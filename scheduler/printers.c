@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.93.2.63 2004/06/30 18:24:18 mike Exp $"
+ * "$Id: printers.c,v 1.93.2.64 2004/07/01 05:55:28 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -113,7 +113,9 @@ AddPrinter(const char *name)	/* I - Name of printer */
 
   SetString(&p->error_policy, "");
   SetString(&p->op_policy, DefaultPolicy);
- 
+
+  p->op_policy_ptr = DefaultPolicyPtr;
+
   if (MaxPrinterHistory)
     p->history = calloc(MaxPrinterHistory, sizeof(ipp_t *));
 
@@ -2468,5 +2470,5 @@ write_irix_state(printer_t *p)		/* I - Printer to update */
 
 
 /*
- * End of "$Id: printers.c,v 1.93.2.63 2004/06/30 18:24:18 mike Exp $".
+ * End of "$Id: printers.c,v 1.93.2.64 2004/07/01 05:55:28 mike Exp $".
  */
