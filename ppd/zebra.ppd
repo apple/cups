@@ -1,6 +1,6 @@
 *PPD-Adobe: "4.3"
 *%
-*% "$Id: zebra.ppd,v 1.1 2004/05/11 20:13:30 mike Exp $"
+*% "$Id: zebra.ppd,v 1.1.2.1 2004/05/11 20:16:05 mike Exp $"
 *%
 *%   Sample Zebra label printer driver PPD file for the Common UNIX Printing
 *%   System (CUPS).
@@ -31,7 +31,7 @@
 *Manufacturer:	"ESP"
 *Product:	"(GNU Ghostscript)"
 *Product:	"(ESP Ghostscript)"
-*cupsVersion:	1.1
+*cupsVersion:	1.2
 *cupsManualCopies: False
 *cupsFilter:	"application/vnd.cups-raster 0 rastertodymo"
 *cupsModelNumber: 16
@@ -130,5 +130,5 @@
 *Font ZapfChancery-MediumItalic: Standard "(001.007S)" Standard ROM
 *Font ZapfDingbats: Special "(001.004S)" Standard ROM
 *%
-*% End of "$Id: zebra.ppd,v 1.1 2004/05/11 20:13:30 mike Exp $".
+*% End of "$Id: zebra.ppd,v 1.1.2.1 2004/05/11 20:16:05 mike Exp $".
 *%

@@ -1,9 +1,9 @@
 /*
- * "$Id: rastertodymo.c,v 1.4.2.8 2003/11/05 19:20:43 mike Exp $"
+ * "$Id: rastertodymo.c,v 1.4.2.9 2004/05/11 20:16:05 mike Exp $"
  *
- *   DYMO label printer filter for the Common UNIX Printing System (CUPS).
+ *   Label printer filter for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2001 by Easy Software Products.
+ *   Copyright 2001-2004 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -30,7 +30,6 @@
  *   EndPage()      - Finish a page of graphics.
  *   Shutdown()     - Shutdown the printer.
  *   CancelJob()    - Cancel the current job...
- *   CompressData() - Compress a line of graphics.
  *   OutputLine()   - Output a line of graphics.
  *   main()         - Main entry and processing of driver.
  */
@@ -49,12 +48,36 @@
 
 
 /*
+ * This driver filter currently supports Dymo and Zebra label printers.
+ *
+ * The Dymo portion of the driver has been tested with the 300, 330,
+ * and 330 Turbo label printers; it may also work with older models.
+ * The Dymo printers support printing at 136, 203, and 300 DPI.
+ *
+ * The Zebra portion of the driver has been tested with the 2844Z label
+ * printer; it may also work with other models.  The driver supports both
+ * ZPL and ZPL II as defined in Zebra's on-line developer documentation.
+ */
+
+/*
+ * Model number constants...
+ */
+
+#define DYMO_3x0	0		/* Dymo Labelwriter 300/330/330 Turbo */
+
+#define ZEBRA_ZPL	0x10		/* Zebra ZPL-based printers */
+#define ZEBRA_ZPL2	0x11		/* Zebra ZPL II-based printers */
+
+
+/*
  * Globals...
  */
 
 unsigned char	*Buffer;		/* Output buffer */
-int		Page,			/* Current page */
-		Feed;			/* Number of lines to skip */
+int		ModelNumber,		/* cupsModelNumber attribute */
+		Page,			/* Current page */
+		Feed,			/* Number of lines to skip */
+		Cancelled;		/* Non-zero if job is cancelled */
 
 
 /*
@@ -63,11 +86,9 @@ int		Page,			/* Current page */
 
 void	Setup(void);
 void	StartPage(cups_page_header_t *header);
-void	EndPage(void);
-
+void	EndPage(cups_page_header_t *header);
 void	CancelJob(int sig);
-
-/**** MRS - supported resolutions = 136, 203, 300 ****/
+void	OutputLine(cups_page_header_t *header);
 
 
 /*
@@ -77,21 +98,45 @@ void	CancelJob(int sig);
 void
 Setup(void)
 {
-  int	i;		/* Looping var */
+  int		i;			/* Looping var */
+  ppd_file_t	*ppd;			/* PPD file */
 
 
  /*
-  * Clear any remaining data...
+  * Get the model number from the PPD file...
   */
 
-  for (i = 0; i < 100; i ++)
-    putchar(0x1b);
+  if ((ppd = ppdOpenFile(getenv("PPD"))) != NULL)
+  {
+    ModelNumber = ppd->model_number;
+    ppdClose(ppd);
+  }
 
  /*
-  * Reset the printer...
+  * Initialize based on the model number...
   */
 
-  printf("\033@");
+  switch (ModelNumber)
+  {
+    case DYMO_3x0 :
+       /*
+	* Clear any remaining data...
+	*/
+
+	for (i = 0; i < 100; i ++)
+	  putchar(0x1b);
+
+       /*
+	* Reset the printer...
+	*/
+
+	fputs("\033@", stdout);
+	break;
+
+    case ZEBRA_ZPL :
+    case ZEBRA_ZPL2 :
+        break;
+  }
 }
 
 
@@ -103,8 +148,6 @@ void
 StartPage(cups_page_header_t *header)	/* I - Page header */
 {
   int	length;				/* Actual label length */
-
-
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
   struct sigaction action;		/* Actions for POSIX signals */
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET */
@@ -127,16 +170,38 @@ StartPage(cups_page_header_t *header)	/* I - Page header */
   signal(SIGTERM, CancelJob);
 #endif /* HAVE_SIGSET */
 
- /*
-  * Setup printer/job attributes...
-  */
+  switch (ModelNumber)
+  {
+    case DYMO_3x0 :
+       /*
+	* Setup printer/job attributes...
+	*/
 
-  length = header->PageSize[1] * header->HWResolution[1] / 72;
+	length = header->PageSize[1] * header->HWResolution[1] / 72;
 
-  printf("\033L%c%c", length >> 8, length);
-  printf("\033D%c", header->cupsBytesPerLine);
+	printf("\033L%c%c", length >> 8, length);
+	printf("\033D%c", header->cupsBytesPerLine);
 
-  printf("\033%c", header->cupsCompression + 'c'); /* Darkness */
+	printf("\033%c", header->cupsCompression + 'c'); /* Darkness */
+	break;
+
+    case ZEBRA_ZPL :
+    case ZEBRA_ZPL2 :
+       /*
+        * Set darkness...
+	*/
+
+	printf("~SD%02d\n", header->cupsCompression);
+
+       /*
+        * Start bitmap graphics...
+	*/
+
+        printf("~DGR:CUPS.GRF,%d,%d,\n",
+	       header->cupsHeight * header->cupsBytesPerLine,
+	       header->cupsBytesPerLine);
+        break;
+  }
 
  /*
   * Allocate memory for a line of graphics...
@@ -152,20 +217,65 @@ StartPage(cups_page_header_t *header)	/* I - Page header */
  */
 
 void
-EndPage(void)
+EndPage(cups_page_header_t *header)	/* I - Page header */
 {
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
-  struct sigaction action;	/* Actions for POSIX signals */
+  struct sigaction action;		/* Actions for POSIX signals */
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET */
 
 
- /*
-  * Eject the current page...
-  */
+  switch (ModelNumber)
+  {
+    case DYMO_3x0 :
+       /*
+	* Eject the current page...
+	*/
 
-  printf("\033E");
+	fputs("\033E", stdout);
 
-  fflush(stdout);
+	fflush(stdout);
+	break;
+
+    case ZEBRA_ZPL :
+    case ZEBRA_ZPL2 :
+        if (Cancelled)
+	{
+	 /*
+	  * Cancel bitmap download...
+	  */
+
+	  puts("~DN");
+	  break;
+	}
+
+       /*
+        * Start label, set origin and length...
+	*/
+
+        puts("^XA");
+	puts("^LH0,0");
+	printf("^LL%d\n", header->cupsHeight);
+
+       /*
+        * Cut labels if requested...
+	*/
+
+	if (header->CutMedia)
+	  puts("^MMC");
+
+       /*
+        * Display the label image...
+	*/
+
+	puts("~FO0,0^XGR:CUPS.GRF,1,1^FS");
+
+       /*
+        * End the label and eject...
+	*/
+
+        puts("^XZ");
+        break;
+  }
 
  /*
   * Unregister the signal handler...
@@ -198,25 +308,84 @@ EndPage(void)
 void
 CancelJob(int sig)			/* I - Signal */
 {
-  int	i;				/* Looping var */
-
+ /*
+  * Tell the main loop to stop...
+  */
 
   (void)sig;
 
- /*
-  * Send out lots of ESC bytes to clear out any pending raster data...
-  */
+  Cancelled = 1;
+}
 
-  for (i = 0; i < 100; i ++)
-    putchar(0x1b);
 
- /*
-  * End the current page and exit...
-  */
+/*
+ * 'OutputLine()' - Output a line of graphics...
+ */
 
-  EndPage();
+void
+OutputLine(cups_page_header_t *header)	/* I - Page header */
+{
+  int		i;			/* Looping var */
+  unsigned char	*ptr;			/* Pointer into buffer */
 
-  exit(0);
+
+  switch (ModelNumber)
+  {
+    case DYMO_3x0 :
+       /*
+	* See if the line is blank; if not, write it to the printer...
+	*/
+
+	if (Buffer[0] ||
+            memcmp(Buffer, Buffer + 1, header->cupsBytesPerLine - 1))
+	{
+          if (Feed)
+	  {
+	    while (Feed > 255)
+	    {
+	      printf("\033f\001%c", 255);
+	      Feed -= 255;
+	    }
+
+	    printf("\033f\001%c", Feed);
+	    Feed = 0;
+          }
+
+          putchar(0x16);
+	  fwrite(Buffer, header->cupsBytesPerLine, 1, stdout);
+	  fflush(stdout);
+
+#ifdef __sgi
+	 /*
+          * This hack works around a bug in the IRIX serial port driver when
+	  * run at high baud rates (e.g. 115200 baud)...  This results in
+	  * slightly slower label printing, but at least the labels come
+	  * out properly.
+	  */
+
+	  sginap(1);
+#endif /* __sgi */
+	}
+	else
+          Feed ++;
+	break;
+
+    case ZEBRA_ZPL :
+    case ZEBRA_ZPL2 :
+        for (i = header->cupsBytesPerLine, ptr = Buffer; i > 0; i --, ptr ++)
+#if 1
+	  if (!*ptr && (i == 1 || !memcmp(ptr, ptr + 1, i - 1)))
+	  {
+	    putchar(',');
+	    break;
+	  }
+	  else
+#endif /* 0 */
+	    printf("%02X", *ptr);
+
+        putchar('\n');
+        break;
+  }
 }
 
 
@@ -224,14 +393,14 @@ CancelJob(int sig)			/* I - Signal */
  * 'main()' - Main entry and processing of driver.
  */
 
-int			/* O - Exit status */
-main(int  argc,		/* I - Number of command-line arguments */
-     char *argv[])	/* I - Command-line arguments */
+int					/* O - Exit status */
+main(int  argc,				/* I - Number of command-line arguments */
+     char *argv[])			/* I - Command-line arguments */
 {
-  int			fd;	/* Raster data file */
-  cups_raster_t		*ras;	/* Raster stream for printing */
-  cups_page_header_t	header;	/* Page header from file */
-  int			y;	/* Current line */
+  int			fd;		/* File descriptor */
+  cups_raster_t		*ras;		/* Raster stream for printing */
+  cups_page_header_t	header;		/* Page header from file */
+  int			y;		/* Current line */
 
 
  /*
@@ -261,7 +430,7 @@ main(int  argc,		/* I - Number of command-line arguments */
 
   if (argc == 7)
   {
-    if ((fd = open(argv[6], O_RDONLY)) < 0)
+    if ((fd = open(argv[6], O_RDONLY)) == -1)
     {
       perror("ERROR: Unable to open raster file - ");
       sleep(1);
@@ -283,7 +452,8 @@ main(int  argc,		/* I - Number of command-line arguments */
   * Process pages as needed...
   */
 
-  Page = 0;
+  Page      = 0;
+  Cancelled = 0;
 
   while (cupsRasterReadHeader(ras, &header))
   {
@@ -305,7 +475,7 @@ main(int  argc,		/* I - Number of command-line arguments */
     * Loop for each line on the page...
     */
 
-    for (y = 0; y < header.cupsHeight; y ++)
+    for (y = 0; y < header.cupsHeight && !Cancelled; y ++)
     {
      /*
       * Let the user know how far we have progressed...
@@ -323,41 +493,10 @@ main(int  argc,		/* I - Number of command-line arguments */
         break;
 
      /*
-      * See if the line is blank; if not, write it to the printer...
+      * Write it to the printer...
       */
 
-      if (Buffer[0] ||
-          memcmp(Buffer, Buffer + 1, header.cupsBytesPerLine - 1))
-      {
-        if (Feed)
-	{
-	  while (Feed > 255)
-	  {
-	    printf("\033f\001%c", 255);
-	    Feed -= 255;
-	  }
-
-	  printf("\033f\001%c", Feed);
-	  Feed = 0;
-        }
-
-        putchar(0x16);
-	fwrite(Buffer, header.cupsBytesPerLine, 1, stdout);
-	fflush(stdout);
-
-#ifdef __sgi
-       /*
-        * This hack works around a bug in the IRIX serial port driver when
-	* run at high baud rates (e.g. 115200 baud)...  This results in
-	* slightly slower label printing, but at least the labels come
-	* out properly.
-	*/
-
-	sginap(1);
-#endif /* __sgi */
-      }
-      else
-        Feed ++;
+      OutputLine(&header);
     }
 
    /*
@@ -365,6 +504,9 @@ main(int  argc,		/* I - Number of command-line arguments */
     */
 
     EndPage();
+
+    if (Cancelled)
+      break;
   }
 
  /*
@@ -372,7 +514,7 @@ main(int  argc,		/* I - Number of command-line arguments */
   */
 
   cupsRasterClose(ras);
-  if (fd)
+  if (fd != 0)
     close(fd);
 
  /*
@@ -382,12 +524,12 @@ main(int  argc,		/* I - Number of command-line arguments */
   if (Page == 0)
     fputs("ERROR: No pages found!\n", stderr);
   else
-    fputs("INFO: " CUPS_SVERSION " is ready to print.\n", stderr);
+    fputs("INFO: Ready to print.\n", stderr);
 
   return (Page == 0);
 }
 
 
 /*
- * End of "$Id: rastertodymo.c,v 1.4.2.8 2003/11/05 19:20:43 mike Exp $".
+ * End of "$Id: rastertodymo.c,v 1.4.2.9 2004/05/11 20:16:05 mike Exp $".
  */
