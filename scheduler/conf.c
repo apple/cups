@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.27 1999/09/09 13:13:01 mike Exp $"
+ * "$Id: conf.c,v 1.28 1999/09/17 19:28:53 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -1148,7 +1148,7 @@ get_address(char               *value,		/* I - Value string */
     case 2 :
         break;
     default :
-	puts("sscanf failed!");
+	LogMessage(LOG_ERROR, "Unable to decode address \"%s\"!", value);
         return (0);
   }
 
@@ -1159,7 +1159,7 @@ get_address(char               *value,		/* I - Value string */
   if (hostname[0] != '\0')
   {
     if (isdigit(hostname[0]))
-      address->sin_addr.s_addr = htonl(inet_addr(hostname));
+      address->sin_addr.s_addr = inet_addr(hostname);
     else
     {
       if ((host = gethostbyname(hostname)) == NULL)
@@ -1191,5 +1191,5 @@ get_address(char               *value,		/* I - Value string */
 
 
 /*
- * End of "$Id: conf.c,v 1.27 1999/09/09 13:13:01 mike Exp $".
+ * End of "$Id: conf.c,v 1.28 1999/09/17 19:28:53 mike Exp $".
  */
