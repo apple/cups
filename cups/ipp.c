@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.55.2.32 2003/03/26 20:20:18 mike Exp $"
+ * "$Id: ipp.c,v 1.55.2.33 2003/03/26 20:31:56 mike Exp $"
  *
  *   Internet Printing Protocol support functions for the Common UNIX
  *   Printing System (CUPS).
@@ -2351,12 +2351,15 @@ ipp_length(ipp_t *ipp,				/* I - IPP request or collection */
   }
 
  /*
-  * Finally, add 1 byte for the "end of attributes/collection" tag and return...
+  * Finally, add 1 byte for the "end of attributes" tag and return...
   */
 
-  DEBUG_printf(("bytes = %d\n", bytes + 1));
+  if (!collection)
+    bytes ++;
 
-  return (bytes + 1);
+  DEBUG_printf(("bytes = %d\n", bytes));
+
+  return (bytes);
 }
 
 
@@ -2474,5 +2477,5 @@ ipp_write_file(int         *fd,			/* I - File descriptor */
 
 
 /*
- * End of "$Id: ipp.c,v 1.55.2.32 2003/03/26 20:20:18 mike Exp $".
+ * End of "$Id: ipp.c,v 1.55.2.33 2003/03/26 20:31:56 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: testipp.c,v 1.1.2.1 2003/03/21 18:07:34 mike Exp $"
+ * "$Id: testipp.c,v 1.1.2.2 2003/03/26 20:31:57 mike Exp $"
  *
  *   IPP test program for the Common UNIX Printing System (CUPS).
  *
@@ -89,6 +89,7 @@ main(int  argc,			/* I - Number of command-line arguments */
   ipp_t		*col;		/* Collection */
   ipp_t		*request;	/* Request */
   ipp_state_t	state;		/* State */
+  int		length;		/* Length of data */
 
 
   request = ippNew();
@@ -100,6 +101,11 @@ main(int  argc,			/* I - Number of command-line arguments */
   col = ippNew();
   ippAddString(col, IPP_TAG_JOB, IPP_TAG_KEYWORD, "media-color", NULL, "blue");
   ippAddCollection(request, IPP_TAG_JOB, "media-col", col);
+
+  length = ippLength(request);
+  if (length != sizeof(collection))
+    printf("ERROR ippLength didn't compute the correct length (%d instead of %d bytes!)\n",
+           length, sizeof(collection));
 
   wused = 0;
   while ((state = ippWriteIO(wbuffer, write_cb, 1, NULL, request)) != IPP_DATA)
@@ -212,5 +218,5 @@ write_cb(void        *data,
 
 
 /*
- * End of "$Id: testipp.c,v 1.1.2.1 2003/03/21 18:07:34 mike Exp $".
+ * End of "$Id: testipp.c,v 1.1.2.2 2003/03/26 20:31:57 mike Exp $".
  */
