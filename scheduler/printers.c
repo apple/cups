@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.91 2001/03/15 19:26:23 andy Exp $"
+ * "$Id: printers.c,v 1.92 2001/03/15 20:00:57 andy Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -330,7 +330,8 @@ DeletePrinter(printer_t *p)	/* I - Printer to delete */
   * Remove this printer from any classes...
   */
 
-  DeletePrinterFromClasses(p);
+  if (!(p->type & (CUPS_PRINTER_CLASS | CUPS_PRINTER_IMPLICIT)))
+    DeletePrinterFromClasses(p);
 
  /*
   * Free all memory used by the printer...
@@ -1781,5 +1782,5 @@ write_printcap(void)
 
 
 /*
- * End of "$Id: printers.c,v 1.91 2001/03/15 19:26:23 andy Exp $".
+ * End of "$Id: printers.c,v 1.92 2001/03/15 20:00:57 andy Exp $".
  */

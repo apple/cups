@@ -1,5 +1,5 @@
 /*
- * "$Id: classes.c,v 1.33 2001/03/15 19:26:22 andy Exp $"
+ * "$Id: classes.c,v 1.34 2001/03/15 20:00:57 andy Exp $"
  *
  *   Printer class routines for the Common UNIX Printing System (CUPS).
  *
@@ -165,32 +165,25 @@ DeletePrinterFromClass(printer_t *c,	/* I - Class to delete from */
   }
 
  /*
-  * If there are no more printers in this class, delete the class...
+  * Recompute the printer type mask as needed...
   */
 
-  if (c->num_printers == 0)
+  if (c->num_printers > 0)
   {
-    DeletePrinter(c);
-    return;
+    type    = c->type & (CUPS_PRINTER_CLASS | CUPS_PRINTER_IMPLICIT);
+    c->type = ~CUPS_PRINTER_REMOTE;
+
+    for (i = 0; i < c->num_printers; i ++)
+      c->type &= c->printers[i]->type;
+
+    c->type |= type;
+
+   /*
+    * Update the IPP attributes...
+    */
+
+    SetPrinterAttrs(c);
   }
-
- /*
-  * Recompute the printer type mask...
-  */
-
-  type    = c->type & (CUPS_PRINTER_CLASS | CUPS_PRINTER_IMPLICIT);
-  c->type = ~CUPS_PRINTER_REMOTE;
-
-  for (i = 0; i < c->num_printers; i ++)
-    c->type &= c->printers[i]->type;
-
-  c->type |= type;
-
- /*
-  * Update the IPP attributes...
-  */
-
-  SetPrinterAttrs(c);
 }
 
 
@@ -202,7 +195,6 @@ void
 DeletePrinterFromClasses(printer_t *p)	/* I - Printer to delete */
 {
   printer_t	*c,			/* Pointer to current class */
-		*prev,
 		*next;			/* Pointer to next class */
 
 
@@ -211,12 +203,25 @@ DeletePrinterFromClasses(printer_t *p)	/* I - Printer to delete */
   * from each class listed...
   */
 
-  for (c = Printers, prev = NULL; c != NULL; prev = c, c = next)
+  for (c = Printers; c != NULL; c = next)
   {
     next = c->next;
 
     if (c->type & (CUPS_PRINTER_CLASS | CUPS_PRINTER_IMPLICIT))
       DeletePrinterFromClass(c, p);
+  }
+
+ /*
+  * Then clean out any empty classes...
+  */
+
+  for (c = Printers; c != NULL; c = next)
+  {
+    next = c->next;
+
+    if ((c->type & (CUPS_PRINTER_CLASS | CUPS_PRINTER_IMPLICIT)) &&
+        c->num_printers == 0)
+      DeletePrinter(c);
   }
 }
 
@@ -625,5 +630,5 @@ SaveAllClasses(void)
 
 
 /*
- * End of "$Id: classes.c,v 1.33 2001/03/15 19:26:22 andy Exp $".
+ * End of "$Id: classes.c,v 1.34 2001/03/15 20:00:57 andy Exp $".
  */
