@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c,v 1.51.2.21 2002/08/14 05:34:13 mike Exp $"
+ * "$Id: ppd.c,v 1.51.2.22 2002/08/23 02:32:39 mike Exp $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -96,10 +96,15 @@ static ppd_attr_t	*ppd_add_attr(ppd_file_t *ppd, const char *name,
 			              const char *spec, const char *value);
 static ppd_choice_t	*ppd_add_choice(ppd_option_t *option, const char *name);
 static ppd_size_t	*ppd_add_size(ppd_file_t *ppd, const char *name);
+#ifndef __APPLE__
 static int		ppd_compare_groups(ppd_group_t *g0, ppd_group_t *g1);
 static int		ppd_compare_options(ppd_option_t *o0, ppd_option_t *o1);
 static void		ppd_decode(char *string);
+#ifdef __APPLE__
+#  define ppd_fix(s)
+#else
 static void		ppd_fix(char *string);
+#endif /* __APPLE__ */
 static void		ppd_free_group(ppd_group_t *group);
 static void		ppd_free_option(ppd_option_t *option);
 static ppd_ext_option_t	*ppd_get_extopt(ppd_file_t *ppd, const char *name);
@@ -1439,6 +1444,7 @@ ppdOpen(FILE *fp)			/* I - File to read from */
     printf("Premature EOF at %lu...\n", (unsigned long)ftell(fp));
 #endif /* DEBUG */
 
+#ifndef __APPLE__
  /*
   * Make sure that all PPD files with an InputSlot option have an
   * "auto" choice that maps to no specific tray or media type.
@@ -1463,20 +1469,25 @@ ppdOpen(FILE *fp)			/* I - File to read from */
       choice->code = NULL;
     }
   }
+#endif /* !__APPLE__ */
 
  /*
   * Set the option back-pointer for each choice...
   */
 
+#ifndef __APPLE__
   qsort(ppd->groups, ppd->num_groups, sizeof(ppd_group_t),
         (int (*)(const void *, const void *))ppd_compare_groups);
+#endif /* !__APPLE__ */
 
   for (i = ppd->num_groups, group = ppd->groups;
        i > 0;
        i --, group ++)
   {
+#ifndef __APPLE__
     qsort(group->options, group->num_options, sizeof(ppd_option_t),
           (int (*)(const void *, const void *))ppd_compare_options);
+#endif /* !__APPLE__ */
 
     for (j = group->num_options, option = group->options;
          j > 0;
@@ -1486,15 +1497,19 @@ ppdOpen(FILE *fp)			/* I - File to read from */
         option->choices[k].option = (void *)option;
     }
 
+#ifndef __APPLE__
     qsort(group->subgroups, group->num_subgroups, sizeof(ppd_group_t),
           (int (*)(const void *, const void *))ppd_compare_groups);
+#endif /* !__APPLE__ */
 
     for (j = group->num_subgroups, subgroup = group->subgroups;
          j > 0;
 	 j --, subgroup ++)
     {
+#ifndef __APPLE__
       qsort(subgroup->options, subgroup->num_options, sizeof(ppd_option_t),
             (int (*)(const void *, const void *))ppd_compare_options);
+#endif /* !__APPLE__ */
 
       for (k = group->num_options, option = group->options;
            k > 0;
@@ -1654,6 +1669,7 @@ ppd_add_attr(ppd_file_t *ppd,		/* I - PPD file data */
 
   return (temp);
 }
+#endif /* !__APPLE__ */
 
 
 /*
@@ -1717,6 +1733,7 @@ ppd_add_size(ppd_file_t *ppd,		/* I - PPD file */
 }
 
 
+#ifndef __APPLE__
 /*
  * 'ppd_compare_groups()' - Compare two groups.
  */
@@ -1739,6 +1756,7 @@ ppd_compare_options(ppd_option_t *o0,	/* I - First option */
 {
   return (strcasecmp(o0->text, o1->text));
 }
+#endif /* !__APPLE__ */
 
 
 /*
@@ -1793,6 +1811,7 @@ ppd_decode(char *string)		/* I - String to decode */
 }
 
 
+#ifndef __APPLE__
 /*
  * 'ppd_fix()' - Fix WinANSI characters in the range 0x80 to 0x9f to be
  *               valid ISO-8859-1 characters...
@@ -1843,6 +1862,7 @@ ppd_fix(char *string)			/* IO - String to fix */
     if (*p >= 0x80 && *p < 0xa0)
       *p = lut[*p - 0x80];
 }
+#endif /* !__APPLE__ */
 
 
 /*
@@ -2331,5 +2351,5 @@ ppd_read(FILE *fp,			/* I - File to read from */
 
 
 /*
- * End of "$Id: ppd.c,v 1.51.2.21 2002/08/14 05:34:13 mike Exp $".
+ * End of "$Id: ppd.c,v 1.51.2.22 2002/08/23 02:32:39 mike Exp $".
  */
