@@ -1,5 +1,5 @@
 /*
- * "$Id: socket.c,v 1.17.2.11 2003/01/23 16:27:17 mike Exp $"
+ * "$Id: socket.c,v 1.17.2.12 2003/01/29 15:38:44 mike Exp $"
  *
  *   AppSocket backend for the Common UNIX Printing System (CUPS).
  *
@@ -52,6 +52,34 @@
 #  include <arpa/inet.h>
 #  include <netdb.h>
 #endif /* WIN32 */
+
+
+/*
+ * Some OS's don't have hstrerror(), most notably Solaris...
+ */
+
+#ifndef HAVE_HSTRERROR
+#  define hstrerror cups_hstrerror
+
+const char *					/* O - Error string */
+cups_hstrerror(int error)			/* I - Error number */
+{
+  static const char * const errors[] =
+		{
+		  "OK",
+		  "Host not found.",
+		  "Try again.",
+		  "Unrecoverable lookup error.",
+		  "No data associated with name."
+		};
+
+
+  if (error < 0 || error > 4)
+    return ("Unknown hostname lookup error.");
+  else
+    return (errors[error]);
+}
+#endif /* !HAVE_HSTRERROR */
 
 
 /*
@@ -359,5 +387,5 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
 
 /*
- * End of "$Id: socket.c,v 1.17.2.11 2003/01/23 16:27:17 mike Exp $".
+ * End of "$Id: socket.c,v 1.17.2.12 2003/01/29 15:38:44 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: cups-polld.c,v 1.5.2.11 2003/01/24 20:45:20 mike Exp $"
+ * "$Id: cups-polld.c,v 1.5.2.12 2003/01/29 15:38:46 mike Exp $"
  *
  *   Polling daemon for the Common UNIX Printing System (CUPS).
  *
@@ -36,6 +36,34 @@
 #include <errno.h>
 #include <cups/language.h>
 #include <cups/string.h>
+
+
+/*
+ * Some OS's don't have hstrerror(), most notably Solaris...
+ */
+
+#ifndef HAVE_HSTRERROR
+#  define hstrerror cups_hstrerror
+
+const char *					/* O - Error string */
+cups_hstrerror(int error)			/* I - Error number */
+{
+  static const char * const errors[] =
+		{
+		  "OK",
+		  "Host not found.",
+		  "Try again.",
+		  "Unrecoverable lookup error.",
+		  "No data associated with name."
+		};
+
+
+  if (error < 0 || error > 4)
+    return ("Unknown hostname lookup error.");
+  else
+    return (errors[error]);
+}
+#endif /* !HAVE_HSTRERROR */
 
 
 /*
@@ -379,5 +407,5 @@ poll_server(http_t      *http,		/* I - HTTP connection */
 
 
 /*
- * End of "$Id: cups-polld.c,v 1.5.2.11 2003/01/24 20:45:20 mike Exp $".
+ * End of "$Id: cups-polld.c,v 1.5.2.12 2003/01/29 15:38:46 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.77.2.22 2003/01/29 00:21:54 mike Exp $"
+ * "$Id: conf.c,v 1.77.2.23 2003/01/29 15:38:45 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -59,6 +59,32 @@
 #ifndef INADDR_NONE
 #  define INADDR_NONE	0xffffffff
 #endif /* !INADDR_NONE */
+
+
+/*
+ * Some OS's don't have hstrerror(), most notably Solaris...
+ */
+
+#ifndef HAVE_HSTRERROR
+const char *					/* O - Error string */
+cups_hstrerror(int error)			/* I - Error number */
+{
+  static const char * const errors[] =
+		{
+		  "OK",
+		  "Host not found.",
+		  "Try again.",
+		  "Unrecoverable lookup error.",
+		  "No data associated with name."
+		};
+
+
+  if (error < 0 || error > 4)
+    return ("Unknown hostname lookup error.");
+  else
+    return (errors[error]);
+}
+#endif /* !HAVE_HSTRERROR */
 
 
 /*
@@ -2165,5 +2191,5 @@ CDSAGetServerCerts(void)
 
 
 /*
- * End of "$Id: conf.c,v 1.77.2.22 2003/01/29 00:21:54 mike Exp $".
+ * End of "$Id: conf.c,v 1.77.2.23 2003/01/29 15:38:45 mike Exp $".
  */
