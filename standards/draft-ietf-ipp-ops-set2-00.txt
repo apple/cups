@@ -1,0 +1,3100 @@
+INTERNET-DRAFT                                               Carl Kugler
+<draft-ietf-ipp-ops-set2-00.txt>                         IBM Corporation
+                                                             T. Hastings
+                                                       Xerox Corporation
+                                                                H. Lewis
+                                                         IBM Corporation
+                                                      September 19, 1999
+
+            Internet Printing Protocol/1.1: Set2 Operations
+
+
+
+Status of this Memo
+
+This document is an Internet-Draft and is in full conformance with all
+provisions of Section 10 of [RFC2026].  Internet-Drafts are working
+documents of the Internet Engineering Task Force (IETF), its areas, and
+its working groups.  Note that other groups may also distribute working
+documents as Internet-Drafts.
+
+Internet-Drafts are draft documents valid for a maximum of six months
+and may be updated, replaced, or obsoleted by other documents at any
+time.  It is inappropriate to use Internet-Drafts as reference material
+or to cite them other than as "work in progress".
+
+The list of current Internet-Drafts can be accessed at
+http://www.ietf.org/ietf/1id-abstracts.txt
+
+The list of Internet-Draft Shadow Directories can be accessed as
+http://www.ietf.org/shadow.html.
+
+                                Abstract
+
+This document specifies 14 additional OPTIONAL operations for use with
+the Internet Printing Protocol/1.0 (IPP) [RFC2565, RFC2566] and IPP/1.1
+[ipp-mod, ipp-pro].  These operations are 7 Printer object operations
+that operators/administrators may perform on a Printer object:
+
+     Set-Printer-Attributes
+     Enable-Printer
+     Disable-Printer
+     Reset-Printer
+     Restart-Printer
+     Non-Process-Run-Out
+     Shutdown-Printer
+
+and 7 Job object operations that end-users may perform on their jobs and
+operators/administrators may perform on any job, depending on
+circumstances:
+
+     Set-Job-Attributes
+     Reprocess-Job
+     Cancel-Current-Job  (though the target is the Printer object)
+
+Kugler, Hastings, Lewis                                        [Page 1]
+                       Expires:  March 19, 200
+
+
+
+PWG-DRAFT             IPP/1.1: Set 2 Operations      September 19, 1999
+
+
+     Pause-Current-Job  (though the target is the Printer object)
+     Resume-Job
+     Promote-Job
+     Space-Current-Job  (though the target is the Printer object)
+
+In addition, two operation attributes are defined:  "printer-message-
+from-operator" and "job-message-from-operator" are included to set the
+corresponding Printer and Job Description attributes with the same
+names.  And the "when" operation attribute is added to the IPP/1.1
+Pause-Printer operation.
+
+Finally, new status codes: 'client-error-attributes-not-settable' and
+'server-error-printer-is-in-standby-mode' are added.
+
+The scope of IPP, is characterized in RFC2526 "Design Goals for an
+Internet Printing Protocol".  It is not the intent of this document to
+revise or clarify this scope or conjecture as to the degree of industry
+adoption or trends related to IPP within printing systems.  It is the
+intent of this document to extend the original set of operations - in a
+similar fashion to the Set1 extensions which referred to IPP/1.0 and
+were later incorporated into IPP/1.1.
+
+This document is intended for registration following the registration
+procedures of IPP/1.0 [RFC2566] and IPP/1.1 [ipp-mod].  This version
+includes the comments discussed at the IPP telecon, on 6/23/1999,
+6/30/1999, at the IETF IPP WG meeting, 7/7/99-7/8/99, in Copenhagen, and
+the IPP telecon, 7/17/1999, the August, 1999 IPP meeting in Alaska and
+subsequent phone conferences and discussions.  Specifically, the 9/16
+update refers to this set of extensions simply as "Set2" rather than
+using the term "Administrative" which was misleading, controversial and
+incorrect as an overall description. Also, two new attributes have been
+proposed to clarify the intent of each operation in terms of its target,
+the Printer vs. the Print Job.  Unresolved ISSUES are highlighted like
+this in the .doc and .pdf files.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Kugler, Hastings, Lewis                                        [Page 2]
+                       Expires:  March 19, 2000
+
+
+
+PWG-DRAFT             IPP/1.1: Set 2 Operations      September 19, 1999
+
+
+The full set of IPP documents includes:
+  Design Goals for an Internet Printing Protocol [RFC2567]
+  Rationale for the Structure and Model and Protocol for the Internet
+     Printing Protocol [RFC2568]
+  Internet Printing Protocol/1.1: Model and Semantics (this document)
+  Internet Printing Protocol/1.1: Encoding and Transport [IPP-PRO]
+  Internet Printing Protocol/1.1: Implementer's Guide [IPP-IIG]
+  Mapping between LPD and IPP Protocols [RFC2569]
+
+
+The "Design Goals for an Internet Printing Protocol" document takes a
+broad look at distributed printing functionality, and it enumerates
+real-life scenarios that help to clarify the features that need to be
+included in a printing protocol for the Internet.  It identifies
+requirements for three types of users: end users, operators, and
+administrators.  It calls out a subset of end user requirements that are
+satisfied in IPP/1.0.  A few OPTIONAL operator operations have been
+added to IPP/1.1.
+
+The "Rationale for the Structure and Model and Protocol for the Internet
+Printing Protocol" document describes IPP from a high level view,
+defines a roadmap for the various documents that form the suite of IPP
+specification documents, and gives background and rationale for the IETF
+working group's major decisions.
+
+The "Internet Printing Protocol/1.1: Encoding and Transport" document is
+a formal mapping of the abstract operations and attributes defined in
+the model document onto HTTP/1.1 [RFC2616].  It defines the encoding
+rules for a new Internet MIME media type called "application/ipp".  This
+document also defines the rules for transporting over HTTP a message
+body whose Content-Type is "application/ipp".  This document defines a
+new scheme named 'ipp' for identifying IPP printers and jobs.
+
+The "Internet Printing Protocol/1.1: Implementer's Guide" document gives
+insight and advice to implementers of IPP clients and IPP objects.  It
+is intended to help them understand IPP/1.1 and some of the
+considerations that may assist them in the design of their client and/or
+IPP object implementations.  For example, a typical order of processing
+requests is given, including error checking.  Motivation for some of the
+specification decisions is also included.
+
+The "Mapping between LPD and IPP Protocols" document gives some advice
+to implementers of gateways between IPP and LPD (Line Printer Daemon)
+implementations.
+
+
+
+
+
+
+
+
+
+Kugler, Hastings, Lewis                                        [Page 3]
+                       Expires:  March 19, 2000
+
+
+
+PWG-DRAFT             IPP/1.1: Set 2 Operations      September 19, 1999
+
+
+                           Table of Contents
+
+
+1. Introduction.....................................................6
+
+2. New objects......................................................6
+ 2.1 Interpreter object............................................6
+
+3. New Operation attributes.........................................6
+ 3.1 New operation attribute:  "printer-message-from-operator"
+ (text(127))6
+ 3.2 New operation attribute:  "job-message-from-operator" (text(127))
+     8
+ 3.3 New operation attribute for Get-Printer-Attributes:  "factory-
+ settings" (boolean)................................................9
+ 3.4 New operation attribute for Pause-Printer:  "when" (type2 keyword)
+     10
+ 3.5 New OPTIONAL operation attribute for any Job or Printer operation:
+ "device-name" (name(127)).........................................11
+  3.5.1  Revised text for [ipp-mod] for the "device-name" extension12
+ 3.6 Summary of the operation attributes for the Printer operations13
+ 3.7 Summary of the operation attributes for the Job operations...13
+
+4. New Printer Description Attributes..............................15
+ 4.1 printer-settable-attributes (1setOf type2 keyword)...........15
+ 4.2 interpreter-settable-attributes (1setOf type2 keyword).......15
+ 4.3 job-settable-attributes (1setOf type2 keyword)...............16
+ 4.4 printer-controls-other-protocols (boolean)...................16
+ 4.5 printer-message-time (integer(MIN:MAX))......................18
+ 4.6 printer-message-date-time (dateTime).........................19
+ 4.7 printer-message-operation (type2 keyword)....................19
+ 4.8 when-values-supported (1setOf type2 keyword).................20
+ 4.9 device-names-supported (1setOf name(127))....................21
+
+5. Additional values for "printer-state-reasons" and "job-state-reasons"
+attributes.........................................................21
+ 5.1 Value for "printer-state-reasons":  'standby'................21
+ 5.2 Value for "job-state-reasons":  'job-paused'.................22
+
+6. New status codes................................................22
+ 6.1 New status code: 'client-error-attributes-not-settable'......22
+ 6.2 New status code: 'server-error-printer-is-in-standby-mode'...23
+
+7. Summary of Set 2 operations and Operation-Id Assignments........23
+ 7.1 Printer Operations...........................................24
+  7.1.1  Set-Printer-Attributes Operation.........................24
+  7.1.2  Disable-Printer Operation................................29
+  7.1.3  Enable-Printer Operation.................................30
+  7.1.4  Reset-Printer operation..................................31
+  7.1.5  Restart-Printer operation................................32
+  7.1.6  Non-Process-Run-Out Operation............................33
+
+
+Kugler, Hastings, Lewis                                        [Page 4]
+                       Expires:  March 19, 2000
+
+
+
+PWG-DRAFT             IPP/1.1: Set 2 Operations      September 19, 1999
+
+
+  7.1.7  Shutdown-Printer Operation...............................34
+ 7.2 Job Operations...............................................36
+  7.2.1  Set-Job-Attributes.......................................36
+  7.2.2  Reprocess-Job Operation..................................40
+  7.2.3  Cancel-Current-Job Operation.............................40
+  7.2.4  Pause-Current-Job operation..............................41
+  7.2.5  Resume-Job operation.....................................43
+  7.2.6  Promote-Job operation....................................43
+  7.2.7  Space-Current-Job operation..............................44
+
+8. IANA Considerations.............................................45
+
+9. Internationalization Considerations.............................45
+
+10.Security Considerations........................................46
+
+11.Author's Addresses.............................................46
+
+12.References.....................................................46
+
+13.Change History.................................................47
+ 13.1Changes to the July 19, 1999 version to make the September 19,
+ 1999 version......................................................47
+ 13.2Changes to the June 30, 1999 version to make the July 19, 1999
+ version    47
+
+14.Appendix A: Full Copyright Statement...........................49
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Kugler, Hastings, Lewis                                        [Page 5]
+                       Expires:  March 19, 2000
+
+
+
+PWG-DRAFT             IPP/1.1: Set 2 Operations      September 19, 1999
+
+
+1. Introduction
+
+
+The Internet Printing Protocol (IPP) is an application level protocol
+that can be used for distributed printing using Internet tools and
+technologies.  IPP version 1.1 (IPP/1.1) focuses only on end user
+functionality with a few administrative operations included.  This
+document defines additional OPTIONAL end user, operation, and
+administrator operations used to control Jobs and Printers. This
+document is a registration proposal for an extension to IPP/1.0 and
+IPP/1.1 following the registration procedures in those documents.
+
+
+
+2. New objects
+
+
+This section defines the new Interpreter object.
+
+
+2.1 Interpreter object
+
+
+The Interpreter object models the document format interpreters that are
+contained in the Printer object.  Depending on implementation, the
+Printer object attributes whose values depend on the interpreter, i.e.,
+on the "document-format" of the document being processed, are considered
+to be Interpreter object attributes instead.  A Get-Printer-Attributes
+operations returns Printer and Interpreter objects as specified in the
+"requested-attributes" supplied by the client.  Depending on the value
+of the "document-format" attribute supplied by the client in the Get-
+Printer-Attributes request (or the "document-format-default", if the
+client omits the "document-format" attribute), selects the corresponding
+Interpreter object.
+
+Note:  the addition of the Interpreter object is completely compatible
+with IPP/1.0 and IPP/1.1 (see the description of the "document-format"
+operation attribute in [ipp-mod] section 3.2.5.1 Get-Printer-Attributes
+request).  The protocol and semantics are the same whether or not the
+Interpreter object is used to distinguish attributes that depend on the
+"document-format".
+
+
+3. New Operation attributes
+
+This section defines the new "printer-message-from-operation" and "job-
+message-from-operator" operation attributes that set the corresponding
+Printer and Job Description attributes.
+
+3.1 New operation attribute:  "printer-message-from-operator"
+(text(127))
+
+Type of registration:  attribute
+
+
+Kugler, Hastings, Lewis                                        [Page 6]
+                       Expires:  March 19, 2000
+
+
+
+PWG-DRAFT             IPP/1.1: Set 2 Operations      September 19, 1999
+
+
+Proposed keyword name of this attribute:  "printer-message-from-
+operator"
+Types of attribute (Operation, Job Template, Job Description, Printer
+Description):  Operation
+Operations to be used with if the attribute is an operation attribute:
+See below
+Object (Job, Printer, etc. if bound to an object):   Printer (already in
+IPP/1.0 and IPP/1.1)
+Attribute syntax(es) (include 1setOf and range as in Section 4.2):
+text(127)
+
+Specification of this attribute (follow the style of IPP Model Section
+4.2):
+
+"printer-message-from-operator" (text(127))
+     The client OPTIONALLY supplies this attribute.  The Printer object
+     SHOULD supports this operation attribute if it supports the
+     corresponding Printer Description attribute.  The value of this
+     attribute is a message from the operator about the Printer object
+     on which the operator is performing the operation.  If supported,
+     the Printer copies the value to the Printer's "printer-message-
+     from-operator" Printer Description attribute (see [ipp-mod] section
+     4.4.25), automatically sets the value of the Printer's "printer-
+     message-time" with the current value of the Printer's "printer-up-
+     time" attribute, the value of the "printer-message-date-time" with
+     the current value of the Printer's printer-current-date-time"
+     attribute, and the value of the Printer's "printer-message-
+     operation" with the operation-id value of this operation (see [ipp-
+     mod] section 4.4.15).
+
+     If the client omits this attribute, the Printer does not change the
+     value of its "printer-message-from-operator", "printer-message-
+     time", "printer-message-date-time", and "printer-message-operation"
+     Printer Description attributes.
+
+     If the client supplies this attribute with a zero-length text value
+     or with a value consisting solely of white space, the Printer
+     copies that value as any other value to the Printer's "printer-
+     message-from-operator" and sets the "printer-message-time",
+     "printer-message-date-time", and "printer-message-operation"
+     attributes.  Supplying such a value is the way that the operator
+     indicates that there is no longer a printer message from the
+     operator (rather than using the "out-of-band" 'no-value' value).
+
+
+This operation attribute is defined for use with the following operator
+operations on the Printer object:
+
+     Pause-Printer - see [ipp-mod] section 3.2.7
+     Resume-Printer - see [ipp-mod] section 3.2.8
+     Purge-Jobs - see [ipp-mod] section 3.2.9
+     Disable-Printer - see section 7.1.2
+
+Kugler, Hastings, Lewis                                        [Page 7]
+                       Expires:  March 19, 2000
+
+
+
+PWG-DRAFT             IPP/1.1: Set 2 Operations      September 19, 1999
+
+
+     Enable-Printer - see section 7.1.3
+     Reset-Printer - see section 7.1.4
+     Restart-Printer - see section 7.1.5
+     Non-Process-Run-Out - see section 7.1.6
+     Shutdown-Printer - see section 7.1.7
+
+
+The "printer-message-from-operator" operation attribute MUST NOT be
+supported as an operation attribute for the Set-Printer-Attributes
+operation.  If the operator wants to set the Printer's "printer-message-
+from-operator" Printer Description attribute when issuing the Set-
+Printer-Attributes operation, the client supplies the "printer-message-
+from-operator" with its new value as one of the Printer Description
+attributes in Group 2 in the request.  The Printer also updates the
+Printer's "printer-message-date-time" and "printer-message-operation"
+Printer Description attributes.  If the client does not explicitly
+supply the "printer-message-from-operator" with its new value, the
+Printer leaves the value of the Printer's "printer-message-from-
+operator" Printer Description attribute unchanged.
+
+
+3.2 New operation attribute:  "job-message-from-operator" (text(127))
+
+Type of registration:  attribute
+Proposed keyword name of this attribute:  "job-message-from-operator"
+Types of attribute (Operation, Job Template, Job Description, Printer
+Description):  Operation
+Operations to be used with if the attribute is an operation attribute:
+See below
+Object (Job, Printer, etc. if bound to an object):   Job (already in
+IPP/1.0 and IPP/1.1)
+Attribute syntax(es) (include 1setOf and range as in Section 4.2):
+text(127)
+
+Specification of this attribute (follow the style of IPP Model Section
+4.2):
+
+"job-message-from-operator" (text(127))
+     The client OPTIONALLY supplies this attribute.  The Printer object
+     SHOULD supports this operation attribute if it supports the
+     corresponding Job Description attribute.  The value of this
+     attribute is a message from the operator about the Job object on
+     which the operator has just performed an operation.  If supported,
+     the Printer copies the value to the Job's "job-message-from-
+     operator" Job Description attribute (see [ipp-mod] section 4.3.16).
+
+     If the client omits this attribute, the Printer does not change the
+     value of its "printer-message-from-operator" Job Description
+     attribute.
+
+     If the client supplies this attribute with a zero-length text value
+     or with a value consisting solely of white space, the Printer
+
+Kugler, Hastings, Lewis                                        [Page 8]
+                       Expires:  March 19, 2000
+
+
+
+PWG-DRAFT             IPP/1.1: Set 2 Operations      September 19, 1999
+
+
+     copies that value as any other value to the job's "job-message-
+     from-operator".  Supplying such a value is the way that the
+     operator indicates that there is no longer a job message from the
+     operator (rather than using the "out-of-band" 'no-value' value).
+
+     Note:  There are no corresponding 'job-message-time", "job-message-
+     date-time", and "job-message-operation" Job Description attributes,
+     since the usual lifetime of a job is limited.
+
+
+This operation attribute is defined for use with the following operator
+operations on the Job object:
+
+     Cancel-Job - see [ipp-mod] section 3.2.4
+     Hold-Job - see [ipp-mod] section 3.3.5
+     Release-Job - see [ipp-mod] section 3.3.6
+     Restart-Job - see [ipp-mod] section 3.3.7
+     Reprocess-Job - see section 7.2.2
+     Cancel-Current-Job - see section 7.2.3
+     Pause-Current-Job - see section 7.2.4
+     Resume-Job - see section 7.2.5
+     Promote-Job - see section 7.2.6
+     Space-Current-Job - see section 7.2.7
+
+
+The "job-message-from-operator" operation attribute MUST NOT be
+supported as an operation attribute for the Set-Job-Attributes
+operation.  If the operator wants to set the Job's "job-message-from-
+operator" Job Description attribute when issuing the Set-Job-Attributes
+operation, the client supplies the "job-message-from-operator" with its
+new value as one of the Job Description attributes in Group 2 in the
+request.  Otherwise, the Printer leaves the value of the Job's "job-
+message-from-operator" Job Description attribute unchanged by not
+explicitly setting the attribute.
+
+
+3.3 New operation attribute for Get-Printer-Attributes:  "factory-
+settings" (boolean)
+
+Type of registration:  attribute
+Proposed keyword name of this attribute:  "factory-settings"
+Types of attribute (Operation, Job Template, Job Description, Printer
+Description):  Operation
+Operations to be used with if the attribute is an operation attribute:
+Get-Printer-Attributes
+Object (Job, Printer, etc. if bound to an object):   N/A
+Attribute syntax(es) (include 1setOf and range as in Section 4.2):
+boolean
+
+Specification of this attribute (follow the style of IPP Model Section
+4.2):
+
+
+
+Kugler, Hastings, Lewis                                        [Page 9]
+                       Expires:  March 19, 2000
+
+
+
+PWG-DRAFT             IPP/1.1: Set 2 Operations      September 19, 1999
+
+
+  "factory-settings" (boolean)
+     The client OPTIONALLY supplies this attribute.  The Printer object
+     OPTIONALLY supports this attribute, if it supports the Set-Printer-
+     Attributes operation.  If the client omits this attribute or
+     supplies the 'false' value, the Printer returns the current values
+     of the requested attributes that are settable, i.e., the values
+     that have been set by previous Set-Printer-Attributes.  If the
+     client supplies the 'true' value, the Printer returns the factory
+     settings, i.e., the inherent values supported by the implementation
+     as shipped from the manufacturer or established at install time.
+     This operation attribute allows an operator to determine which
+     values are supported in an implementation after having modified a
+     settable attribute.  Attributes that are not settable are not
+     affected by this operation attribute, so that the Printer returns
+     the same values for non-settable attribute when either the 'true'
+     or 'false' value has been supplied.  If this operation attribute is
+     supported, both values MUST be supported.
+
+3.4 New operation attribute for Pause-Printer:  "when" (type2 keyword)
+
+Type of registration:  attribute
+Proposed keyword name of this attribute:  "when"
+Types of attribute (Operation, Job Template, Job Description, Printer
+Description):  Operation
+Operations to be used with if the attribute is an operation attribute:
+Pause-Printer, Reset-Printer, Non-Process-Run-Out, Shutdown-Printer, and
+Pause-Current-Job
+Object (Job, Printer, etc. if bound to an object):   N/A
+Attribute syntax(es) (include 1setOf and range as in Section 4.2):
+type2 keyword
+
+Specification of this attribute (follow the style of IPP Model Section
+4.2):
+  "when" (type2 keyword)
+     The client OPTIONALLY supplies this attribute.  The Printer object
+     OPTIONALLY supports this attribute, if it supports this operation.
+     The value of this attribute indicates when to pause, reset, or
+     shutdown the printer.  If the client omits this attribute, the
+     Printer assumes the 'after-current-job' value.  The 'after-current-
+     job' value is REQUIRED to be supported if the "when" attribute is
+     supported; the remaining values are OPTIONAL.
+ISSUE 1: Can a client determine the values of "when" that are supported
+for operations (Pause-Printer, Reset-Printer, Shutdown-Printer, and
+Pause-Current-Job)?
+  TH> Just add a "when-values-supported" that applies to all of the
+  four operations supported, with the exception of Pause-Current-Job.
+  For Pause-Current-Job, only the 'now' and 'after-current-copy' have
+  any meaning, so the other two values ('after-current-job' and
+  'after-all') don't apply.
+
+  HRL> Or, "just say NO". The client can't determine the values of
+
+Kugler, Hastings, Lewis                                       [Page 10]
+                       Expires:  March 19, 2000
+
+
+
+PWG-DRAFT             IPP/1.1: Set 2 Operations      September 19, 1999
+
+
+  "when" supported. The client may specify a value of when and the
+  implementation will do it's best to deliver as close to the desired
+  behavior as possible within the constraints of the device or
+  environment. The client may determine the actual result based on
+  final status and/or notification feedback.
+
+
+     Standard keyword values are:
+          'now' - cancel the currently printing job(s) and shutdown the
+              Printer.  Jobs in the 'held' and 'pending' state remain
+              in those states.
+          'after-current-copy' - shutdown the Printer after the current
+              job finishes printing its current copy.  Jobs in the
+              'held' and 'pending' state remain in those states.
+          'after-current-job' - shutdown the Printer after the current
+              job finishes printing (all its copies).  Jobs in the
+              'held' and 'pending' state remain in those states.
+          'after-all' - shutdown the Printer after all 'pending' jobs
+              finish printing.  Jobs in the 'held' state remain in the
+              'held' state.
+
+
+3.5 New OPTIONAL operation attribute for any Job or Printer operation:
+"device-name" (name(127))
+
+Type of registration:  attribute
+Proposed keyword name of this attribute:  "device-name"
+Types of attribute (Operation, Job Template, Job Description, Printer
+Description):  Operation
+Operations to be used with if the attribute is an operation attribute:
+all
+Object (Job, Printer, etc. if bound to an object):   N/A
+Attribute syntax(es) (include 1setOf and range as in Section 4.2):
+name(127)
+
+Specification of this attribute (follow the style of IPP Model Section
+4.2):
+  "device-name" (name(127))
+     This OPTIONAL Printer operation attribute contains the name of a
+     device which is associated with this Printer object.  The named
+     device is the actual target of the specified Printer operation,
+     that is, the Printer object MUST pass the operation through to the
+     device rather than affecting the Printer object specified by the
+     "printer-uri" operation attribute.  See the Job object attribute
+     "output-device-assigned" in [IPP-MOD] which identifies the named
+     device that the job was assigned to by the Printer object.  See the
+     Printer object attribute "device-names-supported" in section 4.9 of
+     this document.
+
+     ISSUE 2 - Shouldn't the Printer object also be affected?  In other
+     words, if the "device-name" is supplied with the Pause-Printer
+
+
+Kugler, Hastings, Lewis                                       [Page 11]
+                       Expires:  March 19, 2000
+
+
+
+PWG-DRAFT             IPP/1.1: Set 2 Operations      September 19, 1999
+
+
+     operation to pause the actual device, shouldn't the Printer object
+     also enter the 'stopped' state with the 'paused' "printer-state-
+     reasons" value set?
+
+     ISSUE 3 - An implementation is free to support the "device-name"
+     operation attribute on any operation, but NEED NOT support it on
+     all operations, if it supports it on some, correct?
+
+     ISSUE 4 - Could we specify a minimum set of operations which, if
+     supported, MUST also support the "device-name" operation attribute,
+     if the implementation supports the "device-name" operation
+     attribute on any operation?
+
+
+3.5.1 Revised text for [ipp-mod] for the "device-name" extension
+
+The "device-name" extension recommends that the following text be added
+to the IPP-MOD document in section 3.2, "Printer Operations":
+
+     All Printer operations are directed at Printer objects OR at named
+     devices associated with Printer objects.  A client MUST always
+     supply the "printer-uri" operation attribute in order to identify
+     the correct target of the operation.  A client MAY also supply the
+     "device-name" operation attribute in order to pass the operation to
+     the named device (rather than affecting the Printer object
+     specified by "printer-uri")."
+
+     ISSUE 5 (repeat of 2) - Shouldn't the Printer object also be
+     affected?  In other words, if the "device-name" is supplied with
+     the Pause-Printer operation to pause the actual device, shouldn't
+     the Printer object also enter the 'stopped' state with the 'paused'
+     "printer-state-reasons" value set?
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Kugler, Hastings, Lewis                                       [Page 12]
+                       Expires:  March 19, 2000
+
+
+
+PWG-DRAFT             IPP/1.1: Set 2 Operations      September 19, 1999
+
+
+
+
+
+3.6 Summary of the operation attributes for the Printer operations
+
+The following table shows the operation attributes for the Printer
+operations that a client MAY supply in a request.  Operation parameters
+and attributes that a client MUST supply are not shown.  Also
+"requesting-user-name" is not shown, though it is RECOMMENDED that a
+client supply it in every request.
+Legend:
+     R - REQUIRED for a Printer to support
+     O - OPTIONAL for a Printer to support; the Printer ignores the
+attribute if not supported
+
+Operation    Pau  Resu Pur  Get-  Set-  Enab Disa Res  Rest Non  Shu
+Attribute    se-  me-  ge-  Print Print le-  ble- et-  art- -    t
+             Pri  Prin Job  er-   er-   Prin Prin Pri  Prin Pro  dow
+             nte  ter  s    Attri Attri t    ter  nte  ter  ces  n-
+             r              butes butes             r         s-   Pri
+                                                                Run  nte
+                                                                -    r
+                                                                Out
+
+document-                      R     R
+format
+
+factory-                       O
+settings
+
+printer-      O    O    O                  O    O    O    O         O
+message-
+from-
+operator
+
+job-type                                    O    O
+
+when          O                                       O              O
+
+reset-                                                 R
+function
+
+
+synchronize                                                           O
+
+shutdown-                                                             R
+function
+
+device-name   O    O    O    O     O     O    O    O    O    O    O
+
+
+3.7 Summary of the operation attributes for the Job operations
+
+The following table shows the operation attributes for the Job
+operations that a client MAY supply in a request.  Operation attributes
+that specify the Printer or Job object as the target are shown in the
+first two rows, respectively.  Other operation attributes and parameters
+
+
+Kugler, Hastings, Lewis                                       [Page 13]
+                       Expires:  March 19, 2000
+
+
+
+PWG-DRAFT             IPP/1.1: Set 2 Operations      September 19, 1999
+
+
+that a client MUST supply are not shown.  Also "requesting-user-name" is
+not shown, though it is RECOMMENDED that a client supply it in every
+request.
+Legend:
+     R - REQUIRED for a Printer to support
+     O - OPTIONAL for a Printer to support; the Printer ignores the
+attribute if not supported
+
+Operation    Can  Canc Ho  Re Spa  Pau  Re Get-  Set-  Rest Repr  Pro
+Attribute    cel  el-  ld  le ce-  se-  su Job-  Job-  art- oces  mot
+             -    Curr -   as Cur  Cur  me Attr  Attr  Job  s-    e-
+             Job  ent- Jo  e- ren  ren  -  ibut  ibut       Job   Job
+                  Job  b   Jo t-   t-   Jo es    es
+                            b  Job  Job  b
+
+printer-uri        R            R    R
+
+printer-      R         R   R            R    R     R    R    R    R
+uri/job-id
+or job-uri
+
+job-id             R            R    R
+
+requested-                                     R
+attributes
+
+back-space                       O
+
+forward-                         O
+space
+
+
+synchronize                      O    O
+
+when                                  O                          O
+
+job-          O    O    O   O        O   O                O    O    O
+message-
+from-
+operator
+
+message       O         O   O        O   O                O    O    O
+[to-
+operator]
+
+job-hold-               O*  O*                                  O**
+until
+
+device-name   O    O    O   O   O    O   O    O     O    O    O    O
+
+*    The Printer MUST support the "job-hold-until" operation attribute
+if it supports the "job-hold-until" Job Template attribute.
+**  The Printer MUST support the "job-hold-until" operation attribute if
+it supports the Set-Job-Attributes operation, so that the client can
+hold the job with the Reprocess-Job operation and the modify the job
+before releasing it to be processed.
+
+
+
+
+Kugler, Hastings, Lewis                                       [Page 14]
+                       Expires:  March 19, 2000
+
+
+
+PWG-DRAFT             IPP/1.1: Set 2 Operations      September 19, 1999
+
+
+4. New Printer Description Attributes
+
+
+The following new Printer Description attributes are needed to support
+the new operations defined in this document.
+
+
+4.1 printer-settable-attributes (1setOf type2 keyword)
+
+Type of registration:  attribute
+Proposed keyword name of this attribute:  printer-settable-attributes
+Types of attribute (Operation, Job Template, Job Description, Printer
+Description): Printer Description
+Operations to be used with if the attribute is an operation attribute:
+N/A
+Object (Job, Printer, etc. if bound to an object):  Printer
+Attribute syntax(es) (include 1setOf and range as in Section 4.2):
+1setOf type2 keyword
+If attribute syntax is 'keyword' or 'enum', is it type2 or type3:  type2
+If this is a Printer attribute, MAY the value returned depend on
+"document-format" (See Section 6.2):  Yes
+If this is a Job Template attribute, how does its specification depend
+on the value of the "multiple-document-handling" attribute:  N/A
+Specification of this attribute (follow the style of IPP Model Section
+4.2):
+
+4.4.? printer-settable-attributes (1setOf type2 keyword)
+
+This READ-ONLY Printer attribute identifies the Printer object
+attributes that are settable in this implementation, i.e., that are
+settable using the Set-Printer-Attributes operations.  This attribute
+MUST be supported if the Set-Printer-Attributes operations is supported.
+The Printer MUST reject attempts to set any Printer attributes that are
+not in this list, returning the 'client-error-attributes-not-settable'
+status code (see section 6.1).  The value of this attribute MAY depend
+on the value of the "document-format" operation attribute supplied in
+the Get-Printer-Attributes operation (see [ipp-mod] section 3.2.5.1).
+
+4.2 interpreter-settable-attributes (1setOf type2 keyword)
+
+Type of registration:  attribute
+Proposed keyword name of this attribute:  interpreter-settable-
+attributes
+Types of attribute (Operation, Job Template, Job Description, Printer
+Description): Printer Description
+Operations to be used with if the attribute is an operation attribute:
+N/A
+Object (Job, Printer, etc. if bound to an object):  Printer
+Attribute syntax(es) (include 1setOf and range as in Section 4.2):
+1setOf type2 keyword
+If attribute syntax is 'keyword' or 'enum', is it type2 or type3:  type2
+If this is a Printer attribute, MAY the value returned depend on
+"document-format" (See Section 6.2):  Yes
+
+Kugler, Hastings, Lewis                                       [Page 15]
+                       Expires:  March 19, 2000
+
+
+
+PWG-DRAFT             IPP/1.1: Set 2 Operations      September 19, 1999
+
+
+If this is a Job Template attribute, how does its specification depend
+on the value of the "multiple-document-handling" attribute:  N/A
+Specification of this attribute (follow the style of IPP Model Section
+4.2):
+
+4.4.? interpreter-settable-attributes (1setOf type2 keyword)
+
+This READ-ONLY Printer attribute identifies the Interpreter object (see
+section 2.1) attributes that are settable in this implementation, i.e.,
+that are settable using the Set-Printer-Attributes operations.  This
+attribute MUST be supported if the Set-Printer-Attributes operations is
+supported.  The Printer MUST reject attempts to set any Printer or
+Interpreter attributes that are not in this list, returning the 'client-
+error-attributes-not-settable' status code (see section 6.1).  The value
+of this attribute MAY depend on the value of the "document-format"
+operation attribute supplied in the Get-Printer-Attributes operation
+(see [ipp-mod] section 3.2.5.1).
+
+4.3 job-settable-attributes (1setOf type2 keyword)
+
+Type of registration:  attribute
+Proposed keyword name of this attribute:  job-settable-attributes
+Types of attribute (Operation, Job Template, Job Description, Printer
+Description): Printer Description
+Operations to be used with if the attribute is an operation attribute:
+N/A
+Object (Job, Printer, etc. if bound to an object):  Printer
+Attribute syntax(es) (include 1setOf and range as in Section 4.2):
+1setOf type2 keyword
+If attribute syntax is 'keyword' or 'enum', is it type2 or type3:  type2
+If this is a Printer attribute, MAY the value returned depend on
+"document-format" (See Section 6.2):  Yes
+If this is a Job Template attribute, how does its specification depend
+on the value of the "multiple-document-handling" attribute:  N/A
+Specification of this attribute (follow the style of IPP Model Section
+4.2):
+
+4.4.? job-settable-attributes (1setOf type2 keyword)
+
+This READ-ONLY Printer attribute identifies the Job object attributes
+that are settable in this implementation, i.e., that are settable using
+the Set-Job-Attributes operations.  This attribute MUST be supported if
+the Set-Job-Attributes operations is supported.  The Printer MUST reject
+attempts to set any Job attributes that are not in this list, returning
+the 'client-error-attributes-not-settable' status code (see section
+6.1).
+
+
+4.4 printer-controls-other-protocols (boolean)
+
+Type of registration:  attribute
+Proposed keyword name of this attribute:  printer-controls-other-
+protocols
+
+Kugler, Hastings, Lewis                                       [Page 16]
+                       Expires:  March 19, 2000
+
+
+
+PWG-DRAFT             IPP/1.1: Set 2 Operations      September 19, 1999
+
+
+Types of attribute (Operation, Job Template, Job Description, Printer
+Description): Printer Description
+Operations to be used with if the attribute is an operation attribute:
+N/A
+Object (Job, Printer, etc. if bound to an object):  Printer
+Attribute syntax(es) (include 1setOf and range as in Section 4.2):
+boolean
+If attribute syntax is 'keyword' or 'enum', is it type2 or type3:  N/A
+If this is a Printer attribute, MAY the value returned depend on
+"document-format" (See Section 6.2):  No
+If this is a Job Template attribute, how does its specification depend
+on the value of the "multiple-document-handling" attribute:  N/A
+Specification of this attribute (follow the style of IPP Model Section
+4.2):
+
+4.4.? printer-controls-other-protocols (boolean)
+
+This Printer attribute indicates whether operations, such as Disable-
+Printer, Pause-Printer, etc., affect non-IPP protocols that may be
+supported.  It is RECOMMENDED that IPP control other non-IPP protocols.
+However, this attribute permits an implementation to indicate explicitly
+whether it does affect other protocols or not.
+
+A 'false' value indicates that IPP operations only affect jobs submitted
+by the IPP Protocol.  For example, a 'true' value indicates that a
+Disable-Printer operation prevents all protocols from submitting jobs,
+not just the IPP protocol.  An another example, a 'true' value indicates
+that the Pause-Printer operation would pause the current job, no matter
+what job submission protocol had submitted it.
+
+ISSUE 6:  Ok that the "printer-controls-other-protocols" Printer
+Description attribute is just a boolean, or do we need a list of
+operations that affect non-IPP protocols?
+
+  TH> It would be more flexible to allow per-operation control, so
+  change from "printer-controls-other-protocols" Printer Description
+  attribute to "operations-affecting-other-protocols (1setOf type2
+  enum).  The values are defined by the "operations-supported (1setOf
+  type2 enum)" operation.
+
+  HRL> The situation is already complex in that SNMP or IPP (possibly
+  others?) may "compete" or "conflict" is managing the printer. Per-
+  operation control does nothing to alleviate this and may make the
+  situation even more complex. Suggest leave as is.
+
+As with any Printer Description attribute that this specification does
+not list as READ-ONLY, an implementation MAY allow a client to change
+the value of this attribute using Set-Printer-Attributes, thereby
+changing the way that the IPP operations affect other non-IPP protocols.
+An implementation MAY also support other means to change the value of
+this attribute, such as via the console or at installation time.
+
+
+
+Kugler, Hastings, Lewis                                       [Page 17]
+                       Expires:  March 19, 2000
+
+
+
+PWG-DRAFT             IPP/1.1: Set 2 Operations      September 19, 1999
+
+
+ISSUE 7:  Is IPP intended for printer management. The issue is still
+undetermined?
+  TH> I think it is natural and so far there is not much overlap with
+  any MIB.  If and when we do get overlap, we need to make sure that the
+  semantics are the same.
+
+  HRL> I think it is clear that IPP is moving in this direction. I leave
+  this issue open for further discussion, however, because I believe we
+  need to be as clear as possible about the possible conflicts of two
+  management protocols originating form one organization (SNMP and IPP)
+  and provide some guidelines.
+
+4.5 printer-message-time (integer(MIN:MAX))
+
+Type of registration:  attribute
+Proposed keyword name of this attribute:  printer-message-time
+Types of attribute (Operation, Job Template, Job Description, Printer
+Description):  Printer Description
+Operations to be used with if the attribute is an operation attribute:
+N/A
+Object (Job, Printer, etc. if bound to an object):  Printer
+Attribute syntax(es) (include 1setOf and range as in Section 4.2):
+integer(MIN:MAX)
+If attribute syntax is 'keyword' or 'enum', is it type2 or type3:  N/A
+If this is a Printer attribute, MAY the value returned depend on
+"document-format" (See Section 6.2):  No
+If this is a Job Template attribute, how does its specification depend
+on the value of the "multiple-document-handling" attribute:  N/A
+Specification of this attribute (follow the style of IPP Model Section
+4.2):
+
+4.4.? printer-message-time (integer(MIN:MAX))
+
+This READ-ONLY Printer Description attribute contains the time that the
+Printer's "printer-message-from-operator" was changed by the operator
+using any operation where the client supplied the "printer-message-from-
+operator" operation attribute (see section 3.1) or was explicitly set
+using the Set-Printer-Attributes operation (see section 7.1.1).  This
+attribute allows the users to know when the "printer-message-from-
+operator" attribute was last set.
+
+The Printer sets the value of this attribute by copying the value of the
+Printer's "printer-up-time" attribute (see [ipp-mod] section 4.3.14).
+If the Printer resets its "printer-up-time" attribute to 1 on power-up,
+then it MUST change the value of the "printer-message-time" to 0 or a
+negative number as specified in [ipp-mod] section 4.3.14.
+
+Note:  This attribute helps users better understand the context for the
+"printer-message-from-operator" message.
+
+
+
+
+Kugler, Hastings, Lewis                                       [Page 18]
+                       Expires:  March 19, 2000
+
+
+
+PWG-DRAFT             IPP/1.1: Set 2 Operations      September 19, 1999
+
+
+4.6 printer-message-date-time (dateTime)
+
+Type of registration:  attribute
+Proposed keyword name of this attribute:  printer-message-date-time
+Types of attribute (Operation, Job Template, Job Description, Printer
+Description):  Printer Description
+Operations to be used with if the attribute is an operation attribute:
+N/A
+Object (Job, Printer, etc. if bound to an object):  Printer
+Attribute syntax(es) (include 1setOf and range as in Section 4.2):
+dateTime
+If attribute syntax is 'keyword' or 'enum', is it type2 or type3:  N/A
+If this is a Printer attribute, MAY the value returned depend on
+"document-format" (See Section 6.2):  No
+If this is a Job Template attribute, how does its specification depend
+on the value of the "multiple-document-handling" attribute:  N/A
+Specification of this attribute (follow the style of IPP Model Section
+4.2):
+
+4.4.? printer-message-date-time (dateTime)
+
+This READ-ONLY Printer Description attribute contains the date and time
+that the Printer's "printer-message-from-operator" was changed by the
+operator using any operation where the client supplied the "printer-
+message-from-operator" operation attribute (see section 3.1) or was
+explicitly set using the Set-Printer-Attributes operation (see section
+7.1.1).  This attribute allows the users to know when the "printer-
+message-from-operator" attribute was last set.  This attribute MUST be
+supported if the Printer supports both the "printer-message-from-
+operator" and the "printer-current-date-time" attributes.
+
+Note:  This attribute helps users better understand the context for the
+"printer-message-from-operator" message.
+
+
+4.7 printer-message-operation (type2 keyword)
+
+Type of registration:  attribute
+Proposed keyword name of this attribute:  printer-message-operation
+Types of attribute (Operation, Job Template, Job Description, Printer
+Description):  Printer Description
+Operations to be used with if the attribute is an operation attribute:
+N/A
+Object (Job, Printer, etc. if bound to an object):  Printer
+Attribute syntax(es) (include 1setOf and range as in Section 4.2):
+type2 enum
+If attribute syntax is 'keyword' or 'enum', is it type2 or type3:  type2
+If this is a Printer attribute, MAY the value returned depend on
+"document-format" (See Section 6.2):  No
+If this is a Job Template attribute, how does its specification depend
+on the value of the "multiple-document-handling" attribute:  N/A
+
+
+Kugler, Hastings, Lewis                                       [Page 19]
+                       Expires:  March 19, 2000
+
+
+
+PWG-DRAFT             IPP/1.1: Set 2 Operations      September 19, 1999
+
+
+Specification of this attribute (follow the style of IPP Model Section
+4.2):
+
+4.4.? printer-message-operation (type2 enum)
+
+This READ-ONLY Printer Description attribute contains the operation that
+was used to changed the Printer's "printer-message-from-operator" by the
+operator using any operation where the client supplied the "printer-
+message-from-operator" operation attribute (see section 3.1) or
+explicitly set using the Set-Printer-Attributes operation (see section
+7.1.1).  This attribute allows the users to know which operation was
+used to change the "printer-message-from-operator" attribute when it was
+last set.
+
+Note:  This attribute helps users better understand the context for the
+"printer-message-from-operator" message.
+
+
+4.8 when-values-supported (1setOf type2 keyword)
+
+Type of registration:  attribute
+Proposed keyword name of this attribute:  when-values-supported
+Types of attribute (Operation, Job Template, Job Description, Printer
+Description):  Printer Description
+Operations to be used with if the attribute is an operation attribute:
+N/A
+Object (Job, Printer, etc. if bound to an object):  Printer
+Attribute syntax(es) (include 1setOf and range as in Section 4.2):
+1setOf type2 keyword
+If attribute syntax is 'keyword' or 'enum', is it type2 or type3:  type2
+If this is a Printer attribute, MAY the value returned depend on
+"document-format" (See Section 6.2):  No
+If this is a Job Template attribute, how does its specification depend
+on the value of the "multiple-document-handling" attribute:  N/A
+Specification of this attribute (follow the style of IPP Model Section
+4.2):
+
+4.4.? when-values-supported (1setOf type2 keyword)
+
+This READ-ONLY Printer Description attribute contains the supported
+values for the "when" operation attribute in any operation.  The
+operations include:  Pause-Printer, Reset-Printer, Shutdown-Printer, and
+Pause-Current-Job.  For Pause-Current-Job, only the 'now' and 'after-
+current-copy' values are defined.  So the other values: 'after-current-
+job' and 'after-all', if present in this attribute, don't apply to
+Pause-Current-Job).
+
+
+
+
+
+
+
+
+Kugler, Hastings, Lewis                                       [Page 20]
+                       Expires:  March 19, 2000
+
+
+
+PWG-DRAFT             IPP/1.1: Set 2 Operations      September 19, 1999
+
+
+4.9 device-names-supported (1setOf name(127))
+
+
+ISSUE 8 - For consistency with [ipp-mod], shouldn't this be singular
+even though it is multi-valued, i.e., device-name-supported (1setOf
+name(127))?
+
+This OPTIONAL Printer attribute contains at least one device name which
+is associated with this Printer object.  It OPTIONALLY contains more
+than one device name which is associated with this Printer object, i.e.,
+fan-out, see [ipp-mod] section 2.1.  A Printer object which does not
+have an associated named device MUST NOT support this attribute.
+
+An Administrator determines device names and configures this attribute
+to contain those device names via IPP Set-Printer-Attributes operation
+(see section 7.1.1) or by some means outside the scope of this document.
+The precise format of these device names is implementation dependent and
+MAY depend on the protocol stack and the directory namespace.
+
+Note:  The new attribute "device-names-supported" will also enhance the
+usefulness of the IPP/1.1 Job object attribute "output-device-assigned"
+(see [ipp-mod] section 4.3.13).  The "output-device-assigned" Job
+attribute identifies the output device to which the Printer object has
+assigned a job, for example, when a single Printer object is supporting
+multiple devices.
+
+See also the operation attribute "device-name" in section 3.5 of this
+document.
+
+
+
+5. Additional values for "printer-state-reasons" and "job-state-reasons"
+attributes
+
+The following values are added to the "printer-state-reasons" and "job-
+state-reasons" for use with the operations defined in this document.
+
+5.1 Value for "printer-state-reasons":  'standby'
+
+Type of registration:  type2 keyword attribute value
+Name of attribute to which this keyword specification is to be added:
+printer-state-reasons
+Proposed keyword name of this keyword value:  standby
+Specification of this keyword value (follow the style of IPP Model
+Section 4.1.2.3):
+
+
+
+
+
+
+
+
+Kugler, Hastings, Lewis                                       [Page 21]
+                       Expires:  March 19, 2000
+
+
+
+PWG-DRAFT             IPP/1.1: Set 2 Operations      September 19, 1999
+
+
+  'standby':  The Printer has been shutdown in standby mode.  Only
+     Restart-Printer and Get-Printer-Attributes operations are accepted
+     in this state;  all other operations are rejected with the 'server-
+     error-printer-is-in-standby-mode'.
+
+5.2 Value for "job-state-reasons":  'job-paused'
+
+Type of registration:  type2 keyword attribute value
+Name of attribute to which this keyword specification is to be added:
+job-state-reasons
+Proposed keyword name of this keyword value:  job-paused
+Specification of this keyword value (follow the style of IPP Model
+Section 4.1.2.3):
+  'job-paused':  The job has been paused while processing using the
+     Pause-Current-Job operations and other jobs can be processed on the
+     Printer.  The Job can be resumed using the Resume-Job operation
+     which removes this value.
+
+
+
+6. New status codes
+
+This section defines new status codes used by the operations defined in
+this document.
+
+6.1 New status code: 'client-error-attributes-not-settable'
+
+Type of registration:  status code
+Keyword symbolic name of this status code value:  'client-error-
+attributes-not-settable'
+Numeric value (to be assigned by the IPP Designated Expert in
+consultation with IANA):
+Operations that this status code may be used with:  Set-Printer-
+Attributes, Set-Job-Attributes
+Specification of this status code (follow the style of IPP Model Section
+13 APPENDIX B:  Status Codes and Suggested Status Code Messages):
+
+13.1.4.20 client-error-attributes-not-settable (0x0413)
+
+In a Set-Printer-Attributes or Set-Job-Attributes request, if the
+Printer object does not support one or more attributes as settable, the
+Printer object MUST return this status code.  The Printer object MUST
+also return in the Unsupported Attributes Group all the attributes
+and/or values supplied by the client that are not settable.  See [ipp-
+mod] section 3.1.7.  For example, if the request indicates 'job-state',
+all implementations MUST reject the request.  As another example, if the
+request indicates an attribute that is supported, but not settable by
+this implementation, such as, say, "printer-name", the implementation
+rejects the request.
+
+
+
+Kugler, Hastings, Lewis                                       [Page 22]
+                       Expires:  March 19, 2000
+
+
+
+PWG-DRAFT             IPP/1.1: Set 2 Operations      September 19, 1999
+
+
+6.2 New status code: 'server-error-printer-is-in-standby-mode'
+
+Type of registration:  status code
+Keyword symbolic name of this status code value:  'server-error-printer-
+is-in-standby-mode'
+Numeric value (to be assigned by the IPP Designated Expert in
+consultation with IANA):
+Operations that this status code may be used with:  Shutdown-Printer
+Specification of this status code (follow the style of IPP Model Section
+13 APPENDIX B:  Status Codes and Suggested Status Code Messages):
+
+13.1.5.8 server-error-printer-is-in-standby-mode
+
+The Printer has been shutdown and is only accepting the Restart-Printer
+(see section 7.1.5) and Get-Printer-Attributes operations.  An operator
+can perform the Restart-Printer operation to allow the Printer to accept
+other operations.
+
+
+
+7. Summary of Set 2 operations and Operation-Id Assignments
+
+The Set 2 operations are summarized in the following table:
+
+  Operation Name  Operati Brief description
+                  on-Id
+
+  Set-Printer-    0x??    Sets attribute values of the target
+  Attributes               Printer object
+
+  Enable-Printer  0x??    Allows the target Printer to accept
+                           create job operations
+
+  Disable-Printer 0x??    Prevents the target Printer from
+                           accepting create job operations
+
+  Reset-Printer   0x??    Resets the target Printer to one of
+                           several indicated ways
+
+  Restart-Printer 0x??    Restarts the target Printer from a
+                           standby shutdown mode
+
+  Non-Process-    0x??    Moves the last printed sheet(s) to the
+  Run-Out                  exit or stacker
+
+  Shutdown-       0x??    Shuts down the target Printer in
+  Printer                  several ways
+
+  Set-Job-        0x??    Sets attribute values of the target Job
+  Attributes               object
+
+  Reprocess-Job   0x??    Creates a copy of a completed target
+                           job with a new Job ID and processes it
+
+  Cancel-Current- 0x??    Cancels the current job on the target
+  Job                      Printer or the specified job if it is
+                           the current job
+
+  Pause-Current-  0x??    Pauses the current processing job on
+  Job                      the target Printer or the specified job
+                           if it is the current job, allowing
+                           other jobs to be processed instead
+
+  Resume-Job      0x??    Resume the paused target job
+
+
+Kugler, Hastings, Lewis                                       [Page 23]
+                       Expires:  March 19, 2000
+
+
+
+PWG-DRAFT             IPP/1.1: Set 2 Operations      September 19, 1999
+
+
+
+  Operation Name  Operati Brief description
+                  on-Id
+
+  Promote-Job     0x??    Promote the pending target job to be
+                           next after the current job(s) complete
+
+  Space-Current-  0x??    Skips or repeats the specified number
+  Job                      of impressions for the current job on
+                           the target Printer or the specified job
+                           if it is the current job
+
+All of the operations in this registration proposal specification are
+OPTIONAL for an IPP object to support.  Unless the specification of an
+OPTIONAL operation requires support of another OPTIONAL operation,
+conforming implementations may support any combination of these
+operations.
+
+
+7.1 Printer Operations
+
+
+All Printer operations are directed at Printer objects.  A client MUST
+always supply the "printer-uri" operation attribute in order to identify
+the correct target of the operation.  These descriptions assume all of
+the common semantics of IPP/1.1 Model and Semantics document [ipp-mod]
+section 3.1.
+
+
+7.1.1 Set-Printer-Attributes Operation
+
+Type of registration:  operation
+Proposed name of this operation:  Set-Printer-Attributes
+Object Target:  Printer
+Specification of this operation:
+
+This OPTIONAL operation allows a client to set the values of the
+attributes of a Printer object.   In the request, the client supplies
+the set of Printer attribute names and values that are to be set.  In
+the response, the Printer object returns success or rejects the request
+with indications of which attribute or attributes could not be set.
+
+How the Printer object validates the client-supplied attributes in the
+Set-Printer-Attributes request is implementation-dependent, since there
+are no corresponding Printer attributes that specify the allowed values
+that may be set on the Printer object.
+
+The Printer MUST accept this operation in any state, i.e., for any of
+the values of the Printer object's "printer-state" attribute.
+
+
+7.1.1.1 Settable and READ-ONLY Printer Description attributes
+
+If the Printer supports the "printer-message-from-operator" Printer
+Description attribute (see [ipp-mod] section 4.4.25) and the client
+explicitly supplies a new value for the "printer-message-from-operator"
+in the request, then the Printer MUST set the "printer-message-from-
+
+
+Kugler, Hastings, Lewis                                       [Page 24]
+                       Expires:  March 19, 2000
+
+
+
+PWG-DRAFT             IPP/1.1: Set 2 Operations      September 19, 1999
+
+
+operator" Printer attribute to this new value and MUST also set the
+"printer-message-time", "printer-message-date-time", and "printer-
+message-operation" attributes, if supported (see sections 4.5, 4.6, and
+4.7).
+
+If the Printer supports the Set-Printer-Attributes operation, then it
+SHOULD support setting of:
+
+     all Job Template Default ("xxx-default") attributes
+     all Job Template Supported ("xxx-supported") attributes
+     all Job Template Ready ("xxx-ready") attributes
+
+that the implementation supports (see [ipp-mod] section 4.2 and
+extensions).
+
+The following Printer Description attributes (see [ipp-mod] section 4.4)
+MUST NOT be settable, i.e., they are READ-ONLY:
+
+     printer-state
+     printer-state-reasons
+     printer-state-message
+     printer-is-accepting-jobs - see Enable-Printer/Disable-Printer
+     queued-job-count
+     printer-message-time - see Set-Printer-Attributes when setting
+     "printer-message-from-operator"
+     printer-message-date-time - see Set-Printer-Attributes when setting
+     "printer-message-from-operator"
+     printer-message-operation - see Set-Printer-Attributes when setting
+     "printer-message-from-operator"
+     when-values-supported
+     printer-up-time
+     settable-attributes
+
+The remaining Printer Description attributes MAY be settable using the
+Set-Printer-Attributes operation, depending on implementation.  If "xxx-
+supported" Printer Description attribute are settable, then they MUST
+affect the behavior of the implementation.  If they are READ-ONLY then
+they reflect the implementation and cannot be changed using the Set-
+Printer-Attributes operation.  Consider the following examples:
+
+     For example, if the "operations-supported" Printer Description
+     attribute (see [ipp-mod] section 4.4.15) is settable, then changing
+     its value MUST affect the operations that the implementation
+     accepts or rejects.  Such an implementation will need to be able to
+     reject values for operations that it contains no code support for.
+
+     As another example, if the "ipp-versions-supported" Printer
+     Description attribute (see [ipp-mod] section 4.4.14) is settable,
+     then changing its value MUST affect the protocol versions that are
+     accepted or rejected.  Such an implementation will need to be able
+     to reject values for operations that it contains no code support
+     for.
+
+
+Kugler, Hastings, Lewis                                       [Page 25]
+                       Expires:  March 19, 2000
+
+
+
+PWG-DRAFT             IPP/1.1: Set 2 Operations      September 19, 1999
+
+
+See the "factory-settings" operation attribute (see section 3.3) for a
+way to query the implementation supported values using the Get-Printer-
+Attributes operation.  See the "reset-function" operation attribute of
+the Reset-Printer operation (see section 7.1.4) for a way to restore the
+values to the factory settings.
+
+Access Rights: Authentication and access control (see [ipp-mod] sections
+1, 8.3, and 8.5) apply to this operation.
+
+Most Printer attributes will require administrator privileges to set,
+such as "xxx-supported", while some will require operator privileges
+only, such as "media-ready" and "printer-message-from-operator".  Which
+attributes require which privileges depends on implementation and MAY
+depend on site policy.
+
+
+7.1.1.2 Set-Printer-Attributes Request
+
+The following sets of attributes are part of the Set-Printer-Attributes
+Request:
+
+Group 1: Operation Attributes
+
+  Natural Language and Character Set:
+     The "attributes-charset" and "attributes-natural-language"
+     attributes as described in [ipp-mod] section 3.1.4.1.
+
+  Target:
+     The "printer-uri" (uri) operation attribute which is the target for
+     this operation as described in [ipp-mod] section 3.1.5.
+
+  Requesting User Name:
+     The "requesting-user-name" (name(MAX)) attribute SHOULD be supplied
+     by the client as described in [ipp-mod] section 8.3.
+
+
+  "document-format" (mimeMediaType):
+     The client SHOULD supply this attribute.  The Printer object MUST
+     support this attribute.  This attribute is useful for a client to
+     select the Interpreter object to which the attribute modification
+     should be applied.  Each Printer object is modeled to contain one
+     or more Interpreter objects.  Those Printer attributes whose values
+     vary from Interpreter to Interpreter, are modeled as Interpreter
+     objects, while those that do not are Printer object attributes.
+     Thus the target of a Get-Printer-Attributes or Set-Printer-
+     Attributes operation is either the Printer object or the
+     Interpreter object identified by the "document-format" operation
+     attribute supplied by the client.  Except for Get-Printer-
+     Attributes and Set-Printer-Attributes, there are no other
+     operations with the Interpreter object as a target.  See [ipp-mod]
+     section 3.2.5.1 "Get-Printer-Attributes Request".
+
+
+Kugler, Hastings, Lewis                                       [Page 26]
+                       Expires:  March 19, 2000
+
+
+
+PWG-DRAFT             IPP/1.1: Set 2 Operations      September 19, 1999
+
+
+     If a client wants to set an attribute of all of the Interpreter
+     objects to the same value, it can query the Printer's "document-
+     format-supported" Printer Description attribute and perform
+     separate Set-Printer-Attributes for each document format supported.
+
+     ISSUE 9:  Do we need a way to get and/or set the "xxx" attribute
+     for all Interpreter objects in one Get-Printer-Attributes or Set-
+     Printer-Attributes operation?  Or is it sufficient for a client to
+     provide the equivalent functionality by stepping through all the
+     values of the "document-formats-supported" with repeating the Get
+     or Set operation?
+
+     ISSUE 10:  Ok to add the Interpreter object, even though it doesn't
+     solve all of the attribute constraint problems.  At least it gives
+     us a more object-based description of the semantics.  When we do
+     add some sort of Printer Description attribute that enumerates
+     combinations of Job attribute values that may not be used in
+     combination (like PPD file constraints), it can include the
+     "document-format" attribute among them.  So introducing the
+     Interpreter object in no way precludes a complete constraint
+     description mechanism in the future.
+
+     If the Printer object does not distinguish between different sets
+     of supported values for each different document format when
+     validating jobs in the create and Validate-Job operations, it MUST
+     NOT distinguish between different document formats in the Set-
+     Printer-Attributes operation.  If the Printer object does
+     distinguish between different sets of supported values for each
+     different document format specified by the client, this
+     specialization applies only to the same Printer attributes as the
+     Get-Printer-Attributes operation (see [ipp-mod] section 3.2.5.1).
+
+     If the client omits this "document-format" operation attribute, the
+     Printer object MUST respond as if the attribute had been supplied
+     with the value of the Printer object's "document-format-default"
+     attribute.  It is recommended that the client always supply a value
+     for "document-format", since the Printer object's "document-format-
+     default" may be 'application/octet-stream', in which case the set
+     attributes and values are for the union of the document formats
+     that the Printer can automatically sense.  For more details, see
+     the description of the 'mimeMediaType' attribute syntax in [ipp-
+     mod] section 4.1.9.
+
+     If the client supplies a value for the "document-format" Operation
+     attribute that is not supported by the Printer, i.e., is not among
+     the values of the Printer object's "document-format-supported"
+     attribute, the Printer object MUST reject the operation and return
+     the 'client-error-document-format-not-supported' status code.
+
+
+Group 2: Printer Attributes
+
+
+Kugler, Hastings, Lewis                                       [Page 27]
+                       Expires:  March 19, 2000
+
+
+
+PWG-DRAFT             IPP/1.1: Set 2 Operations      September 19, 1999
+
+
+     The client MUST supply a set of Printer attributes as defined in
+     [ipp-mod] section 4.2 Job Template Attributes ("xxx-default", "xxx-
+     supported", and "xxx-ready" attributes) and section 4.4 Printer
+     Description Attributes.  Each Printer attribute supplied in Group 2
+     replaces the value(s) of the corresponding Printer attribute on the
+     target Printer object.  If a Printer object attribute had not been
+     configured yet and so had the 'no-value' out-of-band value (see
+     [ipp-mod] 4.1), the supplied value(s) replace the 'no-value' value.
+     For attributes that can have multiple values (1setOf), all values
+     supplied by the client replace all values of the corresponding
+     Printer object attribute.
+
+
+7.1.1.3 Set-Printer-Attributes Response
+
+The Printer object returns the following sets of attributes as part of
+the Get-Printer-Attributes Response:
+
+Group 1: Operation Attributes
+
+  Status Message:
+     In addition to the REQUIRED status code returned in every response,
+     the response OPTIONALLY includes a "status-message" (text(255))
+     and/or a "detailed-status-message" (text(MAX)) operation attribute
+     as described in [ipp-mod] sections 13 and 3.1.6.
+
+  Natural Language and Character Set:
+     The "attributes-charset" and "attributes-natural-language"
+     attributes as described in [ipp-mod] section 3.1.4.2.
+
+
+Group 2: Unsupported Attributes
+
+     See [ipp-mod] section 3.1.7 for details on returning Unsupported
+     Attributes.
+
+     In the case of attributes that are supported, but are not settable
+     by the implementation, i.e., are not among the values of the
+     Printer's "settable-attributes" Printer Description attribute (see
+     section 4.1), the Printer object returns the client-supplied
+     attribute(s) with a substituted value of 'not-supported' (same out-
+     of-band value as for attributes that are not supported).  This
+     value's syntax type is "out-of-band" and its encoding is defined by
+     special rules for "out-of-band" values in the "Encoding and
+     Transport" document [IPP-PRO].  Its value indicates that the
+     attribute is either not settable or is not supported at all.
+
+     ISSUE 11:  Why not have a separate out-of-band 'not-settable'
+     value, so that the client can distinguish between the cases of the
+     attribute isn't supported versus the attribute is supported, but is
+     not settable?  True, the client can query the "settable-attributes"
+
+
+
+Kugler, Hastings, Lewis                                       [Page 28]
+                       Expires:  March 19, 2000
+
+
+
+PWG-DRAFT             IPP/1.1: Set 2 Operations      September 19, 1999
+
+
+     to see which attributes can be set, before or after issuing the
+     Set-Printer-Attributes operation.
+  TH> I think that providing a separate out-of-band code is useful,
+  since a reply could contain both unsupported attributes and ones that
+  were supported, but are not settable in this implementation.
+
+
+  HRL> What's wrong with what's already described? How is the new
+  proposal better?
+
+7.1.2 Disable-Printer Operation
+
+Type of registration:  operation
+Proposed name of this operation:  Disable-Printer
+Object Target:  Printer
+Specification of this operation:
+
+This OPTIONAL operation allows a client to stop the Printer object from
+accepting jobs, i.e., cause the Printer to reject subsequent create job
+operations (Print-Job, Print-URI, and Create-Job operation) and return
+the 'server-error-not-accepting-jobs' status code.  The Printer still
+accepts all other operations.  All previously submitted Jobs and
+currently processing Jobs continue unaffected.  The Printer sets the
+value of its "printer-is-accepting-jobs" READ-ONLY Printer Description
+attribute to 'false' (see [ipp-mod] section 4.4.20), no matter what the
+previous value was.  This operation has no immediate effect on the
+Printer's "printer-state" and "printer-state-reasons" attributes.
+
+Note:  Use the Enable-Printer operation (section 7.1.3) to enable a
+Printer to accept Jobs again.
+
+If the Disable-Printer operation is supported, then the Enable-Printer
+operation MUST be supported, and vice-versa.
+
+Note:  Use the Enable-Printer and Disable-Printer operations to allow or
+prevent input to a Printer.  Use the Pause-Printer and Resume-Printer
+operations to prevent or allow output from the Printer.
+
+Whether or not the Disable-Printer operation stops jobs that are
+submitted using job submission protocols other than IPP, depends on
+implementation, i.e., on whether the IPP protocol is being used as a
+universal management protocol or just to manage IPP jobs, respectively.
+See "printer-controls-other-protocols"  (section 4.4).
+
+Access Rights: Authentication and access control (see [ipp-mod] sections
+1, 8.3, and 8.5) apply to this operation.
+
+The Disable-Printer Request and Disable-Printer Response have the same
+attribute groups and attributes as the Resume-Printer operation (see
+[ipp-mod] sections 3.2.7.1 and 3.2.7.2), including the new "printer-
+message-from-operator" operation attribute (see section 3.1), and with
+
+
+Kugler, Hastings, Lewis                                       [Page 29]
+                       Expires:  March 19, 2000
+
+
+
+PWG-DRAFT             IPP/1.1: Set 2 Operations      September 19, 1999
+
+
+the addition of the following Group 1 operation attribute in the
+request:
+
+  "job-type" (type2 keyword):
+     The client OPTIONALLY supplies this attribute.  The Printer object
+     OPTIONALLY supports this attribute.  The value of this attribute
+     indicates the type of job to be disabled.  If the client omits this
+     attribute, the Printer assumes the 'network-jobs' value.
+
+     Standard keyword values are:
+          'network-jobs' - disable jobs submitted using the create job
+              operations.
+          'walk-up-jobs' - disable jobs submitted locally, such as
+              walkup copy jobs
+          'all-jobs' - disable all type of jobs
+
+7.1.3 Enable-Printer Operation
+
+Type of registration:  operation
+Proposed name of this operation:  Enable-Printer
+Object Target:  Printer
+Specification of this operation:
+
+This OPTIONAL operation allows a client to start the Printer object
+accepting jobs, i.e., cause the Printer to accept subsequent create job
+operations (Print-Job, Print-URI, and Create-Job operation).  The
+Printer still accepts all other operations.  All previously submitted
+Jobs and currently processing Jobs continue unaffected.  The Printer
+sets the value of its "printer-is-accepting-jobs" READ-ONLY Printer
+Description attribute to 'true' (see [ipp-mod] section 4.4.20), no
+matter what the previous value was.  This operation has no immediate
+effect on the Printer's "printer-state" and "printer-state-reasons"
+attributes.
+
+Note:  Use the Disable-Printer operation (section 7.1.2) to stop a
+Printer from accepting Jobs.
+
+If the Enable-Printer operation is supported, then the Disable-Printer
+operation MUST be supported, and vice-versa.
+
+Note:  Use the Enable-Printer and Disable-Printer operations to allow or
+prevent input to a Printer.  Use the Pause-Printer and Resume-Printer
+operations to prevent or allow output from the Printer.
+
+Whether or not the Enable-Printer operation allows acceptance of  jobs
+that are submitted using job submission protocols other than IPP,
+depends on implementation, i.e., on whether the IPP protocol is being
+used as a universal management protocol or just to manage IPP jobs,
+respectively.  See "printer-controls-other-protocols" (section 4.4).
+
+Access Rights: Authentication and access control (see [ipp-mod] sections
+1, 8.3, and 8.5) apply to this operation.
+
+
+Kugler, Hastings, Lewis                                       [Page 30]
+                       Expires:  March 19, 2000
+
+
+
+PWG-DRAFT             IPP/1.1: Set 2 Operations      September 19, 1999
+
+
+The Enable-Printer Request and Enable-Printer Response have the same
+attribute groups and attributes as the Resume-Printer operation (see
+[ipp-mod] sections 3.2.8.1 and 3.2.8.2), including the new "printer-
+message-from-operator" operation attribute (see section 3.1), and with
+the addition of the following Group 1 operation attribute in the
+request:
+
+  "job-type" (type2 keyword):
+     The client OPTIONALLY supplies this attribute.  The Printer object
+     OPTIONALLY supports this attribute.  The value of this attribute
+     indicates the type of job to be enabled.  If the client omits this
+     attribute, the Printer assumes the 'network-jobs' value.
+
+     Standard keyword values are:
+          'network-jobs' - enable jobs submitted using the create job
+              operations.
+          'walk-up-jobs' - enable jobs submitted locally, such as walkup
+              copy jobs
+          'all-jobs' - enable all types of jobs
+
+7.1.4 Reset-Printer operation
+
+Type of registration:  operation
+Proposed name of this operation:  Reset-Printer
+Object Target:  Printer
+Specification of this operation:
+
+This OPTIONAL operation allows a client to reset the Printer in a number
+of ways, depending on the "reset-function" operation attribute.  The
+keyword values of this attribute map one-to-one to the enum values that
+the NMS writes into the prtGeneralReset object in the Printer MIB
+[RFC1759] to affect a reset operation.  As in the Printer MIB, the
+'reset-to-nvram' (soft reset) value MUST be supported, if this operation
+is supported.  The other values are OPTIONAL.
+
+As is says in the Printer MIB specification, if a device does not have
+NVRAM (non-volatile RAM), the device MUST none-the-less respond to this
+operation for the 'reset-to-nvram' value with some sort of warm reset
+that resets the device to some implementation-defined state that is
+preferably under control of the system administrator by some means
+outside the scope of the Printer MIB and this document.
+
+The effect of this operation on the currently processing job(s), if any,
+is not specified by this document.  Note:  If this operation does affect
+the current job(s), it is expected that the operator would issue this
+operation on a Printer in the 'idle' state after disabling the Printer
+with the Disable operation in order to prevent a job from inadvertently
+being affected by this operation.
+
+The Printer object MUST accept this operation in any state and
+transition the Printer object to the 'idle' state.
+
+
+
+Kugler, Hastings, Lewis                                       [Page 31]
+                       Expires:  March 19, 2000
+
+
+
+PWG-DRAFT             IPP/1.1: Set 2 Operations      September 19, 1999
+
+
+Access Rights: Authentication and access control (see [ipp-mod] sections
+1, 8.3, and 8.5) apply to this operation.
+
+The Reset-Printer Request and Reset-Printer Response have the same
+attribute groups and attributes as the Pause-Printer operation (see
+[ipp-mod] sections 3.2.7.1 and 3.2.7.2), including the new "printer-
+message-from-operator" operation attribute (see section 3.1), the new
+"when" operation attribute (see section 3.4), and with the addition of
+the following Group 1 operation attributes in the request:
+
+  "reset-function" (type3 keyword):
+     The client OPTIONALLY supplies this attribute.  The Printer object
+     MUST support this attribute, if it supports this operation.  The
+     value of this attribute indicates the reset function to be
+     performed.  If the client omits this attribute, the Printer assumes
+     the 'reset-to-nvram' value.
+
+     Standard keyword values are:
+          'power-cycle-reset' - Cold start, i.e., to the state when the
+              device is powered up.
+          'reset-to-nvram' - Warm start.
+          'reset-to-factory-defaults' - reset NVRAM to factory defaults,
+              i.e. to factory settings and/or values established at
+              install time.
+
+
+7.1.5 Restart-Printer operation
+
+Type of registration:  operation
+Proposed name of this operation:  Restart-Printer
+Object Target:  Printer
+Specification of this operation:
+
+This OPTIONAL operation allows a client to restart a Printer that has
+previously been shutdown in standby mode (see section 7.1.7).  Standby
+mode is indicated by the Printer's "printer-state" being 'stopped' and
+its "printer-state-reasons" including the 'standby' and 'paused' values.
+If the Printer is not in standby mode, the Printer MUST reject this
+operation and return the 'client-error-not-possible' status code.
+
+ISSUE 12:   What state does the Printer comes back up on Restart-Printer
+and how can the client control?
+Possible alternatives:
+
+     a. Restart-Printer always brings the Printer up Disabled ("printer-
+     is-accepting-jobs" = 'false') and Paused ("printer-state" =
+     'stopped', and "printer-state-reasons" = 'paused') which is the
+     state that Shutdown-Printer leaves the Printer in.  Then the
+     operator issues Enable-Printer and Resume-Printer when want to
+     restore normal operation.  The client can automatically issues
+     these addition 2 operations depending on GUI options.  Advantages:
+     This is the simplest to implement, allows new states to be added
+
+
+Kugler, Hastings, Lewis                                       [Page 32]
+                       Expires:  March 19, 2000
+
+
+
+PWG-DRAFT             IPP/1.1: Set 2 Operations      September 19, 1999
+
+
+     without changing the Restart-Printer operation, and can have the
+     same GUI interface as b:
+
+     b. Add a REQUIRED operation attribute to Restart-Printer, something
+     like "printer-condition" with values: 'disabled-and-paused',
+     'enabled-and-paused', and 'enabled-and-idle'.
+
+  TH 7/26: Remove the Shutdown-Printer 'standby' mode concept.
+  Shutdown-Printer always powers off eventually.  Also remove
+  Restart-Printer operation all together.  Instead change the
+  Disable-Printer and Enable-Printer operations to Disable-Operations
+  and Enable-Operations, so that individual operations are enabled
+  and disabled independent of the state of the Printer and don't
+  otherwise affect the state of the Printer.
+
+  HRL 9/18: How can the state of the printer not be effected when you
+  disable or enable it? Don't understand 2nd half of this issue
+  resolution.
+
+
+
+If the Restart-Printer operation is supported, then the Shutdown-Printer
+operation MUST be supported, since the Restart-Printer operation is
+meaningful only after a Shutdown-Printer operation has been performed.
+However, if the Shutdown-Printer operation is supported, the Restart-
+Printer NEED NOT be supported.
+
+  Issue 13: Why? This is backward, if you ask me (HRL).
+
+
+
+
+Access Rights: Authentication and access control (see [ipp-mod] sections
+1, 8.3, and 8.5) apply to this operation.
+
+The Restart-Printer Request and Restart-Printer Response have the same
+attribute groups and attributes as the Resume-Printer operation (see
+[ipp-mod] sections 3.2.8.1 and 3.2.8.2), including the new "printer-
+message-from-operator" operation attribute (see section 3.1) and the
+following Group 1 operation attribute:
+
+
+
+
+7.1.6 Non-Process-Run-Out Operation
+
+ISSUE 14 - Can we think of a name for Non-Process-Run-Out that follows
+the pattern of other IPP operations on Printers, namely Xxxx-Yxxx-
+Printer?  How about Non-Process-Run-Out-Printer or more simply Run-Out-
+Printer?
+
+Type of registration:  operation
+Proposed name of this operation:  Non-Process-Run-Out
+Object Target:  Printer
+
+Kugler, Hastings, Lewis                                       [Page 33]
+                       Expires:  March 19, 2000
+
+
+
+PWG-DRAFT             IPP/1.1: Set 2 Operations      September 19, 1999
+
+
+Specification of this operation:
+
+This OPTIONAL operation effectively moves the last printed sheet to the
+exit or stacker. The terminology is common to long path continuous forms
+devices but may have applicability on shorter devices or in cut-sheet
+applications.
+
+Access Rights: Authentication and access control (see [ipp-mod] sections
+1, 8.3, and 8.5) apply to this operation.
+
+The Non-Process-Run-Out Request and Non-Process-Run-Out Response have
+the same attribute groups and attributes as the Pause-Printer operation
+(see [ipp-mod] sections 3.2.7.1 and 3.2.7.2), including the new
+"printer-message-from-operator" operation attribute (see section 3.1)
+and the new "when" operation attribute (see section 3.4).
+
+
+7.1.7 Shutdown-Printer Operation
+
+Type of registration:  operation
+Proposed name of this operation:  Shutdown-Printer
+Object Target:  Printer
+Specification of this operation:
+
+This OPTIONAL operation allows a client to shutdown a Printer, i.e.,
+stop processing jobs and power off in some implementation-dependent
+manner.  The purpose of Shutdown-Printer is to shutdown the Printer for
+an extended period, not to reset the device(s) or modify a Printer
+attribute.  See Reset-Printer (section 7.1.4) for the way to reset the
+device(s).  See the Disable-Printer operation (section 7.1.2) for a way
+for the client to stop the Printer from accepting Job Creation requests
+without stopping processing or shutting down.
+
+The Printer is disabled immediately (see the Disable-Printer operation
+in section 7.1.2).  The Printer adds the 'shutdown' value (see [ipp-mod]
+section 4.4.11) to its "printer-state-reasons" Printer Description
+attribute.  The "when" operation attribute specifies how much processing
+occurs before the Printer is paused (see [ipp-mod] section 3.2.7) and
+the shutdown is complete.  All other requests continue to be accepted
+until the printer is powered down.
+
+ISSUE 15 - Need to look at life cycle of the Printer versus
+standby/power-down and the other operations that can be accepted.  There
+can be appreciable time between acceptance of this operation and when
+the final state of the printer, either standby or powered down is
+reached.  Is it ok for non-submission operations to continue to be
+accepted during this time?  May need 'moving-to-shutdown'.  What about
+'moving-to-standby'?
+
+  TH>  Add 'moving-to-shutdown' which the Shutdown-Printer sets
+  immediately (analogous to 'moving-to-paused').  Then the 'shutdown'
+  values means that the shutdown has completed (and is only meaningful
+  to a server implementation that hosts the Printer object).  Thus the
+
+
+Kugler, Hastings, Lewis                                       [Page 34]
+                       Expires:  March 19, 2000
+
+
+
+PWG-DRAFT             IPP/1.1: Set 2 Operations      September 19, 1999
+
+
+  server can still respond to a Get-Printer-Attributes operation after
+  the Printer is shutdown as stated in IPP/1.1.
+
+  HRL> Is this granularity really achievable enough of a wide enough
+  variety of environments to be reliable or, in reality, will this be
+  implementation dependent?
+
+Whether or not the Shutdown-Printer operation affects jobs that were
+submitted to the device using job submission protocols other than IPP,
+depends on implementation, i.e., on whether the IPP protocol is being
+used as a universal management protocol or just to manage IPP jobs,
+respectively.  See "printer-controls-other-protocols" (section 4.4).
+
+The Printer object MUST accept this operation in any state and
+transition the Printer object to the 'idle' state.
+
+Access Rights: Authentication and access control (see [ipp-mod] sections
+1, 8.3, and 8.5) apply to this operation.
+
+The Shutdown-Printer Request and Shutdown-Printer Response have the same
+attribute groups and attributes as the Pause-Printer operation (see
+[ipp-mod] sections 3.2.7.1 and 3.2.7.2), including the new "printer-
+message-from-operator" operation attribute (see section 3.1), the new
+"when" operation attribute (see section 3.4), and with the addition of
+the following Group 1 operation attributes in the request:
+
+  "shutdown-function" (type2 keyword)
+     The client OPTIONALLY supplies this attribute.  The Printer object
+     OPTIONALLY supports this attribute.  This attribute indicates which
+     shutdown function is to be performed.
+
+     Standard keyword values are:
+          'standby' - shutdown the Printer, but leave it in standby-mode
+              (disabled and paused), which means that Get-Printer-
+              Attributes and Restart-Printer operations are accepted.
+          'power-off' - shutdown the Printer and power it off.  No
+              operations are accepted after power off.
+
+  "synchronize" (boolean)
+     The client OPTIONALLY supplies this attribute.  The Printer object
+     OPTIONALLY supports this attribute.  This attribute indicates
+     whether or not the printer is to synchronize the checkpoint data
+     for the current job ("when" = 'now') with the pages that have
+     actually printed.  If the value of the "when" attribute is not
+     'now' or the "when" attribute is not supplied, then the
+     "synchronize" attribute has no meaning and the Printer MUST ignore
+     it.  If this attribute is supported, then a value of 'true' implies
+     that the Printer will be able to resume the job at the point of
+     synchronization when the Printer is restarted.  If the
+     implementation does not support resuming a job (either
+     automatically or with the Resume-Job operation) after a Shutdown-
+     Printer with "when" = 'now', then it does not implement this
+
+Kugler, Hastings, Lewis                                       [Page 35]
+                       Expires:  March 19, 2000
+
+
+
+PWG-DRAFT             IPP/1.1: Set 2 Operations      September 19, 1999
+
+
+     attribute.  In this case, check-pointing implies that the job may
+     be resumed in the future, exactly from the point and in the state
+     and resource context from which it left off.
+
+
+     If the Printer supports this attribute but the client does not
+     supply it, the Printer is assumed to  perform synchronization
+     ('true' behavior).  If the Printer does not support this attribute,
+     the Printer is assumed to not synchronize ('false' behavior).
+
+
+     ISSUE 16:  Is the current job automatically restarted when the
+     Printer is restarted?  Or does some client have to issue a Restart-
+     Job operation?
+  The question is moot, if we remove the Restart-Job operation, as
+  suggested:
+
+  TH 7/26: Remove the Shutdown-Printer 'standby' mode concept.
+  Shutdown-Printer always powers off eventually.  Also remove
+  Restart-Printer operation all together.  Instead change the
+  Disable-Printer and Enable-Printer operations to Disable-Operations
+  and Enable-Operations, so that individual operations are enabled and
+  disabled independent of the state of the Printer and don't otherwise
+  affect the state of the Printer.
+  HRL> Then, how do we restart the printer?
+
+
+7.2 Job Operations
+
+
+All Job operations are directed at Job objects.  A client MUST always
+supply some means of identifying the Job object in order to identify the
+correct target of the operation.  That job identification MAY either be
+a single Job URI or a combination of a Printer URI with a Job ID.  The
+IPP object implementation MUST support both forms of identification for
+every job.
+
+
+7.2.1 Set-Job-Attributes
+
+Type of registration:  operation
+Proposed name of this operation:  Set-Job-Attributes
+Object Target:  Job
+Specification of this operation:
+
+This OPTIONAL operation allows a client to set the values of the
+attributes of a Job object.   In the request, the client supplies the
+set of Job attribute names and values that are to be set.  In the
+response, the IPP object returns success or rejects the request with
+indications of which attribute or attributes could not be set.
+
+This operation is almost identical to the Set-Printer-Attributes
+operation (see section 7.1.1).  The only differences are that the Set-
+
+Kugler, Hastings, Lewis                                       [Page 36]
+                       Expires:  March 19, 2000
+
+
+
+PWG-DRAFT             IPP/1.1: Set 2 Operations      September 19, 1999
+
+
+Job-Attributes operation is directed at a Job object rather than a
+Printer object, there is no "document-format" operation attribute used
+when setting a Job object, and the validation is the same as the create
+job operations, i.e., depends on the "xxx-supported" Printer Description
+attributes.
+
+The validation of the Set-Job-Attributes request is performed as if the
+job had been submitted originally with the new values and with "ipp-
+attribute-fidelity" set to 'true', i.e., all modified attributes MUST be
+supported along with the attributes not modified.  If such a create job
+operation would have been accepted, then the Set-Job-Attributes MUST be
+accepted.  If such a create job operation would have been rejected, then
+the Set-Job-Attributes MUST be rejected and the Job MUST be unchanged.
+
+The IPP object MUST accept or reject the request based on the job's
+current state and transition the job to the indicated new state as
+follows:
+
+   Current "job-    New "job-     IPP object's response status
+       state"         state"             code and action:
+
+  'pending'       'pending'      'successful-ok'
+  'pending'       'pending-      'successful-ok' - needed
+                  held'          resources are not ready
+  'pending-held'  'pending-      'successful-ok'
+                  held'
+  'pending-held'  'pending'      'successful-ok' - needed
+                                 resources are ready
+  'processing'    'processing'   'successful-ok'  or 'client-
+                                 error-not-possible' depending on
+                                 the attributes being set,
+                                 whether the job has started
+                                 marking media, and/or
+                                 implementation
+  'processing-    'processing-   'successful-ok'  or 'client-
+  stopped'        stopped'       error-not-possible' depending on
+                                 the attributes being set,
+                                 whether the job has started
+                                 marking media, and/or
+                                 implementation
+  'completed'     'completed'    'client-error-not-possible'
+  'canceled'      'canceled'     'client-error-not-possible'
+  'aborted'       'aborted'      'client-error-not-possible'
+
+7.2.1.1 Settable and READ-ONLY Job Description attributes
+
+If the Printer supports the "job-message-from-operator" Job Description
+attribute (see [ipp-mod] section 4.3.16) and the client explicitly
+supplies a new value for the "job-message-from-operator" in the request,
+then the Printer MUST set the "job-message-from-operator" Job attribute
+to this new value.
+
+
+Kugler, Hastings, Lewis                                       [Page 37]
+                       Expires:  March 19, 2000
+
+
+
+PWG-DRAFT             IPP/1.1: Set 2 Operations      September 19, 1999
+
+
+If the Printer supports the Set-Job-Attributes operation, then it SHOULD
+support setting of:
+
+     all Job Template ("xxx") attributes (see [ipp-mod] section 4.2 and
+     extensions)
+
+that the implementation supports.
+
+The following Job Description attributes (see [ipp-mod] section 4.3)
+MUST NOT be settable, i.e., they are READ-ONLY:
+
+     job-uri
+     job-id
+     job-printer-uri
+     job-more-info
+     job-originating-user-name - set in create operation
+     job-state
+     job-state-reasons
+     job-state-message
+     number-of-documents
+     output-device-assigned
+     time-at-creation
+     time-at-processing
+     time-at-completed
+     job-printer-up-time
+     date-time-at-creation
+     date-time-at-processing
+     date-time-at-completed
+     number-of-intervening-jobs
+     job-k-octets
+     job-k-octets-processed
+     job-impressions-completed
+     job-media-sheets-completed
+     attributes-charset - set in create operation
+     attributes-natural-language - set in create operation
+
+The remaining Job Description attributes MAY be settable using the Set-
+Job-Attributes operation, depending on implementation.
+
+Whether or not the Set-Job-Attributes operation affects jobs that are
+submitted using job submission protocols other than IPP, depends on
+implementation, i.e., on whether the IPP protocol is being used as a
+universal management protocol or just to manage IPP jobs, respectively.
+See "printer-controls-other-protocols" (section 4.4).
+
+Access Rights: Authentication and access control (see [ipp-mod] sections
+1, 8.3, and 8.5) apply to this operation.
+
+
+7.2.1.2 Set-Job-Attributes Request
+
+The following sets of attributes are part of the Set-Job-Attributes
+Request:
+
+
+Kugler, Hastings, Lewis                                       [Page 38]
+                       Expires:  March 19, 2000
+
+
+
+PWG-DRAFT             IPP/1.1: Set 2 Operations      September 19, 1999
+
+
+Group 1: Operation Attributes
+
+  Natural Language and Character Set:
+     The "attributes-charset" and "attributes-natural-language"
+     attributes as described in [ipp-mod] section 3.1.4.1.
+
+  Target:
+     Either (1) the "printer-uri" (uri) plus "job-id" (integer(1:MAX))
+     or (2) the "job-uri" (uri) operation attribute(s) which define the
+     target for this operation as described in [ipp-mod] section 3.1.5.
+
+  Requesting User Name:
+     The "requesting-user-name" (name(MAX)) attribute SHOULD be supplied
+     by the client as described in [ipp-mod] section 8.3.
+
+
+
+Group 2: Job Attributes
+
+     The client MUST supply a set of Job attributes as defined in [ipp-
+     mod] section 4.2 Job Template Attributes ("xxx" attributes) and
+     section 4.3 Job Description Attributes.  Each Job attribute
+     supplied in Group 2 replaces the value(s) of the corresponding Job
+     attribute on the target Job object.  For attributes that can have
+     multiple values (1setOf), all values supplied by the client replace
+     all values of the corresponding Job object attribute.
+
+
+7.2.1.3 Set-Job-Attributes Response
+
+The Printer object returns the following sets of attributes as part of
+the Set-Job-Attributes Response:
+
+Group 1: Operation Attributes
+
+  Status Message:
+     In addition to the REQUIRED status code returned in every response,
+     the response OPTIONALLY includes a "status-message" (text(255))
+     and/or a "detailed-status-message" (text(MAX)) operation attribute
+     as described in [ipp-mod] sections 13 and 3.1.6.
+
+  Natural Language and Character Set:
+     The "attributes-charset" and "attributes-natural-language"
+     attributes as described in [ipp-mod] section 3.1.4.2.
+
+
+Group 2: Unsupported Attributes
+
+     See [ipp-mod] section 3.1.7 for details on returning Unsupported
+     Attributes.
+
+     The attributes returned are the same as for the create operation
+     with the same new attribute values.  In the case of attributes that
+     are supported, but are not settable by the implementation, i.e.,
+
+Kugler, Hastings, Lewis                                       [Page 39]
+                       Expires:  March 19, 2000
+
+
+
+PWG-DRAFT             IPP/1.1: Set 2 Operations      September 19, 1999
+
+
+     are not among the values of the Printer's "settable-attributes"
+     Printer Description attribute (see section 4.1), the Printer object
+     returns the client-supplied attribute(s) with a substituted value
+     of 'not-supported' (same out-of-band value as for attributes that
+     are not supported).  This value's syntax type is "out-of-band" and
+     its encoding is defined by special rules for "out-of-band" values
+     in the "Encoding and Transport" document [IPP-PRO].  Its value
+     indicates that the attribute is either not settable or is not
+     supported at all.
+
+
+7.2.2 Reprocess-Job Operation
+
+This OPTIONAL operation is a create job operation that allows a client
+to re-process a copy of a job that had been retained in the queue after
+processing completed, was canceled, or was aborted (see [ipp-mod]
+section 4.3.7.2).  This operation is the same as the Restart-Job
+operation (see [ipp-mod] section 3.3.7), except that the Printer creates
+a new job that is a copy of the target job and the target job is
+unchanged.  The new job is assigned new values to the "job-uri" and
+"job-id" attributes and the new job's Job Description attributes that
+accumulate job progress, such as "job-impressions-completed", "job-
+media-sheets-completed", and "job-k-octets-processed", are initialized
+to 0 as with any create job operation.  The target job moves to the Job
+History after a suitable period, independent of whether one or more
+Reprocess-Job operations have been performed on it.
+
+If the Set-Job-Attributes operation is supported, then the "job-hold-
+until" operation attribute MUST be supported with at least the
+'indefinite' value, so that a client can modify the new job before it is
+scheduled for processing using the Set-Job-Attributes operation.  After
+modifying the job, the client can release the job for processing, by
+using the Release-Job operation specifying the newly assigned "job-uri"
+or "job-id" for the new job.
+
+
+7.2.3 Cancel-Current-Job Operation
+
+This OPTIONAL operation allows a client to cancel the current job on the
+target Printer or the specified job if it is the current job on the
+Printer.  See [ipp-mod] section 3.3.3 for the semantics of canceling a
+job.  Since a Job might already be marking by the time a Cancel-Current-
+Job is received, some media sheet pages might be printed before the job
+is actually terminated.
+
+If the client does not supply a "job-id" operation attribute, the
+Printer MUST accept the request and cancel the current job if there is a
+current job in the 'processing' or 'processing-stopped' state;
+otherwise, it MUST reject the request and return the 'client-error-not-
+possible' status code.  If more than one job is in the 'processing' or
+
+
+
+Kugler, Hastings, Lewis                                       [Page 40]
+                       Expires:  March 19, 2000
+
+
+
+PWG-DRAFT             IPP/1.1: Set 2 Operations      September 19, 1999
+
+
+'processing-stopped' states, the one that is marking is canceled and the
+others are unaffected.
+
+Warning:  On a shared printer, there is a race condition.  Between the
+time that a user issues this operation and its acceptance, the current
+job might change to a different job.  If the user or operator is
+authenticated to cancel the new job, the wrong job is canceled.  To
+prevent this race from canceling the wrong job, the client MAY supply
+the "job-id" operation attribute which is checked against the current
+job's job-id.  If the job identified by the "job-id" attribute is not
+the current job on the Printer, i.e., is not in the 'processing' or
+'processing-stopped' states, the Printer MUST reject this operation and
+return the 'client-error-not-possible' status code.  Otherwise, the
+Printer cancels the specified job.
+
+Access Rights: Authentication and access control (see [ipp-mod] sections
+1, 8.3, and 8.5) apply to this operation.
+
+The Cancel-Current-Job Request and Cancel-Current-Job Response have the
+same attribute groups and attributes as the Resume-Printer operation
+(see [ipp-mod] section 3.2.8), including the new "job-message-from-
+operator" operation attribute (see section 3.2), with the addition of
+the following Group 1 Operation attributes in the request:
+
+  "job-id" (integer(1:MAX)):
+
+     The client OPTIONALLY supplies this Operation attribute in order to
+     verify that the identified job is still the current job on the
+     target Printer object.  The IPP object MUST supports this operation
+     attribute, if it supports this operation.
+
+
+
+
+7.2.4 Pause-Current-Job operation
+
+This OPTIONAL operation allows a client to stop the current job on the
+target Printer or the specified job if it is the current job on the
+Printer, and allow other jobs to be processed instead.  The Printer
+moves the current job or the target job to the 'processing-stopped'
+state and sets the 'job-paused' value in the job's "job-state-reasons"
+attribute and processes other jobs.
+
+If the client does not supply a "job-id" operation attribute, the
+Printer MUST accept the request and pause the current job if there is a
+current job in the 'processing' or 'processing-stopped' state;
+otherwise, it MUST reject the request and return the 'client-error-not-
+possible' status code.  If more than one job is in the 'processing' or
+'processing-stopped' states, all of them are paused.
+
+Warning:  On a shared printer, there is a race condition.  Between the
+time that a user issues this operation and its acceptance, the current
+
+
+Kugler, Hastings, Lewis                                       [Page 41]
+                       Expires:  March 19, 2000
+
+
+
+PWG-DRAFT             IPP/1.1: Set 2 Operations      September 19, 1999
+
+
+job might change to a different job.  If the user or operator is
+authenticated to pause the new job, the wrong job is paused.  To prevent
+this race from pausing the wrong job, the client MAY supply the "job-id"
+operation attribute which is checked against the current job's job-id.
+If the job identified by the "job-id" attribute is not the current job
+on the Printer, i.e., is not in the 'processing' or 'processing-stopped'
+states, the Printer MUST reject this operation and return the 'client-
+error-not-possible' status code.  Otherwise, the Printer pauses the
+specified job and processed other jobs.
+
+A paused job is resumed using the Resume-Job operation (see section
+7.2.5).  If the Pause-Current-Job operation is supported, then the
+Resume-Job operation MUST be supported, and vice-versa.
+
+The Printer MUST reject a Release-Job request (and return the 'client-
+error-not-possible') for a job that has been paused , i.e., for a job in
+the 'processing-stopped' state, with the 'job-paused' value in its "job-
+state-reasons" attribute.  The Hold-Job and Release-Job operations are
+for holding and releasing held jobs, not pausing and resuming paused
+jobs.
+
+Access Rights: Authentication and access control (see [ipp-mod] sections
+1, 8.3, and 8.5) apply to this operation.
+
+The Pause-Current-Job Request and Pause-Current-Job Response have the
+same attribute groups and attributes as the Resume-Printer operation
+(see [ipp-mod] section 3.2.8 ), including the new "job-message-from-
+operator" operation attribute (see section 3.2), the new "when"
+operation attribute (see section 3.4), with the addition of the
+following Group 1 Operation attributes in the request:
+
+  "job-id" (integer(1:MAX)):
+
+     The client OPTIONALLY supplies this Operation attribute in order to
+     verify that the identified job is still the current job on the
+     target Printer object.  The IPP object MUST supports this operation
+     attribute, if it supports this operation.
+
+
+
+  "synchronize" (boolean)
+     The client OPTIONALLY supplies this attribute.  The Printer object
+     OPTIONALLY supports this attribute.  This attribute indicates
+     whether or not the printer is to synchronize the checkpoint data
+     for the current job being paused with the pages that have actually
+     printed.  If this attribute is supported, then a value of 'true'
+     implies that the Printer will be able to resume the job at the
+     point of synchronization when the job is resumed.
+
+     If the Printer supports this attribute but the client does not
+     supply it, the Printer is assumed to perform synchronization
+
+
+
+Kugler, Hastings, Lewis                                       [Page 42]
+                       Expires:  March 19, 2000
+
+
+
+PWG-DRAFT             IPP/1.1: Set 2 Operations      September 19, 1999
+
+
+     ('true' behavior).  If the Printer does not support this attribute,
+     the Printer is assumed to not synchronize ('false' behavior).
+
+
+7.2.5 Resume-Job operation
+
+This OPTIONAL operation allows a client to stop the target job and allow
+other jobs to be processed instead.  The Printer moves the target job to
+the 'pending' state and removes the 'job-paused' value from the job's
+"job-state-reasons" attribute.
+
+If the target job is not in the 'processing-stopped' state with the
+'job-paused' value in the job's "job-state-reasons" attribute, the
+Printer rejects the request and returns the 'client-error-not-possible'
+status code, since the job was not paused.
+
+If the Resume-Job operation is supported, then the Pause-Current-Job
+operation MUST be supported, and vice-versa.
+
+Access Rights: Authentication and access control (see [ipp-mod] sections
+1, 8.3, and 8.5) apply to this operation.
+
+The Resume-Job Request and Resume-Job Response have the same attribute
+groups and attributes as the Release-Job operation (see [ipp-mod]
+section 3.3.6), including the new "job-message-from-operator" operation
+attribute (see section 3.2).
+
+
+7.2.6 Promote-Job operation
+
+This OPTIONAL operation allows a client to make the pending target job
+be processed next after the current job completes.  This operation is
+specially useful in a production printing environment where the operator
+is involved in job scheduling.
+
+If the target job is in the 'pending' state, this operation does not
+change the job's state, but causes the job to be processed after the
+current job(s) complete.  If the target job is not in the 'pending'
+state, the Printer rejects the request and returns the 'client-error-
+not-possible' status code.  The Printer returns the target job
+immediately after the current job(s) in a Get-Jobs response (see [ipp-
+mod] section 3.2.6) for the 'not-completed' jobs.
+
+When the current job completes, is canceled, paused, or aborted, the
+target of this operation is processed next.
+
+If a client issues this request (again) before the target of the
+operation of the original request started processing, the target of this
+new request is scheduled before the previous job that was to be
+processed next.
+
+
+
+Kugler, Hastings, Lewis                                       [Page 43]
+                       Expires:  March 19, 2000
+
+
+
+PWG-DRAFT             IPP/1.1: Set 2 Operations      September 19, 1999
+
+
+Note:  IPP is specified not to require queues for job scheduling, since
+there are other implementations for scheduling multiple jobs.  However,
+if an implementation does implement queues for jobs, then the Promote-
+Job puts the specified job at the front of the queue.  A subsequent
+Promote-Job before the first job starts processing puts that specified
+job at the front of the queue, so that it is "in front" of the
+previously promoted job.
+
+Access Rights: Authentication and access control (see [ipp-mod] sections
+1, 8.3, and 8.5) apply to this operation.
+
+The Promote-Job Request and Promote-Job Response have the same attribute
+groups and attributes as the Cancel-Job operation (see [ipp-mod] section
+3.3.3), including the new "job-message-from-operator" operation
+attribute (see section 3.2).
+
+
+7.2.7 Space-Current-Job operation
+
+This OPTIONAL operation allows a client to repeat or skip a specified
+number of impressions for the current job on the target Printer or the
+specified job if it is the current job on the Printer.  The Printer
+repeats or skips the indicated number of impressions specified by the
+"back-space" or "forward-space" operation attribute, respectively.  This
+operation is typically supported in a continuous forms implementation
+for synchronizing the web after forms run out or media change.
+
+If the client does not supply a "job-id" operation attribute, the
+Printer MUST accept this request in any state, whether or not there is a
+current job, and advance or backspace the media the indicated number of
+impressions specified by the "back-space" or "forward-space" operation
+attribute, respectively.  If more than one job is in the 'processing' or
+'processing-stopped' states, the one that is marking is spaced and the
+others are unaffected.
+
+It is reasonable, although not MANDATORY), to perform Space-Current-Job
+while the Printer is 'stopped', paused, or 'processing'.  Between the
+time that a user issues this operation and its acceptance, the current
+job might change to a different job.  To prevent this race from spacing
+the wrong job, the client MAY supply the "job-id" operation attribute
+which is checked against the current job's job-id.  If the job
+identified by the "job-id" attribute is not the current job on the
+Printer, i.e., is not in the 'processing' or 'processing-stopped'
+states, or is not the job that has impressions in the media path even if
+the job has completed, the Printer MUST reject this operation and return
+the 'client-error-not-possible' status code.  Otherwise, the Printer
+advances or backspaces the media the indicated number of impressions
+specified by the "back-space" or "forward-space" operation attribute,
+respectively.
+
+
+
+
+Kugler, Hastings, Lewis                                       [Page 44]
+                       Expires:  March 19, 2000
+
+
+
+PWG-DRAFT             IPP/1.1: Set 2 Operations      September 19, 1999
+
+
+Access Rights: Authentication and access control (see [ipp-mod] sections
+1, 8.3, and 8.5) apply to this operation.
+
+The Space-Current-Job Request and Space-Current-Job Response have the
+same attribute groups and attributes as the Resume-Printer operation
+(see [ipp-mod] section 3.2.8), including the new "job-message-from-
+operator" operation attribute (see section 3.2), with the addition of
+the following Group 1 Operation attributes in the request:
+
+  "job-id" (integer(1:MAX)):
+
+     The client OPTIONALLY supplies this Operation attribute in order to
+     verify that the identified job is still the current job on the
+     target Printer object.  The IPP object MUST supports this operation
+     attribute, if it supports this operation.
+
+  "back-space" (integer(1:MAX)):
+
+     The client OPTIONALLY supplies this Operation attribute.  The IPP
+     object OPTIONALLY supports this operation attribute, if it is able
+     to repeat impressions.
+
+     If the client supplies a value that specifies more impressions than
+     the job has performed, the job is positioned at the beginning
+     without any indication.
+
+  "forward-space" (integer(1:MAX)):
+
+     The client OPTIONALLY supplies this Operation attribute.  The IPP
+     object OPTIONALLY supports this operation attribute, if it is able
+     to skip impressions.
+
+     If the client supplies a value that specifies more impressions than
+     remain in the job, the job is positioned at the end without any
+     indication.
+
+
+
+
+8. IANA Considerations
+
+The operations and attributes in this registration proposal will be
+published by IANA according to the procedures in RFC 2566 [rfc2566]
+section 6.4 for operations with the following URL:
+
+     ftp.isi.edu/iana/assignments/ipp/operations/set2.txt
+
+
+
+9. Internationalization Considerations
+
+This document has the same localization considerations as the [ipp-mod].
+
+
+
+
+
+Kugler, Hastings, Lewis                                       [Page 45]
+                       Expires:  March 19, 2000
+
+
+
+PWG-DRAFT             IPP/1.1: Set 2 Operations      September 19, 1999
+
+
+10. Security Considerations
+
+The IPP Model and Semantics document [ipp-mod] discusses high level
+security requirements (Client Authentication, Server Authentication and
+Operation Privacy). Client Authentication is the mechanism by which the
+client proves its identity to the server in a secure manner. Server
+Authentication is the mechanism by which the server proves its identity
+to the client in a secure manner. Operation Privacy is defined as a
+mechanism for protecting operations from eavesdropping.
+
+
+11. Author's Addresses
+
+   Carl Kugler
+   IBM
+   Boulder CA
+
+   Phone: (303) 924-5060
+   FAX:
+   e-mail:  kugler@us.ibm.com
+
+   Tom Hastings
+   Xerox Corporation
+   737 Hawaii St.  ESAE 231
+   El Segundo, CA  90245
+
+   Phone: 310-333-6413
+   Fax: 310-333-5514
+   e-mail: hastings@cp10.es.xerox.com
+
+   Harry Lewis
+   IBM
+   Boulder CA
+
+   Phone: (303) 924-5337
+   FAX:
+   e-mail:  harryl@us.ibm.com
+
+
+
+12. References
+
+[ipp-mod]
+     R. deBry, T. Hastings, R. Herriot, S. Isaacson, P. Powell,
+     "Internet Printing Protocol/1.0: Model and Semantics", <draft-ietf-
+     ipp-model-v11-03.txt>, June, 1999.
+
+[RFC2566]
+     R. deBry, T. Hastings, R. Herriot, S. Isaacson, P. Powell,
+     "Internet Printing Protocol/1.0: Model and Semantics", RFC 2566,
+     April 1999.
+
+Kugler, Hastings, Lewis                                       [Page 46]
+                       Expires:  March 19, 2000
+
+
+
+PWG-DRAFT             IPP/1.1: Set 2 Operations      September 19, 1999
+
+
+13. Change History
+
+
+This section summarizes the changes.  Each sub-section is in reverse
+chronological order.
+
+
+13.1 Changes to the July 19, 1999 version to make the September 19, 1999
+version
+
+
+The following changes to the July 19, 1999 version to make the September
+19, 1999 version as a result of the IPP WG meeting in Alaska, 8/99:
+
+1.Refer to proposal as "Set2" rather than "Administrative" operations.
+
+2.Revise the emphasis on administrator throughout the document,
+  although the word administrator remains wherever appropriate.
+
+3.Convert non-process-run-out from an operations attribute to an
+  operation.
+
+4.Added  Issue 21: For all these "access" caveats, why not just say...
+  'authentication and access control (see ipp-mod sections 1, 8.3 and
+  8.5) applies to this operation".?
+
+5.Added Issue 22: Why? This is backward, if you ask me (HRL).
+
+6.Per resolution of Issue 2, the "settable-attributes" Printer
+  Description attribute, was replaced with three Printer Description
+  attributes:  "printer-settable-attributes", "job-settable-
+  attributes", and "interpreter-settable-attributes".  The latter for
+  those implementations that have different values for Printer
+  attributes in the Get-Printer-Attributes and Set-Printer-Attributes
+  operations, depending on the value of the "document-format" operation
+  attribute supplied by the client.  If and when we get a Document
+  object, then we can add a "document-settable-attributes" Printer
+  Description attribute.
+
+7.Added the Interpreter object.
+
+
+13.2 Changes to the June 30, 1999 version to make the July 19, 1999
+version
+
+
+The following changes to the June 30, 1999 version to make the July 19,
+1999 version as a result of the IPP WG meeting in Copenhagen, 7/7/99-
+7/8/99, and the IPP telecon, 7/14/1999:
+
+1.Sections 2.1 and 2.2:  Clarified that the way to remove a message
+  from the operator was for the client to supply a zero-length or all
+
+
+
+Kugler, Hastings, Lewis                                       [Page 47]
+                       Expires:  March 19, 2000
+
+
+
+PWG-DRAFT             IPP/1.1: Set 2 Operations      September 19, 1999
+
+
+  white space text string which is copied as usual to the "xxx-message-
+  from-operator" attribute.
+
+2.Section 2.3:  Added "factory-settings" (boolean) operation attribute
+  to the Get-Printer-Attributes operation.
+
+3.Section 2.4:  Added the "when" operation attribute to the Pause-
+  Current-Job operation.
+
+4.Section 2.4:  Made the "when" operation attribute OPTIONAL for  use
+  in operations (Pause-Printer, Reset-Printer, Shutdown-Printer, and
+  Pause-Current-Job operations).
+
+5.Sections 2.5:  Added table of operation attributes for the Printer
+  operations to make it easy to compare.
+
+6.Sections 2.6:  Added table of operation attributes for the Job
+  operations to make it easy to compare.
+
+7.Section 3.1:  Added "settable-attributes" (1setOf type2 keyword)
+  READ-ONLY Printer Description attribute.
+
+8.Section 3.2:  Added "printer-controls-other-protocols" (boolean)
+  Printer Description attribute
+
+9.Section 3.3:  Added the READ-ONLY "printer-message-time"
+  (integer(MIN:MAX)) Printer Description attribute to keep time message
+  updated in time ticks.
+
+10.  Section 4.2:  Deleted the 'process-next' "job-state-reasons" value,
+  so that repeated Promote-Job operations promote each job "to the
+  front of the queue".
+
+11.  Sections 6.1.1.1 and 6.2.1.1:  Replaced the table that listed all
+  attributes with one that lists only the attributes that MUST be READ-
+  ONLY.
+
+12.  Section 6.1.1.1:  Indicated that attributes that are not specified
+  as READ-ONLY in this document MAY be settable.  If they control
+  behavior, that changing their values MUST change the behavior.
+
+13.  Section 6.1.1.2 and 6.2.1.2:  Deleted the "ipp-attribute-fidelity"
+  operation attribute from the Set-Printer-Attributes and Set-Job-
+  Attributes operations.  All set operations are atomic.
+
+14.  Section 6.1.1.2:  Add the concept of the Interpreter object to
+  handle attributes whose values vary in the Set-Printer-Attributes and
+  Get-Printer-Attributes, depending on the value of the "document-
+  format" operation attribute.
+
+
+
+Kugler, Hastings, Lewis                                       [Page 48]
+                       Expires:  March 19, 2000
+
+
+
+PWG-DRAFT             IPP/1.1: Set 2 Operations      September 19, 1999
+
+
+15.  Sections 6.1.1.3 and 6.2.1.2:  Changed the "out-of-band" 'not-
+  settable' value back to the existing 'not-supported' value.
+
+16.  Section 6.1.2 and 6.1.3:  Added "job-type" operation attribute to
+  Disable-Printer and Enable-Printer operations with values: 'network-
+  jobs', 'walk-up-jobs', and 'all-jobs'.
+
+17.  Section 6.1.5:  Clarified that Restart-Printer brings up the
+  Printer disabled and paused, since that is the eventual state that
+  Shutdown-Printer leaves the printer in.
+
+18.  Section 6.1.5:  Indicated that if Restart-Printer is supported,
+  then Shutdown-Printer MUST be supported.
+
+19.  Section 6.1.6:  Deleted Space-Printer operation.  Keep Space-
+  Current-Job operation only which has a "job-id" operation attribute
+  that a client MAY supply.
+
+20.  Section 6.1.6:  Clarified that Shutdown-Printer is for a long
+  period of time, not just to reset the device or change attribute
+  values.  Also that Shutdown performs an immediate Disable-Printer and
+  an eventual Pause-Printer.
+
+21.  Sections 6.2.3, 6.2.4, and 6.2.7 :  Added a "job-id" operation
+  attribute to Cancel-Current-Job, Pause-Current-Job, and Space-
+  Current-Job that a client MAY supply to check for race condition
+  where current job changes
+
+22.  Section 6.2.4:  Combined Pause-Job into Pause-Current-Job
+  operation.
+
+23.  Sections 6.2.4 and 6.2.5:  Pause-Current-Job puts job in
+  'processing-stopped' state, not 'pending-held' state.
+
+24.  Section 6.2.6:  Simplified Promote-Job, so that it behaves as if
+  the job were put at the front of the queue.
+
+
+
+14. Appendix A: Full Copyright Statement
+
+
+Copyright (C) The Internet Society (1998,1999). All Rights Reserved
+
+This document and translations of it may be copied and furnished to
+others, and derivative works that comment on or otherwise explain it or
+assist in its implementation may be prepared, copied, published and
+distributed, in whole or in part, without restriction of any kind,
+provided that the above copyright notice and this paragraph are included
+on all such copies and derivative works.  However, this document itself
+may not be modified in any way, such as by removing the copyright notice
+or references to the Internet Society or other Internet organizations,
+
+Kugler, Hastings, Lewis                                       [Page 49]
+                       Expires:  March 19, 2000
+
+
+
+PWG-DRAFT             IPP/1.1: Set 2 Operations      September 19, 1999
+
+
+except as needed for the purpose of developing Internet standards in
+which case the procedures for copyrights defined in the Internet
+Standards process must be followed, or as required to translate it into
+languages other than English.
+
+The limited permissions granted above are perpetual and will not be
+revoked by the Internet Society or its successors or assigns.
+
+This document and the information contained herein is provided on an "AS
+IS" basis and THE INTERNET SOCIETY AND THE INTERNET ENGINEERING TASK
+FORCE DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING BUT NOT
+LIMITED TO ANY WARRANTY THAT THE USE OF THE INFORMATION HEREIN WILL NOT
+INFRINGE ANY RIGHTS OR ANY IMPLIED WARRANTIES OF MERCHANTABILITY OR
+FITNESS FOR A PARTICULAR PURPOSE.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Kugler, Hastings, Lewis                                       [Page 50]
+                       Expires:  March 19, 2000
