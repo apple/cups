@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.14 1999/04/23 17:36:42 mike Exp $"
+ * "$Id: conf.c,v 1.15 1999/04/23 18:46:54 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -182,7 +182,6 @@ ReadConfiguration(void)
   BrowseInterval   = DEFAULT_INTERVAL;
   BrowseTimeout    = DEFAULT_TIMEOUT;
   NumBrowsers      = 0;
-  LastBrowseTime   = 0;
 
   NumListeners     = 0;
 
@@ -961,5 +960,5 @@ get_address(char               *value,		/* I - Value string */
 
 
 /*
- * End of "$Id: conf.c,v 1.14 1999/04/23 17:36:42 mike Exp $".
+ * End of "$Id: conf.c,v 1.15 1999/04/23 18:46:54 mike Exp $".
  */

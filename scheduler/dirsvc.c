@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.13 1999/04/23 17:36:42 mike Exp $"
+ * "$Id: dirsvc.c,v 1.14 1999/04/23 18:46:55 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -52,7 +52,7 @@ StartBrowsing(void)
   * Create the broadcast socket...
   */
 
-  if ((BrowseSocket = socket(PF_INET, SOCK_DGRAM, 0)) < 0)
+  if ((BrowseSocket = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
   {
     LogMessage(LOG_ERROR, "StartBrowsing: Unable to create broadcast socket - %s.",
                strerror(errno));
@@ -60,7 +60,7 @@ StartBrowsing(void)
   }
 
  /*
-  * Set the "broadcast" and "allow port reuse" flags...
+  * Set the "broadcast" flag...
   */
 
   val = 1;
@@ -302,5 +302,5 @@ SendBrowseList(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.13 1999/04/23 17:36:42 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.14 1999/04/23 18:46:55 mike Exp $".
  */

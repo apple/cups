@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.26 1999/04/22 15:02:38 mike Exp $"
+ * "$Id: http.c,v 1.27 1999/04/23 18:46:53 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -311,7 +311,7 @@ httpReconnect(http_t *http)	/* I - HTTP data */
   * Create the socket and set options to allow reuse.
   */
 
-  if ((http->fd = socket(AF_INET, SOCK_STREAM, PF_UNSPEC)) < 0)
+  if ((http->fd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
     return (-1);
 
 #ifdef FD_CLOEXEC
@@ -1367,5 +1367,5 @@ http_send(http_t       *http,	/* I - HTTP data */
 
 
 /*
- * End of "$Id: http.c,v 1.26 1999/04/22 15:02:38 mike Exp $".
+ * End of "$Id: http.c,v 1.27 1999/04/23 18:46:53 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.14 1999/04/22 15:02:45 mike Exp $"
+ * "$Id: client.c,v 1.15 1999/04/23 18:46:54 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -1040,7 +1040,7 @@ StartListening(void)
                ntohl(lis->address.sin_addr.s_addr),
 	       ntohs(lis->address.sin_port));
 
-    if ((lis->fd = socket(AF_INET, SOCK_STREAM, PF_UNSPEC)) == -1)
+    if ((lis->fd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
     {
       LogMessage(LOG_ERROR, "StartListening() Unable to open listen socket - %s.",
                  strerror(errno));
@@ -1552,5 +1552,5 @@ pipe_command(client_t *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.14 1999/04/22 15:02:45 mike Exp $".
+ * End of "$Id: client.c,v 1.15 1999/04/23 18:46:54 mike Exp $".
  */
