@@ -1,5 +1,5 @@
 /*
- * "$Id: raster.c,v 1.2.2.4 2002/03/13 11:50:47 mike Exp $"
+ * "$Id: raster.c,v 1.2.2.5 2002/05/09 01:55:39 mike Exp $"
  *
  *   Raster file routines for the Common UNIX Printing System (CUPS).
  *
@@ -32,15 +32,17 @@
  *
  * Contents:
  *
- *   cupsRasterClose()       - Close a raster stream.
- *   cupsRasterOpen()        - Open a raster stream.
- *   cupsRasterReadHeader()  - Read a raster page header.
- *   cupsRasterReadPixels()  - Read raster pixels.
- *   cupsRasterWriteHeader() - Write a raster page header.
- *   cupsRasterWritePixels() - Write raster pixels.
- *   cups_raster_update()    - Update the raster header and row count for the
- *                             current page.
- *   cups_raster_write()     - Write a row of raster data...
+ *   cupsRasterClose()        - Close a raster stream.
+ *   cupsRasterOpen()         - Open a raster stream.
+ *   cupsRasterReadHeader()   - Read a V1 raster page header.
+ *   cupsRasterReadHeader2()  - Read a V2 raster page header.
+ *   cupsRasterReadPixels()   - Read raster pixels.
+ *   cupsRasterWriteHeader()  - Write a V1 raster page header.
+ *   cupsRasterWriteHeader2() - Write a V2 raster page header.
+ *   cupsRasterWritePixels()  - Write raster pixels.
+ *   cups_raster_update()     - Update the raster header and row count for the
+ *                              current page.
+ *   cups_raster_write()      - Write a row of raster data...
  */
 
 /*
@@ -64,6 +66,7 @@
  * Local functions...
  */
 
+static unsigned	cups_raster_read_header(cups_raster_t *r);
 static void	cups_raster_update(cups_raster_t *r);
 static int	cups_raster_write(cups_raster_t *r);
 
@@ -145,66 +148,50 @@ cupsRasterOpen(FILE        *fp,		/* I - File pointer */
 
 
 /*
- * 'cupsRasterReadHeader()' - Read a raster page header.
+ * 'cupsRasterReadHeader()' - Read a V1 raster page header.
  */
 
 unsigned					/* O - 1 on success, 0 on fail */
 cupsRasterReadHeader(cups_raster_t      *r,	/* I - Raster stream */
                      cups_page_header_t *h)	/* I - Pointer to header data */
 {
-  int		len;				/* Number of words to swap */
-  union swap_s					/* Swapping structure */
-  {
-    unsigned char	b[4];
-    unsigned		v;
-  }		*s;
+ /*
+  * Get the raster header...
+  */
 
-
-  if (r == NULL || r->mode != CUPS_RASTER_READ)
+  if (!cups_raster_read_header(r))
     return (0);
-
- /*
-  * Get the length of the raster header...
-  */
-
-  len = sizeof(cups_page_header_t);
-
-  if (r->sync == CUPS_RASTER_SYNCv1 || r->sync == CUPS_RASTER_REVSYNCv1)
-    len -= sizeof(h->cupsMarkerType) + sizeof(h->cupsRenderingIntent) +
-           sizeof(h->cupsString) + sizeof(h->cupsInteger) +
-	   sizeof(h->cupsReal) + sizeof(h->cupsNumColors);
-	   /* Adjust for v1 raster format */
-
- /*
-  * Read the header...
-  */
-
-  memset(&(r->header), 0, sizeof(r->header));
-
-  if (fread(&(r->header), len, 1, r->fp) < 1)
-    return (0);
-
- /*
-  * Swap bytes as needed...
-  */
-
-  if (r->sync == CUPS_RASTER_REVSYNC || r->sync == CUPS_RASTER_REVSYNCv1)
-    for (len = 68, s = (union swap_s *)&(r->header.AdvanceDistance);
-	 len > 0;
-	 len --, s ++)
-      s->v = (((((s->b[3] << 8) | s->b[2]) << 8) | s->b[1]) << 8) | s->b[0];
-
- /*
-  * Update the header and row count...
-  */
-
-  cups_raster_update(r);
-
+  
  /*
   * Copy the header to the user-supplied buffer...
   */
 
-  memcpy(h, &(r->header), sizeof(cups_page_header_t));
+  memcpy(h, &(r->header), sizeof(cups_page_header2_t));
+
+  return (1);
+}
+
+
+/*
+ * 'cupsRasterReadHeader2()' - Read a V2 raster page header.
+ */
+
+unsigned					/* O - 1 on success, 0 on fail */
+cupsRasterReadHeader2(cups_raster_t       *r,	/* I - Raster stream */
+                      cups_page_header2_t *h)	/* I - Pointer to header data */
+{
+ /*
+  * Get the raster header...
+  */
+
+  if (!cups_raster_read_header(r))
+    return (0);
+  
+ /*
+  * Copy the header to the user-supplied buffer...
+  */
+
+  memcpy(h, &(r->header), sizeof(cups_page_header2_t));
 
   return (1);
 }
@@ -390,7 +377,7 @@ cupsRasterReadPixels(cups_raster_t *r,	/* I - Raster stream */
 
 
 /*
- * 'cupsRasterWriteHeader()' - Write a raster page header.
+ * 'cupsRasterWriteHeader()' - Write a V2 raster page header.
  */
  
 unsigned					/* O - 1 on success, 0 on failure */
@@ -405,7 +392,8 @@ cupsRasterWriteHeader(cups_raster_t      *r,	/* I - Raster stream */
   * lines in the page image...
   */
 
-  memcpy(&(r->header), h, sizeof(r->header));
+  memset(&(r->header), 0, sizeof(r->header));
+  memcpy(&(r->header), h, sizeof(cups_page_header_t));
 
   cups_raster_update(r);
 
@@ -413,7 +401,35 @@ cupsRasterWriteHeader(cups_raster_t      *r,	/* I - Raster stream */
   * Write the raster header...
   */
 
-  return (fwrite(&(r->header), sizeof(cups_page_header_t), 1, r->fp));
+  return (fwrite(&(r->header), sizeof(r->header), 1, r->fp));
+}
+
+
+/*
+ * 'cupsRasterWriteHeader2()' - Write a V2 raster page header.
+ */
+ 
+unsigned					/* O - 1 on success, 0 on failure */
+cupsRasterWriteHeader2(cups_raster_t       *r,	/* I - Raster stream */
+                       cups_page_header2_t *h)	/* I - Raster page header */
+{
+  if (r == NULL || r->mode != CUPS_RASTER_WRITE)
+    return (0);
+
+ /*
+  * Make a copy of the header, and compute the number of raster
+  * lines in the page image...
+  */
+
+  memcpy(&(r->header), h, sizeof(cups_page_header2_t));
+
+  cups_raster_update(r);
+
+ /*
+  * Write the raster header...
+  */
+
+  return (fwrite(&(r->header), sizeof(r->header), 1, r->fp));
 }
 
 
@@ -524,6 +540,62 @@ cupsRasterWritePixels(cups_raster_t *r,	/* I - Raster stream */
   }
 
   return (len);
+}
+
+
+/*
+ * 'cups_raster_read_header()' - Read a raster page header.
+ */
+
+static unsigned					/* O - 1 on success, 0 on fail */
+cups_raster_read_header(cups_raster_t *r)	/* I - Raster stream */
+{
+  int		len;				/* Number of words to swap */
+  union swap_s					/* Swapping structure */
+  {
+    unsigned char	b[4];
+    unsigned		v;
+  }		*s;
+
+
+  if (r == NULL || r->mode != CUPS_RASTER_READ)
+    return (0);
+
+ /*
+  * Get the length of the raster header...
+  */
+
+  if (r->sync == CUPS_RASTER_SYNCv1 || r->sync == CUPS_RASTER_REVSYNCv1)
+    len = sizeof(cups_page_header_t);
+  else
+    len = sizeof(cups_page_header2_t);
+
+ /*
+  * Read the header...
+  */
+
+  memset(&(r->header), 0, sizeof(r->header));
+
+  if (fread(&(r->header), len, 1, r->fp) < 1)
+    return (0);
+
+ /*
+  * Swap bytes as needed...
+  */
+
+  if (r->sync == CUPS_RASTER_REVSYNC || r->sync == CUPS_RASTER_REVSYNCv1)
+    for (len = 68, s = (union swap_s *)&(r->header.AdvanceDistance);
+	 len > 0;
+	 len --, s ++)
+      s->v = (((((s->b[3] << 8) | s->b[2]) << 8) | s->b[1]) << 8) | s->b[0];
+
+ /*
+  * Update the header and row count...
+  */
+
+  cups_raster_update(r);
+
+  return (1);
 }
 
 
@@ -718,5 +790,5 @@ cups_raster_write(cups_raster_t *r)	/* I - Raster stream */
 
 
 /*
- * End of "$Id: raster.c,v 1.2.2.4 2002/03/13 11:50:47 mike Exp $".
+ * End of "$Id: raster.c,v 1.2.2.5 2002/05/09 01:55:39 mike Exp $".
  */

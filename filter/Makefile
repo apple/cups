@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.41.2.13 2002/04/19 16:18:09 mike Exp $"
+# "$Id: Makefile,v 1.41.2.14 2002/05/09 01:55:38 mike Exp $"
 #
 #   Filter makefile for the Common UNIX Printing System (CUPS).
 #
@@ -54,7 +54,7 @@ all:	$(TARGETS)
 #
 
 clean:
-	$(RM) $(OBJS) $(TARGETS) $(LIBCUPSIMAGE) `basename $(LIBCUPSIMAGE) .3`
+	$(RM) $(OBJS) $(TARGETS) $(LIBCUPSIMAGE) `basename $(LIBCUPSIMAGE) .2`
 
 
 #
@@ -76,11 +76,11 @@ install:	all installhdrs
 	done
 	$(INSTALL_DIR) $(LIBDIR)
 	$(INSTALL_LIB) $(LIBCUPSIMAGE) $(LIBDIR)
-	-if test $(LIBCUPSIMAGE) = "libcupsimage.so.3" -o $(LIBCUPSIMAGE) = "libcupsimage.sl.3"; then \
-		$(RM) $(LIBDIR)/`basename $(LIBCUPSIMAGE) .3`; \
-		$(LN) $(LIBCUPSIMAGE) $(LIBDIR)/`basename $(LIBCUPSIMAGE) .3`; \
+	-if test $(LIBCUPSIMAGE) = "libcupsimage.so.2" -o $(LIBCUPSIMAGE) = "libcupsimage.sl.2"; then \
+		$(RM) $(LIBDIR)/`basename $(LIBCUPSIMAGE) .2`; \
+		$(LN) $(LIBCUPSIMAGE) $(LIBDIR)/`basename $(LIBCUPSIMAGE) .2`; \
 	fi
-	-if test $(LIBCUPSIMAGE) = "libcupsimage.3.dylib"; then \
+	-if test $(LIBCUPSIMAGE) = "libcupsimage.2.dylib"; then \
 		$(STRIP) -x $(LIBDIR)/$(LIBCUPSIMAGE); \
 		$(RM) $(LIBDIR)/libcupsimage.dylib; \
 		$(LN) $(LIBCUPSIMAGE) $(LIBDIR)/libcupsimage.dylib; \
@@ -111,26 +111,26 @@ hpgltops:	$(HPGLOBJS) common.o ../cups/$(LIBCUPS)
 
 
 #
-# libcupsimage.so.3, libcupsimage.sl.3
+# libcupsimage.so.2, libcupsimage.sl.2
 #
 
-libcupsimage.so.3 libcupsimage.sl.3:	$(IMAGEOBJS)
+libcupsimage.so.2 libcupsimage.sl.2:	$(IMAGEOBJS)
 	echo Linking $@...
 	$(DSO) $(DSOFLAGS) -o $@ $(IMAGEOBJS) $(DSOLIBS) -lm
-	$(RM) `basename $@ .3`
-	$(LN) $@ `basename $@ .3`
+	$(RM) `basename $@ .2`
+	$(LN) $@ `basename $@ .2`
 
 
 #
-# libcupsimage.3.dylib
+# libcupsimage.2.dylib
 #
 
-libcupsimage.3.dylib:	$(IMAGEOBJS)
+libcupsimage.2.dylib:	$(IMAGEOBJS)
 	echo Linking $@...
 	$(DSO) $(DSOFLAGS) -o $@ \
 		-install_name $(libdir)/libcupsimage.dylib \
-		-current_version 3.0.0 \
-		-compatibility_version 3.0.0 \
+		-current_version 2.2.0 \
+		-compatibility_version 2.0.0 \
 		$(IMAGEOBJS) $(DSOLIBS) $(LINKCUPS) -lm -lcc_dynamic
 	$(RM) libcupsimage.dylib
 	$(LN) $@ libcupsimage.dylib
@@ -155,7 +155,7 @@ libcupsimage_s.a:	$(IMAGEOBJS)
 libcupsimage.la:       $(IMAGEOBJS)
 	echo Linking $@...
 	$(DSO) -o $(DSOFLAGS) $@ $(IMAGEOBJS:.o=.lo) $(DSOLIBS) \
-		-rpath $(LIBDIR) -version-info 3:0
+		-rpath $(LIBDIR) -version-info 2:2
 
 
 #
@@ -254,5 +254,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile,v 1.41.2.13 2002/04/19 16:18:09 mike Exp $".
+# End of "$Id: Makefile,v 1.41.2.14 2002/05/09 01:55:38 mike Exp $".
 #

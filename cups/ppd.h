@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.h,v 1.24.2.4 2002/03/25 18:02:48 mike Exp $"
+ * "$Id: ppd.h,v 1.24.2.5 2002/05/09 01:55:38 mike Exp $"
  *
  *   PostScript Printer Description definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -78,9 +78,11 @@ typedef enum			/**** UI types ****/
   PPD_UI_BOOLEAN,		/* True or False option */
   PPD_UI_PICKONE,		/* Pick one from a list */
   PPD_UI_PICKMANY,		/* Pick zero or more from a list */
+  PPD_UI_CUPS_TEXT,		/* Specify a string */
   PPD_UI_CUPS_NUMBER,		/* Specify a linear number */
   PPD_UI_CUPS_GAMMA,		/* Specify a gamma number */
-  PPD_UI_CUPS_CURVE		/* Specify a gamma/density LUT */
+  PPD_UI_CUPS_CURVE,		/* Specify start, end, and gamma numbers */
+  PPD_UI_CUPS_ARRAY		/* Specify an array of linear numbers */
 } ppd_ui_t;
 
 typedef enum			/**** Order dependency sections ****/
@@ -102,6 +104,15 @@ typedef enum			/**** Colorspaces ****/
   PPD_CS_RGBK,			/* RGBK (K = gray) colorspace */
   PPD_CS_N			/* DeviceN colorspace */
 } ppd_cs_t;
+
+typedef struct			/**** PPD Attribute Structure ****/
+{
+  char		name[PPD_MAX_NAME],
+  				/* Name of attribute (cupsXYZ) */
+		spec[PPD_MAX_NAME + PPD_MAX_TEXT],
+				/* Specifier string, if any */
+		*value;		/* Value string */
+} ppd_attr_t;
 
 typedef struct			/**** Option choices ****/
 {
@@ -128,26 +139,51 @@ typedef struct			/**** Options ****/
   float		order;		/* Order number */
   int		num_choices;	/* Number of option choices */
   ppd_choice_t	*choices;	/* Option choices */
-  const char	*command;	/* Command for numeric options */
-  int		num_values;	/* Number of numeric values */
-  float		*values,	/* Current value(s) */
-		lower,		/* Lower bounds for numeric value */
-		upper,		/* Upper bounds for numeric value */
-		precision;	/* Precision of values */
 } ppd_option_t;
 
 typedef struct ppd_group_str	/**** Groups ****/
 {
-  char		name[PPD_MAX_NAME],
-				/* Group name */
-		text[PPD_MAX_TEXT];
+  /**** Group text strings are limited to 39 chars + nul in order to
+   **** preserve binary compatibility with CUPS 1.1.x and allow
+   **** applications to get the group's keyword name.
+   ****/
+  char		text[PPD_MAX_TEXT - PPD_MAX_NAME],
   				/* Human-readable group name */
+		name[PPD_MAX_NAME];
+				/* Group name */
   int		num_options;	/* Number of options */
   ppd_option_t	*options;	/* Options */
   int		num_subgroups;	/* Number of sub-groups */
   struct ppd_group_str	*subgroups;
 				/* Sub-groups (max depth = 1) */
 } ppd_group_t;
+
+typedef union			/**** Extended Values ****/
+{
+  char		*text;		/* Text value */
+  float		linear;		/* Linear value */
+  float		gamma;		/* Gamma value */
+  struct
+  {
+    int		num_elements;	/* Number of array elements */
+    float	*elements;	/* Array of linear values */
+  }		array;		/* Array value */
+  struct
+  {
+    float	start,		/* Linear (density) start value for curve */
+		end,		/* Linear (density) end value for curve */
+		gamma;		/* Gamma correction */
+  }		curve;		/* Curve values */
+} ppd_ext_value_t;
+
+typedef struct			/**** Extended Options ****/
+{
+  ppd_option_t	*option;	/* Option that is being extended... */
+  const char	*command;	/* Generic command for extended options */
+  ppd_ext_value_t value,	/* Current values */
+		minval,		/* Minimum numeric values */
+		maxval;		/* Maximum numeric values */
+} ppd_ext_option_t;
 
 typedef struct			/**** Constraints ****/
 {
@@ -235,7 +271,16 @@ typedef struct			/**** Files ****/
   ppd_profile_t	*profiles;	/* sRGB color profiles */
   int		num_filters;	/* Number of filters */
   char		**filters;	/* Filter strings... */
+
+  /**** New for CUPS 1.1 ****/
   int		flip_duplex;	/* 1 = Flip page for back sides */
+
+  /**** New for CUPS 1.2 ****/
+  int		num_extended;	/* Number of extended options */
+  ppd_ext_option_t **extended;	/* Extended options */
+  int		num_attrs,	/* Number of attributes */
+		cur_attr;	/* Current attribute */
+  ppd_attr_t	**attrs;	/* Attributes */
 } ppd_file_t;
 
 
@@ -253,22 +298,35 @@ extern int		ppdEmitFd(ppd_file_t *ppd, int fd,
 			          ppd_section_t section);
 extern int		ppdEmitJCL(ppd_file_t *ppd, FILE *fp, int job_id,
 			           const char *user, const char *title);
+extern ppd_choice_t	*ppdFindChoice(ppd_option_t *o, const char *option);
+extern ppd_choice_t	*ppdFindMarkedChoice(ppd_file_t *ppd, const char *keyword);
+extern ppd_option_t	*ppdFindOption(ppd_file_t *ppd, const char *keyword);
 extern int		ppdIsMarked(ppd_file_t *ppd, const char *keyword,
 			            const char *option);
 extern void		ppdMarkDefaults(ppd_file_t *ppd);
 extern int		ppdMarkOption(ppd_file_t *ppd, const char *keyword,
 			              const char *option);
-extern int		ppdMarkNumeric(ppd_file_t *ppd, const char *keyword,
-			               int num_values, float *values);
-extern ppd_choice_t	*ppdFindChoice(ppd_option_t *o, const char *option);
-extern ppd_choice_t	*ppdFindMarkedChoice(ppd_file_t *ppd, const char *keyword);
-extern ppd_option_t	*ppdFindOption(ppd_file_t *ppd, const char *keyword);
 extern ppd_file_t	*ppdOpen(FILE *fp);
 extern ppd_file_t	*ppdOpenFd(int fd);
 extern ppd_file_t	*ppdOpenFile(const char *filename);
 extern float		ppdPageLength(ppd_file_t *ppd, const char *name);
 extern ppd_size_t	*ppdPageSize(ppd_file_t *ppd, const char *name);
 extern float		ppdPageWidth(ppd_file_t *ppd, const char *name);
+
+/**** New for CUPS 1.2 ****/
+extern const char	*ppdFindAttr(ppd_file_t *ppd, const char *name,
+			             const char *spec);
+extern ppd_ext_option_t	*ppdFindExtOption(ppd_file_t *ppd, const char *keyword);
+extern const char	*ppdFindNextAttr(ppd_file_t *ppd, const char *name,
+			                 const char *spec);
+extern int		ppdMarkNumeric(ppd_file_t *ppd, const char *keyword,
+			               int num_values, float *values);
+extern int		ppdMarkText(ppd_file_t *ppd, const char *keyword,
+			            const char *value);
+extern int		ppdSave(ppd_file_t *ppd, FILE *fp);
+extern int		ppdSaveFd(ppd_file_t *ppd, int fd);
+extern int		ppdSaveFile(ppd_file_t *ppd, const char *filename);
+
 
 /*
  * C++ magic...
@@ -280,5 +338,5 @@ extern float		ppdPageWidth(ppd_file_t *ppd, const char *name);
 #endif /* !_CUPS_PPD_H_ */
 
 /*
- * End of "$Id: ppd.h,v 1.24.2.4 2002/03/25 18:02:48 mike Exp $".
+ * End of "$Id: ppd.h,v 1.24.2.5 2002/05/09 01:55:38 mike Exp $".
  */

@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-sharedlibs.m4,v 1.6.2.7 2002/04/02 19:00:23 mike Exp $"
+dnl "$Id: cups-sharedlibs.m4,v 1.6.2.8 2002/05/09 01:55:37 mike Exp $"
 dnl
 dnl   Shared library support for the Common UNIX Printing System (CUPS).
 dnl
@@ -31,35 +31,35 @@ if test x$enable_shared != xno; then
 	case "$uname" in
 		SunOS* | UNIX_S*)
 			LIBCUPS="libcups.so.3"
-			LIBCUPSIMAGE="libcupsimage.so.3"
+			LIBCUPSIMAGE="libcupsimage.so.2"
 			LIBIPP="libipp.so.3"
 			DSO="\$(CC)"
 			DSOFLAGS="$DSOFLAGS -Wl,-h,\$@ -G \$(OPTIM)"
 			;;
 		HP-UX*)
 			LIBCUPS="libcups.sl.3"
-			LIBCUPSIMAGE="libcupsimage.sl.3"
+			LIBCUPSIMAGE="libcupsimage.sl.2"
 			LIBIPP="libipp.sl.3"
 			DSO="ld"
 			DSOFLAGS="$DSOFLAGS -b -z +h \$@"
 			;;
 		IRIX*)
 			LIBCUPS="libcups.so.3"
-			LIBCUPSIMAGE="libcupsimage.so.3"
+			LIBCUPSIMAGE="libcupsimage.so.2"
 			LIBIPP="libipp.so.3"
 			DSO="\$(CC)"
 			DSOFLAGS="$DSOFLAGS -Wl,-rpath,\$(libdir),-set_version,sgi3.0,-soname,\$@ -shared \$(OPTIM)"
 			;;
 		OSF1* | Linux* | *BSD*)
 			LIBCUPS="libcups.so.3"
-			LIBCUPSIMAGE="libcupsimage.so.3"
+			LIBCUPSIMAGE="libcupsimage.so.2"
 			LIBIPP="libipp.so.3"
 			DSO="\$(CC)"
 			DSOFLAGS="$DSOFLAGS -Wl,-soname,\$@ -shared \$(OPTIM)"
 			;;
 		Darwin*)
 			LIBCUPS="libcups.3.dylib"
-			LIBCUPSIMAGE="libcupsimage.3.dylib"
+			LIBCUPSIMAGE="libcupsimage.2.dylib"
 			LIBIPP="libipp.3.dylib"
 			DSO="\$(CC)"
 			DSOFLAGS="$DSOFLAGS \$(RC_FLAGS) -dynamiclib -lc"
@@ -75,7 +75,7 @@ if test x$enable_shared != xno; then
 			echo "Warning: shared libraries may not be supported.  Trying -shared"
 			echo "         option with compiler."
 			LIBCUPS="libcups.so.3"
-			LIBCUPSIMAGE="libcupsimage.so.3"
+			LIBCUPSIMAGE="libcupsimage.so.2"
 			LIBIPP="libipp.so.3"
 			DSO="\$(CC)"
 			DSOFLAGS="$DSOFLAGS -Wl,-soname,\$@ -shared \$(OPTIM)"
@@ -154,5 +154,5 @@ AC_SUBST(DSOLIBS)
 AC_SUBST(IMGLIBS)
 
 dnl
-dnl End of "$Id: cups-sharedlibs.m4,v 1.6.2.7 2002/04/02 19:00:23 mike Exp $".
+dnl End of "$Id: cups-sharedlibs.m4,v 1.6.2.8 2002/05/09 01:55:37 mike Exp $".
 dnl

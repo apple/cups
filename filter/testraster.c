@@ -1,5 +1,5 @@
 /*
- * "$Id: testraster.c,v 1.1.2.1 2002/03/07 18:58:45 mike Exp $"
+ * "$Id: testraster.c,v 1.1.2.2 2002/05/09 01:55:40 mike Exp $"
  *
  *   Raster test program routines for the Common UNIX Printing System (CUPS).
  *
@@ -53,7 +53,7 @@ main(void)
   int			page, x, y;	/* Looping vars */
   FILE			*fp;		/* Raster file */
   cups_raster_t		*r;		/* Raster stream */
-  cups_page_header_t	header;		/* Page header */
+  cups_page_header2_t	header;		/* Page header */
   unsigned char		data[2048];	/* Raster data */
 
 
@@ -101,7 +101,7 @@ main(void)
       header.cupsBitsPerPixel = (page & 1) ? 32 : 8;
     }
 
-    cupsRasterWriteHeader(r, &header);
+    cupsRasterWriteHeader2(r, &header);
 
     memset(data, 0, header.cupsBytesPerLine);
     for (y = 0; y < 64; y ++)
@@ -142,7 +142,7 @@ main(void)
 
   for (page = 0; page < 4; page ++)
   {
-    cupsRasterReadHeader(r, &header);
+    cupsRasterReadHeader2(r, &header);
 
     printf("Page %d:\n", page + 1);
     printf("    cupsWidth        = %d\n", header.cupsWidth);
@@ -206,5 +206,5 @@ main(void)
 
 
 /*
- * End of "$Id: testraster.c,v 1.1.2.1 2002/03/07 18:58:45 mike Exp $".
+ * End of "$Id: testraster.c,v 1.1.2.2 2002/05/09 01:55:40 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: imagetoraster.c,v 1.56.2.7 2002/04/29 15:58:07 mike Exp $"
+ * "$Id: imagetoraster.c,v 1.56.2.8 2002/05/09 01:55:38 mike Exp $"
  *
  *   Image file to raster filter for the Common UNIX Printing System (CUPS).
  *
@@ -172,17 +172,17 @@ int	Planes[] =	/* Number of planes for each colorspace */
  * Local functions...
  */
  
-static void	exec_code(cups_page_header_t *header, const char *code);
-static void	format_CMY(cups_page_header_t *header, unsigned char *row, int y, int z, int xsize, int ysize, int yerr0, int yerr1, ib_t *r0, ib_t *r1);
-static void	format_CMYK(cups_page_header_t *header, unsigned char *row, int y, int z, int xsize, int ysize, int yerr0, int yerr1, ib_t *r0, ib_t *r1);
-static void	format_K(cups_page_header_t *header, unsigned char *row, int y, int z, int xsize, int ysize, int yerr0, int yerr1, ib_t *r0, ib_t *r1);
-static void	format_KCMYcm(cups_page_header_t *header, unsigned char *row, int y, int z, int xsize, int ysize, int yerr0, int yerr1, ib_t *r0, ib_t *r1);
-static void	format_KCMY(cups_page_header_t *header, unsigned char *row, int y, int z, int xsize, int ysize, int yerr0, int yerr1, ib_t *r0, ib_t *r1);
+static void	exec_code(cups_page_header2_t *header, const char *code);
+static void	format_CMY(cups_page_header2_t *header, unsigned char *row, int y, int z, int xsize, int ysize, int yerr0, int yerr1, ib_t *r0, ib_t *r1);
+static void	format_CMYK(cups_page_header2_t *header, unsigned char *row, int y, int z, int xsize, int ysize, int yerr0, int yerr1, ib_t *r0, ib_t *r1);
+static void	format_K(cups_page_header2_t *header, unsigned char *row, int y, int z, int xsize, int ysize, int yerr0, int yerr1, ib_t *r0, ib_t *r1);
+static void	format_KCMYcm(cups_page_header2_t *header, unsigned char *row, int y, int z, int xsize, int ysize, int yerr0, int yerr1, ib_t *r0, ib_t *r1);
+static void	format_KCMY(cups_page_header2_t *header, unsigned char *row, int y, int z, int xsize, int ysize, int yerr0, int yerr1, ib_t *r0, ib_t *r1);
 #define		format_RGB format_CMY
-static void	format_RGBA(cups_page_header_t *header, unsigned char *row, int y, int z, int xsize, int ysize, int yerr0, int yerr1, ib_t *r0, ib_t *r1);
-static void	format_W(cups_page_header_t *header, unsigned char *row, int y, int z, int xsize, int ysize, int yerr0, int yerr1, ib_t *r0, ib_t *r1);
-static void	format_YMC(cups_page_header_t *header, unsigned char *row, int y, int z, int xsize, int ysize, int yerr0, int yerr1, ib_t *r0, ib_t *r1);
-static void	format_YMCK(cups_page_header_t *header, unsigned char *row, int y, int z, int xsize, int ysize, int yerr0, int yerr1, ib_t *r0, ib_t *r1);
+static void	format_RGBA(cups_page_header2_t *header, unsigned char *row, int y, int z, int xsize, int ysize, int yerr0, int yerr1, ib_t *r0, ib_t *r1);
+static void	format_W(cups_page_header2_t *header, unsigned char *row, int y, int z, int xsize, int ysize, int yerr0, int yerr1, ib_t *r0, ib_t *r1);
+static void	format_YMC(cups_page_header2_t *header, unsigned char *row, int y, int z, int xsize, int ysize, int yerr0, int yerr1, ib_t *r0, ib_t *r1);
+static void	format_YMCK(cups_page_header2_t *header, unsigned char *row, int y, int z, int xsize, int ysize, int yerr0, int yerr1, ib_t *r0, ib_t *r1);
 static void	make_lut(ib_t *, int, float, float);
 
 
@@ -223,7 +223,7 @@ main(int  argc,		/* I - Number of command-line arguments */
   ppd_profile_t	*profile;	/* Color profile */
   ppd_profile_t	userprofile;	/* User-specified profile */
   cups_raster_t	*ras;		/* Raster stream */
-  cups_page_header_t header;	/* Page header */
+  cups_page_header2_t header;	/* Page header */
   int		num_options;	/* Number of print options */
   cups_option_t	*options;	/* Print options */
   const char	*val;		/* Option value */
@@ -1207,7 +1207,7 @@ main(int  argc,		/* I - Number of command-line arguments */
 	  ytemp = header.HWResolution[1] * yprint;
         }
 
-        cupsRasterWriteHeader(ras, &header);
+        cupsRasterWriteHeader2(ras, &header);
 
         for (plane = 0; plane < num_planes; plane ++)
 	{
@@ -1410,8 +1410,8 @@ main(int  argc,		/* I - Number of command-line arguments */
  */
 
 static void
-exec_code(cups_page_header_t *header,	/* I - Page header */
-          const char         *code)	/* I - Option choice to execute */
+exec_code(cups_page_header2_t *header,	/* I - Page header */
+          const char          *code)	/* I - Option choice to execute */
 {
   char	*ptr,				/* Pointer into name/value string */
 	name[255],			/* Name of pagedevice entry */
@@ -1544,7 +1544,7 @@ exec_code(cups_page_header_t *header,	/* I - Page header */
  */
 
 static void
-format_CMY(cups_page_header_t *header,	/* I - Page header */
+format_CMY(cups_page_header2_t *header,	/* I - Page header */
             unsigned char      *row,	/* IO - Bitmap data for device */
 	    int                y,	/* I - Current row */
 	    int                z,	/* I - Current plane */
@@ -1918,16 +1918,16 @@ format_CMY(cups_page_header_t *header,	/* I - Page header */
  */
 
 static void
-format_CMYK(cups_page_header_t *header,	/* I - Page header */
-            unsigned char      *row,	/* IO - Bitmap data for device */
-	    int                y,	/* I - Current row */
-	    int                z,	/* I - Current plane */
-	    int                xsize,	/* I - Width of image data */
-	    int	               ysize,	/* I - Height of image data */
-	    int                yerr0,	/* I - Top Y error */
-	    int                yerr1,	/* I - Bottom Y error */
-	    ib_t               *r0,	/* I - Primary image data */
-	    ib_t               *r1)	/* I - Image data for interpolation */
+format_CMYK(cups_page_header2_t *header,	/* I - Page header */
+            unsigned char       *row,	/* IO - Bitmap data for device */
+	    int                 y,	/* I - Current row */
+	    int                 z,	/* I - Current plane */
+	    int                 xsize,	/* I - Width of image data */
+	    int	                ysize,	/* I - Height of image data */
+	    int                 yerr0,	/* I - Top Y error */
+	    int                 yerr1,	/* I - Bottom Y error */
+	    ib_t                *r0,	/* I - Primary image data */
+	    ib_t                *r1)	/* I - Image data for interpolation */
 {
   ib_t		*ptr,		/* Pointer into row */
 		*cptr,		/* Pointer into cyan */
@@ -2292,16 +2292,16 @@ format_CMYK(cups_page_header_t *header,	/* I - Page header */
  */
 
 static void
-format_K(cups_page_header_t *header,	/* I - Page header */
-         unsigned char      *row,	/* IO - Bitmap data for device */
-	 int                y,		/* I - Current row */
-	 int                z,		/* I - Current plane */
-	 int                xsize,	/* I - Width of image data */
-	 int	            ysize,	/* I - Height of image data */
-	 int                yerr0,	/* I - Top Y error */
-	 int                yerr1,	/* I - Bottom Y error */
-	 ib_t               *r0,	/* I - Primary image data */
-	 ib_t               *r1)	/* I - Image data for interpolation */
+format_K(cups_page_header2_t *header,	/* I - Page header */
+         unsigned char       *row,	/* IO - Bitmap data for device */
+	 int                 y,		/* I - Current row */
+	 int                 z,		/* I - Current plane */
+	 int                 xsize,	/* I - Width of image data */
+	 int	             ysize,	/* I - Height of image data */
+	 int                 yerr0,	/* I - Top Y error */
+	 int                 yerr1,	/* I - Bottom Y error */
+	 ib_t                *r0,	/* I - Primary image data */
+	 ib_t                *r1)	/* I - Image data for interpolation */
 {
   ib_t		*ptr,		/* Pointer into row */
 		bitmask;	/* Current mask for pixel */
@@ -2410,16 +2410,16 @@ format_K(cups_page_header_t *header,	/* I - Page header */
  */
 
 static void
-format_KCMY(cups_page_header_t *header,	/* I - Page header */
-            unsigned char      *row,	/* IO - Bitmap data for device */
-	    int                y,	/* I - Current row */
-	    int                z,	/* I - Current plane */
-	    int                xsize,	/* I - Width of image data */
-	    int	               ysize,	/* I - Height of image data */
-	    int                yerr0,	/* I - Top Y error */
-	    int                yerr1,	/* I - Bottom Y error */
-	    ib_t               *r0,	/* I - Primary image data */
-	    ib_t               *r1)	/* I - Image data for interpolation */
+format_KCMY(cups_page_header2_t *header,	/* I - Page header */
+            unsigned char       *row,	/* IO - Bitmap data for device */
+	    int                 y,	/* I - Current row */
+	    int                 z,	/* I - Current plane */
+	    int                 xsize,	/* I - Width of image data */
+	    int	                ysize,	/* I - Height of image data */
+	    int                 yerr0,	/* I - Top Y error */
+	    int                 yerr1,	/* I - Bottom Y error */
+	    ib_t                *r0,	/* I - Primary image data */
+	    ib_t                *r1)	/* I - Image data for interpolation */
 {
   ib_t		*ptr,		/* Pointer into row */
 		*cptr,		/* Pointer into cyan */
@@ -2818,16 +2818,16 @@ format_KCMY(cups_page_header_t *header,	/* I - Page header */
  */
 
 static void
-format_KCMYcm(cups_page_header_t *header,/* I - Page header */
-              unsigned char      *row,	/* IO - Bitmap data for device */
-	      int                y,	/* I - Current row */
-	      int                z,	/* I - Current plane */
-	      int                xsize,	/* I - Width of image data */
-	      int	         ysize,	/* I - Height of image data */
-	      int                yerr0,	/* I - Top Y error */
-	      int                yerr1,	/* I - Bottom Y error */
-	      ib_t               *r0,	/* I - Primary image data */
-	      ib_t               *r1)	/* I - Image data for interpolation */
+format_KCMYcm(cups_page_header2_t *header,/* I - Page header */
+              unsigned char       *row,	/* IO - Bitmap data for device */
+	      int                 y,	/* I - Current row */
+	      int                 z,	/* I - Current plane */
+	      int                 xsize,/* I - Width of image data */
+	      int	          ysize,/* I - Height of image data */
+	      int                 yerr0,/* I - Top Y error */
+	      int                 yerr1,/* I - Bottom Y error */
+	      ib_t                *r0,	/* I - Primary image data */
+	      ib_t                *r1)	/* I - Image data for interpolation */
 {
   int		pc, pm, py, pk;	/* Cyan, magenta, yellow, and black values */
   ib_t		*ptr,		/* Pointer into row */
@@ -3155,16 +3155,16 @@ format_KCMYcm(cups_page_header_t *header,/* I - Page header */
  */
 
 static void
-format_RGBA(cups_page_header_t *header,	/* I - Page header */
-            unsigned char      *row,	/* IO - Bitmap data for device */
-	    int                y,	/* I - Current row */
-	    int                z,	/* I - Current plane */
-	    int                xsize,	/* I - Width of image data */
-	    int	               ysize,	/* I - Height of image data */
-	    int                yerr0,	/* I - Top Y error */
-	    int                yerr1,	/* I - Bottom Y error */
-	    ib_t               *r0,	/* I - Primary image data */
-	    ib_t               *r1)	/* I - Image data for interpolation */
+format_RGBA(cups_page_header2_t *header,	/* I - Page header */
+            unsigned char       *row,	/* IO - Bitmap data for device */
+	    int                 y,	/* I - Current row */
+	    int                 z,	/* I - Current plane */
+	    int                 xsize,	/* I - Width of image data */
+	    int	                ysize,	/* I - Height of image data */
+	    int                 yerr0,	/* I - Top Y error */
+	    int                 yerr1,	/* I - Bottom Y error */
+	    ib_t                *r0,	/* I - Primary image data */
+	    ib_t                *r1)	/* I - Image data for interpolation */
 {
   ib_t		*ptr,		/* Pointer into row */
 		*cptr,		/* Pointer into cyan */
@@ -3558,16 +3558,16 @@ format_RGBA(cups_page_header_t *header,	/* I - Page header */
  */
 
 static void
-format_W(cups_page_header_t *header,	/* I - Page header */
-            unsigned char      *row,	/* IO - Bitmap data for device */
-	    int                y,	/* I - Current row */
-	    int                z,	/* I - Current plane */
-	    int                xsize,	/* I - Width of image data */
-	    int	               ysize,	/* I - Height of image data */
-	    int                yerr0,	/* I - Top Y error */
-	    int                yerr1,	/* I - Bottom Y error */
-	    ib_t               *r0,	/* I - Primary image data */
-	    ib_t               *r1)	/* I - Image data for interpolation */
+format_W(cups_page_header2_t *header,	/* I - Page header */
+            unsigned char    *row,	/* IO - Bitmap data for device */
+	    int              y,		/* I - Current row */
+	    int              z,		/* I - Current plane */
+	    int              xsize,	/* I - Width of image data */
+	    int	             ysize,	/* I - Height of image data */
+	    int              yerr0,	/* I - Top Y error */
+	    int              yerr1,	/* I - Bottom Y error */
+	    ib_t             *r0,	/* I - Primary image data */
+	    ib_t             *r1)	/* I - Image data for interpolation */
 {
   ib_t		*ptr,		/* Pointer into row */
 		bitmask;	/* Current mask for pixel */
@@ -3676,7 +3676,7 @@ format_W(cups_page_header_t *header,	/* I - Page header */
  */
 
 static void
-format_YMC(cups_page_header_t *header,	/* I - Page header */
+format_YMC(cups_page_header2_t *header,	/* I - Page header */
             unsigned char      *row,	/* IO - Bitmap data for device */
 	    int                y,	/* I - Current row */
 	    int                z,	/* I - Current plane */
@@ -4065,16 +4065,16 @@ format_YMC(cups_page_header_t *header,	/* I - Page header */
  */
 
 static void
-format_YMCK(cups_page_header_t *header,	/* I - Page header */
-            unsigned char      *row,	/* IO - Bitmap data for device */
-	    int                y,	/* I - Current row */
-	    int                z,	/* I - Current plane */
-	    int                xsize,	/* I - Width of image data */
-	    int	               ysize,	/* I - Height of image data */
-	    int                yerr0,	/* I - Top Y error */
-	    int                yerr1,	/* I - Bottom Y error */
-	    ib_t               *r0,	/* I - Primary image data */
-	    ib_t               *r1)	/* I - Image data for interpolation */
+format_YMCK(cups_page_header2_t *header,	/* I - Page header */
+            unsigned char       *row,	/* IO - Bitmap data for device */
+	    int                 y,	/* I - Current row */
+	    int                 z,	/* I - Current plane */
+	    int                 xsize,	/* I - Width of image data */
+	    int	                ysize,	/* I - Height of image data */
+	    int                 yerr0,	/* I - Top Y error */
+	    int                 yerr1,	/* I - Bottom Y error */
+	    ib_t                *r0,	/* I - Primary image data */
+	    ib_t                *r1)	/* I - Image data for interpolation */
 {
   ib_t		*ptr,		/* Pointer into row */
 		*cptr,		/* Pointer into cyan */
@@ -4506,5 +4506,5 @@ make_lut(ib_t  *lut,		/* I - Lookup table */
 
 
 /*
- * End of "$Id: imagetoraster.c,v 1.56.2.7 2002/04/29 15:58:07 mike Exp $".
+ * End of "$Id: imagetoraster.c,v 1.56.2.8 2002/05/09 01:55:38 mike Exp $".
  */
