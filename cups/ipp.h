@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.h,v 1.2 1999/01/24 14:18:43 mike Exp $"
+ * "$Id: ipp.h,v 1.3 1999/01/28 22:00:45 mike Exp $"
  *
  *   Internet Printing Protocol definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -58,9 +58,13 @@ typedef enum			/**** Format tags for attribute formats... ****/
   IPP_TAG_ZERO = 0x00,
   IPP_TAG_OPERATION,
   IPP_TAG_JOB,
-  IPP_TAG_PRINTER,
   IPP_TAG_END,
-  IPP_TAG_UNSUPPORTED,
+  IPP_TAG_PRINTER,
+  IPP_TAG_EXTENSION,
+  IPP_TAG_UNSUPPORTED = 0x10,
+  IPP_TAG_DEFAULT,
+  IPP_TAG_UNKNOWN,
+  IPP_TAG_NOVALUE,
   IPP_TAG_INTEGER = 0x21,
   IPP_TAG_BOOLEAN,
   IPP_TAG_ENUM,
@@ -85,6 +89,56 @@ typedef enum			/**** Resolution units... ****/
   IPP_RES_PER_INCH = 3,
   IPP_RES_PER_CM
 } ipp_res_t;
+
+typedef enum			/**** Multiple Document Handling ****/
+{
+  IPP_DOC_SINGLE,
+  IPP_DOC_UNCOLLATED,
+  IPP_DOC_COLLATED,
+  IPP_DOC_SEPARATE
+} ipp_doc_t;
+
+typedef enum			/**** Finishings... ****/
+{
+  IPP_FINISH_NONE = 3,
+  IPP_FINISH_STAPLE,
+  IPP_FINISH_PUNCH,
+  IPP_FINISH_COVER,
+  IPP_FINISH_BIND
+} ipp_finish_t;
+
+typedef enum			/**** Duplex/Sides... ****/
+{
+  IPP_SIDES_ONE,
+  IPP_SIDES_TWO_LONG_EDGE,
+  IPP_SIDES_TWO_SHORT_EDGE
+} ipp_sides_t;
+
+typedef enum			/**** Orientation... ****/
+{
+  IPP_PORTRAIT = 3,		/* No rotation */
+  IPP_LANDSCAPE,		/* 90 degrees counter-clockwise */
+  IPP_REVERSE_LANDSCAPE,	/* 90 degrees clockwise */
+  IPP_REVERSE_PORTRAIT		/* 180 degrees */
+} ipp_orient_t;
+
+typedef enum			/**** Qualities... ****/
+{
+  IPP_QUALITY_DRAFT = 3,
+  IPP_QUALITY_NORMAL,
+  IPP_QUALITY_HIGH
+} ipp_quality_t;
+
+typedef enum			/**** Job States.... */
+{
+  IPP_JOB_PENDING = 3,
+  IPP_JOB_HELD,
+  IPP_JOB_PROCESSING,
+  IPP_JOB_STOPPED,
+  IPP_JOB_CANCELED,
+  IPP_JOB_ABORTED,
+  IPP_JOB_COMPLETED
+} ipp_jobstate_t;
 
 typedef enum			/**** IPP states... ****/
 {
@@ -146,29 +200,31 @@ typedef unsigned char uchar;	/**** Unsigned 8-bit integer/character ****/
 typedef unsigned short ushort;	/**** Unsigned 16-bit integer ****/
 typedef unsigned int uint;	/**** Unsigned 32-bit integer ****/
 
-typedef struct			/**** Request Header ****/
+typedef union			/**** Request Header ****/
 {
-  uchar		version[2];	/* Protocol version number */
-  ipp_op_t	operation_id;	/* Operation ID */
-  int		request_id;	/* Request ID */
+  struct			/* Operation Header */
+  {
+    uchar	version[2];	/* Protocol version number */
+    ipp_op_t	operation_id;	/* Operation ID */
+    int		request_id;	/* Request ID */
+  }		op;
+
+  struct			/* Status Header */
+  {
+    uchar	version[2];	/* Protocol version number */
+    ipp_status_t status_code;	/* Status code */
+    int		request_id;	/* Request ID */
+  }		status;
 } ipp_request_t;
 
-typedef struct			/**** Response Header ****/
-{
-  uchar		version[2];	/* Protocol version number */
-  ipp_status_t	status_code;	/* Status code */
-  int		request_id;	/* Request ID */
-} ipp_response_t;
 
 typedef union			/**** Attribute Value ****/
 {
-  int		integer;	/* Integer value */
+  int		integer;	/* Integer/enumerated value */
 
   char		boolean;	/* Boolean value */
 
-  int		enumeration;	/* Enumerated value */
-
-  uchar		*string;	/* String value */
+  char		*string;	/* String value */
 
   uchar		date[11];	/* Date/time value */
 
@@ -176,7 +232,7 @@ typedef union			/**** Attribute Value ****/
   {
     int		xres,		/* Horizontal resolution */
 		yres;		/* Vertical resolution */
-    char	unit;		/* Resolution units */
+    ipp_res_t	units;		/* Resolution units */
   }		resolution;	/* Resolution value */
 
   struct
@@ -207,9 +263,9 @@ typedef struct			/**** Request State ****/
 {
   ipp_state_t	state;		/* State of request */
   ipp_request_t	request;	/* Request header */
-  ipp_attribute_t *attrs;	/* Attributes */
-		*last;		/* Last attribute in list */
-  ipp_status_t	status;		/* Response status */
+  ipp_attribute_t *attrs,	/* Attributes */
+		*last,		/* Last attribute in list */
+		*current;	/* Current attribute (for read/write) */
 } ipp_t;
 
 
@@ -217,25 +273,25 @@ typedef struct			/**** Request State ****/
  * Prototypes...
  */
 
-extern void	ippAddBoolean(ipp_t *ipp, uchar group, char *name, char value);
-extern void	ippAddBooleans(ipp_t *ipp, uchar group, char *name, int num_values, char *values);
-extern void	ippAddDate(ipp_t *ipp, uchar group, char *name, uchar *value);
-extern void	ippAddEnum(ipp_t *ipp, uchar group, char *name, int value);
-extern void	ippAddEnums(ipp_t *ipp, uchar group, char *name, int num_values, int *values);
-extern void	ippAddInteger(ipp_t *ipp, uchar group, char *name, int value);
-extern void	ippAddIntegers(ipp_t *ipp, uchar group, char *name, int num_values, int *values);
-extern void	ippAddLString(ipp_t *ipp, uchar group, char *name, char *charset, uchar *value);
-extern void	ippAddLStrings(ipp_t *ipp, uchar group, char *name, int num_values, char *charset, uchar **values);
-extern void	ippAddRange(ipp_t *ipp, uchar group, char *name, int lower, int upper);
-extern void	ippAddResolution(ipp_t *ipp, uchar group, char *name, int units, int xres, int yres);
-extern void	ippAddString(ipp_t *ipp, uchar group, char *name, uchar *value);
-extern void	ippAddStrings(ipp_t *ipp, uchar group, char *name, int num_values, uchar **values);
-extern time_t	ippDateToTime(uchar *date);
-extern void	ippDelete(ipp_t *ipp);
-extern ipp_t	*ippNew(void);
-extern int	ippRead(http_t *http, ipp_t *ipp);
-extern uchar	*ippTimeToDate(time_t t);
-extern int	ippWrite(http_t *http, ipp_t *ipp);
+extern time_t		ippDateToTime(uchar *date);
+extern ipp_attribute_t	*ippAddBoolean(ipp_t *ipp, ipp_tag_t group, char *name, char value);
+extern ipp_attribute_t	*ippAddBooleans(ipp_t *ipp, ipp_tag_t group, char *name, int num_values, char *values);
+extern ipp_attribute_t	*ippAddDate(ipp_t *ipp, ipp_tag_t group, char *name, uchar *value);
+extern ipp_attribute_t	*ippAddInteger(ipp_t *ipp, ipp_tag_t group, char *name, int value);
+extern ipp_attribute_t	*ippAddIntegers(ipp_t *ipp, ipp_tag_t group, char *name, int num_values, int *values);
+extern ipp_attribute_t	*ippAddLString(ipp_t *ipp, ipp_tag_t group, char *name, char *charset, uchar *value);
+extern ipp_attribute_t	*ippAddLStrings(ipp_t *ipp, ipp_tag_t group, char *name, int num_values, char *charset, uchar **values);
+extern ipp_attribute_t	*ippAddRange(ipp_t *ipp, ipp_tag_t group, char *name, int lower, int upper);
+extern ipp_attribute_t	*ippAddResolution(ipp_t *ipp, ipp_tag_t group, char *name, ipp_res_t units, int xres, int yres);
+extern ipp_attribute_t	*ippAddString(ipp_t *ipp, ipp_tag_t group, char *name, char *value);
+extern ipp_attribute_t	*ippAddStrings(ipp_t *ipp, ipp_tag_t group, char *name, int num_values, char **values);
+extern void		ippDelete(ipp_t *ipp);
+extern ipp_attribute_t	*ippFindAttribute(ipp_t *ipp, char *name);
+extern size_t		ippLength(ipp_t *ipp);
+extern ipp_t		*ippNew(void);
+extern int		ippRead(http_t *http, ipp_t *ipp);
+extern uchar		*ippTimeToDate(time_t t);
+extern int		ippWrite(http_t *http, ipp_t *ipp);
 
 /*
  * C++ magic...
@@ -247,5 +303,5 @@ extern int	ippWrite(http_t *http, ipp_t *ipp);
 #endif /* !_CUPS_IPP_H_ */
 
 /*
- * End of "$Id: ipp.h,v 1.2 1999/01/24 14:18:43 mike Exp $".
+ * End of "$Id: ipp.h,v 1.3 1999/01/28 22:00:45 mike Exp $".
  */

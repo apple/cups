@@ -1,5 +1,5 @@
 /*
- * "$Id: http.h,v 1.6 1999/01/27 00:54:30 mike Exp $"
+ * "$Id: http.h,v 1.7 1999/01/28 22:00:45 mike Exp $"
  *
  *   Hyper-Text Transport Protocol definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -30,8 +30,22 @@
  * Include necessary headers...
  */
 
+#  include <stdio.h>
+#  include <stdlib.h>
+#  include <string.h>
 #  include <time.h>
 
+#  ifdef WIN32
+#    include <winsock.h>
+#  else
+#    include <sys/time.h>
+#    include <sys/socket.h>
+#    include <netdb.h>
+#    include <netinet/in.h>
+#    include <netinet/in_systm.h>
+#    include <netinet/ip.h>
+#    include <netinet/tcp.h>
+#  endif /* WIN32 */
 
 /*
  * C++ magic...
@@ -162,8 +176,9 @@ typedef enum
  * HTTP field names...
  */
 
-typedef struct
+typedef enum
 {
+  HTTP_FIELD_UNKNOWN = -1,
   HTTP_FIELD_ACCEPT = 0,
   HTTP_FIELD_ACCEPT_CHARSET,
   HTTP_FIELD_ACCEPT_ENCODING,
@@ -226,7 +241,8 @@ typedef struct
   http_version_t	version;	/* Protocol version */
   http_keepalive_t	keep_alive;	/* Keep-alive supported? */
   struct sockaddr_in	hostaddr;	/* Address of connected host */
-  int			hostlength;	/* Hostname length */
+  int			hostport,	/* Port number */
+			hostlength;	/* Hostname length */
   char			hostname[HTTP_MAX_HOST],
   					/* Name of connected host */
 			uri[HTTP_MAX_URI],
@@ -249,12 +265,11 @@ typedef struct
  * Prototypes...
  */
 
-extern int	httpChunkf(http_t *http, const char *format, ...);
 extern void	httpClose(http_t *http);
 extern http_t	*httpConnect(char *host, int port);
 extern int	httpDelete(http_t *http, char *uri);
 extern int	httpGet(http_t *http, char *uri);
-extern char	*httpGets(char *buffer, int length, http_t *http);
+extern char	*httpGets(char *line, int length, http_t *http);
 extern char	*httpGetDateString(time_t t);
 extern time_t	httpGetDateTime(char *s);
 #  define	httpGetField(http,field)	(http)->fields[field]
@@ -267,13 +282,15 @@ extern int	httpPrintf(http_t *http, const char *format, ...);
 extern int	httpPut(http_t *http, char *uri);
 extern int	httpRead(http_t *http, char *buffer, int length);
 extern int	httpReconnect(http_t *http);
-extern void	httpSeparate(char *uri, char *method, char *host, int *port,
-		             char *resource);
+extern void	httpSeparate(char *uri, char *method, char *username,
+		             char *host, int *port, char *resource);
 extern void	httpSetField(http_t *http, http_field_t field, char *value);
 extern char	*httpStatus(http_status_t status);
 extern int	httpTrace(http_t *http, char *uri);
 extern int	httpUpdate(http_t *http);
 extern int	httpWrite(http_t *http, char *buffer, int length);
+extern char	*httpEncode64(char *out, char *in);
+extern char	*httpDecode64(char *out, char *in);
 
 /*
  * C++ magic...
@@ -285,5 +302,5 @@ extern int	httpWrite(http_t *http, char *buffer, int length);
 #endif /* !_CUPS_HTTP_H_ */
 
 /*
- * End of "$Id: http.h,v 1.6 1999/01/27 00:54:30 mike Exp $".
+ * End of "$Id: http.h,v 1.7 1999/01/28 22:00:45 mike Exp $".
  */

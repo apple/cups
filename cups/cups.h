@@ -1,5 +1,5 @@
 /*
- * "$Id: cups.h,v 1.2 1999/01/24 14:18:43 mike Exp $"
+ * "$Id: cups.h,v 1.3 1999/01/28 22:00:44 mike Exp $"
  *
  *   API definitions for the Common UNIX Printing System (CUPS).
  *
@@ -184,6 +184,13 @@ typedef struct				/**** Message Header ****/
 } cups_header_t;
 
 
+typedef struct				/**** Option Structure ****/
+{
+  char		*name;			/* Option name */
+  char		*value;			/* Option value */
+} cups_option_t;
+
+
 /*
  * Functions...
  */
@@ -228,6 +235,8 @@ extern cups_msg_t	*cupsPageClear(unsigned char *job_name,
 				       char *filename, int priority,
 				       time_t start_date, time_t end_date);
 
+extern int		*cupsParseOptions(char *arg, cups_option_t **options);
+
 #  ifdef _cplusplus
 }
 #  endif /* _cplusplus */
@@ -235,5 +244,5 @@ extern cups_msg_t	*cupsPageClear(unsigned char *job_name,
 #endif /* !_CUPS_CUPS_H_ */
 
 /*
- * End of "$Id: cups.h,v 1.2 1999/01/24 14:18:43 mike Exp $".
+ * End of "$Id: cups.h,v 1.3 1999/01/28 22:00:44 mike Exp $".
  */
