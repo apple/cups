@@ -1,5 +1,5 @@
 /*
- * "$Id: lpd.c,v 1.28.2.28 2004/02/06 21:01:59 mike Exp $"
+ * "$Id: lpd.c,v 1.28.2.29 2004/02/24 21:51:36 mike Exp $"
  *
  *   Line Printer Daemon backend for the Common UNIX Printing System (CUPS).
  *
@@ -71,8 +71,17 @@ static char	tmpfilename[1024] = "";	/* Temporary spool file name */
  * The order for control and data files in LPD requests...
  */
 
-#define ORDER_CONTROL_DATA	0
-#define ORDER_DATA_CONTROL	1
+#define ORDER_CONTROL_DATA	0	/* Control file first, then data */
+#define ORDER_DATA_CONTROL	1	/* Data file first, then control */
+
+
+/*
+ * What to reserve...
+ */
+
+#define RESERVE_NONE		0	/* Don't reserve a priviledged port */
+#define RESERVE_RFC1179		1	/* Reserve port 721-731 */
+#define RESERVE_ANY		2	/* Reserve port 1-1023 */
 
 
 /*
@@ -228,15 +237,12 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   banner         = 0;
   format         = 'l';
   order          = ORDER_CONTROL_DATA;
-  reserve        = 0;
+  reserve        = RESERVE_ANY;
   manual_copies  = 1;
   timeout        = 300;
   sanitize_title = 1;
 
 #if defined(__APPLE__)
-  /* We want to use a reserved port if possible (3471949) */
-  reserve        = 1;
-
   /* We want to pass utf-8 characters, not re-map them (3071945) */
   sanitize_title= 0;
 #endif
@@ -327,10 +333,16 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
         * Set port reservation mode...
 	*/
 
-        reserve = !value[0] ||
-	          strcasecmp(value, "on") == 0 ||
-	 	  strcasecmp(value, "yes") == 0 ||
-	 	  strcasecmp(value, "true") == 0;
+        if (!value[0] ||
+	    !strcasecmp(value, "on") ||
+	    !strcasecmp(value, "yes") ||
+	    !strcasecmp(value, "true") ||
+	    !strcasecmp(value, "rfc1179"))
+	  reserve = RESERVE_RFC1179;
+	else if (!strcasecmp(value, "any"))
+	  reserve = RESERVE_ANY;
+	else
+	  reserve = RESERVE_NONE;
       }
       else if (strcasecmp(name, "manual_copies") == 0)
       {
@@ -569,8 +581,19 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
     addr.sin_family = hostaddr->h_addrtype;
     addr.sin_port   = htons(port);
 
-    for (lport = 732;;)
+    for (lport = reserve == RESERVE_RFC1179 ? 732 : 1024;;)
     {
+     /*
+      * Choose the next priviledged port...
+      */
+
+      lport --;
+
+      if (lport < 721 && reserve == RESERVE_RFC1179)
+	lport = 731;
+      else if (lport < 1)
+	lport = 1023;
+
       if (getuid() || !reserve)
       {
        /*
@@ -589,13 +612,14 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
       {
        /*
 	* We're running as root and want to comply with RFC 1179.  Reserve a
-	* priviledged lport between 721 and 732...
+	* priviledged lport between 721 and 731...
 	*/
 
 	if ((fd = rresvport(&lport)) < 0)
 	{
 	  perror("ERROR: Unable to reserve port");
-	  sleep(30);
+	  sleep(1);
+
 	  continue;
 	}
       }
@@ -615,13 +639,15 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
 	}
 	else if (error == EADDRINUSE)
 	{
-	  port --;
-	  if (port < 721)
-	    port = 732;
+	 /*
+	  * Try on another port...
+	  */
+
+	  sleep(1);
 	}
 	else
 	{
-	  perror("ERROR: Unable to connect to printer");
+	  perror("ERROR: Unable to connect to printer; will retry in 30 seconds...");
           sleep(30);
 	}
       }
@@ -1002,5 +1028,5 @@ sigterm_handler(int sig)		/* I - Signal */
 
 
 /*
- * End of "$Id: lpd.c,v 1.28.2.28 2004/02/06 21:01:59 mike Exp $".
+ * End of "$Id: lpd.c,v 1.28.2.29 2004/02/24 21:51:36 mike Exp $".
  */
