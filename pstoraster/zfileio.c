@@ -485,7 +485,7 @@ zbytesavailable(register os_ptr op)
 int
 zflush(register os_ptr op)
 {	stream *s;
-	int code = zget_stdout(&s);
+	int code = zget_stderr(&s);
 	if ( code < 0 )
 	  return code;
 	sflush(s);
@@ -526,7 +526,7 @@ zprint(register os_ptr op)
 	ref rstdout;
 	int code;
 	check_read_type(*op, t_string);
-	code = zget_stdout(&s);
+	code = zget_stderr(&s);
 	if ( code < 0 )
 	  return code;
 	status = write_string(op, s);

@@ -264,7 +264,7 @@ WRITEDICTS
 currentdict /cntdict .undef
 currentdict /w2dict .undef
 
-/printobject { (%stdout) (w) file 3 1 roll writeobject } odef
+/printobject { (%stderr) (w) file 3 1 roll writeobject } odef
 /writeobject { exch 1 array astore .writeobjects } odef
 
 % Implement binary error message output.

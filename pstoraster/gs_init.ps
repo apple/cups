@@ -206,7 +206,7 @@ userdict /=string 256 string put
    revision 100 idiv ( )
    product
    counttomark
-    { (%stdout) (w) file exch false .writecvp
+    { (%stderr) (w) file exch false .writecvp
     } repeat pop
  } bind def
 
@@ -454,7 +454,7 @@ systemdict /internaldict .knownget not { 0 } if type /operatortype ne
 /write=
 	{ 1 index exch write=only (\n) writestring
 	} bind def
-/=only	{ (%stdout) (w) file exch write=only } bind def
+/=only	{ (%stderr) (w) file exch write=only } bind def
 /=	{ =only (\n) print } bind def
 /=print	/=only load def
 % Temporarily define == as = for the sake of runlibfile0.
@@ -834,7 +834,7 @@ end
 
 /write==only exch def
 /write== {1 index exch write==only (\n) writestring} bind def
-/==only { (%stdout) (w) file exch write==only } bind def
+/==only { (%stderr) (w) file exch write==only } bind def
 /== {==only (\n) print} bind def
 
 % Define [write]===[only], an extension that prints dictionaries
@@ -866,7 +866,7 @@ end
 
 /write===only exch def
 /write=== {1 index exch write===only (\n) writestring} bind def
-/===only { (%stdout) (w) file exch write===only } bind def
+/===only { (%stderr) (w) file exch write===only } bind def
 /=== { ===only (\n) print } bind def
 
 (END PROCS) VMDEBUG
