@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.18 1999/02/20 16:04:34 mike Exp $"
+ * "$Id: http.c,v 1.19 1999/02/26 15:10:23 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -48,9 +48,9 @@
  *   httpUpdate()        - Update the current HTTP state for incoming data.
  *   httpDecode64()      - Base64-decode a string.
  *   httpEncode64()      - Base64-encode a string.
- *   http_field()        - Return the field index for a field name.
- *   http_get_length()   - Get the amount of data remaining from the
+ *   httpGetLength()     - Get the amount of data remaining from the
  *                         content-length or transfer-encoding fields.
+ *   http_field()        - Return the field index for a field name.
  *   http_send()         - Send a request with all fields and the trailing
  *                         blank line.
  */
@@ -67,15 +67,7 @@
 #include <fcntl.h>
 
 #include "http.h"
-
-/*#define DEBUG*/
-#ifdef DEBUG
-#  define DEBUG_puts(x) puts(x)
-#  define DEBUG_printf(x) printf x
-#else
-#  define DEBUG_puts(x)
-#  define DEBUG_printf(x)
-#endif /* DEBUG */
+#include "debug.h"
 
 
 /*
@@ -83,7 +75,6 @@
  */
 
 static http_field_t	http_field(char *name);
-static void		http_get_length(http_t *http);
 static int		http_send(http_t *http, http_state_t request, char *uri);
 
 
@@ -378,7 +369,7 @@ httpSeparate(char *uri,		/* I - Universal Resource Identifier */
 
 
   if (uri == NULL || method == NULL || username == NULL || host == NULL ||
-      port == NULL || resource)
+      port == NULL || resource == NULL)
     return;
 
  /*
@@ -571,7 +562,7 @@ int					/* O - Status of call (0 = success) */
 httpPost(http_t *http,			/* I - HTTP data */
          char   *uri)			/* I - URI for post */
 {
-  http_get_length(http);
+  httpGetLength(http);
 
   return (http_send(http, HTTP_POST, uri));
 }
@@ -585,7 +576,7 @@ int					/* O - Status of call (0 = success) */
 httpPut(http_t *http,			/* I - HTTP data */
         char   *uri)			/* I - URI to put */
 {
-  http_get_length(http);
+  httpGetLength(http);
 
   return (http_send(http, HTTP_PUT, uri));
 }
@@ -616,6 +607,8 @@ httpRead(http_t *http,			/* I - HTTP data */
   char		len[32];		/* Length string */
 
 
+  DEBUG_printf(("httpRead(%08x, %08d, %d)\n", http, buffer, length));
+
   if (http == NULL || buffer == NULL)
     return (-1);
 
@@ -634,6 +627,8 @@ httpRead(http_t *http,			/* I - HTTP data */
 
     http->data_remaining = strtol(len, NULL, 16);
   }
+
+  DEBUG_printf(("httpRead: data_remaining = %d\n", http->data_remaining));
 
   if (http->data_remaining == 0)
   {
@@ -659,6 +654,8 @@ httpRead(http_t *http,			/* I - HTTP data */
 
     bytes = length;
 
+    DEBUG_printf(("httpRead: grabbing %d bytes from input buffer...\n", bytes));
+
     memcpy(buffer, http->buffer, length);
     http->used -= length;
 
@@ -666,10 +663,22 @@ httpRead(http_t *http,			/* I - HTTP data */
       memcpy(http->buffer, http->buffer + length, http->used);
   }
   else
+  {
+    DEBUG_printf(("httpRead: reading %d bytes from socket...\n", length));
     bytes = recv(http->fd, buffer, length, 0);
+    DEBUG_printf(("httpRead: read %d bytes from socket...\n", bytes));
+  }
 
   if (bytes > 0)
     http->data_remaining -= bytes;
+
+  if (http->data_remaining == 0 && http->data_encoding != HTTP_ENCODE_CHUNKED)
+  {
+    if (http->state == HTTP_POST_RECV)
+      http->state ++;
+    else
+      http->state = HTTP_WAITING;
+  }
 
   return (bytes);
 }
@@ -719,16 +728,22 @@ httpWrite(http_t *http,			/* I - HTTP data */
   }
 
   tbytes = 0;
+
   while (length > 0)
   {
     bytes = send(http->fd, buffer, length, 0);
     if (bytes < 0)
+    {
+      DEBUG_puts("httpWrite: error writing data...\n");
       return (-1);
+    }
 
     buffer += bytes;
     tbytes += bytes;
     length -= bytes;
   }
+
+  DEBUG_printf(("httpWrite: wrote %d bytes...\n", tbytes));
 
   return (tbytes);
 }
@@ -748,6 +763,8 @@ httpGets(char   *line,			/* I - Line to read into */
 	*bufend;			/* Pointer to end of buffer */
   int	bytes;				/* Number of bytes read */
 
+
+  DEBUG_printf(("httpGets(%08x, %d, %08x)\n", line, length, http));
 
   if (http == NULL || line == NULL)
     return (NULL);
@@ -962,6 +979,8 @@ httpUpdate(http_t *http)		/* I - HTTP data */
   http_status_t	status;			/* Authorization status */
 
 
+  DEBUG_printf(("httpUpdate(%08x)\n", http));
+
  /*
   * If we haven't issued any commands, then there is nothing to "update"...
   */
@@ -985,7 +1004,7 @@ httpUpdate(http_t *http)		/* I - HTTP data */
       */
 
       if (http->state == HTTP_GET || http->state == HTTP_POST_SEND)
-        http_get_length(http);
+        httpGetLength(http);
 
       switch (http->state)
       {
@@ -1031,7 +1050,7 @@ httpUpdate(http_t *http)		/* I - HTTP data */
 
       if ((field = http_field(line)) == HTTP_FIELD_UNKNOWN)
       {
-        DEBUG_printf(("Unknown field %s seen!\n", line));
+        DEBUG_printf(("httpUpdate: unknown field %s seen!\n", line));
         continue;
       }
 
@@ -1172,30 +1191,12 @@ httpEncode64(char *out,		/* I - String to write to */
 
 
 /*
- * 'http_field()' - Return the field index for a field name.
+ * 'httpGetLength()' - Get the amount of data remaining from the
+ *                     content-length or transfer-encoding fields.
  */
 
-static http_field_t		/* O - Field index */
-http_field(char *name)		/* I - String name */
-{
-  int	i;			/* Looping var */
-
-
-  for (i = 0; i < HTTP_FIELD_MAX; i ++)
-    if (strcasecmp(name, http_fields[i]) == 0)
-      return ((http_field_t)i);
-
-  return (HTTP_FIELD_UNKNOWN);
-}
-
-
-/*
- * 'http_get_length()' - Get the amount of data remaining from the
- *                       content-length or transfer-encoding fields.
- */
-
-static void
-http_get_length(http_t *http)	/* I - HTTP data */
+int
+httpGetLength(http_t *http)	/* I - HTTP data */
 {
   if (strcasecmp(http->fields[HTTP_FIELD_TRANSFER_ENCODING], "chunked") == 0)
   {
@@ -1219,6 +1220,26 @@ http_get_length(http_t *http)	/* I - HTTP data */
     else
       http->data_remaining = atoi(http->fields[HTTP_FIELD_CONTENT_LENGTH]);
   }
+
+  return (http->data_remaining);
+}
+
+
+/*
+ * 'http_field()' - Return the field index for a field name.
+ */
+
+static http_field_t		/* O - Field index */
+http_field(char *name)		/* I - String name */
+{
+  int	i;			/* Looping var */
+
+
+  for (i = 0; i < HTTP_FIELD_MAX; i ++)
+    if (strcasecmp(name, http_fields[i]) == 0)
+      return ((http_field_t)i);
+
+  return (HTTP_FIELD_UNKNOWN);
 }
 
 
@@ -1298,8 +1319,12 @@ http_send(http_t       *http,	/* I - HTTP data */
 
   for (i = 0; i < HTTP_FIELD_MAX; i ++)
     if (http->fields[i][0] != '\0')
+    {
+      DEBUG_printf(("%s: %s\n", http_fields[i], http->fields[i]));
+
       if (httpPrintf(http, "%s: %s\n", http_fields[i], http->fields[i]) < 1)
         return (-1);
+    }
 
   if (httpPrintf(http, "\n") < 1)
     return (-1);
@@ -1311,5 +1336,5 @@ http_send(http_t       *http,	/* I - HTTP data */
 
 
 /*
- * End of "$Id: http.c,v 1.18 1999/02/20 16:04:34 mike Exp $".
+ * End of "$Id: http.c,v 1.19 1999/02/26 15:10:23 mike Exp $".
  */

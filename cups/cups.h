@@ -1,5 +1,5 @@
 /*
- * "$Id: cups.h,v 1.4 1999/02/05 17:40:50 mike Exp $"
+ * "$Id: cups.h,v 1.5 1999/02/26 15:10:22 mike Exp $"
  *
  *   API definitions for the Common UNIX Printing System (CUPS).
  *
@@ -105,6 +105,7 @@ typedef struct				/**** Printer Options ****/
 extern int		cupsCancelJob(char *printer, int job);
 extern int		cupsGetClasses(char ***classes);
 extern char		*cupsGetPPD(char *printer);
+extern char		*cupsGetDefault(void);
 extern int		cupsGetPrinters(char ***printers);
 extern int		cupsPrintFile(char *printer, char *filename,
 			              int num_options, cups_option_t *options);
@@ -114,7 +115,8 @@ extern int		cupsAddOption(char *name, char *value, int num_options,
 extern void		cupsFreeOptions(int num_options, cups_option_t *options);
 extern char		*cupsGetOption(char *name, int num_options,
 			               cups_option_t *options);
-extern int		cupsParseOptions(char *arg, cups_option_t **options);
+extern int		cupsParseOptions(char *arg, int num_options,
+			                 cups_option_t **options);
 
 #  ifdef _cplusplus
 }
@@ -123,5 +125,5 @@ extern int		cupsParseOptions(char *arg, cups_option_t **options);
 #endif /* !_CUPS_CUPS_H_ */
 
 /*
- * End of "$Id: cups.h,v 1.4 1999/02/05 17:40:50 mike Exp $".
+ * End of "$Id: cups.h,v 1.5 1999/02/26 15:10:22 mike Exp $".
  */

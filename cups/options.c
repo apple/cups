@@ -1,5 +1,5 @@
 /*
- * "$Id: options.c,v 1.1 1999/02/05 17:40:54 mike Exp $"
+ * "$Id: options.c,v 1.2 1999/02/26 15:10:25 mike Exp $"
  *
  *   Option routines for the Common UNIX Printing System (CUPS).
  *
@@ -127,9 +127,9 @@ cupsGetOption(char          *name,	/* I - Name of option */
 
 int						/* O - Number of options found */
 cupsParseOptions(char          *arg,		/* I - Argument to parse */
+                 int           num_options,	/* I - Number of options */
                  cups_option_t **options)	/* O - Options found */
 {
-  int	num_options;				/* Number of options */
   char	*copyarg,				/* Copy of input string */
 	*ptr,					/* Pointer into string */
 	*name,					/* Pointer to name */
@@ -144,7 +144,6 @@ cupsParseOptions(char          *arg,		/* I - Argument to parse */
   */
 
   copyarg     = strdup(arg);
-  num_options = 0;
   ptr         = copyarg;
 
   while (*ptr != '\0')
@@ -244,5 +243,5 @@ cupsParseOptions(char          *arg,		/* I - Argument to parse */
 
 
 /*
- * End of "$Id: options.c,v 1.1 1999/02/05 17:40:54 mike Exp $".
+ * End of "$Id: options.c,v 1.2 1999/02/26 15:10:25 mike Exp $".
  */

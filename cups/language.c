@@ -1,5 +1,5 @@
 /*
- * "$Id: language.c,v 1.2 1999/02/10 19:27:38 mike Exp $"
+ * "$Id: language.c,v 1.3 1999/02/26 15:10:25 mike Exp $"
  *
  *   for the Common UNIX Printing System (CUPS).
  *
@@ -73,7 +73,7 @@ char *					/* O - Character encoding */
 cupsLangEncoding(cups_lang_t *lang)	/* I - Language data */
 {
   if (lang == NULL)
-    return (NULL);
+    return (lang_encodings[0]);
   else
     return (lang_encodings[lang->encoding]);
 }
@@ -344,5 +344,5 @@ cupsLangGet(char *language)	/* I - Language or locale */
 
 
 /*
- * End of "$Id: language.c,v 1.2 1999/02/10 19:27:38 mike Exp $".
+ * End of "$Id: language.c,v 1.3 1999/02/26 15:10:25 mike Exp $".
  */

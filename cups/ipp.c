@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.5 1999/02/20 16:04:37 mike Exp $"
+ * "$Id: ipp.c,v 1.6 1999/02/26 15:10:24 mike Exp $"
  *
  *   Internet Printing Protocol support functions for the Common UNIX
  *   Printing System (CUPS).
@@ -54,6 +54,7 @@
 #include <string.h>
 
 #include "ipp.h"
+#include "debug.h"
 
 
 /*
@@ -163,6 +164,9 @@ ippAddInteger(ipp_t     *ipp,		/* I - IPP request */
 {
   ipp_attribute_t	*attr;		/* New attribute */
 
+
+  DEBUG_printf(("ippAddInteger(%08x, %d, \'%s\', %d)\n", ipp, group, name,
+                value));
 
   if (ipp == NULL || name == NULL)
     return (NULL);
@@ -356,6 +360,9 @@ ippAddString(ipp_t     *ipp,		/* I - IPP request */
   ipp_attribute_t	*attr;		/* New attribute */
 
 
+  DEBUG_printf(("ippAddString(%08x, %d, \'%s\', \'%s\')\n", ipp, group, name,
+                value));
+
   if (ipp == NULL || name == NULL)
     return (NULL);
 
@@ -385,6 +392,9 @@ ippAddStrings(ipp_t     *ipp,		/* I - IPP request */
   int			i;		/* Looping var */
   ipp_attribute_t	*attr;		/* New attribute */
 
+
+  DEBUG_printf(("ippAddStrings(%08x, %d, \'%s\', %d, \'%s\')\n", ipp, group,
+                name, num_values, values[0]));
 
   if (ipp == NULL || name == NULL)
     return (NULL);
@@ -562,9 +572,13 @@ ippLength(ipp_t *ipp)		/* I - IPP request */
       group = attr->group_tag;
     };
 
-    bytes ++;				/* Value tag */
+    DEBUG_printf(("attr->name = %s, attr->num_values = %d, bytes = %d\n",
+                  attr->name, attr->num_values, bytes));
+
     bytes += strlen(attr->name);	/* Name */
-    bytes += 4 * attr->num_values;	/* Name and value length */
+    bytes += attr->num_values;		/* Value tag for each value */
+    bytes += 2 * attr->num_values;	/* Name lengths */
+    bytes += 2 * attr->num_values;	/* Value lengths */
 
     switch (attr->value_tag)
     {
@@ -616,6 +630,8 @@ ippLength(ipp_t *ipp)		/* I - IPP request */
   * Finally, add 1 byte for the "end of attributes" tag and return...
   */
 
+  DEBUG_printf(("bytes = %d\n", bytes + 1));
+
   return (bytes + 1);
 }
 
@@ -641,28 +657,37 @@ ippRead(http_t *http,		/* I - HTTP data */
   ipp_tag_t		tag;		/* Current tag */
 
 
+  DEBUG_printf(("ippRead(%08x, %08x)\n", http, ipp));
+
   if (http == NULL || ipp == NULL)
     return (IPP_ERROR);
 
   switch (ipp->state)
   {
     case IPP_IDLE :
-        break;
+        ipp->state ++; /* Avoid common problem... */
 
     case IPP_HEADER :
        /*
         * Get the request header...
 	*/
 
-        if (httpRead(http, buffer, 8) < 8)
-	  return (IPP_ERROR);
+        if ((n = httpRead(http, buffer, 8)) < 8)
+	{
+	  DEBUG_printf(("ippRead: Unable to read header (%d bytes read)!\n", n));
+	  return (n == 0 ? IPP_IDLE : IPP_ERROR);
+	}
 
        /*
         * Verify the major version number...
 	*/
 
 	if (buffer[0] != 1)
+	{
+	  DEBUG_printf(("ippRead: version number (%d.%d) is bad.\n", buffer[0],
+	                buffer[1]));
 	  return (IPP_ERROR);
+	}
 
        /*
         * Then copy the request header over...
@@ -700,10 +725,12 @@ ippRead(http_t *http,		/* I - HTTP data */
 	    * No more attributes left...
 	    */
 
+            DEBUG_puts("ippRead: IPP_TAG_END!");
+
 	    ipp->state = IPP_DATA;
 	    break;
 	  }
-          else if (tag < IPP_TAG_UNSUPPORTED)
+          else if (tag <= IPP_TAG_UNSUPPORTED)
 	  {
 	   /*
 	    * Group tag...  Set the current group and continue...
@@ -711,6 +738,7 @@ ippRead(http_t *http,		/* I - HTTP data */
 
 	    ipp->curtag  = tag;
 	    ipp->current = NULL;
+	    DEBUG_printf(("ippRead: tag = %x\n", tag));
 	    continue;
 	  }
 
@@ -719,9 +747,14 @@ ippRead(http_t *http,		/* I - HTTP data */
 	  */
 
           if (httpRead(http, buffer, 2) < 2)
+	  {
+	    DEBUG_puts("ippRead: unable to read name length!");
 	    return (IPP_ERROR);
+	  }
 
           n = (buffer[0] << 8) | buffer[1];
+
+          DEBUG_printf(("ippRead: name length = %d\n", n));
 
           if (n == 0)
 	  {
@@ -744,15 +777,30 @@ ippRead(http_t *http,		/* I - HTTP data */
 	    */
 
 	    if (httpRead(http, buffer, n) < n)
+	    {
+	      DEBUG_puts("ippRead: unable to read name!");
 	      return (IPP_ERROR);
+	    }
 
 	    buffer[n] = '\0';
+	    DEBUG_printf(("ippRead: name = \'%s\'\n", buffer));
+
 	    attr = ipp->current = add_attr(ipp, IPP_MAX_VALUES);
 
-	    attr->group_tag = ipp->curtag;
-	    attr->value_tag = tag;
-	    attr->name      = strdup(buffer);
+	    attr->group_tag  = ipp->curtag;
+	    attr->value_tag  = tag;
+	    attr->name       = strdup(buffer);
+	    attr->num_values = 0;
 	  }
+
+	  if (httpRead(http, buffer, 2) < 2)
+	  {
+	    DEBUG_puts("ippRead: unable to read value length!");
+	    return (IPP_ERROR);
+	  }
+
+	  n = (buffer[0] << 8) | buffer[1];
+          DEBUG_printf(("ippRead: value length = %d\n", n));
 
 	  switch (tag)
 	  {
@@ -767,7 +815,7 @@ ippRead(http_t *http,		/* I - HTTP data */
                 attr->values[attr->num_values].integer = n;
 	        break;
 	    case IPP_TAG_BOOLEAN :
-	        if (httpRead(http, buffer, 1) < 4)
+	        if (httpRead(http, buffer, 1) < 1)
 		  return (IPP_ERROR);
 
                 attr->values[attr->num_values].boolean = buffer[0];
@@ -781,11 +829,6 @@ ippRead(http_t *http,		/* I - HTTP data */
 	    case IPP_TAG_CHARSET :
 	    case IPP_TAG_LANGUAGE :
 	    case IPP_TAG_MIMETYPE :
-	        if (httpRead(http, buffer, 2) < 2)
-		  return (IPP_ERROR);
-
-		n = (buffer[0] << 8) | buffer[1];
-
 	        if (httpRead(http, buffer, n) < n)
 		  return (IPP_ERROR);
 
@@ -825,11 +868,6 @@ ippRead(http_t *http,		/* I - HTTP data */
 	        break;
 	    case IPP_TAG_TEXTLANG :
 	    case IPP_TAG_NAMELANG :
-	        if (httpRead(http, buffer, 2) < 2)
-		  return (IPP_ERROR);
-
-		n = (buffer[0] << 8) | buffer[1];
-
 	        if (httpRead(http, buffer, n) < n)
 		  return (IPP_ERROR);
 
@@ -939,7 +977,7 @@ ippWrite(http_t *http,		/* I - HTTP data */
   switch (ipp->state)
   {
     case IPP_IDLE :
-        break;
+        ipp->state ++; /* Avoid common problem... */
 
     case IPP_HEADER :
        /*
@@ -958,7 +996,10 @@ ippWrite(http_t *http,		/* I - HTTP data */
 	*bufptr++ = ipp->request.any.request_id;
 
         if (httpWrite(http, buffer, bufptr - buffer) < 0)
+	{
+	  DEBUG_puts("ippWrite: Could not write IPP header...");
 	  return (IPP_ERROR);
+	}
 
         ipp->state   = IPP_ATTRIBUTE;
 	ipp->current = ipp->attrs;
@@ -1194,7 +1235,10 @@ ippWrite(http_t *http,		/* I - HTTP data */
 	  */
 
           if (httpWrite(http, buffer, bufptr - buffer) < 0)
+	  {
+	    DEBUG_puts("ippWrite: Could not write IPP attribute...");
 	    return (IPP_ERROR);
+	  }
 
 	 /*
           * If blocking is disabled, stop here...
@@ -1212,7 +1256,10 @@ ippWrite(http_t *http,		/* I - HTTP data */
 
           buffer[0] = IPP_TAG_END;
 	  if (httpWrite(http, buffer, 1) < 0)
+	  {
+	    DEBUG_puts("ippWrite: Could not write IPP end-tag...");
 	    return (IPP_ERROR);
+	  }
 
 	  ipp->state = IPP_DATA;
 	}
@@ -1227,6 +1274,23 @@ ippWrite(http_t *http,		/* I - HTTP data */
 
 
 /*
+ * 'ippPort()' - Return the default IPP port number.
+ */
+
+int			/* O - Port number */
+ippPort(void)
+{
+  struct servent *port;	/* Port number info */  
+
+
+  if ((port = getservbyname("ipp", NULL)) == NULL)
+    return (631);
+  else
+    return (port->s_port);
+}
+
+
+/*
  * 'add_attr()' - Add a new attribute to the request.
  */
 
@@ -1237,11 +1301,15 @@ add_attr(ipp_t *ipp,			/* I - IPP request */
   ipp_attribute_t	*attr;		/* New attribute */
 
 
+  DEBUG_printf(("add_attr(%08x, %d)\n", ipp, num_values));
+
   if (ipp == NULL || num_values < 1)
     return (NULL);
 
   attr = calloc(sizeof(ipp_attribute_t) +
                 (num_values - 1) * sizeof(ipp_value_t), 1);
+
+  attr->num_values = num_values;
 
   if (attr == NULL)
     return (NULL);
@@ -1258,5 +1326,5 @@ add_attr(ipp_t *ipp,			/* I - IPP request */
 
 
 /*
- * End of "$Id: ipp.c,v 1.5 1999/02/20 16:04:37 mike Exp $".
+ * End of "$Id: ipp.c,v 1.6 1999/02/26 15:10:24 mike Exp $".
  */
