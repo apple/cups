@@ -61,8 +61,8 @@ const char gp_current_directory_name[] = ".";
 FILE *
 gp_open_scratch_file(const char *prefix, char *fname, const char *mode)
 {	char *temp;
-	if ( (temp = getenv("TEMP")) == NULL )
-		strcpy(fname, "/tmp/");
+	if ( (temp = getenv("TMPDIR")) == NULL )
+		strcpy(fname, "/var/tmp/");
 	else
 	{	strcpy(fname, temp);
 		if ( strlen(fname) != 0 && fname[strlen(fname) - 1] != '/' )
