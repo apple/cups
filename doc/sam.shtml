@@ -450,7 +450,7 @@ You'll find a complete list of PPD files and the printers they will work with
 in <A HREF="#PRINTER_DRIVERS">Appendix C, "Printer Drivers"</A>.
 
 
-<P>For a dot matrix printer connected to the serial port this would might look like:
+<P>For a dot matrix printer connected to the serial port, this might look like:
 
 <UL><PRE>
 <B>/usr/sbin/lpadmin -p DotMatrix -E -m epson9.ppd \
