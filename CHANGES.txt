@@ -1,4 +1,4 @@
-CHANGES.txt - 03/02/2001
+CHANGES.txt - 03/08/2001
 ------------------------
 
 CHANGES IN CUPS V1.1.7
@@ -84,6 +84,10 @@ CHANGES IN CUPS V1.1.7
 	- The "percent complete" calculations in the LPD backend
 	  could overflow on large files, causing the percentage
 	  to wrap to 0 every 40MB or so.
+	- Fixed a memory reallocation bug in pstoraster that
+	  could cause it to crash.
+	- The LPD backend now sanitizes the job title to avoid
+	  potential problems on remote LPD servers.
 
 
 CHANGES IN CUPS V1.1.6-3

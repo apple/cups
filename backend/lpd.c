@@ -1,5 +1,5 @@
 /*
- * "$Id: lpd.c,v 1.27 2001/03/08 14:40:53 mike Exp $"
+ * "$Id: lpd.c,v 1.28 2001/03/08 15:13:13 mike Exp $"
  *
  *   Line Printer Daemon backend for the Common UNIX Printing System (CUPS).
  *
@@ -37,6 +37,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
+#include <ctype.h>
 #include <cups/string.h>
 #include <errno.h>
 #include <sys/types.h>
@@ -99,7 +100,8 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 	name[255],	/* Name of option */
 	value[255],	/* Value of option */
 	*ptr,		/* Pointer into name or value */
-	filename[1024];	/* File to print */
+	filename[1024],	/* File to print */
+	title[256];	/* Title string */
   int	port;		/* Port number (not used) */
   int	status;		/* Status of LPD job */
   int	banner;		/* Print banner page? */
@@ -267,22 +269,32 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   }
 
  /*
+  * Sanitize the document title...
+  */
+
+  strncpy(title, argv[3], sizeof(title) - 1);
+  title[sizeof(title) - 1] = '\0';
+
+  for (ptr = title; *ptr; ptr ++)
+    if (!isalnum(*ptr) && !isspace(*ptr))
+      *ptr = '_';
+
+ /*
   * Queue the job...
   */
 
   if (argc > 6)
   {
     status = lpd_queue(hostname, resource + 1, filename,
-                       argv[2] /* user */, argv[3] /* title */,
-		       atoi(argv[4]) /* copies */, banner, format, order);
+                       argv[2] /* user */, title, atoi(argv[4]) /* copies */,
+		       banner, format, order);
 
     if (!status)
       fprintf(stderr, "PAGE: 1 %d\n", atoi(argv[4]));
   }
   else
     status = lpd_queue(hostname, resource + 1, filename,
-                       argv[2] /* user */, argv[3] /* title */, 1,
-		       banner, format, order);
+                       argv[2] /* user */, title, 1, banner, format, order);
 
  /*
   * Remove the temporary file if necessary...
@@ -657,5 +669,5 @@ lpd_write(int  lpd_fd,		/* I - LPD socket */
 
 
 /*
- * End of "$Id: lpd.c,v 1.27 2001/03/08 14:40:53 mike Exp $".
+ * End of "$Id: lpd.c,v 1.28 2001/03/08 15:13:13 mike Exp $".
  */

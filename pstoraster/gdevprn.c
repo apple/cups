@@ -24,7 +24,7 @@
   GNU software to build or run it.
 */
 
-/*$Id: gdevprn.c,v 1.10 2001/01/22 15:03:55 mike Exp $ */
+/*$Id: gdevprn.c,v 1.11 2001/03/08 15:13:14 mike Exp $ */
 /* Generic printer driver support */
 #include "ctype_.h"
 #include "gdevprn.h"
@@ -196,9 +196,9 @@ gdev_prn_allocate(gx_device *pdev, gdev_prn_space_params *new_space_params,
     gx_device_memory * const pmemdev = (gx_device_memory *)pdev;
     byte *the_memory = 0;
     gdev_prn_space_params save_params;
-    int save_width = ppdev->width, save_height = ppdev->height;
+    int save_width, save_height;
     bool is_command_list = false;
-    bool save_is_command_list = false;
+    bool save_is_command_list;
     int ecode = 0;
     int pass;
     gs_memory_t *buffer_memory =
@@ -215,7 +215,7 @@ gdev_prn_allocate(gx_device *pdev, gdev_prn_space_params *new_space_params,
 	ulong mem_space;
 	byte *base = 0;
 	bool bufferSpace_is_default = false;
-	gdev_prn_space_params space_params = ppdev->space_params;
+	gdev_prn_space_params space_params;
 
 	if (reallocate)
 	    switch (pass)
@@ -243,6 +243,7 @@ gdev_prn_allocate(gx_device *pdev, gdev_prn_space_params *new_space_params,
 
 	/* Compute desired space params: never use the space_params as-is. */
 	/* Rather, give the dev-specific driver a chance to adjust them. */
+	space_params = ppdev->space_params;
 	space_params.BufferSpace = 0;
 	(*ppdev->printer_procs.get_space_params)(ppdev, &space_params);
 	if (ppdev->is_async_renderer && space_params.band.BandBufferSpace != 0)
