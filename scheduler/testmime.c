@@ -1,5 +1,5 @@
 /*
- * "$Id: testmime.c,v 1.3 2001/01/22 15:04:01 mike Exp $"
+ * "$Id: testmime.c,v 1.4 2001/02/02 19:38:45 mike Exp $"
  *
  *   MIME test program for the Common UNIX Printing System (CUPS).
  *
@@ -31,6 +31,7 @@
  */
 
 #include <stdio.h>
+#include <string.h>
 #include "mime.h"
 
 
@@ -65,7 +66,7 @@ main(int  argc,				/* I - Number of command-line args */
   puts("MIME database types:");
   for (i = 0, types = mime->types; i < mime->num_types; i ++, types ++)
   {
-    printf("\t%s/%s: ", (*types)->super, (*types)->type);
+    printf("\t%s/%s:\n", (*types)->super, (*types)->type);
     print_rules((*types)->rules);
     puts("");
   }
@@ -135,22 +136,19 @@ main(int  argc,				/* I - Number of command-line args */
 static void
 print_rules(mime_magic_t *rules)	/* I - Rules to print */
 {
-  char	logic;				/* Logic separator */
+  int	i;				/* Looping var */
+  static char	indent[255] = "\t";	/* Indentation for rules */
 
 
   if (rules == NULL)
     return;
 
-  if (rules->parent == NULL ||
-      rules->parent->op == MIME_MAGIC_OR)
-    logic = ',';
-  else
-    logic = '+';
-
   while (rules != NULL)
   {
-    if (rules->prev != NULL)
-      putchar(logic);
+    printf("%s[%p] ", indent, rules);
+
+    if (rules->invert)
+      printf("NOT ");
 
     switch (rules->op)
     {
@@ -167,7 +165,14 @@ print_rules(mime_magic_t *rules)	/* I - Rules to print */
           printf("printable(%d,%d)", rules->offset, rules->length);
 	  break;
       case MIME_MAGIC_STRING :
-          printf("string(%d,%s)", rules->offset, rules->value.stringv);
+          printf("string(%d,", rules->offset);
+	  for (i = 0; i < rules->length; i ++)
+	    if (rules->value.stringv[i] < ' ' ||
+	        rules->value.stringv[i] > 126)
+	      printf("<%02X>", rules->value.stringv[i]);
+	    else
+	      putchar(rules->value.stringv[i]);
+          putchar(')');
 	  break;
       case MIME_MAGIC_CHAR :
           printf("char(%d,%d)", rules->offset, rules->value.charv);
@@ -178,15 +183,34 @@ print_rules(mime_magic_t *rules)	/* I - Rules to print */
       case MIME_MAGIC_INT :
           printf("int(%d,%d)", rules->offset, rules->value.intv);
 	  break;
+      case MIME_MAGIC_CONTAINS :
+          printf("contains(%d,%d,", rules->offset, rules->region);
+	  for (i = 0; i < rules->length; i ++)
+	    if (rules->value.stringv[i] < ' ' ||
+	        rules->value.stringv[i] > 126)
+	      printf("<%02X>", rules->value.stringv[i]);
+	    else
+	      putchar(rules->value.stringv[i]);
+          putchar(')');
+	  break;
       default :
-          if (rules->child != NULL)
-	  {
-	    putchar('(');
-	    print_rules(rules->child);
-	    putchar(')');
-	  }
 	  break;
     }
+
+    if (rules->child != NULL)
+    {
+      if (rules->op == MIME_MAGIC_OR)
+	puts("OR (");
+      else
+	puts("AND (");
+
+      strcat(indent, "\t");
+      print_rules(rules->child);
+      indent[strlen(indent) - 1] = '\0';
+      printf("%s)\n", indent);
+    }
+    else
+      putchar('\n');
 
     rules = rules->next;
   }
@@ -195,5 +219,5 @@ print_rules(mime_magic_t *rules)	/* I - Rules to print */
 
 
 /*
- * End of "$Id: testmime.c,v 1.3 2001/01/22 15:04:01 mike Exp $".
+ * End of "$Id: testmime.c,v 1.4 2001/02/02 19:38:45 mike Exp $".
  */

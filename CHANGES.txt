@@ -7,6 +7,7 @@ CHANGES IN CUPS V1.1.6-2
 	- Added separate compiler options for pstoraster
 	  (Ghostscript) to avoid compiler-induced errors
 	  from Ghostscript's twisted code.
+	- The mime.types file contained syntax errors.
 
 
 CHANGES IN CUPS V1.1.6-1
@@ -23,7 +24,7 @@ CHANGES IN CUPS V1.1.6
 	  POSTSCRIPT" in mime.types.
 	- Resolution options were not being passed into the
 	  filter programs properly.
-	- The default compiler options for GCC no longer includ
+	- The default compiler options for GCC no longer include
 	  "-g3", which apparently is deprecated in newer
 	  versions of GCC.
 	- CheckJobs() could cause cupsd to crash if a job is

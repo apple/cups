@@ -1,5 +1,5 @@
 /*
- * "$Id: type.c,v 1.9 2001/01/22 15:04:01 mike Exp $"
+ * "$Id: type.c,v 1.10 2001/02/02 19:38:45 mike Exp $"
  *
  *   MIME typing routines for the Common UNIX Printing System (CUPS).
  *
@@ -43,6 +43,7 @@
 
 #include <cups/string.h>
 #include "mime.h"
+#include <cups/debug.h>
 
 
 /*
@@ -166,6 +167,8 @@ mimeAddTypeRule(mime_type_t *mt,	/* I - Type to add to */
   logic  = MIME_MAGIC_NOP;
   invert = 0;
 
+  DEBUG_printf(("%s/%s: %s\n", mt->super, mt->type, rule));
+
   while (*rule != '\0')
   {
     while (isspace(*rule))
@@ -173,11 +176,13 @@ mimeAddTypeRule(mime_type_t *mt,	/* I - Type to add to */
 
     if (*rule == '(')
     {
+      DEBUG_puts("new parenthesis group");
       logic = MIME_MAGIC_NOP;
       rule ++;
     }
     else if (*rule == ')')
     {
+      DEBUG_puts("close paren...");
       if (current == NULL || current->parent == NULL)
         return (-1);
 
@@ -211,9 +216,14 @@ mimeAddTypeRule(mime_type_t *mt,	/* I - Type to add to */
 
         current->prev   = NULL;
 	current->parent = temp;
+
+        DEBUG_printf(("creating new AND group %p...\n", temp));
       }
       else
+      {
+        DEBUG_printf(("setting group %p op to AND...\n", current->parent));
         current->parent->op = MIME_MAGIC_AND;
+      }
 
       logic = MIME_MAGIC_AND;
       rule ++;
@@ -237,6 +247,8 @@ mimeAddTypeRule(mime_type_t *mt,	/* I - Type to add to */
 	  if ((temp = calloc(1, sizeof(mime_magic_t))) == NULL)
 	    return (-1);
 
+          DEBUG_printf(("creating new AND group %p inside OR group\n", temp));
+
           while (current->prev != NULL)
 	  {
 	    current->parent = temp;
@@ -255,6 +267,7 @@ mimeAddTypeRule(mime_type_t *mt,	/* I - Type to add to */
 	  * This isn't the top rule, so go up one level...
 	  */
 
+          DEBUG_puts("going up one level");
 	  current = current->parent;
 	}
       }
@@ -264,6 +277,7 @@ mimeAddTypeRule(mime_type_t *mt,	/* I - Type to add to */
     }
     else if (*rule == '!')
     {
+      DEBUG_puts("NOT");
       invert = 1;
       rule ++;
     }
@@ -286,7 +300,9 @@ mimeAddTypeRule(mime_type_t *mt,	/* I - Type to add to */
 	*/
 
 	rule ++;
-	for (num_values = 0; num_values < 3; num_values ++)
+	for (num_values = 0;
+	     num_values < (sizeof(value) / sizeof(value[0]));
+	     num_values ++)
 	{
 	  ptr = value[num_values];
 
@@ -424,6 +440,8 @@ mimeAddTypeRule(mime_type_t *mt,	/* I - Type to add to */
         * Add parenthetical grouping...
 	*/
 
+        DEBUG_printf(("making new OR group %p for parenthesis...\n", temp));
+
         temp->op = MIME_MAGIC_OR;
 
 	if ((temp->child = calloc(1, sizeof(mime_magic_t))) == NULL)
@@ -434,6 +452,9 @@ mimeAddTypeRule(mime_type_t *mt,	/* I - Type to add to */
 	temp  = temp->child;
         logic = MIME_MAGIC_OR;
       }
+
+      DEBUG_printf(("adding %p: %s, op = %d, logic = %d, invert = %d\n",
+                    temp, name, op, logic, invert));
 
      /*
       * Fill in data for the rule...
@@ -941,6 +962,8 @@ checkrules(const char   *filename,	/* I - Filename */
     * the the rule set is false...
     */
 
+    DEBUG_printf(("result of test %p is %d\n", rules, result));
+
     if ((result && logic == MIME_MAGIC_OR) ||
         (!result && logic == MIME_MAGIC_AND))
       return (result);
@@ -1061,5 +1084,5 @@ patmatch(const char *s,		/* I - String to match against */
 
 
 /*
- * End of "$Id: type.c,v 1.9 2001/01/22 15:04:01 mike Exp $".
+ * End of "$Id: type.c,v 1.10 2001/02/02 19:38:45 mike Exp $".
  */
