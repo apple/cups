@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.27 1999/09/29 17:08:35 mike Exp $"
+ * "$Id: ipp.c,v 1.28 1999/09/29 19:20:15 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -1784,19 +1784,28 @@ print_job(client_t        *con,		/* I - Client connection */
   * Is it a format we support?
   */
 
-  if ((format = ippFindAttribute(con->request, "document-format", IPP_TAG_MIMETYPE)) == NULL)
+  if ((format = ippFindAttribute(con->request, "document-format", IPP_TAG_MIMETYPE)) != NULL)
   {
-    DEBUG_puts("print_job: missing document-format attribute!");
-    send_ipp_error(con, IPP_BAD_REQUEST);
-    return;
-  }
+   /*
+    * Grab format from client...
+    */
 
-  if (sscanf(format->values[0].string.text, "%15[^/]/%31[^;]", super, type) != 2)
+    if (sscanf(format->values[0].string.text, "%15[^/]/%31[^;]", super, type) != 2)
+    {
+      DEBUG_printf(("print_job: could not scan type \'%s\'!\n",
+	            format->values[0].string.text));
+      send_ipp_error(con, IPP_BAD_REQUEST);
+      return;
+    }
+  }
+  else
   {
-    DEBUG_printf(("print_job: could not scan type \'%s\'!\n",
-	          format->values[0].string.text));
-    send_ipp_error(con, IPP_BAD_REQUEST);
-    return;
+   /*
+    * No document format attribute?  Auto-type it!
+    */
+
+    strcpy(super, "application");
+    strcpy(type, "octet-stream");
   }
 
   if (strcmp(super, "application") == 0 &&
@@ -1815,9 +1824,16 @@ print_job(client_t        *con,		/* I - Client connection */
       * Replace the document-format attribute value with the auto-typed one.
       */
 
-      free(format->values[0].string.text);
       sprintf(mimetype, "%s/%s", filetype->super, filetype->type);
-      format->values[0].string.text = strdup(mimetype);
+
+      if (format != NULL)
+      {
+	free(format->values[0].string.text);
+	format->values[0].string.text = strdup(mimetype);
+      }
+      else
+        ippAddString(con->request, IPP_TAG_JOB, IPP_TAG_MIMETYPE,
+	             "document-format", NULL, mimetype);
     }
   }
   else
@@ -2445,5 +2461,5 @@ validate_job(client_t        *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.27 1999/09/29 17:08:35 mike Exp $".
+ * End of "$Id: ipp.c,v 1.28 1999/09/29 19:20:15 mike Exp $".
  */
