@@ -1,8 +1,10 @@
-CHANGES.txt - 01/16/2003
+CHANGES.txt - 01/23/2003
 ------------------------
 
 CHANGES IN CUPS V1.1.19
 
+	- The pstops filter didn't handle page ranges properly
+	  when a page contained an embedded document.
 	- Added a partial translation of the web interface to
 	  German.
 	- When printing using the OutputOrder=Reverse option
