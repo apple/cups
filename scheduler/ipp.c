@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.188 2003/02/10 17:58:12 mike Exp $"
+ * "$Id: ipp.c,v 1.189 2003/02/26 19:49:24 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -1205,7 +1205,7 @@ add_printer(client_t        *con,	/* I - Client connection */
     strlcpy(printer->state_message, attr->values[0].string.text,
             sizeof(printer->state_message));
   if ((attr = ippFindAttribute(con->request, "job-sheets-default", IPP_TAG_ZERO)) != NULL &&
-      !Classification[0])
+      !Classification)
   {
     SetString(&printer->job_sheets[0], attr->values[0].string.text);
     if (attr->num_values > 1)
@@ -6069,5 +6069,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.188 2003/02/10 17:58:12 mike Exp $".
+ * End of "$Id: ipp.c,v 1.189 2003/02/26 19:49:24 mike Exp $".
  */
