@@ -1,5 +1,5 @@
 /*
- * "$Id: cups-lpd.c,v 1.18 2001/01/12 15:40:10 mike Exp $"
+ * "$Id: cups-lpd.c,v 1.19 2001/01/18 22:29:07 mike Exp $"
  *
  *   Line Printer Daemon interface for the Common UNIX Printing System (CUPS).
  *
@@ -130,7 +130,7 @@ main(int  argc,			/* I - Number of command-line arguments */
   else
   {
     hostip   = ntohl(hostaddr.sin_addr.s_addr);
-    hostname = gethostbyaddr(&hostaddr, hostlen, AF_INET);
+    hostname = gethostbyaddr((struct sockaddr *)&hostaddr, hostlen, AF_INET);
 
     syslog(LOG_INFO, "Connection from %s (%d.%d.%d.%d)",
            hostname ? hostname->h_name : "unknown",
@@ -1214,5 +1214,5 @@ smart_gets(char *s,	/* I - Pointer to line buffer */
 
 
 /*
- * End of "$Id: cups-lpd.c,v 1.18 2001/01/12 15:40:10 mike Exp $".
+ * End of "$Id: cups-lpd.c,v 1.19 2001/01/18 22:29:07 mike Exp $".
  */
