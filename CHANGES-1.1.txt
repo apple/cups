@@ -3,6 +3,12 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.20rc1
 
+	- The ppdOpen() functions now add all Default attributes
+	  to the attribute list; previously only certain
+	  unassigned default attributes would be added (STR
+	  #139)
+	- The ppdEmitJCL() function wrote JCL commands to stdout
+	  instead of the passed file pointer (STR #142)
 	- The httpGets() function could, in certain states,
 	  block waiting for data (STR #132)
 	- The cupsEmitJCL() function not outputs an empty @PJL

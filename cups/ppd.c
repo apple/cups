@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c,v 1.51.2.51 2003/04/11 13:07:36 mike Exp $"
+ * "$Id: ppd.c,v 1.51.2.52 2003/06/07 16:35:54 mike Exp $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -808,21 +808,6 @@ ppdOpen(FILE *fp)			/* I - File to read from */
       ppd->color_device = strcmp(string, "True") == 0;
     else if (strcmp(keyword, "ContoneOnly") == 0)
       ppd->contone_only = strcmp(string, "True") == 0;
-    else if (strcmp(keyword, "DefaultColorSpace") == 0)
-    {
-      if (strcmp(string, "CMY") == 0)
-        ppd->colorspace = PPD_CS_CMY;
-      else if (strcmp(string, "CMYK") == 0)
-        ppd->colorspace = PPD_CS_CMYK;
-      else if (strcmp(string, "RGB") == 0)
-        ppd->colorspace = PPD_CS_RGB;
-      else if (strcmp(string, "RGBK") == 0)
-        ppd->colorspace = PPD_CS_RGBK;
-      else if (strcmp(string, "N") == 0)
-        ppd->colorspace = PPD_CS_N;
-      else
-        ppd->colorspace = PPD_CS_GRAY;
-    }
     else if (strcmp(keyword, "cupsFlipDuplex") == 0)
       ppd->flip_duplex = strcmp(string, "True") == 0;
     else if (strcmp(keyword, "cupsManualCopies") == 0)
@@ -1688,39 +1673,64 @@ ppdOpen(FILE *fp)			/* I - File to read from */
       if (string == NULL)
         continue;
 
+     /*
+      * Drop UI text, if any, from value...
+      */
+
       if (strchr(string, '/') != NULL)
         *strchr(string, '/') = '\0';
 
-      if (option == NULL)
+     /*
+      * Assign the default value as appropriate...
+      */
+
+      if (strcmp(keyword, "DefaultColorSpace") == 0)
       {
-        if ((option = ppdFindOption(ppd, keyword + 7)) != NULL)
-	{
-	  strlcpy(option->defchoice, string, sizeof(option->defchoice));
-	  option = NULL;
-	}
+       /*
+        * Set default colorspace...
+	*/
+
+	if (strcmp(string, "CMY") == 0)
+          ppd->colorspace = PPD_CS_CMY;
+	else if (strcmp(string, "CMYK") == 0)
+          ppd->colorspace = PPD_CS_CMYK;
+	else if (strcmp(string, "RGB") == 0)
+          ppd->colorspace = PPD_CS_RGB;
+	else if (strcmp(string, "RGBK") == 0)
+          ppd->colorspace = PPD_CS_RGBK;
+	else if (strcmp(string, "N") == 0)
+          ppd->colorspace = PPD_CS_N;
 	else
-	{
-	 /*
-	  * Option not found; add this as an attribute...
-	  */
-
-          ppd_add_attr(ppd, keyword, "", "", string);
-
-          string = NULL;		/* Don't free this string below */
-	}
+          ppd->colorspace = PPD_CS_GRAY;
       }
-      else if (strcmp(keyword + 7, option->keyword) == 0)
+      else if (option && strcmp(keyword + 7, option->keyword) == 0)
+      {
+       /*
+        * Set the default as part of the current option...
+	*/
+
         strlcpy(option->defchoice, string, sizeof(option->defchoice));
+      }
       else
       {
        /*
-	* Default doesn't match this option; add as an attribute...
+        * Lookup option and set if it has been defined...
 	*/
 
-        ppd_add_attr(ppd, keyword, "", "", string);
+        ppd_option_t	*toption;	/* Temporary option */
 
-        string = NULL;			/* Don't free this string below */
+
+        if ((toption = ppdFindOption(ppd, keyword + 7)) != NULL)
+	  strlcpy(toption->defchoice, string, sizeof(toption->defchoice));
       }
+
+     /*
+      * Add default as attribute, too...
+      */
+
+      ppd_add_attr(ppd, keyword, "", "", string);
+
+      string = NULL;		/* Don't free this string below */
     }
     else if (strcmp(keyword, "UIConstraints") == 0 ||
              strcmp(keyword, "NonUIConstraints") == 0)
@@ -3361,5 +3371,5 @@ ppd_read(FILE *fp,			/* I - File to read from */
 
 
 /*
- * End of "$Id: ppd.c,v 1.51.2.51 2003/04/11 13:07:36 mike Exp $".
+ * End of "$Id: ppd.c,v 1.51.2.52 2003/06/07 16:35:54 mike Exp $".
  */
