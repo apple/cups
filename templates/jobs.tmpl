@@ -1,16 +1,21 @@
+<P>{#job_id=0?No Jobs:
 <TABLE BORDER="1">
 <TR>
 	<TH>ID</TH>
-	<TH>Information</TH>
+	<TH>Name</TH>
+	<TH>User</TH>
+	<TH>Size</TH>
+	<TH>State</TH>
+	<TH>Control</TH>
 </TR>
 {[job_id]
 <TR>
 	<TD VALIGN=TOP>{job_id}</TD>
-	<TD VALIGN=TOP>Name: {job_name}<BR>
-	Who: {job_originating_user_name}<BR>
-	Size: {job_k_octets}k<BR>
-	State: {job_state=3?pending:{job_state=4?held:processing}}.
-	<P>
+	<TD VALIGN=TOP>{job_name}</TD>
+	<TD VALIGN=TOP>{job_originating_user_name}</TD>
+	<TD VALIGN=TOP>{job_k_octets}k</TD>
+	<TD VALIGN=TOP>{job_state=3?pending:{job_state=4?held:processing}}</TD>
+	<TD VALIGN=TOP>
 	<IMG SRC="../images/hold-job.gif" ALT="Hold Job">
 	<IMG SRC="../images/resume-job.gif" ALT="Resume Job">
 	<IMG SRC="../images/cancel-job.gif" ALT="Cancel Job">
@@ -18,3 +23,4 @@
 </TR>
 }
 </TABLE>
+}

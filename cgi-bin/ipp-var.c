@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp-var.c,v 1.1 2000/02/01 02:52:23 mike Exp $"
+ * "$Id: ipp-var.c,v 1.2 2000/02/02 00:50:42 mike Exp $"
  *
  *   IPP variable routines for the Common UNIX Printing System (CUPS).
  *
@@ -46,19 +46,29 @@ ippSetCGIVars(ipp_t *response)		/* I - Response data to be copied... */
   char			name[1024],	/* Name of attribute */
 			value[16384],	/* Value(s) */
 			*valptr;	/* Pointer into value */
+  char			method[HTTP_MAX_URI],
+			username[HTTP_MAX_URI],
+			hostname[HTTP_MAX_URI],
+			resource[HTTP_MAX_URI],
+			uri[HTTP_MAX_URI];
+  int			port;
 
 
   cgiSetVariable("SERVER_NAME", getenv("SERVER_NAME"));
   cgiSetVariable("REMOTE_USER", getenv("REMOTE_USER"));
   cgiSetVariable("CUPS_VERSION", CUPS_SVERSION);
 
-  for (element = 0, attr = response->attrs;
-       attr != NULL;
-       attr = attr->next, element ++)
+  for (attr = response->attrs;
+       attr && attr->group_tag == IPP_TAG_OPERATION;
+       attr = attr->next);
+
+  for (element = 0; attr != NULL; attr = attr->next, element ++)
   {
    /*
     * Copy attributes to a separator...
     */
+
+/*    puts("<HR>");*/
 
     for (; attr != NULL && attr->group_tag != IPP_TAG_ZERO; attr = attr->next)
     {
@@ -68,6 +78,8 @@ ippSetCGIVars(ipp_t *response)		/* I - Response data to be copied... */
 
       if (attr->name == NULL)
         continue;
+
+/*      printf("<P>%s\n", attr->name);*/
 
       for (i = 0; attr->name[i]; i ++)
         if (attr->name[i] == '-')
@@ -118,6 +130,22 @@ ippSetCGIVars(ipp_t *response)		/* I - Response data to be copied... */
 			  "dpi" : "dpc");
 	      break;
 
+	  case IPP_TAG_URI :
+	      if (strncmp(attr->values[i].string.text, "ipp:", 4) == 0)
+	      {
+	        httpSeparate(attr->values[i].string.text, method, username,
+		             hostname, &port, resource);
+	        if (username[0])
+		  snprintf(uri, sizeof(uri), "http://%s@%s:%d%s", username,
+		           hostname, port, resource);
+                else
+		  snprintf(uri, sizeof(uri), "http://%s:%d%s", hostname, port,
+		           resource);
+
+		strcat(valptr, uri);
+	        break;
+	      }
+
           case IPP_TAG_STRING :
 	  case IPP_TAG_TEXT :
 	  case IPP_TAG_NAME :
@@ -143,5 +171,5 @@ ippSetCGIVars(ipp_t *response)		/* I - Response data to be copied... */
 
 
 /*
- * End of "$Id: ipp-var.c,v 1.1 2000/02/01 02:52:23 mike Exp $".
+ * End of "$Id: ipp-var.c,v 1.2 2000/02/02 00:50:42 mike Exp $".
  */

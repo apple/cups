@@ -1,5 +1,5 @@
 #
-# "$Id: cups.list,v 1.41 2000/01/29 23:08:00 mike Exp $"
+# "$Id: cups.list,v 1.42 2000/02/02 00:50:40 mike Exp $"
 #
 #   ESP Package Manager (EPM) file list for the Common UNIX Printing
 #   System (CUPS).
@@ -222,6 +222,26 @@ f 0444 root sys /usr/share/cups/model/laserjet.ppd ppd/laserjet.ppd
 f 0444 root sys /usr/share/cups/model/stcolor.ppd ppd/stcolor.ppd
 f 0444 root sys /usr/share/cups/model/stphoto.ppd ppd/stphoto.ppd
 
+f 0444 root sys /usr/share/cups/templates/add-class.tmpl templates/add-class.tmpl
+f 0444 root sys /usr/share/cups/templates/add-printer.tmpl templates/add-printer.tmpl
+f 0444 root sys /usr/share/cups/templates/admin.tmpl templates/admin.tmpl
+f 0444 root sys /usr/share/cups/templates/choose-device.tmpl templates/choose-device.tmpl
+f 0444 root sys /usr/share/cups/templates/choose-make.tmpl templates/choose-make.tmpl
+f 0444 root sys /usr/share/cups/templates/choose-model.tmpl templates/choose-model.tmpl
+f 0444 root sys /usr/share/cups/templates/choose-uri.tmpl templates/choose-uri.tmpl
+f 0444 root sys /usr/share/cups/templates/classes.tmpl templates/classes.tmpl
+f 0444 root sys /usr/share/cups/templates/header.tmpl templates/header.tmpl
+f 0444 root sys /usr/share/cups/templates/jobs.tmpl templates/jobs.tmpl
+f 0444 root sys /usr/share/cups/templates/modify-class.tmpl templates/modify-class.tmpl
+f 0444 root sys /usr/share/cups/templates/modify-printer.tmpl templates/modify-printer.tmpl
+f 0444 root sys /usr/share/cups/templates/option-boolean.tmpl templates/option-boolean.tmpl
+f 0444 root sys /usr/share/cups/templates/option-header.tmpl templates/option-header.tmpl
+f 0444 root sys /usr/share/cups/templates/option-pickmany.tmpl templates/option-pickmany.tmpl
+f 0444 root sys /usr/share/cups/templates/option-pickone.tmpl templates/option-pickone.tmpl
+f 0444 root sys /usr/share/cups/templates/option-trailer.tmpl templates/option-trailer.tmpl
+f 0444 root sys /usr/share/cups/templates/printers.tmpl templates/printers.tmpl
+f 0444 root sys /usr/share/cups/templates/trailer.tmpl templates/trailer.tmpl
+
 # Config files
 c 0644 root sys /etc/cups/classes.conf conf/classes.conf
 c 0644 root sys /etc/cups/cupsd.conf conf/cupsd.conf
@@ -259,17 +279,36 @@ f 0444 root sys /usr/share/doc/cups/cups.css doc/cups.css
 f 0444 root sys /usr/share/doc/cups/documentation.html doc/documentation.html
 f 0444 root sys /usr/share/doc/cups/idd.html doc/idd.html
 f 0444 root sys /usr/share/doc/cups/idd.pdf doc/idd.pdf
+f 0444 root sys /usr/share/doc/cups/images/accept-jobs.gif doc/images/accept-jobs.gif
+f 0444 root sys /usr/share/doc/cups/images/add-class.gif doc/images/add-class.gif
+f 0444 root sys /usr/share/doc/cups/images/add-printer.gif doc/images/add-printer.gif
+f 0444 root sys /usr/share/doc/cups/images/cancel-jobs.gif doc/images/cancel-jobs.gif
+f 0444 root sys /usr/share/doc/cups/images/cancel-job.gif doc/images/cancel-job.gif
+f 0444 root sys /usr/share/doc/cups/images/cancel.gif doc/images/cancel.gif
 f 0444 root sys /usr/share/doc/cups/images/classes.gif doc/images/classes.gif
+f 0444 root sys /usr/share/doc/cups/images/continue.gif doc/images/continue.gif
 f 0444 root sys /usr/share/doc/cups/images/cups-bar.gif doc/images/cups-bar.gif
 f 0444 root sys /usr/share/doc/cups/images/cups-block-diagram.gif doc/images/cups-block-diagram.gif
 f 0444 root sys /usr/share/doc/cups/images/cups-large.gif doc/images/cups-large.gif
 f 0444 root sys /usr/share/doc/cups/images/cups-medium.gif doc/images/cups-medium.gif
 f 0444 root sys /usr/share/doc/cups/images/cups-small.gif doc/images/cups-small.gif
+f 0444 root sys /usr/share/doc/cups/images/delete-class.gif doc/images/delete-class.gif
+f 0444 root sys /usr/share/doc/cups/images/delete-printer.gif doc/images/delete-printer.gif
+f 0444 root sys /usr/share/doc/cups/images/hold-job.gif doc/images/hold-job.gif
 f 0444 root sys /usr/share/doc/cups/images/logo.gif doc/images/logo.gif
+f 0444 root sys /usr/share/doc/cups/images/modify-class.gif doc/images/modify-class.gif
+f 0444 root sys /usr/share/doc/cups/images/modify-printer.gif doc/images/modify-printer.gif
 f 0444 root sys /usr/share/doc/cups/images/navbar.gif doc/images/navbar.gif
 f 0444 root sys /usr/share/doc/cups/images/printer-idle.gif doc/images/printer-idle.gif
 f 0444 root sys /usr/share/doc/cups/images/printer-processing.gif doc/images/printer-processing.gif
 f 0444 root sys /usr/share/doc/cups/images/printer-stopped.gif doc/images/printer-stopped.gif
+f 0444 root sys /usr/share/doc/cups/images/print-test-page.gif doc/images/print-test-page.gif
+f 0444 root sys /usr/share/doc/cups/images/reject-jobs.gif doc/images/reject-jobs.gif
+f 0444 root sys /usr/share/doc/cups/images/resume-job.gif doc/images/resume-job.gif
+f 0444 root sys /usr/share/doc/cups/images/start-class.gif doc/images/start-class.gif
+f 0444 root sys /usr/share/doc/cups/images/start-printer.gif doc/images/start-printer.gif
+f 0444 root sys /usr/share/doc/cups/images/stop-class.gif doc/images/stop-class.gif
+f 0444 root sys /usr/share/doc/cups/images/stop-printer.gif doc/images/stop-printer.gif
 f 0444 root sys /usr/share/doc/cups/index.html doc/index.html
 f 0444 root sys /usr/share/doc/cups/overview.html doc/overview.html
 f 0444 root sys /usr/share/doc/cups/overview.pdf doc/overview.pdf
@@ -333,5 +372,5 @@ f 0444 root sys /usr/man/man5/printers.conf.5 man/printers.conf.5
 i 0555 root sys cups cups.sh
 
 #
-# End of "$Id: cups.list,v 1.41 2000/01/29 23:08:00 mike Exp $".
+# End of "$Id: cups.list,v 1.42 2000/02/02 00:50:40 mike Exp $".
 #

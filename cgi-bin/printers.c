@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.14 2000/02/01 02:52:23 mike Exp $"
+ * "$Id: printers.c,v 1.15 2000/02/02 00:50:42 mike Exp $"
  *
  *   Printer status CGI for the Common UNIX Printing System (CUPS).
  *
@@ -113,7 +113,7 @@ main(int  argc,			/* I - Number of command-line arguments */
   else
   {
    /*
-    * Build a IPP_GET_PRINTER_ATTRIBUTES request, which requires the following
+    * Build an IPP_GET_PRINTER_ATTRIBUTES request, which requires the following
     * attributes:
     *
     *    attributes-charset
@@ -146,6 +146,51 @@ main(int  argc,			/* I - Number of command-line arguments */
 
   cgiCopyTemplateFile(stdout, TEMPLATES "/header.tmpl");
   cgiCopyTemplateFile(stdout, TEMPLATES "/printers.tmpl");
+
+ /*
+  * Get jobs for the specified printer if a printer has been chosen...
+  */
+
+  if (printer != NULL)
+  {
+   /*
+    * Build an IPP_GET_JOBS request, which requires the following
+    * attributes:
+    *
+    *    attributes-charset
+    *    attributes-natural-language
+    *    printer-uri
+    */
+
+    request = ippNew();
+
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
+        	 "attributes-charset", NULL, cupsLangEncoding(language));
+
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
+        	 "attributes-natural-language", NULL, language->language);
+
+    request->request.op.operation_id = IPP_GET_JOBS;
+    request->request.op.request_id   = 1;
+
+    snprintf(uri, sizeof(uri), "ipp://%s/printers/%s", getenv("SERVER_NAME"),
+             printer);
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri", NULL,
+                 uri);
+
+   /*
+    * Do the request and get back a response...
+    */
+
+    if ((response = cupsDoRequest(http, request, "/")) != NULL)
+    {
+      ippSetCGIVars(response);
+      ippDelete(response);
+
+      cgiCopyTemplateFile(stdout, TEMPLATES "/jobs.tmpl");
+    }
+  }
+
   cgiCopyTemplateFile(stdout, TEMPLATES "/trailer.tmpl");
 
  /*
@@ -164,5 +209,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: printers.c,v 1.14 2000/02/01 02:52:23 mike Exp $".
+ * End of "$Id: printers.c,v 1.15 2000/02/02 00:50:42 mike Exp $".
  */

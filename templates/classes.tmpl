@@ -5,12 +5,13 @@
 </TR>
 {[printer_name]
 <TR>
-	<TD VALIGN=TOP><A HREF="{printer_uri}">
+	<TD VALIGN=TOP><A HREF="{printer_uri_supported}">
 	<IMG SRC="../images/classes.gif" BORDER="0"><BR>{printer_name}</A></TD>
 	<TD VALIGN=TOP>Description: {printer_info}<BR>
 	Location: {printer_location}<BR>
 	Class State: {printer_state=3?idle:{printer_state=4?processing:stopped}}},
 	{printer_is_accepting_jobs=0?rejecting jobs:accepting jobs}.
+	{printer_state_message!?<BR><I>"{printer_state_message}"</I>:}
 	<P>
 	<IMG SRC="../images/print-test-page.gif" ALT="Print Test Page">
 	<IMG SRC="../images/start-class.gif" ALT="Start Class">
