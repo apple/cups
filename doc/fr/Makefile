@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.38 2002/07/18 21:14:07 mike Exp $"
+# "$Id: Makefile,v 1.1 2002/07/18 21:14:08 mike Exp $"
 #
 #   Documentation makefile for the Common UNIX Printing System (CUPS).
 #
@@ -22,7 +22,7 @@
 #         WWW: http://www.cups.org
 #
 
-include ../Makedefs
+include ../../Makedefs
 
 #
 # HTMLDOC generation rules...
@@ -46,27 +46,21 @@ include ../Makedefs
 # Document files...
 #
 
-DOCUMENTS	=	cmp.shtml idd.shtml ipp.shtml sam.shtml sdd.shtml \
-			spm.shtml sps.shtml ssr.shtml stp.shtml sum.shtml \
-			svd.shtml translation.shtml
+DOCUMENTS	=	sam.shtml sum.shtml
 DOCIMAGES	=	images/cups-block-diagram.gif images/cups-large.gif \
 			images/cups-medium.gif images/cups-small.gif
 WEBPAGES	=	cups.css cupsdoc.css index.html documentation.html
 WEBIMAGES	=	images/accept-jobs.gif \
 			images/add-class.gif \
 			images/add-printer.gif \
+			images/cancel.gif \
 			images/cancel-job.gif \
 			images/cancel-jobs.gif \
-			images/cancel.gif \
-			images/classes.gif \
 			images/config-printer.gif \
 			images/continue.gif \
 			images/delete-class.gif \
 			images/delete-printer.gif \
-			images/draft.gif \
 			images/hold-job.gif \
-			images/left.gif \
-			images/logo.gif \
 			images/manage-classes.gif \
 			images/manage-jobs.gif \
 			images/manage-printers.gif \
@@ -74,13 +68,9 @@ WEBIMAGES	=	images/accept-jobs.gif \
 			images/modify-printer.gif \
 			images/navbar.gif \
 			images/print-test-page.gif \
-			images/printer-idle.gif \
-			images/printer-processing.gif \
-			images/printer-stopped.gif \
 			images/reject-jobs.gif \
 			images/release-job.gif \
 			images/restart-job.gif \
-			images/right.gif \
 			images/show-active.gif \
 			images/show-completed.gif \
 			images/start-class.gif \
@@ -94,7 +84,6 @@ WEBIMAGES	=	images/accept-jobs.gif \
 #
 
 all:	$(DOCUMENTS:.shtml=.pdf) $(DOCUMENTS:.shtml=.html) overview.pdf
-	cd fr; make all
 
 
 #
@@ -102,7 +91,6 @@ all:	$(DOCUMENTS:.shtml=.pdf) $(DOCUMENTS:.shtml=.html) overview.pdf
 #
 
 ps:	$(DOCUMENTS:.shtml=.ps) overview.ps
-	cd fr; make ps
 
 
 #
@@ -113,7 +101,6 @@ clean:
 	$(RM) $(DOCUMENTS:.shtml=.pdf)
 	$(RM) $(DOCUMENTS:.shtml=.html)
 	$(RM) overview.pdf
-	cd fr; make clean
 
 
 #
@@ -121,23 +108,22 @@ clean:
 #
 
 install:
-	$(INSTALL_DIR) $(DOCDIR)
+	$(INSTALL_DIR) $(DOCDIR)/fr
 	for file in $(WEBPAGES); do \
-		$(INSTALL_MAN) $$file $(DOCDIR); \
+		$(INSTALL_MAN) $$file $(DOCDIR)/fr; \
 	done
-	$(INSTALL_MAN) overview.html $(DOCDIR)
-	$(INSTALL_MAN) overview.pdf $(DOCDIR)
+	$(INSTALL_MAN) overview.html $(DOCDIR)/fr
+	$(INSTALL_MAN) overview.pdf $(DOCDIR)/fr
 	for file in $(DOCUMENTS:.shtml=.html); do \
-		$(INSTALL_MAN) $$file $(DOCDIR); \
+		$(INSTALL_MAN) $$file $(DOCDIR)/fr; \
 	done
 	for file in $(DOCUMENTS:.shtml=.pdf); do \
-		$(INSTALL_MAN) $$file $(DOCDIR); \
+		$(INSTALL_MAN) $$file $(DOCDIR)/fr; \
 	done
-	$(INSTALL_DIR) $(DOCDIR)/images
+	$(INSTALL_DIR) $(DOCDIR)/fr/images
 	for file in $(WEBIMAGES) $(DOCIMAGES); do \
-		$(INSTALL_MAN) $$file $(DOCDIR)/images; \
+		$(INSTALL_MAN) $$file $(DOCDIR)/fr/images; \
 	done
-	cd fr; make install
 
 
 #
@@ -147,92 +133,58 @@ install:
 
 overview.pdf:	overview.html
 	echo Formatting $@...
-	htmldoc --duplex --compression=9 --jpeg --webpage -f overview.pdf overview.html
+	htmldoc --path ".;.." --duplex --compression=9 --jpeg --webpage -f overview.pdf overview.html
 overview.ps:	overview.html
 	echo Formatting $@...
-	htmldoc --duplex --jpeg --webpage -f overview.ps overview.html
+	htmldoc --path ".;.." --duplex --jpeg --webpage -f overview.ps overview.html
 
 sam.html:	sam.shtml
 	echo Formatting $@...
-	htmldoc --titleimage images/cups-large.gif -f $@ $<
+	htmldoc --path ".;.." --titleimage images/cups-large.gif -f $@ $<
 sam.pdf:	sam.shtml
 	echo Formatting $@...
-	htmldoc --titleimage images/cups-large.gif --duplex --compression=9 \
+	htmldoc --path ".;.." --titleimage images/cups-large.gif --duplex --compression=9 \
 		--jpeg -f $@ $<
 sam.ps:		sam.shtml
 	echo Formatting $@...
-	htmldoc --titleimage images/cups-large.gif --duplex --jpeg -f $@ $<
+	htmldoc --path ".;.." --titleimage images/cups-large.gif --duplex --jpeg -f $@ $<
 
 spm.html:	spm.shtml
 	echo Formatting $@...
-	htmldoc --titleimage images/cups-large.gif -f $@ $<
+	htmldoc --path ".;.." --titleimage images/cups-large.gif -f $@ $<
 spm.pdf:	spm.shtml
 	echo Formatting $@...
-	htmldoc --titleimage images/cups-large.gif --duplex --compression=9 \
+	htmldoc --path ".;.." --titleimage images/cups-large.gif --duplex --compression=9 \
 		--jpeg -f $@ $<
 spm.ps:		spm.shtml
 	echo Formatting $@...
-	htmldoc --titleimage images/cups-large.gif --duplex --jpeg -f $@ $<
+	htmldoc --path ".;.." --titleimage images/cups-large.gif --duplex --jpeg -f $@ $<
 
 sum.html:	sum.shtml
 	echo Formatting $@...
-	htmldoc --titleimage images/cups-large.gif -f $@ $<
+	htmldoc --path ".;.." --titleimage images/cups-large.gif -f $@ $<
 sum.pdf:	sum.shtml
 	echo Formatting $@...
-	htmldoc --titleimage images/cups-large.gif --duplex --compression=9 \
+	htmldoc --path ".;.." --titleimage images/cups-large.gif --duplex --compression=9 \
 		--jpeg -f $@ $<
 sum.ps:		sum.shtml
 	echo Formatting $@...
-	htmldoc --titleimage images/cups-large.gif --duplex --jpeg -f $@ $<
-
-sam-7x8.pdf:	sam.shtml
-	echo Formatting $@...
-	htmldoc --titleimage images/cups-large.gif --duplex --compression=9 \
-		--pagelayout tworight --pagemode document \
-		--jpeg --size 7x8.5in --left 0.5in --right 0.25in \
-		--top 0.25in --bottom 0.25in --fontsize 10 --headfootsize 10 -f $@ sam.shtml
-sam-7x8.ps:		sam.shtml
-	echo Formatting $@...
-	htmldoc --titleimage images/cups-large.gif --duplex --jpeg \
-		--size 7x8.5in --left 0.5in --right 0.25in \
-		--top 0.25in --bottom 0.25in --fontsize 10 --headfootsize 10 -f $@ sam.shtml
-spm-7x8.pdf:	spm.shtml
-	echo Formatting $@...
-	htmldoc --titleimage images/cups-large.gif --duplex --compression=9 \
-		--pagelayout tworight --pagemode document \
-		--jpeg --size 7x8.5in --left 0.5in --right 0.25in \
-		--top 0.25in --bottom 0.25in --fontsize 10 --headfootsize 10 -f $@ spm.shtml
-spm-7x8.ps:		spm.shtml
-	echo Formatting $@...
-	htmldoc --titleimage images/cups-large.gif --duplex --jpeg \
-		--size 7x8.5in --left 0.5in --right 0.25in \
-		--top 0.25in --bottom 0.25in --fontsize 10 --headfootsize 10 -f $@ spm.shtml
-sum-7x8.pdf:	sum.shtml
-	echo Formatting $@...
-	htmldoc --titleimage images/cups-large.gif --duplex --compression=9 \
-		--pagelayout tworight --pagemode document \
-		--jpeg --size 7x8.5in --left 0.5in --right 0.25in \
-		--top 0.25in --bottom 0.25in --fontsize 10 --headfootsize 10 -f $@ sum.shtml
-sum-7x8.ps:		sum.shtml
-	echo Formatting $@...
-	htmldoc --titleimage images/cups-large.gif --duplex --jpeg \
-		--size 7x8.5in --left 0.5in --right 0.25in \
-		--top 0.25in --bottom 0.25in --fontsize 10 --headfootsize 10 -f $@ sum.shtml
+	htmldoc --path ".;.." --titleimage images/cups-large.gif --duplex --jpeg -f $@ $<
 
 $(DOCUMENTS:.shtml=.html): \
 		glossary.shtml printing-overview.shtml \
 		references.shtml system-overview.shtml \
-		../LICENSE.html
+		../../LICENSE.html
 
 $(DOCUMENTS:.shtml=.pdf): \
 		glossary.shtml printing-overview.shtml \
 		references.shtml system-overview.shtml \
-		../LICENSE.html
+		../../LICENSE.html
 
 $(DOCUMENTS:.shtml=.ps): \
 		glossary.shtml printing-overview.shtml \
 		references.shtml system-overview.shtml \
-		../LICENSE.html
+		../../LICENSE.html
 
 
 #

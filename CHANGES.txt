@@ -3,6 +3,9 @@ CHANGES.txt - 07/18/2002
 
 CHANGES IN CUPS V1.1.16
 
+	- Added French translations of the web interface, CUPS
+	  Overview, Software Administrators Manual, and Software
+	  Users Manual contributed by Marian REYT-LLABRES.
 	- Added several "hint" messages for common configuration
 	  problems that are stored in the error_log file.
 	- httpSeparate() now unquotes %xx characters in the
