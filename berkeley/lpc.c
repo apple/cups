@@ -1,5 +1,5 @@
 /*
- * "$Id: lpc.c,v 1.2 1999/06/09 20:03:47 mike Exp $"
+ * "$Id: lpc.c,v 1.3 1999/06/21 19:10:07 mike Exp $"
  *
  *   "lpc" command for the Common UNIX Printing System (CUPS).
  *
@@ -87,8 +87,14 @@ main(int  argc,		/* I - Number of command-line arguments */
     */
 
     printf("lpc> ");
-    while (gets(line) != NULL)
+    while (fgets(line, sizeof(line), stdin) != NULL)
     {
+     /*
+      * Strip the trailing newline...
+      */
+
+      line[strlen(line) - 1] = '\0';
+
      /*
       * Find any options in the string...
       */
@@ -448,5 +454,5 @@ show_status(http_t *http,	/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpc.c,v 1.2 1999/06/09 20:03:47 mike Exp $".
+ * End of "$Id: lpc.c,v 1.3 1999/06/21 19:10:07 mike Exp $".
  */
