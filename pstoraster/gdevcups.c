@@ -1,5 +1,5 @@
 /*
- * "$Id: gdevcups.c,v 1.43.2.9 2002/05/16 14:00:03 mike Exp $"
+ * "$Id: gdevcups.c,v 1.43.2.10 2002/05/17 21:04:21 mike Exp $"
  *
  *   GNU Ghostscript raster output driver for the Common UNIX Printing
  *   System (CUPS).
@@ -188,8 +188,26 @@ private gx_device_procs	cups_procs =
 
 gx_device_cups	gs_cups_device =
 {
-  prn_device_body_copies(gx_device_cups, cups_procs, "cups", 85, 110, 100, 100,
-                         0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 2, 0, cups_print_pages),
+  prn_device_body_copies(gx_device_cups,	/* type */
+                         cups_procs,		/* procedures */
+			 "cups",		/* device name */
+			 85,			/* initial width */
+			 110,			/* initial height */
+			 100,			/* initial x resolution */
+			 100,			/* initial y resolution */
+                         0,			/* initial left offset */
+			 0,			/* initial top offset */
+			 0,			/* initial left margin */
+			 0,			/* initial bottom margin */
+			 0,			/* initial right margin */
+			 0,			/* initial top margin */
+			 1,			/* number of color components */
+			 1,			/* number of color bits */
+			 1,			/* maximum gray value */
+			 0,			/* maximum color value */
+			 2,			/* number of gray values */
+			 0,			/* number of color values */
+			 cups_print_pages),	/* print procedure */
   0,				/* page */
   NULL,				/* stream */
   NULL,				/* ppd */
@@ -390,7 +408,6 @@ private int				/* O - Error status */
 cups_get_params(gx_device     *pdev,	/* I - Device info */
                 gs_param_list *plist)	/* I - Parameter list */
 {
-  int			i;		/* Looping var */
   int			code;		/* Return code */
   gs_param_string	s;		/* Temporary string value */
   bool			b;		/* Temporary boolean value */
@@ -768,10 +785,13 @@ cups_map_cmyk_color(gx_device      *pdev,	/* I - Device info */
   * Density correct...
   */
 
-  c  = cupsDensity[c];
-  m  = cupsDensity[m];
-  y  = cupsDensity[y];
-  k  = cupsDensity[k];
+  if (cupsHaveProfile)
+  {
+    c  = cupsDensity[c];
+    m  = cupsDensity[m];
+    y  = cupsDensity[y];
+    k  = cupsDensity[k];
+  }
 
   ic = lut_rgb_color[c];
   im = lut_rgb_color[m];
@@ -1808,7 +1828,9 @@ cups_put_params(gx_device     *pdev,	/* I - Device info */
   } \
   else if (code == 0) \
   { \
-    strlcpy(cups->header.name, (const char *)stringval.data, 64); \
+    strncpy(cups->header.name, (const char *)stringval.data, \
+            stringval.size); \
+    cups->header.name[stringval.size] = '\0'; \
   }
 
 #define intoption(name, sname, type) \
@@ -2185,7 +2207,6 @@ cups_set_color_info(gx_device *pdev)	/* I - Device info */
     cups->color_info.dither_colors = 0;
   }
 
-#if 0 /* MRS: This seems to not work with GNU Ghostscript 7.05 (blank page)... */
  /*
   * Enable/disable CMYK color support...
   */
@@ -2194,7 +2215,6 @@ cups_set_color_info(gx_device *pdev)	/* I - Device info */
     cups->procs.map_cmyk_color = cups_map_cmyk_color;
   else
     cups->procs.map_cmyk_color = NULL;
-#endif /* 0 */
 
  /*
   * Tell Ghostscript to forget any colors it has cached...
@@ -3425,5 +3445,5 @@ cups_print_planar(gx_device_printer *pdev,	/* I - Printer device */
 
 
 /*
- * End of "$Id: gdevcups.c,v 1.43.2.9 2002/05/16 14:00:03 mike Exp $".
+ * End of "$Id: gdevcups.c,v 1.43.2.10 2002/05/17 21:04:21 mike Exp $".
  */
