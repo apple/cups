@@ -1,5 +1,5 @@
 /*
- * "$Id: cupsd.h,v 1.38 2003/01/17 14:42:27 mike Exp $"
+ * "$Id: cupsd.h,v 1.39 2003/01/24 19:16:33 mike Exp $"
  *
  *   Main header file for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -52,6 +52,10 @@
 #include <cups/ipp.h>
 #include <cups/language.h>
 #include <cups/debug.h>
+
+#if defined(HAVE_CDSASSL)
+#  include <CoreFoundation/CoreFoundation.h>
+#endif /* HAVE_CDSASSL */
 
 
 /*
@@ -173,5 +177,5 @@ extern void	StopServer(void);
 
 
 /*
- * End of "$Id: cupsd.h,v 1.38 2003/01/17 14:42:27 mike Exp $".
+ * End of "$Id: cupsd.h,v 1.39 2003/01/24 19:16:33 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.114 2003/01/23 16:26:37 mike Exp $"
+ * "$Id: conf.c,v 1.115 2003/01/24 19:16:32 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -27,6 +27,8 @@
  *   read_configuration() - Read a configuration file.
  *   read_location()      - Read a <Location path> definition.
  *   get_address()        - Get an address + port number from a line.
+ *   CDSAGetServerCerts() - Convert a keychain name into the CFArrayRef
+ *                          required by SSLSetCertificate.
  */
 
 /*
@@ -38,6 +40,11 @@
 #include <pwd.h>
 #include <grp.h>
 #include <sys/resource.h>
+
+#ifdef HAVE_CDSASSL
+#  include <Security/SecureTransport.h>
+#  include <Security/SecIdentitySearch.h>
+#endif /* HAVE_CDSASSL */
 
 #ifdef HAVE_VSYSLOG
 #  include <syslog.h>
@@ -144,6 +151,10 @@ static int	read_location(FILE *fp, char *name, int linenum);
 static int	get_address(char *value, unsigned defaddress, int defport,
 		            struct sockaddr_in *address);
 
+#ifdef HAVE_CDSASSL
+static CFArrayRef CDSAGetServerCerts();
+#endif /* HAVE_CDSASSL */
+
 
 /*
  * 'ReadConfiguration()' - Read the cupsd.conf file.
@@ -243,8 +254,19 @@ ReadConfiguration(void)
   ClassifyOverride  = 0;
 
 #ifdef HAVE_SSL
+#  ifdef HAVE_CDSASSL
+  if (ServerCertificatesArray)
+  {
+    CFRelease(ServerCertificatesArray);
+    ServerCertificatesArray = NULL;
+  }
+
+  strcpy(ServerCertificate, "/var/root/Library/Keychains/CUPS");
+
+#  else
   strcpy(ServerCertificate, "ssl/server.crt");
   strcpy(ServerKey, "ssl/server.key");
+#  endif /* HAVE_CDSASSL */
 #endif /* HAVE_SSL */
 
   if ((language = DEFAULT_LANGUAGE) == NULL)
@@ -589,6 +611,10 @@ ReadConfiguration(void)
 
   snprintf(directory, sizeof(directory), "%s/backend", ServerBin);
   LoadDevices(directory);
+
+#ifdef HAVE_CDSASSL
+  ServerCertificatesArray = CDSAGetServerCerts();
+#endif /* HAVE_CDSASSL */
 
  /*
   * Startup the server...
@@ -1912,6 +1938,95 @@ get_address(char               *value,		/* I - Value string */
 }
 
 
+#ifdef HAVE_CDSASSL
 /*
- * End of "$Id: conf.c,v 1.114 2003/01/23 16:26:37 mike Exp $".
+ * 'CDSAGetServerCerts()' - Convert a keychain name into the CFArrayRef
+ *                          required by SSLSetCertificate.
+ *
+ * For now we assumes that there is exactly one SecIdentity in the
+ * keychain - i.e. there is exactly one matching cert/private key pair.
+ * In the future we will search a keychain for a SecIdentity matching a
+ * specific criteria.  We also skip the operation of adding additional
+ * non-signing certs from the keychain to the CFArrayRef.
+ *
+ * To create a self-signed certificate for testing use the certtool.
+ * Executing the following as root will do it:
+ *
+ *     certtool c c v k=CUPS
+ */
+
+static CFArrayRef
+CDSAGetServerCerts(void)
+{
+  OSStatus		err;		/* Error info */
+  SecKeychainRef 	kcRef;		/* Keychain reference */
+  SecIdentitySearchRef	srchRef;	/* Search reference */
+  SecIdentityRef	identity;	/* Identity */
+  CFArrayRef		ca;		/* Certificate array */
+
+
+  kcRef    = NULL;
+  srchRef  = NULL;
+  identity = NULL;
+  ca       = NULL;
+  err      = SecKeychainOpen(ServerCertificate, &kcRef);
+
+  if (err)
+    LogMessage(L_ERROR, "Cannot open keychain \"%s\", error %d.",
+               ServerCertficate, err);
+  else
+  {
+   /*
+    * Search for "any" identity matching specified key use; 
+    * in this app, we expect there to be exactly one. 
+    */
+
+    err = SecIdentitySearchCreate(kcRef, CSSM_KEYUSE_SIGN, &srchRef);
+
+    if (err)
+      LogMessage(L_ERROR,
+                 "Cannot find signing key in keychain \"%s\", error %d",
+                 ServerCertificate, err);
+    else
+    {
+      err = SecIdentitySearchCopyNext(srchRef, &identity);
+
+      if (err)
+	LogMessage(L_ERROR,
+	           "Cannot find signing key in keychain \"%s\", error %d",
+	           ServerCertificate, err);
+      else
+      {
+	if (CFGetTypeID(identity) != SecIdentityGetTypeID())
+	  LogMessage(L_ERROR, "SecIdentitySearchCopyNext CFTypeID failure!");
+	else
+	{
+	 /* 
+	  * Found one. Place it in a CFArray. 
+	  * TBD: snag other (non-identity) certs from keychain and add them
+	  * to array as well.
+	  */
+
+	  ca = CFArrayCreate(NULL, (const void **)&identity, 1, NULL);
+
+	  if (ca == nil)
+	    LogMessage(L_ERROR, "CFArrayCreate error");
+	}
+
+	/*CFRelease(identity);*/
+      }
+
+      /*CFRelease(srchRef);*/
+    }
+
+    /*CFRelease(kcRef);*/
+  }
+
+  return ca;
+}
+#endif /* HAVE_CDSASSL */
+
+
+/*
+ * End of "$Id: conf.c,v 1.115 2003/01/24 19:16:32 mike Exp $".
  */
