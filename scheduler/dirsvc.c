@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.71 2001/02/08 19:24:15 mike Exp $"
+ * "$Id: dirsvc.c,v 1.72 2001/02/21 17:01:17 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -192,12 +192,21 @@ UpdateBrowseList(void)
   if ((bytes = recvfrom(BrowseSocket, packet, sizeof(packet), 0, 
                         (struct sockaddr *)&srcaddr, &len)) <= 0)
   {
-    LogMessage(L_ERROR, "Browse recv failed - %s.",
-               strerror(errno));
-    LogMessage(L_ERROR, "Browsing turned off.");
+   /*
+    * "Connection refused" is returned under Linux if the destination port
+    * or address is unreachable from a previous sendto(); check for the
+    * error here and ignore it for now...
+    */
 
-    StopBrowsing();
-    Browsing = 0;
+    if (errno != ECONNREFUSED)
+    {
+      LogMessage(L_ERROR, "Browse recv failed - %s.", strerror(errno));
+      LogMessage(L_ERROR, "Browsing turned off.");
+
+      StopBrowsing();
+      Browsing = 0;
+    }
+
     return;
   }
 
@@ -938,5 +947,5 @@ StopPolling(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.71 2001/02/08 19:24:15 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.72 2001/02/21 17:01:17 mike Exp $".
  */

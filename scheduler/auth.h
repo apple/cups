@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.h,v 1.15 2001/02/20 22:41:55 mike Exp $"
+ * "$Id: auth.h,v 1.16 2001/02/21 17:01:17 mike Exp $"
  *
  *   Authorization definitions for the Common UNIX Printing System (CUPS)
  *   scheduler.
@@ -41,8 +41,8 @@
 #define AUTH_NAME		0	/* Authorize host by name */
 #define AUTH_IP			1	/* Authorize host by IP */
 
+#define AUTH_SATISFY_ALL	0	/* Satisfy both address and auth */
 #define AUTH_SATISFY_ANY	1	/* Satisfy either address or auth */
-#define AUTH_SATISFY_ALL	2	/* Satisfy both address and auth */
 
 #define AUTH_LIMIT_DELETE	1	/* Limit DELETE requests */
 #define AUTH_LIMIT_GET		2	/* Limit GET requests */
@@ -120,6 +120,7 @@ extern void		AllowIP(location_t *loc, unsigned address,
 			        unsigned netmask);
 extern int		CheckAuth(unsigned ip, char *name, int namelen,
 				  int num_masks, authmask_t *masks);
+extern location_t	*CopyLocation(location_t **loc);
 extern void		DeleteAllLocations(void);
 extern void		DenyHost(location_t *loc, char *name);
 extern void		DenyIP(location_t *loc, unsigned address,
@@ -130,5 +131,5 @@ extern http_status_t	IsAuthorized(client_t *con);
 
 
 /*
- * End of "$Id: auth.h,v 1.15 2001/02/20 22:41:55 mike Exp $".
+ * End of "$Id: auth.h,v 1.16 2001/02/21 17:01:17 mike Exp $".
  */

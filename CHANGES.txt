@@ -1,6 +1,18 @@
 CHANGES.txt - 02/20/2001
 ------------------------
 
+CHANGES IN CUPS V1.1.7
+
+	- All scheduler configuration files are now case
+	  insensitive to match Apache.
+	- Added support for Apache ListenBackLog, LogFormat,
+	  PassEnv, SetEnv, UnsetEnv, Require, UseCanonicalName,
+	  Satisfy, <Limit>, <LimitExcept>, LimitRequestSize, and
+	  Options directives.
+	- Added new "RunAsUser" directive to support non-root
+	  configurations on the standard ports.
+
+
 CHANGES IN CUPS V1.1.6-3
 
 	- The configure script put the JPEG library before the

@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.c,v 1.40 2001/02/20 22:41:54 mike Exp $"
+ * "$Id: auth.c,v 1.41 2001/02/21 17:01:17 mike Exp $"
  *
  *   Authorization routines for the Common UNIX Printing System (CUPS).
  *
@@ -24,10 +24,13 @@
  * Contents:
  *
  *   AddLocation()        - Add a location for authorization.
+ *   AddName()            - Add a name to a location...
  *   AllowHost()          - Add a host name that is allowed to access the
  *                          location.
  *   AllowIP()            - Add an IP address or network that is allowed to
  *                          access the location.
+ *   CheckAuth()          - Check authorization masks.
+ *   CopyLocation()       - Make a copy of a location...
  *   DeleteAllLocations() - Free all memory used for location authorization.
  *   DenyHost()           - Add a host name that is not allowed to access the
  *                          location.
@@ -255,6 +258,142 @@ CheckAuth(unsigned   ip,	/* I - Client address */
 
 
 /*
+ * 'CopyLocation()' - Make a copy of a location...
+ */
+
+location_t *			/* O - New location */
+CopyLocation(location_t **loc)	/* IO - Original location */
+{
+  int		i;		/* Looping var */
+  int		locindex;	/* Index into Locations array */
+  location_t	*temp;		/* New location */
+
+
+ /*
+  * Add the new location, updating the original location
+  * pointer as needed...
+  */
+
+  locindex = *loc - Locations;
+
+  if ((temp = AddLocation((*loc)->location)) == NULL)
+    return (NULL);
+
+  *loc = Locations + locindex;
+
+ /*
+  * Copy the information from the original location to the new one.
+  */
+
+  temp->limit = (*loc)->limit;
+  temp->order_type = (*loc)->order_type;
+  temp->type       = (*loc)->type;
+  temp->level      = (*loc)->level;
+  temp->satisfy    = (*loc)->satisfy;
+  temp->encryption = (*loc)->encryption;
+
+  if ((temp->num_names  = (*loc)->num_names) > 0)
+  {
+   /*
+    * Copy the names array...
+    */
+
+    if ((temp->names = calloc(temp->num_names, sizeof(char *))) == NULL)
+    {
+      LogMessage(L_ERROR, "CopyLocation: Unable to allocate memory for %d names: %s",
+                 temp->num_names, strerror(errno));
+      NumLocations --;
+      return (NULL);
+    }
+
+    for (i = 0; i < temp->num_names; i ++)
+      if ((temp->names[i] = strdup((*loc)->names[i])) == NULL)
+      {
+	LogMessage(L_ERROR, "CopyLocation: Unable to copy name \"%s\": %s",
+                   (*loc)->names[i], strerror(errno));
+
+	NumLocations --;
+	return (NULL);
+      }
+  }
+
+  if ((temp->num_allow  = (*loc)->num_allow) > 0)
+  {
+   /*
+    * Copy allow rules...
+    */
+
+    if ((temp->allow = calloc(temp->num_allow, sizeof(authmask_t))) == NULL)
+    {
+      LogMessage(L_ERROR, "CopyLocation: Unable to allocate memory for %d allow rules: %s",
+                 temp->num_allow, strerror(errno));
+      NumLocations --;
+      return (NULL);
+    }
+
+    for (i = 0; i < temp->num_allow; i ++)
+      switch (temp->allow[i].type = (*loc)->allow[i].type)
+      {
+        case AUTH_NAME :
+	    temp->allow[i].mask.name.length = (*loc)->allow[i].mask.name.length;
+	    temp->allow[i].mask.name.name   = strdup((*loc)->allow[i].mask.name.name);
+
+            if (temp->allow[i].mask.name.name == NULL)
+	    {
+	      LogMessage(L_ERROR, "CopyLocation: Unable to copy allow name \"%s\": %s",
+                	 (*loc)->allow[i].mask.name.name, strerror(errno));
+	      NumLocations --;
+	      return (NULL);
+	    }
+	    break;
+	case AUTH_IP :
+	    memcpy(&(temp->allow[i].mask.ip), &((*loc)->allow[i].mask.ip),
+	           sizeof(ipmask_t));
+	    break;
+      }
+  }
+
+  if ((temp->num_deny  = (*loc)->num_deny) > 0)
+  {
+   /*
+    * Copy deny rules...
+    */
+
+    if ((temp->deny = calloc(temp->num_deny, sizeof(authmask_t))) == NULL)
+    {
+      LogMessage(L_ERROR, "CopyLocation: Unable to allocate memory for %d deny rules: %s",
+                 temp->num_deny, strerror(errno));
+      NumLocations --;
+      return (NULL);
+    }
+
+    for (i = 0; i < temp->num_deny; i ++)
+      switch (temp->deny[i].type = (*loc)->deny[i].type)
+      {
+        case AUTH_NAME :
+	    temp->deny[i].mask.name.length = (*loc)->deny[i].mask.name.length;
+	    temp->deny[i].mask.name.name   = strdup((*loc)->deny[i].mask.name.name);
+
+            if (temp->deny[i].mask.name.name == NULL)
+	    {
+	      LogMessage(L_ERROR, "CopyLocation: Unable to copy deny name \"%s\": %s",
+                	 (*loc)->deny[i].mask.name.name, strerror(errno));
+	      NumLocations --;
+	      return (NULL);
+	    }
+	    break;
+	case AUTH_IP :
+	    memcpy(&(temp->deny[i].mask.ip), &((*loc)->deny[i].mask.ip),
+	           sizeof(ipmask_t));
+	    break;
+      }
+  }
+
+  return (temp);
+}
+
+
+/*
  * 'DeleteAllLocations()' - Free all memory used for location authorization.
  */
 
@@ -387,11 +526,14 @@ FindBest(client_t *con)		/* I - Connection */
   * Loop through the list of locations to find a match...
   */
 
-  limit   = limits[con->http.status];
+  limit   = limits[con->http.state];
   best    = NULL;
   bestlen = 0;
 
   for (i = NumLocations, loc = Locations; i > 0; i --, loc ++)
+  {
+    DEBUG_printf(("Location %s Limit %x\n", loc->location, loc->limit));
+
     if (loc->length > bestlen &&
         strncmp(con->uri, loc->location, loc->length) == 0 &&
 	loc->location[0] == '/' &&
@@ -400,6 +542,7 @@ FindBest(client_t *con)		/* I - Connection */
       best    = loc;
       bestlen = loc->length;
     }
+  }
 
  /*
   * Return the match, if any...
@@ -483,7 +626,12 @@ IsAuthorized(client_t *con)	/* I - Connection */
   */
 
   if ((best = FindBest(con)) == NULL)
+  {
+    DEBUG_printf(("FindBest(%s, %s) failed!\n", states[con->http.state],
+                  con->uri));
+
     return (HTTP_FORBIDDEN);
+  }
 
  /*
   * Check host/ip-based accesses...
@@ -1001,5 +1149,5 @@ pam_func(int                      num_msg,	/* I - Number of messages */
 
 
 /*
- * End of "$Id: auth.c,v 1.40 2001/02/20 22:41:54 mike Exp $".
+ * End of "$Id: auth.c,v 1.41 2001/02/21 17:01:17 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.h,v 1.32 2001/01/22 15:03:59 mike Exp $"
+ * "$Id: conf.h,v 1.33 2001/02/21 17:01:17 mike Exp $"
  *
  *   Configuration file definitions for the Common UNIX Printing System (CUPS)
  *   scheduler.
@@ -102,8 +102,10 @@ VAR int			User			VALUE(1),
 					/* Are classes implicitly created? */
 			FilterLimit		VALUE(0),
 					/* Max filter cost at any time */
-			FilterLevel		VALUE(0);
+			FilterLevel		VALUE(0),
 					/* Current filter level */
+			RunAsUser		VALUE(FALSE);
+					/* Run as unpriviledged user? */
 VAR FILE		*AccessFile		VALUE(NULL),
 					/* Access log file */
 			*ErrorFile		VALUE(NULL),
@@ -133,5 +135,5 @@ extern int	LogPage(job_t *job, const char *page);
 
 
 /*
- * End of "$Id: conf.h,v 1.32 2001/01/22 15:03:59 mike Exp $".
+ * End of "$Id: conf.h,v 1.33 2001/02/21 17:01:17 mike Exp $".
  */
