@@ -42,14 +42,14 @@ long gs_buildtime = GS_BUILDTIME;
 
 #ifndef GS_COPYRIGHT
 #  define GS_COPYRIGHT\
-	"Copyright 1997-1999 Easy Software Products, All Rights Reserved.\n"\
+	"Copyright 1993-1999 Easy Software Products, All Rights Reserved.\n"\
 	"Copyright 1996 Aladdin Enterprises, Menlo Park, CA.  All rights reserved."
 #endif
 const char *gs_copyright = GS_COPYRIGHT;	
 
 #ifndef GS_PRODUCT
 #  define GS_PRODUCT\
-	"ESP Print v4.0"
+	"ESP Print Pro v4.0"
 #endif
 const char *gs_product = GS_PRODUCT;
 
