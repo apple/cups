@@ -1,5 +1,5 @@
 /*
- * "$Id: lpr.c,v 1.20.2.9 2003/04/10 18:38:07 mike Exp $"
+ * "$Id: lpr.c,v 1.20.2.10 2003/05/09 18:52:13 mike Exp $"
  *
  *   "lpr" command for the Common UNIX Printing System (CUPS).
  *
@@ -321,7 +321,11 @@ main(int  argc,		/* I - Number of command-line arguments */
 
   if (printer == NULL)
   {
-    fputs("lpr: error - no default destination available.\n", stderr);
+    if (cupsLastError() >= IPP_BAD_REQUEST)
+      fputs("lpr: error - scheduler not responding!\n", stderr);
+    else
+      fputs("lpr: error - no default destination available.\n", stderr);
+
     return (1);
   }
 
@@ -427,5 +431,5 @@ sighandler(int s)	/* I - Signal number */
 
 
 /*
- * End of "$Id: lpr.c,v 1.20.2.9 2003/04/10 18:38:07 mike Exp $".
+ * End of "$Id: lpr.c,v 1.20.2.10 2003/05/09 18:52:13 mike Exp $".
  */

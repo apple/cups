@@ -3,6 +3,10 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.19rc5
 
+	- The lp and lpr commands did not report when the
+	  scheduler was not responding; instead, the user would
+	  incorrectly see a "no default destination" error (STR
+	  #70)
 	- cupsLangGet() could fail on OSX due to a corrupt
 	  language preference (STR #78)
 	- Added more checks for HTTP request timeouts.
