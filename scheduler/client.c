@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.31 1999/08/12 20:31:41 mike Exp $"
+ * "$Id: client.c,v 1.32 1999/08/27 16:33:39 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -721,7 +721,7 @@ ReadClient(client_t *con)	/* I - Client to read from */
             LogRequest(con, HTTP_OK);
 	  }
 
-          if (send(con->http.fd, "\r\n", 2, 0) < 0)
+          if (httpPrintf(HTTP(con), "\r\n") < 0)
 	  {
 	    CloseClient(con);
 	    return (0);
@@ -922,7 +922,7 @@ int				/* O - 1 if successful, 0 otherwise */
 SendError(client_t      *con,	/* I - Connection */
           http_status_t code)	/* I - Error code */
 {
-  char	message[1024];		/* Text version of error code */
+  char	message[1024];		/* Message for user */
 
 
  /*
@@ -969,7 +969,8 @@ SendError(client_t      *con,	/* I - Connection */
     sprintf(message, "<HTML><HEAD><TITLE>%d %s</TITLE></HEAD>"
                      "<BODY><H1>%s</H1>%s</BODY></HTML>\n",
             code, httpStatus(code), httpStatus(code),
-	    con->language ? con->language->messages[code] : httpStatus(code));
+	    con->language ? con->language->messages[code] :
+		            httpStatus(code));
 
     if (httpPrintf(HTTP(con), "Content-Type: text/html\r\n") < 0)
       return (0);
@@ -977,7 +978,7 @@ SendError(client_t      *con,	/* I - Connection */
       return (0);
     if (httpPrintf(HTTP(con), "\r\n") < 0)
       return (0);
-    if (send(con->http.fd, message, strlen(message), 0) < 0)
+    if (httpPrintf(HTTP(con), "%s", message) < 0)
       return (0);
   }
   else if (httpPrintf(HTTP(con), "\r\n") < 0)
@@ -1503,5 +1504,5 @@ pipe_command(client_t *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.31 1999/08/12 20:31:41 mike Exp $".
+ * End of "$Id: client.c,v 1.32 1999/08/27 16:33:39 mike Exp $".
  */
