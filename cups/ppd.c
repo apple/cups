@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c,v 1.44 2000/06/12 15:51:26 mike Exp $"
+ * "$Id: ppd.c,v 1.45 2000/07/18 16:56:11 mike Exp $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -1573,7 +1573,7 @@ ppd_read(FILE *fp,		/* I - File to read from */
 		*textptr,	/* Text pointer */
 		*strptr,	/* Pointer into string */
 		*lineptr,	/* Current position in line buffer */
-		line[262144];	/* Line buffer (256k) */
+		line[65536];	/* Line buffer (64k) */
 
 
  /*
@@ -1587,6 +1587,8 @@ ppd_read(FILE *fp,		/* I - File to read from */
  /*
   * Now loop until we have a valid line...
   */
+
+  *string = NULL;
 
   do
   {
@@ -1621,10 +1623,12 @@ ppd_read(FILE *fp,		/* I - File to read from */
 	    ungetc(ch, fp);
 	}
 
-	*lineptr++ = '\n';
+	ch = '\n';
 
 	if (!endquote)			/* Continue for multi-line text */
           break;
+
+	*lineptr++ = '\n';
       }
       else
       {
@@ -1637,6 +1641,46 @@ ppd_read(FILE *fp,		/* I - File to read from */
 	if (ch == '\"')
           endquote = !endquote;
       }
+    }
+
+    if (endquote)
+    {
+     /*
+      * Didn't finish this quoted string...
+      */
+
+      while ((ch = getc(fp)) != EOF)
+        if (ch == '\"')
+	  break;
+    }
+
+    if (ch != '\n')
+    {
+     /*
+      * Didn't finish this line...
+      */
+
+      while ((ch = getc(fp)) != EOF)
+	if (ch == '\r' || ch == '\n')
+	{
+	 /*
+	  * Line feed or carriage return...
+	  */
+
+	  if (ch == '\r')
+	  {
+	   /*
+            * Check for a trailing line feed...
+	    */
+
+	    if ((ch = getc(fp)) == EOF)
+	      break;
+	    if (ch != 0x0a)
+	      ungetc(ch, fp);
+	  }
+
+	  break;
+	}
     }
 
     if (lineptr > line && lineptr[-1] == '\n')
@@ -1856,5 +1900,5 @@ ppd_fix(char *string)		/* IO - String to fix */
 
 
 /*
- * End of "$Id: ppd.c,v 1.44 2000/06/12 15:51:26 mike Exp $".
+ * End of "$Id: ppd.c,v 1.45 2000/07/18 16:56:11 mike Exp $".
  */

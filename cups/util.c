@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c,v 1.54 2000/07/17 20:28:52 mike Exp $"
+ * "$Id: util.c,v 1.55 2000/07/18 16:56:11 mike Exp $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -1283,7 +1283,7 @@ cupsTempFile(char *filename,		/* I - Pointer to buffer */
   * Make the temporary name using the specified directory...
   */
 
-  snprintf(filename, sizeof(filename), "%s/XXXXXX", tmpdir);
+  snprintf(filename, len, "%s/XXXXXX", tmpdir);
   return (mktemp(filename));
 }
 
@@ -1410,5 +1410,5 @@ cups_local_auth(http_t *http)	/* I - Connection */
 
 
 /*
- * End of "$Id: util.c,v 1.54 2000/07/17 20:28:52 mike Exp $".
+ * End of "$Id: util.c,v 1.55 2000/07/18 16:56:11 mike Exp $".
  */
