@@ -1,5 +1,5 @@
 /*
- * "$Id: accept.c,v 1.5 1999/10/10 15:41:14 mike Exp $"
+ * "$Id: accept.c,v 1.6 1999/12/08 17:45:17 mike Exp $"
  *
  *   "accept", "disable", "enable", and "reject" commands for the Common
  *   UNIX Printing System (CUPS).
@@ -60,6 +60,7 @@ main(int  argc,			/* I - Number of command-line arguments */
   ipp_t		*response;	/* IPP response */
   ipp_op_t	op;		/* Operation */
   cups_lang_t	*language;	/* Language */
+  int		cancel;		/* Cancel jobs? */
 
 
  /*
@@ -70,6 +71,8 @@ main(int  argc,			/* I - Number of command-line arguments */
     command ++;
   else
     command = argv[0];
+
+  cancel = 0;
 
   if (strcmp(command, "accept") == 0)
     op = CUPS_ACCEPT_JOBS;
@@ -96,6 +99,10 @@ main(int  argc,			/* I - Number of command-line arguments */
     if (argv[i][0] == '-')
       switch (argv[i][1])
       {
+        case 'c' : /* Cancel jobs */
+	    cancel = 1;
+	    break;
+
         case 'h' : /* Connect to host */
 	    if (http != NULL)
 	      httpClose(http);
@@ -204,6 +211,42 @@ main(int  argc,			/* I - Number of command-line arguments */
         fprintf(stderr, "%s: Operation failed!\n", command);
 	return (1);
       }
+
+     /*
+      * Cancel all jobs if requested...
+      */
+
+      if (cancel)
+      {
+       /*
+	* Build an IPP_PURGE_JOBS request, which requires the following
+	* attributes:
+	*
+	*    attributes-charset
+	*    attributes-natural-language
+	*    printer-uri
+	*/
+
+	request = ippNew();
+
+	request->request.op.operation_id = IPP_PURGE_JOBS;
+	request->request.op.request_id   = 1;
+
+	language = cupsLangDefault();
+
+	ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
+              	     "attributes-charset", NULL, cupsLangEncoding(language));
+
+	ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
+                     "attributes-natural-language", NULL, language->language);
+
+	snprintf(uri, sizeof(uri), "ipp://%s:%d/printers/%s", hostname, ippPort(), printer);
+	ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI,
+                     "printer-uri", NULL, uri);
+
+	if ((response = cupsDoRequest(http, request, "/admin/")) != NULL)
+          ippDelete(response);
+      }
     }
 
   if (http != NULL)
@@ -214,5 +257,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: accept.c,v 1.5 1999/10/10 15:41:14 mike Exp $".
+ * End of "$Id: accept.c,v 1.6 1999/12/08 17:45:17 mike Exp $".
  */
