@@ -1,4 +1,4 @@
-CHANGES.txt - 11/13/2001
+CHANGES.txt - 11/14/2001
 ------------------------
 
 CHANGES IN CUPS V1.1.12
@@ -11,6 +11,11 @@ CHANGES IN CUPS V1.1.12
 	- The CUPS-Add-Printer operation did not support the
 	  allow=all or deny=none values to clear the per-user
 	  printer ACLs.
+	- The SetPrinterAttrs() function did not handle invalid
+	  PPD files that were missing the required NickName
+	  attribute.  It now looks for NickName, ModelName, and
+	  then substitutes the string "Bad PPD File" for the
+	  printer-make-and-model attribute.
 
 
 CHANGES IN CUPS V1.1.11
