@@ -1,5 +1,5 @@
 /*
- * "$Id: imagetoraster.c,v 1.23 1999/07/13 12:03:58 mike Exp $"
+ * "$Id: imagetoraster.c,v 1.24 1999/07/27 13:33:40 mike Exp $"
  *
  *   Image file to raster filter for the Common UNIX Printing System (CUPS).
  *
@@ -2245,7 +2245,7 @@ format_KCMYcm(cups_page_header_t *header,/* I - Page header */
 	        if (pk)
 		  *ptr++ ^= 32;	/* Black */
 		else if (pc && pm)
-		  *ptr++ ^= 3;	/* Blue (light cyan + light magenta) */
+		  *ptr++ ^= 17;	/* Blue (cyan + light magenta) */
 		else if (pc && py)
 		  *ptr++ ^= 6;	/* Green (light cyan + yellow) */
 		else if (pm && py)
@@ -2311,7 +2311,7 @@ format_KCMYcm(cups_page_header_t *header,/* I - Page header */
 		  *kptr ^= bitmask;	/* Black */
 		else if (pc && pm)
 		{
-		  *lcptr ^= bitmask;	/* Blue (light cyan + light magenta) */
+		  *cptr ^= bitmask;	/* Blue (cyan + light magenta) */
 		  *lmptr ^= bitmask;
 		}
 		else if (pc && py)
@@ -2402,7 +2402,6 @@ format_KCMYcm(cups_page_header_t *header,/* I - Page header */
         	    for (x = xsize; x > 0; x --, r0 += 4)
         	    {
         	      if (r0[0] > dither[x & 15] &&
-			  r0[1] < dither[x & 15] &&
 			  r0[2] < dither[x & 15])
         		*ptr ^= bitmask;
 
@@ -2456,7 +2455,6 @@ format_KCMYcm(cups_page_header_t *header,/* I - Page header */
         	    for (x = xsize; x > 0; x --, r0 += 4)
         	    {
         	      if (r0[0] > dither[x & 15] &&
-			  r0[1] < dither[x & 15] &&
 			  r0[2] > dither[x & 15])
         		*ptr ^= bitmask;
 
@@ -3838,5 +3836,5 @@ make_lut(ib_t  *lut,		/* I - Lookup table */
 
 
 /*
- * End of "$Id: imagetoraster.c,v 1.23 1999/07/13 12:03:58 mike Exp $".
+ * End of "$Id: imagetoraster.c,v 1.24 1999/07/27 13:33:40 mike Exp $".
  */
