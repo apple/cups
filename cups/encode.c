@@ -1,5 +1,5 @@
 /*
- * "$Id: encode.c,v 1.1.2.3 2002/02/14 16:18:03 mike Exp $"
+ * "$Id: encode.c,v 1.1.2.4 2002/02/28 18:02:43 mike Exp $"
  *
  *   Option encoding routines for the Common UNIX Printing System (CUPS).
  *
@@ -38,6 +38,47 @@
 
 
 /*
+ * Local list of option names and the value tags they should use...
+ */
+
+typedef struct
+{
+  const char	*name;
+  ipp_tag_t	value_tag;
+} ipp_option_t;
+
+static ipp_option_t	ipp_options[] =
+			{
+			  { "blackplot",		IPP_TAG_BOOLEAN },
+			  { "brightness",		IPP_TAG_INTEGER },
+			  { "columns",			IPP_TAG_INTEGER },
+			  { "copies",			IPP_TAG_INTEGER },
+			  { "finishings",		IPP_TAG_ENUM },
+			  { "fitplot",			IPP_TAG_BOOLEAN },
+			  { "gamma",			IPP_TAG_INTEGER },
+			  { "hue",			IPP_TAG_INTEGER },
+			  { "job-priority",		IPP_TAG_INTEGER },
+			  { "landscape",		IPP_TAG_BOOLEAN },
+			  { "natural-scaling",		IPP_TAG_INTEGER },
+			  { "number-up",		IPP_TAG_INTEGER },
+			  { "orientation-requested",	IPP_TAG_ENUM },
+			  { "page-bottom",		IPP_TAG_INTEGER },
+			  { "page-left",		IPP_TAG_INTEGER },
+			  { "page-ranges",		IPP_TAG_RANGE },
+			  { "page-right",		IPP_TAG_INTEGER },
+			  { "page-top",			IPP_TAG_INTEGER },
+			  { "penwidth",			IPP_TAG_INTEGER },
+			  { "ppi",			IPP_TAG_INTEGER },
+			  { "prettyprint",		IPP_TAG_BOOLEAN },
+			  { "printer-resolution",	IPP_TAG_RESOLUTION },
+			  { "print-quality",		IPP_TAG_ENUM },
+			  { "saturation",		IPP_TAG_INTEGER },
+			  { "scaling",			IPP_TAG_INTEGER },
+			  { "wrap",			IPP_TAG_BOOLEAN }
+			};
+
+
+/*
  * 'cupsEncodeOptions()' - Encode printer options into IPP attributes.
  */
 
@@ -46,10 +87,8 @@ cupsEncodeOptions(ipp_t         *ipp,		/* I - Request to add to */
         	  int           num_options,	/* I - Number of options */
 		  cups_option_t *options)	/* I - Options */
 {
-  int		i, j, k;			/* Looping vars */
+  int		i, j;				/* Looping vars */
   int		count;				/* Number of values */
-  int		n;				/* Attribute value */
-  int		numbers;			/* 1 if all number values */
   char		*s,				/* Pointer into option value */
 		*val,				/* Pointer to option value */
 		*copy,				/* Copy of option value */
@@ -95,7 +134,7 @@ cupsEncodeOptions(ipp_t         *ipp,		/* I - Request to add to */
     * Count the number of values...
     */
 
-    for (count = 1, sep = options[i].value, numbers = 1; *sep; sep ++)
+    for (count = 1, sep = options[i].value; *sep; sep ++)
     {
       if (*sep == '\'')
       {
@@ -104,7 +143,6 @@ cupsEncodeOptions(ipp_t         *ipp,		/* I - Request to add to */
 	*/
 
         sep ++;
-	numbers = 0;
 
         while (*sep && *sep != '\'')
 	  sep ++;
@@ -119,7 +157,6 @@ cupsEncodeOptions(ipp_t         *ipp,		/* I - Request to add to */
 	*/
 
         sep ++;
-	numbers = 0;
 
         while (*sep && *sep != '\"')
 	  sep ++;
@@ -129,19 +166,16 @@ cupsEncodeOptions(ipp_t         *ipp,		/* I - Request to add to */
       }
       else if (*sep == ',')
         count ++;
-      else if (!isdigit(*sep) && *sep != '-')
-      {
-       /*
-        * Isn't a standard numeric value, check for "NxMdpi" values...
-	*/
-        if (*sep != 'x' ||
-	    (strstr(sep, "dpc") == NULL && strstr(sep, "dpi") == NULL))
-	  numbers = 0;
-      }
+      else if (*sep == '\\' && sep[1])
+        sep ++;
     }
 
     DEBUG_printf(("cupsEncodeOptions: option = \'%s\', count = %d\n",
                   options[i].name, count));
+
+   /*
+    * Allocate memory for the attribute values...
+    */
 
     if ((attr = _ipp_add_attr(ipp, count)) == NULL)
     {
@@ -153,7 +187,27 @@ cupsEncodeOptions(ipp_t         *ipp,		/* I - Request to add to */
       return;
     }
 
+   /*
+    * Now figure out what type of value we have...
+    */
+
     attr->group_tag = IPP_TAG_JOB;
+
+    if (strncasecmp(options[i].name, "no", 2) == 0)
+      attr->value_tag = IPP_TAG_BOOLEAN;
+    else
+      attr->value_tag = IPP_TAG_NAME;
+
+    for (j = 0; j < (int)(sizeof(ipp_options) / sizeof(ipp_options[0])); j ++)
+      if (strcasecmp(options[i].name, ipp_options[j].name) == 0)
+      {
+        attr->value_tag = ipp_options[j].value_tag;
+	break;
+      }
+
+   /*
+    * Copy the name over...
+    */
 
     if ((attr->name = strdup(options[i].name)) == NULL)
     {
@@ -194,92 +248,134 @@ cupsEncodeOptions(ipp_t         *ipp,		/* I - Request to add to */
     }
 
    /*
-    * See what the option value is; for compatibility with older interface
-    * scripts, we have to support single-argument options as well as
-    * option=value, option=low-high, option=MxN, and option=val1,val2,...,valN.
+    * Scan the value string for values...
     */
 
-    if (*val == '\0')
+    for (j = 0; *val != '\0' || j == 0; val = sep, j ++)
     {
      /*
-      * Old-style System V boolean value...
+      * Find the end of this value and mark it if needed...
       */
 
-      attr->value_tag = IPP_TAG_BOOLEAN;
-
-      if (strncasecmp(attr->name, "no", 2) == 0)
-      {
-        DEBUG_puts("cupsEncodeOptions: Added boolean false value...");
-        strcpy(attr->name, attr->name + 2);
-	attr->values[0].boolean = 0;
-      }
+      if ((sep = strchr(val, ',')) != NULL)
+	*sep++ = '\0';
       else
-      {
-        DEBUG_puts("cupsEncodeOptions: Added boolean true value...");
-	attr->values[0].boolean = 1;
-      }
-    }
-    else
-    {
+	sep = val + strlen(val);
+
      /*
-      * Scan the value string for values...
+      * Copy the option value(s) over as needed by the type...
       */
 
-      for (j = 0; *val != '\0'; val = sep, j ++)
+      switch (attr->value_tag)
       {
-       /*
-        * Find the end of this value and mark it if needed...
-	*/
-
-        if ((sep = strchr(val, ',')) != NULL)
-	  *sep++ = '\0';
-	else
-	  sep = val + strlen(val);
-
-       /*
-        * See what kind of value it is...
-	*/
-
-	if (strcasecmp(val, "true") == 0 ||
-            strcasecmp(val, "on") == 0 ||
-	    strcasecmp(val, "yes") == 0)
-	{
-	 /*
-	  * Boolean value - true...
-	  */
-
-          attr->value_tag         = IPP_TAG_BOOLEAN;
-	  attr->values[j].boolean = 1;
-
-          DEBUG_puts("cupsEncodeOptions: Added boolean true value...");
-	}
-	else if (strcasecmp(val, "false") == 0 ||
-        	 strcasecmp(val, "off") == 0 ||
-		 strcasecmp(val, "no") == 0)
-	{
-	 /*
-	  * Boolean value - false...
-	  */
-
-          attr->value_tag         = IPP_TAG_BOOLEAN;
-	  attr->values[j].boolean = 0;
-
-          DEBUG_puts("cupsEncodeOptions: Added boolean false value...");
-	}
-	else
-	{
-	 /*
-	  * Number, range, resolution, or string...
-	  */
-
-	  n = strtol(val, &s, 0);
-
-	  if (!numbers)
-	  {
+	case IPP_TAG_INTEGER :
+	case IPP_TAG_ENUM :
 	   /*
-	    * String value(s)...
+	    * Integer/enumeration value...
 	    */
 
+            attr->values[j].integer = strtol(val, &s, 0);
+
+            DEBUG_printf(("cupsEncodeOptions: Adding integer option value %d...\n",
+	                  attr->values[j].integer));
+            break;
+
+	case IPP_TAG_BOOLEAN :
+            if (!*val)
+	    {
+	     /*
+	      * Add a boolean option without a value, so the option is
+	      * passed in as "name" or "noname" for true/false...
+	      */
+
+	      if (strncasecmp(attr->name, "no", 2) == 0)
+	      {
+        	DEBUG_puts("cupsEncodeOptions: Added boolean false value...");
+        	strcpy(attr->name, attr->name + 2);
+		attr->values[0].boolean = 0;
+	      }
+	      else
+	      {
+        	DEBUG_puts("cupsEncodeOptions: Added boolean true value...");
+		attr->values[0].boolean = 1;
+	      }
+	    }
+	    else if (strcasecmp(val, "true") == 0 ||
+        	     strcasecmp(val, "on") == 0 ||
+		     strcasecmp(val, "yes") == 0)
+	    {
+	     /*
+	      * Boolean value - true...
+	      */
+
+	      attr->values[j].boolean = 1;
+
+              DEBUG_puts("cupsEncodeOptions: Added boolean true value...");
+	    }
+	    else if (strcasecmp(val, "false") == 0 ||
+        	     strcasecmp(val, "off") == 0 ||
+		     strcasecmp(val, "no") == 0)
+	    {
+	     /*
+	      * Boolean value - false...
+	      */
+
+	      attr->values[j].boolean = 0;
+
+              DEBUG_puts("cupsEncodeOptions: Added boolean false value...");
+	    }
+            break;
+
+	case IPP_TAG_RANGE :
+	   /*
+	    * Range...
+	    */
+
+            if (*val == '-')
+	    {
+	      attr->values[j].range.lower = 1;
+	      s = val;
+	    }
+	    else
+	      attr->values[j].range.lower = strtol(val, &s, 0);
+
+	    if (*s == '-')
+	    {
+	      if (s[1])
+		attr->values[j].range.upper = strtol(s + 1, NULL, 0);
+	      else
+		attr->values[j].range.upper = 2147483647;
+            }
+	    else
+	      attr->values[j].range.upper = attr->values[j].range.lower;
+
+	    DEBUG_printf(("cupsEncodeOptions: Added range option value %d-%d...\n",
+                	  attr->values[j].range.lower,
+			  attr->values[j].range.upper));
+            break;
+
+	case IPP_TAG_RESOLUTION :
+	   /*
+	    * Resolution...
+	    */
+
+	    attr->values[j].resolution.xres = strtol(val, &s, 0);
+
+	    if (*s == 'x')
+	      attr->values[j].resolution.yres = strtol(s + 1, &s, 0);
+	    else
+	      attr->values[j].resolution.yres = attr->values[j].resolution.xres;
+
+	    if (strcasecmp(s, "dpc") == 0)
+              attr->values[j].resolution.units = IPP_RES_PER_CM;
+            else
+              attr->values[j].resolution.units = IPP_RES_PER_INCH;
+
+	    DEBUG_printf(("cupsEncodeOptions: Adding resolution option value %s...\n",
+                	  val));
+            break;
+
+	default :
             if ((attr->values[j].string.text = strdup(val)) == NULL)
 	    {
 	     /*
@@ -290,84 +386,9 @@ cupsEncodeOptions(ipp_t         *ipp,		/* I - Request to add to */
 	      return;
 	    }
 
-            attr->value_tag = IPP_TAG_NAME;
-
-	    DEBUG_printf(("cupsEncodeOptions: Added string value \'%s\'...\n", val));
-	  }
-	  else if (*s == '-')
-	  {
-	    if (j > 0 && attr->value_tag == IPP_TAG_INTEGER)
-	    {
-	     /*
-	      * Reset previous integer values to N-N ranges...
-	      */
-
-              for (k = 0; k < j; k ++)
-	        attr->values[k].range.upper = attr->values[k].range.lower;
-	    }
-
-            attr->value_tag             = IPP_TAG_RANGE;
-	    attr->values[j].range.lower = n;
-	    attr->values[j].range.upper = strtol(s + 1, NULL, 0);
-
-	    DEBUG_printf(("cupsEncodeOptions: Added range option value %d-%d...\n",
-                	  n, attr->values[j].range.upper));
-	  }
-	  else if (*s == 'x')
-	  {
-            attr->value_tag                 = IPP_TAG_RESOLUTION;
-	    attr->values[j].resolution.xres = n;
-	    attr->values[j].resolution.yres = strtol(s + 1, &s, 0);
-
-	    if (strcasecmp(s, "dpc") == 0)
-              attr->values[j].resolution.units = IPP_RES_PER_CM;
-            else if (strcasecmp(s, "dpi") == 0)
-              attr->values[j].resolution.units = IPP_RES_PER_INCH;
-            else
-	    {
-              if ((attr->values[j].string.text = strdup(val)) == NULL)
-	      {
-	       /*
-		* Ran out of memory!
-		*/
-
-		DEBUG_puts("cupsEncodeOptions: Ran out of memory for string!");
-		return;
-	      }
-
-              attr->value_tag = IPP_TAG_NAME;
-
-	      DEBUG_printf(("cupsEncodeOptions: Added string value \'%s\'...\n", val));
-	      continue;
-            }
-
-	    DEBUG_printf(("cupsEncodeOptions: Adding resolution option value %s...\n",
-                	  val));
-	  }
-	  else
-	  {
-	    if (j && attr->value_tag == IPP_TAG_RANGE)
-	    {
-	     /*
-	      * Set this value as a range...
-	      */
-
-	      attr->values[j].range.lower = n;
-	      attr->values[j].range.upper = n;
-	    }
-	    else
-	    {
-	     /*
-	      * Set this value as an integer...
-	      */
-
-              attr->value_tag         = IPP_TAG_INTEGER;
-	      attr->values[j].integer = n;
-            }
-
-	    DEBUG_printf(("cupsEncodeOptions: Adding integer option value %d...\n", n));
-	  }
-        }
+	    DEBUG_printf(("cupsEncodeOptions: Added string value \'%s\'...\n",
+	                  val));
+            break;
       }
     }
   }
@@ -375,5 +396,5 @@ cupsEncodeOptions(ipp_t         *ipp,		/* I - Request to add to */
 
 
 /*
- * End of "$Id: encode.c,v 1.1.2.3 2002/02/14 16:18:03 mike Exp $".
+ * End of "$Id: encode.c,v 1.1.2.4 2002/02/28 18:02:43 mike Exp $".
  */
