@@ -23,8 +23,8 @@ CUPS.</p>
 
 <h2>Document Overview</h2>
 
-<p>This interface design description document is organized into the following
-sections:
+<p>This CUPS PostScript Printer Description File Specification
+document is organized into the following sections:</p>
 
 <ul>
 
@@ -49,7 +49,6 @@ sections:
 </ul>
 
 <embed src="references.shtml"/>
-
 
 <h1>PPD File Syntax</h1>
 
@@ -143,31 +142,79 @@ the string "1.0", "1.1", or "1.2".</p>
 
 <h1>Color Profiles</h1>
 
-<h4>cupsProfile</h4>
+<h4>cupsColorProfile</h4>
 
 <p>This string attribute specifies a color profile of the
 form:</p>
 
 <pre>
-    resolution/type density gamma m00 m01 m02 m10 m11 m12 m20 m21 m22
+    *cupsColorProfile Resolution/MediaType: "density gamma m00 m01 m02 m10 m11 m12 m20 m21 m22"
 </pre>
 
-<p>The <i>resolution</i> and <i>type</i> values may be "-" to
-act as a wildcard. Otherwise they must match one of the
-<CODE>Resolution</CODE> or <CODE>MediaType</CODE> attributes
-defined in the PPD file.</p>
+<p>The <i>Resolution</i> and <i>MediaType</i> values may be "-"
+to act as a wildcard. Otherwise they must match one of the
+<tt>Resolution</tt> or <tt>MediaType</tt> attributes defined in
+the PPD file.</p>
 
 <p>The <i>density</i> and <i>gamma</i> values define gamma and
 density adjustment function such that:</p>
 
 <pre>
-f(x) = density * x<SUp>gamma</SUp>
+    f(x) = density * x<SUp>gamma</SUp>
 </pre>
 
 <p>The <i>m00</i> through <i>m22</i> values define a 3x3
 transformation matrix for the CMY color values. The density
-function is applied <i>after</i> the CMY transformation.</p>
+function is applied <i>after</i> the CMY transformation:</p>
 
+<pre>
+    | m00 m01 m02 |
+    | m10 m11 m12 |
+    | m20 m21 m22 |
+</pre>
+
+<h2>cupsICCProfile</h2>
+
+<p>This attribute specifies an ICC color profile of the
+form:</p>
+
+<pre>
+    *cupsICCProfile ColorModel.MediaType.Resolution/Description: "filename"
+</pre>
+
+<p>The <tt>ColorModel</tt>, <tt>MediaType</tt>, and
+<tt>Resolution</tt> keywords specify a selector for color
+profiles. If omitted, the color profile will match any option
+keyword for the corresponding main keyword.</p>
+
+<p>The <tt>Description</tt> specifies human-readable text that
+is associated with the color profile. The <tt>filename</tt>
+portion specifies the ICC color profile to use; if the filename
+is not absolute, it is loaded relative to the
+<var>/usr/share/cups/profiles</var> directory.</p>
+
+<h3>Customizing the Profile Selection Keywords</h3>
+
+<p>The <tt>ColorModel</tt>, <tt>MediaType</tt>, and
+<tt>Resolution</tt> keywords can be reassigned to different main
+keywords, allowing drivers to do color profile selection based
+on different parameters. The <tt>cupsICCQualifier1</tt>,
+<tt>cupsICCQualifier2</tt>, and <tt>cupsICCQualifier3</tt>
+attributes define the mapping from selector to main keyword:</p>
+
+<pre>
+    *cupsICCQualifier1: MainKeyword
+    *cupsICCQualifier2: MainKeyword
+    *cupsICCQualifier3: MainKeyword
+</pre>
+
+<p>The default mapping is as follows:</p>
+
+<pre>
+    *cupsICCQualifier1: ColorModel
+    *cupsICCQualifier2: MediaType
+    *cupsICCQualifier3: Resolution
+</pre>
 
 <h1>I18N Support</h1>
 
@@ -176,12 +223,13 @@ languages by following the following rules:</p>
 
 <ol>
 
-	<li>The <tt>LanguageVersion is <tt>English</tt></li>
+	<li>The <tt>LanguageVersion</tt> is <tt>English</tt></li>
 
 	<li>The <tt>LanguageEncoding</tt> is <tt>ISOLatin1</tt></li>
 
 	<li>Main and option keywords may not exceed 34
-	characters (subset of what the PPD spec allows)</li>
+	characters, which is a subset of what the Adobe PPD spec
+	allows.</li>
 
 	<li>Translations are specified using a locale prefix of
 	the form "ll_CC." where "ll" is the 2-letter ISO
@@ -200,14 +248,15 @@ languages by following the following rules:</p>
 
 </ol>
 
-<p>This would update the previous example to look like:
+<p>The following example shows how a fictional Foobar Laser 9999
+PPD file would be localized for English, French, and German:</p>
 
 <pre>
     *LanguageVersion: English
     *LanguageEncoding: ISOLatin1
-    *ModelName: "HP LaserJet 9999"
-    *fr_FR.Translation ModelName/La HP LaserJet 9999: ""
-    *de_DE.Translation ModelName/HP LaserDrucken 9999: ""
+    *ModelName: "Foobar Laser 9999"
+    *fr_FR.Translation ModelName/La Foobar Laser 9999: ""
+    *de_DE.Translation ModelName/Foobar LaserDrucken 9999: ""
     ...
     *OpenUI *InputSlot/Paper Source: PickOne
     *OrderDependency: 10 AnySetup *InputSlot
@@ -223,15 +272,6 @@ languages by following the following rules:</p>
     *CloseUI: *InputSlot
 </pre>
 
-<p>Notice that this scheme allows for other main keywords, such
-as ModelName, to be translated as well.  We need localized model
-and product names for devices like the Epson inkjet
-printers...</p>
-
-<p>By using UTF-8 as the translation encoding, we can transcode
-to whatever locale encoding is needed when presenting the human-
-readable text to the user.</p>
-
 <embed src="glossary.shtml"/>
 
 <h1>Change History</h1>
@@ -242,7 +282,7 @@ readable text to the user.</p>
 
 	<li><tt>cupsICCProfile</tt></li>
 
-	<li></li>
+	<li>New I18N support</li>
 
 	<li></li>
 
