@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.77.2.39 2003/04/10 21:18:35 mike Exp $"
+ * "$Id: conf.c,v 1.77.2.40 2003/04/23 18:55:28 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -702,11 +702,11 @@ ReadConfiguration(void)
     * Load devices and PPDs...
     */
 
-    snprintf(temp, sizeof(temp), "%s/model", DataDir);
-    LoadPPDs(temp);
-
     snprintf(temp, sizeof(temp), "%s/backend", ServerBin);
     LoadDevices(temp);
+
+    snprintf(temp, sizeof(temp), "%s/model", DataDir);
+    LoadPPDs(temp);
 
    /*
     * Load queued jobs...
@@ -2293,5 +2293,5 @@ CDSAGetServerCerts(void)
 
 
 /*
- * End of "$Id: conf.c,v 1.77.2.39 2003/04/10 21:18:35 mike Exp $".
+ * End of "$Id: conf.c,v 1.77.2.40 2003/04/23 18:55:28 mike Exp $".
  */

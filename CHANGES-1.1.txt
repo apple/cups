@@ -3,6 +3,7 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.19rc3
 
+	- Scan backends first, PPDs second (STR #37)
 	- Updated the Netatalk documentation in the SAM (STR #38
 	  and #39)
 	- The test suite sent text files to a non-PS print queue,
