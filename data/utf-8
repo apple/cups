@@ -9,7 +9,7 @@ charset utf8
 #
 # First and last are the first and last glyphs in the font mapping
 # that correspond to that font; a maximum of 256 characters can be
-# mapped with each group, which a maximum of 256 mappings (this is a
+# mapped within each group, with a maximum of 256 mappings (this is a
 # PostScript limitation.) The glyph values are hexadecimal.
 #
 # Direction is the string "ltor" or "rtol", indicating left-to-right or
