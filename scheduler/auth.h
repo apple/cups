@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.h,v 1.7 2000/01/04 13:46:08 mike Exp $"
+ * "$Id: auth.h,v 1.8 2000/02/06 22:09:06 mike Exp $"
  *
  *   Authorization definitions for the Common UNIX Printing System (CUPS)
  *   scheduler.
@@ -26,6 +26,10 @@
 /*
  * HTTP authorization types and levels...
  */
+
+#define AUTH_NONE		0	/* No authentication */
+#define AUTH_BASIC		1	/* Basic authentication */
+#define AUTH_DIGEST		2	/* Digest authentication */
 
 #define AUTH_ANON		0	/* Anonymous access */
 #define AUTH_USER		1	/* Must have a valid username/password */
@@ -69,6 +73,7 @@ typedef struct
   char		location[HTTP_MAX_URI];	/* Location of resource */
   int		length,			/* Length of location string */
 		order_type,		/* Allow or Deny */
+		type,			/* Type of authentication */
 		level;			/* Access level required */
   char		group_name[MAX_USERPASS];/* User group name */
   int		num_allow;		/* Number of Allow lines */
@@ -104,5 +109,5 @@ extern http_status_t	IsAuthorized(client_t *con);
 
 
 /*
- * End of "$Id: auth.h,v 1.7 2000/01/04 13:46:08 mike Exp $".
+ * End of "$Id: auth.h,v 1.8 2000/02/06 22:09:06 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.h,v 1.18 2000/01/04 13:45:36 mike Exp $"
+ * "$Id: ppd.h,v 1.19 2000/02/06 22:09:04 mike Exp $"
  *
  *   PostScript Printer Description definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -166,7 +166,8 @@ typedef struct			/**** Files ****/
 		contone_only,	/* 1 = continuous tone only, 0 = not */
 		landscape,	/* -90 or 90 */
 		model_number,	/* Device-specific model number */
-		manual_copies;	/* 1 = Copies done manually, 0 = hardware */
+		manual_copies,	/* 1 = Copies done manually, 0 = hardware */
+		throughput;	/* Pages per minute */
   ppd_cs_t	colorspace;	/* Default colorspace */
   char		*patches;	/* Patch commands to be sent to printer */
   int		num_emulations;	/* Number of emulations supported */
@@ -235,5 +236,5 @@ extern float		ppdPageWidth(ppd_file_t *ppd, const char *name);
 #endif /* !_CUPS_PPD_H_ */
 
 /*
- * End of "$Id: ppd.h,v 1.18 2000/01/04 13:45:36 mike Exp $".
+ * End of "$Id: ppd.h,v 1.19 2000/02/06 22:09:04 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.31 2000/01/21 20:33:16 mike Exp $"
+ * "$Id: ipp.c,v 1.32 2000/02/06 22:09:04 mike Exp $"
  *
  *   Internet Printing Protocol support functions for the Common UNIX
  *   Printing System (CUPS).
@@ -785,10 +785,27 @@ ippLength(ipp_t *ipp)		/* I - IPP request */
 }
 
 
+/*
+ * 'ippNew()' - Allocate a new IPP request.
+ */
+
 ipp_t *				/* O - New IPP request */
 ippNew(void)
 {
-  return ((ipp_t *)calloc(sizeof(ipp_t), 1));
+  ipp_t	*temp;			/* New IPP request */
+
+
+  if ((temp = (ipp_t *)calloc(sizeof(ipp_t), 1)) != NULL)
+  {
+   /*
+    * Default to IPP 1.1...
+    */
+
+    temp->request.any.version[0] = 1;
+    temp->request.any.version[1] = 1;
+  }
+
+  return (temp);
 }
 
 
@@ -1140,8 +1157,8 @@ ippWrite(http_t *http,		/* I - HTTP data */
 
         bufptr = buffer;
 
-	*bufptr++ = 1;
-	*bufptr++ = 0;
+	*bufptr++ = ipp->request.any.version[0];
+	*bufptr++ = ipp->request.any.version[1];
 	*bufptr++ = ipp->request.any.op_status >> 8;
 	*bufptr++ = ipp->request.any.op_status;
 	*bufptr++ = ipp->request.any.request_id >> 24;
@@ -1566,5 +1583,5 @@ ipp_read(http_t        *http,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.31 2000/01/21 20:33:16 mike Exp $".
+ * End of "$Id: ipp.c,v 1.32 2000/02/06 22:09:04 mike Exp $".
  */

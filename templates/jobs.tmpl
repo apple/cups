@@ -11,7 +11,7 @@
 {[job_id]
 <TR>
 	<TD VALIGN=TOP>{job_id}</TD>
-	<TD VALIGN=TOP>{job_name}</TD>
+	<TD VALIGN=TOP>{?job_name=?Unknown:{job_name}}</TD>
 	<TD VALIGN=TOP>{job_originating_user_name}</TD>
 	<TD VALIGN=TOP>{job_k_octets}k</TD>
 	<TD VALIGN=TOP>{job_state=3?pending:{job_state=4?held:processing}}</TD>

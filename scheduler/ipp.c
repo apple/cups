@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.49 2000/02/03 21:25:49 mike Exp $"
+ * "$Id: ipp.c,v 1.50 2000/02/06 22:09:06 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -23,26 +23,40 @@
  *
  * Contents:
  *
- *   ProcessIPPRequest() - Process an incoming IPP request...
- *   accept_jobs()       - Accept print jobs to a printer.
- *   add_class()         - Add a class to the system.
- *   add_printer()       - Add a printer to the system.
- *   cancel_all_jobs()   - Cancel all print jobs.
- *   cancel_job()        - Cancel a print job.
- *   copy_attrs()        - Copy attributes from one request to another.
- *   copy_file()         - Copy a PPD file or interface script...
- *   delete_printer()    - Remove a printer or class from the system.
- *   get_default()       - Get the default destination.
- *   get_jobs()          - Get a list of jobs for the specified printer.
- *   get_job_attrs()     - Get job attributes.
- *   get_printers()      - Get a list of printers.
- *   get_printer_attrs() - Get printer attributes.
- *   print_job()         - Print a file to a printer or class.
- *   reject_jobs()       - Reject print jobs to a printer.
- *   send_ipp_error()    - Send an error status back to the IPP client.
- *   start_printer()     - Start a printer.
- *   stop_printer()      - Stop a printer.
- *   validate_job()      - Validate printer options and destination.
+ *   ProcessIPPRequest()         - Process an incoming IPP request...
+ *   accept_jobs()               - Accept print jobs to a printer.
+ *   add_class()                 - Add a class to the system.
+ *   add_job_state_reasons()     - Add the "job-state-reasons" attribute based
+ *                                 upon the job and printer state...
+ *   add_printer()               - Add a printer to the system.
+ *   add_printer_state_reasons() - Add the "printer-state-reasons" attribute
+ *                                 based upon the printer state...
+ *   add_queued_job_count()      - Add the "queued-job-count" attribute for
+ *   cancel_all_jobs()           - Cancel all print jobs.
+ *   cancel_job()                - Cancel a print job.
+ *   copy_attrs()                - Copy attributes from one request to another.
+ *   create_job()                - Print a file to a printer or class.
+ *   copy_file()                 - Copy a PPD file or interface script...
+ *   delete_printer()            - Remove a printer or class from the system.
+ *   get_default()               - Get the default destination.
+ *   get_devices()               - Get the list of available devices on the
+ *                                 local system.
+ *   get_jobs()                  - Get a list of jobs for the specified printer.
+ *   get_job_attrs()             - Get job attributes.
+ *   get_ppds()                  - Get the list of PPD files on the local
+ *                                 system.
+ *   get_printer_attrs()         - Get printer attributes.
+ *   get_printers()              - Get a list of printers.
+ *   hold_job()                  - Hold a print job.
+ *   print_job()                 - Print a file to a printer or class.
+ *   reject_jobs()               - Reject print jobs to a printer.
+ *   restart_job()               - Cancel a print job.
+ *   send_document()             - Send a file to a printer or class.
+ *   send_ipp_error()            - Send an error status back to the IPP client.
+ *   set_default()               - Set the default destination...
+ *   start_printer()             - Start a printer.
+ *   stop_printer()              - Stop a printer.
+ *   validate_job()              - Validate printer options and destination.
  */
 
 /*
@@ -60,7 +74,10 @@
 
 static void	accept_jobs(client_t *con, ipp_attribute_t *uri);
 static void	add_class(client_t *con, ipp_attribute_t *uri);
+static void	add_job_state_reasons(client_t *con, job_t *job);
 static void	add_printer(client_t *con, ipp_attribute_t *uri);
+static void	add_printer_state_reasons(client_t *con, printer_t *p);
+static void	add_queued_job_count(client_t *con, printer_t *p);
 static void	cancel_all_jobs(client_t *con, ipp_attribute_t *uri);
 static void	cancel_job(client_t *con, ipp_attribute_t *uri);
 static void	copy_attrs(ipp_t *to, ipp_t *from, ipp_attribute_t *req,
@@ -111,8 +128,8 @@ ProcessIPPRequest(client_t *con)	/* I - Client connection */
 
   con->response = ippNew();
 
-  con->response->request.status.version[0] = 1;
-  con->response->request.status.version[1] = 0;
+  con->response->request.status.version[0] = con->request->request.op.version[0];
+  con->response->request.status.version[1] = con->request->request.op.version[1];
   con->response->request.status.request_id = con->request->request.op.request_id;
 
  /*
@@ -615,6 +632,67 @@ add_class(client_t        *con,		/* I - Client connection */
 
 
 /*
+ * 'add_job_state_reasons()' - Add the "job-state-reasons" attribute based
+ *                             upon the job and printer state...
+ */
+
+static void
+add_job_state_reasons(client_t *con,	/* I - Client connection */
+                      job_t    *job)	/* I - Job info */
+{
+  printer_t	*dest;			/* Destination printer */
+
+
+  switch (job->state->values[0].integer)
+  {
+    case IPP_JOB_PENDING :
+        if (job->dtype & CUPS_PRINTER_CLASS)
+	  dest = FindClass(job->dest);
+	else
+	  dest = FindPrinter(job->dest);
+
+        if (dest != NULL && dest->state == IPP_PRINTER_STOPPED)
+          ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_KEYWORD,
+	               "job-state-reasons", NULL, "printer-stopped");
+        else
+          ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_KEYWORD,
+	               "job-state-reasons", NULL, "none");
+        break;
+
+    case IPP_JOB_HELD :
+        ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_KEYWORD,
+	             "job-state-reasons", NULL, "job-hold-until-specified");
+        break;
+
+    case IPP_JOB_PROCESSING :
+        ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_KEYWORD,
+	             "job-state-reasons", NULL, "job-printing");
+        break;
+
+    case IPP_JOB_STOPPED :
+        ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_KEYWORD,
+	             "job-state-reasons", NULL, "job-stopped");
+        break;
+
+    case IPP_JOB_CANCELLED :
+        ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_KEYWORD,
+	             "job-state-reasons", NULL, "job-canceled-by-user");
+        break;
+
+    case IPP_JOB_ABORTED :
+        ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_KEYWORD,
+	             "job-state-reasons", NULL, "aborted-by-system");
+        break;
+
+    case IPP_JOB_COMPLETED :
+        ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_KEYWORD,
+	             "job-state-reasons", NULL, "job-completed-successfully");
+        break;
+  }
+}
+
+
+/*
  * 'add_printer()' - Add a printer to the system.
  */
 
@@ -883,6 +961,56 @@ add_printer(client_t        *con,	/* I - Client connection */
              con->username);
 
   con->response->request.status.status_code = IPP_OK;
+}
+
+
+/*
+ * 'add_printer_state_reasons()' - Add the "printer-state-reasons" attribute
+ *                                 based upon the printer state...
+ */
+
+static void
+add_printer_state_reasons(client_t  *con,	/* I - Client connection */
+                          printer_t *p)		/* I - Printer info */
+{
+  switch (p->state)
+  {
+    case IPP_PRINTER_STOPPED :
+        ippAddString(con->response, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
+	             "printer-state-reasons", NULL, "paused");
+        break;
+
+    default :
+        ippAddString(con->response, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
+	             "printer-state-reasons", NULL, "none");
+        break;
+  }
+}
+
+
+/*
+ * 'add_queued_job_count()' - Add the "queued-job-count" attribute for
+ *                            the specified printer or class.
+ */
+
+static void
+add_queued_job_count(client_t  *con,	/* I - Client connection */
+                     printer_t *p)	/* I - Printer or class */
+{
+  job_t		*job;			/* Current job */
+  cups_ptype_t	dtype;			/* Destination type */
+  int		count;			/* Number of jobs on destination */
+
+
+  dtype = p->type & CUPS_PRINTER_CLASS;
+
+  for (count = 0, job = Jobs; job != NULL; job = job->next)
+    if (strcmp(job->dest, p->name) == 0 && job->dtype == dtype &&
+        job->state->values[0].integer < IPP_JOB_STOPPED)
+      count ++;
+
+  ippAddInteger(con->response, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
+                "queued-job-count", count);
 }
 
 
@@ -1396,6 +1524,15 @@ create_job(client_t        *con,	/* I - Client connection */
     attr->name = strdup("job-originating-user-name");
   }
 
+  ippAddInteger(job->attrs, IPP_TAG_JOB, IPP_TAG_INTEGER, "time-at-creation",
+                time(NULL) - StartTime);
+  attr = ippAddInteger(job->attrs, IPP_TAG_JOB, IPP_TAG_INTEGER,
+                       "time-at-processing", 0);
+  attr->value_tag = IPP_TAG_NOVALUE;
+  attr = ippAddInteger(job->attrs, IPP_TAG_JOB, IPP_TAG_INTEGER,
+                       "time-at-completed", 0);
+  attr->value_tag = IPP_TAG_NOVALUE;
+
   SaveJob(job->id);
 
   LogMessage(L_INFO, "Job %d created on \'%s\' by \'%s\'.", job->id,
@@ -1746,6 +1883,7 @@ get_jobs(client_t        *con,		/* I - Client connection */
     *    job-state
     *    job-uri
     *    job-name
+    *    job-printer-up-time
     *
     * Note that we are supposed to look at the "requested-attributes"
     * attribute to determine what we send, however the IPP/1.0 spec also
@@ -1774,6 +1912,9 @@ get_jobs(client_t        *con,		/* I - Client connection */
     ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_URI,
                  "job-uri", NULL, job_uri);
 
+    ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_INTEGER,
+                  "job-printer-up-time", time(NULL) - StartTime);
+
    /*
     * Copy the job attributes to the response using the requested-attributes
     * attribute that may be provided by the client.
@@ -1782,6 +1923,8 @@ get_jobs(client_t        *con,		/* I - Client connection */
     copy_attrs(con->response, job->attrs,
                ippFindAttribute(con->request, "requested-attributes",
 	                	IPP_TAG_KEYWORD), IPP_TAG_JOB);
+
+    add_job_state_reasons(con, job);
 
     ippAddSeparator(con->response);
   }
@@ -1907,6 +2050,9 @@ get_job_attrs(client_t        *con,		/* I - Client connection */
   ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_URI,
                "job-uri", NULL, job_uri);
 
+  ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_INTEGER,
+                "job-printer-up-time", time(NULL) - StartTime);
+
  /*
   * Copy the job attributes to the response using the requested-attributes
   * attribute that may be provided by the client.
@@ -1915,6 +2061,8 @@ get_job_attrs(client_t        *con,		/* I - Client connection */
   copy_attrs(con->response, job->attrs,
              ippFindAttribute(con->request, "requested-attributes",
 	                      IPP_TAG_KEYWORD), IPP_TAG_JOB);
+
+  add_job_state_reasons(con, job);
 
   if (ippFindAttribute(con->request, "requested-attributes", IPP_TAG_KEYWORD) != NULL)
     con->response->request.status.status_code = IPP_OK_SUBST;
@@ -1938,79 +2086,6 @@ get_ppds(client_t *con)			/* I - Client connection */
   copy_attrs(con->response, PPDs,
              ippFindAttribute(con->request, "requested-attributes",
 	                      IPP_TAG_KEYWORD), IPP_TAG_ZERO);
-
-  con->response->request.status.status_code = IPP_OK;
-}
-
-
-/*
- * 'get_printers()' - Get a list of printers.
- */
-
-static void
-get_printers(client_t *con,		/* I - Client connection */
-             int      type)		/* I - 0 or CUPS_PRINTER_CLASS */
-{
-  ipp_attribute_t	*attr;		/* Current attribute */
-  int			limit;		/* Maximum number of printers to return */
-  int			count;		/* Number of printers that match */
-  printer_t		*printer;	/* Current printer pointer */
-  time_t		curtime;	/* Current time */
-
-
-  DEBUG_printf(("get_printers(%08x)\n", con));
-
- /*
-  * See if they want to limit the number of printers reported; if not, limit
-  * the report to 1000 printers to prevent swamping of the server...
-  */
-
-  if ((attr = ippFindAttribute(con->request, "limit", IPP_TAG_INTEGER)) != NULL)
-    limit = attr->values[0].integer;
-  else
-    limit = 1000;
-
- /*
-  * OK, build a list of printers for this printer...
-  */
-
-  curtime = time(NULL);
-
-  for (count = 0, printer = Printers;
-       count < limit && printer != NULL;
-       printer = printer->next)
-    if ((printer->type & CUPS_PRINTER_CLASS) == type)
-    {
-     /*
-      * Send the following attributes for each printer:
-      *
-      *    printer-state
-      *    printer-state-message
-      *    printer-is-accepting-jobs
-      *    + all printer attributes
-      */
-
-      ippAddInteger(con->response, IPP_TAG_PRINTER, IPP_TAG_ENUM,
-                    "printer-state", printer->state);
-
-      if (printer->state_message[0])
-	ippAddString(con->response, IPP_TAG_PRINTER, IPP_TAG_TEXT,
-                     "printer-state-message", NULL, printer->state_message);
-
-      ippAddBoolean(con->response, IPP_TAG_PRINTER, "printer-is-accepting-jobs",
-                    printer->accepting);
-
-      ippAddInteger(con->response, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
-                    "printer-up-time", curtime - StartTime);
-      ippAddDate(con->response, IPP_TAG_PRINTER, "printer-current-time",
-        	 ippTimeToDate(curtime));
-
-      copy_attrs(con->response, printer->attrs,
-        	 ippFindAttribute(con->request, "requested-attributes",
-	                	  IPP_TAG_KEYWORD), IPP_TAG_ZERO);
-
-      ippAddSeparator(con->response);
-    }
 
   con->response->request.status.status_code = IPP_OK;
 }
@@ -2077,6 +2152,8 @@ get_printer_attrs(client_t        *con,	/* I - Client connection */
   ippAddInteger(con->response, IPP_TAG_PRINTER, IPP_TAG_ENUM, "printer-state",
                 printer->state);
 
+  add_printer_state_reasons(con, printer);
+
   if (printer->state_message[0])
     ippAddString(con->response, IPP_TAG_PRINTER, IPP_TAG_TEXT,
                  "printer-state-message", NULL, printer->state_message);
@@ -2089,12 +2166,91 @@ get_printer_attrs(client_t        *con,	/* I - Client connection */
   ippAddDate(con->response, IPP_TAG_PRINTER, "printer-current-time",
              ippTimeToDate(curtime));
 
+  add_queued_job_count(con, printer);
+
   con->response->request.status.status_code = IPP_OK;
 }
 
 
 /*
- * 'hold_job()' - Cancel a print job.
+ * 'get_printers()' - Get a list of printers.
+ */
+
+static void
+get_printers(client_t *con,		/* I - Client connection */
+             int      type)		/* I - 0 or CUPS_PRINTER_CLASS */
+{
+  ipp_attribute_t	*attr;		/* Current attribute */
+  int			limit;		/* Maximum number of printers to return */
+  int			count;		/* Number of printers that match */
+  printer_t		*printer;	/* Current printer pointer */
+  time_t		curtime;	/* Current time */
+
+
+  DEBUG_printf(("get_printers(%08x)\n", con));
+
+ /*
+  * See if they want to limit the number of printers reported; if not, limit
+  * the report to 1000 printers to prevent swamping of the server...
+  */
+
+  if ((attr = ippFindAttribute(con->request, "limit", IPP_TAG_INTEGER)) != NULL)
+    limit = attr->values[0].integer;
+  else
+    limit = 1000;
+
+ /*
+  * OK, build a list of printers for this printer...
+  */
+
+  curtime = time(NULL);
+
+  for (count = 0, printer = Printers;
+       count < limit && printer != NULL;
+       printer = printer->next)
+    if ((printer->type & CUPS_PRINTER_CLASS) == type)
+    {
+     /*
+      * Send the following attributes for each printer:
+      *
+      *    printer-state
+      *    printer-state-message
+      *    printer-is-accepting-jobs
+      *    + all printer attributes
+      */
+
+      ippAddInteger(con->response, IPP_TAG_PRINTER, IPP_TAG_ENUM,
+                    "printer-state", printer->state);
+
+      add_printer_state_reasons(con, printer);
+
+      if (printer->state_message[0])
+	ippAddString(con->response, IPP_TAG_PRINTER, IPP_TAG_TEXT,
+                     "printer-state-message", NULL, printer->state_message);
+
+      ippAddBoolean(con->response, IPP_TAG_PRINTER, "printer-is-accepting-jobs",
+                    printer->accepting);
+
+      ippAddInteger(con->response, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
+                    "printer-up-time", curtime - StartTime);
+      ippAddDate(con->response, IPP_TAG_PRINTER, "printer-current-time",
+        	 ippTimeToDate(curtime));
+
+      add_queued_job_count(con, printer);
+
+      copy_attrs(con->response, printer->attrs,
+        	 ippFindAttribute(con->request, "requested-attributes",
+	                	  IPP_TAG_KEYWORD), IPP_TAG_ZERO);
+
+      ippAddSeparator(con->response);
+    }
+
+  con->response->request.status.status_code = IPP_OK;
+}
+
+
+/*
+ * 'hold_job()' - Hold a print job.
  */
 
 static void
@@ -2310,9 +2466,11 @@ print_job(client_t        *con,		/* I - Client connection */
   * doesn't support compression yet...
   */
 
-  if ((attr = ippFindAttribute(con->request, "compression", IPP_TAG_KEYWORD)) != NULL)
+  if ((attr = ippFindAttribute(con->request, "compression", IPP_TAG_KEYWORD)) != NULL &&
+      strcmp(attr->values[0].string.text, "none") == 0)
   {
-    LogMessage(L_ERROR, "print_job: Unsupported compression attribute!");
+    LogMessage(L_ERROR, "print_job: Unsupported compression attribute %s!",
+               attr->values[0].string.text);
     send_ipp_error(con, IPP_ATTRIBUTES);
     ippAddString(con->response, IPP_TAG_UNSUPPORTED_GROUP, IPP_TAG_KEYWORD,
 	         "compression", NULL, attr->values[0].string.text);
@@ -2530,6 +2688,15 @@ print_job(client_t        *con,		/* I - Client connection */
   ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_NAME, "job-name", NULL,
                title);
 
+  ippAddInteger(job->attrs, IPP_TAG_JOB, IPP_TAG_INTEGER, "time-at-creation",
+                time(NULL) - StartTime);
+  attr = ippAddInteger(job->attrs, IPP_TAG_JOB, IPP_TAG_INTEGER,
+                       "time-at-processing", 0);
+  attr->value_tag = IPP_TAG_NOVALUE;
+  attr = ippAddInteger(job->attrs, IPP_TAG_JOB, IPP_TAG_INTEGER,
+                       "time-at-completed", 0);
+  attr->value_tag = IPP_TAG_NOVALUE;
+
   SaveJob(job->id);
 
  /*
@@ -2550,6 +2717,7 @@ print_job(client_t        *con,		/* I - Client connection */
 
   ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_ENUM, "job-state",
                 job->state->values[0].integer);
+  add_job_state_reasons(con, job);
 
   con->response->request.status.status_code = IPP_OK;
 }
@@ -2971,9 +3139,11 @@ send_document(client_t        *con,	/* I - Client connection */
   * doesn't support compression yet...
   */
 
-  if ((attr = ippFindAttribute(con->request, "compression", IPP_TAG_KEYWORD)) != NULL)
+  if ((attr = ippFindAttribute(con->request, "compression", IPP_TAG_KEYWORD)) != NULL &&
+      strcmp(attr->values[0].string.text, "none") == 0)
   {
-    LogMessage(L_ERROR, "send_document: Unsupported compression attribute!");
+    LogMessage(L_ERROR, "send_document: Unsupported compression attribute %s!",
+               attr->values[0].string.text);
     send_ipp_error(con, IPP_ATTRIBUTES);
     ippAddString(con->response, IPP_TAG_UNSUPPORTED_GROUP, IPP_TAG_KEYWORD,
 	         "compression", NULL, attr->values[0].string.text);
@@ -3119,6 +3289,7 @@ send_document(client_t        *con,	/* I - Client connection */
 
   ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_ENUM, "job-state",
                 job->state->values[0].integer);
+  add_job_state_reasons(con, job);
 
   con->response->request.status.status_code = IPP_OK;
 }
@@ -3444,9 +3615,11 @@ validate_job(client_t        *con,	/* I - Client connection */
   * doesn't support compression yet...
   */
 
-  if ((attr = ippFindAttribute(con->request, "compression", IPP_TAG_KEYWORD)) != NULL)
+  if ((attr = ippFindAttribute(con->request, "compression", IPP_TAG_KEYWORD)) != NULL &&
+      strcmp(attr->values[0].string.text, "none") == 0)
   {
-    LogMessage(L_ERROR, "validate_job: Unsupported compression attribute!");
+    LogMessage(L_ERROR, "validate_job: Unsupported compression attribute %s!",
+               attr->values[0].string.text);
     send_ipp_error(con, IPP_ATTRIBUTES);
     ippAddString(con->response, IPP_TAG_UNSUPPORTED_GROUP, IPP_TAG_KEYWORD,
 	         "compression", NULL, attr->values[0].string.text);
@@ -3510,5 +3683,5 @@ validate_job(client_t        *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.49 2000/02/03 21:25:49 mike Exp $".
+ * End of "$Id: ipp.c,v 1.50 2000/02/06 22:09:06 mike Exp $".
  */

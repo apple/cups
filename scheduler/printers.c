@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.51 2000/01/27 03:38:35 mike Exp $"
+ * "$Id: printers.c,v 1.52 2000/02/06 22:09:07 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -635,6 +635,9 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
   int		i;			/* Looping var */
   char		filename[1024];		/* Name of PPD file */
   int		num_media;		/* Number of media options */
+  location_t	*auth;			/* Pointer to authentication element */
+  int		auth_len;		/* Length of class or printer resource */
+  const char	*auth_supported;	/* Authentication supported */
   ppd_file_t	*ppd;			/* PPD file data */
   ppd_option_t	*input_slot,		/* InputSlot options */
 		*media_type,		/* MediaType options */
@@ -655,6 +658,11 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
 		  "one",
 		  "two-long-edge",
 		  "two-short-edge"
+		};
+  const char	*versions[] =		/* ipp-versions-supported values */
+		{
+		  "1.0",
+		  "1.1"
 		};
   ipp_op_t	ops[] =			/* operations-supported values */
 		{
@@ -700,6 +708,13 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
 		};
   int		num_finishings;
   ipp_finish_t	finishings[5];
+  const char	*multiple_document_handling[] =
+		{
+		  "single-document",
+		  "separate-documents-uncollated-copies",
+		  "separate-documents-collated-copies",
+		  "single-document-new-sheet"
+		}
 #ifdef __sgi
   FILE		*fp;		/* Interface script file */
 #endif /* __sgi */
@@ -717,6 +732,53 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
   AddPrinterFilter(p, "application/vnd.cups-raw 0 -");
 
  /*
+  * Figure out the authentication that is required for the printer.
+  */
+
+  auth_supported = "requesting-user-name";
+  if (!(p->type & CUPS_PRINTER_REMOTE))
+  {
+    if (p->type & CUPS_PRINTER_CLASS)
+    {
+      auth_len = 8;
+      sprintf(resource, "/classes/%s", p->name);
+    }
+    else
+    {
+      auth_len = 9;
+      sprintf(resource, "/printers/%s", p->name);
+    }
+
+    for (i = NumLocations, auth = Locations; i > 0; i --, auth ++)
+      if (strcmp(auth->location, resource) == 0)
+      {
+       /*
+        * Exact match...
+	*/
+
+	if (auth->type == AUTH_BASIC)
+	  auth_supported = "basic";
+	else if (auth->type == AUTH_DIGEST)
+	  auth_supported = "digest";
+	break;
+      }
+      else if (strcmp(auth->location, "/") == 0 ||
+               (strncmp(auth->location, resource, auth_len) == 0 &&
+                (strlen(auth->location) == auth_len ||
+	         strlen(auth->location) == (auth_len + 1))))
+      {
+       /*
+        * Matches base printer or class resources...
+	*/
+
+	if (auth->type == AUTH_BASIC)
+	  auth_supported = "basic";
+	else if (auth->type == AUTH_DIGEST)
+	  auth_supported = "digest";
+      }
+  }
+
+ /*
   * Create the required IPP attributes for a printer...
   */
 
@@ -727,6 +789,8 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
 
   ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_URI, "printer-uri-supported",
                NULL, p->uri);
+  ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
+               "uri-authentication-supported", NULL, auth_supported);
   ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
                "uri-security-supported", NULL, "none");
   ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_NAME, "printer-name", NULL,
@@ -739,8 +803,17 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
                NULL, p->more_info);
   ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
                "pdl-override-supported", NULL, "not-attempted");
+  ippAddStrings(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
+                "ipp-versions-supported", sizeof(versions) / sizeof(versions[0]),
+		NULL, versions);
   ippAddIntegers(p->attrs, IPP_TAG_PRINTER, IPP_TAG_ENUM, "operations-supported",
                  sizeof(ops) / sizeof(ops[0]), (int *)ops);
+  ippAddBoolean(p->attrs, IPP_TAG_PRINTER, "multiple-document-jobs-supported", 1);
+  ippAddStrings(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
+                "multiple-document-handling-supported",
+                sizeof(multiple_document_handling) /
+		    sizeof(multiple_document_handling[0]), NULL,
+	        multiple_document_handling);
   ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_CHARSET, "charset-configured",
                NULL, DefaultCharset);
   ippAddStrings(p->attrs, IPP_TAG_PRINTER, IPP_TAG_CHARSET, "charset-supported",
@@ -753,6 +826,8 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
                "document-format-default", NULL, "application/octet-stream");
   ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_MIMETYPE,
                "document-format-supported", NULL, "application/octet-stream");
+  ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
+               "compression-supported", NULL, "none");
   ippAddInteger(p->attrs, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
                 "job-priority-supported", 100);
   ippAddInteger(p->attrs, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
@@ -883,6 +958,9 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
 
 	ippAddBoolean(p->attrs, IPP_TAG_PRINTER, "color-supported",
                       ppd->color_device);
+	if (ppd->throughput)
+	  ippAddInteger(p->attrs, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
+	                "pages-per-minute", ppd->throughput);
 	ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_TEXT,
                      "printer-make-and-model", NULL, ppd->nickname);
 
@@ -1239,5 +1317,5 @@ write_printcap(void)
 
 
 /*
- * End of "$Id: printers.c,v 1.51 2000/01/27 03:38:35 mike Exp $".
+ * End of "$Id: printers.c,v 1.52 2000/02/06 22:09:07 mike Exp $".
  */

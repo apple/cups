@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.51 2000/01/27 03:38:35 mike Exp $"
+ * "$Id: job.c,v 1.52 2000/02/06 22:09:06 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -78,6 +78,7 @@ typedef struct direct DIRENT;
 
 static ipp_state_t	ipp_read_file(const char *filename, ipp_t *ipp);
 static ipp_state_t	ipp_write_file(const char *filename, ipp_t *ipp);
+static void		set_time(job_t *job, const char *name);
 static int		start_process(const char *command, char *argv[],
 			              char *envp[], int in, int out, int err,
 				      int root);
@@ -147,6 +148,8 @@ CancelJob(int id)		/* I - Job to cancel */
 
       current->state->values[0].integer = IPP_JOB_CANCELLED;
 
+      set_time(current, "job-at-completion");
+
      /*
       * Remove the print file for good if we aren't preserving jobs or
       * files...
@@ -195,6 +198,8 @@ CancelJob(int id)		/* I - Job to cancel */
 
         if (current->attrs != NULL)
           ippDelete(current->attrs);
+
+        free(current->filetypes);
 
         free(current);
       }
@@ -654,6 +659,8 @@ StartJob(int       id,		/* I - Job ID */
   current->printer = printer;
   printer->job     = current;
   SetPrinterState(printer, IPP_PRINTER_PROCESSING);
+
+  set_time(current, "job-at-processing");
 
  /*
   * Figure out what filters are required to convert from
@@ -1680,8 +1687,8 @@ ipp_write_file(const char *filename,	/* I - File to write to */
 
         bufptr = buffer;
 
-	*bufptr++ = 1;
-	*bufptr++ = 0;
+	*bufptr++ = ipp->request.any.version[0];
+	*bufptr++ = ipp->request.any.version[1];
 	*bufptr++ = ipp->request.any.op_status >> 8;
 	*bufptr++ = ipp->request.any.op_status;
 	*bufptr++ = ipp->request.any.request_id >> 24;
@@ -2020,6 +2027,27 @@ ipp_write_file(const char *filename,	/* I - File to write to */
 
 
 /*
+ * 'set_time()' - Set one of the "job-time-at-xyz" attributes...
+ */
+
+static void
+set_time(job_t      *job,	/* I - Job to update */
+         const char *name)	/* I - Name of attribute */
+{
+  ipp_attribute_t	*attr;	/* Time attribute */
+
+
+  if ((attr = ippFindAttribute(job->attrs, name, IPP_TAG_NOVALUE)) == NULL)
+  {
+    attr->value_tag = IPP_TAG_INTEGER;
+    attr->values[0].integer = time(NULL) - StartTime;
+  }
+  else if ((attr = ippFindAttribute(job->attrs, name, IPP_TAG_INTEGER)) == NULL)
+    attr->values[0].integer = time(NULL) - StartTime;
+}
+
+
+/*
  * 'start_process()' - Start a background process.
  */
 
@@ -2102,5 +2130,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.51 2000/01/27 03:38:35 mike Exp $".
+ * End of "$Id: job.c,v 1.52 2000/02/06 22:09:06 mike Exp $".
  */

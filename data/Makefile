@@ -1,9 +1,9 @@
 #
-# "$Id: Makefile,v 1.2 1999/07/30 14:22:10 mike Exp $"
+# "$Id: Makefile,v 1.3 2000/02/06 22:09:05 mike Exp $"
 #
 #   Datafile makefile for the Common UNIX Printing System (CUPS).
 #
-#   Copyright 1993-1999 by Easy Software Products.
+#   Copyright 1993-2000 by Easy Software Products.
 #
 #   These coded instructions, statements, and computer programs are the
 #   property of Easy Software Products and are protected by Federal
@@ -52,5 +52,5 @@ install:
 	$(CP) $(FILES) $(DATADIR)/data
 
 #
-# End of "$Id: Makefile,v 1.2 1999/07/30 14:22:10 mike Exp $".
+# End of "$Id: Makefile,v 1.3 2000/02/06 22:09:05 mike Exp $".
 #

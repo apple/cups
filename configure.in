@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: configure.in,v 1.28 2000/01/20 13:05:38 mike Exp $"
+dnl "$Id: configure.in,v 1.29 2000/02/06 22:09:03 mike Exp $"
 dnl
 dnl   Configuration script for the Common UNIX Printing System (CUPS).
 dnl
@@ -29,7 +29,7 @@ AC_PREFIX_DEFAULT(/usr)
 dnl Get the operating system and version number...
 
 uname=`uname`
-uversion=`uname -r | sed -e '1,$s/\.//g'`
+uversion=`uname -r | sed -e '1,$s/[[^0-9]]//g'`
 if test "$uname" = "IRIX64"; then
     uname="IRIX"
 fi
@@ -348,5 +348,5 @@ AC_SUBST(CUPS_DATADIR)
 AC_OUTPUT(Makedefs)
 
 dnl
-dnl End of "$Id: configure.in,v 1.28 2000/01/20 13:05:38 mike Exp $".
+dnl End of "$Id: configure.in,v 1.29 2000/02/06 22:09:03 mike Exp $".
 dnl
