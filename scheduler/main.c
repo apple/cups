@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c,v 1.17 1999/05/10 16:38:43 mike Exp $"
+ * "$Id: main.c,v 1.18 1999/05/26 20:05:05 mike Exp $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -336,37 +336,12 @@ sigchld_handler(int sig)	/* I - Signal number */
           if (status)
 	  {
 	   /*
-	    * A fatal error occurred, so stop the printer until the problem
-	    * can be resolved...
+	    * A fatal error occurred; save the exit status so we know to stop
+	    * the printer when all of the filters finish...
 	    */
 
-	    StopPrinter(job->printer);
+	    job->status = status;
 	  }
-	  else
-	  {
-	   /*
-	    * OK return status; see if all processes are complete...
-	    */
-
-            for (i = 0; job->procs[i]; i ++)
-	      if (job->procs[i] > 0)
-		break;
-
-            if (job->procs[i])
-	      return; /* Still have active processes left */
-
-	   /*
-            * OK, this was the last process; cancel the job...
-	    */
-
-            DEBUG_printf(("sigcld_handler: job %d is completed.\n", job->id));
-
-            job->printer->state_message[0] = '\0';
-
-            CancelJob(job->id);
-	    CheckJobs();
-	  }
-
 	  break;
 	}
       }
@@ -406,5 +381,5 @@ usage(void)
 
 
 /*
- * End of "$Id: main.c,v 1.17 1999/05/10 16:38:43 mike Exp $".
+ * End of "$Id: main.c,v 1.18 1999/05/26 20:05:05 mike Exp $".
  */
