@@ -1,5 +1,5 @@
 /*
- * "$Id: imagetops.c,v 1.36.2.14 2003/04/10 14:13:50 mike Exp $"
+ * "$Id: imagetops.c,v 1.36.2.15 2003/04/15 12:57:34 mike Exp $"
  *
  *   Image file to PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -80,8 +80,7 @@ main(int  argc,		/* I - Number of command-line arguments */
 		ypages,		/* # y pages */
 		xpage,		/* Current x page */
 		ypage,		/* Current y page */
-		page,		/* Current page number */
-		pos;		/* Position on page */
+		page;		/* Current page number */
   int		x0, y0,		/* Corners of the page in image coords */
 		x1, y1;
   ib_t		*row;		/* Current row */
@@ -172,7 +171,7 @@ main(int  argc,		/* I - Number of command-line arguments */
   options     = NULL;
   num_options = cupsParseOptions(argv[5], 0, &options);
 
-  ppd = SetCommonOptions(num_options, options, 1);
+  ppd = SetCommonOptions(num_options, options, 0);
 
   if ((val = cupsGetOption("multiple-document-handling", num_options, options)) != NULL)
   {
@@ -586,6 +585,7 @@ main(int  argc,		/* I - Number of command-line arguments */
     printf("{ neg 1 add dup 0 lt { pop 1 } { %.3f exp neg 1 add } "
            "ifelse %.3f mul } bind settransfer\n", g, b);
 
+  WriteCommon();
   WriteLabelProlog(cupsGetOption("page-label", num_options, options),
                    PageBottom, PageTop, PageWidth);
 
@@ -604,6 +604,16 @@ main(int  argc,		/* I - Number of command-line arguments */
   */
 
   row = malloc(img->xsize * abs(colorspace) + 3);
+
+  UpdatePageVars();
+
+  fprintf(stderr, "DEBUG: XPosition=%d, YPosition=%d, Orientation=%d\n",
+          XPosition, YPosition, Orientation);
+  fprintf(stderr, "DEBUG: xprint=%.0f, yprint=%.0f\n", xprint, yprint);
+  fprintf(stderr, "DEBUG: PageLeft=%.0f, PageRight=%.0f, PageWidth=%.0f\n",
+          PageLeft, PageRight, PageWidth);
+  fprintf(stderr, "DEBUG: PageBottom=%.0f, PageTop=%.0f, PageLength=%.0f\n",
+          PageBottom, PageTop, PageLength);
 
   for (page = 1; Copies > 0; Copies --)
     for (xpage = 0; xpage < xpages; xpage ++)
@@ -641,58 +651,26 @@ main(int  argc,		/* I - Number of command-line arguments */
 	y0 = img->ysize * ypage / ypages;
 	y1 = img->ysize * (ypage + 1) / ypages - 1;
 
-        switch (Orientation)
-	{
-	  default : /* Portrait */
-	      pos = XPosition;
-	      break;
-	  case 1 : /* Landscape */
-	      pos = YPosition;
-	      break;
-	  case 2 : /* Reverse Portrait */
-	      pos = -XPosition;
-	      break;
-	  case 3 : /* Reverse Lanscape */
-	      pos = -YPosition;
-	      break;
-	}
-
-        switch (pos)
+        switch (XPosition)
 	{
 	  case -1 :
-	      left = PageLeft;
+              left = PageLeft;
 	      break;
 	  default :
-	      left = PageLeft + (PageWidth - xprint * 72.0) * 0.5;
+	      left = (PageLeft + PageRight - xprint * 72.0) * 0.5;
 	      break;
 	  case 1 :
 	      left = PageRight - xprint * 72.0;
 	      break;
 	}
 
-        switch (Orientation)
-	{
-	  default : /* Portrait */
-	      pos = YPosition;
-	      break;
-	  case 1 : /* Landscape */
-	      pos = -XPosition;
-	      break;
-	  case 2 : /* Reverse Portrait */
-	      pos = -YPosition;
-	      break;
-	  case 3 : /* Reverse Lanscape */
-	      pos = XPosition;
-	      break;
-	}
-
-        switch (pos)
+        switch (YPosition)
 	{
 	  case -1 :
 	      top = PageBottom + 72.0 * yprint;
 	      break;
 	  default :
-	      top = PageBottom + (PageLength + yprint * 72.0) * 0.5;
+	      top = (PageBottom + PageTop + yprint * 72.0) * 0.5;
 	      break;
 	  case 1 :
 	      top = PageTop;
@@ -924,5 +902,5 @@ ps_ascii85(ib_t *data,		/* I - Data to print */
 
 
 /*
- * End of "$Id: imagetops.c,v 1.36.2.14 2003/04/10 14:13:50 mike Exp $".
+ * End of "$Id: imagetops.c,v 1.36.2.15 2003/04/15 12:57:34 mike Exp $".
  */

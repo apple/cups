@@ -1,5 +1,5 @@
 /*
- * "$Id: common.c,v 1.15.2.12 2003/01/07 18:26:50 mike Exp $"
+ * "$Id: common.c,v 1.15.2.13 2003/04/15 12:57:33 mike Exp $"
  *
  *   Common filter routines for the Common UNIX Printing System (CUPS).
  *
@@ -293,11 +293,11 @@ WriteCommon(void)
   puts("% x y w h ESPrf - Fill a rectangle.\n"
        "userdict/ESPrf/rectfill where{pop/rectfill load}\n"
        "{{gsave newpath 4 2 roll moveto 1 index 0 rlineto 0 exch rlineto\n"
-       "neg 0 rlineto closepath fill grestore}bind}ifelse put\n");
+       "neg 0 rlineto closepath fill grestore}bind}ifelse put");
   puts("% x y w h ESPrs - Stroke a rectangle.\n"
        "userdict/ESPrs/rectstroke where{pop/rectstroke load}\n"
        "{{gsave newpath 4 2 roll moveto 1 index 0 rlineto 0 exch rlineto\n"
-       "neg 0 rlineto closepath stroke grestore}bind}ifelse put\n");
+       "neg 0 rlineto closepath stroke grestore}bind}ifelse put");
 }
 
 
@@ -460,5 +460,5 @@ WriteLabels(int orient)	/* I - Orientation of the page */
 
 
 /*
- * End of "$Id: common.c,v 1.15.2.12 2003/01/07 18:26:50 mike Exp $".
+ * End of "$Id: common.c,v 1.15.2.13 2003/04/15 12:57:33 mike Exp $".
  */
