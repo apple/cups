@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.91.2.20 2002/09/15 22:55:15 mike Exp $"
+ * "$Id: client.c,v 1.91.2.21 2002/09/25 12:52:41 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -1985,8 +1985,6 @@ decode_auth(client_t *con)		/* I - Client to decode to */
 
   LogMessage(L_DEBUG2, "decode_auth(%p): Authorization string = \"%s\"",
              con, s);
-  LogMessage(L_INFO, "decode_auth(%p): Authorization string = \"%s\"",
-             con, s);
 
   if (strncmp(s, "Basic", 5) == 0)
   {
@@ -2626,5 +2624,5 @@ pipe_command(client_t *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.91.2.20 2002/09/15 22:55:15 mike Exp $".
+ * End of "$Id: client.c,v 1.91.2.21 2002/09/25 12:52:41 mike Exp $".
  */
