@@ -1,5 +1,5 @@
 /*
- * "$Id: pstoraster.c,v 1.1 1999/05/07 14:38:59 mike Exp $"
+ * "$Id: pstoraster.c,v 1.2 1999/05/10 16:36:34 mike Exp $"
  *
  *   PostScript RIP filter main entry for the Common UNIX Printing System
  *   (CUPS).
@@ -95,8 +95,7 @@ main(int  argc,		/* I - Number of command-line arguments */
   * Tell the interpreter where to find its files...
   */
 
-/*  minst->lib_path.final = gs_lib_default_path;*/
-  minst->lib_path.final = "/usr/people/mike/c/cups/pstoraster/data";
+  minst->lib_path.final = gs_lib_default_path;
   gs_main_set_lib_paths(minst);
 
  /*
@@ -108,7 +107,6 @@ main(int  argc,		/* I - Number of command-line arguments */
   initial_enter_name("QUIET", &vtrue);
   initial_enter_name("NOPAUSE", &vtrue);
   define_string("OutputFile", "-");
-  define_string("FONTPATH", "/usr/lib/DPS/outline/base");
 
  /*
   * Start the interpreter...
@@ -175,5 +173,5 @@ define_string(char *name,	/* I - Variable to set */
 
 
 /*
- * End of "$Id: pstoraster.c,v 1.1 1999/05/07 14:38:59 mike Exp $".
+ * End of "$Id: pstoraster.c,v 1.2 1999/05/10 16:36:34 mike Exp $".
  */

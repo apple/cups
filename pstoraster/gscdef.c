@@ -53,8 +53,7 @@ const char *gs_product = GS_PRODUCT;
 
 #ifndef GS_REVISION
 #  define GS_REVISION\
-	403		/* primary release # x 100 + */\
-			/* secondary release # x 10 + beta release #. */
+	400000		/* MMmmPP */
 #endif
 long gs_revision = GS_REVISION;		/* should be const, see gscdefs.h */
 
@@ -72,13 +71,11 @@ long gs_serialnumber = GS_SERIALNUMBER;	/* should be const, see gscdefs.h */
 
 /* ---------------- Installation directories and files ---------------- */
 
-/* Here is where the library search path, the name of the */
-/* initialization file, and the doc directory are defined. */
-/* Define the documentation directory (only used in help messages). */
-const char *gs_doc_directory = GS_DOCDIR;
+/* Here is where the library search path and the name of the */
+/* initialization file are defined. */
 
 /* Define the default library search path. */
-const char *gs_lib_default_path = GS_LIB_DEFAULT;
+const char *gs_lib_default_path = CUPS_DATADIR "/pstoraster:" CUPS_DATADIR "/fonts";
 
 /* Define the interpreter initialization file. */
-const char *gs_init_file = GS_INIT;
+const char *gs_init_file = "gs_init.ps";

@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.4 1999/05/07 14:38:48 mike Exp $"
+# "$Id: Makefile,v 1.5 1999/05/10 16:36:22 mike Exp $"
 #
 #   GNU Ghostscript makefile for the Common UNIX Printing System (CUPS).
 #
@@ -87,14 +87,6 @@ OBJS	=	gconf.o gdevabuf.o gdevddrw.o gdevdflt.o gdevemap.o \
 TARGETS		=	genarch arch.h pstoraster
 
 #
-# Directories and paths for all GNU GhostScript data and support files...
-#
-
-GSDIR		=	$(DATADIR)/ghostscript
-GS_LIB_DEFAULT	=	$(GSDIR):$(DATADIR)/fonts
-GS_INIT		=	gs_init.ps
-
-#
 # Make everything...
 #
 
@@ -129,5 +121,5 @@ $(OBJS):	arch.h ../config.h ../Makedefs
 gconf.o iconf.o gscdef.o:	gconfig.h
 
 #
-# End of "$Id: Makefile,v 1.4 1999/05/07 14:38:48 mike Exp $".
+# End of "$Id: Makefile,v 1.5 1999/05/10 16:36:22 mike Exp $".
 #
