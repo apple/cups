@@ -1,5 +1,5 @@
 /*
- * "$Id: admin.c,v 1.44 2003/04/11 02:11:14 mike Exp $"
+ * "$Id: admin.c,v 1.45 2003/09/30 15:13:57 mike Exp $"
  *
  *   Administration CGI for the Common UNIX Printing System (CUPS).
  *
@@ -961,7 +961,12 @@ do_config_printer(http_t      *http,	/* I - HTTP connection */
     return;
   }
 
-  ppd = ppdOpenFile(filename);
+  if ((ppd = ppdOpenFile(filename)) == NULL)
+  {
+    cgiSetVariable("ERROR", ippErrorString(IPP_DEVICE_ERROR));
+    cgiCopyTemplateLang(stdout, TEMPLATES, "error.tmpl", getenv("LANG"));
+    return;
+  }
 
   if (cgiGetVariable("job_sheets_start") != NULL ||
       cgiGetVariable("job_sheets_end") != NULL)
@@ -1592,5 +1597,5 @@ get_line(char *buf,	/* I - Line buffer */
 
 
 /*
- * End of "$Id: admin.c,v 1.44 2003/04/11 02:11:14 mike Exp $".
+ * End of "$Id: admin.c,v 1.45 2003/09/30 15:13:57 mike Exp $".
  */
