@@ -1,5 +1,5 @@
 /*
- * "$Id: cups.h,v 1.47 2002/12/19 16:35:19 mike Exp $"
+ * "$Id: cups.h,v 1.48 2003/04/03 03:30:12 mike Exp $"
  *
  *   API definitions for the Common UNIX Printing System (CUPS).
  *
@@ -81,6 +81,7 @@ enum					/* Not a typedef'd enum so we can OR */
   CUPS_PRINTER_VARIABLE = 0x8000,	/* Can do variable sizes */
   CUPS_PRINTER_IMPLICIT = 0x10000,	/* Implicit class */
   CUPS_PRINTER_DEFAULT = 0x20000,	/* Default printer on network */
+  CUPS_PRINTER_FAX = 0x40000,		/* Fax queue */
   CUPS_PRINTER_OPTIONS = 0xfffc		/* ~(CLASS | REMOTE | IMPLICIT) */
 };
 
@@ -176,5 +177,5 @@ extern const char	*cupsUser(void);
 #endif /* !_CUPS_CUPS_H_ */
 
 /*
- * End of "$Id: cups.h,v 1.47 2002/12/19 16:35:19 mike Exp $".
+ * End of "$Id: cups.h,v 1.48 2003/04/03 03:30:12 mike Exp $".
  */

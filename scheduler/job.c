@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.200 2003/03/31 20:07:51 mike Exp $"
+ * "$Id: job.c,v 1.201 2003/04/03 03:30:12 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -828,7 +828,7 @@ MoveJob(int        id,		/* I - Job ID */
 
       SetString(&current->dest, dest);
       current->dtype = p->type & (CUPS_PRINTER_CLASS | CUPS_PRINTER_REMOTE |
-                                  CUPS_PRINTER_IMPLICIT);
+                                  CUPS_PRINTER_IMPLICIT | CUPS_PRINTER_FAX);
 
       if ((attr = ippFindAttribute(current->attrs, "job-printer-uri", IPP_TAG_URI)) != NULL)
       {
@@ -1037,7 +1037,7 @@ SetJobHoldUntil(int        id,		/* I - Job ID */
                         (((5 - curdate->tm_wday) * 24 +
                           (17 - curdate->tm_hour)) * 60 + 59 -
 			   curdate->tm_min) * 60 + 60 - curdate->tm_sec;
-  }  
+  }
   else if (sscanf(when, "%d:%d:%d", &hour, &minute, &second) >= 2)
   {
    /*
@@ -2246,11 +2246,23 @@ UpdateJob(job_t *job)		/* I - Job to check */
       SaveJob(job->id);
 
      /*
-      * If the job was queued to a class, try requeuing it...
+      * If the job was queued to a class, try requeuing it...  For
+      * faxes, hold the current job for 5 minutes.
       */
 
       if (job->dtype & (CUPS_PRINTER_CLASS | CUPS_PRINTER_IMPLICIT))
         CheckJobs();
+      else if (job->dtype & CUPS_PRINTER_FAX)
+      {
+       /*
+        * Hold the current job for 5 minutes...
+	*/
+
+        job->state->values[0].integer = IPP_JOB_HELD;
+	job->hold_until               = time(NULL) + 300;
+
+        CheckJobs();
+      }
     }
     else if (job->status > 0)
     {
@@ -2588,5 +2600,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.200 2003/03/31 20:07:51 mike Exp $".
+ * End of "$Id: job.c,v 1.201 2003/04/03 03:30:12 mike Exp $".
  */
