@@ -1,5 +1,5 @@
 /*
- * "$Id: imagetoraster.c,v 1.18 1999/04/21 14:12:46 mike Exp $"
+ * "$Id: imagetoraster.c,v 1.19 1999/04/21 16:14:43 mike Exp $"
  *
  *   Image file to raster filter for the Common UNIX Printing System (CUPS).
  *
@@ -57,7 +57,6 @@
 int	Flip = 0,		/* Flip/mirror pages */
 	Collate = 0,		/* Collate copies? */
 	Copies = 1;		/* Number of copies */
-#if 1
 int	Floyd16x16[16][16] =	/* Traditional Floyd ordered dither */
 	{
 	  { 0,   128, 32,  160, 8,   136, 40,  168,
@@ -93,27 +92,6 @@ int	Floyd16x16[16][16] =	/* Traditional Floyd ordered dither */
 	  { 254, 127, 223, 95,  247, 119, 215, 87,
 	    253, 125, 221, 93,  245, 117, 213, 85 }
 	};
-#else
-int	Floyd16x16[16][16] =
-	{
-	  {   0, 223,  48, 207,  14, 237,  62, 221,   3, 226,  51, 210,  13, 236,  61, 220 },
-	  { 175,  80, 128,  96, 189,  94, 141, 110, 178,  83, 130,  99, 188,  93, 140, 109 },
-	  { 191,  32, 239,  16, 205,  46, 253,  30, 194,  35, 242,  19, 204,  45, 252,  29 },
-	  { 112, 143,  64, 159, 126, 157,  78, 173, 115, 146,  67, 162, 125, 156,  77, 172 },
-	  {  11, 234,  59, 218,   5, 228,  53, 212,   8, 231,  56, 215,   6, 229,  54, 213 },
-	  { 186,  91, 138, 107, 180,  85, 132, 101, 183,  88, 135, 104, 181,  86, 133, 102 },
-	  { 202,  43, 250,  27, 196,  37, 244,  21, 199,  40, 247,  24, 197,  38, 245,  22 },
-	  { 123, 154,  75, 170, 117, 148,  69, 164, 120, 151,  72, 167, 118, 149,  70, 165 },
-	  {  12, 235,  60, 219,   2, 225,  50, 209,  15, 238,  63, 222,   1, 224,  49, 208 },
-	  { 187,  92, 139, 108, 177,  82, 129,  98, 190,  95, 142, 111, 176,  81, 128,  97 },
-	  { 203,  44, 251,  28, 193,  34, 241,  18, 206,  47, 254,  31, 192,  33, 240,  17 },
-	  { 124, 155,  76, 171, 114, 145,  66, 161, 127, 158,  79, 174, 113, 144,  65, 160 },
-	  {   7, 230,  55, 214,   9, 232,  57, 216,   4, 227,  52, 211,  10, 233,  58, 217 },
-	  { 182,  87, 134, 103, 184,  89, 136, 105, 179,  84, 131, 100, 185,  90, 137, 106 },
-	  { 198,  39, 246,  23, 200,  41, 248,  25, 195,  36, 243,  20, 201,  42, 249,  26 },
-	  { 119, 150,  71, 166, 121, 152,  73, 168, 116, 147,  68, 163, 122, 153,  74, 169 }
-	};
-#endif /* 0 */
 int	Floyd8x8[8][8] =
 	{
 	  {  0, 32,  8, 40,  2, 34, 10, 42 },
@@ -438,12 +416,7 @@ main(int  argc,		/* I - Number of command-line arguments */
 
   fputs("INFO: Loading image file...\n", stderr);
 
-  if (primary == IMAGE_CMYK && header.cupsBitsPerColor == 1)
-    img = ImageOpen(argv[6], IMAGE_CMY, IMAGE_CMY, sat, hue, lut);
-  else
-    img = ImageOpen(argv[6], primary, secondary, sat, hue, lut);
-
-  if (img == NULL)
+  if ((img = ImageOpen(argv[6], primary, secondary, sat, hue, lut)) == NULL)
   {
     fputs("ERROR: Unable to open image file for printing!\n", stderr);
     ppdClose(ppd);
@@ -454,8 +427,16 @@ main(int  argc,		/* I - Number of command-line arguments */
   * Scale as necessary...
   */
 
-  xprint = (PageRight - PageLeft) / 72.0;
-  yprint = (PageTop - PageBottom) / 72.0;
+  if (Orientation & 1)
+  {
+    xprint = (PageTop - PageBottom) / 72.0;
+    yprint = (PageRight - PageLeft) / 72.0;
+  }
+  else
+  {
+    xprint = (PageRight - PageLeft) / 72.0;
+    yprint = (PageTop - PageBottom) / 72.0;
+  }
 
   if (zoom == 0.0 && ppi == 0)
     ppi = img->xppi;
@@ -501,10 +482,20 @@ main(int  argc,		/* I - Number of command-line arguments */
   if ((val = cupsGetOption("Page", num_options, options)) != NULL &&
       strncmp(val, "Custom.", 7) == 0)
   {
-    header.cupsWidth   = xprint * header.HWResolution[0];
-    header.cupsHeight  = yprint * header.HWResolution[1];
-    header.PageSize[0] = xprint * 72.0;
-    header.PageSize[1] = yprint * 72.0;
+    if (Orientation & 1)
+    {
+      header.cupsWidth   = yprint * header.HWResolution[0];
+      header.cupsHeight  = xprint * header.HWResolution[1];
+      header.PageSize[0] = yprint * 72.0;
+      header.PageSize[1] = xprint * 72.0;
+    }
+    else
+    {
+      header.cupsWidth   = xprint * header.HWResolution[0];
+      header.cupsHeight  = yprint * header.HWResolution[1];
+      header.PageSize[0] = xprint * 72.0;
+      header.PageSize[1] = yprint * 72.0;
+    }
   }
   else
   {
@@ -614,23 +605,26 @@ main(int  argc,		/* I - Number of command-line arguments */
       {
         fprintf(stderr, "INFO: Formatting page %d...\n", page);
 
-	if (!(Orientation & 1))
+	if (Orientation & 1)
 	{
-	  x0 = img->xsize * xpage / xpages;
-	  x1 = img->xsize * (xpage + 1) / xpages - 1;
-	  y0 = img->ysize * ypage / ypages;
-	  y1 = img->ysize * (ypage + 1) / ypages - 1;
+	  x0    = img->xsize * ypage / ypages;
+	  x1    = img->xsize * (ypage + 1) / ypages - 1;
+	  y0    = img->ysize * xpage / xpages;
+	  y1    = img->ysize * (xpage + 1) / xpages - 1;
+
+	  xtemp = header.HWResolution[0] * yprint;
+	  ytemp = header.HWResolution[1] * xprint;
 	}
 	else
 	{
-	  x0 = img->xsize * ypage / ypages;
-	  x1 = img->xsize * (ypage + 1) / ypages - 1;
-	  y0 = img->ysize * xpage / xpages;
-	  y1 = img->ysize * (xpage + 1) / xpages - 1;
-	}
+	  x0    = img->xsize * xpage / xpages;
+	  x1    = img->xsize * (xpage + 1) / xpages - 1;
+	  y0    = img->ysize * ypage / ypages;
+	  y1    = img->ysize * (ypage + 1) / ypages - 1;
 
-	xtemp = header.HWResolution[0] * xinches / xpages;
-	ytemp = header.HWResolution[1] * yinches / ypages;
+	  xtemp = header.HWResolution[0] * xprint;
+	  ytemp = header.HWResolution[1] * yprint;
+        }
 
         cupsRasterWriteHeader(ras, &header);
 
@@ -666,7 +660,7 @@ main(int  argc,		/* I - Number of command-line arguments */
 	  * Then write image data...
 	  */
 
-	  for (y = z->ysize, yerr0 = z->ysize, yerr1 = 0, iy = 0, last_iy = -2;
+	  for (y = z->ysize, yerr0 = 0, yerr1 = z->ysize, iy = 0, last_iy = -2;
                y > 0;
                y --)
 	  {
@@ -704,7 +698,6 @@ main(int  argc,		/* I - Number of command-line arguments */
             r0 = z->rows[z->row];
             r1 = z->rows[1 - z->row];
 
-#if 0
             switch (header.cupsColorSpace)
 	    {
 	      case CUPS_CSPACE_W :
@@ -748,51 +741,6 @@ main(int  argc,		/* I - Number of command-line arguments */
 		                yerr0, yerr1, r0, r1);
 		  break;
 	    }
-#else
-            switch (header.cupsColorSpace)
-	    {
-	      case CUPS_CSPACE_W :
-	          format_W(&header, row, y, plane, z->xsize, z->ysize,
-		           yerr1, yerr0, r0, r1);
-		  break;
-	      case CUPS_CSPACE_RGB :
-	          format_RGB(&header, row, y, plane, z->xsize, z->ysize,
-		             yerr1, yerr0, r0, r1);
-		  break;
-	      case CUPS_CSPACE_RGBA :
-	          format_RGBA(&header, row, y, plane, z->xsize, z->ysize,
-		              yerr1, yerr0, r0, r1);
-		  break;
-	      case CUPS_CSPACE_K :
-	          format_K(&header, row, y, plane, z->xsize, z->ysize,
-		           yerr1, yerr0, r0, r1);
-		  break;
-	      case CUPS_CSPACE_CMY :
-	          format_CMY(&header, row, y, plane, z->xsize, z->ysize,
-		             yerr1, yerr0, r0, r1);
-		  break;
-	      case CUPS_CSPACE_YMC :
-	          format_YMC(&header, row, y, plane, z->xsize, z->ysize,
-		             yerr1, yerr0, r0, r1);
-		  break;
-	      case CUPS_CSPACE_CMYK :
-	          format_CMYK(&header, row, y, plane, z->xsize, z->ysize,
-		              yerr1, yerr0, r0, r1);
-		  break;
-	      case CUPS_CSPACE_YMCK :
-	          format_YMCK(&header, row, y, plane, z->xsize, z->ysize,
-		              yerr1, yerr0, r0, r1);
-		  break;
-	      case CUPS_CSPACE_KCMY :
-	          format_KCMY(&header, row, y, plane, z->xsize, z->ysize,
-		              yerr1, yerr0, r0, r1);
-		  break;
-	      case CUPS_CSPACE_KCMYcm :
-	          format_KCMYcm(&header, row, y, plane, z->xsize, z->ysize,
-		                yerr1, yerr0, r0, r1);
-		  break;
-	    }
-#endif /* 0 */
 
            /*
 	    * Write the raster data to the driver...
@@ -811,12 +759,12 @@ main(int  argc,		/* I - Number of command-line arguments */
 	    */
 
 	    iy    += z->ystep;
-	    yerr0 -= z->ymod;
-	    yerr1 += z->ymod;
-	    if (yerr0 <= 0)
+	    yerr0 += z->ymod;
+	    yerr1 -= z->ymod;
+	    if (yerr1 <= 0)
 	    {
-              yerr0 += z->ysize;
-              yerr1 -= z->ysize;
+              yerr0 -= z->ysize;
+              yerr1 += z->ysize;
               iy    += z->yincr;
 	    }
 	  }
@@ -1377,8 +1325,7 @@ format_CMYK(cups_page_header_t *header,	/* I - Page header */
 		*mptr,		/* Pointer into magenta */
 		*yptr,		/* Pointer into yellow */
 		*kptr,		/* Pointer into black */
-		bitmask,	/* Current mask for pixel */
-		km;		/* Black mask */
+		bitmask;	/* Current mask for pixel */
   int		bitoffset;	/* Current offset in line */
   int		bandwidth;	/* Width of a color band */
   int		x,		/* Current X coordinate on page */
@@ -1414,26 +1361,19 @@ format_CMYK(cups_page_header_t *header,	/* I - Page header */
 
 	        if (*r0++ > dither[x & 15])
 		  *ptr ^= bitmask;
+		bitmask >>= 1;
 
-                if (bitmask > 2)
-		  bitmask >>= 2;
+	        if (*r0++ > dither[x & 15])
+		  *ptr ^= bitmask;
+
+                if (bitmask > 1)
+		  bitmask >>= 1;
 		else
         	{
         	  bitmask = 128;
-		  
-        	  if ((*ptr & 0xe0) == 0xe0)
-        	    *ptr ^= 0xf0;
-        	  if ((*ptr & 0x0e) == 0x0e)
-        	    *ptr ^= 0x0f;
-
         	  ptr ++;
         	}
               }
-
-              if ((*ptr & 0xe0) == 0xe0)
-        	*ptr ^= 0xf0;
-              if ((*ptr & 0x0e) == 0x0e)
-        	*ptr ^= 0x0f;
               break;
 
           case 2 :
@@ -1520,25 +1460,20 @@ format_CMYK(cups_page_header_t *header,	/* I - Page header */
         	  *mptr ^= bitmask;
         	if (*r0++ > dither[x & 15])
         	  *yptr ^= bitmask;
+        	if (*r0++ > dither[x & 15])
+        	  *kptr ^= bitmask;
 
                 if (bitmask > 1)
 		  bitmask >>= 1;
 		else
 		{
 		  bitmask = 0x80;
-		  *kptr   = *cptr & *mptr & *yptr;
-		  km      = ~*kptr++;
-		  *cptr++ &= km;
-		  *mptr++ &= km;
-		  *yptr++ &= km;
+		  cptr ++;
+		  mptr ++;
+		  yptr ++;
+		  kptr ++;
         	}
 	      }
-
-	      *kptr   = *cptr & *mptr & *yptr;
-	      km      = ~*kptr++;
-	      *cptr++ &= km;
-	      *mptr++ &= km;
-	      *yptr++ &= km;
               break;
 
           case 2 :
@@ -1654,87 +1589,27 @@ format_CMYK(cups_page_header_t *header,	/* I - Page header */
           case 1 :
               bitmask = 0x80 >> (bitoffset & 7);
 	      dither  = Floyd16x16[y & 15];
+              r0      += z;
 
-              switch (z)
-	      {
-	        case 0 :
-        	    for (x = xsize; x > 0; x --, r0 += 3)
-        	    {
-        	      if (r0[0] > dither[x & 15] &&
-			  (r0[1] < dither[x & 15] ||
-			   r0[2] < dither[x & 15]))
-        		*ptr ^= bitmask;
+              for (x = xsize; x > 0; x --, r0 += 4)
+              {
+        	if (*r0 > dither[x & 15])
+        	  *ptr ^= bitmask;
 
-                      if (bitmask > 1)
-			bitmask >>= 1;
-		      else
-		      {
-			bitmask = 0x80;
-			ptr ++;
-        	      }
-	            }
-		    break;
-
-	        case 1 :
-        	    for (x = xsize; x > 0; x --, r0 += 3)
-        	    {
-        	      if (r0[1] > dither[x & 15] &&
-			  (r0[0] < dither[x & 15] ||
-			   r0[2] < dither[x & 15]))
-        		*ptr ^= bitmask;
-
-                      if (bitmask > 1)
-			bitmask >>= 1;
-		      else
-		      {
-			bitmask = 0x80;
-			ptr ++;
-        	      }
-	            }
-		    break;
-
-	        case 2 :
-        	    for (x = xsize; x > 0; x --, r0 += 3)
-        	    {
-        	      if (r0[2] > dither[x & 15] &&
-			  (r0[0] < dither[x & 15] ||
-			   r0[1] < dither[x & 15]))
-        		*ptr ^= bitmask;
-
-                      if (bitmask > 1)
-			bitmask >>= 1;
-		      else
-		      {
-			bitmask = 0x80;
-			ptr ++;
-        	      }
-	            }
-		    break;
-
-	        case 3 :
-        	    for (x = xsize; x > 0; x --, r0 += 3)
-        	    {
-        	      if (r0[0] > dither[x & 15] &&
-			  r0[1] > dither[x & 15] &&
-			  r0[2] > dither[x & 15])
-        		*ptr ^= bitmask;
-
-                      if (bitmask > 1)
-			bitmask >>= 1;
-		      else
-		      {
-			bitmask = 0x80;
-			ptr ++;
-        	      }
-	            }
-		    break;
+                if (bitmask > 1)
+		  bitmask >>= 1;
+		else
+		{
+		  bitmask = 0x80;
+		  ptr ++;
+        	}
 	      }
-              break;
+	      break;
 
           case 2 :
               bitmask = 0xc0 >> (bitoffset & 7);
 	      dither  = Floyd8x8[y & 7];
-              r0 += z;
+              r0      += z;
 
               for (x = xsize; x > 0; x --, r0 += 4)
               {
@@ -1924,8 +1799,7 @@ format_KCMY(cups_page_header_t *header,	/* I - Page header */
 		*mptr,		/* Pointer into magenta */
 		*yptr,		/* Pointer into yellow */
 		*kptr,		/* Pointer into black */
-		bitmask,	/* Current mask for pixel */
-		km;		/* Black mask */
+		bitmask;	/* Current mask for pixel */
   int		bitoffset;	/* Current offset in line */
   int		bandwidth;	/* Width of a color band */
   int		x,		/* Current X coordinate on page */
@@ -1946,41 +1820,34 @@ format_KCMY(cups_page_header_t *header,	/* I - Page header */
         switch (header->cupsBitsPerColor)
         {
           case 1 :
-              bitmask = 64 >> (bitoffset & 7);
+              bitmask = 128 >> (bitoffset & 7);
               dither  = Floyd16x16[y & 15];
 
-              for (x = xsize ; x > 0; x --)
+              for (x = xsize ; x > 0; x --, r0 += 4)
               {
-	        if (*r0++ > dither[x & 15])
+	        if (r0[3] > dither[x & 15])
 		  *ptr ^= bitmask;
 		bitmask >>= 1;
 
-	        if (*r0++ > dither[x & 15])
+	        if (r0[0] > dither[x & 15])
 		  *ptr ^= bitmask;
 		bitmask >>= 1;
 
-	        if (*r0++ > dither[x & 15])
+	        if (r0[1] > dither[x & 15])
+		  *ptr ^= bitmask;
+		bitmask >>= 1;
+
+	        if (r0[2] > dither[x & 15])
 		  *ptr ^= bitmask;
 
                 if (bitmask > 1)
-		  bitmask >>= 2;
+		  bitmask >>= 1;
 		else
         	{
-        	  bitmask = 64;
-		  
-        	  if ((*ptr & 0x70) == 0x70)
-        	    *ptr ^= 0xf0;
-        	  if ((*ptr & 0x07) == 0x07)
-        	    *ptr ^= 0x0f;
-
+        	  bitmask = 128;
         	  ptr ++;
         	}
               }
-
-              if ((*ptr & 0x70) == 0x70)
-        	*ptr ^= 0xf0;
-              if ((*ptr & 0x07) == 0x07)
-        	*ptr ^= 0x0f;
               break;
 
           case 2 :
@@ -2084,25 +1951,20 @@ format_KCMY(cups_page_header_t *header,	/* I - Page header */
         	  *mptr ^= bitmask;
         	if (*r0++ > dither[x & 15])
         	  *yptr ^= bitmask;
+        	if (*r0++ > dither[x & 15])
+        	  *kptr ^= bitmask;
 
                 if (bitmask > 1)
 		  bitmask >>= 1;
 		else
 		{
 		  bitmask = 0x80;
-		  *kptr   = *cptr & *mptr & *yptr;
-		  km      = ~*kptr++;
-		  *cptr++ &= km;
-		  *mptr++ &= km;
-		  *yptr++ &= km;
+		  cptr ++;
+		  mptr ++;
+		  yptr ++;
+		  kptr ++;
         	}
 	      }
-
-	      *kptr   = *cptr & *mptr & *yptr;
-	      km      = ~*kptr++;
-	      *cptr++ &= km;
-	      *mptr++ &= km;
-	      *yptr++ &= km;
               break;
 
           case 2 :
@@ -2218,82 +2080,25 @@ format_KCMY(cups_page_header_t *header,	/* I - Page header */
           case 1 :
               bitmask = 0x80 >> (bitoffset & 7);
               dither  = Floyd16x16[y & 15];
+	      if (z == 0)
+	        r0 += 3;
+	      else
+	        r0 += z - 1;
 
-              switch (z)
-	      {
-	        case 0 :
-        	    for (x = xsize; x > 0; x --, r0 += 3)
-        	    {
-        	      if (r0[0] > dither[x & 15] &&
-			  r0[1] > dither[x & 15] &&
-			  r0[2] > dither[x & 15])
-        		*ptr ^= bitmask;
+              for (x = xsize; x > 0; x --, r0 += 4)
+              {
+        	if (*r0 > dither[x & 15])
+        	  *ptr ^= bitmask;
 
-                      if (bitmask > 1)
-			bitmask >>= 1;
-		      else
-		      {
-			bitmask = 0x80;
-			ptr ++;
-        	      }
-	            }
-		    break;
-
-	        case 1 :
-        	    for (x = xsize; x > 0; x --, r0 += 3)
-        	    {
-        	      if (r0[0] > dither[x & 15] &&
-			  (r0[1] < dither[x & 15] ||
-			   r0[2] < dither[x & 15]))
-        		*ptr ^= bitmask;
-
-                      if (bitmask > 1)
-			bitmask >>= 1;
-		      else
-		      {
-			bitmask = 0x80;
-			ptr ++;
-        	      }
-	            }
-		    break;
-
-	        case 2 :
-        	    for (x = xsize; x > 0; x --, r0 += 3)
-        	    {
-        	      if (r0[1] > dither[x & 15] &&
-			  (r0[0] < dither[x & 15] ||
-			   r0[2] < dither[x & 15]))
-        		*ptr ^= bitmask;
-
-                      if (bitmask > 1)
-			bitmask >>= 1;
-		      else
-		      {
-			bitmask = 0x80;
-			ptr ++;
-        	      }
-	            }
-		    break;
-
-	        case 3 :
-        	    for (x = xsize; x > 0; x --, r0 += 3)
-        	    {
-        	      if (r0[2] > dither[x & 15] &&
-			  (r0[0] < dither[x & 15] ||
-			   r0[1] < dither[x & 15]))
-        		*ptr ^= bitmask;
-
-                      if (bitmask > 1)
-			bitmask >>= 1;
-		      else
-		      {
-			bitmask = 0x80;
-			ptr ++;
-        	      }
-	            }
-		    break;
+                if (bitmask > 1)
+		  bitmask >>= 1;
+		else
+		{
+		  bitmask = 0x80;
+		  ptr ++;
+        	}
 	      }
-              break;
+	      break;
 
           case 2 :
               bitmask = 0xc0 >> (bitoffset & 7);
@@ -2389,7 +2194,7 @@ format_KCMYcm(cups_page_header_t *header,/* I - Page header */
 	      ib_t               *r0,	/* I - Primary image data */
 	      ib_t               *r1)	/* I - Image data for interpolation */
 {
-  int		pc, pm, py;	/* Cyan, magenta, and yellow values */
+  int		pc, pm, py, pk;	/* Cyan, magenta, yellow, and black values */
   ib_t		*ptr,		/* Pointer into row */
 		*cptr,		/* Pointer into cyan */
 		*mptr,		/* Pointer into magenta */
@@ -2397,8 +2202,7 @@ format_KCMYcm(cups_page_header_t *header,/* I - Page header */
 		*kptr,		/* Pointer into black */
 		*lcptr,		/* Pointer into light cyan */
 		*lmptr,		/* Pointer into light magenta */
-		bitmask,	/* Current mask for pixel */
-		km;		/* Black mask */
+		bitmask;	/* Current mask for pixel */
   int		bitoffset;	/* Current offset in line */
   int		bandwidth;	/* Width of a color band */
   int		x,		/* Current X coordinate on page */
@@ -2429,8 +2233,9 @@ format_KCMYcm(cups_page_header_t *header,/* I - Page header */
 	        pc = *r0++ > dither[x & 15];
 		pm = *r0++ > dither[x & 15];
 		py = *r0++ > dither[x & 15];
+		pk = *r0++ > dither[x & 15];
 
-	        if (pc && pm && py)
+	        if (pk)
 		  *ptr++ ^= 32;	/* Black */
 		else if (pc && pm)
 		  *ptr++ ^= 3;	/* Blue (light cyan + light magenta) */
@@ -2493,8 +2298,9 @@ format_KCMYcm(cups_page_header_t *header,/* I - Page header */
 	        pc = *r0++ > dither[x & 15];
 		pm = *r0++ > dither[x & 15];
 		py = *r0++ > dither[x & 15];
+		pk = *r0++ > dither[x & 15];
 
-	        if (pc && pm && py)
+	        if (pk)
 		  *kptr ^= bitmask;	/* Black */
 		else if (pc && pm)
 		{
@@ -2570,11 +2376,9 @@ format_KCMYcm(cups_page_header_t *header,/* I - Page header */
               switch (z)
 	      {
 	        case 0 :
-        	    for (x = xsize; x > 0; x --, r0 += 3)
+        	    for (x = xsize; x > 0; x --, r0 += 4)
         	    {
-        	      if (r0[0] > dither[x & 15] &&
-			  r0[1] > dither[x & 15] &&
-			  r0[2] > dither[x & 15])
+        	      if (r0[3] > dither[x & 15])
         		*ptr ^= bitmask;
 
                       if (bitmask > 1)
@@ -2588,7 +2392,7 @@ format_KCMYcm(cups_page_header_t *header,/* I - Page header */
 		    break;
 
 	        case 1 :
-        	    for (x = xsize; x > 0; x --, r0 += 3)
+        	    for (x = xsize; x > 0; x --, r0 += 4)
         	    {
         	      if (r0[0] > dither[x & 15] &&
 			  r0[1] < dither[x & 15] &&
@@ -2606,7 +2410,7 @@ format_KCMYcm(cups_page_header_t *header,/* I - Page header */
 		    break;
 
 	        case 2 :
-        	    for (x = xsize; x > 0; x --, r0 += 3)
+        	    for (x = xsize; x > 0; x --, r0 += 4)
         	    {
         	      if (r0[1] > dither[x & 15] &&
 			  (r0[0] < dither[x & 15] ||
@@ -2624,7 +2428,7 @@ format_KCMYcm(cups_page_header_t *header,/* I - Page header */
 		    break;
 
 	        case 3 :
-        	    for (x = xsize; x > 0; x --, r0 += 3)
+        	    for (x = xsize; x > 0; x --, r0 += 4)
         	    {
         	      if (r0[2] > dither[x & 15] &&
 			  (r0[0] < dither[x & 15] ||
@@ -2642,7 +2446,7 @@ format_KCMYcm(cups_page_header_t *header,/* I - Page header */
 		    break;
 
 	        case 4 :
-        	    for (x = xsize; x > 0; x --, r0 += 3)
+        	    for (x = xsize; x > 0; x --, r0 += 4)
         	    {
         	      if (r0[0] > dither[x & 15] &&
 			  r0[1] < dither[x & 15] &&
@@ -2660,7 +2464,7 @@ format_KCMYcm(cups_page_header_t *header,/* I - Page header */
 		    break;
 
 	        case 5 :
-        	    for (x = xsize; x > 0; x --, r0 += 3)
+        	    for (x = xsize; x > 0; x --, r0 += 4)
         	    {
         	      if (r0[0] > dither[x & 15] &&
 			  r0[1] > dither[x & 15] &&
@@ -3610,8 +3414,7 @@ format_YMCK(cups_page_header_t *header,	/* I - Page header */
 		*mptr,		/* Pointer into magenta */
 		*yptr,		/* Pointer into yellow */
 		*kptr,		/* Pointer into black */
-		bitmask,	/* Current mask for pixel */
-		km;		/* Black mask */
+		bitmask;	/* Current mask for pixel */
   int		bitoffset;	/* Current offset in line */
   int		bandwidth;	/* Width of a color band */
   int		x,		/* Current X coordinate on page */
@@ -3635,7 +3438,7 @@ format_YMCK(cups_page_header_t *header,	/* I - Page header */
               bitmask = 128 >> (bitoffset & 7);
               dither  = Floyd16x16[y & 15];
 
-              for (x = xsize ; x > 0; x --, r0 += 3)
+              for (x = xsize ; x > 0; x --, r0 += 4)
               {
 	        if (r0[2] > dither[x & 15])
 		  *ptr ^= bitmask;
@@ -3647,26 +3450,20 @@ format_YMCK(cups_page_header_t *header,	/* I - Page header */
 
 	        if (r0[0] > dither[x & 15])
 		  *ptr ^= bitmask;
+		bitmask >>= 1;
 
-                if (bitmask > 2)
-		  bitmask >>= 2;
+	        if (r0[3] > dither[x & 15])
+		  *ptr ^= bitmask;
+
+                if (bitmask > 1)
+		  bitmask >>= 1;
 		else
         	{
         	  bitmask = 128;
-		  
-        	  if ((*ptr & 0xe0) == 0xe0)
-        	    *ptr ^= 0xf0;
-        	  if ((*ptr & 0x0e) == 0x0e)
-        	    *ptr ^= 0x0f;
 
         	  ptr ++;
         	}
               }
-
-              if ((*ptr & 0xe0) == 0xe0)
-        	*ptr ^= 0xf0;
-              if ((*ptr & 0x0e) == 0x0e)
-        	*ptr ^= 0x0f;
               break;
 
           case 2 :
@@ -3770,25 +3567,21 @@ format_YMCK(cups_page_header_t *header,	/* I - Page header */
         	  *mptr ^= bitmask;
         	if (*r0++ > dither[x & 15])
         	  *yptr ^= bitmask;
+        	if (*r0++ > dither[x & 15])
+        	  *kptr ^= bitmask;
 
                 if (bitmask > 1)
 		  bitmask >>= 1;
 		else
 		{
 		  bitmask = 0x80;
-		  *kptr   = *cptr & *mptr & *yptr;
-		  km      = ~*kptr++;
-		  *cptr++ &= km;
-		  *mptr++ &= km;
-		  *yptr++ &= km;
+
+		  cptr ++;
+		  mptr ++;
+		  yptr ++;
+		  kptr ++;
         	}
 	      }
-
-	      *kptr   = *cptr & *mptr & *yptr;
-	      km      = ~*kptr++;
-	      *cptr++ &= km;
-	      *mptr++ &= km;
-	      *yptr++ &= km;
               break;
 
           case 2 :
@@ -3905,79 +3698,23 @@ format_YMCK(cups_page_header_t *header,	/* I - Page header */
               bitmask = 0x80 >> (bitoffset & 7);
               dither  = Floyd16x16[y & 15];
 
-              switch (z)
-	      {
-	        case 3 :
-        	    for (x = xsize; x > 0; x --, r0 += 3)
-        	    {
-        	      if (r0[0] > dither[x & 15] &&
-			  r0[1] > dither[x & 15] &&
-			  r0[2] > dither[x & 15])
-        		*ptr ^= bitmask;
+              if (z < 3)
+	        r0 += 2 - z;
+	      else
+	        r0 += z;
 
-                      if (bitmask > 1)
-			bitmask >>= 1;
-		      else
-		      {
-			bitmask = 0x80;
-			ptr ++;
-        	      }
-	            }
-		    break;
+              for (x = xsize; x > 0; x --, r0 += 4)
+              {
+        	if (*r0 > dither[x & 15])
+        	  *ptr ^= bitmask;
 
-	        case 2 :
-        	    for (x = xsize; x > 0; x --, r0 += 3)
-        	    {
-        	      if (r0[0] > dither[x & 15] &&
-			  (r0[1] < dither[x & 15] ||
-			   r0[2] < dither[x & 15]))
-        		*ptr ^= bitmask;
-
-                      if (bitmask > 1)
-			bitmask >>= 1;
-		      else
-		      {
-			bitmask = 0x80;
-			ptr ++;
-        	      }
-	            }
-		    break;
-
-	        case 1 :
-        	    for (x = xsize; x > 0; x --, r0 += 3)
-        	    {
-        	      if (r0[1] > dither[x & 15] &&
-			  (r0[0] < dither[x & 15] ||
-			   r0[2] < dither[x & 15]))
-        		*ptr ^= bitmask;
-
-                      if (bitmask > 1)
-			bitmask >>= 1;
-		      else
-		      {
-			bitmask = 0x80;
-			ptr ++;
-        	      }
-	            }
-		    break;
-
-	        case 0 :
-        	    for (x = xsize; x > 0; x --, r0 += 3)
-        	    {
-        	      if (r0[2] > dither[x & 15] &&
-			  (r0[0] < dither[x & 15] ||
-			   r0[1] < dither[x & 15]))
-        		*ptr ^= bitmask;
-
-                      if (bitmask > 1)
-			bitmask >>= 1;
-		      else
-		      {
-			bitmask = 0x80;
-			ptr ++;
-        	      }
-	            }
-		    break;
+        	if (bitmask > 1)
+		  bitmask >>= 1;
+		else
+		{
+		  bitmask = 0x80;
+		  ptr ++;
+        	}
 	      }
               break;
 
@@ -4094,5 +3831,5 @@ make_lut(ib_t  *lut,		/* I - Lookup table */
 
 
 /*
- * End of "$Id: imagetoraster.c,v 1.18 1999/04/21 14:12:46 mike Exp $".
+ * End of "$Id: imagetoraster.c,v 1.19 1999/04/21 16:14:43 mike Exp $".
  */
