@@ -1,5 +1,5 @@
 /*
- * "$Id: lpstat.c,v 1.14 1999/09/22 20:48:03 mike Exp $"
+ * "$Id: lpstat.c,v 1.15 1999/11/04 13:41:23 mike Exp $"
  *
  *   "lpstat" command for the Common UNIX Printing System (CUPS).
  *
@@ -277,7 +277,7 @@ show_accepting(http_t     *http,	/* I - HTTP connection to server */
     for (attr = response->attrs; attr != NULL; attr = attr->next)
     {
      /*
-      * Skip leading attributes until we hit a job...
+      * Skip leading attributes until we hit a printer...
       */
 
       while (attr != NULL && attr->group_tag != IPP_TAG_PRINTER)
@@ -287,7 +287,7 @@ show_accepting(http_t     *http,	/* I - HTTP connection to server */
         break;
 
      /*
-      * Pull the needed attributes from this job...
+      * Pull the needed attributes from this printer...
       */
 
       printer   = NULL;
@@ -1271,5 +1271,5 @@ show_scheduler(http_t *http)	/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpstat.c,v 1.14 1999/09/22 20:48:03 mike Exp $".
+ * End of "$Id: lpstat.c,v 1.15 1999/11/04 13:41:23 mike Exp $".
  */
