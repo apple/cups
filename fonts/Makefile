@@ -28,21 +28,8 @@ include ../Makedefs
 # Font files...
 #
 
-FONTS	=	AvantGarde-Book AvantGarde-BookOblique AvantGarde-Demi \
-		AvantGarde-DemiOblique Bookman-Demi Bookman-DemiItalic \
-		Bookman-Light Bookman-LightItalic Charter-Bold \
-		Charter-BoldItalic Charter-Italic Charter-Roman Courier \
-		Courier-Bold Courier-BoldOblique Courier-Oblique \
-		Helvetica Helvetica-Bold Helvetica-BoldOblique \
-		Helvetica-Narrow Helvetica-Narrow-Bold \
-		Helvetica-Narrow-BoldOblique Helvetica-Narrow-Oblique \
-		Helvetica-Oblique NewCenturySchlbk-Bold \
-		NewCenturySchlbk-BoldItalic NewCenturySchlbk-Italic \
-		NewCenturySchlbk-Roman Palatino-Bold \
-		Palatino-BoldItalic Palatino-Italic Palatino-Roman \
-		Symbol Times-Bold Times-BoldItalic Times-Italic \
-		Times-Roman Utopia-Bold Utopia-BoldItalic Utopia-Italic \
-		Utopia-Regular ZapfChancery-MediumItalic ZapfDingbats
+FONTS	=	Courier-Bold Courier-BoldOblique Courier-Oblique \
+		Symbol
 
 
 #
