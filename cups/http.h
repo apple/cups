@@ -1,5 +1,5 @@
 /*
- * "$Id: http.h,v 1.5 1999/01/24 14:18:43 mike Exp $"
+ * "$Id: http.h,v 1.6 1999/01/27 00:54:30 mike Exp $"
  *
  *   Hyper-Text Transport Protocol definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -249,38 +249,31 @@ typedef struct
  * Prototypes...
  */
 
-extern http_t	*httpAccept(int fd);
+extern int	httpChunkf(http_t *http, const char *format, ...);
 extern void	httpClose(http_t *http);
 extern http_t	*httpConnect(char *host, int port);
+extern int	httpDelete(http_t *http, char *uri);
+extern int	httpGet(http_t *http, char *uri);
+extern char	*httpGets(char *buffer, int length, http_t *http);
+extern char	*httpGetDateString(time_t t);
+extern time_t	httpGetDateTime(char *s);
+#  define	httpGetField(http,field)	(http)->fields[field]
+extern int	httpHead(http_t *http, char *uri);
+extern void	httpInitialize(char *proxyhost, int port);
+extern char	*httpLongStatus(http_status_t status);
+extern int	httpOptions(http_t *http, char *uri);
+extern int	httpPost(http_t *http, char *uri);
+extern int	httpPrintf(http_t *http, const char *format, ...);
+extern int	httpPut(http_t *http, char *uri);
+extern int	httpRead(http_t *http, char *buffer, int length);
 extern int	httpReconnect(http_t *http);
 extern void	httpSeparate(char *uri, char *method, char *host, int *port,
 		             char *resource);
 extern void	httpSetField(http_t *http, http_field_t field, char *value);
-#  define	httpGetField(http,field)	(http)->fields[field]
-
-extern int	httpDelete(http_t *http, char *uri);
-extern int	httpGet(http_t *http, char *uri);
-extern int	httpHead(http_t *http, char *uri);
-extern int	httpOptions(http_t *http, char *uri);
-extern int	httpPost(http_t *http, char *uri);
-extern int	httpPut(http_t *http, char *uri);
-extern int	httpTrace(http_t *http, char *uri);
-
-extern int	httpRead(http_t *http, char *buffer, int length);
-extern int	httpWrite(http_t *http, char *buffer, int length);
-
-extern char	*httpGets(char *buffer, int length, http_t *http);
-extern int	httpPrintf(http_t *http, const char *format, ...);
-extern int	httpChunkf(http_t *http, const char *format, ...);
-
 extern char	*httpStatus(http_status_t status);
-extern char	*httpLongStatus(http_status_t status);
-
-extern char	*httpGetDateString(time_t t);
-extern time_t	httpGetDateTime(char *s);
-
+extern int	httpTrace(http_t *http, char *uri);
 extern int	httpUpdate(http_t *http);
-
+extern int	httpWrite(http_t *http, char *buffer, int length);
 
 /*
  * C++ magic...
@@ -292,5 +285,5 @@ extern int	httpUpdate(http_t *http);
 #endif /* !_CUPS_HTTP_H_ */
 
 /*
- * End of "$Id: http.h,v 1.5 1999/01/24 14:18:43 mike Exp $".
+ * End of "$Id: http.h,v 1.6 1999/01/27 00:54:30 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.7 1999/01/24 14:18:43 mike Exp $"
+ * "$Id: http.c,v 1.8 1999/01/27 00:54:29 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -71,6 +71,8 @@ static void		http_sighandler(int sig);
  * Local globals...
  */
 
+static char		http_proxyhost[HTTP_MAX_URI] = "";
+static int		http_proxyport = 0;
 static char		*http_fields[] =
 			{
 			  "Accept",
@@ -144,6 +146,18 @@ static char		*months[12] =
 			  "Nov",
 			  "Dec"
 			};
+
+
+/*
+ * 'httpInitialize()' - Initialize the HTTP interface library and set the
+ *                      default HTTP proxy (if any).
+ */
+
+void
+httpInitialize(char *proxyhost,	/* I - Proxy hostname */
+               int  port)	/* I - Port to connect to */
+{
+}
 
 
 /*
@@ -2121,5 +2135,5 @@ sigpipe_handler(int sig)	/* I - Signal number */
 
 
 /*
- * End of "$Id: http.c,v 1.7 1999/01/24 14:18:43 mike Exp $".
+ * End of "$Id: http.c,v 1.8 1999/01/27 00:54:29 mike Exp $".
  */
