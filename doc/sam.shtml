@@ -219,6 +219,19 @@ prior to running configure:
 <B>./configure ... ENTER</B>
 </PRE></UL>
 
+<P>To enable support for encryption, you'll also want to add the
+"--enable-ssl" option:
+
+<UL><PRE>
+./configure --enable-ssl
+</PRE></UL>
+
+<P>SSL and TLS support require the OpenSSL library, available at:
+
+<UL><PRE>
+<A HREF="http://www.openssl.org">http://www.openssl.org</A>
+</PRE></UL>
+
 <P>Once you have configured things, just type:
 
 <UL><PRE>

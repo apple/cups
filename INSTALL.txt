@@ -1,4 +1,4 @@
-INSTALL - CUPS v1.1.5 - 11/12/2000
+INSTALL - CUPS v1.1.5 - 12/20/2000
 ----------------------------------
 
 This file describes how to compile and install CUPS from source
@@ -46,7 +46,6 @@ another location:
 
     ./configure --prefix=/some/directory ENTER
 
-
 If the PNG, JPEG, TIFF, and ZLIB libraries are not installed in
 a system default location (typically "/usr/include" and
 "/usr/lib") you'll need to set the CFLAGS, CXXFLAGS, and LDFLAGS
@@ -63,6 +62,15 @@ or:
     CXXFLAGS="-I/some/directory"; export CXXFLAGS ENTER
     LDFLAGS="-L/some/directory"; export LDFLAGS ENTER
     ./configure ... ENTER
+
+To enable support for encryption, you'll also want to add the
+"--enable-ssl" option:
+
+    ./configure --enable-ssl
+
+SSL and TLS support require the OpenSSL library, available at:
+
+    http://www.openssl.org
 
 Once you have configured things, just type:
 
@@ -144,5 +152,3 @@ go unanswered for days or weeks.  In general, only general build
 or distribution problems will actually get answered - for
 end-user support see the "README.txt" for a summary of the
 resources available.
-
-

@@ -1,4 +1,4 @@
-README - CUPS v1.1.4 - 10/04/2000
+README - CUPS v1.1.5 - 12/20/2000
 ---------------------------------
 
 Looking for compile instructions?  Read the file "INSTALL.txt"
@@ -52,8 +52,8 @@ found in the file "INSTALL.txt".
 
 SOFTWARE REQUIREMENTS
 
-The following operating system software is required to install one of
-the binary distributions from Easy Software Products:
+The following operating system software is required to install
+one of the binary distributions from Easy Software Products:
 
     - Digital UNIX (aka OSF1 aka Compaq Tru64 UNIX) 4.0 or higher
     - HP-UX 10.20 or higher
