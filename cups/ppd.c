@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c,v 1.103 2003/06/07 16:34:30 mike Exp $"
+ * "$Id: ppd.c,v 1.104 2003/06/14 16:08:20 mike Exp $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -174,17 +174,8 @@ ppdClose(ppd_file_t *ppd)		/* I - PPD file record */
 
   ppd_free(ppd->patches);
   ppd_free(ppd->jcl_begin);
-  ppd_free(ppd->jcl_ps);
   ppd_free(ppd->jcl_end);
-  ppd_free(ppd->lang_encoding);
-  ppd_free(ppd->lang_version);
-  ppd_free(ppd->modelname);
-  ppd_free(ppd->ttrasterizer);
-  ppd_free(ppd->manufacturer);
-  ppd_free(ppd->nickname);
-  ppd_free(ppd->shortnickname);
-  ppd_free(ppd->protocols);
-  ppd_free(ppd->pcfilename);
+  ppd_free(ppd->jcl_ps);
 
  /*
   * Free any emulations...
@@ -691,94 +682,39 @@ ppdOpen(FILE *fp)			/* I - File to read from */
     if (strcmp(keyword, "LanguageLevel") == 0)
       ppd->language_level = atoi(string);
     else if (strcmp(keyword, "LanguageEncoding") == 0)
-    {
-      ppd_free(ppd->lang_encoding);
       ppd->lang_encoding = string;
-      string = NULL;			/* Don't free this string below */
-    }
     else if (strcmp(keyword, "LanguageVersion") == 0)
-    {
-      ppd_free(ppd->lang_version);
       ppd->lang_version = string;
-      string = NULL;			/* Don't free this string below */
-    }
     else if (strcmp(keyword, "Manufacturer") == 0)
-    {
-      ppd_free(ppd->manufacturer);
       ppd->manufacturer = string;
-      string = NULL;			/* Don't free this string below */
-    }
     else if (strcmp(keyword, "ModelName") == 0)
-    {
-      ppd_free(ppd->modelname);
       ppd->modelname = string;
-      string = NULL;			/* Don't free this string below */
-    }
     else if (strcmp(keyword, "Protocols") == 0)
-    {
-      ppd_free(ppd->protocols);
       ppd->protocols = string;
-      string = NULL;			/* Don't free this string below */
-    }
     else if (strcmp(keyword, "PCFileName") == 0)
-    {
-      ppd_free(ppd->pcfilename);
       ppd->pcfilename = string;
-      string = NULL;			/* Don't free this string below */
-    }
     else if (strcmp(keyword, "NickName") == 0)
-    {
-      ppd_free(ppd->nickname);
       ppd->nickname = string;
-      string = NULL;			/* Don't free this string below */
-    }
     else if (strcmp(keyword, "Product") == 0)
-    {
-     /*
-      * Add each Product keyword as an attribute...
-      */
-
-      ppd_add_attr(ppd, keyword, "", "", string);
-
-     /*
-      * Save the last one in the product element...
-      */
-
       ppd->product = string;
-      string = NULL;			/* Don't free this string below */
-    }
     else if (strcmp(keyword, "ShortNickName") == 0)
-    {
-      ppd_free(ppd->shortnickname);
       ppd->shortnickname = string;
-      string = NULL;			/* Don't free this string below */
-    }
     else if (strcmp(keyword, "TTRasterizer") == 0)
-    {
-      ppd_free(ppd->ttrasterizer);
       ppd->ttrasterizer = string;
-      string = NULL;			/* Don't free this string below */
-    }
     else if (strcmp(keyword, "JCLBegin") == 0)
     {
-      ppd_free(ppd->jcl_begin);
-      ppd_decode(string);		/* Decode quoted string */
-      ppd->jcl_begin = string;
-      string = NULL;			/* Don't free this string below */
+      ppd->jcl_begin = strdup(string);
+      ppd_decode(ppd->jcl_begin);	/* Decode quoted string */
     }
     else if (strcmp(keyword, "JCLEnd") == 0)
     {
-      ppd_free(ppd->jcl_end);
-      ppd_decode(string);		/* Decode quoted string */
-      ppd->jcl_end = string;
-      string = NULL;			/* Don't free this string below */
+      ppd->jcl_end = strdup(string);
+      ppd_decode(ppd->jcl_end);		/* Decode quoted string */
     }
     else if (strcmp(keyword, "JCLToPSInterpreter") == 0)
     {
-      ppd_free(ppd->jcl_ps);
-      ppd_decode(string);		/* Decode quoted string */
-      ppd->jcl_ps = string;
-      string = NULL;			/* Don't free this string below */
+      ppd->jcl_ps = strdup(string);
+      ppd_decode(ppd->jcl_ps);		/* Decode quoted string */
     }
     else if (strcmp(keyword, "AccurateScreensSupport") == 0)
       ppd->accurate_screens = strcmp(string, "True") == 0;
@@ -1189,10 +1125,7 @@ ppdOpen(FILE *fp)			/* I - File to read from */
     else if (strcmp(keyword, "JobPatchFile") == 0)
     {
       if (ppd->patches == NULL)
-      {
-        ppd->patches = string;
-	string       = NULL;
-      }
+        ppd->patches = strdup(string);
       else
       {
         temp = realloc(ppd->patches, strlen(ppd->patches) +
@@ -1386,6 +1319,9 @@ ppdOpen(FILE *fp)			/* I - File to read from */
       }
 
       option->section = PPD_ORDER_ANY;
+
+      ppd_free(string);
+      string = NULL;
     }
     else if (strcmp(keyword, "JCLOpenUI") == 0)
     {
@@ -1508,10 +1444,18 @@ ppdOpen(FILE *fp)			/* I - File to read from */
 
       option->section = PPD_ORDER_JCL;
       group = NULL;
+
+      ppd_free(string);
+      string = NULL;
     }
     else if (strcmp(keyword, "CloseUI") == 0 ||
              strcmp(keyword, "JCLCloseUI") == 0)
+    {
       option = NULL;
+
+      ppd_free(string);
+      string = NULL;
+    }
     else if (strcmp(keyword, "OpenGroup") == 0)
     {
      /*
@@ -1577,9 +1521,17 @@ ppdOpen(FILE *fp)			/* I - File to read from */
       */
 
       group = ppd_get_group(ppd, string, sptr);
+
+      ppd_free(string);
+      string = NULL;
     }
     else if (strcmp(keyword, "CloseGroup") == 0)
+    {
       group = NULL;
+
+      ppd_free(string);
+      string = NULL;
+    }
     else if (strcmp(keyword, "OrderDependency") == 0 ||
              strcmp(keyword, "NonUIOrderDependency") == 0)
     {
@@ -1645,6 +1597,9 @@ ppdOpen(FILE *fp)			/* I - File to read from */
         option->section = section;
 	option->order   = order;
       }
+
+      ppd_free(string);
+      string = NULL;
     }
     else if (strncmp(keyword, "Default", 7) == 0)
     {
@@ -1701,14 +1656,6 @@ ppdOpen(FILE *fp)			/* I - File to read from */
         if ((toption = ppdFindOption(ppd, keyword + 7)) != NULL)
 	  strlcpy(toption->defchoice, string, sizeof(toption->defchoice));
       }
-
-     /*
-      * Add default as attribute, too...
-      */
-
-      ppd_add_attr(ppd, keyword, "", "", string);
-
-      string = NULL;		/* Don't free this string below */
     }
     else if (strcmp(keyword, "UIConstraints") == 0 ||
              strcmp(keyword, "NonUIConstraints") == 0)
@@ -1803,6 +1750,9 @@ ppdOpen(FILE *fp)			/* I - File to read from */
   	      strcpy(constraint->option2, constraint->option2 + 1);
 	    break;
       }
+
+      ppd_free(string);
+      string = NULL;
     }
     else if (strcmp(keyword, "PaperDimension") == 0)
     {
@@ -1833,6 +1783,9 @@ ppdOpen(FILE *fp)			/* I - File to read from */
       }
 
       sscanf(string, "%f%f", &(size->width), &(size->length));
+
+      ppd_free(string);
+      string = NULL;
     }
     else if (strcmp(keyword, "ImageableArea") == 0)
     {
@@ -1864,6 +1817,9 @@ ppdOpen(FILE *fp)			/* I - File to read from */
 
       sscanf(string, "%f%f%f%f", &(size->left), &(size->bottom),
 	     &(size->right), &(size->top));
+
+      ppd_free(string);
+      string = NULL;
     }
     else if (option != NULL &&
              (mask & (PPD_KEYWORD | PPD_OPTION | PPD_STRING)) ==
@@ -1904,17 +1860,18 @@ ppdOpen(FILE *fp)			/* I - File to read from */
         ppd_decode(string);		/* Decode quoted string */
 
       choice->code = string;
-      string = NULL;			/* Don't free this string below */
+      string = NULL;			/* Don't add as an attribute below */
     }
-    else if (strcmp(keyword, "OpenSubGroup") != 0 &&
-             strcmp(keyword, "CloseSubGroup") != 0)
-    {
+
+   /*
+    * Add remaining lines with keywords and string values as attributes...
+    */
+
+    if (string &&
+        (mask & (PPD_KEYWORD | PPD_STRING)) == (PPD_KEYWORD | PPD_STRING))
       ppd_add_attr(ppd, keyword, name, text, string);
-
-      string = NULL;			/* Don't free this string below */
-    }
-
-    ppd_free(string);
+    else
+      ppd_free(string);
   }
 
  /*
@@ -2653,63 +2610,7 @@ ppd_read(FILE *fp,			/* I - File to read from */
 	  colon = 1;
 
 	if (ch == '\"' && colon)
-        {
 	  endquote = !endquote;
-
-          if (!endquote)
-	  {
-	   /*
-	    * End of quoted string; ignore trailing characters...
-	    */
-
-	    while ((ch = getc(fp)) != EOF)
-	      if (ch == '\r' || ch == '\n')
-	      {
-                ppd_line ++;
-		col = 0;
-
-		if (ch == '\r')
-		{
-		  ch = getc(fp);
-		  if (ch != '\n')
-	            ungetc(ch, fp);
-
-		  ch = '\n';
-		}
-
-		break;
-	      }
-	      else if (ch < ' ' && ch != '\t' && ch != 0x1a)
-	      {
-	       /*
-        	* Other control characters...
-		*/
-
-                ppd_line   = startline;
-        	ppd_status = PPD_ILLEGAL_CHARACTER;
-
-        	return (0);
-	      }
-	      else if (ch != 0x1a)
-	      {
-	        col ++;
-
-		if (col > (PPD_MAX_LINE - 1))
-		{
-		 /*
-        	  * Line is too long...
-		  */
-
-                  ppd_line   = startline;
-        	  ppd_status = PPD_LINE_TOO_LONG;
-
-        	  return (0);
-		}
-	      }
-
-            break;
-	  }
-	}
       }
     }
 
@@ -2854,7 +2755,6 @@ ppd_read(FILE *fp,			/* I - File to read from */
     if (!line[0] ||			/* Blank line */
         strcmp(line, "*") == 0 ||	/* (Bad) comment line */
         strncmp(line, "*%", 2) == 0 ||	/* Comment line */
-        strncmp(line, "*?", 2) == 0 ||	/* Query line */
         strcmp(line, "*End") == 0)	/* End of multi-line string */
     {
       startline = ppd_line + 1;
@@ -2980,15 +2880,24 @@ ppd_read(FILE *fp,			/* I - File to read from */
       while (strptr >= lineptr && isspace(*strptr))
         *strptr-- = '\0';
 
-      *string = malloc(strlen(lineptr) + 1);
+      if (*strptr == '\"')
+      {
+       /*
+        * Quoted string by itself...
+	*/
 
-      strptr = *string;
+	*string = malloc(strlen(lineptr) + 1);
 
-      for (; *lineptr != '\0'; lineptr ++)
-	if (*lineptr != '\"')
-	  *strptr++ = *lineptr;
+	strptr = *string;
 
-      *strptr = '\0';
+	for (; *lineptr != '\0'; lineptr ++)
+	  if (*lineptr != '\"')
+	    *strptr++ = *lineptr;
+
+	*strptr = '\0';
+      }
+      else
+        *string = strdup(lineptr);
 
 /*      DEBUG_printf(("string = \"%s\", lineptr = \"%s\"\n", *string, lineptr));*/
 
@@ -3002,5 +2911,5 @@ ppd_read(FILE *fp,			/* I - File to read from */
 
 
 /*
- * End of "$Id: ppd.c,v 1.103 2003/06/07 16:34:30 mike Exp $".
+ * End of "$Id: ppd.c,v 1.104 2003/06/14 16:08:20 mike Exp $".
  */

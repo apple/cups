@@ -18,9 +18,9 @@ CHANGES IN CUPS V1.1.20rc1
 	  capability bit (STR #144)
 	- The appleLangDefault() function could leak a small
 	  amount of memory (STR #145)
-	- The ppdOpen() functions now add all Default attributes
-	  to the attribute list; previously only certain
-	  unassigned default attributes would be added (STR
+	- The ppdOpen() functions now mirror all normal
+	  attributes to the attribute list; previously only
+	  certain unassigned attributes would be added (STR
 	  #139)
 	- The ppdEmitJCL() function wrote JCL commands to stdout
 	  instead of the passed file pointer (STR #142)
