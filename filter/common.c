@@ -1,9 +1,9 @@
 /*
- * "$Id: common.c,v 1.15.2.1 2001/05/13 18:38:18 mike Exp $"
+ * "$Id: common.c,v 1.15.2.2 2002/01/02 18:04:42 mike Exp $"
  *
  *   Common filter routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2001 by Easy Software Products.
+ *   Copyright 1997-2002 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -351,5 +351,5 @@ WriteLabelProlog(const char *label)	/* I - Page label */
 
 
 /*
- * End of "$Id: common.c,v 1.15.2.1 2001/05/13 18:38:18 mike Exp $".
+ * End of "$Id: common.c,v 1.15.2.2 2002/01/02 18:04:42 mike Exp $".
  */

@@ -1,9 +1,9 @@
 /*
- * "$Id: ipp.c,v 1.127.2.3 2001/12/26 16:52:53 mike Exp $"
+ * "$Id: ipp.c,v 1.127.2.4 2002/01/02 18:05:02 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
- *   Copyright 1997-2001 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2002 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -5665,5 +5665,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.127.2.3 2001/12/26 16:52:53 mike Exp $".
+ * End of "$Id: ipp.c,v 1.127.2.4 2002/01/02 18:05:02 mike Exp $".
  */

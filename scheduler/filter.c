@@ -1,9 +1,9 @@
 /*
- * "$Id: filter.c,v 1.3 2001/01/22 15:03:59 mike Exp $"
+ * "$Id: filter.c,v 1.3.2.1 2002/01/02 18:05:01 mike Exp $"
  *
  *   File type conversion routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2001 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2002 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -297,5 +297,5 @@ lookup(mime_t      *mime,	/* I - MIME database */
 
 
 /*
- * End of "$Id: filter.c,v 1.3 2001/01/22 15:03:59 mike Exp $".
+ * End of "$Id: filter.c,v 1.3.2.1 2002/01/02 18:05:01 mike Exp $".
  */

@@ -1,10 +1,10 @@
 /*
- * "$Id: usersys.c,v 1.14 2001/01/22 15:03:31 mike Exp $"
+ * "$Id: usersys.c,v 1.14.2.1 2002/01/02 18:04:30 mike Exp $"
  *
  *   User, system, and password routines for the Common UNIX Printing
  *   System (CUPS).
  *
- *   Copyright 1997-2001 by Easy Software Products.
+ *   Copyright 1997-2002 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -443,5 +443,5 @@ cups_get_line(char *buf,	/* I - Line buffer */
 
 
 /*
- * End of "$Id: usersys.c,v 1.14 2001/01/22 15:03:31 mike Exp $".
+ * End of "$Id: usersys.c,v 1.14.2.1 2002/01/02 18:04:30 mike Exp $".
  */

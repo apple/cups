@@ -1,9 +1,9 @@
 /*
- * "$Id: http.c,v 1.82.2.5 2001/12/30 22:06:51 mike Exp $"
+ * "$Id: http.c,v 1.82.2.6 2002/01/02 18:04:24 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2001 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2002 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -2194,5 +2194,5 @@ http_upgrade(http_t *http)	/* I - HTTP data */
 
 
 /*
- * End of "$Id: http.c,v 1.82.2.5 2001/12/30 22:06:51 mike Exp $".
+ * End of "$Id: http.c,v 1.82.2.6 2002/01/02 18:04:24 mike Exp $".
  */

@@ -1,10 +1,10 @@
 /*
- * "$Id: conf.h,v 1.36.2.1 2001/12/26 16:52:51 mike Exp $"
+ * "$Id: conf.h,v 1.36.2.2 2002/01/02 18:05:00 mike Exp $"
  *
  *   Configuration file definitions for the Common UNIX Printing System (CUPS)
  *   scheduler.
  *
- *   Copyright 1997-2001 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2002 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -163,5 +163,5 @@ extern int	LogPage(job_t *job, const char *page);
 
 
 /*
- * End of "$Id: conf.h,v 1.36.2.1 2001/12/26 16:52:51 mike Exp $".
+ * End of "$Id: conf.h,v 1.36.2.2 2002/01/02 18:05:00 mike Exp $".
  */

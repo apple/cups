@@ -1,9 +1,9 @@
 .\"
-.\" "$Id: printers.conf.man,v 1.4 2001/01/23 16:26:21 mike Exp $"
+.\" "$Id: printers.conf.man,v 1.4.2.1 2002/01/02 18:04:54 mike Exp $"
 .\"
 .\"   printers.conf man page for the Common UNIX Printing System (CUPS).
 .\"
-.\"   Copyright 1997-2001 by Easy Software Products.
+.\"   Copyright 1997-2002 by Easy Software Products.
 .\"
 .\"   These coded instructions, statements, and computer programs are the
 .\"   property of Easy Software Products and are protected by Federal
@@ -67,7 +67,7 @@ CUPS Software Administrators Manual,
 CUPS Interface Design Description,
 http://localhost:631/documentation.html
 .SH COPYRIGHT
-Copyright 1993-2001 by Easy Software Products, All Rights Reserved.
+Copyright 1993-2002 by Easy Software Products, All Rights Reserved.
 .\"
-.\" End of "$Id: printers.conf.man,v 1.4 2001/01/23 16:26:21 mike Exp $".
+.\" End of "$Id: printers.conf.man,v 1.4.2.1 2002/01/02 18:04:54 mike Exp $".
 .\"

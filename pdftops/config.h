@@ -24,7 +24,7 @@
 #define supportedPDFVersionNum 1.4
 
 // copyright notice
-#define xpdfCopyright "Copyright 1996-2001 Derek B. Noonburg"
+#define xpdfCopyright "Copyright 1996-2002 Derek B. Noonburg"
 
 // default paper size (in points) for PostScript output
 #ifdef A4_PAPER

@@ -1,9 +1,9 @@
 /*
- * "$Id: lpstat.c,v 1.37.2.1 2001/05/13 18:38:41 mike Exp $"
+ * "$Id: lpstat.c,v 1.37.2.2 2002/01/02 18:05:08 mike Exp $"
  *
  *   "lpstat" command for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2001 by Easy Software Products.
+ *   Copyright 1997-2002 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -1845,5 +1845,5 @@ show_scheduler(http_t *http)	/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpstat.c,v 1.37.2.1 2001/05/13 18:38:41 mike Exp $".
+ * End of "$Id: lpstat.c,v 1.37.2.2 2002/01/02 18:05:08 mike Exp $".
  */

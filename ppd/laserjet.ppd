@@ -1,11 +1,11 @@
 *PPD-Adobe: "4.3"
 *%
-*% "$Id: laserjet.ppd,v 1.7.2.1 2001/05/13 18:38:30 mike Exp $"
+*% "$Id: laserjet.ppd,v 1.7.2.2 2002/01/02 18:04:56 mike Exp $"
 *%
 *%   Sample HP LaserJet driver PPD file for the Common UNIX Printing
 *%   System (CUPS).
 *%
-*%   Copyright 1997-2001 by Easy Software Products.
+*%   Copyright 1997-2002 by Easy Software Products.
 *%
 *%   These coded instructions, statements, and computer programs are the
 *%   property of Easy Software Products and are protected by Federal
@@ -196,5 +196,5 @@
 *Font ZapfChancery-MediumItalic: Standard "(001.007S)" Standard ROM
 *Font ZapfDingbats: Special "(001.004S)" Standard ROM
 *%
-*% End of "$Id: laserjet.ppd,v 1.7.2.1 2001/05/13 18:38:30 mike Exp $".
+*% End of "$Id: laserjet.ppd,v 1.7.2.2 2002/01/02 18:04:56 mike Exp $".
 *%

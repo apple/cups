@@ -1,9 +1,9 @@
 /*
- * "$Id: client.h,v 1.17.2.1 2001/04/02 19:51:47 mike Exp $"
+ * "$Id: client.h,v 1.17.2.2 2002/01/02 18:04:59 mike Exp $"
  *
  *   Client definitions for the Common UNIX Printing System (CUPS) scheduler.
  *
- *   Copyright 1997-2001 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2002 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -101,5 +101,5 @@ extern int	WriteClient(client_t *con);
 
 
 /*
- * End of "$Id: client.h,v 1.17.2.1 2001/04/02 19:51:47 mike Exp $".
+ * End of "$Id: client.h,v 1.17.2.2 2002/01/02 18:04:59 mike Exp $".
  */

@@ -1,10 +1,10 @@
 /*
- * "$Id: accept.c,v 1.11.2.2 2001/12/26 16:52:56 mike Exp $"
+ * "$Id: accept.c,v 1.11.2.3 2002/01/02 18:05:06 mike Exp $"
  *
  *   "accept", "disable", "enable", and "reject" commands for the Common
  *   UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2001 by Easy Software Products.
+ *   Copyright 1997-2002 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -311,5 +311,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: accept.c,v 1.11.2.2 2001/12/26 16:52:56 mike Exp $".
+ * End of "$Id: accept.c,v 1.11.2.3 2002/01/02 18:05:06 mike Exp $".
  */

@@ -1,9 +1,9 @@
 /*
- * "$Id: lppasswd.c,v 1.11 2001/02/14 16:06:43 mike Exp $"
+ * "$Id: lppasswd.c,v 1.11.2.1 2002/01/02 18:05:08 mike Exp $"
  *
  *   MD5 password program for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2001 by Easy Software Products.
+ *   Copyright 1997-2002 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -417,5 +417,5 @@ xstrdup(const char *in)		/* I - String to duplicate */
 
 
 /*
- * End of "$Id: lppasswd.c,v 1.11 2001/02/14 16:06:43 mike Exp $".
+ * End of "$Id: lppasswd.c,v 1.11.2.1 2002/01/02 18:05:08 mike Exp $".
  */

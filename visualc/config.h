@@ -1,11 +1,11 @@
 /*
- * "$Id: config.h,v 1.5.2.2 2001/12/31 13:04:17 mike Exp $"
+ * "$Id: config.h,v 1.5.2.3 2002/01/02 18:05:10 mike Exp $"
  *
  *   Configuration file for the Common UNIX Printing System (CUPS).
  *
  *   @configure_input@
  *
- *   Copyright 1997-2001 by Easy Software Products.
+ *   Copyright 1997-2002 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -137,5 +137,5 @@
 
 
 /*
- * End of "$Id: config.h,v 1.5.2.2 2001/12/31 13:04:17 mike Exp $".
+ * End of "$Id: config.h,v 1.5.2.3 2002/01/02 18:05:10 mike Exp $".
  */

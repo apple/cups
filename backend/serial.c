@@ -1,9 +1,9 @@
 /*
- * "$Id: serial.c,v 1.32.2.2 2001/12/29 21:30:43 mike Exp $"
+ * "$Id: serial.c,v 1.32.2.3 2002/01/02 18:04:18 mike Exp $"
  *
  *   Serial port backend for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2001 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2002 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -862,5 +862,5 @@ list_devices(void)
 
 
 /*
- * End of "$Id: serial.c,v 1.32.2.2 2001/12/29 21:30:43 mike Exp $".
+ * End of "$Id: serial.c,v 1.32.2.3 2002/01/02 18:04:18 mike Exp $".
  */

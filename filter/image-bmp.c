@@ -1,9 +1,9 @@
 /*
- * "$Id: image-bmp.c,v 1.3.2.1 2001/05/13 18:38:18 mike Exp $"
+ * "$Id: image-bmp.c,v 1.3.2.2 2002/01/02 18:04:44 mike Exp $"
  *
  *   BMP image routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1993-2001 by Easy Software Products.
+ *   Copyright 1993-2002 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -506,5 +506,5 @@ read_long(FILE *fp)               /* I - File to read from */
 
 
 /*
- * End of "$Id: image-bmp.c,v 1.3.2.1 2001/05/13 18:38:18 mike Exp $".
+ * End of "$Id: image-bmp.c,v 1.3.2.2 2002/01/02 18:04:44 mike Exp $".
  */

@@ -1,9 +1,9 @@
 #
-# "$Id: Makefile,v 1.31.2.3 2001/12/29 19:04:05 mike Exp $"
+# "$Id: Makefile,v 1.31.2.4 2002/01/02 18:04:16 mike Exp $"
 #
 #   Top-level Makefile for the Common UNIX Printing System (CUPS).
 #
-#   Copyright 1997-2001 by Easy Software Products, all rights reserved.
+#   Copyright 1997-2002 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
 #   property of Easy Software Products and are protected by Federal
@@ -141,5 +141,5 @@ tardist:
 	epm $(EPMFLAGS) -f tardist cups
 
 #
-# End of "$Id: Makefile,v 1.31.2.3 2001/12/29 19:04:05 mike Exp $".
+# End of "$Id: Makefile,v 1.31.2.4 2002/01/02 18:04:16 mike Exp $".
 #

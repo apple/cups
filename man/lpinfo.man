@@ -1,9 +1,9 @@
 .\"
-.\" "$Id: lpinfo.man,v 1.5 2001/01/23 17:36:21 mike Exp $"
+.\" "$Id: lpinfo.man,v 1.5.2.1 2002/01/02 18:04:53 mike Exp $"
 .\"
 .\"   lpinfo man page for the Common UNIX Printing System (CUPS).
 .\"
-.\"   Copyright 1997-2001 by Easy Software Products.
+.\"   Copyright 1997-2002 by Easy Software Products.
 .\"
 .\"   These coded instructions, statements, and computer programs are the
 .\"   property of Easy Software Products and are protected by Federal
@@ -54,7 +54,7 @@ lpadmin(8),
 CUPS Software Administrators Manual,
 http://localhost:631/documentation.html
 .SH COPYRIGHT
-Copyright 1993-2001 by Easy Software Products, All Rights Reserved.
+Copyright 1993-2002 by Easy Software Products, All Rights Reserved.
 .\"
-.\" End of "$Id: lpinfo.man,v 1.5 2001/01/23 17:36:21 mike Exp $".
+.\" End of "$Id: lpinfo.man,v 1.5.2.1 2002/01/02 18:04:53 mike Exp $".
 .\"

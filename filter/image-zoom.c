@@ -1,9 +1,9 @@
 /*
- * "$Id: image-zoom.c,v 1.7 2001/01/22 15:03:39 mike Exp $"
+ * "$Id: image-zoom.c,v 1.7.2.1 2002/01/02 18:04:46 mike Exp $"
  *
  *   Image zoom routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1993-2001 by Easy Software Products.
+ *   Copyright 1993-2002 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -306,5 +306,5 @@ ImageZoomFree(izoom_t *z)	/* I - Zoom record to free */
 
 
 /*
- * End of "$Id: image-zoom.c,v 1.7 2001/01/22 15:03:39 mike Exp $".
+ * End of "$Id: image-zoom.c,v 1.7.2.1 2002/01/02 18:04:46 mike Exp $".
  */

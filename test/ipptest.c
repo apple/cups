@@ -1,9 +1,9 @@
 /*
- * "$Id: ipptest.c,v 1.8 2001/02/23 19:30:12 mike Exp $"
+ * "$Id: ipptest.c,v 1.8.2.1 2002/01/02 18:05:09 mike Exp $"
  *
  *   IPP test command for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2001 by Easy Software Products.
+ *   Copyright 1997-2002 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -797,5 +797,5 @@ print_attr(ipp_attribute_t *attr)	/* I - Attribute to print */
 
 
 /*
- * End of "$Id: ipptest.c,v 1.8 2001/02/23 19:30:12 mike Exp $".
+ * End of "$Id: ipptest.c,v 1.8.2.1 2002/01/02 18:05:09 mike Exp $".
  */
