@@ -1,5 +1,5 @@
 /*
- * "$Id: lpq.c,v 1.17.2.15 2004/06/29 13:15:08 mike Exp $"
+ * "$Id: lpq.c,v 1.17.2.16 2004/09/08 19:02:07 mike Exp $"
  *
  *   "lpq" command for the Common UNIX Printing System (CUPS).
  *
@@ -66,7 +66,8 @@ main(int  argc,		/* I - Number of command-line arguments */
   int		i;		/* Looping var */
   http_t	*http;		/* Connection to server */
   const char	*dest,		/* Desired printer */
-		*user;		/* Desired user */
+		*user,		/* Desired user */
+		*val;		/* Environment variable name */
   char		*instance;	/* Printer instance */
   int		id,		/* Desired job ID */
 		all,		/* All printers */
@@ -184,7 +185,26 @@ main(int  argc,		/* I - Number of command-line arguments */
 
     if (dest == NULL)
     {
-      fputs("lpq: error - no default destination available.\n", stderr);
+      val = NULL;
+
+      if ((dest = getenv("LPDEST")) == NULL)
+      {
+	if ((dest = getenv("PRINTER")) != NULL)
+	{
+          if (!strcmp(dest, "lp"))
+            dest = NULL;
+	  else
+	    val = "PRINTER";
+	}
+      }
+      else
+	val = "LPDEST";
+
+      if (dest && !cupsGetDest(dest, NULL, num_dests, dests))
+	fprintf(stderr, "lp: error - %s environment variable names non-existent destination \"%s\"!\n",
+        	val, dest);
+      else
+	fputs("lpq: error - no default destination available.\n", stderr);
       httpClose(http);
       cupsFreeDests(num_dests, dests);
       return (1);
@@ -591,5 +611,5 @@ usage(void)
 
 
 /*
- * End of "$Id: lpq.c,v 1.17.2.15 2004/06/29 13:15:08 mike Exp $".
+ * End of "$Id: lpq.c,v 1.17.2.16 2004/09/08 19:02:07 mike Exp $".
  */

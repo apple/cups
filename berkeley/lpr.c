@@ -1,5 +1,5 @@
 /*
- * "$Id: lpr.c,v 1.20.2.13 2004/07/17 02:44:49 mike Exp $"
+ * "$Id: lpr.c,v 1.20.2.14 2004/09/08 19:02:07 mike Exp $"
  *
  *   "lpr" command for the Common UNIX Printing System (CUPS).
  *
@@ -72,7 +72,8 @@ main(int  argc,		/* I - Number of command-line arguments */
   char		ch;		/* Option character */
   char		*printer,	/* Destination printer or class */
 		*instance;	/* Instance */
-  const char	*title;		/* Job title */
+  const char	*title,		/* Job title */
+		*val;		/* Environment variable name */
   int		num_copies;	/* Number of copies per file */
   int		num_files;	/* Number of files to print */
   const char	*files[1000];	/* Files to print */
@@ -321,7 +322,25 @@ main(int  argc,		/* I - Number of command-line arguments */
 
   if (printer == NULL)
   {
-    if (cupsLastError() == IPP_NOT_FOUND)
+    val = NULL;
+
+    if ((printer = getenv("LPDEST")) == NULL)
+    {
+      if ((printer = getenv("PRINTER")) != NULL)
+      {
+        if (!strcmp(printer, "lp"))
+          printer = NULL;
+	else
+	  val = "PRINTER";
+      }
+    }
+    else
+      val = "LPDEST";
+
+    if (printer && !cupsGetDest(printer, NULL, num_dests, dests))
+      fprintf(stderr, "lpr: error - %s environment variable names non-existent destination \"%s\"!\n",
+              val, printer);
+    else if (cupsLastError() == IPP_NOT_FOUND)
       fputs("lpr: error - no default destination available.\n", stderr);
     else
       fputs("lpr: error - scheduler not responding!\n", stderr);
@@ -432,5 +451,5 @@ sighandler(int s)	/* I - Signal number */
 
 
 /*
- * End of "$Id: lpr.c,v 1.20.2.13 2004/07/17 02:44:49 mike Exp $".
+ * End of "$Id: lpr.c,v 1.20.2.14 2004/09/08 19:02:07 mike Exp $".
  */

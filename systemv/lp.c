@@ -1,5 +1,5 @@
 /*
- * "$Id: lp.c,v 1.29.2.19 2004/07/17 02:44:49 mike Exp $"
+ * "$Id: lp.c,v 1.29.2.20 2004/09/08 19:02:07 mike Exp $"
  *
  *   "lp" command for the Common UNIX Printing System (CUPS).
  *
@@ -520,7 +520,25 @@ main(int  argc,		/* I - Number of command-line arguments */
 
   if (printer == NULL)
   {
-    if (cupsLastError() == IPP_NOT_FOUND)
+    val = NULL;
+
+    if ((printer = getenv("LPDEST")) == NULL)
+    {
+      if ((printer = getenv("PRINTER")) != NULL)
+      {
+        if (!strcmp(printer, "lp"))
+          printer = NULL;
+	else
+	  val = "PRINTER";
+      }
+    }
+    else
+      val = "LPDEST";
+
+    if (printer && !cupsGetDest(printer, NULL, num_dests, dests))
+      fprintf(stderr, "lp: error - %s environment variable names non-existent destination \"%s\"!\n",
+              val, printer);
+    else if (cupsLastError() == IPP_NOT_FOUND)
       fputs("lp: error - no default destination available.\n", stderr);
     else
       fputs("lp: error - scheduler not responding!\n", stderr);
@@ -748,5 +766,5 @@ sighandler(int s)	/* I - Signal number */
 
 
 /*
- * End of "$Id: lp.c,v 1.29.2.19 2004/07/17 02:44:49 mike Exp $".
+ * End of "$Id: lp.c,v 1.29.2.20 2004/09/08 19:02:07 mike Exp $".
  */

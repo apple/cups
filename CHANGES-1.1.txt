@@ -3,6 +3,10 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.21rc3
 
+	- The lp, lpq, lpr, and lpstat commands now report when
+	  an environment variable is pointing to a non-existent
+	  printer instead of just saying "no default
+	  destination" (STR #879)
 	- Queue names with 2 periods (e.g. "printer..2") were
 	  not supported (STR #866)
 

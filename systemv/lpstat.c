@@ -1,5 +1,5 @@
 /*
- * "$Id: lpstat.c,v 1.37.2.21 2004/06/29 13:15:11 mike Exp $"
+ * "$Id: lpstat.c,v 1.37.2.22 2004/09/08 19:02:07 mike Exp $"
  *
  *   "lpstat" command for the Common UNIX Printing System (CUPS).
  *
@@ -1049,7 +1049,8 @@ show_default(int         num_dests,	/* I - Number of user-defined dests */
 	     cups_dest_t *dests)	/* I - User-defined destinations */
 {
   cups_dest_t	*dest;			/* Destination */
-
+  const char	*printer,		/* Printer name */
+		*val;			/* Environment variable name */
 
   if ((dest = cupsGetDest(NULL, NULL, num_dests, dests)) != NULL)
   {
@@ -1059,7 +1060,28 @@ show_default(int         num_dests,	/* I - Number of user-defined dests */
       printf("system default destination: %s\n", dest->name);
   }
   else
-    puts("no system default destination");
+  {
+    val = NULL;
+
+    if ((printer = getenv("LPDEST")) == NULL)
+    {
+      if ((printer = getenv("PRINTER")) != NULL)
+      {
+        if (!strcmp(printer, "lp"))
+          printer = NULL;
+	else
+	  val = "PRINTER";
+      }
+    }
+    else
+      val = "LPDEST";
+
+    if (printer && !cupsGetDest(printer, NULL, num_dests, dests))
+      printf("lpstat: error - %s environment variable names non-existent destination \"%s\"!\n",
+             val, printer);
+    else
+      puts("no system default destination");
+  }
 }
 
 
@@ -2085,5 +2107,5 @@ show_scheduler(http_t *http)	/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpstat.c,v 1.37.2.21 2004/06/29 13:15:11 mike Exp $".
+ * End of "$Id: lpstat.c,v 1.37.2.22 2004/09/08 19:02:07 mike Exp $".
  */
