@@ -1,5 +1,5 @@
 /*
- * "$Id: log.c,v 1.2 1999/09/29 15:38:07 mike Exp $"
+ * "$Id: log.c,v 1.3 1999/10/12 13:59:07 mike Exp $"
  *
  *   Log file routines for the Common UNIX Printing System (CUPS).
  *
@@ -23,9 +23,10 @@
  *
  * Contents:
  *
- *   LogMessage() - Log a message to the error log file.
- *   LogPage()    - Log a page to the page log file.
- *   LogRequest() - Log an HTTP request in Common Log Format.
+ *   LogMessage()   - Log a message to the error log file.
+ *   LogPage()      - Log a page to the page log file.
+ *   LogRequest()   - Log an HTTP request in Common Log Format.
+ *   get_datetime() - Returns a pointer to a date/time string.
  */
 
 /*
@@ -356,16 +357,16 @@ get_datetime(time_t t)		/* I - Time value */
   sprintf(s, "[%02d/%s/%04d:%02d:%02d:%02d %+02d%02d]",
 	  date->tm_mday, months[date->tm_mon], 1900 + date->tm_year,
 	  date->tm_hour, date->tm_min, date->tm_sec,
-#ifdef BSD
+#if defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__)
           date->tm_gmtoff / 3600, (date->tm_gmtoff / 60) % 60);
 #else
           timezone / 3600, (timezone / 60) % 60);
-#endif
+#endif /* __*BSD__ */
  
   return (s);
 }
 
 
 /*
- * End of "$Id: log.c,v 1.2 1999/09/29 15:38:07 mike Exp $".
+ * End of "$Id: log.c,v 1.3 1999/10/12 13:59:07 mike Exp $".
  */
