@@ -2472,7 +2472,7 @@ void Gfx::doForm(Object *str) {
 void Gfx::doAnnot(Object *str, double xMin, double yMin,
 		  double xMax, double yMax) {
   Dict *dict, *resDict;
-  Object matrixObj, bboxObj, resObj;
+  Object matrixObj, bboxObj, resObj, subTypeObj;
   Object obj1;
   double m[6], bbox[6], ictm[6];
   double *ctm;
@@ -2483,6 +2483,29 @@ void Gfx::doAnnot(Object *str, double xMin, double yMin,
 
   // get stream dict
   dict = str->streamGetDict();
+
+  // check if the SubType is set to Widget, and ignore if so - we don't
+  // need no stinkin' buttons in the PS output!
+  dict->lookup("SubType", &subTypeObj);
+
+  if (!subTypeObj.isName()) {
+    if (subTypeObj.isNull()) {
+      error(getPos(), "Missing (required) SubType in Annot object");
+    } else {
+      error(getPos(), "Bad Annot object SubType of type %s", subTypeObj.getTypeName());
+    }
+
+    subTypeObj.free();
+    return;
+  }
+
+  if (subTypeObj.isName("Widget")) {
+    // Don't draw form widgets...
+    subTypeObj.free();
+    return;
+  }
+
+  subTypeObj.free();
 
   // get the form bounding box
   dict->lookup("BBox", &bboxObj);
