@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c,v 1.8 1999/03/24 16:09:48 mike Exp $"
+ * "$Id: util.c,v 1.9 1999/04/19 21:13:26 mike Exp $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -41,6 +41,13 @@
 
 
 /*
+ * Local globals...
+ */
+
+static http_t	*cupsServer = NULL;
+
+
+/*
  * 'cupsCancelJob()' - Cancel a print job.
  */
 
@@ -49,6 +56,74 @@ cupsCancelJob(char *printer,
               int  job)
 {
   return (0);
+}
+
+
+/*
+ * 'cupsDoRequest()' - Do an IPP request...
+ */
+
+ipp_t *				/* O - Response data */
+cupsDoRequest(http_t *http,	/* I - HTTP connection to server */
+              ipp_t  *request,	/* I - IPP request */
+              char   *resource)	/* I - HTTP resource for POST */
+{
+  ipp_t		*response;	/* IPP response data */
+  char		length[255];	/* Content-Length field */
+
+
+  DEBUG_printf(("cupsDoRequest(%08x, %08s, \'%s\')\n", http, request, resource));
+
+ /*
+  * Setup the HTTP variables needed...
+  */
+
+  sprintf(length, "%d", ippLength(request));
+  httpClearFields(http);
+  httpSetField(http, HTTP_FIELD_CONTENT_LENGTH, length);
+  httpSetField(http, HTTP_FIELD_CONTENT_TYPE, "application/ipp");
+
+ /*
+  * Try the request (twice, if needed)...
+  */
+
+  if (httpPost(http, resource))
+    if (httpPost(http, resource))
+    {
+      ippDelete(request);
+      return (NULL);
+    }
+
+ /*
+  * Send the IPP data and wait for the response...
+  */
+
+  if (ippWrite(http, request) != IPP_DATA)
+    response = NULL;
+  else if (httpUpdate(http) != HTTP_OK)
+    response = NULL;
+  else
+  {
+   /*
+    * Read the response...
+    */
+
+    response = ippNew();
+
+    if (ippRead(http, response) == IPP_ERROR)
+    {
+      ippDelete(response);
+      response = NULL;
+    }
+  }
+
+ /*
+  * Delete the original request and return the response...
+  */
+  
+  ippDelete(request);
+
+  return (response);
 }
 
 
@@ -67,10 +142,72 @@ cupsGetClasses(char ***classes)
  * 'cupsGetDefault()' - Get the default printer or class.
  */
 
-char *
+char *				/* O - Default printer or NULL */
 cupsGetDefault(void)
 {
-  return ("LJ4000");
+  ipp_t		*request,	/* IPP Request */
+		*response;	/* IPP Response */
+  ipp_attribute_t *attr;	/* Current attribute */
+  cups_lang_t	*language;	/* Default language */
+  static char	def_printer[64];/* Default printer */
+
+
+ /*
+  * First see if the LPDEST or PRINTER environment variables are
+  * set...
+  */
+
+  if (getenv("LPDEST") != NULL)
+    return (getenv("LPDEST"));
+  else if (getenv("PRINTER") != NULL)
+    return (getenv("PRINTER"));
+
+ /*
+  * Try to connect to the server...
+  */
+
+  if (cupsServer == NULL)
+    if ((cupsServer = httpConnect("localhost", ippPort())) == NULL)
+      return (NULL);
+
+ /*
+  * Build a CUPS_GET_DEFAULT request, which requires the following
+  * attributes:
+  *
+  *    attributes-charset
+  *    attributes-natural-language
+  */
+
+  request = ippNew();
+
+  request->request.op.operation_id = CUPS_GET_DEFAULT;
+  request->request.op.request_id   = 1;
+
+  language = cupsLangDefault();
+
+  attr = ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
+                      "attributes-charset", NULL, cupsLangEncoding(language));
+
+  attr = ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
+                      "attributes-natural-language", NULL, language->language);
+
+ /*
+  * Do the request and get back a response...
+  */
+
+  if ((response = cupsDoRequest(cupsServer, request, "/printers/")) != NULL)
+  {
+    if ((attr = ippFindAttribute(response, "printer-name", IPP_TAG_NAME)) != NULL)
+    {
+      strcpy(def_printer, attr->values[0].string.text);
+      ippDelete(response);
+      return (def_printer);
+    }
+
+    ippDelete(response);
+  }
+
+  return (NULL);
 }
 
 
@@ -110,7 +247,6 @@ cupsPrintFile(char          *printer,	/* I - Printer or class name */
   char			*name,			/* Name of option */
 			*val,			/* Pointer to option value */
 			*s;			/* Pointer into option value */
-  http_t		*http;			/* HTTP connection */
   ipp_t			*request;		/* IPP request */
   ipp_t			*response;		/* IPP response */
   char			uri[HTTP_MAX_URI];	/* Printer URI */
@@ -119,7 +255,6 @@ cupsPrintFile(char          *printer,	/* I - Printer or class name */
   struct stat		filestats;		/* File information */
   FILE			*fp;			/* File pointer */
   char			buffer[8192];		/* Copy buffer */
-  http_status_t		status;			/* HTTP status of request */
   int			jobid;			/* New job ID */
   
 
@@ -152,22 +287,15 @@ cupsPrintFile(char          *printer,	/* I - Printer or class name */
     return (0);
   }
 
-  if ((response = ippNew()) == NULL)
-  {
-    fclose(fp);
-    ippDelete(request);
-    return (0);
-  }
-
-  if ((http = httpConnect("localhost", ippPort())) == NULL)
-  {
-    DEBUG_printf(("cupsPrintFile: Unable to open connection - %s.\n",
-                  strerror(errno)));
-    fclose(fp);
-    ippDelete(request);
-    ippDelete(response);
-    return (0);
-  }
+  if (cupsServer == NULL)
+    if ((cupsServer = httpConnect("localhost", ippPort())) == NULL)
+    {
+      DEBUG_printf(("cupsPrintFile: Unable to open connection - %s.\n",
+                    strerror(errno)));
+      fclose(fp);
+      ippDelete(request);
+      return (0);
+    }
 
  /*
   * Build a standard CUPS URI for the printer and fill the standard IPP
@@ -269,7 +397,10 @@ cupsPrintFile(char          *printer,	/* I - Printer or class name */
       DEBUG_printf(("cupsPrintJob: Adding string option \'%s\' with value \'%s\'...\n",
                     name, val));
 
-      attr = ippAddString(request, IPP_TAG_JOB, IPP_TAG_STRING, name, NULL, val);
+      if (strcmp(name, "job-name") == 0)
+        ippAddString(request, IPP_TAG_JOB, IPP_TAG_NAME, name, NULL, val);
+      else
+        ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD, name, NULL, val);
     }
     else if (val != NULL)
     {
@@ -280,7 +411,7 @@ cupsPrintFile(char          *printer,	/* I - Printer or class name */
       if (*s == '-')
       {
         n2   = strtol(s + 1, NULL, 0);
-        attr = ippAddRange(request, IPP_TAG_JOB, name, n, n2);
+        ippAddRange(request, IPP_TAG_JOB, name, n, n2);
 
 	DEBUG_printf(("cupsPrintJob: Adding range option \'%s\' with value %d-%d...\n",
                       name, n, n2));
@@ -290,20 +421,18 @@ cupsPrintFile(char          *printer,	/* I - Printer or class name */
         n2 = strtol(s + 1, &s, 0);
 
 	if (strcmp(s, "dpc") == 0)
-          attr = ippAddResolution(request, IPP_TAG_JOB, name,
-	                          IPP_RES_PER_CM, n, n2);
+          ippAddResolution(request, IPP_TAG_JOB, name, IPP_RES_PER_CM, n, n2);
         else if (strcmp(s, "dpi") == 0)
-          attr = ippAddResolution(request, IPP_TAG_JOB, name,
-	                          IPP_RES_PER_INCH, n, n2);
+          ippAddResolution(request, IPP_TAG_JOB, name, IPP_RES_PER_INCH, n, n2);
         else
-          attr = ippAddString(request, IPP_TAG_JOB, IPP_TAG_STRING, name, NULL, val);
+          ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD, name, NULL, val);
 
 	DEBUG_printf(("cupsPrintJob: Adding resolution option \'%s\' with value %s...\n",
                       name, val));
       }
       else
       {
-        attr = ippAddInteger(request, IPP_TAG_JOB, IPP_TAG_INTEGER, name, n);
+        ippAddInteger(request, IPP_TAG_JOB, IPP_TAG_INTEGER, name, n);
 
 	DEBUG_printf(("cupsPrintJob: Adding integer option \'%s\' with value %d...\n",
                       name, n));
@@ -317,7 +446,7 @@ cupsPrintFile(char          *printer,	/* I - Printer or class name */
 
       DEBUG_printf(("cupsPrintJob: Adding boolean option \'%s\' with value %d...\n",
                     name, n));
-      attr = ippAddBoolean(request, IPP_TAG_JOB, name, (char)n);
+      ippAddBoolean(request, IPP_TAG_JOB, name, (char)n);
     }
   }
 
@@ -325,11 +454,11 @@ cupsPrintFile(char          *printer,	/* I - Printer or class name */
   * Setup the necessary HTTP fields...
   */
 
-  httpClearFields(http);
-  httpSetField(http, HTTP_FIELD_CONTENT_TYPE, "application/ipp");
+  httpClearFields(cupsServer);
+  httpSetField(cupsServer, HTTP_FIELD_CONTENT_TYPE, "application/ipp");
 
   sprintf(buffer, "%u", ippLength(request) + filestats.st_size);
-  httpSetField(http, HTTP_FIELD_CONTENT_LENGTH, buffer);
+  httpSetField(cupsServer, HTTP_FIELD_CONTENT_LENGTH, buffer);
 
  /*
   * Finally, issue a POST request for the printer and send the IPP data and
@@ -338,12 +467,14 @@ cupsPrintFile(char          *printer,	/* I - Printer or class name */
 
   sprintf(uri, "/printers/%s", printer);
 
-  if (httpPost(http, uri))
+  response = ippNew();
+
+  if (httpPost(cupsServer, uri))
   {
     DEBUG_puts("httpPost() failed.");
     jobid = 0;
   }
-  else if (ippWrite(http, request) == IPP_ERROR)
+  else if (ippWrite(cupsServer, request) == IPP_ERROR)
   {
     DEBUG_puts("ippWrite() failed.");
     jobid = 0;
@@ -351,25 +482,25 @@ cupsPrintFile(char          *printer,	/* I - Printer or class name */
   else
   {
     while ((i = fread(buffer, 1, sizeof(buffer), fp)) > 0)
-      if (httpWrite(http, buffer, i) < i)
+      if (httpWrite(cupsServer, buffer, i) < i)
       {
         DEBUG_puts("httpWrite() failed.");
 
 	fclose(fp);
 	ippDelete(request);
 	ippDelete(response);
-	httpClose(http);
+	httpClose(cupsServer);
 	return (0);
       }
 
-    httpWrite(http, buffer, 0);
+    httpWrite(cupsServer, buffer, 0);
 
-    if ((status = httpUpdate(http)) == HTTP_ERROR)
+    if (httpUpdate(cupsServer) == HTTP_ERROR)
     {
       DEBUG_printf(("httpUpdate() failed (%d).\n", status));
       jobid = 0;
     }
-    else if ((ippRead(http, response)) == IPP_ERROR)
+    else if ((ippRead(cupsServer, response)) == IPP_ERROR)
     {
       DEBUG_puts("ippRead() failed.");
       jobid = 0;
@@ -392,12 +523,11 @@ cupsPrintFile(char          *printer,	/* I - Printer or class name */
   fclose(fp);
   ippDelete(request);
   ippDelete(response);
-  httpClose(http);
 
   return (jobid);
 }
 
 
 /*
- * End of "$Id: util.c,v 1.8 1999/03/24 16:09:48 mike Exp $".
+ * End of "$Id: util.c,v 1.9 1999/04/19 21:13:26 mike Exp $".
  */
