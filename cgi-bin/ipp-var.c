@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp-var.c,v 1.23.2.6 2003/01/07 18:26:19 mike Exp $"
+ * "$Id: ipp-var.c,v 1.23.2.7 2003/01/15 20:30:49 mike Exp $"
  *
  *   IPP variable routines for the Common UNIX Printing System (CUPS).
  *
@@ -103,13 +103,34 @@ ippSetCGIVars(ipp_t      *response,	/* I - Response data to be copied... */
   int			port;		/* URI data */
   int			ishttps;	/* Using encryption? */
   const char		*server;	/* Name of server */
+  char			servername[1024];/* Locale server name */
   struct tm		*date;		/* Date information */
 
 
+ /*
+  * Set common CGI template variables...
+  */
+
   ippSetServerVersion();
 
-  server  = getenv("SERVER_NAME");
+ /*
+  * Get the server name associated with the client interface as well as
+  * the locally configured hostname.  We'll check *both* of these to
+  * see if the printer URL is local...
+  */
+
+  server = getenv("SERVER_NAME");
+  gethostname(servername, sizeof(servername));
+
+ /*
+  * Flag whether we are using SSL on this connection...
+  */
+
   ishttps = getenv("HTTPS") != NULL;
+
+ /*
+  * Loop through the attributes and set them for the template...
+  */
 
   for (attr = response->attrs;
        attr && attr->group_tag == IPP_TAG_OPERATION;
@@ -239,10 +260,11 @@ ippSetCGIVars(ipp_t      *response,	/* I - Response data to be copied... */
 	            strcmp(method, "http") == 0)
         	{
         	 /*
-		  * Map localhost access to localhost and local port...
+		  * Map local access to a local URI...
 		  */
 
-        	  if (strcasecmp(hostname, server) == 0)
+        	  if (strcasecmp(hostname, server) == 0 ||
+		      strcasecmp(hostname, servername) == 0)
 		  {
 		   /*
 		    * Make URI relative to the current server...
@@ -300,5 +322,5 @@ ippSetCGIVars(ipp_t      *response,	/* I - Response data to be copied... */
 
 
 /*
- * End of "$Id: ipp-var.c,v 1.23.2.6 2003/01/07 18:26:19 mike Exp $".
+ * End of "$Id: ipp-var.c,v 1.23.2.7 2003/01/15 20:30:49 mike Exp $".
  */
