@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.127.2.17 2002/06/27 15:10:40 mike Exp $"
+ * "$Id: ipp.c,v 1.127.2.18 2002/07/18 15:40:28 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -3933,6 +3933,7 @@ print_job(client_t        *con,		/* I - Client connection */
   {
     LogMessage(L_ERROR, "print_job: Unsupported format \'%s/%s\'!",
 	       super, type);
+    LogMessage(L_INFO, "Hint: Do you have the raw file printing rules enabled?");
     send_ipp_error(con, IPP_DOCUMENT_FORMAT);
 
     if (format)
@@ -4953,6 +4954,7 @@ send_document(client_t        *con,	/* I - Client connection */
   {
     LogMessage(L_ERROR, "send_document: Unsupported format \'%s/%s\'!",
 	       super, type);
+    LogMessage(L_INFO, "Hint: Do you have the raw file printing rules enabled?");
     send_ipp_error(con, IPP_DOCUMENT_FORMAT);
 
     if (format)
@@ -5665,6 +5667,7 @@ validate_job(client_t        *con,	/* I - Client connection */
     {
       LogMessage(L_ERROR, "validate_job: Unsupported format \'%s\'!\n",
 		 format->values[0].string.text);
+      LogMessage(L_INFO, "Hint: Do you have the raw file printing rules enabled?");
       send_ipp_error(con, IPP_DOCUMENT_FORMAT);
       ippAddString(con->response, IPP_TAG_UNSUPPORTED_GROUP, IPP_TAG_MIMETYPE,
                    "document-format", NULL, format->values[0].string.text);
@@ -5793,5 +5796,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.127.2.17 2002/06/27 15:10:40 mike Exp $".
+ * End of "$Id: ipp.c,v 1.127.2.18 2002/07/18 15:40:28 mike Exp $".
  */
