@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.101 2001/07/23 19:10:20 mike Exp $"
+ * "$Id: client.c,v 1.102 2001/07/24 14:00:07 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -630,7 +630,7 @@ ReadClient(client_t *con)	/* I - Client to read from */
       * Do OPTIONS command...
       */
 
-      if ((best = FindBest(con)) != NULL &&
+      if ((best = FindBest(con->uri, con->http.state)) != NULL &&
           best->type != AUTH_NONE)
       {
 	if (!SendHeader(con, HTTP_UNAUTHORIZED, NULL))
@@ -1634,7 +1634,11 @@ SendHeader(client_t    *con,	/* I - Client to send to */
 
   if (code == HTTP_UNAUTHORIZED)
   {
-    loc = FindBest(con); /* This already succeeded in IsAuthorized */
+   /*
+    * This already succeeded in IsAuthorized...
+    */
+
+    loc = FindBest(con->uri, con->http.state);
 
     if (loc->type == AUTH_BASIC)
     {
@@ -2471,5 +2475,5 @@ pipe_command(client_t *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.101 2001/07/23 19:10:20 mike Exp $".
+ * End of "$Id: client.c,v 1.102 2001/07/24 14:00:07 mike Exp $".
  */

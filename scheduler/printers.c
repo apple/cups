@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.102 2001/07/23 21:17:49 mike Exp $"
+ * "$Id: printers.c,v 1.103 2001/07/24 14:00:07 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -814,8 +814,8 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
   char		filename[1024];		/* Name of PPD file */
   int		num_media;		/* Number of media options */
   location_t	*auth;			/* Pointer to authentication element */
-  int		auth_len;		/* Length of class or printer resource */
   const char	*auth_supported;	/* Authentication supported */
+  cups_ptype_t	printer_type;		/* Printer type data */
   ppd_file_t	*ppd;			/* PPD file data */
   ppd_option_t	*input_slot,		/* InputSlot options */
 		*media_type,		/* MediaType options */
@@ -933,43 +933,17 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
   if (!(p->type & CUPS_PRINTER_REMOTE))
   {
     if (p->type & CUPS_PRINTER_CLASS)
-    {
-      auth_len = 8;
       snprintf(resource, sizeof(resource), "/classes/%s", p->name);
-    }
     else
-    {
-      auth_len = 9;
       snprintf(resource, sizeof(resource), "/printers/%s", p->name);
+
+    if ((auth = FindBest(resource, HTTP_POST)) != NULL)
+    {
+      if (auth->type == AUTH_BASIC)
+	auth_supported = "basic";
+      else if (auth->type == AUTH_DIGEST)
+	auth_supported = "digest";
     }
-
-    for (i = NumLocations, auth = Locations; i > 0; i --, auth ++)
-      if (strcmp(auth->location, resource) == 0)
-      {
-       /*
-        * Exact match...
-	*/
-
-	if (auth->type == AUTH_BASIC)
-	  auth_supported = "basic";
-	else if (auth->type == AUTH_DIGEST)
-	  auth_supported = "digest";
-	break;
-      }
-      else if (strcmp(auth->location, "/") == 0 ||
-               (strncmp(auth->location, resource, auth_len) == 0 &&
-                (strlen(auth->location) == auth_len ||
-	         strlen(auth->location) == (auth_len + 1))))
-      {
-       /*
-        * Matches base printer or class resources...
-	*/
-
-	if (auth->type == AUTH_BASIC)
-	  auth_supported = "basic";
-	else if (auth->type == AUTH_DIGEST)
-	  auth_supported = "digest";
-      }
   }
 
  /*
@@ -1095,6 +1069,8 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
       attr->values[1].string.text = strdup(p->job_sheets[1]);
     }
   }
+
+  printer_type = p->type;
 
   if (p->type & CUPS_PRINTER_REMOTE)
   {
@@ -1340,6 +1316,8 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
           AddPrinterFilter(p, "application/vnd.cups-postscript 0 -");
 
 	ppdClose(ppd);
+
+        printer_type = p->type;
       }
       else if (access(filename, 0) == 0)
       {
@@ -1368,6 +1346,38 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
 	           ServerRoot, p->name);
 	  AddPrinterFilter(p, filename);
 	}
+	else if (strncmp(p->device_uri, "ipp://", 6) == 0 &&
+	         (strstr(p->device_uri, "/printers/") != NULL ||
+		  strstr(p->device_uri, "/classes/") != NULL))
+        {
+	 /*
+	  * Tell the client this is really a hard-wired remote printer.
+	  */
+
+          printer_type |= CUPS_PRINTER_REMOTE;
+
+         /*
+	  * Reset the printer-uri-supported attribute to point at the
+	  * remote printer...
+	  */
+
+	  attr = ippFindAttribute(p->attrs, "printer-uri-supported", IPP_TAG_URI);
+	  free(attr->values[0].string.text);
+	  attr->values[0].string.text = strdup(p->device_uri);
+
+         /*
+	  * Then set the make-and-model accordingly...
+	  */
+
+	  ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_TEXT,
+                       "printer-make-and-model", NULL, "Remote Printer");
+
+         /*
+	  * Print all files directly...
+	  */
+
+	  AddPrinterFilter(p, "*/* 0 -");
+	}
 	else
 	{
 	 /*
@@ -1393,7 +1403,8 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
   * Add the CUPS-specific printer-type attribute...
   */
 
-  ippAddInteger(p->attrs, IPP_TAG_PRINTER, IPP_TAG_ENUM, "printer-type", p->type);
+  ippAddInteger(p->attrs, IPP_TAG_PRINTER, IPP_TAG_ENUM, "printer-type",
+                printer_type);
 
   DEBUG_printf(("SetPrinterAttrs: leaving name = %s, type = %x\n", p->name,
                 p->type));
@@ -1796,5 +1807,5 @@ write_printcap(void)
 
 
 /*
- * End of "$Id: printers.c,v 1.102 2001/07/23 21:17:49 mike Exp $".
+ * End of "$Id: printers.c,v 1.103 2001/07/24 14:00:07 mike Exp $".
  */

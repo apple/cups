@@ -1,4 +1,4 @@
-CHANGES.txt - 07/23/2001
+CHANGES.txt - 07/24/2001
 ------------------------
 
 CHANGES IN CUPS V1.1.10
@@ -10,6 +10,9 @@ CHANGES IN CUPS V1.1.10
 	  browse protocols are used (currently CUPS and SLP).
 	- Added SLPv2 support (thanks to Matt Peterson for
 	  contributing the initial implementation for CUPS.)
+	- Adding a raw printer on a remote CUPS server now
+	  correctly redirects PPD file requests to the remote
+	  server.
 	- The serial backend now limits writes to 1/10th
 	  second worth of data to avoid buffer overflows
 	  with some types of flow control.

@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.82 2001/07/23 21:25:41 mike Exp $"
+ * "$Id: dirsvc.c,v 1.83 2001/07/24 14:00:07 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -1480,10 +1480,15 @@ SrvUrlCallback(SLPHandle      hslp, 	/* I - SLP handle */
 void
 UpdateSLPBrowse(void)
 {
-  slpsrvurl_t	*s,	/* Temporary list of service URLs */
-		*next;	/* Next service in list */
-  printer_t	p;	/* Printer information */
-  const char	*uri;	/* Pointer to printer URI */
+  slpsrvurl_t	*s,			/* Temporary list of service URLs */
+		*next;			/* Next service in list */
+  printer_t	p;			/* Printer information */
+  const char	*uri;			/* Pointer to printer URI */
+  char		method[HTTP_MAX_URI],	/* Method portion of URI */
+		username[HTTP_MAX_URI],	/* Username portion of URI */
+		host[HTTP_MAX_URI],	/* Host portion of URI */
+		resource[HTTP_MAX_URI];	/* Resource portion of URI */
+  int		port;			/* Port portion of URI */
 
 
   LogMessage(L_DEBUG, "UpdateSLPBrowse() Start...");
@@ -1525,6 +1530,15 @@ UpdateSLPBrowse(void)
         strncmp(uri, "ipp://", 6) == 0)
     {
      /*
+      * Pull the URI apart to see if this is a local or remote printer...
+      */
+
+      httpSeparate(uri, method, username, host, &port, resource);
+
+      if (strcasecmp(host, ServerName) == 0)
+	continue;
+
+     /*
       * OK, at least an IPP printer, see if it is a CUPS printer or
       * class...
       */
@@ -1551,5 +1565,5 @@ UpdateSLPBrowse(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.82 2001/07/23 21:25:41 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.83 2001/07/24 14:00:07 mike Exp $".
  */

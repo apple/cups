@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.c,v 1.47 2001/06/07 15:54:04 mike Exp $"
+ * "$Id: auth.c,v 1.48 2001/07/24 14:00:06 mike Exp $"
  *
  *   Authorization routines for the Common UNIX Printing System (CUPS).
  *
@@ -508,7 +508,8 @@ DenyIP(location_t *loc,		/* I - Location to add to */
  */
 
 location_t *			/* O - Location that matches */
-FindBest(client_t *con)		/* I - Connection */
+FindBest(const char   *path,	/* I - Resource path */
+         http_state_t state)	/* I - HTTP state/request */
 {
   int		i;		/* Looping var */
   char		uri[HTTP_MAX_URI],
@@ -541,12 +542,10 @@ FindBest(client_t *con)		/* I - Connection */
   * First copy the connection URI to a local string so we have drop
   * any .ppd extension from the pathname in /printers or /classes
   * URIs...
-  *
-  * Note: The uri and con->uri variables are both strings of size
-  *       HTTP_MAX_URI, so strcpy is safe...
   */
 
-  strcpy(uri, con->uri);
+  strncpy(uri, path, sizeof(uri) - 1);
+  uri[sizeof(uri) - 1] = '\0';
 
   if (strncmp(uri, "/printers/", 10) == 0 ||
       strncmp(uri, "/classes/", 9) == 0)
@@ -567,7 +566,7 @@ FindBest(client_t *con)		/* I - Connection */
   * Loop through the list of locations to find a match...
   */
 
-  limit   = limits[con->http.state];
+  limit   = limits[state];
   best    = NULL;
   bestlen = 0;
 
@@ -676,7 +675,7 @@ IsAuthorized(client_t *con)	/* I - Connection */
   * not authorized...
   */
 
-  if ((best = FindBest(con)) == NULL)
+  if ((best = FindBest(con->uri, con->http.state)) == NULL)
     return (HTTP_FORBIDDEN);
 
  /*
@@ -1280,5 +1279,5 @@ pam_func(int                      num_msg,	/* I - Number of messages */
 
 
 /*
- * End of "$Id: auth.c,v 1.47 2001/06/07 15:54:04 mike Exp $".
+ * End of "$Id: auth.c,v 1.48 2001/07/24 14:00:06 mike Exp $".
  */
