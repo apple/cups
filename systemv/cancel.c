@@ -1,7 +1,7 @@
 /*
- * "$Id: lp.c,v 1.3 1999/03/03 21:18:58 mike Exp $"
+ * "$Id: cancel.c,v 1.1 1999/03/03 21:18:58 mike Exp $"
  *
- *   "lp" command for the Common UNIX Printing System (CUPS).
+ *   "cancel" command for the Common UNIX Printing System (CUPS).
  *
  *   Copyright 1997-1999 by Easy Software Products.
  *
@@ -23,7 +23,7 @@
  *
  * Contents:
  *
- *   main() - Parse options and send files for printing.
+ *   main() - Parse options and cancel jobs.
  */
 
 /*
@@ -36,7 +36,7 @@
 
 
 /*
- * 'main()' - Parse options and send files for printing.
+ * 'main()' - Parse options and cancel jobs.
  */
 
 int
@@ -225,5 +225,5 @@ main(int  argc,		/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: lp.c,v 1.3 1999/03/03 21:18:58 mike Exp $".
+ * End of "$Id: cancel.c,v 1.1 1999/03/03 21:18:58 mike Exp $".
  */
