@@ -3,6 +3,12 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.20
 
+	- The pstops filter didn't properly handle collated,
+	  duplexed copies of documents with an odd number of
+	  pages on printers that did not do their own collated
+	  copies (STR #389)
+	- Tru64 doesn't define a prototype for hstrerror() (STR
+	  #430)
 	- Updated the pdftops filter to use the annotation flags
 	  instead of the subtype to determine whether to print
 	  an annotation (STR #425)

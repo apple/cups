@@ -1,5 +1,5 @@
 /*
- * "$Id: http-private.h,v 1.1.2.4 2003/10/09 19:13:49 mike Exp $"
+ * "$Id: http-private.h,v 1.1.2.5 2003/11/24 15:39:04 mike Exp $"
  *
  *   Private HTTP definitions for the Common UNIX Printing System (CUPS).
  *
@@ -88,9 +88,9 @@ typedef SSLConnectionRef http_tls_t;
 #  ifndef HAVE_HSTRERROR
 extern const char *cups_hstrerror(int error);
 #    define hstrerror cups_hstrerror
-#  elif defined(_AIX)
+#  elif defined(_AIX) || defined(__osf__)
 /*
- * AIX doesn't provide a prototype but does provide the function...
+ * AIX and Tru64 UNIX don't provide a prototype but do provide the function...
  */
 extern const char *hstrerror(int error);
 #  endif /* !HAVE_HSTRERROR */
@@ -98,5 +98,5 @@ extern const char *hstrerror(int error);
 #endif /* !_CUPS_HTTP_PRIVATE_H_ */
 
 /*
- * End of "$Id: http-private.h,v 1.1.2.4 2003/10/09 19:13:49 mike Exp $".
+ * End of "$Id: http-private.h,v 1.1.2.5 2003/11/24 15:39:04 mike Exp $".
  */
