@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.140 2003/01/24 20:39:44 mike Exp $"
+ * "$Id: client.c,v 1.141 2003/01/29 00:19:42 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -66,9 +66,9 @@ static int		pipe_command(client_t *con, int infile, int *outfile,
 			             char *command, char *options);
 
 #ifdef HAVE_CDSASSL
-OSStatus		CDSAReadFunc(SSLConnectionRef connection, void *data,
+static OSStatus		CDSAReadFunc(SSLConnectionRef connection, void *data,
 			             size_t *dataLength);
-OSStatus		CDSAWriteFunc(SSLConnectionRef connection,
+static OSStatus		CDSAWriteFunc(SSLConnectionRef connection,
 			              const void *data, size_t *dataLength);
 #endif /* HAVE_CDSASSL */
 
@@ -2932,5 +2932,5 @@ CDSAWriteFunc(SSLConnectionRef connection,	/* I  - SSL/TLS connection */
 
 
 /*
- * End of "$Id: client.c,v 1.140 2003/01/24 20:39:44 mike Exp $".
+ * End of "$Id: client.c,v 1.141 2003/01/29 00:19:42 mike Exp $".
  */
