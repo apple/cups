@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c,v 1.62 2002/03/25 17:51:18 mike Exp $"
+ * "$Id: ppd.c,v 1.63 2002/04/17 18:06:28 mike Exp $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -1855,7 +1855,7 @@ ppd_read(FILE *fp,		/* I - File to read from */
       optptr = option;
 
       while (*lineptr != '\0' && *lineptr != '\n' && *lineptr != ':' &&
-             *lineptr != '/' && (optptr - option) < 40)
+             *lineptr != '/' && (optptr - option) < (PPD_MAX_NAME - 1))
 	*optptr++ = *lineptr++;
 
       *optptr = '\0';
@@ -2025,5 +2025,5 @@ ppd_fix(char *string)		/* IO - String to fix */
 
 
 /*
- * End of "$Id: ppd.c,v 1.62 2002/03/25 17:51:18 mike Exp $".
+ * End of "$Id: ppd.c,v 1.63 2002/04/17 18:06:28 mike Exp $".
  */
