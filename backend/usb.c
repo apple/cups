@@ -1,5 +1,5 @@
 /*
- * "$Id: usb.c,v 1.15 2001/01/24 17:14:02 mike Exp $"
+ * "$Id: usb.c,v 1.16 2001/02/06 10:41:04 mike Exp $"
  *
  *   USB port backend for the Common UNIX Printing System (CUPS).
  *
@@ -406,7 +406,7 @@ list_devices(void)
 
   for (i = 0; i < 3; i ++)
   {
-    sprintf(device, "/dev/ulpt%d", i);
+    sprintf(device, "/dev/unlpt%d", i);
     if ((fd = open(device, O_WRONLY)) >= 0)
     {
       close(fd);
@@ -418,5 +418,5 @@ list_devices(void)
 
 
 /*
- * End of "$Id: usb.c,v 1.15 2001/01/24 17:14:02 mike Exp $".
+ * End of "$Id: usb.c,v 1.16 2001/02/06 10:41:04 mike Exp $".
  */
