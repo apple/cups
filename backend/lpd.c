@@ -1,5 +1,5 @@
 /*
- * "$Id: lpd.c,v 1.6 1999/06/18 18:36:02 mike Exp $"
+ * "$Id: lpd.c,v 1.7 1999/06/27 12:13:52 mike Exp $"
  *
  *   Line Printer Daemon backend for the Common UNIX Printing System (CUPS).
  *
@@ -345,7 +345,7 @@ lpd_queue(char *hostname,	/* I - Host to connect to */
 
     fputs("INFO: Control file sent successfully\n", stderr);
 
-    lpd_command(fd, "\003%d dfA%03.3d%s\n", filestats.st_size,
+    lpd_command(fd, "\003%u dfA%03.3d%s\n", (unsigned)filestats.st_size,
                 getpid() % 1000, localhost);
 
     fprintf(stderr, "INFO: Sending data file (%u bytes)\n",
@@ -389,5 +389,5 @@ lpd_queue(char *hostname,	/* I - Host to connect to */
 
 
 /*
- * End of "$Id: lpd.c,v 1.6 1999/06/18 18:36:02 mike Exp $".
+ * End of "$Id: lpd.c,v 1.7 1999/06/27 12:13:52 mike Exp $".
  */
