@@ -1,5 +1,5 @@
 /*
- * "$Id: lpoptions.c,v 1.6 2000/08/29 18:23:33 mike Exp $"
+ * "$Id: lpoptions.c,v 1.7 2000/09/05 20:35:44 mike Exp $"
  *
  *   Printer option program for the Common UNIX Printing System (CUPS).
  *
@@ -23,8 +23,10 @@
  *
  * Contents:
  *
- *   main()  - Main entry.
- *   usage() - Show program usage and exit.
+ *   main()         - Main entry.
+ *   list_group()   - List printer-specific options from the PPD group.
+ *   list_options() - List printer-specific options from the PPD file.
+ *   usage()        - Show program usage and exit.
  */
 
 /*
@@ -39,6 +41,8 @@
  * Local functions...
  */
 
+void	list_group(ppd_group_t *group);
+void	list_options(cups_dest_t *dest);
 void	usage(void);
 
 
@@ -51,7 +55,6 @@ main(int  argc,			/* I - Number of command-line arguments */
      char *argv[])		/* I - Command-line arguments */
 {
   int		i, j;		/* Looping vars */
-  char		server[1024];	/* Print server */
   int		changes;	/* Did we make changes? */
   int		num_options;	/* Number of options */
   cups_option_t	*options;	/* Options */
@@ -66,9 +69,6 @@ main(int  argc,			/* I - Number of command-line arguments */
  /*
   * Loop through the command-line arguments...
   */
-
-  snprintf(server, sizeof(server), "CUPS_SERVER=%s", cupsServer());
-  putenv(server);
 
   dest        = NULL;
   num_dests   = 0;
@@ -125,17 +125,37 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 	case 'h' : /* -h server */
 	    if (argv[i][2])
-	      snprintf(server, sizeof(server), "CUPS_SERVER=%s", argv[i] + 2);
+	      cupsSetServer(argv[i] + 2);
 	    else
 	    {
 	      i ++;
 	      if (i >= argc)
 	        usage();
 
-	      snprintf(server, sizeof(server), "CUPS_SERVER=%s", argv[i]);
+	      cupsSetServer(argv[i]);
+	    }
+	    break;
+
+	case 'l' : /* -l (list options) */
+            if (dest == NULL)
+	    {
+	      if (num_dests == 0)
+		num_dests = cupsGetDests(&dests);
+
+	      for (i = num_dests, dest = dests; i > 0; i --, dest ++)
+	        if (dest->is_default)
+		  break;
+
+              if (i == 0)
+	        dest = dests;
 	    }
 
-            putenv(server);
+            if (dest == NULL)
+	      fputs("lpoptions: No printers!?!\n", stderr);
+	    else
+	      list_options(dest);
+
+            changes = 1;
 	    break;
 
 	case 'o' : /* -o option[=value] */
@@ -318,6 +338,73 @@ main(int  argc,			/* I - Number of command-line arguments */
   return (0);
 }
 
+/*
+ * 'list_group()' - List printer-specific options from the PPD group.
+ */
+
+void
+list_group(ppd_group_t *group)	/* I - Group to show */
+{
+  int		i, j;		/* Looping vars */
+  ppd_option_t	*option;	/* Current option */
+  ppd_choice_t	*choice;	/* Current choice */
+  ppd_group_t	*subgroup;	/* Current subgroup */
+
+
+  for (i = group->num_options, option = group->options; i > 0; i --, option ++)
+  {
+    printf("%s/%s:", option->keyword, option->text);
+
+    for (j = option->num_choices, choice = option->choices; j > 0; j --, choice ++)
+      if (choice->marked)
+        printf(" *%s", choice->choice);
+      else
+        printf(" %s", choice->choice);
+
+    putchar('\n');
+  }
+
+  for (i = group->num_subgroups, subgroup = group->subgroups; i > 0; i --, subgroup ++)
+    list_group(subgroup);
+}
+
+
+/*
+ * 'list_options()' - List printer-specific options from the PPD file.
+ */
+
+void
+list_options(cups_dest_t *dest)	/* I - Destination to list */
+{
+  int		i;		/* Looping var */
+  const char	*filename;	/* PPD filename */
+  ppd_file_t	*ppd;		/* PPD data */
+  ppd_group_t	*group;		/* Current group */
+
+
+  if ((filename = cupsGetPPD(dest->name)) == NULL)
+  {
+    fprintf(stderr, "lpoptions: Destination %s has no PPD file!\n", dest->name);
+    return;
+  }
+
+  if ((ppd = ppdOpenFile(filename)) == NULL)
+  {
+    unlink(filename);
+    fprintf(stderr, "lpoptions: Unable to open PPD file for %s!\n", dest->name);
+    return;
+  }
+
+  ppdMarkDefaults(ppd);
+  cupsMarkOptions(ppd, dest->num_options, dest->options);
+
+  for (i = ppd->num_groups, group = ppd->groups; i > 0; i --, group ++)
+    list_group(group);
+
+  ppdClose(ppd);
+  unlink(filename);
+}
+
 
 /*
  * 'usage()' - Show program usage and exit.
@@ -327,6 +414,7 @@ void
 usage(void)
 {
   puts("Usage: lpoptions -d printer");
+  puts("       lpoptions [-p printer] -l");
   puts("       lpoptions -p printer -o option[=value] ...");
   puts("       lpoptions -x printer");
 
@@ -335,5 +423,5 @@ usage(void)
 
 
 /*
- * End of "$Id: lpoptions.c,v 1.6 2000/08/29 18:23:33 mike Exp $".
+ * End of "$Id: lpoptions.c,v 1.7 2000/09/05 20:35:44 mike Exp $".
  */
