@@ -1,5 +1,5 @@
 /*
- * "$Id: cups-lpd.c,v 1.3 2000/06/28 16:06:22 mike Exp $"
+ * "$Id: cups-lpd.c,v 1.4 2000/07/17 12:32:00 mike Exp $"
  *
  *   Line Printer Daemon interface for the Common UNIX Printing System (CUPS).
  *
@@ -417,7 +417,9 @@ recv_print_job(const char *dest)	/* I - Destination */
   const char	*tmpdir;		/* Temporary directory */
   char		user[1024],		/* User name */
 		title[1024],		/* Job title */
-		docname[1024];		/* Document name */
+		docname[1024],		/* Document name */
+		queue[256],		/* Printer/class queue */
+		*instance;		/* Printer/class instance */
   int		num_dests;		/* Number of destinations */
   cups_dest_t	*dests,			/* Destinations */
 		*destptr;		/* Current destination */
@@ -427,11 +429,17 @@ recv_print_job(const char *dest)	/* I - Destination */
 
   status   = 0;
   num_data = 0;
-  if ((tmpdir = getenv("TMP")) == NULL)
-    tmpdir = "/var/tmp";
+  if ((tmpdir = getenv("TMPDIR")) == NULL)
+    tmpdir = CUPS_REQUESTS "/tmp";
+
+  strncpy(queue, dest, sizeof(queue) - 1);
+  queue[sizeof(queue) - 1] = '\0';
+
+  if ((instance = strrchr(queue, '/')) != NULL)
+    *instance++ = '\0';
 
   num_dests = cupsGetDests(&dests);
-  if ((destptr = cupsGetDest(dest, NULL, num_dests, dests)) == NULL)
+  if ((destptr = cupsGetDest(queue, instance, num_dests, dests)) == NULL)
   {
     cupsFreeDests(num_dests, dests);
     return (1);
@@ -647,7 +655,7 @@ recv_print_job(const char *dest)	/* I - Destination */
               snprintf(filename, sizeof(filename), "%s/%06d-%d", tmpdir,
 	               getpid(), i + 1);
 
-              if (print_file(dest, filename, title, docname, user, num_options,
+              if (print_file(queue, filename, title, docname, user, num_options,
 	                     options) == 0)
                 status = 1;
 	      else
@@ -1085,5 +1093,5 @@ remove_jobs(const char *dest,		/* I - Destination */
 
 
 /*
- * End of "$Id: cups-lpd.c,v 1.3 2000/06/28 16:06:22 mike Exp $".
+ * End of "$Id: cups-lpd.c,v 1.4 2000/07/17 12:32:00 mike Exp $".
  */

@@ -1,6 +1,24 @@
 CHANGES.txt - 07/10/2000
 ------------------------
 
+CHANGES IN CUPS v1.1.1
+
+	- The pstoraster Makefile still referenced one of the old
+	  PDF filter files.
+	- The administration CGI didn't work properly with network
+	  devices.
+	- The BrowseACL variable was not updated after the cupsd.conf
+	  file was loaded.
+	- The lpd mini-daemon didn't support printer instances.
+	- Now use a default umask of 077 for child processes.
+	- Now put temp files in /var/spool/cups/tmp for child
+	  processes and the root user, unless TMPDIR or TempDir
+	  is defined otherwise.
+	- cupsGetPPD() no longer uses easy-to-guess filenames.
+	- The CUPS-Delete-Class and CUPS-Delete-Printer operations
+	  now save classes.conf file as needed.
+
+
 CHANGES IN CUPS v1.1
 
 	- Documentation updates.

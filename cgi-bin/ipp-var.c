@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp-var.c,v 1.11 2000/07/13 03:21:48 mike Exp $"
+ * "$Id: ipp-var.c,v 1.12 2000/07/17 12:31:53 mike Exp $"
  *
  *   IPP variable routines for the Common UNIX Printing System (CUPS).
  *
@@ -192,34 +192,37 @@ ippSetCGIVars(ipp_t      *response,	/* I - Response data to be copied... */
 	      break;
 
 	  case IPP_TAG_URI :
-	      httpSeparate(attr->values[i].string.text, method, username,
-		           hostname, &port, resource);
+	      if (strchr(attr->values[i].string.text, ':') != NULL)
+	      {
+		httpSeparate(attr->values[i].string.text, method, username,
+		             hostname, &port, resource);
 
-              if (strcmp(method, "ipp") == 0 ||
-	          strcmp(method, "http") == 0)
-              {
-               /*
-		* Map localhost access to localhost...
-		*/
+        	if (strcmp(method, "ipp") == 0 ||
+	            strcmp(method, "http") == 0)
+        	{
+        	 /*
+		  * Map localhost access to localhost...
+		  */
 
-        	if (strcasecmp(hostname, server) == 0 &&
-	            (strcmp(getenv("REMOTE_HOST"), "127.0.0.1") == 0 ||
-		     strcmp(getenv("REMOTE_HOST"), "localhost") == 0))
-		  strcpy(hostname, "localhost");
+        	  if (strcasecmp(hostname, server) == 0 &&
+	              (strcmp(getenv("REMOTE_HOST"), "127.0.0.1") == 0 ||
+		       strcmp(getenv("REMOTE_HOST"), "localhost") == 0))
+		    strcpy(hostname, "localhost");
 
-               /*
-		* Rewrite URI with HTTP address...
-		*/
+        	 /*
+		  * Rewrite URI with HTTP address...
+		  */
 
-		if (username[0])
-		  snprintf(uri, sizeof(uri), "http://%s@%s:%d%s", username,
-		           hostname, port, resource);
-        	else
-		  snprintf(uri, sizeof(uri), "http://%s:%d%s", hostname, port,
-		           resource);
+		  if (username[0])
+		    snprintf(uri, sizeof(uri), "http://%s@%s:%d%s", username,
+		             hostname, port, resource);
+        	  else
+		    snprintf(uri, sizeof(uri), "http://%s:%d%s", hostname, port,
+		             resource);
 
-		strcat(valptr, uri);
-        	break;
+		  strcat(valptr, uri);
+        	  break;
+        	}
               }
 
           case IPP_TAG_STRING :
@@ -250,5 +253,5 @@ ippSetCGIVars(ipp_t      *response,	/* I - Response data to be copied... */
 
 
 /*
- * End of "$Id: ipp-var.c,v 1.11 2000/07/13 03:21:48 mike Exp $".
+ * End of "$Id: ipp-var.c,v 1.12 2000/07/17 12:31:53 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c,v 1.52 2000/06/28 16:40:52 mike Exp $"
+ * "$Id: util.c,v 1.53 2000/07/17 12:31:54 mike Exp $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -656,7 +656,6 @@ cupsGetPPD(const char *name)		/* I - Printer name */
   char		printer[HTTP_MAX_URI],	/* Printer name */
 		hostname[HTTP_MAX_URI],	/* Hostname */
 		resource[HTTP_MAX_URI];	/* Resource name */
-  char		*tempdir;		/* Temporary file directory */
   const char	*password;		/* Password string */
   char		realm[HTTP_MAX_VALUE],	/* realm="xyz" string */
 		nonce[HTTP_MAX_VALUE],	/* nonce="xyz" string */
@@ -677,19 +676,10 @@ cupsGetPPD(const char *name)		/* I - Printer name */
   }
 
  /*
-  * Then check for the cache file...
+  * Get a temp file...
   */
 
-#if defined(WIN32) || defined(__EMX__)
-  tempdir = "C:/WINDOWS/TEMP";
-
-  snprintf(filename, sizeof(filename), "%s/%s.ppd", tempdir, printer);
-#else
-  if ((tempdir = getenv("TMPDIR")) == NULL)
-    tempdir = "/tmp";
-
-  snprintf(filename, sizeof(filename), "%s/%d.%s.ppd", tempdir, getuid(), printer);
-#endif /* WIN32 || __EMX__ */
+  cupsTempFile(filename, sizeof(filename));
 
  /*
   * And send a request to the HTTP server...
@@ -1272,26 +1262,27 @@ cupsTempFile(char *filename,		/* I - Pointer to buffer */
   */
 
   if ((tmpdir = getenv("TMPDIR")) == NULL)
-    tmpdir = "/var/tmp";
-
-  if ((int)(strlen(tmpdir) + 8) > len)
   {
+#ifdef WIN32
+    tmpdir = "C:/WINDOWS/TEMP";
+#else
    /*
-    * The specified directory exceeds the size of the buffer; default it...
+    * Put root temp files in restricted temp directory...
     */
 
-    strcpy(buf, "/var/tmp/XXXXXX");
-    return (mktemp(buf));
+    if (getuid())
+      tmpdir = CUPS_REQUESTS "/tmp";
+    else
+      tmpdir = "/var/tmp";
+#endif /* WIN32 */
   }
-  else
-  {
-   /*
-    * Make the temporary name using the specified directory...
-    */
 
-    sprintf(filename, "%s/XXXXXX", tmpdir);
-    return (mktemp(filename));
-  }
+ /*
+  * Make the temporary name using the specified directory...
+  */
+
+  snprintf(filename, sizeof(filename), "%s/XXXXXX", tmpdir);
+  return (mktemp(filename));
 }
 
 
@@ -1417,5 +1408,5 @@ cups_local_auth(http_t *http)	/* I - Connection */
 
 
 /*
- * End of "$Id: util.c,v 1.52 2000/06/28 16:40:52 mike Exp $".
+ * End of "$Id: util.c,v 1.53 2000/07/17 12:31:54 mike Exp $".
  */

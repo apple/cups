@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.79 2000/07/01 16:36:15 mike Exp $"
+ * "$Id: job.c,v 1.80 2000/07/17 12:32:01 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -2535,6 +2535,12 @@ start_process(const char *command,	/* I - Full path to command */
     }
 
    /*
+    * Change umask to restrict permissions on created files...
+    */
+
+    umask(077);
+
+   /*
     * Execute the command; if for some reason this doesn't work,
     * return the error code...
     */
@@ -2562,5 +2568,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.79 2000/07/01 16:36:15 mike Exp $".
+ * End of "$Id: job.c,v 1.80 2000/07/17 12:32:01 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.51 2000/06/27 21:07:10 mike Exp $"
+ * "$Id: conf.c,v 1.52 2000/07/17 12:32:00 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -212,7 +212,7 @@ ReadConfiguration(void)
   strcpy(DefaultCharset, DEFAULT_CHARSET);
   strcpy(RIPCache, "8m");
   if (getenv("TMPDIR") == NULL)
-    strcpy(TempDir, "/var/tmp");
+    strcpy(TempDir, CUPS_REQUESTS "/tmp");
   else
   {
     strncpy(TempDir, getenv("TMPDIR"), sizeof(TempDir) - 1);
@@ -303,7 +303,6 @@ ReadConfiguration(void)
   BrowsePort       = ippPort();
   BrowseInterval   = DEFAULT_INTERVAL;
   BrowseTimeout    = DEFAULT_TIMEOUT;
-  BrowseACL        = NULL;
   NumBrowsers      = 0;
   NumRelays        = 0;
   NumPolled        = 0;
@@ -326,6 +325,8 @@ ReadConfiguration(void)
   status = read_configuration(fp);
 
   fclose(fp);
+
+  BrowseACL = FindLocation("CUPS_INTERNAL_BROWSE_ACL");
 
   if (!status)
     return (0);
@@ -464,6 +465,7 @@ read_configuration(FILE *fp)		/* I - File to read from */
   dirsvc_relay_t *relay;		/* Relay data */
   dirsvc_poll_t	*poll;			/* Polling data */
   struct sockaddr_in polladdr;		/* Polling address */
+  location_t	*location;		/* Browse location */
   static unsigned netmasks[4] =		/* Standard netmasks... */
   {
     0xff000000,
@@ -597,15 +599,15 @@ read_configuration(FILE *fp)		/* I - File to read from */
       * "BrowseOrder Deny,Allow" or "BrowseOrder Allow,Deny"...
       */
 
-      if (BrowseACL == NULL)
-        BrowseACL = AddLocation("CUPS_INTERNAL_BROWSE_ACL");
+      if ((location = FindLocation("CUPS_INTERNAL_BROWSE_ACL")) == NULL)
+        location = AddLocation("CUPS_INTERNAL_BROWSE_ACL");
 
-      if (BrowseACL == NULL)
+      if (location == NULL)
         LogMessage(L_ERROR, "Unable to initialize browse access control list!");
       else if (strncasecmp(value, "deny", 4) == 0)
-        BrowseACL->order_type = AUTH_ALLOW;
+        location->order_type = AUTH_ALLOW;
       else if (strncasecmp(value, "allow", 5) == 0)
-        BrowseACL->order_type = AUTH_DENY;
+        location->order_type = AUTH_DENY;
       else
         LogMessage(L_ERROR, "Unknown BrowseOrder value %s on line %d.",
 	           value, linenum);
@@ -618,10 +620,10 @@ read_configuration(FILE *fp)		/* I - File to read from */
       * BrowseDeny [From] host/ip...
       */
 
-      if (BrowseACL == NULL)
-        BrowseACL = AddLocation("CUPS_INTERNAL_BROWSE_ACL");
+      if ((location = FindLocation("CUPS_INTERNAL_BROWSE_ACL")) == NULL)
+        location = AddLocation("CUPS_INTERNAL_BROWSE_ACL");
 
-      if (BrowseACL == NULL)
+      if (location == NULL)
         LogMessage(L_ERROR, "Unable to initialize browse access control list!");
       else
       {
@@ -660,9 +662,9 @@ read_configuration(FILE *fp)		/* I - File to read from */
 	  */
 
           if (strcmp(name, "BrowseAllow") == 0)
-	    AllowIP(BrowseACL, 0, 0);
+	    AllowIP(location, 0, 0);
 	  else
-	    DenyIP(BrowseACL, 0, 0);
+	    DenyIP(location, 0, 0);
 	}
 	else if (strcasecmp(value, "none") == 0)
 	{
@@ -671,9 +673,9 @@ read_configuration(FILE *fp)		/* I - File to read from */
 	  */
 
           if (strcmp(name, "BrowseAllow") == 0)
-	    AllowIP(BrowseACL, ~0, 0);
+	    AllowIP(location, ~0, 0);
 	  else
-	    DenyIP(BrowseACL, ~0, 0);
+	    DenyIP(location, ~0, 0);
 	}
 	else if (value[0] == '*' || value[0] == '.' || !isdigit(value[0]))
 	{
@@ -685,9 +687,9 @@ read_configuration(FILE *fp)		/* I - File to read from */
 	    value ++;
 
           if (strcmp(name, "BrowseAllow") == 0)
-	    AllowHost(BrowseACL, value);
+	    AllowHost(location, value);
 	  else
-	    DenyHost(BrowseACL, value);
+	    DenyHost(location, value);
 	}
 	else
 	{
@@ -724,9 +726,9 @@ read_configuration(FILE *fp)		/* I - File to read from */
 	    netmask = netmasks[ipcount - 1];
 
           if (strcmp(name, "BrowseAllow") == 0)
-	    AllowIP(BrowseACL, address, netmask);
+	    AllowIP(location, address, netmask);
 	  else
-	    DenyIP(BrowseACL, address, netmask);
+	    DenyIP(location, address, netmask);
 	}
       }
     }
@@ -1393,5 +1395,5 @@ get_address(char               *value,		/* I - Value string */
 
 
 /*
- * End of "$Id: conf.c,v 1.51 2000/06/27 21:07:10 mike Exp $".
+ * End of "$Id: conf.c,v 1.52 2000/07/17 12:32:00 mike Exp $".
  */

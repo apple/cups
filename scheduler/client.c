@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.63 2000/07/12 19:25:17 mike Exp $"
+ * "$Id: client.c,v 1.64 2000/07/17 12:31:59 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -1549,6 +1549,7 @@ pipe_command(client_t *con,	/* I - Client connection */
 {
   int	pid;			/* Process ID */
   char	*commptr;		/* Command string pointer */
+  int	fd;			/* Looping var */
   int	fds[2];			/* Pipe FDs */
   int	argc;			/* Number of arguments */
   int	envc;			/* Number of environment variables */
@@ -1726,8 +1727,18 @@ pipe_command(client_t *con,	/* I - Client connection */
     close(1);
     dup(fds[1]);
 
-    close(fds[0]);
-    close(fds[1]);
+   /*
+    * Close extra file descriptors...
+    */
+
+    for (fd = 3; fd < 1024; fd ++)
+      close(fd);
+
+   /*
+    * Change umask to restrict permissions on created files...
+    */
+
+    umask(077);
 
    /*
     * Execute the pipe program; if an error occurs, exit with status 1...
@@ -1770,5 +1781,5 @@ pipe_command(client_t *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.63 2000/07/12 19:25:17 mike Exp $".
+ * End of "$Id: client.c,v 1.64 2000/07/17 12:31:59 mike Exp $".
  */
