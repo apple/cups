@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.81 2000/07/01 16:36:15 mike Exp $"
+ * "$Id: ipp.c,v 1.82 2000/07/07 18:05:12 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -1802,9 +1802,12 @@ create_job(client_t        *con,	/* I - Client connection */
     * Hold job until specified time...
     */
 
-    job->state->values[0].integer = IPP_JOB_HELD;
     SetJobHoldUntil(job->id, attr->values[0].string.text);
   }
+  else
+    job->hold_until = time(NULL) + 60;
+
+  job->state->values[0].integer = IPP_JOB_HELD;
 
   if (!(printer->type & CUPS_PRINTER_REMOTE))
   {
@@ -4310,11 +4313,17 @@ send_document(client_t        *con,	/* I - Client connection */
     SaveJob(job->id);
     CheckJobs();
   }
-  else if (ippFindAttribute(job->attrs, "job-hold-until", IPP_TAG_ZERO) == NULL)
+  else
   {
-    job->state->values[0].integer = IPP_JOB_HELD;
-    job->hold_until               = time(NULL) + 60;
-    SaveJob(job->id);
+    if ((attr = ippFindAttribute(job->attrs, "job-hold-until", IPP_TAG_KEYWORD)) == NULL)
+      attr = ippFindAttribute(job->attrs, "job-hold-until", IPP_TAG_NAME);
+
+    if (attr == NULL || strcmp(attr->values[0].string.text, "no-hold") == 0)
+    {
+      job->state->values[0].integer = IPP_JOB_HELD;
+      job->hold_until               = time(NULL) + 60;
+      SaveJob(job->id);
+    }
   }
 
  /*
@@ -4989,5 +4998,5 @@ validate_job(client_t        *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.81 2000/07/01 16:36:15 mike Exp $".
+ * End of "$Id: ipp.c,v 1.82 2000/07/07 18:05:12 mike Exp $".
  */
