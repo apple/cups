@@ -1,5 +1,5 @@
 /*
- * "$Id: gdevcups.c,v 1.18 1999/12/16 22:48:25 mike Exp $"
+ * "$Id: gdevcups.c,v 1.19 1999/12/16 23:13:15 mike Exp $"
  *
  *   GNU Ghostscript raster output driver for the Common UNIX Printing
  *   System (CUPS).
@@ -955,16 +955,16 @@ cups_print_pages(gx_device_printer *pdev,	/* I - Device info */
     case CUPS_ORDER_BANDED :
         if (cups->header.cupsColorSpace == CUPS_CSPACE_KCMYcm &&
 	    cups->header.cupsBitsPerColor == 1)
-          cups->header.cupsBytesPerLine = (cups->header.cupsBitsPerPixel *
+          cups->header.cupsBytesPerLine = (cups->header.cupsBitsPerColor *
                                            cups->header.cupsWidth + 7) / 8 * 6;
         else
-          cups->header.cupsBytesPerLine = (cups->header.cupsBitsPerPixel *
+          cups->header.cupsBytesPerLine = (cups->header.cupsBitsPerColor *
                                            cups->header.cupsWidth + 7) / 8 *
 				          cups->color_info.num_components;
         break;
 
     case CUPS_ORDER_PLANAR :
-        cups->header.cupsBytesPerLine = (cups->header.cupsBitsPerPixel *
+        cups->header.cupsBytesPerLine = (cups->header.cupsBitsPerColor *
 	                                 cups->header.cupsWidth + 7) / 8;
         break;
   }
@@ -1597,7 +1597,7 @@ cups_print_banded(gx_device_printer *pdev,	/* I - Printer device */
   * to separate each chunked color as needed...
   */
 
-  bandbytes = cups->header.cupsBytesPerLine / pdev->color_info.num_components;
+  bandbytes = (cups->header.cupsWidth * cups->header.cupsBitsPerColor + 7) / 8;
 
   for (y = 0; y < cups->height; y ++)
   {
@@ -2349,5 +2349,5 @@ cups_print_planar(gx_device_printer *pdev,	/* I - Printer device */
 
 
 /*
- * End of "$Id: gdevcups.c,v 1.18 1999/12/16 22:48:25 mike Exp $".
+ * End of "$Id: gdevcups.c,v 1.19 1999/12/16 23:13:15 mike Exp $".
  */
