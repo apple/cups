@@ -1,9 +1,9 @@
 #
-# "$Id: Makefile,v 1.6 2000/02/08 20:38:45 mike Exp $"
+# "$Id: Makefile,v 1.7 2000/03/10 16:56:46 mike Exp $"
 #
 #   Configuration file makefile for the Common UNIX Printing System (CUPS).
 #
-#   Copyright 1993-1999 by Easy Software Products.
+#   Copyright 1993-2000 by Easy Software Products.
 #
 #   These coded instructions, statements, and computer programs are the
 #   property of Easy Software Products and are protected by Federal
@@ -28,8 +28,9 @@ include ../Makedefs
 # Config files...
 #
 
-KEEP	=	classes.conf cupsd.conf printers.conf
+KEEP	=	classes.conf client.conf cupsd.conf printers.conf
 REPLACE	=	mime.convs mime.types
+
 
 #
 # Make everything...
@@ -37,11 +38,13 @@ REPLACE	=	mime.convs mime.types
 
 all:
 
+
 #
 # Clean all config and object files...
 #
 
 clean:
+
 
 #
 # Install files...
@@ -67,5 +70,5 @@ install:
 	fi
 
 #
-# End of "$Id: Makefile,v 1.6 2000/02/08 20:38:45 mike Exp $".
+# End of "$Id: Makefile,v 1.7 2000/03/10 16:56:46 mike Exp $".
 #
