@@ -7,49 +7,379 @@
 </HEAD>
 <BODY>
 
-<H1>Scope</H1>
+<H1 ALIGN=RIGHT>Preface</H1>
 
-<H2>Identification</H2>
-
-This softwae administrators manual provides printer administration
+This software administrators manual provides printer administration
 information for the Common UNIX Printing System ("CUPS") Version 1.0.0.
+
+<H2>System Overview</H2>
+
+The Common UNIX Printing System provides a portable printing layer for 
+UNIX&reg; operating systems. It has been developed by Easy Software 
+Products to promote a standard printing solution for all UNIX vendors 
+and users. CUPS provides the System V and Berkeley command-line interfaces.
+
+<P>CUPS uses the Internet Printing Protocol (IETF-IPP) as the basis
+for managing print jobs and queues. The Line Printer Daemon (LPD,
+RFC1179), Server Message Block (SMB), and AppSocket protocols are also
+supported with reduced functionality.
+
+<P>CUPS adds network printer browsing and PostScript Printer
+Description (&quot;PPD&quot;)-based printing options to support real
+world applications under UNIX.
 
 <H2>Document Overview</H2>
 
 <P>This software administrators manual is organized into the following sections:</P>
 
 <UL>
-	<LI>1 - Scope</LI>
-	<LI>2 - References</LI>
-	<LI>3 - Printing System Overview</LI>
-	<LI>4 - Printer Queue Management</LI>
-	<LI>5 - Printing System Management</LI>
-	<LI>A - Glossary</LI>
+	<LI>1 - Printing System Overview</LI>
+	<LI>2 - Building and Installing CUPS</LI>
+	<LI>3 - Printer Queue Management</LI>
+	<LI>4 - Printing System Management</LI>
 </UL>
 
-<H1>Printing System Overview</H1>
+<H1 ALIGN=RIGHT>1 - Printing System Overview</H1>
 
-<H1>Printer Queue Management</H1>
+<P>This chapter provides an overview of how the Common UNIX Printing System
+works.
 
-<H2>Adding Printers</H2>
+<H2>The Printing Problem</H2>
+
+<P>For years <I>the printing problem</I> has plagued UNIX&reg;. Unlike
+Microsoft&reg; Windows&reg; or MacOS, UNIX has no standard interface or
+system in place for supporting printers. Among the solutions previously
+available, the Berkeley and System V printing systems are the most
+prevalent.
+
+<P>These printing systems support line printers (text only) or
+PostScript printers (text and graphics), and with some coaxing they can
+be made to support a full range of printers and file formats. However,
+because each varient of the UNIX operating system uses a different
+printing system than the next, developing printer drivers for a wide
+range of printers is extremely difficult. That combined with the
+limited volume of customers for each UNIX varient has forced most
+printer vendors to give up supporting UNIX entirely.
+
+<P>The Common UNIX Printing System, or CUPS, is designed to eliminate
+<I>the printing problem</I>. One common printing system can be used by
+all UNIX varients to support the printing needs of users. Printer
+vendors can use its modular filter interface to develop a single driver
+program that supports a wide range of file formats with little or no
+effort.  Since CUPS provides both the System V and Berkeley printing
+commands, users (and applications) can reap the benefits of this new
+technology with no changes.
+
+<H2>The Technology</H2>
+
+<P>CUPS is based upon an emerging Internet standard called the Internet
+Printing Protocol, or IPP. IPP has been embraced by dozens of printer
+and printer server manufacturers, and will be supported by the next
+Microsoft Windows operating system.
+
+<P>IPP defines a standard protocol for printing as well as managing print
+jobs and printer options like media size, resolution, and so forth. Like all
+IP-based protocols, IPP can be used locally or over the Internet to printers
+hundreds or thousands of miles away. Unlike other protocols, however, IPP
+also supports access control, authentication, and encryption, making it a
+much more secure printing solution than older ones.
+
+<P>IPP is layered on top of the Hyper-Text Transport Protocol, or HTTP,
+which is the basis of web servers on the Internet. This allows the user to
+view documentation and status information on a printer or server using their
+web browser.
+
+<P>CUPS provides a complete IPP/1.0-based printing system that provides Basic
+authentication and domain or IP-based access control. Digest authentication
+and TLS encryption will be available in future versions of CUPS.
+
+<H2>Filters</H2>
+
+<P>Filters allow a user or application to print many types of files
+without extra effort. Print jobs sent to a CUPS server are filtered
+before sending them to a printer. Some filters convert job files to
+different formats that the printer can understand. Others perform page
+selection and ordering tasks. <I>Backend</I> filters perform the most
+important task of all - they send the filtered print data to the
+printer.
+
+<P>CUPS provides filters for printing many types of image files,
+HP-GL/2 files, PDF files, and text files. CUPS also supplies
+PostScript and image file Raster Image Processors, or RIPs, that
+convert PostScript or image files into bitmaps that can be sent to a
+raster printer.
+
+<P>CUPS provides backends for printing over parallel and serial ports,
+and over the network via the JetDirect (AppSocket), Server Message
+Block, and Line Printer Daemon protocols.
+
+<H2>Printer Drivers</H2>
+
+<P>Printer drivers in CUPS consist of one of more filters specific to a
+printer. CUPS includes a sample printer driver for Hewlett-Packard
+LaserJet and DeskJet printers. While this driver does not generate
+optimal output for different printer models, it does demonstrate how
+you can write your own printer drivers and incorporate them into CUPS.
+
+<H1 ALIGN=RIGHT>2 - Building and Installing CUPS</H1>
+
+<P>This chapter shows how to build and install the Common UNIX Printing System.
+
+<H2>Requirements</H2>
+
+<P>You'll need an ANSI C compiler to build CUPS on your system. As its name
+implies, CUPS is designed to run on the UNIX operating system, however
+the CUPS interface library and most of the filters and backends supplied
+with CUPS should also run under Microsoft&reg; Windows&reg;.
+
+<P>For the image file filters and PostScript RIP, you'll need the JPEG,
+PNG, TIFF, and ZLIB libraries. CUPS will build without these, but with
+reduced functionality. Easy Software Products maintains a mirror of the
+current versions of these libraries at:
+
+<UL><PRE>
+<A HREF="ftp://ftp.easysw.com/pub/libraries">ftp://ftp.easysw.com/pub/libraries</A>
+</PRE></UL>
+
+<P>If you make changes to the man pages you'll need GNU groff or another
+nroff-like package. GNU groff is available from:
+
+<UL><PRE>
+<A HREF="ftp://ftp.gnu.org/pub/groff">ftp://ftp.gnu.org/pub/groff</A>
+</PRE></UL>
+
+<P>The documentation is formatted using the HTMLDOC software. If you need to
+make changes you can get the HTMLDOC software from:
+
+<UL><PRE>
+<A HREF="http://www.easysw.com/htmldoc">http://www.easysw.com/htmldoc</A>
+</PRE></UL>
+
+<H2>Compiling CUPS</H2>
+
+<P>CUPS uses GNU autoconf to configure the makefiles and source code
+for your system. To configure CUPS for your system type:
+
+<UL><PRE>
+% ./configure ENTER
+</PRE></UL>
+
+<P>The default installation will put the CUPS software in the
+<CODE>/usr</CODE> and <CODE>/var</CODE> directories on your system,
+which will overwrite any existing printing commands on your system. To
+install the CUPS software in another location use the
+<CODE>--prefix</CODE> option:
+
+<UL><PRE>
+% ./configure --prefix=/usr/local ENTER
+</PRE></UL>
+
+<P>If the PNG, JPEG, TIFF, and ZLIB libraries are not installed in a
+system default location (typically <CODE>/usr/include</CODE> and
+<CODE>/usr/lib</CODE>) you'll need to set the <CODE>CFLAGS</CODE> and
+<CODE>LDFLAGS</CODE> environment variables prior to running configure:
+
+<UL><PRE>
+% setenv CFLAGS "-I/some/directory"
+% setenv LDFLAGS "-L/some/directory"
+% ./configure ... ENTER
+</PRE></UL>
+
+<P>Once you have configured things, just type:
+
+<UL><PRE>
+% make ENTER
+</PRE></UL>
+
+<P>to build the software.
+
+<H2>Installing the Software</H2>
+
+<P>To install the software type:
+
+<UL><PRE>
+% make install ENTER
+</PRE></UL>
+
+<H2>Running the Software</A></H2>
+
+Once you have installed the software you can start the CUPS daemon by
+typing:
+
+<UL><PRE>
+% /usr/sbin/cupsd &amp; ENTER
+</PRE></UL>
+
+<H1 ALIGN=RIGHT>3 - Printer Queue Management</H1>
+
+<P>This chapter discusses how to add, modify, and delete print queues
+on your system.
+
+<H2>The lpadmin Command</H2>
+
+<P>The <CODE>lpadmin</CODE> command allows you to perform most printer
+administration tasks from the command-line. Since <CODE>lpadmin</CODE>
+is also a System V printing system command, it is located in the
+<CODE>/usr/lib</CODE> directory instead of a more common one like
+<CODE>/usr/bin</CODE> or <CODE>/usr/sbin</CODE>.
+
+<H2>Adding and Modifying Printers</H2>
+
+<P>To add a printer to CUPS you simply run the <CODE>lpadmin</CODE> command
+with the "-p" option:
+
+<UL><PRE>
+% /usr/lib/lpadmin -p<I>printer</I> -v<I>device</I> -P<I>ppd</I> ENTER
+</PRE></UL>
+
+<P>The <I>printer</I> name can be up to 127 letters, digits, hyphens,
+and underscores. Unlike other printing systems, the printer name in
+CUPS is <I>not</I> case-sensitive, so you can't add two printers named
+<CODE>LaserJet</CODE> and <CODE>laserjet</CODE>.
+
+<P>The <I>device</I> argument specifies the device URI or filename for the
+printer. The following devices are supported in a basic installation of
+CUPS:
+
+<DL>
+
+	<DT>file:/dev/filename
+	<DT>/dev/filename
+	<DD>Sends all output to the specified file.
+
+	<DT>ipp://hostname[:port]/resource
+	<DD>Sends all output to the specified IPP printer or server.
+	The <I>port</I> parameters defaults to 631.
+
+	<DT>lpd://hostname/queue
+	<DD>Sends all output to the specified LPD printer queue.
+
+	<DT>parallel:/dev/filename
+	<DD>Sends all output to the specified parallel port device.
+
+	<DT>serial:/dev/filename[?options]
+	<DD>Sends all output to the specified serial port device.  The
+	<I>options</I> can be any of the following separated by the
+	plus (+) character:
+	<UL>
+		<LI><CODE>baud=<I>rate</I></CODE> - Sets the baud rate
+		for the device.
+		<LI><CODE>bits=<I>7 or 8</I></CODE> - Sets the number
+		of data bits.
+		<LI><CODE>parity=<I>even</I></CODE> - Sets even parity
+		checking.
+		<LI><CODE>parity=<I>odd</I></CODE> - Sets odd parity
+		checking.
+		<LI><CODE>parity=<I>none</I></CODE> - Turns parity
+		checking off.
+	</UL>
+
+	<DT>socket://hostname[:port]
+	<DD>Sends all output to the specified printer using the
+	AppSocket protocol. The <I>port</I> parameter defaults to 9100.
+
+</DL>
+
+<P>The <I>ppd</I> argument specifies the PostScript Printer Description file
+to use for this printer. Many options (such as media size, etc.) will not
+be available if you omit this part of the <CODE>lpadmin</CODE> command.
 
 <H2>Removing Printers</H2>
 
-<H2>Reconfiguring Printers</H2>
+<P>To remove a printer to CUPS you simply run the <CODE>lpadmin</CODE> command
+with the "-x" option:
 
-<H2>Printer Options</H2>
+<UL><PRE>
+% /usr/lib/lpadmin -x<I>printer</I> ENTER
+</PRE></UL>
+
+<H2>Printer Classes</H2>
+
+<P>CUPS allows you to group similar printers in a <I>printer class</I>. When
+a user sends a print job to a class, the job will be processed by the first
+available printer in that class.
+
+<P>To add a printer to a class you simply run the <CODE>lpadmin</CODE> command
+with the "-p" and "-c" options:
+
+<UL><PRE>
+% /usr/lib/lpadmin -p<I>printer</I> -c<I>class</I> ENTER
+</PRE></UL>
+
+<P>The <I>class</I> is created automatically if it doesn't exist. To remove a
+class just use the "-x" option:
+
+<UL><PRE>
+% /usr/lib/lpadmin -x<I>class</I> ENTER
+</PRE></UL>
+
+<H2>Setting the Default Printer</H2>
+
+<P>To set the default printer or class simply run the <CODE>lpadmin</CODE>
+command with the "-d" option:
+
+<UL><PRE>
+% /usr/lib/lpadmin -d<I>destination</I> ENTER
+</PRE></UL>
+
+<P>The <I>destination</I> argument is the name of the printer or class.
+
+<H1 ALIGN=RIGHT>4 - Printing System Management</H1>
+
+<H2>Network Configuration</H2>
 
 <H2>Printer Security</H2>
 
 <H2>Printer Accounting</H2>
 
-<H1>Printing System Management</H1>
-
-<H2>Log Files</H2>
-
-<H2>Network Configuration</H2>
-
 <H2>Adding File Types</H2>
+
+Before you run CUPS for the first time you'll need to edit the CUPS
+configuration files which are normally located in /var/cups/conf.
+
+<UL>
+
+	The <CODE>cupsd.conf</CODE> file configures all of the
+	"global" server settings and access control. The default
+	settings are usually appropriate for most environments.
+
+	<P>The <CODE>printers.conf</CODE> file configures each printer
+	queue. You'll need to add a listing for each printer on your
+	system.
+
+	<P>The <CODE>classes.conf</CODE> file configures each printer
+	class. You'll need to add a listing for each printer class you
+	want.
+
+	<P>The <CODE>mime.types</CODE> file defines all of the
+	recognized file types. You don't normally have to edit this
+	file.
+
+	<P>The <CODE>mime.convs</CODE> file defines all of the file
+	conversion filters. You don't normally have to edit this file.
+
+</UL>
+
+In addition to the files in the /var/cups/conf directory, you'll also need
+to copy PPD files for each printer to the /var/cups/ppd directory.  If you
+don't have a PPD file for your printer, the drivers will still work, just
+with reduced functionality.
+
+<H2><A NAME="use">Using the Software</A></H2>
+
+Once you have installed the software, you can use the normal lp or lpr
+commands to print jobs. If you installed the software under /usr then
+you shouldn't have to reconfigure any applications to recognize the new
+printing system.
+
+<P>One of the advantages of CUPS is that you don't always have to send
+PostScript or Text files to your printers. If you have a JPEG file, you
+can just type "lp filename.jpg" and CUPS will handle converting it for
+you!
+
+<P>You can monitor the status of jobs via the lpstat command or with your
+web browser by pointing it at "http://localhost:631".
+
 
 </BODY>
 </HTML>

@@ -1,7 +1,27 @@
 *PPD-Adobe: "4.3"
 *%
-*% PPD file for sample HP DeskJet driver.
-*% Copyright 1993-1999 Easy Software Products
+*% "$Id: deskjet.ppd,v 1.2 1999/05/17 18:03:38 mike Exp $"
+*%
+*%   Sample HP DeskJet driver PPD file for the Common UNIX Printing
+*%   System (CUPS).
+*%
+*%   Copyright 1997-1999 by Easy Software Products.
+*%
+*%   These coded instructions, statements, and computer programs are the
+*%   property of Easy Software Products and are protected by Federal
+*%   copyright law.  Distribution and use rights are outlined in the file
+*%   "LICENSE.txt" which should have been included with this file.  If this
+*%   file is missing or damaged please contact Easy Software Products
+*%   at:
+*%
+*%       Attn: CUPS Licensing Information
+*%       Easy Software Products
+*%       44145 Airport View Drive, Suite 204
+*%       Hollywood, Maryland 20636-3111 USA
+*%
+*%       Voice: (301) 373-9603
+*%       EMail: cups-info@cups.org
+*%         WWW: http://www.cups.org
 *%
 *FormatVersion:	"4.3"
 *FileVersion:	"1.0"
@@ -12,6 +32,7 @@
 *Product:	"(CUPS v1.0)"
 *cupsVersion:	1.0
 *cupsManualCopies: True
+*cupsFilter:	"application/vnd.cups-raster 0 rastertohp"
 *ModelName:     "HP DeskJet Series"
 *ShortNickName: "HP DeskJet Series"
 *NickName:      "HP DeskJet Series CUPS v1.0"
@@ -23,6 +44,7 @@
 *Throughput:	"1"
 *LandscapeOrientation: Plus90
 *VariablePaperSize: False
+*TTRasterizer:	Type42
 
 *UIConstraints: *PageSize Executive *InputSlot Envelope
 *UIConstraints: *PageSize Letter *InputSlot Envelope
@@ -64,17 +86,17 @@
 *CloseUI: *PageRegion
 
 *DefaultImageableArea: Letter 
-*ImageableArea Letter/US Letter:	"18.00 36.00 594.00 756.00"
-*ImageableArea Legal/US Legal:		"18.00 36.00 594.00 972.00"
-*ImageableArea Executive/Executive:	"18.00 36.00 504.00 753.12"
-*ImageableArea A4/A4:			"18.00 36.00 577.00 839.12"
-*ImageableArea A5/A5:			"18.00 36.00 403.00 593.12"
-*ImageableArea B5/JIS B5:		"18.00 36.00 498.00 725.12"
-*ImageableArea EnvISOB5/B5 (ISO):	"18.00 36.00 481.00 706.12"
-*ImageableArea Env10/Com-10:		"18.00 36.00 279.00 681.12"
-*ImageableArea EnvC5/EnvC5:		"18.00 36.00 441.00 646.12"
-*ImageableArea EnvDL/EnvDL:		"18.00 36.00 294.00 621.12"
-*ImageableArea EnvMonarch/Envelope Monarch: "18.00 36.00 271.00 537.12"
+*ImageableArea Letter/US Letter:	"18 36 594 756"
+*ImageableArea Legal/US Legal:		"18 36 594 972"
+*ImageableArea Executive/Executive:	"18 36 504 684"
+*ImageableArea A4/A4:			"18 36 577 806"
+*ImageableArea A5/A5:			"18 36 403 559"
+*ImageableArea B5/JIS B5:		"18 36 498 693"
+*ImageableArea EnvISOB5/B5 (ISO):	"18 36 463 673"
+*ImageableArea Env10/Com-10:		"18 36 279 648"
+*ImageableArea EnvC5/EnvC5:		"18 36 441 613"
+*ImageableArea EnvDL/EnvDL:		"18 36 294 588"
+*ImageableArea EnvMonarch/Envelope Monarch: "18 36 261 504"
 
 *DefaultPaperDimension: Letter
 *PaperDimension Letter/Letter:		"612 792"
@@ -158,3 +180,6 @@
 *Font Times-Roman: Standard "(001.007S)" Standard ROM
 *Font ZapfChancery-MediumItalic: Standard "(001.007S)" Standard ROM
 *Font ZapfDingbats: Special "(001.004S)" Standard ROM
+*%
+*% End of "$Id: deskjet.ppd,v 1.2 1999/05/17 18:03:38 mike Exp $".
+*%

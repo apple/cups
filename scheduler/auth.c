@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.c,v 1.10 1999/05/10 21:35:40 mike Exp $"
+ * "$Id: auth.c,v 1.11 1999/05/17 18:03:40 mike Exp $"
  *
  *   Authorization routines for the Common UNIX Printing System (CUPS).
  *
@@ -48,8 +48,9 @@
 #ifdef HAVE_SHADOW_H
 #  include <shadow.h>
 #endif /* HAVE_SHADOW_H */
-#include <crypt.h>
-
+#ifdef HAVE_CRYPT_H
+#  include <crypt.h>
+#endif /* HAVE_CRYPT_H */
 
 /*
  * Local functions...
@@ -566,5 +567,5 @@ check_auth(unsigned   ip,	/* I - Client address */
 
 
 /*
- * End of "$Id: auth.c,v 1.10 1999/05/10 21:35:40 mike Exp $".
+ * End of "$Id: auth.c,v 1.11 1999/05/17 18:03:40 mike Exp $".
  */

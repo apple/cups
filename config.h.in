@@ -1,5 +1,5 @@
 /*
- * "$Id: config.h.in,v 1.5 1999/05/14 17:02:53 mike Exp $"
+ * "$Id: config.h.in,v 1.6 1999/05/17 18:03:29 mike Exp $"
  *
  *   Configuration file for the Common UNIX Printing System (CUPS).
  *
@@ -69,6 +69,12 @@
 #undef HAVE_SHADOW_H
 
 /*
+ * Do we have <crypt.h>?
+ */
+
+#undef HAVE_CRYPT_H
+
+/*
  * Do we have the strXXX() functions?
  */
 
@@ -91,5 +97,5 @@
 #undef HAVE_WAIT3
 
 /*
- * End of "$Id: config.h.in,v 1.5 1999/05/14 17:02:53 mike Exp $".
+ * End of "$Id: config.h.in,v 1.6 1999/05/17 18:03:29 mike Exp $".
  */

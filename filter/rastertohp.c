@@ -1,5 +1,5 @@
 /*
- * "$Id: rastertopcl.c,v 1.1 1999/05/15 03:39:34 mike Exp $"
+ * "$Id: rastertohp.c,v 1.1 1999/05/17 18:03:36 mike Exp $"
  *
  *   Hewlett-Packard Page Control Language and Raster Transfer Language
  *   filter for ESP Print.
@@ -106,7 +106,8 @@ StartPage(cups_page_header_t *header)	/* I - Page header */
   printf("\033*t%dR", header->HWResolution[0]);	/* Set resolution */
   printf("\033*r%dS", header->cupsWidth);	/* Set width */
   printf("\033*r%dT", header->cupsHeight);	/* Set height */
-  printf("\033*r0A");				/* Start graphics */
+  printf("\033&a0H\033&a0V");			/* Set top-of-page */
+  printf("\033*r1A");				/* Start graphics */
 
   if (header->cupsCompression)
     printf("\033*b%dM",				/* Set compression */
@@ -488,5 +489,5 @@ main(int  argc,		/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: rastertopcl.c,v 1.1 1999/05/15 03:39:34 mike Exp $".
+ * End of "$Id: rastertohp.c,v 1.1 1999/05/17 18:03:36 mike Exp $".
  */

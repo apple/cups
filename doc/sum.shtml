@@ -8,30 +8,121 @@
 </HEAD>
 <BODY>
 
-<H1>Scope</H1>
-
-<H2>Identification</H2>
+<H1 ALIGN=RIGHT>Preface</H1>
 
 This software users manual describes how to use the Common UNIX Printing
 System ("CUPS") Version 1.0.0.
+
+<H2>System Overview</H2>
+
+The Common UNIX Printing System provides a portable printing layer for 
+UNIX&reg; operating systems. It has been developed by Easy Software 
+Products to promote a standard printing solution for all UNIX vendors 
+and users. CUPS provides the System V and Berkeley command-line interfaces.
+
+<P>CUPS uses the Internet Printing Protocol (IETF-IPP) as the basis
+for managing print jobs and queues. The Line Printer Daemon (LPD,
+RFC1179), Server Message Block (SMB), and AppSocket protocols are also
+supported with reduced functionality.
+
+<P>CUPS adds network printer browsing and PostScript Printer
+Description (&quot;PPD&quot;)-based printing options to support real
+world applications under UNIX.
 
 <H2>Document Overview</H2>
 
 <P>This software users manual is organized into the following sections:</P>
 
 <UL>
-	<LI>1 - Scope</LI>
-	<LI>2 - References</LI>
-	<LI>3 - Printing System Overview</LI>
-	<LI>4 - Using the Printing System</LI>
-	<LI>A - Glossary</LI>
+	<LI>1 - Printing System Overview</LI>
+	<LI>2 - Using the Printing System</LI>
+	<LI>3 - Standard Printer Options</LI>
+	<LI>4 - Checking the Status Via the Web</LI>
 </UL>
 
-<H1>Printing System Overview</H1>
+<H1 ALIGN=RIGHT>1 - Printing System Overview</H1>
 
-<P></P>
+<P>This chapter provides an overview of how the Common UNIX Printing System
+works.
 
-<H1>Using the Printing System</H1>
+<H2>The Printing Problem</H2>
+
+<P>For years <I>the printing problem</I> has plagued UNIX&reg;. Unlike
+Microsoft&reg; Windows&reg; or MacOS, UNIX has no standard interface or
+system in place for supporting printers. Among the solutions previously
+available, the Berkeley and System V printing systems are the most
+prevalent.
+
+<P>These printing systems support line printers (text only) or
+PostScript printers (text and graphics), and with some coaxing they can
+be made to support a full range of printers and file formats. However,
+because each varient of the UNIX operating system uses a different
+printing system than the next, developing printer drivers for a wide
+range of printers is extremely difficult. That combined with the
+limited volume of customers for each UNIX varient has forced most
+printer vendors to give up supporting UNIX entirely.
+
+<P>The Common UNIX Printing System, or CUPS, is designed to eliminate
+<I>the printing problem</I>. One common printing system can be used by
+all UNIX varients to support the printing needs of users. Printer
+vendors can use its modular filter interface to develop a single driver
+program that supports a wide range of file formats with little or no
+effort.  Since CUPS provides both the System V and Berkeley printing
+commands, users (and applications) can reap the benefits of this new
+technology with no changes.
+
+<H2>The Technology</H2>
+
+<P>CUPS is based upon an emerging Internet standard called the Internet
+Printing Protocol, or IPP. IPP has been embraced by dozens of printer
+and printer server manufacturers, and will be supported by the next
+Microsoft Windows operating system.
+
+<P>IPP defines a standard protocol for printing as well as managing print
+jobs and printer options like media size, resolution, and so forth. Like all
+IP-based protocols, IPP can be used locally or over the Internet to printers
+hundreds or thousands of miles away. Unlike other protocols, however, IPP
+also supports access control, authentication, and encryption, making it a
+much more secure printing solution than older ones.
+
+<P>IPP is layered on top of the Hyper-Text Transport Protocol, or HTTP,
+which is the basis of web servers on the Internet. This allows the user to
+view documentation and status information on a printer or server using their
+web browser.
+
+<P>CUPS provides a complete IPP/1.0-based printing system that provides Basic
+authentication and domain or IP-based access control. Digest authentication
+and TLS encryption will be available in future versions of CUPS.
+
+<H2>Filters</H2>
+
+<P>Filters allow a user or application to print many types of files
+without extra effort. Print jobs sent to a CUPS server are filtered
+before sending them to a printer. Some filters convert job files to
+different formats that the printer can understand. Others perform page
+selection and ordering tasks. <I>Backend</I> filters perform the most
+important task of all - they send the filtered print data to the
+printer.
+
+<P>CUPS provides filters for printing many types of image files,
+HP-GL/2 files, PDF files, and text files. CUPS also supplies
+PostScript and image file Raster Image Processors, or RIPs, that
+convert PostScript or image files into bitmaps that can be sent to a
+raster printer.
+
+<P>CUPS provides backends for printing over parallel and serial ports,
+and over the network via the JetDirect (AppSocket), Server Message
+Block, and Line Printer Daemon protocols.
+
+<H2>Printer Drivers</H2>
+
+<P>Printer drivers in CUPS consist of one of more filters specific to a
+printer. CUPS includes a sample printer driver for Hewlett-Packard
+LaserJet and DeskJet printers. While this driver does not generate
+optimal output for different printer models, it does demonstrate how
+you can write your own printer drivers and incorporate them into CUPS.
+
+<H1 ALIGN=RIGHT>2 - Using the Printing System</H1>
 
 <H2>Choosing a Printer</H2>
 
@@ -40,6 +131,12 @@ System ("CUPS") Version 1.0.0.
 <H2>Submitting Files for Printing</H2>
 
 <H2>Checking the Printer Status</H2>
+
+<H1 ALIGN=RIGHT>3 - Standard Printer Options</H1>
+
+
+<H1 ALIGN=RIGHT>4 - Checking the Status Via the Web</H1>
+
 
 </BODY>
 </HTML>

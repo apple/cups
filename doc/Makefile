@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.6 1999/05/13 20:40:39 mike Exp $"
+# "$Id: Makefile,v 1.7 1999/05/17 18:03:33 mike Exp $"
 #
 #   Documentation makefile for the Common UNIX Printing System (CUPS).
 #
@@ -78,11 +78,23 @@ install:
 	$(CP) $(DOCIMAGES) $(SERVERROOT)/doc/images
 
 #
-# The overview PDF file gets special attention...
+# The overview, admin guide, and user's guide get special attention...
 #
 
 overview.pdf:	overview.html
 	htmldoc --duplex --compression=9 --jpeg --webpage -f $@ $<
+
+sam.html:	sam.shtml
+	htmldoc --title images/cups-large.gif -f $@ $<
+sam.pdf:	sam.shtml
+	htmldoc --title images/cups-large.gif --duplex --compression=9 \
+		--jpeg -f $@ $<
+
+sum.html:	sum.shtml
+	htmldoc --title images/cups-large.gif -f $@ $<
+sum.pdf:	sum.shtml
+	htmldoc --title images/cups-large.gif --duplex --compression=9 \
+		--jpeg -f $@ $<
 
 #
 # End of Makefile.
