@@ -1,5 +1,5 @@
 /*
- * "$Id: options.c,v 1.6 1999/06/10 18:12:52 mike Exp $"
+ * "$Id: options.c,v 1.7 1999/06/28 22:55:08 mike Exp $"
  *
  *   Option routines for the Common UNIX Printing System (CUPS).
  *
@@ -302,12 +302,12 @@ cupsMarkOptions(ppd_file_t    *ppd,		/* I - PPD file */
       }
       else if (strcmp(options->value, "two-sided-long-edge") == 0)
       {
-        if (ppdMarkOption(ppd, "Duplex", "NoTumble"))
+        if (ppdMarkOption(ppd, "Duplex", "DuplexNoTumble"))
 	  conflict = 1;
       }
       else if (strcmp(options->value, "two-sided-short-edge") == 0)
       {
-        if (ppdMarkOption(ppd, "Duplex", "Tumble"))
+        if (ppdMarkOption(ppd, "Duplex", "DuplexTumble"))
 	  conflict = 1;
       }
     }
@@ -326,5 +326,5 @@ cupsMarkOptions(ppd_file_t    *ppd,		/* I - PPD file */
 
 
 /*
- * End of "$Id: options.c,v 1.6 1999/06/10 18:12:52 mike Exp $".
+ * End of "$Id: options.c,v 1.7 1999/06/28 22:55:08 mike Exp $".
  */
