@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.118 2003/08/01 20:00:53 mike Exp $"
+ * "$Id: dirsvc.c,v 1.119 2003/09/02 20:39:11 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -1641,8 +1641,7 @@ SLPDeregPrinter(printer_t *p)
 int 					/* O - 0 on success */
 GetSlpAttrVal(const char *attrlist,	/* I - Attribute list string */
               const char *tag,		/* I - Name of attribute */
-              char       *valbuf,	/* O - Value */
-              int        valbuflen)	/* I - Max length of value */
+              char       **valbuf)	/* O - Value */
 {
   char	*ptr1,				/* Pointer into string */
 	*ptr2;				/* ... */
@@ -1656,25 +1655,24 @@ GetSlpAttrVal(const char *attrlist,	/* I - Attribute list string */
 
     if ((ptr2 = strchr(ptr1,')')) != NULL)
     {
-      if (valbuflen > (ptr2 - ptr1))
-      {
-       /*
-        * Copy the value...
-	*/
+     /*
+      * Copy the value...
+      */
 
-        strncpy(valbuf, ptr1, ptr2 - ptr1);
-	valbuf[ptr2 - ptr1] = '\0';
+      ClearString(valbuf);
 
-       /*
-        * Dequote the value...
-	*/
+      *valbuf = malloc(ptr2 - ptr1 + 1);
+      strcpy(valbuf, ptr1);
 
-	for (ptr1 = valbuf; *ptr1; ptr1 ++)
-	  if (*ptr1 == '\\' && ptr1[1])
-	    cups_strcpy(ptr1, ptr1 + 1);
+     /*
+      * Dequote the value...
+      */
 
-        return (0);
-      }
+      for (ptr1 = valbuf; *ptr1; ptr1 ++)
+	if (*ptr1 == '\\' && ptr1[1])
+	  cups_strcpy(ptr1, ptr1 + 1);
+
+      return (0);
     }
   }
 
@@ -1692,7 +1690,7 @@ AttrCallback(SLPHandle  hslp,
              SLPError   errcode, 
              void       *cookie)
 {
-  char         tmp[IPP_MAX_NAME];
+  char         *tmp = 0;
   printer_t    *p = (printer_t*)cookie;
 
 
@@ -1717,19 +1715,17 @@ AttrCallback(SLPHandle  hslp,
 
   p->type = CUPS_PRINTER_REMOTE;
 
-  if (GetSlpAttrVal(attrlist, "(printer-location=", p->location,
-                    sizeof(p->location)))
+  if (GetSlpAttrVal(attrlist, "(printer-location=", &(p->location)))
     return (SLP_FALSE);
-  if (GetSlpAttrVal(attrlist, "(printer-make-and-model=", p->make_model,
-                    sizeof(p->make_model)))
+  if (GetSlpAttrVal(attrlist, "(printer-make-and-model=", &(p->make_model))
     return (SLP_FALSE);
 
-  if (GetSlpAttrVal(attrlist, "(color-supported=", tmp, sizeof(tmp)))
+  if (GetSlpAttrVal(attrlist, "(color-supported=", &tmp))
     return (SLP_FALSE);
   if (strcasecmp(tmp, "true") == 0)
     p->type |= CUPS_PRINTER_COLOR;
 
-  if (GetSlpAttrVal(attrlist, "(finishings-supported=", tmp, sizeof(tmp)))
+  if (GetSlpAttrVal(attrlist, "(finishings-supported=", &tmp))
     return (SLP_FALSE);
   if (strstr(tmp, "staple"))
     p->type |= CUPS_PRINTER_STAPLE;
@@ -1738,10 +1734,12 @@ AttrCallback(SLPHandle  hslp,
   if (strstr(tmp, "punch"))
     p->type |= CUPS_PRINTER_PUNCH;
 
-  if (GetSlpAttrVal(attrlist, "(sides-supported=", tmp, sizeof(tmp)))
+  if (GetSlpAttrVal(attrlist, "(sides-supported=", &tmp))
     return (SLP_FALSE);
   if (strstr(tmp,"two-sided"))
     p->type |= CUPS_PRINTER_DUPLEX;
+
+  ClearString(&tmp);
 
   return (SLP_TRUE);
 }
@@ -1905,5 +1903,5 @@ UpdateSLPBrowse(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.118 2003/08/01 20:00:53 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.119 2003/09/02 20:39:11 mike Exp $".
  */
