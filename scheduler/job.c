@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.36 1999/09/03 16:07:04 mike Exp $"
+ * "$Id: job.c,v 1.37 1999/09/03 19:36:43 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -640,7 +640,8 @@ StartJob(int       id,		/* I - Job ID */
     {
       current->procs[i] = pid;
 
-      DEBUG_printf(("StartJob: started %s - pid = %d.\n", command, pid));
+      LogMessage(LOG_DEBUG, "Started %s (PID %d) for job %d.", command, pid,
+                 current->id);
     }
   }
 
@@ -688,7 +689,8 @@ StartJob(int       id,		/* I - Job ID */
     {
       current->procs[i] = pid;
 
-      DEBUG_printf(("StartJob: started %s - pid = %d.\n", command, pid));
+      LogMessage(LOG_DEBUG, "Started %s (PID %d) for job %d.", command, pid,
+                 current->id);
     }
   }
   else
@@ -799,7 +801,7 @@ UpdateJob(job_t *job)		/* I - Job to check */
         loglevel = LOG_WARN;
 	message  = buffer + 8;
       }
-      if (strncmp(buffer, "INFO:", 5) == 0)
+      else if (strncmp(buffer, "INFO:", 5) == 0)
       {
         loglevel = LOG_INFO;
 	message  = buffer + 5;
@@ -849,7 +851,7 @@ UpdateJob(job_t *job)		/* I - Job to check */
 	  LogMessage(loglevel, "%s", message);
 
 	if ((loglevel >= LOG_INFO && !job->state) ||
-	    loglevel == LOG_ERROR)
+	    loglevel < LOG_INFO)
           strncpy(job->printer->state_message, message,
                   sizeof(job->printer->state_message) - 1);
       }
@@ -967,5 +969,5 @@ start_process(char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.36 1999/09/03 16:07:04 mike Exp $".
+ * End of "$Id: job.c,v 1.37 1999/09/03 19:36:43 mike Exp $".
  */

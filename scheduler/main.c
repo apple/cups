@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c,v 1.25 1999/07/08 14:22:58 mike Exp $"
+ * "$Id: main.c,v 1.26 1999/09/03 19:36:44 mike Exp $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -355,6 +355,9 @@ sigchld_handler(int sig)	/* I - Signal number */
   {
     DEBUG_printf(("sigcld_handler: pid = %d, status = %d\n", pid, status));
 
+    if (status)
+      LogMessage(LOG_ERROR, "PID %d crashed with status %d!", pid, status);
+
     for (job = Jobs; job != NULL; job = job->next)
       if (job->state == IPP_JOB_PROCESSING)
       {
@@ -418,5 +421,5 @@ usage(void)
 
 
 /*
- * End of "$Id: main.c,v 1.25 1999/07/08 14:22:58 mike Exp $".
+ * End of "$Id: main.c,v 1.26 1999/09/03 19:36:44 mike Exp $".
  */
