@@ -1,0 +1,575 @@
+%    Copyright (C) 1994, 1996 Aladdin Enterprises.  All rights reserved.
+% 
+% This file is part of GNU Ghostscript.
+% 
+% GNU Ghostscript is distributed in the hope that it will be useful, but
+% WITHOUT ANY WARRANTY.  No author or distributor accepts responsibility to
+% anyone for the consequences of using it or for whether it serves any
+% particular purpose or works at all, unless he says so in writing.  Refer to
+% the GNU General Public License for full details.
+% 
+% Everyone is granted permission to copy, modify and redistribute GNU
+% Ghostscript, but only under the conditions described in the GNU General
+% Public License.  A copy of this license is supposed to have been given to
+% you along with GNU Ghostscript so you can know your rights and
+% responsibilities.  It should be in a file named COPYING.  Among other
+% things, the copyright notice and this notice must be preserved on all
+% copies.
+% 
+% Aladdin Enterprises is not affiliated with the Free Software Foundation or
+% the GNU Project.  GNU Ghostscript, as distributed by Aladdin Enterprises,
+% does not depend on any other GNU software.
+
+% gs_pdf.ps
+% ProcSet for PostScript files created by the PDF to PostScript converter.
+% This ProcSet requires only a Level 1 interpreter.
+
+% pdf2ps copies this file from %BEGIN to the end.
+
+%BEGIN
+mark				% patches
+/currentglobal { false }
+/setglobal { pop }
+/packedarray { array astore readonly }
+/setcmykcolor
+ { 1 exch sub
+   4 -1 roll 1 exch sub 1 index mul
+   4 -1 roll 1 exch sub 2 index mul
+   4 -2 roll exch 1 exch sub mul
+   setrgbcolor
+ }
+/.copydict
+ { dup 3 -1 roll { put dup } forall pop }
+/.dicttomark
+ { counttomark 2 idiv dup dict begin { def } repeat pop currentdict end }
+/.knownget
+ { 2 copy known { get true } { pop pop false } ifelse }
+counttomark 2 idiv
+ { 1 index where { pop pop pop } { bind executeonly def } ifelse
+ } repeat pop
+
+currentglobal true setglobal
+
+% Define pdfmark.  Don't allow it to be bound in.
+% Also don't define it in systemdict, because this leads some Adobe code
+% to think this interpreter is a distiller.
+% (If this interpreter really is a distiller, don't do this.)
+systemdict /pdfmark known not
+ { userdict /pdfmark { cleartomark } bind put } if
+
+% This ProcSet is designed so that it can be used either to execute PDF
+% (the default) or to convert PDF to PostScript.  See ! and ~ below.
+
+userdict /GS_PDF_ProcSet 119 dict dup begin
+
+% ---------------- Abbreviations ---------------- %
+
+/bdef { bind def } bind def
+
+% ---------------- Operator execution ---------------- %
+
+% We record "operator" names in a dictionary with their argument counts,
+% so that they can easily be redefined later to write PostScript in
+% addition to (or instead of) being executed.
+
+/numargsdict 100 dict def
+/!		% <procname> <proc> <numargs> ! -
+ { //numargsdict 3 index 3 -1 roll put def
+ } bdef
+/~		% <procname> <opname> <numargs> ~ -
+ { exch cvx 1 packedarray cvx exch !
+ } bdef
+
+% ---------------- Graphics state stack ---------------- %
+
+% PDF adds a number of parameters to the graphics state.
+% We implement this by pushing and popping a dictionary
+% each time we do a PDF gsave or grestore.
+% The keys in this dictionary are as follows:
+%	self			% identifies the dictionary as one of ours
+%	Show
+%	TextOrigin		% origin of current line, in text space
+%	TextSaveMatrix		% matrix at time of BT
+% (The following correspond directly to PDF state parameters.)
+%	FillColor
+%	FillColorSpace
+%	StrokeColor
+%	StrokeColorSpace
+%	TextSpacing
+%	TextHScaling
+%	Leading
+%	TextFont
+%	TextMatrix
+%	TextRise
+%	TextRenderingMode
+%	WordSpacing
+
+/nodict 1 dict def
+nodict /self { //nodict } executeonly put
+nodict readonly pop
+
+/beginpage
+ { //nodict 20 dict .copydict begin graphicsbeginpage textbeginpage
+ } bdef
+/endpage
+ { showpage end
+ } bdef
+
+/graphicsbeginpage { initgraphics  0 g  0 G } bdef
+
+/gput		% <value> <key> gput -
+ { exch currentdict //nodict eq { /self dup load end 5 dict begin def } if
+		% If we're in a Level 1 system, we need to grow the
+		% dictionary explicitly.
+   currentdict length currentdict maxlength ge %eq
+    { currentdict dup length 3 mul 2 idiv 1 add dict .copydict end begin 
+    }
+   if def
+ } bdef
+
+/q_
+ { gsave //nodict begin
+ } bdef
+/q /q_ load 0 !
+% Some PDF files have excess Q operators!
+/Q_
+ { currentdict /self .knownget { exec //nodict eq { end grestore } if } if
+ } bdef
+/Q /Q_ load 0 !
+
+% ---------------- Graphics state parameters ---------------- %
+
+/d /setdash 2 ~
+/i /setflat 1 ~
+/j /setlinejoin 1 ~
+/J /setlinecap 1 ~
+/M /setmiterlimit 1 ~
+/w /setlinewidth 1 ~
+
+% ---------------- Color setting ---------------- %
+
+/fcput		% <color> <colorspace> fcput -
+ { /FillColorSpace gput /FillColor gput
+ } bdef
+/scput		% <color> <colorspace> scput -
+ { /StrokeColorSpace gput /StrokeColor gput
+ } bdef
+
+/csdevgray [/DeviceGray] readonly def
+/csdevrgb [/DeviceRGB] readonly def
+/csdevcmyk [/DeviceCMYK] readonly def
+
+/CSdict 11 dict dup begin
+  /DeviceGray { 0 exch } bdef
+  /DeviceRGB { [0 0 0] cvx exch } bdef
+  /DeviceCMYK { [0 0 0 1] cvx exch } bdef
+  /Indexed
+   { dup 1 get csset exch pop
+     dup 2 index 1 get eq
+      { pop }
+      { exch 4 array copy dup 1 4 -1 roll put }
+     ifelse 0 exch
+    } bdef
+  /setcolorrendering where
+   { pop
+     /CalGray
+      { 1 get dup /Gamma .knownget
+	 { dup length 1 add dict .copydict
+	   dup /DecodeA 4 -1 roll /exp load 2 packedarray cvx put
+         }
+	if /CIEBasedA exch 2 array astore 0 exch
+      } bdef
+     /CalRGB
+      { 1 get dup /Gamma known 1 index /Matrix known or
+	 { dup length 2 add dict .copydict
+	   dup /Matrix .knownget { 1 index /MatrixABC 3 -1 roll put } if
+	   dup /Gamma .knownget
+	    { [ exch { /exp load 2 packedarray cvx } forall
+	      ] 1 index /DecodeABC 3 -1 roll put
+	    }
+	   if
+         }
+	if /CIEBasedABC exch 2 array astore [0 0 0] cvx exch
+      } bdef
+     /CalCMYK { pop //csdevcmyk csset } bdef	% not supported yet
+   }
+   { /CalGray { pop //csdevgray csset } bdef
+     /CalRGB { pop //csdevrgb csset } bdef
+     /CalCMYK { pop //csdevcmyk csset } bdef
+   }
+  ifelse
+end def
+/csset			% <cspace> csset <color> <cspace>
+ { dup dup type /nametype ne { 0 get } if //CSdict exch get exec
+ } bdef
+
+/g { //csdevgray fcput } 1 !
+/G { //csdevgray scput } 1 !
+/rg { 3 array astore cvx //csdevrgb fcput } 3 !
+/RG { 3 array astore cvx //csdevrgb scput } 3 !
+/k { 4 array astore cvx //csdevcmyk fcput } 4 !
+/K { 4 array astore cvx //csdevcmyk scput } 4 !
+/cs { csset fcput } 1 !
+/CS { csset scput } 1 !
+% We have to break up sc according to the number of operands.
+/sc1 { /FillColor gput } 1 !
+/SC1 { /StrokeColor gput } 1 !
+/sc3 { /FillColor load astore pop } 3 !
+/SC3 { /StrokeColor load astore pop } 3 !
+/sc4 { /FillColor load astore pop } 4 !
+/SC4 { /StrokeColor load astore pop } 4 !
+
+% ---------------- Color installation ---------------- %
+
+% Establish a given color (and color space) as current.
+/setfillcolor { FillColor FillColorSpace setgcolor } def
+/setstrokecolor { StrokeColor StrokeColorSpace setgcolor } def
+/CIdict mark			% only used for Level 1
+  /DeviceGray 1   /DeviceRGB 3   /DeviceCMYK 4
+  /CIEBaseA 1   /CIEBaseABC 3   /CIEBasedDEF 3   /CIEBaseDEFG 4
+.dicttomark def
+/Cdict 11 dict dup begin	% <color...> <colorspace> -proc- -
+  /DeviceGray { pop setgray } bdef
+  /DeviceRGB { pop setrgbcolor } bdef
+  /DeviceCMYK { pop setcmykcolor } bdef
+  /CIEBasedA
+   { dup currentcolorspace eq { pop } { setcolorspace } ifelse setcolor } bdef
+  /CIEBasedABC /CIEBasedA load def
+  /CIEBasedDEF /CIEBasedA load def
+  /CIEBasedDEFG /CIEBasedA load def
+  /Indexed /setcolorspace where
+   { pop /CIEBasedA load }
+   { /setindexedcolor cvx }
+  ifelse def
+end def
+/setindexedcolor		% <index> [/Indexed base hival proc|str]
+				%   setindexedcolor - (only used for Level 1)
+ { mark 3 -1 roll
+   2 index 3 get	% Stack: cspace -mark- index proc|str
+   dup type /stringtype eq
+    { //CIdict 4 index 1 get 0 get get		% # of components
+      dup 4 -1 roll mul exch getinterval { 255 div } forall
+    }
+    { exec
+    }
+   ifelse
+   counttomark 2 add -2 roll pop
+   1 get setgcolor
+ } bdef
+/setgcolor	% (null | <color...>) <colorspace> setgcolor -
+ { 1 index null eq
+    { pop pop }
+    { dup 0 get //Cdict exch get exec }
+   ifelse
+ } bdef
+/fsexec		% <fillop|strokeop> fsexec -
+ {		% Preserve the current point, if any.
+    { currentpoint } stopped
+    { $error /newerror false put   cvx exec }
+    { 3 -1 roll cvx exec moveto }
+   ifelse
+ } bdef
+
+% ---------------- Transformations ---------------- %
+
+/cmmatrix matrix def
+/cm { //cmmatrix astore concat } 6 !
+
+% ---------------- Path creation ---------------- %
+
+/m /moveto 2 ~
+/l /lineto 2 ~
+/c /curveto 6 ~
+/h /closepath 0 ~
+/v { currentpoint 6 2 roll curveto } 4 !
+/y { 2 copy curveto } 4 !
+/re
+ { 4 2 roll moveto  exch dup 0 rlineto  0 3 -1 roll rlineto  neg 0 rlineto
+   closepath
+ } 4 !
+
+% ---------------- Path painting and clipping ---------------- %
+
+/S_ { setstrokecolor /stroke fsexec } bdef
+/S { S_ } 0 !
+/f { setfillcolor /fill fsexec } 0 !
+/f* { setfillcolor /eofill fsexec } 0 !
+/n_ { newpath } bdef		% don't allow n_ to get bound in
+/n { n_ } 0 !
+/s { closepath S_ } 0 !
+/B_ { gsave setfillcolor fill grestore S_ } bdef
+/B /B_ load 0 !
+/b { closepath B_ } 0 !
+/B*_ { gsave setfillcolor eofill grestore S_ } bdef
+/B* /B*_ load 0 !
+/b* { closepath B*_ } 0 !
+
+% Clipping:
+
+/Wdict 4 dict dup begin
+/S_ { gsave setstrokecolor stroke grestore n_ } bdef
+/f { gsave setfillcolor fill grestore n_ } 0 !
+/f* { gsave setfillcolor eofill grestore n_ } 0 !
+/n_ { end clip newpath } bdef
+end readonly def
+/W { //Wdict begin } 0 !
+/W*dict 4 dict dup begin
+/S_ { gsave setstrokecolor stroke grestore n_ } bdef
+/f { gsave setfillcolor fill grestore n_ } 0 !
+/f* { gsave setfillcolor eofill grestore n_ } 0 !
+/n_ { end eoclip newpath } bdef
+end readonly def
+/W* { //W*dict begin } 0 !
+
+% ---------------- Images ---------------- %
+
+% We mustn't bind these now, since they reference Level 2 operators.
+/Is		% <imagedict> Is <imagedict> <datasource>
+ { dup /DataSource get string /readstring cvx /currentfile cvx
+		% Stack: imagedict string -readstring- -currentfile-
+   3 index /FilterProc .knownget
+    { dup dup 0 get /ASCIIHexDecode eq exch length 2 eq and
+       { pop exch pop /readhexstring cvx exch }
+       { exch exec exch exec }
+      ifelse
+    }
+   if 3 1 roll /pop cvx 4 packedarray cvx
+ } bdef
+/EI { } def	% placeholder, only needed when writing PostScript
+% Note that ID* take a dictionary, not separate values;
+% ColorSpace must be a name if it has no parameters;
+% DataSource is the size of the row buffer in bytes;
+% FilterProc is an optional procedure for constructing the decoding filter;
+% and ImageMask is required, not optional.
+/csimage
+ { /setcolorspace where
+    { pop dup /ColorSpace get csset setcolorspace pop image }
+    { .colorspaceimage }
+   ifelse
+ } def		% don't bind, because of Level 2
+/ID	% <imagedict> ID -
+ { Is dup 3 -1 roll dup /ImageMask get
+    { setfillcolor dup /Interpolate .knownget not { false } if
+       { dup /DataSource 4 -1 roll put /imagemask cvx exec
+       }
+       {  { /Width /Height /Decode /ImageMatrix }
+	  { 1 index exch get exch }
+	 forall pop exch 0 get 0 ne exch
+	 5 -1 roll imagemask
+       }
+      ifelse
+    }
+    { dup /ColorSpace get /DeviceGray eq
+      1 index /BitsPerComponent get 8 le and
+      1 index /Decode get dup 1 get 1 eq exch 0 get 0 eq and and
+      1 index /Interpolate .knownget not { false } if not and
+       {  { /Width /Height /BitsPerComponent /ImageMatrix }
+	  { 1 index exch get exch }
+	 forall pop 5 -1 roll image
+       }
+       { dup /DataSource 4 -1 roll put csimage
+       }
+      ifelse
+    }
+   ifelse
+		% If we were reading with readhexstring,
+		% skip the terminating > now.
+		% Stack: datasource
+   dup type /filetype ne		% array or packedarray
+    { dup 2 get /readhexstring eq
+       {  { dup 0 get exec read pop (>) 0 get eq { exit } if } loop
+       }
+      if pop
+    }
+    { pop
+    }
+   ifelse EI
+ } 1 !
+% IDx handles general images.
+/IDx	% <imagedict> IDx -
+ { Is 1 index /DataSource 3 -1 roll put
+   csimage EI
+ } 1 !
+
+% ---------------- Text control ---------------- %
+
+/textbeginpage
+ { /TextSpacing 0 def		% 0 Tc
+   /TextLeading 0 def		% 0 TL
+   /TextRenderingMode 0 def	% 0 Tr
+   /TextRise 0 def		% 0 Ts
+   /WordSpacing 0 def		% 0 Tw
+   /TextHScaling 1.0 def	% 100 Tz
+   /TextFont null def
+   /Show { showfirst } def
+ } bdef
+
+% Contrary to the statement in the PDF manual, BT and ET *can* be nested,
+% if the CharProc for a Type 3 font does a BT/ET itself.
+% Since we always call the CharProc inside a q_/Q_, we simply ensure that
+% the text state is saved and restored like the rest of the extended
+% graphics state.
+
+/settextmatrix
+ { TextMatrix concat
+   TextHScaling 1 ne { TextHScaling 1 scale } if
+   TextRise 0 ne { 0 TextRise translate } if
+ } bdef
+/settextstate { TextSaveMatrix setmatrix settextmatrix } bdef
+
+/BT
+ { currentdict /TextMatrix .knownget
+    { identmatrix pop }
+    { matrix /TextMatrix gput }
+   ifelse
+   currentdict /TextOrigin .knownget
+    { dup 0 0 put 1 0 put }
+    { [0 0] cvx /TextOrigin gput }
+   ifelse
+    { showfirst } /Show gput
+   currentdict /TextSaveMatrix .knownget not
+    { matrix dup /TextSaveMatrix gput }
+   if currentmatrix pop settextmatrix 0 0 moveto
+   TextFont dup null eq { pop } { setfont } ifelse
+ } bind 0 !
+/ET
+ { TextSaveMatrix setmatrix
+ } bind 0 !
+/Tc_ { /TextSpacing gput { showfirst } /Show gput } bdef
+/Tc { Tc_ } 1 !
+/TL { /TextLeading gput } bind 1 !
+/Tr { /TextRenderingMode gput { showfirst } /Show gput } bind 1 !
+/Ts { /TextRise gput settextstate } bind 1 !
+/Tw_ { /WordSpacing gput { showfirst } /Show gput } bdef
+/Tw { Tw_ } 1 !
+/Tz { 100 div /TextHScaling gput settextstate } bind 1 !
+
+/Tf		% <font> <scale> Tf -
+ { dup 1 eq { pop } { scalefont } ifelse
+   dup setfont /TextFont gput
+ } 2 !
+
+% Copy a font, removing its FID.  If changed is true, also remove
+% the UniqueID and XUID, if any.  If the original dictionary doesn't have
+% the keys being removed, don't copy it.
+/.copyfontdict		% <font> <changed> .copyfontdict <dict>
+ { 1 index /FID known
+   1 index { 2 index /UniqueID known or 2 index /XUID known or } if
+    {		% We add 1 to the length just in case the original
+		% didn't have a FID.
+      exch dup length 1 add dict exch
+       {		% Stack: changed newfont key value
+	 1 index /FID eq 4 index
+	  { 2 index /UniqueID eq or 2 index /XUID eq or }
+	 if not { 3 copy put } if pop pop
+       }
+      forall exch
+    }
+   if pop
+ } bdef
+
+% Insert a new Encoding or Metrics into a font if necessary.
+% Return a possibly updated font, and a flag to indicate whether
+% the font was actually copied.
+/.updatefont		% <font> <Encoding|null> <Metrics|null> .updatefont
+			%   <font'> <copied>
+ { 2 index 4 1 roll
+   dup null ne
+    { 3 -1 roll true .copyfontdict dup /Metrics 4 -1 roll put exch }
+    { pop }
+   ifelse
+   dup null ne 1 index 3 index /Encoding get ne and
+    { exch false .copyfontdict dup /Encoding 4 -1 roll put }
+    { pop }
+   ifelse exch 1 index ne
+ } bdef
+
+% ---------------- Text positioning ---------------- %
+
+/Td_
+ { TextOrigin exch 4 -1 roll add 3 1 roll add
+   2 copy /TextOrigin load astore pop moveto
+ } bdef
+/Td { Td_ } 2 !
+/TD { dup neg /TextLeading gput Td_ } 2 !
+/T*_ { 0 TextLeading neg Td_ } bdef
+/T* { T*_ } 0 !
+/Tm
+ { TextMatrix astore pop settextstate
+   0 0 /TextOrigin load astore pop
+   0 0 moveto
+ } 6 !
+
+% ---------------- Text painting ---------------- %
+
+/textrenderingprocs [		% (0 is handled specially)
+   { tf } { tS } { tB } { tn }
+	% We don't know what the clipping modes mean....
+   4 copy
+] readonly def
+/setshowstate
+ { WordSpacing 0 eq TextSpacing 0 eq and
+    { TextRenderingMode 0 eq
+       { { setfillcolor show } }
+       { { false charpath textrenderingprocs TextRenderingMode get exec } }
+      ifelse
+    }
+    { TextRenderingMode 0 eq
+       { WordSpacing 0 eq
+          { { setfillcolor TextSpacing exch 0 exch ashow } }
+	  { TextSpacing 0 eq
+	     { { setfillcolor WordSpacing exch 0 exch 32 exch widthshow } }
+	     { { setfillcolor WordSpacing exch TextSpacing exch 0 32 4 2 roll 0 exch awidthshow } }
+	    ifelse
+	  }
+	 ifelse
+       }
+       { { WordSpacing TextSpacing 2 index
+			% Implement the combination of t3 and false charpath.
+			% Stack: xword xchar string
+	   0 1 2 index length 1 sub
+	    { 2 copy 1 getinterval false charpath
+			% Stack: xword xchar string i
+	      4 copy get 32 eq { add } { exch pop } ifelse 0 rmoveto
+	      pop
+	    }
+	   for pop pop pop pop
+	   textrenderingprocs TextRenderingMode get exec
+	 }
+       }
+      ifelse
+    }
+   ifelse /Show gput
+ } bdef
+/showfirst { setshowstate Show } def
+
+/Tj { Show } 1 !
+/' { T*_ Show } 1 !
+/" { exch Tc_ exch Tw_ T*_ Show } 3 !
+% TJ expects a mark followed by arguments, not an array.
+/TJ
+ { counttomark -1 1
+    { -1 roll dup type /stringtype eq
+       { Show }
+       { neg 1000 div 0 rmoveto }
+      ifelse
+    }
+   for pop
+% Adobe implementations don't accept /[, so we don't either.
+ } ([) cvn !
+
+/tf { setfillcolor currentpoint fill moveto } bdef
+/tn { currentpoint newpath moveto } bdef
+% For stroking characters, temporarily restore the graphics CTM so that
+% the line width will be transformed properly.
+/Tmatrix matrix def
+/tS
+ { setstrokecolor
+   currentpoint //Tmatrix currentmatrix TextSaveMatrix setmatrix stroke
+   setmatrix moveto
+ } bdef
+/tB { gsave tf grestore tS } bdef
+
+end readonly put		% GS_PDF_ProcSet
+
+setglobal

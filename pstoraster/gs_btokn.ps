@@ -1,0 +1,287 @@
+%    Copyright (C) 1994, 1996 Aladdin Enterprises.  All rights reserved.
+% 
+% This file is part of GNU Ghostscript.
+% 
+% GNU Ghostscript is distributed in the hope that it will be useful, but
+% WITHOUT ANY WARRANTY.  No author or distributor accepts responsibility to
+% anyone for the consequences of using it or for whether it serves any
+% particular purpose or works at all, unless he says so in writing.  Refer to
+% the GNU General Public License for full details.
+% 
+% Everyone is granted permission to copy, modify and redistribute GNU
+% Ghostscript, but only under the conditions described in the GNU General
+% Public License.  A copy of this license is supposed to have been given to
+% you along with GNU Ghostscript so you can know your rights and
+% responsibilities.  It should be in a file named COPYING.  Among other
+% things, the copyright notice and this notice must be preserved on all
+% copies.
+% 
+% Aladdin Enterprises is not affiliated with the Free Software Foundation or
+% the GNU Project.  GNU Ghostscript, as distributed by Aladdin Enterprises,
+% does not depend on any other GNU software.
+
+% Initialization file for binary tokens.
+% When this is run, systemdict is still writable,
+% but everything defined here goes into level2dict.
+
+% Define whether or not to allow writing dictionaries.
+/WRITEDICTS true def
+
+languagelevel 1 .setlanguagelevel
+level2dict begin
+
+% Initialization for the system name table.
+
+mark
+% 0
+	/abs /add /aload /anchorsearch /and
+	/arc /arcn /arct /arcto /array
+	/ashow /astore /awidthshow /begin /bind
+	/bitshift /ceiling /charpath /clear /cleartomark
+% 20
+	/clip /clippath /closepath /concat /concatmatrix
+	/copy /count /counttomark /currentcmykcolor /currentdash
+	/currentdict /currentfile /currentfont /currentgray /currentgstate
+	/currenthsbcolor /currentlinecap /currentlinejoin /currentlinewidth /currentmatrix
+% 40
+	/currentpoint /currentrgbcolor /currentshared /curveto /cvi
+	/cvlit /cvn /cvr /cvrs /cvs
+	/cvx /def /defineusername /dict /div
+	/dtransform /dup /end /eoclip /eofill
+% 60
+	/eoviewclip /eq /exch /exec /exit
+	/file /fill /findfont /flattenpath /floor
+	/flush /flushfile /for /forall /ge
+	/get /getinterval /grestore /gsave /gstate
+% 80
+	/gt /identmatrix /idiv /idtransform /if
+	/ifelse /image /imagemask /index /ineofill
+	/infill /initviewclip /inueofill /inufill /invertmatrix
+	/itransform /known /le /length /lineto
+% 100
+	/load /loop /lt /makefont /matrix
+	/maxlength /mod /moveto /mul /ne
+	/neg /newpath /not /null /or
+	/pathbbox /pathforall /pop /print /printobject
+% 120
+	/put /putinterval /rcurveto /read /readhexstring
+	/readline /readstring /rectclip /rectfill /rectstroke
+	/rectviewclip /repeat /restore /rlineto /rmoveto
+	/roll /rotate /round /save /scale
+% 140
+	/scalefont /search /selectfont /setbbox /setcachedevice
+	/setcachedevice2 /setcharwidth /setcmykcolor /setdash /setfont
+	/setgray /setgstate /sethsbcolor /setlinecap /setlinejoin
+	/setlinewidth /setmatrix /setrgbcolor /setshared /shareddict
+% 160
+	/show /showpage /stop /stopped /store
+	/string /stringwidth /stroke /strokepath /sub
+	/systemdict /token /transform /translate /truncate
+	/type /uappend /ucache /ueofill /ufill
+% 180
+	/undef /upath /userdict /ustroke /viewclip
+	/viewclippath /where /widthshow /write /writehexstring
+	/writeobject /writestring /wtranslation /xor /xshow
+	/xyshow /yshow /FontDirectory /SharedFontDirectory /Courier
+% 200
+	/Courier-Bold /Courier-BoldOblique /Courier-Oblique /Helvetica /Helvetica-Bold
+	/Helvetica-BoldOblique /Helvetica-Oblique /Symbol /Times-Bold /Times-BoldItalic
+	/Times-Italic /Times-Roman /execuserobject /currentcolor /currentcolorspace
+	/currentglobal /execform /filter /findresource /globaldict
+% 220
+	/makepattern /setcolor /setcolorspace /setglobal /setpagedevice
+	/setpattern
+% pad to 256
+	counttomark 256 exch sub { 0 } repeat
+% 256
+	/= /== /ISOLatin1Encoding /StandardEncoding
+% 260
+	([) cvn (]) cvn /atan /banddevice /bytesavailable
+	/cachestatus /closefile /colorimage /condition /copypage
+	/cos /countdictstack /countexecstack /cshow /currentblackgeneration
+	/currentcacheparams /currentcolorscreen /currentcolortransfer /currentcontext /currentflat
+% 280
+	/currenthalftone /currenthalftonephase /currentmiterlimit /currentobjectformat /currentpacking
+	/currentscreen /currentstrokeadjust /currenttransfer /currentundercolorremoval /defaultmatrix
+	/definefont /deletefile /detach /deviceinfo /dictstack
+	/echo /erasepage /errordict /execstack /executeonly
+% 300
+	/exp /false /filenameforall /fileposition /fork
+	/framedevice /grestoreall /handleerror /initclip /initgraphics
+	/initmatrix /instroke /inustroke /join /kshow
+	/ln /lock /log /mark /monitor
+% 320
+	/noaccess /notify /nulldevice /packedarray /quit
+	/rand /rcheck /readonly /realtime /renamefile
+	/renderbands /resetfile /reversepath /rootfont /rrand
+	/run /scheck /setblackgeneration /setcachelimit /setcacheparams
+% 340
+	/setcolorscreen /setcolortransfer /setfileposition /setflat /sethalftone
+	/sethalftonephase /setmiterlimit /setobjectformat /setpacking /setscreen
+	/setstrokeadjust /settransfer /setucacheparams /setundercolorremoval /sin
+	/sqrt /srand /stack /status /statusdict
+% 360
+	/true /ucachestatus /undefinefont /usertime /ustrokepath
+	/version /vmreclaim /vmstatus /wait /wcheck
+	/xcheck /yield /defineuserobject /undefineuserobject /UserObjects
+	/cleardictstack
+% 376
+	/A /B /C /D /E /F /G /H /I /J /K /L /M
+	/N /O /P /Q /R /S /T /U /V /W /X /Y /Z
+	/a /b /c /d /e /f /g /h /i /j /k /l /m
+	/n /o /p /q /r /s /t /u /v /w /x /y /z
+% 428
+	/setvmthreshold (<<) cvn
+	(>>) cvn /currentcolorrendering /currentdevparams /currentoverprint /currentpagedevice
+	/currentsystemparams /currentuserparams /defineresource /findencoding /gcheck
+% 440
+	/glyphshow /languagelevel /product /pstack /resourceforall
+	/resourcestatus /revision /serialnumber /setcolorrendering /setdevparams
+	/setoverprint /setsystemparams /setuserparams /startjob /undefineresource
+	/GlobalFontDirectory /ASCII85Decode /ASCII85Encode /ASCIIHexDecode /ASCIIHexEncode
+% 460
+	/CCITTFaxDecode /CCITTFaxEncode /DCTDecode /DCTEncode /LZWDecode
+	/LZWEncode /NullEncode /RunLengthDecode /RunLengthEncode /SubFileDecode
+	/CIEBasedA /CIEBasedABC /DeviceCMYK /DeviceGray /DeviceRGB
+	/Indexed /Pattern /Separation
+% 478 -- end
+.packtomark
+
+% Install the system and user name tables.
+% The user name table is read-only for ordinary programs,
+% since it doesn't obey save/restore and must be managed specially.
+ 
+dup /SystemNames exch def
+100 array readonly dup /UserNames exch def
+.installnames
+
+% Define printobject and writeobject.
+% These are mostly implemented in PostScript, so that we don't have to
+% worry about interrupts or callbacks when writing to the output file.
+
+% Define procedures for accumulating the space required to represent
+% an object in binary form.
+/cntdict mark		% <#refs> <#chars> <obj> -proc- <#refs> <#chars>
+	/integertype /pop load
+	/realtype 1 index
+	/marktype 1 index
+	/nulltype 1 index
+	/booleantype 1 index
+	/nametype { length add } bind
+	/stringtype 1 index
+	/arraytype null
+	WRITEDICTS { /dicttype null } if
+.dicttomark def
+cntdict /arraytype
+ { dup dup length 5 -1 roll add 4 2 roll
+    { dup type //cntdict exch get exec } forall
+ } bind put
+WRITEDICTS
+ { cntdict /dicttype
+    { dup dup length 2 mul 5 -1 roll add 4 2 roll
+       { 4 1 roll dup type //cntdict exch get exec
+	 3 -1 roll dup type //cntdict exch get exec
+       } forall
+    } bind put
+ } if
+
+/w2dict mark
+	/nametype { 2 copy .writecvs pop } bind
+	/stringtype 1 index
+.dicttomark def
+
+/.writeobjects		% <file> <tag> <array> .writeobjects -
+ {
+	mark exch
+
+	% Count the space required for refs and strings.
+	dup length 0 3 -1 roll
+	% Stack: <file> <tag> -mark- <#refs> <#chars> <array>
+
+	dup 4 1 roll
+	 { dup type //cntdict exch get exec
+	 } forall
+
+	% Write the header.
+	% Stack: <file> <tag> -mark- <array1> ... <array|dictN> <#refs> <#chars>
+	counttomark 3 add -2 roll 4 1 roll
+	% Stack: -mark- <array1> ... <array|dictN> <tag> <#refs> <#chars> <file>
+	dup counttomark 1 sub index length
+	4 index 3 bitshift 4 index add
+	(xxxxxxxx) .bosheader writestring
+
+	% Write the objects per se.
+	3 1 roll pop
+	counttomark 1 sub index length 3 bitshift exch
+	3 bitshift
+	% Stack: -mark- <array1> ... <array|dictN> <tag> <file> <ref#> <char#>
+
+	counttomark 4 sub
+	 { counttomark -1 roll dup 6 1 roll
+	   dup type /dicttype eq		% can't be first object
+	    {  { 5 1 roll (xxxxxxxx) .bosobject
+		 3 index exch writestring
+		 4 -1 roll (xxxxxxxx) .bosobject
+		 3 index exch writestring
+	       } forall
+	    }
+	    {  { (xxxxxxxx) .bosobject
+		 dup 1 6 index put
+		 3 index exch writestring
+		 4 -1 roll pop 0 4 1 roll	% clear tag
+	       } forall
+	    }
+	   ifelse
+	 }
+	repeat
+
+	% Write the strings and names.
+	pop pop exch pop
+	% Stack: -mark- <array1> ... <array|dictN> <file>
+
+ 	counttomark 1 sub
+	 { counttomark -1 roll
+	    {		% The counting pass ensured that the keys and values
+			% of any dictionary must be writable objects.
+			% Hence, we are processing a dictionary iff
+			% the next-to-top stack element is not a file.
+	      1 index type /filetype ne
+	       { exch 2 index exch dup type //w2dict exch .knownget
+		  { exec } { pop } ifelse pop
+	       }
+	      if
+              dup type //w2dict exch .knownget { exec } { pop } ifelse
+	    } forall
+	 }
+	repeat
+
+	% Clean up.
+	% Stack: -mark- <file>
+
+	pop pop
+
+ } odef
+currentdict /cntdict .undef
+currentdict /w2dict .undef
+
+/printobject { (%stdout) (w) file 3 1 roll writeobject } odef
+/writeobject { exch 1 array astore .writeobjects } odef
+
+% Implement binary error message output.
+  /.printerror
+   { $error /binary get .languagelevel 2 eq and
+      { currentobjectformat 0 ne
+         { [ /Error $error /errorname get $error /command get false
+	   ] 250 printobject
+	 }
+	 //.printerror
+	ifelse
+      }
+      //.printerror
+     ifelse
+   } bind def
+
+% End of level2dict
+
+end
+.setlanguagelevel

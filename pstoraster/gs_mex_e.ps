@@ -1,0 +1,70 @@
+%    Copyright (C) 1994 Aladdin Enterprises.  All rights reserved.
+% 
+% This file is part of GNU Ghostscript.
+% 
+% GNU Ghostscript is distributed in the hope that it will be useful, but
+% WITHOUT ANY WARRANTY.  No author or distributor accepts responsibility to
+% anyone for the consequences of using it or for whether it serves any
+% particular purpose or works at all, unless he says so in writing.  Refer to
+% the GNU General Public License for full details.
+% 
+% Everyone is granted permission to copy, modify and redistribute GNU
+% Ghostscript, but only under the conditions described in the GNU General
+% Public License.  A copy of this license is supposed to have been given to
+% you along with GNU Ghostscript so you can know your rights and
+% responsibilities.  It should be in a file named COPYING.  Among other
+% things, the copyright notice and this notice must be preserved on all
+% copies.
+% 
+% Aladdin Enterprises is not affiliated with the Free Software Foundation or
+% the GNU Project.  GNU Ghostscript, as distributed by Aladdin Enterprises,
+% does not depend on any other GNU software.
+
+% Define the MacExpert encoding vector.
+/currentglobal where
+ { pop currentglobal { setglobal } true setglobal }
+ { { } }
+ifelse
+/MacExpertEncoding
+% \00x
+    /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef
+    /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef
+    /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef
+    /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef
+% \04x
+    /space /exclamsmall /Hungarumlautsmall /centoldstyle /dollaroldstyle /dollarsuperior /ampersandsmall /Acutesmall
+    /parenleftsuperior /parenrightsuperior /twodotenleader /onedotenleader /comma /hyphen /period /fraction
+    /zerooldstyle /oneoldstyle /twooldstyle /threeoldstyle /fouroldstyle /fiveoldstyle /sixoldstyle /sevenoldstyle
+    /eightoldstyle /nineoldstyle /colon /semicolon /.notdef /threequartersemdash /.notdef /questionsmall
+% \10x
+    /.notdef /.notdef /.notdef /.notdef /Ethsmall /.notdef /.notdef /onequarter
+    /onehalf /threequarters /oneeighth /threeeighths /fiveeighths /seveneighths /onethird /twothirds
+    /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /ff /fi
+    /fl /ffi /ffl /parenleftinferior /.notdef /parenrightinferior /Circumflexsmall /hypheninferior
+% \14x
+    /Gravesmall /Asmall /Bsmall /Csmall /Dsmall /Esmall /Fsmall /Gsmall
+    /Hsmall /Ismall /Jsmall /Ksmall /Lsmall /Msmall /Nsmall /Osmall
+    /Psmall /Qsmall /Rsmall /Ssmall /Tsmall /Usmall /Vsmall /Wsmall
+    /Xsmall /Ysmall /Zsmall /colonmonetary /onefitted /rupiah /Tildesmall /.notdef
+% \20x
+    /.notdef /asuperior /centsuperior /.notdef /.notdef /.notdef /.notdef /Aacutesmall
+    /Agravesmall /Acircumflexsmall /Adieresissmall /Atildesmall /Aringsmall /Ccedillasmall /Eacutesmall /Egravesmall
+    /Ecircumflexsmall /Edieresissmall /Iacutesmall /Igravesmall /Icircumflexsmall /Idieresissmall /Ntildesmall /Oacutesmall
+    /Ogravesmall /Ocircumflexsmall /Odieresissmall /Otildesmall /Uacutesmall /Ugravesmall /Ucircumflexsmall /Udieresissmall
+% \24x
+    /.notdef /eightsuperior /fourinferior /threeinferior /sixinferior /eightinferior /seveninferior /Scaronsmall
+    /.notdef /centinferior /twoinferior /.notdef /Dieresissmall /.notdef /Caronsmall /osuperior
+    /fiveinferior /.notdef /commainferior /periodinferior /Yacutesmall /.notdef /dollarinferior /.notdef
+    /.notdef /Thornsmall /.notdef /nineinferior /zeroinferior /Zcaronsmall /AEsmall /Oslashsmall
+% \30x
+    /questiondownsmall /oneinferior /Lslashsmall /.notdef /.notdef /.notdef /.notdef /.notdef
+    /.notdef /Cedillasmall /.notdef /.notdef /.notdef /.notdef /.notdef /OEsmall
+    /figuredash /hyphensuperior /.notdef /.notdef /.notdef /.notdef /exclamdownsmall /.notdef
+    /Ydieresissmall /.notdef /onesuperior /twosuperior /threesuperior /foursuperior /fivesuperior /sixsuperior
+% \34x
+    /sevensuperior /ninesuperior /zerosuperior /.notdef /esuperior /rsuperior /tsuperior /.notdef
+    /.notdef /isuperior /ssuperior /dsuperior /.notdef /.notdef /.notdef /.notdef
+    /.notdef /lsuperior /Ogoneksmall /Brevesmall /Macronsmall /bsuperior /nsuperior /msuperior
+    /commasuperior /periodsuperior /Dotaccentsmall /Ringsmall /.notdef /.notdef /.notdef /.notdef
+256 packedarray .defineencoding
+exec

@@ -1,0 +1,374 @@
+%    Copyright (C) 1994, 1996 Aladdin Enterprises.  All rights reserved.
+% 
+% This file is part of GNU Ghostscript.
+% 
+% GNU Ghostscript is distributed in the hope that it will be useful, but
+% WITHOUT ANY WARRANTY.  No author or distributor accepts responsibility to
+% anyone for the consequences of using it or for whether it serves any
+% particular purpose or works at all, unless he says so in writing.  Refer to
+% the GNU General Public License for full details.
+% 
+% Everyone is granted permission to copy, modify and redistribute GNU
+% Ghostscript, but only under the conditions described in the GNU General
+% Public License.  A copy of this license is supposed to have been given to
+% you along with GNU Ghostscript so you can know your rights and
+% responsibilities.  It should be in a file named COPYING.  Among other
+% things, the copyright notice and this notice must be preserved on all
+% copies.
+% 
+% Aladdin Enterprises is not affiliated with the Free Software Foundation or
+% the GNU Project.  GNU Ghostscript, as distributed by Aladdin Enterprises,
+% does not depend on any other GNU software.
+
+% pdf_font.ps
+% PDF font operations.
+
+/.setlanguagelevel where { pop 2 .setlanguagelevel } if
+.currentglobal true .setglobal
+/pdfdict where { pop } { /pdfdict 100 dict def } ifelse
+GS_PDF_ProcSet begin
+pdfdict begin
+
+% We cache the PostScript font in an additional element of the
+% font resource dictionary, called PSFont.
+
+% ---------------- Encodings ---------------- %
+
+% Apply a list of differences to an Encoding.
+/updateencoding		% <encoding> <differences> updateencoding <enc'>
+ { exch dup length array copy
+   exch dup 0 get exch dup length 1 sub
+   1 exch getinterval
+    { dup type /nametype ne
+       { exch pop }
+       { 3 copy put pop 1 add }
+      ifelse
+    }
+   forall pop
+ } bdef
+
+% Get the Encoding for a font.
+/getencoding		% <base-encoding> <font-resource> getencoding <enc>
+ { /Encoding knownoget
+    { dup type /nametype eq
+       { exch pop findencoding
+       }
+       { dup /BaseEncoding knownoget
+	  { findencoding 3 -1 roll pop exch
+	  }
+	 if
+	 /Differences knownoget { updateencoding } if
+       }
+      ifelse
+    }
+   if
+ } bdef
+
+% Adjust a font according to the Encoding and Widths in the font resource.
+/adjustfont		% <font-resource> <font> adjustfont
+			%   <font'> <changed>
+ { getfontencoding getfontmetrics 4 -1 roll pop .updatefont
+    { dup /FontName 2 copy get genfontname dup 5 1 roll put definefont }
+   if
+ } bind def
+
+% Get the (possibly modified) encoding of a font.
+/getfontencoding	% <font-resource> <font> getfontencoding
+			%   <font-resource> <font> <encoding>
+ { dup /Encoding get 2 index getencoding
+ } bdef
+
+% Get the metrics of a font, if specified.
+/getfontmetrics		% <font-resource> <font> <encoding> getfontmetrics
+			%   <font-resource> <font> <encoding> <Metrics|null>
+ { 2 index /Widths known
+    { 2 dict begin
+      /Encoding exch def
+      /Metrics Encoding length dict def
+      exch
+		% Stack: font font-res
+		% Note that widths are always based on a 1000-unit
+		% character space, but the FontMatrix may specify
+		% some other scale factor.  Compensate for this here,
+		% by scaling the Widths if necessary.
+      0.001 2 index /FontMatrix get 0 get div
+		% Stack: font font-res mscale
+      1 index /FirstChar oget dup 1 4 index /LastChar oget
+       {	% Stack: font font-res mscale first-char index
+	 Encoding 1 index get
+	 4 index /Widths oget 2 index 4 index sub get
+	 	% Stack: font font-res mscale first-char index charname width
+	 4 index mul
+		% There is a hack here to deal with encodings where the
+		% same character appears more than once, because the Metrics
+		% dictionary works by character name, not by character code.
+		% Because of this, we can't deal with Width vectors that
+		% specify different widths for the same character name
+		% appearing multiple times in the Encoding.
+	 Metrics 2 index .knownget not { 0 } if 0 ne
+	  { pop pop }
+	  { Metrics 3 1 roll put }
+	 ifelse pop
+       }
+      for pop
+		% Now fill in the MissingWidth for any encoded characters
+		% that aren't in Metrics already.
+		% Stack: font font-res mscale
+      Metrics 2 index /FontDescriptor oget
+      /MissingWidth knownoget { 2 index mul } { 0 } ifelse exch
+      Encoding
+       {	% Stack: font font-res mscale missing-width metrics charname
+	 2 copy known not { 2 copy 4 index put } if pop
+       }
+      forall pop pop pop
+      exch Encoding Metrics end
+    }
+    { null
+    }
+   ifelse
+ } bdef
+
+% ---------------- Descriptors ---------------- %
+
+% Partial descriptors for the 14 built-in fonts.
+/standardfontdescriptors mark
+  /Courier mark /Flags 16#23 .dicttomark
+  /Courier-Oblique 1 index
+  /Courier-Bold 1 index
+  /Courier-BoldOblique 1 index
+  /Helvetica mark /Flags 16#20 .dicttomark
+  /Helvetica-Oblique 1 index
+  /Helvetica-Bold 1 index
+  /Helvetica-BoldOblique 1 index
+  /Times-Roman mark /Flags 16#22 .dicttomark
+  /Times-Bold 1 index
+  /Times-Italic mark /Flags 16#62 .dicttomark
+  /Times-BoldItalic 1 index
+  /Symbol mark /Flags 16#4 .dicttomark
+  /ZapfDingbats 1 index
+.dicttomark readonly def
+
+% ---------------- Utilities ---------------- %
+
+% Fabricate a font name by adding %'s on the end.
+/genfontname		% <name> genfontname <name>
+ { dup length string cvs
+    { (%) concatstrings
+      dup cvn FontDirectory exch known not { cvn exit } if
+    }
+   loop
+ } bdef
+
+% Find a font, and adjust its encoding if necessary.
+/pdffindfont		% <font-resource> <fontname> pdffindfont <font>
+ { findfont adjustfont
+ } bdef
+
+% ---------------- Type 1 fonts ---------------- %
+
+/buildType1		% <Type1-font-resource> buildType1 <font>
+ { dup /BaseFont get pdffindfont
+ } bdef
+
+% The state dictionary for the embedded Type 1 font reading procedure
+% has the following keys and values:
+%	data - stream (filter)
+%	buffer, buffer2 - string
+%	leftstr - string containing (non-negative) integer
+%	sectionstr - string containing a character 0 .. 2
+%	stream - (stream) dictionary
+%	proc - procedure of the form {-dict- type1read}
+% When the procedure is executing, this dictionary is current.
+% leftstr and sectionstr are strings so that we can change their values
+% reliably in case the font executes a restore!
+
+% Read an embedded Type 1 font.
+/readfontfilter		% <proc> readfontfilter <filter>
+ {	% We make this a separate procedure so that we can
+	% redefine it when we're writing PostScript.
+   0 () /SubFileDecode filter
+ } bdef
+/readtype1		% <font-resource> <stream-dict> readtype1 <font>
+ {		% Read the definition, using a procedure-based filter
+		% that turns binary/hex conversion on and off
+		% at the right times.
+   PDFfile fileposition 3 1 roll
+   7 dict begin
+     /leftstr (          ) 10 string copy def
+       dup /Length1 oget leftstr cvs pop
+     /sectionstr <00> 1 string copy def
+     /stream 1 index def
+     true resolvestream /data exch def
+     /buffer 1000 string def		% arbitrary
+     /buffer2 buffer length 2.1 div cvi 1 sub string def
+   currentdict end
+   /type1read cvx 2 array astore cvx dup 0 get /proc 2 index put
+   readfontfilter
+		% Some buggy embedded fonts leave extra junk on the stack,
+		% so we have to make a closure that records the stack depth
+		% in a fail-safe way.
+   //systemdict begin
+    { run } aload pop count 1 sub 2 packedarray cvx exec
+   end
+   count exch sub { pop } repeat
+   PDFfile 3 -1 roll setfileposition
+   /FontDescriptor oget /FontName oget findfont
+ } bdef
+
+% Execute the appropriate reading procedure.
+/type1read		% <dict> type1read <string>
+ { begin leftstr cvi
+    { type1read1 type1read2 type1read3 } sectionstr 0 get get exec
+   (          ) leftstr copy cvs pop end
+ } bdef
+
+% Read the next block of data into the buffer.
+/type1readdata		% <left> <buffer> type1readdata <substring> <left'>
+ { 0 2 index 2 index length min getinterval
+		% Adobe requires readstring to signal an error if given
+		% an empty string.  Work around this nonsense here.
+   dup length 0 ne { data exch readstring pop } if
+   dup length 3 -1 roll exch sub
+   DEBUG
+    { dup =only ( read ) print
+      1 index length =only (: ) print
+      1 index == flush
+    } if
+ } bdef
+
+% Read the next block of the initial text portion.
+/type1read1		% <left> type1read1 <string> <left'>
+ { DEBUG { (read1 ) print } if
+   dup 0 eq
+    { pop sectionstr 0 1 put
+      stream /Length2 oget type1read2
+    }
+    { buffer type1readdata
+    }
+   ifelse
+ } bdef
+
+% Read the next block of the encrypted portion.
+/type1trailer
+(0000000000000000000000000000000000000000000000000000000000000000\n\
+0000000000000000000000000000000000000000000000000000000000000000\n\
+0000000000000000000000000000000000000000000000000000000000000000\n\
+0000000000000000000000000000000000000000000000000000000000000000\n\
+0000000000000000000000000000000000000000000000000000000000000000\n\
+0000000000000000000000000000000000000000000000000000000000000000\n\
+0000000000000000000000000000000000000000000000000000000000000000\n\
+0000000000000000000000000000000000000000000000000000000000000000\n\
+cleartomark\n)
+readonly def
+/type1read2		% <left> type1read2 <string> <left'>
+ { DEBUG { (read2 ) print } if
+   dup 0 eq
+    { pop sectionstr 0 2 put
+      stream /Length3 oget
+      dup 0 eq
+       { DEBUG { (trailer ) print } if
+	 type1trailer exch
+       }
+       { type1read3
+       }
+      ifelse
+    }
+    { buffer2 type1readdata exch
+      buffer /ASCIIHexEncode filter dup 3 -1 roll writestring closefile
+      buffer (>) search pop exch pop exch pop exch
+    }
+   ifelse
+ } bdef
+
+% Read the next block of the final text portion.
+% When finished, this procedure returns an empty string.
+/type1read3		% <left> type1read3 <string> <left'>
+ { DEBUG { (read3 ) print } if
+   buffer type1readdata
+ } bdef
+
+% ---------------- Type 3 fonts ---------------- %
+
+/.notdefEncoding 256 { /.notdef } repeat 256 packedarray def
+
+/buildType3		% <Type3-font-resource> buildType3 <font>
+  { 8 dict begin
+    /FontType 3 def
+    /FontBBox 1 index /FontBBox get cvx def
+    /FontMatrix 1 index /FontMatrix oget def
+    /CharProcs 1 index /CharProcs oget def
+    /FontName 1 index /Name get genfontname def
+    /Encoding .notdefEncoding 2 index getencoding def
+    /BuildGlyph
+     { exch /CharProcs get exch oget
+       PDFfile fileposition exch
+       false resolvestream
+		% Don't let setgcolor set the color inside the BuildGlyph
+		% procedure, because this causes an /undefined error.
+       q_ null /FillColor gput null /StrokeColor gput
+       pdfopdict .pdfrun
+       Q_
+       PDFfile exch setfileposition
+     } bdef
+    FontName currentdict end definefont exch pop
+  } bdef
+
+% ---------------- TrueType fonts ---------------- %
+
+/TTfonts mark
+  /Arial /Helvetica
+  /Arial,Italic /Helvetica-Oblique
+  /Arial,Bold /Helvetica-Bold
+  /Arial,BoldItalic /Helvetica-BoldOblique
+  /TimesNewRoman /Times-Roman
+  /TimesNewRoman,Italic /Times-Italic
+  /TimesNewRoman,Bold /Times-Bold
+  /TimesNewRoman,BoldItalic /Times-BoldItalic
+.dicttomark readonly def
+
+/buildTrueType		% <TrueType-font-resource> buildTrueType <font>
+ { dup /BaseFont get
+   dup TTfonts exch .knownget { exch pop } if pdffindfont
+ } bdef
+
+% ---------------- Font lookup ---------------- %
+
+/fonttypeprocs mark		% <font-resource> -proc- <font>
+  /Type1 /buildType1 cvx
+  /MMType1 1 index
+  /Type3 /buildType3 cvx
+  /TrueType /buildTrueType cvx
+.dicttomark readonly def
+
+/resourcefont			% <font-resource> resourcefont <font>
+ { dup /PSFont .knownget
+    { /FID .knownget { type /fonttype eq } { false } ifelse }
+    { false }
+   ifelse
+    { /PSFont get
+    }
+    { dup dup /FontDescriptor knownoget
+       { /FontFile knownoget }
+       { false }
+      ifelse
+       { 1 index 3 1 roll readtype1 adjustfont }
+       { dup /Subtype get fonttypeprocs exch get exec }
+      ifelse
+      2 copy /PSFont exch put
+      exch pop
+    }
+   ifelse
+ } bdef
+
+drawopdict begin
+  /d0 /setcharwidth load def
+  /d1 /setcachedevice load def
+  /Tf
+   { exch Page /Resources oget /Font oget exch oget resourcefont
+     exch Tf
+   } bdef
+end
+
+end			% pdfdict
+end			% GS_PDF_ProcSet
+.setglobal

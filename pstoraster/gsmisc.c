@@ -1,4 +1,6 @@
-/* Copyright (C) 1989, 1996 Aladdin Enterprises.  All rights reserved.
+/*
+  Copyright 1993-1999 by Easy Software Products.
+  Copyright (C) 1989, 1996 Aladdin Enterprises.  All rights reserved.
   
   This file is part of GNU Ghostscript.
   

@@ -1,0 +1,127 @@
+%    Copyright (C) 1995 Aladdin Enterprises.  All rights reserved.
+% 
+% This file is part of GNU Ghostscript.
+% 
+% GNU Ghostscript is distributed in the hope that it will be useful, but
+% WITHOUT ANY WARRANTY.  No author or distributor accepts responsibility to
+% anyone for the consequences of using it or for whether it serves any
+% particular purpose or works at all, unless he says so in writing.  Refer to
+% the GNU General Public License for full details.
+% 
+% Everyone is granted permission to copy, modify and redistribute GNU
+% Ghostscript, but only under the conditions described in the GNU General
+% Public License.  A copy of this license is supposed to have been given to
+% you along with GNU Ghostscript so you can know your rights and
+% responsibilities.  It should be in a file named COPYING.  Among other
+% things, the copyright notice and this notice must be preserved on all
+% copies.
+% 
+% Aladdin Enterprises is not affiliated with the Free Software Foundation or
+% the GNU Project.  GNU Ghostscript, as distributed by Aladdin Enterprises,
+% does not depend on any other GNU software.
+
+% ProcSet for implementing CID-keyed fonts.
+% When this is run, systemdict is still writable.
+
+%**************** This file is not ready for use:
+%	- It doesn't include the actual character mapper (BuildGlyph).
+%	- It loads the entire font into RAM.
+%	- It has never been tested on a real font.
+
+/.setlanguagelevel where { pop 2 .setlanguagelevel } if
+.currentglobal true .setglobal
+
+/GS_CIDInit_ProcSet 30 dict dup begin
+
+% ---------------- CIDFont operators ---------------- %
+
+/StartData		% <cidfontdict> <(Binary)|(Hex)> <datalength>
+			%   StartData -
+ { 2 index begin	% CID font dict
+   20 dict begin	% temporary dict
+   /datalength exch def
+   (Hex) eq /hex exch def
+   /cidfont exch def
+   /startdata currentfile fileposition def
+   
+	% Read the character data into an array of strings.
+	% There's no particular reason to prefer long strings over short,
+	% so we just create a separate string for each character.
+
+   /charstrings CIDCount array def
+   /fontindices CIDCount FDBytes 1 eq { string } { array } ifelse def
+   0 1 CIDCount 1 sub
+    { /cid exch def
+      currentfile FDBytes GDBytes add cid mul startdata add setfileposition
+      fontindices cid FDBytes .readint put
+      charstrings cid
+      /pos GDBytes .readint def
+      FDBytes .readint pop	% skip FD of next entry
+      GDBytes .readint pos sub
+      dup 0 eq
+       { pop null }
+       { currentfile pos setfileposition string readstring pop }
+      ifelse put
+    }
+   for
+
+	% Process each font in the FDArray.
+	% For Type 3 fonts, just do a definefont with an empty Encoding.
+	% For Type 1 fonts, read the Subrs (don't bother to check for
+	% duplicates), and set CharStrings to the character data array.
+	% We don't support embedded Type 0 fonts, but it isn't clear
+	% whether they're allowed anyway.
+
+   cidfont /FDepVector [ FDArray
+    { dup /FontType get 1 eq
+       { dup /CharStrings charstrings put
+	 /Private get
+	 dup /SubrCount known
+	  { begin /Subrs [	% Private
+	    0 1 SubrCount 1 sub
+	     { SDBytes mul SubrMapOffset add startdata add
+	       currentfile exch setfileposition
+	       /pos SDBytes .readint def
+	       SDBytes .readint pos sub
+	       currentfile pos setfileposition string readstring pop
+	     }
+	    ] readonly def end	% Private
+	  }
+	 if pop
+       }
+      if
+      dup /Encoding [] put
+      dup /FontName get exch definefont
+    }
+   forall ] readonly def
+
+	% Install the rest of the data in the font.
+
+   cidfont /CharStrings charstrings readonly put
+   cidfont /FontIndices fontindices readonly put
+   FontName cidfont /CIDFont defineresource pop
+
+	% Wrap up.
+
+   end			% temporary dict
+   end			% CID font dict
+   end			% resource dict
+ } bind def
+
+/.readint		% <nbytes> .readint <int>
+ { 0 exch { 8 bitshift currentfile read pop add } repeat
+ } bind def
+
+% ---------------- Resource category definition ---------------- %
+
+end readonly def
+
+/defineresource where
+ { pop
+   /CIDFont /Generic /Category findresource dup length dict .copydict
+   /Category defineresource pop
+   /CIDInit GS_CIDInit_ProcSet /ProcSet defineresource pop
+ }
+if
+
+.setglobal

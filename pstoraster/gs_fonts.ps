@@ -1,0 +1,797 @@
+%    Copyright (C) 1990, 1995, 1996 Aladdin Enterprises.  All rights reserved.
+% 
+% This file is part of GNU Ghostscript.
+% 
+% GNU Ghostscript is distributed in the hope that it will be useful, but
+% WITHOUT ANY WARRANTY.  No author or distributor accepts responsibility to
+% anyone for the consequences of using it or for whether it serves any
+% particular purpose or works at all, unless he says so in writing.  Refer to
+% the GNU General Public License for full details.
+% 
+% Everyone is granted permission to copy, modify and redistribute GNU
+% Ghostscript, but only under the conditions described in the GNU General
+% Public License.  A copy of this license is supposed to have been given to
+% you along with GNU Ghostscript so you can know your rights and
+% responsibilities.  It should be in a file named COPYING.  Among other
+% things, the copyright notice and this notice must be preserved on all
+% copies.
+% 
+% Aladdin Enterprises is not affiliated with the Free Software Foundation or
+% the GNU Project.  GNU Ghostscript, as distributed by Aladdin Enterprises,
+% does not depend on any other GNU software.
+
+% Font initialization and management code.
+
+% Define the default font.
+/defaultfontname /Courier def
+
+% Define the name of the font map file.
+/defaultfontmap (Fontmap) def
+
+% ------ End of editable parameters ------ %
+
+% If DISKFONTS is true, we load individual CharStrings as they are needed.
+% (This is intended primarily for machines with very small memories.)
+% In this case, we define another dictionary, parallel to FontDirectory,
+% that retains an open file for every font loaded.
+/FontFileDirectory 10 dict def
+
+% Split up a search path into individual directories or files.
+/.pathlist		% <path> .pathlist <dir1|file1> ...
+ {  { dup length 0 eq { pop exit } if
+      .filenamelistseparator search not { exit } if
+      exch pop exch
+    }
+   loop
+ } bind def
+
+% Load a font name -> font file name map.
+userdict /Fontmap FontDirectory maxlength dict put
+/.loadFontmap		% <file> .loadFontmap -
+ {		% We would like to simply execute .definefontmap as we read,
+		% but we have to maintain backward compatibility with an older
+		% specification that makes later entries override earlier.
+   50 dict exch
+    { dup token not { closefile exit } if
+		% stack: <file> fontname
+      % This is a hack to get around the absurd habit of MS-DOS editors
+      % of adding an EOF character at the end of the file.
+      dup (\032) eq { pop closefile exit } if
+      1 index token not
+       { (Fontmap entry for ) print dup =only
+	 ( has no associated file or alias name!  Giving up.\n) print flush
+	 {.loadFontmap} 0 get 1 .quit
+       } if
+      dup type dup /stringtype eq exch /nametype eq or not
+       { (Fontmap entry for ) print 1 index =only
+	 ( has an invalid file or alias name!  Giving up.\n) print flush
+	 {.loadFontmap} 0 get 1 .quit
+       } if
+		% stack: dict file fontname filename|aliasname
+		% Read and pop tokens until a semicolon.
+       { 2 index token not
+	  { (Fontmap entry for ) print 1 index =only
+	    ( ends prematurely!  Giving up.\n) print flush
+	    {.loadFontmap} 0 get 1 .quit
+	  } if
+	 dup /; eq { pop 3 index 3 1 roll .growput exit } if
+	 pop
+       } loop
+    } loop
+    { .definefontmap } forall
+ } bind def
+% Add an entry in Fontmap.  We redefine this if the Level 2
+% resource machinery is loaded.
+/.definefontmap			% <fontname> <file|alias> .definefontmap -
+ {		% Since Fontmap is global, make sure the values are storable.
+   .currentglobal 3 1 roll true .setglobal
+   dup type /stringtype eq
+    { dup .gcheck not { dup length string copy } if
+    }
+   if
+   Fontmap 3 -1 roll 2 copy .knownget
+    {		% Add an element to the end of the existing value,
+		% unless it's the same as the current last element.
+      mark exch aload pop counttomark 4 add -1 roll
+      2 copy eq { cleartomark pop pop } { ] readonly .growput } ifelse
+    }
+    {		% Make a new entry.
+      mark 4 -1 roll ] readonly .growput
+    }
+   ifelse .setglobal
+ } bind def
+
+% Parse a font file just enough to find the FontName or FontType.
+/.findfontvalue		% <file> <key> .findfontvalue <value> true
+			% <file> <key> .findfontvalue false
+			% Closes the file in either case.
+ { exch dup read not { -1 } if
+   2 copy unread 16#80 eq
+    { dup (xxxxxx) readstring pop pop }		% skip .PFB header
+   if
+		% Stack: key file
+    { dup token not { false exit } if		% end of file
+      dup /eexec eq { pop false exit } if	% reached eexec section
+      dup /Subrs eq { pop false exit } if	% Subrs without eexec
+      dup /CharStrings eq { pop false exit } if	% CharStrings without eexec
+      dup 3 index eq
+       { xcheck not { dup token exit } if }	% found key
+       { pop }
+      ifelse
+    } loop
+		% Stack: key file value true   (or)
+		% Stack: key file false
+   dup { 4 } { 3 } ifelse -2 roll closefile pop
+ } bind def
+/.findfontname
+ { /FontName .findfontvalue
+ } bind def
+
+% If there is no FONTPATH, try to get one from the environment.
+NOFONTPATH { /FONTPATH () def } if
+/FONTPATH where
+ { pop }
+ { /FONTPATH (GS_FONTPATH) getenv not { () } if def }
+ifelse
+FONTPATH length 0 eq { (%END FONTPATH) .skipeof } if
+/FONTPATH [ FONTPATH .pathlist ] def
+
+% Scan directories looking for plausible fonts.  "Plausible" means that
+% the file begins with %!PS-AdobeFont or %!FontType1, or with \200\001
+% followed by four arbitrary bytes and then either of these strings.
+% To speed up the search, we skip any file whose name appears in
+% the Fontmap (with any extension and upper/lower case variation) already,
+% and any file whose extension definitely indicates it is not a font.
+%
+% NOTE: The current implementation of this procedure is somewhat Unix/DOS-
+% specific.  It assumes that '/' and '\' are directory separators, and that
+% the part of a file name following the last '.' is the extension.
+%
+/.lowerstring		% <string> .lowerstring <lowerstring>
+ { 0 1 2 index length 1 sub
+    { 2 copy get dup 65 ge exch 90 le and
+       { 2 copy 2 copy get 32 add put }
+     if pop
+    }
+   for
+ } bind def
+/.splitfilename		% <dir.../base.extn> .basename <base> <extn>
+ {  { (/) search { true } { (\\) search } ifelse
+       { pop pop }
+       { exit }
+      ifelse
+    }
+   loop
+   dup { (.) search { pop pop } { exit } ifelse } loop
+   2 copy eq
+    { pop () }
+    { exch dup length 2 index length 1 add sub 0 exch getinterval exch }
+   ifelse
+% Following is debugging code.
+%   (*** Split => ) print 2 copy exch ==only ( ) print ==only
+%   ( ***\n) print flush
+ } bind def
+/.scanfontdict 1 dict def		% establish a binding
+/.scanfontbegin
+ {	% Construct the table of all file names already in Fontmap.
+   currentglobal true setglobal
+   .scanfontdict dup maxlength Fontmap length 2 add .max .setmaxlength
+   Fontmap
+    { exch pop
+       { dup type /stringtype eq
+	  { .splitfilename pop =string copy .lowerstring cvn
+	    .scanfontdict exch true put
+	  }
+	  { pop
+	  }
+	 ifelse
+       }
+      forall
+    }
+   forall
+   setglobal
+ } bind def
+/.scanfontskip mark
+		% Strings are converted to names anyway, so....
+  /afm true
+  /bat true
+  /c true
+  /cmd true
+  /com true
+  /dll true
+  /doc true
+  /drv true
+  /exe true
+  /fon true
+  /fot true
+  /h true
+  /o true
+  /obj true
+  /pfm true
+  /txt true
+.dicttomark def
+/.scan1fontstring 128 string def
+/.scanfontheaders [(%!PS-AdobeFont*) (%!FontType1*)] def
+0 .scanfontheaders { length max } forall 6 add	% extra for PFB header
+/.scan1fontfirst exch string def
+/.scanfontdir		% <dirname> .scanfontdir -
+ { currentglobal exch true setglobal
+   QUIET not { (Scanning ) print dup print ( for fonts...) print flush } if
+   (*) 2 copy .filenamedirseparator
+   dup (\\) eq { pop (\\\\) } if	% double \ for pattern match
+   exch concatstrings concatstrings
+   0 0 0 4 -1 roll	% found scanned files
+    {		% stack: <fontcount> <scancount> <filecount> <filename>
+      exch 1 add exch                   % increment filecount
+      dup .splitfilename .lowerstring
+		% stack: <fontcount> <scancount> <filecount+1> <filename>
+		%	<BASE> <ext>
+      .scanfontskip exch known exch .scanfontdict exch known or
+       { pop
+		% stack: <fontcount> <scancount> <filecount+1>
+       }
+       { 3 -1 roll 1 add 3 1 roll
+		% stack: <fontcount> <scancount+1> <filecount+1> <filename>
+	 dup (r) { file } .internalstopped
+	  { pop pop null ()
+		% stack: <fontcount> <scancount+1> <filecount+1> <filename>
+		%	null ()
+	  }
+	  {
+		% On some platforms, the file operator will open directories,
+		% but an error will occur if we try to read from one.
+		% Handle this possibility here.
+	    dup .scan1fontfirst { readstring } .internalstopped
+	     { pop pop () }
+	     { pop }
+	    ifelse
+		% stack: <fontcount> <scancount+1> <filecount+1>
+		%	<filename> <file> <header>
+	  }
+	 ifelse
+		% Check for PFB file header.
+	 dup (\200\001????*) .stringmatch
+	  { dup length 6 sub 6 exch getinterval }
+	 if
+		% Check for font file headers.
+	 false .scanfontheaders
+	  { 2 index exch .stringmatch or
+	  }
+	 forall exch pop
+	  {	% stack: <fontcount> <scancount+1> <filecount+1> <filename>
+		%	<file>
+	    dup 0 setfileposition .findfontname
+	     { dup Fontmap exch known
+		{ pop pop
+		}
+		{ exch copystring exch
+		  DEBUG { ( ) print dup =only } if
+		  1 index .definefontmap
+		  .splitfilename pop true .scanfontdict 3 1 roll .growput
+			% Increment fontcount.
+		  3 -1 roll 1 add 3 1 roll
+		}
+	       ifelse
+	     }
+	     { pop
+	     }
+	    ifelse
+	  }
+		% .findfontname will have done a closefile in the above case.
+	  { dup null eq { pop } { closefile } ifelse pop
+	  }
+	 ifelse
+       }
+      ifelse
+    }
+   .scan1fontstring filenameforall
+   QUIET
+    { pop pop pop }
+    { ( ) print =only ( files, ) print =only ( scanned, ) print
+      =only ( new fonts.\n) print flush
+    }
+   ifelse
+   setglobal
+ } bind def
+
+%END FONTPATH
+
+% Define definefont.  This is a procedure built on a set of operators
+% that do all the error checking and key insertion.
+mark
+	/.buildfont0 where { pop 0 /.buildfont0 cvx } if
+	/.buildfont1 where { pop 1 /.buildfont1 cvx } if
+	/.buildfont3 where { pop 3 /.buildfont3 cvx } if
+	/.buildfont4 where { pop 4 /.buildfont4 cvx } if
+	/.buildfont42 where { pop 42 /.buildfont42 cvx } if
+.dicttomark /buildfontdict exch def
+/.growfontdict
+ {	% Grow the font dictionary, if necessary, to ensure room for an
+	% added entry, making sure there is at least one slot left for FID.
+   dup maxlength 1 index length sub 2 lt
+    { dup dup wcheck
+       { .growdict }
+       { .growdictlength dict .copydict }
+      ifelse
+    }
+    { dup wcheck not { dup maxlength dict .copydict } if
+    }
+   ifelse
+ } bind def 
+/definefont
+ { 1 dict begin count /d exch def	% save stack depth in case of error
+    {		% Check for disabled platform fonts.
+      NOPLATFONTS
+       {	% Make sure we leave room for FID.
+	 .growfontdict dup /ExactSize 0 put
+       }
+       {	% Hack: if the Encoding looks like it might be the
+		% Symbol or Dingbats encoding, load those now (for the
+		% benefit of platform font matching) just in case
+		% the font didn't actually reference them.
+	 dup /Encoding get length 65 ge
+	  { dup /Encoding get 64 get
+	    dup /congruent eq { SymbolEncoding pop } if
+	    /a9 eq { DingbatsEncoding pop } if
+	  }
+	 if
+       }
+      ifelse
+      dup /FontType get //buildfontdict exch get exec
+      DISKFONTS
+       { FontFileDirectory 2 index known
+	  { dup /FontFile FontFileDirectory 4 index get .growput
+	  }
+	 if
+       }
+      if
+      readonly
+    }
+   stopped
+    { count d sub { pop } repeat end /invalidfont signalerror
+    }
+    { end		% stack: name fontdict
+		% If the current allocation mode is global, also enter
+		% the font in LocalFontDirectory.
+      .currentglobal
+       { //systemdict /LocalFontDirectory .knownget
+	  { 2 index 2 index .growput }
+	 if
+       }
+      if
+      dup FontDirectory 4 -2 roll .growput
+    }
+   ifelse
+ } odef
+
+% Define a procedure for defining aliased fonts.
+% We can't just copy the font (or even use the same font unchanged),
+% because a significant number of PostScript files assume that
+% the FontName of a font is the same as the font resource name or
+% the key in [Shared]FontDirectory; on the other hand, some Adobe files
+% rely on the FontName of a substituted font *not* being the same as
+% the requested resource name.  We address this issue heuristically:
+% we substitute the new name iff the font name doesn't have MM in it.
+/.aliasfont		% <name> <font> .aliasfont <newFont>
+ { .currentglobal 3 1 roll dup .gcheck .setglobal
+   dup length 2 add dict
+   dup 3 -1 roll { 1 index /FID eq { pop pop } { put dup } ifelse } forall
+		% Stack: global fontname newfont newfont.
+		% We might be defining a global font whose FontName
+		% is a local string.  This is weird, but legal,
+		% and doesn't cause problems anywhere else.
+		% To avoid any possible problems, do a cvn.
+   2 index =string cvs (MM) search
+    { pop pop pop pop
+    }
+    { /FontName exch dup type /stringtype eq { cvn } if put
+    }
+   ifelse
+   //systemdict /definefont get exec	% Don't bind, since Level 2
+					% redefines definefont
+   exch .setglobal
+ } odef		% so findfont will bind it
+
+% Define .loadfontfile for loading a font.  If we recognize Type 1 and/or
+% TrueType fonts, gs_type1.ps and/or gs_ttf.ps will redefine this.
+/.loadfontfile { cvx exec } bind def
+/.loadfont
+ {		% Some buggy fonts leave extra junk on the stack,
+		% so we have to make a closure that records the stack depth
+		% in a fail-safe way.
+   /.loadfontfile cvx count 1 sub 2 packedarray cvx exec
+   count exch sub { pop } repeat
+ } bind def
+
+% Find an alternate font to substitute for an unknown one.
+% We go to some trouble to parse the font name and extract
+% properties from it.  Later entries take priority over earlier.
+/.substitutefaces [
+	% Guess at suitable substitutions for random unknown fonts.
+  [(Grot) /Times]
+  [(Roman) /Times]
+  [(Book) /NewCenturySchlbk]
+	% If the family name appears in the font name,
+	% use a font from that family.
+  [(Arial) /Helvetica]
+  [(Avant) /AvantGarde]
+  [(Bookman) /Bookman]
+  [(Century) /NewCenturySchlbk]
+  [(Cour) /Courier]
+  [(Geneva) /Helvetica]
+  [(Helv) /Helvetica]
+  [(NewYork) /Times]
+  [(Pala) /Palatino]
+  [(Sans) /Helvetica]
+  [(Schlbk) /NewCenturySchlbk]
+  [(Serif) /Times]
+  [(Swiss) /Helvetica]
+  [(Times) /Times]
+	% Substitute for Adobe Multiple Master fonts.
+  [(Myriad) /Times]
+  [(Minion) /Helvetica]
+	% Condensed or narrow fonts map to the only narrow family we have.
+  [(Cond) /Helvetica-Narrow]
+  [(Narrow) /Helvetica-Narrow]
+	% If the font wants to be monospace, use Courier.
+  [(Monospace) /Courier]
+  [(Typewriter) /Courier]
+] readonly def
+/.substituteproperties [
+  [(It) 1] [(Oblique) 1]
+  [(Bd) 2] [(Bold) 2] [(bold) 2] [(Demi) 2] [(Heavy) 2] [(Sb) 2]
+] readonly def
+/.substitutefamilies mark
+  /AvantGarde
+    {/AvantGarde-Book /AvantGarde-BookOblique
+     /AvantGarde-Demi /AvantGarde-DemiOblique}
+  /Bookman
+    {/Bookman-Demi /Bookman-DemiItalic /Bookman-Light /Bookman-LightItalic}
+  /Courier
+    {/Courier /Courier-Oblique /Courier-Bold /Courier-BoldOblique}
+  /Helvetica
+    {/Helvetica /Helvetica-Oblique /Helvetica-Bold /Helvetica-BoldOblique}
+  /Helvetica-Narrow
+    {/Helvetica-Narrow /Helvetica-Narrow-Oblique
+     /Helvetica-Narrow-Bold /Helvetica-Narrow-BoldOblique}
+  /NewCenturySchlbk
+    {/NewCenturySchlbk-Roman /NewCenturySchlbk-Italic
+     /NewCenturySchlbk-Bold /NewCenturySchlbk-BoldItalic}
+  /Palatino
+    {/Palatino-Roman /Palatino-Italic /Palatino-Bold /Palatino-BoldItalic}
+  /Times
+    {/Times-Roman /Times-Italic /Times-Bold /Times-BoldItalic}
+.dicttomark readonly def
+/.substitutefont		% <fontname> .substitutefont <altname>
+ {	% Look for properties and/or a face name in the font name.
+	% If we find any, use Helvetica as the base font;
+	% otherwise, use the default font.
+	% Note that the "substituted" font name may be the same as
+	% the requested one; the caller must check this.
+   dup length string cvs
+    {defaultfontname /Helvetica-Oblique /Helvetica-Bold /Helvetica-BoldOblique}
+   exch 0 exch	% stack: fontname facelist properties fontname
+	% Look for a face name.
+   .substitutefaces
+    { 2 copy 0 get search
+       { pop pop pop 1 get .substitutefamilies exch get
+	 4 -1 roll pop 3 1 roll
+       }
+       { pop pop
+       }
+      ifelse
+    }
+   forall
+   .substituteproperties
+    { 2 copy 0 get search
+       { pop pop pop 1 get 3 -1 roll or exch }
+       { pop pop }
+      ifelse
+    }
+   forall pop get
+	% If SUBSTFONT is defined, use it.
+   /SUBSTFONT where
+    { pop pop /SUBSTFONT load cvn }
+    { exec }
+   ifelse
+	% Only accept fonts known in the Fontmap.
+   Fontmap 1 index known not { pop defaultfontname } if
+ } bind def
+
+% If requested, make (and recognize) fake entries in FontDirectory for fonts
+% present in Fontmap but not actually loaded.  Thanks to Ray Johnston for
+% the idea behind this code.
+FAKEFONTS not { (%END FAKEFONTS) .skipeof } if
+
+% We use the presence or absence of the FontMatrix key to indicate whether
+% a font is real or fake.
+
+/definefont		% <name> <font> definefont <font>
+ { dup /FontMatrix known not { /FontName get findfont } if
+   //definefont
+ } bind odef
+
+/scalefont		% <font> <scale> scalefont <font>
+ { exch dup /FontMatrix known not { /FontName get findfont } if
+   exch //scalefont
+ } bind odef
+
+/makefont		% <font> <matrix> makefont <font>
+ { exch dup /FontMatrix known not { /FontName get findfont } if
+   exch //makefont
+ } bind def
+
+/setfont		% <font> setfont -
+ { dup /FontMatrix known not { /FontName get findfont } if
+   //setfont
+ } bind odef
+
+%END FAKEFONTS
+
+% Define findfont so it tries to load a font if it's not found.
+% The Red Book requires that findfont be a procedure, not an operator.
+/findfont
+ { mark exch
+    { .dofindfont
+    } stopped
+    { counttomark 1 sub { pop } repeat exch pop stop
+    }
+    {	% Define any needed aliases.
+      counttomark 1 sub { .aliasfont } repeat
+      exch pop
+    }
+   ifelse
+ } bind def
+% Check whether the font name we are about to look for is already on the list
+% of aliases we're accumulating; if so, cause an error.
+/.checkalias		% -mark- <alias1> ... <name> .checkalias <<same>>
+ { counttomark 1 sub -1 1
+    { index 1 index eq
+       { pop QUIET not
+	  { (Unable to substitute for font.\n) print flush
+	  } if
+	 /findfont cvx /invalidfont signalerror
+       }
+      if
+    }
+   for
+ } bind def
+% Get a (non-fake) font if present in a FontDirectory.
+/.fontknownget		% <fontdir> <fontname> .fontknownget <font> true
+			% <fontdir> <fontname> .fontknownget false
+ { .knownget
+    { FAKEFONTS
+       { dup /FontMatrix known { true } { pop false } ifelse }
+       { true }
+      ifelse
+    }
+    { false
+    }
+   ifelse
+ } bind def
+% Do the work of findfont, including substitution, defaulting, and
+% scanning of FONTPATH.
+/.dofindfont		% <fontname> .dofindfont <font>
+ {  { .tryfindfont { exit } if
+			% We didn't find the font.  If we haven't scanned
+			% all the directories in FONTPATH, scan the next one now,
+			% and look for the font again.
+      null 0 1 FONTPATH length 1 sub
+       { FONTPATH 1 index get null ne { exch pop exit } if pop
+       }
+      for dup null ne
+       { dup 0 eq { .scanfontbegin } if
+	 FONTPATH 1 index get .scanfontdir
+	 FONTPATH exch null put
+			% Start over with an empty alias list.
+	 counttomark 1 sub { pop } repeat
+	 .dofindfont exit
+       }
+      if pop
+			% No luck, substitute for the font.
+      dup defaultfontname eq
+       { QUIET not
+	  { (Unable to load default font ) print
+	    dup =only (!  Giving up.\n) print flush
+	  }
+	 if /findfont cvx /invalidfont signalerror
+       }
+      if dup .substitutefont
+      2 copy eq { pop defaultfontname } if
+      .checkalias
+      QUIET not
+       { (Substituting font ) print dup =only ( for ) print
+	 1 index =only (.\n) print flush
+       }
+      if
+    }
+   loop
+ } bind def
+% Try to find a font using only the present contents of Fontmap.
+/.tryfindfont		% <fontname> .tryfindfont <font> true
+			% <fontname> .tryfindfont false
+ { FontDirectory 1 index .fontknownget
+    {			% Already loaded
+      exch pop true
+    }
+    { dup Fontmap exch .knownget not
+       {		% Unknown font name
+	 false
+       }
+
+       {		% Try each element of the Fontmap in turn.
+	false exch	% (in case we exhaust the list)
+	 { exch pop
+	   dup type /nametype eq
+	    {			% Font alias
+	      .checkalias .tryfindfont exit
+	    }
+	    { dup dup type dup /arraytype eq exch /packedarraytype eq or exch xcheck and
+	       {		% Font with a procedural definition
+		 exec		% The procedure will load the font.
+				% Check to make sure this really happened.
+		 FontDirectory 1 index .knownget
+		  { exch pop true exit }
+		 if
+	       }
+	       {		% Font file name
+		 .loadfontloop { true exit } if
+	       }
+	      ifelse
+	    }
+	   ifelse false
+	 }
+	forall
+       }
+      ifelse
+    }
+   ifelse
+ } bind def
+% Attempt to load a font from a file.
+/.loadfontloop		% <filename> .loadfontloop <font> true
+			% <filename> .loadfontloop false
+ {			% See above regarding the use of 'loop'.
+
+    {
+			% Can we open the file?
+	findlibfile not
+	 { QUIET not
+	    { (Can't find \(or can't open\) font file ) print dup print
+	      (.\n) print flush
+	    }
+	   if pop false exit
+	 }
+	if
+
+			% Stack: fontname fontfilename fontfile
+	DISKFONTS
+	 { .currentglobal true .setglobal
+	   2 index (r) file
+	   FontFileDirectory exch 5 index exch .growput
+	   .setglobal
+	 }
+	if
+	QUIET not
+	 { (Loading ) print 2 index =only
+	   ( font from ) print 1 index print (... ) print flush
+	 }
+	if
+	% If LOCALFONTS isn't set, load the font into local or global
+	% VM according to FontType; if LOCALFONTS is set, load the font
+	% into the current VM, which is what Adobe printers (but not
+	% DPS or CPSI) do.
+	LOCALFONTS { false } { /setglobal where } ifelse
+	 { pop /FontType .findfontvalue { 1 eq } { false } ifelse
+		% .setglobal, like setglobal, aliases FontDirectory to
+		% GlobalFontDirectory if appropriate.  However, we mustn't
+		% allow the current version of .setglobal to be bound in,
+		% because it's different depending on language level.
+	   .currentglobal exch /.setglobal load exec
+		% Remove the fake definition, if any.
+	   FontDirectory 3 index .undef
+	   1 index (r) file .loadfont FontDirectory exch
+	   /.setglobal load exec
+	 }
+	 { .loadfont FontDirectory
+	 }
+	ifelse
+		% Stack: fontname fontfilename fontdirectory
+	QUIET not
+	 { //systemdict /level2dict known
+	    { .currentglobal false .setglobal vmstatus
+	      true .setglobal vmstatus 3 -1 roll pop
+	      6 -1 roll .setglobal 5
+	    }
+	    { vmstatus 3
+	    }
+	   ifelse { =only ( ) print } repeat
+	   (done.\n) print flush
+	 } if
+
+		% Check to make sure the font was actually loaded.
+	dup 3 index .fontknownget
+	 { 4 1 roll pop pop pop true exit } if
+
+		% Maybe the file had a different FontName.
+		% See if we can get a FontName from the file, and if so,
+		% whether a font by that name exists now.
+	exch (r) file .findfontname
+	 { 2 copy .fontknownget
+	    {	% Yes.  Stack: origfontname fontdirectory filefontname fontdict
+	      3 -1 roll pop exch
+	      QUIET
+	       { pop
+	       }
+	       { (Using ) print =only
+	         ( font for ) print 1 index =only
+	         (.\n) print flush
+	       }
+	      ifelse true exit
+	    }
+	   if pop
+	 }
+	if pop
+
+		% The font definitely did not load correctly.
+	QUIET not
+	 { (Loading ) print dup =only
+	   ( font failed.\n) print flush
+	 } if
+	false exit
+
+    } loop		% end of loop
+
+ } bind def
+
+% Define a procedure to load all known fonts.
+% This isn't likely to be very useful.
+/loadallfonts
+ { Fontmap { pop findfont pop } forall
+ } bind def
+
+% If requested, load all the fonts defined in the Fontmap into FontDirectory
+% as "fake" fonts i.e., font dicts with only FontName defined.
+% We must ensure that this happens in both global and local directories.
+/.definefakefonts
+    {
+    }
+    { (gs_fonts FAKEFONTS) VMDEBUG
+      2
+	{ .currentglobal not .setglobal
+	  Fontmap
+	   { pop dup type /stringtype eq { cvn } if
+	     FontDirectory 1 index known not
+	      { 1 dict dup /FontName 3 index put       
+	        FontDirectory 3 1 roll put
+	      }
+	     if
+	   }
+	  forall
+       }
+      repeat
+    }
+FAKEFONTS { exch } if pop def		% don't bind, .current/setglobal get redefined
+
+% Install initial fonts from Fontmap.
+/.loadinitialfonts
+ { NOFONTMAP not
+    { /FONTMAP where
+	  { pop [ FONTMAP .pathlist ]
+	     { dup VMDEBUG findlibfile
+		{ exch pop .loadFontmap }
+		{ /undefinedfilename signalerror }
+	       ifelse
+	     }
+	  }
+	  { LIBPATH
+	     { defaultfontmap 2 copy .filenamedirseparator
+	       exch concatstrings concatstrings dup VMDEBUG
+	       (r) { file } .internalstopped
+		{ pop pop } { .loadFontmap } ifelse
+	     }
+	  }
+	 ifelse forall
+    }
+   if
+   .definefakefonts
+ } def			% don't bind, .current/setglobal get redefined

@@ -1,0 +1,235 @@
+%    Copyright (C) 1995 Aladdin Enterprises.  All rights reserved.
+% 
+% This file is part of GNU Ghostscript.
+% 
+% GNU Ghostscript is distributed in the hope that it will be useful, but
+% WITHOUT ANY WARRANTY.  No author or distributor accepts responsibility to
+% anyone for the consequences of using it or for whether it serves any
+% particular purpose or works at all, unless he says so in writing.  Refer to
+% the GNU General Public License for full details.
+% 
+% Everyone is granted permission to copy, modify and redistribute GNU
+% Ghostscript, but only under the conditions described in the GNU General
+% Public License.  A copy of this license is supposed to have been given to
+% you along with GNU Ghostscript so you can know your rights and
+% responsibilities.  It should be in a file named COPYING.  Among other
+% things, the copyright notice and this notice must be preserved on all
+% copies.
+% 
+% Aladdin Enterprises is not affiliated with the Free Software Foundation or
+% the GNU Project.  GNU Ghostscript, as distributed by Aladdin Enterprises,
+% does not depend on any other GNU software.
+
+% ProcSet for implementing CMap resource.
+% When this is run, systemdict is still writable.
+
+%**************** This file is not ready for use:
+%	- Rearranged fonts are not implemented.
+%	- It has never been tested on a real font.
+
+/.setlanguagelevel where { pop 2 .setlanguagelevel } if
+.currentglobal true .setglobal
+
+/GS_CMapInit_ProcSet 30 dict dup begin
+
+% ---------------- CMap operators ---------------- %
+
+% We create the following structures for character code mapping.
+%	Map - a multi-level array indexed by the successive bytes of
+%	  the character code.  All of the arrays are read-only.
+%	NotdefMap - the same.
+
+% ------ Font-level operators ------ %
+
+% composefont doesn't appear in CMap files -- it's documented in
+% the "PostScript Language Reference Manual Supplement".
+/composefont		% <name> <cmap|cmapname> <fonts> composefont <font>
+ { exch dup /dicttype ne { /CMap findresource } if
+   10 dict
+     dup /FontType 0 put
+     dup /FMapType 9 put
+     dup /CMap 5 -1 roll put
+     dup /Encoding [ 0 1 6 index length 1 sub { } for ] put
+     dup /FDepVector 4 -1 roll put
+   /Font defineresource
+ } bind def
+
+/begincmap		% - begincmap -
+ { /Map 256 array def
+   /NotdefMap 256 array def
+ } bind def
+/endcmap		% - endcmap -
+ { /Map Map .endmap def
+   /NotdefMap NotdefMap .endmap def
+ } bind def
+
+/begincodespacerange	% <count> begincodespacerange -
+ { pop mark
+ } bind def
+/endcodespacerange	% <code_lo> <code_hi> ... endcodespacerange -
+ { counttomark 2 idiv
+    { 2 copy Map .addcodespacerange NotdefMap .addcodespacerange
+    } repeat pop
+ } bind def
+
+/.addcodespacerange	% <code_lo> <code_hi> <map> .addcodespacerange -
+ { 2 index length 1 eq
+    { 2 { 3 -1 roll 0 get } repeat 1 exch
+       { 2 copy 0 put pop } for pop
+    }
+    { 2 index 0 get 1 3 index 0 get
+      6 -2 roll
+      2 { 1 1 index length 1 sub getinterval 6 1 roll } repeat
+		% Stack: lo hi map lo0 1 hi0
+       { 2 copy get null eq { 2 copy 256 array put } if
+         4 copy get .addcodespacerange pop
+       }
+      for pop pop pop
+    }
+   ifelse
+ } bind def
+/.endmap		% <map> .endmap <map>
+ { dup type /arraytype eq { dup { .endmap exch } forall astore readonly } if
+ } bind def
+
+/usecmap		% <CMap_name> usecmap -
+ { /CMap findresource
+   dup length dict .copydict
+   currentdict end exch .copydict begin
+ } bind def
+
+% ------ Rearranged font operators ------ %
+
+/beginrearrangedfont	% <font_name> <font*> beginrearrangedfont -
+ {	(NOT IMPLEMENTED YET.\n) print flush
+ } bind def
+/endrearrangedfont	% - endrearrangedfont -
+ {	(NOT IMPLEMENTED YET.\n) print flush
+ } bind def
+
+/usefont		% <fontID> usefont -
+ {	(NOT IMPLEMENTED YET.\n) print flush
+ } bind def
+
+/beginusematrix		% <fontID> beginusematrix -
+ {	(NOT IMPLEMENTED YET.\n) print flush
+ } bind def
+/endusematrix		% <matrix> endusematrix -
+ {	(NOT IMPLEMENTED YET.\n) print flush
+ } bind def
+
+% ------ Character name/code selector operators ------ %
+
+/beginbfchar		% <count> beginbfchar -
+ { pop mark
+ } bind def
+/endbfchar		% <code> <to_code|charname> ... endbfchar
+ { Map .endmapchar /Map exch store pop
+ } bind def
+
+/beginbfrange		% <count> beginbfrange -
+ { pop mark
+ } bind def
+/endbfrange		% <code_lo> <code_hi> <to_code|(charname*)> ...
+			%   endbfrange -
+ { Map counttomark 3 idiv { .addbfrange } repeat /Map exch store pop
+ } bind def
+
+/.addbfrange		% <code_lo> <code_hi> <to_code|(charname*)> <map>
+			%   .addbfrange <map>
+ { 1 index type /stringtype eq
+    {  { dup length string copy dup dup length 1 sub 2 copy get 1 add put }
+      exch .addmaprange
+    }
+    { 2 dict begin exch /codes 1 index def 0 get exch
+       { codes dup length 1 sub 1 exch getinterval /codes 1 index def
+	 dup length 0 gt { 0 get } if
+       }
+      exch .addmaprange end
+    }
+   ifelse exch pop
+ } bind def
+
+% ------ CID selector operators ------ %
+
+/begincidchar		% <count> begincidchar -
+ { pop mark
+ } bind def
+/endcidchar		% <code> <cid> ... endcidchar -
+ { Map .endmapchar /Map exch store pop
+ } bind def
+
+/begincidrange		% <count> begincidrange -
+ { pop mark
+ } bind def
+/endcidrange		% <code_lo> <code_hi> <cid_base> ... endcidrange -
+ { Map counttomark 3 idiv { { 1 add } exch .addmaprange exch pop } repeat
+   /Map exch store pop
+ } bind def
+
+/.endmapchar		% <code> <value> ... <map> .endmapchar -
+ { counttomark 2 idiv
+    { 2 index 3 1 roll { } exch .addmaprange exch pop
+    } repeat exch pop
+ } bind def
+
+/.addmaprange		% <code_lo> <code_hi> <value_base> <next_proc> <map>
+			%   .addcidrange <value_next> <map>
+ {	% We may be updating a (partly) read-only map from another CMap.
+	% If so, implement copy-on-write.
+   dup wcheck not { dup length array copy } if
+   4 index length 1 eq
+    { 2 { 5 -1 roll 0 get } repeat 1 exch
+       {	% Stack: value proc map code
+	 2 copy 5 index put pop
+	 3 -1 roll 2 index exec 3 1 roll
+       } for
+    }
+    { 4 index 0 get 1 5 index 0 get
+      8 -2 roll
+      2 { 1 1 index length 1 sub getinterval 8 1 roll } repeat
+		% Stack: lo hi next proc map lo0 1 hi0
+       { 6 copy get .addmaprange
+		% Stack: lo hi oldnext proc map i next submap
+	 exch 6 1 roll 5 -1 roll pop
+		% Stack: lo hi next proc map i submap
+	 3 copy put pop pop
+       }
+      for 5 -2 roll pop pop
+    }
+   ifelse exch pop
+ } bind def
+
+% ------ notdef operators ------ %
+
+/beginnotdefchar	% <count> beginnotdefchar -
+ { pop mark
+ } bind def
+/endnotdefchar		% <code> <cid> ... endnotdefchar -
+ { counttomark 2 idiv { 1 index exch .addnotdefrange } repeat pop
+ } bind def
+
+/beginnotdefrange	% <count> beginnotdefrange -
+ { pop mark
+ } bind def
+/endnotdefrange		% <code_lo> <code_hi> <cid> ... endnotdefrange -
+ { counttomark 3 idiv { .addnotdefrange } repeat pop
+ } bind def
+
+/.addnotdefrange	% <code_lo> <code_hi> <cid_base> .addnotdefrange -
+ { { } NotdefMap .addmaprange /NotdefMap exch store pop
+ } bind def
+
+% ---------------- Resource category definition ---------------- %
+
+end readonly def
+
+/defineresource where
+ { pop
+   /CMap /Generic /Category findresource dup length dict .copydict
+   /Category defineresource pop
+   /CMapInit GS_CMapInit_ProcSet /ProcSet defineresource pop
+ }
+if
+
+.setglobal
