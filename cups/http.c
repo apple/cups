@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.112 2003/02/11 16:23:53 mike Exp $"
+ * "$Id: http.c,v 1.113 2003/02/12 19:31:11 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS).
  *
@@ -79,6 +79,7 @@
 #include "string.h"
 #include <fcntl.h>
 #include <errno.h>
+#include <sys/time.h>
 #include <sys/resource.h>
 
 #include "http.h"
@@ -2270,5 +2271,5 @@ CDSAWriteFunc(SSLConnectionRef connection,	/* I  - SSL/TLS connection */
 
 
 /*
- * End of "$Id: http.c,v 1.112 2003/02/11 16:23:53 mike Exp $".
+ * End of "$Id: http.c,v 1.113 2003/02/12 19:31:11 mike Exp $".
  */

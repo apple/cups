@@ -1,5 +1,5 @@
 /*
- * "$Id: cupsd.h,v 1.42 2003/02/05 21:10:15 mike Exp $"
+ * "$Id: cupsd.h,v 1.43 2003/02/12 19:31:12 mike Exp $"
  *
  *   Main header file for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -22,13 +22,14 @@
  *         WWW: http://www.cups.org
  */
 
+#ifdef __sun
 /*
- * Define FD_SETSIZE to 2048; on platforms that support this, this will
- * ensure that the correct version of select() is used for large numbers
- * of file descriptors.
+ * Define FD_SETSIZE to 2048 on Solaris to get the correct version of
+ * select() for large numbers of file descriptors.
  */
 
-#define FD_SETSIZE	2048
+#  define FD_SETSIZE	2048
+#endif /* __sun */
 
 
 /*
@@ -201,5 +202,5 @@ extern void	StopServer(void);
 
 
 /*
- * End of "$Id: cupsd.h,v 1.42 2003/02/05 21:10:15 mike Exp $".
+ * End of "$Id: cupsd.h,v 1.43 2003/02/12 19:31:12 mike Exp $".
  */
