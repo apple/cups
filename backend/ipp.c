@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.44 2001/06/06 16:47:52 mike Exp $"
+ * "$Id: ipp.c,v 1.45 2001/06/19 20:58:41 mike Exp $"
  *
  *   IPP backend for the Common UNIX Printing System (CUPS).
  *
@@ -412,13 +412,15 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
     fprintf(stderr, "DEBUG: printer-uri = \"%s\"\n", uri);
 
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "requesting-user-name",
-        	 NULL, argv[2]);
+    if (argv[2][0])
+      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "requesting-user-name",
+        	   NULL, argv[2]);
 
     fprintf(stderr, "DEBUG: requesting-user-name = \"%s\"\n", argv[2]);
 
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "job-name", NULL,
-        	 argv[3]);
+    if (argv[3][0])
+      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "job-name", NULL,
+        	   argv[3]);
 
     fprintf(stderr, "DEBUG: job-name = \"%s\"\n", argv[3]);
 
@@ -626,5 +628,5 @@ password_cb(const char *prompt)	/* I - Prompt (not used) */
 
 
 /*
- * End of "$Id: ipp.c,v 1.44 2001/06/06 16:47:52 mike Exp $".
+ * End of "$Id: ipp.c,v 1.45 2001/06/19 20:58:41 mike Exp $".
  */

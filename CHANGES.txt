@@ -87,6 +87,14 @@ CHANGES IN CUPS V1.1.9
 	- The cups-polld program would poll servers continuously
 	  with no delay if there was an error contacting the
 	  server.
+	- The IPP backend would send an empty job-name or
+	  requesting-user-name attribute if the corresponding
+	  job attribute was an empty string.  While this is
+	  allowed by the IPP specification, some HP JetDirect
+	  implementations return a client-error-bad-request
+	  error if an empty name attribute value is received.
+	  The new code only sends these attributes if they are
+	  not the empty string.
 
 
 CHANGES IN CUPS V1.1.8
