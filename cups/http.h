@@ -1,5 +1,5 @@
 /*
- * "$Id: http.h,v 1.8 1999/01/29 16:18:05 mike Exp $"
+ * "$Id: http.h,v 1.9 1999/01/29 22:01:48 mike Exp $"
  *
  *   Hyper-Text Transport Protocol definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -34,6 +34,7 @@
 #  include <stdlib.h>
 #  include <string.h>
 #  include <time.h>
+#  include <fcntl.h>
 
 #  ifdef WIN32
 #    include <winsock.h>
@@ -129,7 +130,7 @@ typedef enum
 
 typedef enum
 {
-  HTTP_ERROR = 0,		/* An error response from httpXxxx() */
+  HTTP_ERROR = -1,		/* An error response from httpXxxx() */
   HTTP_CONTINUE,		/* Everything OK, keep going... */
 
   HTTP_OK = 200,		/* OPTIONS/GET/HEAD/POST/TRACE command was successful */
@@ -184,6 +185,7 @@ typedef enum
   HTTP_FIELD_ACCEPT_CHARSET,
   HTTP_FIELD_ACCEPT_ENCODING,
   HTTP_FIELD_ACCEPT_LANGUAGE,
+  HTTP_FIELD_ACCEPT_RANGES,
   HTTP_FIELD_AGE,
   HTTP_FIELD_ALLOW,
   HTTP_FIELD_AUTHORIZATION,
@@ -236,26 +238,20 @@ typedef enum
 typedef struct
 {
   int			fd;		/* File descriptor for this socket */
+  int			blocking;	/* To block or not to block */
   time_t		activity;	/* Time since last read/write */
   http_state_t		state;		/* State of client */
   http_status_t		status;		/* Status of last request */
   http_version_t	version;	/* Protocol version */
   http_keepalive_t	keep_alive;	/* Keep-alive supported? */
   struct sockaddr_in	hostaddr;	/* Address of connected host */
-  int			hostport,	/* Port number */
-			hostlength;	/* Hostname length */
   char			hostname[HTTP_MAX_HOST],
   					/* Name of connected host */
-			uri[HTTP_MAX_URI],
-					/* Resource we're attached to */
 			fields[HTTP_FIELD_MAX][HTTP_MAX_VALUE];
 					/* Field values */
-  time_t		request_time;	/* Request file time */
-  int			request_size;	/* Request file size */
   char			*data;		/* Pointer to data buffer */
   http_encoding_t	data_encoding;	/* Chunked or not */
-  int			data_length,	/* Content-Length: or chunk length line */
-			data_remaining;	/* Number of bytes left */
+  int			data_remaining;	/* Number of bytes left */
   int			used;		/* Number of bytes used in buffer */
   char			buffer[HTTP_MAX_BUFFER];
 					/* Buffer for messages */
@@ -266,7 +262,9 @@ typedef struct
  * Prototypes...
  */
 
-#define			httpClearFields(http)	memset((http)->fields, 0, sizeof((http)->fields))
+extern void		httpBlocking(http_t *http, int blocking);
+#  define		httpClearFields(http)	memset((http)->fields, 0, sizeof((http)->fields)),\
+						httpSetField((http), HTTP_FIELD_HOST, (http)->hostname)
 extern void		httpClose(http_t *http);
 extern http_t		*httpConnect(char *host, int port);
 extern int		httpDelete(http_t *http, char *uri);
@@ -276,7 +274,7 @@ extern char		*httpGetDateString(time_t t);
 extern time_t		httpGetDateTime(char *s);
 #  define		httpGetField(http,field)	(http)->fields[field]
 extern int		httpHead(http_t *http, char *uri);
-extern void		httpInitialize(char *proxyhost, int port);
+extern void		httpInitialize(void);
 extern char		*httpLongStatus(http_status_t status);
 extern int		httpOptions(http_t *http, char *uri);
 extern int		httpPost(http_t *http, char *uri);
@@ -304,5 +302,5 @@ extern char		*httpDecode64(char *out, char *in);
 #endif /* !_CUPS_HTTP_H_ */
 
 /*
- * End of "$Id: http.h,v 1.8 1999/01/29 16:18:05 mike Exp $".
+ * End of "$Id: http.h,v 1.9 1999/01/29 22:01:48 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.10 1999/01/29 16:18:05 mike Exp $"
+ * "$Id: http.c,v 1.11 1999/01/29 22:01:48 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -50,6 +50,8 @@
  *   httpDecode64()      - Base64-decode a string.
  *   httpEncode64()      - Base64-encode a string.
  *   http_field()        - Return the field index for a field name.
+ *   http_get_length()   - Get the amount of data remaining from the
+ *                         content-length or transfer-encoding fields.
  *   http_send()         - Send a request with all fields and the trailing
  *                         blank line.
  *   http_sighandler()   - Handle broken pipe signals from lost network
@@ -69,6 +71,7 @@
  */
 
 static http_field_t	http_field(char *name);
+static void		http_get_length(http_t *http);
 static int		http_send(http_t *http, http_state_t request, char *uri);
 static void		http_sighandler(int sig);
 
@@ -77,14 +80,13 @@ static void		http_sighandler(int sig);
  * Local globals...
  */
 
-static char		http_proxyhost[HTTP_MAX_URI] = "";
-static int		http_proxyport = 0;
 static char		*http_fields[] =
 			{
 			  "Accept",
 			  "Accept-Charset",
 			  "Accept-Encoding",
 			  "Accept-Language",
+			  "Accept-Ranges",
 			  "Age",
 			  "Allow",
 			  "Authorization",
@@ -160,8 +162,7 @@ static char		*months[12] =
  */
 
 void
-httpInitialize(char *proxyhost,	/* I - Proxy hostname */
-               int  port)	/* I - Port to connect to */
+httpInitialize(void)
 {
 #ifdef WIN32
   WSADATA	winsockdata;	/* WinSock data */
@@ -171,10 +172,6 @@ httpInitialize(char *proxyhost,	/* I - Proxy hostname */
   if (!initialized)
     WSAStartup(MAKEWORD(1,1), &winsockdata);
 #endif /* WIN32 */
-
-  if (proxyhost != NULL)
-    strcpy(http_proxyhost, proxyhost);
-  http_proxyport = port;
 }
 
 
@@ -214,12 +211,7 @@ httpConnect(char *host,		/* I - Host to connect to */
   * Lookup the host...
   */
 
-  if (http_proxyhost[0] != '\0')
-    hostaddr = gethostbyname(http_proxyhost);
-  else
-    hostaddr = gethostbyname(host);
-
-  if (hostaddr == NULL)
+  if ((hostaddr = gethostbyname(host)) == NULL)
     return (NULL);
 
  /*
@@ -231,6 +223,7 @@ httpConnect(char *host,		/* I - Host to connect to */
     return (NULL);
 
   http->version  = HTTP_1_1;
+  http->blocking = 1;
   http->activity = time(NULL);
 
  /*
@@ -238,16 +231,10 @@ httpConnect(char *host,		/* I - Host to connect to */
   */
 
   strcpy(http->hostname, host);
-  http->hostlength = strlen(host);
-  http->hostport   = port;
-
-  memcpy((char *)&(http->hostaddr), hostaddr->h_addr, hostaddr->h_length);
+  memset((char *)&(http->hostaddr), 0, sizeof(http->hostaddr));
+  memcpy((char *)&(http->hostaddr.sin_addr), hostaddr->h_addr, hostaddr->h_length);
   http->hostaddr.sin_family = hostaddr->h_addrtype;
-
-  if (http_proxyhost[0] != '\0')
-    http->hostaddr.sin_port = htons(http_proxyport);
-  else
-    http->hostaddr.sin_port = htons(port);
+  http->hostaddr.sin_port   = htons(port);
 
   if (httpReconnect(http))
   {
@@ -316,7 +303,28 @@ httpReconnect(http_t *http)	/* I - HTTP data */
     return (-1);
   };
 
+  httpBlocking(http, http->blocking);
+
   return (0);
+}
+
+
+/*
+ * 'httpBlocking()' - Make a HTTP connection blocking or non-blocking...
+ */
+
+void
+httpBlocking(http_t *http,	/* I - HTTP data */
+             int    blocking)	/* I - 1 = block on reads, 0 = don't block */
+{
+  if (http == NULL)
+    return;
+
+  http->blocking = blocking;
+  if (blocking)
+    fcntl(http->fd, F_SETFL, fcntl(http->fd, F_GETFL) & ~FNONBLK);
+  else
+    fcntl(http->fd, F_SETFL, fcntl(http->fd, F_GETFL) | FNONBLK);
 }
 
 
@@ -530,6 +538,8 @@ int					/* O - Status of call (0 = success) */
 httpPost(http_t *http,			/* I - HTTP data */
          char   *uri)			/* I - URI for post */
 {
+  http_get_length(http);
+
   return (http_send(http, HTTP_POST, uri));
 }
 
@@ -542,6 +552,8 @@ int					/* O - Status of call (0 = success) */
 httpPut(http_t *http,			/* I - HTTP data */
         char   *uri)			/* I - URI to put */
 {
+  http_get_length(http);
+
   return (http_send(http, HTTP_PUT, uri));
 }
 
@@ -580,14 +592,15 @@ httpRead(http_t *http,			/* I - HTTP data */
   if (length <= 0)
     return (0);
 
-  if (http->version == HTTP_1_1 && http->data_remaining <= 0 &&
+  if (http->data_encoding == HTTP_ENCODE_CHUNKED &&
+      http->data_remaining <= 0 &&
       (http->state == HTTP_GET_SEND || http->state == HTTP_POST_RECV ||
        http->state == HTTP_POST_SEND || http->state == HTTP_PUT_RECV))
   {
     if (httpGets(len, sizeof(len), http) == NULL)
       return (0);
 
-    http->data_remaining = atoi(len);
+    http->data_remaining = strtol(len, NULL, 16);
   }
 
   if (http->data_remaining == 0)
@@ -604,22 +617,29 @@ httpRead(http_t *http,			/* I - HTTP data */
 
     return (0);
   }
+  else if (length > http->data_remaining)
+    length = http->data_remaining;
 
-  tbytes = 0;
-  while (length > 0)
+  if (http->used > 0)
   {
-    bytes = recv(http->fd, buffer, length, MSG_DONTWAIT);
-    if (bytes < 0)
-      return (-1);
-    else if (bytes == 0)
-      break;
+    if (length > http->used)
+      length = http->used;
 
-    buffer += bytes;
-    tbytes += bytes;
-    length -= bytes;
+    bytes = length;
+
+    memcpy(buffer, http->buffer, length);
+    http->used -= length;
+
+    if (http->used > 0)
+      memcpy(http->buffer, http->buffer + length, http->used);
   }
+  else
+    bytes = recv(http->fd, buffer, length, 0);
 
-  return (tbytes);
+  if (bytes > 0)
+    http->data_remaining -= bytes;
+
+  return (bytes);
 }
 
 
@@ -646,7 +666,7 @@ httpWrite(http_t *http,			/* I - HTTP data */
       (http->state == HTTP_GET_SEND || http->state == HTTP_POST_RECV ||
        http->state == HTTP_POST_SEND || http->state == HTTP_PUT_RECV))
   {
-    sprintf(len, "%d\r\n", length);
+    sprintf(len, "%x\r\n", length);
     if (send(http->fd, len, strlen(len), 0) < 3)
       return (-1);
   }
@@ -704,40 +724,43 @@ httpGets(char   *line,			/* I - Line to read into */
   * Pre-scan the buffer and see if there is a newline in there...
   */
 
-  bufptr  = http->buffer;
-  bufend  = http->buffer + http->used;
-
-  while (bufptr < bufend)
-    if (*bufptr == 0x0a)
-      break;
-    else
-      bufptr ++;
-
-  if (bufptr >= bufend)
+  do
   {
-   /*
-    * No newline; see if there is more data to be read...
-    */
+    bufptr  = http->buffer;
+    bufend  = http->buffer + http->used;
 
-    if ((bytes = recv(http->fd, bufend, HTTP_MAX_BUFFER - http->used,
-                      MSG_DONTWAIT)) < 1)
+    while (bufptr < bufend)
+      if (*bufptr == 0x0a)
+	break;
+      else
+	bufptr ++;
+
+    if (bufptr >= bufend)
     {
      /*
-      * Nope, can't get a line this time...
+      * No newline; see if there is more data to be read...
       */
 
-      return (NULL);
-    }
-    else
-    {
-     /*
-      * Yup, update the amount used and the end pointer...
-      */
+      if ((bytes = recv(http->fd, bufend, HTTP_MAX_BUFFER - http->used, 0)) < 1)
+      {
+       /*
+	* Nope, can't get a line this time...
+	*/
 
-      http->used += bytes;
-      bufend        += bytes;
+        return (NULL);
+      }
+      else
+      {
+       /*
+	* Yup, update the amount used and the end pointer...
+	*/
+
+	http->used += bytes;
+	bufend     += bytes;
+      }
     }
   }
+  while (bufptr >= bufend);
 
   http->activity = time(NULL);
 
@@ -958,11 +981,22 @@ httpUpdate(http_t *http)		/* I - HTTP data */
       * the result code, too...
       */
 
-      if (http->status != HTTP_OK ||
-          http->state != HTTP_POST_RECV)
-	http->state = HTTP_WAITING;
-      else
-        http->state ++;
+      if (http->state == HTTP_GET || http->state == HTTP_POST_SEND)
+        http_get_length(http);
+
+      switch (http->state)
+      {
+        case HTTP_GET :
+	case HTTP_POST :
+	case HTTP_POST_RECV :
+	case HTTP_PUT :
+	    http->state ++;
+	    break;
+
+	default :
+	    http->state = HTTP_WAITING;
+	    break;
+      }
 
       return (http->status);
     }
@@ -1146,6 +1180,39 @@ http_field(char *name)		/* I - String name */
 
 
 /*
+ * 'http_get_length()' - Get the amount of data remaining from the
+ *                       content-length or transfer-encoding fields.
+ */
+
+static void
+http_get_length(http_t *http)	/* I - HTTP data */
+{
+  if (strcasecmp(http->fields[HTTP_FIELD_TRANSFER_ENCODING], "chunked") == 0)
+  {
+    http->data_encoding  = HTTP_ENCODE_CHUNKED;
+    http->data_remaining = 0;
+  }
+  else
+  {
+    http->data_encoding  = HTTP_ENCODE_LENGTH;
+
+   /*
+    * The following is a hack for HTTP servers that don't send a
+    * content-length or transfer-encoding field...
+    *
+    * If there is no content-length then the connection must close
+    * after the transfer is complete...
+    */
+
+    if (http->fields[HTTP_FIELD_CONTENT_LENGTH][0] == '\0')
+      http->data_remaining = 2147483647;
+    else
+      http->data_remaining = atoi(http->fields[HTTP_FIELD_CONTENT_LENGTH]);
+  }
+}
+
+
+/*
  * 'http_send()' - Send a request with all fields and the trailing blank line.
  */
 
@@ -1229,15 +1296,6 @@ http_send(http_t       *http,	/* I - HTTP data */
 
   httpClearFields(http);
 
- /*
-  * Update the state as needed...
-  */
-
-  if (codes[request + 1] == NULL)
-    http->state ++;
-  else
-    http->state = HTTP_STATUS;
-
   return (0);
 }
 
@@ -1255,5 +1313,5 @@ http_sighandler(int sig)	/* I - Signal number */
 
 
 /*
- * End of "$Id: http.c,v 1.10 1999/01/29 16:18:05 mike Exp $".
+ * End of "$Id: http.c,v 1.11 1999/01/29 22:01:48 mike Exp $".
  */
