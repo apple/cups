@@ -1,5 +1,5 @@
 /*
- * "$Id: cupstestppd.c,v 1.1.2.32 2004/06/29 13:15:11 mike Exp $"
+ * "$Id: cupstestppd.c,v 1.1.2.33 2004/07/01 14:04:03 mike Exp $"
  *
  *   PPD test program for the Common UNIX Printing System (CUPS).
  *
@@ -825,6 +825,52 @@ main(int  argc,			/* I - Number of command-line arguments */
 	}
       }
 
+     /*
+      * Check for a duplex option, and for standard values...
+      */
+
+      if ((option = ppdFindOption(ppd, "Duplex")) == NULL)
+	if ((option = ppdFindOption(ppd, "JCLDuplex")) == NULL)
+	  if ((option = ppdFindOption(ppd, "EFDuplex")) == NULL)
+            option = ppdFindOption(ppd, "KD03Duplex");
+
+      if (option != NULL)
+      {
+        if (ppdFindChoice(option, "None") == NULL)
+	{
+	  if (verbose >= 0)
+	  {
+	    if (!errors && !verbose)
+	      puts(" FAIL");
+
+	    printf("      **FAIL**  REQUIRED %s does not define choice None!\n",
+	           option->keyword);
+	    puts("                REF: Page 122, section 5.17");
+          }
+
+	  errors ++;
+	}
+
+        for (j = option->num_choices, choice = option->choices; j > 0; j --, choice ++)
+          if (strcmp(choice->choice, "None") &&
+	      strcmp(choice->choice, "DuplexNoTumble") &&
+	      strcmp(choice->choice, "DuplexTumble") &&
+	      strcmp(choice->choice, "SimplexTumble"))
+	  {
+	    if (verbose >= 0)
+	    {
+	      if (!errors && !verbose)
+		puts(" FAIL");
+
+	      printf("      **FAIL**  Bad %s choice %s!\n",
+	             option->keyword, choice->choice);
+	      puts("                REF: Page 122, section 5.17");
+            }
+
+	    errors ++;
+	  }
+      }
+
       if (errors)
 	status = ERROR_CONFORMANCE;
       else if (!verbose)
@@ -832,6 +878,14 @@ main(int  argc,			/* I - Number of command-line arguments */
 	 
       if (verbose >= 0)
       {
+        if (option &&
+	    strcmp(option->keyword, "Duplex") &&
+	    strcmp(option->keyword, "JCLDuplex"))
+	{
+	  printf("        WARN    Duplex option keyword %s should be named Duplex!\n",
+	         option->keyword);
+	}
+
         ppdMarkDefaults(ppd);
 	if (ppdConflicts(ppd))
 	{
@@ -1182,5 +1236,5 @@ usage(void)
 
 
 /*
- * End of "$Id: cupstestppd.c,v 1.1.2.32 2004/06/29 13:15:11 mike Exp $".
+ * End of "$Id: cupstestppd.c,v 1.1.2.33 2004/07/01 14:04:03 mike Exp $".
  */

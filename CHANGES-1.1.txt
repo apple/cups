@@ -3,6 +3,9 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.21rc2
 
+	- The cupstestppd program now checks for invalid Duplex
+	  option choices and fails PPD files that use
+	  non-standard values (STR #791)
 	- Updated the printer name error message to indicate
 	  that spaces are not allowed (STR #675)
 	- The scheduler didn't handle HTTP GET form data
