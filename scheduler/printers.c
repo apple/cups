@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.145 2003/03/28 17:31:23 mike Exp $"
+ * "$Id: printers.c,v 1.146 2003/03/30 19:50:35 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -568,7 +568,7 @@ FreePrinterUsers(printer_t *p)	/* I - Printer */
 void
 LoadAllPrinters(void)
 {
-  FILE		*fp;			/* printers.conf file */
+  cups_file_t	*fp;			/* printers.conf file */
   int		linenum;		/* Current line number */
   int		len;			/* Length of line */
   char		line[1024],		/* Line from file */
@@ -584,7 +584,7 @@ LoadAllPrinters(void)
   */
 
   snprintf(line, sizeof(line), "%s/printers.conf", ServerRoot);
-  if ((fp = fopen(line, "r")) == NULL)
+  if ((fp = cupsFileOpen(line, "r")) == NULL)
   {
     LogMessage(L_ERROR, "LoadAllPrinters: Unable to open %s - %s", line,
                strerror(errno));
@@ -598,7 +598,7 @@ LoadAllPrinters(void)
   linenum = 0;
   p       = NULL;
 
-  while (fgets(line, sizeof(line), fp) != NULL)
+  while (cupsFileGets(fp, line, sizeof(line)) != NULL)
   {
     linenum ++;
 
@@ -790,7 +790,7 @@ LoadAllPrinters(void)
     }
   }
 
-  fclose(fp);
+  cupsFileClose(fp);
 }
 
 
@@ -803,7 +803,7 @@ void
 SaveAllPrinters(void)
 {
   int		i;			/* Looping var */
-  FILE		*fp;			/* printers.conf file */
+  cups_file_t	*fp;			/* printers.conf file */
   char		temp[1024];		/* Temporary string */
   char		backup[1024];		/* printers.conf.O file */
   printer_t	*printer;		/* Current printer class */
@@ -821,7 +821,7 @@ SaveAllPrinters(void)
   if (rename(temp, backup))
     LogMessage(L_ERROR, "Unable to backup printers.conf - %s", strerror(errno));
 
-  if ((fp = fopen(temp, "w")) == NULL)
+  if ((fp = cupsFileOpen(temp, "w")) == NULL)
   {
     LogMessage(L_ERROR, "Unable to save printers.conf - %s", strerror(errno));
 
@@ -836,8 +836,8 @@ SaveAllPrinters(void)
   * Restrict access to the file...
   */
 
-  fchown(fileno(fp), User, Group);
-  fchmod(fileno(fp), 0600);
+  fchown(cupsFileNumber(fp), User, Group);
+  fchmod(cupsFileNumber(fp), 0600);
 
  /*
   * Write a small header to the file...
@@ -847,8 +847,8 @@ SaveAllPrinters(void)
   curdate = gmtime(&curtime);
   strftime(temp, sizeof(temp) - 1, CUPS_STRFTIME_FORMAT, curdate);
 
-  fputs("# Printer configuration file for " CUPS_SVERSION "\n", fp);
-  fprintf(fp, "# Written by cupsd on %s\n", temp);
+  cupsFilePuts(fp, "# Printer configuration file for " CUPS_SVERSION "\n");
+  cupsFilePrintf(fp, "# Written by cupsd on %s\n", temp);
 
  /*
   * Write each local printer known to the system...
@@ -870,44 +870,44 @@ SaveAllPrinters(void)
     */
 
     if (printer == DefaultPrinter)
-      fprintf(fp, "<DefaultPrinter %s>\n", printer->name);
+      cupsFilePrintf(fp, "<DefaultPrinter %s>\n", printer->name);
     else
-      fprintf(fp, "<Printer %s>\n", printer->name);
+      cupsFilePrintf(fp, "<Printer %s>\n", printer->name);
 
     if (printer->info)
-      fprintf(fp, "Info %s\n", printer->info);
+      cupsFilePrintf(fp, "Info %s\n", printer->info);
 
     if (printer->location)
-      fprintf(fp, "Location %s\n", printer->location);
+      cupsFilePrintf(fp, "Location %s\n", printer->location);
 
     if (printer->device_uri)
-      fprintf(fp, "DeviceURI %s\n", printer->device_uri);
+      cupsFilePrintf(fp, "DeviceURI %s\n", printer->device_uri);
 
     if (printer->state == IPP_PRINTER_STOPPED)
     {
-      fputs("State Stopped\n", fp);
-      fprintf(fp, "StateMessage %s\n", printer->state_message);
+      cupsFilePuts(fp, "State Stopped\n");
+      cupsFilePrintf(fp, "StateMessage %s\n", printer->state_message);
     }
     else
-      fputs("State Idle\n", fp);
+      cupsFilePuts(fp, "State Idle\n");
 
     if (printer->accepting)
-      fputs("Accepting Yes\n", fp);
+      cupsFilePuts(fp, "Accepting Yes\n");
     else
-      fputs("Accepting No\n", fp);
+      cupsFilePuts(fp, "Accepting No\n");
 
-    fprintf(fp, "JobSheets %s %s\n", printer->job_sheets[0],
+    cupsFilePrintf(fp, "JobSheets %s %s\n", printer->job_sheets[0],
             printer->job_sheets[1]);
 
-    fprintf(fp, "QuotaPeriod %d\n", printer->quota_period);
-    fprintf(fp, "PageLimit %d\n", printer->page_limit);
-    fprintf(fp, "KLimit %d\n", printer->k_limit);
+    cupsFilePrintf(fp, "QuotaPeriod %d\n", printer->quota_period);
+    cupsFilePrintf(fp, "PageLimit %d\n", printer->page_limit);
+    cupsFilePrintf(fp, "KLimit %d\n", printer->k_limit);
 
     for (i = 0; i < printer->num_users; i ++)
-      fprintf(fp, "%sUser %s\n", printer->deny_users ? "Deny" : "Allow",
+      cupsFilePrintf(fp, "%sUser %s\n", printer->deny_users ? "Deny" : "Allow",
               printer->users[i]);
 
-    fputs("</Printer>\n", fp);
+    cupsFilePuts(fp, "</Printer>\n");
 
 #ifdef __sgi
     /*
@@ -918,7 +918,7 @@ SaveAllPrinters(void)
 #endif /* __sgi */
   }
 
-  fclose(fp);
+  cupsFileClose(fp);
 }
 
 
@@ -1985,7 +1985,7 @@ ValidateDest(const char   *hostname,	/* I - Host name */
 void
 WritePrintcap(void)
 {
-  FILE		*fp;		/* printcap file */
+  cups_file_t	*fp;		/* printcap file */
   printer_t	*p;		/* Current printer */
 
 
@@ -2010,7 +2010,7 @@ WritePrintcap(void)
   * Open the printcap file...
   */
 
-  if ((fp = fopen(Printcap, "w")) == NULL)
+  if ((fp = cupsFileOpen(Printcap, "w")) == NULL)
     return;
 
  /*
@@ -2018,10 +2018,10 @@ WritePrintcap(void)
   * data has come from...
   */
 
-  fputs("# This file was automatically generated by cupsd(8) from the\n", fp);
-  fprintf(fp, "# %s/printers.conf file.  All changes to this file\n",
+  cupsFilePuts(fp, "# This file was automatically generated by cupsd(8) from the\n");
+  cupsFilePrintf(fp, "# %s/printers.conf file.  All changes to this file\n",
           ServerRoot);
-  fputs("# will be lost.\n", fp);
+  cupsFilePuts(fp, "# will be lost.\n");
 
  /*
   * Write a new printcap with the current list of printers.
@@ -2041,12 +2041,12 @@ WritePrintcap(void)
 	*/
 
         if (DefaultPrinter)
-	  fprintf(fp, "%s|%s:rm=%s:rp=%s:\n", DefaultPrinter->name,
+	  cupsFilePrintf(fp, "%s|%s:rm=%s:rp=%s:\n", DefaultPrinter->name,
 	          DefaultPrinter->info, ServerName, DefaultPrinter->name);
 
 	for (p = Printers; p != NULL; p = p->next)
 	  if (p != DefaultPrinter)
-	    fprintf(fp, "%s|%s:rm=%s:rp=%s:\n", p->name, p->info,
+	    cupsFilePrintf(fp, "%s|%s:rm=%s:rp=%s:\n", p->name, p->info,
 	            ServerName, p->name);
         break;
 
@@ -2071,15 +2071,15 @@ WritePrintcap(void)
 	*            :description=Description:
 	*/
 
-        fputs("_all:all=", fp);
+        cupsFilePuts(fp, "_all:all=");
 	for (p = Printers; p != NULL; p = p->next)
-	  fprintf(fp, "%s%c", p->name, p->next ? ',' : '\n');
+	  cupsFilePrintf(fp, "%s%c", p->name, p->next ? ',' : '\n');
 
         if (DefaultPrinter)
-	  fprintf(fp, "_default:use=%s\n", DefaultPrinter->name);
+	  cupsFilePrintf(fp, "_default:use=%s\n", DefaultPrinter->name);
 
 	for (p = Printers; p != NULL; p = p->next)
-	  fprintf(fp, "%s:\\\n"
+	  cupsFilePrintf(fp, "%s:\\\n"
 	              "\t:bsdaddr=%s,%s:\\\n"
 		      "\t:description=%s:\n",
 		  p->name, ServerName, p->name, p->info ? p->info : "");
@@ -2090,7 +2090,7 @@ WritePrintcap(void)
   * Close the file...
   */
 
-  fclose(fp);
+  cupsFileClose(fp);
 }
 
 
@@ -2104,7 +2104,7 @@ static void
 write_irix_config(printer_t *p)	/* I - Printer to update */
 {
   char		filename[1024];	/* Interface script filename */
-  FILE		*fp;		/* Interface script file */
+  cups_file_t	*fp;		/* Interface script file */
   ipp_attribute_t *attr;	/* Attribute value */
 
 
@@ -2118,27 +2118,27 @@ write_irix_config(printer_t *p)	/* I - Printer to update */
 
   if (p->type & CUPS_PRINTER_CLASS)
     unlink(filename);
-  else if ((fp = fopen(filename, "w")) != NULL)
+  else if ((fp = cupsFileOpen(filename, "w")) != NULL)
   {
-    fputs("#!/bin/sh\n", fp);
+    cupsFilePuts(fp, "#!/bin/sh\n");
 
     if ((attr = ippFindAttribute(p->attrs, "printer-make-and-model",
                                  IPP_TAG_TEXT)) != NULL)
-      fprintf(fp, "NAME=\"%s\"\n", attr->values[0].string.text);
+      cupsFilePrintf(fp, "NAME=\"%s\"\n", attr->values[0].string.text);
     else if (p->type & CUPS_PRINTER_CLASS)
-      fputs("NAME=\"Printer Class\"\n", fp);
+      cupsFilePuts(fp, "NAME=\"Printer Class\"\n");
     else
-      fputs("NAME=\"Remote Destination\"\n", fp);
+      cupsFilePuts(fp, "NAME=\"Remote Destination\"\n");
 
     if (p->type & CUPS_PRINTER_COLOR)
-      fputs("TYPE=ColorPostScript\n", fp);
+      cupsFilePuts(fp, "TYPE=ColorPostScript\n");
     else
-      fputs("TYPE=MonoPostScript\n", fp);
+      cupsFilePuts(fp, "TYPE=MonoPostScript\n");
 
-    fprintf(fp, "HOSTNAME=%s\n", ServerName);
-    fprintf(fp, "HOSTPRINTER=%s\n", p->name);
+    cupsFilePrintf(fp, "HOSTNAME=%s\n", ServerName);
+    cupsFilePrintf(fp, "HOSTPRINTER=%s\n", p->name);
 
-    fclose(fp);
+    cupsFileClose(fp);
 
     chmod(filename, 0755);
     chown(filename, User, Group);
@@ -2154,11 +2154,11 @@ write_irix_config(printer_t *p)	/* I - Printer to update */
 
   if (p->type & CUPS_PRINTER_CLASS)
     unlink(filename);
-  else if ((fp = fopen(filename, "w")) != NULL)
+  else if ((fp = cupsFileOpen(filename, "w")) != NULL)
   {
-    fputs("/dev/null\n", fp);
+    cupsFilePuts(fp, "/dev/null\n");
 
-    fclose(fp);
+    cupsFileClose(fp);
 
     chmod(filename, 0644);
     chown(filename, User, Group);
@@ -2180,12 +2180,12 @@ write_irix_config(printer_t *p)	/* I - Printer to update */
 
   if (p->type & CUPS_PRINTER_CLASS)
     unlink(filename);
-  else if ((fp = fopen(filename, "w")) != NULL)
+  else if ((fp = cupsFileOpen(filename, "w")) != NULL)
   {
-    fputs("#!/bin/sh\n", fp);
-    fprintf(fp, "%s -d %s -o \"$3\"\n", PrintcapGUI, p->name);
+    cupsFilePuts(fp, "#!/bin/sh\n");
+    cupsFilePrintf(fp, "%s -d %s -o \"$3\"\n", PrintcapGUI, p->name);
 
-    fclose(fp);
+    cupsFileClose(fp);
 
     chmod(filename, 0755);
     chown(filename, User, Group);
@@ -2200,19 +2200,19 @@ write_irix_config(printer_t *p)	/* I - Printer to update */
 
   if (p->type & CUPS_PRINTER_CLASS)
     unlink(filename);
-  else if ((fp = fopen(filename, "w")) != NULL)
+  else if ((fp = cupsFileOpen(filename, "w")) != NULL)
   {
-    fprintf(fp, "Printer Class      | %s\n",
+    cupsFilePrintf(fp, "Printer Class      | %s\n",
             (p->type & CUPS_PRINTER_COLOR) ? "ColorPostScript" : "MonoPostScript");
-    fprintf(fp, "Printer Model      | %s\n", p->make_model ? p->make_model : "");
-    fprintf(fp, "Location Code      | %s\n", p->location ? p->location : "");
-    fprintf(fp, "Physical Location  | %s\n", p->info ? p->info : "");
-    fprintf(fp, "Port Path          | %s\n", p->device_uri ? p->device_uri : "");
-    fprintf(fp, "Config Path        | /var/spool/lp/pod/%s.config\n", p->name);
-    fprintf(fp, "Active Status Path | /var/spool/lp/pod/%s.status\n", p->name);
-    fputs("Status Update Wait | 10 seconds\n", fp);
+    cupsFilePrintf(fp, "Printer Model      | %s\n", p->make_model ? p->make_model : "");
+    cupsFilePrintf(fp, "Location Code      | %s\n", p->location ? p->location : "");
+    cupsFilePrintf(fp, "Physical Location  | %s\n", p->info ? p->info : "");
+    cupsFilePrintf(fp, "Port Path          | %s\n", p->device_uri ? p->device_uri : "");
+    cupsFilePrintf(fp, "Config Path        | /var/spool/lp/pod/%s.config\n", p->name);
+    cupsFilePrintf(fp, "Active Status Path | /var/spool/lp/pod/%s.status\n", p->name);
+    cupsFilePuts(fp, "Status Update Wait | 10 seconds\n");
 
-    fclose(fp);
+    cupsFileClose(fp);
 
     chmod(filename, 0664);
     chown(filename, User, Group);
@@ -2226,11 +2226,11 @@ write_irix_config(printer_t *p)	/* I - Printer to update */
  */
 
 static void
-write_irix_state(printer_t *p)	/* I - Printer to update */
+write_irix_state(printer_t *p)		/* I - Printer to update */
 {
-  char	filename[1024];		/* Interface script filename */
-  FILE	*fp;			/* Interface script file */
-  int	tag;			/* Status tag value */
+  char		filename[1024];		/* Interface script filename */
+  cups_file_t	*fp;			/* Interface script file */
+  int		tag;			/* Status tag value */
 
 
   if (p)
@@ -2244,20 +2244,20 @@ write_irix_state(printer_t *p)	/* I - Printer to update */
 
     if (p->type & CUPS_PRINTER_CLASS)
       unlink(filename);
-    else if ((fp = fopen(filename, "w")) != NULL)
+    else if ((fp = cupsFileOpen(filename, "w")) != NULL)
     {
-      fprintf(fp, "Operational Status | %s\n",
+      cupsFilePrintf(fp, "Operational Status | %s\n",
               (p->state == IPP_PRINTER_IDLE)       ? "Idle" :
               (p->state == IPP_PRINTER_PROCESSING) ? "Busy" :
                                                      "Faulted");
-      fprintf(fp, "Information        | 01 00 00 | %s\n", CUPS_SVERSION);
-      fprintf(fp, "Information        | 02 00 00 | Device URI: %s\n",
+      cupsFilePrintf(fp, "Information        | 01 00 00 | %s\n", CUPS_SVERSION);
+      cupsFilePrintf(fp, "Information        | 02 00 00 | Device URI: %s\n",
               p->device_uri ? p->device_uri : "");
-      fprintf(fp, "Information        | 03 00 00 | %s jobs\n",
+      cupsFilePrintf(fp, "Information        | 03 00 00 | %s jobs\n",
               p->accepting ? "Accepting" : "Not accepting");
-      fprintf(fp, "Information        | 04 00 00 | %s\n", p->state_message);
+      cupsFilePrintf(fp, "Information        | 04 00 00 | %s\n", p->state_message);
 
-      fclose(fp);
+      cupsFileClose(fp);
 
       chmod(filename, 0664);
       chown(filename, User, Group);
@@ -2298,7 +2298,7 @@ write_irix_state(printer_t *p)	/* I - Printer to update */
 
     if (p->type & CUPS_PRINTER_CLASS)
       unlink(filename);
-    else if ((fp = fopen(filename, "w")) != NULL)
+    else if ((fp = cupsFileOpen(filename, "w")) != NULL)
     {
       if (p->type & CUPS_PRINTER_COLOR)
 	tag = 66240;
@@ -2314,10 +2314,10 @@ write_irix_state(printer_t *p)	/* I - Printer to update */
       else if (p->state == IPP_PRINTER_STOPPED)
 	tag |= 2;
 
-      fputs("#!/bin/sh\n", fp);
-      fprintf(fp, "#Tag %d\n", tag);
+      cupsFilePuts(fp, "#!/bin/sh\n");
+      cupsFilePrintf(fp, "#Tag %d\n", tag);
 
-      fclose(fp);
+      cupsFileClose(fp);
 
       chmod(filename, 0755);
       chown(filename, User, Group);
@@ -2333,11 +2333,11 @@ write_irix_state(printer_t *p)	/* I - Printer to update */
 
   if (DefaultPrinter != NULL)
   {
-    if ((fp = fopen(filename, "w")) != NULL)
+    if ((fp = cupsFileOpen(filename, "w")) != NULL)
     {
-      fprintf(fp, "%s\n", DefaultPrinter->name);
+      cupsFilePrintf(fp, "%s\n", DefaultPrinter->name);
 
-      fclose(fp);
+      cupsFileClose(fp);
 
       chmod(filename, 0644);
       chown(filename, User, Group);
@@ -2350,5 +2350,5 @@ write_irix_state(printer_t *p)	/* I - Printer to update */
 
 
 /*
- * End of "$Id: printers.c,v 1.145 2003/03/28 17:31:23 mike Exp $".
+ * End of "$Id: printers.c,v 1.146 2003/03/30 19:50:35 mike Exp $".
  */
