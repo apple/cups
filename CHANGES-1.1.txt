@@ -3,6 +3,10 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.13
 
+	- The scheduler now forces all processes to exit (kill
+	  -9) when it is stopped.  This prevents parallel and
+	  USB devices from running in the background after cupsd
+	  goes away.
 	- The cupsParseOptions() function didn't skip trailing
 	  whitespace after quoted values.
 	- More changes to support CUPS on OS/2.

@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.124.2.6 2002/01/26 21:36:37 mike Exp $"
+ * "$Id: job.c,v 1.124.2.7 2002/01/29 03:10:20 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -133,7 +133,7 @@ CancelJob(int id,		/* I - Job to cancel */
       DEBUG_puts("CancelJob: found job in list.");
 
       if (current->state->values[0].integer == IPP_JOB_PROCESSING)
-	StopJob(current->id);
+	StopJob(current->id, 0);
 
       current->state->values[0].integer = IPP_JOB_CANCELLED;
 
@@ -242,14 +242,7 @@ CheckJobs(void)
 		*pclass;	/* Printer class destination */
 
 
-  LogMessage(L_DEBUG2, "CheckJobs()");
-
-  if (ActiveJobs >= MaxActiveJobs && MaxActiveJobs)
-  {
-    LogMessage(L_DEBUG2, "ActiveJobs = %d, MaxActiveJobs = %d...\n",
-               ActiveJobs, MaxActiveJobs);
-    return;
-  }
+  DEBUG_puts("CheckJobs()");
 
   for (current = Jobs; current != NULL; current = next)
   {
@@ -432,7 +425,7 @@ HoldJob(int id)			/* I - Job ID */
     return;
 
   if (job->state->values[0].integer == IPP_JOB_PROCESSING)
-    StopJob(id);
+    StopJob(id, 0);
 
   DEBUG_puts("HoldJob: setting state to held...");
 
@@ -451,10 +444,10 @@ HoldJob(int id)			/* I - Job ID */
 void
 LoadAllJobs(void)
 {
-  int		fd;		/* Job control file descriptor */
   DIR		*dir;		/* Directory */
   DIRENT	*dent;		/* Directory entry */
   char		filename[1024];	/* Full filename of job file */
+  int		fd;		/* File descriptor */
   job_t		*job,		/* New job */
 		*current,	/* Current job */
 		*prev;		/* Previous job */
@@ -524,25 +517,28 @@ LoadAllJobs(void)
       snprintf(filename, sizeof(filename), "%s/%s", RequestRoot, dent->d_name);
       if ((fd = open(filename, O_RDONLY)) < 0)
       {
-        LogMessage(L_ERROR, "LoadAllJobs: Unable to open job control file \"%s\": %s!",
+        LogMessage(L_ERROR, "LoadAllJobs: Unable to open job control file \"%s\" - %s!",
 	           filename, strerror(errno));
 	ippDelete(job->attrs);
 	free(job);
-	continue;
-      }
-
-      if (ippReadFile(fd, job->attrs) != IPP_DATA)
-      {
-        LogMessage(L_ERROR, "LoadAllJobs: Unable to read job control file \"%s\"!",
-	           filename);
-	ippDelete(job->attrs);
-	free(job);
-	close(fd);
 	unlink(filename);
 	continue;
       }
+      else
+      {
+        if (ippReadFile(fd, job->attrs) != IPP_DATA)
+	{
+          LogMessage(L_ERROR, "LoadAllJobs: Unable to read job control file \"%s\"!",
+	             filename);
+	  close(fd);
+	  ippDelete(job->attrs);
+	  free(job);
+	  unlink(filename);
+	  continue;
+	}
 
-      close(fd);
+	close(fd);
+      }
 
       if ((attr = ippFindAttribute(job->attrs, "job-printer-uri", IPP_TAG_URI)) == NULL)
       {
@@ -812,8 +808,8 @@ void
 SaveJob(int id)			/* I - Job ID */
 {
   job_t	*job;			/* Pointer to job */
-  int	fd;			/* Job contril file descriptor */
   char	filename[1024];		/* Job control filename */
+  int	fd;			/* File descriptor */
 
 
   if ((job = FindJob(id)) == NULL)
@@ -821,20 +817,17 @@ SaveJob(int id)			/* I - Job ID */
 
   snprintf(filename, sizeof(filename), "%s/c%05d", RequestRoot, id);
 
-  if ((fd = open(filename, O_WRONLY | O_CREAT | O_TRUNC, 0600)) == -1)
+  if ((fd = open(filename, O_WRONLY | O_CREAT | O_TRUNC, 0600)) < 0)
   {
-    LogMessage(L_ERROR, "SaveJob: Unable to create \"%s\": %s!",
+    LogMessage(L_ERROR, "SaveJob: Unable to create job control file \"%s\" - %s.",
                filename, strerror(errno));
-    return;
+    return (IPP_ERROR);
   }
 
   fchmod(fd, 0600);
   fchown(fd, User, Group);
 
-  if (ippWriteFile(fd, job->attrs) == IPP_ERROR)
-    LogMessage(L_ERROR, "SaveJob: Unable to write job state to \"%s\"!",
-               filename);
-
+  ippWriteFile(fd, job->attrs);
   close(fd);
 }
 
@@ -1060,6 +1053,7 @@ StartJob(int       id,		/* I - Job ID */
 {
   job_t		*current;	/* Current job */
   int		i;		/* Looping var */
+  int		slot;		/* Pipe slot */
   int		num_filters;	/* Number of filters for job */
   mime_filter_t	*filters;	/* Filters for job */
   char		method[255],	/* Method for output */
@@ -1483,7 +1477,7 @@ StartJob(int       id,		/* I - Job ID */
     ldpath[0] = '\0';
 
   envp[0]  = path;
-  envp[1]  = "SERVER_SOFTWARE=CUPS/1.2";
+  envp[1]  = "SOFTWARE=CUPS/1.1";
   envp[2]  = "USER=root";
   envp[3]  = charset;
   envp[4]  = language;
@@ -1512,6 +1506,25 @@ StartJob(int       id,		/* I - Job ID */
   current->current_file ++;
 
  /*
+  * Make sure we have a buffer to read status info into...
+  */
+
+  if (current->buffer == NULL)
+  {
+    LogMessage(L_DEBUG2, "UpdateJob: Allocating status buffer...");
+
+    if ((current->buffer = malloc(JOB_BUFFER_SIZE)) == NULL)
+    {
+      LogMessage(L_EMERG, "Unable to allocate memory for job status buffer - %s",
+                 strerror(errno));
+      CancelJob(current->id, 0);
+      return;
+    }
+
+    current->bufused = 0;
+  }
+
+ /*
   * Now create processes for all of the filters...
   */
 
@@ -1531,20 +1544,14 @@ StartJob(int       id,		/* I - Job ID */
   current->status = 0;
   memset(current->procs, 0, sizeof(current->procs));
 
-  if (num_filters > 0 && strcmp(filters[num_filters - 1].filter, "-") == 0)
-    num_filters --;
-
   filterfds[1][0] = open("/dev/null", O_RDONLY);
   filterfds[1][1] = -1;
 
   LogMessage(L_DEBUG, "StartJob: filterfds[%d] = %d, %d", 1, filterfds[1][0],
              filterfds[1][1]);
 
-  for (i = 0; i < num_filters; i ++)
+  for (i = 0, slot = 0; i < num_filters; i ++)
   {
-    if (i == 1)
-      argv[6] = NULL;
-
     if (filters[i].filter[0] != '/')
       snprintf(command, sizeof(command), "%s/filter/%s", ServerBin,
                filters[i].filter);
@@ -1556,27 +1563,27 @@ StartJob(int       id,		/* I - Job ID */
 
     if (i < (num_filters - 1) ||
 	strncmp(printer->device_uri, "file:", 5) != 0)
-      pipe(filterfds[i & 1]);
+      pipe(filterfds[slot]);
     else
     {
-      filterfds[i & 1][0] = -1;
+      filterfds[slot][0] = -1;
       if (strncmp(printer->device_uri, "file:/dev/", 10) == 0)
-	filterfds[i & 1][1] = open(printer->device_uri + 5,
-	                           O_WRONLY | O_EXCL);
+	filterfds[slot][1] = open(printer->device_uri + 5,
+	                          O_WRONLY | O_EXCL);
       else
-	filterfds[i & 1][1] = open(printer->device_uri + 5,
-	                           O_WRONLY | O_CREAT, 0600);
+	filterfds[slot][1] = open(printer->device_uri + 5,
+	                          O_WRONLY | O_CREAT | O_TRUNC, 0600);
     }
 
     LogMessage(L_DEBUG, "StartJob: filter = \"%s\"", command);
     LogMessage(L_DEBUG, "StartJob: filterfds[%d] = %d, %d",
-               i & 1, filterfds[i & 1][0], filterfds[i & 1][1]);
+               slot, filterfds[slot][0], filterfds[slot][1]);
 
-    pid = start_process(command, argv, envp, filterfds[!(i & 1)][0],
-                        filterfds[i & 1][1], statusfds[1], 0);
+    pid = start_process(command, argv, envp, filterfds[!slot][0],
+                        filterfds[slot][1], statusfds[1], 0);
 
-    close(filterfds[!(i & 1)][0]);
-    close(filterfds[!(i & 1)][1]);
+    close(filterfds[!slot][0]);
+    close(filterfds[!slot][1]);
 
     if (pid == 0)
     {
@@ -1587,13 +1594,14 @@ StartJob(int       id,		/* I - Job ID */
                filters[i].filter, strerror(errno));
       return;
     }
-    else
-    {
-      current->procs[i] = pid;
 
-      LogMessage(L_INFO, "Started filter %s (PID %d) for job %d.",
-                 command, pid, current->id);
-    }
+    current->procs[i] = pid;
+
+    LogMessage(L_INFO, "Started filter %s (PID %d) for job %d.",
+               command, pid, current->id);
+
+    argv[6] = NULL;
+    slot    = !slot;
   }
 
   if (filters != NULL)
@@ -1609,21 +1617,19 @@ StartJob(int       id,		/* I - Job ID */
     snprintf(command, sizeof(command), "%s/backend/%s", ServerBin, method);
 
     argv[0] = printer->device_uri;
-    if (num_filters)
-      argv[6] = NULL;
 
-    filterfds[i & 1][0] = -1;
-    filterfds[i & 1][1] = open("/dev/null", O_WRONLY);
+    filterfds[slot][0] = -1;
+    filterfds[slot][1] = open("/dev/null", O_WRONLY);
 
     LogMessage(L_DEBUG, "StartJob: backend = \"%s\"", command);
     LogMessage(L_DEBUG, "StartJob: filterfds[%d] = %d, %d",
-               i & 1, filterfds[i & 1][0], filterfds[i & 1][1]);
+               slot, filterfds[slot][0], filterfds[slot][1]);
 
-    pid = start_process(command, argv, envp, filterfds[!(i & 1)][0],
-			filterfds[i & 1][1], statusfds[1], 1);
+    pid = start_process(command, argv, envp, filterfds[!slot][0],
+			filterfds[slot][1], statusfds[1], 1);
 
-    close(filterfds[!(i & 1)][0]);
-    close(filterfds[!(i & 1)][1]);
+    close(filterfds[!slot][0]);
+    close(filterfds[!slot][1]);
 
     if (pid == 0)
     {
@@ -1643,22 +1649,21 @@ StartJob(int       id,		/* I - Job ID */
   }
   else
   {
-    filterfds[i & 1][0] = -1;
-    filterfds[i & 1][1] = -1;
+    filterfds[slot][0] = -1;
+    filterfds[slot][1] = -1;
 
-    close(filterfds[!(i & 1)][0]);
-    close(filterfds[!(i & 1)][1]);
+    close(filterfds[!slot][0]);
+    close(filterfds[!slot][1]);
   }
 
-  close(filterfds[i & 1][0]);
-  close(filterfds[i & 1][1]);
+  close(filterfds[slot][0]);
+  close(filterfds[slot][1]);
 
   close(statusfds[1]);
 
-  LogMessage(L_DEBUG2, "StartJob: Adding %d to the InputSet...", current->pipe);
-  FD_SET(current->pipe, &InputSet);
+  LogMessage(L_DEBUG2, "StartJob: Adding fd %d to InputSet...", current->pipe);
 
-  ActiveJobs ++;
+  FD_SET(current->pipe, &InputSet);
 }
 
 
@@ -1677,7 +1682,7 @@ StopAllJobs(void)
   for (current = Jobs; current != NULL; current = current->next)
     if (current->state->values[0].integer == IPP_JOB_PROCESSING)
     {
-      StopJob(current->id);
+      StopJob(current->id, 1);
       current->state->values[0].integer = IPP_JOB_PENDING;
     }
 }
@@ -1688,13 +1693,14 @@ StopAllJobs(void)
  */
 
 void
-StopJob(int id)			/* I - Job ID */
+StopJob(int id,			/* I - Job ID */
+        int force)		/* I - 1 = Force all filters to stop */
 {
   int	i;			/* Looping var */
   job_t	*current;		/* Current job */
 
 
-  LogMessage(L_DEBUG, "StopJob: id = %d", id);
+  LogMessage(L_DEBUG, "StopJob: id = %d, force = %d", id, force);
 
   for (current = Jobs; current != NULL; current = current->next)
     if (current->id == id)
@@ -1706,7 +1712,6 @@ StopJob(int id)			/* I - Job ID */
         DEBUG_puts("StopJob: job state is \'processing\'.");
 
         FilterLevel -= current->cost;
-        ActiveJobs --;
 
         if (current->status < 0)
 	  SetPrinterState(current->printer, IPP_PRINTER_STOPPED);
@@ -1724,7 +1729,7 @@ StopJob(int id)			/* I - Job ID */
         for (i = 0; current->procs[i]; i ++)
 	  if (current->procs[i] > 0)
 	  {
-	    kill(current->procs[i], SIGTERM);
+	    kill(current->procs[i], force ? SIGKILL : SIGTERM);
 	    current->procs[i] = 0;
 	  }
 
@@ -1734,10 +1739,26 @@ StopJob(int id)			/* I - Job ID */
 	  * Close the pipe and clear the input bit.
 	  */
 
+          LogMessage(L_DEBUG2, "StopJob: Removing fd %d from InputSet...",
+	             current->pipe);
+
           close(current->pipe);
 	  FD_CLR(current->pipe, &InputSet);
 	  current->pipe = 0;
         }
+
+        if (current->buffer)
+	{
+	 /*
+	  * Free the status buffer...
+	  */
+
+          LogMessage(L_DEBUG2, "StopJob: Freeing status buffer...");
+
+          free(current->buffer);
+	  current->buffer  = NULL;
+	  current->bufused = 0;
+	}
       }
       return;
     }
@@ -1756,21 +1777,20 @@ UpdateJob(job_t *job)		/* I - Job to check */
   char		*lineptr,	/* Pointer to end of line in buffer */
 		*message;	/* Pointer to message text */
   int		loglevel;	/* Log level for message */
-  static int	bufused = 0;	/* Amount of buffer used */
-  static char	buffer[8192];	/* Data buffer */
 
 
-  if ((bytes = read(job->pipe, buffer + bufused, sizeof(buffer) - bufused - 1)) > 0)
+  if ((bytes = read(job->pipe, job->buffer + job->bufused,
+                    JOB_BUFFER_SIZE - job->bufused - 1)) > 0)
   {
-    bufused += bytes;
-    buffer[bufused] = '\0';
-    lineptr = strchr(buffer, '\n');
+    job->bufused += bytes;
+    job->buffer[job->bufused] = '\0';
+    lineptr = strchr(job->buffer, '\n');
   }
   else if (bytes < 0 && errno == EINTR)
     return;
   else
   {
-    lineptr    = buffer + bufused;
+    lineptr    = job->buffer + job->bufused;
     lineptr[1] = 0;
   }
 
@@ -1789,60 +1809,60 @@ UpdateJob(job_t *job)		/* I - Job to check */
     * Figure out the logging level...
     */
 
-    if (strncmp(buffer, "EMERG:", 6) == 0)
+    if (strncmp(job->buffer, "EMERG:", 6) == 0)
     {
       loglevel = L_EMERG;
-      message  = buffer + 6;
+      message  = job->buffer + 6;
     }
-    else if (strncmp(buffer, "ALERT:", 6) == 0)
+    else if (strncmp(job->buffer, "ALERT:", 6) == 0)
     {
       loglevel = L_ALERT;
-      message  = buffer + 6;
+      message  = job->buffer + 6;
     }
-    else if (strncmp(buffer, "CRIT:", 5) == 0)
+    else if (strncmp(job->buffer, "CRIT:", 5) == 0)
     {
       loglevel = L_CRIT;
-      message  = buffer + 5;
+      message  = job->buffer + 5;
     }
-    else if (strncmp(buffer, "ERROR:", 6) == 0)
+    else if (strncmp(job->buffer, "ERROR:", 6) == 0)
     {
       loglevel = L_ERROR;
-      message  = buffer + 6;
+      message  = job->buffer + 6;
     }
-    else if (strncmp(buffer, "WARNING:", 8) == 0)
+    else if (strncmp(job->buffer, "WARNING:", 8) == 0)
     {
       loglevel = L_WARN;
-      message  = buffer + 8;
+      message  = job->buffer + 8;
     }
-    else if (strncmp(buffer, "NOTICE:", 6) == 0)
+    else if (strncmp(job->buffer, "NOTICE:", 6) == 0)
     {
       loglevel = L_NOTICE;
-      message  = buffer + 6;
+      message  = job->buffer + 6;
     }
-    else if (strncmp(buffer, "INFO:", 5) == 0)
+    else if (strncmp(job->buffer, "INFO:", 5) == 0)
     {
       loglevel = L_INFO;
-      message  = buffer + 5;
+      message  = job->buffer + 5;
     }
-    else if (strncmp(buffer, "DEBUG:", 6) == 0)
+    else if (strncmp(job->buffer, "DEBUG:", 6) == 0)
     {
       loglevel = L_DEBUG;
-      message  = buffer + 6;
+      message  = job->buffer + 6;
     }
-    else if (strncmp(buffer, "DEBUG2:", 7) == 0)
+    else if (strncmp(job->buffer, "DEBUG2:", 7) == 0)
     {
       loglevel = L_DEBUG2;
-      message  = buffer + 7;
+      message  = job->buffer + 7;
     }
-    else if (strncmp(buffer, "PAGE:", 5) == 0)
+    else if (strncmp(job->buffer, "PAGE:", 5) == 0)
     {
       loglevel = L_PAGE;
-      message  = buffer + 5;
+      message  = job->buffer + 5;
     }
     else
     {
       loglevel = L_DEBUG;
-      message  = buffer;
+      message  = job->buffer;
     }
 
    /*
@@ -1902,10 +1922,13 @@ UpdateJob(job_t *job)		/* I - Job to check */
     * Copy over the buffer data we've used up...
     */
 
-    strcpy(buffer, lineptr);
-    bufused -= lineptr - buffer;
+    strcpy(job->buffer, lineptr);
+    job->bufused -= lineptr - job->buffer;
 
-    lineptr = strchr(buffer, '\n');
+    if (job->bufused < 0)
+      job->bufused = 0;
+
+    lineptr = strchr(job->buffer, '\n');
   }
 
   if (bytes <= 0)
@@ -1919,6 +1942,9 @@ UpdateJob(job_t *job)		/* I - Job to check */
       * Close the pipe and clear the input bit.
       */
 
+      LogMessage(L_DEBUG2, "UpdateJob: Removing fd %d from InputSet...",
+                 job->pipe);
+
       close(job->pipe);
       FD_CLR(job->pipe, &InputSet);
       job->pipe = 0;
@@ -1930,7 +1956,7 @@ UpdateJob(job_t *job)		/* I - Job to check */
       * Backend had errors; stop it...
       */
 
-      StopJob(job->id);
+      StopJob(job->id, 0);
       job->state->values[0].integer = IPP_JOB_PENDING;
       SaveJob(job->id);
     }
@@ -1958,13 +1984,12 @@ UpdateJob(job_t *job)		/* I - Job to check */
     else
     {
      /*
-      * Job printed successfully; cancel it or print the next file...
+      * Job printed successfully; cancel it...
       */
 
       if (job->current_file < job->num_files)
       {
         FilterLevel -= job->cost;
-	ActiveJobs --;
         StartJob(job->id, job->printer);
       }
       else
@@ -2104,5 +2129,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.124.2.6 2002/01/26 21:36:37 mike Exp $".
+ * End of "$Id: job.c,v 1.124.2.7 2002/01/29 03:10:20 mike Exp $".
  */
