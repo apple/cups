@@ -3,10 +3,13 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.19rc2
 
+	- The configure script didn't add CPPFLAGS to the
+	  compiler options or LDFLAGS to the DSO options (STR
+	  #13)
 	- The scheduler would try to write a debug log message
 	  when starting a job that contained a NULL string. 
 	  Since not all versions of snprintf() support NULL
-	  string pointers this caused some problems.
+	  string pointers this caused some problems (STR #20)
 	- The testipp program now supports reading of IPP
 	  message files such as those used for the job history
 	  in /var/spool/cups.
