@@ -1,5 +1,5 @@
 /*
- * "$Id: gdevcups.c,v 1.7 1999/06/29 14:39:55 mike Exp $"
+ * "$Id: gdevcups.c,v 1.8 1999/07/22 20:58:34 mike Exp $"
  *
  *   GNU Ghostscript raster output driver for the Common UNIX Printing
  *   System (CUPS).
@@ -1602,7 +1602,7 @@ cups_set_color_info(gx_device *pdev)	/* I - Device info */
           }
 
       d = profile->density;
-      g = 1.0 / profile->density;
+      g = 1.0 / (profile->density * profile->density);
 
       for (k = 0; k <= gx_max_color_value; k ++)
       {
@@ -2434,5 +2434,5 @@ cups_print_planar(gx_device_printer *pdev,	/* I - Printer device */
 
 
 /*
- * End of "$Id: gdevcups.c,v 1.7 1999/06/29 14:39:55 mike Exp $".
+ * End of "$Id: gdevcups.c,v 1.8 1999/07/22 20:58:34 mike Exp $".
  */
