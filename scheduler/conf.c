@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.32 1999/09/29 15:45:56 mike Exp $"
+ * "$Id: conf.c,v 1.33 1999/09/30 18:48:21 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -412,7 +412,7 @@ read_configuration(FILE *fp)	/* I - File to read from */
 	                &(Listeners[NumListeners].address)))
         {
           LogMessage(LOG_INFO, "Listening to %x:%d\n",
-                     ntohl(Listeners[NumListeners].address.sin_addr),
+                     ntohl(Listeners[NumListeners].address.sin_addr.s_addr),
                      ntohs(Listeners[NumListeners].address.sin_port));
 	  NumListeners ++;
         }
@@ -435,7 +435,7 @@ read_configuration(FILE *fp)	/* I - File to read from */
         if (get_address(value, INADDR_NONE, BrowsePort, Browsers + NumBrowsers))
         {
           LogMessage(LOG_INFO, "Sending browsing info to %x:%d\n",
-                     ntohl(Browsers[NumBrowsers].sin_addr),
+                     ntohl(Browsers[NumBrowsers].sin_addr.s_addr),
                      ntohs(Browsers[NumBrowsers].sin_port));
 	  NumBrowsers ++;
         }
@@ -903,5 +903,5 @@ get_address(char               *value,		/* I - Value string */
 
 
 /*
- * End of "$Id: conf.c,v 1.32 1999/09/29 15:45:56 mike Exp $".
+ * End of "$Id: conf.c,v 1.33 1999/09/30 18:48:21 mike Exp $".
  */
