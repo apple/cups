@@ -1,7 +1,7 @@
 /*
- * "$Id: language.c,v 1.6 1999/04/22 20:19:22 mike Exp $"
+ * "$Id: language.c,v 1.7 1999/05/06 21:46:20 mike Exp $"
  *
- *   for the Common UNIX Printing System (CUPS).
+ *   I18N/language support for the Common UNIX Printing System (CUPS).
  *
  *   Copyright 1997-1999 by Easy Software Products.
  *
@@ -141,26 +141,15 @@ cupsLangGet(char *language)	/* I - Language or locale */
 
 
  /*
-  * First see if we already have this language loaded...
+  * Convert the language string passed in to a locale string. "C" is the
+  * standard POSIX locale and is copied unchanged.  Otherwise the
+  * language string is converted from ll-cc (language-country) to ll_CC
+  * to match the file naming convention used by all POSIX-compliant
+  * operating systems.
   */
 
   if (language == NULL || language[0] == '\0')
     language = "C";
-
-  for (lang = lang_cache; lang != NULL; lang = lang->next)
-    if (strcmp(lang->language, language) == 0)
-    {
-      lang->used ++;
-      return (lang);
-    }
-
- /*
-  * Then convert the language string passed in to a locale string.
-  * "C" is the standard POSIX locale and is copied unchanged.  Otherwise
-  * the language string is converted from ll-cc (language-country) to
-  * ll_CC to match the file naming convention used by all POSIX-compliant
-  * operating systems.
-  */
 
   if (strlen(language) < 2)
     strcpy(real, "C");
@@ -205,6 +194,21 @@ cupsLangGet(char *language)	/* I - Language or locale */
       real[2] = '\0';
       sprintf(filename, "%s/%s/cups_%s", localedir, real, real);
       fp = fopen(filename, "r");
+    }
+
+ /*
+  * Then see if we already have this language loaded...
+  */
+
+  for (lang = lang_cache; lang != NULL; lang = lang->next)
+    if (strcmp(lang->language, language) == 0)
+    {
+      lang->used ++;
+
+      if (fp != NULL)
+        fclose(fp);
+
+      return (lang);
     }
 
  /*
@@ -265,6 +269,7 @@ cupsLangGet(char *language)	/* I - Language or locale */
     lang->next = lang_cache;
     lang_cache = lang;
   }
+
 
  /*
   * Free all old strings as needed...
@@ -361,5 +366,5 @@ cupsLangGet(char *language)	/* I - Language or locale */
 
 
 /*
- * End of "$Id: language.c,v 1.6 1999/04/22 20:19:22 mike Exp $".
+ * End of "$Id: language.c,v 1.7 1999/05/06 21:46:20 mike Exp $".
  */
