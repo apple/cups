@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-opsys.m4,v 1.2 2001/06/27 21:53:08 mike Exp $"
+dnl "$Id: cups-opsys.m4,v 1.3 2001/07/03 17:07:29 mike Exp $"
 dnl
 dnl   Operating system stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -36,7 +36,7 @@ AC_ARG_WITH(cups-user, [ --with-cups-user    set default user for CUPS],
 	if test -f /etc/passwd; then
 		CUPS_USER=""
 		for user in lp lpd guest daemon nobody; do
-			if test "`grep ^${user}: /etc/passwd`" != ""; then
+			if test "`grep \^${user}: /etc/passwd`" != ""; then
 				CUPS_USER="$user"
 				AC_MSG_RESULT($user)
 				break;
@@ -58,7 +58,7 @@ AC_ARG_WITH(cups-group, [ --with-cups-group   set default group for CUPS],
 	if test -f /etc/group; then
 		CUPS_GROUP=""
 		for group in sys system root; do
-			if test "`grep ^${group}: /etc/group`" != ""; then
+			if test "`grep \^${group}: /etc/group`" != ""; then
 				CUPS_GROUP="$group"
 				AC_MSG_RESULT($group)
 				break;
@@ -81,5 +81,5 @@ AC_DEFINE(CUPS_DEFAULT_USER, "$CUPS_USER")
 AC_DEFINE(CUPS_DEFAULT_GROUP, "$CUPS_GROUP")
 
 dnl
-dnl "$Id: cups-opsys.m4,v 1.2 2001/06/27 21:53:08 mike Exp $"
+dnl "$Id: cups-opsys.m4,v 1.3 2001/07/03 17:07:29 mike Exp $"
 dnl
