@@ -1,5 +1,5 @@
 /*
- * "$Id: config.h.in,v 1.28 2000/08/18 19:27:22 mike Exp $"
+ * "$Id: config.h.in,v 1.29 2000/08/29 21:23:06 mike Exp $"
  *
  *   Configuration file for the Common UNIX Printing System (CUPS).
  *
@@ -41,6 +41,7 @@
 #define CUPS_REQUESTS	"/var/spool/cups"
 #define CUPS_LOGDIR	"/var/logs/cups"
 #define CUPS_DATADIR    "/usr/share/cups"
+#define CUPS_FONTPATH	"/usr/share/cups/fonts"
 
 
 /*
@@ -123,5 +124,5 @@
 #undef HAVE_WAIT3
 
 /*
- * End of "$Id: config.h.in,v 1.28 2000/08/18 19:27:22 mike Exp $".
+ * End of "$Id: config.h.in,v 1.29 2000/08/29 21:23:06 mike Exp $".
  */

@@ -31,6 +31,9 @@ CHANGES IN CUPS v1.1.3
 	- The cups-lpd mini-daemon now checks for a
 	  document-format option before forcing raw mode with
 	  filter mode 'l'.
+	- The cups-lpd mini-daemon now supports "-o" options
+	  on the command-line (passed by inetd) to set global
+	  defaults for all print queues.
 	- The pstops filter assumed that a file with a Trailer
 	  comment would also have an EOF comment.
 	- Added new cupsSetPasswordCB(), cupsSetServer(),
@@ -40,6 +43,16 @@ CHANGES IN CUPS v1.1.3
 	  didn't reset the printer-name attribute on remote
 	  print queues that had to be renamed when a local
 	  printer was defined with the same name.
+	- The lpoptions command now supports a "-r" option to
+	  remove options for a printer or instance.
+	- The lpadmin and admin.cgi programs no longer allow
+	  class and printer names to begin with a number; this
+	  caused the command-line utilities to become confused.
+	- The Linux USB backend now looks for both the parallel
+	  and usblp driver names in the device list.
+	- Added a new FontPath directive to cupsd.conf, and also
+	  a "--with-fontpath" option for the configure script to
+	  specify alternate font paths for pstoraster.
 
 
 CHANGES IN CUPS v1.1.2

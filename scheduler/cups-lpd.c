@@ -1,5 +1,5 @@
 /*
- * "$Id: cups-lpd.c,v 1.10 2000/08/29 18:41:21 mike Exp $"
+ * "$Id: cups-lpd.c,v 1.11 2000/08/29 21:23:12 mike Exp $"
  *
  *   Line Printer Daemon interface for the Common UNIX Printing System (CUPS).
  *
@@ -132,7 +132,7 @@ main(int  argc,			/* I - Number of command-line arguments */
             }
 	    break;
 	default :
-	    syslog(LOG_WARNING, "Unknown option \"%c\" ignored!", *opt);
+	    syslog(LOG_WARNING, "Unknown option \"%c\" ignored!", argv[i][1]);
 	    break;
       }
     }
@@ -1189,5 +1189,5 @@ remove_jobs(const char *dest,		/* I - Destination */
 
 
 /*
- * End of "$Id: cups-lpd.c,v 1.10 2000/08/29 18:41:21 mike Exp $".
+ * End of "$Id: cups-lpd.c,v 1.11 2000/08/29 21:23:12 mike Exp $".
  */

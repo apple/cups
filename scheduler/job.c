@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.82 2000/08/18 14:30:28 mike Exp $"
+ * "$Id: job.c,v 1.83 2000/08/29 21:23:13 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -945,7 +945,8 @@ StartJob(int       id,		/* I - Job ID */
 		cache[255],	/* RIP_MAX_CACHE environment variable */
 		tmpdir[1024],	/* TMPDIR environment variable */
 		ldpath[1024],	/* LD_LIBRARY_PATH environment variable */
-		datadir[1024];	/* CUPS_DATADIR environment variable */
+		datadir[1024],	/* CUPS_DATADIR environment variable */
+		fontpath[1050];	/* CUPS_FONTPATH environment variable */
 
 
   DEBUG_printf(("StartJob(%d, %08x)\n", id, printer));
@@ -1224,6 +1225,7 @@ StartJob(int       id,		/* I - Job ID */
   snprintf(root, sizeof(root), "CUPS_SERVERROOT=%s", ServerRoot);
   snprintf(tmpdir, sizeof(tmpdir), "TMPDIR=%s", TempDir);
   snprintf(datadir, sizeof(datadir), "CUPS_DATADIR=%s", DataDir);
+  snprintf(fontpath, sizeof(fontpath), "CUPS_FONTPATH=%s", FontPath);
 
   if (getenv("LD_LIBRARY_PATH") != NULL)
     snprintf(ldpath, sizeof(ldpath), "LD_LIBRARY_PATH=%s", getenv("LD_LIBRARY_PATH"));
@@ -1244,8 +1246,9 @@ StartJob(int       id,		/* I - Job ID */
   envp[11] = device_uri;
   envp[12] = printer_name;
   envp[13] = datadir;
-  envp[14] = ldpath;
-  envp[15] = NULL;
+  envp[14] = fontpath;
+  envp[15] = ldpath;
+  envp[16] = NULL;
 
   DEBUG_puts(envp[0]);
   DEBUG_puts(envp[1]);
@@ -1262,6 +1265,7 @@ StartJob(int       id,		/* I - Job ID */
   DEBUG_puts(envp[12]);
   DEBUG_puts(envp[13]);
   DEBUG_puts(envp[14]);
+  DEBUG_puts(envp[15]);
 
   current->current_file ++;
 
@@ -2595,5 +2599,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.82 2000/08/18 14:30:28 mike Exp $".
+ * End of "$Id: job.c,v 1.83 2000/08/29 21:23:13 mike Exp $".
  */

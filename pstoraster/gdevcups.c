@@ -1,5 +1,5 @@
 /*
- * "$Id: gdevcups.c,v 1.31 2000/08/16 18:56:00 mike Exp $"
+ * "$Id: gdevcups.c,v 1.32 2000/08/29 21:23:10 mike Exp $"
  *
  *   GNU Ghostscript raster output driver for the Common UNIX Printing
  *   System (CUPS).
@@ -106,6 +106,7 @@ extern const char	*cupsProfile;
 private dev_proc_close_device(cups_close);
 private dev_proc_get_initial_matrix(cups_get_matrix);
 private int cups_get_params(gx_device *, gs_param_list *);
+private dev_proc_map_cmyk_color(cups_map_cmyk_color);
 private dev_proc_map_color_rgb(cups_map_color_rgb);
 private dev_proc_map_rgb_color(cups_map_rgb_color);
 private dev_proc_open_device(cups_open);
@@ -145,7 +146,7 @@ private gx_device_procs	cups_procs =
    gx_default_get_bits,
    cups_get_params,
    cups_put_params,
-   NULL,
+   NULL,	/* map_cmyk_color */
    NULL,	/* get_xfont_procs */
    NULL,	/* get_xfont_device */
    NULL,	/* map_rgb_alpha_color */
@@ -598,6 +599,145 @@ cups_get_params(gx_device     *pdev,	/* I - Device info */
 
 
 /*
+ * 'cups_map_cmyk_color()' - Map a CMYK color to a color index.
+ *
+ * This function is only called when a 4 or 6 color colorspace is
+ * selected for output.  CMYK colors are *not* corrected but *are*
+ * density adjusted.
+ */
+
+private gx_color_index				/* O - Color index */
+cups_map_cmyk_color(gx_device      *pdev,	/* I - Device info */
+                    gx_color_value c,		/* I - Cyan value */
+                    gx_color_value m,		/* I - Magenta value */
+                    gx_color_value y,		/* I - Yellow value */
+		    gx_color_value k)		/* I - Black value */
+{
+  gx_color_index	i;			/* Temporary index */
+  gx_color_value	ic, im, iy, ik;		/* Integral CMYK values */
+
+
+#ifdef DEBUG
+  fprintf(stderr, "DEBUG: cups_map_cmyk_color(%08x, %d, %d, %d, %d)\n", pdev,
+          c, m, y, k);
+#endif /* DEBUG */
+
+ /*
+  * Setup the color info data as needed...
+  */
+
+  if (pdev->color_info.num_components == 0)
+    cups_set_color_info(pdev);
+
+ /*
+  * Density correct...
+  */
+
+  c  = cupsDensity[c];
+  m  = cupsDensity[m];
+  y  = cupsDensity[y];
+  k  = cupsDensity[k];
+
+  ic = lut_rgb_color[c];
+  im = lut_rgb_color[m];
+  iy = lut_rgb_color[y];
+  ik = lut_rgb_color[k];
+
+ /*
+  * Convert the CMYK color to a color index...
+  */
+
+  switch (cups->header.cupsColorSpace)
+  {
+    default :
+        switch (cups->header.cupsBitsPerColor)
+        {
+          case 1 :
+              i = (((((ic << 1) | im) << 1) | iy) << 1) | ik;
+              break;
+          case 2 :
+              i = (((((ic << 2) | im) << 2) | iy) << 2) | ik;
+              break;
+          case 4 :
+              i = (((((ic << 4) | im) << 4) | iy) << 4) | ik;
+              break;
+          case 8 :
+              i = (((((ic << 8) | im) << 8) | iy) << 8) | ik;
+              break;
+        }
+        break;
+
+    case CUPS_CSPACE_YMCK :
+    case CUPS_CSPACE_GMCK :
+    case CUPS_CSPACE_GMCS :
+        switch (cups->header.cupsBitsPerColor)
+        {
+          case 1 :
+              i = (((((iy << 1) | im) << 1) | ic) << 1) | ik;
+              break;
+          case 2 :
+              i = (((((iy << 2) | im) << 2) | ic) << 2) | ik;
+              break;
+          case 4 :
+              i = (((((iy << 4) | im) << 4) | ic) << 4) | ik;
+              break;
+          case 8 :
+              i = (((((iy << 8) | im) << 8) | ic) << 8) | ik;
+              break;
+        }
+        break;
+
+    case CUPS_CSPACE_KCMYcm :
+        if (cups->header.cupsBitsPerColor == 1)
+	{
+	  if (ik)
+	    i = 32;
+	  else
+	    i = 0;
+
+	  if (ic && im)
+	    i |= 17;
+	  else if (ic && iy)
+	    i |= 6;
+	  else if (im && iy)
+	    i |= 12;
+	  else if (ic)
+	    i |= 16;
+	  else if (im)
+	    i |= 8;
+	  else if (iy)
+	    i |= 4;
+	  break;
+	}
+
+    case CUPS_CSPACE_KCMY :
+        switch (cups->header.cupsBitsPerColor)
+        {
+          case 1 :
+              i = (((((ik << 1) | ic) << 1) | im) << 1) | iy;
+              break;
+          case 2 :
+              i = (((((ik << 2) | ic) << 2) | im) << 2) | iy;
+              break;
+          case 4 :
+              i = (((((ik << 4) | ic) << 4) | im) << 4) | iy;
+              break;
+          case 8 :
+              i = (((((ik << 8) | ic) << 8) | im) << 8) | iy;
+              break;
+        }
+        break;
+  }
+
+  if (gs_log_errors > 1)
+    fprintf(stderr, "DEBUG: CMYK (%d,%d,%d,%d) -> CMYK %08.8x (%d,%d,%d,%d)\n",
+	    c, m, y, k, i, ic, im, iy, ik);
+
+  return (i);
+}
+    
+
+/*
  * 'cups_map_color_rgb()' - Map a color index to an RGB color.
  */
  
@@ -795,6 +935,7 @@ cups_map_rgb_color(gx_device      *pdev,	/* I - Device info */
   gx_color_index	i;			/* Temporary index */
   gx_color_value	ic, im, iy, ik, mk;	/* Integral CMYK values */
   int			tc, tm, ty;		/* Temporary color values */
+  float			kscale;			/* K scaling value */
 
 
 #ifdef DEBUG
@@ -901,10 +1042,7 @@ cups_map_rgb_color(gx_device      *pdev,	/* I - Device info */
         }
         break;
 
-    case CUPS_CSPACE_K :
-    case CUPS_CSPACE_WHITE :
-    case CUPS_CSPACE_GOLD :
-    case CUPS_CSPACE_SILVER :
+    default :
         i = lut_rgb_color[gx_max_color_value - (r * 31 + g * 61 + b * 8) / 100];
         break;
 
@@ -960,7 +1098,10 @@ cups_map_rgb_color(gx_device      *pdev,	/* I - Device info */
 
         mk = max(ic, max(im, iy));
         if (mk > ik)
-	  ik = ik * ik / mk;
+	{
+	  kscale = (float)ik / (float)mk;
+	  ik = ik * kscale * kscale;
+	}
 
         ic = lut_rgb_color[ic - ik];
         im = lut_rgb_color[im - ik];
@@ -998,7 +1139,10 @@ cups_map_rgb_color(gx_device      *pdev,	/* I - Device info */
 
         mk = max(ic, max(im, iy));
         if (mk > ik)
-	  ik = ik * ik / mk;
+	{
+	  kscale = (float)ik / (float)mk;
+	  ik = ik * kscale * kscale;
+	}
 
         ic = lut_rgb_color[ic - ik];
         im = lut_rgb_color[im - ik];
@@ -1061,7 +1205,10 @@ cups_map_rgb_color(gx_device      *pdev,	/* I - Device info */
 
         mk = max(ic, max(im, iy));
         if (mk > ik)
-	  ik = ik * ik / mk;
+	{
+	  kscale = (float)ik / (float)mk;
+	  ik = ik * kscale * kscale;
+	}
 
         ic = lut_rgb_color[ic - ik];
         im = lut_rgb_color[im - ik];
@@ -1141,6 +1288,8 @@ cups_print_pages(gx_device_printer *pdev,	/* I - Device info */
   unsigned char	*src,		/* Scanline data */
 		*dst;		/* Bitmap data */
 
+
+  (void)fp; /* reference unused file pointer to prevent compiler warning */
 
 #ifdef DEBUG
   fprintf(stderr, "DEBUG: cups_print_pages(%08x, %08x, %d)\n", pdev, fp,
@@ -1596,6 +1745,15 @@ cups_set_color_info(gx_device *pdev)	/* I - Device info */
     cups->color_info.dither_grays  = (1 << cups->header.cupsBitsPerColor);
     cups->color_info.dither_colors = 0;
   }
+
+ /*
+  * Enable/disable CMYK color support...
+  */
+
+  if (cups->color_info.num_components == 4)
+    cups->procs.map_cmyk_color = cups_map_cmyk_color;
+  else
+    cups->procs.map_cmyk_color = NULL;
 
  /*
   * Compute the lookup tables...
@@ -2551,5 +2709,5 @@ cups_print_planar(gx_device_printer *pdev,	/* I - Printer device */
 
 
 /*
- * End of "$Id: gdevcups.c,v 1.31 2000/08/16 18:56:00 mike Exp $".
+ * End of "$Id: gdevcups.c,v 1.32 2000/08/29 21:23:10 mike Exp $".
  */

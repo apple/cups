@@ -1,5 +1,5 @@
 /*
- * "$Id: pstoraster.c,v 1.15 2000/06/28 18:42:49 mike Exp $"
+ * "$Id: pstoraster.c,v 1.16 2000/08/29 21:23:10 mike Exp $"
  *
  *   PostScript RIP filter main entry for the Common UNIX Printing System
  *   (CUPS).
@@ -96,8 +96,8 @@ main(int  argc,		/* I - Number of command-line arguments */
   int			num_options;	/* Number of job options */
   cups_option_t		*options;	/* Job options */
   char			gspath[2048];	/* Path to GS files... */
-  char			fontpath[2048];	/* Path to GS fonts... */
   const char		*datadir;	/* CUPS_DATADIR env variable */
+  const char		*fontpath;	/* CUPS_FONTPATH env variable */
 
 
  /*
@@ -142,8 +142,10 @@ main(int  argc,		/* I - Number of command-line arguments */
 
   if ((datadir = getenv("CUPS_DATADIR")) == NULL)
     datadir = CUPS_DATADIR;
+  if ((fontpath = getenv("CUPS_FONTPATH")) == NULL)
+    fontpath = CUPS_FONTPATH;
 
-  snprintf(gspath, sizeof(gspath), "%s/pstoraster:%s/fonts", datadir, datadir);
+  snprintf(gspath, sizeof(gspath), "%s/pstoraster:%s", datadir, fontpath);
 
   minst->lib_path.final = gspath;
   gs_main_set_lib_paths(minst);
@@ -160,7 +162,6 @@ main(int  argc,		/* I - Number of command-line arguments */
 
   define_string("OutputFile", "-");
 
-  snprintf(fontpath, sizeof(fontpath), "%s/fonts", datadir);
   define_string("FONTPATH", fontpath);
 
  /*
@@ -228,5 +229,5 @@ define_string(char *name,	/* I - Variable to set */
 
 
 /*
- * End of "$Id: pstoraster.c,v 1.15 2000/06/28 18:42:49 mike Exp $".
+ * End of "$Id: pstoraster.c,v 1.16 2000/08/29 21:23:10 mike Exp $".
  */

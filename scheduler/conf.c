@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.54 2000/08/18 14:30:28 mike Exp $"
+ * "$Id: conf.c,v 1.55 2000/08/29 21:23:12 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -92,6 +92,7 @@ static var_t	variables[] =
   { "RIPCache",		RIPCache,		VAR_STRING,	sizeof(RIPCache) },
   { "TempDir",		TempDir,		VAR_STRING,	sizeof(TempDir) },
   { "Printcap",		Printcap,		VAR_STRING,	sizeof(Printcap) },
+  { "FontPath",		FontPath,		VAR_STRING,	sizeof(FontPath) },
   { "HostNameLookups",	&HostNameLookups,	VAR_BOOLEAN,	0 },
   { "Timeout",		&Timeout,		VAR_INTEGER,	0 },
   { "KeepAlive",	&KeepAlive,		VAR_BOOLEAN,	0 },
@@ -201,6 +202,7 @@ ReadConfiguration(void)
   strcpy(ErrorLog, CUPS_LOGDIR "/error_log");
   strcpy(PageLog, CUPS_LOGDIR "/page_log");
   strcpy(Printcap, "");
+  strcpy(FontPath, CUPS_FONTPATH);
 
   if ((language = DEFAULT_LANGUAGE) == NULL)
     language = "en";
@@ -1410,5 +1412,5 @@ get_address(char               *value,		/* I - Value string */
 
 
 /*
- * End of "$Id: conf.c,v 1.54 2000/08/18 14:30:28 mike Exp $".
+ * End of "$Id: conf.c,v 1.55 2000/08/29 21:23:12 mike Exp $".
  */
