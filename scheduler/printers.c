@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.93.2.39 2003/03/10 21:05:31 mike Exp $"
+ * "$Id: printers.c,v 1.93.2.40 2003/03/10 21:22:23 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -1871,11 +1871,13 @@ WritePrintcap(void)
 	*/
 
         if (DefaultPrinter)
-	  fprintf(fp, "%s:\n", DefaultPrinter->name);
+	  fprintf(fp, "%s|%s:rm=%s:rp=%s:\n", DefaultPrinter->name,
+	          DefaultPrinter->info, ServerName, DefaultPrinter->name);
 
 	for (p = Printers; p != NULL; p = p->next)
 	  if (p != DefaultPrinter)
-	    fprintf(fp, "%s:\n", p->name);
+	    fprintf(fp, "%s|%s:rm=%s:rp=%s:\n", p->name, p->info,
+	            ServerName, p->name);
         break;
 
     case PRINTCAP_SOLARIS:
@@ -2178,5 +2180,5 @@ write_irix_state(printer_t *p)	/* I - Printer to update */
 
 
 /*
- * End of "$Id: printers.c,v 1.93.2.39 2003/03/10 21:05:31 mike Exp $".
+ * End of "$Id: printers.c,v 1.93.2.40 2003/03/10 21:22:23 mike Exp $".
  */

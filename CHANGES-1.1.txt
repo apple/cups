@@ -3,6 +3,10 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.19
 
+	- When writing BSD printcap files, the scheduler now
+	  includes the rm and rp attributes, allowing the file
+	  to be exported to LPD clients. [Patch from Dominic
+	  Kubla]
 	- The scheduler optimization to reference IPP attribute
 	  data instead of performing a full copy caused problems
 	  when the referenced data was deleted before it was
