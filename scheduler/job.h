@@ -1,5 +1,5 @@
 /*
- * "$Id: job.h,v 1.25.2.7 2003/01/29 20:08:26 mike Exp $"
+ * "$Id: job.h,v 1.25.2.8 2003/01/31 01:29:04 mike Exp $"
  *
  *   Print job definitions for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -44,7 +44,6 @@ typedef struct job_str
   char		*username;		/* Printing user */
   char		*dest;			/* Destination printer or class */
   cups_ptype_t	dtype;			/* Destination type (class/remote bits) */
-  char		*title;			/* Job name/title */
   ipp_attribute_t *job_sheets;		/* Job sheets (NULL if none) */
   int		num_files;		/* Number of files in job */
   int		current_file;		/* Current file in job */
@@ -109,5 +108,5 @@ extern void	UpdateJob(job_t *job);
 
 
 /*
- * End of "$Id: job.h,v 1.25.2.7 2003/01/29 20:08:26 mike Exp $".
+ * End of "$Id: job.h,v 1.25.2.8 2003/01/31 01:29:04 mike Exp $".
  */

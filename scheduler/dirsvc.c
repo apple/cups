@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.73.2.23 2003/01/29 20:08:21 mike Exp $"
+ * "$Id: dirsvc.c,v 1.73.2.24 2003/01/31 01:28:59 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -164,8 +164,7 @@ ProcessBrowseData(const char   *uri,	/* I - URI of printer/class */
 
 	  if (p->type & CUPS_PRINTER_REMOTE)
 	  {
-            strlcat(p->name, "@", sizeof(p->name));
-	    strlcat(p->name, p->hostname, sizeof(p->name));
+            SetStringf(&p->name, "%s@%s", p->name, p->hostname);
 	    SetPrinterAttrs(p);
 	    SortPrinters();
 	  }
@@ -1881,5 +1880,5 @@ UpdateSLPBrowse(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.73.2.23 2003/01/29 20:08:21 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.73.2.24 2003/01/31 01:28:59 mike Exp $".
  */

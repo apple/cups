@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.124.2.45 2003/01/29 20:11:12 mike Exp $"
+ * "$Id: job.c,v 1.124.2.46 2003/01/31 01:29:02 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -204,7 +204,6 @@ CancelJob(int id,		/* I - Job to cancel */
 
         ClearString(&current->username);
         ClearString(&current->dest);
-        ClearString(&current->title);
 
         free(current);
 
@@ -657,9 +656,6 @@ LoadAllJobs(void)
 
       attr = ippFindAttribute(job->attrs, "job-priority", IPP_TAG_INTEGER);
       job->priority = attr->values[0].integer;
-
-      attr = ippFindAttribute(job->attrs, "job-name", IPP_TAG_NAME);
-      SetString(&job->title, attr->values[0].string.text);
 
       attr = ippFindAttribute(job->attrs, "job-originating-user-name", IPP_TAG_NAME);
       SetString(&job->username, attr->values[0].string.text);
@@ -2602,5 +2598,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.124.2.45 2003/01/29 20:11:12 mike Exp $".
+ * End of "$Id: job.c,v 1.124.2.46 2003/01/31 01:29:02 mike Exp $".
  */

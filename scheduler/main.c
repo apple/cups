@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c,v 1.57.2.30 2003/01/29 20:36:20 mike Exp $"
+ * "$Id: main.c,v 1.57.2.31 2003/01/31 01:29:04 mike Exp $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -725,7 +725,7 @@ void
 SetString(char       **s,		/* O - New string */
           const char *v)		/* I - String value */
 {
-  if (!s)
+  if (!s || *s == v)
     return;
 
   if (*s)
@@ -749,13 +749,13 @@ SetStringf(char       **s,		/* O - New string */
 {
   char		v[1024];		/* Formatting string value */
   va_list	ap;			/* Argument pointer */
+  char		*olds;			/* Old string */
 
 
   if (!s)
     return;
 
-  if (*s)
-    free(*s);
+  olds = *s;
 
   if (f)
   {
@@ -767,6 +767,9 @@ SetStringf(char       **s,		/* O - New string */
   }
   else
     *s = NULL;
+
+  if (olds)
+    free(olds);
 }
 
 
@@ -1005,5 +1008,5 @@ usage(void)
 
 
 /*
- * End of "$Id: main.c,v 1.57.2.30 2003/01/29 20:36:20 mike Exp $".
+ * End of "$Id: main.c,v 1.57.2.31 2003/01/31 01:29:04 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.127.2.39 2003/01/29 20:08:22 mike Exp $"
+ * "$Id: ipp.c,v 1.127.2.40 2003/01/31 01:29:00 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -2230,8 +2230,6 @@ create_job(client_t        *con,	/* I - Client connection */
   job->attrs   = con->request;
   con->request = NULL;
 
-  SetString(&job->title, title);
-
   attr = ippFindAttribute(job->attrs, "requesting-user-name", IPP_TAG_NAME);
 
   if (con->username[0])
@@ -3437,7 +3435,7 @@ get_printers(client_t *con,		/* I - Client connection */
   else
     printer_mask = 0;
 
-  if ((attr = ippFindAttribute(con->request, "location", IPP_TAG_TEXT)) != NULL)
+  if ((attr = ippFindAttribute(con->request, "printer-location", IPP_TAG_TEXT)) != NULL)
     location = attr->values[0].string.text;
   else
     location = NULL;
@@ -3456,7 +3454,8 @@ get_printers(client_t *con,		/* I - Client connection */
        printer = printer->next)
     if ((printer->type & CUPS_PRINTER_CLASS) == type &&
         (printer->type & printer_mask) == printer_type &&
-	(location == NULL || strcasecmp(printer->location, location) == 0))
+	(location == NULL || printer->location == NULL ||
+	 strcasecmp(printer->location, location) == 0))
     {
      /*
       * If HideImplicitMembers is enabled, see if this printer or class
@@ -4135,8 +4134,6 @@ print_job(client_t        *con,		/* I - Client connection */
  /*
   * Copy the rest of the job info...
   */
-
-  SetString(&job->title, title);
 
   attr = ippFindAttribute(job->attrs, "requesting-user-name", IPP_TAG_NAME);
 
@@ -5613,9 +5610,7 @@ set_job_attrs(client_t        *con,	/* I - Client connection */
       * See if the job-name or job-hold-until is being changed.
       */
 
-      if (strcmp(attr->name, "job-name") == 0)
-        SetString(&job->title, attr->values[0].string.text);
-      else if (strcmp(attr->name, "job-hold-until") == 0)
+      if (strcmp(attr->name, "job-hold-until") == 0)
       {
         SetJobHoldUntil(job->id, attr->values[0].string.text);
 
@@ -6077,5 +6072,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.127.2.39 2003/01/29 20:08:22 mike Exp $".
+ * End of "$Id: ipp.c,v 1.127.2.40 2003/01/31 01:29:00 mike Exp $".
  */
