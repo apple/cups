@@ -1,5 +1,5 @@
 /*
- * "$Id: cupsd.h,v 1.14 1999/09/22 18:08:41 mike Exp $"
+ * "$Id: cupsd.h,v 1.15 1999/12/07 18:26:15 mike Exp $"
  *
  *   Main header file for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -34,7 +34,6 @@
 #include <time.h>
 #include <signal.h>
 #include <fcntl.h>
-/*#include <bstring.h>*/
 #include <sys/types.h>
 #include <sys/time.h>
 #include <sys/stat.h>
@@ -91,27 +90,6 @@
 #define DEFAULT_CHARSET		"iso-8859-1"
 					/* Default charset */
 
-#ifdef __sgi
-#  define DEFAULT_UID		9	/* Default user ID */
-#  define DEFAULT_GID		0	/* Default group ID */
-#elif defined(__hpux)
-#  define DEFAULT_UID		9	/* Default user ID */
-#  define DEFAULT_GID		0	/* Default group ID */
-#elif defined(__sun)
-#  define DEFAULT_UID		71	/* Default user ID */
-#  define DEFAULT_GID		0	/* Default group ID */
-#elif defined(__linux)
-#  define DEFAULT_UID		4	/* Default user ID */
-#  define DEFAULT_GID		0	/* Default group ID */
-#elif defined(__osf__)
-#  define DEFAULT_UID		8	/* Default user ID */
-#  define DEFAULT_GID		0	/* Default group ID */
-#else
-#  define DEFAULT_UID		9	/* Default user ID */
-#  define DEFAULT_GID		0	/* Default group ID */
-#endif /* __sgi */
-
-
 /*
  * Global variable macros...
  */
@@ -158,5 +136,5 @@ VAR char		TZ[1024]	VALUE("TZ=GMT");
 
 
 /*
- * End of "$Id: cupsd.h,v 1.14 1999/09/22 18:08:41 mike Exp $".
+ * End of "$Id: cupsd.h,v 1.15 1999/12/07 18:26:15 mike Exp $".
  */

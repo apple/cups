@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.c,v 1.18 1999/11/02 20:39:23 mike Exp $"
+ * "$Id: auth.c,v 1.19 1999/12/07 18:26:15 mike Exp $"
  *
  *   Authorization routines for the Common UNIX Printing System (CUPS).
  *
@@ -477,10 +477,10 @@ IsAuthorized(client_t *con)	/* I - Connection */
 
  /*
   * OK, the password is good.  See if we need normal user access, or group
-  * access...
+  * access... (root always matches)
   */
 
-  if (best->level == AUTH_USER)
+  if (best->level == AUTH_USER || strcmp(con->username, "root") == 0)
     return (HTTP_OK);
 
  /*
@@ -719,5 +719,5 @@ pam_func(int                      num_msg,	/* I - Number of messages */
 
 
 /*
- * End of "$Id: auth.c,v 1.18 1999/11/02 20:39:23 mike Exp $".
+ * End of "$Id: auth.c,v 1.19 1999/12/07 18:26:15 mike Exp $".
  */
