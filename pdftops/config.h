@@ -104,6 +104,13 @@
 // uncompress program
 //------------------------------------------------------------------------
 
+// Many Linux distributions no longer ship uncompress, but all ship
+// gzip...
+
+#if defined(__linux) && !defined(USE_GZIP)
+#  define USE_GZIP
+#endif // __linux && USE_GZIP
+
 #ifdef HAVE_POPEN
 
 // command to uncompress to stdout
