@@ -5,6 +5,8 @@ CHANGES IN CUPS V1.1.15
 
 	- Updated the CUPS license agreement for the new MacOS
 	  license exception.
+	- The cupsaddsmb program now supports alternative CUPS
+	  and SAMBA server names.
 	- The PostScript filter now supports the Orientation
 	  comment and rotates the page as needed automatically.
 	- Revamped the makefiles slightly to use automatically

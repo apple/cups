@@ -1,5 +1,5 @@
 /*
- * "$Id: cupsaddsmb.c,v 1.3.2.2 2002/02/12 19:23:13 mike Exp $"
+ * "$Id: cupsaddsmb.c,v 1.3.2.3 2002/03/14 15:09:32 mike Exp $"
  *
  *   "cupsaddsmb" command for the Common UNIX Printing System (CUPS).
  *
@@ -43,7 +43,9 @@
  * Local globals...
  */
 
-int	Verbosity = 0;
+int		Verbosity = 0;
+const char	*SAMBAUser,
+		*SAMBAServer;
 
 
 /*
@@ -52,6 +54,7 @@ int	Verbosity = 0;
 
 int	do_samba_command(const char *, const char *);
 int	export_dest(const char *);
+void	usage();
 
 
 /*
@@ -64,51 +67,88 @@ main(int  argc,		/* I - Number of command-line arguments */
 {
   int	i, j;		/* Looping vars */
   int	status;		/* Status from export_dest() */
+  int	export_all;	/* Export all printers? */
   int	num_printers;	/* Number of printers */
   char	**printers;	/* Printers */
 
 
+ /*
+  * Parse command-line arguments...
+  */
+
+  export_all = 0;
+
+  SAMBAUser   = cupsUser();
+  SAMBAServer = NULL;
+
   for (i = 1; i < argc; i ++)
     if (strcmp(argv[i], "-a") == 0)
-    {
-      num_printers = cupsGetPrinters(&printers);
-
-      for (j = 0, status = 0; j < num_printers; j ++)
-        if ((status = export_dest(printers[j])) != 0)
-	  break;
-
-      for (j = 0; j < num_printers; j ++)
-        free(printers[j]);
-
-      if (num_printers)
-        free(printers);
-
-      if (status)
-        return (status);
-    }
+      export_all = 1;
     else if (strcmp(argv[i], "-U") == 0)
     {
       i ++;
       if (i >= argc)
-      {
-	puts("Usage: cupsaddsmb [-a] [-U user] [-v] [printer1 ... printerN]");
-	return (1);
-      }
+        usage();
 
-      cupsSetUser(argv[i]);
+      SAMBAUser = argv[i];
+    }
+    else if (strcmp(argv[i], "-H") == 0)
+    {
+      i ++;
+      if (i >= argc)
+        usage();
+
+      SAMBAServer = argv[i];
+    }
+    else if (strcmp(argv[i], "-h") == 0)
+    {
+      i ++;
+      if (i >= argc)
+        usage();
+
+      cupsSetServer(argv[i]);
     }
     else if (strcmp(argv[i], "-v") == 0)
       Verbosity = 1;
     else if (argv[i][0] != '-')
     {
+      if (SAMBAServer == NULL)
+	SAMBAServer = cupsServer();
+
       if ((status = export_dest(argv[i])) != 0)
 	return (status);
     }
     else
-    {
-      puts("Usage: cupsaddsmb [-a] [-U user] [-v] [printer1 ... printerN]");
-      return (1);
-    }
+      usage();
+
+ /*
+  * See if the user specified "-a"...
+  */
+
+  if (export_all)
+  {
+   /*
+    * Export all printers...
+    */
+
+    if (SAMBAServer == NULL)
+      SAMBAServer = cupsServer();
+
+    num_printers = cupsGetPrinters(&printers);
+
+    for (j = 0, status = 0; j < num_printers; j ++)
+      if ((status = export_dest(printers[j])) != 0)
+	break;
+
+    for (j = 0; j < num_printers; j ++)
+      free(printers[j]);
+
+    if (num_printers)
+      free(printers);
+
+    if (status)
+      return (status);
+  }
 
   return (0);
 }
@@ -134,14 +174,14 @@ do_samba_command(const char *command,	/* I - Command to run */
     {
       snprintf(temp, sizeof(temp),
                "Password for %s required to access %s via SAMBA: ",
-	       cupsUser(), cupsServer());
+	       SAMBAUser, SAMBAServer);
 
       if ((p = cupsGetPassword(temp)) == NULL)
 	break;
     }
 
     snprintf(temp, sizeof(temp), "%s -N -U\'%s%%%s\' -c \'%s\'",
-             command, cupsUser(), p, subcmd);
+             command, SAMBAUser, p, subcmd);
 
     if (Verbosity)
       printf("Running command: %s\n", temp);
@@ -156,7 +196,10 @@ do_samba_command(const char *command,	/* I - Command to run */
       if (Verbosity)
         puts("");
 
-      p = NULL;
+      if (p[0])
+        p = NULL;
+      else
+        break;
     }
     else
     {
@@ -196,7 +239,7 @@ export_dest(const char *dest)	/* I - Destination to export */
   }
 
   /* Do the smbclient commands needed for the Windows drivers... */
-  snprintf(command, sizeof(command), "smbclient //%s/print\\$", cupsServer());
+  snprintf(command, sizeof(command), "smbclient //%s/print\\$", SAMBAServer);
 
   snprintf(subcmd, sizeof(subcmd),
            "mkdir W32X86;"
@@ -241,7 +284,7 @@ export_dest(const char *dest)	/* I - Destination to export */
            "adddriver \"Windows NT x86\" \"%s:ADOBEPS5.DLL:%s.PPD:ADOBEPSU.DLL:ADOBEPSU.HLP:NULL:RAW:NULL\"",
 	   dest, dest);
 
-  snprintf(command, sizeof(command), "rpcclient %s", cupsServer());
+  snprintf(command, sizeof(command), "rpcclient %s", SAMBAServer);
 
   if ((status = do_samba_command(command, subcmd)) != 0)
   {
@@ -276,5 +319,25 @@ export_dest(const char *dest)	/* I - Destination to export */
 
 
 /*
- * End of "$Id: cupsaddsmb.c,v 1.3.2.2 2002/02/12 19:23:13 mike Exp $".
+ * 'usage()' - Show program usage and exit...
+ */
+
+void
+usage()
+{
+  puts("Usage: cupsaddsmb [options] printer1 ... printerN");
+  puts("       cupsaddsmb [options] -a");
+  puts("");
+  puts("Options:");
+  puts("  -H samba-server  Use the named SAMBA server");
+  puts("  -U samba-user    Authenticate using the named SAMBA user");
+  puts("  -a               Export all printers");
+  puts("  -h cups-server   Use the named CUPS server");
+  puts("  -v               Be verbose (show commands)");
+  exit(1);
+}
+
+
+/*
+ * End of "$Id: cupsaddsmb.c,v 1.3.2.3 2002/03/14 15:09:32 mike Exp $".
  */

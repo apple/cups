@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: cupsaddsmb.man,v 1.2.2.2 2002/01/02 18:04:52 mike Exp $"
+.\" "$Id: cupsaddsmb.man,v 1.2.2.3 2002/03/14 15:09:32 mike Exp $"
 .\"
 .\"   cupsaddsmb man page for the Common UNIX Printing System (CUPS).
 .\"
@@ -21,19 +21,27 @@
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
-.TH cupsaddsmb 8 "Common UNIX Printing System" "9 November 2001" "Easy Software Products"
+.TH cupsaddsmb 8 "Common UNIX Printing System" "14 March 2002" "Easy Software Products"
 .SH NAME
 cupsaddsmb \- export printers to samba for windows clients
 .SH SYNOPSIS
 .B cupsaddsmb
-[ -a ] [ -U
-.I user
-] [ -v ]
+[ -H
+.I samba-server
+] [ -U
+.I samba-user
+] [ -h
+.I cups-server
+] [ -v ] -a
 .br
 .B cupsaddsmb
-[ -u
-.I user
-] [ -v ] [ printer1 ... printerN ]
+[ -H
+.I samba-server
+] [ -U
+.I samba-user
+] [ -h
+.I cups-server
+] [ -v ] printer [ ... printer ]
 .SH DESCRIPTION
 \fIcupsaddsmb\fR exports printers to the SAMBA software (version
 2.2.0 or higher) for use with Windows clients. Depending on the
@@ -41,11 +49,16 @@ SAMBA configuration, you may need to provide a password to
 export the printers. This program requires the Adobe PostScript
 printer driver files described below.
 .LP
-The \fI-a\fR option exports all known printers. Otherwise, only
+The \fI-H\fR option specifies the SAMBA server which defaults
+to the CUPS server.
+.LP
+The \fI-U\fR option specifies the SAMBA print admin username which defaults
+to your current username.
+.LP
+The \fI-a\fR option exports all known printers. Otherwise only
 the named printers are exported.
 .LP
-The \fI-U\fR option specifies the print admin username which defaults
-to your current username.
+The \fI-h\fR option specifies a different CUPS server to use.
 .LP
 The \fI-v\fR option specifies that verbose information should be
 shown and is useful for debugging SAMBA configuration problems.
@@ -110,5 +123,5 @@ http://localhost:631/documentation.html
 .SH COPYRIGHT
 Copyright 1993-2002 by Easy Software Products, All Rights Reserved.
 .\"
-.\" End of "$Id: cupsaddsmb.man,v 1.2.2.2 2002/01/02 18:04:52 mike Exp $".
+.\" End of "$Id: cupsaddsmb.man,v 1.2.2.3 2002/03/14 15:09:32 mike Exp $".
 .\"
