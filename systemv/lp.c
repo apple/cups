@@ -1,5 +1,5 @@
 /*
- * "$Id: lp.c,v 1.6 1999/05/10 21:36:09 mike Exp $"
+ * "$Id: lp.c,v 1.7 1999/05/20 16:16:48 mike Exp $"
  *
  *   "lp" command for the Common UNIX Printing System (CUPS).
  *
@@ -115,6 +115,7 @@ main(int  argc,		/* I - Number of command-line arguments */
 	    }
 	    break;
 
+	case 'p' : /* Queue priority */
 	case 'q' : /* Queue priority */
 	    if (argv[i][2] != '\0')
 	      priority = atoi(argv[i] + 2);
@@ -239,5 +240,5 @@ main(int  argc,		/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: lp.c,v 1.6 1999/05/10 21:36:09 mike Exp $".
+ * End of "$Id: lp.c,v 1.7 1999/05/20 16:16:48 mike Exp $".
  */

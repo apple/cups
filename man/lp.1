@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: lp.1,v 1.1 1999/05/14 17:03:02 mike Exp $"
+.\" "$Id: lp.1,v 1.2 1999/05/20 16:16:45 mike Exp $"
 .\"
 .\"   lp/cancel man page for the Common UNIX Printing System (CUPS).
 .\"
@@ -27,9 +27,32 @@ lp \- print files
 .br
 cancel \- cancel jobs
 .SH SYNOPSIS
-.B lpstat
+.B lp
+[ \-c ] [ \-d
+.I destination
+] [ \-m ] [ \-n
+.I num-copies
+[ \-o
+.I option
+] [ \-p/q
+.I priority
+] [ \-s ] [ \-t
+.I title
+] 
+.br
+.B cancel
+[ \-a ] [
+.I id
+] [
+.I destination
+] [
+.I destination-id
+]
 .SH DESCRIPTION
-\fBlpstat\fR
+\fBlp\fR submits files for printing.
+.LP
+\fBcancel\fR cancels existing print jobs. The \fI-a\fR option will remove
+all jobs from the specified destination.
 .SH COMPATIBILITY
 Unlike the System V printing system, CUPS allows printer names to contain
 any printable character except SPACE and TAB. Also, printer and class names are
@@ -40,5 +63,5 @@ CUPS Software User's Manual
 .SH COPYRIGHT
 Copyright 1993-1999 by Easy Software Products, All Rights Reserved.
 .\"
-.\" End of "$Id: lp.1,v 1.1 1999/05/14 17:03:02 mike Exp $".
+.\" End of "$Id: lp.1,v 1.2 1999/05/20 16:16:45 mike Exp $".
 .\"
