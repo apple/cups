@@ -1,5 +1,5 @@
 /*
- * "$Id: common.c,v 1.15.2.6 2002/08/19 16:49:52 mike Exp $"
+ * "$Id: common.c,v 1.15.2.7 2002/09/24 13:36:48 mike Exp $"
  *
  *   Common filter routines for the Common UNIX Printing System (CUPS).
  *
@@ -95,12 +95,13 @@ SetCommonOptions(int           num_options,	/* I - Number of options */
     LanguageLevel = ppd->language_level;
   }
 
-  if ((val = cupsGetOption("landscape", num_options, options)) != NULL &&
-      strcasecmp(val, "no") != 0 && strcasecmp(val, "off") != 0 &&
-      strcasecmp(val, "false") != 0)
-    Orientation = 1;
-
-  if ((val = cupsGetOption("orientation-requested", num_options, options)) != NULL)
+  if ((val = cupsGetOption("landscape", num_options, options)) != NULL)
+  {
+    if (strcasecmp(val, "no") != 0 && strcasecmp(val, "off") != 0 &&
+        strcasecmp(val, "false") != 0)
+      Orientation = 1;
+  }
+  else if ((val = cupsGetOption("orientation-requested", num_options, options)) != NULL)
   {
    /*
     * Map IPP orientation values to 0 to 3:
@@ -439,5 +440,5 @@ WriteLabels(int orient)	/* I - Orientation of the page */
 
 
 /*
- * End of "$Id: common.c,v 1.15.2.6 2002/08/19 16:49:52 mike Exp $".
+ * End of "$Id: common.c,v 1.15.2.7 2002/09/24 13:36:48 mike Exp $".
  */
