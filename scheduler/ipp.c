@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.200 2003/03/30 19:50:34 mike Exp $"
+ * "$Id: ipp.c,v 1.201 2003/03/30 19:57:14 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -2718,7 +2718,7 @@ copy_banner(client_t   *con,	/* I - Client connection */
 
       if (strcmp(s, "printer-name") == 0)
       {
-        fputs(job->dest, out);
+        cupsFilePuts(out, job->dest);
 	continue;
       }
       else if ((attr = ippFindAttribute(job->attrs, s, IPP_TAG_ZERO)) == NULL)
@@ -2829,7 +2829,7 @@ copy_banner(client_t   *con,	/* I - Client connection */
 
   cupsFileClose(in);
 
-  kbytes = (ftell(out) + 1023) / 1024;
+  kbytes = (cupsFileTell(out) + 1023) / 1024;
 
   if ((attr = ippFindAttribute(job->attrs, "job-k-octets", IPP_TAG_INTEGER)) != NULL)
     attr->values[0].integer += kbytes;
@@ -6291,5 +6291,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.200 2003/03/30 19:50:34 mike Exp $".
+ * End of "$Id: ipp.c,v 1.201 2003/03/30 19:57:14 mike Exp $".
  */
