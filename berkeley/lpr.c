@@ -1,5 +1,5 @@
 /*
- * "$Id: lpr.c,v 1.20.2.5 2002/09/15 12:02:43 mike Exp $"
+ * "$Id: lpr.c,v 1.20.2.6 2002/10/01 17:31:21 mike Exp $"
  *
  *   "lpr" command for the Common UNIX Printing System (CUPS).
  *
@@ -33,12 +33,14 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <errno.h>
 
-#include <config.h>
+#include <cups/string.h>
 #include <cups/cups.h>
 
 
 #ifndef WIN32
+#  include <unistd.h>
 #  include <signal.h>
 
 
@@ -276,6 +278,13 @@ main(int  argc,		/* I - Number of command-line arguments */
       * Print a file...
       */
 
+      if (access(argv[i], R_OK) != 0)
+      {
+        fprintf(stderr, "lpr: Unable to access \"%s\" - %s\n", argv[i],
+	        strerror(errno));
+        return (1);
+      }
+
       files[num_files] = argv[i];
       num_files ++;
 
@@ -420,5 +429,5 @@ sighandler(int s)	/* I - Signal number */
 
 
 /*
- * End of "$Id: lpr.c,v 1.20.2.5 2002/09/15 12:02:43 mike Exp $".
+ * End of "$Id: lpr.c,v 1.20.2.6 2002/10/01 17:31:21 mike Exp $".
  */

@@ -3,6 +3,9 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.16
 
+	- The lp and lpr commands did not return an error when
+	  one or more files in a set of files for printing could
+	  not be printed.
 	- The lp, lpadmin, and lpstat commands now consistently
 	  return with a non-zero exit status when an error
 	  occurs.
