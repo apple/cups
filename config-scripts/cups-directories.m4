@@ -1,9 +1,9 @@
 dnl
-dnl "$Id: cups-directories.m4,v 1.5.2.5 2002/10/17 17:06:00 mike Exp $"
+dnl "$Id: cups-directories.m4,v 1.5.2.6 2003/04/14 19:56:01 mike Exp $"
 dnl
 dnl   Directory stuff for the Common UNIX Printing System (CUPS).
 dnl
-dnl   Copyright 1997-2002 by Easy Software Products, all rights reserved.
+dnl   Copyright 1997-2003 by Easy Software Products, all rights reserved.
 dnl
 dnl   These coded instructions, statements, and computer programs are the
 dnl   property of Easy Software Products and are protected by Federal
@@ -238,5 +238,5 @@ AC_SUBST(CUPS_FONTPATH)
 AC_DEFINE_UNQUOTED(CUPS_FONTPATH, "$fontpath")
 
 dnl
-dnl End of "$Id: cups-directories.m4,v 1.5.2.5 2002/10/17 17:06:00 mike Exp $".
+dnl End of "$Id: cups-directories.m4,v 1.5.2.6 2003/04/14 19:56:01 mike Exp $".
 dnl

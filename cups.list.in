@@ -1,5 +1,5 @@
 #
-# "$Id: cups.list.in,v 1.13.2.14 2003/03/30 21:49:14 mike Exp $"
+# "$Id: cups.list.in,v 1.13.2.15 2003/04/14 19:56:01 mike Exp $"
 #
 #   ESP Package Manager (EPM) file list for the Common UNIX Printing
 #   System (CUPS).
@@ -91,6 +91,7 @@ $SERVERBIN=@CUPS_SERVERBIN@
 $SERVERROOT=@CUPS_SERVERROOT@
 
 $CUPS_USER=@CUPS_USER@
+$CUPS_GROUP=@CUPS_GROUP@
 
 $CAT1EXT=@CAT1EXT@
 $CAT3EXT=@CAT3EXT@
@@ -120,6 +121,7 @@ f 0555 root sys $SERVERBIN/backend/ipp backend/ipp
 l 0555 root sys $SERVERBIN/backend/http ipp
 f 0555 root sys $SERVERBIN/backend/lpd backend/lpd
 f 0555 root sys $SERVERBIN/backend/parallel backend/parallel
+f 0555 root sys $SERVERBIN/backend/scsi backend/scsi
 f 0555 root sys $SERVERBIN/backend/serial backend/serial
 f 0555 root sys $SERVERBIN/backend/socket backend/socket
 f 0555 root sys $SERVERBIN/backend/usb backend/usb
@@ -163,6 +165,7 @@ l 0555 root sys /usr/etc/lpc $SBINDIR/lpc
 
 # User commands
 f 0555 root sys $BINDIR/cancel systemv/cancel
+f 0555 root sys $BINDIR/cupstestppd systemv/cupstestppd
 f 0555 root sys $BINDIR/lp systemv/lp
 f 0555 root sys $BINDIR/lpoptions systemv/lpoptions
 f 4555 $CUPS_USER sys $BINDIR/lppasswd systemv/lppasswd
@@ -179,23 +182,23 @@ l 0555 root sys /usr/bsd/lprm $BINDIR/lprm
 
 # DSOs
 %system hpux
-f 0555 root sys $LIBDIR/libcups.sl.3 cups/libcups.sl.3
-l 0555 root sys $LIBDIR/libcups.sl libcups.sl.3
-f 0555 root sys $LIBDIR/libcupsimage.sl.3 filter/libcupsimage.sl.3
-l 0555 root sys $LIBDIR/libcupsimage.sl libcupsimage.sl.3
-f 0555 root sys $LIBDIR/libipp.sl.3 ipp/libipp.sl.3
-l 0555 root sys $LIBDIR/libipp.sl libipp.sl.3
+f 0555 root sys $LIBDIR/libcups.sl.2 cups/libcups.sl.2
+l 0555 root sys $LIBDIR/libcups.sl libcups.sl.2
+f 0555 root sys $LIBDIR/libcupsimage.sl.2 filter/libcupsimage.sl.2
+l 0555 root sys $LIBDIR/libcupsimage.sl libcupsimage.sl.2
 %system aix
 f 0555 root sys $LIBDIR/libcups_s.a cups/libcups_s.a
 f 0555 root sys $LIBDIR/libcupsimage_s.a filter/libcupsimage_s.a
-f 0555 root sys $LIBDIR/libipp_s.a ipp/libipp_s.a
-%system !hpux !aix
-f 0555 root sys $LIBDIR/libcups.so.3 cups/libcups.so.3
-l 0555 root sys $LIBDIR/libcups.so libcups.so.3
-f 0555 root sys $LIBDIR/libcupsimage.so.3 filter/libcupsimage.so.3
-l 0555 root sys $LIBDIR/libcupsimage.so libcupsimage.so.3
-f 0555 root sys $LIBDIR/libipp.so.3 ipp/libipp.so.3
-l 0555 root sys $LIBDIR/libipp.so libipp.so.3
+%system darwin
+f 0555 root sys $LIBDIR/libcups.2.dylib cups/libcups.2.dylib
+l 0555 root sys $LIBDIR/libcups.dylib libcups.2.dylib
+f 0555 root sys $LIBDIR/libcupsimage.2.dylib filter/libcupsimage.2.dylib
+l 0555 root sys $LIBDIR/libcupsimage.dylib libcupsimage.2.dylib
+%system !hpux !aix !darwin
+f 0555 root sys $LIBDIR/libcups.so.2 cups/libcups.so.2
+l 0555 root sys $LIBDIR/libcups.so libcups.so.2
+f 0555 root sys $LIBDIR/libcupsimage.so.2 filter/libcupsimage.so.2
+l 0555 root sys $LIBDIR/libcupsimage.so libcupsimage.so.2
 %system all
 
 # Directories
@@ -254,6 +257,10 @@ f 0444 root sys $DATADIR/data/HPGLprolog data/HPGLprolog
 f 0444 root sys $DATADIR/data/psglyphs data/psglyphs
 f 0444 root sys $DATADIR/data/testprint.ps data/testprint.ps
 
+d 0555 root sys $DATADIR/fonts -
+f 0444 root sys $DATADIR/fonts fonts/Courier*
+f 0444 root sys $DATADIR/fonts/Symbol fonts/Symbol
+
 d 0555 root sys $DATADIR/model -
 f 0444 root sys $DATADIR/model ppd/*.ppd
 
@@ -269,35 +276,35 @@ c 0600 root sys $SERVERROOT conf/*.conf
 c 0600 root sys $SERVERROOT/mime.convs conf/mime.convs
 c 0600 root sys $SERVERROOT/mime.types conf/mime.types
 
-%system linux
+%if PAMDIR
 d 0555 root sys $PAMDIR -
+
+%system linux
+# Linux almost always supports PAM...
 c 0644 root sys $PAMDIR/cups conf/pam.conf
 
+%system irix
 # IRIX doesn't normally support PAM, but the freeware project
 # includes a version of PAM that can be used...
-%system irix
-d 0555 root sys $PAMDIR -
-c 0644 root sys $PAMDIR/cups data/cups.irix
+c 0644 root sys $PAMDIR/cups conf/pam.irix
 
 %system all
+%endif
 
 # Developer files
 f 0555 root sys $BINDIR/cups-config cups-config
 d 0555 root sys $INCLUDEDIR/cups -
 f 0444 root sys $INCLUDEDIR/cups/cups.h cups/cups.h
+f 0444 root sys $INCLUDEDIR/cups/http.h cups/http.h
 f 0444 root sys $INCLUDEDIR/cups/image.h filter/image.h
+f 0444 root sys $INCLUDEDIR/cups/ipp.h cups/ipp.h
 f 0444 root sys $INCLUDEDIR/cups/language.h cups/language.h
+f 0444 root sys $INCLUDEDIR/cups/md5.h cups/md5.h
 f 0444 root sys $INCLUDEDIR/cups/ppd.h cups/ppd.h
 f 0444 root sys $INCLUDEDIR/cups/raster.h filter/raster.h
 
-d 0555 root sys $INCLUDEDIR/ipp -
-f 0444 root sys $INCLUDEDIR/ipp/http.h ipp/http.h
-f 0444 root sys $INCLUDEDIR/ipp/ipp.h ipp/ipp.h
-f 0444 root sys $INCLUDEDIR/ipp/md5.h ipp/md5.h
-
 f 0444 root sys $LIBDIR/libcups.a cups/libcups.a
-f 0444 root sys $LIBDIR/libcupsimage.a filter/libcupsimage.a
-f 0444 root sys $LIBDIR/libipp.a ipp/libipp.a
+f 0444 root sys $LIBDIR/libcupsimage.a cups/libcupsimage.a
 
 # Documentation files
 d 0555 root sys $DOCDIR -
@@ -314,13 +321,15 @@ d 0555 root sys $AMANDIR/cat$MAN8DIR -
 d 0555 root sys $AMANDIR/man$MAN8DIR -
 d 0555 root sys $MANDIR -
 d 0555 root sys $MANDIR/cat1 -
-d 0555 root sys $PMANDIR/cat3 -
 d 0555 root sys $MANDIR/cat5 -
 d 0555 root sys $MANDIR/man1 -
-d 0555 root sys $PMANDIR/man3 -
 d 0555 root sys $MANDIR/man5 -
+d 0555 root sys $PMANDIR -
+d 0555 root sys $PMANDIR/cat3 -
+d 0555 root sys $PMANDIR/man3 -
 
 f 0444 root sys $MANDIR/cat1/backend.$CAT1EXT man/backend.$CAT1EXT
+f 0444 root sys $MANDIR/cat1/cupstestppd.$CAT1EXT man/cupstestppd.$CAT1EXT
 f 0444 root sys $MANDIR/cat1/filter.$CAT1EXT man/filter.$CAT1EXT
 f 0444 root sys $MANDIR/cat1/lpoptions.$CAT1EXT man/lpoptions.$CAT1EXT
 f 0444 root sys $MANDIR/cat1/lppasswd.$CAT1EXT man/lppasswd.$CAT1EXT
@@ -353,6 +362,7 @@ f 0444 root sys $AMANDIR/cat$MAN8DIR/lpinfo.$CAT8EXT man/lpinfo.$CAT8EXT
 f 0444 root sys $AMANDIR/cat$MAN8DIR/lpmove.$CAT8EXT man/lpmove.$CAT8EXT
 
 f 0444 root sys $MANDIR/man1/backend.$MAN1EXT man/backend.man
+f 0444 root sys $MANDIR/man1/cupstestppd.$MAN1EXT man/cupstestppd.man
 f 0444 root sys $MANDIR/man1/filter.$MAN1EXT man/filter.man
 f 0444 root sys $MANDIR/man1/lpoptions.$MAN1EXT man/lpoptions.man
 f 0444 root sys $MANDIR/man1/lppasswd.$MAN1EXT man/lppasswd.man
@@ -361,7 +371,7 @@ f 0444 root sys $MANDIR/man1/lprm.$MAN1EXT man/lprm.man
 f 0444 root sys $MANDIR/man1/lpr.$MAN1EXT man/lpr.man
 f 0444 root sys $MANDIR/man1/lpstat.$MAN1EXT man/lpstat.man
 f 0444 root sys $MANDIR/man1/lp.$MAN1EXT man/lp.man
-l 0444 root sys $MANDIR/man1/cancel.$MAN1EXT lp.man
+l 0444 root sys $MANDIR/man1/cancel.$MAN1EXT lp.$MAN1EXT
 
 f 0444 root sys $PMANDIR/man3/cups-config.$MAN3EXT man/cups-config.man
 
@@ -372,13 +382,13 @@ f 0444 root sys $MANDIR/man5/mime.types.$MAN5EXT man/mime.types.man
 f 0444 root sys $MANDIR/man5/printers.conf.$MAN5EXT man/printers.conf.man
 
 f 0444 root sys $AMANDIR/man$MAN8DIR/accept.$MAN8EXT man/accept.man
-l 0444 root sys $AMANDIR/man$MAN8DIR/reject.$MAN8EXT accept.man
+l 0444 root sys $AMANDIR/man$MAN8DIR/reject.$MAN8EXT accept.$MAN8EXT
 f 0444 root sys $AMANDIR/man$MAN8DIR/cupsaddsmb.$MAN8EXT man/cupsaddsmb.man
 f 0444 root sys $AMANDIR/man$MAN8DIR/cups-lpd.$MAN8EXT man/cups-lpd.man
 f 0444 root sys $AMANDIR/man$MAN8DIR/cups-polld.$MAN8EXT man/cups-polld.man
 f 0444 root sys $AMANDIR/man$MAN8DIR/cupsd.$MAN8EXT man/cupsd.man
 f 0444 root sys $AMANDIR/man$MAN8DIR/enable.$MAN8EXT man/enable.man
-l 0444 root sys $AMANDIR/man$MAN8DIR/disable.$MAN8EXT enable.man
+l 0444 root sys $AMANDIR/man$MAN8DIR/disable.$MAN8EXT enable.$MAN8EXT
 f 0444 root sys $AMANDIR/man$MAN8DIR/lpadmin.$MAN8EXT man/lpadmin.man
 f 0444 root sys $AMANDIR/man$MAN8DIR/lpc.$MAN8EXT man/lpc.man
 f 0444 root sys $AMANDIR/man$MAN8DIR/lpinfo.$MAN8EXT man/lpinfo.man
@@ -389,5 +399,5 @@ f 0444 root sys $AMANDIR/man$MAN8DIR/lpmove.$MAN8EXT man/lpmove.man
 i 0555 root sys cups cups.sh
 
 #
-# End of "$Id: cups.list.in,v 1.13.2.14 2003/03/30 21:49:14 mike Exp $".
+# End of "$Id: cups.list.in,v 1.13.2.15 2003/04/14 19:56:01 mike Exp $".
 #

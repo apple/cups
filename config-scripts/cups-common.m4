@@ -1,9 +1,9 @@
 dnl
-dnl "$Id: cups-common.m4,v 1.12.2.14 2003/04/10 21:02:08 mike Exp $"
+dnl "$Id: cups-common.m4,v 1.12.2.15 2003/04/14 19:56:01 mike Exp $"
 dnl
 dnl   Common configuration stuff for the Common UNIX Printing System (CUPS).
 dnl
-dnl   Copyright 1997-2002 by Easy Software Products, all rights reserved.
+dnl   Copyright 1997-2003 by Easy Software Products, all rights reserved.
 dnl
 dnl   These coded instructions, statements, and computer programs are the
 dnl   property of Easy Software Products and are protected by Federal
@@ -28,6 +28,7 @@ AC_PREREQ(2.50)
 dnl Set the name of the config header file...
 AC_CONFIG_HEADER(config.h)
 
+dnl Versio number information...
 CUPS_VERSION="1.2.0b1"
 AC_SUBST(CUPS_VERSION)
 AC_DEFINE_UNQUOTED(CUPS_SVERSION, "CUPS v$CUPS_VERSION")
@@ -65,12 +66,12 @@ AC_PATH_PROG(RM,rm)
 AC_PATH_PROG(SED,sed)
 AC_PATH_PROG(STRIP,strip)
 
+dnl Architecture checks...
+AC_C_BIGENDIAN
+
 dnl Check for libraries...
-AC_CHECK_LIB(c,crypt,LIBS="$LIBS")
-if test "$ac_cv_lib_c_crypt" = "no"; then
-	AC_CHECK_LIB(crypt,crypt)
-fi
-AC_SEARCH_LIBS(getspent, sec, gen)
+AC_SEARCH_LIBS(crypt, crypt)
+AC_SEARCH_LIBS(getspent, sec gen)
 
 LIBMALLOC=""
 AC_ARG_ENABLE(mallinfo, [  --enable-mallinfo       turn on malloc debug information, default=no])
@@ -198,5 +199,5 @@ AC_SUBST(DEFAULT_IPP_PORT)
 AC_DEFINE_UNQUOTED(CUPS_DEFAULT_IPP_PORT,$DEFAULT_IPP_PORT)
 
 dnl
-dnl End of "$Id: cups-common.m4,v 1.12.2.14 2003/04/10 21:02:08 mike Exp $".
+dnl End of "$Id: cups-common.m4,v 1.12.2.15 2003/04/14 19:56:01 mike Exp $".
 dnl

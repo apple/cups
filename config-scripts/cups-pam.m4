@@ -1,9 +1,9 @@
 dnl
-dnl "$Id: cups-pam.m4,v 1.2.2.5 2002/08/30 20:58:21 mike Exp $"
+dnl "$Id: cups-pam.m4,v 1.2.2.6 2003/04/14 19:56:02 mike Exp $"
 dnl
 dnl   PAM stuff for the Common UNIX Printing System (CUPS).
 dnl
-dnl   Copyright 1997-2002 by Easy Software Products, all rights reserved.
+dnl   Copyright 1997-2003 by Easy Software Products, all rights reserved.
 dnl
 dnl   These coded instructions, statements, and computer programs are the
 dnl   property of Easy Software Products and are protected by Federal
@@ -67,5 +67,5 @@ AC_SUBST(PAMLIBS)
 AC_SUBST(PAMMOD)
 
 dnl
-dnl End of "$Id: cups-pam.m4,v 1.2.2.5 2002/08/30 20:58:21 mike Exp $".
+dnl End of "$Id: cups-pam.m4,v 1.2.2.6 2003/04/14 19:56:02 mike Exp $".
 dnl
