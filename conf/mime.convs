@@ -1,5 +1,5 @@
 #
-# "$Id: mime.convs,v 1.4 1999/03/24 18:38:50 mike Exp $"
+# "$Id: mime.convs,v 1.5 1999/04/21 19:29:35 mike Exp $"
 #
 #   MIME converts file for the Common UNIX Printing System (CUPS).
 #
@@ -33,7 +33,7 @@
 #   Currently the "cost" field is not used (all filters are assumed to
 #   be equally costly in terms of speed/memory).  Also, a filter program
 #   *must* accept the standard command-line arguments (job-id, user, title,
-#   copies,options,[filenames or stdin]) or this won't work.
+#   copies,options,[filename or stdin]) or this won't work.
 #
 
 ########################################################################
@@ -58,5 +58,5 @@ image/*			application/vnd.cups-raster	50	imagetoraster
 application/vnd.cups-postscript	application/vnd.cups-raster	50	pstoraster
 
 #
-# End of "$Id: mime.convs,v 1.4 1999/03/24 18:38:50 mike Exp $".
+# End of "$Id: mime.convs,v 1.5 1999/04/21 19:29:35 mike Exp $".
 #
