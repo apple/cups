@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-polygon.c,v 1.2 1996/10/14 16:50:14 mike Exp $"
+ * "$Id: hpgl-polygon.c,v 1.3 1998/09/10 20:00:01 mike Exp $"
  *
  *   HPGL polygon routines for espPrint, a collection of printer drivers.
  *
@@ -16,7 +16,10 @@
  * Revision History:
  *
  *   $Log: hpgl-polygon.c,v $
- *   Revision 1.2  1996/10/14 16:50:14  mike
+ *   Revision 1.3  1998/09/10 20:00:01  mike
+ *   Wasn't doing an initial "move" when starting a polygon.
+ *
+ *   Revision 1.2  1996/10/14  16:50:14  mike
  *   Updated for 3.2 release.
  *   Added 'blackplot', grayscale, and default pen width options.
  *   Added encoded polyline support.
@@ -110,7 +113,7 @@ ER_edge_rect_relative(int num_params, param_t *params)
 void
 EW_edge_wedge(int num_params, param_t *params)
 {
-  float x, y, dx, dy;
+  float x, y;
   float start, end, theta, dt, radius;
 
 
@@ -188,6 +191,7 @@ PM_polygon_mode(int num_params, param_t *params)
       params[0].value.number == 0)
   {
     fputs("MP\n", OutputFile);
+    fprintf(OutputFile, "%.3f %.3f MO\n", PenPosition[0], PenPosition[1]);
     PolygonMode = 1;
   }
   else if (params[0].value.number == 2)
@@ -262,7 +266,7 @@ RR_fill_rect_relative(int num_params, param_t *params)
 void
 WG_fill_wedge(int num_params, param_t *params)
 {
-  float x, y, dx, dy;
+  float x, y;
   float start, end, theta, dt, radius;
 
 
@@ -325,5 +329,5 @@ WG_fill_wedge(int num_params, param_t *params)
 
 
 /*
- * End of "$Id: hpgl-polygon.c,v 1.2 1996/10/14 16:50:14 mike Exp $".
+ * End of "$Id: hpgl-polygon.c,v 1.3 1998/09/10 20:00:01 mike Exp $".
  */
