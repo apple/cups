@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.15 1999/06/21 19:00:53 mike Exp $"
+# "$Id: Makefile,v 1.16 1999/07/08 14:58:10 mike Exp $"
 #
 #   Filter makefile for the Common UNIX Printing System (CUPS).
 #
@@ -46,7 +46,7 @@ all:	$(TARGETS)
 #
 
 clean:
-	rm -f $(OBJS) $(TARGETS) image.a
+	rm -f $(OBJS) $(TARGETS) $(LIBCUPSIMAGE)
 
 #
 # Install all targets...
@@ -55,50 +55,69 @@ clean:
 install:
 	-$(MKDIR) $(SERVERROOT)/filter
 	$(CP) $(TARGETS) $(SERVERROOT)/filter
+	-$(MKDIR) $(LIBDIR)
+	$(CP) $(LIBCUPSIMAGE) $(LIBDIR)
+	if test $(LIBCUPSIMAGE) != "libcupsimage.a"; then \
+		$(LN) $(LIBCUPSIMAGE) `basename $(LIBCUPSIMAGE) .1` \
+	fi
 
 #
 # hpgltops
 #
 
-hpgltops:	$(HPGLOBJS) common.o ../Makedefs ../cups/libcups.a
+hpgltops:	$(HPGLOBJS) common.o ../Makedefs ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ $(HPGLOBJS) common.o $(LIBS) -lm
 $(HPGLOBJS):	hpgltops.h
 
 #
-# image.a
+# libcupsimage.so.1, libcupsimage.sl.1
 #
 
-image.a:	$(IMAGEOBJS) ../Makedefs ../cups/libcups.a
+libcupsimage.so.1 libcupsimage.sl.1:	$(IMAGEOBJS) ../Makedefs
+	echo Linking $@...
+	$(DSO) $@ $(IMAGEOBJS) $(DSOLIBS)
+	$(LN) $@ `basename $@ .1`
+
+#
+# libcupsimage.a
+#
+
+libcupsimage.a:	$(IMAGEOBJS) ../Makedefs
 	echo Archiving $@...
 	$(RM) $@
 	$(AR) $(ARFLAGS) $@ $(IMAGEOBJS)
 	$(RANLIB) $@
+
 $(IMAGEOBJS):	image.h
 
 #
 # imagetops
 #
 
-imagetops:	imagetops.o common.o image.a ../Makedefs ../cups/libcups.a
+imagetops:	imagetops.o common.o $(LIBCUPSIMAGE) ../Makedefs \
+		../cups/$(LIBCUPS)
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ imagetops.o common.o image.a $(IMGLIBS)
+	$(CC) $(LDFLAGS) -o $@ imagetops.o common.o -L. -lcupsimage \
+		$(IMGLIBS) $(LIBS)
 imagetops:	common.h image.h
 
 #
 # imagetoraster
 #
 
-imagetoraster:	imagetoraster.o common.o image.a ../Makedefs ../cups/libcups.a
+imagetoraster:	imagetoraster.o common.o $(LIBCUPSIMAGE) ../Makedefs \
+		../cups/$(LIBCUPS)
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ imagetoraster.o common.o image.a $(IMGLIBS)
+	$(CC) $(LDFLAGS) -o $@ imagetoraster.o common.o -L. -lcupsimage \
+		$(IMGLIBS) $(LIBS)
 imagetoraster:	common.h image.h
 
 #
 # pstops
 #
 
-pstops:	pstops.o common.o ../Makedefs ../cups/libcups.a
+pstops:	pstops.o common.o ../Makedefs ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ pstops.o common.o $(LIBS)
 pstops.o:	common.h
@@ -107,7 +126,7 @@ pstops.o:	common.h
 # rastertohp
 #
 
-rastertohp:	rastertohp.o ../Makedefs ../cups/libcups.a
+rastertohp:	rastertohp.o ../Makedefs ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ rastertohp.o $(LIBS)
 rastertohp.o:	../cups/raster.h
@@ -116,7 +135,8 @@ rastertohp.o:	../cups/raster.h
 # texttops
 #
 
-texttops:	texttops.o textcommon.o common.o ../Makedefs ../cups/libcups.a
+texttops:	texttops.o textcommon.o common.o ../Makedefs \
+		../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ texttops.o textcommon.o common.o $(LIBS)
 texttops.o:	common.h textcommon.h
@@ -126,5 +146,5 @@ textcommon.o:	textcommon.h common.h
 $(OBJS):	../Makedefs ../cups/cups.h ../cups/ppd.h ../cups/language.h
 
 #
-# End of "$Id: Makefile,v 1.15 1999/06/21 19:00:53 mike Exp $".
+# End of "$Id: Makefile,v 1.16 1999/07/08 14:58:10 mike Exp $".
 #
