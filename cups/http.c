@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.61 2000/03/02 20:19:08 mike Exp $"
+ * "$Id: http.c,v 1.62 2000/03/20 13:51:48 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -258,6 +258,9 @@ httpConnect(const char *host,	/* I - Host to connect to */
   http_t		*http;		/* New HTTP connection */
   struct hostent	*hostaddr;	/* Host address data */
 
+
+  if (host == NULL)
+    return (NULL);
 
   httpInitialize();
 
@@ -1539,5 +1542,5 @@ http_send(http_t       *http,	/* I - HTTP data */
 
 
 /*
- * End of "$Id: http.c,v 1.61 2000/03/02 20:19:08 mike Exp $".
+ * End of "$Id: http.c,v 1.62 2000/03/20 13:51:48 mike Exp $".
  */
