@@ -1,5 +1,5 @@
 #
-# "$Id: cups.spec,v 1.58 2003/04/10 20:43:56 mike Exp $"
+# "$Id: cups.spec,v 1.59 2003/04/11 19:16:07 mike Exp $"
 #
 #   RPM "spec" file for the Common UNIX Printing System (CUPS).
 #
@@ -135,21 +135,22 @@ rm -rf $RPM_BUILD_ROOT
 # RC dirs are a pain under Linux...  Uncomment the appropriate ones if you
 # don't use Red Hat or Mandrake...
 
-/etc/init.d/*
-/etc/rc0.d/*
-/etc/rc3.d/*
-/etc/rc5.d/*
-
 # OLD RedHat/Mandrake
-#/etc/rc.d/init.d/*
-#/etc/rc.d/rc0.d/*
-#/etc/rc.d/rc3.d/*
-#/etc/rc.d/rc5.d/*
+/etc/rc.d/init.d/*
+/etc/rc.d/rc0.d/*
+/etc/rc.d/rc3.d/*
+/etc/rc.d/rc5.d/*
 
 #/sbin/rc.d/*
 #/sbin/rc.d/rc0.d/*
 #/sbin/rc.d/rc3.d/*
 #/sbin/rc.d/rc5.d/*
+
+# NEW RedHat/Mandrake
+#/etc/init.d/*
+#/etc/rc0.d/*
+#/etc/rc3.d/*
+#/etc/rc5.d/*
 
 /usr/bin/cancel
 /usr/bin/disable
@@ -214,5 +215,5 @@ rm -rf $RPM_BUILD_ROOT
 /usr/lib/*.so*
 
 #
-# End of "$Id: cups.spec,v 1.58 2003/04/10 20:43:56 mike Exp $".
+# End of "$Id: cups.spec,v 1.59 2003/04/11 19:16:07 mike Exp $".
 #
