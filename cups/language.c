@@ -1,5 +1,5 @@
 /*
- * "$Id: language.c,v 1.20.2.18 2003/05/09 18:44:41 mike Exp $"
+ * "$Id: language.c,v 1.20.2.19 2003/05/15 15:55:36 mike Exp $"
  *
  *   I18N/language support for the Common UNIX Printing System (CUPS).
  *
@@ -25,13 +25,15 @@
  *
  * Contents:
  *
- *   cupsEncodingName() - Return the character encoding name string
- *                        for the given encoding enumeration.
- *   cupsLangEncoding() - Return the character encoding (us-ascii, etc.)
- *                        for the given language.
- *   cupsLangFlush()    - Flush all language data out of the cache.
- *   cupsLangFree()     - Free language data.
- *   cupsLangGet()      - Get a language.
+ *   cupsEncodingName()  - Return the character encoding name string
+ *                         for the given encoding enumeration.
+ *   cupsLangEncoding()  - Return the character encoding (us-ascii, etc.)
+ *                         for the given language.
+ *   cupsLangFlush()     - Flush all language data out of the cache.
+ *   cupsLangFree()      - Free language data.
+ *   cupsLangGet()       - Get a language.
+ *   appleLangDefault()  - Get the default locale string.
+ *   cups_cache_lookup() - Lookup a language in the cache...
  */
 
 /*
@@ -49,20 +51,30 @@
 #include "string.h"
 #include "language.h"
 
+
+/*
+ * Local functions...
+ */
+
 #ifdef __APPLE__
 #  include <CoreFoundation/CoreFoundation.h>
-static const char *appleLangDefault(void);
+static const char	*appleLangDefault(void);
 #endif /* __APPLE__ */
 
+static cups_lang_t	*cups_cache_lookup(const char *name,
+			                   cups_encoding_t encoding);
+  
 
 /*
  * Local globals...
  */
 
-static cups_lang_t	*lang_cache = NULL;	/* Language string cache */
-static const char	*lang_blank = "";	/* Blank constant string */
-static const char * const lang_encodings[] =	/* Encoding strings */
-			{
+static cups_lang_t	*lang_cache = NULL;
+					/* Language string cache */
+static const char	*lang_blank = "";
+					/* Blank constant string */
+static const char * const lang_encodings[] =
+			{		/* Encoding strings */
 			  "us-ascii",		"iso-8859-1",
 			  "iso-8859-2",		"iso-8859-3",
 			  "iso-8859-4",		"iso-8859-5",
@@ -130,8 +142,8 @@ static const char * const lang_encodings[] =	/* Encoding strings */
 			  "euc-cn",		"euc-jp",
 			  "euc-kr",		"euc-tw"
 			};
-static const char *const lang_default[] =	/* Default POSIX locale */
-			{
+static const char *const lang_default[] =
+			{		/* Default POSIX locale */
 #include "cups_C.h"
 			  NULL
 			};
@@ -176,20 +188,34 @@ cupsLangEncoding(cups_lang_t *lang)	/* I - Language data */
 void
 cupsLangFlush(void)
 {
-  int		i;	/* Looping var */
-  cups_lang_t	*lang,	/* Current language */
-		*next;	/* Next language */
+  int		i;			/* Looping var */
+  cups_lang_t	*lang,			/* Current language */
+		*next;			/* Next language */
 
+
+ /*
+  * Free all languages in the cache...
+  */
 
   for (lang = lang_cache; lang != NULL; lang = next)
   {
+   /*
+    * Free all messages...
+    */
+
     for (i = 0; i < CUPS_MSG_MAX; i ++)
       if (lang->messages[i] != NULL && lang->messages[i] != lang_blank)
         free(lang->messages[i]);
 
+   /*
+    * Then free the language structure itself...
+    */
+
     next = lang->next;
     free(lang);
   }
+
+  lang_cache = NULL;
 }
 
 
@@ -383,18 +409,40 @@ cupsLangGet(const char *language)	/* I - Language or locale */
   if ((localedir = getenv("LOCALEDIR")) == NULL)
     localedir = CUPS_LOCALEDIR;
 
-  snprintf(filename, sizeof(filename), "%s/%s_%s/cups_%s_%s", localedir,
-           langname, country, langname, country);
-  if (!access(filename, 0))
-    snprintf(real, sizeof(real), "%s_%s", langname, country);
-  else
+ /*
+  * See if we already have this language/country loaded...
+  */
+
+  snprintf(real, sizeof(real), "%s_%s", langname, country);
+
+  if ((lang = cups_cache_lookup(real, encoding)) != NULL)
+    return (lang);
+
+  snprintf(filename, sizeof(filename), "%s/%s/cups_%s", localedir, real, real);
+
+  if (access(filename, 0))
   {
+   /*
+    * Country localization not available, look for generic localization...
+    */
+
+    if ((lang = cups_cache_lookup(langname, encoding)) != NULL)
+      return (lang);
+
     snprintf(filename, sizeof(filename), "%s/%s/cups_%s", localedir,
              langname, langname);
-    if (!access(filename, 0))
-      strcpy(real, langname);
-    else
+
+    if (access(filename, 0))
+    {
+     /*
+      * No generic localization, so use POSIX...
+      */
+
       strcpy(real, "C");
+      snprintf(filename, sizeof(filename), "%s/C/cups_C", localedir);
+    }
+    else
+      strcpy(real, langname);
   }
 
  /*
@@ -406,18 +454,6 @@ cupsLangGet(const char *language)	/* I - Language or locale */
 #else
   setlocale(LC_CTYPE, oldlocale);
 #endif /* __APPLE__ || !LC_CTYPE */
-
- /*
-  * See if we already have this language loaded...
-  */
-
-  for (lang = lang_cache; lang != NULL; lang = lang->next)
-    if (!strcmp(lang->language, real) == 0 && encoding == lang->encoding)
-    {
-      lang->used ++;
-
-      return (lang);
-    }
 
  /*
   * Open the messages file; the first line contains the default
@@ -437,7 +473,10 @@ cupsLangGet(const char *language)	/* I - Language or locale */
   * All leading whitespace is deleted.
   */
 
-  fp = fopen(filename, "r");
+  if (strcmp(real, "C"))
+    fp = fopen(filename, "r");
+  else
+    fp = NULL;
 
   if (fp == NULL)
     strlcpy(line, lang_default[0], sizeof(line));
@@ -731,5 +770,33 @@ appleLangDefault(void)
 
 
 /*
- * End of "$Id: language.c,v 1.20.2.18 2003/05/09 18:44:41 mike Exp $".
+ * 'cups_cache_lookup()' - Lookup a language in the cache...
+ */
+
+static cups_lang_t *			/* O - Language data or NULL */
+cups_cache_lookup(const char      *name,/* I - Name of locale */
+                  cups_encoding_t encoding)
+					/* I - Encoding of locale */
+{
+  cups_lang_t	*lang;			/* Current language */
+
+
+ /*
+  * Loop through the cache and return a match if found...
+  */
+
+  for (lang = lang_cache; lang != NULL; lang = lang->next)
+    if (!strcmp(lang->language, name) && encoding == lang->encoding)
+    {
+      lang->used ++;
+
+      return (lang);
+    }
+
+  return (NULL);
+}
+
+
+/*
+ * End of "$Id: language.c,v 1.20.2.19 2003/05/15 15:55:36 mike Exp $".
  */

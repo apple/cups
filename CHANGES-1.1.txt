@@ -3,6 +3,7 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.19
 
+	- cupsLangGet didn't use its language cache (STR #97)
 	- "lpq -P" would segfault instead of showing a usage
 	  message (STR #94)
 	- Fixed compiler warnings in pdftops filter (STR #96)
