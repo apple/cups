@@ -1,6 +1,6 @@
 %PDF-1.2
 %âãÏÓ
-1 0 obj<</Producer(htmldoc 2.0b1 Copyright 1997-1999 Michael Sweet, All Rights Reserved.)/CreationDate(D:19990513142508Z)/Title(DRAFT - CUPS Software Security Report)/Author(Easy Software Products)>>endobj
+1 0 obj<</Producer(htmldoc 2.0b1 Copyright 1997-1999 Michael Sweet, All Rights Reserved.)/CreationDate(D:19990521210323Z)/Title(DRAFT - CUPS Software Security Report)/Author(Easy Software Products)>>endobj
 2 0 obj<</Type/Encoding/BaseEncoding/WinAnsiEncoding>>endobj
 3 0 obj<</Type/Font/Subtype/Type1/BaseFont/Times-Roman/Encoding 2 0 R>>endobj
 4 0 obj<</Type/Font/Subtype/Type1/BaseFont/Times-Bold/Encoding 2 0 R>>endobj
@@ -15,9 +15,9 @@
 13 0 obj<</Subtype/Link/Rect[108.0 646.8 124.5 659.8]/Border[0 0 0]/Dest[82 0 R/XYZ null 658 0]>>endobj
 14 0 obj<</Subtype/Link/Rect[124.5 646.8 159.6 659.8]/Border[0 0 0]/Dest[82 0 R/XYZ null 658 0]>>endobj
 15 0 obj<</Subtype/Link/Rect[159.6 646.8 203.0 659.8]/Border[0 0 0]/Dest[82 0 R/XYZ null 658 0]>>endobj
-16 0 obj<</Subtype/Link/Rect[108.0 633.6 124.5 646.6]/Border[0 0 0]/Dest[82 0 R/XYZ null 474 0]>>endobj
-17 0 obj<</Subtype/Link/Rect[124.5 633.6 173.1 646.6]/Border[0 0 0]/Dest[82 0 R/XYZ null 474 0]>>endobj
-18 0 obj<</Subtype/Link/Rect[173.1 633.6 216.4 646.6]/Border[0 0 0]/Dest[82 0 R/XYZ null 474 0]>>endobj
+16 0 obj<</Subtype/Link/Rect[108.0 633.6 124.5 646.6]/Border[0 0 0]/Dest[82 0 R/XYZ null 434 0]>>endobj
+17 0 obj<</Subtype/Link/Rect[124.5 633.6 173.1 646.6]/Border[0 0 0]/Dest[82 0 R/XYZ null 434 0]>>endobj
+18 0 obj<</Subtype/Link/Rect[173.1 633.6 216.4 646.6]/Border[0 0 0]/Dest[82 0 R/XYZ null 434 0]>>endobj
 19 0 obj<</Subtype/Link/Rect[72.0 607.2 80.2 620.2]/Border[0 0 0]/Dest[88 0 R/XYZ null 818 0]>>endobj
 20 0 obj<</Subtype/Link/Rect[80.2 607.2 131.6 620.2]/Border[0 0 0]/Dest[88 0 R/XYZ null 818 0]>>endobj
 21 0 obj<</Subtype/Link/Rect[108.0 594.0 124.5 607.0]/Border[0 0 0]/Dest[88 0 R/XYZ null 737 0]>>endobj
@@ -107,7 +107,7 @@
 59 0 obj<</D[82 0 R/XYZ null 818 null]>>endobj
 60 0 obj<</D[82 0 R/XYZ null 737 null]>>endobj
 61 0 obj<</D[82 0 R/XYZ null 658 null]>>endobj
-62 0 obj<</D[82 0 R/XYZ null 474 null]>>endobj
+62 0 obj<</D[82 0 R/XYZ null 434 null]>>endobj
 63 0 obj<</D[88 0 R/XYZ null 818 null]>>endobj
 64 0 obj<</D[88 0 R/XYZ null 737 null]>>endobj
 65 0 obj<</D[88 0 R/XYZ null 540 null]>>endobj
@@ -183,13 +183,14 @@ endobj
 endobj
 82 0 obj<</Type/Page/Parent 75 0 R/Contents 83 0 R/Resources<</ProcSet[/PDF/Text]/Font<</F4 3 0 R/F8 6 0 R/F9 7 0 R/Fc 8 0 R>>>>>>endobj
 83 0 obj<</Length 84 0 R/Filter/FlateDecode>>stream
-xÚ•UKoÚ@¾ó+F9%Rpc <z!©ÒÖ¨.‹=‡µ×ÙYƒè¯ïìÚ‚hÚ.ì¼¾ï›¯-®øãÃ İ>Äykµ>İÀA”²¥?èA”œûÆªÄ‹è¥¶^{ÃÚŞ¾zµ‡çÃ4ÁÂdi“©¢vîï7®~í-3R©Ù@W:3[ĞX*m Ôj%H 
-ş
-¹%öV)”Š(›Ëƒ€X1ê‚ UÌáVå¹*àéÛô§-Î%ı®×±%1²bá–æ0;?»}
-Â³Ù<£&F¾wåà×íøuvÁß×¨×nŞ!øWßSKYXVåÎGŠ-jGÉÆÎ:×}`åµpFr	Èƒ©¥ #–sÄ\£äˆæ[¸´…p'u URÅ†À(‹!WQ$B'{¤de;èP)kk,¥m_’£º±†XE÷ÜlC¾Ï6Æ¨W(Ñö-Ïù¡-³K¢NEŒä5Yw*ºtœºN5µ~š½˜ÌÆ¨XInæô.ºoOƒ€Û)j÷¹°ccñs)±°ş¼¨¹£ ¯V\¸YGt,.W†1hû8;&—ğxëûƒÑìâB¶E"±@K¯Ø-ü:¶V[á¦,C~D7Ó*Wæ6Iê¨$U¥nÚ&3K^îÿH«"¶’çı¤>"IX–Ò«š!cškµ!KÙ¢™0ÖYiöœÜCæˆÁ„¡Í’áÁ(g·³r+ƒ¸®L@”¥l¶ *¬‡÷ı}êÂDÅUÎ'ãïÅŞıŸ{ ôBÙ/&Àğ•TI©6nÑ©HŸëüq“¿3dBäœuúx€Ï^ûğğÅ{`;1NEqRxÄ5ò}¢…vmhF«“§ô?sôv9nˆ—‡¬ÀŠ¿áø/’¯­ĞÛÚ4lLíF±n}ğ¯Ğ^y#Îl_íï»¨õ£õÑòæendstream
+xÚ•UKsÚH¾ó+º|²«‚ÖŒ!7¿‹ª<´§öÀeµÌÄ£ezE~ıvK°–Í&e_˜~}ß×}ë¤pÉ)\÷ ?]vng?ÇaV°ex=€Y~ÂTû
+/f_[ëU2jíİ«QÒz$)LrtÑF«h¼k¦[×Ş°u-ù"®U@ Ôu0q+"TÁ¯LÊñ¿²bo_@å‰ÌÂhï4GPø q‰pçËÒ;xù4ùKŠsÉ´Ÿô¤d#s¯0İPÄæçgw/Ùôl~_0£…4¹LNğëwüz»àÏ++ƒëŸüWßS¡¬„Uµó±jƒ¡¡$±óŞÕXù #5	(I„¥¢#–D9®ĞrD‹<(ÚÀt'u|^ëH½`(}D†@Q¹\…|¼­¥ƒ
+emËb….÷Aú’Õ­‰5L@İs“†lù~‘¸Åğ†¥oeÉ]k—ÄP(”l³îTlÒqê6ÕDüÆ½˜Ì&zí-7sò0{ìN²ŒÛ©Z÷…’±ü\J½ŠC¾úEC¾ÕXsQàfÑù ¸š2Üˆ{…ÒÇùù‡ìş<?Ş¥éõx~ñ¦<lÿˆDêáÖzıÆnÓ·b•
+7U5åGlfºÊ•¹Ê’?*Iu%“ÀM[›¸äUà>ñ¢vZ¡,ÏûI}T°,kŞZ†Œiüš„² È<Å©¦Š{NHÍƒiˆeÙ=/B—%Ãƒ!ğ]få4V©,p]›ƒª*»İz‚ÚåØïiÄÌ»®mİn€®)úÒ|çÚ«í*ò¶?}z§åúüœ—>ğy±húâß^ƒä²?¿8Â+"ğ-1¥´©0¼kÏ“Œ‡DEĞü¾@²\vbÇÌy×=m++ıü<ôáŞëºdˆÿ} Ø{øÿPî]xU®Ñ„Kûf¢o­_7ë‰ÍPĞû6¿Şæï˜ï?ZÏ{Ãkø _ñîá×{`;­NEqRxÆY}ŞÒß
+íK¨¡·“_†_Ì1Øå¸!¾$ÿVüÇ?Yşx¨°iM£­©Û*–ûmW>rƒÑe2æÌò*¿f?;\8Gendstream
 endobj
 84 0 obj
-734
+824
 endobj
 85 0 obj<</Type/Page/Parent 75 0 R/Contents 86 0 R/Resources<</ProcSet[/PDF/Text]/Font<</F8 6 0 R>>>>>>endobj
 86 0 obj<</Length 87 0 R/Filter/FlateDecode>>stream
@@ -292,7 +293,7 @@ endobj
 120 0 obj<</Parent 118 0 R/Count -3/First 121 0 R/Last 123 0 R/Title(1 Scope)/Dest[82 0 R/XYZ null 743 null]/Prev 119 0 R/Next 124 0 R>>endobj
 121 0 obj<</Parent 120 0 R/Title(1.1 Identification)/Dest[82 0 R/XYZ null 693 null]/Next 122 0 R>>endobj
 122 0 obj<</Parent 120 0 R/Title(1.2 System Overview)/Dest[82 0 R/XYZ null 613 null]/Prev 121 0 R/Next 123 0 R>>endobj
-123 0 obj<</Parent 120 0 R/Title(1.3 Document Overview)/Dest[82 0 R/XYZ null 429 null]/Prev 122 0 R>>endobj
+123 0 obj<</Parent 120 0 R/Title(1.3 Document Overview)/Dest[82 0 R/XYZ null 389 null]/Prev 122 0 R>>endobj
 124 0 obj<</Parent 118 0 R/Count -2/First 125 0 R/Last 126 0 R/Title(2 References)/Dest[88 0 R/XYZ null 743 null]/Prev 120 0 R/Next 127 0 R>>endobj
 125 0 obj<</Parent 124 0 R/Title(2.1 CUPS Documentation)/Dest[88 0 R/XYZ null 693 null]/Next 126 0 R>>endobj
 126 0 obj<</Parent 124 0 R/Title(2.2 Other Documents)/Dest[88 0 R/XYZ null 495 null]/Prev 125 0 R>>endobj
@@ -392,61 +393,61 @@ xref
 0000013815 00000 n 
 0000013834 00000 n 
 0000013971 00000 n 
-0000014774 00000 n 
-0000014794 00000 n 
-0000014904 00000 n 
-0000015091 00000 n 
-0000015111 00000 n 
-0000015248 00000 n 
-0000015839 00000 n 
-0000015859 00000 n 
-0000015969 00000 n 
-0000016159 00000 n 
-0000016179 00000 n 
-0000016298 00000 n 
-0000016513 00000 n 
-0000016533 00000 n 
-0000016643 00000 n 
-0000016842 00000 n 
-0000016862 00000 n 
-0000016983 00000 n 
-0000017194 00000 n 
-0000017215 00000 n 
-0000017327 00000 n 
-0000017525 00000 n 
-0000017546 00000 n 
-0000017685 00000 n 
-0000018182 00000 n 
-0000018203 00000 n 
-0000018333 00000 n 
-0000018787 00000 n 
-0000018808 00000 n 
-0000018961 00000 n 
-0000020090 00000 n 
-0000020112 00000 n 
-0000020224 00000 n 
-0000020398 00000 n 
-0000020419 00000 n 
-0000020474 00000 n 
-0000020579 00000 n 
-0000020722 00000 n 
-0000020827 00000 n 
-0000020946 00000 n 
-0000021054 00000 n 
-0000021202 00000 n 
-0000021311 00000 n 
-0000021417 00000 n 
-0000021574 00000 n 
-0000021683 00000 n 
-0000021793 00000 n 
-0000021947 00000 n 
-0000022057 00000 n 
-0000022168 00000 n 
-0000022302 00000 n 
-0000022399 00000 n 
-0000022499 00000 n 
+0000014864 00000 n 
+0000014884 00000 n 
+0000014994 00000 n 
+0000015181 00000 n 
+0000015201 00000 n 
+0000015338 00000 n 
+0000015929 00000 n 
+0000015949 00000 n 
+0000016059 00000 n 
+0000016249 00000 n 
+0000016269 00000 n 
+0000016388 00000 n 
+0000016603 00000 n 
+0000016623 00000 n 
+0000016733 00000 n 
+0000016932 00000 n 
+0000016952 00000 n 
+0000017073 00000 n 
+0000017284 00000 n 
+0000017305 00000 n 
+0000017417 00000 n 
+0000017615 00000 n 
+0000017636 00000 n 
+0000017775 00000 n 
+0000018272 00000 n 
+0000018293 00000 n 
+0000018423 00000 n 
+0000018877 00000 n 
+0000018898 00000 n 
+0000019051 00000 n 
+0000020180 00000 n 
+0000020202 00000 n 
+0000020314 00000 n 
+0000020488 00000 n 
+0000020509 00000 n 
+0000020564 00000 n 
+0000020669 00000 n 
+0000020812 00000 n 
+0000020917 00000 n 
+0000021036 00000 n 
+0000021144 00000 n 
+0000021292 00000 n 
+0000021401 00000 n 
+0000021507 00000 n 
+0000021664 00000 n 
+0000021773 00000 n 
+0000021883 00000 n 
+0000022037 00000 n 
+0000022147 00000 n 
+0000022258 00000 n 
+0000022392 00000 n 
+0000022489 00000 n 
+0000022589 00000 n 
 trailer
 <</Size 137/Root 136 0 R/Info 1 0 R>>
 startxref
-22682
+22772
 %%EOF

@@ -36,6 +36,9 @@ Copyright 1997-1999, All Rights Reserved<BR>
 <LI><A HREF=#3_3_2>3.3.2 mime.convs</A></LI>
 </UL>
 <LI><A HREF=#3_4>3.4 PostScript Printer Description Files</A></LI>
+<UL>
+<LI><A HREF=#3_4_1>3.4.1 CUPS Extensions to PPD Files</A></LI>
+</UL>
 <LI><A HREF=#3_5>3.5 Scheduler Configuration Files</A></LI>
 <UL>
 <LI><A HREF=#3_5_1>3.5.1 classes.conf</A></LI>
@@ -52,6 +55,21 @@ Copyright 1997-1999, All Rights Reserved<BR>
 <LI><A HREF=#4_5>4.5 CUPS Raw Files</A></LI>
 <LI><A HREF=#4_6>4.6 File Transfer Protocol</A></LI>
 <LI><A HREF=#4_7>4.7 Internet Printing Protocol</A></LI>
+<UL>
+<LI><A HREF=#4_7_1>4.7.1 Get Default Destination (CUPS_GET_DEFAULT = 
+0x4001)</A></LI>
+<LI><A HREF=#4_7_2>4.7.2 Get Printers (CUPS_GET_PRINTERS = 0x4002)</A></LI>
+<LI><A HREF=#4_7_3>4.7.3 Add Printer (CUPS_ADD_PRINTER = 0x4003)</A></LI>
+<LI><A HREF=#4_7_4>4.7.4 Delete Printer (CUPS_DELETE_PRINTER = 0x4004)</A>
+</LI>
+<LI><A HREF=#4_7_5>4.7.5 Get Classes (CUPS_GET_CLASSES = 0x4005)</A></LI>
+<LI><A HREF=#4_7_6>4.7.6 Add Class (CUPS_ADD_CLASS = 0x4006)</A></LI>
+<LI><A HREF=#4_7_7>4.7.7 Delete Class (CUPS_DELETE_CLASS = 0x4007)</A></LI>
+<LI><A HREF=#4_7_8>4.7.8 Accept Jobs (CUPS_ACCEPT_JOBS = 0x4008)</A></LI>
+<LI><A HREF=#4_7_9>4.7.9 Reject Jobs (CUPS_REJECT_JOBS = 0x4009)</A></LI>
+<LI><A HREF=#4_7_10>4.7.10 Set Default Destination (CUPS_SET_DEFAULT = 
+0x400A)</A></LI>
+</UL>
 <LI><A HREF=#4_8>4.8 Line Printer Daemon Protocol</A></LI>
 <LI><A HREF=#4_9>4.9 Server Message Block Protocol</A></LI>
 <LI><A HREF=#4_10>4.10 Trivial File Transfer Protocol</A></LI>
@@ -82,6 +100,9 @@ with reduced functionality. </P>
 <P>CUPS adds network printer browsing and PostScript Printer 
 Description (&quot;PPD&quot;)-based printing options to support real world 
 applications under UNIX. </P>
+<P>CUPS also includes a customized version of GNU GhostScript 
+(currently based off GNU GhostScript 4.03) and an image file RIP that 
+can be used to support non-PostScript printers. </P>
 <H2><A NAME=1_3>1.3 Document Overview</A></H2>
 <P>This interface design description document is organized into the 
 following sections: </P>
@@ -195,6 +216,50 @@ must reside in the CUPS filter directory. </P>
 HREF=http://partners.adobe.com/supportservice/devrelations/PDFS/TN/5003.PPD_Spec_v4.3.pdf>
 Adobe TechNote #5003: PostScript Printer Description File Format 
 Specification Version 4.3</A>. </P>
+<H3><A NAME=3_4_1>3.4.1 CUPS Extensions to PPD Files</A></H3>
+<P>CUPS adds several new attributes that are described below. </P>
+<H4>3.4.1.1 cupsFilter</H4>
+<P>This string attribute provides a conversion rule of the form: </P>
+<UL>
+<PRE>
+source/type cost program
+</PRE>
+</UL>
+<P>The destination type is assumed to the printer's type. If a printer 
+supports the source type directly the special filter program &quot;-&quot; may be 
+used. </P>
+<H4>3.4.1.2 cupsManualCopies</H4>
+<P>This boolean attribute notifies the RIP filters that the destination 
+printer does not support copy generation in hardware. The default value 
+is false. </P>
+<H4>3.4.1.3 cupsModelNumber</H4>
+<P>This integer attribute specifies a printer-specific model number. 
+This number can be used by a filter program to adjust the output for a 
+specific model of printer. </P>
+<H4>3.4.1.4 cupsProfile</H4>
+<P>This string attribute specifies a color profile of the form: </P>
+<UL>
+<PRE>
+resolution/type density m00 m01 m02 m10 m11 m12 m20 m21 m22
+</PRE>
+</UL>
+<P>The <I>resolution</I> and <I>type</I> values may be &quot;-&quot; to act as a 
+wildcard. Otherwise they must match one of the <CODE>Resolution</CODE>
+ or <CODE>MediaType</CODE> attributes defined in the PPD file. </P>
+<P>The <I>density</I> value defines a gamma and density adjustment 
+function such that: </P>
+<UL>
+<PRE>
+f(x) = d * x<SUP>1/d</SUP>
+</PRE>
+</UL>
+<P>The <I>m00</I> through <I>m22</I> values define a 3x3 transformation 
+matrix for the CMY color values. The density function is applied <I>
+after</I> the CMY transformation. </P>
+<H4>3.4.1.5 cupsVersion</H4>
+<P>This required attribute describes which version of the CUPS IDD was 
+used for the PPD file extensions. Currently it must be the string 
+&quot;1.0&quot;. </P>
 <H2><A NAME=3_5>3.5 Scheduler Configuration Files</A></H2>
 <P>The scheduler reads three configuration files that define the 
 available printers, classes, and services: </P>
@@ -219,7 +284,7 @@ understood:
 <TR><TD>&lt;Class name&gt;
 <BR> &lt;/Class&gt;</TD><TD></TR>
 <TR><TD>&lt;DefaultClass name&gt;
-<BR> &lt;/DefaultClass&gt;</TD><TD></TR>
+<BR> &lt;/Class&gt;</TD><TD></TR>
 <TR><TD>Info</TD><TD></TR>
 <TR><TD>Location</TD><TD></TR>
 <TR><TD>MoreInfo</TD><TD></TR>
@@ -236,7 +301,8 @@ understood:
 <CENTER>
 <TABLE BORDER=1 WIDTH=90%>
 <TR><TH WIDTH=25%>Directive</TH><TH>Description</TH></TR>
-<TR><TD>AccessLog</TD><TD></TR>
+<TR><TD>AccessLog</TD><TD>Specifies the location of the access log file 
+(default  &quot;logs/access_log&quot;).</TD></TR>
 <TR><TD>Allow</TD><TD></TR>
 <TR><TD>AuthClass</TD><TD></TR>
 <TR><TD>AuthType</TD><TD></TR>
@@ -283,7 +349,7 @@ understood:
 <TABLE BORDER=1 WIDTH=90%>
 <TR><TH WIDTH=25%>Directive</TH><TH>Description</TH></TR>
 <TR><TD>&lt;DefaultPrinter name&gt;
-<BR> &lt;/DefaultPrinter&gt;</TD><TD></TR>
+<BR> &lt;/Printer&gt;</TD><TD></TR>
 <TR><TD>DeviceURI</TD><TD></TR>
 <TR><TD>Info</TD><TD></TR>
 <TR><TD>Location</TD><TD></TR>
@@ -491,6 +557,83 @@ Protocol</A></LI>
 <LI><A HREF=http://www.ietf.org/rfc/rfc2569.txt>RFC 2569: Mapping 
 between LPD and IPP Protocols</A></LI>
 </UL>
+<P>CUPS defines the following extension operations to IPP. </P>
+<H3><A NAME=4_7_1>4.7.1 Get Default Destination (CUPS_GET_DEFAULT = 
+0x4001)</A></H3>
+<P>The get default destination operation returns the printer attributes 
+for the system default printer or class. The only required attributes 
+are <CODE>attributes-charset</CODE> and <CODE>
+attributes-natural-language</CODE>. </P>
+<P>Get default destination will only return <CODE>ipp-ok</CODE>. </P>
+<H3><A NAME=4_7_2>4.7.2 Get Printers (CUPS_GET_PRINTERS = 0x4002)</A></H3>
+<P>The get printers operation returns the printer attributes for all 
+printers known to the system. The only required attributes are <CODE>
+attributes-charset</CODE> and <CODE>attributes-natural-language</CODE>. </P>
+<P>Get printers will only return <CODE>ipp-ok</CODE>. </P>
+<H3><A NAME=4_7_3>4.7.3 Add Printer (CUPS_ADD_PRINTER = 0x4003)</A></H3>
+<P>The add printer operation adds or replaces the specified printer. 
+The <CODE>attributes-charset</CODE>, <CODE>attributes-natural-language</CODE>
+ and <CODE>printer-uri</CODE> attributes are required. </P>
+<P>The <CODE>printer-location</CODE>, <CODE>printer-info</CODE>, <CODE>
+printer-more-info</CODE>, and <CODE>device-uri</CODE> attributes are 
+required when initially adding a printer and optional when modifying a 
+printer. </P>
+<P>A PPD file or System V interface script may follow the IPP request 
+body. Note that the printer will be disabled until a valid interface 
+script or PPD file is sent. </P>
+<P>Add printer will return <CODE>ipp-ok</CODE>, <CODE>ipp-not-authorized</CODE>
+, <CODE>ipp-bad-request</CODE>, or <CODE>ipp-attributes</CODE>. </P>
+<H3><A NAME=4_7_4>4.7.4 Delete Printer (CUPS_DELETE_PRINTER = 0x4004)</A>
+</H3>
+<P>The delete printer operation removes the specified printer. The only 
+required attributes are <CODE>attributes-charset</CODE>, <CODE>
+attributes-natural-language</CODE>, and <CODE>printer-uri</CODE>. </P>
+<P>Delete printer will return <CODE>ipp-ok</CODE>, <CODE>ipp-not-found</CODE>
+, or <CODE>ipp-not-authorized</CODE>. </P>
+<H3><A NAME=4_7_5>4.7.5 Get Classes (CUPS_GET_CLASSES = 0x4005)</A></H3>
+<P>The get classes operation returns the printer attributes for all 
+classes known to the system. The only required attributes are <CODE>
+attributes-charset</CODE> and <CODE>attributes-natural-language</CODE>. </P>
+<P>Get classes will only return <CODE>ipp-ok</CODE>. </P>
+<H3><A NAME=4_7_6>4.7.6 Add Class (CUPS_ADD_CLASS = 0x4006)</A></H3>
+<P>The add class operation adds or replaces the specified class. The <CODE>
+attributes-charset</CODE>, <CODE>attributes-natural-language</CODE>, 
+and <CODE>printer-uri</CODE> attributes are required. </P>
+<P>The <CODE>printer-location</CODE>, <CODE>printer-info</CODE>, <CODE>
+printer-more-info</CODE>, and <CODE>member-uris</CODE> attributes are 
+required when initially adding a printer and optional when modifying a 
+printer. </P>
+<P>Add class will return <CODE>ipp-ok</CODE>, <CODE>ipp-not-authorized</CODE>
+, <CODE>ipp-bad-request</CODE>, or <CODE>ipp-attributes</CODE>. </P>
+<H3><A NAME=4_7_7>4.7.7 Delete Class (CUPS_DELETE_CLASS = 0x4007)</A></H3>
+<P>The delete class operation removes the specified class. The only 
+required attributes are <CODE>attributes-charset</CODE>, <CODE>
+attributes-natural-language</CODE>, and <CODE>printer-uri</CODE>. </P>
+<P>Delete class will return <CODE>ipp-ok</CODE>, <CODE>ipp-not-found</CODE>
+, or <CODE>ipp-not-authorized</CODE>. </P>
+<H3><A NAME=4_7_8>4.7.8 Accept Jobs (CUPS_ACCEPT_JOBS = 0x4008)</A></H3>
+<P>The accept jobs operation allows jobs to be accepted by the 
+specified destination. The only required attributes are <CODE>
+attributes-charset</CODE>, <CODE>attributes-natural-language</CODE>, 
+and <CODE>printer-uri</CODE>. </P>
+<P>Accept jobs will return <CODE>ipp-ok</CODE>, <CODE>ipp-not-found</CODE>
+, or <CODE>ipp-not-authorized</CODE>. </P>
+<H3><A NAME=4_7_9>4.7.9 Reject Jobs (CUPS_REJECT_JOBS = 0x4009)</A></H3>
+<P>The reject jobs operation prevents jobs from being accepted by the 
+specified destination. The only required attributes are <CODE>
+attributes-charset</CODE>, <CODE>attributes-natural-language</CODE>, 
+and <CODE>printer-uri</CODE>. </P>
+<P>Reject jobs will return <CODE>ipp-ok</CODE>, <CODE>ipp-not-found</CODE>
+, or <CODE>ipp-not-authorized</CODE>. </P>
+<H3><A NAME=4_7_10>4.7.10 Set Default Destination (CUPS_SET_DEFAULT = 
+0x400A)</A></H3>
+<P>The set default destination operation returns the printer attributes 
+for the system default printer or class. The only required attributes 
+are <CODE>attributes-charset</CODE>, <CODE>attributes-natural-language</CODE>
+, and <CODE>printer-uri</CODE>. </P>
+<P>Set default destination will return <CODE>ipp-ok</CODE>, <CODE>
+ipp-not-authorized</CODE>, <CODE>ipp-bad-request</CODE>, or <CODE>
+ipp-not-found</CODE>. </P>
 <H2><A NAME=4_8>4.8 Line Printer Daemon Protocol</A></H2>
 <P>The Line Printer Daemon (LPD) protocol is described by <A HREF=http://www.ietf.org/rfc/rfc1179.txt>
 RFC 1179: Line Printer Daemon Protocol</A>. </P>
@@ -516,6 +659,8 @@ lpadmin</CODE>, and <CODE>reject</CODE> commands reside here. </DD>
 <DD>The character set and filter data files reside here. </DD>
 <DT>/usr/share/cups/fonts </DT>
 <DD>The <CODE>pstoraster</CODE> font files reside here. </DD>
+<DT>/usr/share/cups/model </DT>
+<DD>The sample PPD files reside here. </DD>
 <DT>/usr/share/cups/pstoraster </DT>
 <DD>The <CODE>pstoraster</CODE> data files reside here. </DD>
 <DT>/var/cups </DT>
