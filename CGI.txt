@@ -1,4 +1,4 @@
-CGI - CUPS v1.1.19 - 03/14/2003
+CGI - CUPS v1.1.21 - 06/29/2004
 -------------------------------
 
 This file describes the experimental scripting/CGI support
@@ -31,20 +31,20 @@ The following MIME types are reserved for the CGI support in
 CUPS (the names have been chosen to mirror those used by
 Apache):
 
-    application/x-http-cgi      CGI script/program
-    application/x-http-java     Java program
-    application/x-http-perl     Perl script
-    application/x-http-php      PHP script
-    application/x-http-python   Python script
+    application/x-httpd-cgi      CGI script/program
+    application/x-httpd-java     Java program
+    application/x-httpd-perl     Perl script
+    application/x-httpd-php      PHP script
+    application/x-httpd-python   Python script
 
 In order to enable the corresponding type, you must create a new
 /etc/cups/cgi.types file which maps the filename extensions to
 the appropriate MIME type, for example:
 
-    application/x-http-cgi cgi
-    application/x-http-php php
+    application/x-httpd-cgi cgi
+    application/x-httpd-php php
 
-CGI scripts/programs (application/x-http-cgi) also must have
+CGI scripts/programs (application/x-httpd-cgi) also must have
 execution permissions to be treated as a CGI script or program.
 
 
