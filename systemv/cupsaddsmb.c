@@ -1,5 +1,5 @@
 /*
- * "$Id: cupsaddsmb.c,v 1.3.2.3 2002/03/14 15:09:32 mike Exp $"
+ * "$Id: cupsaddsmb.c,v 1.3.2.4 2002/03/14 20:28:16 mike Exp $"
  *
  *   "cupsaddsmb" command for the Common UNIX Printing System (CUPS).
  *
@@ -26,6 +26,7 @@
  *   main()             - Export printers on the command-line.
  *   do_samba_command() - Do a SAMBA command, asking for a password as needed.
  *   export_dest()      - Export a destination to SAMBA.
+ *   usage()            - Show program usage and exit...
  */
 
 /*
@@ -339,5 +340,5 @@ usage()
 
 
 /*
- * End of "$Id: cupsaddsmb.c,v 1.3.2.3 2002/03/14 15:09:32 mike Exp $".
+ * End of "$Id: cupsaddsmb.c,v 1.3.2.4 2002/03/14 20:28:16 mike Exp $".
  */
