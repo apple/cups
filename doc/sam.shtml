@@ -2253,6 +2253,10 @@ The
 <A HREF="#Require"><CODE>Require</CODE></A>, and
 <A HREF="#Satisfy"><CODE>Satisfy</CODE></A>
 directives may all appear inside a location.
+Note that more specific resources override the less specific ones.  
+So the directives inside the <CODE>/printers/name</CODE> location will override ones from <CODE>/printers</CODE>.
+Directives inside <CODE>/printers</CODE> will override ones from <CODE>/</CODE>.
+None of the directives are inherited.
 More information can be found later in this chapter in
 <A HREF="#PRINTING_SECURITY">"Printing System Security"</A>.
 

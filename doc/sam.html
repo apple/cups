@@ -2247,9 +2247,13 @@ Port</CODE></A> directive but allows you to restrict access to specific
  <CODE>Encryption</CODE></A>,<A HREF="#Limit"> <CODE>Limit</CODE></A>,<A HREF="#LimitExcept">
  <CODE>LimitExcept</CODE></A>,<A HREF="#Order"> <CODE>Order</CODE></A>,<A
 HREF="#Require"> <CODE>Require</CODE></A>, and<A HREF="#Satisfy"> <CODE>
-Satisfy</CODE></A> directives may all appear inside a location. More
- information can be found later in this chapter in<A HREF="#PRINTING_SECURITY">
- &quot;Printing System Security&quot;</A>.
+Satisfy</CODE></A> directives may all appear inside a location. Note
+ that more specific resources override the less specific ones. So the
+ directives inside the <CODE>/printers/name</CODE> location will
+ override ones from <CODE>/printers</CODE>. Directives inside <CODE>
+/printers</CODE> will override ones from <CODE>/</CODE>. None of the
+ directives are inherited. More information can be found later in this
+ chapter in<A HREF="#PRINTING_SECURITY"> &quot;Printing System Security&quot;</A>.
 <!-- NEED 3in -->
 </P>
 <H3><A NAME="LogLevel">LogLevel</A></H3>
