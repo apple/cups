@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: configure.in,v 1.58 2000/10/16 23:02:08 mike Exp $"
+dnl "$Id: configure.in,v 1.59 2000/11/06 19:52:27 mike Exp $"
 dnl
 dnl   Configuration script for the Common UNIX Printing System (CUPS).
 dnl
@@ -273,6 +273,8 @@ AC_CHECK_FUNCS(wait3)
 
 dnl Update compiler options...
 if test -n "$GCC"; then
+	GXX="gcc"
+
 	if test -z "$OPTIM"; then
 	       	OPTIM="-O2 -g3"
 	fi
@@ -572,5 +574,5 @@ AC_DEFINE_UNQUOTED(CUPS_FONTPATH, "$fontpath")
 AC_OUTPUT(Makedefs cups.sh)
 
 dnl
-dnl End of "$Id: configure.in,v 1.58 2000/10/16 23:02:08 mike Exp $".
+dnl End of "$Id: configure.in,v 1.59 2000/11/06 19:52:27 mike Exp $".
 dnl
