@@ -1,6 +1,13 @@
 CHANGES-1.1.txt
 ---------------
 
+CHANGES IN CUPS V1.1.19
+
+	- The polling daemon allocated an extra localization
+	  buffer but did not free it, causing cups-polld to
+	  eventually use all available memory (STR #40)
+
+
 CHANGES IN CUPS V1.1.19rc3
 
 	- The scheduler could get in an infinite loop cancelling

@@ -1,5 +1,5 @@
 /*
- * "$Id: cups-polld.c,v 1.5.2.15 2003/04/25 15:30:20 mike Exp $"
+ * "$Id: cups-polld.c,v 1.5.2.16 2003/04/29 19:35:14 mike Exp $"
  *
  *   Polling daemon for the Common UNIX Printing System (CUPS).
  *
@@ -71,7 +71,7 @@ cups_hstrerror(int error)			/* I - Error number */
  */
 
 int	poll_server(http_t *http, cups_lang_t *language, ipp_op_t op,
-	            int sock, int port, int interval);
+	            int sock, int port, int interval, const char *prefix);
 
 
 /*
@@ -90,10 +90,11 @@ main(int  argc,				/* I - Number of command-line arguments */
   int			val;		/* Socket option value */
   int			seconds,	/* Seconds left from poll */
 			remain;		/* Total remaining time to sleep */
+  char			prefix[1024];	/* Prefix for log messages */
 
 
  /*
-  * Don't buffer errors...
+  * Don't buffer log messages...
   */
 
   setbuf(stderr, NULL);
@@ -113,13 +114,18 @@ main(int  argc,				/* I - Number of command-line arguments */
   interval = atoi(argv[3]);
   port     = atoi(argv[4]);
 
+  if (interval < 2)
+    interval = 2;
+
+  snprintf(prefix, sizeof(prefix), "[cups-polld %s:%d]", argv[1], atoi(argv[2]));
+
  /*
   * Open a broadcast socket...
   */
 
   if ((sock = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
   {
-    fprintf(stderr, "cups-polld: Unable to open broadcast socket: %s\n",
+    fprintf(stderr, "ERROR: %s Unable to open broadcast socket: %s\n", prefix,
             strerror(errno));
     return (1);
   }
@@ -131,8 +137,8 @@ main(int  argc,				/* I - Number of command-line arguments */
   val = 1;
   if (setsockopt(sock, SOL_SOCKET, SO_BROADCAST, &val, sizeof(val)))
   {
-    fprintf(stderr, "cups-polld: Unable to put socket in broadcast mode: %s\n",
-            strerror(errno));
+    fprintf(stderr, "ERROR: %s Unable to put socket in broadcast mode: %s\n",
+            prefix, strerror(errno));
 
     close(sock);
     return (1);
@@ -145,8 +151,9 @@ main(int  argc,				/* I - Number of command-line arguments */
   while ((http = httpConnectEncrypt(argv[1], atoi(argv[2]),
                                     cupsEncryption())) == NULL)
   {
-    fprintf(stderr, "cups-polld: Unable to connect to %s on port %s: %s\n",
-            argv[1], argv[2], h_errno ? hstrerror(h_errno) : strerror(errno));
+    fprintf(stderr, "ERROR: %s Unable to connect to %s on port %s: %s\n",
+            prefix, argv[1], argv[2],
+	    h_errno ? hstrerror(h_errno) : strerror(errno));
     sleep (interval);
   }
 
@@ -165,11 +172,11 @@ main(int  argc,				/* I - Number of command-line arguments */
     remain = interval;
 
     if ((seconds = poll_server(http, language, CUPS_GET_PRINTERS, sock, port,
-                               interval / 2)) > 0)
+                               interval / 2, prefix)) > 0)
       remain -= seconds;
 
     if ((seconds = poll_server(http, language, CUPS_GET_CLASSES, sock, port,
-                               interval / 2)) > 0)
+                               interval / 2, prefix)) > 0)
       remain -= seconds;
 
    /*
@@ -179,6 +186,8 @@ main(int  argc,				/* I - Number of command-line arguments */
     if (remain > 0) 
       sleep(remain);
   }
+
+  return (0);
 }
 
 
@@ -192,7 +201,8 @@ poll_server(http_t      *http,		/* I - HTTP connection */
 	    ipp_op_t    op,		/* I - Operation code */
 	    int         sock,		/* I - Broadcast sock */
 	    int         port,		/* I - Broadcast port */
-	    int         interval)	/* I - Polling interval */
+	    int         interval,	/* I - Polling interval */
+	    const char	*prefix)	/* I - Prefix for log messages */
 {
   int			seconds;	/* Number of seconds */
   int			count,		/* Current number of printers/classes */
@@ -213,6 +223,7 @@ poll_server(http_t      *http,		/* I - HTTP connection */
 			  "printer-info",
 			  "printer-location",
 			  "printer-make-and-model",
+			  "printer-name",
 			  "printer-state",
 			  "printer-type",
 			  "printer-uri-supported"
@@ -238,8 +249,6 @@ poll_server(http_t      *http,		/* I - HTTP connection */
   request->request.op.operation_id = op;
   request->request.op.request_id   = 1;
 
-  language = cupsLangDefault();
-
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
                "attributes-charset", NULL, cupsLangEncoding(language));
 
@@ -258,7 +267,7 @@ poll_server(http_t      *http,		/* I - HTTP connection */
   {
     if (response->request.status.status_code > IPP_OK_CONFLICT)
     {
-      fprintf(stderr, "cups-polld: get-%s failed: %s\n",
+      fprintf(stderr, "ERROR: %s get-%s failed: %s\n", prefix,
               op == CUPS_GET_PRINTERS ? "printers" : "classes",
               ippErrorString(response->request.status.status_code));
       ippDelete(response);
@@ -274,6 +283,9 @@ poll_server(http_t      *http,		/* I - HTTP connection */
 	 attr != NULL;
 	 attr = ippFindNextAttribute(response, "printer-name", IPP_TAG_NAME),
 	     max_count ++);
+
+    fprintf(stderr, "DEBUG: %s found %d %s.\n", prefix, max_count,
+            op == CUPS_GET_PRINTERS ? "printers" : "classes");
 
     count     = 0;
     seconds   = time(NULL);
@@ -361,6 +373,8 @@ poll_server(http_t      *http,		/* I - HTTP connection */
         	 type | CUPS_PRINTER_REMOTE, state, uri,
 		 location, info, make_model);
 
+        fprintf(stderr, "DEBUG2: %s Sending %s", prefix, packet);
+
 	if (sendto(sock, packet, strlen(packet), 0,
 	           (struct sockaddr *)&addr, sizeof(addr)) <= 0)
 	{
@@ -394,7 +408,7 @@ poll_server(http_t      *http,		/* I - HTTP connection */
   }
   else
   {
-    fprintf(stderr, "cups-polld: get-%s failed: %s\n",
+    fprintf(stderr, "ERROR: %s get-%s failed: %s\n", prefix,
             op == CUPS_GET_PRINTERS ? "printers" : "classes",
             ippErrorString(cupsLastError()));
     return (-1);
@@ -409,5 +423,5 @@ poll_server(http_t      *http,		/* I - HTTP connection */
 
 
 /*
- * End of "$Id: cups-polld.c,v 1.5.2.15 2003/04/25 15:30:20 mike Exp $".
+ * End of "$Id: cups-polld.c,v 1.5.2.16 2003/04/29 19:35:14 mike Exp $".
  */
