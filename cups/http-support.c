@@ -1,5 +1,5 @@
 /*
- * "$Id: http-support.c,v 1.1.2.2 2003/01/07 18:26:24 mike Exp $"
+ * "$Id: http-support.c,v 1.1.2.3 2003/02/04 05:10:17 mike Exp $"
  *
  *   HTTP support routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -161,8 +161,7 @@ httpSeparate(const char *uri,		/* I - Universal Resource Identifier */
   * Grab the username, if any...
   */
 
-  while (*uri == '/')
-    uri ++;
+  uri += 2;
 
   if ((slash = strchr(uri, '/')) == NULL)
     slash = uri + strlen(uri);
@@ -265,5 +264,5 @@ httpSeparate(const char *uri,		/* I - Universal Resource Identifier */
 
 
 /*
- * End of "$Id: http-support.c,v 1.1.2.2 2003/01/07 18:26:24 mike Exp $".
+ * End of "$Id: http-support.c,v 1.1.2.3 2003/02/04 05:10:17 mike Exp $".
  */
