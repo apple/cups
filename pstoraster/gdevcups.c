@@ -1,5 +1,5 @@
 /*
- * "$Id: gdevcups.c,v 1.43.2.1 2001/12/26 16:52:48 mike Exp $"
+ * "$Id: gdevcups.c,v 1.43.2.2 2001/12/29 19:04:10 mike Exp $"
  *
  *   GNU Ghostscript raster output driver for the Common UNIX Printing
  *   System (CUPS).
@@ -58,7 +58,7 @@
 #include "gsexit.h"
 
 #include <stdlib.h>
-#include <filter/raster.h>
+#include <cups/raster.h>
 #include <cups/ppd.h>
 #include <math.h>
 
@@ -70,7 +70,7 @@
  * Globals...
  */
 
-extern const char	*cupsProfile;
+const char	*cupsProfile = NULL;
 
 
 /*
@@ -169,10 +169,22 @@ private gx_device_procs	cups_procs =
    NULL		/* strip_copy_rop */
 };
 
+#define prn_device_body_copies(dtype, procs, dname, w10, h10, xdpi, ydpi, lo, to, lm, bm, rm, tm, ncomp, depth, mg, mc, dg, dc, print_pages)\
+	std_device_full_body_type(dtype, &procs, dname, &st_device_printer,\
+	  (int)((long)(w10) * (xdpi) / 10),\
+	  (int)((long)(h10) * (ydpi) / 10),\
+	  xdpi, ydpi,\
+	  ncomp, depth, mg, mc, dg, dc,\
+	  -(lo) * (xdpi), -(to) * (ydpi),\
+	  (lm) * 72.0, (bm) * 72.0,\
+	  (rm) * 72.0, (tm) * 72.0\
+	),\
+	prn_device_body_copies_rest_(print_pages)
+
 gx_device_cups	gs_cups_device =
 {
   prn_device_body_copies(gx_device_cups, cups_procs, "cups", 85, 110, 100, 100,
-                         0, 0, 0, 0, 0, 1, 0, 0, 0, 0, cups_print_pages),
+                         0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, cups_print_pages),
   0,				/* page */
   NULL,				/* stream */
   NULL,				/* ppd */
@@ -1610,16 +1622,6 @@ cups_put_params(gx_device     *pdev,	/* I - Device info */
 
   cups_set_color_info(pdev);
 
-  if (old_depth != pdev->color_info.depth)
-  {
-    fputs("DEBUG: Reallocating memory for new color depth...\n", stderr);
-    sp = ((gx_device_printer *)pdev)->space_params;
-
-    if ((code = gdev_prn_reallocate_memory(pdev, &sp, pdev->width,
-                                           pdev->height)) < 0)
-      return (code);
-  }
-
  /*
   * Compute the page margins...
   */
@@ -1635,10 +1637,10 @@ cups_put_params(gx_device     *pdev,	/* I - Device info */
     for (i = cups->ppd->num_sizes, size = cups->ppd->sizes;
          i > 0;
          i --, size ++)
-      if ((fabs(cups->PageSize[1] - size->length) < 18.0 &&
-           fabs(cups->PageSize[0] - size->width) < 18.0) ||
-          (fabs(cups->PageSize[0] - size->length) < 18.0 &&
-           fabs(cups->PageSize[1] - size->width) < 18.0))
+      if ((fabs(cups->MediaSize[1] - size->length) < 18.0 &&
+           fabs(cups->MediaSize[0] - size->width) < 18.0) ||
+          (fabs(cups->MediaSize[0] - size->length) < 18.0 &&
+           fabs(cups->MediaSize[1] - size->width) < 18.0))
 	break;
 
     if (i == 0 && !cups->ppd->variable_sizes)
@@ -1700,8 +1702,8 @@ cups_put_params(gx_device     *pdev,	/* I - Device info */
   cups->header.HWResolution[0] = pdev->HWResolution[0];
   cups->header.HWResolution[1] = pdev->HWResolution[1];
 
-  cups->header.PageSize[0] = pdev->PageSize[0];
-  cups->header.PageSize[1] = pdev->PageSize[1];
+  cups->header.PageSize[0] = pdev->MediaSize[0];
+  cups->header.PageSize[1] = pdev->MediaSize[1];
 
  /*
   * Reallocate memory if the size or color depth was changed...
@@ -3061,5 +3063,5 @@ cups_print_planar(gx_device_printer *pdev,	/* I - Printer device */
 
 
 /*
- * End of "$Id: gdevcups.c,v 1.43.2.1 2001/12/26 16:52:48 mike Exp $".
+ * End of "$Id: gdevcups.c,v 1.43.2.2 2001/12/29 19:04:10 mike Exp $".
  */

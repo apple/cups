@@ -1,5 +1,5 @@
 #
-# "$Id: mime.convs,v 1.12 2001/03/02 22:33:58 andy Exp $"
+# "$Id: mime.convs,v 1.12.2.1 2001/12/29 19:04:05 mike Exp $"
 #
 #   MIME converts file for the Common UNIX Printing System (CUPS).
 #
@@ -30,10 +30,12 @@
 #
 # General Notes:
 #
-#   Currently the "cost" field is not used (all filters are assumed to
-#   be equally costly in terms of speed/memory).  Also, a filter program
-#   *must* accept the standard command-line arguments (job-id, user, title,
-#   copies,options,[filename or stdin]) or this won't work.
+#   The "cost" field is used to find the least costly filters to run
+#   when converting a job file to a printable format.
+#
+#   All filters *must* accept the standard command-line arguments
+#   (job-id, user, title, copies, options, [filename or stdin]) to
+#   work with CUPS.
 #
 
 ########################################################################
@@ -41,18 +43,25 @@
 # PostScript filters
 #
 
-#application/msword	application/postscript	33	mswordtops
 application/pdf		application/postscript	33	pdftops
 application/postscript	application/vnd.cups-postscript	66	pstops
 application/vnd.hp-HPGL	application/postscript	66	hpgltops
 image/*			application/vnd.cups-postscript	66	imagetops
-#text/html		application/postscript	33	htmltops
 application/x-cshell	application/postscript	33	texttops
 application/x-perl	application/postscript	33	texttops
 application/x-shell	application/postscript	33	texttops
-text/html		application/postscript	33	texttops
 text/plain		application/postscript	33	texttops
-application/vnd.cups-form application/vnd.cups-postscript 33 formtops
+text/html		application/postscript	33	texttops
+
+########################################################################
+#
+# Form filter...
+#
+# This filter does not currently exist, but the file format is defined
+# in the IDD and registered with the IANA for future use...
+#
+
+#application/vnd.cups-form application/vnd.cups-postscript 33 formtops
 
 ########################################################################
 #
@@ -60,7 +69,7 @@ application/vnd.cups-form application/vnd.cups-postscript 33 formtops
 #
 
 image/*			application/vnd.cups-raster	100	imagetoraster
-application/vnd.cups-postscript	application/vnd.cups-raster	100	pstoraster
+# pstoraster is now included with ESP Ghostscript
 
 ########################################################################
 #
@@ -74,5 +83,5 @@ application/vnd.cups-postscript	application/vnd.cups-raster	100	pstoraster
 #*/*			application/vnd.cups-raw	0	-
 
 #
-# End of "$Id: mime.convs,v 1.12 2001/03/02 22:33:58 andy Exp $".
+# End of "$Id: mime.convs,v 1.12.2.1 2001/12/29 19:04:05 mike Exp $".
 #

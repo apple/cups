@@ -1,0 +1,52 @@
+#!/bin/sh
+#
+# "$Id: pstoraster,v 1.1.2.1 2001/12/29 19:04:32 mike Exp $"
+#
+# CUPS filter script for Ghostscript.
+#
+# Copyright 2001 by Easy Software Products.
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2, or (at your option)
+# any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+#
+
+# Installation directories...
+prefix=/usr
+exec_prefix=${prefix}
+bindir=${exec_prefix}/bin
+datadir=${prefix}/share
+
+# Set the library/font path...
+GS_LIB="$datadir/ghostscript/6.52.1:$datadir/ghostscript/fonts:${prefix}/share/ghostscript/6.52/fonts:${prefix}/share/fonts/default/ghostscript:${prefix}/share/fonts/default/Type1:$CUPS_FONTPATH"
+export GS_LIB
+
+# Options we use with Ghostscript...
+gsopts="-dQUIET -dDEBUG -dSAFER -dNOPAUSE -dBATCH -sDEVICE=cups"
+
+# See if we have a profile=n,n,n,n,n,n,n,n,n,n,n option...
+profile=""
+for option in $5; do
+    case $option in
+        profile=*)
+	    profile="-s$option"
+	    ;;
+    esac
+done
+
+# Now run Ghostscript...
+$bindir/gs $gsopts -sOUTPUTFILE="%stdout%" $profile $6
+
+#
+# End of "$Id: pstoraster,v 1.1.2.1 2001/12/29 19:04:32 mike Exp $".
+#

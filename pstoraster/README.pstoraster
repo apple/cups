@@ -1,0 +1,74 @@
+README.pstoraster - 12/29/2001
+------------------------------
+
+INTRODUCTION
+
+    This directory contains the CUPS "driver" for GNU
+    Ghostscript 6.52, the pstoraster script that is used to run
+    Ghostscript as a CUPS filter, the pstoraster.convs file that
+    defines the PostScript to raster filter for CUPS drivers, a
+    makefile fragment that adds the CUPS driver, and the
+    required patch against GNU Ghostscript which fixes critical
+    bugs in the current release.
+
+    This software is also available as part of the ESP
+    Ghostscript distribution, which is available from:
+
+        http://espgs.sourceforge.net/
+
+
+COMPILING GHOSTSCRIPT WITH THE CUPS DRIVER
+
+    The easiest way to add the CUPS driver to Ghostscript is to
+    run the "patchgs.sh" shell script:
+
+        ./patchgs.sh /path/to/ghostscript
+
+    The patch script runs the following commands:
+
+        cp pstoraster pstoraster.convs /path/to/ghostscript
+	cp cups.mak gdevcups.c /path/to/ghostscript/src
+	cd /path/to/ghostscript
+	patch -p1 </path/to/cups/pstoraster/espgs.patch
+
+    Once you have patched Ghostscript, make the software using
+    the "unixansi.mak" makefile:
+
+        make -f src/unixansi.mak
+
+    Then install the software with:
+
+        make -f src/unixansi.mak install
+
+    Finally, restart the cupsd process, either by sending the
+    HUP signal to the process or using the init script supplied
+    with CUPS.
+
+
+WHAT IS IN THE PATCH?
+
+    The "espgs.patch" file contains changes that map all text
+    messages sent to the user to stderr instead of stdout,
+    otherwise raster data will get mixed with text messages,
+    resulting in corrupted output - this also happens with
+    non-CUPS drivers...
+
+    The patch also changes the font list so that fonts are
+    separated by a newline instead of a space, updates the RGB
+    luminance constants to match those used by sRGB colors, and
+    fixes the handling of unknown setpagedevice attributes so
+    that media attributes can be specified for printing.
+
+    Finally, the patch adds the cups driver to the
+    "unixansi.mak" makefile.
+
+
+WHY DO I NEED TO INSTALL THE PATCH ON GHOSTSCRIPT?
+
+    If you don't install the patch, text messages will be
+    interleaved with the raster data, causing corrupted output.
+    This problem also affects non-CUPS drivers.
+
+    The setpagedevice fix is necessary to support most of the
+    media options in CUPS drivers.  Without it, printing will be
+    incorrect or may not work at all.
