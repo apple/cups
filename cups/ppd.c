@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c,v 1.11 1999/04/05 14:04:44 mike Exp $"
+ * "$Id: ppd.c,v 1.12 1999/04/05 15:23:01 mike Exp $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -428,11 +428,11 @@ ppdOpen(FILE *fp)		/* I - File to read from */
       else
         ppd->colorspace = PPD_CS_GRAY;
     }
-    else if (strcmp(keyword, "ManualCopies") == 0)
+    else if (strcmp(keyword, "cupsManualCopies") == 0)
       ppd->manual_copies = strcmp((char *)string, "True") == 0;
-    else if (strcmp(keyword, "ModelNumber") == 0)
+    else if (strcmp(keyword, "cupsModelNumber") == 0)
       ppd->model_number = atoi((char *)string);
-    else if (strcmp(keyword, "ColorProfile") == 0)
+    else if (strcmp(keyword, "cupsColorProfile") == 0)
     {
       if (ppd->num_profiles == 0)
         profile = malloc(sizeof(ppd_profile_t));
@@ -1428,5 +1428,5 @@ ppd_decode(unsigned char *string)	/* I - String to decode */
 
 
 /*
- * End of "$Id: ppd.c,v 1.11 1999/04/05 14:04:44 mike Exp $".
+ * End of "$Id: ppd.c,v 1.12 1999/04/05 15:23:01 mike Exp $".
  */
