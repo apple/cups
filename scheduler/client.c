@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.91.2.82 2004/06/17 14:45:12 mike Exp $"
+ * "$Id: client.c,v 1.91.2.83 2004/06/29 02:45:24 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -15,9 +15,9 @@
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
  *       44141 Airport View Drive, Suite 204
- *       Hollywood, Maryland 20636-3111 USA
+ *       Hollywood, Maryland 20636-3142 USA
  *
- *       Voice: (301) 373-9603
+ *       Voice: (301) 373-9600
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
  *
@@ -3405,5 +3405,5 @@ CDSAWriteFunc(SSLConnectionRef connection,	/* I  - SSL/TLS connection */
 
 
 /*
- * End of "$Id: client.c,v 1.91.2.82 2004/06/17 14:45:12 mike Exp $".
+ * End of "$Id: client.c,v 1.91.2.83 2004/06/29 02:45:24 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: config.h.in,v 1.39.2.21 2003/10/09 19:13:47 mike Exp $"
+ * "$Id: config.h.in,v 1.39.2.22 2004/06/29 02:45:24 mike Exp $"
  *
  *   Configuration file for the Common UNIX Printing System (CUPS).
  *
@@ -143,6 +143,13 @@
 
 
 /*
+ * Do we have the geteuid() function?
+ */
+
+#undef HAVE_GETEUID
+
+
+/*
  * Do we have the vsyslog() function?
  */
 
@@ -279,5 +286,5 @@
 #endif /* !_CUPS_CONFIG_H_ */
 
 /*
- * End of "$Id: config.h.in,v 1.39.2.21 2003/10/09 19:13:47 mike Exp $".
+ * End of "$Id: config.h.in,v 1.39.2.22 2004/06/29 02:45:24 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: lpd.c,v 1.28.2.32 2004/05/13 15:13:52 mike Exp $"
+ * "$Id: lpd.c,v 1.28.2.33 2004/06/29 02:45:24 mike Exp $"
  *
  *   Line Printer Daemon backend for the Common UNIX Printing System (CUPS).
  *
@@ -605,7 +605,11 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
       else if (lport < 1)
 	lport = 1023;
 
+#ifdef HAVE_GETEUID
+      if (geteuid() || !reserve)
+#else
       if (getuid() || !reserve)
+#endif /* HAVE_GETEUID */
       {
        /*
 	* Just create a regular socket...
@@ -1039,5 +1043,5 @@ sigterm_handler(int sig)		/* I - Signal */
 
 
 /*
- * End of "$Id: lpd.c,v 1.28.2.32 2004/05/13 15:13:52 mike Exp $".
+ * End of "$Id: lpd.c,v 1.28.2.33 2004/06/29 02:45:24 mike Exp $".
  */

@@ -3,6 +3,10 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.21rc2
 
+	- The LPD backend now uses geteuid() instead of getuid()
+	  when it is available (STR #752)
+	- The IPP backend did not report the printer state if
+	  the wait option was set to "no" (STR #761)
 	- The printer state was not updated for "STATE: foo,bar"
 	  messages (STR #745)
 	- Added new CUPS API convenience functions which accept

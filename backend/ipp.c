@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.38.2.31 2004/05/27 18:04:39 mike Exp $"
+ * "$Id: ipp.c,v 1.38.2.32 2004/06/29 02:45:24 mike Exp $"
  *
  *   IPP backend for the Common UNIX Printing System (CUPS).
  *
@@ -26,6 +26,7 @@
  * Contents:
  *
  *   main()                 - Send a file to the printer or server.
+ *   check_printer_state()  - Check the printer state...
  *   password_cb()          - Disable the password prompt for
  *                            cupsDoFileRequest().
  *   report_printer_state() - Report the printer state.
@@ -55,16 +56,21 @@
  * Globals...
  */
 
-static char	tmpfilename[1024] = "";	/* Temporary spool file name */
+static char	*password = NULL;	/* Password for device URI */
 #ifdef __APPLE__
 static char	pstmpname[1024] = "";	/* Temporary PostScript file name */
 #endif /* __APPLE__ */
+static char	tmpfilename[1024] = "";	/* Temporary spool file name */
 
 
 /*
  * Local functions...
  */
 
+void		check_printer_state(http_t *http, cups_lang_t *language,
+				    const char *charset, const char *uri,	/* I - Printer URI */
+		                    const char *resource, const char *user,
+				    int version);
 const char	*password_cb(const char *);
 int		report_printer_state(ipp_t *ipp);
 
@@ -72,13 +78,6 @@ int		report_printer_state(ipp_t *ipp);
 int		run_pictwps_filter(char **argv, const char *filename);
 #endif /* __APPLE__ */
 static void	sigterm_handler(int sig);
-
-
-/*
- * Local globals...
- */
-
-char	*password = NULL;
 
 
 /*
@@ -934,43 +933,14 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 	ippDelete(response);
 
      /*
-      * Now check on the printer state...
+      * Check the printer state and report it if necessary...
       */
 
-      request = ippNew();
-      request->request.op.version[1]   = version;
-      request->request.op.operation_id = IPP_GET_PRINTER_ATTRIBUTES;
-      request->request.op.request_id   = 1;
+/*      if (!copies_sup)
+	httpReconnect(http);*/
 
-      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-        	   "attributes-charset", NULL, charset);
-
-      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
-        	   "attributes-natural-language", NULL,
-        	   language != NULL ? language->language : "en");
-
-      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
-        	   NULL, uri);
-
-      if (argv[2][0])
-	ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "requesting-user-name",
-        	     NULL, argv[2]);
-
-      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
-                   "requested-attributes", NULL, "printer-state-reasons");
-
-     /*
-      * Do the request...
-      */
-
-      if (!copies_sup)
-	httpReconnect(http);
-
-      if ((response = cupsDoRequest(http, request, resource)) != NULL)
-      {
-        reasons = report_printer_state(response);
-	ippDelete(response);
-      }
+      check_printer_state(http, language, charset, uri, resource, argv[2],
+                          version);
 
      /*
       * Wait 10 seconds before polling again...
@@ -979,6 +949,15 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
       sleep(10);
     }
   }
+
+ /*
+  * Check the printer state and report it if necessary...
+  */
+
+/*      if (!copies_sup)
+	httpReconnect(http);*/
+
+  check_printer_state(http, language, charset, uri, resource, argv[2], version);
 
  /*
   * Free memory...
@@ -1006,6 +985,64 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   */
 
   return (ipp_status > IPP_OK_CONFLICT);
+}
+
+
+/*
+ * 'check_printer_state()' - Check the printer state...
+ */
+
+void
+check_printer_state(http_t      *http,	/* I - HTTP connection */
+                    cups_lang_t *language,
+					/* I - Language */
+		    const char  *charset,
+					/* I - Charset */
+		    const char  *uri,	/* I - Printer URI */
+		    const char  *resource,
+					/* I - Resource path */
+		    const char  *user,	/* I - Username, if any */
+		    int         version)/* I - IPP version */
+{
+  ipp_t	*request,			/* IPP request */
+	*response;			/* IPP response */
+
+
+ /*
+  * Check on the printer state...
+  */
+
+  request = ippNew();
+  request->request.op.version[1]   = version;
+  request->request.op.operation_id = IPP_GET_PRINTER_ATTRIBUTES;
+  request->request.op.request_id   = 1;
+
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
+               "attributes-charset", NULL, charset);
+
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
+               "attributes-natural-language", NULL,
+               language != NULL ? language->language : "en");
+
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
+               NULL, uri);
+
+  if (user && user[0])
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
+                 "requesting-user-name", NULL, user);
+
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
+               "requested-attributes", NULL, "printer-state-reasons");
+
+ /*
+  * Do the request...
+  */
+
+  if ((response = cupsDoRequest(http, request, resource)) != NULL)
+  {
+    report_printer_state(response);
+    ippDelete(response);
+  }
 }
 
 
@@ -1329,5 +1366,5 @@ sigterm_handler(int sig)		/* I - Signal */
 
 
 /*
- * End of "$Id: ipp.c,v 1.38.2.31 2004/05/27 18:04:39 mike Exp $".
+ * End of "$Id: ipp.c,v 1.38.2.32 2004/06/29 02:45:24 mike Exp $".
  */
