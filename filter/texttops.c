@@ -1,5 +1,5 @@
 /*
- * "$Id: texttops.c,v 1.22 2000/02/26 22:56:50 mike Exp $"
+ * "$Id: texttops.c,v 1.23 2000/02/27 16:01:31 mike Exp $"
  *
  *   Text to PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -57,6 +57,7 @@ int		Directions[256];/* Text directions for each font */
 
 static void	write_line(int row, lchar_t *line);
 static void	write_string(int col, int row, int len, lchar_t *s);
+static void	write_text(char *s);
 
 
 /*
@@ -682,7 +683,7 @@ WriteProlog(char       *title,	/* I - Title of job */
     for (i = 1 + PrettyPrint; i >= 0; i --)
     {
       printf("/%s findfont\n", Fonts[0][i]);
-      puts("dup length dict begin\n"
+      puts("dup length 1 add dict begin\n"
 	   "	{ 1 index /FID ne { def } { pop pop } ifelse } forall\n"
 	   "	/Encoding cupsEncoding00 def\n"
 	   "	currentdict\n"
@@ -702,22 +703,25 @@ WriteProlog(char       *title,	/* I - Title of job */
       for (j = 0; j < NumFonts; j ++)
       {
 	printf("/%s findfont\n", Fonts[j][i]);
-	printf("dup length dict begin\n"
+	printf("dup length 1 add dict begin\n"
 	       "	{ 1 index /FID ne { def } { pop pop } ifelse } forall\n"
 	       "	/Encoding cupsEncoding%02x def\n"
 	       "	currentdict\n"
 	       "end\n", j);
-	printf("/%s%02x exch definefont pop\n", names[i], j);
+	printf("/%s%02x exch definefont /%s%02x exch def\n", names[i], j,
+	       names[i], j);
       }
 
    /*
     * Then merge them into composite fonts...
     */
 
+    puts("% Create composite fonts...");
+
     for (i = 1 + PrettyPrint; i >= 0; i --)
     {
-      printf("/%s 6 dict begin", names[i]);
-      puts("/FMapType 3 def/Encoding[");
+      puts("8 dict begin");
+      puts("/FontType 0 def/FontMatrix[1.0 0 0 1.0 0 0]def/FMapType 2 def/Encoding[");
       for (j = 0; j < NumFonts; j ++)
         if (j == (NumFonts - 1))
 	  printf("%d", j);
@@ -728,12 +732,13 @@ WriteProlog(char       *title,	/* I - Title of job */
       puts("]def/FDepVector[");
       for (j = 0; j < NumFonts; j ++)
         if (j == (NumFonts - 1))
-          printf("/%s%02x", names[i], j);
+          printf("%s%02x", names[i], j);
 	else if ((j & 3) == 3)
-          printf("/%s%02x\n", names[i], j);
+          printf("%s%02x\n", names[i], j);
 	else
-	  printf("/%s%02x ", names[i], j);
-      puts("]def end definefont pop");
+	  printf("%s%02x ", names[i], j);
+      puts("]def currentdict end");
+      printf("/%s exch definefont pop\n", names[i]);
     }
   }
 
@@ -779,18 +784,28 @@ WriteProlog(char       *title,	/* I - Title of job */
 
     puts("/I { FI setfont moveto } bind def");
 
-    puts("/P 20 string def");
-    printf("/T(");
+    puts("/n {");
+    puts("\t20 string cvs % convert page number to string");
+    puts("\tdup length % get length");
+    puts("\tdup 2 mul string /P exch def % P = string twice as long");
+    puts("\t0 1 2 index 1 sub { % loop through each character in the page number");
+    puts("\t\tdup 3 index exch get % get character N from the page number");
+    puts("\t\texch 2 mul dup % compute offset in P");
+    puts("\t\tP exch 0 put % font 0");
+    puts("\t\t1 add P exch 2 index put % character");
+    puts("\t\tpop % discard character");
+    puts("\t} for % do for loop");
+    puts("\tpop pop % discard string and length");
+    puts("\tP % put string on stack");
+    puts("} bind def");
 
-    while (*title != '\0')
-    {
-      if (*title == '(' || *title == ')' || *title == '\\')
-	putchar('\\');
+    printf("/T");
+    write_text(title);
+    puts("def");
 
-      putchar(*title++);
-    }
-
-    puts(")def");
+    printf("/D");
+    write_text(curdate);
+    puts("def");
 
     puts("/H {");
     puts("gsave");
@@ -829,15 +844,14 @@ WriteProlog(char       *title,	/* I - Title of job */
 
     puts("\tmoveto T show");
 
-    printf("\t(%s)\n", curdate);
-    printf("\tdup stringwidth pop neg 2 div %.1f add %.1f\n",
+    printf("\tD dup stringwidth pop neg 2 div %.1f add %.1f\n",
            (PageRight - PageLeft) * 0.5,
            (0.5f + 0.157f) * 72.0f / LinesPerInch);
     puts("\tmoveto show");
 
     if (Duplex)
     {
-      puts("\tdup P cvs exch 2 mod 0 eq {");
+      puts("\tdup n exch 2 mod 0 eq {");
       printf("\t\t%.1f %.1f } {\n", 36.0f / LinesPerInch,
 	     (0.5f + 0.157f) * 72.0f / LinesPerInch);
       printf("\t\tdup stringwidth pop neg %.1f add %.1f } ifelse\n",
@@ -845,7 +859,7 @@ WriteProlog(char       *title,	/* I - Title of job */
 	     (0.5f + 0.157f) * 72.0f / LinesPerInch);
     }
     else
-      printf("\tP cvs dup stringwidth pop neg %.1f add %.1f\n",
+      printf("\tn dup stringwidth pop neg %.1f add %.1f\n",
              PageRight - PageLeft - 36.0f / LinesPerInch,
 	     (0.5f + 0.157f) * 72.0f / LinesPerInch);
 
@@ -874,7 +888,8 @@ write_line(int     row,		/* I - Row number (0 to N) */
   int		attr;		/* Current attribute */
   lchar_t	*start;		/* First character in sequence */
 
-  
+
+  /**** TODO - handle bidi text and arabic composition ****/
   for (col = 0, start = line; col < SizeColumns;)
   {
     while (col < SizeColumns && (line->ch == ' ' || line->ch == 0))
@@ -910,11 +925,10 @@ write_string(int     col,	/* I - Start column */
              int     len,	/* I - Number of characters */
              lchar_t *s)	/* I - String to print */
 {
-  int		i;		/* Looping var */
   int		ch;		/* Current character */
+  int		font;		/* Font for character */
   float		x, y;		/* Position of text */
   unsigned	attr;		/* Character attributes */
-  int		font;		/* Current font */
 
 
  /*
@@ -962,58 +976,62 @@ write_string(int     col,	/* I - Start column */
   if (attr & ATTR_UNDERLINE)
     printf(" %.1f U", (float)len * 72.0 / (float)CharsPerInch);
 
- /*
-  * Write a quoted string...
-  */
-
-  font = 0;
-
-  putchar('(');
-
-  while (len > 0)
+  if (UTF8)
   {
-    ch = Chars[s->ch];
+   /*
+    * Write a hex string...
+    */
 
-    if ((ch / 256) != font)
+    putchar('<');
+
+    while (len > 0)
     {
-      font = ch / 256;
-      printf("\\377");
-      if (font > 126 || font < 32)
-        printf("\\%03o", font);
+      printf("%04x", Chars[s->ch]);
+
+      len --;
+      s ++;
+    }
+
+    putchar('>');
+  }
+  else
+  {
+   /*
+    * Write a quoted string...
+    */
+
+    putchar('(');
+
+    while (len > 0)
+    {
+      ch = Chars[s->ch];
+
+      if (ch < 32 || ch > 126)
+      {
+       /*
+	* Quote 8-bit and control characters...
+	*/
+
+	printf("\\%03o", ch);
+      }
       else
       {
+       /*
+	* Quote the parenthesis and backslash as needed...
+	*/
+
 	if (ch == '(' || ch == ')' || ch == '\\')
 	  putchar('\\');
 
-        putchar(font);
+	putchar(ch);
       }
+
+      len --;
+      s ++;
     }
 
-    if (ch < 32 || ch > 126)
-    {
-     /*
-      * Quote 8-bit and control characters...
-      */
-
-      printf("\\%03o", ch);
-    }
-    else
-    {
-     /*
-      * Quote the parenthesis and backslash as needed...
-      */
-
-      if (ch == '(' || ch == ')' || ch == '\\')
-	putchar('\\');
-
-      putchar(ch);
-    }
-
-    len --;
-    s ++;
+    putchar(')');
   }
-
-  putchar(')');
 
   if (PrettyPrint)
   {
@@ -1032,5 +1050,83 @@ write_string(int     col,	/* I - Start column */
 
 
 /*
- * End of "$Id: texttops.c,v 1.22 2000/02/26 22:56:50 mike Exp $".
+ * 'write_text()' - Write a text string, quoting/encoding as needed.
+ */
+
+static void
+write_text(char *s)	/* I - String to write */
+{
+  int		ch;	/* Actual character value (UTF8) */
+  unsigned char	*utf8;	/* UTF8 text */
+
+
+  if (UTF8)
+  {
+   /*
+    * 8/8 encoding...
+    */
+
+    putchar('<');
+
+    utf8 = (unsigned char *)s;
+
+    while (*utf8)
+    {
+      if (*utf8 < 0xc0)
+        ch = *utf8 ++;
+      else if ((*utf8 & 0xe0) == 0xc0)
+      {
+       /*
+        * Two byte character...
+	*/
+
+        ch = ((utf8[0] & 0x1f) << 6) | (utf8[1] & 0x3f);
+	utf8 += 2;
+      }
+      else
+      {
+       /*
+        * Three byte character...
+	*/
+
+        ch = ((((utf8[0] & 0x1f) << 6) | (utf8[1] & 0x3f)) << 6) |
+	     (utf8[2] & 0x3f);
+	utf8 += 3;
+      }
+
+      printf("%04x", Chars[ch]);
+    }
+
+    putchar('>');
+  }
+  else
+  {
+   /*
+    * Standard 8-bit encoding...
+    */
+
+    putchar('(');
+
+    while (*s)
+    {
+      if (*s < 32 || *s > 126)
+        printf("\\%03o", *s);
+      else
+      {
+	if (*s == '(' || *s == ')' || *s == '\\')
+	  putchar('\\');
+
+	putchar(*s);
+      }
+
+      s ++;
+    }
+
+    putchar(')');
+  }
+}
+
+
+/*
+ * End of "$Id: texttops.c,v 1.23 2000/02/27 16:01:31 mike Exp $".
  */
