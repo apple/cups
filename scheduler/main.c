@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c,v 1.57.2.34 2003/02/13 03:33:33 mike Exp $"
+ * "$Id: main.c,v 1.57.2.35 2003/03/07 19:25:50 mike Exp $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -688,6 +688,10 @@ CatchChildSignals(void)
 #else
   signal(SIGCLD, sigchld_handler);	/* No, SIGCLD isn't a typo... */
 #endif /* HAVE_SIGSET */
+
+#if defined(HAVE_WAITPID) || defined(HAVE_WAIT3)
+  sigchld_handler(SIGCHLD);
+#endif /* HAVE_WAITPID || HAVE_WAIT3 */
 }
 
 
@@ -1026,5 +1030,5 @@ usage(void)
 
 
 /*
- * End of "$Id: main.c,v 1.57.2.34 2003/02/13 03:33:33 mike Exp $".
+ * End of "$Id: main.c,v 1.57.2.35 2003/03/07 19:25:50 mike Exp $".
  */

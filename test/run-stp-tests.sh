@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# "$Id: run-stp-tests.sh,v 1.4.2.11 2003/01/03 18:50:18 mike Exp $"
+# "$Id: run-stp-tests.sh,v 1.4.2.12 2003/03/07 19:25:51 mike Exp $"
 #
 #   Perform the complete set of IPP compliance tests specified in the
 #   CUPS Software Test Plan.
@@ -50,6 +50,7 @@ echo ""
 echo "1 - Basic conformance test with no load testing (all systems)"
 echo "2 - Basic conformance test with some load testing (minimum 256MB VM)"
 echo "3 - Basic conformance test with extreme load testing (minimum 1024MB VM)"
+echo "4 - Basic conformance test with torture load testing (minimum 2048MB VM)"
 echo ""
 echo "Please enter the number of the test you wish to perform:"
 
@@ -67,6 +68,12 @@ case "$testtype" in
 		nprinters1=500
 		nprinters2=1000
 		pjobs=100
+		;;
+	4)
+		echo "Running the torture tests (4)"
+		nprinters1=10000
+		nprinters2=20000
+		pjobs=200
 		;;
 	*)
 		echo "Running the timid tests (1)"
@@ -435,5 +442,5 @@ echo "    $pdffile"
 echo ""
 
 #
-# End of "$Id: run-stp-tests.sh,v 1.4.2.11 2003/01/03 18:50:18 mike Exp $"
+# End of "$Id: run-stp-tests.sh,v 1.4.2.12 2003/03/07 19:25:51 mike Exp $"
 #
