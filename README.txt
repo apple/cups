@@ -1,5 +1,10 @@
-README - CUPS v1.1.19 - 12/19/2002
-----------------------------------
+README - CUPS v1.1.19rc1 - 04/11/2003
+-------------------------------------
+
+**** THIS IS A RELEASE CANDIDATE AND NOT A PRODUCTION     ****
+**** RELEASE.  REPORT ALL PROBLEMS USING THE FORM AT:     ****
+****                                                      ****
+****             http://www.cups.org/str.php              ****
 
 Looking for compile instructions?  Read the file "INSTALL.txt"
 instead...
@@ -254,10 +259,6 @@ trademark property of Easy Software Products.
 
 The MD5 Digest code is Copyright 1999 Aladdin Enterprises.
 
-The PostScript RIP software (pstoraster) is based on the GNU
-Ghostscript 5.50 core, Copyright 1986-1998 by Aladdin
-Enterprises.
-
 The PDF filter (pdftops) is based on the Xpdf software,
 Copyright 1996-2002 by Derek B. Noonburg.
 
@@ -283,6 +284,5 @@ For commercial licensing information, please contact:
     WWW: http://www.cups.org
 
 Note that commercial licensors may also require a license from
-Artifex Software Inc. which handles commercial licensing of the
-Ghostscript software, and from Derek B. Noonburg who developed
-the Xpdf software used to print PDF files.
+Derek B. Noonburg who developed the Xpdf software used to print
+PDF files.
