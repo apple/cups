@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.4 1998/10/13 18:27:05 mike Exp $"
+ * "$Id: http.c,v 1.5 1998/10/13 18:55:52 mike Exp $"
  *
  *   HTTP server test code for CUPS.
  *
@@ -30,7 +30,11 @@
  * Revision History:
  *
  *   $Log: http.c,v $
- *   Revision 1.4  1998/10/13 18:27:05  mike
+ *   Revision 1.5  1998/10/13 18:55:52  mike
+ *   Fixed error handling code so that all errors cause the connection to be
+ *   closed.
+ *
+ *   Revision 1.4  1998/10/13  18:27:05  mike
  *   Added Host: line checking & enforcement.
  *
  *   Revision 1.3  1998/10/13  18:24:15  mike
@@ -657,19 +661,11 @@ ReadConnection(connection_t *con)	/* I - Connection to read from */
 	    else if (filestats.st_size == con->remote_size &&
 	             filestats.st_mtime == con->remote_time)
             {
-              if (!SendHeader(con, HTTP_NOT_MODIFIED, NULL))
+              if (!SendError(con, HTTP_NOT_MODIFIED))
 	      {
 		CloseConnection(con);
 		return (0);
 	      }
-
-	      if (conprintf(con, "\r\n") < 0)
-	      {
-		CloseConnection(con);
-		return (0);
-	      }
-
-              con->state = HTTP_WAITING;
 	    }
 	    else
             {
@@ -738,15 +734,9 @@ ReadConnection(connection_t *con)	/* I - Connection to read from */
 	  else if (filestats.st_size == con->remote_size &&
 	           filestats.st_mtime == con->remote_time)
           {
-            if (!SendHeader(con, HTTP_NOT_MODIFIED, NULL))
+            if (!SendError(con, HTTP_NOT_MODIFIED))
 	    {
               CloseConnection(con);
-	      return (0);
-	    }
-
-	    if (conprintf(con, "\r\n") < 0)
-	    {
-	      CloseConnection(con);
 	      return (0);
 	    }
 	  }
@@ -796,12 +786,6 @@ ReadConnection(connection_t *con)	/* I - Connection to read from */
 	    return (0);
 	  }
 
-          if (!con->keep_alive)
-	  {
-	    CloseConnection(con);
-	    return (0);
-	  }
-
           con->state = HTTP_WAITING;
           break;
     }
@@ -819,7 +803,13 @@ ReadConnection(connection_t *con)	/* I - Connection to read from */
         break;
   }
 
-  return (1);
+  if (!con->keep_alive && con->state == HTTP_WAITING)
+  {
+    CloseConnection(con);
+    return (0);
+  }
+  else
+    return (1);
 }
 
 
@@ -948,25 +938,21 @@ int
 SendError(connection_t *con,
           int          code)
 {
-  char		*filename;
-  struct stat	filestats;
-
-
-  sprintf(con->uri, "/errors/%d.html", code);
-  filename = get_file(con, &filestats);
-
-  if (filename != NULL)
-    return (SendFile(con, code, filename, "text/html", &filestats));
-
   if (!SendHeader(con, code, NULL))
     return (0);
   if (code == HTTP_UNAUTHORIZED)
     if (conprintf(con, "WWW-Authenticate: Basic realm=\"CUPS\"\r\n") < 0)
       return (0);
+  if (con->version >= HTTP_1_1)
+    if (conprintf(con, "Connection: close\r\n") < 0)
+      return (0);
   if (conprintf(con, "\r\n") < 0)
     return (0);
 
-  return (0);
+  con->keep_alive = 0;
+  con->state      = HTTP_WAITING;
+
+  return (1);
 }
 
 
@@ -999,9 +985,6 @@ SendFile(connection_t *con,
     return (0);
   if (conprintf(con, "Content-Length: %d\r\n", filestats->st_size) < 0)
     return (0);
-  if (code == HTTP_UNAUTHORIZED)
-    if (conprintf(con, "WWW-Authenticate: Basic realm=\"CUPS\"\r\n") < 0)
-      return (0);
   if (conprintf(con, "\r\n") < 0)
     return (0);
 
@@ -1696,5 +1679,5 @@ signal_handler(int sig)	/* I - Signal number */
 
 
 /*
- * End of "$Id: http.c,v 1.4 1998/10/13 18:27:05 mike Exp $".
+ * End of "$Id: http.c,v 1.5 1998/10/13 18:55:52 mike Exp $".
  */
