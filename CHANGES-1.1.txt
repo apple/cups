@@ -3,6 +3,10 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.20rc2
 
+	- The serial backend set the IXANY option on the port
+	  for XON/XOFF flow control; this caused problems with
+	  printers that returned status info but were not ready
+	  for more print data (STR #287)
 	- The scheduler didn't support scripted index files
 	  (index.php, index.pl, etc. - STR #290)
 	- The scheduler did not correctly localize script files

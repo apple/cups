@@ -1,5 +1,5 @@
 /*
- * "$Id: serial.c,v 1.32.2.15 2003/08/30 23:12:59 mike Exp $"
+ * "$Id: serial.c,v 1.32.2.16 2003/09/17 19:26:32 mike Exp $"
  *
  *   Serial port backend for the Common UNIX Printing System (CUPS).
  *
@@ -386,23 +386,23 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
 	if (strcasecmp(value, "none") == 0)
 	{
-	  opts.c_iflag &= ~(IXON | IXOFF | IXANY);
+	  opts.c_iflag &= ~(IXON | IXOFF);
           opts.c_cflag &= ~CRTSCTS;
 	}
 	else if (strcasecmp(value, "soft") == 0)
 	{
-	  opts.c_iflag |= IXON | IXOFF | IXANY;
+	  opts.c_iflag |= IXON | IXOFF;
           opts.c_cflag &= ~CRTSCTS;
 	}
 	else if (strcasecmp(value, "hard") == 0 ||
 	         strcasecmp(value, "rtscts") == 0)
         {
-	  opts.c_iflag &= ~(IXON | IXOFF | IXANY);
+	  opts.c_iflag &= ~(IXON | IXOFF);
           opts.c_cflag |= CRTSCTS;
 	}
 	else if (strcasecmp(value, "dtrdsr") == 0)
 	{
-	  opts.c_iflag &= ~(IXON | IXOFF | IXANY);
+	  opts.c_iflag &= ~(IXON | IXOFF);
           opts.c_cflag &= ~CRTSCTS;
 
 	  dtrdsr = 1;
@@ -990,5 +990,5 @@ list_devices(void)
 
 
 /*
- * End of "$Id: serial.c,v 1.32.2.15 2003/08/30 23:12:59 mike Exp $".
+ * End of "$Id: serial.c,v 1.32.2.16 2003/09/17 19:26:32 mike Exp $".
  */
