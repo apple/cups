@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.29 1999/04/29 19:23:20 mike Exp $"
+ * "$Id: http.c,v 1.30 1999/04/30 14:42:43 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -374,7 +374,7 @@ httpSeparate(char *uri,		/* I - Universal Resource Identifier */
   * Grab the method portion of the URI...
   */
 
-  ptr = method;
+  ptr = host;
   while (*uri != ':' && *uri != '\0')
     *ptr ++ = *uri ++;
 
@@ -383,19 +383,40 @@ httpSeparate(char *uri,		/* I - Universal Resource Identifier */
     uri ++;
 
  /*
-  * If the method contains a period or slash, then it's probably a
-  * filename...
+  * If the method contains a period or slash, then it's probably
+  * hostname/filename...
   */
 
-  if (strchr(method, '.') != NULL || strchr(method, '/') != NULL)
+  if (strchr(host, '.') != NULL || strchr(host, '/') != NULL)
   {
-    strcpy(resource, method);
-    strcpy(method, "file");
+    if ((ptr = strchr(host, '/')) != NULL)
+    {
+      strcpy(resource, ptr);
+      *ptr = '\0';
+    }
+    else
+      resource[0] = '\0';
+
+    if (isdigit(*uri))
+    {
+     /*
+      * OK, we have "hostname:port[/resource]"...
+      */
+
+      *port = strtol(uri, &uri, 10);
+
+      if (*uri == '/')
+        strcpy(resource, uri);
+    }
+    else
+      *port = 0;
+
+    strcpy(method, "http");
     username[0] = '\0';
-    host[0]     = '\0';
-    *port       = 0;
     return;
   }
+  else
+    strcpy(method, host);
 
  /*
   * If the method starts with less than 2 slashes then it is a local resource...
@@ -1338,5 +1359,5 @@ http_send(http_t       *http,	/* I - HTTP data */
 
 
 /*
- * End of "$Id: http.c,v 1.29 1999/04/29 19:23:20 mike Exp $".
+ * End of "$Id: http.c,v 1.30 1999/04/30 14:42:43 mike Exp $".
  */
