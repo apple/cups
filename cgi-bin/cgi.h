@@ -1,9 +1,23 @@
 /*
- * "$Id: cgi.h,v 1.5 1999/09/10 15:44:12 mike Exp $"
+ * "$Id: cgi.h,v 1.6 1999/09/28 19:05:14 mike Exp $"
  *
  *   CGI support library definitions.
  *
- *   Copyright 1997-1999 by Easy Software Products, All Rights Reserved.
+ *   Copyright 1997-1999 by Easy Software Products.
+ *
+ *   This program is free software; you can redistribute it and/or modify it
+ *   under the terms of the GNU General Public License as published by the Free
+ *   Software Foundation; either version 2 of the License, or (at your option)
+ *   any later version.
+ *
+ *   This program is distributed in the hope that it will be useful, but
+ *   WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ *   or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+ *   for more details.
+ *
+ *   You should have received a copy of the GNU General Public License
+ *   along with this program; if not, write to the Free Software
+ *   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
 #ifndef _CGI_H_
@@ -39,9 +53,9 @@ extern void		cgiEndHTML(FILE *out);
 extern FILE		*cgiEMailOpen(const char *from, const char *to,
 			              const char *cc, const char *subject,
 				      int multipart);
-extern void		cgiEMailPart(FILE *out, const char *type,
-			             const char *encoding);
-extern void		cgiEMailClose(FILE *out);
+extern void		cgiEMailPart(FILE *mail, const char *type,
+			             const char *charset, const char *encoding);
+extern void		cgiEMailClose(FILE *mail);
 
 
 #  define cgiGetUser()	getenv("REMOTE_USER")
@@ -50,5 +64,5 @@ extern void		cgiEMailClose(FILE *out);
 #endif /* !_CGI_H_ */
 
 /*
- * End of "$Id: cgi.h,v 1.5 1999/09/10 15:44:12 mike Exp $".
+ * End of "$Id: cgi.h,v 1.6 1999/09/28 19:05:14 mike Exp $".
  */

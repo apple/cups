@@ -1,9 +1,23 @@
 /*
- * "$Id: template.c,v 1.7 1999/09/27 18:49:27 mike Exp $"
+ * "$Id: template.c,v 1.8 1999/09/28 19:05:15 mike Exp $"
  *
  *   CGI template function.
  *
- *   Copyright 1997-1999 by Easy Software Products, All Rights Reserved.
+ *   Copyright 1997-1999 by Easy Software Products.
+ *
+ *   This program is free software; you can redistribute it and/or modify it
+ *   under the terms of the GNU General Public License as published by the Free
+ *   Software Foundation; either version 2 of the License, or (at your option)
+ *   any later version.
+ *
+ *   This program is distributed in the hope that it will be useful, but
+ *   WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ *   or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+ *   for more details.
+ *
+ *   You should have received a copy of the GNU General Public License
+ *   along with this program; if not, write to the Free Software
+ *   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
  * Contents:
  *
@@ -31,11 +45,7 @@ void
 cgiCopyTemplateFile(FILE       *out,		/* I - Output file */
                     const char *template)	/* I - Template file to read */
 {
-  FILE		*in;			/* Input file */
-  int		ch;			/* Character from file */
-  char		name[255],		/* Name of variable */
-		*s;			/* String pointer */
-  const char	*value;			/* Value of variable */
+  FILE	*in;					/* Input file */
 
 
  /*
@@ -69,14 +79,14 @@ cgi_copy(FILE *out,		/* I - Output file */
 	 int  element,		/* I - Element number (0 to N) */
 	 char term)		/* I - Terminating character */
 {
-  int		ch;			/* Character from file */
-  char		op;			/* Operation */
-  char		name[255],		/* Name of variable */
-		*s;			/* String pointer */
-  const char	*value;			/* Value of variable */
-  char		outval[1024],		/* Output string */
-		compare[1024];		/* Comparison string */
-  int		result;			/* Result of comparison */
+  int		ch;		/* Character from file */
+  char		op;		/* Operation */
+  char		name[255],	/* Name of variable */
+		*s;		/* String pointer */
+  const char	*value;		/* Value of variable */
+  char		outval[1024],	/* Output string */
+		compare[1024];	/* Comparison string */
+  int		result;		/* Result of comparison */
 
 
  /*
@@ -123,7 +133,10 @@ cgi_copy(FILE *out,		/* I - Output file */
         * Insert count...
 	*/
 
-        sprintf(outval, "%d", cgiGetSize(name + 1));
+        if (name[1])
+          sprintf(outval, "%d", cgiGetSize(name + 1));
+	else
+	  sprintf(outval, "%d", element + 1);
       }
       else if (name[0] == '[')
       {
@@ -213,6 +226,11 @@ cgi_copy(FILE *out,		/* I - Output file */
 	for (s = compare; (ch = getc(in)) != EOF;)
           if (ch == '?')
             break;
+	  else if (ch == '#')
+	  {
+	    sprintf(s, "%d", element + 1);
+	    s += strlen(s);
+	  }
           else if (ch == '\\')
 	    *s++ = getc(in);
 	  else
@@ -276,5 +294,5 @@ cgi_copy(FILE *out,		/* I - Output file */
 
 
 /*
- * End of "$Id: template.c,v 1.7 1999/09/27 18:49:27 mike Exp $".
+ * End of "$Id: template.c,v 1.8 1999/09/28 19:05:15 mike Exp $".
  */

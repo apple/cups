@@ -1,9 +1,23 @@
 /*
- * "$Id: var.c,v 1.10 1999/09/10 15:44:13 mike Exp $"
+ * "$Id: var.c,v 1.11 1999/09/28 19:05:16 mike Exp $"
  *
  *   CGI form variable and array functions.
  *
- *   Copyright 1997-1999 by Easy Software Products, All Rights Reserved.
+ *   Copyright 1997-1999 by Easy Software Products.
+ *
+ *   This program is free software; you can redistribute it and/or modify it
+ *   under the terms of the GNU General Public License as published by the Free
+ *   Software Foundation; either version 2 of the License, or (at your option)
+ *   any later version.
+ *
+ *   This program is distributed in the hope that it will be useful, but
+ *   WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ *   or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+ *   for more details.
+ *
+ *   You should have received a copy of the GNU General Public License
+ *   along with this program; if not, write to the Free Software
+ *   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
  * Contents:
  *
@@ -155,6 +169,9 @@ cgiGetArray(const char *name,	/* I - Name of array variable */
 
   if ((var = cgi_find_variable(name)) == NULL)
     return (NULL);
+
+  if (var->nvalues == 1)
+    return (var->values[0]);
 
   if (element < 0 || element >= var->nvalues)
     return (NULL);
@@ -591,5 +608,5 @@ cgi_sort_variables(void)
 
 
 /*
- * End of "$Id: var.c,v 1.10 1999/09/10 15:44:13 mike Exp $".
+ * End of "$Id: var.c,v 1.11 1999/09/28 19:05:16 mike Exp $".
  */
