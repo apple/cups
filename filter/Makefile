@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.55 2002/01/15 20:38:41 mike Exp $"
+# "$Id: Makefile,v 1.56 2002/01/23 17:25:38 mike Exp $"
 #
 #   Filter makefile for the Common UNIX Printing System (CUPS).
 #
@@ -115,7 +115,11 @@ libcupsimage.so.2 libcupsimage.sl.2:	$(IMAGEOBJS) ../Makedefs
 
 libcupsimage.2.dylib:	$(IMAGEOBJS) ../Makedefs
 	echo Linking $@...
-	$(DSO) $(DSOFLAGS) -o $@ $(IMAGEOBJS) $(DSOLIBS) $(LINKCUPS) -lm -lcc_dynamic
+	$(DSO) $(DSOFLAGS) -o $@  \
+		-dylib_install_name $(LIBDIR)/libcupsimage.dylib \
+		-dylib_current_version 2.0.0 \
+		-dylib_compatibility_version 2.0.0 \
+		$(IMAGEOBJS) $(DSOLIBS) $(LINKCUPS) -lm -lcc_dynamic
 	$(RM) libcupsimage.dylib
 	$(LN) $@ libcupsimage.dylib
 
@@ -238,5 +242,5 @@ $(OBJS):	../Makedefs ../cups/cups.h ../cups/ppd.h ../cups/language.h
 
 
 #
-# End of "$Id: Makefile,v 1.55 2002/01/15 20:38:41 mike Exp $".
+# End of "$Id: Makefile,v 1.56 2002/01/23 17:25:38 mike Exp $".
 #
