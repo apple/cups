@@ -93,6 +93,14 @@ CHANGES IN CUPS v1.1.3
 	  new client connections.
 	- The imagetoraster filter didn't support all of the
 	  required pagedevice parameters.
+	- The serial backend now checks for 100 serial ports
+	  under Linux.
+	- The scheduler used sscanf() to pull out the remote
+	  printer location, description, and make/model strings,
+	  but if any of these options was empty then sscanf()
+	  would stop processing.
+	- Added "debug2" log level to provide a little less
+	  verbose debugging information at the "debug" level.
 
 
 CHANGES IN CUPS v1.1.2
