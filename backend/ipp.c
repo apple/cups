@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.38.2.15 2002/10/15 16:40:32 mike Exp $"
+ * "$Id: ipp.c,v 1.38.2.16 2002/11/01 21:05:54 mike Exp $"
  *
  *   IPP backend for the Common UNIX Printing System (CUPS).
  *
@@ -217,7 +217,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   {
     fprintf(stderr, "INFO: Connecting to %s on port %d...\n", hostname, port);
 
-    if ((http = httpConnect(hostname, port)) == NULL)
+    if ((http = httpConnectEncrypt(hostname, port, cupsEncryption())) == NULL)
     {
       if (getenv("CLASS") != NULL)
       {
@@ -902,5 +902,5 @@ report_printer_state(ipp_t *ipp)	/* I - IPP response */
 
 
 /*
- * End of "$Id: ipp.c,v 1.38.2.15 2002/10/15 16:40:32 mike Exp $".
+ * End of "$Id: ipp.c,v 1.38.2.16 2002/11/01 21:05:54 mike Exp $".
  */

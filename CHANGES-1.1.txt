@@ -3,6 +3,8 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.17
 
+	- The IPP backend didn't honor the encryption settings
+	  in /etc/cups/client.conf.
 	- Fixed a potential bug in the HTTP code which was
 	  caused by servers sending the status line and
 	  newline(s) in separate packets.
