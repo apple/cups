@@ -1,5 +1,5 @@
 /*
- * "$Id: lpd.c,v 1.28.2.22 2003/04/10 14:13:48 mike Exp $"
+ * "$Id: lpd.c,v 1.28.2.23 2003/07/29 12:53:01 mike Exp $"
  *
  *   Line Printer Daemon backend for the Common UNIX Printing System (CUPS).
  *
@@ -683,12 +683,14 @@ lpd_queue(char *hostname,		/* I - Host to connect to */
     gethostname(localhost, sizeof(localhost));
     localhost[31] = '\0'; /* RFC 1179, Section 7.2 - host name < 32 chars */
 
-    snprintf(control, sizeof(control), "H%s\nP%s\nJ%s\n", localhost, user, title);
+    snprintf(control, sizeof(control), "H%s\nP%s\nJ%s\n", localhost, user,
+             title);
     cptr = control + strlen(control);
 
     if (banner)
     {
-      snprintf(cptr, sizeof(control) - (cptr - control), "L%s\n", user);
+      snprintf(cptr, sizeof(control) - (cptr - control), "L%s\nC%s\n", user,
+               localhost);
       cptr   += strlen(cptr);
     }
 
@@ -1020,5 +1022,5 @@ sigterm_handler(int sig)		/* I - Signal */
 
 
 /*
- * End of "$Id: lpd.c,v 1.28.2.22 2003/04/10 14:13:48 mike Exp $".
+ * End of "$Id: lpd.c,v 1.28.2.23 2003/07/29 12:53:01 mike Exp $".
  */
