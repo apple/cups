@@ -1,5 +1,5 @@
 /*
- * "$Id: cupstestppd.c,v 1.1.2.17 2003/02/20 16:00:33 mike Exp $"
+ * "$Id: cupstestppd.c,v 1.1.2.18 2003/02/25 19:18:26 mike Exp $"
  *
  *   PPD test program for the Common UNIX Printing System (CUPS).
  *
@@ -140,7 +140,7 @@ main(int  argc,			/* I - Number of command-line arguments */
       * Open the PPD file...
       */
 
-      if (files)
+      if (files && verbose >= 0)
         putchar('\n');
 
       files ++;
@@ -868,5 +868,5 @@ usage(void)
 
 
 /*
- * End of "$Id: cupstestppd.c,v 1.1.2.17 2003/02/20 16:00:33 mike Exp $".
+ * End of "$Id: cupstestppd.c,v 1.1.2.18 2003/02/25 19:18:26 mike Exp $".
  */

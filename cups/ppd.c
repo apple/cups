@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c,v 1.51.2.46 2003/02/20 16:53:30 mike Exp $"
+ * "$Id: ppd.c,v 1.51.2.47 2003/02/25 19:18:24 mike Exp $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -3225,8 +3225,8 @@ ppd_read(FILE *fp,			/* I - File to read from */
       while (*lineptr == ':' || isspace(*lineptr))
         lineptr ++;
 
-      strptr = lineptr + strlen(lineptr);
-      while (*strptr == '\0' || isspace(*strptr))
+      strptr = lineptr + strlen(lineptr) - 1;
+      while (strptr >= lineptr && isspace(*strptr))
         *strptr-- = '\0';
 
       *string = malloc(strlen(lineptr) + 1);
@@ -3251,5 +3251,5 @@ ppd_read(FILE *fp,			/* I - File to read from */
 
 
 /*
- * End of "$Id: ppd.c,v 1.51.2.46 2003/02/20 16:53:30 mike Exp $".
+ * End of "$Id: ppd.c,v 1.51.2.47 2003/02/25 19:18:24 mike Exp $".
  */
