@@ -1,102 +1,34 @@
 
 
 
-lpinfo(1)             Easy Software Products            lpinfo(1)
+lpinfo(8)             Easy Software Products            lpinfo(8)
 
 
 NNAAMMEE
-       lpinfo - print cups status information
+       lpinfo - show available devices or drivers
 
 SSYYNNOOPPSSIISS
-       llppiinnffoo [ -a [ _d_e_s_t_i_n_a_t_i_o_n_(_s_) ] ] [ -c [ _c_l_a_s_s_(_e_s_) ] [ -d ]
-       [ -h _s_e_r_v_e_r ] [ -l ] [ -o [ _d_e_s_t_i_n_a_t_i_o_n_(_s_)  ]  ]  [  -p  [
-       _p_r_i_n_t_e_r_(_s_)  ] ] [ -r ] [ -R ] [ -s ] [ -t ] [ -u [ _u_s_e_r_(_s_)
-       ] ] [ -v [ _p_r_i_n_t_e_r_(_s_) ] ]
+       llppiinnffoo [ -l ] [ -m ] [ -v ]
 
 DDEESSCCRRIIPPTTIIOONN
-       llppiinnffoo  displays  status  information  about  the  current
-       classes,  jobs,  and printers. When run with no arguments,
-       llppiinnffoo will list jobs queued by the  user.  Other  options
-       include:
-
-       -a [_p_r_i_n_t_e_r_(_s_)]
-            Shows  the  accepting  state of printer queues. If no
-            printers are specified then all printers are  listed.
-
-       -c [_c_l_a_s_s_(_e_s_)]
-            Shows  the  printer  classes  and  the  printers that
-            belong to them. If no classes are specified then  all
-            classes are listed.
-
-       -d
-            Shows the current default destination.
-
-       -h _s_e_r_v_e_r
-            Specifies the CUPS server to communicate with.
+       llppiinnffoo lists the available devices or drivers known to the
+       CUPS server. One of the _-_m or _-_v options must be specified
+       to get any output:
 
        -l
-            Shows a long listing of printers, classes, or jobs.
+            Shows a "long" listing of devices or drivers.
 
-       -o [_d_e_s_t_i_n_a_t_i_o_n_(_s_)]
-            Shows  the  jobs queue on the specified destinations.
-            If no destinations are specified all jobs are  shown.
+       -m
+            Shows the available printer drivers on the system.
 
-       -p [_p_r_i_n_t_e_r_(_s_)]
-            Shows  the  printers  and  whether  or  not  they are
-            enabled for printing. If no  printers  are  specified
-            then all printers are listed.
-
-       -r
-            Shows whether or not the CUPS server is running.
-
-       -R
-            Shows the ranking of print jobs.
-
-       -s
-            Shows  a status summary, including the system default
-            destination, a  list  of  classes  and  their  member
-            printers, and a list of printers and their associated
-            devices. This is equivalent to using the "-d",  "-c",
-            and "-p" options.
-
-
-
-1 May 2000         Common UNIX Printing System                  1
-
-
-
-
-
-lpinfo(1)             Easy Software Products            lpinfo(1)
-
-
-       -t
-            Shows  all  status information. This is equivalent to
-            using the "-r", "-d", "-c", "-d", "-v",  "-a",  "-p",
-            and "-o" options.
-
-       -u [_u_s_e_r_(_s_)]
-            Shows  a  list  of print jobs queued by the specified
-            users. If no users  are  specified,  lists  the  jobs
-            queued by the current user.
-
-       -v [_p_r_i_n_t_e_r_(_s_)]
-            Shows  the printers and what device they are attached
-            to. If no printers are specified  then  all  printers
-            are listed.
+       -v
+            Shows the available printer devices on the system.
 
 CCOOMMPPAATTIIBBIILLIITTYY
-       Unlike  the  System V printing system, CUPS allows printer
-       names to contain any printable character except SPACE  and
-       TAB. Also, printer and class names are nnoott case-sensitive.
-
-       The "-h" option is not a standard System V option.
-
-       The Solaris "-f", "-P",  and  "-S"  options  are  silently
-       ignored.
+       The llppiinnffoo command is unique to CUPS.
 
 SSEEEE AALLSSOO
-       cancel(1), lp(1), CUPS Software Users Manual
+       lpadmin(8), CUPS Software Administrators Manual
 
 CCOOPPYYRRIIGGHHTT
        Copyright  1993-2000 by Easy Software Products, All Rights
@@ -127,6 +59,8 @@ CCOOPPYYRRIIGGHHTT
 
 
 
-1 May 2000         Common UNIX Printing System                  2
+
+
+10 May 2000        Common UNIX Printing System                  1
 
 
