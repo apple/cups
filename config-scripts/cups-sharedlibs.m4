@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-sharedlibs.m4,v 1.9 2002/01/14 20:37:44 mike Exp $"
+dnl "$Id: cups-sharedlibs.m4,v 1.10 2002/01/24 18:51:05 mike Exp $"
 dnl
 dnl   Shared library support for the Common UNIX Printing System (CUPS).
 dnl
@@ -47,13 +47,13 @@ if test x$enable_shared != xno; then
 			DSO="\$(CC)"
 			DSOFLAGS="$DSOFLAGS -Wl,-rpath,\$(libdir),-set_version,sgi2.4,-soname,\$@ -shared \$(OPTIM)"
 			;;
-		OSF1* | Linux*)
+		OSF1* | Linux* | NetBSD* | OpenBSD*)
 			LIBCUPS="libcups.so.2"
 			LIBCUPSIMAGE="libcupsimage.so.2"
 			DSO="\$(CC)"
 			DSOFLAGS="$DSOFLAGS -Wl,-soname,\$@ -shared \$(OPTIM)"
 			;;
-		Darwin* | *BSD*)
+		Darwin* | FreeBSD*)
 			LIBCUPS="libcups.2.dylib"
 			LIBCUPSIMAGE="libcupsimage.2.dylib"
 			DSO="ld"
@@ -146,5 +146,5 @@ AC_SUBST(DSOLIBS)
 AC_SUBST(IMGLIBS)
 
 dnl
-dnl End of "$Id: cups-sharedlibs.m4,v 1.9 2002/01/14 20:37:44 mike Exp $".
+dnl End of "$Id: cups-sharedlibs.m4,v 1.10 2002/01/24 18:51:05 mike Exp $".
 dnl

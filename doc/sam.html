@@ -64,7 +64,7 @@ Copyright 1997-2002, All Rights Reserved<BR>
 <LI><A HREF="#DPKG-BINARY">Installing an Debian Distribution</A></LI>
 </UL>
 </UL>
-<B><A HREF="#PRINTER_MANAGEMENT">3 - Printer Management</A></B>
+<B><A HREF="#MANAGING_PRINTERS">3 - Managing Printers</A></B>
 <UL>
 <LI><A HREF="#4_1">The Basics</A></LI>
 <LI><A HREF="#4_2">Adding Your First Printer</A></LI>
@@ -263,7 +263,7 @@ Copyright 1997-2002, All Rights Reserved<BR>
 <UL>
 <LI><A HREF="#13_1">My Applications Don't See the Available Printers</A></LI>
 <LI><A HREF="#13_2">CUPS Doesn't Recognize My Username or Password!</A></LI>
-<LI><A HREF="#13_3">I Can't Do Administration Tasks from Another
+<LI><A HREF="#ALLOW_REMOTE">I Can't Do Administration Tasks from Another
  Machine!</A></LI>
 <LI><A HREF="#13_4">I Can't Do Administration Tasks from My Web Browser!</A>
 </LI>
@@ -663,8 +663,7 @@ CXXFLAGS</CODE>, and <CODE>LDFLAGS</CODE> environment variables prior to
 </UL>
 <P>After a short delay the CUPS software will be installed and the
  scheduler will be started automatically.</P>
-<H1 ALIGN="RIGHT"><A NAME="PRINTER_MANAGEMENT">3 - Printer Management</A>
-</H1>
+<H1 ALIGN="RIGHT"><A NAME="MANAGING_PRINTERS">3 - Managing Printers</A></H1>
 <P>This chapter describes how to add your first printer and how to
  manage your printers.</P>
 <H2><A NAME="4_1">The Basics</A></H2>
@@ -1001,7 +1000,7 @@ ServerName <I>server</I>
  configuration information.</P>
 <P>Polling is enabled by specifying one or more<A HREF="#BrowsePoll"> <CODE>
 BrowsePoll</CODE></A> directives in the<VAR> /etc/cups/cupsd.conf</VAR>
- file. For information on making these changes, see<A HREF="PRINTING_MANAGEMENT">
+ file. For information on making these changes, see<A HREF="#PRINTING_MANAGEMENT">
  Chapter 6, &quot;Printing System Management&quot;</A>.</P>
 <H1 ALIGN="RIGHT"><A NAME="PRINTING_MANAGEMENT">6 - Printing System
  Management</A></H1>
@@ -4788,7 +4787,7 @@ AuthClass System
 </PRE>
 </UL>
  for the<VAR> /admin</VAR> location. Then restart the CUPS server as
- described in<A HREF="PRINTING_MANAGEMENT"> Chapter 8, &quot;Printing System
+ described in<A HREF="#PRINTING_MANAGEMENT"> Chapter 6, &quot;Printing System
  Management&quot;</A>.
 <CENTER>
 <TABLE BGCOLOR="#cccccc" BORDER="1" CELLPADDING="5" WIDTH="80%">
@@ -4799,8 +4798,8 @@ AuthClass System
 </TD></TR>
 </TABLE>
 </CENTER>
-<H2><A NAME="13_3">I Can't Do Administration Tasks from Another Machine!</A>
-</H2>
+<H2><A NAME="ALLOW_REMOTE">I Can't Do Administration Tasks from Another
+ Machine!</A></H2>
 <P>The default CUPS configuration limits administration to the local
  machine. To open up access, edit the<VAR> /etc/cups/cupsd.conf</VAR>
  and comment out the lines reading:</P>
@@ -4812,7 +4811,7 @@ Allow from 127.0.0.1
 </PRE>
 </UL>
  for the<VAR> /admin</VAR> location. Then restart the CUPS server as
- described in<A HREF="PRINTING_MANAGEMENT"> Chapter 8, &quot;Printing System
+ described in<A HREF="#PRINTING_MANAGEMENT"> Chapter 6, &quot;Printing System
  Management&quot;</A>.
 <CENTER>
 <TABLE BGCOLOR="#cccccc" BORDER="1" CELLPADDING="5" WIDTH="80%">

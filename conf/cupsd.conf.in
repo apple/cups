@@ -1,5 +1,5 @@
 #
-# "$Id: cupsd.conf,v 1.38 2002/01/23 17:25:33 mike Exp $"
+# "$Id: cupsd.conf.in,v 1.1 2002/01/24 18:51:04 mike Exp $"
 #
 #   Sample configuration file for the Common UNIX Printing System (CUPS)
 #   scheduler.
@@ -63,13 +63,13 @@
 #
 # AccessLog: the access log file; if this does not start with a leading /
 # then it is assumed to be relative to ServerRoot.  By default set to
-# "/var/log/cups/access_log"
+# "@CUPS_LOGDIR@/access_log"
 #
 # You can also use the special name "syslog" to send the output to the
 # syslog file or daemon.
 #
 
-#AccessLog /var/log/cups/access_log
+#AccessLog @CUPS_LOGDIR@/access_log
 
 #
 # Classification: the classification level of the server.  If set, this
@@ -118,28 +118,28 @@
 
 #
 # DocumentRoot: the root directory for HTTP documents that are served.
-# By default the compiled in directory.
+# By default @CUPS_DOCROOT@.
 #
 
-#DocumentRoot /usr/share/doc/cups
+#DocumentRoot @CUPS_DOCROOT@
 
 #
 # ErrorLog: the error log file; if this does not start with a leading /
 # then it is assumed to be relative to ServerRoot.  By default set to
-# "/var/log/cups/error_log"
+# "@CUPS_LOGDIR@/error_log"
 #
 # You can also use the special name "syslog" to send the output to the
 # syslog file or daemon.
 #
 
-#ErrorLog /var/log/cups/error_log
+#ErrorLog @CUPS_LOGDIR@/error_log
 
 #
 # FontPath: the path to locate all font files (currently only for pstoraster)
-# By default /usr/share/cups/fonts.
+# By default @CUPS_FONTPATH@.
 #
 
-#FontPath /usr/share/cups/fonts
+#FontPath @CUPS_FONTPATH@
 
 #
 # LogLevel: controls the number of messages logged to the ErrorLog
@@ -165,13 +165,13 @@ LogLevel info
 #
 # PageLog: the page log file; if this does not start with a leading /
 # then it is assumed to be relative to ServerRoot.  By default set to
-# "/var/log/cups/page_log"
+# "@CUPS_LOGDIR@/page_log"
 #
 # You can also use the special name "syslog" to send the output to the
 # syslog file or daemon.
 #
 
-#PageLog /var/log/cups/page_log
+#PageLog @CUPS_LOGDIR@/page_log
 
 #
 # PreserveJobHistory: whether or not to preserve the job history after a
@@ -230,10 +230,10 @@ LogLevel info
 
 #
 # RequestRoot: the directory where request files are stored.
-# By default /var/spool/cups.
+# By default @CUPS_REQUESTS@.
 #
 
-#RequestRoot /var/spool/cups
+#RequestRoot @CUPS_REQUESTS@
 
 #
 # RemoteRoot: the name of the user assigned to unauthenticated accesses
@@ -244,17 +244,17 @@ LogLevel info
 
 #
 # ServerBin: the root directory for the scheduler executables.
-# By default /usr/lib/cups or /usr/lib32/cups (IRIX 6.5).
+# By default @CUPS_SERVERBIN@.
 #
 
-#ServerBin /usr/lib/cups
+#ServerBin @CUPS_SERVERBIN@
 
 #
 # ServerRoot: the root directory for the scheduler.
-# By default /etc/cups.
+# By default @CUPS_SERVERROOT@.
 #
 
-#ServerRoot /etc/cups
+#ServerRoot @CUPS_SERVERROOT@
 
 
 ########
@@ -263,17 +263,17 @@ LogLevel info
 
 #
 # ServerCertificate: the file to read containing the server's certificate.
-# Defaults to "/etc/cups/ssl/server.crt".
+# Defaults to "@CUPS_SERVERROOT@/ssl/server.crt".
 #
 
-#ServerCertificate /etc/cups/ssl/server.crt
+#ServerCertificate @CUPS_SERVERROOT@/ssl/server.crt
 
 #
 # ServerKey: the file to read containing the server's key.
-# Defaults to "/etc/cups/ssl/server.key".
+# Defaults to "@CUPS_SERVERROOT@/ssl/server.key".
 #
 
-#ServerKey /etc/cups/ssl/server.key
+#ServerKey @CUPS_SERVERROOT@/ssl/server.key
 
 
 ########
@@ -303,12 +303,12 @@ LogLevel info
 #RIPCache 8m
 
 #
-# TempDir: the directory to put temporary files in. This directory must be
-# writable by the user defined above!  Defaults to "/var/spool/cups/tmp" or
+# TempDir: the directory to put temporary files in.  This directory must be
+# writable by the user defined above!  Defaults to "@CUPS_REQUESTS@/tmp" or
 # the value of the TMPDIR environment variable.
 #
 
-#TempDir /var/spool/cups/tmp
+#TempDir @CUPS_REQUESTS@/tmp
 
 #
 # FilterLimit: sets the maximum cost of all job filters that can be run
@@ -716,5 +716,5 @@ Allow From 127.0.0.1
 </Location>
 
 #
-# End of "$Id: cupsd.conf,v 1.38 2002/01/23 17:25:33 mike Exp $".
+# End of "$Id: cupsd.conf.in,v 1.1 2002/01/24 18:51:04 mike Exp $".
 #
