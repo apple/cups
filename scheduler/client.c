@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.18 1999/05/10 16:38:40 mike Exp $"
+ * "$Id: client.c,v 1.19 1999/05/10 21:35:40 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -119,7 +119,7 @@ AcceptClient(listener_t *lis)	/* I - Listener socket */
   else
     strncpy(con->http.hostname, host->h_name, sizeof(con->http.hostname) - 1);
 
-  LogMessage(LOG_INFO, "accept() %d from %s:%d.", con->http.fd,
+  LogMessage(LOG_DEBUG, "accept() %d from %s:%d.", con->http.fd,
              con->http.hostname, ntohs(con->http.hostaddr.sin_port));
 
  /*
@@ -169,7 +169,7 @@ CloseClient(client_t *con)	/* I - Client to close */
   int	status;			/* Exit status of pipe command */
 
 
-  LogMessage(LOG_INFO, "CloseClient() %d", con->http.fd);
+  LogMessage(LOG_DEBUG, "CloseClient() %d", con->http.fd);
 
  /*
   * Close the socket and clear the file from the input set for select()...
@@ -368,7 +368,7 @@ ReadClient(client_t *con)	/* I - Client to read from */
         con->start     = time(NULL);
         con->operation = con->http.state;
 
-        LogMessage(LOG_INFO, "ReadClient() %d %s %s HTTP/%d.%d", con->http.fd,
+        LogMessage(LOG_DEBUG, "ReadClient() %d %s %s HTTP/%d.%d", con->http.fd,
 	           operation, con->uri,
 		   con->http.version / 100, con->http.version % 100);
 
@@ -753,7 +753,7 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	    con->file = mkstemp(con->filename);
 	    fchmod(con->file, 0644);
 
-            LogMessage(LOG_INFO, "ReadClient() %d REQUEST %s", con->http.fd,
+            LogMessage(LOG_DEBUG, "ReadClient() %d REQUEST %s", con->http.fd,
 	               con->filename);
 
 	    if (con->file < 0)
@@ -1053,7 +1053,7 @@ StartListening(void)
 
   for (i = NumListeners, lis = Listeners; i > 0; i --, lis ++)
   {
-    LogMessage(LOG_INFO, "StartListening() address=%08x port=%d",
+    LogMessage(LOG_DEBUG, "StartListening() address=%08x port=%d",
                ntohl(lis->address.sin_addr.s_addr),
 	       ntohs(lis->address.sin_port));
 
@@ -1106,7 +1106,7 @@ StartListening(void)
     FD_SET(lis->fd, &InputSet);
   }
 
-  LogMessage(LOG_INFO, "StartListening() NumListeners=%d", NumListeners);
+  LogMessage(LOG_DEBUG, "StartListening() NumListeners=%d", NumListeners);
 }
 
 
@@ -1133,7 +1133,7 @@ StopListening(void)
     FD_CLR(lis->fd, &InputSet);
   }
 
-  LogMessage(LOG_INFO, "StopListening()");
+  LogMessage(LOG_DEBUG, "StopListening()");
 }
 
 
@@ -1565,5 +1565,5 @@ pipe_command(client_t *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.18 1999/05/10 16:38:40 mike Exp $".
+ * End of "$Id: client.c,v 1.19 1999/05/10 21:35:40 mike Exp $".
  */

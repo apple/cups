@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.c,v 1.9 1999/04/23 14:06:14 mike Exp $"
+ * "$Id: auth.c,v 1.10 1999/05/10 21:35:40 mike Exp $"
  *
  *   Authorization routines for the Common UNIX Printing System (CUPS).
  *
@@ -95,7 +95,7 @@ AddLocation(char *location)	/* I - Location path */
   strncpy(temp->location, location, sizeof(temp->location) - 1);
   temp->length = strlen(temp->location);
 
-  LogMessage(LOG_INFO, "AddLocation: added location \'%s\'", location);
+  LogMessage(LOG_DEBUG, "AddLocation: added location \'%s\'", location);
 
  /*
   * Return the new record...
@@ -343,7 +343,7 @@ IsAuthorized(client_t *con)	/* I - Connection */
 
   if (pw == NULL)			/* No such user... */
   {
-    LogMessage(LOG_INFO, "IsAuthorized: Unknown username \"%s\".",
+    LogMessage(LOG_WARN, "IsAuthorized: Unknown username \"%s\"; access denied.",
                con->username);
     return (HTTP_UNAUTHORIZED);
   }
@@ -566,5 +566,5 @@ check_auth(unsigned   ip,	/* I - Client address */
 
 
 /*
- * End of "$Id: auth.c,v 1.9 1999/04/23 14:06:14 mike Exp $".
+ * End of "$Id: auth.c,v 1.10 1999/05/10 21:35:40 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.16 1999/05/10 16:38:41 mike Exp $"
+ * "$Id: conf.c,v 1.17 1999/05/10 21:35:41 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -127,7 +127,7 @@ ReadConfiguration(void)
   StopListening();
   StopBrowsing();
 
-  LogMessage(LOG_INFO, "ReadConfiguration() ConfigurationFile=\"%s\"",
+  LogMessage(LOG_DEBUG, "ReadConfiguration() ConfigurationFile=\"%s\"",
              ConfigurationFile);
 
   if (AccessFile != NULL)
@@ -1060,5 +1060,5 @@ get_address(char               *value,		/* I - Value string */
 
 
 /*
- * End of "$Id: conf.c,v 1.16 1999/05/10 16:38:41 mike Exp $".
+ * End of "$Id: conf.c,v 1.17 1999/05/10 21:35:41 mike Exp $".
  */

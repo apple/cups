@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.6 1999/04/16 20:47:46 mike Exp $"
+# "$Id: Makefile,v 1.7 1999/05/10 21:35:40 mike Exp $"
 #
 #   Scheduler Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -24,20 +24,14 @@
 
 include ../Makedefs
 
-#OPTIONS	=	-DDEBUG
 OBJS	=	auth.o classes.o client.o conf.o dirsvc.o main.o ipp.o job.o \
 		printers.o
 
 #
-# Make the scheduler executable, "cupsd".
+# Make everything...
 #
 
-cupsd:	$(OBJS) ../cups/libcups.a
-	$(CC) $(LDFLAGS) -o cupsd $(OBJS) $(LIBS)
-
-$(OBJS):	auth.h classes.h client.h conf.h cupsd.h dirsvc.h job.h \
-		printers.h ../cups/cups.h ../cups/http.h ../cups/ipp.h \
-		../cups/mime.h ../cups/string.h ../Makedefs
+all:	cupsd
 
 #
 # Clean all object files...
@@ -51,7 +45,23 @@ clean:
 #
 
 install:
+	-$(MKDIR) $(SBINDIR)
+	$(CP) cupsd $(SBINDIR)
+	-$(MKDIR) $(SERVERROOT)/logs
+	-$(MKDIR) $(SERVERROOT)/ppd
+	-$(MKDIR) $(SERVERROOT)/requests
 
 #
-# End of "$Id: Makefile,v 1.6 1999/04/16 20:47:46 mike Exp $".
+# Make the scheduler executable, "cupsd".
+#
+
+cupsd:	$(OBJS) ../cups/libcups.a
+	$(CC) $(LDFLAGS) -o cupsd $(OBJS) $(LIBS)
+
+$(OBJS):	auth.h classes.h client.h conf.h cupsd.h dirsvc.h job.h \
+		printers.h ../cups/cups.h ../cups/http.h ../cups/ipp.h \
+		../cups/mime.h ../cups/string.h ../Makedefs
+
+#
+# End of "$Id: Makefile,v 1.7 1999/05/10 21:35:40 mike Exp $".
 #
