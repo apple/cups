@@ -1,28 +1,28 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <HTML>
 <HEAD>
-<TITLE> CUPS Software Programmers Manual</TITLE>
+<TITLE>CUPS Software Programmers Manual</TITLE>
 <META NAME="author" CONTENT="Easy Software Products">
 <META NAME="copyright" CONTENT="Copyright 1997-2001, All Rights Reserved">
-<META NAME="docnumber" CONTENT="CUPS-SPM-1.1.7">
+<META NAME="docnumber" CONTENT="CUPS-SPM-1.1.8">
 <META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-8859-1">
-<STYLE><!--
-BODY { font-family: serif; font-size: 11.0pt }
-H1 { font-family: sans-serif; font-size: 19.0pt }
-H2 { font-family: sans-serif; font-size: 15.8pt }
-H3 { font-family: sans-serif; font-size: 13.2pt }
-H4 { font-family: sans-serif; font-size: 11.0pt }
-H5 { font-family: sans-serif; font-size: 9.2pt }
-H6 { font-family: sans-serif; font-size: 7.6pt }
-SUB { font-size: 7.6pt }
-SUP { font-size: 7.6pt }
-PRE { font-size: 9.2pt }
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
 --></STYLE>
 </HEAD>
 <BODY BGCOLOR="#ffffff">
-<CENTER><A HREF="#CONTENTS"><IMG SRC="images/cups-large.gif" BORDER="0" WIDTH="100%"><BR>
-<H1> CUPS Software Programmers Manual</H1></A><BR>
-CUPS-SPM-1.1.7<BR>
+<CENTER><A HREF="#CONTENTS"><IMG SRC="images/cups-large.gif" BORDER="0" WIDTH="431" HEIGHT="511"><BR>
+<H1>CUPS Software Programmers Manual</H1></A><BR>
+CUPS-SPM-1.1.8<BR>
 Easy Software Products<BR>
 Copyright 1997-2001, All Rights Reserved<BR>
 </CENTER>
@@ -1073,7 +1073,7 @@ Copyright 1997-2001, All Rights Reserved<BR>
 <HR>
 <H1 ALIGN="RIGHT"><A NAME="1">Preface</A></H1>
 <P>This software programmers manual provides software programming 
-information for the Common UNIX Printing System (&quot;CUPS&quot;) Version 1.1.7. </P>
+information for the Common UNIX Printing System (&quot;CUPS&quot;) Version 1.1.8. </P>
 <H2><A NAME="1_1">System Overview</A></H2>
 <P>CUPS provides a portable printing layer for UNIX&reg;-based operating 
 systems. It has been developed by <A HREF="http://www.easysw.com">Easy 
@@ -1092,7 +1092,6 @@ are used to support non-PostScript printers. Sample drivers for HP and
 EPSON printers are included that use these filters. </P>
 
 <!-- NEED 2in -->
-
 <H2><A NAME="1_2">Document Overview</A></H2>
 <P>This software programmers manual is organized into the following 
 sections: </P>
@@ -1115,9 +1114,9 @@ and their meanings and uses are explained below:
 <TR><TH>Example</TH><TD>&nbsp;&nbsp;&nbsp;</TD><TH>Description</TH></TR>
 <TR><TD>&nbsp;</TD></TR>
 <TR VALIGN="TOP"><TD><CODE>lpstat</CODE>
-<BR><CODE> lpstat(1)</CODE></TD><TD>&nbsp;&nbsp;&nbsp;</TD><TD>The names of 
-commands; the first mention of a command or  function in a chapter is 
-followed by a manual page section  number.</TD></TR>
+<BR><CODE> lpstat(1)</CODE></TD><TD>&nbsp;&nbsp;&nbsp;</TD><TD>The names of commands; 
+the first mention of a command or  function in a chapter is followed by 
+a manual page section  number.</TD></TR>
 <TR><TD>&nbsp;</TD></TR>
 <TR VALIGN="TOP"><TD><VAR>/var</VAR>
 <BR><VAR> /usr/share/cups/data/testprint.ps</VAR></TD><TD>&nbsp;&nbsp;&nbsp;</TD><TD>
@@ -1706,18 +1705,17 @@ PPD_CS_RGBK, PPD_CS_N</TD></TR>
 printer is continuous tone only</TD></TR>
 <TR><TD><CODE>num_emulations
 <BR> emulations</CODE></TD><TD><CODE>int
-<BR> ppd_emul_t *</CODE></TD><TD>Emulations supported by the 
-printer</TD></TR>
+<BR> ppd_emul_t *</CODE></TD><TD>Emulations supported by the printer</TD>
+</TR>
 <TR><TD><CODE>flip_duplex</CODE></TD><TD><CODE>int</CODE></TD><TD>1 = 
 need to flip odd pages when duplexing</TD></TR>
 <TR><TD><CODE>num_fonts
 <BR> fonts</CODE></TD><TD><CODE>int
-<BR> char **</CODE></TD><TD>The fonts available on the printer.</TD>
-</TR>
+<BR> char **</CODE></TD><TD>The fonts available on the printer.</TD></TR>
 <TR><TD><CODE>jcl_begin
 <BR> jcl_ps
-<BR> jcl_end</CODE></TD><TD><CODE>char *</CODE></TD><TD>Job 
-Control Language commands for PostScript output</TD></TR>
+<BR> jcl_end</CODE></TD><TD><CODE>char *</CODE></TD><TD>Job Control 
+Language commands for PostScript output</TD></TR>
 <TR><TD><CODE>landscape</CODE></TD><TD><CODE>int</CODE></TD><TD>
 Landscape orientation, -90 or 90 degrees</TD></TR>
 <TR><TD><CODE>lang_encoding</CODE></TD><TD><CODE>char *</CODE></TD><TD>
@@ -2587,7 +2585,6 @@ find out more at our web site: </P>
 </UL>
 
 <!-- NEW PAGE -->
-
 <H2><A NAME="7_2">GNU GENERAL PUBLIC LICENSE</A></H2>
 <P>Version 2, June 1991 </P>
 <PRE>
@@ -2642,8 +2639,7 @@ patent must be licensed for everyone's free use or not licensed at all. </P>
 <P>The precise terms and conditions for copying, distribution and 
 modification follow. </P>
 <H4>GNU GENERAL PUBLIC LICENSE
-<BR> TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND 
-MODIFICATION</H4>
+<BR> TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION</H4>
 <OL START="0">
 <LI>This License applies to any program or other work which contains a 
 notice placed by the copyright holder saying it may be distributed 
@@ -2846,7 +2842,6 @@ DAMAGES. </LI>
 <H4>END OF TERMS AND CONDITIONS</H4>
 
 <!-- NEW PAGE -->
-
 <H2><A NAME="7_3">GNU LIBRARY GENERAL PUBLIC LICENSE</A></H2>
 <P>Version 2, June 1991 </P>
 <PRE>
@@ -3806,7 +3801,7 @@ step</TD></TR>
 </TABLE>
 </CENTER>
 </P>
-<H1 ALIGN="RIGHT"><A NAME="10"><A HREF="FUNCTIONS">D - Functions</A></A></H1>
+<H1 ALIGN="RIGHT"><A HREF="FUNCTIONS" NAME="10">D - Functions</A></H1>
 <P>This appendix provides a reference for all of the CUPS API 
 functions. 
 <!-- NEW PAGE -->
@@ -4102,7 +4097,7 @@ num_classes = cupsGetClasses(
 
 if (num_classes &gt; 0)
 {
-  for (i = 0; i num_classes; i ++)
+  for (i = 0; i &lt;num_classes; i ++)
     free(classes[i]);
 
   free(classes);
@@ -4252,7 +4247,6 @@ unlink(ppd);
 </PRE>
 
 <!-- NEW PAGE -->
-
 <H2><A NAME="cupsGetPrinters">cupsGetPrinters()</A></H2>
 <H3><A NAME="10_11_1">Usage</A></H3>
 <PRE>
@@ -4288,7 +4282,7 @@ num_printers = cupsGetPrinters(
 
 if (num_printers &gt; 0)
 {
-  for (i = 0; i num_printers; i ++)
+  for (i = 0; i &lt;num_printers; i ++)
     free(printers[i]);
 
   free(printers);
@@ -4663,7 +4657,6 @@ jobid = cupsPrintFile(&quot;printer@hostname&quot;, &quot;filename.ps&quot;, &qu
 <P><A HREF="#cupsCancelJob"> cupsCancelJob()</A>, <A HREF="#cupsLastError">
 cupsLastError()</A>, <A HREF="#cupsPrintFiles">cupsPrintFiles()</A>
 <!-- NEW PAGE -->
-
 </P>
 <H2><A NAME="cupsPrintFiles">cupsPrintFiles()</A></H2>
 <H3><A NAME="10_22_1">Usage</A></H3>
@@ -5157,7 +5150,6 @@ cupsTempFile(filename, sizeof(filename));
 </PRE>
 
 <!-- NEW PAGE -->
-
 <H2><A NAME="cupsUser">cupsUser()</A></H2>
 <H3><A NAME="10_34_1">Usage</A></H3>
 <PRE>
@@ -7370,7 +7362,6 @@ close(fd);
 <A HREF="#ppdClose"><CODE> ppdClose()</CODE></A>, <A HREF="#ppdOpen"><CODE>
 ppdOpen()</CODE></A>, <A HREF="#ppdOpenFile"><CODE>ppdOpenFile()</CODE></A>
 <!-- NEW PAGE -->
-
 
 <H2><A NAME="ppdOpenFile">ppdOpenFile()</A></H2>
 <H3><A NAME="10_97_1">Usage</A></H3>
