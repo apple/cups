@@ -1,0 +1,138 @@
+#
+# "$Id: mime.types,v 1.1 1998/08/06 14:39:36 mike Exp $"
+#
+#   MIME types file for the Common UNIX Printing System (CUPS).
+#
+#   Copyright 1997-1998 by Easy Software Products, all rights reserved.
+#
+#   These coded instructions, statements, and computer programs are the
+#   property of Easy Software Products and are protected by Federal
+#   copyright law.  Distribution and use rights are outlined in the file
+#   "LICENSE.txt" which should have been included with this file.  If this
+#   file is missing or damaged please contact Easy Software Products
+#   at:
+#
+#       Attn: CUPS Licensing Information
+#       Easy Software Products
+#       44145 Airport View Drive, Suite 204
+#       Hollywood, Maryland 20636-3111 USA
+#
+#       Voice: (301) 373-9603
+#       EMail: cups-info@cups.org
+#         WWW: http://www.cups.org
+#
+# Revision History:
+#
+#   $Log: mime.types,v $
+#   Revision 1.1  1998/08/06 14:39:36  mike
+#   Initial revision
+#
+
+########################################################################
+#
+# Format of Lines:
+#
+#   super/type rules
+#
+# "rules" can be any combination of:
+#
+#   ( expr )				Parenthesis for expression grouping
+#   +					Logical AND
+#   , or whitespace			Logical OR
+#   !					Logical NOT
+#   match("pattern")			Pattern match on filename
+#   extension				Pattern match on "*.extension"
+#   ascii(offset,length)		True if bytes are valid printable ASCII
+#					(CR, NL, TAB, BS, 32-126)
+#   printable(offset,length)		True if bytes are printable 8-bit chars
+#					(CR, NL, TAB, BS, 32-126, 160-254)
+#   string(offset,"string")		True if bytes are identical to string
+#   char(offset,value)			True if byte is identical
+#   short(offset,value)			True if 16-bit integer is identical
+#   int(offset,value)			True if 32-bit integer is identical
+#   locale("string")                    True if current locale matches string
+#
+# General Notes:
+#
+#   MIME type names are case-insensitive.  Internally they are converted
+#   to lowercase.  Multiple occurrences of a type will cause the provided
+#   rules to be appended to the existing definition.  Type names are sorted
+#   in ascending order, so if two types use the same rules to resolve a type
+#   (e.g. doc extension for two types), the returned type will be the first
+#   type in the sorted list.
+#
+#   The "printable" rule only returns true if the characters in question
+#   are printable 8-bit characters *and* there is at least 1 character with
+#   the MSB set (that is, characters from 160-254).  If the file in question
+#   *may* contain 8-bit characters you should use:
+#
+#       (ascii(offset,length),printable(offset,length))
+#
+#   The rationale behind this is simple - for ISO-8859 text we need to use
+#   the specific character encoding for a locale, while plain ASCII text
+#   uses the same encoding regardless of locale.
+#
+
+########################################################################
+#
+# Application-generated files...
+#
+
+application/msword		doc
+application/pdf			pdf string(0,"%PDF")
+application/postscript		ai eps ps string(0,"%!")
+application/x-hpgl		hpgl
+
+########################################################################
+#
+# Image files...
+#
+
+image/gif			gif
+image/png			png
+image/jpeg			jpeg jpg jpe
+image/tiff			tiff tif        
+image/x-portable-anymap		pnm
+image/x-portable-bitmap		pbm
+image/x-portable-graymap	pgm
+image/x-portable-pixmap		ppm
+image/x-rgb			rgb
+image/x-xbitmap			xbm
+image/x-xpixmap			xpm
+image/x-xwindowdump		xwd
+
+########################################################################
+#
+# Text files...
+#
+
+text/html			html htm printable(0,1024) +\
+				(string(0,"<HTML>") string(0,"<!DOCTYPE"))
+text/plain			txt ascii(0,1024)
+text/iso8859-1			printable(0,1024) +\
+				(locale("C") locale("POSIX") locale("af")\
+				 locale("ca") locale("da") locale("de")\
+				 locale("de_AT") locale("de_CH") locale("en")\
+				 locale("en_AU") locale("en_CA")\
+				 locale("en_US") locale("es") locale("es_AR")\
+				 locale("es_MX") locale("eu") locale("fi")\
+				 locale("fo") locale("fr") locale("fr_BE")\
+				 locale("fr_CA") locale("fr_CH") locale("ga")\
+				 locale("gd") locale("is") locale("it")\
+				 locale("it_CH") locale("nl") locale("nl_BE")\
+				 locale("no") locale("pt") locale("pt_BR")\
+				 locale("rm") locale("sq") locale("sv")\
+				 locale("sw"))
+# TODO: add text/iso8859-[23456789...] rules
+
+########################################################################
+#
+# CUPS-specific types...
+#
+
+cups/postscript
+cups/raster
+
+#
+# End of "$Id: mime.types,v 1.1 1998/08/06 14:39:36 mike Exp $".
+#

@@ -1,0 +1,69 @@
+#
+# "$Id: mime.convs,v 1.1 1998/08/06 14:39:36 mike Exp $"
+#
+#   MIME converts file for the Common UNIX Printing System (CUPS).
+#
+#   Copyright 1997-1998 by Easy Software Products, all rights reserved.
+#
+#   These coded instructions, statements, and computer programs are the
+#   property of Easy Software Products and are protected by Federal
+#   copyright law.  Distribution and use rights are outlined in the file
+#   "LICENSE.txt" which should have been included with this file.  If this
+#   file is missing or damaged please contact Easy Software Products
+#   at:
+#
+#       Attn: CUPS Licensing Information
+#       Easy Software Products
+#       44145 Airport View Drive, Suite 204
+#       Hollywood, Maryland 20636-3111 USA
+#
+#       Voice: (301) 373-9603
+#       EMail: cups-info@cups.org
+#         WWW: http://www.cups.org
+#
+# Revision History:
+#
+#   $Log: mime.convs,v $
+#   Revision 1.1  1998/08/06 14:39:36  mike
+#   Initial revision
+#
+
+########################################################################
+#
+# Format of Lines:
+#
+#   source/type destination/type cost filter
+#
+# General Notes:
+#
+#   Currently the "cost" field is not used (all filters are assumed to
+#   be equally costly in terms of speed/memory).  Also, a filter program
+#   *must* accept the standard command-line arguments (job-id, user, title,
+#   copies,options,[filename or stdin]) or this won't work.
+#
+
+########################################################################
+#
+# PostScript filters
+#
+
+application/msword	application/postscript	50	msword2ps
+application/pdf		application/postscript	50	pdf2ps
+application/postscript	cups/postscript		50	ps2ps
+application/x-hpgl	application/postscript	50	hpgl2ps
+image/*			application/postscript	50	img2ps
+text/html		application/postscript	50	html2ps
+text/plain		application/postscript	50	text2ps
+text/iso8859-1		application/postscript	50	iso2ps
+
+########################################################################
+#
+# Raster filters...
+#
+
+image/*			cups/raster		50	imgrip
+cups/postscript		cups/raster		50	gsrip
+
+#
+# End of "$Id: mime.convs,v 1.1 1998/08/06 14:39:36 mike Exp $".
+#
