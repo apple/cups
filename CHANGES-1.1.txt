@@ -3,6 +3,9 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.16
 
+	- The texttops filter didn't handle prettyprint=no.
+	- The text and HP-GL/2 filters didn't check for other
+	  common duplex option names like cupsMarkOptions() did.
 	- "lpoptions -x printer" no longer clears the "default
 	  printer" status of the printer.
 	- cupsTempFd() now stops trying to create a temporary

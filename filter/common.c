@@ -1,5 +1,5 @@
 /*
- * "$Id: common.c,v 1.15.2.5 2002/05/14 16:24:22 mike Exp $"
+ * "$Id: common.c,v 1.15.2.6 2002/08/19 16:49:52 mike Exp $"
  *
  *   Common filter routines for the Common UNIX Printing System (CUPS).
  *
@@ -95,7 +95,9 @@ SetCommonOptions(int           num_options,	/* I - Number of options */
     LanguageLevel = ppd->language_level;
   }
 
-  if ((val = cupsGetOption("landscape", num_options, options)) != NULL)
+  if ((val = cupsGetOption("landscape", num_options, options)) != NULL &&
+      strcasecmp(val, "no") != 0 && strcasecmp(val, "off") != 0 &&
+      strcasecmp(val, "false") != 0)
     Orientation = 1;
 
   if ((val = cupsGetOption("orientation-requested", num_options, options)) != NULL)
@@ -199,8 +201,23 @@ SetCommonOptions(int           num_options,	/* I - Number of options */
   else if ((val = cupsGetOption("Duplex", num_options, options)) != NULL &&
            strncasecmp(val, "Duplex", 6) == 0)
     Duplex = 1;
+  else if ((val = cupsGetOption("JCLDuplex", num_options, options)) != NULL &&
+           strncasecmp(val, "Duplex", 6) == 0)
+    Duplex = 1;
+  else if ((val = cupsGetOption("EFDuplex", num_options, options)) != NULL &&
+           strncasecmp(val, "Duplex", 6) == 0)
+    Duplex = 1;
+  else if ((val = cupsGetOption("KD03Duplex", num_options, options)) != NULL &&
+           strncasecmp(val, "Duplex", 6) == 0)
+    Duplex = 1;
   else if (ppdIsMarked(ppd, "Duplex", "DuplexNoTumble") ||
-           ppdIsMarked(ppd, "Duplex", "DuplexTumble"))
+           ppdIsMarked(ppd, "Duplex", "DuplexTumble") ||
+	   ppdIsMarked(ppd, "JCLDuplex", "DuplexNoTumble") ||
+           ppdIsMarked(ppd, "JCLDuplex", "DuplexTumble") ||
+	   ppdIsMarked(ppd, "EFDuplex", "DuplexNoTumble") ||
+           ppdIsMarked(ppd, "EFDuplex", "DuplexTumble") ||
+	   ppdIsMarked(ppd, "KD03Duplex", "DuplexNoTumble") ||
+           ppdIsMarked(ppd, "KD03Duplex", "DuplexTumble"))
     Duplex = 1;
 
   return (ppd);
@@ -422,5 +439,5 @@ WriteLabels(int orient)	/* I - Orientation of the page */
 
 
 /*
- * End of "$Id: common.c,v 1.15.2.5 2002/05/14 16:24:22 mike Exp $".
+ * End of "$Id: common.c,v 1.15.2.6 2002/08/19 16:49:52 mike Exp $".
  */
