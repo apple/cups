@@ -68,7 +68,6 @@ public class CUPS
       if (http == null)
       {
         String url_str = site + dest;
-System.out.println("\nDest: " + url_str + "\n");
 
         try
         {

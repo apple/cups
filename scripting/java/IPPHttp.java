@@ -286,7 +286,7 @@ public class IPPHttp
     while (!done)
     {
         s = read_line();
-        System.out.println( s );
+        // System.out.println( s );
 
         if (s.startsWith("Content-Length:"))
         {
@@ -414,7 +414,7 @@ public class IPPHttp
         case IPPDefs.HEADER :
           if (read_buffer_remaining < 8)
 	  {
-	    System.out.println("\nippRead: Unable to read header!\n" );
+	    // System.out.println("\nippRead: Unable to read header!\n" );
 	    return (null);
 	  }
 
@@ -423,8 +423,8 @@ public class IPPHttp
 	  //
 	  if (buffer[0] != (char)1)
 	  {
-	    System.out.println("ippRead: version number is bad: " 
-                              + (int)buffer[0] + "." + (int)buffer[1] + "\n");
+	    // System.out.println("ippRead: version number is bad: " 
+            //                  + (int)buffer[0] + "." + (int)buffer[1] + "\n");
 	    return (null);
 	  }
 
