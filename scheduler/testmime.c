@@ -1,5 +1,5 @@
 /*
- * "$Id: testmime.c,v 1.4 2001/02/02 19:38:45 mike Exp $"
+ * "$Id: testmime.c,v 1.5 2001/06/05 18:28:43 mike Exp $"
  *
  *   MIME test program for the Common UNIX Printing System (CUPS).
  *
@@ -86,6 +86,7 @@ main(int  argc,				/* I - Number of command-line args */
   {
     default :
         fputs("Usage: testmime source-file [destination-type]\n", stderr);
+	mimeDelete(mime);
 	return (1);
 
     case 2 :
@@ -94,11 +95,13 @@ main(int  argc,				/* I - Number of command-line args */
 	if (src != NULL)
 	{
 	  printf("%s: %s/%s\n", argv[1], src->super, src->type);
+	  mimeDelete(mime);
 	  return (0);
 	}
 	else
 	{
 	  printf("%s: unknown\n", argv[1]);
+	  mimeDelete(mime);
 	  return (1);
 	}
 
@@ -113,6 +116,7 @@ main(int  argc,				/* I - Number of command-line args */
         if (filters == NULL)
 	{
 	  printf("No filters to convert from %s to %s.\n", argv[1], argv[2]);
+	  mimeDelete(mime);
 	  return (1);
 	}
 	else
@@ -123,6 +127,7 @@ main(int  argc,				/* I - Number of command-line args */
 	    else
 	      puts(filters[i].filter);
 
+	  mimeDelete(mime);
           return (0);
 	}
   }
@@ -219,5 +224,5 @@ print_rules(mime_magic_t *rules)	/* I - Rules to print */
 
 
 /*
- * End of "$Id: testmime.c,v 1.4 2001/02/02 19:38:45 mike Exp $".
+ * End of "$Id: testmime.c,v 1.5 2001/06/05 18:28:43 mike Exp $".
  */

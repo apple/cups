@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.74 2001/04/24 14:22:01 mike Exp $"
+ * "$Id: dirsvc.c,v 1.75 2001/06/05 18:28:43 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -115,6 +115,9 @@ StartBrowsing(void)
   * Finally, add the socket to the input selection set...
   */
 
+  LogMessage(L_DEBUG2, "StartBrowsing: Adding fd %d to InputSet...",
+             BrowseSocket);
+
   FD_SET(BrowseSocket, &InputSet);
 }
 
@@ -140,6 +143,9 @@ StopBrowsing(void)
 #else
     close(BrowseSocket);
 #endif /* WIN32 || __EMX__ */
+
+    LogMessage(L_DEBUG2, "StopBrowsing: Removing fd %d from InputSet...",
+               BrowseSocket);
 
     FD_CLR(BrowseSocket, &InputSet);
     BrowseSocket = 0;
@@ -955,5 +961,5 @@ StopPolling(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.74 2001/04/24 14:22:01 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.75 2001/06/05 18:28:43 mike Exp $".
  */

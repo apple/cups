@@ -1,5 +1,5 @@
 /*
- * "$Id: listen.c,v 1.9 2001/02/20 22:02:11 mike Exp $"
+ * "$Id: listen.c,v 1.10 2001/06/05 18:28:43 mike Exp $"
  *
  *   Server listening routines for the Common UNIX Printing System (CUPS)
  *   scheduler.
@@ -57,7 +57,12 @@ PauseListening(void)
   LogMessage(L_DEBUG, "PauseListening: clearing input bits...");
 
   for (i = NumListeners, lis = Listeners; i > 0; i --, lis ++)
+  {
+    LogMessage(L_DEBUG2, "PauseListening: Removing fd %d from InputSet...",
+               lis->fd);
+
     FD_CLR(lis->fd, &InputSet);
+  }
 }
 
 
@@ -81,7 +86,12 @@ ResumeListening(void)
   LogMessage(L_DEBUG, "ResumeListening: setting input bits...");
 
   for (i = NumListeners, lis = Listeners; i > 0; i --, lis ++)
+  {
+    LogMessage(L_DEBUG2, "ResumeListening: Adding fd %d to InputSet...",
+               lis->fd);
+
     FD_SET(lis->fd, &InputSet);
+  }
 }
 
 
@@ -208,5 +218,5 @@ StopListening(void)
 
 
 /*
- * End of "$Id: listen.c,v 1.9 2001/02/20 22:02:11 mike Exp $".
+ * End of "$Id: listen.c,v 1.10 2001/06/05 18:28:43 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.95 2001/06/05 15:36:41 mike Exp $"
+ * "$Id: client.c,v 1.96 2001/06/05 18:28:43 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -226,7 +226,7 @@ AcceptClient(listener_t *lis)	/* I - Listener socket */
 
   fcntl(con->http.fd, F_SETFD, fcntl(con->http.fd, F_GETFD) | FD_CLOEXEC);
 
-  LogMessage(L_DEBUG2, "AcceptClient() Adding fd %d to InputSet...",
+  LogMessage(L_DEBUG2, "AcceptClient: Adding fd %d to InputSet...",
              con->http.fd);
   FD_SET(con->http.fd, &InputSet);
 
@@ -335,9 +335,9 @@ CloseClient(client_t *con)	/* I - Client to close */
       waitpid(con->pipe_pid, &status, WNOHANG);
     }
 
-    LogMessage(L_DEBUG2, "CloseClient() %d Closing data file %d.",
+    LogMessage(L_DEBUG2, "CloseClient: %d Closing data file %d.",
                con->http.fd, con->file);
-    LogMessage(L_DEBUG2, "CloseClient() %d Removing fd %d from InputSet.",
+    LogMessage(L_DEBUG2, "CloseClient: %d Removing fd %d from InputSet.",
                con->http.fd, con->file);
 
     FD_CLR(con->file, &InputSet);
@@ -1582,21 +1582,21 @@ WriteClient(client_t *con)		/* I - Client connection */
 
     con->http.state = HTTP_WAITING;
 
-    LogMessage(L_DEBUG2, "WriteClient() Removing fd %d from OutputSet...",
+    LogMessage(L_DEBUG2, "WriteClient: Removing fd %d from OutputSet...",
                con->http.fd);
 
     FD_CLR(con->http.fd, &OutputSet);
 
     if (con->file)
     {
-      LogMessage(L_DEBUG2, "WriteClient() Removing fd %d from InputSet...",
+      LogMessage(L_DEBUG2, "WriteClient: Removing fd %d from InputSet...",
                  con->file);
       FD_CLR(con->file, &InputSet);
 
       if (con->pipe_pid)
 	kill(con->pipe_pid, SIGTERM);
 
-      LogMessage(L_DEBUG2, "WriteClient() %d Closing data file %d.",
+      LogMessage(L_DEBUG2, "WriteClient: %d Closing data file %d.",
                  con->http.fd, con->file);
 
       close(con->file);
@@ -1606,7 +1606,7 @@ WriteClient(client_t *con)		/* I - Client connection */
 
     if (con->filename[0])
     {
-      LogMessage(L_DEBUG2, "WriteClient() %d Removing temp file %s",
+      LogMessage(L_DEBUG2, "WriteClient: %d Removing temp file %s",
                  con->http.fd, con->filename);
       unlink(con->filename);
     }
@@ -2121,5 +2121,5 @@ pipe_command(client_t *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.95 2001/06/05 15:36:41 mike Exp $".
+ * End of "$Id: client.c,v 1.96 2001/06/05 18:28:43 mike Exp $".
  */
