@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c,v 1.104 2003/06/14 16:08:20 mike Exp $"
+ * "$Id: ppd.c,v 1.105 2003/06/14 16:15:05 mike Exp $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -455,7 +455,7 @@ ppdOpen(FILE *fp)			/* I - File to read from */
   * Allocate memory for the PPD file record...
   */
 
-  if ((ppd = calloc(sizeof(ppd_file_t), 1)) == NULL)
+  if ((ppd = calloc(1, sizeof(ppd_file_t))) == NULL)
   {
     ppd_status = PPD_ALLOC_ERROR;
 
@@ -2911,5 +2911,5 @@ ppd_read(FILE *fp,			/* I - File to read from */
 
 
 /*
- * End of "$Id: ppd.c,v 1.104 2003/06/14 16:08:20 mike Exp $".
+ * End of "$Id: ppd.c,v 1.105 2003/06/14 16:15:05 mike Exp $".
  */
