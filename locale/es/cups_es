@@ -1,125 +1,114 @@
 iso-8859-1
 OK
-Cancel
-Help
-Quit
-Close
-Yes
-No
-Auto
-On
-Off
-Save
-Discard
-Default
-User-Defined
-Options
-More Info
-Black
-Colour
-Cyan
-Magenta
-Yellow
-Copyright
-All Rights Reserved
-General
-Printer
-PostScript
-Image
-Text
-HPGL
-Extra
-Print Banner Page
-Verbose Logging
-Print Pages
-Document
-Entire Document
-Page Range
-Reverse Order
-Page Format
- 1-Up
- 2-Up
- 4-Up
-Image Scaling
-Use Natural Image Size
-Zoom by Percent
-Zoom by PPI
-Mirror Image
-Rotate Image
-Best Fit
-Colour Saturation
-Colour Hue
-Number of Columns
-Margins
-Wrap Text
-Fit to Page
-Shading
-Default Pen Width
-Gamma Correction
-Brightness
-Colour Profile
-Add Printer
-Delete Printer
-Modify Printer
-Printer URI
-Printer Name
-Printer Location
-Printer Info
-Printer Make and Model
-Device URI
-Formatting Page
-Printing Page
-Initializing Printer
-Printer State
-Accepting Jobs
-Not Accepting Jobs
-Print Jobs
-Class
-Local
-Remote
-Duplexing
-Stapling
-Fast Copies
-Collated Copies
-Hole Punching
-Covering
-Binding
-Sorting
-Small (up to 241x356mm)
-Medium (241x356mm to 330x483mm)
-Large (330x483mm and larger)
-Custom Size
-Idle
-Processing
-Stopped
-All
-Odd
-Even Pages
-Other
-Media Size
-Media Type
-Media Source
-Portrait
-Landscape
-400 Your browser sent a request that this server could not understand.
-This server could not verify that you are authorized to access the resource.
-You must pay to access this server.
-You don't have permission to access the resource on this server.
-The requested resource was not found on this server.
-The requested method is not allowed with the resource.
-An appropriate representation for the resource was not found on this server.
-You don't have permission to use this server as a proxy host.
-The request has taken too long to complete and has been aborted.
-The requested resource has more than one value.
-The requested resource is gone and has not been replaced.
-The requested method requires a valid Content-Length.
-The precondition on the request evaluated to false.
-The request is too large for this server to process.
-The request URI is too large for this server to process.
-The request format is not understood by this server.
-500 The server has detected an unrecoverable error and cannot process your request.
-The requested method is not implemented by this server.
-The proxy server received an invalid response from an upstream server.
-The requested resource is currently unavailable on this server.
-The proxy server has taken too long to respond to this server.
-This server does not support the HTTP version required by your browser.
+Cancelación 
+Ayuda 
+Salido 
+Cercano 
+Sí 
+No 
+En 
+De 
+Excepto 
+Descarte 
+Valor por defecto 
+Opciones 
+Más Info 
+Negro 
+Color 
+Ciánico 
+Magenta 
+Amarillo 
+El copyright 1993-1999 por Easy Software Products, todos endereza reservado. 
+General 
+Impresora 
+Opciones De la Imagen
+Opciones De HP-GL/2
+Suplemento 
+Documento 
+Otro 
+Paginaciones De la Impresión: 
+Entero Documento 
+Rango De Paginación: 
+Orden Reversa: 
+Formato De la Paginación: 
+ 1-Up 
+ 2-Up 
+ 4-Up 
+Escalamiento De la Imagen: 
+Talla Natural De la Imagen Del Uso 
+Zoom de Percent 
+Zoom de PPI 
+Imagen Del Espejo: 
+Saturación Del Color: 
+Tonalidad Del Color: 
+Quepa para paginar: 
+Sombreando: 
+Anchura De la Pluma: 
+Corrección Gamma: 
+Brillo: 
+Agregue 
+Cancelación 
+Modifiqúese 
+URI De la Impresora 
+Nombre De la Impresora 
+Localización De la Impresora 
+Impresora Info 
+La impresora hace y modela 
+URI Del Dispositivo 
+Paginación Del Formato 
+Imprimiendo La Paginación 
+De Incialización Impresora 
+Estado De la Impresora 
+Validando Trabajos 
+No validando Trabajos 
+Trabajos De Impresión 
+Clase 
+Local 
+Telecontrol 
+Duplexing 
+Sujetando con grapa 
+Rápidas Copias 
+Clasificadas Copias 
+Perforación Del Agujero 
+Cubierta 
+Atando 
+Clasificando 
+Pequeño (los hasta 9.5x14in) 
+Media (los 9.5x14in a el 13x19in) 
+Grande (el 13x19in y más grande) 
+De encargo Talla 
+Marcha lenta 
+Procesando 
+Parado 
+Todo 
+Impar 
+Uniformes Paginaciones 
+Más Oscuro       Más Brillante
+Talla De Media 
+Tipo De Media 
+Fuente De los Media 
+Orientación: 
+Retrato 
+Paisaje 
+400 Su browser envió una petición que este servidor no podría entender. 
+Este servidor no podría verificar que le autoricen a tener acceso al recurso. 
+Usted debe pagar tener acceso a este servidor. 
+Usted no tiene permiso de tener acceso al recurso en este servidor. 
+El recurso solicitado no fue encontrado en este servidor. 
+El método solicitado no se permite con el recurso. 
+Una representación apropiada para el recurso no fue encontrada en este servidor. 
+Usted no tiene permiso de utilizar este servidor como ordenador principal del poder. 
+La petición ha durado demasiado para terminar y se ha abortado. 
+El recurso solicitado tiene más de un valor. 
+Se va y no se ha substituido el recurso solicitado. 
+El método solicitado requiere un Content-Length válido. 
+La condición previa en la petición evaluó a falso. 
+La petición es demasiado grande para que este servidor procese. 
+El URI de la petición es demasiado grande para que este servidor procese. 
+El formato de la petición no es entendido por este servidor. 
+500 El servidor ha detectado un error irrecuperable y no puede procesar su petición. 
+El método solicitado no es puesto en ejecución por este servidor. 
+El proxy server recibió una respuesta inválida de un servidor por aguas arriba. 
+El recurso solicitado es actualmente inasequible en este servidor. 
+El proxy server ha durado demasiado para responder a este servidor. 
+Este servidor no utiliza la versión del HTTP requerida por su browser. 
