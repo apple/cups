@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgltops.h,v 1.4 1998/08/31 20:35:49 mike Exp $"
+ * "$Id: hpgltops.h,v 1.5 1999/02/17 21:51:57 mike Exp $"
  *
  *   HPGL to PostScript conversion program header file for espPrint, a
  *   collection of printer/image software.
@@ -15,7 +15,17 @@
  * Revision History:
  *
  *   $Log: hpgltops.h,v $
- *   Revision 1.4  1998/08/31 20:35:49  mike
+ *   Revision 1.5  1999/02/17 21:51:57  mike
+ *   Updated scaling code to ignore the PlotSize.
+ *
+ *   Added support for IW command.
+ *
+ *   Revision 1.4  1998/08/31  20:35:49  mike
+ *   Updated pen width code to automatically adjust scaling as needed.
+ *   Updated PS code to adjust width/height by a factor of 0.75 for better
+ *   scaling of plots.
+ *
+ *   Revision 1.4  1998/08/31  20:35:49  mike
  *   Updated pen width code to automatically adjust scaling as needed.
  *   Updated PS code to adjust width/height by a factor of 0.75 for better
  *   scaling of plots.
@@ -86,7 +96,9 @@ VAR FILE	*InputFile,			/* Input file */
 		*OutputFile;			/* Output file */
 
 VAR int		P1[2],				/* Lower-lefthand physical limit */
-		P2[2];				/* Upper-righthand physical limit */
+		P2[2],				/* Upper-righthand physical limit */
+		IW1[2],				/* Window lower-lefthand limit */
+		IW2[2];				/* Window upper-righthand limit */
 VAR int		Rotation	VALUE(0);	/* Page rotation */
 VAR int		ScalingType	VALUE(-1);	/* Type of scaling (-1 for none) */
 VAR float	Scaling1[2],			/* Lower-lefthand user limit */
@@ -205,5 +217,5 @@ extern int	OutputProlog(int shading, float penwidth);
 extern int	OutputTrailer(void);
 
 /*
- * End of "$Id: hpgltops.h,v 1.4 1998/08/31 20:35:49 mike Exp $".
+ * End of "$Id: hpgltops.h,v 1.5 1999/02/17 21:51:57 mike Exp $".
  */

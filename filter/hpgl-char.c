@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-char.c,v 1.2 1996/10/14 16:50:14 mike Exp $"
+ * "$Id: hpgl-char.c,v 1.3 1999/02/17 21:51:57 mike Exp $"
  *
  *   HPGL character processing for espPrint, a collection of printer drivers.
  *
@@ -16,7 +16,19 @@
  * Revision History:
  *
  *   $Log: hpgl-char.c,v $
- *   Revision 1.2  1996/10/14 16:50:14  mike
+ *   Revision 1.3  1999/02/17 21:51:57  mike
+ *   Updated scaling code to ignore the PlotSize.
+ *
+ *   Added support for IW command.
+ *
+ *   Revision 1.2  1996/10/14  16:50:14  mike
+ *   Updated for 3.2 release.
+ *   Added 'blackplot', grayscale, and default pen width options.
+ *   Added encoded polyline support.
+ *   Added fit-to-page code.
+ *   Added pen color palette support.
+ *
+ *   Revision 1.2  1996/10/14  16:50:14  mike
  *   Updated for 3.2 release.
  *   Added 'blackplot', grayscale, and default pen width options.
  *   Added encoded polyline support.
@@ -278,6 +290,6 @@ TD_transparent_data(int num_params, param_t *params)
 
 
 /*
- * End of "$Id: hpgl-char.c,v 1.2 1996/10/14 16:50:14 mike Exp $".
+ * End of "$Id: hpgl-char.c,v 1.3 1999/02/17 21:51:57 mike Exp $".
  */
 

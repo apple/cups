@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-input.c,v 1.3 1997/05/02 14:52:03 mike Exp $"
+ * "$Id: hpgl-input.c,v 1.4 1999/02/17 21:51:57 mike Exp $"
  *
  *   HPGL input processing for espPrint, a collection of printer drivers.
  *
@@ -19,7 +19,16 @@
  * Revision History:
  *
  *   $Log: hpgl-input.c,v $
- *   Revision 1.3  1997/05/02 14:52:03  mike
+ *   Revision 1.4  1999/02/17 21:51:57  mike
+ *   Updated scaling code to ignore the PlotSize.
+ *
+ *   Added support for IW command.
+ *
+ *   Revision 1.3  1997/05/02  14:52:03  mike
+ *   Updated ParseCommand() to range-check parameter buffer additions.
+ *   Increased the maximum number of parameters from 1000 to 16384.
+ *
+ *   Revision 1.3  1997/05/02  14:52:03  mike
  *   Updated ParseCommand() to range-check parameter buffer additions.
  *   Increased the maximum number of parameters from 1000 to 16384.
  *
@@ -234,5 +243,5 @@ FreeParameters(int     num_params, /* I - Number of parameters */
 
 
 /*
- * End of "$Id: hpgl-input.c,v 1.3 1997/05/02 14:52:03 mike Exp $".
+ * End of "$Id: hpgl-input.c,v 1.4 1999/02/17 21:51:57 mike Exp $".
  */

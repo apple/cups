@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-attr.c,v 1.4 1998/08/31 20:35:49 mike Exp $"
+ * "$Id: hpgl-attr.c,v 1.5 1999/02/17 21:51:57 mike Exp $"
  *
  *   HPGL attribute processing for espPrint, a collection of printer drivers.
  *
@@ -16,7 +16,17 @@
  * Revision History:
  *
  *   $Log: hpgl-attr.c,v $
- *   Revision 1.4  1998/08/31 20:35:49  mike
+ *   Revision 1.5  1999/02/17 21:51:57  mike
+ *   Updated scaling code to ignore the PlotSize.
+ *
+ *   Added support for IW command.
+ *
+ *   Revision 1.4  1998/08/31  20:35:49  mike
+ *   Updated pen width code to automatically adjust scaling as needed.
+ *   Updated PS code to adjust width/height by a factor of 0.75 for better
+ *   scaling of plots.
+ *
+ *   Revision 1.4  1998/08/31  20:35:49  mike
  *   Updated pen width code to automatically adjust scaling as needed.
  *   Updated PS code to adjust width/height by a factor of 0.75 for better
  *   scaling of plots.
@@ -277,5 +287,5 @@ WU_width_units(int num_params, param_t *params)
 
 
 /*
- * End of "$Id: hpgl-attr.c,v 1.4 1998/08/31 20:35:49 mike Exp $".
+ * End of "$Id: hpgl-attr.c,v 1.5 1999/02/17 21:51:57 mike Exp $".
  */

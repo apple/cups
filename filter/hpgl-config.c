@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-config.c,v 1.8 1998/09/16 14:37:29 mike Exp $"
+ * "$Id: hpgl-config.c,v 1.9 1999/02/17 21:51:57 mike Exp $"
  *
  *   HPGL configuration routines for espPrint, a collection of printer drivers.
  *
@@ -16,7 +16,12 @@
  * Revision History:
  *
  *   $Log: hpgl-config.c,v $
- *   Revision 1.8  1998/09/16 14:37:29  mike
+ *   Revision 1.9  1999/02/17 21:51:57  mike
+ *   Updated scaling code to ignore the PlotSize.
+ *
+ *   Added support for IW command.
+ *
+ *   Revision 1.8  1998/09/16  14:37:29  mike
  *   Fixed landscape printing bug.
  *   Fixed margins when page is rotated.
  *
@@ -68,50 +73,53 @@ update_transform(void)
 {
   float p1[2], p2[2];
   float	width, height;
+  float	xoff, yoff;
   float	plotsize[2];
   float	scaling,
 	pen_scaling;
 
 
+  width  = IW2[0] - IW1[0];
+  height = IW2[1] - IW1[1];
+
+  if (width == 0 || height == 0)
+    return;
+
   if (FitPlot)
   {
-    width  = PageWidth;
-    height = PageHeight;
-
     if (Rotation == 0 || Rotation == 180)
     {
-      scaling = PageWidth / PlotSize[0];
+      scaling = PageWidth / width;
 
-      if (scaling > (PageHeight / PlotSize[1]))
+      if (scaling > (PageHeight / height))
       {
-	if ((scaling * PlotSize[1]) > PageHeight)
-          scaling = PageHeight / PlotSize[1];
+	if ((scaling * height) > PageHeight)
+          scaling = PageHeight / height;
       }
-      else if ((PageHeight / PlotSize[1] * PlotSize[0]) <= PageWidth)
-        scaling = PageHeight / PlotSize[1];
+      else if ((PageHeight / height * width) <= PageWidth)
+        scaling = PageHeight / height;
     }
     else
     {
-      scaling = PageWidth / PlotSize[1];
+      scaling = PageWidth / height;
 
-      if (scaling > (PageHeight / PlotSize[0]))
+      if (scaling > (PageHeight / width))
       {
-	if ((scaling * PlotSize[0]) > PageHeight)
-          scaling = PageHeight / PlotSize[0];
+	if ((scaling * width) > PageHeight)
+          scaling = PageHeight / width;
       }
-      else if ((PageHeight / PlotSize[0] * PlotSize[1]) <= PageWidth)
-        scaling = PageHeight / PlotSize[0];
+      else if ((PageHeight / width * height) <= PageWidth)
+        scaling = PageHeight / width;
     };
 
-    plotsize[0] = PlotSize[0] * scaling;
-    plotsize[1] = PlotSize[1] * scaling;
+    plotsize[0] = width * scaling;
+    plotsize[1] = height * scaling;
   }
   else
   {
-    width       = PlotSize[0];
-    height      = PlotSize[1];
-    plotsize[0] = PlotSize[0];
-    plotsize[1] = PlotSize[1];
+    plotsize[0] = width * 72.0 / 1016.0;
+    plotsize[1] = height * 72.0 / 1016.0;
+    scaling     = 72.0 / 1016.0;
   };
 
   switch (ScalingType)
@@ -149,46 +157,53 @@ update_transform(void)
   switch (Rotation)
   {
     case 0 :
-	Transform[0][0] = plotsize[0] / (p2[0] - p1[0]);
+	Transform[0][0] = scaling;
 	Transform[0][1] = 0.0;
-	Transform[0][2] = p1[0] * Transform[0][0];
+	Transform[0][2] = -IW1[0] * scaling;
 	Transform[1][0] = 0.0;
-	Transform[1][1] = plotsize[1] / (p2[1] - p1[1]);
-	Transform[1][2] = p1[1] * Transform[1][1];
+	Transform[1][1] = scaling;
+	Transform[1][2] = -IW1[1] * scaling;
 	break;
 
     case 90 :
 	Transform[0][0] = 0.0;
-	Transform[0][1] = -plotsize[0] / (p2[0] - p1[0]);
-	Transform[0][2] = width + p1[0] * Transform[0][1];
-	Transform[1][0] = plotsize[1] / (p2[1] - p1[1]);
+	Transform[0][1] = -scaling;
+	Transform[0][2] = (height - IW1[0]) * scaling;
+	Transform[1][0] = scaling;
 	Transform[1][1] = 0.0;
-	Transform[1][2] = p1[1] * Transform[1][0];
+	Transform[1][2] = -IW1[1] * scaling;
 	break;
 
     case 180 :
-	Transform[0][0] = -plotsize[0] / (p2[0] - p1[0]);
+	Transform[0][0] = -scaling;
 	Transform[0][1] = 0.0;
-	Transform[0][2] = width + p1[0] * Transform[0][0];
+	Transform[0][2] = (height - IW1[0]) * scaling;
 	Transform[1][0] = 0.0;
-	Transform[1][1] = -plotsize[1] / (p2[1] - p1[1]);
-	Transform[1][2] = height + p1[1] * Transform[1][1];
+	Transform[1][1] = -scaling;
+	Transform[1][2] = (width - IW1[1]) * scaling;
 	break;
 
     case 270 :
 	Transform[0][0] = 0.0;
-	Transform[0][1] = plotsize[0] / (p2[0] - p1[0]);
-	Transform[0][2] = p1[0] * Transform[0][1];
-	Transform[1][0] = -plotsize[1] / (p2[1] - p1[1]);
+	Transform[0][1] = scaling;
+	Transform[0][2] = -IW1[0] * scaling;
+	Transform[1][0] = -scaling;
 	Transform[1][1] = 0.0;
-	Transform[1][2] = height + p1[1] * Transform[1][0];
+	Transform[1][2] = (width - IW1[1]) * scaling;
 	break;
   };
 
   if (Verbosity)
   {
-    fprintf(stderr, "hpgl2ps: P1 = { %f %f }, P2 = { %f %f }\n",
+    fprintf(stderr, "hpgl2ps: IW1 = { %d %d }, IW2 = { %d %d }\n",
+            IW1[0], IW1[1], IW2[0], IW2[1]);
+    fprintf(stderr, "hpgl2ps: P1 = { %d %d }, P2 = { %d %d }\n",
             P1[0], P1[1], P2[0], P2[1]);
+    fprintf(stderr, "hpgl2ps: PlotSize = { %f %f }\n",
+            PlotSize[0], PlotSize[1]);
+    fprintf(stderr, "hpgl2ps: Rotation = %d\n", Rotation);
+    fprintf(stderr, "hpgl2ps: Scaling1 = { %d %d }, Scaling2 = { %d %d }\n",
+            Scaling1[0], Scaling1[1], Scaling2[0], Scaling2[1]);
     fprintf(stderr, "hpgl2ps: p1 = { %f %f }, p2 = { %f %f }\n",
             p1[0], p1[1], p2[0], p2[1]);
     fprintf(stderr, "hpgl2ps: width = %f, height = %f\n", width, height);
@@ -289,6 +304,11 @@ IP_input_absolute(int num_params, param_t *params)
     P2[1] = params[3].value.number;
   };
 
+  IW1[0] = P1[0];
+  IW1[1] = P1[1];
+  IW2[0] = P2[0];
+  IW2[1] = P2[1];
+
   update_transform();
 }
 
@@ -320,6 +340,11 @@ IR_input_relative(int num_params, param_t *params)
     P2[1] = params[3].value.number * PageHeight / 72.0 * 1016.0 / 100.0;
   };
 
+  IW1[0] = P1[0];
+  IW1[1] = P1[1];
+  IW2[0] = P2[0];
+  IW2[1] = P2[1];
+
   update_transform();
 }
 
@@ -327,6 +352,22 @@ IR_input_relative(int num_params, param_t *params)
 void
 IW_input_window(int num_params, param_t *params)
 {
+  if (num_params == 0)
+  {
+    IW1[0] = P1[0];
+    IW1[1] = P1[1];
+    IW2[0] = P2[0];
+    IW2[1] = P2[1];
+  }
+  else if (num_params == 4)
+  {
+    IW1[0] = params[0].value.number;
+    IW1[1] = params[1].value.number;
+    IW2[0] = params[2].value.number;
+    IW2[1] = params[3].value.number;
+  };
+
+  update_transform();
 }
 
 
@@ -405,12 +446,6 @@ PS_plot_size(int num_params, param_t *params)
   */
 
   IP_input_absolute(0, NULL);
-
- /*
-  * Update the transform matrix...
-  */
-
-  update_transform();
 }
 
 
@@ -456,5 +491,5 @@ SC_scale(int num_params, param_t *params)
 
 
 /*
- * End of "$Id: hpgl-config.c,v 1.8 1998/09/16 14:37:29 mike Exp $".
+ * End of "$Id: hpgl-config.c,v 1.9 1999/02/17 21:51:57 mike Exp $".
  */
