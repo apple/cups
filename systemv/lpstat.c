@@ -1,5 +1,5 @@
 /*
- * "$Id: lpstat.c,v 1.18 2000/02/24 02:18:57 mike Exp $"
+ * "$Id: lpstat.c,v 1.19 2000/02/25 16:39:42 mike Exp $"
  *
  *   "lpstat" command for the Common UNIX Printing System (CUPS).
  *
@@ -1210,6 +1210,7 @@ show_printers(http_t     *http,	/* I - HTTP connection to server */
 		*response,	/* IPP Response */
 		*jobs;		/* IPP Get Jobs response */
   ipp_attribute_t *attr;	/* Current attribute */
+  ipp_attribute_t *jobattr;	/* Job ID attribute */
   cups_lang_t	*language;	/* Default language */
   const char	*printer,	/* Printer name */
 		*message;	/* Printer state message */
@@ -1414,8 +1415,8 @@ show_printers(http_t     *http,	/* I - HTTP connection to server */
 
           if ((jobs = cupsDoRequest(http, request, "/jobs/")) != NULL)
 	  {
-	    if ((attr = ippFindAttribute(jobs, "job-id", IPP_TAG_INTEGER)) != NULL)
-              jobid = attr->values[0].integer;
+	    if ((jobattr = ippFindAttribute(jobs, "job-id", IPP_TAG_INTEGER)) != NULL)
+              jobid = jobattr->values[0].integer;
 
             ippDelete(jobs);
 	  }
@@ -1464,5 +1465,5 @@ show_scheduler(http_t *http)	/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpstat.c,v 1.18 2000/02/24 02:18:57 mike Exp $".
+ * End of "$Id: lpstat.c,v 1.19 2000/02/25 16:39:42 mike Exp $".
  */
