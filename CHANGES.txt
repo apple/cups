@@ -3,6 +3,12 @@ CHANGES.txt - 04/14/2002
 
 CHANGES IN CUPS V1.2.0a1
 
+	- New policy mechanism allows per-operation and
+	  per-printer control over what users and groups are
+	  allowed to do various IPP operations.
+	- New error policy mechanism to control how aborted
+	  backend errors are handled by the scheduler
+	  (abort-job, retry-job, requeue-job, stop-printer)
 	- Updated the printer test page with a better color
 	  wheel and a separate grayscale ramp.
 	- The IPP and HTTP functions are now provided in a
