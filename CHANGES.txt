@@ -111,6 +111,13 @@ CHANGES IN CUPS V1.1.7
 	  cause cupsd to crash when a printer was removed.
 	- The LPDEST and PRINTER environment variables didn't
 	  support instances.
+	- Dropped the "file" backend from the device list that
+	  is reported, since it is only available for *testing*
+	  and should never be used in a production environment.
+	  The file: device can still be used, but it won't show
+	  up in the list of devices from lpinfo or the web
+	  interface.
+	- Added support for /dev/lpa# parallel ports under *BSD.
 
 
 CHANGES IN CUPS V1.1.6-3

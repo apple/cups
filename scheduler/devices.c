@@ -1,5 +1,5 @@
 /*
- * "$Id: devices.c,v 1.13 2001/01/22 15:03:59 mike Exp $"
+ * "$Id: devices.c,v 1.14 2001/03/23 13:58:17 mike Exp $"
  *
  *   Device scanning routines for the Common UNIX Printing System (CUPS).
  *
@@ -89,19 +89,10 @@ LoadDevices(const char *d)	/* I - Directory to scan */
 
 
  /*
-  * We always support the "file" device...
+  * Initialize the device list.
   */
 
   Devices = ippNew();
-
-  ippAddString(Devices, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
-               "device-class", NULL, "file");
-  ippAddString(Devices, IPP_TAG_PRINTER, IPP_TAG_TEXT,
-               "device-info", NULL, "Disk File");
-  ippAddString(Devices, IPP_TAG_PRINTER, IPP_TAG_TEXT,
-               "device-make-and-model", NULL, "Unknown");
-  ippAddString(Devices, IPP_TAG_PRINTER, IPP_TAG_URI,
-               "device-uri", NULL, "file");
 
  /*
   * Try opening the backend directory...
@@ -325,7 +316,9 @@ LoadDevices(const char *d)	/* I - Directory to scan */
     * Add strings to attributes...
     */
 
-    ippAddSeparator(Devices);
+    if (i < num_devs)
+      ippAddSeparator(Devices);
+
     ippAddString(Devices, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
                  "device-class", NULL, dev->device_class);
     ippAddString(Devices, IPP_TAG_PRINTER, IPP_TAG_TEXT,
@@ -482,5 +475,5 @@ sigalrm_handler(int sig)	/* I - Signal number */
 
 
 /*
- * End of "$Id: devices.c,v 1.13 2001/01/22 15:03:59 mike Exp $".
+ * End of "$Id: devices.c,v 1.14 2001/03/23 13:58:17 mike Exp $".
  */
