@@ -1,5 +1,5 @@
 /*
- * "$Id: http.h,v 1.33.2.10 2002/05/09 02:22:07 mike Exp $"
+ * "$Id: http.h,v 1.33.2.11 2002/05/09 03:44:17 mike Exp $"
  *
  *   Hyper-Text Transport Protocol definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -230,9 +230,7 @@ typedef enum
   HTTP_FIELD_CONTENT_RANGE,
   HTTP_FIELD_CONTENT_TYPE,
   HTTP_FIELD_CONTENT_VERSION,
-  HTTP_FIELD_COOKIE,
   HTTP_FIELD_DATE,
-  HTTP_FIELD_EXPECT,
   HTTP_FIELD_HOST,
   HTTP_FIELD_IF_MODIFIED_SINCE,
   HTTP_FIELD_IF_UNMODIFIED_SINCE,
@@ -243,7 +241,6 @@ typedef enum
   HTTP_FIELD_RANGE,
   HTTP_FIELD_REFERER,
   HTTP_FIELD_RETRY_AFTER,
-  HTTP_FIELD_SET_COOKIE,
   HTTP_FIELD_TRANSFER_ENCODING,
   HTTP_FIELD_UPGRADE,
   HTTP_FIELD_USER_AGENT,
@@ -280,7 +277,7 @@ typedef struct
   http_status_t		status;		/* Status of last request */
   http_version_t	version;	/* Protocol version */
   http_keepalive_t	keep_alive;	/* Keep-alive supported? */
-  http_addr_t		hostaddr;	/* Host address and port */
+  struct sockaddr_in	oldaddr;	/* Address of connected host */
   char			hostname[HTTP_MAX_HOST],
   					/* Name of connected host */
 			fields[HTTP_FIELD_MAX][HTTP_MAX_VALUE];
@@ -298,6 +295,10 @@ typedef struct
   int			nonce_count;	/* Nonce count */
   void			*tls;		/* TLS state information */
   http_encryption_t	encryption;	/* Encryption requirements */
+  http_addr_t		hostaddr;	/* Host address and port */
+  http_status_t		expect;		/* Expect: header */
+  char			cookie[HTTP_MAX_VALUE * 2];
+					/* Cookie value(s) */
 } http_t;
 
 
@@ -372,5 +373,5 @@ extern char		*httpAddrString(const http_addr_t *addr,
 #endif /* !_IPP_HTTP_H_ */
 
 /*
- * End of "$Id: http.h,v 1.33.2.10 2002/05/09 02:22:07 mike Exp $".
+ * End of "$Id: http.h,v 1.33.2.11 2002/05/09 03:44:17 mike Exp $".
  */
