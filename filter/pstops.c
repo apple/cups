@@ -1,5 +1,5 @@
 /*
- * "$Id: pstops.c,v 1.54.2.39 2003/04/23 17:42:41 mike Exp $"
+ * "$Id: pstops.c,v 1.54.2.40 2003/07/20 02:07:45 mike Exp $"
  *
  *   PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -232,11 +232,11 @@ main(int  argc,			/* I - Number of command-line arguments */
   }
 
   if ((val = cupsGetOption("Collate", num_options, options)) != NULL &&
-      strcasecmp(val, "True") == 0)
+      !strcasecmp(val, "True"))
     Collate = 1;
 
   if ((val = cupsGetOption("OutputOrder", num_options, options)) != NULL &&
-      strcasecmp(val, "Reverse") == 0)
+      !strcasecmp(val, "Reverse"))
     Order = 1;
 
   if ((val = cupsGetOption("number-up", num_options, options)) != NULL)
@@ -244,35 +244,35 @@ main(int  argc,			/* I - Number of command-line arguments */
 
   if ((val = cupsGetOption("page-border", num_options, options)) != NULL)
   {
-    if (strcasecmp(val, "none") == 0)
+    if (strcasecmp(val, "none"))
       Border = BORDER_NONE;
-    else if (strcasecmp(val, "single") == 0)
+    else if (strcasecmp(val, "single"))
       Border = BORDER_SINGLE;
-    else if (strcasecmp(val, "single-thick") == 0)
+    else if (!strcasecmp(val, "single-thick"))
       Border = BORDER_SINGLE2;
-    else if (strcasecmp(val, "double") == 0)
+    else if (!strcasecmp(val, "double"))
       Border = BORDER_DOUBLE;
-    else if (strcasecmp(val, "double-thick") == 0)
+    else if (!strcasecmp(val, "double-thick"))
       Border = BORDER_DOUBLE2;
   }
 
   if ((val = cupsGetOption("number-up-layout", num_options, options)) != NULL)
   {
-    if (strcasecmp(val, "lrtb") == 0)
+    if (!strcasecmp(val, "lrtb"))
       Layout = LAYOUT_LRTB;
-    else if (strcasecmp(val, "lrbt") == 0)
+    else if (!strcasecmp(val, "lrbt"))
       Layout = LAYOUT_LRBT;
-    else if (strcasecmp(val, "rltb") == 0)
+    else if (!strcasecmp(val, "rltb"))
       Layout = LAYOUT_RLTB;
-    else if (strcasecmp(val, "rlbt") == 0)
+    else if (!strcasecmp(val, "rlbt"))
       Layout = LAYOUT_RLBT;
-    else if (strcasecmp(val, "tblr") == 0)
+    else if (!strcasecmp(val, "tblr"))
       Layout = LAYOUT_TBLR;
-    else if (strcasecmp(val, "tbrl") == 0)
+    else if (!strcasecmp(val, "tbrl"))
       Layout = LAYOUT_TBRL;
-    else if (strcasecmp(val, "btlr") == 0)
+    else if (!strcasecmp(val, "btlr"))
       Layout = LAYOUT_BTLR;
-    else if (strcasecmp(val, "btrl") == 0)
+    else if (!strcasecmp(val, "btrl"))
       Layout = LAYOUT_BTRL;
   }
 
@@ -283,7 +283,7 @@ main(int  argc,			/* I - Number of command-line arguments */
     b = atoi(val) * 0.01f;
 
   if ((val = cupsGetOption("mirror", num_options, options)) != NULL &&
-      strcasecmp(val, "True") == 0)
+      !strcasecmp(val, "True"))
     Flip = 1;
 
  /*
@@ -387,7 +387,7 @@ main(int  argc,			/* I - Number of command-line arguments */
   * Handle leading PJL fun...
   */
 
-  while (strncmp(line, "\033%-12345X", 9) == 0)
+  while (!strncmp(line, "\033%-12345X", 9))
   {
    /*
     * Yup, we have leading PJL fun, so copy it until we hit the line
@@ -478,7 +478,7 @@ main(int  argc,			/* I - Number of command-line arguments */
   fprintf(stderr, "DEBUG: slowcollate=%d, slowduplex=%d, sloworder=%d\n",
           slowcollate, slowduplex, sloworder);
 
-  if (strncmp(line, "%!PS-Adobe-", 11) == 0 && strstr(line, "EPSF") == NULL)
+  if (!strncmp(line, "%!PS-Adobe-", 11) && !strstr(line, "EPSF"))
   {
    /*
     * OK, we have DSC comments and this isn't an EPS file; read until we
@@ -495,7 +495,7 @@ main(int  argc,			/* I - Number of command-line arguments */
       if (psgets(line, &len, fp) == NULL)
         break;
 
-      if (strncmp(line, "%%", 2) == 0)
+      if (!strncmp(line, "%%", 2))
         fprintf(stderr, "DEBUG: %d %s", level, line);
       else if (line[0] != '%' && line[0] && !sent_espsp && UseESPsp)
       {
@@ -509,18 +509,18 @@ main(int  argc,			/* I - Number of command-line arguments */
 	     "userdict/showpage{}put");
       }
 
-      if (strncmp(line, "%%BeginDocument:", 16) == 0 ||
-          strncmp(line, "%%BeginDocument ", 16) == 0)	/* Adobe Acrobat BUG */
+      if (!strncmp(line, "%%BeginDocument:", 16) ||
+          !strncmp(line, "%%BeginDocument ", 16))	/* Adobe Acrobat BUG */
       {
 	fputs(line, stdout);
         level ++;
       }
-      else if (strncmp(line, "%%EndDocument", 13) == 0 && level > 0)
+      else if (!strncmp(line, "%%EndDocument", 13) && level > 0)
       {
 	fputs(line, stdout);
         level --;
       }
-      else if (strncmp(line, "%cupsRotation:", 14) == 0 && level == 0)
+      else if (!strncmp(line, "%cupsRotation:", 14) && level == 0)
       {
        /*
         * Reset orientation of document?
@@ -535,7 +535,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	  Orientation = orient;
 	}
       }
-      else if (strncmp(line, "%%BeginProlog", 13) == 0 && level == 0)
+      else if (!strncmp(line, "%%BeginProlog", 13) && level == 0)
       {
        /*
         * Write the existing comment line, and then follow with patches
@@ -550,7 +550,7 @@ main(int  argc,			/* I - Number of command-line arguments */
           do_prolog(ppd);
 	}
       }
-      else if (strncmp(line, "%%BeginSetup", 12) == 0 && level == 0)
+      else if (!strncmp(line, "%%BeginSetup", 12) && level == 0)
       {
        /*
         * Write the existing comment line, and then follow with document
@@ -565,11 +565,11 @@ main(int  argc,			/* I - Number of command-line arguments */
           do_setup(ppd, Copies, Collate, slowcollate, g, b);
 	}
       }
-      else if (strncmp(line, "%%Page:", 7) == 0 && level == 0)
+      else if (!strncmp(line, "%%Page:", 7) && level == 0)
         break;
-      else if (strncmp(line, "%%BeginBinary:", 14) == 0 ||
-               (strncmp(line, "%%BeginData:", 12) == 0 &&
-	        strstr(line, "ASCII") == NULL && strstr(line, "Hex") == NULL))
+      else if (!strncmp(line, "%%BeginBinary:", 14) ||
+               (!strncmp(line, "%%BeginData:", 12) &&
+	        !strstr(line, "ASCII") && !strstr(line, "Hex")))
       {
        /*
         * Copy binary data...
@@ -661,23 +661,23 @@ main(int  argc,			/* I - Number of command-line arguments */
 
     for (page = 1, real_page = 1;;)
     {
-      if (strncmp(line, "%%", 2) == 0)
+      if (!strncmp(line, "%%", 2))
         fprintf(stderr, "DEBUG: %d %s", level, line);
 
-      if (strncmp(line, "%%BeginDocument:", 16) == 0 ||
-          strncmp(line, "%%BeginDocument ", 16) == 0)	/* Adobe Acrobat BUG */
+      if (!strncmp(line, "%%BeginDocument:", 16) ||
+          !strncmp(line, "%%BeginDocument ", 16))	/* Adobe Acrobat BUG */
         level ++;
-      else if (strncmp(line, "%%EndDocument", 13) == 0 && level > 0)
+      else if (!strncmp(line, "%%EndDocument", 13) && level > 0)
         level --;
-      else if (strcmp(line, "\004") == 0)
+      else if (!strcmp(line, "\004") && len == 1)
         break;
-      else if (strncmp(line, "%%EOF", 5) == 0 && level == 0)
+      else if (!strncmp(line, "%%EOF", 5) && level == 0)
       {
         fputs("DEBUG: Saw EOF!\n", stderr);
         saweof = 1;
 	break;
       }
-      else if (strncmp(line, "%%Page:", 7) == 0 && level == 0)
+      else if (!strncmp(line, "%%Page:", 7) && level == 0)
       {
 	if (!check_range(real_page))
 	{
@@ -687,22 +687,22 @@ main(int  argc,			/* I - Number of command-line arguments */
 	    if (psgets(line, &len, fp) == NULL)
 	      break;
 
-	    if (strncmp(line, "%%", 2) == 0)
+	    if (!strncmp(line, "%%", 2))
               fprintf(stderr, "DEBUG: %d %s", level, line);
 
-	    if (strncmp(line, "%%BeginDocument:", 16) == 0 ||
-        	strncmp(line, "%%BeginDocument ", 16) == 0)	/* Adobe Acrobat BUG */
+	    if (!strncmp(line, "%%BeginDocument:", 16) ||
+        	!strncmp(line, "%%BeginDocument ", 16))	/* Adobe Acrobat BUG */
               level ++;
-	    else if (strncmp(line, "%%EndDocument", 13) == 0 && level > 0)
+	    else if (!strncmp(line, "%%EndDocument", 13) && level > 0)
               level --;
-	    else if (strncmp(line, "%%Page:", 7) == 0 && level == 0)
+	    else if (!strncmp(line, "%%Page:", 7) && level == 0)
 	    {
 	      real_page ++;
 	      break;
 	    }
-	    else if (strncmp(line, "%%BeginBinary:", 14) == 0 ||
-        	     (strncmp(line, "%%BeginData:", 12) == 0 &&
-	              strstr(line, "ASCII") == NULL && strstr(line, "Hex") == NULL))
+	    else if (!strncmp(line, "%%BeginBinary:", 14) ||
+        	     (!strncmp(line, "%%BeginData:", 12) &&
+	              !strstr(line, "ASCII") && !strstr(line, "Hex")))
 	    {
 	     /*
               * Skip binary data...
@@ -755,9 +755,9 @@ main(int  argc,			/* I - Number of command-line arguments */
 	NumPages ++;
 	real_page ++;
       }
-      else if (strncmp(line, "%%BeginBinary:", 14) == 0 ||
-               (strncmp(line, "%%BeginData:", 12) == 0 &&
-	        strstr(line, "ASCII") == NULL && strstr(line, "Hex") == NULL))
+      else if (!strncmp(line, "%%BeginBinary:", 14) ||
+               (!strncmp(line, "%%BeginData:", 12) &&
+	        !strstr(line, "ASCII") && !strstr(line, "Hex")))
       {
        /*
         * Copy binary data...
@@ -792,7 +792,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	  tbytes -= nbytes;
 	}
       }
-      else if (strncmp(line, "%%Trailer", 9) == 0 && level == 0)
+      else if (!strncmp(line, "%%Trailer", 9) && level == 0)
       {
         fputs("DEBUG: Saw Trailer!\n", stderr);
         break;
@@ -967,11 +967,11 @@ main(int  argc,			/* I - Number of command-line arguments */
       if (psgets(line, &len, fp) == NULL)
         break;
 
-      if (strcmp(line, "\004") != 0 &&
+      if (!(!strcmp(line, "\004") && len == 1) &&
           strncmp(line, "%%Pages:", 8) != 0)
         pswrite(line, len, stdout);
 
-      if (strncmp(line, "%%EOF", 5) == 0)
+      if (!strncmp(line, "%%EOF", 5))
       {
         fputs("DEBUG: Saw EOF!\n", stderr);
         saweof = 1;
@@ -1101,9 +1101,9 @@ check_range(int page)	/* I - Page number */
     * See if we only print even or odd pages...
     */
 
-    if (strcasecmp(PageSet, "even") == 0 && ((page - 1) % (NUp << 1)) <  NUp)
+    if (!strcasecmp(PageSet, "even") && ((page - 1) % (NUp << 1)) <  NUp)
       return (0);
-    if (strcasecmp(PageSet, "odd")  == 0 && ((page - 1) % (NUp << 1)) >= NUp)
+    if (!strcasecmp(PageSet, "odd") && ((page - 1) % (NUp << 1)) >= NUp)
       return (0);
   }
 
@@ -1886,5 +1886,5 @@ start_nup(int number,			/* I - Page number */
 
 
 /*
- * End of "$Id: pstops.c,v 1.54.2.39 2003/04/23 17:42:41 mike Exp $".
+ * End of "$Id: pstops.c,v 1.54.2.40 2003/07/20 02:07:45 mike Exp $".
  */

@@ -3,6 +3,8 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.20rc1
 
+	- The pstops filter didn't handle poorly-formed binary
+	  PostScript files that had CTRL-D's in them (STR #156)
 	- The ppdOpen*() and cupsLangGet() functions did not
 	  make a copy of the old locale strings when using the
 	  POSIX locale when reading files, which apparently
