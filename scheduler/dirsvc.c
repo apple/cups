@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.73.2.8 2002/01/27 21:20:31 mike Exp $"
+ * "$Id: dirsvc.c,v 1.73.2.9 2002/01/31 12:38:53 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -699,7 +699,10 @@ StartPolling(void)
   */
 
   if (NumPolled == 0)
+  {
+    PollPipe = -1;
     return;
+  }
 
  /*
   * Setup string arguments for port and interval options.
@@ -721,6 +724,7 @@ StartPolling(void)
   {
     LogMessage(L_ERROR, "Unable to create polling status pipes - %s.",
 	       strerror(errno));
+    PollPipe = -1;
     return;
   }
 
@@ -876,7 +880,7 @@ StopPolling(void)
                PollPipe);
     FD_CLR(PollPipe, &InputSet);
 
-    PollPipe = 0;
+    PollPipe = -1;
   }
 
   for (i = 0, poll = Polled; i < NumPolled; i ++, poll ++)
@@ -1721,5 +1725,5 @@ UpdateSLPBrowse(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.73.2.8 2002/01/27 21:20:31 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.73.2.9 2002/01/31 12:38:53 mike Exp $".
  */
