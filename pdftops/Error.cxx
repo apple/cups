@@ -26,9 +26,9 @@ void CDECL error(int pos, const char *msg, ...) {
     return;
   }
   if (pos >= 0) {
-    fprintf(stderr, "Error (%d): ", pos);
+    fprintf(stderr, "ERROR: (%d) ", pos);
   } else {
-    fprintf(stderr, "Error: ");
+    fprintf(stderr, "ERROR: ");
   }
   va_start(args, msg);
   vfprintf(stderr, msg, args);

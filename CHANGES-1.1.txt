@@ -3,6 +3,8 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.20rc1
 
+	- The PDF filter no longer prints form widgets; this
+	  duplicates the behavior of Acrobat Reader (STR #241)
 	- cupsGetPPD() didn't handle a late termination of a
 	  HTTP connection with the server (STR #220)
 	- ppdOpen() did not correctly check for "*PPD-Adobe-4."
