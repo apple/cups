@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-config.c,v 1.4 1998/03/18 20:46:04 mike Exp $"
+ * "$Id: hpgl-config.c,v 1.5 1998/03/18 20:47:27 mike Exp $"
  *
  *   HPGL configuration routines for espPrint, a collection of printer drivers.
  *
@@ -16,7 +16,11 @@
  * Revision History:
  *
  *   $Log: hpgl-config.c,v $
- *   Revision 1.4  1998/03/18 20:46:04  mike
+ *   Revision 1.5  1998/03/18 20:47:27  mike
+ *   Fixed problem with some HPGL files not plotting - added IP call after
+ *   a PS command.
+ *
+ *   Revision 1.4  1998/03/18  20:46:04  mike
  *   Updated to do optional page scaling.
  *   Now support 0, 90, 180, and 270 degree rotations.
  *
@@ -323,7 +327,15 @@ PS_plot_size(int num_params, param_t *params)
         break;
   };
 
+ /*
+  * This is required for buggy files that don't set the input window.
+  */
+
   IP_input_absolute(0, NULL);
+
+ /*
+  * Update the transform matrix...
+  */
 
   update_transform();
 }
@@ -371,5 +383,5 @@ SC_scale(int num_params, param_t *params)
 
 
 /*
- * End of "$Id: hpgl-config.c,v 1.4 1998/03/18 20:46:04 mike Exp $".
+ * End of "$Id: hpgl-config.c,v 1.5 1998/03/18 20:47:27 mike Exp $".
  */
