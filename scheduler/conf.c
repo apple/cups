@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.73 2001/02/21 20:16:47 mike Exp $"
+ * "$Id: conf.c,v 1.74 2001/02/21 21:26:15 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -1040,8 +1040,8 @@ read_configuration(FILE *fp)		/* I - File to read from */
       else if (strcasecmp(value, "double") == 0)
         HostNameLookups = 2;
       else
-	LogMessage(L_WARN, "ReadConfiguration() Unknown HostNameLookups value \"%s\"",
-	           value);
+	LogMessage(L_WARN, "ReadConfiguration() Unknown HostNameLookups %s on line %d.",
+	           value, linenum);
     }
     else if (strcasecmp(name, "LogLevel") == 0)
     {
@@ -1071,6 +1071,20 @@ read_configuration(FILE *fp)		/* I - File to read from */
         LogLevel = L_NONE;
       else
         LogMessage(L_WARN, "Unknown LogLevel %s on line %d.", value, linenum);
+    }
+    else if (strcasecmp(name, "PrintcapFormat") == 0)
+    {
+     /*
+      * Format of printcap file?
+      */
+
+      if (strcasecmp(value, "bsd") == 0)
+        PrintcapFormat = PRINTCAP_BSD;
+      else if (strcasecmp(value, "solaris") == 0)
+        PrintcapFormat = PRINTCAP_SOLARIS;
+      else
+	LogMessage(L_WARN, "ReadConfiguration() Unknown PrintcapFormat %s on line %d.",
+	           value, linenum);
     }
     else
     {
@@ -1617,5 +1631,5 @@ get_address(char               *value,		/* I - Value string */
 
 
 /*
- * End of "$Id: conf.c,v 1.73 2001/02/21 20:16:47 mike Exp $".
+ * End of "$Id: conf.c,v 1.74 2001/02/21 21:26:15 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.h,v 1.34 2001/02/21 20:16:47 mike Exp $"
+ * "$Id: conf.h,v 1.35 2001/02/21 21:26:15 mike Exp $"
  *
  *   Configuration file definitions for the Common UNIX Printing System (CUPS)
  *   scheduler.
@@ -38,6 +38,14 @@
 #define L_INFO		7	/* General information */
 #define L_DEBUG		8	/* General debugging */
 #define L_DEBUG2	9	/* Detailed debugging */
+
+
+/*
+ * Printcap formats...
+ */
+
+#define PRINTCAP_BSD	0	/* Berkeley LPD format */
+#define PRINTCAP_SOLARIS 1	/* Solaris lpsched format */
 
 
 /*
@@ -108,8 +116,10 @@ VAR int			User			VALUE(1),
 					/* Max filter cost at any time */
 			FilterLevel		VALUE(0),
 					/* Current filter level */
-			RunAsUser		VALUE(FALSE);
+			RunAsUser		VALUE(FALSE),
 					/* Run as unpriviledged user? */
+			PrintcapFormat		VALUE(PRINTCAP_BSD);
+					/* Format of printcap file? */
 VAR FILE		*AccessFile		VALUE(NULL),
 					/* Access log file */
 			*ErrorFile		VALUE(NULL),
@@ -139,5 +149,5 @@ extern int	LogPage(job_t *job, const char *page);
 
 
 /*
- * End of "$Id: conf.h,v 1.34 2001/02/21 20:16:47 mike Exp $".
+ * End of "$Id: conf.h,v 1.35 2001/02/21 21:26:15 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.88 2001/02/09 18:40:34 mike Exp $"
+ * "$Id: printers.c,v 1.89 2001/02/21 21:26:16 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -1686,21 +1686,57 @@ write_printcap(void)
     return;
 
  /*
-  * Write a new printcap with the current list of printers. Each printer
-  * is put in the file as:
-  *
-  *    Printer1:
-  *    Printer2:
-  *    Printer3:
-  *    ...
-  *    PrinterN:
+  * Open the printcap file...
   */
 
   if ((fp = fopen(Printcap, "w")) == NULL)
     return;
 
-  for (p = Printers; p != NULL; p = p->next)
-    fprintf(fp, "%s:\n", p->name);
+ /*
+  * Write a new printcap with the current list of printers.
+  */
+
+  switch (PrintcapFormat)
+  {
+    case PRINTCAP_BSD:
+       /*
+        * Each printer is put in the file as:
+	*
+	*    Printer1:
+	*    Printer2:
+	*    Printer3:
+	*    ...
+	*    PrinterN:
+	*/
+
+	for (p = Printers; p != NULL; p = p->next)
+	  fprintf(fp, "%s:\n", p->name);
+        break;
+
+    case PRINTCAP_SOLARIS:
+       /*
+        * Each printer is put in the file as:
+	*
+	*    _all:all=Printer1,Printer2,Printer3,...,PrinterN
+	*    _default:use=DefaultPrinter
+	*    Printer1:
+	*    Printer2:
+	*    Printer3:
+	*    ...
+	*    PrinterN:
+	*/
+
+        fputs("_all:all=", fp);
+	for (p = Printers; p != NULL; p = p->next)
+	  fprintf(fp, "%s%c", p->name, p->next ? ',' : '\n');
+
+        if (DefaultPrinter)
+	  fprintf(fp, "_default:use=%s\n", DefaultPrinter->name);
+
+	for (p = Printers; p != NULL; p = p->next)
+	  fprintf(fp, "%s:\n", p->name);
+        break;
+  }
 
  /*
   * Close the file...
@@ -1711,5 +1747,5 @@ write_printcap(void)
 
 
 /*
- * End of "$Id: printers.c,v 1.88 2001/02/09 18:40:34 mike Exp $".
+ * End of "$Id: printers.c,v 1.89 2001/02/21 21:26:16 mike Exp $".
  */
