@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.21 1999/06/17 19:40:25 mike Exp $"
+ * "$Id: client.c,v 1.22 1999/06/18 16:43:01 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -31,8 +31,6 @@
  *   SendError()           - Send an error message via HTTP.
  *   SendFile()            - Send a file via HTTP.
  *   SendHeader()          - Send an HTTP request.
- *   StartListening()      - Create all listening sockets...
- *   StopListening()       - Close all listening sockets...
  *   WriteClient()         - Write data to a client as needed.
  *   check_if_modified()   - Decode an "If-Modified-Since" line.
  *   decode_basic_auth()   - Decode a Basic authorization string.
@@ -1078,127 +1076,6 @@ SendHeader(client_t    *con,	/* I - Client to send to */
 
 
 /*
- * 'StartListening()' - Create all listening sockets...
- */
-
-void
-StartListening(void)
-{
-  int		i,		/* Looping var */
-		val;		/* Parameter value */
-  listener_t	*lis;		/* Current listening socket */
-
-
-#if defined(WIN32) || defined(__EMX__)
- /*
-  * Initialize Windows sockets...  This handles loading the DLL, etc. since
-  * Windows doesn't have built-in support for sockets like UNIX...
-  */
-
-  WSADATA	wsadata;	/* Socket data for application from DLL */
-  static int	initialized = 0;/* Whether or not we've initialized things */
-
-
-  if (!initialized)
-  {
-    initialized = 1;
-
-    if (WSAStartup(MAKEWORD(1,1), &wsadata) != 0)
-      exit(1);
-  }
-#endif /* !WIN32 */
-
- /*
-  * Setup socket listeners...
-  */
-
-  for (i = NumListeners, lis = Listeners; i > 0; i --, lis ++)
-  {
-    LogMessage(LOG_DEBUG, "StartListening() address=%08x port=%d",
-               ntohl(lis->address.sin_addr.s_addr),
-	       ntohs(lis->address.sin_port));
-
-    if ((lis->fd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
-    {
-      LogMessage(LOG_ERROR, "StartListening() Unable to open listen socket - %s.",
-                 strerror(errno));
-      exit(errno);
-    }
-
-    fcntl(lis->fd, F_SETFD, fcntl(lis->fd, F_GETFD) | FD_CLOEXEC);
-
-   /*
-    * Set things up to reuse the local address for this port.
-    */
-
-    val = 1;
-#ifdef __sun
-    setsockopt(lis->fd, SOL_SOCKET, SO_REUSEADDR, (char *)&val, sizeof(val));
-#else
-    setsockopt(lis->fd, SOL_SOCKET, SO_REUSEADDR, &val, sizeof(val));
-#endif /* __sun */
-
-   /*
-    * Bind to the port we found...
-    */
-
-    if (bind(lis->fd, (struct sockaddr *)&(lis->address), sizeof(lis->address)) < 0)
-    {
-      LogMessage(LOG_ERROR, "StartListening() Unable to bind socket - %s.", strerror(errno));
-      exit(errno);
-    }
-
-   /*
-    * Listen for new clients.
-    */
-
-    if (listen(lis->fd, SOMAXCONN) < 0)
-    {
-      LogMessage(LOG_ERROR, "StartListening() Unable to listen for clients - %s.",
-                 strerror(errno));
-      exit(errno);
-    }
-
-   /*
-    * Setup the select() input mask to contain the listening socket we have.
-    */
-
-    DEBUG_printf(("StartListening: Adding fd %d to InputSet...\n", lis->fd));
-    FD_SET(lis->fd, &InputSet);
-  }
-
-  LogMessage(LOG_DEBUG, "StartListening() NumListeners=%d", NumListeners);
-}
-
-
-/*
- * 'StopListening()' - Close all listening sockets...
- */
-
-void
-StopListening(void)
-{
-  int		i;		/* Looping var */
-  listener_t	*lis;		/* Current listening socket */
-
-
-  for (i = NumListeners, lis = Listeners; i > 0; i --, lis ++)
-  {
-#if defined(WIN32) || defined(__EMX__)
-    closesocket(lis->fd);
-#else
-    close(lis->fd);
-#endif /* WIN32 || __EMX__ */
-
-    DEBUG_printf(("StopListening: Removing fd %d from InputSet...\n", lis->fd));
-    FD_CLR(lis->fd, &InputSet);
-  }
-
-  LogMessage(LOG_DEBUG, "StopListening()");
-}
-
-
-/*
  * 'WriteClient()' - Write data to a client as needed.
  */
 
@@ -1626,5 +1503,5 @@ pipe_command(client_t *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.21 1999/06/17 19:40:25 mike Exp $".
+ * End of "$Id: client.c,v 1.22 1999/06/18 16:43:01 mike Exp $".
  */
