@@ -4908,7 +4908,7 @@ character.
 </TABLE></CENTER>
 
 <!-- NEED 3in -->
-<H3>NetATalk</H3>
+<H3>Netatalk</H3>
 
 <P>To use your system as a print server for Mac OS clients,
 configure each printer in the <VAR>papd.conf</VAR> file, specifying the
@@ -4917,7 +4917,7 @@ each printer. For a printer named <CODE>MyPrinter</CODE> the entry
 would look like:
 
 <UL><PRE>
-Printer Description:MyPrinter@MyServer:\
+Printer Name@Zone Name:\
 :pr=|/usr/bin/lp -d MyPrinter:\
 :op=daemon:\
 :pd=/etc/cups/ppd/MyPrinter.ppd:

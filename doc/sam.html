@@ -269,7 +269,7 @@ Copyright 1997-2003, All Rights Reserved<BR>
 <UL>
 <LI><A HREF="#8_5_1">Columbia Appletalk Package (CAP)</A></LI>
 <LI><A HREF="#8_5_2">XINET KA/Spool</A></LI>
-<LI><A HREF="#8_5_3">NetATalk</A></LI>
+<LI><A HREF="#8_5_3">Netatalk</A></LI>
 </UL>
 <LI><A HREF="#8_6">Printing to Mac OS 10.2 and Later Servers</A></LI>
 <LI><A HREF="#8_7">Printing to Mac OS 10.1 and Earlier Servers</A></LI>
@@ -4532,7 +4532,7 @@ lwsrv -n &quot;<I>Name</I>&quot; -p <I>printer</I> -a /usr/lib/adicts -f /usr/li
 </CENTER>
 
 <!-- NEED 3in -->
-<H3><A NAME="8_5_3">NetATalk</A></H3>
+<H3><A NAME="8_5_3">Netatalk</A></H3>
 <P>To use your system as a print server for Mac OS clients, configure
  each printer in the<VAR> papd.conf</VAR> file, specifying the
  corresponding PPD file in the<VAR> /etc/cups/ppd</VAR> directory for
@@ -4540,7 +4540,7 @@ lwsrv -n &quot;<I>Name</I>&quot; -p <I>printer</I> -a /usr/lib/adicts -f /usr/li
  would look like:</P>
 <UL>
 <PRE>
-Printer Description:MyPrinter@MyServer:\
+Printer Name@Zone Name:\
 :pr=|/usr/bin/lp -d MyPrinter:\
 :op=daemon:\
 :pd=/etc/cups/ppd/MyPrinter.ppd:
