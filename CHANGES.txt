@@ -24,6 +24,9 @@ CHANGES IN CUPS v1.0.2
 	- The N-up code in the PostScript filter didn't scale
 	  the pages to fit within the imageable area of the
 	  page.
+	- Wasn't doing an fchown() on the request files.  This
+	  caused problems when the default root account group
+	  and CUPS group were not the same.
 
 
 CHANGES IN CUPS v1.0.1
