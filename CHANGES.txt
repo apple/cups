@@ -1,5 +1,13 @@
-CHANGES.txt - 12/18/2002
+CHANGES.txt - 12/20/2002
 ------------------------
+
+CHANGES IN CUPS V1.1.19
+
+	- The cupstestppd file was incorrectly installed in the
+	  /usr/sbin directory instead of /usr/bin.
+	- The EPM list file did not include the cupstestppd
+	  program or man page files.
+
 
 CHANGES IN CUPS V1.1.18
 
