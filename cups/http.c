@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.41 1999/07/27 16:27:24 mike Exp $"
+ * "$Id: http.c,v 1.42 1999/08/12 20:31:33 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -25,6 +25,8 @@
  *
  *   httpInitialize()    - Initialize the HTTP interface library and set the
  *                         default HTTP proxy (if any).
+ *   httpCheck()         - Check to see if there is a pending response from
+ *                         the server.
  *   httpClose()         - Close an HTTP connection...
  *   httpConnect()       - Connect to a HTTP server.
  *   httpReconnect()     - Reconnect to a HTTP server...
@@ -187,6 +189,41 @@ httpInitialize(void)
 #else
   signal(SIGPIPE, SIG_IGN);
 #endif /* WIN32 || __EMX__ */
+}
+
+
+/*
+ * 'httpCheck()' - Check to see if there is a pending response from the server.
+ */
+
+int				/* O - 0 = no data, 1 = data available */
+httpCheck(http_t *http)		/* I - HTTP connection */
+{
+  fd_set	input;		/* Input set for select() */
+  struct timeval timeout;	/* Timeout */
+
+
+ /*
+  * First see if there is data in the buffer...
+  */
+
+  if (http == NULL)
+    return (0);
+
+  if (http->used)
+    return (1);
+
+ /*
+  * Then try doing a select() to poll the socket...
+  */
+
+  FD_ZERO(&input);
+  FD_SET(http->fd, &input);
+
+  timeout.tv_sec  = 0;
+  timeout.tv_usec = 0;
+
+  return (select(http->fd + 1, &input, NULL, NULL, &timeout) > 0);
 }
 
 
@@ -746,6 +783,7 @@ httpWrite(http_t     *http,		/* I - HTTP data */
     if (bytes < 0)
     {
       DEBUG_puts("httpWrite: error writing data...\n");
+
       return (-1);
     }
 
@@ -815,11 +853,16 @@ httpGets(char   *line,			/* I - Line to read into */
       * No newline; see if there is more data to be read...
       */
 
-      if ((bytes = recv(http->fd, bufend, HTTP_MAX_BUFFER - http->used, 0)) < 1)
+      if ((bytes = recv(http->fd, bufend, HTTP_MAX_BUFFER - http->used, 0)) < 0)
       {
        /*
 	* Nope, can't get a line this time...
 	*/
+
+        if (errno == EPIPE)
+	  continue;
+
+        DEBUG_printf(("httpGets(): recv() error %d!\n", errno));
 
         return (NULL);
       }
@@ -859,6 +902,7 @@ httpGets(char   *line,			/* I - Line to read into */
       if (http->used > 0)
 	memcpy(http->buffer, bufptr, http->used);
 
+      DEBUG_printf(("httpGets(): Returning \"%s\"\n", line));
       return (line);
     }
     else if (*bufptr == 0x0d)
@@ -866,6 +910,8 @@ httpGets(char   *line,			/* I - Line to read into */
     else
       *lineptr++ = *bufptr++;
   }
+
+  DEBUG_puts("httpGets(): No new line available!");
 
   return (NULL);
 }
@@ -1342,6 +1388,8 @@ http_send(http_t       *http,	/* I - HTTP data */
   if (request == HTTP_POST || request == HTTP_PUT)
     http->state ++;
 
+  http->status = HTTP_CONTINUE;
+
   if (httpPrintf(http, "%s %s HTTP/1.1\r\n", codes[request], buf) < 1)
   {
    /*
@@ -1379,5 +1427,5 @@ http_send(http_t       *http,	/* I - HTTP data */
 
 
 /*
- * End of "$Id: http.c,v 1.41 1999/07/27 16:27:24 mike Exp $".
+ * End of "$Id: http.c,v 1.42 1999/08/12 20:31:33 mike Exp $".
  */
