@@ -34,6 +34,10 @@ CHANGES IN CUPS V1.1.7
 	  attributes-natural-language attributes.
 	- Sun fix: need httpFlush() call for chunked IPP
 	  requests in cupsDoFileRequest().
+	- httpConnect() now looks up "localhost" by name and
+	  by address (127.0.0.1) for users the go to the
+	  trouble of removing the required localhost entry
+	  in /etc/hosts or on their DNS server...
 
 
 CHANGES IN CUPS V1.1.6-3

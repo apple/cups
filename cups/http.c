@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.80 2001/02/09 16:23:35 mike Exp $"
+ * "$Id: http.c,v 1.81 2001/02/28 14:48:07 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -325,7 +325,17 @@ httpConnect(const char *host,	/* I - Host to connect to */
   */
 
   if ((hostaddr = gethostbyname(host)) == NULL)
-    return (NULL);
+  {
+   /*
+    * This hack to make users that don't have a localhost entry in
+    * their hosts file or DNS happy...
+    */
+
+    if (strcasecmp(host, "localhost") != 0)
+      return (NULL);
+    else if ((hostaddr = gethostbyname("127.0.0.1")) == NULL)
+      return (NULL);
+  }
 
  /*
   * Verify that it is an IPv4 address (IPv6 support will come in CUPS 1.2...)
@@ -2028,5 +2038,5 @@ http_upgrade(http_t *http)	/* I - HTTP data */
 
 
 /*
- * End of "$Id: http.c,v 1.80 2001/02/09 16:23:35 mike Exp $".
+ * End of "$Id: http.c,v 1.81 2001/02/28 14:48:07 mike Exp $".
  */
