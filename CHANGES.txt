@@ -1,8 +1,9 @@
-CHANGES.txt - 05/16/2003
+CHANGES.txt - 05/22/2003
 ------------------------
 
 CHANGES IN CUPS V1.1.19
 
+	- The German web templates had errors (STR #119)
 	- The configure script didn't specify the static
 	  libraries properly when configuring with the
 	  --disable-shared option (STR #104)
