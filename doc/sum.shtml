@@ -558,6 +558,38 @@ keywords are highlighted, and comment lines are italicized:
 
 <P>The following options apply when printing image files.
 
+<H3>Positioning the Image</H3>
+
+<P>The <CODE>-o position=name</CODE> option specifies the position of the
+image on the page:
+
+<UL>
+
+	<LI><CODE>center</CODE> - Center the image on the page (default)
+
+	<LI><CODE>top</CODE> - Print the image centered at the top of the page
+
+	<LI><CODE>left</CODE> - Print the image centered on the left of page
+
+	<LI><CODE>right</CODE> - Print the image centered on the right of the page
+
+	<LI><CODE>top-left</CODE> - Print the image at the top left corner of
+	the page
+
+	<LI><CODE>top-right</CODE> - Print the image at the top right corner of
+	the page
+
+	<LI><CODE>bottom</CODE> - Print the image centered at the bottom of
+	the page
+
+	<LI><CODE>bottom-left</CODE> - Print the image at the bottom left
+	corner of the page
+
+	<LI><CODE>bottom-right</CODE> - Print the image at the bottom right
+	corner of the page
+
+</UL>
+
 <H3>Scaling the Image</H3>
 
 <P>The <CODE>-o scaling=percent</CODE> and <CODE>-o ppi=value</CODE>

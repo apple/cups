@@ -88,9 +88,10 @@ Copyright 1997-2000, All Rights Reserved<BR>
 </UL>
 <LI><A HREF="#4_5">Image Options</A></LI>
 <UL>
-<LI><A HREF="#4_5_1">Scaling the Image</A></LI>
-<LI><A HREF="#4_5_2">Adjusting the Hue (Tint) of an Image</A></LI>
-<LI><A HREF="#4_5_3">Adjusting the Saturation (Color) of an Image</A></LI>
+<LI><A HREF="#4_5_1">Positioning the Image</A></LI>
+<LI><A HREF="#4_5_2">Scaling the Image</A></LI>
+<LI><A HREF="#4_5_3">Adjusting the Hue (Tint) of an Image</A></LI>
+<LI><A HREF="#4_5_4">Adjusting the Saturation (Color) of an Image</A></LI>
 </UL>
 <LI><A HREF="#4_6">HP-GL/2 Options</A></LI>
 <UL>
@@ -674,7 +675,27 @@ are italicized: </P>
 </UL>
 <H2><A NAME="4_5">Image Options</A></H2>
 <P>The following options apply when printing image files. </P>
-<H3><A NAME="4_5_1">Scaling the Image</A></H3>
+<H3><A NAME="4_5_1">Positioning the Image</A></H3>
+<P>The <CODE>-o position=name</CODE> option specifies the position of 
+the image on the page: </P>
+<UL>
+<LI><CODE>center</CODE> - Center the image on the page (default) </LI>
+<LI><CODE>top</CODE> - Print the image centered at the top of the page </LI>
+<LI><CODE>left</CODE> - Print the image centered on the left of page </LI>
+<LI><CODE>right</CODE> - Print the image centered on the right of the 
+page </LI>
+<LI><CODE>top-left</CODE> - Print the image at the top left corner of 
+ the page </LI>
+<LI><CODE>top-right</CODE> - Print the image at the top right corner of 
+ the page </LI>
+<LI><CODE>bottom</CODE> - Print the image centered at the bottom of 
+ the page </LI>
+<LI><CODE>bottom-left</CODE> - Print the image at the bottom left 
+ corner of the page </LI>
+<LI><CODE>bottom-right</CODE> - Print the image at the bottom right 
+ corner of the page </LI>
+</UL>
+<H3><A NAME="4_5_2">Scaling the Image</A></H3>
 <P>The <CODE>-o scaling=percent</CODE> and <CODE>-o ppi=value</CODE>
  options change the size of a printed image: </P>
 <UL>
@@ -693,7 +714,7 @@ resolution of the image in pixels per inch. An image that is 3000x2400
 pixels will print 10x8 inches at 300 pixels per inch, for example. If 
 the specified resolution makes the image larger than the page, multiple 
 pages will be printed to satisfy the request. </P>
-<H3><A NAME="4_5_2">Adjusting the Hue (Tint) of an Image</A></H3>
+<H3><A NAME="4_5_3">Adjusting the Hue (Tint) of an Image</A></H3>
 <P>The <CODE>-o hue=value</CODE> option will adjust the hue of the 
 printed image, much like the tint control on your television: </P>
 <UL>
@@ -720,7 +741,7 @@ change you'll see with different colors:
 </CENTER>
 </P>
 <P>The default hue adjustment is 0. </P>
-<H3><A NAME="4_5_3">Adjusting the Saturation (Color) of an Image</A></H3>
+<H3><A NAME="4_5_4">Adjusting the Saturation (Color) of an Image</A></H3>
 <P>The <CODE>-o saturation=percent</CODE> option adjusts the saturation 
 of the colors in an image, much like the color knob on your television: </P>
 <UL>

@@ -1649,6 +1649,38 @@ equals 1 inch). The default value is the device physical margin.
 <P>The penwidth attribute specifies the default pen width in micrometers
 when printing HP-GL/2 plot files. The default value is 1000 (1 millimeter).
 
+<H3>position (type2 keyword)</H3>
+
+<P>The position attribute specifies the location of image files on the
+media. The following keyword values are recognized:
+
+<UL>
+
+	<LI><CODE>center</CODE> - Center the image on the page (default)
+
+	<LI><CODE>top</CODE> - Print the image centered at the top of the page
+
+	<LI><CODE>left</CODE> - Print the image centered on the left of page
+
+	<LI><CODE>right</CODE> - Print the image centered on the right of the page
+
+	<LI><CODE>top-left</CODE> - Print the image at the top left corner of
+	the page
+
+	<LI><CODE>top-right</CODE> - Print the image at the top right corner of
+	the page
+
+	<LI><CODE>bottom</CODE> - Print the image centered at the bottom of
+	the page
+
+	<LI><CODE>bottom-left</CODE> - Print the image at the bottom left
+	corner of the page
+
+	<LI><CODE>bottom-right</CODE> - Print the image at the bottom right
+	corner of the page
+
+</UL>
+
 <H3>ppi (integer(1:MAX))</H3>
 
 <P>The ppi attribute specifies the resolution of an image file in pixels
