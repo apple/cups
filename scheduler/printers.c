@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.93.2.57 2004/06/28 23:35:10 mike Exp $"
+ * "$Id: printers.c,v 1.93.2.58 2004/06/29 01:07:18 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -1768,8 +1768,7 @@ SetPrinterReasons(printer_t  *p,	/* I - Printer */
 	  i --;
 	}
     }
-    else if (s[0] == '+' &&
-             p->num_reasons < (int)(sizeof(p->reasons) / sizeof(p->reasons[0])))
+    else if (p->num_reasons < (int)(sizeof(p->reasons) / sizeof(p->reasons[0])))
     {
      /*
       * Add reason...
@@ -2439,5 +2438,5 @@ write_irix_state(printer_t *p)		/* I - Printer to update */
 
 
 /*
- * End of "$Id: printers.c,v 1.93.2.57 2004/06/28 23:35:10 mike Exp $".
+ * End of "$Id: printers.c,v 1.93.2.58 2004/06/29 01:07:18 mike Exp $".
  */

@@ -3,6 +3,8 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.21rc2
 
+	- The printer state was not updated for "STATE: foo,bar"
+	  messages (STR #745)
 	- Added new CUPS API convenience functions which accept
 	  a HTTP connection to eliminate extra username/password
 	  prompts. This resolves a previous authentication
