@@ -1,5 +1,5 @@
 #
-# "$Id: cups.list.in,v 1.20 2002/02/12 19:37:51 mike Exp $"
+# "$Id: cups.list.in,v 1.21 2002/02/12 20:56:13 mike Exp $"
 #
 #   ESP Package Manager (EPM) file list for the Common UNIX Printing
 #   System (CUPS).
@@ -254,7 +254,7 @@ f 0444 root sys $DATADIR/fonts fonts/Courier*
 f 0444 root sys $DATADIR/fonts fonts/Helvetica*
 f 0444 root sys $DATADIR/fonts fonts/NewCentury*
 f 0444 root sys $DATADIR/fonts fonts/Palatino*
-f 0444 root sys $DATADIR/fonts fonts/Symbol
+f 0444 root sys $DATADIR/fonts/Symbol fonts/Symbol
 f 0444 root sys $DATADIR/fonts fonts/Times*
 f 0444 root sys $DATADIR/fonts fonts/Utopia*
 f 0444 root sys $DATADIR/fonts fonts/Zapf*
@@ -397,5 +397,5 @@ f 0444 root sys $AMANDIR/man$MAN8DIR/lpmove.$MAN8EXT man/lpmove.man
 i 0555 root sys cups cups.sh
 
 #
-# End of "$Id: cups.list.in,v 1.20 2002/02/12 19:37:51 mike Exp $".
+# End of "$Id: cups.list.in,v 1.21 2002/02/12 20:56:13 mike Exp $".
 #
