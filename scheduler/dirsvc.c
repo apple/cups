@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.8 1999/04/23 13:01:57 mike Exp $"
+ * "$Id: dirsvc.c,v 1.9 1999/04/23 13:35:58 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -65,11 +65,11 @@ StartBrowsing(void)
 
   val = 1;
   if (setsockopt(BrowseSocket, SOL_SOCKET, SO_BROADCAST, &val, sizeof(val)))
-    perror("StartBrowsing");
+    perror("StartBrowsing/SO_BROADCAST");
 
   len = sizeof(val);
   getsockopt(BrowseSocket, IPPROTO_IP, IP_TTL, &val, &len);
-  printf("ttl = %d\n", val);
+  printf("ttl = %d (%d)\n", val, len);
 
  /*
   * Bind the socket to browse port...
@@ -163,7 +163,7 @@ UpdateBrowseList(void)
   }
 
   packet[bytes] = '\0';
-  fprintf(stderr, "UpdateBrowseList: %s", packet);
+  fprintf(stderr, "UpdateBrowseList: (%d bytes) %s", bytes, packet);
 
   if (sscanf(packet, "%x%x%s", &type, &state, uri) != 3)
   {
@@ -276,7 +276,7 @@ SendBrowseList(void)
 
       sprintf(packet, "%x %x %s\n", p->type, p->state, p->uri);
       bytes = strlen(packet);
-      fprintf(stderr, "SendBrowseList: %s", packet);
+      fprintf(stderr, "SendBrowseList: (%d bytes) %s", bytes, packet);
 
      /*
       * Send a packet to each browse address...
@@ -292,5 +292,5 @@ SendBrowseList(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.8 1999/04/23 13:01:57 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.9 1999/04/23 13:35:58 mike Exp $".
  */
