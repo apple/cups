@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.c,v 1.41.2.12 2002/06/06 03:01:53 mike Exp $"
+ * "$Id: auth.c,v 1.41.2.13 2002/06/11 18:40:07 mike Exp $"
  *
  *   Authorization routines for the Common UNIX Printing System (CUPS).
  *
@@ -39,12 +39,12 @@
  *   FindBest()           - Find the location entry that best matches the
  *                          resource.
  *   FindLocation()       - Find the named location.
+ *   GetMD5Passwd()       - Get an MD5 password.
  *   IsAuthorized()       - Check to see if the user is authorized...
  *   add_allow()          - Add an allow mask to the location.
  *   add_deny()           - Add a deny mask to the location.
  *   cups_crypt()         - Encrypt the password using the DES or MD5
  *                          algorithms, as needed.
- *   get_md5_passwd()     - Get an MD5 password.
  *   pam_func()           - PAM conversation function.
  *   to64()               - Base64-encode an integer value...
  */
@@ -83,8 +83,6 @@ static authmask_t	*add_deny(location_t *loc);
 #if !HAVE_LIBPAM
 static char		*cups_crypt(const char *pw, const char *salt);
 #endif /* !HAVE_LIBPAM */
-static char		*get_md5_passwd(const char *username, const char *group,
-			                char passwd[33]);
 #if HAVE_LIBPAM
 static int		pam_func(int, const struct pam_message **,
 			         struct pam_response **, void *);
@@ -816,6 +814,52 @@ FindLocation(const char *location)	/* I - Connection */
 
 
 /*
+ * 'GetMD5Passwd()' - Get an MD5 password.
+ */
+
+char *					/* O - MD5 password string */
+GetMD5Passwd(const char *username,	/* I - Username */
+             const char *group,		/* I - Group */
+             char       passwd[33])	/* O - MD5 password string */
+{
+  FILE	*fp;				/* passwd.md5 file */
+  char	filename[1024],			/* passwd.md5 filename */
+	line[256],			/* Line from file */
+	tempuser[33],			/* User from file */
+	tempgroup[33];			/* Group from file */
+
+
+  snprintf(filename, sizeof(filename), "%s/passwd.md5", ServerRoot);
+  if ((fp = fopen(filename, "r")) == NULL)
+    return (NULL);
+
+  while (fgets(line, sizeof(line), fp) != NULL)
+  {
+    if (sscanf(line, "%32[^:]:%32[^:]:%32s", tempuser, tempgroup, passwd) != 3)
+      continue;
+
+    if (strcmp(username, tempuser) == 0 &&
+        (group == NULL || strcmp(group, tempgroup) == 0))
+    {
+     /*
+      * Found the password entry!
+      */
+
+      fclose(fp);
+      return (passwd);
+    }
+  }
+
+ /*
+  * Didn't find a password entry - return NULL!
+  */
+
+  fclose(fp);
+  return (NULL);
+}
+
+
+/*
  * 'IsAuthorized()' - Check to see if the user is authorized...
  */
 
@@ -1203,13 +1247,13 @@ IsAuthorized(client_t *con)	/* I - Connection */
 	  if (best->num_names && best->level == AUTH_GROUP)
 	  {
             for (i = 0; i < best->num_names; i ++)
-	      if (get_md5_passwd(con->username, best->names[i], md5))
+	      if (GetMD5Passwd(con->username, best->names[i], md5))
 		break;
 
             if (i >= best->num_names)
 	      md5[0] = '\0';
 	  }
-	  else if (!get_md5_passwd(con->username, NULL, md5))
+	  else if (!GetMD5Passwd(con->username, NULL, md5))
 	    md5[0] = '\0';
 
 
@@ -1238,13 +1282,13 @@ IsAuthorized(client_t *con)	/* I - Connection */
 	  if (best->num_names && best->level == AUTH_GROUP)
 	  {
             for (i = 0; i < best->num_names; i ++)
-	      if (get_md5_passwd(con->username, best->names[i], md5))
+	      if (GetMD5Passwd(con->username, best->names[i], md5))
 		break;
 
             if (i >= best->num_names)
 	      md5[0] = '\0';
 	  }
-	  else if (!get_md5_passwd(con->username, NULL, md5))
+	  else if (!GetMD5Passwd(con->username, NULL, md5))
 	    md5[0] = '\0';
 
 	  if (!md5[0])
@@ -1569,52 +1613,6 @@ cups_crypt(const char *pw,	/* I - Password string */
 #endif /* !HAVE_LIBPAM */
 
 
-/*
- * 'get_md5_passwd()' - Get an MD5 password.
- */
-
-static char *				/* O - MD5 password string */
-get_md5_passwd(const char *username,	/* I - Username */
-               const char *group,	/* I - Group */
-               char       passwd[33])	/* O - MD5 password string */
-{
-  FILE	*fp;				/* passwd.md5 file */
-  char	filename[1024],			/* passwd.md5 filename */
-	line[256],			/* Line from file */
-	tempuser[33],			/* User from file */
-	tempgroup[33];			/* Group from file */
-
-
-  snprintf(filename, sizeof(filename), "%s/passwd.md5", ServerRoot);
-  if ((fp = fopen(filename, "r")) == NULL)
-    return (NULL);
-
-  while (fgets(line, sizeof(line), fp) != NULL)
-  {
-    if (sscanf(line, "%32[^:]:%32[^:]:%32s", tempuser, tempgroup, passwd) != 3)
-      continue;
-
-    if (strcmp(username, tempuser) == 0 &&
-        strcmp(group, tempgroup) == 0)
-    {
-     /*
-      * Found the password entry!
-      */
-
-      fclose(fp);
-      return (passwd);
-    }
-  }
-
- /*
-  * Didn't find a password entry - return NULL!
-  */
-
-  fclose(fp);
-  return (NULL);
-}
-
-
 #if HAVE_LIBPAM
 /*
  * 'pam_func()' - PAM conversation function.
@@ -1728,5 +1726,5 @@ to64(char          *s,	/* O - Output string */
 
 
 /*
- * End of "$Id: auth.c,v 1.41.2.12 2002/06/06 03:01:53 mike Exp $".
+ * End of "$Id: auth.c,v 1.41.2.13 2002/06/11 18:40:07 mike Exp $".
  */

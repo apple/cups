@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.127.2.15 2002/05/16 14:00:10 mike Exp $"
+ * "$Id: ipp.c,v 1.127.2.16 2002/06/11 18:40:08 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -5707,6 +5707,7 @@ validate_user(client_t   *con,		/* I - Client connection */
   ipp_attribute_t	*attr;		/* requesting-user-name attribute */
   struct passwd		*user;		/* User info */
   struct group		*group;		/* System group info */
+  char			junk[33];	/* MD5 password (not used) */
 
 
   LogMessage(L_DEBUG2, "validate_user(%d, %s, %s, %d)\n", con->http.fd,
@@ -5767,7 +5768,16 @@ validate_user(client_t   *con,		/* I - Client connection */
     {
      /*
       * Username not found, group not found, or user is not part of the
-      * system group...
+      * system group...  Check for a user and group in the MD5 password
+      * file...
+      */
+
+      for (i = 0; i < NumSystemGroups; i ++)
+        if (GetMD5Passwd(username, SystemGroups[i], junk) != NULL)
+	  return (1);
+
+     /*
+      * Nope, not an MD5 user, either.  Return 0 indicating no-go...
       */
 
       return (0);
@@ -5779,5 +5789,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.127.2.15 2002/05/16 14:00:10 mike Exp $".
+ * End of "$Id: ipp.c,v 1.127.2.16 2002/06/11 18:40:08 mike Exp $".
  */

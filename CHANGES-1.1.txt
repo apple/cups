@@ -3,6 +3,10 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.16
 
+	- The scheduler didn't validate Digest users against the
+	  system group(s), so Digest and BasicDigest
+	  authentication didn't work for administration
+	  operations.
 	- The scheduler now passes the SHLIB_PATH environment
 	  variable to child processes (HP-UX shared libraries)
 	- The scheduler now maps accesses from the loopback
