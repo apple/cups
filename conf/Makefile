@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.10.2.4 2003/01/07 18:26:20 mike Exp $"
+# "$Id: Makefile,v 1.10.2.5 2004/02/26 16:59:02 mike Exp $"
 #
 #   Configuration file makefile for the Common UNIX Printing System (CUPS).
 #
@@ -67,10 +67,10 @@ install:
 	done
 	-if test x$(PAMDIR) != x$(BUILDROOT); then \
 		$(INSTALL_DIR) $(PAMDIR); \
-		$(INSTALL_DATA) pam.conf $(PAMDIR)/cups; \
+		$(INSTALL_DATA) $(PAMFILE) $(PAMDIR)/cups; \
 	fi
 
 
 #
-# End of "$Id: Makefile,v 1.10.2.4 2003/01/07 18:26:20 mike Exp $".
+# End of "$Id: Makefile,v 1.10.2.5 2004/02/26 16:59:02 mike Exp $".
 #

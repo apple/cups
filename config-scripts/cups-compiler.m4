@@ -1,9 +1,9 @@
 dnl
-dnl "$Id: cups-compiler.m4,v 1.9.2.16 2003/08/20 18:28:27 mike Exp $"
+dnl "$Id: cups-compiler.m4,v 1.9.2.17 2004/02/26 16:59:02 mike Exp $"
 dnl
 dnl   Common configuration stuff for the Common UNIX Printing System (CUPS).
 dnl
-dnl   Copyright 1997-2003 by Easy Software Products, all rights reserved.
+dnl   Copyright 1997-2004 by Easy Software Products, all rights reserved.
 dnl
 dnl   These coded instructions, statements, and computer programs are the
 dnl   property of Easy Software Products and are protected by Federal
@@ -202,5 +202,5 @@ if test $uname = HP-UX; then
 fi
 
 dnl
-dnl End of "$Id: cups-compiler.m4,v 1.9.2.16 2003/08/20 18:28:27 mike Exp $".
+dnl End of "$Id: cups-compiler.m4,v 1.9.2.17 2004/02/26 16:59:02 mike Exp $".
 dnl

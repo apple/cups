@@ -1,9 +1,9 @@
 dnl
-dnl "$Id: cups-common.m4,v 1.12.2.18 2003/11/19 17:32:31 mike Exp $"
+dnl "$Id: cups-common.m4,v 1.12.2.19 2004/02/26 16:59:02 mike Exp $"
 dnl
 dnl   Common configuration stuff for the Common UNIX Printing System (CUPS).
 dnl
-dnl   Copyright 1997-2003 by Easy Software Products, all rights reserved.
+dnl   Copyright 1997-2004 by Easy Software Products, all rights reserved.
 dnl
 dnl   These coded instructions, statements, and computer programs are the
 dnl   property of Easy Software Products and are protected by Federal
@@ -210,5 +210,5 @@ AC_SUBST(DEFAULT_IPP_PORT)
 AC_DEFINE_UNQUOTED(CUPS_DEFAULT_IPP_PORT,$DEFAULT_IPP_PORT)
 
 dnl
-dnl End of "$Id: cups-common.m4,v 1.12.2.18 2003/11/19 17:32:31 mike Exp $".
+dnl End of "$Id: cups-common.m4,v 1.12.2.19 2004/02/26 16:59:02 mike Exp $".
 dnl

@@ -1,9 +1,9 @@
 dnl
-dnl "$Id: cups-network.m4,v 1.1.2.10 2003/08/28 15:16:25 mike Exp $"
+dnl "$Id: cups-network.m4,v 1.1.2.11 2004/02/26 16:59:02 mike Exp $"
 dnl
 dnl   Networking stuff for the Common UNIX Printing System (CUPS).
 dnl
-dnl   Copyright 1997-2003 by Easy Software Products, all rights reserved.
+dnl   Copyright 1997-2004 by Easy Software Products, all rights reserved.
 dnl
 dnl   These coded instructions, statements, and computer programs are the
 dnl   property of Easy Software Products and are protected by Federal
@@ -55,5 +55,5 @@ AC_ARG_WITH(maxfiles, [  --with-maxfiles=N       set maximum number of file desc
 AC_DEFINE_UNQUOTED(CUPS_MAX_FDS, $maxfiles)
 
 dnl
-dnl End of "$Id: cups-network.m4,v 1.1.2.10 2003/08/28 15:16:25 mike Exp $".
+dnl End of "$Id: cups-network.m4,v 1.1.2.11 2004/02/26 16:59:02 mike Exp $".
 dnl
