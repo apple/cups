@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c,v 1.51.2.40 2003/02/19 14:43:53 mike Exp $"
+ * "$Id: ppd.c,v 1.51.2.41 2003/02/19 14:46:28 mike Exp $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -627,9 +627,7 @@ ppdOpen(FILE *fp)			/* I - File to read from */
 	* Now fill in the initial information for the option...
 	*/
 
-	if (!strcmp(name, "SetResolution"))
-          option->section = PPD_ORDER_EXIT;
-	else if (!strncmp(name, "JCL", 3))
+	if (!strncmp(name, "JCL", 3))
           option->section = PPD_ORDER_JCL;
 	else
           option->section = PPD_ORDER_ANY;
@@ -3214,5 +3212,5 @@ ppd_read(FILE *fp,			/* I - File to read from */
 
 
 /*
- * End of "$Id: ppd.c,v 1.51.2.40 2003/02/19 14:43:53 mike Exp $".
+ * End of "$Id: ppd.c,v 1.51.2.41 2003/02/19 14:46:28 mike Exp $".
  */
