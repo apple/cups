@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.124 2003/09/16 20:38:19 mike Exp $"
+ * "$Id: dirsvc.c,v 1.125 2003/10/09 19:30:06 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -302,19 +302,19 @@ ProcessBrowseData(const char   *uri,	/* I - URI of printer/class */
     update  = 1;
   }
 
-  if (!p->location || strcmp(p->location, location))
+  if (location && (!p->location || strcmp(p->location, location)))
   {
     SetString(&p->location, location);
     update = 1;
   }
 
-  if (!p->info || strcmp(p->info, info))
+  if (info && (!p->info || strcmp(p->info, info)))
   {
     SetString(&p->info, info);
     update = 1;
   }
 
-  if (!make_model[0])
+  if (!make_model || !make_model[0])
   {
     if (type & CUPS_PRINTER_CLASS)
       snprintf(local_make_model, sizeof(local_make_model),
@@ -1716,6 +1716,8 @@ AttrCallback(SLPHandle  hslp,		/* I - SLP handle */
 
   if (GetSlpAttrVal(attrlist, "(printer-location=", &(p->location)))
     return (SLP_FALSE);
+  if (GetSlpAttrVal(attrlist, "(printer-info=", &(p->info)))
+    return (SLP_FALSE);
   if (GetSlpAttrVal(attrlist, "(printer-make-and-model=", &(p->make_model)))
     return (SLP_FALSE);
 
@@ -1902,5 +1904,5 @@ UpdateSLPBrowse(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.124 2003/09/16 20:38:19 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.125 2003/10/09 19:30:06 mike Exp $".
  */
