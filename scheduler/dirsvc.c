@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.25 1999/06/23 15:38:25 mike Exp $"
+ * "$Id: dirsvc.c,v 1.26 1999/06/23 15:58:14 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -325,7 +325,7 @@ UpdateBrowseList(void)
   * Update the state...
   */
 
-  p->type        = type;
+  p->type        = type | CUPS_PRINTER_REMOTE;
   p->state       = state;
   p->accepting   = state != IPP_PRINTER_STOPPED;
   p->browse_time = time(NULL);
@@ -492,5 +492,5 @@ SendBrowseList(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.25 1999/06/23 15:38:25 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.26 1999/06/23 15:58:14 mike Exp $".
  */
