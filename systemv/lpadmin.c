@@ -1,5 +1,5 @@
 /*
- * "$Id: lpadmin.c,v 1.22.2.17 2003/01/07 18:27:29 mike Exp $"
+ * "$Id: lpadmin.c,v 1.22.2.18 2003/01/15 04:25:57 mike Exp $"
  *
  *   "lpadmin" command for the Common UNIX Printing System (CUPS).
  *
@@ -252,7 +252,7 @@ main(int  argc,			/* I - Number of command-line arguments */
         case 'E' : /* Enable the printer */
 	    if (printer == NULL)
 	    {
-#ifdef HAVE_LIBSSL
+#ifdef HAVE_SSL
 	      cupsSetEncryption(HTTP_ENCRYPT_REQUIRED);
 
 	      if (http)
@@ -260,7 +260,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 #else
               fprintf(stderr, "%s: Sorry, no encryption support compiled in!\n",
 	              argv[0]);
-#endif /* HAVE_LIBSSL */
+#endif /* HAVE_SSL */
 	      break;
 	    }
 
@@ -2018,5 +2018,5 @@ validate_name(const char *name)	/* I - Name to check */
 
 
 /*
- * End of "$Id: lpadmin.c,v 1.22.2.17 2003/01/07 18:27:29 mike Exp $".
+ * End of "$Id: lpadmin.c,v 1.22.2.18 2003/01/15 04:25:57 mike Exp $".
  */

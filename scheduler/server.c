@@ -1,5 +1,5 @@
 /*
- * "$Id: server.c,v 1.2.2.3 2003/01/07 18:27:27 mike Exp $"
+ * "$Id: server.c,v 1.2.2.4 2003/01/15 04:25:56 mike Exp $"
  *
  *   Server start/stop routines for the Common UNIX Printing System (CUPS).
  *
@@ -35,9 +35,11 @@
 
 #include <grp.h>
 
-#ifdef HAVE_LIBSSL
+#if defined HAVE_LIBSSL
 #  include <openssl/ssl.h>
 #  include <openssl/rand.h>
+#elif defined HAVE_GNUTLS
+#  include <gnutls/gnutls.h>
 #endif /* HAVE_LIBSSL */
 
 
@@ -55,7 +57,7 @@ StartServer(void)
 #endif /* HAVE_LIBSSL */
 
 
-#ifdef HAVE_LIBSSL
+#if defined HAVE_LIBSSL
  /*
   * Initialize the encryption libraries...
   */
@@ -75,6 +77,12 @@ StartServer(void)
     data[i] = rand(); /* Yes, this is a poor source of random data... */
 
   RAND_seed(&data, sizeof(data));
+#elif defined HAVE_GNUTLS
+ /*
+  * Initialize the encryption libraries...
+  */
+
+  gnutls_global_init();
 #endif /* HAVE_LIBSSL */
 
  /*
@@ -146,5 +154,5 @@ StopServer(void)
 
 
 /*
- * End of "$Id: server.c,v 1.2.2.3 2003/01/07 18:27:27 mike Exp $".
+ * End of "$Id: server.c,v 1.2.2.4 2003/01/15 04:25:56 mike Exp $".
  */

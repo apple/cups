@@ -7,6 +7,8 @@ lpd.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
 lpd.o: ../cups/ppd.h ../cups/string.h ../config.h
 parallel.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
 parallel.o: ../cups/ppd.h ../cups/string.h ../config.h
+scsi.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
+scsi.o: ../cups/ppd.h ../cups/string.h ../config.h
 serial.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
 serial.o: ../cups/ppd.h ../cups/string.h ../config.h
 socket.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h

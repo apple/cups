@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.82.2.22 2003/01/14 14:34:15 mike Exp $"
+ * "$Id: http.c,v 1.82.2.23 2003/01/15 04:25:49 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS).
  *
@@ -59,6 +59,10 @@
  *   http_send()          - Send a request with all fields and the trailing
  *                          blank line.
  *   http_upgrade()       - Force upgrade to TLS encryption.
+ *   http_setup_ssl()     - Set up SSL/TLS on a connection.
+ *   http_shutdown_ssl()  - Shut down SSL/TLS on a connection.
+ *   http_read_ssl()      - Read from a SSL/TLS connection.
+ *   http_write_ssl()     - Write to a SSL/TLS connection.
  */
 
 /*
@@ -73,19 +77,13 @@
 #include <fcntl.h>
 #include <errno.h>
 
-#include "http.h"
+#include "http-private.h"
 #include "ipp.h"
 #include "debug.h"
 
 #ifndef WIN32
 #  include <signal.h>
 #endif /* !WIN32 */
-
-#ifdef HAVE_LIBSSL
-#  include <openssl/err.h>
-#  include <openssl/rand.h>
-#  include <openssl/ssl.h>
-#endif /* HAVE_LIBSSL */
 
 
 /*
@@ -105,9 +103,13 @@
 static http_field_t	http_field(const char *name);
 static int		http_send(http_t *http, http_state_t request,
 			          const char *uri);
-#ifdef HAVE_LIBSSL
+#ifdef HAVE_SSL
 static int		http_upgrade(http_t *http);
-#endif /* HAVE_LIBSSL */
+static int		http_setup_ssl(http_t *http);
+static void		http_shutdown_ssl(http_t *http);
+static int		http_read_ssl(http_t *http, char *buf, int len);
+static int		http_write_ssl(http_t *http, const char *buf, int len);
+#endif /* HAVE_SSL */
 
 
 /*
@@ -209,6 +211,10 @@ httpInitialize(void)
   signal(SIGPIPE, SIG_IGN);
 #endif /* WIN32 */
 
+#ifdef HAVE_GNUTLS
+  gnutls_global_init();
+#endif /* HAVE_GNUTLS */
+
 #ifdef HAVE_LIBSSL
   SSL_load_error_strings();
   SSL_library_init();
@@ -271,28 +277,13 @@ httpCheck(http_t *http)		/* I - HTTP connection */
 void
 httpClose(http_t *http)		/* I - Connection to close */
 {
-#ifdef HAVE_LIBSSL
-  SSL_CTX	*context;	/* Context for encryption */
-  SSL		*conn;		/* Connection for encryption */
-#endif /* HAVE_LIBSSL */
-
-
   if (!http)
     return;
 
-#ifdef HAVE_LIBSSL
+#ifdef HAVE_SSL
   if (http->tls)
-  {
-    conn    = (SSL *)(http->tls);
-    context = SSL_get_SSL_CTX(conn);
-
-    SSL_shutdown(conn);
-    SSL_CTX_free(context);
-    SSL_free(conn);
-
-    http->tls = NULL;
-  }
-#endif /* HAVE_LIBSSL */
+    http_shutdown_ssl(http);
+#endif /* HAVE_SSL */
 
 #ifdef WIN32
   closesocket(http->fd);
@@ -444,7 +435,7 @@ int					/* O - -1 on error, 0 on success */
 httpEncryption(http_t            *http,	/* I - HTTP data */
                http_encryption_t e)	/* I - New encryption preference */
 {
-#ifdef HAVE_LIBSSL
+#ifdef HAVE_SSL
   if (!http)
     return (0);
 
@@ -462,7 +453,7 @@ httpEncryption(http_t            *http,	/* I - HTTP data */
     return (-1);
   else
     return (0);
-#endif /* HAVE_LIBSSL */
+#endif /* HAVE_SSL */
 }
 
 
@@ -474,23 +465,11 @@ int				/* O - 0 on success, non-zero on failure */
 httpReconnect(http_t *http)	/* I - HTTP data */
 {
   int		val;		/* Socket option value */
-#ifdef HAVE_LIBSSL
-  SSL_CTX	*context;	/* Context for encryption */
-  SSL		*conn;		/* Connection for encryption */
 
-
+#ifdef HAVE_SSL
   if (http->tls)
-  {
-    conn    = (SSL *)(http->tls);
-    context = SSL_get_SSL_CTX(conn);
-
-    SSL_shutdown(conn);
-    SSL_CTX_free(context);
-    SSL_free(conn);
-
-    http->tls = NULL;
-  }
-#endif /* HAVE_LIBSSL */
+    http_shutdown_ssl(http);
+#endif /* HAVE_SSL */
 
  /*
   * Close any previously open socket...
@@ -569,43 +548,27 @@ httpReconnect(http_t *http)	/* I - HTTP data */
   http->error  = 0;
   http->status = HTTP_CONTINUE;
 
-#ifdef HAVE_LIBSSL
+#ifdef HAVE_SSL
   if (http->encryption == HTTP_ENCRYPT_ALWAYS)
   {
    /*
     * Always do encryption via SSL.
     */
 
-    context = SSL_CTX_new(SSLv23_method());
-    conn    = SSL_new(context);
-
-    SSL_set_fd(conn, http->fd);
-    if (SSL_connect(conn) != 1)
+    if (http_setup_ssl(http) != 0)
     {
-      SSL_CTX_free(context);
-      SSL_free(conn);
-
-#ifdef WIN32
-      http->error  = WSAGetLastError();
-#else
-      http->error  = errno;
-#endif /* WIN32 */
-      http->status = HTTP_ERROR;
-
 #ifdef WIN32
       closesocket(http->fd);
 #else
       close(http->fd);
-#endif
+#endif /* WIN32 */
 
       return (-1);
     }
-
-    http->tls = conn;
   }
   else if (http->encryption == HTTP_ENCRYPT_REQUIRED)
     return (http_upgrade(http));
-#endif /* HAVE_LIBSSL */
+#endif /* HAVE_SSL */
 
   return (0);
 }
@@ -920,11 +883,11 @@ httpRead(http_t *http,			/* I - HTTP data */
     else
       bytes = http->data_remaining;
 
-#ifdef HAVE_LIBSSL
+#ifdef HAVE_SSL
     if (http->tls)
-      bytes = SSL_read((SSL *)(http->tls), http->buffer, bytes);
+      bytes = http_read_ssl(http, http->buffer, bytes);
     else
-#endif /* HAVE_LIBSSL */
+#endif /* HAVE_SSL */
     {
       DEBUG_printf(("httpRead: reading %d bytes from socket into buffer...\n",
                     bytes));
@@ -969,10 +932,10 @@ httpRead(http_t *http,			/* I - HTTP data */
     if (http->used > 0)
       memmove(http->buffer, http->buffer + length, http->used);
   }
-#ifdef HAVE_LIBSSL
+#ifdef HAVE_SSL
   else if (http->tls)
-    bytes = SSL_read((SSL *)(http->tls), buffer, length);
-#endif /* HAVE_LIBSSL */
+    bytes = http_read_ssl(http, buffer, length);
+#endif /* HAVE_SSL */
   else
   {
     DEBUG_printf(("httpRead: reading %d bytes from socket...\n", length));
@@ -1094,11 +1057,11 @@ httpWrite(http_t     *http,		/* I - HTTP data */
 
   while (length > 0)
   {
-#ifdef HAVE_LIBSSL
+#ifdef HAVE_SSL
     if (http->tls)
-      bytes = SSL_write((SSL *)(http->tls), buffer, length);
+      bytes = http_write_ssl(http, buffer, length);
     else
-#endif /* HAVE_LIBSSL */
+#endif /* HAVE_SSL */
     bytes = send(http->fd, buffer, length, 0);
 
     if (bytes < 0)
@@ -1231,12 +1194,11 @@ httpGets(char   *line,			/* I - Line to read into */
       * No newline; see if there is more data to be read...
       */
 
-#ifdef HAVE_LIBSSL
+#ifdef HAVE_SSL
       if (http->tls)
-        bytes = SSL_read((SSL *)(http->tls), bufend,
-	                 HTTP_MAX_BUFFER - http->used);
+	bytes = http_read_ssl(http, bufend, HTTP_MAX_BUFFER - http->used);
       else
-#endif /* HAVE_LIBSSL */
+#endif /* HAVE_SSL */
       bytes = recv(http->fd, bufend, HTTP_MAX_BUFFER - http->used, 0);
 
       if (bytes < 0)
@@ -1355,11 +1317,11 @@ httpPrintf(http_t     *http,		/* I - HTTP data */
 
   for (tbytes = 0, bufptr = buf; tbytes < bytes; tbytes += nbytes, bufptr += nbytes)
   {
-#ifdef HAVE_LIBSSL
+#ifdef HAVE_SSL
     if (http->tls)
-      nbytes = SSL_write((SSL *)(http->tls), bufptr, bytes - tbytes);
+      nbytes = http_write_ssl(http, bufptr, bytes - tbytes);
     else
-#endif /* HAVE_LIBSSL */
+#endif /* HAVE_SSL */
     nbytes = send(http->fd, bufptr, bytes - tbytes, 0);
 
     if (nbytes < 0)
@@ -1505,10 +1467,6 @@ httpUpdate(http_t *http)		/* I - HTTP data */
   http_field_t	field;			/* Field index */
   int		major, minor;		/* HTTP version numbers */
   http_status_t	status;			/* Authorization status */
-#ifdef HAVE_LIBSSL
-  SSL_CTX	*context;		/* Context for encryption */
-  SSL		*conn;			/* Connection for encryption */
-#endif /* HAVE_LIBSSL */
 
 
   DEBUG_printf(("httpUpdate(%p)\n", http));
@@ -1542,42 +1500,26 @@ httpUpdate(http_t *http)		/* I - HTTP data */
       if (http->status == HTTP_CONTINUE)
         return (http->status);
 
-#ifdef HAVE_LIBSSL
+#ifdef HAVE_SSL
       if (http->status == HTTP_SWITCHING_PROTOCOLS && !http->tls)
       {
-	context = SSL_CTX_new(SSLv23_method());
-	conn    = SSL_new(context);
-
-	SSL_set_fd(conn, http->fd);
-	if (SSL_connect(conn) != 1)
+	if (http_setup_ssl(http) != 0)
 	{
-	  SSL_CTX_free(context);
-	  SSL_free(conn);
-
-#ifdef WIN32
-	  http->error  = WSAGetLastError();
-#else
-	  http->error  = errno;
-#endif /* WIN32 */
-	  http->status = HTTP_ERROR;
-
-#ifdef WIN32
+#  ifdef WIN32
 	  closesocket(http->fd);
-#else
+#  else
 	  close(http->fd);
-#endif
+#  endif /* WIN32 */
 
 	  return (HTTP_ERROR);
 	}
-
-	http->tls = conn;
 
         return (HTTP_CONTINUE);
       }
       else if (http->status == HTTP_UPGRADE_REQUIRED &&
                http->encryption != HTTP_ENCRYPT_NEVER)
         http->encryption = HTTP_ENCRYPT_REQUIRED;
-#endif /* HAVE_LIBSSL */
+#endif /* HAVE_SSL */
 
       httpGetLength(http);
 
@@ -1911,13 +1853,13 @@ http_send(http_t       *http,	/* I - HTTP data */
 
   http->status = HTTP_CONTINUE;
 
-#ifdef HAVE_LIBSSL
+#ifdef HAVE_SSL
   if (http->encryption == HTTP_ENCRYPT_REQUIRED && !http->tls)
   {
     httpSetField(http, HTTP_FIELD_CONNECTION, "Upgrade");
     httpSetField(http, HTTP_FIELD_UPGRADE, "TLS/1.0,SSL/2.0,SSL/3.0");
   }
-#endif /* HAVE_LIBSSL */
+#endif /* HAVE_SSL */
 
   if (httpPrintf(http, "%s %s HTTP/1.1\r\n", codes[request], buf) < 1)
   {
@@ -1949,7 +1891,8 @@ http_send(http_t       *http,	/* I - HTTP data */
 }
 
 
-#ifdef HAVE_LIBSSL
+#ifdef HAVE_SSL
+
 /*
  * 'http_upgrade()' - Force upgrade to TLS encryption.
  */
@@ -2038,9 +1981,160 @@ http_upgrade(http_t *http)	/* I - HTTP data */
   else
     return (ret);
 }
-#endif /* HAVE_LIBSSL */
 
 
 /*
- * End of "$Id: http.c,v 1.82.2.22 2003/01/14 14:34:15 mike Exp $".
+ * 'http_setup_ssl()' - Set up SSL/TLS support on a connection.
+ */
+
+static int				/* O - Status of connection */
+http_setup_ssl(http_t *http)		/* I - HTTP data */
+{
+#ifdef HAVE_LIBSSL
+  SSL_CTX	*context;	/* Context for encryption */
+  SSL		*conn;		/* Connection for encryption */
+#elif defined(HAVE_GNUTLS) /* HAVE_LIBSSL */
+  http_tls_t	*conn;		/* TLS session object */
+  gnutls_certificate_client_credentials *credentials; /* TLS credentials */
+#endif /* HAVE_GNUTLS */
+
+#ifdef HAVE_LIBSSL
+
+  context = SSL_CTX_new(SSLv23_client_method());
+  conn    = SSL_new(context);
+
+  SSL_set_fd(conn, http->fd);
+  if (SSL_connect(conn) != 1)
+  {
+    SSL_CTX_free(context);
+    SSL_free(conn);
+
+#ifdef WIN32
+    http->error  = WSAGetLastError();
+#else
+    http->error  = errno;
+#endif /* WIN32 */
+    http->status = HTTP_ERROR;
+
+    return (HTTP_ERROR);
+  }
+
+#elif defined(HAVE_GNUTLS) /* HAVE_LIBSSL */
+
+  conn = (http_tls_t *)malloc(sizeof(http_tls_t));
+  if (conn == NULL)
+  {
+    http->error  = errno;
+    http->status = HTTP_ERROR;
+
+    return (-1);
+  }
+  credentials = (gnutls_certificate_client_credentials *)
+    malloc(sizeof(gnutls_certificate_client_credentials));
+  if (credentials == NULL)
+  {
+    free(conn);
+
+    http->error = errno;
+    http->status = HTTP_ERROR;
+
+    return (-1);
+  }
+
+  gnutls_certificate_allocate_credentials(credentials);
+
+  gnutls_init(&(conn->session), GNUTLS_CLIENT);
+  gnutls_set_default_priority(conn->session);
+  gnutls_credentials_set(conn->session, GNUTLS_CRD_CERTIFICATE, *credentials);
+  gnutls_transport_set_ptr(conn->session, http->fd);
+
+  if ((gnutls_handshake(conn->session)) != GNUTLS_E_SUCCESS)
+  {
+    http->error  = errno;
+    http->status = HTTP_ERROR;
+
+    return (-1);
+  }
+
+  conn->credentials = credentials;
+
+#endif /* HAVE_GNUTLS */
+
+  http->tls = conn;
+  return (0);
+}
+
+
+/*
+ * 'http_shutdown_ssl()' - Shut down SSL/TLS on a connection.
+ */
+
+static void
+http_shutdown_ssl(http_t *http)	/* I - HTTP data */
+{
+#ifdef HAVE_LIBSSL
+  SSL_CTX	*context;	/* Context for encryption */
+  SSL		*conn;		/* Connection for encryption */
+
+  conn    = (SSL *)(http->tls);
+  context = SSL_get_SSL_CTX(conn);
+
+  SSL_shutdown(conn);
+  SSL_CTX_free(context);
+  SSL_free(conn);
+#elif defined(HAVE_GNUTLS) /* HAVE_LIBSSL */
+  http_tls_t      *conn;		/* Encryption session */
+  gnutls_certificate_client_credentials *credentials; /* TLS credentials */
+
+  conn = (http_tls_t *)(http->tls);
+  credentials = (gnutls_certificate_client_credentials *)(conn->credentials);
+
+  gnutls_bye(conn->session, GNUTLS_SHUT_RDWR);
+  gnutls_deinit(conn->session);
+  gnutls_certificate_free_credentials(*credentials);
+  free(credentials);
+  free(conn);
+#endif /* HAVE_GNUTLS */
+
+  http->tls = NULL;
+}
+
+
+/*
+ * 'http_read_ssl()' - Read from a SSL/TLS connection.
+ */
+
+static int				/* O - Bytes read */
+http_read_ssl(http_t *http,		/* I - HTTP data */
+	      char   *buf,		/* I - Buffer to store data */
+	      int    len)		/* I - Length of buffer */
+{
+#if defined(HAVE_LIBSSL)
+  return (SSL_read((SSL *)(http->tls), buf, len));
+#elif defined(HAVE_GNUTLS) /* HAVE_LIBSSL */
+  return (gnutls_record_recv(((http_tls_t *)(http->tls))->session, buf, len));
+#endif /* HAVE_GNUTLS */
+}
+
+
+/*
+ * 'http_write_ssl()' - Write to a SSL/TLS connection.
+ */
+
+static int				/* O - Bytes written */
+http_write_ssl(http_t     *http,	/* I - HTTP data */
+	       const char *buf,		/* I - Buffer holding data */
+	       int        len)		/* I - Length of buffer */
+{
+#if defined(HAVE_LIBSSL)
+  return (SSL_write((SSL *)(http->tls), buf, len));
+#elif defined(HAVE_GNUTLS) /* HAVE_LIBSSL */
+  return (gnutls_record_send(((http_tls_t *)(http->tls))->session, buf, len));
+#endif /* HAVE_GNUTLS */
+}
+
+#endif /* HAVE_SSL */
+
+/*
+ * End of "$Id: http.c,v 1.82.2.23 2003/01/15 04:25:49 mike Exp $".
  */

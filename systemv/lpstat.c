@@ -1,5 +1,5 @@
 /*
- * "$Id: lpstat.c,v 1.37.2.14 2003/01/07 18:27:31 mike Exp $"
+ * "$Id: lpstat.c,v 1.37.2.15 2003/01/15 04:25:58 mike Exp $"
  *
  *   "lpstat" command for the Common UNIX Printing System (CUPS).
  *
@@ -101,7 +101,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	    break;
 
         case 'E' : /* Encrypt */
-#ifdef HAVE_LIBSSL
+#ifdef HAVE_SSL
 	    cupsSetEncryption(HTTP_ENCRYPT_REQUIRED);
 
 	    if (http)
@@ -109,7 +109,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 #else
             fprintf(stderr, "%s: Sorry, no encryption support compiled in!\n",
 	            argv[0]);
-#endif /* HAVE_LIBSSL */
+#endif /* HAVE_SSL */
 	    break;
 
         case 'P' : /* Show paper types */
@@ -2114,5 +2114,5 @@ show_scheduler(http_t *http)	/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpstat.c,v 1.37.2.14 2003/01/07 18:27:31 mike Exp $".
+ * End of "$Id: lpstat.c,v 1.37.2.15 2003/01/15 04:25:58 mike Exp $".
  */

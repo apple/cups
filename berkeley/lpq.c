@@ -1,5 +1,5 @@
 /*
- * "$Id: lpq.c,v 1.17.2.8 2003/01/07 18:26:17 mike Exp $"
+ * "$Id: lpq.c,v 1.17.2.9 2003/01/15 04:25:47 mike Exp $"
  *
  *   "lpq" command for the Common UNIX Printing System (CUPS).
  *
@@ -71,9 +71,9 @@ main(int  argc,		/* I - Number of command-line arguments */
 		longstatus;	/* Show file details */
   int		num_dests;	/* Number of destinations */
   cups_dest_t	*dests;		/* Destinations */
-#ifdef HAVE_LIBSSL
+#ifdef HAVE_SSL
   http_encryption_t encryption;	/* Encryption? */
-#endif /* HAVE_LIBSSL */
+#endif /* HAVE_SSL */
 
 
  /*
@@ -111,7 +111,7 @@ main(int  argc,		/* I - Number of command-line arguments */
       switch (argv[i][1])
       {
         case 'E' : /* Encrypt */
-#ifdef HAVE_LIBSSL
+#ifdef HAVE_SSL
 	    encryption = HTTP_ENCRYPT_REQUIRED;
 
 	    if (http)
@@ -119,7 +119,7 @@ main(int  argc,		/* I - Number of command-line arguments */
 #else
             fprintf(stderr, "%s: Sorry, no encryption support compiled in!\n",
 	            argv[0]);
-#endif /* HAVE_LIBSSL */
+#endif /* HAVE_SSL */
 	    break;
 
         case 'P' : /* Printer */
@@ -545,5 +545,5 @@ show_printer(http_t     *http,	/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpq.c,v 1.17.2.8 2003/01/07 18:26:17 mike Exp $".
+ * End of "$Id: lpq.c,v 1.17.2.9 2003/01/15 04:25:47 mike Exp $".
  */

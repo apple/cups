@@ -1,5 +1,5 @@
 /*
- * "$Id: lpr.c,v 1.20.2.7 2003/01/07 18:26:17 mike Exp $"
+ * "$Id: lpr.c,v 1.20.2.8 2003/01/15 04:25:48 mike Exp $"
  *
  *   "lpr" command for the Common UNIX Printing System (CUPS).
  *
@@ -104,12 +104,12 @@ main(int  argc,		/* I - Number of command-line arguments */
       switch (ch = argv[i][1])
       {
         case 'E' : /* Encrypt */
-#ifdef HAVE_LIBSSL
+#ifdef HAVE_SSL
 	    cupsSetEncryption(HTTP_ENCRYPT_REQUIRED);
 #else
             fprintf(stderr, "%s: Sorry, no encryption support compiled in!\n",
 	            argv[0]);
-#endif /* HAVE_LIBSSL */
+#endif /* HAVE_SSL */
 	    break;
 
 	case '1' : /* TROFF font set 1 */
@@ -429,5 +429,5 @@ sighandler(int s)	/* I - Signal number */
 
 
 /*
- * End of "$Id: lpr.c,v 1.20.2.7 2003/01/07 18:26:17 mike Exp $".
+ * End of "$Id: lpr.c,v 1.20.2.8 2003/01/15 04:25:48 mike Exp $".
  */

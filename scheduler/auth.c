@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.c,v 1.41.2.17 2003/01/07 18:27:14 mike Exp $"
+ * "$Id: auth.c,v 1.41.2.18 2003/01/15 04:25:53 mike Exp $"
  *
  *   Authorization routines for the Common UNIX Printing System (CUPS).
  *
@@ -1018,7 +1018,7 @@ IsAuthorized(client_t *con)	/* I - Connection */
   if (auth == AUTH_DENY && best->satisfy == AUTH_SATISFY_ALL)
     return (HTTP_FORBIDDEN);
 
-#ifdef HAVE_LIBSSL
+#ifdef HAVE_SSL
  /*
   * See if encryption is required...
   */
@@ -1028,7 +1028,7 @@ IsAuthorized(client_t *con)	/* I - Connection */
     LogMessage(L_DEBUG2, "IsAuthorized: Need upgrade to TLS...");
     return (HTTP_UPGRADE_REQUIRED);
   }
-#endif /* HAVE_LIBSSL */
+#endif /* HAVE_SSL */
 
  /*
   * Now see what access level is required...
@@ -1730,5 +1730,5 @@ to64(char          *s,	/* O - Output string */
 
 
 /*
- * End of "$Id: auth.c,v 1.41.2.17 2003/01/07 18:27:14 mike Exp $".
+ * End of "$Id: auth.c,v 1.41.2.18 2003/01/15 04:25:53 mike Exp $".
  */

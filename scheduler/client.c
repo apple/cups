@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.91.2.34 2003/01/14 22:09:45 mike Exp $"
+ * "$Id: client.c,v 1.91.2.35 2003/01/15 04:25:54 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -46,14 +46,7 @@
  */
 
 #include "cupsd.h"
-
 #include <grp.h>
-
-#ifdef HAVE_LIBSSL
-#  include <openssl/err.h>
-#  include <openssl/ssl.h>
-#  include <openssl/rand.h>
-#endif /* HAVE_LIBSSL */
 
 
 /*
@@ -308,7 +301,7 @@ AcceptClient(listener_t *lis)	/* I - Listener socket */
   if (NumClients == MaxClients)
     PauseListening();
 
-#ifdef HAVE_LIBSSL
+#ifdef HAVE_SSL
  /*
   * See if we are connecting on a secure port...
   */
@@ -323,7 +316,7 @@ AcceptClient(listener_t *lis)	/* I - Listener socket */
 
     EncryptClient(con);
   }
-#endif /* HAVE_LIBSSL */
+#endif /* HAVE_SSL */
 }
 
 
@@ -347,22 +340,27 @@ void
 CloseClient(client_t *con)	/* I - Client to close */
 {
   int		status;		/* Exit status of pipe command */
-#ifdef HAVE_LIBSSL
+#if defined HAVE_LIBSSL
   SSL_CTX	*context;	/* Context for encryption */
   SSL		*conn;		/* Connection for encryption */
   unsigned long	error;		/* Error code */
-#endif /* HAVE_LIBSSL */
+#elif defined HAVE_GNUTLS /* HAVE_LIBSSL */
+  http_tls_t      *conn;		/* TLS connection information */
+  int            error;		/* Error code */
+  gnutls_certificate_server_credentials *credentials; /* TLS credentials */
+#endif /* HAVE_GNUTLS */
 
 
   LogMessage(L_DEBUG, "CloseClient() %d", con->http.fd);
 
-#ifdef HAVE_LIBSSL
+#ifdef HAVE_SSL
  /*
   * Shutdown encryption as needed...
   */
 
   if (con->http.tls)
   {
+#if defined HAVE_LIBSSL
     conn    = (SSL *)(con->http.tls);
     context = SSL_get_SSL_CTX(conn);
 
@@ -381,6 +379,26 @@ CloseClient(client_t *con)	/* I - Client to close */
 
     SSL_CTX_free(context);
     SSL_free(conn);
+#elif defined HAVE_GNUTLS /* HAVE_LIBSSL */
+    conn        = (http_tls_t *)(con->http.tls);
+    credentials = (gnutls_certificate_server_credentials *)(conn->credentials);
+
+    error = gnutls_bye(conn->session, GNUTLS_SHUT_WR);
+    switch (error)
+    {
+      case GNUTLS_E_SUCCESS:
+	LogMessage(L_INFO, "CloseClient: SSL shutdown successful!");
+	break;
+      default:
+	LogMessage(L_ERROR, "CloseClient: %s", gnutls_strerror(error));
+	break;
+    }
+
+    gnutls_deinit(conn->session);
+    gnutls_certificate_free_credentials(*credentials);
+    free(credentials);
+    free(conn);
+#endif /* HAVE_GNUTLS */
 
     con->http.tls = NULL;
   }
@@ -473,7 +491,7 @@ CloseClient(client_t *con)	/* I - Client to close */
 int				/* O - 1 on success, 0 on error */
 EncryptClient(client_t *con)	/* I - Client to encrypt */
 {
-#ifdef HAVE_LIBSSL
+#if defined HAVE_LIBSSL
   SSL_CTX	*context;	/* Context for encryption */
   SSL		*conn;		/* Connection for encryption */
   unsigned long	error;		/* Error code */
@@ -483,11 +501,12 @@ EncryptClient(client_t *con)	/* I - Client to encrypt */
   * Create the SSL context and accept the connection...
   */
 
-  context = SSL_CTX_new(SSLv23_method());
-  conn    = SSL_new(context);
+  context = SSL_CTX_new(SSLv23_server_method());
 
-  SSL_use_PrivateKey_file(conn, ServerKey, SSL_FILETYPE_PEM);
-  SSL_use_certificate_file(conn, ServerCertificate, SSL_FILETYPE_PEM);
+  SSL_CTX_use_PrivateKey_file(context, ServerKey, SSL_FILETYPE_PEM);
+  SSL_CTX_use_certificate_file(context, ServerCertificate, SSL_FILETYPE_PEM);
+
+  conn = SSL_new(context);
 
   SSL_set_fd(conn, con->http.fd);
   if (SSL_accept(conn) != 1)
@@ -502,9 +521,56 @@ EncryptClient(client_t *con)	/* I - Client to encrypt */
 
   con->http.tls = conn;
   return (1);
+#elif defined HAVE_GNUTLS /* HAVE_LIBSSL */
+  http_tls_t	*conn;		/* TLS session object */
+  int		error;		/* Error code */
+  gnutls_certificate_server_credentials *credentials; /* TLS credentials */
+
+ /*
+  * Create the SSL object and perform the SSL handshake...
+  */
+
+  conn = (http_tls_t *)malloc(sizeof(gnutls_session));
+  if (conn == NULL)
+    return (0);
+  credentials = (gnutls_certificate_server_credentials *)
+    malloc(sizeof(gnutls_certificate_server_credentials));
+  if (credentials == NULL)
+  {
+    free(conn);
+    return (0);
+  }
+
+  gnutls_certificate_allocate_credentials(credentials);
+  gnutls_certificate_set_x509_key_file(*credentials, ServerCertificate, 
+				       ServerKey, GNUTLS_X509_FMT_PEM);
+
+  gnutls_init(&(conn->session), GNUTLS_SERVER);
+  gnutls_set_default_priority(conn->session);
+  gnutls_credentials_set(conn->session, GNUTLS_CRD_CERTIFICATE, *credentials);
+  gnutls_transport_set_ptr(conn->session, con->http.fd);
+
+  error = gnutls_handshake(conn->session);
+
+  if (error != GNUTLS_E_SUCCESS)
+  {
+    LogMessage(L_ERROR, "EncryptClient: %s", gnutls_strerror(error));
+    gnutls_deinit(conn->session);
+    gnutls_certificate_free_credentials(*credentials);
+    free(conn);
+    free(credentials);
+    return (0);
+  }
+
+  LogMessage(L_DEBUG, "EncryptClient() %d Connection now encrypted.",
+             con->http.fd);
+
+  conn->credentials = credentials;
+  con->http.tls = conn;
+  return (1);
 #else
   return (0);
-#endif /* HAVE_LIBSSL */
+#endif /* HAVE_GNUTLS */
 }
 
 
@@ -733,7 +799,7 @@ ReadClient(client_t *con)	/* I - Client to read from */
       if (strcasecmp(con->http.fields[HTTP_FIELD_CONNECTION], "Upgrade") == 0 &&
 	  con->http.tls == NULL)
       {
-#ifdef HAVE_LIBSSL
+#ifdef HAVE_SSL
        /*
         * Do encryption stuff...
 	*/
@@ -756,7 +822,7 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	  CloseClient(con);
           return (0);
 	}
-#endif /* HAVE_LIBSSL */
+#endif /* HAVE_SSL */
       }
 
       if (!SendHeader(con, HTTP_OK, NULL))
@@ -798,7 +864,7 @@ ReadClient(client_t *con)	/* I - Client to read from */
       if (strcasecmp(con->http.fields[HTTP_FIELD_CONNECTION], "Upgrade") == 0 &&
 	  con->http.tls == NULL)
       {
-#ifdef HAVE_LIBSSL
+#ifdef HAVE_SSL
        /*
         * Do encryption stuff...
 	*/
@@ -823,7 +889,7 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	  CloseClient(con);
           return (0);
 	}
-#endif /* HAVE_LIBSSL */
+#endif /* HAVE_SSL */
       }
 
       if (status != HTTP_OK)
@@ -1641,14 +1707,14 @@ SendError(client_t      *con,	/* I - Connection */
   if (!SendHeader(con, code, NULL))
     return (0);
 
-#ifdef HAVE_LIBSSL
+#ifdef HAVE_SSL
   if (code == HTTP_UPGRADE_REQUIRED)
     if (httpPrintf(HTTP(con), "Connection: Upgrade\r\n") < 0)
       return (0);
 
   if (httpPrintf(HTTP(con), "Upgrade: TLS/1.0,HTTP/1.1\r\n") < 0)
     return (0);
-#endif /* HAVE_LIBSSL */
+#endif /* HAVE_SSL */
 
   if ((con->http.version >= HTTP_1_1 && !con->http.keep_alive) ||
       (code >= HTTP_BAD_REQUEST && code != HTTP_UPGRADE_REQUIRED))
@@ -2711,5 +2777,5 @@ pipe_command(client_t *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.91.2.34 2003/01/14 22:09:45 mike Exp $".
+ * End of "$Id: client.c,v 1.91.2.35 2003/01/15 04:25:54 mike Exp $".
  */

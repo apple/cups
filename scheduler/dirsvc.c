@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.73.2.20 2003/01/07 18:27:19 mike Exp $"
+ * "$Id: dirsvc.c,v 1.73.2.21 2003/01/15 04:25:55 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -1543,11 +1543,11 @@ SendSLPBrowse(printer_t *p)		/* I - Printer to register */
   snprintf(attrs, sizeof(attrs),
            "(printer-uri-supported=%s),"
            "(uri-authentication-supported=%s>),"
-#ifdef HAVE_LIBSSL
+#ifdef HAVE_SSL
            "(uri-security-supported=tls>),"
 #else
            "(uri-security-supported=none>),"
-#endif /* HAVE_LIBSSL */
+#endif /* HAVE_SSL */
            "(printer-name=%s),"
            "(printer-location=%s),"
            "(printer-info=%s),"
@@ -1882,5 +1882,5 @@ UpdateSLPBrowse(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.73.2.20 2003/01/07 18:27:19 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.73.2.21 2003/01/15 04:25:55 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: lprm.c,v 1.15.2.8 2003/01/07 18:26:17 mike Exp $"
+ * "$Id: lprm.c,v 1.15.2.9 2003/01/15 04:25:48 mike Exp $"
  *
  *   "lprm" command for the Common UNIX Printing System (CUPS).
  *
@@ -98,14 +98,14 @@ main(int  argc,			/* I - Number of command-line arguments */
       switch (argv[i][1])
       {
         case 'E' : /* Encrypt */
-#ifdef HAVE_LIBSSL
+#ifdef HAVE_SSL
 	    encryption = HTTP_ENCRYPT_REQUIRED;
 
 	    httpEncryption(http, encryption);
 #else
             fprintf(stderr, "%s: Sorry, no encryption support compiled in!\n",
 	            argv[0]);
-#endif /* HAVE_LIBSSL */
+#endif /* HAVE_SSL */
 	    break;
 
         case 'P' : /* Cancel jobs on a printer */
@@ -271,5 +271,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: lprm.c,v 1.15.2.8 2003/01/07 18:26:17 mike Exp $".
+ * End of "$Id: lprm.c,v 1.15.2.9 2003/01/15 04:25:48 mike Exp $".
  */

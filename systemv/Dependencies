@@ -6,10 +6,12 @@ cancel.o: ../cups/string.h ../config.h ../cups/cups.h ../cups/ipp.h
 cancel.o: ../cups/http.h ../cups/md5.h ../cups/ppd.h ../cups/language.h
 cupsaddsmb.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
 cupsaddsmb.o: ../cups/ppd.h ../cups/language.h ../cups/string.h ../config.h
+cupstestppd.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
+cupstestppd.o: ../cups/ppd.h ../cups/string.h ../config.h
 lp.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h ../cups/ppd.h
 lp.o: ../cups/string.h ../config.h ../cups/language.h
-lpadmin.o: ../cups/string.h ../config.h ../cups/cups.h ../cups/ipp.h
-lpadmin.o: ../cups/http.h ../cups/md5.h ../cups/ppd.h ../cups/language.h
+lpadmin.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
+lpadmin.o: ../cups/ppd.h ../cups/string.h ../config.h ../cups/language.h
 lpadmin.o: ../cups/debug.h
 lpinfo.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
 lpinfo.o: ../cups/ppd.h ../cups/language.h ../cups/debug.h ../cups/string.h

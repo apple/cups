@@ -1,5 +1,5 @@
 /*
- * "$Id: http-private.h,v 1.1 2003/01/15 04:15:47 mike Exp $"
+ * "$Id: http-private.h,v 1.1.2.1 2003/01/15 04:25:49 mike Exp $"
  *
  *   Private HTTP definitions for the Common UNIX Printing System (CUPS).
  *
@@ -63,5 +63,5 @@ typedef struct
 #endif /* !_CUPS_HTTP_PRIVATE_H_ */
 
 /*
- * End of "$Id: http-private.h,v 1.1 2003/01/15 04:15:47 mike Exp $".
+ * End of "$Id: http-private.h,v 1.1.2.1 2003/01/15 04:25:49 mike Exp $".
  */

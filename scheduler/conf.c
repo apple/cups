@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.77.2.18 2003/01/07 18:27:17 mike Exp $"
+ * "$Id: conf.c,v 1.77.2.19 2003/01/15 04:25:54 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -125,10 +125,10 @@ static var_t	variables[] =
   { "RootCertDuration", &RootCertDuration,	VAR_INTEGER,	0 },
   { "ServerAdmin",	ServerAdmin,		VAR_STRING,	sizeof(ServerAdmin) },
   { "ServerBin",	ServerBin,		VAR_STRING,	sizeof(ServerBin) },
-#ifdef HAVE_LIBSSL
+#ifdef HAVE_SSL
   { "ServerCertificate",ServerCertificate,	VAR_STRING,	sizeof(ServerCertificate) },
   { "ServerKey",	ServerKey,		VAR_STRING,	sizeof(ServerKey) },
-#endif /* HAVE_LIBSSL */
+#endif /* HAVE_SSL */
   { "ServerName",	ServerName,		VAR_STRING,	sizeof(ServerName) },
   { "ServerRoot",	ServerRoot,		VAR_STRING,	sizeof(ServerRoot) },
   { "TempDir",		TempDir,		VAR_STRING,	sizeof(TempDir) },
@@ -255,10 +255,10 @@ ReadConfiguration(void)
   Classification[0] = '\0';
   ClassifyOverride  = 0;
 
-#ifdef HAVE_LIBSSL
+#ifdef HAVE_SSL
   strcpy(ServerCertificate, "ssl/server.crt");
   strcpy(ServerKey, "ssl/server.key");
-#endif /* HAVE_LIBSSL */
+#endif /* HAVE_SSL */
 
   if ((language = DEFAULT_LANGUAGE) == NULL)
     language = "en";
@@ -430,7 +430,7 @@ ReadConfiguration(void)
     strlcpy(ServerBin, directory, sizeof(ServerBin));
   }
 
-#ifdef HAVE_LIBSSL
+#ifdef HAVE_SSL
   if (ServerCertificate[0] != '/')
   {
     snprintf(directory, sizeof(directory), "%s/%s", ServerRoot, ServerCertificate);
@@ -448,7 +448,7 @@ ReadConfiguration(void)
 
   chown(ServerKey, User, Group);
   chmod(ServerKey, ConfigFilePerm);
-#endif /* HAVE_LIBSSL */
+#endif /* HAVE_SSL */
 
  /*
   * Make sure that ServerRoot and the config files are owned and
@@ -777,7 +777,7 @@ read_configuration(FILE *fp)		/* I - File to read from */
         LogMessage(L_WARN, "Too many %s directives at line %d.", name,
 	           linenum);
     }
-#ifdef HAVE_LIBSSL
+#ifdef HAVE_SSL
     else if (strcasecmp(name, "SSLPort") == 0 ||
              strcasecmp(name, "SSLListen") == 0)
     {
@@ -813,7 +813,7 @@ read_configuration(FILE *fp)		/* I - File to read from */
         LogMessage(L_WARN, "Too many %s directives at line %d.", name,
 	           linenum);
     }
-#endif /* HAVE_LIBSSL */
+#endif /* HAVE_SSL */
     else if (strcasecmp(name, "BrowseAddress") == 0)
     {
      /*
@@ -2050,5 +2050,5 @@ get_addr_and_mask(const char *value,	/* I - String from config file */
 
 
 /*
- * End of "$Id: conf.c,v 1.77.2.18 2003/01/07 18:27:17 mike Exp $".
+ * End of "$Id: conf.c,v 1.77.2.19 2003/01/15 04:25:54 mike Exp $".
  */

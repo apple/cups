@@ -1,5 +1,5 @@
 /*
- * "$Id: lpinfo.c,v 1.3.2.6 2003/01/07 18:27:30 mike Exp $"
+ * "$Id: lpinfo.c,v 1.3.2.7 2003/01/15 04:25:58 mike Exp $"
  *
  *   "lpinfo" command for the Common UNIX Printing System (CUPS).
  *
@@ -70,7 +70,7 @@ main(int  argc,			/* I - Number of command-line arguments */
       switch (argv[i][1])
       {
         case 'E' : /* Encrypt */
-#ifdef HAVE_LIBSSL
+#ifdef HAVE_SSL
 	    cupsSetEncryption(HTTP_ENCRYPT_REQUIRED);
 
 	    if (http)
@@ -78,7 +78,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 #else
             fprintf(stderr, "%s: Sorry, no encryption support compiled in!\n",
 	            argv[0]);
-#endif /* HAVE_LIBSSL */
+#endif /* HAVE_SSL */
 	    break;
 
         case 'l' : /* Show long listing */
@@ -437,5 +437,5 @@ show_models(http_t *http,	/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpinfo.c,v 1.3.2.6 2003/01/07 18:27:30 mike Exp $".
+ * End of "$Id: lpinfo.c,v 1.3.2.7 2003/01/15 04:25:58 mike Exp $".
  */

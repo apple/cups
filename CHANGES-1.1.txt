@@ -3,6 +3,8 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.19
 
+	- Added preliminary support for GNU TLS; patch provided
+	  by Jeff Licquia.
 	- Now timeout IPP attribute reads after 1 second inside
 	  an attribute definition.
 	- Now timeout connections that have been shutdown (due

@@ -5,7 +5,7 @@ dest.o: cups.h ipp.h http.h string.h ../config.h md5.h ppd.h language.h
 emit.o: ppd.h string.h ../config.h
 encode.o: cups.h ipp.h http.h string.h ../config.h md5.h ppd.h debug.h
 extended.o: ppd.h string.h ../config.h debug.h
-http.o: string.h ../config.h http.h md5.h ipp.h debug.h
+http.o: string.h ../config.h http-private.h http.h md5.h ipp.h debug.h
 http-addr.o: http.h string.h ../config.h md5.h debug.h
 http-support.o: string.h ../config.h http.h md5.h ipp.h
 ipp.o: string.h ../config.h ipp.h http.h md5.h debug.h
