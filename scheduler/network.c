@@ -1,5 +1,5 @@
 /*
- * "$Id: network.c,v 1.5.2.10 2004/06/29 13:15:11 mike Exp $"
+ * "$Id: network.c,v 1.5.2.11 2004/08/18 17:49:19 mike Exp $"
  *
  *   Network interface functions for the Common UNIX Printing System
  *   (CUPS) scheduler.
@@ -129,6 +129,9 @@ NetIFFree(void)
 void
 NetIFUpdate(void)
 {
+  int		i,		/* Looping var */
+		match;		/* Matching address? */
+  listener_t	*lis;		/* Listen address */
   cups_netif_t	*temp;		/* Current interface */
   struct ifaddrs *addrs,	/* Interface address list */
 		*addr;		/* Current interface address */
@@ -218,6 +221,52 @@ NetIFUpdate(void)
     if (!(addr->ifa_flags & IFF_POINTOPOINT) &&
         !httpAddrLocalhost(&(temp->address)))
       temp->is_local = 1;
+
+   /*
+    * Determine which port to use when advertising printers...
+    */
+
+    for (i = NumListeners, lis = Listeners; i > 0; i --, lis ++)
+    {
+      match = 0;
+
+      if (httpAddrAny(&(lis->address)))
+        match = 1;
+      else if (addr->ifa_addr->sa_family == AF_INET &&
+               lis->address.addr.sa_family == AF_INET &&
+               (lis->address.ipv4.sin_addr.s_addr &
+	           temp->mask.ipv4.sin_addr.s_addr) ==
+	               temp->address.ipv4.sin_addr.s_addr)
+        match = 1;
+#ifdef AF_INET6
+      else if (addr->ifa_addr->sa_family == AF_INET6 &&
+               lis->address.addr.sa_family == AF_INET6 &&
+               (lis->address.ipv6.sin6_addr.s6_addr[0] &
+	           temp->mask.ipv6.sin6_addr.s6_addr[0]) ==
+	               temp->address.ipv6.sin6_addr.s6_addr[0] &&
+               (lis->address.ipv6.sin6_addr.s6_addr[1] &
+	           temp->mask.ipv6.sin6_addr.s6_addr[1]) ==
+	               temp->address.ipv6.sin6_addr.s6_addr[1] &&
+               (lis->address.ipv6.sin6_addr.s6_addr[2] &
+	           temp->mask.ipv6.sin6_addr.s6_addr[2]) ==
+	               temp->address.ipv6.sin6_addr.s6_addr[2] &&
+               (lis->address.ipv6.sin6_addr.s6_addr[3] &
+	           temp->mask.ipv6.sin6_addr.s6_addr[3]) ==
+	               temp->address.ipv6.sin6_addr.s6_addr[3])
+        match = 1;
+#endif /* AF_INET6 */
+
+      if (match)
+      {
+        if (lis->address.addr.sa_family == AF_INET)
+          temp->port = ntohs(lis->address.ipv4.sin_port);
+#ifdef AF_INET6
+        else if (lis->address.addr.sa_family == AF_INET6)
+          temp->port = ntohs(lis->address.ipv6.sin6_port);
+#endif /* AF_INET6 */
+	break;
+      }
+    }
 
    /*
     * Finally, try looking up the hostname for the address as needed...
@@ -484,5 +533,5 @@ freeifaddrs(struct ifaddrs *addrs)	/* I - Interface list to free */
 
 
 /*
- * End of "$Id: network.c,v 1.5.2.10 2004/06/29 13:15:11 mike Exp $".
+ * End of "$Id: network.c,v 1.5.2.11 2004/08/18 17:49:19 mike Exp $".
  */

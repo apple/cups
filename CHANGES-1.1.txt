@@ -3,6 +3,14 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.21rc2
 
+	- The IPP backend incorrectly used the local port when
+	  communicating with a remote server; this caused
+	  problems with some custom configurations (STR #852)
+	- The cups-lpd mini-daemon wasn't using the right
+	  default banner option (STR #851)
+	- Updated the new httpDecode64_2() and httpEncode64_2()
+	  functions to handle arbitrary binary data, not just
+	  text (STR #860)
 	- String options with quotes in their values were not
 	  quoted properly by the scheduler (STR #839)
 	- Configure script changes for GNU/Hurd (STR #838)

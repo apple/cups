@@ -1,5 +1,5 @@
 /*
- * "$Id: http.h,v 1.33.2.24 2004/07/02 04:08:59 mike Exp $"
+ * "$Id: http.h,v 1.33.2.25 2004/08/18 17:49:19 mike Exp $"
  *
  *   Hyper-Text Transport Protocol definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -338,15 +338,6 @@ typedef struct
   http_addr_t		hostaddr;	/* Host address and port */
 } http_t;
 
-/**** New in CUPS 1.1.21 ****/
-extern char		*httpDecode64_2(char *out, const char *in, int outlen);
-extern char		*httpEncode64_2(char *out, const char *in, int outlen);
-extern void		httpSeparate2(const char *uri,
-			              char *method, int methodlen,
-			              char *username, int usernamelen,
-				      char *host, int hostlen, int *port,
-				      char *resource, int resourcelen);
-
 
 /*
  * Prototypes...
@@ -408,6 +399,16 @@ extern void		httpClearCookie(http_t *http);
 extern void		httpSetCookie(http_t *http, const char *cookie);
 extern int		httpWait(http_t *http, int msec);
 
+/**** New in CUPS 1.1.21 ****/
+extern char		*httpDecode64_2(char *out, int *outlen, const char *in);
+extern char		*httpEncode64_2(char *out, int outlen, const char *in,
+			                int inlen);
+extern void		httpSeparate2(const char *uri,
+			              char *method, int methodlen,
+			              char *username, int usernamelen,
+				      char *host, int hostlen, int *port,
+				      char *resource, int resourcelen);
+
 /**** New in CUPS 1.2 ****/
 extern int		httpAddrAny(const http_addr_t *addr);
 extern int		httpAddrEqual(const http_addr_t *addr1,
@@ -431,5 +432,5 @@ extern char		*httpAddrString(const http_addr_t *addr,
 #endif /* !_IPP_HTTP_H_ */
 
 /*
- * End of "$Id: http.h,v 1.33.2.24 2004/07/02 04:08:59 mike Exp $".
+ * End of "$Id: http.h,v 1.33.2.25 2004/08/18 17:49:19 mike Exp $".
  */
