@@ -73,6 +73,9 @@ CHANGES IN CUPS V1.1.7
 	  /dev/urandom.
 	- Fixed a bug in the whitespace skipping code in
 	  httpGetSubField().
+	- The LPD backend now supports a new "order" option:
+	  "lpd://server/queue?order=control,data" (default) and
+	  "lpd://server/queue?order=data,control".
 
 
 CHANGES IN CUPS V1.1.6-3

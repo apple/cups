@@ -1,5 +1,5 @@
 /*
- * "$Id: lpd.c,v 1.25 2001/02/21 20:22:26 mike Exp $"
+ * "$Id: lpd.c,v 1.26 2001/03/06 16:06:05 mike Exp $"
  *
  *   Line Printer Daemon backend for the Common UNIX Printing System (CUPS).
  *
@@ -26,6 +26,7 @@
  *   main()        - Send a file to the printer or server.
  *   lpd_command() - Send an LPR command sequence and wait for a reply.
  *   lpd_queue()   - Queue a file using the Line Printer Daemon protocol.
+ *   lpd_write()   - Write a buffer of data to an LPD server.
  */
 
 /*
@@ -53,6 +54,14 @@
 
 
 /*
+ * The order for control and data files in LPD requests...
+ */
+
+#define ORDER_CONTROL_DATA	0
+#define ORDER_DATA_CONTROL	1
+
+
+/*
  * It appears that rresvport() is never declared on most systems...
  */
 
@@ -66,7 +75,8 @@ extern int	rresvport(int *port);
 static int	lpd_command(int lpd_fd, char *format, ...);
 static int	lpd_queue(char *hostname, char *printer, char *filename,
 		          char *user, char *title, int copies, int banner,
-			  int format);
+			  int format, int order);
+static int	lpd_write(int lpd_fd, char *buffer, int length);
 
 
 /*
@@ -94,6 +104,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   int	status;		/* Status of LPD job */
   int	banner;		/* Print banner page? */
   int	format;		/* Print format */
+  int	order;		/* Order of control/data files */
 
 
  /*
@@ -170,6 +181,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
   banner = 0;
   format = 'l';
+  order  = ORDER_CONTROL_DATA;
 
   if ((options = strchr(resource, '?')) != NULL)
   {
@@ -238,6 +250,19 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 	else
 	  fprintf(stderr, "ERROR: Unknown format character \"%c\"\n", value[0]);
       }
+      else if (strcasecmp(name, "order") == 0 && value[0])
+      {
+       /*
+        * Set control/data order...
+	*/
+
+        if (strcasecmp(value, "control,data") == 0)
+	  order = ORDER_CONTROL_DATA;
+	else if (strcasecmp(value, "data,control") == 0)
+	  order = ORDER_DATA_CONTROL;
+	else
+	  fprintf(stderr, "ERROR: Unknown file order \"%s\"\n", value);
+      }
     }
   }
 
@@ -249,7 +274,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   {
     status = lpd_queue(hostname, resource + 1, filename,
                        argv[2] /* user */, argv[3] /* title */,
-		       atoi(argv[4]) /* copies */, banner, format);
+		       atoi(argv[4]) /* copies */, banner, format, order);
 
     if (!status)
       fprintf(stderr, "PAGE: 1 %d\n", atoi(argv[4]));
@@ -257,7 +282,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   else
     status = lpd_queue(hostname, resource + 1, filename,
                        argv[2] /* user */, argv[3] /* title */, 1,
-		       banner, format);
+		       banner, format, order);
 
  /*
   * Remove the temporary file if necessary...
@@ -305,7 +330,7 @@ lpd_command(int  fd,		/* I - Socket connection to LPD host */
 
   fprintf(stderr, "DEBUG: Sending command string (%d bytes)...\n", bytes);
 
-  if (send(fd, buf, bytes, 0) < bytes)
+  if (lpd_write(fd, buf, bytes) < bytes)
     return (-1);
 
  /*
@@ -335,7 +360,8 @@ lpd_queue(char *hostname,	/* I - Host to connect to */
 	  char *title,		/* I - Job title */
 	  int  copies,		/* I - Number of copies */
 	  int  banner,		/* I - Print LPD banner? */
-          int  format)		/* I - Format specifier */
+          int  format,		/* I - Format specifier */
+          int  order)		/* I - Order of data/control files */
 {
   FILE			*fp;		/* Job file */
   char			localhost[255];	/* Local host name */
@@ -502,26 +528,35 @@ lpd_queue(char *hostname,	/* I - Host to connect to */
 
   fprintf(stderr, "DEBUG: Control file is:\n%s", control);
 
-  lpd_command(fd, "\002%d cfA%03.3d%s\n", strlen(control), getpid() % 1000,
-              localhost);
-
-  fprintf(stderr, "INFO: Sending control file (%d bytes)\n", strlen(control));
-
-  if (send(fd, control, strlen(control) + 1, 0) < (strlen(control) + 1))
+  if (order == ORDER_CONTROL_DATA)
   {
-    perror("ERROR: Unable to write control file");
-    status = 1;
+    lpd_command(fd, "\002%d cfA%03.3d%s\n", strlen(control), getpid() % 1000,
+        	localhost);
+
+    fprintf(stderr, "INFO: Sending control file (%d bytes)\n", strlen(control));
+
+    if (lpd_write(fd, control, strlen(control) + 1) < (strlen(control) + 1))
+    {
+      status = errno;
+      perror("ERROR: Unable to write control file");
+    }
+    else if (read(fd, &status, 1) < 1)
+      status = errno;
+
+    if (status != 0)
+      fprintf(stderr, "ERROR: Remote host did not accept control file (%d)\n",
+              status);
+    else
+      fputs("INFO: Control file sent successfully\n", stderr);
   }
-  else if (read(fd, &status, 1) < 1 || status != 0)
-    fprintf(stderr, "ERROR: Remote host did not accept control file (%d)\n",
-            status);
   else
+    status = 0;
+
+  if (status == 0)
   {
    /*
     * Send the print file...
     */
-
-    fputs("INFO: Control file sent successfully\n", stderr);
 
     lpd_command(fd, "\003%u dfA%03.3d%s\n", (unsigned)filestats.st_size,
                 getpid() % 1000, localhost);
@@ -535,7 +570,7 @@ lpd_queue(char *hostname,	/* I - Host to connect to */
       fprintf(stderr, "INFO: Spooling LPR job, %u%% complete...\n",
               (unsigned)(100 * tbytes / filestats.st_size));
 
-      if (send(fd, buffer, nbytes, 0) < nbytes)
+      if (lpd_write(fd, buffer, nbytes) < nbytes)
       {
         perror("ERROR: Unable to send print file to printer");
         break;
@@ -544,15 +579,40 @@ lpd_queue(char *hostname,	/* I - Host to connect to */
         tbytes += nbytes;
     }
 
-    send(fd, "", 1, 0);
-
     if (tbytes < filestats.st_size)
-      status = 1;
-    else if (recv(fd, &status, 1, 0) < 1 || status != 0)
+      status = errno;
+    else if (lpd_write(fd, "", 1) < 1)
+      status = errno;
+    else if (recv(fd, &status, 1, 0) < 1)
+      status = errno;
+
+    if (status != 0)
       fprintf(stderr, "ERROR: Remote host did not accept data file (%d)\n",
               status);
     else
       fputs("INFO: Data file sent successfully\n", stderr);
+  }
+
+  if (status == 0 && order == ORDER_DATA_CONTROL)
+  {
+    lpd_command(fd, "\002%d cfA%03.3d%s\n", strlen(control), getpid() % 1000,
+        	localhost);
+
+    fprintf(stderr, "INFO: Sending control file (%d bytes)\n", strlen(control));
+
+    if (lpd_write(fd, control, strlen(control) + 1) < (strlen(control) + 1))
+    {
+      status = errno;
+      perror("ERROR: Unable to write control file");
+    }
+    else if (read(fd, &status, 1) < 1)
+      status = errno;
+
+    if (status != 0)
+      fprintf(stderr, "ERROR: Remote host did not accept control file (%d)\n",
+              status);
+    else
+      fputs("INFO: Control file sent successfully\n", stderr);
   }
 
  /*
@@ -567,5 +627,35 @@ lpd_queue(char *hostname,	/* I - Host to connect to */
 
 
 /*
- * End of "$Id: lpd.c,v 1.25 2001/02/21 20:22:26 mike Exp $".
+ * 'lpd_write()' - Write a buffer of data to an LPD server.
+ */
+
+static int			/* O - Number of bytes written or -1 on error */
+lpd_write(int  lpd_fd,		/* I - LPD socket */
+          char *buffer,		/* I - Buffer to write */
+	  int  length)		/* I - Number of bytes to write */
+{
+  int	bytes,			/* Number of bytes written */
+	total;			/* Total number of bytes written */
+
+
+  total = 0;
+  while ((bytes = send(lpd_fd, buffer, length - total, 0)) >= 0)
+  {
+    total  += bytes;
+    buffer += bytes;
+
+    if (total == length)
+      break;
+  }
+
+  if (bytes < 0)
+    return (-1);
+  else
+    return (length);
+}
+
+
+/*
+ * End of "$Id: lpd.c,v 1.26 2001/03/06 16:06:05 mike Exp $".
  */
