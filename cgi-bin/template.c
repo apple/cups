@@ -1,30 +1,25 @@
 /*
- * "$Id: template.c,v 1.3 1997/05/13 14:46:54 mike Exp $"
+ * "$Id: template.c,v 1.4 1999/09/10 13:38:33 mike Exp $"
  *
  *   CGI template function.
  *
- *   Copyright 1997 by Easy Software Products, All Rights Reserved.
+ *   Copyright 1997-1999 by Easy Software Products, All Rights Reserved.
  *
  * Contents:
  *
  *   cgiCopyTemplateFile() - Copy a template file and replace all the
  *                           '{variable}' strings with the variable value.
- *
- * Revision History:
- *
- *   $Log: template.c,v $
- *   Revision 1.3  1997/05/13 14:46:54  mike
- *   Added "{?name}" syntax to conditionally include variables.
- *
- *   Revision 1.2  1997/05/08  20:14:19  mike
- *   Renamed CGI_Name functions to cgiName functions.
- *   Updated documentation.
- *
- *   Revision 1.1  1997/05/08  19:55:53  mike
- *   Initial revision
+ *   cgi_copy()            - Copy the template file, substituting as needed...
  */
 
 #include "cgi.h"
+
+
+/*
+ * Local functions...
+ */
+
+static void	cgi_copy(FILE *out, FILE *in, int element);
 
 
 /*
@@ -33,63 +28,28 @@
  */
 
 void
-cgiCopyTemplateFile(FILE *out,		/* I - Output file */
-                    char *template)	/* I - Template file to read */
+cgiCopyTemplateFile(FILE       *out,		/* I - Output file */
+                    const char *template)	/* I - Template file to read */
 {
-  FILE	*in;		/* Input file */
-  int	ch;		/* Character from file */
-  char	name[255],	/* Name of variable */
-	*s,		/* String pointer */
-	*value;		/* Value of variable */
+  FILE		*in;			/* Input file */
+  int		ch;			/* Character from file */
+  char		name[255],		/* Name of variable */
+		*s;			/* String pointer */
+  const char	*value;			/* Value of variable */
 
 
  /*
   * Open the template file...
   */
 
-  in = fopen(template, "r");
-  if (in == NULL)
+  if ((in = fopen(template, "r")) == NULL)
     return;
 
  /*
   * Parse the file to the end...
   */
 
-  while ((ch = getc(in)) != EOF)
-    if (ch == '{')
-    {
-     /*
-      * Get a variable name...
-      */
-
-      for (s = name; (ch = getc(in)) != EOF; s ++)
-        if (ch == '}')
-          break;
-        else
-          *s = ch;
-      *s = '\0';
-
-     /*
-      * See if it has a value...
-      */
-
-      if (name[0] == '?')
-      	value = cgiGetVariable(name + 1);
-      else
-      {
-	value = cgiGetVariable(name);
-
-	if (value == NULL)
-          fprintf(out, "{%s}", name);
-      };
-
-      if (value != NULL)
-        fputs(value, out);
-    }
-    else if (ch == '\\')	/* Quoted char */
-      putc(getc(in), out);
-    else
-      putc(ch, out);
+  cgi_copy(out, in, 0);
 
  /*
   * Close the template file and return...
@@ -100,5 +60,100 @@ cgiCopyTemplateFile(FILE *out,		/* I - Output file */
 
 
 /*
- * End of "$Id: template.c,v 1.3 1997/05/13 14:46:54 mike Exp $".
+ * 'cgi_copy()' - Copy the template file, substituting as needed...
+ */
+
+static void
+cgi_copy(FILE *out,		/* I - Output file */
+         FILE *in,		/* I - Input file */
+	 int  element)		/* I - Element number (0 to N) */
+{
+  int		ch;			/* Character from file */
+  char		name[255],		/* Name of variable */
+		*s;			/* String pointer */
+  const char	*value;			/* Value of variable */
+
+
+ /*
+  * Parse the file to the end...
+  */
+
+  while ((ch = getc(in)) != EOF)
+    if (ch == '}')
+      break;
+    else if (ch == '{')
+    {
+     /*
+      * Get a variable name...
+      */
+
+      for (s = name; (ch = getc(in)) != EOF; s ++)
+        if (ch == '}' || ch == ']')
+          break;
+        else
+          *s = ch;
+      *s = '\0';
+
+     /*
+      * See if it has a value...
+      */
+
+      if (name[0] == '?')
+      {
+       /*
+        * Insert value only if it exists...
+	*/
+
+        if ((value = cgiGetArray(name + 1, element)) != NULL)
+          fputs(value, out);
+      }
+      else if (name[0] == '#')
+      {
+       /*
+        * Insert count...
+	*/
+
+        fprintf(out, "%d", cgiGetSize(name + 1));
+      }
+      else if (name[0] == '[')
+      {
+       /*
+        * Loop for # of elements...
+	*/
+
+	int  i;		/* Looping var */
+        long pos;	/* File position */
+	int  count;	/* Number of elements */
+
+
+        count = cgiGetSize(name + 1);
+	pos   = ftell(in);
+
+        for (i = 0; i < count; i ++)
+	{
+	  fseek(in, pos, SEEK_SET);
+	  cgi_copy(out, in, i);
+	}
+      }
+      else
+      {
+       /*
+        * Insert variable or variable name (if element is NULL)...
+	*/
+
+	if ((value = cgiGetArray(name, element)) == NULL)
+          fprintf(out, "{%s}", name);
+	else
+          fputs(value, out);
+      }
+    }
+    else if (ch == '\\')	/* Quoted char */
+      putc(getc(in), out);
+    else
+      putc(ch, out);
+}
+
+
+/*
+ * End of "$Id: template.c,v 1.4 1999/09/10 13:38:33 mike Exp $".
  */

@@ -1,53 +1,26 @@
 /*
- * "$Id: var.c,v 1.8 1999/07/11 12:56:42 mike Exp $"
+ * "$Id: var.c,v 1.9 1999/09/10 13:38:33 mike Exp $"
  *
- *   CGI form variable functions.
+ *   CGI form variable and array functions.
  *
- *   Copyright 1997 by Easy Software Products, All Rights Reserved.
+ *   Copyright 1997-1999 by Easy Software Products, All Rights Reserved.
  *
  * Contents:
  *
  *   cgiInitialize()         - Initialize the CGI variable "database"...
  *   cgiCheckVariables()     - Check for the presence of "required" variables.
+ *   cgiGetArray()           - Get an element from a form array...
+ *   cgiGetSize()            - Get the size of a form array value.
  *   cgiGetVariable()        - Get a CGI variable from the database...
+ *   cgiSetArray()           - Set array element N to the specified string.
  *   cgiSetVariable()        - Set a CGI variable in the database...
- *   cgi_sort_variables()    - Sort all form variables for faster lookup.
- *   cgi_compare_variables() - Compare two variables.
  *   cgi_add_variable()      - Add a form variable.
- *   cgi_initialize_string() - Initialize form variables from a string.
+ *   cgi_compare_variables() - Compare two variables.
+ *   cgi_find_variable()     - Find a variable...
  *   cgi_initialize_get()    - Initialize form variables using the GET method.
  *   cgi_initialize_post()   - Initialize variables using the POST method.
- *
- * Revision History:
- *
- *   $Log: var.c,v $
- *   Revision 1.8  1999/07/11 12:56:42  mike
- *   Checkin for CVS.
- *
- *   Revision 1.7  1997/09/02  18:46:51  mike
- *   OK, now we check for errors in the form data.
- *   cgiInitialize() returns 0 if there was no form data or an error occured
- *   and 1 if form data is present.
- *
- *   Revision 1.6  1997/08/26  16:49:24  mike
- *   Updated cgiInitialize() to always return FALSE if no parameter data
- *   is present.
- *
- *   Revision 1.5  1997/05/13  16:38:07  mike
- *   Fixed a bug in the cgi_initialize_string() code - was not sorting vars!
- *
- *   Revision 1.4  1997/05/13  15:16:30  mike
- *   Updated cgiCheckVariables() to see if the variable is blank.
- *
- *   Revision 1.3  1997/05/13  14:56:37  mike
- *   Added cgiCheckVariables() function to check for required variables.
- *
- *   Revision 1.2  1997/05/08  20:14:19  mike
- *   Renamed CGI_Name functions to cgiName functions.
- *   Updated documentation.
- *
- *   Revision 1.1  1997/05/08  19:55:53  mike
- *   Initial revision
+ *   cgi_initialize_string() - Initialize form variables from a string.
+ *   cgi_sort_variables()    - Sort all form variables for faster lookup.
  */
 
 /*#define DEBUG*/
@@ -55,13 +28,15 @@
 
 
 /*
- * Data structure to hold all the CGI form variables...
+ * Data structure to hold all the CGI form variables and arrays...
  */
 
 typedef struct
 {
-  char	*name,	/* Name of variable */
-	*value;	/* Value of variable */
+  const char	*name;		/* Name of variable */
+  int		nvalues,	/* Number of values */
+		avalues;	/* Number of values allocated */
+  const char	**values;	/* Value(s) of variable */
 } var_t;
 
 
@@ -69,7 +44,8 @@ typedef struct
  * Local globals...
  */
 
-static int	form_count = 0;		/* Form variable count */
+static int	form_count = 0,		/* Form variable count */
+		form_alloc = 0;		/* Number of variables allocated */
 static var_t	*form_vars = NULL;	/* Form variables */
 
 
@@ -77,19 +53,21 @@ static var_t	*form_vars = NULL;	/* Form variables */
  * Local functions...
  */
 
-static void	cgi_sort_variables(void);
-static int	cgi_compare_variables(var_t *v1, var_t *v2);
-static void	cgi_add_variable(char *name, char *value);
-static int	cgi_initialize_string(char *data);
+static void	cgi_add_variable(const char *name, int element,
+		                 const char *value);
+static int	cgi_compare_variables(const var_t *v1, const var_t *v2);
+static var_t	*cgi_find_variable(const char *name);
 static int	cgi_initialize_get(int need_content);
 static int	cgi_initialize_post(int need_content);
+static int	cgi_initialize_string(const char *data);
+static void	cgi_sort_variables(void);
 
 
 /*
  * 'cgiInitialize()' - Initialize the CGI variable "database"...
  */
 
-int
+int				/* O - Non-zero if there was form data */
 cgiInitialize(int need_content)	/* I - True if input is required */
 {
   char	*method;		/* Form posting method */
@@ -117,16 +95,16 @@ cgiInitialize(int need_content)	/* I - True if input is required */
 /*
  * 'cgiCheckVariables()' - Check for the presence of "required" variables.
  *
- * Returns 1 if all variables are present, 0 otherwise.  Name may be separated
- * by spaces and/or commas.
+ * Names may be separated by spaces and/or commas.
  */
 
-int
-cgiCheckVariables(char *names)	/* I - Variables to look for */
+int					/* O - 1 if all variables present, 0 otherwise */
+cgiCheckVariables(const char *names)	/* I - Variables to look for */
 {
-  char	name[255],	/* Current variable name */
-	*s,		/* Pointer in string */
-	*val;		/* Value of variable */
+  char		name[255],		/* Current variable name */
+		*s;			/* Pointer in string */
+  const char	*val;			/* Value of variable */
+  int		element;		/* Array element number */
 
 
   if (names == NULL)
@@ -144,124 +122,169 @@ cgiCheckVariables(char *names)	/* I - Variables to look for */
     if (name[0] == '\0')
       break;
 
-    if ((val = cgiGetVariable(name)) == NULL)
+    if ((s = strrchr(name, '-')) != NULL)
+    {
+      *s      = '\0';
+      element = atoi(s + 1) - 1;
+      val     = cgiGetArray(name, element);
+    }
+    else
+      val = cgiGetVariable(name);
+
+    if (val == NULL)
       return (0);
 
     if (*val == '\0')
       return (0);	/* Can't be blank, either! */
-  };
+  }
 
   return (1);
 }
 
 
 /*
- * 'cgiGetVariable()' - Get a CGI variable from the database...
- *
- * Returns NULL if the variable doesn't exist...
+ * 'cgiGetArray()' - Get an element from a form array...
  */
 
-char *
-cgiGetVariable(char *name)	/* I - Name of variable */
+const char *			/* O - Element value or NULL */
+cgiGetArray(const char *name,	/* I - Name of array variable */
+            int        element)	/* I - Element number (0 to N) */
 {
-  var_t	key,	/* Search key */
-	*var;	/* Returned variable */
+  var_t	*var;			/* Pointer to variable */
 
 
-  if (form_count < 1)
+  if ((var = cgi_find_variable(name)) == NULL)
     return (NULL);
 
-  key.name = name;
+  if (element < 0 || element >= var->nvalues)
+    return (NULL);
 
-  var = bsearch(&key, form_vars, form_count, sizeof(var_t),
-                (int (*)(const void *, const void *))cgi_compare_variables);
+  return (var->values[element]);
+}
+
+
+/*
+ * 'cgiGetSize()' - Get the size of a form array value.
+ */
+
+int				/* O - Number of elements */
+cgiGetSize(const char *name)	/* I - Name of variable */
+{
+  var_t	*var;			/* Pointer to variable */
+
+
+  if ((var = cgi_find_variable(name)) == NULL)
+    return (0);
+
+  return (var->nvalues);
+}
+
+
+/*
+ * 'cgiGetVariable()' - Get a CGI variable from the database...
+ *
+ * Returns NULL if the variable doesn't exist...  If the variable is an
+ * array of values, returns the last element...
+ */
+
+const char *			/* O - Value of variable */
+cgiGetVariable(const char *name)/* I - Name of variable */
+{
+  const var_t	*var;		/* Returned variable */
+
+
+  var = cgi_find_variable(name);
 
 #ifdef DEBUG
   if (var == NULL)
     printf("cgiGetVariable(\"%s\") is returning NULL...\n", name);
   else
-    printf("cgiGetVariable(\"%s\") is returning \"%s\"...\n", name, var->value);
+    printf("cgiGetVariable(\"%s\") is returning \"%s\"...\n", name,
+           var->values[var->nvalues - 1]);
 #endif /* DEBUG */
 
-  return ((var == NULL) ? NULL : var->value);
+  return ((var == NULL) ? NULL : var->values[var->nvalues - 1]);
+}
+
+
+/*
+ * 'cgiSetArray()' - Set array element N to the specified string.
+ *
+ * If the variable array is smaller than (element + 1), the intervening
+ * elements are set to NULL.
+ */
+
+void
+cgiSetArray(const char *name,	/* I - Name of variable */
+            int        element,	/* I - Element number (0 to N) */
+            const char *value)	/* I - Value of variable */
+{
+  int	i;	/* Looping var */
+  var_t	*var;	/* Returned variable */
+
+
+  if (name == NULL || value == NULL || element < 0)
+    return;
+
+  if ((var = cgi_find_variable(name)) == NULL)
+  {
+    cgi_add_variable(name, element, value);
+    cgi_sort_variables();
+  }
+  else
+  {
+    if (element >= var->avalues)
+    {
+      var->avalues = element + 16;
+      var->values  = realloc(var->values, sizeof(char *) * var->avalues);
+    }
+
+    if (element >= var->nvalues)
+    {
+      for (i = var->nvalues; i < element; i ++)
+	var->values[i] = NULL;
+
+      var->nvalues = element + 1;
+    }
+    else if (var->values[element])
+      free((char *)var->values[element]);
+
+    var->values[element] = strdup(value);
+  }
 }
 
 
 /*
  * 'cgiSetVariable()' - Set a CGI variable in the database...
+ *
+ * If the variable is an array, this truncates the array to a single element.
  */
 
 void
-cgiSetVariable(char *name,	/* I - Name of variable */
-               char *value)	/* I - Value of variable */
+cgiSetVariable(const char *name,	/* I - Name of variable */
+               const char *value)	/* I - Value of variable */
 {
-  var_t	key,	/* Search key */
-	*var;	/* Returned variable */
+  int	i;				/* Looping var */
+  var_t	*var;				/* Returned variable */
 
 
   if (name == NULL || value == NULL)
     return;
 
-  if (form_count > 0)
+  if ((var = cgi_find_variable(name)) == NULL)
   {
-    key.name = name;
-
-    var = bsearch(&key, form_vars, form_count, sizeof(var_t),
-                  (int (*)(const void *, const void *))cgi_compare_variables);
-  }
-  else
-    var = NULL;
-
-  if (var == NULL)
-  {
-    cgi_add_variable(name, value);
+    cgi_add_variable(name, 0, value);
     cgi_sort_variables();
   }
   else
   {
-    free(var->value);
-    var->value = strdup(value);
-  };
-}
+    for (i = 0; i < var->nvalues; i ++)
+      if (var->values[i])
+        free((char *)var->values[i]);
 
-
-/*
- * 'cgi_sort_variables()' - Sort all form variables for faster lookup.
- */
-
-static void
-cgi_sort_variables(void)
-{
-#ifdef DEBUG
-  int	i;
-
-
-  puts("Sorting variables...");
-#endif /* DEBUG */
-
-  if (form_count < 2)
-    return;
-
-  qsort(form_vars, form_count, sizeof(var_t),
-        (int (*)(const void *, const void *))cgi_compare_variables);
-
-#ifdef DEBUG
-  puts("New variable list is:");
-  for (i = 0; i < form_count; i ++)
-    printf("%s = %s\n", form_vars[i].name, form_vars[i].value);
-#endif /* DEBUG */
-}
-
-
-/*
- * 'cgi_compare_variables()' - Compare two variables.
- */
-
-static int
-cgi_compare_variables(var_t *v1,	/* I - First variable */
-                      var_t *v2)	/* I - Second variable */
-{
-  return (strcasecmp(v1->name, v2->name));
+    var->values[0] = strdup(value);
+    var->nvalues   = 1;
+  }
 }
 
 
@@ -270,10 +293,11 @@ cgi_compare_variables(var_t *v1,	/* I - First variable */
  */
 
 static void
-cgi_add_variable(char *name,		/* I - Variable name */
-                 char *value)		/* I - Variable value */
+cgi_add_variable(const char *name,	/* I - Variable name */
+		 int        element,	/* I - Array element number */
+                 const char *value)	/* I - Variable value */
 {
-  var_t	*var;
+  var_t	*var;				/* New variable */
 
 
   if (name == NULL || value == NULL)
@@ -283,120 +307,56 @@ cgi_add_variable(char *name,		/* I - Variable name */
   printf("Adding variable \'%s\' with value \'%s\'...\n", name, value);
 #endif /* DEBUG */
 
-  if (form_count == 0)
-    form_vars = malloc(sizeof(var_t));
-  else
-    form_vars = realloc(form_vars, (form_count + 1) * sizeof(var_t));
+  if (form_count >= form_alloc)
+  {
+    if (form_alloc == 0)
+      form_vars = malloc(sizeof(var_t) * 16);
+    else
+      form_vars = realloc(form_vars, (form_alloc + 16) * sizeof(var_t));
 
-  var        = form_vars + form_count;
-  var->name  = strdup(name);
-  var->value = strdup(value);
+    form_alloc += 16;
+  }
+
+  var                  = form_vars + form_count;
+  var->name            = strdup(name);
+  var->nvalues         = element + 1;
+  var->avalues         = element + 1;
+  var->values          = calloc(element + 1, sizeof(char *));
+  var->values[element] = strdup(value);
+
   form_count ++;
 }
 
 
 /*
- * 'cgi_initialize_string()' - Initialize form variables from a string.
+ * 'cgi_compare_variables()' - Compare two variables.
  */
 
-static int
-cgi_initialize_string(char *data)	/* I - Form data string */
+static int				/* O - Result of comparison */
+cgi_compare_variables(const var_t *v1,	/* I - First variable */
+                      const var_t *v2)	/* I - Second variable */
 {
-  int	done;		/* True if we're done reading a form variable */
-  char	*s,		/* Pointer to current form string */
-	ch,		/* Temporary character */
-	name[255],	/* Name of form variable */
-	value[65536];	/* Variable value... */
+  return (strcasecmp(v1->name, v2->name));
+}
 
 
- /*
-  * Check input...
-  */
+/*
+ * 'cgi_find_variable()' - Find a variable...
+ */
 
-  if (data == NULL)
-    return (0);
+static var_t *				/* O - Variable pointer or NULL */
+cgi_find_variable(const char *name)	/* I - Name of variable */
+{
+  var_t	key;				/* Search key */
 
- /*
-  * Loop until we've read all the form data...
-  */
 
-  while (*data != '\0')
-  {
-   /*
-    * Get the variable name...
-    */
+  if (form_count < 1 || name == NULL)
+    return (NULL);
 
-    for (s = name; *data != '\0'; data ++, s ++)
-      if (*data == '=')
-        break;
-      else
-        *s = *data;
+  key.name = name;
 
-    *s = '\0';
-    if (*data == '=')
-      data ++;
-    else
-      return (0);
-
-   /*
-    * Read the variable value...
-    */
-
-    for (s = value, done = 0; !done && *data != '\0'; data ++, s ++)
-      switch (*data)
-      {
-	case '&' :	/* End of data... */
-            done = 1;
-            s --;
-            break;
-
-	case '+' :	/* Escaped space character */
-            *s = ' ';
-            break;
-
-	case '%' :	/* Escaped control character */
-	   /*
-	    * Read the hex code from stdin...
-	    */
-
-            data ++;
-            ch = *data - '0';
-            if (ch > 9)
-              ch -= 7;
-            *s = ch << 4;
-
-            data ++;
-            ch = *data - '0';
-            if (ch > 9)
-              ch -= 7;
-            *s |= ch;
-            break;
-
-	default :	/* Other characters come straight through */
-            *s = *data;
-            break;
-      };
-
-    *s = '\0';		/* nul terminate the string */
-
-   /*
-    * Remove trailing whitespace...
-    */
-
-    s --;
-    while (s >= value && *s == ' ')
-      *s-- = '\0';
-
-   /*
-    * Add the string to the variable "database"...
-    */
-
-    cgi_add_variable(name, value);
-  };
-
-  cgi_sort_variables();
-
-  return (1);
+  return ((var_t *)bsearch(&key, form_vars, form_count, sizeof(var_t),
+                           (int (*)(const void *, const void *))cgi_compare_variables));
 }
 
 
@@ -473,7 +433,7 @@ cgi_initialize_post(int need_content)	/* I - True if input is required */
     {
       free(data);
       return (0);
-    };
+    }
 
   data[length] = '\0';
 
@@ -494,5 +454,142 @@ cgi_initialize_post(int need_content)	/* I - True if input is required */
 
 
 /*
- * End of "$Id: var.c,v 1.8 1999/07/11 12:56:42 mike Exp $".
+ * 'cgi_initialize_string()' - Initialize form variables from a string.
+ */
+
+static int
+cgi_initialize_string(const char *data)	/* I - Form data string */
+{
+  int	done;		/* True if we're done reading a form variable */
+  char	*s,		/* Pointer to current form string */
+	ch,		/* Temporary character */
+	name[255],	/* Name of form variable */
+	value[65536];	/* Variable value... */
+
+
+ /*
+  * Check input...
+  */
+
+  if (data == NULL)
+    return (0);
+
+ /*
+  * Loop until we've read all the form data...
+  */
+
+  while (*data != '\0')
+  {
+   /*
+    * Get the variable name...
+    */
+
+    for (s = name; *data != '\0'; data ++, s ++)
+      if (*data == '=')
+        break;
+      else
+        *s = *data;
+
+    *s = '\0';
+    if (*data == '=')
+      data ++;
+    else
+      return (0);
+
+   /*
+    * Read the variable value...
+    */
+
+    for (s = value, done = 0; !done && *data != '\0'; data ++, s ++)
+      switch (*data)
+      {
+	case '&' :	/* End of data... */
+            done = 1;
+            s --;
+            break;
+
+	case '+' :	/* Escaped space character */
+            *s = ' ';
+            break;
+
+	case '%' :	/* Escaped control character */
+	   /*
+	    * Read the hex code from stdin...
+	    */
+
+            data ++;
+            ch = *data - '0';
+            if (ch > 9)
+              ch -= 7;
+            *s = ch << 4;
+
+            data ++;
+            ch = *data - '0';
+            if (ch > 9)
+              ch -= 7;
+            *s |= ch;
+            break;
+
+	default :	/* Other characters come straight through */
+            *s = *data;
+            break;
+      }
+
+    *s = '\0';		/* nul terminate the string */
+
+   /*
+    * Remove trailing whitespace...
+    */
+
+    s --;
+    while (s >= value && *s == ' ')
+      *s-- = '\0';
+
+   /*
+    * Add the string to the variable "database"...
+    */
+
+    if ((s = strrchr(name, '-')) != NULL)
+    {
+      *s = '\0';
+      cgiSetArray(name, atoi(s + 1) - 1, value);
+    }
+    else
+      cgiSetVariable(name, value);
+  }
+
+  return (1);
+}
+
+
+/*
+ * 'cgi_sort_variables()' - Sort all form variables for faster lookup.
+ */
+
+static void
+cgi_sort_variables(void)
+{
+#ifdef DEBUG
+  int	i;
+
+
+  puts("Sorting variables...");
+#endif /* DEBUG */
+
+  if (form_count < 2)
+    return;
+
+  qsort(form_vars, form_count, sizeof(var_t),
+        (int (*)(const void *, const void *))cgi_compare_variables);
+
+#ifdef DEBUG
+  puts("New variable list is:");
+  for (i = 0; i < form_count; i ++)
+    printf("%s = %s\n", form_vars[i].name, form_vars[i].value);
+#endif /* DEBUG */
+}
+
+
+/*
+ * End of "$Id: var.c,v 1.9 1999/09/10 13:38:33 mike Exp $".
  */
