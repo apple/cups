@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.169 2002/08/25 22:57:30 mike Exp $"
+ * "$Id: ipp.c,v 1.170 2002/08/27 19:19:22 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -3310,9 +3310,8 @@ get_printer_attrs(client_t        *con,	/* I - Client connection */
 
   add_printer_state_reasons(con, printer);
 
-  if (printer->state_message[0])
-    ippAddString(con->response, IPP_TAG_PRINTER, IPP_TAG_TEXT,
-                 "printer-state-message", NULL, printer->state_message);
+  ippAddString(con->response, IPP_TAG_PRINTER, IPP_TAG_TEXT,
+               "printer-state-message", NULL, printer->state_message);
 
   ippAddBoolean(con->response, IPP_TAG_PRINTER, "printer-is-accepting-jobs",
                 printer->accepting);
@@ -3459,9 +3458,8 @@ get_printers(client_t *con,		/* I - Client connection */
 
       add_printer_state_reasons(con, printer);
 
-      if (printer->state_message[0])
-	ippAddString(con->response, IPP_TAG_PRINTER, IPP_TAG_TEXT,
-                     "printer-state-message", NULL, printer->state_message);
+      ippAddString(con->response, IPP_TAG_PRINTER, IPP_TAG_TEXT,
+                   "printer-state-message", NULL, printer->state_message);
 
       ippAddBoolean(con->response, IPP_TAG_PRINTER, "printer-is-accepting-jobs",
                     printer->accepting);
@@ -5981,5 +5979,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.169 2002/08/25 22:57:30 mike Exp $".
+ * End of "$Id: ipp.c,v 1.170 2002/08/27 19:19:22 mike Exp $".
  */
