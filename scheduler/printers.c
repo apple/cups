@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.22 1999/06/23 15:11:25 mike Exp $"
+ * "$Id: printers.c,v 1.23 1999/06/23 16:20:30 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -935,6 +935,46 @@ SetPrinterState(printer_t    *p,	/* I - Printer to change */
 
 
 /*
+ * 'SortPrinters()' - Sort the printer list when a printer name is changed.
+ */
+
+void
+SortPrinters(void)
+{
+  printer_t	*current,	/* Current printer */
+		*prev,		/* Previous printer */
+		*next;		/* Next printer */
+
+
+  for (current = Printers, prev = NULL; current != NULL;)
+    if (current->next == NULL)
+      break;
+    else if (strcasecmp(current->name, current->next->name) > 0)
+    {
+     /*
+      * Need to swap these two printers...
+      */
+
+      if (prev == NULL)
+        Printers = current->next;
+      else
+        prev->next = current->next;
+
+     /*
+      * Yes, we can all get a headache from the next bunch of pointer
+      * swapping...
+      */
+
+      next          = current->next;
+      current->next = next->next;
+      next->next    = current;
+    }
+    else
+      current = current->next;
+}
+
+
+/*
  * 'StopPrinter()' - Stop a printer from printing any jobs...
  */
 
@@ -949,5 +989,5 @@ StopPrinter(printer_t *p)	/* I - Printer to stop */
 
 
 /*
- * End of "$Id: printers.c,v 1.22 1999/06/23 15:11:25 mike Exp $".
+ * End of "$Id: printers.c,v 1.23 1999/06/23 16:20:30 mike Exp $".
  */
