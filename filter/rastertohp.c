@@ -1,5 +1,5 @@
 /*
- * "$Id: rastertohp.c,v 1.10 2000/07/21 15:29:04 mike Exp $"
+ * "$Id: rastertohp.c,v 1.11 2000/09/26 21:29:25 mike Exp $"
  *
  *   Hewlett-Packard Page Control Language filter for the Common UNIX
  *   Printing System (CUPS).
@@ -52,7 +52,8 @@
 unsigned char	*Planes[4],		/* Output buffers */
 		*CompBuffer;		/* Compression buffer */
 int		NumPlanes,		/* Number of color planes */
-		Feed;			/* Number of lines to skip */
+		Feed,			/* Number of lines to skip */
+		Page;			/* Current page number */
 
 
 /*
@@ -94,76 +95,83 @@ StartPage(cups_page_header_t *header)	/* I - Page header */
   int	plane;				/* Looping var */
 
 
- /*
-  * Set the media type, position, and size...
-  */
-
-  printf("\033&l6D\033&k12H");			/* Set 6 LPI, 10 CPI */
-
-  switch (header->PageSize[1])
+  if (!header->Duplex || (Page & 1))
   {
-    case 540 : /* Monarch Envelope */
-        printf("\033&l80A");			/* Set page size */
-	break;
+   /*
+    * Set the media type, position, and size...
+    */
 
-    case 624 : /* DL Envelope */
-        printf("\033&l90A");			/* Set page size */
-	break;
+    printf("\033&l6D\033&k12H");		/* Set 6 LPI, 10 CPI */
 
-    case 649 : /* C5 Envelope */
-        printf("\033&l91A");			/* Set page size */
-	break;
+    switch (header->PageSize[1])
+    {
+      case 540 : /* Monarch Envelope */
+          printf("\033&l80A");			/* Set page size */
+	  break;
 
-    case 684 : /* COM-10 Envelope */
-        printf("\033&l81A");			/* Set page size */
-	break;
+      case 624 : /* DL Envelope */
+          printf("\033&l90A");			/* Set page size */
+	  break;
 
-    case 709 : /* B5 Envelope */
-        printf("\033&l100A");			/* Set page size */
-	break;
+      case 649 : /* C5 Envelope */
+          printf("\033&l91A");			/* Set page size */
+	  break;
 
-    case 756 : /* Executive */
-        printf("\033&l1A");			/* Set page size */
-	break;
+      case 684 : /* COM-10 Envelope */
+          printf("\033&l81A");			/* Set page size */
+	  break;
 
-    case 792 : /* Letter */
-        printf("\033&l2A");			/* Set page size */
-	break;
+      case 709 : /* B5 Envelope */
+          printf("\033&l100A");			/* Set page size */
+	  break;
 
-    case 842 : /* A4 */
-        printf("\033&l26A");			/* Set page size */
-	break;
+      case 756 : /* Executive */
+          printf("\033&l1A");			/* Set page size */
+	  break;
 
-    case 1008 : /* Legal */
-        printf("\033&l3A");			/* Set page size */
-	break;
+      case 792 : /* Letter */
+          printf("\033&l2A");			/* Set page size */
+	  break;
 
-    case 1191 : /* A3 */
-        printf("\033&l27A");			/* Set page size */
-	break;
+      case 842 : /* A4 */
+          printf("\033&l26A");			/* Set page size */
+	  break;
 
-    case 1224 : /* Tabloid */
-        printf("\033&l6A");			/* Set page size */
-	break;
+      case 1008 : /* Legal */
+          printf("\033&l3A");			/* Set page size */
+	  break;
+
+      case 1191 : /* A3 */
+          printf("\033&l27A");			/* Set page size */
+	  break;
+
+      case 1224 : /* Tabloid */
+          printf("\033&l6A");			/* Set page size */
+	  break;
+    }
+
+    printf("\033&l%dP",				/* Set page length */
+           header->PageSize[1] / 12);
+    printf("\033&l0E");				/* Set top margin to 0 */
+
+    printf("\033&l%dX", header->NumCopies);	/* Set number copies */
+
+    if (header->MediaPosition)
+      printf("\033&l%dH",			/* Set media position */
+             header->MediaPosition);
+
+    if (header->cupsMediaType)
+      printf("\033&l%dM",			/* Set media type */
+             header->cupsMediaType);
+
+    if (header->Duplex)
+      printf("\033&l%dS",			/* Set duplex mode */
+             header->Duplex + header->Tumble);
+
+    printf("\033&l0L");				/* Turn off perforation skip */
   }
-
-  printf("\033&l%dP", header->PageSize[1] / 12);/* Set page length */
-  printf("\033&l0E");				/* Set top margin to 0 */
-
-  printf("\033&l%dX", header->NumCopies);	/* Set number copies */
-
-  if (header->MediaPosition)
-    printf("\033&l%dH", header->MediaPosition);	/* Set media position */
-
-  if (header->cupsMediaType)
-    printf("\033&l%dM",				/* Set media type */
-           header->cupsMediaType);
-
-  if (header->Duplex)
-    printf("\033&l%dS",				/* Set duplex mode */
-           header->Duplex + header->Tumble);
-
-  printf("\033&l0L");				/* Turn off perforation skip */
+  else
+    printf("\033&a2G");				/* Set back side */
 
  /*
   * Set graphics mode...
@@ -227,7 +235,9 @@ EndPage(cups_page_header_t *header)	/* I - Page header */
   else
   {
      printf("\033*r0B");		/* End GFX */
-     printf("\014");			/* Eject currnet page */
+
+     if (!(header->Duplex && (Page & 1)))
+       printf("\014");			/* Eject current page */
   }
 
  /*
@@ -430,7 +440,6 @@ main(int  argc,		/* I - Number of command-line arguments */
   int			fd;	/* File descriptor */
   cups_raster_t		*ras;	/* Raster stream for printing */
   cups_page_header_t	header;	/* Page header from file */
-  int			page;	/* Current page */
   int			y;	/* Current line */
 
 
@@ -477,7 +486,7 @@ main(int  argc,		/* I - Number of command-line arguments */
   * Process pages as needed...
   */
 
-  page = 0;
+  Page = 0;
 
   while (cupsRasterReadHeader(ras, &header))
   {
@@ -485,9 +494,9 @@ main(int  argc,		/* I - Number of command-line arguments */
     * Write a status message with the page number and number of copies.
     */
 
-    page ++;
+    Page ++;
 
-    fprintf(stderr, "PAGE: %d %d\n", page, header.NumCopies);
+    fprintf(stderr, "PAGE: %d %d\n", Page, header.NumCopies);
 
    /*
     * Start the page...
@@ -506,7 +515,7 @@ main(int  argc,		/* I - Number of command-line arguments */
       */
 
       if ((y & 127) == 0)
-        fprintf(stderr, "INFO: Printing page %d, %d%% complete...\n", page,
+        fprintf(stderr, "INFO: Printing page %d, %d%% complete...\n", Page,
 	        100 * y / header.cupsHeight);
 
      /*
@@ -552,15 +561,15 @@ main(int  argc,		/* I - Number of command-line arguments */
   * If no pages were printed, send an error message...
   */
 
-  if (page == 0)
+  if (Page == 0)
     fputs("ERROR: No pages found!\n", stderr);
   else
     fputs("INFO: Ready to print.\n", stderr);
 
-  return (page == 0);
+  return (Page == 0);
 }
 
 
 /*
- * End of "$Id: rastertohp.c,v 1.10 2000/07/21 15:29:04 mike Exp $".
+ * End of "$Id: rastertohp.c,v 1.11 2000/09/26 21:29:25 mike Exp $".
  */
