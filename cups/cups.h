@@ -1,5 +1,5 @@
 /*
- * "$Id: cups.h,v 1.32.2.12 2003/08/29 23:58:37 mike Exp $"
+ * "$Id: cups.h,v 1.32.2.13 2004/01/08 03:07:36 mike Exp $"
  *
  *   API definitions for the Common UNIX Printing System (CUPS).
  *
@@ -60,7 +60,7 @@ extern "C" {
  */
 
 typedef unsigned cups_ptype_t;		/**** Printer Type/Capability Bits ****/
-enum					/* Not a typedef'd enum so we can OR */
+enum cups_ptype_e			/* Not a typedef'd enum so we can OR */
 {
   CUPS_PRINTER_LOCAL = 0x0000,		/* Local printer or class */
   CUPS_PRINTER_CLASS = 0x0001,		/* Printer class */
@@ -85,13 +85,13 @@ enum					/* Not a typedef'd enum so we can OR */
   CUPS_PRINTER_OPTIONS = 0x6fffc	/* ~(CLASS | REMOTE | IMPLICIT) */
 };
 
-typedef struct				/**** Printer Options ****/
+typedef struct cups_option_s		/**** Printer Options ****/
 {
   char		*name;			/* Name of option */
   char		*value;			/* Value of option */
 } cups_option_t;
 
-typedef struct				/**** Destination ****/
+typedef struct cups_dest_s		/**** Destination ****/
 {
   char		*name,			/* Printer or class name */
 		*instance;		/* Local instance name or NULL */
@@ -100,7 +100,7 @@ typedef struct				/**** Destination ****/
   cups_option_t	*options;		/* Options */
 } cups_dest_t;
 
-typedef struct				/**** Job ****/
+typedef struct cups_job_s		/**** Job ****/
 {
   int		id;			/* The job ID */
   char		*dest,			/* Printer or class name */
@@ -188,5 +188,5 @@ extern http_status_t	cupsPutFd(http_t *http, const char *resource, int fd);
 #endif /* !_CUPS_CUPS_H_ */
 
 /*
- * End of "$Id: cups.h,v 1.32.2.12 2003/08/29 23:58:37 mike Exp $".
+ * End of "$Id: cups.h,v 1.32.2.13 2004/01/08 03:07:36 mike Exp $".
  */

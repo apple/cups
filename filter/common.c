@@ -1,5 +1,5 @@
 /*
- * "$Id: common.c,v 1.15.2.14 2003/11/17 02:29:53 mike Exp $"
+ * "$Id: common.c,v 1.15.2.15 2004/01/08 03:07:36 mike Exp $"
  *
  *   Common filter routines for the Common UNIX Printing System (CUPS).
  *
@@ -363,6 +363,8 @@ WriteLabelProlog(const char *label,	/* I - Page label */
     for (ptr = classification; *ptr; ptr ++)
       if (*ptr < 32 || *ptr > 126)
         printf("\\%03o", *ptr);
+      else if (*ptr == '_')
+        putchar(' ');
       else
       {
 	if (*ptr == '(' || *ptr == ')' || *ptr == '\\')
@@ -465,5 +467,5 @@ WriteLabels(int orient)	/* I - Orientation of the page */
 
 
 /*
- * End of "$Id: common.c,v 1.15.2.14 2003/11/17 02:29:53 mike Exp $".
+ * End of "$Id: common.c,v 1.15.2.15 2004/01/08 03:07:36 mike Exp $".
  */

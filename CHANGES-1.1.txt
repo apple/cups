@@ -1,6 +1,12 @@
 CHANGES-1.1.txt
 ---------------
 
+CHANGES IN CUPS V1.1.21rc1
+
+	- The PostScript filters now convert underscores ("_")
+	  to spaces for custom classification names (STR #???)
+
+
 CHANGES IN CUPS V1.1.20
 
 	- The pstops filter didn't properly handle collated,

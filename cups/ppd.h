@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.h,v 1.24.2.18 2003/08/01 15:00:29 mike Exp $"
+ * "$Id: ppd.h,v 1.24.2.19 2004/01/08 03:07:36 mike Exp $"
  *
  *   PostScript Printer Description definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -73,14 +73,14 @@ extern "C" {
  * Types and structures...
  */
 
-typedef enum			/**** UI Types ****/
+typedef enum ppd_ui_e		/**** UI Types ****/
 {
   PPD_UI_BOOLEAN,		/* True or False option */
   PPD_UI_PICKONE,		/* Pick one from a list */
   PPD_UI_PICKMANY		/* Pick zero or more from a list */
 } ppd_ui_t;
 
-typedef enum			/**** Order dependency sections ****/
+typedef enum ppd_section_e	/**** Order dependency sections ****/
 {
   PPD_ORDER_ANY,		/* Option code can be anywhere in the file */
   PPD_ORDER_DOCUMENT,		/* ... must be in the DocumentSetup section */
@@ -90,7 +90,7 @@ typedef enum			/**** Order dependency sections ****/
   PPD_ORDER_PROLOG		/* ... must be in the Prolog section */
 } ppd_section_t;
 
-typedef enum			/**** Colorspaces ****/
+typedef enum ppd_cs_e		/**** Colorspaces ****/
 {
   PPD_CS_CMYK = -4,		/* CMYK colorspace */
   PPD_CS_CMY,			/* CMY colorspace */
@@ -100,7 +100,7 @@ typedef enum			/**** Colorspaces ****/
   PPD_CS_N			/* DeviceN colorspace */
 } ppd_cs_t;
 
-typedef enum			/**** Status Codes ****/
+typedef enum ppd_status_e	/**** Status Codes ****/
 {
   PPD_OK = 0,			/* OK */
   PPD_FILE_OPEN_ERROR,		/* Unable to open PPD file */
@@ -124,49 +124,52 @@ typedef enum			/**** Status Codes ****/
   PPD_ILLEGAL_WHITESPACE	/* Illegal whitespace character */
 } ppd_status_t;
 
-typedef enum			/**** Conformance Levels ****/
+typedef enum ppd_conform_e	/**** Conformance Levels ****/
 {
   PPD_CONFORM_RELAXED,		/* Relax whitespace and control char */
   PPD_CONFORM_STRICT		/* Require strict conformance */
 } ppd_conform_t;
 
-typedef struct			/**** PPD Attribute Structure ****/
+typedef struct ppd_attr_str	/**** PPD Attribute Structure ****/
 {
-  char		name[PPD_MAX_NAME],
+  char		name[PPD_MAX_NAME];
   				/* Name of attribute (cupsXYZ) */
-		spec[PPD_MAX_NAME],
+  char		spec[PPD_MAX_NAME];
 				/* Specifier string, if any */
-		text[PPD_MAX_TEXT],
+  char		text[PPD_MAX_TEXT];
 				/* Human-readable text, if any */
-		*value;		/* Value string */
+  char		*value;		/* Value string */
 } ppd_attr_t;
 
-typedef struct			/**** Option choices ****/
+typedef struct ppd_option_str ppd_option_t;
+				/**** Options ****/
+
+typedef struct ppd_choice_str	/**** Option choices ****/
 {
-  char		marked,		/* 0 if not selected, 1 otherwise */
-		choice[PPD_MAX_NAME],
+  char		marked;		/* 0 if not selected, 1 otherwise */
+  char		choice[PPD_MAX_NAME];
 				/* Computer-readable option name */
-		text[PPD_MAX_TEXT],
+  char		text[PPD_MAX_TEXT];
 				/* Human-readable option name */
-		*code;		/* Code to send for this option */
-  void		*option;	/* Pointer to parent option structure */
+  char		*code;		/* Code to send for this option */
+  ppd_option_t	*option;	/* Pointer to parent option structure */
 } ppd_choice_t;
 
-typedef struct			/**** Options ****/
+struct ppd_option_str		/**** Options ****/
 {
-  char		conflicted,	/* 0 if no conflicts exist, 1 otherwise */
-		keyword[PPD_MAX_NAME],
+  char		conflicted;	/* 0 if no conflicts exist, 1 otherwise */
+  char		keyword[PPD_MAX_NAME];
 				/* Option keyword name ("PageSize", etc.) */
-		defchoice[PPD_MAX_NAME],
+  char		defchoice[PPD_MAX_NAME];
 				/* Default option choice */
-		text[PPD_MAX_TEXT];
+  char		text[PPD_MAX_TEXT];
 				/* Human-readable text */
   ppd_ui_t	ui;		/* Type of UI option */
   ppd_section_t	section;	/* Section for command */
   float		order;		/* Order number */
   int		num_choices;	/* Number of option choices */
   ppd_choice_t	*choices;	/* Option choices */
-} ppd_option_t;
+};
 
 typedef struct ppd_group_str	/**** Groups ****/
 {
@@ -174,9 +177,9 @@ typedef struct ppd_group_str	/**** Groups ****/
    **** preserve binary compatibility and allow applications to get
    **** the group's keyword name.
    ****/
-  char		text[PPD_MAX_TEXT - PPD_MAX_NAME],
+  char		text[PPD_MAX_TEXT - PPD_MAX_NAME];
   				/* Human-readable group name */
-		name[PPD_MAX_NAME];
+  char		name[PPD_MAX_NAME];
 				/* Group name */
   int		num_options;	/* Number of options */
   ppd_option_t	*options;	/* Options */
@@ -187,50 +190,50 @@ typedef struct ppd_group_str	/**** Groups ****/
 
 typedef struct			/**** Constraints ****/
 {
-  char		option1[PPD_MAX_NAME],
+  char		option1[PPD_MAX_NAME];
   				/* First keyword */
-		choice1[PPD_MAX_NAME],
+  char		choice1[PPD_MAX_NAME];
 				/* First option/choice (blank for all) */
-		option2[PPD_MAX_NAME],
+  char		option2[PPD_MAX_NAME];
 				/* Second keyword */
-		choice2[PPD_MAX_NAME];
+  char		choice2[PPD_MAX_NAME];
 				/* Second option/choice (blank for all) */
 } ppd_const_t;
 
-typedef struct			/**** Page Sizes ****/
+typedef struct ppd_size_str	/**** Page Sizes ****/
 {
   int		marked;		/* Page size selected? */
   char		name[PPD_MAX_NAME];
   				/* Media size option */
-  float		width,		/* Width of media in points */
-		length,		/* Length of media in points */
-		left,		/* Left printable margin in points */
-		bottom,		/* Bottom printable margin in points */
-		right,		/* Right printable margin in points */
-		top;		/* Top printable margin in points */
+  float		width;		/* Width of media in points */
+  float		length;		/* Length of media in points */
+  float		left;		/* Left printable margin in points */
+  float		bottom;		/* Bottom printable margin in points */
+  float		right;		/* Right printable margin in points */
+  float		top;		/* Top printable margin in points */
 } ppd_size_t;
 
-typedef struct			/**** Emulators ****/
+typedef struct ppd_emul_str	/**** Emulators ****/
 {
-  char		name[PPD_MAX_NAME],
+  char		name[PPD_MAX_NAME];
   				/* Emulator name */
-		*start,		/* Code to switch to this emulation */
-		*stop;		/* Code to stop this emulation */
+  char		*start;		/* Code to switch to this emulation */
+  char		*stop;		/* Code to stop this emulation */
 } ppd_emul_t;
 
-typedef struct			/**** sRGB Color Profiles ****/
+typedef struct ppd_profile_str	/**** sRGB Color Profiles ****/
 {
-  char		resolution[PPD_MAX_NAME],
+  char		resolution[PPD_MAX_NAME];
   				/* Resolution or "-" */
-		media_type[PPD_MAX_NAME];
+  char		media_type[PPD_MAX_NAME];
 				/* Media type of "-" */
-  float		density,	/* Ink density to use */
-		gamma,		/* Gamma correction to use */
-		matrix[3][3];	/* Transform matrix */
+  float		density;	/* Ink density to use */
+  float		gamma;		/* Gamma correction to use */
+  float		matrix[3][3];	/* Transform matrix */
 } ppd_profile_t;
 
 /**** New in CUPS 1.1.19 ****/
-typedef enum			/**** Extended UI Types ****/
+typedef enum ppd_ext_ui_e	/**** Extended UI Types ****/
 {
   PPD_UI_CUPS_TEXT,		/* Specify a string */
   PPD_UI_CUPS_INTEGER,		/* Specify an integer number */
@@ -242,7 +245,7 @@ typedef enum			/**** Extended UI Types ****/
   PPD_UI_CUPS_XY_ARRAY		/* Specify an array of X/Y real numbers */
 } ppd_ext_ui_t;
 
-typedef union			/**** Extended Values ****/
+typedef union ppd_ext_value_u	/**** Extended Values ****/
 {
   char		*text;		/* Text value */
   int		integer;	/* Integer value */
@@ -250,14 +253,14 @@ typedef union			/**** Extended Values ****/
   float		gamma;		/* Gamma value */
   struct
   {
-    float	start,		/* Linear (density) start value for curve */
-		end,		/* Linear (density) end value for curve */
-		gamma;		/* Gamma correction */
+    float	start;		/* Linear (density) start value for curve */
+    float	end;		/* Linear (density) end value for curve */
+    float	gamma;		/* Gamma correction */
   }		curve;		/* Curve values */
   struct
   {
-    int		num_elements,	/* Number of array elements */
-		*elements;	/* Array of integer values */
+    int		num_elements;	/* Number of array elements */
+    int		*elements;	/* Array of integer values */
   }		integer_array;	/* Integer array value */
   struct
   {
@@ -271,19 +274,20 @@ typedef union			/**** Extended Values ****/
   }		xy_array;	/* XY array value */
 } ppd_ext_value_t;
 
-typedef struct			/**** Extended Parameter ****/
+typedef struct ppd_ext_param_str/**** Extended Parameter ****/
 {
-  char		keyword[PPD_MAX_NAME],
+  char		keyword[PPD_MAX_NAME];
 				/* Parameter name */
-		text[PPD_MAX_TEXT];
+  char		text[PPD_MAX_TEXT];
 				/* Human-readable text */
-  ppd_ext_value_t *value,	/* Current values */
-		*defval,	/* Default values */
-		*minval,	/* Minimum numeric values */
-		*maxval;	/* Maximum numeric values */
+  ppd_ext_value_t *value;	/* Current values */
+  ppd_ext_value_t *defval;	/* Default values */
+  ppd_ext_value_t *minval;	/* Minimum numeric values */
+  ppd_ext_value_t *maxval;	/* Maximum numeric values */
 } ppd_ext_param_t;
 
-typedef struct			/**** Extended Options ****/
+typedef struct ppd_ext_option_str
+				/**** Extended Options ****/
 {
   char		keyword[PPD_MAX_NAME];
 				/* Name of option that is being extended... */
@@ -294,39 +298,40 @@ typedef struct			/**** Extended Options ****/
   ppd_ext_param_t **params;	/* Parameters */
 } ppd_ext_option_t;
 
-typedef struct			/**** Files ****/
+typedef struct ppd_file_str	/**** Files ****/
 {
-  int		language_level,	/* Language level of device */
-		color_device,	/* 1 = color device, 0 = grayscale */
-		variable_sizes,	/* 1 = supports variable sizes, 0 = doesn't */
-		accurate_screens,/* 1 = supports accurate screens, 0 = not */
-		contone_only,	/* 1 = continuous tone only, 0 = not */
-		landscape,	/* -90 or 90 */
-		model_number,	/* Device-specific model number */
-		manual_copies,	/* 1 = Copies done manually, 0 = hardware */
-		throughput;	/* Pages per minute */
+  int		language_level;	/* Language level of device */
+  int		color_device;	/* 1 = color device, 0 = grayscale */
+  int		variable_sizes;	/* 1 = supports variable sizes, 0 = doesn't */
+  int		accurate_screens;
+				/* 1 = supports accurate screens, 0 = not */
+  int		contone_only;	/* 1 = continuous tone only, 0 = not */
+  int		landscape;	/* -90 or 90 */
+  int		model_number;	/* Device-specific model number */
+  int		manual_copies;	/* 1 = Copies done manually, 0 = hardware */
+  int		throughput;	/* Pages per minute */
   ppd_cs_t	colorspace;	/* Default colorspace */
   char		*patches;	/* Patch commands to be sent to printer */
   int		num_emulations;	/* Number of emulations supported */
   ppd_emul_t	*emulations;	/* Emulations and the code to invoke them */
-  char		*jcl_begin,	/* Start JCL commands */
-		*jcl_ps,	/* Enter PostScript interpreter */
-		*jcl_end,	/* End JCL commands */
-		*lang_encoding,	/* Language encoding */
-		*lang_version,	/* Language version (English, Spanish, etc.) */
-		*modelname,	/* Model name (general) */
-		*ttrasterizer,	/* Truetype rasterizer */
-		*manufacturer,	/* Manufacturer name */
-		*product,	/* Product name (from PS RIP/interpreter) */
-		*nickname,	/* Nickname (specific) */
-		*shortnickname;	/* Short version of nickname */
+  char		*jcl_begin;	/* Start JCL commands */
+  char		*jcl_ps;	/* Enter PostScript interpreter */
+  char		*jcl_end;	/* End JCL commands */
+  char		*lang_encoding;	/* Language encoding */
+  char		*lang_version;	/* Language version (English, Spanish, etc.) */
+  char		*modelname;	/* Model name (general) */
+  char		*ttrasterizer;	/* Truetype rasterizer */
+  char		*manufacturer;	/* Manufacturer name */
+  char		*product;	/* Product name (from PS RIP/interpreter) */
+  char		*nickname;	/* Nickname (specific) */
+  char		*shortnickname;	/* Short version of nickname */
   int		num_groups;	/* Number of UI groups */
   ppd_group_t	*groups;	/* UI groups */
   int		num_sizes;	/* Number of page sizes */
   ppd_size_t	*sizes;		/* Page sizes */
-  float		custom_min[2],	/* Minimum variable page size */
-		custom_max[2],	/* Maximum variable page size */
-		custom_margins[4];/* Margins around page */
+  float		custom_min[2];	/* Minimum variable page size */
+  float		custom_max[2];	/* Maximum variable page size */
+  float		custom_margins[4];/* Margins around page */
   int		num_consts;	/* Number of UI/Non-UI constraints */
   ppd_const_t	*consts;	/* UI/Non-UI constraints */
   int		num_fonts;	/* Number of pre-loaded fonts */
@@ -340,10 +345,10 @@ typedef struct			/**** Files ****/
   int		flip_duplex;	/* 1 = Flip page for back sides */
 
   /**** New in CUPS 1.1.19 ****/
-  char		*protocols,	/* Protocols (BCP, TBCP) string */
-		*pcfilename;	/* PCFileName string */
-  int		num_attrs,	/* Number of attributes */
-		cur_attr;	/* Current attribute */
+  char		*protocols;	/* Protocols (BCP, TBCP) string */
+  char		*pcfilename;	/* PCFileName string */
+  int		num_attrs;	/* Number of attributes */
+  int		cur_attr;	/* Current attribute */
   ppd_attr_t	**attrs;	/* Attributes */
   int		num_extended;	/* Number of extended options */
   ppd_ext_option_t **extended;	/* Extended options */
@@ -428,5 +433,5 @@ extern int		ppdSaveFile(ppd_file_t *ppd, const char *filename);
 #endif /* !_CUPS_PPD_H_ */
 
 /*
- * End of "$Id: ppd.h,v 1.24.2.18 2003/08/01 15:00:29 mike Exp $".
+ * End of "$Id: ppd.h,v 1.24.2.19 2004/01/08 03:07:36 mike Exp $".
  */
