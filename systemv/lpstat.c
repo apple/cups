@@ -1,5 +1,5 @@
 /*
- * "$Id: lpstat.c,v 1.24 2000/06/29 01:11:36 mike Exp $"
+ * "$Id: lpstat.c,v 1.25 2000/09/18 16:24:10 mike Exp $"
  *
  *   "lpstat" command for the Common UNIX Printing System (CUPS).
  *
@@ -820,6 +820,7 @@ show_devices(http_t      *http,		/* I - HTTP connection to server */
   ipp_attribute_t *attr;	/* Current attribute */
   cups_lang_t	*language;	/* Default language */
   const char	*printer,	/* Printer name */
+		*uri,		/* Printer URI */
 		*device,	/* Printer device URI */
 		*dptr,		/* Pointer into destination list */
 		*ptr;		/* Pointer into printer name */
@@ -894,11 +895,16 @@ show_devices(http_t      *http,		/* I - HTTP connection to server */
 
       printer = NULL;
       device  = NULL;
+      uri     = NULL;
 
       while (attr != NULL && attr->group_tag == IPP_TAG_PRINTER)
       {
         if (strcmp(attr->name, "printer-name") == 0 &&
 	    attr->value_tag == IPP_TAG_NAME)
+	  printer = attr->values[0].string.text;
+
+        if (strcmp(attr->name, "printer-uri-supported") == 0 &&
+	    attr->value_tag == IPP_TAG_URI)
 	  printer = attr->values[0].string.text;
 
         if (strcmp(attr->name, "device-uri") == 0 &&
@@ -974,6 +980,38 @@ show_devices(http_t      *http,		/* I - HTTP connection to server */
 
       if (match)
       {
+#ifdef __osf__ /* Compaq/Digital like to do it their own way... */
+        char	method[HTTP_MAX_URI],	/* Components of printer URI */
+		username[HTTP_MAX_URI],
+		hostname[HTTP_MAX_URI],
+		resource[HTTP_MAX_URI];
+	int	port;
+
+
+        if (device == NULL)
+	{
+	  httpSeparate(uri, method, username, hostname, &port, resource);
+          printf("Output for printer %s is sent to remote printer %s on %s\n",
+	         printer, strrchr(resource, '/') + 1, hostname);
+        }
+        else if (strncmp(device, "file:", 5) == 0)
+          printf("Output for printer %s is sent to %s\n", printer, device + 5);
+        else
+          printf("Output for printer %s is sent to %s\n", printer, device);
+
+        for (i = 0; i < num_dests; i ++)
+	  if (strcasecmp(printer, dests[i].name) == 0 && dests[i].instance)
+	  {
+            if (device == NULL)
+              printf("Output for printer %s/%s is sent to remote printer %s on %s\n",
+	             printer, dests[i].instance, strrchr(resource, '/') + 1,
+		     hostname);
+            else if (strncmp(device, "file:", 5) == 0)
+              printf("Output for printer %s/%s is sent to %s\n", printer, dests[i].instance, device + 5);
+            else
+              printf("Output for printer %s/%s is sent to %s\n", printer, dests[i].instance, device);
+	  }
+#else
         if (device == NULL)
           printf("device for %s: /dev/null\n", printer);
         else if (strncmp(device, "file:", 5) == 0)
@@ -991,6 +1029,7 @@ show_devices(http_t      *http,		/* I - HTTP connection to server */
             else
               printf("device for %s/%s: %s\n", printer, dests[i].instance, device);
 	  }
+#endif /* __osf__ */
       }
 
       if (attr == NULL)
@@ -1640,5 +1679,5 @@ show_scheduler(http_t *http)	/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpstat.c,v 1.24 2000/06/29 01:11:36 mike Exp $".
+ * End of "$Id: lpstat.c,v 1.25 2000/09/18 16:24:10 mike Exp $".
  */
