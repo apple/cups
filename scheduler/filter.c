@@ -1,5 +1,5 @@
 /*
- * "$Id: filter.c,v 1.3.2.5 2002/12/16 03:04:40 mike Exp $"
+ * "$Id: filter.c,v 1.3.2.6 2002/12/16 20:05:09 mike Exp $"
  *
  *   File type conversion routines for the Common UNIX Printing System (CUPS).
  *
@@ -150,9 +150,7 @@ mimeFilter(mime_t      *mime,		/* I - MIME database */
 		mincost;		/* Current minimum */
   mime_filter_t	*temp,			/* Temporary filter */
 		*mintemp,		/* Current minimum */
-		*mincurrent,		/* Current filter for minimum */
-		*current,		/* Current filter */
-		*filters;		/* Filters to use */
+		*current;		/* Current filter */
 
 
  /*
@@ -188,7 +186,7 @@ mimeFilter(mime_t      *mime,		/* I - MIME database */
     mincost     = mintemp->cost;
 
     DEBUG_puts("    Found direct filter:");
-    DEBUG_printf(("    %s\n", filters->filter));
+    DEBUG_printf(("    %s (cost=%d)\n", mintemp->filter, mincost));
   }
   else
   {
@@ -205,7 +203,7 @@ mimeFilter(mime_t      *mime,		/* I - MIME database */
   * OK, now look for filters from the source type to any other type...
   */
 
-  for (i = mime->num_filters, mincurrent  = NULL, current = mime->filters;
+  for (i = mime->num_filters, current = mime->filters;
        i > 0;
        i --, current ++)
     if (current->src == src)
@@ -232,10 +230,25 @@ mimeFilter(mime_t      *mime,		/* I - MIME database */
         if (mintemp != NULL)
 	  free(mintemp);
 
+       /*
+	* Hey, we got a match!  Add the current filter to the beginning of the
+	* filter list...
+	*/
+
+	mintemp = (mime_filter_t *)realloc(temp, sizeof(mime_filter_t) *
+                                                 (num_temp + 1));
+
+	if (mintemp == NULL)
+	{
+	  *num_filters = 0;
+	  return (NULL);
+	}
+
+	memmove(mintemp + 1, mintemp, num_temp * sizeof(mime_filter_t));
+	memcpy(mintemp, current, sizeof(mime_filter_t));
+
+	num_mintemp = num_temp + 1;
 	mincost     = cost;
-	mintemp     = temp;
-	num_mintemp = num_temp;
-	mincurrent  = current;
       }
       else
         free(temp);
@@ -244,31 +257,18 @@ mimeFilter(mime_t      *mime,		/* I - MIME database */
   if (mintemp != NULL)
   {
    /*
-    * Hey, we got a match!  Add the current filter to the beginning of the
-    * filter list...
+    * Hey, we got a match!
     */
 
-    filters = (mime_filter_t *)realloc(mintemp, sizeof(mime_filter_t) *
-                                                (num_mintemp + 1));
-
-    if (filters == NULL)
-    {
-      *num_filters = 0;
-      return (NULL);
-    }
-
-    memmove(filters + 1, filters, num_mintemp * sizeof(mime_filter_t));
-    memcpy(filters, mincurrent, sizeof(mime_filter_t));
-
-    *num_filters = num_mintemp + 1;
+    *num_filters = num_mintemp;
 
 #ifdef DEBUG
     printf("    Returning %d filters:\n", *num_filters);
-    for (i = 0; i <= num_mintemp; i ++)
-      printf("    %s\n", filters[i].filter);
+    for (i = 0; i < num_mintemp; i ++)
+      printf("    %s\n", mintemp[i].filter);
 #endif /* DEBUG */
 
-    return (filters);
+    return (mintemp);
   }
 
   DEBUG_puts("    Returning zippo...");
@@ -322,5 +322,5 @@ lookup(mime_t      *mime,	/* I - MIME database */
 
 
 /*
- * End of "$Id: filter.c,v 1.3.2.5 2002/12/16 03:04:40 mike Exp $".
+ * End of "$Id: filter.c,v 1.3.2.6 2002/12/16 20:05:09 mike Exp $".
  */
