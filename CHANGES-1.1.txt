@@ -3,6 +3,9 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.21rc1
 
+	- The pdftops filter did not print the contents of
+	  textual form elements, making it impossible to print a
+	  filled-in form (STR #663)
 	- Integrated the MacOS X/Darwin USB backend into the
 	  CUPS baseline (STR #661)
 	- The USB backend incorrectly reported "media tray
