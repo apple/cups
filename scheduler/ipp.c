@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.57 2000/03/09 19:47:33 mike Exp $"
+ * "$Id: ipp.c,v 1.58 2000/03/11 18:30:13 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -55,6 +55,7 @@
  *   send_document()             - Send a file to a printer or class.
  *   send_ipp_error()            - Send an error status back to the IPP client.
  *   set_default()               - Set the default destination...
+ *   set_job_attrs()             - Set job attributes.
  *   start_printer()             - Start a printer.
  *   stop_printer()              - Stop a printer.
  *   validate_job()              - Validate printer options and destination.
@@ -104,6 +105,7 @@ static void	restart_job(client_t *con, ipp_attribute_t *uri);
 static void	send_document(client_t *con, ipp_attribute_t *uri);
 static void	send_ipp_error(client_t *con, ipp_status_t status);
 static void	set_default(client_t *con, ipp_attribute_t *uri);
+static void	set_job_attrs(client_t *con, ipp_attribute_t *uri);
 static void	start_printer(client_t *con, ipp_attribute_t *uri);
 static void	stop_printer(client_t *con, ipp_attribute_t *uri);
 static void	validate_job(client_t *con, ipp_attribute_t *uri);
@@ -301,6 +303,10 @@ ProcessIPPRequest(client_t *con)	/* I - Client connection */
 
 	  case IPP_PURGE_JOBS :
               cancel_all_jobs(con, uri);
+              break;
+
+	  case IPP_SET_JOB_ATTRIBUTES :
+              set_job_attrs(con, uri);
               break;
 
 	  case CUPS_GET_DEFAULT :
@@ -3662,6 +3668,220 @@ set_default(client_t        *con,	/* I - Client connection */
 
 
 /*
+ * 'set_job_attrs()' - Set job attributes.
+ */
+
+static void
+set_job_attrs(client_t        *con,		/* I - Client connection */
+	      ipp_attribute_t *uri)		/* I - Job URI */
+{
+  int			i;		/* Looping var */
+  ipp_attribute_t	*attr;		/* Current attribute */
+  int			jobid;		/* Job ID */
+  job_t			*job;		/* Current job */
+  const char		*dest;		/* Destination */
+  cups_ptype_t		dtype;		/* Destination type (printer or class) */
+  char			method[HTTP_MAX_URI],
+					/* Method portion of URI */
+			username[HTTP_MAX_URI],
+					/* Username portion of URI */
+			host[HTTP_MAX_URI],
+					/* Host portion of URI */
+			resource[HTTP_MAX_URI];
+					/* Resource portion of URI */
+  int			port;		/* Port portion of URI */
+  struct passwd		*user;		/* User info */
+  struct group		*group;		/* System group info */
+
+
+  DEBUG_printf(("set_job_attrs(%08x, %08x)\n", con, uri));
+
+ /*
+  * See if we have a job URI or a printer URI...
+  */
+
+  if (strcmp(uri->name, "printer-uri") == 0)
+  {
+   /*
+    * Got a printer URI; see if we also have a job-id attribute...
+    */
+
+    if ((attr = ippFindAttribute(con->request, "job-id", IPP_TAG_INTEGER)) == NULL)
+    {
+      LogMessage(L_ERROR, "set_job_attrs: got a printer-uri attribute but no job-id!");
+      send_ipp_error(con, IPP_BAD_REQUEST);
+      return;
+    }
+
+    jobid = attr->values[0].integer;
+  }
+  else
+  {
+   /*
+    * Got a job URI; parse it to get the job ID...
+    */
+
+    httpSeparate(uri->values[0].string.text, method, username, host, &port, resource);
+ 
+    if (strncmp(resource, "/jobs/", 6) != 0)
+    {
+     /*
+      * Not a valid URI!
+      */
+
+      LogMessage(L_ERROR, "set_job_attrs: bad job-uri attribute \'%s\'!\n",
+                 uri->values[0].string.text);
+      send_ipp_error(con, IPP_BAD_REQUEST);
+      return;
+    }
+
+    jobid = atoi(resource + 6);
+  }
+
+ /*
+  * See if the job exists...
+  */
+
+  if ((job = FindJob(jobid)) == NULL)
+  {
+   /*
+    * Nope - return a "not found" error...
+    */
+
+    LogMessage(L_ERROR, "set_job_attrs: job #%d doesn't exist!", jobid);
+    send_ipp_error(con, IPP_NOT_FOUND);
+    return;
+  }
+
+ /*
+  * See if the job has been completed...
+  */
+
+  if (job->state->values[0].integer > IPP_JOB_STOPPED)
+  {
+   /*
+    * Return a "not-possible" error...
+    */
+
+    LogMessage(L_ERROR, "set_job_attrs: job #%d is finished and cannot be altered!", jobid);
+    send_ipp_error(con, IPP_NOT_POSSIBLE);
+    return;
+  }
+
+ /*
+  * See if the job is owned by the requesting user...
+  */
+
+  if (con->username[0])
+    strcpy(username, con->username);
+  else if ((attr = ippFindAttribute(con->request, "requesting-user-name", IPP_TAG_NAME)) != NULL)
+  {
+    strncpy(username, attr->values[0].string.text, sizeof(username) - 1);
+    username[sizeof(username) - 1] = '\0';
+  }
+  else
+    strcpy(username, "anonymous");
+
+  if (strcmp(username, job->username) != 0 && strcmp(username, "root") != 0)
+  {
+   /*
+    * Not the owner or root; check to see if the user is a member of the
+    * system group...
+    */
+
+    user = getpwnam(username);
+    endpwent();
+
+    group = getgrnam(SystemGroup);
+    endgrent();
+
+    if (group != NULL)
+      for (i = 0; group->gr_mem[i]; i ++)
+        if (strcmp(username, group->gr_mem[i]) == 0)
+	  break;
+
+    if (user == NULL || group == NULL ||
+        (group->gr_mem[i] == NULL && group->gr_gid != user->pw_gid))
+    {
+     /*
+      * Username not found, group not found, or user is not part of the
+      * system group...
+      */
+
+      LogMessage(L_ERROR, "cancel_job: \"%s\" not authorized to delete job id %d owned by \"%s\"!",
+        	 username, jobid, job->username);
+      send_ipp_error(con, IPP_FORBIDDEN);
+      return;
+    }
+  }
+
+ /*
+  * See what the user wants to change.
+  *
+  * NOTE: Unfortunately, the job-printer-uri attribute is specified as
+  *       READ ONLY in the Job and Printer Set Operations.  In order to
+  *       support a "move" operation from one printer to another, and
+  *       rather than defining YET ANOTHER extension operation, CUPS
+  *       allows the client to set this attribute in violation of the
+  *       spec.
+  *
+  *       If this bothers you, comment the job-printer-uri code out to
+  *       provide a completely compliant set-job-attributes operation.
+  *       [you will lose the ability to move jobs]
+  *
+  *       We did propose a change to the spec for this, but it was rejected
+  *       due to some special cases that might need to be supported (although
+  *       it is entirely possible to limit the valid values to the same
+  *       host, eliminating the problem...  sigh...)
+  */
+
+  if ((attr = ippFindAttribute(con->request, "job-printer-uri", IPP_TAG_URI)) != NULL)
+  {
+   /*
+    * Move the job to a different printer or class...
+    */
+
+    httpSeparate(attr->values[0].string.text, method, username, host, &port,
+                 resource);
+    if ((dest = ValidateDest(resource, &dtype)) == NULL)
+    {
+     /*
+      * Bad URI...
+      */
+
+      LogMessage(L_ERROR, "set_job_attrs: resource name \'%s\' no good!", resource);
+      send_ipp_error(con, IPP_NOT_FOUND);
+      return;
+    }
+
+    MoveJob(jobid, dest);
+  }
+
+  if ((attr = ippFindAttribute(con->request, "job-priority", IPP_TAG_INTEGER)) != NULL &&
+      job->state->values[0].integer != IPP_JOB_PROCESSING)
+  {
+   /*
+    * Change the job priority
+    */
+
+    SetJobPriority(jobid, attr->values[0].integer);
+  }
+
+ /*
+  * Start jobs if possible...
+  */
+
+  CheckJobs();
+
+ /*
+  * Return with "everything is OK" status...
+  */
+
+  con->response->request.status.status_code = IPP_OK;
+}
+
+
+/*
  * 'start_printer()' - Start a printer.
  */
 
@@ -3954,5 +4174,5 @@ validate_job(client_t        *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.57 2000/03/09 19:47:33 mike Exp $".
+ * End of "$Id: ipp.c,v 1.58 2000/03/11 18:30:13 mike Exp $".
  */

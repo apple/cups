@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.55 2000/03/09 20:13:28 mike Exp $"
+ * "$Id: job.c,v 1.56 2000/03/11 18:30:13 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -36,6 +36,8 @@
  *   ReleaseJob()     - Release the specified job.
  *   RestartJob()     - Restart the specified job.
  *   SaveJob()        - Save a job to disk.
+ *   SetJobPriority() - Set the priority of a job, moving it up/down in the
+ *                      list as needed.
  *   StartJob()       - Start a print job.
  *   StopAllJobs()    - Stop all print jobs.
  *   StopJob()        - Stop a print job.
@@ -106,7 +108,9 @@ AddJob(int        priority,	/* I - Job priority */
 
   NumJobs ++;
 
-  for (current = Jobs, prev = NULL; current != NULL; prev = current, current = current->next)
+  for (current = Jobs, prev = NULL;
+       current != NULL;
+       prev = current, current = current->next)
     if (job->priority > current->priority)
       break;
 
@@ -483,7 +487,9 @@ LoadAllJobs(void)
       * Insert the job into the array, sorting by job priority and ID...
       */
 
-      for (current = Jobs, prev = NULL; current != NULL; prev = current, current = current->next)
+      for (current = Jobs, prev = NULL;
+           current != NULL;
+	   prev = current, current = current->next)
 	if (job->priority > current->priority)
 	  break;
 	else if (job->priority == current->priority && job->id < current->id)
@@ -634,6 +640,80 @@ SaveJob(int id)			/* I - Job ID */
 
   snprintf(filename, sizeof(filename), "%s/c%05d", RequestRoot, id);
   ipp_write_file(filename, job->attrs);
+}
+
+
+/*
+ * 'SetJobPriority()' - Set the priority of a job, moving it up/down in the
+ *                      list as needed.
+ */
+
+void
+SetJobPriority(int id,		/* I - Job ID */
+               int priority)	/* I - New priority (0 to 100) */
+{
+  job_t		*job,		/* Job to change */
+		*current,	/* Current job */
+		*prev;		/* Previous job */
+  ipp_attribute_t *attr;	/* Job attribute */
+
+
+ /*
+  * Find the job...
+  */
+
+  for (current = Jobs, prev = NULL;
+       current != NULL;
+       prev = current, current = current->next)
+    if (current->id == id)
+      break;
+
+  if (current == NULL)
+    return;
+
+ /*
+  * Set the new priority...
+  */
+
+  job = current;
+  job->priority = priority;
+
+  if ((attr = ippFindAttribute(job->attrs, "job-priority", IPP_TAG_INTEGER)) != NULL)
+    attr->values[0].integer = priority;
+  else
+    ippAddInteger(job->attrs, IPP_TAG_JOB, IPP_TAG_INTEGER, "job-priority",
+                  priority);
+
+  SaveJob(job->id);
+
+ /*
+  * See if we need to do any sorting...
+  */
+
+  if ((prev == NULL || job->priority < prev->priority) &&
+      (job->next == NULL || job->next->priority < job->priority))
+    return;
+
+ /*
+  * Remove the job from the list, and then insert it where it belongs...
+  */
+
+  if (prev == NULL)
+    Jobs = job->next;
+  else
+    prev->next = job->next;
+
+  for (current = Jobs, prev = NULL;
+       current != NULL;
+       prev = current, current = current->next)
+    if (job->priority > current->priority)
+      break;
+
+  job->next = current;
+  if (prev != NULL)
+    prev->next = job;
+  else
+    Jobs = job;
 }
 
 
@@ -2223,5 +2303,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.55 2000/03/09 20:13:28 mike Exp $".
+ * End of "$Id: job.c,v 1.56 2000/03/11 18:30:13 mike Exp $".
  */
