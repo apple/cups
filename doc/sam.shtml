@@ -1,7 +1,7 @@
 <HTML>
 <HEAD>
 	<META NAME="COPYRIGHT" CONTENT="Copyright 1997-2002, All Rights Reserved">
-	<META NAME="DOCNUMBER" CONTENT="CUPS-SAM-1.1.15">
+	<META NAME="DOCNUMBER" CONTENT="CUPS-SAM-1.1.16">
 	<META NAME="Author" CONTENT="Easy Software Products">
 	<TITLE>CUPS Software Administrators Manual</TITLE>
 </HEAD>
@@ -11,7 +11,7 @@
 
 <P>This software administrators manual provides printer administration
 information for the Common UNIX Printing System<SUP>TM</SUP>
-("CUPS<SUP>TM</SUP>"), version 1.1.15.
+("CUPS<SUP>TM</SUP>"), version 1.1.16.
 
 <EMBED SRC="system-overview.shtml">
 
@@ -4823,11 +4823,12 @@ For more information please contact us at:
 <P>Many applications read the <VAR>/etc/printcap</VAR> file to
 get a list of available printers.
 
-<P>The default CUPS configuration does not create the
-<VAR>/etc/printcap</VAR> file automatically. To enable automatic
-creation and updating of this file, use the
-<A HREF="#Printcap"><CODE>Printcap</CODE></A> directive described in
-<A HREF="#PRINTING_MANAGEMENT">Chapter 6, "Printing System Management"</A>.
+<P>The default CUPS configuration creates the
+<VAR>/etc/printcap</VAR> file automatically. To enable or
+disable automatic creation and updating of this file, use the <A
+HREF="#Printcap"><CODE>Printcap</CODE></A> directive described
+in <A HREF="#PRINTING_MANAGEMENT">Chapter 6, "Printing System
+Management"</A>.
 
 <H2>CUPS Doesn't Recognize My Username or Password!</H2>
 
