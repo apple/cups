@@ -1,5 +1,5 @@
 /*
- * "$Id: file.c,v 1.1.2.5 2003/11/04 16:37:55 mike Exp $"
+ * "$Id: file.c,v 1.1.2.6 2004/02/03 04:08:18 mike Exp $"
  *
  *   File functions for the Common UNIX Printing System (CUPS).
  *
@@ -551,7 +551,9 @@ cupsFileSeek(cups_file_t *fp,		/* I - CUPS file */
       fp->pos = pos;
       fp->ptr = NULL;
       fp->end = NULL;
+#ifdef HAVE_LIBZ
       fp->eof = 0;
+#endif /* HAVE_LIBZ */
     }
   }
   else if (pos >= (fp->pos + bytes))
@@ -577,6 +579,9 @@ cupsFileSeek(cups_file_t *fp,		/* I - CUPS file */
       fp->pos = pos;
       fp->ptr = NULL;
       fp->end = NULL;
+#ifdef HAVE_LIBZ
+      fp->eof = 0;
+#endif /* HAVE_LIBZ */
     }
   }
   else
@@ -587,6 +592,9 @@ cupsFileSeek(cups_file_t *fp,		/* I - CUPS file */
     */
 
     fp->ptr = fp->buf + pos - fp->pos;
+#ifdef HAVE_LIBZ
+    fp->eof = 0;
+#endif /* HAVE_LIBZ */
   }
 
   return (pos);
@@ -638,8 +646,10 @@ static int				/* O - Number of bytes or -1 */
 cups_fill(cups_file_t *fp)		/* I - CUPS file */
 {
   int			bytes;		/* Number of bytes read */
+#ifdef HAVE_LIBZ
   const unsigned char	*ptr,		/* Pointer into buffer */
 			*end;		/* End of buffer */
+#endif /* HAVE_LIBZ */
 
 
  /*
@@ -971,5 +981,5 @@ cups_write(int        fd,		/* I - File descriptor */
 
 
 /*
- * End of "$Id: file.c,v 1.1.2.5 2003/11/04 16:37:55 mike Exp $".
+ * End of "$Id: file.c,v 1.1.2.6 2004/02/03 04:08:18 mike Exp $".
  */

@@ -3,6 +3,25 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.21rc1
 
+	- The PPD conformance tests did not catch group
+	  translation strings that exceeded the maximum allowed
+	  size (STR #454)
+	- Updated the client code in the scheduler to close the
+	  client connection on errors rather than shutting down
+	  the receive end of the socket; this caused resource
+	  problems on some systems (STR #434)
+	- cups-polld didn't compile on Tru64 5.1B (STR #436)
+	- "lpc stat" crashed if the device URI was empty (STR
+	  #548)
+	- The scheduler did not compile without zlib (STR #433)
+	- std:floor() cast needed on IRIX 6.5 with SGI C++
+	  compiler (STR #497)
+	- cupsRasterReadPixels() and cupsRasterWritePixels() did
+	  not handle EAGAIN and EINTR properly (STR #473)
+	- RequiresPageRegion should not be consulted for Manual
+	  Feed (STR #514)
+	- International characters were not substituted in
+	  banner files properly (STR #468)
 	- Updated pdftops to Xpdf 2.03 code to fix printing bugs
 	  (STR #470)
 	- The Digest authentication code did not include the

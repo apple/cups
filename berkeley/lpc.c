@@ -1,5 +1,5 @@
 /*
- * "$Id: lpc.c,v 1.11.2.7 2003/07/20 12:51:39 mike Exp $"
+ * "$Id: lpc.c,v 1.11.2.8 2004/02/03 04:08:18 mike Exp $"
  *
  *   "lpc" command for the Common UNIX Printing System (CUPS).
  *
@@ -220,7 +220,8 @@ show_status(http_t *http,	/* I - HTTP connection to server */
 		*jattr;		/* Current job attribute */
   cups_lang_t	*language;	/* Default language */
   char		*printer,	/* Printer name */
-		*device;	/* Device URI */
+		*device,	/* Device URI */
+                *delimiter;     /* Char search result */
   ipp_pstate_t	pstate;		/* Printer state */
   int		accepting;	/* Is printer accepting jobs? */
   int		jobcount;	/* Count of current jobs */
@@ -453,8 +454,11 @@ show_status(http_t *http,	/* I - HTTP connection to server */
 	  * Just show the method...
 	  */
 
-	  *strchr(device, ':') = '\0';
-	  printf("\tprinter is on device \'%s\' speed -1\n", device);
+	  if ((delimiter = strchr(device, ':')) != NULL )
+	  {
+	      *delimiter = '\0';
+	      printf("\tprinter is on device \'%s\' speed -1\n", device);
+	  }
 	}
 
 	printf("\tqueuing is %sabled\n", accepting ? "en" : "dis");
@@ -477,5 +481,5 @@ show_status(http_t *http,	/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpc.c,v 1.11.2.7 2003/07/20 12:51:39 mike Exp $".
+ * End of "$Id: lpc.c,v 1.11.2.8 2004/02/03 04:08:18 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c,v 1.51.2.61 2003/11/17 02:29:53 mike Exp $"
+ * "$Id: ppd.c,v 1.51.2.62 2004/02/03 04:08:18 mike Exp $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -619,11 +619,7 @@ ppdOpen(FILE *fp)			/* I - File to read from */
 	                          cupsLangString(language, CUPS_MSG_GENERAL));
 
           if (group == NULL)
-	  {
-            ppd_status = PPD_ALLOC_ERROR;
-
 	    goto error;
-	  }
 
           DEBUG_printf(("Adding to group %s...\n", group->text));
           option = ppd_get_option(group, keyword);
@@ -856,8 +852,6 @@ ppdOpen(FILE *fp)			/* I - File to read from */
 	  {
 	    DEBUG_puts("Unable to get general group!");
 
-            ppd_status = PPD_ALLOC_ERROR;
-
 	    goto error;
 	  }
 
@@ -1026,11 +1020,7 @@ ppdOpen(FILE *fp)			/* I - File to read from */
 	                        cupsLangString(language, CUPS_MSG_GENERAL));
 
         if (group == NULL)
-	{
-          ppd_status = PPD_ALLOC_ERROR;
-
 	  goto error;
-	}
 
         DEBUG_printf(("Adding to group %s...\n", group->text));
         option = ppd_get_option(group, name);
@@ -1128,11 +1118,7 @@ ppdOpen(FILE *fp)			/* I - File to read from */
       group = ppd_get_group(ppd, "JCL", "JCL");
 
       if (group == NULL)
-      {
-        ppd_status = PPD_ALLOC_ERROR;
-
 	goto error;
-      }
 
      /*
       * Add an option record to the current JCLs...
@@ -1236,6 +1222,9 @@ ppdOpen(FILE *fp)			/* I - File to read from */
       */
 
       group = ppd_get_group(ppd, string, sptr);
+
+      if (group == NULL)
+	goto error;
 
       ppd_free(string);
       string = NULL;
@@ -2484,6 +2473,13 @@ ppd_get_group(ppd_file_t *ppd,		/* I - PPD file */
   {
     DEBUG_printf(("Adding group %s...\n", name));
 
+    if (ppd_conform == PPD_CONFORM_STRICT && strlen(text) >= sizeof(group->text))
+    {
+      ppd_status = PPD_ILLEGAL_TRANSLATION;
+
+      return (NULL);
+    }
+	    
     if (ppd->num_groups == 0)
       group = malloc(sizeof(ppd_group_t));
     else
@@ -2491,7 +2487,11 @@ ppd_get_group(ppd_file_t *ppd,		/* I - PPD file */
 	              (ppd->num_groups + 1) * sizeof(ppd_group_t));
 
     if (group == NULL)
+    {
+      ppd_status = PPD_ALLOC_ERROR;
+
       return (NULL);
+    }
 
     ppd->groups = group;
     group += ppd->num_groups;
@@ -3022,5 +3022,5 @@ ppd_read(FILE *fp,			/* I - File to read from */
 
 
 /*
- * End of "$Id: ppd.c,v 1.51.2.61 2003/11/17 02:29:53 mike Exp $".
+ * End of "$Id: ppd.c,v 1.51.2.62 2004/02/03 04:08:18 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: raster.c,v 1.2.2.7 2003/02/11 18:23:32 mike Exp $"
+ * "$Id: raster.c,v 1.2.2.8 2004/02/03 04:08:18 mike Exp $"
  *
  *   Raster file routines for the Common UNIX Printing System (CUPS).
  *
@@ -824,8 +824,19 @@ cups_read(int  fd,				/* I - File descriptor */
 
 
   for (total = 0; total < bytes; total += count, buf += count)
-    if ((count = read(fd, buf, bytes - total)) <= 0)
-      return (-1);
+  {
+    count = read(fd, buf, bytes - total);
+
+    if (count == 0)
+      return (0);
+    else if (count < 0)
+    {
+      if (errno != EAGAIN && errno != EINTR)
+        count = 0;
+      else
+        return (-1);
+    }
+  }
 
   return (total);
 }
@@ -845,13 +856,22 @@ cups_write(int        fd,			/* I - File descriptor */
 
 
   for (total = 0; total < bytes; total += count, buf += count)
-    if ((count = write(fd, buf, bytes - total)) <= 0)
-      return (-1);
+  {
+    count = write(fd, buf, bytes - total);
+
+    if (count < 0)
+    {
+      if (errno != EAGAIN && errno != EINTR)
+        count = 0;
+      else
+        return (-1);
+    }
+  }
 
   return (total);
 }
 
 
 /*
- * End of "$Id: raster.c,v 1.2.2.7 2003/02/11 18:23:32 mike Exp $".
+ * End of "$Id: raster.c,v 1.2.2.8 2004/02/03 04:08:18 mike Exp $".
  */
