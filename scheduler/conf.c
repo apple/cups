@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.43 2000/02/06 22:09:06 mike Exp $"
+ * "$Id: conf.c,v 1.44 2000/02/25 12:41:39 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -369,9 +369,10 @@ ReadConfiguration(void)
   * Load devices and PPDs...
   */
 
+  LoadPPDs(CUPS_DATADIR "/model");
+
   sprintf(directory, "%s/backend", ServerBin);
   LoadDevices(directory);
-  LoadPPDs(CUPS_DATADIR "/model");
 
  /*
   * Add a default browser if browsing is enabled and no browser addresses
@@ -862,7 +863,7 @@ read_location(FILE *fp,		/* I - Configuration file */
     else if (strcmp(name, "AuthType") == 0)
     {
      /*
-      * AuthType Basic
+      * AuthType {none,basic,digest}
       */
 
       if (strcasecmp(value, "none") == 0)
@@ -1018,5 +1019,5 @@ get_address(char               *value,		/* I - Value string */
 
 
 /*
- * End of "$Id: conf.c,v 1.43 2000/02/06 22:09:06 mike Exp $".
+ * End of "$Id: conf.c,v 1.44 2000/02/25 12:41:39 mike Exp $".
  */
