@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c,v 1.51.2.16 2002/05/23 17:55:02 mike Exp $"
+ * "$Id: ppd.c,v 1.51.2.17 2002/05/31 19:08:22 mike Exp $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -1480,6 +1480,31 @@ ppdOpen(FILE *fp)		/* I - File to read from */
 #endif /* DEBUG */
 
  /*
+  * Make sure that all PPD files with an InputSlot option have an
+  * "auto" choice that maps to no specific tray or media type.
+  */
+
+  if ((option = ppdFindOption(ppd, "InputSlot")) != NULL)
+  {
+    for (i = 0; i < option->num_choices; i ++)
+      if (option->choices[i].code == NULL || !option->choices[i].code[0])
+	break;
+
+    if (i >= option->num_choices)
+    {
+     /*
+      * No "auto" input slot, add one...
+      */
+
+      choice = ppd_add_choice(option, "Auto");
+
+      strlcpy(choice->text, cupsLangString(language, CUPS_MSG_AUTO),
+              sizeof(choice->text));
+      choice->code = NULL;
+    }
+  }
+
+ /*
   * Set the option back-pointer for each choice...
   */
 
@@ -2148,5 +2173,5 @@ ppd_fix(char *string)		/* IO - String to fix */
 
 
 /*
- * End of "$Id: ppd.c,v 1.51.2.16 2002/05/23 17:55:02 mike Exp $".
+ * End of "$Id: ppd.c,v 1.51.2.17 2002/05/31 19:08:22 mike Exp $".
  */

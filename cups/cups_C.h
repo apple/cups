@@ -109,6 +109,7 @@
 "Filename(s)",
 "Print",
 "Options Installed",
+"Auto",
 "400 Your browser sent a request that this server could not understand.",
 "This server could not verify that you are authorized to access the resource.",
 "You must pay to access this server.",
