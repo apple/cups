@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.75 2004/02/25 20:14:51 mike Exp $"
+# "$Id: Makefile,v 1.76 2004/04/05 16:18:52 mike Exp $"
 #
 #   Filter makefile for the Common UNIX Printing System (CUPS).
 #
@@ -110,9 +110,9 @@ formtops:	$(FORMOBJS) common.o ../Makedefs ../cups/$(LIBCUPS)
 # gziptoany
 #
 
-gziptoany:	gziptoany.o ../Makedefs
+gziptoany:	gziptoany.o ../Makedefs ../cups/$(LIBCUPS)
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ gziptoany.o $(LIBZ)
+	$(CC) $(LDFLAGS) -o $@ gziptoany.o $(LIBZ) $(LIBS)
 
 
 #
@@ -269,5 +269,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile,v 1.75 2004/02/25 20:14:51 mike Exp $".
+# End of "$Id: Makefile,v 1.76 2004/04/05 16:18:52 mike Exp $".
 #
