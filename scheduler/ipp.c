@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.33 1999/10/22 18:45:54 mike Exp $"
+ * "$Id: ipp.c,v 1.34 1999/10/27 20:19:57 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -324,7 +324,7 @@ accept_jobs(client_t        *con,	/* I - Client connection */
   if (strncmp(con->uri, "/admin/", 7) != 0)
   {
     LogMessage(LOG_ERROR, "accept_jobs: admin request on bad resource \'%s\'!",
-               resource);
+               con->uri);
     send_ipp_error(con, IPP_NOT_AUTHORIZED);
     return;
   }
@@ -396,7 +396,7 @@ add_class(client_t        *con,		/* I - Client connection */
   if (strncmp(con->uri, "/admin/", 7) != 0)
   {
     LogMessage(LOG_ERROR, "add_class: admin request on bad resource \'%s\'!",
-               resource);
+               con->uri);
     send_ipp_error(con, IPP_NOT_AUTHORIZED);
     return;
   }
@@ -621,7 +621,7 @@ add_printer(client_t        *con,	/* I - Client connection */
   if (strncmp(con->uri, "/admin/", 7) != 0)
   {
     LogMessage(LOG_ERROR, "add_printer: admin request on bad resource \'%s\'!",
-               resource);
+               con->uri);
     send_ipp_error(con, IPP_NOT_AUTHORIZED);
     return;
   }
@@ -901,7 +901,7 @@ cancel_all_jobs(client_t        *con,	/* I - Client connection */
   if (strncmp(con->uri, "/admin/", 7) != 0)
   {
     LogMessage(LOG_ERROR, "cancel_all_jobs: admin request on bad resource \'%s\'!",
-               resource);
+               con->uri);
     send_ipp_error(con, IPP_NOT_AUTHORIZED);
     return;
   }
@@ -977,11 +977,11 @@ cancel_job(client_t        *con,	/* I - Client connection */
   */
 
   if (strncmp(con->uri, "/classes/", 9) != 0 &&
-      strncmp(con->uri, "/job/", 5) != 0 &&
+      strncmp(con->uri, "/jobs/", 5) != 0 &&
       strncmp(con->uri, "/printers/", 10) != 0)
   {
     LogMessage(LOG_ERROR, "cancel_job: cancel request on bad resource \'%s\'!",
-               resource);
+               con->uri);
     send_ipp_error(con, IPP_NOT_AUTHORIZED);
     return;
   }
@@ -1237,7 +1237,7 @@ delete_printer(client_t        *con,	/* I - Client connection */
   if (strncmp(con->uri, "/admin/", 7) != 0)
   {
     LogMessage(LOG_ERROR, "delete_printer: admin request on bad resource \'%s\'!",
-               resource);
+               con->uri);
     send_ipp_error(con, IPP_NOT_AUTHORIZED);
     return;
   }
@@ -1843,7 +1843,7 @@ print_job(client_t        *con,		/* I - Client connection */
       strncmp(con->uri, "/printers/", 10) != 0)
   {
     LogMessage(LOG_ERROR, "print_job: cancel request on bad resource \'%s\'!",
-               resource);
+               con->uri);
     send_ipp_error(con, IPP_NOT_AUTHORIZED);
     return;
   }
@@ -2088,7 +2088,7 @@ reject_jobs(client_t        *con,	/* I - Client connection */
   if (strncmp(con->uri, "/admin/", 7) != 0)
   {
     LogMessage(LOG_ERROR, "reject_jobs: admin request on bad resource \'%s\'!",
-               resource);
+               con->uri);
     send_ipp_error(con, IPP_NOT_AUTHORIZED);
     return;
   }
@@ -2194,7 +2194,7 @@ set_default(client_t        *con,	/* I - Client connection */
   if (strncmp(con->uri, "/admin/", 7) != 0)
   {
     LogMessage(LOG_ERROR, "set_default: admin request on bad resource \'%s\'!",
-               resource);
+               con->uri);
     send_ipp_error(con, IPP_NOT_AUTHORIZED);
     return;
   }
@@ -2270,7 +2270,7 @@ start_printer(client_t        *con,	/* I - Client connection */
   if (strncmp(con->uri, "/admin/", 7) != 0)
   {
     LogMessage(LOG_ERROR, "start_printer: admin request on bad resource \'%s\'!",
-               resource);
+               con->uri);
     send_ipp_error(con, IPP_NOT_AUTHORIZED);
     return;
   }
@@ -2357,7 +2357,7 @@ stop_printer(client_t        *con,	/* I - Client connection */
   if (strncmp(con->uri, "/admin/", 7) != 0)
   {
     LogMessage(LOG_ERROR, "stop_printer: admin request on bad resource \'%s\'!",
-               resource);
+               con->uri);
     send_ipp_error(con, IPP_NOT_AUTHORIZED);
     return;
   }
@@ -2500,7 +2500,7 @@ validate_job(client_t        *con,	/* I - Client connection */
       strncmp(con->uri, "/printers/", 10) != 0)
   {
     LogMessage(LOG_ERROR, "validate_job: request on bad resource \'%s\'!",
-               resource);
+               con->uri);
     send_ipp_error(con, IPP_NOT_AUTHORIZED);
     return;
   }
@@ -2576,5 +2576,5 @@ validate_job(client_t        *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.33 1999/10/22 18:45:54 mike Exp $".
+ * End of "$Id: ipp.c,v 1.34 1999/10/27 20:19:57 mike Exp $".
  */
