@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.143 2003/03/19 06:06:04 mike Exp $"
+ * "$Id: printers.c,v 1.144 2003/03/20 03:04:44 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -682,6 +682,7 @@ LoadAllPrinters(void)
       if (p != NULL)
       {
         SetPrinterAttrs(p);
+	AddPrinterHistory(p);
         p = NULL;
       }
       else
@@ -2346,5 +2347,5 @@ write_irix_state(printer_t *p)	/* I - Printer to update */
 
 
 /*
- * End of "$Id: printers.c,v 1.143 2003/03/19 06:06:04 mike Exp $".
+ * End of "$Id: printers.c,v 1.144 2003/03/20 03:04:44 mike Exp $".
  */
