@@ -1,134 +1,134 @@
-windows-1251
-OK
-Cancel
-Help
-Quit
-Close
-Yes
-No
-On
-Off
-Save
-Discard
-Default
-Options
-More Info
-Black
-Colour
+utf-8
+Добра
+Адмяніць
+Даведка
+Выйсьці
+Зачыніць
+Так
+Не
+Уключыць
+Выключыць
+Захавць
+Адкінуць
+Дапомна
+Выбары
+Больш зьвестак
+Чорны
+Каляровы
 Cyan
 Magenta
-Yellow
-Copyright 1993-2003 by Easy Software Products, All Rights Reserved.
-General
-Printer
-Image
+Жоўты
+Аўтарскія правы ў 1993-2004 гадох належаць Easy Software Products. Усе правы абаронены.
+Агульныя
+Друкаркі
+Відарыс
 HP-GL/2
-Extra
-Document
-Other
-Print Pages: 
-Entire Document
-Page Range:
-Reverse Order: 
-Page Format: 
+Дадатковыя
+Дакумэнт
+Іншае
+Друк старонак: 
+Увесь дакумэнт
+Прамежак старонак:
+Адваротны парадак: 
+Фармат старонак: 
  1-Up
  2-Up
  4-Up
-Image Scaling: 
-Use Natural Image Size
+Расьцягваньне відарысаў: 
+Выкарыстоўваць сапраўдны памер відарысаў
 Zoom by Percent
 Zoom by PPI
 Mirror Image: 
-Colour Saturation: 
-Colour Hue: 
-Fit to Page: 
+Насычанасьць колеру:
+Адценне колеру: 
+Расьцягнуць да памераў старонкі: 
 Shading: 
-Pen Width: 
-Gamma Correction: 
-Brightness: 
-Add
-Delete
-Modify
-Printer URI
-Printer Name
-Printer Location
-Printer Info
-Printer Make and Model
-Device URI
-Formatting Page
-Printing Page
-Initializing Printer
-Printer State
-Accepting Jobs
-Not Accepting Jobs
-Print Jobs
-Class
-Local
-Remote
-Duplexing
+Шырыня асадкі: 
+Выпраўленьне гамы: 
+Зыркасьць: 
+Дадаць
+Выдаліць
+Зьмяніць
+URI друкаркі
+Назва друкаркі
+Знаходжаньне друкаркі
+Зьвесткі пра друкарку
+Вытворца і мадэль друкаркі
+URI прылады
+Фарматаваньне старонкі
+Друк старонкі
+Ініцыялізацыя друкаркі
+Стан друкаркі
+Прыймае заданьні
+Не прыймае заданьні
+Друк заданьняў
+Клясы
+Мясцовая
+Аддаленая
+Здвоены друк
 Stapling
-Fast Copies
+Хуткія копіі
 Collated Copies
 Hole Punching
 Covering
 Binding
-Sorting
-Small (up to 9.5x14in)
-Medium (9.5x14in to 13x19in)
-Large (13x19in and larger)
-Custom Size
-Idle
-Processing
-Stopped
-All
-Odd
-Even
-Darker                     Lighter
-Media Size
-Media Type
-Media Source
-Orientation: 
-Portrait
-Landscape
-Job State
-Job Name
-User Name
-Priority
-Copies
-File Size
+Упарадкаваньне
+Маленькі (да 9.5x14 цаляў)
+Сярэдні (ад 9.5x14 цаляў да 13x19 цаляў)
+Вялікі (ад 13x19 цаляў і больш)
+Адмысловы памер
+Бязьдзейнічае
+Друкуе
+Спынена
+Усе
+Няцотны
+Цотны
+Цямней                     Сьвятлей
+Памеры аркушаў
+Від аркушаў
+Крыніца аркушаў
+Спагляданьне: 
+Вэртыкальнае
+Гарызантальнае
+Стан заданьня
+Назва заданьня
+Уліковае імя
+Прыярытэт
+Копіі
+Памер файла
 Pending
-Output Mode
-Resolution
-Text
-Pretty Print
-Margins
-Left
-Right
-Bottom
-Top
-Filename(s)
-Print
-Options Installed
-Auto
-400 Your browser sent a request that this server could not understand.
-This server could not verify that you are authorized to access the resource.
-You must pay to access this server.
-You don't have permission to access the resource on this server.
-The requested resource was not found on this server.
-The requested method is not allowed with the resource.
-An appropriate representation for the resource was not found on this server.
-You don't have permission to use this server as a proxy host.
-The request has taken too long to complete and has been aborted.
-The requested resource has more than one value.
-The requested resource is gone and has not been replaced.
-The requested method requires a valid Content-Length.
+Рэжым вываду
+Разрозьненьне
+Тэкст
+Прыгожы друк
+Палі
+Левае
+Правае
+Верхняе
+Ніжняе
+Назва(ы) файла(ў)
+Надрукаваць
+Усталяваныя зручнасьці
+Аўтаматычна
+400 Ваш вандроўнік даслаў запыт, які гэты паслужнік ня можа зразумець.
+Паслужнік ня можа ўпэўніцца, што вы аўтарызаваны на доступ да гэтага расурса.
+Вы мусіце плаціць за доступ на гэты паслужнік.
+Вы ня маеце правоў каб атрымаць доступ да расурса на гэтым паслужніке.
+Запатрабаваны расурс ня быў адшуканы на гэтым паслужніке.
+Запатрабаваны мэтад не дазволены для расурса.
+Адпаведнае форма для гэтага расурса не была знойдзена на на гэтым паслужніке.
+Вы ня маеце правоў, каб выкарыстоўваць гэты паслужнік у якасьці паўнамоцнага вузла.
+Запыт займе вельмі шмат часу, таму ён быў пярэрваны.
+Запатрабаваны расурс мае больш чым адно значэньне.
+Запатрабаваны расурс скончыўся й ня будзе заменены.
+Запатрабаваны мэтад патрабуе рэчаіснае значэньне Content-Length.
 The precondition on the request evaluated to false.
-The request is too large for this server to process.
-The request URI is too large for this server to process.
-The request format is not understood by this server.
-500 The server has detected an unrecoverable error and cannot process your request.
-The requested method is not implemented by this server.
-The proxy server received an invalid response from an upstream server.
-The requested resource is currently unavailable on this server.
-The proxy server has taken too long to respond to this server.
-This server does not support the HTTP version required by your browser.
+Запыт занадта вялікі, каб апрацаваць яго на гэтым паслужніке.
+Запатрабаваны URI занадта вялікі для гэтага паслужніка каб апрацаваць яго.
+Запатрабаваны фармат зьяўляецца незразумелым для гэтага паслужніка.
+500 Гэты паслужнік знайшоў невыправімую памылку й ня можа апазаваць ваш запыт.
+Запатрабаваны мэтад не ажыцьцяўляецца гэтым паслужнікам.
+Паўнамоцны паслужнік атрымаў нерэчаісны адказ ад вышэйстаячага паслужніка.
+Запатрабаваны расурс у бягучы момант недаступны на гэтым паслужніке.
+Паўнамоцны паслужнік зашмат часу дае адказ гэтаму паслужніку.
+Гэты паслужнік не падтрымлівае вэрсыю HTTP, якую патрабуе ваш вандроўнік.

@@ -1,0 +1,43 @@
+<FORM METHOD="POST" ACTION="/admin">
+<INPUT TYPE="HIDDEN" NAME="OP" VALUE="{op}">
+<INPUT TYPE="HIDDEN" NAME="PRINTER_NAME" VALUE="{printer_name}">
+<INPUT TYPE="HIDDEN" NAME="PRINTER_LOCATION" VALUE="{?printer_location}">
+<INPUT TYPE="HIDDEN" NAME="PRINTER_INFO" VALUE="{?printer_info}">
+<INPUT TYPE="HIDDEN" NAME="CURRENT_MAKE_AND_MODEL" VALUE="{?current_make_and_model}">
+<TABLE CELLPADDING="0" CELLSPACING="0" BORDER="0" WIDTH="100%">
+<TR BGCOLOR="#999966">
+	<TH WIDTH="16"><IMG SRC="/images/left.gif" ALT=""></TH>
+	<TH COLSPAN="2">URI прылады для {printer_name}</TH>
+	<TH BGCOLOR="#cccc99" WIDTH="16"><IMG SRC="/images/right.gif" ALT=""></TH>
+</TR>
+<TR>
+	<TD HEIGHT="4"></TD>
+</TR>
+<TR>
+	<TD></TD>
+	<TD ALIGN="RIGHT">URI прылады:&nbsp;</TD>
+	<TD><INPUT TYPE="TEXT" SIZE="40" MAXLENGTH="1024" NAME="DEVICE_URI" VALUE="{device_uri}"></TD>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+	<TD>Прыклады:
+	<PRE>
+    file:/path/to/filename.prn
+    http://hostname:631/ipp/
+    http://hostname:631/ipp/port1
+    ipp://hostname/ipp/
+    ipp://hostname/ipp/port1
+    lpd://hostname/queue
+    socket://hostname
+    socket://hostname:9100
+	</PRE>
+	</TD>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+	<TD><INPUT TYPE="IMAGE" SRC="/images/continue.gif" ALT="Працяг..." BORDER="0"></TD>
+</TR>
+</TABLE>
+</FORM>
