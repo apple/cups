@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.h,v 1.36.2.18 2003/08/01 20:09:21 mike Exp $"
+ * "$Id: conf.h,v 1.36.2.19 2003/08/22 22:02:35 mike Exp $"
  *
  *   Configuration file definitions for the Common UNIX Printing System (CUPS)
  *   scheduler.
@@ -102,6 +102,8 @@ VAR uid_t		User			VALUE(1);
 					/* User ID for server */
 VAR gid_t		Group			VALUE(0);
 					/* Group ID for server */
+VAR time_t		TimeZoneOffset		VALUE(0);
+					/* Offset from UTC to local time */
 VAR int			ClassifyOverride	VALUE(0),
 					/* Allow overrides? */
 			ConfigFilePerm		VALUE(0600),
@@ -192,5 +194,5 @@ extern int	LogPage(job_t *job, const char *page);
 
 
 /*
- * End of "$Id: conf.h,v 1.36.2.18 2003/08/01 20:09:21 mike Exp $".
+ * End of "$Id: conf.h,v 1.36.2.19 2003/08/22 22:02:35 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: log.c,v 1.19.2.15 2003/07/25 17:37:33 mike Exp $"
+ * "$Id: log.c,v 1.19.2.16 2003/08/22 22:02:35 mike Exp $"
  *
  *   Log file routines for the Common UNIX Printing System (CUPS).
  *
@@ -79,26 +79,26 @@ GetDateTime(time_t t)		/* I - Time value */
   * Get the date and time from the UNIX time value, and then format it
   * into a string.  Note that we *can't* use the strftime() function since
   * it is localized and will seriously confuse automatic programs if the
-  * month names are in the wrong language!
+  * month names are in the wrong language!  Also, thanks to a marvelous
+  * deadlock condition present in most/all versions of Sun's C libraries
+  * we can't use localtime()...
   *
-  * Also, we use the "timezone" variable that contains the current timezone
-  * offset from GMT in seconds so that we are reporting local time in the
-  * log files.  If you want GMT, set the TZ environment variable accordingly
-  * before starting the scheduler.
-  *
-  * (*BSD and Darwin store the timezone offset in the tm structure)
+  * We use the "TimeZoneOffset" variable that contains the current
+  * timezone offset from UTC in seconds so that we are reporting local
+  * time in the log files.  If you want GMT, set the TZ environment
+  * variable accordingly before starting the scheduler.  Because of the
+  * static nature of the TimeZoneOffset variable, the time may not
+  * reflect daylight savings time accurately until you reconfigure or
+  * restart the scheduler...
   */
 
-  date = localtime(&t);
+  t    += TimeZoneOffset;
+  date = gmtime(&t);
 
   snprintf(s, sizeof(s), "[%02d/%s/%04d:%02d:%02d:%02d %+03ld%02ld]",
 	   date->tm_mday, months[date->tm_mon], 1900 + date->tm_year,
 	   date->tm_hour, date->tm_min, date->tm_sec,
-#ifdef HAVE_TM_GMTOFF
-           date->tm_gmtoff / 3600, (date->tm_gmtoff / 60) % 60);
-#else
-           timezone / 3600, (timezone / 60) % 60);
-#endif /* HAVE_TM_GMTOFF */
+	   TimeZoneOffset / 3600, (TimeZoneOffset / 60) % 60);
  
   return (s);
 }
@@ -563,5 +563,5 @@ check_log_file(cups_file_t **log,	/* IO - Log file */
 
 
 /*
- * End of "$Id: log.c,v 1.19.2.15 2003/07/25 17:37:33 mike Exp $".
+ * End of "$Id: log.c,v 1.19.2.16 2003/08/22 22:02:35 mike Exp $".
  */
