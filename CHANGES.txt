@@ -8,7 +8,8 @@ CHANGES IN CUPS V1.1.10
 	  to override the classification of individual jobs.
 	- Added new BrowseProtocols directive to control which
 	  browse protocols are used (currently CUPS and SLP).
-	- Added SLPv2 support.
+	- Added SLPv2 support (thanks to Matt Peterson for
+	  contributing the initial implementation for CUPS.)
 	- The serial backend now limits writes to 1/10th
 	  second worth of data to avoid buffer overflows
 	  with some types of flow control.
