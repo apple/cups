@@ -1393,9 +1393,9 @@ mm</TH><TH WIDTH="20%">netmask</TH></TR>
 </TABLE>
 </CENTER>
 </P>
-<P>The <CODE>@LOCAL</CODE> name will allow access from all local
- interfaces. The <CODE>@IF(name)</CODE> name will allow access from the
- named interface.</P>
+<P>The <CODE>@LOCAL</CODE> name will allow access from all local network
+ interfaces, but not remote point-to-point interfaces. The <CODE>
+@IF(name)</CODE> name will allow access from the named interface.</P>
 <P>The <CODE>Allow</CODE> directive must appear inside a<A HREF="#Location">
  <CODE>Location</CODE></A> directive.
 <!-- NEED 3in -->
@@ -1550,8 +1550,8 @@ BrowseAllow from @IF(name)
  255.255.255.0, or network addresses using the specified netmask or bit
  count.</P>
 <P>The <CODE>@LOCAL</CODE> name will allow browse data from all local
- interfaces. The <CODE>@IF(name)</CODE> name will allow browse data from
- the named interface.
+ network interfaces, but not remote point-to-point interfaces. The <CODE>
+@IF(name)</CODE> name will allow browse data from the named interface.
 <!-- NEED 4in -->
 </P>
 <H3><A NAME="BrowseDeny">BrowseDeny</A></H3>
@@ -1580,8 +1580,8 @@ BrowseDeny from @IF(name)
  255.255.255.0, or network addresses using the specified netmask or bit
  count.</P>
 <P>The <CODE>@LOCAL</CODE> name will block browse data from all local
- interfaces. The <CODE>@IF(name)</CODE> name will block browse data from
- the named interface.
+ network interfaces, but not remote point-to-point interfaces. The <CODE>
+@IF(name)</CODE> name will block browse data from the named interface.
 <!-- NEED 3in -->
 </P>
 <H3><A NAME="BrowseOrder">BrowseOrder</A></H3>
@@ -1913,9 +1913,9 @@ mm</TH><TH WIDTH="20%">netmask</TH></TR>
 </TABLE>
 </CENTER>
 </P>
-<P>The <CODE>@LOCAL</CODE> name will deny access from all local
- interfaces. The <CODE>@IF(name)</CODE> name will deny access from the
- named interface.</P>
+<P>The <CODE>@LOCAL</CODE> name will deny access from all local network
+ interfaces, but not remote point-to-point interfaces. The <CODE>
+@IF(name)</CODE> name will deny access from the named interface.</P>
 <P>The <CODE>Deny</CODE> directive must appear inside a<A HREF="#Location">
  <CODE>Location</CODE></A> directive.
 <!-- NEED 3in -->

@@ -1235,8 +1235,9 @@ can be used to allow access for multiple hosts or networks.  The
 </TABLE></CENTER>
 
 <P>The <CODE>@LOCAL</CODE> name will allow access from all local
-interfaces. The <CODE>@IF(name)</CODE> name will allow access
-from the named interface.
+network interfaces, but not remote point-to-point interfaces. The
+<CODE>@IF(name)</CODE> name will allow access from the named
+interface.
 
 <P>The <CODE>Allow</CODE> directive must appear inside a
 <A HREF="#Location"><CODE>Location</CODE></A> directive.
@@ -1429,8 +1430,9 @@ match networks using netmasks of 255.0.0.0, 255.255.0.0, and 255.255.255.0,
 or network addresses using the specified netmask or bit count.
 
 <P>The <CODE>@LOCAL</CODE> name will allow browse data from all
-local interfaces. The <CODE>@IF(name)</CODE> name will allow
-browse data from the named interface.
+local network interfaces, but not remote point-to-point
+interfaces. The <CODE>@IF(name)</CODE> name will allow browse
+data from the named interface.
 
 
 <!-- NEED 4in -->
@@ -1464,8 +1466,9 @@ match networks using netmasks of 255.0.0.0, 255.255.0.0, and 255.255.255.0,
 or network addresses using the specified netmask or bit count.
 
 <P>The <CODE>@LOCAL</CODE> name will block browse data from all
-local interfaces. The <CODE>@IF(name)</CODE> name will block
-browse data from the named interface.
+local network interfaces, but not remote point-to-point
+interfaces. The <CODE>@IF(name)</CODE> name will block browse
+data from the named interface.
 
 
 <!-- NEED 3in -->
@@ -1866,8 +1869,9 @@ can be used to allow access for multiple hosts or networks. The
 </TABLE></CENTER>
 
 <P>The <CODE>@LOCAL</CODE> name will deny access from all local
-interfaces. The <CODE>@IF(name)</CODE> name will deny access
-from the named interface.
+network interfaces, but not remote point-to-point interfaces. The
+<CODE>@IF(name)</CODE> name will deny access from the named
+interface.
 
 <P>The <CODE>Deny</CODE> directive must appear inside a
 <A HREF="#Location"><CODE>Location</CODE></A> directive.
