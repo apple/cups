@@ -1,8 +1,10 @@
-CHANGES.txt - 03/14/2003
+CHANGES.txt - 03/17/2003
 ------------------------
 
 CHANGES IN CUPS V1.1.19
 
+	- If a backend failed for a printer, CUPS would
+	  incorrectly requeue the job for printing again.
 	- Added support for IPP collections and files.
 	- Added experimental support for generic CGI scripts and
 	  programs, Java, Perl, PHP, and Python to the
