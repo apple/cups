@@ -1,5 +1,5 @@
 /*
- * "$Id: cancel.c,v 1.22 2002/01/02 17:59:19 mike Exp $"
+ * "$Id: cancel.c,v 1.23 2002/05/16 13:45:04 mike Exp $"
  *
  *   "cancel" command for the Common UNIX Printing System (CUPS).
  *
@@ -163,8 +163,7 @@ main(int  argc,			/* I - Number of command-line arguments */
       }
       else
       {
-        strncpy(name, argv[i], sizeof(name) - 1);
-	name[sizeof(name) - 1] = '\0';
+        strlcpy(name, argv[i], sizeof(name));
 
 	dest   = name;
         job_id = 0;
@@ -282,5 +281,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: cancel.c,v 1.22 2002/01/02 17:59:19 mike Exp $".
+ * End of "$Id: cancel.c,v 1.23 2002/05/16 13:45:04 mike Exp $".
  */

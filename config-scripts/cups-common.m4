@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-common.m4,v 1.16 2002/03/08 19:48:58 mike Exp $"
+dnl "$Id: cups-common.m4,v 1.17 2002/05/16 13:44:53 mike Exp $"
 dnl
 dnl   Common configuration stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -91,7 +91,7 @@ AC_CHECK_HEADER(usersec.h,AC_DEFINE(HAVE_USERSEC_H))
 AC_CHECK_HEADER(sys/ioctl.h,AC_DEFINE(HAVE_SYS_IOCTL_H))
 
 dnl Checks for string functions.
-AC_CHECK_FUNCS(strdup strcasecmp strncasecmp)
+AC_CHECK_FUNCS(strdup strcasecmp strncasecmp strlcat strlcpy)
 if test "$uname" = "HP-UX" -a "$uversion" = "1020"; then
 	echo Forcing snprintf emulation for HP-UX.
 else
@@ -152,5 +152,5 @@ esac
 AC_SUBST(ARFLAGS)
 
 dnl
-dnl End of "$Id: cups-common.m4,v 1.16 2002/03/08 19:48:58 mike Exp $".
+dnl End of "$Id: cups-common.m4,v 1.17 2002/05/16 13:44:53 mike Exp $".
 dnl

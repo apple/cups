@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c,v 1.67 2002/05/14 16:13:48 mike Exp $"
+ * "$Id: ppd.c,v 1.68 2002/05/16 13:44:54 mike Exp $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -310,7 +310,7 @@ ppd_get_group(ppd_file_t *ppd,	/* I - PPD file */
     ppd->num_groups ++;
 
     memset(group, 0, sizeof(ppd_group_t));
-    strncpy(group->text, name, sizeof(group->text) - 1);
+    strlcpy(group->text, name, sizeof(group->text));
   }
 
   return (group);
@@ -349,7 +349,7 @@ ppd_get_option(ppd_group_t *group,	/* I - Group */
     group->num_options ++;
 
     memset(option, 0, sizeof(ppd_option_t));
-    strncpy(option->keyword, name, sizeof(option->keyword) - 1);
+    strlcpy(option->keyword, name, sizeof(option->keyword));
   }
 
   return (option);
@@ -381,7 +381,7 @@ ppd_add_choice(ppd_option_t *option,	/* I - Option */
   option->num_choices ++;
 
   memset(choice, 0, sizeof(ppd_choice_t));
-  strncpy(choice->choice, name, sizeof(choice->choice) - 1);
+  strlcpy(choice->choice, name, sizeof(choice->choice));
 
   return (choice);
 }
@@ -411,7 +411,7 @@ ppd_add_size(ppd_file_t *ppd,	/* I - PPD file */
   ppd->num_sizes ++;
 
   memset(size, 0, sizeof(ppd_size_t));
-  strncpy(size->name, name, sizeof(size->name) - 1);
+  strlcpy(size->name, name, sizeof(size->name));
 
   return (size);
 }
@@ -646,8 +646,8 @@ ppdOpen(FILE *fp)		/* I - File to read from */
       ppd->num_profiles ++;
 
       memset(profile, 0, sizeof(ppd_profile_t));
-      strncpy(profile->resolution, name, sizeof(profile->resolution) - 1);
-      strncpy(profile->media_type, text, sizeof(profile->media_type) - 1);
+      strlcpy(profile->resolution, name, sizeof(profile->resolution));
+      strlcpy(profile->media_type, text, sizeof(profile->media_type));
       sscanf(string, "%f%f%f%f%f%f%f%f%f%f%f", &(profile->density),
 	     &(profile->gamma),
 	     profile->matrix[0] + 0, profile->matrix[0] + 1,
@@ -751,8 +751,8 @@ ppdOpen(FILE *fp)		/* I - File to read from */
 	return (NULL);
       }
 
-      strncpy(choice->text, cupsLangString(language, CUPS_MSG_VARIABLE),
-              sizeof(choice->text) - 1);
+      strlcpy(choice->text, cupsLangString(language, CUPS_MSG_VARIABLE),
+              sizeof(choice->text));
       option = NULL;
     }
     else if (strcmp(keyword, "MaxMediaWidth") == 0)
@@ -821,8 +821,8 @@ ppdOpen(FILE *fp)		/* I - File to read from */
 	  return (NULL);
 	}
 
-	strncpy(choice->text, cupsLangString(language, CUPS_MSG_VARIABLE),
-        	sizeof(choice->text) - 1);
+	strlcpy(choice->text, cupsLangString(language, CUPS_MSG_VARIABLE),
+        	sizeof(choice->text));
 	option = NULL;
       }
 
@@ -994,28 +994,28 @@ ppdOpen(FILE *fp)		/* I - File to read from */
 
       if (text[0])
       {
-        strncpy(option->text, text, sizeof(option->text) - 1);
+        strlcpy(option->text, text, sizeof(option->text));
 	ppd_fix(option->text);
       }
       else
       {
         if (strcmp(name, "PageSize") == 0)
-	  strncpy(option->text, cupsLangString(language, CUPS_MSG_MEDIA_SIZE),
-                  sizeof(option->text) - 1);
+	  strlcpy(option->text, cupsLangString(language, CUPS_MSG_MEDIA_SIZE),
+                  sizeof(option->text));
 	else if (strcmp(name, "MediaType") == 0)
-	  strncpy(option->text, cupsLangString(language, CUPS_MSG_MEDIA_TYPE),
-                  sizeof(option->text) - 1);
+	  strlcpy(option->text, cupsLangString(language, CUPS_MSG_MEDIA_TYPE),
+                  sizeof(option->text));
 	else if (strcmp(name, "InputSlot") == 0)
-	  strncpy(option->text, cupsLangString(language, CUPS_MSG_MEDIA_SOURCE),
-                  sizeof(option->text) - 1);
+	  strlcpy(option->text, cupsLangString(language, CUPS_MSG_MEDIA_SOURCE),
+                  sizeof(option->text));
 	else if (strcmp(name, "ColorModel") == 0)
-	  strncpy(option->text, cupsLangString(language, CUPS_MSG_OUTPUT_MODE),
-                  sizeof(option->text) - 1);
+	  strlcpy(option->text, cupsLangString(language, CUPS_MSG_OUTPUT_MODE),
+                  sizeof(option->text));
 	else if (strcmp(name, "Resolution") == 0)
-	  strncpy(option->text, cupsLangString(language, CUPS_MSG_RESOLUTION),
-                  sizeof(option->text) - 1);
+	  strlcpy(option->text, cupsLangString(language, CUPS_MSG_RESOLUTION),
+                  sizeof(option->text));
         else
-	  strncpy(option->text, name, sizeof(option->text) - 1);
+	  strlcpy(option->text, name, sizeof(option->text));
       }
 
       option->section = PPD_ORDER_ANY;
@@ -1062,7 +1062,7 @@ ppdOpen(FILE *fp)		/* I - File to read from */
       else
         option->ui = PPD_UI_PICKONE;
 
-      strncpy(option->text, text, sizeof(option->text) - 1);
+      strlcpy(option->text, text, sizeof(option->text));
 
       option->section = PPD_ORDER_JCL;
       group = NULL;
@@ -1192,13 +1192,13 @@ ppdOpen(FILE *fp)		/* I - File to read from */
           for (i = 0; i < temp->num_options; i ++)
 	    if (strcmp(keyword, temp->options[i].keyword) == 0)
 	    {
-	      strncpy(temp->options[i].defchoice, string,
-                      sizeof(temp->options[i].defchoice) - 1);
+	      strlcpy(temp->options[i].defchoice, string,
+                      sizeof(temp->options[i].defchoice));
 	      break;
 	    }
       }
       else
-        strncpy(option->defchoice, string, sizeof(option->defchoice) - 1);
+        strlcpy(option->defchoice, string, sizeof(option->defchoice));
     }
     else if (strcmp(keyword, "UIConstraints") == 0 ||
              strcmp(keyword, "NonUIConstraints") == 0)
@@ -1342,7 +1342,7 @@ ppdOpen(FILE *fp)		/* I - File to read from */
 
       if (mask & PPD_TEXT)
       {
-        strncpy(choice->text, text, sizeof(choice->text) - 1);
+        strlcpy(choice->text, text, sizeof(choice->text));
         ppd_fix(choice->text);
       }
       else if (strcmp(name, "True") == 0)
@@ -1350,7 +1350,7 @@ ppdOpen(FILE *fp)		/* I - File to read from */
       else if (strcmp(name, "False") == 0)
         strcpy(choice->text, "No");
       else
-        strncpy(choice->text, name, sizeof(choice->text) - 1);
+        strlcpy(choice->text, name, sizeof(choice->text));
 
       if (option->section == PPD_ORDER_JCL)
         ppd_decode(string);		/* Decode quoted string */
@@ -2028,5 +2028,5 @@ ppd_fix(char *string)		/* IO - String to fix */
 
 
 /*
- * End of "$Id: ppd.c,v 1.67 2002/05/14 16:13:48 mike Exp $".
+ * End of "$Id: ppd.c,v 1.68 2002/05/16 13:44:54 mike Exp $".
  */

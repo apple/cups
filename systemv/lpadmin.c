@@ -1,5 +1,5 @@
 /*
- * "$Id: lpadmin.c,v 1.29 2002/03/14 19:11:12 mike Exp $"
+ * "$Id: lpadmin.c,v 1.30 2002/05/16 13:45:04 mike Exp $"
  *
  *   "lpadmin" command for the Common UNIX Printing System (CUPS).
  *
@@ -1764,8 +1764,7 @@ set_printer_options(http_t        *http,	/* I - Server connection */
         * Get default option name...
 	*/
 
-        strncpy(keyword, line + 8, sizeof(keyword) - 1);
-	keyword[sizeof(keyword) - 1] = '\0';
+        strlcpy(keyword, line + 8, sizeof(keyword));
 
 	for (keyptr = keyword; *keyptr; keyptr ++)
 	  if (*keyptr == ':' || isspace(*keyptr))
@@ -1864,5 +1863,5 @@ validate_name(const char *name)	/* I - Name to check */
 
 
 /*
- * End of "$Id: lpadmin.c,v 1.29 2002/03/14 19:11:12 mike Exp $".
+ * End of "$Id: lpadmin.c,v 1.30 2002/05/16 13:45:04 mike Exp $".
  */

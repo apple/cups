@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.153 2002/05/15 01:52:18 mike Exp $"
+ * "$Id: job.c,v 1.154 2002/05/16 13:45:01 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -91,7 +91,7 @@ AddJob(int        priority,	/* I - Job priority */
 
   job->id       = NextJobId ++;
   job->priority = priority;
-  strncpy(job->dest, dest, sizeof(job->dest) - 1);
+  strlcpy(job->dest, dest, sizeof(job->dest));
 
   NumJobs ++;
 
@@ -585,7 +585,7 @@ LoadAllJobs(void)
 	continue;
       }
 
-      strncpy(job->dest, dest, sizeof(job->dest) - 1);
+      strlcpy(job->dest, dest, sizeof(job->dest));
 
       job->sheets     = ippFindAttribute(job->attrs, "job-media-sheets-completed",
                                          IPP_TAG_INTEGER);
@@ -595,12 +595,12 @@ LoadAllJobs(void)
       job->priority = attr->values[0].integer;
 
       attr = ippFindAttribute(job->attrs, "job-name", IPP_TAG_NAME);
-      strncpy(job->title, attr->values[0].string.text,
-              sizeof(job->title) - 1);
+      strlcpy(job->title, attr->values[0].string.text,
+              sizeof(job->title));
 
       attr = ippFindAttribute(job->attrs, "job-originating-user-name", IPP_TAG_NAME);
-      strncpy(job->username, attr->values[0].string.text,
-              sizeof(job->username) - 1);
+      strlcpy(job->username, attr->values[0].string.text,
+              sizeof(job->username));
 
       if (job->state->values[0].integer == IPP_JOB_HELD)
       {
@@ -728,7 +728,7 @@ MoveJob(int        id,		/* I - Job ID */
       if (current->state->values[0].integer >= IPP_JOB_PROCESSING)
         break;
 
-      strncpy(current->dest, dest, sizeof(current->dest) - 1);
+      strlcpy(current->dest, dest, sizeof(current->dest));
       current->dtype = p->type & (CUPS_PRINTER_CLASS | CUPS_PRINTER_REMOTE);
 
       if ((attr = ippFindAttribute(current->attrs, "job-printer-uri", IPP_TAG_URI)) != NULL)
@@ -1259,10 +1259,7 @@ StartJob(int       id,		/* I - Job ID */
     else if (strcmp(attr->name, "job-name") == 0 &&
 	     (attr->value_tag == IPP_TAG_NAME ||
 	      attr->value_tag == IPP_TAG_NAMELANG))
-    {
-      strncpy(title, attr->values[0].string.text, sizeof(title) - 1);
-      title[sizeof(title) - 1] = '\0';
-    }
+      strlcpy(title, attr->values[0].string.text, sizeof(title));
     else if (attr->group_tag == IPP_TAG_JOB)
     {
      /*
@@ -1299,18 +1296,18 @@ StartJob(int       id,		/* I - Job ID */
       */
 
       if (optptr > options)
-	strncat(optptr, " ", sizeof(options) - (optptr - options) - 1);
+	strlcat(optptr, " ", sizeof(options) - (optptr - options));
 
       if (attr->value_tag != IPP_TAG_BOOLEAN)
       {
-	strncat(optptr, attr->name, sizeof(options) - (optptr - options) - 1);
-	strncat(optptr, "=", sizeof(options) - (optptr - options) - 1);
+	strlcat(optptr, attr->name, sizeof(options) - (optptr - options));
+	strlcat(optptr, "=", sizeof(options) - (optptr - options));
       }
 
       for (i = 0; i < attr->num_values; i ++)
       {
 	if (i)
-	  strncat(optptr, ",", sizeof(options) - (optptr - options) - 1);
+	  strlcat(optptr, ",", sizeof(options) - (optptr - options));
 
 	optptr += strlen(optptr);
 
@@ -1318,17 +1315,17 @@ StartJob(int       id,		/* I - Job ID */
 	{
 	  case IPP_TAG_INTEGER :
 	  case IPP_TAG_ENUM :
-	      snprintf(optptr, sizeof(options) - (optptr - options) - 1,
+	      snprintf(optptr, sizeof(options) - (optptr - options),
 	               "%d", attr->values[i].integer);
 	      break;
 
 	  case IPP_TAG_BOOLEAN :
 	      if (!attr->values[i].boolean)
-		strncat(optptr, "no", sizeof(options) - (optptr - options) - 1);
+		strlcat(optptr, "no", sizeof(options) - (optptr - options));
 
 	  case IPP_TAG_NOVALUE :
-	      strncat(optptr, attr->name,
-	              sizeof(options) - (optptr - options) - 1);
+	      strlcat(optptr, attr->name,
+	              sizeof(options) - (optptr - options));
 	      break;
 
 	  case IPP_TAG_RANGE :
@@ -1359,14 +1356,14 @@ StartJob(int       id,		/* I - Job ID */
 		  strchr(attr->values[i].string.text, '\t') != NULL ||
 		  strchr(attr->values[i].string.text, '\n') != NULL)
 	      {
-		strncat(optptr, "\'", sizeof(options) - (optptr - options) - 1);
-		strncat(optptr, attr->values[i].string.text,
-		        sizeof(options) - (optptr - options) - 1);
-		strncat(optptr, "\'", sizeof(options) - (optptr - options) - 1);
+		strlcat(optptr, "\'", sizeof(options) - (optptr - options));
+		strlcat(optptr, attr->values[i].string.text,
+		        sizeof(options) - (optptr - options));
+		strlcat(optptr, "\'", sizeof(options) - (optptr - options));
 	      }
 	      else
-		strncat(optptr, attr->values[i].string.text,
-		        sizeof(options) - (optptr - options) - 1);
+		strlcat(optptr, attr->values[i].string.text,
+		        sizeof(options) - (optptr - options));
 	      break;
 
           default :
@@ -1588,10 +1585,7 @@ StartJob(int       id,		/* I - Job ID */
       snprintf(command, sizeof(command), "%s/filter/%s", ServerBin,
                filters[i].filter);
     else
-    {
-      strncpy(command, filters[i].filter, sizeof(command) - 1);
-      command[sizeof(command) - 1] = '\0';
-    }
+      strlcpy(command, filters[i].filter, sizeof(command));
 
     if (i < (num_filters - 1) ||
 	strncmp(printer->device_uri, "file:", 5) != 0)
@@ -1946,8 +1940,8 @@ UpdateJob(job_t *job)		/* I - Job to check */
 
       if ((loglevel == L_INFO && !job->status) ||
 	  loglevel < L_INFO)
-        strncpy(job->printer->state_message, message,
-                sizeof(job->printer->state_message) - 1);
+        strlcpy(job->printer->state_message, message,
+                sizeof(job->printer->state_message));
     }
 
    /*
@@ -3062,5 +3056,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.153 2002/05/15 01:52:18 mike Exp $".
+ * End of "$Id: job.c,v 1.154 2002/05/16 13:45:01 mike Exp $".
  */

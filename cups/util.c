@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c,v 1.93 2002/03/01 19:53:30 mike Exp $"
+ * "$Id: util.c,v 1.94 2002/05/16 13:44:55 mike Exp $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -340,8 +340,7 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
 	if (!password[0])
 	  break;
 
-        strncpy(pwdstring, password, sizeof(pwdstring) - 1);
-	pwdstring[sizeof(pwdstring) - 1] = '\0';
+        strlcpy(pwdstring, password, sizeof(pwdstring));
 
         digest_tries = 0;
       }
@@ -683,8 +682,7 @@ cupsGetDefault(void)
 
     if ((attr = ippFindAttribute(response, "printer-name", IPP_TAG_NAME)) != NULL)
     {
-      strncpy(def_printer, attr->values[0].string.text, sizeof(def_printer) - 1);
-      def_printer[sizeof(def_printer) - 1] = '\0';
+      strlcpy(def_printer, attr->values[0].string.text, sizeof(def_printer));
       ippDelete(response);
       return (def_printer);
     }
@@ -1070,8 +1068,7 @@ cupsGetPPD(const char *name)		/* I - Printer name */
 	  * Found a printer!
 	  */
 
-	  strncpy(printer, resource + 10, sizeof(printer) - 1);
-	  printer[sizeof(printer) - 1] = '\0';
+	  strlcpy(printer, resource + 10, sizeof(printer));
 	  break;
 	}
       }
@@ -1085,8 +1082,7 @@ cupsGetPPD(const char *name)		/* I - Printer name */
 
       httpSeparate(attr->values[0].string.text, method, username, hostname,
 	           &port, resource);
-      strncpy(printer, strrchr(resource, '/') + 1, sizeof(printer) - 1);
-      printer[sizeof(printer) - 1] = '\0';
+      strlcpy(printer, strrchr(resource, '/') + 1, sizeof(printer));
     }
 
     ippDelete(response);
@@ -1204,8 +1200,7 @@ cupsGetPPD(const char *name)		/* I - Printer name */
 	if (!password[0])
 	  break;
 
-        strncpy(pwdstring, password, sizeof(pwdstring) - 1);
-	pwdstring[sizeof(pwdstring) - 1] = '\0';
+        strlcpy(pwdstring, password, sizeof(pwdstring));
 
         digest_tries = 0;
       }
@@ -1635,24 +1630,15 @@ cups_connect(const char *name,		/* I - Destination (printer[@host]) */
   }
 
   if (sscanf(name, "%1023[^@]@%1023s", printerbuf, hostbuf) == 1)
-  {
-    strncpy(hostbuf, cupsServer(), sizeof(hostbuf) - 1);
-    hostbuf[sizeof(hostbuf) - 1] = '\0';
-  }
+    strlcpy(hostbuf, cupsServer(), sizeof(hostbuf));
 
   if (hostname != NULL)
-  {
-    strncpy(hostname, hostbuf, HTTP_MAX_URI - 1);
-    hostname[HTTP_MAX_URI - 1] = '\0';
-  }
+    strlcpy(hostname, hostbuf, HTTP_MAX_URI);
   else
     hostname = hostbuf;
 
   if (printer != NULL)
-  {
-    strncpy(printer, printerbuf, HTTP_MAX_URI - 1);
-    printer[HTTP_MAX_URI - 1] = '\0';
-  }
+    strlcpy(printer, printerbuf, HTTP_MAX_URI);
   else
     printer = printerbuf;
 
@@ -1745,5 +1731,5 @@ cups_local_auth(http_t *http)	/* I - Connection */
 
 
 /*
- * End of "$Id: util.c,v 1.93 2002/03/01 19:53:30 mike Exp $".
+ * End of "$Id: util.c,v 1.94 2002/05/16 13:44:55 mike Exp $".
  */

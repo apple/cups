@@ -1,5 +1,5 @@
 /*
- * "$Id: cups-lpd.c,v 1.32 2002/04/29 17:25:26 mike Exp $"
+ * "$Id: cups-lpd.c,v 1.33 2002/05/16 13:44:59 mike Exp $"
  *
  *   Line Printer Daemon interface for the Common UNIX Printing System (CUPS).
  *
@@ -139,10 +139,7 @@ main(int  argc,			/* I - Number of command-line arguments */
     hostent  = gethostbyaddr((void *)&(hostaddr.sin_addr), hostlen, AF_INET);
 
     if (hostent)
-    {
-      strncpy(hostname, hostent->h_name, sizeof(hostname) - 1);
-      hostname[sizeof(hostname) - 1] = '\0';
-    }
+      strlcpy(hostname, hostent->h_name, sizeof(hostname));
     else
     {
       snprintf(hostname, sizeof(hostname), "%d.%d.%d.%d",
@@ -441,8 +438,7 @@ recv_print_job(const char    *dest,	/* I - Destination */
 
   control[0] = '\0';
 
-  strncpy(queue, dest, sizeof(queue) - 1);
-  queue[sizeof(queue) - 1] = '\0';
+  strlcpy(queue, dest, sizeof(queue));
 
   if ((instance = strrchr(queue, '/')) != NULL)
     *instance++ = '\0';
@@ -548,8 +544,7 @@ recv_print_job(const char    *dest,	/* I - Destination */
 	    break;
 	  }
 
-	  strncpy(data[num_data], name, sizeof(data[0]) - 1);
-	  data[num_data][sizeof(data[0]) - 1] = '\0';
+	  strlcpy(data[num_data], name, sizeof(data[0]));
 
           if ((fd = cupsTempFd(temp[num_data], sizeof(temp[0]))) < 0)
 	  {
@@ -654,16 +649,13 @@ recv_print_job(const char    *dest,	/* I - Destination */
 	switch (line[0])
 	{
 	  case 'J' : /* Job name */
-	      strncpy(title, line + 1, sizeof(title) - 1);
-	      title[sizeof(title) - 1] = '\0';
+	      strlcpy(title, line + 1, sizeof(title));
 	      break;
 	  case 'N' : /* Document name */
-	      strncpy(docname, line + 1, sizeof(docname) - 1);
-	      docname[sizeof(docname) - 1] = '\0';
+	      strlcpy(docname, line + 1, sizeof(docname));
 	      break;
 	  case 'P' : /* User identification */
-	      strncpy(user, line + 1, sizeof(user) - 1);
-	      user[sizeof(user) - 1] = '\0';
+	      strlcpy(user, line + 1, sizeof(user));
 	      break;
 	  case 'L' : /* Print banner page */
 	      banner = 1;
@@ -962,8 +954,7 @@ send_state(const char *dest,		/* I - Destination */
   * Remove instance from destination, if any...
   */
 
-  strncpy(queue, dest, sizeof(queue) - 1);
-  queue[sizeof(queue) - 1] = '\0';
+  strlcpy(queue, dest, sizeof(queue));
 
   if ((instance = strrchr(queue, '/')) != NULL)
     *instance++ = '\0';
@@ -1212,10 +1203,7 @@ send_state(const char *dest,		/* I - Destination */
 	  snprintf(namestr, sizeof(namestr), "%d copies of %s", jobcopies,
 	           jobname);
 	else
-	{
-	  strncpy(namestr, jobname, sizeof(namestr) - 1);
-	  namestr[sizeof(namestr) - 1] = '\0';
-	}
+	  strlcpy(namestr, jobname, sizeof(namestr));
 
         printf("%s: %-34.34s[job %d localhost]\n", jobuser, rankstr, jobid);
         printf("        %-40.40s%d bytes\n", namestr, jobsize);
@@ -1301,5 +1289,5 @@ smart_gets(char *s,	/* I - Pointer to line buffer */
 
 
 /*
- * End of "$Id: cups-lpd.c,v 1.32 2002/04/29 17:25:26 mike Exp $".
+ * End of "$Id: cups-lpd.c,v 1.33 2002/05/16 13:44:59 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: parallel.c,v 1.42 2002/03/25 18:10:08 mike Exp $"
+ * "$Id: parallel.c,v 1.43 2002/05/16 13:44:50 mike Exp $"
  *
  *   Parallel port backend for the Common UNIX Printing System (CUPS).
  *
@@ -395,10 +395,10 @@ list_devices(void)
 
         if (strncmp(line, "MODEL:", 6) == 0 &&
 	    strncmp(line, "MODEL:Unknown", 13) != 0)
-	  strncpy(model, line + 6, sizeof(model) - 1);
+	  strlcpy(model, line + 6, sizeof(model));
 	else if (strncmp(line, "MANUFACTURER:", 13) == 0 &&
 	         strncmp(line, "MANUFACTURER:Unknown", 20) != 0)
-	  strncpy(make, line + 13, sizeof(make) - 1);
+	  strlcpy(make, line + 13, sizeof(make));
       }
 
       fclose(probe);
@@ -658,5 +658,5 @@ list_devices(void)
 
 
 /*
- * End of "$Id: parallel.c,v 1.42 2002/03/25 18:10:08 mike Exp $".
+ * End of "$Id: parallel.c,v 1.43 2002/05/16 13:44:50 mike Exp $".
  */

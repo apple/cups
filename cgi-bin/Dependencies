@@ -1,11 +1,11 @@
 # DO NOT DELETE
 
-html.o: cgi.h
+html.o: cgi.h ../cups/string.h ../config.h
 ipp-var.o: ipp-var.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
 ipp-var.o: ../cups/md5.h ../cups/ppd.h ../cups/debug.h ../cups/language.h
 ipp-var.o: ../cups/string.h ../config.h cgi.h
-template.o: cgi.h
-var.o: cgi.h
+template.o: cgi.h ../cups/string.h ../config.h
+var.o: cgi.h ../cups/string.h ../config.h
 admin.o: ipp-var.h ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
 admin.o: ../cups/ppd.h ../cups/debug.h ../cups/language.h ../cups/string.h
 admin.o: ../config.h cgi.h

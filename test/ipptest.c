@@ -1,5 +1,5 @@
 /*
- * "$Id: ipptest.c,v 1.14 2002/04/09 19:27:07 mike Exp $"
+ * "$Id: ipptest.c,v 1.15 2002/05/16 13:45:05 mike Exp $"
  *
  *   IPP test command for the Common UNIX Printing System (CUPS).
  *
@@ -276,44 +276,44 @@ do_tests(const char *uri,		/* I - URI to connect on */
 
             if (strncasecmp(tempptr + 1, "uri", 3) == 0)
 	    {
-	      strncpy(tokenptr, uri, sizeof(token) - 1 - (tokenptr - token));
+	      strlcpy(tokenptr, uri, sizeof(token) - (tokenptr - token));
 	      tempptr += 4;
 	    }
 	    else if (strncasecmp(tempptr + 1, "method", 6) == 0)
 	    {
-	      strncpy(tokenptr, method, sizeof(token) - 1 - (tokenptr - token));
+	      strlcpy(tokenptr, method, sizeof(token) - (tokenptr - token));
 	      tempptr += 7;
 	    }
 	    else if (strncasecmp(tempptr + 1, "username", 8) == 0)
 	    {
-	      strncpy(tokenptr, userpass, sizeof(token) - 1 - (tokenptr - token));
+	      strlcpy(tokenptr, userpass, sizeof(token) - (tokenptr - token));
 	      tempptr += 9;
 	    }
 	    else if (strncasecmp(tempptr + 1, "hostname", 8) == 0)
 	    {
-	      strncpy(tokenptr, server, sizeof(token) - 1 - (tokenptr - token));
+	      strlcpy(tokenptr, server, sizeof(token) - (tokenptr - token));
 	      tempptr += 9;
 	    }
 	    else if (strncasecmp(tempptr + 1, "port", 4) == 0)
 	    {
-	      snprintf(tokenptr, sizeof(token) - 1 - (tokenptr - token),
+	      snprintf(tokenptr, sizeof(token) - (tokenptr - token),
 	               "%d", port);
 	      tempptr += 5;
 	    }
 	    else if (strncasecmp(tempptr + 1, "resource", 8) == 0)
 	    {
-	      strncpy(tokenptr, resource, sizeof(token) - 1 - (tokenptr - token));
+	      strlcpy(tokenptr, resource, sizeof(token) - (tokenptr - token));
 	      tempptr += 9;
 	    }
 	    else if (strncasecmp(tempptr + 1, "job-id", 6) == 0)
 	    {
-	      snprintf(tokenptr, sizeof(token) - 1 - (tokenptr - token),
+	      snprintf(tokenptr, sizeof(token) - (tokenptr - token),
 	               "%d", job_id);
 	      tempptr += 7;
 	    }
 	    else if (strncasecmp(tempptr + 1, "user", 4) == 0)
 	    {
-	      strncpy(tokenptr, cupsUser(), sizeof(token) - 1 - (tokenptr - token));
+	      strlcpy(tokenptr, cupsUser(), sizeof(token) - (tokenptr - token));
 	      tempptr += 5;
 	    }
             else
@@ -822,5 +822,5 @@ print_attr(ipp_attribute_t *attr)	/* I - Attribute to print */
 
 
 /*
- * End of "$Id: ipptest.c,v 1.14 2002/04/09 19:27:07 mike Exp $".
+ * End of "$Id: ipptest.c,v 1.15 2002/05/16 13:45:05 mike Exp $".
  */

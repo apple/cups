@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.121 2002/05/15 21:00:00 mike Exp $"
+ * "$Id: printers.c,v 1.122 2002/05/16 13:45:03 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -93,8 +93,8 @@ AddPrinter(const char *name)	/* I - Name of printer */
   if ((p = calloc(1, sizeof(printer_t))) == NULL)
     return (NULL);
 
-  strncpy(p->name, name, sizeof(p->name) - 1);
-  strncpy(p->hostname, ServerName, sizeof(p->hostname) - 1);
+  strlcpy(p->name, name, sizeof(p->name));
+  strlcpy(p->hostname, ServerName, sizeof(p->hostname));
   snprintf(p->uri, sizeof(p->uri), "ipp://%s:%d/printers/%s", ServerName,
            ntohs(Listeners[0].address.sin_port), name);
 
@@ -597,11 +597,11 @@ LoadAllPrinters(void)
       return;
     }
     else if (strcmp(name, "Info") == 0)
-      strncpy(p->info, value, sizeof(p->info) - 1);
+      strlcpy(p->info, value, sizeof(p->info));
     else if (strcmp(name, "Location") == 0)
-      strncpy(p->location, value, sizeof(p->location) - 1);
+      strlcpy(p->location, value, sizeof(p->location));
     else if (strcmp(name, "DeviceURI") == 0)
-      strncpy(p->device_uri, value, sizeof(p->device_uri) - 1);
+      strlcpy(p->device_uri, value, sizeof(p->device_uri));
     else if (strcmp(name, "State") == 0)
     {
      /*
@@ -622,7 +622,7 @@ LoadAllPrinters(void)
       while (isspace(*value))
         value ++;
 
-      strncpy(p->state_message, value, sizeof(p->state_message) - 1);
+      strlcpy(p->state_message, value, sizeof(p->state_message));
     }
     else if (strcmp(name, "Accepting") == 0)
     {
@@ -646,7 +646,7 @@ LoadAllPrinters(void)
       if (*valueptr)
         *valueptr++ = '\0';
 
-      strncpy(p->job_sheets[0], value, sizeof(p->job_sheets[0]) - 1);
+      strlcpy(p->job_sheets[0], value, sizeof(p->job_sheets[0]));
 
       while (isspace(*valueptr))
         valueptr ++;
@@ -658,7 +658,7 @@ LoadAllPrinters(void)
 	if (*valueptr)
           *valueptr++ = '\0';
 
-	strncpy(p->job_sheets[1], value, sizeof(p->job_sheets[1]) - 1);
+	strlcpy(p->job_sheets[1], value, sizeof(p->job_sheets[1]));
       }
     }
     else if (strcmp(name, "AllowUser") == 0)
@@ -1221,9 +1221,9 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
 	                "pages-per-minute", ppd->throughput);
 
         if (ppd->nickname)
-          strncpy(p->make_model, ppd->nickname, sizeof(p->make_model) - 1);
+          strlcpy(p->make_model, ppd->nickname, sizeof(p->make_model));
 	else if (ppd->modelname)
-          strncpy(p->make_model, ppd->modelname, sizeof(p->make_model) - 1);
+          strlcpy(p->make_model, ppd->modelname, sizeof(p->make_model));
 	else
 	  strcpy(p->make_model, "Bad PPD File");
 
@@ -1667,8 +1667,7 @@ ValidateDest(const char   *hostname,	/* I - Host name */
   if (strcasecmp(hostname, "localhost") == 0)
     hostname = ServerName;
 
-  strncpy(localname, hostname, sizeof(localname) - 1);
-  localname[sizeof(localname) - 1] = '\0';
+  strlcpy(localname, hostname, sizeof(localname));
 
   if (strcasecmp(hostname, ServerName) != 0)
   {
@@ -2076,5 +2075,5 @@ write_irix_state(printer_t *p)	/* I - Printer to update */
 
 
 /*
- * End of "$Id: printers.c,v 1.121 2002/05/15 21:00:00 mike Exp $".
+ * End of "$Id: printers.c,v 1.122 2002/05/16 13:45:03 mike Exp $".
  */

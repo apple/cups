@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.96 2002/04/09 19:27:06 mike Exp $"
+ * "$Id: http.c,v 1.97 2002/05/16 13:44:53 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -394,7 +394,7 @@ httpConnectEncrypt(const char *host,	/* I - Host to connect to */
   * Copy the hostname and port and then "reconnect"...
   */
 
-  strncpy(http->hostname, host, sizeof(http->hostname) - 1);
+  strlcpy(http->hostname, host, sizeof(http->hostname));
   http->hostaddr.sin_family = hostaddr->h_addrtype;
 #ifdef WIN32
   http->hostaddr.sin_port   = htons((u_short)port);
@@ -415,7 +415,7 @@ httpConnectEncrypt(const char *host,	/* I - Host to connect to */
   * Loop through the addresses we have until one of them connects...
   */
 
-  strncpy(http->hostname, host, sizeof(http->hostname) - 1);
+  strlcpy(http->hostname, host, sizeof(http->hostname));
 
   for (i = 0; hostaddr->h_addr_list[i]; i ++)
   {
@@ -719,8 +719,7 @@ httpSeparate(const char *uri,		/* I - Universal Resource Identifier */
   * longer than HTTP_MAX_URI characters long...
   */
 
-  strncpy(safeuri, uri, sizeof(safeuri));
-  safeuri[sizeof(safeuri) - 1] = '\0';
+  strlcpy(safeuri, uri, sizeof(safeuri));
 
   uri = safeuri;
 
@@ -759,8 +758,7 @@ httpSeparate(const char *uri,		/* I - Universal Resource Identifier */
     {
       if ((ptr = strchr(host, '/')) != NULL)
       {
-	strncpy(resource, ptr, HTTP_MAX_URI);
-	resource[HTTP_MAX_URI - 1] = '\0';
+	strlcpy(resource, ptr, HTTP_MAX_URI);
 	*ptr = '\0';
       }
       else
@@ -775,10 +773,7 @@ httpSeparate(const char *uri,		/* I - Universal Resource Identifier */
 	*port = strtol(uri, (char **)&uri, 10);
 
 	if (*uri == '/')
-	{
-          strncpy(resource, uri, HTTP_MAX_URI);
-          resource[HTTP_MAX_URI - 1] = '\0';
-	}
+          strlcpy(resource, uri, HTTP_MAX_URI);
       }
       else
 	*port = 631;
@@ -788,10 +783,7 @@ httpSeparate(const char *uri,		/* I - Universal Resource Identifier */
       return;
     }
     else
-    {
-      strncpy(method, host, 31);
-      method[31] = '\0';
-    }
+      strlcpy(method, host, 32);
   }
 
  /*
@@ -800,8 +792,7 @@ httpSeparate(const char *uri,		/* I - Universal Resource Identifier */
 
   if (strncmp(uri, "//", 2) != 0)
   {
-    strncpy(resource, uri, 1023);
-    resource[1023] = '\0';
+    strlcpy(resource, uri, HTTP_MAX_URI);
 
     username[0] = '\0';
     host[0]     = '\0';
@@ -889,8 +880,7 @@ httpSeparate(const char *uri,		/* I - Universal Resource Identifier */
   * The remaining portion is the resource string...
   */
 
-  strncpy(resource, uri, HTTP_MAX_URI);
-  resource[HTTP_MAX_URI - 1] = '\0';
+  strlcpy(resource, uri, HTTP_MAX_URI);
 }
 
 
@@ -1032,8 +1022,7 @@ httpSetField(http_t       *http,	/* I - HTTP data */
       value == NULL)
     return;
 
-  strncpy(http->fields[field], value, HTTP_MAX_VALUE - 1);
-  http->fields[field][HTTP_MAX_VALUE - 1] = '\0';
+  strlcpy(http->fields[field], value, HTTP_MAX_VALUE);
 }
 
 
@@ -2280,5 +2269,5 @@ http_upgrade(http_t *http)	/* I - HTTP data */
 
 
 /*
- * End of "$Id: http.c,v 1.96 2002/04/09 19:27:06 mike Exp $".
+ * End of "$Id: http.c,v 1.97 2002/05/16 13:44:53 mike Exp $".
  */

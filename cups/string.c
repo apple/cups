@@ -1,5 +1,5 @@
 /*
- * "$Id: string.c,v 1.7 2002/03/01 19:53:30 mike Exp $"
+ * "$Id: string.c,v 1.8 2002/05/16 13:44:54 mike Exp $"
  *
  *   String functions for the Common UNIX Printing System (CUPS).
  *
@@ -25,9 +25,11 @@
  *
  * Contents:
  *
- *   strdup()      - Duplicate a string.
- *   strcasecmp()  - Do a case-insensitive comparison.
- *   strncasecmp() - Do a case-insensitive comparison on up to N chars.
+ *   cups_strdup()      - Duplicate a string.
+ *   cups_strcasecmp()  - Do a case-insensitive comparison.
+ *   cups_strncasecmp() - Do a case-insensitive comparison on up to N chars.
+ *   cups_strlcat()     - Safely concatenate two strings.
+ *   cups_strlcpy()     - Safely copy two strings.
  */
 
 /*
@@ -38,14 +40,14 @@
 
 
 /*
- * 'strdup()' - Duplicate a string.
+ * 'cups_strdup()' - Duplicate a string.
  */
 
-#  ifndef HAVE_STRDUP
-char *			/* O - New string pointer */
-strdup(const char *s)	/* I - String to duplicate */
+#ifndef HAVE_STRDUP
+char 	*			/* O - New string pointer */
+cups_strdup(const char *s)	/* I - String to duplicate */
 {
-  char	*t;		/* New string pointer */
+  char	*t;			/* New string pointer */
 
 
   if (s == NULL)
@@ -56,17 +58,17 @@ strdup(const char *s)	/* I - String to duplicate */
 
   return (strcpy(t, s));
 }
-#  endif /* !HAVE_STRDUP */
+#endif /* !HAVE_STRDUP */
 
 
 /*
- * 'strcasecmp()' - Do a case-insensitive comparison.
+ * 'cups_strcasecmp()' - Do a case-insensitive comparison.
  */
 
-#  ifndef HAVE_STRCASECMP
+#ifndef HAVE_STRCASECMP
 int				/* O - Result of comparison (-1, 0, or 1) */
-strcasecmp(const char *s,	/* I - First string */
-           const char *t)	/* I - Second string */
+cups_strcasecmp(const char *s,	/* I - First string */
+                const char *t)	/* I - Second string */
 {
   while (*s != '\0' && *t != '\0')
   {
@@ -86,17 +88,17 @@ strcasecmp(const char *s,	/* I - First string */
   else
     return (-1);
 }
-#  endif /* !HAVE_STRCASECMP */
+#endif /* !HAVE_STRCASECMP */
 
 /*
- * 'strncasecmp()' - Do a case-insensitive comparison on up to N chars.
+ * 'cups_strncasecmp()' - Do a case-insensitive comparison on up to N chars.
  */
 
-#  ifndef HAVE_STRNCASECMP
+#ifndef HAVE_STRNCASECMP
 int				/* O - Result of comparison (-1, 0, or 1) */
-strncasecmp(const char *s,	/* I - First string */
-            const char *t,	/* I - Second string */
-	    size_t     n)	/* I - Maximum number of characters to compare */
+cups_strncasecmp(const char *s,	/* I - First string */
+                 const char *t,	/* I - Second string */
+		 size_t     n)	/* I - Maximum number of characters to compare */
 {
   while (*s != '\0' && *t != '\0' && n > 0)
   {
@@ -119,9 +121,90 @@ strncasecmp(const char *s,	/* I - First string */
   else
     return (-1);
 }
-#  endif /* !HAVE_STRNCASECMP */
+#endif /* !HAVE_STRNCASECMP */
+
+
+#ifndef HAVE_STRLCAT
+/*
+ * 'cups_strlcat()' - Safely concatenate two strings.
+ */
+
+size_t				/* O - Length of string */
+cups_strlcat(char       *dst,	/* O - Destination string */
+             const char *src,	/* I - Source string */
+	     size_t     size)	/* I - Size of destination string buffer */
+{
+  size_t	srclen;		/* Length of source string */
+  size_t	dstlen;		/* Length of destination string */
+
+
+ /*
+  * Figure out how much room is left...
+  */
+
+  dstlen = strlen(dst);
+  size   -= dstlen + 1;
+
+  if (!size)
+    return (dstlen);		/* No room, return immediately... */
+
+ /*
+  * Figure out how much room is needed...
+  */
+
+  srclen = strlen(src);
+
+ /*
+  * Copy the appropriate amount...
+  */
+
+  if (srclen > size)
+    srclen = size;
+
+  memcpy(dst + dstlen, src, srclen);
+  dst[dstlen + srclen] = '\0';
+
+  return (dstlen + srclen);
+}
+#endif /* !HAVE_STRLCAT */
+
+
+#ifndef HAVE_STRLCPY
+/*
+ * 'cups_strlcpy()' - Safely copy two strings.
+ */
+
+size_t				/* O - Length of string */
+cups_strlcpy(char       *dst,	/* O - Destination string */
+             const char *src,	/* I - Source string */
+	     size_t      size)	/* I - Size of destination string buffer */
+{
+  size_t	srclen;		/* Length of source string */
+
+
+ /*
+  * Figure out how much room is needed...
+  */
+
+  size --;
+
+  srclen = strlen(src);
+
+ /*
+  * Copy the appropriate amount...
+  */
+
+  if (srclen > size)
+    srclen = size;
+
+  memcpy(dst, src, srclen);
+  dst[srclen] = '\0';
+
+  return (srclen);
+}
+#endif /* !HAVE_STRLCPY */
 
 
 /*
- * End of "$Id: string.c,v 1.7 2002/03/01 19:53:30 mike Exp $".
+ * End of "$Id: string.c,v 1.8 2002/05/16 13:44:54 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: network.c,v 1.8 2002/04/02 18:58:53 mike Exp $"
+ * "$Id: network.c,v 1.9 2002/05/16 13:45:02 mike Exp $"
  *
  *   Network interface functions for the Common UNIX Printing System
  *   (CUPS) scheduler.
@@ -180,7 +180,7 @@ NetIFUpdate(void)
     * Then copy all of the information...
     */
 
-    strncpy(temp->name, addr->ifa_name, sizeof(temp->name) - 1);
+    strlcpy(temp->name, addr->ifa_name, sizeof(temp->name));
     memcpy(&(temp->address), addr->ifa_addr, sizeof(temp->address));
     memcpy(&(temp->mask), addr->ifa_netmask, sizeof(temp->mask));
 
@@ -215,11 +215,11 @@ NetIFUpdate(void)
     */
 
     if (host != NULL)
-      strncpy(temp->hostname, host->h_name, sizeof(temp->hostname) - 1);
+      strlcpy(temp->hostname, host->h_name, sizeof(temp->hostname));
     else if (ntohl(temp->address.sin_addr.s_addr) == 0x7f000001)
       strcpy(temp->hostname, "localhost");
     else if (temp->address.sin_addr.s_addr == ServerAddr.sin_addr.s_addr)
-      strncpy(temp->hostname, ServerName, sizeof(temp->hostname) - 1);
+      strlcpy(temp->hostname, ServerName, sizeof(temp->hostname));
     else
     {
       unsigned ip = ntohl(temp->address.sin_addr.s_addr);
@@ -470,5 +470,5 @@ freeifaddrs(struct ifaddrs *addrs)	/* I - Interface list to free */
 
 
 /*
- * End of "$Id: network.c,v 1.8 2002/04/02 18:58:53 mike Exp $".
+ * End of "$Id: network.c,v 1.9 2002/05/16 13:45:02 mike Exp $".
  */

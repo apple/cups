@@ -1,5 +1,5 @@
 /*
- * "$Id: ieee1394-linux.c,v 1.1 2002/05/04 16:58:23 mike Exp $"
+ * "$Id: ieee1394-linux.c,v 1.2 2002/05/16 13:44:50 mike Exp $"
  *
  *   Linux IEEE-1394 glue for the Common UNIX Printing System (CUPS).
  *
@@ -645,8 +645,8 @@ ieee1394_list(int *num_devices)		/* O - Number of printers */
 	        * Use the description directly...
 		*/
 
-        	strncpy(nodes[num_nodes].make_model, idptr,
-	        	sizeof(nodes[num_nodes].make_model) - 1);
+        	strlcpy(nodes[num_nodes].make_model, idptr,
+	        	sizeof(nodes[num_nodes].make_model));
               }
 	      else
 	      {
@@ -847,5 +847,5 @@ ieee1394_error(void)
 
 
 /*
- * End of "$Id: ieee1394-linux.c,v 1.1 2002/05/04 16:58:23 mike Exp $".
+ * End of "$Id: ieee1394-linux.c,v 1.2 2002/05/16 13:44:50 mike Exp $".
  */

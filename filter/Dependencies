@@ -24,21 +24,21 @@ hpgl-polygon.o: ../cups/string.h ../config.h
 hpgl-vector.o: hpgltops.h common.h ../cups/cups.h ../cups/ipp.h
 hpgl-vector.o: ../cups/http.h ../cups/md5.h ../cups/ppd.h ../cups/language.h
 hpgl-vector.o: ../cups/string.h ../config.h
-image-bmp.o: image.h ../config.h
-image-colorspace.o: image.h ../config.h
-image-gif.o: image.h ../config.h
-image-jpeg.o: image.h ../config.h
-image-photocd.o: image.h ../config.h
-image-pix.o: image.h ../config.h
-image-png.o: image.h ../config.h
-image-pnm.o: image.h ../config.h
-image-sgi.o: image.h ../config.h image-sgi.h
+image-bmp.o: image.h ../config.h raster.h
+image-colorspace.o: image.h ../config.h raster.h
+image-gif.o: image.h ../config.h raster.h
+image-jpeg.o: image.h ../config.h raster.h
+image-photocd.o: image.h ../config.h raster.h
+image-pix.o: image.h ../config.h raster.h
+image-png.o: image.h ../config.h raster.h
+image-pnm.o: image.h ../config.h raster.h
+image-sgi.o: image.h ../config.h raster.h image-sgi.h
 image-sgilib.o: image-sgi.h
-image-sun.o: image.h ../config.h
-image-tiff.o: image.h ../config.h
-image-zoom.o: image.h ../config.h
-image.o: image.h ../config.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
-image.o: ../cups/md5.h ../cups/ppd.h
+image-sun.o: image.h ../config.h raster.h
+image-tiff.o: image.h ../config.h raster.h
+image-zoom.o: image.h ../config.h raster.h
+image.o: image.h ../config.h raster.h ../cups/cups.h ../cups/ipp.h
+image.o: ../cups/http.h ../cups/md5.h ../cups/ppd.h
 raster.o: raster.h
 form-main.o: form.h common.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
 form-main.o: ../cups/md5.h ../cups/ppd.h ../cups/language.h ../cups/string.h
@@ -51,7 +51,7 @@ form-tree.o: ../cups/md5.h ../cups/ppd.h ../cups/language.h ../cups/string.h
 form-tree.o: ../config.h
 imagetops.o: common.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
 imagetops.o: ../cups/md5.h ../cups/ppd.h ../cups/language.h ../cups/string.h
-imagetops.o: ../config.h image.h
+imagetops.o: ../config.h image.h raster.h
 imagetoraster.o: common.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
 imagetoraster.o: ../cups/md5.h ../cups/ppd.h ../cups/language.h
 imagetoraster.o: ../cups/string.h ../config.h image.h raster.h

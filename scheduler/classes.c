@@ -1,5 +1,5 @@
 /*
- * "$Id: classes.c,v 1.41 2002/01/02 17:59:14 mike Exp $"
+ * "$Id: classes.c,v 1.42 2002/05/16 13:44:58 mike Exp $"
  *
  *   Printer class routines for the Common UNIX Printing System (CUPS).
  *
@@ -450,9 +450,9 @@ LoadAllClasses(void)
     }
     
     else if (strcmp(name, "Info") == 0)
-      strncpy(p->info, value, sizeof(p->info) - 1);
+      strlcpy(p->info, value, sizeof(p->info));
     else if (strcmp(name, "Location") == 0)
-      strncpy(p->location, value, sizeof(p->location) - 1);
+      strlcpy(p->location, value, sizeof(p->location));
     else if (strcmp(name, "Printer") == 0)
     {
       if ((temp = FindPrinter(value)) == NULL)
@@ -501,7 +501,7 @@ LoadAllClasses(void)
       while (isspace(*value))
         value ++;
 
-      strncpy(p->state_message, value, sizeof(p->state_message) - 1);
+      strlcpy(p->state_message, value, sizeof(p->state_message));
     }
     else if (strcmp(name, "Accepting") == 0)
     {
@@ -525,7 +525,7 @@ LoadAllClasses(void)
       if (*valueptr)
         *valueptr++ = '\0';
 
-      strncpy(p->job_sheets[0], value, sizeof(p->job_sheets[0]) - 1);
+      strlcpy(p->job_sheets[0], value, sizeof(p->job_sheets[0]));
 
       while (isspace(*valueptr))
         valueptr ++;
@@ -537,7 +537,7 @@ LoadAllClasses(void)
 	if (*valueptr)
           *valueptr++ = '\0';
 
-	strncpy(p->job_sheets[1], value, sizeof(p->job_sheets[1]) - 1);
+	strlcpy(p->job_sheets[1], value, sizeof(p->job_sheets[1]));
       }
     }
     else if (strcmp(name, "AllowUser") == 0)
@@ -691,5 +691,5 @@ SaveAllClasses(void)
 
 
 /*
- * End of "$Id: classes.c,v 1.41 2002/01/02 17:59:14 mike Exp $".
+ * End of "$Id: classes.c,v 1.42 2002/05/16 13:44:58 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: cert.c,v 1.10 2002/01/02 17:59:13 mike Exp $"
+ * "$Id: cert.c,v 1.11 2002/05/16 13:44:58 mike Exp $"
  *
  *   Authentication certificate routines for the Common UNIX
  *   Printing System (CUPS).
@@ -69,7 +69,7 @@ AddCert(int        pid,			/* I - Process ID */
   */
 
   cert->pid = pid;
-  strncpy(cert->username, username, sizeof(cert->username) - 1);
+  strlcpy(cert->username, username, sizeof(cert->username));
 
   for (i = 0; i < 32; i ++)
     cert->certificate[i] = hex[random() & 15];
@@ -271,5 +271,5 @@ InitCerts(void)
 
 
 /*
- * End of "$Id: cert.c,v 1.10 2002/01/02 17:59:13 mike Exp $".
+ * End of "$Id: cert.c,v 1.11 2002/05/16 13:44:58 mike Exp $".
  */
