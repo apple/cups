@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-attr.c,v 1.14 2000/01/04 13:45:43 mike Exp $"
+ * "$Id: hpgl-attr.c,v 1.15 2000/01/05 20:13:57 mike Exp $"
  *
  *   HP-GL/2 attribute processing for the Common UNIX Printing System (CUPS).
  *
@@ -254,7 +254,7 @@ PC_pen_color(int     num_params,	/* I - Number of parameters */
 
     if (PageDirty)
       printf("%.3f %.3f %.3f %.2f SP\n", Pens[PenNumber].rgb[0],
-	     Pens[PenNumber].rgb[PenNumber], Pens[PenNumber].rgb[2],
+	     Pens[PenNumber].rgb[1], Pens[PenNumber].rgb[2],
 	     Pens[PenNumber].width * PenScaling);
   }
   else if (num_params == 1 || num_params == 4)
@@ -276,7 +276,7 @@ PC_pen_color(int     num_params,	/* I - Number of parameters */
 
     if (PageDirty && i == PenNumber)
       printf("%.3f %.3f %.3f %.2f SP\n", Pens[PenNumber].rgb[0],
-	     Pens[PenNumber].rgb[PenNumber], Pens[PenNumber].rgb[2],
+	     Pens[PenNumber].rgb[1], Pens[PenNumber].rgb[2],
 	     Pens[PenNumber].width * PenScaling);
   }
   else
@@ -330,7 +330,7 @@ PW_pen_width(int     num_params,	/* I - Number of parameters */
 
     if (PageDirty && pen == PenNumber)
       printf("%.3f %.3f %.3f %.2f SP\n", Pens[PenNumber].rgb[0],
-	     Pens[PenNumber].rgb[PenNumber], Pens[PenNumber].rgb[2],
+	     Pens[PenNumber].rgb[1], Pens[PenNumber].rgb[2],
 	     Pens[PenNumber].width * PenScaling);
   }
   else if (num_params < 2)
@@ -344,7 +344,7 @@ PW_pen_width(int     num_params,	/* I - Number of parameters */
 
     if (PageDirty)
       printf("%.3f %.3f %.3f %.2f SP\n", Pens[PenNumber].rgb[0],
-	     Pens[PenNumber].rgb[PenNumber], Pens[PenNumber].rgb[2],
+	     Pens[PenNumber].rgb[1], Pens[PenNumber].rgb[2],
 	     Pens[PenNumber].width * PenScaling);
   }
   else
@@ -401,7 +401,7 @@ SP_select_pen(int     num_params,	/* I - Number of parameters */
 
   if (PageDirty)
     printf("%.3f %.3f %.3f %.2f SP\n", Pens[PenNumber].rgb[0],
-	   Pens[PenNumber].rgb[PenNumber], Pens[PenNumber].rgb[2],
+	   Pens[PenNumber].rgb[1], Pens[PenNumber].rgb[2],
 	   Pens[PenNumber].width * PenScaling);
 }
 
@@ -438,5 +438,5 @@ WU_width_units(int     num_params,	/* I - Number of parameters */
 
 
 /*
- * End of "$Id: hpgl-attr.c,v 1.14 2000/01/04 13:45:43 mike Exp $".
+ * End of "$Id: hpgl-attr.c,v 1.15 2000/01/05 20:13:57 mike Exp $".
  */
