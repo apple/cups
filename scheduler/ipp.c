@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.95 2000/09/06 18:31:30 mike Exp $"
+ * "$Id: ipp.c,v 1.96 2000/09/13 12:49:55 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -1441,6 +1441,22 @@ cancel_job(client_t        *con,	/* I - Client connection */
     LogMessage(L_ERROR, "cancel_job: \"%s\" not authorized to delete job id %d owned by \"%s\"!",
                username, jobid, job->username);
     send_ipp_error(con, IPP_FORBIDDEN);
+    return;
+  }
+
+ /*
+  * See if the job is already completed, cancelled, or aborted; if so,
+  * we can't cancel...
+  */
+
+  if (job->state->values[0].integer >= IPP_JOB_CANCELLED)
+  {
+    LogMessage(L_ERROR, "cancel_job: job id %d is %s - can't cancel!",
+               jobid,
+	       job->state->values[0].integer == IPP_JOB_CANCELLED ? "cancelled" :
+	       job->state->values[0].integer == IPP_JOB_ABORTED ? "aborted" :
+	       "completed");
+    send_ipp_error(con, IPP_NOT_POSSIBLE);
     return;
   }
 
@@ -4833,5 +4849,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.95 2000/09/06 18:31:30 mike Exp $".
+ * End of "$Id: ipp.c,v 1.96 2000/09/13 12:49:55 mike Exp $".
  */
