@@ -1,7 +1,7 @@
 CHANGES-1.1.txt
 ---------------
 
-CHANGES IN CUPS V1.1.20
+CHANGES IN CUPS V1.1.20rc6
 
 	- "lp -i jobid -H restart" would often return an error
 	  even though the job restarted successfully (STR #362)
