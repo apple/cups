@@ -14,7 +14,7 @@
 %
 %   PostScript banner page for the Common UNIX Printing System ("CUPS").
 %
-%   Copyright 1993-2000 Easy Software Products
+%   Copyright 1993-2001 Easy Software Products
 %
 %   These coded instructions, statements, and computer programs contain
 %   unpublished proprietary information of Easy Software Products, and
@@ -262,6 +262,6 @@ gsave
 grestore
 showpage
 %
-% End of "$Id: unclassified,v 1.4 2000/09/18 17:12:41 mike Exp $".
+% End of "$Id: unclassified,v 1.5 2001/03/02 22:34:00 andy Exp $".
 %
 %%EOF
