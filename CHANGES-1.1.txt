@@ -5,6 +5,9 @@ CHANGES IN CUPS V1.1.15
 
 	- Updated the CUPS license agreement for the new MacOS
 	  license exception.
+	- When tunneling to a remote system using SSH, the
+	  printer URIs for local printers on the remote system
+	  did not reflect the correct port number.
 	- The Allow, Deny, BrowseAllow, BrowseDeny, and
 	  BrowseAddress directives now support the network
 	  interface names "@LOCAL" and "@IF(name)" for access

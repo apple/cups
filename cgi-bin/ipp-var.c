@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp-var.c,v 1.23.2.1 2002/01/02 18:04:20 mike Exp $"
+ * "$Id: ipp-var.c,v 1.23.2.2 2002/03/28 13:48:10 mike Exp $"
  *
  *   IPP variable routines for the Common UNIX Printing System (CUPS).
  *
@@ -239,27 +239,34 @@ ippSetCGIVars(ipp_t      *response,	/* I - Response data to be copied... */
 		  * Map localhost access to localhost and local port...
 		  */
 
-        	  if (strcasecmp(hostname, server) == 0 &&
+        	  if ((strcasecmp(hostname, server) == 0 ||
+		       strcasecmp(hostname, "localhost") == 0) &&
 	              (strcmp(getenv("REMOTE_HOST"), "127.0.0.1") == 0 ||
 		       strcmp(getenv("REMOTE_HOST"), "localhost") == 0 ||
 		       strcmp(getenv("REMOTE_HOST"), server) == 0))
 		  {
-		    strcpy(hostname, "localhost");
-		    port = atoi(getenv("SERVER_PORT"));
+		   /*
+		    * Make URI relative to the current server...
+		    */
+
+                    strncpy(uri, resource, sizeof(uri) - 1);
+		    uri[sizeof(uri) - 1] = '\0';
 		  }
+		  else
+		  {
+        	   /*
+		    * Rewrite URI with HTTP address...
+		    */
 
-        	 /*
-		  * Rewrite URI with HTTP address...
-		  */
-
-		  if (username[0])
-		    snprintf(uri, sizeof(uri), "%s://%s@%s:%d%s",
-		             ishttps ? "https" : "http",
-		             username, hostname, port, resource);
-        	  else
-		    snprintf(uri, sizeof(uri), "%s://%s:%d%s", 
-		             ishttps ? "https" : "http",
-			     hostname, port, resource);
+		    if (username[0])
+		      snprintf(uri, sizeof(uri), "%s://%s@%s:%d%s",
+		               ishttps ? "https" : "http",
+		               username, hostname, port, resource);
+        	    else
+		      snprintf(uri, sizeof(uri), "%s://%s:%d%s", 
+		               ishttps ? "https" : "http",
+			       hostname, port, resource);
+                  }
 
 		  strncat(valptr, uri, sizeof(value) - (valptr - value) - 1);
         	  break;
@@ -295,5 +302,5 @@ ippSetCGIVars(ipp_t      *response,	/* I - Response data to be copied... */
 
 
 /*
- * End of "$Id: ipp-var.c,v 1.23.2.1 2002/01/02 18:04:20 mike Exp $".
+ * End of "$Id: ipp-var.c,v 1.23.2.2 2002/03/28 13:48:10 mike Exp $".
  */
