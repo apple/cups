@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-input.c,v 1.10.2.6 2004/06/29 13:15:09 mike Exp $"
+ * "$Id: hpgl-input.c,v 1.10.2.7 2004/12/16 19:42:32 mike Exp $"
  *
  *   HP-GL/2 input processing for the Common UNIX Printing System (CUPS).
  *
@@ -15,7 +15,7 @@
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
  *       44141 Airport View Drive, Suite 204
- *       Hollywood, Maryland 20636-3142 USA
+ *       Hollywood, Maryland 20636 USA
  *
  *       Voice: (301) 373-9600
  *       EMail: cups-info@cups.org
@@ -54,7 +54,8 @@ ParseCommand(FILE    *fp,	/* I - File to read from */
 		ch,		/* Current char */
 		done,		/* Non-zero when the current command is read */
 		i;		/* Looping var */
-  char		buf[262144];	/* String buffer */
+  char		buf[262144],	/* String buffer */
+		*bufptr;	/* Pointer into buffer */
   static param_t p[MAX_PARAMS];	/* Parameter buffer */
 
 
@@ -128,9 +129,12 @@ ParseCommand(FILE    *fp,	/* I - File to read from */
 
   if (strcasecmp(name, "LB") == 0)
   {
-    for (i = 0; (ch = getc(fp)) != StringTerminator; i ++)
-      buf[i] = ch;
-    buf[i] = '\0';
+    bufptr = buf;
+    while ((ch = getc(fp)) != StringTerminator)
+      if (bufptr < (buf + sizeof(buf) - 1))
+        *bufptr++ = ch;
+    *bufptr = '\0';
+
     p[num_params].type         = PARAM_STRING;
     p[num_params].value.string = strdup(buf);
     num_params ++;
@@ -155,11 +159,12 @@ ParseCommand(FILE    *fp,	/* I - File to read from */
   }
   else if (strcasecmp(name, "PE") == 0)
   {
-    for (i = 0; i < (sizeof(buf) - 1); i ++)
-      if ((buf[i] = getc(fp)) == ';')
-        break;
+    bufptr = buf;
+    while ((ch = getc(fp)) != ';')
+      if (bufptr < (buf + sizeof(buf) - 1))
+        *bufptr++ = ch;
+    *bufptr = '\0';
 
-    buf[i] = '\0';
     p[num_params].type         = PARAM_STRING;
     p[num_params].value.string = strdup(buf);
     num_params ++;
@@ -243,5 +248,5 @@ FreeParameters(int     num_params,	/* I - Number of parameters */
 
 
 /*
- * End of "$Id: hpgl-input.c,v 1.10.2.6 2004/06/29 13:15:09 mike Exp $".
+ * End of "$Id: hpgl-input.c,v 1.10.2.7 2004/12/16 19:42:32 mike Exp $".
  */

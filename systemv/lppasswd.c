@@ -1,5 +1,5 @@
 /*
- * "$Id: lppasswd.c,v 1.11.2.4 2004/06/29 13:15:11 mike Exp $"
+ * "$Id: lppasswd.c,v 1.11.2.5 2004/12/16 19:42:32 mike Exp $"
  *
  *   MD5 password program for the Common UNIX Printing System (CUPS).
  *
@@ -15,7 +15,7 @@
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
  *       44141 Airport View Drive, Suite 204
- *       Hollywood, Maryland 20636-3142 USA
+ *       Hollywood, Maryland 20636 USA
  *
  *       Voice: (301) 373-9600
  *       EMail: cups-info@cups.org
@@ -23,9 +23,8 @@
  *
  * Contents:
  *
- *   main()    - Add, change, or delete passwords from the MD5 password file.
- *   usage()   - Show program usage.
- *   xstrdup() - strdup() function with NULL checking...
+ *   main()  - Add, change, or delete passwords from the MD5 password file.
+ *   usage() - Show program usage.
  */
 
 /*
@@ -45,6 +44,11 @@
 #include <cups/md5.h>
 #include <cups/string.h>
 
+#ifndef WIN32
+#  include <unistd.h>
+#  include <signal.h>
+#endif /* !WIN32 */
+
 
 /*
  * Operations...
@@ -60,7 +64,6 @@
  */
 
 static void	usage(FILE *fp);
-static char	*xstrdup(const char *);
 
 
 /*
@@ -92,7 +95,27 @@ main(int  argc,			/* I - Number of command-line arguments */
   		*oldpass;	/* old password */
   int		flag;		/* Password check flags... */
   int		fd;		/* Password file descriptor */
+  int		error;		/* Write error */
+#if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
+  struct sigaction action;	/* Signal action */
+#endif /* HAVE_SIGACTION && !HAVE_SIGSET*/
 
+
+ /*
+  * Check to see if stdin, stdout, and stderr are still open...
+  */
+
+  if (fcntl(0, F_GETFD, &i) ||
+      fcntl(1, F_GETFD, &i) ||
+      fcntl(2, F_GETFD, &i))
+  {
+   /*
+    * No, return exit status 2 and don't try to send any output since
+    * someone is trying to bypass the security on the server.
+    */
+
+    return (2);
+  }
 
  /*
   * Find the server directory...
@@ -196,60 +219,103 @@ main(int  argc,			/* I - Number of command-line arguments */
     if ((passwd = cupsGetPassword("Enter old password:")) == NULL)
       return (1);
 
-    oldpass = xstrdup(passwd);
+    if ((oldpass = strdup(passwd)) == NULL)
+    {
+      perror("lppasswd: Unable to copy password string");
+      return (1);
+    }
   }
 
  /*
-  * Now get the new password
+  * Now get the new password, if necessary...
   */
 
-  if ((passwd = cupsGetPassword("Enter password:")) == NULL)
-    return (1);
-
-  newpass = xstrdup(passwd);
-
-  if ((passwd = cupsGetPassword("Enter password again:")) == NULL)
-    return (1);
-
-  if (strcmp(passwd, newpass) != 0)
+  if (op != DELETE)
   {
-    fputs("lppasswd: Sorry, passwords don't match!\n", stderr);
-    return (1);
+    if ((passwd = cupsGetPassword("Enter password:")) == NULL)
+      return (1);
+
+    if ((newpass = strdup(passwd)) == NULL)
+    {
+      perror("lppasswd: Unable to copy password string!");
+      return (1);
+    }
+
+    if ((passwd = cupsGetPassword("Enter password again:")) == NULL)
+      return (1);
+
+    if (strcmp(passwd, newpass) != 0)
+    {
+      fputs("lppasswd: Sorry, passwords don't match!\n", stderr);
+      return (1);
+    }
+
+   /*
+    * Check that the password contains at least one letter and number.
+    */
+
+    flag = 0;
+
+    for (passwd = newpass; *passwd; passwd ++)
+      if (isdigit(*passwd & 255))
+	flag |= 1;
+      else if (isalpha(*passwd & 255))
+	flag |= 2;
+
+   /*
+    * Only allow passwords that are at least 6 chars, have a letter and
+    * a number, and don't contain the username.
+    */
+
+    if (strlen(newpass) < 6 || strstr(newpass, username) != NULL || flag != 3)
+    {
+      fputs("lppasswd: Sorry, password rejected.\n"
+	    "Your password must be at least 6 characters long, cannot contain\n"
+	    "your username, and must contain at least one letter and number.\n",
+	    stderr);
+      return (1);
+    }
   }
 
  /*
-  * Check that the password contains at least one letter and number.
+  * Ignore SIGHUP, SIGINT, SIGTERM, and SIGXFSZ (if defined) for the
+  * remainder of the time so that we won't end up with bogus password
+  * files...
   */
 
-  flag = 0;
+#ifndef WIN32
+#  if defined(HAVE_SIGSET)
+  sigset(SIGHUP, SIG_IGN);
+  sigset(SIGINT, SIG_IGN);
+  sigset(SIGTERM, SIG_IGN);
+#    ifdef SIGXFSZ
+  sigset(SIGXFSZ, SIG_IGN);
+#    endif /* SIGXFSZ */
+#  elif defined(HAVE_SIGACTION)
+  memset(&action, 0, sizeof(action));
+  action.sa_handler = SIG_IGN;
 
-  for (passwd = newpass; *passwd; passwd ++)
-    if (isdigit(*passwd & 255))
-      flag |= 1;
-    else if (isalpha(*passwd & 255))
-      flag |= 2;
+  sigaction(SIGHUP, &action, NULL);
+  sigaction(SIGINT, &action, NULL);
+  sigaction(SIGTERM, &action, NULL);
+#    ifdef SIGXFSZ
+  sigaction(SIGXFSZ, &action, NULL);
+#    endif /* SIGXFSZ */
+#  else
+  signal(SIGHUP, SIG_IGN);
+  signal(SIGINT, SIG_IGN);
+  signal(SIGTERM, SIG_IGN);
+#    ifdef SIGXFSZ
+  signal(SIGXFSZ, SIG_IGN);
+#    endif /* SIGXFSZ */
+#  endif
+#endif /* !WIN32 */
 
  /*
-  * Only allow passwords that are at least 6 chars, have a letter and
-  * a number, and don't contain the username.
+  * Open the output file.
   */
 
-  if (strlen(newpass) < 6 || strstr(newpass, username) != NULL || flag != 3)
-  {
-    fputs("lppasswd: Sorry, password rejected.\n"
-	  "Your password must be at least 6 characters long, cannot contain\n"
-	  "your username, and must contain at least one letter and number.\n",
-	  stderr);
-    return (1);
-  }
-
-  outfile = infile = NULL;
-
-  /*
-   * Open the output file.
-   */
-
-  if ((fd = open(passwdnew, O_WRONLY|O_CREAT|O_EXCL, 0400)) < 0)
+  if ((fd = open(passwdnew, O_WRONLY | O_CREAT | O_EXCL, 0400)) < 0)
   {
     if (errno == EEXIST)
       fputs("lppasswd: Password file busy!\n", stderr);
@@ -262,8 +328,13 @@ main(int  argc,			/* I - Number of command-line arguments */
   if ((outfile = fdopen(fd, "w")) == NULL)
   {
     perror("lppasswd: Unable to open passwd file");
-    goto fail_out;
+
+    unlink(passwdnew);
+
+    return (1);
   }
+
+  setbuf(outfile, NULL);
 
  /*
   * Open the existing password file and create a new one...
@@ -272,8 +343,13 @@ main(int  argc,			/* I - Number of command-line arguments */
   infile = fopen(passwdmd5, "r");
   if (infile == NULL && errno != ENOENT && op != ADD)
   {
-    fputs("lppasswd: No password file to add to or delete from!\n", stderr);
-    goto fail_out;
+    perror("lppasswd: Unable to open password file");
+
+    fclose(outfile);
+
+    unlink(passwdnew);
+
+    return (1);
   }
 
  /*
@@ -281,6 +357,11 @@ main(int  argc,			/* I - Number of command-line arguments */
   *
   *   username:group:MD5-sum
   */
+
+  error        = 0;
+  userline[0]  = '\0';
+  groupline[0] = '\0';
+  md5line[0]   = '\0';
 
   if (infile)
   {
@@ -293,52 +374,87 @@ main(int  argc,			/* I - Number of command-line arguments */
           strcmp(groupname, groupline) == 0)
 	break;
 
-      fputs(line, outfile);
+      if (fputs(line, outfile) == EOF)
+      {
+        perror("lppasswd: Unable to write to password file");
+        error = 1;
+	break;
+      }
     }
 
-    while (fgets(line, sizeof(line), infile) != NULL)
-      fputs(line, outfile);
-  }
-  else
-  {
-    userline[0]  = '\0';
-    groupline[0] = '\0';
-    md5line[0]   = '\0';
+    if (!error)
+    {
+      while (fgets(line, sizeof(line), infile) != NULL)
+	if (fputs(line, outfile) == EOF)
+	{
+          perror("lppasswd: Unable to write to password file");
+	  error = 1;
+	  break;
+	}
+    }
   }
 
   if (op == CHANGE &&
-      (strcmp(username, userline) != 0 ||
-       strcmp(groupname, groupline) != 0))
+      (strcmp(username, userline) || strcmp(groupname, groupline)))
+  {
     fprintf(stderr, "lppasswd: user \"%s\" and group \"%s\" do not exist.\n",
             username, groupname);
+    error = 1;
+  }
   else if (op != DELETE)
   {
     if (oldpass &&
         strcmp(httpMD5(username, "CUPS", oldpass, md5new), md5line) != 0)
     {
       fputs("lppasswd: Sorry, password doesn't match!\n", stderr);
-      goto fail_out;
+      error = 1;
     }
-
-    fprintf(outfile, "%s:%s:%s\n", username, groupname,
-            httpMD5(username, "CUPS", newpass, md5new));
+    else
+    {
+      snprintf(line, sizeof(line), "%s:%s:%s\n", username, groupname,
+               httpMD5(username, "CUPS", newpass, md5new));
+      if (fputs(line, outfile) == EOF)
+      {
+        perror("lppasswd: Unable to write to password file");
+        error = 1;
+      }
+    }
   }
 
  /*
-  * Close the files and remove the old password file...
+  * Close the files...
   */
 
   if (infile)
     fclose(infile);
 
-  fclose(outfile);
+  if (fclose(outfile) == EOF)
+    error = 1;
+
+ /*
+  * Error out gracefully as needed...
+  */
+
+  if (error)
+  {
+    fputs("lppasswd: Password file not updated!\n", stderr);
+    
+    unlink(passwdnew);
+
+    return (1);
+  }
 
  /*
   * Save old passwd file
   */
 
   unlink(passwdold);
-  link(passwdmd5, passwdold);
+  if (link(passwdmd5, passwdold))
+  {
+    perror("lppasswd: failed to backup old password file");
+    unlink(passwdnew);
+    return (1);
+  }
 
  /*
   * Install new password file
@@ -346,28 +462,12 @@ main(int  argc,			/* I - Number of command-line arguments */
 
   if (rename(passwdnew, passwdmd5) < 0)
   {
-    perror("lppasswd: failed to rename passwd file");
+    perror("lppasswd: failed to rename password file");
     unlink(passwdnew);
     return (1);
   }
 
   return (0);
-
- /*
-  * This is where all errors die...
-  */
-
-fail_out:
-
-  if (infile)
-    fclose(infile);
-
-  if (outfile)
-    fclose(outfile);
-
-  unlink(passwdnew);
-
-  return (1);
 }
 
 
@@ -394,28 +494,5 @@ usage(FILE *fp)		/* I - File to send usage to */
 
 
 /*
- * 'xstrdup()' - strdup() function with NULL checking...
- */
-
-static char *			/* O - New string */
-xstrdup(const char *in)		/* I - String to duplicate */
-{
-  char	*out;			/* New string */
-
-
-  if (in == NULL)
-    return (NULL);
-
-  if ((out = strdup(in)) == NULL)
-  {
-    perror("lppasswd: Out of memory!");
-    exit(1);
-  }
-
-  return (out);
-}
-
-
-/*
- * End of "$Id: lppasswd.c,v 1.11.2.4 2004/06/29 13:15:11 mike Exp $".
+ * End of "$Id: lppasswd.c,v 1.11.2.5 2004/12/16 19:42:32 mike Exp $".
  */
