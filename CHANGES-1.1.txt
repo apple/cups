@@ -3,6 +3,12 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.21rc1
 
+	- Fixed some "type-punned" warnings produced by GCC when
+	  -fstrict-aliasing is specified (STR #679)
+	- The PDF filter incorrectly calculated the bounding box
+	  of a page (STR #682)
+	- The IPP backend did not use SSL when printing over a
+	  port other than 443 (STR #730)
 	- The scheduler could crash when processing a Limit or
 	  LimitExcept directive (STR #728)
 	- The lpq, lpr, and lp commands did not differentiate

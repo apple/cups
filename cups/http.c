@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.82.2.47 2004/04/20 14:14:13 mike Exp $"
+ * "$Id: http.c,v 1.82.2.48 2004/05/27 18:04:39 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS).
  *
@@ -1545,8 +1545,8 @@ httpUpdate(http_t *http)		/* I - HTTP data */
   char		line[1024],		/* Line from connection... */
 		*value;			/* Pointer to value on line */
   http_field_t	field;			/* Field index */
-  int		major, minor;		/* HTTP version numbers */
-  http_status_t	status;			/* Authorization status */
+  int		major, minor,		/* HTTP version numbers */
+		status;			/* Request status */
 
 
   DEBUG_printf(("httpUpdate(http=%p), state=%d\n", http, http->state));
@@ -1623,11 +1623,11 @@ httpUpdate(http_t *http)		/* I - HTTP data */
       * Got the beginning of a response...
       */
 
-      if (sscanf(line, "HTTP/%d.%d%d", &major, &minor, (int *)&status) != 3)
+      if (sscanf(line, "HTTP/%d.%d%d", &major, &minor, &status) != 3)
         return (HTTP_ERROR);
 
       http->version = (http_version_t)(major * 100 + minor);
-      http->status  = status;
+      http->status  = (http_status_t)status;
     }
     else if ((value = strchr(line, ':')) != NULL)
     {
@@ -2462,5 +2462,5 @@ CDSAWriteFunc(SSLConnectionRef connection,	/* I  - SSL/TLS connection */
 
 
 /*
- * End of "$Id: http.c,v 1.82.2.47 2004/04/20 14:14:13 mike Exp $".
+ * End of "$Id: http.c,v 1.82.2.48 2004/05/27 18:04:39 mike Exp $".
  */

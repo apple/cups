@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.38.2.30 2004/05/13 15:13:52 mike Exp $"
+ * "$Id: ipp.c,v 1.38.2.31 2004/05/27 18:04:39 mike Exp $"
  *
  *   IPP backend for the Common UNIX Printing System (CUPS).
  *
@@ -213,6 +213,25 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
     content_type = "application/octet-stream";
 
  /*
+  * Extract the hostname and printer name from the URI...
+  */
+
+  if (strchr(argv[0], ':') != NULL)
+    httpSeparate(argv[0], method, username, hostname, &port, resource);
+  else if (getenv("DEVICE_URI") != NULL)
+    httpSeparate(getenv("DEVICE_URI"), method, username, hostname, &port,
+                 resource);
+  else
+  {
+    fputs("ERROR: Missing device URI on command-line and no DEVICE_URI environment variable!\n",
+          stderr);
+    return (1);
+  }
+
+  if (!strcmp(method, "https"))
+    cupsSetEncryption(HTTP_ENCRYPT_ALWAYS);
+
+ /*
   * If we have 7 arguments, print the file named on the command-line.
   * Otherwise, copy stdin to a temporary file and print the temporary
   * file.
@@ -249,12 +268,6 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   }
   else
     filename = argv[6];
-
- /*
-  * Extract the hostname and printer name from the URI...
-  */
-
-  httpSeparate(argv[0], method, username, hostname, &port, resource);
 
  /*
   * See if there are any options...
@@ -1316,5 +1329,5 @@ sigterm_handler(int sig)		/* I - Signal */
 
 
 /*
- * End of "$Id: ipp.c,v 1.38.2.30 2004/05/13 15:13:52 mike Exp $".
+ * End of "$Id: ipp.c,v 1.38.2.31 2004/05/27 18:04:39 mike Exp $".
  */
