@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.127.2.49 2003/03/13 03:35:00 mike Exp $"
+ * "$Id: ipp.c,v 1.127.2.50 2003/03/19 06:07:42 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -1431,18 +1431,14 @@ add_printer_state_reasons(client_t  *con,	/* I - Client connection */
   LogMessage(L_DEBUG2, "add_printer_state_reasons(%d, %s)\n", con->http.fd,
              p->name);
 
-  switch (p->state)
-  {
-    case IPP_PRINTER_STOPPED :
-        ippAddString(con->response, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
-	             "printer-state-reasons", NULL, "paused");
-        break;
-
-    default :
-        ippAddString(con->response, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
-	             "printer-state-reasons", NULL, "none");
-        break;
-  }
+  if (p->num_reasons == 0)
+    ippAddString(con->response, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
+                 "printer-state-reasons", NULL,
+		 p->state == IPP_PRINTER_STOPPED ? "paused" : "none");
+  else
+    ippAddStrings(con->response, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
+                  "printer-state-reasons", p->num_reasons, NULL,
+		  (const char * const *)p->reasons);
 }
 
 
@@ -2063,7 +2059,19 @@ copy_attribute(ipp_t           *to,	/* O - Destination request/response */
         }
         break;
 
-     default :
+    case IPP_TAG_BEGIN_COLLECTION :
+        toattr = ippAddCollections(to, attr->group_tag, attr->name,
+	                           attr->num_values, NULL);
+
+        for (i = 0; i < attr->num_values; i ++)
+	{
+	  toattr->values[i].collection = ippNew();
+	  copy_attrs(toattr->values[i].collection, attr->values[i].collection,
+	             NULL, IPP_TAG_ZERO, 0);
+	}
+        break;
+
+    default :
         toattr = ippAddIntegers(to, attr->group_tag, attr->value_tag,
 	                        attr->name, attr->num_values, NULL);
 
@@ -3416,6 +3424,9 @@ get_printer_attrs(client_t        *con,	/* I - Client connection */
   int			port;		/* Port portion of URI */
   printer_t		*printer;	/* Printer/class */
   time_t		curtime;	/* Current time */
+  int			i;		/* Looping var */
+  ipp_attribute_t	*requested,	/* requested-attributes */
+			*history;	/* History collection */
 
 
   LogMessage(L_DEBUG2, "get_printer_attrs(%d, %s)\n", con->http.fd,
@@ -3463,20 +3474,31 @@ get_printer_attrs(client_t        *con,	/* I - Client connection */
 
   ippAddInteger(con->response, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
                 "printer-up-time", curtime);
+  ippAddInteger(con->response, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
+                "printer-state-time", printer->state_time);
   ippAddDate(con->response, IPP_TAG_PRINTER, "printer-current-time",
              ippTimeToDate(curtime));
 
   add_queued_job_count(con, printer);
 
-  copy_attrs(con->response, printer->attrs,
-             ippFindAttribute(con->request, "requested-attributes",
-	                      IPP_TAG_KEYWORD), IPP_TAG_ZERO, 0);
+  requested = ippFindAttribute(con->request, "requested-attributes",
+	                       IPP_TAG_KEYWORD);
 
-  copy_attrs(con->response, CommonData,
-             ippFindAttribute(con->request, "requested-attributes",
-	                      IPP_TAG_KEYWORD), IPP_TAG_ZERO, IPP_TAG_COPY);
+  copy_attrs(con->response, printer->attrs, requested, IPP_TAG_ZERO, 0);
+  copy_attrs(con->response, CommonData, requested, IPP_TAG_ZERO, IPP_TAG_COPY);
 
-  con->response->request.status.status_code = IPP_OK;
+  if (MaxPrinterHistory > 0 && printer->num_history > 0)
+  {
+    history = ippAddCollections(con->response, IPP_TAG_PRINTER,
+                                "printer-state-history",
+                                printer->num_history, NULL);
+
+    for (i = 0; i < printer->num_history; i ++)
+      copy_attrs(history->values[i].collection = ippNew(), printer->history[i],
+                 NULL, IPP_TAG_ZERO, 0);
+  }
+
+  con->response->request.status.status_code = requested ? IPP_OK_SUBST : IPP_OK;
 }
 
 
@@ -3488,8 +3510,10 @@ static void
 get_printers(client_t *con,		/* I - Client connection */
              int      type)		/* I - 0 or CUPS_PRINTER_CLASS */
 {
-  ipp_attribute_t	*attr,		/* Current attribute */
-			*requested;	/* Requested attributes */
+  int			i;		/* Looping var */
+  ipp_attribute_t	*requested,	/* requested-attributes */
+			*history,	/* History collection */
+			*attr;		/* Current attribute */
   int			limit;		/* Maximum number of printers to return */
   int			count;		/* Number of printers that match */
   printer_t		*printer;	/* Current printer pointer */
@@ -3613,6 +3637,8 @@ get_printers(client_t *con,		/* I - Client connection */
 
       ippAddInteger(con->response, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
                     "printer-up-time", curtime);
+      ippAddInteger(con->response, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
+                    "printer-state-time", printer->state_time);
       ippAddDate(con->response, IPP_TAG_PRINTER, "printer-current-time",
         	 ippTimeToDate(curtime));
 
@@ -3622,9 +3648,20 @@ get_printers(client_t *con,		/* I - Client connection */
 
       copy_attrs(con->response, CommonData, requested, IPP_TAG_ZERO,
                  IPP_TAG_COPY);
+
+      if (MaxPrinterHistory > 0 && printer->num_history > 0)
+      {
+	history = ippAddCollections(con->response, IPP_TAG_PRINTER,
+                                    "printer-state-history",
+                                    printer->num_history, NULL);
+
+	for (i = 0; i < printer->num_history; i ++)
+	  copy_attrs(history->values[i].collection = ippNew(),
+	             printer->history[i], NULL, IPP_TAG_ZERO, 0);
+      }
     }
 
-  con->response->request.status.status_code = IPP_OK;
+  con->response->request.status.status_code = requested ? IPP_OK_SUBST : IPP_OK;
 }
 
 
@@ -6187,5 +6224,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.127.2.49 2003/03/13 03:35:00 mike Exp $".
+ * End of "$Id: ipp.c,v 1.127.2.50 2003/03/19 06:07:42 mike Exp $".
  */

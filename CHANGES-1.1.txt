@@ -3,6 +3,9 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.19
 
+	- Added support for STATE: messages
+	  (printer-state-reasons), printer-state-history, and
+	  printer-state-time to the scheduler.
 	- When using RunAsUser, the scheduler would initially
 	  start any previously queued (pending) jobs with
 	  RunAsUser disabled - all backends would be running as

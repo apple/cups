@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.93.2.40 2003/03/10 21:22:23 mike Exp $"
+ * "$Id: printers.c,v 1.93.2.41 2003/03/19 06:07:50 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -25,6 +25,7 @@
  *
  *   AddPrinter()           - Add a printer to the system.
  *   AddPrinterFilter()     - Add a MIME filter for a printer.
+ *   AddPrinterHistory()    - Add the current printer state to the history.
  *   AddPrinterUser()       - Add a user to the ACL.
  *   DeleteAllPrinters()    - Delete all printers from the system.
  *   DeletePrinter()        - Delete a printer from the system.
@@ -34,6 +35,7 @@
  *   LoadAllPrinters()      - Load printers from the printers.conf file.
  *   SaveAllPrinters()      - Save all printer definitions to the printers.conf
  *   SetPrinterAttrs()      - Set printer attributes based upon the PPD file.
+ *   SetPrinterReasons()    - Set/update the reasons strings.
  *   SetPrinterState()      - Update the current state of a printer.
  *   SortPrinters()         - Sort the printer list when a printer name is
  *                            changed.
@@ -115,6 +117,9 @@ AddPrinter(const char *name)	/* I - Name of printer */
 
   SetString(&p->job_sheets[0], "none");
   SetString(&p->job_sheets[1], "none");
+ 
+  if (MaxPrinterHistory)
+    p->history = calloc(MaxPrinterHistory, sizeof(ipp_t *));
 
  /*
   * Insert the printer in the printer list alphabetically...
@@ -204,6 +209,60 @@ AddPrinterFilter(printer_t  *p,		/* I - Printer to add to */
 
 
 /*
+ * 'AddPrinterHistory()' - Add the current printer state to the history.
+ */
+
+void
+AddPrinterHistory(printer_t *p)		/* I - Printer */
+{
+  ipp_t	*history;			/* History collection */
+
+
+ /*
+  * Stop early if we aren't keeping history data...
+  */
+
+  if (MaxPrinterHistory <= 0)
+    return;
+
+ /*
+  * Retire old history data as needed...
+  */
+
+  if (p->num_history >= MaxPrinterHistory)
+  {
+    p->num_history --;
+    ippDelete(p->history[0]);
+    memmove(p->history, p->history + 1, p->num_history * sizeof(ipp_t *));
+  }
+
+ /*
+  * Create a collection containing the current printer-state, printer-up-time,
+  * printer-state-message, and printer-state-reasons attributes.
+  */
+
+  history = ippNew();
+  ippAddInteger(history, IPP_TAG_PRINTER, IPP_TAG_ENUM, "printer-state",
+                p->state);
+  ippAddString(history, IPP_TAG_PRINTER, IPP_TAG_TEXT, "printer-state-message",
+               NULL, p->state_message);
+  if (p->num_reasons == 0)
+    ippAddString(history, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
+                 "printer-state-reasons", NULL,
+		 p->state == IPP_PRINTER_STOPPED ? "paused" : "none");
+  else
+    ippAddStrings(history, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
+                  "printer-state-reasons", p->num_reasons, NULL,
+		  (const char * const *)p->reasons);
+  ippAddInteger(history, IPP_TAG_PRINTER, IPP_TAG_ENUM, "printer-state-time",
+                p->state_time);
+
+  p->history[p->num_history] = history;
+  p->num_history ++;
+}
+
+
+/*
  * 'AddPrinterUser()' - Add a user to the ACL.
  */
 
@@ -267,6 +326,7 @@ DeleteAllPrinters(void)
 void
 DeletePrinter(printer_t *p)	/* I - Printer to delete */
 {
+  int		i;		/* Looping var */
   printer_t	*current,	/* Current printer in list */
 		*prev;		/* Previous printer in list */
 #ifdef __sgi
@@ -360,6 +420,17 @@ DeletePrinter(printer_t *p)	/* I - Printer to delete */
 
   if (p->printers != NULL)
     free(p->printers);
+
+  if (MaxPrinterHistory)
+  {
+    for (i = 0; i < p->num_history; i ++)
+      ippDelete(p->history[i]);
+
+    free(p->history);
+  }
+
+  for (i = 0; i < p->num_reasons; i ++)
+    free(p->reasons[i]);
 
   ippDelete(p->attrs);
 
@@ -1546,6 +1617,108 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
 
 
 /*
+ * 'SetPrinterReasons()' - Set/update the reasons strings.
+ */
+
+void
+SetPrinterReasons(printer_t  *p,	/* I - Printer */
+                  const char *s)	/* I - Reasons strings */
+{
+  int		i;			/* Looping var */
+  const char	*sptr;			/* Pointer into reasons */
+  char		reason[255],		/* Reason string */
+		*rptr;			/* Pointer into reason */
+
+
+  if (s[0] == '-' || s[0] == '+')
+  {
+   /*
+    * Add/remove reasons...
+    */
+
+    sptr = s + 1;
+  }
+  else
+  {
+   /*
+    * Replace reasons...
+    */
+
+    sptr = s;
+
+    for (i = 0; i < p->num_reasons; i ++)
+      free(p->reasons[i]);
+
+    p->num_reasons = 0;
+  }
+
+ /*
+  * Loop through all of the reasons...
+  */
+
+  while (*sptr)
+  {
+   /*
+    * Skip leading whitespace and commas...
+    */
+
+    while (isspace(*sptr) || *sptr == ',')
+      sptr ++;
+
+    for (rptr = reason; *sptr && !isspace(*sptr) && *sptr != ','; sptr ++)
+      if (rptr < (reason + sizeof(reason) - 1))
+        *rptr++ = *sptr;
+
+    if (rptr == reason)
+      break;
+
+    *rptr = '\0';
+
+    if (s[0] == '-')
+    {
+     /*
+      * Remove reason...
+      */
+
+      for (i = 0; i < p->num_reasons; i ++)
+        if (!strcasecmp(reason, p->reasons[i]))
+	{
+	 /*
+	  * Found a match, so remove it...
+	  */
+
+	  p->num_reasons --;
+	  free(p->reasons[i]);
+
+	  if (i < p->num_reasons)
+	    memmove(p->reasons + i, p->reasons + i + 1,
+	            (p->num_reasons - i) * sizeof(char *));
+
+	  i --;
+	}
+    }
+    else if (s[0] == '+' &&
+             p->num_reasons < (int)(sizeof(p->reasons) / sizeof(p->reasons[0])))
+    {
+     /*
+      * Add reason...
+      */
+
+      for (i = 0; i < p->num_reasons; i ++)
+        if (!strcasecmp(reason, p->reasons[i]))
+	  break;
+
+      if (i >= p->num_reasons)
+      {
+        p->reasons[i] = strdup(reason);
+	p->num_reasons ++;
+      }
+    }
+  }
+}
+
+
+/*
  * 'SetPrinterState()' - Update the current state of a printer.
  */
 
@@ -1567,18 +1740,20 @@ SetPrinterState(printer_t    *p,	/* I - Printer to change */
   * Set the new state...
   */
 
-  old_state      = p->state;
-  p->state       = s;
-  p->state_time  = time(NULL);
+  old_state = p->state;
+  p->state  = s;
 
   if (old_state != s)
   {
+    p->state_time  = time(NULL);
     p->browse_time = 0;
 
 #ifdef __sgi
     write_irix_state(p);
 #endif /* __sgi */
   }
+
+  AddPrinterHistory(p);
 
  /*
   * Save the printer configuration if a printer goes from idle or processing
@@ -2180,5 +2355,5 @@ write_irix_state(printer_t *p)	/* I - Printer to update */
 
 
 /*
- * End of "$Id: printers.c,v 1.93.2.40 2003/03/10 21:22:23 mike Exp $".
+ * End of "$Id: printers.c,v 1.93.2.41 2003/03/19 06:07:50 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.h,v 1.36.2.15 2003/02/04 05:45:26 mike Exp $"
+ * "$Id: conf.h,v 1.36.2.16 2003/03/19 06:07:42 mike Exp $"
  *
  *   Configuration file definitions for the Common UNIX Printing System (CUPS)
  *   scheduler.
@@ -28,6 +28,7 @@
  * Log levels...
  */
 
+#define L_STATE		-2	/* Used internally for state-reasons */
 #define L_PAGE		-1	/* Used internally for page logging */
 #define L_NONE		0
 #define L_EMERG		1	/* Emergency issues */
@@ -117,6 +118,8 @@ VAR int			ClassifyOverride	VALUE(0),
 					/* Maximum number of copies per job */
 			MaxLogSize		VALUE(1024 * 1024),
 					/* Maximum size of log files */
+			MaxPrinterHistory	VALUE(10),
+					/* Maximum printer state history */
 			MaxRequestSize		VALUE(0),
 					/* Maximum size of IPP requests */
 			HostNameLookups		VALUE(FALSE),
@@ -189,5 +192,5 @@ extern int	LogPage(job_t *job, const char *page);
 
 
 /*
- * End of "$Id: conf.h,v 1.36.2.15 2003/02/04 05:45:26 mike Exp $".
+ * End of "$Id: conf.h,v 1.36.2.16 2003/03/19 06:07:42 mike Exp $".
  */

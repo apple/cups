@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.h,v 1.22.2.10 2003/03/10 21:05:32 mike Exp $"
+ * "$Id: printers.h,v 1.22.2.11 2003/03/19 06:07:52 mike Exp $"
  *
  *   Printer definitions for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -54,7 +54,8 @@ typedef struct printer_str
   int		accepting;		/* Accepting jobs? */
   ipp_pstate_t	state;			/* Printer state */
   char		state_message[1024];	/* Printer state message */
-  ipp_attribute_t *state_reasons;	/* Printer state reasons */
+  int		num_reasons;		/* Number of printer-state-reasons */
+  char		*reasons[16];		/* printer-state-reasons strings */
   time_t	state_time;		/* Time at this state */
   char		*job_sheets[2];		/* Banners/job sheets */
   cups_ptype_t	type;			/* Printer type (color, small, etc.) */
@@ -75,6 +76,8 @@ typedef struct printer_str
   int		deny_users,		/* 1 = deny, 0 = allow */
 		num_users;		/* Number of allowed/denied users */
   const char	**users;		/* Allowed/denied users */
+  int		num_history;		/* Number of history collections */
+  ipp_t		**history;		/* History data */
 } printer_t;
 
 
@@ -93,6 +96,7 @@ VAR printer_t		*DefaultPrinter VALUE(NULL);
 
 extern printer_t	*AddPrinter(const char *name);
 extern void		AddPrinterFilter(printer_t *p, const char *filter);
+extern void		AddPrinterHistory(printer_t *p);
 extern void		AddPrinterUser(printer_t *p, const char *username);
 extern quota_t		*AddQuota(printer_t *p, const char *username);
 extern void		DeleteAllPrinters(void);
@@ -106,6 +110,7 @@ extern void		FreeQuotas(printer_t *p);
 extern void		LoadAllPrinters(void);
 extern void		SaveAllPrinters(void);
 extern void		SetPrinterAttrs(printer_t *p);
+extern void		SetPrinterReasons(printer_t *p, const char *s);
 extern void		SetPrinterState(printer_t *p, ipp_pstate_t s);
 extern void		SortPrinters(void);
 #define			StartPrinter(p) SetPrinterState((p), IPP_PRINTER_IDLE)
@@ -119,5 +124,5 @@ extern void		WritePrintcap(void);
 
 
 /*
- * End of "$Id: printers.h,v 1.22.2.10 2003/03/10 21:05:32 mike Exp $".
+ * End of "$Id: printers.h,v 1.22.2.11 2003/03/19 06:07:52 mike Exp $".
  */
