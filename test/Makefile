@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.5 2002/01/02 17:59:20 mike Exp $"
+# "$Id: Makefile,v 1.6 2002/03/08 21:53:05 mike Exp $"
 #
 #   IPP test makefile for the Common UNIX Printing System (CUPS).
 #
@@ -41,6 +41,14 @@ clean:
 
 
 #
+# Update dependencies (without system header dependencies...)
+#
+
+depend:
+	makedepend -Y -I.. -fDependencies ipptest.c >/dev/null 2>&1
+
+
+#
 # Install all targets...
 #
 
@@ -55,8 +63,6 @@ ipptest:	ipptest.o ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o ipptest ipptest.o $(LIBS)
 
-ipptest.o:	../cups/cups.h ../Makedefs
-
 
 #
 # purify target for doing tests on the CUPS API...
@@ -68,5 +74,12 @@ purify:	ipptest.o ../cups/$(LIBCUPS)
 
 
 #
-# End of "$Id: Makefile,v 1.5 2002/01/02 17:59:20 mike Exp $".
+# Dependencies...
+#
+
+include Dependencies
+
+
+#
+# End of "$Id: Makefile,v 1.6 2002/03/08 21:53:05 mike Exp $".
 #

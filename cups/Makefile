@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.68 2002/03/08 19:48:58 mike Exp $"
+# "$Id: Makefile,v 1.69 2002/03/08 21:52:30 mike Exp $"
 #
 #   Support library Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -193,7 +193,6 @@ ppd-debug.o:	ppd.c ppd.h string.h ../config.h language.h debug.h
 	$(CC) $(OPTIM) $(CFLAGS) -DDEBUG -c -o $@ $<
 
 
-
 #
 # Dependencies...
 #
@@ -202,5 +201,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile,v 1.68 2002/03/08 19:48:58 mike Exp $".
+# End of "$Id: Makefile,v 1.69 2002/03/08 21:52:30 mike Exp $".
 #
