@@ -1,5 +1,5 @@
 /*
- * "$Id: dest.c,v 1.21 2001/07/02 19:38:04 mike Exp $"
+ * "$Id: dest.c,v 1.22 2001/09/17 20:35:19 mike Exp $"
  *
  *   User-defined destination (and option) support for the Common UNIX
  *   Printing System (CUPS).
@@ -270,6 +270,21 @@ cupsGetDests(cups_dest_t **dests)	/* O - Destinations */
   {
     snprintf(filename, sizeof(filename), "%s/.lpoptions", home);
     num_dests = cups_get_dests(filename, num_dests, dests);
+  }
+
+ /*
+  * Reset the default destination if the LPDEST or PRINTER environment
+  * variables are set...
+  */
+
+  if (getenv("LPDEST") != NULL || getenv("PRINTER") != NULL)
+  {
+   /*
+    * Lookup the printer and instance and make it the default...
+    */
+
+    if ((dest = cupsGetDest(name, instance, num_dests, *dests)) != NULL)
+      dest->is_default = 1;
   }
 
  /*
@@ -722,5 +737,5 @@ cups_get_sdests(ipp_op_t    op,		/* I - get-printers or get-classes */
 
 
 /*
- * End of "$Id: dest.c,v 1.21 2001/07/02 19:38:04 mike Exp $".
+ * End of "$Id: dest.c,v 1.22 2001/09/17 20:35:19 mike Exp $".
  */
