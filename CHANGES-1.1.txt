@@ -3,6 +3,9 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.20
 
+	- The cupsLangGet() cache was only used if the locale
+	  name provided an explicit character set name (STR
+	  #354)
 	- The CUPS API convenience functions did not call
 	  cupsLangFree() when they were done with the
 	  localization data (STR #354)
