@@ -166,6 +166,9 @@ CHANGES IN CUPS V1.1.9
 	- The scheduler did not truncate file: output files.
 	- The PPD file reading code did not handle options with
 	  raw quotes (") in the human-readable names.
+	- The pdftops filter now remaps the space character when
+	  (bad) PDF files contain a .notdef glyph for the space
+	  character.
 
 
 CHANGES IN CUPS V1.1.8
