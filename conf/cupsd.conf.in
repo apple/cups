@@ -1,0 +1,720 @@
+#
+# "$Id: cupsd.conf.in,v 1.2 2002/01/25 16:50:02 mike Exp $"
+#
+#   Sample configuration file for the Common UNIX Printing System (CUPS)
+#   scheduler.
+#
+#   Copyright 1997-2002 by Easy Software Products, all rights reserved.
+#
+#   These coded instructions, statements, and computer programs are the
+#   property of Easy Software Products and are protected by Federal
+#   copyright law.  Distribution and use rights are outlined in the file
+#   "LICENSE.txt" which should have been included with this file.  If this
+#   file is missing or damaged please contact Easy Software Products
+#   at:
+#
+#       Attn: CUPS Licensing Information
+#       Easy Software Products
+#       44141 Airport View Drive, Suite 204
+#       Hollywood, Maryland 20636-3111 USA
+#
+#       Voice: (301) 373-9603
+#       EMail: cups-info@cups.org
+#         WWW: http://www.cups.org
+#
+
+########################################################################
+#                                                                      #
+# This is the CUPS configuration file.  If you are familiar with       #
+# Apache or any of the other popular web servers, we've followed the   #
+# same format.  Any configuration variable used here has the same      #
+# semantics as the corresponding variable in Apache.  If we need       #
+# different functionality then a different name is used to avoid       #
+# confusion...                                                         #
+#                                                                      #
+########################################################################
+
+
+########
+######## Server Identity
+########
+
+#
+# ServerName: the hostname of your server, as advertised to the world.
+# By default CUPS will use the hostname of the system.
+#
+# To set the default server used by clients, see the client.conf file.
+#
+
+#ServerName myhost.domain.com
+
+#
+# ServerAdmin: the email address to send all complaints/problems to.
+# By default CUPS will use "root@hostname".
+#
+
+#ServerAdmin root@your.domain.com
+
+
+########
+######## Server Options
+########
+
+#
+# AccessLog: the access log file; if this does not start with a leading /
+# then it is assumed to be relative to ServerRoot.  By default set to
+# "@CUPS_LOGDIR@/access_log"
+#
+# You can also use the special name "syslog" to send the output to the
+# syslog file or daemon.
+#
+
+#AccessLog @CUPS_LOGDIR@/access_log
+
+#
+# Classification: the classification level of the server.  If set, this
+# classification is displayed on all pages, and raw printing is disabled.
+# The default is the empty string.
+#
+
+#Classification classified
+#Classification confidential
+#Classification secret
+#Classification topsecret
+#Classification unclassified
+
+#
+# ClassifyOverride: whether to allow users to override the classification
+# on printouts. If enabled, users can limit banner pages to before or
+# after the job, and can change the classification of a job, but cannot
+# completely eliminate the classification or banners.
+#
+# The default is off.
+#
+
+#ClassifyOverride off
+
+#
+# DataDir: the root directory for the CUPS data files.
+# By default "@CUPS_DATADIR@".
+#
+
+#DataDir @CUPS_DATADIR@
+
+#
+# DefaultCharset: the default character set to use. If not specified,
+# defaults to "utf-8".  Note that this can also be overridden in
+# HTML documents...
+#
+
+#DefaultCharset utf-8
+
+#
+# DefaultLanguage: the default language if not specified by the browser.
+# If not specified, the current locale is used.
+#
+
+#DefaultLanguage en
+
+#
+# DocumentRoot: the root directory for HTTP documents that are served.
+# By default "@CUPS_DOCROOT@".
+#
+
+#DocumentRoot @CUPS_DOCROOT@
+
+#
+# ErrorLog: the error log file; if this does not start with a leading /
+# then it is assumed to be relative to ServerRoot.  By default set to
+# "@CUPS_LOGDIR@/error_log"
+#
+# You can also use the special name "syslog" to send the output to the
+# syslog file or daemon.
+#
+
+#ErrorLog @CUPS_LOGDIR@/error_log
+
+#
+# FontPath: the path to locate all font files (currently only for pstoraster)
+# By default "@CUPS_FONTPATH@".
+#
+
+#FontPath @CUPS_FONTPATH@
+
+#
+# LogLevel: controls the number of messages logged to the ErrorLog
+# file and can be one of the following:
+#
+#     debug2	Log everything.
+#     debug	Log almost everything.
+#     info      Log all requests and state changes.
+#     warn      Log errors and warnings.
+#     error     Log only errors.
+#     none      Log nothing.
+#
+
+LogLevel info
+
+#
+# MaxLogSize: controls the maximum size of each log file before they are
+# rotated.  Defaults to 1048576 (1MB).  Set to 0 to disable log rotating.
+#
+
+#MaxLogSize 0
+
+#
+# PageLog: the page log file; if this does not start with a leading /
+# then it is assumed to be relative to ServerRoot.  By default set to
+# "@CUPS_LOGDIR@/page_log"
+#
+# You can also use the special name "syslog" to send the output to the
+# syslog file or daemon.
+#
+
+#PageLog @CUPS_LOGDIR@/page_log
+
+#
+# PreserveJobHistory: whether or not to preserve the job history after a
+# job is completed, cancelled, or stopped.  Default is Yes.
+#
+
+#PreserveJobHistory Yes
+
+#
+# PreserveJobFiles: whether or not to preserve the job files after a
+# job is completed, cancelled, or stopped.  Default is No.
+#
+
+#PreserveJobFiles No
+
+#
+# AutoPurgeJobs: automatically purge jobs when not needed for quotas.
+# Default is No.
+#
+
+#AutoPurgeJobs No
+
+#
+# MaxJobs: maximum number of jobs to keep in memory (active and completed.)
+# Default is 500; the value 0 is used for no limit.
+#
+
+#MaxJobs 500
+
+#
+# Printcap: the name of the printcap file.  Default is /etc/printcap.
+# Leave blank to disable printcap file generation.
+#
+
+#Printcap /etc/printcap
+
+#
+# PrintcapFormat: the format of the printcap file, currently either
+# BSD or Solaris.  The default is "BSD".
+#
+
+#PrintcapFormat BSD
+#PrintcapFormat Solaris
+
+#
+# PrintcapGUI: the name of the GUI options panel program to associate
+# with print queues under IRIX.  The default is "/usr/bin/glpoptions"
+# from ESP Print Pro.
+#
+# This option is only used under IRIX; the options panel program
+# must accept the "-d printer" and "-o options" options and write
+# the selected printer options back to stdout on completion.
+#
+
+#PrintcapGUI /usr/bin/glpoptions
+
+#
+# RequestRoot: the directory where request files are stored.
+# By default "@CUPS_REQUESTS@".
+#
+
+#RequestRoot @CUPS_REQUESTS@
+
+#
+# RemoteRoot: the name of the user assigned to unauthenticated accesses
+# from remote systems.  By default "remroot".
+#
+
+#RemoteRoot remroot
+
+#
+# ServerBin: the root directory for the scheduler executables.
+# By default "@CUPS_SERVERBIN@".
+#
+
+#ServerBin @CUPS_SERVERBIN@
+
+#
+# ServerRoot: the root directory for the scheduler.
+# By default "@CUPS_SERVERROOT@".
+#
+
+#ServerRoot @CUPS_SERVERROOT@
+
+
+########
+######## Encryption Support
+########
+
+#
+# ServerCertificate: the file to read containing the server's certificate.
+# Defaults to "@CUPS_SERVERROOT@/ssl/server.crt".
+#
+
+#ServerCertificate @CUPS_SERVERROOT@/ssl/server.crt
+
+#
+# ServerKey: the file to read containing the server's key.
+# Defaults to "@CUPS_SERVERROOT@/ssl/server.key".
+#
+
+#ServerKey @CUPS_SERVERROOT@/ssl/server.key
+
+
+########
+######## Filter Options
+########
+
+#
+# User/Group: the user and group the server runs under.  Normally this
+# must be lp and sys, however you can configure things for another user
+# or group as needed.
+#
+# Note: the server must be run initially as root to support the
+# default IPP port of 631.  It changes users whenever an external
+# program is run...
+#
+
+#User lp
+#Group sys
+
+#
+# RIPCache: the amount of memory that each RIP should use to cache
+# bitmaps.  The value can be any real number followed by "k" for
+# kilobytes, "m" for megabytes, "g" for gigabytes, or "t" for tiles
+# (1 tile = 256x256 pixels.)  Defaults to "8m" (8 megabytes).
+#
+
+#RIPCache 8m
+
+#
+# TempDir: the directory to put temporary files in.  This directory must be
+# writable by the user defined above!  Defaults to "@CUPS_REQUESTS@/tmp" or
+# the value of the TMPDIR environment variable.
+#
+
+#TempDir @CUPS_REQUESTS@/tmp
+
+#
+# FilterLimit: sets the maximum cost of all job filters that can be run
+# at the same time.  A limit of 0 means no limit.  A typical job may need
+# a filter limit of at least 200; limits less than the minimum required
+# by a job force a single job to be printed at any time.
+#
+# The default limit is 0 (unlimited).
+#
+
+#FilterLimit 0
+
+########
+######## Network Options
+########
+
+#
+# Ports/addresses that we listen to.  The default port 631 is reserved
+# for the Internet Printing Protocol (IPP) and is what we use here.
+#
+# You can have multiple Port/Listen lines to listen to more than one
+# port or address, or to restrict access:
+#
+#    Port 80
+#    Port 631
+#    Listen hostname
+#    Listen hostname:80
+#    Listen hostname:631
+#    Listen 1.2.3.4
+#    Listen 1.2.3.4:631
+# 
+# NOTE: Unfortunately, most web browsers don't support TLS or HTTP Upgrades
+# for encryption.  If you want to support web-based encryption you'll
+# probably need to listen on port 443 (the "https" port...)
+#
+
+#Port 80
+#Port 443
+Port 631
+
+#
+# HostNameLookups: whether or not to do lookups on IP addresses to get a
+# fully-qualified hostname.  This defaults to Off for performance reasons...
+#
+
+#HostNameLookups On
+
+#
+# KeepAlive: whether or not to support the Keep-Alive connection
+# option.  Default is on.
+#
+
+#KeepAlive On
+
+#
+# KeepAliveTimeout: the timeout before Keep-Alive connections are
+# automatically closed.  Default is 60 seconds.
+#
+
+#KeepAliveTimeout 60
+
+#
+# MaxClients: controls the maximum number of simultaneous clients that
+# will be handled.  Defaults to 100.
+#
+
+#MaxClients 100
+
+#
+# MaxRequestSize: controls the maximum size of HTTP requests and print files.
+# Set to 0 to disable this feature (defaults to 0.)
+#
+
+#MaxRequestSize 0
+
+#
+# Timeout: the timeout before requests time out.  Default is 300 seconds.
+#
+
+#Timeout 300
+
+
+########
+######## Browsing Options
+########
+
+#
+# Browsing: whether or not to broadcast and/or listen for CUPS printer
+# information on the network.  Enabled by default.
+#
+
+#Browsing On
+
+#
+# BrowseProtocols: which protocols to use for browsing.  Can be
+# any of the following separated by whitespace and/or commas:
+#
+#     all  - Use all supported protocols.
+#     cups - Use the CUPS browse protocol.
+#     slp  - Use the SLPv2 protocol.
+#
+# The default is "cups".
+#
+# NOTE: If you choose to use SLPv2, it is *strongly* recommended that
+#       you have at least one SLP Directory Agent (DA) on your
+#       network.  Otherwise, browse updates can take several seconds,
+#       during which the scheduler will not response to client
+#       requests.
+#
+
+#BrowseProtocols cups
+
+#
+# BrowseAddress: specifies a broadcast address to be used.  By
+# default browsing information is not sent!
+#
+# Note: HP-UX does not properly handle broadcast unless you have a
+# Class A, B, C, or D netmask (i.e. no CIDR support).
+#
+# Note: Using the "global" broadcast address (255.255.255.255) will
+# activate a Linux demand-dial link with the default configuration.
+# If you have a LAN as well as the dial-up link, use the LAN's
+# broadcast address.
+#
+
+#BrowseAddress x.y.z.255
+#BrowseAddress x.y.255.255
+#BrowseAddress x.255.255.255
+#BrowseAddress 255.255.255.255
+
+#
+# BrowseShortNames: whether or not to use "short" names for remote printers
+# when possible (e.g. "printer" instead of "printer@host".)  Enabled by
+# default.
+#
+
+#BrowseShortNames Yes
+
+#
+# BrowseAllow: specifies an address mask to allow for incoming browser
+# packets. The default is to allow packets from all addresses.
+#
+# BrowseDeny: specifies an address mask to deny for incoming browser
+# packets. The default is to deny packets from no addresses.
+#
+# Both "BrowseAllow" and "BrowseDeny" accept the following notations for
+# addresses:
+#
+#     All
+#     None
+#     *.domain.com
+#     .domain.com
+#     host.domain.com
+#     nnn.*
+#     nnn.nnn.*
+#     nnn.nnn.nnn.*
+#     nnn.nnn.nnn.nnn
+#     nnn.nnn.nnn.nnn/mm
+#     nnn.nnn.nnn.nnn/mmm.mmm.mmm.mmm
+#
+# The hostname/domainname restrictions only work if you have turned hostname
+# lookups on!
+#
+
+#BrowseAllow address
+#BrowseDeny address
+
+#
+# BrowseInterval: the time between browsing updates in seconds.  Default
+# is 30 seconds.
+#
+# Note that browsing information is sent whenever a printer's state changes
+# as well, so this represents the maximum time between updates.
+#
+# Set this to 0 to disable outgoing broadcasts so your local printers are
+# not advertised but you can still see printers on other hosts.
+#
+
+#BrowseInterval 30
+
+#
+# BrowseOrder: specifies the order of BrowseAllow/BrowseDeny comparisons.
+#
+
+#BrowseOrder allow,deny
+#BrowseOrder deny,allow
+
+#
+# BrowsePoll: poll the named server(s) for printers
+#
+
+#BrowsePoll address:port
+
+#
+# BrowsePort: the port used for UDP broadcasts.  By default this is
+# the IPP port; if you change this you need to do it on all servers.
+# Only one BrowsePort is recognized.
+#
+
+#BrowsePort 631
+
+#
+# BrowseRelay: relay browser packets from one address/network to another.
+#
+
+#BrowseRelay source-address destination-address
+
+#
+# BrowseTimeout: the timeout for network printers - if we don't
+# get an update within this time the printer will be removed
+# from the printer list.  This number definitely should not be
+# less the BrowseInterval value for obvious reasons.  Defaults
+# to 300 seconds.
+#
+
+#BrowseTimeout 300
+
+#
+# ImplicitClasses: whether or not to use implicit classes.
+#
+# Printer classes can be specified explicitly in the classes.conf
+# file, implicitly based upon the printers available on the LAN, or
+# both.
+#
+# When ImplicitClasses is On, printers on the LAN with the same name
+# (e.g. Acme-LaserPrint-1000) will be put into a class with the same
+# name. This allows you to setup multiple redundant queues on a LAN
+# without a lot of administrative difficulties.  If a user sends a
+# job to Acme-LaserPrint-1000, the job will go to the first available
+# queue.
+#
+# Enabled by default.
+#
+
+#ImplicitClasses On
+
+#
+# ImplicitAnyClasses: whether or not to create "AnyPrinter" implicit
+# classes.
+#
+# When ImplicitAnyClasses is On and a local queue of the same name
+# exists, e.g. "printer", "printer@server1", "printer@server1", then
+# an implicit class called "Anyprinter" is created instead.
+#
+# When ImplicitAnyClasses is Off, implicit classes are not created
+# when there is a local queue of the same name.
+#
+# Disabled by default.
+#
+
+#ImplicitAnyCLasses Off
+
+#
+# HideImplicitMembers: whether or not to show the members of an
+# implicit class.
+#
+# When HideImplicitMembers is On, any remote printers that are
+# part of an implicit class are hidden from the user, who will
+# then only see a single queue even though many queues will be
+# supporting the implicit class.
+#
+# Enabled by default.
+#
+
+#HideImplicitMembers On
+
+
+########
+######## Security Options
+########
+
+#
+# SystemGroup: the group name for "System" (printer administration)
+# access.  The default varies depending on the operating system, but
+# will be "sys", "system", or "root" (checked for in that order.)
+#
+
+#SystemGroup sys
+
+#
+# Access permissions for each directory served by the scheduler.
+# Locations are relative to DocumentRoot...
+#
+# AuthType: the authorization to use:
+#
+#    None   - Perform no authentication
+#    Basic  - Perform authentication using the HTTP Basic method.
+#    Digest - Perform authentication using the HTTP Digest method.
+#
+#    (Note: local certificate authentication can be substituted by
+#           the client for Basic or Digest when connecting to the
+#           localhost interface)
+#
+# AuthClass: the authorization class; currently only "Anonymous", "User",
+# "System" (valid user belonging to group SystemGroup), and "Group"
+# (valid user belonging to the specified group) are supported.
+#
+# AuthGroupName: the group name for "Group" authorization.
+#
+# Order: the order of Allow/Deny processing.
+#
+# Allow: allows access from the specified hostname, domain, IP address, or
+# network.
+#
+# Deny: denies access from the specified hostname, domain, IP address, or
+# network.
+#
+# Both "Allow" and "Deny" accept the following notations for addresses:
+#
+#     All
+#     None
+#     *.domain.com
+#     .domain.com
+#     host.domain.com
+#     nnn.*
+#     nnn.nnn.*
+#     nnn.nnn.nnn.*
+#     nnn.nnn.nnn.nnn
+#     nnn.nnn.nnn.nnn/mm
+#     nnn.nnn.nnn.nnn/mmm.mmm.mmm.mmm
+#
+# The host and domain address require that you enable hostname lookups
+# with "HostNameLookups On" above.
+#
+# Encryption: whether or not to use encryption; this depends on having
+# the OpenSSL library linked into the CUPS library and scheduler.
+#
+# Possible values:
+#
+#     Always       - Always use encryption (SSL)
+#     Never        - Never use encryption
+#     Required     - Use TLS encryption upgrade
+#     IfRequested  - Use encryption if the server requests it
+#
+# The default value is "IfRequested".
+#
+
+<Location />
+Order Deny,Allow
+Deny From All
+Allow From 127.0.0.1
+</Location>
+
+#<Location /classes>
+#
+# You may wish to limit access to printers and classes, either with Allow
+# and Deny lines, or by requiring a username and password.
+#
+#</Location>
+
+#<Location /classes/name>
+#
+# You may wish to limit access to printers and classes, either with Allow
+# and Deny lines, or by requiring a username and password.
+#
+#</Location>
+
+#<Location /printers>
+#
+# You may wish to limit access to printers and classes, either with Allow
+# and Deny lines, or by requiring a username and password.
+#
+#</Location>
+
+#<Location /printers/name>
+#
+# You may wish to limit access to printers and classes, either with Allow
+# and Deny lines, or by requiring a username and password.
+#
+
+## Anonymous access (default)
+#AuthType None
+
+## Require a username and password (Basic authentication)
+#AuthType Basic
+#AuthClass User
+
+## Require a username and password (Digest/MD5 authentication)
+#AuthType Digest
+#AuthClass User
+
+## Restrict access to local domain
+#Order Deny,Allow
+#Deny From All
+#Allow From .mydomain.com
+#</Location>
+
+<Location /admin>
+#
+# You definitely will want to limit access to the administration functions.
+# The default configuration requires a local connection from a user who
+# is a member of the system group to do any admin tasks.  You can change
+# the group name using the SystemGroup directive.
+#
+
+AuthType Basic
+AuthClass System
+
+## Restrict access to local domain
+Order Deny,Allow
+Deny From All
+Allow From 127.0.0.1
+
+#Encryption Required
+</Location>
+
+#
+# End of "$Id: cupsd.conf.in,v 1.2 2002/01/25 16:50:02 mike Exp $".
+#
