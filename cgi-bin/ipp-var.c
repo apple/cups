@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp-var.c,v 1.23.2.10 2003/04/08 03:48:03 mike Exp $"
+ * "$Id: ipp-var.c,v 1.23.2.11 2003/06/14 16:53:47 mike Exp $"
  *
  *   IPP variable routines for the Common UNIX Printing System (CUPS).
  *
@@ -101,13 +101,19 @@ ippSetCGIVars(ipp_t      *response,	/* I - Response data to be copied... */
   char			method[HTTP_MAX_URI],
 			username[HTTP_MAX_URI],
 			hostname[HTTP_MAX_URI],
+			rawresource[HTTP_MAX_URI],
 			resource[HTTP_MAX_URI],
-			uri[HTTP_MAX_URI];
+			uri[HTTP_MAX_URI],
+			*rawptr,	/* Pointer into rawresource */
+			*resptr;	/* Pointer into resource */
   int			port;		/* URI data */
   int			ishttps;	/* Using encryption? */
   const char		*server;	/* Name of server */
-  char			servername[1024];/* Locale server name */
+  char			servername[1024];
+					/* Locale server name */
   struct tm		*date;		/* Date information */
+  static const char	hexchars[] = "0123456789ABCDEF";
+					/* Hexadecimal conversion characters */
 
 
   DEBUG_printf(("<P>ippSetCGIVars(response=%p, filter_name=\"%s\", filter_value=\"%s\", prefix=\"%s\")\n",
@@ -270,12 +276,36 @@ ippSetCGIVars(ipp_t      *response,	/* I - Response data to be copied... */
 	  case IPP_TAG_URI :
 	      if (strchr(attr->values[i].string.text, ':') != NULL)
 	      {
+	       /*
+	        * Rewrite URIs...
+		*/
+
 		httpSeparate(attr->values[i].string.text, method, username,
-		             hostname, &port, resource);
+		             hostname, &port, rawresource);
 
         	if (strcmp(method, "ipp") == 0 ||
 	            strcmp(method, "http") == 0)
         	{
+        	 /*
+	          * Rewrite the resource string so it doesn't contain any
+		  * illegal chars...
+		  */
+
+                  for (rawptr = rawresource, resptr = resource; *rawptr;)
+		    if (*rawptr & 128 || *rawptr == '%' || *rawptr == ' ')
+		    {
+		      if (resptr < (resource + sizeof(resource) - 3))
+		      {
+		        *resptr++ = '%';
+			*resptr++ = hexchars[(*rawptr >> 4) & 15];
+			*resptr++ = hexchars[*rawptr & 15];
+		      }
+		    }
+		    else if (resptr < (resource + sizeof(resource) - 1))
+		      *resptr++ = *rawptr++;
+
+                  *resptr = '\0';
+
         	 /*
 		  * Map local access to a local URI...
 		  */
@@ -353,5 +383,5 @@ ippSetCGIVars(ipp_t      *response,	/* I - Response data to be copied... */
 
 
 /*
- * End of "$Id: ipp-var.c,v 1.23.2.10 2003/04/08 03:48:03 mike Exp $".
+ * End of "$Id: ipp-var.c,v 1.23.2.11 2003/06/14 16:53:47 mike Exp $".
  */

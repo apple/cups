@@ -3,6 +3,8 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.20rc1
 
+	- Printers with special characters in their names were
+	  not accessible from the web interface (STR #120)
 	- The lpstat command now shows the correct interface
 	  script or PPD file, if any, for a print queue (STR #89)
 	- The lpstat command now shows the printer-state-message
