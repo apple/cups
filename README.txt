@@ -258,7 +258,7 @@ The PostScript RIP software (pstoraster) is based on the GNU
 Ghostscript 5.50 core, Copyright 1986-1998 by Aladdin
 Enterprises.
 
-The PDF filter (pdftops) is based on the Xpdf 1.01 software,
+The PDF filter (pdftops) is based on the Xpdf software,
 Copyright 1996-2002 by Derek B. Noonburg.
 
 This software is based in part on the work of the Independent
