@@ -1,0 +1,122 @@
+#
+# "$Id: ipp.list.in,v 1.1.2.1 2002/03/22 16:01:37 mike Exp $"
+#
+#   ESP Package Manager (EPM) file list for the Common UNIX Printing
+#   System (CUPS).
+#
+#   Copyright 1997-2002 by Easy Software Products, all rights reserved.
+#
+#   These coded instructions, statements, and computer programs are the
+#   property of Easy Software Products and are protected by Federal
+#   copyright law.  Distribution and use rights are outlined in the file
+#   "LICENSE.txt" which should have been included with this file.  If this
+#   file is missing or damaged please contact Easy Software Products
+#   at:
+#
+#       Attn: CUPS Licensing Information
+#       Easy Software Products
+#       44141 Airport View Drive, Suite 204
+#       Hollywood, Maryland 20636-3111 USA
+#
+#       Voice: (301) 373-9603
+#       EMail: cups-info@cups.org
+#         WWW: http://www.cups.org
+#
+
+# Product information
+%product Common UNIX Printing System IPP Library
+%copyright 1993-2002 by Easy Software Products, All Rights Reserved.
+%vendor Easy Software Products
+%license LICENSE.txt
+%readme README.txt
+%version @CUPS_VERSION@
+%description The IPP library provides Internet Printing Protocol client
+%description and server functionality.
+
+#
+# GNU variables...
+#
+
+$prefix=@prefix@
+$exec_prefix=@exec_prefix@
+$bindir=@bindir@
+$datadir=@datadir@
+$includedir=@includedir@
+$infodir=@infodir@
+$libdir=@libdir@
+$libexecdir=@libexecdir@
+$localstatedir=@localstatedir@
+$mandir=@mandir@
+$oldincludedir=@oldincludedir@
+$sbindir=@sbindir@
+$sharedstatedir=@sharedstatedir@
+$srcdir=@srcdir@
+$sysconfdir=@sysconfdir@
+$top_srcdir=@top_srcdir@
+
+#
+# ESP variables...
+#
+
+$AMANDIR=@AMANDIR@
+$BINDIR=@bindir@
+$DATADIR=@CUPS_DATADIR@
+$DOCDIR=@CUPS_DOCROOT@
+$INCLUDEDIR=${includedir}
+$INITDIR=@INITDIR@
+$INITDDIR=@INITDDIR@
+$LIBDIR=${libdir}
+$LOCALEDIR=@CUPS_LOCALEDIR@
+$LOGDIR=@CUPS_LOGDIR@
+$MANDIR=@mandir@
+$PAMDIR=@PAMDIR@
+$PMANDIR=@PMANDIR@
+$REQUESTS=@CUPS_REQUESTS@
+$SBINDIR=@sbindir@
+$SERVERBIN=@CUPS_SERVERBIN@
+$SERVERROOT=@CUPS_SERVERROOT@
+
+$CAT1EXT=@CAT1EXT@
+$CAT3EXT=@CAT3EXT@
+$CAT5EXT=@CAT5EXT@
+$CAT8EXT=@CAT8EXT@
+$MAN8EXT=@MAN8EXT@
+$MAN8DIR=@MAN8DIR@
+
+# Make sure the shared libraries are refreshed...
+%system linux
+%postinstall ldconfig
+%system all
+
+# DSOs
+%system hpux
+f 0555 root sys $LIBDIR/libipp.sl.3 ipp/libipp.sl.3
+l 0555 root sys $LIBDIR/libipp.sl libipp.sl.3
+%system aix
+f 0555 root sys $LIBDIR/libipp_s.a ipp/libipp_s.a
+%system !hpux !aix
+f 0555 root sys $LIBDIR/libipp.so.3 ipp/libipp.so.3
+l 0555 root sys $LIBDIR/libipp.so libipp.so.3
+%system all
+
+# Developer files
+#f 0555 root sys $BINDIR/ipp-config ipp-config
+
+d 0555 root sys $INCLUDEDIR/ipp -
+f 0444 root sys $INCLUDEDIR/ipp/http.h ipp/http.h
+f 0444 root sys $INCLUDEDIR/ipp/ipp.h ipp/ipp.h
+f 0444 root sys $INCLUDEDIR/ipp/md5.h ipp/md5.h
+
+f 0444 root sys $LIBDIR/libipp.a ipp/libipp.a
+
+# Man pages
+#d 0555 root sys $PMANDIR/cat3 -
+#d 0555 root sys $PMANDIR/man3 -
+
+#f 0444 root sys $PMANDIR/cat3/ipp-config.$CAT3EXT man/ipp-config.$CAT3EXT
+
+#f 0444 root sys $PMANDIR/man3/ipp-config.$MAN3EXT man/ipp-config.man
+
+#
+# End of "$Id: ipp.list.in,v 1.1.2.1 2002/03/22 16:01:37 mike Exp $".
+#

@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile.in,v 1.1.2.1 2002/03/22 15:47:23 mike Exp $"
+# "$Id: Makefile.in,v 1.1.2.2 2002/03/22 16:01:36 mike Exp $"
 #
 #   IPP library Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -171,6 +171,37 @@ testhttp:	testhttp.o libipp.a
 
 
 #
+# Make software distributions using EPM (http://www.easysw.com/epm/)...
+#
+
+EPMFLAGS	=	-v
+
+aix:
+	epm $(EPMFLAGS) -f aix ipp
+
+bsd:
+	epm $(EPMFLAGS) -f bsd ipp
+
+epm:
+	epm $(EPMFLAGS) ipp
+
+rpm:
+	epm $(EPMFLAGS) -f rpm ipp
+
+deb:
+	epm $(EPMFLAGS) -f deb ipp
+
+depot:
+	epm $(EPMFLAGS) -f depot ipp
+
+pkg:
+	epm $(EPMFLAGS) -f pkg ipp
+
+tardist:
+	epm $(EPMFLAGS) -f tardist ipp
+
+
+#
 # Dependencies...
 #
   
@@ -178,5 +209,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile.in,v 1.1.2.1 2002/03/22 15:47:23 mike Exp $".
+# End of "$Id: Makefile.in,v 1.1.2.2 2002/03/22 16:01:36 mike Exp $".
 #
