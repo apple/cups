@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c,v 1.53 2001/06/28 18:01:17 mike Exp $"
+ * "$Id: ppd.c,v 1.54 2001/06/29 16:33:06 mike Exp $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -525,6 +525,21 @@ ppdOpen(FILE *fp)		/* I - File to read from */
     puts("");
 #endif /* DEBUG */
 
+    if (strcmp(keyword, "CloseUI") != 0 &&
+        strcmp(keyword, "JCLCloseUI") != 0 &&
+        strcmp(keyword, "CloseGroup") != 0 &&
+	strcmp(keyword, "CloseSubGroup") != 0 &&
+	strncmp(keyword, "Default", 7) != 0 &&
+	string == NULL)
+    {
+     /*
+      * Need a string value!
+      */
+
+      ppdClose(ppd);
+      return (NULL);
+    }
+
     if (strcmp(keyword, "LanguageLevel") == 0)
       ppd->language_level = atoi(string);
     else if (strcmp(keyword, "LanguageEncoding") == 0)
@@ -912,12 +927,6 @@ ppdOpen(FILE *fp)		/* I - File to read from */
 
       if (name[0] == '*')
         strcpy(name, name + 1);
-
-      if (string == NULL)
-      {
-        ppdClose(ppd);
-	return (NULL);
-      }
 
       if (subgroup != NULL)
         option = ppd_get_option(subgroup, name);
@@ -1606,6 +1615,7 @@ ppd_read(FILE *fp,		/* I - File to read from */
 	 char **string)		/* O - Code/string data */
 {
   int		ch,		/* Character from file */
+		colon,		/* Colon seen? */
 		endquote,	/* Waiting for an end quote */
 		mask;		/* Mask to be returned */
   char		*keyptr,	/* Keyword pointer */
@@ -1638,6 +1648,7 @@ ppd_read(FILE *fp,		/* I - File to read from */
 
     lineptr  = line;
     endquote = 0;
+    colon    = 0;
 
     while ((ch = getc(fp)) != EOF &&
            (lineptr - line) < (sizeof(line) - 1))
@@ -1678,7 +1689,10 @@ ppd_read(FILE *fp,		/* I - File to read from */
 
 	*lineptr++ = ch;
 
-	if (ch == '\"')
+	if (ch == ':')
+	  colon = 1;
+
+	if (ch == '\"' && colon)
         {
 	  endquote = !endquote;
 
@@ -1786,13 +1800,15 @@ ppd_read(FILE *fp,		/* I - File to read from */
     *keyptr = '\0';
     mask |= PPD_KEYWORD;
 
-    if (*lineptr == ' ' || *lineptr == '\t')
+    DEBUG_printf(("keyword = \"%s\", lineptr = \"%s\"\n", keyword, lineptr));
+
+    if (isspace(*lineptr))
     {
      /*
       * Get an option name...
       */
 
-      while (*lineptr == ' ' || *lineptr == '\t')
+      while (isspace(*lineptr))
         lineptr ++;
 
       optptr = option;
@@ -1803,6 +1819,8 @@ ppd_read(FILE *fp,		/* I - File to read from */
 
       *optptr = '\0';
       mask |= PPD_OPTION;
+
+      DEBUG_printf(("option = \"%s\", lineptr = \"%s\"\n", option, lineptr));
 
       if (*lineptr == '/')
       {
@@ -1823,6 +1841,8 @@ ppd_read(FILE *fp,		/* I - File to read from */
 
 	mask |= PPD_TEXT;
       }
+
+      DEBUG_printf(("text = \"%s\", lineptr = \"%s\"\n", text, lineptr));
     }
 
     if (*lineptr == ':')
@@ -1847,6 +1867,8 @@ ppd_read(FILE *fp,		/* I - File to read from */
       }
 
       *strptr = '\0';
+
+      DEBUG_printf(("string = \"%s\", lineptr = \"%s\"\n", *string, lineptr));
 
       mask |= PPD_STRING;
     }
@@ -1962,5 +1984,5 @@ ppd_fix(char *string)		/* IO - String to fix */
 
 
 /*
- * End of "$Id: ppd.c,v 1.53 2001/06/28 18:01:17 mike Exp $".
+ * End of "$Id: ppd.c,v 1.54 2001/06/29 16:33:06 mike Exp $".
  */
