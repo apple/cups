@@ -1,27 +1,9 @@
 /*
-   +----------------------------------------------------------------------+
-   | PHP version 4.0                                                      |
-   +----------------------------------------------------------------------+
-   | Copyright (c) 1997, 1998, 1999, 2000, 2001 The PHP Group             |
-   +----------------------------------------------------------------------+
-   | This source file is subject to version 2.02 of the PHP license,      |
-   | that is bundled with this package in the file LICENSE, and is        |
-   | available at through the world-wide-web at                           |
-   | http://www.php.net/license/2_02.txt.                                 |
-   | If you did not receive a copy of the PHP license and are unable to   |
-   | obtain it through the world-wide-web, please send a note to          |
-   | license@php.net so we can mail you a copy immediately.               |
-   +----------------------------------------------------------------------+
-   | Authors:                                                             |
-   |                                                                      |
-   +----------------------------------------------------------------------+
- */
-
-/*
+ * "$Id: phpcups.c,v 1.3 2003/04/08 19:56:25 mike Exp $"
  *
- *   Printing utilities for the Common UNIX Printing System (CUPS).
+ *   PHP module for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2002 by Easy Software Products.
+ *   Copyright 1997-2003 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -38,10 +20,13 @@
  *       Voice: (301) 373-9603
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
+ *
+ * Contents:
+ *
  */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#  include "config.h"
 #endif
 
 #include "php.h"
@@ -70,14 +55,26 @@
 #endif /* WIN32 || __EMX__ */
 
 
-static int le_result, le_link, le_plink;
+/*
+ * Local structures and types...
+ */
 
-
+typedef struct printer_attrs_str
+{
+  char      *name;				/* Name of attribute */
+  char      *value;				/* Value of attribute */
+} printer_attrs_t;
 
 
 /*
  * Local globals...
  */
+
+#if 0
+static int		le_result,		/* */
+			le_link,		/* */
+			le_plink;		/* */
+#endif /* 0 */
 
 static http_t		*cups_server = NULL;	/* Current server connection */
 static ipp_status_t	last_error = IPP_OK;	/* Last IPP error */
@@ -85,93 +82,21 @@ static char		authstring[HTTP_MAX_VALUE] = "";
 						/* Authorization string */
 static char		pwdstring[33] = "";	/* Last password string */
 
-typedef struct printer_attrs_type
-{
-  char      *name;
-  char      *value;
-} printer_attrs_t;
-
-
-int              num_attrs = 0;
-printer_attrs_t  *printer_attrs = NULL;
-
-int  _phpcups_get_printer_status(char *name );
-void free_attrs_list(void);
-void _phpcups_free_attrs_list(void);
-
-
-
+static int		num_attrs = 0;		/* Number of attributes */
+static printer_attrs_t	*printer_attrs = NULL;	/* Attributes */
 
 
 /*
- *  *******************************************************************
- *
- *  CUPS prototypes from the file cups/util.c of the cups distribution.
- *
- *  *******************************************************************
+ * Local functions...
  */
 
+void		_phpcups_free_attrs_list(void);
+int		_phpcups_get_printer_status(char *name);
+/*static void	free_attrs_list(void);*/
 
-int				/* O - 1 on success, 0 on failure */
-cupsCancelJob(const char *name,	/* I - Name of printer or class */
-              int        job);	/* I - Job ID */
-
-ipp_t *					/* O - Response data */
-cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
-                  ipp_t      *request,	/* I - IPP request */
-                  const char *resource,	/* I - HTTP resource for POST */
-		  const char *filename);	/* I - File to send or NULL */
-void
-cupsFreeJobs(int        num_jobs,/* I - Number of jobs */
-             cups_job_t *jobs);	 /* I - Jobs */
-
-int				        /* O - Number of classes */
-cupsGetClasses(char ***classes);	/* O - Classes */
-
-const char *			/* O - Default printer or NULL */
-cupsGetDefault(void);
-
-
-int					/* O - Number of jobs */
-cupsGetJobs(cups_job_t **jobs,		/* O - Job data */
-            const char *mydest,		/* I - Only show jobs for dest? */
-            int        myjobs,		/* I - Only show my jobs? */
-	    int        completed);	/* I - Only show completed jobs? */
-
-const char *				/* O - Filename for PPD file */
-cupsGetPPD(const char *name);		/* I - Printer name */
-
-int					/* O - Number of printers */
-cupsGetPrinters(char ***printers);	/* O - Printers */
-
-
-ipp_status_t		/* O - IPP error code */
-cupsLastError(void);
-
-int					/* O - Job ID */
-cupsPrintFile(const char    *name,	/* I - Printer or class name */
-              const char    *filename,	/* I - File to print */
-	      const char    *title,	/* I - Title of job */
-              int           num_options,/* I - Number of options */
-	      cups_option_t *options);	/* I - Options */
-
-
-int					/* O - Job ID */
-cupsPrintFiles(const char    *name,	/* I - Printer or class name */
-               int           num_files,	/* I - Number of files */
-               const char    **files,	/* I - File(s) to print */
-	       const char    *title,	/* I - Title of job */
-               int           num_options,/* I - Number of options */
-	       cups_option_t *options);	/* I - Options */
-
-
-static char *				/* I - Printer name or NULL */
-cups_connect(const char *name,		/* I - Destination (printer[@host]) */
-	     char       *printer,	/* O - Printer name [HTTP_MAX_URI] */
-             char       *hostname);	/* O - Hostname [HTTP_MAX_URI] */
-
-static int			/* O - 1 if available, 0 if not */
-cups_local_auth(http_t *http);	/* I - Connection */
+static char	*cups_connect(const char *name, char *printer,
+		              char *hostname);
+static int	cups_local_auth(http_t *http);
 
 /*
  *  *********************************************************************
@@ -185,7 +110,7 @@ ZEND_DECLARE_MODULE_GLOBALS(phpcups)
 */
 
 /* True global resources - no need for thread safety here */
-static int le_phpcups;
+/*static int le_phpcups;*/
 
 /* 
  * Every user visible function must have an entry in phpcups_functions[].
@@ -347,8 +272,8 @@ PHP_FUNCTION(confirm_phpcups_compiled)
  */
 PHP_FUNCTION(cups_get_dest_options)
 {
-    char        *arg = NULL;
-    int         arg_len, len;
+/*    char        *arg = NULL;
+    int         arg_len, len;*/
 
     zval        *new_object;
 
@@ -360,7 +285,7 @@ PHP_FUNCTION(cups_get_dest_options)
                 c_name[256], 
                 c_instance[256];
 
-    char	l_server[256],
+    char	/*l_server[256],*/
                 l_name[256], 
                 l_instance[256];
 
@@ -459,8 +384,8 @@ PHP_FUNCTION(cups_get_dest_options)
  */
 PHP_FUNCTION(cups_get_dest_list)
 {
-    char        *arg = NULL;
-    int         arg_len, len;
+/*    char        *arg = NULL;
+    int         arg_len, len;*/
 
     zval        **z_server;
     zval        *new_object;
@@ -468,7 +393,7 @@ PHP_FUNCTION(cups_get_dest_list)
     char        c_server[256];
 
     char        string[2560];
-    char        temp[256];
+/*    char        temp[256];*/
 
     cups_dest_t *dests, *dptr;
     int         num_dests;
@@ -583,11 +508,11 @@ PHP_FUNCTION(cups_get_dest_list)
  */
 PHP_FUNCTION( cups_get_jobs )
 {
-    char        *arg = NULL;
+/*    char        *arg = NULL;
 
     int         arg_len, 
                 len;
-
+*/
     zval        *new_object;
 
     zval        **z_server,
@@ -887,7 +812,7 @@ cups_option_t *_phpcups_parse_options( cups_option_t *options,
       options->value = (char *)emalloc(strlen(value)+1);
       strcpy( options->name, name );
       strcpy( options->value, value );
-      *num_options++;
+      (*num_options)++;
     }
     else
     {
@@ -897,7 +822,7 @@ cups_option_t *_phpcups_parse_options( cups_option_t *options,
       options[*num_options].value = (char *)emalloc(strlen(value)+1);
       strcpy( options[*num_options].name, name );
       strcpy( options[*num_options].value, value );
-      *num_options++;
+      (*num_options)++;
     }
   }
   return(options);
@@ -1216,7 +1141,7 @@ int _phpcups_get_printer_status(char *name )
 
   char          printer_uri[1024];
   char          temp[1024];
-  static char  *req_attrs[] = {"printer-state", "printer-state-reason" };
+/*  static char  *req_attrs[] = {"printer-state", "printer-state-reason" };*/
   int          i;
 
   if (name == NULL)
@@ -3039,9 +2964,5 @@ cups_local_auth(http_t *http)	/* I - Connection */
 
 
 /*
- * End of "$Id: phpcups.c,v 1.2 2003/04/08 18:42:10 mike Exp $".
- */
-
-
-/*
+ * End of "$Id: phpcups.c,v 1.3 2003/04/08 19:56:25 mike Exp $".
  */

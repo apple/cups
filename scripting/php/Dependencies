@@ -1,0 +1,6 @@
+# DO NOT DELETE
+
+phpcups.o: php_phpcups.h ../../cups/cups.h ../../cups/ipp.h ../../cups/http.h
+phpcups.o: ../../cups/md5.h ../../cups/ppd.h ../../cups/ipp.h
+phpcups.o: ../../cups/language.h ../../cups/string.h ../../config.h
+phpcups.o: ../../cups/debug.h
