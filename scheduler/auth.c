@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.c,v 1.60 2002/06/11 18:33:57 mike Exp $"
+ * "$Id: auth.c,v 1.61 2002/06/11 18:35:22 mike Exp $"
  *
  *   Authorization routines for the Common UNIX Printing System (CUPS).
  *
@@ -39,12 +39,12 @@
  *   FindBest()           - Find the location entry that best matches the
  *                          resource.
  *   FindLocation()       - Find the named location.
+ *   GetMD5Passwd()       - Get an MD5 password.
  *   IsAuthorized()       - Check to see if the user is authorized...
  *   add_allow()          - Add an allow mask to the location.
  *   add_deny()           - Add a deny mask to the location.
  *   cups_crypt()         - Encrypt the password using the DES or MD5
  *                          algorithms, as needed.
- *   GetMD5Passwd()     - Get an MD5 password.
  *   pam_func()           - PAM conversation function.
  *   to64()               - Base64-encode an integer value...
  */
@@ -1623,5 +1623,5 @@ to64(char          *s,	/* O - Output string */
 
 
 /*
- * End of "$Id: auth.c,v 1.60 2002/06/11 18:33:57 mike Exp $".
+ * End of "$Id: auth.c,v 1.61 2002/06/11 18:35:22 mike Exp $".
  */
