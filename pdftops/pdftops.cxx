@@ -81,6 +81,7 @@ int main(int argc, char *argv[]) {
   width  = 595;
   length = 792;
   level  = psLevel2;
+  duplex = 0;
 
   // Get PPD and initialize options as needed...
   num_options = cupsParseOptions(argv[5], 0, &options);
