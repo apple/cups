@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.216 2003/07/20 12:42:34 mike Exp $"
+ * "$Id: job.c,v 1.217 2003/07/20 15:15:08 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -1210,7 +1210,8 @@ StartJob(int       id,			/* I - Job ID */
 		nlspath[1024],		/* NLSPATH environment variable */
 		datadir[1024],		/* CUPS_DATADIR environment variable */
 		fontpath[1050],		/* CUPS_FONTPATH environment variable */
-		vg_args[1024];		/* VG_ARGS environment variable */
+		vg_args[1024],		/* VG_ARGS environment variable */
+		ld_assume_kernel[1024];	/* LD_ASSUME_KERNEL environment variable */
   static char	*options = NULL;	/* Full list of options */
   static int	optlength = 0;		/* Length of option buffer */
 
@@ -1726,6 +1727,13 @@ StartJob(int       id,			/* I - Job ID */
   {
     snprintf(vg_args, sizeof(vg_args), "VG_ARGS=%s", getenv("VG_ARGS"));
     envp[envc ++] = vg_args;
+  }
+
+  if (getenv("LD_ASSUME_KERNEL") != NULL)
+  {
+    snprintf(ld_assume_kernel, sizeof(ld_assume_kernel), "LD_ASSUME_KERNEL=%s",
+             getenv("LD_ASSUME_KERNEL"));
+    envp[envc ++] = ld_assume_kernel;
   }
 
   if (getenv("LD_LIBRARY_PATH") != NULL)
@@ -2682,5 +2690,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.216 2003/07/20 12:42:34 mike Exp $".
+ * End of "$Id: job.c,v 1.217 2003/07/20 15:15:08 mike Exp $".
  */
