@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-prolog.c,v 1.19 1999/12/07 21:55:51 mike Exp $"
+ * "$Id: hpgl-prolog.c,v 1.20 1999/12/16 22:47:56 mike Exp $"
  *
  *   HP-GL/2 prolog routines for for the Common UNIX Printing System (CUPS).
  *
@@ -106,7 +106,7 @@ OutputTrailer(void)
   if (PageDirty)
     PG_advance_page(0, NULL);
 
-  puts("%%BeginTrailer");
+  puts("%%Trailer");
   printf("%%%%Pages: %d\n", PageCount);
   puts("%%EOF");
 }
@@ -140,8 +140,6 @@ Outputf(const char *format,	/* I - Printf-style string */
   {
     PageDirty = 1;
     PageCount ++;
-
-    printf("%%%%Page: %d %d\n", PageCount, PageCount);
 
     if (PPD != NULL && !FitPlot)
     {
@@ -187,7 +185,7 @@ Outputf(const char *format,	/* I - Printf-style string */
 	option = ppdFindOption(PPD, "PageSize");
 	choice = ppdFindChoice(option, size->name);
 
-        puts("%%BeginPageSetup");
+        puts("%%BeginSetup");
         printf("%%%%BeginFeature: PageSize %s\n", size->name);
 
         if (strcasecmp(size->name, "custom") == 0)
@@ -261,7 +259,7 @@ Outputf(const char *format,	/* I - Printf-style string */
       }
     }
 
-    printf("/PenScaling %.3f def\n", PenScaling);
+    printf("%%%%Page: %d %d\n", PageCount, PageCount);
 
     printf("/SA {\n"
            "	/%s%s%s%s findfont\n"
@@ -365,5 +363,5 @@ Outputf(const char *format,	/* I - Printf-style string */
 
 
 /*
- * End of "$Id: hpgl-prolog.c,v 1.19 1999/12/07 21:55:51 mike Exp $".
+ * End of "$Id: hpgl-prolog.c,v 1.20 1999/12/16 22:47:56 mike Exp $".
  */

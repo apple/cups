@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-config.c,v 1.19 1999/12/07 21:55:51 mike Exp $"
+ * "$Id: hpgl-config.c,v 1.20 1999/12/16 22:47:55 mike Exp $"
  *
  *   HP-GL/2 configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -149,23 +149,11 @@ update_transform(void)
   * Rotate the plot as needed...
   */
 
-  if (Rotation == 0 || Rotation == 180)
+  if ((width > height && page_width > page_height) ||
+      (width < height && page_width < page_height))
   {
-    if ((width > height && page_width < page_height) ||
-        (width < height && page_width > page_height))
-    {
-      fputs("DEBUG: Automatically rotating the page...\n", stderr);
-      Rotation += 90;
-    }
-  }
-  else
-  {
-    if ((width > height && page_width > page_height) ||
-        (width < height && page_width < page_height))
-    {
-      fputs("DEBUG: Automatically rotating the page...\n", stderr);
-      Rotation = (Rotation + 90) % 360;
-    }
+    fputs("DEBUG: Automatically rotating the page...\n", stderr);
+    Rotation = (Rotation + 90) % 360;
   }
 
  /*
@@ -643,5 +631,5 @@ SC_scale(int     num_params,	/* I - Number of parameters */
 
 
 /*
- * End of "$Id: hpgl-config.c,v 1.19 1999/12/07 21:55:51 mike Exp $".
+ * End of "$Id: hpgl-config.c,v 1.20 1999/12/16 22:47:55 mike Exp $".
  */

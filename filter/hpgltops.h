@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgltops.h,v 1.13 1999/11/01 16:53:42 mike Exp $"
+ * "$Id: hpgltops.h,v 1.14 1999/12/16 22:47:56 mike Exp $"
  *
  *   HP-GL/2 to PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -117,7 +117,7 @@ VAR int		PenMotion	VALUE(0), 	/* 0 = absolute, 1 = relative */
 		PenCount	VALUE(8),	/* Number of pens */
 		PenDown		VALUE(0),	/* 0 = pen up, 1 = pen down */
 		PolygonMode	VALUE(0),	/* Drawing polygons? */
-		PageCount	VALUE(1),	/* Number of pages in plot */
+		PageCount	VALUE(0),	/* Number of pages in plot */
 		PageDirty	VALUE(0),	/* Current page written on? */
 		WidthUnits	VALUE(0);	/* 0 = mm, 1 = proportionate */
 VAR float	PlotSize[2]	VALUE2(2592.0f, 3456.0f);
@@ -228,5 +228,5 @@ extern void	OutputTrailer(void);
 extern int	Outputf(const char *format, ...);
 
 /*
- * End of "$Id: hpgltops.h,v 1.13 1999/11/01 16:53:42 mike Exp $".
+ * End of "$Id: hpgltops.h,v 1.14 1999/12/16 22:47:56 mike Exp $".
  */
