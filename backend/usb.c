@@ -1,5 +1,5 @@
 /*
- * "$Id: usb.c,v 1.18.2.30 2004/02/24 16:19:55 mike Exp $"
+ * "$Id: usb.c,v 1.18.2.31 2004/03/19 12:07:00 mike Exp $"
  *
  *   USB port backend for the Common UNIX Printing System (CUPS).
  *
@@ -660,6 +660,7 @@ open_device(const char *uri)		/* I - Device URI */
     */
 
     int		i;			/* Looping var */
+    int		busy;			/* Are any ports busy? */
     int		length;			/* Length of device ID info */
     int		fd;			/* File descriptor */
     char	format[255],		/* Format for device filename */
@@ -684,52 +685,79 @@ open_device(const char *uri)		/* I - Device URI */
     * Then find the correct USB device...
     */
 
-    for (i = 0; i < 16; i ++)
+    do
     {
-      sprintf(device, format, i);
-
-      if ((fd = open(device, O_RDWR | O_EXCL)) >= 0)
+      for (busy = 0, i = 0; i < 16; i ++)
       {
-	if (ioctl(fd, LPIOC_GET_DEVICE_ID(sizeof(device_id)), device_id) == 0)
+	sprintf(device, format, i);
+
+	if ((fd = open(device, O_RDWR | O_EXCL)) >= 0)
 	{
-	  length = (((unsigned)device_id[0] & 255) << 8) +
-	           ((unsigned)device_id[1] & 255);
-	  memmove(device_id, device_id + 2, length);
-	  device_id[length] = '\0';
+	  if (ioctl(fd, LPIOC_GET_DEVICE_ID(sizeof(device_id)), device_id) == 0)
+	  {
+	    length = (((unsigned)device_id[0] & 255) << 8) +
+	             ((unsigned)device_id[1] & 255);
+	    memmove(device_id, device_id + 2, length);
+	    device_id[length] = '\0';
+	  }
+	  else
+            device_id[0] = '\0';
 	}
 	else
-          device_id[0] = '\0';
-      }
-      else
-	device_id[0] = '\0';
-
-      if (device_id[0])
-      {
-       /*
-        * Got the device ID - is this the one?
-	*/
-
-	decode_device_id(i, device_id, make_model, sizeof(make_model),
-                	 device_uri, sizeof(device_uri));
-
-        if (strcmp(uri, device_uri) == 0)
 	{
 	 /*
-	  * Yes, return this file descriptor...
+	  * If the open failed because it was busy, flag it so we retry
+	  * as needed...
 	  */
 
-	  fprintf(stderr, "DEBUG: Printer using device file \"%s\"...\n", device);
+	  if (errno == EBUSY)
+	    busy = 1;
 
-	  return (fd);
+	  device_id[0] = '\0';
+        }
+
+	if (device_id[0])
+	{
+	 /*
+          * Got the device ID - is this the one?
+	  */
+
+	  decode_device_id(i, device_id, make_model, sizeof(make_model),
+                	   device_uri, sizeof(device_uri));
+
+          if (strcmp(uri, device_uri) == 0)
+	  {
+	   /*
+	    * Yes, return this file descriptor...
+	    */
+
+	    fprintf(stderr, "DEBUG: Printer using device file \"%s\"...\n", device);
+
+	    return (fd);
+	  }
 	}
+
+       /*
+	* This wasn't the one...
+	*/
+
+        if (fd >= 0)
+	  close(fd);
       }
 
      /*
-      * This wasn't the one...
+      * If we get here and at least one of the printer ports showed up
+      * as "busy", then sleep for a bit and retry...
       */
 
-      close(fd);
+      if (busy)
+      {
+	fputs("INFO: USB printer is busy; will retry in 5 seconds...\n",
+	      stderr);
+	sleep(5);
+      }
     }
+    while (busy);
 
    /*
     * Couldn't find the printer, return "no such device or address"...
@@ -747,6 +775,7 @@ open_device(const char *uri)		/* I - Device URI */
     */
 
     int		i;			/* Looping var */
+    int		busy;			/* Are any ports busy? */
     int		fd;			/* File descriptor */
     char	device[255],		/* Device filename */
 		device_id[1024],	/* Device ID string */
@@ -759,49 +788,76 @@ open_device(const char *uri)		/* I - Device URI */
     * Find the correct USB device...
     */
 
-    for (i = 0; i < 8; i ++)
+    do
     {
-      sprintf(device, "/dev/usb/printer%d", i);
-
-      if ((fd = open(device, O_RDWR | O_EXCL)) >= 0)
+      for (i = 0; i < 8; i ++)
       {
-	did.mode = ECPP_CENTRONICS;
-	did.len  = sizeof(device_id);
-	did.rlen = 0;
-	did.addr = device_id;
+	sprintf(device, "/dev/usb/printer%d", i);
 
-	if (ioctl(fd, ECPPIOC_GETDEVID, &did) == 0)
+	if ((fd = open(device, O_RDWR | O_EXCL)) >= 0)
 	{
-          if (did.rlen < (sizeof(device_id) - 1))
-	    device_id[did.rlen] = '\0';
-          else
-	    device_id[sizeof(device_id) - 1] = '\0';
+	  did.mode = ECPP_CENTRONICS;
+	  did.len  = sizeof(device_id);
+	  did.rlen = 0;
+	  did.addr = device_id;
+
+	  if (ioctl(fd, ECPPIOC_GETDEVID, &did) == 0)
+	  {
+            if (did.rlen < (sizeof(device_id) - 1))
+	      device_id[did.rlen] = '\0';
+            else
+	      device_id[sizeof(device_id) - 1] = '\0';
+	  }
+	  else
+            device_id[0] = '\0';
 	}
 	else
-          device_id[0] = '\0';
-      }
-      else
-	device_id[0] = '\0';
+	{
+	 /*
+	  * If the open failed because it was busy, flag it so we retry
+	  * as needed...
+	  */
 
-      if (device_id[0])
-      {
+	  if (errno == EBUSY)
+	    busy = 1;
+
+	  device_id[0] = '\0';
+        }
+
+	if (device_id[0])
+	{
+	 /*
+          * Got the device ID - is this the one?
+	  */
+
+	  decode_device_id(i, device_id, make_model, sizeof(make_model),
+                	   device_uri, sizeof(device_uri));
+
+          if (strcmp(uri, device_uri) == 0)
+	    return (fd);	/* Yes, return this file descriptor... */
+	}
+
        /*
-        * Got the device ID - is this the one?
+	* This wasn't the one...
 	*/
 
-	decode_device_id(i, device_id, make_model, sizeof(make_model),
-                	 device_uri, sizeof(device_uri));
-
-        if (strcmp(uri, device_uri) == 0)
-	  return (fd);	/* Yes, return this file descriptor... */
+        if (fd >= 0)
+	  close(fd);
       }
 
      /*
-      * This wasn't the one...
+      * If we get here and at least one of the printer ports showed up
+      * as "busy", then sleep for a bit and retry...
       */
 
-      close(fd);
+      if (busy)
+      {
+	fputs("INFO: USB printer is busy; will retry in 5 seconds...\n",
+	      stderr);
+	sleep(5);
+      }
     }
+    while (busy);
 
    /*
     * Couldn't find the printer, return "no such device or address"...
@@ -821,5 +877,5 @@ open_device(const char *uri)		/* I - Device URI */
 
 
 /*
- * End of "$Id: usb.c,v 1.18.2.30 2004/02/24 16:19:55 mike Exp $".
+ * End of "$Id: usb.c,v 1.18.2.31 2004/03/19 12:07:00 mike Exp $".
  */

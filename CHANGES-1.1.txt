@@ -3,6 +3,9 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.21rc1
 
+	- The USB backend now retries printing to devices of the
+	  form "usb://make/model" if any USB port shows up as
+	  "busy" (STR #617)
 	- The httpGetHostByName() function did not range check
 	  IP address values (STR #608)
 	- The httpUpdate() function could return HTTP_ERROR
