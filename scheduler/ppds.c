@@ -1,5 +1,5 @@
 /*
- * "$Id: ppds.c,v 1.18 2001/06/22 20:22:38 mike Exp $"
+ * "$Id: ppds.c,v 1.19 2001/07/30 18:09:01 mike Exp $"
  *
  *   PPD scanning routines for the Common UNIX Printing System (CUPS).
  *
@@ -649,8 +649,9 @@ load_ppds(const char *d,		/* I - Actual directory */
 	*ptr = '\0';
       else if (strncasecmp(manufacturer, "agfa", 4) == 0)
 	strcpy(manufacturer, "AGFA");
-      else if (strncasecmp(manufacturer, "herk", 4) == 0)
-	strcpy(manufacturer, "Linotype");
+      else if (strncasecmp(manufacturer, "herk", 4) == 0 ||
+               strncasecmp(manufacturer, "linotype", 8) == 0)
+	strcpy(manufacturer, "LHAG");
       else
 	strcpy(manufacturer, "Other");
 
@@ -676,6 +677,9 @@ load_ppds(const char *d,		/* I - Actual directory */
       else if (strcasecmp(manufacturer, "designjet") == 0)
 	strcpy(manufacturer, "HP");
     }
+    else if (strncasecmp(manufacturer, "LHAG", 4) == 0 ||
+             strncasecmp(manufacturer, "linotype", 8) == 0)
+      strcpy(manufacturer, "LHAG");
 
    /*
     * Fix the language as needed...
@@ -835,5 +839,5 @@ ppd_gets(buf_t *fp,		/* I - File to read from */
 
 
 /*
- * End of "$Id: ppds.c,v 1.18 2001/06/22 20:22:38 mike Exp $".
+ * End of "$Id: ppds.c,v 1.19 2001/07/30 18:09:01 mike Exp $".
  */
