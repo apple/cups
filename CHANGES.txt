@@ -111,6 +111,7 @@ CHANGES IN CUPS V1.1.5
 	- Expanded the click area for the navigation bar in the
 	  web interface.
 
+
 CHANGES IN CUPS v1.1.4
 
 	- Makefile and configure script fixes.
