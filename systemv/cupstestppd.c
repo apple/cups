@@ -1,5 +1,5 @@
 /*
- * "$Id: cupstestppd.c,v 1.1.2.5 2003/01/29 17:04:34 mike Exp $"
+ * "$Id: cupstestppd.c,v 1.1.2.6 2003/02/03 15:02:10 mike Exp $"
  *
  *   PPD test program for the Common UNIX Printing System (CUPS).
  *
@@ -297,6 +297,19 @@ main(int  argc,			/* I - Number of command-line arguments */
 	  puts("      **FAIL**  REQUIRED PageRegion");
       }
 
+      if (ppd->pcfilename != NULL)
+      {
+	if (verbose >= 0)
+	  puts("        PASS    PCFileName");
+      }
+      else
+      {
+	errors ++;
+
+	if (verbose >= 0)
+	  puts("      **FAIL**  REQUIRED PCFileName");
+      }
+
       if (ppd->product != NULL)
       {
 	if (verbose >= 0)
@@ -466,5 +479,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: cupstestppd.c,v 1.1.2.5 2003/01/29 17:04:34 mike Exp $".
+ * End of "$Id: cupstestppd.c,v 1.1.2.6 2003/02/03 15:02:10 mike Exp $".
  */
