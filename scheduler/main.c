@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c,v 1.91 2003/02/12 19:31:12 mike Exp $"
+ * "$Id: main.c,v 1.92 2003/02/13 03:32:54 mike Exp $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -703,6 +703,9 @@ ClearString(char **s)			/* O - String value */
 
 /*
  * 'IgnoreChildSignals()' - Ignore SIGCHLD signals...
+ *
+ * We don't really ignore them, we set the signal handler to SIG_DFL,
+ * since some OS's rely on signals for the wait4() function to work.
  */
 
 void
@@ -713,16 +716,16 @@ IgnoreChildSignals(void)
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET */
 
 #ifdef HAVE_SIGSET /* Use System V signals over POSIX to avoid bugs */
-  sigset(SIGCHLD, SIG_IGN);
+  sigset(SIGCHLD, SIG_DFL);
 #elif defined(HAVE_SIGACTION)
   memset(&action, 0, sizeof(action));
 
   sigemptyset(&action.sa_mask);
   sigaddset(&action.sa_mask, SIGCHLD);
-  action.sa_handler = SIG_IGN;
+  action.sa_handler = SIG_DFL;
   sigaction(SIGCHLD, &action, NULL);
 #else
-  signal(SIGCLD, SIG_IGN);	/* No, SIGCLD isn't a typo... */
+  signal(SIGCLD, SIG_DFL);	/* No, SIGCLD isn't a typo... */
 #endif /* HAVE_SIGSET */
 }
 
@@ -1014,5 +1017,5 @@ usage(void)
 
 
 /*
- * End of "$Id: main.c,v 1.91 2003/02/12 19:31:12 mike Exp $".
+ * End of "$Id: main.c,v 1.92 2003/02/13 03:32:54 mike Exp $".
  */
