@@ -1,10 +1,10 @@
-README.pstoraster - 07/20/2003
+README.pstoraster - 11/14/2003
 ------------------------------
 
 INTRODUCTION
 
-    This directory contains the CUPS "driver" for GNU
-    Ghostscript, the pstoraster script that is used to run
+    This directory contains the CUPS "driver" for Ghostscript
+    7.x and 8.x, the pstoraster script that is used to run
     Ghostscript as a CUPS filter, the pstoraster.convs file that
     defines the PostScript to raster filter for CUPS drivers, a
     makefile fragment that adds the CUPS driver, and the wrapper
@@ -14,21 +14,19 @@ INTRODUCTION
     This software is included with both the CUPS and ESP
     Ghostscript 7.07.1 distributions.  While the files will also
     compile with earlier versions of Ghostscript, there are bugs
-    in older versions of GNU Ghostscript which may cause
-    problems.
+    in older versions of Ghostscript which may cause problems.
+
+    Also, this driver may not be used in any commercial
+    Ghostscript distributions without prior written
+    permission/licensing from Easy Software Products.  See the
+    contact information in the file "gdevcups.c" for more
+    information.
 
 
 COMPILING ESP GHOSTSCRIPT WITH THE CUPS DRIVER
 
     Normally the CUPS driver will be automatically included when
     you use the configure script supplied with ESP Ghostscript.
-    To use the CUPS driver with the traditional Ghostscript
-    makefiles, add the following include line to the end of the
-    makefile:
-
-        include pstoraster/cups.mak
-
-    Then add "$(DD)cups.dev" to any of the DEVICE_DEVS lines.
 
     Once you have compiled and installed Ghostscript, restart
     the cupsd process, either by sending the HUP signal to the
@@ -38,30 +36,34 @@ COMPILING ESP GHOSTSCRIPT WITH THE CUPS DRIVER
     configure Ghostscript with the pxlmono and pxlcolor drivers.
 
 
-COMPILING GNU GHOSTSCRIPT WITH THE CUPS DRIVER
+COMPILING AFPL/GNU GHOSTSCRIPT WITH THE CUPS DRIVER
 
-    Before configuring GNU Ghostscript, first copy this directory
-    to the GNU Ghostscript source directory, e.g.:
+    Before configuring AFPL or GNU Ghostscript, first copy this
+    directory to the Ghostscript source directory, e.g.:
 
         cp -r pstoraster /some/path/to/ghostscript-7.07
 
-    Next apply the patch:
+    Then apply the appropriate patch:
 
         cd /some/path/to/ghostscript-7.07
-        patch -p1 pstoraster/ghostscript-707.patch
+        patch -p1 pstoraster/gs707-lib.patch
 
-    Finally, run the configure script to use the new Ghostscript
-    with CUPS:
+    or:
+
+        cd /some/path/to/ghostscript-8.11
+        patch -p1 pstoraster/gs811-lib.patch
+
+    Next, run the configure script to configure the Ghostscript
+    software:
 
         ./configure [any configure options you want]
 
-    To use the CUPS driver with the traditional Ghostscript
-    makefiles, add the following include line to the end of the
+    Finally, add the following include line to the end of the
     makefile:
 
         include pstoraster/cups.mak
 
-    Then add "$(DD)cups.dev" to any of the DEVICE_DEVS lines.
+    and add "$(DD)cups.dev" to any of the DEVICE_DEVS lines.
 
     Once you have compiled and installed Ghostscript, restart
     the cupsd process, either by sending the HUP signal to the
