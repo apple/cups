@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.52 2000/03/09 15:42:30 mike Exp $"
+ * "$Id: client.c,v 1.53 2000/03/10 14:08:53 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -401,8 +401,12 @@ ReadClient(client_t *con)	/* I - Client to read from */
     decode_auth(con);
 
     if (con->http.fields[HTTP_FIELD_HOST][0] == '\0' &&
-        con->http.version >= HTTP_1_0)
+        con->http.version >= HTTP_1_1)
     {
+     /*
+      * HTTP/1.1 and higher require the "Host:" field...
+      */
+
       if (!SendError(con, HTTP_BAD_REQUEST))
       {
 	CloseClient(con);
@@ -1680,5 +1684,5 @@ pipe_command(client_t *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.52 2000/03/09 15:42:30 mike Exp $".
+ * End of "$Id: client.c,v 1.53 2000/03/10 14:08:53 mike Exp $".
  */
