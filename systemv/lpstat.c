@@ -1,5 +1,5 @@
 /*
- * "$Id: lpstat.c,v 1.23 2000/06/28 16:49:30 mike Exp $"
+ * "$Id: lpstat.c,v 1.24 2000/06/29 01:11:36 mike Exp $"
  *
  *   "lpstat" command for the Common UNIX Printing System (CUPS).
  *
@@ -413,7 +413,7 @@ show_accepting(http_t      *http,	/* I - HTTP connection to server */
   if (http == NULL)
     return;
 
-  if (strcmp(printers, "all") == 0)
+  if (printers != NULL && strcmp(printers, "all") == 0)
     printers = NULL;
 
  /*
@@ -616,7 +616,7 @@ show_classes(http_t     *http,	/* I - HTTP connection to server */
   if (http == NULL)
     return;
 
-  if (strcmp(dests, "all") == 0)
+  if (dests != NULL && strcmp(dests, "all") == 0)
     dests = NULL;
 
  /*
@@ -831,7 +831,7 @@ show_devices(http_t      *http,		/* I - HTTP connection to server */
   if (http == NULL)
     return;
 
-  if (strcmp(printers, "all") == 0)
+  if (printers != NULL && strcmp(printers, "all") == 0)
     printers = NULL;
 
  /*
@@ -1039,11 +1039,8 @@ show_jobs(http_t     *http,	/* I - HTTP connection to server */
   if (http == NULL)
     return;
 
-  if (strcmp(dests, "all") == 0)
+  if (dests != NULL && strcmp(dests, "all") == 0)
     dests = NULL;
-
-  if (strcmp(users, "all") == 0)
-    users = NULL;
 
  /*
   * Build a IPP_GET_JOBS request, which requires the following
@@ -1313,7 +1310,7 @@ show_printers(http_t      *http,	/* I - HTTP connection to server */
   if ((root = getenv("CUPS_SERVERROOT")) == NULL)
     root = CUPS_SERVERROOT;
 
-  if (strcmp(printers, "all") == 0)
+  if (printers != NULL && strcmp(printers, "all") == 0)
     printers = NULL;
 
  /*
@@ -1643,5 +1640,5 @@ show_scheduler(http_t *http)	/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpstat.c,v 1.23 2000/06/28 16:49:30 mike Exp $".
+ * End of "$Id: lpstat.c,v 1.24 2000/06/29 01:11:36 mike Exp $".
  */
