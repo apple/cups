@@ -1,0 +1,95 @@
+CHANGES.txt - 11/04/1999
+------------------------
+
+CHANGES IN CUPS v1.0.2
+
+	- The HP-GL/2 filter didn't always scale the output
+	  correctly.
+	- The HP-GL/2 filter now supports changing the page size
+	  automatically when the "fitplot" option is not used.
+	- The cancel-job operation was expecting a resource name
+	  of the form "/job/#" instead of "/jobs/#"; this
+	  prevented the cancel and lprm commands from working.
+	- The backends didn't log pages when files were printed
+	  using the "-oraw" option.
+	- The authorization code did not work with the Slackware
+	  long shadow password package because its crypt() can
+	  return NULL.
+	- The chunking code didn't work for reading the response
+	  of a POST request.
+	- cupsGetPPD() now does authentication as needed.
+	- The N-up code in the PostScript filter didn't work
+	  with some printers (grestoreall would restore the
+	  default blank page and device settings).
+	- The N-up code in the PostScript filter didn't scale
+	  the pages to fit within the imageable area of the
+	  page.
+
+
+CHANGES IN CUPS v1.0.1
+
+	- Documentation updates.
+
+	- Fixed a bunch of possible buffer-overflow conditions.
+
+	- The scheduler now supports authentication using PAM.
+
+	- Updated the Italian message file.
+
+	- httpEncode64() didn't add an extra "=" if there was
+	  only one byte in the last three-byte group.
+
+	- Now drop any trailing character set from the locale
+	  string (e.g. "en_US.ISO_8859-1" becomes "en_US")
+
+	- Fixed "timezone" vs "tm_gmtoff" usage for BSD-based
+	  operating systems.
+
+	- Updated IPP security so that "get" operations can be
+	  done from any resource name; this allows the CGIs to
+	  work with printer authentication enabled so long as
+	  authentication isn't turned on for the whole "site".
+
+	- The IPP code didn't properly handle the "unsupported"
+	  group; this caused problems with the HP JetDirect since
+	  it doesn't seem to support the "copies" attribute.
+
+	- The HTTP chunking code was missing a CR LF pair at the
+	  end of a 0-length chunk.
+
+	- The httpSeparate() function didn't handle embedded
+	  usernames and passwords in the URI properly.
+
+	- Doing "lpadmin -p printer -E" didn't restart printing
+	  if there were pending jobs.
+
+	- The cancel-job operation now requires either a
+	  requesting-user-name attribute or an authenticated
+	  username.
+
+	- The add-printer code did not report errors if the
+	  interface script or PPD file could not be renamed.
+
+	- Request files are now created without world read
+	  permissions.
+
+	- Added a cupsLastError() function to the CUPS API to
+	  retrieve the IPP error code from the last request.
+
+	- Options are now case-insensitive.
+
+	- The lpq command now provides 10 characters for the
+	  username instead of the original (Berkeley standard)
+	  7.
+
+	- The cancel command needed a local CUPS server to work
+	  (or the appropriate ServerName in cupsd.conf)
+
+	- The cancel and lprm commands didn't report the IPP
+	  error if the job could not be cancelled.
+
+	- The lp and lpr commands didn't intercept SIGTERM to
+	  remove temporary files when printing from stdin.
+
+	- The lp and lpr commands didn't report the IPP error if
+	  the job could not be printed.
