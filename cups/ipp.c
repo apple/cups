@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.23 1999/08/05 16:16:51 mike Exp $"
+ * "$Id: ipp.c,v 1.24 1999/09/29 15:34:37 mike Exp $"
  *
  *   Internet Printing Protocol support functions for the Common UNIX
  *   Printing System (CUPS).
@@ -511,8 +511,6 @@ ippDateToTime(const ipp_uchar_t *date)	/* I - RFC 1903 date info */
     t += date[9] * 3600 + date[10] * 60;
   else
     t -= date[9] * 3600 + date[10] * 60;
-
-  t -= timezone;
 
   return (t);
 }
@@ -1455,5 +1453,5 @@ ipp_read(http_t        *http,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.23 1999/08/05 16:16:51 mike Exp $".
+ * End of "$Id: ipp.c,v 1.24 1999/09/29 15:34:37 mike Exp $".
  */
