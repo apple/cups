@@ -1,5 +1,5 @@
 /*
- * "$Id: cupstestppd.c,v 1.1.2.23 2003/06/07 16:35:56 mike Exp $"
+ * "$Id: cupstestppd.c,v 1.1.2.24 2003/07/20 02:34:29 mike Exp $"
  *
  *   PPD test program for the Common UNIX Printing System (CUPS).
  *
@@ -421,7 +421,21 @@ main(int  argc,			/* I - Number of command-line arguments */
 
       if (ppd->manufacturer != NULL)
       {
-	if (verbose > 0)
+        if (!strncasecmp(ppd->manufacturer, "Hewlett-Packard", 15) ||
+	    !strncasecmp(ppd->manufacturer, "Hewlett Packard", 15))
+	{
+	  if (verbose >= 0)
+	  {
+	    if (!errors && !verbose)
+	      puts(" FAIL");
+
+	    puts("      **FAIL**  BAD Manufacturer (should be \"HP\")");
+	    puts("                REF: Page 211, table D.1.");
+          }
+
+	  errors ++;
+	}
+	else if (verbose > 0)
 	  puts("        PASS    Manufacturer");
       }
       else if (ppdversion >= 43)
@@ -648,6 +662,21 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 	  puts("      **FAIL**  REQUIRED ShortNickName");
 	  puts("                REF: Page 64-65, section 5.3.");
+        }
+
+	errors ++;
+      }
+
+      if (ppd->patches != NULL && strchr(ppd->patches, '\"') &&
+          strstr(ppd->patches, "*End"))
+      {
+	if (verbose >= 0)
+	{
+	  if (!errors && !verbose)
+	    puts(" FAIL");
+
+	  puts("      **FAIL**  BAD JobPatchFile attribute in file");
+	  puts("                REF: Page 24, section 3.4.");
         }
 
 	errors ++;
@@ -987,5 +1016,5 @@ usage(void)
 
 
 /*
- * End of "$Id: cupstestppd.c,v 1.1.2.23 2003/06/07 16:35:56 mike Exp $".
+ * End of "$Id: cupstestppd.c,v 1.1.2.24 2003/07/20 02:34:29 mike Exp $".
  */

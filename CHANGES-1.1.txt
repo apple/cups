@@ -3,6 +3,14 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.20rc1
 
+	- The cupstestppd program now checks for bad
+	  JobPatchFile attributes and incorrect versions of the
+	  Manufacturer attribute for HP printers (STR #155)
+	- The filter makefile incorrectly installed
+	  libcupsimage.a in the filter directory (STR #180)
+	- The scheduler did not verify that the job history
+	  files define the job-priority and
+	  job-originating-user-name attributes (STR #178)
 	- The pstops filter didn't handle poorly-formed binary
 	  PostScript files that had CTRL-D's in them (STR #156)
 	- The ppdOpen*() and cupsLangGet() functions did not
