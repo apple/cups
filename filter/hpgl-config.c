@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-config.c,v 1.33 2002/12/17 18:59:25 swdev Exp $"
+ * "$Id: hpgl-config.c,v 1.34 2003/09/12 20:19:14 mike Exp $"
  *
  *   HP-GL/2 configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -182,6 +182,7 @@ update_transform(void)
 
   switch (Rotation)
   {
+    default :
     case 0 :
 	Transform[0][0] = scaling;
 	Transform[0][1] = 0.0;
@@ -280,6 +281,7 @@ DF_default_values(int     num_params,	/* I - Number of parameters */
   (void)num_params;
   (void)params;
 
+  NP_number_pens(0, NULL);
   AC_anchor_corner(0, NULL);
   AD_define_alternate(0, NULL);
   SD_define_standard(0, NULL);
@@ -639,5 +641,5 @@ SC_scale(int     num_params,	/* I - Number of parameters */
 
 
 /*
- * End of "$Id: hpgl-config.c,v 1.33 2002/12/17 18:59:25 swdev Exp $".
+ * End of "$Id: hpgl-config.c,v 1.34 2003/09/12 20:19:14 mike Exp $".
  */

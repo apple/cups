@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgltops.h,v 1.20 2002/12/17 18:59:26 swdev Exp $"
+ * "$Id: hpgltops.h,v 1.21 2003/09/12 20:19:14 mike Exp $"
  *
  *   HP-GL/2 to PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -60,10 +60,14 @@ typedef struct
 
 typedef struct
 {
-  int	typeface,	/* Typeface number */
+  int	symbol_set,	/* Symbol set */
+	spacing,	/* Spacing (0 = fixed, 1 = proportional) */
 	posture,	/* Posture number */
-	weight;		/* Weight number */
-  float	height;		/* Height/size of font */
+	weight,		/* Weight number */
+	typeface;	/* Typeface number */
+  float	pitch,		/* Characters per inch */
+	height,		/* Height/size of font */
+	xpitch;		/* X pitch scaling value */
   float	x, y;		/* X and Y direction/scaling */
 } font_t;
 
@@ -192,6 +196,7 @@ extern void	RR_fill_rect_relative(int num_params, param_t *params);
 extern void	WG_fill_wedge(int num_params, param_t *params);
 
 /* hpgl-char.c */
+extern void	define_font(int f);
 extern void	AD_define_alternate(int num_params, param_t *params);
 extern void	CF_character_fill(int num_params, param_t *params);
 extern void	CP_character_plot(int num_params, param_t *params);
@@ -231,5 +236,5 @@ extern void	OutputTrailer(void);
 extern int	Outputf(const char *format, ...);
 
 /*
- * End of "$Id: hpgltops.h,v 1.20 2002/12/17 18:59:26 swdev Exp $".
+ * End of "$Id: hpgltops.h,v 1.21 2003/09/12 20:19:14 mike Exp $".
  */
