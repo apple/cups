@@ -1,5 +1,5 @@
 /*
- * "$Id: pstops.c,v 1.113 2004/04/26 19:25:32 mike Exp $"
+ * "$Id: pstops.c,v 1.114 2004/06/29 04:09:07 mike Exp $"
  *
  *   PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -385,7 +385,7 @@ main(int  argc,			/* I - Number of command-line arguments */
   * Handle leading PJL fun...
   */
 
-  while (!strncmp(line, "\033%-12345X", 9))
+  while (!strncmp(line, "\033%-12345X", 9) || !strncmp(line, "@PJL ", 5))
   {
    /*
     * Yup, we have leading PJL fun, so skip it until we hit the line
@@ -1890,5 +1890,5 @@ start_nup(int number,			/* I - Page number */
 
 
 /*
- * End of "$Id: pstops.c,v 1.113 2004/04/26 19:25:32 mike Exp $".
+ * End of "$Id: pstops.c,v 1.114 2004/06/29 04:09:07 mike Exp $".
  */
