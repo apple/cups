@@ -1,5 +1,5 @@
 /*
- * "$Id: texttops.c,v 1.16 1999/07/22 14:49:20 mike Exp $"
+ * "$Id: texttops.c,v 1.17 1999/08/04 16:12:29 mike Exp $"
  *
  *   Text to PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -343,34 +343,36 @@ WriteProlog(char       *title,	/* I - Title of job */
     {
       puts("\tdup 2 mod 0 eq {");
       printf("\t\tT stringwidth pop neg %.1f add %.1f } {\n",
-             PageRight - PageLeft - 36.0f / LinesPerInch, 54.0f / LinesPerInch);
+             PageRight - PageLeft - 36.0f / LinesPerInch,
+	     (0.5f + 0.157f) * 72.0f / LinesPerInch);
       printf("\t\t%.1f %.1f } ifelse\n", 36.0f / LinesPerInch,
-             54.0f / LinesPerInch);
+	     (0.5f + 0.157f) * 72.0f / LinesPerInch);
     }
     else
       printf("\t%.1f %.1f\n", 36.0f / LinesPerInch,
-             54.0f / LinesPerInch);
+	     (0.5f + 0.157f) * 72.0f / LinesPerInch);
 
     puts("\tmoveto T show");
 
     printf("\t(%s)\n", curdate);
     printf("\tdup stringwidth pop neg 2 div %.1f add %.1f\n",
-           (PageRight - PageLeft) * 0.5, 54.0f / LinesPerInch);
+           (PageRight - PageLeft) * 0.5,
+           (0.5f + 0.157f) * 72.0f / LinesPerInch);
     puts("\tmoveto show");
 
     if (Duplex)
     {
       puts("\tdup P cvs exch 2 mod 0 eq {");
       printf("\t\t%.1f %.1f } {\n", 36.0f / LinesPerInch,
-             54.0f / LinesPerInch);
+	     (0.5f + 0.157f) * 72.0f / LinesPerInch);
       printf("\t\tdup stringwidth pop neg %.1f add %.1f } ifelse\n",
              PageRight - PageLeft - 36.0f / LinesPerInch,
-             54.0f / LinesPerInch);
+	     (0.5f + 0.157f) * 72.0f / LinesPerInch);
     }
     else
       printf("\tP cvs dup stringwidth pop neg %.1f add %.1f\n",
              PageRight - PageLeft - 36.0f / LinesPerInch,
-             54.0f / LinesPerInch);
+	     (0.5f + 0.157f) * 72.0f / LinesPerInch);
 
     puts("\tmoveto show");
     puts("\tgrestore");
@@ -454,7 +456,7 @@ write_string(int     col,	/* I - Start column */
   }
 
   x += (float)col * 72.0f / (float)CharsPerInch;
-  y -= (float)(row + 0.5) * 72.0f / (float)LinesPerInch;
+  y -= (float)(row + 0.843) * 72.0f / (float)LinesPerInch;
 
   attr = s->attr;
 
@@ -562,5 +564,5 @@ write_string(int     col,	/* I - Start column */
 
 
 /*
- * End of "$Id: texttops.c,v 1.16 1999/07/22 14:49:20 mike Exp $".
+ * End of "$Id: texttops.c,v 1.17 1999/08/04 16:12:29 mike Exp $".
  */

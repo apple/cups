@@ -1,5 +1,5 @@
 /*
- * "$Id: textcommon.c,v 1.9 1999/07/22 14:49:19 mike Exp $"
+ * "$Id: textcommon.c,v 1.10 1999/08/04 16:12:29 mike Exp $"
  *
  *   Common text filter routines for the Common UNIX Printing System (CUPS).
  *
@@ -193,6 +193,17 @@ TextMain(char *name,		/* I - Name of filter */
   options     = NULL;
   num_options = cupsParseOptions(argv[5], 0, &options);
 
+  if ((val = cupsGetOption("prettyprint", num_options, options)) != NULL)
+  {
+    PrettyPrint  = 1;
+    PageLeft     = 72.0f;
+    PageRight    = PageWidth - 36.0f;
+    PageBottom   = PageBottom > 36.0f ? PageBottom : 36.0f;
+    PageTop      = PageLength - 36.0f;
+    CharsPerInch = 12;
+    LinesPerInch = 8;
+  }
+
   if ((ppd = SetCommonOptions(num_options, options, 1)) != NULL)
     ppdClose(ppd);
 
@@ -201,22 +212,14 @@ TextMain(char *name,		/* I - Name of filter */
   if ((val = cupsGetOption("columns", num_options, options)) != NULL)
     PageColumns = atoi(val);
 
-  if ((val = cupsGetOption("prettyprint", num_options, options)) != NULL)
-  {
-    PrettyPrint  = 1;
-    PageLeft     = 72.0f;
-    PageRight    = PageWidth - 36.0f;
-    PageBottom   = PageBottom > 36.0f ? PageBottom : 36.0f;
-    PageTop      = PageLength - 36.0f - 216.0f / LinesPerInch;
-    CharsPerInch = 12;
-    LinesPerInch = 8;
-  }
-
   if ((val = cupsGetOption("cpi", num_options, options)) != NULL)
     CharsPerInch = atoi(val);
 
   if ((val = cupsGetOption("lpi", num_options, options)) != NULL)
     LinesPerInch = atoi(val);
+
+  if ((val = cupsGetOption("prettyprint", num_options, options)) != NULL)
+    PageTop -= 216.0f / LinesPerInch;
 
   Copies = atoi(argv[4]);
 
@@ -738,5 +741,5 @@ getutf8(FILE *fp)	/* I - File to read from */
 
 
 /*
- * End of "$Id: textcommon.c,v 1.9 1999/07/22 14:49:19 mike Exp $".
+ * End of "$Id: textcommon.c,v 1.10 1999/08/04 16:12:29 mike Exp $".
  */
