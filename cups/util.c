@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c,v 1.19 1999/05/20 18:43:03 mike Exp $"
+ * "$Id: util.c,v 1.20 1999/05/20 19:33:59 mike Exp $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -24,7 +24,7 @@
  * Contents:
  *
  *   cupsCancelJob()     - Cancel a print job.
- *   cupsDoRequestFile() - Do an IPP request...
+ *   cupsDoFileRequest() - Do an IPP request...
  *   cupsGetClasses()    - Get a list of printer classes.
  *   cupsGetDefault()    - Get the default printer or class.
  *   cupsGetPPD()        - Get the PPD file for a printer.
@@ -230,29 +230,21 @@ cupsDoFileRequest(http_t *http,		/* I - HTTP connection to server */
     DEBUG_puts("cupsDoFileRequest: ipp write...");
 
     request->state = IPP_IDLE;
-    if (ippWrite(http, request) == IPP_ERROR)
-      break;
+    if (ippWrite(http, request) != IPP_ERROR)
+      if (filename != NULL)
+      {
+        DEBUG_puts("cupsDoFileRequest: file write...");
 
-    if (filename != NULL)
-    {
-      DEBUG_puts("cupsDoFileRequest: file write...");
+       /*
+        * Send the file...
+        */
 
-     /*
-      * Send the file...
-      */
+        rewind(file);
 
-      rewind(file);
-
-      while ((bytes = fread(buffer, 1, sizeof(buffer), file)) > 0)
-	if (httpWrite(http, buffer, bytes) < bytes)
-	{
-          DEBUG_puts("httpWrite() failed.");
-
-	  fclose(file);
-	  ippDelete(request);
-	  return (NULL);
-	}
-    }
+        while ((bytes = fread(buffer, 1, sizeof(buffer), file)) > 0)
+  	  if (httpWrite(http, buffer, bytes) < bytes)
+            break;
+      }
 
    /*
     * Get the server's return status...
@@ -260,10 +252,10 @@ cupsDoFileRequest(http_t *http,		/* I - HTTP connection to server */
 
     DEBUG_puts("cupsDoFileRequest: update...");
 
-#if defined(WIN32) || defined(__EMX__)
-    status = httpUpdate(http);
-#else
-    if ((status = httpUpdate(http)) == HTTP_UNAUTHORIZED)
+    while ((status = httpUpdate(http)) == HTTP_CONTINUE);
+
+#if !defined(WIN32) && !defined(__EMX__)
+    if (status == HTTP_UNAUTHORIZED)
     {
       DEBUG_puts("cupsDoFileRequest: unauthorized...");
 
@@ -273,12 +265,14 @@ cupsDoFileRequest(http_t *http,		/* I - HTTP connection to server */
 
       httpFlush(http);
 
-      if ((password = getpass("Password:")) != NULL && password[0])
+      if ((password = getpass("Password:")) != NULL)
       {
        /*
 	* Got a password; send it to the server...
 	*/
 
+        if (!password[0])
+          break;
 	sprintf(plain, "%s:%s", cuserid(NULL), password);
 	httpEncode64(encode, plain);
 	sprintf(authstring, "Basic %s", encode);
@@ -288,7 +282,7 @@ cupsDoFileRequest(http_t *http,		/* I - HTTP connection to server */
       else
         break;
     }
-#endif /* WIN32 || __EMX__ */
+#endif /* !WIN32 && !__EMX__ */
 
     if (status != HTTP_OK)
     {
@@ -951,5 +945,5 @@ cups_connect(char *name,	/* I - Destination (printer[@host]) */
 
 
 /*
- * End of "$Id: util.c,v 1.19 1999/05/20 18:43:03 mike Exp $".
+ * End of "$Id: util.c,v 1.20 1999/05/20 19:33:59 mike Exp $".
  */
