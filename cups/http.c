@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.46 1999/08/27 16:31:58 mike Exp $"
+ * "$Id: http.c,v 1.47 1999/09/01 18:59:32 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -62,6 +62,7 @@
  * Include necessary headers...
  */
 
+#define DEBUG
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
@@ -329,7 +330,10 @@ httpReconnect(http_t *http)	/* I - HTTP data */
   */
 
   if ((http->fd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
+  {
+    http->error = errno;
     return (-1);
+  }
 
 #ifdef FD_CLOEXEC
   fcntl(http->fd, F_SETFD, FD_CLOEXEC);	/* Close this socket when starting *
@@ -351,6 +355,8 @@ httpReconnect(http_t *http)	/* I - HTTP data */
   if (connect(http->fd, (struct sockaddr *)&(http->hostaddr),
               sizeof(http->hostaddr)) < 0)
   {
+    http->error = errno;
+
 #ifdef WIN32
     closesocket(http->fd);
 #else
@@ -359,6 +365,8 @@ httpReconnect(http_t *http)	/* I - HTTP data */
 
     return (-1);
   }
+  else
+    http->error = 0;
 
   return (0);
 }
@@ -724,6 +732,8 @@ httpRead(http_t *http,			/* I - HTTP data */
 
   if (bytes > 0)
     http->data_remaining -= bytes;
+  else if (bytes < 0)
+    http->error = errno;
 
   if (http->data_remaining == 0)
   {
@@ -841,7 +851,6 @@ httpGets(char   *line,			/* I - Line to read into */
 	*bufptr,			/* Pointer into input buffer */
 	*bufend;			/* Pointer to end of buffer */
   int	bytes;				/* Number of bytes read */
-  int	lasterror;			/* Last error received */
 
 
   DEBUG_printf(("httpGets(%08x, %d, %08x)\n", line, length, http));
@@ -853,8 +862,7 @@ httpGets(char   *line,			/* I - Line to read into */
   * Pre-scan the buffer and see if there is a newline in there...
   */
 
-  lasterror = 0;
-  errno     = 0;
+  errno = 0;
 
   do
   {
@@ -879,9 +887,9 @@ httpGets(char   *line,			/* I - Line to read into */
 	* Nope, can't get a line this time...
 	*/
 
-        if (errno != lasterror)
+        if (errno != http->error)
 	{
-	  lasterror = errno;
+	  http->error = errno;
 	  continue;
 	}
 
@@ -890,7 +898,12 @@ httpGets(char   *line,			/* I - Line to read into */
         return (NULL);
       }
       else if (bytes == 0)
+      {
+        if (http->blocking)
+	  http->error = EPIPE;
+
         return (NULL);
+      }
 
      /*
       * Yup, update the amount used and the end pointer...
@@ -1173,7 +1186,7 @@ httpUpdate(http_t *http)		/* I - HTTP data */
   * See if there was an error...
   */
 
-  if (errno)
+  if (http->error)
     return (HTTP_ERROR);
 
  /*
@@ -1457,5 +1470,5 @@ http_send(http_t       *http,	/* I - HTTP data */
 
 
 /*
- * End of "$Id: http.c,v 1.46 1999/08/27 16:31:58 mike Exp $".
+ * End of "$Id: http.c,v 1.47 1999/09/01 18:59:32 mike Exp $".
  */
