@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.101 2000/10/13 03:29:18 mike Exp $"
+ * "$Id: ipp.c,v 1.102 2000/11/01 14:06:09 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -2906,13 +2906,19 @@ hold_job(client_t        *con,	/* I - Client connection */
       attr->value_tag = IPP_TAG_KEYWORD;
       attr->values[0].string.text = strdup("indefinite");
     }
-
-   /*
-    * Hold job until specified time...
-    */
-
-    SetJobHoldUntil(job->id, attr->values[0].string.text);
   }
+  else
+  {
+    LogMessage(L_ERROR, "Lost the job's job-hold-until attribute!");
+    send_ipp_error(con, IPP_INTERNAL_ERROR);
+    return;
+  }
+
+ /*
+  * Hold job until specified time...
+  */
+
+  SetJobHoldUntil(job->id, attr->values[0].string.text);
 
   LogMessage(L_INFO, "Job %d was held by \'%s\'.", jobid, username);
 
@@ -4840,5 +4846,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.101 2000/10/13 03:29:18 mike Exp $".
+ * End of "$Id: ipp.c,v 1.102 2000/11/01 14:06:09 mike Exp $".
  */
