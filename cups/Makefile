@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.53.2.20 2003/01/07 18:26:23 mike Exp $"
+# "$Id: Makefile,v 1.53.2.21 2003/01/28 15:32:59 mike Exp $"
 #
 #   API library Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -123,7 +123,7 @@ libcups.2.dylib:	$(LIBOBJS)
 	echo Linking $@...
 	$(DSO) $(DSOFLAGS) -o $@ \
 		-install_name $(libdir)/libcups.dylib \
-		-current_version 2.5.0 \
+		-current_version 2.6.0 \
 		-compatibility_version 2.0.0 \
 		$(LIBOBJS)
 	$(RM) libcups.dylib
@@ -207,5 +207,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile,v 1.53.2.20 2003/01/07 18:26:23 mike Exp $".
+# End of "$Id: Makefile,v 1.53.2.21 2003/01/28 15:32:59 mike Exp $".
 #
