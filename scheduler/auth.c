@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.c,v 1.28 2000/03/10 16:56:00 mike Exp $"
+ * "$Id: auth.c,v 1.29 2000/03/11 15:31:27 mike Exp $"
  *
  *   Authorization routines for the Common UNIX Printing System (CUPS).
  *
@@ -63,8 +63,6 @@
 
 static authmask_t	*add_allow(location_t *loc);
 static authmask_t	*add_deny(location_t *loc);
-static int		check_auth(unsigned ip, char *name, int namelen,
-				   int num_masks, authmask_t *masks);
 #if HAVE_LIBPAM
 static int		pam_func(int, const struct pam_message **,
 			         struct pam_response **, void *);
@@ -159,6 +157,58 @@ AllowIP(location_t *loc,	/* I - Location to add to */
 
   LogMessage(L_DEBUG, "AllowIP: %s allow %08x/%08x", loc->location,
              address, netmask);
+}
+
+
+/*
+ * 'CheckAuth()' - Check authorization masks.
+ */
+
+int				/* O - 1 if mask matches, 0 otherwise */
+CheckAuth(unsigned   ip,	/* I - Client address */
+          char       *name,	/* I - Client hostname */
+          int        name_len,	/* I - Length of hostname */
+          int        num_masks, /* I - Number of masks */
+          authmask_t *masks)	/* I - Masks */
+{
+  while (num_masks > 0)
+  {
+    switch (masks->type)
+    {
+      case AUTH_NAME :
+         /*
+	  * Check for exact name match...
+	  */
+
+          if (strcasecmp(name, masks->mask.name.name) == 0)
+	    return (1);
+
+         /*
+	  * Check for domain match...
+	  */
+
+	  if (name_len >= masks->mask.name.length &&
+	      masks->mask.name.name[0] == '.' &&
+	      strcasecmp(name + name_len - masks->mask.name.length,
+	                 masks->mask.name.name) == 0)
+	    return (1);
+          break;
+
+      case AUTH_IP :
+         /*
+	  * Check for IP/network address match...
+	  */
+
+          if ((ip & masks->mask.ip.netmask) == masks->mask.ip.address)
+	    return (1);
+          break;
+    }
+
+    masks ++;
+    num_masks --;
+  }
+
+  return (0);
 }
 
 
@@ -329,22 +379,22 @@ IsAuthorized(client_t *con)	/* I - Connection */
     switch (auth)
     {
       case AUTH_ALLOW : /* Order Deny,Allow */
-          if (check_auth(address, con->http.hostname, hostlen,
-	        	 best->num_deny, best->deny))
+          if (CheckAuth(address, con->http.hostname, hostlen,
+	          	best->num_deny, best->deny))
 	    auth = AUTH_DENY;
 
-          if (check_auth(address, con->http.hostname, hostlen,
-	        	 best->num_allow, best->allow))
+          if (CheckAuth(address, con->http.hostname, hostlen,
+	        	best->num_allow, best->allow))
 	    auth = AUTH_ALLOW;
 	  break;
 
       case AUTH_DENY : /* Order Allow,Deny */
-          if (check_auth(address, con->http.hostname, hostlen,
-	        	 best->num_allow, best->allow))
+          if (CheckAuth(address, con->http.hostname, hostlen,
+	        	best->num_allow, best->allow))
 	    auth = AUTH_ALLOW;
 
-          if (check_auth(address, con->http.hostname, hostlen,
-	        	 best->num_deny, best->deny))
+          if (CheckAuth(address, con->http.hostname, hostlen,
+	        	best->num_deny, best->deny))
 	    auth = AUTH_DENY;
 	  break;
     }
@@ -618,58 +668,6 @@ add_deny(location_t *loc)	/* I - Location to add to */
 }
 
 
-/*
- * 'check_auth()' - Check authorization masks.
- */
-
-static int			/* O - 1 if mask matches, 0 otherwise */
-check_auth(unsigned   ip,	/* I - Client address */
-           char       *name,	/* I - Client hostname */
-	   int        name_len,	/* I - Length of hostname */
-           int        num_masks,/* I - Number of masks */
-	   authmask_t *masks)	/* I - Masks */
-{
-  while (num_masks > 0)
-  {
-    switch (masks->type)
-    {
-      case AUTH_NAME :
-         /*
-	  * Check for exact name match...
-	  */
-
-          if (strcasecmp(name, masks->mask.name.name) == 0)
-	    return (1);
-
-         /*
-	  * Check for domain match...
-	  */
-
-	  if (name_len >= masks->mask.name.length &&
-	      masks->mask.name.name[0] == '.' &&
-	      strcasecmp(name + name_len - masks->mask.name.length,
-	                 masks->mask.name.name) == 0)
-	    return (1);
-          break;
-
-      case AUTH_IP :
-         /*
-	  * Check for IP/network address match...
-	  */
-
-          if ((ip & masks->mask.ip.netmask) == masks->mask.ip.address)
-	    return (1);
-          break;
-    }
-
-    masks ++;
-    num_masks --;
-  }
-
-  return (0);
-}
-
-
 #if HAVE_LIBPAM
 /*
  * 'pam_func()' - PAM conversation function.
@@ -735,5 +733,5 @@ pam_func(int                      num_msg,	/* I - Number of messages */
 
 
 /*
- * End of "$Id: auth.c,v 1.28 2000/03/10 16:56:00 mike Exp $".
+ * End of "$Id: auth.c,v 1.29 2000/03/11 15:31:27 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.45 2000/03/10 16:56:01 mike Exp $"
+ * "$Id: conf.c,v 1.46 2000/03/11 15:31:28 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -126,6 +126,7 @@ static int	get_address(char *value, unsigned defaddress, int defport,
 int				/* O - 1 if file read successfully, 0 otherwise */
 ReadConfiguration(void)
 {
+  int		i;		/* Looping var */
   FILE		*fp;		/* Configuration file */
   int		status;		/* Return status */
   char		directory[1024];/* Configuration directory */
@@ -290,6 +291,10 @@ ReadConfiguration(void)
   MaxLogSize       = 1024 * 1024;
   MaxRequestSize   = 0;
 
+  for (i = 0; i < NumRelays; i ++)
+    if (Relays[i].from.type == AUTH_NAME)
+      free(Relays[i].from.mask.name.name);
+
   Browsing         = TRUE;
   BrowsePort       = ippPort();
   BrowseInterval   = DEFAULT_INTERVAL;
@@ -444,6 +449,9 @@ read_configuration(FILE *fp)		/* I - File to read from */
   int		ip[4],			/* IP address components */
 		ipcount,		/* Number of components provided */
  		mask[4];		/* IP netmask components */
+  dirsvc_relay_t *relay;		/* Relay data */
+  dirsvc_poll_t	*poll;			/* Polling data */
+  struct sockaddr_in polladdr;		/* Polling address */
   static unsigned netmasks[4] =		/* Standard netmasks... */
   {
     0xff000000,
@@ -535,7 +543,7 @@ read_configuration(FILE *fp)		/* I - File to read from */
         if (get_address(value, INADDR_ANY, IPP_PORT,
 	                &(Listeners[NumListeners].address)))
         {
-          LogMessage(L_INFO, "Listening to %x:%d\n",
+          LogMessage(L_INFO, "Listening to %x:%d",
                      ntohl(Listeners[NumListeners].address.sin_addr.s_addr),
                      ntohs(Listeners[NumListeners].address.sin_port));
 	  NumListeners ++;
@@ -558,7 +566,7 @@ read_configuration(FILE *fp)		/* I - File to read from */
       {
         if (get_address(value, INADDR_NONE, BrowsePort, Browsers + NumBrowsers))
         {
-          LogMessage(L_INFO, "Sending browsing info to %x:%d\n",
+          LogMessage(L_INFO, "Sending browsing info to %x:%d",
                      ntohl(Browsers[NumBrowsers].sin_addr.s_addr),
                      ntohs(Browsers[NumBrowsers].sin_port));
 	  NumBrowsers ++;
@@ -605,13 +613,13 @@ read_configuration(FILE *fp)		/* I - File to read from */
         LogMessage(L_ERROR, "Unable to initialize browse access control list!");
       else
       {
-	if (strncasecmp(value, "from", 4) == 0)
+	if (strncasecmp(value, "from ", 5) == 0)
 	{
 	 /*
           * Strip leading "from"...
 	  */
 
-	  value += 4;
+	  value += 5;
 
 	  while (isspace(*value))
 	    value ++;
@@ -644,7 +652,7 @@ read_configuration(FILE *fp)		/* I - File to read from */
 	  else
 	    DenyIP(BrowseACL, 0, 0);
 	}
-	else  if (strcasecmp(value, "none") == 0)
+	else if (strcasecmp(value, "none") == 0)
 	{
 	 /*
           * No hosts...
@@ -713,14 +721,187 @@ read_configuration(FILE *fp)		/* I - File to read from */
     else if (strcmp(name, "BrowseRelay") == 0)
     {
      /*
-      * BrowseRelay source destination
+      * BrowseRelay [from] source [to] destination
       */
+
+      if (NumRelays >= MAX_BROWSERS)
+      {
+        LogMessage(L_WARN, "Too many BrowseRelay directives at line %d.",
+	           linenum);
+        continue;
+      }
+
+      relay = Relays + NumRelays;
+
+      memset(relay, 0, sizeof(dirsvc_relay_t));
+
+      if (strncasecmp(value, "from ", 5) == 0)
+      {
+       /*
+        * Strip leading "from"...
+	*/
+
+	value += 5;
+
+	while (isspace(*value))
+	  value ++;
+      }
+
+     /*
+      * Figure out what form the from address takes:
+      *
+      *    *.domain.com
+      *    .domain.com
+      *    host.domain.com
+      *    nnn.*
+      *    nnn.nnn.*
+      *    nnn.nnn.nnn.*
+      *    nnn.nnn.nnn.nnn
+      *    nnn.nnn.nnn.nnn/mm
+      *    nnn.nnn.nnn.nnn/mmm.mmm.mmm.mmm
+      */
+
+      if (value[0] == '*' || value[0] == '.' || !isdigit(value[0]))
+      {
+       /*
+        * Host or domain name...
+	*/
+
+	if (value[0] == '*')
+	  value ++;
+
+        relay->from.type             = AUTH_NAME;
+	relay->from.mask.name.name   = strdup(value);
+	relay->from.mask.name.length = strlen(value);
+      }
+      else
+      {
+       /*
+        * One of many IP address forms...
+	*/
+
+        memset(ip, 0, sizeof(ip));
+        ipcount = sscanf(value, "%d.%d.%d.%d", ip + 0, ip + 1, ip + 2, ip + 3);
+	address = (((((ip[0] << 8) | ip[1]) << 8) | ip[2]) << 8) | ip[3];
+
+        for (; *value; value ++)
+	  if (*value == '/' || isspace(*value))
+	    break;
+
+        if (*value == '/')
+	{
+	  value ++;
+	  memset(mask, 0, sizeof(mask));
+          switch (sscanf(value, "%d.%d.%d.%d", mask + 0, mask + 1,
+	                 mask + 2, mask + 3))
+	  {
+	    case 1 :
+	        netmask = (0xffffffff << (32 - mask[0])) & 0xffffffff;
+	        break;
+	    case 4 :
+	        netmask = (((((mask[0] << 8) | mask[1]) << 8) |
+		            mask[2]) << 8) | mask[3];
+                break;
+	    default :
+        	LogMessage(L_ERROR, "Bad netmask value %s on line %d.",
+	        	   value, linenum);
+		netmask = 0xffffffff;
+		break;
+	  }
+	}
+	else
+	  netmask = netmasks[ipcount - 1];
+
+        relay->from.type            = AUTH_IP;
+	relay->from.mask.ip.address = address;
+	relay->from.mask.ip.netmask = netmask;
+      }
+
+     /*
+      * Skip value and trailing whitespace...
+      */
+
+      for (; *value; value ++)
+	if (isspace(*value))
+	  break;
+
+      while (isspace(*value))
+        value ++;
+
+      if (strncasecmp(value, "to ", 3) == 0)
+      {
+       /*
+        * Strip leading "to"...
+	*/
+
+	value += 3;
+
+	while (isspace(*value))
+	  value ++;
+      }
+
+     /*
+      * Get "to" address and port...
+      */
+
+      if (get_address(value, INADDR_BROADCAST, BrowsePort, &(relay->to)))
+      {
+        if (relay->from.type == AUTH_NAME)
+          LogMessage(L_INFO, "Relaying from %s to %x:%d",
+                     ntohl(relay->to.sin_addr.s_addr),
+                     ntohs(relay->to.sin_port));
+        else
+          LogMessage(L_INFO, "Relaying from %x/%x to %x:%d",
+                     relay->from.mask.ip.address, relay->from.mask.ip.netmask,
+                     ntohl(relay->to.sin_addr.s_addr),
+                     ntohs(relay->to.sin_port));
+
+	NumRelays ++;
+      }
+      else
+      {
+        if (relay->from.type == AUTH_NAME)
+	  free(relay->from.mask.name.name);
+
+        LogMessage(L_ERROR, "Bad relay address %s at line %d.", name,
+	           value, linenum);
+      }
     }
     else if (strcmp(name, "BrowsePoll") == 0)
     {
      /*
       * BrowsePoll address[:port]
       */
+
+      if (NumPolled >= MAX_BROWSERS)
+      {
+        LogMessage(L_WARN, "Too many BrowsePoll directives at line %d.",
+	           linenum);
+        continue;
+      }
+
+     /*
+      * Get poll address and port...
+      */
+
+      if (get_address(value, INADDR_ANY, ippPort(), &polladdr))
+      {
+        LogMessage(L_INFO, "Polling %x:%d", ntohl(polladdr.sin_addr.s_addr),
+                   ntohs(polladdr.sin_port));
+
+        poll = Polled + NumPolled;
+	NumPolled ++;
+	memset(poll, 0, sizeof(dirsvc_poll_t));
+
+        address = ntohl(polladdr.sin_addr.s_addr);
+
+	sprintf(poll->hostname, "%d.%d.%d.%d", address >> 24,
+	        (address >> 16) & 255, (address >> 8) & 255, address & 255);
+        poll->port = ntohs(polladdr.sin_port);
+      }
+      else
+        LogMessage(L_ERROR, "Bad poll address %s at line %d.", name,
+	           value, linenum);
     }
     else if (strcmp(name, "User") == 0)
     {
@@ -1202,5 +1383,5 @@ get_address(char               *value,		/* I - Value string */
 
 
 /*
- * End of "$Id: conf.c,v 1.45 2000/03/10 16:56:01 mike Exp $".
+ * End of "$Id: conf.c,v 1.46 2000/03/11 15:31:28 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.49 2000/03/10 16:56:01 mike Exp $"
+ * "$Id: dirsvc.c,v 1.50 2000/03/11 15:31:28 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -151,10 +151,15 @@ void
 UpdateBrowseList(void)
 {
   int		i;			/* Looping var */
+  int		auth;			/* Authorization status */
   int		len,			/* Length of name string */
 		offset;			/* Offset in name string */
   int		bytes;			/* Number of bytes left */
   char		packet[1540];		/* Broadcast packet */
+  struct sockaddr_in srcaddr;		/* Source address */
+  char		srcname[1024];		/* Source hostname */
+  unsigned	address;		/* Source address (host order) */
+  struct hostent *srchost;		/* Host entry for source address */
   cups_ptype_t	type;			/* Printer type */
   ipp_pstate_t	state;			/* Printer state */
   char		uri[HTTP_MAX_URI],	/* Printer URI */
@@ -178,13 +183,9 @@ UpdateBrowseList(void)
   * Read a packet from the browse socket...
   */
 
-#ifdef DEBUG
-  struct sockaddr_in	addr;
-
-
-  len = sizeof(addr);
+  len = sizeof(srcaddr);
   if ((bytes = recvfrom(BrowseSocket, packet, sizeof(packet), 0, 
-                        (struct sockaddr *)&addr, &len)) <= 0)
+                        (struct sockaddr *)&srcaddr, &len)) <= 0)
   {
     LogMessage(L_ERROR, "Browse recv failed - %s.",
                strerror(errno));
@@ -196,22 +197,95 @@ UpdateBrowseList(void)
   }
 
   packet[bytes] = '\0';
-  printf("UpdateBrowseList: (%d bytes from %08x) %s", bytes,
-         ntohl(addr.sin_addr.s_addr), packet);
+
+ /*
+  * Figure out where it came from...
+  */
+
+  address = ntohl(srcaddr.sin_addr.s_addr);
+
+  if (HostNameLookups)
+#ifndef __sgi
+    srchost = gethostbyaddr((char *)&(srcaddr.sin_addr), sizeof(struct in_addr),
+                            AF_INET);
 #else
-  if ((bytes = recv(BrowseSocket, packet, sizeof(packet), 0)) <= 0)
-  {
-    LogMessage(L_ERROR, "Browse recv failed - %s.",
-               strerror(errno));
-    LogMessage(L_ERROR, "Browsing turned off.");
+    srchost = gethostbyaddr(&(srcaddr.sin_addr), sizeof(struct in_addr),
+                            AF_INET);
+#endif /* !__sgi */
+  else
+    srchost = NULL;
 
-    StopBrowsing();
-    Browsing = 0;
+  if (srchost == NULL)
+    sprintf(srcname, "%d.%d.%d.%d", address >> 24, (address >> 16) & 255,
+            (address >> 8) & 255, address & 255);
+  else
+  {
+    strncpy(srcname, srchost->h_name, sizeof(srcname) - 1);
+    srcname[sizeof(srcname) - 1] = '\0';
+  }
+
+  len = strlen(srcname);
+
+ /*
+  * Do ACL stuff...
+  */
+
+  if (BrowseACL)
+  {
+    if (address == 0x7f000001 || strcasecmp(srcname, "localhost") == 0)
+    {
+     /*
+      * Access from localhost (127.0.0.1) is always allowed...
+      */
+
+      auth = AUTH_ALLOW;
+    }
+    else
+    {
+     /*
+      * Do authorization checks on the domain/address...
+      */
+
+      switch (auth)
+      {
+	case AUTH_ALLOW : /* Order Deny,Allow */
+            if (CheckAuth(address, srcname, len,
+	        	  BrowseACL->num_deny, BrowseACL->deny))
+	      auth = AUTH_DENY;
+
+            if (CheckAuth(address, srcname, len,
+	        	  BrowseACL->num_allow, BrowseACL->allow))
+	      auth = AUTH_ALLOW;
+	    break;
+
+	case AUTH_DENY : /* Order Allow,Deny */
+            if (CheckAuth(address, srcname, len,
+	        	  BrowseACL->num_allow, BrowseACL->allow))
+	      auth = AUTH_ALLOW;
+
+            if (CheckAuth(address, srcname, len,
+	        	  BrowseACL->num_deny, BrowseACL->deny))
+	      auth = AUTH_DENY;
+	    break;
+      }
+    }
+  }
+  else
+    auth = AUTH_ALLOW;
+
+  if (auth == AUTH_DENY)
+  {
+    LogMessage(L_DEBUG, "UpdateBrowseList: Refused %d bytes from %s", bytes,
+               srcname);
     return;
   }
 
-  packet[bytes] = '\0';
-#endif /* DEBUG */
+  LogMessage(L_DEBUG, "UpdateBrowseList: (%d bytes from %s) %s", bytes, srcname,
+             packet);
+
+ /*
+  * Parse packet...
+  */
 
   location[0]   = '\0';
   info[0]       = '\0';
@@ -240,6 +314,21 @@ UpdateBrowseList(void)
 
   if (strcasecmp(host, ServerName) == 0)
     return;
+
+ /*
+  * Do relaying...
+  */
+
+  for (i = 0; i < NumRelays; i ++)
+    if (CheckAuth(address, srcname, len, 1, &(Relays[i].from)))
+      if (sendto(BrowseSocket, packet, bytes, 0,
+                 (struct sockaddr *)&(Relays[i].to),
+		 sizeof(struct sockaddr_in)) <= 0)
+      {
+	LogMessage(L_ERROR, "UpdateBrowseList: sendto failed for relay %d - %s.",
+	           i + 1, strerror(errno));
+	return;
+      }
 
  /*
   * OK, this isn't a local printer; see if we already have it listed in
@@ -550,6 +639,48 @@ SendBrowseList(void)
 void
 StartPolling(void)
 {
+  int		i;		/* Looping var */
+  dirsvc_poll_t	*poll;		/* Current polling server */
+  int		pid;		/* New process ID */
+  char		sport[10];	/* Server port */
+  char		bport[10];	/* Browser port */
+  char		interval[10];	/* Poll interval */
+
+
+  sprintf(bport, "%d", BrowsePort);
+  sprintf(interval, "%d", BrowseInterval);
+
+  for (i = 0, poll = Polled; i < NumPolled; i ++, poll ++)
+  {
+    sprintf(sport, "%d", poll->port);
+
+    if ((pid = fork()) == 0)
+    {
+     /*
+      * Child...
+      */
+
+      setgid(Group);
+      setuid(User);
+
+      execl(CUPS_SERVERBIN "/daemon/cups-polld", "cups-polld", poll->hostname,
+            sport, interval, bport, NULL);
+      exit(errno);
+    }
+    else if (pid < 0)
+    {
+      LogMessage(L_ERROR, "StartPolling: Unable to fork polling daemon - %s",
+                 strerror(errno));
+      poll->pid = 0;
+      break;
+    }
+    else
+    {
+      poll->pid = pid;
+      LogMessage(L_DEBUG, "StartPolling: Started polling daemon for %s:%d, pid = %d",
+                 poll->hostname, poll->port, pid);
+    }
+  }
 }
 
 
@@ -560,9 +691,16 @@ StartPolling(void)
 void
 StopPolling(void)
 {
+  int		i;		/* Looping var */
+  dirsvc_poll_t	*poll;		/* Current polling server */
+
+
+  for (i = 0, poll = Polled; i < NumPolled; i ++, poll ++)
+    if (poll->pid)
+      kill(poll->pid, SIGTERM);
 }
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.49 2000/03/10 16:56:01 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.50 2000/03/11 15:31:28 mike Exp $".
  */
