@@ -1,5 +1,5 @@
 /*
- * "$Id: imagetops.c,v 1.47 2002/06/27 12:06:17 mike Exp $"
+ * "$Id: imagetops.c,v 1.48 2002/08/27 16:19:38 mike Exp $"
  *
  *   Image file to PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -258,6 +258,10 @@ main(int  argc,		/* I - Number of command-line arguments */
 
   if ((val = cupsGetOption("hue", num_options, options)) != NULL)
     hue = atoi(val);
+
+  if ((val = cupsGetOption("mirror", num_options, options)) != NULL &&
+      strcasecmp(val, "True") == 0)
+    Flip = 1;
 
  /*
   * Open the input image to print...
@@ -884,5 +888,5 @@ ps_ascii85(ib_t *data,		/* I - Data to print */
 
 
 /*
- * End of "$Id: imagetops.c,v 1.47 2002/06/27 12:06:17 mike Exp $".
+ * End of "$Id: imagetops.c,v 1.48 2002/08/27 16:19:38 mike Exp $".
  */
