@@ -1,5 +1,5 @@
 {#printer_name=0?No printers:
-<P><B>Systemvoreinstellung f&uuml; das Druckziel:</B> <A HREF="{default_uri}">{default_name}</A>
+<P><B>Systemvoreingestelltes Druckziel: </B> <A HREF="{default_uri}">{default_name}</A>
 <P><TABLE CELLPADDING="0" CELLSPACING="0" BORDER="0" WIDTH="100%">
 {[printer_name]
 <TR>
@@ -24,27 +24,27 @@
 	{?device_uri=?:<BR>Ger&auml;te URI: {device_uri}}
 	<P>
 	<A HREF="{printer_uri_supported}?op=print-test-page">
-	<IMG SRC="/images/print-test-page.gif" ALT="Print Test Page" BORDER="0"></A>
+	<IMG SRC="/images/print-test-page.gif" ALT="Drucker Testseite" BORDER="0"></A>
 	{printer_state=5?
 	<A HREF="/admin/?op=start-printer&printer_name={printer_name}">
-	<IMG SRC="/images/start-printer.gif" ALT="Start Printer" BORDER="0"></A>
+	<IMG SRC="/images/start-printer.gif" ALT="Drucker starten" BORDER="0"></A>
 	:
 	<A HREF="/admin/?op=stop-printer&printer_name={printer_name}">
-	<IMG SRC="/images/stop-printer.gif" ALT="Stop Printer" BORDER="0"></A>
+	<IMG SRC="/images/stop-printer.gif" ALT="Drucker anhalten" BORDER="0"></A>
 	}
 	{printer_is_accepting_jobs=0?
 	<A HREF="/admin/?op=accept-jobs&printer_name={printer_name}">
-	<IMG SRC="/images/accept-jobs.gif" ALT="Accept Jobs" BORDER="0"></A>
+	<IMG SRC="/images/accept-jobs.gif" ALT="Auftr&auml;ge annehmen" BORDER="0"></A>
 	:
 	<A HREF="/admin/?op=reject-jobs&printer_name={printer_name}">
-	<IMG SRC="/images/reject-jobs.gif" ALT="Reject Jobs" BORDER="0"></A>
+	<IMG SRC="/images/reject-jobs.gif" ALT="Auftr&auml;ge ablehnen" BORDER="0"></A>
 	}
 	<A HREF="/admin/?op=modify-printer&printer_name={printer_name}">
-	<IMG SRC="/images/modify-printer.gif" ALT="Modify Printer" BORDER="0"></A>
+	<IMG SRC="/images/modify-printer.gif" ALT="Drucker modifizieren" BORDER="0"></A>
 	<A HREF="/admin/?op=config-printer&printer_name={printer_name}">
-	<IMG SRC="/images/config-printer.gif" ALT="Configure Printer" BORDER="0"></A>
+	<IMG SRC="/images/config-printer.gif" ALT="Drucker konfigurieren" BORDER="0"></A>
 	<A HREF="/admin/?op=delete-printer&printer_name={printer_name}">
-	<IMG SRC="/images/delete-printer.gif" ALT="Delete Printer" BORDER="0"></A>
+	<IMG SRC="/images/delete-printer.gif" ALT="Drucker l&ouml;schen" BORDER="0"></A>
 	</TD>
 </TR>
 <TR>
@@ -54,4 +54,4 @@
 </TABLE>
 }
 <P><A HREF="/admin/?op=add-printer">
-<IMG SRC="/images/add-printer.gif" ALT="Add Printer" BORDER="0"></A>
+<IMG SRC="/images/add-printer.gif" ALT="Drucker hinzuf&uuml;gen" BORDER="0"></A>

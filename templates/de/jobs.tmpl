@@ -31,18 +31,18 @@
 	{job_state>5?
 	{job_k_octets>0?
 	<A HREF="/admin/?op=restart-job&job_id={job_id}">
-	<IMG SRC="/images/restart-job.gif" ALT="Restart Job" BORDER="0"></A>
+	<IMG SRC="/images/restart-job.gif" ALT="Auftrag wieder starten" BORDER="0"></A>
 	:}:}
 	{job_state>6?:
 	{job_state=4?
 	<A HREF="/admin/?op=release-job&job_id={job_id}">
-	<IMG SRC="/images/release-job.gif" ALT="Release Job" BORDER="0"></A>
+	<IMG SRC="/images/release-job.gif" ALT="Auftrag freigeben" BORDER="0"></A>
 	:
 	<A HREF="/admin/?op=hold-job&job_id={job_id}">
-	<IMG SRC="/images/hold-job.gif" ALT="Hold Job" BORDER="0"></A>
+	<IMG SRC="/images/hold-job.gif" ALT="Auftrag anhalten" BORDER="0"></A>
 	}
 	<A HREF="/admin/?op=cancel-job&job_id={job_id}">
-	<IMG SRC="/images/cancel-job.gif" ALT="Cancel Job" BORDER="0"></A>
+	<IMG SRC="/images/cancel-job.gif" ALT="Auftrag l&ouml;schen" BORDER="0"></A>
 	}
 	&nbsp;</TD>
 </TR>
@@ -51,8 +51,8 @@
 }
 <P>{?which_jobs=?
 <A HREF="{?printer_name=?/jobs:/printers/{printer_name}}?which_jobs=completed">
-<IMG SRC="/images/show-completed.gif" BORDER="0" ALT="Show Completed Jobs"></A>
+<IMG SRC="/images/show-completed.gif" BORDER="0" ALT="Fertige Auftr&auml;ge anzeigen"></A>
 :
 <A HREF="{?printer_name=?/jobs:/printers/{printer_name}}">
-<IMG SRC="/images/show-active.gif" BORDER="0" ALT="Show Active Jobs"></A>
+<IMG SRC="/images/show-active.gif" BORDER="0" ALT="Aktive Auftr&auml;ge anzeigen"></A>
 }
