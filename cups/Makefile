@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.72 2002/05/23 17:54:13 mike Exp $"
+# "$Id: Makefile,v 1.73 2002/05/23 20:07:34 mike Exp $"
 #
 #   Support library Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -33,7 +33,7 @@ include ../Makedefs
 LIBOBJS	=	dest.o emit.o encode.o http.o ipp.o language.o mark.o md5.o \
 		md5passwd.o options.o page.o ppd.o snprintf.o string.o \
 		tempfile.o usersys.o util.o
-OBJS	=	$(LIBOBJS) testhttp.o testppd.o ppd-debug.o
+OBJS	=	$(LIBOBJS) testhttp.o testlang.o testppd.o ppd-debug.o
 
 
 #
@@ -182,6 +182,15 @@ testhttp:	testhttp.o libcups.a
 
 
 #
+# testlang (dependency on static CUPS library is intentional)
+#
+
+testlang:	testlang.o libcups.a
+	echo Linking $@...
+	$(CC) $(LDFLAGS) -o $@ testlang.o libcups.a $(NETLIBS) $(SSLLIBS)
+
+
+#
 # testppd
 #
 
@@ -203,5 +212,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile,v 1.72 2002/05/23 17:54:13 mike Exp $".
+# End of "$Id: Makefile,v 1.73 2002/05/23 20:07:34 mike Exp $".
 #
