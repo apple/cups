@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.76 2000/09/14 20:34:50 mike Exp $"
+ * "$Id: printers.c,v 1.77 2000/10/02 14:34:23 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -753,7 +753,20 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
 		  "iso-8859-8",
 		  "iso-8859-9",
 		  "iso-8859-10",
-		  "utf-8"
+		  "iso-8859-13",
+		  "iso-8859-14",
+		  "iso-8859-15",
+		  "utf-8",
+		  "windows-874",
+		  "windows-1250",
+		  "windows-1251",
+		  "windows-1252",
+		  "windows-1253",
+		  "windows-1254",
+		  "windows-1255",
+		  "windows-1256",
+		  "windows-1257",
+		  "windows-1258"
 		};
   int		num_finishings;
   ipp_finish_t	finishings[5];
@@ -1560,5 +1573,5 @@ write_printcap(void)
 
 
 /*
- * End of "$Id: printers.c,v 1.76 2000/09/14 20:34:50 mike Exp $".
+ * End of "$Id: printers.c,v 1.77 2000/10/02 14:34:23 mike Exp $".
  */

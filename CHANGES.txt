@@ -3,7 +3,7 @@ CHANGES.txt - 10/02/2000
 
 CHANGES IN CUPS v1.1.4
 
-	- Makefile fixes.
+	- Makefile and configure script fixes.
 	- **** Changed the default Printcap setting **** to
 	  /etc/printcap. There are just too many people asking
 	  why application XYZ doesn't see their printers!
@@ -32,6 +32,10 @@ CHANGES IN CUPS v1.1.4
 	  changes.  This removes an ordering constraint on
 	  the color, page size, and resolution options in
 	  PPD files.
+	- The IPP backend didn't use the job's character set
+	  when the destination printer supported it.  This
+	  caused problems when printing text files to other
+	  CUPS servers.
 
 
 CHANGES IN CUPS v1.1.3
