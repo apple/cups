@@ -13,6 +13,8 @@ CHANGES IN CUPS V1.1.13
 	  "root".	
 	- The serial port backend did not clear the OPOST
 	  option, which could cause problems with some printers.
+	- The cups-lpd mini-daemon didn't lookup the client IP
+	  address properly.
 
 
 CHANGES IN CUPS V1.1.12
