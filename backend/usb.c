@@ -1,5 +1,5 @@
 /*
- * "$Id: usb.c,v 1.18.2.19 2002/10/15 16:40:33 mike Exp $"
+ * "$Id: usb.c,v 1.18.2.20 2002/10/21 19:03:19 mike Exp $"
  *
  *   USB port backend for the Common UNIX Printing System (CUPS).
  *
@@ -58,6 +58,10 @@
  */
 #  define LPIOC_GET_DEVICE_ID(len)	_IOC(_IOC_READ, 'P', IOCNR_GET_DEVICE_ID, len)
 #endif /* __linux */
+
+#ifdef __sun
+#  include <sys/ecppio.h>
+#endif /* __sun */
 
 
 /*
@@ -218,6 +222,27 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   signal(SIGTERM, SIG_IGN);
 #endif /* HAVE_SIGSET */
 
+#ifdef __linux
+ /*
+  * Show the printer status before we send the file; normally, we'd
+  * do this while we write data to the printer, however at least some
+  * Linux kernels have buggy USB drivers which don't like to be
+  * queried while sending data to the printer...
+  */
+
+  if (ioctl(fd, LPGETSTATUS, &status) == 0)
+  {
+    fprintf(stderr, "DEBUG: LPGETSTATUS returned a port status of %02X...\n", status);
+
+    if (status & LP_NOPA)
+      fputs("WARNING: Media tray empty!\n", stderr);
+    else if (status & LP_ERR)
+      fputs("WARNING: Printer fault!\n", stderr);
+    else if (status & LP_OFFL)
+      fputs("WARNING: Printer off-line.\n", stderr);
+  }
+#endif /* __linux */
+
  /*
   * Finally, send the print file...
   */
@@ -244,19 +269,6 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
       while (nbytes > 0)
       {
-#ifdef __linux
-        if (ioctl(fd, LPGETSTATUS, &status) == 0)
-	{
-	  fprintf(stderr, "DEBUG: LPGETSTATUS returned %02X...\n", status);
-
-	  if (status & LP_NOPA)
-	    fputs("INFO: Media tray empty!\n", stderr);
-	  else if (status & LP_ERR)
-	    fputs("INFO: Printer fault!\n", stderr);
-	  else if (status & LP_OFFL)
-	    fputs("INFO: Printer off-line.\n", stderr);
-	}
-#endif /* __linux */
 
 	if ((wbytes = write(fd, bufptr, nbytes)) < 0)
 	  if (errno == ENOTTY)
@@ -477,6 +489,20 @@ list_devices(void)
       {
 	length = (((unsigned)device_id[0] & 255) << 8) +
 	         ((unsigned)device_id[1] & 255);
+
+       /*
+        * Check to see if the length is larger than our buffer; first
+	* assume that the vendor incorrectly implemented the 1284 spec,
+	* and then limit the length to the size of our buffer...
+	*/
+
+        if (length > (sizeof(device_id) - 2))
+	  length = (((unsigned)device_id[1] & 255) << 8) +
+	           ((unsigned)device_id[0] & 255);
+
+        if (length > (sizeof(device_id) - 2))
+	  length = sizeof(device_id) - 2;
+
 	memcpy(device_id, device_id + 2, length);
 	device_id[length] = '\0';
       }
@@ -501,15 +527,62 @@ list_devices(void)
   }
 #elif defined(__sgi)
 #elif defined(__sun)
-  int   i;                      /* Looping var */
-  char  device[255];            /* Device filename */
+  int	i;			/* Looping var */
+  int	fd;			/* File descriptor */
+  char	device[255],		/* Device filename */
+	device_id[1024],	/* Device ID string */
+	device_uri[1024],	/* Device URI string */
+	make_model[1024];	/* Make and model */
+#  ifdef ECPPIOC_GETDEVID
+  struct ecpp_device_id did;	/* Device ID buffer */
+#  endif /* ECPPIOC_GETDEVID */
 
+
+ /*
+  * Open each USB device...
+  */
 
   for (i = 0; i < 8; i ++)
   {
     sprintf(device, "/dev/usb/printer%d", i);
+
+#  ifndef ECPPIOC_GETDEVID
     if (!access(device, 0))
       printf("direct usb:%s \"Unknown\" \"USB Printer #%d\"\n", device, i + 1);
+#  else
+    if ((fd = open(device, O_RDWR | O_EXCL)) >= 0)
+    {
+      did.mode = ECPP_CENTRONICS;
+      did.len  = sizeof(device_id);
+      did.rlen = 0;
+      did.addr = device_id;
+
+      if (ioctl(fd, ECPPIOC_GETDEVID, &did) == 0)
+      {
+        if (did.rlen < (sizeof(device_id) - 1))
+	  device_id[did.rlen] = '\0';
+        else
+	  device_id[sizeof(device_id) - 1] = '\0';
+      }
+      else
+        device_id[0] = '\0';
+
+      close(fd);
+    }
+    else
+      device_id[0] = '\0';
+
+    if (device_id[0])
+    {
+      decode_device_id(i, device_id, make_model, sizeof(make_model),
+		       device_uri, sizeof(device_uri));
+
+      printf("direct %s \"%s\" \"USB Printer #%d\"\n", device_uri,
+	     make_model, i + 1);
+    }
+    else
+      printf("direct usb:%s \"Unknown\" \"USB Printer #%d\"\n", device, i + 1);
+#  endif /* !ECPPIOC_GETDEVID */
   }
 #elif defined(__hpux)
 #elif defined(__osf)
@@ -626,6 +699,78 @@ open_device(const char *uri)		/* I - Device URI */
 
     return (-1);
   }
+#elif defined(__sun) && defined(ECPPIOC_GETDEVID)
+  else if (strncmp(uri, "usb://", 6) == 0)
+  {
+   /*
+    * For Solaris, try looking up the device serial number or model...
+    */
+
+    int		i;			/* Looping var */
+    int		fd;			/* File descriptor */
+    char	device[255],		/* Device filename */
+		device_id[1024],	/* Device ID string */
+		make_model[1024],	/* Make and model */
+		device_uri[1024];	/* Device URI string */
+    struct ecpp_device_id did;		/* Device ID buffer */
+
+
+   /*
+    * Find the correct USB device...
+    */
+
+    for (i = 0; i < 8; i ++)
+    {
+      sprintf(device, "/dev/usb/printer%d", i);
+
+      if ((fd = open(device, O_RDWR | O_EXCL)) >= 0)
+      {
+	did.mode = ECPP_CENTRONICS;
+	did.len  = sizeof(device_id);
+	did.rlen = 0;
+	did.addr = device_id;
+
+	if (ioctl(fd, ECPPIOC_GETDEVID, &did) == 0)
+	{
+          if (did.rlen < (sizeof(device_id) - 1))
+	    device_id[did.rlen] = '\0';
+          else
+	    device_id[sizeof(device_id) - 1] = '\0';
+	}
+	else
+          device_id[0] = '\0';
+      }
+      else
+	device_id[0] = '\0';
+
+      if (device_id[0])
+      {
+       /*
+        * Got the device ID - is this the one?
+	*/
+
+	decode_device_id(i, device_id, make_model, sizeof(make_model),
+                	 device_uri, sizeof(device_uri));
+
+        if (strcmp(uri, device_uri) == 0)
+	  return (fd);	/* Yes, return this file descriptor... */
+      }
+
+     /*
+      * This wasn't the one...
+      */
+
+      close(fd);
+    }
+
+   /*
+    * Couldn't find the printer, return "no such device or address"...
+    */
+
+    errno = ENODEV;
+
+    return (-1);
+  }
 #endif /* __linux */
   else
   {
@@ -636,5 +781,5 @@ open_device(const char *uri)		/* I - Device URI */
 
 
 /*
- * End of "$Id: usb.c,v 1.18.2.19 2002/10/15 16:40:33 mike Exp $".
+ * End of "$Id: usb.c,v 1.18.2.20 2002/10/21 19:03:19 mike Exp $".
  */

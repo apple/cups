@@ -3,6 +3,8 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.17
 
+	- The Solaris USB backend now supports the new device
+	  URI syntax.
 	- The ppdOpen*() functions now reset the numeric locale
 	  settings while loading a PPD file.
 	- Fixed the libtool build rules.
