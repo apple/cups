@@ -8,4 +8,6 @@ libcups_s.a
 libcups.2.dylib
 libcups.dylib
 testhttp
+testipp
+testlang
 testppd
