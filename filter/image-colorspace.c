@@ -1,5 +1,5 @@
 /*
- * "$Id: image-colorspace.c,v 1.22.2.5 2002/04/19 16:18:09 mike Exp $"
+ * "$Id: image-colorspace.c,v 1.22.2.6 2002/04/29 15:58:06 mike Exp $"
  *
  *   Colorspace conversions for the Common UNIX Printing System (CUPS).
  *
@@ -84,14 +84,23 @@
  * Local globals...
  */
 
-static int	ImageHaveProfile = 0;	/* Do we have a color profile? */
-static int	ImageDensity[256];	/* Ink/marker density LUT */
-static int	ImageMatrix[3][3][256];	/* Color transform matrix LUT */
+static int		ImageHaveProfile = 0;
+					/* Do we have a color profile? */
+static int		ImageDensity[256];
+					/* Ink/marker density LUT */
+static int		ImageMatrix[3][3][256];
+					/* Color transform matrix LUT */
+static cups_cspace_t	ImageColorSpace = CUPS_CSPACE_RGB;
+					/* Destination colorspace */
 
 
 /*
  * Local functions...
  */
+
+static float	cielab(float x, float xn);
+static void	rgb_to_xyz(ib_t *val);
+static void	rgb_to_lab(ib_t *val);
 
 static void	huerotate(float [3][3], float);
 static void	ident(float [3][3]);
@@ -102,6 +111,28 @@ static void	xrotate(float [3][3], float, float);
 static void	yrotate(float [3][3], float, float);
 static void	zrotate(float [3][3], float, float);
 static void	zshear(float [3][3], float, float);
+
+
+/*
+ * 'ImageSetColorSpace()' - Set the destination colorspace.
+ */
+
+void
+ImageSetColorSpace(cups_cspace_t cs)	/* I - Destination colorspace */
+{
+ /*
+  * Set the destination colorspace...
+  */
+
+  ImageColorSpace  = cs;
+
+ /*
+  * Don't use color profiles in colorimetric colorspaces...
+  */
+
+  if (cs >= CUPS_CSPACE_CIEXYZ)
+    ImageHaveProfile = 0;
+}
 
 
 /*
@@ -160,6 +191,7 @@ ImageWhiteToRGB(const ib_t *in,		/* I - Input pixels */
                 int        count)	/* I - Number of pixels */
 {
   if (ImageHaveProfile)
+  {
     while (count > 0)
     {
       out[0] = 255 - ImageDensity[255 - *in++];
@@ -168,14 +200,23 @@ ImageWhiteToRGB(const ib_t *in,		/* I - Input pixels */
       out += 3;
       count --;
     }
+  }
   else
+  {
     while (count > 0)
     {
       *out++ = *in;
       *out++ = *in;
       *out++ = *in++;
+
+      if (ImageColorSpace == CUPS_CSPACE_CIELab)
+        rgb_to_lab(out - 3);
+      else if (ImageColorSpace >= CUPS_CSPACE_CIEXYZ)
+        rgb_to_xyz(out - 3);
+
       count --;
     }
+  }
 }
 
 
@@ -461,19 +502,23 @@ ImageRGBToWhite(const ib_t *in,		/* I - Input pixels */
                 int        count)	/* I - Number of pixels */
 {
   if (ImageHaveProfile)
+  {
     while (count > 0)
     {
       *out++ = 255 - ImageDensity[255 - (31 * in[0] + 61 * in[1] + 8 * in[2]) / 100];
       in += 3;
       count --;
     }
+  }
   else
+  {
     while (count > 0)
     {
       *out++ = (31 * in[0] + 61 * in[1] + 8 * in[2]) / 100;
       in += 3;
       count --;
     }
+  }
 }
 
 
@@ -491,6 +536,7 @@ ImageRGBToRGB(const ib_t *in,	/* I - Input pixels */
 
 
   if (ImageHaveProfile)
+  {
     while (count > 0)
     {
       c = 255 - *in++;
@@ -534,8 +580,26 @@ ImageRGBToRGB(const ib_t *in,	/* I - Input pixels */
 
       count --;
     }
-  else if (in != out)
-    memcpy(out, in, count * 3);
+  }
+  else
+  {
+    if (in != out)
+      memcpy(out, in, count * 3);
+
+    if (ImageColorSpace >= CUPS_CSPACE_CIEXYZ)
+    {
+      while (count > 0)
+      {
+	if (ImageColorSpace == CUPS_CSPACE_CIELab)
+          rgb_to_lab(out);
+	else
+          rgb_to_xyz(out);
+
+	out += 3;
+	count --;
+      }
+    }
+  }
 }
 
 
@@ -586,8 +650,8 @@ ImageCMYKToBlack(const ib_t *in,	/* I - Input pixels */
 
 void
 ImageCMYKToCMY(const ib_t *in,	/* I - Input pixels */
-              ib_t       *out,	/* I - Output pixels */
-              int        count)	/* I - Number of pixels */
+               ib_t       *out,	/* I - Output pixels */
+               int        count)/* I - Number of pixels */
 {
   int	c, m, y, k;		/* CMYK values */
   int	cc, cm, cy;		/* Calibrated CMY values */
@@ -866,6 +930,11 @@ ImageCMYKToRGB(const ib_t *in,	/* I - Input pixels */
       else
         *out++ = 0;
 
+      if (ImageColorSpace == CUPS_CSPACE_CIELab)
+        rgb_to_lab(out - 3);
+      else if (ImageColorSpace >= CUPS_CSPACE_CIEXYZ)
+        rgb_to_xyz(out - 3);
+
       count --;
     }
   }
@@ -974,6 +1043,156 @@ ImageRGBAdjust(ib_t *pixels,	/* IO - Input/output pixels */
     count --;
     pixels += 3;
   }
+}
+
+
+/*
+ * Convert from RGB to CIE XYZ or Lab...
+ */
+
+#define D65_X	(0.412453 + 0.357580 + 0.180423)
+#define D65_Y	(0.212671 + 0.715160 + 0.072169)
+#define D65_Z	(0.019334 + 0.119193 + 0.950227)
+
+
+/*
+ * 'cielab()' - Map CIE Lab transformation...
+ */
+
+static float		/* O - Adjusted color value */
+cielab(float x,		/* I - Raw color value */
+       float xn)	/* I - Whitepoint color value */
+{
+  float x_xn;		/* Fraction of whitepoint */
+
+
+  x_xn = x / xn;
+
+  if (x_xn > 0.008856)
+    return (cbrt(x_xn));
+  else
+    return (7.787 * x_xn + 16.0 / 116.0);
+}
+
+
+/*
+ * 'rgb_to_xyz()' - Convert an RGB color to CIE XYZ.
+ */
+
+static void
+rgb_to_xyz(ib_t *val)	/* IO - Color value */
+{
+  float	r,		/* Red value */
+	g,		/* Green value */
+	b,		/* Blue value */
+	ciex,		/* CIE X value */
+	ciey,		/* CIE Y value */
+	ciez;		/* CIE Z value */
+
+
+ /*
+  * Convert sRGB to linear RGB...
+  */
+
+  r = pow(val[0] / 255.0, 0.58823529412);
+  g = pow(val[1] / 255.0, 0.58823529412);
+  b = pow(val[2] / 255.0, 0.58823529412);
+
+ /*
+  * Convert to CIE XYZ...
+  */
+
+  ciex = 0.412453 * r + 0.357580 * g + 0.180423 * b; 
+  ciey = 0.212671 * r + 0.715160 * g + 0.072169 * b;
+  ciez = 0.019334 * r + 0.119193 * g + 0.950227 * b;
+
+ /*
+  * Output 8-bit value...
+  */
+
+  val[0] = (int)(ciex * 255.0 + 0.5);
+  val[1] = (int)(ciey * 255.0 + 0.5);
+  val[2] = (int)(ciez * 255.0 + 0.5);
+}
+
+
+/*
+ * 'rgb_to_lab()' - Convert an RGB color to CIE Lab.
+ */
+
+static void
+rgb_to_lab(ib_t *val)	/* IO - Color value */
+{
+  float	r,		/* Red value */
+	g,		/* Green value */
+	b,		/* Blue value */
+	ciex,		/* CIE X value */
+	ciey,		/* CIE Y value */
+	ciez,		/* CIE Z value */
+	ciey_yn,	/* Normalized luminance */
+	ciel,		/* CIE L value */
+	ciea,		/* CIE a value */
+	cieb;		/* CIE b value */
+
+
+ /*
+  * Convert sRGB to linear RGB...
+  */
+
+  r = pow(val[0] / 255.0, 0.58823529412);
+  g = pow(val[1] / 255.0, 0.58823529412);
+  b = pow(val[2] / 255.0, 0.58823529412);
+
+ /*
+  * Convert to CIE XYZ...
+  */
+
+  ciex = 0.412453 * r + 0.357580 * g + 0.180423 * b; 
+  ciey = 0.212671 * r + 0.715160 * g + 0.072169 * b;
+  ciez = 0.019334 * r + 0.119193 * g + 0.950227 * b;
+
+ /*
+  * Normalize and convert to CIE Lab...
+  */
+
+  ciey_yn = ciey / D65_Y;
+
+  if (ciey_yn > 0.008856)
+    ciel = 116 * cbrt(ciey_yn) - 16;
+  else
+    ciel = 903.3 * ciey_yn;
+
+  ciea = 500 * (cielab(ciex, D65_X) - cielab(ciey, D65_Y));
+  cieb = 200 * (cielab(ciey, D65_Y) - cielab(ciez, D65_Z));
+
+ /*
+  * Output 8-bit value...
+  */
+
+  if (ciel < 0.0)
+    val[0] = 0;
+  else if (ciel < 255.0)
+    val[0] = (int)(ciel + 0.5);
+  else
+    val[0] = 255;
+
+  if (ciea < -127.0)
+    val[1] = 128;
+  else if (ciea < 0.0)
+    val[1] = (int)(ciea + 256.5);
+  else if (ciea > 127.0)
+    val[1] = 127;
+  else
+    val[1] = (int)(ciea + 0.5);
+
+  if (cieb < -127.0)
+    val[2] = 128;
+  else if (cieb < 0.0)
+    val[2] = (int)(cieb + 256.5);
+  else if (cieb > 127.0)
+    val[2] = 127;
+  else
+    val[2] = (int)(cieb + 0.5);
 }
 
 
@@ -1262,5 +1481,5 @@ zshear(float mat[3][3],	/* I - Matrix */
 
 
 /*
- * End of "$Id: image-colorspace.c,v 1.22.2.5 2002/04/19 16:18:09 mike Exp $".
+ * End of "$Id: image-colorspace.c,v 1.22.2.6 2002/04/29 15:58:06 mike Exp $".
  */

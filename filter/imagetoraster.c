@@ -1,5 +1,5 @@
 /*
- * "$Id: imagetoraster.c,v 1.56.2.6 2002/03/07 18:58:42 mike Exp $"
+ * "$Id: imagetoraster.c,v 1.56.2.7 2002/04/29 15:58:07 mike Exp $"
  *
  *   Image file to raster filter for the Common UNIX Printing System (CUPS).
  *
@@ -117,7 +117,55 @@ int	Floyd4x4[4][4] =
 ib_t	OnPixels[256],	/* On-pixel LUT */
 	OffPixels[256];	/* Off-pixel LUT */
 int	Planes[] =	/* Number of planes for each colorspace */
-	{ 1, 3, 4, 1, 3, 3, 4, 4, 4, 6, 4, 4, 1, 1, 1 };
+	{
+	  1,		/* CUPS_CSPACE_W */
+	  3,		/* CUPS_CSPACE_RGB */
+	  4,		/* CUPS_CSPACE_RGBA */
+	  1,		/* CUPS_CSPACE_K */
+	  3,		/* CUPS_CSPACE_CMY */
+	  3,		/* CUPS_CSPACE_YMC */
+	  4,		/* CUPS_CSPACE_CMYK */
+	  4,		/* CUPS_CSPACE_YMCK */
+	  4,		/* CUPS_CSPACE_KCMY */
+	  6,		/* CUPS_CSPACE_KCMYcm */
+	  4,		/* CUPS_CSPACE_GMCK */
+	  4,		/* CUPS_CSPACE_GMCS */
+	  1,		/* CUPS_CSPACE_WHITE */
+	  1,		/* CUPS_CSPACE_GOLD */
+	  1,		/* CUPS_CSPACE_SILVER */
+	  3,		/* CUPS_CSPACE_CIEXYZ */
+	  3,		/* CUPS_CSPACE_CIELab */
+	  0,		/* ... reserved ... */
+	  0,		/* ... reserved ... */
+	  0,		/* ... reserved ... */
+	  0,		/* ... reserved ... */
+	  0,		/* ... reserved ... */
+	  0,		/* ... reserved ... */
+	  0,		/* ... reserved ... */
+	  0,		/* ... reserved ... */
+	  0,		/* ... reserved ... */
+	  0,		/* ... reserved ... */
+	  0,		/* ... reserved ... */
+	  0,		/* ... reserved ... */
+	  0,		/* ... reserved ... */
+	  0,		/* ... reserved ... */
+	  0,		/* ... reserved ... */
+	  1,		/* CUPS_CSPACE_ICC1 */
+	  2,		/* CUPS_CSPACE_ICC2 */
+	  3,		/* CUPS_CSPACE_ICC3 */
+	  4,		/* CUPS_CSPACE_ICC4 */
+	  5,		/* CUPS_CSPACE_ICC5 */
+	  6,		/* CUPS_CSPACE_ICC6 */
+	  7,		/* CUPS_CSPACE_ICC7 */
+	  8,		/* CUPS_CSPACE_ICC8 */
+	  9,		/* CUPS_CSPACE_ICC9 */
+	  10,		/* CUPS_CSPACE_ICCA */
+	  11,		/* CUPS_CSPACE_ICCB */
+	  12,		/* CUPS_CSPACE_ICCC */
+	  13,		/* CUPS_CSPACE_ICCD */
+	  14,		/* CUPS_CSPACE_ICCE */
+	  15		/* CUPS_CSPACE_ICCF */
+	};
 
 
 /*
@@ -484,6 +532,7 @@ main(int  argc,		/* I - Number of command-line arguments */
         header.cupsBitsPerPixel = header.cupsBitsPerColor;
 	break;
 
+    default :
     case CUPS_CSPACE_RGB :
     case CUPS_CSPACE_RGBA :
         primary   = IMAGE_RGB;
@@ -509,7 +558,11 @@ main(int  argc,		/* I - Number of command-line arguments */
         header.cupsBitsPerPixel = header.cupsBitsPerColor;
 	break;
 
-    default :
+    case CUPS_CSPACE_CMYK :
+    case CUPS_CSPACE_YMCK :
+    case CUPS_CSPACE_KCMY :
+    case CUPS_CSPACE_GMCK :
+    case CUPS_CSPACE_GMCS :
         primary   = IMAGE_CMYK;
 	secondary = IMAGE_CMYK;
 
@@ -621,6 +674,8 @@ main(int  argc,		/* I - Number of command-line arguments */
 
   if (profile)
     ImageSetProfile(profile->density, profile->gamma, profile->matrix);
+
+  ImageSetColorSpace(header.cupsColorSpace);
 
  /*
   * Create a gamma/brightness LUT...
@@ -1234,6 +1289,7 @@ main(int  argc,		/* I - Number of command-line arguments */
 	          format_W(&header, row, y, plane, z->xsize, z->ysize,
 		           yerr0, yerr1, r0, r1);
 		  break;
+              default :
 	      case CUPS_CSPACE_RGB :
 	          format_RGB(&header, row, y, plane, z->xsize, z->ysize,
 		             yerr0, yerr1, r0, r1);
@@ -4450,5 +4506,5 @@ make_lut(ib_t  *lut,		/* I - Lookup table */
 
 
 /*
- * End of "$Id: imagetoraster.c,v 1.56.2.6 2002/03/07 18:58:42 mike Exp $".
+ * End of "$Id: imagetoraster.c,v 1.56.2.7 2002/04/29 15:58:07 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: image.h,v 1.11.2.3 2002/04/19 16:18:11 mike Exp $"
+ * "$Id: image.h,v 1.11.2.4 2002/04/29 15:58:07 mike Exp $"
  *
  *   Image library definitions for the Common UNIX Printing System (CUPS).
  *
@@ -36,6 +36,7 @@
 #  include <string.h>
 #  include <errno.h>
 #  include <config.h>
+#  include "raster.h"
 
 
 /*
@@ -159,6 +160,7 @@ typedef struct
 extern image_t	*ImageOpen(char *filename, int primary, int secondary,
 		           int saturation, int hue, const ib_t *lut);
 extern void	ImageClose(image_t *img);
+extern void	ImageSetColorSpace(cups_cspace_t cs);
 extern void	ImageSetMaxTiles(image_t *img, int max_tiles);
 extern void	ImageSetProfile(float d, float g, float matrix[3][3]);
 
@@ -237,5 +239,5 @@ extern void	ImageZoomFree(izoom_t *z);
 #endif /* !_IMAGE_H_ */
 
 /*
- * End of "$Id: image.h,v 1.11.2.3 2002/04/19 16:18:11 mike Exp $".
+ * End of "$Id: image.h,v 1.11.2.4 2002/04/29 15:58:07 mike Exp $".
  */
