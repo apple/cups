@@ -1,7 +1,7 @@
 <HTML>
 <HEAD>
 	<META NAME="COPYRIGHT" CONTENT="Copyright 1997-2000, All Rights Reserved">
-	<META NAME="DOCNUMBER" CONTENT="CUPS-SAM-1.1.3">
+	<META NAME="DOCNUMBER" CONTENT="CUPS-SAM-1.1.5">
 	<META NAME="Author" CONTENT="Easy Software Products">
 	<TITLE>CUPS Software Administrators Manual</TITLE>
 </HEAD>
@@ -11,7 +11,7 @@
 
 <P>This software administrators manual provides printer administration
 information for the Common UNIX Printing System<SUP>TM</SUP>
-("CUPS<SUP>TM</SUP>"), version 1.1.3.
+("CUPS<SUP>TM</SUP>"), version 1.1.5.
 
 <EMBED SRC="system-overview.shtml">
 
@@ -824,6 +824,7 @@ determine how the server operates:
 	<LI><A HREF="#AuthClass"><CODE>AuthClass</CODE></A>
 	<LI><A HREF="#AuthGroupName"><CODE>AuthGroupName</CODE></A>
 	<LI><A HREF="#AuthType"><CODE>AuthType</CODE></A>
+	<LI><A HREF="#AutoPurgeJobs"><CODE>AutoPurgeJobs</CODE></A>
 	<LI><A HREF="#BrowseAddress"><CODE>BrowseAddress</CODE></A>
 	<LI><A HREF="#BrowseAllow"><CODE>BrowseAllow</CODE></A>
 	<LI><A HREF="#BrowseDeny"><CODE>BrowseDeny</CODE></A>
@@ -858,6 +859,7 @@ determine how the server operates:
 	<LI><A HREF="#Location"><CODE>Location</CODE></A>
 	<LI><A HREF="#LogLevel"><CODE>LogLevel</CODE></A>
 	<LI><A HREF="#MaxClients"><CODE>MaxClients</CODE></A>
+	<LI><A HREF="#MaxJobs"><CODE>MaxJobs</CODE></A>
 	<LI><A HREF="#MaxLogSize"><CODE>MaxLogSize</CODE></A>
 	<LI><A HREF="#MaxRequestSize"><CODE>MaxRequestSize</CODE></A>
 
@@ -1076,6 +1078,23 @@ authenticate using <A HREF="#CERTIFICATES">certificates</A>.
 
 <P>The <CODE>AuthType</CODE> directive must appear inside a
 <A HREF="#Location"><CODE>Location</CODE></A> directive.
+
+<!-- NEED 3in -->
+<H3><A NAME="AutoPurgeJobs">AutoPurgeJobs</A></H3>
+<HR>
+
+<H4>Examples</H4>
+
+<UL><PRE>
+AutoPurgeJobs Yes
+AutoPurgeJobs No
+</PRE></UL>
+
+<H4>Description</H4>
+
+<P>The <CODE>AutoPurgeJobs</CODE> directive specifies whether or not to purge
+completed jobs once they are no longer required for quotas. This option has
+no effect if quotas are not enabled. The default setting is <CODE>No</CODE>.
 
 <!-- NEED 5in -->
 <H3><A NAME="BrowseAddress">BrowseAddress</A></H3>
@@ -1773,6 +1792,29 @@ simultaneous clients that will be allowed by the server. The default is
 	</TD>
 </TR>
 </TABLE></CENTER>
+
+<!-- NEED 3in -->
+<H3><A NAME="MaxJobs">MaxJobs</A></H3>
+<HR>
+
+<H4>Examples</H4>
+
+<UL><PRE>
+MaxJobs 100
+MaxJobs 9999
+MaxJobs 0
+</PRE></UL>
+
+<H4>Description</H4>
+
+<P>The <CODE>MaxJobs</CODE> directive controls the maximum number of jobs
+that are kept in memory. Once the number of jobs reaches the limit, the
+oldest completed job is automatically purged from the system to make room
+for the new one. If all of the known jobs are still pending or active then
+the new job will be rejected.
+
+<P>Setting the maximum size to 0 disables this functionality. The default
+setting is 0.
 
 <!-- NEED 3in -->
 <H3><A NAME="MaxLogSize">MaxLogSize</A></H3>

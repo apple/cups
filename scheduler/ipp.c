@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.108 2000/11/17 21:56:19 mike Exp $"
+ * "$Id: ipp.c,v 1.109 2000/11/18 19:16:33 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -693,6 +693,44 @@ add_class(client_t        *con,		/* I - Client connection */
     else
       strcpy(pclass->job_sheets[1], "none");
   }
+  if ((attr = ippFindAttribute(con->request, "requesting-user-name-allowed",
+                               IPP_TAG_ZERO)) != NULL)
+  {
+    FreePrinterUsers(pclass);
+
+    pclass->deny_users = 0;
+    if (attr->value_tag == IPP_TAG_NAME)
+      for (i = 0; i < attr->num_values; i ++)
+	AddPrinterUser(pclass, attr->values[i].string.text);
+  }
+  else if ((attr = ippFindAttribute(con->request, "requesting-user-name-denied",
+                                    IPP_TAG_ZERO)) != NULL)
+  {
+    FreePrinterUsers(pclass);
+
+    pclass->deny_users = 1;
+    if (attr->value_tag == IPP_TAG_NAME)
+      for (i = 0; i < attr->num_values; i ++)
+	AddPrinterUser(pclass, attr->values[i].string.text);
+  }
+  if ((attr = ippFindAttribute(con->request, "job-quota-period",
+                               IPP_TAG_INTEGER)) != NULL)
+  {
+    FreeQuotas(pclass);
+    pclass->quota_period = attr->values[0].integer;
+  }
+  if ((attr = ippFindAttribute(con->request, "job-k-limit",
+                               IPP_TAG_INTEGER)) != NULL)
+  {
+    FreeQuotas(pclass);
+    pclass->k_limit = attr->values[0].integer;
+  }
+  if ((attr = ippFindAttribute(con->request, "job-page-limit",
+                               IPP_TAG_INTEGER)) != NULL)
+  {
+    FreeQuotas(pclass);
+    pclass->page_limit = attr->values[0].integer;
+  }
 
   if ((attr = ippFindAttribute(con->request, "member-uris", IPP_TAG_URI)) != NULL)
   {
@@ -874,6 +912,7 @@ static void
 add_printer(client_t        *con,	/* I - Client connection */
             ipp_attribute_t *uri)	/* I - URI of printer */
 {
+  int			i;		/* Looping var */
   char			method[HTTP_MAX_URI],
 					/* Method portion of URI */
 			username[HTTP_MAX_URI],
@@ -1065,6 +1104,44 @@ add_printer(client_t        *con,	/* I - Client connection */
               sizeof(printer->job_sheets[1]) - 1);
     else
       strcpy(printer->job_sheets[1], "none");
+  }
+  if ((attr = ippFindAttribute(con->request, "requesting-user-name-allowed",
+                               IPP_TAG_ZERO)) != NULL)
+  {
+    FreePrinterUsers(printer);
+
+    printer->deny_users = 0;
+    if (attr->value_tag == IPP_TAG_NAME)
+      for (i = 0; i < attr->num_values; i ++)
+	AddPrinterUser(printer, attr->values[i].string.text);
+  }
+  else if ((attr = ippFindAttribute(con->request, "requesting-user-name-denied",
+                                    IPP_TAG_ZERO)) != NULL)
+  {
+    FreePrinterUsers(printer);
+
+    printer->deny_users = 1;
+    if (attr->value_tag == IPP_TAG_NAME)
+      for (i = 0; i < attr->num_values; i ++)
+	AddPrinterUser(printer, attr->values[i].string.text);
+  }
+  if ((attr = ippFindAttribute(con->request, "job-quota-period",
+                               IPP_TAG_INTEGER)) != NULL)
+  {
+    FreeQuotas(printer);
+    printer->quota_period = attr->values[0].integer;
+  }
+  if ((attr = ippFindAttribute(con->request, "job-k-limit",
+                               IPP_TAG_INTEGER)) != NULL)
+  {
+    FreeQuotas(printer);
+    printer->k_limit = attr->values[0].integer;
+  }
+  if ((attr = ippFindAttribute(con->request, "job-page-limit",
+                               IPP_TAG_INTEGER)) != NULL)
+  {
+    FreeQuotas(printer);
+    printer->page_limit = attr->values[0].integer;
   }
 
  /*
@@ -5034,5 +5111,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.108 2000/11/17 21:56:19 mike Exp $".
+ * End of "$Id: ipp.c,v 1.109 2000/11/18 19:16:33 mike Exp $".
  */

@@ -1,7 +1,7 @@
 /*
- * "$Id: quotas.c,v 1.2 2000/11/17 21:56:19 mike Exp $"
+ * "$Id: quotas.c,v 1.3 2000/11/18 19:16:33 mike Exp $"
  *
- *   for the Common UNIX Printing System (CUPS).
+ *   Quota routines for the Common UNIX Printing System (CUPS).
  *
  *   Copyright 1997-2000 by Easy Software Products.
  *
@@ -23,6 +23,11 @@
  *
  * Contents:
  *
+ *   AddQuota()    - Add a quota record for this printer and user.
+ *   FindQuota()   - Find a quota record.
+ *   FreeQuotas()  - Free quotas for a printer.
+ *   UpdateQuota() - Update quota data for the specified printer and user.
+ *   compare()     - Compare two quota records...
  */
 
 /*
@@ -110,6 +115,24 @@ FindQuota(printer_t  *p,		/* I - Printer */
 
 
 /*
+ * 'FreeQuotas()' - Free quotas for a printer.
+ */
+
+void
+FreeQuotas(printer_t *p)		/* I - Printer */
+{
+  if (!p)
+    return;
+
+  if (p->num_quotas)
+    free(p->quotas);
+
+  p->num_quotas = 0;
+  p->quotas     = NULL;
+}
+
+
+/*
  * 'UpdateQuota()' - Update quota data for the specified printer and user.
  */
 
@@ -145,7 +168,11 @@ UpdateQuota(printer_t  *p,		/* I - Printer */
     return (q);
   }
 
-  curtime        -= p->quota_period;
+  if (p->quota_period)
+    curtime -= p->quota_period;
+  else
+    curtime = 0;
+
   q->next_update = 0;
   q->page_count  = 0;
   q->k_count     = 0;
@@ -205,5 +232,5 @@ compare(const quota_t *q1,		/* I - First quota record */
 
 
 /*
- * End of "$Id: quotas.c,v 1.2 2000/11/17 21:56:19 mike Exp $".
+ * End of "$Id: quotas.c,v 1.3 2000/11/18 19:16:33 mike Exp $".
  */

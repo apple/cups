@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.80 2000/11/17 19:57:14 mike Exp $"
+ * "$Id: printers.c,v 1.81 2000/11/18 19:16:33 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -30,7 +30,7 @@
  *   DeletePrinter()        - Delete a printer from the system.
  *   DeletePrinterFilters() - Delete all MIME filters for a printer.
  *   FindPrinter()          - Find a printer in the list.
- *   FindPrinterUsers()     - Free allow/deny users.
+ *   FreePrinterUsers()     - Free allow/deny users.
  *   LoadAllPrinters()      - Load printers from the printers.conf file.
  *   SaveAllPrinters()      - Save all printer definitions to the printers.conf
  *   SetPrinterAttrs()      - Set printer attributes based upon the PPD file.
@@ -322,9 +322,7 @@ DeletePrinter(printer_t *p)	/* I - Printer to delete */
   DeletePrinterFilters(p);
 
   FreePrinterUsers(p);
-
-  if (p->num_quotas)
-    free(p->quotas);
+  FreeQuotas(p);
 
   free(p);
 
@@ -412,7 +410,7 @@ FindPrinter(const char *name)	/* I - Name of printer to find */
 
 
 /*
- * 'FindPrinterUsers()' - Free allow/deny users.
+ * 'FreePrinterUsers()' - Free allow/deny users.
  */
 
 void
@@ -1016,6 +1014,13 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
                     "requesting-user-name-allowed", p->num_users, NULL,
 		    p->users);
   }
+
+  ippAddInteger(p->attrs, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
+                "job-quota-period", p->quota_period);
+  ippAddInteger(p->attrs, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
+                "job-k-limit", p->k_limit);
+  ippAddInteger(p->attrs, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
+                "job-page-limit", p->page_limit);
 
   if (NumBanners > 0)
   {
@@ -1686,5 +1691,5 @@ write_printcap(void)
 
 
 /*
- * End of "$Id: printers.c,v 1.80 2000/11/17 19:57:14 mike Exp $".
+ * End of "$Id: printers.c,v 1.81 2000/11/18 19:16:33 mike Exp $".
  */

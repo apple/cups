@@ -772,14 +772,14 @@ CUPS-Add-Printer request:
 	<P>The client OPTIONALLY supplies this attribute indicating a
 	textual reason for the current printer state.
 
-	<P>"requesting-user-name-allowed" (1setof name(127))
+	<P>"requesting-user-name-allowed" (1setof name(127) | delete)
 	<P><I>OR</I>
-	<P>"requesting-user-name-denied" (1setof name(127)):
+	<P>"requesting-user-name-denied" (1setof name(127) | delete):
 
 	<P>The client OPTIONALLY supplies one of these attributes to
-	specify an access control list for incoming print jobs. The
-	special name "ALLUSERS" is reserved to indicate that all users
-	are allowed or denied.
+	specify an access control list for incoming print jobs. To allow
+	all users access to a printer, use the delete tag for the
+	attribute value.
 
 </UL>
 
@@ -988,7 +988,7 @@ CUPS-Add-Class request:
 	<P>"printer-is-accepting-jobs" (boolean):
 
 	<P>The client OPTIONALLY supplies this boolean attribute
-	indicating whether or not the printer object should accept new jobs.
+	indicating whether or not the class object should accept new jobs.
 
 	<P>"printer-info" (text(127)):
 
@@ -998,32 +998,32 @@ CUPS-Add-Class request:
 	<P>"printer-location" (text(127)):
 
 	<P>The client OPTIONALLY supplies this attribute indicating a
-	textual location of the printer.
+	textual location of the class.
 
 	<P>"printer-more-info" (uri):
 
 	<P>The client OPTIONALLY supplies this attribute indicating a
-	URI for additional printer information.
+	URI for additional class information.
 
 	<P>"printer-state" (type2 enum):
 
 	<P>The client OPTIONALLY supplies this attribute indicating the
-	initial/current state of the printer. Only the "idle" and "stopped"
+	initial/current state of the class. Only the "idle" and "stopped"
 	enumerations are recognized.
 
 	<P>"printer-state-message" (text(MAX)):
 
 	<P>The client OPTIONALLY supplies this attribute indicating a
-	textual reason for the current printer state.
+	textual reason for the current class state.
 
 	<P>"requesting-user-name-allowed" (1setof name(127))
 	<P><I>OR</I>
 	<P>"requesting-user-name-denied" (1setof name(127)):
 
 	<P>The client OPTIONALLY supplies one of these attributes to
-	specify an access control list for incoming print jobs. The
-	special name "ALLUSERS" is reserved to indicate that all users
-	are allowed or denied.
+	specify an access control list for incoming print jobs. To allow
+	all users access to a class, use the delete tag for the
+	attribute value.
 
 </UL>
 
@@ -1760,13 +1760,30 @@ delineate directories.
 
 <H2>Printer Attributes</H2>
 
-<H3>job-sheets-default (1setof type3 keyword | name(MAX))</H3>
+<H3>job-k-limit (integer)</H3>
 
 <P><I>(CUPS 1.1 and higher)</I>
 
-<P>The job-sheets-default attribute specifies the default banner file(s) to
-print before and after each job. The value "none" specifies that no banner
-should be printed.
+<P>The job-k-limit attribute specifies the maximum number of kilobytes that
+may be printed by a user, including banner files. The default value of 0
+specifies that there is no limit.
+
+<H3>job-page-limit (integer)</H3>
+
+<P><I>(CUPS 1.1 and higher)</I>
+
+<P>The job-page-limit attribute specifies the maximum number of pages that
+may be printed by a user, including banner files. The default value of 0
+specifies that there is no limit.
+
+<H3>job-quota-period (integer)</H3>
+
+<P><I>(CUPS 1.1 and higher)</I>
+
+<P>The job-quota-period attribute specifies the time period used for quota
+calculations, in seconds. The default value of 0 specifies that the limits
+apply to all jobs that have been printed by a user that are still known to
+the system.
 
 <H3>job-sheets-supported (1setof type3 keyword | name(MAX))</H3>
 
@@ -1872,9 +1889,6 @@ identically to the printer-type attribute and default to all 1's.
 allowed to access a printer or class. Either this attribute or the
 requesting-user-name-denied attribute will be defined, but not both.
 
-<P>The special name "ALLUSERS" is reserved to indicate that all users
-are allowed.
-
 <H3>requesting-user-name-denied (1setof name(127))</H3>
 
 <P><I>(CUPS 1.1 and higher)</I>
@@ -1882,9 +1896,6 @@ are allowed.
 <P>The requesting-user-name-denied attribute lists all of the users that are
 not allowed to access a printer or class. Either this attribute or the
 requesting-user-name-allowed attribute will be defined, but not both.
-
-<P>The special name "ALLUSERS" is reserved to indicate that all users
-are denied.
 
 <H2>Printer Class Attributes</H2>
 
