@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.190 2003/03/12 16:09:48 mike Exp $"
+ * "$Id: job.c,v 1.191 2003/03/12 21:24:35 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -25,7 +25,7 @@
  *
  *   AddJob()             - Add a new job to the job queue...
  *   CancelJob()          - Cancel the specified print job.
- *   CancelJobs()         - Cancel all jobs on the given printer or class.
+ *   CancelJobs()         - Cancel all jobs for the given destination/user...
  *   CheckJobs()          - Check the pending jobs and start any if the
  *                          destination is available.
  *   CleanJobs()          - Clean out old jobs.
@@ -213,23 +213,26 @@ CancelJob(int id,		/* I - Job to cancel */
 
 
 /*
- * 'CancelJobs()' - Cancel all jobs on the given printer or class.
+ * 'CancelJobs()' - Cancel all jobs for the given destination/user...
  */
 
 void
-CancelJobs(const char *dest)	/* I - Destination to cancel */
+CancelJobs(const char *dest,	/* I - Destination to cancel */
+           const char *username,/* I - Username or NULL */
+	   int        purge)	/* I - Purge jobs? */
 {
   job_t	*current;		/* Current job */
 
 
   for (current = Jobs; current != NULL;)
-    if (strcmp(current->dest, dest) == 0)
+    if ((dest == NULL || !strcmp(current->dest, dest)) &&
+        (username == NULL || !strcmp(current->username, username)))
     {
      /*
-      * Cancel all jobs matching this destination...
+      * Cancel all jobs matching this destination/user...
       */
 
-      CancelJob(current->id, 1);
+      CancelJob(current->id, purge);
 
       current = Jobs;
     }
@@ -3397,5 +3400,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.190 2003/03/12 16:09:48 mike Exp $".
+ * End of "$Id: job.c,v 1.191 2003/03/12 21:24:35 mike Exp $".
  */
