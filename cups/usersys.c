@@ -1,5 +1,5 @@
 /*
- * "$Id: usersys.c,v 1.4 2000/03/10 16:32:25 mike Exp $"
+ * "$Id: usersys.c,v 1.5 2000/04/18 19:41:08 mike Exp $"
  *
  *   User, system, and password routines for the Common UNIX Printing
  *   System (CUPS).
@@ -125,6 +125,7 @@ cupsServer(void)
 {
   FILE		*fp;			/* client.conf file */
   char		*server;		/* Pointer to server name */
+  const char	*home;			/* Home directory of user */
   static char	line[1024];		/* Line from file */
 
 
@@ -136,14 +137,25 @@ cupsServer(void)
     return (server);
 
  /*
-  * Next check to see if we have a client.conf file...
+  * Next check to see if we have a $HOME/.cupsrc or client.conf file...
   */
 
-  if ((fp = fopen(CUPS_SERVERROOT "/client.conf", "r")) == NULL)
+  if ((home = getenv("HOME")) != NULL)
+  {
+    snprintf(line, sizeof(line), "%s/.cupsrc", home);
+    fp = fopen(line, "r");
+  }
+  else
+    fp = NULL;
+
+  if (fp == NULL)
+    fp = fopen(CUPS_SERVERROOT "/client.conf", "r");
+
+  if (fp == NULL)
     return ("localhost");
 
  /*
-  * Read the client.conf file and look for a ServerName line...
+  * Read the config file and look for a ServerName line...
   */
 
   while (fgets(line, sizeof(line), fp) != NULL)
@@ -177,5 +189,5 @@ cupsServer(void)
 
 
 /*
- * End of "$Id: usersys.c,v 1.4 2000/03/10 16:32:25 mike Exp $".
+ * End of "$Id: usersys.c,v 1.5 2000/04/18 19:41:08 mike Exp $".
  */

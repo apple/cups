@@ -1,5 +1,5 @@
 /*
- * "$Id: type.c,v 1.3 2000/04/09 23:09:08 mike Exp $"
+ * "$Id: type.c,v 1.4 2000/04/18 19:41:12 mike Exp $"
  *
  *   MIME typing routines for the Common UNIX Printing System (CUPS).
  *
@@ -732,7 +732,7 @@ checkrules(const char   *filename,	/* I - Filename */
 	  }
 
          /*
-	  * Test for ASCII printable characters plus standard control chars.
+	  * Test for 8-bit printable characters plus standard control chars.
 	  */
 
 	  if ((rules->offset + rules->length) > (bufoffset + buflength))
@@ -743,7 +743,7 @@ checkrules(const char   *filename,	/* I - Filename */
           bufptr = buffer + rules->offset - bufoffset;
 
 	  while (n > 0)
-	    if ((*bufptr >= 160 && *bufptr <= 254) ||
+	    if (*bufptr >= 128 ||
 	        (*bufptr >= 32 && *bufptr <= 126) ||
 	        (*bufptr >= 8 && *bufptr <= 13) ||
 		*bufptr == 26 || *bufptr == 27)
@@ -1061,5 +1061,5 @@ patmatch(const char *s,		/* I - String to match against */
 
 
 /*
- * End of "$Id: type.c,v 1.3 2000/04/09 23:09:08 mike Exp $".
+ * End of "$Id: type.c,v 1.4 2000/04/18 19:41:12 mike Exp $".
  */

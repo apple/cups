@@ -1,5 +1,5 @@
 /*
- * "$Id: form-main.c,v 1.1 2000/02/11 05:04:13 mike Exp $"
+ * "$Id: form-main.c,v 1.2 2000/04/18 19:41:11 mike Exp $"
  *
  *   CUPS form main entry for the Common UNIX Printing System (CUPS).
  *
@@ -23,6 +23,7 @@
  *
  * Contents:
  *
+ *   main() - Load the specified form file and output PostScript.
  */
 
 /*
@@ -33,5 +34,27 @@
 
 
 /*
- * End of "$Id: form-main.c,v 1.1 2000/02/11 05:04:13 mike Exp $".
+ * Globals...
+ */
+
+int		NumOptions;	/* Number of command-line options */
+cups_option_t	*Options;	/* Command-line options */
+ppd_file_t	*PPD;		/* PPD file */
+
+
+/*
+ * 'main()' - Load the specified form file and output PostScript.
+ */
+
+int				/* O - Exit status */
+main(int  argc,			/* I - Number of command-line arguments */
+     char *argv[])		/* I - Command-line arguments */
+{
+
+  return (0);
+}
+
+
+/*
+ * End of "$Id: form-main.c,v 1.2 2000/04/18 19:41:11 mike Exp $".
  */

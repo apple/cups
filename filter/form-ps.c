@@ -1,5 +1,5 @@
 /*
- * "$Id: form-ps.c,v 1.1 2000/02/11 05:04:13 mike Exp $"
+ * "$Id: form-ps.c,v 1.2 2000/04/18 19:41:11 mike Exp $"
  *
  *   CUPS form PostScript routines for the Common UNIX Printing System (CUPS).
  *
@@ -33,5 +33,15 @@
 
 
 /*
- * End of "$Id: form-ps.c,v 1.1 2000/02/11 05:04:13 mike Exp $".
+ * 'formWrite()' - Write PostScript output for the given form document.
+ */
+
+void
+formWrite(tree_t *t)			/* I - Document tree to write */
+{
+}
+
+
+/*
+ * End of "$Id: form-ps.c,v 1.2 2000/04/18 19:41:11 mike Exp $".
  */

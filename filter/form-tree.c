@@ -1,5 +1,5 @@
 /*
- * "$Id: form-tree.c,v 1.1 2000/02/11 05:04:13 mike Exp $"
+ * "$Id: form-tree.c,v 1.2 2000/04/18 19:41:11 mike Exp $"
  *
  *   CUPS form document tree routines for the Common UNIX Printing
  *   System (CUPS).
@@ -34,5 +34,60 @@
 
 
 /*
- * End of "$Id: form-tree.c,v 1.1 2000/02/11 05:04:13 mike Exp $".
+ * 'formDelete()' - Delete a node and its children.
+ */
+
+void
+formDelete(tree_t *t)			/* I - Tree node */
+{
+}
+
+
+/*
+ * 'formGetAttr()' - Get a node attribute value.
+ */
+
+char *					/* O - Value or NULL */
+formGetAttr(tree_t     *t,		/* I - Tree node */
+            const char *name)		/* I - Name of attribute */
+{
+}
+
+
+/*
+ * 'formNew()' - Create a new form node.
+ */
+
+tree_t *				/* O - New tree node */
+formNew(element_t e,			/* I - Element type */
+        tree_t    *p)			/* I - Parent node */
+{
+}
+
+
+/*
+ * 'formRead()' - Read a form tree from a file.
+ */
+
+tree_t *				/* O - New form tree */
+formRead(FILE   *fp,			/* I - File to read from */
+         tree_t *p)			/* I - Parent node */
+{
+}
+
+
+/*
+ * 'formSetAttr()' - Set a node attribute.
+ */
+
+void
+formSetAttr(tree_t     *t,		/* I - Tree node */
+            const char *name,		/* I - Attribute name */
+	    const char *value)		/* I - Attribute value */
+{
+}
+
+
+/*
+ * End of "$Id: form-tree.c,v 1.2 2000/04/18 19:41:11 mike Exp $".
  */

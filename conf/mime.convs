@@ -1,9 +1,9 @@
 #
-# "$Id: mime.convs,v 1.7 1999/07/30 13:57:16 mike Exp $"
+# "$Id: mime.convs,v 1.8 2000/04/18 19:41:07 mike Exp $"
 #
 #   MIME converts file for the Common UNIX Printing System (CUPS).
 #
-#   Copyright 1997-1999 by Easy Software Products.
+#   Copyright 1997-2000 by Easy Software Products.
 #
 #   These coded instructions, statements, and computer programs are the
 #   property of Easy Software Products and are protected by Federal
@@ -47,7 +47,9 @@ application/postscript	application/vnd.cups-postscript	50	pstops
 application/vnd.hp-HPGL	application/postscript	50	hpgltops
 image/*			application/vnd.cups-postscript	50	imagetops
 #text/html		application/postscript	50	htmltops
+text/html		application/postscript	50	texttops
 text/plain		application/postscript	50	texttops
+application/vnd.cups-form application/vnd.cups-postscript 50 formtops
 
 ########################################################################
 #
@@ -58,5 +60,5 @@ image/*			application/vnd.cups-raster	50	imagetoraster
 application/vnd.cups-postscript	application/vnd.cups-raster	50	pstoraster
 
 #
-# End of "$Id: mime.convs,v 1.7 1999/07/30 13:57:16 mike Exp $".
+# End of "$Id: mime.convs,v 1.8 2000/04/18 19:41:07 mike Exp $".
 #
