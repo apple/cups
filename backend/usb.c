@@ -1,5 +1,5 @@
 /*
- * "$Id: usb.c,v 1.39 2002/10/21 18:56:17 mike Exp $"
+ * "$Id: usb.c,v 1.40 2002/10/21 18:57:22 mike Exp $"
  *
  *   USB port backend for the Common UNIX Printing System (CUPS).
  *
@@ -533,8 +533,7 @@ list_devices(void)
 #elif defined(__sun)
   int	i;			/* Looping var */
   int	fd;			/* File descriptor */
-  char	format[255],		/* Format for device filename */
-	device[255],		/* Device filename */
+  char	device[255],		/* Device filename */
 	device_id[1024],	/* Device ID string */
 	device_uri[1024],	/* Device URI string */
 	make_model[1024];	/* Make and model */
@@ -713,8 +712,7 @@ open_device(const char *uri)		/* I - Device URI */
 
     int		i;			/* Looping var */
     int		fd;			/* File descriptor */
-    char	format[255],		/* Format for device filename */
-		device[255],		/* Device filename */
+    char	device[255],		/* Device filename */
 		device_id[1024],	/* Device ID string */
 		make_model[1024],	/* Make and model */
 		device_uri[1024];	/* Device URI string */
@@ -787,5 +785,5 @@ open_device(const char *uri)		/* I - Device URI */
 
 
 /*
- * End of "$Id: usb.c,v 1.39 2002/10/21 18:56:17 mike Exp $".
+ * End of "$Id: usb.c,v 1.40 2002/10/21 18:57:22 mike Exp $".
  */
