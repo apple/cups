@@ -1,5 +1,5 @@
 /*
- * "$Id: lprm.c,v 1.5 1999/07/13 12:03:20 mike Exp $"
+ * "$Id: lprm.c,v 1.6 1999/07/30 15:03:10 mike Exp $"
  *
  *   "lprm" command for the Common UNIX Printing System (CUPS).
  *
@@ -169,7 +169,14 @@ main(int  argc,			/* I - Number of command-line arguments */
         response = cupsDoRequest(http, request, "/jobs/");
 
       if (response != NULL)
+      {
+        if (response->request->status.status_code == IPP_NOT_FOUND)
+          fputs("lprm: Job or printer not found!\n", stderr);
+        else if (response->request->status.status_code > IPP_OK_CONFLICT)
+          fputs("lprm: Unable to cancel job(s)!\n", stderr);
+
         ippDelete(response);
+      }
       else
       {
         fputs("lprm: Unable to cancel job(s)!\n", stderr);
@@ -194,5 +201,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: lprm.c,v 1.5 1999/07/13 12:03:20 mike Exp $".
+ * End of "$Id: lprm.c,v 1.6 1999/07/30 15:03:10 mike Exp $".
  */
