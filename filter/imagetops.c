@@ -1,5 +1,5 @@
 /*
- * "$Id: imagetops.c,v 1.5 1998/08/10 15:51:04 mike Exp $"
+ * "$Id: imagetops.c,v 1.6 1998/08/10 16:20:08 mike Exp $"
  *
  *   Image file to PostScript conversion program for espPrint, a collection
  *   of printer drivers.
@@ -17,7 +17,10 @@
  * Revision History:
  *
  *   $Log: imagetops.c,v $
- *   Revision 1.5  1998/08/10 15:51:04  mike
+ *   Revision 1.6  1998/08/10 16:20:08  mike
+ *   Removed extra debug statements.
+ *
+ *   Revision 1.5  1998/08/10  15:51:04  mike
  *   Fixed scaling problems.
  *   FIxed offset problems.
  *
@@ -544,11 +547,6 @@ main(int  argc,		/* I - Number of command-line arguments */
   left   = 36.0 * (size->width - xprint);
   bottom = 36.0 * (size->length - yprint);
 
-  fprintf(stderr, "xprint = %.2f, yprint = %.2f, width = %.2f, length = %.2f\n"
-                  "xinches = %.2f, yinches = %.2f, left = %.0f, bottom = %.0f\n",
-          xprint, yprint, size->width, size->length, xinches, yinches,
-	  left, bottom);
-
   fputs("%!PS-Adobe-3.0\n", out);
   fprintf(out, "%%%%BoundingBox: %.1f %.1f %.1f %.1f\n", left, bottom,
           left + 72.0 * xprint, bottom + 72.0 * yprint);
@@ -932,5 +930,5 @@ print_prolog(FILE  *out,
 
 
 /*
- * End of "$Id: imagetops.c,v 1.5 1998/08/10 15:51:04 mike Exp $".
+ * End of "$Id: imagetops.c,v 1.6 1998/08/10 16:20:08 mike Exp $".
  */
