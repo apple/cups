@@ -1,4 +1,4 @@
-CHANGES.txt - 07/11/2001
+CHANGES.txt - 07/12/2001
 ------------------------
 
 CHANGES IN CUPS V1.1.9-1
@@ -14,6 +14,9 @@ CHANGES IN CUPS V1.1.9-1
 	  distribution.
 	- The New DeskJet series driver did not use the
 	  correct OrderDependency for the Duplex option.
+	- Use read() instead of fread() to read piped
+	  print files in lpr/lp.  This avoids a bug in the
+	  HP-UX 10.20 fread() function.
 
 
 CHANGES IN CUPS V1.1.9

@@ -1,5 +1,5 @@
 /*
- * "$Id: lp.c,v 1.31 2001/06/21 22:00:55 mike Exp $"
+ * "$Id: lp.c,v 1.32 2001/07/12 12:28:25 mike Exp $"
  *
  *   "lp" command for the Common UNIX Printing System (CUPS).
  *
@@ -530,7 +530,7 @@ main(int  argc,		/* I - Number of command-line arguments */
       return (1);
     }
 
-    while ((i = fread(buffer, 1, sizeof(buffer), stdin)) > 0)
+    while ((i = read(0, buffer, sizeof(buffer))) > 0)
       write(temp, buffer, i);
 
     i = lseek(temp, 0, SEEK_CUR);
@@ -651,5 +651,5 @@ sighandler(int s)	/* I - Signal number */
 
 
 /*
- * End of "$Id: lp.c,v 1.31 2001/06/21 22:00:55 mike Exp $".
+ * End of "$Id: lp.c,v 1.32 2001/07/12 12:28:25 mike Exp $".
  */
