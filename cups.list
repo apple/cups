@@ -1,5 +1,5 @@
 #
-# "$Id: cups.list,v 1.16 1999/08/09 17:11:19 mike Exp $"
+# "$Id: cups.list,v 1.17 1999/08/12 13:11:10 mike Exp $"
 #
 #   ESP Package Manager (EPM) file list for the Common UNIX Printing
 #   System (CUPS).
@@ -31,7 +31,7 @@
 %vendor Easy Software Products
 %license LICENSE.cups
 %readme README.cups
-%version 1.0b6
+%version 1.0b7
 %incompat printpro
 
 %system all
@@ -56,19 +56,26 @@ f 0555 root sys /var/cups/filter/rastertohp filter/rastertohp
 f 0555 root sys /var/cups/filter/hpgltops filter/hpgltops
 f 0555 root sys /var/cups/filter/imagetoraster filter/imagetoraster
 
-# User commands
-f 0555 root sys /usr/bin/lp systemv/lp
-f 0555 root sys /usr/bin/lpstat systemv/lpstat
-f 0555 root sys /usr/lib/lpadmin systemv/lpadmin
-f 0555 root sys /usr/bin/cancel systemv/cancel
-f 0555 root sys /usr/lib/accept systemv/accept
+# Admin commands
+l 0555 root sys /usr/bin/disable /usr/sbin/accept
+l 0555 root sys /usr/bin/enable /usr/sbin/accept
+l 0555 root sys /usr/lib/accept /usr/sbin/accept
+l 0555 root sys /usr/lib/lpadmin /usr/sbin/lpadmin
 l 0555 root sys /usr/lib/reject accept
-l 0555 root sys /usr/bin/disable /usr/lib/accept
-l 0555 root sys /usr/bin/enable /usr/lib/accept
+f 0555 root sys /usr/sbin/accept systemv/accept
+f 0555 root sys /usr/sbin/esplicense license/esplicense
+f 0555 root sys /usr/sbin/lpadmin systemv/lpadmin
 f 0555 root sys /usr/sbin/lpc berkeley/lpc
+l 0555 root sys /usr/sbin/reject accept
+
+# User commands
+f 0555 root sys /usr/bin/cancel systemv/cancel
+f 0555 root sys /usr/bin/lp systemv/lp
 f 0555 root sys /usr/bin/lpq berkeley/lpq
 f 0555 root sys /usr/bin/lpr berkeley/lpr
 f 0555 root sys /usr/bin/lprm berkeley/lprm
+f 0555 root sys /usr/bin/lpstat systemv/lpstat
+f 0555 root sys /usr/bin/lpwin gui/lpwin
 
 # DSOs
 %system hpux
@@ -340,5 +347,5 @@ l 0555 root sys /etc/rc0.d/K20cups ../init.d/cups
 l 0555 root sys /etc/rc2.d/S80cups ../init.d/cups
 
 #
-# End of "$Id: cups.list,v 1.16 1999/08/09 17:11:19 mike Exp $".
+# End of "$Id: cups.list,v 1.17 1999/08/12 13:11:10 mike Exp $".
 #

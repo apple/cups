@@ -1,5 +1,5 @@
 #
-# "$Id: cups.spec,v 1.3 1999/08/11 13:59:15 mike Exp $"
+# "$Id: cups.spec,v 1.4 1999/08/12 13:11:11 mike Exp $"
 #
 #   RPM "spec" file for the Common UNIX Printing System (CUPS).
 #
@@ -106,9 +106,6 @@ rm -rf $RPM_BUILD_ROOT
 %config /var/cups/conf/mime.convs
 %config /var/cups/conf/mime.types
 %config /var/cups/conf/printers.conf
-/usr/lib/accept
-/usr/lib/lpadmin
-/usr/lib/reject
 /usr/bin/lpr
 /usr/bin/lprm
 /usr/bin/disable
@@ -116,6 +113,11 @@ rm -rf $RPM_BUILD_ROOT
 /usr/bin/cancel
 /usr/bin/lp
 /usr/bin/lpstat
+/usr/lib/accept
+/usr/lib/libcups.so.1
+/usr/lib/libcupsimage.so.1
+/usr/lib/lpadmin
+/usr/lib/reject
 /usr/man/man1/backend.1
 /usr/man/man1/filter.1
 /usr/man/man1/lprm.1
@@ -135,10 +137,11 @@ rm -rf $RPM_BUILD_ROOT
 /usr/man/man8/lpc.8
 /usr/man/man8/reject.8
 /usr/man/man8/disable.8
-/usr/sbin/lpc
+/usr/sbin/accept
 /usr/sbin/cupsd
-/usr/lib/libcups.so.1
-/usr/lib/libcupsimage.so.1
+/usr/sbin/lpadmin
+/usr/sbin/lpc
+/usr/sbin/reject
 %dir /usr/share/cups
 /usr/share/cups/data/8859-1
 /usr/share/cups/data/8859-14
@@ -304,5 +307,5 @@ rm -rf $RPM_BUILD_ROOT
 /usr/lib/libcupsimage.so
 
 #
-# End of "$Id: cups.spec,v 1.3 1999/08/11 13:59:15 mike Exp $".
+# End of "$Id: cups.spec,v 1.4 1999/08/12 13:11:11 mike Exp $".
 #
