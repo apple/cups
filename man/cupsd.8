@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: cupsd.8,v 1.2 1999/09/22 20:06:36 mike Exp $"
+.\" "$Id: cupsd.8,v 1.3 1999/12/14 20:46:18 mike Exp $"
 .\"
 .\"   cupsd man page for the Common UNIX Printing System (CUPS).
 .\"
@@ -25,13 +25,13 @@
 .SH NAME
 cupsd \- common unix printing system daemon
 .SH SYNOPSIS
-.B cups
+.B cupsd
 .I [ \-c config-file ]
 .SH DESCRIPTION
 \fIcupsd\fR is the scheduler for the Common UNIX Printing System. It implements
 a printing system based upon the Internet Printing Protocol, version 1.0.  If
 no options are specified on the command-line then the default configuration file
-(usually \fI/var/cups/conf/cupsf.conf\fR) will be used.
+(usually \fI/var/cups/conf/cupsd.conf\fR) will be used.
 .SH COMPATIBILITY
 \fIcupsd\fR implements all of the required IPP/1.0 attributes and operations.
 It also implements optional operation set 1 and several CUPS-specific
@@ -44,5 +44,5 @@ CUPS Interface Design Description
 .SH COPYRIGHT
 Copyright 1993-1999 by Easy Software Products, All Rights Reserved.
 .\"
-.\" End of "$Id: cupsd.8,v 1.2 1999/09/22 20:06:36 mike Exp $".
+.\" End of "$Id: cupsd.8,v 1.3 1999/12/14 20:46:18 mike Exp $".
 .\"
