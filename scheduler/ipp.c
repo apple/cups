@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.114 2001/01/22 15:03:59 mike Exp $"
+ * "$Id: ipp.c,v 1.115 2001/01/23 16:26:21 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -704,7 +704,9 @@ add_class(client_t        *con,		/* I - Client connection */
     FreePrinterUsers(pclass);
 
     pclass->deny_users = 0;
-    if (attr->value_tag == IPP_TAG_NAME)
+    if (attr->value_tag == IPP_TAG_NAME &&
+        (attr->num_values > 1 ||
+	 strcmp(attr->values[0].string.text, "all") != 0))
       for (i = 0; i < attr->num_values; i ++)
 	AddPrinterUser(pclass, attr->values[i].string.text);
   }
@@ -714,7 +716,9 @@ add_class(client_t        *con,		/* I - Client connection */
     FreePrinterUsers(pclass);
 
     pclass->deny_users = 1;
-    if (attr->value_tag == IPP_TAG_NAME)
+    if (attr->value_tag == IPP_TAG_NAME &&
+        (attr->num_values > 1 ||
+	 strcmp(attr->values[0].string.text, "none") != 0))
       for (i = 0; i < attr->num_values; i ++)
 	AddPrinterUser(pclass, attr->values[i].string.text);
   }
@@ -5125,5 +5129,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.114 2001/01/22 15:03:59 mike Exp $".
+ * End of "$Id: ipp.c,v 1.115 2001/01/23 16:26:21 mike Exp $".
  */

@@ -1,9 +1,9 @@
 .\"
-.\" "$Id: filter.man,v 1.5 2000/07/20 17:10:56 mike Exp $"
+.\" "$Id: filter.man,v 1.6 2001/01/23 16:26:20 mike Exp $"
 .\"
 .\"   filter man page for the Common UNIX Printing System (CUPS).
 .\"
-.\"   Copyright 1997-2000 by Easy Software Products.
+.\"   Copyright 1997-2001 by Easy Software Products.
 .\"
 .\"   These coded instructions, statements, and computer programs are the
 .\"   property of Easy Software Products and are protected by Federal
@@ -110,7 +110,7 @@ CUPS Software Administrators Manual,
 CUPS Software Programmers Manual,
 http://localhost:631/documentation.html
 .SH COPYRIGHT
-Copyright 1993-2000 by Easy Software Products, All Rights Reserved.
+Copyright 1993-2001 by Easy Software Products, All Rights Reserved.
 .\"
-.\" End of "$Id: filter.man,v 1.5 2000/07/20 17:10:56 mike Exp $".
+.\" End of "$Id: filter.man,v 1.6 2001/01/23 16:26:20 mike Exp $".
 .\"

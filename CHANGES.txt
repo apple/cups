@@ -44,6 +44,10 @@ CHANGES IN CUPS V1.1.6
 	  whitespace.
 	- The MaxJobs directive was being treated as a boolean
 	  instead of an integer.
+	- The scheduler would not timeout remote printers if
+	  BrowseInterval was set to 0.
+	- The lpadmin command now supports setting of options
+	  and user-level access control.
 
 
 CHANGES IN CUPS V1.1.5-2
