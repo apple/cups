@@ -1,4 +1,4 @@
-CHANGES.txt - 11/27/2001
+CHANGES.txt - 12/05/2001
 ------------------------
 
 CHANGES IN CUPS V1.1.13
@@ -17,6 +17,8 @@ CHANGES IN CUPS V1.1.13
 	  address properly.
 	- The parallel backend now identifies the polled and
 	  interrupt-driven devices under *BSD.
+	- The scheduler allowed the "always" encryption mode
+	  inside a Location, which is not valid.
 
 
 CHANGES IN CUPS V1.1.12

@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.92 2001/10/30 20:37:16 mike Exp $"
+ * "$Id: conf.c,v 1.93 2001/12/05 13:24:05 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -1445,7 +1445,12 @@ read_location(FILE *fp,		/* I - Configuration file */
       if (strcasecmp(value, "never") == 0)
         loc->encryption = HTTP_ENCRYPT_NEVER;
       else if (strcasecmp(value, "always") == 0)
-        loc->encryption = HTTP_ENCRYPT_ALWAYS;
+      {
+        LogMessage(L_ERROR, "Encryption value \"%s\" on line %d is invalid in this context. "
+	                    "Using \"required\" instead.", value, linenum);
+
+        loc->encryption = HTTP_ENCRYPT_REQUIRED;
+      }
       else if (strcasecmp(value, "required") == 0)
         loc->encryption = HTTP_ENCRYPT_REQUIRED;
       else if (strcasecmp(value, "ifrequested") == 0)
@@ -1794,5 +1799,5 @@ get_address(char               *value,		/* I - Value string */
 
 
 /*
- * End of "$Id: conf.c,v 1.92 2001/10/30 20:37:16 mike Exp $".
+ * End of "$Id: conf.c,v 1.93 2001/12/05 13:24:05 mike Exp $".
  */
