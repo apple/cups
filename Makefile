@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.33 2001/06/27 21:53:06 mike Exp $"
+# "$Id: Makefile,v 1.34 2001/06/28 16:20:08 mike Exp $"
 #
 #   Top-level Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -106,15 +106,7 @@ test:	all
 # Make software distributions using EPM (http://www.easysw.com/epm)...
 #
 
-EPMFLAGS	=	-v \
-			AMANDIR=$(AMANDIR) \
-			BINDIR=$(BINDIR) DATADIR=$(DATADIR) \
-			DOCDIR=$(DOCDIR) INCLUDEDIR=$(INCLUDEDIR) \
-			LIBDIR=$(LIBDIR) LOCALEDIR=$(LOCALEDIR) \
-			LOGDIR=$(LOGDIR) MANDIR=$(MANDIR) \
-			PAMDIR=$(PAMDIR) REQUESTS=$(REQUESTS) \
-			SBINDIR=$(SBINDIR) SERVERBIN=$(SERVERBIN) \
-			SERVERROOT=$(SERVERROOT)
+EPMFLAGS	=	-v
 
 aix:
 	epm $(EPMFLAGS) -f aix cups
@@ -141,5 +133,5 @@ tardist:
 	epm $(EPMFLAGS) -f tardist cups
 
 #
-# End of "$Id: Makefile,v 1.33 2001/06/27 21:53:06 mike Exp $".
+# End of "$Id: Makefile,v 1.34 2001/06/28 16:20:08 mike Exp $".
 #

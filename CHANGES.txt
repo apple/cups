@@ -1,11 +1,20 @@
-CHANGES.txt - 06/05/2001
+CHANGES.txt - 06/28/2001
 ------------------------
 
 CHANGES IN CUPS V1.1.9
 
+	- Revamped the configure script to use a modular
+	  approach for the various tests.
+	- Added --with-openssl-* options to properly reference
+	  the OpenSSL libraries in DSOs.
+	- Added --with-cups-user and --with-cups-group
+	  options to specify the default user and group for
+	  CUPS.
 	- Added AIX shared library support.
 	- Added AIX device discovery for the serial and
 	  parallel ports.
+	- Now use install program or script to install
+	  directories, files, and symlinks.
 	- Updated pstops filter to use strict handling of EPS
 	  files embedded in a PostScript document.  The %%EOF
 	  handling in 1.1.8 caused some dvips files not to
@@ -147,6 +156,8 @@ CHANGES IN CUPS V1.1.9
 	- Added new "natural-scaling" option which scales the
 	  natural size of the image (percent of natural image
 	  size instead of percent of page size.)
+	- The lppasswd program is now setuid to the CUPS user
+	  instead of root.
 
 
 CHANGES IN CUPS V1.1.8
