@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: configure.in,v 1.56 2000/09/14 18:54:12 mike Exp $"
+dnl "$Id: configure.in,v 1.57 2000/09/20 19:11:05 mike Exp $"
 dnl
 dnl   Configuration script for the Common UNIX Printing System (CUPS).
 dnl
@@ -368,8 +368,12 @@ if test "$infodir" = "\${prefix}/info" -a "$prefix" = "/"; then
 fi
 
 dnl Fix "datadir" variable if it hasn't been specified...
-if test "$datadir" = "\${prefix}/share" -a "$prefix" = "/"; then
-	datadir="/usr/share"
+if test "$datadir" = "\${prefix}/share"; then
+	if test "$prefix" = "/"; then
+		datadir="/usr/share"
+	else
+		datadir="$prefix/share"
+        fi
 fi
 
 dnl Fix "includedir" variable if it hasn't been specified...
@@ -555,5 +559,5 @@ AC_DEFINE_UNQUOTED(CUPS_FONTPATH, "$fontpath")
 AC_OUTPUT(Makedefs cups.sh)
 
 dnl
-dnl End of "$Id: configure.in,v 1.56 2000/09/14 18:54:12 mike Exp $".
+dnl End of "$Id: configure.in,v 1.57 2000/09/20 19:11:05 mike Exp $".
 dnl
