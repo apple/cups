@@ -147,6 +147,11 @@ CHANGES IN CUPS V1.1.5
 	  user name, causing it to always fail.
 	- Updated the cupsTempFile() code to use GetTempPath()
 	  under Windows.
+	- The cups-lpd mini-daemon didn't limit the number of
+	  data files accepted, didn't use cupsTempFile(),
+	  didn't handle control file job information in any
+	  order, and didn't free job options after printing
+	  a file.
 
 
 CHANGES IN CUPS v1.1.4
