@@ -1,5 +1,5 @@
 #
-# "$Id: cups.list,v 1.31 1999/12/08 15:23:29 mike Exp $"
+# "$Id: cups.list,v 1.32 1999/12/15 15:10:52 mike Exp $"
 #
 #   ESP Package Manager (EPM) file list for the Common UNIX Printing
 #   System (CUPS).
@@ -214,8 +214,10 @@ c 0644 root sys /var/cups/conf/printers.conf conf/printers.conf
 
 # Dummy printcap file for Digital UNIX and Linux...
 %system dunix linux
+%format !rpm
 f 0644 root sys /etc/printcap conf/printcap
 %system all
+%format all
 
 # Developer files
 f 0444 root sys /usr/include/cups/cups.h cups/cups.h
@@ -314,5 +316,5 @@ f 0444 root sys /usr/man/man5/printers.conf.5 man/printers.conf.5
 i 0555 root sys cups cups.sh
 
 #
-# End of "$Id: cups.list,v 1.31 1999/12/08 15:23:29 mike Exp $".
+# End of "$Id: cups.list,v 1.32 1999/12/15 15:10:52 mike Exp $".
 #
