@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.5 1999/02/26 22:02:07 mike Exp $"
+ * "$Id: job.c,v 1.6 1999/03/01 22:26:17 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -276,6 +276,7 @@ StartJob(int       id,		/* I - Job ID */
 		filterfds[2][2];/* Pipes used between the filters */
   char		*argv[8];	/* Filter command-line arguments */
   char		command[1024],	/* Full path to filter/backend command */
+		method[255],	/* Method for output */
 		jobid[255],	/* Job ID string */
 		title[IPP_MAX_NAME],
 				/* Job title string */
@@ -487,7 +488,7 @@ StartJob(int       id,		/* I - Job ID */
 	  argv[6] = NULL;
 
         if (filters[i].filter[0] != '/')
-	  sprintf(command, "%s/filters/%s", ServerRoot, filters[i].filter);
+	  sprintf(command, "%s/filter/%s", ServerRoot, filters[i].filter);
 	else
 	  strcpy(command, filters[i].filter);
 
@@ -527,6 +528,8 @@ StartJob(int       id,		/* I - Job ID */
 
 	  close(2);
 	  dup(statusfds[1]);
+	  close(statusfds[0]);
+	  close(statusfds[1]);
 
          /*
 	  * Change user to something "safe"...
@@ -584,6 +587,76 @@ StartJob(int       id,		/* I - Job ID */
 
       if (strncmp(printer->device_uri, "file:", 5) != 0)
       {
+        sscanf(printer->device_uri, "%[^:]", method);
+        sprintf(command, "%s/backend/%s", ServerRoot, method);
+
+        argv[6] = printer->device_uri;
+
+        if ((pid = fork()) == 0)
+	{
+	 /*
+	  * Child process goes here...
+	  */
+
+         /*
+	  * Update stdin/stdout/stderr as needed...
+	  */
+
+          close(0);
+	  dup(filterfds[!(i & 1)][0]);
+          close(filterfds[!(i & 1)][0]);
+          close(filterfds[!(i & 1)][1]);
+
+	  close(1);
+	  open("/dev/null", O_WRONLY);
+
+	  close(2);
+	  dup(statusfds[1]);
+	  close(statusfds[0]);
+	  close(statusfds[1]);
+
+         /*
+	  * Change user to something "safe"...
+	  */
+
+	  setuid(User);
+	  setgid(Group);
+
+         /*
+	  * Execute the command; if for some reason this doesn't work,
+	  * return error code 1.
+	  */
+
+	  execve(command, argv, envp);
+
+          DEBUG_printf(("StartJob: unable to execve() %s - %s.\n", command,
+	                strerror(errno)));
+
+	  exit(-1);
+	}
+	else if (pid < 0)
+	{
+	 /*
+	  * ERROR
+	  */
+
+          DEBUG_printf(("StartJob: unable to fork() %s - %s.\n", command,
+	                strerror(errno)));
+
+          current->procs[i] = 0;
+	  CancelJob(current->id);
+	  return;
+	}
+	else
+	{
+	 /*
+	  * Parent process goes here...
+	  */
+
+	  current->procs[i] = pid;
+
+          DEBUG_printf(("StartJob: started %s - pid = %d.\n", command, pid));
+	}
       }
 
       close(filterfds[!(i & 1)][0]);
@@ -658,5 +731,5 @@ UpdateJob(job_t *job)	/* I - Job to check */
 
 
 /*
- * End of "$Id: job.c,v 1.5 1999/02/26 22:02:07 mike Exp $".
+ * End of "$Id: job.c,v 1.6 1999/03/01 22:26:17 mike Exp $".
  */

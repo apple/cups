@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.6 1999/02/26 22:02:05 mike Exp $"
+ * "$Id: client.c,v 1.7 1999/03/01 22:26:16 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -38,8 +38,6 @@
  *   decode_basic_auth()   - Decode a Basic authorization string.
  *   get_file()            - Get a filename and state info.
  *   pipe_command()        - Pipe the output of a command to the remote client.
- *   process_ipp_request() - Process an incoming IPP request...
- *   send_ipp_error()      - Send an error status back to the IPP client.
  *   sigpipe_handler()     - Handle 'broken pipe' signals from lost network
  *                           clients.
  */
@@ -59,13 +57,7 @@ static int	check_if_modified(client_t *con, struct stat *filestats);
 static void	decode_basic_auth(client_t *con);
 static char	*get_file(client_t *con, struct stat *filestats);
 static int	pipe_command(client_t *con, int infile, int *outfile, char *command, char *options);
-static void	process_ipp_request(client_t *con);
-static void	send_ipp_error(client_t *con, ipp_status_t status);
 static void	sigpipe_handler(int sig);
-
-/**** OBSOLETE ****/
-static char	*get_extension(char *filename);
-static char	*get_type(char *extension);
 
 
 /*
@@ -232,13 +224,11 @@ ReadClient(client_t *con)	/* I - Client to read from */
   int		major, minor;	/* HTTP version numbers */
   http_status_t	status;		/* Transfer status */
   int		bytes;		/* Number of bytes to POST */
-  char		*filename,	/* Name of file for GET/HEAD */
-		*extension,	/* Extension of file */
-		*type;		/* MIME type */
+  char		*filename;	/* Name of file for GET/HEAD */
   struct stat	filestats;	/* File information */
+  mime_type_t	*type;		/* MIME type of file */
   char		command[1024],	/* Command to run */
 		*options;	/* Options/CGI data */
-
 
   status = HTTP_CONTINUE;
 
@@ -503,10 +493,13 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	    }
 	    else
             {
-	      extension = get_extension(filename);
-	      type      = get_type(extension);
+	      type = mimeFileType(MimeDatabase, filename);
+	      if (type == NULL)
+	        strcpy(line, "text/plain");
+	      else
+	        sprintf(line, "%s/%s", type->super, type->type);
 
-              if (!SendFile(con, HTTP_OK, filename, type, &filestats))
+              if (!SendFile(con, HTTP_OK, filename, line, &filestats))
 	      {
 		CloseClient(con);
 		return (0);
@@ -632,10 +625,13 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	    * Serve a file...
 	    */
 
-	    extension = get_extension(filename);
-	    type      = get_type(extension);
+	    type = mimeFileType(MimeDatabase, filename);
+	    if (type == NULL)
+	      strcpy(line, "text/plain");
+	    else
+	      sprintf(line, "%s/%s", type->super, type->type);
 
-            if (!SendHeader(con, HTTP_OK, type))
+            if (!SendHeader(con, HTTP_OK, line))
 	    {
 	      CloseClient(con);
 	      return (0);
@@ -747,7 +743,7 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	  close(con->file);
 
           if (con->request)
-            process_ipp_request(con);
+            ProcessIPPRequest(con);
 	}
         break;
   }
@@ -1238,6 +1234,72 @@ decode_basic_auth(client_t *con)	/* I - Client to decode to */
 
 
 /*
+ * 'get_file()' - Get a filename and state info.
+ */
+
+static char *			/* O - Real filename */
+get_file(client_t    *con,	/* I - Client connection */
+         struct stat *filestats)/* O - File information */
+{
+  int		status;		/* Status of filesystem calls */
+  char		*params;	/* Pointer to parameters in URI */
+  static char	filename[1024];	/* Filename buffer */
+
+
+ /*
+  * Need to add DocumentRoot global...
+  */
+
+  if (con->language != NULL)
+    sprintf(filename, "%s/%s%s", DocumentRoot, con->language->language,
+            con->uri);
+  else
+    sprintf(filename, "%s%s", DocumentRoot, con->uri);
+
+  if ((params = strchr(filename, '?')) != NULL)
+    *params = '\0';
+
+ /*
+  * Grab the status for this language; if there isn't a language-specific file
+  * then fallback to the default one...
+  */
+
+  if ((status = stat(filename, filestats)) != 0 && con->language != NULL)
+  {
+   /*
+    * Drop the language prefix and try the current directory...
+    */
+
+    sprintf(filename, "%s%s", DocumentRoot, con->uri);
+
+    status = stat(filename, filestats);
+  }
+
+ /*
+  * If we're found a directory, get the index.html file instead...
+  */
+
+  if (!status && S_ISDIR(filestats->st_mode))
+  {
+    if (filename[strlen(filename) - 1] == '/')
+      strcat(filename, "index.html");
+    else
+      strcat(filename, "/index.html");
+
+    status = stat(filename, filestats);
+  }
+
+  LogMessage(LOG_DEBUG, "get_filename() %d filename=%s size=%d",
+             con->http.fd, filename, filestats->st_size);
+
+  if (status)
+    return (NULL);
+  else
+    return (filename);
+}
+
+
+/*
  * 'pipe_command()' - Pipe the output of a command to the remote client.
  */
 
@@ -1414,417 +1476,6 @@ pipe_command(client_t *con,	/* I - Client connection */
 
 
 /*
- * 'process_ipp_request()' - Process an incoming IPP request...
- */
-
-static void
-process_ipp_request(client_t *con)	/* I - Client connection */
-{
-  ipp_tag_t		group;		/* Current group tag */
-  ipp_attribute_t	*attr;		/* Current attribute */
-  ipp_attribute_t	*charset;	/* Character set attribute */
-  ipp_attribute_t	*language;	/* Language attribute */
-  ipp_attribute_t	*uri;		/* Printer URI attribute */
-  ipp_attribute_t	*format;	/* Document-format attribute */
-  char			*dest;		/* Destination */
-  cups_ptype_t		dtype;		/* Destination type (printer or class) */
-  int			priority;	/* Job priority */
-  job_t			*job;		/* Current job */
-  char			job_uri[HTTP_MAX_URI],
-					/* Job URI */
-			method[HTTP_MAX_URI],
-					/* Method portion of URI */
-			username[HTTP_MAX_URI],
-					/* Username portion of URI */
-			host[HTTP_MAX_URI],
-					/* Host portion of URI */
-			resource[HTTP_MAX_URI];
-					/* Resource portion of URI */
-  int			port;		/* Port portion of URI */
-  mime_type_t		*filetype;	/* Type of file */
-  char			super[MIME_MAX_SUPER],
-					/* Supertype of file */
-			type[MIME_MAX_TYPE];
-					/* Subtype of file */
-
-
-  DEBUG_printf(("process_ipp_request(%08x)\n", con));
-  DEBUG_printf(("process_ipp_request: operation_id = %04x\n",
-                con->request->request.op.operation_id));
-
- /*
-  * First build an empty response message for this request...
-  */
-
-  con->response = ippNew();
-
-  con->response->request.status.version[0] = 1;
-  con->response->request.status.version[1] = 0;
-  con->response->request.status.request_id = con->request->request.op.request_id;
-
- /*
-  * Then validate the request header and required attributes...
-  */
-  
-  if (con->request->request.any.version[0] != 1)
-  {
-   /*
-    * Return an error, since we only support IPP 1.x.
-    */
-
-    send_ipp_error(con, IPP_VERSION_NOT_SUPPORTED);
-
-    return;
-  }  
-
- /*
-  * Make sure that the attributes are provided in the correct order and
-  * don't repeat groups...
-  */
-
-  for (attr = con->request->attrs, group = attr->group_tag;
-       attr != NULL;
-       attr = attr->next)
-    if (attr->group_tag < group)
-    {
-     /*
-      * Out of order; return an error...
-      */
-
-      DEBUG_puts("process_ipp_request: attribute groups are out of order!");
-      send_ipp_error(con, IPP_BAD_REQUEST);
-      return;
-    }
-    else
-      group = attr->group_tag;
-
- /*
-  * Then make sure that the first three attributes are:
-  *
-  *     attributes-charset
-  *     attributes-natural-language
-  *     printer-uri
-  */
-
-  attr = con->request->attrs;
-  if (attr != NULL && strcmp(attr->name, "attributes-charset") == 0 &&
-      attr->value_tag == IPP_TAG_CHARSET)
-    charset = attr;
-  else
-    charset = NULL;
-
-  attr = attr->next;
-  if (attr != NULL && strcmp(attr->name, "attributes-natural-language") == 0 &&
-      attr->value_tag == IPP_TAG_LANGUAGE)
-    language = attr;
-  else
-    language = NULL;
-
-  attr = attr->next;
-  if (attr != NULL && strcmp(attr->name, "printer-uri") == 0 &&
-      attr->value_tag == IPP_TAG_URI)
-    uri = attr;
-  else if (attr != NULL && strcmp(attr->name, "job-uri") == 0 &&
-           attr->value_tag == IPP_TAG_URI)
-    uri = attr;
-  else
-    uri = NULL;
-
-  if (charset == NULL || language == NULL || uri == NULL)
-  {
-   /*
-    * Return an error, since attributes-charset,
-    * attributes-natural-language, and printer-uri/job-uri are required
-    * for all operations.
-    */
-
-    DEBUG_printf(("process_ipp_request: missing attributes (%08x, %08x, %08x)!\n",
-                  charset, language, uri));
-    send_ipp_error(con, IPP_BAD_REQUEST);
-    return;
-  }
-
-  attr = ippAddString(con->response, IPP_TAG_OPERATION, "attributes-charset",
-                      charset->values[0].string);
-  attr->value_tag = IPP_TAG_CHARSET;
-
-  attr = ippAddString(con->response, IPP_TAG_OPERATION,
-                      "attributes-natural-language", language->values[0].string);
-  attr->value_tag = IPP_TAG_LANGUAGE;
-
-  httpSeparate(uri->values[0].string, method, username, host, &port, resource);
-
- /*
-  * OK, all the checks pass so far; try processing the operation...
-  */
-
-  switch (con->request->request.op.operation_id)
-  {
-    case IPP_PRINT_JOB :
-       /*
-        * OK, see if the client is sending the document compressed - CUPS
-	* doesn't support compression yet...
-	*/
-
-        if ((attr = ippFindAttribute(con->request, "compression")) != NULL)
-	{
-	  DEBUG_puts("process_ipp_request: Unsupported compression attribute!");
-	  send_ipp_error(con, IPP_ATTRIBUTES);
-	  attr            = ippAddString(con->response, IPP_TAG_UNSUPPORTED,
-	                                 "compression", attr->values[0].string);
-	  attr->value_tag = IPP_TAG_KEYWORD;
-
-	  return;
-	}
-
-       /*
-        * Do we have a file to print?
-	*/
-
-        if (con->filename[0] == '\0')
-	{
-	  DEBUG_puts("process_ipp_request: No filename!?!");
-	  send_ipp_error(con, IPP_BAD_REQUEST);
-	  return;
-	}
-
-       /*
-        * Is it a format we support?
-	*/
-
-        if ((format = ippFindAttribute(con->request, "document-format")) == NULL ||
-	    format->value_tag != IPP_TAG_MIMETYPE)
-	{
-	  DEBUG_puts("process_ipp_request: missing document-format attribute!");
-	  send_ipp_error(con, IPP_BAD_REQUEST);
-	  return;
-	}
-
-        if (sscanf(format->values[0].string, "%15[^/]/%31[^;]", super, type) != 2)
-	{
-	  DEBUG_printf(("process_ipp_request: could not scan type \'%s\'!\n",
-	                format->values[0].string));
-	  send_ipp_error(con, IPP_BAD_REQUEST);
-	  return;
-	}
-
-        if (strcmp(super, "application") == 0 &&
-	    strcmp(type, "octet-stream") == 0)
-	{
-	  DEBUG_puts("process_ipp_request: auto-typing request using magic rules.");
-	  filetype = mimeFileType(MimeDatabase, con->filename);
-	}
-	else
-	  filetype = mimeType(MimeDatabase, super, type);
-
-        if (filetype == NULL)
-	{
-	  DEBUG_printf(("process_ipp_request: Unsupported format \'%s\'!\n",
-	                format->values[0].string));
-	  send_ipp_error(con, IPP_ATTRIBUTES);
-	  attr            = ippAddString(con->response, IPP_TAG_UNSUPPORTED,
-	                                 "document-format",
-					 format->values[0].string);
-	  attr->value_tag = IPP_TAG_MIMETYPE;
-
-	  return;
-	}
-
-        DEBUG_printf(("process_ipp_request: request file type is %s/%s.\n",
-	              filetype->super, filetype->type));
-
-       /*
-        * Is the destination valid?
-	*/
-
-	if (strncmp(resource, "/classes/", 9) == 0)
-	{
-	 /*
-	  * Print to a class...
-	  */
-
-	  dest  = resource + 9;
-	  dtype = CUPS_PRINTER_CLASS;
-
-	  if (FindClass(dest) == NULL)
-	  {
-	    send_ipp_error(con, IPP_NOT_FOUND);
-	    return;
-	  }
-	}
-	else if (strncmp(resource, "/printers/", 10) == 0)
-	{
-	 /*
-	  * Print to a specific printer...
-	  */
-
-	  dest  = resource + 10;
-	  dtype = (cups_ptype_t)0;
-
-	  if (FindPrinter(dest) == NULL && FindClass(dest) == NULL)
-	  {
-	    send_ipp_error(con, IPP_NOT_FOUND);
-	    return;
-	  }
-	}
-	else
-	{
-	 /*
-	  * Bad URI...
-	  */
-
-          DEBUG_printf(("process_ipp_request: resource name \'%s\' no good!\n",
-	                resource));
-          send_ipp_error(con, IPP_BAD_REQUEST);
-	  return;
-	}
-
-       /*
-        * Create the job and set things up...
-	*/
-
-        if ((attr = ippFindAttribute(con->request, "job-priority")) != NULL &&
-	    attr->value_tag == IPP_TAG_INTEGER)
-          priority = attr->values[0].integer;
-	else
-	  priority = 50;
-
-        if ((job = AddJob(priority, dest)) == NULL)
-	{
-	  send_ipp_error(con, IPP_INTERNAL_ERROR);
-	  return;
-	}
-
-	job->dtype    = dtype;
-	job->state    = IPP_JOB_PENDING;
-	job->filetype = filetype;
-	job->attrs    = con->request;
-	con->request  = NULL;
-
-	strcpy(job->filename, con->filename);
-	con->filename[0] = '\0';
-
-        strcpy(job->username, con->username);
-	if ((attr = ippFindAttribute(con->request, "requesting-user-name")) != NULL &&
-	    attr->value_tag == IPP_TAG_NAME)
-	{
-	  strncpy(job->username, attr->values[0].string, sizeof(job->username) - 1);
-	  job->username[sizeof(job->username) - 1] = '\0';
-	}
-
-        if (job->username[0] == '\0')
-	  strcpy(job->username, "guest");
-
-       /*
-        * Start the job if possible...
-	*/
-
-	CheckJobs();
-
-       /*
-        * Fill in the response info...
-	*/
-
-        sprintf(job_uri, "http://%s:%d/jobs/%d", ServerName,
-	        ntohs(con->http.hostaddr.sin_port), job->id);
-        attr = ippAddString(con->response, IPP_TAG_JOB, "job-uri", job_uri);
-	attr->value_tag = IPP_TAG_URI;
-
-        attr = ippAddInteger(con->response, IPP_TAG_JOB, "job-id", job->id);
-	attr->value_tag = IPP_TAG_INTEGER;
-
-        attr = ippAddInteger(con->response, IPP_TAG_JOB, "job-state", job->state);
-	attr->value_tag = IPP_TAG_ENUM;
-
-        con->response->request.status.status_code = IPP_OK;
-        break;
-
-    case IPP_VALIDATE_JOB :
-        send_ipp_error(con, IPP_OPERATION_NOT_SUPPORTED);
-        break;
-
-    case IPP_CANCEL_JOB :
-        send_ipp_error(con, IPP_OPERATION_NOT_SUPPORTED);
-        break;
-
-    case IPP_GET_JOB_ATTRIBUTES :
-        send_ipp_error(con, IPP_OPERATION_NOT_SUPPORTED);
-        break;
-
-    case IPP_GET_JOBS :
-        send_ipp_error(con, IPP_OPERATION_NOT_SUPPORTED);
-        break;
-
-    case IPP_GET_PRINTER_ATTRIBUTES :
-        send_ipp_error(con, IPP_OPERATION_NOT_SUPPORTED);
-        break;
-
-    case CUPS_GET_DEFAULT :
-        send_ipp_error(con, IPP_OPERATION_NOT_SUPPORTED);
-        break;
-
-    case CUPS_GET_PRINTERS :
-        send_ipp_error(con, IPP_OPERATION_NOT_SUPPORTED);
-        break;
-
-    case CUPS_ADD_PRINTER :
-        send_ipp_error(con, IPP_OPERATION_NOT_SUPPORTED);
-        break;
-
-    case CUPS_DELETE_PRINTER :
-        send_ipp_error(con, IPP_OPERATION_NOT_SUPPORTED);
-        break;
-
-    case CUPS_GET_CLASSES :
-        send_ipp_error(con, IPP_OPERATION_NOT_SUPPORTED);
-        break;
-
-    case CUPS_ADD_CLASS :
-        send_ipp_error(con, IPP_OPERATION_NOT_SUPPORTED);
-        break;
-
-    case CUPS_DELETE_CLASS :
-        send_ipp_error(con, IPP_OPERATION_NOT_SUPPORTED);
-        break;
-
-    default :
-        send_ipp_error(con, IPP_OPERATION_NOT_SUPPORTED);
-	return;
-  }
-
-  FD_SET(con->http.fd, &OutputSet);
-}
-
-
-/*
- * 'send_ipp_error()' - Send an error status back to the IPP client.
- */
-
-static void
-send_ipp_error(client_t     *con,	/* I - Client connection */
-               ipp_status_t status)	/* I - IPP status code */
-{
-  ipp_attribute_t	*attr;		/* Current attribute */
-
-
-  if (con->filename[0])
-    unlink(con->filename);
-
-  con->response->request.status.status_code = status;
-
-  attr = ippAddString(con->response, IPP_TAG_OPERATION, "attributes-charset",
-                      DefaultCharset);
-  attr->value_tag = IPP_TAG_CHARSET;
-
-  attr = ippAddString(con->response, IPP_TAG_OPERATION,
-                      "attributes-natural-language", DefaultLanguage);
-  attr->value_tag = IPP_TAG_LANGUAGE;
-
-  FD_SET(con->http.fd, &OutputSet);
-}
-
-
-/*
  * 'sigpipe_handler()' - Handle 'broken pipe' signals from lost network
  *                       clients.
  */
@@ -1834,126 +1485,6 @@ sigpipe_handler(int sig)	/* I - Signal number */
 {
   (void)sig;
 /* IGNORE */
-}
-
-
-
-
-/**** OBSOLETE ****/
-
-/*
- * 'get_extension()' - Get the extension for a filename.
- */
-
-static char *			/* O - Pointer to extension */
-get_extension(char *filename)	/* I - Filename or URI */
-{
-  char	*ext;			/* Pointer to extension */
-
-
-  ext = filename + strlen(filename) - 1;
-
-  while (ext > filename && *ext != '/')
-    if (*ext == '.')
-      return (ext + 1);
-    else
-      ext --;
-
-  return ("");
-}
-
-
-/*
- * 'get_file()' - Get a filename and state info.
- */
-
-static char *			/* O - Real filename */
-get_file(client_t    *con,	/* I - Client connection */
-         struct stat *filestats)/* O - File information */
-{
-  int		status;		/* Status of filesystem calls */
-  char		*params;	/* Pointer to parameters in URI */
-  static char	filename[1024];	/* Filename buffer */
-
-
- /*
-  * Need to add DocumentRoot global...
-  */
-
-  if (con->language != NULL)
-    sprintf(filename, "%s/%s%s", DocumentRoot, con->language->language,
-            con->uri);
-  else
-    sprintf(filename, "%s%s", DocumentRoot, con->uri);
-
-  if ((params = strchr(filename, '?')) != NULL)
-    *params = '\0';
-
- /*
-  * Grab the status for this language; if there isn't a language-specific file
-  * then fallback to the default one...
-  */
-
-  if ((status = stat(filename, filestats)) != 0 && con->language != NULL)
-  {
-   /*
-    * Drop the language prefix and try the current directory...
-    */
-
-    sprintf(filename, "%s%s", DocumentRoot, con->uri);
-
-    status = stat(filename, filestats);
-  }
-
- /*
-  * If we're found a directory, get the index.html file instead...
-  */
-
-  if (!status && S_ISDIR(filestats->st_mode))
-  {
-    if (filename[strlen(filename) - 1] == '/')
-      strcat(filename, "index.html");
-    else
-      strcat(filename, "/index.html");
-
-    status = stat(filename, filestats);
-  }
-
-  LogMessage(LOG_DEBUG, "get_filename() %d filename=%s size=%d",
-             con->http.fd, filename, filestats->st_size);
-
-  if (status)
-    return (NULL);
-  else
-    return (filename);
-}
-
-
-/*
- * 'get_type()' - Get MIME type from the given extension.
- */
-
-static char *
-get_type(char *extension)
-{
-  if (strcmp(extension, "html") == 0 || strcmp(extension, "htm") == 0)
-    return ("text/html");
-  else if (strcmp(extension, "txt") == 0)
-    return ("text/plain");
-  else if (strcmp(extension, "gif") == 0)
-    return ("image/gif");
-  else if (strcmp(extension, "jpg") == 0)
-    return ("image/jpg");
-  else if (strcmp(extension, "png") == 0)
-    return ("image/png");
-  else if (strcmp(extension, "ps") == 0)
-    return ("application/postscript");
-  else if (strcmp(extension, "pdf") == 0)
-    return ("application/pdf");
-  else if (strcmp(extension, "gz") == 0)
-    return ("application/gzip");
-  else
-    return ("application/unknown");
 }
 
 
@@ -2061,5 +1592,5 @@ show_printer_status(client_t *con)
 
 
 /*
- * End of "$Id: client.c,v 1.6 1999/02/26 22:02:05 mike Exp $".
+ * End of "$Id: client.c,v 1.7 1999/03/01 22:26:16 mike Exp $".
  */
