@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-vector.c,v 1.11 2000/01/04 13:45:44 mike Exp $"
+ * "$Id: hpgl-vector.c,v 1.12 2000/06/16 20:20:33 mike Exp $"
  *
  *   HP-GL/2 vector routines for the Common UNIX Printing System (CUPS).
  *
@@ -377,6 +377,10 @@ PE_polyline_encoded(int     num_params,	/* I - Number of parameters */
       case '7' :
           s ++;
           base_bits = 5;
+
+#ifdef DEBUG
+          fputs("DEBUG:     7-bit\n", stderr);
+#endif /* DEBUG */
           break;
       case ':' :	/* Select pen */
           s ++;
@@ -385,19 +389,35 @@ PE_polyline_encoded(int     num_params,	/* I - Number of parameters */
 	    printf("%.3f %.3f %.3f %.2f SP\n", Pens[PenNumber].rgb[0],
 		   Pens[PenNumber].rgb[PenNumber], Pens[PenNumber].rgb[2],
 		   Pens[PenNumber].width * PenScaling);
+
+#ifdef DEBUG
+          fprintf(stderr, "DEBUG:     set pen #%d\n", PenNumber);
+#endif /* DEBUG */
           break;
       case '<' :	/* Next coords are a move-to */
           draw = 0;
           s ++;
+
+#ifdef DEBUG
+          fputs("DEBUG:     moveto\n", stderr);
+#endif /* DEBUG */
           break;
       case '>' :	/* Set fractional bits */
           s ++;
           temp      = (int)decode_number(&s, base_bits, 1.0);
           frac_bits = 1.0 / (1 << temp);
+
+#ifdef DEBUG
+          fprintf(stderr, "DEBUG:     set fractional bits %d\n", temp);
+#endif /* DEBUG */
           break;
       case '=' :	/* Next coords are absolute */
           s ++;
           abscoords = 1;
+
+#ifdef DEBUG
+          fputs("DEBUG:     absolute\n", stderr);
+#endif /* DEBUG */
           break;
       default :
           if (*s >= 63)
@@ -408,6 +428,10 @@ PE_polyline_encoded(int     num_params,	/* I - Number of parameters */
 
             x = decode_number(&s, base_bits, frac_bits);
             y = decode_number(&s, base_bits, frac_bits);
+
+#ifdef DEBUG
+            fprintf(stderr, "DEBUG:     coords %.3f %.3f\n", x, y);
+#endif /* DEBUG */
 
             if (abscoords)
             {
@@ -703,5 +727,5 @@ plot_points(int     num_params,	/* I - Number of parameters */
 
 
 /*
- * End of "$Id: hpgl-vector.c,v 1.11 2000/01/04 13:45:44 mike Exp $".
+ * End of "$Id: hpgl-vector.c,v 1.12 2000/06/16 20:20:33 mike Exp $".
  */

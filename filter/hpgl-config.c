@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-config.c,v 1.24 2000/03/21 04:03:26 mike Exp $"
+ * "$Id: hpgl-config.c,v 1.25 2000/06/16 20:20:32 mike Exp $"
  *
  *   HP-GL/2 configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -361,10 +361,10 @@ IP_input_absolute(int     num_params,	/* I - Number of parameters */
     P2[1] = params[3].value.number;
   }
 
-  IW1[0] = P1[0];
-  IW1[1] = P1[1];
-  IW2[0] = P2[0];
-  IW2[1] = P2[1];
+  IW1[0] = 0.0;
+  IW1[1] = 0.0;
+  IW2[0] = 0.0;
+  IW2[1] = 0.0;
 
   if (ScalingType < 0)
   {
@@ -410,10 +410,10 @@ IR_input_relative(int     num_params,	/* I - Number of parameters */
     P2[1] = params[3].value.number * PlotSize[1] / 72.0f * 1016.0f / 100.0f;
   }
 
-  IW1[0] = P1[0];
-  IW1[1] = P1[1];
-  IW2[0] = P2[0];
-  IW2[1] = P2[1];
+  IW1[0] = 0.0;
+  IW1[1] = 0.0;
+  IW2[0] = 0.0;
+  IW2[1] = 0.0;
 
   if (ScalingType < 0)
   {
@@ -634,5 +634,5 @@ SC_scale(int     num_params,	/* I - Number of parameters */
 
 
 /*
- * End of "$Id: hpgl-config.c,v 1.24 2000/03/21 04:03:26 mike Exp $".
+ * End of "$Id: hpgl-config.c,v 1.25 2000/06/16 20:20:32 mike Exp $".
  */

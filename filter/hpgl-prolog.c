@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-prolog.c,v 1.25 2000/03/21 04:03:26 mike Exp $"
+ * "$Id: hpgl-prolog.c,v 1.26 2000/06/16 20:20:33 mike Exp $"
  *
  *   HP-GL/2 prolog routines for for the Common UNIX Printing System (CUPS).
  *
@@ -141,7 +141,11 @@ Outputf(const char *format,	/* I - Printf-style string */
     PageDirty = 1;
     PageCount ++;
 
-    if (PPD != NULL && !FitPlot)
+    printf("%%%%Page: %d %d\n", PageCount, PageCount);
+
+    landscape = 0;
+
+    if (!FitPlot)
     {
      /*
       * Set the page size for this page...
@@ -158,110 +162,130 @@ Outputf(const char *format,	/* I - Printf-style string */
 	length = PlotSize[0];
       }
 
-      landscape = 0;
+      fprintf(stderr, "DEBUG: hpgltops setting page size (%.0f x %.0f)\n",
+              width, length);
 
-     /*
-      * Lookup the closest PageSize and set it...
-      */
-
-      for (i = PPD->num_sizes, size = PPD->sizes; i > 0; i --, size ++)
-	if ((fabs(length - size->length) < 36.0 && size->width >= width) ||
-            (fabs(length - size->width) < 36.0 && size->length >= width))
-	  break;
-
-      if (i == 0 && PPD->variable_sizes)
+      if (PPD != NULL)
       {
-        for (i = PPD->num_sizes, size = PPD->sizes; i > 0; i --, size ++)
-	  if (strcasecmp(size->name, "custom") == 0)
-	    break;
-      } 
-       
-      if (i > 0)
-      {
+        fputs("DEBUG: hpgltops has a PPD file!\n", stderr);
+
        /*
-	* Found a matching size...
+	* Lookup the closest PageSize and set it...
 	*/
 
-	option = ppdFindOption(PPD, "PageSize");
-	choice = ppdFindChoice(option, size->name);
+	for (i = PPD->num_sizes, size = PPD->sizes; i > 0; i --, size ++)
+	  if ((fabs(length - size->length) < 36.0 && size->width >= width) ||
+              (fabs(length - size->width) < 36.0 && size->length >= width))
+	    break;
 
-        puts("%%BeginSetup");
-        printf("%%%%BeginFeature: PageSize %s\n", size->name);
-
-        if (strcasecmp(size->name, "custom") == 0)
+	if (i == 0 && PPD->variable_sizes)
 	{
-	  PageLeft   = PPD->custom_margins[0];
-	  PageRight  = width - PPD->custom_margins[2];
-	  PageWidth  = width;
-	  PageBottom = PPD->custom_margins[1];
-	  PageTop    = length - PPD->custom_margins[3];
-	  PageLength = length;
+          for (i = PPD->num_sizes, size = PPD->sizes; i > 0; i --, size ++)
+	    if (strcasecmp(size->name, "custom") == 0)
+	      break;
+	} 
 
-          printf("%.0f %.0f 0 0 0\n", width, length);
-
-	  if (choice->code == NULL)
-	  {
-	   /*
-	    * This can happen with certain buggy PPD files that don't include
-	    * a CustomPageSize command sequence...  We just use a generic
-	    * Level 2 command sequence...
-	    */
-
-	    puts("pop pop pop");
-	    puts("<</PageSize[5 -2 roll]/ImagingBBox null>>setpagedevice\n");
-	  }
-          else
-	  {
-	   /*
-	    * Use the vendor-supplied command...
-	    */
-
-	    printf("%s\n", choice->code);
-	  }
-	}
-	else
+	if (i > 0)
 	{
-	  if (choice->code)
-            printf("%s\n", choice->code);
+	 /*
+	  * Found a matching size...
+	  */
 
-	  if (fabs(length - size->width) < 36.0)
+	  option = ppdFindOption(PPD, "PageSize");
+	  choice = ppdFindChoice(option, size->name);
+
+          puts("%%BeginPageSetup");
+          printf("%%%%BeginFeature: PageSize %s\n", size->name);
+
+          if (strcasecmp(size->name, "custom") == 0)
 	  {
-	   /*
-            * Do landscape orientation...
-	    */
+	    PageLeft   = PPD->custom_margins[0];
+	    PageRight  = width - PPD->custom_margins[2];
+	    PageWidth  = width;
+	    PageBottom = PPD->custom_margins[1];
+	    PageTop    = length - PPD->custom_margins[3];
+	    PageLength = length;
 
-	    PageLeft   = size->bottom;
-	    PageRight  = size->top;
-	    PageWidth  = size->length;
-	    PageBottom = size->left;
-	    PageTop    = size->right;
-	    PageLength = size->width;
+            printf("%.0f %.0f 0 0 0\n", width, length);
 
-            landscape = 1;
+	    if (choice->code == NULL)
+	    {
+	     /*
+	      * This can happen with certain buggy PPD files that don't include
+	      * a CustomPageSize command sequence...  We just use a generic
+	      * Level 2 command sequence...
+	      */
+
+	      puts("pop pop pop");
+	      puts("<</PageSize[5 -2 roll]/ImagingBBox null>>setpagedevice\n");
+	    }
+            else
+	    {
+	     /*
+	      * Use the vendor-supplied command...
+	      */
+
+	      printf("%s\n", choice->code);
+	    }
 	  }
 	  else
 	  {
-	   /*
-            * Do portrait orientation...
-	    */
+	    if (choice->code)
+              printf("%s\n", choice->code);
 
-	    PageLeft   = size->left;
-	    PageRight  = size->right;
-	    PageWidth  = size->width;
-	    PageBottom = size->bottom;
-	    PageTop    = size->top;
-	    PageLength = size->length;
+	    if (fabs(length - size->width) < 36.0)
+	    {
+	     /*
+              * Do landscape orientation...
+	      */
+
+	      PageLeft   = size->bottom;
+	      PageRight  = size->top;
+	      PageWidth  = size->length;
+	      PageBottom = size->left;
+	      PageTop    = size->right;
+	      PageLength = size->width;
+
+              landscape = 1;
+	    }
+	    else
+	    {
+	     /*
+              * Do portrait orientation...
+	      */
+
+	      PageLeft   = size->left;
+	      PageRight  = size->right;
+	      PageWidth  = size->width;
+	      PageBottom = size->bottom;
+	      PageTop    = size->top;
+	      PageLength = size->length;
+	    }
 	  }
-	}
 
+	  puts("%%EndFeature");
+	  puts("%%EndPageSetup");
+	}
+      }
+      else
+      {
+        fputs("DEBUG: hpgltops does not have a PPD file!\n", stderr);
+
+        puts("%%BeginPageSetup");
+        printf("%%%%BeginFeature: PageSize w%.0fh%.0f\n", width, length);
+	printf("<</PageSize[%.0f %.0f]/ImageBBox null>>setpagedevice\n",
+	       width, length);
 	puts("%%EndFeature");
-	puts("%%EndSetup");
+	puts("%%EndPageSetup");
+
+	PageLeft   = 0.0;
+	PageRight  = width;
+	PageWidth  = width;
+	PageBottom = 0.0;
+	PageTop    = length;
+	PageLength = length;
       }
     }
-    else
-      landscape = 0;
-
-    printf("%%%%Page: %d %d\n", PageCount, PageCount);
 
     printf("/SA {\n"
            "	/%s%s%s%s findfont\n"
@@ -371,5 +395,5 @@ Outputf(const char *format,	/* I - Printf-style string */
 
 
 /*
- * End of "$Id: hpgl-prolog.c,v 1.25 2000/03/21 04:03:26 mike Exp $".
+ * End of "$Id: hpgl-prolog.c,v 1.26 2000/06/16 20:20:33 mike Exp $".
  */

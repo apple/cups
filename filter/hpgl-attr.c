@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-attr.c,v 1.15 2000/01/05 20:13:57 mike Exp $"
+ * "$Id: hpgl-attr.c,v 1.16 2000/06/16 20:20:32 mike Exp $"
  *
  *   HP-GL/2 attribute processing for the Common UNIX Printing System (CUPS).
  *
@@ -71,6 +71,7 @@ CR_color_range(int     num_params,	/* I - Number of parameters */
    /*
     * Set the range based on the parameters...
     */
+
     ColorRange[0][0] = params[0].value.number;
     ColorRange[0][1] = params[1].value.number - params[0].value.number;
     ColorRange[1][0] = params[2].value.number;
@@ -269,9 +270,12 @@ PC_pen_color(int     num_params,	/* I - Number of parameters */
     }
     else
     {
-      Pens[i].rgb[0] = params[1].value.number;
-      Pens[i].rgb[1] = params[2].value.number;
-      Pens[i].rgb[2] = params[3].value.number;
+      Pens[i].rgb[0] = (params[1].value.number - ColorRange[0][0]) /
+                       (ColorRange[0][1] - ColorRange[0][0]);
+      Pens[i].rgb[1] = (params[2].value.number - ColorRange[1][0]) /
+                       (ColorRange[1][1] - ColorRange[1][0]);
+      Pens[i].rgb[2] = (params[3].value.number - ColorRange[2][0]) /
+                       (ColorRange[2][1] - ColorRange[2][0]);
     }
 
     if (PageDirty && i == PenNumber)
@@ -438,5 +442,5 @@ WU_width_units(int     num_params,	/* I - Number of parameters */
 
 
 /*
- * End of "$Id: hpgl-attr.c,v 1.15 2000/01/05 20:13:57 mike Exp $".
+ * End of "$Id: hpgl-attr.c,v 1.16 2000/06/16 20:20:32 mike Exp $".
  */
