@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.c,v 1.19 1999/12/07 18:26:15 mike Exp $"
+ * "$Id: auth.c,v 1.20 1999/12/14 22:02:53 mike Exp $"
  *
  *   Authorization routines for the Common UNIX Printing System (CUPS).
  *
@@ -52,7 +52,7 @@
 #ifdef HAVE_CRYPT_H
 #  include <crypt.h>
 #endif /* HAVE_CRYPT_H */
-#ifdef HAVE_LIBPAM
+#if HAVE_LIBPAM
 #  include <security/pam_appl.h>
 #endif /* HAVE_LIBPAM */
 
@@ -65,7 +65,7 @@ static authmask_t	*add_allow(location_t *loc);
 static authmask_t	*add_deny(location_t *loc);
 static int		check_auth(unsigned ip, char *name, int namelen,
 				   int num_masks, authmask_t *masks);
-#ifdef HAVE_LIBPAM
+#if HAVE_LIBPAM
 static int		pam_func(int, const struct pam_message **,
 			         struct pam_response **, void *);
 #endif /* HAVE_LIBPAM */
@@ -274,7 +274,7 @@ IsAuthorized(client_t *con)	/* I - Connection */
 #ifdef HAVE_SHADOW_H
   struct spwd	*spw;		/* Shadow password data */
 #endif /* HAVE_SHADOW_H */
-#ifdef HAVE_LIBPAM
+#if HAVE_LIBPAM
   pam_handle_t	*pamh;		/* PAM authentication handle */
   int		pamerr;		/* PAM error code */
   struct pam_conv pamdata;	/* PAM conversation data */
@@ -379,7 +379,7 @@ IsAuthorized(client_t *con)	/* I - Connection */
     return (HTTP_UNAUTHORIZED);
   }
 
-#ifdef HAVE_LIBPAM
+#if HAVE_LIBPAM
   /*
    * Only use PAM to do authentication.  This allows MD5 passwords, among
    * other things...
@@ -654,7 +654,7 @@ check_auth(unsigned   ip,	/* I - Client address */
 }
 
 
-#ifdef HAVE_LIBPAM
+#if HAVE_LIBPAM
 /*
  * 'pam_func()' - PAM conversation function.
  */
@@ -719,5 +719,5 @@ pam_func(int                      num_msg,	/* I - Number of messages */
 
 
 /*
- * End of "$Id: auth.c,v 1.19 1999/12/07 18:26:15 mike Exp $".
+ * End of "$Id: auth.c,v 1.20 1999/12/14 22:02:53 mike Exp $".
  */
