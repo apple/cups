@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.108 2002/01/23 17:25:39 mike Exp $"
+ * "$Id: client.c,v 1.109 2002/04/08 16:28:31 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -2426,7 +2426,7 @@ pipe_command(client_t *con,	/* I - Client connection */
     setgroups(0, NULL);
 
    /*
-    * Update stdin/stdout...
+    * Update stdin/stdout/stderr...
     */
 
     if (infile)
@@ -2439,6 +2439,9 @@ pipe_command(client_t *con,	/* I - Client connection */
     close(1);
     if (dup(fds[1]) < 0)
       exit(errno);
+
+    close(2);
+    open("/dev/null", O_WRONLY);
 
    /*
     * Close extra file descriptors...
@@ -2493,5 +2496,5 @@ pipe_command(client_t *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.108 2002/01/23 17:25:39 mike Exp $".
+ * End of "$Id: client.c,v 1.109 2002/04/08 16:28:31 mike Exp $".
  */
