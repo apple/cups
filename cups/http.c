@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.33 1999/04/30 15:39:39 mike Exp $"
+ * "$Id: http.c,v 1.34 1999/05/01 13:14:25 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -38,6 +38,7 @@
  *   httpPost()          - Send a POST request to the server.
  *   httpPut()           - Send a PUT request to the server.
  *   httpTrace()         - Send an TRACE request to the server.
+ *   httpFlush()         - Flush data from a HTTP connection.
  *   httpRead()          - Read data from a HTTP connection.
  *   httpWrite()         - Write data to a HTTP connection.
  *   httpGets()          - Get a line of text from a HTTP connection.
@@ -614,6 +615,20 @@ httpTrace(http_t *http,			/* I - HTTP data */
 
 
 /*
+ * 'httpFlush()' - Flush data from a HTTP connection.
+ */
+
+void
+httpFlush(http_t *http)	/* I - HTTP data */
+{
+  char	buffer[8192];	/* Junk buffer */
+
+
+  while (httpRead(http, buffer, sizeof(buffer)) > 0);
+}
+
+
+/*
  * 'httpRead()' - Read data from a HTTP connection.
  */
 
@@ -761,6 +776,20 @@ httpWrite(http_t *http,			/* I - HTTP data */
     buffer += bytes;
     tbytes += bytes;
     length -= bytes;
+    if (http->data_encoding == HTTP_ENCODE_LENGTH)
+      http->data_remaining -= bytes;
+  }
+
+  if (http->data_remaining == 0 && http->data_encoding == HTTP_ENCODE_LENGTH)
+  {
+   /*
+    * Finished with the transfer; unless we are sending POST data, go idle...
+    */
+
+    if (http->state == HTTP_POST_RECV)
+      http->state ++;
+    else
+      http->state = HTTP_WAITING;
   }
 
   DEBUG_printf(("httpWrite: wrote %d bytes...\n", tbytes));
@@ -1360,5 +1389,5 @@ http_send(http_t       *http,	/* I - HTTP data */
 
 
 /*
- * End of "$Id: http.c,v 1.33 1999/04/30 15:39:39 mike Exp $".
+ * End of "$Id: http.c,v 1.34 1999/05/01 13:14:25 mike Exp $".
  */

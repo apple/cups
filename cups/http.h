@@ -1,5 +1,5 @@
 /*
- * "$Id: http.h,v 1.16 1999/04/28 15:52:05 mike Exp $"
+ * "$Id: http.h,v 1.17 1999/05/01 13:14:26 mike Exp $"
  *
  *   Hyper-Text Transport Protocol definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -276,6 +276,7 @@ typedef struct
 extern void		httpClose(http_t *http);
 extern http_t		*httpConnect(char *host, int port);
 extern int		httpDelete(http_t *http, char *uri);
+extern void		httpFlush(http_t *http);
 extern int		httpGet(http_t *http, char *uri);
 extern char		*httpGets(char *line, int length, http_t *http);
 extern char		*httpGetDateString(time_t t);
@@ -311,5 +312,5 @@ extern int		httpGetLength(http_t *http);
 #endif /* !_CUPS_HTTP_H_ */
 
 /*
- * End of "$Id: http.h,v 1.16 1999/04/28 15:52:05 mike Exp $".
+ * End of "$Id: http.h,v 1.17 1999/05/01 13:14:26 mike Exp $".
  */
