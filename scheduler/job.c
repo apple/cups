@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.124.2.48 2003/02/05 21:14:54 mike Exp $"
+ * "$Id: job.c,v 1.124.2.49 2003/02/28 20:18:26 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -2073,6 +2073,7 @@ UpdateJob(job_t *job)		/* I - Job to check */
   char		*lineptr,	/* Pointer to end of line in buffer */
 		*message;	/* Pointer to message text */
   int		loglevel;	/* Log level for message */
+  int		job_history;	/* Did CancelJob() keep the job? */
 
 
   if ((bytes = read(job->status_pipe, job->buffer + job->bufused,
@@ -2280,9 +2281,11 @@ UpdateJob(job_t *job)		/* I - Job to check */
         StartJob(job->id, job->printer);
       else
       {
+	job_history = JobHistory && !(job->dtype & CUPS_PRINTER_REMOTE);
+
         CancelJob(job->id, 0);
 
-        if (JobHistory)
+        if (job_history)
 	{
           job->state->values[0].integer = IPP_JOB_ABORTED;
 	  SaveJob(job->id);
@@ -2304,9 +2307,11 @@ UpdateJob(job_t *job)		/* I - Job to check */
       }
       else
       {
+	job_history = JobHistory && !(job->dtype & CUPS_PRINTER_REMOTE);
+
 	CancelJob(job->id, 0);
 
-        if (JobHistory)
+        if (job_history)
 	{
           job->state->values[0].integer = IPP_JOB_COMPLETED;
 	  SaveJob(job->id);
@@ -2627,5 +2632,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.124.2.48 2003/02/05 21:14:54 mike Exp $".
+ * End of "$Id: job.c,v 1.124.2.49 2003/02/28 20:18:26 mike Exp $".
  */
