@@ -1,5 +1,5 @@
 /*
- * "$Id: imagetops.c,v 1.36.2.16 2004/06/29 13:15:09 mike Exp $"
+ * "$Id: imagetops.c,v 1.36.2.17 2004/09/09 15:39:55 mike Exp $"
  *
  *   Image file to PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -287,9 +287,6 @@ main(int  argc,		/* I - Number of command-line arguments */
   * Scale as necessary...
   */
 
-  xprint = (PageRight - PageLeft) / 72.0;
-  yprint = (PageTop - PageBottom) / 72.0;
-
   if (zoom == 0.0 && xppi == 0)
   {
     xppi = img->xppi;
@@ -308,6 +305,20 @@ main(int  argc,		/* I - Number of command-line arguments */
     * Scale the image as neccesary to match the desired pixels-per-inch.
     */
     
+    if (Orientation & 1)
+    {
+      xprint = (PageTop - PageBottom) / 72.0;
+      yprint = (PageRight - PageLeft) / 72.0;
+    }
+    else
+    {
+      xprint = (PageRight - PageLeft) / 72.0;
+      yprint = (PageTop - PageBottom) / 72.0;
+    }
+
+    fprintf(stderr, "DEBUG: Before scaling: xprint=%.1f, yprint=%.1f\n",
+            xprint, yprint);
+
     xinches = (float)img->xsize / (float)xppi;
     yinches = (float)img->ysize / (float)yppi;
 
@@ -342,16 +353,6 @@ main(int  argc,		/* I - Number of command-line arguments */
 	xsize       = yprint;
 	yprint      = xprint;
 	xprint      = xsize;
-
-	xsize       = PageLeft;
-	PageLeft    = PageBottom;
-	PageBottom  = PageWidth - PageRight;
-	PageRight   = PageTop;
-	PageTop     = PageLength - xsize;
-
-	xsize       = PageWidth;
-	PageWidth   = PageLength;
-	PageLength  = xsize;
       }
     }
   }
@@ -361,7 +362,12 @@ main(int  argc,		/* I - Number of command-line arguments */
     * Scale percentage of page size...
     */
 
+    xprint = (PageRight - PageLeft) / 72.0;
+    yprint = (PageTop - PageBottom) / 72.0;
     aspect = (float)img->yppi / (float)img->xppi;
+
+    fprintf(stderr, "DEBUG: Before scaling: xprint=%.1f, yprint=%.1f\n",
+            xprint, yprint);
 
     fprintf(stderr, "DEBUG: img->xppi = %d, img->yppi = %d, aspect = %f\n",
             img->xppi, img->yppi, aspect);
@@ -455,6 +461,9 @@ main(int  argc,		/* I - Number of command-line arguments */
   xprint = xinches / xpages;
   yprint = yinches / ypages;
 
+  fprintf(stderr, "DEBUG: xpages = %dx%.2fin, ypages = %dx%.2fin\n",
+          xpages, xprint, ypages, yprint);
+
  /*
   * Update the page size for custom sizes...
   */
@@ -467,23 +476,12 @@ main(int  argc,		/* I - Number of command-line arguments */
     char	s[255];		/* New custom page size... */
 
 
-    if (Orientation & 1)
-    {
-      width  = yprint * 72.0;
-      length = xprint * 72.0;
-    }
-    else
-    {
-      width  = xprint * 72.0;
-      length = yprint * 72.0;
-    }
-
    /*
     * Add margins to page size...
     */
 
-    width  += ppd->custom_margins[0] + ppd->custom_margins[2];
-    length += ppd->custom_margins[1] + ppd->custom_margins[3];
+    width  = xprint * 72.0 + ppd->custom_margins[0] + ppd->custom_margins[2];
+    length = yprint * 72.0 + ppd->custom_margins[1] + ppd->custom_margins[3];
 
    /*
     * Enforce minimums...
@@ -495,15 +493,15 @@ main(int  argc,		/* I - Number of command-line arguments */
     if (length < ppd->custom_min[1])
       length = ppd->custom_min[1];
 
+    fprintf(stderr, "DEBUG: Updated custom page size to %.2f x %.2f inches...\n",
+            width / 72.0, length / 72.0);
+
    /*
     * Set the new custom size...
     */
 
     sprintf(s, "Custom.%.0fx%.0f", width, length);
     ppdMarkOption(ppd, "PageSize", s);
-
-    fprintf(stderr, "DEBUG: Updated custom page size to %.2f x %.2f inches...\n",
-            width / 72.0, length / 72.0);
 
    /*
     * Update page variables...
@@ -515,8 +513,6 @@ main(int  argc,		/* I - Number of command-line arguments */
     PageRight  = width - ppd->custom_margins[2];
     PageBottom = ppd->custom_margins[1];
     PageTop    = length - ppd->custom_margins[3];
-
-    UpdatePageVars();
   }
 
  /*
@@ -604,8 +600,6 @@ main(int  argc,		/* I - Number of command-line arguments */
   */
 
   row = malloc(img->xsize * abs(colorspace) + 3);
-
-  UpdatePageVars();
 
   fprintf(stderr, "DEBUG: XPosition=%d, YPosition=%d, Orientation=%d\n",
           XPosition, YPosition, Orientation);
@@ -902,5 +896,5 @@ ps_ascii85(ib_t *data,		/* I - Data to print */
 
 
 /*
- * End of "$Id: imagetops.c,v 1.36.2.16 2004/06/29 13:15:09 mike Exp $".
+ * End of "$Id: imagetops.c,v 1.36.2.17 2004/09/09 15:39:55 mike Exp $".
  */

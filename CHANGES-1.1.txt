@@ -3,6 +3,8 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.21rc3
 
+	- Fixed some problems with image printing to custom page
+	  sizes (STR #891)
 	- Removed the remaining scheduler code that did not use
 	  the "close-on-exec" file descriptor flag to speed up
 	  program invocations (STR #890)

@@ -1,5 +1,5 @@
 /*
- * "$Id: imagetoraster.c,v 1.56.2.19 2004/06/29 13:15:09 mike Exp $"
+ * "$Id: imagetoraster.c,v 1.56.2.20 2004/09/09 15:39:55 mike Exp $"
  *
  *   Image file to raster filter for the Common UNIX Printing System (CUPS).
  *
@@ -866,16 +866,6 @@ main(int  argc,		/* I - Number of command-line arguments */
       yinches     = ysize2;
       xprint      = (PageTop - PageBottom) / 72.0;
       yprint      = (PageRight - PageLeft) / 72.0;
-
-      xsize       = PageLeft;
-      PageLeft    = PageBottom;
-      PageBottom  = PageWidth - PageRight;
-      PageRight   = PageTop;
-      PageTop     = PageLength - xsize;
-
-      xsize       = PageWidth;
-      PageWidth   = PageLength;
-      PageLength  = xsize;
     }
     else
     {
@@ -888,17 +878,23 @@ main(int  argc,		/* I - Number of command-line arguments */
     }
   }
 
+ /*
+  * Compute the number of pages to print and the size of the image on each
+  * page...
+  */
+
   xpages = ceil(xinches / xprint);
   ypages = ceil(yinches / yprint);
 
-  fprintf(stderr, "DEBUG: xpages = %d, ypages = %d\n", xpages, ypages);
+  xprint = xinches / xpages;
+  yprint = yinches / ypages;
+
+  fprintf(stderr, "DEBUG: xpages = %dx%.2fin, ypages = %dx%.2fin\n",
+          xpages, xprint, ypages, yprint);
 
  /*
   * Compute the bitmap size...
   */
-
-  xprint = xinches / xpages;
-  yprint = yinches / ypages;
 
   if ((choice = ppdFindMarkedChoice(ppd, "PageSize")) != NULL &&
       strcasecmp(choice->choice, "Custom") == 0)
@@ -907,23 +903,12 @@ main(int  argc,		/* I - Number of command-line arguments */
 		length;		/* New length in points */
 
 
-    if (Orientation & 1)
-    {
-      width  = yprint * 72.0;
-      length = xprint * 72.0;
-    }
-    else
-    {
-      width  = xprint * 72.0;
-      length = yprint * 72.0;
-    }
-
    /*
     * Add margins to page size...
     */
 
-    width  += ppd->custom_margins[0] + ppd->custom_margins[2];
-    length += ppd->custom_margins[1] + ppd->custom_margins[3];
+    width  = xprint * 72.0 + ppd->custom_margins[0] + ppd->custom_margins[2];
+    length = yprint * 72.0 + ppd->custom_margins[1] + ppd->custom_margins[3];
 
    /*
     * Enforce minimums...
@@ -4594,5 +4579,5 @@ make_lut(ib_t  *lut,		/* I - Lookup table */
 
 
 /*
- * End of "$Id: imagetoraster.c,v 1.56.2.19 2004/06/29 13:15:09 mike Exp $".
+ * End of "$Id: imagetoraster.c,v 1.56.2.20 2004/09/09 15:39:55 mike Exp $".
  */
