@@ -1,7 +1,7 @@
 <HTML>
 <HEAD>
 	<META NAME="COPYRIGHT" CONTENT="Copyright 1997-2000, All Rights Reserved">
-	<META NAME="DOCNUMBER" CONTENT="CUPS-SPM-1.1">
+	<META NAME="DOCNUMBER" CONTENT="CUPS-SPM-1.1.1">
 	<META NAME="Author" CONTENT="Easy Software Products">
 	<TITLE>CUPS Software Programmers Manual</TITLE>
 </HEAD>
@@ -10,7 +10,7 @@
 <H1 ALIGN="RIGHT">Preface</H1>
 
 <P>This software programmers manual provides software programming
-information for the Common UNIX Printing System ("CUPS") Version 1.1.
+information for the Common UNIX Printing System ("CUPS") Version 1.1.1.
 
 <EMBED SRC="system-overview.shtml">
 

@@ -29,269 +29,269 @@ Copyright 1997-2000, All Rights Reserved<BR>
 <HR>
 <H1 ALIGN="CENTER"><A NAME="CONTENTS">Table of Contents</A></H1>
 <BR>
-<BR><B><A HREF="#1">1  Scope</A></B>
+<BR><B><A HREF="#1">1 Scope</A></B>
 <UL>
-<LI><A HREF="#1_1">1.1  Identification</A></LI>
-<LI><A HREF="#1_2">1.2  System Overview</A></LI>
-<LI><A HREF="#1_3">1.3  Document Overview</A></LI>
+<LI><A HREF="#1_1">1.1 Identification</A></LI>
+<LI><A HREF="#1_2">1.2 System Overview</A></LI>
+<LI><A HREF="#1_3">1.3 Document Overview</A></LI>
 </UL>
-<B><A HREF="#2">2  References</A></B>
+<B><A HREF="#2">2 References</A></B>
 <UL>
-<LI><A HREF="#2_1">2.1  CUPS Documentation</A></LI>
-<LI><A HREF="#2_2">2.2  Other Documents</A></LI>
+<LI><A HREF="#2_1">2.1 CUPS Documentation</A></LI>
+<LI><A HREF="#2_2">2.2 Other Documents</A></LI>
 </UL>
-<B><A HREF="#3">3  Additions</A></B>
+<B><A HREF="#3">3 Additions</A></B>
 <UL>
-<LI><A HREF="#3_1">3.1  Filters</A></LI>
+<LI><A HREF="#3_1">3.1 Filters</A></LI>
 <UL>
-<LI><A HREF="#3_1_1">3.1.1  imagetoraster, imagetops</A></LI>
-<LI><A HREF="#3_1_2">3.1.2  pdftops</A></LI>
-<LI><A HREF="#3_1_3">3.1.3  pstoraster</A></LI>
-<LI><A HREF="#3_1_4">3.1.4  rastertoepson</A></LI>
+<LI><A HREF="#3_1_1">3.1.1 imagetoraster, imagetops</A></LI>
+<LI><A HREF="#3_1_2">3.1.2 pdftops</A></LI>
+<LI><A HREF="#3_1_3">3.1.3 pstoraster</A></LI>
+<LI><A HREF="#3_1_4">3.1.4 rastertoepson</A></LI>
 </UL>
-<LI><A HREF="#3_2">3.2  User-Defined Printers and Options</A></LI>
-<LI><A HREF="#3_3">3.3  Daemons</A></LI>
+<LI><A HREF="#3_2">3.2 User-Defined Printers and Options</A></LI>
+<LI><A HREF="#3_3">3.3 Daemons</A></LI>
 <UL>
-<LI><A HREF="#3_3_1">3.3.1  cups-lpd</A></LI>
-<LI><A HREF="#3_3_2">3.3.2  cups-polld</A></LI>
+<LI><A HREF="#3_3_1">3.3.1 cups-lpd</A></LI>
+<LI><A HREF="#3_3_2">3.3.2 cups-polld</A></LI>
 </UL>
-<LI><A HREF="#3_4">3.4  Commands</A></LI>
+<LI><A HREF="#3_4">3.4 Commands</A></LI>
 <UL>
-<LI><A HREF="#3_4_1">3.4.1  lpoptions</A></LI>
-<LI><A HREF="#3_4_2">3.4.2  lpmove</A></LI>
-<LI><A HREF="#3_4_3">3.4.3  lpinfo</A></LI>
+<LI><A HREF="#3_4_1">3.4.1 lpoptions</A></LI>
+<LI><A HREF="#3_4_2">3.4.2 lpmove</A></LI>
+<LI><A HREF="#3_4_3">3.4.3 lpinfo</A></LI>
 </UL>
-<LI><A HREF="#3_5">3.5  IPP Implementation</A></LI>
+<LI><A HREF="#3_5">3.5 IPP Implementation</A></LI>
 </UL>
-<B><A HREF="#4">4  Changes</A></B>
+<B><A HREF="#4">4 Changes</A></B>
 <UL>
-<LI><A HREF="#4_1">4.1  Directory Structure</A></LI>
-<LI><A HREF="#4_2">4.2  IPP Implementation</A></LI>
+<LI><A HREF="#4_1">4.1 Directory Structure</A></LI>
+<LI><A HREF="#4_2">4.2 IPP Implementation</A></LI>
 </UL>
-<B><A HREF="#5">A  Glossary</A></B>
+<B><A HREF="#5">A Glossary</A></B>
 <UL>
-<LI><A HREF="#5_1">A.1  Terms</A></LI>
-<LI><A HREF="#5_2">A.2  Acronyms</A></LI>
+<LI><A HREF="#5_1">A.1 Terms</A></LI>
+<LI><A HREF="#5_2">A.2 Acronyms</A></LI>
 </UL>
 <HR>
-<H1><A NAME="1">1  Scope</A></H1>
-<H2><A NAME="1_1">1.1  Identification</A></H2>
+<H1><A NAME="1">1 Scope</A></H1>
+<H2><A NAME="1_1">1.1 Identification</A></H2>
  This software version description document provides release 
 information for the Common UNIX Printing System (&quot;CUPS&quot;) Version 1.1. 
-<H2><A NAME="1_2">1.2  System Overview</A></H2>
-<P> CUPS provides a portable printing layer for UNIX&reg;-based operating 
+<H2><A NAME="1_2">1.2 System Overview</A></H2>
+<P>CUPS provides a portable printing layer for UNIX&reg;-based operating 
 systems. It has been developed by <A HREF="http://www.easysw.com">Easy 
 Software Products</A> to promote a standard printing solution for all 
 UNIX vendors and users. CUPS provides the System V and Berkeley 
 command-line interfaces. </P>
-<P> CUPS uses the Internet Printing Protocol (&quot;IPP&quot;) as the basis for 
+<P>CUPS uses the Internet Printing Protocol (&quot;IPP&quot;) as the basis for 
 managing print jobs and queues. The Line Printer Daemon (&quot;LPD&quot;) Server 
 Message Block (&quot;SMB&quot;), and AppSocket (a.k.a. JetDirect) protocols are 
 also supported with reduced functionality. CUPS adds network printer 
 browsing and PostScript Printer Description (&quot;PPD&quot;) based printing 
 options to support real-world printing under UNIX. </P>
-<P> CUPS also includes a customized version of GNU Ghostscript 
+<P>CUPS also includes a customized version of GNU Ghostscript 
 (currently based off GNU Ghostscript 5.50) and an image file RIP that 
 are used to support non-PostScript printers. Sample drivers for HP and 
 EPSON printers are included that use these filters. </P>
-<H2><A NAME="1_3">1.3  Document Overview</A></H2>
-<P> This software version description document is organized into the 
+<H2><A NAME="1_3">1.3 Document Overview</A></H2>
+<P>This software version description document is organized into the 
 following sections:</P>
 <UL>
-<LI><A HREF="#1"> 1 - Scope</A></LI>
-<LI><A HREF="#2"> 2 - References</A></LI>
-<LI><A HREF="#3"> 3 - Additions</A></LI>
-<LI><A HREF="#4"> 4 - Changes</A></LI>
-<LI><A HREF="#5"> A - Glossary</A></LI>
+<LI><A HREF="#1">1 - Scope</A></LI>
+<LI><A HREF="#2">2 - References</A></LI>
+<LI><A HREF="#3">3 - Additions</A></LI>
+<LI><A HREF="#4">4 - Changes</A></LI>
+<LI><A HREF="#5">A - Glossary</A></LI>
 </UL>
-<H1><A NAME="2">2  References</A></H1>
-<H2><A NAME="2_1">2.1  CUPS Documentation</A></H2>
-<P> The following CUPS documentation is referenced by this document: </P>
+<H1><A NAME="2">2 References</A></H1>
+<H2><A NAME="2_1">2.1 CUPS Documentation</A></H2>
+<P>The following CUPS documentation is referenced by this document: </P>
 <UL>
-<LI> CUPS-CMP-1.1: CUPS Configuration Management Plan </LI>
-<LI> CUPS-IDD-1.1: CUPS System Interface Design Description </LI>
-<LI> CUPS-IPP-1.1: CUPS Implmentation of IPP </LI>
-<LI> CUPS-SAM-1.1.x: CUPS Software Administrators Manual </LI>
-<LI> CUPS-SDD-1.1: CUPS Software Design Description </LI>
-<LI> CUPS-SPM-1.1.x: CUPS Software Programming Manual </LI>
-<LI> CUPS-SSR-1.1: CUPS Software Security Report </LI>
-<LI> CUPS-STP-1.1: CUPS Software Test Plan </LI>
-<LI> CUPS-SUM-1.1.x: CUPS Software Users Manual </LI>
-<LI> CUPS-SVD-1.1.x: CUPS Software Version Description </LI>
+<LI>CUPS-CMP-1.1: CUPS Configuration Management Plan </LI>
+<LI>CUPS-IDD-1.1: CUPS System Interface Design Description </LI>
+<LI>CUPS-IPP-1.1: CUPS Implmentation of IPP </LI>
+<LI>CUPS-SAM-1.1.x: CUPS Software Administrators Manual </LI>
+<LI>CUPS-SDD-1.1: CUPS Software Design Description </LI>
+<LI>CUPS-SPM-1.1.x: CUPS Software Programming Manual </LI>
+<LI>CUPS-SSR-1.1: CUPS Software Security Report </LI>
+<LI>CUPS-STP-1.1: CUPS Software Test Plan </LI>
+<LI>CUPS-SUM-1.1.x: CUPS Software Users Manual </LI>
+<LI>CUPS-SVD-1.1: CUPS Software Version Description </LI>
 </UL>
-<H2><A NAME="2_2">2.2  Other Documents</A></H2>
-<P> The following non-CUPS documents are referenced by this document: </P>
+<H2><A NAME="2_2">2.2 Other Documents</A></H2>
+<P>The following non-CUPS documents are referenced by this document: </P>
 <UL>
 <LI><A HREF="http://partners.adobe.com/asn/developer/PDFS/TN/5003.PPD_Spec_v4.3.pdf">
- Adobe  PostScript Printer Description File Format Specification, 
+Adobe  PostScript Printer Description File Format Specification, 
  Version 4.3.</A></LI>
 <LI><A HREF="http://partners.adobe.com/asn/developer/PDFS/TN/PLRM.pdf">
- Adobe  PostScript Language Reference, Third Edition.</A></LI>
-<LI> IPP: Job and Printer Set Operations </LI>
-<LI> IPP/1.1: Encoding and Transport </LI>
-<LI> IPP/1.1: Implementers Guide </LI>
-<LI> IPP/1.1: Model and Semantics </LI>
-<LI><A HREF="http://www.ietf.org/rfc/rfc1179.txt"> RFC 1179, Line 
+Adobe  PostScript Language Reference, Third Edition.</A></LI>
+<LI>IPP: Job and Printer Set Operations </LI>
+<LI>IPP/1.1: Encoding and Transport </LI>
+<LI>IPP/1.1: Implementers Guide </LI>
+<LI>IPP/1.1: Model and Semantics </LI>
+<LI><A HREF="http://www.ietf.org/rfc/rfc1179.txt">RFC 1179, Line 
 Printer Daemon Protocol</A></LI>
-<LI><A HREF="http://www.ietf.org/rfc/rfc2567.txt"> RFC 2567, Design 
+<LI><A HREF="http://www.ietf.org/rfc/rfc2567.txt">RFC 2567, Design 
 Goals for an Internet Printing Protocol</A></LI>
-<LI><A HREF="http://www.ietf.org/rfc/rfc2568.txt"> RFC 2568, Rationale 
+<LI><A HREF="http://www.ietf.org/rfc/rfc2568.txt">RFC 2568, Rationale 
 for the Structure of the Model and Protocol</A> for the Internet 
 Printing Protocol</LI>
-<LI><A HREF="http://www.ietf.org/rfc/rfc2569.txt"> RFC 2569, Mapping 
+<LI><A HREF="http://www.ietf.org/rfc/rfc2569.txt">RFC 2569, Mapping 
 between LPD and IPP Protocols</A></LI>
-<LI><A HREF="http://www.ietf.org/rfc/rfc2616.txt"> RFC 2616, Hypertext 
+<LI><A HREF="http://www.ietf.org/rfc/rfc2616.txt">RFC 2616, Hypertext 
 Transfer Protocol -- HTTP/1.1</A></LI>
-<LI><A HREF="http://www.ietf.org/rfc/rfc2617.txt"> RFC 2617, HTTP 
+<LI><A HREF="http://www.ietf.org/rfc/rfc2617.txt">RFC 2617, HTTP 
 Authentication: Basic and Digest Access</A> Authentication </LI>
 </UL>
-<H1><A NAME="3">3  Additions</A></H1>
-<P> CUPS 1.1 includes many new features from the 1.0.x releases. </P>
-<H2><A NAME="3_1">3.1  Filters</A></H2>
-<H3><A NAME="3_1_1">3.1.1 <CODE> imagetoraster</CODE>, <CODE>imagetops</CODE>
+<H1><A NAME="3">3 Additions</A></H1>
+<P>CUPS 1.1 includes many new features from the 1.0.x releases. </P>
+<H2><A NAME="3_1">3.1 Filters</A></H2>
+<H3><A NAME="3_1_1">3.1.1 <CODE>imagetoraster</CODE>, <CODE>imagetops</CODE>
 </A></H3>
-<P> The image file filters have been upgraded to support conversion of 
+<P>The image file filters have been upgraded to support conversion of 
 Microsoft Bitmap (&quot;BMP&quot;) and Alias PIX files. </P>
-<H3><A NAME="3_1_2">3.1.2  pdftops</A></H3>
-<P> A new pdftops filter has been developed that is based on the 
+<H3><A NAME="3_1_2">3.1.2 pdftops</A></H3>
+<P>A new pdftops filter has been developed that is based on the 
 excellent Xpdf 0.90 software from Derek B. Noonburg. The new filter is 
 faster, smaller, and considerably more reliable than the 
 Ghostscript-based filter in CUPS 1.0. </P>
-<H3><A NAME="3_1_3">3.1.3  pstoraster</A></H3>
-<P> The <CODE>pstoraster</CODE> filter has been integrated with GNU 
+<H3><A NAME="3_1_3">3.1.3 pstoraster</A></H3>
+<P>The <CODE>pstoraster</CODE> filter has been integrated with GNU 
 GhostScript 5.50. The new RIP supports most Level 3 PostScript language 
 features. </P>
-<H3><A NAME="3_1_4">3.1.4  rastertoepson</A></H3>
-<P> The new <CODE>rastertoepson</CODE> filter supports EPSON printers 
+<H3><A NAME="3_1_4">3.1.4 rastertoepson</A></H3>
+<P>The new <CODE>rastertoepson</CODE> filter supports EPSON printers 
 using the ESC/P or ESC/P2 command sets. PPDs are supplied for 9-pin, 
 24-pin, Stylus Color, and Stylus Photo printers. </P>
-<H2><A NAME="3_2">3.2  User-Defined Printers and Options</A></H2>
-<P> The new <CODE>lpoptions</CODE> command allows users to configure 
+<H2><A NAME="3_2">3.2 User-Defined Printers and Options</A></H2>
+<P>The new <CODE>lpoptions</CODE> command allows users to configure 
 default document options and create additional &quot;instances&quot; of existing 
 printers, each with unique options. </P>
-<P> The <CODE>lp</CODE>, <CODE>lpr</CODE>, and <CODE>lpstat</CODE>
+<P>The <CODE>lp</CODE>, <CODE>lpr</CODE>, and <CODE>lpstat</CODE>
  commands have been upgraded to use this option and printer instance 
 information automatically. </P>
-<H2><A NAME="3_3">3.3  Daemons</A></H2>
-<P> CUPS 1.1 includes two new daemons that provide enhanced network 
+<H2><A NAME="3_3">3.3 Daemons</A></H2>
+<P>CUPS 1.1 includes two new daemons that provide enhanced network 
 printing support. </P>
-<H3><A NAME="3_3_1">3.3.1  cups-lpd</A></H3>
-<P> The <CODE>cups-lpd</CODE> daemon provides support for clients using 
+<H3><A NAME="3_3_1">3.3.1 cups-lpd</A></H3>
+<P>The <CODE>cups-lpd</CODE> daemon provides support for clients using 
 the Line Printer Daemon protocol. </P>
-<H3><A NAME="3_3_2">3.3.2  cups-polld</A></H3>
-<P> The <CODE>cups-polld</CODE> daemon provides remote polling services 
+<H3><A NAME="3_3_2">3.3.2 cups-polld</A></H3>
+<P>The <CODE>cups-polld</CODE> daemon provides remote polling services 
 for the scheduler. </P>
-<H2><A NAME="3_4">3.4  Commands</A></H2>
-<P> CUPS 1.1 includes several new printing commands. </P>
-<H3><A NAME="3_4_1">3.4.1  lpoptions</A></H3>
-<P> The <CODE>lpoptions</CODE> command provides user-defined printers 
+<H2><A NAME="3_4">3.4 Commands</A></H2>
+<P>CUPS 1.1 includes several new printing commands. </P>
+<H3><A NAME="3_4_1">3.4.1 lpoptions</A></H3>
+<P>The <CODE>lpoptions</CODE> command provides user-defined printers 
 and options. </P>
-<H3><A NAME="3_4_2">3.4.2  lpmove</A></H3>
-<P> The <CODE>lpmove</CODE> command moves a print job to a new 
+<H3><A NAME="3_4_2">3.4.2 lpmove</A></H3>
+<P>The <CODE>lpmove</CODE> command moves a print job to a new 
 destination. </P>
-<H3><A NAME="3_4_3">3.4.3  lpinfo</A></H3>
-<P> The <CODE>lpinfo</CODE> command lists the available PPD files or 
+<H3><A NAME="3_4_3">3.4.3 lpinfo</A></H3>
+<P>The <CODE>lpinfo</CODE> command lists the available PPD files or 
 devices. </P>
-<H2><A NAME="3_5">3.5  IPP Implementation</A></H2>
-<P> CUPS 1.1 adds support for the <CODE>set-job-attributes</CODE>
+<H2><A NAME="3_5">3.5 IPP Implementation</A></H2>
+<P>CUPS 1.1 adds support for the <CODE>set-job-attributes</CODE>
  extension operation as well as two new CUPS-specific extension 
 operations to determine which devices and printer drivers are available 
 on the system. </P>
-<P> Further information on the CUPS implementation of IPP can be found 
+<P>Further information on the CUPS implementation of IPP can be found 
 in CUPS-IPP-1.1. </P>
-<H1><A NAME="4">4  Changes</A></H1>
-<P> CUPS 1.1 includes many changes from the 1.0.x releases. </P>
-<H2><A NAME="4_1">4.1  Directory Structure</A></H2>
-<P> The directory structure in CUPS 1.1 has been modified to conform to 
+<H1><A NAME="4">4 Changes</A></H1>
+<P>CUPS 1.1 includes many changes from the 1.0.x releases. </P>
+<H2><A NAME="4_1">4.1 Directory Structure</A></H2>
+<P>The directory structure in CUPS 1.1 has been modified to conform to 
 the Filesystem Hierarchy Standard, 2.0. The following table describes 
 the new file locations. 
 <CENTER>
 <TABLE BORDER WIDTH="80%"><CAPTION> Table 1: Directory structure 
 changes from CUPS 1.0.x to 1.1.x.</CAPTION>
-<TR><TH> Description</TH><TH> CUPS 1.0.x</TH><TH> CUPS 1.1.x</TH></TR>
-<TR><TD> Backends</TD><TD> /var/cups/backend</TD><TD>
- /usr/lib/cups/backend</TD></TR>
-<TR><TD> CGI programs</TD><TD> /var/cups/cgi-bin</TD><TD>
- /usr/lib/cups/cgi-bin</TD></TR>
-<TR><TD> Configuration files</TD><TD> /var/cups/conf</TD><TD> /etc/cups</TD>
+<TR><TH>Description</TH><TH>CUPS 1.0.x</TH><TH>CUPS 1.1.x</TH></TR>
+<TR><TD>Backends</TD><TD>/var/cups/backend</TD><TD>/usr/lib/cups/backend</TD>
 </TR>
-<TR><TD> Documentation</TD><TD> /usr/share/cups/doc</TD><TD>
- /usr/share/doc/cups</TD></TR>
-<TR><TD> Filter programs</TD><TD> /var/cups/filter</TD><TD>
- /usr/lib/cups/filter</TD></TR>
-<TR><TD> Interface scripts</TD><TD> /var/cups/interfaces</TD><TD>
- /etc/cups/interfaces</TD></TR>
-<TR><TD> Locale data</TD><TD> /usr/lib/locale</TD><TD> /usr/share/locale</TD>
+<TR><TD>CGI programs</TD><TD>/var/cups/cgi-bin</TD><TD>
+/usr/lib/cups/cgi-bin</TD></TR>
+<TR><TD>Configuration files</TD><TD>/var/cups/conf</TD><TD>/etc/cups</TD>
 </TR>
-<TR><TD> Log files</TD><TD> /var/cups/logs</TD><TD> /var/log/cups</TD></TR>
-<TR><TD> PPD files</TD><TD> /var/cups/ppd</TD><TD> /etc/cups/ppd</TD></TR>
-<TR><TD> Request files</TD><TD> /var/cups/requests</TD><TD>
- /var/spool/cups</TD></TR>
+<TR><TD>Documentation</TD><TD>/usr/share/cups/doc</TD><TD>
+/usr/share/doc/cups</TD></TR>
+<TR><TD>Filter programs</TD><TD>/var/cups/filter</TD><TD>
+/usr/lib/cups/filter</TD></TR>
+<TR><TD>Interface scripts</TD><TD>/var/cups/interfaces</TD><TD>
+/etc/cups/interfaces</TD></TR>
+<TR><TD>Locale data</TD><TD>/usr/lib/locale</TD><TD>/usr/share/locale</TD>
+</TR>
+<TR><TD>Log files</TD><TD>/var/cups/logs</TD><TD>/var/log/cups</TD></TR>
+<TR><TD>PPD files</TD><TD>/var/cups/ppd</TD><TD>/etc/cups/ppd</TD></TR>
+<TR><TD>Request files</TD><TD>/var/cups/requests</TD><TD>/var/spool/cups</TD>
+</TR>
 </TABLE>
 </CENTER>
 </P>
-<H2><A NAME="4_2">4.2  IPP Implementation</A></H2>
-<P> CUPS 1.1 is based on version 1.1 of the Internet Printing Protocol. </P>
-<P> The new scheduler supports the <CODE>create-job</CODE> and <CODE>
+<H2><A NAME="4_2">4.2 IPP Implementation</A></H2>
+<P>CUPS 1.1 is based on version 1.1 of the Internet Printing Protocol. </P>
+<P>The new scheduler supports the <CODE>create-job</CODE> and <CODE>
 send-document</CODE> operations. In addition, the <CODE>job-sheets</CODE>
 , <CODE>job-sheets-default</CODE>, and <CODE>job-sheets-supported</CODE>
  attributes are now supported for banner pages. </P>
-<P> The <CODE>CUPS-get-printers</CODE> and <CODE>CUPS-get-classes</CODE>
+<P>The <CODE>CUPS-get-printers</CODE> and <CODE>CUPS-get-classes</CODE>
  operations have been upgraded to support limited filtering based upon 
 the <CODE>printer-type</CODE>, <CODE>printer-location</CODE>, <CODE>
 printer-info</CODE>, and <CODE>printer-make-and-model</CODE>
  attributes. </P>
-<P> The <CODE>CUPS-add-printer</CODE> operation now supports the <CODE>
+<P>The <CODE>CUPS-add-printer</CODE> operation now supports the <CODE>
 ppd-name</CODE> attribute to specify a locally-available PPD file 
 rather than sending the PPD file from the client with the request. </P>
-<P> Further information on the CUPS implementation of IPP can be found 
+<P>Further information on the CUPS implementation of IPP can be found 
 in CUPS-IPP-1.1. </P>
-<H1 TYPE="A" VALUE="1"><A NAME="5">A  Glossary</A></H1>
-<H2><A NAME="5_1">A.1  Terms</A></H2>
+<H1 TYPE="A" VALUE="1"><A NAME="5">A Glossary</A></H1>
+<H2><A NAME="5_1">A.1 Terms</A></H2>
 <DL>
-<DT> C </DT>
-<DD> A computer language. </DD>
-<DT> parallel </DT>
-<DD> Sending or receiving data more than 1 bit at a time. </DD>
-<DT> pipe </DT>
-<DD> A one-way communications channel between two programs. </DD>
-<DT> serial </DT>
-<DD> Sending or receiving data 1 bit at a time. </DD>
-<DT> socket </DT>
-<DD> A two-way network communications channel. </DD>
+<DT>C </DT>
+<DD>A computer language. </DD>
+<DT>parallel </DT>
+<DD>Sending or receiving data more than 1 bit at a time. </DD>
+<DT>pipe </DT>
+<DD>A one-way communications channel between two programs. </DD>
+<DT>serial </DT>
+<DD>Sending or receiving data 1 bit at a time. </DD>
+<DT>socket </DT>
+<DD>A two-way network communications channel. </DD>
 </DL>
-<H2><A NAME="5_2">A.2  Acronyms</A></H2>
+<H2><A NAME="5_2">A.2 Acronyms</A></H2>
 <DL>
-<DT> ASCII </DT>
-<DD> American Standard Code for Information Interchange </DD>
-<DT> CUPS </DT>
-<DD> Common UNIX Printing System </DD>
-<DT> ESC/P </DT>
-<DD> EPSON Standard Code for Printers </DD>
-<DT> FTP </DT>
-<DD> File Transfer Protocol </DD>
-<DT> HP-GL </DT>
-<DD> Hewlett-Packard Graphics Language </DD>
-<DT> HP-PCL </DT>
-<DD> Hewlett-Packard Page Control Language </DD>
-<DT> HP-PJL </DT>
-<DD> Hewlett-Packard Printer Job Language </DD>
-<DT> IETF </DT>
-<DD> Internet Engineering Task Force </DD>
-<DT> IPP </DT>
-<DD> Internet Printing Protocol </DD>
-<DT> ISO </DT>
-<DD> International Standards Organization </DD>
-<DT> LPD </DT>
-<DD> Line Printer Daemon </DD>
-<DT> MIME </DT>
-<DD> Multimedia Internet Mail Exchange </DD>
-<DT> PPD </DT>
-<DD> PostScript Printer Description </DD>
-<DT> SMB </DT>
-<DD> Server Message Block </DD>
-<DT> TFTP </DT>
-<DD> Trivial File Transfer Protocol </DD>
+<DT>ASCII </DT>
+<DD>American Standard Code for Information Interchange </DD>
+<DT>CUPS </DT>
+<DD>Common UNIX Printing System </DD>
+<DT>ESC/P </DT>
+<DD>EPSON Standard Code for Printers </DD>
+<DT>FTP </DT>
+<DD>File Transfer Protocol </DD>
+<DT>HP-GL </DT>
+<DD>Hewlett-Packard Graphics Language </DD>
+<DT>HP-PCL </DT>
+<DD>Hewlett-Packard Page Control Language </DD>
+<DT>HP-PJL </DT>
+<DD>Hewlett-Packard Printer Job Language </DD>
+<DT>IETF </DT>
+<DD>Internet Engineering Task Force </DD>
+<DT>IPP </DT>
+<DD>Internet Printing Protocol </DD>
+<DT>ISO </DT>
+<DD>International Standards Organization </DD>
+<DT>LPD </DT>
+<DD>Line Printer Daemon </DD>
+<DT>MIME </DT>
+<DD>Multimedia Internet Mail Exchange </DD>
+<DT>PPD </DT>
+<DD>PostScript Printer Description </DD>
+<DT>SMB </DT>
+<DD>Server Message Block </DD>
+<DT>TFTP </DT>
+<DD>Trivial File Transfer Protocol </DD>
 </DL>
 </BODY>
 </HTML>
