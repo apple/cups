@@ -1,5 +1,5 @@
 /*
- * "$Id: lp.c,v 1.18 2000/02/28 19:17:46 mike Exp $"
+ * "$Id: lp.c,v 1.19 2000/03/01 21:55:50 mike Exp $"
  *
  *   "lp" command for the Common UNIX Printing System (CUPS).
  *
@@ -216,6 +216,9 @@ main(int  argc,		/* I - Number of command-line arguments */
 
       if (printer == NULL)
       {
+	if (num_dests == 0)
+	  num_dests = cupsGetDests(&dests);
+
         for (j = 0, dest = dests; j < num_dests; j ++, dest ++)
 	  if (dest->is_default)
 	  {
@@ -268,6 +271,9 @@ main(int  argc,		/* I - Number of command-line arguments */
   {
     if (printer == NULL)
     {
+      if (num_dests == 0)
+	num_dests = cupsGetDests(&dests);
+
       for (j = 0, dest = dests; j < num_dests; j ++, dest ++)
 	if (dest->is_default)
 	{
@@ -371,5 +377,5 @@ sighandler(int s)	/* I - Signal number */
 
 
 /*
- * End of "$Id: lp.c,v 1.18 2000/02/28 19:17:46 mike Exp $".
+ * End of "$Id: lp.c,v 1.19 2000/03/01 21:55:50 mike Exp $".
  */

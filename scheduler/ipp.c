@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.54 2000/02/25 03:00:54 mike Exp $"
+ * "$Id: ipp.c,v 1.55 2000/03/01 21:55:49 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -2187,6 +2187,8 @@ get_printer_attrs(client_t        *con,	/* I - Client connection */
 
 
   DEBUG_printf(("get_printer_attrs(%08x, %08x)\n", con, uri));
+  LogMessage(L_DEBUG, "get_printer_attrs(%08x, \"%s\")\n", con,
+             uri->values[0].string.text);
 
  /*
   * Is the destination valid?
@@ -3958,5 +3960,5 @@ validate_job(client_t        *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.54 2000/02/25 03:00:54 mike Exp $".
+ * End of "$Id: ipp.c,v 1.55 2000/03/01 21:55:49 mike Exp $".
  */
