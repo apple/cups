@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c,v 1.41 1999/12/15 15:21:34 mike Exp $"
+ * "$Id: util.c,v 1.42 1999/12/21 02:26:46 mike Exp $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -293,7 +293,11 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
     }
     else if (status == HTTP_ERROR)
     {
+#if defined(WIN32) || defined(__EMX__)
+      if (http->error != WSAENETDOWN && http->error != WSAENETUNREACH)
+#else
       if (http->error != ENETDOWN && http->error != ENETUNREACH)
+#endif /* WIN32 || __EMX__ */
         continue;
       else
         break;
@@ -1022,7 +1026,7 @@ cupsTempFile(char *filename,		/* I - Pointer to buffer */
   if ((tmpdir = getenv("TMPDIR")) == NULL)
     tmpdir = "/var/tmp";
 
-  if ((strlen(tmpdir) + 8) > len)
+  if ((int)(strlen(tmpdir) + 8) > len)
   {
    /*
     * The specified directory exceeds the size of the buffer; default it...
@@ -1105,5 +1109,5 @@ cups_connect(const char *name,		/* I - Destination (printer[@host]) */
 
 
 /*
- * End of "$Id: util.c,v 1.41 1999/12/15 15:21:34 mike Exp $".
+ * End of "$Id: util.c,v 1.42 1999/12/21 02:26:46 mike Exp $".
  */

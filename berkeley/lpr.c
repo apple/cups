@@ -1,5 +1,5 @@
 /*
- * "$Id: lpr.c,v 1.8 1999/10/26 14:40:55 mike Exp $"
+ * "$Id: lpr.c,v 1.9 1999/12/21 02:26:43 mike Exp $"
  *
  *   "lpr" command for the Common UNIX Printing System (CUPS).
  *
@@ -44,7 +44,7 @@
  * Local functions.
  */
 
-void	sighandler(void);
+void	sighandler(int);
 #endif /* !WIN32 */
 
 
@@ -76,6 +76,9 @@ main(int  argc,		/* I - Number of command-line arguments */
 		deletefile;	/* Delete file after print? */
   char		buffer[8192];	/* Copy buffer */
   FILE		*temp;		/* Temporary file pointer */
+#ifdef HAVE_SIGACTION
+  struct sigaction action;	/* Signal action */
+#endif /* HAVE_SIGACTION */
 
 
   silent      = 0;
@@ -230,7 +233,22 @@ main(int  argc,		/* I - Number of command-line arguments */
     }
 
 #ifndef WIN32
+#  if defined(HAVE_SIGSET)
+    sigset(SIGHUP, sighandler);
+    sigset(SIGINT, sighandler);
+    sigset(SIGTERM, sighandler);
+#  elif defined(HAVE_SIGACTION)
+    memset(&action, 0, sizeof(action));
+    action.sa_handler = sighandler;
+
+    sigaction(SIGHUP, &action, NULL);
+    sigaction(SIGINT, &action, NULL);
+    sigaction(SIGTERM, &action, NULL);
+#  else
+    signal(SIGHUP, sighandler);
+    signal(SIGINT, sighandler);
     signal(SIGTERM, sighandler);
+#  endif
 #endif /* !WIN32 */
 
     temp = fopen(cupsTempFile(tempfile, sizeof(tempfile)), "w");
@@ -278,17 +296,23 @@ main(int  argc,		/* I - Number of command-line arguments */
  */
 
 void
-sighandler(void)
+sighandler(int s)	/* I - Signal number */
 {
  /*
   * Remove the temporary file we're using to print from stdin...
   */
 
   unlink(tempfile);
+
+ /*
+  * Exit...
+  */
+
+  exit(s);
 }
 #endif /* !WIN32 */
 
 
 /*
- * End of "$Id: lpr.c,v 1.8 1999/10/26 14:40:55 mike Exp $".
+ * End of "$Id: lpr.c,v 1.9 1999/12/21 02:26:43 mike Exp $".
  */

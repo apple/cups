@@ -1,5 +1,5 @@
 /*
- * "$Id: mark.c,v 1.18 1999/10/25 18:40:51 mike Exp $"
+ * "$Id: mark.c,v 1.19 1999/12/21 02:26:45 mike Exp $"
  *
  *   Option marking routines for the Common UNIX Printing System (CUPS).
  *
@@ -287,7 +287,6 @@ ppdMarkDefaults(ppd_file_t *ppd)/* I - PPD file record */
 {
   int		i;		/* Looping variables */
   ppd_group_t	*g;		/* Current group */
-  ppd_option_t	*o;		/* PageSize option */
 
 
   if (ppd == NULL)
@@ -408,5 +407,5 @@ ppd_defaults(ppd_file_t  *ppd,	/* I - PPD file */
 
 
 /*
- * End of "$Id: mark.c,v 1.18 1999/10/25 18:40:51 mike Exp $".
+ * End of "$Id: mark.c,v 1.19 1999/12/21 02:26:45 mike Exp $".
  */

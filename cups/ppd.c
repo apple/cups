@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c,v 1.37 1999/11/03 19:08:09 mike Exp $"
+ * "$Id: ppd.c,v 1.38 1999/12/21 02:26:46 mike Exp $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -674,9 +674,9 @@ ppdOpen(FILE *fp)		/* I - File to read from */
       option = NULL;
     }
     else if (strcmp(keyword, "MaxMediaWidth") == 0)
-      ppd->custom_max[0] = atof(string);
+      ppd->custom_max[0] = (float)atof(string);
     else if (strcmp(keyword, "MaxMediaHeight") == 0)
-      ppd->custom_max[1] = atof(string);
+      ppd->custom_max[1] = (float)atof(string);
     else if (strcmp(keyword, "ParamCustomPageSize") == 0)
     {
       if (strcmp(name, "Width") == 0)
@@ -1810,5 +1810,5 @@ ppd_fix(char *string)		/* IO - String to fix */
 
 
 /*
- * End of "$Id: ppd.c,v 1.37 1999/11/03 19:08:09 mike Exp $".
+ * End of "$Id: ppd.c,v 1.38 1999/12/21 02:26:46 mike Exp $".
  */

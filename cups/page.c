@@ -1,5 +1,5 @@
 /*
- * "$Id: page.c,v 1.9 1999/10/10 13:42:12 mike Exp $"
+ * "$Id: page.c,v 1.10 1999/12/21 02:26:45 mike Exp $"
  *
  *   Page size functions for the Common UNIX Printing System (CUPS).
  *
@@ -85,30 +85,30 @@ ppdPageSize(ppd_file_t *ppd,	/* I - PPD file record */
 
       if (strcasecmp(units, "in") == 0)
       {
-        ppd->sizes[i].width  = w * 72.0;
-	ppd->sizes[i].length = l * 72.0;
+        ppd->sizes[i].width  = w * 72.0f;
+	ppd->sizes[i].length = l * 72.0f;
 	ppd->sizes[i].left   = ppd->custom_margins[0];
 	ppd->sizes[i].bottom = ppd->custom_margins[1];
-	ppd->sizes[i].right  = w * 72.0 - ppd->custom_margins[2];
-	ppd->sizes[i].top    = l * 72.0 - ppd->custom_margins[3];
+	ppd->sizes[i].right  = w * 72.0f - ppd->custom_margins[2];
+	ppd->sizes[i].top    = l * 72.0f - ppd->custom_margins[3];
       }
       else if (strcasecmp(units, "cm") == 0)
       {
-        ppd->sizes[i].width  = w * 2.54 * 72.0;
-	ppd->sizes[i].length = l * 2.54 * 72.0;
+        ppd->sizes[i].width  = w / 2.54f * 72.0f;
+	ppd->sizes[i].length = l / 2.54f * 72.0f;
 	ppd->sizes[i].left   = ppd->custom_margins[0];
 	ppd->sizes[i].bottom = ppd->custom_margins[1];
-	ppd->sizes[i].right  = w * 2.54 * 72.0 - ppd->custom_margins[2];
-	ppd->sizes[i].top    = l * 2.54 * 72.0 - ppd->custom_margins[3];
+	ppd->sizes[i].right  = w / 2.54f * 72.0f - ppd->custom_margins[2];
+	ppd->sizes[i].top    = l / 2.54f * 72.0f - ppd->custom_margins[3];
       }
       else if (strcasecmp(units, "mm") == 0)
       {
-        ppd->sizes[i].width  = w * 25.4 * 72.0;
-	ppd->sizes[i].length = l * 25.4 * 72.0;
+        ppd->sizes[i].width  = w / 25.4f * 72.0f;
+	ppd->sizes[i].length = l / 25.4f * 72.0f;
 	ppd->sizes[i].left   = ppd->custom_margins[0];
 	ppd->sizes[i].bottom = ppd->custom_margins[1];
-	ppd->sizes[i].right  = w * 25.4 * 72.0 - ppd->custom_margins[2];
-	ppd->sizes[i].top    = l * 25.4 * 72.0 - ppd->custom_margins[3];
+	ppd->sizes[i].right  = w / 25.4f * 72.0f - ppd->custom_margins[2];
+	ppd->sizes[i].top    = l / 25.4f * 72.0f - ppd->custom_margins[3];
       }
       else
       {
@@ -185,5 +185,5 @@ ppdPageLength(ppd_file_t *ppd,	/* I - PPD file */
 
 
 /*
- * End of "$Id: page.c,v 1.9 1999/10/10 13:42:12 mike Exp $".
+ * End of "$Id: page.c,v 1.10 1999/12/21 02:26:45 mike Exp $".
  */

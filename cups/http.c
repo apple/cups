@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.56 1999/11/02 22:26:47 mike Exp $"
+ * "$Id: http.c,v 1.57 1999/12/21 02:26:45 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -329,7 +329,11 @@ httpReconnect(http_t *http)	/* I - HTTP data */
 
   if ((http->fd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
   {
+#if defined(WIN32) || defined(__EMX__)
+    http->error  = WSAGetLastError();
+#else
     http->error  = errno;
+#endif /* WIN32 || __EMX__ */
     http->status = HTTP_ERROR;
     return (-1);
   }
@@ -354,7 +358,11 @@ httpReconnect(http_t *http)	/* I - HTTP data */
   if (connect(http->fd, (struct sockaddr *)&(http->hostaddr),
               sizeof(http->hostaddr)) < 0)
   {
+#if defined(WIN32) || defined(__EMX__)
+    http->error  = WSAGetLastError();
+#else
     http->error  = errno;
+#endif /* WIN32 || __EMX__ */
     http->status = HTTP_ERROR;
 
 #ifdef WIN32
@@ -747,7 +755,11 @@ httpRead(http_t *http,			/* I - HTTP data */
   if (bytes > 0)
     http->data_remaining -= bytes;
   else if (bytes < 0)
+#if defined(WIN32) || defined(__EMX__)
+    http->error = WSAGetLastError();
+#else
     http->error = errno;
+#endif /* WIN32 || __EMX__ */
 
   if (http->data_remaining == 0)
   {
@@ -776,9 +788,8 @@ httpWrite(http_t     *http,		/* I - HTTP data */
           const char *buffer,		/* I - Buffer for data */
 	  int        length)		/* I - Number of bytes to write */
 {
-  int		tbytes,			/* Total bytes sent */
-		bytes;			/* Bytes sent */
-  char		len[32];		/* Length string */
+  int	tbytes,				/* Total bytes sent */
+	bytes;				/* Bytes sent */
 
 
   if (http == NULL || buffer == NULL)
@@ -879,7 +890,11 @@ httpGets(char   *line,			/* I - Line to read into */
   * Pre-scan the buffer and see if there is a newline in there...
   */
 
+#if defined(WIN32) || defined(__EMX__)
+  WSASetLastError(0);
+#else
   errno = 0;
+#endif /* WIN32 || __EMX__ */
 
   do
   {
@@ -904,6 +919,15 @@ httpGets(char   *line,			/* I - Line to read into */
 	* Nope, can't get a line this time...
 	*/
 
+#if defined(WIN32) || defined(__EMX__)
+        if (WSAGetLastError() != http->error)
+	{
+	  http->error = WSAGetLastError();
+	  continue;
+	}
+
+        DEBUG_printf(("httpGets(): recv() error %d!\n", WSAGetLastError()));
+#else
         if (errno != http->error)
 	{
 	  http->error = errno;
@@ -911,6 +935,7 @@ httpGets(char   *line,			/* I - Line to read into */
 	}
 
         DEBUG_printf(("httpGets(): recv() error %d!\n", errno));
+#endif /* WIN32 || __EMX__ */
 
         return (NULL);
       }
@@ -1503,5 +1528,5 @@ http_send(http_t       *http,	/* I - HTTP data */
 
 
 /*
- * End of "$Id: http.c,v 1.56 1999/11/02 22:26:47 mike Exp $".
+ * End of "$Id: http.c,v 1.57 1999/12/21 02:26:45 mike Exp $".
  */

@@ -15,6 +15,21 @@ Package=<4>
 
 ###############################################################################
 
+Project: "cupsd"=.\scheduler\cupsd.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name cups
+    End Project Dependency
+}}}
+
+###############################################################################
+
 Project: "hpgltops"=.\filter\hpgltops.dsp - Package Owner=<4>
 
 Package=<5>
