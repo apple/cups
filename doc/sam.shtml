@@ -284,6 +284,7 @@ CUPS:
 	<DT>/dev/filename
 	<DD>Sends all output to the specified file.
 
+	<DT>http://hostname[:port]/resource
 	<DT>ipp://hostname[:port]/resource
 	<DD>Sends all output to the specified IPP printer or server.
 	The <I>port</I> parameters defaults to 631.
@@ -339,6 +340,23 @@ driver connected to parallel port 1 under Linux you would use:
 % /usr/lib/lpadmin -pDeskJet -vparallel:/dev/par1 -mdeskjet.ppd ENTER
 </PRE></UL>
 
+<H3>Enabling New Printer Queues</H3>
+
+<P>Before you can print to your new printer queue you need to enable it
+with the following two commands:
+
+<UL><PRE>
+% /usr/bin/enable <I>printer</I> ENTER
+% /usr/lib/accept <I>printer</I> ENTER
+</PRE></UL>
+
+<P>The <CODE>enable</CODE> command tells the scheduler to start the
+named printer. Otherwise any jobs you submitted would sit in the queue without
+being printed!
+
+<P>The <CODE>accept</CODE> command tells the scheduler to start accepting
+print jobs for that printer.
+
 <H2>Removing Printers</H2>
 
 <P>To remove a printer to CUPS you simply run the <CODE>lpadmin</CODE> command
@@ -378,6 +396,37 @@ command with the "-d" option:
 </PRE></UL>
 
 <P>The <I>destination</I> argument is the name of the printer or class.
+
+<H2>Starting and Stopping Printers</H2>
+
+<P>The <CODE>enable</CODE> and <CODE>disable</CODE> commands start and stop
+printer queues, respectively:
+
+<UL><PRE>
+% /usr/bin/enable <I>printer</I> ENTER
+% /usr/bin/disable <I>printer</I> ENTER
+</PRE></UL>
+
+<P>Printers that are disabled may still accept jobs for printing, but won't
+actually print any files until they are restarted. This is useful if the
+printer malfunctions and you need time to correct the problem. Any queues
+jobs are printed after the printer is enabled (started).
+
+<H2>Accepting and Rejecting Print Jobs</H2>
+
+<P>The <CODE>accept</CODE> and <CODE>reject</CODE> commands accept and reject
+print jobs for the named printer, respectively:
+
+<UL><PRE>
+% /usr/lib/accept <I>printer</I> ENTER
+% /usr/lib/reject <I>printer</I> ENTER
+</PRE></UL>
+
+<P>As noted above, a printer can be stopped but accepting new print
+jobs. A printer can also be rejecting new print jobs while it finishes
+those that have been queued. This is useful for when you must perform
+maintenance on the printer and will not have it available to users for
+a long period of time.
 
 <H1 ALIGN=RIGHT>4 - Printing System Management</H1>
 
