@@ -3,6 +3,12 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.19rc2
 
+	- The printer-state-time collection attribute was
+	  encoded as an enumeration instead of an integer.
+	- The printer-is-accepting-jobs collection attribute was
+	  was not added to the collection value.
+	- The printer-state-sequence-number collection attribute
+	  was not added to the collection value.
 	- Fixed typo and const mismatch in IPP backend.
 	- Updated the man pages for the new configuration
 	  directives.

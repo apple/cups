@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.127.2.61 2003/04/11 02:13:42 mike Exp $"
+ * "$Id: ipp.c,v 1.127.2.62 2003/04/16 20:32:38 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -560,6 +560,8 @@ accept_jobs(client_t        *con,	/* I - Client connection */
   printer->accepting        = 1;
   printer->state_message[0] = '\0';
 
+  AddPrinterHistory(printer);
+
   if (dtype & CUPS_PRINTER_CLASS)
     SaveAllClasses();
   else
@@ -721,29 +723,30 @@ add_class(client_t        *con,		/* I - Client connection */
                pclass->name, attr->values[0].boolean, pclass->accepting);
 
     pclass->accepting = attr->values[0].boolean;
+    AddPrinterHistory(pclass);
   }
   if ((attr = ippFindAttribute(con->request, "printer-state", IPP_TAG_ENUM)) != NULL)
   {
+    if (attr->values[0].integer != IPP_PRINTER_IDLE &&
+        attr->values[0].integer == IPP_PRINTER_STOPPED)
+    {
+      LogMessage(L_ERROR, "Attempt to set %s printer-state to bad value %d!",
+                 pclass->name, attr->values[0].integer);
+      send_ipp_error(con, IPP_BAD_REQUEST);
+      return;
+    }
+
     LogMessage(L_INFO, "Setting %s printer-state to %d (was %d.)", pclass->name,
                attr->values[0].integer, pclass->state);
 
-    if (pclass->state == IPP_PRINTER_STOPPED &&
-        attr->values[0].integer != IPP_PRINTER_STOPPED)
-      pclass->state = IPP_PRINTER_IDLE;
-    else if (pclass->state != IPP_PRINTER_STOPPED &&
-             attr->values[0].integer == IPP_PRINTER_STOPPED)
-    {
-      if (pclass->state == IPP_PRINTER_PROCESSING)
-        StopJob(((job_t *)pclass->job)->id, 0);
-
-      pclass->state = IPP_PRINTER_STOPPED;
-    }
-
-    pclass->browse_time = 0;
+    SetPrinterState(pclass, attr->values[0].integer);
   }
   if ((attr = ippFindAttribute(con->request, "printer-state-message", IPP_TAG_TEXT)) != NULL)
+  {
     strlcpy(pclass->state_message, attr->values[0].string.text,
             sizeof(pclass->state_message));
+    AddPrinterHistory(pclass);
+  }
   if ((attr = ippFindAttribute(con->request, "job-sheets-default", IPP_TAG_ZERO)) != NULL &&
       !Classification)
   {
@@ -1212,29 +1215,30 @@ add_printer(client_t        *con,	/* I - Client connection */
                printer->name, attr->values[0].boolean, printer->accepting);
 
     printer->accepting = attr->values[0].boolean;
+    AddPrinterHistory(printer);
   }
   if ((attr = ippFindAttribute(con->request, "printer-state", IPP_TAG_ENUM)) != NULL)
   {
+    if (attr->values[0].integer != IPP_PRINTER_IDLE &&
+        attr->values[0].integer == IPP_PRINTER_STOPPED)
+    {
+      LogMessage(L_ERROR, "Attempt to set %s printer-state to bad value %d!",
+                 printer->name, attr->values[0].integer);
+      send_ipp_error(con, IPP_BAD_REQUEST);
+      return;
+    }
+
     LogMessage(L_INFO, "Setting %s printer-state to %d (was %d.)", printer->name,
                attr->values[0].integer, printer->state);
 
-    if (printer->state == IPP_PRINTER_STOPPED &&
-        attr->values[0].integer != IPP_PRINTER_STOPPED)
-      printer->state = IPP_PRINTER_IDLE;
-    else if (printer->state != IPP_PRINTER_STOPPED &&
-             attr->values[0].integer == IPP_PRINTER_STOPPED)
-    {
-      if (printer->state == IPP_PRINTER_PROCESSING)
-        StopJob(((job_t *)printer->job)->id, 0);
-
-      printer->state = IPP_PRINTER_STOPPED;
-    }
-
-    printer->browse_time = 0;
+    SetPrinterState(printer, attr->values[0].integer);
   }
   if ((attr = ippFindAttribute(con->request, "printer-state-message", IPP_TAG_TEXT)) != NULL)
+  {
     strlcpy(printer->state_message, attr->values[0].string.text,
             sizeof(printer->state_message));
+    AddPrinterHistory(printer);
+  }
   if ((attr = ippFindAttribute(con->request, "job-sheets-default", IPP_TAG_ZERO)) != NULL &&
       !Classification)
   {
@@ -5218,6 +5222,8 @@ reject_jobs(client_t        *con,	/* I - Client connection */
     strlcpy(printer->state_message, attr->values[0].string.text,
             sizeof(printer->state_message));
 
+  AddPrinterHistory(printer);
+
   if (dtype & CUPS_PRINTER_CLASS)
   {
     SaveAllClasses();
@@ -6294,24 +6300,15 @@ start_printer(client_t        *con,	/* I - Client connection */
   else
     printer = FindPrinter(name);
 
-  StartPrinter(printer);
-
   printer->state_message[0] = '\0';
 
-  if (dtype & CUPS_PRINTER_CLASS)
-  {
-    SaveAllClasses();
+  StartPrinter(printer);
 
+  if (dtype & CUPS_PRINTER_CLASS)
     LogMessage(L_INFO, "Class \'%s\' started by \'%s\'.", name,
                con->username);
-  }
-  else
-  {
-    SaveAllPrinters();
-
     LogMessage(L_INFO, "Printer \'%s\' started by \'%s\'.", name,
                con->username);
-  }
 
   CheckJobs();
 
@@ -6387,8 +6384,6 @@ stop_printer(client_t        *con,	/* I - Client connection */
   else
     printer = FindPrinter(name);
 
-  StopPrinter(printer);
-
   if ((attr = ippFindAttribute(con->request, "printer-state-message",
                                IPP_TAG_TEXT)) == NULL)
     strcpy(printer->state_message, "Paused");
@@ -6398,20 +6393,14 @@ stop_printer(client_t        *con,	/* I - Client connection */
             sizeof(printer->state_message));
   }
 
-  if (dtype & CUPS_PRINTER_CLASS)
-  {
-    SaveAllClasses();
+  StopPrinter(printer);
 
+  if (dtype & CUPS_PRINTER_CLASS)
     LogMessage(L_INFO, "Class \'%s\' stopped by \'%s\'.", name,
                con->username);
-  }
   else
-  {
-    SaveAllPrinters();
-
     LogMessage(L_INFO, "Printer \'%s\' stopped by \'%s\'.", name,
                con->username);
-  }
 
  /*
   * Everything was ok, so return OK status...
@@ -6628,5 +6617,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.127.2.61 2003/04/11 02:13:42 mike Exp $".
+ * End of "$Id: ipp.c,v 1.127.2.62 2003/04/16 20:32:38 mike Exp $".
  */
