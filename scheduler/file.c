@@ -1,5 +1,5 @@
 /*
- * "$Id: file.c,v 1.1.2.4 2003/06/14 13:35:50 mike Exp $"
+ * "$Id: file.c,v 1.1.2.5 2003/11/04 16:37:55 mike Exp $"
  *
  *   File functions for the Common UNIX Printing System (CUPS).
  *
@@ -535,6 +535,7 @@ cupsFileSeek(cups_file_t *fp,		/* I - CUPS file */
       fp->pos = 0;
       fp->ptr = NULL;
       fp->end = NULL;
+      fp->eof = 0;
 
       while ((bytes = cups_fill(fp)) > 0)
         if (pos >= fp->pos && pos < (fp->pos + bytes))
@@ -550,6 +551,7 @@ cupsFileSeek(cups_file_t *fp,		/* I - CUPS file */
       fp->pos = pos;
       fp->ptr = NULL;
       fp->end = NULL;
+      fp->eof = 0;
     }
   }
   else if (pos >= (fp->pos + bytes))
@@ -969,5 +971,5 @@ cups_write(int        fd,		/* I - File descriptor */
 
 
 /*
- * End of "$Id: file.c,v 1.1.2.4 2003/06/14 13:35:50 mike Exp $".
+ * End of "$Id: file.c,v 1.1.2.5 2003/11/04 16:37:55 mike Exp $".
  */

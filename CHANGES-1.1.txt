@@ -3,6 +3,9 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.20
 
+	- The scheduler's cupsLangSeek() function did not reset
+	  the "EOF" flag, preventing compressed files from being
+	  typed properly in some cases (STR #368)
 	- The cupsLangGet() cache was only used if the locale
 	  name provided an explicit character set name (STR
 	  #354)
