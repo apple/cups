@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.22 1999/03/03 21:16:13 mike Exp $"
+ * "$Id: http.c,v 1.23 1999/04/16 16:57:48 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -224,6 +224,8 @@ httpConnect(char *host,		/* I - Host to connect to */
   struct hostent	*hostaddr;	/* Host address data */
 
 
+  httpInitialize();
+
  /*
   * Lookup the host...
   */
@@ -407,11 +409,10 @@ httpSeparate(char *uri,		/* I - Universal Resource Identifier */
   }
 
  /*
-  * If the method is "file" then copy the rest as a filename and
-  * return...
+  * If the method starts with less than 2 slashes then it is a local resource...
   */
 
-  if (strcasecmp(method, "file") == 0)
+  if (strncmp(uri, "//", 2) != 0)
   {
     strcpy(resource, uri);
     username[0] = '\0';
@@ -1347,5 +1348,5 @@ http_send(http_t       *http,	/* I - HTTP data */
 
 
 /*
- * End of "$Id: http.c,v 1.22 1999/03/03 21:16:13 mike Exp $".
+ * End of "$Id: http.c,v 1.23 1999/04/16 16:57:48 mike Exp $".
  */

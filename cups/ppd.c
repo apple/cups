@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c,v 1.14 1999/04/09 14:21:24 mike Exp $"
+ * "$Id: ppd.c,v 1.15 1999/04/16 16:57:49 mike Exp $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -1448,9 +1448,9 @@ ppd_decode(unsigned char *string)	/* I - String to decode */
       while (isxdigit(*inptr))
       {
 	if (isalpha(*inptr))
-	  *outptr = (tolower(*inptr) - 'a' + 10) << 16;
+	  *outptr = (tolower(*inptr) - 'a' + 10) << 4;
 	else
-	  *outptr = (*inptr - '0') << 16;
+	  *outptr = (*inptr - '0') << 4;
 
 	inptr ++;
 
@@ -1478,5 +1478,5 @@ ppd_decode(unsigned char *string)	/* I - String to decode */
 
 
 /*
- * End of "$Id: ppd.c,v 1.14 1999/04/09 14:21:24 mike Exp $".
+ * End of "$Id: ppd.c,v 1.15 1999/04/16 16:57:49 mike Exp $".
  */
