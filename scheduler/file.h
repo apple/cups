@@ -1,5 +1,5 @@
 /*
- * "$Id: file.h,v 1.1 2003/03/28 22:28:00 mike Exp $"
+ * "$Id: file.h,v 1.1.2.1 2003/03/29 21:42:13 mike Exp $"
  *
  *   File definitions for the Common UNIX Printing System (CUPS).
  *
@@ -90,5 +90,5 @@ extern int		cupsFileSeek(cups_file_t *fp, int pos);
 #endif /* !_CUPS_FILE_H_ */
 
 /*
- * End of "$Id: file.h,v 1.1 2003/03/28 22:28:00 mike Exp $".
+ * End of "$Id: file.h,v 1.1.2.1 2003/03/29 21:42:13 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: file.c,v 1.1 2003/03/28 22:27:59 mike Exp $"
+ * "$Id: file.c,v 1.1.2.1 2003/03/29 21:42:13 mike Exp $"
  *
  *   File functions for the Common UNIX Printing System (CUPS).
  *
@@ -806,5 +806,5 @@ cups_write(int        fd,		/* I - File descriptor */
 
 
 /*
- * End of "$Id: file.c,v 1.1 2003/03/28 22:27:59 mike Exp $".
+ * End of "$Id: file.c,v 1.1.2.1 2003/03/29 21:42:13 mike Exp $".
  */
