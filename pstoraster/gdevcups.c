@@ -1,5 +1,5 @@
 /*
- * "$Id: gdevcups.c,v 1.23 2000/03/24 19:24:37 mike Exp $"
+ * "$Id: gdevcups.c,v 1.24 2000/04/12 14:39:32 mike Exp $"
  *
  *   GNU Ghostscript raster output driver for the Common UNIX Printing
  *   System (CUPS).
@@ -319,7 +319,8 @@ private int				/* O - Error status */
 cups_get_params(gx_device     *pdev,	/* I - Device info */
                 gs_param_list *plist)	/* I - Parameter list */
 {
-  int	code;				/* Return code */
+  int			code;		/* Return code */
+  gs_param_string	s;		/* Temporary string value */
 
 
 #ifdef DEBUG
@@ -334,8 +335,68 @@ cups_get_params(gx_device     *pdev,	/* I - Device info */
     return (code);
 
  /*
-  * Then write the CUPS-specific parameters...
+  * Then write the CUPS parameters...
   */
+
+  param_string_from_string(s, cups->header.MediaClass);
+  if ((code = param_write_string(plist, "MediaClass", &s)) < 0)
+    return (code);
+
+  if ((code = param_write_int(plist, "AdvanceDistance",
+                              (int *)&(cups->header.AdvanceDistance))) < 0)
+    return (code);
+
+  if ((code = param_write_int(plist, "AdvanceMedia",
+                              (int *)&(cups->header.AdvanceMedia))) < 0)
+    return (code);
+
+  if ((code = param_write_int(plist, "Collate",
+                              (int *)&(cups->header.Collate))) < 0)
+    return (code);
+
+  if ((code = param_write_int(plist, "CutMedia",
+                              (int *)&(cups->header.CutMedia))) < 0)
+    return (code);
+
+  if ((code = param_write_int(plist, "InsertSheet",
+                              (int *)&(cups->header.InsertSheet))) < 0)
+    return (code);
+
+  if ((code = param_write_int(plist, "Jog",
+                              (int *)&(cups->header.Jog))) < 0)
+    return (code);
+
+  if ((code = param_write_int(plist, "LeadingEdge",
+                              (int *)&(cups->header.LeadingEdge))) < 0)
+    return (code);
+
+  if ((code = param_write_int(plist, "MediaPosition",
+                              (int *)&(cups->header.MediaPosition))) < 0)
+    return (code);
+
+  if ((code = param_write_int(plist, "MirrorPrint",
+                              (int *)&(cups->header.MirrorPrint))) < 0)
+    return (code);
+
+  if ((code = param_write_int(plist, "NegativePrint",
+                              (int *)&(cups->header.NegativePrint))) < 0)
+    return (code);
+
+  if ((code = param_write_int(plist, "OutputFaceUp",
+                              (int *)&(cups->header.OutputFaceUp))) < 0)
+    return (code);
+
+  if ((code = param_write_int(plist, "Separations",
+                              (int *)&(cups->header.Separations))) < 0)
+    return (code);
+
+  if ((code = param_write_int(plist, "TraySwitch",
+                              (int *)&(cups->header.TraySwitch))) < 0)
+    return (code);
+
+  if ((code = param_write_int(plist, "Tumble",
+                              (int *)&(cups->header.Tumble))) < 0)
+    return (code);
 
   if ((code = param_write_int(plist, "cupsWidth",
                               (int *)&(cups->header.cupsWidth))) < 0)
@@ -1178,7 +1239,8 @@ cups_put_params(gx_device     *pdev,	/* I - Device info */
   intoption(LeadingEdge, "LeadingEdge", cups_edge_t)
   arrayoption(Margins, "Margins", 2)
   booloption(ManualFeed, "ManualFeed")
-  intoption(MediaPosition, "cupsMediaPosition", unsigned)
+  intoption(MediaPosition, "cupsMediaPosition", unsigned) /* Compatibility */
+  intoption(MediaPosition, "MediaPosition", unsigned)
   floatoption(MediaWeight, "MediaWeight")
   booloption(MirrorPrint, "MirrorPrint")
   booloption(NegativePrint, "NegativePrint")
@@ -2347,5 +2409,5 @@ cups_print_planar(gx_device_printer *pdev,	/* I - Printer device */
 
 
 /*
- * End of "$Id: gdevcups.c,v 1.23 2000/03/24 19:24:37 mike Exp $".
+ * End of "$Id: gdevcups.c,v 1.24 2000/04/12 14:39:32 mike Exp $".
  */
