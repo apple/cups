@@ -3,6 +3,10 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.19
 
+	- When using RunAsUser, the scheduler would initially
+	  start any previously queued (pending) jobs with
+	  RunAsUser disabled - all backends would be running as
+	  root.
 	- If a backend failed for a printer, CUPS would
 	  incorrectly requeue the job for printing again.
 	- Added support for IPP collections and files.
