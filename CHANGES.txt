@@ -152,6 +152,11 @@ CHANGES IN CUPS V1.1.5
 	  didn't handle control file job information in any
 	  order, and didn't free job options after printing
 	  a file.
+	- The scheduler copy_banner() function did not
+	  explicitly set the owner and permissions of the banner
+	  files, which could prevent the banner pages from
+	  printing on some systems.
+	- The lpstat program wasn't listing remote classes.
 
 
 CHANGES IN CUPS v1.1.4

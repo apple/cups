@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.66 2000/11/22 13:33:11 mike Exp $"
+ * "$Id: dirsvc.c,v 1.67 2000/12/14 22:21:58 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -335,27 +335,33 @@ UpdateBrowseList(void)
     while (*pptr && isspace(*pptr))
       pptr ++;
 
-    for (i = 0, pptr ++;
-         i < (sizeof(info) - 1) && *pptr && *pptr != '\"';
-         i ++, pptr ++)
-      info[i] = *pptr;
-
-    if (i)
-      info[i] = '\0';
-
     if (*pptr == '\"')
-      pptr ++;
+    {
+      for (i = 0, pptr ++;
+           i < (sizeof(info) - 1) && *pptr && *pptr != '\"';
+           i ++, pptr ++)
+	info[i] = *pptr;
 
-    while (*pptr && isspace(*pptr))
-      pptr ++;
+      if (i)
+	info[i] = '\0';
 
-    for (i = 0, pptr ++;
-         i < (sizeof(make_model) - 1) && *pptr && *pptr != '\"';
-         i ++, pptr ++)
-      make_model[i] = *pptr;
+      if (*pptr == '\"')
+	pptr ++;
 
-    if (i)
-      make_model[i] = '\0';
+      while (*pptr && isspace(*pptr))
+	pptr ++;
+
+      if (*pptr == '\"')
+      {
+	for (i = 0, pptr ++;
+             i < (sizeof(make_model) - 1) && *pptr && *pptr != '\"';
+             i ++, pptr ++)
+	  make_model[i] = *pptr;
+
+	if (i)
+	  make_model[i] = '\0';
+      }
+    }
   }
 
   DEBUG_puts(packet);
@@ -635,14 +641,6 @@ UpdateBrowseList(void)
     SetPrinterAttrs(p);
 
  /*
-  * If the remote printer is idle, check for local jobs that might need to
-  * go to it...
-  */
-
-  if (p->state == IPP_PRINTER_IDLE)
-    CheckJobs();
-
- /*
   * See if we have a default printer...  If not, make the first printer the
   * default.
   */
@@ -822,7 +820,7 @@ SendBrowseList(void)
 	       p->location, p->info, p->make_model);
 
       bytes = strlen(packet);
-      DEBUG_printf(("SendBrowseList: (%d bytes) %s", bytes, packet));
+      LogMessage(L_DEBUG2, "SendBrowseList: (%d bytes) %s", bytes, packet);
 
      /*
       * Send a packet to each browse address...
@@ -919,5 +917,5 @@ StopPolling(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.66 2000/11/22 13:33:11 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.67 2000/12/14 22:21:58 mike Exp $".
  */
