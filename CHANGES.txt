@@ -1,4 +1,4 @@
-CHANGES.txt - 10/04/2000
+CHANGES.txt - 10/16/2000
 ------------------------
 
 CHANGES IN CUPS V1.1.5
@@ -25,6 +25,8 @@ CHANGES IN CUPS V1.1.5
 	  data required when getting the list of printer or
 	  class information.  This should improve performance
 	  with large numbers of printers on slower machines.
+	- Updated the Linux USB backend to support Mandrake's
+	  /dev/usb/usblp# filenames.
 
 
 CHANGES IN CUPS v1.1.4

@@ -1,5 +1,5 @@
 /*
- * "$Id: usb.c,v 1.11 2000/08/29 20:36:17 mike Exp $"
+ * "$Id: usb.c,v 1.12 2000/10/16 23:02:09 mike Exp $"
  *
  *   USB port backend for the Common UNIX Printing System (CUPS).
  *
@@ -276,6 +276,8 @@ list_devices(void)
 
   if ((fd = open("/dev/usb/lp0", O_WRONLY)) >= 0)
     close(fd); /* 2.3.x and 2.4.x */
+  else if ((fd = open("/dev/usb/usblp0", O_WRONLY)) >= 0)
+    close(fd); /* Mandrake 7.x */
   else if ((fd = open("/dev/usblp0", O_WRONLY)) >= 0)
     close(fd); /* 2.2.x */
 
@@ -331,8 +333,17 @@ list_devices(void)
         * We were processing a printer device; send the info out...
 	*/
 
-	printf("direct usb:/dev/usb/lp%d \"%s %s\" \"USB Printer #%d\"\n",
-	       i, make, model, i + 1);
+        sprintf(device, "/dev/usb/lp%d", i);
+	if (access(device, 0))
+	{
+	  sprintf(device, "/dev/usb/usblp%d", i);
+
+	  if (access(device, 0))
+	    sprintf(device, "/dev/usblp%d", i);
+	}
+
+	printf("direct usb:%s \"%s %s\" \"USB Printer #%d\"\n",
+	       device, make, model, i + 1);
 
 	i ++;
 
@@ -352,6 +363,13 @@ list_devices(void)
     for (i = 0; i < 8; i ++)
     {
       sprintf(device, "/dev/usb/lp%d", i);
+      if ((fd = open(device, O_WRONLY)) >= 0)
+      {
+	close(fd);
+	printf("direct usb:%s \"Unknown\" \"USB Printer #%d\"\n", device, i + 1);
+      }
+
+      sprintf(device, "/dev/usb/usblp%d", i);
       if ((fd = open(device, O_WRONLY)) >= 0)
       {
 	close(fd);
@@ -389,5 +407,5 @@ list_devices(void)
 
 
 /*
- * End of "$Id: usb.c,v 1.11 2000/08/29 20:36:17 mike Exp $".
+ * End of "$Id: usb.c,v 1.12 2000/10/16 23:02:09 mike Exp $".
  */

@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: configure.in,v 1.57 2000/09/20 19:11:05 mike Exp $"
+dnl "$Id: configure.in,v 1.58 2000/10/16 23:02:08 mike Exp $"
 dnl
 dnl   Configuration script for the Common UNIX Printing System (CUPS).
 dnl
@@ -47,6 +47,7 @@ AC_ARG_ENABLE(debug, [  --enable-debug        turn on debugging [default=no]],[i
 	OPTIM="-g "
 fi])
 AC_ARG_ENABLE(shared, [  --enable-shared        turn on shared libraries [default=yes]])
+AC_ARG_ENABLE(ssl, [  --enable-ssl           turn on SSL/TLS support [default=yes]])
 AC_ARG_ENABLE(libtool_unsupported, [  --enable-libtool-unsupported=LIBTOOL_PATH
                           turn on building with libtool (UNSUPPORTED!) [default=no]],[if eval "test x$enable_libtool_unsupported != xno"; then
 	LIBTOOL="$enable_libtool_unsupported"
@@ -188,6 +189,18 @@ if test "$uname" != "IRIX"; then
 else
 	echo "Not using -lnsl since you are running IRIX."
 fi)
+
+dnl Encryption support...
+
+SSLLIBS=""
+AC_SUBST(SSLLIBS)
+
+if test "$enable_ssl" != "no"; then
+	AC_CHECK_LIB(ssl,SSL_new,
+		SSLLIBS="-lssl -lcrypto"
+		AC_DEFINE(HAVE_LIBSSL)
+	)
+fi
 
 dnl Save the current libraries since we don't want the image libraries
 dnl included with every program...
@@ -559,5 +572,5 @@ AC_DEFINE_UNQUOTED(CUPS_FONTPATH, "$fontpath")
 AC_OUTPUT(Makedefs cups.sh)
 
 dnl
-dnl End of "$Id: configure.in,v 1.57 2000/09/20 19:11:05 mike Exp $".
+dnl End of "$Id: configure.in,v 1.58 2000/10/16 23:02:08 mike Exp $".
 dnl

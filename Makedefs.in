@@ -1,5 +1,5 @@
 #
-# "$Id: Makedefs.in,v 1.30 2000/09/14 15:36:24 mike Exp $"
+# "$Id: Makedefs.in,v 1.31 2000/10/16 23:02:08 mike Exp $"
 #
 #   Common makefile definitions for the Common UNIX Printing System (CUPS).
 #
@@ -88,6 +88,7 @@ LIBS	=	$(LINKCUPS) $(NETLIBS) @LIBS@
 NETLIBS	=	@NETLIBS@
 OPTIM	=	@OPTIM@
 OPTIONS	=
+SSLLIBS	=	@SSLLIBS@
 
 #
 # Directories...
@@ -162,5 +163,5 @@ CAT8EXT		=	@CAT8EXT@
 	$(MV) t.z $@
 
 #
-# End of "$Id: Makedefs.in,v 1.30 2000/09/14 15:36:24 mike Exp $"
+# End of "$Id: Makedefs.in,v 1.31 2000/10/16 23:02:08 mike Exp $"
 #
