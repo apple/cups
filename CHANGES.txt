@@ -120,6 +120,9 @@ CHANGES IN CUPS V1.1.7
 	- Added support for /dev/lpa# parallel ports under *BSD.
 	- Added META variables to the CGI header template to
 	  prevent caching of the results.
+	- Fixed an unaligned memory buffer for the pstoraster
+	  clist states; this caused bus errors for some
+	  combinations of printers, drivers, and options.
 
 
 CHANGES IN CUPS V1.1.6-3

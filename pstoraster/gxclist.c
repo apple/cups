@@ -24,7 +24,7 @@
   GNU software to build or run it.
 */
 
-/*$Id: gxclist.c,v 1.6 2001/01/22 15:03:55 mike Exp $ */
+/*$Id: gxclist.c,v 1.7 2001/03/27 15:45:20 mike Exp $ */
 /* Command list document- and page-level code. */
 #include "memory_.h"
 #include "string_.h"
@@ -239,6 +239,8 @@ clist_init_states(gx_device * dev, byte * init_data, uint data_size)
 	&((gx_device_clist *)dev)->writer;
     ulong state_size = cdev->nbands * (ulong) sizeof(gx_clist_state);
 
+    fprintf(stderr, "DEBUG: init_data = %p for cdev->states!\n", init_data);
+
     /*
      * The +100 in the next line is bogus, but we don't know what the
      * real check should be. We're effectively assuring that at least 100
@@ -288,12 +290,16 @@ clist_init_data(gx_device * dev, byte * init_data, uint data_size)
 	if (band_data_size >= band_space)
 	    return_error(gs_error_rangecheck);
 	bits_size = min(band_space - band_data_size, data_size >> 1);
+	/**** MRS - make sure bits_size is 64-bit aligned for clist data!!! ****/
+	bits_size = (bits_size + 7) & ~7;
     } else {			/*
 				 * Choose the largest band height that will fit in the
 				 * rendering-time buffer.
 				 */
 	bits_size = clist_tile_cache_size(target, band_space);
 	bits_size = min(bits_size, data_size >> 1);
+	/**** MRS - make sure bits_size is 64-bit aligned for clist data!!! ****/
+	bits_size = (bits_size + 7) & ~7;
 	band_height = gdev_mem_max_height((gx_device_memory *) target,
 					  band_width,
 					  band_space - bits_size);

@@ -24,7 +24,7 @@
   GNU software to build or run it.
 */
 
-/*$Id: gdevprn.c,v 1.12 2001/03/16 20:42:06 mike Exp $ */
+/*$Id: gdevprn.c,v 1.13 2001/03/27 15:45:20 mike Exp $ */
 /* Generic printer driver support */
 #include "ctype_.h"
 #include "gdevprn.h"
@@ -573,7 +573,7 @@ gdev_prn_default_get_space_params(const gx_device_printer *printer_dev,
     switch (sscanf(cache_env, "%d%254s", &cache_size, cache_units))
     {
       case 0 :
-          cache_size = 32 * 1024 * 1024;
+          cache_size = 8 * 1024 * 1024;
 	  break;
       case 1 :
           cache_size *= 4 * TILE_SIZE * TILE_SIZE;
@@ -591,9 +591,10 @@ gdev_prn_default_get_space_params(const gx_device_printer *printer_dev,
     }
   }
   else
-    cache_size = 32 * 1024 * 1024;
+    cache_size = 8 * 1024 * 1024;
 
-  space_params->MaxBitmap = cache_size;
+  space_params->MaxBitmap   = cache_size;
+  space_params->BufferSpace = cache_size / 10;
 }
 
 /* Generic routine to send the page to the printer. */
