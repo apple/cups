@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.209 2003/04/16 20:31:43 mike Exp $"
+ * "$Id: ipp.c,v 1.210 2003/04/16 20:54:15 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -2361,7 +2361,7 @@ copy_banner(client_t   *con,	/* I - Client connection */
         * Ignore { followed by stuff that is not an attribute name...
 	*/
 
-        cupsFilePrintf(out, "{%s}", attrname);
+        cupsFilePrintf(out, "{%s", attrname);
 	continue;
       }
 
@@ -6572,5 +6572,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.209 2003/04/16 20:31:43 mike Exp $".
+ * End of "$Id: ipp.c,v 1.210 2003/04/16 20:54:15 mike Exp $".
  */
