@@ -1,11 +1,8 @@
 #
-# "$Id: cups.list,v 1.37 2000/01/20 13:05:38 mike Exp $"
+# "$Id: cups.list,v 1.38 2000/01/20 22:33:10 mike Exp $"
 #
 #   ESP Package Manager (EPM) file list for the Common UNIX Printing
 #   System (CUPS).
-#
-#   EPM can be found in the "epm" subdirectory of this distribution.
-#   Please report problems and fixes to "epm@easysw.com".
 #
 #   Copyright 1997-2000 by Easy Software Products, all rights reserved.
 #
@@ -51,6 +48,7 @@ l 0555 root sys /usr/lib/cups/filter/pdftops pstoraster
 f 0555 root sys /usr/lib/cups/filter/imagetops filter/imagetops
 f 0555 root sys /usr/lib/cups/filter/pstops filter/pstops
 f 0555 root sys /usr/lib/cups/filter/texttops filter/texttops
+f 0555 root sys /usr/lib/cups/filter/rastertoepson filter/rastertoepson
 f 0555 root sys /usr/lib/cups/filter/rastertohp filter/rastertohp
 f 0555 root sys /usr/lib/cups/filter/hpgltops filter/hpgltops
 f 0555 root sys /usr/lib/cups/filter/imagetoraster filter/imagetoraster
@@ -221,6 +219,8 @@ f 0444 root sys /usr/share/cups/pstoraster/gs_fform.ps pstoraster/gs_fform.ps
 f 0444 root sys /usr/share/cups/pstoraster/pdf_main.ps pstoraster/pdf_main.ps
 f 0444 root sys /usr/share/cups/model/deskjet.ppd ppd/deskjet.ppd
 f 0444 root sys /usr/share/cups/model/laserjet.ppd ppd/laserjet.ppd
+f 0444 root sys /usr/share/cups/model/stcolor.ppd ppd/stcolor.ppd
+f 0444 root sys /usr/share/cups/model/stphoto.ppd ppd/stphoto.ppd
 
 # Config files
 c 0644 root sys /etc/cups/classes.conf conf/classes.conf
@@ -333,5 +333,5 @@ f 0444 root sys /usr/man/man5/printers.conf.5 man/printers.conf.5
 i 0555 root sys cups cups.sh
 
 #
-# End of "$Id: cups.list,v 1.37 2000/01/20 13:05:38 mike Exp $".
+# End of "$Id: cups.list,v 1.38 2000/01/20 22:33:10 mike Exp $".
 #

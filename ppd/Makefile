@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.2 1999/05/19 18:00:57 mike Exp $"
+# "$Id: Makefile,v 1.3 2000/01/20 22:33:12 mike Exp $"
 #
 #   PPD file makefile for the Common UNIX Printing System (CUPS).
 #
@@ -28,7 +28,7 @@ include ../Makedefs
 # PPD files...
 #
 
-FILES	=	deskjet.ppd laserjet.ppd
+FILES	=	deskjet.ppd laserjet.ppd stcolor.ppd stphoto.ppd
 
 #
 # Make everything...
@@ -51,5 +51,5 @@ install:
 	$(CP) $(FILES) $(DATADIR)/model
 
 #
-# End of "$Id: Makefile,v 1.2 1999/05/19 18:00:57 mike Exp $".
+# End of "$Id: Makefile,v 1.3 2000/01/20 22:33:12 mike Exp $".
 #

@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.22 2000/01/20 14:56:28 mike Exp $"
+# "$Id: Makefile,v 1.23 2000/01/20 22:33:11 mike Exp $"
 #
 #   Filter makefile for the Common UNIX Printing System (CUPS).
 #
@@ -25,7 +25,7 @@
 include ../Makedefs
 
 TARGETS	=	hpgltops texttops pstops imagetops imagetoraster \
-		rastertohp
+		rastertoepson rastertohp
 
 HPGLOBJS =	hpgl-attr.o hpgl-config.o hpgl-main.o hpgl-prolog.o \
 		hpgl-char.o hpgl-input.o hpgl-polygon.o hpgl-vector.o
@@ -33,8 +33,8 @@ IMAGEOBJS =	image-colorspace.o image-photocd.o image-sgilib.o \
 		image-tiff.o image-gif.o image-png.o image-sgi.o image-zoom.o \
 		image-jpeg.o image-pnm.o image-sun.o image.o
 OBJS	=	$(HPGLOBJS) $(IMAGEOBJS) imagetops.o imagetoraster.o \
-		common.o pstops.o raster.o rastertohp.o texttops.o \
-		textcommon.o
+		common.o pstops.o raster.o rastertoepson.o rastertohp.o \
+		texttops.o textcommon.o
 
 #
 # Make all targets...
@@ -126,6 +126,15 @@ pstops:	pstops.o common.o ../Makedefs ../cups/$(LIBCUPS)
 pstops.o:	common.h
 
 #
+# rastertoepson
+#
+
+rastertoepson:	rastertoepson.o ../Makedefs ../cups/$(LIBCUPS)
+	echo Linking $@...
+	$(CC) $(LDFLAGS) -o $@ rastertoepson.o -L. -lcupsimage $(LIBS)
+rastertoepson.o:	raster.h
+
+#
 # rastertohp
 #
 
@@ -149,5 +158,5 @@ textcommon.o:	textcommon.h common.h
 $(OBJS):	../Makedefs ../cups/cups.h ../cups/ppd.h ../cups/language.h
 
 #
-# End of "$Id: Makefile,v 1.22 2000/01/20 14:56:28 mike Exp $".
+# End of "$Id: Makefile,v 1.23 2000/01/20 22:33:11 mike Exp $".
 #

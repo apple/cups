@@ -1,0 +1,128 @@
+*PPD-Adobe: "4.3"
+*%
+*% "$Id: stcolor.ppd,v 1.1 2000/01/20 22:33:12 mike Exp $"
+*%
+*%   Sample EPSON Stylus Color driver PPD file for the Common UNIX Printing
+*%   System (CUPS).
+*%
+*%   Copyright 1997-2000 by Easy Software Products.
+*%
+*%   These coded instructions, statements, and computer programs are the
+*%   property of Easy Software Products and are protected by Federal
+*%   copyright law.  Distribution and use rights are outlined in the file
+*%   "LICENSE.txt" which should have been included with this file.  If this
+*%   file is missing or damaged please contact Easy Software Products
+*%   at:
+*%
+*%       Attn: CUPS Licensing Information
+*%       Easy Software Products
+*%       44141 Airport View Drive, Suite 204
+*%       Hollywood, Maryland 20636-3111 USA
+*%
+*%       Voice: (301) 373-9603
+*%       EMail: cups-info@cups.org
+*%         WWW: http://www.cups.org
+*%
+*FormatVersion:	"4.3"
+*FileVersion:	"1.1"
+*LanguageVersion: English 
+*LanguageEncoding: ISOLatin1
+*PCFileName:	"STCOLOR.PPD"
+*Manufacturer:	"ESP"
+*Product:	"(CUPS v1.1)"
+*cupsVersion:	1.1
+*cupsManualCopies: True
+*cupsFilter:	"application/vnd.cups-raster 0 rastertoepson"
+*ModelName:     "EPSON Stylus Color Series"
+*ShortNickName: "EPSON Stylus Color Series"
+*NickName:      "EPSON Stylus Color Series CUPS v1.1"
+*PSVersion:	"(2017.000) 0"
+*LanguageLevel:	"2"
+*ColorDevice:	True
+*DefaultColorSpace: RGB
+*FileSystem:	False
+*Throughput:	"1"
+*LandscapeOrientation: Plus90
+*VariablePaperSize: False
+*TTRasterizer:	Type42
+
+*OpenUI *PageSize/Media Size: PickOne
+*OrderDependency: 10 AnySetup *PageSize
+*DefaultPageSize: Letter
+*PageSize Letter:	"<</PageSize[612 792]/ImagingBBox null>>setpagedevice"
+*PageSize Legal:	"<</PageSize[612 1008]/ImagingBBox null>>setpagedevice"
+*PageSize A4:		"<</PageSize[595 842]/ImagingBBox null>>setpagedevice"
+*CloseUI: *PageSize
+
+*OpenUI *PageRegion: PickOne
+*OrderDependency: 10 AnySetup *PageRegion
+*DefaultPageRegion: Letter
+*PageRegion Letter:	"<</PageSize[612 792]/ImagingBBox null>>setpagedevice"
+*PageRegion Legal:	"<</PageSize[612 1008]/ImagingBBox null>>setpagedevice"
+*PageRegion A4:		"<</PageSize[595 842]/ImagingBBox null>>setpagedevice"
+*CloseUI: *PageRegion
+
+*DefaultImageableArea: Letter 
+*ImageableArea Letter:	"8.60 39.60 584.60 783.40"
+*ImageableArea Legal:	"8.60 39.60 584.60 999.40"
+*ImageableArea A4:	"8.60 39.60 567.60 833.40"
+
+*DefaultPaperDimension: Letter
+*PaperDimension Letter:	"612 792"
+*PaperDimension Legal:	"612 1008"
+*PaperDimension A4:	"595 842"
+
+*OpenUI *Resolution/Output Resolution: PickOne
+*OrderDependency: 20 AnySetup *Resolution
+*DefaultResolution: 360dpi
+*Resolution 180dpi/180 DPI: "<</HWResolution[180 180]>>setpagedevice"
+*Resolution 360dpi/360 DPI: "<</HWResolution[360 360]>>setpagedevice"
+*Resolution 720dpi/720 DPI: "<</HWResolution[720 720]>>setpagedevice"
+*CloseUI: *Resolution
+
+*OpenUI *ColorModel/Output Mode: PickOne
+*OrderDependency: 10 AnySetup *ColorModel
+*DefaultColorModel: CMYK
+*ColorModel CMYK/Color: "<</cupsColorOrder 1/cupsColorSpace 8/cupsCompression 1>>setpagedevice"
+*ColorModel Gray/Grayscale: "<</cupsColorOrder 0/cupsColorSpace 3/cupsCompression 1>>setpagedevice"
+*CloseUI: *ColorModel
+
+*DefaultFont: Courier
+*Font AvantGarde-Book: Standard "(001.006S)" Standard ROM
+*Font AvantGarde-BookOblique: Standard "(001.006S)" Standard ROM
+*Font AvantGarde-Demi: Standard "(001.007S)" Standard ROM
+*Font AvantGarde-DemiOblique: Standard "(001.007S)" Standard ROM
+*Font Bookman-Demi: Standard "(001.004S)" Standard ROM
+*Font Bookman-DemiItalic: Standard "(001.004S)" Standard ROM
+*Font Bookman-Light: Standard "(001.004S)" Standard ROM
+*Font Bookman-LightItalic: Standard "(001.004S)" Standard ROM
+*Font Courier: Standard "(002.004S)" Standard ROM
+*Font Courier-Bold: Standard "(002.004S)" Standard ROM
+*Font Courier-BoldOblique: Standard "(002.004S)" Standard ROM
+*Font Courier-Oblique: Standard "(002.004S)" Standard ROM
+*Font Helvetica: Standard "(001.006S)" Standard ROM
+*Font Helvetica-Bold: Standard "(001.007S)" Standard ROM
+*Font Helvetica-BoldOblique: Standard "(001.007S)" Standard ROM
+*Font Helvetica-Narrow: Standard "(001.006S)" Standard ROM
+*Font Helvetica-Narrow-Bold: Standard "(001.007S)" Standard ROM
+*Font Helvetica-Narrow-BoldOblique: Standard "(001.007S)" Standard ROM
+*Font Helvetica-Narrow-Oblique: Standard "(001.006S)" Standard ROM
+*Font Helvetica-Oblique: Standard "(001.006S)" Standard ROM
+*Font NewCenturySchlbk-Bold: Standard "(001.009S)" Standard ROM
+*Font NewCenturySchlbk-BoldItalic: Standard "(001.007S)" Standard ROM
+*Font NewCenturySchlbk-Italic: Standard "(001.006S)" Standard ROM
+*Font NewCenturySchlbk-Roman: Standard "(001.007S)" Standard ROM
+*Font Palatino-Bold: Standard "(001.005S)" Standard ROM
+*Font Palatino-BoldItalic: Standard "(001.005S)" Standard ROM
+*Font Palatino-Italic: Standard "(001.005S)" Standard ROM
+*Font Palatino-Roman: Standard "(001.005S)" Standard ROM
+*Font Symbol: Special "(001.007S)" Special ROM
+*Font Times-Bold: Standard "(001.007S)" Standard ROM
+*Font Times-BoldItalic: Standard "(001.009S)" Standard ROM
+*Font Times-Italic: Standard "(001.007S)" Standard ROM
+*Font Times-Roman: Standard "(001.007S)" Standard ROM
+*Font ZapfChancery-MediumItalic: Standard "(001.007S)" Standard ROM
+*Font ZapfDingbats: Special "(001.004S)" Standard ROM
+*%
+*% End of "$Id: stcolor.ppd,v 1.1 2000/01/20 22:33:12 mike Exp $".
+*%

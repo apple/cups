@@ -1,11 +1,11 @@
 #
-# "$Id: cups.spec,v 1.10 1999/11/04 13:35:01 mike Exp $"
+# "$Id: cups.spec,v 1.11 2000/01/20 22:33:10 mike Exp $"
 #
 #   RPM "spec" file for the Common UNIX Printing System (CUPS).
 #
 #   Original version by Jason McMullan <jmcc@ontv.com>.
 #
-#   Copyright 1999 by Easy Software Products, all rights reserved.
+#   Copyright 1999-2000 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
 #   property of Easy Software Products and are protected by Federal
@@ -26,11 +26,11 @@
 
 Summary: Common Unix Printing System
 Name: cups
-Version: 1.0.2
+Version: 1.1
 Release: 0
 Copyright: GPL
 Group: System Environment/Daemons
-Source: ftp://ftp.easysw.com/pub/cups/1.0.2/cups-1.0.2-source.tar.gz
+Source: ftp://ftp.easysw.com/pub/cups/1.1/cups-1.1-source.tar.gz
 Url: http://www.cups.org
 Packager: Michael Sweet <mike@easysw.com>
 Vendor: Easy Software Products
@@ -66,24 +66,17 @@ make
 # these lines just make sure the directory structure in the
 # RPM_BUILD_ROOT exists
 rm -rf $RPM_BUILD_ROOT
-mkdir -p $RPM_BUILD_ROOT/etc
-mkdir -p $RPM_BUILD_ROOT/etc/rc.d
+mkdir -p $RPM_BUILD_ROOT/etc/cups
 mkdir -p $RPM_BUILD_ROOT/etc/rc.d/init.d
-mkdir -p $RPM_BUILD_ROOT/usr
 mkdir -p $RPM_BUILD_ROOT/usr/bin
-mkdir -p $RPM_BUILD_ROOT/usr/lib
-mkdir -p $RPM_BUILD_ROOT/usr/man
+mkdir -p $RPM_BUILD_ROOT/usr/lib/cups
 mkdir -p $RPM_BUILD_ROOT/usr/man/man1
 mkdir -p $RPM_BUILD_ROOT/usr/man/man5
 mkdir -p $RPM_BUILD_ROOT/usr/man/man8
+mkdir -p $RPM_BUILD_ROOT/usr/share/cups
 mkdir -p $RPM_BUILD_ROOT/usr/share/locale
-mkdir -p $RPM_BUILD_ROOT/var/cups
-mkdir -p $RPM_BUILD_ROOT/var/cups/conf
-mkdir -p $RPM_BUILD_ROOT/var/cups/logs
-mkdir -p $RPM_BUILD_ROOT/var/log
-
-ln -sf /var/cups/logs $RPM_BUILD_ROOT/var/log/cups
-ln -sf /var/cups/conf $RPM_BUILD_ROOT/etc/cups
+mkdir -p $RPM_BUILD_ROOT/var/log/cups
+mkdir -p $RPM_BUILD_ROOT/var/spool/cups
 
 make prefix=$RPM_BUILD_ROOT/usr DATADIR=$RPM_BUILD_ROOT/usr/share/cups LOCALEDIR=$RPM_BUILD_ROOT/usr/share/locale SERVERROOT=$RPM_BUILD_ROOT/var/cups install
 
@@ -130,5 +123,5 @@ rm -rf $RPM_BUILD_ROOT
 /usr/include/cups/*
 
 #
-# End of "$Id: cups.spec,v 1.10 1999/11/04 13:35:01 mike Exp $".
+# End of "$Id: cups.spec,v 1.11 2000/01/20 22:33:10 mike Exp $".
 #

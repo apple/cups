@@ -1,8 +1,8 @@
 /*
- * "$Id: rastertohp.c,v 1.4 2000/01/20 22:33:11 mike Exp $"
+ * "$Id: rastertoepson.c,v 1.1 2000/01/20 22:33:11 mike Exp $"
  *
- *   Hewlett-Packard Page Control Language filter for the Common UNIX
- *   Printing System (CUPS).
+ *   EPSON ESC/P and ESC/P2 filter for the Common UNIX Printing System
+ *   (CUPS).
  *
  *   Copyright 1993-2000 by Easy Software Products.
  *
@@ -38,6 +38,7 @@
  */
 
 #include <cups/cups.h>
+#include <cups/ppd.h>
 #include <cups/string.h>
 #include "raster.h"
 #include <stdlib.h>
@@ -46,10 +47,17 @@
 
 
 /*
+ * Macros...
+ */
+
+#define pwrite(s,n) fwrite((s), 1, (n), stdout)
+
+
+/*
  * Globals...
  */
 
-unsigned char	*Planes[4],		/* Output buffers */
+unsigned char	*Planes[6],		/* Output buffers */
 		*CompBuffer;		/* Compression buffer */
 int		NumPlanes,		/* Number of color planes */
 		Feed;			/* Number of lines to skip */
@@ -60,11 +68,12 @@ int		NumPlanes,		/* Number of color planes */
  */
 
 void	Setup(void);
-void	StartPage(cups_page_header_t *header);
+void	StartPage(cups_page_header_t *header, ppd_file_t *ppd);
 void	EndPage(cups_page_header_t *header);
 void	Shutdown(void);
 
-void	CompressData(unsigned char *line, int length, int plane, int type);
+void	CompressData(unsigned char *line, int length, int plane, int type,
+	              int xstep, int ystep);
 void	OutputLine(cups_page_header_t *header);
 
 
@@ -76,11 +85,10 @@ void
 Setup(void)
 {
  /*
-  * Send a PCL reset sequence.
+  * Send a reset sequence.
   */
 
-  putchar(0x1b);
-  putchar('E');
+  printf("\033@");
 }
 
 
@@ -89,48 +97,66 @@ Setup(void)
  */
 
 void
-StartPage(cups_page_header_t *header)	/* I - Page header */
+StartPage(cups_page_header_t *header,	/* I - Page header */
+          ppd_file_t         *ppd)	/* I - PPD file */
 {
+  int	n, t;				/* Numbers */
   int	plane;				/* Looping var */
 
 
  /*
-  * Set the media type, position, and size...
+  * Send a reset sequence.
   */
 
-  printf("\033&l6D\033&k12H");			/* Set 6 LPI, 10 CPI */
-  printf("\033&l%.2fP",				/* Set page length */
-         header->PageSize[1] / 12.0);
-  printf("\033&l%dX", header->NumCopies);	/* Set number copies */
-  if (header->MediaPosition)
-    printf("\033&l%dH", header->MediaPosition);	/* Set media position */
-  if (header->cupsMediaType)
-    printf("\033&l%dM",				/* Set media type */
-           header->cupsMediaType);
+  printf("\033@");
+
+ /*
+  * Set the media size...
+  */
+
+  n = header->PageSize[1] * header->HWResolution[1] / 72.0;
+
+  pwrite("\033(C\002\000", 5);	/* Page length */
+  putchar(n);
+  putchar(n >> 8);
+
+  t = (ppd->sizes[1].length - ppd->sizes[1].top) *
+      header->HWResolution[1] / 72.0;
+
+  pwrite("\033(c\004\000", 5);	/* Top & bottom margins */
+  putchar(t);
+  putchar(t >> 8);
+  putchar(n);
+  putchar(n >> 8);
 
  /*
   * Set graphics mode...
   */
 
-  if (header->cupsColorSpace == CUPS_CSPACE_KCMY)
-  {
+  if (header->cupsColorSpace == CUPS_CSPACE_CMY)
+    NumPlanes = 3;
+  else if (header->cupsColorSpace == CUPS_CSPACE_KCMY)
     NumPlanes = 4;
-    printf("\033*r-4U");			/* Set KCMY graphics */
-  }
+  else if (header->cupsColorSpace == CUPS_CSPACE_KCMYcm)
+    NumPlanes = 6;
   else
     NumPlanes = 1;
 
-  printf("\033*t%dR", header->HWResolution[0]);	/* Set resolution */
-  printf("\033*r%dS", header->cupsWidth);	/* Set width */
-  printf("\033*r%dT", header->cupsHeight);	/* Set height */
-  printf("\033&a0H\033&a0V");			/* Set top-of-page */
-  printf("\033*r1A");				/* Start graphics */
+  pwrite("\033(G\001\000\001", 6);	/* Graphics mode */
+  pwrite("\033(U\001\000", 5);		/* Resolution */
+  putchar(3600 / header->HWResolution[1]);
 
-  if (header->cupsCompression)
-    printf("\033*b%dM",				/* Set compression */
-           header->cupsCompression);
+  if (header->HWResolution[1] == 720)
+  {
+    pwrite("\033(i\001\000\001", 6);	/* Microweave */
+    pwrite("\033(e\002\000\000\001", 7);/* Small dots */
+  }
 
-  Feed = 0;					/* No blank lines yet */
+  pwrite("\033(V\002\000", 5);		/* Set absolute position */
+  putchar(t);
+  putchar(t >> 8);
+
+  Feed = 0;				/* No blank lines yet */
 
  /*
   * Allocate memory for a line of graphics...
@@ -156,16 +182,7 @@ EndPage(cups_page_header_t *header)	/* I - Page header */
   * Eject the current page...
   */
 
-  if (NumPlanes > 1)
-  {
-     printf("\033*rC");			/* End color GFX */
-     printf("\033&l0H");		/* Eject current page */
-  }
-  else
-  {
-     printf("\033*r0B");		/* End GFX */
-     printf("\014");			/* Eject currnet page */
-  }
+  putchar(12);			/* Form feed */
 
  /*
   * Free memory...
@@ -186,11 +203,10 @@ void
 Shutdown(void)
 {
  /*
-  * Send a PCL reset sequence.
+  * Send a reset sequence.
   */
 
-  putchar(0x1b);
-  putchar('E');
+  printf("\033@");
 }
 
 
@@ -202,13 +218,17 @@ void
 CompressData(unsigned char *line,	/* I - Data to compress */
              int           length,	/* I - Number of bytes */
 	     int           plane,	/* I - Color plane */
-	     int           type)	/* I - Type of compression */
+	     int           type,	/* I - Type of compression */
+	     int           xstep,	/* I - X resolution */
+	     int           ystep)	/* I - Y resolution */
 {
   unsigned char	*line_ptr,		/* Current byte pointer */
         	*line_end,		/* End-of-line byte pointer */
         	*comp_ptr,		/* Pointer into compression buffer */
         	*start;			/* Start of compression sequence */
   int           count;			/* Count of bytes for output */
+  static int	ctable[6] = { 0, 2, 1, 4, 2, 1 };
+					/* KCMYcm color values */
 
 
   switch (type)
@@ -223,30 +243,6 @@ CompressData(unsigned char *line,	/* I - Data to compress */
 	break;
 
     case 1 :
-       /*
-        * Do run-length encoding...
-        */
-
-	line_end = line + length;
-	for (line_ptr = line, comp_ptr = CompBuffer;
-	     line_ptr < line_end;
-	     comp_ptr += 2, line_ptr += count)
-	{
-	  for (count = 1;
-               (line_ptr + count) < line_end &&
-	           line_ptr[0] == line_ptr[count] &&
-        	   count < 256;
-               count ++);
-
-	  comp_ptr[0] = count - 1;
-	  comp_ptr[1] = line_ptr[0];
-	}
-
-        line_ptr = CompBuffer;
-        line_end = comp_ptr;
-	break;
-
-    case 2 :
        /*
         * Do TIFF pack-bits encoding...
         */
@@ -317,11 +313,37 @@ CompressData(unsigned char *line,	/* I - Data to compress */
   }
 
  /*
-  * Set the length of the data and write a raster plane...
+  * Set the color if necessary...
   */
 
-  printf("\033*b%d%c", line_end - line_ptr, plane);
-  fwrite(line_ptr, line_end - line_ptr, 1, stdout);
+  if (NumPlanes > 1)
+  {
+    if (plane > 3)
+      printf("\033(r%c%c%c%c", 2, 0, 1, ctable[plane]);
+					/* Set extended color */
+    else if (NumPlanes == 3)
+      printf("\033r%c", ctable[plane + 1]);
+					/* Set color */
+    else
+      printf("\033r%c", ctable[plane]);	/* Set color */
+  }
+
+ /*
+  * Send a raster plane...
+  */
+
+  putchar(0x0d);			/* Move print head to left margin */
+
+  length *= 8;
+  printf("\033.");			/* Raster graphics */
+  putchar(type);
+  putchar(ystep);
+  putchar(xstep);
+  putchar(1);
+  putchar(length);
+  putchar(length >> 8);
+
+  pwrite(line_ptr, line_end - line_ptr);
 }
 
 
@@ -332,8 +354,8 @@ CompressData(unsigned char *line,	/* I - Data to compress */
 void
 OutputLine(cups_page_header_t *header)	/* I - Page header */
 {
-  int	plane;	/* Current plane */
-
+  int	plane;				/* Current plane */
+  int	xstep, ystep;			/* X & Y resolutions */
 
  /*
   * Output whitespace as needed...
@@ -341,7 +363,10 @@ OutputLine(cups_page_header_t *header)	/* I - Page header */
 
   if (Feed > 0)
   {
-    printf("\033*b%dY", Feed);
+    pwrite("\033(v\002\000", 5);	/* Relative vertical position */
+    putchar(Feed);
+    putchar(Feed >> 8);
+
     Feed = 0;
   }
 
@@ -349,10 +374,14 @@ OutputLine(cups_page_header_t *header)	/* I - Page header */
   * Write bitmap data as needed...
   */
 
+  xstep = 3600 / header->HWResolution[0];
+  ystep = 3600 / header->HWResolution[1];
+
   for (plane = 0; plane < NumPlanes; plane ++)
-    CompressData(Planes[plane], header->cupsBytesPerLine / NumPlanes,
-		 plane < (NumPlanes - 1) ? 'V' : 'W',
-		 header->cupsCompression);
+    CompressData(Planes[plane], header->cupsBytesPerLine / NumPlanes, plane,
+		 header->cupsCompression, xstep, ystep);
+
+  Feed ++;
 }
 
 
@@ -367,6 +396,7 @@ main(int  argc,		/* I - Number of command-line arguments */
   int			fd;	/* File descriptor */
   cups_raster_t		*ras;	/* Raster stream for printing */
   cups_page_header_t	header;	/* Page header from file */
+  ppd_file_t		*ppd;	/* PPD file */
   int			page;	/* Current page */
   int			y;	/* Current line */
 
@@ -382,7 +412,7 @@ main(int  argc,		/* I - Number of command-line arguments */
     * and return.
     */
 
-    fputs("ERROR: rastertopcl job-id user title copies options [file]\n", stderr);
+    fputs("ERROR: rastertoepson job-id user title copies options [file]\n", stderr);
     return (1);
   }
 
@@ -408,6 +438,8 @@ main(int  argc,		/* I - Number of command-line arguments */
   * Initialize the print device...
   */
 
+  ppd = ppdOpenFile(getenv("PPD"));
+
   Setup();
 
  /*
@@ -430,7 +462,7 @@ main(int  argc,		/* I - Number of command-line arguments */
     * Start the page...
     */
 
-    StartPage(&header);
+    StartPage(&header, ppd);
 
    /*
     * Loop for each line on the page...
@@ -477,6 +509,8 @@ main(int  argc,		/* I - Number of command-line arguments */
 
   Shutdown();
 
+  ppdClose(ppd);
+
  /*
   * Close the raster stream...
   */
@@ -499,5 +533,5 @@ main(int  argc,		/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: rastertohp.c,v 1.4 2000/01/20 22:33:11 mike Exp $".
+ * End of "$Id: rastertoepson.c,v 1.1 2000/01/20 22:33:11 mike Exp $".
  */
