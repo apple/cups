@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.37 1999/06/18 18:36:08 mike Exp $"
+ * "$Id: http.c,v 1.38 1999/07/09 13:08:37 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -99,18 +99,10 @@ static int		http_send(http_t *http, http_state_t request, char *uri);
 
 static char		*http_fields[] =
 			{
-			  "Accept",
-			  "Accept-Charset",
-			  "Accept-Encoding",
 			  "Accept-Language",
 			  "Accept-Ranges",
-			  "Age",
-			  "Allow",
-			  "Alternates",
 			  "Authorization",
-			  "Cache-Control",
 			  "Connection",
-			  "Content-Base",
 			  "Content-Encoding",
 			  "Content-Language",
 			  "Content-Length",
@@ -120,38 +112,19 @@ static char		*http_fields[] =
 			  "Content-Type",
 			  "Content-Version",
 			  "Date",
-			  "Derived-From",
-			  "Etag",
-			  "Expires",
-			  "From",
 			  "Host",
-			  "If-Match",
 			  "If-Modified-Since",
-			  "If-None-Match",
-			  "If-Range",
 			  "If-Unmodified-since",
 			  "Keep-Alive",
 			  "Last-Modified",
 			  "Link",
 			  "Location",
-			  "Max-Forwards",
-			  "Message-Id",
-			  "MIME-Version",
-			  "Pragma",
-			  "Proxy-Authenticate",
-			  "Proxy-Authorization",
-			  "Public",
 			  "Range",
 			  "Referer",
 			  "Retry-After",
-			  "Server",
 			  "Transfer-Encoding",
 			  "Upgrade",
-			  "URI",
 			  "User-Agent",
-			  "Vary",
-			  "Via",
-			  "Warning",
 			  "WWW-Authenticate"
 			};
 static char		*days[7] =
@@ -500,6 +473,8 @@ httpSeparate(char *uri,		/* I - Universal Resource Identifier */
       *port = 443;
     else if (strcasecmp(method, "ipp") == 0)	/* Not registered yet... */
       *port = ippPort();
+    else if (strcasecmp(method, "socket") == 0)	/* Not registered yet... */
+      *port = 9100;
     else
       *port = 0;
   }
@@ -1395,5 +1370,5 @@ http_send(http_t       *http,	/* I - HTTP data */
 
 
 /*
- * End of "$Id: http.c,v 1.37 1999/06/18 18:36:08 mike Exp $".
+ * End of "$Id: http.c,v 1.38 1999/07/09 13:08:37 mike Exp $".
  */
