@@ -15,8 +15,8 @@ CHANGES IN CUPS V1.1.6
 	  cancelled in StartJob().
 	- The printers.conf and classes.conf files are now
 	  written with restricted permissions.
-	- FindAvailablePrinter() would go into an infinite loop
-	  if a class only contained 1 printer.
+	- The round-robin algorithm used by FindAvailablePrinter()
+	  had problems; fixes contributed by Joel Fredrikson.
 	- If LoadAllJobs() is unable to determine the file type
 	  of a print job, assume "application/vnd.cups-raw".
 	- The web interface now provides a job_printer_name
