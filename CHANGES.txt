@@ -1,5 +1,11 @@
-CHANGES.txt - 10/13/2004
+CHANGES.txt - 10/20/2004
 ------------------------
+
+CHANGES IN CUPS V1.1.22
+
+	- cupsLangGet() incorrectly set the current locale (STR
+	  #970)
+
 
 CHANGES IN CUPS V1.1.22rc2
 
