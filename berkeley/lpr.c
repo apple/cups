@@ -1,5 +1,5 @@
 /*
- * "$Id: lpr.c,v 1.2 1999/07/07 13:44:12 mike Exp $"
+ * "$Id: lpr.c,v 1.3 1999/07/07 18:21:11 mike Exp $"
  *
  *   "lpr" command for the Common UNIX Printing System (CUPS).
  *
@@ -52,13 +52,15 @@ main(int  argc,		/* I - Number of command-line arguments */
   int		num_files;	/* Number of files printed */
   int		num_options;	/* Number of options */
   cups_option_t	*options;	/* Options */
-  int		silent;		/* Silent or verbose output? */
+  int		silent,		/* Silent or verbose output? */
+		deletefile;	/* Delete file after print? */
   char		tempfile[1024];	/* Temporary file for printing from stdin */
   char		buffer[8192];	/* Copy buffer */
   FILE		*temp;		/* Temporary file pointer */
 
 
   silent      = 0;
+  deletefile  = 0;
   dest        = cupsGetDefault();
   num_options = 0;
   options     = NULL;
@@ -106,8 +108,12 @@ main(int  argc,		/* I - Number of command-line arguments */
 	case 's' : /* Don't use symlinks */
 	    break;
 
-	case 'm' : /* mail on completion */
+	case 'm' : /* Mail on completion */
 	    fputs("Warning: email notification is not supported!\n", stderr);
+	    break;
+
+	case 'r' : /* Remove file after printing */
+	    deletefile = 1;
 	    break;
 
         case 'P' : /* Destination printer or class */
@@ -187,6 +193,8 @@ main(int  argc,		/* I - Number of command-line arguments */
 	fprintf(stderr, "lpr: unable to print file \'%s\'.\n", argv[i]);
 	return (1);
       }
+      else if (deletefile)
+        unlink(argv[i]);
     }
 
  /*
@@ -238,5 +246,5 @@ main(int  argc,		/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: lpr.c,v 1.2 1999/07/07 13:44:12 mike Exp $".
+ * End of "$Id: lpr.c,v 1.3 1999/07/07 18:21:11 mike Exp $".
  */
