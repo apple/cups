@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c,v 1.21 1999/06/04 21:04:29 mike Exp $"
+ * "$Id: ppd.c,v 1.22 1999/06/15 20:40:00 mike Exp $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -50,11 +50,13 @@
  * Include necessary headers.
  */
 
-/*#define DEBUG*/
+#define DEBUG
 #include "ppd.h"
 #include <stdlib.h>
 #include <ctype.h>
 #include "string.h"
+#include "language.h"
+#include "debug.h"
 
 
 /*
@@ -417,7 +419,14 @@ ppdOpen(FILE *fp)		/* I - File to read from */
   ppd_section_t	section;	/* Order dependency section */
   ppd_profile_t	*profile;	/* Pointer to color profile */
   char		**filter;	/* Pointer to filter */
+  cups_lang_t	*language;	/* Default language */
 
+
+ /*
+  * Get the default language for the user...
+  */
+
+  language = cupsLangDefault();
 
  /*
   * Range check input...
@@ -795,9 +804,9 @@ ppdOpen(FILE *fp)		/* I - File to read from */
             strcmp(name, "OutputOrder") != 0 &&
 	    strcmp(name, "PageSize") != 0 &&
             strcmp(name, "PageRegion") != 0)
-	  group = ppd_get_group(ppd, "Extra");
+	  group = ppd_get_group(ppd, cupsLangString(language, CUPS_MSG_EXTRA));
 	else
-	  group = ppd_get_group(ppd, "General");
+	  group = ppd_get_group(ppd, cupsLangString(language, CUPS_MSG_GENERAL));
 
         if (group == NULL)
 	{
@@ -835,11 +844,11 @@ ppdOpen(FILE *fp)		/* I - File to read from */
       else
       {
         if (strcmp(name, "PageSize") == 0)
-	  strcpy(option->text, "Media Size");
+	  strcpy(option->text, cupsLangString(language, CUPS_MSG_MEDIA_SIZE));
 	else if (strcmp(name, "MediaType") == 0)
-	  strcpy(option->text, "Media Type");
+	  strcpy(option->text, cupsLangString(language, CUPS_MSG_MEDIA_TYPE));
 	else if (strcmp(name, "InputSlot") == 0)
-	  strcpy(option->text, "Media Source");
+	  strcpy(option->text, cupsLangString(language, CUPS_MSG_MEDIA_SOURCE));
         else
 	  strcpy(option->text, name);
       }
@@ -1682,5 +1691,5 @@ ppd_decode(char *string)	/* I - String to decode */
 
 
 /*
- * End of "$Id: ppd.c,v 1.21 1999/06/04 21:04:29 mike Exp $".
+ * End of "$Id: ppd.c,v 1.22 1999/06/15 20:40:00 mike Exp $".
  */

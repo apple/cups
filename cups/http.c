@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.35 1999/05/17 18:03:31 mike Exp $"
+ * "$Id: http.c,v 1.36 1999/06/15 20:39:55 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -1051,7 +1051,14 @@ httpUpdate(http_t *http)		/* I - HTTP data */
      /*
       * Blank line means the start of the data section (if any).  Return
       * the result code, too...
+      *
+      * If we get status 100 (HTTP_CONTINUE), then we *don't* change states.
+      * Instead, we just return HTTP_CONTINUE to the caller and keep on
+      * tryin'...
       */
+
+      if (http->status == HTTP_CONTINUE)
+        return (http->status);
 
       httpGetLength(http);
 
@@ -1388,5 +1395,5 @@ http_send(http_t       *http,	/* I - HTTP data */
 
 
 /*
- * End of "$Id: http.c,v 1.35 1999/05/17 18:03:31 mike Exp $".
+ * End of "$Id: http.c,v 1.36 1999/06/15 20:39:55 mike Exp $".
  */

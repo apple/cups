@@ -1,5 +1,5 @@
 /*
- * "$Id: language.h,v 1.6 1999/04/27 19:57:08 mike Exp $"
+ * "$Id: language.h,v 1.7 1999/06/15 20:39:59 mike Exp $"
  *
  *   Multi-language support for the Common UNIX Printing System (CUPS).
  *
@@ -48,13 +48,11 @@ typedef enum			/**** Message Indices ****/
   CUPS_MSG_CLOSE,
   CUPS_MSG_YES,
   CUPS_MSG_NO,
-  CUPS_MSG_AUTO,
   CUPS_MSG_ON,
   CUPS_MSG_OFF,
   CUPS_MSG_SAVE,
   CUPS_MSG_DISCARD,
   CUPS_MSG_DEFAULT,
-  CUPS_MSG_USER_DEFINED,
   CUPS_MSG_OPTIONS,
   CUPS_MSG_MORE_INFO,
   CUPS_MSG_BLACK,
@@ -63,18 +61,14 @@ typedef enum			/**** Message Indices ****/
   CUPS_MSG_MAGENTA,
   CUPS_MSG_YELLOW,
   CUPS_MSG_COPYRIGHT,
-  CUPS_MSG_ALL_RIGHTS_RESERVED,
   CUPS_MSG_GENERAL,
   CUPS_MSG_PRINTER,
-  CUPS_MSG_POSTSCRIPT,
   CUPS_MSG_IMAGE,
-  CUPS_MSG_TEXT,
-  CUPS_MSG_HPGL,
-  CUPS_MSG_ADVANCED,
-  CUPS_MSG_PRINT_BANNER_PAGE,
-  CUPS_MSG_VERBOSE_LOGGING,
-  CUPS_MSG_PRINT_PAGES,
+  CUPS_MSG_HPGL2,
+  CUPS_MSG_EXTRA,
   CUPS_MSG_DOCUMENT,
+  CUPS_MSG_OTHER,
+  CUPS_MSG_PRINT_PAGES,
   CUPS_MSG_ENTIRE_DOCUMENT,
   CUPS_MSG_PAGE_RANGE,
   CUPS_MSG_REVERSE_ORDER,
@@ -87,22 +81,16 @@ typedef enum			/**** Message Indices ****/
   CUPS_MSG_ZOOM_BY_PERCENT,
   CUPS_MSG_ZOOM_BY_PPI,
   CUPS_MSG_MIRROR_IMAGE,
-  CUPS_MSG_ROTATE_IMAGE,
-  CUPS_MSG_BEST_FIT,
   CUPS_MSG_COLOR_SATURATION,
   CUPS_MSG_COLOR_HUE,
-  CUPS_MSG_NUMBER_OF_COLUMNS,
-  CUPS_MSG_MARGINS,
-  CUPS_MSG_WRAP_TEXT,
   CUPS_MSG_FIT_TO_PAGE,
   CUPS_MSG_SHADING,
   CUPS_MSG_DEFAULT_PEN_WIDTH,
   CUPS_MSG_GAMMA_CORRECTION,
   CUPS_MSG_BRIGHTNESS,
-  CUPS_MSG_COLOR_PROFILE,
-  CUPS_MSG_ADD_PRINTER,
-  CUPS_MSG_DELETE_PRINTER,
-  CUPS_MSG_MODIFY_PRINTER,
+  CUPS_MSG_ADD,
+  CUPS_MSG_DELETE,
+  CUPS_MSG_MODIFY,
   CUPS_MSG_PRINTER_URI,
   CUPS_MSG_PRINTER_NAME,
   CUPS_MSG_PRINTER_LOCATION,
@@ -134,6 +122,16 @@ typedef enum			/**** Message Indices ****/
   CUPS_MSG_IDLE,
   CUPS_MSG_PROCESSING,
   CUPS_MSG_STOPPED,
+  CUPS_MSG_ALL,
+  CUPS_MSG_ODD,
+  CUPS_MSG_EVEN_PAGES,
+  CUPS_MSG_DARKER_LIGHTER,
+  CUPS_MSG_MEDIA_SIZE,
+  CUPS_MSG_MEDIA_TYPE,
+  CUPS_MSG_MEDIA_SOURCE,
+  CUPS_MSG_ORIENTATION,
+  CUPS_MSG_PORTRAIT,
+  CUPS_MSG_LANDSCAPE,
   CUPS_MSG_HTTP_BASE = 200,
   CUPS_MSG_HTTP_END = 505,
   CUPS_MSG_MAX
@@ -170,7 +168,7 @@ typedef struct cups_lang_str	/**** Language Cache Structure ****/
  * Prototypes...
  */
 
-#  define		cupsLangDefault() cupsLangGet(setlocale(LC_ALL, 0))
+#  define		cupsLangDefault() cupsLangGet(setlocale(LC_ALL, ""))
 extern char		*cupsLangEncoding(cups_lang_t *lang);
 extern void		cupsLangFlush(void);
 extern void		cupsLangFree(cups_lang_t *lang);
@@ -184,5 +182,5 @@ extern cups_lang_t	*cupsLangGet(char *language);
 #endif /* !_CUPS_LANGUAGE_H_ */
 
 /*
- * End of "$Id: language.h,v 1.6 1999/04/27 19:57:08 mike Exp $".
+ * End of "$Id: language.h,v 1.7 1999/06/15 20:39:59 mike Exp $".
  */

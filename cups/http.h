@@ -1,5 +1,5 @@
 /*
- * "$Id: http.h,v 1.17 1999/05/01 13:14:26 mike Exp $"
+ * "$Id: http.h,v 1.18 1999/06/15 20:39:58 mike Exp $"
  *
  *   Hyper-Text Transport Protocol definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -131,7 +131,8 @@ typedef enum
 typedef enum
 {
   HTTP_ERROR = -1,		/* An error response from httpXxxx() */
-  HTTP_CONTINUE,		/* Everything OK, keep going... */
+
+  HTTP_CONTINUE = 100,		/* Everything OK, keep going... */
 
   HTTP_OK = 200,		/* OPTIONS/GET/HEAD/POST/TRACE command was successful */
   HTTP_CREATED,			/* PUT command was successful */
@@ -312,5 +313,5 @@ extern int		httpGetLength(http_t *http);
 #endif /* !_CUPS_HTTP_H_ */
 
 /*
- * End of "$Id: http.h,v 1.17 1999/05/01 13:14:26 mike Exp $".
+ * End of "$Id: http.h,v 1.18 1999/06/15 20:39:58 mike Exp $".
  */
