@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# "$Id: run-stp-tests.sh,v 1.10 2002/05/14 01:14:31 mike Exp $"
+# "$Id: run-stp-tests.sh,v 1.11 2002/06/07 21:05:25 mike Exp $"
 #
 #   Perform the complete set of IPP compliance tests specified in the
 #   CUPS Software Test Plan.
@@ -151,6 +151,14 @@ else
 fi
 
 export DYLD_LIBRARY_PATH
+
+if test "x$SHLIB_PATH" = x; then
+	SHLIB_PATH="$root/cups:$root/filter"
+else
+	SHLIB_PATH="$root/cups:$root/filter:$SHLIB_PATH"
+fi
+
+export SHLIB_PATH
 
 CUPS_SERVERROOT=/tmp/$user; export CUPS_SERVERROOT
 CUPS_DATADIR=/tmp/$user/share; export CUPS_DATADIR
@@ -326,5 +334,5 @@ echo "    $pdffile"
 echo ""
 
 #
-# End of "$Id: run-stp-tests.sh,v 1.10 2002/05/14 01:14:31 mike Exp $"
+# End of "$Id: run-stp-tests.sh,v 1.11 2002/06/07 21:05:25 mike Exp $"
 #
