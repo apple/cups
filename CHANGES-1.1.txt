@@ -3,15 +3,19 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.19
 
+	- Added a new httpWait() function to support waiting for
+	  data for a specific number of milliseconds.
+	- httpGets() now times out after 1 second on
+	  non-blocking HTTP connections.
 	- The scheduler no longer accepts rangeOfInteger values
 	  that are out of order (e.g. 5-1)
 	- The sides attribute was incorrectly sent as a name
 	  value; it is a keyword value.
 	- The IPP backend now detects if the destination queue
 	  has gone away and reports an error.
-	- The scheduler now allocates its select() sets to
-	  support larger numbers of clients on systems that
-	  support it.
+	- The scheduler and HTTP API now allocate their select()
+	  sets to support larger numbers of clients on systems
+	  that support it.
 	- The scheduler now sets the CFProcessPath environment
 	  variable under MacOS X.
 	- The cupsLangDefault() function now uses the

@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.82.2.25 2003/01/24 20:45:11 mike Exp $"
+ * "$Id: http.c,v 1.82.2.26 2003/02/11 18:23:28 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS).
  *
@@ -44,6 +44,7 @@
  *   httpTrace()          - Send an TRACE request to the server.
  *   httpFlush()          - Flush data from a HTTP connection.
  *   httpRead()           - Read data from a HTTP connection.
+ *   httpWait()           - Wait for data available on a connection.
  *   httpWrite()          - Write data to a HTTP connection.
  *   httpGets()           - Get a line of text from a HTTP connection.
  *   httpPrintf()         - Print a formatted string to a HTTP connection.
@@ -78,6 +79,7 @@
 #include "string.h"
 #include <fcntl.h>
 #include <errno.h>
+#include <sys/resource.h>
 
 #include "http-private.h"
 #include "ipp.h"
@@ -248,31 +250,7 @@ httpInitialize(void)
 int				/* O - 0 = no data, 1 = data available */
 httpCheck(http_t *http)		/* I - HTTP connection */
 {
-  fd_set	input;		/* Input set for select() */
-  struct timeval timeout;	/* Timeout */
-
-
- /*
-  * First see if there is data in the buffer...
-  */
-
-  if (http == NULL)
-    return (0);
-
-  if (http->used)
-    return (1);
-
- /*
-  * Then try doing a select() to poll the socket...
-  */
-
-  FD_ZERO(&input);
-  FD_SET(http->fd, &input);
-
-  timeout.tv_sec  = 0;
-  timeout.tv_usec = 0;
-
-  return (select(http->fd + 1, &input, NULL, NULL, &timeout) > 0);
+  return (httpWait(http, 0));
 }
 
 
@@ -285,6 +263,9 @@ httpClose(http_t *http)		/* I - Connection to close */
 {
   if (!http)
     return;
+
+  if (http->input_set)
+    free(http->input_set);
 
 #ifdef HAVE_SSL
   if (http->tls)
@@ -1014,6 +995,61 @@ httpRead(http_t *http,			/* I - HTTP data */
 
 
 /*
+ * 'httpWait()' - Wait for data available on a connection.
+ */
+
+int					/* O - 1 if data is available, 0 otherwise */
+httpWait(http_t *http,			/* I - HTTP data */
+         int    msec)			/* I - Milliseconds to wait */
+{
+  struct rlimit		limit;          /* Runtime limit */
+  struct timeval	timeout;	/* Timeout */
+
+
+ /*
+  * First see if there is data in the buffer...
+  */
+
+  if (http == NULL)
+    return (0);
+
+  if (http->used)
+    return (1);
+
+ /*
+  * Then try doing a select() to poll the socket...
+  */
+
+  if (!http->input_set)
+  {
+   /*
+    * Allocate the select() input set based upon the max number of file
+    * descriptors available for this process...
+    */
+
+    getrlimit(RLIMIT_NOFILE, &limit);
+
+    http->input_set = calloc(1, (limit.rlim_cur + 7) / 8);
+
+    if (!http->input_set)
+      return (0);
+  }
+
+  FD_SET(http->fd, http->input_set);
+
+  if (msec >= 0)
+  {
+    timeout.tv_sec  = msec / 1000;
+    timeout.tv_usec = (msec % 1000) * 1000;
+
+    return (select(http->fd + 1, http->input_set, NULL, NULL, &timeout) > 0);
+  }
+  else
+    return (select(http->fd + 1, http->input_set, NULL, NULL, NULL) > 0);
+}
+
+
+/*
  * 'httpWrite()' - Write data to a HTTP connection.
  */
  
@@ -1199,6 +1235,9 @@ httpGets(char   *line,			/* I - Line to read into */
      /*
       * No newline; see if there is more data to be read...
       */
+
+      if (!http->blocking && !httpWait(http, 1000))
+        return (NULL);
 
 #ifdef HAVE_SSL
       if (http->tls)
@@ -2263,5 +2302,5 @@ CDSAWriteFunc(SSLConnectionRef connection,	/* I  - SSL/TLS connection */
 
 
 /*
- * End of "$Id: http.c,v 1.82.2.25 2003/01/24 20:45:11 mike Exp $".
+ * End of "$Id: http.c,v 1.82.2.26 2003/02/11 18:23:28 mike Exp $".
  */

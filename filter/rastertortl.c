@@ -1,5 +1,5 @@
 /*
- * "$Id: rastertortl.c,v 1.1.2.3 2003/01/07 18:27:01 mike Exp $"
+ * "$Id: rastertortl.c,v 1.1.2.4 2003/02/11 18:23:33 mike Exp $"
  *
  *   Hewlett-Packard Raster Transfer Language filter for the Common UNIX
  *   Printing System (CUPS).
@@ -926,7 +926,7 @@ int			/* O - Exit status */
 main(int  argc,		/* I - Number of command-line arguments */
      char *argv[])	/* I - Command-line arguments */
 {
-  FILE			*fp;	/* Raster data file */
+  int			fd;	/* Raster data file */
   cups_raster_t		*ras;	/* Raster stream for printing */
   cups_page_header_t	header;	/* Page header from file */
   int			y;	/* Current line */
@@ -960,7 +960,7 @@ main(int  argc,		/* I - Number of command-line arguments */
 
   if (argc == 7)
   {
-    if ((fp = fopen(argv[6], "rb")) == NULL)
+    if ((fd = open(argv[6], O_RDONLY)) < 0)
     {
       perror("ERROR: Unable to open raster file - ");
       sleep(1);
@@ -968,9 +968,9 @@ main(int  argc,		/* I - Number of command-line arguments */
     }
   }
   else
-    fp = stdin;
+    fd = 0;
 
-  ras = cupsRasterOpen(fp, CUPS_RASTER_READ);
+  ras = cupsRasterOpen(fd, CUPS_RASTER_READ);
 
  /*
   * Initialize the print device...
@@ -1051,8 +1051,8 @@ main(int  argc,		/* I - Number of command-line arguments */
   */
 
   cupsRasterClose(ras);
-  if (fp != stdin)
-    fclose(fp);
+  if (fd)
+    close(fd);
 
  /*
   * If no pages were printed, send an error message...
@@ -1068,5 +1068,5 @@ main(int  argc,		/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: rastertortl.c,v 1.1.2.3 2003/01/07 18:27:01 mike Exp $".
+ * End of "$Id: rastertortl.c,v 1.1.2.4 2003/02/11 18:23:33 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.91.2.43 2003/02/05 21:14:48 mike Exp $"
+ * "$Id: client.c,v 1.91.2.44 2003/02/11 18:23:34 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -294,10 +294,14 @@ AcceptClient(listener_t *lis)	/* I - Listener socket */
   setsockopt(con->http.fd, IPPROTO_TCP, TCP_NODELAY, &val, sizeof(val)); 
 
  /*
-  * Add the socket to the select() input mask.
+  * Close this file on all execs...
   */
 
   fcntl(con->http.fd, F_SETFD, fcntl(con->http.fd, F_GETFD) | FD_CLOEXEC);
+
+ /*
+  * Add the socket to the select() input mask.
+  */
 
   LogMessage(L_DEBUG2, "AcceptClient: Adding fd %d to InputSet...",
              con->http.fd);
@@ -364,6 +368,9 @@ CloseClient(client_t *con)	/* I - Client to close */
 
 
   LogMessage(L_DEBUG, "CloseClient() %d", con->http.fd);
+
+  if (con->http.input_set)
+    free(con->http.input_set);
 
 #ifdef HAVE_SSL
  /*
@@ -2965,5 +2972,5 @@ CDSAWriteFunc(SSLConnectionRef connection,	/* I  - SSL/TLS connection */
 
 
 /*
- * End of "$Id: client.c,v 1.91.2.43 2003/02/05 21:14:48 mike Exp $".
+ * End of "$Id: client.c,v 1.91.2.44 2003/02/11 18:23:34 mike Exp $".
  */
