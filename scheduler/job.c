@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.124.2.51 2003/03/10 15:05:53 mike Exp $"
+ * "$Id: job.c,v 1.124.2.52 2003/03/12 16:16:32 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -1795,6 +1795,11 @@ StartJob(int       id,		/* I - Job ID */
       snprintf(printer->state_message, sizeof(printer->state_message),
                "Unable to start filter \"%s\" - %s.",
                filters[i].filter, strerror(errno));
+
+      if (filters != NULL)
+	free(filters);
+
+      CancelJob(current->id, 0);
       return;
     }
 
@@ -1868,6 +1873,7 @@ StartJob(int       id,		/* I - Job ID */
 	current->back_pipes[0] = -1;
 	current->back_pipes[1] = -1;
 
+        CancelJob(current->id, 0);
 	return;
       }
       else
@@ -2614,5 +2620,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.124.2.51 2003/03/10 15:05:53 mike Exp $".
+ * End of "$Id: job.c,v 1.124.2.52 2003/03/12 16:16:32 mike Exp $".
  */

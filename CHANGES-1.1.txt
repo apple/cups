@@ -3,6 +3,9 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.19
 
+	- If the scheduler was unable to execute a filter, it
+	  would try to restart the job indefinitely until the
+	  filter could be executed.
 	- When writing BSD printcap files, the scheduler now
 	  includes the rm and rp attributes, allowing the file
 	  to be exported to LPD clients. [Patch from Dominic
