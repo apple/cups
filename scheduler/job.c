@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.124.2.79 2003/09/02 20:40:00 mike Exp $"
+ * "$Id: job.c,v 1.124.2.80 2003/09/10 19:30:08 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -53,6 +53,7 @@
  *   ipp_length()         - Compute the size of the buffer needed to hold 
  *		            the textual IPP attributes.
  *   start_process()      - Start a background process.
+ *   set_hold_until()     - Set the hold time and update job-hold-until attribute.
  */
 
 /*
@@ -86,6 +87,7 @@ static int		start_process(const char *command, char *argv[],
 			              char *envp[], int infd, int outfd,
 				      int errfd, int backfd, int root,
 				      int *pid);
+static void		set_hold_until(job_t *job, time_t holdtime);
 
 
 /*
@@ -2456,8 +2458,7 @@ UpdateJob(job_t *job)		/* I - Job to check */
 	  * Try again in N seconds...
 	  */
 
-          job->state->values[0].integer = IPP_JOB_HELD;
-	  job->hold_until               = time(NULL) + FaxRetryInterval;
+	  set_hold_until(job, time(NULL) + FaxRetryInterval);
 	}
 
         CheckJobs();
@@ -2811,5 +2812,53 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.124.2.79 2003/09/02 20:40:00 mike Exp $".
+ * 'set_hold_until()' - Set the hold time and update job-hold-until attribute...
+ */
+
+static void 
+set_hold_until(job_t *job, 		/* I - Job to update */
+	       time_t holdtime)		/* I - Hold until time */
+{
+  ipp_attribute_t	*attr;		/* job-hold-until attribute */
+  struct tm		*holddate;	/* Hold date */
+  char			holdstr[64];	/* Hold time */
+
+
+ /*
+  * Set the hold_until value and hold the job...
+  */
+
+  LogMessage(L_DEBUG, "set_hold_until: hold_until = %d", (int)holdtime);
+
+  job->state->values[0].integer = IPP_JOB_HELD;
+  job->hold_until               = holdtime;
+
+ /*
+  * Update the job-hold-until attribute with a string representing GMT
+  * time (HH:MM:SS)...
+  */
+
+  holddate = gmtime(&holdtime);
+  snprintf(holdstr, sizeof(holdstr), "%d:%d:%d", holddate->tm_hour, 
+	   holddate->tm_min, holddate->tm_sec);
+
+  if ((attr = ippFindAttribute(job->attrs, "job-hold-until", IPP_TAG_KEYWORD)) == NULL)
+    attr = ippFindAttribute(job->attrs, "job-hold-until", IPP_TAG_NAME);
+
+ /*
+  * Either add the attribute or update the value of the existing one
+  */
+
+  if (attr == NULL)
+    attr = ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_KEYWORD,
+                        "job-hold-until", NULL, holdstr);
+  else
+    SetString(&attr->values[0].string.text, holdstr);
+
+  SaveJob(job->id);
+}
+
+
+/*
+ * End of "$Id: job.c,v 1.124.2.80 2003/09/10 19:30:08 mike Exp $".
  */

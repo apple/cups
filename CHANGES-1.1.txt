@@ -1,6 +1,19 @@
 CHANGES-1.1.txt
 ---------------
 
+CHANGES IN CUPS V1.1.20
+
+	- The fax support did not update/set the job-hold-until
+	  attribute when a fax job fails (STR #269)
+	- The cupsLangGet() function didn't support locales of
+	  the form "ll.charset" (STR #271)
+	- The scheduler did not use the charset when getting the
+	  language localization for a request; this caused extra
+	  disk IO for every request (STR #271)
+	- The scheduler did not support requests with more than
+	  one language specified (STR #267)
+
+
 CHANGES IN CUPS V1.1.20rc1
 
 	- The scheduler now waits up to 60 seconds before
