@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.30 1999/06/25 12:53:01 mike Exp $"
+ * "$Id: printers.c,v 1.31 1999/06/25 14:50:24 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -152,7 +152,8 @@ AddPrinterFilter(printer_t *p,		/* I - Printer to add to */
   for (temptype = MimeDatabase->types, i = MimeDatabase->num_types;
        i > 0;
        i --, temptype ++)
-    if ((super[0] == '*' || strcmp((*temptype)->super, super) == 0) &&
+    if (((super[0] == '*' && strcmp((*temptype)->super, "printer") != 0) ||
+         strcmp((*temptype)->super, super) == 0) &&
         (type[0] == '*' || strcmp((*temptype)->type, type) == 0))
     {
       LogMessage(LOG_DEBUG, "Adding filter %s/%s %s/%s %d %s",
@@ -196,6 +197,8 @@ DeletePrinter(printer_t *p)	/* I - Printer to delete */
   printer_t	*current,	/* Current printer in list */
 		*prev;		/* Previous printer in list */
 
+
+  DEBUG_printf(("DeletePrinter(%08x): p->name = \"%s\"...\n", p, p->name));
 
  /*
   * Range check input...
@@ -705,15 +708,7 @@ SetPrinterAttrs(printer_t *p)	/* I - Printer to setup */
   ippAddInteger(p->attrs, IPP_TAG_PRINTER, IPP_TAG_ENUM,
                 "orientation-requested-default", IPP_PORTRAIT);
 
-  if (p->type & CUPS_PRINTER_REMOTE)
-  {
-   /*
-    * Remote printers go directly to the remote destination...
-    */
-
-    AddPrinterFilter(p, "*/* 0 -");
-  }
-  else
+  if (!(p->type & CUPS_PRINTER_REMOTE))
   {
    /*
     * Assign additional attributes depending on whether this is a printer
@@ -924,6 +919,13 @@ SetPrinterState(printer_t    *p,	/* I - Printer to change */
 
 
  /*
+  * Can't set status of remote printers...
+  */
+
+  if (p->type & CUPS_PRINTER_REMOTE)
+    return;
+
+ /*
   * Set the new state...
   */
 
@@ -1008,5 +1010,5 @@ StopPrinter(printer_t *p)	/* I - Printer to stop */
 
 
 /*
- * End of "$Id: printers.c,v 1.30 1999/06/25 12:53:01 mike Exp $".
+ * End of "$Id: printers.c,v 1.31 1999/06/25 14:50:24 mike Exp $".
  */

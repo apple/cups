@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.36 1999/06/25 12:27:55 mike Exp $"
+ * "$Id: dirsvc.c,v 1.37 1999/06/25 14:50:23 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -496,7 +496,11 @@ SendBrowseList(void)
       */
 
       if (p->browse_time < to)
+      {
+        DEBUG_printf(("Printer \"%s\" has timed out (%d < %d...)\n",
+	              p->name, p->browse_time, to));
         DeletePrinter(p);
+      }
     }
     else if (p->browse_time < ut && !(p->type & CUPS_PRINTER_IMPLICIT))
     {
@@ -526,5 +530,5 @@ SendBrowseList(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.36 1999/06/25 12:27:55 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.37 1999/06/25 14:50:23 mike Exp $".
  */

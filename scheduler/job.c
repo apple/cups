@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.29 1999/06/21 19:43:49 mike Exp $"
+ * "$Id: job.c,v 1.30 1999/06/25 14:50:24 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -312,347 +312,380 @@ StartJob(int       id,		/* I - Job ID */
 
   for (current = Jobs; current != NULL; current = current->next)
     if (current->id == id)
+      break;
+
+  if (current == NULL)
+    return;
+
+ /*
+  * Update the printer and job state to "processing"...
+  */
+
+  DEBUG_puts("StartJob: found job in list.");
+
+  current->state   = IPP_JOB_PROCESSING;
+  current->status  = 0;
+  current->printer = printer;
+  printer->job     = current;
+  SetPrinterState(printer, IPP_PRINTER_PROCESSING);
+
+ /*
+  * Figure out what filters are required to convert from
+  * the source to the destination type...
+  */
+
+  num_filters = 0;
+
+#ifdef DEBUG
+  printf("Filtering from %s/%s to %s/%s...\n",
+         current->filetype->super, current->filetype->type,
+         printer->filetype->super, printer->filetype->type);
+  printf("num_filters = %d\n", MimeDatabase->num_filters);
+  for (i = 0; i < MimeDatabase->num_filters; i ++)
+    printf("filters[%d] = %s/%s to %s/%s using \"%s\" (cost %d)\n",
+	   i, MimeDatabase->filters[i].src->super,
+	   MimeDatabase->filters[i].src->type,
+	   MimeDatabase->filters[i].dst->super,
+	   MimeDatabase->filters[i].dst->type,
+	   MimeDatabase->filters[i].filter,
+	   MimeDatabase->filters[i].cost);
+#endif /* DEBUG */	       
+
+  if (printer->type & CUPS_PRINTER_REMOTE)
+  {
+   /*
+    * Remote jobs go directly to the remote job...
+    */
+
+    filters = NULL;
+  }
+  else
+  {
+   /*
+    * Local jobs get filtered...
+    */
+
+    filters = mimeFilter(MimeDatabase, current->filetype,
+                         printer->filetype, &num_filters);
+
+    if (num_filters == 0)
     {
-     /*
-      * Update the printer and job state to "processing"...
-      */
-
-      DEBUG_puts("StartJob: found job in list.");
-
-      current->state   = IPP_JOB_PROCESSING;
-      current->status  = 0;
-      current->printer = printer;
-      printer->job     = current;
-      SetPrinterState(printer, IPP_PRINTER_PROCESSING);
-
-     /*
-      * Figure out what filters are required to convert from
-      * the source to the destination type...
-      */
-
-      num_filters = 0;
-
-      if (!(printer->type & CUPS_PRINTER_REMOTE))
-        filters = mimeFilter(MimeDatabase, current->filetype,
-                             printer->filetype, &num_filters);
-
-      if (num_filters == 0)
-      {
-        LogMessage(LOG_ERROR, "Unable to convert file to printable format for job %s-%d!",
-	           printer->name, current->id);
-        CancelJob(current->id);
-	return;
-      }
-
-     /*
-      * Building the options string is harder than it needs to be, but
-      * for the moment we need to pass strings for command-line args and
-      * not IPP attribute pointers... :)
-      */
-
-      optptr  = options;
-      *optptr = '\0';
-
-      sprintf(title, "%s-%d", printer->name, current->id);
-      strcpy(copies, "1");
-
-      for (attr = current->attrs->attrs; attr != NULL; attr = attr->next)
-      {
-        if (strcmp(attr->name, "copies") == 0 &&
-	    attr->value_tag == IPP_TAG_INTEGER)
-	  sprintf(copies, "%d", attr->values[0].integer);
-        else if (strcmp(attr->name, "job-name") == 0 &&
-	         (attr->value_tag == IPP_TAG_NAME ||
-		  attr->value_tag == IPP_TAG_NAMELANG))
-	  strcpy(title, attr->values[0].string.text);
-	else if ((attr->group_tag == IPP_TAG_JOB ||
-	          attr->group_tag == IPP_TAG_EXTENSION) &&
-		 (optptr - options) < (sizeof(options) - 128))
-        {
-	  if (attr->value_tag == IPP_TAG_MIMETYPE ||
-	      attr->value_tag == IPP_TAG_NAMELANG ||
-	      attr->value_tag == IPP_TAG_TEXTLANG ||
-	      attr->value_tag == IPP_TAG_URI ||
-	      attr->value_tag == IPP_TAG_URISCHEME)
-	    continue;
-
-	  if (optptr > options)
-	    strcat(optptr, " ");
-
-          if (attr->value_tag != IPP_TAG_BOOLEAN)
-	  {
-	    strcat(optptr, attr->name);
-	    strcat(optptr, "=");
-	  }
-
-	  for (i = 0; i < attr->num_values; i ++)
-	  {
-	    if (i)
-	      strcat(optptr, ",");
-
-	    optptr += strlen(optptr);
-
-	    switch (attr->value_tag)
-	    {
-	      case IPP_TAG_INTEGER :
-	      case IPP_TAG_ENUM :
-		  sprintf(optptr, "%d", attr->values[i].integer);
-		  break;
-
-	      case IPP_TAG_BOOLEAN :
-	          if (!attr->values[i].boolean)
-		    strcat(optptr, "no");
-
-	      case IPP_TAG_NOVALUE :
-		  strcat(optptr, attr->name);
-		  break;
-
-	      case IPP_TAG_RANGE :
-		  sprintf(optptr, "%d-%d", attr->values[i].range.lower,
-		          attr->values[i].range.upper);
-		  break;
-
-	      case IPP_TAG_RESOLUTION :
-		  sprintf(optptr, "%dx%d%s", attr->values[i].resolution.xres,
-		          attr->values[i].resolution.yres,
-			  attr->values[i].resolution.units == IPP_RES_PER_INCH ?
-			      "dpi" : "dpc");
-		  break;
-
-              case IPP_TAG_STRING :
-	      case IPP_TAG_TEXT :
-	      case IPP_TAG_NAME :
-	      case IPP_TAG_KEYWORD :
-	      case IPP_TAG_CHARSET :
-	      case IPP_TAG_LANGUAGE :
-	          if (strchr(attr->values[i].string.text, ' ') != NULL ||
-		      strchr(attr->values[i].string.text, '\t') != NULL ||
-		      strchr(attr->values[i].string.text, '\n') != NULL)
-		  {
-		    strcat(optptr, "\'");
-		    strcat(optptr, attr->values[i].string.text);
-		    strcat(optptr, "\'");
-		  }
-		  else
-		    strcat(optptr, attr->values[i].string.text);
-		  break;
-	    }
-	  }
-
-	  optptr += strlen(optptr);
-	}
-      }
-
-     /*
-      * Build the command-line arguments for the filters.  Each filter
-      * has 6 or 7 arguments:
-      *
-      *     argv[0] = printer
-      *     argv[1] = job ID
-      *     argv[2] = username
-      *     argv[3] = title
-      *     argv[4] = # copies
-      *     argv[5] = options
-      *     argv[6] = filename (optional; normally stdin)
-      *
-      * This allows legacy printer drivers that use the old System V
-      * printing interface to be used by CUPS.
-      */
-
-      sprintf(jobid, "%d", current->id);
-
-      argv[0] = printer->name;
-      argv[1] = jobid;
-      argv[2] = current->username;
-      argv[3] = title;
-      argv[4] = copies;
-      argv[5] = options;
-      argv[6] = current->filename;
-      argv[7] = NULL;
-
-      DEBUG_printf(("StartJob: args = \'%s\',\'%s\',\'%s\',\'%s\',\'%s\',\'%s\',\'%s\'\n",
-                    argv[0], argv[1], argv[2], argv[3], argv[4], argv[5], argv[6]));
-
-     /*
-      * Create environment variable strings for the filters...
-      */
-
-      attr = ippFindAttribute(current->attrs, "attributes-natural-language",
-                              IPP_TAG_LANGUAGE);
-      sprintf(language, "LANG=%s", attr->values[0].string.text);
-
-      attr = ippFindAttribute(current->attrs, "document-format",
-                              IPP_TAG_MIMETYPE);
-      if ((optptr = strstr(attr->values[0].string.text, "charset=")) != NULL)
-        sprintf(charset, "CHARSET=%s", optptr + 8);
-      else
-      {
-        attr = ippFindAttribute(current->attrs, "attributes-charset",
-	                        IPP_TAG_CHARSET);
-        sprintf(charset, "CHARSET=%s", attr->values[0].string.text);
-      }
-
-      sprintf(ppd, "PPD=%s/ppd/%s.ppd", ServerRoot, printer->name);
-      sprintf(root, "SERVER_ROOT=%s", ServerRoot);
-      sprintf(cache, "RIP_MAX_CACHE=%s", RIPCache);
-      sprintf(tmpdir, "TMPDIR=%s", TempDir);
-
-      envp[0]  = "PATH=/bin:/usr/bin";
-      envp[1]  = "SOFTWARE=CUPS/1.0";
-      envp[2]  = "TZ=GMT";
-      envp[3]  = "USER=root";
-      envp[4]  = charset;
-      envp[5]  = language;
-      envp[6]  = "TZ=GMT";
-      envp[7]  = ppd;
-      envp[8]  = root;
-      envp[9]  = cache;
-      envp[10] = tmpdir;
-      envp[11] = NULL;
-
-      DEBUG_puts(envp[0]);
-      DEBUG_puts(envp[1]);
-      DEBUG_puts(envp[2]);
-      DEBUG_puts(envp[3]);
-      DEBUG_puts(envp[4]);
-      DEBUG_puts(envp[5]);
-      DEBUG_puts(envp[6]);
-      DEBUG_puts(envp[7]);
-      DEBUG_puts(envp[8]);
-      DEBUG_puts(envp[9]);
-      DEBUG_puts(envp[10]);
-
-     /*
-      * Now create processes for all of the filters...
-      */
-
-      if (pipe(statusfds))
-      {
-        LogMessage(LOG_ERROR, "StartJob: unable to create status pipes - %s.",
-	           strerror(errno));
-        return;
-      }
-
-      DEBUG_printf(("statusfds = %d, %d\n", statusfds[0], statusfds[1]));
-
-      current->pipe = statusfds[0];
-      memset(current->procs, 0, sizeof(current->procs));
-
-      if (strcmp(filters[num_filters - 1].filter, "-") == 0)
-        num_filters --;
-
-      filterfds[1][0] = open("/dev/null", O_RDONLY);
-      filterfds[1][1] = -1;
-      DEBUG_printf(("filterfds[%d] = %d, %d\n", 1, filterfds[1][0],
-                    filterfds[1][1]));
-
-      for (i = 0; i < num_filters; i ++)
-      {
-        if (i == 1)
-	  argv[6] = NULL;
-
-        if (filters[i].filter[0] != '/')
-	  sprintf(command, "%s/filter/%s", ServerRoot, filters[i].filter);
-	else
-	  strcpy(command, filters[i].filter);
-
-	DEBUG_printf(("%s: %s %s %s %s %s %s %s\n", command, argv[0],
-	              argv[1], argv[2], argv[3], argv[4], argv[5], argv[6]));
-
-        if (i < (num_filters - 1) ||
-	    strncmp(printer->device_uri, "file:", 5) != 0)
-          pipe(filterfds[i & 1]);
-	else
-	{
-	  filterfds[i & 1][0] = -1;
-	  if (strncmp(printer->device_uri, "file:/dev/", 10) == 0)
-	    filterfds[i & 1][1] = open(printer->device_uri + 5,
-	                               O_WRONLY | O_EXCL);
-	  else
-	    filterfds[i & 1][1] = open(printer->device_uri + 5,
-	                               O_WRONLY | O_CREAT | O_TRUNC, 0666);
-	}
-
-	DEBUG_printf(("filterfds[%d] = %d, %d\n", i & 1, filterfds[i & 1][0],
-         	      filterfds[i & 1][1]));
-
-        pid = start_process(command, argv, envp, filterfds[!(i & 1)][0],
-	                    filterfds[i & 1][1], statusfds[1]);
-
-        close(filterfds[!(i & 1)][0]);
-        close(filterfds[!(i & 1)][1]);
-
-	if (pid == 0)
-	{
-	  StopPrinter(current->printer);
-	  return;
-	}
-	else
-	{
-	  current->procs[i] = pid;
-
-          DEBUG_printf(("StartJob: started %s - pid = %d.\n", command, pid));
-	}
-      }
-
-      free(filters);
-
-     /*
-      * Finally, pipe the final output into a backend process if needed...
-      */
-
-      if (strncmp(printer->device_uri, "file:", 5) != 0)
-      {
-        sscanf(printer->device_uri, "%[^:]", method);
-        sprintf(command, "%s/backend/%s", ServerRoot, method);
-
-        argv[0] = printer->device_uri;
-        if (num_filters)
-	  argv[6] = NULL;
-
-	DEBUG_printf(("%s: %s %s %s %s %s %s %s\n", command, argv[0],
-	              argv[1], argv[2], argv[3], argv[4], argv[5], argv[6]));
-
-	filterfds[i & 1][0] = -1;
-	filterfds[i & 1][1] = open("/dev/null", O_WRONLY);
-
-	DEBUG_printf(("filterfds[%d] = %d, %d\n", i & 1, filterfds[i & 1][0],
-        	      filterfds[i & 1][1]));
-
-        pid = start_process(command, argv, envp, filterfds[!(i & 1)][0],
-	                    filterfds[i & 1][1], statusfds[1]);
-
-        close(filterfds[!(i & 1)][0]);
-        close(filterfds[!(i & 1)][1]);
-
-	if (pid == 0)
-	{
-	  StopPrinter(current->printer);
-	  return;
-	}
-	else
-	{
-	  current->procs[i] = pid;
-
-          DEBUG_printf(("StartJob: started %s - pid = %d.\n", command, pid));
-	}
-      }
-      else
-      {
-	filterfds[i & 1][0] = -1;
-	filterfds[i & 1][1] = -1;
-
-        close(filterfds[!(i & 1)][0]);
-        close(filterfds[!(i & 1)][1]);
-      }
-
-      close(filterfds[i & 1][0]);
-      close(filterfds[i & 1][1]);
-
-      close(statusfds[1]);
-
-      FD_SET(current->pipe, &InputSet);
+      LogMessage(LOG_ERROR, "Unable to convert file to printable format for job %s-%d!",
+	         printer->name, current->id);
+      CancelJob(current->id);
+      return;
     }
+  }
+
+ /*
+  * Building the options string is harder than it needs to be, but
+  * for the moment we need to pass strings for command-line args and
+  * not IPP attribute pointers... :)
+  */
+
+  optptr  = options;
+  *optptr = '\0';
+
+  sprintf(title, "%s-%d", printer->name, current->id);
+  strcpy(copies, "1");
+
+  for (attr = current->attrs->attrs; attr != NULL; attr = attr->next)
+  {
+    if (strcmp(attr->name, "copies") == 0 &&
+	attr->value_tag == IPP_TAG_INTEGER)
+      sprintf(copies, "%d", attr->values[0].integer);
+    else if (strcmp(attr->name, "job-name") == 0 &&
+	     (attr->value_tag == IPP_TAG_NAME ||
+	      attr->value_tag == IPP_TAG_NAMELANG))
+      strcpy(title, attr->values[0].string.text);
+    else if ((attr->group_tag == IPP_TAG_JOB ||
+	      attr->group_tag == IPP_TAG_EXTENSION) &&
+	     (optptr - options) < (sizeof(options) - 128))
+    {
+      if (attr->value_tag == IPP_TAG_MIMETYPE ||
+	  attr->value_tag == IPP_TAG_NAMELANG ||
+	  attr->value_tag == IPP_TAG_TEXTLANG ||
+	  attr->value_tag == IPP_TAG_URI ||
+	  attr->value_tag == IPP_TAG_URISCHEME)
+	continue;
+
+      if (optptr > options)
+	strcat(optptr, " ");
+
+      if (attr->value_tag != IPP_TAG_BOOLEAN)
+      {
+	strcat(optptr, attr->name);
+	strcat(optptr, "=");
+      }
+
+      for (i = 0; i < attr->num_values; i ++)
+      {
+	if (i)
+	  strcat(optptr, ",");
+
+	optptr += strlen(optptr);
+
+	switch (attr->value_tag)
+	{
+	  case IPP_TAG_INTEGER :
+	  case IPP_TAG_ENUM :
+	      sprintf(optptr, "%d", attr->values[i].integer);
+	      break;
+
+	  case IPP_TAG_BOOLEAN :
+	      if (!attr->values[i].boolean)
+		strcat(optptr, "no");
+
+	  case IPP_TAG_NOVALUE :
+	      strcat(optptr, attr->name);
+	      break;
+
+	  case IPP_TAG_RANGE :
+	      sprintf(optptr, "%d-%d", attr->values[i].range.lower,
+		      attr->values[i].range.upper);
+	      break;
+
+	  case IPP_TAG_RESOLUTION :
+	      sprintf(optptr, "%dx%d%s", attr->values[i].resolution.xres,
+		      attr->values[i].resolution.yres,
+		      attr->values[i].resolution.units == IPP_RES_PER_INCH ?
+			  "dpi" : "dpc");
+	      break;
+
+          case IPP_TAG_STRING :
+	  case IPP_TAG_TEXT :
+	  case IPP_TAG_NAME :
+	  case IPP_TAG_KEYWORD :
+	  case IPP_TAG_CHARSET :
+	  case IPP_TAG_LANGUAGE :
+	      if (strchr(attr->values[i].string.text, ' ') != NULL ||
+		  strchr(attr->values[i].string.text, '\t') != NULL ||
+		  strchr(attr->values[i].string.text, '\n') != NULL)
+	      {
+		strcat(optptr, "\'");
+		strcat(optptr, attr->values[i].string.text);
+		strcat(optptr, "\'");
+	      }
+	      else
+		strcat(optptr, attr->values[i].string.text);
+	      break;
+	}
+      }
+
+      optptr += strlen(optptr);
+    }
+  }
+
+ /*
+  * Build the command-line arguments for the filters.  Each filter
+  * has 6 or 7 arguments:
+  *
+  *     argv[0] = printer
+  *     argv[1] = job ID
+  *     argv[2] = username
+  *     argv[3] = title
+  *     argv[4] = # copies
+  *     argv[5] = options
+  *     argv[6] = filename (optional; normally stdin)
+  *
+  * This allows legacy printer drivers that use the old System V
+  * printing interface to be used by CUPS.
+  */
+
+  sprintf(jobid, "%d", current->id);
+
+  argv[0] = printer->name;
+  argv[1] = jobid;
+  argv[2] = current->username;
+  argv[3] = title;
+  argv[4] = copies;
+  argv[5] = options;
+  argv[6] = current->filename;
+  argv[7] = NULL;
+
+  DEBUG_printf(("StartJob: args = \'%s\',\'%s\',\'%s\',\'%s\',\'%s\',\'%s\',\'%s\'\n",
+                argv[0], argv[1], argv[2], argv[3], argv[4], argv[5], argv[6]));
+
+ /*
+  * Create environment variable strings for the filters...
+  */
+
+  attr = ippFindAttribute(current->attrs, "attributes-natural-language",
+                          IPP_TAG_LANGUAGE);
+  sprintf(language, "LANG=%s", attr->values[0].string.text);
+
+  attr = ippFindAttribute(current->attrs, "document-format",
+                          IPP_TAG_MIMETYPE);
+  if ((optptr = strstr(attr->values[0].string.text, "charset=")) != NULL)
+    sprintf(charset, "CHARSET=%s", optptr + 8);
+  else
+  {
+    attr = ippFindAttribute(current->attrs, "attributes-charset",
+	                    IPP_TAG_CHARSET);
+    sprintf(charset, "CHARSET=%s", attr->values[0].string.text);
+  }
+
+  sprintf(ppd, "PPD=%s/ppd/%s.ppd", ServerRoot, printer->name);
+  sprintf(root, "SERVER_ROOT=%s", ServerRoot);
+  sprintf(cache, "RIP_MAX_CACHE=%s", RIPCache);
+  sprintf(tmpdir, "TMPDIR=%s", TempDir);
+
+  envp[0]  = "PATH=/bin:/usr/bin";
+  envp[1]  = "SOFTWARE=CUPS/1.0";
+  envp[2]  = "TZ=GMT";
+  envp[3]  = "USER=root";
+  envp[4]  = charset;
+  envp[5]  = language;
+  envp[6]  = "TZ=GMT";
+  envp[7]  = ppd;
+  envp[8]  = root;
+  envp[9]  = cache;
+  envp[10] = tmpdir;
+  envp[11] = NULL;
+
+  DEBUG_puts(envp[0]);
+  DEBUG_puts(envp[1]);
+  DEBUG_puts(envp[2]);
+  DEBUG_puts(envp[3]);
+  DEBUG_puts(envp[4]);
+  DEBUG_puts(envp[5]);
+  DEBUG_puts(envp[6]);
+  DEBUG_puts(envp[7]);
+  DEBUG_puts(envp[8]);
+  DEBUG_puts(envp[9]);
+  DEBUG_puts(envp[10]);
+
+ /*
+  * Now create processes for all of the filters...
+  */
+
+  if (pipe(statusfds))
+  {
+    LogMessage(LOG_ERROR, "StartJob: unable to create status pipes - %s.",
+	       strerror(errno));
+    return;
+  }
+
+  DEBUG_printf(("statusfds = %d, %d\n", statusfds[0], statusfds[1]));
+
+  current->pipe = statusfds[0];
+  memset(current->procs, 0, sizeof(current->procs));
+
+  if (num_filters > 0 && strcmp(filters[num_filters - 1].filter, "-") == 0)
+    num_filters --;
+
+  filterfds[1][0] = open("/dev/null", O_RDONLY);
+  filterfds[1][1] = -1;
+  DEBUG_printf(("filterfds[%d] = %d, %d\n", 1, filterfds[1][0],
+                filterfds[1][1]));
+
+  for (i = 0; i < num_filters; i ++)
+  {
+    if (i == 1)
+      argv[6] = NULL;
+
+    if (filters[i].filter[0] != '/')
+      sprintf(command, "%s/filter/%s", ServerRoot, filters[i].filter);
+    else
+      strcpy(command, filters[i].filter);
+
+    DEBUG_printf(("%s: %s %s %s %s %s %s %s\n", command, argv[0],
+	          argv[1], argv[2], argv[3], argv[4], argv[5], argv[6]));
+
+    if (i < (num_filters - 1) ||
+	strncmp(printer->device_uri, "file:", 5) != 0)
+      pipe(filterfds[i & 1]);
+    else
+    {
+      filterfds[i & 1][0] = -1;
+      if (strncmp(printer->device_uri, "file:/dev/", 10) == 0)
+	filterfds[i & 1][1] = open(printer->device_uri + 5,
+	                           O_WRONLY | O_EXCL);
+      else
+	filterfds[i & 1][1] = open(printer->device_uri + 5,
+	                           O_WRONLY | O_CREAT | O_TRUNC, 0666);
+    }
+
+    DEBUG_printf(("filterfds[%d] = %d, %d\n", i & 1, filterfds[i & 1][0],
+         	  filterfds[i & 1][1]));
+
+    pid = start_process(command, argv, envp, filterfds[!(i & 1)][0],
+	                filterfds[i & 1][1], statusfds[1]);
+
+    close(filterfds[!(i & 1)][0]);
+    close(filterfds[!(i & 1)][1]);
+
+    if (pid == 0)
+    {
+      StopPrinter(current->printer);
+      return;
+    }
+    else
+    {
+      current->procs[i] = pid;
+
+      DEBUG_printf(("StartJob: started %s - pid = %d.\n", command, pid));
+    }
+  }
+
+  if (filters != NULL)
+    free(filters);
+
+ /*
+  * Finally, pipe the final output into a backend process if needed...
+  */
+
+  if (strncmp(printer->device_uri, "file:", 5) != 0)
+  {
+    sscanf(printer->device_uri, "%[^:]", method);
+    sprintf(command, "%s/backend/%s", ServerRoot, method);
+
+    argv[0] = printer->device_uri;
+    if (num_filters)
+      argv[6] = NULL;
+
+    DEBUG_printf(("%s: %s %s %s %s %s %s %s\n", command, argv[0],
+	          argv[1], argv[2], argv[3], argv[4], argv[5], argv[6]));
+
+    filterfds[i & 1][0] = -1;
+    filterfds[i & 1][1] = open("/dev/null", O_WRONLY);
+
+    DEBUG_printf(("filterfds[%d] = %d, %d\n", i & 1, filterfds[i & 1][0],
+        	  filterfds[i & 1][1]));
+
+    pid = start_process(command, argv, envp, filterfds[!(i & 1)][0],
+	                filterfds[i & 1][1], statusfds[1]);
+
+    close(filterfds[!(i & 1)][0]);
+    close(filterfds[!(i & 1)][1]);
+
+    if (pid == 0)
+    {
+      StopPrinter(current->printer);
+      return;
+    }
+    else
+    {
+      current->procs[i] = pid;
+
+      DEBUG_printf(("StartJob: started %s - pid = %d.\n", command, pid));
+    }
+  }
+  else
+  {
+    filterfds[i & 1][0] = -1;
+    filterfds[i & 1][1] = -1;
+
+    close(filterfds[!(i & 1)][0]);
+    close(filterfds[!(i & 1)][1]);
+  }
+
+  close(filterfds[i & 1][0]);
+  close(filterfds[i & 1][1]);
+
+  close(statusfds[1]);
+
+  FD_SET(current->pipe, &InputSet);
 }
 
 
@@ -913,5 +946,5 @@ start_process(char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.29 1999/06/21 19:43:49 mike Exp $".
+ * End of "$Id: job.c,v 1.30 1999/06/25 14:50:24 mike Exp $".
  */
