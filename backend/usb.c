@@ -1,5 +1,5 @@
 /*
- * "$Id: usb.c,v 1.45 2003/07/06 20:19:34 mike Exp $"
+ * "$Id: usb.c,v 1.46 2003/07/22 18:12:43 mike Exp $"
  *
  *   USB port backend for the Common UNIX Printing System (CUPS).
  *
@@ -509,7 +509,7 @@ list_devices(void)
         if (length > (sizeof(device_id) - 2))
 	  length = sizeof(device_id) - 2;
 
-	memcpy(device_id, device_id + 2, length);
+	memmove(device_id, device_id + 2, length);
 	device_id[length] = '\0';
       }
       else
@@ -668,7 +668,7 @@ open_device(const char *uri)		/* I - Device URI */
 	{
 	  length = (((unsigned)device_id[0] & 255) << 8) +
 	           ((unsigned)device_id[1] & 255);
-	  memcpy(device_id, device_id + 2, length);
+	  memmove(device_id, device_id + 2, length);
 	  device_id[length] = '\0';
 	}
 	else
@@ -795,5 +795,5 @@ open_device(const char *uri)		/* I - Device URI */
 
 
 /*
- * End of "$Id: usb.c,v 1.45 2003/07/06 20:19:34 mike Exp $".
+ * End of "$Id: usb.c,v 1.46 2003/07/22 18:12:43 mike Exp $".
  */
