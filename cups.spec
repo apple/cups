@@ -1,5 +1,5 @@
 #
-# "$Id: cups.spec,v 1.82 2004/10/29 13:43:10 mike Exp $"
+# "$Id: cups.spec,v 1.83 2004/10/29 14:34:02 mike Exp $"
 #
 #   RPM "spec" file for the Common UNIX Printing System (CUPS).
 #
@@ -201,6 +201,37 @@ rm -rf $RPM_BUILD_ROOT
 %dir /usr/share/man/man8
 /usr/share/man/man8/*
 
+%dir /usr/share/man/es/cat1
+/usr/share/man/es/cat1/backend.1
+/usr/share/man/es/cat1/cupstestppd.1
+/usr/share/man/es/cat1/filter.1
+/usr/share/man/es/cat1/lp.1
+/usr/share/man/es/cat1/lpoptions.1
+/usr/share/man/es/cat1/lppasswd.1
+/usr/share/man/es/cat1/lpq.1
+/usr/share/man/es/cat1/lpr.1
+/usr/share/man/es/cat1/lprm.1
+/usr/share/man/es/cat1/lpstat.1
+%dir /usr/share/man/es/cat5
+/usr/share/man/es/cat5/*
+%dir /usr/share/man/es/cat8
+/usr/share/man/es/cat8/*
+%dir /usr/share/man/es/man1
+/usr/share/man/es/man1/backend.1.gz
+/usr/share/man/es/man1/cupstestppd.1.gz
+/usr/share/man/es/man1/filter.1.gz
+/usr/share/man/es/man1/lp.1.gz
+/usr/share/man/es/man1/lpoptions.1.gz
+/usr/share/man/es/man1/lppasswd.1.gz
+/usr/share/man/es/man1/lpq.1.gz
+/usr/share/man/es/man1/lpr.1.gz
+/usr/share/man/es/man1/lprm.1.gz
+/usr/share/man/es/man1/lpstat.1.gz
+%dir /usr/share/man/es/man5
+/usr/share/man/es/man5/*
+%dir /usr/share/man/es/man8
+/usr/share/man/es/man8/*
+
 %dir /usr/share/man/fr/cat1
 /usr/share/man/fr/cat1/backend.1
 /usr/share/man/fr/cat1/cupstestppd.1
@@ -238,12 +269,19 @@ rm -rf $RPM_BUILD_ROOT
 %files devel
 %dir /usr/share/man/cat1
 /usr/share/man/cat1/cups-config.1
-%dir /usr/share/man/fr/cat1
-/usr/share/man/fr/cat1/cups-config.1
 %dir /usr/share/man/man1
 /usr/share/man/man1/cups-config.1.gz
+
+%dir /usr/share/man/es/cat1
+/usr/share/man/es/cat1/cups-config.1
+%dir /usr/share/man/es/man1
+/usr/share/man/es/man1/cups-config.1.gz
+
+%dir /usr/share/man/fr/cat1
+/usr/share/man/fr/cat1/cups-config.1
 %dir /usr/share/man/fr/man1
 /usr/share/man/fr/man1/cups-config.1.gz
+
 /usr/bin/cups-config
 %dir /usr/include/cups
 /usr/include/cups/*
@@ -253,5 +291,5 @@ rm -rf $RPM_BUILD_ROOT
 /usr/lib/*.so*
 
 #
-# End of "$Id: cups.spec,v 1.82 2004/10/29 13:43:10 mike Exp $".
+# End of "$Id: cups.spec,v 1.83 2004/10/29 14:34:02 mike Exp $".
 #
