@@ -1,5 +1,5 @@
 /*
- * "$Id: accept.c,v 1.16 2002/05/16 13:45:04 mike Exp $"
+ * "$Id: accept.c,v 1.17 2002/08/22 01:43:02 mike Exp $"
  *
  *   "accept", "disable", "enable", and "reject" commands for the Common
  *   UNIX Printing System (CUPS).
@@ -52,19 +52,13 @@ main(int  argc,			/* I - Number of command-line arguments */
   http_t	*http;		/* HTTP connection to server */
   int		i;		/* Looping var */
   char		*command,	/* Command to do */
-		hostname[HTTP_MAX_URI],
-				/* Name of host */
-		printer[HTTP_MAX_URI],
-				/* Name of printer or class */
 		uri[1024],	/* Printer URI */
 		*reason;	/* Reason for reject/disable */
-  const char	*server;	/* Server name */
   ipp_t		*request;	/* IPP request */
   ipp_t		*response;	/* IPP response */
   ipp_op_t	op;		/* Operation */
   cups_lang_t	*language;	/* Language */
   int		cancel;		/* Cancel jobs? */
-  http_encryption_t encryption;	/* Encryption? */
 
 
  /*
@@ -92,10 +86,8 @@ main(int  argc,			/* I - Number of command-line arguments */
     return (1);
   }
 
-  server     = cupsServer();
-  http       = NULL;
-  reason     = NULL;
-  encryption = cupsEncryption();
+  http   = NULL;
+  reason = NULL;
 
  /*
   * Process command-line arguments...
@@ -107,13 +99,13 @@ main(int  argc,			/* I - Number of command-line arguments */
       {
         case 'E' : /* Encrypt */
 #ifdef HAVE_LIBSSL
-	    encryption = HTTP_ENCRYPT_REQUIRED;
+	    cupsSetEncryption(HTTP_ENCRYPT_REQUIRED);
 
 	    if (http)
-	      httpEncryption(http, encryption);
+	      httpEncryption(http, HTTP_ENCRYPT_REQUIRED);
 #else
             fprintf(stderr, "%s: Sorry, no encryption support compiled in!\n",
-	            argv[0]);
+	            command);
 #endif /* HAVE_LIBSSL */
 	    break;
 
@@ -126,7 +118,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	      httpClose(http);
 
 	    if (argv[i][2] != '\0')
-	      server = argv[i] + 2;
+	      cupsSetServer(argv[i] + 2);
 	    else
 	    {
 	      i ++;
@@ -137,16 +129,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	        return (1);
 	      }
 
-              server = argv[i];
-	    }
-
-            http = httpConnectEncrypt(server, ippPort(), encryption);
-
-	    if (http == NULL)
-	    {
-	      fputs(argv[0], stderr);
-	      perror(": Unable to connect to server");
-	      return (1);
+              cupsSetServer(argv[i]);
 	    }
 	    break;
 
@@ -177,21 +160,12 @@ main(int  argc,			/* I - Number of command-line arguments */
       * Accept/disable/enable/reject a destination...
       */
 
-      if (sscanf(argv[i], "%1023[^@]@%1023s", printer, hostname) == 1)
-	strlcpy(hostname, server, sizeof(hostname));
-
-      if (http != NULL && strcasecmp(http->hostname, hostname) != 0)
-      {
-	httpClose(http);
-	http = NULL;
-      }
-
       if (http == NULL)
-        http = httpConnectEncrypt(hostname, ippPort(), encryption);
+        http = httpConnectEncrypt(cupsServer(), ippPort(), cupsEncryption());
 
       if (http == NULL)
       {
-	fputs(argv[0], stderr);
+	fputs(command, stderr);
 	perror(": Unable to connect to server");
 	return (1);
       }
@@ -219,7 +193,7 @@ main(int  argc,			/* I - Number of command-line arguments */
       ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
                    "attributes-natural-language", NULL, language->language);
 
-      snprintf(uri, sizeof(uri), "ipp://%s:%d/printers/%s", hostname, ippPort(), printer);
+      snprintf(uri, sizeof(uri), "ipp://localhost/printers/%s", argv[i]);
       ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI,
                    "printer-uri", NULL, uri);
 
@@ -277,7 +251,6 @@ main(int  argc,			/* I - Number of command-line arguments */
 	ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
                      "attributes-natural-language", NULL, language->language);
 
-	snprintf(uri, sizeof(uri), "ipp://%s:%d/printers/%s", hostname, ippPort(), printer);
 	ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI,
                      "printer-uri", NULL, uri);
 
@@ -309,5 +282,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: accept.c,v 1.16 2002/05/16 13:45:04 mike Exp $".
+ * End of "$Id: accept.c,v 1.17 2002/08/22 01:43:02 mike Exp $".
  */

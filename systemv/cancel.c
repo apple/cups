@@ -1,5 +1,5 @@
 /*
- * "$Id: cancel.c,v 1.25 2002/08/21 19:59:43 mike Exp $"
+ * "$Id: cancel.c,v 1.26 2002/08/22 01:43:02 mike Exp $"
  *
  *   "cancel" command for the Common UNIX Printing System (CUPS).
  *
@@ -60,7 +60,6 @@ main(int  argc,			/* I - Number of command-line arguments */
   ipp_t		*response;	/* IPP response */
   ipp_op_t	op;		/* Operation */
   cups_lang_t	*language;	/* Language */
-  http_encryption_t encryption;	/* Encryption? */
 
 
  /*
@@ -71,7 +70,6 @@ main(int  argc,			/* I - Number of command-line arguments */
   job_id     = 0;
   dest       = NULL;
   http       = NULL;
-  encryption = cupsEncryption();
   num_dests  = 0;
   dests      = NULL;
 
@@ -85,10 +83,10 @@ main(int  argc,			/* I - Number of command-line arguments */
       {
         case 'E' : /* Encrypt */
 #ifdef HAVE_LIBSSL
-	    encryption = HTTP_ENCRYPT_REQUIRED;
+	    cupsSetEncryption(HTTP_ENCRYPT_REQUIRED);
 
 	    if (http)
-	      httpEncryption(http, encryption);
+	      httpEncryption(http, HTTP_ENCRYPT_REQUIRED);
 #else
             fprintf(stderr, "%s: Sorry, no encryption support compiled in!\n",
 	            argv[0]);
@@ -211,7 +209,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 
       if (http == NULL)
 	if ((http = httpConnectEncrypt(cupsServer(), ippPort(),
-	                               encryption)) == NULL)
+	                               cupsEncryption())) == NULL)
 	{
 	  fputs("cancel: Unable to contact server!\n", stderr);
 	  return (1);
@@ -289,5 +287,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: cancel.c,v 1.25 2002/08/21 19:59:43 mike Exp $".
+ * End of "$Id: cancel.c,v 1.26 2002/08/22 01:43:02 mike Exp $".
  */
