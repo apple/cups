@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c,v 1.57 2000/07/24 15:38:07 mike Exp $"
+ * "$Id: util.c,v 1.58 2000/08/04 02:06:00 mike Exp $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -178,6 +178,15 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
 		plain[255],		/* Plaintext username:password */
 		encode[255];		/* Encoded username:password */
 
+
+  if (http == NULL || request == NULL || resource == NULL)
+  {
+    if (request != NULL)
+      ippDelete(request);
+
+    last_error = IPP_INTERNAL_ERROR;
+    return (NULL);
+  }
 
   DEBUG_printf(("cupsDoFileRequest(%08x, %08s, \'%s\', \'%s\')\n",
                 http, request, resource, filename ? filename : "(null)"));
@@ -435,6 +444,12 @@ cupsGetClasses(char ***classes)	/* O - Classes */
   char		**temp;		/* Temporary pointer */
 
 
+  if (classes == NULL)
+  {
+    last_error = IPP_INTERNAL_ERROR;
+    return (0);
+  }
+
  /*
   * Try to connect to the server...
   */
@@ -675,6 +690,12 @@ cupsGetPPD(const char *name)		/* I - Printer name */
   static char	filename[HTTP_MAX_URI];	/* Local filename */
 
 
+  if (name == NULL)
+  {
+    last_error = IPP_INTERNAL_ERROR;
+    return (NULL);
+  }
+
  /*
   * See if we can connect to the server...
   */
@@ -895,6 +916,12 @@ cupsGetPrinters(char ***printers)	/* O - Printers */
   cups_lang_t	*language;	/* Default language */
   char		**temp;		/* Temporary pointer */
 
+
+  if (printers == NULL)
+  {
+    last_error = IPP_INTERNAL_ERROR;
+    return (0);
+  }
 
  /*
   * Try to connect to the server...
@@ -1536,5 +1563,5 @@ cups_local_auth(http_t *http)	/* I - Connection */
 
 
 /*
- * End of "$Id: util.c,v 1.57 2000/07/24 15:38:07 mike Exp $".
+ * End of "$Id: util.c,v 1.58 2000/08/04 02:06:00 mike Exp $".
  */
