@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.38.2.25 2003/03/24 21:30:07 mike Exp $"
+ * "$Id: ipp.c,v 1.38.2.26 2003/04/10 14:13:48 mike Exp $"
  *
  *   IPP backend for the Common UNIX Printing System (CUPS).
  *
@@ -82,6 +82,11 @@ cups_hstrerror(int error)			/* I - Error number */
   else
     return (errors[error]);
 }
+#elif defined(_AIX)
+/*
+ * AIX doesn't provide a prototype but does provide the function...
+ */
+extern const char *hstrerror(int);
 #endif /* !HAVE_HSTRERROR */
 
 
@@ -1209,5 +1214,5 @@ sigterm_handler(int sig)		/* I - Signal */
 
 
 /*
- * End of "$Id: ipp.c,v 1.38.2.25 2003/03/24 21:30:07 mike Exp $".
+ * End of "$Id: ipp.c,v 1.38.2.26 2003/04/10 14:13:48 mike Exp $".
  */

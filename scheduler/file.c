@@ -1,5 +1,5 @@
 /*
- * "$Id: file.c,v 1.1.2.2 2003/03/30 20:01:44 mike Exp $"
+ * "$Id: file.c,v 1.1.2.3 2003/04/10 14:13:53 mike Exp $"
  *
  *   File functions for the Common UNIX Printing System (CUPS).
  *
@@ -296,6 +296,9 @@ cupsFileOpen(const char *filename,	/* I - Name of file */
         o = O_WRONLY | O_TRUNC | O_CREAT;
 	fp->mode = 'w';
         break;
+
+    default : /* Remove bogus compiler warning... */
+        return (NULL);
   }
 
   if ((fp->fd = open(filename, o, 0644)) < 0)
@@ -966,5 +969,5 @@ cups_write(int        fd,		/* I - File descriptor */
 
 
 /*
- * End of "$Id: file.c,v 1.1.2.2 2003/03/30 20:01:44 mike Exp $".
+ * End of "$Id: file.c,v 1.1.2.3 2003/04/10 14:13:53 mike Exp $".
  */

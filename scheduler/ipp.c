@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.127.2.58 2003/04/08 03:48:08 mike Exp $"
+ * "$Id: ipp.c,v 1.127.2.59 2003/04/10 14:13:54 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -2560,7 +2560,7 @@ copy_model(const char *from,		/* I - Source file */
     * Read all of the default lines from the old PPD...
     */
 
-    while (cupsFileGets(src, buffer, sizeof(buffer)) != NULL)
+    while (cupsFileGets(dst, buffer, sizeof(buffer)) != NULL)
       if (!strncmp(buffer, "*Default", 8))
       {
        /*
@@ -6592,5 +6592,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.127.2.58 2003/04/08 03:48:08 mike Exp $".
+ * End of "$Id: ipp.c,v 1.127.2.59 2003/04/10 14:13:54 mike Exp $".
  */

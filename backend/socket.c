@@ -1,5 +1,5 @@
 /*
- * "$Id: socket.c,v 1.17.2.13 2003/02/12 16:33:49 mike Exp $"
+ * "$Id: socket.c,v 1.17.2.14 2003/04/10 14:13:49 mike Exp $"
  *
  *   AppSocket backend for the Common UNIX Printing System (CUPS).
  *
@@ -79,6 +79,11 @@ cups_hstrerror(int error)			/* I - Error number */
   else
     return (errors[error]);
 }
+#elif defined(_AIX)
+/*
+ * AIX doesn't provide a prototype but does provide the function...
+ */
+extern const char *hstrerror(int);
 #endif /* !HAVE_HSTRERROR */
 
 
@@ -306,11 +311,7 @@ main(int  argc,			/* I - Number of command-line arguments (6 or 7) */
 
       FD_ZERO(&input);
       FD_SET(fd, &input);
-#ifdef __hpux
-      if (select(fd + 1, (int *)&input, NULL, NULL, &timeout) > 0)
-#else
       if (select(fd + 1, &input, NULL, NULL, &timeout) > 0)
-#endif /* __hpux */
       {
        /*
 	* Grab the data coming back and spit it out to stderr...
@@ -387,5 +388,5 @@ main(int  argc,			/* I - Number of command-line arguments (6 or 7) */
 
 
 /*
- * End of "$Id: socket.c,v 1.17.2.13 2003/02/12 16:33:49 mike Exp $".
+ * End of "$Id: socket.c,v 1.17.2.14 2003/04/10 14:13:49 mike Exp $".
  */

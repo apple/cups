@@ -1,5 +1,5 @@
 /*
- * "$Id: imagetops.c,v 1.36.2.13 2003/02/24 20:09:42 mike Exp $"
+ * "$Id: imagetops.c,v 1.36.2.14 2003/04/10 14:13:50 mike Exp $"
  *
  *   Image file to PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -643,7 +643,7 @@ main(int  argc,		/* I - Number of command-line arguments */
 
         switch (Orientation)
 	{
-	  case 0 : /* Portrait */
+	  default : /* Portrait */
 	      pos = XPosition;
 	      break;
 	  case 1 : /* Landscape */
@@ -672,7 +672,7 @@ main(int  argc,		/* I - Number of command-line arguments */
 
         switch (Orientation)
 	{
-	  case 0 : /* Portrait */
+	  default : /* Portrait */
 	      pos = YPosition;
 	      break;
 	  case 1 : /* Landscape */
@@ -924,5 +924,5 @@ ps_ascii85(ib_t *data,		/* I - Data to print */
 
 
 /*
- * End of "$Id: imagetops.c,v 1.36.2.13 2003/02/24 20:09:42 mike Exp $".
+ * End of "$Id: imagetops.c,v 1.36.2.14 2003/04/10 14:13:50 mike Exp $".
  */
