@@ -3349,7 +3349,7 @@ use your favorite text editor to make changes to it.
 <!-- NEED 4in -->
 <H2>Client Directives</H2>
 
-<P>The <VAR>client.conf</VAR> file contains many directives that
+<P>The <VAR>client.conf</VAR> file contains two directives that
 determine how the client behaves:</P>
 
 <UL>

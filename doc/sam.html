@@ -20,7 +20,7 @@ PRE { font-family: monospace }
 --></STYLE>
 </HEAD>
 <BODY BGCOLOR="white">
-<CENTER><A HREF="#CONTENTS"><IMG SRC="images/cups-large.gif" BORDER="0" WIDTH="431" HEIGHT="511"><BR>
+<CENTER><A HREF="#CONTENTS"><IMG SRC="images/cups-large.gif" BORDER="0" WIDTH="431" HEIGHT="511" ALT="CUPS Software Administrators Manual"><BR>
 <H1>CUPS Software Administrators Manual</H1></A><BR>
 CUPS-SAM-1.1.21<BR>
 Easy Software Products<BR>
@@ -50,29 +50,32 @@ Copyright 1997-2004, All Rights Reserved<BR>
 </UL>
 <B><A HREF="#BUILDING_INSTALLING">2 - Building and Installing CUPS</A></B>
 <UL>
-<LI><A HREF="#3_1">Installing a Source Distribution</A></LI>
+<LI><A HREF="#3_1">Installing a Source Distribution</A>
 <UL>
 <LI><A HREF="#REQUIREMENTS">Requirements</A></LI>
 <LI><A HREF="#COMPILING">Compiling CUPS</A></LI>
 <LI><A HREF="#INSTALLING">Installing the Software</A></LI>
 <LI><A HREF="#RUNNING">Running the Software</A></LI>
 </UL>
-<LI><A HREF="#BINARY">Installing a Binary Distribution</A></LI>
+</LI>
+<LI><A HREF="#BINARY">Installing a Binary Distribution</A>
 <UL>
 <LI><A HREF="#PORTABLE-BINARY">Installing a Portable Distribution</A></LI>
 <LI><A HREF="#RPM-BINARY">Installing an RPM Distribution</A></LI>
 <LI><A HREF="#DPKG-BINARY">Installing an Debian Distribution</A></LI>
 </UL>
+</LI>
 </UL>
 <B><A HREF="#MANAGING_PRINTERS">3 - Managing Printers</A></B>
 <UL>
 <LI><A HREF="#4_1">The Basics</A></LI>
-<LI><A HREF="#4_2">Adding Your First Printer</A></LI>
+<LI><A HREF="#4_2">Adding Your First Printer</A>
 <UL>
 <LI><A HREF="#4_2_1">Adding Your First Printer from the Command-Line</A></LI>
 <LI><A HREF="#ADD_WEB">Adding Your First Printer from the Web</A></LI>
 </UL>
-<LI><A HREF="#4_3">Managing Printers from the Command-Line</A></LI>
+</LI>
+<LI><A HREF="#4_3">Managing Printers from the Command-Line</A>
 <UL>
 <LI><A HREF="#4_3_1">Adding and Modifying Printers</A></LI>
 <LI><A HREF="#4_3_2">Deleting Printers</A></LI>
@@ -82,6 +85,7 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#4_3_6">Setting Quotas on a Printer</A></LI>
 <LI><A HREF="#4_3_7">Restricting User Access to a Printer</A></LI>
 </UL>
+</LI>
 <LI><A HREF="#4_4">Managing Printers from the Web</A></LI>
 </UL>
 <B><A HREF="#PRINTER_CLASSES">4 - Printer Classes</A></B>
@@ -93,7 +97,7 @@ Copyright 1997-2004, All Rights Reserved<BR>
 </UL>
 <B><A HREF="#CLIENT_SETUP">5 - Client Setup</A></B>
 <UL>
-<LI><A HREF="#6_1">The Basics</A></LI>
+<LI><A HREF="#6_1">The Basics</A>
 <UL>
 <LI><A HREF="#CLIENT_MANUAL">Manual Configuration of Print Queues</A></LI>
 <LI><A HREF="#CLIENT_SERVER">Specifying a Single Server for Printing</A></LI>
@@ -101,6 +105,7 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#CLIENT_POLL">Specifying Multiple Servers for Printing</A></LI>
 <LI><A HREF="#CLIENT_RELAY">Relaying Printers to Other Clients</A></LI>
 </UL>
+</LI>
 <LI><A HREF="#6_2">Load Balancing and Failsafe Operation</A></LI>
 </UL>
 <B><A HREF="#PRINTING_MANAGEMENT">6 - Printing System Management</A></B>
@@ -108,7 +113,7 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#7_1">The Basics</A></LI>
 <LI><A HREF="#RESTARTING">Restarting the CUPS Server</A></LI>
 <LI><A HREF="#7_3">Changing the Server Configuration</A></LI>
-<LI><A HREF="#7_4">Server Directives</A></LI>
+<LI><A HREF="#7_4">Server Directives</A>
 <UL>
 <LI><A HREF="#AccessLog">AccessLog</A></LI>
 <LI><A HREF="#Allow">Allow</A></LI>
@@ -197,14 +202,16 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#Timeout">Timeout</A></LI>
 <LI><A HREF="#User">User</A></LI>
 </UL>
+</LI>
 <LI><A HREF="#7_5">Changing the Client Configuration</A></LI>
-<LI><A HREF="#7_6">Client Directives</A></LI>
+<LI><A HREF="#7_6">Client Directives</A>
 <UL>
 <LI><A HREF="#Encryption">Encryption</A></LI>
 <LI><A HREF="#ServerName">ServerName</A></LI>
 </UL>
+</LI>
 <LI><A HREF="#7_7">Changing the Printer Configuration</A></LI>
-<LI><A HREF="#7_8">Printer Directives</A></LI>
+<LI><A HREF="#7_8">Printer Directives</A>
 <UL>
 <LI><A HREF="#Accepting">Accepting</A></LI>
 <LI><A HREF="#AllowUser">AllowUser</A></LI>
@@ -221,8 +228,9 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#State">State</A></LI>
 <LI><A HREF="#StateMessage">StateMessage</A></LI>
 </UL>
+</LI>
 <LI><A HREF="#7_9">Changing the Classes Configuration</A></LI>
-<LI><A HREF="#7_10">Classes Directives</A></LI>
+<LI><A HREF="#7_10">Classes Directives</A>
 <UL>
 <LI><A HREF="#ClassAccepting">Accepting</A></LI>
 <LI><A HREF="#ClassAllowUser">AllowUser</A></LI>
@@ -239,20 +247,23 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#ClassState">State</A></LI>
 <LI><A HREF="#ClassStateMessage">StateMessage</A></LI>
 </UL>
-<LI><A HREF="#PRINTING_SECURITY">Printing System Security</A></LI>
+</LI>
+<LI><A HREF="#PRINTING_SECURITY">Printing System Security</A>
 <UL>
 <LI><A HREF="#CERTIFICATES">Authentication Using Certificates</A></LI>
 <LI><A HREF="#7_11_2">Using Basic Authentication</A></LI>
 <LI><A HREF="#7_11_3">Using Digest Authentication</A></LI>
 <LI><A HREF="#7_11_4">System and Group Authentication</A></LI>
 </UL>
-<LI><A HREF="#PRINTER_ACCOUNTING">Printer Accounting</A></LI>
+</LI>
+<LI><A HREF="#PRINTER_ACCOUNTING">Printer Accounting</A>
 <UL>
 <LI><A HREF="#7_12_1">The access_log File</A></LI>
 <LI><A HREF="#7_12_2">The error_log File</A></LI>
 <LI><A HREF="#7_12_3">The page_log File</A></LI>
 </UL>
-<LI><A HREF="#FILE_TYPING_FILTERING">File Typing and Filtering</A></LI>
+</LI>
+<LI><A HREF="#FILE_TYPING_FILTERING">File Typing and Filtering</A>
 <UL>
 <LI><A HREF="#7_13_1">mime.types</A></LI>
 <LI><A HREF="#7_13_2">mime.convs</A></LI>
@@ -260,6 +271,7 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#7_13_4">Printer Drivers and PPD Files</A></LI>
 <LI><A HREF="#7_13_5">Writing Your Own Filter or Printer Driver</A></LI>
 </UL>
+</LI>
 </UL>
 <B><A HREF="#PRINTING_OTHER">7 - Printing with Other Systems</A></B>
 <UL>
@@ -267,23 +279,25 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#8_2">Printing from LPD Clients</A></LI>
 <LI><A HREF="#LPD">Printing to LPD Servers</A></LI>
 <LI><A HREF="#8_4">Printing from Mac OS 10.2 and Later Clients</A></LI>
-<LI><A HREF="#8_5">Printing from Mac OS 10.1 and Earlier Clients</A></LI>
+<LI><A HREF="#8_5">Printing from Mac OS 10.1 and Earlier Clients</A>
 <UL>
 <LI><A HREF="#8_5_1">Columbia Appletalk Package (CAP)</A></LI>
 <LI><A HREF="#8_5_2">XINET KA/Spool</A></LI>
 <LI><A HREF="#8_5_3">Netatalk</A></LI>
 </UL>
+</LI>
 <LI><A HREF="#8_6">Printing to Mac OS 10.2 and Later Servers</A></LI>
 <LI><A HREF="#8_7">Printing to Mac OS 10.1 and Earlier Servers</A></LI>
-<LI><A HREF="#8_8">Printing from Windows Clients</A></LI>
+<LI><A HREF="#8_8">Printing from Windows Clients</A>
 <UL>
 <LI><A HREF="#8_8_1">Exporting Printer Drivers</A></LI>
 </UL>
+</LI>
 <LI><A HREF="#8_9">Printing to Windows Servers</A></LI>
 </UL>
 <B><A HREF="#LICENSE">A - Software License Agreement</A></B>
 <UL>
-<LI><A HREF="#9_1">Common UNIX Printing System License Agreement</A></LI>
+<LI><A HREF="#9_1">Common UNIX Printing System License Agreement</A>
 <UL>
 <LI><A HREF="#9_1_1">Introduction</A></LI>
 <LI><A HREF="#9_1_2">License Exceptions</A></LI>
@@ -291,23 +305,27 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#9_1_4">Binary Distribution Rights</A></LI>
 <LI><A HREF="#9_1_5">Support</A></LI>
 </UL>
-<LI><A HREF="#9_2">GNU GENERAL PUBLIC LICENSE</A></LI>
+</LI>
+<LI><A HREF="#9_2">GNU GENERAL PUBLIC LICENSE</A>
 <UL>
 <LI><A HREF="#9_2_1">Preamble</A></LI>
 </UL>
-<LI><A HREF="#9_3">GNU LIBRARY GENERAL PUBLIC LICENSE</A></LI>
+</LI>
+<LI><A HREF="#9_3">GNU LIBRARY GENERAL PUBLIC LICENSE</A>
 <UL>
 <LI><A HREF="#9_3_1">Preamble</A></LI>
 </UL>
+</LI>
 </UL>
 <B><A HREF="#COMMON_NETWORK">B - Common Network Settings</A></B>
 <UL>
-<LI><A HREF="#10_1">Configuring a Network Interface</A></LI>
+<LI><A HREF="#10_1">Configuring a Network Interface</A>
 <UL>
 <LI><A HREF="#10_1_1">Configuring the IP Address Using ARP</A></LI>
 <LI><A HREF="#10_1_2">Configuring the IP Address Using RARP</A></LI>
 <LI><A HREF="#10_1_3">Configuring the IP Address Using BOOTP</A></LI>
 </UL>
+</LI>
 <LI><A HREF="#10_2">Verifying the Printer Connection</A></LI>
 <LI><A HREF="#10_3">Common Network Interface Settings</A></LI>
 <LI><A HREF="#AXIS">Configuring Axis Print Servers</A></LI>
@@ -3245,7 +3263,7 @@ User guest
 <!-- NEED 4in -->
 </P>
 <H2><A NAME="7_6">Client Directives</A></H2>
-<P>The<VAR> client.conf</VAR> file contains many directives that
+<P>The<VAR> client.conf</VAR> file contains two directives that
  determine how the client behaves:</P>
 <UL>
 <TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0">

@@ -1956,7 +1956,7 @@ void PSOutputDev::startPage(int pageNum, GfxState *state) {
 		 state->getCTM()[0] ? "Portrait" : "Landscape");
       writePS("pdfStartPage\n");
     }
-    if ((width > imageWidth || height > imageHeight) && globalParams->getPSFit()) {
+    if (globalParams->getPSFit()) {
       xScale = (double)imageWidth / (double)width;
       yScale = (double)imageHeight / (double)height;
       if (yScale < xScale) {
