@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.22 1999/08/05 15:39:44 mike Exp $"
+ * "$Id: ipp.c,v 1.23 1999/08/05 16:16:51 mike Exp $"
  *
  *   Internet Printing Protocol support functions for the Common UNIX
  *   Printing System (CUPS).
@@ -65,7 +65,7 @@
  */
 
 static ipp_attribute_t	*add_attr(ipp_t *ipp, int num_values);
-static int		ipp_read(http_t *http, char *buffer, int length);
+static int		ipp_read(http_t *http, unsigned char *buffer, int length);
 
 
 /*
@@ -867,7 +867,7 @@ ippRead(http_t *http,		/* I - HTTP data */
 
 	    attr->group_tag  = ipp->curtag;
 	    attr->value_tag  = tag;
-	    attr->name       = strdup(buffer);
+	    attr->name       = strdup((char *)buffer);
 	    attr->num_values = 0;
 	  }
 
@@ -913,7 +913,7 @@ ippRead(http_t *http,		/* I - HTTP data */
                 buffer[n] = '\0';
 		DEBUG_printf(("ippRead: value = \'%s\'\n", buffer));
 
-                attr->values[attr->num_values].string.text = strdup(buffer);
+                attr->values[attr->num_values].string.text = strdup((char *)buffer);
 	        break;
 	    case IPP_TAG_DATE :
 	        if (ipp_read(http, buffer, 11) < 11)
@@ -952,7 +952,7 @@ ippRead(http_t *http,		/* I - HTTP data */
 
                 buffer[n] = '\0';
 
-                attr->values[attr->num_values].string.charset = strdup(buffer);
+                attr->values[attr->num_values].string.charset = strdup((char *)buffer);
 
 	        if (ipp_read(http, buffer, 2) < 2)
 		  return (IPP_ERROR);
@@ -964,7 +964,7 @@ ippRead(http_t *http,		/* I - HTTP data */
 
                 buffer[n] = '\0';
 
-                attr->values[attr->num_values].string.text = strdup(buffer);
+                attr->values[attr->num_values].string.text = strdup((char *)buffer);
 	        break;
 	  }
 
@@ -1073,7 +1073,7 @@ ippWrite(http_t *http,		/* I - HTTP data */
 	*bufptr++ = ipp->request.any.request_id >> 8;
 	*bufptr++ = ipp->request.any.request_id;
 
-        if (httpWrite(http, buffer, bufptr - buffer) < 0)
+        if (httpWrite(http, (char *)buffer, bufptr - buffer) < 0)
 	{
 	  DEBUG_puts("ippWrite: Could not write IPP header...");
 	  return (IPP_ERROR);
@@ -1329,7 +1329,7 @@ ippWrite(http_t *http,		/* I - HTTP data */
 	  * Write the data out...
 	  */
 
-          if (httpWrite(http, buffer, bufptr - buffer) < 0)
+          if (httpWrite(http, (char *)buffer, bufptr - buffer) < 0)
 	  {
 	    DEBUG_puts("ippWrite: Could not write IPP attribute...");
 	    return (IPP_ERROR);
@@ -1352,7 +1352,7 @@ ippWrite(http_t *http,		/* I - HTTP data */
 	  */
 
           buffer[0] = IPP_TAG_END;
-	  if (httpWrite(http, buffer, 1) < 0)
+	  if (httpWrite(http, (char *)buffer, 1) < 0)
 	  {
 	    DEBUG_puts("ippWrite: Could not write IPP end-tag...");
 	    return (IPP_ERROR);
@@ -1429,13 +1429,13 @@ add_attr(ipp_t *ipp,			/* I - IPP request */
  * 'ipp_read()' - Semi-blocking read on a HTTP connection...
  */
 
-static int		/* O - Number of bytes read */
-ipp_read(http_t *http,	/* I - Client connection */
-         char   *buffer,/* O - Buffer for data */
-	 int    length)	/* I - Total length */
+static int			/* O - Number of bytes read */
+ipp_read(http_t        *http,	/* I - Client connection */
+         unsigned char *buffer,	/* O - Buffer for data */
+	 int           length)	/* I - Total length */
 {
-  int	tbytes,		/* Total bytes read */
-	bytes;		/* Bytes read this pass */
+  int	tbytes,			/* Total bytes read */
+	bytes;			/* Bytes read this pass */
 
 
  /*
@@ -1443,7 +1443,7 @@ ipp_read(http_t *http,	/* I - Client connection */
   */
 
   for (tbytes = 0; tbytes < length; tbytes += bytes, buffer += bytes)
-    if ((bytes = httpRead(http, buffer, length - tbytes)) <= 0)
+    if ((bytes = httpRead(http, (char *)buffer, length - tbytes)) <= 0)
       break;
 
  /*
@@ -1455,5 +1455,5 @@ ipp_read(http_t *http,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.22 1999/08/05 15:39:44 mike Exp $".
+ * End of "$Id: ipp.c,v 1.23 1999/08/05 16:16:51 mike Exp $".
  */
