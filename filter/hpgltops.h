@@ -1,9 +1,9 @@
 /*
- * "$Id: hpgltops.h,v 1.22 2003/11/07 21:41:38 mike Exp $"
+ * "$Id: hpgltops.h,v 1.23 2004/02/25 20:14:52 mike Exp $"
  *
  *   HP-GL/2 to PostScript filter for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1993-2003 by Easy Software Products.
+ *   Copyright 1993-2004 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -237,5 +237,5 @@ extern void	OutputTrailer(void);
 extern int	Outputf(const char *format, ...);
 
 /*
- * End of "$Id: hpgltops.h,v 1.22 2003/11/07 21:41:38 mike Exp $".
+ * End of "$Id: hpgltops.h,v 1.23 2004/02/25 20:14:52 mike Exp $".
  */

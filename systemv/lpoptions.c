@@ -1,9 +1,9 @@
 /*
- * "$Id: lpoptions.c,v 1.17 2003/04/10 18:41:39 mike Exp $"
+ * "$Id: lpoptions.c,v 1.18 2004/02/25 20:14:54 mike Exp $"
  *
  *   Printer option program for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2003 by Easy Software Products.
+ *   Copyright 1997-2004 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -438,5 +438,5 @@ usage(void)
 
 
 /*
- * End of "$Id: lpoptions.c,v 1.17 2003/04/10 18:41:39 mike Exp $".
+ * End of "$Id: lpoptions.c,v 1.18 2004/02/25 20:14:54 mike Exp $".
  */

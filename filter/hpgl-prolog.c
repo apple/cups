@@ -1,9 +1,9 @@
 /*
- * "$Id: hpgl-prolog.c,v 1.37 2003/09/12 20:19:14 mike Exp $"
+ * "$Id: hpgl-prolog.c,v 1.38 2004/02/25 20:14:52 mike Exp $"
  *
  *   HP-GL/2 prolog routines for for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1993-2003 by Easy Software Products.
+ *   Copyright 1993-2004 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -373,5 +373,5 @@ Outputf(const char *format,	/* I - Printf-style string */
 
 
 /*
- * End of "$Id: hpgl-prolog.c,v 1.37 2003/09/12 20:19:14 mike Exp $".
+ * End of "$Id: hpgl-prolog.c,v 1.38 2004/02/25 20:14:52 mike Exp $".
  */

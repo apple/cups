@@ -1,9 +1,9 @@
 /*
- * "$Id: log.c,v 1.38 2003/10/09 19:13:30 mike Exp $"
+ * "$Id: log.c,v 1.39 2004/02/25 20:14:53 mike Exp $"
  *
  *   Log file routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2003 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2004 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -528,5 +528,5 @@ check_log_file(cups_file_t **log,	/* IO - Log file */
 
 
 /*
- * End of "$Id: log.c,v 1.38 2003/10/09 19:13:30 mike Exp $".
+ * End of "$Id: log.c,v 1.39 2004/02/25 20:14:53 mike Exp $".
  */

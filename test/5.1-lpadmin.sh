@@ -1,10 +1,10 @@
 #!/bin/sh
 #
-# "$Id: 5.1-lpadmin.sh,v 1.3 2002/12/17 19:00:24 swdev Exp $"
+# "$Id: 5.1-lpadmin.sh,v 1.4 2004/02/25 20:14:54 mike Exp $"
 #
 #   Test the lpadmin command.
 #
-#   Copyright 1997-2003 by Easy Software Products, all rights reserved.
+#   Copyright 1997-2004 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
 #   property of Easy Software Products and are protected by Federal
@@ -60,5 +60,5 @@ fi
 echo ""
 
 #
-# End of "$Id: 5.1-lpadmin.sh,v 1.3 2002/12/17 19:00:24 swdev Exp $".
+# End of "$Id: 5.1-lpadmin.sh,v 1.4 2004/02/25 20:14:54 mike Exp $".
 #

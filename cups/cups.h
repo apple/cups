@@ -1,9 +1,9 @@
 /*
- * "$Id: cups.h,v 1.53 2004/02/24 19:03:53 mike Exp $"
+ * "$Id: cups.h,v 1.54 2004/02/25 20:14:51 mike Exp $"
  *
  *   API definitions for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2003 by Easy Software Products.
+ *   Copyright 1997-2004 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -189,5 +189,5 @@ extern http_status_t	cupsPutFd(http_t *http, const char *resource, int fd);
 #endif /* !_CUPS_CUPS_H_ */
 
 /*
- * End of "$Id: cups.h,v 1.53 2004/02/24 19:03:53 mike Exp $".
+ * End of "$Id: cups.h,v 1.54 2004/02/25 20:14:51 mike Exp $".
  */

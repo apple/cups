@@ -1,9 +1,9 @@
 /*
- * "$Id: lpmove.c,v 1.11 2003/01/15 04:15:50 mike Exp $"
+ * "$Id: lpmove.c,v 1.12 2004/02/25 20:14:54 mike Exp $"
  *
  *   "lpmove" command for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2003 by Easy Software Products.
+ *   Copyright 1997-2004 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -231,5 +231,5 @@ move_job(http_t     *http,	/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpmove.c,v 1.11 2003/01/15 04:15:50 mike Exp $".
+ * End of "$Id: lpmove.c,v 1.12 2004/02/25 20:14:54 mike Exp $".
  */

@@ -1,10 +1,10 @@
 #!/bin/sh
 #
-# "$Id: pstoraster.in,v 1.5 2003/07/20 22:47:42 mike Exp $"
+# "$Id: pstoraster.in,v 1.6 2004/02/25 20:14:53 mike Exp $"
 #
 # CUPS raster filter script for Ghostscript.
 #
-# Copyright 2001-2003 by Easy Software Products.
+# Copyright 2001-2004 by Easy Software Products.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -58,5 +58,5 @@ echo DEBUG: Running $bindir/@GS@ $gsopts -sOUTPUTFILE="%stdout" -c"$profile" "$i
 $bindir/@GS@ $gsopts -sOUTPUTFILE="%stdout" -c"$profile" "$ifile"
 
 #
-# End of "$Id: pstoraster.in,v 1.5 2003/07/20 22:47:42 mike Exp $".
+# End of "$Id: pstoraster.in,v 1.6 2004/02/25 20:14:53 mike Exp $".
 #

@@ -1,9 +1,9 @@
 /*
- * "$Id: textcommon.h,v 1.12 2002/12/17 18:59:30 swdev Exp $"
+ * "$Id: textcommon.h,v 1.13 2004/02/25 20:14:52 mike Exp $"
  *
  *   Common text filter definitions for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2003 by Easy Software Products.
+ *   Copyright 1997-2004 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -118,5 +118,5 @@ extern void	WriteProlog(const char *title, const char *user,
 
 
 /*
- * End of "$Id: textcommon.h,v 1.12 2002/12/17 18:59:30 swdev Exp $".
+ * End of "$Id: textcommon.h,v 1.13 2004/02/25 20:14:52 mike Exp $".
  */

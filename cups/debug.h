@@ -1,9 +1,9 @@
 /*
- * "$Id: debug.h,v 1.7 2002/12/17 18:56:41 swdev Exp $"
+ * "$Id: debug.h,v 1.8 2004/02/25 20:14:51 mike Exp $"
  *
  *   Debugging macros for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2003 by Easy Software Products.
+ *   Copyright 1997-2004 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -55,5 +55,5 @@
 #endif /* !_CUPS_DEBUG_H_ */
 
 /*
- * End of "$Id: debug.h,v 1.7 2002/12/17 18:56:41 swdev Exp $".
+ * End of "$Id: debug.h,v 1.8 2004/02/25 20:14:51 mike Exp $".
  */

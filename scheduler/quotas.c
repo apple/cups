@@ -1,9 +1,9 @@
 /*
- * "$Id: quotas.c,v 1.9 2003/01/03 22:02:37 mike Exp $"
+ * "$Id: quotas.c,v 1.10 2004/02/25 20:14:53 mike Exp $"
  *
  *   Quota routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2003 by Easy Software Products.
+ *   Copyright 1997-2004 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -234,5 +234,5 @@ compare(const quota_t *q1,		/* I - First quota record */
 
 
 /*
- * End of "$Id: quotas.c,v 1.9 2003/01/03 22:02:37 mike Exp $".
+ * End of "$Id: quotas.c,v 1.10 2004/02/25 20:14:53 mike Exp $".
  */

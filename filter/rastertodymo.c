@@ -1,9 +1,9 @@
 /*
- * "$Id: rastertodymo.c,v 1.11 2003/11/05 19:20:31 mike Exp $"
+ * "$Id: rastertodymo.c,v 1.12 2004/02/25 20:14:52 mike Exp $"
  *
  *   DYMO label printer filter for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2001-2003 by Easy Software Products.
+ *   Copyright 2001-2004 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -389,5 +389,5 @@ main(int  argc,		/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: rastertodymo.c,v 1.11 2003/11/05 19:20:31 mike Exp $".
+ * End of "$Id: rastertodymo.c,v 1.12 2004/02/25 20:14:52 mike Exp $".
  */

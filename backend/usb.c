@@ -1,9 +1,9 @@
 /*
- * "$Id: usb.c,v 1.50 2004/02/24 16:19:45 mike Exp $"
+ * "$Id: usb.c,v 1.51 2004/02/25 20:14:50 mike Exp $"
  *
  *   USB port backend for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2003 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2004 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -825,5 +825,5 @@ open_device(const char *uri)		/* I - Device URI */
 
 
 /*
- * End of "$Id: usb.c,v 1.50 2004/02/24 16:19:45 mike Exp $".
+ * End of "$Id: usb.c,v 1.51 2004/02/25 20:14:50 mike Exp $".
  */

@@ -1,10 +1,10 @@
 /*
- * "$Id: ipp.h,v 1.47 2003/03/14 22:16:21 mike Exp $"
+ * "$Id: ipp.h,v 1.48 2004/02/25 20:14:51 mike Exp $"
  *
  *   Internet Printing Protocol definitions for the Common UNIX Printing
  *   System (CUPS).
  *
- *   Copyright 1997-2003 by Easy Software Products.
+ *   Copyright 1997-2004 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -463,5 +463,5 @@ extern void		_ipp_free_attr(ipp_attribute_t *);
 #endif /* !_CUPS_IPP_H_ */
 
 /*
- * End of "$Id: ipp.h,v 1.47 2003/03/14 22:16:21 mike Exp $".
+ * End of "$Id: ipp.h,v 1.48 2004/02/25 20:14:51 mike Exp $".
  */

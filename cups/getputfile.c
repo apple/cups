@@ -1,9 +1,9 @@
 /*
- * "$Id: getputfile.c,v 1.4 2004/02/05 20:50:41 mike Exp $"
+ * "$Id: getputfile.c,v 1.5 2004/02/25 20:14:51 mike Exp $"
  *
  *   Get/put file functions for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2003 by Easy Software Products.
+ *   Copyright 1997-2004 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -415,5 +415,5 @@ cupsPutFile(http_t     *http,		/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: getputfile.c,v 1.4 2004/02/05 20:50:41 mike Exp $".
+ * End of "$Id: getputfile.c,v 1.5 2004/02/25 20:14:51 mike Exp $".
  */

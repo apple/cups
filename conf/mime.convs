@@ -1,9 +1,9 @@
 #
-# "$Id: mime.convs,v 1.19 2003/05/12 17:38:18 mike Exp $"
+# "$Id: mime.convs,v 1.20 2004/02/25 20:14:51 mike Exp $"
 #
 #   MIME converts file for the Common UNIX Printing System (CUPS).
 #
-#   Copyright 1997-2003 by Easy Software Products.
+#   Copyright 1997-2004 by Easy Software Products.
 #
 #   These coded instructions, statements, and computer programs are the
 #   property of Easy Software Products and are protected by Federal
@@ -114,5 +114,5 @@ image/x-sun-raster	application/vnd.cups-raster	100	imagetoraster
 #application/octet-stream	application/vnd.cups-raw	0	-
 
 #
-# End of "$Id: mime.convs,v 1.19 2003/05/12 17:38:18 mike Exp $".
+# End of "$Id: mime.convs,v 1.20 2004/02/25 20:14:51 mike Exp $".
 #

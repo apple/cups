@@ -1,9 +1,9 @@
 /*
- * "$Id: testipp.c,v 1.5 2003/04/14 18:33:26 mike Exp $"
+ * "$Id: testipp.c,v 1.6 2004/02/25 20:14:51 mike Exp $"
  *
  *   IPP test program for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2003 by Easy Software Products.
+ *   Copyright 1997-2004 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -517,5 +517,5 @@ write_cb(void        *data,		/* I - Data */
 
 
 /*
- * End of "$Id: testipp.c,v 1.5 2003/04/14 18:33:26 mike Exp $".
+ * End of "$Id: testipp.c,v 1.6 2004/02/25 20:14:51 mike Exp $".
  */

@@ -1,9 +1,9 @@
 /*
- * "$Id: hpgl-char.c,v 1.18 2003/11/07 21:41:37 mike Exp $"
+ * "$Id: hpgl-char.c,v 1.19 2004/02/25 20:14:51 mike Exp $"
  *
  *   HP-GL/2 character processing for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1993-2003 by Easy Software Products.
+ *   Copyright 1993-2004 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -636,5 +636,5 @@ TD_transparent_data(int     num_params,	/* I - Number of parameters */
 
 
 /*
- * End of "$Id: hpgl-char.c,v 1.18 2003/11/07 21:41:37 mike Exp $".
+ * End of "$Id: hpgl-char.c,v 1.19 2004/02/25 20:14:51 mike Exp $".
  */

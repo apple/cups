@@ -1,9 +1,9 @@
 /*
- * "$Id: main.c,v 1.113 2004/02/25 16:20:04 mike Exp $"
+ * "$Id: main.c,v 1.114 2004/02/25 20:14:53 mike Exp $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2003 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2004 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -1153,5 +1153,5 @@ usage(void)
 
 
 /*
- * End of "$Id: main.c,v 1.113 2004/02/25 16:20:04 mike Exp $".
+ * End of "$Id: main.c,v 1.114 2004/02/25 20:14:53 mike Exp $".
  */

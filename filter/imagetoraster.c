@@ -1,9 +1,9 @@
 /*
- * "$Id: imagetoraster.c,v 1.72 2004/02/25 19:41:13 mike Exp $"
+ * "$Id: imagetoraster.c,v 1.73 2004/02/25 20:14:52 mike Exp $"
  *
  *   Image file to raster filter for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1993-2003 by Easy Software Products.
+ *   Copyright 1993-2004 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -4594,5 +4594,5 @@ make_lut(ib_t  *lut,		/* I - Lookup table */
 
 
 /*
- * End of "$Id: imagetoraster.c,v 1.72 2004/02/25 19:41:13 mike Exp $".
+ * End of "$Id: imagetoraster.c,v 1.73 2004/02/25 20:14:52 mike Exp $".
  */

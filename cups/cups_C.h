@@ -18,7 +18,7 @@
 "Cyan",
 "Magenta",
 "Yellow",
-"Copyright 1993-2003 by Easy Software Products, All Rights Reserved.",
+"Copyright 1993-2004 by Easy Software Products, All Rights Reserved.",
 "General",
 "Printer",
 "Image",

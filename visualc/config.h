@@ -1,9 +1,9 @@
 /*
- * "$Id: config.h,v 1.12 2003/11/05 19:11:42 mike Exp $"
+ * "$Id: config.h,v 1.13 2004/02/25 20:14:54 mike Exp $"
  *
  *   Configuration file for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2003 by Easy Software Products.
+ *   Copyright 1997-2004 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -286,5 +286,5 @@
 
 
 /*
- * End of "$Id: config.h,v 1.12 2003/11/05 19:11:42 mike Exp $".
+ * End of "$Id: config.h,v 1.13 2004/02/25 20:14:54 mike Exp $".
  */

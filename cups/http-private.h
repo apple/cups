@@ -1,9 +1,9 @@
 /*
- * "$Id: http-private.h,v 1.5 2003/11/24 15:38:46 mike Exp $"
+ * "$Id: http-private.h,v 1.6 2004/02/25 20:14:51 mike Exp $"
  *
  *   Private HTTP definitions for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2003 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2004 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -98,5 +98,5 @@ extern const char *hstrerror(int error);
 #endif /* !_CUPS_HTTP_PRIVATE_H_ */
 
 /*
- * End of "$Id: http-private.h,v 1.5 2003/11/24 15:38:46 mike Exp $".
+ * End of "$Id: http-private.h,v 1.6 2004/02/25 20:14:51 mike Exp $".
  */

@@ -1,9 +1,9 @@
 dnl
-dnl "$Id: configure.in,v 1.108 2003/03/14 17:04:08 mike Exp $"
+dnl "$Id: configure.in,v 1.109 2004/02/25 20:14:50 mike Exp $"
 dnl
 dnl   Configuration script for the Common UNIX Printing System (CUPS).
 dnl
-dnl   Copyright 1997-2003 by Easy Software Products, all rights reserved.
+dnl   Copyright 1997-2004 by Easy Software Products, all rights reserved.
 dnl
 dnl   These coded instructions, statements, and computer programs are the
 dnl   property of Easy Software Products and are protected by Federal
@@ -46,5 +46,5 @@ AC_OUTPUT(Makedefs cups.list cups.sh cups-config conf/cupsd.conf conf/pam.conf)
 chmod +x cups-config
 
 dnl
-dnl End of "$Id: configure.in,v 1.108 2003/03/14 17:04:08 mike Exp $".
+dnl End of "$Id: configure.in,v 1.109 2004/02/25 20:14:50 mike Exp $".
 dnl

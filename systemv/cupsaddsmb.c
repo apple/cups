@@ -1,9 +1,9 @@
 /*
- * "$Id: cupsaddsmb.c,v 1.16 2003/11/17 22:04:53 mike Exp $"
+ * "$Id: cupsaddsmb.c,v 1.17 2004/02/25 20:14:53 mike Exp $"
  *
  *   "cupsaddsmb" command for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2001-2003 by Easy Software Products.
+ *   Copyright 2001-2004 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -590,5 +590,5 @@ usage()
 
 
 /*
- * End of "$Id: cupsaddsmb.c,v 1.16 2003/11/17 22:04:53 mike Exp $".
+ * End of "$Id: cupsaddsmb.c,v 1.17 2004/02/25 20:14:53 mike Exp $".
  */

@@ -1,9 +1,9 @@
 /*
- * "$Id: socket.c,v 1.39 2003/10/09 19:13:28 mike Exp $"
+ * "$Id: socket.c,v 1.40 2004/02/25 20:14:50 mike Exp $"
  *
  *   AppSocket backend for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2003 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2004 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -414,5 +414,5 @@ print_backchannel(const unsigned char *buffer,	/* I - Data buffer */
 
 
 /*
- * End of "$Id: socket.c,v 1.39 2003/10/09 19:13:28 mike Exp $".
+ * End of "$Id: socket.c,v 1.40 2004/02/25 20:14:50 mike Exp $".
  */

@@ -1,10 +1,10 @@
 #!/bin/sh
 #
-# "$Id: 5.6-lpr.sh,v 1.6 2003/04/23 18:38:37 mike Exp $"
+# "$Id: 5.6-lpr.sh,v 1.7 2004/02/25 20:14:54 mike Exp $"
 #
 #   Test the lpr command.
 #
-#   Copyright 1997-2003 by Easy Software Products, all rights reserved.
+#   Copyright 1997-2004 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
 #   property of Easy Software Products and are protected by Federal
@@ -67,5 +67,5 @@ fi
 echo ""
 
 #
-# End of "$Id: 5.6-lpr.sh,v 1.6 2003/04/23 18:38:37 mike Exp $".
+# End of "$Id: 5.6-lpr.sh,v 1.7 2004/02/25 20:14:54 mike Exp $".
 #

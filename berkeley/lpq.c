@@ -1,9 +1,9 @@
 /*
- * "$Id: lpq.c,v 1.27 2004/02/25 16:58:16 mike Exp $"
+ * "$Id: lpq.c,v 1.28 2004/02/25 20:14:50 mike Exp $"
  *
  *   "lpq" command for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2003 by Easy Software Products.
+ *   Copyright 1997-2004 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -569,5 +569,5 @@ usage(void)
 
 
 /*
- * End of "$Id: lpq.c,v 1.27 2004/02/25 16:58:16 mike Exp $".
+ * End of "$Id: lpq.c,v 1.28 2004/02/25 20:14:50 mike Exp $".
  */

@@ -1,10 +1,10 @@
 /*
- * "$Id: rastertoepson.c,v 1.18 2004/02/24 16:19:45 mike Exp $"
+ * "$Id: rastertoepson.c,v 1.19 2004/02/25 20:14:52 mike Exp $"
  *
  *   EPSON ESC/P and ESC/P2 filter for the Common UNIX Printing System
  *   (CUPS).
  *
- *   Copyright 1993-2003 by Easy Software Products.
+ *   Copyright 1993-2004 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -1133,5 +1133,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: rastertoepson.c,v 1.18 2004/02/24 16:19:45 mike Exp $".
+ * End of "$Id: rastertoepson.c,v 1.19 2004/02/25 20:14:52 mike Exp $".
  */

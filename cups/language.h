@@ -1,9 +1,9 @@
 /*
- * "$Id: language.h,v 1.31 2003/10/31 23:10:17 mike Exp $"
+ * "$Id: language.h,v 1.32 2004/02/25 20:14:51 mike Exp $"
  *
  *   Multi-language support for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2003 by Easy Software Products.
+ *   Copyright 1997-2004 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -224,5 +224,5 @@ extern char		*_cupsSaveLocale(int category, const char *locale);
 #endif /* !_CUPS_LANGUAGE_H_ */
 
 /*
- * End of "$Id: language.h,v 1.31 2003/10/31 23:10:17 mike Exp $".
+ * End of "$Id: language.h,v 1.32 2004/02/25 20:14:51 mike Exp $".
  */

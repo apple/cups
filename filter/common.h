@@ -1,9 +1,9 @@
 /*
- * "$Id: common.h,v 1.13 2002/12/17 18:59:24 swdev Exp $"
+ * "$Id: common.h,v 1.14 2004/02/25 20:14:51 mike Exp $"
  *
  *   Common filter definitions for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2003 by Easy Software Products.
+ *   Copyright 1997-2004 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -88,5 +88,5 @@ extern void	WriteLabels(int orient);
 
 
 /*
- * End of "$Id: common.h,v 1.13 2002/12/17 18:59:24 swdev Exp $".
+ * End of "$Id: common.h,v 1.14 2004/02/25 20:14:51 mike Exp $".
  */

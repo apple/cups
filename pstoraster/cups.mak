@@ -1,9 +1,9 @@
 #
-# "$Id: cups.mak,v 1.6 2004/02/24 21:59:13 mike Exp $"
+# "$Id: cups.mak,v 1.7 2004/02/25 20:14:53 mike Exp $"
 #
 # CUPS driver makefile for Ghostscript.
 #
-# Copyright 2001-2003 by Easy Software Products.
+# Copyright 2001-2004 by Easy Software Products.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -49,5 +49,5 @@ install-cups:
 
 
 #
-# End of "$Id: cups.mak,v 1.6 2004/02/24 21:59:13 mike Exp $".
+# End of "$Id: cups.mak,v 1.7 2004/02/25 20:14:53 mike Exp $".
 #
