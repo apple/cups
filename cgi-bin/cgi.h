@@ -1,14 +1,17 @@
 /*
- * "$Id: cgi.h,v 1.1 1997/05/08 19:55:53 mike Exp $"
+ * "$Id: cgi.h,v 1.2 1997/05/08 20:01:03 mike Exp $"
  *
  *   CGI support library definitions.
  *
  * Revision History:
  *
  *   $Log: cgi.h,v $
- *   Revision 1.1  1997/05/08 19:55:53  mike
- *   Initial revision
+ *   Revision 1.2  1997/05/08 20:01:03  mike
+ *   Changed function names to cgiName instead of CGI_Name
+ *   Added HTML functions.
  *
+ *   Revision 1.1  1997/05/08  19:55:53  mike
+ *   Initial revision
  */
 
 #ifndef _CGI_H_
@@ -38,5 +41,5 @@ extern void	cgiEndHTML(FILE *out);
 #endif /* !_CGI_H_ */
 
 /*
- * End of "$Id: cgi.h,v 1.1 1997/05/08 19:55:53 mike Exp $".
+ * End of "$Id: cgi.h,v 1.2 1997/05/08 20:01:03 mike Exp $".
  */
