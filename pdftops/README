@@ -1,0 +1,348 @@
+xpdf
+====
+
+version 0.90
+99-aug-02
+
+The xpdf software and documentation are
+copyright 1996-1999 Derek B. Noonburg.
+
+Email: derekn@foolabs.com
+WWW: http://www.foolabs.com/xpdf/
+
+The PDF data structures, operators, and specification are
+copyright 1995 Adobe Systems Inc.
+
+
+What is xpdf?
+-------------
+
+Xpdf is a viewer for Portable Document Format (PDF) files.  (These are
+also sometimes also called 'Acrobat' files, from the name of Adobe's
+PDF software.)  Xpdf runs under the X Window System on UNIX, VMS, and
+OS/2.  The non-X components of the package (pdftops, pdftotext, etc.)
+also run on Win32 systems and should run on pretty much any system
+with a decent C++ compiler.
+
+Xpdf is designed to be small and efficient.  It does not use the Motif
+or Xt libraries.  It can use standard X fonts.
+
+
+Distribution
+------------
+
+Xpdf is licensed under the GNU General Public License (GPL), version
+2.  In my opinion, the GPL is a convoluted, confusing, ambiguous mess.
+But it's also pervasive, and I'm sick of arguing.  And even if it is
+confusing, the basic idea is good.
+
+In order to cut down on the confusion a little bit, here are some
+informal clarifications:
+
+- I don't mind if you redistribute xpdf in source and/or binary form,
+  as long as you include all of the documentation: README, man pages
+  (or help files), and COPYING.  (Note that the README file contains a
+  pointer to a web page with the source code.)
+
+- Selling a CD-ROM that contains xpdf is fine with me, as long as it
+  includes the documentation.  I wouldn't mind receiving a sample
+  copy, but it's not necessary.
+
+- If you make useful changes to xpdf, please make the source code
+  available -- post it on a web site, email it to me, whatever.
+
+If you're interested in commercial licensing, please contact me by
+email: derekn@foolabs.com .
+
+
+Compatibility
+-------------
+
+Xpdf is developed and tested on a Linux 2.0 x86 system.
+
+In addition, it has been compiled by others on Solaris, AIX, HP-UX,
+SCO UnixWare, Digital Unix, Irix, and numerous other Unix
+implementations, as well as VMS and OS/2.  It should work on pretty
+much any system which runs X11 and has Unix-like libraries.  You'll
+need ANSI C++ and C compilers to compile it.
+
+The non-X components of xpdf (pdftops, pdftotext, pdfinfo, pdfimages)
+can also be compiled on Win32 systems.  See the xpdf web page for
+details.
+
+If you compiled xpdf for a system not listed on the web page, please
+let me know.  If you're willing to make your binary available by ftp
+or on the web, I'll be happy to add a link from the xpdf web page.  I
+have decided not to host any binaries I didn't compile myself (for
+disk space and support reasons).
+
+If you can't get xpdf to compile on your system, send me email and
+I'll try to help.
+
+Xpdf has been ported to the Acorn, Amiga, and BeOS.  See the xpdf web
+page for links.
+
+
+Getting xpdf
+------------
+
+The latest version is available from:
+
+  http://www.foolabs.com/xpdf/
+
+or:
+
+  ftp://ftp.foolabs.com/pub/xpdf/
+
+Source code and several precompiled executables are available.
+
+Announcements of new versions are posted to several newsgroups
+(comp.text.pdf, comp.os.linux.announce, and others) and emailed to a
+list of people.  If you'd like to receive email notification of new
+versions, just let me know.
+
+
+Running xpdf
+------------
+
+To run xpdf, simply type:
+
+  xpdf file.pdf
+
+To generate a PostScript file, hit the "print" button in xpdf, or run
+pdftops:
+
+  pdftops file.pdf
+
+To generate a plain text file, run pdftotext:
+
+  pdftotext file.pdf
+
+There are three additional utilities (which are fully described in
+their man pages):
+
+  pdfinfo -- dumps a PDF file's Info dictionary (plus some other
+             useful information)
+  pdftopbm -- converts a PDF file to a series of PBM-format bitmaps
+  pdfimages -- extracts the images from a PDF file
+
+Command line options and many other details are described in the man
+pages (xpdf.1, etc.) and the VMS help files (xpdf.hlp, etc.).
+
+
+Fonts
+-----
+
+Xpdf uses X server fonts.  It requires the following fonts:
+
+* Courier: medium-r, bold-r, medium-o, and bold-o
+* Helvetica: medium-r, bold-r, medium-o, and bold-o
+* Times: medium-r, bold-r, medium-i, and bold-i
+* Symbol: medium-r
+* Zapf Dingbats: medium-r
+
+Most X installations should already have all of these fonts, except
+Zapf Dingbats.  You can install a Type 1 Zapf Dingbats font -- see the
+mkfontdir(1) man page for details.  Use this font descriptor in your
+fonts.scale file:
+
+    -itc-zapfdingbats-medium-r-normal--0-0-0-0-p-0-adobe-fontspecific
+
+You can get a Type 1 font file from the ghostscript 4.x distribution
+(look for d050000l.pfb).
+
+X servers, starting at R5, support font scaling.  Xpdf will
+automatically take advantage of this.  There are two types of scaling.
+The first type uses standard bitmap fonts: if a font doesn't exist in
+the requested size, the server will scale the bitmapped characters.
+This is reasonably fast, and the results are readable but not very
+pretty.  X servers can also handle true scalable, e.g., Type 1, fonts.
+(See the mkfontdir(1) man page for details on setting these up.)
+Scalable fonts are slower, especially since PDF documents tend to use
+lots of fonts, but they look much nicer.
+
+Some X servers also support font rotation.  Xpdf will use this feature
+if available.
+
+For Japanese support, you will need a Japanese font of the form:
+
+    -*-fixed-medium-r-normal-*-NN-*-*-*-*-*-jisx0208.1983-0
+
+and an X server that can handle 16-bit fonts.
+
+If compiled with t1lib support, xpdf will use t1lib to render embedded
+Type 1 and Type 1C fonts.  In addition, xpdf can be configured to use
+t1lib for the base 14 fonts and for substituted fonts.  To enable this
+feature, you must set an X resource for each Type 1 font file.  For
+example:
+
+    xpdf.t1TimesRoman:           /usr/local/fonts/Times-Roman.pfa
+    xpdf.t1TimesItalic:          /usr/local/fonts/Times-Italic.pfa
+    xpdf.t1TimesBold:            /usr/local/fonts/Times-Bold.pfa
+    xpdf.t1TimesBoldItalic:      /usr/local/fonts/Times-BoldItalic.pfa
+    xpdf.t1Helvetica:            /usr/local/fonts/Helvetica.pfa
+    xpdf.t1HelveticaOblique:     /usr/local/fonts/Helvetica-Oblique.pfa
+    xpdf.t1HelveticaBold:        /usr/local/fonts/Helvetica-Bold.pfa
+    xpdf.t1HelveticaBoldOblique: /usr/local/fonts/Helvetica-BoldOblique.pfa
+    xpdf.t1Courier:              /usr/local/fonts/Courier.pfa
+    xpdf.t1CourierOblique:       /usr/local/fonts/Courier-Oblique.pfa
+    xpdf.t1CourierBold:          /usr/local/fonts/Courier-Bold.pfa
+    xpdf.t1CourierBoldOblique:   /usr/local/fonts/Courier-BoldOblique.pfa
+    xpdf.t1Symbol:               /usr/local/fonts/Symbol.pfa
+    xpdf.t1ZapfDingbats:         /usr/local/fonts/ZapfDingbats.pfa
+
+
+The Unisys LZW Patent
+---------------------
+
+Nearly all PDF files include data which has been compressed with the
+LZW compression algorithm.  Unfortunately, LZW is covered by a
+software patent which is owned by Unisys Corporation.  Unisys refuses
+to license this patent for PDF-related use in software such as xpdf
+which is released for free and which may be freely redistributed.
+(This is same algorithm which is used by GIF.  However, Unisys is not
+doing licensing for free PDF viwers in the same way as for free GIF
+viewers.)
+
+As a workaround, xpdf converts PDF-format LZW data to compress-format
+LZW data.  (The standard UNIX compress utility also uses LZW, but with
+a slightly different file format.)  This conversion does *not*
+decompress the data; it simply converts it to a different file format.
+Xpdf then calls uncompress to actually decompress the data.
+
+I have been told by several notable people that the LZW patent covers
+compression only, and does not cover decompression.  This seems pretty
+fuzzy to me, so I'm going to stick with my workaround, at least for
+now.
+
+For Unisys's slant on things (mostly regarding GIF), see
+<http://www.unisys.com/LeadStory/lzwterms.html> and
+<http://www.unisys.com/LeadStory/lzwfaq.html>.  These pages mention
+an email address for feedback.
+
+
+Compiling xpdf
+--------------
+
+See the separate file, INSTALL.
+
+
+Bugs
+----
+
+This release of xpdf should improve the situation with embedded
+fonts.  However, Type 3 and TrueType fonts are still not handled.
+
+If you find a bug in xpdf, i.e., if it prints an error message,
+crashes, or incorrectly displays a document, and you don't see that
+bug listed here, please send me email, with a pointer (URL, ftp site,
+etc.) to the PDF file.
+
+
+Acknowledgments
+---------------
+
+Thanks to:
+
+* Patrick Voigt for help with the remote server code.
+* Patrick Moreau and Martin P.J. Zinser for the VMS port.
+* David Boldt and Rick Rodgers for sample man pages.
+* Brendan Miller for the icon idea.
+* Olly Betts for help testing pdftotext.
+* Peter Ganten for the OS/2 port.
+* Michael Richmond for the Win32 port of pdftops and pdftotext.
+* Frank M. Siegert for improvements in the PostScript code.
+* Leo Smiers for the decryption patches.
+* Rainer Menzner for creating t1lib, and for helping me adapt it to
+  xpdf.
+
+
+References
+----------
+
+Adobe Systems Inc., _Portable Document Format Reference Manual_.
+Addison-Wesley, 1993, ISBN 0-201-62628-4.
+[The printed manual for PDF version 1.0.]
+
+Adobe Systems Inc., _Portable Document Format Reference Manual_,
+Version 1.3.  March 11, 1999.
+http://partners.adobe.com/asn/developer/PDFS/TN/PDFSPEC.PDF
+[Updated manual for PDF 1.3.]
+
+Adobe Systems Inc., _PostScript Language Reference Manual_, 2nd ed.
+Addison-Wesley, 1990, ISBN 0-201-18127-4.
+[The official PostScript manual.]
+
+Adobe Systems, Inc., _Adobe CMap and CIDFont Files Specification_,
+Adobe Developer Support Technical Specification #5014.  1995.
+http://www.adobe.com/supportservice/devrelations/PDFS/TN/5014.CIDFont_Spec.pdf
+[CMap file format needed for Japanese font support.]
+
+Adobe Systems, Inc., _Adobe-Japan1-2 Character Collection for
+CID-Keyed Fonts_ (Bitmap Character Image Version), Adobe Developer
+Support Technical Note #5078-b.  1994. 
+http://www.adobe.com/supportservice/devrelations/PDFS/TN/5078b.pdf
+[The complete Adobe Japanese character set.]
+
+Adobe Systems Inc., _Supporting the DCT Filters in PostScript Level
+2_, Adobe Developer Support Technical Note #5116.  1992.
+http://www.adobe.com/supportservice/devrelations/PDFS/TN/5116.PS2_DCT.PDF
+[Description of the DCTDecode filter parameters.]
+
+Anonymous, RC4 source code.
+ftp://ftp.ox.ac.uk/pub/crypto/misc/rc4.tar.gz
+ftp://idea.sec.dsi.unimi.it/pub/crypt/code/rc4.tar.gz
+[This is the algorithm used to encrypt PDF files.]
+
+CCITT, _Blue Book_, Volume VII Fascicle 3: "Terminal Equipment and
+Protocols for Telematic Services", Recommendations T.4 and T.6.
+ftp://ftp.uu.net/doc/standards/ccitt/1988/7_3_01.ps
+ftp://ftp.uu.net/doc/standards/ccitt/1988/7_3_02.ps
+[The official Group 3 and 4 fax standards.  The online copies are
+unfortunately misformatted.]
+
+L. Peter Deutsch, "ZLIB Compressed Data Format Specification version
+3.3".  RFC 1950.
+[Information on the general format used in FlateDecode streams.]
+
+L. Peter Deutsch, "DEFLATE Compressed Data Format Specification
+version 1.3".  RFC 1951.
+[The definition of the compression algorithm used in FlateDecode
+streams.]
+
+Jim Flowers, "X Logical Font Description Conventions", Version 1.5, X
+Consortium Standard, X Version 11, Release 6.1.
+ftp://ftp.x.org/pub/R6.1/xc/doc/hardcopy/XLFD/xlfd.PS.Z
+[The official specification of X font descriptors, including font
+transformation matrices.]
+
+Foley, van Dam, Feiner, and Hughes, _Computer Graphics: Principles and
+Practice_, 2nd ed.  Addison-Wesley, 1990, ISBN 0-201-12110-7.
+[Colorspace conversion functions, Bezier spline math.]
+
+Robert L. Hummel, _Programmer's Technical Reference: Data and Fax
+Communications_.  Ziff-Davis Press, 1993, ISBN 1-56276-077-7.
+[CCITT Group 3 and 4 fax decoding.]
+
+Christoph Loeffler, Adriaan Ligtenberg, George S. Moschytz, "Practical
+Fast 1-D DCT Algorithms with 11 Multiplications".  IEEE Intl. Conf. on
+Acoustics, Speech & Signal Processing, 1989, 988-991.
+[The fast IDCT algorithm used in the DCTDecode filter.]
+
+R. Rivest, "The MD5 Message-Digest Algorithm".  RFC 1321.
+[MD5 is used in PDF document encryption.]
+
+Gregory K. Wallace, "The JPEG Still Picture Compression Standard".
+ftp://ftp.uu.net/graphics/jpeg/wallace.ps.gz
+[Good description of the JPEG standard.  Also published in CACM, April
+1991, and submitted to IEEE Transactions on Consumer Electronics.]
+
+W3C Recommendation, "PNG (Portable Network Graphics) Specification
+Version 1.0".
+http://www.w3.org/Graphics/PNG/
+[Defines the PNG image predictor.]
+
+"ISO 8859-2 (Latin 2) Resources".
+http://sizif.mf.uni-lj.si/linux/cee/iso8859-2.html
+[This is a web page with all sorts of useful Latin-2 character set and
+font information.]
