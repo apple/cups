@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.147 2002/02/14 16:16:26 mike Exp $"
+ * "$Id: job.c,v 1.148 2002/03/14 19:35:01 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -1407,7 +1407,39 @@ StartJob(int       id,		/* I - Job ID */
 
   attr = ippFindAttribute(current->attrs, "attributes-natural-language",
                           IPP_TAG_LANGUAGE);
-  snprintf(language, sizeof(language), "LANG=%s", attr->values[0].string.text);
+
+  switch (strlen(attr->values[0].string.text))
+  {
+    default :
+       /*
+        * This is an unknown or badly formatted language code; use
+	* the POSIX locale...
+	*/
+
+	strcpy(language, "LANG=C");
+	break;
+
+    case 2 :
+       /*
+        * Just the language code (ll)...
+	*/
+
+        snprintf(language, sizeof(language), "LANG=%s",
+	         attr->values[0].string.text);
+        break;
+
+    case 5 :
+       /*
+        * Language and country code (ll-cc)...
+	*/
+
+        snprintf(language, sizeof(language), "LANG=%c%c_%c%c",
+	         attr->values[0].string.text[0],
+		 attr->values[0].string.text[1],
+		 toupper(attr->values[0].string.text[3]),
+		 toupper(attr->values[0].string.text[4]));
+        break;
+  }
 
   attr = ippFindAttribute(current->attrs, "document-format",
                           IPP_TAG_MIMETYPE);
@@ -3009,5 +3041,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.147 2002/02/14 16:16:26 mike Exp $".
+ * End of "$Id: job.c,v 1.148 2002/03/14 19:35:01 mike Exp $".
  */
