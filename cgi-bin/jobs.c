@@ -1,5 +1,5 @@
 /*
- * "$Id: jobs.c,v 1.8 1999/10/10 15:40:18 mike Exp $"
+ * "$Id: jobs.c,v 1.9 1999/10/18 15:29:29 mike Exp $"
  *
  *   Job status CGI for the Common UNIX Printing System (CUPS).
  *
@@ -105,10 +105,10 @@ main(int  argc,			/* I - Number of command-line arguments */
   puts("<LINK REL=STYLESHEET TYPE=\"text/css\" HREF=\"/cups.css\">");
   puts("<MAP NAME=\"navbar\">");
 #ifdef ESPPRINTPRO
-  puts("<AREA SHAPE=\"RECT\" COORDS=\"10,10,76,30\" HREF=\"printers\" ALT=\"Current Printer Status\">");
-  puts("<AREA SHAPE=\"RECT\" COORDS=\"88,10,158,30\" HREF=\"classes\" ALT=\"Current Printer Classes Status\">");
+  puts("<AREA SHAPE=\"RECT\" COORDS=\"10,10,76,30\" HREF=\"/printers\" ALT=\"Current Printer Status\">");
+  puts("<AREA SHAPE=\"RECT\" COORDS=\"88,10,158,30\" HREF=\"/classes\" ALT=\"Current Printer Classes Status\">");
   puts("<AREA SHAPE=\"RECT\" COORDS=\"170,10,210,30\" HREF=\"jobs\" ALT=\"Current Jobs Status\">");
-  puts("<AREA SHAPE=\"RECT\" COORDS=\"222,10,354,30\" HREF=\"documentation.html\" ALT=\"Read CUPS Documentation On-Line\">");
+  puts("<AREA SHAPE=\"RECT\" COORDS=\"222,10,354,30\" HREF=\"/documentation.html\" ALT=\"Read CUPS Documentation On-Line\">");
   puts("<AREA SHAPE=\"RECT\" COORDS=\"366,10,442,30\" HREF=\"http://www.easysw.com/printpro/software.html\" ALT=\"Download the Current ESP Print Pro Software\">");
   puts("<AREA SHAPE=\"RECT\" COORDS=\"454,10,530,30\" HREF=\"http://www.easysw.com/printpro/support.html\" ALT=\"Get Tech Support for Current ESP Print Pro\">");
 #else
@@ -217,7 +217,7 @@ show_job_list(http_t      *http,	/* I - HTTP connection */
   * Do the request and get back a response...
   */
 
-  if ((response = cupsDoRequest(http, request, "/jobs/")) != NULL)
+  if ((response = cupsDoRequest(http, request, "/")) != NULL)
   {
    /*
     * Do a table for the jobs...
@@ -393,7 +393,7 @@ show_job_info(http_t      *http,	/* I - Server connection */
   * Do the request and get back a response...
   */
 
-  if ((response = cupsDoRequest(http, request, uri + 15)) == NULL)
+  if ((response = cupsDoRequest(http, request, "/")) == NULL)
   {
     puts("<P>Unable to communicate with CUPS server!");
     return;
@@ -507,8 +507,7 @@ show_job_info(http_t      *http,	/* I - Server connection */
 
   for (attr = response->attrs; attr != NULL; attr = attr->next)
   {
-    if (attr->group_tag != IPP_TAG_JOB &&
-        attr->group_tag != IPP_TAG_EXTENSION)
+    if (attr->group_tag != IPP_TAG_JOB)
       continue;
 
     if (strcmp(attr->name, "job-uri") == 0 ||
@@ -581,5 +580,5 @@ show_job_info(http_t      *http,	/* I - Server connection */
 
 
 /*
- * End of "$Id: jobs.c,v 1.8 1999/10/10 15:40:18 mike Exp $".
+ * End of "$Id: jobs.c,v 1.9 1999/10/18 15:29:29 mike Exp $".
  */

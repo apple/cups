@@ -1,5 +1,5 @@
 /*
- * "$Id: classes.c,v 1.9 1999/10/10 15:40:18 mike Exp $"
+ * "$Id: classes.c,v 1.10 1999/10/18 15:29:28 mike Exp $"
  *
  *   Class status CGI for the Common UNIX Printing System (CUPS).
  *
@@ -105,10 +105,10 @@ main(int  argc,			/* I - Number of command-line arguments */
   puts("<LINK REL=STYLESHEET TYPE=\"text/css\" HREF=\"/cups.css\">");
   puts("<MAP NAME=\"navbar\">");
 #ifdef ESPPRINTPRO
-  puts("<AREA SHAPE=\"RECT\" COORDS=\"10,10,76,30\" HREF=\"printers\" ALT=\"Current Printer Status\">");
-  puts("<AREA SHAPE=\"RECT\" COORDS=\"88,10,158,30\" HREF=\"classes\" ALT=\"Current Printer Classes Status\">");
-  puts("<AREA SHAPE=\"RECT\" COORDS=\"170,10,210,30\" HREF=\"jobs\" ALT=\"Current Jobs Status\">");
-  puts("<AREA SHAPE=\"RECT\" COORDS=\"222,10,354,30\" HREF=\"documentation.html\" ALT=\"Read CUPS Documentation On-Line\">");
+  puts("<AREA SHAPE=\"RECT\" COORDS=\"10,10,76,30\" HREF=\"/printers\" ALT=\"Current Printer Status\">");
+  puts("<AREA SHAPE=\"RECT\" COORDS=\"88,10,158,30\" HREF=\"/classes\" ALT=\"Current Printer Classes Status\">");
+  puts("<AREA SHAPE=\"RECT\" COORDS=\"170,10,210,30\" HREF=\"/jobs\" ALT=\"Current Jobs Status\">");
+  puts("<AREA SHAPE=\"RECT\" COORDS=\"222,10,354,30\" HREF=\"/documentation.html\" ALT=\"Read CUPS Documentation On-Line\">");
   puts("<AREA SHAPE=\"RECT\" COORDS=\"366,10,442,30\" HREF=\"http://www.easysw.com/printpro/software.html\" ALT=\"Download the Current ESP Print Pro Software\">");
   puts("<AREA SHAPE=\"RECT\" COORDS=\"454,10,530,30\" HREF=\"http://www.easysw.com/printpro/support.html\" ALT=\"Get Tech Support for Current ESP Print Pro\">");
 #else
@@ -216,7 +216,7 @@ show_class_list(http_t      *http,	/* I - HTTP connection */
   * Do the request and get back a response...
   */
 
-  if ((response = cupsDoRequest(http, request, "/classes/")) != NULL)
+  if ((response = cupsDoRequest(http, request, "/")) != NULL)
   {
    /*
     * Loop through the classes returned in the list and display
@@ -305,7 +305,7 @@ show_class_info(http_t      *http,
   * Do the request and get back a response...
   */
 
-  if ((response = cupsDoRequest(http, request, uri + 15)) == NULL)
+  if ((response = cupsDoRequest(http, request, "/")) == NULL)
   {
     puts("<P>Unable to communicate with CUPS server!");
     return;
@@ -402,7 +402,7 @@ show_class_info(http_t      *http,
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI,
 	         "printer-uri", NULL, uri);
 
-    jobs = cupsDoRequest(http, request, uri + 15);
+    jobs = cupsDoRequest(http, request, "/");
   }
   else
     jobs = NULL;
@@ -482,5 +482,5 @@ show_class_info(http_t      *http,
 
 
 /*
- * End of "$Id: classes.c,v 1.9 1999/10/10 15:40:18 mike Exp $".
+ * End of "$Id: classes.c,v 1.10 1999/10/18 15:29:28 mike Exp $".
  */
