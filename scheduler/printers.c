@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.61 2000/04/19 15:18:55 mike Exp $"
+ * "$Id: printers.c,v 1.62 2000/04/20 20:11:32 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -620,7 +620,8 @@ SaveAllPrinters(void)
     */
 
     if ((printer->type & CUPS_PRINTER_REMOTE) ||
-        (printer->type & CUPS_PRINTER_CLASS))
+        (printer->type & CUPS_PRINTER_CLASS) ||
+	(printer->type & CUPS_PRINTER_IMPLICIT))
       continue;
 
    /*
@@ -1376,5 +1377,5 @@ write_printcap(void)
 
 
 /*
- * End of "$Id: printers.c,v 1.61 2000/04/19 15:18:55 mike Exp $".
+ * End of "$Id: printers.c,v 1.62 2000/04/20 20:11:32 mike Exp $".
  */
