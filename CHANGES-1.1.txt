@@ -743,9 +743,8 @@ CHANGES IN CUPS V1.1.7
 	  test CUPS prior to installation.
 	- All scheduler configuration files are now case
 	  insensitive to match Apache.
-	- Added support for Apache ListenBackLog, LogFormat,
-	  Require, UseCanonicalName, Satisfy, <Limit>,
-	  <LimitExcept>, LimitRequestSize, and Options
+	- Added support for Apache ListenBackLog, Require,
+	  Satisfy, <Limit>, <LimitExcept>, and LimitRequestSize
 	  directives.
 	- Added support for all Apache log levels...
 	- Added support for "double" HostNameLookups.
