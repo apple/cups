@@ -1,5 +1,5 @@
 /*
- * "$Id: banners.c,v 1.10 2003/03/30 21:43:01 mike Exp $"
+ * "$Id: banners.c,v 1.11 2003/07/06 20:01:37 mike Exp $"
  *
  *   Banner routines for the Common UNIX Printing System (CUPS).
  *
@@ -162,7 +162,7 @@ LoadBanners(const char *d)	/* I - Directory to search */
 
     if (stat(filename, &fileinfo))
     {
-      LogMessage(L_WARN, "LoadBanners: Unable to state \"%s\" banner: %s",
+      LogMessage(L_WARN, "LoadBanners: Unable to stat \"%s\" banner: %s",
                  dent->d_name, strerror(errno));
       continue;
     }
@@ -211,5 +211,5 @@ compare(const banner_t *b0,	/* I - First banner */
 
 
 /*
- * End of "$Id: banners.c,v 1.10 2003/03/30 21:43:01 mike Exp $".
+ * End of "$Id: banners.c,v 1.11 2003/07/06 20:01:37 mike Exp $".
  */
