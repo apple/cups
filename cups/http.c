@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.119 2003/05/12 20:39:03 mike Exp $"
+ * "$Id: http.c,v 1.120 2003/05/27 14:03:37 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS).
  *
@@ -1110,7 +1110,7 @@ httpWait(http_t *http,			/* I - HTTP data */
     if (SSL_pending((SSL *)(http->tls)))
       return (1);
 #  elif defined(HAVE_GNUTLS)
-    if (gnutls_check_pending(((http_tls_t *)(http->tls))->session))
+    if (gnutls_record_check_pending(((http_tls_t *)(http->tls))->session))
       return (1);
 #  elif defined(HAVE_CDSASSL)
     size_t bytes;			/* Bytes that are available */
@@ -2387,5 +2387,5 @@ CDSAWriteFunc(SSLConnectionRef connection,	/* I  - SSL/TLS connection */
 
 
 /*
- * End of "$Id: http.c,v 1.119 2003/05/12 20:39:03 mike Exp $".
+ * End of "$Id: http.c,v 1.120 2003/05/27 14:03:37 mike Exp $".
  */
