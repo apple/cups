@@ -33,6 +33,7 @@
 #endif // WIN32
 #include "GString.h"
 #include "gfile.h"
+#include <cups/cups.h>
 
 // Some systems don't define this, so just make it something reasonably
 // large.
@@ -442,65 +443,19 @@ time_t getModTime(char *fileName) {
 }
 
 GBool openTempFile(GString **name, FILE **f, char *mode, char *ext) {
-#if defined(VMS) || defined(__EMX__) || defined(WIN32) || defined(ACORN) || defined(MACOS)
-  //---------- non-Unix ----------
-  char *s;
+  char	filename[1024];	// Name of temporary file...
+  int	fd;		// File descriptor...
 
-  // There is a security hole here: an attacker can create a symlink
-  // with this file name after the tmpnam call and before the fopen
-  // call.  I will happily accept fixes to this function for non-Unix
-  // OSs.
-  if (!(s = tmpnam(NULL))) {
-    return gFalse;
-  }
-  *name = new GString(s);
-  if (ext) {
-    (*name)->append(ext);
-  }
-  if (!(*f = fopen((*name)->getCString(), mode))) {
-    delete (*name);
-    return gFalse;
-  }
-  return gTrue;
-#else
-  //---------- Unix ----------
-  char *s, *p;
-  int fd;
 
-  if (ext) {
-    if (!(s = tmpnam(NULL))) {
-      return gFalse;
-    }
-    *name = new GString(s);
-    s = (*name)->getCString();
-    if ((p = strrchr(s, '.'))) {
-      (*name)->del(p - s, (*name)->getLength() - (p - s));
-    }
-    (*name)->append(ext);
-    fd = open((*name)->getCString(), O_WRONLY | O_CREAT | O_EXCL, 0600);
-  } else {
-#if HAVE_MKSTEMP
-    if ((s = getenv("TMPDIR"))) {
-      *name = new GString(s);
-    } else {
-      *name = new GString("/tmp");
-    }
-    (*name)->append("/XXXXXX");
-    fd = mkstemp((*name)->getCString());
-#else // HAVE_MKSTEMP
-    if (!(s = tmpnam(NULL))) {
-      return gFalse;
-    }
-    *name = new GString(s);
-    fd = open((*name)->getCString(), O_WRONLY | O_CREAT | O_EXCL, 0600);
-#endif // HAVE_MKSTEMP
-  }
-  if (fd < 0 || !(*f = fdopen(fd, mode))) {
-    delete *name;
-    return gFalse;
-  }
-  return gTrue;
-#endif
+  // Use the CUPS temporary file function on all platforms...
+  if ((fd = cupsTempFd(filename, sizeof(filename))) < 0)
+    return (gFalse);
+
+  // Make the file descriptor a FILE *, and copy the temp filename...
+  *f    = fdopen(fd, mode);
+  *name = new GString(filename);
+
+  return (gTrue);
 }
 
 //------------------------------------------------------------------------

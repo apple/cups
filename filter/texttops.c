@@ -1,5 +1,5 @@
 /*
- * "$Id: texttops.c,v 1.33 2001/01/26 14:21:58 mike Exp $"
+ * "$Id: texttops.c,v 1.34 2001/03/02 14:30:15 mike Exp $"
  *
  *   Text to PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -680,6 +680,8 @@ WriteProlog(char       *title,	/* I - Title of job */
           break;
       }
     }
+    else
+      j = 0;
 
     if (ppd == NULL || j >= ppd->num_fonts)
     {
@@ -702,9 +704,13 @@ WriteProlog(char       *title,	/* I - Title of job */
   for (i = 0; i < num_fonts; i ++)
   {
     if (ppd != NULL)
+    {
       for (j = 0; j < ppd->num_fonts; j ++)
 	if (strcmp(fonts[i], ppd->fonts[j]) == 0)
           break;
+    }
+    else
+      j = 0;
 
     if (ppd == NULL || j >= ppd->num_fonts)
     {
@@ -1270,5 +1276,5 @@ write_text(char *s)	/* I - String to write */
 
 
 /*
- * End of "$Id: texttops.c,v 1.33 2001/01/26 14:21:58 mike Exp $".
+ * End of "$Id: texttops.c,v 1.34 2001/03/02 14:30:15 mike Exp $".
  */

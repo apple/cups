@@ -1,5 +1,5 @@
 /*
- * "$Id: rastertohp.c,v 1.14 2001/01/24 17:18:58 mike Exp $"
+ * "$Id: rastertohp.c,v 1.15 2001/03/02 14:30:15 mike Exp $"
  *
  *   Hewlett-Packard Page Control Language filter for the Common UNIX
  *   Printing System (CUPS).
@@ -528,9 +528,6 @@ main(int  argc,		/* I - Number of command-line arguments */
   cups_raster_t		*ras;	/* Raster stream for printing */
   cups_page_header_t	header;	/* Page header from file */
   int			y;	/* Current line */
-#if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
-  struct sigaction action;	/* Actions for POSIX signals */
-#endif /* HAVE_SIGACTION && !HAVE_SIGSET */
 
 
  /*
@@ -667,5 +664,5 @@ main(int  argc,		/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: rastertohp.c,v 1.14 2001/01/24 17:18:58 mike Exp $".
+ * End of "$Id: rastertohp.c,v 1.15 2001/03/02 14:30:15 mike Exp $".
  */
