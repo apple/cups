@@ -1,7 +1,7 @@
 /*
- * "$Id: parallel.c,v 1.2 1999/01/24 14:14:17 mike Exp $"
+ * "$Id: parallel.c,v 1.3 1999/03/06 20:26:06 mike Exp $"
  *
- *   for the Common UNIX Printing System (CUPS).
+ *   Parallel port backend for the Common UNIX Printing System (CUPS).
  *
  *   Copyright 1997-1999 by Easy Software Products, all rights reserved.
  *
@@ -23,25 +23,43 @@
  *
  * Contents:
  *
- *
- * Revision History:
- *
- *   $Log: parallel.c,v $
- *   Revision 1.2  1999/01/24 14:14:17  mike
- *   Check-in prior to CVS use.
- *
- *   Revision 1.1  1998/01/05  20:50:13  mike
- *   Initial revision
- *
  */
 
 /*
  * Include necessary headers.
  */
 
-#include
+#include <cups/cups.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <cups/string.h>
 
 
 /*
- * End of "$Id: parallel.c,v 1.2 1999/01/24 14:14:17 mike Exp $".
+ * 'main()' - Send a file to the printer or server.
+ *
+ * Usage:
+ *
+ *    printer-uri job-id user title copies options [file]
+ */
+
+int			/* O - Exit status */
+main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
+     char *argv[])	/* I - Command-line arguments */
+{
+  if (argc < 6 || argc > 7)
+  {
+    fprintf(stderr, "Usage: %s job-id user title copies options [file]\n",
+            argv[0]);
+    return (1);
+  }
+
+  fputs("ERROR: Backend not implemented yet!\n", stderr);
+
+  return (1);
+}
+
+
+/*
+ * End of "$Id: parallel.c,v 1.3 1999/03/06 20:26:06 mike Exp $".
  */
