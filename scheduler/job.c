@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.232 2004/10/04 20:23:54 mike Exp $"
+ * "$Id: job.c,v 1.233 2004/10/08 20:18:02 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -1696,6 +1696,7 @@ StartJob(int       id,			/* I - Job ID */
            current->filetypes[current->current_file]->super,
            current->filetypes[current->current_file]->type);
   snprintf(device_uri, sizeof(device_uri), "DEVICE_URI=%s", printer->device_uri);
+  cupsdSanitizeURI(printer->device_uri, sani_uri, sizeof(sani_uri));
   snprintf(ppd, sizeof(ppd), "PPD=%s/ppd/%s.ppd", ServerRoot, printer->name);
   snprintf(printer_name, sizeof(printer_name), "PRINTER=%s", printer->name);
   snprintf(cache, sizeof(cache), "RIP_MAX_CACHE=%s", RIPCache);
@@ -1807,9 +1808,7 @@ StartJob(int       id,			/* I - Job ID */
     if (strncmp(envp[i], "DEVICE_URI=", 11))
       LogMessage(L_DEBUG, "StartJob: envp[%d]=\"%s\"", i, envp[i]);
     else
-      LogMessage(L_DEBUG, "StartJob: envp[%d]=\"DEVICE_URI=%s\"", i,
-                 cupsdSanitizeURI(printer->device_uri, sani_uri,
-		                  sizeof(sani_uri)));
+      LogMessage(L_DEBUG, "StartJob: envp[%d]=\"DEVICE_URI=%s\"", i, sani_uri);
 
   current->current_file ++;
 
@@ -2019,7 +2018,7 @@ StartJob(int       id,			/* I - Job ID */
     LogMessage(L_DEBUG, "StartJob: %s\n", processPath);
 #endif	/* __APPLE__ */
 
-    argv[0] = printer->device_uri;
+    argv[0] = sani_uri;
 
     filterfds[slot][0] = -1;
     filterfds[slot][1] = open("/dev/null", O_WRONLY);
@@ -2841,5 +2840,5 @@ set_hold_until(job_t *job, 		/* I - Job to update */
 
 
 /*
- * End of "$Id: job.c,v 1.232 2004/10/04 20:23:54 mike Exp $".
+ * End of "$Id: job.c,v 1.233 2004/10/08 20:18:02 mike Exp $".
  */
