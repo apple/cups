@@ -4,7 +4,7 @@
 <TITLE>CUPS Software Administrators Manual</TITLE>
 <META NAME="author" CONTENT="Easy Software Products">
 <META NAME="copyright" CONTENT="Copyright 1997-2002, All Rights Reserved">
-<META NAME="docnumber" CONTENT="CUPS-SAM-1.1.14">
+<META NAME="docnumber" CONTENT="CUPS-SAM-1.1.15">
 <META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-8859-1">
 <STYLE TYPE="text/css"><!--
 BODY { font-family: serif }
@@ -22,7 +22,7 @@ PRE { font-family: monospace }
 <BODY BGCOLOR="#ffffff">
 <CENTER><A HREF="#CONTENTS"><IMG SRC="images/cups-large.gif" BORDER="0" WIDTH="431" HEIGHT="511"><BR>
 <H1>CUPS Software Administrators Manual</H1></A><BR>
-CUPS-SAM-1.1.14<BR>
+CUPS-SAM-1.1.15<BR>
 Easy Software Products<BR>
 Copyright 1997-2002, All Rights Reserved<BR>
 </CENTER>
@@ -280,7 +280,7 @@ Copyright 1997-2002, All Rights Reserved<BR>
 <H1 ALIGN="RIGHT"><A NAME="1">Preface</A></H1>
 <P>This software administrators manual provides printer administration
  information for the Common UNIX Printing System<SUP>TM</SUP> (&quot;CUPS<SUP>
-TM</SUP>&quot;), version 1.1.14.</P>
+TM</SUP>&quot;), version 1.1.15.</P>
 <H2><A NAME="1_1">System Overview</A></H2>
 <P>CUPS provides a portable printing layer for UNIX&reg;-based operating
  systems. It has been developed by<A HREF="http://www.easysw.com"> Easy
@@ -895,9 +895,7 @@ lpoptions(1)</CODE> command.</P>
 <B>/usr/sbin/lpadmin -p <I>printer</I> -o job-quota-period=604800 -o job-page-limit=100<I>ENTER</I></B>
 </PRE>
 </UL>
-<P>Or, you can combine all three options on the same line. Please note
- that you must enter all quota options with one call of the <CODE>
-lpadmin</CODE> command, and not with several calls.</P>
+<P>Or, you can combine all three options on the same line.</P>
 <H3><A NAME="4_3_7">Restricting Access to a Printer</A></H3>
 <P>The <CODE>-u</CODE> option of the <CODE>lpadmin</CODE> command
  controls which users can print to a printer. The default configuration
@@ -917,7 +915,7 @@ lpadmin</CODE> command, and not with several calls.</P>
 </PRE>
 </UL>
 <P>This command allows peter, paul, and mary to print to the named
- printer, but all other users cannon print. The command:</P>
+ printer, but all other users cannot print. The command:</P>
 <UL>
 <PRE>
 <B>/usr/sbin/lpadmin -p <I>printer</I> -u deny:peter,paul,mary <I>ENTER</I></B>

@@ -1,7 +1,7 @@
 <HTML>
 <HEAD>
 	<META NAME="COPYRIGHT" CONTENT="Copyright 1997-2002, All Rights Reserved">
-	<META NAME="DOCNUMBER" CONTENT="CUPS-SAM-1.1.14">
+	<META NAME="DOCNUMBER" CONTENT="CUPS-SAM-1.1.15">
 	<META NAME="Author" CONTENT="Easy Software Products">
 	<TITLE>CUPS Software Administrators Manual</TITLE>
 </HEAD>
@@ -11,7 +11,7 @@
 
 <P>This software administrators manual provides printer administration
 information for the Common UNIX Printing System<SUP>TM</SUP>
-("CUPS<SUP>TM</SUP>"), version 1.1.14.
+("CUPS<SUP>TM</SUP>"), version 1.1.15.
 
 <EMBED SRC="system-overview.shtml">
 
@@ -628,9 +628,7 @@ quotas:</P>
 </PRE>
 </UL>
 
-<P>Or, you can combine all three options on the same line. 
-Please note that you must enter all quota options with one 
-call of the <CODE>lpadmin</CODE> command, and not with several calls.</P>
+<P>Or, you can combine all three options on the same line.</P>
 
 <H3>Restricting Access to a Printer</A></H3>
 
@@ -656,7 +654,7 @@ not allowed to use the printer:</P>
 </UL>
 
 <P>This command allows peter, paul, and mary to print to the named
-printer, but all other users cannon print. The command:</P>
+printer, but all other users cannot print. The command:</P>
 
 <UL>
 <PRE>
@@ -669,15 +667,20 @@ be able to print to the named printer.</P>
 
 <CENTER>
 <TABLE BGCOLOR="#cccccc" BORDER="1" CELLPADDING="5" WIDTH="80%">
-<TR><TD><B>NOTE:</B>
-<P>The<I> allow</I> and<I> deny</I> options are not cummulative. That
-is, you must provide the complete list of users to allow or deny each
-time.</P>
-<P>Also, CUPS only maintains one list of users - the list can
-allow or deny users from printing. If you specify an allow list and
-then specify a deny list, the deny list will replace the allow list -
-only one list is active at any time.</P>
-</TD></TR>
+<TR>
+	<TD><B>NOTE:</B>
+
+	<P>The<I> allow</I> and<I> deny</I> options are not cummulative. That
+	is, you must provide the complete list of users to allow or deny each
+	time.</P>
+
+	<P>Also, CUPS only maintains one list of users - the list can
+	allow or deny users from printing. If you specify an allow list and
+	then specify a deny list, the deny list will replace the allow list -
+	only one list is active at any time.</P>
+
+	</TD>
+</TR>
 </TABLE>
 </CENTER>
 
