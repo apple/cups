@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.140 2003/11/07 19:41:25 mike Exp $"
+ * "$Id: conf.c,v 1.141 2004/02/05 16:17:16 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -650,6 +650,8 @@ ReadConfiguration(void)
     LoadAllPrinters();
     LoadAllClasses();
 
+    CreateCommonData();
+
    /*
     * Load devices and PPDs...
     */
@@ -669,7 +671,11 @@ ReadConfiguration(void)
     LogMessage(L_INFO, "Full reload complete.");
   }
   else
+  {
+    CreateCommonData();
+
     LogMessage(L_INFO, "Partial reload complete.");
+  }
 
  /*
   * Reset the reload state...
@@ -2147,5 +2153,5 @@ CDSAGetServerCerts(void)
 
 
 /*
- * End of "$Id: conf.c,v 1.140 2003/11/07 19:41:25 mike Exp $".
+ * End of "$Id: conf.c,v 1.141 2004/02/05 16:17:16 mike Exp $".
  */
