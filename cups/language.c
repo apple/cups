@@ -1,5 +1,5 @@
 /*
- * "$Id: language.c,v 1.20.2.2 2002/01/29 20:28:02 mike Exp $"
+ * "$Id: language.c,v 1.20.2.3 2002/01/30 17:44:39 mike Exp $"
  *
  *   I18N/language support for the Common UNIX Printing System (CUPS).
  *
@@ -145,8 +145,8 @@ cups_lang_t *			/* O - Language data */
 cupsLangGet(const char *language) /* I - Language or locale */
 {
   int		i, count;	/* Looping vars */
-  char		langname[16],	/* Requested language name */
-		real[16],	/* Real language name */
+  char		langname[32],	/* Requested language name */
+		real[32],	/* Real language name */
 		*realptr,	/* Pointer into real language name */
 		filename[1024],	/* Filename for language locale file */
 		*localedir;	/* Directory for locale files */
@@ -185,7 +185,7 @@ cupsLangGet(const char *language) /* I - Language or locale */
    /*
     * Convert the language name to a normalized form, e.g.:
     *
-    *     ll[_CC[.setname]]
+    *     ll[_CC[.charset]]
     */
 
     real[0] = tolower(langname[0]);
@@ -213,6 +213,7 @@ cupsLangGet(const char *language) /* I - Language or locale */
       */
 
       strncpy(real + count, langname + count, sizeof(real) - count - 1);
+      langname[count] = '\0';
       count += strlen(langname + count);
 
      /*
@@ -425,5 +426,5 @@ cupsLangGet(const char *language) /* I - Language or locale */
 
 
 /*
- * End of "$Id: language.c,v 1.20.2.2 2002/01/29 20:28:02 mike Exp $".
+ * End of "$Id: language.c,v 1.20.2.3 2002/01/30 17:44:39 mike Exp $".
  */
