@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.29 2000/08/04 03:14:12 mike Exp $"
+# "$Id: Makefile,v 1.30 2000/08/24 18:47:02 mike Exp $"
 #
 #   Documentation makefile for the Common UNIX Printing System (CUPS).
 #
@@ -208,7 +208,18 @@ sum-7x8.ps:		sum.shtml
 		--size 7x8.5in --left 0.5in --right 0.25in \
 		--top 0.25in --bottom 0.25in --fontsize 10 --headfootsize 10 -f $@ sum.shtml
 
-$(DOCUMENTS):	glossary.shtml printing-overview.shtml \
+$(DOCUMENTS:.shtml=.html): \
+		glossary.shtml printing-overview.shtml \
+		references.shtml system-overview.shtml \
+		../LICENSE.html
+
+$(DOCUMENTS:.shtml=.pdf): \
+		glossary.shtml printing-overview.shtml \
+		references.shtml system-overview.shtml \
+		../LICENSE.html
+
+$(DOCUMENTS:.shtml=.ps): \
+		glossary.shtml printing-overview.shtml \
 		references.shtml system-overview.shtml \
 		../LICENSE.html
 
