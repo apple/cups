@@ -3,10 +3,16 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.16
 
+	- The cancel command now ignores a trailing destination
+	  name when cancelling a specific job ID (Solaris
+	  compatibility).
 	- The scheduler now rejects jobs with copies outside the
 	  range of 1 to 100, inclusive.
 	- The scheduler didn't block signals while it processed
 	  others and when it forked processes.
+	- The scheduler checked for new jobs to print when
+	  stopping a job.  This caused jobs to restart before a
+	  shutdown.
 	- Updated the CUPS startup script to better support
 	  different timezones and to support the RedHat/Mandrake
 	  init script functions, if available.

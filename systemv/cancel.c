@@ -1,5 +1,5 @@
 /*
- * "$Id: cancel.c,v 1.19.2.6 2002/06/27 19:04:33 mike Exp $"
+ * "$Id: cancel.c,v 1.19.2.7 2002/08/21 20:00:17 mike Exp $"
  *
  *   "cancel" command for the Common UNIX Printing System (CUPS).
  *
@@ -51,9 +51,7 @@ main(int  argc,			/* I - Number of command-line arguments */
   int		num_dests;	/* Number of destinations */
   cups_dest_t	*dests;		/* Destinations */
   char		*dest,		/* Destination printer */
-		*host,		/* Host name */
 		*job;		/* Job ID pointer */
-  char		name[255];	/* Printer name */
   char		uri[1024];	/* Printer or job URI */
   ipp_t		*request;	/* IPP request */
   ipp_t		*response;	/* IPP response */
@@ -103,7 +101,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	      httpClose(http);
 
 	    if (argv[i][2] != '\0')
-	      http = httpConnectEncrypt(argv[i] + 2, ippPort(), encryption);
+              cupsSetServer(argv[i] + 2);
 	    else
 	    {
 	      i ++;
@@ -114,13 +112,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 		return (1);
               }
 	      else
-		http = httpConnectEncrypt(argv[i], ippPort(), encryption);
-	    }
-
-	    if (http == NULL)
-	    {
-	      perror("cancel: Unable to connect to server");
-	      return (1);
+                cupsSetServer(argv[i]);
 	    }
 	    break;
 
@@ -154,53 +146,61 @@ main(int  argc,			/* I - Number of command-line arguments */
       if (num_dests == 0)
         num_dests = cupsGetDests(&dests);
 
-      if (isdigit(argv[i][0]) && cupsGetDest(argv[i], NULL, num_dests, dests) == NULL)
+      if (strcmp(argv[i], "-") == 0)
       {
+       /*
+        * Delete the current job...
+	*/
+
+        dest   = "";
+	job_id = 0;
+      }
+      else if (cupsGetDest(argv[i], NULL, num_dests, dests) != NULL)
+      {
+       /*
+        * Delete the current job on the named destination...
+	*/
+
+        dest   = argv[i];
+	job_id = 0;
+      }
+      else if ((job = strrchr(argv[i], '-')) != NULL && isdigit(job[1]))
+      {
+       /*
+        * Delete the specified job ID.
+	*/
+
+        dest   = NULL;
+	op     = IPP_CANCEL_JOB;
+        job_id = atoi(job + 1);
+      }
+      else if (isdigit(argv[i][0]))
+      {
+       /*
+        * Delete the specified job ID.
+	*/
+
         dest   = NULL;
 	op     = IPP_CANCEL_JOB;
         job_id = atoi(argv[i]);
       }
-      else if (argv[i][0] == '-')
-      {
-        dest   = "";
-	job_id = 0;
-      }
       else
       {
-        strlcpy(name, argv[i], sizeof(name));
+       /*
+        * Bad printer name!
+	*/
 
-	dest   = name;
-        job_id = 0;
-
-	if ((job = strrchr(name, '-')) != NULL &&
-	    cupsGetDest(name, NULL, num_dests, dests) == NULL &&
-	    isdigit(job[1]))
-	{
-	  *job++ = '\0';
-	  job_id = atoi(job);
-	}
-	    
-	if (job_id)
-	  op = IPP_CANCEL_JOB;
-
-        if ((host = strrchr(name, '@')) != NULL)
-	{
-	 /*
-	  * Reconnect to the named host...
-	  */
-
-          if (http != NULL)
-            httpClose(http);
-
-	  *host++ = '\0';
-
-	  if ((http = httpConnectEncrypt(host, ippPort(), encryption)) == NULL)
-	  {
-	    perror("cancel: Unable to connect to server");
-	    return (1);
-	  }
-	}
+        fprintf(stderr, "cancel: Unknown destination \"%s\"!\n", argv[i]);
       }
+
+     /*
+      * For Solaris LP compatibility, ignore a destination name after
+      * cancelling a specific job ID...
+      */
+
+      if (job_id && (i + 1) < argc &&
+          cupsGetDest(argv[i + 1], NULL, num_dests, dests) != NULL)
+        i ++;
 
      /*
       * Open a connection to the server...
@@ -286,5 +286,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: cancel.c,v 1.19.2.6 2002/06/27 19:04:33 mike Exp $".
+ * End of "$Id: cancel.c,v 1.19.2.7 2002/08/21 20:00:17 mike Exp $".
  */
