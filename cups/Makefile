@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.11 1999/05/03 18:34:01 mike Exp $"
+# "$Id: Makefile,v 1.12 1999/05/10 21:32:36 mike Exp $"
 #
 #   Support library Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -63,8 +63,8 @@ clean:
 install:	all
 	-$(MKDIR) $(LIBDIR)
 	$(CP) libcups.a $(LIBDIR)
-	-$(MKDIR) $(INCDIR)/cups
-	$(CP) $(HEADERS) $(INCDIR)/cups
+	-$(MKDIR) $(INCLUDEDIR)/cups
+	$(CP) $(HEADERS) $(INCLUDEDIR)/cups
 
 #
 # libcups.a
@@ -126,5 +126,5 @@ testppd:	testppd.o libcups.a
 testppd.o:	ppd.h ../Makedefs
 
 #
-# End of "$Id: Makefile,v 1.11 1999/05/03 18:34:01 mike Exp $".
+# End of "$Id: Makefile,v 1.12 1999/05/10 21:32:36 mike Exp $".
 #
