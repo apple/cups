@@ -108,7 +108,7 @@ GString *getCurrentDir() {
   return new GString();
 }
 
-GString *appendToPath(GString *path, char *fileName) {
+GString *appendToPath(GString *path, const char *fileName) {
 #if defined(VMS)
   //---------- VMS ----------
   //~ this should handle everything necessary for file
@@ -274,7 +274,7 @@ GString *appendToPath(GString *path, char *fileName) {
 #endif
 }
 
-GString *grabPath(char *fileName) {
+GString *grabPath(const char *fileName) {
 #ifdef VMS
   //---------- VMS ----------
   char *p;
@@ -323,7 +323,7 @@ GString *grabPath(char *fileName) {
 #endif
 }
 
-GBool isAbsolutePath(char *path) {
+GBool isAbsolutePath(const char *path) {
 #ifdef VMS
   //---------- VMS ----------
   return strchr(path, ':') ||
@@ -429,7 +429,7 @@ GString *makePathAbsolute(GString *path) {
 #endif
 }
 
-time_t getModTime(char *fileName) {
+time_t getModTime(const char *fileName) {
 #ifdef WIN32
   //~ should implement this, but it's (currently) only used in xpdf
   return 0;
@@ -443,7 +443,7 @@ time_t getModTime(char *fileName) {
 #endif
 }
 
-GBool openTempFile(GString **name, FILE **f, char *mode, char *ext) {
+GBool openTempFile(GString **name, FILE **f, const char *mode, const char *ext) {
 #if defined(WIN32)
   //---------- Win32 ----------
   char *s;
@@ -528,7 +528,7 @@ GBool openTempFile(GString **name, FILE **f, char *mode, char *ext) {
 #endif
 }
 
-GBool executeCommand(char *cmd) {
+GBool executeCommand(const char *cmd) {
 #ifdef VMS
   return system(cmd) ? gTrue : gFalse;
 #else
@@ -569,7 +569,7 @@ char *getLine(char *buf, int size, FILE *f) {
 // GDir and GDirEntry
 //------------------------------------------------------------------------
 
-GDirEntry::GDirEntry(char *dirPath, char *nameA, GBool doStat) {
+GDirEntry::GDirEntry(const char *dirPath, const char *nameA, GBool doStat) {
 #ifdef VMS
   char *p;
 #elif defined(WIN32)
@@ -608,7 +608,7 @@ GDirEntry::~GDirEntry() {
   delete name;
 }
 
-GDir::GDir(char *name, GBool doStatA) {
+GDir::GDir(const char *name, GBool doStatA) {
   path = new GString(name);
   doStat = doStatA;
 #if defined(WIN32)

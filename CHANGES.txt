@@ -1,5 +1,10 @@
-CHANGES.txt - 05/12/2003
+CHANGES.txt - 05/14/2003
 ------------------------
+
+CHANGES IN CUPS V1.1.19
+
+	- Fixed compiler warnings in pdftops filter (STR #96)
+
 
 CHANGES IN CUPS V1.1.19rc5
 

@@ -27,12 +27,12 @@ public:
   NameToCharCode();
   ~NameToCharCode();
 
-  void add(char *name, CharCode c);
-  CharCode lookup(char *name);
+  void add(const char *name, CharCode c);
+  CharCode lookup(const char *name);
 
 private:
 
-  int hash(char *name);
+  int hash(const char *name);
 
   NameToCharCodeEntry *tab;
   int size;

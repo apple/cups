@@ -44,7 +44,7 @@
 // PostScript prolog and setup
 //------------------------------------------------------------------------
 
-static char *prolog[] = {
+static const char *prolog[] = {
   "/xpdf 75 dict def xpdf begin",
   "% PDF special state",
   "/pdfDictSize 14 def",
@@ -353,7 +353,7 @@ static char *prolog[] = {
   NULL
 };
 
-static char *cmapProlog[] = {
+static const char *cmapProlog[] = {
   "/CIDInit /ProcSet findresource begin",
   "10 dict begin",
   "  begincmap",
@@ -403,11 +403,11 @@ static char *cmapProlog[] = {
 //------------------------------------------------------------------------
 
 struct PSSubstFont {
-  char *psName;			// PostScript name
+  const char *psName;		// PostScript name
   double mWidth;		// width of 'm' character
 };
 
-static char *psFonts[] = {
+static const char *psFonts[] = {
   "Courier",
   "Courier-Bold",
   "Courier-Oblique",
@@ -494,11 +494,11 @@ extern "C" {
 typedef void (*SignalFunc)(int);
 }
 
-static void outputToFile(void *stream, char *data, int len) {
+static void outputToFile(void *stream, const char *data, int len) {
   fwrite(data, 1, len, (FILE *)stream);
 }
 
-PSOutputDev::PSOutputDev(char *fileName, XRef *xrefA, Catalog *catalog,
+PSOutputDev::PSOutputDev(const char *fileName, XRef *xrefA, Catalog *catalog,
 			 int firstPage, int lastPage, PSOutMode modeA) {
   FILE *f;
   PSFileType fileTypeA;
@@ -566,7 +566,7 @@ void PSOutputDev::init(PSOutputFunc outputFuncA, void *outputStreamA,
   PDFRectangle *box;
   Dict *resDict;
   Annots *annots;
-  char **p;
+  const char **p;
   int pg;
   Object obj1, obj2;
   int i;
@@ -872,10 +872,10 @@ void PSOutputDev::setupFont(GfxFont *font, Dict *parentResDict) {
   GString *name;
   PSFontParam *fontParam;
   GString *psNameStr;
-  char *psName;
+  const char *psName;
   char type3Name[64], buf[16];
   UnicodeMap *uMap;
-  char *charName;
+  const char *charName;
   double xs, ys;
   int code;
   double w1, w2;
@@ -1086,9 +1086,9 @@ void PSOutputDev::setupFont(GfxFont *font, Dict *parentResDict) {
 	  }
 	}
 	writePS("/");
-	writePSName(charName ? charName : (char *)".notdef");
+	writePSName(charName ? charName : ".notdef");
       }
-      writePS((i == 256-8) ? (char *)"]\n" : (char *)"\n");
+      writePS((i == 256-8) ? "]\n" : "\n");
     }
     writePS("pdfMakeFont\n");
   }
@@ -1098,7 +1098,7 @@ void PSOutputDev::setupFont(GfxFont *font, Dict *parentResDict) {
   }
 }
 
-void PSOutputDev::setupEmbeddedType1Font(Ref *id, char *psName) {
+void PSOutputDev::setupEmbeddedType1Font(Ref *id, const char *psName) {
   static char hexChar[17] = "0123456789abcdef";
   Object refObj, strObj, obj1, obj2;
   Dict *dict;
@@ -1223,7 +1223,7 @@ void PSOutputDev::setupEmbeddedType1Font(Ref *id, char *psName) {
 
 //~ This doesn't handle .pfb files or binary eexec data (which only
 //~ happens in pfb files?).
-void PSOutputDev::setupExternalType1Font(GString *fileName, char *psName) {
+void PSOutputDev::setupExternalType1Font(GString *fileName, const char *psName) {
   FILE *fontFile;
   int c;
   int i;
@@ -1264,7 +1264,7 @@ void PSOutputDev::setupExternalType1Font(GString *fileName, char *psName) {
 }
 
 void PSOutputDev::setupEmbeddedType1CFont(GfxFont *font, Ref *id,
-					  char *psName) {
+					  const char *psName) {
   char *fontBuf;
   int fontLen;
   Type1CFontFile *t1cFile;
@@ -1302,7 +1302,7 @@ void PSOutputDev::setupEmbeddedType1CFont(GfxFont *font, Ref *id,
 }
 
 void PSOutputDev::setupEmbeddedTrueTypeFont(GfxFont *font, Ref *id,
-					    char *psName) {
+					    const char *psName) {
   char *fontBuf;
   int fontLen;
   TrueTypeFontFile *ttFile;
@@ -1344,7 +1344,7 @@ void PSOutputDev::setupEmbeddedTrueTypeFont(GfxFont *font, Ref *id,
   writePS("%%EndResource\n");
 }
 
-void PSOutputDev::setupExternalTrueTypeFont(GfxFont *font, char *psName) {
+void PSOutputDev::setupExternalTrueTypeFont(GfxFont *font, const char *psName) {
   GString *fileName;
   char *fontBuf;
   int fontLen;
@@ -1390,7 +1390,7 @@ void PSOutputDev::setupExternalTrueTypeFont(GfxFont *font, char *psName) {
 }
 
 void PSOutputDev::setupEmbeddedCIDType0Font(GfxFont *font, Ref *id,
-					    char *psName) {
+					    const char *psName) {
   char *fontBuf;
   int fontLen;
   Type1CFontFile *t1cFile;
@@ -1434,7 +1434,7 @@ void PSOutputDev::setupEmbeddedCIDType0Font(GfxFont *font, Ref *id,
 }
 
 void PSOutputDev::setupEmbeddedCIDTrueTypeFont(GfxFont *font, Ref *id,
-					       char *psName) {
+					       const char *psName) {
   char *fontBuf;
   int fontLen;
   TrueTypeFontFile *ttFile;
@@ -1481,7 +1481,7 @@ void PSOutputDev::setupEmbeddedCIDTrueTypeFont(GfxFont *font, Ref *id,
   writePS("%%EndResource\n");
 }
 
-void PSOutputDev::setupType3Font(GfxFont *font, char *psName,
+void PSOutputDev::setupType3Font(GfxFont *font, const char *psName,
 				 Dict *parentResDict) {
   Dict *resDict;
   Dict *charProcs;
@@ -3254,7 +3254,7 @@ void PSOutputDev::writePSChar(char c) {
   }
 }
 
-void PSOutputDev::writePS(char *s) {
+void PSOutputDev::writePS(const char *s) {
   if (t3String) {
     t3String->append(s);
   } else {
@@ -3300,8 +3300,8 @@ void PSOutputDev::writePSString(GString *s) {
   writePSChar(')');
 }
 
-void PSOutputDev::writePSName(char *s) {
-  char *p;
+void PSOutputDev::writePSName(const char *s) {
+  const char *p;
   char c;
 
   p = s;

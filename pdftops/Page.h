@@ -78,7 +78,7 @@ public:
 
 private:
 
-  GBool readBox(Dict *dict, char *key, PDFRectangle *box);
+  GBool readBox(Dict *dict, const char *key, PDFRectangle *box);
 
   PDFRectangle mediaBox;
   PDFRectangle cropBox;

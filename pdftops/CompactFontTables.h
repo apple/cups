@@ -9,7 +9,7 @@
 #ifndef COMPACTFONTINFO_H
 #define COMPACTFONTINFO_H
 
-static char *type1CStdStrings[391] = {
+static const char *type1CStdStrings[391] = {
   ".notdef",
   "space",
   "exclam",

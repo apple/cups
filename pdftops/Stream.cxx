@@ -84,7 +84,7 @@ char *Stream::getLine(char *buf, int size) {
   return buf;
 }
 
-GString *Stream::getPSFilter(char *indent) {
+GString *Stream::getPSFilter(const char *indent) {
   return new GString();
 }
 
@@ -132,7 +132,7 @@ Stream *Stream::addFilters(Object *dict) {
   return str;
 }
 
-Stream *Stream::makeFilter(char *name, Stream *str, Object *params) {
+Stream *Stream::makeFilter(const char *name, Stream *str, Object *params) {
   int pred;			// parameters
   int colors;
   int bits;
@@ -880,7 +880,7 @@ int ASCIIHexStream::lookChar() {
   return buf;
 }
 
-GString *ASCIIHexStream::getPSFilter(char *indent) {
+GString *ASCIIHexStream::getPSFilter(const char *indent) {
   GString *s;
 
   if (!(s = str->getPSFilter(indent))) {
@@ -958,7 +958,7 @@ int ASCII85Stream::lookChar() {
   return b[index];
 }
 
-GString *ASCII85Stream::getPSFilter(char *indent) {
+GString *ASCII85Stream::getPSFilter(const char *indent) {
   GString *s;
 
   if (!(s = str->getPSFilter(indent))) {
@@ -1137,7 +1137,7 @@ int LZWStream::getCode() {
   return code;
 }
 
-GString *LZWStream::getPSFilter(char *indent) {
+GString *LZWStream::getPSFilter(const char *indent) {
   GString *s;
 
   if (pred) {
@@ -1174,7 +1174,7 @@ void RunLengthStream::reset() {
   eof = gFalse;
 }
 
-GString *RunLengthStream::getPSFilter(char *indent) {
+GString *RunLengthStream::getPSFilter(const char *indent) {
   GString *s;
 
   if (!(s = str->getPSFilter(indent))) {
@@ -1724,7 +1724,7 @@ short CCITTFaxStream::lookBits(int n) {
   return (inputBuf >> (inputBits - n)) & (0xffff >> (16 - n));
 }
 
-GString *CCITTFaxStream::getPSFilter(char *indent) {
+GString *CCITTFaxStream::getPSFilter(const char *indent) {
   GString *s;
   char s1[50];
 
@@ -3086,7 +3086,7 @@ int DCTStream::read16() {
   return (c1 << 8) + c2;
 }
 
-GString *DCTStream::getPSFilter(char *indent) {
+GString *DCTStream::getPSFilter(const char *indent) {
   GString *s;
 
   if (!(s = str->getPSFilter(indent))) {
@@ -3276,7 +3276,7 @@ int FlateStream::getRawChar() {
   return c;
 }
 
-GString *FlateStream::getPSFilter(char *indent) {
+GString *FlateStream::getPSFilter(const char *indent) {
   return NULL;
 }
 
@@ -3684,7 +3684,7 @@ void ASCIIHexEncoder::close() {
 }
 
 GBool ASCIIHexEncoder::fillBuf() {
-  static char *hex = "0123456789abcdef";
+  static const char hex[] = "0123456789abcdef";
   int c;
 
   if (eof) {

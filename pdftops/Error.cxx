@@ -18,7 +18,7 @@
 #include "GlobalParams.h"
 #include "Error.h"
 
-void CDECL error(int pos, char *msg, ...) {
+void CDECL error(int pos, const char *msg, ...) {
   va_list args;
 
   // NB: this can be called before the globalParams object is created
