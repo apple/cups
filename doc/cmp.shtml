@@ -1,6 +1,6 @@
 <HTML>
 <HEAD>
-	<META NAME="DOCNUMBER" CONTENT="CUPS-CMP-1.1">
+	<META NAME="DOCNUMBER" CONTENT="CUPS-CMP-1.2">
 	<META NAME="COPYRIGHT" CONTENT="Copyright 1997-2002, All Rights Reserved">
 	<META NAME="Author" CONTENT="Easy Software Products">
 	<TITLE>CUPS Configuration Management Plan</TITLE>
@@ -13,7 +13,7 @@
 
 This configuration management plan document provides the guidelines for
 development and maintenance of the Common UNIX Printing System ("CUPS")
-Version 1.1 software.
+Version 1.2 software.
 
 <EMBED SRC="system-overview.shtml">
 
@@ -126,7 +126,7 @@ the major, minor, and patch release numbers:
 <UL>
 <PRE>
 major.minor.patch
-1.1.0
+1.2.0
 </PRE>
 </UL>
 
@@ -136,7 +136,7 @@ the build number:
 <UL>
 <PRE>
 major.minor.patchbbuild
-1.1.0b1
+1.2.0b1
 </PRE>
 </UL>
 
@@ -159,13 +159,13 @@ be incremented and the minor and patch release numbers reset to 0:
 
 <UL>
 <PRE>
-1.1.0b1    First beta release
-1.1.0b2    Second beta release
-1.1.0      First production release
-1.1.1b1    First beta of 1.1.1
-1.1.1      Production release of 1.1.1
-1.1.1b1    First beta of 1.1.1
-1.1.1      Production release of 1.1.1
+1.2.0b1    First beta release
+1.2.0b2    Second beta release
+1.2.0      First production release
+1.2.1b1    First beta of 1.2.1
+1.2.1      Production release of 1.2.1
+1.2.1b1    First beta of 1.2.1
+1.2.1      Production release of 1.2.1
 2.0.0b1    First beta of 2.0.0
 2.0.0      Production release of 2.0.0
 </PRE>
@@ -180,7 +180,7 @@ to performing a full build to ensure that source files are recompiled.
 <H2>Testing</H2>
 
 Software testing shall be conducted according to the CUPS Software Test
-Plan, CUPS-STP-1.1. Failed tests cause STRs to be generated to correct
+Plan, CUPS-STP-1.2. Failed tests cause STRs to be generated to correct
 the problems found.
 
 <H2>Release</H2>
@@ -289,8 +289,8 @@ does, the possible input limits (if any), and the possible output values
  * Notes: none.
  */
 
-static float     /* O - Inverse power value, 0.0 &lt;= y &lt;= 1.1 */
-do_this(float x) /* I - Power value (0.0 &lt;= x &lt;= 1.1) */
+static float     /* O - Inverse power value, 0.0 &lt;= y &lt;= 1.0 */
+do_this(float x) /* I - Power value (0.0 &lt;= x &lt;= 1.0) */
 {
   ...
   return (y);

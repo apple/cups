@@ -80,7 +80,7 @@ their meanings and uses are explained below:
 
 	<TD>&nbsp;&nbsp;&nbsp;</TD>
 
-	<TD>Literal user input; special keys like <KBD>ENTER</B></KBD> are
+	<TD>Literal user input; special keys like <KBD>ENTER</KBD> are
 	in ALL CAPS.</TD>
 </TR>
 <TR><TD>&nbsp;</TD></TR>
@@ -279,7 +279,7 @@ and <CODE>--with-openssl-libs</CODE> options:</P>
 </TR>
 </TABLE></CENTER>
 
-<H3><A NAME="RUNNING">Running the Software</A></A></H3>
+<H3><A NAME="RUNNING">Running the Software</A></H3>
 
 <P>Once you have installed the software you can start the CUPS server by
 typing:
@@ -380,7 +380,6 @@ example, the first parallel port in Linux usually uses a device URI of
 
 <UL><PRE>
 <B>lpinfo -v ENTER</B>
-file file
 network socket
 network http
 network ipp
@@ -430,14 +429,14 @@ printer to CUPS:
 <B>/usr/sbin/lpadmin -p <I>printer</I> -E -v <I>device</I> -m <I>ppd</I> ENTER</B>
 </PRE></UL>
 
-<P>For an HP DeskJet printer connected to the parallel port this would look
+<P>For a HP DeskJet printer connected to the parallel port this would look
 like:
 
 <UL><PRE>
 <B>/usr/sbin/lpadmin -p DeskJet -E -v parallel:/dev/lp1 -m deskjet.ppd ENTER</B>
 </PRE></UL>
 
-<P>Similarly, an HP LaserJet printer using a JetDirect network interface at
+<P>Similarly, a HP LaserJet printer using a JetDirect network interface at
 IP address 11.22.33.44 would be added with the command:
 
 <UL><PRE>
@@ -517,7 +516,7 @@ to add or modify a printer:
 
 	<DT>-r <I>class</I>
 
-	<DD>Removes the named printer from printer class <VAR>class</CODE>.
+	<DD>Removes the named printer from printer class <VAR>class</VAR>.
 	If the resulting class becomes empty then it is removed.
 
 	<DT>-v <I>device-uri</I>
@@ -600,6 +599,89 @@ jobs. A printer can also be rejecting new print jobs while it finishes
 those that have been queued. This is useful for when you must perform
 maintenance on the printer and will not have it available to users for
 a long period of time.
+
+<H3>Setting Quotas on a Printer</H3>
+
+<P>CUPS supports page and size-based quotas for each printer.
+The quotas are tracked individually for each user, but a single set of
+limits applies to all users for a partiuclar printer. For example, you
+can limit every user to 5 pages per day on an expensive printer, but
+you cannot limit every user except Johnny.</P>
+
+<P>The <I>job-k-limit</I>, <I>job-page-limit</I>, and <I>job-quota-peiod</I>
+options determine whether and how quotas are enforced for a printer.
+The <I>job-quota-period</I> option determines the time interval for
+quota tracking. The interval is expressed in seconds, so a day is
+86,400, a week is 604,800 and a month is 2,592,000 seconds. The
+<I>job-k-limit</I> option specifies the job size limit in killobytes. The 
+<I>job-page-limit</I> option specifies the number of pages limit.</P>
+
+<P>For quotas to be enforced, the period and at least one of the limits
+must be set to a non-zero value. The following options will enable
+quotas:</P>
+
+<UL>
+<PRE>
+<B>/usr/sbin/lpadmin -p <I>printer</I> -o job-quota-period=604800 -o job-k-limit=1024 <I>ENTER</I></B>
+<B>/usr/sbin/lpadmin -p <I>printer</I> -o job-quota-period=604800 -o job-page-limit=100 <I>ENTER</I></B>
+</PRE>
+</UL>
+
+<P>Or, you can combine all three options on the same line.</P>
+
+<H3>Restricting User Access to a Printer</H3>
+
+<P>The <CODE>-u</CODE> option of the <CODE>lpadmin</CODE> command controls which users can
+print to a printer. The default configuration allows all users to print
+to a printer:</P>
+
+<UL>
+<PRE>
+<B>/usr/sbin/lpadmin -p <I>printer</I> -u allow:all <I>ENTER</I></B>
+</PRE>
+</UL>
+
+<P>CUPS supports allow and deny lists so that you can specify a
+list of users who are allowed to print or not allowed to print. Along
+with your list of users, you can specify whether they are allowed or
+not allowed to use the printer:</P>
+
+<UL>
+<PRE>
+<B>/usr/sbin/lpadmin -p <I>printer</I> -u allow:peter,paul,mary <I>ENTER</I></B>
+</PRE>
+</UL>
+
+<P>This command allows peter, paul, and mary to print to the named
+printer, but all other users cannot print. The command:</P>
+
+<UL>
+<PRE>
+<B>/usr/sbin/lpadmin -p <I>printer</I> -u deny:peter,paul,mary <I>ENTER</I></B>
+</PRE>
+</UL>
+
+<P>has the opposite effect. All users except peter, paul, and mary will
+be able to print to the named printer.</P>
+
+<CENTER>
+<TABLE BGCOLOR="#cccccc" BORDER="1" CELLPADDING="5" WIDTH="80%">
+<TR>
+	<TD><B>NOTE:</B>
+
+	<P>The <I>allow</I> and <I>deny</I> options are not cummulative. That
+	is, you must provide the complete list of users to allow or deny each
+	time.</P>
+
+	<P>Also, CUPS only maintains one list of users - the list can
+	allow or deny users from printing. If you specify an allow list and
+	then specify a deny list, the deny list will replace the allow list -
+	only one list is active at any time.</P>
+
+	</TD>
+</TR>
+</TABLE>
+</CENTER>
 
 <H2>Managing Printers from the Web</H2>
 
@@ -692,15 +774,11 @@ any printers of their own.
 <P>CUPS supports several methods of configuring client machines:
 
 <UL>
-
 	<LI><A HREF="#CLIENT_MANUAL">Manual configuration of print queues.</A>
-
 	<LI><A HREF="#CLIENT_SERVER">Specifying a single server for printing.</A>
-
 	<LI><A HREF="#CLIENT_AUTO">Automatic configuration of print queues.</A>
-
 	<LI><A HREF="#CLIENT_POLL">Specifying multiple servers for printing.</A>
-
+	<LI><A HREF="#CLIENT_RELAY">Relaying printers to other clients.</A>
 </UL>
 
 <H3><A NAME="CLIENT_MANUAL">Manual Configuration of Print Queues</A></H3>
@@ -715,7 +793,20 @@ each remote queue by hand using the <CODE>lpadmin</CODE> command:
 <P>The <CODE>printer</CODE> name is the name of the printer on the server
 machine. The <CODE>server</CODE> name is the hostname or IP address of the
 server machine. Repeat the <CODE>lpadmin</CODE> command for each remote
-printer you wish to use.
+printer you wish to use.</P>
+
+<CENTER>
+<TABLE BGCOLOR="#cccccc" BORDER="1" CELLPADDING="5" WIDTH="80%">
+	<TR>
+	<TD><B> NOTE:</B>
+	<P>Manual configuration of print queues is not recommended for large
+	numbers of client machines because of the administration nightmare it
+	creates. For busy networks, consider subnetting groups of clients and
+	polling and relaying printer information instead.</P>
+	</TD>
+	</TR>
+</TABLE>
+</CENTER>
 
 <H3><A NAME="CLIENT_SERVER">Specifying a Single Server for Printing</A></H3>
 
@@ -754,8 +845,27 @@ automatically. The printer and class lists are updated automatically as
 printers and servers are added or removed.
 
 <P>If you want to see printers on other subnets as well, use the
-<A HREF="#BrowsePoll"><CODE>BrowsePoll</CODE></A> directive as
-described next.
+<A HREF="#BrowsePoll"><CODE>BrowsePoll</CODE></A> 
+directive as described next.</P>
+
+<CENTER>
+<TABLE BGCOLOR="#cccccc" BORDER="1" CELLPADDING="5" WIDTH="80%">
+	<TR>
+	<TD><B> NOTE:</B>
+	<P>The<A HREF="#BrowseAddress"> <CODE>BrowseAddress</CODE></A> directive
+	enables broadcast traffic from your server. The default configuration
+	braodcasts printer information every 30 seconds. Although this printer
+	information does not use much bandwidth, typically about 80 bytes per
+	printer, it can add up with large numbers of servers and printers.</P>
+	<P>Use the <A HREF="#BrowseInterval"><CODE>BrowseInterval</CODE></A> 
+	and <A HREF="#BrowseTimeout"><CODE>BrowseTimeout</CODE></A> directives to tune
+	the amount of data that is added to your network load. In addition,
+	subnets can be used to minimize the amount of traffic that is carried
+	by the &quot;backbone&quot; of your large network.</P>
+	</TD>
+	</TR>
+</TABLE>
+</CENTER>
 
 <H3><A NAME="CLIENT_POLL">Specifying Multiple Servers for Printing</A></H3>
 
@@ -764,12 +874,88 @@ CUPS to poll those servers. Polling provides the benefits of automatic
 configuration without significant configuration on the clients, and multiple
 clients on the same subnet can share the same configuration information.
 
-<P>Polling is enabled by specifying one or more
-<A HREF="#BrowsePoll"><CODE>BrowsePoll</CODE></A> directives in the
-<VAR>/etc/cups/cupsd.conf</VAR> file. For information on making these
-changes, see <A HREF="#PRINTING_MANAGEMENT">Chapter 6, "Printing System
-Management"</A>.
+<P>Polling is enabled by specifying one or more 
+<A HREF="#BrowsePoll"><CODE>BrowsePoll</CODE></A> 
+directives in the <VAR>/etc/cups/cupsd.conf</VAR> file. 
+For information on making these changes, see 
+<A HREF="#PRINTING_MANAGEMENT">Chapter 6, "Printing System Management"</A>.
 
+<P>Multiple <A HREF="#BrowsePoll"><CODE>BrowsePoll</CODE></A> lines can
+be used to poll multiple CUPS servers. To limit the amount of
+polling you do from client machines, you can have only one of the
+clients do the polling and relay that information to the others on the
+same subnet (described next).</P>
+
+<H3><A NAME="CLIENT_RELAY">Relaying Printers to Other Clients</A></H3>
+
+<P>When you have clients and servers spread across multiple subnets, the
+polling method is inefficient. CUPS provides a 
+<A HREF="#BrowseRelay"><CODE>BrowseRelay</CODE></A> directive that enables a 
+single client to relay (broadcast) the polled printer information to the local subnet.</P>
+
+<P>For example, Server A and Server B are on subnet 1 and subnet 2,
+while the clients are on subnet 3.
+To provide printers to all of the clients in subnet 3,
+client C will be configured with the following directives in <VAR>/etc/cups/cupsd.conf</VAR>:</P>
+
+<UL><PRE>
+# Poll the two servers
+<B>
+BrowsePoll ServerA ENTER
+BrowsePoll ServerB ENTER
+</B>
+
+# Relay the printers to the local subnet
+<B>
+BrowseRelay 127.0.0.1 192.168.3.255 ENTER
+</B></PRE></UL>
+
+<P>The <A HREF="#BrowseRelay"><CODE>BrowseRelay</CODE></A> line specifies a source address and mask.
+Any browse packets coming from a matching address wil be sent to the given broadcast address.
+In this case, we want the packets from the local machine (127.0.0.1) relayed to the other clients.</P>
+
+<P>As printers are found using polling, 
+they are relayed from client C to the rest of the clients through a broadcast on subnet 3.
+The rest of the clients can use the standard <VAR>cupsd.conf</VAR> configuration.</P>
+
+<P>The <A HREF="#BrowseRelay"><CODE>BrowseRelay</CODE></A> directive can also be used to relay
+browsing packets from one network interface to another.
+For example, if client C in the previous example had network interfaces attaches to both
+subnet 1 and subnet 2, it could use the <A HREF="#BrowseRelay"><CODE>BrowseRelay</CODE></A> directive exclusively:
+
+<UL><PRE>
+# Relay the printers from subnet 1 and 2 to subnet 3
+<B>
+BrowseRelay 192.168.1 192.168.3.255 ENTER
+BrowseRelay 192.168.2 192.168.3.255 ENTER
+</B></PRE></UL>
+
+<H2>Load Balancing and Failsafe Operation</H2>
+
+<P>When using server polling or broadcasting, CUPS clients can
+automatically merge identical printers on multiple servers into a
+single <I>implicit class</I> queue. Clients assume that printers with
+the same name on multiple servers are in fact the same printer or type
+of printer being served by multiple machines.</P>
+
+<P>If you have two printers, LaserJet@ServerA and LaserJet@ServerB, a
+third implicit class called <I>LaserJet</I> will be created
+automatically on the client that refers to both printers. If the client
+also has a local printer with the name LaserJet then an implicit class
+named <I>AnyLaserJet</I> will be created instead.</P>
+
+<P>The client will alternate between servers and automatically stop
+sending jobs to a server if it goes down, providing a load-balancing
+effect and fail-safe operation with automatic switchover.</P>
+
+<CENTER><TABLE BGCOLOR="#cccccc" BORDER="1" CELLPADDING="5" WIDTH="80%">
+	<TR>
+	<TD><B> NOTE:</B>
+	<P>Note that implicit classes (<A HREF="#ImplicitClasses"><CODE>ImplicitClasses</CODE></A>) 
+	are enabled by default.</P>
+	</TD>
+	</TR>
+</TABLE></CENTER>
 
 <H1 ALIGN="RIGHT"><A NAME="PRINTING_MANAGEMENT">6 - Printing System Management</A></H1>
 
@@ -835,6 +1021,7 @@ script in the <VAR>init.d</VAR> directory with the name
 <VAR>cups</VAR>. The location varies based upon the operating system:
 
 <UL><PRE>
+<B>/etc/software/init.d/cups restart ENTER</B>
 <B>/etc/rc.d/init.d/cups restart ENTER</B>
 <B>/etc/init.d/cups restart ENTER</B>
 <B>/sbin/init.d/cups restart ENTER</B>
@@ -880,11 +1067,13 @@ determine how the server operates:
 	<LI><A HREF="#Browsing"><CODE>Browsing</CODE></A>
 	<LI><A HREF="#Classification"><CODE>Classification</CODE></A>
 	<LI><A HREF="#ClassifyOverride"><CODE>ClassifyOverride</CODE></A>
+	<LI><A HREF="#ConfigFilePerm"><CODE>ConfigFilePerm</CODE></A>
 	<LI><A HREF="#DataDir"><CODE>DataDir</CODE></A>
 	<LI><A HREF="#DefaultCharset"><CODE>DefaultCharset</CODE></A>
 	<LI><A HREF="#DefaultLanguage"><CODE>DefaultLanguage</CODE></A>
 	<LI><A HREF="#Deny"><CODE>Deny</CODE></A>
 	<LI><A HREF="#DocumentRoot"><CODE>DocumentRoot</CODE></A>
+	<LI><A HREF="#Encryption"><CODE>Encryption</CODE></A>
 
 </TD>
 <TD VALIGN="TOP">
@@ -892,9 +1081,9 @@ determine how the server operates:
 </TD>
 <TD VALIGN="TOP">
 
-	<LI><A HREF="#Encryption"><CODE>Encryption</CODE></A>
 	<LI><A HREF="#ErrorLog"><CODE>ErrorLog</CODE></A>
 	<LI><A HREF="#FilterLimit"><CODE>FilterLimit</CODE></A>
+	<LI><A HREF="#FilterNice"><CODE>FilterNice</CODE></A>
 	<LI><A HREF="#FontPath"><CODE>FontPath</CODE></A>
 	<LI><A HREF="#Group"><CODE>Group</CODE></A>
 	<LI><A HREF="#HideImplicitMembers"><CODE>HideImplicitMembers</CODE></A>
@@ -909,6 +1098,7 @@ determine how the server operates:
 	<LI><A HREF="#LimitRequestBody"><CODE>LimitRequestBody</CODE></A>
 	<LI><A HREF="#Listen"><CODE>Listen</CODE></A>
 	<LI><A HREF="#Location"><CODE>Location</CODE></A>
+	<LI><A HREF="#LogFilePerm"><CODE>LogFilePerm</CODE></A>
 	<LI><A HREF="#LogLevel"><CODE>LogLevel</CODE></A>
 	<LI><A HREF="#MaxClients"><CODE>MaxClients</CODE></A>
 	<LI><A HREF="#MaxJobs"><CODE>MaxJobs</CODE></A>
@@ -917,6 +1107,7 @@ determine how the server operates:
 	<LI><A HREF="#MaxLogSize"><CODE>MaxLogSize</CODE></A>
 	<LI><A HREF="#MaxRequestSize"><CODE>MaxRequestSize</CODE></A>
 	<LI><A HREF="#Order"><CODE>Order</CODE></A>
+	<LI><A HREF="#PageLog"><CODE>PageLog</CODE></A>
 
 </TD>
 <TD VALIGN="TOP">
@@ -924,7 +1115,6 @@ determine how the server operates:
 </TD>
 <TD VALIGN="TOP">
 
-	<LI><A HREF="#PageLog"><CODE>PageLog</CODE></A>
 	<LI><A HREF="#Port"><CODE>Port</CODE></A>
 	<LI><A HREF="#PreserveJobFiles"><CODE>PreserveJobFiles</CODE></A>
 	<LI><A HREF="#PreserveJobHistory"><CODE>PreserveJobHistory</CODE></A>
@@ -935,6 +1125,7 @@ determine how the server operates:
 	<LI><A HREF="#RequestRoot"><CODE>RequestRoot</CODE></A>
 	<LI><A HREF="#Require"><CODE>Require</CODE></A>
 	<LI><A HREF="#RIPCache"><CODE>RIPCache</CODE></A>
+	<LI><A HREF="#RootCertDuration"><CODE>RootCertDuration</CODE></A>
 	<LI><A HREF="#RunAsUser"><CODE>RunAsUser</CODE></A>
 	<LI><A HREF="#Satisfy"><CODE>Satisfy</CODE></A>
 	<LI><A HREF="#ServerAdmin"><CODE>ServerAdmin</CODE></A>
@@ -1001,6 +1192,8 @@ Allow from nnn.nnn.nnn.*
 Allow from nnn.nnn.nnn.nnn
 Allow from nnn.nnn.nnn.nnn/mm
 Allow from nnn.nnn.nnn.nnn/mmm.mmm.mmm.mmm
+Allow from @LOCAL
+Allow from @IF(name)
 </PRE></UL>
 
 <H4>Description</H4>
@@ -1043,6 +1236,11 @@ can be used to allow access for multiple hosts or networks.  The
 	<TD ALIGN="CENTER">255.255.255.255</TD>
 </TR>
 </TABLE></CENTER>
+
+<P>The <CODE>@LOCAL</CODE> name will allow access from all local
+network interfaces, but not remote point-to-point interfaces. The
+<CODE>@IF(name)</CODE> name will allow access from the named
+interface.
 
 <P>The <CODE>Allow</CODE> directive must appear inside a
 <A HREF="#Location"><CODE>Location</CODE></A> directive.
@@ -1174,6 +1372,8 @@ no effect if quotas are not enabled. The default setting is <CODE>No</CODE>.
 BrowseAddress 255.255.255.255:631
 BrowseAddress 192.0.2.255:631
 BrowseAddress host.domain.com:631
+BrowseAddress @LOCAL
+BrowseAddress @IF(name)
 </PRE></UL>
 
 <H4>Description</H4>
@@ -1183,8 +1383,11 @@ send browsing information to. Multiple <CODE>BrowseAddress</CODE>
 directives can be specified to send browsing information to different
 networks or systems.
 
-<P>The default address is <CODE>255.255.255.255:631</CODE> which will
-broadcast the information to all networks the server is connected to.
+<P>The <CODE>@LOCAL</CODE> name will broadcast printer
+information to all local interfaces. The <CODE>@IF(name)</CODE>
+name will broadcast to the named interface.
+
+<P>No browse addresses are set by default.</P>
 
 <CENTER><TABLE WIDTH="80%" BORDER="1" CELLPADDING="5" BGCOLOR="#cccccc">
 <TR>
@@ -1212,6 +1415,8 @@ BrowseAllow from 192.0.2
 BrowseAllow from 192.0.2.0/24
 BrowseAllow from 192.0.2.0/255.255.255.0
 BrowseAllow from *.domain.com
+BrowseAllow from @LOCAL
+BrowseAllow from @IF(name)
 </PRE></UL>
 
 <H4>Description</H4>
@@ -1227,6 +1432,12 @@ from all hosts.
 match networks using netmasks of 255.0.0.0, 255.255.0.0, and 255.255.255.0,
 or network addresses using the specified netmask or bit count.
 
+<P>The <CODE>@LOCAL</CODE> name will allow browse data from all
+local network interfaces, but not remote point-to-point
+interfaces. The <CODE>@IF(name)</CODE> name will allow browse
+data from the named interface.
+
+
 <!-- NEED 4in -->
 <H3><A NAME="BrowseDeny">BrowseDeny</A></H3>
 <HR>
@@ -1240,6 +1451,8 @@ BrowseDeny from 192.0.2
 BrowseDeny from 192.0.2.0/24
 BrowseDeny from 192.0.2.0/255.255.255.0
 BrowseDeny from *.domain.com
+BrowseDeny from @LOCAL
+BrowseDeny from @IF(name)
 </PRE></UL>
 
 <H4>Description</H4>
@@ -1254,6 +1467,12 @@ from no hosts.
 <P>IP address matching supports exact matches, partial addresses that
 match networks using netmasks of 255.0.0.0, 255.255.0.0, and 255.255.255.0,
 or network addresses using the specified netmask or bit count.
+
+<P>The <CODE>@LOCAL</CODE> name will block browse data from all
+local network interfaces, but not remote point-to-point
+interfaces. The <CODE>@IF(name)</CODE> name will block browse
+data from the named interface.
+
 
 <!-- NEED 3in -->
 <H3><A NAME="BrowseOrder">BrowseOrder</A></H3>
@@ -1339,7 +1558,7 @@ BrowsePort 9999
 <H4>Description</H4>
 
 <P>The <CODE>BrowsePort</CODE> directive specifies the UDP port number
-used for browse packets. The default port number is 631.
+used for browse packets. The default port number is 631.</P>
 
 <CENTER><TABLE WIDTH="80%" BORDER="1" CELLPADDING="5" BGCOLOR="#cccccc">
 <TR>
@@ -1370,7 +1589,7 @@ BrowseProtocols all
 <P>The <CODE>BrowseProtocols</CODE> directive specifies the protocols to
 use when collecting and distributing shared printers on the local network.
 The default protocol is <CODE>CUPS</CODE>, which is a broadcast-based
-protocol.
+protocol.</P>
 
 <CENTER><TABLE WIDTH="80%" BORDER="1" CELLPADDING="5" BGCOLOR="#cccccc">
 <TR>
@@ -1474,7 +1693,7 @@ Browsing Off
 <H4>Description</H4>
 
 <P>The <CODE>Browsing</CODE> directive controls whether or not network printer
-browsing is enabled. The default setting is <CODE>On</CODE>.
+browsing is enabled. The default setting is <CODE>On</CODE>.</P>
 
 <CENTER><TABLE WIDTH="80%" BORDER="1" CELLPADDING="5" BGCOLOR="#cccccc">
 <TR>
@@ -1533,6 +1752,22 @@ option is set to <CODE>none</CODE> then the server default classification
 is used.
 
 <P>The default is to not allow classification overrides.
+
+<!-- NEED 3in -->
+<H3><A NAME="ConfigFilePerm">ConfigFilePerm</A></H3>
+<HR>
+
+<H4>Examples</H4>
+
+<UL><PRE>
+ConfigFilePerm 0644
+ConfigFilePerm 0600
+</PRE></UL>
+
+<H4>Description</H4>
+
+<P>The <CODE>ConfigFilePerm</CODE> directive specifies the permissions
+to use when writing configuration files. The default is 0600.
 
 <!-- NEED 3in -->
 <H3><A NAME="DataDir">DataDir</A></H3>
@@ -1607,6 +1842,8 @@ Deny from nnn.nnn.nnn.*
 Deny from nnn.nnn.nnn.nnn
 Deny from nnn.nnn.nnn.nnn/mm
 Deny from nnn.nnn.nnn.nnn/mmm.mmm.mmm.mmm
+Deny from @LOCAL
+Deny from @IF(name)
 </PRE></UL>
 
 <H4>Description</H4>
@@ -1649,6 +1886,11 @@ can be used to allow access for multiple hosts or networks. The
 	<TD ALIGN="CENTER">255.255.255.255</TD>
 </TR>
 </TABLE></CENTER>
+
+<P>The <CODE>@LOCAL</CODE> name will deny access from all local
+network interfaces, but not remote point-to-point interfaces. The
+<CODE>@IF(name)</CODE> name will deny access from the named
+interface.
 
 <P>The <CODE>Deny</CODE> directive must appear inside a
 <A HREF="#Location"><CODE>Location</CODE></A> directive.
@@ -1749,6 +1991,28 @@ limit of about 200. A PostScript printer needs about half that
 limit the scheduler to printing a single job at any time.
 
 <P>The default limit is 0.
+
+<!-- NEED 3in -->
+<H3><A NAME="FilterNice">FilterNice</A></H3>
+<HR>
+
+<H4>Examples</H4>
+
+<UL><PRE>
+FilterNice 0
+FilterNice 39
+FilterNice -10
+</PRE></UL>
+
+<H4>Description</H4>
+
+<P>The <CODE>FilterNice</CODE> directive sets the scheduling
+priority of job filters. Values larger than 0 give filters a
+lower priority while values smaller than 0 give filters a higher
+priority. The <CODE>FilterNice</CODE> value does not affect the
+priority of job backends.
+
+<P>The default priority is 0.
 
 <!-- NEED 3in -->
 <H3><A NAME="FontPath">FontPath</A></H3>
@@ -2033,7 +2297,19 @@ access to specific interfaces or networks.
 ...
 &lt;/Location&gt;
 
+&lt;Location /printers&gt;
+...
+&lt;/Location&gt;
+
 &lt;Location /printers/name&gt;
+...
+&lt;/Location&gt;
+
+&lt;Location /classes&gt;
+...
+&lt;/Location&gt;
+
+&lt;Location /classes/name&gt;
 ...
 &lt;/Location&gt;
 </PRE></UL>
@@ -2041,9 +2317,56 @@ access to specific interfaces or networks.
 <H4>Description</H4>
 
 <P>The <CODE>Location</CODE> directive specifies access control and
-authentication options for the specified HTTP resource or path. More
-information can be found later in this chapter in
-<A HREF="#PRINTING_SECURITY">"Printing System Security"</A>.
+authentication options for the specified HTTP resource or path. 
+The 
+<A HREF="#Allow"><CODE>Allow</CODE></A>,
+<A HREF="#AuthClass"><CODE>AuthClass</CODE></A>,
+<A HREF="#AuthGroupName"><CODE>AuthGroupName</CODE></A>,
+<A HREF="#AuthType"><CODE>AuthType</CODE></A>,
+<A HREF="#Deny"><CODE>Deny</CODE></A>,
+<A HREF="#Encryption"><CODE>Encryption</CODE></A>,
+<A HREF="#Limit"><CODE>Limit</CODE></A>,
+<A HREF="#LimitExcept"><CODE>LimitExcept</CODE></A>,
+<A HREF="#Order"><CODE>Order</CODE></A>,
+<A HREF="#Require"><CODE>Require</CODE></A>, and
+<A HREF="#Satisfy"><CODE>Satisfy</CODE></A>
+directives may all appear inside a location.
+
+<CENTER><TABLE BORDER="1"><CAPTION>Locations on the Server.</CAPTION>
+<TR><TH>Location</TH><TH>Description</TH></TR>
+<TR><TD>/</TD><TD>The path for all get operations (get-printers, get-jobs, etc.)</TD></TR>
+<TR><TD>/admin</TD><TD>The path for all administration operations (add-printer, delete-printer, start-printer, etc.)</TD></TR>
+<TR><TD>/admin/conf</TD><TD>The path for access to the ESP Print Pro configuration files (cupsd.conf, client.conf, etc.)</TD></TR>
+<TR><TD>/classes</TD><TD>The path for all classes</TD></TR>
+<TR><TD>/classes/name</TD><TD>The resource for class <CODE>name</CODE></TD></TR>
+<TR><TD>/jobs</TD><TD>The path for all jobs (hold-job, release-job, etc.)</TD></TR>
+<TR><TD>/jobs/id</TD><TD>The resource for job <CODE>id</CODE></TD></TR>
+<TR><TD>/printers</TD><TD>The path for all printers</TD></TR>
+<TR><TD>/printers/name</TD><TD>The path for printer <CODE>name</CODE></TD></TR>
+<TR><TD>/printers/name.ppd</TD><TD>The PPD file path for printer <CODE>name</CODE></TD></TR>
+</TABLE></CENTER>
+
+<P>Note that more specific resources override the less specific ones.
+So the directives inside the <CODE>/printers/name</CODE> location will override ones from <CODE>/printers</CODE>.
+Directives inside <CODE>/printers</CODE> will override ones from <CODE>/</CODE>. &nbsp;
+None of the directives are inherited.
+More information can be found in section <A HREF="#PRINTING_SECURITY">"Printing System Security"</A>.
+
+<!-- NEED 3in -->
+<H3><A NAME="LogFilePerm">LogFilePerm</A></H3>
+<HR>
+
+<H4>Examples</H4>
+
+<UL><PRE>
+LogFilePerm 0644
+LogFilePerm 0600
+</PRE></UL>
+
+<H4>Description</H4>
+
+<P>The <CODE>LogFilePerm</CODE> directive specifies the permissions
+to use when writing configuration files. The default is 0644.
 
 <!-- NEED 3in -->
 <H3><A NAME="LogLevel">LogLevel</A></H3>
@@ -2112,7 +2435,7 @@ MaxClients 1024
 
 <P>The <CODE>MaxClients</CODE> directive controls the maximum number of
 simultaneous clients that will be allowed by the server. The default is
-100 clients.
+100 clients.</P>
 
 <CENTER><TABLE WIDTH="80%" BORDER="1" CELLPADDING="5" BGCOLOR="#cccccc">
 <TR>
@@ -2456,6 +2779,35 @@ provided then it is assumed to be relative to the
 <A HREF="#ServerRoot"><CODE>ServerRoot</CODE></A> directory. The
 default request directory is <VAR>/var/spool/cups</VAR>.
 
+<!-- NEED 4in -->
+<H3><A NAME="Require">Require</A></H3>
+<HR>
+
+<H4>Examples</H4>
+
+<UL><PRE>
+Require group foo bar
+Require user john mary
+Require valid-user
+</PRE></UL>
+
+<H4>Description</H4>
+
+<P>The <CODE>Require</CODE> directive specifies that
+authentication is required for the resource. The
+<CODE>group</CODE> keyword specifies that the authenticated user
+must be a member of one or more of the named groups that follow.
+
+<P>The <CODE>user</CODE> keyboard specifies that the
+authenticated user must be one of the named users that follow.
+
+<P>The <CODE>valid-user</CODE> keyword specifies that any
+authenticated user may access the resource.
+
+<P>The default is to do no authentication. This directive must
+appear inside a <A HREF="#Location"><CODE>Location</CODE></A>
+directive.
+
 <!-- NEED 3in -->
 <H3><A NAME="RIPCache">RIPCache</A></H3>
 <HR>
@@ -2475,6 +2827,26 @@ cache used by Raster Image Processor ("RIP") filters such as
 <CODE>imagetoraster</CODE> and <CODE>pstoraster</CODE>. The size can
 be suffixed with a "k" for kilobytes, "m" for megabytes, or
 "g" for gigabytes. The default cache size is "8m", or 8 megabytes.
+
+<!-- NEED 3in -->
+<H3><A NAME="RootCertDuration">RootCertDuration</A></H3>
+<HR>
+
+<H4>Examples</H4>
+
+<UL><PRE>
+RootCertDuration 300
+RootCertDuration 0
+</PRE></UL>
+
+<H4>Description</H4>
+
+<P>The <CODE>RootCertDuration</CODE> directive controls the
+interval between updates of the root authentication certificate.
+The default is <CODE>300</CODE> seconds which updates the root
+certificate approximately once every 5 minutes. Set the interval
+to 0 to disable certificate updates entirely.
+
 
 <!-- NEED 3in -->
 <H3><A NAME="RunAsUser">RunAsUser</A></H3>
@@ -2501,6 +2873,33 @@ automatically use a non-priviledged mode that is not 100%
 compliant with RFC 1179. The <CODE>parallel</CODE>,
 <CODE>serial</CODE>, and <CODE>usb</CODE> backends will need
 write access to the corresponding device files.
+
+<!-- NEED 3in -->
+<H3><A NAME="Satisfy">Satisfy</A></H3>
+<HR>
+
+<H4>Examples</H4>
+
+<UL><PRE>
+Satisfy all
+Satisfy any
+</PRE></UL>
+
+<H4>Description</H4>
+
+<P>The <CODE>Satisfy</CODE> directive specifies whether all
+conditions must be satisfied to allow access to the resource. If
+set to <CODE>all</CODE>, then all authentication and access
+control conditions must be satified to allow access.
+
+<P>Setting <CODE>Satisfy</CODE> to <CODE>any</CODE> allows a user to
+gain access if the authentication or access control requirements are
+satisfied. For example, you might require authentication for remote
+access, but allow local access without authentication.
+
+<P>The default is <CODE>all</CODE>. This directive must appear
+inside a <A HREF="#Location"><CODE>Location</CODE></A>
+directive.
 
 <!-- NEED 3in -->
 <H3><A NAME="ServerAdmin">ServerAdmin</A></H3>
@@ -2835,7 +3234,7 @@ root certificate is automatically regenerated every 5 minutes.
 
 <P>Basic authentication uses UNIX users and passwords to authenticate
 access to resources such as printers and classes, and to limit access
-to administrative functions.
+to administrative functions.</P>
 
 <CENTER><TABLE WIDTH="80%" BORDER="1" CELLPADDING="5" BGCOLOR="#cccccc">
 <TR>
@@ -2858,7 +3257,7 @@ using an account without a password, your access will be immediately
 blocked.
 
 <P>Once a valid username and password is authenticated by CUPS, any
-additional group membership requirements are checked.
+additional group membership requirements are checked.</P>
 
 <CENTER><TABLE WIDTH="80%" BORDER="1" CELLPADDING="5" BGCOLOR="#cccccc">
 <TR>
@@ -2884,7 +3283,7 @@ AuthType Basic
 <P>Digest authentication uses users and passwords defined in the
 <VAR>/etc/cups/passwd.md5</VAR> file to authenticate access to
 resources such as printers and classes, and to limit access to
-administrative functions.
+administrative functions.</P>
 
 <CENTER><TABLE WIDTH="80%" BORDER="1" CELLPADDING="5" BGCOLOR="#cccccc">
 <TR>
@@ -2948,7 +3347,7 @@ Password again: <B>(password) ENTER</B> [password is not echoed]
 </PRE></UL>
 
 <P>Once a valid username and password is authenticated by CUPS, any
-additional group membership requirements are checked.
+additional group membership requirements are checked.</P>
 
 <CENTER><TABLE WIDTH="80%" BORDER="1" CELLPADDING="5" BGCOLOR="#cccccc">
 <TR>
@@ -3002,7 +3401,7 @@ Password again: <B>(password) ENTER</B> [password is not echoed]
 <!-- NEW PAGE -->
 <H2><A NAME="PRINTER_ACCOUNTING">Printer Accounting</A></H2>
 
-<P>ESP Print Pro maintains a log of all accesses, errors, and
+<P>CUPS maintains a log of all accesses, errors, and
 pages that are printed. The log files are normally stored in the
 <VAR>/var/log/cups</VAR> directory. You can change this by
 editing the <VAR>/etc/cups/cupsd.conf</VAR> configuration file.
@@ -3239,7 +3638,7 @@ In addition, any file starting with the hexadecimal string
 character between and including <CODE>0xe0</CODE> and <CODE>0xef</CODE>
 (JPEG APPn markers) is also a JPEG file.
 
-<H3>mime.convs</A></H3>
+<H3>mime.convs</H3>
 
 <P>The <VAR>mime.convs</VAR> file defines all of the filter programs that
 are known to the system. Each line consists of:
@@ -3356,9 +3755,11 @@ the automatic client configuration and printer options are not supported by
 the LPD protocol, so you must manually configure each client for the printers
 it needs to access.
 
-<P>The <CODE>cups-lpd(8)</CODE> program provides support for LPD clients.
-To enable LPD support on your server, edit the <VAR>/etc/inetd.conf</VAR>
-file and add a line reading:
+<P>The <CODE>cups-lpd(8)</CODE> program provides support for LPD
+clients and can be used from either the <CODE>inetd(8)</CODE> or
+<CODE>xinetd(8)</CODE> programs. Add the following line to the
+<VAR>/etc/inetd.conf</VAR> file to enable LPD support on your
+server through the <CODE>inetd</CODE> program:
 
 <UL><PRE>
 printer stream tcp nowait lp /usr/lib/cups/daemon/cups-lpd cups-lpd
@@ -3367,14 +3768,54 @@ printer stream tcp nowait lp /usr/lib/cups/daemon/cups-lpd cups-lpd
 <P>The path to the <CODE>cups-lpd</CODE> may vary depending on your
 installation.
 
-<P>Once you have added this line, send the <CODE>inetd(8)</CODE> process
-a <CODE>HUP</CODE> signal or reboot the system:
+<P>Once you have added this line, send the <CODE>inetd</CODE>
+process a <CODE>HUP</CODE> signal or reboot the system:
 
 <UL><PRE>
 <B>killall -HUP inetd ENTER</B> [IRIX and some versions of Linux]
 <B>kill -HUP <I>pid</I> ENTER [Others]</B>
 <B>reboot ENTER [For all systems if the HUP signal fails]</B>
 </PRE></UL>
+
+<P>If you are using the <CODE>xinetd</CODE> program, create a
+file named <VAR>/etc/xinetd.d/printer</VAR> containing the
+following lines:
+
+<UL><PRE>
+service printer
+{
+    socket_type = stream
+    protocol = tcp
+    wait = no
+    user = lp
+    server = /usr/lib/cups/daemon/cups-lpd
+}
+</PRE></UL>
+
+<P>The <CODE>xinetd</CODE> program automatically reads the new
+configuration file and enables LPD printing support.
+
+<CENTER><TABLE WIDTH="80%" BORDER="1" CELLPADDING="5" BGCOLOR="#cccccc">
+<TR>
+	<TD><B>Warning:</B>
+
+	<P><CODE>cups-lpd</CODE> currently does not perform any
+	access control based on the settings in
+	<VAR>cupsd.conf</VAR> or in the <VAR>hosts.allow</VAR>
+	or <VAR>hosts.deny</VAR> files used by TCP wrappers.
+	Therefore, running <CODE>cups-lpd</CODE> on your server
+	will allow any computer on your network (and perhaps the
+	entire Internet) to print to your server.
+
+	<P>While <CODE>xinetd</CODE> has built-in access control
+	support, you should use the TCP wrappers package with
+	<CODE>inetd</CODE> to limit access to only those
+	computers that should be able to print through your
+	server.
+
+	</TD>
+</TR>
+</TABLE></CENTER>
 
 <H2>Printing to LPD Servers</H2>
 
@@ -3597,14 +4038,14 @@ Otherwise you will not be able to authenticate
 the printer drivers for one or more queues:
 
 <UL><PRE>
-<KBD>cupsaddsmb -U root printer1 ... printerN <I>ENTER</I></KBD>
+<B>cupsaddsmb -U root printer1 ... printerN <I>ENTER</I></B>
 </PRE></UL>
 
 <P>Running <CODE>cupsaddsmb</CODE> with the <CODE>-a</CODE> option
 will export all printers:
 
 <UL><PRE>
-<KBD>cupsaddsmb -U root -a <I>ENTER</I></KBD>
+<B>cupsaddsmb -U root -a <I>ENTER</I></B>
 </PRE></UL>
 
 <H2>Printing to Windows Servers</H2>
@@ -3746,7 +4187,7 @@ myprinter:ha=080069001234:ip=192.0.2.2:<VAR>t144=myprinter.boot</VAR>
 
 <P>The <VAR>myprinter.boot</VAR> file resides in the <VAR>/usr/local/boot</VAR>
 directory by default. If you do not need to provide a boot file you may leave
-the last part of the line blank.
+the last part of the line blank.</P>
 
 <!-- NEED 2in -->
 <CENTER><TABLE WIDTH="80%" BORDER="1" CELLPADDING="5" BGCOLOR="#cccccc">
@@ -4183,11 +4624,11 @@ the Common UNIX Printing System.
 </TR>
 <TR VALIGN="TOP">
 	<TD>/etc/cups/mime.convs</TD>
-	<TD>The list of standard file filters included with ESP Print Pro.</TD>
+	<TD>The list of standard file filters included with CUPS.</TD>
 </TR>
 <TR VALIGN="TOP">
 	<TD>/etc/cups/mime.types</TD>
-	<TD>The list of recognized file types for ESP Print Pro.</TD>
+	<TD>The list of recognized file types for CUPS.</TD>
 </TR>
 <TR VALIGN="TOP">
 	<TD>/etc/cups/ppd/</TD>
@@ -4399,16 +4840,17 @@ For more information please contact us at:
 
 </UL>
 
-<H2>My Applications Don't See the Available Printers</H1>
+<H2>My Applications Don't See the Available Printers</H2>
 
 <P>Many applications read the <VAR>/etc/printcap</VAR> file to
 get a list of available printers.
 
-<P>The default CUPS configuration does not create the
-<VAR>/etc/printcap</VAR> file automatically. To enable automatic
-creation and updating of this file, use the
-<A HREF="#Printcap"><CODE>Printcap</CODE></A> directive described in
-<A HREF="#PRINTING_MANAGEMENT">Chapter 6, "Printing System Management"</A>.
+<P>The default CUPS configuration creates the
+<VAR>/etc/printcap</VAR> file automatically. To enable or
+disable automatic creation and updating of this file, use the <A
+HREF="#Printcap"><CODE>Printcap</CODE></A> directive described
+in <A HREF="#PRINTING_MANAGEMENT">Chapter 6, "Printing System
+Management"</A>.
 
 <H2>CUPS Doesn't Recognize My Username or Password!</H2>
 
@@ -4430,11 +4872,11 @@ lines reading:
 <UL><PRE>
 AuthType Basic
 AuthClass System
-</UL></PRE>
+</PRE></UL>
 
-for the <VAR>/admin</VAR> location. Then restart the CUPS server as
+<P>for the <VAR>/admin</VAR> location. Then restart the CUPS server as
 described in <A HREF="#PRINTING_MANAGEMENT">Chapter 6, "Printing System
-Management"</A>.
+Management"</A>.</P>
 
 <CENTER><TABLE WIDTH="80%" BORDER="1" CELLPADDING="5" BGCOLOR="#cccccc">
 <TR>
@@ -4460,9 +4902,9 @@ Deny from all
 Allow from 127.0.0.1
 </PRE></UL>
 
-for the <VAR>/admin</VAR> location. Then restart the CUPS server as
+<P>for the <VAR>/admin</VAR> location. Then restart the CUPS server as
 described in <A HREF="#PRINTING_MANAGEMENT">Chapter 6, "Printing System
-Management"</A>.
+Management"</A>.</P>
 
 <CENTER><TABLE WIDTH="80%" BORDER="1" CELLPADDING="5" BGCOLOR="#cccccc">
 <TR>
@@ -4470,7 +4912,7 @@ Management"</A>.
 	<B>NOTE:</B>
 
 	<P>Allowing administration access from all hosts is a potential
-	security risk. Please read <A HREF="PRINTING_SECURITY">Chapter
+	security risk. Please read <A HREF="#PRINTING_SECURITY">Chapter
 	6, "Printing System Management"</A> for a description of these
 	risks and ways to minimize them.
 	</TD>

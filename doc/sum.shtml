@@ -73,7 +73,7 @@ their meanings and uses are explained below:
 
 	<TD>&nbsp;&nbsp;&nbsp;</TD>
 
-	<TD>Literal user input; special keys like <KBD>ENTER</B></KBD> are
+	<TD>Literal user input; special keys like <KBD>ENTER</KBD> are
 	in ALL CAPS.</TD>
 </TR>
 <TR><TD>&nbsp;</TD></TR>
@@ -165,9 +165,9 @@ port, or available over the network.
 <B>lpstat -p -d ENTER</B>
 </PRE></UL>
 
-<P>The <CODE>-p</CODE> option specifies that you want to see a list of
-printers, and the <CODE>-d</CODE> option reports the current system
-default printer or class.
+<P>The <CODE>-p</CODE> option specifies that you want to see a
+list of printers, and the <CODE>-d</CODE> option reports the
+current default printer or class.
 
 <P>Use the <CODE>-d</CODE> option with the <CODE>lp</CODE> command to
 print to a specific printer:
@@ -287,16 +287,6 @@ when printing with the <CODE>lp</CODE> and <CODE>lpr</CODE> commands.
 
 <P>The following options apply when printing all types of files.
 
-<H3>Setting the Orientation</H3>
-
-<P>The <CODE>-o landscape</CODE> option will rotate the page 90 degrees
-to print in landscape orientation:
-
-<UL><PRE>
-<B>lp -o landscape filename ENTER</B>
-<B>lpr -o landscape filename ENTER</B>
-</PRE></UL>
-
 <!-- NEED 2in -->
 <H3>Selecting the Media Size, Type, and Source</H3>
 
@@ -342,6 +332,16 @@ most support the following options (case is not significant):
 <P>The actual options supported are defined in the printer's PPD file
 in the <CODE>PageSize</CODE>, <CODE>InputSlot</CODE>, and
 <CODE>MediaType</CODE> options.
+
+<H3>Setting the Orientation</H3>
+
+<P>The <CODE>-o landscape</CODE> option will rotate the page 90 degrees
+to print in landscape orientation:
+
+<UL><PRE>
+<B>lp -o landscape filename ENTER</B>
+<B>lpr -o landscape filename ENTER</B>
+</PRE></UL>
 
 <H3>Printing On Both Sides of the Paper</H3>
 
@@ -450,16 +450,40 @@ of the order of the pages in the <CODE>page-ranges</CODE> option.
 
 <P>The <CODE>-o number-up=value</CODE> option selects N-Up printing. 
 N-Up printing places multiple document pages on a single printed page. 
-CUPS supports 1-Up, 2-Up, and 4-Up formats:
+CUPS supports 1, 2, 4, 6, 9, and 16-Up formats; the default format is
+1-Up:
 
 <UL><PRE>
 <B>lp -o number-up=1 filename ENTER</B>
 <B>lp -o number-up=2 filename ENTER</B>
 <B>lp -o number-up=4 filename ENTER</B>
-<B>lpr -o number-up=4 filename ENTER</B>
+<B>lpr -o number-up=16 filename ENTER</B>
 </PRE></UL>
 
-<P>The default format is 1-Up.
+<P>The <CODE>-o page-border=value</CODE> option chooses the border
+to draw around each page:
+
+<UL>
+	<LI><CODE>-o page-border=double</CODE>; draw two hairline borders around each page</LI>
+	<LI><CODE>-o page-border=double-thick</CODE>; draw two 1pt borders around each page</LI>
+	<LI><CODE>-o page-border=none</CODE>; do not draw a border (default)</LI>
+	<LI><CODE>-o page-border=single</CODE>; draw one hairline border around each page</LI>
+	<LI><CODE>-o page-border=single-thick</CODE>; draw one 1pt border around each page</LI>
+</UL>
+
+<P>The <CODE>-o number-up-layout=value</CODE> option chooses the layout
+of the pages on each output page:
+
+<UL>
+	<LI><CODE>-o number-up-layout=btlr</CODE>; Bottom to top, left to right</LI>
+	<LI><CODE>-o number-up-layout=btrl</CODE>; Bottom to top, right to left</LI>
+	<LI><CODE>-o number-up-layout=lrbt</CODE>; Left to right, bottom to top</LI>
+	<LI><CODE>-o number-up-layout=lrtb</CODE>; Left to right, top to bottom (default)</LI>
+	<LI><CODE>-o number-up-layout=rlbt</CODE>; Right to left, bottom to top</LI>
+	<LI><CODE>-o number-up-layout=rltb</CODE>; Right to left, top to bottom</LI>
+	<LI><CODE>-o number-up-layout=tblr</CODE>; Top to bottom, left to right</LI>
+	<LI><CODE>-o number-up-layout=tbrl</CODE>; Top to bottom, right to left</LI>
+</UL>
 
 <H3>Setting the Brightness</H3>
 
@@ -799,6 +823,7 @@ Like the <CODE>lp</CODE> and <CODE>lpr</CODE> commands, it accepts printer
 options using the <CODE>-o</CODE> argument:
 
 <UL><PRE>
+<B>lpoptions -o prettyprint ENTER</B>
 <B>lpoptions -o media=A4 -o sides=two-sided-long-edge ENTER</B>
 <B>lpoptions -o media=Legal -o scaling=100 ENTER</B>
 </PRE></UL>
@@ -813,8 +838,20 @@ printer. The <CODE>-p printer</CODE> option specifies the options are
 for another printer:
 
 <UL><PRE>
+<B>lpoptions -p laserjet -o prettyprint ENTER</B>
 <B>lpoptions -p laserjet -o media=A4 -o sides=two-sided-long-edge ENTER</B>
 <B>lpoptions -p deskjet -o media=Legal -o scaling=100 ENTER</B>
+</PRE></UL>
+
+<H2>Removing Options</H2>
+
+<P>The previous two examples shows how to set options for the default
+and a specific printer.  Below, shows you how to remove the saved 
+option using the <CODE>-r</CODE> argument:
+
+<UL><PRE>
+<KBD>lpoptions -r prettyprint <I>ENTER</I></KBD>
+<KBD>lpoptions -p laserjet -r prettyprint <I>ENTER</I></KBD>
 </PRE></UL>
 
 <H2>Viewing the Current Defaults</H2>
@@ -827,6 +864,15 @@ options by not specifying any new options on the command-line:
 media=A4 sides=two-sided-long-edge
 <B>lpoptions -p deskjet ENTER</B>
 media=Legal scaling=100
+</PRE></UL>
+
+<H2>Viewing Options for a Specific Printer</H2>
+
+<P>You can display the supported options using the <CODE>lpoptions</CODE>
+command with the <CODE>-l</CODE> option, as follows:
+
+<UL><PRE>
+<B>lpoptions -p laserjet -l ENTER</B>
 </PRE></UL>
 
 <H2>Setting the Default Printer</H2>
@@ -854,7 +900,7 @@ the slash (<CODE>/</CODE>) character:
 <B>lpoptions -p laserjet/legal -o media=Legal ENTER</B>
 </PRE></UL>
 
-<P>The <CODE>lp</CODE> and </CODE>lpr</CODE> commands also understand
+<P>The <CODE>lp</CODE> and <CODE>lpr</CODE> commands also understand
 this notation:
 
 <UL><PRE>

@@ -4,7 +4,7 @@
 <TITLE>CUPS Software Security Report</TITLE>
 <META NAME="author" CONTENT="Easy Software Products">
 <META NAME="copyright" CONTENT="Copyright 1997-2002, All Rights Reserved">
-<META NAME="docnumber" CONTENT="CUPS-SSR-1.1">
+<META NAME="docnumber" CONTENT="CUPS-SSR-1.2">
 <META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-8859-1">
 <STYLE TYPE="text/css"><!--
 BODY { font-family: serif }
@@ -22,7 +22,7 @@ PRE { font-family: monospace }
 <BODY>
 <CENTER><A HREF="#CONTENTS"><IMG SRC="images/cups-large.gif" BORDER="0" WIDTH="431" HEIGHT="511"><BR>
 <H1>CUPS Software Security Report</H1></A><BR>
-CUPS-SSR-1.1<BR>
+CUPS-SSR-1.2<BR>
 Easy Software Products<BR>
 Copyright 1997-2002, All Rights Reserved<BR>
 </CENTER>
@@ -59,7 +59,7 @@ Copyright 1997-2002, All Rights Reserved<BR>
 <H2><A NAME="1_1">1.1 Identification</A></H2>
 <P>This software security report provides an analysis of possible
  security concerns for the Common UNIX Printing System (&quot;CUPS&quot;) Version
- 1.1.</P>
+ 1.2.</P>
 <H2><A NAME="1_2">1.2 System Overview</A></H2>
 <P>CUPS provides a portable printing layer for UNIX&reg;-based operating
  systems. It has been developed by<A HREF="http://www.easysw.com"> Easy
@@ -90,16 +90,16 @@ Copyright 1997-2002, All Rights Reserved<BR>
 <H2><A NAME="2_1">2.1 CUPS Documentation</A></H2>
 <P>The following CUPS documentation is referenced by this document:</P>
 <UL>
-<LI>CUPS-CMP-1.1: CUPS Configuration Management Plan</LI>
-<LI>CUPS-IDD-1.1: CUPS System Interface Design Description</LI>
-<LI>CUPS-IPP-1.1: CUPS Implementation of IPP</LI>
-<LI>CUPS-SAM-1.1.x: CUPS Software Administrators Manual</LI>
-<LI>CUPS-SDD-1.1: CUPS Software Design Description</LI>
-<LI>CUPS-SPM-1.1.x: CUPS Software Programming Manual</LI>
-<LI>CUPS-SSR-1.1: CUPS Software Security Report</LI>
-<LI>CUPS-STP-1.1: CUPS Software Test Plan</LI>
-<LI>CUPS-SUM-1.1.x: CUPS Software Users Manual</LI>
-<LI>CUPS-SVD-1.1: CUPS Software Version Description</LI>
+<LI>CUPS-CMP-1.2: CUPS Configuration Management Plan</LI>
+<LI>CUPS-IDD-1.2: CUPS System Interface Design Description</LI>
+<LI>CUPS-IPP-1.2: CUPS Implementation of IPP</LI>
+<LI>CUPS-SAM-1.2.x: CUPS Software Administrators Manual</LI>
+<LI>CUPS-SDD-1.2: CUPS Software Design Description</LI>
+<LI>CUPS-SPM-1.2.x: CUPS Software Programming Manual</LI>
+<LI>CUPS-SSR-1.2: CUPS Software Security Report</LI>
+<LI>CUPS-STP-1.2: CUPS Software Test Plan</LI>
+<LI>CUPS-SUM-1.2.x: CUPS Software Users Manual</LI>
+<LI>CUPS-SVD-1.2: CUPS Software Version Description</LI>
 </UL>
 <H2><A NAME="2_2">2.2 Other Documents</A></H2>
 <P>The following non-CUPS documents are referenced by this document:</P>
@@ -118,8 +118,8 @@ Adobe PostScript Language Reference, Third Edition.</A></LI>
 <LI><A HREF="http://www.ietf.org/rfc/rfc2567.txt">RFC 2567, Design Goals
  for an Internet Printing Protocol</A></LI>
 <LI><A HREF="http://www.ietf.org/rfc/rfc2568.txt">RFC 2568, Rationale
- for the Structure of the Model and Protocol</A> for the Internet
- Printing Protocol</LI>
+ for the Structure of the Model and Protocol for the Internet Printing
+ Protocol</A></LI>
 <LI><A HREF="http://www.ietf.org/rfc/rfc2569.txt">RFC 2569, Mapping
  between LPD and IPP Protocols</A></LI>
 <LI><A HREF="http://www.ietf.org/rfc/rfc2616.txt">RFC 2616, Hypertext
@@ -138,13 +138,14 @@ Adobe PostScript Language Reference, Third Edition.</A></LI>
 <LI>Device URIs are passed to backend filters in argv[0] and in an
  environment variable. Since device URIs can contain usernames and
  passwords it may be possible for a local user to gain access to a
- remote resource.</LI>
+ remote resource.
 <P>We recommend that any password-protected accounts used for remote
  printing have limited access priviledges so that the possible damages
  can be minimized.</P>
 <P>The device URI is &quot;sanitized&quot; (the username and password are removed)
  when sent to an IPP client so that a remote user cannot exploit this
  vulnerability.</P>
+</LI>
 </OL>
 <H1><A NAME="4">4 Remote Access Risks</A></H1>
 <P>Remote access risks are those that can be exploited without a local
@@ -155,36 +156,41 @@ Adobe PostScript Language Reference, Third Edition.</A></LI>
  of service attacks, including:</P>
 <OL>
 <LI>Establishing multiple connections to the server until the server
- will accept no more.</LI>
+ will accept no more.
 <P>This cannot be protected against by the current software. It is
  possible that future versions of the CUPS software could be configured
  to limit the number of connections allowed from a single host, however
  that still would not prevent a distributed attack.</P>
 <LI>Repeatedly opening and closing connections to the server as fast as
- possible.</LI>
+ possible.
 <P>There is no easy way of protecting against this in the CUPS software.
  If the attack is coming from outside the local network it might be
  possible to filter such an attack, however once the connection request
  has been received by the server it must at least accept the connection
  to find out who is connecting.</P>
-<LI>Flooding the network with broadcast packets on port 631.</LI>
+<LI>Flooding the network with broadcast packets on port 631.
 <P>It might be possible to disable browsing if this condition is
  detected by the CUPS software, however if there are large numbers of
  printers available on the network such an algorithm might think that an
  attack was occurring when instead a valid update was being received.</P>
 <LI>Sending partial IPP requests; specifically, sending part of an
- attribute value and then stopping transmission.</LI>
+ attribute value and then stopping transmission.
 <P>The current code is structured to read and write the IPP request data
  on-the-fly, so there is no easy way to protect against this for large
  attribute values.</P>
 <LI>Sending large/long print jobs to printers, preventing other users
- from printing.</LI>
+ from printing.
 <P>There are limited facilities for protecting against large print jobs
  (the <CODE>MaxRequestSize</CODE> attribute), however this will not
  protect printers from malicious users and print files that generate
  hundreds or thousands of pages. In general, we recommend restricting
  printer access to known hosts or networks, and adding user-level access
  control as needed for expensive printers.</P>
+</LI>
+</LI>
+</LI>
+</LI>
+</LI>
 </OL>
 <H2><A NAME="4_2">4.2 Security Breaches</A></H2>
 <P>The current CUPS server supports Basic, Digest, and local certificate

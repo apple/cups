@@ -4,7 +4,7 @@
 <TITLE>CUPS Configuration Management Plan</TITLE>
 <META NAME="author" CONTENT="Easy Software Products">
 <META NAME="copyright" CONTENT="Copyright 1997-2002, All Rights Reserved">
-<META NAME="docnumber" CONTENT="CUPS-CMP-1.1">
+<META NAME="docnumber" CONTENT="CUPS-CMP-1.2">
 <META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-8859-1">
 <STYLE TYPE="text/css"><!--
 BODY { font-family: serif }
@@ -22,7 +22,7 @@ PRE { font-family: monospace }
 <BODY>
 <CENTER><A HREF="#CONTENTS"><IMG SRC="images/cups-large.gif" BORDER="0" WIDTH="431" HEIGHT="511"><BR>
 <H1>CUPS Configuration Management Plan</H1></A><BR>
-CUPS-CMP-1.1<BR>
+CUPS-CMP-1.2<BR>
 Easy Software Products<BR>
 Copyright 1997-2002, All Rights Reserved<BR>
 </CENTER>
@@ -118,7 +118,7 @@ Copyright 1997-2002, All Rights Reserved<BR>
 <H2><A NAME="1_1">1.1 Identification</A></H2>
  This configuration management plan document provides the guidelines for
  development and maintenance of the Common UNIX Printing System (&quot;CUPS&quot;)
- Version 1.1 software.
+ Version 1.2 software.
 <H2><A NAME="1_2">1.2 System Overview</A></H2>
 <P>CUPS provides a portable printing layer for UNIX&reg;-based operating
  systems. It has been developed by<A HREF="http://www.easysw.com"> Easy
@@ -151,16 +151,16 @@ Copyright 1997-2002, All Rights Reserved<BR>
 <H2><A NAME="2_1">2.1 CUPS Documentation</A></H2>
 <P>The following CUPS documentation is referenced by this document:</P>
 <UL>
-<LI>CUPS-CMP-1.1: CUPS Configuration Management Plan</LI>
-<LI>CUPS-IDD-1.1: CUPS System Interface Design Description</LI>
-<LI>CUPS-IPP-1.1: CUPS Implementation of IPP</LI>
-<LI>CUPS-SAM-1.1.x: CUPS Software Administrators Manual</LI>
-<LI>CUPS-SDD-1.1: CUPS Software Design Description</LI>
-<LI>CUPS-SPM-1.1.x: CUPS Software Programming Manual</LI>
-<LI>CUPS-SSR-1.1: CUPS Software Security Report</LI>
-<LI>CUPS-STP-1.1: CUPS Software Test Plan</LI>
-<LI>CUPS-SUM-1.1.x: CUPS Software Users Manual</LI>
-<LI>CUPS-SVD-1.1: CUPS Software Version Description</LI>
+<LI>CUPS-CMP-1.2: CUPS Configuration Management Plan</LI>
+<LI>CUPS-IDD-1.2: CUPS System Interface Design Description</LI>
+<LI>CUPS-IPP-1.2: CUPS Implementation of IPP</LI>
+<LI>CUPS-SAM-1.2.x: CUPS Software Administrators Manual</LI>
+<LI>CUPS-SDD-1.2: CUPS Software Design Description</LI>
+<LI>CUPS-SPM-1.2.x: CUPS Software Programming Manual</LI>
+<LI>CUPS-SSR-1.2: CUPS Software Security Report</LI>
+<LI>CUPS-STP-1.2: CUPS Software Test Plan</LI>
+<LI>CUPS-SUM-1.2.x: CUPS Software Users Manual</LI>
+<LI>CUPS-SVD-1.2: CUPS Software Version Description</LI>
 </UL>
 <H2><A NAME="2_2">2.2 Other Documents</A></H2>
 <P>The following non-CUPS documents are referenced by this document:</P>
@@ -179,8 +179,8 @@ Adobe PostScript Language Reference, Third Edition.</A></LI>
 <LI><A HREF="http://www.ietf.org/rfc/rfc2567.txt">RFC 2567, Design Goals
  for an Internet Printing Protocol</A></LI>
 <LI><A HREF="http://www.ietf.org/rfc/rfc2568.txt">RFC 2568, Rationale
- for the Structure of the Model and Protocol</A> for the Internet
- Printing Protocol</LI>
+ for the Structure of the Model and Protocol for the Internet Printing
+ Protocol</A></LI>
 <LI><A HREF="http://www.ietf.org/rfc/rfc2569.txt">RFC 2569, Mapping
  between LPD and IPP Protocols</A></LI>
 <LI><A HREF="http://www.ietf.org/rfc/rfc2616.txt">RFC 2616, Hypertext
@@ -253,7 +253,7 @@ Adobe PostScript Language Reference, Third Edition.</A></LI>
 <UL>
 <PRE>
 major.minor.patch
-1.1.0
+1.2.0
 </PRE>
 </UL>
  Beta-test releases are indentified by appending the letter B followed
@@ -261,7 +261,7 @@ major.minor.patch
 <UL>
 <PRE>
 major.minor.patchbbuild
-1.1.0b1
+1.2.0b1
 </PRE>
 </UL>
  A CVS snapshot is generated for every beta and final release and uses
@@ -281,13 +281,13 @@ v1_0_0
  numbers reset to 0:
 <UL>
 <PRE>
-1.1.0b1    First beta release
-1.1.0b2    Second beta release
-1.1.0      First production release
-1.1.1b1    First beta of 1.1.1
-1.1.1      Production release of 1.1.1
-1.1.1b1    First beta of 1.1.1
-1.1.1      Production release of 1.1.1
+1.2.0b1    First beta release
+1.2.0b2    Second beta release
+1.2.0      First production release
+1.2.1b1    First beta of 1.2.1
+1.2.1      Production release of 1.2.1
+1.2.1b1    First beta of 1.2.1
+1.2.1      Production release of 1.2.1
 2.0.0b1    First beta of 2.0.0
 2.0.0      Production release of 2.0.0
 </PRE>
@@ -299,7 +299,7 @@ v1_0_0
  are recompiled.
 <H2><A NAME="5_3">5.3 Testing</A></H2>
  Software testing shall be conducted according to the CUPS Software Test
- Plan, CUPS-STP-1.1. Failed tests cause STRs to be generated to correct
+ Plan, CUPS-STP-1.2. Failed tests cause STRs to be generated to correct
  the problems found.
 <H2><A NAME="5_4">5.4 Release</A></H2>
  When testing has been completed successfully a new distribution image
@@ -435,8 +435,8 @@ v1_0_0
  * Notes: none.
  */
 
-static float     /* O - Inverse power value, 0.0 &lt;= y &lt;= 1.1 */
-do_this(float x) /* I - Power value (0.0 &lt;= x &lt;= 1.1) */
+static float     /* O - Inverse power value, 0.0 &lt;= y &lt;= 1.0 */
+do_this(float x) /* I - Power value (0.0 &lt;= x &lt;= 1.0) */
 {
   ...
   return (y);

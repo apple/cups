@@ -2,7 +2,7 @@
 <HEAD>
 	<META NAME="Description" CONTENT="Common UNIX Printing System Software Test Plan">
 	<META NAME="COPYRIGHT" CONTENT="Copyright 1997-2002, All Rights Reserved">
-	<META NAME="DOCNUMBER" CONTENT="CUPS-STP-1.1">
+	<META NAME="DOCNUMBER" CONTENT="CUPS-STP-1.2">
 	<META NAME="Author" CONTENT="Easy Software Products">
 	<TITLE>CUPS Software Test Plan</TITLE>
 </HEAD>
@@ -14,7 +14,7 @@
 
 <P>This software test plan provides detailed tests that are used
 to evaluate the stability and compliance of the Common UNIX
-Printing System ("CUPS") Version 1.1.
+Printing System ("CUPS") Version 1.2.
 
 <EMBED SRC="system-overview.shtml">
 

@@ -4,7 +4,7 @@
 <TITLE>CUPS Software Users Manual</TITLE>
 <META NAME="author" CONTENT="Easy Software Products">
 <META NAME="copyright" CONTENT="Copyright 1997-2002, All Rights Reserved">
-<META NAME="docnumber" CONTENT="CUPS-SUM-1.1.7">
+<META NAME="docnumber" CONTENT="CUPS-SUM-1.2.0">
 <META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-8859-1">
 <STYLE TYPE="text/css"><!--
 BODY { font-family: serif }
@@ -22,7 +22,7 @@ PRE { font-family: monospace }
 <BODY BGCOLOR="#ffffff">
 <CENTER><A HREF="#CONTENTS"><IMG SRC="images/cups-large.gif" BORDER="0" WIDTH="431" HEIGHT="511"><BR>
 <H1>CUPS Software Users Manual</H1></A><BR>
-CUPS-SUM-1.1.7<BR>
+CUPS-SUM-1.2.0<BR>
 Easy Software Products<BR>
 Copyright 1997-2002, All Rights Reserved<BR>
 </CENTER>
@@ -62,8 +62,8 @@ Copyright 1997-2002, All Rights Reserved<BR>
 <UL>
 <LI><A HREF="#4_1">General Options</A></LI>
 <UL>
-<LI><A HREF="#4_1_1">Setting the Orientation</A></LI>
-<LI><A HREF="#4_1_2">Selecting the Media Size, Type, and Source</A></LI>
+<LI><A HREF="#4_1_1">Selecting the Media Size, Type, and Source</A></LI>
+<LI><A HREF="#4_1_2">Setting the Orientation</A></LI>
 <LI><A HREF="#4_1_3">Printing On Both Sides of the Paper</A></LI>
 </UL>
 <LI><A HREF="#4_2">Banner Options</A></LI>
@@ -105,19 +105,22 @@ Copyright 1997-2002, All Rights Reserved<BR>
 <UL>
 <LI><A HREF="#5_1">Printer Options</A></LI>
 <LI><A HREF="#5_2">Setting Options for a Specific Printer</A></LI>
-<LI><A HREF="#5_3">Viewing the Current Defaults</A></LI>
-<LI><A HREF="#5_4">Setting the Default Printer</A></LI>
-<LI><A HREF="#5_5">Printer Instances</A></LI>
-<LI><A HREF="#5_6">Removing Instances</A></LI>
+<LI><A HREF="#5_3">Removing Options</A></LI>
+<LI><A HREF="#5_4">Viewing the Current Defaults</A></LI>
+<LI><A HREF="#5_5">Viewing Options for a Specific Printer</A></LI>
+<LI><A HREF="#5_6">Setting the Default Printer</A></LI>
+<LI><A HREF="#5_7">Printer Instances</A></LI>
+<LI><A HREF="#5_8">Removing Instances</A></LI>
 </UL>
 <B><A HREF="#LICENSE">A - Software License Agreement</A></B>
 <UL>
 <LI><A HREF="#6_1">Common UNIX Printing System License Agreement</A></LI>
 <UL>
 <LI><A HREF="#6_1_1">Introduction</A></LI>
-<LI><A HREF="#6_1_2">Trademarks</A></LI>
-<LI><A HREF="#6_1_3">Binary Distribution Rights</A></LI>
-<LI><A HREF="#6_1_4">Support</A></LI>
+<LI><A HREF="#6_1_2">License Exceptions</A></LI>
+<LI><A HREF="#6_1_3">Trademarks</A></LI>
+<LI><A HREF="#6_1_4">Binary Distribution Rights</A></LI>
+<LI><A HREF="#6_1_5">Support</A></LI>
 </UL>
 <LI><A HREF="#6_2">GNU GENERAL PUBLIC LICENSE</A></LI>
 <LI><A HREF="#6_3">GNU LIBRARY GENERAL PUBLIC LICENSE</A></LI>
@@ -125,9 +128,7 @@ Copyright 1997-2002, All Rights Reserved<BR>
 <HR>
 <H1 ALIGN="RIGHT"><A NAME="1">Preface</A></H1>
 <P>This software users manual describes how to use the Common UNIX
- Printing &lt;&lt;&lt;&lt;&lt;&lt;&lt; sum.shtml System<SUP>TM</SUP> (&quot;CUPS<SUP>TM</SUP>&quot;)
- Version 1.1.7. ======= System<SUP>TM</SUP> (&quot;CUPS<SUP>TM</SUP>&quot;)
- Version 1.1.13. &gt;&gt;&gt;&gt;&gt;&gt;&gt; 1.29</P>
+ Printing System<SUP>TM</SUP> (&quot;CUPS<SUP>TM</SUP>&quot;) Version 1.2.0.</P>
 <H2><A NAME="1_1">System Overview</A></H2>
 <P>CUPS provides a portable printing layer for UNIX&reg;-based operating
  systems. It has been developed by<A HREF="http://www.easysw.com"> Easy
@@ -346,8 +347,8 @@ lpr(1)</CODE>) printing commands. Type the following command to print a
 </PRE>
 </UL>
 <P>The <CODE>-p</CODE> option specifies that you want to see a list of
- printers, and the <CODE>-d</CODE> option reports the current system
- default printer or class.</P>
+ printers, and the <CODE>-d</CODE> option reports the current default
+ printer or class.</P>
 <P>Use the <CODE>-d</CODE> option with the <CODE>lp</CODE> command to
  print to a specific printer:</P>
 <UL>
@@ -455,19 +456,10 @@ printer DeskJet now printing DeskJet-1.
  available when printing with the <CODE>lp</CODE> and <CODE>lpr</CODE>
  commands.</P>
 <H2><A NAME="4_1">General Options</A></H2>
-<P>The following options apply when printing all types of files.</P>
-<H3><A NAME="4_1_1">Setting the Orientation</A></H3>
-<P>The <CODE>-o landscape</CODE> option will rotate the page 90 degrees
- to print in landscape orientation:</P>
-<UL>
-<PRE>
-<B>lp -o landscape filename ENTER</B>
-<B>lpr -o landscape filename ENTER</B>
-</PRE>
-</UL>
-
+<P>The following options apply when printing all types of files.
 <!-- NEED 2in -->
-<H3><A NAME="4_1_2">Selecting the Media Size, Type, and Source</A></H3>
+</P>
+<H3><A NAME="4_1_1">Selecting the Media Size, Type, and Source</A></H3>
 <P>The <CODE>-o media=xyz</CODE> option sets the media size, type,
  and/or source:</P>
 <UL>
@@ -498,6 +490,15 @@ printer DeskJet now printing DeskJet-1.
 <P>The actual options supported are defined in the printer's PPD file in
  the <CODE>PageSize</CODE>, <CODE>InputSlot</CODE>, and <CODE>MediaType</CODE>
  options.</P>
+<H3><A NAME="4_1_2">Setting the Orientation</A></H3>
+<P>The <CODE>-o landscape</CODE> option will rotate the page 90 degrees
+ to print in landscape orientation:</P>
+<UL>
+<PRE>
+<B>lp -o landscape filename ENTER</B>
+<B>lpr -o landscape filename ENTER</B>
+</PRE>
+</UL>
 <H3><A NAME="4_1_3">Printing On Both Sides of the Paper</A></H3>
 <P>The <CODE>-o sides=two-sided-short-edge</CODE> and <CODE>-o
  sides=two-sided-long-edge</CODE> options will enable duplexing on the
@@ -583,16 +584,42 @@ printer DeskJet now printing DeskJet-1.
 <H3><A NAME="4_3_3">N-Up Printing</A></H3>
 <P>The <CODE>-o number-up=value</CODE> option selects N-Up printing.
  N-Up printing places multiple document pages on a single printed page.
- CUPS supports 1-Up, 2-Up, and 4-Up formats:</P>
+ CUPS supports 1, 2, 4, 6, 9, and 16-Up formats; the default format is
+ 1-Up:</P>
 <UL>
 <PRE>
 <B>lp -o number-up=1 filename ENTER</B>
 <B>lp -o number-up=2 filename ENTER</B>
 <B>lp -o number-up=4 filename ENTER</B>
-<B>lpr -o number-up=4 filename ENTER</B>
+<B>lpr -o number-up=16 filename ENTER</B>
 </PRE>
 </UL>
-<P>The default format is 1-Up.</P>
+<P>The <CODE>-o page-border=value</CODE> option chooses the border to
+ draw around each page:</P>
+<UL>
+<LI><CODE>-o page-border=double</CODE>; draw two hairline borders around
+ each page</LI>
+<LI><CODE>-o page-border=double-thick</CODE>; draw two 1pt borders
+ around each page</LI>
+<LI><CODE>-o page-border=none</CODE>; do not draw a border (default)</LI>
+<LI><CODE>-o page-border=single</CODE>; draw one hairline border around
+ each page</LI>
+<LI><CODE>-o page-border=single-thick</CODE>; draw one 1pt border around
+ each page</LI>
+</UL>
+<P>The <CODE>-o number-up-layout=value</CODE> option chooses the layout
+ of the pages on each output page:</P>
+<UL>
+<LI><CODE>-o number-up-layout=btlr</CODE>; Bottom to top, left to right</LI>
+<LI><CODE>-o number-up-layout=btrl</CODE>; Bottom to top, right to left</LI>
+<LI><CODE>-o number-up-layout=lrbt</CODE>; Left to right, bottom to top</LI>
+<LI><CODE>-o number-up-layout=lrtb</CODE>; Left to right, top to bottom
+ (default)</LI>
+<LI><CODE>-o number-up-layout=rlbt</CODE>; Right to left, bottom to top</LI>
+<LI><CODE>-o number-up-layout=rltb</CODE>; Right to left, top to bottom</LI>
+<LI><CODE>-o number-up-layout=tblr</CODE>; Top to bottom, left to right</LI>
+<LI><CODE>-o number-up-layout=tbrl</CODE>; Top to bottom, right to left</LI>
+</UL>
 <H3><A NAME="4_3_4">Setting the Brightness</A></H3>
 <P>You can control the overall brightness of the printed output using
  the <CODE>-o brightness=percent</CODE> option:</P>
@@ -855,6 +882,7 @@ printer DeskJet now printing DeskJet-1.
  accepts printer options using the <CODE>-o</CODE> argument:</P>
 <UL>
 <PRE>
+<B>lpoptions -o prettyprint ENTER</B>
 <B>lpoptions -o media=A4 -o sides=two-sided-long-edge ENTER</B>
 <B>lpoptions -o media=Legal -o scaling=100 ENTER</B>
 </PRE>
@@ -867,11 +895,22 @@ printer DeskJet now printing DeskJet-1.
  for another printer:</P>
 <UL>
 <PRE>
+<B>lpoptions -p laserjet -o prettyprint ENTER</B>
 <B>lpoptions -p laserjet -o media=A4 -o sides=two-sided-long-edge ENTER</B>
 <B>lpoptions -p deskjet -o media=Legal -o scaling=100 ENTER</B>
 </PRE>
 </UL>
-<H2><A NAME="5_3">Viewing the Current Defaults</A></H2>
+<H2><A NAME="5_3">Removing Options</A></H2>
+<P>The previous two examples shows how to set options for the default
+ and a specific printer. Below, shows you how to remove the saved option
+ using the <CODE>-r</CODE> argument:</P>
+<UL>
+<PRE>
+<KBD>lpoptions -r prettyprint <I>ENTER</I></KBD>
+<KBD>lpoptions -p laserjet -r prettyprint <I>ENTER</I></KBD>
+</PRE>
+</UL>
+<H2><A NAME="5_4">Viewing the Current Defaults</A></H2>
 <P>The <CODE>lpoptions</CODE> command can also be used to show the
  current options by not specifying any new options on the command-line:</P>
 <UL>
@@ -882,7 +921,15 @@ media=A4 sides=two-sided-long-edge
 media=Legal scaling=100
 </PRE>
 </UL>
-<H2><A NAME="5_4">Setting the Default Printer</A></H2>
+<H2><A NAME="5_5">Viewing Options for a Specific Printer</A></H2>
+<P>You can display the supported options using the <CODE>lpoptions</CODE>
+ command with the <CODE>-l</CODE> option, as follows:</P>
+<UL>
+<PRE>
+<B>lpoptions -p laserjet -l ENTER</B>
+</PRE>
+</UL>
+<H2><A NAME="5_6">Setting the Default Printer</A></H2>
 <P>The administrator normally will set a system-wide default printer
  that is normally used as the default printer by everyone. Use the <CODE>
 -d printer</CODE> option to set your own default printer:</P>
@@ -893,7 +940,7 @@ media=Legal scaling=100
 </UL>
 <P>The printer can be local (<CODE>deskjet</CODE>) or remote (<CODE>
 deskjet@server</CODE>).</P>
-<H2><A NAME="5_5">Printer Instances</A></H2>
+<H2><A NAME="5_7">Printer Instances</A></H2>
 <P>Besides setting options for each print queue, CUPS supports<I>
  printer instances</I> which allow you to define several different sets
  of options for each printer. You specify a printer instance using the
@@ -904,14 +951,15 @@ deskjet@server</CODE>).</P>
 <B>lpoptions -p laserjet/legal -o media=Legal ENTER</B>
 </PRE>
 </UL>
-<P>The <CODE>lp</CODE> and lpr commands also understand this notation:</P>
+<P>The <CODE>lp</CODE> and <CODE>lpr</CODE> commands also understand
+ this notation:</P>
 <UL>
 <PRE>
 <B>lp -d laserjet/duplex filename ENTER</B>
 <B>lpr -P laserjet/legal filename ENTER</B>
 </PRE>
 </UL>
-<H2><A NAME="5_6">Removing Instances</A></H2>
+<H2><A NAME="5_8">Removing Instances</A></H2>
 <P>Use the <CODE>-x printer/instance</CODE> option to remove a printer
  instance that you no longer need:</P>
 <UL>
@@ -937,15 +985,14 @@ deskjet@server</CODE>).</P>
 <H3><A NAME="6_1_1">Introduction</A></H3>
 <P>The Common UNIX Printing System<SUP>TM</SUP>, (&quot;CUPS<SUP>TM</SUP>&quot;),
  is provided under the GNU General Public License (&quot;GPL&quot;) and GNU
- Library General Public License (&quot;LGPL&quot;), Version 2. A copy of these
- licenses follow this introduction.</P>
+ Library General Public License (&quot;LGPL&quot;), Version 2, with exceptions for
+ Apple operating systems and the OpenSSL toolkit. A copy of the
+ exceptions and licenses follow this introduction.</P>
 <P>The GNU LGPL applies to the CUPS API library, located in the &quot;cups&quot;
- subdirectory of the CUPS source distribution and in the
- &quot;/usr/include/cups&quot; directory and &quot;libcups.a&quot;, &quot;libcups_s.a&quot;,
- &quot;libcups.sl&quot;, or &quot;libcups.so&quot; files in the binary distributions.</P>
-<P>The GNU GPL applies to the remainder of the CUPS distribution,
- including the &quot;pstoraster&quot; filter which is based upon GNU Ghostscript
- 5.50 and the &quot;pdftops&quot; filter which is based upon Xpdf 0.93a.</P>
+ subdirectory of the CUPS source distribution and in the &quot;cups&quot; include
+ directory and library files in the binary distributions. The GNU GPL
+ applies to the remainder of the CUPS distribution, including the
+ &quot;pdftops&quot; filter which is based upon Xpdf and the CUPS imaging library.</P>
 <P>For those not familiar with the GNU GPL, the license basically allows
  you to:</P>
 <UL>
@@ -960,49 +1007,80 @@ deskjet@server</CODE>).</P>
  add features to CUPS and then sell a binary distribution without source
  code. You must provide source for any new drivers, changes, or
  additions to the software, and all code must be provided under the GPL
- or LGPL as appropriate.</P>
+ or LGPL as appropriate. The only exceptions to this are the portions of
+ the CUPS software covered by the Apple operating system license
+ exceptions outlined later in this license agreement.</P>
 <P>The GNU LGPL relaxes the &quot;link-to&quot; restriction, allowing you to
  develop applications that use the CUPS API library under other licenses
  and/or conditions as appropriate for your application.</P>
-<H3><A NAME="6_1_2">Trademarks</A></H3>
+<H3><A NAME="6_1_2">License Exceptions</A></H3>
+<P>In addition, as the copyright holder of CUPS, Easy Software Products
+ grants the following special exceptions:</P>
+<OL>
+<LI><B>Apple Operating System Development License Exception</B>;
+<OL TYPE="a">
+<LI>Software that is developed by any person or entity for an Apple
+ Operating System (&quot;Apple OS-Developed Software&quot;), including but not
+ limited to Apple and third party printer drivers, filters, and backends
+ for an Apple Operating System, that is linked to the CUPS imaging
+ library or based on any sample filters or backends provided with CUPS
+ shall not be considered to be a derivative work or collective work
+ based on the CUPS program and is exempt from the mandatory source code
+ release clauses of the GNU GPL. You may therefore distribute linked
+ combinations of the CUPS imaging library with Apple OS-Developed
+ Software without releasing the source code of the Apple OS-Developed
+ Software. You may also use sample filters and backends provided with
+ CUPS to develop Apple OS-Developed Software without releasing the
+ source code of the Apple OS-Developed Software.</LI>
+<LI>An Apple Operating System means any operating system software
+ developed and/or marketed by Apple Computer, Inc., including but not
+ limited to all existing releases and versions of Apple's Darwin, Mac OS
+ X, and Mac OS X Server products and all follow-on releases and future
+ versions thereof.</LI>
+<LI>This exception is only available for Apple OS-Developed Software and
+ does not apply to software that is distributed for use on other
+ operating systems.</LI>
+<LI>All CUPS software that falls under this license exception have the
+ following text at the top of each source file:<BLOCKQUOTE>This file is
+ subject to the Apple OS-Developed Software exception.</BLOCKQUOTE></LI>
+</OL>
+</LI>
+<LI><B>OpenSSL Toolkit License Exception</B>;
+<OL TYPE="a">
+<LI>Easy Software Products explicitly allows the compilation and
+ distribution of the CUPS software with the OpenSSL Toolkit.</LI>
+</OL>
+</LI>
+</OL>
+<P>No developer is required to provide these exceptions in a derived
+ work.</P>
+<H3><A NAME="6_1_3">Trademarks</A></H3>
 <P>Easy Software Products has trademarked the Common UNIX Printing
  System, CUPS, and CUPS logo. These names and logos may be used freely
- in any direct port or binary distribution of CUPS. To use them in
- derivative products, please contract Easy Software Products for written
- permission. Our intention is to protect the value of these trademarks
- and ensure that any derivative product meets the same high-quality
+ in any direct port or binary distribution of CUPS. Please contract Easy
+ Software Products for written permission to use them in derivative
+ products. Our intention is to protect the value of these trademarks and
+ ensure that any derivative product meets the same high-quality
  standards as the original.</P>
-<H3><A NAME="6_1_3">Binary Distribution Rights</A></H3>
+<H3><A NAME="6_1_4">Binary Distribution Rights</A></H3>
 <P>Easy Software Products also sells rights to the CUPS source code
  under a binary distribution license for vendors that are unable to
  release source code for their drivers, additions, and modifications to
  CUPS under the GNU GPL and LGPL. For information please contact us at
  the address shown above.</P>
-<P>The Common UNIX Printing System provides a &quot;pstoraster&quot; filter that
- utilizes the GNU GhostScript 5.50 core to convert PostScript files into
- a stream of raster images. For binary distribution licensing of this
- software, please contact:<BLOCKQUOTE> Miles Jones
-<BR> Director of Marketing
-<BR> Artifex Software Inc.
-<BR> 454 Las Gallinas Ave., Suite 108
-<BR> San Rafael, CA 94903 USA
-<BR> Voice: +1.415.492.9861
-<BR> Fax: +1.415.492.9862
-<BR> EMail:<A HREF="mailto:info@arsoft.com"> info@arsoft.com</A></BLOCKQUOTE>
-</P>
-<P>The &quot;pdftops&quot; filter is based on the Xpdf 0.93a software. For binary
- distribution licensing of this software, please contact:<BLOCKQUOTE>
- Derek B. Noonburg
+<P>The Common UNIX Printing System provides a &quot;pdftops&quot; filter that is
+ based on the Xpdf software. For binary distribution licensing of this
+ software, please contact:<BLOCKQUOTE> Derek B. Noonburg
 <BR> Email:<A HREF="mailto:derekn@foolabs.com"> derekn@foolabs.com</A>
 <BR> WWW:<A HREF="http://www.foolabs.com/xpdf/">
  http://www.foolabs.com/xpdf/</A></BLOCKQUOTE></P>
-<H3><A NAME="6_1_4">Support</A></H3>
+<H3><A NAME="6_1_5">Support</A></H3>
 <P>Easy Software Products sells software support for CUPS as well as a
  commercial printing product based on CUPS called ESP Print Pro. You can
  find out more at our web site:</P>
 <UL>
 <PRE>
-<A HREF="http://www.easysw.com">http://www.easysw.com</A>
+<A HREF="http://www.easysw.com/">http://www.easysw.com/</A>
 </PRE>
 </UL>
 
@@ -1015,9 +1093,6 @@ Copyright 1989, 1991 Free Software Foundation, Inc.
 
 Everyone is permitted to copy and distribute verbatim
 copies of this license document, but changing it is not allowed.
-</PRE>
-<PRE>
-
 </PRE>
 <H4>Preamble</H4>
 <P>The licenses for most software are designed to take away your freedom
@@ -1071,7 +1146,7 @@ copies of this license document, but changing it is not allowed.
  that is to say, a work containing the Program or a portion of it,
  either verbatim or with modifications and/or translated into another
  language. (Hereinafter, translation is included without limitation in
- the term &quot;modification&quot;.) Each licensee is addressed as &quot;you&quot;.</LI>
+ the term &quot;modification&quot;.) Each licensee is addressed as &quot;you&quot;.
 <P>Activities other than copying, distribution and modification are not
  covered by this License; they are outside its scope. The act of running
  the Program is not restricted, and the output from the Program is
@@ -1084,7 +1159,7 @@ copies of this license document, but changing it is not allowed.
  and disclaimer of warranty; keep intact all the notices that refer to
  this License and to the absence of any warranty; and give any other
  recipients of the Program a copy of this License along with the
- Program.</LI>
+ Program.
 <P>You may charge a fee for the physical act of transferring a copy, and
  you may at your option offer warranty protection in exchange for a fee.</P>
 <LI>You may modify your copy or copies of the Program or any portion of
@@ -1108,7 +1183,6 @@ copies of this license document, but changing it is not allowed.
  is interactive but does not normally print such an announcement, your
  work based on the Program is not required to print an announcement.)</LI>
 </OL>
-</LI>
 <P>These requirements apply to the modified work as a whole. If
  identifiable sections of that work are not derived from the Program,
  and can be reasonably considered independent and separate works in
@@ -1146,7 +1220,6 @@ copies of this license document, but changing it is not allowed.
  object code or executable form with such an offer, in accord with
  Subsection b above.)</LI>
 </OL>
-</LI>
 <P>The source code for a work means the preferred form of the work for
  making modifications to it. For an executable work, complete source
  code means all the source code for all modules it contains, plus any
@@ -1194,7 +1267,7 @@ copies of this license document, but changing it is not allowed.
  would not permit royalty-free redistribution of the Program by all
  those who receive copies directly or indirectly through you, then the
  only way you could satisfy both it and this License would be to refrain
- entirely from distribution of the Program.</LI>
+ entirely from distribution of the Program.
 <P>If any portion of this section is held invalid or unenforceable under
  any particular circumstance, the balance of the section is intended to
  apply and the section as a whole is intended to apply in other
@@ -1221,7 +1294,7 @@ copies of this license document, but changing it is not allowed.
 <LI>The Free Software Foundation may publish revised and/or new versions
  of the General Public License from time to time. Such new versions will
  be similar in spirit to the present version, but may differ in detail
- to address new problems or concerns.</LI>
+ to address new problems or concerns.
 <P>Each version is given a distinguishing version number. If the Program
  specifies a version number of this License which applies to it and &quot;any
  later version&quot;, you have the option of following the terms and
@@ -1236,6 +1309,12 @@ copies of this license document, but changing it is not allowed.
  sometimes make exceptions for this. Our decision will be guided by the
  two goals of preserving the free status of all derivatives of our free
  software and of promoting the sharing and reuse of software generally.</LI>
+</LI>
+</LI>
+</LI>
+</LI>
+</LI>
+</LI>
 </OL>
 <H4>NO WARRANTY</H4>
 <OL START="11">
@@ -1389,13 +1468,13 @@ of this license document, but changing it is not allowed.
  copy and distribute such modifications or work under the terms of
  Section 1 above, provided that you also meet all of these conditions:</P>
 <OL TYPE="a">
-<LI>The modified work must itself be a software library.</LI>
+<LI>The modified work must itself be a software library.
 <P></P>
 <LI>You must cause the files modified to carry prominent notices stating
- that you changed the files and the date of any change.</LI>
+ that you changed the files and the date of any change.
 <P></P>
 <LI>You must cause the whole of the work to be licensed at no charge to
- all third parties under the terms of this License.</LI>
+ all third parties under the terms of this License.
 <P></P>
 <LI>If a facility in the modified Library refers to a function or a
  table of data to be supplied by an application program that uses the
@@ -1403,13 +1482,17 @@ of this license document, but changing it is not allowed.
  invoked, then you must make a good faith effort to ensure that, in the
  event an application does not supply such function or table, the
  facility still operates, and performs whatever part of its purpose
- remains meaningful.</LI>
+ remains meaningful.
 <P>(For example, a function in a library to compute square roots has a
  purpose that is entirely well-defined independent of the application.
  Therefore, Subsection 2d requires that any application-supplied
  function or table used by this function must be optional: if the
  application does not supply it, the square root function must still
  compute square roots.)</P>
+</LI>
+</LI>
+</LI>
+</LI>
 </OL>
 <P>These requirements apply to the modified work as a whole. If
  identifiable sections of that work are not derived from the Library,
@@ -1502,19 +1585,22 @@ of this license document, but changing it is not allowed.
  produce a modified executable containing the modified Library. (It is
  understood that the user who changes the contents of definitions files
  in the Library will not necessarily be able to recompile the
- application to use the modified definitions.)</LI>
+ application to use the modified definitions.)
 <P></P>
 <LI>Accompany the work with a written offer, valid for at least three
  years, to give the same user the materials specified in Subsection 6a,
  above, for a charge no more than the cost of performing this
- distribution.</LI>
+ distribution.
 <P></P>
 <LI>If distribution of the work is made by offering access to copy from
  a designated place, offer equivalent access to copy the above specified
- materials from the same place.</LI>
+ materials from the same place.
 <P></P>
 <LI>Verify that the user has already received a copy of these materials
  or that you have already sent this user a copy.</LI>
+</LI>
+</LI>
+</LI>
 </OL>
 <P>For an executable, the required form of the &quot;work that uses the
  Library&quot; must include any data and utility programs needed for
@@ -1538,11 +1624,12 @@ of this license document, but changing it is not allowed.
 <OL TYPE="a">
 <LI>Accompany the combined library with a copy of the same work based on
  the Library, uncombined with any other library facilities. This must be
- distributed under the terms of the Sections above.</LI>
+ distributed under the terms of the Sections above.
 <P></P>
 <LI>Give prominent notice with the combined library of the fact that
  part of it is a work based on the Library, and explaining where to find
  the accompanying uncombined form of the same work.</LI>
+</LI>
 </OL>
 <P><STRONG>8.</STRONG> You may not copy, modify, sublicense, link with,
  or distribute the Library except as expressly provided under this

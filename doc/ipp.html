@@ -4,7 +4,7 @@
 <TITLE>CUPS Implementation of IPP</TITLE>
 <META NAME="author" CONTENT="Easy Software Products">
 <META NAME="copyright" CONTENT="Copyright 1997-2002 All Rights Reserved">
-<META NAME="docnumber" CONTENT="CUPS-IPP-1.1">
+<META NAME="docnumber" CONTENT="CUPS-IPP-1.2">
 <META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-8859-1">
 <STYLE TYPE="text/css"><!--
 BODY { font-family: serif }
@@ -22,7 +22,7 @@ PRE { font-family: monospace }
 <BODY>
 <CENTER><A HREF="#CONTENTS"><IMG SRC="images/cups-large.gif" BORDER="0" WIDTH="431" HEIGHT="511"><BR>
 <H1>CUPS Implementation of IPP</H1></A><BR>
-CUPS-IPP-1.1<BR>
+CUPS-IPP-1.2<BR>
 Easy Software Products<BR>
 Copyright 1997-2002 All Rights Reserved<BR>
 </CENTER>
@@ -72,10 +72,10 @@ Copyright 1997-2002 All Rights Reserved<BR>
 <LI><A HREF="#4_5_1">4.5.1 CUPS-Get-Printers Request</A></LI>
 <LI><A HREF="#4_5_2">4.5.2 CUPS-Get-Printers Response</A></LI>
 </UL>
-<LI><A HREF="#4_6">4.6 CUPS-Add-Printer Operation</A></LI>
+<LI><A HREF="#4_6">4.6 CUPS-Add-Modify-Printer Operation</A></LI>
 <UL>
-<LI><A HREF="#4_6_1">4.6.1 CUPS-Add-Printer Request</A></LI>
-<LI><A HREF="#4_6_2">4.6.2 CUPS-Add-Printer Response</A></LI>
+<LI><A HREF="#4_6_1">4.6.1 CUPS-Add-Modify-Printer Request</A></LI>
+<LI><A HREF="#4_6_2">4.6.2 CUPS-Add-Modify-Printer Response</A></LI>
 </UL>
 <LI><A HREF="#4_7">4.7 CUPS-Delete-Printer Operation</A></LI>
 <UL>
@@ -87,10 +87,10 @@ Copyright 1997-2002 All Rights Reserved<BR>
 <LI><A HREF="#4_8_1">4.8.1 CUPS-Get-Classes Request</A></LI>
 <LI><A HREF="#4_8_2">4.8.2 CUPS-Get-Classes Response</A></LI>
 </UL>
-<LI><A HREF="#4_9">4.9 CUPS-Add-Class Operation</A></LI>
+<LI><A HREF="#4_9">4.9 CUPS-Add-Modify-Class Operation</A></LI>
 <UL>
-<LI><A HREF="#4_9_1">4.9.1 CUPS-Add-Class Request</A></LI>
-<LI><A HREF="#4_9_2">4.9.2 CUPS-Add-Class Response</A></LI>
+<LI><A HREF="#4_9_1">4.9.1 CUPS-Add-Modify-Class Request</A></LI>
+<LI><A HREF="#4_9_2">4.9.2 CUPS-Add-Modify-Class Response</A></LI>
 </UL>
 <LI><A HREF="#4_10">4.10 CUPS-Delete-Class Operation</A></LI>
 <UL>
@@ -153,19 +153,21 @@ Copyright 1997-2002 All Rights Reserved<BR>
 <LI><A HREF="#5_2_11">5.2.11 job-originating-host-name (name(MAX))</A></LI>
 <LI><A HREF="#5_2_12">5.2.12 lpi (type2 enum)</A></LI>
 <LI><A HREF="#5_2_13">5.2.13 natural-scaling (integer(1:1000))</A></LI>
-<LI><A HREF="#5_2_14">5.2.14 page-bottom (integer(0:MAX))</A></LI>
-<LI><A HREF="#5_2_15">5.2.15 page-label (text(MAX))</A></LI>
-<LI><A HREF="#5_2_16">5.2.16 page-left (integer(0:MAX))</A></LI>
-<LI><A HREF="#5_2_17">5.2.17 page-right (integer(0:MAX))</A></LI>
-<LI><A HREF="#5_2_18">5.2.18 page-set (type2 keyword)</A></LI>
-<LI><A HREF="#5_2_19">5.2.19 page-top (integer(0:MAX))</A></LI>
-<LI><A HREF="#5_2_20">5.2.20 penwidth (integer(0:MAX))</A></LI>
-<LI><A HREF="#5_2_21">5.2.21 position (type2 keyword)</A></LI>
-<LI><A HREF="#5_2_22">5.2.22 ppi (integer(1:MAX))</A></LI>
-<LI><A HREF="#5_2_23">5.2.23 prettyprint (boolean)</A></LI>
-<LI><A HREF="#5_2_24">5.2.24 saturation (integer(0:200))</A></LI>
-<LI><A HREF="#5_2_25">5.2.25 scaling (integer(1:1000))</A></LI>
-<LI><A HREF="#5_2_26">5.2.26 wrap (boolean)</A></LI>
+<LI><A HREF="#5_2_14">5.2.14 number-up-layout (type2 keyword)</A></LI>
+<LI><A HREF="#5_2_15">5.2.15 page-border (type2 keyword)</A></LI>
+<LI><A HREF="#5_2_16">5.2.16 page-bottom (integer(0:MAX))</A></LI>
+<LI><A HREF="#5_2_17">5.2.17 page-label (text(MAX))</A></LI>
+<LI><A HREF="#5_2_18">5.2.18 page-left (integer(0:MAX))</A></LI>
+<LI><A HREF="#5_2_19">5.2.19 page-right (integer(0:MAX))</A></LI>
+<LI><A HREF="#5_2_20">5.2.20 page-set (type2 keyword)</A></LI>
+<LI><A HREF="#5_2_21">5.2.21 page-top (integer(0:MAX))</A></LI>
+<LI><A HREF="#5_2_22">5.2.22 penwidth (integer(0:MAX))</A></LI>
+<LI><A HREF="#5_2_23">5.2.23 position (type2 keyword)</A></LI>
+<LI><A HREF="#5_2_24">5.2.24 ppi (integer(1:MAX))</A></LI>
+<LI><A HREF="#5_2_25">5.2.25 prettyprint (boolean)</A></LI>
+<LI><A HREF="#5_2_26">5.2.26 saturation (integer(0:200))</A></LI>
+<LI><A HREF="#5_2_27">5.2.27 scaling (integer(1:1000))</A></LI>
+<LI><A HREF="#5_2_28">5.2.28 wrap (boolean)</A></LI>
 </UL>
 <LI><A HREF="#5_3">5.3 PPD Attributes</A></LI>
 <UL>
@@ -204,7 +206,7 @@ Copyright 1997-2002 All Rights Reserved<BR>
 <H2><A NAME="1_1">1.1 Identification</A></H2>
 <P>This document provides an overview of the Internet Printing Protocol
  (&quot;IPP&quot;) version 1.1 as implemented in the Common UNIX Printing System
- (&quot;CUPS&quot;) version 1.1.</P>
+ (&quot;CUPS&quot;) version 1.2.</P>
 <H2><A NAME="1_2">1.2 System Overview</A></H2>
 <P>CUPS provides a portable printing layer for UNIX&reg;-based operating
  systems. It has been developed by<A HREF="http://www.easysw.com"> Easy
@@ -235,16 +237,16 @@ Copyright 1997-2002 All Rights Reserved<BR>
 <H2><A NAME="2_1">2.1 CUPS Documentation</A></H2>
 <P>The following CUPS documentation is referenced by this document:</P>
 <UL>
-<LI>CUPS-CMP-1.1: CUPS Configuration Management Plan</LI>
-<LI>CUPS-IDD-1.1: CUPS System Interface Design Description</LI>
-<LI>CUPS-IPP-1.1: CUPS Implementation of IPP</LI>
-<LI>CUPS-SAM-1.1.x: CUPS Software Administrators Manual</LI>
-<LI>CUPS-SDD-1.1: CUPS Software Design Description</LI>
-<LI>CUPS-SPM-1.1.x: CUPS Software Programming Manual</LI>
-<LI>CUPS-SSR-1.1: CUPS Software Security Report</LI>
-<LI>CUPS-STP-1.1: CUPS Software Test Plan</LI>
-<LI>CUPS-SUM-1.1.x: CUPS Software Users Manual</LI>
-<LI>CUPS-SVD-1.1: CUPS Software Version Description</LI>
+<LI>CUPS-CMP-1.2: CUPS Configuration Management Plan</LI>
+<LI>CUPS-IDD-1.2: CUPS System Interface Design Description</LI>
+<LI>CUPS-IPP-1.2: CUPS Implementation of IPP</LI>
+<LI>CUPS-SAM-1.2.x: CUPS Software Administrators Manual</LI>
+<LI>CUPS-SDD-1.2: CUPS Software Design Description</LI>
+<LI>CUPS-SPM-1.2.x: CUPS Software Programming Manual</LI>
+<LI>CUPS-SSR-1.2: CUPS Software Security Report</LI>
+<LI>CUPS-STP-1.2: CUPS Software Test Plan</LI>
+<LI>CUPS-SUM-1.2.x: CUPS Software Users Manual</LI>
+<LI>CUPS-SVD-1.2: CUPS Software Version Description</LI>
 </UL>
 <H2><A NAME="2_2">2.2 Other Documents</A></H2>
 <P>The following non-CUPS documents are referenced by this document:</P>
@@ -263,8 +265,8 @@ Adobe PostScript Language Reference, Third Edition.</A></LI>
 <LI><A HREF="http://www.ietf.org/rfc/rfc2567.txt">RFC 2567, Design Goals
  for an Internet Printing Protocol</A></LI>
 <LI><A HREF="http://www.ietf.org/rfc/rfc2568.txt">RFC 2568, Rationale
- for the Structure of the Model and Protocol</A> for the Internet
- Printing Protocol</LI>
+ for the Structure of the Model and Protocol for the Internet Printing
+ Protocol</A></LI>
 <LI><A HREF="http://www.ietf.org/rfc/rfc2569.txt">RFC 2569, Mapping
  between LPD and IPP Protocols</A></LI>
 <LI><A HREF="http://www.ietf.org/rfc/rfc2616.txt">RFC 2616, Hypertext
@@ -311,9 +313,9 @@ Code</TH><TH VALIGN="TOP">Brief Description</TH></TR>
 0x0002</TD><TD VALIGN="TOP">Print a file.</TD></TR>
 <TR><TD VALIGN="TOP">Validate-Job</TD><TD VALIGN="TOP">1.0</TD><TD VALIGN="TOP">
 0x0004</TD><TD VALIGN="TOP">Validate job attributes.</TD></TR>
-<TR><TD VALIGN="TOP">Create-Job</TD><TD VALIGN="TOP">1.1</TD><TD VALIGN="TOP">
+<TR><TD VALIGN="TOP">Create-Job</TD><TD VALIGN="TOP">1.2</TD><TD VALIGN="TOP">
 0x0005</TD><TD VALIGN="TOP">Create a print job.</TD></TR>
-<TR><TD VALIGN="TOP">Send-Document</TD><TD VALIGN="TOP">1.1</TD><TD VALIGN="TOP">
+<TR><TD VALIGN="TOP">Send-Document</TD><TD VALIGN="TOP">1.2</TD><TD VALIGN="TOP">
 0x0006</TD><TD VALIGN="TOP">Send a file for a print job.</TD></TR>
 <TR><TD VALIGN="TOP">Cancel-Job</TD><TD VALIGN="TOP">1.0</TD><TD VALIGN="TOP">
 0x0008</TD><TD VALIGN="TOP">Cancel a print job.</TD></TR>
@@ -323,9 +325,9 @@ Code</TH><TH VALIGN="TOP">Brief Description</TH></TR>
 0x000A</TD><TD VALIGN="TOP">Get all jobs.</TD></TR>
 <TR><TD VALIGN="TOP">Get-Printer-Attributes</TD><TD VALIGN="TOP">1.0</TD><TD
 VALIGN="TOP">0x000B</TD><TD VALIGN="TOP">Get printer attributes.</TD></TR>
-<TR><TD VALIGN="TOP">Hold-Job</TD><TD VALIGN="TOP">1.1</TD><TD VALIGN="TOP">
+<TR><TD VALIGN="TOP">Hold-Job</TD><TD VALIGN="TOP">1.2</TD><TD VALIGN="TOP">
 0x000C</TD><TD VALIGN="TOP">Hold a job for printing.</TD></TR>
-<TR><TD VALIGN="TOP">Release-Job</TD><TD VALIGN="TOP">1.1</TD><TD VALIGN="TOP">
+<TR><TD VALIGN="TOP">Release-Job</TD><TD VALIGN="TOP">1.2</TD><TD VALIGN="TOP">
 0x000D</TD><TD VALIGN="TOP">Release a job for printing.</TD></TR>
 <TR><TD VALIGN="TOP">Pause-Printer</TD><TD VALIGN="TOP">1.0</TD><TD VALIGN="TOP">
 0x0010</TD><TD VALIGN="TOP">Pause printing on a printer.</TD></TR>
@@ -333,22 +335,23 @@ VALIGN="TOP">0x000B</TD><TD VALIGN="TOP">Get printer attributes.</TD></TR>
 0x0011</TD><TD VALIGN="TOP">Resume printing on a printer.</TD></TR>
 <TR><TD VALIGN="TOP">Purge-Jobs</TD><TD VALIGN="TOP">1.0</TD><TD VALIGN="TOP">
 0x0012</TD><TD VALIGN="TOP">Purge all jobs.</TD></TR>
-<TR><TD VALIGN="TOP">Set-Job-Attributes</TD><TD VALIGN="TOP">1.1</TD><TD VALIGN="TOP">
+<TR><TD VALIGN="TOP">Set-Job-Attributes</TD><TD VALIGN="TOP">1.2</TD><TD VALIGN="TOP">
 0x0014</TD><TD VALIGN="TOP">Set attributes for a pending or held job.</TD>
 </TR>
 <TR><TD VALIGN="TOP">CUPS-Get-Default</TD><TD VALIGN="TOP">1.0</TD><TD VALIGN="TOP">
 0x4001</TD><TD VALIGN="TOP">Get the default destination.</TD></TR>
 <TR><TD VALIGN="TOP">CUPS-Get-Printers</TD><TD VALIGN="TOP">1.0</TD><TD VALIGN="TOP">
 0x4002</TD><TD VALIGN="TOP">Get all of the available printers.</TD></TR>
-<TR><TD VALIGN="TOP">CUPS-Add-Printer</TD><TD VALIGN="TOP">1.0</TD><TD VALIGN="TOP">
-0x4003</TD><TD VALIGN="TOP">Add or modify a printer.</TD></TR>
+<TR><TD VALIGN="TOP">CUPS-Add-Modify-Printer</TD><TD VALIGN="TOP">1.0</TD><TD
+VALIGN="TOP">0x4003</TD><TD VALIGN="TOP">Add or modify a printer.</TD></TR>
 <TR><TD VALIGN="TOP">CUPS-Delete-Printer</TD><TD VALIGN="TOP">1.0</TD><TD
 VALIGN="TOP">0x4004</TD><TD VALIGN="TOP">Delete a printer.</TD></TR>
 <TR><TD VALIGN="TOP">CUPS-Get-Classes</TD><TD VALIGN="TOP">1.0</TD><TD VALIGN="TOP">
 0x4005</TD><TD VALIGN="TOP">Get all of the available printer classes.</TD>
 </TR>
-<TR><TD VALIGN="TOP">CUPS-Add-Class</TD><TD VALIGN="TOP">1.0</TD><TD VALIGN="TOP">
-0x4006</TD><TD VALIGN="TOP">Add or modify a printer class.</TD></TR>
+<TR><TD VALIGN="TOP">CUPS-Add-Modify-Class</TD><TD VALIGN="TOP">1.0</TD><TD
+VALIGN="TOP">0x4006</TD><TD VALIGN="TOP">Add or modify a printer class.</TD>
+</TR>
 <TR><TD VALIGN="TOP">CUPS-Delete-Class</TD><TD VALIGN="TOP">1.0</TD><TD VALIGN="TOP">
 0x4007</TD><TD VALIGN="TOP">Delete a printer class.</TD></TR>
 <TR><TD VALIGN="TOP">CUPS-Accept-Jobs</TD><TD VALIGN="TOP">1.0</TD><TD VALIGN="TOP">
@@ -359,11 +362,11 @@ VALIGN="TOP">0x4004</TD><TD VALIGN="TOP">Delete a printer.</TD></TR>
 </TR>
 <TR><TD VALIGN="TOP">CUPS-Set-Default</TD><TD VALIGN="TOP">1.0</TD><TD VALIGN="TOP">
 0x400A</TD><TD VALIGN="TOP">Set the default destination.</TD></TR>
-<TR><TD VALIGN="TOP">CUPS-Get-Devices</TD><TD VALIGN="TOP">1.1</TD><TD VALIGN="TOP">
+<TR><TD VALIGN="TOP">CUPS-Get-Devices</TD><TD VALIGN="TOP">1.2</TD><TD VALIGN="TOP">
 0x400B</TD><TD VALIGN="TOP">Get all of the available devices.</TD></TR>
-<TR><TD VALIGN="TOP">CUPS-Get-PPDs</TD><TD VALIGN="TOP">1.1</TD><TD VALIGN="TOP">
+<TR><TD VALIGN="TOP">CUPS-Get-PPDs</TD><TD VALIGN="TOP">1.2</TD><TD VALIGN="TOP">
 0x400C</TD><TD VALIGN="TOP">Get all of the available PPDs.</TD></TR>
-<TR><TD VALIGN="TOP">CUPS-Move-Job</TD><TD VALIGN="TOP">1.1</TD><TD VALIGN="TOP">
+<TR><TD VALIGN="TOP">CUPS-Move-Job</TD><TD VALIGN="TOP">1.2</TD><TD VALIGN="TOP">
 0x400D</TD><TD VALIGN="TOP">Move a job to a different printer.</TD></TR>
 </TABLE>
 </CENTER>
@@ -620,12 +623,12 @@ VALIGN="TOP">0x4004</TD><TD VALIGN="TOP">Delete a printer.</TD></TR>
 <P>The set of requested attributes and their current values for each
  printer.</P>
 </UL>
-<H2><A NAME="4_6">4.6 CUPS-Add-Printer Operation</A></H2>
-<P>The CUPS-Add-Printer operation (0x4003) adds a new printer or
+<H2><A NAME="4_6">4.6 CUPS-Add-Modify-Printer Operation</A></H2>
+<P>The CUPS-Add-Modify-Printer operation (0x4003) adds a new printer or
  modifies an existing printer on the system.</P>
-<H3><A NAME="4_6_1">4.6.1 CUPS-Add-Printer Request</A></H3>
+<H3><A NAME="4_6_1">4.6.1 CUPS-Add-Modify-Printer Request</A></H3>
 <P>The following groups of attributes are supplied as part of the
- CUPS-Add-Printer request:</P>
+ CUPS-Add-Modify-Printer request:</P>
 <P>Group 1: Operation Attributes</P>
 <UL>
 <P>Natural Language and Character Set:</P>
@@ -678,13 +681,13 @@ VALIGN="TOP">0x4004</TD><TD VALIGN="TOP">Delete a printer.</TD></TR>
  access control list for incoming print jobs. To allow all users access
  to a printer, use the delete tag for the attribute value.</P>
 </UL>
-<P>The CUPS-Add-Printer request can optionally be followed by a PPD file
- or System V interface script to be used for the printer. The &quot;ppd-name&quot;
- attribute overrides any file that is attached to the end of the request
- with a local CUPS PPD file.</P>
-<H3><A NAME="4_6_2">4.6.2 CUPS-Add-Printer Response</A></H3>
+<P>The CUPS-Add-Modify-Printer request can optionally be followed by a
+ PPD file or System V interface script to be used for the printer. The
+ &quot;ppd-name&quot; attribute overrides any file that is attached to the end of
+ the request with a local CUPS PPD file.</P>
+<H3><A NAME="4_6_2">4.6.2 CUPS-Add-Modify-Printer Response</A></H3>
 <P>The following groups of attributes are send as part of the
- CUPS-Add-Printer Response:</P>
+ CUPS-Add-Modify-Printer Response:</P>
 <P>Group 1: Operation Attributes</P>
 <UL>
 <P>Status Message:</P>
@@ -776,12 +779,12 @@ VALIGN="TOP">0x4004</TD><TD VALIGN="TOP">Delete a printer.</TD></TR>
 <P>The set of requested attributes and their current values for each
  printer class.</P>
 </UL>
-<H2><A NAME="4_9">4.9 CUPS-Add-Class Operation</A></H2>
-<P>The CUPS-Add-Class operation (0x4006) adds a new printer class or
- modifies and existing printer class on the system.</P>
-<H3><A NAME="4_9_1">4.9.1 CUPS-Add-Class Request</A></H3>
+<H2><A NAME="4_9">4.9 CUPS-Add-Modify-Class Operation</A></H2>
+<P>The CUPS-Add-Modify-Class operation (0x4006) adds a new printer class
+ or modifies and existing printer class on the system.</P>
+<H3><A NAME="4_9_1">4.9.1 CUPS-Add-Modify-Class Request</A></H3>
 <P>The following groups of attributes are supplied as part of the
- CUPS-Add-Class request:</P>
+ CUPS-Add-Modify-Class request:</P>
 <P>Group 1: Operation Attributes</P>
 <UL>
 <P>Natural Language and Character Set:</P>
@@ -822,9 +825,9 @@ VALIGN="TOP">0x4004</TD><TD VALIGN="TOP">Delete a printer.</TD></TR>
  access control list for incoming print jobs. To allow all users access
  to a class, use the delete tag for the attribute value.</P>
 </UL>
-<H3><A NAME="4_9_2">4.9.2 CUPS-Add-Class Response</A></H3>
+<H3><A NAME="4_9_2">4.9.2 CUPS-Add-Modify-Class Response</A></H3>
 <P>The following groups of attributes are send as part of the
- CUPS-Add-Class Response:</P>
+ CUPS-Add-Modify-Class Response:</P>
 <P>Group 1: Operation Attributes</P>
 <UL>
 <P>Status Message:</P>
@@ -1113,14 +1116,14 @@ VALIGN="TOP">0x4004</TD><TD VALIGN="TOP">Delete a printer.</TD></TR>
  on the underlying hardware. The parity value can be one of &quot;none&quot;,
  &quot;even&quot;, or &quot;odd&quot;. The flow value can be one of &quot;none&quot;, &quot;soft&quot; (XON/XOFF
  handshaking), &quot;hard&quot; or &quot;rts/cts&quot; (RTS/CTS handshaking), or &quot;dtrdsr&quot;
- (DTR/DSR handshaking).</LI>
+ (DTR/DSR handshaking).
 <P>The URI returned by CUPS-Get-Devices will contain the maximum baud
  rate supported by the device and the best type of flow control
  available (&quot;soft&quot; or &quot;hard&quot;).</P>
 <LI>&quot;network&quot; - The device-uri will be of the form
  &quot;method://[username:password@]hostname[:port]/[resource]&quot;, where method
  may be &quot;http&quot;, &quot;ipp&quot;, &quot;lpd&quot;, &quot;smb&quot;, or &quot;socket&quot; in the current
- implementation.</LI>
+ implementation.
 <P>The URI returned by CUPS-Get-Devices will only contain the method
  name followed by two slashes (&quot;method://&quot;). It is up to the client
  application to add the appropriate host and other information when
@@ -1129,6 +1132,8 @@ VALIGN="TOP">0x4004</TD><TD VALIGN="TOP">Delete a printer.</TD></TR>
  any username and password information stripped; the information is
  still stored and used by the server internally to perform any needed
  authentication.</P>
+</LI>
+</LI>
 </UL>
 <H2><A NAME="5_2">5.2 Job Template Attributes</A></H2>
 <H3><A NAME="5_2_1">5.2.1 blackplot (boolean)</A></H3>
@@ -1206,32 +1211,58 @@ VALIGN="TOP">0x4004</TD><TD VALIGN="TOP">Delete a printer.</TD></TR>
  100.</P>
 <P>The ppi option can be used to override the natural resolution of the
  image, which controls the natural size.</P>
-<H3><A NAME="5_2_14">5.2.14 page-bottom (integer(0:MAX))</A></H3>
+<H3><A NAME="5_2_14">5.2.14 number-up-layout (type2 keyword)</A></H3>
+<P><I>(CUPS 1.1.15 and higher)</I></P>
+<P>The number-up-layout attribute specifies the order each input page is
+ placed on each output page. The following keywords are presently
+ defined:</P>
+<UL>
+<LI><CODE>btlr</CODE> - Bottom to top, left to right</LI>
+<LI><CODE>btrl</CODE> - Bottom to top, right to left</LI>
+<LI><CODE>lrbt</CODE> - Left to right, bottom to top</LI>
+<LI><CODE>lrtb</CODE> - Left to right, top to bottom (default)</LI>
+<LI><CODE>rlbt</CODE> - Right to left, bottom to top</LI>
+<LI><CODE>rltb</CODE> - Right to left, top to bottom</LI>
+<LI><CODE>tblr</CODE> - Top to bottom, left to right</LI>
+<LI><CODE>tbrl</CODE> - Top to bottom, right to left</LI>
+</UL>
+<H3><A NAME="5_2_15">5.2.15 page-border (type2 keyword)</A></H3>
+<P><I>(CUPS 1.1.15 and higher)</I></P>
+<P>The page-border attribute specifies whether a border is draw around
+ each page. The following keywords are presently defined:</P>
+<UL>
+<LI><CODE>double</CODE> - Two hairline borders are drawn</LI>
+<LI><CODE>double-thick</CODE> - Two 1pt borders are drawn</LI>
+<LI><CODE>none</CODE> - No border is drawn (default)</LI>
+<LI><CODE>single</CODE> - A single hairline border is drawn</LI>
+<LI><CODE>single-thick</CODE> - A single 1pt border is drawn</LI>
+</UL>
+<H3><A NAME="5_2_16">5.2.16 page-bottom (integer(0:MAX))</A></H3>
 <P>The page-bottom attribute specifies the bottom margin in points (72
  points equals 1 inch). The default value is the device physical margin.</P>
-<H3><A NAME="5_2_15">5.2.15 page-label (text(MAX))</A></H3>
+<H3><A NAME="5_2_17">5.2.17 page-label (text(MAX))</A></H3>
 <P><I>(CUPS 1.1.7 and higher)</I></P>
 <P>The page-label attribute provides a text value to place in the header
  and footer on each page. If a classification level is set on the
  server, then this classification is printed before the page label.</P>
-<H3><A NAME="5_2_16">5.2.16 page-left (integer(0:MAX))</A></H3>
+<H3><A NAME="5_2_18">5.2.18 page-left (integer(0:MAX))</A></H3>
 <P>The page-left attribute specifies the left margin in points (72
  points equals 1 inch). The default value is the device physical margin.</P>
-<H3><A NAME="5_2_17">5.2.17 page-right (integer(0:MAX))</A></H3>
+<H3><A NAME="5_2_19">5.2.19 page-right (integer(0:MAX))</A></H3>
 <P>The page-right attribute specifies the right margin in points (72
  points equals 1 inch). The default value is the device physical margin.</P>
-<H3><A NAME="5_2_18">5.2.18 page-set (type2 keyword)</A></H3>
+<H3><A NAME="5_2_20">5.2.20 page-set (type2 keyword)</A></H3>
 <P>The page-set attribute specifies which pages to print in a file. The
  supported keywords are &quot;all&quot;, &quot;even&quot;, and &quot;odd&quot;. The default value is
  &quot;all&quot;.</P>
-<H3><A NAME="5_2_19">5.2.19 page-top (integer(0:MAX))</A></H3>
+<H3><A NAME="5_2_21">5.2.21 page-top (integer(0:MAX))</A></H3>
 <P>The page-top attribute specifies the top margin in points (72 points
  equals 1 inch). The default value is the device physical margin.</P>
-<H3><A NAME="5_2_20">5.2.20 penwidth (integer(0:MAX))</A></H3>
+<H3><A NAME="5_2_22">5.2.22 penwidth (integer(0:MAX))</A></H3>
 <P>The penwidth attribute specifies the default pen width in micrometers
  when printing HP-GL/2 plot files. The default value is 1000 (1
  millimeter).</P>
-<H3><A NAME="5_2_21">5.2.21 position (type2 keyword)</A></H3>
+<H3><A NAME="5_2_23">5.2.23 position (type2 keyword)</A></H3>
 <P>The position attribute specifies the location of image files on the
  media. The following keyword values are recognized:</P>
 <UL>
@@ -1251,27 +1282,27 @@ VALIGN="TOP">0x4004</TD><TD VALIGN="TOP">Delete a printer.</TD></TR>
 <LI><CODE>bottom-right</CODE> - Print the image at the bottom right
  corner of the page</LI>
 </UL>
-<H3><A NAME="5_2_22">5.2.22 ppi (integer(1:MAX))</A></H3>
+<H3><A NAME="5_2_24">5.2.24 ppi (integer(1:MAX))</A></H3>
 <P>The ppi attribute specifies the resolution of an image file in pixels
  per inch. The default value is the resolution included with the file or
  128 if no resolution information is available.</P>
-<H3><A NAME="5_2_23">5.2.23 prettyprint (boolean)</A></H3>
+<H3><A NAME="5_2_25">5.2.25 prettyprint (boolean)</A></H3>
 <P>The prettyprint attribute specifies whether text files should be
  printed with a shaded header and keyword highlighting
  (prettyprint=true) or without additional formatting
  (prettyprint=false). The default value is false.</P>
-<H3><A NAME="5_2_24">5.2.24 saturation (integer(0:200))</A></H3>
+<H3><A NAME="5_2_26">5.2.26 saturation (integer(0:200))</A></H3>
 <P>The saturation attribute specifies the color saturation when printing
  image files. A saturation of 100 is normal, while values of 50 and 200
  will be half and twice as colorful, respectively. The default value is
  100.</P>
-<H3><A NAME="5_2_25">5.2.25 scaling (integer(1:1000))</A></H3>
+<H3><A NAME="5_2_27">5.2.27 scaling (integer(1:1000))</A></H3>
 <P>The scaling attribute specifies the scaling of image files with
  respect to the selected media. A value of 100 specifies that the image
  file should fit 100% of the page, or as much as possible given the
  image dimensions. The default value is unspecified.</P>
 <P>The scaling attribute overrides the ppi attribute if specified.</P>
-<H3><A NAME="5_2_26">5.2.26 wrap (boolean)</A></H3>
+<H3><A NAME="5_2_28">5.2.28 wrap (boolean)</A></H3>
 <P>The wrap attribute specifies whether long lines should be wrapped
  (wrap=true) or not (wrap=false) when printing text files. The default
  value is true.</P>

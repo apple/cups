@@ -4,15 +4,15 @@
 	<TITLE>An Overview of the Common UNIX Printing System</TITLE>
 	<LINK REL=STYLESHEET TYPE="text/css" HREF="cupsdoc.css">
 </HEAD>
-<BODY BGCOLOR=#ffffff>
+<BODY>
 <TABLE WIDTH="100%">
 <TR VALIGN=TOP>
 	<TD><IMG SRC="images/cups-large.gif" WIDTH="103" HEIGHT="120"></TD>
 	<TD><H1 ALIGN="RIGHT">An Overview of the<BR>
 	Common UNIX Printing System,<BR>
-	Version 1.1</H1>
+	Version 1.2</H1>
 
-	<P ALIGN="RIGHT">July 10, 2000<BR>
+	<P ALIGN="RIGHT">August 14, 2002<BR>
 	Michael Sweet, Easy Software Products<BR>
 	Copyright 1998-2002, All Rights Reserved.</P>
 	</TD>
@@ -76,10 +76,10 @@ to the original CUPS 1.0 release that addressed security, portability,
 and bugs found, but no new functionality was added to improve the
 stability of the CUPS code.
 
-<P>CUPS 1.1 is based on IPP/1.1 and adds many of the functional
-enhancements that have been requested by our users. As with 1.0, CUPS
-1.1 will be followed by patch releases that address any problems found
-with the software but add no new features.
+<P>CUPS 1.2 is based on IPP/1.1 and adds many of the functional
+enhancements that have been requested by our users. As with 1.1, CUPS
+1.2 will be followed by patch releases that address any problems found
+with the software but add no new major features.
 
 <H2>Design Overview</H2>
 
@@ -199,7 +199,7 @@ printers drivers.
 
 <P>A backend program is a special filter that sends print data to a
 device or network connection. Backends for parallel, serial, USB, LPD, IPP,
-and AppSocket (JetDirect) connections are provided in CUPS 1.1.
+and AppSocket (JetDirect) connections are provided in CUPS 1.2.
 
 <P>SAMBA version 2.0.6 and higher includes a SMB backend
 (<CODE>smbspool(1)</CODE>) that can be used with CUPS 1.0 or 1.1 for
@@ -228,9 +228,9 @@ the implicit class and have them print on the first available printer
 or server. In addition, failsafe and load-balancing functions are
 enabled simply by defining the same printer on multiple servers!
 
-<H2>New Features in CUPS 1.1</H2>
+<H2>New Features in CUPS 1.2</H2>
 
-<P>CUPS 1.1 includes many new features and capabilities:
+<P>CUPS 1.2 includes many new features and capabilities:
 
 <OL>
 
@@ -264,7 +264,7 @@ enabled simply by defining the same printer on multiple servers!
 
 <H3><A NAME="BACKENDS">1. Backends</A></H3>
 
-<P>CUPS 1.1 implements a new backend interface for retrieving a list of
+<P>CUPS 1.2 implements a new backend interface for retrieving a list of
 available devices for CUPS clients. This allows administration
 interfaces to query the CUPS scheduler for a list of available devices,
 automatically configure printers if the device identification
@@ -278,7 +278,7 @@ a subsequent patch release.
 
 <H3><A NAME="BANNERS">2. Banner Page Support</A></H3>
 
-<P>CUPS 1.1 includes support for banner pages at the beginning and end
+<P>CUPS 1.2 includes support for banner pages at the beginning and end
 of a job. Banner pages may be of any file format and support variable
 substitution for job titles, usernames, etc. Default banner pages are
 associated with each printer and can be overridden with command-line
@@ -291,13 +291,13 @@ access to the printing system. Unlike Basic authentication, Digest
 authentication does not send passwords "in the clear" so it is more
 difficult to gain unauthorized access to your system.
 
-<P>CUPS 1.1 implements Digest authentication using a special MD5
+<P>CUPS 1.2 implements Digest authentication using a special MD5
 password file instead of the UNIX password file. This file is managed
 using the new <CODE>lppasswd</CODE> command.
 
 <H3><A NAME="DIRSVC">4. Directory Services</A></H3>
 
-<P>CUPS 1.1 adds new directory service ("printer browsing") features to
+<P>CUPS 1.2 adds new directory service ("printer browsing") features to
 make using CUPS on large LANs and WANs easier. You can now poll a
 remote server for printer information and relay it to the LAN as well
 as restrict what printer information is processed (e.g. to "hide"
@@ -305,26 +305,26 @@ servers, domains, or networks that you don't want to see.)
 
 <H3><A NAME="FHS2">5. Directory Structure Changes</A></H3>
 
-<P>CUPS 1.1 now uses a directory structure that complies with the
+<P>CUPS 1.2 now uses a directory structure that complies with the
 Filesystem Hierarchy Standard ("FHS"), version 2.0. This should make
 integration into existing Linux and *BSD distributions a lot easier.
 
 <H3><A NAME="DOCOS">6. Documentation</A></H3>
 
-<P>The CUPS 1.1 documentation has gone through many revisions,
+<P>The CUPS 1.2 documentation has gone through many revisions,
 including a completely rewritten administrators manual, a new
 programmers manual, and an IPP implementation reference manual.
 
 <H3><A NAME="DRIVERS">7. Drivers</A></H3>
 
-<P>CUPS 1.1 includes drivers for EPSON dot-matrix and inkjet printers.
+<P>CUPS 1.2 includes drivers for EPSON dot-matrix and inkjet printers.
 As with the HP PCL drivers, the EPSON drivers don't necessarily provide
 the best possible output for each printer but should provide adequate
 printing quality for general day-to-day printing.
 
 <H3><A NAME="FILTERS">8. Filters</A></H3>
 
-<P>CUPS 1.1 includes new image, PostScript, PDF, and text filters. The image
+<P>CUPS 1.2 includes new image, PostScript, PDF, and text filters. The image
 filters have been upgraded to support Windows BMP and Alias PIX files.
 
 <P>The PostScript filter is now based off GNU Ghostscript 5.50. The new
@@ -350,10 +350,10 @@ support for banner pages.
 
 <H3><A NAME="PERSISTENCE">10. Job Persistence</A></H3>
 
-<P>CUPS 1.1 supports job persistence. This means that jobs are preserved
+<P>CUPS 1.2 supports job persistence. This means that jobs are preserved
 even after a reboot, a feature that was sorely missing from CUPS 1.0.
 
-<P>In addition, CUPS 1.1 allows you to keep job information after the
+<P>In addition, CUPS 1.2 allows you to keep job information after the
 job has printed. The basic post-job persistence mode provides a job
 history (number of pages printed, time job was printed, etc.) but does
 not preserve the actual job files. This can be changed to discard all
@@ -362,13 +362,13 @@ so you can reprint a job at some later time.
 
 <H3><A NAME="LPD">11. LPD Client Support</A></H3>
 
-<P>By popular request, CUPS 1.1 supports LPD-based clients using a new
+<P>By popular request, CUPS 1.2 supports LPD-based clients using a new
 mini-daemon that handles LPD requests and passes them on to the main
 server.
 
 <H3><A NAME="USEROPTS">12. User-Defined Printers and Options</A></H3>
 
-<P>CUPS 1.1 includes support for user-defined printers and options via
+<P>CUPS 1.2 includes support for user-defined printers and options via
 a new <CODE>lpoptions</CODE> command. User-defined printers are special
 instances of the available printers (e.g. "printer/instance" or
 "printer@server/instance") that can have their own default options such
@@ -378,7 +378,7 @@ command can also be used to set a different default printer queue.
 <H3><A NAME="WEB">13. Web Administration Interface</A></H3>
 
 <P>CUPS 1.0 provided a simple class, job, and printer monitoring
-interface for web browsers. CUPS 1.1 replaces this interface with an
+interface for web browsers. CUPS 1.2 replaces this interface with an
 enhanced administration interface that allows you to add, modify,
 delete, configure, and control classes, jobs, and printers.
 
@@ -406,10 +406,10 @@ panel for CUPS and can be found at:
 </PRE></UL>
 
 <P>Numerous other filters, drivers, tutorials, etc. have been made available
-on the CUPS bazaar, available at:
+on the CUPS Links web page, available at:
 
 <UL><PRE>
-<A HREF="http://www.cups.org/bazaar.cgi">http://www.cups.org/bazaar.cgi</A>
+<A HREF="http://www.cups.org/links.php">http://www.cups.org/links.php</A>
 </PRE></UL>
 
 <P>Finally, our own ESP Print Pro software uses CUPS to provide drivers
@@ -431,7 +431,7 @@ are considering it in their next releases.
 <P>The Common UNIX Printing System provides a modern printing interface
 for UNIX applications that is both flexible and user-friendly. The
 software provides System V and Berkeley compatible command-line
-interfaces to ensure compatibility with existing applications. CUPS 1.1
+interfaces to ensure compatibility with existing applications. CUPS 1.2
 adds many new features that make it an even better choice for printing
 under UNIX.
 

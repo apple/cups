@@ -1,7 +1,7 @@
 <HTML>
 <HEAD>
 	<META NAME="COPYRIGHT" CONTENT="Copyright 1997-2002, All Rights Reserved">
-	<META NAME="DOCNUMBER" CONTENT="CUPS-SPS-1.1">
+	<META NAME="DOCNUMBER" CONTENT="CUPS-SPS-1.2">
 	<META NAME="Author" CONTENT="Easy Software Products">
 	<TITLE>CUPS Software Performance Specification</TITLE>
 </HEAD>
@@ -13,7 +13,7 @@
 
 <P>This software performance specification provides an analysis of the
 memory, disk, and processor utilitization of each program in the
-Common UNIX Printing System ("CUPS") Version 1.1.</P>
+Common UNIX Printing System ("CUPS") Version 1.2.</P>
 
 <P>For the purposes of comparison, all figures are for the Linux Intel
 platform. Memory utilization on other platforms should be similar.

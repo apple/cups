@@ -1,7 +1,7 @@
 <HTML>
 <HEAD>
 	<META NAME="COPYRIGHT" CONTENT="Copyright 1997-2002, All Rights Reserved">
-	<META NAME="DOCNUMBER" CONTENT="CUPS-SSR-1.1">
+	<META NAME="DOCNUMBER" CONTENT="CUPS-SSR-1.2">
 	<META NAME="Author" CONTENT="Easy Software Products">
 	<TITLE>CUPS Software Security Report</TITLE>
 </HEAD>
@@ -12,7 +12,7 @@
 <H2>Identification</H2>
 
 <P>This software security report provides an analysis of possible security
-concerns for the Common UNIX Printing System ("CUPS") Version 1.1.</P>
+concerns for the Common UNIX Printing System ("CUPS") Version 1.2.</P>
 
 <EMBED SRC="system-overview.shtml">
 

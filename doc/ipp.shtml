@@ -1,7 +1,7 @@
 <HTML>
 <HEAD>
 	<META NAME="COPYRIGHT" CONTENT="Copyright 1997-2002 All Rights Reserved">
-	<META NAME="DOCNUMBER" CONTENT="CUPS-IPP-1.1">
+	<META NAME="DOCNUMBER" CONTENT="CUPS-IPP-1.2">
 	<META NAME="Author" CONTENT="Easy Software Products">
 	<TITLE>CUPS Implementation of IPP</TITLE>
 </HEAD>
@@ -13,7 +13,7 @@
 
 <P>This document provides an overview of the Internet Printing Protocol
 ("IPP") version 1.1 as implemented in the Common UNIX Printing System
-("CUPS") version 1.1.
+("CUPS") version 1.2.
 
 <EMBED SRC="system-overview.shtml">
 
@@ -104,13 +104,13 @@ standard IPP and registered extension operations:
 </TR>
 <TR>
 	<TD VALIGN="TOP">Create-Job</TD>
-	<TD VALIGN="TOP">1.1</TD>
+	<TD VALIGN="TOP">1.2</TD>
 	<TD VALIGN="TOP">0x0005</TD>
 	<TD VALIGN="TOP">Create a print job.</TD>
 </TR>
 <TR>
 	<TD VALIGN="TOP">Send-Document</TD>
-	<TD VALIGN="TOP">1.1</TD>
+	<TD VALIGN="TOP">1.2</TD>
 	<TD VALIGN="TOP">0x0006</TD>
 	<TD VALIGN="TOP">Send a file for a print job.</TD>
 </TR>
@@ -140,13 +140,13 @@ standard IPP and registered extension operations:
 </TR>
 <TR>
 	<TD VALIGN="TOP">Hold-Job</TD>
-	<TD VALIGN="TOP">1.1</TD>
+	<TD VALIGN="TOP">1.2</TD>
 	<TD VALIGN="TOP">0x000C</TD>
 	<TD VALIGN="TOP">Hold a job for printing.</TD>
 </TR>
 <TR>
 	<TD VALIGN="TOP">Release-Job</TD>
-	<TD VALIGN="TOP">1.1</TD>
+	<TD VALIGN="TOP">1.2</TD>
 	<TD VALIGN="TOP">0x000D</TD>
 	<TD VALIGN="TOP">Release a job for printing.</TD>
 </TR>
@@ -170,7 +170,7 @@ standard IPP and registered extension operations:
 </TR>
 <TR>
 	<TD VALIGN="TOP">Set-Job-Attributes</TD>
-	<TD VALIGN="TOP">1.1</TD>
+	<TD VALIGN="TOP">1.2</TD>
 	<TD VALIGN="TOP">0x0014</TD>
 	<TD VALIGN="TOP">Set attributes for a pending or held job.</TD>
 </TR>
@@ -187,7 +187,7 @@ standard IPP and registered extension operations:
 	<TD VALIGN="TOP">Get all of the available printers.</TD>
 </TR>
 <TR>
-	<TD VALIGN="TOP">CUPS-Add-Printer</TD>
+	<TD VALIGN="TOP">CUPS-Add-Modify-Printer</TD>
 	<TD VALIGN="TOP">1.0</TD>
 	<TD VALIGN="TOP">0x4003</TD>
 	<TD VALIGN="TOP">Add or modify a printer.</TD>
@@ -205,7 +205,7 @@ standard IPP and registered extension operations:
 	<TD VALIGN="TOP">Get all of the available printer classes.</TD>
 </TR>
 <TR>
-	<TD VALIGN="TOP">CUPS-Add-Class</TD>
+	<TD VALIGN="TOP">CUPS-Add-Modify-Class</TD>
 	<TD VALIGN="TOP">1.0</TD>
 	<TD VALIGN="TOP">0x4006</TD>
 	<TD VALIGN="TOP">Add or modify a printer class.</TD>
@@ -236,19 +236,19 @@ standard IPP and registered extension operations:
 </TR>
 <TR>
 	<TD VALIGN="TOP">CUPS-Get-Devices</TD>
-	<TD VALIGN="TOP">1.1</TD>
+	<TD VALIGN="TOP">1.2</TD>
 	<TD VALIGN="TOP">0x400B</TD>
 	<TD VALIGN="TOP">Get all of the available devices.</TD>
 </TR>
 <TR>
 	<TD VALIGN="TOP">CUPS-Get-PPDs</TD>
-	<TD VALIGN="TOP">1.1</TD>
+	<TD VALIGN="TOP">1.2</TD>
 	<TD VALIGN="TOP">0x400C</TD>
 	<TD VALIGN="TOP">Get all of the available PPDs.</TD>
 </TR>
 <TR>
 	<TD VALIGN="TOP">CUPS-Move-Job</TD>
-	<TD VALIGN="TOP">1.1</TD>
+	<TD VALIGN="TOP">1.2</TD>
 	<TD VALIGN="TOP">0x400D</TD>
 	<TD VALIGN="TOP">Move a job to a different printer.</TD>
 </TR>
@@ -685,15 +685,15 @@ CUPS-Get-Printers Response:
 
 </UL>
 
-<H2>CUPS-Add-Printer Operation</H2>
+<H2>CUPS-Add-Modify-Printer Operation</H2>
 
-<P>The CUPS-Add-Printer operation (0x4003) adds a new printer or
+<P>The CUPS-Add-Modify-Printer operation (0x4003) adds a new printer or
 modifies an existing printer on the system.
 
-<H3>CUPS-Add-Printer Request</H3>
+<H3>CUPS-Add-Modify-Printer Request</H3>
 
 <P>The following groups of attributes are supplied as part of the
-CUPS-Add-Printer request:
+CUPS-Add-Modify-Printer request:
 
 <P>Group 1: Operation Attributes
 
@@ -783,15 +783,15 @@ CUPS-Add-Printer request:
 
 </UL>
 
-<P>The CUPS-Add-Printer request can optionally be followed by a PPD
+<P>The CUPS-Add-Modify-Printer request can optionally be followed by a PPD
 file or System V interface script to be used for the printer. The
 "ppd-name" attribute overrides any file that is attached to the end of
 the request with a local CUPS PPD file.
 
-<H3>CUPS-Add-Printer Response</H3>
+<H3>CUPS-Add-Modify-Printer Response</H3>
 
 <P>The following groups of attributes are send as part of the
-CUPS-Add-Printer Response:
+CUPS-Add-Modify-Printer Response:
 
 <P>Group 1: Operation Attributes
 
@@ -950,15 +950,15 @@ CUPS-Get-Classes Response:
 
 </UL>
 
-<H2>CUPS-Add-Class Operation</H2>
+<H2>CUPS-Add-Modify-Class Operation</H2>
 
-<P>The CUPS-Add-Class operation (0x4006) adds a new printer class or
+<P>The CUPS-Add-Modify-Class operation (0x4006) adds a new printer class or
 modifies and existing printer class on the system.
 
-<H3>CUPS-Add-Class Request</H3>
+<H3>CUPS-Add-Modify-Class Request</H3>
 
 <P>The following groups of attributes are supplied as part of the
-CUPS-Add-Class request:
+CUPS-Add-Modify-Class request:
 
 <P>Group 1: Operation Attributes
 
@@ -1027,9 +1027,9 @@ CUPS-Add-Class request:
 
 </UL>
 
-<H3>CUPS-Add-Class Response</H3>
+<H3>CUPS-Add-Modify-Class Response</H3>
 
-<P>The following groups of attributes are send as part of the CUPS-Add-Class Response:
+<P>The following groups of attributes are send as part of the CUPS-Add-Modify-Class Response:
 
 <P>Group 1: Operation Attributes
 
@@ -1644,6 +1644,56 @@ and 200 is twice the natural size. The default value is 100.
 
 <P>The ppi option can be used to override the natural resolution of the
 image, which controls the natural size.
+
+<H3>number-up-layout (type2 keyword)</H3>
+
+<P><I>(CUPS 1.1.15 and higher)</I>
+
+<P>The number-up-layout attribute specifies the order each input
+page is placed on each output page. The following keywords are
+presently defined:
+
+<UL>
+
+	<LI><CODE>btlr</CODE> - Bottom to top, left to right</LI>
+
+	<LI><CODE>btrl</CODE> - Bottom to top, right to left</LI>
+
+	<LI><CODE>lrbt</CODE> - Left to right, bottom to top</LI>
+
+	<LI><CODE>lrtb</CODE> - Left to right, top to bottom (default)</LI>
+
+	<LI><CODE>rlbt</CODE> - Right to left, bottom to top</LI>
+
+	<LI><CODE>rltb</CODE> - Right to left, top to bottom</LI>
+
+	<LI><CODE>tblr</CODE> - Top to bottom, left to right</LI>
+
+	<LI><CODE>tbrl</CODE> - Top to bottom, right to left</LI>
+
+</UL>
+
+<H3>page-border (type2 keyword)</H3>
+
+<P><I>(CUPS 1.1.15 and higher)</I>
+
+<P>The page-border attribute specifies whether a border is
+draw around each page. The following keywords are presently
+defined:
+
+<UL>
+
+	<LI><CODE>double</CODE> - Two hairline borders are drawn</LI>
+
+	<LI><CODE>double-thick</CODE> - Two 1pt borders are drawn</LI>
+
+	<LI><CODE>none</CODE> - No border is drawn (default)</LI>
+
+	<LI><CODE>single</CODE> - A single hairline border is drawn</LI>
+
+	<LI><CODE>single-thick</CODE> - A single 1pt border is drawn</LI>
+
+</UL>
 
 <H3>page-bottom (integer(0:MAX))</H3>
 

@@ -1,7 +1,7 @@
 <HTML>
 <HEAD>
 	<META NAME="COPYRIGHT" CONTENT="Copyright 1997-2002, All Rights Reserved">
-	<META NAME="DOCNUMBER" CONTENT="CUPS-IDD-1.1">
+	<META NAME="DOCNUMBER" CONTENT="CUPS-IDD-1.2">
 	<META NAME="Author" CONTENT="Easy Software Products">
 	<TITLE>CUPS Interface Design Description</TITLE>
 </HEAD>
@@ -13,7 +13,7 @@
 
 <P>This interface design description document provides detailed file
 formats, message formats, and program conventions for the Common UNIX
-Printing System ("CUPS") Version 1.1.
+Printing System ("CUPS") Version 1.2.
 
 <EMBED SRC="system-overview.shtml">
 
@@ -310,8 +310,9 @@ the CMY transformation.
 
 <H4>cupsVersion</H4>
 
-<P>This required attribute describes which version of the CUPS IDD was used
-for the PPD file extensions. Currently it must be the string "1.0" or "1.1".
+<P>This required attribute describes which version of the CUPS
+IDD was used for the PPD file extensions. Currently it must be
+the string "1.0", "1.1", or "1.2".
 
 <H2>Scheduler Configuration Files</H2>
 

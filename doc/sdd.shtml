@@ -1,7 +1,7 @@
 <HTML>
 <HEAD>
 	<META NAME="COPYRIGHT" CONTENT="Copyright 1997-2002, All Rights Reserved">
-	<META NAME="DOCNUMBER" CONTENT="CUPS-SDD-1.1">
+	<META NAME="DOCNUMBER" CONTENT="CUPS-SDD-1.2">
 	<META NAME="Author" CONTENT="Easy Software Products">
 	<TITLE>CUPS Software Design Description</TITLE>
 </HEAD>
@@ -13,7 +13,7 @@
 
 This software design description document provides general information 
 on the architecture and coding of the Common UNIX Printing System 
-(&quot;CUPS&quot;) Version 1.1.
+(&quot;CUPS&quot;) Version 1.2.
 
 <EMBED SRC="system-overview.shtml">
 
