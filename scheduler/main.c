@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c,v 1.102 2003/05/01 17:58:28 mike Exp $"
+ * "$Id: main.c,v 1.103 2003/05/02 15:54:18 mike Exp $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -171,6 +171,30 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   if (!fg)
   {
+   /*
+    * Setup signal handlers for the parent...
+    */
+
+#ifdef HAVE_SIGSET /* Use System V signals over POSIX to avoid bugs */
+    sigset(SIGUSR1, sigusr1_handler);
+
+    sigset(SIGHUP, SIG_IGN);
+#elif defined(HAVE_SIGACTION)
+    memset(&action, 0, sizeof(action));
+    sigemptyset(&action.sa_mask);
+    sigaddset(&action.sa_mask, SIGUSR1);
+    action.sa_handler = sigusr1_handler;
+    sigaction(SIGUSR1, &action, NULL);
+
+    sigemptyset(&action.sa_mask);
+    action.sa_handler = SIG_IGN;
+    sigaction(SIGHUP, &action, NULL);
+#else
+    signal(SIGUSR1, sigusr1_handler);
+
+    signal(SIGHUP, SIG_IGN);
+#endif /* HAVE_SIGSET */
+
     if (fork() > 0)
     {
      /*
@@ -178,26 +202,6 @@ main(int  argc,				/* I - Number of command-line arguments */
       * also need to ignore SIGHUP which might be sent by the init
       * script to restart the scheduler...
       */
-
-#ifdef HAVE_SIGSET /* Use System V signals over POSIX to avoid bugs */
-      sigset(SIGUSR1, sigusr1_handler);
-
-      sigset(SIGHUP, SIG_IGN);
-#elif defined(HAVE_SIGACTION)
-      memset(&action, 0, sizeof(action));
-      sigemptyset(&action.sa_mask);
-      sigaddset(&action.sa_mask, SIGUSR1);
-      action.sa_handler = sigusr1_handler;
-      sigaction(SIGUSR1, &action, NULL);
-
-      sigemptyset(&action.sa_mask);
-      action.sa_handler = SIG_IGN;
-      sigaction(SIGHUP, &action, NULL);
-#else
-      signal(SIGUSR1, sigusr1_handler);
-
-      signal(SIGHUP, SIG_IGN);
-#endif /* HAVE_SIGSET */
 
       if (wait(&i) < 0)
         i = 0;
@@ -1062,5 +1066,5 @@ usage(void)
 
 
 /*
- * End of "$Id: main.c,v 1.102 2003/05/01 17:58:28 mike Exp $".
+ * End of "$Id: main.c,v 1.103 2003/05/02 15:54:18 mike Exp $".
  */

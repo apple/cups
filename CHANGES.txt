@@ -1,5 +1,13 @@
-CHANGES.txt - 05/01/2003
+CHANGES.txt - 05/02/2003
 ------------------------
+
+CHANGES IN CUPS V1.1.19
+
+	- The scheduler child might send SIGUSR1 to the parent
+	  before the signal handler was installed; this didn't
+	  prevent the scheduler from starting but produced an
+	  annoying error message (STR #45)
+
 
 CHANGES IN CUPS V1.1.19rc4
 
