@@ -1,19 +1,19 @@
 iso-8859-1
 OK
-Cancelación 
-Ayuda 
-Salido 
-Cercano 
-Sí 
-No 
-En 
-De 
-Excepto 
-Descarte 
-Valor por defecto 
-Opciones 
-Más Info 
-Negro 
+Cancel
+Ayuda
+Salido
+Cercano
+Sí
+No
+En
+De
+Excepto
+Descarte
+Valor por defecto
+Opciones
+Más Info
+Negro
 Color 
 Ciánico 
 Magenta 
@@ -21,8 +21,8 @@ Amarillo
 El copyright 1993-1999 por Easy Software Products, todos endereza reservado. 
 General 
 Impresora 
-Opciones De la Imagen
-Opciones De HP-GL/2
+Imagen
+HP-GL/2
 Suplemento 
 Documento 
 Otro 
@@ -82,7 +82,7 @@ Procesando
 Parado 
 Todo 
 Impar 
-Uniformes Paginaciones 
+Par
 Más Oscuro       Más Brillante
 Talla De Media 
 Tipo De Media 
@@ -90,15 +90,24 @@ Fuente De los Media
 Orientación: 
 Retrato 
 Paisaje 
-Job State
-Job Name
-User Name
-Priority
-Copies
-File Size
-Pending
-Output Mode
-Resolution
+Estatus del trabajo
+Nombre del trabajo
+Nombre del utilizador
+Prioridad
+Copias
+Tamaño
+Pendiente
+Modo de impresión
+Resolución
+Texto
+Especial impresión
+Márgenes
+Izquierda
+La derecha
+Fondo
+Tapa
+Nombre(s)
+Impresión 
 400 Su browser envió una petición que este servidor no podría entender. 
 Este servidor no podría verificar que le autoricen a tener acceso al recurso. 
 Usted debe pagar tener acceso a este servidor. 

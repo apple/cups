@@ -1,43 +1,43 @@
 iso-8859-1
 OK
-Annulation 
-Aide 
-Quitté 
+Annulation
+Aide
+Quitté
 Fermer
 Oui
 Non
 Oui
 Non
 Sauver
-Quitté 
-Défaut 
-Options 
-Plus d'information 
-Noir 
-Couleur 
-Cyan 
-Magenta 
-Jaune 
-Copyright 1993-1999 par Easy Software Products, tous droits réservés. 
-Général 
-Imprimante 
-Options d'Image
-Options d'HP-GL/2
-Options supplémentaires 
-Document 
-Autre 
+Quitté
+Défaut
+Options
+Plus d'information
+Noir
+Couleur
+Cyan
+Magenta
+Jaune
+Copyright 1993-1999 par Easy Software Products, tous droits réservés.
+Général
+Imprimante
+Image
+HP-GL/2
+Options supplémentaires
+Document
+Autre
 Pages d'impression: 
-Entier document 
-Chaîne de page 
+Entier document
+Chaîne de page
 Commande d'Inversion: 
 Pages par feuilles: 
- 1 
- 2 
- 4 
+ 1
+ 2
+ 4
 Graduation d'image: 
 Emploi taille normale d'image
-Zoom par pourcent 
-Zoom par PPI 
+Zoom par pourcent
+Zoom par PPI
 Image de miroir: 
 Saturation de couleur: 
 Teinture de couleur: 
@@ -46,50 +46,50 @@ Ombrageant:
 Largeur de crayon lecteur: 
 Correction de Gamma: 
 Éclat: 
-Ajoutez 
-Éffacer 
-Modifiez 
-URI de l'imprimante 
-Nom de l'imprimante 
-Emplacement de l'imprimante 
-Information de l'imprimante 
-Font et modèlent de l'imprimante 
+Ajoutez
+Éffacer
+Modifiez
+URI de l'imprimante
+Nom de l'imprimante
+Emplacement de l'imprimante
+Information de l'imprimante
+Font et modèlent de l'imprimante
 Dispositif de l'URI
 Formatage du page
-Imprimant la page 
-Initialisation de l'imprimante 
-État de l'Imprimante 
+Imprimant la page
+Initialisation de l'imprimante
+État de l'Imprimante
 Recevant les travaux
-Ne recevant pas Les Travaux 
-Tirages 
-Classe 
-Local 
+Ne recevant pas Les Travaux
+Tirages
+Classe
+Local
 Distant
-Duplexage 
-Agrafant 
-Copie Rapides 
+Duplexage
+Agrafant
+Copie Rapides
 Copies Assemblées
-Poinçon de trou 
-Bâche 
-Liant 
-Triant 
-Petit (jusqu'à 9.5x1pouce) 
-Moyen (9.5x1pouce à 13x19pouce) 
-Grand (13x19pouce et plus grand) 
+Poinçon de trou
+Bâche
+Liant
+Triant
+Petit (jusqu'à 9.5x1pouce)
+Moyen (9.5x1pouce à 13x19pouce)
+Grand (13x19pouce et plus grand)
 Taille faite sur commande
 Arrêter
-Traitant 
-Arrêté 
-Tout 
-Impair 
-Même Pages 
-Plus foncé       Plus Lumineux
+Traitant
+Arrêté
+Tout
+Impair
+Même
+Plus foncé    Plus Lumineux
 Dimension du medias
-Sorte de medias 
-Source du medias 
+Sorte de medias
+Source du medias
 Orientation: 
-Verticale 
-Horizontal 
+Verticale
+Horizontal
 État du travail
 Nom du travail
 Nom de l'utilisateur
@@ -99,6 +99,15 @@ Grandeur du fichier
 Imminent
 Method de sortie
 Resolution
+Texte
+Empreinte Spéciale
+Marge
+Gauche
+Droite
+Bas
+Haut
+Nom du ficher(s)
+Imprimer
 400 Votre browser a envoyé une demande que ce serveur ne pouvait pas comprendre. 
 Ce serveur ne pouvait pas vérifier que vous êtes autoriséz à accéder à la ressource. 
 Vous devez payer pour accéder à ce serveur. 

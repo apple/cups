@@ -21,8 +21,8 @@ Gelb
 Copyright 1993-1999 durch Easy Software Products, alle Rechte vorbehalten. 
 Allgemein
 Drucker
-Bild Optionen
-HP-GL/2 Optionen
+Bild
+HP-GL/2
 Speziell
 Dokument
 Andere
@@ -82,7 +82,7 @@ In Arbeit
 Gestoppt 
 Alles 
 Ungerade 
-Gerade Seiten 
+Gerade
 Dunkler                    Heller
 Medien-Größe 
 Medium 
@@ -99,6 +99,15 @@ Dateigröße
 In Warteposition
 Ausgabe-Modus
 Auflösung
+Text
+Spezieller Druck
+Seitenränder
+Links
+Recht
+Unterseite
+Oberseite
+Dateiname(s)
+Druker
 400 Der Server versteht die Anfrage Ihres Browsers nicht. 
 Der Server konnte nicht Ihre Berechtigung überprüfen, diese Ressource zu benutzen. 
 Sie müssen bezahlen, um auf diesen Server zuzugreifen. 

@@ -21,8 +21,8 @@ Giallo
 Copyright 1993-1999 di Easy Software Products, tutti i diritti riservati. 
 Generale
 Stampante 
-Opzioni per immagini
-Opzioni per HP-GL/2
+Immagini
+HP-GL/2
 Extra 
 Documento 
 Altro 
@@ -82,7 +82,7 @@ Elaborando
 Arrestato 
 Tutto 
 Dispari 
-Pagine pari
+Pari
 Più Scuro       Più Luminoso 
 Formato del supporto 
 Tipo del supporto 
@@ -90,15 +90,24 @@ Sorgente del supporto
 Orientamento: 
 Verticale 
 Orizzontale 
-Job State
-Job Name
-User Name
+Condizione di lavoro
+Nome di lavoro
+Nome dell' utente
 Priorita'
 Copie
 Dimensioni del file
 In attesa
-Output Mode
+Modo stampa
 Risoluzione
+Testo
+Speciale stampa 
+Margini
+Sinistra
+Destra
+Inferiore
+Superiore
+Nome(s)
+Stampa
 400 Il vostro browser ha trasmesso una richiesta che questo server non ha capito 
 Questo server non ha potuto verificare che siete autorizzati ad accedere alla risorsa. 
 Dovete pagare accedere a questo server. 
