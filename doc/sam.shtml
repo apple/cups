@@ -430,14 +430,14 @@ printer to CUPS:
 <B>/usr/sbin/lpadmin -p <I>printer</I> -E -v <I>device</I> -m <I>ppd</I> ENTER</B>
 </PRE></UL>
 
-<P>For an HP DeskJet printer connected to the parallel port this would look
+<P>For a HP DeskJet printer connected to the parallel port this would look
 like:
 
 <UL><PRE>
 <B>/usr/sbin/lpadmin -p DeskJet -E -v parallel:/dev/lp1 -m deskjet.ppd ENTER</B>
 </PRE></UL>
 
-<P>Similarly, an HP LaserJet printer using a JetDirect network interface at
+<P>Similarly, a HP LaserJet printer using a JetDirect network interface at
 IP address 11.22.33.44 would be added with the command:
 
 <UL><PRE>
