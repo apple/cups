@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.70 2002/03/12 20:37:34 mike Exp $"
+# "$Id: Makefile,v 1.71 2002/05/14 01:14:27 mike Exp $"
 #
 #   Support library Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -62,7 +62,7 @@ all:	$(TARGETS)
 #
 
 clean:
-	$(RM) $(OBJS) $(TARGETS) `basename $(LIBCUPS) .2`
+	$(RM) $(OBJS) $(TARGETS) `basename $(LIBCUPS) .2` libcups.dylib
 
 
 #
@@ -202,5 +202,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile,v 1.70 2002/03/12 20:37:34 mike Exp $".
+# End of "$Id: Makefile,v 1.71 2002/05/14 01:14:27 mike Exp $".
 #

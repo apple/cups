@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.118 2002/03/25 17:28:42 mike Exp $"
+ * "$Id: printers.c,v 1.119 2002/05/14 01:14:30 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -1219,8 +1219,6 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
 	if (ppd->throughput)
 	  ippAddInteger(p->attrs, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
 	                "pages-per-minute", ppd->throughput);
-	ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_TEXT,
-                     "printer-make-and-model", NULL, ppd->nickname);
 
         if (ppd->nickname)
           strncpy(p->make_model, ppd->nickname, sizeof(p->make_model) - 1);
@@ -1228,6 +1226,9 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
           strncpy(p->make_model, ppd->modelname, sizeof(p->make_model) - 1);
 	else
 	  strcpy(p->make_model, "Bad PPD File");
+
+	ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_TEXT,
+                     "printer-make-and-model", NULL, p->make_model);
 
        /*
 	* Add media options from the PPD file...
@@ -2065,5 +2066,5 @@ write_irix_state(printer_t *p)	/* I - Printer to update */
 
 
 /*
- * End of "$Id: printers.c,v 1.118 2002/03/25 17:28:42 mike Exp $".
+ * End of "$Id: printers.c,v 1.119 2002/05/14 01:14:30 mike Exp $".
  */

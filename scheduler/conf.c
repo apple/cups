@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.100 2002/03/27 21:54:01 mike Exp $"
+ * "$Id: conf.c,v 1.101 2002/05/14 01:14:28 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -85,6 +85,7 @@ static var_t	variables[] =
   { "Browsing",		&Browsing,		VAR_BOOLEAN,	0 },
   { "Classification",	Classification,		VAR_STRING,	sizeof(Classification) },
   { "ClassifyOverride",	&ClassifyOverride,	VAR_BOOLEAN,	0 },
+  { "ConfigFilePerm",	&ConfigFilePerm,	VAR_INTEGER,	0 },
   { "DataDir",		DataDir,		VAR_STRING,	sizeof(DataDir) },
   { "DefaultCharset",	DefaultCharset,		VAR_STRING,	sizeof(DefaultCharset) },
   { "DefaultLanguage",	DefaultLanguage,	VAR_STRING,	sizeof(DefaultLanguage) },
@@ -99,6 +100,7 @@ static var_t	variables[] =
   { "KeepAlive",	&KeepAlive,		VAR_BOOLEAN,	0 },
   { "LimitRequestBody",	&MaxRequestSize,	VAR_INTEGER,	0 },
   { "ListenBackLog",	&ListenBackLog,		VAR_INTEGER,	0 },
+  { "LogFilePerm",	&LogFilePerm,		VAR_INTEGER,	0 },
   { "MaxClients",	&MaxClients,		VAR_INTEGER,	0 },
   { "MaxJobs",		&MaxJobs,		VAR_INTEGER,	0 },
   { "MaxJobsPerPrinter",&MaxJobsPerPrinter,	VAR_INTEGER,	0 },
@@ -305,6 +307,9 @@ ReadConfiguration(void)
   * Numeric options...
   */
 
+  ConfigFilePerm      = 0600;
+  LogFilePerm         = 0644;
+
   FilterLevel         = 0;
   FilterLimit         = 0;
   HostNameLookups     = FALSE;
@@ -418,7 +423,7 @@ ReadConfiguration(void)
   }
 
   chown(ServerCertificate, User, Group);
-  chmod(ServerCertificate, 0600);
+  chmod(ServerCertificate, ConfigFilePerm);
 
   if (ServerKey[0] != '/')
   {
@@ -428,7 +433,7 @@ ReadConfiguration(void)
   }
 
   chown(ServerKey, User, Group);
-  chmod(ServerKey, 0600);
+  chmod(ServerKey, ConfigFilePerm);
 #endif /* HAVE_LIBSSL */
 
  /*
@@ -453,15 +458,15 @@ ReadConfiguration(void)
 
   snprintf(directory, sizeof(directory), "%s/cupsd.conf", ServerRoot);
   chown(directory, User, Group);
-  chmod(directory, 0600);
+  chmod(directory, ConfigFilePerm);
 
   snprintf(directory, sizeof(directory), "%s/classes.conf", ServerRoot);
   chown(directory, User, Group);
-  chmod(directory, 0600);
+  chmod(directory, ConfigFilePerm);
 
   snprintf(directory, sizeof(directory), "%s/printers.conf", ServerRoot);
   chown(directory, User, Group);
-  chmod(directory, 0600);
+  chmod(directory, ConfigFilePerm);
 
   snprintf(directory, sizeof(directory), "%s/passwd.md5", ServerRoot);
   chown(directory, User, Group);
@@ -514,8 +519,10 @@ ReadConfiguration(void)
   * Read the MIME type and conversion database...
   */
 
+  snprintf(directory, sizeof(directory), "%s/filter", ServerBin);
+
   MimeDatabase = mimeNew();
-  mimeMerge(MimeDatabase, ServerRoot);
+  mimeMerge(MimeDatabase, ServerRoot, directory);
 
  /*
   * Create a list of MIME types for the document-format-supported
@@ -1332,29 +1339,25 @@ read_configuration(FILE *fp)		/* I - File to read from */
       {
         case VAR_INTEGER :
 	    {
-	      float	n;		/* Number */
-	      char	units[255];	/* Units */
+	      int	n;	/* Number */
+	      char	*units;	/* Units */
 
 
-	      switch (sscanf(value, "%f%254s", &n, units))
+              n = strtol(value, &units, 0);
+
+	      if (units && *units)
 	      {
-		case 0 :
-        	    n = 0.0;
-		case 1 :
-		    break;
-		case 2 :
-        	    if (tolower(units[0]) == 'g')
-		      n *= 1024.0 * 1024.0 * 1024.0;
-        	    else if (tolower(units[0]) == 'm')
-		      n *= 1024.0 * 1024.0;
-		    else if (tolower(units[0]) == 'k')
-		      n *= 1024.0;
-		    else if (tolower(units[0]) == 't')
-		      n *= 262144.0;
-		    break;
+        	if (tolower(units[0]) == 'g')
+		  n *= 1024 * 1024 * 1024;
+        	else if (tolower(units[0]) == 'm')
+		  n *= 1024 * 1024;
+		else if (tolower(units[0]) == 'k')
+		  n *= 1024;
+		else if (tolower(units[0]) == 't')
+		  n *= 262144;
 	      }
 
-	      *((int *)var->ptr) = (int)n;
+	      *((int *)var->ptr) = n;
 	    }
 	    break;
 
@@ -1893,5 +1896,5 @@ get_address(char               *value,		/* I - Value string */
 
 
 /*
- * End of "$Id: conf.c,v 1.100 2002/03/27 21:54:01 mike Exp $".
+ * End of "$Id: conf.c,v 1.101 2002/05/14 01:14:28 mike Exp $".
  */

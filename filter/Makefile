@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.63 2002/05/09 03:22:13 mike Exp $"
+# "$Id: Makefile,v 1.64 2002/05/14 01:14:28 mike Exp $"
 #
 #   Filter makefile for the Common UNIX Printing System (CUPS).
 #
@@ -53,7 +53,8 @@ all:	$(TARGETS)
 #
 
 clean:
-	$(RM) $(OBJS) $(TARGETS) $(LIBCUPSIMAGE) `basename $(LIBCUPSIMAGE) .2`
+	$(RM) $(OBJS) $(TARGETS) $(LIBCUPSIMAGE)
+	$(RM) `basename $(LIBCUPSIMAGE) .2` libcupsimage.dylib
 
 
 #
@@ -244,5 +245,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile,v 1.63 2002/05/09 03:22:13 mike Exp $".
+# End of "$Id: Makefile,v 1.64 2002/05/14 01:14:28 mike Exp $".
 #
