@@ -1,5 +1,5 @@
 /*
- * "$Id: image-gif.c,v 1.10 2002/03/01 19:53:33 mike Exp $"
+ * "$Id: image-gif.c,v 1.11 2002/04/19 16:17:26 mike Exp $"
  *
  *   GIF image routines for the Common UNIX Printing System (CUPS).
  *
@@ -91,6 +91,13 @@ ImageReadGIF(image_t    *img,		/* IO - Image */
 		ncolors,	/* Bits per pixel */
 		transparent;	/* Transparent color index */
 
+
+ /*
+  * GIF files are either grayscale or RGB - no CMYK...
+  */
+
+  if (primary == IMAGE_RGB_CMYK)
+    primary = IMAGE_RGB;
 
  /*
   * Read the header; we already know it is a GIF file...
@@ -642,5 +649,5 @@ gif_read_image(FILE       *fp,		/* I - Input file */
 
 
 /*
- * End of "$Id: image-gif.c,v 1.10 2002/03/01 19:53:33 mike Exp $".
+ * End of "$Id: image-gif.c,v 1.11 2002/04/19 16:17:26 mike Exp $".
  */

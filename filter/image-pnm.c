@@ -1,5 +1,5 @@
 /*
- * "$Id: image-pnm.c,v 1.9 2002/03/01 19:53:34 mike Exp $"
+ * "$Id: image-pnm.c,v 1.10 2002/04/19 16:17:27 mike Exp $"
  *
  *   Portable Any Map file routines for the Common UNIX Printing System (CUPS).
  *
@@ -135,7 +135,7 @@ ImageReadPNM(image_t    *img,		/* IO - Image */
   if (format == 1 || format == 2 || format == 4 || format == 5)
     img->colorspace = secondary;
   else
-    img->colorspace = primary;
+    img->colorspace = (primary == IMAGE_RGB_CMYK) ? IMAGE_RGB : primary;
 
   ImageSetMaxTiles(img, 0);
 
@@ -286,5 +286,5 @@ ImageReadPNM(image_t    *img,		/* IO - Image */
 
 
 /*
- * End of "$Id: image-pnm.c,v 1.9 2002/03/01 19:53:34 mike Exp $".
+ * End of "$Id: image-pnm.c,v 1.10 2002/04/19 16:17:27 mike Exp $".
  */
