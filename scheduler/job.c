@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.124.2.88 2004/06/29 16:59:21 mike Exp $"
+ * "$Id: job.c,v 1.124.2.89 2004/06/30 18:24:18 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -785,7 +785,7 @@ LoadAllJobs(void)
       httpSeparate(attr->values[0].string.text, method, username, host,
                    &port, resource);
 
-      if ((dest = ValidateDest(host, resource, &(job->dtype))) == NULL &&
+      if ((dest = ValidateDest(host, resource, &(job->dtype), NULL)) == NULL &&
           job->state != NULL &&
 	  job->state->values[0].integer <= IPP_JOB_PROCESSING)
       {
@@ -2891,5 +2891,5 @@ set_hold_until(job_t *job, 		/* I - Job to update */
 
 
 /*
- * End of "$Id: job.c,v 1.124.2.88 2004/06/29 16:59:21 mike Exp $".
+ * End of "$Id: job.c,v 1.124.2.89 2004/06/30 18:24:18 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: policy.c,v 1.1.2.6 2004/06/30 05:15:52 mike Exp $"
+ * "$Id: policy.c,v 1.1.2.7 2004/06/30 18:24:18 mike Exp $"
  *
  *   Policy routines for the Common UNIX Printing System (CUPS).
  *
@@ -173,11 +173,13 @@ AddPolicyOpName(policyop_t *po,		/* I - Policy operation */
 
 int					/* I - 1 if OK, 0 otherwise */
 CheckPolicy(policy_t   *p,		/* I - Policy */
-            ipp_op_t   op,		/* I - IPP operation */
-	    const char *name,		/* I - Username */
-	    int        authenticated,	/* I - Authenticated? */
+            client_t   *con,		/* I - Client connection */
 	    const char *owner)		/* I - Owner of object */
 {
+  ipp_op_t	op;			/* IPP operation */
+  const char	*name;			/* Username */
+  int		authenticated;		/* Authenticated? */
+  ipp_attribute_t *attr;		/* IPP attribute */
   int		status;			/* Status */
   policyop_t	*po;			/* Current policy operation */
 
@@ -186,8 +188,31 @@ CheckPolicy(policy_t   *p,		/* I - Policy */
   * Range check...
   */
 
-  if (p == NULL)
+  if (!p || !con)
     return (0);
+
+ /*
+  * Collect info from the request...
+  */
+
+  op = con->request->request.op.operation_id;
+
+  if (con->username[0])
+  {
+    name          = con->username;
+    authenticated = 1;
+  }
+  else if ((attr = ippFindAttribute(con->request, "requesting-user-name",
+                                    IPP_TAG_NAME)) != NULL)
+  {
+    name          = attr->values[0].string.text;
+    authenticated = 0;
+  }
+  else
+  {
+    name          = "anonymous";
+    authenticated = 0;
+  }
 
  /*
   * Find a match for the operation...
@@ -402,6 +427,60 @@ check_group(const char *username,	/* I - Authenticated username */
   */
 
   return (0);
+
+
+#if 0 //// OLD OLD OLD OLD OLD
+  if (strcasecmp(username, owner) != 0 && strcasecmp(username, "root") != 0)
+  {
+   /*
+    * Not the owner or root; check to see if the user is a member of the
+    * system group...
+    */
+
+    user = getpwnam(username);
+    endpwent();
+
+    for (i = 0, j = 0, group = NULL; i < NumSystemGroups; i ++)
+    {
+      group = getgrnam(SystemGroups[i]);
+      endgrent();
+
+      if (group != NULL)
+      {
+	for (j = 0; group->gr_mem[j]; j ++)
+          if (strcasecmp(username, group->gr_mem[j]) == 0)
+	    break;
+
+        if (group->gr_mem[j])
+	  break;
+      }
+      else
+	j = 0;
+    }
+
+    if (user == NULL || group == NULL ||
+        (group->gr_mem[j] == NULL && group->gr_gid != user->pw_gid))
+    {
+     /*
+      * Username not found, group not found, or user is not part of the
+      * system group...  Check for a user and group in the MD5 password
+      * file...
+      */
+
+      for (i = 0; i < NumSystemGroups; i ++)
+        if (GetMD5Passwd(username, SystemGroups[i], junk) != NULL)
+	  return (1);
+
+     /*
+      * Nope, not an MD5 user, either.  Return 0 indicating no-go...
+      */
+
+      return (0);
+    }
+  }
+
+  return (1);
+#endif //// 0
 }
 
 
@@ -443,5 +522,5 @@ check_op(policyop_t *po,		/* I - Policy operation */
 
 
 /*
- * End of "$Id: policy.c,v 1.1.2.6 2004/06/30 05:15:52 mike Exp $".
+ * End of "$Id: policy.c,v 1.1.2.7 2004/06/30 18:24:18 mike Exp $".
  */

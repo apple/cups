@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.93.2.62 2004/06/30 17:19:51 mike Exp $"
+ * "$Id: printers.c,v 1.93.2.63 2004/06/30 18:24:18 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -1967,7 +1967,8 @@ StopPrinter(printer_t *p,		/* I - Printer to stop */
 const char *				/* O - Printer or class name */
 ValidateDest(const char   *hostname,	/* I - Host name */
              const char   *resource,	/* I - Resource name */
-             cups_ptype_t *dtype)	/* O - Type (printer or class) */
+             cups_ptype_t *dtype,	/* O - Type (printer or class) */
+	     printer_t    **printer)	/* O - Printer pointer */
 {
   printer_t	*p;			/* Current printer */
   char		localname[1024],	/* Localized hostname */
@@ -1975,7 +1976,17 @@ ValidateDest(const char   *hostname,	/* I - Host name */
 		*sptr;			/* Pointer into server name */
 
 
-  DEBUG_printf(("ValidateDest(\"%s\", \"%s\", %p)\n", hostname, resource, dtype));
+  DEBUG_printf(("ValidateDest(\"%s\", \"%s\", %p, %p)\n", hostname, resource,
+                dtype, printer));
+
+ /*
+  * Initialize return values...
+  */
+
+  if (printer)
+    *printer = NULL;
+
+  *dtype = (cups_ptype_t)0;
 
  /*
   * See if the resource is a class or printer...
@@ -2017,6 +2028,9 @@ ValidateDest(const char   *hostname,	/* I - Host name */
     return (NULL);
   else if (p != NULL)
   {
+    if (printer)
+      *printer = p;
+
     *dtype = p->type & (CUPS_PRINTER_CLASS | CUPS_PRINTER_IMPLICIT |
                         CUPS_PRINTER_REMOTE);
     return (p->name);
@@ -2069,6 +2083,9 @@ ValidateDest(const char   *hostname,	/* I - Host name */
     if (strcasecmp(p->hostname, localname) == 0 &&
         strcasecmp(p->name, resource) == 0)
     {
+      if (printer)
+        *printer = p;
+
       *dtype = p->type & (CUPS_PRINTER_CLASS | CUPS_PRINTER_IMPLICIT |
                           CUPS_PRINTER_REMOTE);
       return (p->name);
@@ -2451,5 +2468,5 @@ write_irix_state(printer_t *p)		/* I - Printer to update */
 
 
 /*
- * End of "$Id: printers.c,v 1.93.2.62 2004/06/30 17:19:51 mike Exp $".
+ * End of "$Id: printers.c,v 1.93.2.63 2004/06/30 18:24:18 mike Exp $".
  */

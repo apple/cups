@@ -1,5 +1,5 @@
 /*
- * "$Id: policy.h,v 1.1.2.7 2004/06/30 05:15:52 mike Exp $"
+ * "$Id: policy.h,v 1.1.2.8 2004/06/30 18:24:18 mike Exp $"
  *
  *   Policy definitions for the Common UNIX Printing System (CUPS)
  *   scheduler.
@@ -84,8 +84,7 @@ extern policy_t		*AddPolicy(const char *policy);
 extern policyop_t	*AddPolicyOp(policy_t *p, policyop_t *po, ipp_op_t op);
 extern void		AddPolicyOpName(policyop_t *po, int allow_deny,
 			                const char *name);
-extern int		CheckPolicy(policy_t *p, ipp_op_t op,
-			            const char *name, int authenticated,
+extern int		CheckPolicy(policy_t *p, client_t *con,
 				    const char *owner);
 extern void		DeleteAllPolicies(void);
 extern policy_t		*FindPolicy(const char *policy);
@@ -93,5 +92,5 @@ extern policyop_t	*FindPolicyOp(policy_t *p, ipp_op_t op);
 
 
 /*
- * End of "$Id: policy.h,v 1.1.2.7 2004/06/30 05:15:52 mike Exp $".
+ * End of "$Id: policy.h,v 1.1.2.8 2004/06/30 18:24:18 mike Exp $".
  */
