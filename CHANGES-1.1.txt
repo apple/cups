@@ -3,6 +3,10 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.18
 
+	- The pstops filter didn't reset the showpage operator
+	  back to its original at the end of a job; this
+	  prevented the concatenation of documents (used
+	  primarily for CUPS 1.2...)
 	- The cupsGetPPD() function didn't always set the
 	  cupsLastError() value when an error occurred.
 	- The IPP media, output-bin, and sides attributes took
