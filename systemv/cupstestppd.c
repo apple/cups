@@ -1,5 +1,5 @@
 /*
- * "$Id: cupstestppd.c,v 1.1.2.14 2003/02/20 03:50:36 mike Exp $"
+ * "$Id: cupstestppd.c,v 1.1.2.15 2003/02/20 14:12:03 mike Exp $"
  *
  *   PPD test program for the Common UNIX Printing System (CUPS).
  *
@@ -213,42 +213,42 @@ main(int  argc,			/* I - Number of command-line arguments */
             switch (error)
 	    {
 	      case PPD_MISSING_PPDADOBE4 :
-	          puts("    REF: Page 42, section 5.2.");
+	          puts("                REF: Page 42, section 5.2.");
 	          break;
 	      case PPD_MISSING_VALUE :
-	          puts("    REF: Page 20, section 3.4.");
+	          puts("                REF: Page 20, section 3.4.");
 	          break;
 	      case PPD_BAD_OPEN_GROUP :
 	      case PPD_NESTED_OPEN_GROUP :
-	          puts("    REF: Pages 45-46, section 5.2.");
+	          puts("                REF: Pages 45-46, section 5.2.");
 	          break;
 	      case PPD_BAD_OPEN_UI :
 	      case PPD_NESTED_OPEN_UI :
-	          puts("    REF: Pages 42-45, section 5.2.");
+	          puts("                REF: Pages 42-45, section 5.2.");
 	          break;
 	      case PPD_BAD_ORDER_DEPENDENCY :
-	          puts("    REF: Pages 48-49, section 5.2.");
+	          puts("                REF: Pages 48-49, section 5.2.");
 	          break;
 	      case PPD_BAD_UI_CONSTRAINTS :
-	          puts("    REF: Pages 52-54, section 5.2.");
+	          puts("                REF: Pages 52-54, section 5.2.");
 	          break;
 	      case PPD_MISSING_ASTERISK :
-	          puts("    REF: Page 15, section 3.2.");
+	          puts("                REF: Page 15, section 3.2.");
 	          break;
 	      case PPD_LINE_TOO_LONG :
-	          puts("    REF: Page 15, section 3.1.");
+	          puts("                REF: Page 15, section 3.1.");
 	          break;
 	      case PPD_ILLEGAL_CHARACTER :
-	          puts("    REF: Page 15, section 3.1.");
+	          puts("                REF: Page 15, section 3.1.");
 	          break;
 	      case PPD_ILLEGAL_MAIN_KEYWORD :
-	          puts("    REF: Pages 16-17, section 3.2.");
+	          puts("                REF: Pages 16-17, section 3.2.");
 	          break;
 	      case PPD_ILLEGAL_OPTION_KEYWORD :
-	          puts("    REF: Page 19, section 3.3.");
+	          puts("                REF: Page 19, section 3.3.");
 	          break;
 	      case PPD_ILLEGAL_TRANSLATION :
-	          puts("    REF: Page 27, section 3.5.");
+	          puts("                REF: Page 27, section 3.5.");
 	          break;
               default :
 	          break;
@@ -869,5 +869,5 @@ usage(void)
 
 
 /*
- * End of "$Id: cupstestppd.c,v 1.1.2.14 2003/02/20 03:50:36 mike Exp $".
+ * End of "$Id: cupstestppd.c,v 1.1.2.15 2003/02/20 14:12:03 mike Exp $".
  */
