@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.89 2000/09/14 16:38:36 mike Exp $"
+ * "$Id: job.c,v 1.90 2000/10/12 01:52:42 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -202,11 +202,10 @@ CancelJob(int id,		/* I - Job to cancel */
 void
 CancelJobs(const char *dest)	/* I - Destination to cancel */
 {
-  job_t	*current,		/* Current job */
-	*prev;			/* Previous job in list */
+  job_t	*current;		/* Current job */
 
 
-  for (current = Jobs, prev = NULL; current != NULL; prev = current)
+  for (current = Jobs; current != NULL;)
     if (strcmp(current->dest, dest) == 0)
     {
      /*
@@ -215,10 +214,7 @@ CancelJobs(const char *dest)	/* I - Destination to cancel */
 
       CancelJob(current->id, 1);
 
-      if (prev == NULL)
-	current = Jobs;
-      else
-	current = prev->next;
+      current = Jobs;
     }
     else
       current = current->next;
@@ -2580,5 +2576,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.89 2000/09/14 16:38:36 mike Exp $".
+ * End of "$Id: job.c,v 1.90 2000/10/12 01:52:42 mike Exp $".
  */
