@@ -1,5 +1,5 @@
 /*
- * "$Id: encode.c,v 1.1.2.5 2002/03/01 19:55:10 mike Exp $"
+ * "$Id: encode.c,v 1.1.2.6 2002/08/12 18:48:17 mike Exp $"
  *
  *   Option encoding routines for the Common UNIX Printing System (CUPS).
  *
@@ -195,7 +195,10 @@ cupsEncodeOptions(ipp_t         *ipp,		/* I - Request to add to */
 
     attr->group_tag = IPP_TAG_JOB;
 
-    if (strncasecmp(options[i].name, "no", 2) == 0)
+    if (strcasecmp(options[i].value, "true") == 0 ||
+        strcasecmp(options[i].value, "false") == 0 ||
+	strcasecmp(options[i].value, "yes") == 0 ||
+        strcasecmp(options[i].value, "no") == 0)
       attr->value_tag = IPP_TAG_BOOLEAN;
     else
       attr->value_tag = IPP_TAG_NAME;
@@ -283,28 +286,7 @@ cupsEncodeOptions(ipp_t         *ipp,		/* I - Request to add to */
             break;
 
 	case IPP_TAG_BOOLEAN :
-            if (!*val)
-	    {
-	     /*
-	      * Add a boolean option without a value, so the option is
-	      * passed in as "name" or "noname" for true/false...
-	      */
-
-	      if (strncasecmp(attr->name, "no", 2) == 0)
-	      {
-        	DEBUG_puts("cupsEncodeOptions: Added boolean false value...");
-        	strcpy(attr->name, attr->name + 2);
-		attr->values[0].boolean = 0;
-	      }
-	      else
-	      {
-        	DEBUG_puts("cupsEncodeOptions: Added boolean true value...");
-		attr->values[0].boolean = 1;
-	      }
-	    }
-	    else if (strcasecmp(val, "true") == 0 ||
-        	     strcasecmp(val, "on") == 0 ||
-		     strcasecmp(val, "yes") == 0)
+	    if (strcasecmp(val, "true") == 0 || strcasecmp(val, "yes") == 0)
 	    {
 	     /*
 	      * Boolean value - true...
@@ -314,9 +296,7 @@ cupsEncodeOptions(ipp_t         *ipp,		/* I - Request to add to */
 
               DEBUG_puts("cupsEncodeOptions: Added boolean true value...");
 	    }
-	    else if (strcasecmp(val, "false") == 0 ||
-        	     strcasecmp(val, "off") == 0 ||
-		     strcasecmp(val, "no") == 0)
+	    else
 	    {
 	     /*
 	      * Boolean value - false...
@@ -398,5 +378,5 @@ cupsEncodeOptions(ipp_t         *ipp,		/* I - Request to add to */
 
 
 /*
- * End of "$Id: encode.c,v 1.1.2.5 2002/03/01 19:55:10 mike Exp $".
+ * End of "$Id: encode.c,v 1.1.2.6 2002/08/12 18:48:17 mike Exp $".
  */
