@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c,v 1.24 1999/07/07 13:16:51 mike Exp $"
+ * "$Id: util.c,v 1.25 1999/07/12 12:42:50 mike Exp $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -807,7 +807,7 @@ cupsPrintFile(char          *name,	/* I - Printer or class name */
       * String value(s)...
       */
 
-      DEBUG_printf(("cupsPrintJob: Adding string option \'%s\' with value \'%s\'...\n",
+      DEBUG_printf(("cupsPrintFile: Adding string option \'%s\' with value \'%s\'...\n",
                     option, val));
 
       ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD, option, NULL, val);
@@ -823,7 +823,7 @@ cupsPrintFile(char          *name,	/* I - Printer or class name */
         n2 = strtol(s + 1, NULL, 0);
         ippAddRange(request, IPP_TAG_JOB, option, n, n2);
 
-	DEBUG_printf(("cupsPrintJob: Adding range option \'%s\' with value %d-%d...\n",
+	DEBUG_printf(("cupsPrintFile: Adding range option \'%s\' with value %d-%d...\n",
                       option, n, n2));
       }
       else if (*s == 'x')
@@ -837,14 +837,14 @@ cupsPrintFile(char          *name,	/* I - Printer or class name */
         else
           ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD, option, NULL, val);
 
-	DEBUG_printf(("cupsPrintJob: Adding resolution option \'%s\' with value %s...\n",
+	DEBUG_printf(("cupsPrintFile: Adding resolution option \'%s\' with value %s...\n",
                       option, val));
       }
       else
       {
         ippAddInteger(request, IPP_TAG_JOB, IPP_TAG_INTEGER, option, n);
 
-	DEBUG_printf(("cupsPrintJob: Adding integer option \'%s\' with value %d...\n",
+	DEBUG_printf(("cupsPrintFile: Adding integer option \'%s\' with value %d...\n",
                       option, n));
       }
     }
@@ -854,7 +854,7 @@ cupsPrintFile(char          *name,	/* I - Printer or class name */
       * Boolean value...
       */
 
-      DEBUG_printf(("cupsPrintJob: Adding boolean option \'%s\' with value %d...\n",
+      DEBUG_printf(("cupsPrintFile: Adding boolean option \'%s\' with value %d...\n",
                     option, n));
       ippAddBoolean(request, IPP_TAG_JOB, option, (char)n);
     }
@@ -936,5 +936,5 @@ cups_connect(char *name,	/* I - Destination (printer[@host]) */
 
 
 /*
- * End of "$Id: util.c,v 1.24 1999/07/07 13:16:51 mike Exp $".
+ * End of "$Id: util.c,v 1.25 1999/07/12 12:42:50 mike Exp $".
  */
