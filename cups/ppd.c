@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c,v 1.51.2.20 2002/08/12 00:44:37 mike Exp $"
+ * "$Id: ppd.c,v 1.51.2.21 2002/08/14 05:34:13 mike Exp $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -1223,24 +1223,30 @@ ppdOpen(FILE *fp)			/* I - File to read from */
       else if (strcmp(string, "Integer") == 0)
       {
         option->ui             = PPD_UI_CUPS_INTEGER;
+	extopt->defval.integer = 0;
 	extopt->minval.integer = 0;
 	extopt->maxval.integer = 100;
       }
       else if (strcmp(string, "Real") == 0)
       {
         option->ui          = PPD_UI_CUPS_REAL;
+	extopt->defval.real = 0.0;
 	extopt->minval.real = 0.0;
 	extopt->maxval.real = 1.0;
       }
       else if (strcmp(string, "Gamma") == 0)
       {
         option->ui           = PPD_UI_CUPS_GAMMA;
+	extopt->defval.gamma = 1.0;
 	extopt->minval.gamma = 1.0;
 	extopt->maxval.gamma = 10.0;
       }
       else if (strcmp(string, "Curve") == 0)
       {
         option->ui                 = PPD_UI_CUPS_CURVE;
+	extopt->defval.curve.start = 0.0;
+	extopt->defval.curve.end   = 0.0;
+	extopt->defval.curve.gamma = 1.0;
 	extopt->minval.curve.start = 0.0;
 	extopt->minval.curve.end   = 0.0;
 	extopt->minval.curve.gamma = 1.0;
@@ -1251,17 +1257,65 @@ ppdOpen(FILE *fp)			/* I - File to read from */
       else if (strcmp(string, "IntegerArray") == 0)
       {
         option->ui                                = PPD_UI_CUPS_INTEGER_ARRAY;
+	extopt->defval.integer_array.num_elements = 2;
 	extopt->minval.integer_array.num_elements = 2;
 	extopt->maxval.integer_array.num_elements = 16;
       }
       else if (strcmp(string, "RealArray") == 0)
       {
         option->ui                             = PPD_UI_CUPS_REAL_ARRAY;
+	extopt->defval.real_array.num_elements = 2;
 	extopt->minval.real_array.num_elements = 2;
 	extopt->maxval.real_array.num_elements = 16;
       }
     }
-    else if (strcmp(keyword, "cupsUIMin") == 0 &&
+    else if (strcmp(keyword, "cupsUIDefault") == 0 &&
+             (mask & (PPD_KEYWORD | PPD_STRING)) == (PPD_KEYWORD | PPD_STRING) &&
+	     option != NULL)
+    {
+     /*
+      * Define an extended option minimum value...
+      */
+
+      extopt = ppd_get_extopt(ppd, name);
+
+      switch (option->ui)
+      {
+        case PPD_UI_CUPS_INTEGER :
+	    sscanf(string, "%d", &(extopt->defval.integer));
+	    break;
+
+        case PPD_UI_CUPS_REAL :
+	    sscanf(string, "%f", &(extopt->defval.real));
+	    break;
+
+        case PPD_UI_CUPS_GAMMA :
+	    sscanf(string, "%f", &(extopt->defval.gamma));
+	    break;
+
+        case PPD_UI_CUPS_CURVE :
+	    sscanf(string, "%f%f%f", &(extopt->defval.curve.start),
+	           &(extopt->defval.curve.end),
+	           &(extopt->defval.curve.gamma));
+	    break;
+
+        case PPD_UI_CUPS_INTEGER_ARRAY :
+	    extopt->defval.integer_array.elements = calloc(1, sizeof(int));
+	    sscanf(string, "%d%d", &(extopt->defval.integer_array.num_elements),
+	           extopt->defval.integer_array.elements);
+	    break;
+
+        case PPD_UI_CUPS_REAL_ARRAY :
+	    extopt->defval.real_array.elements = calloc(1, sizeof(float));
+	    sscanf(string, "%d%f", &(extopt->defval.real_array.num_elements),
+	           extopt->defval.real_array.elements);
+	    break;
+
+	default :
+            break;
+      }
+    }
+    else if (strcmp(keyword, "cupsUIMinimum") == 0 &&
              (mask & (PPD_KEYWORD | PPD_STRING)) == (PPD_KEYWORD | PPD_STRING) &&
 	     option != NULL)
     {
@@ -1307,7 +1361,7 @@ ppdOpen(FILE *fp)			/* I - File to read from */
             break;
       }
     }
-    else if (strcmp(keyword, "cupsUIMax") == 0 &&
+    else if (strcmp(keyword, "cupsUIMaximum") == 0 &&
              (mask & (PPD_KEYWORD | PPD_STRING)) == (PPD_KEYWORD | PPD_STRING) &&
 	     option != NULL)
     {
@@ -2277,5 +2331,5 @@ ppd_read(FILE *fp,			/* I - File to read from */
 
 
 /*
- * End of "$Id: ppd.c,v 1.51.2.20 2002/08/12 00:44:37 mike Exp $".
+ * End of "$Id: ppd.c,v 1.51.2.21 2002/08/14 05:34:13 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.h,v 1.24.2.7 2002/08/12 00:44:38 mike Exp $"
+ * "$Id: ppd.h,v 1.24.2.8 2002/08/14 05:34:14 mike Exp $"
  *
  *   PostScript Printer Description definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -191,6 +191,7 @@ typedef struct			/**** Extended Options ****/
   ppd_option_t	*option;	/* Option that is being extended... */
   const char	*command;	/* Generic command for extended options */
   ppd_ext_value_t value,	/* Current values */
+		defval,		/* Default values */
 		minval,		/* Minimum numeric values */
 		maxval;		/* Maximum numeric values */
 } ppd_ext_option_t;
@@ -358,5 +359,5 @@ extern int		ppdSaveFile(ppd_file_t *ppd, const char *filename);
 #endif /* !_CUPS_PPD_H_ */
 
 /*
- * End of "$Id: ppd.h,v 1.24.2.7 2002/08/12 00:44:38 mike Exp $".
+ * End of "$Id: ppd.h,v 1.24.2.8 2002/08/14 05:34:14 mike Exp $".
  */
