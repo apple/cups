@@ -3,6 +3,10 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.21rc2
 
+	- The config.h file did not define the HAVE_USERSEC_H
+	  constant when the configure script detected the
+	  usersec.h header file. This caused authentication
+	  errors on AIX (STR #832)
 	- The lp and lpr commands now report the temporary
 	  filename and error if they are unable to create a
 	  temporary file (STR #812)
