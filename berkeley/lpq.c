@@ -1,5 +1,5 @@
 /*
- * "$Id: lpq.c,v 1.17.2.6 2002/05/16 13:59:55 mike Exp $"
+ * "$Id: lpq.c,v 1.17.2.7 2002/10/02 16:39:38 mike Exp $"
  *
  *   "lpq" command for the Common UNIX Printing System (CUPS).
  *
@@ -132,7 +132,18 @@ main(int  argc,		/* I - Number of command-line arguments */
 	    }
 
 	    if ((instance = strchr(dest, '/')) != NULL)
-	      *instance = '\0';
+	      *instance++ = '\0';
+
+            if (cupsGetDest(dest, instance, num_dests, dests) == NULL)
+	    {
+	      if (instance)
+		fprintf(stderr, "lpq: Unknown destination \"%s/%s\"!\n",
+		        dest, instance);
+              else
+		fprintf(stderr, "lpq: Unknown destination \"%s\"!\n", dest);
+
+	      return (1);
+	    }
 	    break;
 
 	case 'a' : /* All printers */
@@ -534,5 +545,5 @@ show_printer(http_t     *http,	/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpq.c,v 1.17.2.6 2002/05/16 13:59:55 mike Exp $".
+ * End of "$Id: lpq.c,v 1.17.2.7 2002/10/02 16:39:38 mike Exp $".
  */

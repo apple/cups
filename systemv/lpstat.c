@@ -1,5 +1,5 @@
 /*
- * "$Id: lpstat.c,v 1.37.2.10 2002/10/01 17:24:27 mike Exp $"
+ * "$Id: lpstat.c,v 1.37.2.11 2002/10/02 16:39:43 mike Exp $"
  *
  *   "lpstat" command for the Common UNIX Printing System (CUPS).
  *
@@ -24,6 +24,7 @@
  * Contents:
  *
  *   main()           - Parse options and show status information.
+ *   check_dest()     - Verify that the named destination exists.
  *   show_accepting() - Show acceptance status.
  *   show_classes()   - Show printer classes.
  *   show_default()   - Show default destination.
@@ -50,11 +51,13 @@
  * Local functions...
  */
 
+static void	check_dest(const char *, int *, cups_dest_t **);
 static int	show_accepting(http_t *, const char *, int, cups_dest_t *);
 static int	show_classes(http_t *, const char *);
 static void	show_default(int, cups_dest_t *);
 static int	show_devices(http_t *, const char *, int, cups_dest_t *);
-static int	show_jobs(http_t *, const char *, const char *, int, int);
+static int	show_jobs(http_t *, const char *, const char *, int, int,
+		          const char *);
 static int	show_printers(http_t *, const char *, int, cups_dest_t *, int);
 static void	show_scheduler(http_t *);
 
@@ -74,6 +77,7 @@ main(int  argc,			/* I - Number of command-line arguments */
   cups_dest_t	*dests;		/* User destinations */
   int		long_status;	/* Long status report? */
   int		ranking;	/* Show job ranking? */
+  const char	*which;		/* Which jobs to show? */
 
 
   http        = NULL;
@@ -82,6 +86,7 @@ main(int  argc,			/* I - Number of command-line arguments */
   long_status = 0;
   ranking     = 0;
   status      = 0;
+  which       = "not-completed";
 
   for (i = 1; i < argc; i ++)
     if (argv[i][0] == '-')
@@ -115,6 +120,31 @@ main(int  argc,			/* I - Number of command-line arguments */
 	      i ++;
 	    break;
 
+        case 'W' : /* Show which jobs? */
+	    if (argv[i][2])
+	      which = argv[i] + 2;
+	    else
+	    {
+	      i ++;
+
+	      if (i >= argc)
+	      {
+	        fputs("lpstat: Need \"completed\" or \"not-completed\" after -W!\n",
+		      stderr);
+		return (1);
+              }
+
+	      which = argv[i];
+	    }
+
+            if (strcmp(which, "completed") && strcmp(which, "not-completed"))
+	    {
+	      fputs("lpstat: Need \"completed\" or \"not-completed\" after -W!\n",
+		    stderr);
+	      return (1);
+	    }
+	    break;
+
         case 'a' : /* Show acceptance status */
 	    if (!http)
 	    {
@@ -128,18 +158,27 @@ main(int  argc,			/* I - Number of command-line arguments */
 	      }
             }
 
-            if (num_dests == 0)
-	      num_dests = cupsGetDests(&dests);
-
 	    if (argv[i][2] != '\0')
+	    {
+              check_dest(argv[i] + 2, &num_dests, &dests);
+
 	      status |= show_accepting(http, argv[i] + 2, num_dests, dests);
+	    }
 	    else if ((i + 1) < argc && argv[i + 1][0] != '-')
 	    {
 	      i ++;
+
+              check_dest(argv[i], &num_dests, &dests);
+
 	      status |= show_accepting(http, argv[i], num_dests, dests);
 	    }
 	    else
+	    {
+              if (num_dests == 0)
+		num_dests = cupsGetDests(&dests);
+
 	      status |= show_accepting(http, NULL, num_dests, dests);
+	    }
 	    break;
 
 #ifdef __sgi
@@ -167,8 +206,10 @@ main(int  argc,			/* I - Number of command-line arguments */
 	      * happy...
 	      */
 
+              check_dest(argv[i] + 2, &num_dests, &dests);
+
 	      puts("");
-	      status |= show_jobs(http, argv[i] + 2, NULL, 3, ranking);
+	      status |= show_jobs(http, argv[i] + 2, NULL, 3, ranking, which);
 	    }
 	    else
 	    {
@@ -194,10 +235,17 @@ main(int  argc,			/* I - Number of command-line arguments */
             }
 
 	    if (argv[i][2] != '\0')
+	    {
+              check_dest(argv[i] + 2, &num_dests, &dests);
+
 	      status |= show_classes(http, argv[i] + 2);
+	    }
 	    else if ((i + 1) < argc && argv[i + 1][0] != '-')
 	    {
 	      i ++;
+
+              check_dest(argv[i], &num_dests, &dests);
+
 	      status |= show_classes(http, argv[i]);
 	    }
 	    else
@@ -254,7 +302,11 @@ main(int  argc,			/* I - Number of command-line arguments */
             }
 
 	    if (argv[i][2] != '\0')
-	      status |= show_jobs(http, argv[i] + 2, NULL, 3, ranking);
+	    {
+              check_dest(argv[i] + 2, &num_dests, &dests);
+
+	      status |= show_jobs(http, argv[i] + 2, NULL, 3, ranking, which);
+	    }
 	    else
 #endif /* __sgi */
 	      long_status = 2;
@@ -274,14 +326,24 @@ main(int  argc,			/* I - Number of command-line arguments */
             }
 
 	    if (argv[i][2] != '\0')
-	      status |= show_jobs(http, argv[i] + 2, NULL, long_status, ranking);
+	    {
+              check_dest(argv[i] + 2, &num_dests, &dests);
+
+	      status |= show_jobs(http, argv[i] + 2, NULL, long_status,
+	                          ranking, which);
+	    }
 	    else if ((i + 1) < argc && argv[i + 1][0] != '-')
 	    {
 	      i ++;
-	      status |= show_jobs(http, argv[i], NULL, long_status, ranking);
+
+              check_dest(argv[i], &num_dests, &dests);
+
+	      status |= show_jobs(http, argv[i], NULL, long_status,
+	                          ranking, which);
 	    }
 	    else
-	      status |= show_jobs(http, NULL, NULL, long_status, ranking);
+	      status |= show_jobs(http, NULL, NULL, long_status,
+	                          ranking, which);
 	    break;
 
         case 'p' : /* Show printers */
@@ -297,18 +359,27 @@ main(int  argc,			/* I - Number of command-line arguments */
 	      }
             }
 
-            if (num_dests == 0)
-	      num_dests = cupsGetDests(&dests);
-
 	    if (argv[i][2] != '\0')
+	    {
+              check_dest(argv[i] + 2, &num_dests, &dests);
+
 	      status |= show_printers(http, argv[i] + 2, num_dests, dests, long_status);
+	    }
 	    else if ((i + 1) < argc && argv[i + 1][0] != '-')
 	    {
 	      i ++;
+
+              check_dest(argv[i], &num_dests, &dests);
+
 	      status |= show_printers(http, argv[i], num_dests, dests, long_status);
 	    }
 	    else
+	    {
+              if (num_dests == 0)
+		num_dests = cupsGetDests(&dests);
+
 	      status |= show_printers(http, NULL, num_dests, dests, long_status);
+	    }
 	    break;
 
         case 'r' : /* Show scheduler status */
@@ -370,7 +441,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	    status |= show_devices(http, NULL, num_dests, dests);
 	    status |= show_accepting(http, NULL, num_dests, dests);
 	    status |= show_printers(http, NULL, num_dests, dests, long_status);
-	    status |= show_jobs(http, NULL, NULL, long_status, ranking);
+	    status |= show_jobs(http, NULL, NULL, long_status, ranking, which);
 	    break;
 
         case 'u' : /* Show jobs by user */
@@ -387,14 +458,17 @@ main(int  argc,			/* I - Number of command-line arguments */
             }
 
 	    if (argv[i][2] != '\0')
-	      status |= show_jobs(http, NULL, argv[i] + 2, long_status, ranking);
+	      status |= show_jobs(http, NULL, argv[i] + 2, long_status,
+	                          ranking, which);
 	    else if ((i + 1) < argc && argv[i + 1][0] != '-')
 	    {
 	      i ++;
-	      status |= show_jobs(http, NULL, argv[i], long_status, ranking);
+	      status |= show_jobs(http, NULL, argv[i], long_status,
+	                          ranking, which);
 	    }
 	    else
-	      status |= show_jobs(http, NULL, NULL, long_status, ranking);
+	      status |= show_jobs(http, NULL, NULL, long_status,
+	                          ranking, which);
 	    break;
 
         case 'v' : /* Show printer devices */
@@ -410,18 +484,27 @@ main(int  argc,			/* I - Number of command-line arguments */
 	      }
             }
 
-            if (num_dests == 0)
-	      num_dests = cupsGetDests(&dests);
-
 	    if (argv[i][2] != '\0')
+	    {
+              check_dest(argv[i] + 2, &num_dests, &dests);
+
 	      status |= show_devices(http, argv[i] + 2, num_dests, dests);
+	    }
 	    else if ((i + 1) < argc && argv[i + 1][0] != '-')
 	    {
 	      i ++;
+
+              check_dest(argv[i], &num_dests, &dests);
+
 	      status |= show_devices(http, argv[i], num_dests, dests);
 	    }
 	    else
+	    {
+              if (num_dests == 0)
+		num_dests = cupsGetDests(&dests);
+
 	      status |= show_devices(http, NULL, num_dests, dests);
+	    }
 	    break;
 
 
@@ -443,7 +526,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	}
       }
 
-      status |= show_jobs(http, argv[i], NULL, long_status, ranking);
+      status |= show_jobs(http, argv[i], NULL, long_status, ranking, which);
     }
 
   if (argc == 1)
@@ -460,10 +543,30 @@ main(int  argc,			/* I - Number of command-line arguments */
       }
     }
 
-    status |= show_jobs(http, NULL, cupsUser(), long_status, ranking);
+    status |= show_jobs(http, NULL, cupsUser(), long_status, ranking, which);
   }
 
   return (status);
+}
+
+
+/*
+ * 'check_dest()' - Verify that the named destination exists.
+ */
+
+static void
+check_dest(const char  *name,		/* I  - Name of printer/class */
+           int         *num_dests,	/* IO - Number of destinations */
+	   cups_dest_t **dests)		/* IO - Destinations */
+{
+  if (*num_dests == 0)
+    *num_dests = cupsGetDests(dests);
+
+  if (cupsGetDest(name, NULL, *num_dests, *dests) == NULL)
+  {
+    fprintf(stderr, "lpstat: Unknown destination \"%s\"!\n", name);
+    exit(1);
+  }
 }
 
 
@@ -1257,7 +1360,8 @@ show_jobs(http_t     *http,		/* I - HTTP connection to server */
           const char *dests,		/* I - Destinations */
           const char *users,		/* I - Users */
           int        long_status,	/* I - Show long status? */
-          int        ranking)		/* I - Show job ranking? */
+          int        ranking,		/* I - Show job ranking? */
+	  const char *which)		/* I - Show which jobs? */
 {
   ipp_t		*request,		/* IPP Request */
 		*response;		/* IPP Response */
@@ -1324,6 +1428,9 @@ show_jobs(http_t     *http,		/* I - HTTP connection to server */
 
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "job-uri",
                NULL, "ipp://localhost/jobs/");
+
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD, "which-jobs",
+               NULL, which);
 
  /*
   * Do the request and get back a response...
@@ -1956,5 +2063,5 @@ show_scheduler(http_t *http)	/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpstat.c,v 1.37.2.10 2002/10/01 17:24:27 mike Exp $".
+ * End of "$Id: lpstat.c,v 1.37.2.11 2002/10/02 16:39:43 mike Exp $".
  */
