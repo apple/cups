@@ -1,5 +1,5 @@
 /*
- * "$Id: pstoraster.c,v 1.5 1999/06/18 15:54:09 mike Exp $"
+ * "$Id: pstoraster.c,v 1.6 1999/07/26 19:21:30 mike Exp $"
  *
  *   PostScript RIP filter main entry for the Common UNIX Printing System
  *   (CUPS).
@@ -68,6 +68,12 @@ main(int  argc,		/* I - Number of command-line arguments */
   int			exit_code;	/* Exit code */
   ref			error_object;	/* Error object */
 
+
+ /*
+  * Force the locale to "C" to avoid bugs...
+  */
+
+  putenv("LANG=C");
 
  /*
   * Create a PostScript interpreter instance...
@@ -174,5 +180,5 @@ define_string(char *name,	/* I - Variable to set */
 
 
 /*
- * End of "$Id: pstoraster.c,v 1.5 1999/06/18 15:54:09 mike Exp $".
+ * End of "$Id: pstoraster.c,v 1.6 1999/07/26 19:21:30 mike Exp $".
  */

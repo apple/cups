@@ -1,5 +1,5 @@
 /*
- * "$Id: gdevcups.c,v 1.8 1999/07/22 20:58:34 mike Exp $"
+ * "$Id: gdevcups.c,v 1.9 1999/07/26 19:21:24 mike Exp $"
  *
  *   GNU Ghostscript raster output driver for the Common UNIX Printing
  *   System (CUPS).
@@ -102,6 +102,7 @@ private dev_proc_open_device(cups_open);
 private int cups_print_pages(gx_device_printer *, FILE *, int);
 private int cups_put_params(gx_device *, gs_param_list *);
 private void cups_set_color_info(gx_device *);
+private dev_proc_sync_output(cups_sync_output);
 
 /*
  * The device descriptors...
@@ -121,7 +122,7 @@ private gx_device_procs	cups_procs =
 {
    cups_open,
    cups_get_matrix,
-   gx_default_sync_output,
+   cups_sync_output,
    gdev_prn_output_page,
    cups_close,
    cups_map_rgb_color,
@@ -1113,7 +1114,14 @@ cups_print_pages(gx_device_printer *pdev,	/* I - Device info */
   */
 
   srcbytes = gdev_prn_raster(pdev);
-  src       = (unsigned char *)gs_malloc(srcbytes, 1, "cups_print_pages");
+
+#ifdef DEBUG
+  fprintf(stderr, "DEBUG: cupsBitsPerPixel = %d, cupsWidth = %d, cupsBytesPerLine = %d, srcbytes = %d\n",
+          cups->header.cupsBitsPerPixel, cups->header.cupsWidth,
+	  cups->header.cupsBytesPerLine, srcbytes);
+#endif /* DEBUG */
+
+  src = (unsigned char *)gs_malloc(srcbytes, 1, "cups_print_pages");
 
   if (src == NULL)	/* can't allocate input buffer */
     return_error(gs_error_VMerror);
@@ -1491,8 +1499,8 @@ cups_set_color_info(gx_device *pdev)	/* I - Device info */
         if (cups->header.cupsBitsPerColor == 1)
 	{
 	  cups->header.cupsBitsPerPixel   = 8;
-	  cups->color_info.depth          = 8;
-	  cups->color_info.num_components = 6;
+	  cups->color_info.depth          = 4;
+	  cups->color_info.num_components = 4;
 	  break;
 	}
 
@@ -1616,6 +1624,19 @@ cups_set_color_info(gx_device *pdev)	/* I - Device info */
       }
     }
   }
+}
+
+
+/*
+ * 'cups_sync_output()' - Keep the user informed of our status...
+ */
+
+private int				/* O - Error status */
+cups_sync_output(gx_device *pdev)	/* I - Device info */
+{
+  fprintf(stderr, "INFO: Processing page %d...\n", cups->page);
+
+  return (0);
 }
 
 
@@ -2434,5 +2455,5 @@ cups_print_planar(gx_device_printer *pdev,	/* I - Printer device */
 
 
 /*
- * End of "$Id: gdevcups.c,v 1.8 1999/07/22 20:58:34 mike Exp $".
+ * End of "$Id: gdevcups.c,v 1.9 1999/07/26 19:21:24 mike Exp $".
  */
