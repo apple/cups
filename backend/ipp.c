@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.72 2003/01/31 21:22:53 swdev Exp $"
+ * "$Id: ipp.c,v 1.73 2003/02/07 12:03:43 mike Exp $"
  *
  *   IPP backend for the Common UNIX Printing System (CUPS).
  *
@@ -402,9 +402,21 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 	version = 0;
 	httpReconnect(http);
       }
+      else if (ipp_status == IPP_NOT_FOUND)
+      {
+        fputs("ERROR: Destination printer does not exist!\n", stderr);
+
+	if (supported)
+          ippDelete(supported);
+
+	return (1);
+      }
       else
+      {
 	fprintf(stderr, "ERROR: Unable to get printer status (%s)!\n",
 	        ippErrorString(ipp_status));
+        sleep(10);
+      }
 
       if (supported)
         ippDelete(supported);
@@ -1125,5 +1137,5 @@ run_pictwps_filter(char **argv,			/* I - Command-line arguments */
 
 
 /*
- * End of "$Id: ipp.c,v 1.72 2003/01/31 21:22:53 swdev Exp $".
+ * End of "$Id: ipp.c,v 1.73 2003/02/07 12:03:43 mike Exp $".
  */
