@@ -1,9 +1,9 @@
 /*
- * "$Id: http.c,v 1.6 1998/10/16 18:28:01 mike Exp $"
+ * "$Id: http.c,v 1.7 1999/01/24 14:25:11 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
- *   Copyright 1997-1998 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-1999 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -34,6 +34,7 @@
  *   StartListening()     - Create all listening sockets...
  *   StopListening()      - Close all listening sockets...
  *   WriteClient()        - Write data to a client as needed.
+ *   chunkprintf()        - Do a printf() to a client (chunked)...
  *   conprintf()          - Do a printf() to a client...
  *   decode_basic_auth()  - Decode a Basic authorization string.
  *   decode_digest_auth() - Decode an MD5 Digest authorization string.
@@ -68,6 +69,7 @@ static char	*months[12] = { "Jan", "Feb", "Mar", "Apr", "May", "Jun",
  * Local functions...
  */
 
+static int	chunkprintf(client_t *con, char *format, ...);
 static int	conprintf(client_t *con, char *format, ...);
 static void	decode_basic_auth(client_t *con, char *line);
 static void	decode_if_modified(client_t *con, char *line);
@@ -75,10 +77,11 @@ static char	*get_datetime(time_t t);
 static char	*get_extension(char *filename);
 static char	*get_file(client_t *con, struct stat *filestats);
 static char	*get_line(client_t *con, char *line, int length);
-static char	*get_long_message(int code);
-static char	*get_message(int code);
+static char	*get_long_message(http_code_t code);
+static char	*get_message(http_code_t code);
 static char	*get_type(char *extension);
 static int	pipe_command(int infile, int *outfile, char *command);
+static int	show_printer_status(client_t *con);
 static void	sigpipe_handler(int sig);
 
 
@@ -241,7 +244,8 @@ ReadClient(client_t *con)	/* I - Client to read from */
 		*valptr;		/* Pointer to value */
   int		major, minor;		/* HTTP version numbers */
   int		start;			/* TRUE if we need to start the transfer */
-  int		code;			/* Authorization code */
+  http_code_t	code;			/* Authorization code */
+  int		bytes;			/* Number of bytes to POST */
   char		*filename,		/* Name of file for GET/HEAD */
 		*extension,		/* Extension of file */
 		*type;			/* MIME type */
@@ -313,7 +317,7 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	      else if (major == 1 && minor == 0)
 	        con->version = HTTP_1_0;
 	      else if (major == 0 && minor == 9)
-	        con->version == HTTP_0_9;
+	        con->version = HTTP_0_9;
 	      else
 	      {
 	        SendError(con, HTTP_NOT_SUPPORTED);
@@ -428,17 +432,18 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	* Copy the parameters that we need...
 	*/
 
-	if (strcmp(name, "Content-Type") == 0)
+	if (strcasecmp(name, "Content-type") == 0)
 	{
 	  strncpy(con->content_type, value, sizeof(con->content_type) - 1);
 	  con->content_type[sizeof(con->content_type) - 1] = '\0';
 	}
-	else if (strcmp(name, "Content-Length") == 0)
+	else if (strcasecmp(name, "Content-length") == 0)
 	{
-	  con->data_encoding = HTTP_DATA_SINGLE;
-	  con->data_length   = atoi(value);
+	  con->data_encoding  = HTTP_DATA_SINGLE;
+	  con->data_length    = atoi(value);
+	  con->data_remaining = con->data_length;
 	}
-	else if (strcmp(name, "Accept-Language") == 0)
+	else if (strcasecmp(name, "Accept-Language") == 0)
 	{
 	  strncpy(con->language, value, sizeof(con->language) - 1);
 	  con->language[sizeof(con->language) - 1] = '\0';
@@ -454,7 +459,7 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	      break;
 	    }
 	}
-	else if (strcmp(name, "Authorization") == 0)
+	else if (strcasecmp(name, "Authorization") == 0)
 	{
 	 /*
 	  * Get the authorization string...
@@ -478,9 +483,9 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	    return (0);
 	  }
 	}
-	else if (strcmp(name, "Transfer-Encoding") == 0)
+	else if (strcasecmp(name, "Transfer-Encoding") == 0)
 	{
-	  if (strcmp(value, "chunked") == 0)
+	  if (strcasecmp(value, "chunked") == 0)
 	  {
 	    con->data_encoding = HTTP_DATA_CHUNKED;
 	    con->data_length   = 0;
@@ -492,22 +497,22 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	    return (0);
 	  }
 	}
-	else if (strcmp(name, "User-Agent") == 0)
+	else if (strcasecmp(name, "User-Agent") == 0)
 	{
 	  strncpy(con->user_agent, value, sizeof(con->user_agent) - 1);
 	  con->user_agent[sizeof(con->user_agent) - 1] = '\0';
 	}
-	else if (strcmp(name, "Host") == 0)
+	else if (strcasecmp(name, "Host") == 0)
 	{
 	  strncpy(con->host, value, sizeof(con->host) - 1);
 	  con->host[sizeof(con->host) - 1] = '\0';
 	}
-	else if (strcmp(name, "Connection") == 0)
+	else if (strcasecmp(name, "Connection") == 0)
 	{
 	  if (strcmp(value, "Keep-Alive") == 0)
 	    con->keep_alive = 1;
 	}
-	else if (strcmp(name, "If-Modified-Since") == 0)
+	else if (strcasecmp(name, "If-Modified-Since") == 0)
 	{
 	  valptr = strchr(line, ':') + 1;
 	  while (*valptr == ' ' || *valptr == '\t')
@@ -558,21 +563,19 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	  if (strncmp(con->uri, "/printers", 9) == 0)
 	  {
 	   /*
-	    * Do a command...
+	    * Show printer status...
 	    */
 
-	    if (strlen(con->uri) > 9)
-	      sprintf(line, "lpstat -p %s -o %s", con->uri + 10, con->uri + 10);
-	    else
-	      strcpy(line, "lpstat -d -p -o");
-
-	    if (!SendCommand(con, HTTP_OK, line, "text/plain"))
+            if (!show_printer_status(con))
 	    {
-	      CloseClient(con);
-	      return (0);
-	    }
+	      if (!SendError(con, HTTP_NOT_FOUND))
+	      {
+	        CloseClient(con);
+		return (0);
+	      }
+            }
 
-            con->state = HTTP_GET_DATA;
+            con->state = HTTP_WAITING;
 
 	    if (con->data_length == 0 &&
 	        con->data_encoding == HTTP_DATA_SINGLE &&
@@ -618,8 +621,26 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	  }
           break;
 
-      case HTTP_PUT :
       case HTTP_POST :
+          sprintf(con->filename, "%s/requests/XXXXXX", ServerRoot);
+	  con->file = mkstemp(con->filename);
+
+          fprintf(stderr, "cupsd: POST %s, con->file = %d...\n", con->filename,
+	          con->file);
+
+	  if (con->file < 0)
+	  {
+	    if (!SendError(con, HTTP_REQUEST_TOO_LARGE))
+	    {
+	      CloseClient(con);
+	      return (0);
+	    }
+	  }
+	  else
+	    con->state = HTTP_POST_DATA;
+	  break;
+
+      case HTTP_PUT :
       case HTTP_DELETE :
       case HTTP_TRACE :
           SendError(con, HTTP_NOT_IMPLEMENTED);
@@ -717,6 +738,51 @@ ReadClient(client_t *con)	/* I - Client to read from */
         break;
 
     case HTTP_POST_DATA :
+        printf("cupsd: con->data_encoding = %s, con->data_length = %d...\n",
+	       con->data_encoding == HTTP_DATA_CHUNKED ? "chunked" : "single",
+	       con->data_length);
+
+        if (con->data_encoding == HTTP_DATA_CHUNKED &&
+	    con->data_remaining == 0)
+	{
+          if (get_line(con, line, sizeof(line) - 1) == NULL)
+	    break;
+
+	  con->data_remaining = atoi(line);
+	  con->data_length    += con->data_remaining;
+	  if (con->data_remaining == 0)
+	    con->data_encoding = HTTP_DATA_SINGLE;
+	}
+
+        if (con->data_remaining > 0)
+	{
+	  if (con->data_remaining > con->bufused)
+	    bytes = con->bufused;
+	  else 
+	    bytes = con->data_remaining;
+
+          fprintf(stderr, "cupsd: Writing %d bytes to temp file...\n", bytes);
+
+          write(con->file, con->buf, bytes);
+
+	  con->bufused        -= bytes;
+	  con->data_remaining -= bytes;
+
+	  if (con->bufused > 0)
+	    memcpy(con->buf, con->buf + bytes, con->bufused);
+	}
+
+	if (con->data_remaining == 0 &&
+	    con->data_encoding == HTTP_DATA_SINGLE)
+	{
+	  close(con->file);
+	  
+          if (!SendError(con, HTTP_ACCEPTED))
+	  {
+	    CloseClient(con);
+	    return (0);
+	  }
+	}
         break;
   }
 
@@ -731,14 +797,29 @@ ReadClient(client_t *con)	/* I - Client to read from */
 
 
 /*
+ * 'SendCGI()' - Launch a CGI script...
+ */
+
+int				/* O - 1 on success, 0 on failure */
+SendCGI(client_t *con)		/* I - Connection to use */
+{
+ /**** Insert pipe code - need to read data from request file, and then
+       set state to HTTP_POST_RESPONSE ****/
+
+ /**** When program is done need to remove temp file and so forth ****/
+ /**** Don't forget to put CONTENT_TYPE and REQUEST_METHOD... ****/
+}
+
+
+/*
  * 'SendCommand()' - Send output from a command via HTTP.
  */
 
 int
-SendCommand(client_t *con,
-            int          code,
-	    char         *command,
-	    char         *type)
+SendCommand(client_t    *con,
+            http_code_t code,
+	    char        *command,
+	    char        *type)
 {
   con->pipe_pid = pipe_command(0, &(con->file), command);
 
@@ -773,8 +854,8 @@ SendCommand(client_t *con,
  */
 
 int				/* O - 1 if successful, 0 otherwise */
-SendError(client_t *con,	/* I - Connection */
-          int      code)	/* I - Error code */
+SendError(client_t    *con,	/* I - Connection */
+          http_code_t code)	/* I - Error code */
 {
   char	message[1024];		/* Text version of error code */
 
@@ -784,7 +865,7 @@ SendError(client_t *con,	/* I - Connection */
   * error messages...
   */
 
-  if (code >= 400)
+  if (code >= HTTP_BAD_REQUEST)
     con->keep_alive = 0;
 
  /*
@@ -807,7 +888,7 @@ SendError(client_t *con,	/* I - Connection */
       return (0);
   }
 
-  if (code >= 400)
+  if (code >= HTTP_BAD_REQUEST)
   {
    /*
     * Send a human-readable error message.
@@ -841,11 +922,11 @@ SendError(client_t *con,	/* I - Connection */
  */
 
 int
-SendFile(client_t *con,
-         int          code,
-	 char         *filename,
-	 char         *type,
-	 struct stat  *filestats)
+SendFile(client_t    *con,
+         http_code_t code,
+	 char        *filename,
+	 char        *type,
+	 struct stat *filestats)
 {
   con->file = open(filename, O_RDONLY);
 
@@ -879,9 +960,9 @@ SendFile(client_t *con,
  */
 
 int				/* O - 1 on success, 0 on failure */
-SendHeader(client_t *con,	/* I - Client to send to */
-           int          code,	/* I - HTTP status code */
-	   char         *type)	/* I - MIME type of document */
+SendHeader(client_t    *con,	/* I - Client to send to */
+           http_code_t code,	/* I - HTTP status code */
+	   char        *type)	/* I - MIME type of document */
 {
   if (conprintf(con, "HTTP/%d.%d %d %s\r\n", con->version / 100,
                 con->version % 100, code, get_message(code)) < 0)
@@ -1109,12 +1190,48 @@ WriteClient(client_t *con)
 
 
 /*
+ * 'chunkprintf()' - Do a printf() to a client...
+ */
+
+static int			/* O - Number of bytes written or -1 on error */
+chunkprintf(client_t *con,	/* I - Client to write to */
+            char     *format,	/* I - printf()-style format string */
+            ...)		/* I - Additional args as needed */
+{
+  int		bytes;		/* Number of bytes to write */
+  char		buf[MAX_BUFFER];/* Buffer for formatted string */
+  char		len[32];	/* Length string */
+  va_list	ap;		/* Variable argument pointer */
+
+
+  va_start(ap, format);
+  bytes = vsprintf(buf, format, ap);
+  va_end(ap);
+
+  fprintf(stderr, "cupsd: SEND %s", buf);
+  if (buf[bytes - 1] != '\n')
+    putc('\n', stderr);
+
+  con->activity = time(NULL);
+
+  if (con->version == HTTP_1_1)
+  {
+    sprintf(len, "%d\r\n", bytes);
+    if (send(con->fd, len, strlen(len), 0) < 3)
+      return (-1);
+  }
+
+  return (send(con->fd, buf, bytes, 0));
+}
+
+
+/*
  * 'conprintf()' - Do a printf() to a client...
  */
 
 static int			/* O - Number of bytes written or -1 on error */
 conprintf(client_t *con,	/* I - Client to write to */
-          char         *format,	/* I - printf()-style format string */
+          char     *format,	/* I - printf()-style format string */
           ...)			/* I - Additional args as needed */
 {
   int		bytes;		/* Number of bytes to write */
@@ -1340,8 +1457,6 @@ get_file(client_t *con,
   * Need to add DocumentRoot global...
   */
 
-#define DocumentRoot "/development/CUPS/www"
-
   if (con->language[0] != '\0')
     sprintf(filename, "%s/%s%s", DocumentRoot, con->language, con->uri);
   else
@@ -1467,7 +1582,7 @@ get_line(client_t *con,
  */
 
 static char *			/* O - Message string */
-get_long_message(int code)	/* I - Message code */
+get_long_message(http_code_t code)	/* I - Message code */
 {
   switch (code)
   {
@@ -1479,6 +1594,8 @@ get_long_message(int code)	/* I - Message code */
         return ("You are not allowed to access this page.");
     case HTTP_NOT_FOUND :
         return ("The specified file or directory was not found.");
+    case HTTP_REQUEST_TOO_LARGE :
+        return ("The server reported that the request is too large.");
     case HTTP_URI_TOO_LONG :
         return ("The server reported that the URI is too long.");
     case HTTP_NOT_IMPLEMENTED :
@@ -1496,7 +1613,7 @@ get_long_message(int code)	/* I - Message code */
  */
 
 static char *		/* O - Message string */
-get_message(int code)	/* I - Message code */
+get_message(http_code_t code)	/* I - Message code */
 {
   switch (code)
   {
@@ -1508,7 +1625,6 @@ get_message(int code)	/* I - Message code */
         return ("Accepted");
     case HTTP_NO_CONTENT :
         return ("No Content");
-	break;
     case HTTP_NOT_MODIFIED :
         return ("Not Modified");
     case HTTP_BAD_REQUEST :
@@ -1519,6 +1635,8 @@ get_message(int code)	/* I - Message code */
         return ("Forbidden");
     case HTTP_NOT_FOUND :
         return ("Not Found");
+    case HTTP_REQUEST_TOO_LARGE :
+        return ("Request Entity Too Large");
     case HTTP_URI_TOO_LONG :
         return ("URI Too Long");
     case HTTP_NOT_IMPLEMENTED :
@@ -1684,6 +1802,105 @@ pipe_command(int infile,	/* I - Standard input for command */
 
 
 /*
+ * 'show_printer_status()' - Show the current printer status.
+ */
+
+static int
+show_printer_status(client_t *con)
+{
+  printer_t	*p;
+  static char	*states[] =
+  {
+    "Idle", "Busy", "Faulted", "Unavailable",
+    "Disabled", "Disabled", "Disabled", "Disabled",
+    "Rejecting", "Rejecting", "Rejecting", "Rejecting",
+    "Rejecting", "Rejecting", "Rejecting", "Rejecting"
+  };
+
+
+  p = NULL;
+  if (con->uri[10] != '\0')
+    if ((p = FindPrinter(con->uri + 10)) == NULL)
+      return (0);
+
+  if (!SendHeader(con, HTTP_OK, "text/html"))
+    return (0);
+
+  if (con->version == HTTP_1_1)
+  {
+    con->data_encoding = HTTP_DATA_CHUNKED;
+
+    if (conprintf(con, "Transfer-Encoding: chunked\r\n") < 0)
+      return (0);
+  }
+
+  if (conprintf(con, "\r\n") < 0)
+    return (0);
+
+  if (p != NULL)
+  {
+   /*
+    * Send printer information...
+    */
+
+    chunkprintf(con, "<HTML>\n"
+                     "<HEAD>\n"
+		     "\t<TITLE>Printer Status for %s</TITLE>\n"
+		     "\t<META HTTP-EQUIV=\"Refresh\" CONTENT=\"10\">\n"
+		     "</HEAD>\n"
+		     "<BODY BGCOLOR=#ffffff>\n"
+		     "<TABLE WIDTH=100%%><TR>\n"
+		     "\t<TD ALIGN=LEFTV ALIGN=MIDDLE><IMG SRC=\"/images/cups-small.gif\"></TD>\n"
+		     "\t<TD ALIGN=CENTER VALIGN=MIDDLE><H1>Printer Status for %s</H1></TD>\n"
+		     "\t<TD ALIGN=RIGHT VALIGN=MIDDLE><IMG SRC=\"/images/vendor.gif\"></TD>\n"
+		     "</TR></TABLE>\n", p->name, p->name);
+
+    chunkprintf(con, "<CENTER><TABLE BORDER=1 WIDTH=80%%>\n"
+                     "<TR><TH>Name</TH><TH>Value</TH></TR>\n"
+		     "<TR><TD>Info</TD><TD>%s</TD></TR>\n"
+		     "<TR><TD>MoreInfo</TD><TD>%s</TD></TR>\n"
+		     "<TR><TD>LocationCode</TD><TD>%s</TD></TR>\n"
+		     "<TR><TD>LocationText</TD><TD>%s</TD></TR>\n"
+		     "<TR><TD>Device</TD><TD>%s</TD></TR>\n"
+		     "<TR><TD>PPDFile</TD><TD>%s</TD></TR>\n",
+		     p->info, p->more_info, p->location_code, p->location_text,
+		     p->device_uri, p->ppd);
+  }
+  else
+  {
+    chunkprintf(con, "<HTML>\n"
+                     "<HEAD>\n"
+		     "\t<TITLE>Available Printers</TITLE>\n"
+		     "\t<META HTTP-EQUIV=\"Refresh\" CONTENT=\"10\">\n"
+		     "</HEAD>\n"
+		     "<BODY BGCOLOR=#ffffff>\n"
+		     "<TABLE WIDTH=100%%><TR>\n"
+		     "\t<TD ALIGN=LEFT VALIGN=MIDDLE><IMG SRC=\"/images/cups-small.gif\"></TD>\n"
+		     "\t<TD ALIGN=CENTER VALIGN=MIDDLE><H1>Available Printers</H1></TD>\n"
+		     "\t<TD ALIGN=RIGHT VALIGN=MIDDLE><IMG SRC=\"/images/vendor.gif\"></TD>\n"
+		     "</TR></TABLE>\n"
+		     "<CENTER><TABLE BORDER=1 WIDTH=80%%>\n"
+                     "<TR><TH>Name</TH><TH>State</TH><TH>Info</TH></TR>\n");
+
+    for (p = Printers; p != NULL; p = p->next)
+      chunkprintf(con, "<TR><TD><A HREF=/printers/%s>%s</A></TD><TD>%s</TD><TD>%s</TD></TR>\n",
+		       p->name, p->name, states[p->state], p->info);
+  }
+
+  chunkprintf(con, "</TABLE></CENTER>\n"
+                   "<HR>\n"
+		   "CUPS Copyright 1997-1999 by Easy Software Products, "
+		   "All Rights Reserved.  CUPS and the CUPS logo are the "
+		   "trademark property of Easy Software Products.\n"
+		   "</BODY>\n"
+                   "</HTML>\n");
+  chunkprintf(con, "");
+
+  return (1);
+}
+
+
+/*
  * 'sigpipe_handler()' - Handle 'broken pipe' signals from lost network
  *                       clients.
  */
@@ -1696,5 +1913,5 @@ sigpipe_handler(int sig)	/* I - Signal number */
 
 
 /*
- * End of "$Id: http.c,v 1.6 1998/10/16 18:28:01 mike Exp $".
+ * End of "$Id: http.c,v 1.7 1999/01/24 14:25:11 mike Exp $".
  */

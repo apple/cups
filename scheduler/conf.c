@@ -1,9 +1,9 @@
 /*
- * "$Id: conf.c,v 1.2 1998/10/16 18:28:01 mike Exp $"
+ * "$Id: conf.c,v 1.3 1999/01/24 14:25:11 mike Exp $"
  *
  *   for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-1998 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-1999 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -69,6 +69,7 @@ static var_t	variables[] =
   { "SystemGroup",	SystemGroup,		VAR_STRING,	sizeof(SystemGroup) },
   { "AccessLog",	AccessLog,		VAR_STRING,	sizeof(AccessLog) },
   { "ErrorLog",		ErrorLog,		VAR_STRING,	sizeof(ErrorLog) },
+  { "DefaultCharset",	DefaultCharset,		VAR_STRING,	sizeof(DefaultCharset) },
   { "DefaultLanguage",	DefaultLanguage,	VAR_STRING,	sizeof(DefaultLanguage) },
   { "LogLevel",		&LogLevel,		VAR_INTEGER,	0 },
   { "HostNameLookups",	&HostNameLookups,	VAR_BOOLEAN,	0 },
@@ -112,9 +113,6 @@ ReadConfiguration(void)
   CloseAllClients();
   StopListening();
   StopBrowsing();
-#if 0
-  StopAllJobs();
-#endif /* 0 */
 
   if (AccessFile != NULL)
   {
@@ -139,9 +137,7 @@ ReadConfiguration(void)
 
   DeleteAllLocations();
 
-#if 0
   DeleteAllClasses();
-#endif /* 0 */
 
   gethostname(ServerName, sizeof(ServerName));
   sprintf(ServerAdmin, "root@%s", ServerName);
@@ -151,6 +147,7 @@ ReadConfiguration(void)
   strcpy(AccessLog, "logs/access_log");
   strcpy(ErrorLog, "logs/error_log");
   strcpy(DefaultLanguage, DEFAULT_LANGUAGE);
+  strcpy(DefaultCharset, DEFAULT_CHARSET);
   User             = DEFAULT_UID;
   Group            = DEFAULT_GID;
   LogLevel         = LOG_ERROR;
@@ -169,9 +166,7 @@ ReadConfiguration(void)
 
   NumListeners     = 0;
 
-#if 0
   DeleteAllPrinters();
-#endif /* 0 */
 
   if ((fp = fopen(ConfigurationFile, "r")) == NULL)
     return (0);
@@ -185,6 +180,9 @@ ReadConfiguration(void)
 
   if (!status)
     return (0);
+
+  LoadAllPrinters();
+  LoadAllClasses();
 
   StartListening();
   StartBrowsing();
@@ -201,6 +199,7 @@ int				/* O - 1 on success, 0 on error */
 LogRequest(client_t *con,	/* I - Request to log */
            int      code)	/* I - Response code */
 {
+  return (1);
 }
 
 
@@ -213,6 +212,7 @@ LogMessage(int  level,		/* I - Log level */
            char *message,	/* I - printf-style message string */
 	   ...)			/* I - Additional args as needed */
 {
+  return (1);
 }
 
 
@@ -231,6 +231,7 @@ read_configuration(FILE *fp)	/* I - File to read from */
 	*nameptr,		/* Pointer into name */
 	*value;			/* Pointer to value */
   var_t	*var;			/* Current variable */
+
 
  /*
   * Loop through each line in the file...
@@ -722,5 +723,5 @@ get_address(char               *value,		/* I - Value string */
 
 
 /*
- * End of "$Id: conf.c,v 1.2 1998/10/16 18:28:01 mike Exp $".
+ * End of "$Id: conf.c,v 1.3 1999/01/24 14:25:11 mike Exp $".
  */

@@ -1,9 +1,9 @@
 /*
- * "$Id: classes.c,v 1.2 1998/10/16 18:28:01 mike Exp $"
+ * "$Id: classes.c,v 1.3 1999/01/24 14:25:11 mike Exp $"
  *
  *   for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-1998 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-1999 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -33,6 +33,58 @@
 #include "cupsd.h"
 
 
+class_t *
+AddClass(char *name)
+{
+  return (NULL);
+}
+
+
+void
+AddPrinterToClass(class_t   *c,
+                  printer_t *p)
+{
+}
+
+
+void
+DeleteAllClasses(void)
+{
+}
+
+
+void
+DeleteClass(class_t *c)
+{
+}
+
+
+printer_t *
+FindAvailablePrinter(char *name)
+{
+  return (NULL);
+}
+
+
+class_t *
+FindClass(char *name)
+{
+  return (NULL);
+}
+
+
+void
+LoadAllClasses(void)
+{
+}
+
+
+void
+SaveAllClasses(void)
+{
+}
+
+
 /*
- * End of "$Id: classes.c,v 1.2 1998/10/16 18:28:01 mike Exp $".
+ * End of "$Id: classes.c,v 1.3 1999/01/24 14:25:11 mike Exp $".
  */

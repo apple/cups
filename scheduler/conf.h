@@ -1,10 +1,10 @@
 /*
- * "$Id: conf.h,v 1.2 1998/10/16 18:28:01 mike Exp $"
+ * "$Id: conf.h,v 1.3 1999/01/24 14:25:11 mike Exp $"
  *
  *   Configuration file definitions for the Common UNIX Printing System (CUPS)
  *   scheduler.
  *
- *   Copyright 1997-1998 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-1999 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -53,8 +53,10 @@ VAR char		ConfigurationFile[256] VALUE("/var/spool/cups/cupsd.conf"),
 					/* Access log filename */
 			ErrorLog[1024]	VALUE("logs/error_log"),
 					/* Error log filename */
-			DefaultLanguage[32] VALUE(DEFAULT_LANGUAGE);
+			DefaultLanguage[32] VALUE(DEFAULT_LANGUAGE),
 					/* Default language encoding */
+			DefaultCharset[32] VALUE(DEFAULT_CHARSET);
+					/* Default charset */
 VAR int			User		VALUE(DEFAULT_UID),
 					/* User ID for server */
 			Group		VALUE(DEFAULT_GID),
@@ -87,5 +89,5 @@ extern int	LogMessage(int level, char *message, ...);
 
 
 /*
- * End of "$Id: conf.h,v 1.2 1998/10/16 18:28:01 mike Exp $".
+ * End of "$Id: conf.h,v 1.3 1999/01/24 14:25:11 mike Exp $".
  */

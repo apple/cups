@@ -1,9 +1,9 @@
 /*
- * "$Id: cupsd.h,v 1.2 1998/10/16 18:28:01 mike Exp $"
+ * "$Id: cupsd.h,v 1.3 1999/01/24 14:25:11 mike Exp $"
  *
  *   Main header file for the Common UNIX Printing System (CUPS) scheduler.
  *
- *   Copyright 1997-1998 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-1999 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -42,6 +42,8 @@
 #include <sys/stat.h>
 #include <sys/wait.h>
 
+#include <mime.h>
+
 #ifdef WIN32
 #  include <windows.h>
 #  include <winsock.h>
@@ -69,8 +71,10 @@
  * Implementation limits...
  */
 
-#define MAX_NAME		32	/* Max length of printer or class name */
+#define MAX_NAME		128	/* Max length of printer or class name */
+#define MAX_HOST		256	/* Max length of host name */
 #define MAX_URI			1024	/* Max length of URI */
+#define MAX_STATUS		256	/* Max length of status text */
 #define MAX_BROWSERS		10	/* Maximum number of browse addresses */
 #define MAX_LISTENERS		10	/* Maximum number of listener sockets */
 #define MAX_CLIENTS		100	/* Maximum number of client sockets */
@@ -86,6 +90,7 @@
 #define DEFAULT_KEEPALIVE	30	/* Timeout between requests */
 #define DEFAULT_INTERVAL	30	/* Interval between browse updates */
 #define DEFAULT_LANGUAGE	"en"	/* Default language encoding */
+#define DEFAULT_CHARSET		"iso-8859-1"	/* Default charset */
 #define DEFAULT_GROUP		"sys"	/* Default system group */
 #define DEFAULT_UID		9	/* Default user ID */
 #define DEFAULT_GID		0	/* Default group ID */
@@ -109,11 +114,13 @@
  */
 
 #include "http.h"
+#include "ipp.h"
 #include "auth.h"
-#include "classes.h"
 #include "conf.h"
 #include "dirsvc.h"
 #include "printers.h"
+#include "classes.h"
+#include "job.h"
 
 
 /*
@@ -133,5 +140,5 @@ VAR int			NeedReload	VALUE(TRUE);
 
 
 /*
- * End of "$Id: cupsd.h,v 1.2 1998/10/16 18:28:01 mike Exp $".
+ * End of "$Id: cupsd.h,v 1.3 1999/01/24 14:25:11 mike Exp $".
  */
