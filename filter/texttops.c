@@ -1,15 +1,15 @@
 /*
- * "$Id: texttops.c,v 1.2 1996/10/14 16:28:08 mike Exp $"
+ * "$Id: texttops.c,v 1.3 1998/07/28 17:42:01 mike Exp $"
  *
  *   PostScript text output filter for espPrint, a collection of printer
  *   drivers.
  *
- *   Copyright 1993-1996 by Easy Software Products
+ *   Copyright 1993-1998 by Easy Software Products
  *
- *   These coded instructions, statements, and computer  programs  contain
- *   unpublished  proprietary  information  of Easy Software Products, and
- *   are protected by Federal copyright law.  They may  not  be  disclosed
- *   to  third  parties  or  copied or duplicated in any form, in whole or
+ *   These coded instructions, statements, and computer programs contain
+ *   unpublished proprietary information of Easy Software Products, and
+ *   are protected by Federal copyright law. They may not be disclosed
+ *   to third parties or copied or duplicated in any form, in whole or
  *   in part, without the prior written consent of Easy Software Products.
  *
  * Contents:
@@ -17,7 +17,10 @@
  * Revision History:
  *
  *   $Log: texttops.c,v $
- *   Revision 1.2  1996/10/14 16:28:08  mike
+ *   Revision 1.3  1998/07/28 17:42:01  mike
+ *   Updated the page count at the end of the file - off by one...
+ *
+ *   Revision 1.2  1996/10/14  16:28:08  mike
  *   Updated for 3.2 release.
  *   Added width, length, left, right, top, and bottom margin options.
  *   Revamped Setup() code for new options.
@@ -77,7 +80,7 @@ int	SizeLines = 60,
 	PageColumns = 1;
 
 float	CharsPerInch = 10.0;
-int	LinesPerInch = 6;
+float	LinesPerInch = 6.0;
 
 
 /*
@@ -96,12 +99,18 @@ Setup(FILE  *out,
       float fontsize,
       int   landscape)
 {
-  int	i;
   float	temp;
 
 
-  LinesPerInch = 72.0 / fontsize;
+/*  LinesPerInch = 72.0 / fontsize;*/
   CharsPerInch = 120.0 / fontsize;
+
+  if (CharsPerInch > 12)
+    LinesPerInch = 8;
+  else if (CharsPerInch < 10)
+    LinesPerInch = 4;
+  else
+    LinesPerInch = 6;
   
   if (landscape)
   {
@@ -125,7 +134,7 @@ Setup(FILE  *out,
   {
     SizeColumns = ((width - left - right) / 72.0 - (PageColumns - 1) * 0.25) *
                   CharsPerInch;
-    SizeLines   = (length - bottom - top) * LinesPerInch;
+    SizeLines   = (length - bottom - top) / 72.0 * LinesPerInch;
   };
 
   SizeColumns /= PageColumns;
@@ -139,15 +148,114 @@ Setup(FILE  *out,
   fputs("%%EndComments\n\n", out);
 
   fputs("%%BeginProlog\n", out);
+
+ /*
+  * Oh, joy, another font encoding.  For now assume that all documents use
+  * ISO-8859-1 encoding (this covers about 1/2 of the human population)...
+  */
+
+  fputs("/iso8859encoding [\n", out);
+  fputs("/.notdef /.notdef /.notdef /.notdef\n", out);
+  fputs("/.notdef /.notdef /.notdef /.notdef\n", out);
+  fputs("/.notdef /.notdef /.notdef /.notdef\n", out);
+  fputs("/.notdef /.notdef /.notdef /.notdef\n", out);
+  fputs("/.notdef /.notdef /.notdef /.notdef\n", out);
+  fputs("/.notdef /.notdef /.notdef /.notdef\n", out);
+  fputs("/.notdef /.notdef /.notdef /.notdef\n", out);
+  fputs("/.notdef /.notdef /.notdef /.notdef\n", out);
+  fputs("/space /exclam /quotedbl /numbersign\n", out);
+  fputs("/dollar /percent /ampersand /quoteright\n", out);
+  fputs("/parenleft /parenright /asterisk /plus\n", out);
+  fputs("/comma /minus /period /slash\n", out);
+  fputs("/zero /one /two /three /four /five /six /seven\n", out);
+  fputs("/eight /nine /colon /semicolon\n", out);
+  fputs("/less /equal /greater /question\n", out);
+  fputs("/at /A /B /C /D /E /F /G\n", out);
+  fputs("/H /I /J /K /L /M /N /O\n", out);
+  fputs("/P /Q /R /S /T /U /V /W\n", out);
+  fputs("/X /Y /Z /bracketleft\n", out);
+  fputs("/backslash /bracketright /asciicircum /underscore\n", out);
+  fputs("/quoteleft /a /b /c /d /e /f /g\n", out);
+  fputs("/h /i /j /k /l /m /n /o\n", out);
+  fputs("/p /q /r /s /t /u /v /w\n", out);
+  fputs("/x /y /z /braceleft\n", out);
+  fputs("/bar /braceright /asciitilde /guilsinglright\n", out);
+  fputs("/fraction /florin /quotesingle /quotedblleft\n", out);
+  fputs("/guilsinglleft /fi /fl /endash\n", out);
+  fputs("/dagger /daggerdbl /bullet /quotesinglbase\n", out);
+  fputs("/quotedblbase /quotedblright /ellipsis /trademark\n", out);
+  fputs("/dotlessi /grave /acute /circumflex\n", out);
+  fputs("/tilde /macron /breve /dotaccent\n", out);
+  fputs("/dieresis /perthousand /ring /cedilla\n", out);
+  fputs("/Ydieresis /hungarumlaut /ogonek /caron\n", out);
+  fputs("/emdash /exclamdown /cent /sterling\n", out);
+  fputs("/currency /yen /brokenbar /section\n", out);
+  fputs("/dieresis /copyright /ordfeminine /guillemotleft\n", out);
+  fputs("/logicalnot /hyphen /registered /macron\n", out);
+  fputs("/degree /plusminus /twosuperior /threesuperior\n", out);
+  fputs("/acute /mu /paragraph /periodcentered\n", out);
+  fputs("/cedilla /onesuperior /ordmasculine /guillemotright\n", out);
+  fputs("/onequarter /onehalf /threequarters /questiondown\n", out);
+  fputs("/Agrave /Aacute /Acircumflex /Atilde\n", out);
+  fputs("/Adieresis /Aring /AE /Ccedilla\n", out);
+  fputs("/Egrave /Eacute /Ecircumflex /Edieresis\n", out);
+  fputs("/Igrave /Iacute /Icircumflex /Idieresis\n", out);
+  fputs("/Eth /Ntilde /Ograve /Oacute\n", out);
+  fputs("/Ocircumflex /Otilde /Odieresis /multiply\n", out);
+  fputs("/Oslash /Ugrave /Uacute /Ucircumflex\n", out);
+  fputs("/Udieresis /Yacute /Thorn /germandbls\n", out);
+  fputs("/agrave /aacute /acircumflex /atilde\n", out);
+  fputs("/adieresis /aring /ae /ccedilla\n", out);
+  fputs("/egrave /eacute /ecircumflex /edieresis\n", out);
+  fputs("/igrave /iacute /icircumflex /idieresis\n", out);
+  fputs("/eth /ntilde /ograve /oacute\n", out);
+  fputs("/ocircumflex /otilde /odieresis /divide\n", out);
+  fputs("/oslash /ugrave /uacute /ucircumflex\n", out);
+  fputs("/udieresis /yacute /thorn /ydieresis ] def\n", out);
+
+  fprintf(out, "/%s findfont\n", fontname);
+  fputs("dup length dict begin\n"
+        "	{ 1 index /FID ne { def } { pop pop } ifelse } forall\n"
+        "	/Encoding iso8859encoding def\n"
+        "	currentdict\n"
+        "end\n", out);
+  fprintf(out, "/%s exch definefont pop\n", fontname);
+
   fprintf(out, "/R /%s findfont %f scalefont def\n", fontname, fontsize);
-  fprintf(out, "/B /%s-Bold findfont %f scalefont def\n", fontname, fontsize);
+
+  if (strcasecmp(fontname, "Times-Roman") == 0)
+    fputs("/Times-Bold findfont\n", out);
+  else
+    fprintf(out, "/%s findfont\n", fontname);
+  fputs("dup length dict begin\n"
+        "	{ 1 index /FID ne { def } { pop pop } ifelse } forall\n"
+        "	/Encoding iso8859encoding def\n"
+        "	currentdict\n"
+        "end\n", out);
+  if (strcasecmp(fontname, "Times-Roman") == 0)
+    fputs("/Times-Bold exch definefont pop\n", out);
+  else
+    fprintf(out, "/%s exch definefont pop\n", fontname);
+
+  if (strcasecmp(fontname, "Times-Roman") == 0)
+    fprintf(out, "/B /Times-Bold findfont %f scalefont def\n", fontsize);
+  else
+    fprintf(out, "/B /%s-Bold findfont %f scalefont def\n", fontname, fontsize);
+
   fprintf(out, "/S { setfont /y exch %f mul %f sub neg def %f mul %f add exch %f mul add /x exch def "
                "x y moveto show } bind def\n",
-          fontsize, length - fontsize, 72.0 / CharsPerInch, left, width);
+          fontsize, length - top - fontsize, 72.0 / CharsPerInch, left, width);
+
   fprintf(out, "/U { setfont /y exch %f mul %f sub neg def %f mul %f add exch %f mul add /x exch def "
                "x y moveto dup show x y moveto stringwidth rlineto } bind def\n",
-          fontsize, length - fontsize, 72.0 / CharsPerInch, left, width);
+          fontsize, length - top - fontsize, 72.0 / CharsPerInch, left, width);
+
   fputs("%%EndProlog\n", out);
+
+  if (Verbosity)
+    fprintf(stderr, "text2ps: cpi = %.2f, lpi = %.2f, chars/col = %d\n"
+                    "text2ps: columns = %d, lines = %d\n",
+            CharsPerInch, LinesPerInch, SizeColumns, PageColumns, SizeLines);
 }
 
 
@@ -155,7 +263,7 @@ void
 Shutdown(FILE *out,
          int  pages)
 {
-  fprintf(out, "%%%%Pages: %d\n", pages);
+  fprintf(out, "%%%%Pages: %d\n", pages - 1);
   fputs("%%EOF\n", out);
 }
 
@@ -219,12 +327,16 @@ OutputLine(FILE    *out,
 
     if (strchr("()\\", buffer->ch) != NULL)
     {
-      *lineptr = '\\';
-      lineptr ++;
-    };
-
-    *lineptr = buffer->ch;
-    lineptr ++;
+      *lineptr++ = '\\';
+      *lineptr++ = buffer->ch;
+    }
+    else if (buffer->ch < ' ' || buffer->ch > 126)
+    {
+      sprintf(lineptr, "\\%03o", buffer->ch);
+      lineptr += 4;
+    }
+    else
+      *lineptr++ = buffer->ch;
   };
 
   if (lineptr > line)
@@ -255,15 +367,14 @@ Usage(void)
  * 'main()' - Main entry and processing of driver.
  */
 
-void
+int
 main(int  argc,    /* I - Number of command-line arguments */
      char *argv[]) /* I - Command-line arguments */
 {
   int			i,		/* Looping var */
 			ch;		/* Current char from file */
   char			*opt;		/* Current option character */
-  int			empty_infile,	/* TRUE if the input file is empty */
-			need_status;	/* TRUE if all we need to do is update the printer status */
+  int			empty_infile;	/* TRUE if the input file is empty */
   char			*filename;	/* Input filename, if specified (NULL otherwise). */
   FILE			*fp;		/* Input file */
   int			line,
@@ -301,8 +412,8 @@ main(int  argc,    /* I - Number of command-line arguments */
   length    = 792;
   left      = 18;
   right     = 18;
-  bottom    = 18;
-  top       = 18;
+  bottom    = 36;
+  top       = 36;
   
   for (i = 1; i < argc; i ++)
     if (argv[i][0] == '-')
@@ -333,12 +444,14 @@ main(int  argc,    /* I - Number of command-line arguments */
 
               width  = size->width * 72.0;
               length = size->length * 72.0;
+#if 0 /* Leave these alone for nicer margins */
               left   = size->left_margin * 72.0;
               right  = 72.0 * (size->width - size->left_margin -
                                size->horizontal_addr / (float)info->horizontal_resolution);
               bottom = 72.0 * (size->length - size->top_margin -
                                size->vertical_addr / (float)info->vertical_resolution);
               top    = size->top_margin * 72.0;
+#endif /* 0 */
               break;
 
           case 'O' : /* Output file */
@@ -617,10 +730,10 @@ main(int  argc,    /* I - Number of command-line arguments */
   * Exit with no errors...
   */
 
-  exit(NO_ERROR);
+  return (NO_ERROR);
 }
 
 
 /*
- * End of "$Id: texttops.c,v 1.2 1996/10/14 16:28:08 mike Exp $".
+ * End of "$Id: texttops.c,v 1.3 1998/07/28 17:42:01 mike Exp $".
  */
