@@ -1,5 +1,5 @@
 /*
- * "$Id: options.c,v 1.16 2000/09/13 18:47:00 mike Exp $"
+ * "$Id: options.c,v 1.17 2000/10/03 13:06:14 mike Exp $"
  *
  *   Option routines for the Common UNIX Printing System (CUPS).
  *
@@ -442,6 +442,17 @@ cupsParseOptions(const char    *arg,		/* I - Argument to parse */
   copyarg     = strdup(arg);
   ptr         = copyarg;
 
+ /*
+  * Skip leading spaces...
+  */
+
+  while (isspace(*ptr))
+    ptr ++;
+
+ /*
+  * Loop through the string...
+  */
+
   while (*ptr != '\0')
   {
    /*
@@ -650,5 +661,5 @@ cupsMarkOptions(ppd_file_t    *ppd,		/* I - PPD file */
 
 
 /*
- * End of "$Id: options.c,v 1.16 2000/09/13 18:47:00 mike Exp $".
+ * End of "$Id: options.c,v 1.17 2000/10/03 13:06:14 mike Exp $".
  */
