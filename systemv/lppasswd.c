@@ -1,5 +1,5 @@
 /*
- * "$Id: lppasswd.c,v 1.5 2000/06/28 16:49:30 mike Exp $"
+ * "$Id: lppasswd.c,v 1.6 2000/07/17 19:44:35 mike Exp $"
  *
  *   MD5 password program for the Common UNIX Printing System (CUPS).
  *
@@ -98,7 +98,7 @@ main(int  argc,			/* I - Number of command-line arguments */
   else
   {
     strcpy(passwdmd5, CUPS_SERVERROOT "/passwd.md5");
-    strcpy(passwdold, CUPS_SERVERROOT "/passwd.md5");
+    strcpy(passwdold, CUPS_SERVERROOT "/passwd.old");
   }
 
  /*
@@ -195,10 +195,11 @@ main(int  argc,			/* I - Number of command-line arguments */
   }
 
   if (rename(passwdmd5, passwdold))
-  {
-    perror("lppasswd: Unable to rename password file");
-    return (1);
-  }
+    if (errno != ENOENT && op != ADD)
+    {
+      perror("lppasswd: Unable to rename password file");
+      return (1);
+    }
 
  /*
   * Open the existing password file and create a new one...
@@ -411,5 +412,5 @@ usage(FILE *fp)		/* I - File to send usage to */
 
 
 /*
- * End of "$Id: lppasswd.c,v 1.5 2000/06/28 16:49:30 mike Exp $".
+ * End of "$Id: lppasswd.c,v 1.6 2000/07/17 19:44:35 mike Exp $".
  */
