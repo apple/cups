@@ -1,5 +1,5 @@
 /*
- * "$Id: getputfile.c,v 1.1.2.2 2004/02/04 02:32:44 mike Exp $"
+ * "$Id: getputfile.c,v 1.1.2.3 2004/02/04 19:18:06 mike Exp $"
  *
  *   Get/put file functions for the Common UNIX Printing System (CUPS).
  *
@@ -139,22 +139,16 @@ cupsGetFd(http_t     *http,		/* I - HTTP connection to server */
 #ifdef HAVE_LIBSSL
     else if (status == HTTP_UPGRADE_REQUIRED)
     {
-     /*
-      * Flush any error message...
-      */
-
+      /* Flush any error message... */
       httpFlush(http);
 
-     /*
-      * Upgrade with encryption...
-      */
+      /* Reconnect... */
+      httpReconnect(http);
 
+      /* Upgrade with encryption... */
       httpEncryption(http, HTTP_ENCRYPT_REQUIRED);
 
-     /*
-      * Try again, this time with encryption enabled...
-      */
-
+      /* Try again, this time with encryption enabled... */
       continue;
     }
 #endif /* HAVE_LIBSSL */
@@ -362,6 +356,9 @@ cupsPutFd(http_t     *http,		/* I - HTTP connection to server */
       /* Flush any error message... */
       httpFlush(http);
 
+      /* Reconnect... */
+      httpReconnect(http);
+
       /* Upgrade with encryption... */
       httpEncryption(http, HTTP_ENCRYPT_REQUIRED);
 
@@ -437,5 +434,5 @@ cupsPutFile(http_t     *http,		/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: getputfile.c,v 1.1.2.2 2004/02/04 02:32:44 mike Exp $".
+ * End of "$Id: getputfile.c,v 1.1.2.3 2004/02/04 19:18:06 mike Exp $".
  */

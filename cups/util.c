@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c,v 1.81.2.29 2003/10/30 15:45:29 mike Exp $"
+ * "$Id: util.c,v 1.81.2.30 2004/02/04 19:18:06 mike Exp $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -344,22 +344,16 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
 #ifdef HAVE_SSL
     else if (status == HTTP_UPGRADE_REQUIRED)
     {
-     /*
-      * Flush any error message...
-      */
-
+      /* Flush any error message... */
       httpFlush(http);
 
-     /*
-      * Upgrade with encryption...
-      */
+      /* Reconnect... */
+      httpReconnect(http);
 
+      /* Upgrade with encryption... */
       httpEncryption(http, HTTP_ENCRYPT_REQUIRED);
 
-     /*
-      * Try again, this time with encryption enabled...
-      */
-
+      /* Try again, this time with encryption enabled... */
       continue;
     }
 #endif /* HAVE_SSL */
@@ -1560,5 +1554,5 @@ cups_connect(const char *name,		/* I - Destination (printer[@host]) */
 
 
 /*
- * End of "$Id: util.c,v 1.81.2.29 2003/10/30 15:45:29 mike Exp $".
+ * End of "$Id: util.c,v 1.81.2.30 2004/02/04 19:18:06 mike Exp $".
  */

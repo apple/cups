@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.82.2.41 2003/10/09 19:13:49 mike Exp $"
+ * "$Id: http.c,v 1.82.2.42 2004/02/04 19:18:06 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS).
  *
@@ -35,6 +35,7 @@
  *   httpConnectEncrypt() - Connect to a HTTP server using encryption.
  *   httpEncryption()     - Set the required encryption on the link.
  *   httpReconnect()      - Reconnect to a HTTP server...
+ *   httpGetSubField()    - Get a sub-field value.
  *   httpSetField()       - Set the value of an HTTP header.
  *   httpDelete()         - Send a DELETE request to the server.
  *   httpGet()            - Send a GET request to the server.
@@ -84,7 +85,7 @@
 #include <fcntl.h>
 #include <errno.h>
 
-#include "ipp.h"
+#include "http.h"
 #include "debug.h"
 
 #ifndef WIN32
@@ -195,14 +196,16 @@ void
 httpInitialize(void)
 {
 #ifdef HAVE_LIBSSL
+#  ifndef WIN32
   struct timeval	curtime;	/* Current time in microseconds */
+#  endif /* !WIN32 */
   int			i;		/* Looping var */
   unsigned char		data[1024];	/* Seed data */
 #endif /* HAVE_LIBSSL */
 
 #ifdef WIN32
-  WSADATA	winsockdata;	/* WinSock data */
-  static int	initialized = 0;/* Has WinSock been initialized? */
+  WSADATA	winsockdata;		/* WinSock data */
+  static int	initialized = 0;	/* Has WinSock been initialized? */
 
 
   if (!initialized)
@@ -210,7 +213,7 @@ httpInitialize(void)
 #elif defined(HAVE_SIGSET)
   sigset(SIGPIPE, SIG_IGN);
 #elif defined(HAVE_SIGACTION)
-  struct sigaction	action;	/* POSIX sigaction data */
+  struct sigaction	action;		/* POSIX sigaction data */
 
 
  /*
@@ -237,8 +240,11 @@ httpInitialize(void)
   * it is the best we can do (on others, this seed isn't even used...)
   */
 
+#ifdef WIN32
+#else
   gettimeofday(&curtime, NULL);
   srand(curtime.tv_sec + curtime.tv_usec);
+#endif /* WIN32 */
 
   for (i = 0; i < sizeof(data); i ++)
     data[i] = rand(); /* Yes, this is a poor source of random data... */
@@ -423,20 +429,15 @@ httpConnectEncrypt(const char *host,	/* I - Host to connect to */
     */
 
     if (!httpReconnect(http))
-      break;
+      return (http);
   }
 
  /*
-  * Return the new structure if we could connect; otherwise, bail out...
+  * Could not connect to any known address - bail out!
   */
 
-  if (hostaddr->h_addr_list[i])
-    return (http);
-  else
-  {
-    free(http);
-    return (NULL);
-  }
+  free(http);
+  return (NULL);
 }
 
 
@@ -448,6 +449,8 @@ int					/* O - -1 on error, 0 on success */
 httpEncryption(http_t            *http,	/* I - HTTP data */
                http_encryption_t e)	/* I - New encryption preference */
 {
+  DEBUG_printf(("httpEncryption(http=%p, e=%d)\n", http, e));
+
 #ifdef HAVE_SSL
   if (!http)
     return (0);
@@ -478,6 +481,12 @@ int				/* O - 0 on success, non-zero on failure */
 httpReconnect(http_t *http)	/* I - HTTP data */
 {
   int		val;		/* Socket option value */
+
+
+  DEBUG_printf(("httpReconnect(http=%p)\n", http));
+
+  if (!http)
+    return (-1);
 
 #ifdef HAVE_SSL
   if (http->tls)
@@ -531,7 +540,11 @@ httpReconnect(http_t *http)	/* I - HTTP data */
   */
 
   val = 1;
+#ifdef WIN32
+  setsockopt(http->fd, IPPROTO_TCP, TCP_NODELAY, (char *)&val, sizeof(val)); 
+#else
   setsockopt(http->fd, IPPROTO_TCP, TCP_NODELAY, &val, sizeof(val)); 
+#endif // WIN32
 
  /*
   * Connect to the server...
@@ -609,6 +622,9 @@ httpGetSubField(http_t       *http,	/* I - HTTP data */
 		*ptr;			/* Pointer into string buffer */
 
 
+  DEBUG_printf(("httpGetSubField(http=%p, field=%d, name=\"%s\", value=%p)\n",
+                http, field, name, value));
+
   if (http == NULL ||
       field < HTTP_FIELD_ACCEPT_LANGUAGE ||
       field > HTTP_FIELD_WWW_AUTHENTICATE ||
@@ -640,15 +656,20 @@ httpGetSubField(http_t       *http,	/* I - HTTP data */
 
     *ptr = '\0';
 
+    DEBUG_printf(("httpGetSubField: name=\"%s\"\n", temp));
+
    /*
     * Skip trailing chars up to the '='...
     */
 
-    while (*fptr && *fptr != '=')
+    while (isspace(*fptr))
       fptr ++;
 
     if (!*fptr)
       break;
+
+    if (*fptr != '=')
+      continue;
 
    /*
     * Skip = and leading whitespace...
@@ -692,6 +713,8 @@ httpGetSubField(http_t       *http,	/* I - HTTP data */
       while (*fptr && !isspace(*fptr) && *fptr != ',')
         fptr ++;
     }
+
+    DEBUG_printf(("httpGetSubField: value=\"%s\"\n", value));
 
    /*
     * See if this is the one...
@@ -819,15 +842,14 @@ httpTrace(http_t     *http,		/* I - HTTP data */
  */
 
 void
-httpFlush(http_t *http)	/* I - HTTP data */
+httpFlush(http_t *http)			/* I - HTTP data */
 {
-  char	buffer[8192];	/* Junk buffer */
+  char	buffer[8192];			/* Junk buffer */
 
 
-  if (http->state != HTTP_WAITING)
-  {
-    while (httpRead(http, buffer, sizeof(buffer)) > 0);
-  }
+  DEBUG_printf(("httpFlush(http=%p), state=%d\n", http, http->state));
+
+  while (httpRead(http, buffer, sizeof(buffer)) > 0);
 }
 
 
@@ -844,7 +866,8 @@ httpRead(http_t *http,			/* I - HTTP data */
   char		len[32];		/* Length string */
 
 
-  DEBUG_printf(("httpRead(%p, %p, %d)\n", http, buffer, length));
+  DEBUG_printf(("httpRead(http=%p, buffer=%p, length=%d)\n",
+                http, buffer, length));
 
   if (http == NULL || buffer == NULL)
     return (-1);
@@ -873,7 +896,7 @@ httpRead(http_t *http,			/* I - HTTP data */
     }
   }
 
-  DEBUG_printf(("httpRead: data_remaining = %d\n", http->data_remaining));
+  DEBUG_printf(("httpRead: data_remaining=%d\n", http->data_remaining));
 
   if (http->data_remaining <= 0)
   {
@@ -889,6 +912,12 @@ httpRead(http_t *http,			/* I - HTTP data */
       http->state ++;
     else
       http->state = HTTP_WAITING;
+
+   /*
+    * Prevent future reads for this request...
+    */
+
+    http->data_encoding = HTTP_ENCODE_LENGTH;
 
     return (0);
   }
@@ -1254,7 +1283,7 @@ httpGets(char   *line,			/* I - Line to read into */
   int	bytes;				/* Number of bytes read */
 
 
-  DEBUG_printf(("httpGets(%p, %d, %p)\n", line, length, http));
+  DEBUG_printf(("httpGets(line=%p, length=%d, http=%p)\n", line, length, http));
 
   if (http == NULL || line == NULL)
     return (NULL);
@@ -1309,7 +1338,7 @@ httpGets(char   *line,			/* I - Line to read into */
 	  continue;
 	}
 
-        DEBUG_printf(("httpGets(): recv() error %d!\n", WSAGetLastError()));
+        DEBUG_printf(("httpGets: recv() error %d!\n", WSAGetLastError()));
 #else
         if (errno == EINTR)
 	  continue;
@@ -1319,7 +1348,7 @@ httpGets(char   *line,			/* I - Line to read into */
 	  continue;
 	}
 
-        DEBUG_printf(("httpGets(): recv() error %d!\n", errno));
+        DEBUG_printf(("httpGets: recv() error %d!\n", errno));
 #endif /* WIN32 */
 
         return (NULL);
@@ -1376,11 +1405,11 @@ httpGets(char   *line,			/* I - Line to read into */
     if (http->used > 0)
       memmove(http->buffer, bufptr, http->used);
 
-    DEBUG_printf(("httpGets(): Returning \"%s\"\n", line));
+    DEBUG_printf(("httpGets: Returning \"%s\"\n", line));
     return (line);
   }
 
-  DEBUG_puts("httpGets(): No new line available!");
+  DEBUG_puts("httpGets: No new line available!");
 
   return (NULL);
 }
@@ -1402,6 +1431,8 @@ httpPrintf(http_t     *http,		/* I - HTTP data */
 		*bufptr;		/* Pointer into buffer */
   va_list	ap;			/* Variable argument pointer */
 
+
+  DEBUG_printf(("httpPrintf(http=%p, format=\"%s\", ...)\n", http, format));
 
   va_start(ap, format);
   bytes = vsnprintf(buf, sizeof(buf), format, ap);
@@ -1516,7 +1547,7 @@ httpUpdate(http_t *http)		/* I - HTTP data */
   http_status_t	status;			/* Authorization status */
 
 
-  DEBUG_printf(("httpUpdate(%p)\n", http));
+  DEBUG_printf(("httpUpdate(http=%p), state=%d\n", http, http->state));
 
  /*
   * If we haven't issued any commands, then there is nothing to "update"...
@@ -1531,7 +1562,7 @@ httpUpdate(http_t *http)		/* I - HTTP data */
 
   while (httpGets(line, sizeof(line), http) != NULL)
   {
-    DEBUG_puts(line);
+    DEBUG_printf(("httpUpdate: Got \"%s\"\n", line));
 
     if (line[0] == '\0')
     {
@@ -1563,9 +1594,6 @@ httpUpdate(http_t *http)		/* I - HTTP data */
 
         return (HTTP_CONTINUE);
       }
-      else if (http->status == HTTP_UPGRADE_REQUIRED &&
-               http->encryption != HTTP_ENCRYPT_NEVER)
-        http->encryption = HTTP_ENCRYPT_REQUIRED;
 #endif /* HAVE_SSL */
 
       httpGetLength(http);
@@ -1764,6 +1792,7 @@ httpEncode64(char       *out,	/* I - String to write to */
     if (*in == '\0')
     {
       *outptr ++ = '=';
+      *outptr ++ = '=';
       break;
     }
 
@@ -1771,12 +1800,14 @@ httpEncode64(char       *out,	/* I - String to write to */
 
     in ++;
     if (*in == '\0')
+    {
+      *outptr ++ = '=';
       break;
+    }
 
     *outptr ++ = base64[in[0] & 63];
   }
 
-  *outptr ++ = '=';
   *outptr = '\0';
 
  /*
@@ -1795,7 +1826,7 @@ httpEncode64(char       *out,	/* I - String to write to */
 int				/* O - Content length */
 httpGetLength(http_t *http)	/* I - HTTP data */
 {
-  DEBUG_printf(("httpGetLength(%p), state = %d\n", http, http->state));
+  DEBUG_printf(("httpGetLength(http=%p), state=%d\n", http, http->state));
 
   if (strcasecmp(http->fields[HTTP_FIELD_TRANSFER_ENCODING], "chunked") == 0)
   {
@@ -1821,7 +1852,7 @@ httpGetLength(http_t *http)	/* I - HTTP data */
     else
       http->data_remaining = atoi(http->fields[HTTP_FIELD_CONTENT_LENGTH]);
 
-    DEBUG_printf(("httpGetLength: content_length = %d\n", http->data_remaining));
+    DEBUG_printf(("httpGetLength: content_length=%d\n", http->data_remaining));
   }
 
   return (http->data_remaining);
@@ -1877,6 +1908,9 @@ http_send(http_t       *http,	/* I - HTTP data */
   static const char hex[] = "0123456789ABCDEF";
 				/* Hex digits */
 
+
+  DEBUG_printf(("http_send(http=%p, request=HTTP_%s, uri=\"%s\")\n",
+                http, codes[request], uri));
 
   if (http == NULL || uri == NULL)
     return (-1);
@@ -1969,6 +2003,8 @@ http_wait(http_t *http,			/* I - HTTP data */
   struct timeval	timeout;	/* Timeout */
   int			nfds;		/* Result from select() */
 
+
+  DEBUG_printf(("http_wait(http=%p, msec=%d)\n", http, msec));
 
  /*
   * Check the SSL/TLS buffers for data first...
@@ -2405,5 +2441,5 @@ CDSAWriteFunc(SSLConnectionRef connection,	/* I  - SSL/TLS connection */
 
 
 /*
- * End of "$Id: http.c,v 1.82.2.41 2003/10/09 19:13:49 mike Exp $".
+ * End of "$Id: http.c,v 1.82.2.42 2004/02/04 19:18:06 mike Exp $".
  */
