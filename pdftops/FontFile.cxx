@@ -2133,12 +2133,14 @@ FontEncoding *TrueTypeFontFile::getEncoding(GBool taken) {
       stringIdx = 0;
       stringPos = pos + 34 + 2*nGlyphs;
       for (i = 0; i < 256; ++i) {
+        fprintf(stderr, "cmap[%d] = %x (%d)\n", i, cmap[i], cmap[i]);
 	if (cmap[i] < nGlyphs) {
 	  j = getUShort(pos + 34 + 2 * cmap[i]);
 	  if (j < 258) {
 	    encoding->addChar(i, copyString(macGlyphNames[j]));
 	  } else {
 	    j -= 258;
+	    fprintf(stderr, "j = %x (%d)\n", j, j);
 	    if (j != stringIdx) {
 	      for (stringIdx = 0, stringPos = pos + 34 + 2*nGlyphs;
 		   stringIdx < j;
@@ -2157,7 +2159,7 @@ FontEncoding *TrueTypeFontFile::getEncoding(GBool taken) {
       }
 
     // Apple subset
-    } else if (fmt == 0x000280000) {
+    } else if (fmt == 0x00028000) {
       for (i = 0; i < 256; ++i) {
 	if (cmap[i] < nGlyphs) {
 	  j = i + getChar(pos + 32 + cmap[i]);
@@ -2167,12 +2169,21 @@ FontEncoding *TrueTypeFontFile::getEncoding(GBool taken) {
 	encoding->addChar(i, copyString(macGlyphNames[j]));
       }
 
-    // Ugh, just assume the Apple glyph set
+    // Ugh, just assume the Apple glyph set + Unicode...
     } else {
-      for (i = 0; i < 256; ++i) {
-	j = (cmap[i] < 258) ? cmap[i] : 0;
-	encoding->addChar(i, copyString(macGlyphNames[j]));
-      }
+      for (i = 0; i < 256; ++i)
+        if (cmap[i] < 258) {
+	  // Use Mac encoding names for the first Unicode page...
+	  j = (cmap[i] < 258) ? cmap[i] : 0;
+	  encoding->addChar(i, copyString(macGlyphNames[j]));
+	} else {
+	  // Map other chars to Unicode names...
+	  char uniCODE[8];
+
+	  sprintf(uniCODE, "uni%04X", cmap[i]);
+
+	  encoding->addChar(i, copyString(uniCODE));
+        }
     }
 
   // no "post" table: assume the Apple glyph set

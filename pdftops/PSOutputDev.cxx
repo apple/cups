@@ -467,15 +467,11 @@ PSOutputDev::~PSOutputDev() {
   if (f) {
     if (doForm) {
       writePS("/Foo exch /Form defineresource pop\n");
-    } else if (psOutEPS) {
+    } else {
       writePS("%%%%Trailer\n");
       writePS("end\n");
       writePS("%%%%DocumentSuppliedResources:\n");
       writePS("%s", embFontList->getCString());
-      writePS("%%%%EOF\n");
-    } else {
-      writePS("%%%%Trailer\n");
-      writePS("end\n");
       writePS("%%%%EOF\n");
     }
     if (fileType == psFile) {
@@ -667,6 +663,9 @@ void PSOutputDev::setupFont(GfxFont *font) {
     }
   }
 
+  fprintf(stderr, "psName = \"%s\", type = %d, is16Bit = %d\n", psName,
+          font->getType(), font->is16Bit());
+
   // generate PostScript code to set up the font
   if (do16Bit) {
     writePS("/F%d_%d /%s pdfMakeFont16\n",
@@ -738,12 +737,10 @@ void PSOutputDev::setupEmbeddedType1Font(Ref *id, const char *psName) {
   obj2.free();
 
   // beginning comment
-  if (psOutEPS) {
-    writePS("%%%%BeginResource: font %s\n", psName);
-    embFontList->append("%%+ font ");
-    embFontList->append(psName);
-    embFontList->append("\n");
-  }
+  writePS("%%%%BeginResource: font %s\n", psName);
+  embFontList->append("%%+ font ");
+  embFontList->append(psName);
+  embFontList->append("\n");
 
   // copy ASCII portion of font
   strObj.streamReset();
@@ -799,9 +796,7 @@ void PSOutputDev::setupEmbeddedType1Font(Ref *id, const char *psName) {
   writePS("cleartomark\n");
 
   // ending comment
-  if (psOutEPS) {
-    writePS("%%%%EndResource\n");
-  }
+  writePS("%%%%EndResource\n");
 
  err1:
   strObj.streamClose();
@@ -831,12 +826,10 @@ void PSOutputDev::setupEmbeddedType1Font(GString *fileName, const char *psName) 
   fontFileNames[fontFileNameLen++] = fileName->copy();
 
   // beginning comment
-  if (psOutEPS) {
-    writePS("%%%%BeginResource: font %s\n", psName);
-    embFontList->append("%%+ font ");
-    embFontList->append(psName);
-    embFontList->append("\n");
-  }
+  writePS("%%%%BeginResource: font %s\n", psName);
+  embFontList->append("%%+ font ");
+  embFontList->append(psName);
+  embFontList->append("\n");
 
   // copy the font file
   if (!(fontFile = fopen(fileName->getCString(), "rb"))) {
@@ -848,9 +841,7 @@ void PSOutputDev::setupEmbeddedType1Font(GString *fileName, const char *psName) 
   fclose(fontFile);
 
   // ending comment
-  if (psOutEPS) {
-    writePS("%%%%EndResource\n");
-  }
+  writePS("%%%%EndResource\n");
 }
 
 void PSOutputDev::setupEmbeddedType1CFont(GfxFont *font, Ref *id,
@@ -875,12 +866,10 @@ void PSOutputDev::setupEmbeddedType1CFont(GfxFont *font, Ref *id,
   fontFileIDs[fontFileIDLen++] = *id;
 
   // beginning comment
-  if (psOutEPS) {
-    writePS("%%%%BeginResource: font %s\n", psName);
-    embFontList->append("%%+ font ");
-    embFontList->append(psName);
-    embFontList->append("\n");
-  }
+  writePS("%%%%BeginResource: font %s\n", psName);
+  embFontList->append("%%+ font ");
+  embFontList->append(psName);
+  embFontList->append("\n");
 
   // convert it to a Type 1 font
   fontBuf = font->readEmbFontFile(&fontLen);
@@ -890,9 +879,7 @@ void PSOutputDev::setupEmbeddedType1CFont(GfxFont *font, Ref *id,
   gfree((void *)fontBuf);
 
   // ending comment
-  if (psOutEPS) {
-    writePS("%%%%EndResource\n");
-  }
+  writePS("%%%%EndResource\n");
 }
 
 void PSOutputDev::setupEmbeddedTrueTypeFont(GfxFont *font, Ref *id,
@@ -917,12 +904,10 @@ void PSOutputDev::setupEmbeddedTrueTypeFont(GfxFont *font, Ref *id,
   fontFileIDs[fontFileIDLen++] = *id;
 
   // beginning comment
-  if (psOutEPS) {
-    writePS("%%%%BeginResource: font %s\n", psName);
-    embFontList->append("%%+ font ");
-    embFontList->append(psName);
-    embFontList->append("\n");
-  }
+  writePS("%%%%BeginResource: font %s\n", psName);
+  embFontList->append("%%+ font ");
+  embFontList->append(psName);
+  embFontList->append("\n");
 
   // convert it to a Type 42 font
   fontBuf = font->readEmbFontFile(&fontLen);
@@ -932,9 +917,7 @@ void PSOutputDev::setupEmbeddedTrueTypeFont(GfxFont *font, Ref *id,
   gfree((void *)fontBuf);
 
   // ending comment
-  if (psOutEPS) {
-    writePS("%%%%EndResource\n");
-  }
+  writePS("%%%%EndResource\n");
 }
 
 void PSOutputDev::setupImages(Dict *resDict) {
