@@ -1,5 +1,5 @@
 /*
- * "$Id: admin.c,v 1.47 2004/02/25 20:14:51 mike Exp $"
+ * "$Id: admin.c,v 1.48 2004/02/26 16:36:02 mike Exp $"
  *
  *   Administration CGI for the Common UNIX Printing System (CUPS).
  *
@@ -119,6 +119,8 @@ main(int  argc,			/* I - Number of command-line arguments */
       do_printer_op(http, language, CUPS_REJECT_JOBS);
     else if (strcmp(op, "purge-jobs") == 0)
       do_printer_op(http, language, IPP_PURGE_JOBS);
+    else if (strcmp(op, "set-as-default") == 0)
+      do_printer_op(http, language, CUPS_SET_DEFAULT);
     else if (strcmp(op, "add-class") == 0)
       do_am_class(http, language, 0);
     else if (strcmp(op, "add-printer") == 0)
@@ -1545,6 +1547,8 @@ do_printer_op(http_t      *http,	/* I - HTTP connection */
     cgiCopyTemplateLang(stdout, TEMPLATES, "printer-reject.tmpl", getenv("LANG"));
   else if (op == IPP_PURGE_JOBS)
     cgiCopyTemplateLang(stdout, TEMPLATES, "printer-purge.tmpl", getenv("LANG"));
+  else if (op == CUPS_SET_DEFAULT)
+    cgiCopyTemplateLang(stdout, TEMPLATES, "printer-default.tmpl", getenv("LANG"));
 }
 
 
@@ -1597,5 +1601,5 @@ get_line(char *buf,	/* I - Line buffer */
 
 
 /*
- * End of "$Id: admin.c,v 1.47 2004/02/25 20:14:51 mike Exp $".
+ * End of "$Id: admin.c,v 1.48 2004/02/26 16:36:02 mike Exp $".
  */
