@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.71 2000/09/14 18:54:13 mike Exp $"
+ * "$Id: client.c,v 1.72 2000/09/26 13:55:42 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -214,6 +214,24 @@ CloseClient(client_t *con)	/* I - Client to close */
     FD_CLR(con->file, &InputSet);
     close(con->file);
     con->file = 0;
+  }
+
+  if (con->request)
+  {
+    ippDelete(con->request);
+    con->request = NULL;
+  }
+
+  if (con->response)
+  {
+    ippDelete(con->response);
+    con->response = NULL;
+  }
+
+  if (con->language)
+  {
+    cupsLangFree(con->language);
+    con->language = NULL;
   }
 
  /*
@@ -1789,5 +1807,5 @@ pipe_command(client_t *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.71 2000/09/14 18:54:13 mike Exp $".
+ * End of "$Id: client.c,v 1.72 2000/09/26 13:55:42 mike Exp $".
  */
