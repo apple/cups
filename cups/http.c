@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.43 1999/08/16 15:38:18 mike Exp $"
+ * "$Id: http.c,v 1.44 1999/08/18 20:06:31 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -862,13 +862,7 @@ httpGets(char   *line,			/* I - Line to read into */
 	* Nope, can't get a line this time...
 	*/
 
-        if (errno == EAGAIN || errno == EINTR)
-	{
-	  lasterror = errno;
-	  continue;
-	}
-
-        if (errno == EPIPE && lasterror != EPIPE)
+        if (errno != lasterror)
 	{
 	  lasterror = errno;
 	  continue;
@@ -1439,5 +1433,5 @@ http_send(http_t       *http,	/* I - HTTP data */
 
 
 /*
- * End of "$Id: http.c,v 1.43 1999/08/16 15:38:18 mike Exp $".
+ * End of "$Id: http.c,v 1.44 1999/08/18 20:06:31 mike Exp $".
  */
