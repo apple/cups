@@ -1,8 +1,12 @@
-CHANGES.txt - 06/29/2004
+CHANGES.txt - 07/02/2004
 ------------------------
 
 CHANGES IN CUPS V1.2.0b1
 
+	- The CUPS browsing protocol now offers a "delete" bit
+	  to remove printers as soon as they are deleted on the
+	  server or as soon as the server shuts down gracefully
+	  (STR #793)
 	- The CUPS_SERVER and ServerName directives (client.conf
 	  and ~/.cupsrc) may now contain names of the form
 	  "server:port" and "/path/to/domain/socket".

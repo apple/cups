@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.73.2.52 2004/06/29 17:48:52 mike Exp $"
+ * "$Id: dirsvc.c,v 1.73.2.53 2004/07/02 19:51:24 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -24,6 +24,7 @@
  * Contents:
  *
  *   ProcessBrowseData() - Process new browse data.
+ *   SendBrowseDelete()  - Send a "browse delete" message for a printer.
  *   SendBrowseList()    - Send new browsing information as necessary.
  *   SendCUPSBrowse()    - Send new browsing information using the CUPS protocol.
  *   StartBrowsing()     - Start sending and receiving broadcast information.
@@ -47,6 +48,11 @@
 
 #include "cupsd.h"
 #include <grp.h>
+
+
+#ifdef HAVE_LIBSLP
+void	SLPDeregPrinter(printer_t *p);
+#endif /* HAVE_LIBSLP */
 
 
 /*
@@ -163,6 +169,7 @@ ProcessBrowseData(const char   *uri,	/* I - URI of printer/class */
   */
 
   type   |= CUPS_PRINTER_REMOTE;
+  type   &= ~CUPS_PRINTER_IMPLICIT;
   update = 0;
   hptr   = strchr(host, '.');
   sptr   = strchr(ServerName, '.');
@@ -394,7 +401,12 @@ ProcessBrowseData(const char   *uri,	/* I - URI of printer/class */
     update = 1;
   }
 
-  if (update)
+  if (type & CUPS_PRINTER_DELETE)
+  {
+    DeletePrinter(p, 1);
+    UpdateImplicitClasses();
+  }
+  else if (update)
   {
     SetPrinterAttrs(p);
     UpdateImplicitClasses();
@@ -546,6 +558,39 @@ ProcessBrowseData(const char   *uri,	/* I - URI of printer/class */
       }
     }
   }
+}
+
+
+/*
+ * 'SendBrowseDelete()' - Send a "browse delete" message for a printer.
+ */
+
+void
+SendBrowseDelete(printer_t *p)		/* I - Printer to delete */
+{
+ /*
+  * Only announce if browsing is enabled...
+  */
+
+  if (!Browsing)
+    return;
+
+ /*
+  * First mark the printer for deletion...
+  */
+
+  p->type |= CUPS_PRINTER_DELETE;
+
+ /*
+  * Announce the deletion...
+  */
+
+  if (BrowseProtocols & BROWSE_CUPS)
+    SendCUPSBrowse(p);
+#ifdef HAVE_LIBSLP
+  if (BrowseProtocols & BROWSE_SLP)
+    SLPDeregPrinter(p);
+#endif /* HAVE_LIBSLP */
 }
 
 
@@ -1773,6 +1818,8 @@ SLPDeregPrinter(printer_t *p)
   char	srvurl[HTTP_MAX_URI];	/* Printer service URI */
 
 
+  LogMessage(L_DEBUG, "SLPDeregPrinter: printer=\"%s\"", printer->name);
+
   if((p->type & CUPS_PRINTER_REMOTE) == 0)
   {
    /*
@@ -2060,5 +2107,5 @@ UpdateSLPBrowse(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.73.2.52 2004/06/29 17:48:52 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.73.2.53 2004/07/02 19:51:24 mike Exp $".
  */

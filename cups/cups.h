@@ -1,5 +1,5 @@
 /*
- * "$Id: cups.h,v 1.32.2.17 2004/06/29 13:15:08 mike Exp $"
+ * "$Id: cups.h,v 1.32.2.18 2004/07/02 19:51:24 mike Exp $"
  *
  *   API definitions for the Common UNIX Printing System (CUPS).
  *
@@ -83,6 +83,7 @@ enum cups_ptype_e			/* Not a typedef'd enum so we can OR */
   CUPS_PRINTER_DEFAULT = 0x20000,	/* Default printer on network */
   CUPS_PRINTER_FAX = 0x40000,		/* Fax queue */
   CUPS_PRINTER_REJECTING = 0x80000,	/* Printer is rejecting jobs */
+  CUPS_PRINTER_DELETE = 0x100000,	/* Delete printer */
   CUPS_PRINTER_OPTIONS = 0x6fffc	/* ~(CLASS | REMOTE | IMPLICIT) */
 };
 
@@ -207,5 +208,5 @@ extern int		cupsSetDests2(http_t *http, int num_dests,
 #endif /* !_CUPS_CUPS_H_ */
 
 /*
- * End of "$Id: cups.h,v 1.32.2.17 2004/06/29 13:15:08 mike Exp $".
+ * End of "$Id: cups.h,v 1.32.2.18 2004/07/02 19:51:24 mike Exp $".
  */

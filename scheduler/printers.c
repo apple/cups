@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.93.2.64 2004/07/01 05:55:28 mike Exp $"
+ * "$Id: printers.c,v 1.93.2.65 2004/07/02 19:51:24 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -473,6 +473,10 @@ CreateCommonData(void)
 		NULL, holds);
   ippAddString(CommonData, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
                "job-hold-until-default", NULL, "no-hold");
+  attr = ippAddStrings(CommonData, IPP_TAG_PRINTER, IPP_TAG_NAME,
+                       "printer-policy-supported", NumPolicies, NULL, NULL);
+  for (i = 0; i < NumPolicies; i ++)
+    attr->values[i].string.text = strdup(Policies[i]->name);
 
   if (NumBanners > 0)
   {
@@ -633,11 +637,14 @@ DeletePrinter(printer_t *p,		/* I - Printer to delete */
   }
 
  /*
-  * Remove this printer from any classes...
+  * Remove this printer from any classes and send a browse delete message...
   */
 
   if (!(p->type & (CUPS_PRINTER_CLASS | CUPS_PRINTER_IMPLICIT)))
+  {
     DeletePrinterFromClasses(p);
+    SendBrowseDelete(p);
+  }
 
  /*
   * Free all memory used by the printer...
@@ -2470,5 +2477,5 @@ write_irix_state(printer_t *p)		/* I - Printer to update */
 
 
 /*
- * End of "$Id: printers.c,v 1.93.2.64 2004/07/01 05:55:28 mike Exp $".
+ * End of "$Id: printers.c,v 1.93.2.65 2004/07/02 19:51:24 mike Exp $".
  */

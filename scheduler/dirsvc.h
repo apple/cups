@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.h,v 1.12.2.10 2004/06/29 17:48:52 mike Exp $"
+ * "$Id: dirsvc.h,v 1.12.2.11 2004/07/02 19:51:24 mike Exp $"
  *
  *   Directory services definitions for the Common UNIX Printing System
  *   (CUPS) scheduler.
@@ -134,6 +134,7 @@ VAR time_t		BrowseSLPRefresh VALUE(0);
 extern void	ProcessBrowseData(const char *uri, cups_ptype_t type,
 		                  ipp_pstate_t state, const char *location,
 				  const char *info, const char *make_model);
+extern void	SendBrowseDelete(printer_t *p);
 extern void	SendBrowseList(void);
 extern void	SendCUPSBrowse(printer_t *p);
 extern void	SendSLPBrowse(printer_t *p);
@@ -147,5 +148,5 @@ extern void	UpdateSLPBrowse(void);
 
 
 /*
- * End of "$Id: dirsvc.h,v 1.12.2.10 2004/06/29 17:48:52 mike Exp $".
+ * End of "$Id: dirsvc.h,v 1.12.2.11 2004/07/02 19:51:24 mike Exp $".
  */
