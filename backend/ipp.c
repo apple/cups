@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.9 1999/08/21 19:28:06 mike Exp $"
+ * "$Id: ipp.c,v 1.10 1999/09/02 14:28:24 mike Exp $"
  *
  *   IPP backend for the Common UNIX Printing System (CUPS).
  *
@@ -336,6 +336,14 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
       }
     }
 
+   /*
+    * If we are chunking the output from stdin, make sure we end up with
+    * a 0-length chunk at the end...
+    */
+
+    if (fp == stdin)
+      httpWrite(http, buffer, 0);
+
     fputs("INFO: Print file sent; checking status...\n", stderr);
 
    /*
@@ -395,5 +403,5 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
 
 /*
- * End of "$Id: ipp.c,v 1.9 1999/08/21 19:28:06 mike Exp $".
+ * End of "$Id: ipp.c,v 1.10 1999/09/02 14:28:24 mike Exp $".
  */
