@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.12 1999/10/18 15:29:29 mike Exp $"
+ * "$Id: printers.c,v 1.13 1999/11/04 14:57:57 mike Exp $"
  *
  *   Printer status CGI for the Common UNIX Printing System (CUPS).
  *
@@ -109,8 +109,8 @@ main(int  argc,			/* I - Number of command-line arguments */
   puts("<AREA SHAPE=\"RECT\" COORDS=\"88,10,158,30\" HREF=\"/classes\" ALT=\"Current Printer Classes Status\">");
   puts("<AREA SHAPE=\"RECT\" COORDS=\"170,10,210,30\" HREF=\"/jobs\" ALT=\"Current Jobs Status\">");
   puts("<AREA SHAPE=\"RECT\" COORDS=\"222,10,354,30\" HREF=\"/documentation.html\" ALT=\"Read CUPS Documentation On-Line\">");
-  puts("<AREA SHAPE=\"RECT\" COORDS=\"366,10,442,30\" HREF=\"http://www.easysw.com/printpro/software.html\" ALT=\"Download the Current ESP Print Pro Software\">");
-  puts("<AREA SHAPE=\"RECT\" COORDS=\"454,10,530,30\" HREF=\"http://www.easysw.com/printpro/support.html\" ALT=\"Get Tech Support for Current ESP Print Pro\">");
+  puts("<AREA SHAPE=\"RECT\" COORDS=\"366,10,442,30\" HREF=\"http://www.easysw.com/software.html\" ALT=\"Download the Current ESP Print Pro Software\">");
+  puts("<AREA SHAPE=\"RECT\" COORDS=\"454,10,530,30\" HREF=\"http://www.easysw.com/support.html\" ALT=\"Get Tech Support for Current ESP Print Pro\">");
 #else
   puts("<AREA SHAPE=\"RECT\" COORDS=\"10,10,85,30\" HREF=\"/printers\" ALT=\"Current Printer Status\">");
   puts("<AREA SHAPE=\"RECT\" COORDS=\"95,10,175,30\" HREF=\"/classes\" ALT=\"Current Printer Classes Status\">");
@@ -484,5 +484,5 @@ show_printer_info(http_t      *http,
 
 
 /*
- * End of "$Id: printers.c,v 1.12 1999/10/18 15:29:29 mike Exp $".
+ * End of "$Id: printers.c,v 1.13 1999/11/04 14:57:57 mike Exp $".
  */
