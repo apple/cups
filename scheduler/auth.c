@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.c,v 1.48 2001/07/24 14:00:06 mike Exp $"
+ * "$Id: auth.c,v 1.49 2001/08/09 13:05:38 mike Exp $"
  *
  *   Authorization routines for the Common UNIX Printing System (CUPS).
  *
@@ -693,6 +693,14 @@ IsAuthorized(client_t *con)	/* I - Connection */
 
     auth = AUTH_ALLOW;
   }
+  else if (best->num_allow == 0 && best->num_deny == 0)
+  {
+   /*
+    * No allow/deny lines - allow access...
+    */
+
+    auth = AUTH_ALLOW;
+  }
   else
   {
    /*
@@ -1279,5 +1287,5 @@ pam_func(int                      num_msg,	/* I - Number of messages */
 
 
 /*
- * End of "$Id: auth.c,v 1.48 2001/07/24 14:00:06 mike Exp $".
+ * End of "$Id: auth.c,v 1.49 2001/08/09 13:05:38 mike Exp $".
  */
