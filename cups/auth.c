@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.c,v 1.1 2003/08/29 21:26:40 mike Exp $"
+ * "$Id: auth.c,v 1.1.2.1 2003/08/31 11:25:35 mike Exp $"
  *
  *   Authentication functions for the Common UNIX Printing System (CUPS).
  *
@@ -179,7 +179,7 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
   * See if we are accessing localhost...
   */
 
-  if (ntohl(http->hostaddr.sin_addr.s_addr) != 0x7f000001 &&
+  if (!httpAddrLocalhost(&http->hostaddr) &&
       strcasecmp(http->hostname, "localhost") != 0)
   {
     DEBUG_puts("cups_local_auth: Not a local connection!");
@@ -234,5 +234,5 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: auth.c,v 1.1 2003/08/29 21:26:40 mike Exp $".
+ * End of "$Id: auth.c,v 1.1.2.1 2003/08/31 11:25:35 mike Exp $".
  */
