@@ -75,6 +75,8 @@ zmatchmedia(register os_ptr op)
 	check_dict_read(*ppol);
 	check_array(*pkeys);
 	check_read(*pkeys);
+/**** MRS - This code 1) doesn't work, and 2) if it did work, why do we want it? ****/
+#if 0
 	switch ( code = dict_int_null_param(preq, "MediaPosition", 0, 0x7fff,
 					    0, &mepos) )
 	  {
@@ -91,6 +93,11 @@ zmatchmedia(register os_ptr op)
 	  case 1: orient = -1;
 	  case 0: ;
 	  }
+#else
+        mepos  = -1;
+	orient = -1;
+#endif /* 0 */
+
 	code = dict_int_param(ppol, "PolicyNotFound", 0, 7, 0,
 			      &policy_default);
 	if ( code < 0 )

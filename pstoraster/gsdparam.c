@@ -33,6 +33,7 @@
 
 /* Define whether we accept PageSize as a synonym for MediaSize. */
 /* This is for backward compatibility only. */
+/* MRS - This is for ADOBE POSTSCRIPT compatibility!!!! */
 #define PAGESIZE_IS_MEDIASIZE
 
 /* ================ Getting parameters ================ */

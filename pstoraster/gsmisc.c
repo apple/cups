@@ -163,6 +163,8 @@ gs_memset(void *dest, register int ch, size_t len)
 void *
 gs_realloc(void *old_ptr, size_t old_size, size_t new_size)
 {	void *new_ptr;
+	/**** MRS - 64-bit align all data structures!!!!!!!!!!! ****/
+	new_size = (new_size + 7) & ~7;
 	if ( new_size )
 	  { new_ptr = malloc(new_size);
 	    if ( new_ptr == NULL )

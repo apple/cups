@@ -394,6 +394,6 @@ void
 gx_device_set_media_size(gx_device *dev, floatp media_width, floatp media_height)
 {	dev->MediaSize[0] = media_width;
 	dev->MediaSize[1] = media_height;
-	dev->width = media_width * dev->x_pixels_per_inch / 72.0 + 0.499;
-	dev->height = media_height * dev->y_pixels_per_inch / 72.0 + 0.499;
+	dev->width = media_width * dev->x_pixels_per_inch / 72.0 + 0.5;
+	dev->height = media_height * dev->y_pixels_per_inch / 72.0 + 0.5;
 }

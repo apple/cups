@@ -40,13 +40,14 @@ long gs_buildtime = GS_BUILDTIME;
 
 #ifndef GS_COPYRIGHT
 #  define GS_COPYRIGHT\
-	"Copyright (C) 1996 Aladdin Enterprises, Menlo Park, CA.  All rights reserved."
+	"Copyright 1997-1999 Easy Software Products, All Rights Reserved.\n"\
+	"Copyright 1996 Aladdin Enterprises, Menlo Park, CA.  All rights reserved."
 #endif
 const char *gs_copyright = GS_COPYRIGHT;	
 
 #ifndef GS_PRODUCT
 #  define GS_PRODUCT\
-	"GNU Ghostscript"
+	"ESP Print PostScript RIP"
 #endif
 const char *gs_product = GS_PRODUCT;
 
@@ -59,13 +60,13 @@ long gs_revision = GS_REVISION;		/* should be const, see gscdefs.h */
 
 #ifndef GS_REVISIONDATE
 #  define GS_REVISIONDATE\
-	19980501	/* year x 10000 + month x 100 + day. */
+	19990507	/* year x 10000 + month x 100 + day. */
 #endif
 long gs_revisiondate = GS_REVISIONDATE;	/* should be const, see gscdefs.h */
 
 #ifndef GS_SERIALNUMBER
 #  define GS_SERIALNUMBER\
-	42		/* a famous number */
+	40000		/* MAJOR minor BBB (build) */
 #endif
 long gs_serialnumber = GS_SERIALNUMBER;	/* should be const, see gscdefs.h */
 

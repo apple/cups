@@ -115,8 +115,8 @@ struct malloc_block_s {
 	malloc_block_data;
 /* ANSI C does not allow zero-size arrays, so we need the following */
 /* unnecessary and wasteful workaround: */
-#define _npad (-sizeof(struct malloc_block_data_s) & 7)
-	byte _pad[(_npad == 0 ? 8 : _npad)];	/* pad to double */
+#define _npad (8 - (sizeof(struct malloc_block_data_s) & 7))
+	byte _pad[_npad];	/* pad to double */
 #undef _npad
 };
 
@@ -158,6 +158,9 @@ private byte *
 gs_heap_alloc_bytes(gs_memory_t *mem, uint size, client_name_t cname)
 {	byte *ptr;
 	const char *msg = "";
+	/**** MRS - 64-bit align all data structures!!!!!!!!!!! ****/
+	size = (size + 7) & ~7;
+
 	if ( size > max_uint - sizeof(malloc_block)
 	   )
 	   {	/* Can't represent the size in a uint! */
@@ -222,11 +225,9 @@ gs_heap_resize_object(gs_memory_t *mem, void *obj, uint new_num_elements,
 {	malloc_block *ptr = (malloc_block *)obj - 1;
 	gs_memory_type_ptr_t pstype = ptr->type;
 	uint old_size = gs_object_size(mem, obj) + sizeof(malloc_block);
-	uint new_size =
-	  gs_struct_type_size(pstype) * new_num_elements +
-	    sizeof(malloc_block);
-	malloc_block *new_ptr =
-	  (malloc_block *)gs_realloc(ptr, old_size, new_size);
+	uint new_size = gs_struct_type_size(pstype) * new_num_elements +
+			sizeof(malloc_block);
+	malloc_block *new_ptr = (malloc_block *)gs_realloc(ptr, old_size, new_size);
 
 	if ( new_ptr == 0 )
 	  return 0;

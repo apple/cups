@@ -276,6 +276,30 @@ extern gx_device_procs prn_std_procs;
   prn_device_margins_body(dtype, procs, dname, w10, h10, xdpi, ydpi,\
     lm, tm, lm, bm, rm, tm, ncomp, depth, mg, mc, dg, dc, print_page)
 
+#define prn_device_body_copies(dtype, procs, dname, w10, h10, xdpi, ydpi, lm, bm, rm, tm, ncomp, depth, mg, mc, dg, dc, print_pages)\
+	std_device_full_body(dtype, &procs, dname,\
+	  (int)((long)w10 * xdpi / 10),\
+	  (int)((long)h10 * ydpi / 10),\
+	  xdpi, ydpi,\
+	  ncomp, depth, mg, mc, dg, dc,\
+	  -(lm) * (xdpi), -(tm) * (ydpi),\
+	  (lm) * 72.0, (bm) * 72.0,\
+	  (rm) * 72.0, (tm) * 72.0\
+	),\
+	 { 0 },		/* std_procs */\
+	 { 0 },		/* skip */\
+	 { NULL,\
+	   print_pages,\
+	   gx_default_make_buffer_device\
+	 },\
+	PRN_MAX_BITMAP,\
+	PRN_BUFFER_SPACE,\
+	 { 0 },		/* fname */\
+	1, 0/*false*/,	/* NumCopies[_set] */\
+	0/*false*/,	/* OpenOutputFile */\
+	0/*false*/, -1,	/* Duplex[_set] */\
+	0/*false*/, 0, { 0 }, 0, { 0 }, 0, 0, 0, { 0 }	/* ... orig_procs */
+
 #define prn_device_std_margins_body(dtype, procs, dname, w10, h10, xdpi, ydpi, lo, to, lm, bm, rm, tm, color_bits, print_page)\
 	std_device_std_color_full_body(dtype, &procs, dname,\
 	  (int)((long)w10 * xdpi / 10),\

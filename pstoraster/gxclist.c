@@ -151,11 +151,13 @@ clist_open(gx_device *dev)
 	 */
 	byte *data = cdev->data;
 	uint size = cdev->data_size;
-#define alloc_data(n) data += (n), size -= (n)
+/**** MRS - 64-bit align all data structures! ****/
+#define alloc_data(n) data += ((n) + 7) & ~7, size -= ((n) + 7) & ~7
 	gx_device *target = cdev->target;
 	uint raster, nbands, band;
 	gx_clist_state *states;
 	ulong state_size;
+        static const gx_clist_state cls_initial = { cls_initial_values };
 
 	cdev->ymin = cdev->ymax = -1;	/* render_init not done yet */
 	{ uint bits_size = (size / 5) & -align_cached_bits_mod;	/* arbitrary */
@@ -217,10 +219,8 @@ clist_open(gx_device *dev)
 	cdev->cend = data + size;
 	cdev->ccl = 0;
 	cdev->all_band_list.head = cdev->all_band_list.tail = 0;
-	for ( band = 0; band < nbands; band++, states++ )
-	  { static const gx_clist_state cls_initial = { cls_initial_values };
-	    *states = cls_initial;
-	  }
+	for ( band = 0; band < nbands; band++)
+          *states++ = cls_initial;
 #undef alloc_data
 	/* Round up the size of the band mask so that */
 	/* the bits, which follow it, stay aligned. */

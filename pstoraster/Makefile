@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.3 1999/05/03 21:26:54 mike Exp $"
+# "$Id: Makefile,v 1.4 1999/05/07 14:38:48 mike Exp $"
 #
 #   GNU Ghostscript makefile for the Common UNIX Printing System (CUPS).
 #
@@ -37,9 +37,9 @@ include ../Makedefs
 OBJS	=	gconf.o gdevabuf.o gdevddrw.o gdevdflt.o gdevemap.o \
 		gdevm1.o gdevm16.o gdevm2.o gdevm24.o gdevm32.o \
 		gdevm4.o gdevm8.o gdevmem.o gdevmpla.o gdevmrop.o \
-		gdevnfwd.o gdevpipe.o gdevprn.o gdevx.o gdevxini.o \
-		gdevxxf.o gp_nofb.o gp_unifn.o gp_unifs.o gp_unix.o \
-		gs.o gsalloc.o gsbitops.o gsbittab.o gscdef.o gschar.o \
+		gdevnfwd.o gdevpipe.o gdevprn.o gp_nofb.o gp_unifn.o \
+		gp_unifs.o gp_unix.o \
+		gsalloc.o gsbitops.o gsbittab.o gscdef.o gschar.o \
 		gschar0.o gscie.o gscolor.o gscolor1.o gscolor2.o \
 		gscoord.o gscsepr.o gsdevice.o gsdevmem.o gsdparam.o \
 		gsdps1.o gsfont.o gsfont0.o gshsb.o gsht.o gsht1.o \
@@ -56,7 +56,7 @@ OBJS	=	gconf.o gdevabuf.o gdevddrw.o gdevdflt.o gdevemap.o \
 		gxpaint.o gxpath.o gxpath2.o gxpcmap.o gxpcopy.o \
 		gxpdash.o gxstroke.o ialloc.o ibnum.o iccinit0.o \
 		iconf.o idebug.o idict.o idparam.o igc.o igcref.o \
-		igcstr.o iinit.o ilocate.o imain.o imainarg.o iname.o \
+		igcstr.o iinit.o ilocate.o imain.o iname.o \
 		interp.o iparam.o ireclaim.o isave.o iscan.o iscanbin.o \
 		iscannum.o iscantab.o istack.o iutil.o iutil2.o sbcp.o \
 		sbhc.o sbwbs.o scfd.o scfdtab.o scfe.o scfetab.o \
@@ -77,13 +77,14 @@ OBJS	=	gconf.o gdevabuf.o gdevddrw.o gdevdflt.o gdevemap.o \
 		zpacked.o zpaint.o zpath.o zpath1.o zpcolor.o zrelbit.o \
 		zstack.o zstring.o zsysvm.o ztoken.o ztype.o zupath.o \
 		zusparam.o zvmem.o zvmem2.o \
-		gdevdjet.o gdevpcl.o
+		gdevcups.o pstoraster.o
+#		gdevx.o gdevxini.o gdevxxf.o gdevdjet.o gdevpcl.o
 
 #
 # Targets...
 #
 
-TARGETS		=	genarch arch.h gs
+TARGETS		=	genarch arch.h pstoraster
 
 #
 # Directories and paths for all GNU GhostScript data and support files...
@@ -117,15 +118,16 @@ arch.h:		genarch
 	./genarch arch.h
 
 #
-# gs - GhostScript interpreter
+# pstoraster - PostScript conversion filter.
 #
 
-gs:	$(OBJS) ../Makedefs ../cups/libcups.a ../jpeg/libjpeg.a ../zlib/libz.a
-	$(CC) $(LDFLAGS) -o gs $(OBJS) ../jpeg/libjpeg.a ../zlib/libz.a -lXt $(GUILIBS)
+pstoraster:	$(OBJS) ../Makedefs ../cups/libcups.a ../jpeg/libjpeg.a ../zlib/libz.a
+	$(CC) $(LDFLAGS) -o pstoraster $(OBJS) ../jpeg/libjpeg.a ../zlib/libz.a \
+		$(LIBS) -lm
 
 $(OBJS):	arch.h ../config.h ../Makedefs
 gconf.o iconf.o gscdef.o:	gconfig.h
 
 #
-# End of "$Id: Makefile,v 1.3 1999/05/03 21:26:54 mike Exp $".
+# End of "$Id: Makefile,v 1.4 1999/05/07 14:38:48 mike Exp $".
 #
