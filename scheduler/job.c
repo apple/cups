@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.91 2000/10/12 03:18:05 mike Exp $"
+ * "$Id: job.c,v 1.92 2000/10/16 20:40:16 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -1036,7 +1036,8 @@ StartJob(int       id,		/* I - Job ID */
   * See if the filter cost is too high...
   */
 
-  if ((FilterLevel + current->cost) > FilterLimit && FilterLevel > 0)
+  if ((FilterLevel + current->cost) > FilterLimit && FilterLevel > 0 &&
+      FilterLimit > 0)
   {
    /*
     * Don't print this job quite yet...
@@ -2576,5 +2577,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.91 2000/10/12 03:18:05 mike Exp $".
+ * End of "$Id: job.c,v 1.92 2000/10/16 20:40:16 mike Exp $".
  */
