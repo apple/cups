@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.80 2000/07/17 12:32:01 mike Exp $"
+ * "$Id: job.c,v 1.81 2000/08/03 16:30:47 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -1207,21 +1207,20 @@ StartJob(int       id,		/* I - Job ID */
 
   envp[0]  = "PATH=/bin:/usr/bin";
   envp[1]  = "SOFTWARE=CUPS/1.1";
-  envp[2]  = "TZ=GMT";
-  envp[3]  = "USER=root";
-  envp[4]  = charset;
-  envp[5]  = language;
-  envp[6]  = TZ;
-  envp[7]  = ppd;
-  envp[8]  = root;
-  envp[9]  = cache;
-  envp[10] = tmpdir;
-  envp[11] = content_type;
-  envp[12] = device_uri;
-  envp[13] = printer_name;
+  envp[2]  = "USER=root";
+  envp[3]  = charset;
+  envp[4]  = language;
+  envp[5]  = TZ;
+  envp[6]  = ppd;
+  envp[7]  = root;
+  envp[8]  = cache;
+  envp[9] = tmpdir;
+  envp[10] = content_type;
+  envp[11] = device_uri;
+  envp[12] = printer_name;
+  envp[13] = datadir;
   envp[14] = ldpath;
-  envp[15] = datadir;
-  envp[16] = NULL;
+  envp[15] = NULL;
 
   DEBUG_puts(envp[0]);
   DEBUG_puts(envp[1]);
@@ -1237,6 +1236,7 @@ StartJob(int       id,		/* I - Job ID */
   DEBUG_puts(envp[11]);
   DEBUG_puts(envp[12]);
   DEBUG_puts(envp[13]);
+  DEBUG_puts(envp[14]);
 
   current->current_file ++;
 
@@ -2568,5 +2568,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.80 2000/07/17 12:32:01 mike Exp $".
+ * End of "$Id: job.c,v 1.81 2000/08/03 16:30:47 mike Exp $".
  */
