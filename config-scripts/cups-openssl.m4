@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-openssl.m4,v 1.4.2.8 2003/01/24 19:19:41 mike Exp $"
+dnl "$Id: cups-openssl.m4,v 1.4.2.9 2003/01/28 13:36:47 mike Exp $"
 dnl
 dnl   OpenSSL/GNUTLS stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -39,7 +39,7 @@ SSLLIBS=""
 if test x$enable_ssl != xno; then
     dnl Check for the OpenSSL library first, which has precedence over
     dnl CDSA and GNUTLS...
-    if test "x${SSLLIBS}" == "x" -a "x${enable_openssl}" != "xno"; then
+    if test "x${SSLLIBS}" = "x" -a "x${enable_openssl}" != "xno"; then
 	AC_CHECK_HEADER(openssl/ssl.h,
 	    dnl Save the current libraries so the crypto stuff isn't always
 	    dnl included...
@@ -71,7 +71,7 @@ if test x$enable_ssl != xno; then
     fi
 
     dnl If OpenSSL wasn't found, look for CDSA...
-    if test "x${SSLLIBS}" == "x" -a "x${enable_cdsassl}" != "xno"; then
+    if test "x${SSLLIBS}" = "x" -a "x${enable_cdsassl}" != "xno"; then
 	if test $uname = Darwin; then
 	    AC_CHECK_HEADER(Security/SecureTransport.h,
 		[SSLLIBS="-framework CoreFoundation -framework Security"
@@ -81,7 +81,7 @@ if test x$enable_ssl != xno; then
     fi
 
     dnl Then look for GNU TLS...
-    if test "x${SSLLIBS}" == "x" -a "x${enable_gnutls}" != "xno"; then
+    if test "x${SSLLIBS}" = "x" -a "x${enable_gnutls}" != "xno"; then
 	AC_CHECK_HEADER(gnutls/gnutls.h,
 	    dnl Save the current libraries so the crypto stuff isn't always
 	    dnl included...
@@ -105,5 +105,5 @@ AC_SUBST(EXPORT_SSLLIBS)
 
 
 dnl
-dnl End of "$Id: cups-openssl.m4,v 1.4.2.8 2003/01/24 19:19:41 mike Exp $".
+dnl End of "$Id: cups-openssl.m4,v 1.4.2.9 2003/01/28 13:36:47 mike Exp $".
 dnl
