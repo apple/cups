@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.136 2003/01/15 04:15:48 mike Exp $"
+ * "$Id: client.c,v 1.137 2003/01/17 14:42:27 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -47,6 +47,7 @@
 
 #include "cupsd.h"
 #include <grp.h>
+#include <cups/http-private.h>
 
 
 /*
@@ -2754,5 +2755,5 @@ pipe_command(client_t *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.136 2003/01/15 04:15:48 mike Exp $".
+ * End of "$Id: client.c,v 1.137 2003/01/17 14:42:27 mike Exp $".
  */
