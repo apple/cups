@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.20 1999/06/18 18:36:46 mike Exp $"
+ * "$Id: dirsvc.c,v 1.21 1999/06/23 14:12:03 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -218,7 +218,7 @@ UpdateBrowseList(void)
     */
 
     if (strncmp(resource, "/classes/", 9) == 0)
-      sprintf(name, "%s@%s", resource + 9, host);
+      strcpy(name, resource + 9);
     else
       return;
 
@@ -228,16 +228,51 @@ UpdateBrowseList(void)
       * Class doesn't exist; add it...
       */
 
-      p = AddPrinter(name);
+      p = AddClass(name);
 
      /*
-      * First the URI to point to the real server...
+      * Force the URI to point to the real server...
       */
 
       strcpy(p->uri, uri);
       strcpy(p->device_uri, uri);
       free(p->attrs->attrs->values[0].string.text);
       p->attrs->attrs->values[0].string.text = strdup(uri);
+    }
+    else if (strcasecmp(p->hostname, host) != 0)
+    {
+     /*
+      * Nope, this isn't the same host; if the hostname isn't the local host,
+      * add it to the other class and then find a class using the full host
+      * name...
+      */
+
+      if (strcasecmp(p->hostname, ServerName) != 0)
+      {
+        strcat(p->name, "@");
+	strcat(p->name, p->hostname);
+      }
+
+      strcat(name, "@");
+      strcat(name, host);
+
+      if ((p = FindClass(name)) == NULL)
+      {
+       /*
+	* Class doesn't exist; add it...
+	*/
+
+	p = AddClass(name);
+
+       /*
+	* Force the URI to point to the real server...
+	*/
+
+	strcpy(p->uri, uri);
+	strcpy(p->device_uri, uri);
+	free(p->attrs->attrs->values[0].string.text);
+	p->attrs->attrs->values[0].string.text = strdup(uri);
+      }
     }
   }
   else
@@ -247,7 +282,7 @@ UpdateBrowseList(void)
     */
 
     if (strncmp(resource, "/printers/", 10) == 0)
-      sprintf(name, "%s@%s", resource + 10, host);
+      strcpy(name, resource + 10);
     else
       return;
 
@@ -267,6 +302,41 @@ UpdateBrowseList(void)
       strcpy(p->device_uri, uri);
       free(p->attrs->attrs->values[0].string.text);
       p->attrs->attrs->values[0].string.text = strdup(uri);
+    }
+    else if (strcasecmp(p->hostname, host) != 0)
+    {
+     /*
+      * Nope, this isn't the same host; if the hostname isn't the local host,
+      * add it to the other printer and then find a printer using the full host
+      * name...
+      */
+
+      if (strcasecmp(p->hostname, ServerName) != 0)
+      {
+        strcat(p->name, "@");
+	strcat(p->name, p->hostname);
+      }
+
+      strcat(name, "@");
+      strcat(name, host);
+
+      if ((p = FindPrinter(name)) == NULL)
+      {
+       /*
+	* Printer doesn't exist; add it...
+	*/
+
+	p = AddPrinter(name);
+
+       /*
+	* Force the URI to point to the real server...
+	*/
+
+	strcpy(p->uri, uri);
+	strcpy(p->device_uri, uri);
+	free(p->attrs->attrs->values[0].string.text);
+	p->attrs->attrs->values[0].string.text = strdup(uri);
+      }
     }
   }
 
@@ -349,9 +419,21 @@ UpdateBrowseList(void)
 	else
 	  len = strlen(p->name);
 
-        strcpy(name, "Any");
-        strncpy(name + 3, p->name, len);
-	name[len + 3] = '\0';
+        strncpy(name, p->name, len);
+	name[len] = '\0';
+
+	if (FindPrinter(name) != NULL)
+	{
+	 /*
+	  * Can't use same name as printer; add "Any" to the front of the
+	  * name...
+	  */
+
+          strcpy(name, "Any");
+          strncpy(name + 3, p->name, len);
+	  name[len + 3] = '\0';
+	}
+
 	first = p;
       }
     }
@@ -427,5 +509,5 @@ SendBrowseList(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.20 1999/06/18 18:36:46 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.21 1999/06/23 14:12:03 mike Exp $".
  */

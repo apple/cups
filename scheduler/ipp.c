@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.19 1999/06/19 13:15:17 mike Exp $"
+ * "$Id: ipp.c,v 1.20 1999/06/23 14:12:03 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -1131,7 +1131,6 @@ get_jobs(client_t        *con,		/* I - Client connection */
 					/* Job URI... */
 			printer_uri[HTTP_MAX_URI];
 					/* Printer URI... */
-  char			mimetype[255];	/* MIME type of document */
   struct stat		filestats;	/* Print file information */
 
 
@@ -1242,7 +1241,6 @@ get_jobs(client_t        *con,		/* I - Client connection */
     *    job-state
     *    job-uri
     *    job-name
-    *    document-format
     *
     * Note that we are supposed to look at the "requested-attributes"
     * attribute to determine what we send, however the IPP/1.0 spec also
@@ -1263,6 +1261,7 @@ get_jobs(client_t        *con,		/* I - Client connection */
 	      ntohs(con->http.hostaddr.sin_port), job->dest);
 
     ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_INTEGER, "job-id", job->id);
+
     ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_NAME, "job-name",
                   NULL, job->title);
 
@@ -1284,10 +1283,6 @@ get_jobs(client_t        *con,		/* I - Client connection */
 
     ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_URI,
                  "job-uri", NULL, job_uri);
-
-    sprintf(mimetype, "%s/%s", job->filetype->super, job->filetype->type);
-    ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_MIMETYPE,
-                 "document-format", NULL, mimetype);
 
     ippAddSeparator(con->response);
   }
@@ -1319,6 +1314,11 @@ get_job_attrs(client_t        *con,		/* I - Client connection */
 			resource[HTTP_MAX_URI];
 					/* Resource portion of URI */
   int			port;		/* Port portion of URI */
+  char			job_uri[HTTP_MAX_URI],
+					/* Job URI... */
+			printer_uri[HTTP_MAX_URI];
+					/* Printer URI... */
+  struct stat		filestats;	/* Print file information */
 
 
   DEBUG_printf(("get_job_attrs(%08x, %08x)\n", con, uri));
@@ -1379,6 +1379,44 @@ get_job_attrs(client_t        *con,		/* I - Client connection */
     send_ipp_error(con, IPP_NOT_FOUND);
     return;
   }
+
+ /*
+  * Put out the standard attributes...
+  */
+
+  sprintf(job_uri, "http://%s:%d/jobs/%d", ServerName,
+	  ntohs(con->http.hostaddr.sin_port), job->id);
+
+  if (job->dtype == CUPS_PRINTER_CLASS)
+    sprintf(printer_uri, "http://%s:%d/classes/%s", ServerName,
+	    ntohs(con->http.hostaddr.sin_port), job->dest);
+  else
+    sprintf(printer_uri, "http://%s:%d/printers/%s", ServerName,
+	    ntohs(con->http.hostaddr.sin_port), job->dest);
+
+  ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_INTEGER, "job-id", job->id);
+
+  ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_NAME, "job-name",
+                NULL, job->title);
+
+  stat(job->filename, &filestats);
+  ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_INTEGER,
+                "job-k-octets", (filestats.st_size + 1023) / 1024);
+
+  ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_URI,
+               "job-more-info", NULL, job_uri);
+
+  ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_NAME,
+               "job-originating-user-name", NULL, job->username);
+
+  ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_URI,
+               "job-printer-uri", NULL, printer_uri);
+
+  ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_ENUM,
+                "job-state", job->state);
+
+  ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_URI,
+               "job-uri", NULL, job_uri);
 
  /*
   * Copy the job attributes to the response using the requested-attributes
@@ -1577,8 +1615,10 @@ print_job(client_t        *con,		/* I - Client connection */
   mime_type_t		*filetype;	/* Type of file */
   char			super[MIME_MAX_SUPER],
 					/* Supertype of file */
-			type[MIME_MAX_TYPE];
+			type[MIME_MAX_TYPE],
 					/* Subtype of file */
+			mimetype[MIME_MAX_SUPER + MIME_MAX_TYPE + 2];
+					/* Textual name of mime type */
   printer_t		*printer;	/* Printer data */
 
 
@@ -1631,8 +1671,20 @@ print_job(client_t        *con,		/* I - Client connection */
   if (strcmp(super, "application") == 0 &&
       strcmp(type, "octet-stream") == 0)
   {
+   /*
+    * Auto-type the file...
+    */
+
     DEBUG_puts("print_job: auto-typing request using magic rules.");
     filetype = mimeFileType(MimeDatabase, con->filename);
+
+   /*
+    * Replace the document-format attribute value with the auto-typed one.
+    */
+
+    free(format->values[0].string.text);
+    sprintf(mimetype, "%s/%s", filetype->super, filetype->type);
+    format->values[0].string.text = strdup(mimetype);
   }
   else
     filetype = mimeType(MimeDatabase, super, type);
@@ -2258,5 +2310,5 @@ validate_job(client_t        *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.19 1999/06/19 13:15:17 mike Exp $".
+ * End of "$Id: ipp.c,v 1.20 1999/06/23 14:12:03 mike Exp $".
  */
