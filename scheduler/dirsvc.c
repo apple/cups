@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.29 1999/06/23 17:19:16 mike Exp $"
+ * "$Id: dirsvc.c,v 1.30 1999/06/24 12:41:17 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -172,6 +172,23 @@ UpdateBrowseList(void)
   * Read a packet from the browse socket...
   */
 
+#ifdef DEBUG
+  struct sockaddr_in	addr;
+  int			len;
+
+
+  len = sizeof(addr);
+  if ((bytes = recvfrom(BrowseSocket, packet, sizeof(packet), 0, &addr, &len)) <= 0)
+  {
+    LogMessage(LOG_ERROR, "UpdateBrowseList: recv failed - %s.",
+               strerror(errno));
+    return;
+  }
+
+  packet[bytes] = '\0';
+  printf("UpdateBrowseList: (%d bytes from %08x) %s", bytes,
+         ntohl(addr.sin_addr.s_addr), packet);
+#else
   if ((bytes = recv(BrowseSocket, packet, sizeof(packet), 0)) <= 0)
   {
     LogMessage(LOG_ERROR, "UpdateBrowseList: recv failed - %s.",
@@ -180,7 +197,7 @@ UpdateBrowseList(void)
   }
 
   packet[bytes] = '\0';
-  DEBUG_printf(("UpdateBrowseList: (%d bytes) %s", bytes, packet));
+#endif /* DEBUG */
 
   if (sscanf(packet, "%x%x%s", &type, &state, uri) != 3)
   {
@@ -202,8 +219,6 @@ UpdateBrowseList(void)
   * OK, this isn't a local printer; see if we already have it listed in
   * the Printers list, and add it if not...
   */
-
-  type |= CUPS_PRINTER_REMOTE;
 
   hptr = strchr(host, '.');
   sptr = strchr(ServerName, '.');
@@ -234,7 +249,7 @@ UpdateBrowseList(void)
 	  * name...
 	  */
 
-	  if (strcasecmp(p->hostname, ServerName) != 0)
+	  if (p->type & CUPS_PRINTER_REMOTE)
 	  {
             strcat(p->name, "@");
 	    strcat(p->name, p->hostname);
@@ -289,7 +304,7 @@ UpdateBrowseList(void)
 	  * name...
 	  */
 
-	  if (strcasecmp(p->hostname, ServerName) != 0)
+	  if (p->type & CUPS_PRINTER_REMOTE)
 	  {
             strcat(p->name, "@");
 	    strcat(p->name, p->hostname);
@@ -369,7 +384,10 @@ UpdateBrowseList(void)
 	*/
 
         if ((pclass = FindClass(name)) == NULL)
+	{
 	  pclass = AddClass(name);
+	  pclass->type |= CUPS_PRINTER_IMPLICIT;
+	}
 
         if (first != NULL)
 	{
@@ -467,7 +485,7 @@ SendBrowseList(void)
       if (p->browse_time < to)
         DeletePrinter(p);
     }
-    else if (p->browse_time < ut)
+    else if (p->browse_time < ut && !(p->type & CUPS_PRINTER_IMPLICIT))
     {
      /*
       * Need to send an update...
@@ -495,5 +513,5 @@ SendBrowseList(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.29 1999/06/23 17:19:16 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.30 1999/06/24 12:41:17 mike Exp $".
  */
