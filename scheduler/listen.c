@@ -1,5 +1,5 @@
 /*
- * "$Id: listen.c,v 1.9.2.9 2003/03/31 16:48:27 mike Exp $"
+ * "$Id: listen.c,v 1.9.2.10 2003/03/31 19:20:16 mike Exp $"
  *
  *   Server listening routines for the Common UNIX Printing System (CUPS)
  *   scheduler.
@@ -179,7 +179,15 @@ StartListening(void)
     * Bind to the port we found...
     */
 
-    if (bind(lis->fd, (struct sockaddr *)&(lis->address), sizeof(lis->address)) < 0)
+#ifdef AF_INET6
+    if (bind(lis->fd, (struct sockaddr *)&(lis->address),
+	     lis->address.addr.sa_family == AF_INET ?
+		 sizeof(lis->address.ipv4) :
+		 sizeof(lis->address.ipv6)) < 0)
+#else
+    if (bind(lis->fd, (struct sockaddr *)&(lis->address),
+             sizeof(lis->address.ipv4)) < 0)
+#endif
     {
       LogMessage(L_ERROR, "StartListening: Unable to bind socket - %s.",
                  strerror(errno));
@@ -227,5 +235,5 @@ StopListening(void)
 
 
 /*
- * End of "$Id: listen.c,v 1.9.2.9 2003/03/31 16:48:27 mike Exp $".
+ * End of "$Id: listen.c,v 1.9.2.10 2003/03/31 19:20:16 mike Exp $".
  */

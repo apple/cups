@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.73.2.28 2003/03/14 21:43:32 mike Exp $"
+ * "$Id: dirsvc.c,v 1.73.2.29 2003/03/31 19:20:15 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -633,6 +633,7 @@ SendCUPSBrowse(printer_t *p)		/* I - Printer to send */
 		   (struct sockaddr *)&(iface->broadcast),
 		   sizeof(struct sockaddr_in));
           }
+#ifdef AF_INET6
 	  else
 	  {
             iface->broadcast.ipv6.sin6_port = htons(BrowsePort);
@@ -641,6 +642,7 @@ SendCUPSBrowse(printer_t *p)		/* I - Printer to send */
 		   (struct sockaddr *)&(iface->broadcast),
 		   sizeof(struct sockaddr_in6));
           }
+#endif /* AF_INET6 */
         }
       }
       else if ((iface = NetIFFind(b->iface)) != NULL)
@@ -667,6 +669,7 @@ SendCUPSBrowse(printer_t *p)		/* I - Printer to send */
 		 (struct sockaddr *)&(iface->broadcast),
 		 sizeof(struct sockaddr_in));
         }
+#ifdef AF_INET6
 	else
 	{
           iface->broadcast.ipv6.sin6_port = htons(BrowsePort);
@@ -675,6 +678,7 @@ SendCUPSBrowse(printer_t *p)		/* I - Printer to send */
 		 (struct sockaddr *)&(iface->broadcast),
 		 sizeof(struct sockaddr_in6));
         }
+#endif /* AF_INET6 */
       }
     }
     else
@@ -691,11 +695,17 @@ SendCUPSBrowse(printer_t *p)		/* I - Printer to send */
       bytes = strlen(packet);
       LogMessage(L_DEBUG2, "SendBrowseList: (%d bytes) %s", bytes, packet);
 
+#ifdef AF_INET6
       if (sendto(BrowseSocket, packet, bytes, 0,
 		 (struct sockaddr *)&(b->to),
 		 b->to.addr.sa_family == AF_INET ?
 		     sizeof(struct sockaddr_in) :
 		     sizeof(struct sockaddr_in6)) <= 0)
+#else
+      if (sendto(BrowseSocket, packet, bytes, 0,
+		 (struct sockaddr *)&(b->to),
+		 sizeof(struct sockaddr_in)) <= 0)
+#endif /* AF_INET6 */
       {
        /*
         * Unable to send browse packet, so remove this address from the
@@ -1913,5 +1923,5 @@ UpdateSLPBrowse(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.73.2.28 2003/03/14 21:43:32 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.73.2.29 2003/03/31 19:20:15 mike Exp $".
  */

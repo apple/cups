@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.77.2.35 2003/03/31 16:48:26 mike Exp $"
+ * "$Id: conf.c,v 1.77.2.36 2003/03/31 19:20:14 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -2015,7 +2015,7 @@ get_address(const char  *value,		/* I - Value string */
         address->ipv6.sin6_port = htons(atoi(portname));
       else
 #endif /* AF_INET6 */
-      address->ipv6.sin6_port = htons(atoi(portname));
+      address->ipv4.sin_port = htons(atoi(portname));
     }
     else
     {
@@ -2032,7 +2032,7 @@ get_address(const char  *value,		/* I - Value string */
           address->ipv6.sin6_port = htons(port->s_port);
 	else
 #endif /* AF_INET6 */
-	address->ipv6.sin6_port = htons(port->s_port);
+	address->ipv4.sin_port = htons(port->s_port);
       }
     }
   }
@@ -2261,5 +2261,5 @@ CDSAGetServerCerts(void)
 
 
 /*
- * End of "$Id: conf.c,v 1.77.2.35 2003/03/31 16:48:26 mike Exp $".
+ * End of "$Id: conf.c,v 1.77.2.36 2003/03/31 19:20:14 mike Exp $".
  */

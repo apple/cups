@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.82.2.29 2003/03/13 05:45:28 mike Exp $"
+ * "$Id: http.c,v 1.82.2.30 2003/03/31 19:20:11 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS).
  *
@@ -535,8 +535,15 @@ httpReconnect(http_t *http)	/* I - HTTP data */
   * Connect to the server...
   */
 
+#ifdef AF_INET6
   if (connect(http->fd, (struct sockaddr *)&(http->hostaddr),
-              sizeof(http->hostaddr)) < 0)
+	      http->hostaddr.addr.sa_family == AF_INET ?
+		  sizeof(http->hostaddr.ipv4) :
+		  sizeof(http->hostaddr.ipv6)) < 0)
+#else
+  if (connect(http->fd, (struct sockaddr *)&(http->hostaddr),
+              sizeof(http->hostaddr.ipv4)) < 0)
+#endif /* AF_INET6 */
   {
 #ifdef WIN32
     http->error  = WSAGetLastError();
@@ -2380,5 +2387,5 @@ CDSAWriteFunc(SSLConnectionRef connection,	/* I  - SSL/TLS connection */
 
 
 /*
- * End of "$Id: http.c,v 1.82.2.29 2003/03/13 05:45:28 mike Exp $".
+ * End of "$Id: http.c,v 1.82.2.30 2003/03/31 19:20:11 mike Exp $".
  */

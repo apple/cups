@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.c,v 1.41.2.21 2003/03/30 20:01:41 mike Exp $"
+ * "$Id: auth.c,v 1.41.2.22 2003/03/31 19:20:13 mike Exp $"
  *
  *   Authorization routines for the Common UNIX Printing System (CUPS).
  *
@@ -329,6 +329,7 @@ CheckAuth(unsigned   ip[4],	/* I - Client address */
 		     iface->mask.ipv4.sin_addr.s_addr))
 		  return (1);
               }
+#ifdef AF_INET6
 	      else
 	      {
 	       /*
@@ -344,6 +345,7 @@ CheckAuth(unsigned   ip[4],	/* I - Client address */
 		if (i == 4)
 		  return (1);
               }
+#endif /* AF_INET6 */
 	    }
 	  }
 	  else
@@ -365,6 +367,7 @@ CheckAuth(unsigned   ip[4],	/* I - Client address */
 		     iface->mask.ipv4.sin_addr.s_addr))
 		  return (1);
               }
+#ifdef AF_INET6
 	      else
 	      {
 	       /*
@@ -380,6 +383,7 @@ CheckAuth(unsigned   ip[4],	/* I - Client address */
 		if (i == 4)
 		  return (1);
               }
+#endif /* AF_INET6 */
 	    }
 	  }
 	  break;
@@ -1746,5 +1750,5 @@ to64(char          *s,	/* O - Output string */
 
 
 /*
- * End of "$Id: auth.c,v 1.41.2.21 2003/03/30 20:01:41 mike Exp $".
+ * End of "$Id: auth.c,v 1.41.2.22 2003/03/31 19:20:13 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: network.c,v 1.5.2.7 2003/01/07 18:27:26 mike Exp $"
+ * "$Id: network.c,v 1.5.2.8 2003/03/31 19:20:16 mike Exp $"
  *
  *   Network interface functions for the Common UNIX Printing System
  *   (CUPS) scheduler.
@@ -164,8 +164,11 @@ NetIFUpdate(void)
     */
 
     if (addr->ifa_addr == NULL ||
-        (addr->ifa_addr->sa_family != AF_INET &&
-	 addr->ifa_addr->sa_family != AF_INET6) ||
+        (addr->ifa_addr->sa_family != AF_INET
+#ifdef AF_INET6
+	 && addr->ifa_addr->sa_family != AF_INET6
+#endif
+	) ||
         addr->ifa_netmask == NULL || addr->ifa_name == NULL)
       continue;
 
@@ -197,6 +200,7 @@ NetIFUpdate(void)
       if (addr->ifa_dstaddr)
 	memcpy(&(temp->broadcast), addr->ifa_dstaddr, sizeof(struct sockaddr_in));
     }
+#ifdef AF_INET6
     else
     {
      /*
@@ -209,6 +213,7 @@ NetIFUpdate(void)
       if (addr->ifa_dstaddr)
 	memcpy(&(temp->broadcast), addr->ifa_dstaddr, sizeof(struct sockaddr_in6));
     }
+#endif /* AF_INET6 */
 
     if (!(addr->ifa_flags & IFF_POINTOPOINT) &&
         !httpAddrLocalhost(&(temp->address)))
@@ -479,5 +484,5 @@ freeifaddrs(struct ifaddrs *addrs)	/* I - Interface list to free */
 
 
 /*
- * End of "$Id: network.c,v 1.5.2.7 2003/01/07 18:27:26 mike Exp $".
+ * End of "$Id: network.c,v 1.5.2.8 2003/03/31 19:20:16 mike Exp $".
  */
