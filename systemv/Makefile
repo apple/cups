@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.10 1999/06/21 19:00:57 mike Exp $"
+# "$Id: Makefile,v 1.11 1999/07/08 14:23:06 mike Exp $"
 #
 #   System V commands makefile for the Common UNIX Printing System (CUPS).
 #
@@ -57,7 +57,7 @@ install:
 # accept
 #
 
-accept:	accept.o ../cups/libcups.a
+accept:	accept.o ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o accept accept.o $(LIBS)
 	-$(LN) accept disable
@@ -70,7 +70,7 @@ accept.o:	../cups/cups.h ../Makedefs
 # cancel
 #
 
-cancel:	cancel.o ../cups/libcups.a
+cancel:	cancel.o ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o cancel cancel.o $(LIBS)
 
@@ -80,7 +80,7 @@ cancel.o:	../cups/cups.h ../Makedefs
 # lp
 #
 
-lp:	lp.o ../cups/libcups.a
+lp:	lp.o ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o lp lp.o $(LIBS)
 
@@ -90,9 +90,9 @@ lp.o:	../cups/cups.h ../Makedefs
 # lpadmin
 #
 
-lpadmin:	lpadmin.o ../cups/libcups.a
+lpadmin:	lpadmin.o ../cups/$(LIBCUPS)
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o lpadmin lpadmin.o $(IMGLIBS)
+	$(CC) $(LDFLAGS) -o lpadmin lpadmin.o $(LIBZ) $(LIBS)
 
 lpadmin.o:	../cups/cups.h ../Makedefs
 
@@ -100,12 +100,12 @@ lpadmin.o:	../cups/cups.h ../Makedefs
 # lpstat
 #
 
-lpstat:	lpstat.o ../cups/libcups.a
+lpstat:	lpstat.o ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o lpstat lpstat.o $(LIBS)
 
 lpstat.o:	../cups/cups.h ../Makedefs
 
 #
-# End of "$Id: Makefile,v 1.10 1999/06/21 19:00:57 mike Exp $".
+# End of "$Id: Makefile,v 1.11 1999/07/08 14:23:06 mike Exp $".
 #
