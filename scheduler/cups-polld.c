@@ -1,5 +1,5 @@
 /*
- * "$Id: cups-polld.c,v 1.5.2.21 2004/07/06 00:35:31 mike Exp $"
+ * "$Id: cups-polld.c,v 1.5.2.22 2004/08/23 18:43:12 mike Exp $"
  *
  *   Polling daemon for the Common UNIX Printing System (CUPS).
  *
@@ -15,7 +15,7 @@
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
  *       44141 Airport View Drive, Suite 204
- *       Hollywood, Maryland 20636-3142 USA
+ *       Hollywood, Maryland 20636 USA
  *
  *       Voice: (301) 373-9600
  *       EMail: cups-info@cups.org
@@ -159,8 +159,6 @@ main(int  argc,				/* I - Number of command-line arguments */
     if (remain > 0) 
       sleep(remain);
   }
-
-  return (0);
 }
 
 
@@ -407,5 +405,5 @@ poll_server(http_t      *http,		/* I - HTTP connection */
 
 
 /*
- * End of "$Id: cups-polld.c,v 1.5.2.21 2004/07/06 00:35:31 mike Exp $".
+ * End of "$Id: cups-polld.c,v 1.5.2.22 2004/08/23 18:43:12 mike Exp $".
  */

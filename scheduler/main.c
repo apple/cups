@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c,v 1.57.2.66 2004/08/23 18:01:56 mike Exp $"
+ * "$Id: main.c,v 1.57.2.67 2004/08/23 18:43:12 mike Exp $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -237,8 +237,6 @@ main(int  argc,				/* I - Number of command-line arguments */
         fprintf(stderr, "cupsd: Child exited on signal %d!\n", WTERMSIG(i));
 	return (3);
       }
-
-      return (0);
     }
   }
 
@@ -1335,5 +1333,5 @@ usage(void)
 
 
 /*
- * End of "$Id: main.c,v 1.57.2.66 2004/08/23 18:01:56 mike Exp $".
+ * End of "$Id: main.c,v 1.57.2.67 2004/08/23 18:43:12 mike Exp $".
  */

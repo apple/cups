@@ -1,5 +1,5 @@
 /*
- * "$Id: type.c,v 1.11.2.14 2004/06/29 13:15:11 mike Exp $"
+ * "$Id: type.c,v 1.11.2.15 2004/08/23 18:43:12 mike Exp $"
  *
  *   MIME typing routines for the Common UNIX Printing System (CUPS).
  *
@@ -15,7 +15,7 @@
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
  *       44141 Airport View Drive, Suite 204
- *       Hollywood, Maryland 20636-3142 USA
+ *       Hollywood, Maryland 20636 USA
  *
  *       Voice: (301) 373-9600
  *       EMail: cups-info@cups.org
@@ -499,15 +499,15 @@ mimeAddTypeRule(mime_type_t *mt,	/* I - Type to add to */
 	    if (length[1] == 1)
 	      temp->value.charv = value[1][0];
 	    else
-	      temp->value.charv = strtol(value[1], NULL, 0);
+	      temp->value.charv = (char)strtol(value[1], NULL, 0);
 	    break;
 	case MIME_MAGIC_SHORT :
 	    temp->offset       = strtol(value[0], NULL, 0);
-	    temp->value.shortv = strtol(value[1], NULL, 0);
+	    temp->value.shortv = (short)strtol(value[1], NULL, 0);
 	    break;
 	case MIME_MAGIC_INT :
 	    temp->offset     = strtol(value[0], NULL, 0);
-	    temp->value.intv = strtol(value[1], NULL, 0);
+	    temp->value.intv = (int)strtol(value[1], NULL, 0);
 	    break;
 	case MIME_MAGIC_LOCALE :
 	    if (length[0] > (sizeof(temp->value.localev) - 1))
@@ -718,7 +718,7 @@ checkrules(const char   *filename,	/* I - Filename */
 	    */
 
             cupsFileSeek(fp, rules->offset);
-	    buflength = cupsFileRead(fp, buffer, sizeof(buffer));
+	    buflength = cupsFileRead(fp, (char *)buffer, sizeof(buffer));
 	    bufoffset = rules->offset;
 	  }
 
@@ -759,7 +759,7 @@ checkrules(const char   *filename,	/* I - Filename */
 	    */
 
             cupsFileSeek(fp, rules->offset);
-	    buflength = cupsFileRead(fp, buffer, sizeof(buffer));
+	    buflength = cupsFileRead(fp, (char *)buffer, sizeof(buffer));
 	    bufoffset = rules->offset;
 	  }
 
@@ -802,7 +802,7 @@ checkrules(const char   *filename,	/* I - Filename */
 	    */
 
             cupsFileSeek(fp, rules->offset);
-	    buflength = cupsFileRead(fp, buffer, sizeof(buffer));
+	    buflength = cupsFileRead(fp, (char *)buffer, sizeof(buffer));
 	    bufoffset = rules->offset;
 	  }
 
@@ -831,7 +831,7 @@ checkrules(const char   *filename,	/* I - Filename */
 	    */
 
             cupsFileSeek(fp, rules->offset);
-	    buflength = cupsFileRead(fp, buffer, sizeof(buffer));
+	    buflength = cupsFileRead(fp, (char *)buffer, sizeof(buffer));
 	    bufoffset = rules->offset;
 	  }
 
@@ -843,7 +843,7 @@ checkrules(const char   *filename,	/* I - Filename */
 	  if ((rules->offset + rules->length) > (bufoffset + buflength))
 	    result = 0;
 	  else
-            result = (strncasecmp(buffer + rules->offset - bufoffset,
+            result = (strncasecmp((char *)buffer + rules->offset - bufoffset,
 	                          rules->value.stringv, rules->length) == 0);
 	  break;
 
@@ -859,7 +859,7 @@ checkrules(const char   *filename,	/* I - Filename */
 	    */
 
             cupsFileSeek(fp, rules->offset);
-	    buflength = cupsFileRead(fp, buffer, sizeof(buffer));
+	    buflength = cupsFileRead(fp, (char *)buffer, sizeof(buffer));
 	    bufoffset = rules->offset;
 	  }
 
@@ -887,7 +887,7 @@ checkrules(const char   *filename,	/* I - Filename */
 	    */
 
             cupsFileSeek(fp, rules->offset);
-	    buflength = cupsFileRead(fp, buffer, sizeof(buffer));
+	    buflength = cupsFileRead(fp, (char *)buffer, sizeof(buffer));
 	    bufoffset = rules->offset;
 	  }
 
@@ -919,7 +919,7 @@ checkrules(const char   *filename,	/* I - Filename */
 	    */
 
             cupsFileSeek(fp, rules->offset);
-	    buflength = cupsFileRead(fp, buffer, sizeof(buffer));
+	    buflength = cupsFileRead(fp, (char *)buffer, sizeof(buffer));
 	    bufoffset = rules->offset;
 	  }
 
@@ -960,7 +960,7 @@ checkrules(const char   *filename,	/* I - Filename */
 	    */
 
             cupsFileSeek(fp, rules->offset);
-	    buflength = cupsFileRead(fp, buffer, sizeof(buffer));
+	    buflength = cupsFileRead(fp, (char *)buffer, sizeof(buffer));
 	    bufoffset = rules->offset;
 	  }
 
@@ -1128,5 +1128,5 @@ patmatch(const char *s,		/* I - String to match against */
 
 
 /*
- * End of "$Id: type.c,v 1.11.2.14 2004/06/29 13:15:11 mike Exp $".
+ * End of "$Id: type.c,v 1.11.2.15 2004/08/23 18:43:12 mike Exp $".
  */

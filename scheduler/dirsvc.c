@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.73.2.56 2004/08/18 17:49:19 mike Exp $"
+ * "$Id: dirsvc.c,v 1.73.2.57 2004/08/23 18:43:12 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -1265,7 +1265,7 @@ UpdateCUPSBrowse(void)
   int		auth;			/* Authorization status */
   int		len;			/* Length of name string */
   int		bytes;			/* Number of bytes left */
-  char		packet[1540],		/* Broadcast packet */
+  char		packet[1541],		/* Broadcast packet */
 		*pptr;			/* Pointer into packet */
   http_addr_t	srcaddr;		/* Source address */
   char		srcname[1024];		/* Source hostname */
@@ -1290,8 +1290,8 @@ UpdateCUPSBrowse(void)
   */
 
   len = sizeof(srcaddr);
-  if ((bytes = recvfrom(BrowseSocket, packet, sizeof(packet), 0, 
-                        (struct sockaddr *)&srcaddr, &len)) <= 0)
+  if ((bytes = recvfrom(BrowseSocket, packet, sizeof(packet) - 1, 0, 
+                        (struct sockaddr *)&srcaddr, &len)) < 0)
   {
    /*
     * "Connection refused" is returned under Linux if the destination port
@@ -2112,5 +2112,5 @@ UpdateSLPBrowse(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.73.2.56 2004/08/18 17:49:19 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.73.2.57 2004/08/23 18:43:12 mike Exp $".
  */

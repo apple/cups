@@ -1,5 +1,5 @@
 /*
- * "$Id: log.c,v 1.19.2.21 2004/06/29 13:15:11 mike Exp $"
+ * "$Id: log.c,v 1.19.2.22 2004/08/23 18:43:12 mike Exp $"
  *
  *   Log file routines for the Common UNIX Printing System (CUPS).
  *
@@ -15,7 +15,7 @@
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
  *       44141 Airport View Drive, Suite 204
- *       Hollywood, Maryland 20636-3142 USA
+ *       Hollywood, Maryland 20636 USA
  *
  *       Voice: (301) 373-9600
  *       EMail: cups-info@cups.org
@@ -120,7 +120,6 @@ LogMessage(int        level,		/* I - Log level */
 	   ...)				/* I - Additional args as needed */
 {
   int		len;			/* Length of message */
-  char		*ptr;			/* Pointer to message */
   va_list	ap;			/* Argument pointer */
   static const char levels[] =		/* Log levels... */
 		{
@@ -248,8 +247,6 @@ LogMessage(int        level,		/* I - Log level */
     len = vsnprintf(line, linesize, message, ap);
     va_end(ap);
   }
-
-  ptr = line;
 
   if (len >= linesize)
     len = linesize - 1;
@@ -528,5 +525,5 @@ check_log_file(cups_file_t **log,	/* IO - Log file */
 
 
 /*
- * End of "$Id: log.c,v 1.19.2.21 2004/06/29 13:15:11 mike Exp $".
+ * End of "$Id: log.c,v 1.19.2.22 2004/08/23 18:43:12 mike Exp $".
  */

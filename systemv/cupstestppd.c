@@ -1,5 +1,5 @@
 /*
- * "$Id: cupstestppd.c,v 1.1.2.33 2004/07/01 14:04:03 mike Exp $"
+ * "$Id: cupstestppd.c,v 1.1.2.34 2004/08/23 18:43:12 mike Exp $"
  *
  *   PPD test program for the Common UNIX Printing System (CUPS).
  *
@@ -15,7 +15,7 @@
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
  *       44141 Airport View Drive, Suite 204
- *       Hollywood, Maryland 20636-3142 USA
+ *       Hollywood, Maryland 20636 USA
  *
  *       Voice: (301) 373-9600
  *       EMail: cups-info@cups.org
@@ -75,7 +75,6 @@ main(int  argc,			/* I - Number of command-line arguments */
   const char	*ptr;		/* Pointer into string */
   int		files;		/* Number of files */
   int		verbose;	/* Want verbose output? */
-  int		relaxed;	/* Want relaxed testing? */
   int		status;		/* Exit status */
   int		errors;		/* Number of conformance errors */
   int		ppdversion;	/* PPD spec version in PPD file */
@@ -101,7 +100,6 @@ main(int  argc,			/* I - Number of command-line arguments */
   ppdSetConformance(PPD_CONFORM_STRICT);
 
   verbose = 0;
-  relaxed = 0;
   ppd     = NULL;
   files   = 0;
   status  = ERROR_NONE;
@@ -125,7 +123,6 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 	  case 'r' :			/* Relaxed mode */
               ppdSetConformance(PPD_CONFORM_RELAXED);
-	      relaxed = 1;
 	      break;
 
 	  case 'v' :			/* Verbose mode */
@@ -1236,5 +1233,5 @@ usage(void)
 
 
 /*
- * End of "$Id: cupstestppd.c,v 1.1.2.33 2004/07/01 14:04:03 mike Exp $".
+ * End of "$Id: cupstestppd.c,v 1.1.2.34 2004/08/23 18:43:12 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: cupsaddsmb.c,v 1.3.2.16 2004/08/19 21:02:55 mike Exp $"
+ * "$Id: cupsaddsmb.c,v 1.3.2.17 2004/08/23 18:43:12 mike Exp $"
  *
  *   "cupsaddsmb" command for the Common UNIX Printing System (CUPS).
  *
@@ -62,7 +62,7 @@ int	convert_ppd(const char *src, char *dst, int dstsize, ipp_t *info);
 int	do_samba_command(const char *command, const char *subcommand);
 int	export_dest(const char *dest);
 char	*ppd_gets(FILE *fp, char *buf, int  buflen);
-void	usage();
+void	usage(void);
 int	write_option(FILE *dstfp, int order, const char *name,
 	             const char *text, const char *attrname,
 	             ipp_attribute_t *suppattr, ipp_attribute_t *defattr,
@@ -821,7 +821,7 @@ ppd_gets(FILE *fp,			/* I - File to read from*/
  */
 
 void
-usage()
+usage(void)
 {
   puts("Usage: cupsaddsmb [options] printer1 ... printerN");
   puts("       cupsaddsmb [options] -a");
@@ -947,5 +947,5 @@ write_option(FILE            *dstfp,	/* I - PPD file */
 
 
 /*
- * End of "$Id: cupsaddsmb.c,v 1.3.2.16 2004/08/19 21:02:55 mike Exp $".
+ * End of "$Id: cupsaddsmb.c,v 1.3.2.17 2004/08/23 18:43:12 mike Exp $".
  */
