@@ -65,9 +65,9 @@ static char *prolog[] = {
   "  } for",
   "~123sn",
   "/pdfSetup {",
+#if 0 /* NOT FOR CUPS */
   "  3 1 roll 2 array astore",
   "  /setpagedevice where {",
-#if 0 /* NOT FOR CUPS */
   "    pop 3 dict begin",
   "      /PageSize exch def",
   "      /ImagingBBox null def",
