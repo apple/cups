@@ -1,5 +1,5 @@
 /*
- * "$Id: image.c,v 1.4 1998/07/07 13:04:52 mike Exp $"
+ * "$Id: image.c,v 1.5 1998/07/28 20:48:30 mike Exp $"
  *
  *   Base image support for espPrint, a collection of printer drivers.
  *
@@ -16,6 +16,12 @@
  * Revision History:
  *
  *   $Log: image.c,v $
+ *   Revision 1.5  1998/07/28 20:48:30  mike
+ *   Changed IMAGE_MAX_CACHE to RIP_MAX_CACHE.
+ *   Now compute minimum required tiles to avoid cache thrashing.
+ *   Fixed bug in flush_tile() - wasn't clearing cache pointer if tile wasn't
+ *   dirty.
+ *
  *   Revision 1.4  1998/07/07 13:04:52  mike
  *   OK, updated ImageSetMaxTiles() again, but this time we look at the
  *   IMAGE_MAX_CACHE environment variable and compute things that way.
@@ -35,6 +41,7 @@
  * Include necessary headers...
  */
 
+/*#define DEBUG*/
 #include "image.h"
 #include <unistd.h>
 #include <ctype.h>
@@ -100,7 +107,7 @@ ImageOpen(char *filename,
   * Load the image as appropriate...
   */
 
-  img->max_ics = TILE_DEFAULT;
+  img->max_ics = TILE_MINIMUM;
   img->xppi    = 128;
   img->yppi    = 128;
 
@@ -192,23 +199,23 @@ ImageSetMaxTiles(image_t *img,		/* I - Image to set */
                  int     max_tiles)	/* I - Number of tiles to cache */
 {
   int	cache_size,			/* Size of tile cache in bytes */
+	min_tiles,			/* Minimum number of tiles to cache */
 	max_size;			/* Maximum cache size in bytes */
   char	*cache_env,			/* Cache size environment variable */
 	cache_units[255];		/* Cache size units */
 
 
+  min_tiles = max(TILE_MINIMUM,
+                  1 + max((img->xsize + TILE_SIZE - 1) / TILE_SIZE,
+                          (img->ysize + TILE_SIZE - 1) / TILE_SIZE));
+
   if (max_tiles == 0)
-  {
     max_tiles = ((img->xsize + TILE_SIZE - 1) / TILE_SIZE) *
                 ((img->ysize + TILE_SIZE - 1) / TILE_SIZE);
 
-    if (max_tiles < TILE_DEFAULT)
-      max_tiles = TILE_DEFAULT;
-  };
-
   cache_size = max_tiles * TILE_SIZE * TILE_SIZE * ImageGetDepth(img);
 
-  if ((cache_env = getenv("IMAGE_MAX_CACHE")) != NULL)
+  if ((cache_env = getenv("RIP_MAX_CACHE")) != NULL)
   {
     switch (sscanf(cache_env, "%d%s", &max_size, cache_units))
     {
@@ -236,7 +243,14 @@ ImageSetMaxTiles(image_t *img,		/* I - Image to set */
   if (cache_size > max_size)
     max_tiles = max_size / TILE_SIZE / TILE_SIZE / ImageGetDepth(img);
 
+  if (max_tiles < min_tiles)
+    max_tiles = min_tiles;
+
   img->max_ics = max_tiles;
+
+#ifdef DEBUG
+  fprintf(stderr, "ImageSetMaxTiles: max_ics=%d...\n", img->max_ics);
+#endif /* DEBUG */
 }
 
 
@@ -501,6 +515,10 @@ get_tile(image_t *img,
     xtiles = (img->xsize + TILE_SIZE - 1) / TILE_SIZE;
     ytiles = (img->ysize + TILE_SIZE - 1) / TILE_SIZE;
 
+#ifdef DEBUG
+    fprintf(stderr, "get_tile: Creating tile array (%dx%d)\n", xtiles, ytiles);
+#endif /* DEBUG */
+
     img->tiles = calloc(sizeof(itile_t *), ytiles);
     tile       = calloc(sizeof(itile_t), xtiles * ytiles);
 
@@ -512,7 +530,7 @@ get_tile(image_t *img,
     };
   };
 
-  bpp   = img->colorspace < 0 ? -img->colorspace : img->colorspace;
+  bpp   = ImageGetDepth(img);
   tilex = x / TILE_SIZE;
   tiley = y / TILE_SIZE;
   x     &= (TILE_SIZE - 1);
@@ -524,6 +542,10 @@ get_tile(image_t *img,
   {
     if (img->num_ics < img->max_ics)
     {
+#ifdef DEBUG
+      fputs("get_tile: Allocating new cache tile...\n", stderr);
+#endif /* DEBUG */
+
       ic         = calloc(sizeof(ic_t) + bpp * TILE_SIZE * TILE_SIZE, 1);
       ic->pixels = ((ib_t *)ic) + sizeof(ic_t);
 
@@ -531,6 +553,10 @@ get_tile(image_t *img,
     }
     else
     {
+#ifdef DEBUG
+      fputs("get_tile: Flushing old cache tile...\n", stderr);
+#endif /* DEBUG */
+
       flush_tile(img);
       ic = img->first;
     };
@@ -540,13 +566,25 @@ get_tile(image_t *img,
 
     if (tile->pos >= 0)
     {
+#ifdef DEBUG
+      fprintf(stderr, "get_tile: loading cache tile from file position %d...\n",
+              tile->pos);
+#endif /* DEBUG */
+
       if (ftell(img->cachefile) != tile->pos)
-        fseek(img->cachefile, tile->pos, SEEK_SET);
+        if (fseek(img->cachefile, tile->pos, SEEK_SET))
+	  perror("get_tile:");
 
       fread(ic->pixels, bpp, TILE_SIZE * TILE_SIZE, img->cachefile);
     }
     else
+    {
+#ifdef DEBUG
+      fputs("get_tile: Clearing cache tile...\n", stderr);
+#endif /* DEBUG */
+
       memset(ic->pixels, 0, bpp * TILE_SIZE * TILE_SIZE);
+    };
   };
 
   if (ic == img->first)
@@ -576,15 +614,28 @@ flush_tile(image_t *img)
   itile_t	*tile;
 
 
-  bpp  = img->colorspace < 0 ? -img->colorspace : img->colorspace;
+
+#ifdef DEBUG
+  fprintf(stderr, "flush_tile(%08x)...\n", img);
+#endif /* DEBUG */
+
+  bpp  = ImageGetDepth(img);
   tile = img->first->tile;
 
   if (!tile->dirty)
+  {
+    tile->ic = NULL;
     return;
+  };
 
   if (img->cachefile == NULL)
   {
     tmpnam(img->cachename);
+
+#ifdef DEBUG
+    fprintf(stderr, "flush_tile: Creating cache file %s...\n", img->cachename);
+#endif /* DEBUG */
+
     if ((img->cachefile = fopen(img->cachename, "wb+")) == NULL)
     {
       fprintf(stderr, "flush_tile: Unable to create swap file - %s\n",
@@ -596,20 +647,28 @@ flush_tile(image_t *img)
   if (tile->pos >= 0)
   {
     if (ftell(img->cachefile) != tile->pos)
-      fseek(img->cachefile, tile->pos, SEEK_SET);
+      if (fseek(img->cachefile, tile->pos, SEEK_SET))
+        perror("flush_tile:");
   }
   else
   {
-    fseek(img->cachefile, 0, SEEK_END);
+    if (fseek(img->cachefile, 0, SEEK_END))
+      perror("flush_tile:");
+
     tile->pos = ftell(img->cachefile);
   };
 
-  fwrite(img->first->pixels, bpp, TILE_SIZE * TILE_SIZE, img->cachefile);
+#ifdef DEBUG
+  fprintf(stderr, "flush_tile: Wrote tile cache at position %d...\n",
+          tile->pos);
+#endif /* DEBUG */
+
+  fwrite(tile->ic->pixels, bpp, TILE_SIZE * TILE_SIZE, img->cachefile);
   tile->ic    = NULL;
   tile->dirty = 0;
 }
 
 
 /*
- * End of "$Id: image.c,v 1.4 1998/07/07 13:04:52 mike Exp $".
+ * End of "$Id: image.c,v 1.5 1998/07/28 20:48:30 mike Exp $".
  */
