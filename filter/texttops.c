@@ -1,5 +1,5 @@
 /*
- * "$Id: texttops.c,v 1.13 1999/03/23 20:10:20 mike Exp $"
+ * "$Id: texttops.c,v 1.14 1999/05/10 16:35:29 mike Exp $"
  *
  *   Text to PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -118,7 +118,6 @@ WriteProlog(char *title,	/* I - Title of job */
 {
   int		line;		/* Current output line */
   char		*charset;	/* Character set string */
-  char		*server_root;	/* SERVER_ROOT variable */
   char		filename[1024];	/* Glyph filenames */
   FILE		*fp;		/* Glyph files */
   int		ch, unicode;	/* Character values */
@@ -184,14 +183,9 @@ WriteProlog(char *title,	/* I - Title of job */
     * set definition...
     */
 
-    if ((server_root = getenv("SERVER_ROOT")) == NULL)
-      strcpy(filename, "../data/psglyphs");
-    else
-      sprintf(filename, "%s/data/psglyphs", server_root);
-
     memset(Glyphs, 0, sizeof(Glyphs));
 
-    if ((fp = fopen(filename, "r")) != NULL)
+    if ((fp = fopen(CUPS_DATADIR "/data/psglyphs", "r")) != NULL)
     {
       while (fscanf(fp, "%x%s", &unicode, glyph) == 2)
         Glyphs[unicode] = strdup(glyph);
@@ -203,10 +197,7 @@ WriteProlog(char *title,	/* I - Title of job */
     {
       memset(chars, 0, sizeof(chars));
 
-      if (server_root == NULL)
-        sprintf(filename, "../data/%s", charset + 4);
-      else
-        sprintf(filename, "%s/data/%s", server_root, charset + 4);
+      sprintf(filename, CUPS_DATADIR "/%s", charset + 4);
 
       if ((fp = fopen(filename, "r")) != NULL)
       {
@@ -574,5 +565,5 @@ write_string(int     col,	/* I - Start column */
 
 
 /*
- * End of "$Id: texttops.c,v 1.13 1999/03/23 20:10:20 mike Exp $".
+ * End of "$Id: texttops.c,v 1.14 1999/05/10 16:35:29 mike Exp $".
  */
