@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.82.2.45 2004/03/19 11:44:35 mike Exp $"
+ * "$Id: http.c,v 1.82.2.46 2004/03/19 22:19:44 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS).
  *
@@ -2009,6 +2009,7 @@ http_wait(http_t *http,			/* I - HTTP data */
 #endif /* !WIN32 */
   struct timeval	timeout;	/* Timeout */
   int			nfds;		/* Result from select() */
+  int			set_size;	/* Size of select set */
 
 
   DEBUG_printf(("http_wait(http=%p, msec=%d)\n", http, msec));
@@ -2057,7 +2058,11 @@ http_wait(http_t *http,			/* I - HTTP data */
 
     getrlimit(RLIMIT_NOFILE, &limit);
 
-    http->input_set = calloc(1, (limit.rlim_cur + 31) / 8);
+    set_size = (limit.rlim_cur + 31) / 8;
+    if (set_size < sizeof(fd_set))
+      set_size = sizeof(fd_set);
+
+    http->input_set = calloc(1, set_size);
 #endif /* WIN32 */
 
     if (!http->input_set)
@@ -2457,5 +2462,5 @@ CDSAWriteFunc(SSLConnectionRef connection,	/* I  - SSL/TLS connection */
 
 
 /*
- * End of "$Id: http.c,v 1.82.2.45 2004/03/19 11:44:35 mike Exp $".
+ * End of "$Id: http.c,v 1.82.2.46 2004/03/19 22:19:44 mike Exp $".
  */

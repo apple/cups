@@ -3,6 +3,8 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.21rc1
 
+	- The select() buffers are now allocated to be at least
+	  as large as sizeof(fd_set) (STR #639)
 	- The LPD backend now supports overriding the print job
 	  username via the device URI (STR #631)
 	- The scheduler did not handle an unknown MIME type when
