@@ -1,5 +1,5 @@
 /*
- * "$Id: image-gif.c,v 1.2 1998/07/28 20:48:30 mike Exp $"
+ * "$Id: image-gif.c,v 1.3 1998/09/10 15:39:35 mike Exp $"
  *
  *   GIF image routines for espPrint, a collection of printer drivers.
  *
@@ -16,12 +16,14 @@
  * Revision History:
  *
  *   $Log: image-gif.c,v $
- *   Revision 1.2  1998/07/28 20:48:30  mike
+ *   Revision 1.3  1998/09/10 15:39:35  mike
+ *   Fixed bug in interlaced GIF loading.
+ *
+ *   Revision 1.2  1998/07/28  20:48:30  mike
  *   Updated for HP-UX.
  *
  *   Revision 1.1  1998/02/19  20:43:33  mike
  *   Initial revision
- *
  */
 
 /*
@@ -73,7 +75,7 @@ ImageReadGIF(image_t *img,
   gif_cmap_t	cmap;		/* Colormap */
   int		i,		/* Looping var */
 		gray,		/* Grayscale image? */
-		ncolors,		/* Bits per pixel */
+		ncolors,	/* Bits per pixel */
 		transparent;	/* Transparent color index */
 
 
@@ -562,7 +564,7 @@ gif_read_image(FILE       *fp,		/* I - Input file */
 		ypasses[5] = { 0, 4, 2, 1, 999999 };
 
 
-  bpp       = img->colorspace < 0 ? -img->colorspace : img->colorspace;
+  bpp       = ImageGetDepth(img);
   pixels    = calloc(bpp, img->xsize);
   xpos      = 0;
   ypos      = 0;
@@ -599,7 +601,6 @@ gif_read_image(FILE       *fp,		/* I - Input file */
       if (interlace)
       {
         ypos += xpasses[pass];
-        temp += (xpasses[pass] - 1) * img->xsize * bpp;
 
         if (ypos >= img->ysize)
 	{
@@ -623,5 +624,5 @@ gif_read_image(FILE       *fp,		/* I - Input file */
 
 
 /*
- * End of "$Id: image-gif.c,v 1.2 1998/07/28 20:48:30 mike Exp $".
+ * End of "$Id: image-gif.c,v 1.3 1998/09/10 15:39:35 mike Exp $".
  */
