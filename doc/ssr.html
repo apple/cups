@@ -138,13 +138,14 @@ Adobe PostScript Language Reference, Third Edition.</A></LI>
 <LI>Device URIs are passed to backend filters in argv[0] and in an
  environment variable. Since device URIs can contain usernames and
  passwords it may be possible for a local user to gain access to a
- remote resource.</LI>
+ remote resource.
 <P>We recommend that any password-protected accounts used for remote
  printing have limited access priviledges so that the possible damages
  can be minimized.</P>
 <P>The device URI is &quot;sanitized&quot; (the username and password are removed)
  when sent to an IPP client so that a remote user cannot exploit this
  vulnerability.</P>
+</LI>
 </OL>
 <H1><A NAME="4">4 Remote Access Risks</A></H1>
 <P>Remote access risks are those that can be exploited without a local
@@ -155,36 +156,41 @@ Adobe PostScript Language Reference, Third Edition.</A></LI>
  of service attacks, including:</P>
 <OL>
 <LI>Establishing multiple connections to the server until the server
- will accept no more.</LI>
+ will accept no more.
 <P>This cannot be protected against by the current software. It is
  possible that future versions of the CUPS software could be configured
  to limit the number of connections allowed from a single host, however
  that still would not prevent a distributed attack.</P>
 <LI>Repeatedly opening and closing connections to the server as fast as
- possible.</LI>
+ possible.
 <P>There is no easy way of protecting against this in the CUPS software.
  If the attack is coming from outside the local network it might be
  possible to filter such an attack, however once the connection request
  has been received by the server it must at least accept the connection
  to find out who is connecting.</P>
-<LI>Flooding the network with broadcast packets on port 631.</LI>
+<LI>Flooding the network with broadcast packets on port 631.
 <P>It might be possible to disable browsing if this condition is
  detected by the CUPS software, however if there are large numbers of
  printers available on the network such an algorithm might think that an
  attack was occurring when instead a valid update was being received.</P>
 <LI>Sending partial IPP requests; specifically, sending part of an
- attribute value and then stopping transmission.</LI>
+ attribute value and then stopping transmission.
 <P>The current code is structured to read and write the IPP request data
  on-the-fly, so there is no easy way to protect against this for large
  attribute values.</P>
 <LI>Sending large/long print jobs to printers, preventing other users
- from printing.</LI>
+ from printing.
 <P>There are limited facilities for protecting against large print jobs
  (the <CODE>MaxRequestSize</CODE> attribute), however this will not
  protect printers from malicious users and print files that generate
  hundreds or thousands of pages. In general, we recommend restricting
  printer access to known hosts or networks, and adding user-level access
  control as needed for expensive printers.</P>
+</LI>
+</LI>
+</LI>
+</LI>
+</LI>
 </OL>
 <H2><A NAME="4_2">4.2 Security Breaches</A></H2>
 <P>The current CUPS server supports Basic, Digest, and local certificate

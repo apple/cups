@@ -1113,14 +1113,14 @@ VALIGN="TOP">0x4004</TD><TD VALIGN="TOP">Delete a printer.</TD></TR>
  on the underlying hardware. The parity value can be one of &quot;none&quot;,
  &quot;even&quot;, or &quot;odd&quot;. The flow value can be one of &quot;none&quot;, &quot;soft&quot; (XON/XOFF
  handshaking), &quot;hard&quot; or &quot;rts/cts&quot; (RTS/CTS handshaking), or &quot;dtrdsr&quot;
- (DTR/DSR handshaking).</LI>
+ (DTR/DSR handshaking).
 <P>The URI returned by CUPS-Get-Devices will contain the maximum baud
  rate supported by the device and the best type of flow control
  available (&quot;soft&quot; or &quot;hard&quot;).</P>
 <LI>&quot;network&quot; - The device-uri will be of the form
  &quot;method://[username:password@]hostname[:port]/[resource]&quot;, where method
  may be &quot;http&quot;, &quot;ipp&quot;, &quot;lpd&quot;, &quot;smb&quot;, or &quot;socket&quot; in the current
- implementation.</LI>
+ implementation.
 <P>The URI returned by CUPS-Get-Devices will only contain the method
  name followed by two slashes (&quot;method://&quot;). It is up to the client
  application to add the appropriate host and other information when
@@ -1129,6 +1129,8 @@ VALIGN="TOP">0x4004</TD><TD VALIGN="TOP">Delete a printer.</TD></TR>
  any username and password information stripped; the information is
  still stored and used by the server internally to perform any needed
  authentication.</P>
+</LI>
+</LI>
 </UL>
 <H2><A NAME="5_2">5.2 Job Template Attributes</A></H2>
 <H3><A NAME="5_2_1">5.2.1 blackplot (boolean)</A></H3>
