@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c,v 1.110 2003/08/01 14:58:40 mike Exp $"
+ * "$Id: ppd.c,v 1.111 2003/08/02 01:03:08 mike Exp $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -963,7 +963,7 @@ ppdOpen(FILE *fp)			/* I - File to read from */
       * Don't allow nesting of options...
       */
 
-      if (option)
+      if (option && ppd_conform == PPD_CONFORM_STRICT)
       {
         ppd_status = PPD_NESTED_OPEN_UI;
 
@@ -1030,12 +1030,14 @@ ppdOpen(FILE *fp)			/* I - File to read from */
         option->ui = PPD_UI_BOOLEAN;
       else if (string && strcmp(string, "PickOne") == 0)
         option->ui = PPD_UI_PICKONE;
-      else
+      else if (ppd_conform == PPD_CONFORM_STRICT)
       {
         ppd_status = PPD_BAD_OPEN_UI;
 
 	goto error;
       }
+      else
+        option->ui = PPD_UI_PICKONE;
 
       for (j = 0; j < ppd->num_attrs; j ++)
 	if (!strncmp(ppd->attrs[j]->name, "Default", 7) &&
@@ -1086,7 +1088,7 @@ ppdOpen(FILE *fp)			/* I - File to read from */
       * Don't allow nesting of options...
       */
 
-      if (option)
+      if (option && ppd_conform == PPD_CONFORM_STRICT)
       {
         ppd_status = PPD_NESTED_OPEN_UI;
 
@@ -2522,7 +2524,7 @@ ppd_read(FILE *fp,			/* I - File to read from */
 
       optptr = option;
 
-      while (*lineptr != '\0' && *lineptr != '\n' && *lineptr != ':' &&
+      while (*lineptr != '\0' && !isspace(*lineptr) && *lineptr != ':' &&
              *lineptr != '/')
       {
 	if (*lineptr <= ' ' || *lineptr > 126 ||
@@ -2537,11 +2539,14 @@ ppd_read(FILE *fp,			/* I - File to read from */
 
       *optptr = '\0';
 
-      if (!option[0] && ppd_conform == PPD_CONFORM_STRICT)
+      if (isspace(*lineptr) && ppd_conform == PPD_CONFORM_STRICT)
       {
         ppd_status = PPD_ILLEGAL_WHITESPACE;
 	return (0);
       }
+
+      while (isspace(*lineptr))
+	lineptr ++;
 
       mask |= PPD_OPTION;
 
@@ -2632,5 +2637,5 @@ ppd_read(FILE *fp,			/* I - File to read from */
 
 
 /*
- * End of "$Id: ppd.c,v 1.110 2003/08/01 14:58:40 mike Exp $".
+ * End of "$Id: ppd.c,v 1.111 2003/08/02 01:03:08 mike Exp $".
  */
