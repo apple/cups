@@ -1,5 +1,5 @@
 /*
- * "$Id: pstops.c,v 1.76 2002/03/09 15:41:22 mike Exp $"
+ * "$Id: pstops.c,v 1.77 2002/04/17 17:22:10 mike Exp $"
  *
  *   PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -349,8 +349,15 @@ main(int  argc,			/* I - Number of command-line arguments */
 
         if (strstr(line, "Landscape") != NULL && !(Orientation & 1))
 	{
-	  Orientation = 1;
+	  Orientation ++;
 	  UpdatePageVars();
+	  Orientation = 1;
+	}
+        else if (strstr(line, "Portrait") != NULL && (Orientation & 1))
+	{
+	  Orientation = 4 - Orientation;
+	  UpdatePageVars();
+	  Orientation = 0;
 	}
       }
       else if (strncmp(line, "%%Page:", 7) == 0 && level == 0)
@@ -1165,5 +1172,5 @@ start_nup(int number)	/* I - Page number */
 
 
 /*
- * End of "$Id: pstops.c,v 1.76 2002/03/09 15:41:22 mike Exp $".
+ * End of "$Id: pstops.c,v 1.77 2002/04/17 17:22:10 mike Exp $".
  */
