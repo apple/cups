@@ -53,6 +53,15 @@ CHANGES IN CUPS v1.1.3
 	- Added a new FontPath directive to cupsd.conf, and also
 	  a "--with-fontpath" option for the configure script to
 	  specify alternate font paths for pstoraster.
+	- The CUPS-move-job operation didn't update the
+	  job-printer-uri attribute.
+	- The scheduler only looked up printers and classes by
+	  name in IPP requests, instead of using the full URI.
+	  This caused problems with KUPS and friends with
+	  remote printers.
+	- The scheduler now handles better localization of
+	  hostnames (e.g. server is host.foo.com, remote is
+	  host.subfoo.foo.com, localized is not host.subfoo...)
 
 
 CHANGES IN CUPS v1.1.2
