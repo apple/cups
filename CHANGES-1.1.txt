@@ -3,6 +3,13 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.19
 
+	- When printing using the OutputOrder=Reverse option
+	  with duplexing, the output order is now truly
+	  reversed; the order of sub-pages when printing N-up is
+	  the same.
+	- The pstops filter did not always output the extra
+	  blank page when printing a document with an odd number
+	  of pages with duplexing enabled.
 	- The ippAddXYZ functions no longer allow the
 	  application to add less than 1 value.
 	- Fixed a URL rewrite bug in the web interface - local
