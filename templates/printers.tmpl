@@ -2,10 +2,10 @@
 <TABLE CELLPADDING="0" CELLSPACING="0" BORDER="0" WIDTH="100%">
 {[printer_name]
 <TR>
-	<TH BGCOLOR="#999966"><IMG SRC="/images/left.gif"></TH>
+	<TH BGCOLOR="#999966"><IMG SRC="/images/left.gif" ALT=""></TH>
 	<TH BGCOLOR="#999966"><A HREF="{printer_uri_supported}">{printer_name}</A></TH>
 	<TH BGCOLOR="#999966">{printer_make_and_model}</TH>
-	<TH><IMG SRC="/images/right.gif"></TH>
+	<TH><IMG SRC="/images/right.gif" ALT=""></TH>
 </TR>
 <TR>
 	<TD HEIGHT="4"></TD>
@@ -13,7 +13,7 @@
 <TR>
 	<TD></TD>
 	<TD VALIGN="TOP"><A HREF="{printer_uri_supported}">
-	<IMG SRC="../images/printer-{printer_state=3?idle:{printer_state=4?processing:stopped}}.gif" BORDER="0"></A>
+	<IMG SRC="../images/printer-{printer_state=3?idle:{printer_state=4?processing:stopped}}.gif" BORDER="0" ALT=""></A>
 	</TD>
 	<TD VALIGN="TOP">Description: {printer_info}<BR>
 	Location: {printer_location}<BR>
