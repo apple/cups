@@ -3,6 +3,8 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.16
 
+	- The scheduler now passes the SHLIB_PATH environment
+	  variable to child processes (HP-UX shared libraries)
 	- The scheduler now maps accesses from the loopback
 	  interface to "localhost".
 	- The cups-lpd mini-daemon sent a status code byte in
