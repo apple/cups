@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.88 2001/02/23 01:15:15 mike Exp $"
+ * "$Id: client.c,v 1.89 2001/03/01 18:10:41 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -308,7 +308,7 @@ CloseClient(client_t *con)	/* I - Client to close */
 
   if (con->http.fd > 0)
   {
-    LogMessage(L_DEBUG2, "CloseClient: Removing fd %d from InputSet...",
+    LogMessage(L_DEBUG2, "CloseClient: Removing fd %d from InputSet and OutputSet...",
                con->http.fd);
     close(con->http.fd);
     FD_CLR(con->http.fd, &InputSet);
@@ -336,6 +336,8 @@ CloseClient(client_t *con)	/* I - Client to close */
     }
 
     LogMessage(L_DEBUG2, "CloseClient() %d Closing data file %d.",
+               con->http.fd, con->file);
+    LogMessage(L_DEBUG2, "CloseClient() %d Removing fd %d from InputSet.",
                con->http.fd, con->file);
 
     FD_CLR(con->file, &InputSet);
@@ -1256,6 +1258,9 @@ SendCommand(client_t      *con,
   fcntl(con->file, F_SETFD, fcntl(con->file, F_GETFD) | FD_CLOEXEC);
 
   LogMessage(L_DEBUG2, "SendCommand: Adding fd %d to InputSet...", con->file);
+  LogMessage(L_DEBUG2, "SendCommand: Adding fd %d to OutputSet...",
+             con->http.fd);
+
   FD_SET(con->file, &InputSet);
   FD_SET(con->http.fd, &OutputSet);
 
@@ -1392,6 +1397,8 @@ SendFile(client_t    *con,
     return (0);
   if (httpPrintf(HTTP(con), "\r\n") < 0)
     return (0);
+
+  LogMessage(L_DEBUG2, "SendFile: Adding fd %d to OutputSet...", con->http.fd);
 
   FD_SET(con->http.fd, &OutputSet);
 
@@ -1571,6 +1578,9 @@ WriteClient(client_t *con)		/* I - Client connection */
     }
 
     con->http.state = HTTP_WAITING;
+
+    LogMessage(L_DEBUG2, "WriteClient() Removing fd %d from OutputSet...",
+               con->http.fd);
 
     FD_CLR(con->http.fd, &OutputSet);
 
@@ -2101,5 +2111,5 @@ pipe_command(client_t *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.88 2001/02/23 01:15:15 mike Exp $".
+ * End of "$Id: client.c,v 1.89 2001/03/01 18:10:41 mike Exp $".
  */

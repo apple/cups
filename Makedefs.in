@@ -1,5 +1,5 @@
 #
-# "$Id: Makedefs.in,v 1.35 2001/02/20 17:32:58 mike Exp $"
+# "$Id: Makedefs.in,v 1.36 2001/03/01 18:10:40 mike Exp $"
 #
 #   Common makefile definitions for the Common UNIX Printing System (CUPS).
 #
@@ -149,14 +149,14 @@ MAN8EXT		=	@MAN8EXT@
 #
 
 .SILENT:
-.SUFFIXES:	.a .c .cxx .h .man .o .0 .1 .5 .8 .z
+.SUFFIXES:	.a .c .cxx .h .man .o .0 .1 .1m .5 .8 .z
 .c.o:
 	echo Compiling $<...
 	$(CC) $(OPTIM) $(CFLAGS) -c $<
 .cxx.o:
 	echo Compiling $<...
 	$(CXX) $(OPTIM) $(CXXFLAGS) -c $<
-.man.0 .man.1 .man.5 .man.8:
+.man.0 .man.1 .man.1m .man.5 .man.8:
 	echo Formatting $<...
 	$(RM) $@
 	$(NROFF) -man $< >$@
@@ -168,5 +168,5 @@ MAN8EXT		=	@MAN8EXT@
 	$(MV) t.z $@
 
 #
-# End of "$Id: Makedefs.in,v 1.35 2001/02/20 17:32:58 mike Exp $"
+# End of "$Id: Makedefs.in,v 1.36 2001/03/01 18:10:40 mike Exp $"
 #
