@@ -1,5 +1,5 @@
 /*
- * "$Id: usb.c,v 1.30 2002/05/16 13:44:50 mike Exp $"
+ * "$Id: usb.c,v 1.31 2002/08/09 00:08:29 mike Exp $"
  *
  *   USB port backend for the Common UNIX Printing System (CUPS).
  *
@@ -433,32 +433,25 @@ list_devices(void)
 #elif defined(__sun)
 #elif defined(__hpux)
 #elif defined(__osf)
-#elif defined(__FreeBSD__)
+#elif defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
   int   i;                      /* Looping var */
   char  device[255];            /* Device filename */
 
 
-  for (i = 0; i < 3; i ++)
-  {
-    sprintf(device, "/dev/unlpt%d", i);
-    if (!access(device, 0))
-      printf("direct usb:%s \"Unknown\" \"USB Printer #%d\"\n", device, i + 1);
-  }
-#elif defined(__NetBSD__) || defined(__OpenBSD__)
-  int   i;                      /* Looping var */
-  char  device[255];            /* Device filename */
-
-
-  for (i = 0; i < 3; i ++)
+  for (i = 0; i < 8; i ++)
   {
     sprintf(device, "/dev/ulpt%d", i);
     if (!access(device, 0))
-      printf("direct usb:%s \"Unknown\" \"USB Printer #%d\"\n", device, i + 1);
+      printf("direct usb:%s \"Unknown\" \"USB Printer #%d (ulpt)\"\n", device, i + 1);
+
+    sprintf(device, "/dev/unlpt%d", i);
+    if (!access(device, 0))
+      printf("direct usb:%s \"Unknown\" \"USB Printer #%d\" (unlpt)\n", device, i + 1);
   }
 #endif
 }
 
 
 /*
- * End of "$Id: usb.c,v 1.30 2002/05/16 13:44:50 mike Exp $".
+ * End of "$Id: usb.c,v 1.31 2002/08/09 00:08:29 mike Exp $".
  */
