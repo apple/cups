@@ -5,6 +5,8 @@ CHANGES IN CUPS V1.1.15
 
 	- Updated the CUPS license agreement for the new MacOS
 	  license exception.
+	- Banner pages were not handled properly for implicit
+	  classes.
 	- When tunneling to a remote system using SSH, the
 	  printer URIs for local printers on the remote system
 	  did not reflect the correct port number.

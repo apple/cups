@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.149 2002/03/25 17:28:42 mike Exp $"
+ * "$Id: job.c,v 1.150 2002/03/28 16:58:49 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -1208,7 +1208,7 @@ StartJob(int       id,		/* I - Job ID */
                current->job_sheets->values[0].string.text,
                current->job_sheets->values[1].string.text);
 
-  if (printer->type & CUPS_PRINTER_REMOTE)
+  if (printer->type & (CUPS_PRINTER_REMOTE | CUPS_PRINTER_IMPLICIT))
     banner_page = 0;
   else if (current->job_sheets == NULL)
     banner_page = 0;
@@ -3042,5 +3042,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.149 2002/03/25 17:28:42 mike Exp $".
+ * End of "$Id: job.c,v 1.150 2002/03/28 16:58:49 mike Exp $".
  */
