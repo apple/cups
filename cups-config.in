@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# "$Id: cups-config.in,v 1.20 2003/04/10 20:43:56 mike Exp $"
+# "$Id: cups-config.in,v 1.21 2003/04/14 19:55:37 mike Exp $"
 # 
 #   CUPS configuration utility.
 #
@@ -23,7 +23,7 @@
 #         WWW: http://www.cups.org
 #
 
-VERSION="1.1.19rc1"
+VERSION="@CUPS_VERSION@"
 APIVERSION="1.1"
 
 prefix=@prefix@
@@ -130,5 +130,5 @@ while test $# -gt 0; do
 done
 
 #
-# End of "$Id: cups-config.in,v 1.20 2003/04/10 20:43:56 mike Exp $".
+# End of "$Id: cups-config.in,v 1.21 2003/04/14 19:55:37 mike Exp $".
 #
