@@ -7,5 +7,5 @@ for x in `cat class.list`; do
 	javac -d ../../../classes $x.java
 done
 echo Creating new cups.jar...
-jar cvf cups.jar ../../../../classes/org/cups
-mv -f cups.jar ../../../..
+jar cvf cups.jar ../../../classes/org/cups
+mv -f cups.jar ../../..
