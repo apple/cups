@@ -1,9 +1,9 @@
 dnl
-dnl "$Id: cups-libtool.m4,v 1.5 2002/12/17 18:56:39 swdev Exp $"
+dnl "$Id: cups-libtool.m4,v 1.6 2004/02/26 16:52:00 mike Exp $"
 dnl
 dnl   Libtool stuff for the Common UNIX Printing System (CUPS).
 dnl
-dnl   Copyright 1997-2003 by Easy Software Products, all rights reserved.
+dnl   Copyright 1997-2004 by Easy Software Products, all rights reserved.
 dnl
 dnl   These coded instructions, statements, and computer programs are the
 dnl   property of Easy Software Products and are protected by Federal
@@ -45,5 +45,5 @@ if test x$LIBTOOL != x; then
 fi
 
 dnl
-dnl End of "$Id: cups-libtool.m4,v 1.5 2002/12/17 18:56:39 swdev Exp $".
+dnl End of "$Id: cups-libtool.m4,v 1.6 2004/02/26 16:52:00 mike Exp $".
 dnl

@@ -1,5 +1,5 @@
 #
-# "$Id: cups.list.in,v 1.52 2004/02/26 16:07:02 mike Exp $"
+# "$Id: cups.list.in,v 1.53 2004/02/26 16:51:59 mike Exp $"
 #
 #   ESP Package Manager (EPM) file list for the Common UNIX Printing
 #   System (CUPS).
@@ -300,17 +300,7 @@ c 0600 root sys $SERVERROOT/mime.types conf/mime.types
 
 %if PAMDIR
 d 0555 root sys $PAMDIR -
-
-%system linux
-# Linux almost always supports PAM...
-c 0644 root sys $PAMDIR/cups conf/pam.conf
-
-%system irix
-# IRIX doesn't normally support PAM, but the freeware project
-# includes a version of PAM that can be used...
-c 0644 root sys $PAMDIR/cups conf/pam.irix
-
-%system all
+c 0644 root sys $PAMDIR/cups conf/@PAMFILE@
 %endif
 
 # Developer files
@@ -505,5 +495,5 @@ f 0444 root sys $AMANDIR/fr/man$MAN8DIR/lpmove.$MAN8EXT man/lpmove.man
 i 0555 root sys cups cups.sh
 
 #
-# End of "$Id: cups.list.in,v 1.52 2004/02/26 16:07:02 mike Exp $".
+# End of "$Id: cups.list.in,v 1.53 2004/02/26 16:51:59 mike Exp $".
 #

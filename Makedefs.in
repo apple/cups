@@ -1,5 +1,5 @@
 #
-# "$Id: Makedefs.in,v 1.63 2004/02/25 20:14:50 mike Exp $"
+# "$Id: Makedefs.in,v 1.64 2004/02/26 16:51:59 mike Exp $"
 #
 #   Common makefile definitions for the Common UNIX Printing System (CUPS).
 #
@@ -145,7 +145,6 @@ LIBDIR		=	$(BUILDROOT)$(libdir)
 LOCALEDIR	= 	$(BUILDROOT)@CUPS_LOCALEDIR@
 LOGDIR		= 	$(BUILDROOT)@CUPS_LOGDIR@
 MANDIR		=	$(BUILDROOT)@mandir@
-PAMDIR		=	$(BUILDROOT)@PAMDIR@
 PMANDIR		=	$(BUILDROOT)@PMANDIR@
 REQUESTS	= 	$(BUILDROOT)@CUPS_REQUESTS@
 SBINDIR		=	$(BUILDROOT)@sbindir@
@@ -158,6 +157,10 @@ CAT5EXT		=	@CAT5EXT@
 CAT8EXT		=	@CAT8EXT@
 MAN8EXT		=	@MAN8EXT@
 MAN8DIR		=	@MAN8DIR@
+
+PAMDIR		=	$(BUILDROOT)@PAMDIR@
+PAMFILE		=	@PAMFILE@
+
 
 #
 # Rules...
@@ -184,5 +187,5 @@ MAN8DIR		=	@MAN8DIR@
 
 
 #
-# End of "$Id: Makedefs.in,v 1.63 2004/02/25 20:14:50 mike Exp $"
+# End of "$Id: Makedefs.in,v 1.64 2004/02/26 16:51:59 mike Exp $"
 #
