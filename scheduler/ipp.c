@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.127.2.76 2004/02/03 04:08:18 mike Exp $"
+ * "$Id: ipp.c,v 1.127.2.77 2004/02/04 20:15:11 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -3344,15 +3344,48 @@ delete_printer(client_t        *con,	/* I - Client connection */
 static void
 get_default(client_t *con)		/* I - Client connection */
 {
-  LogMessage(L_DEBUG2, "get_default(%d)\n", con->http.fd);
+  int			i;		/* Looping var */
+  ipp_attribute_t	*requested,	/* requested-attributes */
+			*history;	/* History collection */
+  int			need_history;	/* Need to send history collection? */
+
+
+  LogMessage(L_DEBUG2, "get_default(%p[%d])\n", con, con->http.fd);
 
   if (DefaultPrinter != NULL)
   {
-    copy_attrs(con->response, DefaultPrinter->attrs,
-               ippFindAttribute(con->request, "requested-attributes",
-	                	IPP_TAG_KEYWORD), IPP_TAG_ZERO, 0);
+    requested = ippFindAttribute(con->request, "requested-attributes",
+	                	 IPP_TAG_KEYWORD);
 
-    con->response->request.status.status_code = IPP_OK;
+    copy_attrs(con->response, DefaultPrinter->attrs, requested, IPP_TAG_ZERO, 0);
+    copy_attrs(con->response, CommonData, requested, IPP_TAG_ZERO, IPP_TAG_COPY);
+
+    need_history = 0;
+
+    if (MaxPrinterHistory > 0 && DefaultPrinter->num_history > 0 && requested)
+    {
+      for (i = 0; i < requested->num_values; i ++)
+	if (!strcmp(requested->values[i].string.text, "all") ||
+            !strcmp(requested->values[i].string.text, "printer-state-history"))
+	{
+          need_history = 1;
+          break;
+	}
+    }
+
+    if (need_history)
+    {
+      history = ippAddCollections(con->response, IPP_TAG_PRINTER,
+                                  "printer-state-history",
+                                  DefaultPrinter->num_history, NULL);
+
+      for (i = 0; i < DefaultPrinter->num_history; i ++)
+	copy_attrs(history->values[i].collection = ippNew(),
+	           DefaultPrinter->history[i],
+                   NULL, IPP_TAG_ZERO, 0);
+    }
+
+    con->response->request.status.status_code = requested ? IPP_OK_SUBST : IPP_OK;
   }
   else
     con->response->request.status.status_code = IPP_NOT_FOUND;
@@ -6865,5 +6898,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.127.2.76 2004/02/03 04:08:18 mike Exp $".
+ * End of "$Id: ipp.c,v 1.127.2.77 2004/02/04 20:15:11 mike Exp $".
  */
