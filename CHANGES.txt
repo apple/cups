@@ -169,6 +169,12 @@ CHANGES IN CUPS V1.1.7
 	  driver.
 	- Fixed the debugging output from pstoraster - the
 	  font list was not terminated by a newline.
+	- Some versions of the HP-UX pam_unix authentication
+	  module apparently do not pass the appdata_ptr argument
+	  to the conversation function, preventing the scheduler
+	  from authenticating users using PAM under HP-UX.  A
+	  workaround using a static variable has been added to
+	  address this problem.
 
 
 CHANGES IN CUPS V1.1.6-3
