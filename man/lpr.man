@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: lpr.man,v 1.1 2000/02/23 03:17:05 mike Exp $"
+.\" "$Id: lpr.man,v 1.2 2000/07/20 17:10:57 mike Exp $"
 .\"
 .\"   lpr man page for the Common UNIX Printing System (CUPS).
 .\"
@@ -88,9 +88,10 @@ The "c", "d", "f", "g", "i", "m", "n", "t", "v", and "w" options are not
 supported by CUPS and will produce a warning message if used.
 .SH SEE ALSO
 cancel(1), lp(1), lpstat(1),
-CUPS Software Users Manual
+CUPS Software Users Manual,
+http://localhost:631/documentation.html
 .SH COPYRIGHT
 Copyright 1993-2000 by Easy Software Products, All Rights Reserved.
 .\"
-.\" End of "$Id: lpr.man,v 1.1 2000/02/23 03:17:05 mike Exp $".
+.\" End of "$Id: lpr.man,v 1.2 2000/07/20 17:10:57 mike Exp $".
 .\"

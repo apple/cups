@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: classes.conf.man,v 1.2 2000/06/22 18:21:40 mike Exp $"
+.\" "$Id: classes.conf.man,v 1.3 2000/07/20 17:10:56 mike Exp $"
 .\"
 .\"   classes.conf man page for the Common UNIX Printing System (CUPS).
 .\"
@@ -63,9 +63,10 @@ StateMessage
 Specifies the message associated with the state.
 .SH SEE ALSO
 cupsd(8), cupsd.conf(5), mime.convs(5), mime.types(5), printers.conf(5),
-CUPS Software Administrators Manual
+CUPS Software Administrators Manual,
+http://localhost:631/documentation.html
 .SH COPYRIGHT
 Copyright 1993-2000 by Easy Software Products, All Rights Reserved.
 .\"
-.\" End of "$Id: classes.conf.man,v 1.2 2000/06/22 18:21:40 mike Exp $".
+.\" End of "$Id: classes.conf.man,v 1.3 2000/07/20 17:10:56 mike Exp $".
 .\"

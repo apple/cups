@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: lpq.man,v 1.1 2000/02/23 03:17:05 mike Exp $"
+.\" "$Id: lpq.man,v 1.2 2000/07/20 17:10:57 mike Exp $"
 .\"
 .\"   lpq man page for the Common UNIX Printing System (CUPS).
 .\"
@@ -44,9 +44,10 @@ The \fI-l\fR option requests a more verbose reporting format.
 .SH SEE ALSO
 cancel(1), lp(1), lpr(1), lprm(1), lpstat(1)
 .br
-CUPS Software Users Manual
+CUPS Software Users Manual,
+http://localhost:631/documentation.html
 .SH COPYRIGHT
 Copyright 1993-2000 by Easy Software Products, All Rights Reserved.
 .\"
-.\" End of "$Id: lpq.man,v 1.1 2000/02/23 03:17:05 mike Exp $".
+.\" End of "$Id: lpq.man,v 1.2 2000/07/20 17:10:57 mike Exp $".
 .\"

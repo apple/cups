@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: cups-polld.man,v 1.1 2000/05/10 21:07:04 mike Exp $"
+.\" "$Id: cups-polld.man,v 1.2 2000/07/20 17:10:56 mike Exp $"
 .\"
 .\"   cups-polld man page for the Common UNIX Printing System (CUPS).
 .\"
@@ -37,9 +37,10 @@ This program is started automatically by \fBcupsd\fR for each
 BrowsePoll directive found in the \fBcupsd.conf\fR file.
 .SH SEE ALSO
 cupsd.conf(5),
-CUPS Software Administrators Manual
+CUPS Software Administrators Manual,
+http://localhost:631/documentation.html
 .SH COPYRIGHT
 Copyright 1993-2000 by Easy Software Products, All Rights Reserved.
 .\"
-.\" End of "$Id: cups-polld.man,v 1.1 2000/05/10 21:07:04 mike Exp $".
+.\" End of "$Id: cups-polld.man,v 1.2 2000/07/20 17:10:56 mike Exp $".
 .\"

@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: lpinfo.man,v 1.2 2000/05/11 12:58:52 mike Exp $"
+.\" "$Id: lpinfo.man,v 1.3 2000/07/20 17:10:57 mike Exp $"
 .\"
 .\"   lpinfo man page for the Common UNIX Printing System (CUPS).
 .\"
@@ -47,9 +47,10 @@ Shows the available printer devices on the system.
 The \fBlpinfo\fR command is unique to CUPS.
 .SH SEE ALSO
 lpadmin(8),
-CUPS Software Administrators Manual
+CUPS Software Administrators Manual,
+http://localhost:631/documentation.html
 .SH COPYRIGHT
 Copyright 1993-2000 by Easy Software Products, All Rights Reserved.
 .\"
-.\" End of "$Id: lpinfo.man,v 1.2 2000/05/11 12:58:52 mike Exp $".
+.\" End of "$Id: lpinfo.man,v 1.3 2000/07/20 17:10:57 mike Exp $".
 .\"

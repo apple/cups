@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: lpadmin.man,v 1.1 2000/02/23 03:17:05 mike Exp $"
+.\" "$Id: lpadmin.man,v 1.2 2000/07/20 17:10:56 mike Exp $"
 .\"
 .\"   lpadmin man page for the Common UNIX Printing System (CUPS).
 .\"
@@ -116,9 +116,10 @@ The CUPS version of \fIlpadmin\fR does not support all of the System V or
 Solaris printing system configuration options.
 .SH SEE ALSO
 accept(8), cancel(1), disable(8), enable(8), lp(1), lpstat(1), reject(8),
-CUPS Software Administrators Manual
+CUPS Software Administrators Manual,
+http://localhost:631/documentation.html
 .SH COPYRIGHT
 Copyright 1993-2000 by Easy Software Products, All Rights Reserved.
 .\"
-.\" End of "$Id: lpadmin.man,v 1.1 2000/02/23 03:17:05 mike Exp $".
+.\" End of "$Id: lpadmin.man,v 1.2 2000/07/20 17:10:56 mike Exp $".
 .\"
