@@ -1,10 +1,10 @@
 /*
- * "$Id: hpgltops.h,v 1.2 1996/10/14 16:50:14 mike Exp $"
+ * "$Id: hpgltops.h,v 1.3 1998/03/17 22:00:22 mike Exp $"
  *
  *   HPGL to PostScript conversion program header file for espPrint, a
  *   collection of printer/image software.
  *
- *   Copyright 1993-1996 by Easy Software Products
+ *   Copyright 1993-1998 by Easy Software Products
  *
  *   These coded instructions, statements, and computer  programs  contain
  *   unpublished  proprietary  information  of Easy Software Products, and
@@ -15,7 +15,11 @@
  * Revision History:
  *
  *   $Log: hpgltops.h,v $
- *   Revision 1.2  1996/10/14 16:50:14  mike
+ *   Revision 1.3  1998/03/17 22:00:22  mike
+ *   Added CR (color range) support.
+ *   Added "to fit or not to fit" plot code.
+ *
+ *   Revision 1.2  1996/10/14  16:50:14  mike
  *   Updated for 3.2 release.
  *   Added 'blackplot', grayscale, and default pen width options.
  *   Added encoded polyline support.
@@ -107,6 +111,16 @@ VAR int		CharFillMode	VALUE(0),
 		CharFont	VALUE(0);
 VAR float	CharHeight[2]	VALUE2(11.5,11.5);
 VAR int		Verbosity	VALUE(0);
+VAR int		FitPage		VALUE(0);
+VAR float	ColorRange[3][2]
+#ifdef _MAIN_C_
+		= {
+		  { 0.0, 255.0 },
+		  { 0.0, 255.0 },
+		  { 0.0, 255.0 }
+		}
+#endif /* _MAIN_C_ */
+;
 
 /*
  * Prototypes...
@@ -168,6 +182,7 @@ extern void	SS_select_standard(int num_params, param_t *params);
 extern void	TD_transparent_data(int num_params, param_t *params);
 
 extern void	AC_anchor_corner(int num_params, param_t *params);
+extern void	CR_color_range(int num_params, param_t *params);
 extern void	FT_fill_type(int num_params, param_t *params);
 extern void	LA_line_attributes(int num_params, param_t *params);
 extern void	LT_line_type(int num_params, param_t *params);
@@ -184,5 +199,5 @@ extern int	OutputProlog(int shading, float penwidth);
 extern int	OutputTrailer(void);
 
 /*
- * End of "$Id: hpgltops.h,v 1.2 1996/10/14 16:50:14 mike Exp $".
+ * End of "$Id: hpgltops.h,v 1.3 1998/03/17 22:00:22 mike Exp $".
  */

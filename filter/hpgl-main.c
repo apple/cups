@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-main.c,v 1.2 1996/10/14 16:50:14 mike Exp $"
+ * "$Id: hpgl-main.c,v 1.3 1998/03/17 22:00:22 mike Exp $"
  *
  *   Main entry for HPGL converter for espPrint, a collection of printer
  *   drivers.
@@ -17,7 +17,11 @@
  * Revision History:
  *
  *   $Log: hpgl-main.c,v $
- *   Revision 1.2  1996/10/14 16:50:14  mike
+ *   Revision 1.3  1998/03/17 22:00:22  mike
+ *   Added CR (color range) support.
+ *   Added "to fit or not to fit" plot code.
+ *
+ *   Revision 1.2  1996/10/14  16:50:14  mike
  *   Updated for 3.2 release.
  *   Added 'blackplot', grayscale, and default pen width options.
  *   Added encoded polyline support.
@@ -45,65 +49,66 @@ typedef struct
 
 static name_t commands[] =
 {
-  "BP", BP_begin_plot,
-  "DF", DF_default_values,
-  "IN", IN_initialize,
-  "IP", IP_input_absolute,
-  "IR", IR_input_relative,
-  "IW", IW_input_window,
-  "PG", PG_advance_page,
-  "RO", RO_rotate,
-  "RP", RP_replot,
-  "SC", SC_scale,
-  "AA", AA_arc_absolute,
-  "AR", AR_arc_relative,
-  "AT", AT_arc_absolute3,
-  "CI", CI_circle,
-  "PA", PA_plot_absolute,
-  "PD", PD_pen_down,
-  "PE", PE_polyline_encoded,
-  "PR", PR_plot_relative,
-  "PS", PS_plot_size,
-  "PU", PU_pen_up,
-  "RT", RT_arc_relative3,
-  "EA", EA_edge_rect_absolute,
-  "EP", EP_edge_polygon,
-  "ER", ER_edge_rect_relative,
-  "EW", EW_edge_wedge,
-  "FP", FP_fill_polygon,
-  "PM", PM_polygon_mode,
-  "RA", RA_fill_rect_absolute,
-  "RR", RR_fill_rect_relative,
-  "WG", WG_fill_wedge,
-  "AD", AD_define_alternate,
-  "CF", CF_character_fill,
-  "CP", CP_character_plot,
-  "DI", DI_absolute_direction,
-  "DR", DR_relative_direction,
-  "DT", DT_define_label_term,
-  "DV", DV_define_variable_path,
-  "ES", ES_extra_space,
-  "LB", LB_label,
-  "LO", LO_label_origin,
-  "SA", SA_select_alternate,
-  "SD", SD_define_standard,
-  "SI", SI_absolute_size,
-  "SL", SL_character_slant,
-  "SR", SR_relative_size,
-  "SS", SS_select_standard,
-  "TD", TD_transparent_data,
-  "AC", AC_anchor_corner,
-  "FT", FT_fill_type,
-  "LA", LA_line_attributes,
-  "LT", LT_line_type,
-  "NP", NP_number_pens,
-  "PC", PC_pen_color,
-  "PW", PW_pen_width,
-  "RF", RF_raster_fill,
-  "SM", SM_symbol_mode,
-  "SP", SP_select_pen,
-  "UL", UL_user_line_type,
-  "WU", WU_width_units
+  { "BP", BP_begin_plot },
+  { "DF", DF_default_values },
+  { "IN", IN_initialize },
+  { "IP", IP_input_absolute },
+  { "IR", IR_input_relative },
+  { "IW", IW_input_window },
+  { "PG", PG_advance_page },
+  { "RO", RO_rotate },
+  { "RP", RP_replot },
+  { "SC", SC_scale },
+  { "AA", AA_arc_absolute },
+  { "AR", AR_arc_relative },
+  { "AT", AT_arc_absolute3 },
+  { "CI", CI_circle },
+  { "PA", PA_plot_absolute },
+  { "PD", PD_pen_down },
+  { "PE", PE_polyline_encoded },
+  { "PR", PR_plot_relative },
+  { "PS", PS_plot_size },
+  { "PU", PU_pen_up },
+  { "RT", RT_arc_relative3 },
+  { "EA", EA_edge_rect_absolute },
+  { "EP", EP_edge_polygon },
+  { "ER", ER_edge_rect_relative },
+  { "EW", EW_edge_wedge },
+  { "FP", FP_fill_polygon },
+  { "PM", PM_polygon_mode },
+  { "RA", RA_fill_rect_absolute },
+  { "RR", RR_fill_rect_relative },
+  { "WG", WG_fill_wedge },
+  { "AD", AD_define_alternate },
+  { "CF", CF_character_fill },
+  { "CP", CP_character_plot },
+  { "DI", DI_absolute_direction },
+  { "DR", DR_relative_direction },
+  { "DT", DT_define_label_term },
+  { "DV", DV_define_variable_path },
+  { "ES", ES_extra_space },
+  { "LB", LB_label },
+  { "LO", LO_label_origin },
+  { "SA", SA_select_alternate },
+  { "SD", SD_define_standard },
+  { "SI", SI_absolute_size },
+  { "SL", SL_character_slant },
+  { "SR", SR_relative_size },
+  { "SS", SS_select_standard },
+  { "TD", TD_transparent_data },
+  { "AC", AC_anchor_corner },
+  { "FT", FT_fill_type },
+  { "LA", LA_line_attributes },
+  { "LT", LT_line_type },
+  { "NP", NP_number_pens },
+  { "PC", PC_pen_color },
+  { "CR", CR_color_range },
+  { "PW", PW_pen_width },
+  { "RF", RF_raster_fill },
+  { "SM", SM_symbol_mode },
+  { "SP", SP_select_pen },
+  { "UL", UL_user_line_type },
+  { "WU", WU_width_units }
 };
 #define NUM_COMMANDS (sizeof(commands) / sizeof(name_t))
 
@@ -123,12 +128,11 @@ Usage(void)
 }
 
 
-void
+int
 main(int  argc,
      char *argv[])
 {
-  int			i,		/* Looping var */
-			val;		/* Temporary value */
+  int			i;		/* Looping var */
   char			*opt;		/* Current option character */
   char			*filename,	/* Input filename, if specified (NULL otherwise). */
 			*outfile;
@@ -178,7 +182,7 @@ main(int  argc,
 	     
 	      size = PDFindPageSize(info, PD_SIZE_CURRENT);
 
-              if (!strncasecmp(info->printer_class, "Color", 5))
+              if (strncasecmp(info->printer_class, "Color", 5) != 0)
                 shading = 0;
 
 	     /*
@@ -231,6 +235,8 @@ main(int  argc,
               i ++;
               if (i >= argc)
                 Usage();
+
+              FitPlot = 1;
               break;
 
           case 'L' : /* Log file */
@@ -329,9 +335,11 @@ main(int  argc,
   };
 
   OutputTrailer();
+
+  return (NO_ERROR);
 }
 
 
 /*
- * End of "$Id: hpgl-main.c,v 1.2 1996/10/14 16:50:14 mike Exp $".
+ * End of "$Id: hpgl-main.c,v 1.3 1998/03/17 22:00:22 mike Exp $".
  */
