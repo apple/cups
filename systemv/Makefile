@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.2 1999/03/03 21:18:57 mike Exp $"
+# "$Id: Makefile,v 1.3 1999/04/16 20:48:30 mike Exp $"
 #
 #   System V commands makefile for the Common UNIX Printing System (CUPS).
 #
@@ -24,7 +24,7 @@
 
 include ../Makedefs
 
-OPTIONS	=	-DDEBUG
+#OPTIONS	=	-DDEBUG
 TARGETS	=	cancel lp lpstat
 OBJS	=	cancel.o lp.o lpstat.o
 
@@ -75,5 +75,5 @@ lpstat:	lpstat.o ../cups/libcups.a
 lpstat.o:	../cups/cups.h ../Makedefs
 
 #
-# End of "$Id: Makefile,v 1.2 1999/03/03 21:18:57 mike Exp $".
+# End of "$Id: Makefile,v 1.3 1999/04/16 20:48:30 mike Exp $".
 #

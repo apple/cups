@@ -1,5 +1,5 @@
 /*
- * "$Id: lpstat.c,v 1.3 1999/03/24 18:39:04 mike Exp $"
+ * "$Id: lpstat.c,v 1.4 1999/04/16 20:48:30 mike Exp $"
  *
  *   "lpstat" command for the Common UNIX Printing System (CUPS).
  *
@@ -60,8 +60,15 @@ do_request(http_t *http,	/* I - HTTP connection to server */
   httpSetField(http, HTTP_FIELD_CONTENT_TYPE, "application/ipp");
 
   if (httpPost(http, resource))
-    response = NULL;
-  else if (ippWrite(http, request) != IPP_DATA)
+  {
+    if (httpPost(http, resource))
+    {
+      ippDelete(request);
+      return (response);
+    }
+  }
+
+  if (ippWrite(http, request) != IPP_DATA)
     response = NULL;
   else if ((status = httpUpdate(http)) != HTTP_OK)
     response = NULL;
@@ -334,6 +341,8 @@ show_default(http_t *http)	/* I - HTTP connection to server */
 
     ippDelete(response);
   }
+  else
+    puts("no system default destination");
 }
 
 
@@ -1119,5 +1128,5 @@ main(int  argc,		/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: lpstat.c,v 1.3 1999/03/24 18:39:04 mike Exp $".
+ * End of "$Id: lpstat.c,v 1.4 1999/04/16 20:48:30 mike Exp $".
  */
