@@ -1,5 +1,5 @@
 /*
- * "$Id: lpadmin.c,v 1.5 1999/06/19 13:14:39 mike Exp $"
+ * "$Id: lpadmin.c,v 1.6 1999/06/23 14:12:24 mike Exp $"
  *
  *   "lpadmin" command for the Common UNIX Printing System (CUPS).
  *
@@ -81,7 +81,7 @@ main(int  argc,		/* I - Number of command-line arguments */
 	filename[1024];	/* Model filename */
 
 
-  if ((http = httpConnect("localhost", ippPort())) == NULL)
+  if ((http = httpConnect(cupsServer(), ippPort())) == NULL)
   {
     fputs("lpadmin: Unable to contact server!\n", stderr);
     return (1);
@@ -1147,5 +1147,5 @@ set_printer_location(http_t *http,	/* I - Server connection */
 
 
 /*
- * End of "$Id: lpadmin.c,v 1.5 1999/06/19 13:14:39 mike Exp $".
+ * End of "$Id: lpadmin.c,v 1.6 1999/06/23 14:12:24 mike Exp $".
  */

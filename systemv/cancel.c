@@ -1,5 +1,5 @@
 /*
- * "$Id: cancel.c,v 1.5 1999/06/18 18:36:52 mike Exp $"
+ * "$Id: cancel.c,v 1.6 1999/06/23 14:12:23 mike Exp $"
  *
  *   "cancel" command for the Common UNIX Printing System (CUPS).
  *
@@ -71,7 +71,7 @@ main(int  argc,			/* I - Number of command-line arguments */
   * Open a connection to the server...
   */
 
-  if ((http = httpConnect("localhost", ippPort())) == NULL)
+  if ((http = httpConnect(cupsServer(), ippPort())) == NULL)
   {
     fputs("cancel: Unable to contact server!\n", stderr);
     return (1);
@@ -209,5 +209,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: cancel.c,v 1.5 1999/06/18 18:36:52 mike Exp $".
+ * End of "$Id: cancel.c,v 1.6 1999/06/23 14:12:23 mike Exp $".
  */
