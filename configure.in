@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: configure.in,v 1.22 1999/08/20 14:29:55 mike Exp $"
+dnl "$Id: configure.in,v 1.23 1999/08/31 14:41:54 mike Exp $"
 dnl
 dnl   Configuration script for the Common UNIX Printing System (CUPS).
 dnl
@@ -91,6 +91,7 @@ AC_PROG_RANLIB
 AC_PATH_PROG(AR,ar)
 AC_PATH_PROG(CHMOD,chmod)
 AC_PATH_PROG(CP,cp)
+AC_PATH_PROG(MV,mv)
 AC_PATH_PROG(NROFF,nroff)
 if test "$NROFF" = ""; then
     AC_PATH_PROG(GROFF,groff)
@@ -272,7 +273,7 @@ if test "$prefix" = "NONE"; then
 fi
 
 dnl Fix "libdir" variable for IRIX 6.x...
-if test "$uname" = "IRIX" -a $uversion -ge 62; then
+if test "$uname" = "IRIX" -a $uversion -ge 65; then
 	libdir="/usr/lib32"
 fi
 
@@ -312,5 +313,5 @@ AC_SUBST(CUPS_DATADIR)
 AC_OUTPUT(Makedefs)
 
 dnl
-dnl End of "$Id: configure.in,v 1.22 1999/08/20 14:29:55 mike Exp $".
+dnl End of "$Id: configure.in,v 1.23 1999/08/31 14:41:54 mike Exp $".
 dnl
