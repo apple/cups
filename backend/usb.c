@@ -1,5 +1,5 @@
 /*
- * "$Id: usb.c,v 1.14 2001/01/22 15:03:20 mike Exp $"
+ * "$Id: usb.c,v 1.15 2001/01/24 17:14:02 mike Exp $"
  *
  *   USB port backend for the Common UNIX Printing System (CUPS).
  *
@@ -85,6 +85,16 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   struct sigaction action;	/* Actions for POSIX signals */
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET */
 
+
+ /*
+  * Make sure status messages are not buffered...
+  */
+
+  setbuf(stderr, NULL);
+
+ /*
+  * Check command-line...
+  */
 
   if (argc == 1)
   {
@@ -408,5 +418,5 @@ list_devices(void)
 
 
 /*
- * End of "$Id: usb.c,v 1.14 2001/01/22 15:03:20 mike Exp $".
+ * End of "$Id: usb.c,v 1.15 2001/01/24 17:14:02 mike Exp $".
  */

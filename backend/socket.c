@@ -1,5 +1,5 @@
 /*
- * "$Id: socket.c,v 1.16 2001/01/24 15:33:55 mike Exp $"
+ * "$Id: socket.c,v 1.17 2001/01/24 17:14:01 mike Exp $"
  *
  *   AppSocket backend for the Common UNIX Printing System (CUPS).
  *
@@ -85,6 +85,16 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   struct sigaction action;	/* Actions for POSIX signals */
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET */
 
+
+ /*
+  * Make sure status messages are not buffered...
+  */
+
+  setbuf(stderr, NULL);
+
+ /*
+  * Check command-line...
+  */
 
   if (argc == 1)
   {
@@ -281,5 +291,5 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
 
 /*
- * End of "$Id: socket.c,v 1.16 2001/01/24 15:33:55 mike Exp $".
+ * End of "$Id: socket.c,v 1.17 2001/01/24 17:14:01 mike Exp $".
  */

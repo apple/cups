@@ -1,5 +1,5 @@
 /*
- * "$Id: lpd.c,v 1.22 2001/01/22 15:03:20 mike Exp $"
+ * "$Id: lpd.c,v 1.23 2001/01/24 17:14:01 mike Exp $"
  *
  *   Line Printer Daemon backend for the Common UNIX Printing System (CUPS).
  *
@@ -90,6 +90,16 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   int	banner;		/* Print banner page? */
   int	format;		/* Print format */
 
+
+ /*
+  * Make sure status messages are not buffered...
+  */
+
+  setbuf(stderr, NULL);
+
+ /*
+  * Check command-line...
+  */
 
   if (argc == 1)
   {
@@ -532,5 +542,5 @@ lpd_queue(char *hostname,	/* I - Host to connect to */
 
 
 /*
- * End of "$Id: lpd.c,v 1.22 2001/01/22 15:03:20 mike Exp $".
+ * End of "$Id: lpd.c,v 1.23 2001/01/24 17:14:01 mike Exp $".
  */

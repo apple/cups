@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.35 2001/01/24 17:10:16 mike Exp $"
+ * "$Id: ipp.c,v 1.36 2001/01/24 17:14:01 mike Exp $"
  *
  *   IPP backend for the Common UNIX Printing System (CUPS).
  *
@@ -88,7 +88,16 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET */
   int		version;	/* IPP version */
 
+
+ /*
+  * Make sure status messages are not buffered...
+  */
+
   setbuf(stderr, NULL);
+
+ /*
+  * Check command-line...
+  */
 
   if (argc == 1)
   {
@@ -681,5 +690,5 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
 
 /*
- * End of "$Id: ipp.c,v 1.35 2001/01/24 17:10:16 mike Exp $".
+ * End of "$Id: ipp.c,v 1.36 2001/01/24 17:14:01 mike Exp $".
  */

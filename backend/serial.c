@@ -1,5 +1,5 @@
 /*
- * "$Id: serial.c,v 1.30 2001/01/22 15:58:23 mike Exp $"
+ * "$Id: serial.c,v 1.31 2001/01/24 17:14:01 mike Exp $"
  *
  *   Serial port backend for the Common UNIX Printing System (CUPS).
  *
@@ -116,6 +116,16 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   struct sigaction action;	/* Actions for POSIX signals */
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET */
 
+
+ /*
+  * Make sure status messages are not buffered...
+  */
+
+  setbuf(stderr, NULL);
+
+ /*
+  * Check command-line...
+  */
 
   if (argc == 1)
   {
@@ -842,5 +852,5 @@ list_devices(void)
 
 
 /*
- * End of "$Id: serial.c,v 1.30 2001/01/22 15:58:23 mike Exp $".
+ * End of "$Id: serial.c,v 1.31 2001/01/24 17:14:01 mike Exp $".
  */
