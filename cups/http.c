@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.105 2002/10/30 20:04:56 mike Exp $"
+ * "$Id: http.c,v 1.106 2002/12/12 20:56:30 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS).
  *
@@ -896,11 +896,16 @@ httpRead(http_t *http,			/* I - HTTP data */
     }
 
     http->data_remaining = strtol(len, NULL, 16);
+    if (http->data_remaining < 0)
+    {
+      DEBUG_puts("httpRead: Negative chunk length!");
+      return (0);
+    }
   }
 
   DEBUG_printf(("httpRead: data_remaining = %d\n", http->data_remaining));
 
-  if (http->data_remaining == 0)
+  if (http->data_remaining <= 0)
   {
    /*
     * A zero-length chunk ends a transfer; unless we are reading POST
@@ -2003,5 +2008,5 @@ http_upgrade(http_t *http)	/* I - HTTP data */
 
 
 /*
- * End of "$Id: http.c,v 1.105 2002/10/30 20:04:56 mike Exp $".
+ * End of "$Id: http.c,v 1.106 2002/12/12 20:56:30 mike Exp $".
  */
