@@ -1,5 +1,5 @@
 /*
- * "$Id: image.h,v 1.12 2002/01/02 17:59:00 mike Exp $"
+ * "$Id: image.h,v 1.13 2002/03/01 19:53:35 mike Exp $"
  *
  *   Image library definitions for the Common UNIX Printing System (CUPS).
  *
@@ -20,6 +20,8 @@
  *       Voice: (301) 373-9603
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
+ *
+ *   This file is subject to the Apple OS-Developed Software exception.
  */
 
 #ifndef _IMAGE_H_
@@ -227,5 +229,5 @@ extern void	ImageZoomFree(izoom_t *z);
 #endif /* !_IMAGE_H_ */
 
 /*
- * End of "$Id: image.h,v 1.12 2002/01/02 17:59:00 mike Exp $".
+ * End of "$Id: image.h,v 1.13 2002/03/01 19:53:35 mike Exp $".
  */

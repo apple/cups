@@ -1,5 +1,5 @@
 /*
- * "$Id: mark.c,v 1.25 2002/01/02 17:58:40 mike Exp $"
+ * "$Id: mark.c,v 1.26 2002/03/01 19:53:29 mike Exp $"
  *
  *   Option marking routines for the Common UNIX Printing System (CUPS).
  *
@@ -22,6 +22,8 @@
  *         WWW: http://www.cups.org
  *
  *   PostScript is a trademark of Adobe Systems, Inc.
+ *
+ *   This file is subject to the Apple OS-Developed Software exception.
  *
  * Contents:
  *
@@ -437,5 +439,5 @@ ppd_defaults(ppd_file_t  *ppd,	/* I - PPD file */
 
 
 /*
- * End of "$Id: mark.c,v 1.25 2002/01/02 17:58:40 mike Exp $".
+ * End of "$Id: mark.c,v 1.26 2002/03/01 19:53:29 mike Exp $".
  */

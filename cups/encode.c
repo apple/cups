@@ -1,5 +1,5 @@
 /*
- * "$Id: encode.c,v 1.5 2002/02/28 18:01:25 mike Exp $"
+ * "$Id: encode.c,v 1.6 2002/03/01 19:53:28 mike Exp $"
  *
  *   Option encoding routines for the Common UNIX Printing System (CUPS).
  *
@@ -20,6 +20,8 @@
  *       Voice: (301) 373-9603
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
+ *
+ *   This file is subject to the Apple OS-Developed Software exception.
  *
  * Contents:
  *
@@ -396,5 +398,5 @@ cupsEncodeOptions(ipp_t         *ipp,		/* I - Request to add to */
 
 
 /*
- * End of "$Id: encode.c,v 1.5 2002/02/28 18:01:25 mike Exp $".
+ * End of "$Id: encode.c,v 1.6 2002/03/01 19:53:28 mike Exp $".
  */

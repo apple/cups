@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.29 2002/01/02 17:58:33 mike Exp $"
+# "$Id: Makefile,v 1.30 2002/03/01 19:53:26 mike Exp $"
 #
 #   Backend makefile for the Common UNIX Printing System (CUPS).
 #
@@ -20,6 +20,8 @@
 #       Voice: (301) 373-9603
 #       EMail: cups-info@cups.org
 #         WWW: http://www.cups.org
+#
+#   This file is subject to the Apple OS-Developed Software exception.
 #
 
 include ../Makedefs
@@ -137,5 +139,5 @@ usb.o:	../cups/cups.h ../Makedefs
 
 
 #
-# End of "$Id: Makefile,v 1.29 2002/01/02 17:58:33 mike Exp $".
+# End of "$Id: Makefile,v 1.30 2002/03/01 19:53:26 mike Exp $".
 #

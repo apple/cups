@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c,v 1.92 2002/02/28 20:51:47 mike Exp $"
+ * "$Id: util.c,v 1.93 2002/03/01 19:53:30 mike Exp $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -20,6 +20,8 @@
  *       Voice: (301) 373-9603
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
+ *
+ *   This file is subject to the Apple OS-Developed Software exception.
  *
  * Contents:
  *
@@ -1743,5 +1745,5 @@ cups_local_auth(http_t *http)	/* I - Connection */
 
 
 /*
- * End of "$Id: util.c,v 1.92 2002/02/28 20:51:47 mike Exp $".
+ * End of "$Id: util.c,v 1.93 2002/03/01 19:53:30 mike Exp $".
  */

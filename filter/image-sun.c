@@ -1,5 +1,5 @@
 /*
- * "$Id: image-sun.c,v 1.9 2002/01/02 17:58:59 mike Exp $"
+ * "$Id: image-sun.c,v 1.10 2002/03/01 19:53:34 mike Exp $"
  *
  *   Sun Raster image file routines for the Common UNIX Printing System (CUPS).
  *
@@ -20,6 +20,8 @@
  *       Voice: (301) 373-9603
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
+ *
+ *   This file is subject to the Apple OS-Developed Software exception.
  *
  * Contents:
  *
@@ -373,5 +375,5 @@ read_unsigned(FILE *fp)	/* I - File to read from */
 
 
 /*
- * End of "$Id: image-sun.c,v 1.9 2002/01/02 17:58:59 mike Exp $".
+ * End of "$Id: image-sun.c,v 1.10 2002/03/01 19:53:34 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.h,v 1.25 2002/01/02 17:58:40 mike Exp $"
+ * "$Id: ppd.h,v 1.26 2002/03/01 19:53:30 mike Exp $"
  *
  *   PostScript Printer Description definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -30,6 +30,8 @@
  *   (or any derivative of it) with software other than GNU
  *   GhostScript (or its derivatives) is governed by the CUPS license
  *   agreement.
+ *
+ *   This file is subject to the Apple OS-Developed Software exception.
  */
 
 #ifndef _CUPS_PPD_H_
@@ -264,5 +266,5 @@ extern float		ppdPageWidth(ppd_file_t *ppd, const char *name);
 #endif /* !_CUPS_PPD_H_ */
 
 /*
- * End of "$Id: ppd.h,v 1.25 2002/01/02 17:58:40 mike Exp $".
+ * End of "$Id: ppd.h,v 1.26 2002/03/01 19:53:30 mike Exp $".
  */

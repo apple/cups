@@ -1,5 +1,5 @@
 /*
- * "$Id: language.c,v 1.25 2002/02/13 21:53:58 mike Exp $"
+ * "$Id: language.c,v 1.26 2002/03/01 19:53:29 mike Exp $"
  *
  *   I18N/language support for the Common UNIX Printing System (CUPS).
  *
@@ -20,6 +20,8 @@
  *       Voice: (301) 373-9603
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
+ *
+ *   This file is subject to the Apple OS-Developed Software exception.
  *
  * Contents:
  *
@@ -427,5 +429,5 @@ cupsLangGet(const char *language) /* I - Language or locale */
 
 
 /*
- * End of "$Id: language.c,v 1.25 2002/02/13 21:53:58 mike Exp $".
+ * End of "$Id: language.c,v 1.26 2002/03/01 19:53:29 mike Exp $".
  */

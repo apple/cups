@@ -1,5 +1,5 @@
 /*
- * "$Id: form-ps.c,v 1.4 2002/01/02 17:58:56 mike Exp $"
+ * "$Id: form-ps.c,v 1.5 2002/03/01 19:53:31 mike Exp $"
  *
  *   CUPS form PostScript routines for the Common UNIX Printing System (CUPS).
  *
@@ -20,6 +20,8 @@
  *       Voice: (301) 373-9603
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
+ *
+ *   This file is subject to the Apple OS-Developed Software exception.
  *
  * Contents:
  *
@@ -43,5 +45,5 @@ formWrite(tree_t *t)			/* I - Document tree to write */
 
 
 /*
- * End of "$Id: form-ps.c,v 1.4 2002/01/02 17:58:56 mike Exp $".
+ * End of "$Id: form-ps.c,v 1.5 2002/03/01 19:53:31 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-config.c,v 1.31 2002/01/02 17:58:57 mike Exp $"
+ * "$Id: hpgl-config.c,v 1.32 2002/03/01 19:53:32 mike Exp $"
  *
  *   HP-GL/2 configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -20,6 +20,8 @@
  *       Voice: (301) 373-9603
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
+ *
+ *   This file is subject to the Apple OS-Developed Software exception.
  *
  * Contents:
  *
@@ -637,5 +639,5 @@ SC_scale(int     num_params,	/* I - Number of parameters */
 
 
 /*
- * End of "$Id: hpgl-config.c,v 1.31 2002/01/02 17:58:57 mike Exp $".
+ * End of "$Id: hpgl-config.c,v 1.32 2002/03/01 19:53:32 mike Exp $".
  */

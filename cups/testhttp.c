@@ -1,5 +1,5 @@
 /*
- * "$Id: testhttp.c,v 1.12 2002/01/02 17:58:41 mike Exp $"
+ * "$Id: testhttp.c,v 1.13 2002/03/01 19:53:30 mike Exp $"
  *
  *   HTTP test program for the Common UNIX Printing System (CUPS).
  *
@@ -20,6 +20,8 @@
  *       Voice: (301) 373-9603
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
+ *
+ *   This file is subject to the Apple OS-Developed Software exception.
  *
  * Contents:
  *
@@ -120,5 +122,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: testhttp.c,v 1.12 2002/01/02 17:58:41 mike Exp $".
+ * End of "$Id: testhttp.c,v 1.13 2002/03/01 19:53:30 mike Exp $".
  */

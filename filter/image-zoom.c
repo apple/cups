@@ -1,5 +1,5 @@
 /*
- * "$Id: image-zoom.c,v 1.8 2002/01/02 17:58:59 mike Exp $"
+ * "$Id: image-zoom.c,v 1.9 2002/03/01 19:53:35 mike Exp $"
  *
  *   Image zoom routines for the Common UNIX Printing System (CUPS).
  *
@@ -20,6 +20,8 @@
  *       Voice: (301) 373-9603
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
+ *
+ *   This file is subject to the Apple OS-Developed Software exception.
  *
  * Contents:
  *
@@ -306,5 +308,5 @@ ImageZoomFree(izoom_t *z)	/* I - Zoom record to free */
 
 
 /*
- * End of "$Id: image-zoom.c,v 1.8 2002/01/02 17:58:59 mike Exp $".
+ * End of "$Id: image-zoom.c,v 1.9 2002/03/01 19:53:35 mike Exp $".
  */

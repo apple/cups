@@ -1,5 +1,5 @@
 /*
- * "$Id: image-sgi.c,v 1.9 2002/01/02 17:58:59 mike Exp $"
+ * "$Id: image-sgi.c,v 1.10 2002/03/01 19:53:34 mike Exp $"
  *
  *   SGI image file routines for the Common UNIX Printing System (CUPS).
  *
@@ -20,6 +20,8 @@
  *       Voice: (301) 373-9603
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
+ *
+ *   This file is subject to the Apple OS-Developed Software exception.
  *
  * Contents:
  *
@@ -263,5 +265,5 @@ ImageReadSGI(image_t    *img,		/* IO - Image */
 
 
 /*
- * End of "$Id: image-sgi.c,v 1.9 2002/01/02 17:58:59 mike Exp $".
+ * End of "$Id: image-sgi.c,v 1.10 2002/03/01 19:53:34 mike Exp $".
  */

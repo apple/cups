@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.94 2002/02/12 19:05:38 mike Exp $"
+ * "$Id: http.c,v 1.95 2002/03/01 19:53:28 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -20,6 +20,8 @@
  *       Voice: (301) 373-9603
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
+ *
+ *   This file is subject to the Apple OS-Developed Software exception.
  *
  * Contents:
  *
@@ -2217,5 +2219,5 @@ http_upgrade(http_t *http)	/* I - HTTP data */
 
 
 /*
- * End of "$Id: http.c,v 1.94 2002/02/12 19:05:38 mike Exp $".
+ * End of "$Id: http.c,v 1.95 2002/03/01 19:53:28 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-prolog.c,v 1.32 2002/01/02 17:58:57 mike Exp $"
+ * "$Id: hpgl-prolog.c,v 1.33 2002/03/01 19:53:32 mike Exp $"
  *
  *   HP-GL/2 prolog routines for for the Common UNIX Printing System (CUPS).
  *
@@ -20,6 +20,8 @@
  *       Voice: (301) 373-9603
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
+ *
+ *   This file is subject to the Apple OS-Developed Software exception.
  *
  * Contents:
  *
@@ -403,5 +405,5 @@ Outputf(const char *format,	/* I - Printf-style string */
 
 
 /*
- * End of "$Id: hpgl-prolog.c,v 1.32 2002/01/02 17:58:57 mike Exp $".
+ * End of "$Id: hpgl-prolog.c,v 1.33 2002/03/01 19:53:32 mike Exp $".
  */

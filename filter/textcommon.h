@@ -1,5 +1,5 @@
 /*
- * "$Id: textcommon.h,v 1.9 2002/01/17 21:39:27 mike Exp $"
+ * "$Id: textcommon.h,v 1.10 2002/03/01 19:53:37 mike Exp $"
  *
  *   Common text filter definitions for the Common UNIX Printing System (CUPS).
  *
@@ -20,6 +20,8 @@
  *       Voice: (301) 373-9603
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
+ *
+ *   This file is subject to the Apple OS-Developed Software exception.
  */
 
 /*
@@ -98,5 +100,5 @@ extern void	WriteProlog(const char *title, const char *user,
 
 
 /*
- * End of "$Id: textcommon.h,v 1.9 2002/01/17 21:39:27 mike Exp $".
+ * End of "$Id: textcommon.h,v 1.10 2002/03/01 19:53:37 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: lpd.c,v 1.33 2002/02/12 19:05:36 mike Exp $"
+ * "$Id: lpd.c,v 1.34 2002/03/01 19:53:26 mike Exp $"
  *
  *   Line Printer Daemon backend for the Common UNIX Printing System (CUPS).
  *
@@ -20,6 +20,8 @@
  *       Voice: (301) 373-9603
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
+ *
+ *   This file is subject to the Apple OS-Developed Software exception.
  *
  * Contents:
  *
@@ -761,5 +763,5 @@ rresvport(int *port)		/* IO - Port number to bind to */
 #endif /* !HAVE_RRESVPORT */
 
 /*
- * End of "$Id: lpd.c,v 1.33 2002/02/12 19:05:36 mike Exp $".
+ * End of "$Id: lpd.c,v 1.34 2002/03/01 19:53:26 mike Exp $".
  */

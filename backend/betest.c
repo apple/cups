@@ -1,5 +1,5 @@
 /*
- * "$Id: betest.c,v 1.4 2002/01/02 17:58:34 mike Exp $"
+ * "$Id: betest.c,v 1.5 2002/03/01 19:53:26 mike Exp $"
  *
  *   Backend test program for the Common UNIX Printing System (CUPS).
  *
@@ -20,6 +20,8 @@
  *       Voice: (301) 373-9603
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
+ *
+ *   This file is subject to the Apple OS-Developed Software exception.
  *
  * Contents:
  *
@@ -81,5 +83,5 @@ main(int  argc,		/* I - Number of command-line arguments (7 or 8) */
 
 
 /*
- * End of "$Id: betest.c,v 1.4 2002/01/02 17:58:34 mike Exp $".
+ * End of "$Id: betest.c,v 1.5 2002/03/01 19:53:26 mike Exp $".
  */

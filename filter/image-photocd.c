@@ -1,5 +1,5 @@
 /*
- * "$Id: image-photocd.c,v 1.11 2002/01/02 17:58:58 mike Exp $"
+ * "$Id: image-photocd.c,v 1.12 2002/03/01 19:53:34 mike Exp $"
  *
  *   PhotoCD routines for the Common UNIX Printing System (CUPS).
  *
@@ -20,6 +20,8 @@
  *       Voice: (301) 373-9603
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
+ *
+ *   This file is subject to the Apple OS-Developed Software exception.
  *
  * Contents:
  *
@@ -319,5 +321,5 @@ ImageReadPhotoCD(image_t    *img,	/* IO - Image */
 
 
 /*
- * End of "$Id: image-photocd.c,v 1.11 2002/01/02 17:58:58 mike Exp $".
+ * End of "$Id: image-photocd.c,v 1.12 2002/03/01 19:53:34 mike Exp $".
  */

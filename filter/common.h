@@ -1,5 +1,5 @@
 /*
- * "$Id: common.h,v 1.9 2002/01/23 22:30:42 mike Exp $"
+ * "$Id: common.h,v 1.10 2002/03/01 19:53:31 mike Exp $"
  *
  *   Common filter definitions for the Common UNIX Printing System (CUPS).
  *
@@ -20,6 +20,8 @@
  *       Voice: (301) 373-9603
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
+ *
+ *   This file is subject to the Apple OS-Developed Software exception.
  */
 
 /*
@@ -67,5 +69,5 @@ extern void	WriteLabels(int orient);
 
 
 /*
- * End of "$Id: common.h,v 1.9 2002/01/23 22:30:42 mike Exp $".
+ * End of "$Id: common.h,v 1.10 2002/03/01 19:53:31 mike Exp $".
  */

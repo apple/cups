@@ -1,5 +1,5 @@
 /*
- * "$Id: parallel.c,v 1.37 2002/02/12 19:31:39 mike Exp $"
+ * "$Id: parallel.c,v 1.38 2002/03/01 19:53:26 mike Exp $"
  *
  *   Parallel port backend for the Common UNIX Printing System (CUPS).
  *
@@ -20,6 +20,8 @@
  *       Voice: (301) 373-9603
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
+ *
+ *   This file is subject to the Apple OS-Developed Software exception.
  *
  * Contents:
  *
@@ -649,5 +651,5 @@ list_devices(void)
 
 
 /*
- * End of "$Id: parallel.c,v 1.37 2002/02/12 19:31:39 mike Exp $".
+ * End of "$Id: parallel.c,v 1.38 2002/03/01 19:53:26 mike Exp $".
  */

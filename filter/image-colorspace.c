@@ -1,5 +1,5 @@
 /*
- * "$Id: image-colorspace.c,v 1.25 2002/01/27 21:16:13 mike Exp $"
+ * "$Id: image-colorspace.c,v 1.26 2002/03/01 19:53:33 mike Exp $"
  *
  *   Colorspace conversions for the Common UNIX Printing System (CUPS).
  *
@@ -20,6 +20,8 @@
  *       Voice: (301) 373-9603
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
+ *
+ *   This file is subject to the Apple OS-Developed Software exception.
  *
  * Contents:
  *
@@ -922,5 +924,5 @@ zshear(float mat[3][3],	/* I - Matrix */
 
 
 /*
- * End of "$Id: image-colorspace.c,v 1.25 2002/01/27 21:16:13 mike Exp $".
+ * End of "$Id: image-colorspace.c,v 1.26 2002/03/01 19:53:33 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: string.c,v 1.6 2002/01/02 17:58:40 mike Exp $"
+ * "$Id: string.c,v 1.7 2002/03/01 19:53:30 mike Exp $"
  *
  *   String functions for the Common UNIX Printing System (CUPS).
  *
@@ -20,6 +20,8 @@
  *       Voice: (301) 373-9603
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
+ *
+ *   This file is subject to the Apple OS-Developed Software exception.
  *
  * Contents:
  *
@@ -121,5 +123,5 @@ strncasecmp(const char *s,	/* I - First string */
 
 
 /*
- * End of "$Id: string.c,v 1.6 2002/01/02 17:58:40 mike Exp $".
+ * End of "$Id: string.c,v 1.7 2002/03/01 19:53:30 mike Exp $".
  */

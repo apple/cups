@@ -1,5 +1,5 @@
 /*
- * "$Id: usersys.c,v 1.15 2002/01/02 17:58:41 mike Exp $"
+ * "$Id: usersys.c,v 1.16 2002/03/01 19:53:30 mike Exp $"
  *
  *   User, system, and password routines for the Common UNIX Printing
  *   System (CUPS).
@@ -21,6 +21,8 @@
  *       Voice: (301) 373-9603
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
+ *
+ *   This file is subject to the Apple OS-Developed Software exception.
  *
  * Contents:
  *
@@ -443,5 +445,5 @@ cups_get_line(char *buf,	/* I - Line buffer */
 
 
 /*
- * End of "$Id: usersys.c,v 1.15 2002/01/02 17:58:41 mike Exp $".
+ * End of "$Id: usersys.c,v 1.16 2002/03/01 19:53:30 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: usb.c,v 1.24 2002/02/12 19:05:37 mike Exp $"
+ * "$Id: usb.c,v 1.25 2002/03/01 19:53:27 mike Exp $"
  *
  *   USB port backend for the Common UNIX Printing System (CUPS).
  *
@@ -20,6 +20,8 @@
  *       Voice: (301) 373-9603
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
+ *
+ *   This file is subject to the Apple OS-Developed Software exception.
  *
  * Contents:
  *
@@ -451,5 +453,5 @@ list_devices(void)
 
 
 /*
- * End of "$Id: usb.c,v 1.24 2002/02/12 19:05:37 mike Exp $".
+ * End of "$Id: usb.c,v 1.25 2002/03/01 19:53:27 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: form-tree.c,v 1.5 2002/01/02 17:58:57 mike Exp $"
+ * "$Id: form-tree.c,v 1.6 2002/03/01 19:53:31 mike Exp $"
  *
  *   CUPS form document tree routines for the Common UNIX Printing
  *   System (CUPS).
@@ -21,6 +21,8 @@
  *       Voice: (301) 373-9603
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
+ *
+ *   This file is subject to the Apple OS-Developed Software exception.
  *
  * Contents:
  *
@@ -618,5 +620,5 @@ parse_element(tree_t *t,		/* I - Current tree node */
 
 
 /*
- * End of "$Id: form-tree.c,v 1.5 2002/01/02 17:58:57 mike Exp $".
+ * End of "$Id: form-tree.c,v 1.6 2002/03/01 19:53:31 mike Exp $".
  */
