@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.124.2.40 2002/11/18 19:03:03 mike Exp $"
+ * "$Id: job.c,v 1.124.2.41 2002/11/23 01:06:16 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -1432,18 +1432,18 @@ StartJob(int       id,		/* I - Job ID */
       */
 
       if (optptr > options)
-	strlcat(optptr, " ", sizeof(options) - (optptr - options));
+	strlcat(optptr, " ", optlength - (optptr - options));
 
       if (attr->value_tag != IPP_TAG_BOOLEAN)
       {
-	strlcat(optptr, attr->name, sizeof(options) - (optptr - options));
-	strlcat(optptr, "=", sizeof(options) - (optptr - options));
+	strlcat(optptr, attr->name, optlength - (optptr - options));
+	strlcat(optptr, "=", optlength - (optptr - options));
       }
 
       for (i = 0; i < attr->num_values; i ++)
       {
 	if (i)
-	  strlcat(optptr, ",", sizeof(options) - (optptr - options));
+	  strlcat(optptr, ",", optlength - (optptr - options));
 
 	optptr += strlen(optptr);
 
@@ -1451,31 +1451,31 @@ StartJob(int       id,		/* I - Job ID */
 	{
 	  case IPP_TAG_INTEGER :
 	  case IPP_TAG_ENUM :
-	      snprintf(optptr, sizeof(options) - (optptr - options),
+	      snprintf(optptr, optlength - (optptr - options),
 	               "%d", attr->values[i].integer);
 	      break;
 
 	  case IPP_TAG_BOOLEAN :
 	      if (!attr->values[i].boolean)
-		strlcat(optptr, "no", sizeof(options) - (optptr - options));
+		strlcat(optptr, "no", optlength - (optptr - options));
 
 	  case IPP_TAG_NOVALUE :
 	      strlcat(optptr, attr->name,
-	              sizeof(options) - (optptr - options));
+	              optlength - (optptr - options));
 	      break;
 
 	  case IPP_TAG_RANGE :
 	      if (attr->values[i].range.lower == attr->values[i].range.upper)
-		snprintf(optptr, sizeof(options) - (optptr - options) - 1,
+		snprintf(optptr, optlength - (optptr - options) - 1,
 	        	 "%d", attr->values[i].range.lower);
               else
-		snprintf(optptr, sizeof(options) - (optptr - options) - 1,
+		snprintf(optptr, optlength - (optptr - options) - 1,
 	        	 "%d-%d", attr->values[i].range.lower,
 			 attr->values[i].range.upper);
 	      break;
 
 	  case IPP_TAG_RESOLUTION :
-	      snprintf(optptr, sizeof(options) - (optptr - options) - 1,
+	      snprintf(optptr, optlength - (optptr - options) - 1,
 	               "%dx%d%s", attr->values[i].resolution.xres,
 		       attr->values[i].resolution.yres,
 		       attr->values[i].resolution.units == IPP_RES_PER_INCH ?
@@ -1492,14 +1492,14 @@ StartJob(int       id,		/* I - Job ID */
 		  strchr(attr->values[i].string.text, '\t') != NULL ||
 		  strchr(attr->values[i].string.text, '\n') != NULL)
 	      {
-		strlcat(optptr, "\'", sizeof(options) - (optptr - options));
+		strlcat(optptr, "\'", optlength - (optptr - options));
 		strlcat(optptr, attr->values[i].string.text,
-		        sizeof(options) - (optptr - options));
-		strlcat(optptr, "\'", sizeof(options) - (optptr - options));
+		        optlength - (optptr - options));
+		strlcat(optptr, "\'", optlength - (optptr - options));
 	      }
 	      else
 		strlcat(optptr, attr->values[i].string.text,
-		        sizeof(options) - (optptr - options));
+		        optlength - (optptr - options));
 	      break;
 
           default :
@@ -2480,5 +2480,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.124.2.40 2002/11/18 19:03:03 mike Exp $".
+ * End of "$Id: job.c,v 1.124.2.41 2002/11/23 01:06:16 mike Exp $".
  */

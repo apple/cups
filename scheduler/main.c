@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c,v 1.57.2.23 2002/10/22 15:54:36 mike Exp $"
+ * "$Id: main.c,v 1.57.2.24 2002/11/23 01:06:17 mike Exp $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -342,6 +342,18 @@ main(int  argc,			/* I - Number of command-line arguments */
 
   if (!fg)
     kill(getppid(), SIGUSR1);
+
+ /*
+  * If the administrator has configured the server to run as an unpriviledged
+  * user, change to that user now...
+  */
+
+  if (RunAsUser)
+  {
+    setgid(Group);
+    setgroups(0, NULL);
+    setuid(User);
+  }
 
  /*
   * Loop forever...
@@ -913,5 +925,5 @@ usage(void)
 
 
 /*
- * End of "$Id: main.c,v 1.57.2.23 2002/10/22 15:54:36 mike Exp $".
+ * End of "$Id: main.c,v 1.57.2.24 2002/11/23 01:06:17 mike Exp $".
  */

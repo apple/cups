@@ -1,5 +1,5 @@
 /*
- * "$Id: server.c,v 1.2.2.1 2002/01/02 18:05:06 mike Exp $"
+ * "$Id: server.c,v 1.2.2.2 2002/11/23 01:06:17 mike Exp $"
  *
  *   Server start/stop routines for the Common UNIX Printing System (CUPS).
  *
@@ -84,18 +84,6 @@ StartServer(void)
   StartListening();
   StartBrowsing();
   StartPolling();
-
- /*
-  * If the administrator has configured the server to run as an unpriviledged
-  * user, change to that user now...
-  */
-
-  if (RunAsUser)
-  {
-    setgid(Group);
-    setgroups(0, NULL);
-    setuid(User);
-  }
 }
 
 
@@ -158,5 +146,5 @@ StopServer(void)
 
 
 /*
- * End of "$Id: server.c,v 1.2.2.1 2002/01/02 18:05:06 mike Exp $".
+ * End of "$Id: server.c,v 1.2.2.2 2002/11/23 01:06:17 mike Exp $".
  */
