@@ -1,5 +1,5 @@
 /*
- * "$Id: lpd.c,v 1.28.2.27 2003/11/19 18:58:45 mike Exp $"
+ * "$Id: lpd.c,v 1.28.2.28 2004/02/06 21:01:59 mike Exp $"
  *
  *   Line Printer Daemon backend for the Common UNIX Printing System (CUPS).
  *
@@ -232,6 +232,14 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   manual_copies  = 1;
   timeout        = 300;
   sanitize_title = 1;
+
+#if defined(__APPLE__)
+  /* We want to use a reserved port if possible (3471949) */
+  reserve        = 1;
+
+  /* We want to pass utf-8 characters, not re-map them (3071945) */
+  sanitize_title= 0;
+#endif
 
   if ((options = strchr(resource, '?')) != NULL)
   {
@@ -668,21 +676,21 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
 
     while (copies > 0)
     {
-      snprintf(cptr, sizeof(control) - (cptr - control), "%cdfA%03d%s\n", format,
+      snprintf(cptr, sizeof(control) - (cptr - control), "%cdfA%03d%.15s\n", format,
                getpid() % 1000, localhost);
       cptr   += strlen(cptr);
       copies --;
     }
 
     snprintf(cptr, sizeof(control) - (cptr - control),
-             "UdfA%03d%s\nN%s\n",
+             "UdfA%03d%.15s\nN%s\n",
              getpid() % 1000, localhost, title);
 
     fprintf(stderr, "DEBUG: Control file is:\n%s", control);
 
     if (order == ORDER_CONTROL_DATA)
     {
-      if (lpd_command(fd, timeout, "\002%d cfA%03.3d%s\n", strlen(control),
+      if (lpd_command(fd, timeout, "\002%d cfA%03.3d%.15s\n", strlen(control),
                       getpid() % 1000, localhost))
         return (1);
 
@@ -723,7 +731,7 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
       * Send the print file...
       */
 
-      if (lpd_command(fd, timeout, "\003%u dfA%03.3d%s\n",
+      if (lpd_command(fd, timeout, "\003%u dfA%03.3d%.15s\n",
                       (unsigned)filestats.st_size, getpid() % 1000,
 		      localhost))
         return (1);
@@ -788,7 +796,7 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
 
     if (status == 0 && order == ORDER_DATA_CONTROL)
     {
-      if (lpd_command(fd, timeout, "\002%d cfA%03.3d%s\n", strlen(control),
+      if (lpd_command(fd, timeout, "\002%d cfA%03.3d%.15s\n", strlen(control),
                       getpid() % 1000, localhost))
         return (1);
 
@@ -994,5 +1002,5 @@ sigterm_handler(int sig)		/* I - Signal */
 
 
 /*
- * End of "$Id: lpd.c,v 1.28.2.27 2003/11/19 18:58:45 mike Exp $".
+ * End of "$Id: lpd.c,v 1.28.2.28 2004/02/06 21:01:59 mike Exp $".
  */

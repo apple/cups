@@ -299,13 +299,13 @@ void Page::displaySlice(OutputDev *out, double hDPI, double vDPI, int rotate,
   cropBox = getCropBox();
 
   if (globalParams->getPrintCommands()) {
-    printf("***** MediaBox = ll:%g,%g ur:%g,%g\n",
-	   box.x1, box.y1, box.x2, box.y2);
+    fprintf(stderr, "DEBUG2: ***** MediaBox = ll:%g,%g ur:%g,%g\n",
+	    box.x1, box.y1, box.x2, box.y2);
     if (isCropped()) {
-      printf("***** CropBox = ll:%g,%g ur:%g,%g\n",
-	     cropBox->x1, cropBox->y1, cropBox->x2, cropBox->y2);
+      fprintf(stderr, "DEBUG2: ***** CropBox = ll:%g,%g ur:%g,%g\n",
+	      cropBox->x1, cropBox->y1, cropBox->x2, cropBox->y2);
     }
-    printf("***** Rotate = %d\n", attrs->getRotate());
+    fprintf(stderr, "DEBUG2: ***** Rotate = %d\n", attrs->getRotate());
   }
 
   gfx = new Gfx(xref, out, num, attrs->getResourceDict(),
@@ -335,7 +335,7 @@ void Page::displaySlice(OutputDev *out, double hDPI, double vDPI, int rotate,
   obj.free();
   if (annotList->getNumAnnots() > 0) {
     if (globalParams->getPrintCommands()) {
-      printf("***** Annotations\n");
+      fprintf(stderr, "DEBUG2: ***** Annotations\n");
     }
     for (i = 0; i < annotList->getNumAnnots(); ++i) {
       annotList->getAnnot(i)->draw(gfx);

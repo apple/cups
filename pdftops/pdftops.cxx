@@ -1,5 +1,5 @@
 //
-// "$Id: pdftops.cxx,v 1.6.2.8 2004/02/02 22:41:44 mike Exp $"
+// "$Id: pdftops.cxx,v 1.6.2.9 2004/02/06 21:01:59 mike Exp $"
 //
 //   PDF to PostScript filter front-end for the Common UNIX Printing
 //   System (CUPS).
@@ -84,6 +84,7 @@ main(int  argc,				// I - Number of command-line args
   int		temp;			// Temporary var
   int		duplex;			// Duplex the output?
   int		fit;			// Fit the pages to the output
+  int		printCommands;		// Output debug info for commands?
 
 
   // Make sure status messages are not buffered...
@@ -227,6 +228,13 @@ main(int  argc,				// I - Number of command-line args
 	break;
   }
 
+  if ((val = cupsGetOption("debug", num_options, options)) != NULL &&
+      strcasecmp(val, "no") && strcasecmp(val, "off") &&
+      strcasecmp(val, "false"))
+    printCommands = 1;
+  else
+    printCommands = 0;
+
   if ((val = cupsGetOption("fitplot", num_options, options)) != NULL &&
       strcasecmp(val, "no") && strcasecmp(val, "off") &&
       strcasecmp(val, "false"))
@@ -284,7 +292,10 @@ main(int  argc,				// I - Number of command-line args
   globalParams->setPSEmbedTrueType(1);
   globalParams->setPSEmbedCIDPostScript(1);
   globalParams->setErrQuiet(0);
-  globalParams->setPrintCommands(0);
+  globalParams->setPrintCommands(printCommands);
+
+  if (printCommands)
+    setbuf(stdout, NULL);
 
   // open PDF file
   doc = new PDFDoc(fileName, NULL, NULL);
@@ -327,5 +338,5 @@ main(int  argc,				// I - Number of command-line args
 
 
 //
-// End of "$Id: pdftops.cxx,v 1.6.2.8 2004/02/02 22:41:44 mike Exp $".
+// End of "$Id: pdftops.cxx,v 1.6.2.9 2004/02/06 21:01:59 mike Exp $".
 //

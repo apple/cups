@@ -3,6 +3,10 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.21rc1
 
+	- The LPD backend used the full length of the hostname
+	  when creating the data and control filenames, which
+	  causes problems with older systems that can't handle
+	  long filenames (STR #560)
 	- The scheduler did not refresh the common printer data
 	  after a fast reload; this prevented banner and other
 	  information from being updated (STR #562)
