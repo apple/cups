@@ -21,7 +21,7 @@
 % Ghostscript, as distributed by Aladdin Enterprises, does not require any
 % GNU software to build or run it.
 
-% $Id: gs_statd.ps,v 1.2 2000/03/08 23:14:31 mike Exp $
+% $Id: gs_statd.ps,v 1.3 2000/06/23 14:48:47 mike Exp $
 % This file provides statusdict, serverdict, and assorted LaserWriter
 % operators, mostly for the benefit of poorly designed PostScript programs
 % that 'know' they are running on a LaserWriter.
@@ -218,7 +218,7 @@ statusdict begin
 
  /pagemargin { 0 } bind def
  /pageparams
-  { currentdevice 1 dict dup /.MediaSize dup put .getdeviceparams
+  { currentdevice 1 dict dup /PageSize dup put .getdeviceparams
     exch pop exch pop aload pop 0 ORIENT1 { 1 } { 0 } ifelse
   } bind def
  /setpage

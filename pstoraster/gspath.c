@@ -22,7 +22,7 @@
   GNU software to build or run it.
 */
 
-/*$Id: gspath.c,v 1.2 2000/03/08 23:14:46 mike Exp $ */
+/*$Id: gspath.c,v 1.3 2000/06/23 14:48:50 mike Exp $ */
 /* Basic path routines for Ghostscript library */
 #include "gx.h"
 #include "gserrors.h"
@@ -490,7 +490,7 @@ gx_default_clip_box(const gs_state * pgs, gs_fixed_rect * pbox)
 	bbox.p.y = dev->ImagingBBox[1];
 	bbox.q.x = dev->ImagingBBox[2];
 	bbox.q.y = dev->ImagingBBox[3];
-    } else {			/* Use the MediaSize indented by the HWMargins, */
+    } else {			/* Use the PageSize indented by the HWMargins, */
 	/* relative to unrotated user space adjusted by */
 	/* the Margins.  (We suspect this isn't quite right, */
 	/* but the whole issue of "margins" is such a mess that */
@@ -503,8 +503,8 @@ gx_default_clip_box(const gs_state * pgs, gs_fixed_rect * pbox)
 	    dev->MarginsHWResolution[1];
 	bbox.p.x = dev->HWMargins[0];
 	bbox.p.y = dev->HWMargins[1];
-	bbox.q.x = dev->MediaSize[0] - dev->HWMargins[2];
-	bbox.q.y = dev->MediaSize[1] - dev->HWMargins[3];
+	bbox.q.x = dev->PageSize[0] - dev->HWMargins[2];
+	bbox.q.y = dev->PageSize[1] - dev->HWMargins[3];
     }
     code = gs_bbox_transform(&bbox, &imat, &bbox);
     if (code < 0)

@@ -22,7 +22,7 @@
   GNU software to build or run it.
 */
 
-/*$Id: gxdevcli.h,v 1.1 2000/03/13 18:57:14 mike Exp $ */
+/*$Id: gxdevcli.h,v 1.2 2000/06/23 14:48:50 mike Exp $ */
 /* Definitions for device clients */
 
 #ifndef gxdevcli_INCLUDED
@@ -219,7 +219,7 @@ dev_page_proc_end_page(gx_default_end_page);
 	gx_device_color_info color_info;	/* color information */\
 	int width;			/* width in pixels */\
 	int height;			/* height in pixels */\
-	float MediaSize[2];		/* media dimensions in points */\
+	float PageSize[2];		/* media dimensions in points */\
 	float ImagingBBox[4];		/* imageable region in points */\
 	  bool ImagingBBox_set;\
 	float HWResolution[2];		/* resolution, dots per inch */\
@@ -836,13 +836,13 @@ int gx_device_adjust_resolution(P4(gx_device * dev, int actual_width, int actual
 void gx_device_set_margins(P3(gx_device * dev, const float *margins /*[4] */ ,
 			      bool move_origin));
 
-/* Set the width and height (in pixels), updating MediaSize. */
+/* Set the width and height (in pixels), updating PageSize. */
 void gx_device_set_width_height(P3(gx_device * dev, int width, int height));
 
 /* Set the resolution (in pixels per inch), updating width and height. */
 void gx_device_set_resolution(P3(gx_device * dev, floatp x_dpi, floatp y_dpi));
 
-/* Set the MediaSize (in 1/72" units), updating width and height. */
+/* Set the PageSize (in 1/72" units), updating width and height. */
 void gx_device_set_media_size(P3(gx_device * dev, floatp media_width, floatp media_height));
 
 /****** BACKWARD COMPATIBILITY ******/

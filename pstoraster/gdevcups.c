@@ -1,5 +1,6 @@
+#define DEBUG
 /*
- * "$Id: gdevcups.c,v 1.28 2000/06/02 20:05:31 mike Exp $"
+ * "$Id: gdevcups.c,v 1.29 2000/06/23 14:48:45 mike Exp $"
  *
  *   GNU Ghostscript raster output driver for the Common UNIX Printing
  *   System (CUPS).
@@ -61,6 +62,9 @@
 #include <filter/raster.h>
 #include <cups/ppd.h>
 #include <math.h>
+
+#undef private
+#define private
 
 
 /*
@@ -346,120 +350,240 @@ cups_get_params(gx_device     *pdev,	/* I - Device info */
   * First process the "standard" page device parameters...
   */
 
+#ifdef DEBUG
+  fputs("DEBUG: before gdev_prn_get_params()\n", stderr);
+#endif /* DEBUG */
+
   if ((code = gdev_prn_get_params(pdev, plist)) < 0)
     return (code);
+
+#ifdef DEBUG
+  fputs("DEBUG: after gdev_prn_get_params()\n", stderr);
+#endif /* DEBUG */
 
  /*
   * Then write the CUPS parameters...
   */
 
+#ifdef DEBUG
+  fputs("DEBUG: MediaClass\n", stderr);
+#endif /* DEBUG */
+
   param_string_from_string(s, cups->header.MediaClass);
   if ((code = param_write_string(plist, "MediaClass", &s)) < 0)
     return (code);
+
+#ifdef DEBUG
+  fputs("DEBUG: AdvanceDistance\n", stderr);
+#endif /* DEBUG */
 
   if ((code = param_write_int(plist, "AdvanceDistance",
                               (int *)&(cups->header.AdvanceDistance))) < 0)
     return (code);
 
+#ifdef DEBUG
+  fputs("DEBUG: AdvanceDistance\n", stderr);
+#endif /* DEBUG */
+
   if ((code = param_write_int(plist, "AdvanceMedia",
                               (int *)&(cups->header.AdvanceMedia))) < 0)
     return (code);
+
+#ifdef DEBUG
+  fputs("DEBUG: Collate\n", stderr);
+#endif /* DEBUG */
 
   if ((code = param_write_int(plist, "Collate",
                               (int *)&(cups->header.Collate))) < 0)
     return (code);
 
+#ifdef DEBUG
+  fputs("DEBUG: CutMedia\n", stderr);
+#endif /* DEBUG */
+
   if ((code = param_write_int(plist, "CutMedia",
                               (int *)&(cups->header.CutMedia))) < 0)
     return (code);
+
+#ifdef DEBUG
+  fputs("DEBUG: InsertSheet\n", stderr);
+#endif /* DEBUG */
 
   if ((code = param_write_int(plist, "InsertSheet",
                               (int *)&(cups->header.InsertSheet))) < 0)
     return (code);
 
+#ifdef DEBUG
+  fputs("DEBUG: Jog\n", stderr);
+#endif /* DEBUG */
+
   if ((code = param_write_int(plist, "Jog",
                               (int *)&(cups->header.Jog))) < 0)
     return (code);
+
+#ifdef DEBUG
+  fputs("DEBUG: LeadingEdge\n", stderr);
+#endif /* DEBUG */
 
   if ((code = param_write_int(plist, "LeadingEdge",
                               (int *)&(cups->header.LeadingEdge))) < 0)
     return (code);
 
+#ifdef DEBUG
+  fputs("DEBUG: MediaPosition\n", stderr);
+#endif /* DEBUG */
+
   if ((code = param_write_int(plist, "MediaPosition",
                               (int *)&(cups->header.MediaPosition))) < 0)
     return (code);
+
+#ifdef DEBUG
+  fputs("DEBUG: MirrorPrint\n", stderr);
+#endif /* DEBUG */
 
   if ((code = param_write_int(plist, "MirrorPrint",
                               (int *)&(cups->header.MirrorPrint))) < 0)
     return (code);
 
+#ifdef DEBUG
+  fputs("DEBUG: NegativePrint\n", stderr);
+#endif /* DEBUG */
+
   if ((code = param_write_int(plist, "NegativePrint",
                               (int *)&(cups->header.NegativePrint))) < 0)
     return (code);
+
+#ifdef DEBUG
+  fputs("DEBUG: OutputFaceUp\n", stderr);
+#endif /* DEBUG */
 
   if ((code = param_write_int(plist, "OutputFaceUp",
                               (int *)&(cups->header.OutputFaceUp))) < 0)
     return (code);
 
+#ifdef DEBUG
+  fputs("DEBUG: Separations\n", stderr);
+#endif /* DEBUG */
+
   if ((code = param_write_int(plist, "Separations",
                               (int *)&(cups->header.Separations))) < 0)
     return (code);
+
+#ifdef DEBUG
+  fputs("DEBUG: TraySwitch\n", stderr);
+#endif /* DEBUG */
 
   if ((code = param_write_int(plist, "TraySwitch",
                               (int *)&(cups->header.TraySwitch))) < 0)
     return (code);
 
+#ifdef DEBUG
+  fputs("DEBUG: Tumble\n", stderr);
+#endif /* DEBUG */
+
   if ((code = param_write_int(plist, "Tumble",
                               (int *)&(cups->header.Tumble))) < 0)
     return (code);
+
+#ifdef DEBUG
+  fputs("DEBUG: cupsWidth\n", stderr);
+#endif /* DEBUG */
 
   if ((code = param_write_int(plist, "cupsWidth",
                               (int *)&(cups->header.cupsWidth))) < 0)
     return (code);
 
+#ifdef DEBUG
+  fputs("DEBUG: cupsHeight\n", stderr);
+#endif /* DEBUG */
+
   if ((code = param_write_int(plist, "cupsHeight",
                               (int *)&(cups->header.cupsHeight))) < 0)
     return (code);
+
+#ifdef DEBUG
+  fputs("DEBUG: cupsMediaType\n", stderr);
+#endif /* DEBUG */
 
   if ((code = param_write_int(plist, "cupsMediaType",
                               (int *)&(cups->header.cupsMediaType))) < 0)
     return (code);
 
+#ifdef DEBUG
+  fputs("DEBUG: cupsBitsPerColor\n", stderr);
+#endif /* DEBUG */
+
   if ((code = param_write_int(plist, "cupsBitsPerColor",
                               (int *)&(cups->header.cupsBitsPerColor))) < 0)
     return (code);
+
+#ifdef DEBUG
+  fputs("DEBUG: cupsBitsPerPixel\n", stderr);
+#endif /* DEBUG */
 
   if ((code = param_write_int(plist, "cupsBitsPerPixel",
                               (int *)&(cups->header.cupsBitsPerPixel))) < 0)
     return (code);
 
+#ifdef DEBUG
+  fputs("DEBUG: cupsBytesPerLine\n", stderr);
+#endif /* DEBUG */
+
   if ((code = param_write_int(plist, "cupsBytesPerLine",
                               (int *)&(cups->header.cupsBytesPerLine))) < 0)
     return (code);
+
+#ifdef DEBUG
+  fputs("DEBUG: cupsColorOrder\n", stderr);
+#endif /* DEBUG */
 
   if ((code = param_write_int(plist, "cupsColorOrder",
                               (int *)&(cups->header.cupsColorOrder))) < 0)
     return (code);
 
+#ifdef DEBUG
+  fputs("DEBUG: cupsColorSpace\n", stderr);
+#endif /* DEBUG */
+
   if ((code = param_write_int(plist, "cupsColorSpace",
                               (int *)&(cups->header.cupsColorSpace))) < 0)
     return (code);
+
+#ifdef DEBUG
+  fputs("DEBUG: cupsCompression\n", stderr);
+#endif /* DEBUG */
 
   if ((code = param_write_int(plist, "cupsCompression",
                               (int *)&(cups->header.cupsCompression))) < 0)
     return (code);
 
+#ifdef DEBUG
+  fputs("DEBUG: cupsRowCount\n", stderr);
+#endif /* DEBUG */
+
   if ((code = param_write_int(plist, "cupsRowCount",
                               (int *)&(cups->header.cupsRowCount))) < 0)
     return (code);
+
+#ifdef DEBUG
+  fputs("DEBUG: cupsRowFeed\n", stderr);
+#endif /* DEBUG */
 
   if ((code = param_write_int(plist, "cupsRowFeed",
                               (int *)&(cups->header.cupsRowFeed))) < 0)
     return (code);
 
+#ifdef DEBUG
+  fputs("DEBUG: cupsRowStep\n", stderr);
+#endif /* DEBUG */
+
   if ((code = param_write_int(plist, "cupsRowStep",
                               (int *)&(cups->header.cupsRowStep))) < 0)
     return (code);
+
+#ifdef DEBUG
+  fputs("DEBUG: Leaving cups_get_params()\n", stderr);
+#endif /* DEBUG */
 
   return (0);
 }
@@ -1317,13 +1441,13 @@ cups_put_params(gx_device     *pdev,	/* I - Device info */
   cups->header.HWResolution[0] = pdev->HWResolution[0];
   cups->header.HWResolution[1] = pdev->HWResolution[1];
 
-  cups->header.PageSize[0] = pdev->MediaSize[0];
-  cups->header.PageSize[1] = pdev->MediaSize[1];
+  cups->header.PageSize[0] = pdev->PageSize[0];
+  cups->header.PageSize[1] = pdev->PageSize[1];
 
 #ifdef DEBUG
   fprintf(stderr, "DEBUG: ppd = %08x\n", cups->ppd);
-  fprintf(stderr, "DEBUG: MediaSize = [ %.3f %.3f ]\n",
-          pdev->MediaSize[0], pdev->MediaSize[1]);
+  fprintf(stderr, "DEBUG: PageSize = [ %.3f %.3f ]\n",
+          pdev->PageSize[0], pdev->PageSize[1]);
   fprintf(stderr, "DEBUG: margins = [ %.3f %.3f %.3f %.3f ]\n",
           margins[0], margins[1], margins[2], margins[3]);
   fprintf(stderr, "DEBUG: HWResolution = [ %.3f %.3f ]\n",
@@ -2382,5 +2506,5 @@ cups_print_planar(gx_device_printer *pdev,	/* I - Printer device */
 
 
 /*
- * End of "$Id: gdevcups.c,v 1.28 2000/06/02 20:05:31 mike Exp $".
+ * End of "$Id: gdevcups.c,v 1.29 2000/06/23 14:48:45 mike Exp $".
  */

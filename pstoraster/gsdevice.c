@@ -24,7 +24,7 @@
   GNU software to build or run it.
 */
 
-/*$Id: gsdevice.c,v 1.6 2000/03/08 23:14:39 mike Exp $ */
+/*$Id: gsdevice.c,v 1.7 2000/06/23 14:48:49 mike Exp $ */
 /* Device operators for Ghostscript library */
 #include "ctype_.h"
 #include "memory_.h"		/* for memcpy */
@@ -444,13 +444,13 @@ gx_device_set_margins(gx_device * dev, const float *margins /*[4] */ ,
 	dev->Margins[1] = -margins[3] * dev->MarginsHWResolution[1];
     }
 
-    dev->width = (dev->MediaSize[0] - dev->HWMargins[0] - dev->HWMargins[2]) *
+    dev->width = (dev->PageSize[0] - dev->HWMargins[0] - dev->HWMargins[2]) *
 	         dev->x_pixels_per_inch / 72.0 + 0.5;
-    dev->height = (dev->MediaSize[1] - dev->HWMargins[1] - dev->HWMargins[3]) *
+    dev->height = (dev->PageSize[1] - dev->HWMargins[1] - dev->HWMargins[3]) *
 	          dev->y_pixels_per_inch / 72.0 + 0.5;
 }
 
-/* Set the width and height, updating MediaSize to remain consistent. */
+/* Set the width and height, updating PageSize to remain consistent. */
 void
 gx_device_set_width_height(gx_device * dev, int width, int height)
 {
@@ -458,8 +458,8 @@ gx_device_set_width_height(gx_device * dev, int width, int height)
                  (dev->HWMargins[0] + dev->HWMargins[2]) / 72.0;
     dev->height = height - dev->y_pixels_per_inch *
 	          (dev->HWMargins[1] + dev->HWMargins[3]) / 72.0;
-    dev->MediaSize[0] = width * 72.0 / dev->x_pixels_per_inch;
-    dev->MediaSize[1] = height * 72.0 / dev->y_pixels_per_inch;
+    dev->PageSize[0] = width * 72.0 / dev->x_pixels_per_inch;
+    dev->PageSize[1] = height * 72.0 / dev->y_pixels_per_inch;
 }
 
 /* Set the resolution, updating width and height to remain consistent. */
@@ -469,22 +469,22 @@ gx_device_set_resolution(gx_device * dev, floatp x_dpi, floatp y_dpi)
     dev->x_pixels_per_inch = x_dpi;
     dev->y_pixels_per_inch = y_dpi;
 
-    dev->width = (dev->MediaSize[0] - dev->HWMargins[0] - dev->HWMargins[2]) *
+    dev->width = (dev->PageSize[0] - dev->HWMargins[0] - dev->HWMargins[2]) *
 	         dev->x_pixels_per_inch / 72.0 + 0.5;
-    dev->height = (dev->MediaSize[1] - dev->HWMargins[1] - dev->HWMargins[3]) *
+    dev->height = (dev->PageSize[1] - dev->HWMargins[1] - dev->HWMargins[3]) *
 	          dev->y_pixels_per_inch / 72.0 + 0.5;
 }
 
-/* Set the MediaSize, updating width and height to remain consistent. */
+/* Set the PageSize, updating width and height to remain consistent. */
 void
 gx_device_set_media_size(gx_device * dev, floatp media_width, floatp media_height)
 {
-    dev->MediaSize[0] = media_width;
-    dev->MediaSize[1] = media_height;
+    dev->PageSize[0] = media_width;
+    dev->PageSize[1] = media_height;
 
-    dev->width = (dev->MediaSize[0] - dev->HWMargins[0] - dev->HWMargins[2]) *
+    dev->width = (dev->PageSize[0] - dev->HWMargins[0] - dev->HWMargins[2]) *
 	         dev->x_pixels_per_inch / 72.0 + 0.5;
-    dev->height = (dev->MediaSize[1] - dev->HWMargins[1] - dev->HWMargins[3]) *
+    dev->height = (dev->PageSize[1] - dev->HWMargins[1] - dev->HWMargins[3]) *
 	          dev->y_pixels_per_inch / 72.0 + 0.5;
 }
 
@@ -499,7 +499,7 @@ gx_device_copy_params(gx_device *to, const gx_device *from)
 #define COPY_ARRAY_PARAM(p) memcpy(to->p, from->p, sizeof(to->p))
 	COPY_PARAM(width);
 	COPY_PARAM(height);
-	COPY_ARRAY_PARAM(MediaSize);
+	COPY_ARRAY_PARAM(PageSize);
 	COPY_ARRAY_PARAM(ImagingBBox);
 	COPY_PARAM(ImagingBBox_set);
 	COPY_ARRAY_PARAM(HWResolution);

@@ -21,7 +21,7 @@
 % Ghostscript, as distributed by Aladdin Enterprises, does not require any
 % GNU software to build or run it.
 
-% $Id: gs_setpd.ps,v 1.4 2000/03/20 18:57:57 mike Exp $
+% $Id: gs_setpd.ps,v 1.5 2000/06/23 14:48:47 mike Exp $
 % The current implementation of setpagedevice has the following limitations:
 %	- It doesn't attempt to "interact with the user" for Policy = 2.
 
@@ -164,7 +164,7 @@ level2dict begin
 % ---------------- Auxiliary definitions ---------------- %
 
 % Define the required attributes of all page devices, and their default values.
-% We don't include attributes such as .MediaSize, which all devices
+% We don't include attributes such as PageSize, which all devices
 % are guaranteed to supply on their own.
 /.defaultpolicies mark
   /PolicyNotFound 1
@@ -197,7 +197,6 @@ level2dict begin
 % We have to deal specially with entries that the driver may change
 % on its own.
 /.dynamicppkeys mark
-  /.MediaSize dup		% because it changes when PageSize is set
   /PageCount dup
 .dicttomark readonly def
 /.makecurrentpagedevice		% - .makecurrentpagedevice <dict>
@@ -324,13 +323,10 @@ level2dict begin
 % true iff the key/value pair should be presented to .putdeviceparams.
 /.presentspecial mark
   .dynamicppkeys { pop false } forall
-			% We must ignore an explicit request for .MediaSize,
-			% because media matching always handles this.
-  /.MediaSize false
   /Name false
   /OutputDevice false
   /PageOffset false
-  /PageSize false		% obsolete alias for .MediaSize
+  /PageSize false
   /InputAttributes false
   .inputattrkeys
     { dup /PageSize eq
@@ -479,11 +475,11 @@ DEBUG { (Rolling back.\n) print pstack flush } if
 /.trysetparams		% <merged> <(ignored)> <device> <Policies>
 			%   .trysetparams
  { true 4 index .prepareparams
-			% Add the computed .MediaSize.
+			% Add the computed PageSize.
 			% Stack: merged (ignored) device Policies -true-
 			%   -mark- key1 value1 ...
    counttomark 5 add index .computemediasize
-   exch pop exch pop /.MediaSize exch
+   exch pop exch pop /PageSize exch
 DEBUG { (Putting.\n) print pstack flush } if
    .putdeviceparamsonly
 DEBUG { (Result of putting.\n) print pstack flush } if

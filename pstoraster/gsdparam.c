@@ -24,7 +24,7 @@
   GNU software to build or run it.
 */
 
-/*$Id: gsdparam.c,v 1.4 2000/03/08 23:14:39 mike Exp $ */
+/*$Id: gsdparam.c,v 1.5 2000/06/23 14:48:49 mike Exp $ */
 /* Default device parameters for Ghostscript library */
 #include "memory_.h"		/* for memcpy */
 #include "string_.h"		/* for strlen */
@@ -33,11 +33,6 @@
 #include "gsparam.h"
 #include "gxdevice.h"
 #include "gxfixed.h"
-
-/* Define whether we accept PageSize as a synonym for MediaSize. */
-/* This is for backward compatibility only. */
-/* MRS - This is for ADOBE POSTSCRIPT compatibility!!!! */
-#define PAGESIZE_IS_MEDIASIZE
 
 /* ================ Getting parameters ================ */
 
@@ -101,7 +96,7 @@ gx_default_get_params(gx_device * dev, gs_param_list * plist)
 	    pcms.data = 0;
     }
     set_param_array(hwra, dev->HWResolution, 2);
-    set_param_array(msa, dev->MediaSize, 2);
+    set_param_array(msa, dev->PageSize, 2);
     set_param_array(ibba, dev->ImagingBBox, 4);
     set_param_array(ma, dev->Margins, 2);
 
@@ -119,9 +114,7 @@ gx_default_get_params(gx_device * dev, gs_param_list * plist)
     /* Standard parameters */
 
 	   (code = param_write_name(plist, "OutputDevice", &dns)) < 0 ||
-#ifdef PAGESIZE_IS_MEDIASIZE
 	   (code = param_write_float_array(plist, "PageSize", &msa)) < 0 ||
-#endif
 	   (code = (pcms.data == 0 ? 0 :
 		param_write_name(plist, "ProcessColorModel", &pcms))) < 0 ||
        (code = param_write_float_array(plist, "HWResolution", &hwra)) < 0 ||
@@ -140,7 +133,6 @@ gx_default_get_params(gx_device * dev, gs_param_list * plist)
 	   (code = param_write_int_array(plist, "HWSize", &hwsa)) < 0 ||
 	 (code = param_write_float_array(plist, ".HWMargins", &hwma)) < 0 ||
 	   (code = param_write_float_array(plist, ".MarginsHWResolution", &mhwra)) < 0 ||
-	   (code = param_write_float_array(plist, ".MediaSize", &msa)) < 0 ||
 	   (code = param_write_string(plist, "Name", &dns)) < 0 ||
 	   (code = param_write_int(plist, "Colors", &colors)) < 0 ||
 	   (code = param_write_int(plist, "BitsPerPixel", &depth)) < 0 ||
@@ -369,7 +361,7 @@ gdev_end_output_media(gs_param_list * mlist, gs_param_dict * pdict)
 /* ================ Putting parameters ================ */
 
 /* Forward references */
-private int param_MediaSize(P4(gs_param_list *, gs_param_name,
+private int param_PageSize(P4(gs_param_list *, gs_param_name,
 			       const float *, gs_param_float_array *));
 
 #if 0				/****** not used ***** */
@@ -452,11 +444,11 @@ e:	param_signal_error(plist, param_name, ecode);\
   }
 
     /*
-     * The HWResolution, HWSize, and MediaSize parameters interact in
+     * The HWResolution, HWSize, and PageSize parameters interact in
      * the following way:
-     *      1. Setting HWResolution recomputes HWSize from MediaSize.
-     *      2. Setting HWSize recomputes MediaSize from HWResolution.
-     *      3. Setting MediaSize recomputes HWSize from HWResolution.
+     *      1. Setting HWResolution recomputes HWSize from PageSize.
+     *      2. Setting HWSize recomputes PageSize from HWResolution.
+     *      3. Setting PageSize recomputes HWSize from HWResolution.
      * If more than one parameter is being set, we apply these rules
      * in the order 1, 2, 3.  This does the right thing in the most
      * common case of setting more than one parameter, namely,
@@ -487,27 +479,10 @@ e:	param_signal_error(plist, param_name, ecode);\
     END_ARRAY_PARAM(hwsa, hwse) {
 	const float *res = (hwra.data == 0 ? dev->HWResolution : hwra.data);
 
-#ifdef PAGESIZE_IS_MEDIASIZE
-	const float *data;
-
-	/* .MediaSize takes precedence over PageSize, so */
-	/* we read PageSize first. */
-	code = param_MediaSize(plist, "PageSize", res, &msa);
+	/* MRS - Dropped questionable use of .PageSize attribute */
+	code = param_PageSize(plist, "PageSize", res, &msa);
 	if (code < 0)
 	    ecode = code;
-	/* Prevent data from being set to 0 if PageSize is specified */
-	/* but .MediaSize is not. */
-	data = msa.data;
-	code = param_MediaSize(plist, ".MediaSize", res, &msa);
-	if (code < 0)
-	    ecode = code;
-	else if (msa.data == 0)
-	    msa.data = data;
-#else
-	code = param_MediaSize(plist, ".MediaSize", res, &msa);
-	if (code < 0)
-	    ecode = code;
-#endif
     }
 
     BEGIN_ARRAY_PARAM(param_read_float_array, "Margins", ma, 2, me)
@@ -673,8 +648,8 @@ nce:
 	gx_device_set_width_height(dev, hwsa.data[0], hwsa.data[1]);
     }
     if (msa.data != 0 &&
-	(dev->MediaSize[0] != msa.data[0] ||
-	 dev->MediaSize[1] != msa.data[1])
+	(dev->PageSize[0] != msa.data[0] ||
+	 dev->PageSize[1] != msa.data[1])
 	) {
 	if (dev->is_open)
 	    gs_closedevice(dev);
@@ -705,9 +680,9 @@ nce:
     return 0;
 }
 
-/* Read .MediaSize or, if supported as a synonym, PageSize. */
+/* Read PageSize. */
 private int
-param_MediaSize(gs_param_list * plist, gs_param_name pname,
+param_PageSize(gs_param_list * plist, gs_param_name pname,
 		const float *res, gs_param_float_array * pa)
 {
     gs_param_name param_name;
