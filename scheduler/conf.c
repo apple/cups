@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.132 2003/04/10 20:14:05 mike Exp $"
+ * "$Id: conf.c,v 1.133 2003/04/10 21:18:10 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -222,7 +222,9 @@ ReadConfiguration(void)
   * Save the old root paths...
   */
 
+  old_serverroot = NULL;
   SetString(&old_serverroot, ServerRoot);
+  old_requestroot = NULL;
   SetString(&old_requestroot, RequestRoot);
 
  /*
@@ -2154,5 +2156,5 @@ CDSAGetServerCerts(void)
 
 
 /*
- * End of "$Id: conf.c,v 1.132 2003/04/10 20:14:05 mike Exp $".
+ * End of "$Id: conf.c,v 1.133 2003/04/10 21:18:10 mike Exp $".
  */
