@@ -1,5 +1,5 @@
 /*
- * "$Id: pstoraster.c,v 1.13 2000/03/13 18:30:14 mike Exp $"
+ * "$Id: pstoraster.c,v 1.14 2000/06/26 15:50:18 mike Exp $"
  *
  *   PostScript RIP filter main entry for the Common UNIX Printing System
  *   (CUPS).
@@ -93,7 +93,6 @@ main(int  argc,		/* I - Number of command-line arguments */
   ref			vtrue;		/* True value */
   int			exit_code;	/* Exit code */
   ref			error_object;	/* Error object */
-  char			*content_type;	/* CONTENT_TYPE environment variable */
   int			num_options;	/* Number of job options */
   cups_option_t		*options;	/* Job options */
 
@@ -150,13 +149,6 @@ main(int  argc,		/* I - Number of command-line arguments */
   initial_enter_name("QUIET", &vtrue);
   initial_enter_name("NOPAUSE", &vtrue);
   initial_enter_name("BATCH", &vtrue);
-
-  if ((content_type = getenv("CONTENT_TYPE")) != NULL &&
-      strcmp(content_type, "application/pdf") == 0)
-  {
-    fputs("INFO: Converting PDF file to PostScript...\n", stderr);
-    define_string("DEVICE", "pswrite");
-  }
 
   define_string("OutputFile", "-");
   define_string("FONTPATH", CUPS_DATADIR "/fonts");
@@ -226,5 +218,5 @@ define_string(char *name,	/* I - Variable to set */
 
 
 /*
- * End of "$Id: pstoraster.c,v 1.13 2000/03/13 18:30:14 mike Exp $".
+ * End of "$Id: pstoraster.c,v 1.14 2000/06/26 15:50:18 mike Exp $".
  */

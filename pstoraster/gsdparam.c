@@ -24,7 +24,7 @@
   GNU software to build or run it.
 */
 
-/*$Id: gsdparam.c,v 1.5 2000/06/23 14:48:49 mike Exp $ */
+/*$Id: gsdparam.c,v 1.6 2000/06/26 15:50:17 mike Exp $ */
 /* Default device parameters for Ghostscript library */
 #include "memory_.h"		/* for memcpy */
 #include "string_.h"		/* for strlen */
@@ -110,9 +110,11 @@ gx_default_get_params(gx_device * dev, gs_param_list * plist)
 
     /* Transmit the values. */
 
-    if (
-    /* Standard parameters */
+    if (!dev->NumCopies_set)
+      dev->NumCopies = 1;
 
+    /* Standard parameters */
+    if (
 	   (code = param_write_name(plist, "OutputDevice", &dns)) < 0 ||
 	   (code = param_write_float_array(plist, "PageSize", &msa)) < 0 ||
 	   (code = (pcms.data == 0 ? 0 :
@@ -124,9 +126,7 @@ gx_default_get_params(gx_device * dev, gs_param_list * plist)
 	   (code = param_write_float_array(plist, "Margins", &ma)) < 0 ||
 	   (code = (dev->NumCopies_set < 0 ||
 		    (*dev_proc(dev, get_page_device))(dev) == 0 ? 0:
-		    dev->NumCopies_set ?
-		    param_write_int(plist, "NumCopies", &dev->NumCopies) :
-		    param_write_null(plist, "NumCopies"))) < 0 ||
+		    param_write_int(plist, "NumCopies", &dev->NumCopies))) < 0 ||
 
     /* Non-standard parameters */
 

@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.26 2000/06/20 17:02:02 mike Exp $"
+# "$Id: Makefile,v 1.27 2000/06/26 15:50:17 mike Exp $"
 #
 #   GNU Ghostscript makefile for the Common UNIX Printing System (CUPS).
 #
@@ -56,14 +56,6 @@ LIBOBJS	=	gconfig.o \
 		gdevnfwd.o \
 		gdevpipe.o \
 		gdevprn.o \
-		gdevpsde.o \
-		gdevpsdf.o \
-		gdevpsdi.o \
-		gdevpsdp.o \
-		gdevpsds.o \
-		gdevpstr.o \
-		gdevps.o \
-		gdevvec.o \
 		gp_getnv.o \
 		gp_nofb.o \
 		gp_nsync.o \
@@ -350,14 +342,12 @@ DFILES	=	Fontmap \
 		gs_cmap.ps gs_cmdl.ps gs_dbt_e.ps gs_diskf.ps \
 		gs_dpnxt.ps gs_dps1.ps gs_dps2.ps gs_dps.ps gs_epsf.ps \
 		gs_fform.ps gs_fonts.ps gs_init.ps gs_iso_e.ps \
-		gs_kanji.ps gs_ksb_e.ps gs_l2img.ps gs_lev2.ps \
-		gs_ll3.ps gs_mex_e.ps gs_mro_e.ps gs_pdfwr.ps \
+		gs_kanji.ps gs_ksb_e.ps gs_lev2.ps \
+		gs_ll3.ps gs_mex_e.ps gs_mro_e.ps \
 		gs_pdf_e.ps gs_pfile.ps gs_res.ps gs_setpd.ps \
 		gs_statd.ps gs_std_e.ps gs_sym_e.ps gs_ttf.ps \
 		gs_typ32.ps gs_typ42.ps gs_type1.ps gs_wan_e.ps \
-		gs_wl1_e.ps gs_wl2_e.ps gs_wl5_e.ps pdf2dsc.ps \
-		pdf_base.ps pdf_draw.ps pdf_font.ps pdf_main.ps \
-		pdf_ops.ps pdf_sec.ps
+		gs_wl1_e.ps gs_wl2_e.ps gs_wl5_e.ps
 
 
 #
@@ -430,5 +420,5 @@ pstoraster:	pstoraster.o libgs.a ../Makedefs ../cups/$(LIBCUPS)
 pstoraster.o:	arch.h ../config.h ../Makedefs
 
 #
-# End of "$Id: Makefile,v 1.26 2000/06/20 17:02:02 mike Exp $".
+# End of "$Id: Makefile,v 1.27 2000/06/26 15:50:17 mike Exp $".
 #

@@ -1,5 +1,5 @@
 /*
- * "$Id: gconfig.h,v 1.9 2000/03/13 19:05:23 mike Exp $"
+ * "$Id: gconfig.h,v 1.10 2000/06/26 15:50:17 mike Exp $"
  *
  *   GNU GhostScript configuration file for the Common UNIX Printing
  *   System (CUPS).
@@ -30,9 +30,8 @@
 
 #ifdef device2_
 device2_(gs_cups_device)
-device2_(gs_pswrite_device)
 device2_(gs_bbox_device)
-device2_(gs_nullpage_device)
+/*device2_(gs_nullpage_device)*/
 #endif
 #ifdef oper_
 oper_(zchar1_op_defs)
@@ -214,20 +213,7 @@ oper_(zfzlib_op_defs)
 #ifdef psfile_
 psfile_("gs_mex_e.ps",11)
 psfile_("gs_mro_e.ps",11)
-psfile_("gs_pdf_e.ps",11)
 psfile_("gs_wan_e.ps",11)
-psfile_("pdf_ops.ps",10)
-psfile_("gs_l2img.ps",11)
-psfile_("pdf_base.ps",11)
-psfile_("pdf_draw.ps",11)
-psfile_("pdf_font.ps",11)
-psfile_("pdf_main.ps",11)
-psfile_("pdf_sec.ps",10)
-#endif
-#ifdef emulator_
-emulator_("PDF",3)
-#endif
-#ifdef psfile_
 psfile_("gs_cff.ps",9)
 psfile_("gs_ttf.ps",9)
 #endif
@@ -253,5 +239,5 @@ init_(gs_gximono_init)
 #define SEARCH_HERE_FIRST 1
 
 /*
- * End of "$Id: gconfig.h,v 1.9 2000/03/13 19:05:23 mike Exp $".
+ * End of "$Id: gconfig.h,v 1.10 2000/06/26 15:50:17 mike Exp $".
  */

@@ -1,6 +1,5 @@
-#define DEBUG
 /*
- * "$Id: gdevcups.c,v 1.29 2000/06/23 14:48:45 mike Exp $"
+ * "$Id: gdevcups.c,v 1.30 2000/06/26 15:50:17 mike Exp $"
  *
  *   GNU Ghostscript raster output driver for the Common UNIX Printing
  *   System (CUPS).
@@ -340,6 +339,7 @@ cups_get_params(gx_device     *pdev,	/* I - Device info */
 {
   int			code;		/* Return code */
   gs_param_string	s;		/* Temporary string value */
+  bool			b;		/* Temporary boolean value */
 
 
 #ifdef DEBUG
@@ -393,8 +393,8 @@ cups_get_params(gx_device     *pdev,	/* I - Device info */
   fputs("DEBUG: Collate\n", stderr);
 #endif /* DEBUG */
 
-  if ((code = param_write_int(plist, "Collate",
-                              (int *)&(cups->header.Collate))) < 0)
+  b = cups->header.Collate;
+  if ((code = param_write_bool(plist, "Collate", &b)) < 0)
     return (code);
 
 #ifdef DEBUG
@@ -409,8 +409,8 @@ cups_get_params(gx_device     *pdev,	/* I - Device info */
   fputs("DEBUG: InsertSheet\n", stderr);
 #endif /* DEBUG */
 
-  if ((code = param_write_int(plist, "InsertSheet",
-                              (int *)&(cups->header.InsertSheet))) < 0)
+  b = cups->header.InsertSheet;
+  if ((code = param_write_bool(plist, "InsertSheet", &b)) < 0)
     return (code);
 
 #ifdef DEBUG
@@ -430,6 +430,14 @@ cups_get_params(gx_device     *pdev,	/* I - Device info */
     return (code);
 
 #ifdef DEBUG
+  fputs("DEBUG: ManualFeed\n", stderr);
+#endif /* DEBUG */
+
+  b = cups->header.ManualFeed;
+  if ((code = param_write_bool(plist, "ManualFeed", &b)) < 0)
+    return (code);
+
+#ifdef DEBUG
   fputs("DEBUG: MediaPosition\n", stderr);
 #endif /* DEBUG */
 
@@ -441,48 +449,48 @@ cups_get_params(gx_device     *pdev,	/* I - Device info */
   fputs("DEBUG: MirrorPrint\n", stderr);
 #endif /* DEBUG */
 
-  if ((code = param_write_int(plist, "MirrorPrint",
-                              (int *)&(cups->header.MirrorPrint))) < 0)
+  b = cups->header.MirrorPrint;
+  if ((code = param_write_bool(plist, "MirrorPrint", &b)) < 0)
     return (code);
 
 #ifdef DEBUG
   fputs("DEBUG: NegativePrint\n", stderr);
 #endif /* DEBUG */
 
-  if ((code = param_write_int(plist, "NegativePrint",
-                              (int *)&(cups->header.NegativePrint))) < 0)
+  b = cups->header.NegativePrint;
+  if ((code = param_write_bool(plist, "NegativePrint", &b)) < 0)
     return (code);
 
 #ifdef DEBUG
   fputs("DEBUG: OutputFaceUp\n", stderr);
 #endif /* DEBUG */
 
-  if ((code = param_write_int(plist, "OutputFaceUp",
-                              (int *)&(cups->header.OutputFaceUp))) < 0)
+  b = cups->header.OutputFaceUp;
+  if ((code = param_write_bool(plist, "OutputFaceUp", &b)) < 0)
     return (code);
 
 #ifdef DEBUG
   fputs("DEBUG: Separations\n", stderr);
 #endif /* DEBUG */
 
-  if ((code = param_write_int(plist, "Separations",
-                              (int *)&(cups->header.Separations))) < 0)
+  b = cups->header.Separations;
+  if ((code = param_write_bool(plist, "Separations", &b)) < 0)
     return (code);
 
 #ifdef DEBUG
   fputs("DEBUG: TraySwitch\n", stderr);
 #endif /* DEBUG */
 
-  if ((code = param_write_int(plist, "TraySwitch",
-                              (int *)&(cups->header.TraySwitch))) < 0)
+  b = cups->header.TraySwitch;
+  if ((code = param_write_bool(plist, "TraySwitch", &b)) < 0)
     return (code);
 
 #ifdef DEBUG
   fputs("DEBUG: Tumble\n", stderr);
 #endif /* DEBUG */
 
-  if ((code = param_write_int(plist, "Tumble",
-                              (int *)&(cups->header.Tumble))) < 0)
+  b = cups->header.Tumble;
+  if ((code = param_write_bool(plist, "Tumble", &b)) < 0)
     return (code);
 
 #ifdef DEBUG
@@ -2506,5 +2514,5 @@ cups_print_planar(gx_device_printer *pdev,	/* I - Printer device */
 
 
 /*
- * End of "$Id: gdevcups.c,v 1.29 2000/06/23 14:48:45 mike Exp $".
+ * End of "$Id: gdevcups.c,v 1.30 2000/06/26 15:50:17 mike Exp $".
  */
