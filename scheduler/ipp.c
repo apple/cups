@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.97 2000/09/14 18:54:13 mike Exp $"
+ * "$Id: ipp.c,v 1.98 2000/09/14 21:20:39 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -1812,6 +1812,12 @@ create_job(client_t        *con,	/* I - Client connection */
   ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_NAME, "job-name", NULL,
                title);
 
+  if ((attr = ippFindAttribute(job->attrs, "job-k-octets", IPP_TAG_INTEGER)) != NULL)
+    attr->values[0].integer = 0;
+  else
+    attr = ippAddInteger(job->attrs, IPP_TAG_JOB, IPP_TAG_INTEGER,
+                         "job-k-octets", 0);
+
   if ((attr = ippFindAttribute(job->attrs, "job-hold-until", IPP_TAG_KEYWORD)) == NULL)
     attr = ippFindAttribute(job->attrs, "job-hold-until", IPP_TAG_NAME);
   if (attr == NULL)
@@ -2049,6 +2055,10 @@ copy_banner(client_t   *con,	/* I - Client connection */
       putc(ch, out);
 
   fclose(in);
+
+  if ((attr = ippFindAttribute(job->attrs, "job-k-octets", IPP_TAG_INTEGER)) != NULL)
+    attr->values[0].integer += (ftell(out) + 1023) / 1024;
+
   fclose(out);
 }
 
@@ -2265,7 +2275,6 @@ static void
 get_jobs(client_t        *con,		/* I - Client connection */
 	 ipp_attribute_t *uri)		/* I - Printer URI */
 {
-  int			i;		/* Looping var */
   ipp_attribute_t	*attr;		/* Current attribute */
   const char		*dest;		/* Destination */
   cups_ptype_t		dtype;		/* Destination type (printer or class) */
@@ -2284,9 +2293,6 @@ get_jobs(client_t        *con,		/* I - Client connection */
   job_t			*job;		/* Current job pointer */
   char			job_uri[HTTP_MAX_URI];
 					/* Job URI... */
-  char			filename[1024];	/* Job filename */
-  struct stat		filestats;	/* Print file information */
-  size_t		jobsize;	/* Total job sizes */
 
 
   DEBUG_printf(("get_jobs(%08x, %08x)\n", con, uri));
@@ -2389,39 +2395,11 @@ get_jobs(client_t        *con,		/* I - Client connection */
     DEBUG_printf(("get_jobs: count = %d\n", count));
 
    /*
-    * Send the following attributes for each job:
-    *
-    *    job-id
-    *    job-k-octets
-    *    job-more-info
-    *    job-originating-user-name
-    *    job-printer-uri
-    *    job-priority
-    *    job-state
-    *    job-uri
-    *    job-name
-    *    job-printer-up-time
-    *
-    * Note that we are supposed to look at the "requested-attributes"
-    * attribute to determine what we send, however the IPP/1.0 spec also
-    * doesn't state that the server must limit the attributes to those
-    * requested.  In other words, the server can either implement the
-    * filtering or not, and if not it needs to send all attributes that
-    * it has...
+    * Send the requested attributes for each job...
     */
 
     sprintf(job_uri, "http://%s:%d/jobs/%d", ServerName,
 	    ntohs(con->http.hostaddr.sin_port), job->id);
-
-    for (i = 0, jobsize = 0; i < job->num_files; i ++)
-    {
-      sprintf(filename, "%s/d%05d-%03d", RequestRoot, job->id, i + 1);
-      stat(filename, &filestats);
-      jobsize += filestats.st_size;
-    }
-
-    ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_INTEGER,
-                  "job-k-octets", (jobsize + 1023) / 1024);
 
     ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_URI,
                  "job-more-info", NULL, job_uri);
@@ -2461,7 +2439,6 @@ static void
 get_job_attrs(client_t        *con,		/* I - Client connection */
 	      ipp_attribute_t *uri)		/* I - Job URI */
 {
-  int			i;		/* Looping var */
   ipp_attribute_t	*attr;		/* Current attribute */
   int			jobid;		/* Job ID */
   job_t			*job;		/* Current job */
@@ -2476,9 +2453,6 @@ get_job_attrs(client_t        *con,		/* I - Client connection */
   int			port;		/* Port portion of URI */
   char			job_uri[HTTP_MAX_URI];
 					/* Job URI... */
-  char			filename[1024];	/* Job filename */
-  struct stat		filestats;	/* Print file information */
-  size_t		jobsize;	/* Total job sizes */
 
 
   DEBUG_printf(("get_job_attrs(%08x, %08x)\n", con, uri));
@@ -2548,16 +2522,6 @@ get_job_attrs(client_t        *con,		/* I - Client connection */
 	  ntohs(con->http.hostaddr.sin_port), job->id);
 
   ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_INTEGER, "job-id", job->id);
-
-  for (i = 0, jobsize = 0; i < job->num_files; i ++)
-  {
-    sprintf(filename, "%s/d%05d-%03d", RequestRoot, job->id, i + 1);
-    stat(filename, &filestats);
-    jobsize += filestats.st_size;
-  }
-
-  ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_INTEGER,
-                "job-k-octets", (jobsize + 1023) / 1024);
 
   ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_URI,
                "job-more-info", NULL, job_uri);
@@ -3135,6 +3099,7 @@ print_job(client_t        *con,		/* I - Client connection */
 			mimetype[MIME_MAX_SUPER + MIME_MAX_TYPE + 2];
 					/* Textual name of mime type */
   printer_t		*printer;	/* Printer data */
+  struct stat		fileinfo;	/* File information */
 
 
   DEBUG_printf(("print_job(%08x, %08x)\n", con, uri));
@@ -3369,6 +3334,13 @@ print_job(client_t        *con,		/* I - Client connection */
                printer_uri);
   ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_NAME, "job-name", NULL,
                title);
+
+  if ((attr = ippFindAttribute(job->attrs, "job-k-octets", IPP_TAG_INTEGER)) == NULL)
+    attr = ippAddInteger(job->attrs, IPP_TAG_JOB, IPP_TAG_INTEGER,
+                         "job-k-octets", 0);
+
+  if (!stat(con->filename, &fileinfo))
+    attr->values[0].integer = (fileinfo.st_size + 1023) / 1024;
 
   ippAddInteger(job->attrs, IPP_TAG_JOB, IPP_TAG_INTEGER, "time-at-creation",
                 time(NULL));
@@ -3897,6 +3869,7 @@ send_document(client_t        *con,	/* I - Client connection */
 					/* Textual name of mime type */
   char			filename[1024];	/* Job filename */
   printer_t		*printer;	/* Current printer */
+  struct stat		fileinfo;	/* File information */
 
 
   DEBUG_printf(("send_document(%08x, %08x)\n", con, uri));
@@ -4092,6 +4065,10 @@ send_document(client_t        *con,	/* I - Client connection */
 
   if (add_file(con, job, filetype))
     return;
+
+  if ((attr = ippFindAttribute(job->attrs, "job-k-octets", IPP_TAG_INTEGER)) != NULL &&
+      !stat(con->filename, &fileinfo))
+    attr->values[0].integer += (fileinfo.st_size + 1023) / 1024;
 
   sprintf(filename, "%s/d%05d-%03d", RequestRoot, job->id, job->num_files);
   rename(con->filename, filename);
@@ -4851,5 +4828,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.97 2000/09/14 18:54:13 mike Exp $".
+ * End of "$Id: ipp.c,v 1.98 2000/09/14 21:20:39 mike Exp $".
  */
