@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c,v 1.95 2003/02/19 22:02:39 mike Exp $"
+ * "$Id: ppd.c,v 1.96 2003/02/20 03:49:49 mike Exp $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -2590,9 +2590,6 @@ ppd_read(FILE *fp,			/* I - File to read from */
         ppd_line ++;
 	col = 0;
 
-	if (lineptr == line)		/* Skip blank lines */
-          continue;
-
 	if (ch == '\r')
 	{
 	 /*
@@ -2604,6 +2601,9 @@ ppd_read(FILE *fp,			/* I - File to read from */
 	  if (ch != 0x0a)
 	    ungetc(ch, fp);
 	}
+
+	if (lineptr == line)		/* Skip blank lines */
+          continue;
 
 	ch = '\n';
 
@@ -2954,13 +2954,17 @@ ppd_read(FILE *fp,			/* I - File to read from */
     if (*lineptr == ':')
     {
      /*
-      * Get string...
+      * Get string after triming leading and trailing whitespace...
       */
-
-      *string = malloc(strlen(lineptr) + 1);
 
       while (*lineptr == ':' || isspace(*lineptr))
         lineptr ++;
+
+      strptr = lineptr + strlen(lineptr);
+      while (*strptr == '\0' || isspace(*strptr))
+        *strptr-- = '\0';
+
+      *string = malloc(strlen(lineptr) + 1);
 
       strptr = *string;
 
@@ -2982,5 +2986,5 @@ ppd_read(FILE *fp,			/* I - File to read from */
 
 
 /*
- * End of "$Id: ppd.c,v 1.95 2003/02/19 22:02:39 mike Exp $".
+ * End of "$Id: ppd.c,v 1.96 2003/02/20 03:49:49 mike Exp $".
  */
