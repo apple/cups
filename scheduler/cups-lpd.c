@@ -1,5 +1,5 @@
 /*
- * "$Id: cups-lpd.c,v 1.33 2002/05/16 13:44:59 mike Exp $"
+ * "$Id: cups-lpd.c,v 1.34 2002/06/07 15:43:20 mike Exp $"
  *
  *   Line Printer Daemon interface for the Common UNIX Printing System (CUPS).
  *
@@ -247,14 +247,14 @@ main(int  argc,			/* I - Number of command-line arguments */
 
     case 0x03 : /* Send queue state (short) */
         syslog(LOG_INFO, "Send queue state (short) for %s %s", dest, list);
-	/* send_state() sends initial status byte */
+	/* no status byte for this command */
 
         status = send_state(dest, list, 0);
 	break;
 
     case 0x04 : /* Send queue state (long) */
         syslog(LOG_INFO, "Send queue state (long) for %s %s", dest, list);
-	/* send_state() sends initial status byte */
+	/* no status byte for this command */
 
         status = send_state(dest, list, 1);
 	break;
@@ -967,7 +967,7 @@ send_state(const char *dest,		/* I - Destination */
                                  cupsEncryption())) == NULL)
   {
     syslog(LOG_ERR, "Unable to connect to server: %s", strerror(errno));
-    putchar(1);
+    printf("Unable to connect to server: %s", strerror(errno));
     return (1);
   }
 
@@ -1010,12 +1010,11 @@ send_state(const char *dest,		/* I - Destination */
     {
       syslog(LOG_WARNING, "Unable to get printer list: %s\n",
              ippErrorString(response->request.status.status_code));
+      printf("Unable to get printer list: %s\n",
+             ippErrorString(response->request.status.status_code));
       ippDelete(response);
-      putchar(1);
       return (1);
     }
-    else
-      putchar(0);
 
     if ((attr = ippFindAttribute(response, "printer-state", IPP_TAG_ENUM)) != NULL)
       state = (ipp_pstate_t)attr->values[0].integer;
@@ -1041,7 +1040,8 @@ send_state(const char *dest,		/* I - Destination */
   {
     syslog(LOG_WARNING, "Unable to get printer list: %s\n",
            ippErrorString(cupsLastError()));
-    putchar(1);
+    printf("Unable to get printer list: %s\n",
+           ippErrorString(cupsLastError()));
     return (1);
   }
 
@@ -1289,5 +1289,5 @@ smart_gets(char *s,	/* I - Pointer to line buffer */
 
 
 /*
- * End of "$Id: cups-lpd.c,v 1.33 2002/05/16 13:44:59 mike Exp $".
+ * End of "$Id: cups-lpd.c,v 1.34 2002/06/07 15:43:20 mike Exp $".
  */
