@@ -1,5 +1,5 @@
 /*
- * "$Id: raster.h,v 1.2.2.4 2002/03/13 11:50:47 mike Exp $"
+ * "$Id: raster.h,v 1.2.2.5 2002/04/22 16:27:08 mike Exp $"
  *
  *   Raster file definitions for the Common UNIX Printing System (CUPS).
  *
@@ -63,6 +63,15 @@ extern "C" {
 
 #  define CUPS_RASTER_SYNCv1	0x52615374	/* RaSt */
 #  define CUPS_RASTER_REVSYNCv1	0x74536152	/* tSaR */
+
+
+/*
+ * The following definition can be used to determine if the
+ * colorimetric colorspaces (CIEXYZ, CIELAB, and ICCn) are
+ * defined...
+ */
+
+#  define CUPS_RASTER_HAVE_COLORIMETRIC 1
 
 
 /*
@@ -275,5 +284,5 @@ extern unsigned		cupsRasterWritePixels(cups_raster_t *r,
 #endif /* !_CUPS_RASTER_H_ */
 
 /*
- * End of "$Id: raster.h,v 1.2.2.4 2002/03/13 11:50:47 mike Exp $".
+ * End of "$Id: raster.h,v 1.2.2.5 2002/04/22 16:27:08 mike Exp $".
  */
