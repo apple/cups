@@ -1,5 +1,5 @@
 /*
- * "$Id: image-colorspace.c,v 1.3 1998/02/24 21:45:43 mike Exp $"
+ * "$Id: image-colorspace.c,v 1.4 1998/03/05 16:58:38 mike Exp $"
  *
  *   Colorspace conversions for espPrint, a collection of printer drivers.
  *
@@ -16,7 +16,10 @@
  * Revision History:
  *
  *   $Log: image-colorspace.c,v $
- *   Revision 1.3  1998/02/24 21:45:43  mike
+ *   Revision 1.4  1998/03/05 16:58:38  mike
+ *   Removed RGB adjustments, as it was causing color shifts to occur.
+ *
+ *   Revision 1.3  1998/02/24  21:45:43  mike
  *   Fixed CMY conversion - don't adjust black...
  *
  *   Revision 1.2  1998/02/24  21:05:22  mike
@@ -143,6 +146,7 @@ ImageRGBToCMY(ib_t *in,
               ib_t *out,
               int  count)
 {
+#if 0 /* This can do strange things */
   int	c, m, y, k;		/* CMYK values */
 
 
@@ -159,6 +163,15 @@ ImageRGBToCMY(ib_t *in,
     in += 3;
     count --;
   };
+#else
+  while (count > 0)
+  {
+    *out++ = 255 - *in++;
+    *out++ = 255 - *in++;
+    *out++ = 255 - *in++;
+    count --;
+  };
+#endif /* 0 */
 }
 
 
@@ -190,9 +203,15 @@ ImageRGBToCMYK(ib_t *in,
     }
     else
     {
+#if 0 /* This can do strange things */
       *out++ = (255 - (in[1] + in[2]) / 8) * (c - k) / divk;
       *out++ = (255 - (in[0] + in[2]) / 8) * (m - k) / divk;
       *out++ = (255 - (in[0] + in[1]) / 8) * (y - k) / divk;
+#else
+      *out++ = 255 * (c - k) / divk;
+      *out++ = 255 * (m - k) / divk;
+      *out++ = 255 * (y - k) / divk;
+#endif /* 0 */
       *out++ = k;
     };
 
@@ -574,5 +593,5 @@ huerotatemat(float mat[3][3],
 
 
 /*
- * End of "$Id: image-colorspace.c,v 1.3 1998/02/24 21:45:43 mike Exp $".
+ * End of "$Id: image-colorspace.c,v 1.4 1998/03/05 16:58:38 mike Exp $".
  */
