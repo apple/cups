@@ -81,14 +81,24 @@ cupsd.conf(5)         Easy Software Products        cupsd.conf(5)
             Specifies  that printer information packets should be
             relayed from one host or network to another.
 
+       BrowseShortNames
+            Specifies whether  remote  printers  will  use  short
+            names  ("printer")  or  not  ("printer@server"). This
+            option is ignored if more  than  one  remote  printer
+            exists with the same name.
+
        BrowseTimeout
             Specifies the maximum interval between printer infor-
             mation updates before remote printers will be removed
             from the list of available printers.
 
        Browsing
-            Specifies whether  or  not  remote  printer  browsing
+            Specifies  whether  or  not  remote  printer browsing
             should be enabled.
+
+       DataDir
+            Specified the  directory  where  data  files  can  be
+            found.
 
        DefaultCharset
             Specifies  the default character set to use for text.
@@ -115,16 +125,6 @@ cupsd.conf(5)         Easy Software Products        cupsd.conf(5)
             Specifies  whether  or  not  to do reverse lookups on
             client addresses.
 
-       ImplicitClasses
-            Specifies whether or not to create  implicit  classes
-            from identical remote printers.
-
-       KeepAlive
-            Specifies  whether or not to support HTTP Keep-Alive.
-
-       KeepAliveTimeout
-            Specifies the connection timeout for HTTP Keep-Alive.
-
 
 
 22 June 2000       Common UNIX Printing System                  2
@@ -135,6 +135,16 @@ cupsd.conf(5)         Easy Software Products        cupsd.conf(5)
 
 cupsd.conf(5)         Easy Software Products        cupsd.conf(5)
 
+
+       ImplicitClasses
+            Specifies whether or not to create  implicit  classes
+            from identical remote printers.
+
+       KeepAlive
+            Specifies  whether or not to support HTTP Keep-Alive.
+
+       KeepAliveTimeout
+            Specifies the connection timeout for HTTP Keep-Alive.
 
        <Location /path> ... </Location>
             Specifies access control for the named location.
@@ -179,17 +189,7 @@ cupsd.conf(5)         Easy Software Products        cupsd.conf(5)
             updated automatically with a list of available print-
             ers (needed for legacy applications)
 
-       RIPCache
-            Specifies  the  maximum  amount of memory to use when
-            converting images and PostScript files to bitmaps for
-            a printer.
 
-       RequestRoot
-            Specifies the directory to store print jobs and other
-            HTTP request data.
-
-       ServerAdmin
-            Specifies   the   email   address   of   the   server
 
 
 
@@ -202,7 +202,18 @@ cupsd.conf(5)         Easy Software Products        cupsd.conf(5)
 cupsd.conf(5)         Easy Software Products        cupsd.conf(5)
 
 
-            administrator.
+       RIPCache
+            Specifies  the  maximum  amount of memory to use when
+            converting images and PostScript files to bitmaps for
+            a printer.
+
+       RequestRoot
+            Specifies the directory to store print jobs and other
+            HTTP request data.
+
+       ServerAdmin
+            Specifies the email address of the server administra-
+            tor.
 
        ServerBin
             Specifies  the  directory  where backends, CGIs, dae-
@@ -237,17 +248,6 @@ SSEEEE AALLSSOO
 CCOOPPYYRRIIGGHHTT
        Copyright 1993-2000 by Easy Software Products, All  Rights
        Reserved.
-
-
-
-
-
-
-
-
-
-
-
 
 
 

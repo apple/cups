@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: filter.man,v 1.2 2000/06/22 18:21:40 mike Exp $"
+.\" "$Id: filter.man,v 1.3 2000/06/27 21:11:16 mike Exp $"
 .\"
 .\"   filter man page for the Common UNIX Printing System (CUPS).
 .\"
@@ -52,6 +52,10 @@ The default text character set (typically us-ascii or iso-8859-1).
 CONTENT_TYPE
 .br
 The MIME type associated with the file (e.g. application/postscript).
+.TP 5
+CUPS_DATADIR
+.br
+The directory where data files can be found.
 .TP 5
 DEVICE_URI
 .br
@@ -107,5 +111,5 @@ CUPS Software Programmers Manual
 .SH COPYRIGHT
 Copyright 1993-2000 by Easy Software Products, All Rights Reserved.
 .\"
-.\" End of "$Id: filter.man,v 1.2 2000/06/22 18:21:40 mike Exp $".
+.\" End of "$Id: filter.man,v 1.3 2000/06/27 21:11:16 mike Exp $".
 .\"

@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: cupsd.conf.man,v 1.2 2000/06/22 18:21:40 mike Exp $"
+.\" "$Id: cupsd.conf.man,v 1.3 2000/06/27 21:11:16 mike Exp $"
 .\"
 .\"   cupsd.conf man page for the Common UNIX Printing System (CUPS).
 .\"
@@ -85,6 +85,12 @@ BrowseRelay
 Specifies that printer information packets should be relayed from one host or
 network to another.
 .TP 5
+BrowseShortNames
+.br
+Specifies whether remote printers will use short names ("printer") or not
+("printer@server"). This option is ignored if more than one remote printer
+exists with the same name.
+.TP 5
 BrowseTimeout
 .br
 Specifies the maximum interval between printer information updates before
@@ -93,6 +99,10 @@ remote printers will be removed from the list of available printers.
 Browsing
 .br
 Specifies whether or not remote printer browsing should be enabled.
+.TP 5
+DataDir
+.br
+Specified the directory where data files can be found.
 .TP 5
 DefaultCharset
 .br
@@ -231,5 +241,5 @@ CUPS Software Administrators Manual
 .SH COPYRIGHT
 Copyright 1993-2000 by Easy Software Products, All Rights Reserved.
 .\"
-.\" End of "$Id: cupsd.conf.man,v 1.2 2000/06/22 18:21:40 mike Exp $".
+.\" End of "$Id: cupsd.conf.man,v 1.3 2000/06/27 21:11:16 mike Exp $".
 .\"
