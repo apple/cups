@@ -3,6 +3,12 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.21rc2
 
+	- The scheduler did not pass the correct CUPS_ENCRYPTION
+	  setting to CGI programs which caused problems on
+	  systems which used non-standard encryption settings
+	  (STR #773)
+	- The lpq command showed 11st, 12nd, and 13rd instead of
+	  11th, 12th, and 13th for the rank (STR #769)
 	- "make install" didn't work on some platforms due to an
 	  error in the man page makefiles (STR #775)
 	- Changed some calls to snprintf() in the scheduler to

@@ -1,5 +1,5 @@
 /*
- * "$Id: listen.c,v 1.9.2.13 2004/03/24 21:28:56 mike Exp $"
+ * "$Id: listen.c,v 1.9.2.14 2004/06/17 14:45:12 mike Exp $"
  *
  *   Server listening routines for the Common UNIX Printing System (CUPS)
  *   scheduler.
@@ -162,7 +162,10 @@ StartListening(void)
     if (!LocalPort &&
         (httpAddrLocalhost(&(lis->address)) ||
          httpAddrAny(&(lis->address))))
-      LocalPort = p;
+    {
+      LocalPort       = p;
+      LocalEncryption = lis->encryption;
+    }
 
    /*
     * Create a socket for listening...
@@ -265,5 +268,5 @@ StopListening(void)
 
 
 /*
- * End of "$Id: listen.c,v 1.9.2.13 2004/03/24 21:28:56 mike Exp $".
+ * End of "$Id: listen.c,v 1.9.2.14 2004/06/17 14:45:12 mike Exp $".
  */
