@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.13 2001/06/07 21:47:37 mike Exp $"
+# "$Id: Makefile,v 1.14 2001/06/27 21:53:16 mike Exp $"
 #
 #   Man page makefile for the Common UNIX Printing System (CUPS).
 #
@@ -60,45 +60,44 @@ clean:
 #
 
 install:
-	-$(MKDIR) $(MANDIR)/man1
-	-$(CHMOD) ugo+rx $(MANDIR)
-	-$(CHMOD) ugo+rx $(MANDIR)/man1
+	$(INSTALL_DIR) $(MANDIR)/man1
 	for file in $(MAN1); do \
 		$(INSTALL_MAN) $$file $(MANDIR)/man1/`basename $$file man`1; \
 	done
-	$(RM) $(MANDIR)/man1/cancel.1
-	$(LN) lp.1 $(MANDIR)/man1/cancel.1
-	-$(MKDIR) $(MANDIR)/man5
-	-$(CHMOD) ugo+rx $(MANDIR)/man5
+	$(RM) cancel.1
+	$(LN) lp.1 cancel.1
+	$(INSTALL_MAN) cancel.1 $(MANDIR)/man1
+	$(INSTALL_DIR) $(MANDIR)/man5
 	for file in $(MAN5); do \
 		$(INSTALL_MAN) $$file $(MANDIR)/man5/`basename $$file man`5; \
 	done
-	-$(MKDIR) $(AMANDIR)/man$(MAN8EXT)
-	-$(CHMOD) ugo+rx $(AMANDIR)/man$(MAN8EXT)
+	$(INSTALL_DIR) $(AMANDIR)/man$(MAN8EXT)
 	for file in $(MAN8); do \
 		$(INSTALL_MAN) $$file $(AMANDIR)/man$(MAN8EXT)/`basename $$file man`$(MAN8EXT); \
 	done
-	$(RM) $(AMANDIR)/man$(MAN8EXT)/reject.$(MAN8EXT)
-	$(LN) accept.$(MAN8EXT) $(AMANDIR)/man$(MAN8EXT)/reject.$(MAN8EXT)
+	$(RM) reject.$(MAN8EXT)
+	$(LN) accept.$(MAN8EXT) reject.$(MAN8EXT)
+	$(INSTALL_MAN) reject.$(MAN8EXT) $(AMANDIR)/man$(MAN8EXT)
 	$(RM) $(AMANDIR)/man$(MAN8EXT)/disable.$(MAN8EXT)
-	$(LN) enable.$(MAN8EXT) $(AMANDIR)/man$(MAN8EXT)/disable.$(MAN8EXT)
-	-$(MKDIR) $(MANDIR)/cat1
-	-$(CHMOD) ugo+rx $(MANDIR)/cat1
+	$(LN) enable.$(MAN8EXT) disable.$(MAN8EXT)
+	$(INSTALL_MAN) disable.$(MAN8EXT) $(AMANDIR)/man$(MAN8EXT)
+	$(INSTALL_DIR) $(MANDIR)/cat1
 	$(INSTALL_MAN) $(CAT1) $(MANDIR)/cat1
-	$(RM) $(MANDIR)/cat1/cancel.$(CAT1EXT)
-	$(LN) lp.$(CAT1EXT) $(MANDIR)/cat1/cancel.$(CAT1EXT)
-	-$(MKDIR) $(MANDIR)/cat5
-	-$(CHMOD) ugo+rx $(MANDIR)/cat5
+	$(RM) cancel.$(CAT1EXT)
+	$(LN) lp.$(CAT1EXT) cancel.$(CAT1EXT)
+	$(INSTALL_MAN) cancel.$(CAT1EXT) $(MANDIR)/cat1
+	$(INSTALL_DIR) $(MANDIR)/cat5
 	$(INSTALL_MAN) $(CAT5) $(MANDIR)/cat5
-	-$(MKDIR) $(AMANDIR)/cat$(MAN8EXT)
-	-$(CHMOD) ugo+rx $(AMANDIR)/cat$(MAN8EXT)
+	$(INSTALL_DIR) $(AMANDIR)/cat$(MAN8EXT)
 	$(INSTALL_MAN) $(CAT8) $(AMANDIR)/cat$(MAN8EXT)
-	$(RM) $(AMANDIR)/cat$(MAN8EXT)/reject.$(CAT8EXT)
-	$(LN) accept.$(CAT1EXT) $(AMANDIR)/cat$(MAN8EXT)/reject.$(CAT8EXT)
-	$(RM) $(AMANDIR)/cat$(MAN8EXT)/disable.$(CAT8EXT)
-	$(LN) enable.$(CAT1EXT) $(AMANDIR)/cat$(MAN8EXT)/disable.$(CAT8EXT)
+	$(RM) reject.$(CAT8EXT)
+	$(LN) accept.$(CAT1EXT) reject.$(CAT8EXT)
+	$(INSTALL_MAN) reject.$(CAT8EXT) $(AMANDIR)/cat$(MAN8EXT)
+	$(RM) disable.$(CAT8EXT)
+	$(LN) enable.$(CAT1EXT) disable.$(CAT8EXT)
+	$(INSTALL_MAN) disable.$(CAT8EXT) $(AMANDIR)/cat$(MAN8EXT)
 
 
 #
-# End of "$Id: Makefile,v 1.13 2001/06/07 21:47:37 mike Exp $".
+# End of "$Id: Makefile,v 1.14 2001/06/27 21:53:16 mike Exp $".
 #

@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.7 2001/05/21 21:32:51 mike Exp $"
+# "$Id: Makefile,v 1.8 2001/06/27 21:53:16 mike Exp $"
 #
 #   pdftops filter Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -43,10 +43,7 @@ clean:
 #
 
 install:
-	-$(MKDIR) $(SERVERBIN)/filter
-	$(CHMOD) ugo+rx $(SERVERBIN)
-	$(CHMOD) ugo+rx $(SERVERBIN)/filter
-	$(RM) $(SERVERBIN)/filter/pdftops
+	$(INSTALL_DIR) $(SERVERBIN)/filter
 	$(INSTALL_BIN) pdftops $(SERVERBIN)/filter
 
 
@@ -130,5 +127,5 @@ XRef.o:		gmem.h Object.h gtypes.h GString.h Array.h Dict.h Stream.h \
 $(OBJS):	../config.h ../Makedefs
 
 #
-# End of "$Id: Makefile,v 1.7 2001/05/21 21:32:51 mike Exp $".
+# End of "$Id: Makefile,v 1.8 2001/06/27 21:53:16 mike Exp $".
 #

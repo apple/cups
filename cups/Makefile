@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.57 2001/06/27 20:03:11 mike Exp $"
+# "$Id: Makefile,v 1.58 2001/06/27 21:53:09 mike Exp $"
 #
 #   Support library Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -68,17 +68,12 @@ clean:
 #
 
 install:	all
-	-$(MKDIR) $(INCLUDEDIR)/cups
-	$(CHMOD) ugo+rx $(INCLUDEDIR)
-	$(CHMOD) ugo+rx $(INCLUDEDIR)/cups
+	$(INSTALL_DIR) $(INCLUDEDIR)/cups
 	$(INSTALL_DATA) $(HEADERS) $(INCLUDEDIR)/cups
-	-$(MKDIR) $(LIBDIR)
-	$(CHMOD) ugo+rx $(LIBDIR)
+	$(INSTALL_DIR) $(LIBDIR)
 	$(INSTALL_LIB) $(LIBCUPS) $(LIBDIR)
-	if test $(LIBCUPS) != "libcups.a" -a $(LIBCUPS) != "libcups.la"; then \
-		$(INSTALL_LIB) libcups.a $(LIBDIR); \
-		$(RM) $(LIBDIR)/`basename $(LIBCUPS) .2`; \
-		$(LN) $(LIBCUPS) $(LIBDIR)/`basename $(LIBCUPS) .2`; \
+	if test $(LIBCUPS) = "libcups.so.2" -o $(LIBCUPS) = "libcups.sl.2"; then \
+		$(INSTALL_LIB) libcups.a $(LIBDIR)/`basename $(LIBCUPS) .2` $(LIBDIR); \
 	fi
 
 
@@ -182,5 +177,5 @@ $(OBJS):	../Makedefs ../config.h
 
 
 #
-# End of "$Id: Makefile,v 1.57 2001/06/27 20:03:11 mike Exp $".
+# End of "$Id: Makefile,v 1.58 2001/06/27 21:53:09 mike Exp $".
 #

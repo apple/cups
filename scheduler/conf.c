@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.85 2001/06/27 06:24:18 mike Exp $"
+ * "$Id: conf.c,v 1.86 2001/06/27 21:53:18 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -259,41 +259,30 @@ ReadConfiguration(void)
   * Find the default system group: "sys", "system", or "root"...
   */
 
-  group = getgrnam("sys");
+  group = getgrnam(CUPS_DEFAULT_GROUP);
   endgrent();
 
   NumSystemGroups = 0;
 
   if (group != NULL)
   {
-    strcpy(SystemGroups[0], "sys");
+    strcpy(SystemGroups[0], CUPS_DEFAULT_GROUP);
     Group = group->gr_gid;
   }
   else
   {
-    group = getgrnam("system");
+    group = getgrgid(0);
     endgrent();
 
     if (group != NULL)
     {
-      strcpy(SystemGroups[0], "system");
-      Group = group->gr_gid;
+      strcpy(SystemGroups[0], group->gr_name);
+      Group = 0;
     }
     else
     {
-      group = getgrnam("root");
-      endgrent();
-
-      if (group != NULL)
-      {
-	strcpy(SystemGroups[0], "root");
-	Group = group->gr_gid;
-      }
-      else
-      {
-	strcpy(SystemGroups[0], "unknown");
-	Group = 0;
-      }
+      strcpy(SystemGroups[0], "unknown");
+      Group = 0;
     }
   }
 
@@ -301,11 +290,7 @@ ReadConfiguration(void)
   * Find the default user...
   */
 
-#ifdef _AIX
-  if ((user = getpwnam("lpd")) == NULL)
-#else
-  if ((user = getpwnam("lp")) == NULL)
-#endif /* _AIX */
+  if ((user = getpwnam(CUPS_DEFAULT_USER)) == NULL)
     User = 1;	/* Force to a non-priviledged account */
   else
     User = user->pw_uid;
@@ -1738,5 +1723,5 @@ get_address(char               *value,		/* I - Value string */
 
 
 /*
- * End of "$Id: conf.c,v 1.85 2001/06/27 06:24:18 mike Exp $".
+ * End of "$Id: conf.c,v 1.86 2001/06/27 21:53:18 mike Exp $".
  */

@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.32 2001/04/19 16:35:34 mike Exp $"
+# "$Id: Makefile,v 1.33 2001/06/27 21:53:06 mike Exp $"
 #
 #   Top-level Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -75,29 +75,21 @@ install:
 	echo Installing in templates...
 	(cd templates; $(MAKE) $(MFLAGS) install)
 	echo Installing startup script...
-	if test "x$(INITDIR)" != "x"; then \
-		$(MKDIR) $(prefix)/$(INITDIR)/init.d; \
-		$(RM) $(prefix)/$(INITDIR)/init.d/cups; \
+	if test "x$INITDIR" != "x"; then \
+		$(INSTALL_DIR) $(prefix)/$(INITDIR)/init.d; \
 		$(INSTALL_SCRIPT) cups.sh $(prefix)/$(INITDIR)/init.d/cups; \
-		$(CHMOD) ugo+rx $(prefix)/$(INITDIR)/init.d/cups; \
-		$(MKDIR) $(prefix)/$(INITDIR)/rc0.d; \
-		$(RM) $(prefix)/$(INITDIR)/rc0.d/K00cups; \
-		ln -s $(INITDDIR)/cups $(prefix)/$(INITDIR)/rc0.d/K00cups; \
-		$(MKDIR) $(prefix)/$(INITDIR)/rc2.d; \
-		$(RM) $(prefix)/$(INITDIR)/rc2.d/S99cups; \
-		ln -s $(INITDDIR)/cups $(prefix)/$(INITDIR)/rc2.d/S99cups; \
-		$(MKDIR) $(prefix)/$(INITDIR)/rc3.d; \
-		$(RM) $(prefix)/$(INITDIR)/rc3.d/S99cups; \
-		ln -s $(INITDDIR)/cups $(prefix)/$(INITDIR)/rc3.d/S99cups; \
-		$(MKDIR) $(prefix)/$(INITDIR)/rc5.d; \
-		$(RM) $(prefix)/$(INITDIR)/rc5.d/S99cups; \
-		ln -s $(INITDDIR)/cups $(prefix)/$(INITDIR)/rc5.d/S99cups; \
+		$(INSTALL_DIR) $(prefix)/$(INITDIR)/rc0.d; \
+		$(INSTALL_SCRIPT) cups.sh  $(prefix)/$(INITDIR)/rc0.d/K00cups; \
+		$(INSTALL_DIR) $(prefix)/$(INITDIR)/rc2.d; \
+		$(INSTALL_SCRIPT) cups.sh $(prefix)/$(INITDIR)/rc2.d/S99cups; \
+		$(INSTALL_DIR) $(prefix)/$(INITDIR)/rc3.d; \
+		$(INSTALL_SCRIPT) cups.sh $(prefix)/$(INITDIR)/rc3.d/S99cups; \
+		$(INSTALL_DIR) $(prefix)/$(INITDIR)/rc5.d; \
+		$(INSTALL_SCRIPT) cups.sh $(prefix)/$(INITDIR)/rc5.d/S99cups; \
 	fi
 	if test "x$(INITDIR)" = "x" -a "x$(INITDDIR)" != "x"; then \
-		$(MKDIR) $(prefix)/$(INITDDIR); \
-		$(RM) $(prefix)/$(INITDDIR)/cups; \
+		$(INSTALL_DIR) $(prefix)/$(INITDDIR); \
 		$(INSTALL_SCRIPT) cups.sh $(prefix)/$(INITDDIR)/cups; \
-		$(CHMOD) ugo+rx $(prefix)/$(INITDDIR)/cups; \
 	fi
 
 
@@ -124,6 +116,12 @@ EPMFLAGS	=	-v \
 			SBINDIR=$(SBINDIR) SERVERBIN=$(SERVERBIN) \
 			SERVERROOT=$(SERVERROOT)
 
+aix:
+	epm $(EPMFLAGS) -f aix cups
+
+bsd:
+	epm $(EPMFLAGS) -f bsd cups
+
 epm:
 	epm $(EPMFLAGS) cups
 
@@ -143,5 +141,5 @@ tardist:
 	epm $(EPMFLAGS) -f tardist cups
 
 #
-# End of "$Id: Makefile,v 1.32 2001/04/19 16:35:34 mike Exp $".
+# End of "$Id: Makefile,v 1.33 2001/06/27 21:53:06 mike Exp $".
 #

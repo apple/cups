@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.32 2001/04/14 12:26:30 mike Exp $"
+# "$Id: Makefile,v 1.33 2001/06/27 21:53:17 mike Exp $"
 #
 #   GNU Ghostscript makefile for the Common UNIX Printing System (CUPS).
 #
@@ -376,13 +376,9 @@ clean:
 #
 
 install:	$(TARGETS)
-	-$(MKDIR) $(SERVERBIN)/filter
-	$(CHMOD) ugo+rx $(SERVERBIN)
-	$(CHMOD) ugo+rx $(SERVERBIN)/filter
+	$(INSTALL_DIR) $(SERVERBIN)/filter
 	$(INSTALL_BIN) pstoraster $(SERVERBIN)/filter
-	-$(MKDIR) $(DATADIR)/pstoraster
-	$(CHMOD) ugo+rx $(DATADIR)
-	$(CHMOD) ugo+rx $(DATADIR)/pstoraster
+	$(INSTALL_DIR) $(DATADIR)/pstoraster
 	$(INSTALL_DATA) $(DFILES) $(DATADIR)/pstoraster
 
 
@@ -442,5 +438,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile,v 1.32 2001/04/14 12:26:30 mike Exp $".
+# End of "$Id: Makefile,v 1.33 2001/06/27 21:53:17 mike Exp $".
 #

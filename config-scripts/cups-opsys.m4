@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-opsys.m4,v 1.1 2001/06/27 19:06:46 mike Exp $"
+dnl "$Id: cups-opsys.m4,v 1.2 2001/06/27 21:53:08 mike Exp $"
 dnl
 dnl   Operating system stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -23,13 +23,63 @@ dnl         WWW: http://www.cups.org
 dnl
 
 dnl Get the operating system and version number...
-
 uname=`uname`
 uversion=`uname -r | sed -e '1,$s/[[^0-9]]//g'`
 if test x$uname = xIRIX64; then
 	uname="IRIX"
 fi
 
+dnl Determine the correct username and group for this OS...
+AC_ARG_WITH(cups-user, [ --with-cups-user    set default user for CUPS],
+	CUPS_USER="$withval",
+	AC_MSG_CHECKING(for default print user)
+	if test -f /etc/passwd; then
+		CUPS_USER=""
+		for user in lp lpd guest daemon nobody; do
+			if test "`grep ^${user}: /etc/passwd`" != ""; then
+				CUPS_USER="$user"
+				AC_MSG_RESULT($user)
+				break;
+			fi
+		done
+
+		if test x$CUPS_USER = x; then
+			CUPS_USER="${USER:=nobody}"
+			AC_MSG_RESULT(not found, using "$CUPS_USER")
+		fi
+	else
+		CUPS_USER="${USER:=nobody}"
+		AC_MSG_RESULT(no password file, using "$CUPS_USER")
+	fi)
+
+AC_ARG_WITH(cups-group, [ --with-cups-group   set default group for CUPS],
+	CUPS_GROUP="$withval",
+	AC_MSG_CHECKING(for default print group)
+	if test -f /etc/group; then
+		CUPS_GROUP=""
+		for group in sys system root; do
+			if test "`grep ^${group}: /etc/group`" != ""; then
+				CUPS_GROUP="$group"
+				AC_MSG_RESULT($group)
+				break;
+			fi
+		done
+
+		if test x$CUPS_GROUP = x; then
+			CUPS_GROUP="${GROUP:=nobody}"
+			AC_MSG_RESULT(not found, using "$CUPS_GROUP")
+		fi
+	else
+		CUPS_GROUP="${GROUP:=nobody}"
+		AC_MSG_RESULT(no group file, using "$CUPS_GROUP")
+	fi)
+
+AC_SUBST(CUPS_USER)
+AC_SUBST(CUPS_GROUP)
+
+AC_DEFINE(CUPS_DEFAULT_USER, "$CUPS_USER")
+AC_DEFINE(CUPS_DEFAULT_GROUP, "$CUPS_GROUP")
+
 dnl
-dnl "$Id: cups-opsys.m4,v 1.1 2001/06/27 19:06:46 mike Exp $"
+dnl "$Id: cups-opsys.m4,v 1.2 2001/06/27 21:53:08 mike Exp $"
 dnl

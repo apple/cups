@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.10 2001/06/06 20:40:25 mike Exp $"
+# "$Id: Makefile,v 1.11 2001/06/27 21:53:17 mike Exp $"
 #
 #   PPD file makefile for the Common UNIX Printing System (CUPS).
 #
@@ -52,11 +52,10 @@ clean:
 #
 
 install:
-	-$(MKDIR) $(DATADIR)/model
-	$(CHMOD) ugo+rx $(DATADIR)/model
+	$(INSTALL_DIR) $(DATADIR)/model
 	$(INSTALL_DATA) $(FILES) $(DATADIR)/model
 
 
 #
-# End of "$Id: Makefile,v 1.10 2001/06/06 20:40:25 mike Exp $".
+# End of "$Id: Makefile,v 1.11 2001/06/27 21:53:17 mike Exp $".
 #

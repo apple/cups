@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-common.m4,v 1.1 2001/06/27 19:06:45 mike Exp $"
+dnl "$Id: cups-common.m4,v 1.2 2001/06/27 21:53:08 mike Exp $"
 dnl
 dnl   Common configuration stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -29,11 +29,10 @@ AC_PROG_AWK
 AC_PROG_CC
 AC_PROG_CXX
 AC_PROG_CPP
+AC_PROG_INSTALL
 AC_PROG_RANLIB
 AC_PATH_PROG(AR,ar)
-AC_PATH_PROG(CHMOD,chmod)
-AC_PATH_PROG(CHOWN,chown)
-AC_PATH_PROG(CP,cp)
+AC_PATH_PROG(HTMLDOC,htmldoc)
 AC_PATH_PROG(MV,mv)
 AC_PATH_PROG(NROFF,nroff)
 if test "$NROFF" = ""; then
@@ -44,8 +43,6 @@ if test "$NROFF" = ""; then
         NROFF="$GROFF -T ascii"
     fi
 fi
-AC_PATH_PROG(HTMLDOC,htmldoc)
-AC_PATH_PROG(MKDIR,mkdir)
 AC_PATH_PROG(RM,rm)
 AC_PATH_PROG(SED,sed)
 
@@ -126,5 +123,5 @@ AC_CHECK_FUNCS(waitpid)
 AC_CHECK_FUNCS(wait3)
 
 dnl
-dnl End of "$Id: cups-common.m4,v 1.1 2001/06/27 19:06:45 mike Exp $".
+dnl End of "$Id: cups-common.m4,v 1.2 2001/06/27 21:53:08 mike Exp $".
 dnl

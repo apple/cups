@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.23 2001/01/22 15:04:02 mike Exp $"
+# "$Id: Makefile,v 1.24 2001/06/27 21:53:19 mike Exp $"
 #
 #   System V commands makefile for the Common UNIX Printing System (CUPS).
 #
@@ -49,30 +49,11 @@ clean:
 # Install all targets...
 #
 
-install:	$(INSTALL_SYSV)
-	-$(MKDIR) $(BINDIR)
-	$(CHMOD) ugo+rx $(BINDIR)
-	$(INSTALL_BIN) accept lpadmin lpinfo lpmove $(SBINDIR)
-	$(INSTALL_BIN) cancel lp lpoptions lppasswd lpstat $(BINDIR)
-	$(CHMOD) u+s $(BINDIR)/lppasswd
-	$(RM) $(SBINDIR)/reject
-	$(LN) accept $(SBINDIR)/reject
-	$(RM) $(BINDIR)/disable
-	$(LN) ../sbin/accept $(BINDIR)/disable
-	$(RM) $(BINDIR)/enable
-	$(LN) ../sbin/accept $(BINDIR)/enable
-
-install-sysv:
-	-$(MKDIR) $(LIBDIR)
-	$(CHMOD) ugo+rx $(LIBDIR)
-	$(RM) $(LIBDIR)/lpadmin
-	$(LN) ../sbin/lpadmin $(LIBDIR)
-	$(RM) $(LIBDIR)/lpmove
-	$(LN) ../sbin/lpmove $(LIBDIR)
-	$(RM) $(LIBDIR)/accept
-	$(LN) ../sbin/accept $(LIBDIR)
-	$(RM) $(LIBDIR)/reject
-	$(LN) ../sbin/accept $(LIBDIR)/reject
+install:
+	$(INSTALL_DIR) $(BINDIR)
+	$(INSTALL_BIN) accept reject lpadmin lpinfo lpmove $(SBINDIR)
+	$(INSTALL_BIN) cancel disable enable lp lpoptions lpstat $(BINDIR)
+	$(INSTALL_BIN) -m 4755 -o $(CUPS_USER) -g $(CUPS_GROUP) lppasswd $(BINDIR)
 
 
 #
@@ -82,6 +63,9 @@ install-sysv:
 accept:	accept.o ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o accept accept.o $(LIBS)
+	$(LN) accept reject
+	$(LN) accept enable
+	$(LN) accept disable
 
 accept.o:	../cups/cups.h
 
@@ -177,5 +161,5 @@ lpstat.o:	../cups/cups.h
 $(OBJS):	../Makedefs
 
 #
-# End of "$Id: Makefile,v 1.23 2001/01/22 15:04:02 mike Exp $".
+# End of "$Id: Makefile,v 1.24 2001/06/27 21:53:19 mike Exp $".
 #
