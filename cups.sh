@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# "$Id: cups.sh,v 1.2 1999/06/21 15:27:42 mike Exp $"
+# "$Id: cups.sh,v 1.3 1999/06/24 17:43:18 mike Exp $"
 #
 #   Startup/shutdown script for the Common UNIX Printing System (CUPS).
 #
@@ -15,7 +15,7 @@
 #
 #       Attn: CUPS Licensing Information
 #       Easy Software Products
-#       44145 Airport View Drive, Suite 204
+#       44141 Airport View Drive, Suite 204
 #       Hollywood, Maryland 20636-3111 USA
 #
 #       Voice: (301) 373-9603
@@ -39,18 +39,26 @@ case "`uname`" in
 		;;
 esac
 
-if test "$pid" != ""; then
-	echo "Stopping CUPS scheduler..."
-	kill $pid
-	sleep 1
-fi
+case $1 in
+	start restart)
+	if test "$pid" != ""; then
+		echo "Restarting CUPS scheduler..."
+		kill -HUP $pid
+	else
+		echo "Starting CUPS scheduler..."
+		/usr/sbin/cupsd 2>&1 >/dev/null &
+	fi
+	;;
 
-# Restart the CUPS daemon as necessary...
-if test "$1" = "start"; then
-	echo "Starting CUPS scheduler..."
-	/usr/sbin/cupsd 2>&1 >/dev/null &
-fi
+	stop)
+	if test "$pid" != ""; then
+		echo "Stopping CUPS scheduler..."
+		kill $pid
+		sleep 1
+	fi
+	;;
+esac
 
 #
-# End of "$Id: cups.sh,v 1.2 1999/06/21 15:27:42 mike Exp $".
+# End of "$Id: cups.sh,v 1.3 1999/06/24 17:43:18 mike Exp $".
 #
