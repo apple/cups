@@ -16,11 +16,21 @@
 %
 %   Copyright 1993-2001 Easy Software Products
 %
-%   These coded instructions, statements, and computer programs contain
-%   unpublished proprietary information of Easy Software Products, and
-%   are protected by Federal copyright law. They may not be disclosed
-%   to third parties or copied or duplicated in any form, in whole or
-%   in part, without the prior written consent of Easy Software Products.
+%   These coded instructions, statements, and computer programs are the
+%   property of Easy Software Products and are protected by Federal
+%   copyright law.  Distribution and use rights are outlined in the file
+%   "LICENSE.txt" which should have been included with this file.  If this
+%   file is missing or damaged please contact Easy Software Products
+%   at:
+%
+%       Attn: CUPS Licensing Information
+%       Easy Software Products
+%       44141 Airport View Drive, Suite 204
+%       Hollywood, Maryland 20636-3111 USA
+%
+%       Voice: (301) 373-9603
+%       EMail: cups-info@cups.org
+%         WWW: http://www.cups.org
 %
 /CENTER {			% Draw centered text
 				% (name) CENTER -
@@ -262,6 +272,6 @@ gsave
 grestore
 showpage
 %
-% End of "$Id: unclassified,v 1.5 2001/03/02 22:34:00 andy Exp $".
+% End of "$Id: unclassified,v 1.6 2001/03/25 12:42:57 mike Exp $".
 %
 %%EOF
