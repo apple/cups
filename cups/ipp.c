@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.36 2000/03/30 05:19:20 mike Exp $"
+ * "$Id: ipp.c,v 1.37 2000/05/11 15:14:38 mike Exp $"
  *
  *   Internet Printing Protocol support functions for the Common UNIX
  *   Printing System (CUPS).
@@ -606,7 +606,7 @@ ippErrorString(ipp_status_t error)	/* I - Error status */
         return (cupsLangString(language, HTTP_NOT_SUPPORTED));
 
     case IPP_SERVICE_UNAVAILABLE :
-    case IPP_DEVICE_UNAVAILABLE :
+    case IPP_DEVICE_ERROR :
     case IPP_TEMPORARY_ERROR :
     case IPP_PRINTER_BUSY :
         return (cupsLangString(language, HTTP_SERVICE_UNAVAILABLE));
@@ -1679,5 +1679,5 @@ ipp_read(http_t        *http,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.36 2000/03/30 05:19:20 mike Exp $".
+ * End of "$Id: ipp.c,v 1.37 2000/05/11 15:14:38 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.h,v 1.27 2000/05/11 14:58:24 mike Exp $"
+ * "$Id: ipp.h,v 1.28 2000/05/11 15:14:39 mike Exp $"
  *
  *   Internet Printing Protocol definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -237,7 +237,7 @@ typedef enum			/**** IPP status codes... ****/
   IPP_TEMPORARY_ERROR,
   IPP_NOT_ACCEPTING,
   IPP_PRINTER_BUSY,
-  IPP_JOB_CANCELLED,
+  IPP_ERROR_JOB_CANCELLED,
   IPP_MULTIPLE_JOBS_NOT_SUPPORTED
 } ipp_status_t;
 
@@ -365,5 +365,5 @@ extern void		_ipp_free_attr(ipp_attribute_t *);
 #endif /* !_CUPS_IPP_H_ */
 
 /*
- * End of "$Id: ipp.h,v 1.27 2000/05/11 14:58:24 mike Exp $".
+ * End of "$Id: ipp.h,v 1.28 2000/05/11 15:14:39 mike Exp $".
  */

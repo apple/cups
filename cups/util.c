@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c,v 1.49 2000/05/10 19:59:09 mike Exp $"
+ * "$Id: util.c,v 1.50 2000/05/11 15:14:39 mike Exp $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -916,11 +916,30 @@ cupsPrintFile(const char    *name,	/* I - Printer or class name */
               int           num_options,/* I - Number of options */
 	      cups_option_t *options)	/* I - Options */
 {
+  DEBUG_printf(("cupsPrintFile(\'%s\', \'%s\', %d, %08x)\n",
+                printer, filename, num_options, options));
+
+  return (cupsPrintFiles(name, 1, &filename, title, num_options, options));
+}
+
+
+/*
+ * 'cupsPrintFiles()' - Print one or more files to a printer or class.
+ */
+
+int					/* O - Job ID */
+cupsPrintFiles(const char    *name,	/* I - Printer or class name */
+               int           num_files,	/* I - Number of files */
+               const char    **files,	/* I - File(s) to print */
+	       const char    *title,	/* I - Title of job */
+               int           num_options,/* I - Number of options */
+	       cups_option_t *options)	/* I - Options */
+{
   int		i;			/* Looping var */
   int		n, n2;			/* Attribute values */
   char		*option,		/* Name of option */
-		*val,			/* Pointer to option value */
 		*s;			/* Pointer into option value */
+  const char	*val;			/* Pointer to option value */
   ipp_t		*request;		/* IPP request */
   ipp_t		*response;		/* IPP response */
   ipp_attribute_t *attr;		/* IPP job-id attribute */
@@ -929,13 +948,12 @@ cupsPrintFile(const char    *name,	/* I - Printer or class name */
 		uri[HTTP_MAX_URI];	/* Printer URI */
   cups_lang_t	*language;		/* Language to use */
   int		jobid;			/* New job ID */
-  cups_option_t	*option;		/* Pointer to current option */
 
 
-  DEBUG_printf(("cupsPrintFile(\'%s\', \'%s\', %d, %08x)\n",
-                printer, filename, num_options, options));
+  DEBUG_printf(("cupsPrintFiles(\'%s\', %d, %p, %d, %08x)\n",
+                printer, num_files, files, num_options, options));
 
-  if (name == NULL || filename == NULL)
+  if (name == NULL || num_files < 1 || files == NULL)
     return (0);
 
  /*
@@ -954,17 +972,18 @@ cupsPrintFile(const char    *name,	/* I - Printer or class name */
     return (0);
   }
 
+  language = cupsLangDefault();
+
  /*
   * Build a standard CUPS URI for the printer and fill the standard IPP
   * attributes...
   */
 
-  request->request.op.operation_id = IPP_PRINT_JOB;
+  request->request.op.operation_id = num_files == 1 ? IPP_PRINT_JOB :
+                                                      IPP_CREATE_JOB;
   request->request.op.request_id   = 1;
 
   snprintf(uri, sizeof(uri), "ipp://%s:%d/printers/%s", hostname, ippPort(), printer);
-
-  language = cupsLangDefault();
 
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
                "attributes-charset", NULL, cupsLangEncoding(language));
@@ -983,9 +1002,9 @@ cupsPrintFile(const char    *name,	/* I - Printer or class name */
   if (cupsGetOption("raw", num_options, options))
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_MIMETYPE, "document-format",
         	 NULL, "application/vnd.cups-raw");
-  else if ((option = cupsGetOption("document-format", num_options, options)) != NULL)
+  else if ((val = cupsGetOption("document-format", num_options, options)) != NULL)
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_MIMETYPE, "document-format",
-        	 NULL, option->value);
+        	 NULL, val);
   else
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_MIMETYPE, "document-format",
         	 NULL, "application/octet-stream");
@@ -1122,12 +1141,17 @@ cupsPrintFile(const char    *name,	/* I - Printer or class name */
   }
 
  /*
-  * Try printing the file...
+  * Do the request...
   */
 
   snprintf(uri, sizeof(uri), "/printers/%s", printer);
 
-  if ((response = cupsDoFileRequest(cups_server, request, uri, filename)) == NULL)
+  if (num_files == 1)
+    response = cupsDoFileRequest(cups_server, request, uri, *files);
+  else
+    response = cupsDoRequest(cups_server, request, uri);
+
+  if (response == NULL)
     jobid = 0;
   else if (response->request.status.status_code > IPP_OK_CONFLICT)
   {
@@ -1145,6 +1169,69 @@ cupsPrintFile(const char    *name,	/* I - Printer or class name */
 
   if (response != NULL)
     ippDelete(response);
+
+ /*
+  * Handle multiple file jobs if the create-job operation worked...
+  */
+
+  if (jobid > 0 && num_files > 1)
+    for (i = 0; i < num_files; i ++)
+    {
+     /*
+      * Build a standard CUPS URI for the job and fill the standard IPP
+      * attributes...
+      */
+
+      request->request.op.operation_id = IPP_SEND_DOCUMENT;
+      request->request.op.request_id   = 1;
+
+      snprintf(uri, sizeof(uri), "ipp://%s:%d/jobs/%d", hostname, ippPort(),
+               jobid);
+
+      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
+        	   "attributes-charset", NULL, cupsLangEncoding(language));
+
+      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
+        	   "attributes-natural-language", NULL,
+        	   language != NULL ? language->language : "C");
+
+      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "job-uri",
+        	   NULL, uri);
+
+     /*
+      * Handle raw print files...
+      */
+
+      if (cupsGetOption("raw", num_options, options))
+	ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_MIMETYPE, "document-format",
+        	     NULL, "application/vnd.cups-raw");
+      else if ((val = cupsGetOption("document-format", num_options, options)) != NULL)
+	ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_MIMETYPE, "document-format",
+        	     NULL, val);
+      else
+	ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_MIMETYPE, "document-format",
+        	     NULL, "application/octet-stream");
+
+      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "requesting-user-name",
+        	   NULL, cupsUser());
+
+     /*
+      * Is this the last document?
+      */
+
+      if (i == (num_files - 1))
+        ippAddBoolean(request, IPP_TAG_OPERATION, "last-document", 1);
+
+     /*
+      * Send the file...
+      */
+
+      snprintf(uri, sizeof(uri), "/printers/%s", printer);
+
+      if ((response = cupsDoFileRequest(cups_server, request, uri,
+                                        files[i])) != NULL)
+	ippDelete(response);
+    }
 
   return (jobid);
 }
@@ -1322,5 +1409,5 @@ cups_local_auth(http_t *http)	/* I - Connection */
 
 
 /*
- * End of "$Id: util.c,v 1.49 2000/05/10 19:59:09 mike Exp $".
+ * End of "$Id: util.c,v 1.50 2000/05/11 15:14:39 mike Exp $".
  */
