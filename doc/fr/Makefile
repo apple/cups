@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.2 2002/07/20 04:08:18 mike Exp $"
+# "$Id: Makefile,v 1.3 2002/10/15 13:54:44 mike Exp $"
 #
 #   Documentation makefile for the Common UNIX Printing System (CUPS).
 #
@@ -138,14 +138,14 @@ overview.ps:	overview.html
 
 sam.html:	sam.shtml
 	echo Formatting $@...
-	htmldoc --path ".;.." --titleimage images/cups-large.gif -f $@ $<
+	htmldoc --toctitle "Table des matières" --path ".;.." --titleimage images/cups-large.gif -f $@ $<
 sam.pdf:	sam.shtml
 	echo Formatting $@...
-	htmldoc --path ".;.." --titleimage images/cups-large.gif --duplex --compression=9 \
+	htmldoc --toctitle "Table des matières" --path ".;.." --titleimage images/cups-large.gif --duplex --compression=9 \
 		--jpeg -f $@ $<
 sam.ps:		sam.shtml
 	echo Formatting $@...
-	htmldoc --path ".;.." --titleimage images/cups-large.gif --duplex --jpeg -f $@ $<
+	htmldoc --toctitle "Table des matières" --path ".;.." --titleimage images/cups-large.gif --duplex --jpeg -f $@ $<
 
 spm.html:	spm.shtml
 	echo Formatting $@...
@@ -160,14 +160,14 @@ spm.ps:		spm.shtml
 
 sum.html:	sum.shtml
 	echo Formatting $@...
-	htmldoc --path ".;.." --titleimage images/cups-large.gif -f $@ $<
+	htmldoc --toctitle "Table des matières" --path ".;.." --titleimage images/cups-large.gif -f $@ $<
 sum.pdf:	sum.shtml
 	echo Formatting $@...
-	htmldoc --path ".;.." --titleimage images/cups-large.gif --duplex --compression=9 \
+	htmldoc --toctitle "Table des matières" --path ".;.." --titleimage images/cups-large.gif --duplex --compression=9 \
 		--jpeg -f $@ $<
 sum.ps:		sum.shtml
 	echo Formatting $@...
-	htmldoc --path ".;.." --titleimage images/cups-large.gif --duplex --jpeg -f $@ $<
+	htmldoc --toctitle "Table des matières" --path ".;.." --titleimage images/cups-large.gif --duplex --jpeg -f $@ $<
 
 $(DOCUMENTS:.shtml=.html): \
 		glossary.shtml printing-overview.shtml \
