@@ -290,7 +290,7 @@ Print-Job request:
 
 <UL>
 
-	<P>"job-billing" (name(MAX)):
+	<P>"job-billing" (text(MAX)):
 
 	<P><I>(CUPS 1.1 and higher)</I>
 
@@ -385,7 +385,7 @@ Create-Job request:
 
 <UL>
 
-	<P>"job-billing" (name(MAX)):
+	<P>"job-billing" (text(MAX)):
 
 	<P><I>(CUPS 1.1 and higher)</I>
 
@@ -1572,11 +1572,11 @@ grayscale output) using the function "f(x) = x<SUP>(1000/gamma)</SUP>".
 <P>The hue attribute specifies a color hue rotation when printing image
 files. The default value is 0.
 
-<H3>job-billing (name(MAX))</H3>
+<H3>job-billing (text(MAX))</H3>
 
 <P><I>(CUPS 1.1 and higher)</I>
 
-<P>The job-billing attribute provides a name value to associate with a job
+<P>The job-billing attribute provides a text value to associate with a job
 for billing purposes.
 
 <H3>job-sheets (1setof type3 keyword | name(MAX))</H3>

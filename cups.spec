@@ -1,5 +1,5 @@
 #
-# "$Id: cups.spec,v 1.15 2000/04/09 23:08:57 mike Exp $"
+# "$Id: cups.spec,v 1.16 2000/05/04 21:17:19 mike Exp $"
 #
 #   RPM "spec" file for the Common UNIX Printing System (CUPS).
 #
@@ -26,11 +26,11 @@
 
 Summary: Common Unix Printing System
 Name: cups
-Version: 1.1b3
+Version: 1.1b4
 Release: 0
 Copyright: GPL
 Group: System Environment/Daemons
-Source: ftp://ftp.easysw.com/pub/cups/beta/cups-1.1b3-source.tar.gz
+Source: ftp://ftp.easysw.com/pub/cups/beta/cups-1.1b4-source.tar.gz
 Url: http://www.cups.org
 Packager: Michael Sweet <mike@easysw.com>
 Vendor: Easy Software Products
@@ -88,51 +88,19 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(-,root,root)
-/etc/rc.d/init.d/cups
-%config /etc/cups/*
-%dir /etc/cups/certs
-%dir /etc/cups/interfaces
-%dir /etc/cups/ppd
+/etc/*
 /usr/bin/*
-%%attr(4555,root,root) /usr/bin/lppasswd
 /usr/lib/*.so*
 /usr/man/*
 /usr/sbin/*
-%dir /usr/share/cups
-/usr/share/cups/*
-%dir /usr/share/doc/cups
-/usr/share/doc/cups/*
-%dir /usr/share/locale
-%dir /usr/share/locale/C
-%dir /usr/share/locale/de
-%dir /usr/share/locale/en
-%dir /usr/share/locale/es
-%dir /usr/share/locale/fr
-%dir /usr/share/locale/it
-/usr/share/locale/C/*
-/usr/share/locale/de/*
-/usr/share/locale/en/*
-/usr/share/locale/es/*
-/usr/share/locale/fr/*
-/usr/share/locale/it/*
-%dir /usr/lib/cups
-%dir /usr/lib/cups/backend
-%dir /usr/lib/cups/cgi-bin
-%dir /usr/lib/cups/daemon
-%dir /usr/lib/cups/filter
-/usr/lib/cups/backend/*
-/usr/lib/cups/cgi-bin/*
-/usr/lib/cups/daemon/*
-/usr/lib/cups/filter/*
-%dir /var/spool/cups
-%dir /var/log/cups
+/usr/share/*
+/usr/lib/cups/*
+/var/*
 
 %files devel
-%dir /usr/include/cups
 /usr/include/cups/*
-%dir /usr/lib
 /usr/lib/*.a
 
 #
-# End of "$Id: cups.spec,v 1.15 2000/04/09 23:08:57 mike Exp $".
+# End of "$Id: cups.spec,v 1.16 2000/05/04 21:17:19 mike Exp $".
 #

@@ -39,22 +39,22 @@ information for the Common UNIX Printing System ("CUPS") Version 1.1.
 
 <P>This chapter shows how to build and install the Common UNIX Printing System.
 If you are installing a binary distribution from the CUPS web site, proceed to
-the section titled, <A HREF="#binary">Installing a Binary Distribution</A>.
+the section titled, <A HREF="#BINARY">Installing a Binary Distribution</A>.
 
 <H2>Installing a Source Distribution</H2>
 
-<H3><A NAME="">Requirements</A></H3>
+<H3><A NAME="REQUIREMENTS">Requirements</A></H3>
 
 <P>You'll need an ANSI-compliant C compiler to build CUPS on your
 system. As its name implies, CUPS is designed to run on the UNIX
 operating system, however the CUPS interface library and most of the
-filters and backends supplied with CUPS should also run under
+filters and backends supplied with CUPS should also compiled and run under
 Microsoft&reg; Windows&reg;.
 
 <P>For the image file filters and PostScript RIP, you'll need the JPEG,
 PNG, TIFF, and ZLIB libraries. CUPS will build without these, but with
-reduced functionality. Easy Software Products maintains a mirror of the
-current versions of these libraries at:
+significantly reduced functionality. Easy Software Products maintains a
+mirror of the current versions of these libraries at:
 
 <UL><PRE>
 <A HREF="ftp://ftp.easysw.com/pub/libraries">ftp://ftp.easysw.com/pub/libraries</A>
@@ -74,7 +74,7 @@ make changes you can get the HTMLDOC software from:
 <A HREF="http://www.easysw.com/htmldoc">http://www.easysw.com/htmldoc</A>
 </PRE></UL>
 
-<H3><A NAME="">Compiling CUPS</A></H3>
+<H3><A NAME="COMPILING">Compiling CUPS</A></H3>
 
 <P>CUPS uses GNU autoconf to configure the makefiles and source code
 for your system. To configure CUPS for your system type:
@@ -112,7 +112,7 @@ system default location (typically <VAR>/usr/include</VAR> and
 
 <P>to build the software.
 
-<H3><A NAME="">Installing the Software</A></H3>
+<H3><A NAME="INSTALLING">Installing the Software</A></H3>
 
 <P>To install the software type:
 
@@ -120,33 +120,41 @@ system default location (typically <VAR>/usr/include</VAR> and
 % make install ENTER
 </PRE></UL>
 
-<H3><A NAME="">Running the Software</A></A></H3>
+<H3><A NAME="RUNNING">Running the Software</A></A></H3>
 
-Once you have installed the software you can start the CUPS daemon by
+<P>Once you have installed the software you can start the CUPS daemon by
 typing:
 
 <UL><PRE>
-% /usr/sbin/cupsd &amp; ENTER
+% /usr/sbin/cupsd ENTER
 </PRE></UL>
 
-<H2><A NAME="binary">Installing a Binary Distribution</A></H2>
+<H2><A NAME="BINARY">Installing a Binary Distribution</A></H2>
 
-<P>We are currently distributing CUPS binary distributions in TAR format
-with installation and removal scripts.
+<P>CUPS comes in a variety of binary distribution formats. Easy
+Software Products provides binaries in TAR format with installation and
+removal scripts ("portable" distributions), and in RPM and DPKG formats
+for Red Hat and Debian-based distributions.  Portable distributions are
+available for all platforms, while the RPM and DPKG distributions are
+only available for Linux.
 
-<UL>
+<BLOCKQUOTE>
+
 	<B>WARNING:</B>
 	
 	<P>Installing CUPS will overwrite your existing printing
 	system. If you experience difficulties with the CUPS software
 	and need to go back to your old printing system, you will need
-	to remove the CUPS software with the provided script and
+	to remove the CUPS software with the provided script and/or
 	reinstall the printing system from your operating system CDs.
-</UL>
 
-<P>To install the CUPS software you will need to be logged in as root
-(doing an "su" is good enough). Once you are the root user, run the
-installation script with:
+</BLOCKQUOTE>
+
+<H3><A NAME="PORTABLE-BINARY">Installing a Portable Distribution</A></H3>
+
+<P>To install the CUPS software from a portable distribution you will
+need to be logged in as root; doing an "su" is good enough. Once you
+are the root user, run the installation script with:
 
 <UL><PRE>
 ./cups.install ENTER
@@ -155,11 +163,157 @@ installation script with:
 <P>After asking you a few yes/no questions the CUPS software will be
 installed and the scheduler will be started automatically.
 
+<H3><A NAME="RPM-BINARY">Installing an RPM Distribution</A></H3>
 
+<P>To install the CUPS software from an RPM distribution you will
+need to be logged in as root; doing an "su" is good enough. Once you
+are the root user, run RPM with:
 
+<UL><PRE>
+rpm -e lpr
+rpm -i cups-1.1-linux-M.m.n-intel.rpm ENTER
+</PRE></UL>
+
+<P>After a short delay the CUPS software will be
+installed and the scheduler will be started automatically.
+
+<H3><A NAME="DPKG-BINARY">Installing an Debian Distribution</A></H3>
+
+<P>To install the CUPS software from a Debian distribution you will
+need to be logged in as root; doing an "su" is good enough. Once you
+are the root user, run dpkg with:
+
+<UL><PRE>
+dpkg -i cups-1.1-linux-M.m.n-intel.deb ENTER
+</PRE></UL>
+
+<P>After a short delay the CUPS software will be installed and the
+scheduler will be started automatically.
 
 <H1 ALIGN="RIGHT">3 - Getting Started</H1>
 
+<P>This chapter describes how to add your first printer.
+
+<H2>The Basics</H2>
+
+<P>CUPS provides two methods for adding printers - a command-line
+program called <CODE>lpadmin</CODE> and a WWW interface. The
+<CODE>lpadmin</CODE> command allows you to perform most printer
+administration tasks from the command-line and is located in
+<VAR>/usr/sbin</VAR>. The WWW interface is located at
+<A HREF="http://localhost:631/admin">http://localhost:631/admin</A> and
+will step you through printer configuration. If you don't like
+command-line interfaces, try the WWW interface instead.
+
+<P>Each printer queue has a name associated with it; the printer name is a
+string of up to 127 letters, numbers, and the underscore (_) that starts with
+a letter. Case is not significant, e.g. PRINTER and printer are considered to
+be the same name.
+
+<P>Printer queues also have a device associated with them. The device can be
+a parallel port, a network interface, and so forth. Devices within CUPS use
+Uniform Resource Identifiers ("URIs") which are a more general form of
+Uniform Resource Locators ("URLs") that are used in your web browser. For
+example, the first parallel port in Linux uses a device URI of
+<CODE>parallel:/dev/lp1</CODE>.
+
+<P>Finally, printer queues usually have a PostScript Printer Description
+("PPD") file associated with them. PPD files describe the capabilities of
+each printer, the page sizes supported, etc., and are used for PostScript
+and non-PostScript printers. CUPS includes PPD files for HP LaserJet, HP
+DeskJet, EPSON 9-pin, EPSON 24-pin, and EPSON Stylus printers.
+
+<H2>Adding Your First Printer</H2>
+
+
+
+
+<H2>Adding and Modifying Printers</H2>
+
+<P>To add a printer to CUPS you simply run the <CODE>lpadmin</CODE> command
+with the "-p" option:
+
+<UL><PRE>
+% /usr/lib/lpadmin -p<I>printer</I> -E -v<I>device</I> -P<I>ppd</I> ENTER
+</PRE></UL>
+
+<P>Spaces between the option letter and value are optional.
+
+<P>The <I>printer</I> name can be up to 127 letters, digits, hyphens,
+and underscores. Unlike other printing systems, the printer name in
+CUPS is <I>not</I> case-sensitive, so you can't add two printers named
+<CODE>LaserJet</CODE> and <CODE>laserjet</CODE>.
+
+<P>The <I>device</I> argument specifies the device URI or filename for the
+printer. The following devices are supported in a basic installation of
+CUPS:
+
+<DL>
+
+	<DT>file:/dev/filename
+	<DT>/dev/filename
+	<DD>Sends all output to the specified file.
+
+	<DT>http://[username:password@]hostname[:port]/resource
+	<DT>ipp://[username:password@]hostname[:port]/resource
+	<DD>Sends all output to the specified IPP printer or server.
+	The <I>port</I> parameters defaults to 631.
+
+	<DT>lpd://hostname/queue
+	<DD>Sends all output to the specified LPD printer queue.
+
+	<DT>parallel:/dev/filename
+	<DD>Sends all output to the specified parallel port device.
+
+	<DT>serial:/dev/filename[?options]
+	<DD>Sends all output to the specified serial port device.  The
+	<I>options</I> can be any of the following separated by the
+	plus (+) character:
+	<UL>
+		<LI><CODE>baud=<I>rate</I></CODE> - Sets the baud rate
+		for the device.
+		<LI><CODE>bits=<I>7 or 8</I></CODE> - Sets the number
+		of data bits.
+		<LI><CODE>parity=<I>even</I></CODE> - Sets even parity
+		checking.
+		<LI><CODE>parity=<I>odd</I></CODE> - Sets odd parity
+		checking.
+		<LI><CODE>parity=<I>none</I></CODE> - Turns parity
+		checking off.
+	</UL>
+
+	<DT>smb://[username:password@]hostname/queue
+	<DT>smb://[username:password@]workgroup/hostname/queue
+	<DD>Sends all output to the specified SMB (Windows) printer queue
+	using the SAMBA software.
+
+	<DT>socket://hostname[:port]
+	<DD>Sends all output to the specified printer using the
+	AppSocket protocol. The <I>port</I> parameter defaults to 9100.
+
+</DL>
+
+<P>The <I>ppd</I> argument specifies the PostScript Printer Description file
+to use for this printer. Many options (such as media size, etc.) will not
+be available if you omit this part of the <CODE>lpadmin</CODE> command.
+
+<H3><A NAME="DRIVERS">Using Standard Printer Drivers</H2>
+
+<P>The <CODE>lpadmin</CODE> command allows you to use "standard" PPD files
+and interface scripts located in the <VAR>/usr/share/cups/model</VAR>
+directory with the "-m" option:
+
+<UL><PRE>
+% /usr/lib/lpadmin -p <I>printer</I> -E -v <I>device</I> -m <I>model</I> ENTER
+</PRE></UL>
+
+<P>The <I>model</I> argument specifies the name of the PPD file or interface
+script. For example, to add a printer using the sample HP DeskJet series
+driver connected to parallel port 1 under Linux you would use:
+
+<UL><PRE>
+% /usr/lib/lpadmin -p DeskJet -E -v parallel:/dev/lp1 -m deskjet.ppd ENTER
+</PRE></UL>
 
 
 <H1 ALIGN="RIGHT">4 - Managing Printers</H1>
@@ -244,14 +398,14 @@ CUPS:
 to use for this printer. Many options (such as media size, etc.) will not
 be available if you omit this part of the <CODE>lpadmin</CODE> command.
 
-<H3><A NAME="">Using Standard Printer Drivers</H2>
+<H3><A NAME="DRIVERS">Using Standard Printer Drivers</H2>
 
 <P>The <CODE>lpadmin</CODE> command allows you to use "standard" PPD files
 and interface scripts located in the <VAR>/usr/share/cups/model</VAR>
 directory with the "-m" option:
 
 <UL><PRE>
-% /usr/lib/lpadmin -p<I>printer</I> -E -v<I>device</I> -m<I>model</I> ENTER
+% /usr/lib/lpadmin -p <I>printer</I> -E -v <I>device</I> -m <I>model</I> ENTER
 </PRE></UL>
 
 <P>The <I>model</I> argument specifies the name of the PPD file or interface
@@ -259,7 +413,7 @@ script. For example, to add a printer using the sample HP DeskJet series
 driver connected to parallel port 1 under Linux you would use:
 
 <UL><PRE>
-% /usr/lib/lpadmin -pDeskJet -E -vparallel:/dev/par1 -mdeskjet.ppd ENTER
+% /usr/lib/lpadmin -p DeskJet -E -v parallel:/dev/lp1 -m deskjet.ppd ENTER
 </PRE></UL>
 
 <H2>Removing Printers</H2>

@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.14 2000/03/09 19:47:18 mike Exp $"
+# "$Id: Makefile,v 1.15 2000/05/04 21:17:18 mike Exp $"
 #
 #   Top-level Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -68,6 +68,8 @@ install:
 	(cd doc; $(MAKE) -$(MAKEFLAGS) install)
 	echo Installing in fonts...
 	(cd fonts; $(MAKE) -$(MAKEFLAGS) install)
+	(cd fonts; $(MAKE) -$(MAKEFLAGS) install)
+	echo Installing in locale...
 	echo Installing in ppd...
 	(cd ppd; $(MAKE) -$(MAKEFLAGS) install)
 	echo Installing in templates...
@@ -90,5 +92,5 @@ tardist:
 	epm -v -f tardist cups
 
 #
-# End of "$Id: Makefile,v 1.14 2000/03/09 19:47:18 mike Exp $".
+# End of "$Id: Makefile,v 1.15 2000/05/04 21:17:18 mike Exp $".
 #
