@@ -1,5 +1,5 @@
 #
-# "$Id: cups.spec,v 1.22 2000/08/01 18:18:02 mike Exp $"
+# "$Id: cups.spec,v 1.23 2000/08/04 14:53:49 mike Exp $"
 #
 #   RPM "spec" file for the Common UNIX Printing System (CUPS).
 #
@@ -85,21 +85,54 @@ make	prefix=$RPM_BUILD_ROOT \
 	install
 
 %post
-/sbin/chkconfig --add cups
-/sbin/chkconfig cups on
-/etc/rc.d/init.d/cups start
+if test -x /sbin/chkconfig; then
+	/sbin/chkconfig --add cups
+	/sbin/chkconfig cups on
+fi
+
+if test -f /sbin/init.d/cups; then
+	/sbin/init.d/cups start
+fi
+if test -f /etc/rc.d/init.d/cups; then
+	/etc/rc.d/init.d/cups start
+fi
+if test -f /etc/init.d/cups; then
+	/etc/init.d/cups start
+fi
 
 %preun
-/etc/rc.d/init.d/cups stop
-/sbin/chkconfig --del cups
+if test -f /sbin/init.d/cups; then
+	/sbin/init.d/cups stop
+fi
+if test -f /etc/rc.d/init.d/cups; then
+	/etc/rc.d/init.d/cups stop
+fi
+if test -f /etc/init.d/cups; then
+	/etc/init.d/cups stop
+fi
+
+if test -x /sbin/chkconfig; then
+	/sbin/chkconfig --del cups
+fi
 
 %clean
 rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(-,root,root)
-%config /etc/cups/*
+/etc/cups/certs
+%config /etc/cups/classes.conf
+%config /etc/cups/client.conf
+%config /etc/cups/cupsd.conf
+/etc/cups/interfaces
+/etc/cups/mime.types
+/etc/cups/mime.convs
+/etc/cups/ppd
+%config /etc/cups/printers.conf
 /etc/pam.d/*
+/etc/init.d/*
+/etc/rc0.d/*
+/etc/rc2.d/*
 /etc/rc.d/*
 /usr/bin/*
 /usr/lib/*.so*
@@ -107,12 +140,14 @@ rm -rf $RPM_BUILD_ROOT
 /usr/sbin/*
 /usr/share/*
 /usr/lib/cups/*
-/var/*
+%attr(0700,lp,root) /var/spool/cups
+%attr(1700,lp,root) /var/spool/cups/tmp
+/sbin/init.d/*
 
 %files devel
 /usr/include/cups/*
 /usr/lib/*.a
 
 #
-# End of "$Id: cups.spec,v 1.22 2000/08/01 18:18:02 mike Exp $".
+# End of "$Id: cups.spec,v 1.23 2000/08/04 14:53:49 mike Exp $".
 #

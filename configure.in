@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: configure.in,v 1.50 2000/07/31 16:12:12 mike Exp $"
+dnl "$Id: configure.in,v 1.51 2000/08/04 14:53:49 mike Exp $"
 dnl
 dnl   Configuration script for the Common UNIX Printing System (CUPS).
 dnl
@@ -415,6 +415,53 @@ AC_SUBST(CAT1EXT)
 AC_SUBST(CAT5EXT)
 AC_SUBST(CAT8EXT)
 
+dnl Setup init.d locations...
+if test $prefix = "/"; then
+	case "$uname" in
+		FreeBSD* | NetBSD* | OpenBSD*)
+			# *BSD
+			INITDIR=""
+			INITDDIR=""
+			;;
+
+		Linux*)
+			# Linux seems to choose an init.d directory at random...
+			if test -d /sbin/init.d; then
+				# SuSE
+				INITDIR="/sbin/init.d"
+				INITDDIR=".."
+			else
+				if test -d /etc/rc.d; then
+					# RedHat
+					INITDIR="/etc/rc.d"
+					INITDDIR="../init.d"
+				else
+					# Others
+					INITDIR="/etc"
+					INITDDIR="../init.d"
+				fi
+			fi
+			;;
+
+		OSF1* HP-UX*)
+			INITDIR="/sbin"
+			INITDDIR="../init.d"
+			;;
+
+		*)
+			INITDIR="/etc"
+			INITDDIR="../init.d"
+			;;
+
+	esac
+else
+	INITDIR="/etc"
+	INITDDIR="../init.d"
+fi
+
+AC_SUBST(INITDIR)
+AC_SUBST(INITDDIR)
+
 dnl Setup default locations...
 CUPS_SERVERROOT='${prefix}/etc/cups'
 CUPS_LOGDIR='${prefix}/var/log/cups'
@@ -480,5 +527,5 @@ AC_SUBST(CUPS_DOCROOT)
 AC_OUTPUT(Makedefs cups.sh)
 
 dnl
-dnl End of "$Id: configure.in,v 1.50 2000/07/31 16:12:12 mike Exp $".
+dnl End of "$Id: configure.in,v 1.51 2000/08/04 14:53:49 mike Exp $".
 dnl

@@ -1,5 +1,5 @@
 #
-# "$Id: cups.list,v 1.76 2000/08/01 17:40:49 mike Exp $"
+# "$Id: cups.list,v 1.77 2000/08/04 14:53:49 mike Exp $"
 #
 #   ESP Package Manager (EPM) file list for the Common UNIX Printing
 #   System (CUPS).
@@ -390,6 +390,8 @@ f 0444 root sys $DOCDIR/sdd.html doc/sdd.html
 f 0444 root sys $DOCDIR/sdd.pdf doc/sdd.pdf
 f 0444 root sys $DOCDIR/spm.html doc/spm.html
 f 0444 root sys $DOCDIR/spm.pdf doc/spm.pdf
+f 0444 root sys $DOCDIR/sps.html doc/sps.html
+f 0444 root sys $DOCDIR/sps.pdf doc/sps.pdf
 f 0444 root sys $DOCDIR/ssr.html doc/ssr.html
 f 0444 root sys $DOCDIR/ssr.pdf doc/ssr.pdf
 f 0444 root sys $DOCDIR/sum.html doc/sum.html
@@ -503,5 +505,5 @@ f 0444 root sys $MANDIR/man5/printers.conf.5 man/printers.conf.man
 i 0555 root sys cups cups.sh
 
 #
-# End of "$Id: cups.list,v 1.76 2000/08/01 17:40:49 mike Exp $".
+# End of "$Id: cups.list,v 1.77 2000/08/04 14:53:49 mike Exp $".
 #

@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.22 2000/07/31 16:12:11 mike Exp $"
+# "$Id: Makefile,v 1.23 2000/08/04 14:53:49 mike Exp $"
 #
 #   Top-level Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -73,23 +73,11 @@ install:
 	echo Installing in templates...
 	(cd templates; $(MAKE) $(MFLAGS) install)
 	echo Installing startup script...
-	if test -d /sbin/init.d; then \
-		$(INSTALL_SCRIPT) cups.sh /sbin/init.d/cups; \
-		$(CHMOD) ugo+rx /sbin/init.d/cups; \
-		ln -s ../init.d/cups /sbin/rc0.d/K000cups; \
-		ln -s ../init.d/cups /sbin/rc2.d/S999cups; \
-	fi
-	if test -d /etc/rc.d/init.d; then \
-		$(INSTALL_SCRIPT) cups.sh /etc/rc.d/init.d/cups; \
-		$(CHMOD) ugo+rx /etc/rc.d/cups; \
-		ln -s ../init.d/cups /etc/rc.d/rc0.d/K00cups; \
-		ln -s ../init.d/cups /etc/rc.d/rc2.d/S99cups; \
-	fi
-	if test -d /etc/init.d; then \
-		$(INSTALL_SCRIPT) cups.sh /etc/init.d/cups; \
-		$(CHMOD) ugo+rx /etc/init.d/cups; \
-		ln -s ../init.d/cups /etc/rc0.d/K00cups; \
-		ln -s ../init.d/cups /etc/rc2.d/S99cups; \
+	if test "x$INITDIR" != "x"; then \
+		$(INSTALL_SCRIPT) cups.sh $prefix/$INITDIR/init.d/cups; \
+		$(CHMOD) ugo+rx $prefix/$INITDIR/init.d/cups; \
+		ln -s $INITDDIR/cups $prefix/$INITDIR/rc0.d/K00cups; \
+		ln -s $INITDDIR/cups $prefix/$INITDIR/rc2.d/S99cups; \
 	fi
 
 #
@@ -124,5 +112,5 @@ tardist:
 	epm $(EPMFLAGS) -f tardist cups
 
 #
-# End of "$Id: Makefile,v 1.22 2000/07/31 16:12:11 mike Exp $".
+# End of "$Id: Makefile,v 1.23 2000/08/04 14:53:49 mike Exp $".
 #

@@ -50,6 +50,9 @@ CHANGES IN CUPS v1.1.2
 	  work for smbspool.  Added a workaround for it.
 	- The HP-GL/2 filter didn't perform the right pen scaling
 	  with some files and the "fitplot" option.
+	- New Software Performance Specification document that
+	  describes the memory, disk, and CPU usage of all the
+	  CUPS software.
 
 
 CHANGES IN CUPS v1.1.1
