@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.h,v 1.5 1999/02/26 22:02:08 mike Exp $"
+ * "$Id: printers.h,v 1.6 1999/03/03 21:17:58 mike Exp $"
  *
  *   Printer definitions for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -30,9 +30,9 @@ typedef struct printer_str
 {
   struct printer_str *next;		/* Next printer in list */
   char		uri[HTTP_MAX_URI],	/* Printer URI */
-		hostname[HTTP_MAX_HOST];/* Host printer resides on */
-  unsigned char	name[IPP_MAX_NAME],	/* Printer name */
-		location[IPP_MAX_NAME],	/* Location code */
+		hostname[HTTP_MAX_HOST],/* Host printer resides on */
+		name[IPP_MAX_NAME];	/* Printer name */
+  unsigned char	location[IPP_MAX_NAME],	/* Location code */
 		info[IPP_MAX_NAME],	/* Description */
 		more_info[HTTP_MAX_URI],/* URL for site-specific info */
 		make_model[IPP_MAX_NAME],/* Make and model from PPD file */
@@ -46,6 +46,7 @@ typedef struct printer_str
 		backend[1024];		/* Backend to use */
   mime_type_t	*filetype;		/* Pseudo-filetype for printer */
   void		*job;			/* Current job in queue */
+  ipp_t		*attrs;			/* Attributes supported by this printer */
 } printer_t;
 
 
@@ -53,8 +54,9 @@ typedef struct printer_str
  * Globals...
  */
 
-VAR printer_t	*Printers VALUE(NULL);	/* Printer list */
-
+VAR printer_t		*Printers VALUE(NULL);	/* Printer list */
+VAR char		DefaultPrinter[IPP_MAX_NAME] VALUE("");
+						/* Default printer */
 
 /*
  * Prototypes...
@@ -71,5 +73,5 @@ extern void		StopPrinter(printer_t *p);
 
 
 /*
- * End of "$Id: printers.h,v 1.5 1999/02/26 22:02:08 mike Exp $".
+ * End of "$Id: printers.h,v 1.6 1999/03/03 21:17:58 mike Exp $".
  */

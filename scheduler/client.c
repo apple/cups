@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.7 1999/03/01 22:26:16 mike Exp $"
+ * "$Id: client.c,v 1.8 1999/03/03 21:17:57 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -689,14 +689,14 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	  if (ippRead(&(con->http), con->request) != IPP_DATA)
 	    break;
 
-         /*
-	  * Then create a file as needed for the request data...
-	  */
-
           if (con->file == 0 &&
 	      (con->http.data_remaining > 0 ||
 	       con->http.data_encoding == HTTP_ENCODE_CHUNKED))
 	  {
+           /*
+	    * Create a file as needed for the request data...
+	    */
+
             sprintf(con->filename, "%s/requests/XXXXXX", ServerRoot);
 	    con->file = mkstemp(con->filename);
 
@@ -711,6 +711,16 @@ ReadClient(client_t *con)	/* I - Client to read from */
 		return (0);
 	      }
 	    }
+	  }
+	  else
+	  {
+	   /*
+	    * No more data - process the request now...
+	    */
+
+            con->http.state = HTTP_POST_SEND;
+            ProcessIPPRequest(con);
+	    break;
 	  }
         }
 
@@ -1592,5 +1602,5 @@ show_printer_status(client_t *con)
 
 
 /*
- * End of "$Id: client.c,v 1.7 1999/03/01 22:26:16 mike Exp $".
+ * End of "$Id: client.c,v 1.8 1999/03/03 21:17:57 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.c,v 1.4 1999/02/09 22:04:10 mike Exp $"
+ * "$Id: auth.c,v 1.5 1999/03/03 21:17:56 mike Exp $"
  *
  *   Authorization routines for the Common UNIX Printing System (CUPS).
  *
@@ -95,7 +95,7 @@ AddLocation(char *location)	/* I - Location path */
   strncpy(temp->location, location, sizeof(temp->location) - 1);
   temp->length = strlen(temp->location);
 
-  fprintf(stderr, "cupsd: Added location \'%s\'...\n", location);
+  LogMessage(LOG_INFO, "AddLocation: added location \'%s\'", location);
 
  /*
   * Return the new record...
@@ -123,7 +123,7 @@ AllowHost(location_t *loc,	/* I - Location to add to */
   temp->mask.name.name   = strdup(name);
   temp->mask.name.length = strlen(name);
 
-  fprintf(stderr, "cupsd: %s allow %s\n", loc->location, name);
+  LogMessage(LOG_DEBUG, "AllowHost: %s allow %s", loc->location, name);
 }
 
 
@@ -147,7 +147,8 @@ AllowIP(location_t *loc,	/* I - Location to add to */
   temp->mask.ip.address = address;
   temp->mask.ip.netmask = netmask;
 
-  fprintf(stderr, "cupsd: %s allow %08x/%08x\n", loc->location, address, netmask);
+  LogMessage(LOG_DEBUG, "AllowIP: %s allow %08x/%08x", loc->location,
+             address, netmask);
 }
 
 
@@ -214,7 +215,7 @@ DenyHost(location_t *loc,	/* I - Location to add to */
   temp->mask.name.name   = strdup(name);
   temp->mask.name.length = strlen(name);
 
-  fprintf(stderr, "cupsd: %s deny %s\n", loc->location, name);
+  LogMessage(LOG_DEBUG, "DenyHost: %s deny %s", loc->location, name);
 }
 
 
@@ -238,7 +239,8 @@ DenyIP(location_t *loc,		/* I - Location to add to */
   temp->mask.ip.address = address;
   temp->mask.ip.netmask = netmask;
 
-  fprintf(stderr, "cupsd: %s deny %08x/%08x\n", loc->location, address, netmask);
+  LogMessage(LOG_DEBUG, "DenyIP: %s deny %08x/%08x\n", loc->location,
+             address, netmask);
 }
 
 
@@ -537,5 +539,5 @@ check_auth(unsigned ip,		/* I - Client address */
 
 
 /*
- * End of "$Id: auth.c,v 1.4 1999/02/09 22:04:10 mike Exp $".
+ * End of "$Id: auth.c,v 1.5 1999/03/03 21:17:56 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.6 1999/02/26 22:02:07 mike Exp $"
+ * "$Id: printers.c,v 1.7 1999/03/03 21:17:58 mike Exp $"
  *
  *   for the Common UNIX Printing System (CUPS).
  *
@@ -47,6 +47,7 @@ AddPrinter(char *name)		/* I - Name of printer */
   printer_t	*p,		/* New printer */
 		*current,	/* Current printer in list */
 		*prev;		/* Previous printer in list */
+  ipp_attribute_t *attr;	/* IPP attribute for printer */
 
 
  /*
@@ -65,6 +66,9 @@ AddPrinter(char *name)		/* I - Name of printer */
 
   strcpy((char *)p->name, name);
   p->state = IPP_PRINTER_STOPPED;
+  p->attrs = ippNew();
+  attr     = ippAddString(p->attrs, IPP_TAG_PRINTER, "printer-name", name);
+  attr->value_tag = IPP_TAG_NAME;
 
  /*
   * Insert the printer in the printer list alphabetically...
@@ -214,6 +218,8 @@ LoadAllPrinters(void)
   * Read printer configurations until we hit EOF...
   */
 
+  DefaultPrinter[0] = '\0';
+
   linenum = 0;
   p       = NULL;
 
@@ -260,10 +266,11 @@ LoadAllPrinters(void)
     * Decode the directive...
     */
 
-    if (strcmp(name, "<Printer") == 0)
+    if (strcmp(name, "<Printer") == 0 ||
+        strcmp(name, "<DefaultPrinter") == 0)
     {
      /*
-      * <Printer name>
+      * <Printer name> or <DefaultPrinter name>
       */
 
       if (line[len - 1] == '>' && p == NULL)
@@ -272,6 +279,9 @@ LoadAllPrinters(void)
 
         p           = AddPrinter(value);
 	p->filetype = mimeAddType(MimeDatabase, "printer", value);
+
+        if (strcmp(name, "<DefaultPrinter") == 0)
+	  strcpy(DefaultPrinter, value);
       }
       else
       {
@@ -390,6 +400,9 @@ LoadAllPrinters(void)
     /**** Add Order, Deny, Allow, AuthType, and AuthClass stuff! ****/
   }
 
+  if (DefaultPrinter[0] == '\0')
+    strcpy(DefaultPrinter, Printers->name);
+
   fclose(fp);
 }
 
@@ -413,5 +426,5 @@ StopPrinter(printer_t *p)
 
 
 /*
- * End of "$Id: printers.c,v 1.6 1999/02/26 22:02:07 mike Exp $".
+ * End of "$Id: printers.c,v 1.7 1999/03/03 21:17:58 mike Exp $".
  */
