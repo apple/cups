@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-prolog.c,v 1.21 2000/01/04 13:45:44 mike Exp $"
+ * "$Id: hpgl-prolog.c,v 1.22 2000/01/28 17:14:21 mike Exp $"
  *
  *   HP-GL/2 prolog routines for for the Common UNIX Printing System (CUPS).
  *
@@ -147,7 +147,7 @@ Outputf(const char *format,	/* I - Printf-style string */
       * Set the page size for this page...
       */
 
-      if (Rotation == 0 || Rotation == 180)
+      if (PageRotation == 0 || PageRotation == 180)
       {
 	width  = PlotSize[0];
 	length = PlotSize[1];
@@ -310,13 +310,16 @@ Outputf(const char *format,	/* I - Printf-style string */
             printf("%.1f %.1f translate\n", PageWidth - PageRight, PageBottom);
 	    break;
 	case 1 :
+            printf("%.0f 0 translate 90 rotate\n", PageLength);
             printf("%.1f %.1f translate\n", PageLength - PageTop,
 	           PageWidth - PageRight);
 	    break;
 	case 2 :
+            printf("%.0f %.0f translate 180 rotate\n", PageWidth, PageLength);
             printf("%.1f %.1f translate\n", PageLeft, PageLength - PageTop);
 	    break;
 	case 3 :
+            printf("0 %.0f translate -90 rotate\n", PageWidth);
             printf("%.1f %.1f translate\n", PageBottom, PageLeft);
 	    break;
       }
@@ -327,13 +330,16 @@ Outputf(const char *format,	/* I - Printf-style string */
             printf("%.1f %.1f translate\n", PageLeft, PageBottom);
 	    break;
 	case 1 :
+            printf("%.0f 0 translate 90 rotate\n", PageLength);
             printf("%.1f %.1f translate\n", PageBottom, PageWidth - PageRight);
 	    break;
 	case 2 :
+            printf("%.0f %.0f translate 180 rotate\n", PageWidth, PageLength);
             printf("%.1f %.1f translate\n", PageWidth - PageRight,
 	            PageLength - PageTop);
 	    break;
 	case 3 :
+            printf("0 %.0f translate -90 rotate\n", PageWidth);
             printf("%.1f %.1f translate\n", PageLength - PageTop, PageLeft);
 	    break;
       }
@@ -363,5 +369,9 @@ Outputf(const char *format,	/* I - Printf-style string */
 
 
 /*
- * End of "$Id: hpgl-prolog.c,v 1.21 2000/01/04 13:45:44 mike Exp $".
+<<<<<<< hpgl-prolog.c
+ * End of "$Id: hpgl-prolog.c,v 1.22 2000/01/28 17:14:21 mike Exp $".
+=======
+ * End of "$Id: hpgl-prolog.c,v 1.22 2000/01/28 17:14:21 mike Exp $".
+>>>>>>> 1.20.4.2
  */
