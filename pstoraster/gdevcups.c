@@ -1,5 +1,5 @@
 /*
- * "$Id: gdevcups.c,v 1.34 2000/09/10 16:46:40 mike Exp $"
+ * "$Id: gdevcups.c,v 1.35 2000/09/29 17:42:55 mike Exp $"
  *
  *   GNU Ghostscript raster output driver for the Common UNIX Printing
  *   System (CUPS).
@@ -1441,6 +1441,8 @@ cups_put_params(gx_device     *pdev,	/* I - Device info */
   float			floatval;	/* Floating point value */
   gs_param_string	stringval;	/* String value */
   gs_param_float_array	arrayval;	/* Float array value */
+  int			old_depth;	/* Old color depth */
+  gdev_prn_space_params	sp;		/* Space parameter data */
 
 
 #ifdef DEBUG
@@ -1517,6 +1519,8 @@ cups_put_params(gx_device     *pdev,	/* I - Device info */
       cups->header.name[i] = (unsigned)arrayval.data[i]; \
   }
 
+  old_depth = pdev->color_info.depth;
+
   stringoption(MediaClass, "MediaClass")
   stringoption(MediaColor, "MediaColor")
   stringoption(MediaType, "MediaType")
@@ -1553,6 +1557,16 @@ cups_put_params(gx_device     *pdev,	/* I - Device info */
   intoption(cupsRowStep, "cupsRowStep", unsigned)
 
   cups_set_color_info(pdev);
+
+  if (old_depth != pdev->color_info.depth)
+  {
+    fputs("DEBUG: Reallocating memory for new color depth...\n", stderr);
+    sp = ((gx_device_printer *)pdev)->space_params;
+
+    if ((code = gdev_prn_reallocate_memory(pdev, &sp, pdev->width,
+                                           pdev->height)) < 0)
+      return (code);
+  }
 
  /*
   * Compute the page margins...
@@ -2708,5 +2722,5 @@ cups_print_planar(gx_device_printer *pdev,	/* I - Printer device */
 
 
 /*
- * End of "$Id: gdevcups.c,v 1.34 2000/09/10 16:46:40 mike Exp $".
+ * End of "$Id: gdevcups.c,v 1.35 2000/09/29 17:42:55 mike Exp $".
  */

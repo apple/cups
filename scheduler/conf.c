@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.57 2000/09/12 18:35:00 mike Exp $"
+ * "$Id: conf.c,v 1.58 2000/09/29 17:42:56 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -202,7 +202,7 @@ ReadConfiguration(void)
   strcpy(AccessLog, CUPS_LOGDIR "/access_log");
   strcpy(ErrorLog, CUPS_LOGDIR "/error_log");
   strcpy(PageLog, CUPS_LOGDIR "/page_log");
-  strcpy(Printcap, "");
+  strcpy(Printcap, "/etc/printcap");
   strcpy(FontPath, CUPS_FONTPATH);
   strcpy(RemoteRoot, "remroot");
 
@@ -1416,5 +1416,5 @@ get_address(char               *value,		/* I - Value string */
 
 
 /*
- * End of "$Id: conf.c,v 1.57 2000/09/12 18:35:00 mike Exp $".
+ * End of "$Id: conf.c,v 1.58 2000/09/29 17:42:56 mike Exp $".
  */

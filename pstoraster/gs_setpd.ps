@@ -21,7 +21,7 @@
 % Ghostscript, as distributed by Aladdin Enterprises, does not require any
 % GNU software to build or run it.
 
-% $Id: gs_setpd.ps,v 1.8 2000/09/10 16:46:41 mike Exp $
+% $Id: gs_setpd.ps,v 1.9 2000/09/29 17:42:55 mike Exp $
 % The current implementation of setpagedevice has the following limitations:
 %	- It doesn't attempt to "interact with the user" for Policy = 2.
 
@@ -282,18 +282,27 @@ level2dict begin
 
 % Define the keys used in input attribute matching.
 /.inputattrkeys [
-  /PageSize /MediaColor /MediaWeight /MediaType /InsertSheet
+%%%% MRS: Can't get Ghostscript to leave these alone, so we only
+%%%%      include PageSize here...
+%  /PageSize /MediaColor /MediaWeight /MediaType /InsertSheet
+  /PageSize
 	% The following are documented in Adobe's supplement for v2017.
-  /LeadingEdge /MediaClass
+%  /LeadingEdge /MediaClass
 ] readonly def
 % Define other keys used in media selection.
 /.inputselectionkeys [
-  /MediaPosition /Orientation
+%%%% MRS: Can't get Ghostscript to leave these alone, so we only
+%%%%      provide a dummy attribute here...
+%  /MediaPosition /Orientation
+  /DummyInput
 ] readonly def
 
 % Define the keys used in output attribute matching.
 /.outputattrkeys [
-  /OutputType
+%%%% MRS: Can't get Ghostscript to leave these alone, so we only
+%%%%      include a dummy attribute here...
+%  /OutputType
+  /DummyOutput
 ] readonly def
 
 % Define all the parameters that should always be copied to the merged

@@ -1,8 +1,12 @@
-CHANGES.txt - 09/26/2000
+CHANGES.txt - 10/02/2000
 ------------------------
 
 CHANGES IN CUPS v1.1.4
 
+	- Makefile fixes.
+	- **** Changed the default Printcap setting **** to
+	  /etc/printcap. There are just too many people asking
+	  why application XYZ doesn't see their printers!
 	- The web admin interface now displays an error if it
 	  can't get the list of printer drivers from cupsd.
 	- The IPP backend was putting the copies option before
@@ -18,6 +22,16 @@ CHANGES IN CUPS v1.1.4
 	- The add-printer web interface didn't initialize the
 	  "old info" data pointer, which caused random crashes
 	  on many OS's.
+	- Fixed many page sizes defined in the Level 1
+	  compatibility file "gs_statd.ps" to match reality.
+	- Fixed another bug in the setpagedevice "code" in
+	  Ghostscript.  It should now accept all standard
+	  Adobe attributes on all platforms.
+	- Fixed pstoraster so that it reallocates memory for
+	  color depth changes as well as size/resolution
+	  changes.  This removes an ordering constraint on
+	  the color, page size, and resolution options in
+	  PPD files.
 
 
 CHANGES IN CUPS v1.1.3
