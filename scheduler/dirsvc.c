@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.18 1999/05/20 18:43:05 mike Exp $"
+ * "$Id: dirsvc.c,v 1.19 1999/06/09 20:07:03 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -147,6 +147,8 @@ StopBrowsing(void)
 void
 UpdateBrowseList(void)
 {
+  int		i;			/* Looping var */
+  int		len;			/* Length of name string */
   int		bytes;			/* Number of bytes left */
   char		packet[1540];		/* Broadcast packet */
   cups_ptype_t	type;			/* Printer type */
@@ -158,8 +160,11 @@ UpdateBrowseList(void)
 		resource[HTTP_MAX_URI];	/* Resource portion of URI */
   int		port;			/* Port portion of URI */
   char		name[IPP_MAX_NAME],	/* Name of printer */
-		*ptr;			/* Pointer into hostname */
-  printer_t	*p;			/* Printer information */
+		*hptr,			/* Pointer into hostname */
+		*sptr;			/* Pointer into ServerName */
+  printer_t	*p,			/* Printer information */
+		*pclass,		/* Printer class */
+		*first;			/* First printer in class */
 
 
  /*
@@ -199,8 +204,12 @@ UpdateBrowseList(void)
 
   type |= CUPS_PRINTER_REMOTE;
 
-  if ((ptr = strchr(host, '.')) != NULL)
-    *ptr = '\0';
+  hptr = strchr(host, '.');
+  sptr = strchr(ServerName, '.');
+
+  if (hptr != NULL && sptr != NULL &&
+      strcasecmp(hptr, sptr) == 0)
+    *hptr = '\0';
 
   if (type & CUPS_PRINTER_CLASS)
   {
@@ -269,6 +278,84 @@ UpdateBrowseList(void)
   p->state       = state;
   p->accepting   = state != IPP_PRINTER_STOPPED;
   p->browse_time = time(NULL);
+
+ /*
+  * Do auto-classing if needed...
+  */
+
+  if (ImplicitClasses)
+  {
+   /*
+    * Loop through all available printers and create classes as needed...
+    */
+
+    for (p = Printers, len = 0; p != NULL; p = p->next)
+    {
+     /*
+      * Skip classes...
+      */
+
+      if (p->type & CUPS_PRINTER_CLASS)
+      {
+        len = 0;
+        continue;
+      }
+
+     /*
+      * If len == 0, get the length of this printer name up to the "@"
+      * sign (if any).
+      */
+
+      if (len > 0 &&
+	  strncasecmp(p->name, name + 3, len) == 0 &&
+	  (p->name[len] == '\0' || p->name[len] == '@'))
+      {
+       /*
+	* We have more than one printer with the same name; see if
+	* we have a class, and if this printer is a member...
+	*/
+
+        if ((pclass = FindClass(name)) == NULL)
+	  pclass = AddClass(name);
+
+        if (first != NULL)
+	{
+          for (i = 0; i < pclass->num_printers; i ++)
+	    if (pclass->printers[i] == first)
+	      break;
+
+          if (i >= pclass->num_printers)
+	    AddPrinterToClass(pclass, first);
+
+	  first = NULL;
+	}
+
+        for (i = 0; i < pclass->num_printers; i ++)
+	  if (pclass->printers[i] == p)
+	    break;
+
+        if (i >= pclass->num_printers)
+	  AddPrinterToClass(pclass, p);
+      }
+      else
+      {
+       /*
+        * First time around; just get name length and mark it as first
+	* in the list...
+	*/
+
+	if ((hptr = strchr(p->name, '@')) != NULL)
+	  len = hptr - p->name;
+	else
+	  len = strlen(p->name);
+
+        strcpy(name, "Any");
+        strncpy(name + 3, p->name, len);
+	name[len + 3] = '\0';
+	first = p;
+      }
+    }
+  }
 }
 
 
@@ -340,5 +427,5 @@ SendBrowseList(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.18 1999/05/20 18:43:05 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.19 1999/06/09 20:07:03 mike Exp $".
  */

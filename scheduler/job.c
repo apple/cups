@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.24 1999/06/04 21:07:23 mike Exp $"
+ * "$Id: job.c,v 1.25 1999/06/09 20:07:04 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -194,8 +194,10 @@ CheckJobs(void)
     {
       DEBUG_printf(("CheckJobs: current->dest = \'%s\'\n", current->dest));
 
-      if ((printer = FindPrinter(current->dest)) == NULL)
+      if (FindClass(current->dest) != NULL)
         printer = FindAvailablePrinter(current->dest);
+      else
+        printer = FindPrinter(current->dest);
 
       if (printer == NULL && FindClass(current->dest) == NULL)
       {
@@ -338,6 +340,7 @@ StartJob(int       id,		/* I - Job ID */
         LogMessage(LOG_ERROR, "Unable to convert file to printable format for job %s-%d!",
 	           printer->name, current->id);
         CancelJob(current->id);
+	return;
       }
 
      /*
@@ -904,5 +907,5 @@ start_process(char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.24 1999/06/04 21:07:23 mike Exp $".
+ * End of "$Id: job.c,v 1.25 1999/06/09 20:07:04 mike Exp $".
  */

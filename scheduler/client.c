@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.19 1999/05/10 21:35:40 mike Exp $"
+ * "$Id: client.c,v 1.20 1999/06/09 20:07:02 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -544,6 +544,28 @@ ReadClient(client_t *con)	/* I - Client to read from */
 
       case HTTP_POST_RECV :
          /*
+	  * See if the POST request includes a Content-Length field, and if
+	  * so check the length against any limits that are set...
+	  */
+
+          if (con->http.fields[HTTP_FIELD_CONTENT_LENGTH][0] &&
+	      atoi(con->http.fields[HTTP_FIELD_CONTENT_LENGTH]) > MaxRequestSize &&
+	      MaxRequestSize > 0)
+	  {
+	   /*
+	    * Request too large...
+	    */
+
+            if (!SendError(con, HTTP_REQUEST_TOO_LARGE))
+	    {
+	      CloseClient(con);
+	      return (0);
+	    }
+
+	    break;
+          }
+
+         /*
 	  * See what kind of POST request this is; for IPP requests the
 	  * content-type field will be "application/ipp"...
 	  */
@@ -804,8 +826,35 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	{
 	  if (con->file)
 	  {
+	    fstat(con->file, &filestats);
 	    close(con->file);
 	    con->file = 0;
+
+            if (filestats.st_size > MaxRequestSize &&
+	        MaxRequestSize > 0)
+	    {
+	     /*
+	      * Request is too big; remove it and send an error...
+	      */
+
+	      unlink(con->filename);
+
+	      if (con->request)
+	      {
+	       /*
+	        * Delete any IPP request data...
+		*/
+
+	        ippDelete(con->request);
+		con->request = NULL;
+              }
+
+              if (!SendError(con, HTTP_REQUEST_TOO_LARGE))
+	      {
+		CloseClient(con);
+		return (0);
+	      }
+	    }
 	  }
 
           if (con->request)
@@ -1565,5 +1614,5 @@ pipe_command(client_t *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.19 1999/05/10 21:35:40 mike Exp $".
+ * End of "$Id: client.c,v 1.20 1999/06/09 20:07:02 mike Exp $".
  */

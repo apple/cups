@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c,v 1.18 1999/05/26 20:05:05 mike Exp $"
+ * "$Id: main.c,v 1.19 1999/06/09 20:07:04 mike Exp $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -35,6 +35,7 @@
 
 #define _MAIN_C_
 #include "cupsd.h"
+#include <sys/resource.h>
 
 
 /*
@@ -64,6 +65,7 @@ main(int  argc,			/* I - Number of command-line arguments */
   listener_t		*lis;		/* Current listener */
   time_t		activity;	/* Activity timer */
   struct timeval	timeout;	/* select() timeout */
+  struct rlimit		limit;		/* Runtime limit */
 #ifdef HAVE_SIGACTION
   struct sigaction	action;		/* Actions for POSIX signals */
 #endif /* HAVE_SIGACTION */
@@ -104,6 +106,24 @@ main(int  argc,			/* I - Number of command-line arguments */
 
   putenv("TZ=GMT");
   tzset();
+
+#ifndef DEBUG
+ /*
+  * Disable core dumps...
+  */
+
+  getrlimit(RLIMIT_CORE, &limit);
+  limit.rlim_cur = 0;
+  setrlimit(RLIMIT_CORE, &limit);
+#endif /* DEBUG */
+
+ /*
+  * Set the maximum number of files...
+  */
+
+  getrlimit(RLIMIT_NOFILE, &limit);
+  limit.rlim_cur = limit.rlim_max;
+  setrlimit(RLIMIT_NOFILE, &limit);
 
  /*
   * Catch hangup and child signals and ignore broken pipes...
@@ -381,5 +401,5 @@ usage(void)
 
 
 /*
- * End of "$Id: main.c,v 1.18 1999/05/26 20:05:05 mike Exp $".
+ * End of "$Id: main.c,v 1.19 1999/06/09 20:07:04 mike Exp $".
  */
