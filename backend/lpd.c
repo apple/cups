@@ -1,5 +1,5 @@
 /*
- * "$Id: lpd.c,v 1.40 2002/09/25 13:08:23 mike Exp $"
+ * "$Id: lpd.c,v 1.41 2002/10/03 13:48:19 mike Exp $"
  *
  *   Line Printer Daemon backend for the Common UNIX Printing System (CUPS).
  *
@@ -471,7 +471,7 @@ lpd_queue(char *hostname,	/* I - Host to connect to */
 
     if ((hostaddr = httpGetHostByName(hostname)) == NULL)
     {
-      fprintf(stderr, "ERROR: Unable to locate printer \'%s\' - %s",
+      fprintf(stderr, "ERROR: Unable to locate printer \'%s\' - %s\n",
               hostname, strerror(errno));
       return (1);
     }
@@ -524,7 +524,7 @@ lpd_queue(char *hostname,	/* I - Host to connect to */
 	if (error == ECONNREFUSED || error == EHOSTDOWN ||
             error == EHOSTUNREACH)
 	{
-	  fprintf(stderr, "INFO: Network host \'%s\' is busy; will retry in 30 seconds...",
+	  fprintf(stderr, "WARNING: Network host \'%s\' is busy; will retry in 30 seconds...",
                   hostname);
 	  sleep(30);
 	}
@@ -908,5 +908,5 @@ rresvport(int *port)		/* IO - Port number to bind to */
 #endif /* !HAVE_RRESVPORT */
 
 /*
- * End of "$Id: lpd.c,v 1.40 2002/09/25 13:08:23 mike Exp $".
+ * End of "$Id: lpd.c,v 1.41 2002/10/03 13:48:19 mike Exp $".
  */
