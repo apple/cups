@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.3 1999/05/10 21:33:02 mike Exp $"
+# "$Id: Makefile,v 1.4 1999/05/11 21:00:09 mike Exp $"
 #
 #   Documentation makefile for the Common UNIX Printing System (CUPS).
 #
@@ -30,8 +30,8 @@ include ../Makedefs
 
 .SUFFIXES:	.html .pdf
 .html.pdf:
-	htmldoc --bodyimage draft.gif --logo cups-bar.gif --numbered \
-		--duplex --compression=9 --jpeg -f $@ $<
+	htmldoc --title images/cups-large.gif --duplex --compression=9 \
+		--jpeg -f $@ $<
 
 #
 # Document files...
@@ -77,8 +77,7 @@ install:
 #
 
 overview.pdf:	overview.html
-	htmldoc --bodyimage draft.gif --logo cups-bar.gif --numbered \
-		--duplex --compression=9 --jpeg --webpage -f $@ $<
+	htmldoc --duplex --compression=9 -jpeg --webpage -f $@ $<
 
 #
 # End of Makefile.
