@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.38.2.18 2003/01/23 16:27:16 mike Exp $"
+ * "$Id: ipp.c,v 1.38.2.19 2003/01/23 19:25:29 mike Exp $"
  *
  *   IPP backend for the Common UNIX Printing System (CUPS).
  *
@@ -52,6 +52,10 @@
 
 const char	*password_cb(const char *);
 int		report_printer_state(ipp_t *ipp);
+
+#ifdef __APPLE__
+int		run_pictwps_filter(char **argv, char *filename, int length);
+#endif /* __APPLE__ */
 
 
 /*
@@ -153,6 +157,18 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   }
 
  /*
+  * Get the content type...
+  */
+
+  if (argc > 6)
+    content_type = getenv("CONTENT_TYPE");
+  else
+    content_type = "application/vnd.cups-raw";
+
+  if (content_type == NULL)
+    content_type = "application/octet-stream";
+
+ /*
   * If we have 7 arguments, print the file named on the command-line.
   * Otherwise, copy stdin to a temporary file and print the temporary
   * file.
@@ -186,6 +202,23 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
     close(fd);
   }
+#ifdef __APPLE__
+  else if (strcasecmp(content_type, "application/pictwps") == 0)
+  {
+   /*
+    * Convert to PostScript...
+    */
+
+    if (run_pictwps_filter(argv, filename, sizeof(filename)))
+      return (1);
+
+   /*
+    * Change the MIME type to application/vnd.cups-postscript...
+    */
+
+    content_type = "application/vnd.cups-postscript";
+  }
+#endif /* __APPLE__ */
   else
     strlcpy(filename, argv[6], sizeof(filename));
 
@@ -231,7 +264,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
         fprintf(stderr, "INFO: Unable to queue job on %s, queuing on next printer in class...\n",
 	        hostname);
 
-        if (argc == 6)
+        if (argc == 6 || strcmp(filename, argv[6]))
 	  unlink(filename);
 
        /*
@@ -409,7 +442,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
       ippDelete(supported);
       httpClose(http);
 
-      if (argc == 6)
+      if (argc == 6 || strcmp(filename, argv[6]))
 	unlink(filename);
 
      /*
@@ -537,11 +570,6 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
     options     = NULL;
     num_options = cupsParseOptions(argv[5], 0, &options);
-
-    if (argc > 6)
-      content_type = getenv("CONTENT_TYPE");
-    else
-      content_type = "application/vnd.cups-raw";
 
     if (content_type != NULL && format_sup != NULL)
     {
@@ -783,7 +811,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   * Close and remove the temporary file if necessary...
   */
 
-  if (argc < 7)
+  if (argc == 6 || strcmp(filename, argv[6]))
     unlink(filename);
 
  /*
@@ -906,7 +934,149 @@ report_printer_state(ipp_t *ipp)	/* I - IPP response */
 }
 
 
+#ifdef __APPLE__
+/*
+ * 'run_pictwps_filter()' - Convert PICT files to PostScript when printing
+ *                          remotely.
+ *
+ * This step is required because the PICT format is not documented and
+ * subject to change, so developing a filter for other OS's is infeasible.
+ * Also, fonts required by the PICT file need to be embedded on the
+ * client side (which has the fonts), so we run the filter to get a
+ * PostScript file for printing...
+ */
+
+int						/* O - Exit status of filter */
+run_pictwps_filter(char **argv,			/* I - Command-line arguments */
+                   char *filename,		/* I - Filename buffer */
+		   int  length)			/* I - Size of filename buffer */
+{
+  struct stat	fileinfo;			/* Print file information */
+  const char	*ppdfile;			/* PPD file for destination printer */
+  int		pid;				/* Child process ID */
+  int		fd;				/* Temporary file descriptor */
+  int		status;				/* Exit status of filter */
+  const char	*printer;			/* PRINTER env var */
+  static char	ppdenv[1024];			/* PPD environment variable */
+
+
+ /*
+  * First get the PPD file for the printer...
+  */
+
+  printer = getenv("PRINTER");
+  if (!printer)
+  {
+    fputs("ERROR: PRINTER environment variable not defined!\n", stderr);
+    return (-1);
+  }
+
+  if ((ppdfile = cupsGetPPD(printer)) == NULL)
+  {
+    fprintf(stderr, "ERROR: Unable to get PPD file for printer \"%s\" - %s.\n",
+            printer, ippErrorString(cupsLastError()));
+    return (-1);
+  }
+
+  snprintf(ppdenv, sizeof(ppdenv), "PPD=%s", ppdfile);
+  putenv(ppdenv);
+
+ /*
+  * Then create a temporary file for printing...
+  */
+
+  if ((fd = cupsTempFd(filename, length)) < 0)
+  {
+    fprintf(stderr, "ERROR: Unable to create temporary file - %s.\n",
+            printer, strerror(errno));
+    return (-1);
+  }
+
+ /*
+  * Get the owner of the spool file - it is owned by the user we want to run
+  * as...
+  */
+
+  stat(argv[6], &fileinfo);
+
+ /*
+  * Finally, run the filter to convert the file...
+  */
+
+  if ((pid = fork()) == 0)
+  {
+   /*
+    * Child process for pictwpstops...  Redirect output of pictwpstops to a
+    * file...
+    */
+
+    close(1);
+    dup(fd);
+    close(fd);
+
+    if (!getuid())
+    {
+     /*
+      * Change to an unpriviledged user...
+      */
+
+      setgid(fileinfo.st_gid);
+      setuid(fileinfo.st_uid);
+    }
+
+    execlp("pictwpstops", printer, argv[1], argv[2], argv[3], argv[4], argv[5],
+           argv[6], NULL);
+    perror("ERROR: Unable to exec pictwpstops");
+    return (errno);
+  }
+  else if (pid < 0)
+  {
+   /*
+    * Error!
+    */
+
+    perror("ERROR: Unable to fork pictwpstops");
+    close(fd);
+    unlink(filename);
+    return (-1);
+  }
+
+ /*
+  * Now wait for the filter to complete...
+  */
+
+  if (wait(&status) < 0)
+  {
+    perror("ERROR: Unable to wait for pictwpstops");
+    close(fd);
+    unlink(filename);
+    return (-1);
+  }
+
+  close(fd);
+
+  if (status)
+  {
+    if (status >= 256)
+      fprintf(stderr, "ERROR: pictwpstops exited with status %d!\n",
+              status / 256);
+    else
+      fprintf(stderr, "ERROR: pictwpstops exited on signal %d!\n",
+              status);
+
+    unlink(filename);
+    return (status);
+  }
+
+ /*
+  * Return with no errors..
+  */
+
+  return (0);
+}
+#endif /* __APPLE__ */
+
 
 /*
- * End of "$Id: ipp.c,v 1.38.2.18 2003/01/23 16:27:16 mike Exp $".
+ * End of "$Id: ipp.c,v 1.38.2.19 2003/01/23 19:25:29 mike Exp $".
  */

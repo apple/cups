@@ -3,6 +3,9 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.19
 
+	- Added support for pre-filtering application/pictwps
+	  files on MacOS clients before sending them to a server
+	  via IPP.
 	- The scheduler now allows file:/dev/null device URIs
 	  even if FileDevices is set to No.
 	- CUPS uses strerror() for hostname resolution errors,
