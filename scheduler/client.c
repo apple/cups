@@ -1,9 +1,9 @@
 /*
- * "$Id: client.c,v 1.91.2.84 2004/06/29 04:31:03 mike Exp $"
+ * "$Id: client.c,v 1.91.2.85 2004/06/29 13:15:10 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
- *   Copyright 1997-2003 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2004 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -3412,5 +3412,5 @@ CDSAWriteFunc(SSLConnectionRef connection,	/* I  - SSL/TLS connection */
 
 
 /*
- * End of "$Id: client.c,v 1.91.2.84 2004/06/29 04:31:03 mike Exp $".
+ * End of "$Id: client.c,v 1.91.2.85 2004/06/29 13:15:10 mike Exp $".
  */

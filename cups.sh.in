@@ -1,10 +1,10 @@
 #!/bin/sh
 #
-# "$Id: cups.sh.in,v 1.9.2.8 2003/01/07 18:26:13 mike Exp $"
+# "$Id: cups.sh.in,v 1.9.2.9 2004/06/29 13:15:08 mike Exp $"
 #
 #   Startup/shutdown script for the Common UNIX Printing System (CUPS).
 #
-#   Copyright 1997-2003 by Easy Software Products, all rights reserved.
+#   Copyright 1997-2004 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
 #   property of Easy Software Products and are protected by Federal
@@ -16,9 +16,9 @@
 #       Attn: CUPS Licensing Information
 #       Easy Software Products
 #       44141 Airport View Drive, Suite 204
-#       Hollywood, Maryland 20636-3111 USA
+#       Hollywood, Maryland 20636-3142 USA
 #
-#       Voice: (301) 373-9603
+#       Voice: (301) 373-9600
 #       EMail: cups-info@cups.org
 #         WWW: http://www.cups.org
 #
@@ -131,22 +131,41 @@ fi
 # See if the CUPS server (cupsd) is running...
 #
 
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+cupsd=@sbindir@/cupsd
+
 case "`uname`" in
 	HP-UX* | AIX* | SINIX*)
-		pid=`ps -e | awk '{if (match($4, ".*/cupsd$") || $4 == "cupsd") print $1}'`
+	        awkstart='{if ($4 == "';
+	        awkend='") print $1}';
+		awkcmd="$awkstart$cupsd$awkend"
+		pid=`ps -e | awk "$awkcmd"`
 		;;
 	IRIX* | SunOS*)
-		pid=`ps -e | nawk '{if (match($4, ".*/cupsd$") || $4 == "cupsd") print $1}'`
+	        awkstart='{if ($4 == "';
+	        awkend='") print $1}';
+		awkcmd="$awkstart$cupsd$awkend"
+		pid=`ps -e | nawk "$awkcmd"`
 		;;
 	UnixWare*)
-		pid=`ps -e | awk '{if (match($6, ".*/cupsd$") || $6 == "cupsd") print $1}'`
+	        awkstart='{if ($6 == "';
+	        awkend='") print $1}';
+		awkcmd="$awkstart$cupsd$awkend"
+		pid=`ps -e | awk "$awkcmd"`
 		. /etc/TIMEZONE
 		;;
 	OSF1*)
-		pid=`ps -e | awk '{if (match($5, ".*/cupsd$") || $5 == "cupsd") print $1}'`
+	        awkstart='{if ($5 == "';
+	        awkend='") print $1}';
+		awkcmd="$awkstart$cupsd$awkend"
+		pid=`ps -e | awk "$awkcmd"`
 		;;
 	Linux* | *BSD* | Darwin*)
-		pid=`ps ax | awk '{if (match($5, ".*/cupsd$") || $5 == "cupsd") print $1}'`
+	        awkstart='{if ($5 == "';
+	        awkend='") print $1}';
+		awkcmd="$awkstart$cupsd$awkend"
+		pid=`ps ax | awk "$awkcmd"`
 		;;
 	*)
 		pid=""
@@ -163,9 +182,7 @@ case $1 in
 			if test "$pid" != ""; then
 				kill -HUP $pid
 			else
-				prefix=@prefix@
-				exec_prefix=@exec_prefix@
-				@sbindir@/cupsd
+				$cupsd
 				if test $? != 0; then
 					$ECHO_FAIL
 					$ECHO "cups: unable to $1 scheduler."
@@ -207,5 +224,5 @@ exit 0
 
 
 #
-# End of "$Id: cups.sh.in,v 1.9.2.8 2003/01/07 18:26:13 mike Exp $".
+# End of "$Id: cups.sh.in,v 1.9.2.9 2004/06/29 13:15:08 mike Exp $".
 #

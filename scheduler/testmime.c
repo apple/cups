@@ -1,9 +1,9 @@
 /*
- * "$Id: testmime.c,v 1.4.2.7 2004/06/29 03:28:08 mike Exp $"
+ * "$Id: testmime.c,v 1.4.2.8 2004/06/29 13:15:11 mike Exp $"
  *
  *   MIME test program for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2003 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2004 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -243,5 +243,5 @@ print_rules(mime_magic_t *rules)	/* I - Rules to print */
 
 
 /*
- * End of "$Id: testmime.c,v 1.4.2.7 2004/06/29 03:28:08 mike Exp $".
+ * End of "$Id: testmime.c,v 1.4.2.8 2004/06/29 13:15:11 mike Exp $".
  */

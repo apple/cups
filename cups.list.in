@@ -1,10 +1,10 @@
 #
-# "$Id: cups.list.in,v 1.13.2.24 2004/05/27 15:37:47 mike Exp $"
+# "$Id: cups.list.in,v 1.13.2.25 2004/06/29 13:15:08 mike Exp $"
 #
 #   ESP Package Manager (EPM) file list for the Common UNIX Printing
 #   System (CUPS).
 #
-#   Copyright 1997-2003 by Easy Software Products, all rights reserved.
+#   Copyright 1997-2004 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
 #   property of Easy Software Products and are protected by Federal
@@ -16,16 +16,16 @@
 #       Attn: CUPS Licensing Information
 #       Easy Software Products
 #       44141 Airport View Drive, Suite 204
-#       Hollywood, Maryland 20636-3111 USA
+#       Hollywood, Maryland 20636-3142 USA
 #
-#       Voice: (301) 373-9603
+#       Voice: (301) 373-9600
 #       EMail: cups-info@cups.org
 #         WWW: http://www.cups.org
 #
 
 # Product information
 %product Common UNIX Printing System
-%copyright 1993-2003 by Easy Software Products, All Rights Reserved.
+%copyright 1993-2004 by Easy Software Products, All Rights Reserved.
 %vendor Easy Software Products
 %license LICENSE.txt
 %readme README.txt
@@ -403,5 +403,5 @@ f 0444 root sys $AMANDIR/man$MAN8DIR/lpmove.$MAN8EXT man/lpmove.man
 i 0555 root sys cups cups.sh
 
 #
-# End of "$Id: cups.list.in,v 1.13.2.24 2004/05/27 15:37:47 mike Exp $".
+# End of "$Id: cups.list.in,v 1.13.2.25 2004/06/29 13:15:08 mike Exp $".
 #

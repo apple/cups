@@ -1,9 +1,9 @@
 /*
- * "$Id: jobs.c,v 1.15.2.11 2003/07/20 03:49:46 mike Exp $"
+ * "$Id: jobs.c,v 1.15.2.12 2004/06/29 13:15:08 mike Exp $"
  *
  *   Job status CGI for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2003 by Easy Software Products.
+ *   Copyright 1997-2004 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -15,9 +15,9 @@
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
  *       44141 Airport View Drive, Suite 204
- *       Hollywood, Maryland 20636-3111 USA
+ *       Hollywood, Maryland 20636-3142 USA
  *
- *       Voice: (301) 373-9603
+ *       Voice: (301) 373-9600
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
  *
@@ -257,5 +257,5 @@ do_job_op(http_t      *http,		/* I - HTTP connection */
 
 
 /*
- * End of "$Id: jobs.c,v 1.15.2.11 2003/07/20 03:49:46 mike Exp $".
+ * End of "$Id: jobs.c,v 1.15.2.12 2004/06/29 13:15:08 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: rastertodymo.c,v 1.4.2.11 2004/05/12 19:32:07 mike Exp $"
+ * "$Id: rastertodymo.c,v 1.4.2.12 2004/06/29 13:15:09 mike Exp $"
  *
  *   Label printer filter for the Common UNIX Printing System (CUPS).
  *
@@ -15,9 +15,9 @@
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
  *       44141 Airport View Drive, Suite 204
- *       Hollywood, Maryland 20636-3111 USA
+ *       Hollywood, Maryland 20636-3142 USA
  *
- *       Voice: (301) 373-9603
+ *       Voice: (301) 373-9600
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
  *
@@ -593,5 +593,5 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: rastertodymo.c,v 1.4.2.11 2004/05/12 19:32:07 mike Exp $".
+ * End of "$Id: rastertodymo.c,v 1.4.2.12 2004/06/29 13:15:09 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: translate.c,v 1.1 1999/06/15 20:41:48 mike Exp $"
+ * "$Id: translate.c,v 1.1.6.1 2004/06/29 13:15:09 mike Exp $"
  *
  *   HTTP-based translation program for the Common UNIX Printing System (CUPS).
  *
@@ -19,9 +19,9 @@
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
  *       44145 Airport View Drive, Suite 204
- *       Hollywood, Maryland 20636-3111 USA
+ *       Hollywood, Maryland 20636-3142 USA
  *
- *       Voice: (301) 373-9603
+ *       Voice: (301) 373-9600
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
  *
@@ -255,5 +255,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: translate.c,v 1.1 1999/06/15 20:41:48 mike Exp $".
+ * End of "$Id: translate.c,v 1.1.6.1 2004/06/29 13:15:09 mike Exp $".
  */

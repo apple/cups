@@ -1,10 +1,10 @@
 /*
- * "$Id: form-tree.c,v 1.4.2.4 2004/02/25 20:01:37 mike Exp $"
+ * "$Id: form-tree.c,v 1.4.2.5 2004/06/29 13:15:09 mike Exp $"
  *
  *   CUPS form document tree routines for the Common UNIX Printing
  *   System (CUPS).
  *
- *   Copyright 1997-2003 by Easy Software Products.
+ *   Copyright 1997-2004 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -16,9 +16,9 @@
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
  *       44141 Airport View Drive, Suite 204
- *       Hollywood, Maryland 20636-3111 USA
+ *       Hollywood, Maryland 20636-3142 USA
  *
- *       Voice: (301) 373-9603
+ *       Voice: (301) 373-9600
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
  *
@@ -620,5 +620,5 @@ parse_element(tree_t *t,		/* I - Current tree node */
 
 
 /*
- * End of "$Id: form-tree.c,v 1.4.2.4 2004/02/25 20:01:37 mike Exp $".
+ * End of "$Id: form-tree.c,v 1.4.2.5 2004/06/29 13:15:09 mike Exp $".
  */

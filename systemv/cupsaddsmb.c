@@ -1,9 +1,9 @@
 /*
- * "$Id: cupsaddsmb.c,v 1.3.2.14 2003/11/17 22:05:10 mike Exp $"
+ * "$Id: cupsaddsmb.c,v 1.3.2.15 2004/06/29 13:15:11 mike Exp $"
  *
  *   "cupsaddsmb" command for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2001-2003 by Easy Software Products.
+ *   Copyright 2001-2004 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -15,9 +15,9 @@
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
  *       44141 Airport View Drive, Suite 204
- *       Hollywood, Maryland 20636-3111 USA
+ *       Hollywood, Maryland 20636-3142 USA
  *
- *       Voice: (301) 373-9603
+ *       Voice: (301) 373-9600
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
  *
@@ -590,5 +590,5 @@ usage()
 
 
 /*
- * End of "$Id: cupsaddsmb.c,v 1.3.2.14 2003/11/17 22:05:10 mike Exp $".
+ * End of "$Id: cupsaddsmb.c,v 1.3.2.15 2004/06/29 13:15:11 mike Exp $".
  */

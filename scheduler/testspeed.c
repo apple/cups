@@ -1,9 +1,9 @@
 /*
- * "$Id: testspeed.c,v 1.3.2.5 2004/06/29 03:28:08 mike Exp $"
+ * "$Id: testspeed.c,v 1.3.2.6 2004/06/29 13:15:11 mike Exp $"
  *
  *   Scheduler speed test for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2003 by Easy Software Products.
+ *   Copyright 1997-2004 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -288,5 +288,5 @@ usage(void)
 
 
 /*
- * End of "$Id: testspeed.c,v 1.3.2.5 2004/06/29 03:28:08 mike Exp $".
+ * End of "$Id: testspeed.c,v 1.3.2.6 2004/06/29 13:15:11 mike Exp $".
  */

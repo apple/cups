@@ -1,9 +1,9 @@
 /*
- * "$Id: hpgl-input.c,v 1.10.2.5 2004/02/25 20:01:37 mike Exp $"
+ * "$Id: hpgl-input.c,v 1.10.2.6 2004/06/29 13:15:09 mike Exp $"
  *
  *   HP-GL/2 input processing for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1993-2003 by Easy Software Products.
+ *   Copyright 1993-2004 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -15,9 +15,9 @@
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
  *       44141 Airport View Drive, Suite 204
- *       Hollywood, Maryland 20636-3111 USA
+ *       Hollywood, Maryland 20636-3142 USA
  *
- *       Voice: (301) 373-9603
+ *       Voice: (301) 373-9600
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
  *
@@ -243,5 +243,5 @@ FreeParameters(int     num_params,	/* I - Number of parameters */
 
 
 /*
- * End of "$Id: hpgl-input.c,v 1.10.2.5 2004/02/25 20:01:37 mike Exp $".
+ * End of "$Id: hpgl-input.c,v 1.10.2.6 2004/06/29 13:15:09 mike Exp $".
  */

@@ -1,10 +1,10 @@
 /*
- * "$Id: rastertohp.c,v 1.15.2.7 2003/02/11 18:23:33 mike Exp $"
+ * "$Id: rastertohp.c,v 1.15.2.8 2004/06/29 13:15:09 mike Exp $"
  *
  *   Hewlett-Packard Page Control Language filter for the Common UNIX
  *   Printing System (CUPS).
  *
- *   Copyright 1993-2003 by Easy Software Products.
+ *   Copyright 1993-2004 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -16,9 +16,9 @@
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
  *       44141 Airport View Drive, Suite 204
- *       Hollywood, Maryland 20636-3111 USA
+ *       Hollywood, Maryland 20636-3142 USA
  *
- *       Voice: (301) 373-9603
+ *       Voice: (301) 373-9600
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
  *
@@ -804,5 +804,5 @@ main(int  argc,		/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: rastertohp.c,v 1.15.2.7 2003/02/11 18:23:33 mike Exp $".
+ * End of "$Id: rastertohp.c,v 1.15.2.8 2004/06/29 13:15:09 mike Exp $".
  */

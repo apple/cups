@@ -1,9 +1,9 @@
 /*
- * "$Id: parallel.c,v 1.29.2.16 2004/05/13 15:13:52 mike Exp $"
+ * "$Id: parallel.c,v 1.29.2.17 2004/06/29 13:15:08 mike Exp $"
  *
  *   Parallel port backend for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2003 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2004 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -15,9 +15,9 @@
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
  *       44141 Airport View Drive, Suite 204
- *       Hollywood, Maryland 20636-3111 USA
+ *       Hollywood, Maryland 20636-3142 USA
  *
- *       Voice: (301) 373-9603
+ *       Voice: (301) 373-9600
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
  *
@@ -671,5 +671,5 @@ list_devices(void)
 
 
 /*
- * End of "$Id: parallel.c,v 1.29.2.16 2004/05/13 15:13:52 mike Exp $".
+ * End of "$Id: parallel.c,v 1.29.2.17 2004/06/29 13:15:08 mike Exp $".
  */

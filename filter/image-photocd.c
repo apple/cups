@@ -1,9 +1,9 @@
 /*
- * "$Id: image-photocd.c,v 1.10.2.4 2003/01/07 18:26:54 mike Exp $"
+ * "$Id: image-photocd.c,v 1.10.2.5 2004/06/29 13:15:09 mike Exp $"
  *
  *   PhotoCD routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1993-2003 by Easy Software Products.
+ *   Copyright 1993-2004 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -15,9 +15,9 @@
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
  *       44141 Airport View Drive, Suite 204
- *       Hollywood, Maryland 20636-3111 USA
+ *       Hollywood, Maryland 20636-3142 USA
  *
- *       Voice: (301) 373-9603
+ *       Voice: (301) 373-9600
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
  *
@@ -321,5 +321,5 @@ ImageReadPhotoCD(image_t    *img,	/* IO - Image */
 
 
 /*
- * End of "$Id: image-photocd.c,v 1.10.2.4 2003/01/07 18:26:54 mike Exp $".
+ * End of "$Id: image-photocd.c,v 1.10.2.5 2004/06/29 13:15:09 mike Exp $".
  */

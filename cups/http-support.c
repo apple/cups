@@ -1,9 +1,9 @@
 /*
- * "$Id: http-support.c,v 1.1.2.7 2004/06/29 03:46:29 mike Exp $"
+ * "$Id: http-support.c,v 1.1.2.8 2004/06/29 13:15:08 mike Exp $"
  *
  *   HTTP support routines for the Common UNIX Printing System (CUPS) scheduler.
  *
- *   Copyright 1997-2003 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2004 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -341,5 +341,5 @@ cups_hstrerror(int error)		/* I - Error number */
 
 
 /*
- * End of "$Id: http-support.c,v 1.1.2.7 2004/06/29 03:46:29 mike Exp $".
+ * End of "$Id: http-support.c,v 1.1.2.8 2004/06/29 13:15:08 mike Exp $".
  */

@@ -1,9 +1,9 @@
 /*
- * "$Id: imagetoraster.c,v 1.56.2.18 2004/05/12 19:32:07 mike Exp $"
+ * "$Id: imagetoraster.c,v 1.56.2.19 2004/06/29 13:15:09 mike Exp $"
  *
  *   Image file to raster filter for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1993-2003 by Easy Software Products.
+ *   Copyright 1993-2004 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -15,9 +15,9 @@
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
  *       44141 Airport View Drive, Suite 204
- *       Hollywood, Maryland 20636-3111 USA
+ *       Hollywood, Maryland 20636-3142 USA
  *
- *       Voice: (301) 373-9603
+ *       Voice: (301) 373-9600
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
  *
@@ -4594,5 +4594,5 @@ make_lut(ib_t  *lut,		/* I - Lookup table */
 
 
 /*
- * End of "$Id: imagetoraster.c,v 1.56.2.18 2004/05/12 19:32:07 mike Exp $".
+ * End of "$Id: imagetoraster.c,v 1.56.2.19 2004/06/29 13:15:09 mike Exp $".
  */

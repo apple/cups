@@ -1,9 +1,9 @@
 /*
- * "$Id: lprm.c,v 1.15.2.10 2004/02/25 16:58:32 mike Exp $"
+ * "$Id: lprm.c,v 1.15.2.11 2004/06/29 13:15:08 mike Exp $"
  *
  *   "lprm" command for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2003 by Easy Software Products.
+ *   Copyright 1997-2004 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -15,9 +15,9 @@
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
  *       44141 Airport View Drive, Suite 204
- *       Hollywood, Maryland 20636-3111 USA
+ *       Hollywood, Maryland 20636-3142 USA
  *
- *       Voice: (301) 373-9603
+ *       Voice: (301) 373-9600
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
  *
@@ -272,5 +272,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: lprm.c,v 1.15.2.10 2004/02/25 16:58:32 mike Exp $".
+ * End of "$Id: lprm.c,v 1.15.2.11 2004/06/29 13:15:08 mike Exp $".
  */

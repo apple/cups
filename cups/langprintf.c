@@ -1,5 +1,5 @@
 /*
- * "$Id: langprintf.c,v 1.1.2.2 2002/09/26 17:24:50 mike Exp $"
+ * "$Id: langprintf.c,v 1.1.2.3 2004/06/29 13:15:08 mike Exp $"
  *
  *   Localized printf/puts functions for the Common UNIX Printing
  *   System (CUPS).
@@ -16,9 +16,9 @@
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
  *       44141 Airport View Drive, Suite 204
- *       Hollywood, Maryland 20636-3111 USA
+ *       Hollywood, Maryland 20636-3142 USA
  *
- *       Voice: (301) 373-9603
+ *       Voice: (301) 373-9600
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
  *
@@ -125,6 +125,6 @@ cupsLangPuts(FILE        *fp,		/* I - File to write to */
 
 
 /*
- * End of "$Id: langprintf.c,v 1.1.2.2 2002/09/26 17:24:50 mike Exp $".
+ * End of "$Id: langprintf.c,v 1.1.2.3 2004/06/29 13:15:08 mike Exp $".
  */
 

@@ -1,9 +1,9 @@
 /*
- * "$Id: auth.c,v 1.1.2.8 2004/06/29 03:46:29 mike Exp $"
+ * "$Id: auth.c,v 1.1.2.9 2004/06/29 13:15:08 mike Exp $"
  *
  *   Authentication functions for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2003 by Easy Software Products.
+ *   Copyright 1997-2004 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -245,5 +245,5 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: auth.c,v 1.1.2.8 2004/06/29 03:46:29 mike Exp $".
+ * End of "$Id: auth.c,v 1.1.2.9 2004/06/29 13:15:08 mike Exp $".
  */
