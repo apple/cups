@@ -1,8 +1,11 @@
-CHANGES.txt - 06/14/2002
+CHANGES.txt - 06/27/2002
 ------------------------
 
 CHANGES IN CUPS V1.1.16
 
+	- Updated the filters to use the %ESPRotation comment
+	  instead of %%Orientation to auto-rotate pages, since
+	  the use of %%Orientation is inconsistent.
 	- Added the RootCertDuration directive to control how
 	  often the root authentication certificate is updated.
 	- Increased the size of the IPP write buffer to 32k to

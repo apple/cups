@@ -1,5 +1,5 @@
 /*
- * "$Id: imagetops.c,v 1.46 2002/05/16 13:44:55 mike Exp $"
+ * "$Id: imagetops.c,v 1.47 2002/06/27 12:06:17 mike Exp $"
  *
  *   Image file to PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -562,6 +562,8 @@ main(int  argc,		/* I - Number of command-line arguments */
   printf("%%%%For: %s\n", argv[2]);
   if (Orientation & 1)
     puts("%%Orientation: Landscape");
+  else
+    puts("%%Orientation: Portrait");
   puts("%%EndComments");
   puts("%%BeginProlog");
 
@@ -882,5 +884,5 @@ ps_ascii85(ib_t *data,		/* I - Data to print */
 
 
 /*
- * End of "$Id: imagetops.c,v 1.46 2002/05/16 13:44:55 mike Exp $".
+ * End of "$Id: imagetops.c,v 1.47 2002/06/27 12:06:17 mike Exp $".
  */
