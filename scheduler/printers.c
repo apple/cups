@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.98 2001/06/07 15:54:05 mike Exp $"
+ * "$Id: printers.c,v 1.99 2001/06/21 21:22:21 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -1027,8 +1027,9 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
                "generated-natural-language-supported", NULL, DefaultLanguage);
   ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_MIMETYPE,
                "document-format-default", NULL, "application/octet-stream");
-  ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_MIMETYPE,
-               "document-format-supported", NULL, "application/octet-stream");
+  ippAddStrings(p->attrs, IPP_TAG_PRINTER,
+                (ipp_tag_t)(IPP_TAG_MIMETYPE | IPP_TAG_COPY),
+                "document-format-supported", NumMimeTypes, NULL, MimeTypes);
   ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
                "compression-supported", NULL, "none");
   ippAddInteger(p->attrs, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
@@ -1802,5 +1803,5 @@ write_printcap(void)
 
 
 /*
- * End of "$Id: printers.c,v 1.98 2001/06/07 15:54:05 mike Exp $".
+ * End of "$Id: printers.c,v 1.99 2001/06/21 21:22:21 mike Exp $".
  */

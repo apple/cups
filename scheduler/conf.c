@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.79 2001/05/22 17:30:14 mike Exp $"
+ * "$Id: conf.c,v 1.80 2001/06/21 21:22:20 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -146,6 +146,8 @@ ReadConfiguration(void)
   FILE		*fp;		/* Configuration file */
   int		status;		/* Return status */
   char		directory[1024];/* Configuration directory */
+  char		type[MIME_MAX_SUPER + MIME_MAX_TYPE];
+				/* MIME type name */
   struct rlimit	limit;		/* Runtime limit */
   char		*language;	/* Language string */
   struct passwd	*user;		/* Default user */
@@ -182,6 +184,14 @@ ReadConfiguration(void)
 
   if (MimeDatabase != NULL)
     mimeDelete(MimeDatabase);
+
+  if (NumMimeTypes)
+  {
+    for (i = 0; i < NumMimeTypes; i ++)
+      free(MimeTypes[i]);
+
+    free(MimeTypes);
+  }
 
   for (i = 0; i < NumRelays; i ++)
     if (Relays[i].from.type == AUTH_NAME)
@@ -451,6 +461,28 @@ ReadConfiguration(void)
 
   MimeDatabase = mimeNew();
   mimeMerge(MimeDatabase, ServerRoot);
+
+ /*
+  * Create a list of MIME types for the document-format-supported
+  * attribute...
+  */
+
+  NumMimeTypes = MimeDatabase->num_types;
+  if (!mimeType(MimeDatabase, "application", "octet-stream"))
+    NumMimeTypes ++;
+
+  MimeTypes = calloc(NumMimeTypes, sizeof(const char *));
+
+  for (i = 0; i < MimeDatabase->num_types; i ++)
+  {
+    snprintf(type, sizeof(type), "%s/%s", MimeDatabase->types[i]->super,
+             MimeDatabase->types[i]->type);
+
+    MimeTypes[i] = strdup(type);
+  }
+
+  if (i < NumMimeTypes)
+    MimeTypes[i] = strdup("application/octet-stream");
 
  /*
   * Load banners...
@@ -1637,5 +1669,5 @@ get_address(char               *value,		/* I - Value string */
 
 
 /*
- * End of "$Id: conf.c,v 1.79 2001/05/22 17:30:14 mike Exp $".
+ * End of "$Id: conf.c,v 1.80 2001/06/21 21:22:20 mike Exp $".
  */

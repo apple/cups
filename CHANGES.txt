@@ -100,6 +100,12 @@ CHANGES IN CUPS V1.1.9
 	  checks to the IPP backend to eliminate extra,
 	  unsupported attributes which should normally be
 	  ignored by a compliant IPP device.
+	- The scheduler did not copy the complete list of
+	  supported file types into the
+	  document-format-supported attribute. This caused
+	  clients to not send the local file type (such as
+	  application/vnd.cups-raw for raw print files) and the
+	  corresponding bad output in some cases.
 
 
 CHANGES IN CUPS V1.1.8

@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.58 2001/05/16 19:33:11 mike Exp $"
+ * "$Id: ipp.c,v 1.59 2001/06/21 21:22:19 mike Exp $"
  *
  *   Internet Printing Protocol support functions for the Common UNIX
  *   Printing System (CUPS).
@@ -270,8 +270,10 @@ ippAddString(ipp_t      *ipp,		/* I - IPP request */
   attr->name                      = strdup(name);
   attr->group_tag                 = group;
   attr->value_tag                 = type;
-  attr->values[0].string.charset  = charset ? strdup(charset) : NULL;
-  attr->values[0].string.text     = value ? strdup(value) : NULL;
+  attr->values[0].string.charset  = ((int)type & IPP_TAG_COPY) ? (char *)charset :
+                                    charset ? strdup(charset) : NULL;
+  attr->values[0].string.text     = ((int)type & IPP_TAG_COPY) ? (char *)value :
+                                    value ? strdup(value) : NULL;
 
   if ((type == IPP_TAG_LANGUAGE || type == IPP_TAG_CHARSET) &&
       attr->values[0].string.text)
@@ -321,16 +323,18 @@ ippAddStrings(ipp_t      *ipp,		/* I - IPP request */
   attr->group_tag = group;
   attr->value_tag = type;
 
-  if (values != NULL)
-    for (i = 0; i < num_values; i ++)
-    {
-      if (i == 0)
-	attr->values[0].string.charset = charset ? strdup(charset) : NULL;
-      else
-	attr->values[i].string.charset = attr->values[0].string.charset;
+  for (i = 0; i < num_values; i ++)
+  {
+    if (i == 0)
+      attr->values[0].string.charset = ((int)type & IPP_TAG_COPY) ? (char *)charset :
+                                       charset ? strdup(charset) : NULL;
+    else
+      attr->values[i].string.charset = attr->values[0].string.charset;
 
-      attr->values[i].string.text = strdup(values[i]);
-    }
+    if (values != NULL)
+      attr->values[i].string.text = ((int)type & IPP_TAG_COPY) ? (char *)values[i] :
+                                    strdup(values[i]);
+  }
 
   return (attr);
 }
@@ -1912,5 +1916,5 @@ ipp_read(http_t        *http,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.58 2001/05/16 19:33:11 mike Exp $".
+ * End of "$Id: ipp.c,v 1.59 2001/06/21 21:22:19 mike Exp $".
  */
