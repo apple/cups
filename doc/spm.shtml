@@ -1003,7 +1003,7 @@ be used by the filter:
 
 </UL>
 
-<H2>Disecting the HP-GL/2 Filter</H2>
+<H2>Dissecting the HP-GL/2 Filter</H2>
 
 <P>The HP-GL/2 filter (<CODE>hpgltops</CODE>) provided with CUPS is a
 complex program that converts HP-GL/2 files into device-independent PostScript
@@ -1164,19 +1164,258 @@ perform a color conversion once each time the color is used for
 multiple output pixels, while the raster filter must convert every
 pixel on the page.
 
-<H2>Raster Functions</H2>
+<H3>Device and Bitmap Variables</H3>
 
-<H3>cupsRasterOpen()</H3>
+<P>Besides the standard PostScript page device dictionary variables defined
+in the Adobe PostScript Level 3 reference manual, the CUPS filters support
+additional variables that are passed in the page device dictionary header for
+the page and in some cases control the type of raster data that is generated:
 
-<H3>cupsRasterReadHeader()</H3>
+<CENTER><TABLE WIDTH="90%" BORDER="1">
+<TR>
+	<TH>Variable</TH>
+	<TH>Type</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD>cupsWidth</TD>
+	<TD>read-only integer</TD>
+	<TD>Width of bitmap in pixels</TD>
+</TR>
+<TR>
+	<TD>cupsHeight</TD>
+	<TD>read-only integer </TD>
+	<TD>Height of bitmap in pixels</TD>
+</TR>
+<TR>
+	<TD>cupsMediaType</TD>
+	<TD>read-write integer</TD>
+	<TD>Device-specific media type code</TD>
+</TR>
+<TR>
+	<TD>cupsBitsPerColor</TD>
+	<TD>read-write integer</TD>
+	<TD>Number of bits per color; 1, 2, 4, and 8 are currently
+	supported</TD>
+</TR>
+<TR>
+	<TD>cupsBitsPerPixel</TD>
+	<TD>read-only integer </TD>
+	<TD>Number of bits per pixel; 1 to 32</TD>
+</TR>
+<TR>
+	<TD>cupsBytesPerLine</TD>
+	<TD>read-only integer</TD>
+	<TD>Number of bytes per line of raster graphics</TD>
+</TR>
+<TR>
+	<TD>cupsColorOrder</TD>
+	<TD>read-write enum</TD>
+	<TD>The order of color values in the bitmap:
+	<UL>
+		<LI><CODE>CUPS_ORDER_CHUNKED</CODE> - CMYK&nbsp;CMYK&nbsp;CMYK
+		<LI><CODE>CUPS_ORDER_BANDED</CODE> - CCC&nbsp;MMM&nbsp;YYY&nbsp;KKK
+		<LI><CODE>CUPS_ORDER_PLANAR</CODE> - CCC&nbsp;...&nbsp;MMM&nbsp;...&nbsp;YYY&nbsp;...&nbsp;KKK&nbsp;...
+	</UL>
+	</TD>
+</TR>
+<TR>
+	<TD>cupsColorSpace</TD>
+	<TD>read-write enum</TD>
+	<TD>The colorspace of the bitmap:
+	<UL>
+		<LI><CODE>CUPS_CSPACE_W</CODE> - White (luminance)
+		<LI><CODE>CUPS_CSPACE_RGB</CODE> - Red, green, blue
+		<LI><CODE>CUPS_CSPACE_RGBA</CODE> - Red, green, blue, alpha
+		<LI><CODE>CUPS_CSPACE_K</CODE> - Black
+		<LI><CODE>CUPS_CSPACE_CMY</CODE> - Cyan, magenta, yellow
+		<LI><CODE>CUPS_CSPACE_YMC</CODE> - Yellow, magenta, cyan
+		<LI><CODE>CUPS_CSPACE_CMYK</CODE> - Cyan, magenta, yellow, black
+		<LI><CODE>CUPS_CSPACE_YMCK</CODE> - Yellow, magenta, cyan, black
+		<LI><CODE>CUPS_CSPACE_KCMY</CODE> - Black, cyan, magenta, yellow
+		<LI><CODE>CUPS_CSPACE_KCMYcm</CODE> - Black, cyan, magenta, yellow,
+		light cyan, light magenta
+		<LI><CODE>CUPS_CSPACE_GMCK</CODE> - Metallic yellow (gold), metallic magenta,
+		metallic cyan, black
+		<LI><CODE>CUPS_CSPACE_GMCS</CODE> - Metallic yellow (gold), metallic magenta,
+		metallic cyan, metallic grey (silver)
+		<LI><CODE>CUPS_CSPACE_WHITE</CODE> - White pigment (black as white pigment)
+		<LI><CODE>CUPS_CSPACE_GOLD</CODE> - Gold foil (black as gold foil)
+		<LI><CODE>CUPS_CSPACE_SILVER</CODE> - Silver foil (black as silver foil)
+	</UL>
+	</TD>
+</TR>
+<TR>
+	<TD>cupsCompression</TD>
+	<TD>read-write integer</TD>
+	<TD>Device-specific compression type code</TD>
+</TR>
+<TR>
+	<TD>cupsRowCount</TD>
+	<TD>read-write integer</TD>
+	<TD>Device-specific row count value</TD>
+</TR>
+<TR>
+	<TD>cupsRowFeed</TD>
+	<TD>read-write integer</TD>
+	<TD>Device-specific row feed value</TD>
+</TR>
+<TR>
+	<TD>cupsRowStep</TD>
+	<TD>read-write integer</TD>
+	<TD>Device-specific row step value</TD>
+</TR>
+</TABLE></CENTER>
 
-<H3>cupsRasterReadPixels()</H3>
+<P>Bitmaps with a colorspace of CUPS_CSPACE_KCMYcm and more than 1 bit per
+color are transmitted to the raster driver in KCMY colorspace; the driver
+is responsible for producing the correct separation of normal and light
+cyan and magenta inks.
 
-<H3>cupsRasterClose()</H3>
+<H2>Dissecting the HP-PCL Driver</H2>
+
+<P>The HP-PCL driver provided with CUPS (<CODE>rastertohp</CODE>) converts
+bitmap data from the raster filters into HP-PCL commands for most
+PCL-compatible printers. The actual format of the raster data is controlled
+by the PPD file being used - <VAR>deskjet.ppd</VAR> or <VAR>laserjet.ppd</VAR>.
+
+<H3>PPD Files</H3>
+
+<P>PPD files play an important part of all raster printer drivers. Options
+defined in the PPD file contain PostScript commands that control the raster
+data that is sent to the printer driver.
+
+<P>A typical CUPS printer driver will include <CODE>ColorModel</CODE>,
+<CODE>InputSlot</CODE>, <CODE>PageSize</CODE>, <CODE>PageRegion</CODE>,
+and <CODE>Resolution</CODE> options. Each option is shown using the
+standard PPD format:
+
+<UL><PRE>
+*OpenUI *PageSize/Media Size: PickOne
+*OrderDependency: 10 AnySetup *PageSize
+*DefaultPageSize: Letter
+*PageSize Letter/US Letter: "&lt;&lt;
+/PageSize [612 792]
+/ImagingBBox null
+>> setpagedevice"
+*End
+*PageSize Legal/US Legal: "&lt;&lt;
+/PageSize [612 1008]
+/ImagingBBox null
+>> setpagedevice"
+*End
+*PageSize A4/A4: "&lt;&lt;
+/PageSize [595 842]
+/ImagingBBox null
+>> setpagedevice"
+*End
+*CloseUI: *PageSize
+</UL></PRE>
+
+<P>The <CODE>OpenUI</CODE> keyword specifies the new option. The first
+name is the option with an asterisk (*) in front of it. The first name is
+usually followed by a slash (/) and a human-readable version of the
+option name.
+
+<P>Every option <B>must</B> have a default value, specified using the
+<CODE>Default<I>Option</I></CODE> keyword.
+
+<P>Each option begins with the option name followed by the computer and
+human-readable values. The PostScript commands follow these inside double
+quotes. PostScript commands can be provided on a single line:
+
+<UL><PRE>
+*PageSize A4/A4: "&lt;&lt;/PageSize[595 842]/ImagingBBox null>> setpagedevice"
+</PRE></UL>
+
+<P>or broken down on separate lines using the <CODE>End</CODE> keyword to
+terminate them:
+
+<UL><PRE>
+*PageSize A4/A4: "&lt;&lt;
+/PageSize [595 842]
+/ImagingBBox null
+>> setpagedevice"
+*End
+</PRE></UL>
+
+<P>The choice of the two formats is usually esthetic. However, each line in
+a PPD file must not exceed 255 characters, so if your PostScript commands are
+long you may need to break them up on separate lines.
+
+<H3>Reading Raster Data</H3>
+
+<P>As with any filter, your printer driver should handle raster data from
+a filename specified on the command-line or from the standard input. The
+<A HREF="#cupsRasterOpen"><CODE>cupsRasterOpen()</CODE></A> function opens
+a raster stream for printing:
+
+<UL><PRE>
+int           fd;   /* File descriptor */
+cups_raster_t *ras; /* Raster stream for printing */
 
 
-<H2>Writing a HP-PCL Driver</H2>
+/*
+ * Check for valid arguments...
+ */
 
+if (argc &lt; 6 || argc > 7)
+{
+ /*
+  * We don't have the correct number of arguments; write an error message
+  * and return.
+  */
+
+  fputs("ERROR: rastertopcl job-id user title copies options [file]\n", stderr);
+  return (1);
+}
+
+/*
+ * Open the page stream...
+ */
+
+if (argc == 7)
+{
+  if ((fd = open(argv[6], O_RDONLY)) == -1)
+  {
+    perror("ERROR: Unable to open raster file - ");
+    sleep(1);
+    return (1);
+  }
+}
+else
+  fd = 0;
+
+ras = cupsRasterOpen(fd, CUPS_RASTER_READ);
+</PRE></UL>
+
+<P>Once you have opened the raster stream you just need to read each
+page and print it:
+
+<UL><PRE>
+cups_raster_header_t header;
+int                  y;
+unsigned char        data[8192];
+
+while (cupsRasterReadHeader(ras, &amp;header))
+{
+  ... initialize the printer ...
+  for (y = header.cupsHeight; y > 0; y ++)
+  {
+    cupsRasterReadPixels(ras, data, header.cupsBytesPerLine);
+    ... send raster line to printer ...
+  }
+}
+</PRE></UL>
+
+<P>After you have processed all pages, close the raster stream and
+return:
+
+<UL><PRE>
+cupsRasterClose(ras);
+
+return (0);
+</PRE></UL>
 
 <H1 ALIGN="RIGHT"><A NAME="WRITING_BACKENDS">5 - Writing Backends</A></H1>
 
@@ -1186,27 +1425,175 @@ filters to send data using any type of connection transparently.
 
 <H2>Overview</H2>
 
+<P>Backends are special filters that communicate with printers directly.
+They are treated slightly differently than filters, however, and have some
+unique requirements.
+
 <H3>Security Considerations</H3>
 
-<H3>Users and Groups</H3>
+<P>Backends are run as the root user, so special care must be taken to
+avoid potential security violations. In particular, remember that a backend
+will be able to manipulate disk files, devices, and other resources that
+potentially could damage a system or printer.
 
-<H3>Temporary Files</H3>
+<H3>Command-Line Arguments</H3>
 
-<H3>Page Accounting</H3>
-
-<H3>Retries</H3>
-
-
-<H2>Command-Line Arguments</H2>
+<P>Besides the standard filter arguments, backends are also run with no
+arguments to get a list of available devices. This discovery process is
+described later in this chapter.
 
 <H3>Copy Generation</H3>
 
+<P>Like filters, backends should send multiple copies of the print file only
+if a filename is supplied on the command-line.  Otherwise the backend should
+assume that the upstream filter has already added the necessary commands or
+data to produce the multiple copies.
 
-<H2>Environment Variables</H2>
+<H3>Page Accounting</H3>
 
+<P>Backend filters generally do not do page accounting, however they should
+at a minimum produce a single page message for each copy that is produced
+when a filename is present on the command-line. This is because the user
+selected "raw" printing and no other accounting information is possible.
 
-<H2>Writing a Serial Port Backend</H2>
+<H3>Exclusive Access</H3>
 
+<P>Backends that talk to local character or block devices should open the
+device file in exclusive mode (<CODE>O_EXCL</CODE>) to cooperate with other
+printers defined for the same device.
+
+<H3>Retries</H3>
+
+<P>All backends <B>must</B> retry connections to the device. This
+includes backends that talk to local character or block devices, as the
+user may define more than one printer queue pointing at the same
+physical device.
+
+<P>To prevent excess CPU utilitization, the backend should go to sleep
+for an amount of time between retries; the CUPS-supplied backends retry
+once every 30 seconds.
+
+<H2>Dissecting the Serial Port Backend</H2>
+
+<P>The serial port backend provides support for serial printers. Since
+it does everything a good backend needs to do, it provides an excellent
+example of what to do.
+
+<H3>Supporting Device Discovery</H3>
+
+<P>As previously noted, backends are special filter programs that talk
+to printer devices. Another task a backend must perform is to list the
+available devices it supports. The backend lists the available devices
+when no additioanl arguments are supplied on the command-line (i.e.
+just the command name...)
+
+<P>The serial backend lists devices by looking at serial port files in the
+<VAR>/dev</VAR> directory, by consulting a hardware inventory (IRIX), and
+in some cases by trying to open the ports to see if they actually exist.
+
+<P>Once it finds a serial port it writes a single line for each port to
+the standard error file. Each line looks like this:
+
+<UL><PRE>
+serial serial:/dev/ttyS0?baud=115200 "Unknown" "Serial Port 1"
+</PRE></UL>
+
+<P>The first word "serial" is the <I>device class</I>; this identifies the
+class of device which can be used to categorize it in user interfaces. CUPS
+currently recognizes the following classes:
+
+<UL>
+
+	<LI>"file" - a disk file.
+
+	<LI>"direct" - a parallel or fixed-rate serial data port,
+	currently used for Centronics, IEEE-1284, and USB printer
+	ports.
+
+	<LI>"serial" - a variable-rate serial port.
+
+	<LI>"network" - a network connection, typically via AppSocket,
+	HTTP, IPP, LPD, or SMB/CIFS protocols.
+
+</UL>
+
+<P>After the device class is the <I>device URI</I>, in this case
+"serial:/dev/ttyS0?baud=115200". This is the URI that should be used by
+the user to select this port. For serial ports, the "baud=115200"
+specifies the maximum baud rate supported by the port - the actual
+value will vary based on the speed the user selects for the printer.
+
+<P>The last two strings are the model and description for the port. The
+"Unknown" string means that the printer model is unknown - some devices
+are able to provide a make and model such as "HP DeskJet" that allows
+users and software to choose an appropriate printer driver more easily.
+Both the model and description must be enclosed inside double quotes.
+
+<H3>Opening the Serial Port</H3>
+
+<P>As noted previously, all backends should open device files in exclusive
+mode, and retry as needed until the port is available. The serial port does
+this using a <CODE>do-while</CODE> loop:
+
+<UL><PRE>
+do
+{
+  if ((fd = open(resource, O_WRONLY | O_NOCTTY | O_EXCL)) == -1)
+  {
+    if (errno == EBUSY)
+    {
+      fputs("INFO: Serial port busy; will retry in 30 seconds...\n", stderr);
+      sleep(30);
+    }
+    else
+    {
+      perror("ERROR: Unable to open serial port device file");
+      return (1);
+    }
+  }
+}
+while (fd &lt; 0);
+</PRE></UL>
+
+<P>If the port is busy or in use by another process, the backend will
+go to sleep for 30 seconds and try again. If another error is detected
+a message is sent to the user and the backend aborts the print job
+until the problem can be corrected.
+
+<H3>Writing Data to the Port</H3>
+
+<P>Network and character devices pose an interesting problem when writing
+data to the port - they may not be able to write all of the bytes in your
+buffer before returning. To work around this problem you must loop until
+all bytes have been written:
+
+<UL><PRE>
+while (nbytes > 0)
+{
+  if ((wbytes = write(fd, bufptr, nbytes)) &lt; 0)
+    if (errno == ENOTTY)
+      wbytes = write(fd, bufptr, nbytes);
+
+  if (wbytes &lt; 0)
+  {
+    perror("ERROR: Unable to send print file to printer");
+    break;
+  }
+
+  nbytes -= wbytes;
+  bufptr += wbytes;
+}
+</PRE></UL>
+
+<P>The check for the <CODE>ENOTTY</CODE> error is needed on some platforms
+to clear an error from a previous <CODE>ioctl()</CODE> call.
+
+<H3>Finishing Up</H3>
+
+<P>Once you have sent the print file, return 0 if the file printed
+successfully or 1 if it did not. This will allow the scheduler to stop
+the print job if there is a device error, preserving the print job for
+later printing once the problem has been corrected.
 
 <H1 ALIGN="RIGHT"><A NAME="LICENSE">A - Software License Agreement</A></H1>
 
@@ -1840,14 +2227,465 @@ state.
 
 <H2>PPD Constants</H2>
 
+<H3>PPD Format Version</H3>
+
+<P>The <CODE>PPD_VERSION</CODE> constant defines a floating point number
+representing the newest format version that is supported by CUPS, currently
+4.3.
+
+<H3>PPD User-Interface Types</H3>
+
+<P>Each printer option has a type associated with it:
+
+<UL>
+
+	<LI><CODE>PPD_UI_BOOLEAN</CODE> - The user can turn this option on or off
+
+	<LI><CODE>PPD_UI_PICKONE</CODE> - The user can choose one option value
+	to use.
+
+	<LI><CODE>PPD_UI_PICKMANY</CODE> - The user can choose zero or more
+	option values.
+
+</UL>
+
+<H3>PPD Sections</H3>
+
+<P>Some options must be output before others, or in different sections of
+the output document. The <CODE>ppd_section_t</CODE> enumeration defines
+which section the option must be output in:
+
+<UL>
+
+	<LI><CODE>PPD_ORDER_ANY</CODE> - The option can be output in any of
+	the document, page, or prolog sections of the document
+
+	<LI><CODE>PPD_ORDER_DOCUMENT</CODE> - The option must be output in
+	the DocumentSetup section of the document
+
+	<LI><CODE>PPD_ORDER_EXIT</CODE> - The option must be output before
+	the document
+
+	<LI><CODE>PPD_ORDER_JCL</CODE> - The option must be output in the
+	job control section of the document
+
+	<LI><CODE>PPD_ORDER_PAGE</CODE> - The option must be output in the
+	PageSetup section of the document
+
+	<LI><CODE>PPD_ORDER_PROLOG</CODE> - The option must be output in the
+	Prolog section of the document
+
+</UL>
+
+<H3>PPD Colorspaces</H3>
+
+<P>Each printer has a default colorspace:
+
+<UL>
+
+	<LI><CODE>PPD_CS_CMYK</CODE> - The printer uses CMYK colors by default
+
+	<LI><CODE>PPD_CS_CMY</CODE> - The printer uses CMY colors by default
+
+	<LI><CODE>PPD_CS_GRAY</CODE> - The printer uses grayscale by default
+
+	<LI><CODE>PPD_CS_RGB</CODE> - The printer uses RGB colors by default
+
+	<LI><CODE>PPD_CS_RGBK</CODE> - The printer uses RGBK colors by default
+
+	<LI><CODE>PPD_CS_N</CODE> - The printer uses a DeviceN colorspace
+	by default
+
+</UL>
+
 <H2>Raster Constants</H2>
 
+<H3>Raster Sync Words</H3>
+
+<P>The <CODE>CUPS_RASTER_SYNC</CODE> and <CODE>CUPS_RASTER_REVSYNC</CODE>
+constants define the standard sync words at the beginning of each CUPS
+raster file.
+
+<H3>Raster Stream Modes</H3>
+
+<P>The <CODE>CUPS_RASTER_READ</CODE> and <CODE>CUPS_RASTER_WRITE</CODE>
+constants are used with the
+<A HREF="#cupsRasterOpen"><CODE>cupsRasterOpen()</CODE></A> function to
+specify a stream for reading or writing.
+
+<H3>Raster Boolean Constants</H3>
+
+<P>The <CODE>CUPS_FALSE</CODE> and <CODE>CUPS_TRUE</CODE> constants
+represent boolean values in the page header.
+
+<H3>Raster Jog Values</H3>
+
+<P>The <CODE>cups_jog_t</CODE> enumeration defines constants for the
+Jog page device dictionary variable:
+
+<UL>
+
+	<LI><CODE>CUPS_JOG_NONE</CODE> - Do no jogging
+
+	<LI><CODE>CUPS_JOG_FILE</CODE> - Jog pages after each file
+
+	<LI><CODE>CUPS_JOG_JOB</CODE> - Jog pages after each job
+
+	<LI><CODE>CUPS_JOG_SET</CODE> - Jog pages after each set of jobs
+
+</UL>
+
+<H3>Raster Orientation Values</H3>
+
+<P>The <CODE>cups_orient_t</CODE> enumeration defines constants for the
+Orientation page device dictionary variable:
+
+<UL>
+
+	<LI><CODE>CUPS_ORIENT_0</CODE> - Portrait orientation
+
+	<LI><CODE>CUPS_ORIENT_90</CODE> - Landscape orientation
+
+	<LI><CODE>CUPS_ORIENT_180</CODE> - Reverse-portrait orientation
+
+	<LI><CODE>CUPS_ORIENT_270</CODE> - Reverse-landscape orientation
+
+</UL>
+
+<H3>Raster CutMedia Values</H3>
+
+<P>The <CODE>cups_cut_t</CODE> enumeration defines constants for the
+CutMedia page device dictionary variable:
+
+<UL>
+
+	<LI><CODE>CUPS_CUT_NONE</CODE> - Do no jogging
+
+	<LI><CODE>CUPS_CUT_FILE</CODE> - Cut pages after each file
+
+	<LI><CODE>CUPS_CUT_JOB</CODE> - Cut pages after each job
+
+	<LI><CODE>CUPS_CUT_SET</CODE> - Cut pages after each set of jobs
+
+	<LI><CODE>CUPS_CUT_PAGE</CODE> - Cut each page
+
+</UL>
+
+<H3>Raster AdvanceMedia Values</H3>
+
+<P>The <CODE>cups_advance_t</CODE> enumeration defines constants for the
+AdvanceMedia page device dictionary variable:
+
+<UL>
+
+	<LI><CODE>CUPS_ADVANCE_NONE</CODE> - Do no jogging
+
+	<LI><CODE>CUPS_ADVANCE_FILE</CODE> - Advance media after each file
+
+	<LI><CODE>CUPS_ADVANCE_JOB</CODE> - Advance media after each job
+
+	<LI><CODE>CUPS_ADVANCE_SET</CODE> - Advance media after each set of jobs
+
+	<LI><CODE>CUPS_ADVANCE_PAGE</CODE> - Advance media for each page
+
+</UL>
+
+<H3>Raster LeadingEdge Values</H3>
+
+<P>The <CODE>cups_edge_t</CODE> enumeration defines constants for the
+LeadingEdge page device dictionary variable:
+
+<UL>
+
+	<LI><CODE>CUPS_EDGE_TOP</CODE> - The top of the media is the leading
+	edge
+
+	<LI><CODE>CUPS_EDGE_RIGHT</CODE> - The right of the media is the leading
+	edge
+
+	<LI><CODE>CUPS_EDGE_BOTTOM</CODE> - The bottom of the media is the
+	leading edge
+
+	<LI><CODE>CUPS_EDGE_LEFT</CODE> - The left of the media is the leading
+	edge
+
+</UL>
+
+<H3>Raster Color Order Values</H3>
+
+<P>The <CODE>cups_order_t</CODE> enumeration defines the possible color
+value orderings:
+
+<UL>
+
+	<LI><CODE>CUPS_ORDER_CHUNKED</CODE> - CMYK&nbsp;CMYK&nbsp;CMYK
+
+	<LI><CODE>CUPS_ORDER_BANDED</CODE> - CCC&nbsp;MMM&nbsp;YYY&nbsp;KKK
+
+	<LI><CODE>CUPS_ORDER_PLANAR</CODE> - CCC&nbsp;...&nbsp;MMM&nbsp;...&nbsp;YYY&nbsp;...&nbsp;KKK&nbsp;...
+
+</UL>
+
+<H3>Raster Colorspace Values</H3>
+
+<P>The <CODE>cups_cspace_t</CODE> enumeration defines the possible colorspaces:
+
+<UL>
+
+	<LI><CODE>CUPS_CSPACE_W</CODE> - White (luminance)
+
+	<LI><CODE>CUPS_CSPACE_RGB</CODE> - Red, green, blue
+
+	<LI><CODE>CUPS_CSPACE_RGBA</CODE> - Red, green, blue, alpha
+
+	<LI><CODE>CUPS_CSPACE_K</CODE> - Black
+
+	<LI><CODE>CUPS_CSPACE_CMY</CODE> - Cyan, magenta, yellow
+
+	<LI><CODE>CUPS_CSPACE_YMC</CODE> - Yellow, magenta, cyan
+
+	<LI><CODE>CUPS_CSPACE_CMYK</CODE> - Cyan, magenta, yellow, black
+
+	<LI><CODE>CUPS_CSPACE_YMCK</CODE> - Yellow, magenta, cyan, black
+
+	<LI><CODE>CUPS_CSPACE_KCMY</CODE> - Black, cyan, magenta, yellow
+
+	<LI><CODE>CUPS_CSPACE_KCMYcm</CODE> - Black, cyan, magenta, yellow,
+	light cyan, light magenta
+
+	<LI><CODE>CUPS_CSPACE_GMCK</CODE> - Metallic yellow (gold), metallic magenta,
+	metallic cyan, black
+
+	<LI><CODE>CUPS_CSPACE_GMCS</CODE> - Metallic yellow (gold), metallic magenta,
+	metallic cyan, metallic grey (silver)
+
+	<LI><CODE>CUPS_CSPACE_WHITE</CODE> - White pigment (black as white pigment)
+
+	<LI><CODE>CUPS_CSPACE_GOLD</CODE> - Gold foil (black as gold foil)
+
+	<LI><CODE>CUPS_CSPACE_SILVER</CODE> - Silver foil (black as silver foil)
+
+</UL>
 
 <H1 ALIGN="RIGHT"><A NAME="STRUCTURES">C - Structures</A></H1>
 
 <P>This appendix describes all of the structures that are defined by the CUPS
 API.
 
+<H2>Raster Structures</H2>
+
+<H3>Raster Page Header</H3>
+
+<P>The raster page header consists of the PostScript page device dictionary
+for the page:
+
+<CENTER><TABLE WIDTH="90%" BORDER="1">
+<TR>
+	<TH>Member</TH>
+	<TH>Type</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD>MediaClass</TD>
+	<TD>char[64]</TD>
+	<TD>The media class name</TD>
+</TR>
+<TR>
+	<TD>MediaColor</TD>
+	<TD>char[64]</TD>
+	<TD>The media color name</TD>
+</TR>
+<TR>
+	<TD>MediaType</TD>
+	<TD>char[64]</TD>
+	<TD>The media type name</TD>
+</TR>
+<TR>
+	<TD>OutputType</TD>
+	<TD>char[64]</TD>
+	<TD>The output type name</TD>
+</TR>
+<TR>
+	<TD>AdvanceDistance</TD>
+	<TD>unsigned</TD>
+	<TD>The distance to advance the media in points</TD>
+</TR>
+<TR>
+	<TD>AdvanceMedia</TD>
+	<TD>cups_adv_t</TD>
+	<TD>When to advance the media</TD>
+</TR>
+<TR>
+	<TD>Collate</TD>
+	<TD>cups_bool_t</TD>
+	<TD>Whether or not to produce collated copies</TD>
+</TR>
+<TR>
+	<TD>CutMedia</TD>
+	<TD>cups_cut_t</TD>
+	<TD>When to cut the media</TD>
+</TR>
+<TR>
+	<TD>Duplex</TD>
+	<TD>cups_bool_t</TD>
+	<TD>Whether or not to print on both sides of the paper</TD>
+</TR>
+<TR>
+	<TD>HWResolution</TD>
+	<TD>unsigned[2]</TD>
+	<TD>The resolution of the page image in pixels per inch; the
+	HWResolution[0] represents the horizontal resolution and
+	HWResolution[1] represents the vertical resolution</TD>
+</TR>
+<TR>
+	<TD>ImagingBoundingBox</TD>
+	<TD>unsigned[4]</TD>
+	<TD>The bounding box for the page in points; the elements
+	represent the left, bottom, right, and top coordinates of the
+	imaged area (if 0 then the whole page is imaged)</TD>
+</TR>
+<TR>
+	<TD>InsertSheet</TD>
+	<TD>cups_bool_t</TD>
+	<TD>Whether or not to insert a sheet before this page</TD>
+</TR>
+<TR>
+	<TD>Jog</TD>
+	<TD>cups_jog_t</TD>
+	<TD>When to jog copies of the page</TD>
+</TR>
+<TR>
+	<TD>LeadingEdge</TD>
+	<TD>cups_edge_t</TD>
+	<TD>The leading edge of the page</TD>
+</TR>
+<TR>
+	<TD>Margins</TD>
+	<TD>unsigned[2]</TD>
+	<TD>The lower-lefthand margin of the page in points</TD>
+</TR>
+<TR>
+	<TD>ManualFeed</TD>
+	<TD>cups_bool_t</TD>
+	<TD>Whether or not to manually feed the page</TD>
+</TR>
+<TR>
+	<TD>MediaPosition</TD>
+	<TD>unsigned</TD>
+	<TD>The input slot number to use</TD>
+</TR>
+<TR>
+	<TD>MediaWeight</TD>
+	<TD>unsigned</TD>
+	<TD>The weight of the output media in grams/m<SUP>2</SUP></TD>
+</TR>
+<TR>
+	<TD>MirrorPrint</TD>
+	<TD>cups_bool_t</TD>
+	<TD>Whether or not to mirror the print</TD>
+</TR>
+<TR>
+	<TD>NegativePrint</TD>
+	<TD>cups_bool_t</TD>
+	<TD>Whether or not to invert the print</TD>
+</TR>
+<TR>
+	<TD>NumCopies</TD>
+	<TD>unsigned</TD>
+	<TD>The number of copies to produce</TD>
+</TR>
+<TR>
+	<TD>Orientation</TD>
+	<TD>cups_orient_t</TD>
+	<TD>The orientation of the page image</TD>
+</TR>
+<TR>
+	<TD>OutputFaceUp</TD>
+	<TD>cups_bool_t</TD>
+	<TD>Whether or not to output the page face up</TD>
+</TR>
+<TR>
+	<TD>PageSize</TD>
+	<TD>unsigned[2]</TD>
+	<TD>The width and height of the page in points</TD>
+</TR>
+<TR>
+	<TD>Separations</TD>
+	<TD>cups_bool_t</TD>
+	<TD>Whether or not to output separations</TD>
+</TR>
+<TR>
+	<TD>TraySwitch</TD>
+	<TD>cups_bool_t</TD>
+	<TD>Whether or not to automatically switch trays for the requested
+	media size/type</TD>
+</TR>
+<TR>
+	<TD>Tumble</TD>
+	<TD>cups_bool_t</TD>
+	<TD>Whether or not to rotate the back side of the page</TD>
+</TR>
+<TR>
+	<TD>cupsWidth</TD>
+	<TD>unsigned</TD>
+	<TD>The width of the page image in pixels</TD>
+</TR>
+<TR>
+	<TD>cupsHeight</TD>
+	<TD>unsigned</TD>
+	<TD>The height of the page image in pixels</TD>
+</TR>
+<TR>
+	<TD>cupsMediaType</TD>
+	<TD>unsigned</TD>
+	<TD>The device-specific media type code</TD>
+</TR>
+<TR>
+	<TD>cupsBitsPerColor</TD>
+	<TD>unsigned</TD>
+	<TD>The number of bits per color</TD>
+</TR>
+<TR>
+	<TD>cupsBitsPerPixel</TD>
+	<TD>unsigned</TD>
+	<TD>The number of bits per pixel</TD>
+</TR>
+<TR>
+	<TD>cupsBytesPerLine</TD>
+	<TD>unsigned</TD>
+	<TD>The number of bytes per line of image data</TD>
+</TR>
+<TR>
+	<TD>cupsColorOrder</TD>
+	<TD>cups_order_t</TD>
+	<TD>The order of color values</TD>
+</TR>
+<TR>
+	<TD>cupsColorSpace</TD>
+	<TD>cups_cspace_t</TD>
+	<TD>The type of color values</TD>
+</TR>
+<TR>
+	<TD>cupsCompression</TD>
+	<TD>unsigned</TD>
+	<TD>The device-specific compression code</TD>
+</TR>
+<TR>
+	<TD>cupsRowCount</TD>
+	<TD>unsigned</TD>
+	<TD>The device-specific row count</TD>
+</TR>
+<TR>
+	<TD>cupsRowFeed</TD>
+	<TD>unsigned</TD>
+	<TD>The device-specific row feed</TD>
+</TR>
+<TR>
+	<TD>cupsRowStep</TD>
+	<TD>unsigned</TD>
+	<TD>The device-specific row step</TD>
+</TR>
+</TABLE></CENTER>
 
 <H1 ALIGN="RIGHT"><A HREF="FUNCTIONS">D - Functions</A></H1>
 
@@ -3571,7 +4409,7 @@ every call to <CODE>cupsServer()</CODE>
 	<LI>The <CODE>CUPS_SERVER</CODE> environment variable,
 
 	<LI>The <CODE>ServerName</CODE> directive in the
-	<VAR>cupsd.conf</VAR> file,
+	<VAR>client.conf</VAR> file,
 
 	<LI>The default host, "localhost".
 
@@ -3680,6 +4518,7 @@ user = cupsUser();
 <H3>Usage</H3>
 
 <PRE>
+void httpBlocking(http_t *http, int blocking)
 </PRE>
 
 <H3>Arguments</H3>
@@ -3690,28 +4529,44 @@ user = cupsUser();
 	<TH>Description</TH>
 </TR>
 <TR>
-	<TD></TD>
-	<TD></TD>
+	<TD>http</TD>
+	<TD>The HTTP connection</TD>
+</TR>
+<TR>
+	<TD>blocking</TD>
+	<TD>0 if the connection should be non-blocking, 1 if it should
+	be blocking</TD>
 </TR>
 </TABLE></CENTER>
 
-<H3>Returns</H3>
-
 <H3>Description</H3>
+
+<P>The <CODE>httpBlocking()</CODE> function sets the blocking mode for the
+HTTP connection. By default HTTP connections will block (stop) the client
+program until data is available or can be sent to the server.
 
 <H3>Example</H3>
 
 <PRE>
+#include &lt;cups/http.h&gt;
+
+http_t *http;
+
+http = httpConnect("server", port);
+httpBlocking(http, 0);
 </PRE>
 
 <H3>See Also</H3>
 
+<A HREF="#httpCheck"><CODE>httpCheck()</CODE></A>,
+<A HREF="#httpConnect"><CODE>httpConnect()</CODE></A>
 
 <!-- NEW PAGE --><H2><A NAME="httpCheck">httpCheck()</A></H2>
 
 <H3>Usage</H3>
 
 <PRE>
+int httpCheck(http_t *http);
 </PRE>
 
 <H3>Arguments</H3>
@@ -3722,21 +4577,39 @@ user = cupsUser();
 	<TH>Description</TH>
 </TR>
 <TR>
-	<TD></TD>
-	<TD></TD>
+	<TD>http</TD>
+	<TD>The HTTP connection</TD>
 </TR>
 </TABLE></CENTER>
 
 <H3>Returns</H3>
 
+<P>0 if there is no data pending, 1 otherwise.
+
 <H3>Description</H3>
+
+<P>The <CODE>httpCheck()</CODE> function checks to see if there is any data
+pending on an HTTP connection.
 
 <H3>Example</H3>
 
 <PRE>
+#include &lt;cups/http.h&gt;
+
+http_t *http;
+
+if (httpCheck(http))
+{
+  ... do something ...
+}
 </PRE>
 
 <H3>See Also</H3>
+
+<A HREF="#httpBlocking"><CODE>httpBlocking()</CODE></A>,
+<A HREF="#httpConnect"><CODE>httpConnect()</CODE></A>,
+<A HREF="#httpGets"><CODE>httpGets()</CODE></A>,
+<A HREF="#httpRead"><CODE>httpRead()</CODE></A>
 
 
 <!-- NEW PAGE --><H2><A NAME="httpClearFields">httpClearFields()</A></H2>
@@ -3744,6 +4617,7 @@ user = cupsUser();
 <H3>Usage</H3>
 
 <PRE>
+void httpClearFields(http_t *http)
 </PRE>
 
 <H3>Arguments</H3>
@@ -3754,28 +4628,38 @@ user = cupsUser();
 	<TH>Description</TH>
 </TR>
 <TR>
-	<TD></TD>
-	<TD></TD>
+	<TD>http</TD>
+	<TD>The HTTP connection</TD>
 </TR>
 </TABLE></CENTER>
 
-<H3>Returns</H3>
-
 <H3>Description</H3>
+
+<P>The <CODE>httpClearFields()</CODE> function clears all HTTP request fields
+for the HTTP connection.
 
 <H3>Example</H3>
 
 <PRE>
+#include &lt;cups/http.h&gt;
+
+http_t *http;
+
+httpClearFields(http);
 </PRE>
 
 <H3>See Also</H3>
 
+<A HREF="#httpConnect"><CODE>httpConnect()</CODE></A>,
+<A HREF="#httpGetField"><CODE>httpGetField()</CODE></A>,
+<A HREF="#httpSetField"><CODE>httpSetField()</CODE></A>
 
 <!-- NEW PAGE --><H2><A NAME="httpClose">httpClose()</A></H2>
 
 <H3>Usage</H3>
 
 <PRE>
+void httpClose(http_t *http);
 </PRE>
 
 <H3>Arguments</H3>
@@ -3786,28 +4670,35 @@ user = cupsUser();
 	<TH>Description</TH>
 </TR>
 <TR>
-	<TD></TD>
-	<TD></TD>
+	<TD>http</TD>
+	<TD>The HTTP connection</TD>
 </TR>
 </TABLE></CENTER>
 
-<H3>Returns</H3>
-
 <H3>Description</H3>
+
+<P>The <CODE>httpClose()</CODE> function closes an active HTTP connection.
 
 <H3>Example</H3>
 
 <PRE>
+#include &lt;cups/http.h&gt;
+
+http_t *http;
+
+httpClose(http);
 </PRE>
 
 <H3>See Also</H3>
 
+<A HREF="#httpConnect"><CODE>httpConnect()</CODE></A>
 
 <!-- NEW PAGE --><H2><A NAME="httpConnect">httpConnect()</A></H2>
 
 <H3>Usage</H3>
 
 <PRE>
+http_t *httpConnect(const char *hostname, int port);
 </PRE>
 
 <H3>Arguments</H3>
@@ -3818,21 +4709,43 @@ user = cupsUser();
 	<TH>Description</TH>
 </TR>
 <TR>
-	<TD></TD>
-	<TD></TD>
+	<TD>hostname</TD>
+	<TD>The name or IP address of the server to connect to</TD>
+</TR>
+<TR>
+	<TD>port</TD>
+	<TD>The port number to use</TD>
 </TR>
 </TABLE></CENTER>
 
 <H3>Returns</H3>
 
+<P>A pointer to a HTTP connection structure or NULL if the connection could
+not be made.
+
 <H3>Description</H3>
+
+<P>The <CODE>httpConnect()</CODE> function opens a HTTP connection to the
+specified server and port.
 
 <H3>Example</H3>
 
 <PRE>
+#include &lt;cups/http.h&gt;
+
+http_t *http;
+
+http = httpConnect(cupsServer(), ippPort());
 </PRE>
 
 <H3>See Also</H3>
+
+<A HREF="#httpClose"><CODE>httpClose()</CODE></A>,
+<A HREF="#httpGet"><CODE>httpGet()</CODE></A>,
+<A HREF="#httpGets"><CODE>httpGets()</CODE></A>,
+<A HREF="#httpPost"><CODE>httpPost()</CODE></A>,
+<A HREF="#httpRead"><CODE>httpRead()</CODE></A>,
+<A HREF="#httpWrite"><CODE>httpWrite()</CODE></A>
 
 
 <!-- NEW PAGE --><H2><A NAME="httpDecode64">httpDecode64()</A></H2>
@@ -3840,6 +4753,7 @@ user = cupsUser();
 <H3>Usage</H3>
 
 <PRE>
+char *httpDecode64(char *out, const char *in);
 </PRE>
 
 <H3>Arguments</H3>
@@ -3850,28 +4764,45 @@ user = cupsUser();
 	<TH>Description</TH>
 </TR>
 <TR>
-	<TD></TD>
-	<TD></TD>
+	<TD>out</TD>
+	<TD>The output string</TD>
+</TR>
+<TR>
+	<TD>in</TD>
+	<TD>The input string</TD>
 </TR>
 </TABLE></CENTER>
 
 <H3>Returns</H3>
 
+<P>A pointer to the decoded string.
+
 <H3>Description</H3>
+
+<P>The <CODE>httpDecode64()</CODE> function decodes a base-64 encoded string
+to the original string.
 
 <H3>Example</H3>
 
 <PRE>
+#include &lt;cups/http.h&gt;
+
+char encoded_string[255];
+char original_string[255];
+
+httpDecode64(original_string, encoded_string);
 </PRE>
 
 <H3>See Also</H3>
 
+<A HREF="#httpEncode64"><CODE>httpEncode64()</CODE></A>
 
 <!-- NEW PAGE --><H2><A NAME="httpDelete">httpDelete()</A></H2>
 
 <H3>Usage</H3>
 
 <PRE>
+int httpDelete(http_t *http, const char *uri);
 </PRE>
 
 <H3>Arguments</H3>
@@ -3882,28 +4813,46 @@ user = cupsUser();
 	<TH>Description</TH>
 </TR>
 <TR>
-	<TD></TD>
-	<TD></TD>
+	<TD>http</TD>
+	<TD>The HTTP connection</TD>
+</TR>
+<TR>
+	<TD>uri</TD>
+	<TD>The URI to delete</TD>
 </TR>
 </TABLE></CENTER>
 
 <H3>Returns</H3>
 
+<P>0 on success, non-zero on failure.
+
 <H3>Description</H3>
+
+<P>The <CODE>httpDelete()</CODE> function sends a HTTP DELETE request to
+the server.
 
 <H3>Example</H3>
 
 <PRE>
+#include &lt;cups/http.h&gt;
+
+http_t *http;
+
+httpDelete(http, "/some/uri");
 </PRE>
 
 <H3>See Also</H3>
 
+<A HREF="#httpConnect"><CODE>httpConnect()</CODE></A>,
+<A HREF="#httpSetField"><CODE>httpSetField()</CODE></A>,
+<A HREF="#httpUpdate"><CODE>httpUpdate()</CODE></A>
 
 <!-- NEW PAGE --><H2><A NAME="httpEncode64">httpEncode64()</A></H2>
 
 <H3>Usage</H3>
 
 <PRE>
+char *httpEncode64(char *out, const char *in);
 </PRE>
 
 <H3>Arguments</H3>
@@ -3914,28 +4863,45 @@ user = cupsUser();
 	<TH>Description</TH>
 </TR>
 <TR>
-	<TD></TD>
-	<TD></TD>
+	<TD>out</TD>
+	<TD>The output string</TD>
+</TR>
+<TR>
+	<TD>in</TD>
+	<TD>The input string</TD>
 </TR>
 </TABLE></CENTER>
 
 <H3>Returns</H3>
 
+<P>A pointer to the encoded string.
+
 <H3>Description</H3>
+
+<P>The <CODE>httpEncode64()</CODE> function decodes a base-64 encoded string
+to the original string.
 
 <H3>Example</H3>
 
 <PRE>
+#include &lt;cups/http.h&gt;
+
+char encoded_string[255];
+char original_string[255];
+
+httpEncode64(encoded_string, original_string);
 </PRE>
 
 <H3>See Also</H3>
 
+<A HREF="#httpDecode64"><CODE>httpDecode64()</CODE></A>
 
 <!-- NEW PAGE --><H2><A NAME="httpError">httpError()</A></H2>
 
 <H3>Usage</H3>
 
 <PRE>
+int httpError(http_t *http);
 </PRE>
 
 <H3>Arguments</H3>
@@ -3946,28 +4912,43 @@ user = cupsUser();
 	<TH>Description</TH>
 </TR>
 <TR>
-	<TD></TD>
-	<TD></TD>
+	<TD>http</TD>
+	<TD>The HTTP connection</TD>
 </TR>
 </TABLE></CENTER>
 
 <H3>Returns</H3>
 
+<P>The last error that occurred or 0 if no error has occurred.
+
 <H3>Description</H3>
+
+<P>The <CODE>httpError()</CODE> function returns the last error that occurred
+on the HTTP connection.
 
 <H3>Example</H3>
 
 <PRE>
+#include &lt;cups/http.h&gt;
+
+http_t *http;
+
+if (httpError(http))
+{
+  ... show an error message ...
+}
 </PRE>
 
 <H3>See Also</H3>
 
+<A HREF="#httpConnect"><CODE>httpConnect()</CODE></A>
 
 <!-- NEW PAGE --><H2><A NAME="httpFlush">httpFlush()</A></H2>
 
 <H3>Usage</H3>
 
 <PRE>
+void httpFlush(http_t *http);
 </PRE>
 
 <H3>Arguments</H3>
@@ -3978,28 +4959,36 @@ user = cupsUser();
 	<TH>Description</TH>
 </TR>
 <TR>
-	<TD></TD>
-	<TD></TD>
+	<TD>http</TD>
+	<TD>The HTTP connection</TD>
 </TR>
 </TABLE></CENTER>
 
-<H3>Returns</H3>
-
 <H3>Description</H3>
+
+<P>The <CODE>httpFlush()</CODE> function flushes any remaining data left from
+a GET or POST operation.
 
 <H3>Example</H3>
 
 <PRE>
+#include &lt;cups/http.h&gt;
+
+http_t *http;
+
+httpFlush(http);
 </PRE>
 
 <H3>See Also</H3>
 
+<A HREF="#httpConnect"><CODE>httpConnect()</CODE></A>,
 
 <!-- NEW PAGE --><H2><A NAME="httpGet">httpGet()</A></H2>
 
 <H3>Usage</H3>
 
 <PRE>
+int httpGet(http_t *http, const char *uri);
 </PRE>
 
 <H3>Arguments</H3>
@@ -4010,21 +4999,39 @@ user = cupsUser();
 	<TH>Description</TH>
 </TR>
 <TR>
-	<TD></TD>
-	<TD></TD>
+	<TD>http</TD>
+	<TD>The HTTP connection</TD>
+</TR>
+<TR>
+	<TD>uri</TD>
+	<TD>The URI to get</TD>
 </TR>
 </TABLE></CENTER>
 
 <H3>Returns</H3>
 
+<P>0 on success, non-zero on failure.
+
 <H3>Description</H3>
+
+<P>The <CODE>httpGet()</CODE> function sends a HTTP GET request to the
+server.
 
 <H3>Example</H3>
 
 <PRE>
+#include &lt;cups/http.h&gt;
+
+http_t *http;
+
+httpGet(http, "/some/uri");
 </PRE>
 
 <H3>See Also</H3>
+
+<A HREF="#httpConnect"><CODE>httpConnect()</CODE></A>,
+<A HREF="#httpSetField"><CODE>httpSetField()</CODE></A>,
+<A HREF="#httpUpdate"><CODE>httpUpdate()</CODE></A>
 
 
 <!-- NEW PAGE --><H2><A NAME="httpGets">httpGets()</A></H2>
@@ -4032,6 +5039,7 @@ user = cupsUser();
 <H3>Usage</H3>
 
 <PRE>
+char *httpGets(char *line, int length, http_t *http)
 </PRE>
 
 <H3>Arguments</H3>
@@ -4042,28 +5050,53 @@ user = cupsUser();
 	<TH>Description</TH>
 </TR>
 <TR>
-	<TD></TD>
-	<TD></TD>
+	<TD>line</TD>
+	<TD>The string to fill with a line from the HTTP connection</TD>
+</TR>
+<TR>
+	<TD>length</TD>
+	<TD>The maximum length of the string</TD>
+</TR>
+<TR>
+	<TD>http</TD>
+	<TD>The HTTP connection</TD>
 </TR>
 </TABLE></CENTER>
 
 <H3>Returns</H3>
 
+<P>A pointer to the string or NULL if no line could be retrieved.
+
 <H3>Description</H3>
+
+<P>The <CODE>httpGets()</CODE> function is used to read a request line from
+the HTTP connection. It is not normally used by a client program.
 
 <H3>Example</H3>
 
 <PRE>
+#include &lt;cups/http.h&gt;
+
+http_t *http;
+char line[1024];
+
+if (httpGets(line, sizeof(line), http))
+{
+  ... process the line ...
+}
 </PRE>
 
 <H3>See Also</H3>
 
+<A HREF="#httpConnect"><CODE>httpConnect()</CODE></A>,
+<A HREF="#httpUpdate"><CODE>httpUpdate()</CODE></A>
 
 <!-- NEW PAGE --><H2><A NAME="httpGetDateString">httpGetDateString()</A></H2>
 
 <H3>Usage</H3>
 
 <PRE>
+const char *httpGetDateString(time_t time)
 </PRE>
 
 <H3>Arguments</H3>
@@ -4074,21 +5107,32 @@ user = cupsUser();
 	<TH>Description</TH>
 </TR>
 <TR>
-	<TD></TD>
-	<TD></TD>
+	<TD>time</TD>
+	<TD>The UNIX date/time value</TD>
 </TR>
 </TABLE></CENTER>
 
 <H3>Returns</H3>
 
+<P>A pointer to a static string containing the HTTP date/time string for
+the specified UNIX time value.
+
 <H3>Description</H3>
+
+<P>The <CODE>httpGetDateString()</CODE> function generates a date/time string
+suitable for HTTP requests from a UNIX time value.
 
 <H3>Example</H3>
 
 <PRE>
+#include &lt;cups/http.h&gt;
+
+puts(httpGetDateString(time(NULL)));
 </PRE>
 
 <H3>See Also</H3>
+
+<A HREF="#httpGetDateTime"><CODE>httpGetDateTime()</CODE></A>
 
 
 <!-- NEW PAGE --><H2><A NAME="httpGetDateTime">httpGetDateTime()</A></H2>
@@ -4096,6 +5140,7 @@ user = cupsUser();
 <H3>Usage</H3>
 
 <PRE>
+time_t httpGetDateTime(const char *date)
 </PRE>
 
 <H3>Arguments</H3>
@@ -4106,21 +5151,31 @@ user = cupsUser();
 	<TH>Description</TH>
 </TR>
 <TR>
-	<TD></TD>
-	<TD></TD>
+	<TD>date</TD>
+	<TD>The HTTP date/time string</TD>
 </TR>
 </TABLE></CENTER>
 
 <H3>Returns</H3>
 
+<P>A UNIX time value.
+
 <H3>Description</H3>
+
+<P>The <CODE>httpGetDateTime()</CODE> function converts a HTTP
+date/time string to a UNIX time value.
 
 <H3>Example</H3>
 
 <PRE>
+#include &lt;cups/http.h&gt;
+
+printf("%d\n", httpGetDateTime("Fri, 30 June 2000 12:34:56 GMT"));
 </PRE>
 
 <H3>See Also</H3>
+
+<A HREF="#httpGetDateString"><CODE>httpGetDateString()</CODE></A>
 
 
 <!-- NEW PAGE --><H2><A NAME="httpGetField">httpGetField()</A></H2>
@@ -4128,6 +5183,7 @@ user = cupsUser();
 <H3>Usage</H3>
 
 <PRE>
+const char *httpGetField(http_t *http, http_field_t field);
 </PRE>
 
 <H3>Arguments</H3>
@@ -4138,53 +5194,41 @@ user = cupsUser();
 	<TH>Description</TH>
 </TR>
 <TR>
-	<TD></TD>
-	<TD></TD>
+	<TD>http</TD>
+	<TD>The HTTP connection</TD>
+</TR>
+<TR>
+	<TD>field</TD>
+	<TD>The HTTP field</TD>
 </TR>
 </TABLE></CENTER>
 
 <H3>Returns</H3>
 
+<P>A pointer to the field value string.
+
 <H3>Description</H3>
+
+<P>The <CODE>httpGetField()</CODE> function returns the current value for
+the specified HTTP field.
 
 <H3>Example</H3>
 
 <PRE>
+#include &lt;cups/http.h&gt;
+
+http_t *http;
+
+httpGet(http, "/some/uri");
+while (httpUpdate(http) == HTTP_CONTINUE);
+
+puts(httpGetField(http, HTTP_FIELD_CONTENT_TYPE));
 </PRE>
 
 <H3>See Also</H3>
 
-
-<!-- NEW PAGE --><H2><A NAME="httpGetLength">httpGetLength()</A></H2>
-
-<H3>Usage</H3>
-
-<PRE>
-</PRE>
-
-<H3>Arguments</H3>
-
-<CENTER><TABLE WIDTH="80%" BORDER>
-<TR>
-	<TH>Argument</TH>
-	<TH>Description</TH>
-</TR>
-<TR>
-	<TD></TD>
-	<TD></TD>
-</TR>
-</TABLE></CENTER>
-
-<H3>Returns</H3>
-
-<H3>Description</H3>
-
-<H3>Example</H3>
-
-<PRE>
-</PRE>
-
-<H3>See Also</H3>
+<A HREF="#httpConnect"><CODE>httpConnect()</CODE></A>,
+<A HREF="#httpSetField"><CODE>httpSetField()</CODE></A>
 
 
 <!-- NEW PAGE --><H2><A NAME="httpHead">httpHead()</A></H2>
@@ -4192,6 +5236,7 @@ user = cupsUser();
 <H3>Usage</H3>
 
 <PRE>
+int httpHead(http_t *http, const char *uri);
 </PRE>
 
 <H3>Arguments</H3>
@@ -4202,21 +5247,39 @@ user = cupsUser();
 	<TH>Description</TH>
 </TR>
 <TR>
-	<TD></TD>
-	<TD></TD>
+	<TD>http</TD>
+	<TD>The HTTP connection</TD>
+</TR>
+<TR>
+	<TD>uri</TD>
+	<TD>The URI to head</TD>
 </TR>
 </TABLE></CENTER>
 
 <H3>Returns</H3>
 
+<P>0 on success, non-zero on failure.
+
 <H3>Description</H3>
+
+<P>The <CODE>httpHead()</CODE> function sends a HTTP HEAD request to the
+server.
 
 <H3>Example</H3>
 
 <PRE>
+#include &lt;cups/http.h&gt;
+
+http_t *http;
+
+httpHead(http, "/some/uri");
 </PRE>
 
 <H3>See Also</H3>
+
+<A HREF="#httpConnect"><CODE>httpConnect()</CODE></A>,
+<A HREF="#httpSetField"><CODE>httpSetField()</CODE></A>,
+<A HREF="#httpUpdate"><CODE>httpUpdate()</CODE></A>
 
 
 <!-- NEW PAGE --><H2><A NAME="httpInitialize">httpInitialize()</A></H2>
@@ -4224,38 +5287,33 @@ user = cupsUser();
 <H3>Usage</H3>
 
 <PRE>
+void httpInitialize(void);
 </PRE>
 
-<H3>Arguments</H3>
-
-<CENTER><TABLE WIDTH="80%" BORDER>
-<TR>
-	<TH>Argument</TH>
-	<TH>Description</TH>
-</TR>
-<TR>
-	<TD></TD>
-	<TD></TD>
-</TR>
-</TABLE></CENTER>
-
-<H3>Returns</H3>
-
 <H3>Description</H3>
+
+<P>The <CODE>httpInitialize()</CODE> function initializes the networking
+code as needed by the underlying platform. It is called automatically by
+the <CODE>httpConnect()</CODE> function.
 
 <H3>Example</H3>
 
 <PRE>
+#include &lt;cups/http.h&gt;
+
+httpInitialize();
 </PRE>
 
 <H3>See Also</H3>
 
+<A HREF="#httpConnect"><CODE>httpConnect()</CODE></A>
 
 <!-- NEW PAGE --><H2><A NAME="httpOptions">httpOptions()</A></H2>
 
 <H3>Usage</H3>
 
 <PRE>
+int httpOptions(http_t *http, const char *uri);
 </PRE>
 
 <H3>Arguments</H3>
@@ -4266,21 +5324,39 @@ user = cupsUser();
 	<TH>Description</TH>
 </TR>
 <TR>
-	<TD></TD>
-	<TD></TD>
+	<TD>http</TD>
+	<TD>The HTTP connection</TD>
+</TR>
+<TR>
+	<TD>uri</TD>
+	<TD>The URI to check for options</TD>
 </TR>
 </TABLE></CENTER>
 
 <H3>Returns</H3>
 
+<P>0 on success, non-zero on failure.
+
 <H3>Description</H3>
+
+<P>The <CODE>httpOptions()</CODE> function sends a HTTP OPTIONS request to the
+server.
 
 <H3>Example</H3>
 
 <PRE>
+#include &lt;cups/http.h&gt;
+
+http_t *http;
+
+httpOptions(http, "/some/uri");
 </PRE>
 
 <H3>See Also</H3>
+
+<A HREF="#httpConnect"><CODE>httpConnect()</CODE></A>,
+<A HREF="#httpSetField"><CODE>httpSetField()</CODE></A>,
+<A HREF="#httpUpdate"><CODE>httpUpdate()</CODE></A>
 
 
 <!-- NEW PAGE --><H2><A NAME="httpPost">httpPost()</A></H2>
@@ -4288,6 +5364,7 @@ user = cupsUser();
 <H3>Usage</H3>
 
 <PRE>
+int httpPost(http_t *http, const char *uri);
 </PRE>
 
 <H3>Arguments</H3>
@@ -4298,21 +5375,39 @@ user = cupsUser();
 	<TH>Description</TH>
 </TR>
 <TR>
-	<TD></TD>
-	<TD></TD>
+	<TD>http</TD>
+	<TD>The HTTP connection</TD>
+</TR>
+<TR>
+	<TD>uri</TD>
+	<TD>The URI to post to</TD>
 </TR>
 </TABLE></CENTER>
 
 <H3>Returns</H3>
 
+<P>0 on success, non-zero on failure.
+
 <H3>Description</H3>
+
+<P>The <CODE>httpPost()</CODE> function sends a HTTP POST request to the
+server.
 
 <H3>Example</H3>
 
 <PRE>
+#include &lt;cups/http.h&gt;
+
+http_t *http;
+
+httpPost(http, "/some/uri");
 </PRE>
 
 <H3>See Also</H3>
+
+<A HREF="#httpConnect"><CODE>httpConnect()</CODE></A>,
+<A HREF="#httpSetField"><CODE>httpSetField()</CODE></A>,
+<A HREF="#httpUpdate"><CODE>httpUpdate()</CODE></A>
 
 
 <!-- NEW PAGE --><H2><A NAME="httpPrintf">httpPrintf()</A></H2>
@@ -4320,6 +5415,7 @@ user = cupsUser();
 <H3>Usage</H3>
 
 <PRE>
+int httpPrintf(http_t *http, const char *format, ...);
 </PRE>
 
 <H3>Arguments</H3>
@@ -4330,28 +5426,44 @@ user = cupsUser();
 	<TH>Description</TH>
 </TR>
 <TR>
-	<TD></TD>
-	<TD></TD>
+	<TD>http</TD>
+	<TD>The HTTP connection</TD>
+</TR>
+<TR>
+	<TD>format</TD>
+	<TD>A printf-style format string</TD>
 </TR>
 </TABLE></CENTER>
 
 <H3>Returns</H3>
 
+<P>The number of bytes written.
+
 <H3>Description</H3>
+
+<P>The <CODE>httpPrintf()</CODE> function sends a formatted string to the
+HTTP connection. It is normally only used by the CUPS API and scheduler.
 
 <H3>Example</H3>
 
 <PRE>
+#include &lt;cups/http.h&gt;
+
+http_t *http;
+
+httpPrintf(http, "GET / HTTP/1.1 \r\n");
 </PRE>
 
 <H3>See Also</H3>
 
+<A HREF="#httpConnect"><CODE>httpConnect()</CODE></A>
 
 <!-- NEW PAGE --><H2><A NAME="httpPut">httpPut()</A></H2>
 
 <H3>Usage</H3>
 
 <PRE>
+int httpPut(http_t *http, const char *uri);
 </PRE>
 
 <H3>Arguments</H3>
@@ -4362,21 +5474,39 @@ user = cupsUser();
 	<TH>Description</TH>
 </TR>
 <TR>
-	<TD></TD>
-	<TD></TD>
+	<TD>http</TD>
+	<TD>The HTTP connection</TD>
+</TR>
+<TR>
+	<TD>uri</TD>
+	<TD>The URI to put</TD>
 </TR>
 </TABLE></CENTER>
 
 <H3>Returns</H3>
 
+<P>0 on success, non-zero on failure.
+
 <H3>Description</H3>
+
+<P>The <CODE>httpPut()</CODE> function sends a HTTP PUT request to the
+server.
 
 <H3>Example</H3>
 
 <PRE>
+#include &lt;cups/http.h&gt;
+
+http_t *http;
+
+httpDelete(http, "/some/uri");
 </PRE>
 
 <H3>See Also</H3>
+
+<A HREF="#httpConnect"><CODE>httpConnect()</CODE></A>,
+<A HREF="#httpSetField"><CODE>httpSetField()</CODE></A>,
+<A HREF="#httpUpdate"><CODE>httpUpdate()</CODE></A>
 
 
 <!-- NEW PAGE --><H2><A NAME="httpRead">httpRead()</A></H2>
@@ -4384,6 +5514,7 @@ user = cupsUser();
 <H3>Usage</H3>
 
 <PRE>
+int httpRead(http_t *http, char *buffer, int length);
 </PRE>
 
 <H3>Arguments</H3>
@@ -4394,28 +5525,57 @@ user = cupsUser();
 	<TH>Description</TH>
 </TR>
 <TR>
-	<TD></TD>
-	<TD></TD>
+	<TD>http</TD>
+	<TD>The HTTP connection</TD>
+</TR>
+<TR>
+	<TD>buffer</TD>
+	<TD>The buffer to read into</TD>
+</TR>
+<TR>
+	<TD>length</TD>
+	<TD>The number of bytes to read</TD>
 </TR>
 </TABLE></CENTER>
 
 <H3>Returns</H3>
 
+<P>The number of bytes read or -1 on error.
+
 <H3>Description</H3>
+
+<P>The <CODE>httpRead()</CODE> function reads data from the HTTP connection,
+possibly the result of a GET or POST request.
 
 <H3>Example</H3>
 
 <PRE>
+#include &lt;cups/http.h&gt;
+
+http_t *http;
+char buffer[1024];
+int  bytes;
+
+httpGet(http, "/");
+while (httpUpdate(http) != HTTP_CONTINUE);
+while ((bytes = httpRead(http, buffer, sizeof(buffer) - 1)) > 0)
+{
+  buffer[bytes] = '\0';
+  fputs(buffer, stdout);
+}
 </PRE>
 
 <H3>See Also</H3>
 
+<A HREF="#httpConnect"><CODE>httpConnect()</CODE></A>,
+<A HREF="#httpWrite"><CODE>httpWrite()</CODE></A>
 
 <!-- NEW PAGE --><H2><A NAME="httpReconnect">httpReconnect()</A></H2>
 
 <H3>Usage</H3>
 
 <PRE>
+int httpReconnect(http_t *http);
 </PRE>
 
 <H3>Arguments</H3>
@@ -4426,28 +5586,43 @@ user = cupsUser();
 	<TH>Description</TH>
 </TR>
 <TR>
-	<TD></TD>
-	<TD></TD>
+	<TD>http</TD>
+	<TD>The HTTP connection</TD>
 </TR>
 </TABLE></CENTER>
 
 <H3>Returns</H3>
 
+<P>0 on success, non-zero on failure.
+
 <H3>Description</H3>
+
+<P>The <CODE>httpReconnect()</CODE> function reconnects to the HTTP server.
+This is usually done automatically if the HTTP functions detect that the
+server connection has terminated.
 
 <H3>Example</H3>
 
 <PRE>
+#include &lt;cups/http.h&gt;
+
+http_t *http;
+
+httpReconnect(http);
 </PRE>
 
 <H3>See Also</H3>
 
+<A HREF="#httpConnect"><CODE>httpConnect()</CODE></A>
 
 <!-- NEW PAGE --><H2><A NAME="httpSeparate">httpSeparate()</A></H2>
 
 <H3>Usage</H3>
 
 <PRE>
+void httpSeparate(const char *uri, char *method,
+                  char *username, char *host, int *port,
+                  char *resource);
 </PRE>
 
 <H3>Arguments</H3>
@@ -4458,28 +5633,62 @@ user = cupsUser();
 	<TH>Description</TH>
 </TR>
 <TR>
-	<TD></TD>
-	<TD></TD>
+	<TD>uri</TD>
+	<TD>The URI to separate</TD>
+</TR>
+<TR>
+	<TD>method</TD>
+	<TD>The method (scheme) of the URI</TD>
+</TR>
+<TR>
+	<TD>username</TD>
+	<TD>The username (and password) portion of the URI, if any</TD>
+</TR>
+<TR>
+	<TD>host</TD>
+	<TD>The hostname portion of the URI, if any</TD>
+</TR>
+<TR>
+	<TD>port</TD>
+	<TD>The port number for the URI, either as specified or as
+	default for the method/scheme</TD>
+</TR>
+<TR>
+	<TD>resource</TD>
+	<TD>The resource string, usually a filename on the server</TD>
 </TR>
 </TABLE></CENTER>
 
-<H3>Returns</H3>
-
 <H3>Description</H3>
+
+<P>The <CODE>httpSeparate()</CODE> function separates the specified URI into
+its component parts. The method, username, hostname, and resource strings should
+be at least <CODE>HTTP_MAX_URI</CODE> characters long to avoid potential
+buffer overflow problems.
 
 <H3>Example</H3>
 
 <PRE>
+char uri[HTTP_MAX_URI];
+char method[HTTP_MAX_URI];
+char username[HTTP_MAX_URI];
+char host[HTTP_MAX_URI];
+char resource[HTTP_MAX_URI];
+int port;
+
+httpSeparate(uri, method, username, host, &amp;port, resource);
 </PRE>
 
 <H3>See Also</H3>
 
+<A HREF="#httpConnect"><CODE>httpConnect()</CODE></A>
 
 <!-- NEW PAGE --><H2><A NAME="httpSetField">httpSetField()</A></H2>
 
 <H3>Usage</H3>
 
 <PRE>
+void httpSetField(http_t *http, http_field_t field, const char *value);
 </PRE>
 
 <H3>Arguments</H3>
@@ -4490,21 +5699,40 @@ user = cupsUser();
 	<TH>Description</TH>
 </TR>
 <TR>
-	<TD></TD>
-	<TD></TD>
+	<TD>http</TD>
+	<TD>The HTTP connection</TD>
+</TR>
+<TR>
+	<TD>field</TD>
+	<TD>The HTTP field</TD>
+</TR>
+<TR>
+	<TD>value</TD>
+	<TD>The string value for the field</TD>
 </TR>
 </TABLE></CENTER>
 
-<H3>Returns</H3>
-
 <H3>Description</H3>
+
+<P>The <CODE>httpSetField()</CODE> function sets the current value for
+the specified HTTP field.
 
 <H3>Example</H3>
 
 <PRE>
+#include &lt;cups/http.h&gt;
+
+http_t *http;
+
+httpSetField(http, HTTP_FIELD_AUTHORIZATION, "Basic dfdr34453454325"));
+httpGet(http, "/some/uri");
+while (httpUpdate(http) == HTTP_CONTINUE);
 </PRE>
 
 <H3>See Also</H3>
+
+<A HREF="#httpConnect"><CODE>httpConnect()</CODE></A>,
+<A HREF="#httpGetField"><CODE>httpGetField()</CODE></A>
 
 
 <!-- NEW PAGE --><H2><A NAME="httpTrace">httpTrace()</A></H2>
@@ -4512,6 +5740,7 @@ user = cupsUser();
 <H3>Usage</H3>
 
 <PRE>
+int httpTrace(http_t *http, const char *uri);
 </PRE>
 
 <H3>Arguments</H3>
@@ -4522,21 +5751,39 @@ user = cupsUser();
 	<TH>Description</TH>
 </TR>
 <TR>
-	<TD></TD>
-	<TD></TD>
+	<TD>http</TD>
+	<TD>The HTTP connection</TD>
+</TR>
+<TR>
+	<TD>uri</TD>
+	<TD>The URI to trace</TD>
 </TR>
 </TABLE></CENTER>
 
 <H3>Returns</H3>
 
+<P>0 on success, non-zero on failure.
+
 <H3>Description</H3>
+
+<P>The <CODE>httpTrace()</CODE> function sends a HTTP TRACE request to the
+server.
 
 <H3>Example</H3>
 
 <PRE>
+#include &lt;cups/http.h&gt;
+
+http_t *http;
+
+httpTrace(http, "/some/uri");
 </PRE>
 
 <H3>See Also</H3>
+
+<A HREF="#httpConnect"><CODE>httpConnect()</CODE></A>,
+<A HREF="#httpSetField"><CODE>httpSetField()</CODE></A>,
+<A HREF="#httpUpdate"><CODE>httpUpdate()</CODE></A>
 
 
 <!-- NEW PAGE --><H2><A NAME="httpUpdate">httpUpdate()</A></H2>
@@ -4544,6 +5791,7 @@ user = cupsUser();
 <H3>Usage</H3>
 
 <PRE>
+http_status_t httpUpdate(http_t *http);
 </PRE>
 
 <H3>Arguments</H3>
@@ -4554,28 +5802,55 @@ user = cupsUser();
 	<TH>Description</TH>
 </TR>
 <TR>
-	<TD></TD>
-	<TD></TD>
+	<TD>http</TD>
+	<TD>The HTTP connection</TD>
 </TR>
 </TABLE></CENTER>
 
 <H3>Returns</H3>
 
+<P>The HTTP status of the current request.
+
 <H3>Description</H3>
+
+<P>The <CODE>httpUpdate()</CODE> function updates the current request status.
+It is used after any DELETE, GET, HEAD, OPTIONS, POST, PUT, or TRACE
+request to finalize the HTTP request and retrieve the request status.
+
+<P>Since proxies and the current blocking mode can cause the request to
+take longer, programs should continue calling <CODE>httpUpdate()</CODE>
+until the return status is not the constant value <CODE>HTTP_CONTINUE</CODE>.
 
 <H3>Example</H3>
 
 <PRE>
+#include &lt;cups/http.h&gt;
+
+http_t *http;
+http_status_t status;
+
+httpGet(http, "/some/uri");
+while ((status = httpUpdate(http)) == HTTP_CONTINUE);
+printf("Request status is %d\n", status);
 </PRE>
 
 <H3>See Also</H3>
 
+<A HREF="#httpConnect"><CODE>httpConnect()</CODE></A>,
+<A HREF="#httpDelete"><CODE>httpDelete()</CODE></A>,
+<A HREF="#httpGet"><CODE>httpGet()</CODE></A>,
+<A HREF="#httpHead"><CODE>httpHead()</CODE></A>,
+<A HREF="#httpOptions"><CODE>httpOptions()</CODE></A>,
+<A HREF="#httpPost"><CODE>httpPost()</CODE></A>,
+<A HREF="#httpPut"><CODE>httpPut()</CODE></A>,
+<A HREF="#httpTrace"><CODE>httpTrace()</CODE></A>
 
 <!-- NEW PAGE --><H2><A NAME="httpWrite">httpWrite()</A></H2>
 
 <H3>Usage</H3>
 
 <PRE>
+int httpWrite(http_t *http, char *buffer, int length);
 </PRE>
 
 <H3>Arguments</H3>
@@ -4586,28 +5861,64 @@ user = cupsUser();
 	<TH>Description</TH>
 </TR>
 <TR>
-	<TD></TD>
-	<TD></TD>
+	<TD>http</TD>
+	<TD>The HTTP connection</TD>
+</TR>
+<TR>
+	<TD>buffer</TD>
+	<TD>The buffer to read into</TD>
+</TR>
+<TR>
+	<TD>length</TD>
+	<TD>The number of bytes to read</TD>
 </TR>
 </TABLE></CENTER>
 
 <H3>Returns</H3>
 
+<P>The number of bytes read or -1 on error.
+
 <H3>Description</H3>
+
+<P>The <CODE>httpWrite()</CODE> function reads data from the HTTP connection,
+possibly the result of a GET or POST request.
 
 <H3>Example</H3>
 
 <PRE>
+#include &lt;cups/http.h&gt;
+
+http_t *http;
+FILE *fp;
+char buffer[1024];
+int  bytes;
+
+httpPost(http, "/");
+
+while ((bytes = fread(buffer, 1, sizeof(buffer), fp)) > 0)
+  httpWrite(http, buffer, bytes);
+
+while (httpUpdate(http) != HTTP_CONTINUE);
+
+while ((bytes = httpRead(http, buffer, sizeof(buffer) - 1)) > 0)
+{
+  buffer[bytes] = '\0';
+  fputs(buffer, stdout);
+}
 </PRE>
 
 <H3>See Also</H3>
 
+<A HREF="#httpConnect"><CODE>httpConnect()</CODE></A>,
+<A HREF="#httpRead"><CODE>httpRead()</CODE></A>
 
 <!-- NEW PAGE --><H2><A NAME="ippAddBoolean">ippAddBoolean()</A></H2>
 
 <H3>Usage</H3>
 
 <PRE>
+ipp_attribute_t *ippAddBoolean(ipp_t *ipp, ipp_tag_t group,
+                               const char *name, char value);
 </PRE>
 
 <H3>Arguments</H3>
@@ -4618,21 +5929,56 @@ user = cupsUser();
 	<TH>Description</TH>
 </TR>
 <TR>
-	<TD></TD>
-	<TD></TD>
+	<TD>ipp</TD>
+	<TD>The IPP request</TD>
+</TR>
+<TR>
+	<TD>group</TD>
+	<TD>The IPP group</TD>
+</TR>
+<TR>
+	<TD>name</TD>
+	<TD>The name of attribute</TD>
+</TR>
+<TR>
+	<TD>value</TD>
+	<TD>The boolean value</TD>
 </TR>
 </TABLE></CENTER>
 
 <H3>Returns</H3>
 
+<P>A pointer to the new attribute or NULL if the attribute could not be
+created.
+
 <H3>Description</H3>
+
+<P>The <CODE>ippAddBoolean()</CODE> function adds a single boolean attribute
+value to the specified IPP request.
 
 <H3>Example</H3>
 
 <PRE>
+#include &lt;cups/ipp.h>
+
+ipp_t *ipp;
+
+ippAddBoolean(ipp, IPP_TAG_OPERATION, "my-jobs", 1);
 </PRE>
 
 <H3>See Also</H3>
+
+<A HREF="#ippAddBooleans"><CODE>ippAddBooleans()</CODE></A>,
+<A HREF="#ippAddDate"><CODE>ippAddDate()</CODE></A>,
+<A HREF="#ippAddInteger"><CODE>ippAddInteger()</CODE></A>,
+<A HREF="#ippAddIntegers"><CODE>ippAddIntegers()</CODE></A>,
+<A HREF="#ippAddRange"><CODE>ippAddRange()</CODE></A>,
+<A HREF="#ippAddRanges"><CODE>ippAddRanges()</CODE></A>,
+<A HREF="#ippAddResolution"><CODE>ippAddResolution()</CODE></A>,
+<A HREF="#ippAddResolutions"><CODE>ippAddResolutions()</CODE></A>,
+<A HREF="#ippAddSeparator"><CODE>ippAddSeparator()</CODE></A>,
+<A HREF="#ippAddString"><CODE>ippAddString()</CODE></A>,
+<A HREF="#ippAddStrings"><CODE>ippAddStrings()</CODE></A>
 
 
 <!-- NEW PAGE --><H2><A NAME="ippAddBooleans">ippAddBooleans()</A></H2>
@@ -4640,6 +5986,9 @@ user = cupsUser();
 <H3>Usage</H3>
 
 <PRE>
+ipp_attribute_t *ippAddBooleans(ipp_t *ipp, ipp_tag_t group,
+                                const char *name, int num_values,
+                                const char *values);
 </PRE>
 
 <H3>Arguments</H3>
@@ -4650,21 +5999,63 @@ user = cupsUser();
 	<TH>Description</TH>
 </TR>
 <TR>
-	<TD></TD>
-	<TD></TD>
+	<TD>ipp</TD>
+	<TD>The IPP request</TD>
+</TR>
+<TR>
+	<TD>group</TD>
+	<TD>The IPP group</TD>
+</TR>
+<TR>
+	<TD>name</TD>
+	<TD>The name of attribute</TD>
+</TR>
+<TR>
+	<TD>num_values</TD>
+	<TD>The number of values</TD>
+</TR>
+<TR>
+	<TD>values</TD>
+	<TD>The boolean values</TD>
 </TR>
 </TABLE></CENTER>
 
 <H3>Returns</H3>
 
+<P>A pointer to the new attribute or NULL if the attribute could not be
+created.
+
 <H3>Description</H3>
+
+<P>The <CODE>ippAddBooleans()</CODE> function adds one or more boolean
+attribute values to the specified IPP request. If the
+<CODE>values</CODE> pointer is <CODE>NULL</CODE> then an array of
+<CODE>num_values</CODE> false values is created.
 
 <H3>Example</H3>
 
 <PRE>
+#include &lt;cups/ipp.h>
+
+ipp_t *ipp;
+char values[10];
+
+ippAddBooleans(ipp, IPP_TAG_OPERATION, "some-attribute", 10, values);
 </PRE>
 
 <H3>See Also</H3>
+
+<A HREF="#ippAddBoolean"><CODE>ippAddBoolean()</CODE></A>,
+<A HREF="#ippAddDate"><CODE>ippAddDate()</CODE></A>,
+<A HREF="#ippAddInteger"><CODE>ippAddInteger()</CODE></A>,
+<A HREF="#ippAddIntegers"><CODE>ippAddIntegers()</CODE></A>,
+<A HREF="#ippAddRange"><CODE>ippAddRange()</CODE></A>,
+<A HREF="#ippAddRanges"><CODE>ippAddRanges()</CODE></A>,
+<A HREF="#ippAddResolution"><CODE>ippAddResolution()</CODE></A>,
+<A HREF="#ippAddResolutions"><CODE>ippAddResolutions()</CODE></A>,
+<A HREF="#ippAddSeparator"><CODE>ippAddSeparator()</CODE></A>,
+<A HREF="#ippAddString"><CODE>ippAddString()</CODE></A>,
+<A HREF="#ippAddStrings"><CODE>ippAddStrings()</CODE></A>
 
 
 <!-- NEW PAGE --><H2><A NAME="ippAddDate">ippAddDate()</A></H2>
@@ -4672,6 +6063,8 @@ user = cupsUser();
 <H3>Usage</H3>
 
 <PRE>
+ipp_attribute_t *ippAddDate(ipp_t *ipp, ipp_tag_t group,
+                            const char *name, ipp_uchar_t *value);
 </PRE>
 
 <H3>Arguments</H3>
@@ -4682,21 +6075,58 @@ user = cupsUser();
 	<TH>Description</TH>
 </TR>
 <TR>
-	<TD></TD>
-	<TD></TD>
+	<TD>ipp</TD>
+	<TD>The IPP request</TD>
+</TR>
+<TR>
+	<TD>group</TD>
+	<TD>The IPP group</TD>
+</TR>
+<TR>
+	<TD>name</TD>
+	<TD>The name of attribute</TD>
+</TR>
+<TR>
+	<TD>value</TD>
+	<TD>The date value</TD>
 </TR>
 </TABLE></CENTER>
 
 <H3>Returns</H3>
 
+<P>A pointer to the new attribute or NULL if the attribute could not be
+created.
+
 <H3>Description</H3>
+
+<P>The <CODE>ippAddDate()</CODE> function adds a single date-time attribute
+value to the specified IPP request.
 
 <H3>Example</H3>
 
 <PRE>
+#include &lt;cups/ipp.h>
+
+ipp_t *ipp;
+
+ippAddDate(ipp, IPP_TAG_OPERATION, "some-attribute", 
+           ippTimeToDate(time(NULL));
 </PRE>
 
 <H3>See Also</H3>
+
+<A HREF="#ippAddBoolean"><CODE>ippAddBoolean()</CODE></A>,
+<A HREF="#ippAddBooleans"><CODE>ippAddBooleans()</CODE></A>,
+<A HREF="#ippAddInteger"><CODE>ippAddInteger()</CODE></A>,
+<A HREF="#ippAddIntegers"><CODE>ippAddIntegers()</CODE></A>,
+<A HREF="#ippAddRange"><CODE>ippAddRange()</CODE></A>,
+<A HREF="#ippAddRanges"><CODE>ippAddRanges()</CODE></A>,
+<A HREF="#ippAddResolution"><CODE>ippAddResolution()</CODE></A>,
+<A HREF="#ippAddResolutions"><CODE>ippAddResolutions()</CODE></A>,
+<A HREF="#ippAddSeparator"><CODE>ippAddSeparator()</CODE></A>,
+<A HREF="#ippAddString"><CODE>ippAddString()</CODE></A>,
+<A HREF="#ippAddStrings"><CODE>ippAddStrings()</CODE></A>,
+<A HREF="#ippTimeToDate"><CODE>ippTimeToDate()</CODE></A>
 
 
 <!-- NEW PAGE --><H2><A NAME="ippAddInteger">ippAddInteger()</A></H2>
@@ -4704,6 +6134,9 @@ user = cupsUser();
 <H3>Usage</H3>
 
 <PRE>
+ipp_attribute_t *ippAddInteger(ipp_t *ipp, ipp_tag_t group,
+                               ipp_tag_t tag, const char *name,
+                               int value);
 </PRE>
 
 <H3>Arguments</H3>
@@ -4714,21 +6147,60 @@ user = cupsUser();
 	<TH>Description</TH>
 </TR>
 <TR>
-	<TD></TD>
-	<TD></TD>
+	<TD>ipp</TD>
+	<TD>The IPP request</TD>
+</TR>
+<TR>
+	<TD>group</TD>
+	<TD>The IPP group</TD>
+</TR>
+<TR>
+	<TD>tag</TD>
+	<TD>The type of integer value (IPP_TAG_INTEGER or IPP_TAG_ENUM)</TD>
+</TR>
+<TR>
+	<TD>name</TD>
+	<TD>The name of attribute</TD>
+</TR>
+<TR>
+	<TD>value</TD>
+	<TD>The integer value</TD>
 </TR>
 </TABLE></CENTER>
 
 <H3>Returns</H3>
 
+<P>A pointer to the new attribute or NULL if the attribute could not be
+created.
+
 <H3>Description</H3>
+
+<P>The <CODE>ippAddInteger()</CODE> function adds a single integer attribute
+value to the specified IPP request.
 
 <H3>Example</H3>
 
 <PRE>
+#include &lt;cups/ipp.h>
+
+ipp_t *ipp;
+
+ippAddInteger(ipp, IPP_TAG_OPERATION, "limit", 100);
 </PRE>
 
 <H3>See Also</H3>
+
+<A HREF="#ippAddBoolean"><CODE>ippAddBoolean()</CODE></A>,
+<A HREF="#ippAddBooleans"><CODE>ippAddBooleans()</CODE></A>,
+<A HREF="#ippAddDate"><CODE>ippAddDate()</CODE></A>,
+<A HREF="#ippAddIntegers"><CODE>ippAddIntegers()</CODE></A>,
+<A HREF="#ippAddRange"><CODE>ippAddRange()</CODE></A>,
+<A HREF="#ippAddRanges"><CODE>ippAddRanges()</CODE></A>,
+<A HREF="#ippAddResolution"><CODE>ippAddResolution()</CODE></A>,
+<A HREF="#ippAddResolutions"><CODE>ippAddResolutions()</CODE></A>,
+<A HREF="#ippAddSeparator"><CODE>ippAddSeparator()</CODE></A>,
+<A HREF="#ippAddString"><CODE>ippAddString()</CODE></A>,
+<A HREF="#ippAddStrings"><CODE>ippAddStrings()</CODE></A>
 
 
 <!-- NEW PAGE --><H2><A NAME="ippAddIntegers">ippAddIntegers()</A></H2>
@@ -4736,6 +6208,9 @@ user = cupsUser();
 <H3>Usage</H3>
 
 <PRE>
+ipp_attribute_t *ippAddIntegers(ipp_t *ipp, ipp_tag_t group,
+                                ipp_tag_t tag, const char *name,
+                                int num_values, const int *values);
 </PRE>
 
 <H3>Arguments</H3>
@@ -4746,21 +6221,67 @@ user = cupsUser();
 	<TH>Description</TH>
 </TR>
 <TR>
-	<TD></TD>
-	<TD></TD>
+	<TD>ipp</TD>
+	<TD>The IPP request</TD>
+</TR>
+<TR>
+	<TD>group</TD>
+	<TD>The IPP group</TD>
+</TR>
+<TR>
+	<TD>tag</TD>
+	<TD>The type of integer value (IPP_TAG_INTEGER or IPP_TAG_ENUM)</TD>
+</TR>
+<TR>
+	<TD>name</TD>
+	<TD>The name of attribute</TD>
+</TR>
+<TR>
+	<TD>num_values</TD>
+	<TD>The number of values</TD>
+</TR>
+<TR>
+	<TD>values</TD>
+	<TD>The integer values</TD>
 </TR>
 </TABLE></CENTER>
 
 <H3>Returns</H3>
 
+<P>A pointer to the new attribute or NULL if the attribute could not be
+created.
+
 <H3>Description</H3>
+
+<P>The <CODE>ippAddIntegers()</CODE> function adds one or more integer
+attribute values to the specified IPP request.  If the
+<CODE>values</CODE> pointer is <CODE>NULL</CODE> then an array of
+<CODE>num_values</CODE> 0 values is created.
 
 <H3>Example</H3>
 
 <PRE>
+#include &lt;cups/ipp.h>
+
+ipp_t *ipp;
+int values[100];
+
+ippAddIntegers(ipp, IPP_TAG_OPERATION, "some-attribute", 100, values);
 </PRE>
 
 <H3>See Also</H3>
+
+<A HREF="#ippAddBoolean"><CODE>ippAddBoolean()</CODE></A>,
+<A HREF="#ippAddBooleans"><CODE>ippAddBooleans()</CODE></A>,
+<A HREF="#ippAddDate"><CODE>ippAddDate()</CODE></A>,
+<A HREF="#ippAddInteger"><CODE>ippAddInteger()</CODE></A>,
+<A HREF="#ippAddRange"><CODE>ippAddRange()</CODE></A>,
+<A HREF="#ippAddRanges"><CODE>ippAddRanges()</CODE></A>,
+<A HREF="#ippAddResolution"><CODE>ippAddResolution()</CODE></A>,
+<A HREF="#ippAddResolutions"><CODE>ippAddResolutions()</CODE></A>,
+<A HREF="#ippAddSeparator"><CODE>ippAddSeparator()</CODE></A>,
+<A HREF="#ippAddString"><CODE>ippAddString()</CODE></A>,
+<A HREF="#ippAddStrings"><CODE>ippAddStrings()</CODE></A>
 
 
 <!-- NEW PAGE --><H2><A NAME="ippAddRange">ippAddRange()</A></H2>
@@ -4768,6 +6289,9 @@ user = cupsUser();
 <H3>Usage</H3>
 
 <PRE>
+ipp_attribute_t *ippAddRange(ipp_t *ipp, ipp_tag_t group,
+                             const char *name, int low,
+                             int high);
 </PRE>
 
 <H3>Arguments</H3>
@@ -4778,21 +6302,60 @@ user = cupsUser();
 	<TH>Description</TH>
 </TR>
 <TR>
-	<TD></TD>
-	<TD></TD>
+	<TD>ipp</TD>
+	<TD>The IPP request</TD>
+</TR>
+<TR>
+	<TD>group</TD>
+	<TD>The IPP group</TD>
+</TR>
+<TR>
+	<TD>name</TD>
+	<TD>The name of attribute</TD>
+</TR>
+<TR>
+	<TD>low</TD>
+	<TD>The lower value</TD>
+</TR>
+<TR>
+	<TD>high</TD>
+	<TD>The higher value</TD>
 </TR>
 </TABLE></CENTER>
 
 <H3>Returns</H3>
 
+<P>A pointer to the new attribute or NULL if the attribute could not be
+created.
+
 <H3>Description</H3>
+
+<P>The <CODE>ippAddRange()</CODE> function adds a single range attribute
+value to the specified IPP request.
 
 <H3>Example</H3>
 
 <PRE>
+#include &lt;cups/ipp.h>
+
+ipp_t *ipp;
+
+ippAddRange(ipp, IPP_TAG_OPERATION, "page-ranges", 1, 10);
 </PRE>
 
 <H3>See Also</H3>
+
+<A HREF="#ippAddBoolean"><CODE>ippAddBoolean()</CODE></A>,
+<A HREF="#ippAddBooleans"><CODE>ippAddBooleans()</CODE></A>,
+<A HREF="#ippAddDate"><CODE>ippAddDate()</CODE></A>,
+<A HREF="#ippAddInteger"><CODE>ippAddInteger()</CODE></A>,
+<A HREF="#ippAddIntegers"><CODE>ippAddIntegers()</CODE></A>,
+<A HREF="#ippAddRanges"><CODE>ippAddRanges()</CODE></A>,
+<A HREF="#ippAddResolution"><CODE>ippAddResolution()</CODE></A>,
+<A HREF="#ippAddResolutions"><CODE>ippAddResolutions()</CODE></A>,
+<A HREF="#ippAddSeparator"><CODE>ippAddSeparator()</CODE></A>,
+<A HREF="#ippAddString"><CODE>ippAddString()</CODE></A>,
+<A HREF="#ippAddStrings"><CODE>ippAddStrings()</CODE></A>
 
 
 <!-- NEW PAGE --><H2><A NAME="ippAddRanges">ippAddRanges()</A></H2>
@@ -4800,6 +6363,9 @@ user = cupsUser();
 <H3>Usage</H3>
 
 <PRE>
+ipp_attribute_t *ippAddRanges(ipp_t *ipp, ipp_tag_t group,
+                              const char *name, int num_values,
+                              const int *lows, const int *highs);
 </PRE>
 
 <H3>Arguments</H3>
@@ -4810,21 +6376,68 @@ user = cupsUser();
 	<TH>Description</TH>
 </TR>
 <TR>
-	<TD></TD>
-	<TD></TD>
+	<TD>ipp</TD>
+	<TD>The IPP request</TD>
+</TR>
+<TR>
+	<TD>group</TD>
+	<TD>The IPP group</TD>
+</TR>
+<TR>
+	<TD>name</TD>
+	<TD>The name of attribute</TD>
+</TR>
+<TR>
+	<TD>num_values</TD>
+	<TD>The number of range values</TD>
+</TR>
+<TR>
+	<TD>lows</TD>
+	<TD>The lower values</TD>
+</TR>
+<TR>
+	<TD>highs</TD>
+	<TD>The higher values</TD>
 </TR>
 </TABLE></CENTER>
 
 <H3>Returns</H3>
 
+<P>A pointer to the new attribute or NULL if the attribute could not be
+created.
+
 <H3>Description</H3>
+
+<P>The <CODE>ippAddRanges()</CODE> function adds one or more range
+attribute values to the specified IPP request. If the
+<CODE>values</CODE> pointer is <CODE>NULL</CODE> then an array of
+<CODE>num_values</CODE> 0,0 ranges is created.
 
 <H3>Example</H3>
 
 <PRE>
+#include &lt;cups/ipp.h>
+
+ipp_t *ipp;
+int lows[2];
+int highs[2];
+
+ippAddRanges(ipp, IPP_TAG_OPERATION, "page-ranges", 2, lows, highs);
 </PRE>
 
 <H3>See Also</H3>
+
+<A HREF="#ippAddBoolean"><CODE>ippAddBoolean()</CODE></A>,
+<A HREF="#ippAddBooleans"><CODE>ippAddBooleans()</CODE></A>,
+<A HREF="#ippAddDate"><CODE>ippAddDate()</CODE></A>,
+<A HREF="#ippAddInteger"><CODE>ippAddInteger()</CODE></A>,
+<A HREF="#ippAddIntegers"><CODE>ippAddIntegers()</CODE></A>,
+<A HREF="#ippAddRange"><CODE>ippAddRange()</CODE></A>,
+<A HREF="#ippAddResolution"><CODE>ippAddResolution()</CODE></A>,
+<A HREF="#ippAddResolutions"><CODE>ippAddResolutions()</CODE></A>,
+<A HREF="#ippAddSeparator"><CODE>ippAddSeparator()</CODE></A>,
+<A HREF="#ippAddString"><CODE>ippAddString()</CODE></A>,
+<A HREF="#ippAddStrings"><CODE>ippAddStrings()</CODE></A>
 
 
 <!-- NEW PAGE --><H2><A NAME="ippAddResolution">ippAddResolution()</A></H2>
@@ -4832,6 +6445,9 @@ user = cupsUser();
 <H3>Usage</H3>
 
 <PRE>
+ipp_attribute_t *ippAddResolution(ipp_t *ipp, ipp_tag_t group,
+                                  const char *name, int xres,
+                                  int yres, ipp_res_t units);
 </PRE>
 
 <H3>Arguments</H3>
@@ -4842,21 +6458,65 @@ user = cupsUser();
 	<TH>Description</TH>
 </TR>
 <TR>
-	<TD></TD>
-	<TD></TD>
+	<TD>ipp</TD>
+	<TD>The IPP request</TD>
+</TR>
+<TR>
+	<TD>group</TD>
+	<TD>The IPP group</TD>
+</TR>
+<TR>
+	<TD>name</TD>
+	<TD>The name of attribute</TD>
+</TR>
+<TR>
+	<TD>xres</TD>
+	<TD>The horizontal resolution</TD>
+</TR>
+<TR>
+	<TD>yres</TD>
+	<TD>The vertical resolution</TD>
+</TR>
+<TR>
+	<TD>units</TD>
+	<TD>The resolution units</TD>
 </TR>
 </TABLE></CENTER>
 
 <H3>Returns</H3>
 
+<P>A pointer to the new attribute or NULL if the attribute could not be
+created.
+
 <H3>Description</H3>
+
+<P>The <CODE>ippAddResolution()</CODE> function adds a single resolution attribute
+value to the specified IPP request.
 
 <H3>Example</H3>
 
 <PRE>
+#include &lt;cups/ipp.h>
+
+ipp_t *ipp;
+
+ippAddBoolean(ipp, IPP_TAG_OPERATION, "printer-resolution",
+              720, 720, IPP_RES_PER_INCH);
 </PRE>
 
 <H3>See Also</H3>
+
+<A HREF="#ippAddBoolean"><CODE>ippAddBoolean()</CODE></A>,
+<A HREF="#ippAddBooleans"><CODE>ippAddBooleans()</CODE></A>,
+<A HREF="#ippAddDate"><CODE>ippAddDate()</CODE></A>,
+<A HREF="#ippAddInteger"><CODE>ippAddInteger()</CODE></A>,
+<A HREF="#ippAddIntegers"><CODE>ippAddIntegers()</CODE></A>,
+<A HREF="#ippAddRange"><CODE>ippAddRange()</CODE></A>,
+<A HREF="#ippAddRanges"><CODE>ippAddRanges()</CODE></A>,
+<A HREF="#ippAddResolutions"><CODE>ippAddResolutions()</CODE></A>,
+<A HREF="#ippAddSeparator"><CODE>ippAddSeparator()</CODE></A>,
+<A HREF="#ippAddString"><CODE>ippAddString()</CODE></A>,
+<A HREF="#ippAddStrings"><CODE>ippAddStrings()</CODE></A>
 
 
 <!-- NEW PAGE --><H2><A NAME="ippAddResolutions">ippAddResolutions()</A></H2>
@@ -4864,6 +6524,10 @@ user = cupsUser();
 <H3>Usage</H3>
 
 <PRE>
+ipp_attribute_t *ippAddResolutions(ipp_t *ipp, ipp_tag_t group,
+                                   const char *name, int num_values,
+                                   const int *xres, const int *yres,
+                                   const ipp_res_t *units);
 </PRE>
 
 <H3>Arguments</H3>
@@ -4874,21 +6538,74 @@ user = cupsUser();
 	<TH>Description</TH>
 </TR>
 <TR>
-	<TD></TD>
-	<TD></TD>
+	<TD>ipp</TD>
+	<TD>The IPP request</TD>
+</TR>
+<TR>
+	<TD>group</TD>
+	<TD>The IPP group</TD>
+</TR>
+<TR>
+	<TD>name</TD>
+	<TD>The name of attribute</TD>
+</TR>
+<TR>
+	<TD>num_values</TD>
+	<TD>The number of resolution values</TD>
+</TR>
+<TR>
+	<TD>xres</TD>
+	<TD>The horizontal resolutions</TD>
+</TR>
+<TR>
+	<TD>yres</TD>
+	<TD>The vertical resolutions</TD>
+</TR>
+<TR>
+	<TD>units</TD>
+	<TD>The resolution units</TD>
 </TR>
 </TABLE></CENTER>
 
 <H3>Returns</H3>
 
+<P>A pointer to the new attribute or NULL if the attribute could not be
+created.
+
 <H3>Description</H3>
+
+<P>The <CODE>ippAddResolutions()</CODE> function adds one or more
+resolution attribute values to the specified IPP request. If the
+<CODE>values</CODE> pointer is <CODE>NULL</CODE> then an array of
+<CODE>num_values</CODE> 0,0 resolutions is created.
 
 <H3>Example</H3>
 
 <PRE>
+#include &lt;cups/ipp.h>
+
+ipp_t *ipp;
+int xres[5];
+int yres[5];
+ipp_res_t units[5];
+
+ippAddBoolean(ipp, IPP_TAG_OPERATION, "printer-resolutions-supported",
+              5, xres, yres, units);
 </PRE>
 
 <H3>See Also</H3>
+
+<A HREF="#ippAddBoolean"><CODE>ippAddBoolean()</CODE></A>,
+<A HREF="#ippAddBooleans"><CODE>ippAddBooleans()</CODE></A>,
+<A HREF="#ippAddDate"><CODE>ippAddDate()</CODE></A>,
+<A HREF="#ippAddInteger"><CODE>ippAddInteger()</CODE></A>,
+<A HREF="#ippAddIntegers"><CODE>ippAddIntegers()</CODE></A>,
+<A HREF="#ippAddRange"><CODE>ippAddRange()</CODE></A>,
+<A HREF="#ippAddRanges"><CODE>ippAddRanges()</CODE></A>,
+<A HREF="#ippAddResolution"><CODE>ippAddResolution()</CODE></A>,
+<A HREF="#ippAddSeparator"><CODE>ippAddSeparator()</CODE></A>,
+<A HREF="#ippAddString"><CODE>ippAddString()</CODE></A>,
+<A HREF="#ippAddStrings"><CODE>ippAddStrings()</CODE></A>
 
 
 <!-- NEW PAGE --><H2><A NAME="ippAddSeparator">ippAddSeparator()</A></H2>
@@ -4896,6 +6613,7 @@ user = cupsUser();
 <H3>Usage</H3>
 
 <PRE>
+ipp_attribute_t *ippAddSeparator(ipp_t *ipp);
 </PRE>
 
 <H3>Arguments</H3>
@@ -4906,21 +6624,44 @@ user = cupsUser();
 	<TH>Description</TH>
 </TR>
 <TR>
-	<TD></TD>
-	<TD></TD>
+	<TD>ipp</TD>
+	<TD>The IPP request</TD>
 </TR>
 </TABLE></CENTER>
 
 <H3>Returns</H3>
 
+<P>A pointer to the new separator or NULL if the separator could not be
+created.
+
 <H3>Description</H3>
+
+<P>The <CODE>ippAddSeparator()</CODE> function adds a group separator
+to the specified IPP request.
 
 <H3>Example</H3>
 
 <PRE>
+#include &lt;cups/ipp.h>
+
+ipp_t *ipp;
+
+ippAddSeparator(ipp);
 </PRE>
 
 <H3>See Also</H3>
+
+<A HREF="#ippAddBoolean"><CODE>ippAddBoolean()</CODE></A>,
+<A HREF="#ippAddBooleans"><CODE>ippAddBooleans()</CODE></A>,
+<A HREF="#ippAddDate"><CODE>ippAddDate()</CODE></A>,
+<A HREF="#ippAddInteger"><CODE>ippAddInteger()</CODE></A>,
+<A HREF="#ippAddIntegers"><CODE>ippAddIntegers()</CODE></A>,
+<A HREF="#ippAddRange"><CODE>ippAddRange()</CODE></A>,
+<A HREF="#ippAddRanges"><CODE>ippAddRanges()</CODE></A>,
+<A HREF="#ippAddResolution"><CODE>ippAddResolution()</CODE></A>,
+<A HREF="#ippAddResolutions"><CODE>ippAddResolutions()</CODE></A>,
+<A HREF="#ippAddString"><CODE>ippAddString()</CODE></A>,
+<A HREF="#ippAddStrings"><CODE>ippAddStrings()</CODE></A>
 
 
 <!-- NEW PAGE --><H2><A NAME="ippAddString">ippAddString()</A></H2>
@@ -4928,6 +6669,9 @@ user = cupsUser();
 <H3>Usage</H3>
 
 <PRE>
+ipp_attribute_t *ippAddString(ipp_t *ipp, ipp_tag_t group,
+                              ipp_tag_t tag, const char *name,
+                              const char *charset, const char *value);
 </PRE>
 
 <H3>Arguments</H3>
@@ -4938,21 +6682,68 @@ user = cupsUser();
 	<TH>Description</TH>
 </TR>
 <TR>
-	<TD></TD>
-	<TD></TD>
+	<TD>ipp</TD>
+	<TD>The IPP request</TD>
+</TR>
+<TR>
+	<TD>group</TD>
+	<TD>The IPP group</TD>
+</TR>
+<TR>
+	<TD>tag</TD>
+	<TD>The type of string value</TD>
+</TR>
+<TR>
+	<TD>name</TD>
+	<TD>The name of attribute</TD>
+</TR>
+<TR>
+	<TD>charset</TD>
+	<TD>The character set for the string</TD>
+</TR>
+<TR>
+	<TD>value</TD>
+	<TD>The string value</TD>
 </TR>
 </TABLE></CENTER>
 
 <H3>Returns</H3>
 
+<P>A pointer to the new attribute or NULL if the attribute could not be
+created.
+
 <H3>Description</H3>
+
+<P>The <CODE>ippAddString()</CODE> function adds a single string attribute
+value to the specified IPP request. For <CODE>IPP_TAG_NAMELANG</CODE> and
+<CODE>IPP_TAG_TEXTLANG</CODE> strings, the charset value is provided with
+the string to identify the string encoding used. Otherwise the charset value
+is ignored.
 
 <H3>Example</H3>
 
 <PRE>
+#include &lt;cups/ipp.h>
+
+ipp_t *ipp;
+
+ippAddString(ipp, IPP_TAG_OPERATION, IPP_TAG_NAME, "job-name",
+             NULL, "abc123");
 </PRE>
 
 <H3>See Also</H3>
+
+<A HREF="#ippAddBoolean"><CODE>ippAddBoolean()</CODE></A>,
+<A HREF="#ippAddBooleans"><CODE>ippAddBooleans()</CODE></A>,
+<A HREF="#ippAddDate"><CODE>ippAddDate()</CODE></A>,
+<A HREF="#ippAddInteger"><CODE>ippAddInteger()</CODE></A>,
+<A HREF="#ippAddIntegers"><CODE>ippAddIntegers()</CODE></A>,
+<A HREF="#ippAddRange"><CODE>ippAddRange()</CODE></A>,
+<A HREF="#ippAddRanges"><CODE>ippAddRanges()</CODE></A>,
+<A HREF="#ippAddResolution"><CODE>ippAddResolution()</CODE></A>,
+<A HREF="#ippAddResolutions"><CODE>ippAddResolutions()</CODE></A>,
+<A HREF="#ippAddSeparator"><CODE>ippAddSeparator()</CODE></A>,
+<A HREF="#ippAddStrings"><CODE>ippAddStrings()</CODE></A>
 
 
 <!-- NEW PAGE --><H2><A NAME="ippAddStrings">ippAddStrings()</A></H2>
@@ -4960,6 +6751,10 @@ user = cupsUser();
 <H3>Usage</H3>
 
 <PRE>
+ipp_attribute_t *ippAddStrings(ipp_t *ipp, ipp_tag_t group,
+                               ipp_tag_t tag, const char *name,
+                               int num_values, const char *charset,
+                               const char **values);
 </PRE>
 
 <H3>Arguments</H3>
@@ -4970,21 +6765,75 @@ user = cupsUser();
 	<TH>Description</TH>
 </TR>
 <TR>
-	<TD></TD>
-	<TD></TD>
+	<TD>ipp</TD>
+	<TD>The IPP request</TD>
+</TR>
+<TR>
+	<TD>group</TD>
+	<TD>The IPP group</TD>
+</TR>
+<TR>
+	<TD>tag</TD>
+	<TD>The type of string value</TD>
+</TR>
+<TR>
+	<TD>name</TD>
+	<TD>The name of attribute</TD>
+</TR>
+<TR>
+	<TD>num_values</TD>
+	<TD>The number of strings</TD>
+</TR>
+<TR>
+	<TD>charset</TD>
+	<TD>The character set for the strings</TD>
+</TR>
+<TR>
+	<TD>values</TD>
+	<TD>The string values</TD>
 </TR>
 </TABLE></CENTER>
 
 <H3>Returns</H3>
 
+<P>A pointer to the new attribute or NULL if the attribute could not be
+created.
+
 <H3>Description</H3>
+
+<P>The <CODE>ippAddStrings()</CODE> function adds one or more string
+attribute values to the specified IPP request. For
+<CODE>IPP_TAG_NAMELANG</CODE> and <CODE>IPP_TAG_TEXTLANG</CODE>
+strings, the charset value is provided with the strings to identify the
+string encoding used. Otherwise the charset value is ignored. If the
+<CODE>values</CODE> pointer is <CODE>NULL</CODE> then an array of
+<CODE>num_values</CODE> NULL strings is created.
 
 <H3>Example</H3>
 
 <PRE>
+#include &lt;cups/ipp.h>
+
+ipp_t *ipp;
+char *values[2] = { "one", "two" };
+
+ippAddStrings(ipp, IPP_TAG_OPERATION, IPP_TAG_KEYWORD, "attr-name",
+              2, NULL, values);
 </PRE>
 
 <H3>See Also</H3>
+
+<A HREF="#ippAddBoolean"><CODE>ippAddBoolean()</CODE></A>,
+<A HREF="#ippAddBooleans"><CODE>ippAddBooleans()</CODE></A>,
+<A HREF="#ippAddDate"><CODE>ippAddDate()</CODE></A>,
+<A HREF="#ippAddInteger"><CODE>ippAddInteger()</CODE></A>,
+<A HREF="#ippAddIntegers"><CODE>ippAddIntegers()</CODE></A>,
+<A HREF="#ippAddRange"><CODE>ippAddRange()</CODE></A>,
+<A HREF="#ippAddRanges"><CODE>ippAddRanges()</CODE></A>,
+<A HREF="#ippAddResolution"><CODE>ippAddResolution()</CODE></A>,
+<A HREF="#ippAddResolutions"><CODE>ippAddResolutions()</CODE></A>,
+<A HREF="#ippAddSeparator"><CODE>ippAddSeparator()</CODE></A>,
+<A HREF="#ippAddString"><CODE>ippAddString()</CODE></A>
 
 
 <!-- NEW PAGE --><H2><A NAME="ippDateToTime">ippDateToTime()</A></H2>
@@ -4992,6 +6841,7 @@ user = cupsUser();
 <H3>Usage</H3>
 
 <PRE>
+time_t ippDateToTime(const ipp_uchar_t date[11]);
 </PRE>
 
 <H3>Arguments</H3>
@@ -5002,21 +6852,33 @@ user = cupsUser();
 	<TH>Description</TH>
 </TR>
 <TR>
-	<TD></TD>
-	<TD></TD>
+	<TD>date</TD>
+	<TD>The IPP date-time value</TD>
 </TR>
 </TABLE></CENTER>
 
 <H3>Returns</H3>
 
+<P>A UNIX time value.
+
 <H3>Description</H3>
+
+<P>The <CODE>ippDateToTime()</CODE> function converts an IPP date-time value
+to a UNIX time value.
 
 <H3>Example</H3>
 
 <PRE>
+#include &lt;cups/ipp.h>
+
+ipp_uchar_t date[11];
+
+printf("UNIX time is %d\n", ippDateToTime(date));
 </PRE>
 
 <H3>See Also</H3>
+
+<A HREF="#ippTimeToDate"><CODE>ippTimeToDate()</CODE></A>
 
 
 <!-- NEW PAGE --><H2><A NAME="ippDelete">ippDelete()</A></H2>
@@ -5024,6 +6886,7 @@ user = cupsUser();
 <H3>Usage</H3>
 
 <PRE>
+void ippDelete(ipp_t *ipp);
 </PRE>
 
 <H3>Arguments</H3>
@@ -5034,21 +6897,29 @@ user = cupsUser();
 	<TH>Description</TH>
 </TR>
 <TR>
-	<TD></TD>
-	<TD></TD>
+	<TD>ipp</TD>
+	<TD>The IPP request or response</TD>
 </TR>
 </TABLE></CENTER>
 
-<H3>Returns</H3>
-
 <H3>Description</H3>
+
+<P>The <CODE>ippDelete()</CODE> function deletes all memory used by an IPP
+request or response.
 
 <H3>Example</H3>
 
 <PRE>
+#include &lt;cups/ipp.h>
+
+ipp_t *ipp;
+
+ippDelete(ipp);
 </PRE>
 
 <H3>See Also</H3>
+
+<A HREF="#ippNew"><CODE>ippNew()</CODE></A>
 
 
 <!-- NEW PAGE --><H2><A NAME="ippFindAttribute">ippFindAttribute()</A></H2>
@@ -5120,31 +6991,30 @@ user = cupsUser();
 <H3>Usage</H3>
 
 <PRE>
+ipp_t *ippNew(void);
 </PRE>
-
-<H3>Arguments</H3>
-
-<CENTER><TABLE WIDTH="80%" BORDER>
-<TR>
-	<TH>Argument</TH>
-	<TH>Description</TH>
-</TR>
-<TR>
-	<TD></TD>
-	<TD></TD>
-</TR>
-</TABLE></CENTER>
 
 <H3>Returns</H3>
 
+<P>A pointer to a new IPP request or response.
+
 <H3>Description</H3>
+
+<P>The <CODE>ippNew()</CODE> function creates a new IPP request or response.
 
 <H3>Example</H3>
 
 <PRE>
+#include &lt;cups/ipp.h>
+
+ipp_t *ipp;
+
+ipp = ippNew();
 </PRE>
 
 <H3>See Also</H3>
+
+<A HREF="#ippDelete"><CODE>ippDelete()</CODE></A>
 
 
 <!-- NEW PAGE --><H2><A NAME="ippPort">ippPort()</A></H2>
@@ -5152,31 +7022,32 @@ user = cupsUser();
 <H3>Usage</H3>
 
 <PRE>
+int ippPort(void);
 </PRE>
-
-<H3>Arguments</H3>
-
-<CENTER><TABLE WIDTH="80%" BORDER>
-<TR>
-	<TH>Argument</TH>
-	<TH>Description</TH>
-</TR>
-<TR>
-	<TD></TD>
-	<TD></TD>
-</TR>
-</TABLE></CENTER>
 
 <H3>Returns</H3>
 
+<P>The default TCP/IP port number for IPP requests.
+
 <H3>Description</H3>
+
+<P>The <CODE>ippPort()</CODE> function returns the default IPP port number
+for requests.
 
 <H3>Example</H3>
 
 <PRE>
+#include &lt;cups/http.h>
+#include &lt;cups/ipp.h>
+
+http_t *http;
+
+http = httpConnect(cupsServer(), ippPort());
 </PRE>
 
 <H3>See Also</H3>
+
+<A HREF="#cupsServer"><CODE>cupsServer()</CODE></A>
 
 
 <!-- NEW PAGE --><H2><A NAME="ippRead">ippRead()</A></H2>
@@ -5184,6 +7055,7 @@ user = cupsUser();
 <H3>Usage</H3>
 
 <PRE>
+ipp_state_t ippRead(http_t *http, ipp_t *ipp);
 </PRE>
 
 <H3>Arguments</H3>
@@ -5194,21 +7066,50 @@ user = cupsUser();
 	<TH>Description</TH>
 </TR>
 <TR>
-	<TD></TD>
-	<TD></TD>
+	<TD>http</TD>
+	<TD>The HTTP connection</TD>
+</TR>
+<TR>
+	<TD>ipp</TD>
+	<TD>The IPP request or response</TD>
 </TR>
 </TABLE></CENTER>
 
 <H3>Returns</H3>
 
+<P>The current read state.
+
 <H3>Description</H3>
+
+<P>The <CODE>ippRead()</CODE> function reads IPP attributes from the specified
+HTTP connection. Programs should continue calling <CODE>ippRead()</CODE> until
+<CODE>IPP_ERROR</CODE> or <CODE>IPP_DATA</CODE> is returned.
 
 <H3>Example</H3>
 
 <PRE>
+#include &lt;cups/http.h>
+#include &lt;cups/ipp.h>
+
+http_t *http;
+ipp_t *ipp;
+ipp_state_t status;
+
+ipp = ippNew();
+
+while ((status = ippRead(http, ipp)) != IPP_ERROR)
+  if (status == IPP_DATA)
+    break;
+
+if (status == IPP_DATA)
+{
+  ... read additional non-IPP data using httpRead() ...
+}
 </PRE>
 
 <H3>See Also</H3>
+
+<A HREF="#ippWrite"><CODE>ippWrite()</CODE></A>
 
 
 <!-- NEW PAGE --><H2><A NAME="ippTimeToDate">ippTimeToDate()</A></H2>
@@ -5216,6 +7117,7 @@ user = cupsUser();
 <H3>Usage</H3>
 
 <PRE>
+ipp_uchar_t *ippTimeToDate(time_t time);
 </PRE>
 
 <H3>Arguments</H3>
@@ -5226,21 +7128,33 @@ user = cupsUser();
 	<TH>Description</TH>
 </TR>
 <TR>
-	<TD></TD>
-	<TD></TD>
+	<TD>time</TD>
+	<TD>The UNIX time value</TD>
 </TR>
 </TABLE></CENTER>
 
 <H3>Returns</H3>
 
+<P>A static pointer to an IPP date-time value.
+
 <H3>Description</H3>
+
+<P>The <CODE>ippTimeToDate()</CODE> function converts a UNIX time to an IPP
+date-time value.
 
 <H3>Example</H3>
 
 <PRE>
+#include &lt;cups/ipp.h>
+
+ipp_uchar_t *date;
+
+date = ippTimeToDate(time(NULL));
 </PRE>
 
 <H3>See Also</H3>
+
+<A HREF="#ippDateToTime"><CODE>ippDateToTime()</CODE></A>
 
 
 <!-- NEW PAGE --><H2><A NAME="ippWrite">ippWrite()</A></H2>
@@ -5248,6 +7162,7 @@ user = cupsUser();
 <H3>Usage</H3>
 
 <PRE>
+ipp_state_t ippWrite(http_t *http, ipp_t *ipp);
 </PRE>
 
 <H3>Arguments</H3>
@@ -5258,21 +7173,51 @@ user = cupsUser();
 	<TH>Description</TH>
 </TR>
 <TR>
-	<TD></TD>
-	<TD></TD>
+	<TD>http</TD>
+	<TD>The HTTP connection</TD>
+</TR>
+<TR>
+	<TD>ipp</TD>
+	<TD>The IPP request or response</TD>
 </TR>
 </TABLE></CENTER>
 
 <H3>Returns</H3>
 
+<P>The current write state.
+
 <H3>Description</H3>
+
+<P>The <CODE>ippWrite()</CODE> function writes IPP attributes to the specified
+HTTP connection. Programs should continue calling <CODE>ippWrite()</CODE> until
+<CODE>IPP_ERROR</CODE> or <CODE>IPP_DATA</CODE> is returned.
 
 <H3>Example</H3>
 
 <PRE>
+#include &lt;cups/http.h>
+#include &lt;cups/ipp.h>
+
+http_t *http;
+ipp_t *ipp;
+ipp_state_t status;
+
+ipp = ippNew();
+... add attributes ...
+
+while ((status = ippWrite(http, ipp)) != IPP_ERROR)
+  if (status == IPP_DATA)
+    break;
+
+if (status == IPP_DATA)
+{
+  ... read additional non-IPP data using httpWrite() ...
+}
 </PRE>
 
 <H3>See Also</H3>
+
+<A HREF="#ippRead"><CODE>ippRead()</CODE></A>
 
 
 <!-- NEW PAGE --><H2><A NAME="ppdClose">ppdClose()</A></H2>
@@ -5280,6 +7225,7 @@ user = cupsUser();
 <H3>Usage</H3>
 
 <PRE>
+void ppdClose(ppd_file_t *ppd);
 </PRE>
 
 <H3>Arguments</H3>
@@ -5290,21 +7236,31 @@ user = cupsUser();
 	<TH>Description</TH>
 </TR>
 <TR>
-	<TD></TD>
-	<TD></TD>
+	<TD>ppd</TD>
+	<TD>The PPD file</TD>
 </TR>
 </TABLE></CENTER>
 
-<H3>Returns</H3>
-
 <H3>Description</H3>
+
+<P>The <CODE>ppdClose()</CODE> function frees all memory associated with the
+PPD file.
 
 <H3>Example</H3>
 
 <PRE>
+#include &lt;cups/ppd.h>
+
+ppd_file_t *ppd;
+
+ppdClose(ppd);
 </PRE>
 
 <H3>See Also</H3>
+
+<A HREF="#ppdOpen"><CODE>ppdOpen()</CODE></A>,
+<A HREF="#ppdOpenFd"><CODE>ppdOpenFd()</CODE></A>,
+<A HREF="#ppdOpenFile"><CODE>ppdOpenFile()</CODE></A>
 
 
 <!-- NEW PAGE --><H2><A NAME="ppdConflicts">ppdConflicts()</A></H2>
@@ -5312,6 +7268,7 @@ user = cupsUser();
 <H3>Usage</H3>
 
 <PRE>
+int ppdConflicts(ppd_file_t *ppd);
 </PRE>
 
 <H3>Arguments</H3>
@@ -5322,53 +7279,36 @@ user = cupsUser();
 	<TH>Description</TH>
 </TR>
 <TR>
-	<TD></TD>
-	<TD></TD>
+	<TD>ppd</TD>
+	<TD>The PPD file</TD>
 </TR>
 </TABLE></CENTER>
 
 <H3>Returns</H3>
 
+<P>The number of option conflicts in the file.
+
 <H3>Description</H3>
+
+<P>The <CODE>ppdConflicts()</CODE> function returns the number of conflicts
+with the currently selected options.
 
 <H3>Example</H3>
 
 <PRE>
+#include &lt;cups/ppd.h>
+
+ppd_file_t *ppd;
+
+printf("%d conflicts\n", ppdConflicts(ppd));
 </PRE>
 
 <H3>See Also</H3>
 
-
-<!-- NEW PAGE --><H2><A NAME="pddEmitFd">pddEmitFd()</A></H2>
-
-<H3>Usage</H3>
-
-<PRE>
-</PRE>
-
-<H3>Arguments</H3>
-
-<CENTER><TABLE WIDTH="80%" BORDER>
-<TR>
-	<TH>Argument</TH>
-	<TH>Description</TH>
-</TR>
-<TR>
-	<TD></TD>
-	<TD></TD>
-</TR>
-</TABLE></CENTER>
-
-<H3>Returns</H3>
-
-<H3>Description</H3>
-
-<H3>Example</H3>
-
-<PRE>
-</PRE>
-
-<H3>See Also</H3>
+<A HREF="#cupsMarkOptions"><CODE>cupsMarkOptions()</CODE></A>,
+<A HREF="#ppdIsMarked"><CODE>ppdIsMarked()</CODE></A>,
+<A HREF="#ppdMarkDefaults"><CODE>ppdMarkDefaults()</CODE></A>,
+<A HREF="#ppdMarkOption"><CODE>ppdMarkOption()</CODE></A>
 
 
 <!-- NEW PAGE --><H2><A NAME="ppdEmit">ppdEmit()</A></H2>
@@ -5376,6 +7316,7 @@ user = cupsUser();
 <H3>Usage</H3>
 
 <PRE>
+int ppdEmit(ppd_file_t *ppd, FILE *file, ppd_section_t section);
 </PRE>
 
 <H3>Arguments</H3>
@@ -5386,21 +7327,94 @@ user = cupsUser();
 	<TH>Description</TH>
 </TR>
 <TR>
-	<TD></TD>
-	<TD></TD>
+	<TD>ppd</TD>
+	<TD>The PPD file</TD>
+</TR>
+<TR>
+	<TD>file</TD>
+	<TD>The file to write to</TD>
+</TR>
+<TR>
+	<TD>section</TD>
+	<TD>The option section to write</TD>
 </TR>
 </TABLE></CENTER>
 
 <H3>Returns</H3>
 
+<P>0 on success, -1 on error.
+
 <H3>Description</H3>
+
+<P>The <CODE>ppdEmit()</CODE> function sends printer-specific option
+commands to the specified file.
 
 <H3>Example</H3>
 
 <PRE>
+#include &lt;cups/ppd.h>
+
+ppd_file_t *ppd;
+
+ppdEmit(ppd, stdout, PPD_ORDER_PAGE);
 </PRE>
 
 <H3>See Also</H3>
+
+<A HREF="#ppdEmitFd"><CODE>ppdEmitFd()</CODE></A>
+
+
+<!-- NEW PAGE --><H2><A NAME="ppdEmitFd">ppdEmitFd()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+int ppdEmitFd(ppd_file_t *ppd, int fd, ppd_section_t section);
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD>ppd</TD>
+	<TD>The PPD file</TD>
+</TR>
+<TR>
+	<TD>fd</TD>
+	<TD>The file descriptor to write to</TD>
+</TR>
+<TR>
+	<TD>section</TD>
+	<TD>The option section to write</TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<P>0 on success, -1 on error.
+
+<H3>Description</H3>
+
+<P>The <CODE>ppdEmitFd()</CODE> function sends printer-specific option
+commands to the specified file descriptor.
+
+<H3>Example</H3>
+
+<PRE>
+#include &lt;cups/ppd.h>
+
+ppd_file_t *ppd;
+
+ppdEmitFd(ppd, 1, PPD_ORDER_PAGE);
+</PRE>
+
+<H3>See Also</H3>
+
+<A HREF="#ppdEmit"><CODE>ppdEmit()</CODE></A>
 
 
 <!-- NEW PAGE --><H2><A NAME="ppdFindChoice">ppdFindChoice()</A></H2>
@@ -5408,6 +7422,7 @@ user = cupsUser();
 <H3>Usage</H3>
 
 <PRE>
+ppd_choice_t *ppdFindChoice(ppd_option_t *option, const char *choice);
 </PRE>
 
 <H3>Arguments</H3>
@@ -5418,21 +7433,41 @@ user = cupsUser();
 	<TH>Description</TH>
 </TR>
 <TR>
-	<TD></TD>
-	<TD></TD>
+	<TD>option</TD>
+	<TD>A pointer to the option</TD>
+</TR>
+<TR>
+	<TD>choice</TD>
+	<TD>The name of the choice</TD>
 </TR>
 </TABLE></CENTER>
 
 <H3>Returns</H3>
 
+<P>A pointer to the choice data or NULL if the choice does not exist.
+
 <H3>Description</H3>
+
+<P>The <CODE>ppdFindChoice()</CODE> function returns a pointer to the choice
+data for the specified option.
 
 <H3>Example</H3>
 
 <PRE>
+#include &lt;cups/ppd.h>
+
+ppd_file_t *ppd;
+ppd_option_t *option;
+ppd_choice_t *choice;
+
+option = ppdFindOption(ppd, "PageSize");
+choice = ppdFindChoice(option, "Letter");
 </PRE>
 
 <H3>See Also</H3>
+
+<A HREF="#ppdFindMarkedChoice"><CODE>ppdFindMarkedChoice()</CODE></A>,
+<A HREF="#ppdFindOption"><CODE>ppdFindOption()</CODE></A>
 
 
 <!-- NEW PAGE --><H2><A NAME="ppdFindMarkedChoice">ppdFindMarkedChoice()</A></H2>
@@ -5440,6 +7475,7 @@ user = cupsUser();
 <H3>Usage</H3>
 
 <PRE>
+ppd_choice_t *ppdFindMarkedChoice(ppd_file_t *ppd, const char *keyword);
 </PRE>
 
 <H3>Arguments</H3>
@@ -5450,21 +7486,40 @@ user = cupsUser();
 	<TH>Description</TH>
 </TR>
 <TR>
-	<TD></TD>
-	<TD></TD>
+	<TD>ppd</TD>
+	<TD>The PPD file</TD>
+</TR>
+<TR>
+	<TD>keyword</TD>
+	<TD>The name of the option</TD>
 </TR>
 </TABLE></CENTER>
 
 <H3>Returns</H3>
 
+<P>A pointer to the choice data or NULL if the choice does not exist or
+is not marked.
+
 <H3>Description</H3>
+
+<P>The <CODE>ppdFindMarkedChoice()</CODE> function returns a pointer to
+the marked choice data for the specified option.
 
 <H3>Example</H3>
 
 <PRE>
+#include &lt;cups/ppd.h>
+
+ppd_file_t *ppd;
+ppd_choice_t *choice;
+
+choice = ppdFindMarkedChoice(ppd, "PageSize");
 </PRE>
 
 <H3>See Also</H3>
+
+<A HREF="#ppdFindChoice"><CODE>ppdFindChoice()</CODE></A>,
+<A HREF="#ppdFindOption"><CODE>ppdFindOption()</CODE></A>
 
 
 <!-- NEW PAGE --><H2><A NAME="ppdFindOption">ppdFindOption()</A></H2>
@@ -5472,6 +7527,7 @@ user = cupsUser();
 <H3>Usage</H3>
 
 <PRE>
+ppd_option_t *ppdFindOption(ppd_file_t *ppd, const char *keyword);
 </PRE>
 
 <H3>Arguments</H3>
@@ -5482,21 +7538,39 @@ user = cupsUser();
 	<TH>Description</TH>
 </TR>
 <TR>
-	<TD></TD>
-	<TD></TD>
+	<TD>ppd</TD>
+	<TD>The PPD file</TD>
+</TR>
+<TR>
+	<TD>keyword</TD>
+	<TD>The name of the option</TD>
 </TR>
 </TABLE></CENTER>
 
 <H3>Returns</H3>
 
+<P>A pointer to the option data or NULL if the option does not exist.
+
 <H3>Description</H3>
+
+<P>The <CODE>ppdFindOption()</CODE> function returns a pointer to the option
+data for the specified option.
 
 <H3>Example</H3>
 
 <PRE>
+#include &lt;cups/ppd.h>
+
+ppd_file_t *ppd;
+ppd_option_t *option;
+
+option = ppdFindOption(ppd, "PageSize");
 </PRE>
 
 <H3>See Also</H3>
+
+<A HREF="#ppdFindChoice"><CODE>ppdFindChoice()</CODE></A>,
+<A HREF="#ppdFindMarkedChoice"><CODE>ppdFindMarkedChoice()</CODE></A>
 
 
 <!-- NEW PAGE --><H2><A NAME="ppdIsMarked">ppdIsMarked()</A></H2>
@@ -5504,6 +7578,7 @@ user = cupsUser();
 <H3>Usage</H3>
 
 <PRE>
+int ppdIsMarked(ppd_file_t *ppd, const char *keyword, char char *choice);
 </PRE>
 
 <H3>Arguments</H3>
@@ -5514,21 +7589,46 @@ user = cupsUser();
 	<TH>Description</TH>
 </TR>
 <TR>
-	<TD></TD>
-	<TD></TD>
+	<TD>ppd</TD>
+	<TD>The PPD file</TD>
+</TR>
+<TR>
+	<TD>keyword</TD>
+	<TD>The name of the option</TD>
+</TR>
+<TR>
+	<TD>choice</TD>
+	<TD>The name of the option choice</TD>
 </TR>
 </TABLE></CENTER>
 
 <H3>Returns</H3>
 
+<P>1 if the choice is marked, 0 otherwise.
+
 <H3>Description</H3>
+
+<P>The <CODE>ppdIsMarked()</CODE> function returns whether or not the
+specified option choice is marked.
 
 <H3>Example</H3>
 
 <PRE>
+#include &lt;cups/ppd.h>
+
+ppd_file_t *ppd;
+
+printf("Letter size %s selected.\n",
+       ppdIsMarked(ppd, "PageSize", "Letter") ? "is" : "is not");
 </PRE>
 
 <H3>See Also</H3>
+
+<A HREF="#cupsMarkOptions"><CODE>cupsMarkOptions()</CODE></A>,
+<A HREF="#ppdConflicts"><CODE>ppdConflicts()</CODE></A>,
+<A HREF="#ppdIsMarked"><CODE>ppdIsMarked()</CODE></A>,
+<A HREF="#ppdMarkDefaults"><CODE>ppdMarkDefaults()</CODE></A>,
+<A HREF="#ppdMarkOption"><CODE>ppdMarkOption()</CODE></A>
 
 
 <!-- NEW PAGE --><H2><A NAME="ppdMarkDefaults">ppdMarkDefaults()</A></H2>
@@ -5536,6 +7636,7 @@ user = cupsUser();
 <H3>Usage</H3>
 
 <PRE>
+void ppdMarkDefaults(ppd_file_t *ppd);
 </PRE>
 
 <H3>Arguments</H3>
@@ -5546,21 +7647,33 @@ user = cupsUser();
 	<TH>Description</TH>
 </TR>
 <TR>
-	<TD></TD>
-	<TD></TD>
+	<TD>ppd</TD>
+	<TD>The PPD file</TD>
 </TR>
 </TABLE></CENTER>
 
-<H3>Returns</H3>
-
 <H3>Description</H3>
+
+<P>The <CODE>ppdMarkDefaults()</CODE> function marks all of the default
+choices in the PPD file.
 
 <H3>Example</H3>
 
 <PRE>
+#include &lt;cups/ppd.h>
+
+ppd_file_t *ppd;
+
+ppdMarkDefaults(ppd);
 </PRE>
 
 <H3>See Also</H3>
+
+<A HREF="#cupsMarkOptions"><CODE>cupsMarkOptions()</CODE></A>,
+<A HREF="#ppdConflicts"><CODE>ppdConflicts()</CODE></A>,
+<A HREF="#ppdIsMarked"><CODE>ppdIsMarked()</CODE></A>,
+<A HREF="#ppdMarkDefaults"><CODE>ppdMarkDefaults()</CODE></A>,
+<A HREF="#ppdMarkOption"><CODE>ppdMarkOption()</CODE></A>
 
 
 <!-- NEW PAGE --><H2><A NAME="ppdMarkOption">ppdMarkOption()</A></H2>
@@ -5568,6 +7681,7 @@ user = cupsUser();
 <H3>Usage</H3>
 
 <PRE>
+int ppdMarkOption(ppd_file_t *ppd, const char *keyword, const char *choice);
 </PRE>
 
 <H3>Arguments</H3>
@@ -5578,85 +7692,45 @@ user = cupsUser();
 	<TH>Description</TH>
 </TR>
 <TR>
-	<TD></TD>
-	<TD></TD>
+	<TD>ppd</TD>
+	<TD>The PPD file</TD>
+</TR>
+<TR>
+	<TD>keyword</TD>
+	<TD>The name of the option</TD>
+</TR>
+<TR>
+	<TD>choice</TD>
+	<TD>The name of the choice</TD>
 </TR>
 </TABLE></CENTER>
 
 <H3>Returns</H3>
 
+<P>The number of conflicts in the PPD file.
+
 <H3>Description</H3>
+
+<P>The <CODE>ppdMarkOption()</CODE> function marks the specified option
+choice.
 
 <H3>Example</H3>
 
 <PRE>
+#include &lt;cups/ppd.h>
+
+ppd_file_t *ppd;
+
+ppdMarkOption(ppd, "PageSize", "Letter");
 </PRE>
 
 <H3>See Also</H3>
 
-
-<!-- NEW PAGE --><H2><A NAME="ppdOpenFd">ppdOpenFd()</A></H2>
-
-<H3>Usage</H3>
-
-<PRE>
-</PRE>
-
-<H3>Arguments</H3>
-
-<CENTER><TABLE WIDTH="80%" BORDER>
-<TR>
-	<TH>Argument</TH>
-	<TH>Description</TH>
-</TR>
-<TR>
-	<TD></TD>
-	<TD></TD>
-</TR>
-</TABLE></CENTER>
-
-<H3>Returns</H3>
-
-<H3>Description</H3>
-
-<H3>Example</H3>
-
-<PRE>
-</PRE>
-
-<H3>See Also</H3>
-
-
-<!-- NEW PAGE --><H2><A NAME="ppdOpenFile">ppdOpenFile()</A></H2>
-
-<H3>Usage</H3>
-
-<PRE>
-</PRE>
-
-<H3>Arguments</H3>
-
-<CENTER><TABLE WIDTH="80%" BORDER>
-<TR>
-	<TH>Argument</TH>
-	<TH>Description</TH>
-</TR>
-<TR>
-	<TD></TD>
-	<TD></TD>
-</TR>
-</TABLE></CENTER>
-
-<H3>Returns</H3>
-
-<H3>Description</H3>
-
-<H3>Example</H3>
-
-<PRE>
-</PRE>
-
-<H3>See Also</H3>
+<A HREF="#cupsMarkOptions"><CODE>cupsMarkOptions()</CODE></A>,
+<A HREF="#ppdConflicts"><CODE>ppdConflicts()</CODE></A>,
+<A HREF="#ppdIsMarked"><CODE>ppdIsMarked()</CODE></A>,
+<A HREF="#ppdMarkDefaults"><CODE>ppdMarkDefaults()</CODE></A>,
+<A HREF="#ppdMarkOption"><CODE>ppdMarkOption()</CODE></A>
 
 
 <!-- NEW PAGE --><H2><A NAME="ppdOpen">ppdOpen()</A></H2>
@@ -5664,6 +7738,7 @@ user = cupsUser();
 <H3>Usage</H3>
 
 <PRE>
+ppd_file_t *ppdOpen(FILE *file);
 </PRE>
 
 <H3>Arguments</H3>
@@ -5674,21 +7749,138 @@ user = cupsUser();
 	<TH>Description</TH>
 </TR>
 <TR>
-	<TD></TD>
-	<TD></TD>
+	<TD>file</TD>
+	<TD>The file to read from</TD>
 </TR>
 </TABLE></CENTER>
 
 <H3>Returns</H3>
 
+<P>A pointer to a PPD file structure or NULL if the PPD file could not be
+read.
+
 <H3>Description</H3>
+
+<P>The <CODE>ppdOpen()</CODE> function reads a PPD file from the specified
+file into memory.
 
 <H3>Example</H3>
 
 <PRE>
+#include &lt;cups/ppd.h>
+
+ppd_file_t *ppd;
+FILE *file;
+
+file = fopen("filename.ppd", "rb");
+ppd = ppdOpen(file);
+fclose(file);
 </PRE>
 
 <H3>See Also</H3>
+
+<A HREF="#ppdClose"><CODE>ppdClose()</CODE></A>,
+<A HREF="#ppdOpenFd"><CODE>ppdOpenFd()</CODE></A>,
+<A HREF="#ppdOpenFile"><CODE>ppdOpenFile()</CODE></A>
+
+
+<!-- NEW PAGE --><H2><A NAME="ppdOpenFd">ppdOpenFd()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+ppd_file_t *ppdOpenFd(int fd);
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD>fd</TD>
+	<TD>The file descriptor to read from</TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<P>A pointer to a PPD file structure or NULL if the PPD file could not be
+read.
+
+<H3>Description</H3>
+
+<P>The <CODE>ppdOpenFd()</CODE> function reads a PPD file from the specified
+file descriptor into memory.
+
+<H3>Example</H3>
+
+<PRE>
+#include &lt;cups/ppd.h>
+
+ppd_file_t *ppd;
+int        fd;
+
+fd = open("filename.ppd", O_RDONLY);
+ppd = ppdOpenFd(fd);
+close(fd);
+</PRE>
+
+<H3>See Also</H3>
+
+<A HREF="#ppdClose"><CODE>ppdClose()</CODE></A>,
+<A HREF="#ppdOpen"><CODE>ppdOpen()</CODE></A>,
+<A HREF="#ppdOpenFile"><CODE>ppdOpenFile()</CODE></A>
+
+
+<!-- NEW PAGE --><H2><A NAME="ppdOpenFile">ppdOpenFile()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+ppd_file_t *ppdOpenFile(const char *filename);
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD>filename</TD>
+	<TD>The name of the file to read from</TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<P>A pointer to a PPD file structure or NULL if the PPD file could not be
+read.
+
+<H3>Description</H3>
+
+<P>The <CODE>ppdOpenFile()</CODE> function reads a PPD file from the named
+file into memory.
+
+<H3>Example</H3>
+
+<PRE>
+#include &lt;cups/ppd.h>
+
+ppd_file_t *ppd;
+
+ppd = ppdOpenFile("filename.ppd");
+</PRE>
+
+<H3>See Also</H3>
+
+<A HREF="#ppdClose"><CODE>ppdClose()</CODE></A>,
+<A HREF="#ppdOpen"><CODE>ppdOpen()</CODE></A>,
+<A HREF="#ppdOpenFd"><CODE>ppdOpenFd()</CODE></A>
 
 
 <!-- NEW PAGE --><H2><A NAME="ppdPageLength">ppdPageLength()</A></H2>
@@ -5696,6 +7888,7 @@ user = cupsUser();
 <H3>Usage</H3>
 
 <PRE>
+float ppdPageLength(ppd_file_t *ppd, const char *name);
 </PRE>
 
 <H3>Arguments</H3>
@@ -5706,21 +7899,40 @@ user = cupsUser();
 	<TH>Description</TH>
 </TR>
 <TR>
-	<TD></TD>
-	<TD></TD>
+	<TD>ppd</TD>
+	<TD>The PPD file</TD>
+</TR>
+<TR>
+	<TD>name</TD>
+	<TD>The name of the page size</TD>
 </TR>
 </TABLE></CENTER>
 
 <H3>Returns</H3>
 
+<P>The length of the specified page size in points or 0 if the page size
+does not exist.
+
 <H3>Description</H3>
+
+<P>The <CODE>ppdPageLength()</CODE> function returns the page length of the
+specified page size.
 
 <H3>Example</H3>
 
 <PRE>
+#include &lt;cups/ppd.h>
+
+ppd_file_t *ppd;
+
+printf("Length = %.0f\n", ppdPageLength(ppd, "Letter"));
 </PRE>
 
 <H3>See Also</H3>
+
+<A HREF="#ppdPageLength"><CODE>ppdPageLength()</CODE></A>,
+<A HREF="#ppdPageSize"><CODE>ppdPageSize()</CODE></A>,
+<A HREF="#ppdPageWidth"><CODE>ppdPageWidth()</CODE></A>
 
 
 <!-- NEW PAGE --><H2><A NAME="ppdPageSize">ppdPageSize()</A></H2>
@@ -5728,6 +7940,7 @@ user = cupsUser();
 <H3>Usage</H3>
 
 <PRE>
+ppd_size_t *ppdPageSize(ppd_file_t *ppd, const char *name);
 </PRE>
 
 <H3>Arguments</H3>
@@ -5738,21 +7951,49 @@ user = cupsUser();
 	<TH>Description</TH>
 </TR>
 <TR>
-	<TD></TD>
-	<TD></TD>
+	<TD>ppd</TD>
+	<TD>The PPD file</TD>
+</TR>
+<TR>
+	<TD>name</TD>
+	<TD>The name of the page size</TD>
 </TR>
 </TABLE></CENTER>
 
 <H3>Returns</H3>
 
+<P>A pointer to the page size record of the specified page size in
+points or NULL if the page size does not exist.
+
 <H3>Description</H3>
+
+<P>The <CODE>ppdPageSize()</CODE> function returns the page size record for the
+specified page size.
 
 <H3>Example</H3>
 
 <PRE>
+#include &lt;cups/ppd.h>
+
+ppd_file_t *ppd;
+ppd_size_t *size;
+
+size = ppdPageSize(ppd, "Letter");
+if (size != NULL)
+{
+  printf(" Width = %.0f\n", size->width);
+  printf("Length = %.0f\n", size->length);
+  printf("  Left = %.0f\n", size->left);
+  printf(" Right = %.0f\n", size->right);
+  printf("Bottom = %.0f\n", size->bottom);
+  printf("   Top = %.0f\n", size->top);
+}
 </PRE>
 
 <H3>See Also</H3>
+
+<A HREF="#ppdPageLength"><CODE>ppdPageLength()</CODE></A>,
+<A HREF="#ppdPageWidth"><CODE>ppdPageWidth()</CODE></A>
 
 
 <!-- NEW PAGE --><H2><A NAME="ppdPageWidth">ppdPageWidth()</A></H2>
@@ -5760,6 +8001,7 @@ user = cupsUser();
 <H3>Usage</H3>
 
 <PRE>
+float ppdPageWidth(ppd_file_t *ppd, const char *name);
 </PRE>
 
 <H3>Arguments</H3>
@@ -5770,21 +8012,39 @@ user = cupsUser();
 	<TH>Description</TH>
 </TR>
 <TR>
-	<TD></TD>
-	<TD></TD>
+	<TD>ppd</TD>
+	<TD>The PPD file</TD>
+</TR>
+<TR>
+	<TD>name</TD>
+	<TD>The name of the page size</TD>
 </TR>
 </TABLE></CENTER>
 
 <H3>Returns</H3>
 
+<P>The width of the specified page size in points or 0 if the page size
+does not exist.
+
 <H3>Description</H3>
+
+<P>The <CODE>ppdPageWidth()</CODE> function returns the page width of the
+specified page size.
 
 <H3>Example</H3>
 
 <PRE>
+#include &lt;cups/ppd.h>
+
+ppd_file_t *ppd;
+
+printf("Width = %.0f\n", ppdPageWidth(ppd, "Letter"));
 </PRE>
 
 <H3>See Also</H3>
+
+<A HREF="#ppdPageLength"><CODE>ppdPageLength()</CODE></A>,
+<A HREF="#ppdPageSize"><CODE>ppdPageSize()</CODE></A>
 
 
 </BODY>
