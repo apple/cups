@@ -133,6 +133,11 @@ CHANGES IN CUPS V1.1.9
 	- Added new pseudo-driver/PPD called "raw" that can be
 	  used to create/convert a raw queue.  This also allows
 	  raw queues to be created in the web interface.
+	- The pdftops filter didn't handle image objects that
+	  used JPEG and Flate compression together.
+	- The pstops filter counted pages wrong when using the
+	  N-up and even/odd printing options.  This prevented
+	  the page-ranges option from working properly.
 
 
 CHANGES IN CUPS V1.1.8

@@ -1,5 +1,5 @@
 /*
- * "$Id: pstops.c,v 1.63 2001/06/06 15:11:59 mike Exp $"
+ * "$Id: pstops.c,v 1.64 2001/06/25 14:16:39 mike Exp $"
  *
  *   PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -101,6 +101,7 @@ main(int  argc,			/* I - Number of command-line arguments */
   int		nbytes,		/* Number of bytes read */
 		tbytes;		/* Total bytes to read for binary data */
   int		page;		/* Current page sequence number */
+  int		real_page;	/* "Real" page number in document */
   int		page_count;	/* Page count for NUp */
   int		basepage;	/* Base page number */
   int		subpage;	/* Sub-page number */
@@ -377,7 +378,7 @@ main(int  argc,			/* I - Number of command-line arguments */
     * Then read all of the pages, filtering as needed...
     */
 
-    for (page = 1;;)
+    for (page = 1, real_page = 1;;)
     {
       if (strncmp(line, "%%", 2) == 0)
         fprintf(stderr, "DEBUG: %d %s", level, line);
@@ -397,7 +398,7 @@ main(int  argc,			/* I - Number of command-line arguments */
       }
       else if (strncmp(line, "%%Page:", 7) == 0 && level == 0)
       {
-	if (!check_range(NumPages + 1))
+	if (!check_range(real_page))
 	{
 	  while (psgets(line, sizeof(line), fp) != NULL)
 	    if (strncmp(line, "%%BeginDocument:", 16) == 0 ||
@@ -406,7 +407,10 @@ main(int  argc,			/* I - Number of command-line arguments */
 	    else if (strcmp(line, "%%EndDocument") == 0 && level > 0)
               level --;
 	    else if (strncmp(line, "%%Page:", 7) == 0 && level == 0)
+	    {
+	      real_page ++;
 	      break;
+	    }
 
           continue;
         }
@@ -433,6 +437,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	}
 
 	NumPages ++;
+	real_page ++;
       }
       else if (strncmp(line, "%%BeginBinary:", 14) == 0 ||
                (strncmp(line, "%%BeginData:", 12) == 0 &&
@@ -1101,5 +1106,5 @@ start_nup(int number)	/* I - Page number */
 
 
 /*
- * End of "$Id: pstops.c,v 1.63 2001/06/06 15:11:59 mike Exp $".
+ * End of "$Id: pstops.c,v 1.64 2001/06/25 14:16:39 mike Exp $".
  */
