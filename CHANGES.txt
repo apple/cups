@@ -3,6 +3,7 @@ CHANGES.txt - 04/16/2003
 
 CHANGES IN CUPS V1.1.19rc2
 
+	- Fixed typo and const mismatch in IPP backend.
 	- Updated the man pages for the new configuration
 	  directives.
 	- Updated the SAM for MacOS 10.2, the CUPS drivers for
