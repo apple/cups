@@ -3,7 +3,7 @@
  *
  *   Raster file routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2004 by Easy Software Products.
+ *   Copyright 1997-2005 by Easy Software Products.
  *
  *   This file is part of the CUPS Imaging library.
  *

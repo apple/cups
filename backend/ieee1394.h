@@ -1,5 +1,5 @@
 /*
- * "$Id: ieee1394.h,v 1.1.2.1 2002/05/24 18:15:46 mike Exp $"
+ * "$Id$"
  *
  *   IEEE-1394 header for the Common UNIX Printing System (CUPS).
  *
@@ -99,5 +99,5 @@ extern const char	*ieee1394_error(void);
 
 
 /*
- * End of "$Id: ieee1394.h,v 1.1.2.1 2002/05/24 18:15:46 mike Exp $".
+ * End of "$Id$".
  */

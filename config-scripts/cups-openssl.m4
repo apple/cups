@@ -1,9 +1,9 @@
 dnl
-dnl "$Id: cups-openssl.m4,v 1.4.2.12 2004/06/29 03:46:29 mike Exp $"
+dnl "$Id$"
 dnl
 dnl   OpenSSL/GNUTLS stuff for the Common UNIX Printing System (CUPS).
 dnl
-dnl   Copyright 1997-2004 by Easy Software Products, all rights reserved.
+dnl   Copyright 1997-2005 by Easy Software Products, all rights reserved.
 dnl
 dnl   These coded instructions, statements, and computer programs are the
 dnl   property of Easy Software Products and are protected by Federal
@@ -15,7 +15,7 @@ dnl
 dnl       Attn: CUPS Licensing Information
 dnl       Easy Software Products
 dnl       44141 Airport View Drive, Suite 204
-dnl       Hollywood, Maryland 20636-3142 USA
+dnl       Hollywood, Maryland 20636 USA
 dnl
 dnl       Voice: (301) 373-9600
 dnl       EMail: cups-info@cups.org
@@ -108,5 +108,5 @@ AC_SUBST(EXPORT_SSLLIBS)
 
 
 dnl
-dnl End of "$Id: cups-openssl.m4,v 1.4.2.12 2004/06/29 03:46:29 mike Exp $".
+dnl End of "$Id$".
 dnl

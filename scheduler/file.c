@@ -1,5 +1,5 @@
 /*
- * "$Id: file.c,v 1.1.2.11 2004/10/28 16:12:54 mike Exp $"
+ * "$Id$"
  *
  *   File functions for the Common UNIX Printing System (CUPS).
  *
@@ -8,7 +8,7 @@
  *   our own file functions allows us to provide transparent support of
  *   gzip'd print files, PPD files, etc.
  *
- *   Copyright 1997-2004 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2005 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -993,5 +993,5 @@ cups_write(int        fd,		/* I - File descriptor */
 
 
 /*
- * End of "$Id: file.c,v 1.1.2.11 2004/10/28 16:12:54 mike Exp $".
+ * End of "$Id$".
  */

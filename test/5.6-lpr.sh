@@ -1,10 +1,10 @@
 #!/bin/sh
 #
-# "$Id: 5.6-lpr.sh,v 1.1.2.4 2003/04/23 18:39:23 mike Exp $"
+# "$Id$"
 #
 #   Test the lpr command.
 #
-#   Copyright 1997-2002 by Easy Software Products, all rights reserved.
+#   Copyright 1997-2005 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
 #   property of Easy Software Products and are protected by Federal
@@ -16,9 +16,9 @@
 #       Attn: CUPS Licensing Information
 #       Easy Software Products
 #       44141 Airport View Drive, Suite 204
-#       Hollywood, Maryland 20636-3111 USA
+#       Hollywood, Maryland 20636 USA
 #
-#       Voice: (301) 373-9603
+#       Voice: (301) 373-9600
 #       EMail: cups-info@cups.org
 #         WWW: http://www.cups.org
 #
@@ -67,5 +67,5 @@ fi
 echo ""
 
 #
-# End of "$Id: 5.6-lpr.sh,v 1.1.2.4 2003/04/23 18:39:23 mike Exp $".
+# End of "$Id$".
 #

@@ -1,9 +1,9 @@
 /*
- * "$Id: interpret.c,v 1.1.2.1 2004/08/02 13:15:07 mike Exp $"
+ * "$Id$"
  *
  *   PPD command interpreter for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1993-2004 by Easy Software Products.
+ *   Copyright 1993-2005 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -15,7 +15,7 @@
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
  *       44141 Airport View Drive, Suite 204
- *       Hollywood, Maryland 20636-3142 USA
+ *       Hollywood, Maryland 20636 USA
  *
  *       Voice: (301) 373-9600
  *       EMail: cups-info@cups.org
@@ -540,5 +540,5 @@ exec_code(cups_page_header2_t *h,	/* O - Page header */
 
 
 /*
- * End of "$Id: interpret.c,v 1.1.2.1 2004/08/02 13:15:07 mike Exp $".
+ * End of "$Id$".
  */

@@ -1,9 +1,9 @@
 /*
- * "$Id: gziptoany.c,v 1.1.2.3 2004/08/19 14:17:44 mike Exp $"
+ * "$Id$"
  *
  *   GZIP pre-filter for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1993-2004 by Easy Software Products.
+ *   Copyright 1993-2005 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -127,5 +127,5 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: gziptoany.c,v 1.1.2.3 2004/08/19 14:17:44 mike Exp $".
+ * End of "$Id$".
  */

@@ -1,9 +1,9 @@
 /*
- * "$Id: lppasswd.c,v 1.11.2.6 2005/02/07 00:14:32 mike Exp $"
+ * "$Id$"
  *
  *   MD5 password program for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2004 by Easy Software Products.
+ *   Copyright 1997-2005 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -494,5 +494,5 @@ usage(FILE *fp)		/* I - File to send usage to */
 
 
 /*
- * End of "$Id: lppasswd.c,v 1.11.2.6 2005/02/07 00:14:32 mike Exp $".
+ * End of "$Id$".
  */

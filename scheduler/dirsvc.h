@@ -1,10 +1,10 @@
 /*
- * "$Id: dirsvc.h,v 1.12.2.12 2004/08/23 18:01:56 mike Exp $"
+ * "$Id$"
  *
  *   Directory services definitions for the Common UNIX Printing System
  *   (CUPS) scheduler.
  *
- *   Copyright 1997-2004 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2005 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -148,5 +148,5 @@ extern void	UpdateSLPBrowse(void);
 
 
 /*
- * End of "$Id: dirsvc.h,v 1.12.2.12 2004/08/23 18:01:56 mike Exp $".
+ * End of "$Id$".
  */

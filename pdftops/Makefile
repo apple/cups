@@ -1,9 +1,9 @@
 #
-# "$Id: Makefile,v 1.6.2.13 2004/07/03 03:30:43 mike Exp $"
+# "$Id$"
 #
 #   pdftops filter Makefile for the Common UNIX Printing System (CUPS).
 #
-#   CUPS filter changes Copyright 1997-2004 by Easy Software Products.
+#   CUPS filter changes Copyright 1997-2005 by Easy Software Products.
 #   Xpdf code Copyright 1996-1999 by Derek B. Noonburg
 #
 
@@ -154,5 +154,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile,v 1.6.2.13 2004/07/03 03:30:43 mike Exp $".
+# End of "$Id$".
 #

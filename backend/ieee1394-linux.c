@@ -1,6 +1,6 @@
 #define DEBUG
 /*
- * "$Id: ieee1394-linux.c,v 1.3.2.2 2002/05/29 16:39:16 mike Exp $"
+ * "$Id$"
  *
  *   Linux IEEE-1394 glue for the Common UNIX Printing System (CUPS).
  *
@@ -874,5 +874,5 @@ ieee1394_error(void)
 
 
 /*
- * End of "$Id: ieee1394-linux.c,v 1.3.2.2 2002/05/29 16:39:16 mike Exp $".
+ * End of "$Id$".
  */

@@ -1,9 +1,9 @@
 /*
- * "$Id: job.c,v 1.124.2.99 2004/12/16 20:03:22 mike Exp $"
+ * "$Id$"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2004 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2005 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -2808,5 +2808,5 @@ set_hold_until(job_t *job, 		/* I - Job to update */
 
 
 /*
- * End of "$Id: job.c,v 1.124.2.99 2004/12/16 20:03:22 mike Exp $".
+ * End of "$Id$".
  */
