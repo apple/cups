@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.h,v 1.3 1999/01/24 14:25:11 mike Exp $"
+ * "$Id: conf.h,v 1.4 1999/02/09 22:04:12 mike Exp $"
  *
  *   Configuration file definitions for the Common UNIX Printing System (CUPS)
  *   scheduler.
@@ -30,7 +30,8 @@
 #define LOG_NONE	0
 #define LOG_ERROR	1
 #define LOG_WARN	2
-#define LOG_DEBUG	3
+#define LOG_INFO	3
+#define LOG_DEBUG	4
 
 
 /*
@@ -77,6 +78,7 @@ VAR FILE		*AccessFile	VALUE(NULL),
 					/* Access log file */
 			*ErrorFile	VALUE(NULL);
 					/* Error log file */
+VAR mime_t		*MimeTypes	VALUE(NULL);
 
 
 /*
@@ -89,5 +91,5 @@ extern int	LogMessage(int level, char *message, ...);
 
 
 /*
- * End of "$Id: conf.h,v 1.3 1999/01/24 14:25:11 mike Exp $".
+ * End of "$Id: conf.h,v 1.4 1999/02/09 22:04:12 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.h,v 1.3 1999/01/24 14:25:11 mike Exp $"
+ * "$Id: auth.h,v 1.4 1999/02/09 22:04:10 mike Exp $"
  *
  *   Authorization definitions for the Common UNIX Printing System (CUPS)
  *   scheduler.
@@ -66,11 +66,11 @@ typedef struct
 
 typedef struct
 {
-  char		location[1024];		/* Location of resource */
+  char		location[HTTP_MAX_URI];	/* Location of resource */
   int		length,			/* Length of location string */
 		order_type,		/* Allow or Deny */
 		level;			/* Access level required */
-  char		group_name[16];		/* User group name */
+  char		group_name[MAX_USERPASS];/* User group name */
   int		num_allow;		/* Number of Allow lines */
   mask_t	*allow;			/* Allow lines */
   int		num_deny;		/* Number of Deny lines */
@@ -100,9 +100,9 @@ extern void		DeleteAllLocations(void);
 extern void		DenyHost(location_t *loc, char *name);
 extern void		DenyIP(location_t *loc, unsigned address,
 			       unsigned netmask);
-extern http_code_t	IsAuthorized(client_t *con);
+extern http_status_t	IsAuthorized(client_t *con);
 
 
 /*
- * End of "$Id: auth.h,v 1.3 1999/01/24 14:25:11 mike Exp $".
+ * End of "$Id: auth.h,v 1.4 1999/02/09 22:04:10 mike Exp $".
  */

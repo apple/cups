@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.h,v 1.3 1999/01/24 14:25:11 mike Exp $"
+ * "$Id: printers.h,v 1.4 1999/02/09 22:04:16 mike Exp $"
  *
  *   Printer definitions for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -22,31 +22,6 @@
  *         WWW: http://www.cups.org
  */
 
-/**** INCLUDE LIBCUPS/CUPS.H EVENTUALLY... ****/
-/*
- * Printer status codes...
- */
-
-#  define CUPS_PRINTER_IDLE             0x00
-#  define CUPS_PRINTER_BUSY             0x01
-#  define CUPS_PRINTER_FAULTED          0x02
-#  define CUPS_PRINTER_UNAVAILABLE      0x03
-#  define CUPS_PRINTER_DISABLED         0x04
-#  define CUPS_PRINTER_REJECTING        0x08
-
-/*
- * Printer type/capability codes...
- */
-
-#  define CUPS_PRINTER_BW               0x01    /* Can do B&W printing */
-#  define CUPS_PRINTER_COLOR            0x02    /* Can do color printing */
-#  define CUPS_PRINTER_DUPLEX           0x04    /* Can do duplexing */
-#  define CUPS_PRINTER_ADVANCED         0x08    /* Can sort/staple output */
-#  define CUPS_PRINTER_SMALL            0x10    /* Can do letter/a4 */
-#  define CUPS_PRINTER_MEDIUM           0x20    /* Can do tabloid/a3 */
-#  define CUPS_PRINTER_LARGE            0x40    /* Can do C/D/E/A2/A1/A0 */
-#  define CUPS_PRINTER_CLASS            0x80    /* Printer class */
-
 /*
  * Printer information structure...
  */
@@ -54,21 +29,20 @@
 typedef struct printer_str
 {
   struct printer_str *next;		/* Next printer in list */
-  char		uri[MAX_URI],		/* Printer URI */
-		hostname[MAX_HOST];	/* Host printer resides on */
-  unsigned char	name[MAX_NAME],		/* Printer name */
-		location_code[MAX_NAME],/* Location code */
-		location_text[MAX_NAME],/* Location text */
-		info[MAX_NAME],		/* Description */
-		more_info[MAX_URI],	/* URL for site-specific info */
-		make_model[MAX_NAME],	/* Make and model from PPD file */
-		username[MAX_NAME],	/* Username for remote system */
-		password[MAX_NAME];	/* Password for remote system */
-  int		state,			/* Printer state */
-		type;			/* Printer type (color, small, etc.) */
+  char		uri[HTTP_MAX_URI],	/* Printer URI */
+		hostname[HTTP_MAX_HOST];/* Host printer resides on */
+  unsigned char	name[IPP_MAX_NAME],	/* Printer name */
+		location[IPP_MAX_NAME],	/* Location code */
+		info[IPP_MAX_NAME],	/* Description */
+		more_info[HTTP_MAX_URI],/* URL for site-specific info */
+		make_model[IPP_MAX_NAME],/* Make and model from PPD file */
+		username[MAX_USERPASS],	/* Username for remote system */
+		password[MAX_USERPASS];	/* Password for remote system */
+  ipp_pstate_t	state;			/* Printer state */
+  cups_ptype_t	type;			/* Printer type (color, small, etc.) */
   time_t	state_time;		/* Time at this state */
-  char		ppd[MAX_URI],		/* PPD file name */
-		device_uri[MAX_URI];	/* Device URI */
+  char		ppd[HTTP_MAX_URI],	/* PPD file name */
+		device_uri[HTTP_MAX_URI];/* Device URI */
   void		*job;			/* Current job in queue */
 } printer_t;
 
@@ -95,5 +69,5 @@ extern void		StopPrinter(printer_t *p);
 
 
 /*
- * End of "$Id: printers.h,v 1.3 1999/01/24 14:25:11 mike Exp $".
+ * End of "$Id: printers.h,v 1.4 1999/02/09 22:04:16 mike Exp $".
  */

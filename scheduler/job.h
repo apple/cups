@@ -1,5 +1,5 @@
 /*
- * "$Id: job.h,v 1.2 1999/01/24 14:25:11 mike Exp $"
+ * "$Id: job.h,v 1.3 1999/02/09 22:04:15 mike Exp $"
  *
  *   Print job definition for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -23,15 +23,6 @@
  */
 
 /*
- * Job state constants...
- */
-
-#define JOB_NEW		0
-#define JOB_QUEUED	1
-#define JOB_PRINTING	2
-
-
-/*
  * Job request structure...
  */
 
@@ -39,12 +30,12 @@ typedef struct job_str
 {
   struct job_str *next;			/* Next job in queue */
   int		id,			/* Job ID */
-		priority,		/* Job priority */
-		state;			/* Job state */
-  char		dest[MAX_NAME],		/* Destination printer or class */
-		user[MAX_NAME],		/* Sending user */
-		title[MAX_URI];		/* Job title */
-  char		filename[MAX_NAME];	/* Name of job file */
+		priority;		/* Job priority */
+  ipp_jstate_t	state;			/* Job state */
+  char		dest[IPP_MAX_NAME],	/* Destination printer or class */
+		user[MAX_USERPASS],	/* Sending user */
+		title[IPP_MAX_NAME];	/* Job title */
+  char		filename[HTTP_MAX_URI];	/* Name of job file */
   size_t	offset;			/* Offset to start of file */
   char		**options;		/* Job options, NULL terminated */
   int		*procs;			/* Process IDs, 0 terminated */
@@ -78,5 +69,5 @@ extern void	StopJob(int id);
 
 
 /*
- * End of "$Id: job.h,v 1.2 1999/01/24 14:25:11 mike Exp $".
+ * End of "$Id: job.h,v 1.3 1999/02/09 22:04:15 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.c,v 1.3 1999/01/24 14:25:11 mike Exp $"
+ * "$Id: auth.c,v 1.4 1999/02/09 22:04:10 mike Exp $"
  *
  *   Authorization routines for the Common UNIX Printing System (CUPS).
  *
@@ -254,7 +254,8 @@ IsAuthorized(client_t *con)	/* I - Connection */
   unsigned	address;	/* Authorization address */
   location_t	*loc,		/* Current location */
 		*best;		/* Best match for location so far */
-  int		bestlen;	/* Length of best match */
+  int		bestlen,	/* Length of best match */
+		hostlen;	/* Length of hostname */
   struct passwd	*pw;		/* User password data */
 #ifdef HAVE_SHADOW_H
   struct spwd	*spw;		/* Shadow password data */
@@ -289,26 +290,27 @@ IsAuthorized(client_t *con)	/* I - Connection */
   */
 
   auth    = best->order_type;
-  address = ntohl(con->remote.sin_addr.s_addr);
+  address = ntohl(con->http.hostaddr.sin_addr.s_addr);
+  hostlen = strlen(con->http.hostname);
 
   switch (auth)
   {
     case AUTH_ALLOW : /* Order Deny,Allow */
-        if (check_auth(address, con->remote_host, con->remote_length,
+        if (check_auth(address, con->http.hostname, hostlen,
 	               best->num_deny, best->deny))
 	  auth = AUTH_DENY;
 
-        if (check_auth(address, con->remote_host, con->remote_length,
+        if (check_auth(address, con->http.hostname, hostlen,
 	               best->num_allow, best->allow))
 	  auth = AUTH_ALLOW;
 	break;
 
     case AUTH_DENY : /* Order Allow,Deny */
-        if (check_auth(address, con->remote_host, con->remote_length,
+        if (check_auth(address, con->http.hostname, hostlen,
 	               best->num_allow, best->allow))
 	  auth = AUTH_ALLOW;
 
-        if (check_auth(address, con->remote_host, con->remote_length,
+        if (check_auth(address, con->http.hostname, hostlen,
 	               best->num_deny, best->deny))
 	  auth = AUTH_DENY;
 	break;
@@ -535,5 +537,5 @@ check_auth(unsigned ip,		/* I - Client address */
 
 
 /*
- * End of "$Id: auth.c,v 1.3 1999/01/24 14:25:11 mike Exp $".
+ * End of "$Id: auth.c,v 1.4 1999/02/09 22:04:10 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c,v 1.5 1999/01/24 14:25:11 mike Exp $"
+ * "$Id: main.c,v 1.6 1999/02/09 22:04:15 mike Exp $"
  *
  *   for the Common UNIX Printing System (CUPS).
  *
@@ -109,7 +109,7 @@ main(int  argc,			/* I - Number of command-line arguments */
   * Loop forever...
   */
 
-  while (TRUE)
+  for (;;)
   {
    /*
     * Check if we need to load the server configuration file...
@@ -120,13 +120,13 @@ main(int  argc,			/* I - Number of command-line arguments */
       if (NumClients > 0)
       {
         for (i = NumClients, con = Clients; i > 0; i --, con ++)
-	  if (con->state == HTTP_WAITING)
+	  if (con->http.state == HTTP_WAITING)
 	  {
 	    CloseClient(con);
 	    con --;
 	  }
 	  else
-	    con->keep_alive = 0;
+	    con->http.keep_alive = 0;
 
 	for (i = 0; i < NumListeners; i ++)
 	  FD_CLR(Listeners[i].fd, &InputSet);
@@ -154,7 +154,7 @@ main(int  argc,			/* I - Number of command-line arguments */
     timeout.tv_usec = 0;
 
     for (i = NumClients, con = Clients; i > 0; i --, con ++)
-      if (con->bufused > 0)
+      if (con->http.used > 0)
       {
         timeout.tv_sec  = 0;
 	break;
@@ -176,28 +176,10 @@ main(int  argc,			/* I - Number of command-line arguments */
     for (i = NumClients, con = Clients; i > 0; i --, con ++)
     {
      /*
-      * Read data as needed...
-      */
-
-      if (FD_ISSET(con->fd, &input))
-      {
-        if ((bytes = recv(con->fd, con->buf + con->bufused,
-                          MAX_BUFFER - con->bufused, 0)) <= 0)
-        {
-	  fprintf(stderr, "cupsd: Lost client #%d\n", con->fd);
-          CloseClient(con);
-	  con --;
-	  continue;
-	}
-
-        con->bufused += bytes;
-      }
-
-     /*
       * Process the input buffer...
       */
 
-      if (con->bufused > 0)
+      if (FD_ISSET(con->http.fd, &input) || con->http.used)
         if (!ReadClient(con))
 	{
 	  con --;
@@ -208,7 +190,7 @@ main(int  argc,			/* I - Number of command-line arguments */
       * Write data as needed...
       */
 
-      if (FD_ISSET(con->fd, &output) ||
+      if (FD_ISSET(con->http.fd, &output) ||
           FD_ISSET(con->file, &output))
         if (!WriteClient(con))
 	{
@@ -221,7 +203,7 @@ main(int  argc,			/* I - Number of command-line arguments */
       */
 
       activity = time(NULL) - 30;
-      if (con->activity < activity)
+      if (con->http.activity < activity)
       {
         CloseClient(con);
         con --;
@@ -266,5 +248,5 @@ usage(void)
 
 
 /*
- * End of "$Id: main.c,v 1.5 1999/01/24 14:25:11 mike Exp $".
+ * End of "$Id: main.c,v 1.6 1999/02/09 22:04:15 mike Exp $".
  */

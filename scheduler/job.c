@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.2 1999/01/24 14:25:11 mike Exp $"
+ * "$Id: job.c,v 1.3 1999/02/09 22:04:14 mike Exp $"
  *
  *   for the Common UNIX Printing System (CUPS).
  *
@@ -88,7 +88,7 @@ CancelJob(int id)	/* I - Job to cancel */
       * Stop any processes that are working on the current...
       */
 
-      if (current->state == JOB_PRINTING)
+      if (current->state == IPP_JOB_PROCESSING)
 	StopJob(current->id);
 
      /*
@@ -172,7 +172,7 @@ MoveJob(int id, char *dest)
   for (current = Jobs, prev = NULL; current != NULL; prev = current, current = current->next)
     if (current->id == id)
     {
-      if (current->state == JOB_QUEUED)
+      if (current->state == IPP_JOB_PENDING)
         strcpy(current->dest, dest);
 
       return;
@@ -191,9 +191,9 @@ StopJob(int id)
   for (current = Jobs, prev = NULL; current != NULL; prev = current, current = current->next)
     if (current->id == id)
     {
-      if (current->state == JOB_PRINTING)
+      if (current->state == IPP_JOB_PROCESSING)
       {
-	current->state = JOB_QUEUED;
+	current->state = IPP_JOB_PENDING;
 
         for (i = 0; current->procs[i]; i ++)
 	  kill(current->procs[i], SIGTERM);
@@ -219,10 +219,10 @@ StartJob(int       id,
   for (current = Jobs, prev = NULL; current != NULL; prev = current, current = current->next)
     if (current->id == id)
     {
-      current->state   = JOB_PRINTING;
+      current->state   = IPP_JOB_PROCESSING;
       current->printer = printer;
       printer->job     = current;
-      printer->state   = CUPS_PRINTER_BUSY;
+      printer->state   = IPP_PRINTER_PROCESSING;
 
       /**** DO FORK/EXEC STUFF HERE, TOO! ****/
     }
@@ -238,7 +238,7 @@ CheckJobs(void)
 
 
   for (current = Jobs, prev = NULL; current != NULL; prev = current)
-    if (current->state == JOB_QUEUED)
+    if (current->state == IPP_JOB_PENDING)
     {
       if ((printer = FindPrinter(current->dest)) == NULL)
         printer = FindAvailablePrinter(current->dest);
@@ -263,7 +263,7 @@ CheckJobs(void)
         * See if the printer is available; if so, start the job...
 	*/
 
-        if (printer->state == CUPS_PRINTER_IDLE)
+        if (printer->state == IPP_PRINTER_IDLE)
 	  StartJob(current->id, printer);
 
         current = current->next;
@@ -275,5 +275,5 @@ CheckJobs(void)
 
 
 /*
- * End of "$Id: job.c,v 1.2 1999/01/24 14:25:11 mike Exp $".
+ * End of "$Id: job.c,v 1.3 1999/02/09 22:04:14 mike Exp $".
  */

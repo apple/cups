@@ -1,5 +1,5 @@
 /*
- * "$Id: cupsd.h,v 1.3 1999/01/24 14:25:11 mike Exp $"
+ * "$Id: cupsd.h,v 1.4 1999/02/09 22:04:12 mike Exp $"
  *
  *   Main header file for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -30,11 +30,9 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <limits.h>
-#include <string.h>
 #include <errno.h>
 #include <time.h>
 #include <signal.h>
-#include <unistd.h>
 #include <fcntl.h>
 #include <bstring.h>
 #include <sys/types.h>
@@ -42,19 +40,18 @@
 #include <sys/stat.h>
 #include <sys/wait.h>
 
-#include <mime.h>
-
-#ifdef WIN32
-#  include <windows.h>
-#  include <winsock.h>
+#if defined(WIN32) || defined(__EMX__)
+#  include <direct.h>
 #else
-#  include <sys/socket.h>
-#  include <netdb.h>
-#  include <netinet/in.h>
-#  include <netinet/in_systm.h>
-#  include <netinet/ip.h>
-#  include <netinet/tcp.h>
-#endif /* WIN32 */
+#  include <unistd.h>
+#endif /* WIN32 || __EMX__ */
+
+#include <cups/cups.h>
+#include <cups/string.h>
+#include <cups/mime.h>
+#include <cups/http.h>
+#include <cups/ipp.h>
+#include <cups/language.h>
 
 
 /*
@@ -71,15 +68,10 @@
  * Implementation limits...
  */
 
-#define MAX_NAME		128	/* Max length of printer or class name */
-#define MAX_HOST		256	/* Max length of host name */
-#define MAX_URI			1024	/* Max length of URI */
-#define MAX_STATUS		256	/* Max length of status text */
 #define MAX_BROWSERS		10	/* Maximum number of browse addresses */
 #define MAX_LISTENERS		10	/* Maximum number of listener sockets */
 #define MAX_CLIENTS		100	/* Maximum number of client sockets */
-#define MAX_BUFFER		8192	/* Maximum size of network buffer */
-
+#define MAX_USERPASS		16	/* Maximum size of username/password */
 
 /*
  * Defaults...
@@ -113,8 +105,7 @@
  * Other stuff for the scheduler...
  */
 
-#include "http.h"
-#include "ipp.h"
+#include "client.h"
 #include "auth.h"
 #include "conf.h"
 #include "dirsvc.h"
@@ -130,8 +121,9 @@
 VAR fd_set		InputSet,	/* Input files for select() */
 			OutputSet;	/* Output files for select() */
 
+VAR time_t		StartTime;	/* Time server was started */
 VAR int			NeedReload	VALUE(TRUE);
-					/* Need to load configuration */
+					/* Need to load configuration? */
 
 
 /*
@@ -140,5 +132,5 @@ VAR int			NeedReload	VALUE(TRUE);
 
 
 /*
- * End of "$Id: cupsd.h,v 1.3 1999/01/24 14:25:11 mike Exp $".
+ * End of "$Id: cupsd.h,v 1.4 1999/02/09 22:04:12 mike Exp $".
  */

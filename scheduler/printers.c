@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.3 1999/01/24 14:25:11 mike Exp $"
+ * "$Id: printers.c,v 1.4 1999/02/09 22:04:16 mike Exp $"
  *
  *   for the Common UNIX Printing System (CUPS).
  *
@@ -60,7 +60,7 @@ AddPrinter(char *name)		/* I - Name of printer */
     return (NULL);
 
   strcpy((char *)p->name, name);
-  p->state = CUPS_PRINTER_DISABLED | CUPS_PRINTER_REJECTING;
+  p->state = IPP_PRINTER_STOPPED;
 
  /*
   * Insert the printer in the printer list alphabetically...
@@ -184,7 +184,7 @@ LoadAllPrinters(void)
   FILE		*fp;			/* printers.conf file */
   int		linenum;		/* Current line number */
   int		len;			/* Length of line */
-  char		line[MAX_BUFFER],	/* Line from file */
+  char		line[HTTP_MAX_BUFFER],	/* Line from file */
 		name[256],		/* Parameter name */
 		*nameptr,		/* Pointer into name */
 		*value;			/* Pointer to value */
@@ -195,7 +195,7 @@ LoadAllPrinters(void)
   * Open the printer.conf file...
   */
 
-  sprintf(line, "%s/printers.conf", ServerRoot);
+  sprintf(line, "%s/conf/printers.conf", ServerRoot);
   if ((fp = fopen(line, "r")) == NULL)
     return;
 
@@ -290,11 +290,9 @@ LoadAllPrinters(void)
       strncpy((char *)p->info, value, sizeof(p->info) - 1);
     else if (strcmp(name, "MoreInfo") == 0)
       strncpy((char *)p->more_info, value, sizeof(p->more_info) - 1);
-    else if (strcmp(name, "LocationCode") == 0)
-      strncpy((char *)p->location_code, value, sizeof(p->location_code) - 1);
-    else if (strcmp(name, "LocationText") == 0)
-      strncpy((char *)p->location_text, value, sizeof(p->location_text) - 1);
-    else if (strcmp(name, "Device") == 0)
+    else if (strcmp(name, "Location") == 0)
+      strncpy((char *)p->location, value, sizeof(p->location) - 1);
+    else if (strcmp(name, "DeviceURI") == 0)
       strncpy(p->device_uri, value, sizeof(p->device_uri) - 1);
     else if (strcmp(name, "Username") == 0)
       strncpy((char *)p->username, value, sizeof(p->username) - 1);
@@ -314,14 +312,10 @@ LoadAllPrinters(void)
       * Set the initial queue state...
       */
 
-      if (strcasecmp(value, "available") == 0)
-        p->state = CUPS_PRINTER_IDLE;
-      else if (strcasecmp(value, "disabled") == 0)
-        p->state = CUPS_PRINTER_DISABLED;
-      else if (strcasecmp(value, "rejecting") == 0)
-        p->state = CUPS_PRINTER_REJECTING;
-      else if (strcasecmp(value, "dead") == 0)
-        p->state = CUPS_PRINTER_DISABLED | CUPS_PRINTER_REJECTING;
+      if (strcasecmp(value, "idle") == 0)
+        p->state = IPP_PRINTER_IDLE;
+      else if (strcasecmp(value, "stopped") == 0)
+        p->state = IPP_PRINTER_STOPPED;
     }
 
     /**** Add Order, Deny, Allow, AuthType, and AuthClass stuff! ****/
@@ -350,5 +344,5 @@ StopPrinter(printer_t *p)
 
 
 /*
- * End of "$Id: printers.c,v 1.3 1999/01/24 14:25:11 mike Exp $".
+ * End of "$Id: printers.c,v 1.4 1999/02/09 22:04:16 mike Exp $".
  */
