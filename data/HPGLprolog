@@ -1,0 +1,62 @@
+%%BeginResource procset hpgltops 4.0 0
+%
+% "$Id: HPGLprolog,v 1.1 1999/03/23 18:37:34 mike Exp $"
+%
+%   HP-GL/2 filter procset for the Common UNIX Printing System (CUPS).
+%
+%   This procset contains the basic drawing commands that are used to
+%   reduce output size.  Note the 'MP' (make newpath) definition - this
+%   should be called 'NP' (newpath), but GhostScript uses the 'NP' name
+%   for 'noaccess put' in some of its font files...
+%
+%   Copyright 1993-1999 Easy Software Products
+%
+%   These coded instructions, statements, and computer programs are the
+%   property of Easy Software Products and are protected by Federal
+%   copyright law.  Distribution and use rights are outlined in the file
+%   "LICENSE.txt" which should have been included with this file.  If this
+%   file is missing or damaged please contact Easy Software Products
+%   at:
+%
+%       Attn: CUPS Licensing Information
+%       Easy Software Products
+%       44141 Airport View Drive, Suite 204
+%       Hollywood, Maryland 20636-3111 USA
+%
+%       Voice: (301) 373-9603
+%       EMail: cups-info@cups.org
+%         WWW: http://www.cups.org
+%
+/MO { moveto } bind def
+/LI { lineto } bind def
+/FI { fill } bind def
+/ST { stroke } bind def
+/CP { closepath } bind def
+/MP { newpath } bind def
+%
+% If you have more than 8 pens defined for your HP-GL/2 output you'll
+% need to add P# definitions (# = pen number) to set the appropriate color.
+% If you don't you'll get errors.  The default 8 pens cover the primary
+% colors (white, black, red, green, yellow, blue, magenta, cyan).  Ditto
+% for pen widths (W#).
+%
+% PC and PW commands in the input stream will define/redefine these
+% appropriately, but some packages don't generate them...
+%
+/P0 { 1.0 1.0 1.0 setrgbcolor } bind def
+/P1 { 0.0 0.0 0.0 setrgbcolor } bind def
+/P2 { 1.0 0.0 0.0 setrgbcolor } bind def
+/P3 { 0.0 1.0 0.0 setrgbcolor } bind def
+/P4 { 1.0 1.0 0.0 setrgbcolor } bind def
+/P5 { 0.0 0.0 1.0 setrgbcolor } bind def
+/P6 { 1.0 0.0 1.0 setrgbcolor } bind def
+/P7 { 0.0 1.0 1.0 setrgbcolor } bind def
+/W0 { DefaultPenWidth PenScaling mul setlinewidth } bind def
+/W1 { DefaultPenWidth PenScaling mul setlinewidth } bind def
+/W2 { DefaultPenWidth PenScaling mul setlinewidth } bind def
+/W3 { DefaultPenWidth PenScaling mul setlinewidth } bind def
+/W4 { DefaultPenWidth PenScaling mul setlinewidth } bind def
+/W5 { DefaultPenWidth PenScaling mul setlinewidth } bind def
+/W6 { DefaultPenWidth PenScaling mul setlinewidth } bind def
+/W7 { DefaultPenWidth PenScaling mul setlinewidth } bind def
+%%EndResource
