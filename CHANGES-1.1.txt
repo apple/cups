@@ -3,6 +3,10 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.21rc1
 
+	- The web interface now provides a "Set As Default"
+	  button to set the default printer or class on a server
+	  (STR #577)
+	- The HTTP authentication cache was broken (STR #517)
 	- The cupstestppd utility now fails PPD files that have
 	  a DefaultOption keyword for a non-existance option
 	  name (STR #476)
