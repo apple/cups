@@ -1,5 +1,5 @@
 /*
- * "$Id: classes.c,v 1.44 2002/12/17 19:00:14 swdev Exp $"
+ * "$Id: classes.c,v 1.45 2003/01/24 17:55:05 mike Exp $"
  *
  *   Printer class routines for the Common UNIX Printing System (CUPS).
  *
@@ -301,19 +301,15 @@ printer_t *			/* O - Matching class or NULL */
 FindClass(const char *name)	/* I - Name of class */
 {
   printer_t	*c;		/* Current class/printer */
+  int		diff;		/* Difference */
 
 
   for (c = Printers; c != NULL; c = c->next)
-    switch (strcasecmp(name, c->name))
-    {
-      case 0 : /* name == c->name */
-          if (c->type & (CUPS_PRINTER_CLASS | CUPS_PRINTER_IMPLICIT))
-	    return (c);
-      case 1 : /* name > c->name */
-          break;
-      case -1 : /* name < c->name */
-          return (NULL);
-    }
+    if ((diff = strcasecmp(name, c->name)) == 0 &&
+        (c->type & (CUPS_PRINTER_CLASS | CUPS_PRINTER_IMPLICIT)))
+      return (c);				/* name == c->name */
+    else if (diff < 0)				/* name < c->name */
+      return (NULL);
 
   return (NULL);
 }
@@ -691,5 +687,5 @@ SaveAllClasses(void)
 
 
 /*
- * End of "$Id: classes.c,v 1.44 2002/12/17 19:00:14 swdev Exp $".
+ * End of "$Id: classes.c,v 1.45 2003/01/24 17:55:05 mike Exp $".
  */

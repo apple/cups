@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.134 2002/12/17 19:00:18 swdev Exp $"
+ * "$Id: printers.c,v 1.135 2003/01/24 17:55:06 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -404,6 +404,27 @@ DeletePrinterFilters(printer_t *p)	/* I - Printer to remove from */
 
 
 /*
+ * 'FindDest()' - Find a destination in the list.
+ */
+
+printer_t *			/* O - Destination in list */
+FindDest(const char *name)	/* I - Name of printer or class to find */
+{
+  printer_t	*p;		/* Current destination */
+  int		diff;		/* Difference */
+
+
+  for (p = Printers; p != NULL; p = p->next)
+    if ((diff = strcasecmp(name, p->name)) == 0)/* name == p->name */
+      return (p);
+    else if (diff < 0)				/* name < p->name */
+      return (NULL);
+
+  return (NULL);
+}
+
+
+/*
  * 'FindPrinter()' - Find a printer in the list.
  */
 
@@ -411,19 +432,15 @@ printer_t *			/* O - Printer in list */
 FindPrinter(const char *name)	/* I - Name of printer to find */
 {
   printer_t	*p;		/* Current printer */
+  int		diff;		/* Difference */
 
 
   for (p = Printers; p != NULL; p = p->next)
-    switch (strcasecmp(name, p->name))
-    {
-      case 0 : /* name == p->name */
-          if (!(p->type & CUPS_PRINTER_CLASS))
-	    return (p);
-      case 1 : /* name > p->name */
-          break;
-      case -1 : /* name < p->name */
-          return (NULL);
-    }
+    if ((diff = strcasecmp(name, p->name)) == 0 &&
+        !(p->type & CUPS_PRINTER_CLASS))	/* name == p->name */
+      return (p);
+    else if (diff < 0)				/* name < p->name */
+      return (NULL);
 
   return (NULL);
 }
@@ -2101,5 +2118,5 @@ write_irix_state(printer_t *p)	/* I - Printer to update */
 
 
 /*
- * End of "$Id: printers.c,v 1.134 2002/12/17 19:00:18 swdev Exp $".
+ * End of "$Id: printers.c,v 1.135 2003/01/24 17:55:06 mike Exp $".
  */
