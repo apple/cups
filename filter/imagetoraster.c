@@ -1,5 +1,5 @@
 /*
- * "$Id: imagetoraster.c,v 1.56.2.15 2003/02/11 18:23:31 mike Exp $"
+ * "$Id: imagetoraster.c,v 1.56.2.16 2003/07/28 17:32:38 mike Exp $"
  *
  *   Image file to raster filter for the Common UNIX Printing System (CUPS).
  *
@@ -1542,43 +1542,87 @@ exec_code(cups_page_header2_t *header,	/* I - Page header */
       *ptr = '\0';
     }
     else
-      continue;
+    {
+     /*
+      * Read a single name...
+      */
+
+      for (ptr = value;
+           (isalnum(*code) || *code == '_') &&
+	       (ptr - value) < (sizeof(value) - 1);)
+	*ptr++ = *code++;
+      *ptr = '\0';
+    }
 
    /*
     * Assign the value as needed...
     */
 
-    if (strcmp(name, "cupsMediaType") == 0)
-      header->cupsMediaType = atoi(value);
-    else if (strcmp(name, "cupsBitsPerColor") == 0)
-      header->cupsBitsPerColor = atoi(value);
-    else if (strcmp(name, "cupsColorOrder") == 0)
-      header->cupsColorOrder = (cups_order_t)atoi(value);
-    else if (strcmp(name, "cupsColorSpace") == 0)
-      header->cupsColorSpace = (cups_cspace_t)atoi(value);
-    else if (strcmp(name, "cupsCompression") == 0)
-      header->cupsCompression = atoi(value);
-    else if (strcmp(name, "cupsRowCount") == 0)
-      header->cupsRowCount = atoi(value);
-    else if (strcmp(name, "cupsRowFeed") == 0)
-      header->cupsRowFeed = atoi(value);
-    else if (strcmp(name, "cupsRowStep") == 0)
-      header->cupsRowStep = atoi(value);
-    else if (strcmp(name, "CutMedia") == 0)
-      header->CutMedia = (cups_cut_t)atoi(value);
-    else if (strcmp(name, "HWResolution") == 0)
-      sscanf(value, "%d%d", header->HWResolution + 0, header->HWResolution + 1);
-    else if (strcmp(name, "cupsMediaPosition") == 0 || /* Compatibility */
-             strcmp(name, "MediaPosition") == 0)
-      header->MediaPosition = atoi(value);
-    else if (strcmp(name, "MediaClass") == 0)
+    if (!strcmp(name, "MediaClass"))
       strlcpy(header->MediaClass, value, sizeof(header->MediaClass));
-    else if (strcmp(name, "MediaColor") == 0)
+    else if (!strcmp(name, "MediaColor"))
       strlcpy(header->MediaColor, value, sizeof(header->MediaColor));
-    else if (strcmp(name, "MediaType") == 0)
+    else if (!strcmp(name, "MediaType"))
       strlcpy(header->MediaType, value, sizeof(header->MediaType));
-    else if (strcmp(name, "OutputType") == 0)
+    else if (!strcmp(name, "OutputType"))
       strlcpy(header->OutputType, value, sizeof(header->OutputType));
+    else if (!strcmp(name, "AdvanceDistance"))
+      header->AdvanceDistance = atoi(value);
+    else if (!strcmp(name, "AdvanceMedia"))
+      header->AdvanceMedia = atoi(value);
+    else if (!strcmp(name, "Collate"))
+      header->Collate = !strcmp(value, "true");
+    else if (!strcmp(name, "CutMedia"))
+      header->CutMedia = (cups_cut_t)atoi(value);
+    else if (!strcmp(name, "Duplex"))
+      header->Duplex = !strcmp(value, "true");
+    else if (!strcmp(name, "HWResolution"))
+      sscanf(value, "%d%d", header->HWResolution + 0, header->HWResolution + 1);
+    else if (!strcmp(name, "InsertSheet"))
+      header->InsertSheet = !strcmp(value, "true");
+    else if (!strcmp(name, "Jog"))
+      header->Jog = atoi(value);
+    else if (!strcmp(name, "LeadingEdge"))
+      header->LeadingEdge = atoi(value);
+    else if (!strcmp(name, "Margins"))
+      sscanf(value, "%d%d", header->Margins + 0, header->Margins + 1);
+    else if (!strcmp(name, "ManualFeed"))
+      header->ManualFeed = !strcmp(value, "true");
+    else if (!strcmp(name, "cupsMediaPosition") || /* Compatibility */
+             !strcmp(name, "MediaPosition"))
+      header->MediaPosition = atoi(value);
+    else if (!strcmp(name, "MediaWeight"))
+      header->MediaWeight = atoi(value);
+    else if (!strcmp(name, "MirrorPrint"))
+      header->MirrorPrint = !strcmp(value, "true");
+    else if (!strcmp(name, "NegativePrint"))
+      header->NegativePrint = !strcmp(value, "true");
+    else if (!strcmp(name, "Orientation"))
+      header->Orientation = atoi(value);
+    else if (!strcmp(name, "OutputFaceUp"))
+      header->OutputFaceUp = !strcmp(value, "true");
+    else if (!strcmp(name, "Separations"))
+      header->Separations = !strcmp(value, "true");
+    else if (!strcmp(name, "TraySwitch"))
+      header->TraySwitch = !strcmp(value, "true");
+    else if (!strcmp(name, "Tumble"))
+      header->Tumble = !strcmp(value, "true");
+    else if (!strcmp(name, "cupsMediaType"))
+      header->cupsMediaType = atoi(value);
+    else if (!strcmp(name, "cupsBitsPerColor"))
+      header->cupsBitsPerColor = atoi(value);
+    else if (!strcmp(name, "cupsColorOrder"))
+      header->cupsColorOrder = (cups_order_t)atoi(value);
+    else if (!strcmp(name, "cupsColorSpace"))
+      header->cupsColorSpace = (cups_cspace_t)atoi(value);
+    else if (!strcmp(name, "cupsCompression"))
+      header->cupsCompression = atoi(value);
+    else if (!strcmp(name, "cupsRowCount"))
+      header->cupsRowCount = atoi(value);
+    else if (!strcmp(name, "cupsRowFeed"))
+      header->cupsRowFeed = atoi(value);
+    else if (!strcmp(name, "cupsRowStep"))
+      header->cupsRowStep = atoi(value);
   }
 }
 
@@ -4550,5 +4594,5 @@ make_lut(ib_t  *lut,		/* I - Lookup table */
 
 
 /*
- * End of "$Id: imagetoraster.c,v 1.56.2.15 2003/02/11 18:23:31 mike Exp $".
+ * End of "$Id: imagetoraster.c,v 1.56.2.16 2003/07/28 17:32:38 mike Exp $".
  */
