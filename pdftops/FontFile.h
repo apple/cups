@@ -114,4 +114,57 @@ private:
   int line;			// number of eexec chars on current line
 };
 
+//------------------------------------------------------------------------
+// TrueTypeFontFile
+//------------------------------------------------------------------------
+
+struct TTFontTableHdr;
+
+class TrueTypeFontFile: public FontFile {
+public:
+
+  TrueTypeFontFile(const char *file, int len);
+  ~TrueTypeFontFile();
+
+  // This always returns NULL, since it's probably better to trust the
+  // font name in the PDF file rather than the one in the TrueType
+  // font file.
+  virtual const char *getName();
+
+  virtual FontEncoding *getEncoding(GBool taken);
+
+  // Convert to a Type 42 font, suitable for embedding in a PostScript
+  // file.  The name will be used as the PostScript font name (so we
+  // don't need to depend on the 'name' table in the font).  The
+  // encoding is needed because the PDF Font object can modify the
+  // encoding.
+  void convertToType42(const char *name, FontEncoding *encoding, FILE *out);
+
+private:
+
+  const char *file;
+  int len;
+
+  FontEncoding *encoding;
+  GBool freeEnc;
+
+  TTFontTableHdr *tableHdrs;
+  int nTables;
+  int bbox[4];
+  int locaFmt;
+  int nGlyphs;
+
+  int getByte(int pos);
+  int getChar(int pos);
+  int getUShort(int pos);
+  int getShort(int pos);
+  Guint getULong(int pos);
+  double getFixed(int pos);
+  int seekTable(const char *tag);
+  void cvtEncoding(FontEncoding *encoding, FILE *out);
+  void cvtCharStrings(FontEncoding *encoding, FILE *out);
+  void cvtSfnts(FILE *out);
+  void dumpString(const char *s, int len, FILE *out);
+};
+
 #endif

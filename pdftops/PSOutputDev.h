@@ -147,6 +147,7 @@ private:
   void setupEmbeddedType1Font(Ref *id, const char *psName);
   void setupEmbeddedType1Font(GString *fileName, const char *psName);
   void setupEmbeddedType1CFont(GfxFont *font, Ref *id, const char *psName);
+  void setupEmbeddedTrueTypeFont(GfxFont *font, Ref *id, const char *psName);
   void setupImages(Dict *resDict);
   void setupImage(Ref id, Stream *str);
   void doPath(GfxPath *path);

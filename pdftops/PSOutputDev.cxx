@@ -600,6 +600,11 @@ void PSOutputDev::setupFont(GfxFont *font) {
     psName = font->getEmbeddedFontName();
     setupEmbeddedType1CFont(font, &fontFileID, psName);
 
+  } else if (embedType1 && font->getType() == fontTrueType &&
+	     font->getEmbeddedFontID(&fontFileID)) {
+    psName = font->getEmbeddedFontName();
+    setupEmbeddedTrueTypeFont(font, &fontFileID, psName);
+
   } else if (font->is16Bit() && font->getCharSet16() == font16AdobeJapan12) {
     psName = "Ryumin-Light-RKSJ";
     do16Bit = gTrue;
@@ -878,6 +883,48 @@ void PSOutputDev::setupEmbeddedType1CFont(GfxFont *font, Ref *id,
   cvt = new Type1CFontConverter(fontBuf, fontLen, f);
   cvt->convert();
   delete cvt;
+  gfree((void *)fontBuf);
+
+  // ending comment
+  if (psOutEPS) {
+    writePS("%%%%EndResource\n");
+  }
+}
+
+void PSOutputDev::setupEmbeddedTrueTypeFont(GfxFont *font, Ref *id,
+					    const char *psName) {
+  const char *fontBuf;
+  int fontLen;
+  TrueTypeFontFile *ttFile;
+  int i;
+
+  // check if font is already embedded
+  for (i = 0; i < fontFileIDLen; ++i) {
+    if (fontFileIDs[i].num == id->num &&
+	fontFileIDs[i].gen == id->gen)
+      return;
+  }
+
+  // add entry to fontFileIDs list
+  if (fontFileIDLen >= fontFileIDSize) {
+    fontFileIDSize += 64;
+    fontFileIDs = (Ref *)grealloc(fontFileIDs, fontFileIDSize * sizeof(Ref));
+  }
+  fontFileIDs[fontFileIDLen++] = *id;
+
+  // beginning comment
+  if (psOutEPS) {
+    writePS("%%%%BeginResource: font %s\n", psName);
+    embFontList->append("%%+ font ");
+    embFontList->append(psName);
+    embFontList->append("\n");
+  }
+
+  // convert it to a Type 42 font
+  fontBuf = font->readEmbFontFile(&fontLen);
+  ttFile = new TrueTypeFontFile(fontBuf, fontLen);
+  ttFile->convertToType42(psName, font->getEncoding(), f);
+  delete ttFile;
   gfree((void *)fontBuf);
 
   // ending comment

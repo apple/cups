@@ -1,5 +1,11 @@
-CHANGES.txt - 08/17/2001
+CHANGES.txt - 09/13/2001
 ------------------------
+
+CHANGES IN CUPS V1.1.11
+
+	- Added support for embedded TrueType fonts in PDF
+	  files.
+
 
 CHANGES IN CUPS V1.1.10-1
 
