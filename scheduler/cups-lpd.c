@@ -1,5 +1,5 @@
 /*
- * "$Id: cups-lpd.c,v 1.4 2000/07/17 12:32:00 mike Exp $"
+ * "$Id: cups-lpd.c,v 1.5 2000/08/03 17:20:19 mike Exp $"
  *
  *   Line Printer Daemon interface for the Common UNIX Printing System (CUPS).
  *
@@ -24,6 +24,7 @@
  * Contents:
  *
  *   main()             - Process an incoming LPD request...
+ *   print_file()       - Print a file to a printer or class.
  *   recv_print_job()   - Receive a print job from the client.
  *   send_short_state() - Send the short queue state.
  *   remove_jobs()      - Cancel one or more jobs.
@@ -37,6 +38,8 @@
 #include <cups/string.h>
 #include <cups/language.h>
 #include <stdlib.h>
+#include <errno.h>
+#include <syslog.h>
 #include <ctype.h>
 
 
@@ -95,6 +98,12 @@ main(int  argc,		/* I - Number of command-line arguments */
   setbuf(stdout, NULL);
 
  /*
+  * Log things using the "cups-lpd" name...
+  */
+
+  openlog("cups-lpd", LOG_PID, LOG_LPR);
+
+ /*
   * RFC1179 specifies that only 1 daemon command can be received for
   * every connection.
   */
@@ -105,6 +114,7 @@ main(int  argc,		/* I - Number of command-line arguments */
     * Unable to get command from client!  Send an error status and return.
     */
 
+    syslog(LOG_ERR, "Unable to get command line from client!");
     putchar(1);
     return (1);
   }
@@ -129,6 +139,8 @@ main(int  argc,		/* I - Number of command-line arguments */
   switch (command)
   {
     default : /* Unknown command */
+        syslog(LOG_ERR, "Unknown LPD command 0x%02X!", command);
+        syslog(LOG_ERR, "Command line = %s", line);
 	putchar(1);
 
         status = 1;
@@ -175,12 +187,14 @@ main(int  argc,		/* I - Number of command-line arguments */
 	break;
   }
 
+  closelog();
+
   return (status);
 }
 
 
 /*
- * 'prin_file()' - Print a file to a printer or class.
+ * 'print_file()' - Print a file to a printer or class.
  */
 
 int					/* O - Job ID */
@@ -211,7 +225,10 @@ print_file(const char    *name,		/* I - Printer or class name */
   */
 
   if ((http = httpConnect(cupsServer(), ippPort())) == NULL)
+  {
+    syslog(LOG_ERR, "Unable to connect to server: %s", strerror(errno));
     return (0);
+  }
 
   language = cupsLangDefault();
 
@@ -221,7 +238,10 @@ print_file(const char    *name,		/* I - Printer or class name */
   */
 
   if ((request = ippNew()) == NULL)
+  {
+    syslog(LOG_ERR, "Unable to create request: %s", strerror(errno));
     return (0);
+  }
 
   request->request.op.operation_id = IPP_PRINT_JOB;
   request->request.op.request_id   = 1;
@@ -441,6 +461,11 @@ recv_print_job(const char *dest)	/* I - Destination */
   num_dests = cupsGetDests(&dests);
   if ((destptr = cupsGetDest(queue, instance, num_dests, dests)) == NULL)
   {
+    if (instance)
+      syslog(LOG_ERR, "Unknown destination %s/%s!", queue, instance);
+    else
+      syslog(LOG_ERR, "Unknown destination %s!", queue);
+
     cupsFreeDests(num_dests, dests);
     return (1);
   }
@@ -469,6 +494,7 @@ recv_print_job(const char *dest)	/* I - Destination */
       case 0x02 : /* Receive control file */
           if (strlen(name) < 2)
 	  {
+	    syslog(LOG_ERR, "Bad control file name \"%s\"", name);
 	    putchar(1);
 	    status = 1;
 	    break;
@@ -479,6 +505,7 @@ recv_print_job(const char *dest)	/* I - Destination */
       case 0x03 : /* Receive data file */
           if (strlen(name) < 2)
 	  {
+	    syslog(LOG_ERR, "Bad data file name \"%s\"", name);
 	    putchar(1);
 	    status = 1;
 	    break;
@@ -505,6 +532,8 @@ recv_print_job(const char *dest)	/* I - Destination */
 
     if ((fp = fopen(filename, "wb")) == NULL)
     {
+      syslog(LOG_ERR, "Unable to open temporary file \"%s\" - %s",
+             filename, strerror(errno));
       putchar(1);
       status = 1;
       break;
@@ -1093,5 +1122,5 @@ remove_jobs(const char *dest,		/* I - Destination */
 
 
 /*
- * End of "$Id: cups-lpd.c,v 1.4 2000/07/17 12:32:00 mike Exp $".
+ * End of "$Id: cups-lpd.c,v 1.5 2000/08/03 17:20:19 mike Exp $".
  */
