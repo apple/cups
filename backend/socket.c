@@ -1,5 +1,5 @@
 /*
- * "$Id: socket.c,v 1.17.2.12 2003/01/29 15:38:44 mike Exp $"
+ * "$Id: socket.c,v 1.17.2.13 2003/02/12 16:33:49 mike Exp $"
  *
  *   AppSocket backend for the Common UNIX Printing System (CUPS).
  *
@@ -90,9 +90,9 @@ cups_hstrerror(int error)			/* I - Error number */
  *    printer-uri job-id user title copies options [file]
  */
 
-int			/* O - Exit status */
-main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
-     char *argv[])	/* I - Command-line arguments */
+int				/* O - Exit status */
+main(int  argc,			/* I - Number of command-line arguments (6 or 7) */
+     char *argv[])		/* I - Command-line arguments */
 {
   char		method[255],	/* Method in URI */
 		hostname[1024],	/* Hostname */
@@ -107,8 +107,8 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   struct sockaddr_in addr;	/* Socket address */
   struct hostent *hostaddr;	/* Host address */
   int		wbytes;		/* Number of bytes written */
-  size_t	nbytes,		/* Number of bytes read */
-		tbytes;		/* Total number of bytes written */
+  int		nbytes;		/* Number of bytes read */
+  size_t	tbytes;		/* Total number of bytes written */
   char		buffer[8192],	/* Output buffer */
 		*bufptr;	/* Pointer into buffer */
   struct timeval timeout;	/* Timeout for select() */
@@ -317,8 +317,8 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 	*/
 
 	if ((nbytes = recv(fd, buffer, sizeof(buffer), 0)) > 0)
-	  fprintf(stderr, "INFO: Received %lu bytes of back-channel data!\n",
-	          (unsigned long)nbytes);
+	  fprintf(stderr, "INFO: Received %d bytes of back-channel data!\n",
+	          nbytes);
       }
       else if (argc > 6)
 	fprintf(stderr, "INFO: Sending print file, %lu bytes...\n",
@@ -357,8 +357,8 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 	*/
 
 	if ((nbytes = recv(fd, buffer, sizeof(buffer), 0)) > 0)
-	  fprintf(stderr, "INFO: Received %lu bytes of back-channel data!\n",
-	          (unsigned long)nbytes);
+	  fprintf(stderr, "INFO: Received %d bytes of back-channel data!\n",
+	          nbytes);
         else
 	  break;
       }
@@ -387,5 +387,5 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
 
 /*
- * End of "$Id: socket.c,v 1.17.2.12 2003/01/29 15:38:44 mike Exp $".
+ * End of "$Id: socket.c,v 1.17.2.13 2003/02/12 16:33:49 mike Exp $".
  */
