@@ -1,8 +1,14 @@
-CHANGES.txt - 12/09/2004
+CHANGES.txt - 02/06/2005
 ------------------------
 
 CHANGES IN CUPS V1.2.0b1
 
+	- Updated serial backend to scan for /dev/ttyC* as well
+	  as /dev/ttyc* for Cyclades serial ports (STR #1049)
+	- The scheduler could hang reading the job status under
+	  certain circumstances (STR #1068)
+	- The USB backend termination signal code was inverted
+	  (STR #1046)
 	- Moved enable and disable commands to sbindir to be
 	  consistent.
 	- Updated pdftops filter to Xpdf 3.00.03.

@@ -1,5 +1,5 @@
 /*
- * "$Id: serial.c,v 1.32.2.18 2004/06/29 13:15:08 mike Exp $"
+ * "$Id: serial.c,v 1.32.2.19 2005/02/07 00:14:32 mike Exp $"
  *
  *   Serial port backend for the Common UNIX Printing System (CUPS).
  *
@@ -827,6 +827,14 @@ list_devices(void)
 	printf("serial serial:%s?baud=115200 \"Unknown\" \"Cyclades #%d Serial Port #%d\"\n",
                device, i, j + 1);
       }
+
+      sprintf(device, "/dev/ttyC%d%c", i, funky_hex[j]);
+      if ((fd = open(device, O_WRONLY | O_NOCTTY | O_NDELAY)) >= 0)
+      {
+	close(fd);
+	printf("serial serial:%s?baud=115200 \"Unknown\" \"Cyclades #%d Serial Port #%d\"\n",
+               device, i, j + 1);
+      }
     }
 
  /*
@@ -992,5 +1000,5 @@ list_devices(void)
 
 
 /*
- * End of "$Id: serial.c,v 1.32.2.18 2004/06/29 13:15:08 mike Exp $".
+ * End of "$Id: serial.c,v 1.32.2.19 2005/02/07 00:14:32 mike Exp $".
  */

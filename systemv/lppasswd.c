@@ -1,5 +1,5 @@
 /*
- * "$Id: lppasswd.c,v 1.11.2.5 2004/12/16 19:42:32 mike Exp $"
+ * "$Id: lppasswd.c,v 1.11.2.6 2005/02/07 00:14:32 mike Exp $"
  *
  *   MD5 password program for the Common UNIX Printing System (CUPS).
  *
@@ -449,7 +449,7 @@ main(int  argc,			/* I - Number of command-line arguments */
   */
 
   unlink(passwdold);
-  if (link(passwdmd5, passwdold))
+  if (link(passwdmd5, passwdold) && errno != ENOENT)
   {
     perror("lppasswd: failed to backup old password file");
     unlink(passwdnew);
@@ -494,5 +494,5 @@ usage(FILE *fp)		/* I - File to send usage to */
 
 
 /*
- * End of "$Id: lppasswd.c,v 1.11.2.5 2004/12/16 19:42:32 mike Exp $".
+ * End of "$Id: lppasswd.c,v 1.11.2.6 2005/02/07 00:14:32 mike Exp $".
  */
