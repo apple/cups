@@ -1,5 +1,5 @@
 /*
- * "$Id: config.h.in,v 1.9 1999/09/03 20:43:59 mike Exp $"
+ * "$Id: config.h.in,v 1.10 1999/10/22 17:37:34 mike Exp $"
  *
  *   Configuration file for the Common UNIX Printing System (CUPS).
  *
@@ -28,7 +28,7 @@
  * Version of software...
  */
 
-#define CUPS_SVERSION	"CUPS v1.0b9"
+#define CUPS_SVERSION	"CUPS v1.0.1"
 
 /*
  * Where are files stored?
@@ -83,6 +83,13 @@
 #undef HAVE_STRNCASECMP
 
 /*
+ * Do we have the (v)snprintf() functions?
+ */
+
+#undef HAVE_SNPRINTF
+#undef HAVE_VSNPRINTF
+
+/*
  * What signal functions to use?
  */
 
@@ -97,5 +104,5 @@
 #undef HAVE_WAIT3
 
 /*
- * End of "$Id: config.h.in,v 1.9 1999/09/03 20:43:59 mike Exp $".
+ * End of "$Id: config.h.in,v 1.10 1999/10/22 17:37:34 mike Exp $".
  */

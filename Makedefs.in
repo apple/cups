@@ -1,5 +1,5 @@
 #
-# "$Id: Makedefs.in,v 1.15 1999/09/09 12:28:46 mike Exp $"
+# "$Id: Makedefs.in,v 1.16 1999/10/22 17:37:34 mike Exp $"
 #
 #   Common makefile definitions for the Common UNIX Printing System (CUPS).
 #
@@ -44,7 +44,6 @@ RANLIB	=	@RANLIB@
 RM	=	@RM@ -f
 SED	=	@SED@
 SHELL	=	/bin/sh
-SMBCLIENT =	@SMBCLIENT@
 
 #
 # Libraries...
@@ -135,5 +134,5 @@ SERVERROOT	= 	@CUPS_SERVERROOT@
 	-mv t.$(CAT) $@
 
 #
-# End of "$Id: Makedefs.in,v 1.15 1999/09/09 12:28:46 mike Exp $"
+# End of "$Id: Makedefs.in,v 1.16 1999/10/22 17:37:34 mike Exp $"
 #
