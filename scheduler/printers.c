@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.93.2.66 2004/07/02 20:19:17 mike Exp $"
+ * "$Id: printers.c,v 1.93.2.67 2004/07/02 22:15:51 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -518,7 +518,8 @@ CreateCommonData(void)
   */
 
   for (p = Printers; p; p = p->next)
-    p->op_policy_ptr = FindPolicy(p->op_policy);
+    if ((p->op_policy_ptr = FindPolicy(p->op_policy)) == NULL)
+      p->op_policy_ptr = DefaultPolicyPtr;
 }
 
 
@@ -2486,5 +2487,5 @@ write_irix_state(printer_t *p)		/* I - Printer to update */
 
 
 /*
- * End of "$Id: printers.c,v 1.93.2.66 2004/07/02 20:19:17 mike Exp $".
+ * End of "$Id: printers.c,v 1.93.2.67 2004/07/02 22:15:51 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: policy.c,v 1.1.2.8 2004/06/30 21:18:31 mike Exp $"
+ * "$Id: policy.c,v 1.1.2.9 2004/07/02 22:15:51 mike Exp $"
  *
  *   Policy routines for the Common UNIX Printing System (CUPS).
  *
@@ -189,7 +189,11 @@ CheckPolicy(policy_t   *p,		/* I - Policy */
   */
 
   if (!p || !con)
+  {
+    LogMessage(L_CRIT, "CheckPolicy: p=%p, con=%p!", p, con);
+
     return (0);
+  }
 
  /*
   * Collect info from the request...
@@ -533,5 +537,5 @@ check_op(policyop_t *po,		/* I - Policy operation */
 
 
 /*
- * End of "$Id: policy.c,v 1.1.2.8 2004/06/30 21:18:31 mike Exp $".
+ * End of "$Id: policy.c,v 1.1.2.9 2004/07/02 22:15:51 mike Exp $".
  */
