@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c,v 1.59 2000/09/13 18:47:00 mike Exp $"
+ * "$Id: util.c,v 1.60 2000/09/14 15:03:42 mike Exp $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -177,6 +177,7 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
 		nonce[HTTP_MAX_VALUE],	/* nonce="xyz" string */
 		plain[255],		/* Plaintext username:password */
 		encode[255];		/* Encoded username:password */
+  char		prompt[1024];		/* Prompt string */
 
 
   if (http == NULL || request == NULL || resource == NULL)
@@ -308,10 +309,10 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
       * Nope - get a password from the user...
       */
 
-      printf("Authentication required for %s on %s...\n", cupsUser(),
-             http->hostname);
+      snprintf(prompt, sizeof(prompt), "Password for %s on %s? ", cupsUser(),
+               http->hostname);
 
-      if ((password = cupsGetPassword("UNIX Password: ")) != NULL)
+      if ((password = cupsGetPassword(prompt)) != NULL)
       {
        /*
 	* Got a password; send it to the server...
@@ -687,6 +688,7 @@ cupsGetPPD(const char *name)		/* I - Printer name */
 		plain[255],		/* Plaintext username:password */
 		encode[255];		/* Encoded username:password */
   http_status_t	status;			/* HTTP status from server */
+  char		prompt[1024];		/* Prompt string */
   static char	filename[HTTP_MAX_URI];	/* Local filename */
 
 
@@ -831,10 +833,10 @@ cupsGetPPD(const char *name)		/* I - Printer name */
       * Nope, get a password from the user...
       */
 
-      printf("Authentication required for %s on %s...\n", cupsUser(),
-             cups_server->hostname);
+      snprintf(prompt, sizeof(prompt), "Password for %s on %s? ", cupsUser(),
+               cups_server->hostname);
 
-      if ((password = cupsGetPassword("UNIX Password: ")) != NULL)
+      if ((password = cupsGetPassword(prompt)) != NULL)
       {
        /*
 	* Got a password; send it to the server...
@@ -1427,5 +1429,5 @@ cups_local_auth(http_t *http)	/* I - Connection */
 
 
 /*
- * End of "$Id: util.c,v 1.59 2000/09/13 18:47:00 mike Exp $".
+ * End of "$Id: util.c,v 1.60 2000/09/14 15:03:42 mike Exp $".
  */
