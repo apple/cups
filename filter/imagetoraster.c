@@ -1,5 +1,5 @@
 /*
- * "$Id: imagetoraster.c,v 1.56.2.16 2003/07/28 17:32:38 mike Exp $"
+ * "$Id: imagetoraster.c,v 1.56.2.17 2004/02/25 20:01:37 mike Exp $"
  *
  *   Image file to raster filter for the Common UNIX Printing System (CUPS).
  *
@@ -1479,7 +1479,7 @@ exec_code(cups_page_header2_t *header,	/* I - Page header */
     */
 
     code ++;
-    for (ptr = name; isalnum(*code) && (ptr - name) < (sizeof(name) - 1);)
+    for (ptr = name; isalnum(*code & 255) && (ptr - name) < (sizeof(name) - 1);)
       *ptr++ = *code++;
     *ptr = '\0';
 
@@ -1487,7 +1487,7 @@ exec_code(cups_page_header2_t *header,	/* I - Page header */
     * The parse the value as needed...
     */
 
-    while (isspace(*code))
+    while (isspace(*code & 255))
       code ++;
 
     if (*code == '\0')
@@ -1519,7 +1519,7 @@ exec_code(cups_page_header2_t *header,	/* I - Page header */
         if (*code == '\\')
 	{
 	  code ++;
-	  if (isdigit(*code))
+	  if (isdigit(*code & 255))
 	    *ptr++ = (char)strtol(code, (char **)&code, 8);
           else
 	    *ptr++ = *code++;
@@ -1529,14 +1529,14 @@ exec_code(cups_page_header2_t *header,	/* I - Page header */
 
       *ptr = '\0';
     }
-    else if (isdigit(*code) || *code == '-')
+    else if (isdigit(*code & 255) || *code == '-')
     {
      /*
       * Read single number...
       */
 
       for (ptr = value;
-           (isdigit(*code) || *code == '-') &&
+           (isdigit(*code & 255) || *code == '-') &&
 	       (ptr - value) < (sizeof(value) - 1);)
 	*ptr++ = *code++;
       *ptr = '\0';
@@ -1548,7 +1548,7 @@ exec_code(cups_page_header2_t *header,	/* I - Page header */
       */
 
       for (ptr = value;
-           (isalnum(*code) || *code == '_') &&
+           (isalnum(*code & 255) || *code == '_') &&
 	       (ptr - value) < (sizeof(value) - 1);)
 	*ptr++ = *code++;
       *ptr = '\0';
@@ -4594,5 +4594,5 @@ make_lut(ib_t  *lut,		/* I - Lookup table */
 
 
 /*
- * End of "$Id: imagetoraster.c,v 1.56.2.16 2003/07/28 17:32:38 mike Exp $".
+ * End of "$Id: imagetoraster.c,v 1.56.2.17 2004/02/25 20:01:37 mike Exp $".
  */

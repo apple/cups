@@ -1,5 +1,5 @@
 /*
- * "$Id: pstops.c,v 1.54.2.47 2004/02/24 20:16:42 mike Exp $"
+ * "$Id: pstops.c,v 1.54.2.48 2004/02/25 20:01:37 mike Exp $"
  *
  *   PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -1131,7 +1131,7 @@ check_range(int page)	/* I - Page number */
       if (*range == '-')
       {
         range ++;
-	if (!isdigit(*range))
+	if (!isdigit(*range & 255))
 	  upper = 65535;
 	else
 	  upper = strtol(range, (char **)&range, 10);
@@ -1892,5 +1892,5 @@ start_nup(int number,			/* I - Page number */
 
 
 /*
- * End of "$Id: pstops.c,v 1.54.2.47 2004/02/24 20:16:42 mike Exp $".
+ * End of "$Id: pstops.c,v 1.54.2.48 2004/02/25 20:01:37 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: mime.c,v 1.7.2.10 2003/03/28 22:29:49 mike Exp $"
+ * "$Id: mime.c,v 1.7.2.11 2004/02/25 20:01:37 mike Exp $"
  *
  *   MIME database file routines for the Common UNIX Printing System (CUPS).
  *
@@ -348,7 +348,7 @@ load_types(mime_t     *mime,		/* I - MIME database */
 
     while (*lineptr != '/' && *lineptr != '\n' && *lineptr != '\0' &&
            (temp - super + 1) < MIME_MAX_SUPER)
-      *temp++ = tolower(*lineptr++);
+      *temp++ = tolower(*lineptr++ & 255);
 
     *temp = '\0';
 
@@ -360,7 +360,7 @@ load_types(mime_t     *mime,		/* I - MIME database */
 
     while (*lineptr != ' ' && *lineptr != '\t' && *lineptr != '\n' &&
            *lineptr != '\0' && (temp - type + 1) < MIME_MAX_TYPE)
-      *temp++ = tolower(*lineptr++);
+      *temp++ = tolower(*lineptr++ & 255);
 
     *temp = '\0';
 
@@ -424,7 +424,7 @@ load_convs(mime_t     *mime,		/* I - MIME database */
     */
 
     for (lineptr = line + strlen(line) - 1;
-         lineptr >= line && isspace(*lineptr);
+         lineptr >= line && isspace(*lineptr & 255);
 	 lineptr --)
       *lineptr = '\0';
 
@@ -444,7 +444,7 @@ load_convs(mime_t     *mime,		/* I - MIME database */
 
     while (*lineptr != '/' && *lineptr != '\n' && *lineptr != '\0' &&
            (temp - super + 1) < MIME_MAX_SUPER)
-      *temp++ = tolower(*lineptr++);
+      *temp++ = tolower(*lineptr++ & 255);
 
     *temp = '\0';
 
@@ -456,7 +456,7 @@ load_convs(mime_t     *mime,		/* I - MIME database */
 
     while (*lineptr != ' ' && *lineptr != '\t' && *lineptr != '\n' &&
            *lineptr != '\0' && (temp - type + 1) < MIME_MAX_TYPE)
-      *temp++ = tolower(*lineptr++);
+      *temp++ = tolower(*lineptr++ & 255);
 
     *temp = '\0';
 
@@ -515,7 +515,7 @@ load_convs(mime_t     *mime,		/* I - MIME database */
 
     while (*lineptr != '/' && *lineptr != '\n' && *lineptr != '\0' &&
            (temp - super + 1) < MIME_MAX_SUPER)
-      *temp++ = tolower(*lineptr++);
+      *temp++ = tolower(*lineptr++ & 255);
 
     *temp = '\0';
 
@@ -527,7 +527,7 @@ load_convs(mime_t     *mime,		/* I - MIME database */
 
     while (*lineptr != ' ' && *lineptr != '\t' && *lineptr != '\n' &&
            *lineptr != '\0' && (temp - type + 1) < MIME_MAX_TYPE)
-      *temp++ = tolower(*lineptr++);
+      *temp++ = tolower(*lineptr++ & 255);
 
     *temp = '\0';
 
@@ -583,5 +583,5 @@ delete_rules(mime_magic_t *rules)	/* I - Rules to free */
 
 
 /*
- * End of "$Id: mime.c,v 1.7.2.10 2003/03/28 22:29:49 mike Exp $".
+ * End of "$Id: mime.c,v 1.7.2.11 2004/02/25 20:01:37 mike Exp $".
  */

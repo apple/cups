@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp-var.c,v 1.23.2.18 2004/02/24 16:38:17 mike Exp $"
+ * "$Id: ipp-var.c,v 1.23.2.19 2004/02/25 20:01:37 mike Exp $"
  *
  *   IPP variable routines for the Common UNIX Printing System (CUPS).
  *
@@ -67,7 +67,7 @@ ippGetAttributes(ipp_t      *request,	/* I - IPP request */
   if (lang != NULL)
   {
     for (i = 0; lang[i] && i < 15; i ++)
-      if (isalnum(lang[i]))
+      if (isalnum(lang[i] & 255))
         locale[i] = tolower(lang[i]);
       else
         locale[i] = '_';
@@ -546,5 +546,5 @@ ippSetCGIVars(ipp_t      *response,	/* I - Response data to be copied... */
 
 
 /*
- * End of "$Id: ipp-var.c,v 1.23.2.18 2004/02/24 16:38:17 mike Exp $".
+ * End of "$Id: ipp-var.c,v 1.23.2.19 2004/02/25 20:01:37 mike Exp $".
  */

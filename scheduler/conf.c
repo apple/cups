@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.77.2.48 2004/02/24 21:36:59 mike Exp $"
+ * "$Id: conf.c,v 1.77.2.49 2004/02/25 20:01:37 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -1530,13 +1530,13 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 
 	      if (units && *units)
 	      {
-        	if (tolower(units[0]) == 'g')
+        	if (tolower(units[0] & 255) == 'g')
 		  n *= 1024 * 1024 * 1024;
-        	else if (tolower(units[0]) == 'm')
+        	else if (tolower(units[0] & 255) == 'm')
 		  n *= 1024 * 1024;
-		else if (tolower(units[0]) == 'k')
+		else if (tolower(units[0] & 255) == 'k')
 		  n *= 1024;
-		else if (tolower(units[0]) == 't')
+		else if (tolower(units[0] & 255) == 't')
 		  n *= 262144;
 	      }
 
@@ -1618,7 +1618,7 @@ read_location(cups_file_t *fp,		/* I - Configuration file */
 
     len = strlen(line);
 
-    while (len > 0 && isspace(line[len - 1]))
+    while (len > 0 && isspace(line[len - 1] & 255))
     {
       len --;
       line[len] = '\0';
@@ -1628,14 +1628,14 @@ read_location(cups_file_t *fp,		/* I - Configuration file */
     * Extract the name from the beginning of the line...
     */
 
-    for (value = line; isspace(*value); value ++);
+    for (value = line; isspace(*value & 255); value ++);
 
-    for (nameptr = name; *value != '\0' && !isspace(*value) &&
+    for (nameptr = name; *value != '\0' && !isspace(*value & 255) &&
                              nameptr < (name + sizeof(name) - 1);)
       *nameptr++ = *value++;
     *nameptr = '\0';
 
-    while (isspace(*value))
+    while (isspace(*value & 255))
       value ++;
 
     if (name[0] == '\0')
@@ -1657,7 +1657,7 @@ read_location(cups_file_t *fp,		/* I - Configuration file */
       while (*value)
       {
         for (valptr = value;
-	     !isspace(*valptr) && *valptr != '>' && *valptr;
+	     !isspace(*valptr & 255) && *valptr != '>' && *valptr;
 	     valptr ++);
 
 	if (*valptr)
@@ -1681,7 +1681,7 @@ read_location(cups_file_t *fp,		/* I - Configuration file */
 	  LogMessage(L_WARN, "Unknown request type %s on line %d!", value,
 	             linenum);
 
-        for (value = valptr; isspace(*value) || *value == '>'; value ++);
+        for (value = valptr; isspace(*value & 255) || *value == '>'; value ++);
       }
 
       if (strcasecmp(name, "<LimitExcept") == 0)
@@ -1744,7 +1744,7 @@ read_location(cups_file_t *fp,		/* I - Configuration file */
 
 	value += 4;
 
-	while (isspace(*value))
+	while (isspace(*value & 255))
 	  value ++;
       }
 
@@ -1786,7 +1786,7 @@ read_location(cups_file_t *fp,		/* I - Configuration file */
 	else
 	  DenyIP(loc, ones, zeros);
       }
-      else if (value[0] == '*' || value[0] == '.' || !isdigit(value[0]))
+      else if (value[0] == '*' || value[0] == '.' || !isdigit(value[0] & 255))
       {
        /*
         * Host or domain name...
@@ -1903,7 +1903,7 @@ read_location(cups_file_t *fp,		/* I - Configuration file */
       */
 
       for (valptr = value;
-	   !isspace(*valptr) && *valptr != '>' && *valptr;
+	   !isspace(*valptr & 255) && *valptr != '>' && *valptr;
 	   valptr ++);
 
       if (*valptr)
@@ -1927,14 +1927,14 @@ read_location(cups_file_t *fp,		/* I - Configuration file */
 
       for (value = valptr; *value;)
       {
-        for (valptr = value; !isspace(*valptr) && *valptr; valptr ++);
+        for (valptr = value; !isspace(*valptr & 255) && *valptr; valptr ++);
 
 	if (*valptr)
 	  *valptr++ = '\0';
 
         AddName(loc, value);
 
-        for (value = valptr; isspace(*value); value ++);
+        for (value = valptr; isspace(*value & 255); value ++);
       }
     }
     else if (strcasecmp(name, "Satisfy") == 0)
@@ -2043,7 +2043,7 @@ get_address(const char  *value,		/* I - Value string */
 
   if (portname[0] != '\0')
   {
-    if (isdigit(portname[0]))
+    if (isdigit(portname[0] & 255))
     {
 #ifdef AF_INET6
       if (address->addr.sa_family == AF_INET6)
@@ -2306,5 +2306,5 @@ CDSAGetServerCerts(void)
 
 
 /*
- * End of "$Id: conf.c,v 1.77.2.48 2004/02/24 21:36:59 mike Exp $".
+ * End of "$Id: conf.c,v 1.77.2.49 2004/02/25 20:01:37 mike Exp $".
  */

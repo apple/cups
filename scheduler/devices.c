@@ -1,5 +1,5 @@
 /*
- * "$Id: devices.c,v 1.14.2.4 2003/01/07 18:27:19 mike Exp $"
+ * "$Id: devices.c,v 1.14.2.5 2004/02/25 20:01:37 mike Exp $"
  *
  *   Device scanning routines for the Common UNIX Printing System (CUPS).
  *
@@ -23,7 +23,9 @@
  *
  * Contents:
  *
- *   LoadDevices() - Load all available devices.
+ *   LoadDevices()     - Load all available devices.
+ *   compare_devs()    - Compare PPD file make and model names for sorting.
+ *   sigalrm_handler() - Handle alarm signals for backends that get hung
  */
 
 /*
@@ -342,12 +344,12 @@ LoadDevices(const char *d)	/* I - Directory to scan */
 
 
 /*
- * 'compare_devs()' - Compare PPD file make and model names for sorting.
+ * 'compare_devs()' - Compare device names for sorting.
  */
 
 static int				/* O - Result of comparison */
-compare_devs(const dev_info_t *d0,	/* I - First PPD file */
-             const dev_info_t *d1)	/* I - Second PPD file */
+compare_devs(const dev_info_t *d0,	/* I - First device */
+             const dev_info_t *d1)	/* I - Second device */
 {
   const char	*s,			/* First name */
 		*t;			/* Second name */
@@ -369,7 +371,7 @@ compare_devs(const dev_info_t *d0,	/* I - First PPD file */
 
   while (*s && *t)
   {
-    if (isdigit(*s) && isdigit(*t))
+    if (isdigit(*s & 255) && isdigit(*t & 255))
     {
      /*
       * Got a number; start by skipping leading 0's...
@@ -384,7 +386,7 @@ compare_devs(const dev_info_t *d0,	/* I - First PPD file */
       * Skip equal digits...
       */
 
-      while (isdigit(*s) && *s == *t)
+      while (isdigit(*s & 255) && *s == *t)
       {
         s ++;
 	t ++;
@@ -394,11 +396,11 @@ compare_devs(const dev_info_t *d0,	/* I - First PPD file */
       * Bounce out if *s and *t aren't both digits...
       */
 
-      if (isdigit(*s) && !isdigit(*t))
+      if (isdigit(*s & 255) && !isdigit(*t & 255))
         return (1);
-      else if (!isdigit(*s) && isdigit(*t))
+      else if (!isdigit(*s & 255) && isdigit(*t & 255))
         return (-1);
-      else if (!isdigit(*s) || !isdigit(*t))
+      else if (!isdigit(*s & 255) || !isdigit(*t & 255))
         continue;     
 
       if (*s < *t)
@@ -414,13 +416,13 @@ compare_devs(const dev_info_t *d0,	/* I - First PPD file */
       s ++;
       t ++;
 
-      while (isdigit(*s))
+      while (isdigit(*s & 255))
       {
         digits ++;
 	s ++;
       }
 
-      while (isdigit(*t))
+      while (isdigit(*t & 255))
       {
         digits --;
 	t ++;
@@ -478,5 +480,5 @@ sigalrm_handler(int sig)	/* I - Signal number */
 
 
 /*
- * End of "$Id: devices.c,v 1.14.2.4 2003/01/07 18:27:19 mike Exp $".
+ * End of "$Id: devices.c,v 1.14.2.5 2004/02/25 20:01:37 mike Exp $".
  */

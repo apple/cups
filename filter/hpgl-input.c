@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-input.c,v 1.10.2.4 2003/11/07 21:43:36 mike Exp $"
+ * "$Id: hpgl-input.c,v 1.10.2.5 2004/02/25 20:01:37 mike Exp $"
  *
  *   HP-GL/2 input processing for the Common UNIX Printing System (CUPS).
  *
@@ -117,7 +117,7 @@ ParseCommand(FILE    *fp,	/* I - File to read from */
 	    }
 
         default : /* HP RTL/PCL control */
-            while ((i = getc(fp)) != EOF && !isupper(i));
+            while ((i = getc(fp)) != EOF && !isupper(i & 255));
             break;
       }
   } while (ch < ' ');
@@ -243,5 +243,5 @@ FreeParameters(int     num_params,	/* I - Number of parameters */
 
 
 /*
- * End of "$Id: hpgl-input.c,v 1.10.2.4 2003/11/07 21:43:36 mike Exp $".
+ * End of "$Id: hpgl-input.c,v 1.10.2.5 2004/02/25 20:01:37 mike Exp $".
  */

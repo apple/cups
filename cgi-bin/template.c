@@ -1,5 +1,5 @@
 /*
- * "$Id: template.c,v 1.22.2.5 2003/07/20 15:41:18 mike Exp $"
+ * "$Id: template.c,v 1.22.2.6 2004/02/25 20:01:37 mike Exp $"
  *
  *   CGI template function.
  *
@@ -96,7 +96,7 @@ cgiCopyTemplateLang(FILE       *out,		/* I - Output file */
   if (lang != NULL)
   {
     for (i = 0; lang[i] && i < 15; i ++)
-      if (isalnum(lang[i]))
+      if (isalnum(lang[i] & 255))
         locale[i] = tolower(lang[i]);
       else
         locale[i] = '_';
@@ -189,7 +189,7 @@ cgi_copy(FILE *out,		/* I - Output file */
 
       *s = '\0';
 
-      if (s == name && isspace(ch))
+      if (s == name && isspace(ch & 255))
       {
         if (out)
 	{
@@ -210,7 +210,7 @@ cgi_copy(FILE *out,		/* I - Output file */
         * Insert value only if it exists...
 	*/
 
-	if ((nameptr = strrchr(name, '-')) != NULL && isdigit(nameptr[1]))
+	if ((nameptr = strrchr(name, '-')) != NULL && isdigit(nameptr[1] & 255))
 	{
 	  *nameptr++ = '\0';
 
@@ -254,7 +254,7 @@ cgi_copy(FILE *out,		/* I - Output file */
 	int  count;	/* Number of elements */
 
 
-        if (isdigit(name[1]))
+        if (isdigit(name[1] & 255))
 	  count = atoi(name + 1);
 	else
           count = cgiGetSize(name + 1);
@@ -280,7 +280,7 @@ cgi_copy(FILE *out,		/* I - Output file */
         * Insert variable or variable name (if element is NULL)...
 	*/
 
-	if ((nameptr = strrchr(name, '-')) != NULL && isdigit(nameptr[1]))
+	if ((nameptr = strrchr(name, '-')) != NULL && isdigit(nameptr[1] & 255))
 	{
 	  *nameptr++ = '\0';
 	  if ((value = cgiGetArray(name, atoi(nameptr) - 1)) == NULL)
@@ -367,7 +367,7 @@ cgi_copy(FILE *out,		/* I - Output file */
             if (innername[0] == '#')
 	      sprintf(s, "%d", cgiGetSize(innername + 1));
 	    else if ((innerptr = strrchr(innername, '-')) != NULL &&
-	             isdigit(innerptr[1]))
+	             isdigit(innerptr[1] & 255))
             {
 	      *innerptr++ = '\0';
 	      if ((innerval = cgiGetArray(innername, atoi(innerptr) - 1)) == NULL)
@@ -488,5 +488,5 @@ cgi_puts(const char *s,
 
 
 /*
- * End of "$Id: template.c,v 1.22.2.5 2003/07/20 15:41:18 mike Exp $".
+ * End of "$Id: template.c,v 1.22.2.6 2004/02/25 20:01:37 mike Exp $".
  */

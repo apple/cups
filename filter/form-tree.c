@@ -1,5 +1,5 @@
 /*
- * "$Id: form-tree.c,v 1.4.2.3 2003/01/07 18:26:51 mike Exp $"
+ * "$Id: form-tree.c,v 1.4.2.4 2004/02/25 20:01:37 mike Exp $"
  *
  *   CUPS form document tree routines for the Common UNIX Printing
  *   System (CUPS).
@@ -202,7 +202,7 @@ formRead(FILE   *fp,			/* I - File to read from */
 
     if (p == NULL || !p->preformatted)
     {
-      while (isspace(ch))
+      while (isspace(ch & 255))
       {
         have_whitespace = 1;
         ch              = getc(fp);
@@ -288,7 +288,7 @@ formRead(FILE   *fp,			/* I - File to read from */
           for (glyphptr = glyph;
                (ch = getc(fp)) != EOF && (glyphptr - glyph) < 15;
                glyphptr ++)
-            if (!isalnum(ch))
+            if (!isalnum(ch & 255))
               break;
             else
               *glyphptr = ch;
@@ -335,14 +335,14 @@ formRead(FILE   *fp,			/* I - File to read from */
       if (have_whitespace)
         *ptr++ = ' ';
 
-      while (!isspace(ch) && ch != '<' && ch != EOF && ptr < (s + sizeof(s) - 1))
+      while (!isspace(ch & 255) && ch != '<' && ch != EOF && ptr < (s + sizeof(s) - 1))
       {
         if (ch == '&')
         {
           for (glyphptr = glyph;
                (ch = getc(fp)) != EOF && (glyphptr - glyph) < 15;
                glyphptr ++)
-            if (!isalnum(ch))
+            if (!isalnum(ch & 255))
               break;
             else
               *glyphptr = ch;
@@ -368,7 +368,7 @@ formRead(FILE   *fp,			/* I - File to read from */
         ch = getc(fp);
       }
 
-      if (isspace(ch))
+      if (isspace(ch & 255))
         *ptr++ = ' ';
 
       *ptr = '\0';
@@ -468,7 +468,7 @@ parse_attr(tree_t *t,			/* I - Current tree node */
 
   ptr = name;
   while ((ch = getc(fp)) != EOF)
-    if (isalnum(ch))
+    if (isalnum(ch & 255))
     {
       if (ptr < (name + sizeof(name) - 1))
         *ptr++ = ch;
@@ -478,7 +478,7 @@ parse_attr(tree_t *t,			/* I - Current tree node */
 
   *ptr = '\0';
 
-  while (isspace(ch) || ch == '\r')
+  while (isspace(ch & 255) || ch == '\r')
     ch = getc(fp);
 
   switch (ch)
@@ -492,7 +492,7 @@ parse_attr(tree_t *t,			/* I - Current tree node */
         ptr = value;
         ch  = getc(fp);
 
-        while (isspace(ch) || ch == '\r')
+        while (isspace(ch & 255) || ch == '\r')
           ch = getc(fp);
 
         if (ch == EOF)
@@ -522,7 +522,7 @@ parse_attr(tree_t *t,			/* I - Current tree node */
         {
           *ptr++ = ch;
           while ((ch = getc(fp)) != EOF)
-            if (isspace(ch) || ch == '>' || ch == '/' || ch == '\r')
+            if (isspace(ch & 255) || ch == '>' || ch == '/' || ch == '\r')
               break;
             else if (ptr < (value + sizeof(value) - 1))
               *ptr++ = ch;
@@ -556,7 +556,7 @@ parse_element(tree_t *t,		/* I - Current tree node */
   eptr = element;
 
   while ((ch = getc(fp)) != EOF && eptr < (element + sizeof(element) - 1))
-    if (ch == '>' || ch == '/' || isspace(ch))
+    if (ch == '>' || ch == '/' || isspace(ch & 255))
       break;
     else
       *eptr++ = ch;
@@ -602,7 +602,7 @@ parse_element(tree_t *t,		/* I - Current tree node */
   {
     while (ch != EOF && ch != '>' && ch != '/')
     {
-      if (!isspace(ch))
+      if (!isspace(ch & 255))
       {
         ungetc(ch, fp);
         parse_variable(t, fp);
@@ -620,5 +620,5 @@ parse_element(tree_t *t,		/* I - Current tree node */
 
 
 /*
- * End of "$Id: form-tree.c,v 1.4.2.3 2003/01/07 18:26:51 mike Exp $".
+ * End of "$Id: form-tree.c,v 1.4.2.4 2004/02/25 20:01:37 mike Exp $".
  */

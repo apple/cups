@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.93.2.55 2004/02/24 21:36:59 mike Exp $"
+ * "$Id: printers.c,v 1.93.2.56 2004/02/25 20:01:37 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -823,7 +823,7 @@ LoadAllPrinters(void)
 
     len = strlen(line);
 
-    while (len > 0 && isspace(line[len - 1]))
+    while (len > 0 && isspace(line[len - 1] & 255))
     {
       len --;
       line[len] = '\0';
@@ -833,14 +833,14 @@ LoadAllPrinters(void)
     * Extract the name from the beginning of the line...
     */
 
-    for (value = line; isspace(*value); value ++);
+    for (value = line; isspace(*value & 255); value ++);
 
-    for (nameptr = name; *value != '\0' && !isspace(*value) &&
+    for (nameptr = name; *value != '\0' && !isspace(*value & 255) &&
                              nameptr < (name + sizeof(name) - 1);)
       *nameptr++ = *value++;
     *nameptr = '\0';
 
-    while (isspace(*value))
+    while (isspace(*value & 255))
       value ++;
 
     if (name[0] == '\0')
@@ -929,7 +929,7 @@ LoadAllPrinters(void)
       * Set the initial queue state message...
       */
 
-      while (isspace(*value))
+      while (isspace(*value & 255))
         value ++;
 
       strlcpy(p->state_message, value, sizeof(p->state_message));
@@ -951,19 +951,19 @@ LoadAllPrinters(void)
       * Set the initial job sheets...
       */
 
-      for (valueptr = value; *valueptr && !isspace(*valueptr); valueptr ++);
+      for (valueptr = value; *valueptr && !isspace(*valueptr & 255); valueptr ++);
 
       if (*valueptr)
         *valueptr++ = '\0';
 
       SetString(&p->job_sheets[0], value);
 
-      while (isspace(*valueptr))
+      while (isspace(*valueptr & 255))
         valueptr ++;
 
       if (*valueptr)
       {
-        for (value = valueptr; *valueptr && !isspace(*valueptr); valueptr ++);
+        for (value = valueptr; *valueptr && !isspace(*valueptr & 255); valueptr ++);
 
 	if (*valueptr)
           *valueptr++ = '\0';
@@ -1714,10 +1714,10 @@ SetPrinterReasons(printer_t  *p,	/* I - Printer */
     * Skip leading whitespace and commas...
     */
 
-    while (isspace(*sptr) || *sptr == ',')
+    while (isspace(*sptr & 255) || *sptr == ',')
       sptr ++;
 
-    for (rptr = reason; *sptr && !isspace(*sptr) && *sptr != ','; sptr ++)
+    for (rptr = reason; *sptr && !isspace(*sptr & 255) && *sptr != ','; sptr ++)
       if (rptr < (reason + sizeof(reason) - 1))
         *rptr++ = *sptr;
 
@@ -2415,5 +2415,5 @@ write_irix_state(printer_t *p)		/* I - Printer to update */
 
 
 /*
- * End of "$Id: printers.c,v 1.93.2.55 2004/02/24 21:36:59 mike Exp $".
+ * End of "$Id: printers.c,v 1.93.2.56 2004/02/25 20:01:37 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: image.c,v 1.28.2.4 2003/01/07 18:26:56 mike Exp $"
+ * "$Id: image.c,v 1.28.2.5 2004/02/25 20:01:37 mike Exp $"
  *
  *   Base image support for the Common UNIX Printing System (CUPS).
  *
@@ -277,13 +277,13 @@ ImageSetMaxTiles(image_t *img,		/* I - Image to set */
           max_size *= 4 * TILE_SIZE * TILE_SIZE;
 	  break;
       case 2 :
-          if (tolower(cache_units[0]) == 'g')
+          if (tolower(cache_units[0] & 255) == 'g')
 	    max_size *= 1024 * 1024 * 1024;
-          else if (tolower(cache_units[0]) == 'm')
+          else if (tolower(cache_units[0] & 255) == 'm')
 	    max_size *= 1024 * 1024;
-	  else if (tolower(cache_units[0]) == 'k')
+	  else if (tolower(cache_units[0] & 255) == 'k')
 	    max_size *= 1024;
-	  else if (tolower(cache_units[0]) == 't')
+	  else if (tolower(cache_units[0] & 255) == 't')
 	    max_size *= 4 * TILE_SIZE * TILE_SIZE;
 	  break;
     }
@@ -771,5 +771,5 @@ flush_tile(image_t *img)	/* I - Image */
 
 
 /*
- * End of "$Id: image.c,v 1.28.2.4 2003/01/07 18:26:56 mike Exp $".
+ * End of "$Id: image.c,v 1.28.2.5 2004/02/25 20:01:37 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: ppds.c,v 1.14.2.12 2003/09/04 14:48:14 mike Exp $"
+ * "$Id: ppds.c,v 1.14.2.13 2004/02/25 20:01:37 mike Exp $"
  *
  *   PPD scanning routines for the Common UNIX Printing System (CUPS).
  *
@@ -300,7 +300,7 @@ compare_ppds(const ppd_info_t *p0,	/* I - First PPD file */
 
   while (*s && *t)
   {
-    if (isdigit(*s) && isdigit(*t))
+    if (isdigit(*s & 255) && isdigit(*t & 255))
     {
      /*
       * Got a number; start by skipping leading 0's...
@@ -315,7 +315,7 @@ compare_ppds(const ppd_info_t *p0,	/* I - First PPD file */
       * Skip equal digits...
       */
 
-      while (isdigit(*s) && *s == *t)
+      while (isdigit(*s & 255) && *s == *t)
       {
         s ++;
 	t ++;
@@ -325,11 +325,11 @@ compare_ppds(const ppd_info_t *p0,	/* I - First PPD file */
       * Bounce out if *s and *t aren't both digits...
       */
 
-      if (isdigit(*s) && !isdigit(*t))
+      if (isdigit(*s & 255) && !isdigit(*t & 255))
         return (1);
-      else if (!isdigit(*s) && isdigit(*t))
+      else if (!isdigit(*s & 255) && isdigit(*t & 255))
         return (-1);
-      else if (!isdigit(*s) || !isdigit(*t))
+      else if (!isdigit(*s & 255) || !isdigit(*t & 255))
         continue;     
 
       if (*s < *t)
@@ -345,13 +345,13 @@ compare_ppds(const ppd_info_t *p0,	/* I - First PPD file */
       s ++;
       t ++;
 
-      while (isdigit(*s))
+      while (isdigit(*s & 255))
       {
         digits ++;
 	s ++;
       }
 
-      while (isdigit(*t))
+      while (isdigit(*t & 255))
       {
         digits --;
 	t ++;
@@ -368,9 +368,9 @@ compare_ppds(const ppd_info_t *p0,	/* I - First PPD file */
       else if (diff)
         return (diff);
     }
-    else if (tolower(*s) < tolower(*t))
+    else if (tolower(*s & 255) < tolower(*t & 255))
       return (-1);
-    else if (tolower(*s) > tolower(*t))
+    else if (tolower(*s & 255) > tolower(*t & 255))
       return (1);
     else
     {
@@ -587,7 +587,7 @@ load_ppds(const char *d,		/* I - Actual directory */
     else
       strcpy(make_model, model_name);
 
-    while (isspace(make_model[0]))
+    while (isspace(make_model[0] & 255))
       cups_strcpy(make_model, make_model + 1);
 
     if (!make_model[0])
@@ -597,7 +597,7 @@ load_ppds(const char *d,		/* I - Actual directory */
     * See if we got a manufacturer...
     */
 
-    while (isspace(manufacturer[0]))
+    while (isspace(manufacturer[0] & 255))
       cups_strcpy(manufacturer, manufacturer + 1);
 
     if (!manufacturer[0] || strcmp(manufacturer, "ESP") == 0)
@@ -780,5 +780,5 @@ load_ppds(const char *d,		/* I - Actual directory */
 
 
 /*
- * End of "$Id: ppds.c,v 1.14.2.12 2003/09/04 14:48:14 mike Exp $".
+ * End of "$Id: ppds.c,v 1.14.2.13 2004/02/25 20:01:37 mike Exp $".
  */

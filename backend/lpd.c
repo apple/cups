@@ -1,5 +1,5 @@
 /*
- * "$Id: lpd.c,v 1.28.2.29 2004/02/24 21:51:36 mike Exp $"
+ * "$Id: lpd.c,v 1.28.2.30 2004/02/25 20:01:36 mike Exp $"
  *
  *   Line Printer Daemon backend for the Common UNIX Printing System (CUPS).
  *
@@ -392,7 +392,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
     */
 
     for (ptr = title; *ptr; ptr ++)
-      if (!isalnum(*ptr) && !isspace(*ptr))
+      if (!isalnum(*ptr & 255) && !isspace(*ptr & 255))
 	*ptr = '_';
   }
 
@@ -1028,5 +1028,5 @@ sigterm_handler(int sig)		/* I - Signal */
 
 
 /*
- * End of "$Id: lpd.c,v 1.28.2.29 2004/02/24 21:51:36 mike Exp $".
+ * End of "$Id: lpd.c,v 1.28.2.30 2004/02/25 20:01:36 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: texttops.c,v 1.34.2.12 2003/01/07 18:27:01 mike Exp $"
+ * "$Id: texttops.c,v 1.34.2.13 2004/02/25 20:01:37 mike Exp $"
  *
  *   Text to PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -294,7 +294,7 @@ WriteProlog(const char *title,		/* I - Title of job */
     */
 
     line[strlen(line) - 1] = '\0'; /* Drop \n */
-    for (lineptr = line + 7; isspace(*lineptr); lineptr ++); /* Skip whitespace */
+    for (lineptr = line + 7; isspace(*lineptr & 255); lineptr ++); /* Skip whitespace */
 
     if (strcmp(lineptr, "8bit") == 0)
     {
@@ -329,7 +329,7 @@ WriteProlog(const char *title,		/* I - Title of job */
         start = strtol(lineptr, &lineptr, 16);
 	end   = strtol(lineptr, &lineptr, 16);
 
-	while (isspace(*lineptr))
+	while (isspace(*lineptr & 255))
 	  lineptr ++;
 
         if (!*lineptr)
@@ -337,7 +337,7 @@ WriteProlog(const char *title,		/* I - Title of job */
 
 	valptr = lineptr;
 
-	while (!isspace(*lineptr) && *lineptr)
+	while (!isspace(*lineptr & 255) && *lineptr)
 	  lineptr ++;
 
 	if (!*lineptr)
@@ -368,12 +368,12 @@ WriteProlog(const char *title,		/* I - Title of job */
 	* Got the direction, now get the width...
 	*/
 
-	while (isspace(*lineptr))
+	while (isspace(*lineptr & 255))
 	  lineptr ++;
 
 	valptr = lineptr;
 
-	while (!isspace(*lineptr) && *lineptr)
+	while (!isspace(*lineptr & 255) && *lineptr)
 	  lineptr ++;
 
 	if (!*lineptr)
@@ -406,12 +406,12 @@ WriteProlog(const char *title,		/* I - Title of job */
 
 	for (i = 0; *lineptr && i < 4; i ++)
 	{
-	  while (isspace(*lineptr))
+	  while (isspace(*lineptr & 255))
 	    lineptr ++;
 
 	  valptr = lineptr;
 
-	  while (!isspace(*lineptr) && *lineptr)
+	  while (!isspace(*lineptr & 255) && *lineptr)
 	    lineptr ++;
 
           if (*lineptr)
@@ -496,12 +496,12 @@ WriteProlog(const char *title,		/* I - Title of job */
         start = strtol(lineptr, &lineptr, 16);
 	end   = strtol(lineptr, &lineptr, 16);
 
-	while (isspace(*lineptr))
+	while (isspace(*lineptr & 255))
 	  lineptr ++;
 
 	valptr = lineptr;
 
-	while (!isspace(*lineptr) && *lineptr)
+	while (!isspace(*lineptr & 255) && *lineptr)
 	  lineptr ++;
 
 	if (!*lineptr)
@@ -532,12 +532,12 @@ WriteProlog(const char *title,		/* I - Title of job */
 	* Got the direction, now get the width...
 	*/
 
-	while (isspace(*lineptr))
+	while (isspace(*lineptr & 255))
 	  lineptr ++;
 
 	valptr = lineptr;
 
-	while (!isspace(*lineptr) && *lineptr)
+	while (!isspace(*lineptr & 255) && *lineptr)
 	  lineptr ++;
 
 	if (!*lineptr)
@@ -570,12 +570,12 @@ WriteProlog(const char *title,		/* I - Title of job */
 
 	for (i = 0; *lineptr && i < 4; i ++)
 	{
-	  while (isspace(*lineptr))
+	  while (isspace(*lineptr & 255))
 	    lineptr ++;
 
 	  valptr = lineptr;
 
-	  while (!isspace(*lineptr) && *lineptr)
+	  while (!isspace(*lineptr & 255) && *lineptr)
 	    lineptr ++;
 
           if (*lineptr)
@@ -1071,7 +1071,7 @@ write_line(int     row,		/* I - Row number (0 to N) */
 	while (col < SizeColumns && line->ch != 0 && attr == line->attr)
 	{
           if (Directions[Chars[line->ch] / 256] > 0 &&
-	      !ispunct(line->ch) && !isspace(line->ch))
+	      !ispunct(line->ch & 255) && !isspace(line->ch & 255))
 	    break;
 
 	  col ++;
@@ -1079,7 +1079,7 @@ write_line(int     row,		/* I - Row number (0 to N) */
 	}
 
         for (i = 1; start < line; i ++, start ++)
-	  if (!isspace(start->ch))
+	  if (!isspace(start->ch & 255))
 	    write_string(col - i, row, 1, start);
       }
     }
@@ -1299,5 +1299,5 @@ write_text(const char *s)	/* I - String to write */
 
 
 /*
- * End of "$Id: texttops.c,v 1.34.2.12 2003/01/07 18:27:01 mike Exp $".
+ * End of "$Id: texttops.c,v 1.34.2.13 2004/02/25 20:01:37 mike Exp $".
  */

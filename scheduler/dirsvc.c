@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.73.2.45 2004/02/24 19:04:05 mike Exp $"
+ * "$Id: dirsvc.c,v 1.73.2.46 2004/02/25 20:01:37 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -1304,7 +1304,7 @@ UpdateCUPSBrowse(void)
     if (*pptr == '\"')
       pptr ++;
 
-    while (*pptr && isspace(*pptr))
+    while (*pptr && isspace(*pptr & 255))
       pptr ++;
 
     if (*pptr == '\"')
@@ -1320,7 +1320,7 @@ UpdateCUPSBrowse(void)
       if (*pptr == '\"')
 	pptr ++;
 
-      while (*pptr && isspace(*pptr))
+      while (*pptr && isspace(*pptr & 255))
 	pptr ++;
 
       if (*pptr == '\"')
@@ -1969,5 +1969,5 @@ UpdateSLPBrowse(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.73.2.45 2004/02/24 19:04:05 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.73.2.46 2004/02/25 20:01:37 mike Exp $".
  */

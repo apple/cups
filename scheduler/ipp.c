@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.127.2.78 2004/02/17 21:32:58 mike Exp $"
+ * "$Id: ipp.c,v 1.127.2.79 2004/02/25 20:01:37 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -2333,7 +2333,7 @@ copy_banner(client_t   *con,	/* I - Client connection */
       */
 
       for (s = attrname; (ch = cupsFileGetChar(in)) != EOF;)
-        if (!isalpha(ch) && ch != '-' && ch != '?')
+        if (!isalpha(ch & 255) && ch != '-' && ch != '?')
           break;
 	else if (s < (attrname + sizeof(attrname) - 1))
           *s++ = ch;
@@ -2602,7 +2602,7 @@ copy_model(const char *from,		/* I - Source file */
     */
 
     strlcpy(system_paper, paper_result, sizeof(system_paper));
-    system_paper[0] = toupper(system_paper[0]);
+    system_paper[0] = toupper(system_paper[0] & 255);
 
     num_defaults = ppd_add_default("PageSize", system_paper, 
 				   num_defaults, &defaults);
@@ -4419,7 +4419,7 @@ ppd_parse_line(const char *line,	/* I - Line */
   * Read the option name...
   */
 
-  for (line += 8, olen --; isalnum(*line); line ++)
+  for (line += 8, olen --; isalnum(*line & 255); line ++)
     if (olen > 0)
     {
       *option++ = *line;
@@ -4444,10 +4444,10 @@ ppd_parse_line(const char *line,	/* I - Line */
   * Now grab the option choice, skipping leading whitespace...
   */
 
-  while (isspace(*line))
+  while (isspace(*line & 255))
     line ++;
 
-  for (clen --; isalnum(*line); line ++)
+  for (clen --; isalnum(*line & 255); line ++)
     if (clen > 0)
     {
       *choice++ = *line;
@@ -6914,5 +6914,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.127.2.78 2004/02/17 21:32:58 mike Exp $".
+ * End of "$Id: ipp.c,v 1.127.2.79 2004/02/25 20:01:37 mike Exp $".
  */

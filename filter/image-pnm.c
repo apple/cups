@@ -1,5 +1,5 @@
 /*
- * "$Id: image-pnm.c,v 1.7.2.5 2003/01/07 18:26:54 mike Exp $"
+ * "$Id: image-pnm.c,v 1.7.2.6 2004/02/25 20:01:37 mike Exp $"
  *
  *   Portable Any Map file routines for the Common UNIX Printing System (CUPS).
  *
@@ -80,17 +80,17 @@ ImageReadPNM(image_t    *img,		/* IO - Image */
   lineptr ++;
 
   format = atoi(lineptr);
-  while (isdigit(*lineptr))
+  while (isdigit(*lineptr & 255))
     lineptr ++;
 
   while (lineptr != NULL && img->xsize == 0)
   {
     if (*lineptr == '\0' || *lineptr == '#')
       lineptr = fgets(line, sizeof(line), fp);
-    else if (isdigit(*lineptr))
+    else if (isdigit(*lineptr & 255))
     {
       img->xsize = atoi(lineptr);
-      while (isdigit(*lineptr))
+      while (isdigit(*lineptr & 255))
 	lineptr ++;
     }
     else
@@ -101,10 +101,10 @@ ImageReadPNM(image_t    *img,		/* IO - Image */
   {
     if (*lineptr == '\0' || *lineptr == '#')
       lineptr = fgets(line, sizeof(line), fp);
-    else if (isdigit(*lineptr))
+    else if (isdigit(*lineptr & 255))
     {
       img->ysize = atoi(lineptr);
-      while (isdigit(*lineptr))
+      while (isdigit(*lineptr & 255))
 	lineptr ++;
     }
     else
@@ -119,10 +119,10 @@ ImageReadPNM(image_t    *img,		/* IO - Image */
     {
       if (*lineptr == '\0' || *lineptr == '#')
 	lineptr = fgets(line, sizeof(line), fp);
-      else if (isdigit(*lineptr))
+      else if (isdigit(*lineptr & 255))
       {
 	maxval = atoi(lineptr);
-	while (isdigit(*lineptr))
+	while (isdigit(*lineptr & 255))
 	  lineptr ++;
       }
       else
@@ -302,5 +302,5 @@ ImageReadPNM(image_t    *img,		/* IO - Image */
 
 
 /*
- * End of "$Id: image-pnm.c,v 1.7.2.5 2003/01/07 18:26:54 mike Exp $".
+ * End of "$Id: image-pnm.c,v 1.7.2.6 2004/02/25 20:01:37 mike Exp $".
  */

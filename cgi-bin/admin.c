@@ -1,5 +1,5 @@
 /*
- * "$Id: admin.c,v 1.22.2.25 2003/09/30 15:14:17 mike Exp $"
+ * "$Id: admin.c,v 1.22.2.26 2004/02/25 20:01:37 mike Exp $"
  *
  *   Administration CGI for the Common UNIX Printing System (CUPS).
  *
@@ -1234,7 +1234,7 @@ do_config_printer(http_t      *http,	/* I - HTTP connection */
         strlcpy(keyword, line + 8, sizeof(keyword));
 
 	for (keyptr = keyword; *keyptr; keyptr ++)
-	  if (*keyptr == ':' || isspace(*keyptr))
+	  if (*keyptr == ':' || isspace(*keyptr & 255))
 	    break;
 
         *keyptr = '\0';
@@ -1597,5 +1597,5 @@ get_line(char *buf,	/* I - Line buffer */
 
 
 /*
- * End of "$Id: admin.c,v 1.22.2.25 2003/09/30 15:14:17 mike Exp $".
+ * End of "$Id: admin.c,v 1.22.2.26 2004/02/25 20:01:37 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.124.2.83 2004/02/03 12:56:07 mike Exp $"
+ * "$Id: job.c,v 1.124.2.84 2004/02/25 20:01:37 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -1682,8 +1682,8 @@ StartJob(int       id,			/* I - Job ID */
         snprintf(language, sizeof(language), "LANG=%c%c_%c%c",
 	         attr->values[0].string.text[0],
 		 attr->values[0].string.text[1],
-		 toupper(attr->values[0].string.text[3]),
-		 toupper(attr->values[0].string.text[4]));
+		 toupper(attr->values[0].string.text[3] & 255),
+		 toupper(attr->values[0].string.text[4] & 255));
         break;
   }
 
@@ -2322,7 +2322,7 @@ UpdateJob(job_t *job)		/* I - Job to check */
     * Skip leading whitespace in the message...
     */
 
-    while (isspace(*message))
+    while (isspace(*message & 255))
       message ++;
 
    /*
@@ -2877,5 +2877,5 @@ set_hold_until(job_t *job, 		/* I - Job to update */
 
 
 /*
- * End of "$Id: job.c,v 1.124.2.83 2004/02/03 12:56:07 mike Exp $".
+ * End of "$Id: job.c,v 1.124.2.84 2004/02/25 20:01:37 mike Exp $".
  */
