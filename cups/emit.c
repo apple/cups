@@ -1,5 +1,5 @@
 /*
- * "$Id: emit.c,v 1.16 2000/07/21 14:55:00 mike Exp $"
+ * "$Id: emit.c,v 1.17 2000/08/01 15:43:24 mike Exp $"
  *
  *   PPD code emission routines for the Common UNIX Printing System (CUPS).
  *
@@ -25,8 +25,10 @@
  *
  * Contents:
  *
- *   ppdEmit()     - Emit code for marked options to a file.
- *   ppdEmitFd()   - Emit code for marked options to a file.
+ *   ppdCollect() - Collect all marked options that reside in the specified
+ *   ppdEmit()    - Emit code for marked options to a file.
+ *   ppdEmitFd()  - Emit code for marked options to a file.
+ *   ppd_sort()   - Sort options by ordering numbers...
  */
 
 /*
@@ -49,8 +51,88 @@
  */
 
 static int	ppd_sort(ppd_choice_t **c1, ppd_choice_t **c2);
-static int	ppd_collect(ppd_file_t *ppd, ppd_section_t section,
-		            ppd_choice_t ***choices);
+
+
+/*
+ * 'ppdCollect()' - Collect all marked options that reside in the specified
+ *                  section.
+ */
+
+int					/* O - Number of options marked */
+ppdCollect(ppd_file_t    *ppd,		/* I - PPD file data */
+           ppd_section_t section,	/* I - Section to collect */
+           ppd_choice_t  ***choices)	/* O - Pointers to choices */
+{
+  int		i, j, k, m;		/* Looping vars */
+  ppd_group_t	*g,			/* Current group */
+		*sg;			/* Current sub-group */
+  ppd_option_t	*o;			/* Current option */
+  ppd_choice_t	*c;			/* Current choice */
+  int		count;			/* Number of choices collected */
+  ppd_choice_t	**collect;		/* Collected choices */
+
+
+  if (ppd == NULL)
+    return (0);
+
+ /*
+  * Allocate memory for up to 1000 selected choices...
+  */
+
+  count   = 0;
+  collect = calloc(sizeof(ppd_choice_t *), 1000);
+
+ /*
+  * Loop through all options and add choices as needed...
+  */
+
+  for (i = ppd->num_groups, g = ppd->groups; i > 0; i --, g ++)
+  {
+    for (j = g->num_options, o = g->options; j > 0; j --, o ++)
+      if (o->section == section)
+	for (k = o->num_choices, c = o->choices; k > 0; k --, c ++)
+	  if (c->marked && count < 1000)
+	  {
+            collect[count] = c;
+	    count ++;
+	  }
+
+    for (j = g->num_subgroups, sg = g->subgroups; j > 0; j --, sg ++)
+      for (k = sg->num_options, o = sg->options; k > 0; k --, o ++)
+	if (o->section == section)
+	  for (m = o->num_choices, c = o->choices; m > 0; m --, c ++)
+	    if (c->marked && count < 1000)
+	    {
+              collect[count] = c;
+	      count ++;
+	    }
+  }
+
+ /*
+  * If we have more than 1 marked choice, sort them...
+  */
+
+  if (count > 1)
+    qsort(collect, count, sizeof(ppd_choice_t *),
+          (int (*)(const void *, const void *))ppd_sort);
+
+ /*
+  * Return the array and number of choices; if 0, free the array since
+  * it isn't needed.
+  */
+
+  if (count > 0)
+  {
+    *choices = collect;
+    return (count);
+  }
+  else
+  {
+    *choices = NULL;
+    free(collect);
+    return (0);
+  }
+}
 
 
 /*
@@ -68,7 +150,7 @@ ppdEmit(ppd_file_t    *ppd,		/* I - PPD file record */
   ppd_size_t	*size;			/* Custom page size */
 
 
-  if ((count = ppd_collect(ppd, section, &choices)) == 0)
+  if ((count = ppdCollect(ppd, section, &choices)) == 0)
     return (0);
 
   for (i = 0; i < count; i ++)
@@ -159,7 +241,7 @@ ppdEmitFd(ppd_file_t    *ppd,		/* I - PPD file record */
   char		buf[1024];		/* Output buffer for feature */
 
 
-  if ((count = ppd_collect(ppd, section, &choices)) == 0)
+  if ((count = ppdCollect(ppd, section, &choices)) == 0)
     return (0);
 
   for (i = 0; i < count; i ++)
@@ -219,87 +301,5 @@ ppd_sort(ppd_choice_t **c1,	/* I - First choice */
 
 
 /*
- * 'ppd_collect()' - Collect all marked options that reside in the specified
- *                   section.
- */
-
-static int				/* O - Number of options marked */
-ppd_collect(ppd_file_t    *ppd,		/* I - PPD file data */
-            ppd_section_t section,	/* I - Section to collect */
-            ppd_choice_t  ***choices)	/* O - Pointers to choices */
-{
-  int		i, j, k, m;		/* Looping vars */
-  ppd_group_t	*g,			/* Current group */
-		*sg;			/* Current sub-group */
-  ppd_option_t	*o;			/* Current option */
-  ppd_choice_t	*c;			/* Current choice */
-  int		count;			/* Number of choices collected */
-  ppd_choice_t	**collect;		/* Collected choices */
-
-
-  if (ppd == NULL)
-    return (0);
-
- /*
-  * Allocate memory for up to 1000 selected choices...
-  */
-
-  count   = 0;
-  collect = calloc(sizeof(ppd_choice_t *), 1000);
-
- /*
-  * Loop through all options and add choices as needed...
-  */
-
-  for (i = ppd->num_groups, g = ppd->groups; i > 0; i --, g ++)
-  {
-    for (j = g->num_options, o = g->options; j > 0; j --, o ++)
-      if (o->section == section)
-	for (k = o->num_choices, c = o->choices; k > 0; k --, c ++)
-	  if (c->marked && count < 1000)
-	  {
-            collect[count] = c;
-	    count ++;
-	  }
-
-    for (j = g->num_subgroups, sg = g->subgroups; j > 0; j --, sg ++)
-      for (k = sg->num_options, o = sg->options; k > 0; k --, o ++)
-	if (o->section == section)
-	  for (m = o->num_choices, c = o->choices; m > 0; m --, c ++)
-	    if (c->marked && count < 1000)
-	    {
-              collect[count] = c;
-	      count ++;
-	    }
-  }
-
- /*
-  * If we have more than 1 marked choice, sort them...
-  */
-
-  if (count > 1)
-    qsort(collect, count, sizeof(ppd_choice_t *),
-          (int (*)(const void *, const void *))ppd_sort);
-
- /*
-  * Return the array and number of choices; if 0, free the array since
-  * it isn't needed.
-  */
-
-  if (count > 0)
-  {
-    *choices = collect;
-    return (count);
-  }
-  else
-  {
-    *choices = NULL;
-    free(collect);
-    return (0);
-  }
-}
-
-
-/*
- * End of "$Id: emit.c,v 1.16 2000/07/21 14:55:00 mike Exp $".
+ * End of "$Id: emit.c,v 1.17 2000/08/01 15:43:24 mike Exp $".
  */

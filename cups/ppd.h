@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.h,v 1.20 2000/04/12 20:03:50 mike Exp $"
+ * "$Id: ppd.h,v 1.21 2000/08/01 15:43:24 mike Exp $"
  *
  *   PostScript Printer Description definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -207,6 +207,8 @@ typedef struct			/**** Files ****/
  */
 
 extern void		ppdClose(ppd_file_t *ppd);
+extern int		ppdCollect(ppd_file_t *ppd, ppd_section_t section,
+			           ppd_choice_t  ***choices);
 extern int		ppdConflicts(ppd_file_t *ppd);
 extern int		ppdEmit(ppd_file_t *ppd, FILE *fp,
 			        ppd_section_t section);
@@ -237,5 +239,5 @@ extern float		ppdPageWidth(ppd_file_t *ppd, const char *name);
 #endif /* !_CUPS_PPD_H_ */
 
 /*
- * End of "$Id: ppd.h,v 1.20 2000/04/12 20:03:50 mike Exp $".
+ * End of "$Id: ppd.h,v 1.21 2000/08/01 15:43:24 mike Exp $".
  */
