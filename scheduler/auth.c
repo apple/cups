@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.c,v 1.42 2001/04/13 20:58:54 mike Exp $"
+ * "$Id: auth.c,v 1.43 2001/04/23 21:27:30 mike Exp $"
  *
  *   Authorization routines for the Common UNIX Printing System (CUPS).
  *
@@ -76,6 +76,15 @@ static char		*get_md5_passwd(const char *username, const char *group,
 static int		pam_func(int, const struct pam_message **,
 			         struct pam_response **, void *);
 #endif /* HAVE_LIBPAM */
+
+
+/*
+ * Local globals...
+ */
+
+#ifdef __hpux
+static client_t		*auth_client;	/* Current client being authenticated */
+#endif /* __hpux */
 
 
 /*
@@ -767,6 +776,17 @@ IsAuthorized(client_t *con)	/* I - Connection */
       pamdata.conv        = pam_func;
       pamdata.appdata_ptr = con;
 
+#  ifdef __hpux
+     /*
+      * Workaround for HP-UX bug in pam_unix; see pam_conv() below for
+      * more info...
+      */
+
+      auth_client = con;
+#  endif /* __hpux */
+
+      DEBUG_printf(("IsAuthorized: Setting appdata_ptr = %p\n", con));
+
       pamerr = pam_start("cups", con->username, &pamdata, &pamh);
       if (pamerr != PAM_SUCCESS)
       {
@@ -1123,31 +1143,59 @@ pam_func(int                      num_msg,	/* I - Number of messages */
   * Answer all of the messages...
   */
 
+  DEBUG_printf(("pam_func: appdata_ptr = %p\n", appdata_ptr));
+
+#ifdef __hpux
+ /*
+  * Apparently some versions of HP-UX 11 have a broken pam_unix security
+  * module.  This is a workaround...
+  */
+
+  client = auth_client;
+  (void)appdata_ptr;
+#else
   client = (client_t *)appdata_ptr;
+#endif /* __hpux */
 
   for (i = 0; i < num_msg; i ++)
+  {
+    DEBUG_printf(("pam_func: Message = \"%s\"\n", msg[i]->msg));
+
     switch (msg[i]->msg_style)
     {
       case PAM_PROMPT_ECHO_ON:
+          DEBUG_printf(("pam_func: PAM_PROMPT_ECHO_ON, returning \"%s\"...\n",
+	                client->username));
           replies[i].resp_retcode = PAM_SUCCESS;
           replies[i].resp         = strdup(client->username);
           break;
 
       case PAM_PROMPT_ECHO_OFF:
+          DEBUG_printf(("pam_func: PAM_PROMPT_ECHO_OFF, returning \"%s\"...\n",
+	                client->password));
           replies[i].resp_retcode = PAM_SUCCESS;
           replies[i].resp         = strdup(client->password);
           break;
 
       case PAM_TEXT_INFO:
+          DEBUG_puts("pam_func: PAM_TEXT_INFO...");
+          replies[i].resp_retcode = PAM_SUCCESS;
+          replies[i].resp         = NULL;
+          break;
+
       case PAM_ERROR_MSG:
+          DEBUG_puts("pam_func: PAM_ERROR_MSG...");
           replies[i].resp_retcode = PAM_SUCCESS;
           replies[i].resp         = NULL;
           break;
 
       default:
+          DEBUG_printf(("pam_func: Unknown PAM message %d...\n",
+	                msg[i]->msg_style));
           free(replies);
           return (PAM_CONV_ERR);
     }
+  }
 
  /*
   * Return the responses back to PAM...
@@ -1161,5 +1209,5 @@ pam_func(int                      num_msg,	/* I - Number of messages */
 
 
 /*
- * End of "$Id: auth.c,v 1.42 2001/04/13 20:58:54 mike Exp $".
+ * End of "$Id: auth.c,v 1.43 2001/04/23 21:27:30 mike Exp $".
  */
