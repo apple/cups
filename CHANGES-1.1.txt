@@ -3,6 +3,11 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.21rc2
 
+	- The pstops filter now makes sure that the prolog code
+	  is sent before the setup code (STR #776)
+	- The pstops filter now handles print files that
+	  incorrectly start @PJL commands without a language
+	  escape (STR #734)
 	- Miscellaneous build fixes for NetBSD (STR #788)
 	- Added support for quoted system group names (STR #784)
 	- Added "version" option to IPP backend to workaround
