@@ -1,5 +1,5 @@
 /*
- * "$Id: usersys.c,v 1.7 2000/08/24 16:45:21 mike Exp $"
+ * "$Id: usersys.c,v 1.8 2000/09/07 20:42:23 mike Exp $"
  *
  *   User, system, and password routines for the Common UNIX Printing
  *   System (CUPS).
@@ -38,7 +38,7 @@
  */
 
 #include "cups.h"
-#include <config.h>
+#include "string.h"
 #include <stdlib.h>
 #include <ctype.h>
 
@@ -294,5 +294,5 @@ cups_get_password(const char *prompt)	/* I - Prompt string */
 
 
 /*
- * End of "$Id: usersys.c,v 1.7 2000/08/24 16:45:21 mike Exp $".
+ * End of "$Id: usersys.c,v 1.8 2000/09/07 20:42:23 mike Exp $".
  */
