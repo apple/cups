@@ -41,6 +41,11 @@ CHANGES IN CUPS V1.1.11
 	  things like the job title.  This had the potential for
 	  browser-based security violations (on the browser's
 	  machine); bug report from SuSE.
+	- The scheduler now treats unauthenticated usernames as
+	  case-insensitive when doing quota and allow/deny
+	  processing.
+	- The lp command sent the "request ID is ..." message
+	  to stderr instead of stdout...
 
 
 CHANGES IN CUPS V1.1.10-1

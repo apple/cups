@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.143 2001/07/23 21:17:48 mike Exp $"
+ * "$Id: ipp.c,v 1.144 2001/10/02 16:32:54 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -1773,7 +1773,7 @@ check_quotas(client_t  *con,	/* I - Client connection */
   if (p->num_users)
   {
     for (i = 0; i < p->num_users; i ++)
-      if (strcmp(username, p->users[i]) == 0)
+      if (strcasecmp(username, p->users[i]) == 0)
 	break;
 
     if ((i < p->num_users) == p->deny_users)
@@ -5455,7 +5455,7 @@ validate_user(client_t   *con,		/* I - Client connection */
   * Check the username against the owner...
   */
 
-  if (strcmp(username, owner) != 0 && strcmp(username, "root") != 0)
+  if (strcasecmp(username, owner) != 0 && strcasecmp(username, "root") != 0)
   {
    /*
     * Not the owner or root; check to see if the user is a member of the
@@ -5473,7 +5473,7 @@ validate_user(client_t   *con,		/* I - Client connection */
       if (group != NULL)
       {
 	for (j = 0; group->gr_mem[j]; j ++)
-          if (strcmp(username, group->gr_mem[j]) == 0)
+          if (strcasecmp(username, group->gr_mem[j]) == 0)
 	    break;
 
         if (group->gr_mem[j])
@@ -5500,5 +5500,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.143 2001/07/23 21:17:48 mike Exp $".
+ * End of "$Id: ipp.c,v 1.144 2001/10/02 16:32:54 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: lp.c,v 1.32 2001/07/12 12:28:25 mike Exp $"
+ * "$Id: lp.c,v 1.33 2001/10/02 16:32:55 mike Exp $"
  *
  *   "lp" command for the Common UNIX Printing System (CUPS).
  *
@@ -557,8 +557,7 @@ main(int  argc,		/* I - Number of command-line arguments */
     return (1);
   }
   else if (!silent)
-    fprintf(stderr, "request id is %s-%d (%d file(s))\n", printer, job_id,
-            num_files);
+    printf("request id is %s-%d (%d file(s))\n", printer, job_id, num_files);
 
   return (0);
 }
@@ -651,5 +650,5 @@ sighandler(int s)	/* I - Signal number */
 
 
 /*
- * End of "$Id: lp.c,v 1.32 2001/07/12 12:28:25 mike Exp $".
+ * End of "$Id: lp.c,v 1.33 2001/10/02 16:32:55 mike Exp $".
  */
