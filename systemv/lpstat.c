@@ -1,5 +1,5 @@
 /*
- * "$Id: lpstat.c,v 1.37.2.15 2003/01/15 04:25:58 mike Exp $"
+ * "$Id: lpstat.c,v 1.37.2.16 2003/04/10 18:41:49 mike Exp $"
  *
  *   "lpstat" command for the Common UNIX Printing System (CUPS).
  *
@@ -1126,20 +1126,14 @@ static void
 show_default(int         num_dests,	/* I - Number of user-defined dests */
 	     cups_dest_t *dests)	/* I - User-defined destinations */
 {
-  int	i;				/* Looping var */
+  cups_dest_t	*dest;			/* Destination */
 
-
-  for (i = 0; i < num_dests; i ++)
-    if (dests[i].is_default)
-      break;
-
-  if (i < num_dests)
+  if ((dest = cupsGetDest(NULL, NULL, num_dests, dests)) != NULL)
   {
-    if (dests[i].instance)
-      printf("system default destination: %s/%s\n", dests[i].name,
-             dests[i].instance);
+    if (dest->instance)
+      printf("system default destination: %s/%s\n", dest->name, dest->instance);
     else
-      printf("system default destination: %s\n", dests[i].name);
+      printf("system default destination: %s\n", dest->name);
   }
   else
     puts("no system default destination");
@@ -2114,5 +2108,5 @@ show_scheduler(http_t *http)	/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpstat.c,v 1.37.2.15 2003/01/15 04:25:58 mike Exp $".
+ * End of "$Id: lpstat.c,v 1.37.2.16 2003/04/10 18:41:49 mike Exp $".
  */

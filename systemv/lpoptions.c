@@ -1,5 +1,5 @@
 /*
- * "$Id: lpoptions.c,v 1.9.2.7 2003/03/04 15:34:59 mike Exp $"
+ * "$Id: lpoptions.c,v 1.9.2.8 2003/04/10 18:41:49 mike Exp $"
  *
  *   Printer option program for the Common UNIX Printing System (CUPS).
  *
@@ -148,11 +148,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	      if (num_dests == 0)
 		num_dests = cupsGetDests(&dests);
 
-	      for (j = num_dests, dest = dests; j > 0; j --, dest ++)
-	        if (dest->is_default)
-		  break;
-
-              if (j == 0)
+	      if ((dest = cupsGetDest(NULL, NULL, num_dests, dests)) == NULL)
 	        dest = dests;
 	    }
 
@@ -305,18 +301,16 @@ main(int  argc,			/* I - Number of command-line arguments */
     num_dests = cupsGetDests(&dests);
 
   if (dest == NULL)
-    for (i = 0; i < num_dests; i ++)
-      if (dests[i].is_default)
-      {
-        dest = dests + i;
-
-	for (j = 0; j < dest->num_options; j ++)
-	  if (cupsGetOption(dest->options[j].name, num_options, options) == NULL)
-	    num_options = cupsAddOption(dest->options[j].name,
-	                                dest->options[j].value,
-	                                num_options, &options);
-	break;
-      }
+  {
+    if ((dest = cupsGetDest(NULL, NULL, num_dests, dests)) != NULL)
+    {
+      for (j = 0; j < dest->num_options; j ++)
+	if (cupsGetOption(dest->options[j].name, num_options, options) == NULL)
+	  num_options = cupsAddOption(dest->options[j].name,
+	                              dest->options[j].value,
+	                              num_options, &options);
+    }
+  }
 
   if (dest == NULL)
     return (0);
@@ -444,5 +438,5 @@ usage(void)
 
 
 /*
- * End of "$Id: lpoptions.c,v 1.9.2.7 2003/03/04 15:34:59 mike Exp $".
+ * End of "$Id: lpoptions.c,v 1.9.2.8 2003/04/10 18:41:49 mike Exp $".
  */
