@@ -27,7 +27,6 @@
 #include "Gfx.h"
 #include "GfxState.h"
 #include "GfxFont.h"
-#include "CharCodeToUnicode.h"
 #include "UnicodeMap.h"
 #include "FontFile.h"
 #include "Catalog.h"
@@ -48,7 +47,15 @@
 static const char *prolog[] = {
   "/xpdf 75 dict def xpdf begin",
   "% PDF special state",
-  "/pdfDictSize 14 def",
+  "/pdfDictSize 15 def",
+  "~1",
+  "/pdfStates 64 array def",
+  "  0 1 63 {",
+  "    pdfStates exch pdfDictSize dict",
+  "    dup /pdfStateIdx 3 index put",
+  "    put",
+  "  } for",
+  "~a",
   "/pdfSetup {",
 #if 0 /* NOT FOR CUPS */
   "  3 1 roll 2 array astore",
@@ -66,8 +73,19 @@ static const char *prolog[] = {
   "  pop pop pop",
 #endif /* 0 */
   "} def",
+  "~1",
+  "/pdfOpNames [",
+  "  /pdfFill /pdfStroke /pdfLastFill /pdfLastStroke",
+  "  /pdfTextMat /pdfFontSize /pdfCharSpacing /pdfTextRender",
+  "  /pdfTextRise /pdfWordSpacing /pdfHorizScaling /pdfTextClipPath",
+  "] def",
+  "~a",
   "/pdfStartPage {",
+  "~1",
+  "  pdfStates 0 get begin",
+  "~2",
   "  pdfDictSize dict begin",
+  "~a",
   "  /pdfFill [0] def",
   "  /pdfStroke [0] def",
   "  /pdfLastFill false def",
@@ -79,6 +97,7 @@ static const char *prolog[] = {
   "  /pdfTextRise 0 def",
   "  /pdfWordSpacing 0 def",
   "  /pdfHorizScaling 1 def",
+  "  /pdfTextClipPath [] def",
   "} def",
   "/pdfEndPage { end } def",
   "% separation convention operators",
@@ -195,7 +214,16 @@ static const char *prolog[] = {
   "  } ifelse",
   "} def",
   "% graphics state operators",
+  "~1",
+  "/q {",
+  "  gsave",
+  "  pdfOpNames length 1 sub -1 0 { pdfOpNames exch get load } for",
+  "  pdfStates pdfStateIdx 1 add get begin",
+  "  pdfOpNames { exch def } forall",
+  "} def",
+  "~2",
   "/q { gsave pdfDictSize dict begin } def",
+  "~a",
   "/Q { end grestore } def",
   "/cm { concat } def",
   "/d { setdash } def",
@@ -252,56 +280,100 @@ static const char *prolog[] = {
   "/Td { pdfTextMat transform moveto } def",
   "/Tm { /pdfTextMat exch def } def",
   "% text string operators",
-  "/awcp { % awidthcharpath",
-  "  exch {",
-  "    1 string dup 0 3 index put 2 index charpath",
-  "    3 index 3 index rmoveto",
-  "    4 index eq { 5 index 5 index rmoveto } if",
+  "/cshow where {",
+  "  pop",
+  "  /cshow2 {",
+  "    dup {",
+  "      pop pop",
+  "      1 string dup 0 3 index put 3 index exec",
+  "    } exch cshow",
+  "    pop pop",
+  "  } def",
+  "}{",
+  "  /cshow2 {",
+  "    currentfont /FontType get 0 eq {",
+  "      0 2 2 index length 1 sub {",
+  "        2 copy get exch 1 add 2 index exch get",
+  "        2 copy exch 256 mul add",
+  "        2 string dup 0 6 5 roll put dup 1 5 4 roll put",
+  "        3 index exec",
+  "      } for",
+  "    } {",
+  "      dup {",
+  "        1 string dup 0 3 index put 3 index exec",
   "  } forall",
+  "    } ifelse",
+  "    pop pop",
+  "  } def",
+  "} ifelse",
+  "/awcp {", // awidthcharpath
+  "  exch {",
+  "    false charpath",
+  "    5 index 5 index rmoveto",
+  "    6 index eq { 7 index 7 index rmoveto } if",
+  "  } exch cshow2",
   "  6 {pop} repeat",
   "} def",
-  "/Tj { fCol",  // because stringwidth has to draw Type 3 chars
-  "      0 pdfTextRise pdfTextMat dtransform rmoveto",
+  "/Tj {",
+  "  fCol",  // because stringwidth has to draw Type 3 chars
   "      1 index stringwidth pdfTextMat idtransform pop",
   "      sub 1 index length dup 0 ne { div } { pop pop 0 } ifelse",
   "      pdfWordSpacing pdfHorizScaling mul 0 pdfTextMat dtransform 32",
   "      4 3 roll pdfCharSpacing pdfHorizScaling mul add 0",
   "      pdfTextMat dtransform",
-  "      6 5 roll",
-  "      currentpoint 8 2 roll",
-  "      pdfTextRender 1 and 0 eq {",
-  "        6 copy awidthshow",
-  "      } if",
-  "      pdfTextRender 3 and dup 1 eq exch 2 eq or {",
-  "        8 6 roll moveto",
-  "        currentfont /FontType get 3 eq { fCol } { sCol } ifelse",
-  "        false awcp currentpoint stroke moveto",
-  "      } {",
-  "        8 {pop} repeat",
-  "      } ifelse",
-  "      0 pdfTextRise neg pdfTextMat dtransform rmoveto } def",
-  "/Tj16 { pdfTextRender 1 and 0 eq { fCol } { sCol } ifelse",
-  "        0 pdfTextRise pdfTextMat dtransform rmoveto",
+  "  6 5 roll Tj1",
+  "} def",
+  "/Tj16 {",
+  "  fCol",  // because stringwidth has to draw Type 3 chars
   "        2 index stringwidth pdfTextMat idtransform pop",
   "        sub exch div",
   "        pdfWordSpacing pdfHorizScaling mul 0 pdfTextMat dtransform 32",
   "        4 3 roll pdfCharSpacing pdfHorizScaling mul add 0",
   "        pdfTextMat dtransform",
-  "        6 5 roll awidthshow",
-  "        0 pdfTextRise neg pdfTextMat dtransform rmoveto } def",
-  "/Tj16V { pdfTextRender 1 and 0 eq { fCol } { sCol } ifelse",
-  "         0 pdfTextRise pdfTextMat dtransform rmoveto",
+  "  6 5 roll Tj1",
+  "} def",
+  "/Tj16V {",
+  "  fCol",  // because stringwidth has to draw Type 3 chars
   "         2 index stringwidth pdfTextMat idtransform exch pop",
   "         sub exch div",
   "         0 pdfWordSpacing pdfTextMat dtransform 32",
   "         4 3 roll pdfCharSpacing add 0 exch",
   "         pdfTextMat dtransform",
-  "         6 5 roll awidthshow",
-  "         0 pdfTextRise neg pdfTextMat dtransform rmoveto } def",
+  "  6 5 roll Tj1",
+  "} def",
+  "/Tj1 {",
+  "  0 pdfTextRise pdfTextMat dtransform rmoveto",
+  "  currentpoint 8 2 roll",
+  "  pdfTextRender 1 and 0 eq {",
+  "    6 copy awidthshow",
+  "  } if",
+  "  pdfTextRender 3 and dup 1 eq exch 2 eq or {",
+  "    7 index 7 index moveto",
+  "    6 copy",
+  "    currentfont /FontType get 3 eq { fCol } { sCol } ifelse",
+  "    false awcp currentpoint stroke moveto",
+  "  } if",
+  "  pdfTextRender 4 and 0 ne {",
+  "    8 6 roll moveto",
+  "    false awcp",
+  "    /pdfTextClipPath [ pdfTextClipPath aload pop",
+  "      {/moveto cvx}",
+  "      {/lineto cvx}",
+  "      {/curveto cvx}",
+  "      {/closepath cvx}",
+  "    pathforall ] def",
+  "    currentpoint newpath moveto",
+  "  } {",
+  "    8 {pop} repeat",
+  "  } ifelse",
+  "  0 pdfTextRise neg pdfTextMat dtransform rmoveto",
+  "} def",
   "/TJm { pdfFontSize 0.001 mul mul neg 0",
   "       pdfTextMat dtransform rmoveto } def",
   "/TJmV { pdfFontSize 0.001 mul mul neg 0 exch",
   "        pdfTextMat dtransform rmoveto } def",
+  "/Tclip { pdfTextClipPath cvx exec clip",
+  "         /pdfTextClipPath [] def } def",
   "% Level 1 image operators",
   "/pdfIm1 {",
   "  /pdfImBuf1 4 index string def",
@@ -504,9 +576,16 @@ static void outputToFile(void *stream, const char *data, int len) {
 }
 
 PSOutputDev::PSOutputDev(const char *fileName, XRef *xrefA, Catalog *catalog,
-			 int firstPage, int lastPage, PSOutMode modeA) {
+			 int firstPage, int lastPage, PSOutMode modeA,
+			 int paperWidthA, int paperHeightA,
+			 GBool manualCtrlA) {
   FILE *f;
   PSFileType fileTypeA;
+
+  underlayCbk = NULL;
+  underlayCbkData = NULL;
+  overlayCbk = NULL;
+  overlayCbkData = NULL;
 
   fontIDs = NULL;
   fontFileIDs = NULL;
@@ -515,6 +594,7 @@ PSOutputDev::PSOutputDev(const char *fileName, XRef *xrefA, Catalog *catalog,
   xobjStack = NULL;
   embFontList = NULL;
   customColors = NULL;
+  haveTextClip = gFalse;
   t3String = NULL;
 
   // open file or pipe
@@ -547,12 +627,15 @@ PSOutputDev::PSOutputDev(const char *fileName, XRef *xrefA, Catalog *catalog,
   }
 
   init(outputToFile, f, fileTypeA,
-       xrefA, catalog, firstPage, lastPage, modeA);
+       xrefA, catalog, firstPage, lastPage, modeA,
+       paperWidthA, paperHeightA, manualCtrlA);
 }
 
 PSOutputDev::PSOutputDev(PSOutputFunc outputFuncA, void *outputStreamA,
 			 XRef *xrefA, Catalog *catalog,
-			 int firstPage, int lastPage, PSOutMode modeA) {
+			 int firstPage, int lastPage, PSOutMode modeA,
+			 int paperWidthA, int paperHeightA,
+			 GBool manualCtrlA) {
   fontIDs = NULL;
   fontFileIDs = NULL;
   fontFileNames = NULL;
@@ -560,23 +643,20 @@ PSOutputDev::PSOutputDev(PSOutputFunc outputFuncA, void *outputStreamA,
   xobjStack = NULL;
   embFontList = NULL;
   customColors = NULL;
+  haveTextClip = gFalse;
   t3String = NULL;
 
   init(outputFuncA, outputStreamA, psGeneric,
-       xrefA, catalog, firstPage, lastPage, modeA);
+       xrefA, catalog, firstPage, lastPage, modeA,
+       paperWidthA, paperHeightA, manualCtrlA);
 }
 
 void PSOutputDev::init(PSOutputFunc outputFuncA, void *outputStreamA,
 		       PSFileType fileTypeA, XRef *xrefA, Catalog *catalog,
-		       int firstPage, int lastPage, PSOutMode modeA) {
+		       int firstPage, int lastPage, PSOutMode modeA,
+		       int paperWidthA, int paperHeightA,
+		       GBool manualCtrlA) {
   Page *page;
-  PDFRectangle *box;
-  Dict *resDict;
-  Annots *annots;
-  const char **p;
-  int pg;
-  Object obj1, obj2;
-  int i;
 
   // initialize
   ok = gTrue;
@@ -586,13 +666,20 @@ void PSOutputDev::init(PSOutputFunc outputFuncA, void *outputStreamA,
   xref = xrefA;
   level = globalParams->getPSLevel();
   mode = modeA;
+  paperWidth = paperWidthA;
+  paperHeight = paperHeightA;
+  if (paperWidth == 0) {
   paperWidth = globalParams->getPSPaperWidth();
+  }
+  if (paperHeight == 0) {
   paperHeight = globalParams->getPSPaperHeight();
+  }
   if (paperWidth < 0 || paperHeight < 0) {
     page = catalog->getPage(firstPage);
     paperWidth = (int)(page->getWidth() + 0.5);
     paperHeight = (int)(page->getHeight() + 0.5);
   }
+  manualCtrl = manualCtrlA;
   if (mode == psModeForm) {
     lastPage = firstPage;
   }
@@ -615,139 +702,30 @@ void PSOutputDev::init(PSOutputFunc outputFuncA, void *outputStreamA,
   fontFileNameSize = 64;
   fontFileNameLen = 0;
   fontFileNames = (GString **)gmalloc(fontFileNameSize * sizeof(GString *));
+  nextTrueTypeNum = 0;
   font16EncLen = 0;
   font16EncSize = 0;
+
   xobjStack = new GList();
+  numSaves = 0;
 
   // initialize embedded font resource comment list
   embFontList = new GString();
 
-  // write header
-  switch (mode) {
-  case psModePS:
-    writePS("%!PS-Adobe-3.0\n");
-    writePSFmt("%%%%Creator: xpdf/pdftops %s\n", xpdfVersion);
-    writePSFmt("%%%%LanguageLevel: %d\n",
-	       (level == psLevel1 || level == psLevel1Sep) ? 1 :
-	       (level == psLevel2 || level == psLevel2Sep) ? 2 : 3);
-    if (level == psLevel1Sep || level == psLevel2Sep || level == psLevel3Sep) {
-      writePS("%%DocumentProcessColors: (atend)\n");
-      writePS("%%DocumentCustomColors: (atend)\n");
+  if (!manualCtrl) {
+    writeHeader(firstPage, lastPage, catalog->getPage(firstPage)->getBox());
+    if (mode != psModeForm) {
+      writePS("%%BeginProlog\n");
     }
-    writePS("%%DocumentSuppliedResources: (atend)\n");
-    writePSFmt("%%%%DocumentMedia: plain %d %d 0 () ()\n",
-	       paperWidth, paperHeight);
-    writePSFmt("%%%%Pages: %d\n", lastPage - firstPage + 1);
-    writePSFmt("%%%%BoundingBox: 0 0 %d %d\n", paperWidth, paperHeight);
-    writePS("%%EndComments\n");
-    writePS("%%BeginDefaults\n");
-    writePS("%%PageMedia: plain\n");
-    writePS("%%EndDefaults\n");
-    break;
-  case psModeEPS:
-    writePS("%!PS-Adobe-3.0 EPSF-3.0\n");
-    writePSFmt("%%%%Creator: xpdf/pdftops %s\n", xpdfVersion);
-    writePSFmt("%%%%LanguageLevel: %d\n",
-	       (level == psLevel1 || level == psLevel1Sep) ? 1 :
-	       (level == psLevel2 || level == psLevel2Sep) ? 2 : 3);
-    if (level == psLevel1Sep || level == psLevel2Sep || level == psLevel3Sep) {
-      writePS("%%DocumentProcessColors: (atend)\n");
-      writePS("%%DocumentCustomColors: (atend)\n");
+    writeXpdfProcset();
+    if (mode != psModeForm) {
+      writePS("%%EndProlog\n");
+      writePS("%%BeginSetup\n");
     }
-    page = catalog->getPage(firstPage);
-    box = page->getBox();
-    writePSFmt("%%%%BoundingBox: %d %d %d %d\n",
-	       (int)floor(box->x1), (int)floor(box->y1),
-	       (int)ceil(box->x2), (int)ceil(box->y2));
-    if (floor(box->x1) != ceil(box->x1) ||
-	floor(box->y1) != ceil(box->y1) ||
-	floor(box->x2) != ceil(box->x2) ||
-	floor(box->y2) != ceil(box->y2)) {
-      writePSFmt("%%%%HiResBoundingBox: %g %g %g %g\n",
-		 box->x1, box->y1, box->x2, box->y2);
+    writeDocSetup(catalog, firstPage, lastPage);
+    if (mode != psModeForm) {
+      writePS("%%EndSetup\n");
     }
-    writePS("%%DocumentSuppliedResources: (atend)\n");
-    writePS("%%EndComments\n");
-    break;
-  case psModeForm:
-    writePS("%!PS-Adobe-3.0 Resource-Form\n");
-    writePSFmt("%%%%Creator: xpdf/pdftops %s\n", xpdfVersion);
-    writePSFmt("%%%%LanguageLevel: %d\n",
-	       (level == psLevel1 || level == psLevel1Sep) ? 1 :
-	       (level == psLevel2 || level == psLevel2Sep) ? 2 : 3);
-    if (level == psLevel1Sep || level == psLevel2Sep || level == psLevel3Sep) {
-      writePS("%%DocumentProcessColors: (atend)\n");
-      writePS("%%DocumentCustomColors: (atend)\n");
-    }
-    writePS("%%DocumentSuppliedResources: (atend)\n");
-    writePS("%%EndComments\n");
-    page = catalog->getPage(firstPage);
-    box = page->getBox();
-    writePS("32 dict dup begin\n");
-    writePSFmt("/BBox [%d %d %d %d] def\n",
-	       (int)box->x1, (int)box->y1, (int)box->x2, (int)box->y2);
-    writePS("/FormType 1 def\n");
-    writePS("/Matrix [1 0 0 1 0 0] def\n");
-    break;
-  }
-
-  // write prolog
-  if (mode != psModeForm) {
-    writePS("%%BeginProlog\n");
-  }
-  writePSFmt("%%%%BeginResource: procset xpdf %s 0\n", xpdfVersion);
-  for (p = prolog; *p; ++p) {
-    writePSFmt("%s\n", *p);
-  }
-  writePS("%%EndResource\n");
-  if (level >= psLevel3) {
-    for (p = cmapProlog; *p; ++p) {
-      writePSFmt("%s\n", *p);
-    }
-  }
-  if (mode != psModeForm) {
-    writePS("%%EndProlog\n");
-  }
-
-  // set up fonts and images
-  if (mode == psModeForm) {
-    // swap the form and xpdf dicts
-    writePS("xpdf end begin dup begin\n");
-  } else {
-    writePS("%%BeginSetup\n");
-    writePS("xpdf begin\n");
-  }
-  for (pg = firstPage; pg <= lastPage; ++pg) {
-    page = catalog->getPage(pg);
-    if ((resDict = page->getResourceDict())) {
-      setupResources(resDict);
-    }
-    annots = new Annots(xref, page->getAnnots(&obj1));
-    obj1.free();
-    for (i = 0; i < annots->getNumAnnots(); ++i) {
-      if (annots->getAnnot(i)->getAppearance(&obj1)->isStream()) {
-	obj1.streamGetDict()->lookup("Resources", &obj2);
-	if (obj2.isDict()) {
-	  setupResources(obj2.getDict());
-	}
-	obj2.free();
-      }
-      obj1.free();
-    }
-    delete annots;
-  }
-  if (mode != psModeForm) {
-    if (mode != psModeEPS) {
-      writePSFmt("%d %d %s pdfSetup\n",
-		 paperWidth, paperHeight,
-		 globalParams->getPSDuplex() ? "true" : "false");
-    }
-#if OPI_SUPPORT
-    if (globalParams->getPSOPI()) {
-      writePS("/opiMatrix matrix currentmatrix def\n");
-    }
-#endif
-    writePS("%%EndSetup\n");
   }
 
   // initialize sequential page number
@@ -759,41 +737,12 @@ PSOutputDev::~PSOutputDev() {
   int i;
 
   if (ok) {
-    if (mode == psModeForm) {
-      writePS("/Foo exch /Form defineresource pop\n");
-    } else {
+    if (!manualCtrl) {
       writePS("%%Trailer\n");
-      writePS("end\n");
-      writePS("%%DocumentSuppliedResources:\n");
-      writePS(embFontList->getCString());
-      if (level == psLevel1Sep || level == psLevel2Sep ||
-	  level == psLevel3Sep) {
-         writePS("%%DocumentProcessColors:");
-         if (processColors & psProcessCyan) {
-	   writePS(" Cyan");
-	 }
-         if (processColors & psProcessMagenta) {
-	   writePS(" Magenta");
-	 }
-         if (processColors & psProcessYellow) {
-	   writePS(" Yellow");
-	 }
-         if (processColors & psProcessBlack) {
-	   writePS(" Black");
-	 }
-         writePS("\n");
-         writePS("%%DocumentCustomColors:");
-	 for (cc = customColors; cc; cc = cc->next) {
-	   writePSFmt(" (%s)", cc->name->getCString());
-	 }
-         writePS("\n");
-         writePS("%%CMYKCustomColor:\n");
-	 for (cc = customColors; cc; cc = cc->next) {
-	   writePSFmt("%%%%+ %g %g %g %g (%s)\n",
-		   cc->c, cc->m, cc->y, cc->k, cc->name->getCString());
-	 }
+      writeTrailer();
+      if (mode != psModeForm) {
+	writePS("%%EOF\n");
       }
-      writePS("%%EOF\n");
     }
     if (fileType == psFile) {
 #ifdef MACOS
@@ -838,6 +787,193 @@ PSOutputDev::~PSOutputDev() {
     cc = customColors;
     customColors = cc->next;
     delete cc;
+  }
+}
+
+void PSOutputDev::writeHeader(int firstPage, int lastPage, PDFRectangle *box) {
+  switch (mode) {
+  case psModePS:
+    writePS("%!PS-Adobe-3.0\n");
+    writePSFmt("%%%%Creator: xpdf/pdftops %s\n", xpdfVersion);
+    writePSFmt("%%%%LanguageLevel: %d\n",
+	       (level == psLevel1 || level == psLevel1Sep) ? 1 :
+	       (level == psLevel2 || level == psLevel2Sep) ? 2 : 3);
+    if (level == psLevel1Sep || level == psLevel2Sep || level == psLevel3Sep) {
+      writePS("%%DocumentProcessColors: (atend)\n");
+      writePS("%%DocumentCustomColors: (atend)\n");
+    }
+    writePS("%%DocumentSuppliedResources: (atend)\n");
+    writePSFmt("%%%%DocumentMedia: plain %d %d 0 () ()\n",
+	       paperWidth, paperHeight);
+    writePSFmt("%%%%BoundingBox: 0 0 %d %d\n", paperWidth, paperHeight);
+    writePSFmt("%%%%Pages: %d\n", lastPage - firstPage + 1);
+    writePSFmt("%%%%BoundingBox: 0 0 %d %d\n", paperWidth, paperHeight);
+    writePS("%%EndComments\n");
+    writePS("%%BeginDefaults\n");
+    writePS("%%PageMedia: plain\n");
+    writePS("%%EndDefaults\n");
+    break;
+  case psModeEPS:
+    writePS("%!PS-Adobe-3.0 EPSF-3.0\n");
+    writePSFmt("%%%%Creator: xpdf/pdftops %s\n", xpdfVersion);
+    writePSFmt("%%%%LanguageLevel: %d\n",
+	       (level == psLevel1 || level == psLevel1Sep) ? 1 :
+	       (level == psLevel2 || level == psLevel2Sep) ? 2 : 3);
+    if (level == psLevel1Sep || level == psLevel2Sep || level == psLevel3Sep) {
+      writePS("%%DocumentProcessColors: (atend)\n");
+      writePS("%%DocumentCustomColors: (atend)\n");
+    }
+    writePSFmt("%%%%BoundingBox: %d %d %d %d\n",
+	       (int)floor(box->x1), (int)floor(box->y1),
+	       (int)ceil(box->x2), (int)ceil(box->y2));
+    if (floor(box->x1) != ceil(box->x1) ||
+	floor(box->y1) != ceil(box->y1) ||
+	floor(box->x2) != ceil(box->x2) ||
+	floor(box->y2) != ceil(box->y2)) {
+      writePSFmt("%%%%HiResBoundingBox: %g %g %g %g\n",
+		 box->x1, box->y1, box->x2, box->y2);
+    }
+    writePS("%%DocumentSuppliedResources: (atend)\n");
+    writePS("%%EndComments\n");
+    break;
+  case psModeForm:
+    writePS("%!PS-Adobe-3.0 Resource-Form\n");
+    writePSFmt("%%%%Creator: xpdf/pdftops %s\n", xpdfVersion);
+    writePSFmt("%%%%LanguageLevel: %d\n",
+	       (level == psLevel1 || level == psLevel1Sep) ? 1 :
+	       (level == psLevel2 || level == psLevel2Sep) ? 2 : 3);
+    if (level == psLevel1Sep || level == psLevel2Sep || level == psLevel3Sep) {
+      writePS("%%DocumentProcessColors: (atend)\n");
+      writePS("%%DocumentCustomColors: (atend)\n");
+    }
+    writePS("%%DocumentSuppliedResources: (atend)\n");
+    writePS("%%EndComments\n");
+    writePS("32 dict dup begin\n");
+    writePSFmt("/BBox [%d %d %d %d] def\n",
+	       (int)box->x1, (int)box->y1, (int)box->x2, (int)box->y2);
+    writePS("/FormType 1 def\n");
+    writePS("/Matrix [1 0 0 1 0 0] def\n");
+    break;
+  }
+  }
+
+void PSOutputDev::writeXpdfProcset() {
+  char prologLevel;
+  const char **p;
+
+  writePSFmt("%%%%BeginResource: procset xpdf %s 0\n", xpdfVersion);
+  prologLevel = 'a';
+  for (p = prolog; *p; ++p) {
+    if ((*p)[0] == '~' && (*p)[1] == '1') {
+      prologLevel = '1';
+    } else if ((*p)[0] == '~' && (*p)[1] == '2') {
+      prologLevel = '2';
+    } else if ((*p)[0] == '~' && (*p)[1] == 'a') {
+      prologLevel = 'a';
+    } else if (prologLevel == 'a' ||
+	       (prologLevel == '1' && level < psLevel2) ||
+	       (prologLevel == '2' && level >= psLevel2)) {
+    writePSFmt("%s\n", *p);
+  }
+  }
+  writePS("%%EndResource\n");
+
+  if (level >= psLevel3) {
+    for (p = cmapProlog; *p; ++p) {
+      writePSFmt("%s\n", *p);
+    }
+  }
+  }
+
+void PSOutputDev::writeDocSetup(Catalog *catalog,
+				int firstPage, int lastPage) {
+  Page *page;
+  Dict *resDict;
+  Annots *annots;
+  Object obj1, obj2;
+  int pg, i;
+
+  if (mode == psModeForm) {
+    // swap the form and xpdf dicts
+    writePS("xpdf end begin dup begin\n");
+  } else {
+    writePS("xpdf begin\n");
+  }
+  for (pg = firstPage; pg <= lastPage; ++pg) {
+    page = catalog->getPage(pg);
+    if ((resDict = page->getResourceDict())) {
+      setupResources(resDict);
+    }
+    annots = new Annots(xref, page->getAnnots(&obj1));
+    obj1.free();
+    for (i = 0; i < annots->getNumAnnots(); ++i) {
+      if (annots->getAnnot(i)->getAppearance(&obj1)->isStream()) {
+	obj1.streamGetDict()->lookup("Resources", &obj2);
+	if (obj2.isDict()) {
+	  setupResources(obj2.getDict());
+	}
+	obj2.free();
+      }
+      obj1.free();
+    }
+    delete annots;
+  }
+  if (mode != psModeForm) {
+    if (mode != psModeEPS && !manualCtrl) {
+      writePSFmt("%d %d %s pdfSetup\n",
+		 paperWidth, paperHeight,
+		 globalParams->getPSDuplex() ? "true" : "false");
+    }
+#if OPI_SUPPORT
+    if (globalParams->getPSOPI()) {
+      writePS("/opiMatrix matrix currentmatrix def\n");
+    }
+#endif
+  }
+  }
+
+void PSOutputDev::writePageTrailer() {
+  if (mode != psModeForm) {
+    writePS("pdfEndPage\n");
+  }
+}
+
+void PSOutputDev::writeTrailer() {
+  PSOutCustomColor *cc;
+
+    if (mode == psModeForm) {
+      writePS("/Foo exch /Form defineresource pop\n");
+    } else {
+      writePS("end\n");
+      writePS("%%DocumentSuppliedResources:\n");
+      writePS(embFontList->getCString());
+      if (level == psLevel1Sep || level == psLevel2Sep ||
+	  level == psLevel3Sep) {
+         writePS("%%DocumentProcessColors:");
+         if (processColors & psProcessCyan) {
+	   writePS(" Cyan");
+	 }
+         if (processColors & psProcessMagenta) {
+	   writePS(" Magenta");
+	 }
+         if (processColors & psProcessYellow) {
+	   writePS(" Yellow");
+	 }
+         if (processColors & psProcessBlack) {
+	   writePS(" Black");
+	 }
+         writePS("\n");
+         writePS("%%DocumentCustomColors:");
+	 for (cc = customColors; cc; cc = cc->next) {
+	   writePSFmt(" (%s)", cc->name->getCString());
+	 }
+         writePS("\n");
+         writePS("%%CMYKCustomColor:\n");
+	 for (cc = customColors; cc; cc = cc->next) {
+	   writePSFmt("%%%%+ %g %g %g %g (%s)\n",
+		   cc->c, cc->m, cc->y, cc->k, cc->name->getCString());
+	 }
+      }
   }
 }
 
@@ -893,29 +1029,39 @@ void PSOutputDev::setupResources(Dict *resDict) {
 }
 
 void PSOutputDev::setupFonts(Dict *resDict) {
-  Object fontDict;
+  Object obj1, obj2;
+  Ref r;
   GfxFontDict *gfxFontDict;
   GfxFont *font;
   int i;
 
-  resDict->lookup("Font", &fontDict);
-  if (fontDict.isDict()) {
-    gfxFontDict = new GfxFontDict(xref, fontDict.getDict());
+  gfxFontDict = NULL;
+  resDict->lookupNF("Font", &obj1);
+  if (obj1.isRef()) {
+    obj1.fetch(xref, &obj2);
+    if (obj2.isDict()) {
+      r = obj1.getRef();
+      gfxFontDict = new GfxFontDict(xref, &r, obj2.getDict());
+    }
+    obj2.free();
+  } else if (obj1.isDict()) {
+    gfxFontDict = new GfxFontDict(xref, NULL, obj1.getDict());
+  }
+  if (gfxFontDict) {
     for (i = 0; i < gfxFontDict->getNumFonts(); ++i) {
       font = gfxFontDict->getFont(i);
       setupFont(font, resDict);
     }
     delete gfxFontDict;
   }
-  fontDict.free();
+  obj1.free();
 }
 
 void PSOutputDev::setupFont(GfxFont *font, Dict *parentResDict) {
   Ref fontFileID;
   GString *name;
   PSFontParam *fontParam;
-  GString *psNameStr;
-  const char *psName;
+  GString *psName;
   char type3Name[64], buf[16];
   GBool subst;
   UnicodeMap *uMap;
@@ -942,28 +1088,25 @@ void PSOutputDev::setupFont(GfxFont *font, Dict *parentResDict) {
   fontIDs[fontIDLen++] = *font->getID();
 
   xs = ys = 1;
-  psNameStr = NULL;
   subst = gFalse;
 
   // check for resident 8-bit font
   if (font->getName() &&
       (fontParam = globalParams->getPSFont(font->getName()))) {
-    psName = fontParam->psFontName->getCString();
+    psName = new GString(fontParam->psFontName->getCString());
 
   // check for embedded Type 1 font
   } else if (globalParams->getPSEmbedType1() &&
 	     font->getType() == fontType1 &&
 	     font->getEmbeddedFontID(&fontFileID)) {
-    psNameStr = filterPSName(font->getEmbeddedFontName());
-    psName = psNameStr->getCString();
+    psName = filterPSName(font->getEmbeddedFontName());
     setupEmbeddedType1Font(&fontFileID, psName);
 
   // check for embedded Type 1C font
   } else if (globalParams->getPSEmbedType1() &&
 	     font->getType() == fontType1C &&
 	     font->getEmbeddedFontID(&fontFileID)) {
-    psNameStr = filterPSName(font->getEmbeddedFontName());
-    psName = psNameStr->getCString();
+    psName = filterPSName(font->getEmbeddedFontName());
     setupEmbeddedType1CFont(font, &fontFileID, psName);
 
   // check for external Type 1 font file
@@ -971,45 +1114,41 @@ void PSOutputDev::setupFont(GfxFont *font, Dict *parentResDict) {
 	     font->getType() == fontType1 &&
 	     font->getExtFontFile()) {
     // this assumes that the PS font name matches the PDF font name
-    psName = font->getName()->getCString();
+    psName = font->getName()->copy();
     setupExternalType1Font(font->getExtFontFile(), psName);
 
   // check for embedded TrueType font
   } else if (globalParams->getPSEmbedTrueType() &&
 	     font->getType() == fontTrueType &&
 	     font->getEmbeddedFontID(&fontFileID)) {
-    psNameStr = filterPSName(font->getEmbeddedFontName());
-    psName = psNameStr->getCString();
+    psName = filterPSName(font->getEmbeddedFontName());
     setupEmbeddedTrueTypeFont(font, &fontFileID, psName);
 
   // check for external TrueType font file
   } else if (globalParams->getPSEmbedTrueType() &&
 	     font->getType() == fontTrueType &&
 	     font->getExtFontFile()) {
-    psNameStr = filterPSName(font->getName());
-    psName = psNameStr->getCString();
+    psName = filterPSName(font->getName());
     setupExternalTrueTypeFont(font, psName);
 
   // check for embedded CID PostScript font
   } else if (globalParams->getPSEmbedCIDPostScript() &&
 	     font->getType() == fontCIDType0C &&
 	     font->getEmbeddedFontID(&fontFileID)) {
-    psNameStr = filterPSName(font->getEmbeddedFontName());
-    psName = psNameStr->getCString();
+    psName = filterPSName(font->getEmbeddedFontName());
     setupEmbeddedCIDType0Font(font, &fontFileID, psName);
 
   // check for embedded CID TrueType font
   } else if (globalParams->getPSEmbedCIDTrueType() &&
 	     font->getType() == fontCIDType2 &&
 	     font->getEmbeddedFontID(&fontFileID)) {
-    psNameStr = filterPSName(font->getEmbeddedFontName());
-    psName = psNameStr->getCString();
+    psName = filterPSName(font->getEmbeddedFontName());
     setupEmbeddedCIDTrueTypeFont(font, &fontFileID, psName);
 
   } else if (font->getType() == fontType3) {
     sprintf(type3Name, "T3_%d_%d",
 	    font->getID()->num, font->getID()->gen);
-    psName = type3Name;
+    psName = new GString(type3Name);
     setupType3Font(font, psName, parentResDict);
 
   // do 8-bit font substitution
@@ -1020,7 +1159,7 @@ void PSOutputDev::setupFont(GfxFont *font, Dict *parentResDict) {
     if (name) {
       for (i = 0; psFonts[i]; ++i) {
 	if (name->cmp(psFonts[i]) == 0) {
-	  psName = psFonts[i];
+	  psName = new GString(psFonts[i]);
 	  break;
 	}
       }
@@ -1039,7 +1178,7 @@ void PSOutputDev::setupFont(GfxFont *font, Dict *parentResDict) {
       if (font->isItalic()) {
 	i += 1;
       }
-      psName = psSubstFonts[i].psName;
+      psName = new GString(psSubstFonts[i].psName);
       for (code = 0; code < 256; ++code) {
 	if ((charName = ((Gfx8BitFont *)font)->getCharName(code)) &&
 	    charName[0] == 'm' && charName[1] == '\0') {
@@ -1077,7 +1216,7 @@ void PSOutputDev::setupFont(GfxFont *font, Dict *parentResDict) {
 			    ((GfxCIDFont *)font)->getCollection(),
 			    font->getWMode()))) {
     subst = gTrue;
-    psName = fontParam->psFontName->getCString();
+    psName = fontParam->psFontName->copy();
     if (font16EncLen >= font16EncSize) {
       font16EncSize += 16;
       font16Enc = (PSFont16Enc *)grealloc(font16Enc,
@@ -1107,16 +1246,17 @@ void PSOutputDev::setupFont(GfxFont *font, Dict *parentResDict) {
   if (font->isCIDFont()) {
     if (level == psLevel3 || level == psLevel3Sep) {
       writePSFmt("/F%d_%d /%s %d pdfMakeFont16L3\n",
-		 font->getID()->num, font->getID()->gen, psName,
+		 font->getID()->num, font->getID()->gen, psName->getCString(),
 		 font->getWMode());
     } else {
       writePSFmt("/F%d_%d /%s %d pdfMakeFont16\n",
-		 font->getID()->num, font->getID()->gen, psName,
+		 font->getID()->num, font->getID()->gen, psName->getCString(),
 		 font->getWMode());
     }
   } else {
     writePSFmt("/F%d_%d /%s %g %g\n",
-	       font->getID()->num, font->getID()->gen, psName, xs, ys);
+	       font->getID()->num, font->getID()->gen, psName->getCString(),
+	       xs, ys);
     for (i = 0; i < 256; i += 8) {
       writePSFmt((i == 0) ? "[ " : "  ");
       for (j = 0; j < 8; ++j) {
@@ -1141,16 +1281,14 @@ void PSOutputDev::setupFont(GfxFont *font, Dict *parentResDict) {
     writePS("pdfMakeFont\n");
   }
 
-  if (psNameStr) {
-    delete psNameStr;
-  }
+  delete psName;
 }
 
-void PSOutputDev::setupEmbeddedType1Font(Ref *id, const char *psName) {
+void PSOutputDev::setupEmbeddedType1Font(Ref *id, GString *psName) {
   static char hexChar[17] = "0123456789abcdef";
-  Object refObj, strObj, obj1, obj2;
+  Object refObj, strObj, obj1, obj2, obj3;
   Dict *dict;
-  int length1, length2;
+  int length1, length2, length3;
   int c;
   int start[4];
   GBool binMode;
@@ -1184,21 +1322,25 @@ void PSOutputDev::setupEmbeddedType1Font(Ref *id, const char *psName) {
   }
   dict->lookup("Length1", &obj1);
   dict->lookup("Length2", &obj2);
-  if (!obj1.isInt() || !obj2.isInt()) {
+  dict->lookup("Length3", &obj3);
+  if (!obj1.isInt() || !obj2.isInt() || !obj3.isInt()) {
     error(-1, "Missing length fields in embedded font stream dictionary");
     obj1.free();
     obj2.free();
+    obj3.free();
     goto err1;
   }
   length1 = obj1.getInt();
   length2 = obj2.getInt();
+  length3 = obj3.getInt();
   obj1.free();
   obj2.free();
+  obj3.free();
 
   // beginning comment
-  writePSFmt("%%%%BeginResource: font %s\n", psName);
+  writePSFmt("%%%%BeginResource: font %s\n", psName->getCString());
   embFontList->append("%%+ font ");
-  embFontList->append(psName);
+  embFontList->append(psName->getCString());
   embFontList->append("\n");
 
   // copy ASCII portion of font
@@ -1227,6 +1369,9 @@ void PSOutputDev::setupEmbeddedType1Font(Ref *id, const char *psName) {
       writePSChar(hexChar[(start[i] >> 4) & 0x0f]);
       writePSChar(hexChar[start[i] & 0x0f]);
     }
+    // if Length2 is incorrect (too small), font data gets chopped, so
+    // we take a few extra characters from the trailer just in case
+    length2 += length3 >= 8 ? 8 : length3;
     while (i < length2) {
       if ((c = strObj.streamGetChar()) == EOF) {
 	break;
@@ -1271,7 +1416,7 @@ void PSOutputDev::setupEmbeddedType1Font(Ref *id, const char *psName) {
 
 //~ This doesn't handle .pfb files or binary eexec data (which only
 //~ happens in pfb files?).
-void PSOutputDev::setupExternalType1Font(GString *fileName, const char *psName) {
+void PSOutputDev::setupExternalType1Font(GString *fileName, GString *psName) {
   FILE *fontFile;
   int c;
   int i;
@@ -1292,9 +1437,9 @@ void PSOutputDev::setupExternalType1Font(GString *fileName, const char *psName) 
   fontFileNames[fontFileNameLen++] = fileName->copy();
 
   // beginning comment
-  writePSFmt("%%%%BeginResource: font %s\n", psName);
+  writePSFmt("%%%%BeginResource: font %s\n", psName->getCString());
   embFontList->append("%%+ font ");
-  embFontList->append(psName);
+  embFontList->append(psName->getCString());
   embFontList->append("\n");
 
   // copy the font file
@@ -1312,7 +1457,7 @@ void PSOutputDev::setupExternalType1Font(GString *fileName, const char *psName) 
 }
 
 void PSOutputDev::setupEmbeddedType1CFont(GfxFont *font, Ref *id,
-					  const char *psName) {
+					  GString *psName) {
   char *fontBuf;
   int fontLen;
   Type1CFontFile *t1cFile;
@@ -1333,9 +1478,9 @@ void PSOutputDev::setupEmbeddedType1CFont(GfxFont *font, Ref *id,
   fontFileIDs[fontFileIDLen++] = *id;
 
   // beginning comment
-  writePSFmt("%%%%BeginResource: font %s\n", psName);
+  writePSFmt("%%%%BeginResource: font %s\n", psName->getCString());
   embFontList->append("%%+ font ");
-  embFontList->append(psName);
+  embFontList->append(psName->getCString());
   embFontList->append("\n");
 
   // convert it to a Type 1 font
@@ -1352,42 +1497,49 @@ void PSOutputDev::setupEmbeddedType1CFont(GfxFont *font, Ref *id,
 }
 
 void PSOutputDev::setupEmbeddedTrueTypeFont(GfxFont *font, Ref *id,
-					    const char *psName) {
+					    GString *psName) {
+  char unique[32];
   char *fontBuf;
   int fontLen;
   TrueTypeFontFile *ttFile;
-  CharCodeToUnicode *ctu;
+  Gushort *codeToGID;
   int i;
 
   // check if font is already embedded
   for (i = 0; i < fontFileIDLen; ++i) {
     if (fontFileIDs[i].num == id->num &&
-	fontFileIDs[i].gen == id->gen)
-      return;
+	fontFileIDs[i].gen == id->gen) {
+      sprintf(unique, "_%d", nextTrueTypeNum++);
+      psName->append(unique);
+      break;
+    }
   }
 
   // add entry to fontFileIDs list
+  if (i == fontFileIDLen) {
   if (fontFileIDLen >= fontFileIDSize) {
     fontFileIDSize += 64;
     fontFileIDs = (Ref *)grealloc(fontFileIDs, fontFileIDSize * sizeof(Ref));
   }
   fontFileIDs[fontFileIDLen++] = *id;
+  }
 
   // beginning comment
-  writePSFmt("%%%%BeginResource: font %s\n", psName);
+  writePSFmt("%%%%BeginResource: font %s\n", psName->getCString());
   embFontList->append("%%+ font ");
-  embFontList->append(psName);
+  embFontList->append(psName->getCString());
   embFontList->append("\n");
 
   // convert it to a Type 42 font
   fontBuf = font->readEmbFontFile(xref, &fontLen);
   ttFile = new TrueTypeFontFile(fontBuf, fontLen);
-  ctu = ((Gfx8BitFont *)font)->getToUnicode();
-  ttFile->convertToType42(psName, ((Gfx8BitFont *)font)->getEncoding(),
-			  ctu, ((Gfx8BitFont *)font)->getHasEncoding(),
-			  ((Gfx8BitFont *)font)->isSymbolic(),
+  codeToGID = ((Gfx8BitFont *)font)->getCodeToGIDMap(ttFile);
+  ttFile->convertToType42(psName->getCString(),
+			  ((Gfx8BitFont *)font)->getEncoding(),
+			  ((Gfx8BitFont *)font)->getHasEncoding(),
+			  codeToGID,
 			  outputFunc, outputStream);
-  ctu->decRefCnt();
+  gfree(codeToGID);
   delete ttFile;
   gfree(fontBuf);
 
@@ -1395,45 +1547,51 @@ void PSOutputDev::setupEmbeddedTrueTypeFont(GfxFont *font, Ref *id,
   writePS("%%EndResource\n");
 }
 
-void PSOutputDev::setupExternalTrueTypeFont(GfxFont *font, const char *psName) {
+void PSOutputDev::setupExternalTrueTypeFont(GfxFont *font, GString *psName) {
+  char unique[32];
   GString *fileName;
   char *fontBuf;
   int fontLen;
   TrueTypeFontFile *ttFile;
-  CharCodeToUnicode *ctu;
+  Gushort *codeToGID;
   int i;
 
   // check if font is already embedded
   fileName = font->getExtFontFile();
   for (i = 0; i < fontFileNameLen; ++i) {
     if (!fontFileNames[i]->cmp(fileName)) {
-      return;
+      sprintf(unique, "_%d", nextTrueTypeNum++);
+      psName->append(unique);
+      break;
     }
   }
 
   // add entry to fontFileNames list
+  if (i == fontFileNameLen) {
   if (fontFileNameLen >= fontFileNameSize) {
     fontFileNameSize += 64;
-    fontFileNames = (GString **)grealloc(fontFileNames,
+      fontFileNames =
+	(GString **)grealloc(fontFileNames,
 					 fontFileNameSize * sizeof(GString *));
+  }
   }
   fontFileNames[fontFileNameLen++] = fileName->copy();
 
   // beginning comment
-  writePSFmt("%%%%BeginResource: font %s\n", psName);
+  writePSFmt("%%%%BeginResource: font %s\n", psName->getCString());
   embFontList->append("%%+ font ");
-  embFontList->append(psName);
+  embFontList->append(psName->getCString());
   embFontList->append("\n");
 
   // convert it to a Type 42 font
   fontBuf = font->readExtFontFile(&fontLen);
   ttFile = new TrueTypeFontFile(fontBuf, fontLen);
-  ctu = ((Gfx8BitFont *)font)->getToUnicode();
-  ttFile->convertToType42(psName, ((Gfx8BitFont *)font)->getEncoding(),
-			  ctu, ((Gfx8BitFont *)font)->getHasEncoding(),
-			  ((Gfx8BitFont *)font)->isSymbolic(),
+  codeToGID = ((Gfx8BitFont *)font)->getCodeToGIDMap(ttFile);
+  ttFile->convertToType42(psName->getCString(),
+			  ((Gfx8BitFont *)font)->getEncoding(),
+			  ((Gfx8BitFont *)font)->getHasEncoding(),
+			  codeToGID,
 			  outputFunc, outputStream);
-  ctu->decRefCnt();
   delete ttFile;
   gfree(fontBuf);
 
@@ -1442,7 +1600,7 @@ void PSOutputDev::setupExternalTrueTypeFont(GfxFont *font, const char *psName) {
 }
 
 void PSOutputDev::setupEmbeddedCIDType0Font(GfxFont *font, Ref *id,
-					    const char *psName) {
+					    GString *psName) {
   char *fontBuf;
   int fontLen;
   Type1CFontFile *t1cFile;
@@ -1463,9 +1621,9 @@ void PSOutputDev::setupEmbeddedCIDType0Font(GfxFont *font, Ref *id,
   fontFileIDs[fontFileIDLen++] = *id;
 
   // beginning comment
-  writePSFmt("%%%%BeginResource: font %s\n", psName);
+  writePSFmt("%%%%BeginResource: font %s\n", psName->getCString());
   embFontList->append("%%+ font ");
-  embFontList->append(psName);
+  embFontList->append(psName->getCString());
   embFontList->append("\n");
 
   // convert it to a Type 0 font
@@ -1474,10 +1632,11 @@ void PSOutputDev::setupEmbeddedCIDType0Font(GfxFont *font, Ref *id,
   if (t1cFile->isOk()) {
     if (globalParams->getPSLevel() >= psLevel3) {
       // Level 3: use a CID font
-      t1cFile->convertToCIDType0(psName, outputFunc, outputStream);
+      t1cFile->convertToCIDType0(psName->getCString(),
+				 outputFunc, outputStream);
     } else {
       // otherwise: use a non-CID composite font
-      t1cFile->convertToType0(psName, outputFunc, outputStream);
+      t1cFile->convertToType0(psName->getCString(), outputFunc, outputStream);
     }
   }
   delete t1cFile;
@@ -1488,7 +1647,7 @@ void PSOutputDev::setupEmbeddedCIDType0Font(GfxFont *font, Ref *id,
 }
 
 void PSOutputDev::setupEmbeddedCIDTrueTypeFont(GfxFont *font, Ref *id,
-					       const char *psName) {
+					       GString *psName) {
   char *fontBuf;
   int fontLen;
   TrueTypeFontFile *ttFile;
@@ -1509,22 +1668,23 @@ void PSOutputDev::setupEmbeddedCIDTrueTypeFont(GfxFont *font, Ref *id,
   fontFileIDs[fontFileIDLen++] = *id;
 
   // beginning comment
-  writePSFmt("%%%%BeginResource: font %s\n", psName);
+  writePSFmt("%%%%BeginResource: font %s\n", psName->getCString());
   embFontList->append("%%+ font ");
-  embFontList->append(psName);
+  embFontList->append(psName->getCString());
   embFontList->append("\n");
 
   // convert it to a Type 0 font
   fontBuf = font->readEmbFontFile(xref, &fontLen);
   ttFile = new TrueTypeFontFile(fontBuf, fontLen);
   if (globalParams->getPSLevel() >= psLevel3) {
-    ttFile->convertToCIDType2(psName,
+    ttFile->convertToCIDType2(psName->getCString(),
 			      ((GfxCIDFont *)font)->getCIDToGID(),
 			      ((GfxCIDFont *)font)->getCIDToGIDLen(),
 			      outputFunc, outputStream);
   } else {
     // otherwise: use a non-CID composite font
-    ttFile->convertToType0(psName, ((GfxCIDFont *)font)->getCIDToGID(),
+    ttFile->convertToType0(psName->getCString(),
+			   ((GfxCIDFont *)font)->getCIDToGID(),
 			   ((GfxCIDFont *)font)->getCIDToGIDLen(),
 			   outputFunc, outputStream);
   }
@@ -1535,7 +1695,7 @@ void PSOutputDev::setupEmbeddedCIDTrueTypeFont(GfxFont *font, Ref *id,
   writePS("%%EndResource\n");
 }
 
-void PSOutputDev::setupType3Font(GfxFont *font, const char *psName,
+void PSOutputDev::setupType3Font(GfxFont *font, GString *psName,
 				 Dict *parentResDict) {
   Dict *resDict;
   Dict *charProcs;
@@ -1548,15 +1708,17 @@ void PSOutputDev::setupType3Font(GfxFont *font, const char *psName,
 
   // set up resources used by font
   if ((resDict = ((Gfx8BitFont *)font)->getResources())) {
+    inType3Char = gTrue;
     setupResources(resDict);
+    inType3Char = gFalse;
   } else {
     resDict = parentResDict;
   }
 
   // beginning comment
-  writePSFmt("%%%%BeginResource: font %s\n", psName);
+  writePSFmt("%%%%BeginResource: font %s\n", psName->getCString());
   embFontList->append("%%+ font ");
-  embFontList->append(psName);
+  embFontList->append(psName->getCString());
   embFontList->append("\n");
 
   // font dictionary
@@ -1616,7 +1778,7 @@ void PSOutputDev::setupType3Font(GfxFont *font, const char *psName,
     writePS("end\n");
   }
   writePS("currentdict end\n");
-  writePSFmt("/%s exch definefont pop\n", psName);
+  writePSFmt("/%s exch definefont pop\n", psName->getCString());
 
   // ending comment
   writePS("%%EndResource\n");
@@ -1626,7 +1788,7 @@ void PSOutputDev::setupImages(Dict *resDict) {
   Object xObjDict, xObj, xObjRef, subtypeObj;
   int i;
 
-  if (mode != psModeForm) {
+  if (!(mode == psModeForm || inType3Char)) {
     return;
   }
 
@@ -1695,6 +1857,7 @@ void PSOutputDev::setupImage(Ref id, Stream *str) {
   } while (c != '~' && c != EOF);
   ++size;
   writePSFmt("%d array dup /ImData_%d_%d exch def\n", size, id.num, id.gen);
+  str->close();
 
   // write the data into the array
   str->reset();
@@ -1737,6 +1900,7 @@ void PSOutputDev::setupImage(Ref id, Stream *str) {
   } while (c != '~' && c != EOF);
   writePS("~> put\n");
   writePS("pop\n");
+  str->close();
 
   delete str;
 }
@@ -1852,9 +2016,17 @@ void PSOutputDev::startPage(int pageNum, GfxState *state) {
     landscape = gFalse;
     break;
   }
+
+  if (underlayCbk) {
+    (*underlayCbk)(this, underlayCbkData);
+  }
 }
 
 void PSOutputDev::endPage() {
+  if (overlayCbk) {
+    (*overlayCbk)(this, overlayCbkData);
+  }
+
 
   if (mode == psModeForm) {
     writePS("pdfEndPage\n");
@@ -1862,18 +2034,22 @@ void PSOutputDev::endPage() {
     writePS("} def\n");
     writePS("end end\n");
   } else {
+    if (!manualCtrl) {
     writePS("showpage\n");
     writePS("%%PageTrailer\n");
-    writePS("pdfEndPage\n");
+      writePageTrailer();
+    }
   }
 }
 
 void PSOutputDev::saveState(GfxState *state) {
   writePS("q\n");
+  ++numSaves;
 }
 
 void PSOutputDev::restoreState(GfxState *state) {
   writePS("Q\n");
+  --numSaves;
 }
 
 void PSOutputDev::updateCTM(GfxState *state, double m11, double m12,
@@ -2205,7 +2381,7 @@ void PSOutputDev::drawString(GfxState *state, GString *s) {
   int len, nChars, uLen, n, m, i, j;
 
   // check for invisible text -- this is used by Acrobat Capture
-  if ((state->getRender() & 3) == 3) {
+  if (state->getRender() == 3) {
     return;
   }
 
@@ -2291,6 +2467,17 @@ void PSOutputDev::drawString(GfxState *state, GString *s) {
   }
   if (font->isCIDFont()) {
     delete s2;
+  }
+
+  if (state->getRender() & 4) {
+    haveTextClip = gTrue;
+  }
+}
+
+void PSOutputDev::endTextObject(GfxState *state) {
+  if (haveTextClip) {
+    writePS("Tclip\n");
+    haveTextClip = gFalse;
   }
 }
 
@@ -2524,6 +2711,7 @@ void PSOutputDev::doImageL2(Object *ref, GfxImageColorMap *colorMap,
       } while (c != '~' && c != EOF);
       writePS("~>]\n");
       writePS("0\n");
+      str->close();
       delete str;
     } else {
       // set up to use the array already created by setupImages()
@@ -2579,7 +2767,8 @@ void PSOutputDev::doImageL2(Object *ref, GfxImageColorMap *colorMap,
 
     // data source
     writePS("  /DataSource currentfile\n");
-    s = str->getPSFilter("    ");
+    s = str->getPSFilter(level < psLevel2 ? 1 : level < psLevel3 ? 2 : 3,
+			 "    ");
     if (inlineImg || !s) {
       useRLE = gTrue;
       useASCII = gTrue;
@@ -2856,7 +3045,10 @@ void PSOutputDev::dumpColorSpaceL2(GfxColorSpace *colorSpace) {
       writePS("\n");
     }
     writePS(">]");
+#if 0 //~ this shouldn't be here since the PS file doesn't actually refer
+      //~ to this colorant (it's converted to CMYK instead)
     addCustomColor(separationCS);
+#endif
     break;
 
   case csDeviceN:

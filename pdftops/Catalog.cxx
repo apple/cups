@@ -56,12 +56,13 @@ Catalog::Catalog(XRef *xrefA) {
     goto err2;
   }
   pagesDict.dictLookup("Count", &obj);
-  if (!obj.isInt()) {
+  // some PDF files actually use real numbers here ("/Count 9.0")
+  if (!obj.isNum()) {
     error(-1, "Page count in top-level pages object is wrong type (%s)",
 	  obj.getTypeName());
     goto err3;
   }
-  pagesSize = numPages0 = obj.getInt();
+  pagesSize = numPages0 = (int)obj.getNum();
   obj.free();
   pages = (Page **)gmalloc(pagesSize * sizeof(Page *));
   pageRefs = (Ref *)gmalloc(pagesSize * sizeof(Ref));
@@ -307,8 +308,8 @@ Object *Catalog::findDestInTree(Object *tree, GString *name, Object *obj) {
 	} else if (cmp < 0) {
 	  done = gTrue;
 	}
-	name1.free();
       }
+      name1.free();
     }
     names.free();
     if (!found)

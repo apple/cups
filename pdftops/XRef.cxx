@@ -134,19 +134,22 @@ Guint XRef::readTrailer() {
   // read last xrefSearchSize bytes
   str->setPos(xrefSearchSize, -1);
   for (n = 0; n < xrefSearchSize; ++n) {
-    if ((c = str->getChar()) == EOF)
+    if ((c = str->getChar()) == EOF) {
       break;
+    }
     buf[n] = c;
   }
   buf[n] = '\0';
 
   // find startxref
   for (i = n - 9; i >= 0; --i) {
-    if (!strncmp(&buf[i], "startxref", 9))
+    if (!strncmp(&buf[i], "startxref", 9)) {
       break;
   }
-  if (i < 0)
-    return 0;
+  }
+  if (i < 0) {
+    goto err1;
+  }
   for (p = &buf[i+9]; isspace(*p); ++p) ;
   pos = lastXRefPos = strToUnsigned(p);
 
@@ -154,20 +157,24 @@ Guint XRef::readTrailer() {
   // (NB: we can't just use the trailer dict at the end of the file --
   // this won't work for linearized files.)
   str->setPos(start + pos);
-  for (i = 0; i < 4; ++i)
+  for (i = 0; i < 4; ++i) {
     buf[i] = str->getChar();
-  if (strncmp(buf, "xref", 4))
-    return 0;
+  }
+  if (strncmp(buf, "xref", 4)) {
+    goto err1;
+  }
   pos1 = pos + 4;
   while (1) {
     str->setPos(start + pos1);
     for (i = 0; i < 35; ++i) {
-      if ((c = str->getChar()) == EOF)
-	return 0;
+      if ((c = str->getChar()) == EOF) {
+	goto err1;
+      }
       buf[i] = c;
     }
-    if (!strncmp(buf, "trailer", 7))
+    if (!strncmp(buf, "trailer", 7)) {
       break;
+    }
     p = buf;
     while (isspace(*p)) ++p;
     while ('0' <= *p && *p <= '9') ++p;
@@ -175,8 +182,9 @@ Guint XRef::readTrailer() {
     n = atoi(p);
     while ('0' <= *p && *p <= '9') ++p;
     while (isspace(*p)) ++p;
-    if (p == buf)
-      return 0;
+    if (p == buf) {
+      goto err1;
+    }
     pos1 += (p - buf) + n * 20;
   }
   pos1 += 7;
@@ -189,26 +197,36 @@ Guint XRef::readTrailer() {
   parser->getObj(&trailerDict);
   if (trailerDict.isDict()) {
     trailerDict.dictLookupNF("Size", &obj);
-    if (obj.isInt())
+    if (obj.isInt()) {
       size = obj.getInt();
-    else
-      pos = 0;
+    } else {
+      goto err3;
+    }
     obj.free();
     trailerDict.dictLookupNF("Root", &obj);
     if (obj.isRef()) {
       rootNum = obj.getRefNum();
       rootGen = obj.getRefGen();
     } else {
-      pos = 0;
+      goto err3;
     }
     obj.free();
   } else {
-    pos = 0;
+    goto err2;
   }
   delete parser;
 
   // return first xref position
   return pos;
+
+ err3:
+  obj.free();
+ err2:
+  trailerDict.free();
+  delete parser;
+ err1:
+  size = 0;
+  return 0;
 }
 
 // Read an xref table and the prev pointer from the trailer.
@@ -266,7 +284,7 @@ GBool XRef::readXRef(Guint *pos) {
     // check for buggy PDF files with an incorrect (too small) xref
     // table size
     if (first + n > size) {
-      newSize = size + 256;
+      newSize = first + n;
       entries = (XRefEntry *)grealloc(entries, newSize * sizeof(XRefEntry));
       for (i = size; i < newSize; ++i) {
 	entries[i].offset = 0xffffffff;
@@ -373,12 +391,14 @@ GBool XRef::constructXRef() {
 
     // got trailer dictionary
     if (!strncmp(p, "trailer", 7)) {
+      gotRoot = gFalse;
       obj.initNull();
       parser = new Parser(NULL,
 		 new Lexer(NULL,
 		   str->makeSubStream(start + pos + 7, gFalse, 0, &obj)));
-      if (!trailerDict.isNone())
+      if (!trailerDict.isNone()) {
 	trailerDict.free();
+      }
       parser->getObj(&trailerDict);
       if (trailerDict.isDict()) {
 	trailerDict.dictLookupNF("Root", &obj);
@@ -389,7 +409,7 @@ GBool XRef::constructXRef() {
 	}
 	obj.free();
       } else {
-	pos = 0;
+	trailerDict.free();
       }
       delete parser;
 
@@ -457,6 +477,8 @@ GBool XRef::checkEncrypted(GString *ownerPassword, GString *userPassword) {
   GBool encrypted1;
   GBool ret;
 
+  keyLength = 0;
+  encVersion = encRevision = 0;
   ret = gFalse;
 
   permFlags = defPermFlags;
@@ -551,38 +573,34 @@ GBool XRef::checkEncrypted(GString *ownerPassword, GString *userPassword) {
 
 GBool XRef::okToPrint(GBool ignoreOwnerPW) {
 #ifndef NO_DECRYPTION
-  if ((ignoreOwnerPW || !ownerPasswordOk) && !(permFlags & permPrint)) {
-    return gFalse;
-  }
-#endif
+  return (!ignoreOwnerPW && ownerPasswordOk) || (permFlags & permPrint);
+#else
   return gTrue;
+#endif
 }
 
 GBool XRef::okToChange(GBool ignoreOwnerPW) {
 #ifndef NO_DECRYPTION
-  if ((ignoreOwnerPW || !ownerPasswordOk) && !(permFlags & permChange)) {
-    return gFalse;
-  }
-#endif
+  return (!ignoreOwnerPW && ownerPasswordOk) || (permFlags & permChange);
+#else
   return gTrue;
+#endif
 }
 
 GBool XRef::okToCopy(GBool ignoreOwnerPW) {
 #ifndef NO_DECRYPTION
-  if ((ignoreOwnerPW || !ownerPasswordOk) && !(permFlags & permCopy)) {
-    return gFalse;
-  }
-#endif
+  return (!ignoreOwnerPW && ownerPasswordOk) || (permFlags & permCopy);
+#else
   return gTrue;
+#endif
 }
 
 GBool XRef::okToAddNotes(GBool ignoreOwnerPW) {
 #ifndef NO_DECRYPTION
-  if ((ignoreOwnerPW || !ownerPasswordOk) && !(permFlags & permNotes)) {
-    return gFalse;
-  }
-#endif
+  return (!ignoreOwnerPW && ownerPasswordOk) || (permFlags & permNotes);
+#else
   return gTrue;
+#endif
 }
 
 Object *XRef::fetch(int num, int gen, Object *obj) {

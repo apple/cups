@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.c,v 1.3 2003/11/19 18:05:55 mike Exp $"
+ * "$Id: auth.c,v 1.4 2004/02/02 22:41:09 mike Exp $"
  *
  *   Authentication functions for the Common UNIX Printing System (CUPS).
  *
@@ -143,7 +143,8 @@ cupsDoAuthentication(http_t     *http,	/* I - HTTP connection to server */
     httpMD5Final(nonce, "POST", resource, encode);
     snprintf(http->authstring, sizeof(http->authstring),
 	     "Digest username=\"%s\", realm=\"%s\", nonce=\"%s\", "
-	     "response=\"%s\"", cupsUser(), realm, nonce, encode);
+	     "uri=\"%s\", response=\"%s\"", cupsUser(), realm, nonce,
+	     resource, encode);
   }
 
   return (0);
@@ -234,5 +235,5 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: auth.c,v 1.3 2003/11/19 18:05:55 mike Exp $".
+ * End of "$Id: auth.c,v 1.4 2004/02/02 22:41:09 mike Exp $".
  */

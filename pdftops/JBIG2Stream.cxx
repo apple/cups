@@ -2324,7 +2324,7 @@ JBIG2Bitmap *JBIG2Stream::readTextRegion(GBool huff, GBool refine,
   } else {
     arithDecoder->decodeInt(&t, iadtStats);
   }
-  t *= -strips;
+  t *= -(int)strips;
 
   inst = 0;
   sFirst = 0;
@@ -2497,7 +2497,7 @@ void JBIG2Stream::readPatternDictSeg(Guint segNum, Guint length) {
   }
 
   // read the bitmap
-  atx[0] = -patternW; aty[0] =  0;
+  atx[0] = -(int)patternW; aty[0] =  0;
   atx[1] = -3;        aty[1] = -1;
   atx[2] =  2;        aty[2] = -2;
   atx[3] = -2;        aty[3] = -2;
@@ -2816,10 +2816,12 @@ JBIG2Bitmap *JBIG2Stream::readGenericBitmap(GBool mmr, int w, int h,
 	      code2 += code3 = mmrDecoder->getBlackCode();
 	    } while (code3 >= 64);
 	  }
+	  if (code1 > 0 || code2 > 0) {
 	  a0 = codingLine[codingI++] = a0 + code1;
 	  a0 = codingLine[codingI++] = a0 + code2;
 	  while (refLine[refI] <= a0 && refLine[refI] < w) {
 	    refI += 2;
+	  }
 	  }
 	  break;
 	case twoDimVert0:
@@ -3027,9 +3029,9 @@ JBIG2Bitmap *JBIG2Stream::readGenericBitmap(GBool mmr, int w, int h,
 	  }
 
 	  // update the context
-	  cx0 = ((cx0 << 1) | bitmap->nextPixel(&cxPtr0)) & 0x07;
+	  cx0 = ((cx0 << 1) | bitmap->nextPixel(&cxPtr0)) & 0x0f;
 	  cx1 = ((cx1 << 1) | bitmap->nextPixel(&cxPtr1)) & 0x1f;
-	  cx2 = ((cx2 << 1) | pix) & 0x0f;
+	  cx2 = ((cx2 << 1) | pix) & 0x07;
 	}
 	break;
 
@@ -3049,7 +3051,7 @@ JBIG2Bitmap *JBIG2Stream::readGenericBitmap(GBool mmr, int w, int h,
 	for (x = 0; x < w; ++x) {
 
 	  // build the context
-	  cx = (cx0 << 9) | (cx1 << 4) | (cx2 << 1) |
+	  cx = (cx0 << 7) | (cx1 << 3) | (cx2 << 1) |
 	       bitmap->nextPixel(&atPtr0);
 
 	  // check for a skipped pixel
@@ -3062,9 +3064,9 @@ JBIG2Bitmap *JBIG2Stream::readGenericBitmap(GBool mmr, int w, int h,
 	  }
 
 	  // update the context
-	  cx0 = ((cx0 << 1) | bitmap->nextPixel(&cxPtr0)) & 0x0f;
-	  cx1 = ((cx1 << 1) | bitmap->nextPixel(&cxPtr1)) & 0x1f;
-	  cx2 = ((cx2 << 1) | pix) & 0x07;
+	  cx0 = ((cx0 << 1) | bitmap->nextPixel(&cxPtr0)) & 0x07;
+	  cx1 = ((cx1 << 1) | bitmap->nextPixel(&cxPtr1)) & 0x0f;
+	  cx2 = ((cx2 << 1) | pix) & 0x03;
 	}
 	break;
 
@@ -3081,7 +3083,7 @@ JBIG2Bitmap *JBIG2Stream::readGenericBitmap(GBool mmr, int w, int h,
 	for (x = 0; x < w; ++x) {
 
 	  // build the context
-	  cx = (cx0 << 9) | (cx1 << 4) | (cx2 << 1) |
+	  cx = (cx1 << 5) | (cx2 << 1) |
 	       bitmap->nextPixel(&atPtr0);
 
 	  // check for a skipped pixel
@@ -3519,7 +3521,7 @@ void JBIG2Stream::discardSegment(Guint segNum) {
   for (i = 0; i < segments->getLength(); ++i) {
     seg = (JBIG2Segment *)segments->get(i);
     if (seg->getSegNum() == segNum) {
-      globalSegments->del(i);
+      segments->del(i);
       return;
     }
   }

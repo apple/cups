@@ -74,6 +74,7 @@ GBool Decrypt::makeFileKey(int encVersion, int encRevision, int keyLength,
   int len, i, j;
 
   // try using the supplied owner password to generate the user password
+  *ownerPasswordOk = gFalse;
   if (ownerPassword) {
     len = ownerPassword->getLength();
     if (len < 32) {
@@ -82,9 +83,6 @@ GBool Decrypt::makeFileKey(int encVersion, int encRevision, int keyLength,
     } else {
       memcpy(test, ownerPassword->getCString(), 32);
     }
-  } else {
-    memcpy(test, passwordPad, 32);
-  }
   md5(test, 32, test);
   if (encRevision == 3) {
     for (i = 0; i < 50; ++i) {
@@ -117,8 +115,8 @@ GBool Decrypt::makeFileKey(int encVersion, int encRevision, int keyLength,
     delete userPassword2;
     return gTrue;
   }
-  *ownerPasswordOk = gFalse;
   delete userPassword2;
+  }
 
   // try using the supplied user password
   return makeFileKey2(encVersion, encRevision, keyLength, ownerKey, userKey,

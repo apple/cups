@@ -128,6 +128,7 @@ public:
   virtual GBool beginType3Char(GfxState *state,
 			       CharCode code, Unicode *u, int uLen);
   virtual void endType3Char(GfxState *state) {}
+  virtual void endTextObject(GfxState *state) {}
 
   //----- image drawing
   virtual void drawImageMask(GfxState *state, Object *ref, Stream *str,

@@ -59,8 +59,12 @@ PageAttrs::PageAttrs(PageAttrs *attrs, Dict *dict) {
   readBox(dict, "MediaBox", &mediaBox);
 
   // crop box
+  if (readBox(dict, "CropBox", &cropBox)) {
+    haveCropBox = gTrue;
+  }
+  if (!haveCropBox) {
   cropBox = mediaBox;
-  haveCropBox = readBox(dict, "CropBox", &cropBox);
+  }
 
   // if the MediaBox is excessively larger than the CropBox,
   // just use the CropBox
@@ -214,15 +218,15 @@ Page::~Page() {
   contents.free();
 }
 
-void Page::display(OutputDev *out, double dpi, int rotate,
+void Page::display(OutputDev *out, double hDPI, double vDPI, int rotate,
 		   Links *links, Catalog *catalog,
 		   GBool (*abortCheckCbk)(void *data),
 		   void *abortCheckCbkData) {
-  displaySlice(out, dpi, rotate, -1, -1, -1, -1, links, catalog,
+  displaySlice(out, hDPI, vDPI, rotate, -1, -1, -1, -1, links, catalog,
 	       abortCheckCbk, abortCheckCbkData);
 }
 
-void Page::displaySlice(OutputDev *out, double dpi, int rotate,
+void Page::displaySlice(OutputDev *out, double hDPI, double vDPI, int rotate,
 			int sliceX, int sliceY, int sliceW, int sliceH,
 			Links *links, Catalog *catalog,
 			GBool (*abortCheckCbk)(void *data),
@@ -234,7 +238,7 @@ void Page::displaySlice(OutputDev *out, double dpi, int rotate,
   Object obj;
   Link *link;
   Annots *annotList;
-  double k;
+  double kx, ky;
   int i;
 
   rotate += getRotate();
@@ -246,46 +250,47 @@ void Page::displaySlice(OutputDev *out, double dpi, int rotate,
 
   mediaBox = getBox();
   if (sliceW >= 0 && sliceH >= 0) {
-    k = 72.0 / dpi;
+    kx = 72.0 / hDPI;
+    ky = 72.0 / vDPI;
     if (rotate == 90) {
       if (out->upsideDown()) {
-	box.x1 = mediaBox->x1 + k * sliceY;
-	box.x2 = mediaBox->x1 + k * (sliceY + sliceH);
+	box.x1 = mediaBox->x1 + ky * sliceY;
+	box.x2 = mediaBox->x1 + ky * (sliceY + sliceH);
       } else {
-	box.x1 = mediaBox->x2 - k * (sliceY + sliceH);
-	box.x2 = mediaBox->x2 - k * sliceY;
+	box.x1 = mediaBox->x2 - ky * (sliceY + sliceH);
+	box.x2 = mediaBox->x2 - ky * sliceY;
       }
-      box.y1 = mediaBox->y1 + k * sliceX;
-      box.y2 = mediaBox->y1 + k * (sliceX + sliceW);
+      box.y1 = mediaBox->y1 + kx * sliceX;
+      box.y2 = mediaBox->y1 + kx * (sliceX + sliceW);
     } else if (rotate == 180) {
-      box.x1 = mediaBox->x2 - k * (sliceX + sliceW);
-      box.x2 = mediaBox->x2 - k * sliceX;
+      box.x1 = mediaBox->x2 - kx * (sliceX + sliceW);
+      box.x2 = mediaBox->x2 - kx * sliceX;
       if (out->upsideDown()) {
-	box.y1 = mediaBox->y1 + k * sliceY;
-	box.y2 = mediaBox->y1 + k * (sliceY + sliceH);
+	box.y1 = mediaBox->y1 + ky * sliceY;
+	box.y2 = mediaBox->y1 + ky * (sliceY + sliceH);
       } else {
-	box.y1 = mediaBox->y2 - k * (sliceY + sliceH);
-	box.y2 = mediaBox->y2 - k * sliceY;
+	box.y1 = mediaBox->y2 - ky * (sliceY + sliceH);
+	box.y2 = mediaBox->y2 - ky * sliceY;
       }
     } else if (rotate == 270) {
       if (out->upsideDown()) {
-	box.x1 = mediaBox->x2 - k * (sliceY + sliceH);
-	box.x2 = mediaBox->x2 - k * sliceY;
+	box.x1 = mediaBox->x2 - ky * (sliceY + sliceH);
+	box.x2 = mediaBox->x2 - ky * sliceY;
       } else {
-	box.x1 = mediaBox->x1 + k * sliceY;
-	box.x2 = mediaBox->x1 + k * (sliceY + sliceH);
+	box.x1 = mediaBox->x1 + ky * sliceY;
+	box.x2 = mediaBox->x1 + ky * (sliceY + sliceH);
       }
-      box.y1 = mediaBox->y2 - k * (sliceX + sliceW);
-      box.y2 = mediaBox->y2 - k * sliceX;
+      box.y1 = mediaBox->y2 - kx * (sliceX + sliceW);
+      box.y2 = mediaBox->y2 - kx * sliceX;
     } else {
-      box.x1 = mediaBox->x1 + k * sliceX;
-      box.x2 = mediaBox->x1 + k * (sliceX + sliceW);
+      box.x1 = mediaBox->x1 + kx * sliceX;
+      box.x2 = mediaBox->x1 + kx * (sliceX + sliceW);
       if (out->upsideDown()) {
-	box.y1 = mediaBox->y2 - k * (sliceY + sliceH);
-	box.y2 = mediaBox->y2 - k * sliceY;
+	box.y1 = mediaBox->y2 - ky * (sliceY + sliceH);
+	box.y2 = mediaBox->y2 - ky * sliceY;
       } else {
-	box.y1 = mediaBox->y1 + k * sliceY;
-	box.y2 = mediaBox->y1 + k * (sliceY + sliceH);
+	box.y1 = mediaBox->y1 + ky * sliceY;
+	box.y2 = mediaBox->y1 + ky * (sliceY + sliceH);
       }
     }
   } else {
@@ -304,25 +309,28 @@ void Page::displaySlice(OutputDev *out, double dpi, int rotate,
   }
 
   gfx = new Gfx(xref, out, num, attrs->getResourceDict(),
-		dpi, &box, isCropped(), cropBox, rotate,
+		hDPI, vDPI, &box, isCropped(), cropBox, rotate,
 		abortCheckCbk, abortCheckCbkData);
   contents.fetch(xref, &obj);
   if (!obj.isNull()) {
+    gfx->saveState();
     gfx->display(&obj);
+    gfx->restoreState();
   }
   obj.free();
 
   // draw links
   if (links) {
+    gfx->saveState();
     for (i = 0; i < links->getNumLinks(); ++i) {
       link = links->getLink(i);
       out->drawLink(link, catalog);
     }
+    gfx->restoreState();
     out->dump();
   }
 
   // draw non-link annotations
-  //~ need to reset CTM ???
   annotList = new Annots(xref, annots.fetch(xref, &obj));
   obj.free();
   if (annotList->getNumAnnots() > 0) {

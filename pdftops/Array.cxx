@@ -38,8 +38,12 @@ Array::~Array() {
 }
 
 void Array::add(Object *elem) {
-  if (length + 1 > size) {
-    size += 8;
+  if (length == size) {
+    if (length == 0) {
+      size = 8;
+    } else {
+      size *= 2;
+    }
     elems = (Object *)grealloc(elems, size * sizeof(Object));
   }
   elems[length] = *elem;

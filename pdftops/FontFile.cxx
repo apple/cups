@@ -19,6 +19,7 @@
 #include <string.h>
 #include <ctype.h>
 #include "gmem.h"
+#include "GHash.h"
 #include "Error.h"
 #include "GlobalParams.h"
 #include "CharCodeToUnicode.h"
@@ -32,7 +33,7 @@
 static inline const char *nextLine(const char *line, const char *end) {
   while (line < end && *line != '\n' && *line != '\r')
     ++line;
-  while (line < end && *line == '\n' || *line == '\r')
+  while (line < end && (*line == '\n' || *line == '\r'))
     ++line;
   return line;
 }
@@ -354,10 +355,12 @@ void Type1CFontFile::readEncoding() {
 	c = file[pos++];
 	nLeft = file[pos++];
 	for (j = 0; j <= nLeft && nCodes < nGlyphs; ++j) {
+	  if (c < 256) {
 	  if (encoding[c]) {
 	    gfree(encoding[c]);
 	  }
 	  encoding[c] = copyString(getString(glyphNames[nCodes], buf));
+	  }
 	  ++nCodes;
 	  ++c;
 	}
@@ -415,7 +418,10 @@ void Type1CFontFile::convertToType1(FontFileOutputFunc outputFuncA,
     (*outputFunc)(outputStream, buf, strlen(buf));
   }
   (*outputFunc)(outputStream, "\n", 1);
-  (*outputFunc)(outputStream, "11 dict begin\n", 14);
+  // the dictionary needs room for 12 entries: the following 9, plus
+  // Private and CharStrings (in the eexec section) and FID (which is
+  // added by definefont)
+  (*outputFunc)(outputStream, "12 dict begin\n", 14);
   (*outputFunc)(outputStream, "/FontInfo 10 dict dup begin\n", 28);
   if (dict.version != 0) {
     (*outputFunc)(outputStream, "/version (", 10);
@@ -590,7 +596,8 @@ void Type1CFontFile::convertToType1(FontFileOutputFunc outputFuncA,
   eexecWrite("/RD {string currentfile exch readstring pop} executeonly def\n");
   eexecWrite("/ND {noaccess def} executeonly def\n");
   eexecWrite("/NP {noaccess put} executeonly def\n");
-  eexecWrite("/MinFeature {16 16} ND\n");
+  eexecWrite("/MinFeature {16 16} def\n");
+  eexecWrite("/password 5839 def\n");
   readPrivateDict(&privateDict, dict.privateOffset, dict.privateSize);
   eexecWrite(privateDict.dictData->getCString());
   defaultWidthX = privateDict.defaultWidthX;
@@ -599,7 +606,7 @@ void Type1CFontFile::convertToType1(FontFileOutputFunc outputFuncA,
   nominalWidthXFP = privateDict.nominalWidthXFP;
 
   // set up subroutines
-  subrIdxPos = dict.privateOffset + privateDict.subrsOffset;
+  subrIdxPos = privateDict.subrsOffset;
   i = getIndexLen(gsubrIdxPos);
   gsubrBias = (i < 1240) ? 107 : (i < 33900) ? 1131 : 32768;
   i = getIndexLen(subrIdxPos);
@@ -806,7 +813,7 @@ void Type1CFontFile::convertToCIDType0(const char *psName,
 	defaultWidthXFP = privateDicts[j].defaultWidthXFP;
 	nominalWidthX = privateDicts[j].nominalWidthX;
 	nominalWidthXFP = privateDicts[j].nominalWidthXFP;
-	subrIdxPos = dict.privateOffset + privateDicts[j].subrsOffset;
+	subrIdxPos = privateDicts[j].subrsOffset;
 	k = getIndexLen(subrIdxPos);
 	subrBias = (k < 1240) ? 107 : (k < 33900) ? 1131 : 32768;
 	cvtGlyph(idxPos, idxLen, gTrue);
@@ -1148,6 +1155,10 @@ void Type1CFontFile::convertToType0(const char *psName,
       sprintf(buf, "dup %d /c%02x put\n", j, j);
       (*outputFunc)(outputStream, buf, strlen(buf));
     }
+    if (j < 256) {
+      sprintf(buf, "%d 1 255 { 1 index exch /.notdef put } for\n", j);
+      (*outputFunc)(outputStream, buf, strlen(buf));
+    }
     (*outputFunc)(outputStream, "readonly def\n", 13);
     (*outputFunc)(outputStream, "currentdict end\n", 16);
 
@@ -1162,7 +1173,8 @@ void Type1CFontFile::convertToType0(const char *psName,
     eexecWrite("/RD {string currentfile exch readstring pop} executeonly def\n");
     eexecWrite("/ND {noaccess def} executeonly def\n");
     eexecWrite("/NP {noaccess put} executeonly def\n");
-    eexecWrite("/MinFeature {16 16} ND\n");
+    eexecWrite("/MinFeature {16 16} def\n");
+    eexecWrite("/password 5839 def\n");
     eexecWrite(privateDicts[fd].dictData->getCString());
     defaultWidthX = privateDicts[fd].defaultWidthX;
     defaultWidthXFP = privateDicts[fd].defaultWidthXFP;
@@ -1170,7 +1182,7 @@ void Type1CFontFile::convertToType0(const char *psName,
     nominalWidthXFP = privateDicts[fd].nominalWidthXFP;
 
     // set up the subroutines
-    subrIdxPos = dict.privateOffset + privateDicts[fd].subrsOffset;
+    subrIdxPos = privateDicts[fd].subrsOffset;
     j = getIndexLen(subrIdxPos);
     subrBias = (j < 1240) ? 107 : (j < 33900) ? 1131 : 32768;
 
@@ -1445,7 +1457,7 @@ void Type1CFontFile::readPrivateDict(Type1CPrivateDict *privateDict,
 	error(-1, "Got Type 1C InitialRandomSeed");
 	break;
       case 0x0013:
-	privateDict->subrsOffset = (int)op[0];
+	privateDict->subrsOffset = offset + (int)op[0];
 	break;
       case 0x0014:
 	privateDict->defaultWidthX = op[0];
@@ -1711,7 +1723,7 @@ void Type1CFontFile::cvtGlyph(int pos, int n, GBool top) {
     } else if (file[i] == 19) {	// hintmask
       // ignored
       if (firstOp) {
-	cvtGlyphWidth(nOps == 1);
+	cvtGlyphWidth(nOps & 1);
 	firstOp = gFalse;
       }
       if (nOps > 0) {
@@ -1726,7 +1738,7 @@ void Type1CFontFile::cvtGlyph(int pos, int n, GBool top) {
     } else if (file[i] == 20) {	// cntrmask
       // ignored
       if (firstOp) {
-	cvtGlyphWidth(nOps == 1);
+	cvtGlyphWidth(nOps & 1);
 	firstOp = gFalse;
       }
       if (nOps > 0) {
@@ -2350,7 +2362,7 @@ int Type1CFontFile::getIndexValPos(int indexPos, int i, int *valLen) {
 int Type1CFontFile::getIndexEnd(int indexPos) {
   int n, offSize, idxStartPos;
 
-  if (indexPos + 3 > len) {
+  if (indexPos < 0 || indexPos + 3 > len) {
     return -1;
   }
   n = (int)getWord(indexPos, 2);
@@ -2546,6 +2558,14 @@ struct TTFontTableHdr {
 struct T42Table {
   const char *tag;		// 4-byte tag
   GBool required;		// required by the TrueType spec?
+};
+
+struct TTFontCmap {
+  int platform;
+  int encoding;
+  int offset;
+  int len;
+  int fmt;
 };
 
 // TrueType tables to be embedded in Type 42 fonts.
@@ -2831,13 +2851,6 @@ static const char *macGlyphNames[258] = {
   "dmacron"
 };
 
-enum T42FontIndexMode {
-  t42FontModeUnicode,
-  t42FontModeCharCode,
-  t42FontModeCharCodeOffset,
-  t42FontModeMacRoman
-};
-
 struct TrueTypeLoca {
   int idx;
   int pos;
@@ -2845,13 +2858,15 @@ struct TrueTypeLoca {
 };
 
 TrueTypeFontFile::TrueTypeFontFile(const char *fileA, int lenA) {
-  int pos, i, idx, n, length;
+  int pos, pos2, i, idx, n, length;
   Guint size, startPos, endPos;
 
   file = fileA;
   len = lenA;
 
   encoding = NULL;
+  cmaps = NULL;
+  nCmaps = 0;
 
   // read table directory
   nTables = getUShort(4);
@@ -2920,6 +2935,23 @@ TrueTypeFontFile::TrueTypeFontFile(const char *fileA, int lenA) {
   // read the 'maxp' table
   pos = seekTable("maxp");
   nGlyphs = getUShort(pos + 4);
+
+  // read the 'cmap' table
+  if ((pos = seekTable("cmap")) >= 0) {
+    pos2 = pos + 2;
+    if ((nCmaps = getUShort(pos2)) > 0) {
+      pos2 += 2;
+      cmaps = (TTFontCmap *)gmalloc(nCmaps * sizeof(TTFontCmap));
+      for (i = 0; i < nCmaps; ++i) {
+	cmaps[i].platform = getUShort(pos2);
+	cmaps[i].encoding = getUShort(pos2 + 2);
+	cmaps[i].offset = pos + getULong(pos2 + 4);
+	pos2 += 8;
+	cmaps[i].fmt = getUShort(cmaps[i].offset);
+	cmaps[i].len = getUShort(cmaps[i].offset + 2);
+      }
+    }
+  }
 }
 
 TrueTypeFontFile::~TrueTypeFontFile() {
@@ -2931,6 +2963,9 @@ TrueTypeFontFile::~TrueTypeFontFile() {
     }
     gfree(encoding);
   }
+  if (cmaps) {
+    gfree(cmaps);
+  }
   gfree(tableHdrs);
 }
 
@@ -2939,146 +2974,117 @@ const char *TrueTypeFontFile::getName() {
 }
 
 const char **TrueTypeFontFile::getEncoding() {
-  int cmap[256];
-  int nCmaps, cmapPlatform, cmapEncoding, cmapFmt;
-  int pos, i, j;
-  Guint fmt;
-  GString *s;
-  int stringIdx, stringPos, n;
+  int i;
 
-  if (encoding) {
-    return (const char **)encoding;
-  }
-
-  //----- construct the (char code) -> (glyph idx) mapping
-
-  // map everything to the missing glyph
-  for (i = 0; i < 256; ++i) {
-    cmap[i] = 0;
-  }
-
-  // look for the 'cmap' table
-  if ((pos = seekTable("cmap")) >= 0) {
-    nCmaps = getUShort(pos+2);
-
-    // if the font has a Windows-symbol cmap, use it;
-    // otherwise, use the first cmap in the table
-    cmapPlatform = 0; // make gcc happy
-    cmapEncoding = 0; // make gcc happy
-    for (i = 0; i < nCmaps; ++i) {
-      cmapPlatform = getUShort(pos + 4 + 8*i);
-      cmapEncoding = getUShort(pos + 4 + 8*i + 2);
-      if (cmapPlatform == 3 && cmapEncoding == 0) {
-	break;
-      }
-    }
-    if (i >= nCmaps) {
-      i = 0;
-      cmapPlatform = getUShort(pos + 4);
-      cmapEncoding = getUShort(pos + 4 + 2);
-    }
-    pos += getULong(pos + 4 + 8*i + 4);
-
-    // read the cmap
-    cmapFmt = getUShort(pos);
+  if (!encoding) {
+    encoding = (char **)gmalloc(256 * sizeof(char *));
     for (i = 0; i < 256; ++i) {
-      cmap[i] = getCmapEntry(cmapFmt, pos, i);
-    }
-    // Windows-symbol sometimes uses char codes 0xf000 - 0xf0ff, so
-    // we use these to override 0x0000 - 0x00ff
-    if (cmapPlatform == 3 && cmapEncoding == 0) {
-      for (i = 0; i < 256; ++i) {
-	if ((j = getCmapEntry(cmapFmt, pos, 0xf000 + i)) != 0) {
-	  cmap[i] = j;
-	}
-      }
+      encoding[i] = NULL;
     }
   }
-
-  //----- construct the (glyph idx) -> (glyph name) mapping
-  //----- and compute the (char code) -> (glyph name) mapping
-
-  encoding = (char **)gmalloc(256 * sizeof(char *));
-  for (i = 0; i < 256; ++i) {
-    encoding[i] = NULL;
-  }
-
-  if ((pos = seekTable("post")) >= 0) {
-    fmt = getULong(pos);
-
-    // Apple font
-    if (fmt == 0x00010000) {
-      for (i = 0; i < 256; ++i) {
-	j = (cmap[i] < 258) ? cmap[i] : 0;
-	encoding[i] = copyString(macGlyphNames[j]);
-      }
-
-    // Microsoft font
-    } else if (fmt == 0x00020000) {
-      stringIdx = 0;
-      stringPos = pos + 34 + 2*nGlyphs;
-      for (i = 0; i < 256; ++i) {
-	if (cmap[i] < nGlyphs) {
-	  j = getUShort(pos + 34 + 2 * cmap[i]);
-	  if (j < 258) {
-	    encoding[i] = copyString(macGlyphNames[j]);
-	  } else {
-	    j -= 258;
-	    if (j != stringIdx) {
-	      for (stringIdx = 0, stringPos = pos + 34 + 2*nGlyphs;
-		   stringIdx < j;
-		   ++stringIdx, stringPos += 1 + getByte(stringPos)) ;
-	    }
-	    n = getByte(stringPos);
-	    if (stringPos >= 0 && stringPos + 1 + n <= len) {
-	      s = new GString(file + stringPos + 1, n);
-	      encoding[i] = copyString(s->getCString());
-	      delete s;
-	    } else {
-	      encoding[i] = copyString(macGlyphNames[0]);
-	    }
-	    ++stringIdx;
-	    stringPos += 1 + n;
-	  }
-	} else {
-	  encoding[i] = copyString(macGlyphNames[0]);
-	}
-      }
-
-    // Apple subset
-    } else if (fmt == 0x000280000) {
-      for (i = 0; i < 256; ++i) {
-	if (cmap[i] < nGlyphs) {
-	  j = i + getChar(pos + 32 + cmap[i]);
-	} else {
-	  j = 0;
-	}
-	encoding[i] = copyString(macGlyphNames[j]);
-      }
-
-    // Ugh, just assume the Apple glyph set
-    } else {
-      for (i = 0; i < 256; ++i) {
-	j = (cmap[i] < 258) ? cmap[i] : 0;
-	encoding[i] = copyString(macGlyphNames[j]);
-      }
-    }
-
-  // no "post" table: assume the Apple glyph set
-  } else {
-    for (i = 0; i < 256; ++i) {
-      j = (cmap[i] < 258) ? cmap[i] : 0;
-      encoding[i] = copyString(macGlyphNames[j]);
-    }
-  }
-
   return (const char **)encoding;
 }
 
+int TrueTypeFontFile::getNumCmaps() {
+  return nCmaps;
+}
+
+int TrueTypeFontFile::getCmapPlatform(int i) {
+  return cmaps[i].platform;
+}
+
+int TrueTypeFontFile::getCmapEncoding(int i) {
+  return cmaps[i].encoding;
+}
+
+int TrueTypeFontFile::findCmap(int platform, int enc) {
+  int i;
+
+  for (i = 0; i < nCmaps; ++i) {
+    if (cmaps[i].platform == platform && cmaps[i].encoding == enc) {
+      return i;
+    }
+  }
+  return -1;
+}
+
+Gushort TrueTypeFontFile::mapCodeToGID(int i, int c) {
+  if (i < 0 || i >= nCmaps) {
+    return 0;
+  }
+  return (Gushort)getCmapEntry(cmaps[i].fmt, cmaps[i].offset, c);
+}
+
+GHash *TrueTypeFontFile::getNameToGID() {
+  GHash *nameToGID;
+  Guint fmt;
+  GString *s;
+  int stringIdx, stringPos, pos, i, j, n;
+
+  if ((pos = seekTable("post")) < 0) {
+    return NULL;
+  }
+
+  fmt = getULong(pos);
+  nameToGID = NULL;
+
+  // Apple font
+  if (fmt == 0x00010000) {
+    nameToGID = new GHash(gTrue);
+    for (i = 0; i < 258; ++i) {
+      nameToGID->add(new GString(macGlyphNames[i]), (void *)i);
+    }
+
+  // Microsoft font
+  } else if (fmt == 0x00020000) {
+    nameToGID = new GHash(gTrue);
+    n = getUShort(pos + 32);
+    if (n > nGlyphs) {
+      n = nGlyphs;
+    }
+    stringIdx = 0;
+    stringPos = pos + 34 + 2*nGlyphs;
+    for (i = 0; i < nGlyphs; ++i) {
+      j = getUShort(pos + 34 + 2*i);
+      if (j < 258) {
+	nameToGID->remove(macGlyphNames[j]);
+	nameToGID->add(new GString(macGlyphNames[j]), (void *)i);
+      } else {
+	j -= 258;
+	if (j != stringIdx) {
+	  for (stringIdx = 0, stringPos = pos + 34 + 2*nGlyphs;
+	       stringIdx < j;
+	       ++stringIdx, stringPos += 1 + getByte(stringPos)) ;
+	}
+	n = getByte(stringPos);
+	if (stringPos >= 0 && stringPos + 1 + n <= len) {
+	  s = new GString(file + stringPos + 1, n);
+	  nameToGID->remove(s);
+	  nameToGID->add(s, (void *)i);
+	}
+	++stringIdx;
+	stringPos += 1 + n;
+      }
+    }
+
+  // Apple subset
+  } else if (fmt == 0x000280000) {
+    nameToGID = new GHash(gTrue);
+    for (i = 0; i < nGlyphs; ++i) {
+      j = getByte(pos + 32 + i);
+      if (j < 258) {
+	nameToGID->remove(macGlyphNames[j]);
+	nameToGID->add(new GString(macGlyphNames[j]), (void *)i);
+      }
+    }
+  }
+
+  return nameToGID;
+}
+
 void TrueTypeFontFile::convertToType42(const char *name, const char **encodingA,
-				       CharCodeToUnicode *toUnicode,
 				       GBool pdfFontHasEncoding,
-				       GBool pdfFontIsSymbolic,
+				       Gushort *codeToGID,
 				       FontFileOutputFunc outputFunc,
 				       void *outputStream) {
   char buf[512];
@@ -3101,7 +3107,7 @@ void TrueTypeFontFile::convertToType42(const char *name, const char **encodingA,
 
   // write the guts of the dictionary
   cvtEncoding(encodingA, pdfFontHasEncoding, outputFunc, outputStream);
-  cvtCharStrings(encodingA, toUnicode, pdfFontHasEncoding, pdfFontIsSymbolic,
+  cvtCharStrings(encodingA, pdfFontHasEncoding, codeToGID,
 		 outputFunc, outputStream);
   cvtSfnts(outputFunc, outputStream, NULL);
 
@@ -3406,96 +3412,26 @@ void TrueTypeFontFile::cvtEncoding(const char **encodingA, GBool pdfFontHasEncod
 }
 
 void TrueTypeFontFile::cvtCharStrings(const char **encodingA,
-				      CharCodeToUnicode *toUnicode,
 				      GBool pdfFontHasEncoding,
-				      GBool pdfFontIsSymbolic,
+				      Gushort *codeToGID,
 				      FontFileOutputFunc outputFunc,
 				      void *outputStream) {
-  int unicodeCmap, macRomanCmap, msSymbolCmap;
-  int nCmaps, cmapPlatform, cmapEncoding, cmapFmt, cmapOffset;
-  T42FontIndexMode mode;
   const char *name;
   char buf[64], buf2[16];
-  Unicode u;
-  int pos, i, j, k;
+  int i, k;
 
   // always define '.notdef'
   (*outputFunc)(outputStream, "/CharStrings 256 dict dup begin\n", 32);
   (*outputFunc)(outputStream, "/.notdef 0 def\n", 15);
 
   // if there's no 'cmap' table, punt
-  if ((pos = seekTable("cmap")) < 0) {
-    goto err;
-  }
-
-  // To match up with the Adobe-defined behaviour, we choose a cmap
-  // like this:
-  // 1. If the PDF font has an encoding:
-  //    1a. If the TrueType font has a Microsoft Unicode cmap, use it,
-  //        and use the Unicode indexes, not the char codes.
-  //    1b. If the PDF font is symbolic and the TrueType font has a
-  //        Microsoft Symbol cmap, use it, and use (0xf000 + char code).
-  //    1c. If the TrueType font has a Macintosh Roman cmap, use it,
-  //        and reverse map the char names through MacRomanEncoding to
-  //        get char codes.
-  // 2. If the PDF font does not have an encoding:
-  //    2a. If the TrueType font has a Macintosh Roman cmap, use it,
-  //        and use char codes directly.
-  //    2b. If the TrueType font has a Microsoft Symbol cmap, use it,
-  //        and use (0xf000 + char code).
-  // 3. If none of these rules apply, use the first cmap and hope for
-  //    the best (this shouldn't happen).
-  nCmaps = getUShort(pos+2);
-  unicodeCmap = macRomanCmap = msSymbolCmap = -1;
-  cmapOffset = 0;
-  for (i = 0; i < nCmaps; ++i) {
-    cmapPlatform = getUShort(pos + 4 + 8*i);
-    cmapEncoding = getUShort(pos + 4 + 8*i + 2);
-    if ((cmapPlatform == 3 && cmapEncoding == 1) || cmapPlatform == 0) {
-      unicodeCmap = i;
-    } else if (cmapPlatform == 1 && cmapEncoding == 0) {
-      macRomanCmap = i;
-    } else if (cmapPlatform == 3 && cmapEncoding == 0) {
-      msSymbolCmap = i;
-    }
-  }
-  i = 0;
-  mode = t42FontModeCharCode;
-  if (pdfFontHasEncoding) {
-    if (unicodeCmap >= 0) {
-      i = unicodeCmap;
-      mode = t42FontModeUnicode;
-    } else if (pdfFontIsSymbolic && msSymbolCmap >= 0) {
-      i = msSymbolCmap;
-      mode = t42FontModeCharCodeOffset;
-      cmapOffset = 0xf000;
-    } else if (macRomanCmap >= 0) {
-      i = macRomanCmap;
-      mode = t42FontModeMacRoman;
-    }
-  } else {
-    if (macRomanCmap >= 0) {
-      i = macRomanCmap;
-      mode = t42FontModeCharCode;
-    } else if (msSymbolCmap >= 0) {
-      i = msSymbolCmap;
-      mode = t42FontModeCharCodeOffset;
-      cmapOffset = 0xf000;
-    }
-  }
-  cmapPlatform = getUShort(pos + 4 + 8*i);
-  cmapEncoding = getUShort(pos + 4 + 8*i + 2);
-  pos += getULong(pos + 4 + 8*i + 4);
-  cmapFmt = getUShort(pos);
-  if (cmapFmt != 0 && cmapFmt != 4 && cmapFmt != 6) {
-    error(-1, "Unimplemented cmap format (%d) in TrueType font file",
-	  cmapFmt);
+  if (nCmaps == 0) {
     goto err;
   }
 
   // map char name to glyph index:
   // 1. use encoding to map name to char code
-  // 2. use cmap to map char code to glyph index
+  // 2. use codeToGID to map char code to glyph index
   // N.B. We do this in reverse order because font subsets can have
   //      weird encodings that use the same character name twice, and
   //      the first definition is probably the one we want.
@@ -3508,24 +3444,7 @@ void TrueTypeFontFile::cvtCharStrings(const char **encodingA,
       name = buf2;
     }
     if (name && strcmp(name, ".notdef")) {
-      switch (mode) {
-      case t42FontModeUnicode:
-	toUnicode->mapToUnicode((CharCode)i, &u, 1);
-	k = getCmapEntry(cmapFmt, pos, (int)u);
-	break;
-      case t42FontModeCharCode:
-	k = getCmapEntry(cmapFmt, pos, i);
-	break;
-      case t42FontModeCharCodeOffset:
-	if ((k = getCmapEntry(cmapFmt, pos, cmapOffset + i)) == 0) {
-	  k = getCmapEntry(cmapFmt, pos, i);
-	}
-	break;
-      case t42FontModeMacRoman:
-	j = globalParams->getMacRomanCharCode(name);
-	k = getCmapEntry(cmapFmt, pos, j);
-	break;
-      }
+      k = codeToGID[i];
       // note: Distiller (maybe Adobe's PS interpreter in general)
       // doesn't like TrueType fonts that have CharStrings entries
       // which point to nonexistent glyphs, hence the (k < nGlyphs)
@@ -3932,7 +3851,7 @@ void TrueTypeFontFile::writeTTF(FILE *out) {
   TrueTypeLoca *origLocaTable;
   char *locaTable;
   int length, glyfLength;
-  Guint t, pos, pos2;
+  Guint t, pos, pos2, pos3;
   int i, j, k;
 
   // check for missing/broken tables
@@ -3940,18 +3859,19 @@ void TrueTypeFontFile::writeTTF(FILE *out) {
   haveName = seekTable("name") >= 0;
   havePost = seekTable("post") >= 0;
   unsortedLoca = gFalse;
-  pos = 0;
+  pos = seekTable("loca");
+  pos2 = 0;
   for (i = 0; i <= nGlyphs; ++i) {
     if (locaFmt) {
-      pos2 = getULong(pos + 4*i);
+      pos3 = getULong(pos + 4*i);
     } else {
-      pos2 = 2 * getUShort(pos + 2*i);
+      pos3 = 2 * getUShort(pos + 2*i);
     }
-    if (pos2 < pos) {
+    if (pos3 < pos2) {
       unsortedLoca = gTrue;
       break;
     }
-    pos = pos2;
+    pos2 = pos3;
   }
   nNewTables = (haveCmap ? 0 : 1) + (haveName ? 0 : 1) + (havePost ? 0 : 1);
   nZeroLengthTables = 0;

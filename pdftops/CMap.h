@@ -18,6 +18,10 @@
 #include "gtypes.h"
 #include "CharTypes.h"
 
+#if MULTITHREADED
+#include "GMutex.h"
+#endif
+
 class GString;
 struct CMapVectorEntry;
 class CMapCache;
@@ -69,6 +73,9 @@ private:
   CMapVectorEntry *vector;	// vector for first byte (NULL for
 				//   identity CMap)
   int refCnt;
+#ifdef MULTITHREADED
+  GMutex mutex;
+#endif
 };
 
 //------------------------------------------------------------------------

@@ -106,7 +106,7 @@ void *GHash::lookup(GString *key) {
   return p->val;
 }
 
-void *GHash::lookup(char *key) {
+void *GHash::lookup(const char *key) {
   GHashBucket *p;
   int h;
 
@@ -139,7 +139,7 @@ void *GHash::remove(GString *key) {
   return val;
 }
 
-void *GHash::remove(char *key) {
+void *GHash::remove(const char *key) {
   GHashBucket *p;
   GHashBucket **q;
   void *val;
@@ -205,7 +205,7 @@ GHashBucket *GHash::find(GString *key, int *h) {
   return NULL;
 }
 
-GHashBucket *GHash::find(char *key, int *h) {
+GHashBucket *GHash::find(const char *key, int *h) {
   GHashBucket *p;
 
   *h = hash(key);
@@ -218,7 +218,7 @@ GHashBucket *GHash::find(char *key, int *h) {
 }
 
 int GHash::hash(GString *key) {
-  char *p;
+  const char *p;
   unsigned int h;
   int i;
 
@@ -229,8 +229,8 @@ int GHash::hash(GString *key) {
   return (int)(h % size);
 }
 
-int GHash::hash(char *key) {
-  char *p;
+int GHash::hash(const char *key) {
+  const char *p;
   unsigned int h;
 
   h = 0;

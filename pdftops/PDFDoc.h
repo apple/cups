@@ -79,19 +79,20 @@ public:
   Object *getStructTreeRoot() { return catalog->getStructTreeRoot(); }
 
   // Display a page.
-  void displayPage(OutputDev *out, int page, double zoom,
+  void displayPage(OutputDev *out, int page, double hDPI, double vDPI,
 		   int rotate, GBool doLinks,
 		   GBool (*abortCheckCbk)(void *data) = NULL,
 		   void *abortCheckCbkData = NULL);
 
   // Display a range of pages.
   void displayPages(OutputDev *out, int firstPage, int lastPage,
-		    int zoom, int rotate, GBool doLinks,
+		    double hDPI, double vDPI, int rotate, GBool doLinks,
 		    GBool (*abortCheckCbk)(void *data) = NULL,
 		    void *abortCheckCbkData = NULL);
 
   // Display part of a page.
-  void displayPageSlice(OutputDev *out, int page, double zoom,
+  void displayPageSlice(OutputDev *out, int page,
+			double hDPI, double vDPI,
 			int rotate, int sliceX, int sliceY,
 			int sliceW, int sliceH,
 			GBool (*abortCheckCbk)(void *data) = NULL,
@@ -103,7 +104,8 @@ public:
 
   // If point <x>,<y> is in a link, return the associated action;
   // else return NULL.
-  LinkAction *findLink(double x, double y) { return links->find(x, y); }
+  LinkAction *findLink(double x, double y)
+    { return links ? links->find(x, y) : (LinkAction *)NULL; }
 
   // Return true if <x>,<y> is in a link.
   GBool onLink(double x, double y) { return links->onLink(x, y); }

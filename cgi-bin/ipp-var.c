@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp-var.c,v 1.40 2003/11/07 18:52:38 mike Exp $"
+ * "$Id: ipp-var.c,v 1.41 2004/02/02 22:41:09 mike Exp $"
  *
  *   IPP variable routines for the Common UNIX Printing System (CUPS).
  *
@@ -250,7 +250,7 @@ ippRewriteURL(const char *uri,		/* I - Current URI */
     * illegal chars...
     */
 
-    for (rawptr = rawresource, resptr = resource; *rawptr;)
+    for (rawptr = rawresource, resptr = resource; *rawptr; rawptr ++)
       if ((*rawptr & 128) || *rawptr == '%' || *rawptr == ' ' ||
 	  *rawptr == '#' || *rawptr == '?' ||
 	  *rawptr == '.') /* For MSIE */
@@ -263,7 +263,7 @@ ippRewriteURL(const char *uri,		/* I - Current URI */
 	}
       }
       else if (resptr < (resource + sizeof(resource) - 1))
-	*resptr++ = *rawptr++;
+	*resptr++ = *rawptr;
 
     *resptr = '\0';
 
@@ -543,5 +543,5 @@ ippSetCGIVars(ipp_t      *response,	/* I - Response data to be copied... */
 
 
 /*
- * End of "$Id: ipp-var.c,v 1.40 2003/11/07 18:52:38 mike Exp $".
+ * End of "$Id: ipp-var.c,v 1.41 2004/02/02 22:41:09 mike Exp $".
  */

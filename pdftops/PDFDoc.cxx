@@ -113,6 +113,8 @@ PDFDoc::PDFDoc(BaseStream *strA, GString *ownerPassword,
 }
 
 GBool PDFDoc::setup(GString *ownerPassword, GString *userPassword) {
+  str->reset();
+
   // check header
   checkHeader();
 
@@ -198,7 +200,7 @@ void PDFDoc::checkHeader() {
   }
 }
 
-void PDFDoc::displayPage(OutputDev *out, int page, double zoom,
+void PDFDoc::displayPage(OutputDev *out, int page, double hDPI, double vDPI,
 			 int rotate, GBool doLinks,
 			 GBool (*abortCheckCbk)(void *data),
 			 void *abortCheckCbkData) {
@@ -213,27 +215,28 @@ void PDFDoc::displayPage(OutputDev *out, int page, double zoom,
       delete links;
     }
     getLinks(p);
-    p->display(out, zoom, rotate, links, catalog,
+    p->display(out, hDPI, vDPI, rotate, links, catalog,
 	       abortCheckCbk, abortCheckCbkData);
   } else {
-    p->display(out, zoom, rotate, NULL, catalog,
+    p->display(out, hDPI, vDPI, rotate, NULL, catalog,
 	       abortCheckCbk, abortCheckCbkData);
   }
 }
 
 void PDFDoc::displayPages(OutputDev *out, int firstPage, int lastPage,
-			  int zoom, int rotate, GBool doLinks,
+			  double hDPI, double vDPI, int rotate, GBool doLinks,
 			  GBool (*abortCheckCbk)(void *data),
 			  void *abortCheckCbkData) {
   int page;
 
   for (page = firstPage; page <= lastPage; ++page) {
-    displayPage(out, page, zoom, rotate, doLinks,
+    displayPage(out, page, hDPI, vDPI, rotate, doLinks,
 		abortCheckCbk, abortCheckCbkData);
   }
 }
 
-void PDFDoc::displayPageSlice(OutputDev *out, int page, double zoom,
+void PDFDoc::displayPageSlice(OutputDev *out, int page,
+			      double hDPI, double vDPI,
 			      int rotate, int sliceX, int sliceY,
 			      int sliceW, int sliceH,
 			      GBool (*abortCheckCbk)(void *data),
@@ -241,7 +244,7 @@ void PDFDoc::displayPageSlice(OutputDev *out, int page, double zoom,
   Page *p;
 
   p = catalog->getPage(page);
-  p->displaySlice(out, zoom, rotate, sliceX, sliceY, sliceW, sliceH,
+  p->displaySlice(out, hDPI, vDPI, rotate, sliceX, sliceY, sliceW, sliceH,
 		  NULL, catalog, abortCheckCbk, abortCheckCbkData);
 }
 
