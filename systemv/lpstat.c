@@ -1,5 +1,5 @@
 /*
- * "$Id: lpstat.c,v 1.37.2.2 2002/01/02 18:05:08 mike Exp $"
+ * "$Id: lpstat.c,v 1.37.2.3 2002/01/18 19:18:25 mike Exp $"
  *
  *   "lpstat" command for the Common UNIX Printing System (CUPS).
  *
@@ -206,8 +206,22 @@ main(int  argc,			/* I - Number of command-line arguments */
 	    }
 	    break;
 
-        case 'l' : /* Long status */
-	    long_status = 2;
+        case 'l' : /* Long status or long job status */
+	    if (!http)
+	    {
+              http = httpConnectEncrypt(cupsServer(), ippPort(), encryption);
+
+	      if (http == NULL)
+	      {
+		perror("lpstat: Unable to connect to server");
+		return (1);
+	      }
+            }
+
+	    if (argv[i][2] != '\0')
+	      show_jobs(http, argv[i] + 2, NULL, 3, ranking);
+	    else
+	      long_status = 2;
 	    break;
 
         case 'o' : /* Show jobs by destination */
@@ -596,18 +610,18 @@ show_accepting(http_t      *http,	/* I - HTTP connection to server */
       if (match)
       {
         if (accepting)
-	  printf("%s accepting requests\n", printer);
+	  printf("%s accepting requests since Jan 01 00:00\n", printer);
 	else
-	  printf("%s not accepting requests -\n\t%s\n", printer,
+	  printf("%s not accepting requests since Jan 01 00:00 -\n\t%s\n", printer,
 	         message == NULL ? "reason unknown" : message);
 
         for (i = 0; i < num_dests; i ++)
 	  if (strcasecmp(dests[i].name, printer) == 0 && dests[i].instance)
 	  {
             if (accepting)
-	      printf("%s/%s accepting requests\n", printer, dests[i].instance);
+	      printf("%s/%s accepting requests since Jan 01 00:00\n", printer, dests[i].instance);
 	    else
-	      printf("%s/%s not accepting requests -\n\t%s\n", printer,
+	      printf("%s/%s not accepting requests since Jan 01 00:00 -\n\t%s\n", printer,
 	             dests[i].instance,
 	             message == NULL ? "reason unknown" : message);
 	  }
@@ -1194,7 +1208,8 @@ show_jobs(http_t     *http,	/* I - HTTP connection to server */
   ipp_attribute_t *attr;	/* Current attribute */
   cups_lang_t	*language;	/* Default language */
   const char	*dest,		/* Pointer into job-printer-uri */
-		*username;	/* Pointer to job-originating-user-name */
+		*username,	/* Pointer to job-originating-user-name */
+		*title;		/* Pointer to job-name */
   int		rank,		/* Rank in queue */
 		jobid,		/* job-id */
 		size;		/* job-k-octets */
@@ -1209,6 +1224,7 @@ show_jobs(http_t     *http,	/* I - HTTP connection to server */
 		{
 		  "job-id",
 		  "job-k-octets",
+		  "job-name",
 		  "time-at-creation",
 		  "job-printer-uri",
 		  "job-originating-user-name"
@@ -1294,6 +1310,7 @@ show_jobs(http_t     *http,	/* I - HTTP connection to server */
       username = NULL;
       dest     = NULL;
       jobtime  = 0;
+      title    = "no title";
 
       while (attr != NULL && attr->group_tag == IPP_TAG_JOB)
       {
@@ -1317,6 +1334,10 @@ show_jobs(http_t     *http,	/* I - HTTP connection to server */
         if (strcmp(attr->name, "job-originating-user-name") == 0 &&
 	    attr->value_tag == IPP_TAG_NAME)
 	  username = attr->values[0].string.text;
+
+        if (strcmp(attr->name, "job-name") == 0 &&
+	    attr->value_tag == IPP_TAG_NAME)
+	  title = attr->values[0].string.text;
 
         attr = attr->next;
       }
@@ -1431,17 +1452,32 @@ show_jobs(http_t     *http,	/* I - HTTP connection to server */
       if (match)
       {
         jobdate = localtime(&jobtime);
-	strftime(date, sizeof(date), CUPS_STRFTIME_FORMAT, jobdate);
         snprintf(temp, sizeof(temp), "%s-%d", dest, jobid);
-        
-        if (ranking)
-	  printf("%3d %-21s %-13s %8d %s\n", rank, temp,
-	         username ? username : "unknown", size, date);
-        else
-	  printf("%-23s %-13s %8d   %s\n", temp,
-	         username ? username : "unknown", size, date);
-        if (long_status)
-	  printf("\tqueued for %s\n", dest);
+
+        if (long_status == 3)
+	{
+	 /*
+	  * Show the consolidated output format for the SGI tools...
+	  */
+
+	  strftime(date, sizeof(date), "%b %d %H:%M", jobdate);
+
+	  printf("%s;%s;%d;%s;%s\n", temp, username ? username : "unknown",
+	         size, title ? title : "unknown", date);
+	}
+	else
+	{
+	  strftime(date, sizeof(date), CUPS_STRFTIME_FORMAT, jobdate);
+
+          if (ranking)
+	    printf("%3d %-21s %-13s %8d %s\n", rank, temp,
+	           username ? username : "unknown", size, date);
+          else
+	    printf("%-23s %-13s %8d   %s\n", temp,
+	           username ? username : "unknown", size, date);
+          if (long_status)
+	    printf("\tqueued for %s\n", dest);
+	}
       }
 
       if (attr == NULL)
@@ -1733,13 +1769,13 @@ show_printers(http_t      *http,	/* I - HTTP connection to server */
         switch (pstate)
 	{
 	  case IPP_PRINTER_IDLE :
-	      printf("printer %s is idle.\n", printer);
+	      printf("printer %s is idle.  enabled since Jan 01 00:00\n", printer);
 	      break;
 	  case IPP_PRINTER_PROCESSING :
-	      printf("printer %s now printing %s-%d.\n", printer, printer, jobid);
+	      printf("printer %s now printing %s-%d.  enabled since Jan 01 00:00\n", printer, printer, jobid);
 	      break;
 	  case IPP_PRINTER_STOPPED :
-	      printf("printer %s disabled -\n\t%s\n", printer,
+	      printf("printer %s disabled since Jan 01 00:00 -\n\t%s\n", printer,
 	             message == NULL ? "reason unknown" : message);
 	      break;
 	}
@@ -1778,14 +1814,14 @@ show_printers(http_t      *http,	/* I - HTTP connection to server */
             switch (pstate)
 	    {
 	      case IPP_PRINTER_IDLE :
-		  printf("printer %s/%s is idle.\n", printer, dests[i].instance);
+		  printf("printer %s/%s is idle.  enabled since Jan 01 00:00\n", printer, dests[i].instance);
 		  break;
 	      case IPP_PRINTER_PROCESSING :
-		  printf("printer %s/%s now printing %s-%d.\n", printer,
+		  printf("printer %s/%s now printing %s-%d.  enabled since Jan 01 00:00\n", printer,
 		         dests[i].instance, printer, jobid);
 		  break;
 	      case IPP_PRINTER_STOPPED :
-		  printf("printer %s/%s disabled -\n\t%s\n", printer,
+		  printf("printer %s/%s disabled since Jan 01 00:00 -\n\t%s\n", printer,
 		         dests[i].instance,
 			 message == NULL ? "reason unknown" : message);
 		  break;
@@ -1845,5 +1881,5 @@ show_scheduler(http_t *http)	/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpstat.c,v 1.37.2.2 2002/01/02 18:05:08 mike Exp $".
+ * End of "$Id: lpstat.c,v 1.37.2.3 2002/01/18 19:18:25 mike Exp $".
  */

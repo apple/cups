@@ -3,6 +3,12 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.13
 
+	- The lpstat command now supports the (undocumented)
+	  IRIX -l option ("-lprintername") for a compact job
+	  listing for a printer.
+	- The lpstat command now includes printer date/time
+	  information in the output (always Jan 01 00:00) to
+	  make third-party tools happy.
 	- The text filter now supports non-integer cpi and lpi
 	  values.
 	- The Margins field in the CUPS raster header was not
