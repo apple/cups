@@ -1,5 +1,5 @@
 /*
- * "$Id: lp.c,v 1.1 1999/02/26 15:11:35 mike Exp $"
+ * "$Id: lp.c,v 1.2 1999/03/01 22:26:41 mike Exp $"
  *
  *   "lp" command for the Common UNIX Printing System (CUPS).
  *
@@ -58,12 +58,10 @@ main(int  argc,		/* I - Number of command-line arguments */
 
 
   silent      = 0;
-  dest        = NULL;
+  dest        = cupsGetDefault();
   num_options = 0;
   options     = NULL;
   num_files   = 0;
-  num_copies  = 1;
-  priority    = 50;
 
   for (i = 1; i < argc; i ++)
     if (argv[i][0] == '-')
@@ -100,6 +98,9 @@ main(int  argc,		/* I - Number of command-line arguments */
 	      fputs("lp: Number copies must be between 1 and 100.\n", stderr);
 	      return (1);
 	    }
+
+            sprintf(buffer, "%d", num_copies);
+            num_options = cupsAddOption("copies", buffer, num_options, &options);
 	    break;
 
 	case 'o' : /* Option */
@@ -126,6 +127,9 @@ main(int  argc,		/* I - Number of command-line arguments */
 	      fputs("lp: Priority must be between 1 and 100.\n", stderr);
 	      return (1);
 	    }
+
+            sprintf(buffer, "%d", priority);
+            num_options = cupsAddOption("job-priority", buffer, num_options, &options);
 	    break;
 
 	case 's' : /* Silent */
@@ -140,6 +144,8 @@ main(int  argc,		/* I - Number of command-line arguments */
 	      i ++;
 	      title = argv[i];
 	    }
+
+	    num_options = cupsAddOption("job-name", title, num_options, &options);
 	    break;
 
 	default :
@@ -151,9 +157,6 @@ main(int  argc,		/* I - Number of command-line arguments */
    /*
     * Print a file...
     */
-
-    if (dest == NULL)
-      dest = cupsGetDefault();
 
     if (dest == NULL)
     {
@@ -179,9 +182,6 @@ main(int  argc,		/* I - Number of command-line arguments */
 
   if (num_files == 0)
   {
-    if (dest == NULL)
-      dest = cupsGetDefault();
-
     if (dest == NULL)
     {
       fputs("lp: error - no default destination available.\n", stderr);
@@ -224,5 +224,5 @@ main(int  argc,		/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: lp.c,v 1.1 1999/02/26 15:11:35 mike Exp $".
+ * End of "$Id: lp.c,v 1.2 1999/03/01 22:26:41 mike Exp $".
  */
