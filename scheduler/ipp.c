@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.14 1999/05/19 19:46:41 mike Exp $"
+ * "$Id: ipp.c,v 1.15 1999/05/20 16:50:20 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -1074,11 +1074,16 @@ get_default(client_t *con)		/* I - Client connection */
 {
   DEBUG_printf(("get_default(%08x)\n", con));
 
-  copy_attrs(con->response, DefaultPrinter->attrs,
-             ippFindAttribute(con->request, "requested-attributes",
-	                      IPP_TAG_KEYWORD));
+  if (DefaultPrinter != NULL)
+  {
+    copy_attrs(con->response, DefaultPrinter->attrs,
+               ippFindAttribute(con->request, "requested-attributes",
+	                	IPP_TAG_KEYWORD));
 
-  con->response->request.status.status_code = IPP_OK;
+    con->response->request.status.status_code = IPP_OK;
+  }
+  else
+    con->response->request.status.status_code = IPP_NOT_FOUND;
 }
 
 
@@ -2236,5 +2241,5 @@ validate_job(client_t        *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.14 1999/05/19 19:46:41 mike Exp $".
+ * End of "$Id: ipp.c,v 1.15 1999/05/20 16:50:20 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c,v 1.17 1999/05/19 18:00:53 mike Exp $"
+ * "$Id: util.c,v 1.18 1999/05/20 16:50:17 mike Exp $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -285,6 +285,8 @@ cupsDoFileRequest(http_t *http,		/* I - HTTP connection to server */
 
         continue;
       }
+      else
+        break;
     }
 #endif /* WIN32 || __EMX__ */
 
@@ -949,5 +951,5 @@ cups_connect(char *name,	/* I - Destination (printer[@host]) */
 
 
 /*
- * End of "$Id: util.c,v 1.17 1999/05/19 18:00:53 mike Exp $".
+ * End of "$Id: util.c,v 1.18 1999/05/20 16:50:17 mike Exp $".
  */
