@@ -3,6 +3,10 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.16
 
+	- "lp -q" would cause the "lp" command to segfault, as
+	  the program would try to print the option letter that
+	  caused the error using the wrong index into the
+	  command-line; bugfix from Debian.
 	- Fixed a minor inconsistancy in the encoding of boolean
 	  attributes from printer options in
 	  cupsEncodeOptions().

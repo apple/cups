@@ -1,5 +1,5 @@
 /*
- * "$Id: lp.c,v 1.29.2.6 2002/05/09 03:08:04 mike Exp $"
+ * "$Id: lp.c,v 1.29.2.7 2002/08/12 18:53:36 mike Exp $"
  *
  *   "lp" command for the Common UNIX Printing System (CUPS).
  *
@@ -290,14 +290,14 @@ main(int  argc,		/* I - Number of command-line arguments */
 	      priority = atoi(argv[i] + 2);
 	    else
 	    {
-	      i ++;
-
-	      if (i >= argc)
+	      if ((i + 1) >= argc)
 	      {
 	        fprintf(stderr, "lp: Expected priority after -%c option!\n",
 		        argv[i][1]);
 		return (1);
               }
+
+	      i ++;
 
 	      priority = atoi(argv[i]);
 	    }
@@ -655,5 +655,5 @@ sighandler(int s)	/* I - Signal number */
 
 
 /*
- * End of "$Id: lp.c,v 1.29.2.6 2002/05/09 03:08:04 mike Exp $".
+ * End of "$Id: lp.c,v 1.29.2.7 2002/08/12 18:53:36 mike Exp $".
  */
