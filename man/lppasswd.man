@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: lppasswd.man,v 1.1.2.2 2002/01/02 18:04:53 mike Exp $"
+.\" "$Id: lppasswd.man,v 1.1.2.3 2002/08/22 17:14:42 mike Exp $"
 .\"
 .\"   lpadmin man page for the Common UNIX Printing System (CUPS).
 .\"
@@ -57,5 +57,5 @@ http://localhost:631/documentation.html
 .SH COPYRIGHT
 Copyright 1993-2002 by Easy Software Products, All Rights Reserved.
 .\"
-.\" End of "$Id: lppasswd.man,v 1.1.2.2 2002/01/02 18:04:53 mike Exp $".
+.\" End of "$Id: lppasswd.man,v 1.1.2.3 2002/08/22 17:14:42 mike Exp $".
 .\"

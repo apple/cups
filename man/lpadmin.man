@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: lpadmin.man,v 1.4.2.2 2002/02/12 19:23:10 mike Exp $"
+.\" "$Id: lpadmin.man,v 1.4.2.3 2002/08/22 17:14:42 mike Exp $"
 .\"
 .\"   lpadmin man page for the Common UNIX Printing System (CUPS).
 .\"
@@ -85,6 +85,21 @@ directory.
 Sets a PPD or server option for the printer. PPD options can be listed
 using the \fI-l\fR option with the \fIlpoptions(1)\fR command.
 .TP 5
+\-o \fIjob-k-limit=value\fR
+.br
+Sets the kilobyte limit for per-user quotas. The value is an integer number
+of kilobytes; one kilobyte is 1024 bytes.
+.TP 5
+\-o \fIjob-page-limit=value\fR
+.br
+Sets the page limit for per-user quotas. The value is the integer number of
+pages that can be printed; double-sided pages are counted as two pages.
+.TP 5
+\-o \fIjob-quota-period=value\fR
+.br
+Sets the accounting period for per-user quotas. The value is an integer number
+of seconds; 86,400 seconds are in one day.
+.TP 5
 \-r \fIclass\fR
 .br
 Removes the named \fIprinter\fR from \fIclass\fR.  If the resulting class
@@ -137,5 +152,5 @@ http://localhost:631/documentation.html
 .SH COPYRIGHT
 Copyright 1993-2002 by Easy Software Products, All Rights Reserved.
 .\"
-.\" End of "$Id: lpadmin.man,v 1.4.2.2 2002/02/12 19:23:10 mike Exp $".
+.\" End of "$Id: lpadmin.man,v 1.4.2.3 2002/08/22 17:14:42 mike Exp $".
 .\"

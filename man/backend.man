@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: backend.man,v 1.6.2.2 2002/07/23 21:20:26 mike Exp $"
+.\" "$Id: backend.man,v 1.6.2.3 2002/08/22 17:14:41 mike Exp $"
 .\"
 .\"   backend man page for the Common UNIX Printing System (CUPS).
 .\"
@@ -111,5 +111,5 @@ http://localhost:631/documentation.html
 .SH COPYRIGHT
 Copyright 1993-2002 by Easy Software Products, All Rights Reserved.
 .\"
-.\" End of "$Id: backend.man,v 1.6.2.2 2002/07/23 21:20:26 mike Exp $".
+.\" End of "$Id: backend.man,v 1.6.2.3 2002/08/22 17:14:41 mike Exp $".
 .\"

@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: cups-lpd.man,v 1.5.2.2 2002/03/04 17:31:08 mike Exp $"
+.\" "$Id: cups-lpd.man,v 1.5.2.3 2002/08/22 17:14:41 mike Exp $"
 .\"
 .\"   cups-lpd man page for the Common UNIX Printing System (CUPS).
 .\"
@@ -56,6 +56,18 @@ lines to the \fBxinetd.conf\fR file:
         server = /usr/lib/cups/daemon/cups-lpd
     }
 .fi
+.SH SECURITY
+\fBcups-lpd\fR currently does not perform any access control
+based on the settings in \fIcupsd.conf(5)\fR or in the
+\fIhosts.allow(5)\fR or \fIhosts.deny\fR files used by TCP
+wrappers. Therefore, running \fBcups-lpd\fR on your server will
+allow any computer on your network (and perhaps the entire
+Internet) to print to your server.
+.LP
+While \fIxinetd\fR has built-in access control support, you
+should use the TCP wrappers package with \fIinetd\fR to limit
+access to only those computers that should be able to print
+through your server.
 .SH OPTIONS
 The \fI-o\fR option to \fBcups-lpd\fR inserts options for all print queues.
 Most often this is used to disable the "l" filter so that remote print jobs
@@ -91,5 +103,5 @@ http://localhost:631/documentation.html
 .SH COPYRIGHT
 Copyright 1993-2002 by Easy Software Products, All Rights Reserved.
 .\"
-.\" End of "$Id: cups-lpd.man,v 1.5.2.2 2002/03/04 17:31:08 mike Exp $".
+.\" End of "$Id: cups-lpd.man,v 1.5.2.3 2002/08/22 17:14:41 mike Exp $".
 .\"

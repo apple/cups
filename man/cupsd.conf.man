@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: cupsd.conf.man,v 1.5.2.1 2002/01/02 18:04:52 mike Exp $"
+.\" "$Id: cupsd.conf.man,v 1.5.2.2 2002/08/22 17:14:41 mike Exp $"
 .\"
 .\"   cupsd.conf man page for the Common UNIX Printing System (CUPS).
 .\"
@@ -21,7 +21,7 @@
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
-.TH cupsd.conf 5 "Common UNIX Printing System" "22 June 2000" "Easy Software Products"
+.TH cupsd.conf 5 "Common UNIX Printing System" "12 August 2002" "Easy Software Products"
 .SH NAME
 cupsd.conf \- server configuration file for cups
 .SH DESCRIPTION
@@ -52,6 +52,11 @@ AuthType
 .br
 Specifies the authentication type (None, Basic, Digest)
 .TP 5
+AutoPurgeJobs
+.br
+Specifies whether to purge job history data automatically when
+it is no longer required for quotas.
+.TP 5
 BrowseAddress
 .br
 Specifies a broadcast address for outgoing printer information packets.
@@ -80,6 +85,10 @@ BrowsePort
 .br
 Specifies the port to listen to for printer information packets.
 .TP 5
+BrowseProtocols
+.br
+Specifies the protocols to use for printer browsing.
+.TP 5
 BrowseRelay
 .br
 Specifies that printer information packets should be relayed from one host or
@@ -99,6 +108,20 @@ remote printers will be removed from the list of available printers.
 Browsing
 .br
 Specifies whether or not remote printer browsing should be enabled.
+.TP 5
+Classification
+.br
+Specifies the security classification of the server.
+.TP 5
+ClassifyOverride
+.br
+Specifies whether to allow users to override the classification
+of individual print jobs.
+.TP 5
+ConfigFilePerm
+.br
+Specifies the permissions for all configuration files that the scheduler
+writes.
 .TP 5
 DataDir
 .br
@@ -120,18 +143,46 @@ DocumentRoot
 .br
 Specifies the root directory for the internal web server documents.
 .TP 5
+Encryption
+.br
+Specifies the level of encryption that is required for a particular
+location.
+.TP 5
 ErrorLog
 .br
 Specifies the error log filename.
+.TP 5
+FilterLimit
+.br
+Specifies the maximum cost of filters that are run concurrently.
+.TP 5
+FilterNice
+.br
+Specifies the scheduling priority ("nice" value) of filters that
+are run to print a job.
+.TP 5
+FontPath
+.br
+Specifies the search path for fonts.
 .TP 5
 Group
 .br
 Specifies the group name or ID that will be used when executing
 external programs.
 .TP 5
+HideImplicitMembers
+.br
+Specifies whether to hide members of implicit classes.
+.TP 5
 HostNameLookups
 .br
 Specifies whether or not to do reverse lookups on client addresses.
+.TP 5
+ImplicitAnyClasses
+.br
+Specifies whether or not to create implicit classes for local and
+remote printers, e.g. "AnyPrinter" from "Printer", "Printer@server1",
+and "Printer@server2".
 .TP 5
 ImplicitClasses
 .br
@@ -146,17 +197,47 @@ KeepAliveTimeout
 .br
 Specifies the connection timeout for HTTP Keep-Alive.
 .TP 5
+<Limit methods> ... </Limit>
+.TP 5
+<LimitExcept methods> ... </LimitExcept>
+.br
+Specifies the HTTP methods that are being limited inside a location.
+.TP 5
+LimitRequestBody
+.br
+Specifies the maximum size of any print job request.
+.TP 5
 <Location /path> ... </Location>
 .br
 Specifies access control for the named location.
 .TP 5
+LogFilePerm
+.br
+Specifies the permissions for all log files that the scheduler writes.
+.TP 5
 LogLevel
 .br
-Specifies the logging level (none, warn, error, info, or debug)
+Specifies the logging level (none, warn, error, info, debug, or debug2)
 .TP 5
 MaxClients
 .br
 Specifies the maximum number of simultaneous clients to support.
+.TP 5
+MaxCopies
+.br
+Specifies the maximum number of copies that a user can print of each job.
+.TP 5
+MaxJobs
+.br
+Specifies the maximum number of simultaneous jobs to support.
+.TP 5
+MaxJobsPerPrinter
+.br
+Specifies the maximum number of simultaneous jobs per printer to support.
+.TP 5
+MaxJobsPerUser
+.br
+Specifies the maximum number of simultaneous jobs per user to support.
 .TP 5
 MaxLogSize
 .br
@@ -193,15 +274,39 @@ Printcap
 Specifies the filename for a printcap file that is updated automatically
 with a list of available printers (needed for legacy applications)
 .TP 5
-RIPCache
+PrintcapGUI
 .br
-Specifies the maximum amount of memory to use when converting images
-and PostScript files to bitmaps for a printer.
+Specifies whether to generate option panel definition files on some
+operating systems.
+.TP 5
+RemoteRoot
+.br
+Specifies the username that is associated with unauthenticated root
+accesses.
 .TP 5
 RequestRoot
 .br
 Specifies the directory to store print jobs and other HTTP request
 data.
+.TP 5
+Require
+.br
+Specifies that user or group authentication is required.
+.TP 5
+RIPCache
+.br
+Specifies the maximum amount of memory to use when converting images
+and PostScript files to bitmaps for a printer.
+.TP 5
+RunAsUser
+.br
+Specifies that the scheduler should run as the unpriviledged user
+set with the User directive.
+.TP 5
+Satisfy
+.br
+Specifies whether all or any limits set for a Location must be
+satisfied to allow access.
 .TP 5
 ServerAdmin
 .br
@@ -211,6 +316,14 @@ ServerBin
 .br
 Specifies the directory where backends, CGIs, daemons, and filters may
 be found.
+.TP 5
+ServerCertificate
+.br
+Specifies the encryption certificate to use.
+.TP 5
+ServerKey
+.br
+Specifies the encryption key to use.
 .TP 5
 ServerName
 .br
@@ -242,5 +355,5 @@ http://localhost:631/documentation.html
 .SH COPYRIGHT
 Copyright 1993-2002 by Easy Software Products, All Rights Reserved.
 .\"
-.\" End of "$Id: cupsd.conf.man,v 1.5.2.1 2002/01/02 18:04:52 mike Exp $".
+.\" End of "$Id: cupsd.conf.man,v 1.5.2.2 2002/08/22 17:14:41 mike Exp $".
 .\"

@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: lp.man,v 1.6.2.2 2002/01/02 18:04:53 mike Exp $"
+.\" "$Id: lp.man,v 1.6.2.3 2002/08/22 17:14:42 mike Exp $"
 .\"
 .\"   lp/cancel man page for the Common UNIX Printing System (CUPS).
 .\"
@@ -89,6 +89,14 @@ The following options are recognized by \fBlp\fR:
 .br
 Forces encryption when connecting to the server.
 .TP 5
+\-c
+.br
+This option is provided for backwards-compatibility only. On
+systems that support it, this option forces the print file to be
+copied to the spool directory before printing. In CUPS, print
+files are always sent to the scheduler via IPP which has the
+same effect.
+.TP 5
 \-d \fIdestination\fR
 .br
 Prints files to the named printer.
@@ -156,5 +164,5 @@ http://localhost:631/documentation.html
 .SH COPYRIGHT
 Copyright 1993-2002 by Easy Software Products, All Rights Reserved.
 .\"
-.\" End of "$Id: lp.man,v 1.6.2.2 2002/01/02 18:04:53 mike Exp $".
+.\" End of "$Id: lp.man,v 1.6.2.3 2002/08/22 17:14:42 mike Exp $".
 .\"
