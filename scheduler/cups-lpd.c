@@ -1,5 +1,5 @@
 /*
- * "$Id: cups-lpd.c,v 1.16 2000/11/20 00:22:55 mike Exp $"
+ * "$Id: cups-lpd.c,v 1.17 2000/12/12 14:58:02 mike Exp $"
  *
  *   Line Printer Daemon interface for the Common UNIX Printing System (CUPS).
  *
@@ -26,8 +26,10 @@
  *   main()             - Process an incoming LPD request...
  *   print_file()       - Print a file to a printer or class.
  *   recv_print_job()   - Receive a print job from the client.
- *   send_short_state() - Send the short queue state.
  *   remove_jobs()      - Cancel one or more jobs.
+ *   send_short_state() - Send the short queue state.
+ *   smart_gets()       - Get a line of text, removing the trailing CR
+ *                        and/or LF.
  */
 
 /*
@@ -59,7 +61,8 @@
  *
  *     - The "Print any waiting jobs" command is a no-op.
  *
- * The LPD-to-IPP mapping and report formats are as defined in RFC 2569.
+ * The LPD-to-IPP mapping is as defined in RFC 2569.  The report formats
+ * currently match the Solaris LPD mini-daemon.
  */
 
 /*
@@ -71,8 +74,9 @@ int	print_file(const char *name, const char *file,
 	           const char *user, int num_options,
 		   cups_option_t *options);
 int	recv_print_job(const char *dest, int num_defaults, cups_option_t *defaults);
-int	send_state(const char *dest, const char *list, int longstatus);
 int	remove_jobs(const char *dest, const char *agent, const char *list);
+int	send_state(const char *dest, const char *list, int longstatus);
+char	*smart_gets(char *s, int len, FILE *fp);
 
 
 /*
@@ -86,7 +90,7 @@ main(int  argc,			/* I - Number of command-line arguments */
   int		i;		/* Looping var */
   int		num_defaults;	/* Number of default options */
   cups_option_t	*defaults;	/* Default options */
-  char		line[1024],	/* Command string */
+  char		line[256],	/* Command string */
 		command,	/* Command code */
 		*dest,		/* Pointer to destination */
 		*list,		/* Pointer to list */
@@ -144,7 +148,7 @@ main(int  argc,			/* I - Number of command-line arguments */
   * every connection.
   */
 
-  if (fgets(line, sizeof(line), stdin) == NULL)
+  if (smart_gets(line, sizeof(line), stdin) == NULL)
   {
    /*
     * Unable to get command from client!  Send an error status and return.
@@ -176,7 +180,7 @@ main(int  argc,			/* I - Number of command-line arguments */
   {
     default : /* Unknown command */
         syslog(LOG_ERR, "Unknown LPD command 0x%02X!", command);
-        syslog(LOG_ERR, "Command line = %s", line);
+        syslog(LOG_ERR, "Command line = %s", line + 1);
 	putchar(1);
 
         status = 1;
@@ -342,15 +346,16 @@ recv_print_job(const char    *dest,	/* I - Destination */
   int		i;			/* Looping var */
   int		status;			/* Command status */
   FILE		*fp;			/* Temporary file */
-  char		filename[1024];		/* Filename */
+  char		filename[1024];		/* Temporary filename */
   int		bytes;			/* Bytes received */
-  char		line[1024],		/* Line from file/stdin */
+  char		line[256],		/* Line from file/stdin */
 		command,		/* Command from line */
 		*count,			/* Number of bytes */
 		*name;			/* Name of file */
   int		num_data;		/* Number of data files */
-  char		data[32][256];		/* Data files */
-  const char	*tmpdir;		/* Temporary directory */
+  char		control[1024],		/* Control filename */
+		data[32][256],		/* Data files */
+		temp[32][1024];		/* Temporary files */
   char		user[1024],		/* User name */
 		title[1024],		/* Job title */
 		docname[1024],		/* Document name */
@@ -366,8 +371,6 @@ recv_print_job(const char    *dest,	/* I - Destination */
 
   status   = 0;
   num_data = 0;
-  if ((tmpdir = getenv("TMPDIR")) == NULL)
-    tmpdir = CUPS_REQUESTS "/tmp";
 
   strncpy(queue, dest, sizeof(queue) - 1);
   queue[sizeof(queue) - 1] = '\0';
@@ -387,7 +390,7 @@ recv_print_job(const char    *dest,	/* I - Destination */
     return (1);
   }
 
-  while (fgets(line, sizeof(line), stdin) != NULL)
+  while (smart_gets(line, sizeof(line), stdin) != NULL)
   {
     if (strlen(line) < 2)
     {
@@ -417,7 +420,8 @@ recv_print_job(const char    *dest,	/* I - Destination */
 	    break;
 	  }
 
-          snprintf(filename, sizeof(filename), "%s/%06d-0", tmpdir, getpid());
+          cupsTempFile(control, sizeof(control));
+	  strcpy(filename, control);
 	  break;
       case 0x03 : /* Receive data file */
           if (strlen(name) < 2)
@@ -428,13 +432,25 @@ recv_print_job(const char    *dest,	/* I - Destination */
 	    break;
 	  }
 
-          name[strlen(name) - 1] = '\0'; /* Strip LF */
+          if (num_data >= (sizeof(data) / sizeof(data[0])))
+	  {
+	   /*
+	    * Too many data files...
+	    */
+
+	    syslog(LOG_ERR, "Too many data files (%d)", num_data);
+	    putchar(1);
+	    status = 1;
+	    break;
+	  }
+
 	  strncpy(data[num_data], name, sizeof(data[0]) - 1);
 	  data[num_data][sizeof(data[0]) - 1] = '\0';
 
+          cupsTempFile(temp[num_data], sizeof(temp[0]));
+	  strcpy(filename, temp[num_data]);
+
           num_data ++;
-          snprintf(filename, sizeof(filename), "%s/%06d-%d", tmpdir, getpid(),
-	           num_data);
 	  break;
     }
 
@@ -505,25 +521,21 @@ recv_print_job(const char    *dest,	/* I - Destination */
     * Process the control file and print stuff...
     */
 
-    snprintf(filename, sizeof(filename), "%s/%06d-0", tmpdir, getpid());
-    if ((fp = fopen(filename, "rb")) == NULL)
+    if ((fp = fopen(control, "rb")) == NULL)
       status = 1;
     else
     {
+     /*
+      * Grab the job information first...
+      */
+
       title[0]   = '\0';
       user[0]    = '\0';
       docname[0] = '\0';
       banner     = 0;
 
-      while (fgets(line, sizeof(line), fp) != NULL)
+      while (smart_gets(line, sizeof(line), fp) != NULL)
       {
-       /*
-        * Strip the trailing newline...
-	*/
-
-        if (line[0])
-	  line[strlen(line) - 1] = '\0';
-
        /*
         * Process control lines...
 	*/
@@ -545,6 +557,26 @@ recv_print_job(const char    *dest,	/* I - Destination */
 	  case 'L' : /* Print banner page */
 	      banner = 1;
 	      break;
+	}
+
+	if (status)
+	  break;
+      }
+
+     /*
+      * Then print the jobs...
+      */
+
+      rewind(fp);
+
+      while (smart_gets(line, sizeof(line), fp) != NULL)
+      {
+       /*
+        * Process control lines...
+	*/
+
+	switch (line[0])
+	{
 	  case 'c' : /* Plot CIF file */
 	  case 'd' : /* Print DVI file */
 	  case 'f' : /* Print formatted file */
@@ -615,14 +647,13 @@ recv_print_job(const char    *dest,	/* I - Destination */
 	      * Send the print request...
 	      */
 
-              snprintf(filename, sizeof(filename), "%s/%06d-%d", tmpdir,
-	               getpid(), i + 1);
-
-              if (print_file(queue, filename, title, docname, user, num_options,
+              if (print_file(queue, temp[i], title, docname, user, num_options,
 	                     options) == 0)
                 status = 1;
 	      else
 	        status = 0;
+
+              cupsFreeOptions(num_options, options);
 	      break;
 	}
 
@@ -638,15 +669,118 @@ recv_print_job(const char    *dest,	/* I - Destination */
   * Clean up all temporary files and return...
   */
 
-  for (i = -1; i < num_data; i ++)
-  {
-    snprintf(filename, sizeof(filename), "%s/%06d-%d", tmpdir, getpid(), i + 1);
-    unlink(filename);
-  }
+  unlink(control);
+
+  for (i = 0; i < num_data; i ++)
+    unlink(temp[i]);
 
   cupsFreeDests(num_dests, dests);
 
   return (status);
+}
+
+
+/*
+ * 'remove_jobs()' - Cancel one or more jobs.
+ */
+
+int					/* O - Command status */
+remove_jobs(const char *dest,		/* I - Destination */
+            const char *agent,		/* I - User agent */
+	    const char *list)		/* I - List of jobs or users */
+{
+  int		id;			/* Job ID */
+  http_t	*http;			/* HTTP server connection */
+  ipp_t		*request,		/* IPP Request */
+		*response;		/* IPP Response */
+  cups_lang_t	*language;		/* Default language */
+  char		uri[HTTP_MAX_URI];	/* Job URI */
+
+
+  (void)dest;	/* Suppress compiler warnings... */
+
+ /*
+  * Try connecting to the local server...
+  */
+
+  if ((http = httpConnect(cupsServer(), ippPort())) == NULL)
+    return (1);
+
+  language = cupsLangDefault();
+
+ /*
+  * Loop for each job...
+  */
+
+  while ((id = atoi(list)) > 0)
+  {
+   /*
+    * Skip job ID in list...
+    */
+
+    while (isdigit(*list))
+      list ++;
+    while (isspace(*list))
+      list ++;
+
+   /*
+    * Build an IPP_CANCEL_JOB request, which requires the following
+    * attributes:
+    *
+    *    attributes-charset
+    *    attributes-natural-language
+    *    job-uri
+    *    requesting-user-name
+    */
+
+    request = ippNew();
+
+    request->request.op.operation_id = IPP_CANCEL_JOB;
+    request->request.op.request_id   = 1;
+
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
+        	 "attributes-charset", NULL, cupsLangEncoding(language));
+
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
+        	 "attributes-natural-language", NULL, language->language);
+
+    sprintf(uri, "ipp://localhost/jobs/%d", id);
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "job-uri", NULL, uri);
+
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
+                 "requesting-user-name", NULL, agent);
+
+   /*
+    * Do the request and get back a response...
+    */
+
+    if ((response = cupsDoRequest(http, request, "/jobs")) != NULL)
+    {
+      if (response->request.status.status_code > IPP_OK_CONFLICT)
+      {
+	printf("cancel-job failed: %s\n",
+               ippErrorString(response->request.status.status_code));
+	ippDelete(response);
+	cupsLangFree(language);
+	httpClose(http);
+	return (1);
+      }
+
+      ippDelete(response);
+    }
+    else
+    {
+      printf("cancel-job failed: %s\n", ippErrorString(cupsLastError()));
+      cupsLangFree(language);
+      httpClose(http);
+      return (1);
+    }
+  }
+
+  cupsLangFree(language);
+  httpClose(http);
+
+  return (0);
 }
 
 
@@ -984,109 +1118,59 @@ send_state(const char *dest,		/* I - Destination */
 
 
 /*
- * 'remove_jobs()' - Cancel one or more jobs.
+ * 'smart_gets()' - Get a line of text, removing the trailing CR and/or LF.
  */
 
-int					/* O - Command status */
-remove_jobs(const char *dest,		/* I - Destination */
-            const char *agent,		/* I - User agent */
-	    const char *list)		/* I - List of jobs or users */
+char *			/* O - Line read or NULL */
+smart_gets(char *s,	/* I - Pointer to line buffer */
+           int  len,	/* I - Size of line buffer */
+	   FILE *fp)	/* I - File to read from */
 {
-  int		id;			/* Job ID */
-  http_t	*http;			/* HTTP server connection */
-  ipp_t		*request,		/* IPP Request */
-		*response;		/* IPP Response */
-  cups_lang_t	*language;		/* Default language */
-  char		uri[HTTP_MAX_URI];	/* Job URI */
+  char	*ptr,		/* Pointer into line */
+	*end;		/* End of line */
+  int	ch;		/* Character from file */
 
-
-  (void)dest;	/* Suppress compiler warnings... */
 
  /*
-  * Try connecting to the local server...
+  * Read the line; unlike fgets(), we read the entire line but dump
+  * characters that go past the end of the buffer.  Also, we accept
+  * CR, LF, or CR LF for the line endings to be "safe", although
+  * RFC 1179 specifically says "just use LF".
   */
 
-  if ((http = httpConnect(cupsServer(), ippPort())) == NULL)
-    return (1);
+  ptr = s;
+  end = s + len - 1;
 
-  language = cupsLangDefault();
-
- /*
-  * Loop for each job...
-  */
-
-  while ((id = atoi(list)) > 0)
+  while ((ch = getc(fp)) != EOF)
   {
-   /*
-    * Skip job ID in list...
-    */
-
-    while (isdigit(*list))
-      list ++;
-    while (isspace(*list))
-      list ++;
-
-   /*
-    * Build an IPP_CANCEL_JOB request, which requires the following
-    * attributes:
-    *
-    *    attributes-charset
-    *    attributes-natural-language
-    *    job-uri
-    *    requesting-user-name
-    */
-
-    request = ippNew();
-
-    request->request.op.operation_id = IPP_CANCEL_JOB;
-    request->request.op.request_id   = 1;
-
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-        	 "attributes-charset", NULL, cupsLangEncoding(language));
-
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
-        	 "attributes-natural-language", NULL, language->language);
-
-    sprintf(uri, "ipp://localhost/jobs/%d", id);
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "job-uri", NULL, uri);
-
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
-                 "requesting-user-name", NULL, agent);
-
-   /*
-    * Do the request and get back a response...
-    */
-
-    if ((response = cupsDoRequest(http, request, "/jobs")) != NULL)
+    if (ch == '\n')
+      break;
+    else if (ch == '\r')
     {
-      if (response->request.status.status_code > IPP_OK_CONFLICT)
-      {
-	printf("cancel-job failed: %s\n",
-               ippErrorString(response->request.status.status_code));
-	ippDelete(response);
-	cupsLangFree(language);
-	httpClose(http);
-	return (1);
-      }
+     /*
+      * See if a LF follows...
+      */
 
-      ippDelete(response);
+      ch = getc(fp);
+
+      if (ch != '\n')
+        ungetc(ch, fp);
+
+      break;
     }
-    else
-    {
-      printf("cancel-job failed: %s\n", ippErrorString(cupsLastError()));
-      cupsLangFree(language);
-      httpClose(http);
-      return (1);
-    }
+    else if (ptr < end)
+      *ptr++ = ch;
   }
 
-  cupsLangFree(language);
-  httpClose(http);
+  *ptr = '\0';
 
-  return (0);
+  if (ch == EOF && ptr == s)
+    return (NULL);
+  else
+    return (s);
 }
 
 
 /*
- * End of "$Id: cups-lpd.c,v 1.16 2000/11/20 00:22:55 mike Exp $".
+ * End of "$Id: cups-lpd.c,v 1.17 2000/12/12 14:58:02 mike Exp $".
  */
