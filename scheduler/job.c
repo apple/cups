@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.221 2003/09/15 19:40:46 mike Exp $"
+ * "$Id: job.c,v 1.222 2003/11/05 19:11:42 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -558,7 +558,7 @@ LoadAllJobs(void)
   */
 
   while ((dent = readdir(dir)) != NULL)
-    if (NAMLEN(dent) == 6 && dent->d_name[0] == 'c')
+    if (NAMLEN(dent) >= 6 && dent->d_name[0] == 'c')
     {
      /*
       * Allocate memory for the job...
@@ -758,14 +758,14 @@ LoadAllJobs(void)
   rewinddir(dir);
 
   while ((dent = readdir(dir)) != NULL)
-    if (NAMLEN(dent) > 7 && dent->d_name[0] == 'd')
+    if (NAMLEN(dent) > 7 && dent->d_name[0] == 'd' && strchr(dent->d_name, '-'))
     {
      /*
       * Find the job...
       */
 
       jobid  = atoi(dent->d_name + 1);
-      fileid = atoi(dent->d_name + 7);
+      fileid = atoi(strchr(dent->d_name, '-') + 1);
 
       LogMessage(L_DEBUG, "LoadAllJobs: Auto-typing document file %s...",
                  dent->d_name);
@@ -2739,5 +2739,5 @@ set_hold_until(job_t *job, 		/* I - Job to update */
 
 
 /*
- * End of "$Id: job.c,v 1.221 2003/09/15 19:40:46 mike Exp $".
+ * End of "$Id: job.c,v 1.222 2003/11/05 19:11:42 mike Exp $".
  */

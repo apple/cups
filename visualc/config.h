@@ -1,7 +1,7 @@
 /*
- * "$Id: config.h,v 1.11 2003/01/15 20:45:29 mike Exp $"
+ * "$Id: config.h,v 1.12 2003/11/05 19:11:42 mike Exp $"
  *
- *   Configuration file for ESP Print Pro.
+ *   Configuration file for the Common UNIX Printing System (CUPS).
  *
  *   Copyright 1997-2003 by Easy Software Products.
  *
@@ -17,17 +17,39 @@
  *       44141 Airport View Drive, Suite 204
  *       Hollywood, Maryland 20636-3111 USA
  *
- *       Voice: (301) 373-9603
+ *       Voice: (301) 373-9600
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
  */
 
 /*
+ * Compiler stuff...
+ */
+
+#undef const
+#undef __CHAR_UNSIGNED__
+
+
+/*
  * Version of software...
  */
 
-#define CUPS_SVERSION	"CUPS v1.1.19"
-#define ESP_SVERSION	"ESP Print Pro v4.3"
+#define CUPS_SVERSION	"CUPS v1.1.20"
+
+
+/*
+ * Default user and group...
+ */
+
+#define CUPS_DEFAULT_USER	"lp"
+#define CUPS_DEFAULT_GROUP	"sys"
+
+
+/*
+ * Maximum number of file descriptors to support.
+ */
+
+#define CUPS_MAX_FDS		4096
 
 
 /*
@@ -42,15 +64,6 @@
 #define CUPS_LOGDIR	"C:/CUPS/logs"
 #define CUPS_DATADIR    "C:/CUPS/share"
 #define CUPS_FONTPATH	"C:/CUPS/share/fonts"
-#define ESP_SOFTWARE	"C:/CUPS/etc/software"
-
-
-/*
- * Default user and group...
- */
-
-#define CUPS_DEFAULT_USER "lp"
-#define CUPS_DEFAULT_GROUP "sys"
 
 
 /*
@@ -75,14 +88,6 @@
  */
 
 #undef WORDS_BIGENDIAN
-
-
-/*
- * Compiler stuff...
- */
-
-#undef const
-#undef __CHAR_UNSIGNED__
 
 
 /*
@@ -189,9 +194,10 @@
  * Which encryption libraries do we have?
  */
 
-#define HAVE_SSL
-#define HAVE_LIBSSL
+#undef HAVE_CDSASSL
 #undef HAVE_GNUTLS
+#undef HAVE_LIBSSL
+#undef HAVE_SSL
 
 
 /*
@@ -199,6 +205,13 @@
  */
 
 #undef HAVE_LIBSLP
+
+
+/*
+ * Do we have libpaper?
+ */
+
+#undef HAVE_LIBPAPER
 
 
 /*
@@ -224,10 +237,24 @@
 
 
 /*
+ * Do we have rresvport()?
+ */
+
+#undef HAVE_RRESVPORT
+
+
+/*
  * Do we have getifaddrs()?
  */
 
 #undef HAVE_GETIFADDRS
+
+
+/*
+ * Do we have hstrerror()?
+ */
+
+#undef HAVE_HSTRERROR
 
 
 /*
@@ -245,5 +272,19 @@
 
 
 /*
- * End of "$Id: config.h,v 1.11 2003/01/15 20:45:29 mike Exp $".
+ * Various scripting languages...
+ */
+
+#undef HAVE_JAVA
+#define CUPS_JAVA	"/usr/bin/java"
+#undef HAVE_PERL
+#define CUPS_PERL	"/usr/bin/perl"
+#undef HAVE_PHP
+#define CUPS_PHP	"/usr/bin/php"
+#undef HAVE_PYTHON
+#define CUPS_PYTHON	"/usr/bin/python"
+
+
+/*
+ * End of "$Id: config.h,v 1.12 2003/11/05 19:11:42 mike Exp $".
  */
