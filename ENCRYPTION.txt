@@ -1,4 +1,4 @@
-ENCRYPTION - CUPS v1.1.19 - 05/27/2003
+ENCRYPTION - CUPS v1.1.20 - 11/24/2003
 --------------------------------------
 
 This file describes the encryption support provided by CUPS.
