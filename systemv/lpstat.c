@@ -1,5 +1,5 @@
 /*
- * "$Id: lpstat.c,v 1.10 1999/06/23 14:12:24 mike Exp $"
+ * "$Id: lpstat.c,v 1.11 1999/06/23 16:03:28 mike Exp $"
  *
  *   "lpstat" command for the Common UNIX Printing System (CUPS).
  *
@@ -604,6 +604,8 @@ show_default(http_t *http)	/* I - HTTP connection to server */
   {
     if ((attr = ippFindAttribute(response, "printer-name", IPP_TAG_NAME)) != NULL)
       printf("system default destination: %s\n", attr->values[0].string.text);
+    else
+      puts("no system default destination");
 
     ippDelete(response);
   }
@@ -1262,5 +1264,5 @@ show_scheduler(http_t *http)	/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpstat.c,v 1.10 1999/06/23 14:12:24 mike Exp $".
+ * End of "$Id: lpstat.c,v 1.11 1999/06/23 16:03:28 mike Exp $".
  */
