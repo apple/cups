@@ -363,8 +363,9 @@ manage your printers.
 <H2>The Basics</H2>
 
 <P>Each printer queue has a name associated with it; the printer name
-must start with a letter and can contain up to 127 letters, numbers,
-and the underscore (_). Case is not significant, e.g. "PRINTER", "Printer",
+must start with any printable character except " ", "/", and "@".  
+It can contain up to 127 letters, numbers, and the underscore (_). 
+Case is not significant, e.g. "PRINTER", "Printer",
 and "printer" are considered to be the same name.
 
 <P>Printer queues also have a device associated with them. The device can be
