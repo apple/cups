@@ -1,5 +1,5 @@
 /*
- * "$Id: classes.c,v 1.6 1999/08/16 17:52:06 mike Exp $"
+ * "$Id: classes.c,v 1.7 1999/09/27 17:14:25 mike Exp $"
  *
  *   Class status CGI for the Common UNIX Printing System (CUPS).
  *
@@ -99,18 +99,22 @@ main(int  argc,			/* I - Number of command-line arguments */
     puts("<META HTTP-EQUIV=\"Refresh\" CONTENT=\"10\">");
   else
     puts("<META HTTP-EQUIV=\"Refresh\" CONTENT=\"30\">");
-  printf("<TITLE>%s on %s - Common UNIX Printing System</TITLE>\n",
+  printf("<TITLE>%s on %s - " CUPS_SVERSION "</TITLE>\n",
          name == NULL ? "Classes" : name, getenv("SERVER_NAME"));
   puts("<LINK REL=STYLESHEET TYPE=\"text/css\" HREF=\"/cups.css\">");
   puts("<MAP NAME=\"navbar\">");
+#ifdef ESPPRINTPRO
+  puts("<AREA SHAPE=\"RECT\" COORDS=\"10,10,76,30\" HREF=\"printers\" ALT=\"Current Printer Status\">");
+  puts("<AREA SHAPE=\"RECT\" COORDS=\"88,10,158,30\" HREF=\"classes\" ALT=\"Current Printer Classes Status\">");
+  puts("<AREA SHAPE=\"RECT\" COORDS=\"170,10,210,30\" HREF=\"jobs\" ALT=\"Current Jobs Status\">");
+  puts("<AREA SHAPE=\"RECT\" COORDS=\"222,10,354,30\" HREF=\"documentation.html\" ALT=\"Read CUPS Documentation On-Line\">");
+  puts("<AREA SHAPE=\"RECT\" COORDS=\"366,10,442,30\" HREF=\"http://www.easysw.com/printpro/software.html\" ALT=\"Download the Current ESP Print Pro Software\">");
+  puts("<AREA SHAPE=\"RECT\" COORDS=\"454,10,530,30\" HREF=\"http://www.easysw.com/printpro/support.html\" ALT=\"Get Tech Support for Current ESP Print Pro\">");
+#else
   puts("<AREA SHAPE=\"RECT\" COORDS=\"10,10,85,30\" HREF=\"/printers\" ALT=\"Current Printer Status\">");
   puts("<AREA SHAPE=\"RECT\" COORDS=\"95,10,175,30\" HREF=\"/classes\" ALT=\"Current Printer Classes Status\">");
   puts("<AREA SHAPE=\"RECT\" COORDS=\"185,10,235,30\" HREF=\"/jobs\" ALT=\"Current Jobs Status\">");
   puts("<AREA SHAPE=\"RECT\" COORDS=\"245,10,395,30\" HREF=\"/documentation.html\" ALT=\"Read CUPS Documentation On-Line\">");
-#ifdef ESPPRINTPRO
-  puts("<AREA SHAPE=\"RECT\" COORDS=\"405,10,490,30\" HREF=\"http://www.easysw.com/printpro/software.html\" ALT=\"Download the Current ESP Print Pro Software\">");
-  puts("<AREA SHAPE=\"RECT\" COORDS=\"505,10,585,30\" HREF=\"http://www.easysw.com/printpro/support.html\" ALT=\"Get Tech Support for Current ESP Print Pro\">");
-#else
   puts("<AREA SHAPE=\"RECT\" COORDS=\"405,10,490,30\" HREF=\"http://www.cups.org\" ALT=\"Download the Current CUPS Software\">");
 #endif /* ESPPRINTPRO */
   puts("</MAP>");
@@ -119,11 +123,7 @@ main(int  argc,			/* I - Number of command-line arguments */
   puts("<P ALIGN=CENTER>");
   puts("<A HREF=\"http://www.easysw.com\" ALT=\"Easy Software Products Home Page\">");
   puts("<IMG SRC=\"/images/logo.gif\" WIDTH=\"71\" HEIGHT=\"40\" BORDER=0 ALT=\"Easy Software Products Home Page\"></A>");
-#ifdef ESPPRINTPRO
-  puts("<IMG SRC=\"/images/navbar.gif\" WIDTH=\"600\" HEIGHT=\"40\" USEMAP=\"#navbar\" BORDER=0>");
-#else
   puts("<IMG SRC=\"/images/navbar.gif\" WIDTH=\"540\" HEIGHT=\"40\" USEMAP=\"#navbar\" BORDER=0>");
-#endif /* ESPPRINTPRO */
 
   printf("<H1>%s on %s</H1>\n", name == NULL ? "Classes" : name,
          getenv("SERVER_NAME"));
@@ -480,5 +480,5 @@ show_class_info(http_t      *http,
 
 
 /*
- * End of "$Id: classes.c,v 1.6 1999/08/16 17:52:06 mike Exp $".
+ * End of "$Id: classes.c,v 1.7 1999/09/27 17:14:25 mike Exp $".
  */
