@@ -1,9 +1,9 @@
 /*
- * "$Id: cupsaddsmb.c,v 1.3.2.7 2002/07/03 15:51:01 mike Exp $"
+ * "$Id: cupsaddsmb.c,v 1.3.2.8 2002/07/31 15:06:08 mike Exp $"
  *
  *   "cupsaddsmb" command for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2001 by Easy Software Products.
+ *   Copyright 2001-2002 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -292,8 +292,9 @@ export_dest(const char *dest)	/* I - Destination to export */
   }
 
   snprintf(subcmd, sizeof(subcmd),
-	   "adddriver \"Windows 4.0\" \"%s:ADOBEPS4.DRV:%s.PPD:NULL:ADOBEPS4.HLP:PSMON.DLL:RAW:ADFONTS.MFM,DEFPRTR2.PPD,ICONLIB.DLL\"",
-	   dest, dest);
+	   "adddriver \"Windows 4.0\" \"%s:ADOBEPS4.DRV:%s.PPD:NULL:ADOBEPS4.HLP:PSMON.DLL:RAW:"
+	   "ADOBEPS4.DRV:%s.PPD,ADOBEPS4.HLP,PSMON.DLL,ADFONTS.MFM,DEFPRTR2.PPD,ICONLIB.DLL\"",
+	   dest, dest, dest);
 
   if ((status = do_samba_command(command, subcmd)) != 0)
   {
@@ -336,5 +337,5 @@ usage()
 
 
 /*
- * End of "$Id: cupsaddsmb.c,v 1.3.2.7 2002/07/03 15:51:01 mike Exp $".
+ * End of "$Id: cupsaddsmb.c,v 1.3.2.8 2002/07/31 15:06:08 mike Exp $".
  */

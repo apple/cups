@@ -3,6 +3,9 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.16
 
+	- The cupsaddsmb utility now lists all data files for
+	  Win9x and WinMe clients when installing that Windows
+	  driver.
 	- Jobs submitted to a class now bounce immediately to
 	  the next available printer rather than waiting until
 	  that printer is available.
