@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.27 1999/06/30 16:19:10 mike Exp $"
+ * "$Id: client.c,v 1.28 1999/07/07 18:24:35 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -135,7 +135,7 @@ AcceptClient(listener_t *lis)	/* I - Listener socket */
   * Temporarily suspend accept()'s until we lose a client...
   */
 
-  if (NumClients == MAX_CLIENTS)
+  if (NumClients == MaxClients)
     for (i = 0; i < NumListeners; i ++)
     {
       DEBUG_printf(("AcceptClient: Removing fd %d from InputSet...\n", Listeners[i].fd));
@@ -442,7 +442,7 @@ ReadClient(client_t *con)	/* I - Client to read from */
     else switch (con->http.state)
     {
       case HTTP_GET_SEND :
-          if (strncmp(con->uri, "/printers", 9) == 0 &&
+          if (strncmp(con->uri, "/printers/", 10) == 0 &&
 	      strcmp(con->uri + strlen(con->uri) - 4, ".ppd") == 0)
 	  {
 	   /*
@@ -804,7 +804,8 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	  {
 	    con->bytes += bytes;
 
-            LogMessage(LOG_DEBUG, "ReadClient() %d writing %d bytes", bytes);
+            if (bytes >= 1024)
+              LogMessage(LOG_DEBUG, "ReadClient() %d writing %d bytes", bytes);
 
             if (write(con->file, line, bytes) < bytes)
 	    {
@@ -1150,7 +1151,8 @@ WriteClient(client_t *con)		/* I - Client connection */
     }
   }
 
-  LogMessage(LOG_DEBUG, "WriteClient() %d %d bytes", con->http.fd, bytes);
+  if (bytes >= 1024)
+    LogMessage(LOG_DEBUG, "WriteClient() %d %d bytes", con->http.fd, bytes);
 
   con->http.activity = time(NULL);
 
@@ -1304,8 +1306,8 @@ get_file(client_t    *con,	/* I - Client connection */
     status = stat(filename, filestats);
   }
 
-  LogMessage(LOG_DEBUG, "get_filename() %d filename=%s size=%d",
-             con->http.fd, filename, filestats->st_size);
+  LogMessage(LOG_DEBUG, "get_file() %d filename=%s size=%d",
+             con->http.fd, filename, status ? -1 : filestats->st_size);
 
   if (status)
     return (NULL);
@@ -1502,5 +1504,5 @@ pipe_command(client_t *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.27 1999/06/30 16:19:10 mike Exp $".
+ * End of "$Id: client.c,v 1.28 1999/07/07 18:24:35 mike Exp $".
  */

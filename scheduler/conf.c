@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.22 1999/06/30 15:14:01 mike Exp $"
+ * "$Id: conf.c,v 1.23 1999/07/07 18:24:37 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -39,6 +39,8 @@
 #include <stdarg.h>
 #include <pwd.h>
 #include <grp.h>
+#include <sys/resource.h>
+
 
 /*
  * Possibly missing network definitions...
@@ -93,6 +95,7 @@ static var_t	variables[] =
   { "BrowsePort",	&BrowsePort,		VAR_INTEGER,	0 },
   { "BrowseInterval",	&BrowseInterval,	VAR_INTEGER,	0 },
   { "BrowseTimeout",	&BrowseTimeout,		VAR_INTEGER,	0 },
+  { "MaxClients",	&MaxClients,		VAR_INTEGER,	0 },
   { "MaxLogSize",	&MaxLogSize,		VAR_INTEGER,	0 },
   { "MaxRequestSize",	&MaxRequestSize,	VAR_INTEGER,	0 }
 };
@@ -131,9 +134,10 @@ static int	get_address(char *value, unsigned defaddress, int defport,
 int			/* O - 1 if file read successfully, 0 otherwise */
 ReadConfiguration(void)
 {
-  FILE	*fp;		/* Configuration file */
-  int	status;		/* Return status */
-  char	directory[1024];/* Configuration directory */
+  FILE		*fp;		/* Configuration file */
+  int		status;		/* Return status */
+  char		directory[1024];/* Configuration directory */
+  struct rlimit	limit;		/* Runtime limit */
 
 
  /*
@@ -144,8 +148,11 @@ ReadConfiguration(void)
   StopListening();
   StopBrowsing();
 
-  LogMessage(LOG_DEBUG, "ReadConfiguration() ConfigurationFile=\"%s\"",
-             ConfigurationFile);
+  if (Clients != NULL)
+  {
+    free(Clients);
+    Clients = NULL;
+  }
 
   if (AccessFile != NULL)
   {
@@ -200,6 +207,10 @@ ReadConfiguration(void)
   KeepAliveTimeout = DEFAULT_KEEPALIVE;
   ImplicitClasses  = TRUE;
 
+  getrlimit(RLIMIT_NOFILE, &limit);
+
+  MaxClients       = limit.rlim_max / 3;
+
   MaxLogSize       = 1024 * 1024;
   MaxRequestSize   = 0;
 
@@ -227,6 +238,26 @@ ReadConfiguration(void)
 
   if (!status)
     return (0);
+
+  LogMessage(LOG_DEBUG, "ReadConfiguration() ConfigurationFile=\"%s\"",
+             ConfigurationFile);
+
+ /*
+  * Check the MaxClients setting, and then allocate memory for it...
+  */
+
+  if (MaxClients > (limit.rlim_max / 3))
+    MaxClients = limit.rlim_max / 3;
+
+  if ((Clients = calloc(sizeof(client_t), MaxClients)) == NULL)
+  {
+    LogMessage(LOG_ERROR, "ReadConfiguration() FATAL: unable to allocate memory for %d clients!",
+               MaxClients);
+    exit(1);
+  }
+  else
+    LogMessage(LOG_INFO, "ReadConfiguration() Configured for up to %d clients.",
+               MaxClients);
 
  /*
   * Read the MIME type and conversion database...
@@ -1138,5 +1169,5 @@ get_address(char               *value,		/* I - Value string */
 
 
 /*
- * End of "$Id: conf.c,v 1.22 1999/06/30 15:14:01 mike Exp $".
+ * End of "$Id: conf.c,v 1.23 1999/07/07 18:24:37 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.h,v 1.13 1999/06/30 15:14:03 mike Exp $"
+ * "$Id: conf.h,v 1.14 1999/07/07 18:24:37 mike Exp $"
  *
  *   Configuration file definitions for the Common UNIX Printing System (CUPS)
  *   scheduler.
@@ -71,6 +71,8 @@ VAR int			User			VALUE(DEFAULT_UID),
 					/* Group ID for server */
 			LogLevel		VALUE(LOG_ERROR),
 					/* Log level */
+			MaxClients		VALUE(0),
+					/* Maximum number of clients */
 			MaxLogSize		VALUE(1024 * 1024),
 					/* Maximum size of log files */
 			MaxRequestSize		VALUE(0),
@@ -106,5 +108,5 @@ extern int	LogPage(job_t *job, char *page);
 
 
 /*
- * End of "$Id: conf.h,v 1.13 1999/06/30 15:14:03 mike Exp $".
+ * End of "$Id: conf.h,v 1.14 1999/07/07 18:24:37 mike Exp $".
  */

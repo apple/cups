@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.20 1999/06/23 14:12:03 mike Exp $"
+ * "$Id: ipp.c,v 1.21 1999/07/07 18:24:38 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -581,11 +581,24 @@ add_printer(client_t        *con,	/* I - Client connection */
   if ((attr = ippFindAttribute(con->request, "printer-more-info", IPP_TAG_URI)) != NULL)
     strcpy(printer->more_info, attr->values[0].string.text);
   if ((attr = ippFindAttribute(con->request, "device-uri", IPP_TAG_URI)) != NULL)
+  {
+    LogMessage(LOG_INFO, "Setting %s device-uri to \"%s\" (was \"%s\".)",
+               printer->name, attr->values[0].string.text, printer->device_uri);
+
     strcpy(printer->device_uri, attr->values[0].string.text);
+  }
   if ((attr = ippFindAttribute(con->request, "printer-is-accepting-jobs", IPP_TAG_BOOLEAN)) != NULL)
+  {
+    LogMessage(LOG_INFO, "Setting %s printer-is-accepting-jobs to %d (was %d.)",
+               printer->name, attr->values[0].boolean, printer->accepting);
+
     printer->accepting = attr->values[0].boolean;
+  }
   if ((attr = ippFindAttribute(con->request, "printer-state", IPP_TAG_ENUM)) != NULL)
   {
+    LogMessage(LOG_INFO, "Setting %s printer-state to %d (was %d.)", printer->name,
+               attr->values[0].integer, printer->state);
+
     if (printer->state == IPP_PRINTER_STOPPED &&
         attr->values[0].integer != IPP_PRINTER_STOPPED)
       printer->state = IPP_PRINTER_IDLE;
@@ -2310,5 +2323,5 @@ validate_job(client_t        *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.20 1999/06/23 14:12:03 mike Exp $".
+ * End of "$Id: ipp.c,v 1.21 1999/07/07 18:24:38 mike Exp $".
  */
