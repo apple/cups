@@ -81,6 +81,7 @@ CHANGES IN CUPS V1.1.11
 	  information when printing via LPD.
 	- Added many warning and informational messages
 	  to cups-lpd where they were missing.
+	- Added Czech message file contributed by SuSE.
 
 
 CHANGES IN CUPS V1.1.10-1
