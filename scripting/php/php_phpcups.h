@@ -1,36 +1,4 @@
 /*
- * "$Id: php_phpcups.h,v 1.1.2.1 2002/08/19 19:42:18 mike Exp $"
- *
- *   PHP extensions for adding support for the Common UNIX
- *   Printing System (CUPS).
- *
- *   Copyright 1997-2002 by Easy Software Products.
- *
- *   These coded instructions, statements, and computer programs are the
- *   property of Easy Software Products and are protected by Federal
- *   copyright law.  Distribution and use rights are outlined in the file
- *   "LICENSE.txt" which should have been included with this file.  If this
- *   file is missing or damaged please contact Easy Software Products
- *   at:
- *
- *       Attn: CUPS Licensing Information
- *       Easy Software Products
- *       44141 Airport View Drive, Suite 204
- *       Hollywood, Maryland 20636-3111 USA
- *
- *       Voice: (301) 373-9603
- *       EMail: cups-info@cups.org
- *         WWW: http://www.cups.org
- *
- *   This file is subject to the Apple OS-Developed Software exception.
- *
- * Contents:
- *
- *   Other functions and data structures in this file are generated 
- *   by the ext_skel script and are standard to PHP extensions. 
- *
- */
-/*
    +----------------------------------------------------------------------+
    | PHP version 4.0                                                      |
    +----------------------------------------------------------------------+
@@ -48,6 +16,7 @@
    |                                                                      |
    +----------------------------------------------------------------------+
  */
+
 
 #ifndef PHP_PHPCUPS_H
 #define PHP_PHPCUPS_H
@@ -72,12 +41,13 @@ PHP_RSHUTDOWN_FUNCTION(phpcups);
 PHP_MINFO_FUNCTION(phpcups);
 
 PHP_FUNCTION(confirm_phpcups_compiled);	
-PHP_FUNCTION(phpcupsGetDestOptions);	
-PHP_FUNCTION(phpcupsGetDests);	
-PHP_FUNCTION(phpcupsGetJobs);	
-PHP_FUNCTION(phpcupsCancelJob);	
-PHP_FUNCTION(phpcupsPrintFile);	
-PHP_FUNCTION(phpcupsLastError);	
+PHP_FUNCTION(cups_get_dest_options);	
+PHP_FUNCTION(cups_get_dest_list);	
+PHP_FUNCTION(cups_get_jobs);	
+PHP_FUNCTION(cups_cancel_job);	
+PHP_FUNCTION(cups_print_file);	
+PHP_FUNCTION(cups_last_error);	
+PHP_FUNCTION(cups_get_printer_attributes);	
 
 /* 
   	Declare any global variables you may need between the BEGIN
@@ -109,5 +79,4 @@ ZEND_END_MODULE_GLOBALS(phpcups)
 
 
 /*
- * End of "$Id: php_phpcups.h,v 1.1.2.1 2002/08/19 19:42:18 mike Exp $".
  */
