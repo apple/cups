@@ -1,5 +1,5 @@
 /*
- * "$Id: cupsaddsmb.c,v 1.3.2.13 2003/10/29 16:53:36 mike Exp $"
+ * "$Id: cupsaddsmb.c,v 1.3.2.14 2003/11/17 22:05:10 mike Exp $"
  *
  *   "cupsaddsmb" command for the Common UNIX Printing System (CUPS).
  *
@@ -379,7 +379,7 @@ export_dest(const char *dest)		/* I - Destination to export */
     snprintf(subcmd, sizeof(subcmd),
              "mkdir W32X86;"
 	     "put %s W32X86/%s.ppd;"
-	     "put %s/drivers/cupsdrvr5.dll W32X86/cupsdrv5.dll;"
+	     "put %s/drivers/cupsdrv5.dll W32X86/cupsdrv5.dll;"
 	     "put %s/drivers/cupsui5.dll W32X86/cupsui5.dll;"
 	     "put %s/drivers/cups5.hlp W32X86/cups5.hlp",
 	     ppdfile, dest, datadir, datadir, datadir);
@@ -590,5 +590,5 @@ usage()
 
 
 /*
- * End of "$Id: cupsaddsmb.c,v 1.3.2.13 2003/10/29 16:53:36 mike Exp $".
+ * End of "$Id: cupsaddsmb.c,v 1.3.2.14 2003/11/17 22:05:10 mike Exp $".
  */

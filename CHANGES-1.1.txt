@@ -3,6 +3,8 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.20
 
+	- The cupsaddsmb program didn't export the new CUPS
+	  driver for Windows properly (STR #390)
 	- The ppdOpen() functions did not issue an error when a
 	  translation string exceeded the maximum allowed by the
 	  Adobe PPD specification (STR #399)
