@@ -1,5 +1,5 @@
 /*
- * "$Id: cancel.c,v 1.9 1999/07/30 15:59:01 mike Exp $"
+ * "$Id: cancel.c,v 1.10 1999/09/22 20:48:02 mike Exp $"
  *
  *   "cancel" command for the Common UNIX Printing System (CUPS).
  *
@@ -97,7 +97,14 @@ main(int  argc,			/* I - Number of command-line arguments */
 	    else
 	    {
 	      i ++;
-	      http = httpConnect(argv[i], ippPort());
+
+	      if (i >= argc)
+	      {
+	        fputs("Error: need hostname after \'-h\' option!\n", stderr);
+		return (1);
+              }
+	      else
+		http = httpConnect(argv[i], ippPort());
 	    }
 
 	    if (http == NULL)
@@ -216,5 +223,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: cancel.c,v 1.9 1999/07/30 15:59:01 mike Exp $".
+ * End of "$Id: cancel.c,v 1.10 1999/09/22 20:48:02 mike Exp $".
  */

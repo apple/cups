@@ -1,5 +1,5 @@
 /*
- * "$Id: lpadmin.c,v 1.8 1999/08/06 16:06:15 mike Exp $"
+ * "$Id: lpadmin.c,v 1.9 1999/09/22 20:48:02 mike Exp $"
  *
  *   "lpadmin" command for the Common UNIX Printing System (CUPS).
  *
@@ -131,7 +131,14 @@ main(int  argc,		/* I - Number of command-line arguments */
 	    else
 	    {
 	      i ++;
-	      http = httpConnect(argv[i], ippPort());
+
+	      if (i >= argc)
+	      {
+	        fputs("Error: need hostname after \'-h\' option!\n", stderr);
+		return (1);
+              }
+	      else
+		http = httpConnect(argv[i], ippPort());
 	    }
 
 	    if (http == NULL)
@@ -1143,5 +1150,5 @@ set_printer_location(http_t *http,	/* I - Server connection */
 
 
 /*
- * End of "$Id: lpadmin.c,v 1.8 1999/08/06 16:06:15 mike Exp $".
+ * End of "$Id: lpadmin.c,v 1.9 1999/09/22 20:48:02 mike Exp $".
  */

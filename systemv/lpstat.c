@@ -1,5 +1,5 @@
 /*
- * "$Id: lpstat.c,v 1.13 1999/07/30 13:31:33 mike Exp $"
+ * "$Id: lpstat.c,v 1.14 1999/09/22 20:48:03 mike Exp $"
  *
  *   "lpstat" command for the Common UNIX Printing System (CUPS).
  *
@@ -112,7 +112,14 @@ main(int  argc,		/* I - Number of command-line arguments */
 	    else
 	    {
 	      i ++;
-	      http = httpConnect(argv[i], ippPort());
+
+	      if (i >= argc)
+	      {
+	        fputs("Error: need hostname after \'-h\' option!\n", stderr);
+		return (1);
+              }
+	      else
+		http = httpConnect(argv[i], ippPort());
 	    }
 
 	    if (http == NULL)
@@ -1264,5 +1271,5 @@ show_scheduler(http_t *http)	/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpstat.c,v 1.13 1999/07/30 13:31:33 mike Exp $".
+ * End of "$Id: lpstat.c,v 1.14 1999/09/22 20:48:03 mike Exp $".
  */
