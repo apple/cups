@@ -1,0 +1,313 @@
+#
+# "$Id: cupsd.conf-professional,v 1.1 1999/06/17 20:02:43 mike Exp $"
+#
+#   Scheduler configuration file for ESP Print Professional.
+#
+
+########################################################################
+#                                                                      #
+# This is the CUPS configuration file.  If you are familiar with       #
+# Apache or any of the other popular web servers, we've followed the   #
+# same format.  Any configuration variable used here has the same      #
+# semantics as the corresponding variable in Apache.  If we need       #
+# different functionality then a different name is used to avoid       #
+# confusion...                                                         #
+#                                                                      #
+########################################################################
+
+#
+# Ports/addresses that we listen to.  The default port 631 is reserved
+# for the Internet Printing Protocol (IPP) and is what we use here.
+#
+# You can have multiple Port/Listen lines to listen to more than one
+# port or address, or to restrict access:
+#
+#    Port 80
+#    Port 631
+#    Listen hostname
+#    Listen hostname:80
+#    Listen hostname:631
+#    Listen 1.2.3.4
+#    Listen 1.2.3.4:631
+# 
+
+#Port 80
+Port 631
+
+#
+# User/Group: the user and group the server runs under.  Normally this
+# must be lp and sys, however you can configure things for another user
+# or group as needed.
+#
+# Note: the server must be run initially as root to support the
+# default IPP port of 631.  It changes users whenever an external
+# program is run...
+#
+
+User lp
+Group sys
+
+#
+# SystemGroup: the group name for "System" (printer administration)
+# access.
+#
+
+SystemGroup sys
+
+#
+# ServerName: the hostname of your server, as advertised to the world.
+# By default CUPS will use the hostname of the system.
+#
+
+#ServerName myhost.domain.com
+
+#
+# ServerAdmin: the email address to send all complaints/problems to.
+# By default CUPS will use "root@hostname".
+#
+
+#ServerAdmin root@your.domain.com
+
+#
+# ServerRoot: the root directory for the scheduler.
+# By default the compiled-in value.
+#
+
+#ServerRoot /var/cups
+
+#
+# AccessLog: the access log file; if this does not start with a leading /
+# then it is assumed to be relative to ServerRoot.  By default set to
+# "logs/access_log"
+#
+
+#AccessLog logs/access_log
+
+#
+# ErrorLog: the error log file; if this does not start with a leading /
+# then it is assumed to be relative to ServerRoot.  By default set to
+# "logs/error_log"
+#
+
+#ErrorLog logs/error_log
+
+#
+# PageLog: the page log file; if this does not start with a leading /
+# then it is assumed to be relative to ServerRoot.  By default set to
+# "logs/page_log"
+#
+
+#PageLog logs/page_log
+
+#
+# LogLevel: controls the number of messages logged to the ErrorLog
+# file and can be one of the following:
+#
+#     debug	Log everything.
+#     info      Log all requests and state changes.
+#     warn      Log errors and warnings.
+#     error     Log only errors.
+#     none      Log nothing.
+#
+
+LogLevel info
+
+#
+# MaxLogSize: controls the maximum size of each log file before they are
+# rotated.  Defaults to 1048576 (1MB).  Set to 0 to disable log rotating.
+#
+
+#MaxLogSize 0
+
+#
+# MaxRequestSize: controls the maximum size of print files.  Set to 0 to
+# disable this feature (defaults to 0.)
+#
+
+#MaxRequestSize 0
+
+#
+# HostNameLookups: whether or not to do lookups on IP addresses to get a
+# fully-qualified hostname.  This defaults to Off for performance reasons...
+#
+
+#HostNameLookups On
+
+#
+# Timeout: the timeout before requests time out.  Default is 300 seconds.
+#
+
+#Timeout 300
+
+#
+# KeepAlive: whether or not to support the Keep-Alive connection
+# option.  Default is on.
+#
+
+#KeepAlive On
+
+#
+# KeepAliveTimeout: the timeout before Keep-Alive connections are
+# automatically closed.  Default is 60 seconds.
+#
+
+#KeepAliveTimeout 60
+
+#
+# ImplicitClasses: whether or not to use implicit classes.
+#
+# Printer classes can be specified explicitly in the classes.conf
+# file, implicitly based upon the printers available on the LAN, or
+# both.
+#
+# When ImplicitClasses is On, printers on the LAN with the same name
+# (e.g. Acme-LaserPrint-1000) will be put into a class with the same
+# name. This allows you to setup multiple redundant queues on a LAN
+# without a lot of administrative difficulties.  If a user sends a
+# job to Acme-LaserPrint-1000, the job will go to the first available
+# queue.
+#
+# Enabled by default.
+#
+
+#ImplicitClasses On
+
+#
+# Browsing: whether or not to broadcast printer information to
+# other CUPS servers.  Enabled by default.
+#
+
+#Browsing On
+
+#
+# BrowseInterval: the time between browsing updates in seconds.  Default
+# is 30 seconds.
+#
+# Note that browsing information is sent whenever a printer's state changes
+# as well, so this represents the maximum time between updates.
+#
+
+#BrowseInterval 30
+
+#
+# BrowseTimeout: the timeout for network printers - if we don't
+# get an update within this time the printer will be removed
+# from the printer list.  This number definitely should not be
+# less the BrowseInterval value for obvious reasons.  Defaults
+# to 300 seconds.
+#
+
+#BrowseTimeout 300
+
+#
+# BrowsePort: the port used for UDP broadcasts.  By default this is
+# the IPP port; if you change this you need to do it on all servers.
+# Only one BrowsePort is recognized.
+#
+
+#BrowsePort 631
+
+#
+# BrowseAddress: specifies a broadcast address to be used.  By
+# default browsing information is broadcast to all active interfaces.
+#
+# Note: HP-UX 10.20 and earlier do not properly handle broadcast unless
+# you have a Class A, B, C, or D netmask (i.e. no CIDR support).
+#
+
+#BrowseAddress x.y.z.255
+#BrowseAddress x.y.255.255
+#BrowseAddress x.255.255.255
+
+#
+# DocumentRoot: the root directory for HTTP documents that are served.
+# By default the compiled in directory.
+#
+
+#DocumentRoot /usr/share/cups/doc
+
+#
+# DefaultLanguage: the default language if not specified by the browser.
+# If not specified, the current locale is used.
+#
+
+#DefaultLanguage en
+
+#
+# DefaultCharset: the default character set to use. If not specified,
+# defaults to iso-8859-1.  Note that this can also be overridden in
+# HTML documents...
+#
+
+#DefaultCharset iso-8859-1
+
+#
+# RIPCache: the amount of memory that each RIP should use to cache
+# bitmaps.  The value can be any real number followed by "k" for
+# kilobytes, "m" for megabytes, "g" for gigabytes, or "t" for tiles
+# (1 tile = 256x256 pixels.)  Defaults to "32m" (32 megabytes).
+#
+
+#RIPCache: 32m
+
+#
+# Access permissions for each directory served by the scheduler.
+# Locations are relative to DocumentRoot...
+#
+# AuthType: the authorization to use; currently only "Basic" authorization is
+# supported.
+#
+# AuthClass: the authorization class; currently only "Anonymous", "User",
+# "System" (valid user belonging to group SystemGroup), and "Group"
+# (valid user belonging to the specified group) are supported.
+#
+# AuthGroupName: the group name for "Group" authorization.
+#
+# Order: the order of Allow/Deny processing.
+#
+# Allow: allows access from the specified hostname, domain, IP address, or
+# network.
+#
+# Deny: denies access from the specified hostname, domain, IP address, or
+# network.
+#
+
+<Location />
+</Location>
+
+<Location /printers>
+#
+# You may wish to limit access to printers and classes, either with Allow
+# and Deny lines, or by requiring a username and password.
+#
+
+## Require a username and password
+#AuthType Basic
+#AuthClass User
+
+## Restrict access to local domain
+#Order Deny,Allow
+#Deny From All
+#Allow From .mydomain.com
+</Location>
+
+<Location /admin>
+#
+# You definitely will want to limit access to the administration tools.
+# The default configuration requires a local connection from a user who
+# is a member of group "sys" to do any admin tasks.  You can change the
+# group name using the SystemGroup directive.
+#
+
+AuthType Basic
+AuthClass System
+
+## Restrict access to local domain
+Order Deny,Allow
+Deny From All
+Allow From 127.0.0.1
+</Location>
+
+#
+# End of "$Id: cupsd.conf-professional,v 1.1 1999/06/17 20:02:43 mike Exp $".
+#
