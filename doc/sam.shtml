@@ -16,7 +16,6 @@ information for the Common UNIX Printing System<SUP>TM</SUP>
 <EMBED SRC="system-overview.shtml">
 
 <!-- NEED 3in -->
-
 <H2>Document Overview</H2>
 
 <P>This software administrators manual is organized into the following sections:</P>
@@ -38,7 +37,7 @@ information for the Common UNIX Printing System<SUP>TM</SUP>
 
 <H2>Notation Conventions</H2>
 
-Various font and syntax conventions are used in this guide. Examples and
+<P>Various font and syntax conventions are used in this guide. Examples and
 their meanings and uses are explained below:
 
 <CENTER><TABLE WIDTH="80%">
@@ -134,6 +133,7 @@ The following abbreviations are used throughout this manual:
 
 
 <EMBED SRC="printing-overview.shtml">
+
 
 <H1 ALIGN="RIGHT"><A NAME="BUILDING_INSTALLING">2 - Building and Installing CUPS</A></H1>
 

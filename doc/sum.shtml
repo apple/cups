@@ -21,7 +21,7 @@ System<SUP>TM</SUP> ("CUPS<SUP>TM</SUP>") Version 1.1.
 <P>This software users manual is organized into the following sections:</P>
 
 <UL>
-	<LI><A HREF="#PRINTING_OVERVIEW">1 - Printing System Overview</A>
+	<LI><A HREF="#OVERVIEW">1 - Printing System Overview</A>
 	<LI><A HREF="#USING_SYSTEM">2 - Using the Printing System</A>
 	<LI><A HREF="#STANDARD_OPTIONS">3 - Standard Printer Options</A>
 	<LI><A HREF="#SAVING_OPTIONS">4 - Saving Printer Options and Defaults</A>
@@ -30,7 +30,7 @@ System<SUP>TM</SUP> ("CUPS<SUP>TM</SUP>") Version 1.1.
 
 <H2>Notation Conventions</H2>
 
-Various font and syntax conventions are used in this guide. Examples and
+<P>Various font and syntax conventions are used in this guide. Examples and
 their meanings and uses are explained below:
 
 <CENTER><TABLE WIDTH="80%">

@@ -1,5 +1,5 @@
 /*
- * "$Id: cups.h,v 1.25 2000/05/11 15:14:38 mike Exp $"
+ * "$Id: cups.h,v 1.26 2000/05/12 18:55:13 mike Exp $"
  *
  *   API definitions for the Common UNIX Printing System (CUPS).
  *
@@ -87,7 +87,7 @@ typedef struct				/**** Printer Options ****/
 typedef struct				/**** Destination ****/
 {
   char		*name,			/* Printer or class name */
-		*instance;		/* Local instance name */
+		*instance;		/* Local instance name or NULL */
   int		is_default;		/* Is this printer the default? */
   int		num_options;		/* Number of options */
   cups_option_t	*options;		/* Options */
@@ -144,5 +144,5 @@ extern const char	*cupsUser(void);
 #endif /* !_CUPS_CUPS_H_ */
 
 /*
- * End of "$Id: cups.h,v 1.25 2000/05/11 15:14:38 mike Exp $".
+ * End of "$Id: cups.h,v 1.26 2000/05/12 18:55:13 mike Exp $".
  */

@@ -3,238 +3,845 @@
 	<META NAME="COPYRIGHT" CONTENT="Copyright 1997-2000, All Rights Reserved">
 	<META NAME="DOCNUMBER" CONTENT="CUPS-SPM-1.1">
 	<META NAME="Author" CONTENT="Easy Software Products">
-	<TITLE>DRAFT - CUPS Software Programmers Manual</TITLE>
+	<TITLE>CUPS Software Programmers Manual</TITLE>
 </HEAD>
 <BODY>
 
 <H1 ALIGN="RIGHT">Preface</H1>
 
-This software programmers manual provides software programming
+<P>This software programmers manual provides software programming
 information for the Common UNIX Printing System ("CUPS") Version 1.1.
 
 <EMBED SRC="system-overview.shtml">
 
+<!-- NEED 2in -->
 <H2>Document Overview</H2>
 
-<P>This software administrators manual is organized into the following sections:</P>
+<P>This software programmers manual is organized into the following sections:
 
 <UL>
-	<LI>1 - Printing System Overview</LI>
-	<LI>2 - The CUPS API</LI>
-	<LI>3 - Writing Filters</LI>
-	<LI>4 - Writing Printer Drivers</LI>
-	<LI>5 - Writing Backends</LI>
-	<LI>A - Constants</LI>
-	<LI>B - Structures</LI>
-	<LI>C - Functions</LI>
+	<LI><A HREF="#OVERVIEW">1 - Printing System Overview</A>
+	<LI><A HREF="#CUPS_API">2 - The CUPS API</A>
+	<LI><A HREF="#WRITING_FILTERS">3 - Writing Filters</A>
+	<LI><A HREF="#WRITING_DRIVERS">4 - Writing Printer Drivers</A>
+	<LI><A HREF="#WRITING_BACKENDS">5 - Writing Backends</A>
+	<LI><A HREF="#LICENSE">A - Software License Agreement</A>
+	<LI><A HREF="#CONSTANTS">B - Constants</A>
+	<LI><A HREF="#STRUCTURES">C - Structures</A>
+	<LI><A HREF="#FUNCTIONS">D - Functions</A>
 </UL>
 
-<H1 ALIGN="RIGHT">1 - Printing System Overview</H1>
+<H2>Notation Conventions</H2>
 
-<P>This chapter provides an overview of how the Common UNIX Printing System
-works.
+<P>Various font and syntax conventions are used in this guide. Examples and
+their meanings and uses are explained below:
 
-<H2>The Printing Problem</H2>
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Example</TH>
+	<TD>&nbsp;&nbsp;&nbsp;</TD>
+	<TH>Description</TH>
+</TR>
+<TR><TD>&nbsp;</TD></TR>
+<TR VALIGN="TOP">
+	<TD><CODE>lpstat</CODE><BR>
+	<CODE>lpstat(1)</CODE></TD>
 
-<P>For years <I>the printing problem</I> has plagued UNIX&reg;. Unlike
-Microsoft&reg; Windows&reg; or MacOS, UNIX has no standard interface or
-system in place for supporting printers. Among the solutions previously
-available, the Berkeley and System V printing systems are the most
-prevalent.
+	<TD>&nbsp;&nbsp;&nbsp;</TD>
 
-<P>These printing systems support line printers (text only) or
-PostScript printers (text and graphics), and with some coaxing they can
-be made to support a full range of printers and file formats. However,
-because each varient of the UNIX operating system uses a different
-printing system than the next, developing printer drivers for a wide
-range of printers is extremely difficult. That combined with the
-limited volume of customers for each UNIX varient has forced most
-printer vendors to give up supporting UNIX entirely.
+	<TD>The names of commands; the first mention of a command or
+	function in a chapter is followed by a manual page section
+	number.</TD>
+</TR>
+<TR><TD>&nbsp;</TD></TR>
+<TR VALIGN="TOP">
+	<TD><VAR>/var</VAR><BR>
+	<VAR>/usr/share/cups/data/testprint.ps</VAR></TD>
 
-<P>The Common UNIX Printing System, or CUPS, is designed to eliminate
-<I>the printing problem</I>. One common printing system can be used by
-all UNIX varients to support the printing needs of users. Printer
-vendors can use its modular filter interface to develop a single driver
-program that supports a wide range of file formats with little or no
-effort.  Since CUPS provides both the System V and Berkeley printing
-commands, users (and applications) can reap the benefits of this new
-technology with no changes.
+	<TD>&nbsp;&nbsp;&nbsp;</TD>
 
-<H2>The Technology</H2>
+	<TD>File and directory names.</TD>
+</TR>
+<TR><TD>&nbsp;</TD></TR>
+<TR VALIGN="TOP">
+	<TD NOWRAP><TT>Request ID is Printer-123</TT></TD>
 
-<P>CUPS is based upon an emerging Internet standard called the Internet
-Printing Protocol, or IPP. IPP has been embraced by dozens of printer
-and printer server manufacturers, and will be supported by the next
-Microsoft Windows operating system.
+	<TD>&nbsp;&nbsp;&nbsp;</TD>
 
-<P>IPP defines a standard protocol for printing as well as managing print
-jobs and printer options like media size, resolution, and so forth. Like all
-IP-based protocols, IPP can be used locally or over the Internet to printers
-hundreds or thousands of miles away. Unlike other protocols, however, IPP
-also supports access control, authentication, and encryption, making it a
-much more secure printing solution than older ones.
+	<TD>Screen output.</TD>
+</TR>
+<TR><TD>&nbsp;</TD></TR>
+<TR VALIGN="TOP">
+	<TD NOWRAP><KBD>lp -d printer filename ENTER</KBD></TD>
 
-<P>IPP is layered on top of the Hyper-Text Transport Protocol, or HTTP,
-which is the basis of web servers on the Internet. This allows the user to
-view documentation and status information on a printer or server using their
-web browser.
+	<TD>&nbsp;&nbsp;&nbsp;</TD>
 
-<P>CUPS provides a complete IPP/1.0-based printing system that provides Basic
-authentication and domain or IP-based access control. Digest authentication
-and TLS encryption will be available in future versions of CUPS.
+	<TD>Literal user input; special keys like <KBD>ENTER</B></KBD> are
+	in ALL CAPS.</TD>
+</TR>
+<TR><TD>&nbsp;</TD></TR>
+<TR VALIGN="TOP">
+	<TD>12.3</TD>
 
-<H2>Jobs</H2>
+	<TD>&nbsp;&nbsp;&nbsp;</TD>
 
-<P>Each file that is submitted for printing is called a <I>job</I>. 
-Jobs are identified by a unique number starting at 1 and are assigned
-to a particular destination (usually a printer). Jobs can also have
-options associated with them such as media size, number of copies, and
-priority.
+	<TD>Numbers in the text are written using the period (.) to indicate
+	the decimal point.</TD>
+</TR>
+</TABLE></CENTER>
 
-<H2>Classes</H2>
+<!-- NEED 3in -->
+<H2>Abbreviations</H2>
 
-<P>CUPS supports collections of printers known as <I>classes</I>. Jobs sent
-to a class are forwarded to the first available printer in the class.
+The following abbreviations are used throughout this manual:
 
-<H2>Filters</H2>
+<UL>
+<DL>
 
-<P>Filters allow a user or application to print many types of files
-without extra effort. Print jobs sent to a CUPS server are filtered
-before sending them to a printer. Some filters convert job files to
-different formats that the printer can understand. Others perform page
-selection and ordering tasks. <I>Backend</I> filters perform the most
-important task of all - they send the filtered print data to the
-printer.
+	<DT>kb
+	<DD>Kilobytes, or 1024 bytes<BR>&nbsp;
 
-<P>CUPS provides filters for printing many types of image files,
-HP-GL/2 files, PDF files, and text files. CUPS also supplies
-PostScript and image file Raster Image Processors, or RIPs, that
-convert PostScript or image files into bitmaps that can be sent to a
-raster printer.
+	<DT>Mb
+	<DD>Megabytes, or 1048576 bytes<BR>&nbsp;
 
-<P>CUPS provides backends for printing over parallel and serial ports,
-and over the network via the JetDirect (AppSocket), Server Message
-Block, and Line Printer Daemon protocols.
+	<DT>Gb
+	<DD>Gigabytes, or 1073741824 bytes<BR>&nbsp;
 
-<H2>Printer Drivers</H2>
+</DL>
+</UL>
 
-<P>Printer drivers in CUPS consist of one of more filters specific to a
-printer. CUPS includes a sample printer driver for Hewlett-Packard
-LaserJet and DeskJet printers. While this driver does not generate
-optimal output for different printer models, it does demonstrate how
-you can write your own printer drivers and incorporate them into CUPS.
+<H2>Other References</H2>
 
-<H2>Networking</H2>
+<UL>
+<DL>
 
-<P>Printers and classes on the local system are automatically shared with
-other systems on the network. This allows you to setup one system to print
-to a printer and use this system as a printer server or spool host for all
-of the others.  If there is only one occurrence of a printer on a network,
-then that printer can be accessed using its name alone. If more than one
-printer exists with the same name, users must select the printer by specifying
-which server to use (e.g. "printer@host1" or "printer@host2".)
+	<DT>CUPS Software Administrators Manual
 
-<P>CUPS also provides <I>implicit classes</I>, which are collections of
-printers and/or classes with the same name. This allows you to setup multiple
-servers pointing to the same physical network printer, for example, so that
-you aren't relying on a single system for printing. Because this also works
-with printer classes, you can setup multiple servers and printers and never
-worry about a "single point of failure" unless all of the printers and servers
-goes down!
+	<DD>An administration guide for the CUPS software.<BR>&nbsp;
 
-<H1 ALIGN="RIGHT">2 - The CUPS API</H1>
+	<DT>CUPS Software Users Manual
+
+	<DD>An end-user guide for using the CUPS software.<BR>&nbsp;
+
+</DL>
+</UL>
+
+
+<EMBED SRC="printing-overview.shtml">
+
+
+<H1 ALIGN="RIGHT"><A NAME="CUPS_API">2 - The CUPS API</A></H1>
 
 <P>This chapter describes the CUPS Application Programmers Interface ("API").
 
-<H2>The CUPS Library</H2>
+<H2>The CUPS API Library</H2>
 
-<H3>Detecting the CUPS Library in Autoconf</H3>
+<P>The CUPS library provides a whole collection of interfaces needed to
+support the internal needs of the CUPS software as well as the needs of
+applications, filters, printer drivers, and backends.
 
+<P>Unlike the rest of CUPS, the CUPS API library is provided under the
+GNU Library General Public License. This means that you can use the
+CUPS API library in both proprietary and open-source programs.
 
-<H2>Basic Services</H2>
+<P>Programs that use the CUPS API library typically will include the
+<CODE>&lt;cups/cups.h&gt;</CODE> header file:
+
+<UL><PRE>
+#include &lt;cups/cups.h&gt;
+
+...
+
+jobid = cupsPrintFile("myprinter", "filename.ps", "title",
+                      num_options, options);
+</PRE></UL>
+
+<P>Use the <CODE>-lcups</CODE> compiler option when linking to the CUPS API
+library:
+
+<UL><PRE>
+<B>cc -o program program.c -lcups ENTER</B>
+</PRE></UL>
+
+<P>Additional options and libraries may be required depending on the
+operating system and the location of the CUPS API library.
+
+<H3>Detecting the CUPS API Library in GNU Autoconf</H3>
+
+<P>GNU autoconf is a popular configuration tool used by many programs.
+Add the following lines to your <VAR>configure.in</CODE> file to check
+for the CUPS API library in your configuration script:
+
+<UL><PRE>
+AC_CHECK_LIB(socket,socket,
+if test "$uname" != "IRIX"; then
+	LIBS="-lsocket $LIBS"
+else
+	echo "Not using -lsocket since you are running IRIX."
+fi)
+AC_CHECK_LIB(nsl,gethostbyaddr,
+if test "$uname" != "IRIX"; then
+	LIBS="-lnsl $LIBS"
+else
+	echo "Not using -lnsl since you are running IRIX."
+fi)
+
+AC_CHECK_LIB(cups,httpConnect)
+</PRE></UL>
+
+<H2>Printing Services</H2>
+
+<P>The CUPS API library provides some basic printing services for applications
+that need to print files.
 
 <H3>Include Files</H3>
 
-<H3>Getting the Available Printers and Classes</H3>
+<P>The include file used by all of these functions is
+<CODE>&lt;cups/cups.h&gt;</CODE>:
 
-<H3>Printing Files</H3>
+<UL><PRE>
+#include &lt;cups/cups.h&gt;
+</PRE></UL>
 
-<H3>Setting Printer Options</H3>
+<H3>Printing a File</H3>
+
+<P>The CUPS API provides two functions for printing files. The first is
+<CODE>cupsPrintFile</CODE> which prints a single named file:
+
+<UL><PRE>
+#include &lt;cups/cups.h&gt;
+
+...
+
+int jobid;
+
+...
+
+jobid = cupsPrintFile("<I>name</I>", "<I>filename</I>", "<I>title</I>", 0, NULL);
+</PRE></UL>
+
+<P>The <CODE>name</CODE> string is the name of the printer or class to
+print to. The <CODE>filename</CODE> string is the name of the file to
+print. The <CODE>title</CODE> string is the name of the print job, e.g.
+"Acme Word Document".
+
+<P>The return value is a unique ID number for the print job or 0 if there
+was an error.
+
+<H3>Printing Multiple Files</H3>
+
+<P>The second printing function is <CODE>cupsPrintFiles</CODE>:
+
+<UL><PRE>
+#include &lt;cups/cups.h&gt;
+
+...
+
+int        jobid;
+int        num_files;
+const char *files[100];
+...
+
+jobid = cupsPrintFiles("name", <I>num_files</I>, <I>files</I>, "title", 0, NULL);
+</PRE></UL>
+
+<P>Instead of passing a filename string as with <CODE>cupsPrintFile()</CODE>,
+you pass a file count (<CODE>num_files</CODE>) and filename pointer array
+(<CODE>files</CODE>) for each file that you want to print.
+
+<P>As with <CODE>cupsPrintFile()</CODE>, the return value is a unique ID for
+the print job.
 
 <H3>Cancelling Jobs</H3>
 
+<P>The <CODE>cupsCancelJob()</CODE> function cancels a queued print job:
 
-<H2>HTTP Services</H2>
+<UL><PRE>
+#include &lt;cups/cups.h&gt;
 
-<H3>Include Files</H3>
+...
 
-<H3>Connecting to a Server</H3>
+int jobid;
+int status;
+...
 
-<H3>Setting Request Fields</H3>
+status = cupsCancelJob("<I>name</I>", <I>jobid</I>);
+</PRE></UL>
 
-<H3>Issuing a Request</H3>
+<P>The <CODE>name</CODE> string specifies the destination and is used
+to determine the server to send the request to. The <CODE>jobid</CODE>
+value is the integer returned from a previous <CODE>cupsPrintFile()</CODE>
+or <CODE>cupsPrintFiles()</CODE> call.
 
-<H3>Getting the Request Status</H3>
+<P><CODE>cupsCancelJob()</CODE> returns <CODE>1</CODE> if the job was
+successfully cancelled and <CODE>0</CODE> if there was an error.
 
-<H3>Sending Request Data</H3>
+<H3>Getting the Available Printers and Classes</H3>
 
-<H3>Reading Request Data</H3>
+<P>The <CODE>cupsGetDests()</CODE> function can be used to get a list
+of the available printers, classes, and instances that a user has defined:
 
+<UL><PRE>
+#include &lt;cups/cups.h&gt;
 
-<H2>IPP Services</H2>
+...
 
-<H3>Include Files</H3>
+int         num_dests;
+cups_dest_t *dests;
 
-<H3>Creating an IPP Request</H3>
+...
 
-<H3>Adding Attributes</H3>
+num_dests = cupsGetDests(&amp;dests);
+</PRE></UL>
 
-<H3>Sending an IPP Request</H3>
+<P>Each destination is stored in a <CODE>cups_dest_t</CODE> structure which
+defines the printer or class name, the instance name (if any), if it is the
+default destination, and the default options the user has defined for the
+destination:
 
-<H3>Reading an IPP Response</H3>
+<UL><PRE>
+typedef struct               /**** Destination ****/
+{
+  char          *name,       /* Printer or class name */
+                *instance;   /* Local instance name or NULL */
+  int           is_default;  /* Is this printer the default? */
+  int           num_options; /* Number of options */
+  cups_option_t *options;    /* Options */
+} cups_dest_t;
+</PRE></UL>
 
-<H3>Finding Attributes</H3>
+<P>The destinations are sorted by name and instance for your convenience.
+Once you have the list of available destinations, you can lookup a specific
+destination using the <CODE>cupsGetDest()</CODE> function:
 
-<H3>Looping Through Attributes</H3>
+<UL><PRE>
+#include &lt;cups/cups.h&gt;
 
-<H3>IPP Standard Operations</H3>
+...
 
-<H3>IPP Extension Operations</H3>
+int         num_dests;
+cups_dest_t *dests;
+cups_dest_t *mydest;
 
-<H3>CUPS Extension Operations</H3>
+...
 
+mydest = cupsGetDest("<I>name</I>", "<I>instance</I>", num_dests, dests);
+</PRE></UL>
 
-<H2>Language Services</H2>
+<P>The <CODE>name</CODE> string is the printer or class name. You can pass
+a value of <CODE>NULL</CODE> to get the default destination.
 
-<H3>Include Files</H3>
+<P>The <CODE>instance</CODE> string is the user-defined instance name. Pass
+<CODE>NULL</CODE> to select the default instance, e.g. "name" instead of
+"name/instance".
 
-<H3>Getting the Default Language</H3>
+<H3>Printing with Options</H3>
 
-<H3>Getting the Language Encoding</H3>
+<P>All of the previous printing examples have passed <CODE>0</CODE> and
+<CODE>NULL</CODE> for the last two arguments to the <CODE>cupsPrintFile()</CODE>
+and <CODE>cupsPrintFiles()</CODE> functions. These last two arguments are the
+number of options and a pointer to the option array:
 
-<H3>Getting a Language String</H3>
+<UL><PRE>
+int cupsPrintFile(const char *name, const char *filename, const char *title,
+                  int num_options, cups_option_t *options);
+int cupsPrintFiles(const char *name, int num_files, const char **files,
+                   const char *title, int num_options,
+		   cups_option_t *options);
+</UL></PRE>
 
+<P>The <CODE>cups_option_t</CODE> structure holds each option and its value.
+These are converted as needed and passed to the CUPS server when printing a
+file.
+
+<P>The simplest way of handling options is to use the <CODE>num_options</CODE>
+and <CODE>options</CODE> members of the <CODE>cups_dest_t</CODE>
+structure described earlier:
+
+<UL><PRE>
+#include &lt;cups/cups.h&gt;
+
+...
+
+int         jobid;
+int         num_dests;
+cups_dest_t *dests;
+cups_dest_t *mydest;
+
+...
+
+mydest = cupsGetDest("<I>name</I>", "<I>instance</I>", num_dests, dests);
+
+jobid  = cupsPrintFile(mydest-&gt;name, "filename", "title",
+                       mydest-&gt;num_options, mydest-&gt;options);
+</PRE></UL>
+
+<P>This effectively uses the options a user has previous selected without a
+lot of code.
+
+<H3>Setting Printer Options</H3>
+
+<P>Options can also be set by your program using the <CODE>cupsAddOption()</CODE>
+function:
+
+<UL><PRE>
+#include &lt;cups/cups.h&gt;
+
+...
+
+int           num_options;
+cups_option_t *options;
+
+...
+
+num_options = 0;
+options     = NULL;
+
+...
+
+num_options = cupsAddOption("<I>name</I>", "<I>value</I>", num_options, &amp;options);
+num_options = cupsAddOption("<I>name</I>", "<I>value</I>", num_options, &amp;options);
+num_options = cupsAddOption("<I>name</I>", "<I>value</I>", num_options, &amp;options);
+num_options = cupsAddOption("<I>name</I>", "<I>value</I>", num_options, &amp;options);
+</PRE></UL>
+
+<P>The <CODE>name</CODE> string is the name of the option, and the
+<CODE>value</CODE> string is the value for that option.
+
+<P>Each call to <CODE>cupsAddOption()</CODE> returns the new number of
+options. Since adding two options with the same name overwrites the
+first value with the second, do not assume that calling
+<CODE>cupsAddOptions()</CODE> 20 times will result in 20 options.
+
+<P>Call <CODE>cupsFreeOptions</CODE> once you are done using the options:
+
+<UL><PRE>
+#include &lt;cups/cups.h&gt;
+
+...
+
+int           num_options;
+cups_option_t *options;
+
+...
+
+cupsFreeOptions(num_options, options);
+</PRE></UL>
+
+<H3>Getting Errors</H3>
+
+<P>If any of the CUPS API printing functions returns an error, the reason for
+that error can be found by calling <CODE>cupsLastError()</CODE> and
+<CODE>cupsErrorString()</CODE>. <CODE>cupsLastError()</CODE> returns the
+last IPP error code that was encountered. <CODE>cupsErrorString()</CODE>
+converts the error code to a localized message string suitable for
+presentation to the user:
+
+<UL><PRE>
+#include &lt;cups/cups.h&gt;
+
+...
+
+int jobid;
+
+...
+
+if (jobid == 0)
+  puts(cupsErrorString(cupsLastError()));
+</PRE></UL>
 
 <H2>PPD Services</H2>
 
+<P>CUPS includes functions to access and manipulate PostScript Printer
+Description ("PPD") files that are used with the printer drivers in CUPS.
+
+<P>Each PPD file enumerates the available features provided by a
+printer, including conflict information for specific options (e.g.
+can't duplex output on envelopes.)
+
 <H3>Include Files</H3>
+
+<P>Include the <CODE>&lt;cups/ppd.h&gt;</CODE> header file to use the PPD
+functions:
+
+<UL><PRE>
+#include &lt;cups/ppd.h&gt;
+</PRE></UL>
+
+<P>This header file is also included by the
+<CODE>&lt;cups/cups.h&gt;</CODE> header file.
+
+<H3>Getting a PPD File for a Printer</H3>
+
+<P>The <CODE>cupsGetPPD()</CODE> function retrieves the PPD file for the
+named printer or class:
+
+<UL><PRE>
+#include &lt;cups/cups.h&gt;
+
+...
+
+const char *filename;
+
+filename = cupsGetPPD("<I>name</I>");
+</PRE></UL>
+
+<P>The <CODE>name</CODE> string is the name of the printer or class, including
+the remote server name as appropriate (e.g. "printer@server".)
+
+<P>The return value is a pointer to a filename in static storage; this value
+is overwritten with each call to <CODE>cupsGetPPD()</CODE>. If the printer
+or class does not exist, a <CODE>NULL</CODE> pointer will be returned.
 
 <H3>Loading a PPD File</H3>
 
-<H3>Options and Groups</H3>
+<P>The <CODE>ppdOpenFile()</CODE> function "opens" a PPD file and loads it
+into memory:
 
-<H3>Finding an Option</H3>
+<UL><PRE>
+#include &lt;cups/ppd.h&gt;
 
-<H3>Finding a Page Size</H3>
+...
+
+ppd_file_t *ppd;
+
+ppd = ppdOpenFile("<I>filename</I>");
+</PRE></UL>
+
+<P>The <CODE>filename</CODE> string is the name of the file to load, such as
+the value returned by the <CODE>cupsGetPPD()</CODE> function.
+
+<P>The return value is a pointer to a structure describing the contents of the
+PPD file or NULL if the PPD file could not be read.
+
+<H3>Freeing PPD File Information</H3>
+
+<P>Once you are done using a PPD file, call the <CODE>ppdClose()</CODE> function
+to free all memory that has been used:
+
+<UL><PRE>
+#include &lt;cups/ppd.h&gt;
+
+...
+
+ppd_file_t *ppd;
+
+...
+
+ppdClose(ppd);
+</PRE></UL>
+
+<H3>The PPD File Structure</H3>
+
+<P>Each PPD file contains a number of capability attributes, printer options,
+and conflict definitions. The page size options also include the physical
+margins for the printer and the minimum and maximum sizes for the printer.
+All of this information is stored in the <CODE>ppd_file_t</CODE> structure.
+
+<H4>Capabilities</H4>
+
+<P>Each PPD file contains a number of informational attributes that
+describe the capabilities of the printer. These are provided in the
+<CODE>ppd_file_t</CODE> structure in the following members:
+
+<CENTER><TABLE WIDTH="80%" BORDER="1">
+<TR>
+	<TH>Member</TH>
+	<TH>Type</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD><CODE>accurate_screens</CODE></TD>
+	<TD><CODE>int</CODE></TD>
+	<TD>1 = supports accurate screens</TD>
+</TR>
+<TR>
+	<TD><CODE>color_device</CODE></TD>
+	<TD><CODE>int</CODE></TD>
+	<TD>1 = color device</TD>
+</TR>
+<TR>
+	<TD><CODE>colorspace</CODE></TD>
+	<TD><CODE>ppd_cs_t</CODE></TD>
+	<TD>Default colorspace: PPD_CS_CMYK, PPD_CS_CMY, PPD_CS_GRAY,
+	PPD_CS_RGB, PPD_CS_RGBK, PPD_CS_N</TD>
+</TR>
+<TR>
+	<TD><CODE>contone_only</CODE></TD>
+	<TD><CODE>int</CODE></TD>
+	<TD>1 = printer is continuous tone only</TD>
+</TR>
+<TR>
+	<TD><CODE>num_emulations<BR>
+	emulations</CODE></TD>
+	<TD><CODE>int<BR>
+	ppd_emul_t *</CODE></TD>
+	<TD>Emulations supported by the printer</TD>
+</TR>
+<TR>
+	<TD><CODE>flip_duplex</CODE></TD>
+	<TD><CODE>int</CODE></TD>
+	<TD>1 = need to flip odd pages when duplexing</TD>
+</TR>
+<TR>
+	<TD><CODE>num_fonts<BR>
+	fonts</CODE></TD>
+	<TD><CODE>int<BR>
+	char **</CODE></TD>
+	<TD>The fonts available on the printer.</TD>
+</TR>
+<TR>
+	<TD><CODE>jcl_begin<BR>
+	jcl_ps<BR>
+	jcl_end</CODE></TD>
+	<TD><CODE>char *</CODE></TD>
+	<TD>Job Control Language commands for PostScript output</TD>
+</TR>
+<TR>
+	<TD><CODE>landscape</CODE></TD>
+	<TD><CODE>int</CODE></TD>
+	<TD>Landscape orientation, -90 or 90 degrees</TD>
+</TR>
+<TR>
+	<TD><CODE>lang_encoding</CODE></TD>
+	<TD><CODE>char *</CODE></TD>
+	<TD>The character used for the option strings</TD>
+</TR>
+<TR>
+	<TD><CODE>lang_version</CODE></TD>
+	<TD><CODE>char *</CODE></TD>
+	<TD>The language used for the options strings (English, French, etc.)</TD>
+</TR>
+<TR>
+	<TD><CODE>language_level</CODE></TD>
+	<TD><CODE>int</CODE></TD>
+	<TD>PostScript language level, 1 to 3</TD>
+</TR>
+<TR>
+	<TD><CODE>manual_copies</CODE></TD>
+	<TD><CODE>int</CODE></TD>
+	<TD>1 = Copies are done manually</TD>
+</TR>
+<TR>
+	<TD><CODE>model_number</CODE></TD>
+	<TD><CODE>int</CODE></TD>
+	<TD>Driver-specific model number.</TD>
+</TR>
+<TR>
+	<TD><CODE>patches</CODE></TD>
+	<TD><CODE>char *</CODE></TD>
+	<TD>Patch commands to send to the printer</TD>
+</TR>
+<TR>
+	<TD><CODE>manufacturer</CODE></TD>
+	<TD><CODE>char *</CODE></TD>
+	<TD>The Manufacturer attribute from the PPD file, if any</TD>
+</TR>
+<TR>
+	<TD><CODE>modelname</CODE></TD>
+	<TD><CODE>char *</CODE></TD>
+	<TD>The ModelName attribute from the PPD file</TD>
+</TR>
+<TR>
+	<TD><CODE>nickname</CODE></TD>
+	<TD><CODE>char *</CODE></TD>
+	<TD>The NickName attribute from the PPD file, if any</TD>
+</TR>
+<TR>
+	<TD><CODE>product</CODE></TD>
+	<TD><CODE>char *</CODE></TD>
+	<TD>The Product attribute from the PPD file, if any</TD>
+</TR>
+<TR>
+	<TD><CODE>shortnickname</CODE></TD>
+	<TD><CODE>char *</CODE></TD>
+	<TD>The ShortNickName attribute from the PPD file, if any</TD>
+</TR>
+<TR>
+	<TD><CODE>throughput</CODE></TD>
+	<TD><CODE>int</CODE></TD>
+	<TD>Number of pages per minute</TD>
+</TR>
+<TR>
+	<TD><CODE>ttrasterizer</CODE></TD>
+	<TD><CODE>char *</CODE></TD>
+	<TD>The TruType font rasterizer (Type42)</TD>
+</TR>
+<TR>
+	<TD><CODE>variable_sizes</CODE></TD>
+	<TD><CODE>int</CODE></TD>
+	<TD>1 = supports variable sizes</TD>
+</TR>
+</TABLE></CENTER>
+
+<H4>Options and Groups</H4>
+
+<P>PPD files support multiple options, which are stored in
+<CODE>ppd_option_t</CODE> and <CODE>ppd_choice_t</CODE> structures by
+the PPD functions.
+
+<P>Each option in turn is associated with a group
+stored in the <CODE>ppd_group_t</CODE> structure. Groups can be
+specified in the PPD file; if an option is not associated with a group
+then it is put in a "General" or "Extra" group depending on the option.
+
+<P>Groups can also have sub-groups; CUPS currently limits the depth of
+sub-groups to 1 level to reduce programming complexity.
+
+<H4>Conflicts</H4>
+
+<P>PPD files support specification of conflict conditions between
+different options. Conflicts are stored in <CODE>ppd_conflict_t</CODE>
+structures which specify the options that conflict with each other.
+
+<H4>Page Sizes</H4>
+
+<P>PPD files specify all of the available pages sizes and the physical
+margins associated with them. These sizes are stored in
+<CODE>ppd_size_t</CODE> structures and are available in the
+<CODE>num_sizes</CODE> and <CODE>sizes</CODE> members of the
+<CODE>ppd_file_t</CODE> structure. You can lookup a particular page size
+with the <CODE>ppdPageWidth()</CODE>, <CODE>ppdPageLength()</CODE>, and
+<CODE>ppdPageSize()</CODE> functions:
+
+<UL><PRE>
+#include &lt;cups/ppd.h&gt;
+
+...
+
+ppd_file_t *ppd;
+ppd_size_t *size;
+float      width;
+float      length;
+
+...
+
+size   = ppdPageSize(ppd, "<I>size</I>");
+width  = ppdPageWidth(ppd, "<I>size</I>");
+length = ppdPageLength(ppd, "<I>size</I>");
+</PRE></UL>
+
+<P>The <CODE>size</CODE> string is the named page size option. The
+width and length are in points; there are 72 points per inch. The
+<CODE>ppd_size_t</CODE> structure contains the width, length, and
+margin information:
+
+<UL><PRE>
+typedef struct    /**** Page Sizes ****/
+{
+  int   marked;   /* Page size selected? */
+  char  name[41]; /* Media size option */
+  float width,    /* Width of media in points */
+        length,   /* Length of media in points */
+        left,     /* Left printable margin in points */
+        bottom,   /* Bottom printable margin in points */
+        right,    /* Right printable margin in points */
+        top;      /* Top printable margin in points */
+} ppd_size_t;
+</PRE></UL>
+
+<H4>Custom Page Sizes</H4>
+
+<P>Besides the standard page sizes listed in a PPD file, some printers
+support variable or custom page sizes. If <CODE>variables_sizes</CODE>
+is non-zero, the <CODE>custom_min</CODE>, <CODE>custom_max</CODE>, and
+<CODE>custom_margins</CODE> members of the <CODE>ppd_file_t</CODE>
+structure define the limits of the variable sizes.
+
+<P>To get the resulting media size, use a page size string of
+<CODE>Custom.<I>width</I>x<I>length</I></CODE>, where <CODE>width</CODE>
+and <CODE>length</CODE> are integer values in points:
+
+<UL><PRE>
+Custom.612x792   [8.5 inches wide, 11 inches long]
+Custom.1224x792  [17 inches wide, 11 inches long]
+</PRE></UL>
 
 <H3>Marking Options</H3>
 
+<P>Before marking any user-defined options, call the <CODE>ppdMarkDefaults()</CODE>
+function to mark the default options from the PPD file:
+
+<UL><PRE>
+#include &lt;cups/ppd.h&gt;
+
+...
+
+ppd_file_t *ppd;
+
+...
+
+ppdMarkDefaults(ppd);
+</PRE></UL>
+
+<P>Then call the <CODE>ppdMarkOption()</CODE> function to mark individual
+options:
+
+<UL><PRE>
+#include &lt;cups/ppd.h&gt;
+
+...
+
+ppd_file_t *ppd;
+int        conflicts;
+
+...
+
+conflicts = ppdMarkOption(ppd, "<I>name</I>", "<I>value</I>");
+</PRE></UL>
+
+<P>The <CODE>name</CODE> and <CODE>value</CODE> strings choose a
+particular option and choice, respectively. The return value is 0
+if there are not conflicts created by the selection.
+
+<P>CUPS also provides a convenience function for marking all options
+in the <CODE>cups_option_t</CODE> structure:
+
+<UL><PRE>
+#include &lt;cups/cups.h&gt;
+
+...
+
+ppd_file_t    *ppd;
+int           num_options;
+cups_option_t *options;
+int           conflicts;
+
+...
+
+conflicts = cupsMarkOptions(ppd, num_options, options);
+</PRE></UL>
+
+<P>The <CODE>cupsMarkOptions()</CODE> function also handles mapping the
+IPP job template attributes to PPD options. The return value is the number
+of conflicts present.
+
 <H3>Checking for Conflicts</H3>
 
-<H3>Sending Options</H3>
+<P>The <CODE>ppdMarkOption()</CODE> and <CODE>cupsMarkOptions()</CODE>
+functions return the number of conflicts with the currently marked options.
+
+<P>Call the <CODE>ppdConflicts()</CODE> function to get the number of
+conflicts after you have marked all of the options:
+
+<UL><PRE>
+#include &lt;cups/cups.h&gt;
+
+...
+
+ppd_file_t *ppd;
+int        conflicts;
+
+...
+
+conflicts = ppdConflicts(ppd);
+</PRE></UL>
+
+<P>The return value is the number of conflicting options, or 0 if there
+are no conflicts.
 
 
-<H1 ALIGN="RIGHT">3 - Writing Filters</H1>
+<H1 ALIGN="RIGHT"><A NAME="WRITING_FILTERS">3 - Writing Filters</A></H1>
 
 <P>This chapter describes how to write a file filter for CUPS.
 
@@ -242,7 +849,7 @@ goes down!
 
 <H3>Security Considerations</H3>
 
-Users and Groups
+<H3>Users and Groups</H3>
 
 <H3>Temporary Files</H3>
 
@@ -260,7 +867,7 @@ Users and Groups
 <H2>Writing a HTML Filter</H2>
 
 
-<H1 ALIGN="RIGHT">4 - Writing Printer Drivers</H1>
+<H1 ALIGN="RIGHT"><A NAME="WRITING_DRIVERS">4 - Writing Filters</A></H1>
 
 <P>This chapter discusses how to write a printer driver, which is a
 special filter program that converts CUPS raster data into the
@@ -287,7 +894,7 @@ appropriate commands and data required for a printer.
 <H2>Writing a HP-PCL Driver</H2>
 
 
-<H1 ALIGN="RIGHT">5 - Writing Backends</H1>
+<H1 ALIGN="RIGHT"><A NAME="WRITING_BACKENDS">5 - Writing Filters</A></H1>
 
 <P>This chapter describes how to write a backend for CUPS.  Backends
 communicate directly with printers and allow printer drivers and
@@ -297,7 +904,7 @@ filters to send data using any type of connection transparently.
 
 <H3>Security Considerations</H3>
 
-Users and Groups
+<H3>Users and Groups</H3>
 
 <H3>Temporary Files</H3>
 
@@ -317,7 +924,12 @@ Users and Groups
 <H2>Writing a Serial Port Backend</H2>
 
 
-<H1 ALIGN="RIGHT">A - Constants</H1>
+<H1 ALIGN="RIGHT"><A NAME="LICENSE">A - Software License Agreement</A></H1>
+
+<EMBED SRC="../LICENSE.html">
+
+
+<H1 ALIGN="RIGHT"><A NAME="CONSTANTS">B - Constants</A></H1>
 
 <P>This appendix lists all of the constants that are defined by the CUPS
 API.
@@ -335,15 +947,13 @@ API.
 <H2>Raster Constants</H2>
 
 
-<H1 ALIGN="RIGHT">B - Structures</H1>
+<H1 ALIGN="RIGHT"><A NAME="STRUCTURES">C - Structures</A></H1>
 
 <P>This appendix describes all of the structures that are defined by the CUPS
 API.
 
-<H2></H2>
 
-
-<H1 ALIGN="RIGHT">C - Functions</H1>
+<H1 ALIGN="RIGHT"><A HREF="FUNCTIONS">D - Functions</A></H1>
 
 <P>This appendix provides a reference for all of the CUPS API functions.
 
@@ -1505,10 +2115,10 @@ num_options = cupsParseOptions(argv[5], num_options, &amp;options);
 
 <PRE>
 int
-cupsPrintFile(const char *printer,
-              const char *filename,
-              const char *title,
-	      int num_options,
+cupsPrintFile(const char    *printer,
+              const char    *filename,
+              const char    *title,
+	      int           num_options,
 	      cups_option_t *options);
 </PRE>
 
@@ -1558,18 +2168,101 @@ found by calling <CODE>cupsLastError()</CODE>.
 
 int           num_options;
 cups_option_t *options;
+int           jobid;
 
 ...
 
-cupsPrintFile("printer@hostname", "filename.ps", "Job Title", num_options,
-              options);
+jobid = cupsPrintFile("printer@hostname", "filename.ps", "Job Title",
+                      num_options, options);
 </PRE>
 
 <H3>See Also</H3>
 
 <P>
 <A HREF="#cupsCancelJob">cupsCancelJob()</A>,
-<A HREF="#cupsLastError">cupsLastError()</A>
+<A HREF="#cupsLastError">cupsLastError()</A>,
+<A HREF="#cupsPrintFiles">cupsPrintFiles()</A>
+
+<!-- NEW PAGE --><H2><A NAME="cupsPrintFiles">cupsPrintFiles()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+int
+cupsPrintFiles(const char    *printer,
+               int           num_files,
+               const char    **files,
+               const char    *title,
+	       int           num_options,
+	       cups_option_t *options);
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD>printer</TD>
+	<TD>The printer or class to print to.</TD>
+</TR>
+<TR>
+	<TD>num_files</TD>
+	<TD>The number of files to print.</TD>
+</TR>
+<TR>
+	<TD>files</TD>
+	<TD>The files to print.</TD>
+</TR>
+<TR>
+	<TD>title</TD>
+	<TD>The job title.</TD>
+</TR>
+<TR>
+	<TD>num_options</TD>
+	<TD>The number of options in the options array.</TD>
+</TR>
+<TR>
+	<TD>options</TD>
+	<TD>A pointer to the options array.</TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<P>The new job ID number or 0 on error.
+
+<H3>Description</H3>
+
+<P><CODE>cupsPrintFiles()</CODE> sends multiple files to the specified
+printer or class for printing. If the job cannot be printed the error
+code can be found by calling <CODE>cupsLastError()</CODE>.
+
+<H3>Example</H3>
+
+<PRE>
+#include &lt;cups/cups.h&gt;
+
+int           num_files;
+const char    *files[100];
+int           num_options;
+cups_option_t *options;
+int           jobid;
+
+...
+
+jobid = cupsPrintFiles("printer@hostname", num_files, files,
+                       "Job Title", num_options, options);
+</PRE>
+
+<H3>See Also</H3>
+
+<P>
+<A HREF="#cupsCancelJob">cupsCancelJob()</A>,
+<A HREF="#cupsLastError">cupsLastError()</A>,
+<A HREF="#cupsPrintFile">cupsPrintFile()</A>
 
 <!-- NEW PAGE --><H2><A NAME="cupsRasterClose">cupsRasterClose()</A></H2>
 

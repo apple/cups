@@ -1,5 +1,5 @@
 /*
- * "$Id: dest.c,v 1.7 2000/03/09 19:47:23 mike Exp $"
+ * "$Id: dest.c,v 1.8 2000/05/12 18:55:13 mike Exp $"
  *
  *   User-defined destination (and option) support for the Common UNIX
  *   Printing System (CUPS).
@@ -152,23 +152,45 @@ cupsGetDest(const char  *name,		/* I - Name of destination */
   int	comp;				/* Result of comparison */
 
 
-  if (name == NULL || num_dests == 0 || dests == NULL)
+  if (num_dests == 0 || dests == NULL)
     return (NULL);
 
-  while (num_dests > 0)
+  if (name == NULL)
   {
-    if ((comp = strcasecmp(name, dests->name)) < 0)
-      return (NULL);
-    else if (comp == 0)
-    {
-      if ((instance == NULL && dests->instance == NULL) ||
-          (instance != NULL && dests->instance != NULL &&
-	   strcasecmp(instance, dests->instance) == 0))
-	return (dests);
-    }
+   /*
+    * NULL name for default printer.
+    */
 
-    num_dests --;
-    dests ++;
+    while (num_dests > 0)
+    {
+      if (dests->is_default)
+        return (dests);
+
+      num_dests --;
+      dests ++;
+    }
+  }
+  else
+  {
+   /*
+    * Lookup name and optionally the instance...
+    */
+
+    while (num_dests > 0)
+    {
+      if ((comp = strcasecmp(name, dests->name)) < 0)
+	return (NULL);
+      else if (comp == 0)
+      {
+	if ((instance == NULL && dests->instance == NULL) ||
+            (instance != NULL && dests->instance != NULL &&
+	     strcasecmp(instance, dests->instance) == 0))
+	  return (dests);
+      }
+
+      num_dests --;
+      dests ++;
+    }
   }
 
   return (NULL);
@@ -468,5 +490,5 @@ cups_get_dests(const char  *filename,	/* I - File to read from */
 
 
 /*
- * End of "$Id: dest.c,v 1.7 2000/03/09 19:47:23 mike Exp $".
+ * End of "$Id: dest.c,v 1.8 2000/05/12 18:55:13 mike Exp $".
  */
