@@ -76,3 +76,4 @@ textcommon.o: textcommon.h common.h ../cups/cups.h ../cups/ipp.h
 textcommon.o: ../cups/http.h ../cups/md5.h ../cups/ppd.h ../cups/language.h
 textcommon.o: ../cups/string.h ../config.h
 testraster.o: raster.h ../cups/string.h ../config.h
+gziptoany.o: ../cups/string.h ../config.h

@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.41.2.25 2003/07/23 20:08:03 mike Exp $"
+# "$Id: Makefile,v 1.41.2.26 2003/11/17 20:17:59 mike Exp $"
 #
 #   Filter makefile for the Common UNIX Printing System (CUPS).
 #
@@ -40,7 +40,7 @@ FORMOBJS =	form-attr.o form-main.o form-ps.o form-text.o form-tree.o
 OBJS	=	$(HPGLOBJS) $(IMAGEOBJS) $(FORMOBJS) \
 		imagetops.o imagetoraster.o common.o pstops.o raster.o \
 		rastertodymo.o rastertoepson.o rastertohp.o rastertortl.o \
-		texttops.o textcommon.o testraster.o
+		texttops.o textcommon.o testraster.o gziptoany.o
 
 
 #
@@ -288,5 +288,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile,v 1.41.2.25 2003/07/23 20:08:03 mike Exp $".
+# End of "$Id: Makefile,v 1.41.2.26 2003/11/17 20:17:59 mike Exp $".
 #
