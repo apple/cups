@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.91.2.52 2003/03/14 18:10:41 mike Exp $"
+ * "$Id: client.c,v 1.91.2.53 2003/03/14 21:43:30 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -34,6 +34,7 @@
  *   SendFile()            - Send a file via HTTP.
  *   SendHeader()          - Send an HTTP request.
  *   ShutdownClient()      - Shutdown the receiving end of a connection.
+ *   UpdateCGI()           - Read status messages from CGI scripts and programs.
  *   WriteClient()         - Write data to a client as needed.
  *   check_if_modified()   - Decode an "If-Modified-Since" line.
  *   decode_auth()         - Decode an authorization string.
@@ -2233,6 +2234,141 @@ ShutdownClient(client_t *con)		/* I - Client connection */
 
 
 /*
+ * 'UpdateCGI()' - Read status messages from CGI scripts and programs.
+ */
+
+void
+UpdateCGI(void)
+{
+  int		bytes;		/* Number of bytes read */
+  char		*lineptr,	/* Pointer to end of line in buffer */
+		*message;	/* Pointer to message text */
+  int		loglevel;	/* Log level for message */
+  static int	bufused = 0;	/* Number of bytes used in buffer */
+  static char	buffer[1024];	/* Status buffer */
+
+
+  if ((bytes = read(CGIPipes[0], buffer + bufused,
+                    sizeof(buffer) - bufused - 1)) > 0)
+  {
+    bufused += bytes;
+    buffer[bufused] = '\0';
+    lineptr = strchr(buffer, '\n');
+  }
+  else if (bytes < 0 && errno == EINTR)
+    return;
+  else
+  {
+    lineptr    = buffer + bufused;
+    lineptr[1] = 0;
+  }
+
+  if (bytes == 0 && bufused == 0)
+    lineptr = NULL;
+
+  while (lineptr != NULL)
+  {
+   /*
+    * Terminate each line and process it...
+    */
+
+    *lineptr++ = '\0';
+
+   /*
+    * Figure out the logging level...
+    */
+
+    if (strncmp(buffer, "EMERG:", 6) == 0)
+    {
+      loglevel = L_EMERG;
+      message  = buffer + 6;
+    }
+    else if (strncmp(buffer, "ALERT:", 6) == 0)
+    {
+      loglevel = L_ALERT;
+      message  = buffer + 6;
+    }
+    else if (strncmp(buffer, "CRIT:", 5) == 0)
+    {
+      loglevel = L_CRIT;
+      message  = buffer + 5;
+    }
+    else if (strncmp(buffer, "ERROR:", 6) == 0)
+    {
+      loglevel = L_ERROR;
+      message  = buffer + 6;
+    }
+    else if (strncmp(buffer, "WARNING:", 8) == 0)
+    {
+      loglevel = L_WARN;
+      message  = buffer + 8;
+    }
+    else if (strncmp(buffer, "NOTICE:", 6) == 0)
+    {
+      loglevel = L_NOTICE;
+      message  = buffer + 6;
+    }
+    else if (strncmp(buffer, "INFO:", 5) == 0)
+    {
+      loglevel = L_INFO;
+      message  = buffer + 5;
+    }
+    else if (strncmp(buffer, "DEBUG:", 6) == 0)
+    {
+      loglevel = L_DEBUG;
+      message  = buffer + 6;
+    }
+    else if (strncmp(buffer, "DEBUG2:", 7) == 0)
+    {
+      loglevel = L_DEBUG2;
+      message  = buffer + 7;
+    }
+    else if (strncmp(buffer, "PAGE:", 5) == 0)
+    {
+      loglevel = L_PAGE;
+      message  = buffer + 5;
+    }
+    else
+    {
+      loglevel = L_DEBUG;
+      message  = buffer;
+    }
+
+   /*
+    * Skip leading whitespace in the message...
+    */
+
+    while (isspace(*message))
+      message ++;
+
+    LogMessage(loglevel, "[CGI] %s", message);
+
+   /*
+    * Copy over the buffer data we've used up...
+    */
+
+    strcpy(buffer, lineptr);
+    bufused -= lineptr - buffer;
+
+    if (bufused < 0)
+      bufused = 0;
+
+    lineptr = strchr(buffer, '\n');
+  }
+
+  if (bytes <= 0)
+  {
+   /*
+    * Fatal error on pipe - should never happen!
+    */
+
+    LogMessage(L_ERROR, "UpdateCGI: error reading from CGI error pipe - %s",
+               strerror(errno));
+  }
+}
+
+
+/*
  * 'WriteClient()' - Write data to a client as needed.
  */
 
@@ -3067,7 +3203,7 @@ pipe_command(client_t *con,		/* I - Client connection */
       exit(errno);
 
     close(2);
-    open("/dev/null", O_WRONLY);
+    dup(CGIPipes[1]);
 
    /*
     * Close extra file descriptors...
@@ -3194,5 +3330,5 @@ CDSAWriteFunc(SSLConnectionRef connection,	/* I  - SSL/TLS connection */
 
 
 /*
- * End of "$Id: client.c,v 1.91.2.52 2003/03/14 18:10:41 mike Exp $".
+ * End of "$Id: client.c,v 1.91.2.53 2003/03/14 21:43:30 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.73.2.27 2003/03/12 18:52:21 mike Exp $"
+ * "$Id: dirsvc.c,v 1.73.2.28 2003/03/14 21:43:32 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -1374,7 +1374,7 @@ UpdatePolling(void)
 
     *lineptr++ = '\0';
 
-    LogMessage(L_ERROR, "%s", buffer);
+    LogMessage(L_ERROR, "[Polling] %s", buffer);
 
    /*
     * Copy over the buffer data we've used up...
@@ -1913,5 +1913,5 @@ UpdateSLPBrowse(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.73.2.27 2003/03/12 18:52:21 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.73.2.28 2003/03/14 21:43:32 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp-var.c,v 1.23.2.7 2003/01/15 20:30:49 mike Exp $"
+ * "$Id: ipp-var.c,v 1.23.2.8 2003/03/14 21:43:29 mike Exp $"
  *
  *   IPP variable routines for the Common UNIX Printing System (CUPS).
  *
@@ -313,6 +313,8 @@ ippSetCGIVars(ipp_t      *response,	/* I - Response data to be copied... */
       */
 
       cgiSetArray(name, element, value);
+
+/*      fprintf(stderr, "DEBUG: %s[%d]=\"%s\"\n", name, element, value);*/
     }
 
     if (attr == NULL)
@@ -322,5 +324,5 @@ ippSetCGIVars(ipp_t      *response,	/* I - Response data to be copied... */
 
 
 /*
- * End of "$Id: ipp-var.c,v 1.23.2.7 2003/01/15 20:30:49 mike Exp $".
+ * End of "$Id: ipp-var.c,v 1.23.2.8 2003/03/14 21:43:29 mike Exp $".
  */
