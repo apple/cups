@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c,v 1.75 2002/12/17 18:56:43 swdev Exp $"
+ * "$Id: ppd.c,v 1.76 2003/01/15 14:52:13 mike Exp $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -2089,9 +2089,10 @@ ppd_read(FILE *fp,		/* I - File to read from */
 
     keyptr = keyword;
 
-    while (*lineptr != '\0' && *lineptr != ':' && !isspace(*lineptr))
+    for (; *lineptr != '\0' && *lineptr != ':' && !isspace(*lineptr);
+         lineptr ++)
       if ((keyptr - keyword) < (PPD_MAX_NAME - 1))
-	*keyptr++ = *lineptr++;
+	*keyptr++ = *lineptr;
 
     *keyptr = '\0';
 
@@ -2113,10 +2114,10 @@ ppd_read(FILE *fp,		/* I - File to read from */
 
       optptr = option;
 
-      while (*lineptr != '\0' && *lineptr != '\n' && *lineptr != ':' &&
-             *lineptr != '/')
+      for (; *lineptr != '\0' && *lineptr != '\n' && *lineptr != ':' &&
+             *lineptr != '/'; lineptr ++)
         if ((optptr - option) < (PPD_MAX_NAME - 1))
-	  *optptr++ = *lineptr++;
+	  *optptr++ = *lineptr;
 
       *optptr = '\0';
       mask |= PPD_OPTION;
@@ -2133,9 +2134,10 @@ ppd_read(FILE *fp,		/* I - File to read from */
 	
 	textptr = text;
 
-	while (*lineptr != '\0' && *lineptr != '\n' && *lineptr != ':')
+	for (; *lineptr != '\0' && *lineptr != '\n' && *lineptr != ':';
+	     lineptr ++)
 	  if ((textptr - text) < (PPD_MAX_LINE - 1))
-	    *textptr++ = *lineptr++;
+	    *textptr++ = *lineptr;
 
 	*textptr = '\0';
 	ppd_decode(text);
@@ -2159,13 +2161,9 @@ ppd_read(FILE *fp,		/* I - File to read from */
 
       strptr = *string;
 
-      while (*lineptr != '\0')
-      {
+      for (; *lineptr != '\0'; lineptr ++)
 	if (*lineptr != '\"')
-	  *strptr++ = *lineptr++;
-	else
-	  lineptr ++;
-      }
+	  *strptr++ = *lineptr;
 
       *strptr = '\0';
 
@@ -2287,5 +2285,5 @@ ppd_fix(char *string)		/* IO - String to fix */
 
 
 /*
- * End of "$Id: ppd.c,v 1.75 2002/12/17 18:56:43 swdev Exp $".
+ * End of "$Id: ppd.c,v 1.76 2003/01/15 14:52:13 mike Exp $".
  */
