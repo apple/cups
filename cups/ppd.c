@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c,v 1.51.2.58 2003/08/02 01:04:17 mike Exp $"
+ * "$Id: ppd.c,v 1.51.2.59 2003/08/20 14:29:31 mike Exp $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -327,7 +327,7 @@ ppdErrorString(ppd_status_t status)	/* I - PPD status */
 		  "Bad OpenGroup",
 		  "OpenGroup without a CloseGroup first",
 		  "Bad OpenUI/JCLOpenUI",
-		  "OpenUI/JCLOpenUI without a CloseUI/JCLCLoseUI first",
+		  "OpenUI/JCLOpenUI without a CloseUI/JCLCloseUI first",
 		  "Bad OrderDependency",
 		  "Bad UIConstraints",
 		  "Missing asterisk in column 1",
@@ -3007,5 +3007,5 @@ ppd_read(FILE *fp,			/* I - File to read from */
 
 
 /*
- * End of "$Id: ppd.c,v 1.51.2.58 2003/08/02 01:04:17 mike Exp $".
+ * End of "$Id: ppd.c,v 1.51.2.59 2003/08/20 14:29:31 mike Exp $".
  */
