@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c,v 1.91 2002/01/27 21:16:12 mike Exp $"
+ * "$Id: util.c,v 1.92 2002/02/28 20:51:47 mike Exp $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -879,7 +879,8 @@ cupsGetJobs(cups_job_t **jobs,		/* O - Job data */
 	         attr->value_tag == IPP_TAG_MIMETYPE)
 	  format = attr->values[0].string.text;
         else if (strcmp(attr->name, "job-name") == 0 &&
-	         attr->value_tag == IPP_TAG_TEXT)
+	         (attr->value_tag == IPP_TAG_TEXT ||
+		  attr->value_tag == IPP_TAG_NAME))
 	  title = attr->values[0].string.text;
 
         attr = attr->next;
@@ -889,14 +890,16 @@ cupsGetJobs(cups_job_t **jobs,		/* O - Job data */
       * See if we have everything needed...
       */
 
-      if (dest == NULL || format == NULL || title == NULL || user == NULL ||
-          id == 0)
+      if (dest == NULL || title == NULL || user == NULL || id == 0)
       {
         if (attr == NULL)
 	  break;
 	else
           continue;
       }
+
+      if (format == NULL)
+        format = "application/octet-stream";
 
      /*
       * Allocate memory for the job...
@@ -939,6 +942,9 @@ cupsGetJobs(cups_job_t **jobs,		/* O - Job data */
       temp->completed_time  = completed_time;
       temp->creation_time   = creation_time;
       temp->processing_time = processing_time;
+
+      if (attr == NULL)
+        break;
     }
 
     ippDelete(response);
@@ -1737,5 +1743,5 @@ cups_local_auth(http_t *http)	/* I - Connection */
 
 
 /*
- * End of "$Id: util.c,v 1.91 2002/01/27 21:16:12 mike Exp $".
+ * End of "$Id: util.c,v 1.92 2002/02/28 20:51:47 mike Exp $".
  */
