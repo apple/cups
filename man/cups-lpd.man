@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: cups-lpd.man,v 1.4 2001/01/24 14:35:49 mike Exp $"
+.\" "$Id: cups-lpd.man,v 1.5 2001/02/13 17:58:26 mike Exp $"
 .\"
 .\"   cups-lpd man page for the Common UNIX Printing System (CUPS).
 .\"
@@ -21,11 +21,14 @@
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
-.TH cups-lpd 8 "Common UNIX Printing System" "10 May 2000" "Easy Software Products"
+.TH cups-lpd 8 "Common UNIX Printing System" "13 February 2001" "Easy Software Products"
 .SH NAME
 cups-lpd \- receive print jobs and report printer status to lpd clients
 .SH SYNOPSIS
 .B cups-lpd
+[ -o
+.I option=value
+]
 .SH DESCRIPTION
 \fBcups-lpd\fR is the CUPS Line Printer Daemon ("LPD") mini-server that
 supports legacy client systems that use the LPD protocol.
@@ -36,7 +39,7 @@ following line to the \fBinetd.conf\fR file to enable the
 .br
 .nf
 
-printer stream tcp nowait lp /usr/lib/cups/daemon/cups-lpd cups-lpd
+    printer stream tcp nowait lp /usr/lib/cups/daemon/cups-lpd cups-lpd
 .fi
 .LP
 If you are using the newer \fIxinetd(8)\fR daemon, add the following
@@ -44,15 +47,29 @@ lines to the \fBxinetd.conf\fR file:
 .br
 .nf
 
-service printer
-{
-    socket_type = stream
-    protocol = tcp
-    wait = no
-    user = lp
-    server = /usr/lib/cups/daemon/cups-lpd
-}
+    service printer
+    {
+        socket_type = stream
+        protocol = tcp
+        wait = no
+        user = lp
+        server = /usr/lib/cups/daemon/cups-lpd
+    }
 .fi
+.SH OPTIONS
+The \fI-o\fR option to \fBcups-lpd\fR inserts options for all print queues.
+Most often this is used to disable the "l" filter so that remote print jobs
+are filtered as needed for printing:
+.br
+.nf
+
+    printer stream tcp nowait lp /usr/lib/cups/daemon/cups-lpd cups-lpd \
+        -o document-format=application/octet-stream
+.fi
+.LP
+The example shown resets the document format to be
+\fIapplication/octet-stream\fR, which forces auto-detection of the print
+file type.
 .SH COMPATIBILITY
 \fBcups-lpd\fR does not enforce the restricted source port
 number specified in RFC 1179, as using restricted ports does not
@@ -71,5 +88,5 @@ http://localhost:631/documentation.html
 .SH COPYRIGHT
 Copyright 1993-2001 by Easy Software Products, All Rights Reserved.
 .\"
-.\" End of "$Id: cups-lpd.man,v 1.4 2001/01/24 14:35:49 mike Exp $".
+.\" End of "$Id: cups-lpd.man,v 1.5 2001/02/13 17:58:26 mike Exp $".
 .\"

@@ -24,6 +24,8 @@ CHANGES IN CUPS V1.1.6-3
 	  using the appropriate method for a Level 1, 2, or 3
 	  printer since some Level 2/3 printers don't support
 	  the /#copies variable anymore.
+	- The man page for cups-lpd did not mention the "-o"
+	  option.
 	- Caldera fix: lpr didn't recognize BSD lpr "-1", "-2",
 	  "-3", or "-4" options.
 	- SuSE fix: Exit from child if setgid() or setuid()
