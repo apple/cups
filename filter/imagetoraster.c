@@ -1,5 +1,5 @@
 /*
- * "$Id: imagetoraster.c,v 1.21 1999/05/26 19:37:51 mike Exp $"
+ * "$Id: imagetoraster.c,v 1.22 1999/06/09 20:04:47 mike Exp $"
  *
  *   Image file to raster filter for the Common UNIX Printing System (CUPS).
  *
@@ -214,6 +214,8 @@ main(int  argc,		/* I - Number of command-line arguments */
   g    = 1.0;
   b    = 1.0;
 
+  Copies = atoi(argv[4]);
+
   options     = NULL;
   num_options = cupsParseOptions(argv[5], 0, &options);
 
@@ -221,9 +223,6 @@ main(int  argc,		/* I - Number of command-line arguments */
 
   ppdMarkDefaults(ppd);
   cupsMarkOptions(ppd, num_options, options);
-
-  if ((val = cupsGetOption("copies", num_options, options)) != NULL)
-    Copies = atoi(val);
 
   if ((val = cupsGetOption("multiple-document-handling", num_options, options)) != NULL)
   {
@@ -3839,5 +3838,5 @@ make_lut(ib_t  *lut,		/* I - Lookup table */
 
 
 /*
- * End of "$Id: imagetoraster.c,v 1.21 1999/05/26 19:37:51 mike Exp $".
+ * End of "$Id: imagetoraster.c,v 1.22 1999/06/09 20:04:47 mike Exp $".
  */
