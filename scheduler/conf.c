@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.26 1999/08/28 16:17:50 mike Exp $"
+ * "$Id: conf.c,v 1.27 1999/09/09 13:13:01 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -157,16 +157,14 @@ ReadConfiguration(void)
 
   if (AccessFile != NULL)
   {
-    if (AccessFile != stderr)
-      fclose(AccessFile);
+    fclose(AccessFile);
 
     AccessFile = NULL;
   }
 
   if (ErrorFile != NULL)
   {
-    if (ErrorFile != stderr)
-      fclose(ErrorFile);
+    fclose(ErrorFile);
 
     ErrorFile = NULL;
   }
@@ -379,7 +377,7 @@ LogRequest(client_t      *con,	/* I - Request to log */
       strcpy(filename, AccessLog);
 
     if ((AccessFile = fopen(filename, "a")) == NULL)
-      AccessFile = stderr;
+      return (0);
   }
 
  /*
@@ -406,7 +404,7 @@ LogRequest(client_t      *con,	/* I - Request to log */
     rename(filename, backname);
 
     if ((AccessFile = fopen(filename, "a")) == NULL)
-      AccessFile = stderr;
+      return (0);
   }
 
  /*
@@ -476,7 +474,7 @@ LogMessage(int  level,		/* I - Log level */
         strcpy(filename, ErrorLog);
 
       if ((ErrorFile = fopen(filename, "a")) == NULL)
-        ErrorFile = stderr;
+        return (0);
     }
 
    /*
@@ -503,7 +501,7 @@ LogMessage(int  level,		/* I - Log level */
       rename(filename, backname);
 
       if ((ErrorFile = fopen(filename, "a")) == NULL)
-        ErrorFile = stderr;
+        return (0);
     }
 
    /*
@@ -570,7 +568,7 @@ LogPage(job_t *job,		/* I - Job being printed */
       strcpy(filename, PageLog);
 
     if ((PageFile = fopen(filename, "a")) == NULL)
-      PageFile = stderr;
+      return (0);
   }
 
  /*
@@ -597,7 +595,7 @@ LogPage(job_t *job,		/* I - Job being printed */
     rename(filename, backname);
 
     if ((PageFile = fopen(filename, "a")) == NULL)
-      PageFile = stderr;
+      return (0);
   }
 
  /*
@@ -1193,5 +1191,5 @@ get_address(char               *value,		/* I - Value string */
 
 
 /*
- * End of "$Id: conf.c,v 1.26 1999/08/28 16:17:50 mike Exp $".
+ * End of "$Id: conf.c,v 1.27 1999/09/09 13:13:01 mike Exp $".
  */

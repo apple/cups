@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c,v 1.26 1999/09/03 19:36:44 mike Exp $"
+ * "$Id: main.c,v 1.27 1999/09/09 13:13:02 mike Exp $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -114,6 +114,12 @@ main(int  argc,			/* I - Number of command-line arguments */
   getrlimit(RLIMIT_CORE, &limit);
   limit.rlim_cur = 0;
   setrlimit(RLIMIT_CORE, &limit);
+
+ /*
+  * Disconnect from the controlling terminal...
+  */
+
+  setsid();
 #endif /* DEBUG */
 
  /*
@@ -421,5 +427,5 @@ usage(void)
 
 
 /*
- * End of "$Id: main.c,v 1.26 1999/09/03 19:36:44 mike Exp $".
+ * End of "$Id: main.c,v 1.27 1999/09/09 13:13:02 mike Exp $".
  */
