@@ -450,6 +450,65 @@ if (jobid == 0)
   puts(cupsErrorString(cupsLastError()));
 </PRE></UL>
 
+<H3>Passwords and Authentication</H3>
+
+<P>CUPS supports authentication of any request, including
+submission of print jobs. The default mechanism for getting the
+username and password is to use the login user and a password
+from the console.
+
+<P>To support other types of applications, in particular
+Graphical User Interfaces ("GUIs"), the CUPS API provides
+functions to set the default username and to register a callback
+function that returns a password string.
+
+<P>The <A HREF="cupsSetPasswordCB"><CODE>cupsSetPasswordCB()</CODE></A>
+function is used to set a password callback in your program. Only one
+function can be used at any time.
+
+<P>The <A HREF="cupsSetUser"><CODE>cupsSetUser()</CODE></A> function sets
+the current username for authentication. This function can be called by
+your password callback function to change the current username as needed.
+
+<P>The following example shows a simple password callback that gets a
+username and password from the user:
+
+<UL><PRE>
+#include &lt;cups/cups.h&gt;
+
+const char *
+my_password_cb(const char *prompt)
+{
+  char	user[65];
+
+
+  puts(prompt);
+
+ /* Get a username from the user */
+  printf("Username: ");
+  if (fgets(user, sizeof(user), stdin) == NULL)
+    return (NULL);
+
+ /* Strip the newline from the string and set the user */
+  user[strlen(user) - 1] = '\0';
+
+  cupsSetUser(user);
+
+ /* Use getpass() to ask for the password... */
+  return (getpass("Password: "));
+}
+
+...
+
+cupsSetPasswordCB(my_password_cb);
+</PRE></UL>
+
+<P>Similarly, a GUI interface could display the prompt string in a
+window with input fields for the username and password. The username
+should probably default to the value of
+<A HREF="#cupsUser"><CODE>cupsUser()</CODE></A> to make things easier
+on the user.
+
 <H2>PPD Services</H2>
 
 <P>CUPS includes functions to access and manipulate PostScript Printer
@@ -3259,6 +3318,9 @@ password = cupsGetPassword("Please enter a password:");
 
 <P>
 <A HREF="#cupsServer">cupsServer()</A>,
+<A HREF="#cupsSetPasswordCB">cupsSetPasswordCB()</A>,
+<A HREF="#cupsSetServer">cupsSetServer()</A>,
+<A HREF="#cupsSetUser">cupsSetUser()</A>,
 <A HREF="#cupsUser()">cupsUser()</A>
 
 <!-- NEW PAGE --><H2><A NAME="cupsGetPPD">cupsGetPPD()</A></H2>
@@ -4429,7 +4491,159 @@ server = cupsServer();
 
 <P>
 <A HREF="#cupsGetPassword">cupsGetPassword()</A>,
+<A HREF="#cupsSetPasswordCB">cupsSetPasswordCB()</A>,
+<A HREF="#cupsSetServer">cupsSetServer()</A>,
+<A HREF="#cupsSetUser">cupsSetUser()</A>,
 <A HREF="#cupsUser">cupsUser()</A>
+
+<!-- NEW PAGE --><H2><A NAME="cupsSetPasswordCB">cupsSetPasswordCB()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+void
+cupsSetPasswordCB(const char *(*cb)(const char *prompt));
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD>cb</TD>
+	<TD>The password callback function.</TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Description</H3>
+
+<P><CODE>cupsSetPasswordCB()</CODE> sets the callback function to use when
+asking the user for a password. The callback function must accept a single
+character string pointer (the prompt string) and return <CODE>NULL</CODE>
+if the user did not enter a password string or a pointer to the password
+string otherwise.
+
+<H3>Example</H3>
+
+<PRE>
+#include &lt;cups/cups.h&gt;
+
+const char *
+my_password_cb(const char *prompt)
+{
+  return (getpass(prompt));
+}
+
+...
+
+char *password;
+
+...
+
+cupsSetPasswordCB(my_password_cb);
+password = cupsGetPassword("Please enter a password:");
+</PRE>
+
+<H3>See Also</H3>
+
+<P>
+<A HREF="#cupsServer">cupsServer()</A>,
+<A HREF="#cupsSetServer">cupsSetServer()</A>,
+<A HREF="#cupsSetUser">cupsSetUser()</A>,
+<A HREF="#cupsUser()">cupsUser()</A>
+
+<!-- NEW PAGE --><H2><A NAME="cupsSetServer">cupsSetServer()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+void
+cupsSetServer(const char *server);
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD>server</TD>
+	<TD>The default server to use.</TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Description</H3>
+
+<P><CODE>cupsSetServer()</CODE> sets the default server to use for
+the CUPS API. If the <CODE>server</CODE> argument is <CODE>NULL</CODE>,
+the default server is used.
+
+<H3>Example</H3>
+
+<PRE>
+#include &lt;cups/cups.h&gt;
+
+cupsSetServer("foo.bar.com");
+</PRE>
+
+<H3>See Also</H3>
+
+<P>
+<A HREF="#cupsServer">cupsServer()</A>,
+<A HREF="#cupsSetPasswordCB">cupsSetPasswordCB()</A>,
+<A HREF="#cupsSetUser">cupsSetUser()</A>,
+<A HREF="#cupsUser()">cupsUser()</A>
+
+<!-- NEW PAGE --><H2><A NAME="cupsSetUser">cupsSetUser()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+void
+cupsSetUser(const char *user);
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD>user</TD>
+	<TD>The user name string to use.</TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Description</H3>
+
+<P><CODE>cupsSetUser()</CODE> sets the default user name for authentication.
+If the <CODE>user</CODE> argument is <CODE>NULL</CODE> then the current
+login user is used.
+
+<H3>Example</H3>
+
+<PRE>
+#include &lt;cups/cups.h&gt;
+
+...
+
+cupsSetUser("root");
+</PRE>
+
+<H3>See Also</H3>
+
+<P>
+<A HREF="#cupsServer">cupsServer()</A>,
+<A HREF="#cupsSetPasswordCB">cupsSetPasswordCB()</A>,
+<A HREF="#cupsSetServer">cupsSetServer()</A>,
+<A HREF="#cupsUser()">cupsUser()</A>
 
 <!-- NEW PAGE --><H2><A NAME="cupsTempFile">cupsTempFile()</A></H2>
 
@@ -7047,7 +7261,8 @@ http = httpConnect(cupsServer(), ippPort());
 
 <H3>See Also</H3>
 
-<A HREF="#cupsServer"><CODE>cupsServer()</CODE></A>
+<A HREF="#cupsServer"><CODE>cupsServer()</CODE></A>,
+<A HREF="#ippSetPort"><CODE>ippSetPort()</CODE></A>
 
 
 <!-- NEW PAGE --><H2><A NAME="ippRead">ippRead()</A></H2>
@@ -7110,6 +7325,49 @@ if (status == IPP_DATA)
 <H3>See Also</H3>
 
 <A HREF="#ippWrite"><CODE>ippWrite()</CODE></A>
+
+
+<!-- NEW PAGE --><H2><A NAME="ippSetPort">ippSetPort()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+void
+ippSetPort(int port);
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD>port</TD>
+	<TD>The port number to use</TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Description</H3>
+
+<P>The <CODE>ippSetPort()</CODE> function sets the default IPP port number
+for requests.
+
+<H3>Example</H3>
+
+<PRE>
+#include &lt;cups/http.h>
+#include &lt;cups/ipp.h>
+
+...
+
+ippSetPort(8631);
+</PRE>
+
+<H3>See Also</H3>
+
+<A HREF="#ippPort"><CODE>ippPort()</CODE></A>
 
 
 <!-- NEW PAGE --><H2><A NAME="ippTimeToDate">ippTimeToDate()</A></H2>

@@ -4,7 +4,7 @@
 <TITLE> CUPS Software Programmers Manual</TITLE>
 <META NAME="AUTHOR" CONTENT="Easy Software Products">
 <META NAME="COPYRIGHT" CONTENT="Copyright 1997-2000, All Rights Reserved">
-<META NAME="DOCNUMBER" CONTENT="CUPS-SPM-1.1.1">
+<META NAME="DOCNUMBER" CONTENT="CUPS-SPM-1.1.3">
 <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
 <STYLE>
 BODY { font-family: serif; font-size: 11.0pt }
@@ -22,7 +22,7 @@ PRE { font-size: 9.0pt }
 <BODY BGCOLOR="#ffffff">
 <CENTER><A HREF="#CONTENTS"><IMG SRC="images/cups-large.gif" BORDER="0" WIDTH="100%"><BR>
 <H1> CUPS Software Programmers Manual</H1></A><BR>
-CUPS-SPM-1.1.1<BR>
+CUPS-SPM-1.1.3<BR>
 Easy Software Products<BR>
 Copyright 1997-2000, All Rights Reserved<BR>
 </CENTER>
@@ -64,6 +64,7 @@ Copyright 1997-2000, All Rights Reserved<BR>
 <LI><A HREF="#3_2_6">Printing with Options</A></LI>
 <LI><A HREF="#3_2_7">Setting Printer Options</A></LI>
 <LI><A HREF="#3_2_8">Getting Errors</A></LI>
+<LI><A HREF="#3_2_9">Passwords and Authentication</A></LI>
 </UL>
 <LI><A HREF="#3_3">PPD Services</A></LI>
 <UL>
@@ -448,23 +449,23 @@ Copyright 1997-2000, All Rights Reserved<BR>
 <LI><A HREF="#10_29_4">Example</A></LI>
 <LI><A HREF="#10_29_5">See Also</A></LI>
 </UL>
-<LI><A HREF="#cupsTempFile">cupsTempFile()</A></LI>
+<LI><A HREF="#cupsSetPasswordCB">cupsSetPasswordCB()</A></LI>
 <UL>
 <LI><A HREF="#10_30_1">Usage</A></LI>
 <LI><A HREF="#10_30_2">Arguments</A></LI>
-<LI><A HREF="#10_30_3">Returns</A></LI>
-<LI><A HREF="#10_30_4">Description</A></LI>
-<LI><A HREF="#10_30_5">Example</A></LI>
+<LI><A HREF="#10_30_3">Description</A></LI>
+<LI><A HREF="#10_30_4">Example</A></LI>
+<LI><A HREF="#10_30_5">See Also</A></LI>
 </UL>
-<LI><A HREF="#cupsUser">cupsUser()</A></LI>
+<LI><A HREF="#cupsSetServer">cupsSetServer()</A></LI>
 <UL>
 <LI><A HREF="#10_31_1">Usage</A></LI>
-<LI><A HREF="#10_31_2">Returns</A></LI>
+<LI><A HREF="#10_31_2">Arguments</A></LI>
 <LI><A HREF="#10_31_3">Description</A></LI>
 <LI><A HREF="#10_31_4">Example</A></LI>
 <LI><A HREF="#10_31_5">See Also</A></LI>
 </UL>
-<LI><A HREF="#httpBlocking">httpBlocking()</A></LI>
+<LI><A HREF="#cupsSetUser">cupsSetUser()</A></LI>
 <UL>
 <LI><A HREF="#10_32_1">Usage</A></LI>
 <LI><A HREF="#10_32_2">Arguments</A></LI>
@@ -472,24 +473,23 @@ Copyright 1997-2000, All Rights Reserved<BR>
 <LI><A HREF="#10_32_4">Example</A></LI>
 <LI><A HREF="#10_32_5">See Also</A></LI>
 </UL>
-<LI><A HREF="#httpCheck">httpCheck()</A></LI>
+<LI><A HREF="#cupsTempFile">cupsTempFile()</A></LI>
 <UL>
 <LI><A HREF="#10_33_1">Usage</A></LI>
 <LI><A HREF="#10_33_2">Arguments</A></LI>
 <LI><A HREF="#10_33_3">Returns</A></LI>
 <LI><A HREF="#10_33_4">Description</A></LI>
 <LI><A HREF="#10_33_5">Example</A></LI>
-<LI><A HREF="#10_33_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#httpClearFields">httpClearFields()</A></LI>
+<LI><A HREF="#cupsUser">cupsUser()</A></LI>
 <UL>
 <LI><A HREF="#10_34_1">Usage</A></LI>
-<LI><A HREF="#10_34_2">Arguments</A></LI>
+<LI><A HREF="#10_34_2">Returns</A></LI>
 <LI><A HREF="#10_34_3">Description</A></LI>
 <LI><A HREF="#10_34_4">Example</A></LI>
 <LI><A HREF="#10_34_5">See Also</A></LI>
 </UL>
-<LI><A HREF="#httpClose">httpClose()</A></LI>
+<LI><A HREF="#httpBlocking">httpBlocking()</A></LI>
 <UL>
 <LI><A HREF="#10_35_1">Usage</A></LI>
 <LI><A HREF="#10_35_2">Arguments</A></LI>
@@ -497,7 +497,7 @@ Copyright 1997-2000, All Rights Reserved<BR>
 <LI><A HREF="#10_35_4">Example</A></LI>
 <LI><A HREF="#10_35_5">See Also</A></LI>
 </UL>
-<LI><A HREF="#httpConnect">httpConnect()</A></LI>
+<LI><A HREF="#httpCheck">httpCheck()</A></LI>
 <UL>
 <LI><A HREF="#10_36_1">Usage</A></LI>
 <LI><A HREF="#10_36_2">Arguments</A></LI>
@@ -506,25 +506,23 @@ Copyright 1997-2000, All Rights Reserved<BR>
 <LI><A HREF="#10_36_5">Example</A></LI>
 <LI><A HREF="#10_36_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#httpDecode64">httpDecode64()</A></LI>
+<LI><A HREF="#httpClearFields">httpClearFields()</A></LI>
 <UL>
 <LI><A HREF="#10_37_1">Usage</A></LI>
 <LI><A HREF="#10_37_2">Arguments</A></LI>
-<LI><A HREF="#10_37_3">Returns</A></LI>
-<LI><A HREF="#10_37_4">Description</A></LI>
-<LI><A HREF="#10_37_5">Example</A></LI>
-<LI><A HREF="#10_37_6">See Also</A></LI>
+<LI><A HREF="#10_37_3">Description</A></LI>
+<LI><A HREF="#10_37_4">Example</A></LI>
+<LI><A HREF="#10_37_5">See Also</A></LI>
 </UL>
-<LI><A HREF="#httpDelete">httpDelete()</A></LI>
+<LI><A HREF="#httpClose">httpClose()</A></LI>
 <UL>
 <LI><A HREF="#10_38_1">Usage</A></LI>
 <LI><A HREF="#10_38_2">Arguments</A></LI>
-<LI><A HREF="#10_38_3">Returns</A></LI>
-<LI><A HREF="#10_38_4">Description</A></LI>
-<LI><A HREF="#10_38_5">Example</A></LI>
-<LI><A HREF="#10_38_6">See Also</A></LI>
+<LI><A HREF="#10_38_3">Description</A></LI>
+<LI><A HREF="#10_38_4">Example</A></LI>
+<LI><A HREF="#10_38_5">See Also</A></LI>
 </UL>
-<LI><A HREF="#httpEncode64">httpEncode64()</A></LI>
+<LI><A HREF="#httpConnect">httpConnect()</A></LI>
 <UL>
 <LI><A HREF="#10_39_1">Usage</A></LI>
 <LI><A HREF="#10_39_2">Arguments</A></LI>
@@ -533,7 +531,7 @@ Copyright 1997-2000, All Rights Reserved<BR>
 <LI><A HREF="#10_39_5">Example</A></LI>
 <LI><A HREF="#10_39_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#httpError">httpError()</A></LI>
+<LI><A HREF="#httpDecode64">httpDecode64()</A></LI>
 <UL>
 <LI><A HREF="#10_40_1">Usage</A></LI>
 <LI><A HREF="#10_40_2">Arguments</A></LI>
@@ -542,15 +540,16 @@ Copyright 1997-2000, All Rights Reserved<BR>
 <LI><A HREF="#10_40_5">Example</A></LI>
 <LI><A HREF="#10_40_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#httpFlush">httpFlush()</A></LI>
+<LI><A HREF="#httpDelete">httpDelete()</A></LI>
 <UL>
 <LI><A HREF="#10_41_1">Usage</A></LI>
 <LI><A HREF="#10_41_2">Arguments</A></LI>
-<LI><A HREF="#10_41_3">Description</A></LI>
-<LI><A HREF="#10_41_4">Example</A></LI>
-<LI><A HREF="#10_41_5">See Also</A></LI>
+<LI><A HREF="#10_41_3">Returns</A></LI>
+<LI><A HREF="#10_41_4">Description</A></LI>
+<LI><A HREF="#10_41_5">Example</A></LI>
+<LI><A HREF="#10_41_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#httpGet">httpGet()</A></LI>
+<LI><A HREF="#httpEncode64">httpEncode64()</A></LI>
 <UL>
 <LI><A HREF="#10_42_1">Usage</A></LI>
 <LI><A HREF="#10_42_2">Arguments</A></LI>
@@ -559,7 +558,7 @@ Copyright 1997-2000, All Rights Reserved<BR>
 <LI><A HREF="#10_42_5">Example</A></LI>
 <LI><A HREF="#10_42_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#httpGets">httpGets()</A></LI>
+<LI><A HREF="#httpError">httpError()</A></LI>
 <UL>
 <LI><A HREF="#10_43_1">Usage</A></LI>
 <LI><A HREF="#10_43_2">Arguments</A></LI>
@@ -568,16 +567,15 @@ Copyright 1997-2000, All Rights Reserved<BR>
 <LI><A HREF="#10_43_5">Example</A></LI>
 <LI><A HREF="#10_43_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#httpGetDateString">httpGetDateString()</A></LI>
+<LI><A HREF="#httpFlush">httpFlush()</A></LI>
 <UL>
 <LI><A HREF="#10_44_1">Usage</A></LI>
 <LI><A HREF="#10_44_2">Arguments</A></LI>
-<LI><A HREF="#10_44_3">Returns</A></LI>
-<LI><A HREF="#10_44_4">Description</A></LI>
-<LI><A HREF="#10_44_5">Example</A></LI>
-<LI><A HREF="#10_44_6">See Also</A></LI>
+<LI><A HREF="#10_44_3">Description</A></LI>
+<LI><A HREF="#10_44_4">Example</A></LI>
+<LI><A HREF="#10_44_5">See Also</A></LI>
 </UL>
-<LI><A HREF="#httpGetDateTime">httpGetDateTime()</A></LI>
+<LI><A HREF="#httpGet">httpGet()</A></LI>
 <UL>
 <LI><A HREF="#10_45_1">Usage</A></LI>
 <LI><A HREF="#10_45_2">Arguments</A></LI>
@@ -586,7 +584,7 @@ Copyright 1997-2000, All Rights Reserved<BR>
 <LI><A HREF="#10_45_5">Example</A></LI>
 <LI><A HREF="#10_45_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#httpGetField">httpGetField()</A></LI>
+<LI><A HREF="#httpGets">httpGets()</A></LI>
 <UL>
 <LI><A HREF="#10_46_1">Usage</A></LI>
 <LI><A HREF="#10_46_2">Arguments</A></LI>
@@ -595,7 +593,7 @@ Copyright 1997-2000, All Rights Reserved<BR>
 <LI><A HREF="#10_46_5">Example</A></LI>
 <LI><A HREF="#10_46_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#httpHead">httpHead()</A></LI>
+<LI><A HREF="#httpGetDateString">httpGetDateString()</A></LI>
 <UL>
 <LI><A HREF="#10_47_1">Usage</A></LI>
 <LI><A HREF="#10_47_2">Arguments</A></LI>
@@ -604,14 +602,16 @@ Copyright 1997-2000, All Rights Reserved<BR>
 <LI><A HREF="#10_47_5">Example</A></LI>
 <LI><A HREF="#10_47_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#httpInitialize">httpInitialize()</A></LI>
+<LI><A HREF="#httpGetDateTime">httpGetDateTime()</A></LI>
 <UL>
 <LI><A HREF="#10_48_1">Usage</A></LI>
-<LI><A HREF="#10_48_2">Description</A></LI>
-<LI><A HREF="#10_48_3">Example</A></LI>
-<LI><A HREF="#10_48_4">See Also</A></LI>
+<LI><A HREF="#10_48_2">Arguments</A></LI>
+<LI><A HREF="#10_48_3">Returns</A></LI>
+<LI><A HREF="#10_48_4">Description</A></LI>
+<LI><A HREF="#10_48_5">Example</A></LI>
+<LI><A HREF="#10_48_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#httpOptions">httpOptions()</A></LI>
+<LI><A HREF="#httpGetField">httpGetField()</A></LI>
 <UL>
 <LI><A HREF="#10_49_1">Usage</A></LI>
 <LI><A HREF="#10_49_2">Arguments</A></LI>
@@ -620,7 +620,7 @@ Copyright 1997-2000, All Rights Reserved<BR>
 <LI><A HREF="#10_49_5">Example</A></LI>
 <LI><A HREF="#10_49_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#httpPost">httpPost()</A></LI>
+<LI><A HREF="#httpHead">httpHead()</A></LI>
 <UL>
 <LI><A HREF="#10_50_1">Usage</A></LI>
 <LI><A HREF="#10_50_2">Arguments</A></LI>
@@ -629,16 +629,14 @@ Copyright 1997-2000, All Rights Reserved<BR>
 <LI><A HREF="#10_50_5">Example</A></LI>
 <LI><A HREF="#10_50_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#httpPrintf">httpPrintf()</A></LI>
+<LI><A HREF="#httpInitialize">httpInitialize()</A></LI>
 <UL>
 <LI><A HREF="#10_51_1">Usage</A></LI>
-<LI><A HREF="#10_51_2">Arguments</A></LI>
-<LI><A HREF="#10_51_3">Returns</A></LI>
-<LI><A HREF="#10_51_4">Description</A></LI>
-<LI><A HREF="#10_51_5">Example</A></LI>
-<LI><A HREF="#10_51_6">See Also</A></LI>
+<LI><A HREF="#10_51_2">Description</A></LI>
+<LI><A HREF="#10_51_3">Example</A></LI>
+<LI><A HREF="#10_51_4">See Also</A></LI>
 </UL>
-<LI><A HREF="#httpPut">httpPut()</A></LI>
+<LI><A HREF="#httpOptions">httpOptions()</A></LI>
 <UL>
 <LI><A HREF="#10_52_1">Usage</A></LI>
 <LI><A HREF="#10_52_2">Arguments</A></LI>
@@ -647,7 +645,7 @@ Copyright 1997-2000, All Rights Reserved<BR>
 <LI><A HREF="#10_52_5">Example</A></LI>
 <LI><A HREF="#10_52_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#httpRead">httpRead()</A></LI>
+<LI><A HREF="#httpPost">httpPost()</A></LI>
 <UL>
 <LI><A HREF="#10_53_1">Usage</A></LI>
 <LI><A HREF="#10_53_2">Arguments</A></LI>
@@ -656,7 +654,7 @@ Copyright 1997-2000, All Rights Reserved<BR>
 <LI><A HREF="#10_53_5">Example</A></LI>
 <LI><A HREF="#10_53_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#httpReconnect">httpReconnect()</A></LI>
+<LI><A HREF="#httpPrintf">httpPrintf()</A></LI>
 <UL>
 <LI><A HREF="#10_54_1">Usage</A></LI>
 <LI><A HREF="#10_54_2">Arguments</A></LI>
@@ -665,23 +663,25 @@ Copyright 1997-2000, All Rights Reserved<BR>
 <LI><A HREF="#10_54_5">Example</A></LI>
 <LI><A HREF="#10_54_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#httpSeparate">httpSeparate()</A></LI>
+<LI><A HREF="#httpPut">httpPut()</A></LI>
 <UL>
 <LI><A HREF="#10_55_1">Usage</A></LI>
 <LI><A HREF="#10_55_2">Arguments</A></LI>
-<LI><A HREF="#10_55_3">Description</A></LI>
-<LI><A HREF="#10_55_4">Example</A></LI>
-<LI><A HREF="#10_55_5">See Also</A></LI>
+<LI><A HREF="#10_55_3">Returns</A></LI>
+<LI><A HREF="#10_55_4">Description</A></LI>
+<LI><A HREF="#10_55_5">Example</A></LI>
+<LI><A HREF="#10_55_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#httpSetField">httpSetField()</A></LI>
+<LI><A HREF="#httpRead">httpRead()</A></LI>
 <UL>
 <LI><A HREF="#10_56_1">Usage</A></LI>
 <LI><A HREF="#10_56_2">Arguments</A></LI>
-<LI><A HREF="#10_56_3">Description</A></LI>
-<LI><A HREF="#10_56_4">Example</A></LI>
-<LI><A HREF="#10_56_5">See Also</A></LI>
+<LI><A HREF="#10_56_3">Returns</A></LI>
+<LI><A HREF="#10_56_4">Description</A></LI>
+<LI><A HREF="#10_56_5">Example</A></LI>
+<LI><A HREF="#10_56_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#httpTrace">httpTrace()</A></LI>
+<LI><A HREF="#httpReconnect">httpReconnect()</A></LI>
 <UL>
 <LI><A HREF="#10_57_1">Usage</A></LI>
 <LI><A HREF="#10_57_2">Arguments</A></LI>
@@ -690,25 +690,23 @@ Copyright 1997-2000, All Rights Reserved<BR>
 <LI><A HREF="#10_57_5">Example</A></LI>
 <LI><A HREF="#10_57_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#httpUpdate">httpUpdate()</A></LI>
+<LI><A HREF="#httpSeparate">httpSeparate()</A></LI>
 <UL>
 <LI><A HREF="#10_58_1">Usage</A></LI>
 <LI><A HREF="#10_58_2">Arguments</A></LI>
-<LI><A HREF="#10_58_3">Returns</A></LI>
-<LI><A HREF="#10_58_4">Description</A></LI>
-<LI><A HREF="#10_58_5">Example</A></LI>
-<LI><A HREF="#10_58_6">See Also</A></LI>
+<LI><A HREF="#10_58_3">Description</A></LI>
+<LI><A HREF="#10_58_4">Example</A></LI>
+<LI><A HREF="#10_58_5">See Also</A></LI>
 </UL>
-<LI><A HREF="#httpWrite">httpWrite()</A></LI>
+<LI><A HREF="#httpSetField">httpSetField()</A></LI>
 <UL>
 <LI><A HREF="#10_59_1">Usage</A></LI>
 <LI><A HREF="#10_59_2">Arguments</A></LI>
-<LI><A HREF="#10_59_3">Returns</A></LI>
-<LI><A HREF="#10_59_4">Description</A></LI>
-<LI><A HREF="#10_59_5">Example</A></LI>
-<LI><A HREF="#10_59_6">See Also</A></LI>
+<LI><A HREF="#10_59_3">Description</A></LI>
+<LI><A HREF="#10_59_4">Example</A></LI>
+<LI><A HREF="#10_59_5">See Also</A></LI>
 </UL>
-<LI><A HREF="#ippAddBoolean">ippAddBoolean()</A></LI>
+<LI><A HREF="#httpTrace">httpTrace()</A></LI>
 <UL>
 <LI><A HREF="#10_60_1">Usage</A></LI>
 <LI><A HREF="#10_60_2">Arguments</A></LI>
@@ -717,7 +715,7 @@ Copyright 1997-2000, All Rights Reserved<BR>
 <LI><A HREF="#10_60_5">Example</A></LI>
 <LI><A HREF="#10_60_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#ippAddBooleans">ippAddBooleans()</A></LI>
+<LI><A HREF="#httpUpdate">httpUpdate()</A></LI>
 <UL>
 <LI><A HREF="#10_61_1">Usage</A></LI>
 <LI><A HREF="#10_61_2">Arguments</A></LI>
@@ -726,7 +724,7 @@ Copyright 1997-2000, All Rights Reserved<BR>
 <LI><A HREF="#10_61_5">Example</A></LI>
 <LI><A HREF="#10_61_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#ippAddDate">ippAddDate()</A></LI>
+<LI><A HREF="#httpWrite">httpWrite()</A></LI>
 <UL>
 <LI><A HREF="#10_62_1">Usage</A></LI>
 <LI><A HREF="#10_62_2">Arguments</A></LI>
@@ -735,7 +733,7 @@ Copyright 1997-2000, All Rights Reserved<BR>
 <LI><A HREF="#10_62_5">Example</A></LI>
 <LI><A HREF="#10_62_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#ippAddInteger">ippAddInteger()</A></LI>
+<LI><A HREF="#ippAddBoolean">ippAddBoolean()</A></LI>
 <UL>
 <LI><A HREF="#10_63_1">Usage</A></LI>
 <LI><A HREF="#10_63_2">Arguments</A></LI>
@@ -744,7 +742,7 @@ Copyright 1997-2000, All Rights Reserved<BR>
 <LI><A HREF="#10_63_5">Example</A></LI>
 <LI><A HREF="#10_63_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#ippAddIntegers">ippAddIntegers()</A></LI>
+<LI><A HREF="#ippAddBooleans">ippAddBooleans()</A></LI>
 <UL>
 <LI><A HREF="#10_64_1">Usage</A></LI>
 <LI><A HREF="#10_64_2">Arguments</A></LI>
@@ -753,7 +751,7 @@ Copyright 1997-2000, All Rights Reserved<BR>
 <LI><A HREF="#10_64_5">Example</A></LI>
 <LI><A HREF="#10_64_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#ippAddRange">ippAddRange()</A></LI>
+<LI><A HREF="#ippAddDate">ippAddDate()</A></LI>
 <UL>
 <LI><A HREF="#10_65_1">Usage</A></LI>
 <LI><A HREF="#10_65_2">Arguments</A></LI>
@@ -762,7 +760,7 @@ Copyright 1997-2000, All Rights Reserved<BR>
 <LI><A HREF="#10_65_5">Example</A></LI>
 <LI><A HREF="#10_65_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#ippAddRanges">ippAddRanges()</A></LI>
+<LI><A HREF="#ippAddInteger">ippAddInteger()</A></LI>
 <UL>
 <LI><A HREF="#10_66_1">Usage</A></LI>
 <LI><A HREF="#10_66_2">Arguments</A></LI>
@@ -771,7 +769,7 @@ Copyright 1997-2000, All Rights Reserved<BR>
 <LI><A HREF="#10_66_5">Example</A></LI>
 <LI><A HREF="#10_66_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#ippAddResolution">ippAddResolution()</A></LI>
+<LI><A HREF="#ippAddIntegers">ippAddIntegers()</A></LI>
 <UL>
 <LI><A HREF="#10_67_1">Usage</A></LI>
 <LI><A HREF="#10_67_2">Arguments</A></LI>
@@ -780,7 +778,7 @@ Copyright 1997-2000, All Rights Reserved<BR>
 <LI><A HREF="#10_67_5">Example</A></LI>
 <LI><A HREF="#10_67_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#ippAddResolutions">ippAddResolutions()</A></LI>
+<LI><A HREF="#ippAddRange">ippAddRange()</A></LI>
 <UL>
 <LI><A HREF="#10_68_1">Usage</A></LI>
 <LI><A HREF="#10_68_2">Arguments</A></LI>
@@ -789,7 +787,7 @@ Copyright 1997-2000, All Rights Reserved<BR>
 <LI><A HREF="#10_68_5">Example</A></LI>
 <LI><A HREF="#10_68_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#ippAddSeparator">ippAddSeparator()</A></LI>
+<LI><A HREF="#ippAddRanges">ippAddRanges()</A></LI>
 <UL>
 <LI><A HREF="#10_69_1">Usage</A></LI>
 <LI><A HREF="#10_69_2">Arguments</A></LI>
@@ -798,7 +796,7 @@ Copyright 1997-2000, All Rights Reserved<BR>
 <LI><A HREF="#10_69_5">Example</A></LI>
 <LI><A HREF="#10_69_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#ippAddString">ippAddString()</A></LI>
+<LI><A HREF="#ippAddResolution">ippAddResolution()</A></LI>
 <UL>
 <LI><A HREF="#10_70_1">Usage</A></LI>
 <LI><A HREF="#10_70_2">Arguments</A></LI>
@@ -807,7 +805,7 @@ Copyright 1997-2000, All Rights Reserved<BR>
 <LI><A HREF="#10_70_5">Example</A></LI>
 <LI><A HREF="#10_70_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#ippAddStrings">ippAddStrings()</A></LI>
+<LI><A HREF="#ippAddResolutions">ippAddResolutions()</A></LI>
 <UL>
 <LI><A HREF="#10_71_1">Usage</A></LI>
 <LI><A HREF="#10_71_2">Arguments</A></LI>
@@ -816,7 +814,7 @@ Copyright 1997-2000, All Rights Reserved<BR>
 <LI><A HREF="#10_71_5">Example</A></LI>
 <LI><A HREF="#10_71_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#ippDateToTime">ippDateToTime()</A></LI>
+<LI><A HREF="#ippAddSeparator">ippAddSeparator()</A></LI>
 <UL>
 <LI><A HREF="#10_72_1">Usage</A></LI>
 <LI><A HREF="#10_72_2">Arguments</A></LI>
@@ -825,15 +823,16 @@ Copyright 1997-2000, All Rights Reserved<BR>
 <LI><A HREF="#10_72_5">Example</A></LI>
 <LI><A HREF="#10_72_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#ippDelete">ippDelete()</A></LI>
+<LI><A HREF="#ippAddString">ippAddString()</A></LI>
 <UL>
 <LI><A HREF="#10_73_1">Usage</A></LI>
 <LI><A HREF="#10_73_2">Arguments</A></LI>
-<LI><A HREF="#10_73_3">Description</A></LI>
-<LI><A HREF="#10_73_4">Example</A></LI>
-<LI><A HREF="#10_73_5">See Also</A></LI>
+<LI><A HREF="#10_73_3">Returns</A></LI>
+<LI><A HREF="#10_73_4">Description</A></LI>
+<LI><A HREF="#10_73_5">Example</A></LI>
+<LI><A HREF="#10_73_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#ippFindAttribute">ippFindAttribute()</A></LI>
+<LI><A HREF="#ippAddStrings">ippAddStrings()</A></LI>
 <UL>
 <LI><A HREF="#10_74_1">Usage</A></LI>
 <LI><A HREF="#10_74_2">Arguments</A></LI>
@@ -842,7 +841,7 @@ Copyright 1997-2000, All Rights Reserved<BR>
 <LI><A HREF="#10_74_5">Example</A></LI>
 <LI><A HREF="#10_74_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#ippLength">ippLength()</A></LI>
+<LI><A HREF="#ippDateToTime">ippDateToTime()</A></LI>
 <UL>
 <LI><A HREF="#10_75_1">Usage</A></LI>
 <LI><A HREF="#10_75_2">Arguments</A></LI>
@@ -851,23 +850,24 @@ Copyright 1997-2000, All Rights Reserved<BR>
 <LI><A HREF="#10_75_5">Example</A></LI>
 <LI><A HREF="#10_75_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#ippNew">ippNew()</A></LI>
+<LI><A HREF="#ippDelete">ippDelete()</A></LI>
 <UL>
 <LI><A HREF="#10_76_1">Usage</A></LI>
-<LI><A HREF="#10_76_2">Returns</A></LI>
+<LI><A HREF="#10_76_2">Arguments</A></LI>
 <LI><A HREF="#10_76_3">Description</A></LI>
 <LI><A HREF="#10_76_4">Example</A></LI>
 <LI><A HREF="#10_76_5">See Also</A></LI>
 </UL>
-<LI><A HREF="#ippPort">ippPort()</A></LI>
+<LI><A HREF="#ippFindAttribute">ippFindAttribute()</A></LI>
 <UL>
 <LI><A HREF="#10_77_1">Usage</A></LI>
-<LI><A HREF="#10_77_2">Returns</A></LI>
-<LI><A HREF="#10_77_3">Description</A></LI>
-<LI><A HREF="#10_77_4">Example</A></LI>
-<LI><A HREF="#10_77_5">See Also</A></LI>
+<LI><A HREF="#10_77_2">Arguments</A></LI>
+<LI><A HREF="#10_77_3">Returns</A></LI>
+<LI><A HREF="#10_77_4">Description</A></LI>
+<LI><A HREF="#10_77_5">Example</A></LI>
+<LI><A HREF="#10_77_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#ippRead">ippRead()</A></LI>
+<LI><A HREF="#ippLength">ippLength()</A></LI>
 <UL>
 <LI><A HREF="#10_78_1">Usage</A></LI>
 <LI><A HREF="#10_78_2">Arguments</A></LI>
@@ -876,42 +876,40 @@ Copyright 1997-2000, All Rights Reserved<BR>
 <LI><A HREF="#10_78_5">Example</A></LI>
 <LI><A HREF="#10_78_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#ippTimeToDate">ippTimeToDate()</A></LI>
+<LI><A HREF="#ippNew">ippNew()</A></LI>
 <UL>
 <LI><A HREF="#10_79_1">Usage</A></LI>
-<LI><A HREF="#10_79_2">Arguments</A></LI>
-<LI><A HREF="#10_79_3">Returns</A></LI>
-<LI><A HREF="#10_79_4">Description</A></LI>
-<LI><A HREF="#10_79_5">Example</A></LI>
-<LI><A HREF="#10_79_6">See Also</A></LI>
+<LI><A HREF="#10_79_2">Returns</A></LI>
+<LI><A HREF="#10_79_3">Description</A></LI>
+<LI><A HREF="#10_79_4">Example</A></LI>
+<LI><A HREF="#10_79_5">See Also</A></LI>
 </UL>
-<LI><A HREF="#ippWrite">ippWrite()</A></LI>
+<LI><A HREF="#ippPort">ippPort()</A></LI>
 <UL>
 <LI><A HREF="#10_80_1">Usage</A></LI>
-<LI><A HREF="#10_80_2">Arguments</A></LI>
-<LI><A HREF="#10_80_3">Returns</A></LI>
-<LI><A HREF="#10_80_4">Description</A></LI>
-<LI><A HREF="#10_80_5">Example</A></LI>
-<LI><A HREF="#10_80_6">See Also</A></LI>
+<LI><A HREF="#10_80_2">Returns</A></LI>
+<LI><A HREF="#10_80_3">Description</A></LI>
+<LI><A HREF="#10_80_4">Example</A></LI>
+<LI><A HREF="#10_80_5">See Also</A></LI>
 </UL>
-<LI><A HREF="#ppdClose">ppdClose()</A></LI>
+<LI><A HREF="#ippRead">ippRead()</A></LI>
 <UL>
 <LI><A HREF="#10_81_1">Usage</A></LI>
 <LI><A HREF="#10_81_2">Arguments</A></LI>
-<LI><A HREF="#10_81_3">Description</A></LI>
-<LI><A HREF="#10_81_4">Example</A></LI>
-<LI><A HREF="#10_81_5">See Also</A></LI>
+<LI><A HREF="#10_81_3">Returns</A></LI>
+<LI><A HREF="#10_81_4">Description</A></LI>
+<LI><A HREF="#10_81_5">Example</A></LI>
+<LI><A HREF="#10_81_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#ppdConflicts">ppdConflicts()</A></LI>
+<LI><A HREF="#ippSetPort">ippSetPort()</A></LI>
 <UL>
 <LI><A HREF="#10_82_1">Usage</A></LI>
 <LI><A HREF="#10_82_2">Arguments</A></LI>
-<LI><A HREF="#10_82_3">Returns</A></LI>
-<LI><A HREF="#10_82_4">Description</A></LI>
-<LI><A HREF="#10_82_5">Example</A></LI>
-<LI><A HREF="#10_82_6">See Also</A></LI>
+<LI><A HREF="#10_82_3">Description</A></LI>
+<LI><A HREF="#10_82_4">Example</A></LI>
+<LI><A HREF="#10_82_5">See Also</A></LI>
 </UL>
-<LI><A HREF="#ppdEmit">ppdEmit()</A></LI>
+<LI><A HREF="#ippTimeToDate">ippTimeToDate()</A></LI>
 <UL>
 <LI><A HREF="#10_83_1">Usage</A></LI>
 <LI><A HREF="#10_83_2">Arguments</A></LI>
@@ -920,7 +918,7 @@ Copyright 1997-2000, All Rights Reserved<BR>
 <LI><A HREF="#10_83_5">Example</A></LI>
 <LI><A HREF="#10_83_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#ppdEmitFd">ppdEmitFd()</A></LI>
+<LI><A HREF="#ippWrite">ippWrite()</A></LI>
 <UL>
 <LI><A HREF="#10_84_1">Usage</A></LI>
 <LI><A HREF="#10_84_2">Arguments</A></LI>
@@ -929,16 +927,15 @@ Copyright 1997-2000, All Rights Reserved<BR>
 <LI><A HREF="#10_84_5">Example</A></LI>
 <LI><A HREF="#10_84_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#ppdFindChoice">ppdFindChoice()</A></LI>
+<LI><A HREF="#ppdClose">ppdClose()</A></LI>
 <UL>
 <LI><A HREF="#10_85_1">Usage</A></LI>
 <LI><A HREF="#10_85_2">Arguments</A></LI>
-<LI><A HREF="#10_85_3">Returns</A></LI>
-<LI><A HREF="#10_85_4">Description</A></LI>
-<LI><A HREF="#10_85_5">Example</A></LI>
-<LI><A HREF="#10_85_6">See Also</A></LI>
+<LI><A HREF="#10_85_3">Description</A></LI>
+<LI><A HREF="#10_85_4">Example</A></LI>
+<LI><A HREF="#10_85_5">See Also</A></LI>
 </UL>
-<LI><A HREF="#ppdFindMarkedChoice">ppdFindMarkedChoice()</A></LI>
+<LI><A HREF="#ppdConflicts">ppdConflicts()</A></LI>
 <UL>
 <LI><A HREF="#10_86_1">Usage</A></LI>
 <LI><A HREF="#10_86_2">Arguments</A></LI>
@@ -947,7 +944,7 @@ Copyright 1997-2000, All Rights Reserved<BR>
 <LI><A HREF="#10_86_5">Example</A></LI>
 <LI><A HREF="#10_86_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#ppdFindOption">ppdFindOption()</A></LI>
+<LI><A HREF="#ppdEmit">ppdEmit()</A></LI>
 <UL>
 <LI><A HREF="#10_87_1">Usage</A></LI>
 <LI><A HREF="#10_87_2">Arguments</A></LI>
@@ -956,7 +953,7 @@ Copyright 1997-2000, All Rights Reserved<BR>
 <LI><A HREF="#10_87_5">Example</A></LI>
 <LI><A HREF="#10_87_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#ppdIsMarked">ppdIsMarked()</A></LI>
+<LI><A HREF="#ppdEmitFd">ppdEmitFd()</A></LI>
 <UL>
 <LI><A HREF="#10_88_1">Usage</A></LI>
 <LI><A HREF="#10_88_2">Arguments</A></LI>
@@ -965,15 +962,16 @@ Copyright 1997-2000, All Rights Reserved<BR>
 <LI><A HREF="#10_88_5">Example</A></LI>
 <LI><A HREF="#10_88_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#ppdMarkDefaults">ppdMarkDefaults()</A></LI>
+<LI><A HREF="#ppdFindChoice">ppdFindChoice()</A></LI>
 <UL>
 <LI><A HREF="#10_89_1">Usage</A></LI>
 <LI><A HREF="#10_89_2">Arguments</A></LI>
-<LI><A HREF="#10_89_3">Description</A></LI>
-<LI><A HREF="#10_89_4">Example</A></LI>
-<LI><A HREF="#10_89_5">See Also</A></LI>
+<LI><A HREF="#10_89_3">Returns</A></LI>
+<LI><A HREF="#10_89_4">Description</A></LI>
+<LI><A HREF="#10_89_5">Example</A></LI>
+<LI><A HREF="#10_89_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#ppdMarkOption">ppdMarkOption()</A></LI>
+<LI><A HREF="#ppdFindMarkedChoice">ppdFindMarkedChoice()</A></LI>
 <UL>
 <LI><A HREF="#10_90_1">Usage</A></LI>
 <LI><A HREF="#10_90_2">Arguments</A></LI>
@@ -982,7 +980,7 @@ Copyright 1997-2000, All Rights Reserved<BR>
 <LI><A HREF="#10_90_5">Example</A></LI>
 <LI><A HREF="#10_90_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#ppdOpen">ppdOpen()</A></LI>
+<LI><A HREF="#ppdFindOption">ppdFindOption()</A></LI>
 <UL>
 <LI><A HREF="#10_91_1">Usage</A></LI>
 <LI><A HREF="#10_91_2">Arguments</A></LI>
@@ -991,7 +989,7 @@ Copyright 1997-2000, All Rights Reserved<BR>
 <LI><A HREF="#10_91_5">Example</A></LI>
 <LI><A HREF="#10_91_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#ppdOpenFd">ppdOpenFd()</A></LI>
+<LI><A HREF="#ppdIsMarked">ppdIsMarked()</A></LI>
 <UL>
 <LI><A HREF="#10_92_1">Usage</A></LI>
 <LI><A HREF="#10_92_2">Arguments</A></LI>
@@ -1000,16 +998,15 @@ Copyright 1997-2000, All Rights Reserved<BR>
 <LI><A HREF="#10_92_5">Example</A></LI>
 <LI><A HREF="#10_92_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#ppdOpenFile">ppdOpenFile()</A></LI>
+<LI><A HREF="#ppdMarkDefaults">ppdMarkDefaults()</A></LI>
 <UL>
 <LI><A HREF="#10_93_1">Usage</A></LI>
 <LI><A HREF="#10_93_2">Arguments</A></LI>
-<LI><A HREF="#10_93_3">Returns</A></LI>
-<LI><A HREF="#10_93_4">Description</A></LI>
-<LI><A HREF="#10_93_5">Example</A></LI>
-<LI><A HREF="#10_93_6">See Also</A></LI>
+<LI><A HREF="#10_93_3">Description</A></LI>
+<LI><A HREF="#10_93_4">Example</A></LI>
+<LI><A HREF="#10_93_5">See Also</A></LI>
 </UL>
-<LI><A HREF="#ppdPageLength">ppdPageLength()</A></LI>
+<LI><A HREF="#ppdMarkOption">ppdMarkOption()</A></LI>
 <UL>
 <LI><A HREF="#10_94_1">Usage</A></LI>
 <LI><A HREF="#10_94_2">Arguments</A></LI>
@@ -1018,7 +1015,7 @@ Copyright 1997-2000, All Rights Reserved<BR>
 <LI><A HREF="#10_94_5">Example</A></LI>
 <LI><A HREF="#10_94_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#ppdPageSize">ppdPageSize()</A></LI>
+<LI><A HREF="#ppdOpen">ppdOpen()</A></LI>
 <UL>
 <LI><A HREF="#10_95_1">Usage</A></LI>
 <LI><A HREF="#10_95_2">Arguments</A></LI>
@@ -1027,7 +1024,7 @@ Copyright 1997-2000, All Rights Reserved<BR>
 <LI><A HREF="#10_95_5">Example</A></LI>
 <LI><A HREF="#10_95_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#ppdPageWidth">ppdPageWidth()</A></LI>
+<LI><A HREF="#ppdOpenFd">ppdOpenFd()</A></LI>
 <UL>
 <LI><A HREF="#10_96_1">Usage</A></LI>
 <LI><A HREF="#10_96_2">Arguments</A></LI>
@@ -1036,11 +1033,47 @@ Copyright 1997-2000, All Rights Reserved<BR>
 <LI><A HREF="#10_96_5">Example</A></LI>
 <LI><A HREF="#10_96_6">See Also</A></LI>
 </UL>
+<LI><A HREF="#ppdOpenFile">ppdOpenFile()</A></LI>
+<UL>
+<LI><A HREF="#10_97_1">Usage</A></LI>
+<LI><A HREF="#10_97_2">Arguments</A></LI>
+<LI><A HREF="#10_97_3">Returns</A></LI>
+<LI><A HREF="#10_97_4">Description</A></LI>
+<LI><A HREF="#10_97_5">Example</A></LI>
+<LI><A HREF="#10_97_6">See Also</A></LI>
+</UL>
+<LI><A HREF="#ppdPageLength">ppdPageLength()</A></LI>
+<UL>
+<LI><A HREF="#10_98_1">Usage</A></LI>
+<LI><A HREF="#10_98_2">Arguments</A></LI>
+<LI><A HREF="#10_98_3">Returns</A></LI>
+<LI><A HREF="#10_98_4">Description</A></LI>
+<LI><A HREF="#10_98_5">Example</A></LI>
+<LI><A HREF="#10_98_6">See Also</A></LI>
+</UL>
+<LI><A HREF="#ppdPageSize">ppdPageSize()</A></LI>
+<UL>
+<LI><A HREF="#10_99_1">Usage</A></LI>
+<LI><A HREF="#10_99_2">Arguments</A></LI>
+<LI><A HREF="#10_99_3">Returns</A></LI>
+<LI><A HREF="#10_99_4">Description</A></LI>
+<LI><A HREF="#10_99_5">Example</A></LI>
+<LI><A HREF="#10_99_6">See Also</A></LI>
+</UL>
+<LI><A HREF="#ppdPageWidth">ppdPageWidth()</A></LI>
+<UL>
+<LI><A HREF="#10_100_1">Usage</A></LI>
+<LI><A HREF="#10_100_2">Arguments</A></LI>
+<LI><A HREF="#10_100_3">Returns</A></LI>
+<LI><A HREF="#10_100_4">Description</A></LI>
+<LI><A HREF="#10_100_5">Example</A></LI>
+<LI><A HREF="#10_100_6">See Also</A></LI>
+</UL>
 </UL>
 <HR>
 <H1 ALIGN="RIGHT"><A NAME="1">Preface</A></H1>
 <P>This software programmers manual provides software programming 
-information for the Common UNIX Printing System (&quot;CUPS&quot;) Version 1.1.1. </P>
+information for the Common UNIX Printing System (&quot;CUPS&quot;) Version 1.1.3. </P>
 <H2><A NAME="1_1">System Overview</A></H2>
 <P>CUPS provides a portable printing layer for UNIX&reg;-based operating 
 systems. It has been developed by <A HREF="http://www.easysw.com">Easy 
@@ -1524,6 +1557,58 @@ if (jobid == 0)
   puts(cupsErrorString(cupsLastError()));
 </PRE>
 </UL>
+<H3><A NAME="3_2_9">Passwords and Authentication</A></H3>
+<P>CUPS supports authentication of any request, including submission of 
+print jobs. The default mechanism for getting the username and password 
+is to use the login user and a password from the console. </P>
+<P>To support other types of applications, in particular Graphical User 
+Interfaces (&quot;GUIs&quot;), the CUPS API provides functions to set the default 
+username and to register a callback function that returns a password 
+string. </P>
+<P>The <A HREF="cupsSetPasswordCB"><CODE>cupsSetPasswordCB()</CODE></A>
+ function is used to set a password callback in your program. Only one 
+function can be used at any time. </P>
+<P>The <A HREF="cupsSetUser"><CODE>cupsSetUser()</CODE></A> function 
+sets the current username for authentication. This function can be 
+called by your password callback function to change the current 
+username as needed. </P>
+<P>The following example shows a simple password callback that gets a 
+username and password from the user: </P>
+<UL>
+<PRE>
+#include &lt;cups/cups.h&gt;
+
+const char *
+my_password_cb(const char *prompt)
+{
+  char	user[65];
+
+
+  puts(prompt);
+
+ /* Get a username from the user */
+  printf(&quot;Username: &quot;);
+  if (fgets(user, sizeof(user), stdin) == NULL)
+    return (NULL);
+
+ /* Strip the newline from the string and set the user */
+  user[strlen(user) - 1] = '\0';
+
+  cupsSetUser(user);
+
+ /* Use getpass() to ask for the password... */
+  return (getpass(&quot;Password: &quot;));
+}
+
+...
+
+cupsSetPasswordCB(my_password_cb);
+</PRE>
+</UL>
+<P>Similarly, a GUI interface could display the prompt string in a 
+window with input fields for the username and password. The username 
+should probably default to the value of <A HREF="#cupsUser"><CODE>
+cupsUser()</CODE></A> to make things easier on the user. </P>
 <H2><A NAME="3_3">PPD Services</A></H2>
 <P>CUPS includes functions to access and manipulate PostScript Printer 
 Description (&quot;PPD&quot;) files that are used with the printer drivers in 
@@ -4117,9 +4202,11 @@ char *password;
 password = cupsGetPassword(&quot;Please enter a password:&quot;);
 </PRE>
 <H3><A NAME="10_9_6">See Also</A></H3>
-<P><A HREF="#cupsServer"> cupsServer()</A>, <A HREF="#cupsUser()">
-cupsUser()</A>
+<P><A HREF="#cupsServer"> cupsServer()</A>, <A HREF="#cupsSetPasswordCB">
+cupsSetPasswordCB()</A>, <A HREF="#cupsSetServer">cupsSetServer()</A>, <A
+HREF="#cupsSetUser">cupsSetUser()</A>, <A HREF="#cupsUser()">cupsUser()</A>
 <!-- NEW PAGE ---->
+
 </P>
 <H2><A NAME="cupsGetPPD">cupsGetPPD()</A></H2>
 <H3><A NAME="10_10_1">Usage</A></H3>
@@ -4921,18 +5008,124 @@ const char *server;
 server = cupsServer();
 </PRE>
 <H3><A NAME="10_29_5">See Also</A></H3>
-<P><A HREF="#cupsGetPassword"> cupsGetPassword()</A>, <A HREF="#cupsUser">
+<P><A HREF="#cupsGetPassword"> cupsGetPassword()</A>, <A HREF="#cupsSetPasswordCB">
+cupsSetPasswordCB()</A>, <A HREF="#cupsSetServer">cupsSetServer()</A>, <A
+HREF="#cupsSetUser">cupsSetUser()</A>, <A HREF="#cupsUser">cupsUser()</A>
+<!-- NEW PAGE ---->
+
+</P>
+<H2><A NAME="cupsSetPasswordCB">cupsSetPasswordCB()</A></H2>
+<H3><A NAME="10_30_1">Usage</A></H3>
+<PRE>
+void
+cupsSetPasswordCB(const char *(*cb)(const char *prompt));
+</PRE>
+<H3><A NAME="10_30_2">Arguments</A></H3>
+<CENTER>
+<TABLE BORDER WIDTH="80%">
+<TR><TH>Argument</TH><TH>Description</TH></TR>
+<TR><TD>cb</TD><TD>The password callback function.</TD></TR>
+</TABLE>
+</CENTER>
+<H3><A NAME="10_30_3">Description</A></H3>
+<P><CODE>cupsSetPasswordCB()</CODE> sets the callback function to use 
+when asking the user for a password. The callback function must accept 
+a single character string pointer (the prompt string) and return <CODE>
+NULL</CODE> if the user did not enter a password string or a pointer to 
+the password string otherwise. </P>
+<H3><A NAME="10_30_4">Example</A></H3>
+<PRE>
+#include &lt;cups/cups.h&gt;
+
+const char *
+my_password_cb(const char *prompt)
+{
+  return (getpass(prompt));
+}
+
+...
+
+char *password;
+
+...
+
+cupsSetPasswordCB(my_password_cb);
+password = cupsGetPassword(&quot;Please enter a password:&quot;);
+</PRE>
+<H3><A NAME="10_30_5">See Also</A></H3>
+<P><A HREF="#cupsServer"> cupsServer()</A>, <A HREF="#cupsSetServer">
+cupsSetServer()</A>, <A HREF="#cupsSetUser">cupsSetUser()</A>, <A HREF="#cupsUser()">
 cupsUser()</A>
 <!-- NEW PAGE ---->
 </P>
+<H2><A NAME="cupsSetServer">cupsSetServer()</A></H2>
+<H3><A NAME="10_31_1">Usage</A></H3>
+<PRE>
+void
+cupsSetServer(const char *server);
+</PRE>
+<H3><A NAME="10_31_2">Arguments</A></H3>
+<CENTER>
+<TABLE BORDER WIDTH="80%">
+<TR><TH>Argument</TH><TH>Description</TH></TR>
+<TR><TD>server</TD><TD>The default server to use.</TD></TR>
+</TABLE>
+</CENTER>
+<H3><A NAME="10_31_3">Description</A></H3>
+<P><CODE>cupsSetServer()</CODE> sets the default server to use for the 
+CUPS API. If the <CODE>server</CODE> argument is <CODE>NULL</CODE>, the 
+default server is used. </P>
+<H3><A NAME="10_31_4">Example</A></H3>
+<PRE>
+#include &lt;cups/cups.h&gt;
+
+cupsSetServer(&quot;foo.bar.com&quot;);
+</PRE>
+<H3><A NAME="10_31_5">See Also</A></H3>
+<P><A HREF="#cupsServer"> cupsServer()</A>, <A HREF="#cupsSetPasswordCB">
+cupsSetPasswordCB()</A>, <A HREF="#cupsSetUser">cupsSetUser()</A>, <A HREF="#cupsUser()">
+cupsUser()</A>
+<!-- NEW PAGE ---->
+</P>
+<H2><A NAME="cupsSetUser">cupsSetUser()</A></H2>
+<H3><A NAME="10_32_1">Usage</A></H3>
+<PRE>
+void
+cupsSetUser(const char *user);
+</PRE>
+<H3><A NAME="10_32_2">Arguments</A></H3>
+<CENTER>
+<TABLE BORDER WIDTH="80%">
+<TR><TH>Argument</TH><TH>Description</TH></TR>
+<TR><TD>user</TD><TD>The user name string to use.</TD></TR>
+</TABLE>
+</CENTER>
+<H3><A NAME="10_32_3">Description</A></H3>
+<P><CODE>cupsSetUser()</CODE> sets the default user name for 
+authentication. If the <CODE>user</CODE> argument is <CODE>NULL</CODE>
+ then the current login user is used. </P>
+<H3><A NAME="10_32_4">Example</A></H3>
+<PRE>
+#include &lt;cups/cups.h&gt;
+
+...
+
+cupsSetUser(&quot;root&quot;);
+</PRE>
+<H3><A NAME="10_32_5">See Also</A></H3>
+<P><A HREF="#cupsServer"> cupsServer()</A>, <A HREF="#cupsSetPasswordCB">
+cupsSetPasswordCB()</A>, <A HREF="#cupsSetServer">cupsSetServer()</A>, <A
+HREF="#cupsUser()">cupsUser()</A>
+<!-- NEW PAGE ---->
+</P>
 <H2><A NAME="cupsTempFile">cupsTempFile()</A></H2>
-<H3><A NAME="10_30_1">Usage</A></H3>
+<H3><A NAME="10_33_1">Usage</A></H3>
 <PRE>
 char *
 cupsTempFile(char *filename,
              int length);
 </PRE>
-<H3><A NAME="10_30_2">Arguments</A></H3>
+<H3><A NAME="10_33_2">Arguments</A></H3>
 <CENTER>
 <TABLE BORDER WIDTH="80%">
 <TR><TH>Argument</TH><TH>Description</TH></TR>
@@ -4941,13 +5134,13 @@ filename.</TD></TR>
 <TR><TD>length</TD><TD>The size of the filename string in bytes.</TD></TR>
 </TABLE>
 </CENTER>
-<H3><A NAME="10_30_3">Returns</A></H3>
+<H3><A NAME="10_33_3">Returns</A></H3>
 <P>A pointer to <CODE>filename</CODE>. </P>
-<H3><A NAME="10_30_4">Description</A></H3>
+<H3><A NAME="10_33_4">Description</A></H3>
 <P><CODE>cupsTempFile()</CODE> generates a temporary filename for the <VAR>
 /var/tmp</VAR> directory or the directory specified by the <CODE>TMPDIR</CODE>
  environment variable. </P>
-<H3><A NAME="10_30_5">Example</A></H3>
+<H3><A NAME="10_33_5">Example</A></H3>
 <PRE>
 #include &lt;cups/cups.h&gt;
 
@@ -4958,18 +5151,18 @@ cupsTempFile(filename, sizeof(filename));
 
 <!-- NEW PAGE ---->
 <H2><A NAME="cupsUser">cupsUser()</A></H2>
-<H3><A NAME="10_31_1">Usage</A></H3>
+<H3><A NAME="10_34_1">Usage</A></H3>
 <PRE>
 const char *
 cupsUser(void);
 </PRE>
-<H3><A NAME="10_31_2">Returns</A></H3>
+<H3><A NAME="10_34_2">Returns</A></H3>
 <P>A pointer to the current username or <CODE>NULL</CODE> if the user 
 ID is undefined. </P>
-<H3><A NAME="10_31_3">Description</A></H3>
+<H3><A NAME="10_34_3">Description</A></H3>
 <P><CODE>cupsUser()</CODE> returns the name associated with the current 
 user ID as reported by the <CODE>getuid()</CODE> system call. </P>
-<H3><A NAME="10_31_4">Example</A></H3>
+<H3><A NAME="10_34_4">Example</A></H3>
 <PRE>
 #include &lt;cups/cups.h&gt;
 
@@ -4977,17 +5170,17 @@ const char *user;
 
 user = cupsUser();
 </PRE>
-<H3><A NAME="10_31_5">See Also</A></H3>
+<H3><A NAME="10_34_5">See Also</A></H3>
 <P><A HREF="#cupsGetPassword"> cupsGetPassword()</A>, <A HREF="#cupsServer">
 cupsServer()</A>
 <!-- NEW PAGE ---->
 </P>
 <H2><A NAME="httpBlocking">httpBlocking()</A></H2>
-<H3><A NAME="10_32_1">Usage</A></H3>
+<H3><A NAME="10_35_1">Usage</A></H3>
 <PRE>
 void httpBlocking(http_t *http, int blocking)
 </PRE>
-<H3><A NAME="10_32_2">Arguments</A></H3>
+<H3><A NAME="10_35_2">Arguments</A></H3>
 <CENTER>
 <TABLE BORDER WIDTH="80%">
 <TR><TH>Argument</TH><TH>Description</TH></TR>
@@ -4996,11 +5189,11 @@ void httpBlocking(http_t *http, int blocking)
 if it should  be blocking</TD></TR>
 </TABLE>
 </CENTER>
-<H3><A NAME="10_32_3">Description</A></H3>
+<H3><A NAME="10_35_3">Description</A></H3>
 <P>The <CODE>httpBlocking()</CODE> function sets the blocking mode for 
 the HTTP connection. By default HTTP connections will block (stop) the 
 client program until data is available or can be sent to the server. </P>
-<H3><A NAME="10_32_4">Example</A></H3>
+<H3><A NAME="10_35_4">Example</A></H3>
 <PRE>
 #include &lt;cups/http.h&gt;
 
@@ -5009,29 +5202,29 @@ http_t *http;
 http = httpConnect(&quot;server&quot;, port);
 httpBlocking(http, 0);
 </PRE>
-<H3><A NAME="10_32_5">See Also</A></H3>
+<H3><A NAME="10_35_5">See Also</A></H3>
 <A HREF="#httpCheck"><CODE> httpCheck()</CODE></A>, <A HREF="#httpConnect">
 <CODE>httpConnect()</CODE></A>
 <!-- NEW PAGE ---->
 
 <H2><A NAME="httpCheck">httpCheck()</A></H2>
-<H3><A NAME="10_33_1">Usage</A></H3>
+<H3><A NAME="10_36_1">Usage</A></H3>
 <PRE>
 int httpCheck(http_t *http);
 </PRE>
-<H3><A NAME="10_33_2">Arguments</A></H3>
+<H3><A NAME="10_36_2">Arguments</A></H3>
 <CENTER>
 <TABLE BORDER WIDTH="80%">
 <TR><TH>Argument</TH><TH>Description</TH></TR>
 <TR><TD>http</TD><TD>The HTTP connection</TD></TR>
 </TABLE>
 </CENTER>
-<H3><A NAME="10_33_3">Returns</A></H3>
+<H3><A NAME="10_36_3">Returns</A></H3>
 <P>0 if there is no data pending, 1 otherwise. </P>
-<H3><A NAME="10_33_4">Description</A></H3>
+<H3><A NAME="10_36_4">Description</A></H3>
 <P>The <CODE>httpCheck()</CODE> function checks to see if there is any 
 data pending on an HTTP connection. </P>
-<H3><A NAME="10_33_5">Example</A></H3>
+<H3><A NAME="10_36_5">Example</A></H3>
 <PRE>
 #include &lt;cups/http.h&gt;
 
@@ -5042,28 +5235,28 @@ if (httpCheck(http))
   ... do something ...
 }
 </PRE>
-<H3><A NAME="10_33_6">See Also</A></H3>
+<H3><A NAME="10_36_6">See Also</A></H3>
 <A HREF="#httpBlocking"><CODE> httpBlocking()</CODE></A>, <A HREF="#httpConnect">
 <CODE>httpConnect()</CODE></A>, <A HREF="#httpGets"><CODE>httpGets()</CODE>
 </A>, <A HREF="#httpRead"><CODE>httpRead()</CODE></A>
 <!-- NEW PAGE ---->
 
 <H2><A NAME="httpClearFields">httpClearFields()</A></H2>
-<H3><A NAME="10_34_1">Usage</A></H3>
+<H3><A NAME="10_37_1">Usage</A></H3>
 <PRE>
 void httpClearFields(http_t *http)
 </PRE>
-<H3><A NAME="10_34_2">Arguments</A></H3>
+<H3><A NAME="10_37_2">Arguments</A></H3>
 <CENTER>
 <TABLE BORDER WIDTH="80%">
 <TR><TH>Argument</TH><TH>Description</TH></TR>
 <TR><TD>http</TD><TD>The HTTP connection</TD></TR>
 </TABLE>
 </CENTER>
-<H3><A NAME="10_34_3">Description</A></H3>
+<H3><A NAME="10_37_3">Description</A></H3>
 <P>The <CODE>httpClearFields()</CODE> function clears all HTTP request 
 fields for the HTTP connection. </P>
-<H3><A NAME="10_34_4">Example</A></H3>
+<H3><A NAME="10_37_4">Example</A></H3>
 <PRE>
 #include &lt;cups/http.h&gt;
 
@@ -5071,28 +5264,28 @@ http_t *http;
 
 httpClearFields(http);
 </PRE>
-<H3><A NAME="10_34_5">See Also</A></H3>
+<H3><A NAME="10_37_5">See Also</A></H3>
 <A HREF="#httpConnect"><CODE> httpConnect()</CODE></A>, <A HREF="#httpGetField">
 <CODE>httpGetField()</CODE></A>, <A HREF="#httpSetField"><CODE>
 httpSetField()</CODE></A>
 <!-- NEW PAGE ---->
 
 <H2><A NAME="httpClose">httpClose()</A></H2>
-<H3><A NAME="10_35_1">Usage</A></H3>
+<H3><A NAME="10_38_1">Usage</A></H3>
 <PRE>
 void httpClose(http_t *http);
 </PRE>
-<H3><A NAME="10_35_2">Arguments</A></H3>
+<H3><A NAME="10_38_2">Arguments</A></H3>
 <CENTER>
 <TABLE BORDER WIDTH="80%">
 <TR><TH>Argument</TH><TH>Description</TH></TR>
 <TR><TD>http</TD><TD>The HTTP connection</TD></TR>
 </TABLE>
 </CENTER>
-<H3><A NAME="10_35_3">Description</A></H3>
+<H3><A NAME="10_38_3">Description</A></H3>
 <P>The <CODE>httpClose()</CODE> function closes an active HTTP 
 connection. </P>
-<H3><A NAME="10_35_4">Example</A></H3>
+<H3><A NAME="10_38_4">Example</A></H3>
 <PRE>
 #include &lt;cups/http.h&gt;
 
@@ -5100,16 +5293,16 @@ http_t *http;
 
 httpClose(http);
 </PRE>
-<H3><A NAME="10_35_5">See Also</A></H3>
+<H3><A NAME="10_38_5">See Also</A></H3>
 <A HREF="#httpConnect"><CODE> httpConnect()</CODE></A>
 <!-- NEW PAGE ---->
 
 <H2><A NAME="httpConnect">httpConnect()</A></H2>
-<H3><A NAME="10_36_1">Usage</A></H3>
+<H3><A NAME="10_39_1">Usage</A></H3>
 <PRE>
 http_t *httpConnect(const char *hostname, int port);
 </PRE>
-<H3><A NAME="10_36_2">Arguments</A></H3>
+<H3><A NAME="10_39_2">Arguments</A></H3>
 <CENTER>
 <TABLE BORDER WIDTH="80%">
 <TR><TH>Argument</TH><TH>Description</TH></TR>
@@ -5118,13 +5311,13 @@ connect to</TD></TR>
 <TR><TD>port</TD><TD>The port number to use</TD></TR>
 </TABLE>
 </CENTER>
-<H3><A NAME="10_36_3">Returns</A></H3>
+<H3><A NAME="10_39_3">Returns</A></H3>
 <P>A pointer to a HTTP connection structure or NULL if the connection 
 could not be made. </P>
-<H3><A NAME="10_36_4">Description</A></H3>
+<H3><A NAME="10_39_4">Description</A></H3>
 <P>The <CODE>httpConnect()</CODE> function opens a HTTP connection to 
 the specified server and port. </P>
-<H3><A NAME="10_36_5">Example</A></H3>
+<H3><A NAME="10_39_5">Example</A></H3>
 <PRE>
 #include &lt;cups/http.h&gt;
 
@@ -5132,7 +5325,7 @@ http_t *http;
 
 http = httpConnect(cupsServer(), ippPort());
 </PRE>
-<H3><A NAME="10_36_6">See Also</A></H3>
+<H3><A NAME="10_39_6">See Also</A></H3>
 <A HREF="#httpClose"><CODE> httpClose()</CODE></A>, <A HREF="#httpGet"><CODE>
 httpGet()</CODE></A>, <A HREF="#httpGets"><CODE>httpGets()</CODE></A>, <A
 HREF="#httpPost"><CODE>httpPost()</CODE></A>, <A HREF="#httpRead"><CODE>
@@ -5140,11 +5333,11 @@ httpRead()</CODE></A>, <A HREF="#httpWrite"><CODE>httpWrite()</CODE></A>
 <!-- NEW PAGE ---->
 
 <H2><A NAME="httpDecode64">httpDecode64()</A></H2>
-<H3><A NAME="10_37_1">Usage</A></H3>
+<H3><A NAME="10_40_1">Usage</A></H3>
 <PRE>
 char *httpDecode64(char *out, const char *in);
 </PRE>
-<H3><A NAME="10_37_2">Arguments</A></H3>
+<H3><A NAME="10_40_2">Arguments</A></H3>
 <CENTER>
 <TABLE BORDER WIDTH="80%">
 <TR><TH>Argument</TH><TH>Description</TH></TR>
@@ -5152,12 +5345,12 @@ char *httpDecode64(char *out, const char *in);
 <TR><TD>in</TD><TD>The input string</TD></TR>
 </TABLE>
 </CENTER>
-<H3><A NAME="10_37_3">Returns</A></H3>
+<H3><A NAME="10_40_3">Returns</A></H3>
 <P>A pointer to the decoded string. </P>
-<H3><A NAME="10_37_4">Description</A></H3>
+<H3><A NAME="10_40_4">Description</A></H3>
 <P>The <CODE>httpDecode64()</CODE> function decodes a base-64 encoded 
 string to the original string. </P>
-<H3><A NAME="10_37_5">Example</A></H3>
+<H3><A NAME="10_40_5">Example</A></H3>
 <PRE>
 #include &lt;cups/http.h&gt;
 
@@ -5166,16 +5359,16 @@ char original_string[255];
 
 httpDecode64(original_string, encoded_string);
 </PRE>
-<H3><A NAME="10_37_6">See Also</A></H3>
+<H3><A NAME="10_40_6">See Also</A></H3>
 <A HREF="#httpEncode64"><CODE> httpEncode64()</CODE></A>
 <!-- NEW PAGE ---->
 
 <H2><A NAME="httpDelete">httpDelete()</A></H2>
-<H3><A NAME="10_38_1">Usage</A></H3>
+<H3><A NAME="10_41_1">Usage</A></H3>
 <PRE>
 int httpDelete(http_t *http, const char *uri);
 </PRE>
-<H3><A NAME="10_38_2">Arguments</A></H3>
+<H3><A NAME="10_41_2">Arguments</A></H3>
 <CENTER>
 <TABLE BORDER WIDTH="80%">
 <TR><TH>Argument</TH><TH>Description</TH></TR>
@@ -5183,12 +5376,12 @@ int httpDelete(http_t *http, const char *uri);
 <TR><TD>uri</TD><TD>The URI to delete</TD></TR>
 </TABLE>
 </CENTER>
-<H3><A NAME="10_38_3">Returns</A></H3>
+<H3><A NAME="10_41_3">Returns</A></H3>
 <P>0 on success, non-zero on failure. </P>
-<H3><A NAME="10_38_4">Description</A></H3>
+<H3><A NAME="10_41_4">Description</A></H3>
 <P>The <CODE>httpDelete()</CODE> function sends a HTTP DELETE request 
 to the server. </P>
-<H3><A NAME="10_38_5">Example</A></H3>
+<H3><A NAME="10_41_5">Example</A></H3>
 <PRE>
 #include &lt;cups/http.h&gt;
 
@@ -5196,18 +5389,18 @@ http_t *http;
 
 httpDelete(http, &quot;/some/uri&quot;);
 </PRE>
-<H3><A NAME="10_38_6">See Also</A></H3>
+<H3><A NAME="10_41_6">See Also</A></H3>
 <A HREF="#httpConnect"><CODE> httpConnect()</CODE></A>, <A HREF="#httpSetField">
 <CODE>httpSetField()</CODE></A>, <A HREF="#httpUpdate"><CODE>
 httpUpdate()</CODE></A>
 <!-- NEW PAGE ---->
 
 <H2><A NAME="httpEncode64">httpEncode64()</A></H2>
-<H3><A NAME="10_39_1">Usage</A></H3>
+<H3><A NAME="10_42_1">Usage</A></H3>
 <PRE>
 char *httpEncode64(char *out, const char *in);
 </PRE>
-<H3><A NAME="10_39_2">Arguments</A></H3>
+<H3><A NAME="10_42_2">Arguments</A></H3>
 <CENTER>
 <TABLE BORDER WIDTH="80%">
 <TR><TH>Argument</TH><TH>Description</TH></TR>
@@ -5215,12 +5408,12 @@ char *httpEncode64(char *out, const char *in);
 <TR><TD>in</TD><TD>The input string</TD></TR>
 </TABLE>
 </CENTER>
-<H3><A NAME="10_39_3">Returns</A></H3>
+<H3><A NAME="10_42_3">Returns</A></H3>
 <P>A pointer to the encoded string. </P>
-<H3><A NAME="10_39_4">Description</A></H3>
+<H3><A NAME="10_42_4">Description</A></H3>
 <P>The <CODE>httpEncode64()</CODE> function decodes a base-64 encoded 
 string to the original string. </P>
-<H3><A NAME="10_39_5">Example</A></H3>
+<H3><A NAME="10_42_5">Example</A></H3>
 <PRE>
 #include &lt;cups/http.h&gt;
 
@@ -5229,28 +5422,28 @@ char original_string[255];
 
 httpEncode64(encoded_string, original_string);
 </PRE>
-<H3><A NAME="10_39_6">See Also</A></H3>
+<H3><A NAME="10_42_6">See Also</A></H3>
 <A HREF="#httpDecode64"><CODE> httpDecode64()</CODE></A>
 <!-- NEW PAGE ---->
 
 <H2><A NAME="httpError">httpError()</A></H2>
-<H3><A NAME="10_40_1">Usage</A></H3>
+<H3><A NAME="10_43_1">Usage</A></H3>
 <PRE>
 int httpError(http_t *http);
 </PRE>
-<H3><A NAME="10_40_2">Arguments</A></H3>
+<H3><A NAME="10_43_2">Arguments</A></H3>
 <CENTER>
 <TABLE BORDER WIDTH="80%">
 <TR><TH>Argument</TH><TH>Description</TH></TR>
 <TR><TD>http</TD><TD>The HTTP connection</TD></TR>
 </TABLE>
 </CENTER>
-<H3><A NAME="10_40_3">Returns</A></H3>
+<H3><A NAME="10_43_3">Returns</A></H3>
 <P>The last error that occurred or 0 if no error has occurred. </P>
-<H3><A NAME="10_40_4">Description</A></H3>
+<H3><A NAME="10_43_4">Description</A></H3>
 <P>The <CODE>httpError()</CODE> function returns the last error that 
 occurred on the HTTP connection. </P>
-<H3><A NAME="10_40_5">Example</A></H3>
+<H3><A NAME="10_43_5">Example</A></H3>
 <PRE>
 #include &lt;cups/http.h&gt;
 
@@ -5261,26 +5454,26 @@ if (httpError(http))
   ... show an error message ...
 }
 </PRE>
-<H3><A NAME="10_40_6">See Also</A></H3>
+<H3><A NAME="10_43_6">See Also</A></H3>
 <A HREF="#httpConnect"><CODE> httpConnect()</CODE></A>
 <!-- NEW PAGE ---->
 
 <H2><A NAME="httpFlush">httpFlush()</A></H2>
-<H3><A NAME="10_41_1">Usage</A></H3>
+<H3><A NAME="10_44_1">Usage</A></H3>
 <PRE>
 void httpFlush(http_t *http);
 </PRE>
-<H3><A NAME="10_41_2">Arguments</A></H3>
+<H3><A NAME="10_44_2">Arguments</A></H3>
 <CENTER>
 <TABLE BORDER WIDTH="80%">
 <TR><TH>Argument</TH><TH>Description</TH></TR>
 <TR><TD>http</TD><TD>The HTTP connection</TD></TR>
 </TABLE>
 </CENTER>
-<H3><A NAME="10_41_3">Description</A></H3>
+<H3><A NAME="10_44_3">Description</A></H3>
 <P>The <CODE>httpFlush()</CODE> function flushes any remaining data 
 left from a GET or POST operation. </P>
-<H3><A NAME="10_41_4">Example</A></H3>
+<H3><A NAME="10_44_4">Example</A></H3>
 <PRE>
 #include &lt;cups/http.h&gt;
 
@@ -5288,16 +5481,16 @@ http_t *http;
 
 httpFlush(http);
 </PRE>
-<H3><A NAME="10_41_5">See Also</A></H3>
+<H3><A NAME="10_44_5">See Also</A></H3>
 <A HREF="#httpConnect"><CODE> httpConnect()</CODE></A>, 
 <!-- NEW PAGE ---->
 
 <H2><A NAME="httpGet">httpGet()</A></H2>
-<H3><A NAME="10_42_1">Usage</A></H3>
+<H3><A NAME="10_45_1">Usage</A></H3>
 <PRE>
 int httpGet(http_t *http, const char *uri);
 </PRE>
-<H3><A NAME="10_42_2">Arguments</A></H3>
+<H3><A NAME="10_45_2">Arguments</A></H3>
 <CENTER>
 <TABLE BORDER WIDTH="80%">
 <TR><TH>Argument</TH><TH>Description</TH></TR>
@@ -5305,12 +5498,12 @@ int httpGet(http_t *http, const char *uri);
 <TR><TD>uri</TD><TD>The URI to get</TD></TR>
 </TABLE>
 </CENTER>
-<H3><A NAME="10_42_3">Returns</A></H3>
+<H3><A NAME="10_45_3">Returns</A></H3>
 <P>0 on success, non-zero on failure. </P>
-<H3><A NAME="10_42_4">Description</A></H3>
+<H3><A NAME="10_45_4">Description</A></H3>
 <P>The <CODE>httpGet()</CODE> function sends a HTTP GET request to the 
 server. </P>
-<H3><A NAME="10_42_5">Example</A></H3>
+<H3><A NAME="10_45_5">Example</A></H3>
 <PRE>
 #include &lt;cups/http.h&gt;
 
@@ -5318,18 +5511,18 @@ http_t *http;
 
 httpGet(http, &quot;/some/uri&quot;);
 </PRE>
-<H3><A NAME="10_42_6">See Also</A></H3>
+<H3><A NAME="10_45_6">See Also</A></H3>
 <A HREF="#httpConnect"><CODE> httpConnect()</CODE></A>, <A HREF="#httpSetField">
 <CODE>httpSetField()</CODE></A>, <A HREF="#httpUpdate"><CODE>
 httpUpdate()</CODE></A>
 <!-- NEW PAGE ---->
 
 <H2><A NAME="httpGets">httpGets()</A></H2>
-<H3><A NAME="10_43_1">Usage</A></H3>
+<H3><A NAME="10_46_1">Usage</A></H3>
 <PRE>
 char *httpGets(char *line, int length, http_t *http)
 </PRE>
-<H3><A NAME="10_43_2">Arguments</A></H3>
+<H3><A NAME="10_46_2">Arguments</A></H3>
 <CENTER>
 <TABLE BORDER WIDTH="80%">
 <TR><TH>Argument</TH><TH>Description</TH></TR>
@@ -5339,12 +5532,12 @@ connection</TD></TR>
 <TR><TD>http</TD><TD>The HTTP connection</TD></TR>
 </TABLE>
 </CENTER>
-<H3><A NAME="10_43_3">Returns</A></H3>
+<H3><A NAME="10_46_3">Returns</A></H3>
 <P>A pointer to the string or NULL if no line could be retrieved. </P>
-<H3><A NAME="10_43_4">Description</A></H3>
+<H3><A NAME="10_46_4">Description</A></H3>
 <P>The <CODE>httpGets()</CODE> function is used to read a request line 
 from the HTTP connection. It is not normally used by a client program. </P>
-<H3><A NAME="10_43_5">Example</A></H3>
+<H3><A NAME="10_46_5">Example</A></H3>
 <PRE>
 #include &lt;cups/http.h&gt;
 
@@ -5356,72 +5549,72 @@ if (httpGets(line, sizeof(line), http))
   ... process the line ...
 }
 </PRE>
-<H3><A NAME="10_43_6">See Also</A></H3>
+<H3><A NAME="10_46_6">See Also</A></H3>
 <A HREF="#httpConnect"><CODE> httpConnect()</CODE></A>, <A HREF="#httpUpdate">
 <CODE>httpUpdate()</CODE></A>
 <!-- NEW PAGE ---->
 
 <H2><A NAME="httpGetDateString">httpGetDateString()</A></H2>
-<H3><A NAME="10_44_1">Usage</A></H3>
+<H3><A NAME="10_47_1">Usage</A></H3>
 <PRE>
 const char *httpGetDateString(time_t time)
 </PRE>
-<H3><A NAME="10_44_2">Arguments</A></H3>
+<H3><A NAME="10_47_2">Arguments</A></H3>
 <CENTER>
 <TABLE BORDER WIDTH="80%">
 <TR><TH>Argument</TH><TH>Description</TH></TR>
 <TR><TD>time</TD><TD>The UNIX date/time value</TD></TR>
 </TABLE>
 </CENTER>
-<H3><A NAME="10_44_3">Returns</A></H3>
+<H3><A NAME="10_47_3">Returns</A></H3>
 <P>A pointer to a static string containing the HTTP date/time string 
 for the specified UNIX time value. </P>
-<H3><A NAME="10_44_4">Description</A></H3>
+<H3><A NAME="10_47_4">Description</A></H3>
 <P>The <CODE>httpGetDateString()</CODE> function generates a date/time 
 string suitable for HTTP requests from a UNIX time value. </P>
-<H3><A NAME="10_44_5">Example</A></H3>
+<H3><A NAME="10_47_5">Example</A></H3>
 <PRE>
 #include &lt;cups/http.h&gt;
 
 puts(httpGetDateString(time(NULL)));
 </PRE>
-<H3><A NAME="10_44_6">See Also</A></H3>
+<H3><A NAME="10_47_6">See Also</A></H3>
 <A HREF="#httpGetDateTime"><CODE> httpGetDateTime()</CODE></A>
 <!-- NEW PAGE ---->
 
 <H2><A NAME="httpGetDateTime">httpGetDateTime()</A></H2>
-<H3><A NAME="10_45_1">Usage</A></H3>
+<H3><A NAME="10_48_1">Usage</A></H3>
 <PRE>
 time_t httpGetDateTime(const char *date)
 </PRE>
-<H3><A NAME="10_45_2">Arguments</A></H3>
+<H3><A NAME="10_48_2">Arguments</A></H3>
 <CENTER>
 <TABLE BORDER WIDTH="80%">
 <TR><TH>Argument</TH><TH>Description</TH></TR>
 <TR><TD>date</TD><TD>The HTTP date/time string</TD></TR>
 </TABLE>
 </CENTER>
-<H3><A NAME="10_45_3">Returns</A></H3>
+<H3><A NAME="10_48_3">Returns</A></H3>
 <P>A UNIX time value. </P>
-<H3><A NAME="10_45_4">Description</A></H3>
+<H3><A NAME="10_48_4">Description</A></H3>
 <P>The <CODE>httpGetDateTime()</CODE> function converts a HTTP 
 date/time string to a UNIX time value. </P>
-<H3><A NAME="10_45_5">Example</A></H3>
+<H3><A NAME="10_48_5">Example</A></H3>
 <PRE>
 #include &lt;cups/http.h&gt;
 
 printf(&quot;%d\n&quot;, httpGetDateTime(&quot;Fri, 30 June 2000 12:34:56 GMT&quot;));
 </PRE>
-<H3><A NAME="10_45_6">See Also</A></H3>
+<H3><A NAME="10_48_6">See Also</A></H3>
 <A HREF="#httpGetDateString"><CODE> httpGetDateString()</CODE></A>
 <!-- NEW PAGE ---->
 
 <H2><A NAME="httpGetField">httpGetField()</A></H2>
-<H3><A NAME="10_46_1">Usage</A></H3>
+<H3><A NAME="10_49_1">Usage</A></H3>
 <PRE>
 const char *httpGetField(http_t *http, http_field_t field);
 </PRE>
-<H3><A NAME="10_46_2">Arguments</A></H3>
+<H3><A NAME="10_49_2">Arguments</A></H3>
 <CENTER>
 <TABLE BORDER WIDTH="80%">
 <TR><TH>Argument</TH><TH>Description</TH></TR>
@@ -5429,12 +5622,12 @@ const char *httpGetField(http_t *http, http_field_t field);
 <TR><TD>field</TD><TD>The HTTP field</TD></TR>
 </TABLE>
 </CENTER>
-<H3><A NAME="10_46_3">Returns</A></H3>
+<H3><A NAME="10_49_3">Returns</A></H3>
 <P>A pointer to the field value string. </P>
-<H3><A NAME="10_46_4">Description</A></H3>
+<H3><A NAME="10_49_4">Description</A></H3>
 <P>The <CODE>httpGetField()</CODE> function returns the current value 
 for the specified HTTP field. </P>
-<H3><A NAME="10_46_5">Example</A></H3>
+<H3><A NAME="10_49_5">Example</A></H3>
 <PRE>
 #include &lt;cups/http.h&gt;
 
@@ -5445,17 +5638,17 @@ while (httpUpdate(http) == HTTP_CONTINUE);
 
 puts(httpGetField(http, HTTP_FIELD_CONTENT_TYPE));
 </PRE>
-<H3><A NAME="10_46_6">See Also</A></H3>
+<H3><A NAME="10_49_6">See Also</A></H3>
 <A HREF="#httpConnect"><CODE> httpConnect()</CODE></A>, <A HREF="#httpSetField">
 <CODE>httpSetField()</CODE></A>
 <!-- NEW PAGE ---->
 
 <H2><A NAME="httpHead">httpHead()</A></H2>
-<H3><A NAME="10_47_1">Usage</A></H3>
+<H3><A NAME="10_50_1">Usage</A></H3>
 <PRE>
 int httpHead(http_t *http, const char *uri);
 </PRE>
-<H3><A NAME="10_47_2">Arguments</A></H3>
+<H3><A NAME="10_50_2">Arguments</A></H3>
 <CENTER>
 <TABLE BORDER WIDTH="80%">
 <TR><TH>Argument</TH><TH>Description</TH></TR>
@@ -5463,93 +5656,10 @@ int httpHead(http_t *http, const char *uri);
 <TR><TD>uri</TD><TD>The URI to head</TD></TR>
 </TABLE>
 </CENTER>
-<H3><A NAME="10_47_3">Returns</A></H3>
-<P>0 on success, non-zero on failure. </P>
-<H3><A NAME="10_47_4">Description</A></H3>
-<P>The <CODE>httpHead()</CODE> function sends a HTTP HEAD request to 
-the server. </P>
-<H3><A NAME="10_47_5">Example</A></H3>
-<PRE>
-#include &lt;cups/http.h&gt;
-
-http_t *http;
-
-httpHead(http, &quot;/some/uri&quot;);
-</PRE>
-<H3><A NAME="10_47_6">See Also</A></H3>
-<A HREF="#httpConnect"><CODE> httpConnect()</CODE></A>, <A HREF="#httpSetField">
-<CODE>httpSetField()</CODE></A>, <A HREF="#httpUpdate"><CODE>
-httpUpdate()</CODE></A>
-<!-- NEW PAGE ---->
-
-<H2><A NAME="httpInitialize">httpInitialize()</A></H2>
-<H3><A NAME="10_48_1">Usage</A></H3>
-<PRE>
-void httpInitialize(void);
-</PRE>
-<H3><A NAME="10_48_2">Description</A></H3>
-<P>The <CODE>httpInitialize()</CODE> function initializes the 
-networking code as needed by the underlying platform. It is called 
-automatically by the <CODE>httpConnect()</CODE> function. </P>
-<H3><A NAME="10_48_3">Example</A></H3>
-<PRE>
-#include &lt;cups/http.h&gt;
-
-httpInitialize();
-</PRE>
-<H3><A NAME="10_48_4">See Also</A></H3>
-<A HREF="#httpConnect"><CODE> httpConnect()</CODE></A>
-<!-- NEW PAGE ---->
-
-<H2><A NAME="httpOptions">httpOptions()</A></H2>
-<H3><A NAME="10_49_1">Usage</A></H3>
-<PRE>
-int httpOptions(http_t *http, const char *uri);
-</PRE>
-<H3><A NAME="10_49_2">Arguments</A></H3>
-<CENTER>
-<TABLE BORDER WIDTH="80%">
-<TR><TH>Argument</TH><TH>Description</TH></TR>
-<TR><TD>http</TD><TD>The HTTP connection</TD></TR>
-<TR><TD>uri</TD><TD>The URI to check for options</TD></TR>
-</TABLE>
-</CENTER>
-<H3><A NAME="10_49_3">Returns</A></H3>
-<P>0 on success, non-zero on failure. </P>
-<H3><A NAME="10_49_4">Description</A></H3>
-<P>The <CODE>httpOptions()</CODE> function sends a HTTP OPTIONS request 
-to the server. </P>
-<H3><A NAME="10_49_5">Example</A></H3>
-<PRE>
-#include &lt;cups/http.h&gt;
-
-http_t *http;
-
-httpOptions(http, &quot;/some/uri&quot;);
-</PRE>
-<H3><A NAME="10_49_6">See Also</A></H3>
-<A HREF="#httpConnect"><CODE> httpConnect()</CODE></A>, <A HREF="#httpSetField">
-<CODE>httpSetField()</CODE></A>, <A HREF="#httpUpdate"><CODE>
-httpUpdate()</CODE></A>
-<!-- NEW PAGE ---->
-
-<H2><A NAME="httpPost">httpPost()</A></H2>
-<H3><A NAME="10_50_1">Usage</A></H3>
-<PRE>
-int httpPost(http_t *http, const char *uri);
-</PRE>
-<H3><A NAME="10_50_2">Arguments</A></H3>
-<CENTER>
-<TABLE BORDER WIDTH="80%">
-<TR><TH>Argument</TH><TH>Description</TH></TR>
-<TR><TD>http</TD><TD>The HTTP connection</TD></TR>
-<TR><TD>uri</TD><TD>The URI to post to</TD></TR>
-</TABLE>
-</CENTER>
 <H3><A NAME="10_50_3">Returns</A></H3>
 <P>0 on success, non-zero on failure. </P>
 <H3><A NAME="10_50_4">Description</A></H3>
-<P>The <CODE>httpPost()</CODE> function sends a HTTP POST request to 
+<P>The <CODE>httpHead()</CODE> function sends a HTTP HEAD request to 
 the server. </P>
 <H3><A NAME="10_50_5">Example</A></H3>
 <PRE>
@@ -5557,7 +5667,7 @@ the server. </P>
 
 http_t *http;
 
-httpPost(http, &quot;/some/uri&quot;);
+httpHead(http, &quot;/some/uri&quot;);
 </PRE>
 <H3><A NAME="10_50_6">See Also</A></H3>
 <A HREF="#httpConnect"><CODE> httpConnect()</CODE></A>, <A HREF="#httpSetField">
@@ -5565,62 +5675,50 @@ httpPost(http, &quot;/some/uri&quot;);
 httpUpdate()</CODE></A>
 <!-- NEW PAGE ---->
 
-<H2><A NAME="httpPrintf">httpPrintf()</A></H2>
+<H2><A NAME="httpInitialize">httpInitialize()</A></H2>
 <H3><A NAME="10_51_1">Usage</A></H3>
 <PRE>
-int httpPrintf(http_t *http, const char *format, ...);
+void httpInitialize(void);
 </PRE>
-<H3><A NAME="10_51_2">Arguments</A></H3>
-<CENTER>
-<TABLE BORDER WIDTH="80%">
-<TR><TH>Argument</TH><TH>Description</TH></TR>
-<TR><TD>http</TD><TD>The HTTP connection</TD></TR>
-<TR><TD>format</TD><TD>A printf-style format string</TD></TR>
-</TABLE>
-</CENTER>
-<H3><A NAME="10_51_3">Returns</A></H3>
-<P>The number of bytes written. </P>
-<H3><A NAME="10_51_4">Description</A></H3>
-<P>The <CODE>httpPrintf()</CODE> function sends a formatted string to 
-the HTTP connection. It is normally only used by the CUPS API and 
-scheduler. </P>
-<H3><A NAME="10_51_5">Example</A></H3>
+<H3><A NAME="10_51_2">Description</A></H3>
+<P>The <CODE>httpInitialize()</CODE> function initializes the 
+networking code as needed by the underlying platform. It is called 
+automatically by the <CODE>httpConnect()</CODE> function. </P>
+<H3><A NAME="10_51_3">Example</A></H3>
 <PRE>
 #include &lt;cups/http.h&gt;
 
-http_t *http;
-
-httpPrintf(http, &quot;GET / HTTP/1.1 \r\n&quot;);
+httpInitialize();
 </PRE>
-<H3><A NAME="10_51_6">See Also</A></H3>
+<H3><A NAME="10_51_4">See Also</A></H3>
 <A HREF="#httpConnect"><CODE> httpConnect()</CODE></A>
 <!-- NEW PAGE ---->
 
-<H2><A NAME="httpPut">httpPut()</A></H2>
+<H2><A NAME="httpOptions">httpOptions()</A></H2>
 <H3><A NAME="10_52_1">Usage</A></H3>
 <PRE>
-int httpPut(http_t *http, const char *uri);
+int httpOptions(http_t *http, const char *uri);
 </PRE>
 <H3><A NAME="10_52_2">Arguments</A></H3>
 <CENTER>
 <TABLE BORDER WIDTH="80%">
 <TR><TH>Argument</TH><TH>Description</TH></TR>
 <TR><TD>http</TD><TD>The HTTP connection</TD></TR>
-<TR><TD>uri</TD><TD>The URI to put</TD></TR>
+<TR><TD>uri</TD><TD>The URI to check for options</TD></TR>
 </TABLE>
 </CENTER>
 <H3><A NAME="10_52_3">Returns</A></H3>
 <P>0 on success, non-zero on failure. </P>
 <H3><A NAME="10_52_4">Description</A></H3>
-<P>The <CODE>httpPut()</CODE> function sends a HTTP PUT request to the 
-server. </P>
+<P>The <CODE>httpOptions()</CODE> function sends a HTTP OPTIONS request 
+to the server. </P>
 <H3><A NAME="10_52_5">Example</A></H3>
 <PRE>
 #include &lt;cups/http.h&gt;
 
 http_t *http;
 
-httpDelete(http, &quot;/some/uri&quot;);
+httpOptions(http, &quot;/some/uri&quot;);
 </PRE>
 <H3><A NAME="10_52_6">See Also</A></H3>
 <A HREF="#httpConnect"><CODE> httpConnect()</CODE></A>, <A HREF="#httpSetField">
@@ -5628,12 +5726,107 @@ httpDelete(http, &quot;/some/uri&quot;);
 httpUpdate()</CODE></A>
 <!-- NEW PAGE ---->
 
-<H2><A NAME="httpRead">httpRead()</A></H2>
+<H2><A NAME="httpPost">httpPost()</A></H2>
 <H3><A NAME="10_53_1">Usage</A></H3>
+<PRE>
+int httpPost(http_t *http, const char *uri);
+</PRE>
+<H3><A NAME="10_53_2">Arguments</A></H3>
+<CENTER>
+<TABLE BORDER WIDTH="80%">
+<TR><TH>Argument</TH><TH>Description</TH></TR>
+<TR><TD>http</TD><TD>The HTTP connection</TD></TR>
+<TR><TD>uri</TD><TD>The URI to post to</TD></TR>
+</TABLE>
+</CENTER>
+<H3><A NAME="10_53_3">Returns</A></H3>
+<P>0 on success, non-zero on failure. </P>
+<H3><A NAME="10_53_4">Description</A></H3>
+<P>The <CODE>httpPost()</CODE> function sends a HTTP POST request to 
+the server. </P>
+<H3><A NAME="10_53_5">Example</A></H3>
+<PRE>
+#include &lt;cups/http.h&gt;
+
+http_t *http;
+
+httpPost(http, &quot;/some/uri&quot;);
+</PRE>
+<H3><A NAME="10_53_6">See Also</A></H3>
+<A HREF="#httpConnect"><CODE> httpConnect()</CODE></A>, <A HREF="#httpSetField">
+<CODE>httpSetField()</CODE></A>, <A HREF="#httpUpdate"><CODE>
+httpUpdate()</CODE></A>
+<!-- NEW PAGE ---->
+
+<H2><A NAME="httpPrintf">httpPrintf()</A></H2>
+<H3><A NAME="10_54_1">Usage</A></H3>
+<PRE>
+int httpPrintf(http_t *http, const char *format, ...);
+</PRE>
+<H3><A NAME="10_54_2">Arguments</A></H3>
+<CENTER>
+<TABLE BORDER WIDTH="80%">
+<TR><TH>Argument</TH><TH>Description</TH></TR>
+<TR><TD>http</TD><TD>The HTTP connection</TD></TR>
+<TR><TD>format</TD><TD>A printf-style format string</TD></TR>
+</TABLE>
+</CENTER>
+<H3><A NAME="10_54_3">Returns</A></H3>
+<P>The number of bytes written. </P>
+<H3><A NAME="10_54_4">Description</A></H3>
+<P>The <CODE>httpPrintf()</CODE> function sends a formatted string to 
+the HTTP connection. It is normally only used by the CUPS API and 
+scheduler. </P>
+<H3><A NAME="10_54_5">Example</A></H3>
+<PRE>
+#include &lt;cups/http.h&gt;
+
+http_t *http;
+
+httpPrintf(http, &quot;GET / HTTP/1.1 \r\n&quot;);
+</PRE>
+<H3><A NAME="10_54_6">See Also</A></H3>
+<A HREF="#httpConnect"><CODE> httpConnect()</CODE></A>
+<!-- NEW PAGE ---->
+
+<H2><A NAME="httpPut">httpPut()</A></H2>
+<H3><A NAME="10_55_1">Usage</A></H3>
+<PRE>
+int httpPut(http_t *http, const char *uri);
+</PRE>
+<H3><A NAME="10_55_2">Arguments</A></H3>
+<CENTER>
+<TABLE BORDER WIDTH="80%">
+<TR><TH>Argument</TH><TH>Description</TH></TR>
+<TR><TD>http</TD><TD>The HTTP connection</TD></TR>
+<TR><TD>uri</TD><TD>The URI to put</TD></TR>
+</TABLE>
+</CENTER>
+<H3><A NAME="10_55_3">Returns</A></H3>
+<P>0 on success, non-zero on failure. </P>
+<H3><A NAME="10_55_4">Description</A></H3>
+<P>The <CODE>httpPut()</CODE> function sends a HTTP PUT request to the 
+server. </P>
+<H3><A NAME="10_55_5">Example</A></H3>
+<PRE>
+#include &lt;cups/http.h&gt;
+
+http_t *http;
+
+httpDelete(http, &quot;/some/uri&quot;);
+</PRE>
+<H3><A NAME="10_55_6">See Also</A></H3>
+<A HREF="#httpConnect"><CODE> httpConnect()</CODE></A>, <A HREF="#httpSetField">
+<CODE>httpSetField()</CODE></A>, <A HREF="#httpUpdate"><CODE>
+httpUpdate()</CODE></A>
+<!-- NEW PAGE ---->
+
+<H2><A NAME="httpRead">httpRead()</A></H2>
+<H3><A NAME="10_56_1">Usage</A></H3>
 <PRE>
 int httpRead(http_t *http, char *buffer, int length);
 </PRE>
-<H3><A NAME="10_53_2">Arguments</A></H3>
+<H3><A NAME="10_56_2">Arguments</A></H3>
 <CENTER>
 <TABLE BORDER WIDTH="80%">
 <TR><TH>Argument</TH><TH>Description</TH></TR>
@@ -5642,12 +5835,12 @@ int httpRead(http_t *http, char *buffer, int length);
 <TR><TD>length</TD><TD>The number of bytes to read</TD></TR>
 </TABLE>
 </CENTER>
-<H3><A NAME="10_53_3">Returns</A></H3>
+<H3><A NAME="10_56_3">Returns</A></H3>
 <P>The number of bytes read or -1 on error. </P>
-<H3><A NAME="10_53_4">Description</A></H3>
+<H3><A NAME="10_56_4">Description</A></H3>
 <P>The <CODE>httpRead()</CODE> function reads data from the HTTP 
 connection, possibly the result of a GET or POST request. </P>
-<H3><A NAME="10_53_5">Example</A></H3>
+<H3><A NAME="10_56_5">Example</A></H3>
 <PRE>
 #include &lt;cups/http.h&gt;
 
@@ -5663,30 +5856,30 @@ while ((bytes = httpRead(http, buffer, sizeof(buffer) - 1)) &gt; 0)
   fputs(buffer, stdout);
 }
 </PRE>
-<H3><A NAME="10_53_6">See Also</A></H3>
+<H3><A NAME="10_56_6">See Also</A></H3>
 <A HREF="#httpConnect"><CODE> httpConnect()</CODE></A>, <A HREF="#httpWrite">
 <CODE>httpWrite()</CODE></A>
 <!-- NEW PAGE ---->
 
 <H2><A NAME="httpReconnect">httpReconnect()</A></H2>
-<H3><A NAME="10_54_1">Usage</A></H3>
+<H3><A NAME="10_57_1">Usage</A></H3>
 <PRE>
 int httpReconnect(http_t *http);
 </PRE>
-<H3><A NAME="10_54_2">Arguments</A></H3>
+<H3><A NAME="10_57_2">Arguments</A></H3>
 <CENTER>
 <TABLE BORDER WIDTH="80%">
 <TR><TH>Argument</TH><TH>Description</TH></TR>
 <TR><TD>http</TD><TD>The HTTP connection</TD></TR>
 </TABLE>
 </CENTER>
-<H3><A NAME="10_54_3">Returns</A></H3>
+<H3><A NAME="10_57_3">Returns</A></H3>
 <P>0 on success, non-zero on failure. </P>
-<H3><A NAME="10_54_4">Description</A></H3>
+<H3><A NAME="10_57_4">Description</A></H3>
 <P>The <CODE>httpReconnect()</CODE> function reconnects to the HTTP 
 server. This is usually done automatically if the HTTP functions detect 
 that the server connection has terminated. </P>
-<H3><A NAME="10_54_5">Example</A></H3>
+<H3><A NAME="10_57_5">Example</A></H3>
 <PRE>
 #include &lt;cups/http.h&gt;
 
@@ -5694,18 +5887,18 @@ http_t *http;
 
 httpReconnect(http);
 </PRE>
-<H3><A NAME="10_54_6">See Also</A></H3>
+<H3><A NAME="10_57_6">See Also</A></H3>
 <A HREF="#httpConnect"><CODE> httpConnect()</CODE></A>
 <!-- NEW PAGE ---->
 
 <H2><A NAME="httpSeparate">httpSeparate()</A></H2>
-<H3><A NAME="10_55_1">Usage</A></H3>
+<H3><A NAME="10_58_1">Usage</A></H3>
 <PRE>
 void httpSeparate(const char *uri, char *method,
                   char *username, char *host, int *port,
                   char *resource);
 </PRE>
-<H3><A NAME="10_55_2">Arguments</A></H3>
+<H3><A NAME="10_58_2">Arguments</A></H3>
 <CENTER>
 <TABLE BORDER WIDTH="80%">
 <TR><TH>Argument</TH><TH>Description</TH></TR>
@@ -5720,12 +5913,12 @@ or as  default for the method/scheme</TD></TR>
 server</TD></TR>
 </TABLE>
 </CENTER>
-<H3><A NAME="10_55_3">Description</A></H3>
+<H3><A NAME="10_58_3">Description</A></H3>
 <P>The <CODE>httpSeparate()</CODE> function separates the specified URI 
 into its component parts. The method, username, hostname, and resource 
 strings should be at least <CODE>HTTP_MAX_URI</CODE> characters long to 
 avoid potential buffer overflow problems. </P>
-<H3><A NAME="10_55_4">Example</A></H3>
+<H3><A NAME="10_58_4">Example</A></H3>
 <PRE>
 char uri[HTTP_MAX_URI];
 char method[HTTP_MAX_URI];
@@ -5736,16 +5929,16 @@ int port;
 
 httpSeparate(uri, method, username, host, &amp;port, resource);
 </PRE>
-<H3><A NAME="10_55_5">See Also</A></H3>
+<H3><A NAME="10_58_5">See Also</A></H3>
 <A HREF="#httpConnect"><CODE> httpConnect()</CODE></A>
 <!-- NEW PAGE ---->
 
 <H2><A NAME="httpSetField">httpSetField()</A></H2>
-<H3><A NAME="10_56_1">Usage</A></H3>
+<H3><A NAME="10_59_1">Usage</A></H3>
 <PRE>
 void httpSetField(http_t *http, http_field_t field, const char *value);
 </PRE>
-<H3><A NAME="10_56_2">Arguments</A></H3>
+<H3><A NAME="10_59_2">Arguments</A></H3>
 <CENTER>
 <TABLE BORDER WIDTH="80%">
 <TR><TH>Argument</TH><TH>Description</TH></TR>
@@ -5754,10 +5947,10 @@ void httpSetField(http_t *http, http_field_t field, const char *value);
 <TR><TD>value</TD><TD>The string value for the field</TD></TR>
 </TABLE>
 </CENTER>
-<H3><A NAME="10_56_3">Description</A></H3>
+<H3><A NAME="10_59_3">Description</A></H3>
 <P>The <CODE>httpSetField()</CODE> function sets the current value for 
 the specified HTTP field. </P>
-<H3><A NAME="10_56_4">Example</A></H3>
+<H3><A NAME="10_59_4">Example</A></H3>
 <PRE>
 #include &lt;cups/http.h&gt;
 
@@ -5767,17 +5960,17 @@ httpSetField(http, HTTP_FIELD_AUTHORIZATION, &quot;Basic dfdr34453454325&quot;))
 httpGet(http, &quot;/some/uri&quot;);
 while (httpUpdate(http) == HTTP_CONTINUE);
 </PRE>
-<H3><A NAME="10_56_5">See Also</A></H3>
+<H3><A NAME="10_59_5">See Also</A></H3>
 <A HREF="#httpConnect"><CODE> httpConnect()</CODE></A>, <A HREF="#httpGetField">
 <CODE>httpGetField()</CODE></A>
 <!-- NEW PAGE ---->
 
 <H2><A NAME="httpTrace">httpTrace()</A></H2>
-<H3><A NAME="10_57_1">Usage</A></H3>
+<H3><A NAME="10_60_1">Usage</A></H3>
 <PRE>
 int httpTrace(http_t *http, const char *uri);
 </PRE>
-<H3><A NAME="10_57_2">Arguments</A></H3>
+<H3><A NAME="10_60_2">Arguments</A></H3>
 <CENTER>
 <TABLE BORDER WIDTH="80%">
 <TR><TH>Argument</TH><TH>Description</TH></TR>
@@ -5785,12 +5978,12 @@ int httpTrace(http_t *http, const char *uri);
 <TR><TD>uri</TD><TD>The URI to trace</TD></TR>
 </TABLE>
 </CENTER>
-<H3><A NAME="10_57_3">Returns</A></H3>
+<H3><A NAME="10_60_3">Returns</A></H3>
 <P>0 on success, non-zero on failure. </P>
-<H3><A NAME="10_57_4">Description</A></H3>
+<H3><A NAME="10_60_4">Description</A></H3>
 <P>The <CODE>httpTrace()</CODE> function sends a HTTP TRACE request to 
 the server. </P>
-<H3><A NAME="10_57_5">Example</A></H3>
+<H3><A NAME="10_60_5">Example</A></H3>
 <PRE>
 #include &lt;cups/http.h&gt;
 
@@ -5798,27 +5991,27 @@ http_t *http;
 
 httpTrace(http, &quot;/some/uri&quot;);
 </PRE>
-<H3><A NAME="10_57_6">See Also</A></H3>
+<H3><A NAME="10_60_6">See Also</A></H3>
 <A HREF="#httpConnect"><CODE> httpConnect()</CODE></A>, <A HREF="#httpSetField">
 <CODE>httpSetField()</CODE></A>, <A HREF="#httpUpdate"><CODE>
 httpUpdate()</CODE></A>
 <!-- NEW PAGE ---->
 
 <H2><A NAME="httpUpdate">httpUpdate()</A></H2>
-<H3><A NAME="10_58_1">Usage</A></H3>
+<H3><A NAME="10_61_1">Usage</A></H3>
 <PRE>
 http_status_t httpUpdate(http_t *http);
 </PRE>
-<H3><A NAME="10_58_2">Arguments</A></H3>
+<H3><A NAME="10_61_2">Arguments</A></H3>
 <CENTER>
 <TABLE BORDER WIDTH="80%">
 <TR><TH>Argument</TH><TH>Description</TH></TR>
 <TR><TD>http</TD><TD>The HTTP connection</TD></TR>
 </TABLE>
 </CENTER>
-<H3><A NAME="10_58_3">Returns</A></H3>
+<H3><A NAME="10_61_3">Returns</A></H3>
 <P>The HTTP status of the current request. </P>
-<H3><A NAME="10_58_4">Description</A></H3>
+<H3><A NAME="10_61_4">Description</A></H3>
 <P>The <CODE>httpUpdate()</CODE> function updates the current request 
 status. It is used after any DELETE, GET, HEAD, OPTIONS, POST, PUT, or 
 TRACE request to finalize the HTTP request and retrieve the request 
@@ -5827,7 +6020,7 @@ status. </P>
 take longer, programs should continue calling <CODE>httpUpdate()</CODE>
  until the return status is not the constant value <CODE>HTTP_CONTINUE</CODE>
 . </P>
-<H3><A NAME="10_58_5">Example</A></H3>
+<H3><A NAME="10_61_5">Example</A></H3>
 <PRE>
 #include &lt;cups/http.h&gt;
 
@@ -5838,7 +6031,7 @@ httpGet(http, &quot;/some/uri&quot;);
 while ((status = httpUpdate(http)) == HTTP_CONTINUE);
 printf(&quot;Request status is %d\n&quot;, status);
 </PRE>
-<H3><A NAME="10_58_6">See Also</A></H3>
+<H3><A NAME="10_61_6">See Also</A></H3>
 <A HREF="#httpConnect"><CODE> httpConnect()</CODE></A>, <A HREF="#httpDelete">
 <CODE>httpDelete()</CODE></A>, <A HREF="#httpGet"><CODE>httpGet()</CODE></A>
 , <A HREF="#httpHead"><CODE>httpHead()</CODE></A>, <A HREF="#httpOptions">
@@ -5848,11 +6041,11 @@ printf(&quot;Request status is %d\n&quot;, status);
 <!-- NEW PAGE ---->
 
 <H2><A NAME="httpWrite">httpWrite()</A></H2>
-<H3><A NAME="10_59_1">Usage</A></H3>
+<H3><A NAME="10_62_1">Usage</A></H3>
 <PRE>
 int httpWrite(http_t *http, char *buffer, int length);
 </PRE>
-<H3><A NAME="10_59_2">Arguments</A></H3>
+<H3><A NAME="10_62_2">Arguments</A></H3>
 <CENTER>
 <TABLE BORDER WIDTH="80%">
 <TR><TH>Argument</TH><TH>Description</TH></TR>
@@ -5861,12 +6054,12 @@ int httpWrite(http_t *http, char *buffer, int length);
 <TR><TD>length</TD><TD>The number of bytes to read</TD></TR>
 </TABLE>
 </CENTER>
-<H3><A NAME="10_59_3">Returns</A></H3>
+<H3><A NAME="10_62_3">Returns</A></H3>
 <P>The number of bytes read or -1 on error. </P>
-<H3><A NAME="10_59_4">Description</A></H3>
+<H3><A NAME="10_62_4">Description</A></H3>
 <P>The <CODE>httpWrite()</CODE> function reads data from the HTTP 
 connection, possibly the result of a GET or POST request. </P>
-<H3><A NAME="10_59_5">Example</A></H3>
+<H3><A NAME="10_62_5">Example</A></H3>
 <PRE>
 #include &lt;cups/http.h&gt;
 
@@ -5888,18 +6081,18 @@ while ((bytes = httpRead(http, buffer, sizeof(buffer) - 1)) &gt; 0)
   fputs(buffer, stdout);
 }
 </PRE>
-<H3><A NAME="10_59_6">See Also</A></H3>
+<H3><A NAME="10_62_6">See Also</A></H3>
 <A HREF="#httpConnect"><CODE> httpConnect()</CODE></A>, <A HREF="#httpRead">
 <CODE>httpRead()</CODE></A>
 <!-- NEW PAGE ---->
 
 <H2><A NAME="ippAddBoolean">ippAddBoolean()</A></H2>
-<H3><A NAME="10_60_1">Usage</A></H3>
+<H3><A NAME="10_63_1">Usage</A></H3>
 <PRE>
 ipp_attribute_t *ippAddBoolean(ipp_t *ipp, ipp_tag_t group,
                                const char *name, char value);
 </PRE>
-<H3><A NAME="10_60_2">Arguments</A></H3>
+<H3><A NAME="10_63_2">Arguments</A></H3>
 <CENTER>
 <TABLE BORDER WIDTH="80%">
 <TR><TH>Argument</TH><TH>Description</TH></TR>
@@ -5909,13 +6102,13 @@ ipp_attribute_t *ippAddBoolean(ipp_t *ipp, ipp_tag_t group,
 <TR><TD>value</TD><TD>The boolean value</TD></TR>
 </TABLE>
 </CENTER>
-<H3><A NAME="10_60_3">Returns</A></H3>
+<H3><A NAME="10_63_3">Returns</A></H3>
 <P>A pointer to the new attribute or NULL if the attribute could not be 
 created. </P>
-<H3><A NAME="10_60_4">Description</A></H3>
+<H3><A NAME="10_63_4">Description</A></H3>
 <P>The <CODE>ippAddBoolean()</CODE> function adds a single boolean 
 attribute value to the specified IPP request. </P>
-<H3><A NAME="10_60_5">Example</A></H3>
+<H3><A NAME="10_63_5">Example</A></H3>
 <PRE>
 #include &lt;cups/ipp.h&gt;
 
@@ -5923,7 +6116,7 @@ ipp_t *ipp;
 
 ippAddBoolean(ipp, IPP_TAG_OPERATION, &quot;my-jobs&quot;, 1);
 </PRE>
-<H3><A NAME="10_60_6">See Also</A></H3>
+<H3><A NAME="10_63_6">See Also</A></H3>
 <A HREF="#ippAddBooleans"><CODE> ippAddBooleans()</CODE></A>, <A HREF="#ippAddDate">
 <CODE>ippAddDate()</CODE></A>, <A HREF="#ippAddInteger"><CODE>
 ippAddInteger()</CODE></A>, <A HREF="#ippAddIntegers"><CODE>
@@ -5937,13 +6130,13 @@ ippAddStrings()</CODE></A>
 <!-- NEW PAGE ---->
 
 <H2><A NAME="ippAddBooleans">ippAddBooleans()</A></H2>
-<H3><A NAME="10_61_1">Usage</A></H3>
+<H3><A NAME="10_64_1">Usage</A></H3>
 <PRE>
 ipp_attribute_t *ippAddBooleans(ipp_t *ipp, ipp_tag_t group,
                                 const char *name, int num_values,
                                 const char *values);
 </PRE>
-<H3><A NAME="10_61_2">Arguments</A></H3>
+<H3><A NAME="10_64_2">Arguments</A></H3>
 <CENTER>
 <TABLE BORDER WIDTH="80%">
 <TR><TH>Argument</TH><TH>Description</TH></TR>
@@ -5954,15 +6147,15 @@ ipp_attribute_t *ippAddBooleans(ipp_t *ipp, ipp_tag_t group,
 <TR><TD>values</TD><TD>The boolean values</TD></TR>
 </TABLE>
 </CENTER>
-<H3><A NAME="10_61_3">Returns</A></H3>
+<H3><A NAME="10_64_3">Returns</A></H3>
 <P>A pointer to the new attribute or NULL if the attribute could not be 
 created. </P>
-<H3><A NAME="10_61_4">Description</A></H3>
+<H3><A NAME="10_64_4">Description</A></H3>
 <P>The <CODE>ippAddBooleans()</CODE> function adds one or more boolean 
 attribute values to the specified IPP request. If the <CODE>values</CODE>
  pointer is <CODE>NULL</CODE> then an array of <CODE>num_values</CODE>
  false values is created. </P>
-<H3><A NAME="10_61_5">Example</A></H3>
+<H3><A NAME="10_64_5">Example</A></H3>
 <PRE>
 #include &lt;cups/ipp.h&gt;
 
@@ -5971,7 +6164,7 @@ char values[10];
 
 ippAddBooleans(ipp, IPP_TAG_OPERATION, &quot;some-attribute&quot;, 10, values);
 </PRE>
-<H3><A NAME="10_61_6">See Also</A></H3>
+<H3><A NAME="10_64_6">See Also</A></H3>
 <A HREF="#ippAddBoolean"><CODE> ippAddBoolean()</CODE></A>, <A HREF="#ippAddDate">
 <CODE>ippAddDate()</CODE></A>, <A HREF="#ippAddInteger"><CODE>
 ippAddInteger()</CODE></A>, <A HREF="#ippAddIntegers"><CODE>
@@ -5985,12 +6178,12 @@ ippAddStrings()</CODE></A>
 <!-- NEW PAGE ---->
 
 <H2><A NAME="ippAddDate">ippAddDate()</A></H2>
-<H3><A NAME="10_62_1">Usage</A></H3>
+<H3><A NAME="10_65_1">Usage</A></H3>
 <PRE>
 ipp_attribute_t *ippAddDate(ipp_t *ipp, ipp_tag_t group,
                             const char *name, ipp_uchar_t *value);
 </PRE>
-<H3><A NAME="10_62_2">Arguments</A></H3>
+<H3><A NAME="10_65_2">Arguments</A></H3>
 <CENTER>
 <TABLE BORDER WIDTH="80%">
 <TR><TH>Argument</TH><TH>Description</TH></TR>
@@ -6000,13 +6193,13 @@ ipp_attribute_t *ippAddDate(ipp_t *ipp, ipp_tag_t group,
 <TR><TD>value</TD><TD>The date value</TD></TR>
 </TABLE>
 </CENTER>
-<H3><A NAME="10_62_3">Returns</A></H3>
+<H3><A NAME="10_65_3">Returns</A></H3>
 <P>A pointer to the new attribute or NULL if the attribute could not be 
 created. </P>
-<H3><A NAME="10_62_4">Description</A></H3>
+<H3><A NAME="10_65_4">Description</A></H3>
 <P>The <CODE>ippAddDate()</CODE> function adds a single date-time 
 attribute value to the specified IPP request. </P>
-<H3><A NAME="10_62_5">Example</A></H3>
+<H3><A NAME="10_65_5">Example</A></H3>
 <PRE>
 #include &lt;cups/ipp.h&gt;
 
@@ -6015,7 +6208,7 @@ ipp_t *ipp;
 ippAddDate(ipp, IPP_TAG_OPERATION, &quot;some-attribute&quot;, 
            ippTimeToDate(time(NULL));
 </PRE>
-<H3><A NAME="10_62_6">See Also</A></H3>
+<H3><A NAME="10_65_6">See Also</A></H3>
 <A HREF="#ippAddBoolean"><CODE> ippAddBoolean()</CODE></A>, <A HREF="#ippAddBooleans">
 <CODE>ippAddBooleans()</CODE></A>, <A HREF="#ippAddInteger"><CODE>
 ippAddInteger()</CODE></A>, <A HREF="#ippAddIntegers"><CODE>
@@ -6030,13 +6223,13 @@ ippTimeToDate()</CODE></A>
 <!-- NEW PAGE ---->
 
 <H2><A NAME="ippAddInteger">ippAddInteger()</A></H2>
-<H3><A NAME="10_63_1">Usage</A></H3>
+<H3><A NAME="10_66_1">Usage</A></H3>
 <PRE>
 ipp_attribute_t *ippAddInteger(ipp_t *ipp, ipp_tag_t group,
                                ipp_tag_t tag, const char *name,
                                int value);
 </PRE>
-<H3><A NAME="10_63_2">Arguments</A></H3>
+<H3><A NAME="10_66_2">Arguments</A></H3>
 <CENTER>
 <TABLE BORDER WIDTH="80%">
 <TR><TH>Argument</TH><TH>Description</TH></TR>
@@ -6048,13 +6241,13 @@ IPP_TAG_ENUM)</TD></TR>
 <TR><TD>value</TD><TD>The integer value</TD></TR>
 </TABLE>
 </CENTER>
-<H3><A NAME="10_63_3">Returns</A></H3>
+<H3><A NAME="10_66_3">Returns</A></H3>
 <P>A pointer to the new attribute or NULL if the attribute could not be 
 created. </P>
-<H3><A NAME="10_63_4">Description</A></H3>
+<H3><A NAME="10_66_4">Description</A></H3>
 <P>The <CODE>ippAddInteger()</CODE> function adds a single integer 
 attribute value to the specified IPP request. </P>
-<H3><A NAME="10_63_5">Example</A></H3>
+<H3><A NAME="10_66_5">Example</A></H3>
 <PRE>
 #include &lt;cups/ipp.h&gt;
 
@@ -6062,7 +6255,7 @@ ipp_t *ipp;
 
 ippAddInteger(ipp, IPP_TAG_OPERATION, &quot;limit&quot;, 100);
 </PRE>
-<H3><A NAME="10_63_6">See Also</A></H3>
+<H3><A NAME="10_66_6">See Also</A></H3>
 <A HREF="#ippAddBoolean"><CODE> ippAddBoolean()</CODE></A>, <A HREF="#ippAddBooleans">
 <CODE>ippAddBooleans()</CODE></A>, <A HREF="#ippAddDate"><CODE>
 ippAddDate()</CODE></A>, <A HREF="#ippAddIntegers"><CODE>
@@ -6076,13 +6269,13 @@ ippAddStrings()</CODE></A>
 <!-- NEW PAGE ---->
 
 <H2><A NAME="ippAddIntegers">ippAddIntegers()</A></H2>
-<H3><A NAME="10_64_1">Usage</A></H3>
+<H3><A NAME="10_67_1">Usage</A></H3>
 <PRE>
 ipp_attribute_t *ippAddIntegers(ipp_t *ipp, ipp_tag_t group,
                                 ipp_tag_t tag, const char *name,
                                 int num_values, const int *values);
 </PRE>
-<H3><A NAME="10_64_2">Arguments</A></H3>
+<H3><A NAME="10_67_2">Arguments</A></H3>
 <CENTER>
 <TABLE BORDER WIDTH="80%">
 <TR><TH>Argument</TH><TH>Description</TH></TR>
@@ -6095,15 +6288,15 @@ IPP_TAG_ENUM)</TD></TR>
 <TR><TD>values</TD><TD>The integer values</TD></TR>
 </TABLE>
 </CENTER>
-<H3><A NAME="10_64_3">Returns</A></H3>
+<H3><A NAME="10_67_3">Returns</A></H3>
 <P>A pointer to the new attribute or NULL if the attribute could not be 
 created. </P>
-<H3><A NAME="10_64_4">Description</A></H3>
+<H3><A NAME="10_67_4">Description</A></H3>
 <P>The <CODE>ippAddIntegers()</CODE> function adds one or more integer 
 attribute values to the specified IPP request.  If the <CODE>values</CODE>
  pointer is <CODE>NULL</CODE> then an array of <CODE>num_values</CODE>
  0 values is created. </P>
-<H3><A NAME="10_64_5">Example</A></H3>
+<H3><A NAME="10_67_5">Example</A></H3>
 <PRE>
 #include &lt;cups/ipp.h&gt;
 
@@ -6112,7 +6305,7 @@ int values[100];
 
 ippAddIntegers(ipp, IPP_TAG_OPERATION, &quot;some-attribute&quot;, 100, values);
 </PRE>
-<H3><A NAME="10_64_6">See Also</A></H3>
+<H3><A NAME="10_67_6">See Also</A></H3>
 <A HREF="#ippAddBoolean"><CODE> ippAddBoolean()</CODE></A>, <A HREF="#ippAddBooleans">
 <CODE>ippAddBooleans()</CODE></A>, <A HREF="#ippAddDate"><CODE>
 ippAddDate()</CODE></A>, <A HREF="#ippAddInteger"><CODE>ippAddInteger()</CODE>
@@ -6126,13 +6319,13 @@ ippAddStrings()</CODE></A>
 <!-- NEW PAGE ---->
 
 <H2><A NAME="ippAddRange">ippAddRange()</A></H2>
-<H3><A NAME="10_65_1">Usage</A></H3>
+<H3><A NAME="10_68_1">Usage</A></H3>
 <PRE>
 ipp_attribute_t *ippAddRange(ipp_t *ipp, ipp_tag_t group,
                              const char *name, int low,
                              int high);
 </PRE>
-<H3><A NAME="10_65_2">Arguments</A></H3>
+<H3><A NAME="10_68_2">Arguments</A></H3>
 <CENTER>
 <TABLE BORDER WIDTH="80%">
 <TR><TH>Argument</TH><TH>Description</TH></TR>
@@ -6143,13 +6336,13 @@ ipp_attribute_t *ippAddRange(ipp_t *ipp, ipp_tag_t group,
 <TR><TD>high</TD><TD>The higher value</TD></TR>
 </TABLE>
 </CENTER>
-<H3><A NAME="10_65_3">Returns</A></H3>
+<H3><A NAME="10_68_3">Returns</A></H3>
 <P>A pointer to the new attribute or NULL if the attribute could not be 
 created. </P>
-<H3><A NAME="10_65_4">Description</A></H3>
+<H3><A NAME="10_68_4">Description</A></H3>
 <P>The <CODE>ippAddRange()</CODE> function adds a single range 
 attribute value to the specified IPP request. </P>
-<H3><A NAME="10_65_5">Example</A></H3>
+<H3><A NAME="10_68_5">Example</A></H3>
 <PRE>
 #include &lt;cups/ipp.h&gt;
 
@@ -6157,7 +6350,7 @@ ipp_t *ipp;
 
 ippAddRange(ipp, IPP_TAG_OPERATION, &quot;page-ranges&quot;, 1, 10);
 </PRE>
-<H3><A NAME="10_65_6">See Also</A></H3>
+<H3><A NAME="10_68_6">See Also</A></H3>
 <A HREF="#ippAddBoolean"><CODE> ippAddBoolean()</CODE></A>, <A HREF="#ippAddBooleans">
 <CODE>ippAddBooleans()</CODE></A>, <A HREF="#ippAddDate"><CODE>
 ippAddDate()</CODE></A>, <A HREF="#ippAddInteger"><CODE>ippAddInteger()</CODE>
@@ -6171,13 +6364,13 @@ ippAddStrings()</CODE></A>
 <!-- NEW PAGE ---->
 
 <H2><A NAME="ippAddRanges">ippAddRanges()</A></H2>
-<H3><A NAME="10_66_1">Usage</A></H3>
+<H3><A NAME="10_69_1">Usage</A></H3>
 <PRE>
 ipp_attribute_t *ippAddRanges(ipp_t *ipp, ipp_tag_t group,
                               const char *name, int num_values,
                               const int *lows, const int *highs);
 </PRE>
-<H3><A NAME="10_66_2">Arguments</A></H3>
+<H3><A NAME="10_69_2">Arguments</A></H3>
 <CENTER>
 <TABLE BORDER WIDTH="80%">
 <TR><TH>Argument</TH><TH>Description</TH></TR>
@@ -6189,15 +6382,15 @@ ipp_attribute_t *ippAddRanges(ipp_t *ipp, ipp_tag_t group,
 <TR><TD>highs</TD><TD>The higher values</TD></TR>
 </TABLE>
 </CENTER>
-<H3><A NAME="10_66_3">Returns</A></H3>
+<H3><A NAME="10_69_3">Returns</A></H3>
 <P>A pointer to the new attribute or NULL if the attribute could not be 
 created. </P>
-<H3><A NAME="10_66_4">Description</A></H3>
+<H3><A NAME="10_69_4">Description</A></H3>
 <P>The <CODE>ippAddRanges()</CODE> function adds one or more range 
 attribute values to the specified IPP request. If the <CODE>values</CODE>
  pointer is <CODE>NULL</CODE> then an array of <CODE>num_values</CODE>
  0,0 ranges is created. </P>
-<H3><A NAME="10_66_5">Example</A></H3>
+<H3><A NAME="10_69_5">Example</A></H3>
 <PRE>
 #include &lt;cups/ipp.h&gt;
 
@@ -6207,7 +6400,7 @@ int highs[2];
 
 ippAddRanges(ipp, IPP_TAG_OPERATION, &quot;page-ranges&quot;, 2, lows, highs);
 </PRE>
-<H3><A NAME="10_66_6">See Also</A></H3>
+<H3><A NAME="10_69_6">See Also</A></H3>
 <A HREF="#ippAddBoolean"><CODE> ippAddBoolean()</CODE></A>, <A HREF="#ippAddBooleans">
 <CODE>ippAddBooleans()</CODE></A>, <A HREF="#ippAddDate"><CODE>
 ippAddDate()</CODE></A>, <A HREF="#ippAddInteger"><CODE>ippAddInteger()</CODE>
@@ -6221,13 +6414,13 @@ ippAddStrings()</CODE></A>
 <!-- NEW PAGE ---->
 
 <H2><A NAME="ippAddResolution">ippAddResolution()</A></H2>
-<H3><A NAME="10_67_1">Usage</A></H3>
+<H3><A NAME="10_70_1">Usage</A></H3>
 <PRE>
 ipp_attribute_t *ippAddResolution(ipp_t *ipp, ipp_tag_t group,
                                   const char *name, int xres,
                                   int yres, ipp_res_t units);
 </PRE>
-<H3><A NAME="10_67_2">Arguments</A></H3>
+<H3><A NAME="10_70_2">Arguments</A></H3>
 <CENTER>
 <TABLE BORDER WIDTH="80%">
 <TR><TH>Argument</TH><TH>Description</TH></TR>
@@ -6239,13 +6432,13 @@ ipp_attribute_t *ippAddResolution(ipp_t *ipp, ipp_tag_t group,
 <TR><TD>units</TD><TD>The resolution units</TD></TR>
 </TABLE>
 </CENTER>
-<H3><A NAME="10_67_3">Returns</A></H3>
+<H3><A NAME="10_70_3">Returns</A></H3>
 <P>A pointer to the new attribute or NULL if the attribute could not be 
 created. </P>
-<H3><A NAME="10_67_4">Description</A></H3>
+<H3><A NAME="10_70_4">Description</A></H3>
 <P>The <CODE>ippAddResolution()</CODE> function adds a single 
 resolution attribute value to the specified IPP request. </P>
-<H3><A NAME="10_67_5">Example</A></H3>
+<H3><A NAME="10_70_5">Example</A></H3>
 <PRE>
 #include &lt;cups/ipp.h&gt;
 
@@ -6254,7 +6447,7 @@ ipp_t *ipp;
 ippAddBoolean(ipp, IPP_TAG_OPERATION, &quot;printer-resolution&quot;,
               720, 720, IPP_RES_PER_INCH);
 </PRE>
-<H3><A NAME="10_67_6">See Also</A></H3>
+<H3><A NAME="10_70_6">See Also</A></H3>
 <A HREF="#ippAddBoolean"><CODE> ippAddBoolean()</CODE></A>, <A HREF="#ippAddBooleans">
 <CODE>ippAddBooleans()</CODE></A>, <A HREF="#ippAddDate"><CODE>
 ippAddDate()</CODE></A>, <A HREF="#ippAddInteger"><CODE>ippAddInteger()</CODE>
@@ -6268,14 +6461,14 @@ ippAddStrings()</CODE></A>
 <!-- NEW PAGE ---->
 
 <H2><A NAME="ippAddResolutions">ippAddResolutions()</A></H2>
-<H3><A NAME="10_68_1">Usage</A></H3>
+<H3><A NAME="10_71_1">Usage</A></H3>
 <PRE>
 ipp_attribute_t *ippAddResolutions(ipp_t *ipp, ipp_tag_t group,
                                    const char *name, int num_values,
                                    const int *xres, const int *yres,
                                    const ipp_res_t *units);
 </PRE>
-<H3><A NAME="10_68_2">Arguments</A></H3>
+<H3><A NAME="10_71_2">Arguments</A></H3>
 <CENTER>
 <TABLE BORDER WIDTH="80%">
 <TR><TH>Argument</TH><TH>Description</TH></TR>
@@ -6288,15 +6481,15 @@ ipp_attribute_t *ippAddResolutions(ipp_t *ipp, ipp_tag_t group,
 <TR><TD>units</TD><TD>The resolution units</TD></TR>
 </TABLE>
 </CENTER>
-<H3><A NAME="10_68_3">Returns</A></H3>
+<H3><A NAME="10_71_3">Returns</A></H3>
 <P>A pointer to the new attribute or NULL if the attribute could not be 
 created. </P>
-<H3><A NAME="10_68_4">Description</A></H3>
+<H3><A NAME="10_71_4">Description</A></H3>
 <P>The <CODE>ippAddResolutions()</CODE> function adds one or more 
 resolution attribute values to the specified IPP request. If the <CODE>
 values</CODE> pointer is <CODE>NULL</CODE> then an array of <CODE>
 num_values</CODE> 0,0 resolutions is created. </P>
-<H3><A NAME="10_68_5">Example</A></H3>
+<H3><A NAME="10_71_5">Example</A></H3>
 <PRE>
 #include &lt;cups/ipp.h&gt;
 
@@ -6308,7 +6501,7 @@ ipp_res_t units[5];
 ippAddBoolean(ipp, IPP_TAG_OPERATION, &quot;printer-resolutions-supported&quot;,
               5, xres, yres, units);
 </PRE>
-<H3><A NAME="10_68_6">See Also</A></H3>
+<H3><A NAME="10_71_6">See Also</A></H3>
 <A HREF="#ippAddBoolean"><CODE> ippAddBoolean()</CODE></A>, <A HREF="#ippAddBooleans">
 <CODE>ippAddBooleans()</CODE></A>, <A HREF="#ippAddDate"><CODE>
 ippAddDate()</CODE></A>, <A HREF="#ippAddInteger"><CODE>ippAddInteger()</CODE>
@@ -6322,24 +6515,24 @@ ippAddStrings()</CODE></A>
 <!-- NEW PAGE ---->
 
 <H2><A NAME="ippAddSeparator">ippAddSeparator()</A></H2>
-<H3><A NAME="10_69_1">Usage</A></H3>
+<H3><A NAME="10_72_1">Usage</A></H3>
 <PRE>
 ipp_attribute_t *ippAddSeparator(ipp_t *ipp);
 </PRE>
-<H3><A NAME="10_69_2">Arguments</A></H3>
+<H3><A NAME="10_72_2">Arguments</A></H3>
 <CENTER>
 <TABLE BORDER WIDTH="80%">
 <TR><TH>Argument</TH><TH>Description</TH></TR>
 <TR><TD>ipp</TD><TD>The IPP request</TD></TR>
 </TABLE>
 </CENTER>
-<H3><A NAME="10_69_3">Returns</A></H3>
+<H3><A NAME="10_72_3">Returns</A></H3>
 <P>A pointer to the new separator or NULL if the separator could not be 
 created. </P>
-<H3><A NAME="10_69_4">Description</A></H3>
+<H3><A NAME="10_72_4">Description</A></H3>
 <P>The <CODE>ippAddSeparator()</CODE> function adds a group separator 
 to the specified IPP request. </P>
-<H3><A NAME="10_69_5">Example</A></H3>
+<H3><A NAME="10_72_5">Example</A></H3>
 <PRE>
 #include &lt;cups/ipp.h&gt;
 
@@ -6347,7 +6540,7 @@ ipp_t *ipp;
 
 ippAddSeparator(ipp);
 </PRE>
-<H3><A NAME="10_69_6">See Also</A></H3>
+<H3><A NAME="10_72_6">See Also</A></H3>
 <A HREF="#ippAddBoolean"><CODE> ippAddBoolean()</CODE></A>, <A HREF="#ippAddBooleans">
 <CODE>ippAddBooleans()</CODE></A>, <A HREF="#ippAddDate"><CODE>
 ippAddDate()</CODE></A>, <A HREF="#ippAddInteger"><CODE>ippAddInteger()</CODE>
@@ -6361,13 +6554,13 @@ ippAddStrings()</CODE></A>
 <!-- NEW PAGE ---->
 
 <H2><A NAME="ippAddString">ippAddString()</A></H2>
-<H3><A NAME="10_70_1">Usage</A></H3>
+<H3><A NAME="10_73_1">Usage</A></H3>
 <PRE>
 ipp_attribute_t *ippAddString(ipp_t *ipp, ipp_tag_t group,
                               ipp_tag_t tag, const char *name,
                               const char *charset, const char *value);
 </PRE>
-<H3><A NAME="10_70_2">Arguments</A></H3>
+<H3><A NAME="10_73_2">Arguments</A></H3>
 <CENTER>
 <TABLE BORDER WIDTH="80%">
 <TR><TH>Argument</TH><TH>Description</TH></TR>
@@ -6379,16 +6572,16 @@ ipp_attribute_t *ippAddString(ipp_t *ipp, ipp_tag_t group,
 <TR><TD>value</TD><TD>The string value</TD></TR>
 </TABLE>
 </CENTER>
-<H3><A NAME="10_70_3">Returns</A></H3>
+<H3><A NAME="10_73_3">Returns</A></H3>
 <P>A pointer to the new attribute or NULL if the attribute could not be 
 created. </P>
-<H3><A NAME="10_70_4">Description</A></H3>
+<H3><A NAME="10_73_4">Description</A></H3>
 <P>The <CODE>ippAddString()</CODE> function adds a single string 
 attribute value to the specified IPP request. For <CODE>IPP_TAG_NAMELANG</CODE>
  and <CODE>IPP_TAG_TEXTLANG</CODE> strings, the charset value is 
 provided with the string to identify the string encoding used. 
 Otherwise the charset value is ignored. </P>
-<H3><A NAME="10_70_5">Example</A></H3>
+<H3><A NAME="10_73_5">Example</A></H3>
 <PRE>
 #include &lt;cups/ipp.h&gt;
 
@@ -6397,7 +6590,7 @@ ipp_t *ipp;
 ippAddString(ipp, IPP_TAG_OPERATION, IPP_TAG_NAME, &quot;job-name&quot;,
              NULL, &quot;abc123&quot;);
 </PRE>
-<H3><A NAME="10_70_6">See Also</A></H3>
+<H3><A NAME="10_73_6">See Also</A></H3>
 <A HREF="#ippAddBoolean"><CODE> ippAddBoolean()</CODE></A>, <A HREF="#ippAddBooleans">
 <CODE>ippAddBooleans()</CODE></A>, <A HREF="#ippAddDate"><CODE>
 ippAddDate()</CODE></A>, <A HREF="#ippAddInteger"><CODE>ippAddInteger()</CODE>
@@ -6411,14 +6604,14 @@ ippAddStrings()</CODE></A>
 <!-- NEW PAGE ---->
 
 <H2><A NAME="ippAddStrings">ippAddStrings()</A></H2>
-<H3><A NAME="10_71_1">Usage</A></H3>
+<H3><A NAME="10_74_1">Usage</A></H3>
 <PRE>
 ipp_attribute_t *ippAddStrings(ipp_t *ipp, ipp_tag_t group,
                                ipp_tag_t tag, const char *name,
                                int num_values, const char *charset,
                                const char **values);
 </PRE>
-<H3><A NAME="10_71_2">Arguments</A></H3>
+<H3><A NAME="10_74_2">Arguments</A></H3>
 <CENTER>
 <TABLE BORDER WIDTH="80%">
 <TR><TH>Argument</TH><TH>Description</TH></TR>
@@ -6431,10 +6624,10 @@ ipp_attribute_t *ippAddStrings(ipp_t *ipp, ipp_tag_t group,
 <TR><TD>values</TD><TD>The string values</TD></TR>
 </TABLE>
 </CENTER>
-<H3><A NAME="10_71_3">Returns</A></H3>
+<H3><A NAME="10_74_3">Returns</A></H3>
 <P>A pointer to the new attribute or NULL if the attribute could not be 
 created. </P>
-<H3><A NAME="10_71_4">Description</A></H3>
+<H3><A NAME="10_74_4">Description</A></H3>
 <P>The <CODE>ippAddStrings()</CODE> function adds one or more string 
 attribute values to the specified IPP request. For <CODE>
 IPP_TAG_NAMELANG</CODE> and <CODE>IPP_TAG_TEXTLANG</CODE> strings, the 
@@ -6442,7 +6635,7 @@ charset value is provided with the strings to identify the string
 encoding used. Otherwise the charset value is ignored. If the <CODE>
 values</CODE> pointer is <CODE>NULL</CODE> then an array of <CODE>
 num_values</CODE> NULL strings is created. </P>
-<H3><A NAME="10_71_5">Example</A></H3>
+<H3><A NAME="10_74_5">Example</A></H3>
 <PRE>
 #include &lt;cups/ipp.h&gt;
 
@@ -6452,7 +6645,7 @@ char *values[2] = { &quot;one&quot;, &quot;two&quot; };
 ippAddStrings(ipp, IPP_TAG_OPERATION, IPP_TAG_KEYWORD, &quot;attr-name&quot;,
               2, NULL, values);
 </PRE>
-<H3><A NAME="10_71_6">See Also</A></H3>
+<H3><A NAME="10_74_6">See Also</A></H3>
 <A HREF="#ippAddBoolean"><CODE> ippAddBoolean()</CODE></A>, <A HREF="#ippAddBooleans">
 <CODE>ippAddBooleans()</CODE></A>, <A HREF="#ippAddDate"><CODE>
 ippAddDate()</CODE></A>, <A HREF="#ippAddInteger"><CODE>ippAddInteger()</CODE>
@@ -6466,23 +6659,23 @@ ippAddString()</CODE></A>
 <!-- NEW PAGE ---->
 
 <H2><A NAME="ippDateToTime">ippDateToTime()</A></H2>
-<H3><A NAME="10_72_1">Usage</A></H3>
+<H3><A NAME="10_75_1">Usage</A></H3>
 <PRE>
 time_t ippDateToTime(const ipp_uchar_t date[11]);
 </PRE>
-<H3><A NAME="10_72_2">Arguments</A></H3>
+<H3><A NAME="10_75_2">Arguments</A></H3>
 <CENTER>
 <TABLE BORDER WIDTH="80%">
 <TR><TH>Argument</TH><TH>Description</TH></TR>
 <TR><TD>date</TD><TD>The IPP date-time value</TD></TR>
 </TABLE>
 </CENTER>
-<H3><A NAME="10_72_3">Returns</A></H3>
+<H3><A NAME="10_75_3">Returns</A></H3>
 <P>A UNIX time value. </P>
-<H3><A NAME="10_72_4">Description</A></H3>
+<H3><A NAME="10_75_4">Description</A></H3>
 <P>The <CODE>ippDateToTime()</CODE> function converts an IPP date-time 
 value to a UNIX time value. </P>
-<H3><A NAME="10_72_5">Example</A></H3>
+<H3><A NAME="10_75_5">Example</A></H3>
 <PRE>
 #include &lt;cups/ipp.h&gt;
 
@@ -6490,26 +6683,26 @@ ipp_uchar_t date[11];
 
 printf(&quot;UNIX time is %d\n&quot;, ippDateToTime(date));
 </PRE>
-<H3><A NAME="10_72_6">See Also</A></H3>
+<H3><A NAME="10_75_6">See Also</A></H3>
 <A HREF="#ippTimeToDate"><CODE> ippTimeToDate()</CODE></A>
 <!-- NEW PAGE ---->
 
 <H2><A NAME="ippDelete">ippDelete()</A></H2>
-<H3><A NAME="10_73_1">Usage</A></H3>
+<H3><A NAME="10_76_1">Usage</A></H3>
 <PRE>
 void ippDelete(ipp_t *ipp);
 </PRE>
-<H3><A NAME="10_73_2">Arguments</A></H3>
+<H3><A NAME="10_76_2">Arguments</A></H3>
 <CENTER>
 <TABLE BORDER WIDTH="80%">
 <TR><TH>Argument</TH><TH>Description</TH></TR>
 <TR><TD>ipp</TD><TD>The IPP request or response</TD></TR>
 </TABLE>
 </CENTER>
-<H3><A NAME="10_73_3">Description</A></H3>
+<H3><A NAME="10_76_3">Description</A></H3>
 <P>The <CODE>ippDelete()</CODE> function deletes all memory used by an 
 IPP request or response. </P>
-<H3><A NAME="10_73_4">Example</A></H3>
+<H3><A NAME="10_76_4">Example</A></H3>
 <PRE>
 #include &lt;cups/ipp.h&gt;
 
@@ -6517,59 +6710,59 @@ ipp_t *ipp;
 
 ippDelete(ipp);
 </PRE>
-<H3><A NAME="10_73_5">See Also</A></H3>
+<H3><A NAME="10_76_5">See Also</A></H3>
 <A HREF="#ippNew"><CODE> ippNew()</CODE></A>
 <!-- NEW PAGE ---->
 
 <H2><A NAME="ippFindAttribute">ippFindAttribute()</A></H2>
-<H3><A NAME="10_74_1">Usage</A></H3>
+<H3><A NAME="10_77_1">Usage</A></H3>
 <PRE>
 </PRE>
-<H3><A NAME="10_74_2">Arguments</A></H3>
+<H3><A NAME="10_77_2">Arguments</A></H3>
 <CENTER>
 <TABLE BORDER WIDTH="80%">
 <TR><TH>Argument</TH><TH>Description</TH></TR>
 <TR><TD><TD></TR>
 </TABLE>
 </CENTER>
-<H3><A NAME="10_74_3">Returns</A></H3>
-<H3><A NAME="10_74_4">Description</A></H3>
-<H3><A NAME="10_74_5">Example</A></H3>
+<H3><A NAME="10_77_3">Returns</A></H3>
+<H3><A NAME="10_77_4">Description</A></H3>
+<H3><A NAME="10_77_5">Example</A></H3>
 <PRE>
 </PRE>
-<H3><A NAME="10_74_6">See Also</A></H3>
+<H3><A NAME="10_77_6">See Also</A></H3>
 
 <!-- NEW PAGE ---->
 <H2><A NAME="ippLength">ippLength()</A></H2>
-<H3><A NAME="10_75_1">Usage</A></H3>
+<H3><A NAME="10_78_1">Usage</A></H3>
 <PRE>
 </PRE>
-<H3><A NAME="10_75_2">Arguments</A></H3>
+<H3><A NAME="10_78_2">Arguments</A></H3>
 <CENTER>
 <TABLE BORDER WIDTH="80%">
 <TR><TH>Argument</TH><TH>Description</TH></TR>
 <TR><TD><TD></TR>
 </TABLE>
 </CENTER>
-<H3><A NAME="10_75_3">Returns</A></H3>
-<H3><A NAME="10_75_4">Description</A></H3>
-<H3><A NAME="10_75_5">Example</A></H3>
+<H3><A NAME="10_78_3">Returns</A></H3>
+<H3><A NAME="10_78_4">Description</A></H3>
+<H3><A NAME="10_78_5">Example</A></H3>
 <PRE>
 </PRE>
-<H3><A NAME="10_75_6">See Also</A></H3>
+<H3><A NAME="10_78_6">See Also</A></H3>
 
 <!-- NEW PAGE ---->
 <H2><A NAME="ippNew">ippNew()</A></H2>
-<H3><A NAME="10_76_1">Usage</A></H3>
+<H3><A NAME="10_79_1">Usage</A></H3>
 <PRE>
 ipp_t *ippNew(void);
 </PRE>
-<H3><A NAME="10_76_2">Returns</A></H3>
+<H3><A NAME="10_79_2">Returns</A></H3>
 <P>A pointer to a new IPP request or response. </P>
-<H3><A NAME="10_76_3">Description</A></H3>
+<H3><A NAME="10_79_3">Description</A></H3>
 <P>The <CODE>ippNew()</CODE> function creates a new IPP request or 
 response. </P>
-<H3><A NAME="10_76_4">Example</A></H3>
+<H3><A NAME="10_79_4">Example</A></H3>
 <PRE>
 #include &lt;cups/ipp.h&gt;
 
@@ -6577,21 +6770,21 @@ ipp_t *ipp;
 
 ipp = ippNew();
 </PRE>
-<H3><A NAME="10_76_5">See Also</A></H3>
+<H3><A NAME="10_79_5">See Also</A></H3>
 <A HREF="#ippDelete"><CODE> ippDelete()</CODE></A>
 <!-- NEW PAGE ---->
 
 <H2><A NAME="ippPort">ippPort()</A></H2>
-<H3><A NAME="10_77_1">Usage</A></H3>
+<H3><A NAME="10_80_1">Usage</A></H3>
 <PRE>
 int ippPort(void);
 </PRE>
-<H3><A NAME="10_77_2">Returns</A></H3>
+<H3><A NAME="10_80_2">Returns</A></H3>
 <P>The default TCP/IP port number for IPP requests. </P>
-<H3><A NAME="10_77_3">Description</A></H3>
+<H3><A NAME="10_80_3">Description</A></H3>
 <P>The <CODE>ippPort()</CODE> function returns the default IPP port 
 number for requests. </P>
-<H3><A NAME="10_77_4">Example</A></H3>
+<H3><A NAME="10_80_4">Example</A></H3>
 <PRE>
 #include &lt;cups/http.h&gt;
 #include &lt;cups/ipp.h&gt;
@@ -6600,16 +6793,17 @@ http_t *http;
 
 http = httpConnect(cupsServer(), ippPort());
 </PRE>
-<H3><A NAME="10_77_5">See Also</A></H3>
-<A HREF="#cupsServer"><CODE> cupsServer()</CODE></A>
+<H3><A NAME="10_80_5">See Also</A></H3>
+<A HREF="#cupsServer"><CODE> cupsServer()</CODE></A>, <A HREF="#ippSetPort">
+<CODE>ippSetPort()</CODE></A>
 <!-- NEW PAGE ---->
 
 <H2><A NAME="ippRead">ippRead()</A></H2>
-<H3><A NAME="10_78_1">Usage</A></H3>
+<H3><A NAME="10_81_1">Usage</A></H3>
 <PRE>
 ipp_state_t ippRead(http_t *http, ipp_t *ipp);
 </PRE>
-<H3><A NAME="10_78_2">Arguments</A></H3>
+<H3><A NAME="10_81_2">Arguments</A></H3>
 <CENTER>
 <TABLE BORDER WIDTH="80%">
 <TR><TH>Argument</TH><TH>Description</TH></TR>
@@ -6617,14 +6811,14 @@ ipp_state_t ippRead(http_t *http, ipp_t *ipp);
 <TR><TD>ipp</TD><TD>The IPP request or response</TD></TR>
 </TABLE>
 </CENTER>
-<H3><A NAME="10_78_3">Returns</A></H3>
+<H3><A NAME="10_81_3">Returns</A></H3>
 <P>The current read state. </P>
-<H3><A NAME="10_78_4">Description</A></H3>
+<H3><A NAME="10_81_4">Description</A></H3>
 <P>The <CODE>ippRead()</CODE> function reads IPP attributes from the 
 specified HTTP connection. Programs should continue calling <CODE>
 ippRead()</CODE> until <CODE>IPP_ERROR</CODE> or <CODE>IPP_DATA</CODE>
  is returned. </P>
-<H3><A NAME="10_78_5">Example</A></H3>
+<H3><A NAME="10_81_5">Example</A></H3>
 <PRE>
 #include &lt;cups/http.h&gt;
 #include &lt;cups/ipp.h&gt;
@@ -6644,28 +6838,57 @@ if (status == IPP_DATA)
   ... read additional non-IPP data using httpRead() ...
 }
 </PRE>
-<H3><A NAME="10_78_6">See Also</A></H3>
+<H3><A NAME="10_81_6">See Also</A></H3>
 <A HREF="#ippWrite"><CODE> ippWrite()</CODE></A>
 <!-- NEW PAGE ---->
 
+<H2><A NAME="ippSetPort">ippSetPort()</A></H2>
+<H3><A NAME="10_82_1">Usage</A></H3>
+<PRE>
+void
+ippSetPort(int port);
+</PRE>
+<H3><A NAME="10_82_2">Arguments</A></H3>
+<CENTER>
+<TABLE BORDER WIDTH="80%">
+<TR><TH>Argument</TH><TH>Description</TH></TR>
+<TR><TD>port</TD><TD>The port number to use</TD></TR>
+</TABLE>
+</CENTER>
+<H3><A NAME="10_82_3">Description</A></H3>
+<P>The <CODE>ippSetPort()</CODE> function sets the default IPP port 
+number for requests. </P>
+<H3><A NAME="10_82_4">Example</A></H3>
+<PRE>
+#include &lt;cups/http.h&gt;
+#include &lt;cups/ipp.h&gt;
+
+...
+
+ippSetPort(8631);
+</PRE>
+<H3><A NAME="10_82_5">See Also</A></H3>
+<A HREF="#ippPort"><CODE> ippPort()</CODE></A>
+<!-- NEW PAGE ---->
+
 <H2><A NAME="ippTimeToDate">ippTimeToDate()</A></H2>
-<H3><A NAME="10_79_1">Usage</A></H3>
+<H3><A NAME="10_83_1">Usage</A></H3>
 <PRE>
 ipp_uchar_t *ippTimeToDate(time_t time);
 </PRE>
-<H3><A NAME="10_79_2">Arguments</A></H3>
+<H3><A NAME="10_83_2">Arguments</A></H3>
 <CENTER>
 <TABLE BORDER WIDTH="80%">
 <TR><TH>Argument</TH><TH>Description</TH></TR>
 <TR><TD>time</TD><TD>The UNIX time value</TD></TR>
 </TABLE>
 </CENTER>
-<H3><A NAME="10_79_3">Returns</A></H3>
+<H3><A NAME="10_83_3">Returns</A></H3>
 <P>A static pointer to an IPP date-time value. </P>
-<H3><A NAME="10_79_4">Description</A></H3>
+<H3><A NAME="10_83_4">Description</A></H3>
 <P>The <CODE>ippTimeToDate()</CODE> function converts a UNIX time to an 
 IPP date-time value. </P>
-<H3><A NAME="10_79_5">Example</A></H3>
+<H3><A NAME="10_83_5">Example</A></H3>
 <PRE>
 #include &lt;cups/ipp.h&gt;
 
@@ -6673,16 +6896,16 @@ ipp_uchar_t *date;
 
 date = ippTimeToDate(time(NULL));
 </PRE>
-<H3><A NAME="10_79_6">See Also</A></H3>
+<H3><A NAME="10_83_6">See Also</A></H3>
 <A HREF="#ippDateToTime"><CODE> ippDateToTime()</CODE></A>
 <!-- NEW PAGE ---->
 
 <H2><A NAME="ippWrite">ippWrite()</A></H2>
-<H3><A NAME="10_80_1">Usage</A></H3>
+<H3><A NAME="10_84_1">Usage</A></H3>
 <PRE>
 ipp_state_t ippWrite(http_t *http, ipp_t *ipp);
 </PRE>
-<H3><A NAME="10_80_2">Arguments</A></H3>
+<H3><A NAME="10_84_2">Arguments</A></H3>
 <CENTER>
 <TABLE BORDER WIDTH="80%">
 <TR><TH>Argument</TH><TH>Description</TH></TR>
@@ -6690,14 +6913,14 @@ ipp_state_t ippWrite(http_t *http, ipp_t *ipp);
 <TR><TD>ipp</TD><TD>The IPP request or response</TD></TR>
 </TABLE>
 </CENTER>
-<H3><A NAME="10_80_3">Returns</A></H3>
+<H3><A NAME="10_84_3">Returns</A></H3>
 <P>The current write state. </P>
-<H3><A NAME="10_80_4">Description</A></H3>
+<H3><A NAME="10_84_4">Description</A></H3>
 <P>The <CODE>ippWrite()</CODE> function writes IPP attributes to the 
 specified HTTP connection. Programs should continue calling <CODE>
 ippWrite()</CODE> until <CODE>IPP_ERROR</CODE> or <CODE>IPP_DATA</CODE>
  is returned. </P>
-<H3><A NAME="10_80_5">Example</A></H3>
+<H3><A NAME="10_84_5">Example</A></H3>
 <PRE>
 #include &lt;cups/http.h&gt;
 #include &lt;cups/ipp.h&gt;
@@ -6718,26 +6941,26 @@ if (status == IPP_DATA)
   ... read additional non-IPP data using httpWrite() ...
 }
 </PRE>
-<H3><A NAME="10_80_6">See Also</A></H3>
+<H3><A NAME="10_84_6">See Also</A></H3>
 <A HREF="#ippRead"><CODE> ippRead()</CODE></A>
 <!-- NEW PAGE ---->
 
 <H2><A NAME="ppdClose">ppdClose()</A></H2>
-<H3><A NAME="10_81_1">Usage</A></H3>
+<H3><A NAME="10_85_1">Usage</A></H3>
 <PRE>
 void ppdClose(ppd_file_t *ppd);
 </PRE>
-<H3><A NAME="10_81_2">Arguments</A></H3>
+<H3><A NAME="10_85_2">Arguments</A></H3>
 <CENTER>
 <TABLE BORDER WIDTH="80%">
 <TR><TH>Argument</TH><TH>Description</TH></TR>
 <TR><TD>ppd</TD><TD>The PPD file</TD></TR>
 </TABLE>
 </CENTER>
-<H3><A NAME="10_81_3">Description</A></H3>
+<H3><A NAME="10_85_3">Description</A></H3>
 <P>The <CODE>ppdClose()</CODE> function frees all memory associated 
 with the PPD file. </P>
-<H3><A NAME="10_81_4">Example</A></H3>
+<H3><A NAME="10_85_4">Example</A></H3>
 <PRE>
 #include &lt;cups/ppd.h&gt;
 
@@ -6745,30 +6968,30 @@ ppd_file_t *ppd;
 
 ppdClose(ppd);
 </PRE>
-<H3><A NAME="10_81_5">See Also</A></H3>
+<H3><A NAME="10_85_5">See Also</A></H3>
 <A HREF="#ppdOpen"><CODE> ppdOpen()</CODE></A>, <A HREF="#ppdOpenFd"><CODE>
 ppdOpenFd()</CODE></A>, <A HREF="#ppdOpenFile"><CODE>ppdOpenFile()</CODE>
 </A>
 <!-- NEW PAGE ---->
 
 <H2><A NAME="ppdConflicts">ppdConflicts()</A></H2>
-<H3><A NAME="10_82_1">Usage</A></H3>
+<H3><A NAME="10_86_1">Usage</A></H3>
 <PRE>
 int ppdConflicts(ppd_file_t *ppd);
 </PRE>
-<H3><A NAME="10_82_2">Arguments</A></H3>
+<H3><A NAME="10_86_2">Arguments</A></H3>
 <CENTER>
 <TABLE BORDER WIDTH="80%">
 <TR><TH>Argument</TH><TH>Description</TH></TR>
 <TR><TD>ppd</TD><TD>The PPD file</TD></TR>
 </TABLE>
 </CENTER>
-<H3><A NAME="10_82_3">Returns</A></H3>
+<H3><A NAME="10_86_3">Returns</A></H3>
 <P>The number of option conflicts in the file. </P>
-<H3><A NAME="10_82_4">Description</A></H3>
+<H3><A NAME="10_86_4">Description</A></H3>
 <P>The <CODE>ppdConflicts()</CODE> function returns the number of 
 conflicts with the currently selected options. </P>
-<H3><A NAME="10_82_5">Example</A></H3>
+<H3><A NAME="10_86_5">Example</A></H3>
 <PRE>
 #include &lt;cups/ppd.h&gt;
 
@@ -6776,7 +6999,7 @@ ppd_file_t *ppd;
 
 printf(&quot;%d conflicts\n&quot;, ppdConflicts(ppd));
 </PRE>
-<H3><A NAME="10_82_6">See Also</A></H3>
+<H3><A NAME="10_86_6">See Also</A></H3>
 <A HREF="#cupsMarkOptions"><CODE> cupsMarkOptions()</CODE></A>, <A HREF="#ppdIsMarked">
 <CODE>ppdIsMarked()</CODE></A>, <A HREF="#ppdMarkDefaults"><CODE>
 ppdMarkDefaults()</CODE></A>, <A HREF="#ppdMarkOption"><CODE>
@@ -6784,11 +7007,11 @@ ppdMarkOption()</CODE></A>
 <!-- NEW PAGE ---->
 
 <H2><A NAME="ppdEmit">ppdEmit()</A></H2>
-<H3><A NAME="10_83_1">Usage</A></H3>
+<H3><A NAME="10_87_1">Usage</A></H3>
 <PRE>
 int ppdEmit(ppd_file_t *ppd, FILE *file, ppd_section_t section);
 </PRE>
-<H3><A NAME="10_83_2">Arguments</A></H3>
+<H3><A NAME="10_87_2">Arguments</A></H3>
 <CENTER>
 <TABLE BORDER WIDTH="80%">
 <TR><TH>Argument</TH><TH>Description</TH></TR>
@@ -6797,12 +7020,12 @@ int ppdEmit(ppd_file_t *ppd, FILE *file, ppd_section_t section);
 <TR><TD>section</TD><TD>The option section to write</TD></TR>
 </TABLE>
 </CENTER>
-<H3><A NAME="10_83_3">Returns</A></H3>
+<H3><A NAME="10_87_3">Returns</A></H3>
 <P>0 on success, -1 on error. </P>
-<H3><A NAME="10_83_4">Description</A></H3>
+<H3><A NAME="10_87_4">Description</A></H3>
 <P>The <CODE>ppdEmit()</CODE> function sends printer-specific option 
 commands to the specified file. </P>
-<H3><A NAME="10_83_5">Example</A></H3>
+<H3><A NAME="10_87_5">Example</A></H3>
 <PRE>
 #include &lt;cups/ppd.h&gt;
 
@@ -6810,16 +7033,16 @@ ppd_file_t *ppd;
 
 ppdEmit(ppd, stdout, PPD_ORDER_PAGE);
 </PRE>
-<H3><A NAME="10_83_6">See Also</A></H3>
+<H3><A NAME="10_87_6">See Also</A></H3>
 <A HREF="#ppdEmitFd"><CODE> ppdEmitFd()</CODE></A>
 <!-- NEW PAGE ---->
 
 <H2><A NAME="ppdEmitFd">ppdEmitFd()</A></H2>
-<H3><A NAME="10_84_1">Usage</A></H3>
+<H3><A NAME="10_88_1">Usage</A></H3>
 <PRE>
 int ppdEmitFd(ppd_file_t *ppd, int fd, ppd_section_t section);
 </PRE>
-<H3><A NAME="10_84_2">Arguments</A></H3>
+<H3><A NAME="10_88_2">Arguments</A></H3>
 <CENTER>
 <TABLE BORDER WIDTH="80%">
 <TR><TH>Argument</TH><TH>Description</TH></TR>
@@ -6828,12 +7051,12 @@ int ppdEmitFd(ppd_file_t *ppd, int fd, ppd_section_t section);
 <TR><TD>section</TD><TD>The option section to write</TD></TR>
 </TABLE>
 </CENTER>
-<H3><A NAME="10_84_3">Returns</A></H3>
+<H3><A NAME="10_88_3">Returns</A></H3>
 <P>0 on success, -1 on error. </P>
-<H3><A NAME="10_84_4">Description</A></H3>
+<H3><A NAME="10_88_4">Description</A></H3>
 <P>The <CODE>ppdEmitFd()</CODE> function sends printer-specific option 
 commands to the specified file descriptor. </P>
-<H3><A NAME="10_84_5">Example</A></H3>
+<H3><A NAME="10_88_5">Example</A></H3>
 <PRE>
 #include &lt;cups/ppd.h&gt;
 
@@ -6841,16 +7064,16 @@ ppd_file_t *ppd;
 
 ppdEmitFd(ppd, 1, PPD_ORDER_PAGE);
 </PRE>
-<H3><A NAME="10_84_6">See Also</A></H3>
+<H3><A NAME="10_88_6">See Also</A></H3>
 <A HREF="#ppdEmit"><CODE> ppdEmit()</CODE></A>
 <!-- NEW PAGE ---->
 
 <H2><A NAME="ppdFindChoice">ppdFindChoice()</A></H2>
-<H3><A NAME="10_85_1">Usage</A></H3>
+<H3><A NAME="10_89_1">Usage</A></H3>
 <PRE>
 ppd_choice_t *ppdFindChoice(ppd_option_t *option, const char *choice);
 </PRE>
-<H3><A NAME="10_85_2">Arguments</A></H3>
+<H3><A NAME="10_89_2">Arguments</A></H3>
 <CENTER>
 <TABLE BORDER WIDTH="80%">
 <TR><TH>Argument</TH><TH>Description</TH></TR>
@@ -6858,12 +7081,12 @@ ppd_choice_t *ppdFindChoice(ppd_option_t *option, const char *choice);
 <TR><TD>choice</TD><TD>The name of the choice</TD></TR>
 </TABLE>
 </CENTER>
-<H3><A NAME="10_85_3">Returns</A></H3>
+<H3><A NAME="10_89_3">Returns</A></H3>
 <P>A pointer to the choice data or NULL if the choice does not exist. </P>
-<H3><A NAME="10_85_4">Description</A></H3>
+<H3><A NAME="10_89_4">Description</A></H3>
 <P>The <CODE>ppdFindChoice()</CODE> function returns a pointer to the 
 choice data for the specified option. </P>
-<H3><A NAME="10_85_5">Example</A></H3>
+<H3><A NAME="10_89_5">Example</A></H3>
 <PRE>
 #include &lt;cups/ppd.h&gt;
 
@@ -6874,17 +7097,17 @@ ppd_choice_t *choice;
 option = ppdFindOption(ppd, &quot;PageSize&quot;);
 choice = ppdFindChoice(option, &quot;Letter&quot;);
 </PRE>
-<H3><A NAME="10_85_6">See Also</A></H3>
+<H3><A NAME="10_89_6">See Also</A></H3>
 <A HREF="#ppdFindMarkedChoice"><CODE> ppdFindMarkedChoice()</CODE></A>, <A
 HREF="#ppdFindOption"><CODE>ppdFindOption()</CODE></A>
 <!-- NEW PAGE ---->
 
 <H2><A NAME="ppdFindMarkedChoice">ppdFindMarkedChoice()</A></H2>
-<H3><A NAME="10_86_1">Usage</A></H3>
+<H3><A NAME="10_90_1">Usage</A></H3>
 <PRE>
 ppd_choice_t *ppdFindMarkedChoice(ppd_file_t *ppd, const char *keyword);
 </PRE>
-<H3><A NAME="10_86_2">Arguments</A></H3>
+<H3><A NAME="10_90_2">Arguments</A></H3>
 <CENTER>
 <TABLE BORDER WIDTH="80%">
 <TR><TH>Argument</TH><TH>Description</TH></TR>
@@ -6892,13 +7115,13 @@ ppd_choice_t *ppdFindMarkedChoice(ppd_file_t *ppd, const char *keyword);
 <TR><TD>keyword</TD><TD>The name of the option</TD></TR>
 </TABLE>
 </CENTER>
-<H3><A NAME="10_86_3">Returns</A></H3>
+<H3><A NAME="10_90_3">Returns</A></H3>
 <P>A pointer to the choice data or NULL if the choice does not exist or 
 is not marked. </P>
-<H3><A NAME="10_86_4">Description</A></H3>
+<H3><A NAME="10_90_4">Description</A></H3>
 <P>The <CODE>ppdFindMarkedChoice()</CODE> function returns a pointer to 
 the marked choice data for the specified option. </P>
-<H3><A NAME="10_86_5">Example</A></H3>
+<H3><A NAME="10_90_5">Example</A></H3>
 <PRE>
 #include &lt;cups/ppd.h&gt;
 
@@ -6907,17 +7130,17 @@ ppd_choice_t *choice;
 
 choice = ppdFindMarkedChoice(ppd, &quot;PageSize&quot;);
 </PRE>
-<H3><A NAME="10_86_6">See Also</A></H3>
+<H3><A NAME="10_90_6">See Also</A></H3>
 <A HREF="#ppdFindChoice"><CODE> ppdFindChoice()</CODE></A>, <A HREF="#ppdFindOption">
 <CODE>ppdFindOption()</CODE></A>
 <!-- NEW PAGE ---->
 
 <H2><A NAME="ppdFindOption">ppdFindOption()</A></H2>
-<H3><A NAME="10_87_1">Usage</A></H3>
+<H3><A NAME="10_91_1">Usage</A></H3>
 <PRE>
 ppd_option_t *ppdFindOption(ppd_file_t *ppd, const char *keyword);
 </PRE>
-<H3><A NAME="10_87_2">Arguments</A></H3>
+<H3><A NAME="10_91_2">Arguments</A></H3>
 <CENTER>
 <TABLE BORDER WIDTH="80%">
 <TR><TH>Argument</TH><TH>Description</TH></TR>
@@ -6925,12 +7148,12 @@ ppd_option_t *ppdFindOption(ppd_file_t *ppd, const char *keyword);
 <TR><TD>keyword</TD><TD>The name of the option</TD></TR>
 </TABLE>
 </CENTER>
-<H3><A NAME="10_87_3">Returns</A></H3>
+<H3><A NAME="10_91_3">Returns</A></H3>
 <P>A pointer to the option data or NULL if the option does not exist. </P>
-<H3><A NAME="10_87_4">Description</A></H3>
+<H3><A NAME="10_91_4">Description</A></H3>
 <P>The <CODE>ppdFindOption()</CODE> function returns a pointer to the 
 option data for the specified option. </P>
-<H3><A NAME="10_87_5">Example</A></H3>
+<H3><A NAME="10_91_5">Example</A></H3>
 <PRE>
 #include &lt;cups/ppd.h&gt;
 
@@ -6939,17 +7162,17 @@ ppd_option_t *option;
 
 option = ppdFindOption(ppd, &quot;PageSize&quot;);
 </PRE>
-<H3><A NAME="10_87_6">See Also</A></H3>
+<H3><A NAME="10_91_6">See Also</A></H3>
 <A HREF="#ppdFindChoice"><CODE> ppdFindChoice()</CODE></A>, <A HREF="#ppdFindMarkedChoice">
 <CODE>ppdFindMarkedChoice()</CODE></A>
 <!-- NEW PAGE ---->
 
 <H2><A NAME="ppdIsMarked">ppdIsMarked()</A></H2>
-<H3><A NAME="10_88_1">Usage</A></H3>
+<H3><A NAME="10_92_1">Usage</A></H3>
 <PRE>
 int ppdIsMarked(ppd_file_t *ppd, const char *keyword, char char *choice);
 </PRE>
-<H3><A NAME="10_88_2">Arguments</A></H3>
+<H3><A NAME="10_92_2">Arguments</A></H3>
 <CENTER>
 <TABLE BORDER WIDTH="80%">
 <TR><TH>Argument</TH><TH>Description</TH></TR>
@@ -6958,12 +7181,12 @@ int ppdIsMarked(ppd_file_t *ppd, const char *keyword, char char *choice);
 <TR><TD>choice</TD><TD>The name of the option choice</TD></TR>
 </TABLE>
 </CENTER>
-<H3><A NAME="10_88_3">Returns</A></H3>
+<H3><A NAME="10_92_3">Returns</A></H3>
 <P>1 if the choice is marked, 0 otherwise. </P>
-<H3><A NAME="10_88_4">Description</A></H3>
+<H3><A NAME="10_92_4">Description</A></H3>
 <P>The <CODE>ppdIsMarked()</CODE> function returns whether or not the 
 specified option choice is marked. </P>
-<H3><A NAME="10_88_5">Example</A></H3>
+<H3><A NAME="10_92_5">Example</A></H3>
 <PRE>
 #include &lt;cups/ppd.h&gt;
 
@@ -6972,7 +7195,7 @@ ppd_file_t *ppd;
 printf(&quot;Letter size %s selected.\n&quot;,
        ppdIsMarked(ppd, &quot;PageSize&quot;, &quot;Letter&quot;) ? &quot;is&quot; : &quot;is not&quot;);
 </PRE>
-<H3><A NAME="10_88_6">See Also</A></H3>
+<H3><A NAME="10_92_6">See Also</A></H3>
 <A HREF="#cupsMarkOptions"><CODE> cupsMarkOptions()</CODE></A>, <A HREF="#ppdConflicts">
 <CODE>ppdConflicts()</CODE></A>, <A HREF="#ppdIsMarked"><CODE>
 ppdIsMarked()</CODE></A>, <A HREF="#ppdMarkDefaults"><CODE>
@@ -6981,21 +7204,21 @@ ppdMarkOption()</CODE></A>
 <!-- NEW PAGE ---->
 
 <H2><A NAME="ppdMarkDefaults">ppdMarkDefaults()</A></H2>
-<H3><A NAME="10_89_1">Usage</A></H3>
+<H3><A NAME="10_93_1">Usage</A></H3>
 <PRE>
 void ppdMarkDefaults(ppd_file_t *ppd);
 </PRE>
-<H3><A NAME="10_89_2">Arguments</A></H3>
+<H3><A NAME="10_93_2">Arguments</A></H3>
 <CENTER>
 <TABLE BORDER WIDTH="80%">
 <TR><TH>Argument</TH><TH>Description</TH></TR>
 <TR><TD>ppd</TD><TD>The PPD file</TD></TR>
 </TABLE>
 </CENTER>
-<H3><A NAME="10_89_3">Description</A></H3>
+<H3><A NAME="10_93_3">Description</A></H3>
 <P>The <CODE>ppdMarkDefaults()</CODE> function marks all of the default 
 choices in the PPD file. </P>
-<H3><A NAME="10_89_4">Example</A></H3>
+<H3><A NAME="10_93_4">Example</A></H3>
 <PRE>
 #include &lt;cups/ppd.h&gt;
 
@@ -7003,7 +7226,7 @@ ppd_file_t *ppd;
 
 ppdMarkDefaults(ppd);
 </PRE>
-<H3><A NAME="10_89_5">See Also</A></H3>
+<H3><A NAME="10_93_5">See Also</A></H3>
 <A HREF="#cupsMarkOptions"><CODE> cupsMarkOptions()</CODE></A>, <A HREF="#ppdConflicts">
 <CODE>ppdConflicts()</CODE></A>, <A HREF="#ppdIsMarked"><CODE>
 ppdIsMarked()</CODE></A>, <A HREF="#ppdMarkDefaults"><CODE>
@@ -7012,11 +7235,11 @@ ppdMarkOption()</CODE></A>
 <!-- NEW PAGE ---->
 
 <H2><A NAME="ppdMarkOption">ppdMarkOption()</A></H2>
-<H3><A NAME="10_90_1">Usage</A></H3>
+<H3><A NAME="10_94_1">Usage</A></H3>
 <PRE>
 int ppdMarkOption(ppd_file_t *ppd, const char *keyword, const char *choice);
 </PRE>
-<H3><A NAME="10_90_2">Arguments</A></H3>
+<H3><A NAME="10_94_2">Arguments</A></H3>
 <CENTER>
 <TABLE BORDER WIDTH="80%">
 <TR><TH>Argument</TH><TH>Description</TH></TR>
@@ -7025,12 +7248,12 @@ int ppdMarkOption(ppd_file_t *ppd, const char *keyword, const char *choice);
 <TR><TD>choice</TD><TD>The name of the choice</TD></TR>
 </TABLE>
 </CENTER>
-<H3><A NAME="10_90_3">Returns</A></H3>
+<H3><A NAME="10_94_3">Returns</A></H3>
 <P>The number of conflicts in the PPD file. </P>
-<H3><A NAME="10_90_4">Description</A></H3>
+<H3><A NAME="10_94_4">Description</A></H3>
 <P>The <CODE>ppdMarkOption()</CODE> function marks the specified option 
 choice. </P>
-<H3><A NAME="10_90_5">Example</A></H3>
+<H3><A NAME="10_94_5">Example</A></H3>
 <PRE>
 #include &lt;cups/ppd.h&gt;
 
@@ -7038,7 +7261,7 @@ ppd_file_t *ppd;
 
 ppdMarkOption(ppd, &quot;PageSize&quot;, &quot;Letter&quot;);
 </PRE>
-<H3><A NAME="10_90_6">See Also</A></H3>
+<H3><A NAME="10_94_6">See Also</A></H3>
 <A HREF="#cupsMarkOptions"><CODE> cupsMarkOptions()</CODE></A>, <A HREF="#ppdConflicts">
 <CODE>ppdConflicts()</CODE></A>, <A HREF="#ppdIsMarked"><CODE>
 ppdIsMarked()</CODE></A>, <A HREF="#ppdMarkDefaults"><CODE>
@@ -7047,24 +7270,24 @@ ppdMarkOption()</CODE></A>
 <!-- NEW PAGE ---->
 
 <H2><A NAME="ppdOpen">ppdOpen()</A></H2>
-<H3><A NAME="10_91_1">Usage</A></H3>
+<H3><A NAME="10_95_1">Usage</A></H3>
 <PRE>
 ppd_file_t *ppdOpen(FILE *file);
 </PRE>
-<H3><A NAME="10_91_2">Arguments</A></H3>
+<H3><A NAME="10_95_2">Arguments</A></H3>
 <CENTER>
 <TABLE BORDER WIDTH="80%">
 <TR><TH>Argument</TH><TH>Description</TH></TR>
 <TR><TD>file</TD><TD>The file to read from</TD></TR>
 </TABLE>
 </CENTER>
-<H3><A NAME="10_91_3">Returns</A></H3>
+<H3><A NAME="10_95_3">Returns</A></H3>
 <P>A pointer to a PPD file structure or NULL if the PPD file could not 
 be read. </P>
-<H3><A NAME="10_91_4">Description</A></H3>
+<H3><A NAME="10_95_4">Description</A></H3>
 <P>The <CODE>ppdOpen()</CODE> function reads a PPD file from the 
 specified file into memory. </P>
-<H3><A NAME="10_91_5">Example</A></H3>
+<H3><A NAME="10_95_5">Example</A></H3>
 <PRE>
 #include &lt;cups/ppd.h&gt;
 
@@ -7075,31 +7298,31 @@ file = fopen(&quot;filename.ppd&quot;, &quot;rb&quot;);
 ppd = ppdOpen(file);
 fclose(file);
 </PRE>
-<H3><A NAME="10_91_6">See Also</A></H3>
+<H3><A NAME="10_95_6">See Also</A></H3>
 <A HREF="#ppdClose"><CODE> ppdClose()</CODE></A>, <A HREF="#ppdOpenFd"><CODE>
 ppdOpenFd()</CODE></A>, <A HREF="#ppdOpenFile"><CODE>ppdOpenFile()</CODE>
 </A>
 <!-- NEW PAGE ---->
 
 <H2><A NAME="ppdOpenFd">ppdOpenFd()</A></H2>
-<H3><A NAME="10_92_1">Usage</A></H3>
+<H3><A NAME="10_96_1">Usage</A></H3>
 <PRE>
 ppd_file_t *ppdOpenFd(int fd);
 </PRE>
-<H3><A NAME="10_92_2">Arguments</A></H3>
+<H3><A NAME="10_96_2">Arguments</A></H3>
 <CENTER>
 <TABLE BORDER WIDTH="80%">
 <TR><TH>Argument</TH><TH>Description</TH></TR>
 <TR><TD>fd</TD><TD>The file descriptor to read from</TD></TR>
 </TABLE>
 </CENTER>
-<H3><A NAME="10_92_3">Returns</A></H3>
+<H3><A NAME="10_96_3">Returns</A></H3>
 <P>A pointer to a PPD file structure or NULL if the PPD file could not 
 be read. </P>
-<H3><A NAME="10_92_4">Description</A></H3>
+<H3><A NAME="10_96_4">Description</A></H3>
 <P>The <CODE>ppdOpenFd()</CODE> function reads a PPD file from the 
 specified file descriptor into memory. </P>
-<H3><A NAME="10_92_5">Example</A></H3>
+<H3><A NAME="10_96_5">Example</A></H3>
 <PRE>
 #include &lt;cups/ppd.h&gt;
 
@@ -7110,30 +7333,30 @@ fd = open(&quot;filename.ppd&quot;, O_RDONLY);
 ppd = ppdOpenFd(fd);
 close(fd);
 </PRE>
-<H3><A NAME="10_92_6">See Also</A></H3>
+<H3><A NAME="10_96_6">See Also</A></H3>
 <A HREF="#ppdClose"><CODE> ppdClose()</CODE></A>, <A HREF="#ppdOpen"><CODE>
 ppdOpen()</CODE></A>, <A HREF="#ppdOpenFile"><CODE>ppdOpenFile()</CODE></A>
 <!-- NEW PAGE ---->
 
 <H2><A NAME="ppdOpenFile">ppdOpenFile()</A></H2>
-<H3><A NAME="10_93_1">Usage</A></H3>
+<H3><A NAME="10_97_1">Usage</A></H3>
 <PRE>
 ppd_file_t *ppdOpenFile(const char *filename);
 </PRE>
-<H3><A NAME="10_93_2">Arguments</A></H3>
+<H3><A NAME="10_97_2">Arguments</A></H3>
 <CENTER>
 <TABLE BORDER WIDTH="80%">
 <TR><TH>Argument</TH><TH>Description</TH></TR>
 <TR><TD>filename</TD><TD>The name of the file to read from</TD></TR>
 </TABLE>
 </CENTER>
-<H3><A NAME="10_93_3">Returns</A></H3>
+<H3><A NAME="10_97_3">Returns</A></H3>
 <P>A pointer to a PPD file structure or NULL if the PPD file could not 
 be read. </P>
-<H3><A NAME="10_93_4">Description</A></H3>
+<H3><A NAME="10_97_4">Description</A></H3>
 <P>The <CODE>ppdOpenFile()</CODE> function reads a PPD file from the 
 named file into memory. </P>
-<H3><A NAME="10_93_5">Example</A></H3>
+<H3><A NAME="10_97_5">Example</A></H3>
 <PRE>
 #include &lt;cups/ppd.h&gt;
 
@@ -7141,17 +7364,17 @@ ppd_file_t *ppd;
 
 ppd = ppdOpenFile(&quot;filename.ppd&quot;);
 </PRE>
-<H3><A NAME="10_93_6">See Also</A></H3>
+<H3><A NAME="10_97_6">See Also</A></H3>
 <A HREF="#ppdClose"><CODE> ppdClose()</CODE></A>, <A HREF="#ppdOpen"><CODE>
 ppdOpen()</CODE></A>, <A HREF="#ppdOpenFd"><CODE>ppdOpenFd()</CODE></A>
 <!-- NEW PAGE ---->
 
 <H2><A NAME="ppdPageLength">ppdPageLength()</A></H2>
-<H3><A NAME="10_94_1">Usage</A></H3>
+<H3><A NAME="10_98_1">Usage</A></H3>
 <PRE>
 float ppdPageLength(ppd_file_t *ppd, const char *name);
 </PRE>
-<H3><A NAME="10_94_2">Arguments</A></H3>
+<H3><A NAME="10_98_2">Arguments</A></H3>
 <CENTER>
 <TABLE BORDER WIDTH="80%">
 <TR><TH>Argument</TH><TH>Description</TH></TR>
@@ -7159,13 +7382,13 @@ float ppdPageLength(ppd_file_t *ppd, const char *name);
 <TR><TD>name</TD><TD>The name of the page size</TD></TR>
 </TABLE>
 </CENTER>
-<H3><A NAME="10_94_3">Returns</A></H3>
+<H3><A NAME="10_98_3">Returns</A></H3>
 <P>The length of the specified page size in points or 0 if the page 
 size does not exist. </P>
-<H3><A NAME="10_94_4">Description</A></H3>
+<H3><A NAME="10_98_4">Description</A></H3>
 <P>The <CODE>ppdPageLength()</CODE> function returns the page length of 
 the specified page size. </P>
-<H3><A NAME="10_94_5">Example</A></H3>
+<H3><A NAME="10_98_5">Example</A></H3>
 <PRE>
 #include &lt;cups/ppd.h&gt;
 
@@ -7173,18 +7396,18 @@ ppd_file_t *ppd;
 
 printf(&quot;Length = %.0f\n&quot;, ppdPageLength(ppd, &quot;Letter&quot;));
 </PRE>
-<H3><A NAME="10_94_6">See Also</A></H3>
+<H3><A NAME="10_98_6">See Also</A></H3>
 <A HREF="#ppdPageLength"><CODE> ppdPageLength()</CODE></A>, <A HREF="#ppdPageSize">
 <CODE>ppdPageSize()</CODE></A>, <A HREF="#ppdPageWidth"><CODE>
 ppdPageWidth()</CODE></A>
 <!-- NEW PAGE ---->
 
 <H2><A NAME="ppdPageSize">ppdPageSize()</A></H2>
-<H3><A NAME="10_95_1">Usage</A></H3>
+<H3><A NAME="10_99_1">Usage</A></H3>
 <PRE>
 ppd_size_t *ppdPageSize(ppd_file_t *ppd, const char *name);
 </PRE>
-<H3><A NAME="10_95_2">Arguments</A></H3>
+<H3><A NAME="10_99_2">Arguments</A></H3>
 <CENTER>
 <TABLE BORDER WIDTH="80%">
 <TR><TH>Argument</TH><TH>Description</TH></TR>
@@ -7192,13 +7415,13 @@ ppd_size_t *ppdPageSize(ppd_file_t *ppd, const char *name);
 <TR><TD>name</TD><TD>The name of the page size</TD></TR>
 </TABLE>
 </CENTER>
-<H3><A NAME="10_95_3">Returns</A></H3>
+<H3><A NAME="10_99_3">Returns</A></H3>
 <P>A pointer to the page size record of the specified page size in 
 points or NULL if the page size does not exist. </P>
-<H3><A NAME="10_95_4">Description</A></H3>
+<H3><A NAME="10_99_4">Description</A></H3>
 <P>The <CODE>ppdPageSize()</CODE> function returns the page size record 
 for the specified page size. </P>
-<H3><A NAME="10_95_5">Example</A></H3>
+<H3><A NAME="10_99_5">Example</A></H3>
 <PRE>
 #include &lt;cups/ppd.h&gt;
 
@@ -7216,17 +7439,17 @@ if (size != NULL)
   printf(&quot;   Top = %.0f\n&quot;, size-&gt;top);
 }
 </PRE>
-<H3><A NAME="10_95_6">See Also</A></H3>
+<H3><A NAME="10_99_6">See Also</A></H3>
 <A HREF="#ppdPageLength"><CODE> ppdPageLength()</CODE></A>, <A HREF="#ppdPageWidth">
 <CODE>ppdPageWidth()</CODE></A>
 <!-- NEW PAGE ---->
 
 <H2><A NAME="ppdPageWidth">ppdPageWidth()</A></H2>
-<H3><A NAME="10_96_1">Usage</A></H3>
+<H3><A NAME="10_100_1">Usage</A></H3>
 <PRE>
 float ppdPageWidth(ppd_file_t *ppd, const char *name);
 </PRE>
-<H3><A NAME="10_96_2">Arguments</A></H3>
+<H3><A NAME="10_100_2">Arguments</A></H3>
 <CENTER>
 <TABLE BORDER WIDTH="80%">
 <TR><TH>Argument</TH><TH>Description</TH></TR>
@@ -7234,13 +7457,13 @@ float ppdPageWidth(ppd_file_t *ppd, const char *name);
 <TR><TD>name</TD><TD>The name of the page size</TD></TR>
 </TABLE>
 </CENTER>
-<H3><A NAME="10_96_3">Returns</A></H3>
+<H3><A NAME="10_100_3">Returns</A></H3>
 <P>The width of the specified page size in points or 0 if the page size 
 does not exist. </P>
-<H3><A NAME="10_96_4">Description</A></H3>
+<H3><A NAME="10_100_4">Description</A></H3>
 <P>The <CODE>ppdPageWidth()</CODE> function returns the page width of 
 the specified page size. </P>
-<H3><A NAME="10_96_5">Example</A></H3>
+<H3><A NAME="10_100_5">Example</A></H3>
 <PRE>
 #include &lt;cups/ppd.h&gt;
 
@@ -7248,7 +7471,7 @@ ppd_file_t *ppd;
 
 printf(&quot;Width = %.0f\n&quot;, ppdPageWidth(ppd, &quot;Letter&quot;));
 </PRE>
-<H3><A NAME="10_96_6">See Also</A></H3>
+<H3><A NAME="10_100_6">See Also</A></H3>
 <A HREF="#ppdPageLength"><CODE> ppdPageLength()</CODE></A>, <A HREF="#ppdPageSize">
 <CODE>ppdPageSize()</CODE></A></BODY>
 </HTML>
