@@ -1,9 +1,9 @@
 /*
- * "$Id: jobs.c,v 1.10 1999/11/04 14:57:57 mike Exp $"
+ * "$Id: jobs.c,v 1.11 2000/02/01 02:52:23 mike Exp $"
  *
  *   Job status CGI for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-1999 by Easy Software Products.
+ *   Copyright 1997-2000 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -145,7 +145,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 
   puts("<P>The Common UNIX Printing System, CUPS, and the CUPS logo are the");
   puts("trademark property of <A HREF=\"http://www.easysw.com\">Easy Software");
-  puts("Products</A>. CUPS is copyright 1997-1999 by Easy Software Products,");
+  puts("Products</A>. CUPS is copyright 1997-2000 by Easy Software Products,");
   puts("All Rights Reserved.");
 
   puts("</BODY>");
@@ -580,5 +580,5 @@ show_job_info(http_t      *http,	/* I - Server connection */
 
 
 /*
- * End of "$Id: jobs.c,v 1.10 1999/11/04 14:57:57 mike Exp $".
+ * End of "$Id: jobs.c,v 1.11 2000/02/01 02:52:23 mike Exp $".
  */

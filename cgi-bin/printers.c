@@ -1,9 +1,9 @@
 /*
- * "$Id: printers.c,v 1.13 1999/11/04 14:57:57 mike Exp $"
+ * "$Id: printers.c,v 1.14 2000/02/01 02:52:23 mike Exp $"
  *
  *   Printer status CGI for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-1999 by Easy Software Products.
+ *   Copyright 1997-2000 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -23,31 +23,14 @@
  *
  * Contents:
  *
- *   main()              - Main entry for CGI.
- *   show_printer_list() - Show a list of printers...
- *   show_printer_info() - Show printer information.
+ *   main() - Main entry for CGI.
  */
 
 /*
  * Include necessary headers...
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <ctype.h>
-#include <cups/cups.h>
-#include <cups/language.h>
-#include <cups/debug.h>
-#include <config.h>
-
-
-/*
- * Local functions...
- */
-
-static void	show_printer_list(http_t *http, cups_lang_t *language);
-static void	show_printer_info(http_t *http, cups_lang_t *language,
-		                  char *name);
+#include "ipp-var.h"
 
 
 /*
@@ -61,7 +44,14 @@ main(int  argc,			/* I - Number of command-line arguments */
   cups_lang_t	*language;	/* Language information */
   char		*printer;	/* Printer name */
   http_t	*http;		/* Connection to the server */
+  ipp_t		*request,	/* IPP request */
+		*response;	/* IPP response */
+  ipp_attribute_t *attr;	/* IPP attribute */
+  char		uri[HTTP_MAX_URI];
+				/* Printer URI */
 
+
+  setbuf(stdout, NULL);
 
  /*
   * Get the request language...
@@ -88,81 +78,75 @@ main(int  argc,			/* I - Number of command-line arguments */
 
   printer = argv[0];
   if (strcmp(printer, "/") == 0 || strcmp(printer, "printers.cgi") == 0)
+  {
     printer = NULL;
-
- /*
-  * Print the standard header...
-  */
-
-  puts("<HTML>");
-  puts("<HEAD>");
-  if (printer)
-    puts("<META HTTP-EQUIV=\"Refresh\" CONTENT=\"10\">");
+    cgiSetVariable("TITLE", "Printers");
+  }
   else
-    puts("<META HTTP-EQUIV=\"Refresh\" CONTENT=\"30\">");
-  printf("<TITLE>%s on %s - " CUPS_SVERSION "</TITLE>\n",
-         printer == NULL ? "Printers" : printer, getenv("SERVER_NAME"));
-  puts("<LINK REL=STYLESHEET TYPE=\"text/css\" HREF=\"/cups.css\">");
-  puts("<MAP NAME=\"navbar\">");
-#ifdef ESPPRINTPRO
-  puts("<AREA SHAPE=\"RECT\" COORDS=\"10,10,76,30\" HREF=\"/printers\" ALT=\"Current Printer Status\">");
-  puts("<AREA SHAPE=\"RECT\" COORDS=\"88,10,158,30\" HREF=\"/classes\" ALT=\"Current Printer Classes Status\">");
-  puts("<AREA SHAPE=\"RECT\" COORDS=\"170,10,210,30\" HREF=\"/jobs\" ALT=\"Current Jobs Status\">");
-  puts("<AREA SHAPE=\"RECT\" COORDS=\"222,10,354,30\" HREF=\"/documentation.html\" ALT=\"Read CUPS Documentation On-Line\">");
-  puts("<AREA SHAPE=\"RECT\" COORDS=\"366,10,442,30\" HREF=\"http://www.easysw.com/software.html\" ALT=\"Download the Current ESP Print Pro Software\">");
-  puts("<AREA SHAPE=\"RECT\" COORDS=\"454,10,530,30\" HREF=\"http://www.easysw.com/support.html\" ALT=\"Get Tech Support for Current ESP Print Pro\">");
-#else
-  puts("<AREA SHAPE=\"RECT\" COORDS=\"10,10,85,30\" HREF=\"/printers\" ALT=\"Current Printer Status\">");
-  puts("<AREA SHAPE=\"RECT\" COORDS=\"95,10,175,30\" HREF=\"/classes\" ALT=\"Current Printer Classes Status\">");
-  puts("<AREA SHAPE=\"RECT\" COORDS=\"185,10,235,30\" HREF=\"/jobs\" ALT=\"Current Jobs Status\">");
-  puts("<AREA SHAPE=\"RECT\" COORDS=\"245,10,395,30\" HREF=\"/documentation.html\" ALT=\"Read CUPS Documentation On-Line\">");
-  puts("<AREA SHAPE=\"RECT\" COORDS=\"405,10,490,30\" HREF=\"http://www.cups.org\" ALT=\"Download the Current CUPS Software\">");
-#endif /* ESPPRINTPRO */
-  puts("</MAP>");
-  puts("</HEAD>");
-  puts("<BODY>");
-  puts("<P ALIGN=CENTER>");
-  puts("<A HREF=\"http://www.easysw.com\" ALT=\"Easy Software Products Home Page\">");
-  puts("<IMG SRC=\"/images/logo.gif\" WIDTH=\"71\" HEIGHT=\"40\" BORDER=0 ALT=\"Easy Software Products Home Page\"></A>");
-  puts("<IMG SRC=\"/images/navbar.gif\" WIDTH=\"540\" HEIGHT=\"40\" USEMAP=\"#navbar\" BORDER=0>");
-
-  printf("<H1>%s on %s</H1>\n", printer == NULL ? "Printers" : printer,
-         getenv("SERVER_NAME"));
-  fflush(stdout);
-
-  puts("<CENTER>");
-  puts("<TABLE WIDTH=\"90%\" BORDER=\"1\">");
-  puts("<TR>");
-  puts("<TH>Name</TH>");
-  puts("<TH WIDTH=\"50%\">Status</TH>");
-  puts("<TH WIDTH=\"25%\">Jobs</TH>");
-  puts("</TR>");
+    cgiSetVariable("TITLE", printer);
 
  /*
-  * Show the information...
+  * Get the printer info...
   */
+
+  request = ippNew();
+
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
+               "attributes-charset", NULL, cupsLangEncoding(language));
+
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
+               "attributes-natural-language", NULL, language->language);
 
   if (printer == NULL)
-    show_printer_list(http, language);
+  {
+   /*
+    * Build a CUPS_GET_PRINTERS request, which requires the following
+    * attributes:
+    *
+    *    attributes-charset
+    *    attributes-natural-language
+    */
+
+    request->request.op.operation_id = CUPS_GET_PRINTERS;
+    request->request.op.request_id   = 1;
+  }
   else
-    show_printer_info(http, language, printer);
+  {
+   /*
+    * Build a IPP_GET_PRINTER_ATTRIBUTES request, which requires the following
+    * attributes:
+    *
+    *    attributes-charset
+    *    attributes-natural-language
+    *    printer-uri
+    */
+
+    request->request.op.operation_id = IPP_GET_PRINTER_ATTRIBUTES;
+    request->request.op.request_id   = 1;
+
+    snprintf(uri, sizeof(uri), "ipp://%s/printers/%s", getenv("SERVER_NAME"),
+             printer);
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri", NULL,
+                 uri);
+  }
 
  /*
-  * Write a standard trailer...
+  * Do the request and get back a response...
   */
 
-  puts("</TABLE>");
-  puts("</CENTER>");
+  if ((response = cupsDoRequest(http, request, "/")) != NULL)
+  {
+    ippSetCGIVars(response);
+    ippDelete(response);
+  }
 
-  puts("<HR>");
+ /*
+  * Write the report...
+  */
 
-  puts("<P>The Common UNIX Printing System, CUPS, and the CUPS logo are the");
-  puts("trademark property of <A HREF=\"http://www.easysw.com\">Easy Software");
-  puts("Products</A>. CUPS is copyright 1997-1999 by Easy Software Products,");
-  puts("All Rights Reserved.");
-
-  puts("</BODY>");
-  puts("</HTML>");
+  cgiCopyTemplateFile(stdout, TEMPLATES "/header.tmpl");
+  cgiCopyTemplateFile(stdout, TEMPLATES "/printers.tmpl");
+  cgiCopyTemplateFile(stdout, TEMPLATES "/trailer.tmpl");
 
  /*
   * Close the HTTP server connection...
@@ -180,309 +164,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * 'show_printer_list()' - Show a list of printers...
- */
-
-static void
-show_printer_list(http_t      *http,	/* I - HTTP connection */
-                  cups_lang_t *language)/* I - Client's language */
-{
-  ipp_t		*request,	/* IPP request */
-		*response;	/* IPP response */
-  ipp_attribute_t *attr;	/* IPP attribute */
-
-
- /*
-  * Build a CUPS_GET_PRINTERS request, which requires the following
-  * attributes:
-  *
-  *    attributes-charset
-  *    attributes-natural-language
-  */
-
-  request = ippNew();
-
-  request->request.op.operation_id = CUPS_GET_PRINTERS;
-  request->request.op.request_id   = 1;
-
-
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-               "attributes-charset", NULL, cupsLangEncoding(language));
-
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
-               "attributes-natural-language", NULL, language->language);
-
- /*
-  * Do the request and get back a response...
-  */
-
-  if ((response = cupsDoRequest(http, request, "/")) != NULL)
-  {
-   /*
-    * Loop through the printers returned in the list and display
-    * their devices...
-    */
-
-    for (attr = response->attrs; attr != NULL; attr = attr->next)
-    {
-     /*
-      * Skip leading attributes until we hit a job...
-      */
-
-      while (attr != NULL && attr->group_tag != IPP_TAG_PRINTER)
-        attr = attr->next;
-
-      if (attr == NULL)
-        break;
-
-     /*
-      * Show the printer status for each printer...
-      */
-
-      while (attr != NULL && attr->group_tag == IPP_TAG_PRINTER)
-      {
-        if (strcmp(attr->name, "printer-name") == 0 &&
-	    attr->value_tag == IPP_TAG_NAME)
-	  show_printer_info(http, language, attr->values[0].string.text);
-
-        attr = attr->next;
-      }
-
-      if (attr == NULL)
-        break;
-    }
-
-    ippDelete(response);
-  }
-}
-
-
-/*
- * 'show_printer_info()' - Show printer information.
- */
-
-static void
-show_printer_info(http_t      *http,
-                  cups_lang_t *language,
-                  char        *name)
-{
-  ipp_t		*request,	/* IPP request */
-		*response,	/* IPP response */
-		*jobs;		/* IPP Get Jobs response */
-  int		jobcount;	/* Number of jobs */
-  ipp_attribute_t *attr;	/* IPP attribute */
-  char		*message;	/* Printer state message */
-  int		accepting;	/* Accepting requests? */
-  ipp_pstate_t	pstate;		/* Printer state */
-  char		uri[HTTP_MAX_URI];/* Printer URI */
-
-
- /*
-  * Build a IPP_GET_PRINTER_ATTRIBUTES request, which requires the following
-  * attributes:
-  *
-  *    attributes-charset
-  *    attributes-natural-language
-  *    printer-uri
-  */
-
-  request = ippNew();
-
-  request->request.op.operation_id = IPP_GET_PRINTER_ATTRIBUTES;
-  request->request.op.request_id   = 1;
-
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-               "attributes-charset", NULL, cupsLangEncoding(language));
-
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
-               "attributes-natural-language", NULL, language->language);
-
-  snprintf(uri, sizeof(uri), "ipp://localhost/printers/%s", name);
-
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri", NULL, uri);
-
- /*
-  * Do the request and get back a response...
-  */
-
-  if ((response = cupsDoRequest(http, request, "/")) == NULL)
-  {
-    puts("<P>Unable to communicate with CUPS server!");
-    return;
-  }
-
-  if (response->request.status.status_code == IPP_NOT_FOUND)
-  {
-    puts("<P>Printer does not exist.");
-    ippDelete(response);
-    return;
-  }
-
- /*
-  * Grab the needed printer attributes...
-  */
-
-  if ((attr = ippFindAttribute(response, "printer-state", IPP_TAG_ENUM)) != NULL)
-    pstate = (ipp_pstate_t)attr->values[0].integer;
-  else
-    pstate = IPP_PRINTER_IDLE;
-
-  if ((attr = ippFindAttribute(response, "printer-state-message", IPP_TAG_TEXT)) != NULL)
-    message = attr->values[0].string.text;
-  else
-    message = NULL;
-
-  if ((attr = ippFindAttribute(response, "printer-is-accepting-jobs",
-                               IPP_TAG_BOOLEAN)) != NULL)
-    accepting = attr->values[0].boolean;
-  else
-    accepting = 1;
-
-  if ((attr = ippFindAttribute(response, "printer-uri-supported", IPP_TAG_URI)) != NULL)
-  {
-    strcpy(uri, "http:");
-    strncpy(uri + 5, strchr(attr->values[0].string.text, '/'), sizeof(uri) - 6);
-    uri[sizeof(uri) - 1] = '\0';
-  }
-
- /*
-  * Display the printer entry...
-  */
-
-  puts("<TR>");
-
-  printf("<TD VALIGN=TOP><A HREF=\"%s\">%s</A></TD>\n", uri, name);
-
-  printf("<TD VALIGN=TOP><IMG SRC=\"/images/printer-%s.gif\" ALIGN=\"LEFT\">\n",
-         pstate == IPP_PRINTER_IDLE ? "idle" :
-	     pstate == IPP_PRINTER_PROCESSING ? "processing" : "stopped");
-
-  printf("%s: %s, %s<BR>\n",
-         cupsLangString(language, CUPS_MSG_PRINTER_STATE),
-         cupsLangString(language, pstate == IPP_PRINTER_IDLE ? CUPS_MSG_IDLE :
-	                          pstate == IPP_PRINTER_PROCESSING ?
-				  CUPS_MSG_PROCESSING : CUPS_MSG_STOPPED),
-         cupsLangString(language, accepting ? CUPS_MSG_ACCEPTING_JOBS :
-	                          CUPS_MSG_NOT_ACCEPTING_JOBS));
-
-  if (message)
-    printf("<BR CLEAR=ALL><I>\"%s\"</I>\n", message);
-  else if (!accepting || pstate == IPP_PRINTER_STOPPED)
-    puts("<BR CLEAR=ALL><I>\"Reason Unknown\"</I>");
-
-  puts("</TD>");
-
- /*
-  * Show a list of jobs as needed...
-  */
-
-  if (pstate != IPP_PRINTER_IDLE)
-  {
-   /*
-    * Build an IPP_GET_JOBS request, which requires the following
-    * attributes:
-    *
-    *    attributes-charset
-    *    attributes-natural-language
-    *    printer-uri
-    */
-
-    request = ippNew();
-
-    request->request.op.operation_id = IPP_GET_JOBS;
-    request->request.op.request_id   = 1;
-
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-                 "attributes-charset", NULL,
-		 cupsLangEncoding(language));
-
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
-                 "attributes-natural-language", NULL,
-		 language->language);
-
-    snprintf(uri, sizeof(uri), "ipp://localhost/printers/%s", name);
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI,
-	         "printer-uri", NULL, uri);
-
-    jobs = cupsDoRequest(http, request, "/");
-  }
-  else
-    jobs = NULL;
-
-  puts("<TD VALIGN=\"TOP\">");
-  jobcount = 0;
-
-  if (jobs != NULL)
-  {
-    char	*username;	/* Pointer to job-originating-user-name */
-    int		jobid,		/* job-id */
-		size;		/* job-k-octets */
-
-
-    for (attr = jobs->attrs; attr != NULL; attr = attr->next)
-    {
-     /*
-      * Skip leading attributes until we hit a job...
-      */
-
-      while (attr != NULL && attr->group_tag != IPP_TAG_JOB)
-        attr = attr->next;
-
-      if (attr == NULL)
-        break;
-
-     /*
-      * Pull the needed attributes from this job...
-      */
-
-      jobid    = 0;
-      size     = 0;
-      username = NULL;
-
-      while (attr != NULL && attr->group_tag == IPP_TAG_JOB)
-      {
-        if (strcmp(attr->name, "job-id") == 0 &&
-	    attr->value_tag == IPP_TAG_INTEGER)
-	  jobid = attr->values[0].integer;
-
-        if (strcmp(attr->name, "job-k-octets") == 0 &&
-	    attr->value_tag == IPP_TAG_INTEGER)
-	  size = attr->values[0].integer;
-
-        if (strcmp(attr->name, "job-originating-user-name") == 0 &&
-	    attr->value_tag == IPP_TAG_NAME)
-	  username = attr->values[0].string.text;
-
-        attr = attr->next;
-      }
-
-     /*
-      * Display the job if it matches the current printer...
-      */
-
-      if (username != NULL)
-      {
-	jobcount ++;
-	printf("<A HREF=\"/jobs/%d\">%s-%d %s %dk</A><BR>\n", jobid, name,
-	       jobid, username, size);
-      }
-
-      if (attr == NULL)
-        break;
-    }
-
-    ippDelete(jobs);
-  }
-
-  if (jobcount == 0)
-    puts("None");
-  puts("</TD>");
-  puts("</TR>");
-
-  ippDelete(response);
-}
-
-
-/*
- * End of "$Id: printers.c,v 1.13 1999/11/04 14:57:57 mike Exp $".
+ * End of "$Id: printers.c,v 1.14 2000/02/01 02:52:23 mike Exp $".
  */

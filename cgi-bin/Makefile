@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.7 2000/01/30 13:38:16 mike Exp $"
+# "$Id: Makefile,v 1.8 2000/02/01 02:52:23 mike Exp $"
 #
 #   CGI makefile for the Common UNIX Printing System (CUPS).
 #
@@ -25,7 +25,7 @@
 include ../Makedefs
 
 TARGETS	=	libcgi.a admin.cgi classes.cgi jobs.cgi printers.cgi
-LIBOBJS	=	abort.o email.o html.o template.o var.o
+LIBOBJS	=	abort.o email.o html.o ipp-var.o template.o var.o
 OBJS	=	$(LIBOBJS) admin.o classes.o jobs.o printers.o
 
 
@@ -60,10 +60,11 @@ install:
 libcgi.a:	$(LIBOBJS)
 	echo Archiving $@...
 	$(RM) $@
-	$(AR) $(ARFLAGS) $@ $(OBJS)
+	$(AR) $(ARFLAGS) $@ $(LIBOBJS)
 	$(RANLIB) $@
 
 $(LIBOBJS):	cgi.h
+ipp-var.o:	ipp-var.h
 
 
 #
@@ -74,7 +75,7 @@ admin.cgi:	admin.o ../Makedefs ../cups/$(LIBCUPS) libcgi.a
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ admin.o libcgi.a $(LIBS)
 
-admin.o:	cgi.h ../cups/cups.h ../cups/ipp.h ../cups/language.h
+admin.o:	cgi.h ipp-var.h ../cups/cups.h ../cups/ipp.h ../cups/language.h
 
 
 #
@@ -85,7 +86,7 @@ classes.cgi:	classes.o ../Makedefs ../cups/$(LIBCUPS) libcgi.a
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ classes.o libcgi.a $(LIBS)
 
-classes.o:	cgi.h ../cups/cups.h ../cups/ipp.h ../cups/language.h
+classes.o:	cgi.h ipp-var.h ../cups/cups.h ../cups/ipp.h ../cups/language.h
 
 
 #
@@ -96,7 +97,7 @@ jobs.cgi:	jobs.o ../Makedefs ../cups/$(LIBCUPS) libcgi.a
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ jobs.o libcgi.a $(LIBS)
 
-jobs.o:	cgi.h ../cups/cups.h ../cups/ipp.h ../cups/language.h
+jobs.o:	cgi.h ipp-var.h ../cups/cups.h ../cups/ipp.h ../cups/language.h
 
 
 #
@@ -107,10 +108,10 @@ printers.cgi:	printers.o ../Makedefs ../cups/$(LIBCUPS) libcgi.a
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ printers.o libcgi.a $(LIBS)
 
-printers.o:	cgi.h ../cups/cups.h ../cups/ipp.h ../cups/language.h
+printers.o:	cgi.h ipp-var.h ../cups/cups.h ../cups/ipp.h ../cups/language.h
 
 $(OBJS):	../Makedefs
 
 #
-# End of "$Id: Makefile,v 1.7 2000/01/30 13:38:16 mike Exp $".
+# End of "$Id: Makefile,v 1.8 2000/02/01 02:52:23 mike Exp $".
 #

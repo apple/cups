@@ -6,16 +6,15 @@
 {[printer_name]
 <TR>
 	<TD VALIGN=TOP><A HREF="{printer_uri}">
-	<IMG SRC="../images/printer-{printer_state=3?idle:{printer_state=4?processing:stopped}}.gif" BORDER="0"><BR>{printer_name}</A></TD>
-	<TD VALIGN=TOP>Make and Model: {printer_make_and_model}<BR>
-	Description: {printer_info}<BR>
+	<IMG SRC="../images/classes.gif" BORDER="0"><BR>{printer_name}</A></TD>
+	<TD VALIGN=TOP>Description: {printer_info}<BR>
 	Location: {printer_location}<BR>
-	Printer State: {printer_state=3?idle:{printer_state=4?processing:stopped}},
+	Class State: {printer_state=3?idle:{printer_state=4?processing:stopped}}},
 	{printer_is_accepting_jobs=0?rejecting jobs:accepting jobs}.
 	<P>
 	<IMG SRC="../images/print-test-page.gif" ALT="Print Test Page">
-	<IMG SRC="../images/start-printer.gif" ALT="Start Printer">
-	<IMG SRC="../images/stop-printer.gif" ALT="Stop Printer">
+	<IMG SRC="../images/start-class.gif" ALT="Start Class">
+	<IMG SRC="../images/stop-class.gif" ALT="Stop Class">
 	<IMG SRC="../images/accept-jobs.gif" ALT="Accept Jobs">
 	<IMG SRC="../images/reject-jobs.gif" ALT="Reject Jobs">
 	</TD>
