@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.73.2.21 2003/01/15 04:25:55 mike Exp $"
+ * "$Id: dirsvc.c,v 1.73.2.22 2003/01/24 18:00:54 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -370,10 +370,10 @@ ProcessBrowseData(const char   *uri,	/* I - URI of printer/class */
       next = p->next;
 
      /*
-      * Skip classes...
+      * Skip implicit classes...
       */
 
-      if (p->type & (CUPS_PRINTER_IMPLICIT | CUPS_PRINTER_CLASS))
+      if (p->type & CUPS_PRINTER_IMPLICIT)
       {
         len = 0;
         continue;
@@ -393,7 +393,7 @@ ProcessBrowseData(const char   *uri,	/* I - URI of printer/class */
 	* we have a class, and if this printer is a member...
 	*/
 
-        if ((pclass = FindPrinter(name)) == NULL)
+        if ((pclass = FindDest(name)) == NULL)
 	{
 	 /*
 	  * Need to add the class...
@@ -447,7 +447,7 @@ ProcessBrowseData(const char   *uri,	/* I - URI of printer/class */
 	name[len] = '\0';
 	offset    = 0;
 
-	if ((pclass = FindPrinter(name)) != NULL &&
+	if ((pclass = FindDest(name)) != NULL &&
 	    !(pclass->type & CUPS_PRINTER_IMPLICIT))
 	{
 	 /*
@@ -456,7 +456,7 @@ ProcessBrowseData(const char   *uri,	/* I - URI of printer/class */
 	  * the "ImplicitAnyClasses"...
 	  */
 
-          if (ImplicitAnyClasses)
+          if (ImplicitAnyClasses && len < (sizeof(name) - 4))
 	  {
 	   /*
 	    * Add "Any" to the class name...
@@ -1882,5 +1882,5 @@ UpdateSLPBrowse(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.73.2.21 2003/01/15 04:25:55 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.73.2.22 2003/01/24 18:00:54 mike Exp $".
  */
