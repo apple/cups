@@ -1,5 +1,5 @@
 #
-# "$Id: mime.convs,v 1.12.2.4 2003/01/07 18:26:21 mike Exp $"
+# "$Id: mime.convs,v 1.12.2.5 2003/05/12 17:38:58 mike Exp $"
 #
 #   MIME converts file for the Common UNIX Printing System (CUPS).
 #
@@ -55,6 +55,7 @@ image/gif		application/vnd.cups-postscript	66	imagetops
 image/png		application/vnd.cups-postscript	66	imagetops
 image/jpeg		application/vnd.cups-postscript	66	imagetops
 image/tiff		application/vnd.cups-postscript	66	imagetops
+image/x-bitmap		application/vnd.cups-postscript	66	imagetops
 image/x-photocd		application/vnd.cups-postscript	66	imagetops
 image/x-portable-anymap	application/vnd.cups-postscript	66	imagetops
 image/x-portable-bitmap	application/vnd.cups-postscript	66	imagetops
@@ -63,7 +64,7 @@ image/x-portable-pixmap	application/vnd.cups-postscript	66	imagetops
 image/x-sgi-rgb		application/vnd.cups-postscript	66	imagetops
 image/x-xbitmap		application/vnd.cups-postscript	66	imagetops
 image/x-xpixmap		application/vnd.cups-postscript	66	imagetops
-image/x-xwindowdump	application/vnd.cups-postscript	66	imagetops
+#image/x-xwindowdump	application/vnd.cups-postscript	66	imagetops
 image/x-sun-raster	application/vnd.cups-postscript	66	imagetops
 
 
@@ -86,6 +87,7 @@ image/gif		application/vnd.cups-raster	100	imagetoraster
 image/png		application/vnd.cups-raster	100	imagetoraster
 image/jpeg		application/vnd.cups-raster	100	imagetoraster
 image/tiff		application/vnd.cups-raster	100	imagetoraster
+image/x-bitmap		application/vnd.cups-raster	100	imagetoraster
 image/x-photocd		application/vnd.cups-raster	100	imagetoraster
 image/x-portable-anymap	application/vnd.cups-raster	100	imagetoraster
 image/x-portable-bitmap	application/vnd.cups-raster	100	imagetoraster
@@ -94,7 +96,7 @@ image/x-portable-pixmap	application/vnd.cups-raster	100	imagetoraster
 image/x-sgi-rgb		application/vnd.cups-raster	100	imagetoraster
 image/x-xbitmap		application/vnd.cups-raster	100	imagetoraster
 image/x-xpixmap		application/vnd.cups-raster	100	imagetoraster
-image/x-xwindowdump	application/vnd.cups-raster	100	imagetoraster
+#image/x-xwindowdump	application/vnd.cups-raster	100	imagetoraster
 image/x-sun-raster	application/vnd.cups-raster	100	imagetoraster
 
 # pstoraster is now part of ESP Ghostscript...
@@ -112,5 +114,5 @@ image/x-sun-raster	application/vnd.cups-raster	100	imagetoraster
 #application/octet-stream	application/vnd.cups-raw	0	-
 
 #
-# End of "$Id: mime.convs,v 1.12.2.4 2003/01/07 18:26:21 mike Exp $".
+# End of "$Id: mime.convs,v 1.12.2.5 2003/05/12 17:38:58 mike Exp $".
 #

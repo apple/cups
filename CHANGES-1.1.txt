@@ -3,6 +3,8 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.19rc5
 
+	- The mime.convs file was missing the filter definition
+	  for Windows BMP (image/x-bitmap) files (STR #85)
 	- The scheduler allowed some READ-ONLY job attributes to
 	  be set, which could cause the scheduler to fail on the
 	  next restart (STR #82)
