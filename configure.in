@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: configure.in,v 1.46 2000/07/10 19:14:26 mike Exp $"
+dnl "$Id: configure.in,v 1.47 2000/07/10 20:10:08 mike Exp $"
 dnl
 dnl   Configuration script for the Common UNIX Printing System (CUPS).
 dnl
@@ -192,7 +192,7 @@ AC_CHECK_LIB(jpeg, jpeg_destroy_decompress,
     LIBJPEG="-ljpeg"
     LIBS="$LIBS -ljpeg")
 
-AC_CHECK_LIB(z, deflate,
+AC_CHECK_LIB(z, gzgets,
     AC_DEFINE(HAVE_LIBZ)
     LIBZ="-lz"
     LIBS="$LIBS -lz")
@@ -447,5 +447,5 @@ AC_SUBST(CUPS_DOCROOT)
 AC_OUTPUT(Makedefs cups.sh)
 
 dnl
-dnl End of "$Id: configure.in,v 1.46 2000/07/10 19:14:26 mike Exp $".
+dnl End of "$Id: configure.in,v 1.47 2000/07/10 20:10:08 mike Exp $".
 dnl
