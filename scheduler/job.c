@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.124.2.20 2002/07/02 12:46:39 mike Exp $"
+ * "$Id: job.c,v 1.124.2.21 2002/07/15 23:47:28 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -479,8 +479,14 @@ LoadAllJobs(void)
   * First open the requests directory...
   */
 
+  LogMessage(L_DEBUG, "LoadAllJobs: Scanning %s...", RequestRoot);
+
   if ((dir = opendir(RequestRoot)) == NULL)
+  {
+    LogMessage(L_ERROR, "LoadAllJobs: Unable to open spool directory %s: %s",
+               RequestRoot, strerror(errno));
     return;
+  }
 
  /*
   * Read all the c##### files...
@@ -513,6 +519,9 @@ LoadAllJobs(void)
       */
 
       job->id = atoi(dent->d_name + 1);
+
+      LogMessage(L_DEBUG, "LoadAllJobs: Loading attributes for job %d...\n",
+                 job->id);
 
       if (job->id >= NextJobId)
         NextJobId = job->id + 1;
@@ -669,6 +678,9 @@ LoadAllJobs(void)
 
       jobid  = atoi(dent->d_name + 1);
       fileid = atoi(dent->d_name + 7);
+
+      LogMessage(L_DEBUG, "LoadAllJobs: Auto-typing document file %s...",
+                 dent->d_name);
 
       snprintf(filename, sizeof(filename), "%s/%s", RequestRoot, dent->d_name);
 
@@ -2309,5 +2321,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.124.2.20 2002/07/02 12:46:39 mike Exp $".
+ * End of "$Id: job.c,v 1.124.2.21 2002/07/15 23:47:28 mike Exp $".
  */
