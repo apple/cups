@@ -1,125 +1,114 @@
 iso-8859-1
 OK
-Cancel
-Help
-Quit
-Close
-Yes
-No
-Auto
-On
-Off
-Save
-Discard
-Default
-User-Defined
-Options
-More Info
-Black
-Colour
-Cyan
-Magenta
-Yellow
-Copyright
-All Rights Reserved
-General
-Printer
-PostScript
-Image
-Text
-HPGL
-Extra
-Print Banner Page
-Verbose Logging
-Print Pages
-Document
-Entire Document
-Page Range
-Reverse Order
-Page Format
- 1-Up
- 2-Up
- 4-Up
-Image Scaling
-Use Natural Image Size
-Zoom by Percent
-Zoom by PPI
-Mirror Image
-Rotate Image
-Best Fit
-Colour Saturation
-Colour Hue
-Number of Columns
-Margins
-Wrap Text
-Fit to Page
-Shading
-Default Pen Width
-Gamma Correction
-Brightness
-Colour Profile
-Add Printer
-Delete Printer
-Modify Printer
-Printer URI
-Printer Name
-Printer Location
-Printer Info
-Printer Make and Model
-Device URI
-Formatting Page
-Printing Page
-Initializing Printer
-Printer State
-Accepting Jobs
-Not Accepting Jobs
-Print Jobs
-Class
-Local
-Remote
-Duplexing
-Stapling
-Fast Copies
-Collated Copies
-Hole Punching
-Covering
-Binding
-Sorting
-Small (up to 241x356mm)
-Medium (241x356mm to 330x483mm)
-Large (330x483mm and larger)
-Custom Size
-Idle
-Processing
-Stopped
-All
-Odd
-Even Pages
-Other
-Media Size
-Media Type
-Media Source
-Portrait
-Landscape
-400 Your browser sent a request that this server could not understand.
-This server could not verify that you are authorized to access the resource.
-You must pay to access this server.
-You don't have permission to access the resource on this server.
-The requested resource was not found on this server.
-The requested method is not allowed with the resource.
-An appropriate representation for the resource was not found on this server.
-You don't have permission to use this server as a proxy host.
-The request has taken too long to complete and has been aborted.
-The requested resource has more than one value.
-The requested resource is gone and has not been replaced.
-The requested method requires a valid Content-Length.
-The precondition on the request evaluated to false.
-The request is too large for this server to process.
-The request URI is too large for this server to process.
-The request format is not understood by this server.
-500 The server has detected an unrecoverable error and cannot process your request.
-The requested method is not implemented by this server.
-The proxy server received an invalid response from an upstream server.
-The requested resource is currently unavailable on this server.
-The proxy server has taken too long to respond to this server.
-This server does not support the HTTP version required by your browser.
+Löschen 
+Hilfe 
+Beendet 
+Nah 
+Ja 
+Kein 
+Auf 
+Weg von 
+Außer 
+Ausschuß 
+Rückstellung 
+Optionen 
+Mehr INFO 
+Schwarzes 
+Farbe 
+Cyan-blau 
+Magenta 
+Gelb 
+Copyright 1993-1999 durch Easy Software Products, alle Rechte vorbehalten. 
+General 
+Drucker 
+BildOptionen 
+HP-GL/2 Optionen 
+Extrakosten 
+Dokument 
+Anderes 
+DruckSeiten: 
+Gesamtes Dokument 
+Seitenbereich: 
+RückOrdnung: 
+Seite Format: 
+ 1-Up 
+ 2-Up 
+ 4-Up 
+BildScaling: 
+Natürliche BildGröße Des Gebrauches 
+Zoom durch Percent 
+Zoom durch PPI 
+SpiegelBild: 
+Farbe Sättigung: 
+Farbe Farbe: 
+Passen Sie, um zu paginieren: 
+Schattierend: 
+FederBreite: 
+Gamma Korrektur: 
+Helligkeit: 
+Fügen Sie hinzu 
+Löschung 
+ändern Sie 
+DruckerURI 
+DruckerName 
+DruckerStandort 
+Drucker-cInfo 
+Drucker bilden und formen 
+EinheitURI 
+Formatierung Seite 
+Seite Druckend 
+InitialisierenDrucker 
+DruckerZustand 
+Jobs Annehmend 
+Jobs Nicht, Annehmend 
+Druckjobs 
+Kategorie 
+Lokal 
+Entfernte Station 
+Duplexing 
+Heftend 
+Schnelle Plattenkopierprogramme 
+Gemischte Exemplare 
+Bohrung Lochen 
+Bedeckung 
+Binden 
+Sortierend 
+Klein (bis 9.5x1în) 
+Medium (9.5x1în bis 13x19in) 
+Groß (13x19in und größeres) 
+Kundenspezifische Größe 
+Leerlauf 
+Verarbeitend 
+Gestoppt 
+Alles 
+Ungerade 
+Gleichmäßige Seiten 
+Dunkleres                  Heller
+MediaGröße 
+MediaArt 
+MediaQuelle 
+Lagebestimmung: 
+Portrait 
+Landschaft 
+400 Ihre Datenbanksuchroutine sendete einen Antrag, den dieser Server nicht verstehen könnte. 
+Dieser Server könnte nicht überprüfen, daß Sie autorisiert sind, das Hilfsmittel zuzugreifen. 
+Sie müssen zahlen, diesen Server zuzugreifen. 
+Sie haben nicht Erlaubnis, das Hilfsmittel auf diesem Server zuzugreifen. 
+Das erbetene Hilfsmittel wurde nicht auf diesem Server gefunden. 
+Die erbetene Methode wird nicht mit dem Hilfsmittel erlaubt. 
+Eine passende Darstellung für das Hilfsmittel wurde nicht auf diesem Server gefunden. 
+Sie haben nicht Erlaubnis, diesen Server als Proxyhauptrechner zu benutzen. 
+Der Antrag hat zu lang genommen, um durchzuführen und ist abgebrochen worden. 
+Das erbetene Hilfsmittel hat mehr als einen Wert. 
+Das erbetene Hilfsmittel wird gegangen und ist nicht ersetzt worden. 
+Die erbetene Methode benötigt ein gültiges Content-Length. 
+Die Vorbedingung auf dem Antrag wertete zu falschem aus. 
+Der Antrag ist zu groß, damit dieser Server verarbeitet. 
+Der AntragcUri ist zu groß, damit dieser Server verarbeitet. 
+Das Antragformat wird nicht durch diesen Server verstanden. 
+500 Der Server hat einen unrecoverable Fehler ermittelt und nicht Ihren Antrag verarbeiten kann. 
+Die erbetene Methode wird nicht durch diesen Server eingeführt. 
+Das proxy server empfing eine unzulässige Antwort von einem aufwärts gerichteten Server. 
+Das erbetene Hilfsmittel ist aktuell auf diesem Server nicht erreichbar. 
+Das proxy server hat zu lang genommen, um auf diesen Server zu reagieren. 
+Dieser Server unterstützt nicht die HTTP-Version, die durch Ihre Datenbanksuchroutine angefordert wird. 
