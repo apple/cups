@@ -1,5 +1,5 @@
 /*
- * "$Id: pstops.c,v 1.43 2000/08/21 20:37:51 mike Exp $"
+ * "$Id: pstops.c,v 1.44 2000/10/04 14:47:19 mike Exp $"
  *
  *   PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -788,21 +788,26 @@ start_nup(int number)	/* I - Page number */
     puts("/ESPsave save def");
 
   if (Flip)
-    printf("%.0f 0 translate -1 1 scale\n", PageWidth);
+    printf("%.1f 0.0 translate -1 1 scale\n", PageWidth);
 
   pw = PageRight - PageLeft;
   pl = PageTop - PageBottom;
 
+  fprintf(stderr, "DEBUG: pw = %.1f, pl = %.1f\n", pw, pl);
+  fprintf(stderr, "DEBUG: PageLeft = %.1f, PageRight = %.1f\n", PageLeft, PageRight);
+  fprintf(stderr, "DEBUG: PageTop = %.1f, PageBottom = %.1f\n", PageTop, PageBottom);
+  fprintf(stderr, "DEBUG: PageWidth = %.1f, PageLength = %.1f\n", PageWidth, PageLength);
+
   switch (Orientation)
   {
     case 1 : /* Landscape */
-        printf("%.0f 0 translate 90 rotate\n", PageLength);
+        printf("%.1f 0.0 translate 90 rotate\n", PageLength);
         break;
     case 2 : /* Reverse Portrait */
-        printf("%.0f %.0f translate 180 rotate\n", PageWidth, PageLength);
+        printf("%.1f %.1f translate 180 rotate\n", PageWidth, PageLength);
         break;
     case 3 : /* Reverse Landscape */
-        printf("0 %.0f translate -90 rotate\n", PageWidth);
+        printf("0.0 %.1f translate -90 rotate\n", PageWidth);
         break;
   }
 
@@ -842,28 +847,28 @@ start_nup(int number)	/* I - Page number */
         }
 
         if (Duplex && (number & 2))
-	  printf("%.0f %.0f translate\n", PageWidth - PageRight, PageBottom);
+	  printf("%.1f %.1f translate\n", PageWidth - PageRight, PageBottom);
 	else
-	  printf("%.0f %.0f translate\n", PageLeft, PageBottom);
+	  printf("%.1f %.1f translate\n", PageLeft, PageBottom);
 
         if (Orientation & 1)
 	{
-          printf("0 %.0f translate -90 rotate\n", pl);
-          printf("%.0f %.0f translate %.3f %.3f scale\n",
-                 ty, tx + l * x, w / pw, l / pl);
+          printf("0.0 %.1f translate -90 rotate\n", pl);
+          printf("%.1f %.1f translate %.3f %.3f scale\n",
+                 ty, tx + l * x, w / PageWidth, l / PageLength);
         }
         else
 	{
-          printf("%.0f 0 translate 90 rotate\n", pw);
-          printf("%.0f %.0f translate %.3f %.3f scale\n",
-                 tx + w * x, ty, w / pw, l / pl);
+          printf("%.1f 0.0 translate 90 rotate\n", pw);
+          printf("%.1f %.1f translate %.3f %.3f scale\n",
+                 tx + w * x, ty, w / PageWidth, l / PageLength);
         }
 
 	printf("newpath\n"
-               "0 0 moveto\n"
-               "%.0f 0 lineto\n"
-               "%.0f %.0f lineto\n"
-               "0 %.0f lineto\n"
+               "0.0 0.0 moveto\n"
+               "%.1f 0.0 lineto\n"
+               "%.1f %.1f lineto\n"
+               "0.0 %.1f lineto\n"
                "closepath clip newpath\n",
                PageWidth, PageWidth, PageLength, PageLength);
         break;
@@ -882,17 +887,17 @@ start_nup(int number)	/* I - Page number */
 	}
 
         if (Duplex && (number & 4))
-	  printf("%.0f %.0f translate\n", PageWidth - PageRight, PageBottom);
+	  printf("%.1f %.1f translate\n", PageWidth - PageRight, PageBottom);
 	else
-	  printf("%.0f %.0f translate\n", PageLeft, PageBottom);
+	  printf("%.1f %.1f translate\n", PageLeft, PageBottom);
 
-	printf("%.0f %.0f translate %.3f %.3f scale\n", x * w, y * l,
+	printf("%.1f %.1f translate %.3f %.3f scale\n", x * w, y * l,
 	       w / PageWidth, l / PageLength);
         printf("newpath\n"
-               "0 0 moveto\n"
-               "%.0f 0 lineto\n"
-               "%.0f %.0f lineto\n"
-               "0 %.0f lineto\n"
+               "0.0 0.0 moveto\n"
+               "%.1f 0.0 lineto\n"
+               "%.1f %.1f lineto\n"
+               "0.0 %.1f lineto\n"
                "closepath clip newpath\n",
                PageWidth, PageWidth, PageLength, PageLength);
         break;
@@ -901,5 +906,5 @@ start_nup(int number)	/* I - Page number */
 
 
 /*
- * End of "$Id: pstops.c,v 1.43 2000/08/21 20:37:51 mike Exp $".
+ * End of "$Id: pstops.c,v 1.44 2000/10/04 14:47:19 mike Exp $".
  */
