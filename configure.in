@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: configure.in,v 1.62 2000/12/20 18:46:14 mike Exp $"
+dnl "$Id: configure.in,v 1.63 2000/12/21 13:45:21 mike Exp $"
 dnl
 dnl   Configuration script for the Common UNIX Printing System (CUPS).
 dnl
@@ -196,10 +196,17 @@ SSLLIBS=""
 AC_SUBST(SSLLIBS)
 
 if test "$enable_ssl" = "yes"; then
+	dnl Save the current libraries so the crypto stuff isn't always
+	dnl included...
+	SAVELIBS="$LIBS"
+
+	LIBS="-lcrypto $LIBS"
 	AC_CHECK_LIB(ssl,SSL_new,
 		SSLLIBS="-lssl -lcrypto"
 		AC_DEFINE(HAVE_LIBSSL)
 	)
+
+	LIBS="$SAVELIBS"
 fi
 
 dnl Save the current libraries since we don't want the image libraries
@@ -569,5 +576,5 @@ AC_DEFINE_UNQUOTED(CUPS_FONTPATH, "$fontpath")
 AC_OUTPUT(Makedefs cups.sh)
 
 dnl
-dnl End of "$Id: configure.in,v 1.62 2000/12/20 18:46:14 mike Exp $".
+dnl End of "$Id: configure.in,v 1.63 2000/12/21 13:45:21 mike Exp $".
 dnl

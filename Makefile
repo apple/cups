@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.26 2000/12/11 04:40:31 mike Exp $"
+# "$Id: Makefile,v 1.27 2000/12/21 13:45:21 mike Exp $"
 #
 #   Top-level Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -71,7 +71,7 @@ install:
 	echo Installing in locale...
 	(cd locale; $(MAKE) $(MFLAGS) install)
 	echo Installing in ppd...
-\	(cd ppd; $(MAKE) $(MFLAGS) install)
+	(cd ppd; $(MAKE) $(MFLAGS) install)
 	echo Installing in templates...
 	(cd templates; $(MAKE) $(MFLAGS) install)
 	echo Installing startup script...
@@ -86,6 +86,9 @@ install:
 		$(MKDIR) $(prefix)/$(INITDIR)/rc3.d; \
 		$(RM) $(prefix)/$(INITDIR)/rc3.d/S99cups; \
 		ln -s $(INITDDIR)/cups $(prefix)/$(INITDIR)/rc3.d/S99cups; \
+		$(MKDIR) $(prefix)/$(INITDIR)/rc5.d; \
+		$(RM) $(prefix)/$(INITDIR)/rc5.d/S99cups; \
+		ln -s $(INITDDIR)/cups $(prefix)/$(INITDIR)/rc5.d/S99cups; \
 	fi
 
 #
@@ -120,5 +123,5 @@ tardist:
 	epm $(EPMFLAGS) -f tardist cups
 
 #
-# End of "$Id: Makefile,v 1.26 2000/12/11 04:40:31 mike Exp $".
+# End of "$Id: Makefile,v 1.27 2000/12/21 13:45:21 mike Exp $".
 #

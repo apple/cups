@@ -1,5 +1,5 @@
 /*
- * "$Id: serial.c,v 1.24 2000/12/06 22:56:08 mike Exp $"
+ * "$Id: serial.c,v 1.25 2000/12/21 13:45:21 mike Exp $"
  *
  *   Serial port backend for the Common UNIX Printing System (CUPS).
  *
@@ -484,10 +484,10 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 void
 list_devices(void)
 {
-#if defined(__hpux) || defined(__sgi) || defined(__sun)
+#if defined(__hpux) || defined(__sgi) || defined(__sun) || defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__)
   static char	*funky_hex = "0123456789abcdefghijklmnopqrstuvwxyz";
 				/* Funky hex numbering used for some devices */
-#endif /* __hpux || __sgi || __sun */
+#endif /* __hpux || __sgi || __sun || __FreeBSD__ || __NetBSD__ || __OpenBSD__ */
 
 #ifdef __linux
   int	i;		/* Looping var */
@@ -805,5 +805,5 @@ list_devices(void)
 
 
 /*
- * End of "$Id: serial.c,v 1.24 2000/12/06 22:56:08 mike Exp $".
+ * End of "$Id: serial.c,v 1.25 2000/12/21 13:45:21 mike Exp $".
  */
