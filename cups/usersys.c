@@ -1,5 +1,5 @@
 /*
- * "$Id: usersys.c,v 1.6 2000/06/28 16:40:52 mike Exp $"
+ * "$Id: usersys.c,v 1.7 2000/08/24 16:45:21 mike Exp $"
  *
  *   User, system, and password routines for the Common UNIX Printing
  *   System (CUPS).
@@ -24,9 +24,13 @@
  *
  * Contents:
  *
- *   cupsUser()        - Return the current users name.
- *   cupsGetPassword() - Get a password from the user...
- *   cupsServer()      - Return the hostname of the default server...
+ *   cupsGetPassword()   - Get a password from the user...
+ *   cupsServer()        - Return the hostname of the default server...
+ *   cupsSetPasswordCB() - Set the password callback for CUPS.
+ *   cupsSetServer()     - Set the default server name...
+ *   cupsSetUser()       - Set the default user name...
+ *   cupsUser()          - Return the current users name.
+ *   cups_get_password() - Get a password from the user...
  */
 
 /*
@@ -37,6 +41,168 @@
 #include <config.h>
 #include <stdlib.h>
 #include <ctype.h>
+
+
+/*
+ * Local functions...
+ */
+
+static const char	*cups_get_password(const char *prompt);
+
+
+/*
+ * Local globals...
+ */
+
+static char		cups_user[65] = "",
+			cups_server[256] = "";
+static const char	*(*cups_pwdcb)(const char *) = cups_get_password;
+
+
+/*
+ * 'cupsGetPassword()' - Get a password from the user...
+ */
+
+const char *				/* O - Password */
+cupsGetPassword(const char *prompt)	/* I - Prompt string */
+{
+  return ((*cups_pwdcb)(prompt));
+}
+
+
+/*
+ * 'cupsServer()' - Return the hostname of the default server...
+ */
+
+const char *				/* O - Server name */
+cupsServer(void)
+{
+  FILE		*fp;			/* client.conf file */
+  char		*server;		/* Pointer to server name */
+  const char	*home;			/* Home directory of user */
+  static char	line[1024];		/* Line from file */
+
+
+ /*
+  * First see if we have already set the server name...
+  */
+
+  if (!cups_server[0])
+  {
+   /*
+    * Then see if the CUPS_SERVER environment variable is set...
+    */
+
+    if ((server = getenv("CUPS_SERVER")) == NULL)
+    {
+     /*
+      * Next check to see if we have a $HOME/.cupsrc or client.conf file...
+      */
+
+      if ((home = getenv("HOME")) != NULL)
+      {
+	snprintf(line, sizeof(line), "%s/.cupsrc", home);
+	fp = fopen(line, "r");
+      }
+      else
+	fp = NULL;
+
+      if (fp == NULL)
+      {
+	if ((home = getenv("CUPS_SERVERROOT")) != NULL)
+	{
+	  snprintf(line, sizeof(line), "%s/client.conf", home);
+	  fp = fopen(line, "r");
+	}
+	else
+	  fp = fopen(CUPS_SERVERROOT "/client.conf", "r");
+      }
+
+      server = "localhost";
+
+      if (fp != NULL)
+      {
+       /*
+	* Read the config file and look for a ServerName line...
+	*/
+
+	while (fgets(line, sizeof(line), fp) != NULL)
+	  if (strncmp(line, "ServerName ", 11) == 0)
+	  {
+	   /*
+	    * Got it!  Drop any trailing newline and find the name...
+	    */
+
+	    server = line + strlen(line) - 1;
+	    if (*server == '\n')
+              *server = '\0';
+
+	    for (server = line + 11; isspace(*server); server ++);
+	    break;
+	  }
+
+	fclose(fp);
+      }
+    }
+
+   /*
+    * Copy the server name over...
+    */
+
+    strncpy(cups_server, server, sizeof(cups_server) - 1);
+    cups_server[sizeof(cups_server) - 1] = '\0';
+  }
+
+  return (cups_server);
+}
+
+
+/*
+ * 'cupsSetPasswordCB()' - Set the password callback for CUPS.
+ */
+
+void
+cupsSetPasswordCB(const char *(*cb)(const char *))	/* I - Callback function */
+{
+  if (cb == (const char *(*)(const char *))0)
+    cups_pwdcb = cups_get_password;
+  else
+    cups_pwdcb = cb;
+}
+
+
+/*
+ * 'cupsSetServer()' - Set the default server name...
+ */
+
+void
+cupsSetServer(const char *server)	/* I - Server name */
+{
+  if (server)
+  {
+    strncpy(cups_server, server, sizeof(cups_server) - 1);
+    cups_server[sizeof(cups_server) - 1] = '\0';
+  }
+  else
+    cups_server[0] = '\0';
+}
+
+
+/*
+ * 'cupsSetUser()' - Set the default user name...
+ */
+
+void
+cupsSetUser(const char *user)		/* I - User name */
+{
+  if (user)
+  {
+    strncpy(cups_user, user, sizeof(cups_user) - 1);
+    cups_user[sizeof(cups_user) - 1] = '\0';
+  }
+  else
+    cups_user[0] = '\0';
+}
 
 
 #if defined(WIN32) || defined(__EMX__)
@@ -51,16 +217,19 @@
 const char *				/* O - User name */
 cupsUser(void)
 {
-  return ("WindowsUser");
+  if (!cups_user[0])
+    strcpy(cups_user, "WindowsUser");
+
+  return (cups_user);
 }
 
 
 /*
- * 'cupsGetPassword()' - Get a password from the user...
+ * 'cups_get_password()' - Get a password from the user...
  */
 
-const char *				/* O - Password */
-cupsGetPassword(const char *prompt)	/* I - Prompt string */
+static const char *			/* O - Password */
+cups_get_password(const char *prompt)	/* I - Prompt string */
 {
   return (NULL);
 }
@@ -81,35 +250,43 @@ cupsUser(void)
   struct passwd	*pwd;			/* User/password entry */
 
 
- /*
-  * Rewind the password file...
-  */
+  if (!cups_user[0])
+  {
+   /*
+    * Rewind the password file...
+    */
 
-  setpwent();
+    setpwent();
 
- /*
-  * Lookup the password entry for the current user.
-  */
+   /*
+    * Lookup the password entry for the current user.
+    */
 
-  if ((pwd = getpwuid(getuid())) == NULL)
-    return ("unknown");			/* Unknown user! */
+    if ((pwd = getpwuid(getuid())) == NULL)
+      strcpy(cups_user, "unknown");	/* Unknown user! */
+    else
+    {
+     /*
+      * Rewind the password file again and copy the username...
+      */
 
- /*
-  * Rewind the password file again and return the username...
-  */
+      setpwent();
 
-  setpwent();
+      strncpy(cups_user, pwd->pw_name, sizeof(cups_user) - 1);
+      cups_user[sizeof(cups_user) - 1] = '\0';
+    }
+  }
 
-  return (pwd->pw_name);
+  return (cups_user);
 }
 
 
 /*
- * 'cupsGetPassword()' - Get a password from the user...
+ * 'cups_get_password()' - Get a password from the user...
  */
 
-const char *				/* O - Password */
-cupsGetPassword(const char *prompt)	/* I - Prompt string */
+static const char *			/* O - Password */
+cups_get_password(const char *prompt)	/* I - Prompt string */
 {
   return (getpass(prompt));
 }
@@ -117,85 +294,5 @@ cupsGetPassword(const char *prompt)	/* I - Prompt string */
 
 
 /*
- * 'cupsServer()' - Return the hostname of the default server...
- */
-
-const char *				/* O - Server name */
-cupsServer(void)
-{
-  FILE		*fp;			/* client.conf file */
-  char		*server;		/* Pointer to server name */
-  const char	*home;			/* Home directory of user */
-  static char	line[1024];		/* Line from file */
-
-
- /*
-  * First see if the CUPS_SERVER environment variable is set...
-  */
-
-  if ((server = getenv("CUPS_SERVER")) != NULL)
-    return (server);
-
- /*
-  * Next check to see if we have a $HOME/.cupsrc or client.conf file...
-  */
-
-  if ((home = getenv("HOME")) != NULL)
-  {
-    snprintf(line, sizeof(line), "%s/.cupsrc", home);
-    fp = fopen(line, "r");
-  }
-  else
-    fp = NULL;
-
-  if (fp == NULL)
-  {
-    if ((home = getenv("CUPS_SERVERROOT")) != NULL)
-    {
-      snprintf(line, sizeof(line), "%s/client.conf", home);
-      fp = fopen(line, "r");
-    }
-    else
-      fp = fopen(CUPS_SERVERROOT "/client.conf", "r");
-  }
-
-  if (fp == NULL)
-    return ("localhost");
-
- /*
-  * Read the config file and look for a ServerName line...
-  */
-
-  while (fgets(line, sizeof(line), fp) != NULL)
-    if (strncmp(line, "ServerName ", 11) == 0)
-    {
-     /*
-      * Got it!  Drop any trailing newline and find the name...
-      */
-
-      server = line + strlen(line) - 1;
-      if (*server == '\n')
-        *server = '\0';
-
-      for (server = line + 11; isspace(*server); server ++);
-
-      if (*server)
-      {
-        fclose(fp);
-        return (server);
-      }
-    }
-
- /*
-  * Didn't see a ServerName line, so return "localhost"...
-  */
-
-  fclose(fp);
-
-  return ("localhost");
-}
-
-
-/*
- * End of "$Id: usersys.c,v 1.6 2000/06/28 16:40:52 mike Exp $".
+ * End of "$Id: usersys.c,v 1.7 2000/08/24 16:45:21 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.41 2000/07/10 13:52:55 mike Exp $"
+ * "$Id: ipp.c,v 1.42 2000/08/24 16:45:21 mike Exp $"
  *
  *   Internet Printing Protocol support functions for the Common UNIX
  *   Printing System (CUPS).
@@ -44,6 +44,7 @@
  *   ippNew()            - Allocate a new IPP request.
  *   ippPort()           - Return the default IPP port number.
  *   ippRead()           - Read data for an IPP request.
+ *   ippSetPort()        - Set the default port number.
  *   ippTimeToDate()     - Convert from UNIX time to RFC 1903 format.
  *   ippWrite()          - Write data for an IPP request.
  *   _ipp_add_attr()     - Add a new attribute to the request.
@@ -63,6 +64,13 @@
 #include "ipp.h"
 #include "debug.h"
 #include <ctype.h>
+
+
+/*
+ * Local globals...
+ */
+
+static int	ipp_port = 0;
 
 
 /*
@@ -1577,12 +1585,25 @@ ippPort(void)
   struct servent *port;		/* Port number info */  
 
 
-  if ((server_port = getenv("IPP_PORT")) != NULL)
-    return (atoi(server_port));
+  if (ipp_port)
+    return (ipp_port);
+  else if ((server_port = getenv("IPP_PORT")) != NULL)
+    return (ipp_port = atoi(server_port));
   else if ((port = getservbyname("ipp", NULL)) == NULL)
-    return (IPP_PORT);
+    return (ipp_port = IPP_PORT);
   else
-    return (ntohs(port->s_port));
+    return (ipp_port = ntohs(port->s_port));
+}
+
+
+/*
+ * 'ippSetPort()' - Set the default port number.
+ */
+
+void
+ippSetPort(int p)		/* I - Port number to use */
+{
+  ipp_port = p;
 }
 
 
@@ -1697,5 +1718,5 @@ ipp_read(http_t        *http,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.41 2000/07/10 13:52:55 mike Exp $".
+ * End of "$Id: ipp.c,v 1.42 2000/08/24 16:45:21 mike Exp $".
  */

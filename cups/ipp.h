@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.h,v 1.30 2000/06/08 19:56:38 mike Exp $"
+ * "$Id: ipp.h,v 1.31 2000/08/24 16:45:21 mike Exp $"
  *
  *   Internet Printing Protocol definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -342,6 +342,7 @@ extern ipp_state_t	ippRead(http_t *http, ipp_t *ipp);
 extern const ipp_uchar_t *ippTimeToDate(time_t t);
 extern ipp_state_t	ippWrite(http_t *http, ipp_t *ipp);
 extern int		ippPort(void);
+extern void		ippSetPort(int p);
 
 extern ipp_attribute_t	*_ipp_add_attr(ipp_t *, int);
 extern void		_ipp_free_attr(ipp_attribute_t *);
@@ -357,5 +358,5 @@ extern void		_ipp_free_attr(ipp_attribute_t *);
 #endif /* !_CUPS_IPP_H_ */
 
 /*
- * End of "$Id: ipp.h,v 1.30 2000/06/08 19:56:38 mike Exp $".
+ * End of "$Id: ipp.h,v 1.31 2000/08/24 16:45:21 mike Exp $".
  */
