@@ -1,5 +1,5 @@
 /*
- * "$Id: var.c,v 1.7 1997/09/02 18:46:51 mike Exp $"
+ * "$Id: var.c,v 1.8 1999/07/11 12:56:42 mike Exp $"
  *
  *   CGI form variable functions.
  *
@@ -21,7 +21,10 @@
  * Revision History:
  *
  *   $Log: var.c,v $
- *   Revision 1.7  1997/09/02 18:46:51  mike
+ *   Revision 1.8  1999/07/11 12:56:42  mike
+ *   Checkin for CVS.
+ *
+ *   Revision 1.7  1997/09/02  18:46:51  mike
  *   OK, now we check for errors in the form data.
  *   cgiInitialize() returns 0 if there was no form data or an error occured
  *   and 1 if form data is present.
@@ -377,6 +380,14 @@ cgi_initialize_string(char *data)	/* I - Form data string */
     *s = '\0';		/* nul terminate the string */
 
    /*
+    * Remove trailing whitespace...
+    */
+
+    s --;
+    while (s >= value && *s == ' ')
+      *s-- = '\0';
+
+   /*
     * Add the string to the variable "database"...
     */
 
@@ -483,5 +494,5 @@ cgi_initialize_post(int need_content)	/* I - True if input is required */
 
 
 /*
- * End of "$Id: var.c,v 1.7 1997/09/02 18:46:51 mike Exp $".
+ * End of "$Id: var.c,v 1.8 1999/07/11 12:56:42 mike Exp $".
  */
