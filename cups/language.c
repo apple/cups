@@ -1,5 +1,5 @@
 /*
- * "$Id: language.c,v 1.12 1999/10/10 15:40:23 mike Exp $"
+ * "$Id: language.c,v 1.13 1999/10/12 13:41:20 mike Exp $"
  *
  *   I18N/language support for the Common UNIX Printing System (CUPS).
  *
@@ -146,7 +146,8 @@ cupsLangGet(const char *language) /* I - Language or locale */
   * standard POSIX locale and is copied unchanged.  Otherwise the
   * language string is converted from ll-cc (language-country) to ll_CC
   * to match the file naming convention used by all POSIX-compliant
-  * operating systems.
+  * operating systems.  Any trailing character set specification is
+  * dropped.
   */
 
   if (language == NULL || language[0] == '\0' ||
@@ -154,8 +155,19 @@ cupsLangGet(const char *language) /* I - Language or locale */
     strcpy(langname, "C");
   else
   {
+   /*
+    * Copy the locale string over safely...
+    */
+
     strncpy(langname, language, sizeof(langname) - 1);
     langname[sizeof(langname) - 1] = '\0';
+
+   /*
+    * Strip charset from "locale.charset"...
+    */
+
+    if ((text = strchr(langname, '.')) != NULL)
+      *text = '\0';
   }
 
   if (strlen(langname) < 2)
@@ -374,5 +386,5 @@ cupsLangGet(const char *language) /* I - Language or locale */
 
 
 /*
- * End of "$Id: language.c,v 1.12 1999/10/10 15:40:23 mike Exp $".
+ * End of "$Id: language.c,v 1.13 1999/10/12 13:41:20 mike Exp $".
  */
