@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.83 2003/01/28 21:43:29 mike Exp $"
+ * "$Id: ipp.c,v 1.84 2003/02/11 16:23:53 mike Exp $"
  *
  *   Internet Printing Protocol object functions for the Common UNIX
  *   Printing System (CUPS).
@@ -2004,8 +2004,6 @@ ipp_read(http_t        *http,	/* I - Client connection */
   int		tbytes,		/* Total bytes read */
 		bytes;		/* Bytes read this pass */
   char		len[32];	/* Length string */
-  fd_set	input;		/* Input set for select() */
-  struct timeval timeout;	/* Timeout */
 
 
  /*
@@ -2053,26 +2051,10 @@ ipp_read(http_t        *http,	/* I - Client connection */
     else
     {
      /*
-      * Try doing a select() to poll the socket for data, waiting a
-      * maximum of 1 second...
+      * Wait a maximum of 1 second for data...
       */
 
-      FD_ZERO(&input);
-      FD_SET(http->fd, &input);
-
-      timeout.tv_sec  = 1;
-      timeout.tv_usec = 0;
-
-      if (select(http->fd + 1, &input, NULL, NULL, &timeout) < 1)
-      {
-       /*
-        * Signal no data...
-	*/
-
-        bytes = -1;
-	break;
-      }
-      else if (!FD_ISSET(http->fd, &input))
+      if (!httpWait(http, 1000))
       {
        /*
         * Signal no data...
@@ -2098,5 +2080,5 @@ ipp_read(http_t        *http,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.83 2003/01/28 21:43:29 mike Exp $".
+ * End of "$Id: ipp.c,v 1.84 2003/02/11 16:23:53 mike Exp $".
  */

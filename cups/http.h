@@ -1,5 +1,5 @@
 /*
- * "$Id: http.h,v 1.43 2003/01/10 19:05:49 swdev Exp $"
+ * "$Id: http.h,v 1.44 2003/02/11 16:23:53 mike Exp $"
  *
  *   Hyper-Text Transport Protocol definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -281,6 +281,7 @@ typedef struct
   int			nonce_count;	/* Nonce count */
   void			*tls;		/* TLS state information */
   http_encryption_t	encryption;	/* Encryption requirements */
+  fd_set		*input_set;	/* select() set for httpWait() */
 } http_t;
 
 
@@ -328,6 +329,7 @@ extern void		httpSetField(http_t *http, http_field_t field,
 extern const char	*httpStatus(http_status_t status);
 extern int		httpTrace(http_t *http, const char *uri);
 extern http_status_t	httpUpdate(http_t *http);
+extern int		httpWait(http_t *http, int msec);
 extern int		httpWrite(http_t *http, const char *buffer, int length);
 extern char		*httpEncode64(char *out, const char *in);
 extern char		*httpDecode64(char *out, const char *in);
@@ -349,5 +351,5 @@ extern char		*httpMD5String(const md5_byte_t *, char [33]);
 #endif /* !_CUPS_HTTP_H_ */
 
 /*
- * End of "$Id: http.h,v 1.43 2003/01/10 19:05:49 swdev Exp $".
+ * End of "$Id: http.h,v 1.44 2003/02/11 16:23:53 mike Exp $".
  */
