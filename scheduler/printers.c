@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.47 1999/12/29 02:15:43 mike Exp $"
+ * "$Id: printers.c,v 1.48 2000/01/03 19:02:33 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -55,7 +55,7 @@ static void	write_printcap(void);
  */
 
 printer_t *			/* O - New printer */
-AddPrinter(char *name)		/* I - Name of printer */
+AddPrinter(const char *name)	/* I - Name of printer */
 {
   printer_t	*p,		/* New printer */
 		*current,	/* Current printer in list */
@@ -334,7 +334,7 @@ DeletePrinterFilters(printer_t *p)	/* I - Printer to remove from */
  */
 
 printer_t *			/* O - Printer in list */
-FindPrinter(char *name)		/* I - Name of printer to find */
+FindPrinter(const char *name)	/* I - Name of printer to find */
 {
   printer_t	*p;		/* Current printer */
 
@@ -1239,5 +1239,5 @@ write_printcap(void)
 
 
 /*
- * End of "$Id: printers.c,v 1.47 1999/12/29 02:15:43 mike Exp $".
+ * End of "$Id: printers.c,v 1.48 2000/01/03 19:02:33 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.39 2000/01/03 17:19:49 mike Exp $"
+ * "$Id: ipp.c,v 1.40 2000/01/03 19:02:32 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -41,7 +41,6 @@
  *   send_ipp_error()    - Send an error status back to the IPP client.
  *   start_printer()     - Start a printer.
  *   stop_printer()      - Stop a printer.
- *   validate_dest()     - Validate a printer class destination.
  *   validate_job()      - Validate printer options and destination.
  */
 
@@ -82,7 +81,6 @@ static void	send_ipp_error(client_t *con, ipp_status_t status);
 static void	set_default(client_t *con, ipp_attribute_t *uri);
 static void	start_printer(client_t *con, ipp_attribute_t *uri);
 static void	stop_printer(client_t *con, ipp_attribute_t *uri);
-static char	*validate_dest(char *resource, cups_ptype_t *dtype);
 static void	validate_job(client_t *con, ipp_attribute_t *uri);
 
 
@@ -355,7 +353,7 @@ accept_jobs(client_t        *con,	/* I - Client connection */
 			resource[HTTP_MAX_URI];
 					/* Resource portion of URI */
   int			port;		/* Port portion of URI */
-  char			*name;		/* Printer name */
+  const char		*name;		/* Printer name */
   printer_t		*printer;	/* Printer data */
 
 
@@ -379,7 +377,7 @@ accept_jobs(client_t        *con,	/* I - Client connection */
 
   httpSeparate(uri->values[0].string.text, method, username, host, &port, resource);
 
-  if ((name = validate_dest(resource, &dtype)) == NULL)
+  if ((name = ValidateDest(resource, &dtype)) == NULL)
   {
    /*
     * Bad URI...
@@ -429,7 +427,7 @@ add_class(client_t        *con,		/* I - Client connection */
   int			port;		/* Port portion of URI */
   printer_t		*pclass;	/* Class */
   cups_ptype_t		dtype;		/* Destination type */
-  char			*dest;		/* Printer or class name */
+  const char		*dest;		/* Printer or class name */
   ipp_attribute_t	*attr;		/* Printer attribute */
 
 
@@ -597,7 +595,7 @@ add_class(client_t        *con,		/* I - Client connection */
       httpSeparate(attr->values[i].string.text, method, username, host,
                    &port, resource);
 
-      if ((dest = validate_dest(resource, &dtype)) == NULL)
+      if ((dest = ValidateDest(resource, &dtype)) == NULL)
       {
        /*
 	* Bad URI...
@@ -933,7 +931,7 @@ cancel_all_jobs(client_t        *con,	/* I - Client connection */
 	        ipp_attribute_t *uri)	/* I - Job or Printer URI */
 {
   ipp_attribute_t	*attr;		/* Current attribute */
-  char			*dest;		/* Destination */
+  const char		*dest;		/* Destination */
   cups_ptype_t		dtype;		/* Destination type */
   char			method[HTTP_MAX_URI],
 					/* Method portion of URI */
@@ -979,7 +977,7 @@ cancel_all_jobs(client_t        *con,	/* I - Client connection */
   httpSeparate(uri->values[0].string.text, method, username, host, &port,
                resource);
 
-  if ((dest = validate_dest(resource, &dtype)) == NULL)
+  if ((dest = ValidateDest(resource, &dtype)) == NULL)
   {
    /*
     * Bad URI...
@@ -1298,13 +1296,15 @@ create_job(client_t        *con,	/* I - Client connection */
 	   ipp_attribute_t *uri)	/* I - Printer URI */
 {
   ipp_attribute_t	*attr;		/* Current attribute */
-  char			*dest;		/* Destination */
+  const char		*dest;		/* Destination */
   cups_ptype_t		dtype;		/* Destination type (printer or class) */
   int			priority;	/* Job priority */
   char			*title;		/* Job name/title */
   job_t			*job;		/* Current job */
   char			job_uri[HTTP_MAX_URI],
 					/* Job URI */
+			printer_uri[HTTP_MAX_URI],
+					/* Printer URI */
 			method[HTTP_MAX_URI],
 					/* Method portion of URI */
 			username[HTTP_MAX_URI],
@@ -1338,7 +1338,7 @@ create_job(client_t        *con,	/* I - Client connection */
 
   httpSeparate(uri->values[0].string.text, method, username, host, &port, resource);
 
-  if ((dest = validate_dest(resource, &dtype)) == NULL)
+  if ((dest = ValidateDest(resource, &dtype)) == NULL)
   {
    /*
     * Bad URI...
@@ -1354,9 +1354,18 @@ create_job(client_t        *con,	/* I - Client connection */
   */
 
   if (dtype == CUPS_PRINTER_CLASS)
+  {
     printer = FindClass(dest);
+    sprintf(printer_uri, "http://%s:%d/classes/%s", ServerName,
+	    ntohs(con->http.hostaddr.sin_port), dest);
+  }
   else
+  {
     printer = FindPrinter(dest);
+
+    sprintf(printer_uri, "http://%s:%d/printers/%s", ServerName,
+	    ntohs(con->http.hostaddr.sin_port), dest);
+  }
 
   if (!printer->accepting)
   {
@@ -1373,12 +1382,14 @@ create_job(client_t        *con,	/* I - Client connection */
   if ((attr = ippFindAttribute(con->request, "job-priority", IPP_TAG_INTEGER)) != NULL)
     priority = attr->values[0].integer;
   else
-    priority = 50;
+    ippAddInteger(con->request, IPP_TAG_JOB, IPP_TAG_INTEGER, "job-priority",
+                  priority = 50);
 
   if ((attr = ippFindAttribute(con->request, "job-name", IPP_TAG_NAME)) != NULL)
     title = attr->values[0].string.text;
   else
-    title = "Untitled";
+    ippAddString(con->request, IPP_TAG_JOB, IPP_TAG_NAME, "job-name", NULL,
+                 title = "Untitled");
 
   if ((job = AddJob(priority, printer->name)) == NULL)
   {
@@ -1405,10 +1416,29 @@ create_job(client_t        *con,	/* I - Client connection */
   }
 
   if (job->username[0] == '\0')
-    strcpy(job->username, "guest");
+    strcpy(job->username, "anonymous");
+
+  if (attr == NULL)
+    ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_NAME, "job-originating-user-name",
+                 NULL, job->username);
+  else
+  {
+    free(attr->name);
+    attr->name = strdup("job-originating-user-name");
+  }
 
   LogMessage(LOG_INFO, "Job %d created on \'%s\' by \'%s\'.", job->id,
              job->dest, job->username);
+
+ /*
+  * Add remaining job attributes...
+  */
+
+  ippAddInteger(job->attrs, IPP_TAG_JOB, IPP_TAG_INTEGER, "job-id", job->id);
+  job->state = ippAddInteger(job->attrs, IPP_TAG_JOB, IPP_TAG_ENUM,
+                             "job->state", IPP_JOB_STOPPED);
+  ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_URI, "job-printer-uri", NULL,
+               printer_uri);
 
  /*
   * Fill in the response info...
@@ -1420,7 +1450,8 @@ create_job(client_t        *con,	/* I - Client connection */
 
   ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_INTEGER, "job-id", job->id);
 
-  ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_ENUM, "job-state", job->state);
+  ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_ENUM, "job-state",
+                job->state->values[0].integer);
 
   con->response->request.status.status_code = IPP_OK;
 }
@@ -1434,7 +1465,7 @@ static void
 delete_printer(client_t        *con,	/* I - Client connection */
                ipp_attribute_t *uri)	/* I - URI of printer or class */
 {
-  char			*dest;		/* Destination */
+  const char		*dest;		/* Destination */
   cups_ptype_t		dtype;		/* Destination type (printer or class) */
   char			method[HTTP_MAX_URI],
 					/* Method portion of URI */
@@ -1469,7 +1500,7 @@ delete_printer(client_t        *con,	/* I - Client connection */
 
   httpSeparate(uri->values[0].string.text, method, username, host, &port, resource);
 
-  if ((dest = validate_dest(resource, &dtype)) == NULL)
+  if ((dest = ValidateDest(resource, &dtype)) == NULL)
   {
    /*
     * Bad URI...
@@ -1570,7 +1601,7 @@ get_jobs(client_t        *con,		/* I - Client connection */
 {
   int			i;		/* Looping var */
   ipp_attribute_t	*attr;		/* Current attribute */
-  char			*dest;		/* Destination */
+  const char		*dest;		/* Destination */
   cups_ptype_t		dtype;		/* Destination type (printer or class) */
   char			method[HTTP_MAX_URI],
 					/* Method portion of URI */
@@ -1613,7 +1644,7 @@ get_jobs(client_t        *con,		/* I - Client connection */
     dest  = NULL;
     dtype = CUPS_PRINTER_CLASS;
   }
-  else if ((dest = validate_dest(resource, &dtype)) == NULL)
+  else if ((dest = ValidateDest(resource, &dtype)) == NULL)
   {
    /*
     * Bad URI...
@@ -1683,9 +1714,9 @@ get_jobs(client_t        *con,		/* I - Client connection */
     if (username[0] != '\0' && strcmp(username, job->username) != 0)
       continue;
 
-    if (completed && job->state <= IPP_JOB_STOPPED)
+    if (completed && job->state->values[0].integer <= IPP_JOB_STOPPED)
       continue;
-    if (!completed && job->state > IPP_JOB_STOPPED)
+    if (!completed && job->state->values[0].integer > IPP_JOB_STOPPED)
       continue;
 
     count ++;
@@ -1716,18 +1747,6 @@ get_jobs(client_t        *con,		/* I - Client connection */
     sprintf(job_uri, "http://%s:%d/jobs/%d", ServerName,
 	    ntohs(con->http.hostaddr.sin_port), job->id);
 
-    if (job->dtype == CUPS_PRINTER_CLASS)
-      sprintf(printer_uri, "http://%s:%d/classes/%s", ServerName,
-	      ntohs(con->http.hostaddr.sin_port), job->dest);
-    else
-      sprintf(printer_uri, "http://%s:%d/printers/%s", ServerName,
-	      ntohs(con->http.hostaddr.sin_port), job->dest);
-
-    ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_INTEGER, "job-id", job->id);
-
-    ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_NAME, "job-name",
-                  NULL, job->title);
-
     for (i = 0, jobsize = 0; i < job->num_files; i ++)
     {
       sprintf(filename, "%s/d%05d-%03d", RequestRoot, job->id, i + 1);
@@ -1741,17 +1760,17 @@ get_jobs(client_t        *con,		/* I - Client connection */
     ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_URI,
                  "job-more-info", NULL, job_uri);
 
-    ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_NAME,
-                 "job-originating-user-name", NULL, job->username);
-
-    ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_URI,
-                 "job-printer-uri", NULL, printer_uri);
-
-    ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_ENUM,
-                  "job-state", job->state);
-
     ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_URI,
                  "job-uri", NULL, job_uri);
+
+   /*
+    * Copy the job attributes to the response using the requested-attributes
+    * attribute that may be provided by the client.
+    */
+
+    copy_attrs(con->response, job->attrs,
+               ippFindAttribute(con->request, "requested-attributes",
+	                	IPP_TAG_KEYWORD));
 
     ippAddSeparator(con->response);
   }
@@ -1859,17 +1878,7 @@ get_job_attrs(client_t        *con,		/* I - Client connection */
   sprintf(job_uri, "http://%s:%d/jobs/%d", ServerName,
 	  ntohs(con->http.hostaddr.sin_port), job->id);
 
-  if (job->dtype == CUPS_PRINTER_CLASS)
-    sprintf(printer_uri, "http://%s:%d/classes/%s", ServerName,
-	    ntohs(con->http.hostaddr.sin_port), job->dest);
-  else
-    sprintf(printer_uri, "http://%s:%d/printers/%s", ServerName,
-	    ntohs(con->http.hostaddr.sin_port), job->dest);
-
   ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_INTEGER, "job-id", job->id);
-
-  ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_NAME, "job-name",
-               NULL, job->title);
 
   for (i = 0, jobsize = 0; i < job->num_files; i ++)
   {
@@ -1884,15 +1893,6 @@ get_job_attrs(client_t        *con,		/* I - Client connection */
   ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_URI,
                "job-more-info", NULL, job_uri);
 
-  ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_NAME,
-               "job-originating-user-name", NULL, job->username);
-
-  ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_URI,
-               "job-printer-uri", NULL, printer_uri);
-
-  ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_ENUM,
-                "job-state", job->state);
-
   ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_URI,
                "job-uri", NULL, job_uri);
 
@@ -1905,7 +1905,10 @@ get_job_attrs(client_t        *con,		/* I - Client connection */
              ippFindAttribute(con->request, "requested-attributes",
 	                      IPP_TAG_KEYWORD));
 
-  con->response->request.status.status_code = IPP_OK;
+  if (ippFindAttribute(con->request, "requested-attributes", IPP_TAG_KEYWORD) != NULL)
+    con->response->request.status.status_code = IPP_OK_SUBST;
+  else
+    con->response->request.status.status_code = IPP_OK;
 }
 
 
@@ -2010,7 +2013,7 @@ static void
 get_printer_attrs(client_t        *con,	/* I - Client connection */
 		  ipp_attribute_t *uri)	/* I - Printer URI */
 {
-  char			*dest;		/* Destination */
+  const char		*dest;		/* Destination */
   cups_ptype_t		dtype;		/* Destination type (printer or class) */
   char			method[HTTP_MAX_URI],
 					/* Method portion of URI */
@@ -2033,7 +2036,7 @@ get_printer_attrs(client_t        *con,	/* I - Client connection */
 
   httpSeparate(uri->values[0].string.text, method, username, host, &port, resource);
 
-  if ((dest = validate_dest(resource, &dtype)) == NULL)
+  if ((dest = ValidateDest(resource, &dtype)) == NULL)
   {
    /*
     * Bad URI...
@@ -2247,13 +2250,15 @@ print_job(client_t        *con,		/* I - Client connection */
 {
   ipp_attribute_t	*attr;		/* Current attribute */
   ipp_attribute_t	*format;	/* Document-format attribute */
-  char			*dest;		/* Destination */
+  const char		*dest;		/* Destination */
   cups_ptype_t		dtype;		/* Destination type (printer or class) */
   int			priority;	/* Job priority */
   char			*title;		/* Job name/title */
   job_t			*job;		/* Current job */
   char			job_uri[HTTP_MAX_URI],
 					/* Job URI */
+			printer_uri[HTTP_MAX_URI],
+					/* Printer URI */
 			method[HTTP_MAX_URI],
 					/* Method portion of URI */
 			username[HTTP_MAX_URI],
@@ -2393,7 +2398,7 @@ print_job(client_t        *con,		/* I - Client connection */
 
   httpSeparate(uri->values[0].string.text, method, username, host, &port, resource);
 
-  if ((dest = validate_dest(resource, &dtype)) == NULL)
+  if ((dest = ValidateDest(resource, &dtype)) == NULL)
   {
    /*
     * Bad URI...
@@ -2409,9 +2414,18 @@ print_job(client_t        *con,		/* I - Client connection */
   */
 
   if (dtype == CUPS_PRINTER_CLASS)
+  {
     printer = FindClass(dest);
+    sprintf(printer_uri, "http://%s:%d/classes/%s", ServerName,
+	    ntohs(con->http.hostaddr.sin_port), dest);
+  }
   else
+  {
     printer = FindPrinter(dest);
+
+    sprintf(printer_uri, "http://%s:%d/printers/%s", ServerName,
+	    ntohs(con->http.hostaddr.sin_port), dest);
+  }
 
   if (!printer->accepting)
   {
@@ -2428,12 +2442,14 @@ print_job(client_t        *con,		/* I - Client connection */
   if ((attr = ippFindAttribute(con->request, "job-priority", IPP_TAG_INTEGER)) != NULL)
     priority = attr->values[0].integer;
   else
-    priority = 50;
+    ippAddInteger(con->request, IPP_TAG_JOB, IPP_TAG_INTEGER, "job-priority",
+                  priority = 50);
 
   if ((attr = ippFindAttribute(con->request, "job-name", IPP_TAG_NAME)) != NULL)
     title = attr->values[0].string.text;
   else
-    title = "Untitled";
+    ippAddString(con->request, IPP_TAG_JOB, IPP_TAG_NAME, "job-name", NULL,
+                 title = "Untitled");
 
   if ((job = AddJob(priority, printer->name)) == NULL)
   {
@@ -2443,10 +2459,10 @@ print_job(client_t        *con,		/* I - Client connection */
     return;
   }
 
-  job->dtype    = dtype;
-  job->state    = IPP_JOB_PENDING;
-  job->attrs    = con->request;
-  con->request  = NULL;
+  job->state->values[0].integer = IPP_JOB_PENDING;
+  job->dtype   = dtype;
+  job->attrs   = con->request;
+  con->request = NULL;
 
   if ((job->filetypes = (mime_type_t **)malloc(sizeof(mime_type_t *))) == NULL)
   {
@@ -2477,10 +2493,29 @@ print_job(client_t        *con,		/* I - Client connection */
   }
 
   if (job->username[0] == '\0')
-    strcpy(job->username, "guest");
+    strcpy(job->username, "anonymous");
+
+  if (attr == NULL)
+    ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_NAME, "job-originating-user-name",
+                 NULL, job->username);
+  else
+  {
+    free(attr->name);
+    attr->name = strdup("job-originating-user-name");
+  }
 
   LogMessage(LOG_INFO, "Job %d queued on \'%s\' by \'%s\'.", job->id,
              job->dest, job->username);
+
+ /*
+  * Add remaining job attributes...
+  */
+
+  ippAddInteger(job->attrs, IPP_TAG_JOB, IPP_TAG_INTEGER, "job-id", job->id);
+  job->state = ippAddInteger(job->attrs, IPP_TAG_JOB, IPP_TAG_ENUM,
+                               "job->state", IPP_JOB_STOPPED);
+  ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_URI, "job-printer-uri", NULL,
+               printer_uri);
 
  /*
   * Start the job if possible...
@@ -2498,7 +2533,8 @@ print_job(client_t        *con,		/* I - Client connection */
 
   ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_INTEGER, "job-id", job->id);
 
-  ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_ENUM, "job-state", job->state);
+  ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_ENUM, "job-state",
+                job->state->values[0].integer);
 
   con->response->request.status.status_code = IPP_OK;
 }
@@ -2522,7 +2558,7 @@ reject_jobs(client_t        *con,	/* I - Client connection */
 			resource[HTTP_MAX_URI];
 					/* Resource portion of URI */
   int			port;		/* Port portion of URI */
-  char			*name;		/* Printer name */
+  const char		*name;		/* Printer name */
   printer_t		*printer;	/* Printer data */
   ipp_attribute_t	*attr;		/* printer-state-message text */
 
@@ -2547,7 +2583,7 @@ reject_jobs(client_t        *con,	/* I - Client connection */
 
   httpSeparate(uri->values[0].string.text, method, username, host, &port, resource);
 
-  if ((name = validate_dest(resource, &dtype)) == NULL)
+  if ((name = ValidateDest(resource, &dtype)) == NULL)
   {
    /*
     * Bad URI...
@@ -3040,16 +3076,29 @@ send_document(client_t        *con,	/* I - Client connection */
              job->username);
 
  /*
+  * Start the job if this is the last document...
+  */
+
+  if ((attr = ippFindAttribute(con->request, "last-document", IPP_TAG_BOOLEAN)) != NULL &&
+      attr->values[0].boolean)
+  {
+    job->state->values[0].integer = IPP_JOB_PENDING;
+    CheckJobs();
+  }
+
+ /*
   * Fill in the response info...
   */
 
   sprintf(job_uri, "http://%s:%d/jobs/%d", ServerName,
 	  ntohs(con->http.hostaddr.sin_port), job->id);
-  ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_URI, "job-uri", NULL, job_uri);
+  ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_URI, "job-uri", NULL,
+               job_uri);
 
   ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_INTEGER, "job-id", job->id);
 
-  ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_ENUM, "job-state", job->state);
+  ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_ENUM, "job-state",
+                job->state->values[0].integer);
 
   con->response->request.status.status_code = IPP_OK;
 }
@@ -3091,7 +3140,7 @@ set_default(client_t        *con,	/* I - Client connection */
 			resource[HTTP_MAX_URI];
 					/* Resource portion of URI */
   int			port;		/* Port portion of URI */
-  char			*name;		/* Printer name */
+  const char		*name;		/* Printer name */
 
 
   DEBUG_printf(("set_default(%08x, %08x)\n", con, uri));
@@ -3114,7 +3163,7 @@ set_default(client_t        *con,	/* I - Client connection */
 
   httpSeparate(uri->values[0].string.text, method, username, host, &port, resource);
 
-  if ((name = validate_dest(resource, &dtype)) == NULL)
+  if ((name = ValidateDest(resource, &dtype)) == NULL)
   {
    /*
     * Bad URI...
@@ -3166,7 +3215,7 @@ start_printer(client_t        *con,	/* I - Client connection */
 			resource[HTTP_MAX_URI];
 					/* Resource portion of URI */
   int			port;		/* Port portion of URI */
-  char			*name;		/* Printer name */
+  const char		*name;		/* Printer name */
   printer_t		*printer;	/* Printer data */
 
 
@@ -3190,7 +3239,7 @@ start_printer(client_t        *con,	/* I - Client connection */
 
   httpSeparate(uri->values[0].string.text, method, username, host, &port, resource);
 
-  if ((name = validate_dest(resource, &dtype)) == NULL)
+  if ((name = ValidateDest(resource, &dtype)) == NULL)
   {
    /*
     * Bad URI...
@@ -3252,7 +3301,7 @@ stop_printer(client_t        *con,	/* I - Client connection */
 			resource[HTTP_MAX_URI];
 					/* Resource portion of URI */
   int			port;		/* Port portion of URI */
-  char			*name;		/* Printer name */
+  const char		*name;		/* Printer name */
   printer_t		*printer;	/* Printer data */
   ipp_attribute_t	*attr;		/* printer-state-message attribute */
 
@@ -3277,7 +3326,7 @@ stop_printer(client_t        *con,	/* I - Client connection */
 
   httpSeparate(uri->values[0].string.text, method, username, host, &port, resource);
 
-  if ((name = validate_dest(resource, &dtype)) == NULL)
+  if ((name = ValidateDest(resource, &dtype)) == NULL)
   {
    /*
     * Bad URI...
@@ -3326,50 +3375,6 @@ stop_printer(client_t        *con,	/* I - Client connection */
   */
 
   con->response->request.status.status_code = IPP_OK;
-}
-
-
-/*
- * 'validate_dest()' - Validate a printer class destination.
- */
-
-static char *				/* O - Printer or class name */
-validate_dest(char         *resource,	/* I - Resource name */
-              cups_ptype_t *dtype)	/* O - Type (printer or class) */
-{
-  if (strncmp(resource, "/classes/", 9) == 0)
-  {
-   /*
-    * Print to a class...
-    */
-
-    *dtype = CUPS_PRINTER_CLASS;
-
-    if (FindClass(resource + 9) == NULL)
-      return (NULL);
-    else
-      return (resource + 9);
-  }
-  else if (strncmp(resource, "/printers/", 10) == 0)
-  {
-   /*
-    * Print to a specific printer...
-    */
-
-    *dtype = (cups_ptype_t)0;
-
-    if (FindPrinter(resource + 10) == NULL)
-    {
-      *dtype = CUPS_PRINTER_CLASS;
-
-      if (FindClass(resource + 10) == NULL)
-        return (NULL);
-    }
-
-    return (resource + 10);
-  }
-  else
-    return (NULL);
 }
 
 
@@ -3465,7 +3470,7 @@ validate_job(client_t        *con,	/* I - Client connection */
 
   httpSeparate(uri->values[0].string.text, method, username, host, &port, resource);
 
-  if (validate_dest(resource, &dtype) == NULL)
+  if (ValidateDest(resource, &dtype) == NULL)
   {
    /*
     * Bad URI...
@@ -3485,5 +3490,5 @@ validate_job(client_t        *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.39 2000/01/03 17:19:49 mike Exp $".
+ * End of "$Id: ipp.c,v 1.40 2000/01/03 19:02:32 mike Exp $".
  */

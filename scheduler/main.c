@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c,v 1.31 1999/12/29 02:15:43 mike Exp $"
+ * "$Id: main.c,v 1.32 2000/01/03 19:02:33 mike Exp $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -162,6 +162,19 @@ main(int  argc,			/* I - Number of command-line arguments */
   signal(SIGCLD, sigchld_handler);	/* No, SIGCLD isn't a typo... */
   signal(SIGPIPE, SIG_IGN);
 #endif /* HAVE_SIGSET */
+
+ /*
+  * Read configuration...
+  */
+
+  if (!ReadConfiguration())
+  {
+    fprintf(stderr, "cupsd: Unable to read configuration file \'%s\' - exiting!\n",
+	    ConfigurationFile);
+    exit(1);
+  }
+
+  LoadAllJobs();
 
  /*
   * Loop forever...
@@ -377,7 +390,7 @@ sigchld_handler(int sig)	/* I - Signal number */
     }
 
     for (job = Jobs; job != NULL; job = job->next)
-      if (job->state == IPP_JOB_PROCESSING)
+      if (job->state->values[0].integer == IPP_JOB_PROCESSING)
       {
 	for (i = 0; job->procs[i]; i ++)
           if (job->procs[i] == pid)
@@ -445,5 +458,5 @@ usage(void)
 
 
 /*
- * End of "$Id: main.c,v 1.31 1999/12/29 02:15:43 mike Exp $".
+ * End of "$Id: main.c,v 1.32 2000/01/03 19:02:33 mike Exp $".
  */

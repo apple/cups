@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.45 2000/01/03 17:19:49 mike Exp $"
+ * "$Id: job.c,v 1.46 2000/01/03 19:02:32 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -39,6 +39,7 @@
  *   StopAllJobs()    - Stop all print jobs.
  *   StopJob()        - Stop a print job.
  *   UpdateJob()      - Read a status update from a job's filters.
+ *   ValidateDest()   - Validate a printer/class destination.
  *   ipp_read_file()  - Read an IPP request from a file.
  *   ipp_write_file() - Write an IPP request to a file.
  *   start_process()  - Start a background process.
@@ -49,6 +50,26 @@
  */
 
 #include "cupsd.h"
+
+#if defined(WIN32) || defined(__EMX__)
+#  include <windows.h>
+#elif HAVE_DIRENT_H
+#  include <dirent.h>
+typedef struct dirent DIRENT;
+#  define NAMLEN(dirent) strlen((dirent)->d_name)
+#else
+#  if HAVE_SYS_NDIR_H
+#    include <sys/ndir.h>
+#  endif
+#  if HAVE_SYS_DIR_H
+#    include <sys/dir.h>
+#  endif
+#  if HAVE_NDIR_H
+#    include <ndir.h>
+#  endif
+typedef struct direct DIRENT;
+#  define NAMLEN(dirent) (dirent)->d_namlen
+#endif
 
 
 /*
@@ -79,7 +100,7 @@ AddJob(int        priority,	/* I - Job priority */
   job->id       = NextJobId ++;
   job->priority = priority;
   strncpy(job->dest, dest, sizeof(job->dest) - 1);
-  job->state    = IPP_JOB_HELD;
+  job->state->values[0].integer = IPP_JOB_HELD;
 
   NumJobs ++;
 
@@ -121,10 +142,10 @@ CancelJob(int id)		/* I - Job to cancel */
 
       DEBUG_puts("CancelJob: found job in list.");
 
-      if (current->state == IPP_JOB_PROCESSING)
+      if (current->state->values[0].integer == IPP_JOB_PROCESSING)
       {
 	StopJob(current->id);
-	current->state = IPP_JOB_CANCELLED;
+	current->state->values[0].integer = IPP_JOB_CANCELLED;
       }
 
      /*
@@ -152,6 +173,14 @@ CancelJob(int id)		/* I - Job to cancel */
       }
       else
       {
+       /*
+        * Remove the job info file...
+	*/
+
+	snprintf(filename, sizeof(filename), "%s/c%05d", RequestRoot,
+	         current->id);
+	unlink(filename);
+
        /*
         * Update pointers if we aren't preserving jobs...
         */
@@ -225,13 +254,14 @@ CheckJobs(void)
 
   for (current = Jobs, prev = NULL; current != NULL; prev = current)
   {
-    DEBUG_printf(("CheckJobs: current->state = %d\n", current->state));
+    DEBUG_printf(("CheckJobs: current->state->values[0].integer = %d\n",
+                  current->state->values[0].integer));
 
    /*
     * Start pending jobs if the destination is available...
     */
 
-    if (current->state == IPP_JOB_PENDING)
+    if (current->state->values[0].integer == IPP_JOB_PENDING)
     {
       DEBUG_printf(("CheckJobs: current->dest = \'%s\'\n", current->dest));
 
@@ -309,10 +339,10 @@ HoldJob(int id)			/* I - Job ID */
   if ((job = FindJob(id)) == NULL)
     return;
 
-  if (job->state == IPP_JOB_PROCESSING)
+  if (job->state->values[0].integer == IPP_JOB_PROCESSING)
     StopJob(id);
 
-  job->state = IPP_JOB_HELD;
+  job->state->values[0].integer = IPP_JOB_HELD;
 
   CheckJobs();
 }
@@ -325,16 +355,180 @@ HoldJob(int id)			/* I - Job ID */
 void
 LoadAllJobs(void)
 {
-}
+  DIR		*dir;		/* Directory */
+  DIRENT	*dent;		/* Directory entry */
+  char		filename[1024];	/* Full filename of job file */
+  job_t		*job,		/* New job */
+		*current,	/* Current job */
+		*prev;		/* Previous job */
+  int		jobid,		/* Current job ID */
+		fileid;		/* Current file ID */
+  ipp_attribute_t *attr;	/* Job attribute */
+  char		method[HTTP_MAX_URI],
+				/* Method portion of URI */
+		username[HTTP_MAX_URI],
+				/* Username portion of URI */
+		host[HTTP_MAX_URI],
+				/* Host portion of URI */
+		resource[HTTP_MAX_URI];
+				/* Resource portion of URI */
+  int		port;		/* Port portion of URI */
+  const char	*dest;		/* Destination */
+  mime_type_t	**filetypes;	/* New filetypes array */
 
 
-/*
- * 'LoadJob()' - Load a job from disk.
- */
+ /*
+  * First open the requests directory...
+  */
 
-void
-LoadJob(int id)			/* I - Job ID */
-{
+  if ((dir = opendir(RequestRoot)) == NULL)
+    return;
+
+ /*
+  * Read all the c##### files...
+  */
+
+  while ((dent = readdir(dir)) != NULL)
+    if (NAMLEN(dent) == 6 && dent->d_name[0] == 'c')
+    {
+     /*
+      * Allocate memory for the job...
+      */
+
+      if ((job = calloc(sizeof(job_t), 1)) == NULL)
+      {
+        LogMessage(LOG_ERROR, "LoadAddJobs: Ran out of memory for jobs!");
+	closedir(dir);
+	return;
+      }
+
+      if ((job->attrs = ippNew()) == NULL)
+      {
+        free(job);
+        LogMessage(LOG_ERROR, "LoadAddJobs: Ran out of memory for job attributes!");
+	closedir(dir);
+	return;
+      }
+
+     /*
+      * Assign the job ID...
+      */
+
+      job->id = atoi(dent->d_name + 1);
+
+      if (job->id >= NextJobId)
+        NextJobId = job->id + 1;
+
+     /*
+      * Load the job control file...
+      */
+
+      snprintf(filename, sizeof(filename), "%s/%s", RequestRoot, dent->d_name);
+      if (ipp_read_file(filename, job->attrs) != IPP_DATA)
+      {
+        LogMessage(LOG_ERROR, "LoadAllJobs: Unable to read job control file \"%s\"!",
+	           filename);
+	ippDelete(job->attrs);
+	free(job);
+	continue;
+      }
+
+      attr = ippFindAttribute(job->attrs, "job-printer-uri", IPP_TAG_URI);
+      httpSeparate(attr->values[0].string.text, method, username, host,
+                   &port, resource);
+
+      if ((dest = ValidateDest(resource, &(job->dtype))) == NULL)
+      {
+        LogMessage(LOG_ERROR, "LoadAllJobs: Unable to queue job for destination \"%s\"!",
+	           attr->values[0].string.text);
+	ippDelete(job->attrs);
+	free(job);
+	continue;
+      }
+
+      strncpy(job->dest, dest, sizeof(job->dest) - 1);
+
+      job->state = ippFindAttribute(job->attrs, "job-state", IPP_TAG_ENUM);
+
+      attr = ippFindAttribute(job->attrs, "job-priority", IPP_TAG_INTEGER);
+      job->priority = attr->values[0].integer;
+
+      attr = ippFindAttribute(job->attrs, "job-name", IPP_TAG_NAME);
+      strncpy(job->title, attr->values[0].string.text,
+              sizeof(job->title) - 1);
+
+      attr = ippFindAttribute(job->attrs, "job-originating-user-name", IPP_TAG_NAME);
+      strncpy(job->username, attr->values[0].string.text,
+              sizeof(job->username) - 1);
+
+     /*
+      * Insert the job into the array, sorting by job priority and ID...
+      */
+
+      for (current = Jobs, prev = NULL; current != NULL; prev = current, current = current->next)
+	if (job->priority > current->priority)
+	  break;
+	else if (job->priority == current->priority && job->id < current->id)
+	  break;
+
+      job->next = current;
+      if (prev != NULL)
+	prev->next = job;
+      else
+	Jobs = job;
+    }
+
+ /*
+  * Read all the d##### files...
+  */
+
+  rewinddir(dir);
+
+  while ((dent = readdir(dir)) != NULL)
+    if (NAMLEN(dent) > 7 && dent->d_name[0] == 'd')
+    {
+     /*
+      * Find the job...
+      */
+
+      jobid  = atoi(dent->d_name + 1);
+      fileid = atoi(dent->d_name + 7);
+
+      snprintf(filename, sizeof(filename), "%s/%s", RequestRoot, dent->d_name);
+
+      if ((job = FindJob(jobid)) == NULL)
+      {
+        LogMessage(LOG_ERROR, "LoadAddJobs: Orphaned print file \"%s\"!",
+	           filename);
+	continue;
+      }
+
+      if (fileid > job->num_files)
+      {
+        if (job->num_files == 0)
+	  filetypes = (mime_type_t **)calloc(sizeof(mime_type_t *), fileid);
+	else
+	  filetypes = (mime_type_t **)realloc(job->filetypes,
+	                                    sizeof(mime_type_t *) * fileid);
+
+        if (filetypes == NULL)
+	{
+          LogMessage(LOG_ERROR, "LoadAddJobs: Ran out of memory for job file types!");
+	  continue;
+	}
+
+        job->filetypes = filetypes;
+	job->num_files = fileid;
+      }
+
+      job->filetypes[fileid - 1] = mimeFileType(MimeDatabase, filename);
+    }
+
+ /*
+  * Check to see if we need to start any jobs...
+  */
+
+  CheckJobs();
 }
 
 
@@ -352,8 +546,10 @@ MoveJob(int        id,		/* I - Job ID */
   for (current = Jobs; current != NULL; current = current->next)
     if (current->id == id)
     {
-      if (current->state == IPP_JOB_PENDING)
-        strcpy(current->dest, dest);
+      if (current->state->values[0].integer == IPP_JOB_PENDING)
+        strncpy(current->dest, dest, sizeof(current->dest) - 1);
+
+      SaveJob(current->id);
 
       return;
     }
@@ -373,9 +569,9 @@ RestartJob(int id)		/* I - Job ID */
   if ((job = FindJob(id)) == NULL)
     return;
 
-  if (job->state == IPP_JOB_HELD)
+  if (job->state->values[0].integer == IPP_JOB_HELD)
   {
-    job->state = IPP_JOB_PENDING;
+    job->state->values[0].integer = IPP_JOB_PENDING;
     CheckJobs();
   }
 }
@@ -388,6 +584,15 @@ RestartJob(int id)		/* I - Job ID */
 void
 SaveJob(int id)			/* I - Job ID */
 {
+  job_t	*job;			/* Pointer to job */
+  char	filename[1024];		/* Job control filename */
+
+
+  if ((job = FindJob(id)) == NULL)
+    return;
+
+  snprintf(filename, sizeof(filename), "%s/c%05d", RequestRoot, id);
+  ipp_write_file(filename, job->attrs);
 }
 
 
@@ -445,7 +650,7 @@ StartJob(int       id,		/* I - Job ID */
 
   DEBUG_puts("StartJob: found job in list.");
 
-  current->state   = IPP_JOB_PROCESSING;
+  current->state->values[0].integer = IPP_JOB_PROCESSING;
   current->status  = 0;
   current->printer = printer;
   printer->job     = current;
@@ -613,11 +818,9 @@ StartJob(int       id,		/* I - Job ID */
   * printing interface to be used by CUPS.
   */
 
-  current->current_file ++;
-
   sprintf(jobid, "%d", current->id);
   sprintf(filename, "%s/d%05d-%03d", RequestRoot, current->id,
-          current->current_file);
+          current->current_file + 1);
 
   argv[0] = printer->name;
   argv[1] = jobid;
@@ -690,6 +893,8 @@ StartJob(int       id,		/* I - Job ID */
   DEBUG_puts(envp[11]);
   DEBUG_puts(envp[12]);
   DEBUG_puts(envp[13]);
+
+  current->current_file ++;
 
  /*
   * Now create processes for all of the filters...
@@ -846,6 +1051,17 @@ StartJob(int       id,		/* I - Job ID */
 void
 StopAllJobs(void)
 {
+  job_t	*current;		/* Current job */
+
+
+  DEBUG_puts(("StopAllJobs()\n", id));
+
+  for (current = Jobs; current != NULL; current = current->next)
+    if (current->state->values[0].integer == IPP_JOB_PROCESSING)
+    {
+      StopJob(current->id);
+      current->state->values[0].integer = IPP_JOB_PENDING;
+    }
 }
 
 
@@ -867,7 +1083,7 @@ StopJob(int id)			/* I - Job ID */
     {
       DEBUG_puts("StopJob: found job in list.");
 
-      if (current->state == IPP_JOB_PROCESSING)
+      if (current->state->values[0].integer == IPP_JOB_PROCESSING)
       {
         DEBUG_puts("StopJob: job state is \'processing\'.");
 
@@ -878,9 +1094,11 @@ StopJob(int id)			/* I - Job ID */
 
         DEBUG_printf(("StopJob: printer state is %d\n", current->printer->state));
 
-	current->state        = IPP_JOB_STOPPED;
+	current->state->values[0].integer = IPP_JOB_STOPPED;
         current->printer->job = NULL;
         current->printer      = NULL;
+
+	current->current_file --;
 
         for (i = 0; current->procs[i]; i ++)
 	  if (current->procs[i] > 0)
@@ -1017,8 +1235,7 @@ UpdateJob(job_t *job)		/* I - Job to check */
       */
 
       StopJob(job->id);
-      job->state = IPP_JOB_PENDING;
-      job->current_file --;
+      job->state->values[0].integer = IPP_JOB_PENDING;
     }
     else if (job->status > 0)
     {
@@ -1033,7 +1250,7 @@ UpdateJob(job_t *job)		/* I - Job to check */
         CancelJob(job->id);
 
         if (JobHistory)
-          job->state = IPP_JOB_ABORTED;
+          job->state->values[0].integer = IPP_JOB_ABORTED;
 
         CheckJobs();
       }
@@ -1051,12 +1268,56 @@ UpdateJob(job_t *job)		/* I - Job to check */
 	CancelJob(job->id);
 
 	if (JobHistory)
-          job->state = IPP_JOB_COMPLETED;
+          job->state->values[0].integer = IPP_JOB_COMPLETED;
 
 	CheckJobs();
       }
     }
   }
+}
+
+
+/*
+ * 'ValidateDest()' - Validate a printer/class destination.
+ */
+
+const char *				/* O - Printer or class name */
+ValidateDest(const char   *resource,	/* I - Resource name */
+             cups_ptype_t *dtype)	/* O - Type (printer or class) */
+{
+  if (strncmp(resource, "/classes/", 9) == 0)
+  {
+   /*
+    * Print to a class...
+    */
+
+    *dtype = CUPS_PRINTER_CLASS;
+
+    if (FindClass(resource + 9) == NULL)
+      return (NULL);
+    else
+      return (resource + 9);
+  }
+  else if (strncmp(resource, "/printers/", 10) == 0)
+  {
+   /*
+    * Print to a specific printer...
+    */
+
+    *dtype = (cups_ptype_t)0;
+
+    if (FindPrinter(resource + 10) == NULL)
+    {
+      *dtype = CUPS_PRINTER_CLASS;
+
+      if (FindClass(resource + 10) == NULL)
+        return (NULL);
+    }
+
+    return (resource + 10);
+  }
+  else
+    return (NULL);
 }
 
 
@@ -1838,5 +2099,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.45 2000/01/03 17:19:49 mike Exp $".
+ * End of "$Id: job.c,v 1.46 2000/01/03 19:02:32 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: classes.c,v 1.12 1999/09/22 18:08:40 mike Exp $"
+ * "$Id: classes.c,v 1.13 2000/01/03 19:02:32 mike Exp $"
  *
  *   Printer class routines for the Common UNIX Printing System (CUPS).
  *
@@ -46,7 +46,7 @@
  */
 
 printer_t *			/* O - New class */
-AddClass(char *name)		/* I - Name of class */
+AddClass(const char *name)	/* I - Name of class */
 {
   printer_t	*c;		/* New class */
 
@@ -223,7 +223,7 @@ DeleteAllClasses(void)
  */
 
 printer_t *				/* O - Available printer or NULL */
-FindAvailablePrinter(char *name)	/* I - Class to check */
+FindAvailablePrinter(const char *name)	/* I - Class to check */
 {
   int		i;			/* Looping var */
   printer_t	*c;			/* Printer class */
@@ -254,10 +254,10 @@ FindAvailablePrinter(char *name)	/* I - Class to check */
  * 'FindClass()' - Find the named class.
  */
 
-printer_t *		/* O - Matching class or NULL */
-FindClass(char *name)	/* I - Name of class */
+printer_t *			/* O - Matching class or NULL */
+FindClass(const char *name)	/* I - Name of class */
 {
-  printer_t	*c;	/* Current class/printer */
+  printer_t	*c;		/* Current class/printer */
 
 
   for (c = Printers; c != NULL; c = c->next)
@@ -540,5 +540,5 @@ SaveAllClasses(void)
 
 
 /*
- * End of "$Id: classes.c,v 1.12 1999/09/22 18:08:40 mike Exp $".
+ * End of "$Id: classes.c,v 1.13 2000/01/03 19:02:32 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.37 2000/01/03 17:19:49 mike Exp $"
+ * "$Id: conf.c,v 1.38 2000/01/03 19:02:32 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -118,7 +118,7 @@ static int	get_address(char *value, unsigned defaddress, int defport,
  * 'ReadConfiguration()' - Read the cupsd.conf file.
  */
 
-int			/* O - 1 if file read successfully, 0 otherwise */
+int				/* O - 1 if file read successfully, 0 otherwise */
 ReadConfiguration(void)
 {
   FILE		*fp;		/* Configuration file */
@@ -158,6 +158,13 @@ ReadConfiguration(void)
     fclose(ErrorFile);
 
     ErrorFile = NULL;
+  }
+
+  if (PageFile != NULL)
+  {
+    fclose(PageFile);
+
+    PageFile = NULL;
   }
 
  /*
@@ -347,7 +354,6 @@ ReadConfiguration(void)
 
   LoadAllPrinters();
   LoadAllClasses();
-  LoadAllJobs();
 
  /*
   * Add a default browser if browsing is enabled and no browser addresses
@@ -972,5 +978,5 @@ get_address(char               *value,		/* I - Value string */
 
 
 /*
- * End of "$Id: conf.c,v 1.37 2000/01/03 17:19:49 mike Exp $".
+ * End of "$Id: conf.c,v 1.38 2000/01/03 19:02:32 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: classes.h,v 1.7 1999/06/18 18:36:44 mike Exp $"
+ * "$Id: classes.h,v 1.8 2000/01/03 19:02:32 mike Exp $"
  *
  *   Printer class definitions for the Common UNIX Printing System (CUPS).
  *
@@ -27,17 +27,17 @@
  * Prototypes...
  */
 
-extern printer_t	*AddClass(char *name);
+extern printer_t	*AddClass(const char *name);
 extern void		AddPrinterToClass(printer_t *c, printer_t *p);
 extern void		DeletePrinterFromClass(printer_t *c, printer_t *p);
 extern void		DeletePrinterFromClasses(printer_t *p);
 extern void		DeleteAllClasses(void);
-extern printer_t	*FindAvailablePrinter(char *name);
-extern printer_t	*FindClass(char *name);
+extern printer_t	*FindAvailablePrinter(const char *name);
+extern printer_t	*FindClass(const char *name);
 extern void		LoadAllClasses(void);
 extern void		SaveAllClasses(void);
 
 
 /*
- * End of "$Id: classes.h,v 1.7 1999/06/18 18:36:44 mike Exp $".
+ * End of "$Id: classes.h,v 1.8 2000/01/03 19:02:32 mike Exp $".
  */
