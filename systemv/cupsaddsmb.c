@@ -1,5 +1,5 @@
 /*
- * "$Id: cupsaddsmb.c,v 1.3.2.12 2003/01/07 18:27:29 mike Exp $"
+ * "$Id: cupsaddsmb.c,v 1.3.2.13 2003/10/29 16:53:36 mike Exp $"
  *
  *   "cupsaddsmb" command for the Common UNIX Printing System (CUPS).
  *
@@ -235,7 +235,9 @@ export_dest(const char *dest)		/* I - Destination to export */
   static const char	*pattrs[] =	/* Printer attributes we want */
 			{
 			  "job-sheets-supported",
-			  "job-sheets-default"
+			  "job-sheets-default",
+			  "job-hold-until-supported",
+			  "job-hold-until-default"
 			};
 
 
@@ -340,6 +342,20 @@ export_dest(const char *dest)		/* I - Destination to export */
     fputs("\"\n", fp);
   }
 
+  if ((attr = ippFindAttribute(response, "job-hold-until-supported",
+                               IPP_TAG_KEYWORD)) != NULL)
+  {
+    fprintf(fp, "*cupsJobHoldUntilSupported: \"%s", attr->values[0].string.text);
+
+    for (i = 1; i < attr->num_values; i ++)
+      fprintf(fp, ",%s", attr->values[i].string.text);
+
+    fputs("\"\n", fp);
+  }
+
+  if ((attr = ippFindAttribute(response, "job-hold-until-default", IPP_TAG_KEYWORD)) != NULL)
+    fprintf(fp, "*cupsJobHoldUntilDefault: \"%s\"\n", attr->values[0].string.text);
+
   fclose(fp);
 
   ippDelete(response);
@@ -347,15 +363,15 @@ export_dest(const char *dest)		/* I - Destination to export */
   httpClose(http);
 
  /*
-  * See which drivers are available - the new CUPS drivers or the
-  * Adobe drivers?
+  * See which drivers are available - old CUPS, new CUPS, old Adobe, or
+  * new Adobe?
   */
 
-  snprintf(command, sizeof(command), "%s/drivers/cupsdrvr.dll", datadir);
+  snprintf(command, sizeof(command), "%s/drivers/cupsdrv5.dll", datadir);
   if (access(command, 0) == 0)
   {
    /*
-    * Do the smbclient commands needed for the CUPS WinNT drivers...
+    * Do the smbclient commands needed for the new CUPS WinNT drivers...
     */
 
     snprintf(command, sizeof(command), "smbclient //%s/print\\$", SAMBAServer);
@@ -363,9 +379,9 @@ export_dest(const char *dest)		/* I - Destination to export */
     snprintf(subcmd, sizeof(subcmd),
              "mkdir W32X86;"
 	     "put %s W32X86/%s.ppd;"
-	     "put %s/drivers/cupsdrvr.dll W32X86/cupsdrvr.dll;"
-	     "put %s/drivers/cupsui.dll W32X86/cupsui.dll;"
-	     "put %s/drivers/cups.hlp W32X86/cups.hlp",
+	     "put %s/drivers/cupsdrvr5.dll W32X86/cupsdrv5.dll;"
+	     "put %s/drivers/cupsui5.dll W32X86/cupsui5.dll;"
+	     "put %s/drivers/cups5.hlp W32X86/cups5.hlp",
 	     ppdfile, dest, datadir, datadir, datadir);
 
     if ((status = do_samba_command(command, subcmd)) != 0)
@@ -381,7 +397,7 @@ export_dest(const char *dest)		/* I - Destination to export */
     */
 
     snprintf(subcmd, sizeof(subcmd),
-             "adddriver \"Windows NT x86\" \"%s:cupsdrvr.dll:%s.ppd:cupsui.dll:cups.hlp:NULL:RAW:NULL\"",
+             "adddriver \"Windows NT x86\" \"%s:cupsdrv5.dll:%s.ppd:cupsui5.dll:cups5.hlp:NULL:RAW:NULL\"",
 	     dest, dest);
 
     snprintf(command, sizeof(command), "rpcclient %s", SAMBAServer);
@@ -396,44 +412,90 @@ export_dest(const char *dest)		/* I - Destination to export */
   }
   else
   {
-   /*
-    * Do the smbclient commands needed for the Adobe WinNT drivers...
-    */
-
-    snprintf(command, sizeof(command), "smbclient //%s/print\\$", SAMBAServer);
-
-    snprintf(subcmd, sizeof(subcmd),
-             "mkdir W32X86;"
-	     "put %s W32X86/%s.PPD;"
-	     "put %s/drivers/ADOBEPS5.DLL W32X86/ADOBEPS5.DLL;"
-	     "put %s/drivers/ADOBEPSU.DLL W32X86/ADOBEPSU.DLL;"
-	     "put %s/drivers/ADOBEPSU.HLP W32X86/ADOBEPSU.HLP",
-	     ppdfile, dest, datadir, datadir, datadir);
-
-    if ((status = do_samba_command(command, subcmd)) != 0)
+    snprintf(command, sizeof(command), "%s/drivers/cupsdrvr.dll", datadir);
+    if (access(command, 0) == 0)
     {
-      fprintf(stderr, "ERROR: Unable to copy Windows printer driver files (%d)!\n",
-              status);
-      unlink(ppdfile);
-      return (4);
+     /*
+      * Do the smbclient commands needed for the old CUPS WinNT drivers...
+      */
+
+      snprintf(command, sizeof(command), "smbclient //%s/print\\$", SAMBAServer);
+
+      snprintf(subcmd, sizeof(subcmd),
+               "mkdir W32X86;"
+	       "put %s W32X86/%s.ppd;"
+	       "put %s/drivers/cupsdrvr.dll W32X86/cupsdrvr.dll;"
+	       "put %s/drivers/cupsui.dll W32X86/cupsui.dll;"
+	       "put %s/drivers/cups.hlp W32X86/cups.hlp",
+	       ppdfile, dest, datadir, datadir, datadir);
+
+      if ((status = do_samba_command(command, subcmd)) != 0)
+      {
+	fprintf(stderr, "ERROR: Unable to copy Windows printer driver files (%d)!\n",
+        	status);
+	unlink(ppdfile);
+	return (4);
+      }
+
+     /*
+      * Do the rpcclient commands needed for the CUPS WinNT drivers...
+      */
+
+      snprintf(subcmd, sizeof(subcmd),
+               "adddriver \"Windows NT x86\" \"%s:cupsdrvr.dll:%s.ppd:cupsui.dll:cups.hlp:NULL:RAW:NULL\"",
+	       dest, dest);
+
+      snprintf(command, sizeof(command), "rpcclient %s", SAMBAServer);
+
+      if ((status = do_samba_command(command, subcmd)) != 0)
+      {
+	fprintf(stderr, "ERROR: Unable to install Windows printer driver files (%d)!\n",
+        	status);
+	unlink(ppdfile);
+	return (5);
+      }
     }
-
-   /*
-    * Do the rpcclient commands needed for the Adobe WinNT drivers...
-    */
-
-    snprintf(subcmd, sizeof(subcmd),
-             "adddriver \"Windows NT x86\" \"%s:ADOBEPS5.DLL:%s.PPD:ADOBEPSU.DLL:ADOBEPSU.HLP:NULL:RAW:NULL\"",
-	     dest, dest);
-
-    snprintf(command, sizeof(command), "rpcclient %s", SAMBAServer);
-
-    if ((status = do_samba_command(command, subcmd)) != 0)
+    else
     {
-      fprintf(stderr, "ERROR: Unable to install Windows printer driver files (%d)!\n",
-              status);
-      unlink(ppdfile);
-      return (5);
+     /*
+      * Do the smbclient commands needed for the old Adobe WinNT drivers...
+      */
+
+      snprintf(command, sizeof(command), "smbclient //%s/print\\$", SAMBAServer);
+
+      snprintf(subcmd, sizeof(subcmd),
+               "mkdir W32X86;"
+	       "put %s W32X86/%s.PPD;"
+	       "put %s/drivers/ADOBEPS5.DLL W32X86/ADOBEPS5.DLL;"
+	       "put %s/drivers/ADOBEPSU.DLL W32X86/ADOBEPSU.DLL;"
+	       "put %s/drivers/ADOBEPSU.HLP W32X86/ADOBEPSU.HLP",
+	       ppdfile, dest, datadir, datadir, datadir);
+
+      if ((status = do_samba_command(command, subcmd)) != 0)
+      {
+	fprintf(stderr, "ERROR: Unable to copy Windows printer driver files (%d)!\n",
+        	status);
+	unlink(ppdfile);
+	return (4);
+      }
+
+     /*
+      * Do the rpcclient commands needed for the Adobe WinNT drivers...
+      */
+
+      snprintf(subcmd, sizeof(subcmd),
+               "adddriver \"Windows NT x86\" \"%s:ADOBEPS5.DLL:%s.PPD:ADOBEPSU.DLL:ADOBEPSU.HLP:NULL:RAW:NULL\"",
+	       dest, dest);
+
+      snprintf(command, sizeof(command), "rpcclient %s", SAMBAServer);
+
+      if ((status = do_samba_command(command, subcmd)) != 0)
+      {
+	fprintf(stderr, "ERROR: Unable to install Windows printer driver files (%d)!\n",
+        	status);
+	unlink(ppdfile);
+	return (5);
+      }
     }
   }
 
@@ -528,5 +590,5 @@ usage()
 
 
 /*
- * End of "$Id: cupsaddsmb.c,v 1.3.2.12 2003/01/07 18:27:29 mike Exp $".
+ * End of "$Id: cupsaddsmb.c,v 1.3.2.13 2003/10/29 16:53:36 mike Exp $".
  */

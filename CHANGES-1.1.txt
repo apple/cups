@@ -1,6 +1,15 @@
 CHANGES-1.1.txt
 ---------------
 
+CHANGES IN CUPS V1.1.20
+
+	- The scheduler did not return the
+	  job-hold-until-supported or job-hold-until-default
+	  attributes (STR #356)
+	- The cupsaddsmb program did not support the new CUPS
+	  driver for Windows (STR #357)
+
+
 CHANGES IN CUPS V1.1.20rc5
 
 	- The scheduler did not initialize the browse socket
