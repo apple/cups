@@ -1,5 +1,5 @@
 /*
- * "$Id: imagetoraster.c,v 1.44 2000/06/27 19:01:58 mike Exp $"
+ * "$Id: imagetoraster.c,v 1.45 2000/07/07 17:57:22 mike Exp $"
  *
  *   Image file to raster filter for the Common UNIX Printing System (CUPS).
  *
@@ -663,28 +663,139 @@ main(int  argc,		/* I - Number of command-line arguments */
   switch (Orientation)
   {
     case 0 :
-        header.ImagingBoundingBox[0] = PageLeft;
-	header.ImagingBoundingBox[1] = PageBottom;
-	header.ImagingBoundingBox[2] = PageLeft + xprint * 72;
-	header.ImagingBoundingBox[3] = PageBottom + yprint * 72;
+	switch (XPosition)
+	{
+	  case -1 :
+              header.ImagingBoundingBox[0] = PageLeft;
+	      header.ImagingBoundingBox[2] = PageLeft + xprint * 72;
+	      break;
+	  case 0 :
+              header.ImagingBoundingBox[0] = (PageRight + PageLeft - xprint * 72) / 2;
+	      header.ImagingBoundingBox[2] = (PageRight + PageLeft + xprint * 72) / 2;
+	      break;
+	  case 1 :
+              header.ImagingBoundingBox[0] = PageRight - xprint * 72;
+	      header.ImagingBoundingBox[2] = PageRight;
+	      break;
+	}
+
+	switch (YPosition)
+	{
+	  case -1 :
+              header.ImagingBoundingBox[1] = PageBottom;
+	      header.ImagingBoundingBox[3] = PageBottom + yprint * 72;
+	      break;
+	  case 0 :
+              header.ImagingBoundingBox[1] = (PageTop + PageBottom - yprint * 72) / 2;
+	      header.ImagingBoundingBox[3] = (PageTop + PageBottom + yprint * 72) / 2;
+	      break;
+	  case 1 :
+              header.ImagingBoundingBox[1] = PageTop - yprint * 72;
+	      header.ImagingBoundingBox[3] = PageTop;
+	      break;
+	}
 	break;
+
     case 1 :
-        header.ImagingBoundingBox[0] = PageRight - yprint * 72;
-	header.ImagingBoundingBox[1] = PageBottom;
-	header.ImagingBoundingBox[2] = PageRight;
-	header.ImagingBoundingBox[3] = PageBottom + xprint * 72;
+	switch (XPosition)
+	{
+	  case -1 :
+              header.ImagingBoundingBox[0] = PageBottom;
+	      header.ImagingBoundingBox[2] = PageBottom + yprint * 72;
+	      break;
+	  case 0 :
+              header.ImagingBoundingBox[0] = (PageTop + PageBottom - yprint * 72) / 2;
+	      header.ImagingBoundingBox[2] = (PageTop + PageBottom + yprint * 72) / 2;
+	      break;
+	  case 1 :
+              header.ImagingBoundingBox[0] = PageTop - yprint * 72;
+	      header.ImagingBoundingBox[2] = PageTop;
+	      break;
+	}
+
+	switch (YPosition)
+	{
+	  case -1 :
+              header.ImagingBoundingBox[1] = PageLeft;
+	      header.ImagingBoundingBox[3] = PageLeft + xprint * 72;
+	      break;
+	  case 0 :
+              header.ImagingBoundingBox[1] = (PageRight + PageLeft - xprint * 72) / 2;
+	      header.ImagingBoundingBox[3] = (PageRight + PageLeft + xprint * 72) / 2;
+	      break;
+	  case 1 :
+              header.ImagingBoundingBox[1] = PageRight - xprint * 72;
+	      header.ImagingBoundingBox[3] = PageRight;
+	      break;
+	}
 	break;
+
     case 2 :
-        header.ImagingBoundingBox[0] = PageRight - xprint * 72;
-	header.ImagingBoundingBox[1] = PageTop - yprint * 72;
-	header.ImagingBoundingBox[2] = PageRight;
-	header.ImagingBoundingBox[3] = PageTop;
+	switch (XPosition)
+	{
+	  case 1 :
+              header.ImagingBoundingBox[0] = PageLeft;
+	      header.ImagingBoundingBox[2] = PageLeft + xprint * 72;
+	      break;
+	  case 0 :
+              header.ImagingBoundingBox[0] = (PageRight + PageLeft - xprint * 72) / 2;
+	      header.ImagingBoundingBox[2] = (PageRight + PageLeft + xprint * 72) / 2;
+	      break;
+	  case -1 :
+              header.ImagingBoundingBox[0] = PageRight - xprint * 72;
+	      header.ImagingBoundingBox[2] = PageRight;
+	      break;
+	}
+
+	switch (YPosition)
+	{
+	  case 1 :
+              header.ImagingBoundingBox[1] = PageBottom;
+	      header.ImagingBoundingBox[3] = PageBottom + yprint * 72;
+	      break;
+	  case 0 :
+              header.ImagingBoundingBox[1] = (PageTop + PageBottom - yprint * 72) / 2;
+	      header.ImagingBoundingBox[3] = (PageTop + PageBottom + yprint * 72) / 2;
+	      break;
+	  case -1 :
+              header.ImagingBoundingBox[1] = PageTop - yprint * 72;
+	      header.ImagingBoundingBox[3] = PageTop;
+	      break;
+	}
 	break;
+
     case 3 :
-        header.ImagingBoundingBox[0] = PageLeft;
-	header.ImagingBoundingBox[1] = PageTop - xprint * 72;
-	header.ImagingBoundingBox[2] = PageLeft + yprint * 72 + 0.5f;
-	header.ImagingBoundingBox[3] = PageTop;
+	switch (XPosition)
+	{
+	  case 1 :
+              header.ImagingBoundingBox[0] = PageBottom;
+	      header.ImagingBoundingBox[2] = PageBottom + yprint * 72;
+	      break;
+	  case 0 :
+              header.ImagingBoundingBox[0] = (PageTop + PageBottom - yprint * 72) / 2;
+	      header.ImagingBoundingBox[2] = (PageTop + PageBottom + yprint * 72) / 2;
+	      break;
+	  case -1 :
+              header.ImagingBoundingBox[0] = PageTop - yprint * 72;
+	      header.ImagingBoundingBox[2] = PageTop;
+	      break;
+	}
+
+	switch (YPosition)
+	{
+	  case 1 :
+              header.ImagingBoundingBox[1] = PageLeft;
+	      header.ImagingBoundingBox[3] = PageLeft + xprint * 72;
+	      break;
+	  case 0 :
+              header.ImagingBoundingBox[1] = (PageRight + PageLeft - xprint * 72) / 2;
+	      header.ImagingBoundingBox[3] = (PageRight + PageLeft + xprint * 72) / 2;
+	      break;
+	  case -1 :
+              header.ImagingBoundingBox[1] = PageRight - xprint * 72;
+	      header.ImagingBoundingBox[3] = PageRight;
+	      break;
+	}
 	break;
   }
 
@@ -967,7 +1078,7 @@ main(int  argc,		/* I - Number of command-line arguments */
 	  * Write trailing blank space as needed...
 	  */
 
-          if (header.cupsHeight > z->ysize && YPosition <= 0)
+          if (header.cupsHeight > z->ysize && YPosition >= 0)
 	  {
 	    memset(row, blank, header.cupsBytesPerLine);
 
@@ -4102,5 +4213,5 @@ make_lut(ib_t  *lut,		/* I - Lookup table */
 
 
 /*
- * End of "$Id: imagetoraster.c,v 1.44 2000/06/27 19:01:58 mike Exp $".
+ * End of "$Id: imagetoraster.c,v 1.45 2000/07/07 17:57:22 mike Exp $".
  */
