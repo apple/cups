@@ -1,8 +1,10 @@
-CHANGES.txt - 04/01/2004
+CHANGES.txt - 04/09/2004
 ------------------------
 
 CHANGES IN CUPS V1.1.21rc1
 
+	- The pdftops filter did not show all annotation objects
+	  in a PDF file (STR #674)
 	- The pdftops filter did not print the contents of
 	  textual form elements, making it impossible to print a
 	  filled-in form (STR #663)
