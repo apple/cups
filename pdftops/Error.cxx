@@ -24,12 +24,7 @@ FILE *errFile;
 GBool errQuiet;
 
 void errorInit() {
-  if (errQuiet) {
-    errFile = NULL;
-  } else {
-    if (!errorsToTTY || !(errFile = fopen("/dev/tty", "w")))
-      errFile = stderr;
-  }
+  errFile = stderr;
 }
 
 void CDECL error(int pos, char *msg, ...) {
@@ -42,9 +37,9 @@ void CDECL error(int pos, char *msg, ...) {
     fflush(stdout);
   }
   if (pos >= 0) {
-    fprintf(errFile, "Error (%d): ", pos);
+    fprintf(errFile, "ERROR: (%d): ", pos);
   } else {
-    fprintf(errFile, "Error: ");
+    fprintf(errFile, "ERROR: ");
   }
   va_start(args, msg);
   vfprintf(errFile, msg, args);

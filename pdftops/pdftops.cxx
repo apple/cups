@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include <stddef.h>
 #include <string.h>
+#include <config.h>
 #include "parseargs.h"
 #include "GString.h"
 #include "gmem.h"
@@ -25,65 +26,85 @@
 #include "Params.h"
 #include "Error.h"
 #include "config.h"
+#include <cups/cups.h>
 
-static int firstPage = 1;
-static int lastPage = 0;
-static GBool noEmbedFonts = gFalse;
-static GBool doForm = gFalse;
 GBool printCommands = gFalse;
-static GBool printHelp = gFalse;
 
-static ArgDesc argDesc[] = {
-  {"-f",      argInt,      &firstPage,     0,
-   "first page to print"},
-  {"-l",      argInt,      &lastPage,      0,
-   "last page to print"},
-  {"-paperw", argInt,      &paperWidth,    0,
-   "paper width, in points"},
-  {"-paperh", argInt,      &paperHeight,   0,
-   "paper height, in points"},
-  {"-level1", argFlag,     &psOutLevel1,   0,
-   "generate Level 1 PostScript"},
-  {"-noemb",  argFlag,     &noEmbedFonts,  0,
-   "don't embed Type 1 fonts"},
-  {"-form",   argFlag,     &doForm,        0,
-   "generate a PostScript form"},
-  {"-q",      argFlag,     &errQuiet,      0,
-   "don't print any messages or errors"},
-  {"-h",      argFlag,     &printHelp,     0,
-   "print usage information"},
-  {"-help",   argFlag,     &printHelp,     0,
-   "print usage information"},
-  {NULL}
-};
 
 int main(int argc, char *argv[]) {
-  PDFDoc *doc;
-  GString *fileName;
-  GString *psFileName;
-  PSOutputDev *psOut;
-  GBool ok;
-  char *p;
+  PDFDoc	*doc;
+  GString	*fileName;
+  PSOutputDev	*psOut;
+  int		num_options;
+  cups_option_t	*options;
+  ppd_file_t	*ppd;
+  ppd_size_t	*size;
+  FILE		*fp;
+  char		tempfile[1024];
+  char		buffer[8192];
+  int		bytes;
 
-  // parse args
-  ok = parseArgs(argDesc, &argc, argv);
-  if (!ok || argc < 2 || argc > 3 || printHelp) {
-    fprintf(stderr, "pdftops version %s\n", xpdfVersion);
-    fprintf(stderr, "%s\n", xpdfCopyright);
-    printUsage("pdftops", "<PDF-file> [<PS-file>]", argDesc);
-    exit(1);
+
+  // Make sure we have the right number of arguments for CUPS!
+  if (argc < 6 || argc > 7)
+  {
+    fputs("Usage: pdftops job user title copies options [filename]\n", stderr);
+    return (1);
   }
-  if (doForm && psOutLevel1) {
-    fprintf(stderr, "Error: forms are only available with Level 2 output.\n");
-    exit(1);
+
+  // Copy stdin if needed...
+  if (argc == 6)
+  {
+    if ((fp = fopen(cupsTempFile(tempfile, sizeof(tempfile)), "w")) == NULL)
+    {
+      perror("ERROR: Unable to copy PDF file");
+      return (1);
+    }
+
+    fprintf(stderr, "DEBUG: pdftops - copying to temp print file \"%s\"\n",
+            tempfile);
+
+    while ((bytes = fread(buffer, 1, sizeof(buffer), stdin)) > 0)
+      fwrite(buffer, 1, bytes, fp);
+    fclose(fp);
+
+    fileName = new GString(tempfile);
   }
-  fileName = new GString(argv[1]);
+  else
+  {
+    fileName = new GString(argv[6]);
+    tempfile[0] = '\0';
+  }
+
+  // Get PPD and initialize options as needed...
+  if ((ppd = ppdOpenFile(getenv("PPD"))) != NULL)
+  {
+    fprintf(stderr, "DEBUG: pdftops - opened PPD file \"%s\"...\n", getenv("PPD"));
+
+    ppdMarkDefaults(ppd);
+    num_options = cupsParseOptions(argv[5], 0, &options);
+    cupsMarkOptions(ppd, num_options, options);
+    cupsFreeOptions(num_options, options);
+
+    if ((size = ppdPageSize(ppd, NULL)) != NULL)
+    {
+      paperWidth  = size->width;
+      paperHeight = size->length;
+    }
+
+    psOutLevel1 = ppd->language_level == 1;
+
+    fprintf(stderr, "DEBUG: pstops - psOutLevel1 = %d, paperWidth = %d, paperHeight = %d\n",
+            psOutLevel1, paperWidth, paperHeight);
+
+    ppdClose(ppd);
+  }
 
   // init error file
   errorInit();
 
   // read config file
-  initParams(xpdfConfigFile);
+  initParams(CUPS_SERVERROOT "/xpdf.conf");
 
   // open PDF file
   xref = NULL;
@@ -98,36 +119,14 @@ int main(int argc, char *argv[]) {
     goto err2;
   }
 
-  // construct PostScript file name
-  if (argc == 3) {
-    psFileName = new GString(argv[2]);
-  } else {
-    p = fileName->getCString() + fileName->getLength() - 4;
-    if (!strcmp(p, ".pdf") || !strcmp(p, ".PDF"))
-      psFileName = new GString(fileName->getCString(),
-			       fileName->getLength() - 4);
-    else
-      psFileName = fileName->copy();
-    psFileName->append(".ps");
-  }
-
-  // get page range
-  if (firstPage < 1)
-    firstPage = 1;
-  if (lastPage < 1 || lastPage > doc->getNumPages())
-    lastPage = doc->getNumPages();
-  if (doForm)
-    lastPage = firstPage;
-
   // write PostScript file
-  psOut = new PSOutputDev(psFileName->getCString(), doc->getCatalog(),
-			  firstPage, lastPage, !noEmbedFonts, doForm);
+  psOut = new PSOutputDev("-", doc->getCatalog(), 1, doc->getNumPages(), 1, 0);
   if (psOut->isOk())
-    doc->displayPages(psOut, firstPage, lastPage, 72, 0);
+    doc->displayPages(psOut, 1, doc->getNumPages(), 72, 0);
+
   delete psOut;
 
   // clean up
-  delete psFileName;
  err2:
   delete doc;
  err1:
@@ -136,6 +135,10 @@ int main(int argc, char *argv[]) {
   // check for memory leaks
   Object::memCheck(stderr);
   gMemReport(stderr);
+
+  // Remove temp file if needed...
+  if (tempfile[0])
+    unlink(tempfile);
 
   return 0;
 }

@@ -34,8 +34,8 @@
 // Generate Level 1 PostScript?
 GBool psOutLevel1 = gFalse;
 
-int paperWidth = defPaperWidth;
-int paperHeight = defPaperHeight;
+int paperWidth = 612;
+int paperHeight = 792;
 
 //------------------------------------------------------------------------
 // PostScript prolog and setup
@@ -45,6 +45,7 @@ static char *prolog[] = {
   "/xpdf 75 dict def xpdf begin",
   "% PDF special state",
   "/pdfDictSize 14 def",
+#if 0 // Not used for CUPS - the pstops filter handles this...
   "/pdfSetup {",
   "  2 array astore",
   "  /setpagedevice where {",
@@ -57,6 +58,7 @@ static char *prolog[] = {
   "    pop",
   "  } ifelse",
   "} def",
+#endif // 0
   "/pdfStartPage {",
   "  pdfDictSize dict begin",
   "  /pdfFill [0] def",
@@ -320,7 +322,8 @@ PSOutputDev::PSOutputDev(char *fileName, Catalog *catalog,
   if (doForm) {
     writePS("end\n");
   } else {
-    writePS("%d %d pdfSetup\n", paperWidth, paperHeight);
+// pdfSetup not used for CUPS filter...
+//    writePS("%d %d pdfSetup\n", paperWidth, paperHeight);
     writePS("%%%%EndSetup\n");
   }
 

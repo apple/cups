@@ -11,6 +11,7 @@
 #ifndef GFILE_H
 #define GFILE_H
 
+#include <config.h>
 #include <stdlib.h>
 #include <stddef.h>
 #if defined(WIN32)
