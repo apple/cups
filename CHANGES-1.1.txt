@@ -3,6 +3,11 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.17
 
+	- Added support for variable sizes in the EPSON dot
+	  matrix printer drivers.  This allows for pages as
+	  short as 1/2" (1 row of labels) and does not do an
+	  automatic form feed.
+	- French translation updates.
 	- The filters did not quote the page label string when
 	  embedding it in PostScript output.
 	- The serial backend now enumerates serial ports under
