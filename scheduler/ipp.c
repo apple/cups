@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.127.2.68 2003/05/12 15:10:07 mike Exp $"
+ * "$Id: ipp.c,v 1.127.2.69 2003/05/12 21:13:22 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -3049,7 +3049,8 @@ create_job(client_t        *con,	/* I - Client connection */
 
   job->state->values[0].integer = IPP_JOB_HELD;
 
-  if (!(printer->type & CUPS_PRINTER_REMOTE) || Classification)
+  if (!(printer->type & (CUPS_PRINTER_REMOTE | CUPS_PRINTER_IMPLICIT)) ||
+      Classification)
   {
    /*
     * Add job sheets options...
@@ -3114,8 +3115,11 @@ create_job(client_t        *con,	/* I - Client connection */
     * See if we need to add the starting sheet...
     */
 
-    if (!(printer->type & CUPS_PRINTER_REMOTE))
+    if (!(printer->type & (CUPS_PRINTER_REMOTE | CUPS_PRINTER_IMPLICIT)))
     {
+      LogMessage(L_INFO, "Adding start banner page \"%s\" to job %d.",
+                 attr->values[0].string.text, job->id);
+
       kbytes = copy_banner(con, job, attr->values[0].string.text);
 
       UpdateQuota(printer, job->username, 0, kbytes);
@@ -4833,7 +4837,8 @@ print_job(client_t        *con,		/* I - Client connection */
     SetJobHoldUntil(job->id, attr->values[0].string.text);
   }
 
-  if (!(printer->type & CUPS_PRINTER_REMOTE) || Classification)
+  if (!(printer->type & (CUPS_PRINTER_REMOTE | CUPS_PRINTER_IMPLICIT)) ||
+      Classification)
   {
    /*
     * Add job sheets options...
@@ -4898,8 +4903,11 @@ print_job(client_t        *con,		/* I - Client connection */
     * Add the starting sheet...
     */
 
-    if (!(printer->type & CUPS_PRINTER_REMOTE))
+    if (!(printer->type & (CUPS_PRINTER_REMOTE | CUPS_PRINTER_IMPLICIT)))
     {
+      LogMessage(L_INFO, "Adding start banner page \"%s\" to job %d.",
+        	 attr->values[0].string.text, job->id);
+
       kbytes = copy_banner(con, job, attr->values[0].string.text);
 
       UpdateQuota(printer, job->username, 0, kbytes);
@@ -4924,13 +4932,18 @@ print_job(client_t        *con,		/* I - Client connection */
   * See if we need to add the ending sheet...
   */
 
-  if (!(printer->type & CUPS_PRINTER_REMOTE) && attr->num_values > 1)
+  if (!(printer->type & (CUPS_PRINTER_REMOTE | CUPS_PRINTER_IMPLICIT)) &&
+      attr->num_values > 1)
   {
    /*
     * Yes...
     */
 
+    LogMessage(L_INFO, "Adding end banner page \"%s\" to job %d.",
+               attr->values[1].string.text, job->id);
+
     kbytes = copy_banner(con, job, attr->values[1].string.text);
+
     UpdateQuota(printer, job->username, 0, kbytes);
   }
 
@@ -5837,7 +5850,8 @@ send_document(client_t        *con,	/* I - Client connection */
     * See if we need to add the ending sheet...
     */
 
-    if (printer != NULL && !(printer->type & CUPS_PRINTER_REMOTE) &&
+    if (printer != NULL &&
+        !(printer->type & (CUPS_PRINTER_REMOTE | CUPS_PRINTER_IMPLICIT)) &&
         (attr = ippFindAttribute(job->attrs, "job-sheets", IPP_TAG_ZERO)) != NULL &&
         attr->num_values > 1)
     {
@@ -5845,7 +5859,11 @@ send_document(client_t        *con,	/* I - Client connection */
       * Yes...
       */
 
+      LogMessage(L_INFO, "Adding end banner page \"%s\" to job %d.",
+        	 attr->values[1].string.text, job->id);
+
       kbytes = copy_banner(con, job, attr->values[1].string.text);
+
       UpdateQuota(printer, job->username, 0, kbytes);
     }
 
@@ -6723,5 +6741,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.127.2.68 2003/05/12 15:10:07 mike Exp $".
+ * End of "$Id: ipp.c,v 1.127.2.69 2003/05/12 21:13:22 mike Exp $".
  */

@@ -3,6 +3,9 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.19rc5
 
+	- Jobs with banner pages that were printed to implicit
+	  classes would get double banner pages for each
+	  file/banner in the job (STR #68)
 	- The mime.convs file was missing the filter definition
 	  for Windows BMP (image/x-bitmap) files (STR #85)
 	- The scheduler allowed some READ-ONLY job attributes to
