@@ -1,5 +1,5 @@
 /*
- * "$Id: textcommon.h,v 1.6.2.2 2002/01/02 18:04:49 mike Exp $"
+ * "$Id: textcommon.h,v 1.6.2.3 2002/01/17 21:40:21 mike Exp $"
  *
  *   Common text filter definitions for the Common UNIX Printing System (CUPS).
  *
@@ -78,10 +78,10 @@ extern int	WrapLines,	/* Wrap text in lines */
 		Copies;		/* Number of copies to produce */
 extern lchar_t	**Page;		/* Page characters */
 extern int	NumPages;	/* Number of pages in document */
-extern int	CharsPerInch,	/* Number of character columns per inch */
-		LinesPerInch,	/* Number of lines per inch */
-		UTF8;		/* Use UTF-8 encoding? */
-extern int	NumKeywords;	/* Number of known keywords */
+extern float	CharsPerInch,	/* Number of character columns per inch */
+		LinesPerInch;	/* Number of lines per inch */
+extern int	UTF8,		/* Use UTF-8 encoding? */
+		NumKeywords;	/* Number of known keywords */
 extern char	**Keywords;	/* List of known keywords... */
 
 
@@ -98,5 +98,5 @@ extern void	WriteProlog(const char *title, const char *user,
 
 
 /*
- * End of "$Id: textcommon.h,v 1.6.2.2 2002/01/02 18:04:49 mike Exp $".
+ * End of "$Id: textcommon.h,v 1.6.2.3 2002/01/17 21:40:21 mike Exp $".
  */

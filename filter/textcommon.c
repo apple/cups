@@ -1,5 +1,5 @@
 /*
- * "$Id: textcommon.c,v 1.16.2.3 2002/01/02 18:04:48 mike Exp $"
+ * "$Id: textcommon.c,v 1.16.2.4 2002/01/17 21:40:21 mike Exp $"
  *
  *   Common text filter routines for the Common UNIX Printing System (CUPS).
  *
@@ -49,8 +49,8 @@ int	WrapLines = 1,		/* Wrap text in lines */
 	Copies = 1;		/* Number of copies */
 lchar_t	**Page = NULL;		/* Page characters */
 int	NumPages = 0;		/* Number of pages in document */
-int	CharsPerInch = 10;	/* Number of character columns per inch */
-int	LinesPerInch = 6;	/* Number of lines per inch */
+float	CharsPerInch = 10;	/* Number of character columns per inch */
+float	LinesPerInch = 6;	/* Number of lines per inch */
 int	UTF8 = 0;		/* Use UTF-8 encoding? */
 int	NumKeywords = 0;	/* Number of known keywords */
 char	**Keywords = NULL;	/* List of known keywords */
@@ -598,10 +598,10 @@ TextMain(const char *name,	/* I - Name of filter */
     PageColumns = atoi(val);
 
   if ((val = cupsGetOption("cpi", num_options, options)) != NULL)
-    CharsPerInch = atoi(val);
+    CharsPerInch = atof(val);
 
   if ((val = cupsGetOption("lpi", num_options, options)) != NULL)
-    LinesPerInch = atoi(val);
+    LinesPerInch = atof(val);
 
   if ((val = cupsGetOption("prettyprint", num_options, options)) != NULL)
     PageTop -= 216.0f / LinesPerInch;
@@ -1151,5 +1151,5 @@ getutf8(FILE *fp)	/* I - File to read from */
 
 
 /*
- * End of "$Id: textcommon.c,v 1.16.2.3 2002/01/02 18:04:48 mike Exp $".
+ * End of "$Id: textcommon.c,v 1.16.2.4 2002/01/17 21:40:21 mike Exp $".
  */
