@@ -1,5 +1,5 @@
 /*
- * "$Id: serial.c,v 1.35 2001/08/02 14:21:13 mike Exp $"
+ * "$Id: serial.c,v 1.36 2001/11/27 20:51:16 mike Exp $"
  *
  *   Serial port backend for the Common UNIX Printing System (CUPS).
  *
@@ -212,6 +212,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   tcgetattr(fd, &opts);
 
   opts.c_lflag &= ~(ICANON | ECHO | ISIG);	/* Raw mode */
+  opts.c_oflag &= ~OPOST;			/* Don't post-process */
 
   bufsize = 96;		/* 9600 baud / 10 bits/char / 10Hz */
   dtrdsr  = 0;		/* No dtr/dsr flow control */
@@ -857,5 +858,5 @@ list_devices(void)
 
 
 /*
- * End of "$Id: serial.c,v 1.35 2001/08/02 14:21:13 mike Exp $".
+ * End of "$Id: serial.c,v 1.36 2001/11/27 20:51:16 mike Exp $".
  */

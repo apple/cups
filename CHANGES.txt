@@ -1,4 +1,4 @@
-CHANGES.txt - 11/25/2001
+CHANGES.txt - 11/27/2001
 ------------------------
 
 CHANGES IN CUPS V1.1.13
@@ -11,7 +11,9 @@ CHANGES IN CUPS V1.1.13
 	- Group authentication via certificates did not work
 	  from the web interface for accounts other than
 	  "root".	
-  
+	- The serial port backend did not clear the OPOST
+	  option, which could cause problems with some printers.
+
 
 CHANGES IN CUPS V1.1.12
 
