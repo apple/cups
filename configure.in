@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: configure.in,v 1.44 2000/07/07 17:02:34 mike Exp $"
+dnl "$Id: configure.in,v 1.45 2000/07/07 19:13:54 mike Exp $"
 dnl
 dnl   Configuration script for the Common UNIX Printing System (CUPS).
 dnl
@@ -328,13 +328,23 @@ if test "$prefix" = "NONE"; then
 fi
 
 dnl Fix "exec_prefix" variable if it hasn't been specified...
-if test "$exec_prefix" = "\${prefix}" -a "$prefix" = "/"; then
+if test "$exec_prefix" = "NONE" -a "$prefix" = "/"; then
 	exec_prefix="/usr"
+fi
+
+dnl Fix "localstatedir" variable if it hasn't been specified...
+if test "$localstatedir" = "\${prefix}/var" -a "$prefix" = "/"; then
+	localstatedir="/var"
+fi
+
+dnl Fix "sysconfdir" variable if it hasn't been specified...
+if test "$sysconfdir" = "\${prefix}/etc" -a "$prefix" = "/"; then
+	sysconfdir="/etc"
 fi
 
 dnl Fix "libdir" variable for IRIX 6.x...
 if test "$uname" = "IRIX" -a $uversion -ge 62; then
-	libdir="${prefix}/lib32"
+	libdir="$exec_prefix/lib32"
 fi
 
 dnl Fix "mandir" variable...
@@ -437,5 +447,5 @@ AC_SUBST(CUPS_DOCROOT)
 AC_OUTPUT(Makedefs cups.sh)
 
 dnl
-dnl End of "$Id: configure.in,v 1.44 2000/07/07 17:02:34 mike Exp $".
+dnl End of "$Id: configure.in,v 1.45 2000/07/07 19:13:54 mike Exp $".
 dnl

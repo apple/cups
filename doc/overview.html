@@ -12,7 +12,7 @@
 	Common UNIX Printing System,<BR>
 	Version 1.1</H1>
 
-	<P ALIGN="RIGHT">July 5, 2000<BR>
+	<P ALIGN="RIGHT">July 7, 2000<BR>
 	Michael Sweet, Easy Software Products<BR>
 	Copyright 1998-2000, All Rights Reserved.</P>
 	</TD>
@@ -35,7 +35,7 @@ over 80 countries worldwide.
 <P>Printing within UNIX has historically been done using one of two
 printing systems - the Berkeley Line Printer Daemon ("LPD") [RFC1179]
 and the AT&amp;T Line Printer system. These printing systems were
-designed originally for printing text to line printers; vendors have
+designed in the 70's for printing text to line printers; vendors have
 since added varying levels of support for other types of printers.
 
 <P>Replacements for these printing systems have emerged [LPRng,
@@ -52,7 +52,7 @@ administration and print jobs, but has been shelved by the IEEE.
 <P>The Internet Printing Protocol defines extensions to the HyperText
 Transport Protocol 1.1 [RFC2616] to provide support for remote printing
 services. IPP/1.0 was accepted by the IETF as an experimental
-specification in October of 1999. Since then the Printer Working Group
+RFC in October of 1999. Since then the Printer Working Group
 has developed an updated set of specifications for IPP/1.1 which have
 been accepted by the IETF and are awaiting publication as proposed
 standards. Unlike POSIX Printing, IPP enjoys widespread industry
@@ -62,22 +62,21 @@ for all operating systems.
 <P>CUPS uses IPP/1.1 to provide a complete, modern printing system for
 UNIX that can be extended to support new printers, devices, and
 protocols while providing compatibility with existing UNIX
-applications.
+applications. CUPS is free software provided under the terms of the
+GNU General Public License and GNU Library General Public License.
 
 <H2>History</H2>
 
 <P>The first production release of CUPS (based on IPP/1.0) was released
 in October of 1999. Since then, we have released several patch updates
 to the original CUPS 1.0 release that addressed security, portability,
-and bugs found, but no new functionality to ensure greater stability of
-the CUPS code. CUPS 1.0 is licensed under the GNU GPL.
+and bugs found, but no new functionality was added to improve the
+stability of the CUPS code.
 
 <P>CUPS 1.1 is based on IPP/1.1 and adds many of the functional
 enhancements that have been requests by our users. As with 1.0, CUPS
 1.1 will be followed by patch releases that address any problems found
-with the software but will add no new functionality in the interests
-of stability. CUPS 1.1 is licensed under both the GNU GPL and LGPL
-for the CUPS API.
+with the software but will add no new features.
 
 <H2>Design Overview</H2>
 
@@ -107,7 +106,7 @@ The configuration files consist of:
 
 <UL>
 
-	<LI>A HTTP server configuration file.
+	<LI>The HTTP server configuration file.
 
 	<LI>Printer and class definition files.
 
@@ -160,10 +159,10 @@ non-GPL applications.
 <P>CUPS provides the System V and Berkeley command-line interfaces for
 submitting jobs and checking the printer status. The
 <CODE>lpstat</CODE> and <CODE>lpc status</CODE> commands also show
-network printers ("printer@hostname") when printer browsing is enabled.
+network printers ("printer@server") when printer browsing is enabled.
 
 <P>The System V administation commands are supplied for managing
-printers local to the system. The Berkeley printer administration tool
+printers and classes. The Berkeley printer administration tool
 (<CODE>lpc</CODE>) is only supported in a "read-only" mode to check the
 current status of the printer queues and scheduler.
 
@@ -175,9 +174,15 @@ including printer name, job ID, username, job title, number of copies,
 and job options. All output is sent to the standard output.
 
 <P>Filters are provided for many file formats and include image file
-and PostScript raster filters that support non-PostScript printers. The
-PostScript raster filter is based on GNU Ghostscript 5.50 but does not
-use the Ghostscript printer drivers or front-end.
+and PostScript raster filters that support non-PostScript printers. Multiple
+filters are run in parallel to produce the required output format.
+
+<P>The PostScript raster filter is based on the GNU Ghostscript 5.50
+core. Instead of using the Ghostscript printer drivers and front-end,
+the CUPS filter uses a generic raster printer driver and CUPS-compliant
+front-end to support any kind of raster printer. This allows the same
+printer driver filter to be used for printing raster data from any
+filter.
 
 <H3>CUPS Imaging</H3>
 
@@ -204,20 +209,21 @@ get working under UNIX. One reason is because each vendor added their
 own extensions to the LPD protocol (the previous standard for network
 printing), making cross-platform printing difficult if not impossible.
 
-<P>Another reason is that administering every network printer on every
-client machine can be tedious. At best you can "clone" each client
-system's printer configuration.
+<P>Another reason is that you have to administer every network printer
+on every client machine. In some cases you can "clone" the printer
+configuration from a "master" client to each of the others, but even
+that can be time-consuming and error-prone. Something better is needed.
 
 <P>CUPS provides "printer browsing", which allows clients to
 automatically see and use printers from any server on a LAN. This means
 that you only need to configure the server and the clients will
-automatically see the changes you have made.
+automatically see the printers and classes on it.
 
 <P>In addition, CUPS can automatically merge multiple identical network
-printers into "implicit classes" so that clients can send jobs to the
-implicit class and have them print on the first available printer or
-server. This allows you to setup failsafe and load-balancing simply by
-defining the same printer on multiple servers.
+printers into "implicit classes". This allows clients to send jobs to
+the implicit class and have them print on the first available printer
+or server. In addition, failsafe and load-balancing functions are
+enabled simply by defining the same printer on multiple servers!
 
 <H2>New Features in CUPS 1.1</H2>
 
@@ -264,15 +270,16 @@ devices rather than relying on the user to know what devices are
 configured on the system.
 
 <P>The new release also includes a backend for USB printers under
-FreeBSD and Linux. Support for USB under Solaris 8 will be provided in
+*BSD and Linux. Support for USB under Solaris 8 will be provided in
 a subsequent patch release.
 
 <H3><A NAME="BANNERS">2. Banner Page Support</A></H3>
 
 <P>CUPS 1.1 includes support for banner pages at the beginning and end
-of a job. Banner pages may be in any printing file format. Default
-banner pages are associated with each printer and can be overridden
-with command-line options by the user.
+of a job. Banner pages may be of any file format and support variable
+substitution for job titles, usernames, etc. Default banner pages are
+associated with each printer and can be overridden with command-line
+options by the user.
 
 <H3><A NAME="DIGEST">3. Digest Authentication</A></H3>
 
