@@ -1,15 +1,6 @@
 diff -ur ghostscript-7.05/lib/gs_setpd.ps espgs/lib/gs_setpd.ps
 --- ghostscript-7.05/lib/gs_setpd.ps	Fri Feb 22 14:45:55 2002
 +++ espgs/lib/gs_setpd.ps	Tue Apr 23 08:37:55 2002
-@@ -13,7 +13,7 @@
- % contact Artifex Software, Inc., 101 Lucas Valley Road #110,
- % San Rafael, CA  94903, U.S.A., +1(415)492-9861.
- 
--% $Id: ghostscript-705.patch,v 1.1.2.3 2002/04/23 15:30:58 mike Exp $
-+% $Id: ghostscript-705.patch,v 1.1.2.3 2002/04/23 15:30:58 mike Exp $
- % The current implementation of setpagedevice has the following limitations:
- %	- It doesn't attempt to "interact with the user" for Policy = 2.
- 
 @@ -321,21 +321,42 @@
      } bind
  .dicttomark readonly def
@@ -71,15 +62,6 @@ diff -ur ghostscript-7.05/lib/gs_setpd.ps espgs/lib/gs_setpd.ps
 diff -ur ghostscript-7.05/src/Makefile.in espgs/src/Makefile.in
 --- ghostscript-7.05/src/Makefile.in	Fri Apr 19 18:23:09 2002
 +++ espgs/src/Makefile.in	Tue Apr 23 11:18:45 2002
-@@ -13,7 +13,7 @@
- # contact Artifex Software, Inc., 101 Lucas Valley Road #110,
- # San Rafael, CA  94903, U.S.A., +1(415)492-9861.
- 
--# $Id: ghostscript-705.patch,v 1.1.2.3 2002/04/23 15:30:58 mike Exp $
-+# $Id: ghostscript-705.patch,v 1.1.2.3 2002/04/23 15:30:58 mike Exp $
- # makefile template for/from the autoconf build.
- # @configure_input@
- 
 @@ -70,7 +70,7 @@
  # Define the default directory/ies for the runtime
  # initialization and font files.  Separate multiple directories with a :.

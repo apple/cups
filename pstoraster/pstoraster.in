@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# "$Id: pstoraster.in,v 1.1 2002/04/23 17:29:00 mike Exp $"
+# "$Id: pstoraster.in,v 1.2 2002/05/13 16:21:23 mike Exp $"
 #
 # CUPS filter script for Ghostscript.
 #
@@ -44,9 +44,16 @@ for option in $5; do
     esac
 done
 
+# See if we have a filename on the command-line...
+if test -z "$6"; then
+	ifile="-"
+else
+	ifile="$6"
+fi
+
 # Now run Ghostscript...
-$bindir/@GS@ $gsopts -sOUTPUTFILE="%stdout" $profile $6
+$bindir/@GS@ $gsopts -sOUTPUTFILE="%stdout" $profile $ifile
 
 #
-# End of "$Id: pstoraster.in,v 1.1 2002/04/23 17:29:00 mike Exp $".
+# End of "$Id: pstoraster.in,v 1.2 2002/05/13 16:21:23 mike Exp $".
 #
