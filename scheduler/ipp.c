@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.112 2001/01/18 00:42:36 mike Exp $"
+ * "$Id: ipp.c,v 1.113 2001/01/18 19:58:34 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -3447,7 +3447,7 @@ print_job(client_t        *con,		/* I - Client connection */
   if (filetype == NULL)
   {
     LogMessage(L_ERROR, "print_job: Unsupported format \'%s/%s\'!",
-	       syper, type);
+	       super, type);
     send_ipp_error(con, IPP_DOCUMENT_FORMAT);
 
     if (format)
@@ -4326,7 +4326,7 @@ send_document(client_t        *con,	/* I - Client connection */
   if (filetype == NULL)
   {
     LogMessage(L_ERROR, "send_document: Unsupported format \'%s/%s\'!",
-	       syper, type);
+	       super, type);
     send_ipp_error(con, IPP_DOCUMENT_FORMAT);
 
     if (format)
@@ -5125,5 +5125,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.112 2001/01/18 00:42:36 mike Exp $".
+ * End of "$Id: ipp.c,v 1.113 2001/01/18 19:58:34 mike Exp $".
  */
