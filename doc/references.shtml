@@ -10,7 +10,7 @@
 	<LI>CUPS-IPP-1.1: CUPS Implmentation of IPP
 	<LI>CUPS-SAM-1.1.x: CUPS Software Administrators Manual 
 	<LI>CUPS-SDD-1.1: CUPS Software Design Description 
-	<LI>CUPS-SPM-1.1: CUPS Software Programming Manual
+	<LI>CUPS-SPM-1.1.x: CUPS Software Programming Manual
 	<LI>CUPS-SSR-1.1: CUPS Software Security Report 
 	<LI>CUPS-STP-1.1: CUPS Software Test Plan 
 	<LI>CUPS-SUM-1.1.x: CUPS Software Users Manual 
@@ -22,19 +22,21 @@
 <P>The following non-CUPS documents are referenced by this document:
 
 <UL>
-	<LI>Adobe PostScript Printer Description File Format Specification,
-	Version 4.3.
-	<LI>Adobe PostScript Language Reference, Third Edition.
+	<LI><A HREF="http://partners.adobe.com/asn/developer/PDFS/TN/5003.PPD_Spec_v4.3.pdf">Adobe
+	PostScript Printer Description File Format Specification,
+	Version 4.3.</A>
+	<LI><A HREF="http://partners.adobe.com/asn/developer/PDFS/TN/PLRM.pdf">Adobe
+	PostScript Language Reference, Third Edition.</A>
 	<LI>IPP: Job and Printer Set Operations
 	<LI>IPP/1.1: Encoding and Transport 
 	<LI>IPP/1.1: Implementers Guide
 	<LI>IPP/1.1: Model and Semantics
-	<LI>RFC 1179, Line Printer Daemon Protocol 
-	<LI>RFC 2567, Design Goals for an Internet Printing Protocol
-	<LI>RFC 2568, Rationale for the Structure of the Model and Protocol
-	for the Internet Printing Protocol
-	<LI>RFC 2569, Mapping between LPD and IPP Protocols
-	<LI>RFC 2616, Hypertext Transfer Protocol -- HTTP/1.1
-	<LI>RFC 2617, HTTP Authentication: Basic and Digest Access
+	<LI><A HREF="http://www.ietf.org/rfc/rfc1179.txt">RFC 1179, Line Printer Daemon Protocol</A>
+	<LI><A HREF="http://www.ietf.org/rfc/rfc2567.txt">RFC 2567, Design Goals for an Internet Printing Protocol</A>
+	<LI><A HREF="http://www.ietf.org/rfc/rfc2568.txt">RFC 2568, Rationale for the Structure of the Model and Protocol</A>
+	for the Internet Printing Protocol</A>
+	<LI><A HREF="http://www.ietf.org/rfc/rfc2569.txt">RFC 2569, Mapping between LPD and IPP Protocols</A>
+	<LI><A HREF="http://www.ietf.org/rfc/rfc2616.txt">RFC 2616, Hypertext Transfer Protocol -- HTTP/1.1</A>
+	<LI><A HREF="http://www.ietf.org/rfc/rfc2617.txt">RFC 2617, HTTP Authentication: Basic and Digest Access</A>
 	Authentication
 </UL>

@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <HTML>
 <HEAD>
-<TITLE>CUPS Interface Design Description</TITLE>
+<TITLE> CUPS Interface Design Description</TITLE>
 <META NAME="AUTHOR" CONTENT="Easy Software Products">
 <META NAME="COPYRIGHT" CONTENT="Copyright 1997-2000, All Rights Reserved">
 <META NAME="DOCNUMBER" CONTENT="CUPS-IDD-1.1">
@@ -17,14 +17,11 @@ H6 { font-family: sans-serif; font-size: 8.0pt }
 SUB { font-size: 8.0pt }
 SUP { font-size: 8.0pt }
 PRE { font-size: 9.0pt }
-A:link { text-decoration: underline }
-A:visited { text-decoration: underline }
-A:active { text-decoration: underline }
 </STYLE>
 </HEAD>
 <BODY>
-<CENTER><A HREF="#CONTENTS"><IMG SRC="images/cups-large.gif" BORDER="0"><BR>
-<H1>CUPS Interface Design Description</H1></A><BR>
+<CENTER><A HREF="#CONTENTS"><IMG SRC="images/cups-large.gif" BORDER="0" WIDTH="100%"><BR>
+<H1> CUPS Interface Design Description</H1></A><BR>
 CUPS-IDD-1.1<BR>
 Easy Software Products<BR>
 Copyright 1997-2000, All Rights Reserved<BR>
@@ -35,7 +32,8 @@ Copyright 1997-2000, All Rights Reserved<BR>
 <BR><B><A HREF="#1">1 Scope</A></B>
 <UL>
 <LI><A HREF="#1_1">1.1 Identification</A></LI>
-<LI><A HREF="#1_2">1.2 Document Overview</A></LI>
+<LI><A HREF="#1_2">1.2 System Overview</A></LI>
+<LI><A HREF="#1_3">1.3 Document Overview</A></LI>
 </UL>
 <B><A HREF="#2">2 References</A></B>
 <UL>
@@ -96,7 +94,23 @@ Copyright 1997-2000, All Rights Reserved<BR>
 <P>This interface design description document provides detailed file 
 formats, message formats, and program conventions for the Common UNIX 
 Printing System (&quot;CUPS&quot;) Version 1.1. </P>
-<H2><A NAME="1_2">1.2 Document Overview</A></H2>
+<H2><A NAME="1_2">1.2 System Overview</A></H2>
+<P>CUPS provides a portable printing layer for UNIX&reg;-based operating 
+systems. It has been developed by <A HREF="http://www.easysw.com">Easy 
+Software Products</A> to promote a standard printing solution for all 
+UNIX vendors and users. CUPS provides the System V and Berkeley 
+command-line interfaces. </P>
+<P>CUPS uses the Internet Printing Protocol (&quot;IPP&quot;) as the basis for 
+managing print jobs and queues. The Line Printer Daemon (&quot;LPD&quot;) Server 
+Message Block (&quot;SMB&quot;), and AppSocket (a.k.a. JetDirect) protocols are 
+also supported with reduced functionality. CUPS adds network printer 
+browsing and PostScript Printer Description (&quot;PPD&quot;) based printing 
+options to support real-world printing under UNIX. </P>
+<P>CUPS also includes a customized version of GNU Ghostscript 
+(currently based off GNU Ghostscript 5.50) and an image file RIP that 
+are used to support non-PostScript printers. Sample drivers for HP and 
+EPSON printers are included that use these filters. </P>
+<H2><A NAME="1_3">1.3 Document Overview</A></H2>
 <P>This interface design description document is organized into the 
 following sections: </P>
 <UL>
@@ -116,7 +130,7 @@ following sections: </P>
 <LI>CUPS-IPP-1.1: CUPS Implmentation of IPP </LI>
 <LI>CUPS-SAM-1.1.x: CUPS Software Administrators Manual </LI>
 <LI>CUPS-SDD-1.1: CUPS Software Design Description </LI>
-<LI>CUPS-SPM-1.1: CUPS Software Programming Manual </LI>
+<LI>CUPS-SPM-1.1.x: CUPS Software Programming Manual </LI>
 <LI>CUPS-SSR-1.1: CUPS Software Security Report </LI>
 <LI>CUPS-STP-1.1: CUPS Software Test Plan </LI>
 <LI>CUPS-SUM-1.1.x: CUPS Software Users Manual </LI>
@@ -125,21 +139,28 @@ following sections: </P>
 <H2><A NAME="2_2">2.2 Other Documents</A></H2>
 <P>The following non-CUPS documents are referenced by this document: </P>
 <UL>
-<LI>Adobe PostScript Printer Description File Format Specification, 
- Version 4.3. </LI>
-<LI>Adobe PostScript Language Reference, Third Edition. </LI>
+<LI><A HREF="http://partners.adobe.com/asn/developer/PDFS/TN/5003.PPD_Spec_v4.3.pdf">
+Adobe  PostScript Printer Description File Format Specification, 
+ Version 4.3.</A></LI>
+<LI><A HREF="http://partners.adobe.com/asn/developer/PDFS/TN/PLRM.pdf">
+Adobe  PostScript Language Reference, Third Edition.</A></LI>
 <LI>IPP: Job and Printer Set Operations </LI>
 <LI>IPP/1.1: Encoding and Transport </LI>
 <LI>IPP/1.1: Implementers Guide </LI>
 <LI>IPP/1.1: Model and Semantics </LI>
-<LI>RFC 1179, Line Printer Daemon Protocol </LI>
-<LI>RFC 2567, Design Goals for an Internet Printing Protocol </LI>
-<LI>RFC 2568, Rationale for the Structure of the Model and Protocol 
- for the Internet Printing Protocol </LI>
-<LI>RFC 2569, Mapping between LPD and IPP Protocols </LI>
-<LI>RFC 2616, Hypertext Transfer Protocol -- HTTP/1.1 </LI>
-<LI>RFC 2617, HTTP Authentication: Basic and Digest Access 
- Authentication </LI>
+<LI><A HREF="http://www.ietf.org/rfc/rfc1179.txt">RFC 1179, Line 
+Printer Daemon Protocol</A></LI>
+<LI><A HREF="http://www.ietf.org/rfc/rfc2567.txt">RFC 2567, Design 
+Goals for an Internet Printing Protocol</A></LI>
+<LI><A HREF="http://www.ietf.org/rfc/rfc2568.txt">RFC 2568, Rationale 
+for the Structure of the Model and Protocol</A> for the Internet 
+Printing Protocol</LI>
+<LI><A HREF="http://www.ietf.org/rfc/rfc2569.txt">RFC 2569, Mapping 
+between LPD and IPP Protocols</A></LI>
+<LI><A HREF="http://www.ietf.org/rfc/rfc2616.txt">RFC 2616, Hypertext 
+Transfer Protocol -- HTTP/1.1</A></LI>
+<LI><A HREF="http://www.ietf.org/rfc/rfc2617.txt">RFC 2617, HTTP 
+Authentication: Basic and Digest Access</A> Authentication </LI>
 </UL>
 <H1><A NAME="3">3 Internal Interfaces</A></H1>
 <H2><A NAME="3_1">3.1 Character Set Files</A></H2>
@@ -222,16 +243,6 @@ string &quot;cups_&quot; to the front of the language specifier (e.g. &quot;cups
 <P>The first line identifies the character set to be used for the 
 messages. The currently recognized values are: </P>
 <UL>
-<LI>cp874 </LI>
-<LI>cp1250 </LI>
-<LI>cp1251 </LI>
-<LI>cp1252 </LI>
-<LI>cp1253 </LI>
-<LI>cp1254 </LI>
-<LI>cp1255 </LI>
-<LI>cp1256 </LI>
-<LI>cp1257 </LI>
-<LI>cp1258 </LI>
 <LI>iso-8859-1 </LI>
 <LI>iso-8859-2 </LI>
 <LI>iso-8859-3 </LI>
@@ -247,6 +258,16 @@ messages. The currently recognized values are: </P>
 <LI>iso-8859-15 </LI>
 <LI>us-ascii </LI>
 <LI>utf-8 </LI>
+<LI>windows-874 </LI>
+<LI>windows-1250 </LI>
+<LI>windows-1251 </LI>
+<LI>windows-1252 </LI>
+<LI>windows-1253 </LI>
+<LI>windows-1254 </LI>
+<LI>windows-1255 </LI>
+<LI>windows-1256 </LI>
+<LI>windows-1257 </LI>
+<LI>windows-1258 </LI>
 </UL>
 <P>The second and succeeding lines define text messages. If the message 
 text is preceded by a number, then the current message number is 
@@ -293,7 +314,12 @@ of 1 or more lines of ASCII text. Comment lines start with the pound
 (&quot;super/type&quot;) representing the source and destination types. Following 
 the MIME types are a cost value (0 to 100) and the filter program to 
 use. If the filter program is not specified using the full path then it 
-must reside in the CUPS filter directory. </P>
+must reside in the CUPS filter directory: </P>
+<UL>
+<PRE>
+super/type SP super/type2 SP cost SP program
+</PRE>
+</UL>
 <H2><A NAME="3_4">3.4 Option Files</A></H2>
 <P>CUPS maintains user-defined printer and option files for each 
 printer and user on the system. The printers and options defined in the 
@@ -408,8 +434,6 @@ other files in a  job.</TD></TR>
 allowed to access the  class.</TD></TR>
 <TR><TD>Info</TD><TD>A textual description of the class.</TD></TR>
 <TR><TD>Location</TD><TD>A textual location of the class.</TD></TR>
-<TR><TD>MoreInfo</TD><TD>A URL pointing to additional information on 
-the class.</TD></TR>
 <TR><TD>Printer</TD><TD>Specifies a printer that is a member of the 
 class.</TD></TR>
 <TR><TD>State</TD><TD>Specifies the initial state of the class; can be 
@@ -458,11 +482,16 @@ use for browse packets.</TD></TR>
 <TR><TD>BrowseRelay</TD><TD>-</TD><TD>Specifies a source and 
 destination address for relaying browser  information from one subnet 
 to another.</TD></TR>
+<TR><TD>BrowseShortNames</TD><TD>yes</TD><TD>Specifies whether or not 
+to provide short names (without the  &quot;@server&quot; part) for remote 
+printers.</TD></TR>
 <TR><TD>BrowseTimeout</TD><TD>300</TD><TD>Specifies the number of 
 seconds to wait until remote destinations  are removed from the local 
 destination list.</TD></TR>
 <TR><TD>Browsing</TD><TD>On</TD><TD>Specifies whether or not printer 
 and class browsing is enabled; can  be &quot;On&quot; or &quot;Off&quot;.</TD></TR>
+<TR><TD>DataDir</TD><TD>/usr/share/cups</TD><TD>Specifies the directory 
+where CUPS data files are stored.</TD></TR>
 <TR><TD>DefaultCharset</TD><TD>iso-8859-1</TD><TD>Specifies the default 
 character set.</TD></TR>
 <TR><TD>DefaultLanguage</TD><TD>current locale</TD><TD>Specifies the 
@@ -566,8 +595,6 @@ allowed to access the  printer.</TD></TR>
 printer.</TD></TR>
 <TR><TD>Info</TD><TD>A textual description of the printer.</TD></TR>
 <TR><TD>Location</TD><TD>A textual location of the printer.</TD></TR>
-<TR><TD>MoreInfo</TD><TD>A URL pointing to additional information on 
-the printer.</TD></TR>
 <TR><TD>&lt;Printer name&gt;
 <BR> &lt;/Printer&gt;</TD><TD>Surrounds the printer definition.</TD></TR>
 <TR><TD>State</TD><TD>Specifies the initial state of the printer; can 
@@ -821,10 +848,9 @@ application/vnd.cups-postscript</CODE>. </P>
 <H2><A NAME="4_5">4.5 CUPS Raster File</A></H2>
 <P>CUPS raster files are device-dependent raster image files that 
 contain a PostScript page device dictionary and device-dependent raster 
-imagery for each page in the document.  These files are used to 
-transfer raster data from the PostScript and image file RIPs to 
-device-dependent filters that convert the raster data to a printable 
-format. </P>
+imagery for each page in the document. These files are used to transfer 
+raster data from the PostScript and image file RIPs to device-dependent 
+filters that convert the raster data to a printable format. </P>
 <P>A raster file begins with a four byte synchronization word: 
 0x52615374 (&quot;RaSt&quot;) for big-endian architectures and 0x74536152 
 (&quot;tSaR&quot;) for little-endian architectures.  The writer of the raster 
@@ -959,7 +985,9 @@ RFC 1179: Line Printer Daemon Protocol</A>. </P>
 <P>The Server Message Block (SMB) and related Common Internet File 
 System (CIFS) protocols are described at <A HREF="http://anu.samba.org/cifs">
 http://anu.samba.org/cifs</A>. </P>
-<P>The URI method name for SMB is &quot;smb&quot;. </P>
+<P>The URI method name for SMB is &quot;smb&quot;. Support for this protocol is 
+provided via the SAMBA <CODE>smbspool(1)</CODE> program provided with 
+SAMBA 2.0.6 and higher. </P>
 <H1><A NAME="5">5 Directories</A></H1>
 <DL>
 <DT>/etc/cups </DT>
@@ -972,8 +1000,10 @@ http://anu.samba.org/cifs</A>. </P>
 <DD>This directory contains PPD files for each printer. </DD>
 <DT>/usr/bin </DT>
 <DD>The <CODE>cancel</CODE>, <CODE>lp</CODE>, <CODE>lpq</CODE>, <CODE>
-lpr</CODE>, <CODE>lprm</CODE>, and <CODE>lpstat</CODE> commands  reside 
-here. </DD>
+ lpr</CODE>, <CODE>lprm</CODE>, and <CODE>lpstat</CODE> commands 
+ reside here. </DD>
+<DT>/usr/lib, /usr/lib32 </DT>
+<DD>The shared libraries (DSOs) reside here. </DD>
 <DT>/usr/lib/cups/backend </DT>
 <DD>The backend filters reside here. </DD>
 <DT>/usr/lib/cups/cgi-bin </DT>
@@ -983,7 +1013,7 @@ here. </DD>
 <DT>/usr/lib/cups/filter </DT>
 <DD>The file filters reside here. </DD>
 <DT>/usr/sbin </DT>
-<DD>The <CODE>accept</CODE>, <CODE>cupsd</CODE>, <CODE>lpadmin</CODE>, <CODE>
+<DD>The <CODE>accept</CODE>, <CODE>cupsd</CODE>, <CODE> lpadmin</CODE>, <CODE>
 lpc</CODE>, and <CODE>reject</CODE> commands reside here. </DD>
 <DT>/usr/share/cups </DT>
 <DD>This is the root directory of the CUPS static data. </DD>
@@ -1001,7 +1031,7 @@ lpc</CODE>, and <CODE>reject</CODE> commands reside here. </DD>
 <DD>The scheduler documentation files reside here. </DD>
 <DT>/var/log/cups </DT>
 <DD>The <CODE>access_log</CODE>, <CODE>error_log</CODE>, and <CODE>
-page_log</CODE> files reside here. </DD>
+ page_log</CODE> files reside here. </DD>
 <DT>/var/spool/cups </DT>
 <DD>This directory contains print job files. </DD>
 </DL>

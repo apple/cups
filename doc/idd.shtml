@@ -129,16 +129,6 @@ file consists of two or more lines of ASCII text.
 The currently recognized values are:
 
 <UL>
-	<LI>cp874
-	<LI>cp1250
-	<LI>cp1251
-	<LI>cp1252
-	<LI>cp1253
-	<LI>cp1254
-	<LI>cp1255
-	<LI>cp1256
-	<LI>cp1257
-	<LI>cp1258
 	<LI>iso-8859-1
 	<LI>iso-8859-2
 	<LI>iso-8859-3
@@ -154,6 +144,16 @@ The currently recognized values are:
 	<LI>iso-8859-15
 	<LI>us-ascii
 	<LI>utf-8
+	<LI>windows-874
+	<LI>windows-1250
+	<LI>windows-1251
+	<LI>windows-1252
+	<LI>windows-1253
+	<LI>windows-1254
+	<LI>windows-1255
+	<LI>windows-1256
+	<LI>windows-1257
+	<LI>windows-1258
 </UL>
 
 <P>The second and succeeding lines define text messages. If the message text
@@ -208,7 +208,11 @@ of 1 or more lines of ASCII text. Comment lines start with the pound
 representing the source and destination types. Following the MIME types are
 a cost value (0 to 100) and the filter program to use. If the filter program
 is not specified using the full path then it must reside in the CUPS filter
-directory.
+directory:
+
+<UL><PRE>
+super/type SP super/type2 SP cost SP program
+</PRE></UL>
 
 <H2>Option Files</H2>
 
@@ -383,10 +387,6 @@ followed by its value. The following directives are understood:
 	<TD>A textual location of the class.</TD>
 </TR>
 <TR>
-	<TD>MoreInfo</TD>
-	<TD>A URL pointing to additional information on the class.</TD>
-</TR>
-<TR>
 	<TD>Printer</TD>
 	<TD>Specifies a printer that is a member of the class.</TD>
 </TR>
@@ -489,6 +489,12 @@ followed by its value. The following directives are understood:
 	information from one subnet to another.</TD>
 </TR>
 <TR>
+	<TD>BrowseShortNames</TD>
+	<TD>yes</TD>
+	<TD>Specifies whether or not to provide short names (without the
+	"@server" part) for remote printers.</TD>
+</TR>
+<TR>
 	<TD>BrowseTimeout</TD>
 	<TD>300</TD>
 	<TD>Specifies the number of seconds to wait until remote destinations
@@ -499,6 +505,11 @@ followed by its value. The following directives are understood:
 	<TD>On</TD>
 	<TD>Specifies whether or not printer and class browsing is enabled; can
 	be "On" or "Off".</TD>
+</TR>
+<TR>
+	<TD>DataDir</TD>
+	<TD>/usr/share/cups</TD>
+	<TD>Specifies the directory where CUPS data files are stored.</TD>
 </TR>
 <TR>
 	<TD>DefaultCharset</TD>
@@ -726,10 +737,6 @@ followed by its value. The following directives are understood:
 <TR>
 	<TD>Location</TD>
 	<TD>A textual location of the printer.</TD>
-</TR>
-<TR>
-	<TD>MoreInfo</TD>
-	<TD>A URL pointing to additional information on the printer.</TD>
 </TR>
 <TR>
 	<TD>&lt;Printer name&gt;<BR>
@@ -1056,7 +1063,7 @@ Adobe PostScript Language Reference Manual, Third Edition</A>.
 
 <P>CUPS raster files are device-dependent raster image files that contain a
 PostScript page device dictionary and device-dependent raster imagery for
-each page in the document.  These files are used to transfer raster data
+each page in the document. These files are used to transfer raster data
 from the PostScript and image file RIPs to device-dependent filters that
 convert the raster data to a printable format.
 
@@ -1341,7 +1348,9 @@ Protocol</A>.
 System (CIFS) protocols are described at
 <A HREF="http://anu.samba.org/cifs">http://anu.samba.org/cifs</A>.
 
-<P>The URI method name for SMB is "smb".
+<P>The URI method name for SMB is "smb". Support for this protocol is
+provided via the SAMBA <CODE>smbspool(1)</CODE> program provided with
+SAMBA 2.0.6 and higher.
 
 <H1>Directories</H1>
 
@@ -1363,6 +1372,9 @@ System (CIFS) protocols are described at
 	<DD>The <CODE>cancel</CODE>, <CODE>lp</CODE>, <CODE>lpq</CODE>,
 	<CODE>lpr</CODE>, <CODE>lprm</CODE>, and <CODE>lpstat</CODE> commands
 	reside here.
+
+	<DT>/usr/lib, /usr/lib32
+	<DD>The shared libraries (DSOs) reside here.
 
 	<DT>/usr/lib/cups/backend
 	<DD>The backend filters reside here.

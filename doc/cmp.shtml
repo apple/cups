@@ -12,7 +12,7 @@
 <H2>Identification</H2>
 
 This configuration management plan document provides the guidelines for
-development and maintainance of the Common UNIX Printing System ("CUPS")
+development and maintenance of the Common UNIX Printing System ("CUPS")
 Version 1.1 software.
 
 <EMBED SRC="system-overview.shtml">
@@ -39,7 +39,7 @@ sections:
 <H2>Directory Structure</H2>
 
 Each source file shall be placed a sub-directory corresponding to the software
-sub-system it belongs to ("scheduler", "libcups", etc.) To remain compatible
+sub-system it belongs to ("scheduler", "cups", etc.) To remain compatible
 with older UNIX filesystems, directory names shall not exceed 16 characters
 in length.
 
