@@ -1,5 +1,5 @@
 /*
- * "$Id: lpmove.c,v 1.10 2002/12/17 19:00:21 swdev Exp $"
+ * "$Id: lpmove.c,v 1.11 2003/01/15 04:15:50 mike Exp $"
  *
  *   "lpmove" command for the Common UNIX Printing System (CUPS).
  *
@@ -74,7 +74,7 @@ main(int  argc,			/* I - Number of command-line arguments */
       switch (argv[i][1])
       {
         case 'E' : /* Encrypt */
-#ifdef HAVE_LIBSSL
+#ifdef HAVE_SSL
 	    cupsSetEncryption(HTTP_ENCRYPT_REQUIRED);
 
 	    if (http)
@@ -82,7 +82,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 #else
             fprintf(stderr, "%s: Sorry, no encryption support compiled in!\n",
 	            argv[0]);
-#endif /* HAVE_LIBSSL */
+#endif /* HAVE_SSL */
 	    break;
 
         case 'h' : /* Connect to host */
@@ -231,5 +231,5 @@ move_job(http_t     *http,	/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpmove.c,v 1.10 2002/12/17 19:00:21 swdev Exp $".
+ * End of "$Id: lpmove.c,v 1.11 2003/01/15 04:15:50 mike Exp $".
  */

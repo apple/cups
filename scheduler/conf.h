@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.h,v 1.50 2002/12/17 22:08:26 mike Exp $"
+ * "$Id: conf.h,v 1.51 2003/01/15 04:15:49 mike Exp $"
  *
  *   Configuration file definitions for the Common UNIX Printing System (CUPS)
  *   scheduler.
@@ -159,12 +159,12 @@ VAR int			NumMimeTypes		VALUE(0);
 VAR const char		**MimeTypes		VALUE(NULL);
 					/* Array of MIME types */
 
-#ifdef HAVE_LIBSSL
+#ifdef HAVE_SSL
 VAR char		ServerCertificate[1024]	VALUE("ssl/server.crt"),
 					/* Server certificate file */
 			ServerKey[1024]		VALUE("ssl/server.key");
 					/* Server key file */
-#endif /* HAVE_LIBSSL */
+#endif /* HAVE_SSL */
 
 
 /*
@@ -183,5 +183,5 @@ extern int	LogPage(job_t *job, const char *page);
 
 
 /*
- * End of "$Id: conf.h,v 1.50 2002/12/17 22:08:26 mike Exp $".
+ * End of "$Id: conf.h,v 1.51 2003/01/15 04:15:49 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: accept.c,v 1.18 2002/12/17 19:00:20 swdev Exp $"
+ * "$Id: accept.c,v 1.19 2003/01/15 04:15:50 mike Exp $"
  *
  *   "accept", "disable", "enable", and "reject" commands for the Common
  *   UNIX Printing System (CUPS).
@@ -98,7 +98,7 @@ main(int  argc,			/* I - Number of command-line arguments */
       switch (argv[i][1])
       {
         case 'E' : /* Encrypt */
-#ifdef HAVE_LIBSSL
+#ifdef HAVE_SSL
 	    cupsSetEncryption(HTTP_ENCRYPT_REQUIRED);
 
 	    if (http)
@@ -106,7 +106,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 #else
             fprintf(stderr, "%s: Sorry, no encryption support compiled in!\n",
 	            command);
-#endif /* HAVE_LIBSSL */
+#endif /* HAVE_SSL */
 	    break;
 
         case 'c' : /* Cancel jobs */
@@ -282,5 +282,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: accept.c,v 1.18 2002/12/17 19:00:20 swdev Exp $".
+ * End of "$Id: accept.c,v 1.19 2003/01/15 04:15:50 mike Exp $".
  */

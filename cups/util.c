@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c,v 1.103 2002/12/19 15:08:46 mike Exp $"
+ * "$Id: util.c,v 1.104 2003/01/15 04:15:47 mike Exp $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -410,7 +410,7 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
       else
         break;
     }
-#ifdef HAVE_LIBSSL
+#ifdef HAVE_SSL
     else if (status == HTTP_UPGRADE_REQUIRED)
     {
      /*
@@ -431,7 +431,7 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
 
       continue;
     }
-#endif /* HAVE_LIBSSL */
+#endif /* HAVE_SSL */
     else if (status != HTTP_OK)
     {
       DEBUG_printf(("cupsDoFileRequest: error %d...\n", status));
@@ -1260,7 +1260,7 @@ cupsGetPPD(const char *name)		/* I - Printer name */
 
       continue;
     }
-#ifdef HAVE_LIBSSL
+#ifdef HAVE_SSL
     else if (status == HTTP_UPGRADE_REQUIRED)
     {
      /*
@@ -1281,7 +1281,7 @@ cupsGetPPD(const char *name)		/* I - Printer name */
 
       continue;
     }
-#endif /* HAVE_LIBSSL */
+#endif /* HAVE_SSL */
   }
   while (status == HTTP_UNAUTHORIZED || status == HTTP_UPGRADE_REQUIRED);
 
@@ -1787,5 +1787,5 @@ cups_local_auth(http_t *http)	/* I - Connection */
 
 
 /*
- * End of "$Id: util.c,v 1.103 2002/12/19 15:08:46 mike Exp $".
+ * End of "$Id: util.c,v 1.104 2003/01/15 04:15:47 mike Exp $".
  */
