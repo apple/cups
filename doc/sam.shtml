@@ -413,7 +413,7 @@ Listen 127.0.0.1:631
 <P>instead of the <CODE>Port</CODE> directive.
 
 <P>If you want to limit access to a specific network/subnet, make sure you
-specific only the network address and not your system's network address!
+specify only the network address and not your system's network address!
 
 <H3>BrowsePort</H3>
 
@@ -677,10 +677,10 @@ the file type based upon the contents of the file instead.
 	<LI><CODE>char(offset,value)</CODE> - True if byte is identical
 
 	<LI><CODE>short(offset,value)</CODE> - True if 16-bit integer
-	is identical
+	is identical (network or "big-endian" byte order)
 
 	<LI><CODE>int(offset,value)</CODE> - True if 32-bit integer is
-	identical
+	identical (network or "big-endian" byte order)
 
 	<LI><CODE>locale("string")</CODE> - True if current locale
 	matches string
