@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.91.2.26 2002/10/31 01:59:11 mike Exp $"
+ * "$Id: client.c,v 1.91.2.27 2002/11/21 21:46:57 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -494,7 +494,8 @@ ReadClient(client_t *con)	/* I - Client to read from */
 
   status = HTTP_CONTINUE;
 
-  LogMessage(L_DEBUG2, "ReadClient() %d", con->http.fd);
+  LogMessage(L_DEBUG2, "ReadClient() %d, used=%d", con->http.fd,
+             con->http.used);
 
   switch (con->http.state)
   {
@@ -552,7 +553,7 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	      LogMessage(L_ERROR, "Bad request line \"%s\"!", line);
 	      SendError(con, HTTP_BAD_REQUEST);
 	      ShutdownClient(con);
-	      return (0);
+	      return (1);
 	  case 2 :
 	      con->http.version = HTTP_0_9;
 	      break;
@@ -562,7 +563,7 @@ ReadClient(client_t *con)	/* I - Client to read from */
 		LogMessage(L_ERROR, "Bad request line \"%s\"!", line);
 		SendError(con, HTTP_BAD_REQUEST);
 		ShutdownClient(con);
-		return (0);
+		return (1);
 	      }
 
 	      if (major < 2)
@@ -577,7 +578,7 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	      {
 	        SendError(con, HTTP_NOT_SUPPORTED);
 	        ShutdownClient(con);
-	        return (0);
+	        return (1);
 	      }
 	      break;
 	}
@@ -605,7 +606,7 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	  LogMessage(L_ERROR, "Bad operation \"%s\"!", operation);
 	  SendError(con, HTTP_BAD_REQUEST);
 	  ShutdownClient(con);
-	  return (0);
+	  return (1);
 	}
 
         con->start     = time(NULL);
@@ -634,7 +635,7 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	{
 	  SendError(con, HTTP_BAD_REQUEST);
 	  ShutdownClient(con);
-	  return (0);
+	  return (1);
 	}
 	break;
 
@@ -783,9 +784,11 @@ ReadClient(client_t *con)	/* I - Client to read from */
 
       if (status != HTTP_OK)
       {
+        LogMessage(L_DEBUG2, "ReadClient: Unauthorized request for %s...\n",
+	           con->uri);
 	SendError(con, status);
         ShutdownClient(con);
-	return (0);
+	return (1);
       }
 
       switch (con->http.state)
@@ -1082,7 +1085,7 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	case HTTP_TRACE :
             SendError(con, HTTP_NOT_IMPLEMENTED);
             ShutdownClient(con);
-	    return (0);
+	    return (1);
 
 	case HTTP_HEAD :
             if (strncmp(con->uri, "/printers/", 10) == 0 &&
@@ -2635,5 +2638,5 @@ pipe_command(client_t *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.91.2.26 2002/10/31 01:59:11 mike Exp $".
+ * End of "$Id: client.c,v 1.91.2.27 2002/11/21 21:46:57 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: mime.c,v 1.7.2.7 2002/08/23 01:45:55 mike Exp $"
+ * "$Id: mime.c,v 1.7.2.8 2002/11/21 21:47:00 mike Exp $"
  *
  *   MIME database file routines for the Common UNIX Printing System (CUPS).
  *
@@ -315,12 +315,19 @@ load_types(mime_t     *mime,		/* I - MIME database */
 
   while (fgets(line, sizeof(line), fp) != NULL)
   {
-    linelen = strlen(line);
+   /*
+    * Skip blank lines and lines starting with a #...
+    */
+
+    if (line[0] == '\n' || line[0] == '#')
+      continue;
 
    /*
     * While the last character in the line is a backslash, continue on to the
     * next line (and the next, etc.)
     */
+
+    linelen = strlen(line);
 
     if (line[linelen - 1] == '\n')
     {
@@ -344,13 +351,6 @@ load_types(mime_t     *mime,		/* I - MIME database */
 	}
       }
     }
-
-   /*
-    * Skip blank lines and lines starting with a #...
-    */
-
-    if (line[0] == '\n' || line[0] == '#')
-      continue;
 
    /*
     * Extract the super-type and type names from the beginning of the line.
@@ -596,5 +596,5 @@ delete_rules(mime_magic_t *rules)	/* I - Rules to free */
 
 
 /*
- * End of "$Id: mime.c,v 1.7.2.7 2002/08/23 01:45:55 mike Exp $".
+ * End of "$Id: mime.c,v 1.7.2.8 2002/11/21 21:47:00 mike Exp $".
  */
