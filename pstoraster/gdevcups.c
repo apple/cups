@@ -1,5 +1,5 @@
 /*
- * "$Id: gdevcups.c,v 1.43.2.14 2002/09/04 02:21:50 mike Exp $"
+ * "$Id: gdevcups.c,v 1.43.2.15 2002/10/04 19:54:09 mike Exp $"
  *
  *   GNU Ghostscript raster output driver for the Common UNIX Printing
  *   System (CUPS).
@@ -70,6 +70,18 @@
 
 
 /*
+ * Check if we are compiling against CUPS 1.2.  If so, enable
+ * certain extended attributes and use a different page header
+ * structure and write function...
+ */
+
+#ifdef CUPS_RASTER_SYNCv1
+#  define cups_page_header_t cups_page_header2_t
+#  define cupsRasterWriteHeader cupsRasterWriteHeader2
+#endif /* CUPS_RASTER_SYNCv1 */
+
+
+/*
  * Globals...
  */
 
@@ -132,6 +144,7 @@ typedef struct gx_device_cups_s
   cups_raster_t		*stream;	/* Raster stream */
   ppd_file_t		*ppd;		/* PPD file for this printer */
   cups_page_header_t	header;		/* PostScript page device info */
+  int			landscape;	/* Non-zero if this is landscape */
 } gx_device_cups;
 
 private gx_device_procs	cups_procs =
@@ -366,8 +379,35 @@ cups_get_matrix(gx_device *pdev,	/* I - Device info */
     fprintf(stderr, "DEBUG: cups->ppd->flip_duplex = %d\n", cups->ppd->flip_duplex);
   }
 
-  if (cups->header.Duplex && !cups->header.Tumble &&
-      cups->ppd && cups->ppd->flip_duplex && !(cups->page & 1))
+  if (cups->landscape)
+  {
+   /*
+    * Do landscape orientation...
+    */
+
+    if (cups->header.Duplex && !cups->header.Tumble &&
+	cups->ppd && cups->ppd->flip_duplex && !(cups->page & 1))
+    {
+      pmat->xx = 0.0;
+      pmat->xy = (float)cups->header.HWResolution[0] / 72.0;
+      pmat->yx = -(float)cups->header.HWResolution[1] / 72.0;
+      pmat->yy = 0.0;
+      pmat->tx = -(float)cups->header.HWResolution[0] * pdev->HWMargins[2] / 72.0;
+      pmat->ty = (float)cups->header.HWResolution[1] *
+                 ((float)cups->header.PageSize[0] - pdev->HWMargins[3]) / 72.0;
+    }
+    else
+    {
+      pmat->xx = 0.0;
+      pmat->xy = (float)cups->header.HWResolution[0] / 72.0;
+      pmat->yx = (float)cups->header.HWResolution[1] / 72.0;
+      pmat->yy = 0.0;
+      pmat->tx = -(float)cups->header.HWResolution[0] * pdev->HWMargins[0] / 72.0;
+      pmat->ty = -(float)cups->header.HWResolution[1] * pdev->HWMargins[1] / 72.0;
+    }
+  }
+  else if (cups->header.Duplex && !cups->header.Tumble &&
+           cups->ppd && cups->ppd->flip_duplex && !(cups->page & 1))
   {
     pmat->xx = (float)cups->header.HWResolution[0] / 72.0;
     pmat->xy = 0.0;
@@ -408,6 +448,10 @@ private int				/* O - Error status */
 cups_get_params(gx_device     *pdev,	/* I - Device info */
                 gs_param_list *plist)	/* I - Parameter list */
 {
+#ifdef CUPS_RASTER_SYNCv1
+  int			i;		/* Looping var */
+  char			name[255];	/* Attribute name */
+#endif /* CUPS_RASTER_SYNCv1 */
   int			code;		/* Return code */
   gs_param_string	s;		/* Temporary string value */
   bool			b;		/* Temporary boolean value */
@@ -687,6 +731,75 @@ cups_get_params(gx_device     *pdev,	/* I - Device info */
   if ((code = param_write_int(plist, "cupsRowStep",
                               (int *)&(cups->header.cupsRowStep))) < 0)
     return (code);
+
+#ifdef CUPS_RASTER_SYNCv1
+#  ifdef DEBUG
+  if (gs_log_errors > 1)
+    fputs("DEBUG: cupsNumColors\n", stderr);
+#  endif /* DEBUG */
+
+  if ((code = param_write_int(plist, "cupsNumColors",
+                              (int *)&(cups->header.cupsNumColors))) < 0)
+    return (code);
+
+#  ifdef DEBUG
+  if (gs_log_errors > 1)
+    fputs("DEBUG: cupsInteger\n", stderr);
+#  endif /* DEBUG */
+
+  for (i = 0; i < 16; i ++)
+  {
+    sprintf(name, "cupsInteger%d", i);
+    if ((code = param_write_int(plist, name,
+                        	(int *)(cups->header.cupsInteger + i))) < 0)
+      return (code);
+  }
+
+#  ifdef DEBUG
+  if (gs_log_errors > 1)
+    fputs("DEBUG: cupsReal\n", stderr);
+#  endif /* DEBUG */
+
+  for (i = 0; i < 16; i ++)
+  {
+    sprintf(name, "cupsReal%d", i);
+    if ((code = param_write_float(plist, name,
+                        	  cups->header.cupsReal + i)) < 0)
+      return (code);
+  }
+
+#  ifdef DEBUG
+  if (gs_log_errors > 1)
+    fputs("DEBUG: cupsString\n", stderr);
+#  endif /* DEBUG */
+
+  for (i = 0; i < 16; i ++)
+  {
+    sprintf(name, "cupsReal%d", i);
+    param_string_from_string(s, cups->header.cupsString[i]);
+    if ((code = param_write_string(plist, name, &s)) < 0)
+      return (code);
+  }
+
+#  ifdef DEBUG
+  if (gs_log_errors > 1)
+    fputs("DEBUG: cupsMarkerType\n", stderr);
+#  endif /* DEBUG */
+
+  param_string_from_string(s, cups->header.cupsMarkerType);
+  if ((code = param_write_string(plist, "cupsMarkerType", &s)) < 0)
+    return (code);
+
+#  ifdef DEBUG
+  if (gs_log_errors > 1)
+    fputs("DEBUG: cupsRenderingIntent\n", stderr);
+#  endif /* DEBUG */
+
+  param_string_from_string(s, cups->header.cupsRenderingIntent);
+  if ((code = param_write_string(plist, "cupsRenderingIntent", &s)) < 0)
+    return (code);
+
+#endif /* CUPS_RASTER_SYNCv1 */
 
 #ifdef DEBUG
   fputs("DEBUG: Leaving cups_get_params()\n", stderr);
@@ -1799,6 +1912,9 @@ cups_put_params(gx_device     *pdev,	/* I - Device info */
                 gs_param_list *plist)	/* I - Parameter list */
 {
   int			i;		/* Looping var */
+#ifdef CUPS_RASTER_SYNCv1
+  char			name[255];	/* Name of attribute */
+#endif /* CUPS_RASTER_SYNCv1 */
   float			margins[4];	/* Physical margins of print */
   ppd_size_t		*size;		/* Page size */
   int			code;		/* Error code */
@@ -1924,6 +2040,29 @@ cups_put_params(gx_device     *pdev,	/* I - Device info */
   intoption(cupsRowFeed, "cupsRowFeed", unsigned)
   intoption(cupsRowStep, "cupsRowStep", unsigned)
 
+#ifdef CUPS_RASTER_SYNCv1
+  for (i = 0; i < 16; i ++)
+  {
+    sprintf(name, "cupsInteger%d", i);
+    intoption(cupsInteger[i], name, unsigned)
+  }
+
+  for (i = 0; i < 16; i ++)
+  {
+    sprintf(name, "cupsReal%d", i);
+    floatoption(cupsReal[i], name)
+  }
+
+  for (i = 0; i < 16; i ++)
+  {
+    sprintf(name, "cupsString%d", i);
+    stringoption(cupsString[i], name)
+  }
+
+  stringoption(cupsMarkerType, "cupsMarkerType");
+  stringoption(cupsRenderingIntent, "cupsRenderingIntent");
+#endif /* CUPS_RASTER_SYNCv1 */
+
   if ((code = param_read_string(plist, "cupsProfile", &stringval)) < 0)
   {
     param_signal_error(plist, "cupsProfile", code);
@@ -1940,95 +2079,129 @@ cups_put_params(gx_device     *pdev,	/* I - Device info */
   cups_set_color_info(pdev);
 
  /*
-  * Compute the page margins...
-  */
-
-  if (cups->ppd != NULL)
-  {
-   /*
-    * Pull the margins from the first size entry; since the margins are not
-    * like the bounding box we have to adjust the top and right values
-    * accordingly.
-    */
-
-    for (i = cups->ppd->num_sizes, size = cups->ppd->sizes;
-         i > 0;
-         i --, size ++)
-      if ((fabs(cups->MediaSize[1] - size->length) < 18.0 &&
-           fabs(cups->MediaSize[0] - size->width) < 18.0) ||
-          (fabs(cups->MediaSize[0] - size->length) < 18.0 &&
-           fabs(cups->MediaSize[1] - size->width) < 18.0))
-	break;
-
-    if (i == 0 && !cups->ppd->variable_sizes)
-    {
-      i    = 1;
-      size = cups->ppd->sizes;
-    }
-
-    if (i > 0)
-    {
-     /*
-      * Standard size...
-      */
-
-      fprintf(stderr, "DEBUG: size = %s\n", size->name);
-
-      margins[0] = size->left / 72.0;
-      margins[1] = size->bottom / 72.0;
-      margins[2] = (size->width - size->right) / 72.0;
-      margins[3] = (size->length - size->top) / 72.0;
-    }
-    else
-    {
-     /*
-      * Custom size...
-      */
-
-      fputs("DEBUG: size = Custom\n", stderr);
-
-      for (i = 0; i < 4; i ++)
-        margins[i] = cups->ppd->custom_margins[i] / 72.0;
-    }
-
-    fprintf(stderr, "DEBUG: margins[] = [ %f %f %f %f ]\n",
-	    margins[0], margins[1], margins[2], margins[3]);
-  }
-  else
-  {
-   /*
-    * Set default margins of 0.0...
-    */
-
-    memset(margins, 0, sizeof(margins));
-  }
-
- /*
-  * Set the margins to update the bitmap size...
-  */
-
-  gx_device_set_margins(pdev, margins, false);
-
- /*
   * Then process standard page device options...
   */
 
   if ((code = gdev_prn_put_params(pdev, plist)) < 0)
     return (code);
 
+ /*
+  * Update margins/sizes as needed...
+  */
+
+  if (size_set)
+  {
+   /*
+    * Compute the page margins...
+    */
+
+    fprintf(stderr, "DEBUG: Updating PageSize to [%.0f %.0f]...\n",
+            cups->MediaSize[0], cups->MediaSize[1]);
+
+    memset(margins, 0, sizeof(margins));
+
+    cups->landscape = 0;
+
+    if (cups->ppd != NULL)
+    {
+     /*
+      * Find the matching page size...
+      */
+
+      for (i = cups->ppd->num_sizes, size = cups->ppd->sizes;
+           i > 0;
+           i --, size ++)
+	if (fabs(cups->MediaSize[1] - size->length) < 5.0 &&
+            fabs(cups->MediaSize[0] - size->width) < 5.0)
+	  break;
+
+      if (i > 0)
+      {
+       /*
+	* Standard size...
+	*/
+
+	fprintf(stderr, "DEBUG: size = %s\n", size->name);
+
+	gx_device_set_media_size(pdev, size->width, size->length);
+
+	margins[0] = size->left / 72.0;
+	margins[1] = size->bottom / 72.0;
+	margins[2] = (size->width - size->right) / 72.0;
+	margins[3] = (size->length - size->top) / 72.0;
+      }
+      else
+      {
+       /*
+	* No matching portrait size; look for a matching size in
+	* landscape orientation...
+	*/
+
+	for (i = cups->ppd->num_sizes, size = cups->ppd->sizes;
+             i > 0;
+             i --, size ++)
+	  if (fabs(cups->MediaSize[0] - size->length) < 5.0 &&
+              fabs(cups->MediaSize[1] - size->width) < 5.0)
+	    break;
+
+	if (i > 0)
+	{
+	 /*
+	  * Standard size in landscape orientation...
+	  */
+
+	  fprintf(stderr, "DEBUG: landscape size = %s\n", size->name);
+
+	  gx_device_set_media_size(pdev, size->length, size->width);
+
+          cups->landscape = 1;
+
+	  margins[0] = size->left / 72.0;
+	  margins[1] = size->bottom / 72.0;
+	  margins[2] = (size->width - size->right) / 72.0;
+	  margins[3] = (size->length - size->top) / 72.0;
+	}
+	else
+	{
+	 /*
+	  * Custom size...
+	  */
+
+	  fputs("DEBUG: size = Custom\n", stderr);
+
+	  for (i = 0; i < 4; i ++)
+            margins[i] = cups->ppd->custom_margins[i] / 72.0;
+	}
+      }
+
+      fprintf(stderr, "DEBUG: margins[] = [ %f %f %f %f ]\n",
+	      margins[0], margins[1], margins[2], margins[3]);
+    }
+
+   /*
+    * Set the margins to update the bitmap size...
+    */
+
+    gx_device_set_margins(pdev, margins, false);
+  }
+
+ /*
+  * Set CUPS raster header values...
+  */
+
   cups->header.HWResolution[0] = pdev->HWResolution[0];
   cups->header.HWResolution[1] = pdev->HWResolution[1];
 
-  cups->header.Margins[0] = 72.0 * margins[0];
-  cups->header.Margins[1] = 72.0 * margins[1];
+  cups->header.Margins[0] = pdev->HWMargins[0];
+  cups->header.Margins[1] = pdev->HWMargins[1];
 
   cups->header.PageSize[0] = pdev->MediaSize[0];
   cups->header.PageSize[1] = pdev->MediaSize[1];
 
-  cups->header.ImagingBoundingBox[0] = 72.0 * margins[0];
-  cups->header.ImagingBoundingBox[1] = 72.0 * margins[1];
-  cups->header.ImagingBoundingBox[2] = pdev->MediaSize[0] - 72.0 * margins[2];
-  cups->header.ImagingBoundingBox[3] = pdev->MediaSize[1] - 72.0 * margins[3];
+  cups->header.ImagingBoundingBox[0] = pdev->HWMargins[0];
+  cups->header.ImagingBoundingBox[1] = pdev->HWMargins[3];
+  cups->header.ImagingBoundingBox[2] = pdev->MediaSize[0] - pdev->HWMargins[2];
+  cups->header.ImagingBoundingBox[3] = pdev->MediaSize[1] - pdev->HWMargins[1];
 
  /*
   * Reallocate memory if the size or color depth was changed...
@@ -2044,12 +2217,24 @@ cups_put_params(gx_device     *pdev,	/* I - Device info */
     * does not keep track of the margins in the bitmap size...
     */
 
-    pdev->width  = (pdev->MediaSize[0] / 72.0f - margins[0] - margins[2]) *
-                   pdev->HWResolution[0] + 0.499f;
-    pdev->height = (pdev->MediaSize[1] / 72.0f - margins[1] - margins[3]) *
-                   pdev->HWResolution[1] + 0.499f;
+    if (cups->landscape)
+    {
+      pdev->width  = (pdev->MediaSize[1] - pdev->HWMargins[0] - pdev->HWMargins[2]) *
+                     pdev->HWResolution[0] / 72.0f + 0.499f;
+      pdev->height = (pdev->MediaSize[0] - pdev->HWMargins[1] - pdev->HWMargins[3]) *
+                     pdev->HWResolution[1] / 72.0f + 0.499f;
+    }
+    else
+    {
+      pdev->width  = (pdev->MediaSize[0] - pdev->HWMargins[0] - pdev->HWMargins[2]) *
+                     pdev->HWResolution[0] / 72.0f + 0.499f;
+      pdev->height = (pdev->MediaSize[1] - pdev->HWMargins[1] - pdev->HWMargins[3]) *
+                     pdev->HWResolution[1] / 72.0f + 0.499f;
+    }
 
-    fputs("DEBUG: Reallocating memory...\n", stderr);
+    fprintf(stderr, "DEBUG: Reallocating memory, [%.0f %.0f] = %dx%d pixels...\n",
+            pdev->MediaSize[0], pdev->MediaSize[1], pdev->width, pdev->height);
+
     sp = ((gx_device_printer *)pdev)->space_params;
 
     if ((code = gdev_prn_reallocate_memory(pdev, &sp, pdev->width,
@@ -2388,7 +2573,8 @@ cups_print_chunked(gx_device_printer *pdev,	/* I - Printer device */
   else
     flip = 0;
 
-  fprintf(stderr, "DEBUG: cups_print_chunked - flip = %d\n", flip);
+  fprintf(stderr, "DEBUG: cups_print_chunked - flip = %d, height = %d\n",
+          flip, cups->height);
 
  /*
   * Loop through the page bitmap and write chunked pixels, reversing as
@@ -2536,7 +2722,8 @@ cups_print_banded(gx_device_printer *pdev,	/* I - Printer device */
   else
     flip = 0;
 
-  fprintf(stderr, "DEBUG: cups_print_banded - flip = %d\n", flip);
+  fprintf(stderr, "DEBUG: cups_print_banded - flip = %d, height = %d\n",
+          flip, cups->height);
 
  /*
   * Loop through the page bitmap and write banded pixels...  We have
@@ -3453,5 +3640,5 @@ cups_print_planar(gx_device_printer *pdev,	/* I - Printer device */
 
 
 /*
- * End of "$Id: gdevcups.c,v 1.43.2.14 2002/09/04 02:21:50 mike Exp $".
+ * End of "$Id: gdevcups.c,v 1.43.2.15 2002/10/04 19:54:09 mike Exp $".
  */

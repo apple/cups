@@ -1,5 +1,5 @@
 /*
- * "$Id: raster.h,v 1.2.2.6 2002/05/09 01:55:40 mike Exp $"
+ * "$Id: raster.h,v 1.2.2.7 2002/10/04 19:54:08 mike Exp $"
  *
  *   Raster file definitions for the Common UNIX Printing System (CUPS).
  *
@@ -287,7 +287,7 @@ typedef struct				/**** Version 2 Page Header ****/
   /**** Version 2 Dictionary Values ****/
   unsigned	cupsNumColors;		/* Number of colors */
   unsigned	cupsInteger[16];	/* User-defined integer values */
-  unsigned	cupsReal[16];		/* User-defined floating-point values */
+  float		cupsReal[16];		/* User-defined floating-point values */
   char		cupsString[16][64];	/* User-defined string values */
   char		cupsMarkerType[64];	/* Ink/toner type */
   char		cupsRenderingIntent[64];/* Color rendering intent */
@@ -340,5 +340,5 @@ extern unsigned		cupsRasterWritePixels(cups_raster_t *r,
 #endif /* !_CUPS_RASTER_H_ */
 
 /*
- * End of "$Id: raster.h,v 1.2.2.6 2002/05/09 01:55:40 mike Exp $".
+ * End of "$Id: raster.h,v 1.2.2.7 2002/10/04 19:54:08 mike Exp $".
  */
