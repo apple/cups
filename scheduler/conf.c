@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.77.2.26 2003/01/31 17:20:23 mike Exp $"
+ * "$Id: conf.c,v 1.77.2.27 2003/01/31 17:48:39 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -1305,7 +1305,7 @@ read_configuration(FILE *fp)		/* I - File to read from */
       char *valueptr; /* Pointer into value */
 
 
-      for (i = NumSystemGroups; i < MAX_SYSTEM_GROUPS; i ++)
+      for (i = NumSystemGroups; *value && i < MAX_SYSTEM_GROUPS; i ++)
       {
         for (valueptr = value; *valueptr; valueptr ++)
 	  if (isspace(*valueptr) || *valueptr == ',')
@@ -1315,6 +1315,8 @@ read_configuration(FILE *fp)		/* I - File to read from */
           *valueptr++ = '\0';
 
         SetString(SystemGroups + i, value);
+
+        value = valueptr;
 
         while (*value == ',' || isspace(*value))
 	  value ++;
@@ -2181,5 +2183,5 @@ CDSAGetServerCerts(void)
 
 
 /*
- * End of "$Id: conf.c,v 1.77.2.26 2003/01/31 17:20:23 mike Exp $".
+ * End of "$Id: conf.c,v 1.77.2.27 2003/01/31 17:48:39 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.127.2.40 2003/01/31 01:29:00 mike Exp $"
+ * "$Id: ipp.c,v 1.127.2.41 2003/01/31 17:48:40 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -1005,6 +1005,8 @@ add_printer(client_t        *con,	/* I - Client connection */
     * No, return an error...
     */
 
+    LogMessage(L_ERROR, "add_printer: bad printer URI \"%s\"!",
+               uri->values[0].string.text);
     send_ipp_error(con, IPP_BAD_REQUEST);
     return;
   }
@@ -1026,6 +1028,8 @@ add_printer(client_t        *con,	/* I - Client connection */
       * Yes, return an error...
       */
 
+      LogMessage(L_ERROR, "add_printer: \"%s\" already exists as a class!",
+        	 resource + 10);
       send_ipp_error(con, IPP_NOT_POSSIBLE);
       return;
     }
@@ -6072,5 +6076,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.127.2.40 2003/01/31 01:29:00 mike Exp $".
+ * End of "$Id: ipp.c,v 1.127.2.41 2003/01/31 17:48:40 mike Exp $".
  */
