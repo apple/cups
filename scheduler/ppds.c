@@ -1,5 +1,5 @@
 /*
- * "$Id: ppds.c,v 1.12 2000/11/07 16:15:49 mike Exp $"
+ * "$Id: ppds.c,v 1.13 2000/11/22 13:33:11 mike Exp $"
  *
  *   PPD scanning routines for the Common UNIX Printing System (CUPS).
  *
@@ -442,7 +442,10 @@ load_ppds(const char *d,		/* I - Actual directory */
     if (p[0])
       snprintf(name, sizeof(name), "%s/%s", p, dent->d_name);
     else
-      strcpy(name, dent->d_name);
+    {
+      strncpy(name, dent->d_name, sizeof(name) - 1);
+      name[sizeof(name) - 1] = '\0';
+    }
 
     if (stat(filename, &fileinfo))
       continue;
@@ -655,5 +658,5 @@ load_ppds(const char *d,		/* I - Actual directory */
 
 
 /*
- * End of "$Id: ppds.c,v 1.12 2000/11/07 16:15:49 mike Exp $".
+ * End of "$Id: ppds.c,v 1.13 2000/11/22 13:33:11 mike Exp $".
  */

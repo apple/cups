@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.65 2000/11/20 20:14:02 mike Exp $"
+ * "$Id: dirsvc.c,v 1.66 2000/11/22 13:33:11 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -440,6 +440,7 @@ UpdateBrowseList(void)
 
 	  if (p->type & CUPS_PRINTER_REMOTE)
 	  {
+	    /* No "p->var[sizeof(p->var) - 1] = '\0';" because p is zeroed */
             strncat(p->name, "@", sizeof(p->name) - 1);
 	    strncat(p->name, p->hostname, sizeof(p->name) - 1);
 	    SetPrinterAttrs(p);
@@ -450,6 +451,7 @@ UpdateBrowseList(void)
 	}
 	else if (!p->hostname[0])
 	{
+	  /* No "p->var[sizeof(p->var) - 1] = '\0';" because p is zeroed */
           strncpy(p->hostname, host, sizeof(p->hostname) - 1);
 	  strncpy(p->uri, uri, sizeof(p->uri) - 1);
 	  strncpy(p->more_info, uri, sizeof(p->more_info) - 1);
@@ -465,6 +467,7 @@ UpdateBrowseList(void)
     }
     else if (!p->hostname[0])
     {
+      /* No "p->var[sizeof(p->var) - 1] = '\0';" because p is zeroed */
       strncpy(p->hostname, host, sizeof(p->hostname) - 1);
       strncpy(p->uri, uri, sizeof(p->uri) - 1);
       strncpy(p->more_info, uri, sizeof(p->more_info) - 1);
@@ -485,6 +488,7 @@ UpdateBrowseList(void)
       */
 
       p->type = type;
+      /* No "p->var[sizeof(p->var) - 1] = '\0';" because p is zeroed */
       strncpy(p->uri, uri, sizeof(p->uri) - 1);
       strncpy(p->more_info, uri, sizeof(p->more_info) - 1);
       strncpy(p->device_uri, uri, sizeof(p->device_uri) - 1);
@@ -518,6 +522,7 @@ UpdateBrowseList(void)
 
 	  if (p->type & CUPS_PRINTER_REMOTE)
 	  {
+	    /* No "p->var[sizeof(p->var) - 1] = '\0';" because p is zeroed */
             strncat(p->name, "@", sizeof(p->name) - 1);
 	    strncat(p->name, p->hostname, sizeof(p->name) - 1);
 	    SetPrinterAttrs(p);
@@ -528,6 +533,7 @@ UpdateBrowseList(void)
 	}
 	else if (!p->hostname[0])
 	{
+	  /* No "p->var[sizeof(p->var) - 1] = '\0';" because p is zeroed */
           strncpy(p->hostname, host, sizeof(p->hostname) - 1);
 	  strncpy(p->uri, uri, sizeof(p->uri) - 1);
 	  strncpy(p->more_info, uri, sizeof(p->more_info) - 1);
@@ -543,6 +549,7 @@ UpdateBrowseList(void)
     }
     else if (!p->hostname[0])
     {
+      /* No "p->var[sizeof(p->var) - 1] = '\0';" because p is zeroed */
       strncpy(p->hostname, host, sizeof(p->hostname) - 1);
       strncpy(p->uri, uri, sizeof(p->uri) - 1);
       strncpy(p->more_info, uri, sizeof(p->more_info) - 1);
@@ -563,6 +570,7 @@ UpdateBrowseList(void)
       */
 
       p->type = type;
+      /* No "p->var[sizeof(p->var) - 1] = '\0';" because p is zeroed */
       strncpy(p->hostname, host, sizeof(p->hostname) - 1);
       strncpy(p->uri, uri, sizeof(p->uri) - 1);
       strncpy(p->more_info, uri, sizeof(p->more_info) - 1);
@@ -588,13 +596,15 @@ UpdateBrowseList(void)
 
   if (strcmp(p->location, location))
   {
-    strcpy(p->location, location);
+    /* No "p->var[sizeof(p->var) - 1] = '\0';" because p is zeroed */
+    strncpy(p->location, location, sizeof(p->location) - 1);
     update = 1;
   }
 
   if (strcmp(p->info, info))
   {
-    strcpy(p->info, info);
+    /* No "p->var[sizeof(p->var) - 1] = '\0';" because p is zeroed */
+    strncpy(p->info, info, sizeof(p->info) - 1);
     update = 1;
   }
 
@@ -616,7 +626,8 @@ UpdateBrowseList(void)
 
   if (strcmp(p->make_model, make_model))
   {
-    strcpy(p->make_model, make_model);
+    /* No "p->var[sizeof(p->var) - 1] = '\0';" because p is zeroed */
+    strncpy(p->make_model, make_model, sizeof(p->make_model) - 1);
     update = 1;
   }
 
@@ -908,5 +919,5 @@ StopPolling(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.65 2000/11/20 20:14:02 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.66 2000/11/22 13:33:11 mike Exp $".
  */
