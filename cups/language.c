@@ -1,5 +1,5 @@
 /*
- * "$Id: language.c,v 1.5 1999/04/21 19:31:29 mike Exp $"
+ * "$Id: language.c,v 1.6 1999/04/22 20:19:22 mike Exp $"
  *
  *   for the Common UNIX Printing System (CUPS).
  *
@@ -61,6 +61,11 @@ static char		*lang_encodings[] =	/* Encoding strings */
 			  "iso8859-9",
 			  "iso8859-10",
 			  "utf8"
+			};
+static char		*lang_default[] =	/* Default POSIX locale */
+			{
+#include "cups_C.h"
+			  NULL
 			};
 
 
@@ -124,7 +129,7 @@ cupsLangFree(cups_lang_t *lang)	/* I - Language to free */
 cups_lang_t *			/* O - Language data */
 cupsLangGet(char *language)	/* I - Language or locale */
 {
-  int		i;		/* Looping var */
+  int		i, count;	/* Looping vars */
   char		real[16],	/* Real language name */
 		filename[1024],	/* Filename for language locale file */
 		*localedir;	/* Directory for locale files */
@@ -203,23 +208,6 @@ cupsLangGet(char *language)	/* I - Language or locale */
     }
 
  /*
-  * No language-specific file; try POSIX locale...
-  */
-
-  if (fp == NULL)
-  {
-    sprintf(filename, "%s/C/cups_C", localedir);
-    fp = fopen(filename, "r");
-  }
-
- /*
-  * If we can't load anything, return NULL to signal an error!
-  */
-
-  if (fp == NULL)
-    return (NULL);
-
- /*
   * OK, we have an open messages file; the first line will contain the
   * language encoding (us-ascii, iso-8859-1, etc.), and the rest will
   * be messages consisting of:
@@ -237,7 +225,9 @@ cupsLangGet(char *language)	/* I - Language or locale */
   * All leading whitespace is deleted.
   */
 
-  if (fgets(line, sizeof(line), fp) == NULL)
+  if (fp == NULL)
+    strcpy(line, lang_default[0]);
+  else if (fgets(line, sizeof(line), fp) == NULL)
   {
    /*
     * Can't read encoding!
@@ -247,7 +237,9 @@ cupsLangGet(char *language)	/* I - Language or locale */
     return (NULL);
   }
 
-  line[strlen(line) - 1] = '\0';	/* Strip LF */
+  i = strlen(line) - 1;
+  if (line[i] == '\n')
+    line[i] = '\0';	/* Strip LF */
 
  /*
   * See if there is a free language available; if so, use that
@@ -304,12 +296,29 @@ cupsLangGet(char *language)	/* I - Language or locale */
   * Read the strings from the file...
   */
 
-  msg = (cups_msg_t)-1;
+  msg   = (cups_msg_t)-1;
+  count = 1;
 
-  while (fgets(line, sizeof(line), fp) != NULL)
+  for (;;)
   {
    /*
-    * Ignore lines not starting with a digit...
+    * Read a line from memory or from a file...
+    */
+
+    if (fp == NULL)
+    {
+      if (lang_default[count] == NULL)
+        break;
+
+      strcpy(line, lang_default[count]);
+    }
+    else if (fgets(line, sizeof(line), fp) == NULL)
+      break;
+
+    count ++;
+
+   /*
+    * Ignore blank lines...
     */
 
     i = strlen(line) - 1;
@@ -344,12 +353,13 @@ cupsLangGet(char *language)	/* I - Language or locale */
   * Close the file and return...
   */
 
-  fclose(fp);
+  if (fp != NULL)
+    fclose(fp);
 
   return (lang);
 }
 
 
 /*
- * End of "$Id: language.c,v 1.5 1999/04/21 19:31:29 mike Exp $".
+ * End of "$Id: language.c,v 1.6 1999/04/22 20:19:22 mike Exp $".
  */

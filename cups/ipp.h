@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.h,v 1.13 1999/04/22 15:02:43 mike Exp $"
+ * "$Id: ipp.h,v 1.14 1999/04/22 20:19:22 mike Exp $"
  *
  *   Internet Printing Protocol definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -224,31 +224,27 @@ typedef enum			/**** IPP status codes... ****/
   IPP_PRINTER_BUSY
 } ipp_status_t;
 
-typedef unsigned char uchar;	/**** Unsigned 8-bit integer/character ****/
-#  if defined(__sgi)
-typedef unsigned short ushort;	/**** Unsigned 16-bit integer ****/
-typedef unsigned int uint;	/**** Unsigned 32-bit integer ****/
-#  endif /* __sgi */
+typedef unsigned char ipp_uchar_t;/**** Unsigned 8-bit integer/character ****/
 
 typedef union			/**** Request Header ****/
 {
   struct			/* Any Header */
   {
-    uchar	version[2];	/* Protocol version number */
+    ipp_uchar_t	version[2];	/* Protocol version number */
     int		op_status;	/* Operation ID or status code*/
     int		request_id;	/* Request ID */
   }		any;
 
   struct			/* Operation Header */
   {
-    uchar	version[2];	/* Protocol version number */
+    ipp_uchar_t	version[2];	/* Protocol version number */
     ipp_op_t	operation_id;	/* Operation ID */
     int		request_id;	/* Request ID */
   }		op;
 
   struct			/* Status Header */
   {
-    uchar	version[2];	/* Protocol version number */
+    ipp_uchar_t	version[2];	/* Protocol version number */
     ipp_status_t status_code;	/* Status code */
     int		request_id;	/* Request ID */
   }		status;
@@ -261,7 +257,7 @@ typedef union			/**** Attribute Value ****/
 
   char		boolean;	/* Boolean value */
 
-  uchar		date[11];	/* Date/time value */
+  ipp_uchar_t	date[11];	/* Date/time value */
 
   struct
   {
@@ -309,10 +305,10 @@ typedef struct			/**** Request State ****/
  * Prototypes...
  */
 
-extern time_t		ippDateToTime(uchar *date);
+extern time_t		ippDateToTime(ipp_uchar_t *date);
 extern ipp_attribute_t	*ippAddBoolean(ipp_t *ipp, ipp_tag_t group, char *name, char value);
 extern ipp_attribute_t	*ippAddBooleans(ipp_t *ipp, ipp_tag_t group, char *name, int num_values, char *values);
-extern ipp_attribute_t	*ippAddDate(ipp_t *ipp, ipp_tag_t group, char *name, uchar *value);
+extern ipp_attribute_t	*ippAddDate(ipp_t *ipp, ipp_tag_t group, char *name, ipp_uchar_t *value);
 extern ipp_attribute_t	*ippAddInteger(ipp_t *ipp, ipp_tag_t group, ipp_tag_t type, char *name, int value);
 extern ipp_attribute_t	*ippAddIntegers(ipp_t *ipp, ipp_tag_t group, ipp_tag_t type, char *name, int num_values, int *values);
 extern ipp_attribute_t	*ippAddRange(ipp_t *ipp, ipp_tag_t group, char *name, int lower, int upper);
@@ -327,7 +323,7 @@ extern ipp_attribute_t	*ippFindAttribute(ipp_t *ipp, char *name, ipp_tag_t type)
 extern size_t		ippLength(ipp_t *ipp);
 extern ipp_t		*ippNew(void);
 extern ipp_state_t	ippRead(http_t *http, ipp_t *ipp);
-extern uchar		*ippTimeToDate(time_t t);
+extern ipp_uchar_t	*ippTimeToDate(time_t t);
 extern ipp_state_t	ippWrite(http_t *http, ipp_t *ipp);
 extern int		ippPort(void);
 
@@ -341,5 +337,5 @@ extern int		ippPort(void);
 #endif /* !_CUPS_IPP_H_ */
 
 /*
- * End of "$Id: ipp.h,v 1.13 1999/04/22 15:02:43 mike Exp $".
+ * End of "$Id: ipp.h,v 1.14 1999/04/22 20:19:22 mike Exp $".
  */

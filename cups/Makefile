@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.7 1999/04/22 13:53:04 mike Exp $"
+# "$Id: Makefile,v 1.8 1999/04/22 20:19:20 mike Exp $"
 #
 #   Support library Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -75,11 +75,19 @@ libcups.a:	$(OBJS)
 	$(AR) $(ARFLAGS) $@ $(OBJS)
 	$(RANLIB) $@
 
+#
+# cups_C.h - the default POSIX locale that is compiled in.
+#
+
+cups_C.h:	../locale/C/cups_C
+	$(RM) cups_C.h
+	$(AWK) '{print "\"" $$0 "\","}' < ../locale/C/cups_C > cups_C.h
+
 emit.o:		ppd.h ../config.h ../Makedefs
 filter.o:	mime.h ../config.h ../Makedefs
 http.o:		http.h string.h ../config.h ../Makedefs
 ipp.o:		http.h ipp.h ../config.h ../Makedefs
-language.o:	language.h string.h ../config.h ../Makedefs
+language.o:	cups_C.h language.h string.h ../config.h ../Makedefs
 mark.o:		ppd.h ../config.h ../Makedefs
 mime.o:		mime.h ../config.h ../Makedefs
 options.o:	cups.h ../config.h ../Makedefs
@@ -117,5 +125,5 @@ testppd:	testppd.o libcups.a
 testppd.o:	ppd.h ../Makedefs
 
 #
-# End of "$Id: Makefile,v 1.7 1999/04/22 13:53:04 mike Exp $".
+# End of "$Id: Makefile,v 1.8 1999/04/22 20:19:20 mike Exp $".
 #

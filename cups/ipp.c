@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.13 1999/04/22 15:02:40 mike Exp $"
+ * "$Id: ipp.c,v 1.14 1999/04/22 20:19:21 mike Exp $"
  *
  *   Internet Printing Protocol support functions for the Common UNIX
  *   Printing System (CUPS).
@@ -138,10 +138,10 @@ ippAddBooleans(ipp_t     *ipp,		/* I - IPP request */
  */
 
 ipp_attribute_t *			/* O - New attribute */
-ippAddDate(ipp_t     *ipp,		/* I - IPP request */
-           ipp_tag_t group,		/* I - IPP group */
-	   char      *name,		/* I - Name of attribute */
-	   uchar     *value)		/* I - Value */
+ippAddDate(ipp_t       *ipp,		/* I - IPP request */
+           ipp_tag_t   group,		/* I - IPP group */
+	   char        *name,		/* I - Name of attribute */
+	   ipp_uchar_t *value)		/* I - Value */
 {
   ipp_attribute_t	*attr;		/* New attribute */
 
@@ -471,8 +471,8 @@ ippAddSeparator(ipp_t *ipp)		/* I - IPP request */
  *                      in seconds.
  */
 
-time_t
-ippDateToTime(uchar *date)	/* RFC 1903 date info */
+time_t				/* O - UNIX time value */
+ippDateToTime(ipp_uchar_t *date)/* I - RFC 1903 date info */
 {
   struct tm	unixdate;	/* UNIX date/time info */
   time_t	t;		/* Computed time */
@@ -988,11 +988,11 @@ ippRead(http_t *http,		/* I - HTTP data */
  * 'ippTimeToDate()' - Convert from UNIX time to RFC 1903 format.
  */
 
-uchar *				/* O - RFC-1903 date/time data */
-ippTimeToDate(time_t t)		/* I - UNIX time value */
+ipp_uchar_t *				/* O - RFC-1903 date/time data */
+ippTimeToDate(time_t t)			/* I - UNIX time value */
 {
-  struct tm	*unixdate;	/* UNIX unixdate/time info */
-  static uchar	date[11];	/* RFC-1903 date/time data */
+  struct tm		*unixdate;	/* UNIX unixdate/time info */
+  static ipp_uchar_t	date[11];	/* RFC-1903 date/time data */
 
 
  /*
@@ -1450,5 +1450,5 @@ ipp_read(http_t *http,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.13 1999/04/22 15:02:40 mike Exp $".
+ * End of "$Id: ipp.c,v 1.14 1999/04/22 20:19:21 mike Exp $".
  */
