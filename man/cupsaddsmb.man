@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: cupsaddsmb.man,v 1.4 2002/03/14 15:09:08 mike Exp $"
+.\" "$Id: cupsaddsmb.man,v 1.5 2002/09/27 13:12:21 mike Exp $"
 .\"
 .\"   cupsaddsmb man page for the Common UNIX Printing System (CUPS).
 .\"
@@ -21,7 +21,7 @@
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
-.TH cupsaddsmb 8 "Common UNIX Printing System" "14 March 2002" "Easy Software Products"
+.TH cupsaddsmb 8 "Common UNIX Printing System" "27 September 2002" "Easy Software Products"
 .SH NAME
 cupsaddsmb \- export printers to samba for windows clients
 .SH SYNOPSIS
@@ -46,7 +46,7 @@ cupsaddsmb \- export printers to samba for windows clients
 \fIcupsaddsmb\fR exports printers to the SAMBA software (version
 2.2.0 or higher) for use with Windows clients. Depending on the
 SAMBA configuration, you may need to provide a password to
-export the printers. This program requires the Adobe PostScript
+export the printers. This program requires the CUPS or Adobe PostScript
 printer driver files described below.
 .LP
 The \fI-H\fR option specifies the SAMBA server which defaults
@@ -98,30 +98,67 @@ share, as follows:
 This configuration assumes a FHS-compliant installation of
 SAMBA; adjust the [printers] and [print$] share paths
 accordingly on your system as needed.
-.SH ADOBE POSTSCRIPT DRIVERS FOR WINDOWS
-\fIcupsaddsmb\fR uses the Adobe PostScript printer drivers for
-Windows, which are available for download from the Adobe web
-site (http://www.adobe.com). Once you have extracted the driver
-files, create a "drivers" directory in the CUPS data directory
-(usually /usr/share/cups) and copy the Adobe files using
-UPPERCASE filenames, as follows:
+
+.SH CUPS POSTSCRIPT DRIVERS FOR WINDOWS
+\fIcupsaddsmb\fR can use the CUPS PostScript printer drivers for
+Windows, which are available for download from the CUPS web
+site.
+.LP
+The CUPS printer drivers are preferred over the Adobe drivers
+since they support page accounting, banner pages, and page
+labels on all printers.  However, currently only Windows NT,
+2000, and XP are supported by the CUPS drivers, so you will also
+need to get the Adobe driver to support Windows 95, 98, and Me
+clients.
+.LP
+Once you have extracted the driver files, create a "drivers"
+directory in the CUPS data directory (usually /usr/share/cups)
+and copy the CUPS files using lowercase filenames, as follows:
 .nf
 
+    [Windows NT, 2000, and XP]
+    cups.hlp
+    cupsdrvr.dll
+    cupsui.dll
+.fi
+
+.SH ADOBE POSTSCRIPT DRIVERS FOR WINDOWS
+\fIcupsaddsmb\fR can use the Adobe PostScript printer drivers for
+Windows, which are available for download from the Adobe web
+site (http://www.adobe.com).
+.LP
+The CUPS printer drivers are preferred over the Adobe drivers
+since they support page accounting, banner pages, and page
+labels on all printers.
+.LP
+Once you have extracted the driver files, create a "drivers"
+directory in the CUPS data directory (usually /usr/share/cups)
+and copy the Adobe files using UPPERCASE filenames, as follows:
+.nf
+
+    [Windows 95, 98, and Me]
     ADFONTS.MFM
     ADOBEPS4.DRV
     ADOBEPS4.HLP
-    ADOBEPS5.DLL
-    ADOBEPSU.DLL
-    ADOBEPSU.HLP
     DEFPRTR2.PPD
     ICONLIB.DLL
     PSMON.DLL
+
+    [Windows NT, 2000, and XP]
+    ADOBEPS5.DLL
+    ADOBEPSU.DLL
+    ADOBEPSU.HLP
 .fi
+.LP
+You can download and copy either set of driver files
+independently, and use the CUPS drivers for Windows NT, 2000,
+and XP while using the Adobe drivers for the Windows 95, 98, and
+Me clients.
 .SH SEE ALSO
 CUPS Software Administrators Manual,
 http://localhost:631/documentation.html
 .SH COPYRIGHT
 Copyright 1993-2002 by Easy Software Products, All Rights Reserved.
 .\"
-.\" End of "$Id: cupsaddsmb.man,v 1.4 2002/03/14 15:09:08 mike Exp $".
+.\" End of "$Id: cupsaddsmb.man,v 1.5 2002/09/27 13:12:21 mike Exp $".
 .\"
