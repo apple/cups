@@ -1,5 +1,5 @@
 /*
- * "$Id: string.h,v 1.7.2.6 2002/05/09 02:22:09 mike Exp $"
+ * "$Id: string.h,v 1.7.2.7 2002/05/15 01:57:01 mike Exp $"
  *
  *   String definitions for the Common UNIX Printing System (CUPS).
  *
@@ -70,28 +70,32 @@ extern "C" {
  */
 
 #  ifndef HAVE_STRDUP
-extern char	*ipp_strdup(const char *);
-#    define strdup ipp_strdup
+extern char	*cups_strdup(const char *);
+#    define strdup cups_strdup
 #  endif /* !HAVE_STRDUP */
 
 #  ifndef HAVE_STRCASECMP
-extern int	ipp_strcasecmp(const char *, const char *);
-#    define strcasecmp ipp_strcasecmp
+extern int	cups_strcasecmp(const char *, const char *);
+#    define strcasecmp cups_strcasecmp
 #  endif /* !HAVE_STRCASECMP */
 
 #  ifndef HAVE_STRNCASECMP
-extern int	ipp_strncasecmp(const char *, const char *, size_t n);
-#    define strncasecmp ipp_strncasecmp
+extern int	cups_strncasecmp(const char *, const char *, size_t n);
+#    define strncasecmp cups_strncasecmp
 #  endif /* !HAVE_STRNCASECMP */
 
 #  ifndef HAVE_SNPRINTF
-extern int	ipp_snprintf(char *, size_t, const char *, ...);
-#    define snprintf ipp_snprintf
+extern int	cups_snprintf(char *, size_t, const char *, ...)
+#    ifdef __GNUC__
+__attribute__ ((__format__ (__printf__, 3, 4)))
+#    endif /* __GNUC__ */
+;
+#    define snprintf cups_snprintf
 #  endif /* !HAVE_SNPRINTF */
 
 #  ifndef HAVE_VSNPRINTF
-extern int	ipp_vsnprintf(char *, size_t, const char *, va_list);
-#    define vsnprintf ipp_vsnprintf
+extern int	cups_vsnprintf(char *, size_t, const char *, va_list);
+#    define vsnprintf cups_vsnprintf
 #  endif /* !HAVE_VSNPRINTF */
 
 
@@ -106,5 +110,5 @@ extern int	ipp_vsnprintf(char *, size_t, const char *, va_list);
 #endif /* !_IPP_STRING_H_ */
 
 /*
- * End of "$Id: string.h,v 1.7.2.6 2002/05/09 02:22:09 mike Exp $".
+ * End of "$Id: string.h,v 1.7.2.7 2002/05/15 01:57:01 mike Exp $".
  */

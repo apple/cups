@@ -1,5 +1,5 @@
 /*
- * "$Id: snprintf.c,v 1.4.2.4 2002/05/09 02:22:09 mike Exp $"
+ * "$Id: snprintf.c,v 1.4.2.5 2002/05/15 01:57:00 mike Exp $"
  *
  *   snprintf functions for the Common UNIX Printing System (CUPS).
  *
@@ -25,8 +25,8 @@
  *
  * Contents:
  *
- *   ipp_vsnprintf() - Format a string into a fixed size buffer.
- *   ipp_snprintf()  - Format a string into a fixed size buffer.
+ *   cups_vsnprintf() - Format a string into a fixed size buffer.
+ *   cups_snprintf()  - Format a string into a fixed size buffer.
  */
 
 /*
@@ -40,11 +40,11 @@
 
 #ifndef HAVE_VSNPRINTF
 /*
- * 'ipp_vsnprintf()' - Format a string into a fixed size buffer.
+ * 'cups_vsnprintf()' - Format a string into a fixed size buffer.
  */
 
 int					/* O - Number of bytes formatted */
-ipp_vsnprintf(char       *buffer,	/* O - Output buffer */
+cups_vsnprintf(char       *buffer,	/* O - Output buffer */
               size_t     bufsize,	/* O - Size of output buffer */
 	      const char *format,	/* I - printf-style format string */
 	      va_list    ap)		/* I - Pointer to additional arguments */
@@ -261,11 +261,11 @@ ipp_vsnprintf(char       *buffer,	/* O - Output buffer */
 
 #ifndef HAVE_SNPRINTF
 /*
- * 'ipp_snprintf()' - Format a string into a fixed size buffer.
+ * 'cups_snprintf()' - Format a string into a fixed size buffer.
  */
 
 int					/* O - Number of bytes formatted */
-ipp_snprintf(char       *buffer,	/* O - Output buffer */
+cups_snprintf(char       *buffer,	/* O - Output buffer */
              size_t     bufsize,	/* O - Size of output buffer */
              const char *format,	/* I - printf-style format string */
 	     ...)			/* I - Additional arguments as needed */
@@ -284,6 +284,6 @@ ipp_snprintf(char       *buffer,	/* O - Output buffer */
 
 
 /*
- * End of "$Id: snprintf.c,v 1.4.2.4 2002/05/09 02:22:09 mike Exp $".
+ * End of "$Id: snprintf.c,v 1.4.2.5 2002/05/15 01:57:00 mike Exp $".
  */
 

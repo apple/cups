@@ -1,5 +1,5 @@
 /*
- * "$Id: string.c,v 1.5.2.4 2002/05/09 02:22:09 mike Exp $"
+ * "$Id: string.c,v 1.5.2.5 2002/05/15 01:57:01 mike Exp $"
  *
  *   String functions for the Common UNIX Printing System (CUPS).
  *
@@ -25,9 +25,9 @@
  *
  * Contents:
  *
- *   ipp_strdup()      - Duplicate a string.
- *   ipp_strcasecmp()  - Do a case-insensitive comparison.
- *   ipp_strncasecmp() - Do a case-insensitive comparison on up to N chars.
+ *   cups_strdup()      - Duplicate a string.
+ *   cups_strcasecmp()  - Do a case-insensitive comparison.
+ *   cups_strncasecmp() - Do a case-insensitive comparison on up to N chars.
  */
 
 /*
@@ -38,12 +38,12 @@
 
 
 /*
- * 'ipp_strdup()' - Duplicate a string.
+ * 'cups_strdup()' - Duplicate a string.
  */
 
 #  ifndef HAVE_STRDUP
 char *				/* O - New string pointer */
-ipp_strdup(const char *s)	/* I - String to duplicate */
+cups_strdup(const char *s)	/* I - String to duplicate */
 {
   char	*t;			/* New string pointer */
 
@@ -60,12 +60,12 @@ ipp_strdup(const char *s)	/* I - String to duplicate */
 
 
 /*
- * 'ipp_strcasecmp()' - Do a case-insensitive comparison.
+ * 'cups_strcasecmp()' - Do a case-insensitive comparison.
  */
 
 #  ifndef HAVE_STRCASECMP
 int				/* O - Result of comparison (-1, 0, or 1) */
-ipp_strcasecmp(const char *s,	/* I - First string */
+cups_strcasecmp(const char *s,	/* I - First string */
                const char *t)	/* I - Second string */
 {
   while (*s != '\0' && *t != '\0')
@@ -89,12 +89,12 @@ ipp_strcasecmp(const char *s,	/* I - First string */
 #  endif /* !HAVE_STRCASECMP */
 
 /*
- * 'ipp_strncasecmp()' - Do a case-insensitive comparison on up to N chars.
+ * 'cups_strncasecmp()' - Do a case-insensitive comparison on up to N chars.
  */
 
 #  ifndef HAVE_STRNCASECMP
 int				/* O - Result of comparison (-1, 0, or 1) */
-ipp_strncasecmp(const char *s,	/* I - First string */
+cups_strncasecmp(const char *s,	/* I - First string */
                 const char *t,	/* I - Second string */
 	        size_t     n)	/* I - Maximum number of characters to compare */
 {
@@ -123,5 +123,5 @@ ipp_strncasecmp(const char *s,	/* I - First string */
 
 
 /*
- * End of "$Id: string.c,v 1.5.2.4 2002/05/09 02:22:09 mike Exp $".
+ * End of "$Id: string.c,v 1.5.2.5 2002/05/15 01:57:01 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: http.h,v 1.33.2.11 2002/05/09 03:44:17 mike Exp $"
+ * "$Id: http.h,v 1.33.2.12 2002/05/15 01:57:00 mike Exp $"
  *
  *   Hyper-Text Transport Protocol definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -330,7 +330,11 @@ extern int		httpHead(http_t *http, const char *uri);
 extern void		httpInitialize(void);
 extern int		httpOptions(http_t *http, const char *uri);
 extern int		httpPost(http_t *http, const char *uri);
-extern int		httpPrintf(http_t *http, const char *format, ...);
+extern int		httpPrintf(http_t *http, const char *format, ...)
+#  ifdef __GNUC__
+__attribute__ ((__format__ (__printf__, 2, 3)))
+#  endif /* __GNUC__ */
+;
 extern int		httpPut(http_t *http, const char *uri);
 extern int		httpRead(http_t *http, char *buffer, int length);
 extern int		httpReconnect(http_t *http);
@@ -373,5 +377,5 @@ extern char		*httpAddrString(const http_addr_t *addr,
 #endif /* !_IPP_HTTP_H_ */
 
 /*
- * End of "$Id: http.h,v 1.33.2.11 2002/05/09 03:44:17 mike Exp $".
+ * End of "$Id: http.h,v 1.33.2.12 2002/05/15 01:57:00 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.124.2.16 2002/05/14 01:25:42 mike Exp $"
+ * "$Id: job.c,v 1.124.2.17 2002/05/15 01:57:04 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -978,7 +978,7 @@ SetJobHoldUntil(int        id,		/* I - Job ID */
       job->hold_until += 24 * 60 * 60 * 60;
   }
 
-  LogMessage(L_DEBUG, "SetJobHoldUntil: hold_until = %d", job->hold_until);
+  LogMessage(L_DEBUG, "SetJobHoldUntil: hold_until = %d", (int)job->hold_until);
 }
 
 
@@ -1106,7 +1106,7 @@ StartJob(int       id,		/* I - Job ID */
 		fontpath[1050];	/* CUPS_FONTPATH environment variable */
 
 
-  LogMessage(L_DEBUG, "StartJob(%d, %08x)", id, printer);
+  LogMessage(L_DEBUG, "StartJob(%d, %p)", id, printer);
 
   for (current = Jobs; current != NULL; current = current->next)
     if (current->id == id)
@@ -2221,7 +2221,7 @@ start_process(const char *command,	/* I - Full path to command */
   int	pid;				/* Process ID */
 
 
-  LogMessage(L_DEBUG, "start_process(\"%s\", %08x, %08x, %d, %d, %d)",
+  LogMessage(L_DEBUG, "start_process(\"%s\", %p, %p, %d, %d, %d)",
              command, argv, envp, infd, outfd, errfd);
 
   if ((pid = fork()) == 0)
@@ -2311,5 +2311,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.124.2.16 2002/05/14 01:25:42 mike Exp $".
+ * End of "$Id: job.c,v 1.124.2.17 2002/05/15 01:57:04 mike Exp $".
  */

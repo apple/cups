@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.91.2.10 2002/04/23 18:40:41 mike Exp $"
+ * "$Id: client.c,v 1.91.2.11 2002/05/15 01:57:01 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -83,7 +83,7 @@ AcceptClient(listener_t *lis)	/* I - Listener socket */
   http_addr_t		temp;	/* Temporary address variable */
 
 
-  LogMessage(L_DEBUG2, "AcceptClient(%08x) %d NumClients = %d",
+  LogMessage(L_DEBUG2, "AcceptClient(%p) %d NumClients = %d",
              lis, lis->fd, NumClients);
 
  /*
@@ -1245,7 +1245,7 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	  fstat(con->file, &filestats);
 
           LogMessage(L_DEBUG2, "ReadClient() %d Closing data file %d, size = %d.",
-                     con->http.fd, con->file, filestats.st_size);
+                     con->http.fd, con->file, (int)filestats.st_size);
 
 	  close(con->file);
 	  con->file = 0;
@@ -1385,7 +1385,7 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	    fstat(con->file, &filestats);
 
             LogMessage(L_DEBUG2, "ReadClient() %d Closing data file %d, size = %d.",
-                       con->http.fd, con->file, filestats.st_size);
+                       con->http.fd, con->file, (int)filestats.st_size);
 
 	    close(con->file);
 	    con->file = 0;
@@ -1911,7 +1911,8 @@ check_if_modified(client_t    *con,		/* I - Client connection */
   }
 
   LogMessage(L_DEBUG2, "check_if_modified() %d sizes=%d,%d dates=%d,%d",
-             con->http.fd, size, filestats->st_size, date, filestats->st_mtime);
+             con->http.fd, size, (int)filestats->st_size, (int)date,
+	     (int)filestats->st_mtime);
 
   return ((size != filestats->st_size && size != 0) ||
           (date < filestats->st_mtime && date != 0) ||
@@ -1937,7 +1938,7 @@ decode_auth(client_t *con)		/* I - Client to decode to */
 
   s = con->http.fields[HTTP_FIELD_AUTHORIZATION];
 
-  LogMessage(L_DEBUG2, "decode_auth(%08x): Authorization string = \"%s\"",
+  LogMessage(L_DEBUG2, "decode_auth(%p): Authorization string = \"%s\"",
              con, s);
 
   if (strncmp(s, "Basic", 5) == 0)
@@ -2072,7 +2073,7 @@ get_file(client_t    *con,	/* I - Client connection */
   }
 
   LogMessage(L_DEBUG2, "get_file() %d filename=%s size=%d",
-             con->http.fd, filename, status ? -1 : filestats->st_size);
+             con->http.fd, filename, status ? -1 : (int)filestats->st_size);
 
   if (status)
     return (NULL);
@@ -2535,5 +2536,5 @@ pipe_command(client_t *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.91.2.10 2002/04/23 18:40:41 mike Exp $".
+ * End of "$Id: client.c,v 1.91.2.11 2002/05/15 01:57:01 mike Exp $".
  */

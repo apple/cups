@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.h,v 1.36.2.4 2002/05/14 01:25:41 mike Exp $"
+ * "$Id: conf.h,v 1.36.2.5 2002/05/15 01:57:02 mike Exp $"
  *
  *   Configuration file definitions for the Common UNIX Printing System (CUPS)
  *   scheduler.
@@ -164,10 +164,14 @@ VAR char		ServerCertificate[1024]	VALUE("ssl/server.crt"),
 extern char	*GetDateTime(time_t t);
 extern int	ReadConfiguration(void);
 extern int	LogRequest(client_t *con, http_status_t code);
-extern int	LogMessage(int level, const char *message, ...);
+extern int	LogMessage(int level, const char *message, ...)
+#ifdef __GNUC__
+__attribute__ ((__format__ (__printf__, 2, 3)))
+#endif /* __GNUC__ */
+;
 extern int	LogPage(job_t *job, const char *page);
 
 
 /*
- * End of "$Id: conf.h,v 1.36.2.4 2002/05/14 01:25:41 mike Exp $".
+ * End of "$Id: conf.h,v 1.36.2.5 2002/05/15 01:57:02 mike Exp $".
  */
