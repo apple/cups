@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-sharedlibs.m4,v 1.3 2001/06/29 14:01:15 mike Exp $"
+dnl "$Id: cups-sharedlibs.m4,v 1.4 2001/07/24 20:23:03 mike Exp $"
 dnl
 dnl   Shared library support for the Common UNIX Printing System (CUPS).
 dnl
@@ -25,7 +25,7 @@ dnl
 PICFLAG=1
 DSOFLAGS="${DSOFLAGS:=}"
 
-AC_ARG_ENABLE(shared, [  --enable-shared        turn on shared libraries [default=yes]])
+AC_ARG_ENABLE(shared, [  --enable-shared         turn on shared libraries [default=yes]])
 
 if test x$enable_shared != xno; then
 	case "$uname" in
@@ -132,5 +132,5 @@ AC_SUBST(DSOLIBS)
 AC_SUBST(IMGLIBS)
 
 dnl
-dnl End of "$Id: cups-sharedlibs.m4,v 1.3 2001/06/29 14:01:15 mike Exp $".
+dnl End of "$Id: cups-sharedlibs.m4,v 1.4 2001/07/24 20:23:03 mike Exp $".
 dnl

@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-opsys.m4,v 1.4 2001/07/10 14:14:26 mike Exp $"
+dnl "$Id: cups-opsys.m4,v 1.5 2001/07/24 20:23:03 mike Exp $"
 dnl
 dnl   Operating system stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -30,7 +30,7 @@ if test x$uname = xIRIX64; then
 fi
 
 dnl Determine the correct username and group for this OS...
-AC_ARG_WITH(cups-user, [ --with-cups-user    set default user for CUPS],
+AC_ARG_WITH(cups-user, [  --with-cups-user        set default user for CUPS],
 	CUPS_USER="$withval",
 	AC_MSG_CHECKING(for default print user)
 	if test -f /etc/passwd; then
@@ -52,7 +52,7 @@ AC_ARG_WITH(cups-user, [ --with-cups-user    set default user for CUPS],
 		AC_MSG_RESULT(no password file, using "$CUPS_USER")
 	fi)
 
-AC_ARG_WITH(cups-group, [ --with-cups-group   set default group for CUPS],
+AC_ARG_WITH(cups-group, [  --with-cups-group       set default group for CUPS],
 	CUPS_GROUP="$withval",
 	AC_MSG_CHECKING(for default print group)
 	if test -f /etc/group; then
@@ -81,5 +81,5 @@ AC_DEFINE_UNQUOTED(CUPS_DEFAULT_USER, "$CUPS_USER")
 AC_DEFINE_UNQUOTED(CUPS_DEFAULT_GROUP, "$CUPS_GROUP")
 
 dnl
-dnl "$Id: cups-opsys.m4,v 1.4 2001/07/10 14:14:26 mike Exp $"
+dnl "$Id: cups-opsys.m4,v 1.5 2001/07/24 20:23:03 mike Exp $"
 dnl

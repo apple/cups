@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-pam.m4,v 1.1 2001/06/27 19:06:46 mike Exp $"
+dnl "$Id: cups-pam.m4,v 1.2 2001/07/24 20:23:03 mike Exp $"
 dnl
 dnl   PAM stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -22,7 +22,7 @@ dnl       EMail: cups-info@cups.org
 dnl         WWW: http://www.cups.org
 dnl
 
-AC_ARG_ENABLE(pam, [  --enable-pam        turn on PAM support [default=yes]])
+AC_ARG_ENABLE(pam, [  --enable-pam            turn on PAM support [default=yes]])
 
 dnl Don't use PAM with AIX...
 if test $uname = AIX; then
@@ -55,5 +55,5 @@ AC_SUBST(PAMDIR)
 AC_SUBST(PAMLIBS)
 
 dnl
-dnl End of "$Id: cups-pam.m4,v 1.1 2001/06/27 19:06:46 mike Exp $".
+dnl End of "$Id: cups-pam.m4,v 1.2 2001/07/24 20:23:03 mike Exp $".
 dnl

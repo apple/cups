@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-directories.m4,v 1.1 2001/06/27 19:06:45 mike Exp $"
+dnl "$Id: cups-directories.m4,v 1.2 2001/07/24 20:23:03 mike Exp $"
 dnl
 dnl   Directory stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -24,10 +24,10 @@ dnl
 
 AC_PREFIX_DEFAULT(/)
 
-AC_ARG_WITH(fontpath, [  --with-fontpath     set font path for pstoraster],fontpath="$withval",fontpath="")
-AC_ARG_WITH(docdir, [  --with-docdir       set path for documentation],docdir="$withval",docdir="")
-AC_ARG_WITH(logdir, [  --with-logdir       set path for log files],logdir="$withval",logdir="")
-AC_ARG_WITH(rcdir, [  --with-rcdir        set path for rc scripts],rcdir="$withval",rcdir="")
+AC_ARG_WITH(fontpath, [  --with-fontpath         set font path for pstoraster],fontpath="$withval",fontpath="")
+AC_ARG_WITH(docdir, [  --with-docdir           set path for documentation],docdir="$withval",docdir="")
+AC_ARG_WITH(logdir, [  --with-logdir           set path for log files],logdir="$withval",logdir="")
+AC_ARG_WITH(rcdir, [  --with-rcdir            set path for rc scripts],rcdir="$withval",rcdir="")
 
 dnl Fix "prefix" variable if it hasn't been specified...
 if test "$prefix" = "NONE"; then
@@ -226,5 +226,5 @@ dnl Set the CUPS_FONTPATH directory...
 AC_DEFINE_UNQUOTED(CUPS_FONTPATH, "$fontpath")
 
 dnl
-dnl End of "$Id: cups-directories.m4,v 1.1 2001/06/27 19:06:45 mike Exp $".
+dnl End of "$Id: cups-directories.m4,v 1.2 2001/07/24 20:23:03 mike Exp $".
 dnl
