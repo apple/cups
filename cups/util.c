@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c,v 1.66 2000/11/06 16:18:10 mike Exp $"
+ * "$Id: util.c,v 1.67 2000/12/06 18:05:01 mike Exp $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -1271,7 +1271,11 @@ cupsTempFile(char *filename,		/* I - Pointer to buffer */
              int  len)			/* I - Size of buffer */
 {
   int		fd;			/* File descriptor for temp file */
+#ifdef WIN32
+  char		tmpdir[1024];		/* Windows temporary directory */
+#else
   char		*tmpdir;		/* TMPDIR environment var */
+#endif /* WIN32 */
   struct timeval curtime;		/* Current time */
   static char	buf[1024] = "";		/* Buffer if you pass in NULL and 0 */
 
@@ -1290,11 +1294,11 @@ cupsTempFile(char *filename,		/* I - Pointer to buffer */
   * See if TMPDIR is defined...
   */
 
+#ifdef WIN32
+  GetTempPath(sizeof(tmpdir), tmpdir);
+#else
   if ((tmpdir = getenv("TMPDIR")) == NULL)
   {
-#ifdef WIN32
-    tmpdir = "C:/WINDOWS/TEMP";
-#else
    /*
     * Put root temp files in restricted temp directory...
     */
@@ -1303,8 +1307,8 @@ cupsTempFile(char *filename,		/* I - Pointer to buffer */
       tmpdir = CUPS_REQUESTS "/tmp";
     else
       tmpdir = "/var/tmp";
-#endif /* WIN32 */
   }
+#endif /* WIN32 */
 
  /*
   * Make the temporary name using the specified directory...
@@ -1481,5 +1485,5 @@ cups_local_auth(http_t *http)	/* I - Connection */
 
 
 /*
- * End of "$Id: util.c,v 1.66 2000/11/06 16:18:10 mike Exp $".
+ * End of "$Id: util.c,v 1.67 2000/12/06 18:05:01 mike Exp $".
  */

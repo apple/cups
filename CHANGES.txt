@@ -1,4 +1,4 @@
-CHANGES.txt - 11/17/2000
+CHANGES.txt - 12/06/2000
 ------------------------
 
 CHANGES IN CUPS V1.1.5
@@ -145,6 +145,8 @@ CHANGES IN CUPS V1.1.5
 	  is set in the plot file.
 	- The lpmove command wasn't sending the requesting
 	  user name, causing it to always fail.
+	- Updated the cupsTempFile() code to use GetTempPath()
+	  under Windows.
 
 
 CHANGES IN CUPS v1.1.4
