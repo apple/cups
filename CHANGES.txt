@@ -121,6 +121,8 @@ CHANGES IN CUPS V1.1.9
 	- Clients can now (with the appropriate authentication)
 	  retrieve and update the server configuration files
 	  using HTTP GET and PUT requests.
+	- The web interface didn't allow you to modify the
+	  location or description of the printer.
 
 
 CHANGES IN CUPS V1.1.8
