@@ -1,5 +1,5 @@
 /*
- * "$Id: pstops.c,v 1.49 2001/02/13 16:08:00 mike Exp $"
+ * "$Id: pstops.c,v 1.50 2001/03/02 13:42:20 mike Exp $"
  *
  *   PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -234,23 +234,7 @@ main(int  argc,			/* I - Number of command-line arguments */
   * Write any JCL commands that are needed to print PostScript code...
   */
 
-  if (ppd != NULL && ppd->jcl_begin && ppd->jcl_ps)
-  {
-    fputs(ppd->jcl_begin, stdout);
-    ppdEmit(ppd, stdout, PPD_ORDER_JCL);
-
-    if (strncmp(ppd->jcl_ps, "@PJL", 4) == 0)
-    {
-     /*
-      * Send other PJL commands before we enter PostScript mode...
-      */
-
-      printf("@PJL JOB NAME = \"%s\" DISPLAY = \"%s %s %s\"\n", argv[3],
-             argv[1], argv[2], argv[3]);
-    }
-
-    fputs(ppd->jcl_ps, stdout);
-  }
+  ppdEmitJCL(ppd, stdout, atoi(argv[1]), argv[2], argv[3]);
 
  /*
   * Read the first line to see if we have DSC comments...
@@ -920,5 +904,5 @@ start_nup(int number)	/* I - Page number */
 
 
 /*
- * End of "$Id: pstops.c,v 1.49 2001/02/13 16:08:00 mike Exp $".
+ * End of "$Id: pstops.c,v 1.50 2001/03/02 13:42:20 mike Exp $".
  */

@@ -1,4 +1,4 @@
-CHANGES.txt - 02/20/2001
+CHANGES.txt - 03/02/2001
 ------------------------
 
 CHANGES IN CUPS V1.1.7
@@ -6,9 +6,6 @@ CHANGES IN CUPS V1.1.7
 	- Documentation updates for encryption, SLP, etc.
 	- New Software Test Plan and automated test script to
 	  test CUPS prior to installation.
-	- cupsDo[File]Request() and cupsGetPPD() no longer
-	  block trying to reconnect to a crashed or inaccessable
-	  server.
 	- All scheduler configuration files are now case
 	  insensitive to match Apache.
 	- Added support for Apache ListenBackLog, LogFormat,
@@ -45,6 +42,11 @@ CHANGES IN CUPS V1.1.7
 	  in /etc/hosts or on their DNS server...
 	- Added support for Linux 2.4.x devfs parallel port
 	  filenames (/dev/parallel/N).
+	- cupsDo[File]Request() and cupsGetPPD() no longer
+	  block trying to reconnect to a crashed or inaccessable
+	  server.
+	- Added new ppdEmitJCL() function to better handle
+	  PJL commands from PPD files.
 
 
 CHANGES IN CUPS V1.1.6-3

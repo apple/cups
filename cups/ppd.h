@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.h,v 1.23 2001/02/09 16:23:35 mike Exp $"
+ * "$Id: ppd.h,v 1.24 2001/03/02 13:42:20 mike Exp $"
  *
  *   PostScript Printer Description definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -237,6 +237,8 @@ extern int		ppdEmit(ppd_file_t *ppd, FILE *fp,
 			        ppd_section_t section);
 extern int		ppdEmitFd(ppd_file_t *ppd, int fd,
 			          ppd_section_t section);
+extern int		ppdEmitJCL(ppd_file_t *ppd, FILE *fp, int job_id,
+			           const char *user, const char *title);
 extern int		ppdIsMarked(ppd_file_t *ppd, const char *keyword,
 			            const char *option);
 extern void		ppdMarkDefaults(ppd_file_t *ppd);
@@ -262,5 +264,5 @@ extern float		ppdPageWidth(ppd_file_t *ppd, const char *name);
 #endif /* !_CUPS_PPD_H_ */
 
 /*
- * End of "$Id: ppd.h,v 1.23 2001/02/09 16:23:35 mike Exp $".
+ * End of "$Id: ppd.h,v 1.24 2001/03/02 13:42:20 mike Exp $".
  */

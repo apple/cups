@@ -1,5 +1,5 @@
 /*
- * "$Id: emit.c,v 1.21 2001/01/22 15:03:24 mike Exp $"
+ * "$Id: emit.c,v 1.22 2001/03/02 13:42:19 mike Exp $"
  *
  *   PPD code emission routines for the Common UNIX Printing System (CUPS).
  *
@@ -28,6 +28,7 @@
  *   ppdCollect() - Collect all marked options that reside in the specified
  *   ppdEmit()    - Emit code for marked options to a file.
  *   ppdEmitFd()  - Emit code for marked options to a file.
+ *   ppdEmitJCL() - Emit code for JCL options to a file.
  *   ppd_sort()   - Sort options by ordering numbers...
  */
 
@@ -315,6 +316,77 @@ ppdEmitFd(ppd_file_t    *ppd,		/* I - PPD file record */
 
 
 /*
+ * 'ppdEmitJCL()' - Emit code for JCL options to a file.
+ */
+
+int					/* O - 0 on success, -1 on failure */
+ppdEmitJCL(ppd_file_t *ppd,		/* I - PPD file record */
+           FILE       *fp,		/* I - File to write to */
+           int        job_id,		/* I - Job ID */
+	   const char *user,		/* I - Username */
+	   const char *title)		/* I - Title */
+{
+  const char	*ptr;			/* Pointer into JCL string */
+
+
+  if (ppd == NULL || ppd->jcl_begin == NULL || ppd->jcl_ps == NULL)
+    return (0);
+
+  if (strncmp(ppd->jcl_begin, "\033%-12345X@", 10) == 0)
+  {
+   /*
+    * This printer uses HP PJL commands for output; filter the output
+    * so that we only have a single "@PJL JOB" command in the header...
+    */
+
+    fputs("\033%-12345X", fp);
+    for (ptr = ppd->jcl_begin + 9; *ptr;)
+      if (strncmp(ptr, "@PJL JOB", 8) == 0)
+      {
+       /*
+        * Skip job command...
+	*/
+
+        for (;*ptr; ptr ++)
+	  if (*ptr == '\n')
+	    break;
+
+	if (*ptr)
+	  ptr ++;
+      }
+      else
+      {
+       /*
+        * Copy line...
+	*/
+
+        for (;*ptr; ptr ++)
+	{
+	  putc(*ptr, fp);
+	  if (*ptr == '\n')
+	    break;
+	}
+
+	if (*ptr)
+	  ptr ++;
+      }
+
+   /*
+    * Send PJL JOB command before we enter PostScript mode...
+    */
+
+    fprintf(fp, "@PJL JOB NAME = \"%s\" DISPLAY = \"%d %s %s\"\n", title,
+            job_id, user, title);
+  }
+  else
+    fputs(ppd->jcl_begin, stdout);
+
+  ppdEmit(ppd, stdout, PPD_ORDER_JCL);
+  fputs(ppd->jcl_ps, stdout);
+}
+
+
+/*
  * 'ppd_sort()' - Sort options by ordering numbers...
  */
 
@@ -332,5 +404,5 @@ ppd_sort(ppd_choice_t **c1,	/* I - First choice */
 
 
 /*
- * End of "$Id: emit.c,v 1.21 2001/01/22 15:03:24 mike Exp $".
+ * End of "$Id: emit.c,v 1.22 2001/03/02 13:42:19 mike Exp $".
  */
