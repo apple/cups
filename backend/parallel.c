@@ -1,5 +1,5 @@
 /*
- * "$Id: parallel.c,v 1.22 2000/08/03 17:51:40 mike Exp $"
+ * "$Id: parallel.c,v 1.23 2000/08/17 15:38:09 mike Exp $"
  *
  *   Parallel port backend for the Common UNIX Printing System (CUPS).
  *
@@ -275,7 +275,8 @@ list_devices(void)
 #ifdef __linux
   int	i;			/* Looping var */
   int	fd;			/* File descriptor */
-  char	device[255];		/* Device filename */
+  char	device[255],		/* Device filename */
+	probefile[255];		/* Probe filename */
   FILE	*probe;			/* /proc/parport/n/autoprobe file */
   char	line[1024],		/* Line from file */
 	*delim,			/* Delimiter in file */
@@ -285,9 +286,41 @@ list_devices(void)
 
   for (i = 0; i < 4; i ++)
   {
-    sprintf(device, "/proc/parport/%d/autoprobe", i);
-    if ((probe = fopen(device, "r")) != NULL)
+   /*
+    * First open the device to make sure the driver module is loaded...
+    */
+
+    sprintf(device, "/dev/lp%d", i);
+    if ((fd = open(device, O_WRONLY)) >= 0)
+      close(fd);
+    else
     {
+      sprintf(device, "/dev/par%d", i);
+      if ((fd = open(device, O_WRONLY)) >= 0)
+	close(fd);
+    }
+
+   /*
+    * Then try looking at the probe file...
+    */
+
+    sprintf(probefile, "/proc/parport/%d/autoprobe", i);
+    if ((probe = fopen(probefile, "r")) == NULL)
+    {
+     /*
+      * Linux 2.4 kernel has different path...
+      */
+
+      sprintf(probefile, "/proc/sys/dev/parport/parport%d/autoprobe", i);
+      probe = fopen(probefile, "r");
+    }
+
+    if (probe != NULL)
+    {
+     /*
+      * Found a probe file!
+      */
+
       memset(make, 0, sizeof(make));
       memset(model, 0, sizeof(model));
       strcpy(model, "Unknown");
@@ -324,23 +357,13 @@ list_devices(void)
 	printf("direct parallel:/dev/lp%d \"%s\" \"Parallel Port #%d\"\n",
 	       i, model, i + 1);
     }
-    else
+    else if (fd >= 0)
     {
-      sprintf(device, "/dev/lp%d", i);
-      if ((fd = open(device, O_WRONLY)) >= 0)
-      {
-	close(fd);
-	printf("direct parallel:%s \"Unknown\" \"Parallel Port #%d\"\n", device, i + 1);
-      }
-      else
-      {
-	sprintf(device, "/dev/par%d", i);
-	if ((fd = open(device, O_WRONLY)) >= 0)
-	{
-	  close(fd);
-	  printf("direct parallel:%s \"Unknown\" \"Parallel Port #%d\"\n", device, i + 1);
-	}
-      }
+     /*
+      * No probe file, but we know the port is there...
+      */
+
+      printf("direct parallel:%s \"Unknown\" \"Parallel Port #%d\"\n", device, i + 1);
     }
   }
 #elif defined(__sgi)
@@ -560,5 +583,5 @@ list_devices(void)
 
 
 /*
- * End of "$Id: parallel.c,v 1.22 2000/08/03 17:51:40 mike Exp $".
+ * End of "$Id: parallel.c,v 1.23 2000/08/17 15:38:09 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: usb.c,v 1.9 2000/06/27 20:15:54 mike Exp $"
+ * "$Id: usb.c,v 1.10 2000/08/17 15:38:10 mike Exp $"
  *
  *   USB port backend for the Common UNIX Printing System (CUPS).
  *
@@ -262,15 +262,33 @@ list_devices(void)
   int	i;			/* Looping var */
   int	fd;			/* File descriptor */
   char	device[255];		/* Device filename */
-  FILE	*probe;			/* /proc/parport/n/autoprobe file */
+  FILE	*probe;			/* /proc/bus/usb/devices file */
   char	line[1024],		/* Line from file */
 	*delim,			/* Delimiter in file */
 	make[IPP_MAX_NAME],	/* Make from file */
 	model[IPP_MAX_NAME];	/* Model from file */
 
 
+ /*
+  * First try opening one of the USB devices to load the driver
+  * module as needed...
+  */
+
+  if ((fd = open("/dev/usb/lp0", O_WRONLY)) >= 0)
+    close(fd); /* 2.3.x and 2.4.x */
+  else if ((fd = open("/dev/usblp0", O_WRONLY)) >= 0)
+    close(fd); /* 2.2.x */
+
+ /*
+  * Then look at the device list for the USB bus...
+  */
+
   if ((probe = fopen("/proc/bus/usb/devices", "r")) != NULL)
   {
+   /*
+    * Scan the device list...
+    */
+
     i = 0;
 
     memset(make, 0, sizeof(make));
@@ -326,6 +344,10 @@ list_devices(void)
   }
   else
   {
+   /*
+    * Just probe manually for USB devices...
+    */
+
     for (i = 0; i < 8; i ++)
     {
       sprintf(device, "/dev/usb/lp%d", i);
@@ -366,5 +388,5 @@ list_devices(void)
 
 
 /*
- * End of "$Id: usb.c,v 1.9 2000/06/27 20:15:54 mike Exp $".
+ * End of "$Id: usb.c,v 1.10 2000/08/17 15:38:10 mike Exp $".
  */
