@@ -1,5 +1,5 @@
 /*
- * "$Id: dest.c,v 1.14 2000/11/06 16:18:09 mike Exp $"
+ * "$Id: dest.c,v 1.15 2000/12/20 21:16:36 mike Exp $"
  *
  *   User-defined destination (and option) support for the Common UNIX
  *   Printing System (CUPS).
@@ -302,6 +302,12 @@ cupsSetDests(int         num_dests,	/* I - Number of destinations */
   * Figure out which file to write to...
   */
 
+#ifdef WIN32
+  if ((home = getenv("CUPS_SERVERROOT")) == NULL)
+    home = CUPS_SERVERROOT;
+
+  snprintf(filename, sizeof(filename), "%s/lpoptions", home);
+#else
   if (getuid() == 0)
   {
     if ((home = getenv("CUPS_SERVERROOT")) == NULL)
@@ -313,6 +319,7 @@ cupsSetDests(int         num_dests,	/* I - Number of destinations */
     snprintf(filename, sizeof(filename), "%s/.lpoptions", home);
   else
     return;
+#endif /* WIN32 */
 
  /*
   * Try to open the file...
@@ -510,5 +517,5 @@ cups_get_dests(const char  *filename,	/* I - File to read from */
 
 
 /*
- * End of "$Id: dest.c,v 1.14 2000/11/06 16:18:09 mike Exp $".
+ * End of "$Id: dest.c,v 1.15 2000/12/20 21:16:36 mike Exp $".
  */

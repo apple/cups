@@ -85,11 +85,11 @@ LIB32=link.exe -lib
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 # Begin Source File
 
-SOURCE=.\emit.c
+SOURCE=.\dest.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\filter.c
+SOURCE=.\emit.c
 # End Source File
 # Begin Source File
 
@@ -109,7 +109,11 @@ SOURCE=.\mark.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\mime.c
+SOURCE=.\md5.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\md5passwd.c
 # End Source File
 # Begin Source File
 
@@ -125,10 +129,6 @@ SOURCE=.\ppd.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\raster.c
-# End Source File
-# Begin Source File
-
 SOURCE=.\snprintf.c
 # End Source File
 # Begin Source File
@@ -137,7 +137,7 @@ SOURCE=.\string.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\type.c
+SOURCE=.\usersys.c
 # End Source File
 # Begin Source File
 
@@ -153,6 +153,14 @@ SOURCE=.\cups.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\cups_C.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\debug.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\http.h
 # End Source File
 # Begin Source File
@@ -165,7 +173,7 @@ SOURCE=.\language.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\mime.h
+SOURCE=.\md5.h
 # End Source File
 # Begin Source File
 
@@ -173,7 +181,7 @@ SOURCE=.\ppd.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\raster.h
+SOURCE=.\string.h
 # End Source File
 # End Group
 # End Target

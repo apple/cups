@@ -1,9 +1,11 @@
 /*
- * "$Id: config.h,v 1.1 1999/12/21 02:26:49 mike Exp $"
+ * "$Id: config.h,v 1.2 2000/12/20 21:16:37 mike Exp $"
  *
- *   Configuration file for the Common UNIX Printing System (CUPS) under WIN32.
+ *   Configuration file for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-1999 by Easy Software Products.
+ *   @configure_input@
+ *
+ *   Copyright 1997-2000 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -26,15 +28,20 @@
  * Version of software...
  */
 
-#define CUPS_SVERSION	"CUPS v1.0.3"
+#define CUPS_SVERSION	"CUPS v1.1.5"
 
 /*
  * Where are files stored?
  */
 
 #define CUPS_LOCALEDIR	"C:/CUPS/locale"
-#define CUPS_SERVERROOT	"C:/CUPS/var"
-#define CUPS_DATADIR	"C:/CUPS/share"
+#define CUPS_SERVERROOT	"C:/CUPS/etc"
+#define CUPS_SERVERBIN	"C:/CUPS"
+#define CUPS_DOCROOT	"C:/CUPS/share/doc"
+#define CUPS_REQUESTS	"C:/CUPS/spool"
+#define CUPS_LOGDIR	"C:/CUPS/logs"
+#define CUPS_DATADIR    "C:/CUPS/share"
+#define CUPS_FONTPATH	"C:/CUPS/share/fonts"
 
 /*
  * Do we have various image libraries?
@@ -89,6 +96,12 @@
 #define HAVE_STRNCASECMP
 
 /*
+ * Do we have the vsyslog() function?
+ */
+
+#undef HAVE_VSYSLOG
+
+/*
  * Do we have the (v)snprintf() functions?
  */
 
@@ -110,5 +123,19 @@
 #undef HAVE_WAIT3
 
 /*
- * End of "$Id: config.h,v 1.1 1999/12/21 02:26:49 mike Exp $".
+ * Do we have the mallinfo function and malloc.h?
+ */
+
+#undef HAVE_MALLINFO
+#undef HAVE_MALLOC_H
+
+/*
+ * Do we have the OpenSSL library?
+ */
+
+#undef HAVE_LIBSSL
+
+
+/*
+ * End of "$Id: config.h,v 1.2 2000/12/20 21:16:37 mike Exp $".
  */

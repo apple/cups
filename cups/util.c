@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c,v 1.68 2000/12/20 13:41:13 mike Exp $"
+ * "$Id: util.c,v 1.69 2000/12/20 21:16:36 mike Exp $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -1273,10 +1273,11 @@ cupsTempFile(char *filename,		/* I - Pointer to buffer */
   int		fd;			/* File descriptor for temp file */
 #ifdef WIN32
   char		tmpdir[1024];		/* Windows temporary directory */
+  DWORD		curtime;		/* Current time */
 #else
   char		*tmpdir;		/* TMPDIR environment var */
-#endif /* WIN32 */
   struct timeval curtime;		/* Current time */
+#endif /* WIN32 */
   static char	buf[1024] = "";		/* Buffer if you pass in NULL and 0 */
 
 
@@ -1316,6 +1317,19 @@ cupsTempFile(char *filename,		/* I - Pointer to buffer */
 
   do
   {
+#ifdef WIN32
+   /*
+    * Get the current time of day...
+    */
+
+    curtime = GetTickCount();
+
+   /*
+    * Format a string using the hex time values...
+    */
+
+    snprintf(filename, len - 1, "%s/%08lx", tmpdir, curtime);
+#else
    /*
     * Get the current time of day...
     */
@@ -1328,6 +1342,7 @@ cupsTempFile(char *filename,		/* I - Pointer to buffer */
 
     snprintf(filename, len - 1, "%s/%08lx%05lx", tmpdir,
              curtime.tv_sec, curtime.tv_usec);
+#endif /* WIN32 */
 
    /*
     * Open the file in "exclusive" mode, making sure that we don't
@@ -1488,5 +1503,5 @@ cups_local_auth(http_t *http)	/* I - Connection */
 
 
 /*
- * End of "$Id: util.c,v 1.68 2000/12/20 13:41:13 mike Exp $".
+ * End of "$Id: util.c,v 1.69 2000/12/20 21:16:36 mike Exp $".
  */
