@@ -1,5 +1,24 @@
-CHANGES.txt - 05/01/2001
+CHANGES.txt - 05/04/2001
 ------------------------
+
+CHANGES IN CUPS V1.1.7-1
+
+	- Updated spec file to generate separate
+	  cups-pstoraster package for pstoraster.
+	- The spec file wasn't setting LOGDIR in the install.
+	- The scheduler might restart a stopped printer
+	  after stopping a print job. Thanks to Florent
+	  Guiliani for finding this bug!
+	- The init script showed run level 0 for the
+	  Red Hat chkconfig program.  This is incorrect
+	  because Red Hat doesn't use run level 0 for
+	  shutdown scripts.
+	- The IPP backend did not handle the
+	  client-error-not-found error when checking the
+	  status of the job that was sent.  This caused
+	  remote queues to stop on client machines when
+	  the server had job history disabled.
+
 
 CHANGES IN CUPS V1.1.7
 
