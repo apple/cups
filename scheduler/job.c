@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.214 2003/07/19 22:13:01 mike Exp $"
+ * "$Id: job.c,v 1.215 2003/07/20 02:28:22 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -689,10 +689,26 @@ LoadAllJobs(void)
                                          IPP_TAG_INTEGER);
       job->job_sheets = ippFindAttribute(job->attrs, "job-sheets", IPP_TAG_NAME);
 
-      attr = ippFindAttribute(job->attrs, "job-priority", IPP_TAG_INTEGER);
+      if ((attr = ippFindAttribute(job->attrs, "job-priority", IPP_TAG_INTEGER)) == NULL)
+      {
+        LogMessage(L_ERROR, "LoadAllJobs: Missing or bad job-priority attribute in control file \"%s\"!",
+	           filename);
+	ippDelete(job->attrs);
+	free(job);
+	unlink(filename);
+	continue;
+      }
       job->priority = attr->values[0].integer;
 
-      attr = ippFindAttribute(job->attrs, "job-originating-user-name", IPP_TAG_NAME);
+      if ((attr = ippFindAttribute(job->attrs, "job-originating-user-name", IPP_TAG_NAME)) == NULL)
+      {
+        LogMessage(L_ERROR, "LoadAllJobs: Missing or bad job-originating-user-name attribute in control file \"%s\"!",
+	           filename);
+	ippDelete(job->attrs);
+	free(job);
+	unlink(filename);
+	continue;
+      }
       SetString(&job->username, attr->values[0].string.text);
 
      /*
@@ -2654,5 +2670,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.214 2003/07/19 22:13:01 mike Exp $".
+ * End of "$Id: job.c,v 1.215 2003/07/20 02:28:22 mike Exp $".
  */
