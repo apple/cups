@@ -1,5 +1,5 @@
 /*
- * "$Id: config.h.in,v 1.39.2.17 2003/01/29 15:38:42 mike Exp $"
+ * "$Id: config.h.in,v 1.39.2.18 2003/02/12 19:32:26 mike Exp $"
  *
  *   Configuration file for the Common UNIX Printing System (CUPS).
  *
@@ -44,6 +44,13 @@
  */
 
 #define CUPS_DEFAULT_IPP_PORT	631
+
+
+/*
+ * Maximum number of file descriptors to support.
+ */
+
+#define CUPS_MAX_FDS		4096
 
 
 /*
@@ -246,5 +253,5 @@
 
 
 /*
- * End of "$Id: config.h.in,v 1.39.2.17 2003/01/29 15:38:42 mike Exp $".
+ * End of "$Id: config.h.in,v 1.39.2.18 2003/02/12 19:32:26 mike Exp $".
  */
