@@ -1,5 +1,5 @@
 /*
- * "$Id: cupsd.h,v 1.44 2003/03/10 15:04:59 mike Exp $"
+ * "$Id: cupsd.h,v 1.45 2003/03/14 21:40:39 mike Exp $"
  *
  *   Main header file for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -121,9 +121,11 @@ extern const char *cups_hstrerror(int);
 #ifdef _MAIN_C_
 #  define VAR
 #  define VALUE(x) =x
+#  define VALUE2(x,y) ={x,y}
 #else
 #  define VAR      extern
 #  define VALUE(x)
+#  define VALUE2(x,y)
 #endif /* _MAIN_C */
 
 
@@ -204,5 +206,5 @@ extern void	StopServer(void);
 
 
 /*
- * End of "$Id: cupsd.h,v 1.44 2003/03/10 15:04:59 mike Exp $".
+ * End of "$Id: cupsd.h,v 1.45 2003/03/14 21:40:39 mike Exp $".
  */

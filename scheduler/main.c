@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c,v 1.94 2003/03/10 15:05:00 mike Exp $"
+ * "$Id: main.c,v 1.95 2003/03/14 21:40:40 mike Exp $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -594,6 +594,13 @@ main(int  argc,				/* I - Number of command-line arguments */
     }
 
    /*
+    * Update CGI messages as needed...
+    */
+
+    if (CGIPipes[0] >= 0 && FD_ISSET(CGIPipes[0], input))
+      UpdateCGI();
+
+   /*
     * Update the browse list as needed...
     */
 
@@ -1069,5 +1076,5 @@ usage(void)
 
 
 /*
- * End of "$Id: main.c,v 1.94 2003/03/10 15:05:00 mike Exp $".
+ * End of "$Id: main.c,v 1.95 2003/03/14 21:40:40 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.191 2003/03/12 21:24:35 mike Exp $"
+ * "$Id: job.c,v 1.192 2003/03/14 21:40:40 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -1655,7 +1655,7 @@ StartJob(int       id,		/* I - Job ID */
 
   if (current->buffer == NULL)
   {
-    LogMessage(L_DEBUG2, "UpdateJob: Allocating status buffer...");
+    LogMessage(L_DEBUG2, "StartJob: Allocating status buffer...");
 
     if ((current->buffer = malloc(JOB_BUFFER_SIZE)) == NULL)
     {
@@ -3400,5 +3400,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.191 2003/03/12 21:24:35 mike Exp $".
+ * End of "$Id: job.c,v 1.192 2003/03/14 21:40:40 mike Exp $".
  */

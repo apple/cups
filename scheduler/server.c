@@ -1,5 +1,5 @@
 /*
- * "$Id: server.c,v 1.9 2003/03/14 17:04:09 mike Exp $"
+ * "$Id: server.c,v 1.10 2003/03/14 21:40:40 mike Exp $"
  *
  *   Server start/stop routines for the Common UNIX Printing System (CUPS).
  *
@@ -92,6 +92,15 @@ StartServer(void)
   StartListening();
   StartBrowsing();
   StartPolling();
+
+ /*
+  * Create a pipe for CGI processes...
+  */
+
+  pipe(CGIPipes);
+
+  LogMessage(L_DEBUG2, "StartServer: Adding fd %d to InputSet...", CGIPipes[0]);
+  FD_SET(CGIPipes[0], InputSet);
 }
 
 
@@ -118,6 +127,19 @@ StopServer(void)
   }
 
   StopAllJobs();
+
+ /*
+  * Close the pipe for CGI processes...
+  */
+
+  if (CGIPipes[0] >= 0)
+  {
+    close(CGIPipes[0]);
+    close(CGIPipes[1]);
+
+    CGIPipes[0] = -1;
+    CGIPipes[1] = -1;
+  }
 
  /*
   * Close all log files...
@@ -154,5 +176,5 @@ StopServer(void)
 
 
 /*
- * End of "$Id: server.c,v 1.9 2003/03/14 17:04:09 mike Exp $".
+ * End of "$Id: server.c,v 1.10 2003/03/14 21:40:40 mike Exp $".
  */
