@@ -1,5 +1,5 @@
 /*
- * "$Id: cert.c,v 1.6 2001/01/22 15:03:58 mike Exp $"
+ * "$Id: cert.c,v 1.7 2001/03/06 14:23:15 mike Exp $"
  *
  *   Authentication certificate routines for the Common UNIX
  *   Printing System (CUPS).
@@ -235,7 +235,7 @@ InitCerts(void)
   * the current time, as available...
   */
 
-  if ((fp = fopen("/dev/random", "rb")) == NULL)
+  if ((fp = fopen("/dev/urandom", "rb")) == NULL)
   {
    /*
     * Get the time in usecs and use it as the initial seed...
@@ -271,5 +271,5 @@ InitCerts(void)
 
 
 /*
- * End of "$Id: cert.c,v 1.6 2001/01/22 15:03:58 mike Exp $".
+ * End of "$Id: cert.c,v 1.7 2001/03/06 14:23:15 mike Exp $".
  */

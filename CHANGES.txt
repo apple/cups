@@ -65,6 +65,12 @@ CHANGES IN CUPS V1.1.7
 	- "lpoptions -l" would resave the options...
 	- The EPSON drivers now send the "end packet mode"
 	  command when printing to USB devices.
+	- The scheduler initialized certificates before loading
+	  the cupsd.conf file.
+	- The scheduler used /dev/random to collect random data,
+	  which could block if insufficient entropy information
+	  had been collected by the kernel.  Now use
+	  /dev/urandom.
 
 
 CHANGES IN CUPS V1.1.6-3

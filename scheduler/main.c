@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c,v 1.54 2001/02/21 20:16:47 mike Exp $"
+ * "$Id: main.c,v 1.55 2001/03/06 14:23:15 mike Exp $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -239,14 +239,14 @@ main(int  argc,			/* I - Number of command-line arguments */
   * Read configuration...
   */
 
-  InitCerts();
-
   if (!ReadConfiguration())
   {
     syslog(LOG_LPR, "Unable to read configuration file \'%s\' - exiting!",
            ConfigurationFile);
     return (1);
   }
+
+  InitCerts();
 
   LoadAllJobs();
 
@@ -720,5 +720,5 @@ usage(void)
 
 
 /*
- * End of "$Id: main.c,v 1.54 2001/02/21 20:16:47 mike Exp $".
+ * End of "$Id: main.c,v 1.55 2001/03/06 14:23:15 mike Exp $".
  */
