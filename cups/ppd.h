@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.h,v 1.31 2003/02/18 22:23:38 mike Exp $"
+ * "$Id: ppd.h,v 1.32 2003/02/18 22:43:07 mike Exp $"
  *
  *   PostScript Printer Description definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -105,8 +105,8 @@ typedef enum			/**** Status Codes ****/
   PPD_OK = 0,			/* OK */
   PPD_FILE_OPEN_ERROR,		/* Unable to open PPD file */
   PPD_NULL_FILE,		/* NULL PPD file pointer */
-  PPD_MISSING_PPDADOBE4,	/* Missing PPD-Adobe-4.x header */
   PPD_ALLOC_ERROR,		/* Memory allocation error */
+  PPD_MISSING_PPDADOBE4,	/* Missing PPD-Adobe-4.x header */
   PPD_MISSING_VALUE,		/* Missing value string */
   PPD_INTERNAL_ERROR,		/* Internal error */
   PPD_BAD_OPEN_GROUP,		/* Bad OpenGroup */
@@ -321,5 +321,5 @@ extern ppd_status_t	ppdLastError(int *line);
 #endif /* !_CUPS_PPD_H_ */
 
 /*
- * End of "$Id: ppd.h,v 1.31 2003/02/18 22:23:38 mike Exp $".
+ * End of "$Id: ppd.h,v 1.32 2003/02/18 22:43:07 mike Exp $".
  */
