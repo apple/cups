@@ -12,25 +12,15 @@
 %%BeginProlog
 %%BeginResource procset testprint 1.0 0
 %
-%   PostScript test page for the Common UNIX Printing System (CUPS).
+%   PostScript test page for ESP Print Pro.
 %
 %   Copyright 1993-1999 Easy Software Products
 %
-%   These coded instructions, statements, and computer programs are the
-%   property of Easy Software Products and are protected by Federal
-%   copyright law.  Distribution and use rights are outlined in the file
-%   "LICENSE.txt" which should have been included with this file.  If this
-%   file is missing or damaged please contact Easy Software Products
-%   at:
-%
-%       Attn: CUPS Licensing Information
-%       Easy Software Products
-%       44141 Airport View Drive, Suite 204
-%       Hollywood, Maryland 20636-3111 USA
-%
-%       Voice: (301) 373-9603
-%       EMail: cups-info@cups.org
-%         WWW: http://www.cups.org
+%   These coded instructions, statements, and computer programs contain
+%   unpublished proprietary information of Easy Software Products, and
+%   are protected by Federal copyright law. They may not be disclosed
+%   to third parties or copied or duplicated in any form, in whole or
+%   in part, without the prior written consent of Easy Software Products.
 %
 /OCTANT {			% Draw a color wheel OCTANT...
 				% (name) radius r g b OCTANT -
@@ -475,7 +465,7 @@ gsave
   pageWidth 36 mul			% Center of page
   pageWidth 19 mul			% Bottom of page
   2 copy moveto				% Position text
-  (Printed Using ESP Print v4.0) CENTER	% Show text centered
+  (Printed Using ESP Print Pro v4.0) CENTER	% Show text centered
 
   pageWidth 3 mul sub			% Move down...
   2 copy moveto				% Position text
@@ -483,7 +473,7 @@ gsave
   (Copyright 1993-1999 Easy Software Products, All Rights Reserved.) CENTER
   pageWidth 1.5 mul sub			% Move down...
   2 copy moveto				% Position text
-  (ESP Print, CUPS, and the CUPS logo are the trademark property of) CENTER
+  (ESP Print Pro, CUPS, and the CUPS logo are the trademark property of) CENTER
   pageWidth 1.5 mul sub			% Move down...
   2 copy moveto				% Position text
   (Easy Software Products, 44141 Airport View Drive, Suite 204,) CENTER
@@ -517,6 +507,6 @@ gsave
 grestore
 showpage
 %
-% End of "$Id: testprint.ps,v 1.2 1999/05/26 19:37:31 mike Exp $".
+% End of "$Id: testprint.ps,v 1.3 1999/06/25 19:00:47 mike Exp $".
 %
 %%EOF
