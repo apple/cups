@@ -53,6 +53,9 @@ CHANGES IN CUPS V1.1.9
 	  instances, and options that are not defined by the
 	  user or server.  This should prevent old system-wide
 	  options from being used in individual user accounts.
+	- Updated the EPSON printer driver and added PPDs for
+	  the newer EPSON Stylus printers that only support the
+	  "ESC i" graphics command.
 
 
 CHANGES IN CUPS V1.1.8

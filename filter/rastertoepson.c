@@ -1,5 +1,5 @@
 /*
- * "$Id: rastertoepson.c,v 1.11 2001/04/23 17:17:24 mike Exp $"
+ * "$Id: rastertoepson.c,v 1.12 2001/06/06 20:40:25 mike Exp $"
  *
  *   EPSON ESC/P and ESC/P2 filter for the Common UNIX Printing System
  *   (CUPS).
@@ -55,6 +55,8 @@
 #define EPSON_24PIN	1
 #define EPSON_COLOR	2
 #define EPSON_PHOTO	3
+#define EPSON_ICOLOR	4
+#define EPSON_IPHOTO	5
 
 
 /*
@@ -71,7 +73,8 @@
 unsigned char	*Planes[6],		/* Output buffers */
 		*CompBuffer,		/* Compression buffer */
 		*LineBuffers[2];	/* Line bitmap buffers */
-int		NumPlanes,		/* Number of color planes */
+int		Model,			/* Model number */
+		NumPlanes,		/* Number of color planes */
 		Feed;			/* Number of lines to skip */
 int		DotBit,			/* Bit in buffers */
 		DotBytes,		/* # bytes in a dot column */
@@ -164,6 +167,8 @@ StartPage(const ppd_file_t         *ppd,	/* I - PPD file */
   * See which type of printer we are using...
   */
 
+  Model = ppd->model_number;
+
   switch (ppd->model_number)
   {
     case EPSON_9PIN :
@@ -217,8 +222,7 @@ StartPage(const ppd_file_t         *ppd,	/* I - PPD file */
 	  }
         break;
 
-    case EPSON_COLOR :
-    case EPSON_PHOTO :
+    default :
        /*
 	* Set graphics mode...
 	*/
@@ -229,8 +233,20 @@ StartPage(const ppd_file_t         *ppd,	/* I - PPD file */
 	* Set the media size...
 	*/
 
-	pwrite("\033(U\001\000", 5);		/* Resolution/units */
-	putchar(3600 / header->HWResolution[1]);
+        if (Model < MODEL_ICOLOR)
+	{
+	  pwrite("\033(U\001\000", 5);		/* Resolution/units */
+	  putchar(3600 / header->HWResolution[1]);
+        }
+	else
+	{
+	  pwrite("\033(U\005\000", 5);
+	  putchar(1440 / header->HWResolution[1]);
+	  putchar(1440 / header->HWResolution[1]);
+	  putchar(1440 / header->HWResolution[0]);
+	  putchar(0xa0);	/* n/1440ths... */
+	  putchar(0x05);
+	}
 
 	n = header->PageSize[1] * header->HWResolution[1] / 72.0;
 
@@ -438,7 +454,7 @@ CompressData(const unsigned char *line,	/* I - Data to compress */
   unsigned char      	*comp_ptr,	/* Pointer into compression buffer */
 			temp;		/* Current byte */
   int   	        count;		/* Count of bytes for output */
-  static int		ctable[6] = { 0, 2, 1, 4, 2, 1 };
+  static int		ctable[6] = { 0, 2, 1, 4, 18, 17 };
 					/* KCMYcm color values */
 
 
@@ -570,36 +586,58 @@ CompressData(const unsigned char *line,	/* I - Data to compress */
 	break;
   }
 
- /*
-  * Set the color if necessary...
-  */
-
-  if (NumPlanes > 1)
-  {
-    if (plane > 3)
-      printf("\033(r%c%c%c%c", 2, 0, 1, ctable[plane]);
-					/* Set extended color */
-    else if (NumPlanes == 3)
-      printf("\033r%c", ctable[plane + 1]);
-					/* Set color */
-    else
-      printf("\033r%c", ctable[plane]);	/* Set color */
-  }
-
- /*
-  * Send a raster plane...
-  */
-
   putchar(0x0d);			/* Move print head to left margin */
 
-  length *= 8;
-  printf("\033.");			/* Raster graphics */
-  putchar(type);
-  putchar(ystep);
-  putchar(xstep);
-  putchar(1);
-  putchar(length);
-  putchar(length >> 8);
+  if (Model < MODEL_ICOLOR)
+  {
+   /*
+    * Do graphics the "old" way...
+    */
+
+    if (NumPlanes > 1)
+    {
+     /*
+      * Set the color...
+      */
+
+      if (plane > 3)
+	printf("\033(r%c%c%c%c", 2, 0, 1, ctable[plane] & 15);
+					  /* Set extended color */
+      else if (NumPlanes == 3)
+	printf("\033r%c", ctable[plane + 1]);
+					  /* Set color */
+      else
+	printf("\033r%c", ctable[plane]);	/* Set color */
+    }
+
+   /*
+    * Send a raster plane...
+    */
+
+    length *= 8;
+    printf("\033.");			/* Raster graphics */
+    putchar(type);
+    putchar(ystep);
+    putchar(xstep);
+    putchar(1);
+    putchar(length);
+    putchar(length >> 8);
+  }
+  else
+  {
+   /*
+    * Do graphics the "new" way...
+    */
+
+    printf("\033i");
+    putchar(ctable[plane]);
+    putchar(type);
+    putchar(1);
+    putchar(length & 255);
+    putchar(length >> 8);
+    putchar(1);
+    putchar(0);
+  }
 
   pwrite(line_ptr, line_end - line_ptr);
   fflush(stdout);
@@ -1089,5 +1127,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: rastertoepson.c,v 1.11 2001/04/23 17:17:24 mike Exp $".
+ * End of "$Id: rastertoepson.c,v 1.12 2001/06/06 20:40:25 mike Exp $".
  */
