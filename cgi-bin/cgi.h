@@ -1,5 +1,5 @@
 /*
- * "$Id: cgi.h,v 1.10 2000/03/30 05:19:19 mike Exp $"
+ * "$Id: cgi.h,v 1.11 2000/05/04 13:24:02 mike Exp $"
  *
  *   CGI support library definitions.
  *
@@ -72,6 +72,10 @@ extern void		cgiEMailPart(FILE *mail, const char *type,
 			             const char *charset, const char *encoding);
 extern void		cgiEMailClose(FILE *mail);
 
+extern char		*cgiGetCookie(const char *name, char *buf, int buflen);
+extern void		cgiSetCookie(const char *name, const char *value,
+			             const char *path, const char *domain,
+				     time_t expires, int secure);
 
 #  define cgiGetUser()	getenv("REMOTE_USER")
 #  define cgiGetHost()	(getenv("REMOTE_HOST") == NULL ? getenv("REMOTE_ADDR") : getenv("REMOTE_HOST"))
@@ -79,5 +83,5 @@ extern void		cgiEMailClose(FILE *mail);
 #endif /* !_CGI_H_ */
 
 /*
- * End of "$Id: cgi.h,v 1.10 2000/03/30 05:19:19 mike Exp $".
+ * End of "$Id: cgi.h,v 1.11 2000/05/04 13:24:02 mike Exp $".
  */
