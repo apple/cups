@@ -867,7 +867,7 @@ are no conflicts.
 <H2>Writing a HTML Filter</H2>
 
 
-<H1 ALIGN="RIGHT"><A NAME="WRITING_DRIVERS">4 - Writing Filters</A></H1>
+<H1 ALIGN="RIGHT"><A NAME="WRITING_DRIVERS">4 - Writing Printer Drivers</A></H1>
 
 <P>This chapter discusses how to write a printer driver, which is a
 special filter program that converts CUPS raster data into the
@@ -894,7 +894,7 @@ appropriate commands and data required for a printer.
 <H2>Writing a HP-PCL Driver</H2>
 
 
-<H1 ALIGN="RIGHT"><A NAME="WRITING_BACKENDS">5 - Writing Filters</A></H1>
+<H1 ALIGN="RIGHT"><A NAME="WRITING_BACKENDS">5 - Writing Backends</A></H1>
 
 <P>This chapter describes how to write a backend for CUPS.  Backends
 communicate directly with printers and allow printer drivers and
