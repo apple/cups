@@ -1,5 +1,5 @@
 /*
- * "$Id: testppd.c,v 1.18 2001/01/22 15:03:31 mike Exp $"
+ * "$Id: testppd.c,v 1.19 2001/06/01 21:13:05 mike Exp $"
  *
  *   PPD test program for the Common UNIX Printing System (CUPS).
  *
@@ -68,14 +68,9 @@ main(int  argc,			/* I - Number of command-line arguments */
 
   for (i = 1; i < argc; i ++)
   {
-    if (strstr(argv[i], ".ppd"))
-      filename = argv[i];
-    else
-      filename = cupsGetPPD(argv[i]);
-
-    if ((ppd = ppdOpenFile(filename)) == NULL)
+    if ((ppd = ppdOpenFile(argv[i])) == NULL)
     {
-      fprintf(stderr, "Unable to open \'%s\' as a PPD file!\n", filename);
+      fprintf(stderr, "Unable to open \'%s\' as a PPD file!\n", argv[i]);
       continue;
     }
 
@@ -194,5 +189,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: testppd.c,v 1.18 2001/01/22 15:03:31 mike Exp $".
+ * End of "$Id: testppd.c,v 1.19 2001/06/01 21:13:05 mike Exp $".
  */
