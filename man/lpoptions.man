@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: lpoptions.man,v 1.3 2000/07/20 17:10:57 mike Exp $"
+.\" "$Id: lpoptions.man,v 1.4 2000/08/29 18:25:19 mike Exp $"
 .\"
 .\"   lpoptions man page for the Common UNIX Printing System (CUPS).
 .\"
@@ -21,7 +21,7 @@
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
-.TH lpoptions 1 "Common UNIX Printing System" "10 May 2000" "Easy Software Products"
+.TH lpoptions 1 "Common UNIX Printing System" "29 August 2000" "Easy Software Products"
 .SH NAME
 lpoptions \- display or set printer options and defaults
 .SH SYNOPSIS
@@ -39,12 +39,14 @@ lpoptions \- display or set printer options and defaults
 .B lpoptions
 [ -h
 .I server
-] -p
-.I dest[/instance]
 [ -o
 .I option=value
 ] ... [ -o
 .I option=value
+] -p
+.I dest[/instance]
+] -r
+.I option
 ]
 .br
 .B lpoptions
@@ -76,6 +78,10 @@ Specifies a new option for the named destination.
 Sets the destination and instance, if specified, for any options that follow.
 If the named instance does not exist then it is created.
 .TP 5
+\-r \fIoption\fR
+.br
+Removes the specified option for the named destination.
+.TP 5
 \-x \fIdest[/instance]\fR
 .br
 Removes the options for the named destination and instance, if specified.
@@ -95,5 +101,5 @@ http://localhost:631/documentation.html
 .SH COPYRIGHT
 Copyright 1993-2000 by Easy Software Products, All Rights Reserved.
 .\"
-.\" End of "$Id: lpoptions.man,v 1.3 2000/07/20 17:10:57 mike Exp $".
+.\" End of "$Id: lpoptions.man,v 1.4 2000/08/29 18:25:19 mike Exp $".
 .\"
