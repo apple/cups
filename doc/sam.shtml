@@ -453,7 +453,8 @@ in <A HREF="#PRINTER_DRIVERS">Appendix C, "Printer Drivers"</A>.
 <P>For a dot matrix printer connected to the serial port this would might look like:
 
 <UL><PRE>
-<B>/usr/sbin/lpadmin -p DotMatrix -E -v serial:/dev/ttyS0?baud=9600+size=8+parity=none+flow=soft deskjet.ppd ENTER</B>
+<B>/usr/sbin/lpadmin -p DotMatrix -E -m epson9.ppd \
+    -v serial:/dev/ttyS0?baud=9600+size=8+parity=none+flow=soft <I>ENTER</I></B>
 </PRE></UL>
 
 <P>Here you specify the serial port (e.g. S0,S1, d0, d1), baud rate 
@@ -944,6 +945,7 @@ BrowseRelay 192.168.1 192.168.3.255 ENTER
 BrowseRelay 192.168.2 192.168.3.255 ENTER
 </B></PRE></UL>
 
+<!-- NEED 3in -->
 <H2>Load Balancing and Failsafe Operation</H2>
 
 <P>When using server polling or broadcasting, CUPS clients can
@@ -952,11 +954,17 @@ single <I>implicit class</I> queue. Clients assume that printers with
 the same name on multiple servers are in fact the same printer or type
 of printer being served by multiple machines.</P>
 
-<P>If you have two printers, LaserJet@ServerA and LaserJet@ServerB, a
-third implicit class called <I>LaserJet</I> will be created
-automatically on the client that refers to both printers. If the client
-also has a local printer with the name LaserJet then an implicit class
-named <I>AnyLaserJet</I> will be created instead.</P>
+<P>If you have two printers, LaserJet@ServerA and
+LaserJet@ServerB, a third implicit class called <I>LaserJet</I>
+will be created automatically on the client that refers to both
+printers. If the client also has a local printer with the name
+LaserJet and the <A
+HREF="#ImplicitAnyClasses"><CODE>ImplicitAnyClasses</CODE></A>
+directive is enabled, then an implicit class named
+<I>AnyLaserJet</I> will be created instead. Otherwise, the local
+printer will prevent the creation of an implicit class, since
+CUPS will assume that the local printer will always be more
+available than a remote one.</P>
 
 <P>The client will alternate between servers and automatically stop
 sending jobs to a server if it goes down, providing a load-balancing
@@ -965,8 +973,11 @@ effect and fail-safe operation with automatic switchover.</P>
 <CENTER><TABLE BGCOLOR="#cccccc" BORDER="1" CELLPADDING="5" WIDTH="80%">
 	<TR>
 	<TD><B> NOTE:</B>
-	<P>Note that implicit classes (<A HREF="#ImplicitClasses"><CODE>ImplicitClasses</CODE></A>) 
-	are enabled by default.</P>
+	<P>Note that implicit classes (<A
+	HREF="#ImplicitClasses"><CODE>ImplicitClasses</CODE></A>) 
+	are enabled and implicit "any" classes (<A
+	HREF="#ImplicitAnyClasses"><CODE>ImplicitAnyClasses</CODE></A>)
+	are disabled by default.</P>
 	</TD>
 	</TR>
 </TABLE></CENTER>
@@ -1088,6 +1099,7 @@ determine how the server operates:
 	<LI><A HREF="#Deny"><CODE>Deny</CODE></A>
 	<LI><A HREF="#DocumentRoot"><CODE>DocumentRoot</CODE></A>
 	<LI><A HREF="#Encryption"><CODE>Encryption</CODE></A>
+	<LI><A HREF="#ErrorLog"><CODE>ErrorLog</CODE></A>
 
 </TD>
 <TD VALIGN="TOP">
@@ -1095,7 +1107,8 @@ determine how the server operates:
 </TD>
 <TD VALIGN="TOP">
 
-	<LI><A HREF="#ErrorLog"><CODE>ErrorLog</CODE></A>
+	<LI><A HREF="#FaxRetryInterval"><CODE>FaxRetryInterval</CODE></A>
+	<LI><A HREF="#FaxRetryLimit"><CODE>FaxRetryLimit</CODE></A>
 	<LI><A HREF="#FileDevice"><CODE>FileDevice</CODE></A>
 	<LI><A HREF="#FilterLimit"><CODE>FilterLimit</CODE></A>
 	<LI><A HREF="#FilterNice"><CODE>FilterNice</CODE></A>
@@ -1103,8 +1116,8 @@ determine how the server operates:
 	<LI><A HREF="#Group"><CODE>Group</CODE></A>
 	<LI><A HREF="#HideImplicitMembers"><CODE>HideImplicitMembers</CODE></A>
 	<LI><A HREF="#HostNameLookups"><CODE>HostNameLookups</CODE></A>
-	<LI><A HREF="#ImplicitClasses"><CODE>ImplicitClasses</CODE></A>
 	<LI><A HREF="#ImplicitAnyClasses"><CODE>ImplicitAnyClasses</CODE></A>
+	<LI><A HREF="#ImplicitClasses"><CODE>ImplicitClasses</CODE></A>
 	<LI><A HREF="#Include"><CODE>Include</CODE></A>
 	<LI><A HREF="#KeepAliveTimeout"><CODE>KeepAliveTimeout</CODE></A>
 	<LI><A HREF="#KeepAlive"><CODE>KeepAlive</CODE></A>
@@ -1122,9 +1135,6 @@ determine how the server operates:
 	<LI><A HREF="#MaxJobsPerPrinter"><CODE>MaxJobsPerPrinter</CODE></A>
 	<LI><A HREF="#MaxJobsPerUser"><CODE>MaxJobsPerUser</CODE></A>
 	<LI><A HREF="#MaxLogSize"><CODE>MaxLogSize</CODE></A>
-	<LI><A HREF="#MaxRequestSize"><CODE>MaxRequestSize</CODE></A>
-	<LI><A HREF="#Order"><CODE>Order</CODE></A>
-	<LI><A HREF="#PageLog"><CODE>PageLog</CODE></A>
 
 </TD>
 <TD VALIGN="TOP">
@@ -1132,6 +1142,9 @@ determine how the server operates:
 </TD>
 <TD VALIGN="TOP">
 
+	<LI><A HREF="#MaxRequestSize"><CODE>MaxRequestSize</CODE></A>
+	<LI><A HREF="#Order"><CODE>Order</CODE></A>
+	<LI><A HREF="#PageLog"><CODE>PageLog</CODE></A>
 	<LI><A HREF="#Port"><CODE>Port</CODE></A>
 	<LI><A HREF="#PreserveJobFiles"><CODE>PreserveJobFiles</CODE></A>
 	<LI><A HREF="#PreserveJobHistory"><CODE>PreserveJobHistory</CODE></A>
@@ -1320,7 +1333,7 @@ AuthGroupName lp
 <P>The <CODE>AuthGroupName</CODE> directive must appear inside a
 <A HREF="#Location"><CODE>Location</CODE></A> directive.
 
-<!-- NEED 3in -->
+<!-- NEED 4in -->
 <H3><A NAME="AuthType">AuthType</A></H3>
 <HR>
 
@@ -1492,6 +1505,29 @@ data from the named interface.
 
 
 <!-- NEED 3in -->
+<H3><A NAME="BrowseInterval">BrowseInterval</A></H3>
+<HR>
+
+<H4>Examples</H4>
+
+<UL><PRE>
+BrowseInterval 0
+BrowseInterval 30
+</PRE></UL>
+
+<H4>Description</H4>
+
+<P>The <CODE>BrowseInterval</CODE> directive specifies the maximum amount of
+time between browsing updates. Specifying a value of 0 seconds disables
+outgoing browse updates but allows a server to receive printer information
+from other hosts.
+
+<P>The <CODE>BrowseInterval</CODE> value should always be less than the
+<A HREF="#BrowseTimeout"><CODE>BrowseTimeout</CODE></A> value. Otherwise
+printers and classes will disappear from client systems between updates.
+
+
+<!-- NEED 3in -->
 <H3><A NAME="BrowseOrder">BrowseOrder</A></H3>
 <HR>
 
@@ -1516,28 +1552,6 @@ processing. The default order is <CODE>deny,allow</CODE>:
 	specifically allowed.
 
 </UL>
-
-<!-- NEED 3in -->
-<H3><A NAME="BrowseInterval">BrowseInterval</A></H3>
-<HR>
-
-<H4>Examples</H4>
-
-<UL><PRE>
-BrowseInterval 0
-BrowseInterval 30
-</PRE></UL>
-
-<H4>Description</H4>
-
-<P>The <CODE>BrowseInterval</CODE> directive specifies the maximum amount of
-time between browsing updates. Specifying a value of 0 seconds disables
-outgoing browse updates but allows a server to receive printer information
-from other hosts.
-
-<P>The <CODE>BrowseInterval</CODE> value should always be less than the
-<A HREF="#BrowseTimeout"><CODE>BrowseTimeout</CODE></A> value. Otherwise
-printers and classes will disappear from client systems between updates.
 
 <!-- NEED 3in -->
 <H3><A NAME="BrowsePoll">BrowsePoll</A></H3>
@@ -1947,7 +1961,6 @@ the web content by providing subdirectories for each language needed.
 Encryption Never
 Encryption IfRequested
 Encryption Required
-Encryption Always
 </PRE></UL>
 
 <H4>Description</H4>
@@ -1981,6 +1994,45 @@ default error log file is <VAR>/var/log/cups/error_log</VAR>.
 
 <P>The special name "syslog" can be used to send the error information
 to the system log instead of a plain file.
+
+
+<!-- NEED 2in -->
+<H3><A NAME="FaxRetryInterval">FaxRetryInterval</A></H3>
+<HR>
+
+<H4>Examples</H4>
+
+<UL><PRE>
+FaxRetryInterval 300
+FaxRetryInterval 30
+</PRE></UL>
+
+<H4>Description</H4>
+
+<P>The <CODE>FaxRetryInterval</CODE> directive determines how
+often fax print jobs are retried when the backend is unable to
+send the fax. The value is the number of seconds between tries.
+
+<P>The default setting is <CODE>300</CODE> seconds.
+
+
+<!-- NEED 2in -->
+<H3><A NAME="FaxRetryLimit">FaxRetryLimit</A></H3>
+<HR>
+
+<H4>Examples</H4>
+
+<UL><PRE>
+FaxRetryLimit 5
+FaxRetryLimit 100
+</PRE></UL>
+
+<H4>Description</H4>
+
+<P>The <CODE>FaxRetryLimit</CODE> directive determines how many
+times a fax job is retried before it is canceled.
+
+<P>The default setting is <CODE>5</CODE>.
 
 
 <!-- NEED 3in -->
@@ -2157,25 +2209,6 @@ performance problems with hostname lookups. Set this option to
 required.
 
 <!-- NEED 3in -->
-<H3><A NAME="ImplicitClasses">ImplicitClasses</A></H3>
-<HR>
-
-<H4>Examples</H4>
-
-<UL><PRE>
-ImplicitClasses On
-ImplicitClasses Off
-</PRE></UL>
-
-<H4>Description</H4>
-
-<P>The <CODE>ImplicitClasses</CODE> directive controls whether implicit
-classes are created based upon the available network printers and classes.
-The default setting is <CODE>On</CODE> but is automatically turned
-<CODE>Off</CODE> if <A HREF="#Browsing"><CODE>Browsing</CODE></A> is
-turned <CODE>Off</CODE>.
-
-<!-- NEED 3in -->
 <H3><A NAME="ImplicitAnyClasses">ImplicitAnyClasses</A></H3>
 <HR>
 
@@ -2195,6 +2228,25 @@ setting is <CODE>Off</CODE>.</P>
 
 <P><A HREF="#ImplicitClasses"><CODE>ImplicitClasses</CODE></A>
 must be enabled for this directive to have any effect.</P>
+
+<!-- NEED 3in -->
+<H3><A NAME="ImplicitClasses">ImplicitClasses</A></H3>
+<HR>
+
+<H4>Examples</H4>
+
+<UL><PRE>
+ImplicitClasses On
+ImplicitClasses Off
+</PRE></UL>
+
+<H4>Description</H4>
+
+<P>The <CODE>ImplicitClasses</CODE> directive controls whether implicit
+classes are created based upon the available network printers and classes.
+The default setting is <CODE>On</CODE> but is automatically turned
+<CODE>Off</CODE> if <A HREF="#Browsing"><CODE>Browsing</CODE></A> is
+turned <CODE>Off</CODE>.
 
 <!-- NEED 3in -->
 <H3><A NAME="Include">Include</A></H3>
@@ -2525,10 +2577,9 @@ MaxClientsPerHost 10
 
 <P>The <CODE>MaxClientsPerHost</CODE> directive controls the
 maximum number of simultaneous clients that will be allowed from
-a single host by the server. The default is 10 or 1/10th the
-<CODE>MaxClients</CODE> value, whichever is greater. A value of
-0 uses the automatic setting based on the
-<CODE>MaxClients</CODE> value.</P>
+a single host by the server. The default is the
+<CODE>MaxClients</CODE> value. A value of 0 uses the automatic
+setting based on the <CODE>MaxClients</CODE> value.</P>
 
 <P>This directive provides a small measure of protection against
 Denial of Service attacks from a single host.
@@ -2744,30 +2795,6 @@ on multiple ports. The <CODE>Port</CODE> directive is equivalent
 to "<CODE>Listen *:nnn</CODE>". The default port is 631.
 
 <!-- NEED 3in -->
-<H3><A NAME="PreserveJobHistory">PreserveJobHistory</A></H3>
-<HR>
-
-<H4>Examples</H4>
-
-<UL><PRE>
-PreserveJobHistory On
-PreserveJobHistory Off
-</PRE></UL>
-
-<H4>Description</H4>
-
-<P>The <CODE>PreserveJobHistory</CODE> directive controls whether
-the history of completed, cancelled, or aborted print jobs is stored
-on disk.
-
-<P>A value of <CODE>On</CODE> (the default) preserves job information
-until the administrator purges it with the <CODE>cancel</CODE>
-command.
-
-<P>A value of <CODE>Off</CODE> removes the job information as soon as
-each job is completed, cancelled, or aborted.
-
-<!-- NEED 3in -->
 <H3><A NAME="PreserveJobFiles">PreserveJobFiles</A></H3>
 <HR>
 
@@ -2790,6 +2817,30 @@ can be restarted (and reprinted) as desired until they are purged.
 
 <P>A value of <CODE>Off</CODE> (the default) removes the job files as
 soon as each job is completed, cancelled, or aborted.
+
+<!-- NEED 3in -->
+<H3><A NAME="PreserveJobHistory">PreserveJobHistory</A></H3>
+<HR>
+
+<H4>Examples</H4>
+
+<UL><PRE>
+PreserveJobHistory On
+PreserveJobHistory Off
+</PRE></UL>
+
+<H4>Description</H4>
+
+<P>The <CODE>PreserveJobHistory</CODE> directive controls whether
+the history of completed, cancelled, or aborted print jobs is stored
+on disk.
+
+<P>A value of <CODE>On</CODE> (the default) preserves job information
+until the administrator purges it with the <CODE>cancel</CODE>
+command.
+
+<P>A value of <CODE>Off</CODE> removes the job information as soon as
+each job is completed, cancelled, or aborted.
 
 <!-- NEED 3in -->
 <H3><A NAME="Printcap">Printcap</A></H3>
@@ -3308,7 +3359,7 @@ for all client operations.  That is, it redirects all client requests to the rem
 The default is to use the local server ("<VAR>localhost</VAR>").
 
 
-
+<!-- NEW PAGE -->
 <H2>Changing the Printer Configuration</H2>
 
 <P>The CUPS scheduler (cupsd) uses the <VAR>/etc/cups/printers.conf</VAR> file 
@@ -3568,7 +3619,7 @@ Location Building 3321
 	<B>NOTE:</B>
 
 	<P>Do not confuse this <CODE>Location</CODE> directive with the 
-	one for cupsd.conf.  They are completely different.
+	one in cupsd.conf.  They are completely different.
 	</TD>
 </TR>
 </TABLE></CENTER>
@@ -3681,7 +3732,7 @@ The following are some example messages:</P>
 or <A HREF="#DefaultPrinter"><CODE>DefaultPrinter</CODE></A> directive.</P>
 
 
-
+<!-- NEW PAGE -->
 <H2>Changing the Classes Configuration</H2>
 
 <P>The CUPS scheduler (cupsd) uses the <VAR>/etc/cups/classes.conf</VAR> file
@@ -3940,7 +3991,7 @@ Location Building 3321
         <B>NOTE:</B>
 
         <P>Do not confuse this <CODE>Location</CODE> directive with the
-        one for cupsd.conf.  They are completely different.
+        one in cupsd.conf.  They are completely different.
         </TD>
 </TR>
 </TABLE></CENTER>
@@ -3990,7 +4041,7 @@ It can be added by the <CODE>lpadmin -c</CODE> command.</P>
         <B>NOTE:</B>
 
         <P>Do not confuse this <CODE>Printer</CODE> directive with the
-        one for printers.conf.  They are completely different.
+        one in printers.conf.  They are completely different.
         </TD>
 </TR>
 </TABLE></CENTER>
@@ -4534,6 +4585,9 @@ printable 8-bit chars (CR, NL, TAB, BS, 32-126, 160-254)
 <LI><CODE>string(offset,"string")</CODE> - True if bytes are
 identical to string
 
+<LI><CODE>istring(offset,"string")</CODE> - True if bytes are
+identical to string after reducing both strings to lowercase
+
 <LI><CODE>contains(offset,range,"string")</CODE> - True if the
 range of bytes contains the string
 
@@ -4647,7 +4701,7 @@ add the company or author name:
 
 <UL><PRE>
 acme-msword.types
-acme.msword.convs
+acme-msword.convs
 </PRE></UL>
 
 <P>This will help to prevent name collisions if you install many
@@ -4765,11 +4819,15 @@ server.
 
 <H2>Printing to LPD Servers</H2>
 
-<P>CUPS provides the <CODE>lpd</CODE> backend for printing to LPD-based
-servers and printers. Use a device URI of <CODE>lpd://server/name</CODE>
-to print to a printer on an LPD server, where <CODE>server</CODE>
-is the hostname or IP address of the server and <CODE>name</CODE> is
-the queue name.
+<P>CUPS provides the <CODE>lpd</CODE> backend for printing to
+LPD-based servers and printers. Use a device URI of
+<CODE>lpd://server/name</CODE> to print to a printer on an LPD
+server, where <CODE>server</CODE> is the hostname or IP address
+of the server and <CODE>name</CODE> is the queue name.
+Additional options can be specified after the remote queue name
+to control how the LPD requests are sent - consult <A
+HREF="#COMMON_NETWORK">Appendix B - Common Network Settings</A>
+for a complete description.
 
 <P>Microsoft Windows NT provides an LPD service under the name "TCP/IP
 Printing Services". To enable LPD printing on NT, open the "Services"
@@ -4777,10 +4835,37 @@ control panel, select the "TCP/IP Printing Services" service, and click
 on the "Start" button. Any shared printer will then be available via
 the LPD protocol.
 
-<H2>Printing from Mac OS Clients</H2>
 
-<P>CUPS does not provide Mac OS support directly. However, there are several
-free and commercial software packages that do.
+<!-- NEED 4in -->
+
+<H2>Printing from Mac OS 10.2 and Later Clients</H2>
+
+<P>Since Mac OS 10.2 uses CUPS as its printing system, all CUPS
+printers will be available to the clients automatically.
+
+<CENTER><TABLE WIDTH="80%" BORDER="1" CELLPADDING="5" BGCOLOR="#cccccc">
+<TR>
+<TD><B>Note:</B>
+
+<P>Certain legacy MacOS X applications, including most Adobe
+applications, produce PICT files with embedded PostScript. Since
+the filter needed to convert these files to pure PostScript is
+only available on MacOS X, you need to either use a MacOS X
+print server or replace the MacOS X IPP backend with the
+standard CUPS IPP backend. The CUPS IPP backend will detect and
+locally convert these print files to PostScript prior to sending
+the job to the server.
+</TD>
+</TR>
+</TABLE></CENTER>
+
+
+<!-- NEED 4in -->
+<H2>Printing from Mac OS 10.1 and Earlier Clients</H2>
+
+<P>CUPS does not provide support for Mac OS 10.1 and earlier
+directly. However, there are several free and commercial
+software packages that do.
 
 <H3>Columbia Appletalk Package (CAP)</H3>
 
@@ -4822,6 +4907,7 @@ character.
 </TR>
 </TABLE></CENTER>
 
+<!-- NEED 3in -->
 <H3>NetATalk</H3>
 
 <P>To use your system as a print server for Mac OS clients,
@@ -4837,19 +4923,32 @@ Printer Description:MyPrinter@MyServer:\
 :pd=/etc/cups/ppd/MyPrinter.ppd:
 </PRE></UL>
 
+
 <!-- NEED 2in -->
+<H2>Printing to Mac OS 10.2 and Later Servers</H2>
 
-<H2>Printing to Mac OS Servers</H2>
+<P>Since MacOS 10.2 and later use CUPS, all you need to do is
+enable printer sharing to allow CUPS clients to print to a Mac
+OS server. You will need to download and install ESP Ghostscript
+on your server to provide PostScript printing support for
+non-PostScript printers, however.
 
-<P>CUPS currently does not provide a backend to communicate with a Mac OS
-server. However, you can write and install a short shell script
-in the <VAR>/usr/lib/cups/backend</VAR> directory that sends a print file
-using the appropriate command. The following is a short script that will
-run the <CODE>papif</CODE> command provided with CAP.
 
-<P>After copying this script to <VAR>/usr/lib/cups/backend/cap</VAR>,
-specify a device URI of <CODE>cap://server/printer</CODE> to use this
-backend with a print queue.
+<!-- NEED 2in -->
+<H2>Printing to Mac OS 10.1 and Earlier Servers</H2>
+
+<P>CUPS currently does not provide a backend to communicate with
+a Mac OS 10.1 and earlier server. However, you can write and
+install a short shell script in the
+<VAR>/usr/lib/cups/backend</VAR> directory that sends a print
+file using the appropriate command. The following is a short
+script that will run the <CODE>papif</CODE> command provided
+with CAP.
+
+<P>After copying this script to
+<VAR>/usr/lib/cups/backend/cap</VAR>, specify a device URI of
+<CODE>cap://server/printer</CODE> to use this backend with a
+print queue.
 
 <!-- NEED 8in -->
 <UL>
@@ -4937,12 +5036,14 @@ print to printers on your system.
 server using the <CODE>cupsaddsmb</CODE> command and the SAMBA
 2.2.0 or higher software.
 
-<P>Before you can export the printers you must download the
-current Adobe PostScript printer drivers from the Adobe web
-site (<A HREF="http://www.adobe.com/">http://www.adobe.com/</A>).
-Use the free <CODE>unzip</CODE> software to extract the files
-from the self-extracting ZIP file containing the drivers; you
-will need the following files:
+<P>Before you can export the printers you must download the CUPS
+drivers for Windows from the CUPS site (<A
+HREF="http://www.cups.org/">http://www.cups.org/</A>) or the
+current Adobe PostScript printer drivers from the Adobe web site
+(<A HREF="http://www.adobe.com/">http://www.adobe.com/</A>). If
+you download the Adobe drivers, use the free <CODE>unzip</CODE>
+software to extract the files from the self-extracting ZIP file
+containing the drivers; you will need the following files:
 
 <UL><PRE>
 ADFONTS.MFM
@@ -4960,8 +5061,9 @@ PSMON.DLL
 directory - you may need to rename some of the files so the
 filenames are all UPPERCASE.
 
-<P>Next, configure SAMBA (via the <VAR>smb.conf</VAR> file) to support printing 
-through CUPS and provide a printer driver download share, as follows:
+<P>Next, configure SAMBA (via the <VAR>smb.conf</VAR> file) to
+support printing  through CUPS and provide a printer driver
+download share, as follows:
 
 <UL><PRE>
 [global]
@@ -4988,14 +5090,16 @@ read only = yes
 write list = root
 </PRE></UL>
 
-<P>This configuration assumes a FHS-compliant installation of SAMBA;
-adjust the [printers] and [print$] share paths accordingly on your system as needed.
-That is, the directory for your printer drivers can be anywhere on the
-system; just make sure it is writable by the users specified by
-the <CODE>write list</CODE> directive plus readable and executable by all users.
-Also, make sure that you have SAMBA passwords defined for each user in the 
-<CODE>write list</CODE> using SAMBA's <CODE>smbpasswd(1)</CODE> command.
-Otherwise you will not be able to authenticate.
+<P>This configuration assumes a FHS-compliant installation of
+SAMBA; adjust the [printers] and [print$] share paths
+accordingly on your system as needed. That is, the directory for
+your printer drivers can be anywhere on the system; just make
+sure it is writable by the users specified by the <CODE>write
+list</CODE> directive plus readable and executable by all users.
+Also, make sure that you have SAMBA passwords defined for each
+user in the  <CODE>write list</CODE> using SAMBA's
+<CODE>smbpasswd(1)</CODE> command. Otherwise you will not be
+able to authenticate.
 
 <P>Finally, run the <CODE>cupsaddsmb</CODE> command to export
 the printer drivers for one or more queues:
@@ -5004,7 +5108,6 @@ the printer drivers for one or more queues:
 <B>cupsaddsmb -U root printer1 ... printerN <I>ENTER</I></B>
 </PRE></UL>
 
-
 <P>Running <CODE>cupsaddsmb</CODE> with the <CODE>-a</CODE> option
 will export all printers:
 
@@ -5012,8 +5115,9 @@ will export all printers:
 <B>cupsaddsmb -U root -a <I>ENTER</I></B>
 </PRE></UL>
 
-<P>Notice in the above examples that the user <CODE>root</CODE> was used 
-which was defined in the <CODE>write list</CODE> of the <VAR>smb.conf</VAR> file.
+<P>Notice in the above examples that the user <CODE>root</CODE>
+was used  which was defined in the <CODE>write list</CODE> of
+the <VAR>smb.conf</VAR> file.
 
 <H2>Printing to Windows Servers</H2>
 
@@ -5487,6 +5591,119 @@ ftp> <B>quit ENTER</B>
 
 <P>Your Linksys print server is now ready for use!
 
+<H2><A NAME="LPD_OPTIONS">Configuring LPD Printing Options</A></H2>
+
+<P>The LPD backend supports several options which are included in the
+device URI, e.g.:
+
+<PRE>
+    lpd://server/name?option1=value1+option2=value2+...+optionN=valueN
+</PRE>
+
+<P>The following table summarizes the options and values that are supported:
+
+<!-- NEED 9in -->
+<CENTER><TABLE BORDER="1" WIDTH="80%">
+<TR>
+	<TH>Option=Value</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD>banner=off<BR>
+	banner=no<BR>
+	banner=false</TD>
+	<TD VALIGN="TOP">Does not request a LPD banner page for
+	the job. (Default)</TD>
+</TR>
+<TR>
+	<TD>banner=on<BR>
+	banner=yes<BR>
+	banner=true</TD>
+	<TD VALIGN="TOP">Requests a LPD banner page for the
+	job.</TD>
+</TR>
+<TR>
+	<TD>format=c<BR>
+	format=d<BR>
+	format=f<BR>
+	format=g<BR>
+	format=l<BR>
+	format=n<BR>
+	format=o<BR>
+	format=p<BR>
+	format=r<BR>
+	format=t<BR>
+	format=v</TD>
+	<TD VALIGN="TOP">Specifies the LPD format code of the
+	print job. "format=l" is raw output, while "format=o" is PostScript.
+	(Default is "format=l" for raw output)</TD>
+</TR>
+<TR>
+	<TD>manual_copies=off<BR>
+	manual_copies=no<BR>
+	manual_copies=false</TD>
+	<TD VALIGN="TOP">Specifies that the backend should not
+	send multiple copies of a print job in the print data
+	file.</TD>
+</TR>
+<TR>
+	<TD>manual_copies=on<BR>
+	manual_copies=yes<BR>
+	manual_copies=true</TD>
+	<TD VALIGN="TOP">Specifies that the backend should send
+	multiple copies of a print job in the print data file to
+	print more than one copy. (Default)</TD>
+</TR>
+<TR>
+	<TD>order=control,data</TD>
+	<TD VALIGN="TOP">Specifies that the LPD control file
+	should be sent before the print data file.
+	(Default)</TD>
+</TR>
+<TR>
+	<TD>order=data,control=</TD>
+	<TD VALIGN="TOP">Specifies that the print data file
+	should be sent before the LPD control file.</TD>
+</TR>
+<TR>
+	<TD>reserve=off<BR>
+	reserve=no<BR>
+	reserve=false</TD>
+	<TD VALIGN="TOP">Specifies that the backend should not
+	reserve a priviledged source port as required by RFC
+	1179. (Default)</TD>
+</TR>
+<TR>
+	<TD>reserve=on<BR>
+	reserve=yes<BR>
+	reserve=true</TD>
+	<TD VALIGN="TOP">Specifies that the backend should
+	reserve a priviledges source port from 721 to 731
+	inclusive as required by RFC 1179. This option may cause
+	reduced printing performance when more than 11 LPD
+	printers are defined on the server due to port
+	contention issues.</TD>
+</TR>
+<TR>
+	<TD>sanitize_title=off<BR>
+	sanitize_title=no<BR>
+	sanitize_title=false</TD>
+	<TD VALIGN="TOP">Specifies that the backend should not
+	sanitize the job title string. (Default on OSX)</TD>
+</TR>
+<TR>
+	<TD>sanitize_title=on<BR>
+	sanitize_title=yes<BR>
+	sanitize_title=true</TD>
+	<TD VALIGN="TOP">Specifies that the backend should
+	sanitize the job title string. (Default on all but OSX)</TD>
+</TR>
+<TR>
+	<TD>timeout=N</TD>
+	<TD VALIGN="TOP">Specifies the response timeout for all LPD
+	commands and transactions in seconds. (Default is 300 seconds)</TD>
+</TR>
+</TABLE></CENTER>
 
 <H1 ALIGN="RIGHT"><A NAME="PRINTER_DRIVERS">C - Printer Drivers</A></H1>
 
@@ -5497,6 +5714,8 @@ ftp> <B>quit ENTER</B>
 <P>CUPS includes the following printer drivers:
 
 <UL>
+
+<LI><A HREF="#DYMO">DYMO Label Printer</A>, <VAR>dymo.ppd</VAR>
 
 <LI><A HREF="#EPSON9">EPSON 9-pin Dot Matrix</A>, <VAR>epson9.ppd</VAR>
 
@@ -5511,6 +5730,13 @@ ftp> <B>quit ENTER</B>
 <LI><A HREF="#LASERJET">HP LaserJet</A>, <VAR>laserjet.ppd</VAR>
 
 </UL>
+
+<H2><A NAME="DYMO">DYMO Label Printer</A></H2>
+
+<P>The DYMO Label Printer driver (<VAR>dymo.ppd</VAR>) supports
+the DYMO LabelWriter 300 series (300/310/315/320/330/330 Turbo)
+thermal label printers. It provides 136, 203, and 300 DPI output
+in black only.
 
 <H2><A NAME="EPSON9">EPSON 9-pin Dot Matrix</A></H2>
 
@@ -5676,20 +5902,36 @@ printers.</TD>
 <TD>Shared libraries (all others)</TD>
 </TR>
 <TR VALIGN="TOP">
+<TD>/usr/libexec/cups/backend/</TD>
+<TD>Backends for various types of printer connections (*BSD and OSX)</TD>
+</TR>
+<TR VALIGN="TOP">
 <TD>/usr/lib/cups/backend/</TD>
-<TD>Backends for various types of printer connections.</TD>
+<TD>Backends for various types of printer connections (all others)</TD>
+</TR>
+<TR VALIGN="TOP">
+<TD>/usr/libexec/cups/cgi-bin/</TD>
+<TD>CGI programs for the scheduler (*BSD and OSX)</TD>
 </TR>
 <TR VALIGN="TOP">
 <TD>/usr/lib/cups/cgi-bin/</TD>
-<TD>CGI programs for the scheduler.</TD>
+<TD>CGI programs for the scheduler (all others)</TD>
+</TR>
+<TR VALIGN="TOP">
+<TD>/usr/libexec/cups/daemon/</TD>
+<TD>Daemons for polling and LPD support (*BSD and OSX)</TD>
 </TR>
 <TR VALIGN="TOP">
 <TD>/usr/lib/cups/daemon/</TD>
-<TD>Daemons for polling and LPD support.</TD>
+<TD>Daemons for polling and LPD support (all others)</TD>
+</TR>
+<TR VALIGN="TOP">
+<TD>/usr/libexec/cups/filter/</TD>
+<TD>Filters for various types of files (*BSD and OSX)</TD>
 </TR>
 <TR VALIGN="TOP">
 <TD>/usr/lib/cups/filter/</TD>
-<TD>Filters for various types of files.</TD>
+<TD>Filters for various types of files (all others)</TD>
 </TR>
 <TR VALIGN="TOP">
 <TD>/usr/lib/locale/</TD>
@@ -5798,8 +6040,8 @@ For more information please contact us at:
 
 <UL>
 
-<LI>WWW: <A HREF="http://www.easysw.com">
-<CODE>http://www.easysw.com</CODE></A>
+<LI>WWW: <A HREF="http://www.easysw.com/cups/">
+<CODE>http://www.easysw.com/cups/</CODE></A>
 
 <LI>EMail: <A HREF="mailto:info@easysw.com">info@easysw.com</A>
 

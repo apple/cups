@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: lp.man,v 1.3 2003/03/12 20:41:42 mike Exp $"
+.\" "$Id: lp.man,v 1.4 2003/04/16 19:03:38 mike Exp $"
 .\"
 .\"   lp/cancel man page for the Common UNIX Printing System (CUPS).
 .\"   Based on cvs revision 1.12
@@ -144,7 +144,7 @@ Définit le nom du travail.
 \-u \fInom_utilisateur\fR
 .br
 Annule les travaux d'impression de l'utilisateur \fInom_utilisateur\fR.
-.TP5
+.TP 5
 \-H \fIméthode\fR
 .br
 Définit quand l'impression doit être effectuée. La valeur \fIimmediate\fR effectue
@@ -180,5 +180,5 @@ Copyright 1993-2003 Easy Software Products, Tous droits réservés.
 .SH TRADUCTION
 Gilles QUERRET <gilles.querret@nerim.net>
 .\"
-.\" End of "$Id: lp.man,v 1.3 2003/03/12 20:41:42 mike Exp $".
+.\" End of "$Id: lp.man,v 1.4 2003/04/16 19:03:38 mike Exp $".
 .\"
