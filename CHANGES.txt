@@ -1,8 +1,10 @@
-CHANGES.txt - 04/14/2003
+CHANGES.txt - 04/15/2003
 ------------------------
 
 CHANGES IN CUPS V1.1.19rc2
 
+	- The imagetops filter didn't position images properly
+	  on the page (STR #18)
 	- The configure script didn't add CPPFLAGS to the
 	  compiler options or LDFLAGS to the DSO options (STR
 	  #13)
