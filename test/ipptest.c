@@ -1,5 +1,5 @@
 /*
- * "$Id: ipptest.c,v 1.8.2.2 2002/01/18 20:12:59 mike Exp $"
+ * "$Id: ipptest.c,v 1.8.2.3 2002/03/08 20:23:06 mike Exp $"
  *
  *   IPP test command for the Common UNIX Printing System (CUPS).
  *
@@ -425,7 +425,8 @@ do_tests(const char *uri,		/* I - URI to connect on */
         printf("        STATUS %x\n", response->request.status.status_code);
         printf("        (%s)\n",
 	       ippErrorString(response->request.status.status_code));
-	printf("        (%d bytes in response)\n", ippLength(response));
+	printf("        (%lu bytes in response)\n",
+	       (unsigned long)ippLength(response));
 
 	pass = 0;
       }
@@ -437,7 +438,8 @@ do_tests(const char *uri,		/* I - URI to connect on */
 	    if (pass)
 	    {
 	      printf("\b\b\b\b\bFAIL]\n");
-	      printf("        (%d bytes in response)\n", ippLength(response));
+	      printf("        (%lu bytes in response)\n",
+	             (unsigned long)ippLength(response));
 	      pass = 0;
 	    }
 
@@ -447,7 +449,8 @@ do_tests(const char *uri,		/* I - URI to connect on */
 	if (pass)
 	{
 	  printf("\b\b\b\b\bPASS]\n");
-	  printf("        (%d bytes in response)\n", ippLength(response));
+	  printf("        (%lu bytes in response)\n",
+	         (unsigned long)ippLength(response));
 	}
 	else
 	{
@@ -804,5 +807,5 @@ print_attr(ipp_attribute_t *attr)	/* I - Attribute to print */
 
 
 /*
- * End of "$Id: ipptest.c,v 1.8.2.2 2002/01/18 20:12:59 mike Exp $".
+ * End of "$Id: ipptest.c,v 1.8.2.3 2002/03/08 20:23:06 mike Exp $".
  */

@@ -5,6 +5,9 @@ CHANGES IN CUPS V1.1.15
 
 	- Updated the CUPS license agreement for the new MacOS
 	  license exception.
+	- Revamped the makefiles slightly to use automatically
+	  generated dependencies.
+	- Build fixes for OS X.
 	- The TIFF reading code depended on the newest version
 	  of libtiff; now conditionally compile that portion of
 	  the loader.

@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-common.m4,v 1.12.2.6 2002/01/14 20:36:31 mike Exp $"
+dnl "$Id: cups-common.m4,v 1.12.2.7 2002/03/08 20:23:01 mike Exp $"
 dnl
 dnl   Common configuration stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -63,6 +63,7 @@ if test "$NROFF" = ""; then
 fi
 AC_PATH_PROG(RM,rm)
 AC_PATH_PROG(SED,sed)
+AC_PATH_PROG(STRIP,strip)
 
 dnl Check for libraries...
 AC_CHECK_LIB(c,crypt,LIBS="$LIBS")
@@ -155,5 +156,5 @@ esac
 AC_SUBST(ARFLAGS)
 
 dnl
-dnl End of "$Id: cups-common.m4,v 1.12.2.6 2002/01/14 20:36:31 mike Exp $".
+dnl End of "$Id: cups-common.m4,v 1.12.2.7 2002/03/08 20:23:01 mike Exp $".
 dnl

@@ -1,16 +1,15 @@
 # DO NOT DELETE
 
 accept.o: ../config.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
-accept.o: ../cups/md5.h ../cups/ppd.h ../cups/string.h ../cups/language.h
+accept.o: ../cups/md5.h ../cups/ppd.h ../cups/language.h
 cancel.o: ../config.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
-cancel.o: ../cups/md5.h ../cups/ppd.h ../cups/string.h ../cups/language.h
+cancel.o: ../cups/md5.h ../cups/ppd.h ../cups/language.h
 cupsaddsmb.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
 cupsaddsmb.o: ../cups/ppd.h ../cups/string.h ../config.h
 lp.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h ../cups/ppd.h
 lp.o: ../cups/string.h ../config.h ../cups/language.h
 lpadmin.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
-lpadmin.o: ../cups/ppd.h ../cups/string.h ../config.h ../cups/language.h
-lpadmin.o: ../cups/debug.h
+lpadmin.o: ../cups/ppd.h ../cups/language.h ../cups/debug.h ../config.h
 lpinfo.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
 lpinfo.o: ../cups/ppd.h ../cups/language.h ../cups/debug.h ../cups/string.h
 lpinfo.o: ../config.h

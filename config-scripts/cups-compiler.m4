@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-compiler.m4,v 1.9.2.4 2002/01/26 21:36:35 mike Exp $"
+dnl "$Id: cups-compiler.m4,v 1.9.2.5 2002/03/08 20:23:02 mike Exp $"
 dnl
 dnl   Common configuration stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -174,7 +174,14 @@ else
 fi
 
 case $uname in
-	Darwin* | *BSD)
+	*BSD)
+		ARFLAGS="-rcv"
+		;;
+	Darwin*)
+ 		# For Darwin RC_CFLAGS can be "-arch ppc -arch i386 -pipe"
+ 		CFLAGS="\$(RC_CFLAGS) $CFLAGS"
+ 		CXXFLAGS="\$(RC_CFLAGS) $CXXFLAGS"
+
 		ARFLAGS="-rcv"
 		;;
 	*)
@@ -183,5 +190,5 @@ case $uname in
 esac
 
 dnl
-dnl End of "$Id: cups-compiler.m4,v 1.9.2.4 2002/01/26 21:36:35 mike Exp $".
+dnl End of "$Id: cups-compiler.m4,v 1.9.2.5 2002/03/08 20:23:02 mike Exp $".
 dnl

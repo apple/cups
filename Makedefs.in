@@ -1,5 +1,5 @@
 #
-# "$Id: Makedefs.in,v 1.36.2.3 2002/01/02 18:04:16 mike Exp $"
+# "$Id: Makedefs.in,v 1.36.2.4 2002/03/08 20:22:58 mike Exp $"
 #
 #   Common makefile definitions for the Common UNIX Printing System (CUPS).
 #
@@ -41,6 +41,7 @@ RANLIB	=	@RANLIB@
 RM	=	@RM@ -f
 SED	=	@SED@
 SHELL	=	/bin/sh
+STRIP	=	@STRIP@
 
 #
 # Installation programs...
@@ -126,6 +127,8 @@ srcdir		=	@srcdir@
 sysconfdir	=	@sysconfdir@
 top_srcdir	=	@top_srcdir@
 
+BUILDROOT	=	$(DSTROOT)
+
 AMANDIR		=	$(BUILDROOT)@AMANDIR@
 BINDIR		=	$(BUILDROOT)@bindir@
 DATADIR		=	$(BUILDROOT)@CUPS_DATADIR@
@@ -175,5 +178,5 @@ MAN8DIR		=	@MAN8DIR@
 	$(MV) t.z $@
 
 #
-# End of "$Id: Makedefs.in,v 1.36.2.3 2002/01/02 18:04:16 mike Exp $"
+# End of "$Id: Makedefs.in,v 1.36.2.4 2002/03/08 20:22:58 mike Exp $"
 #

@@ -39,7 +39,7 @@ image-tiff.o: image.h ../config.h
 image-zoom.o: image.h ../config.h
 image.o: image.h ../config.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
 image.o: ../cups/md5.h ../cups/ppd.h
-raster.o: raster.h
+raster.o: raster.h ../cups/string.h ../config.h
 form-main.o: form.h common.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
 form-main.o: ../cups/md5.h ../cups/ppd.h ../cups/language.h ../cups/string.h
 form-main.o: ../config.h
@@ -59,7 +59,7 @@ common.o: common.h ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
 common.o: ../cups/ppd.h ../cups/language.h ../cups/string.h ../config.h
 pstops.o: common.h ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
 pstops.o: ../cups/ppd.h ../cups/language.h ../cups/string.h ../config.h
-raster.o: raster.h
+raster.o: raster.h ../cups/string.h ../config.h
 rastertodymo.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
 rastertodymo.o: ../cups/ppd.h ../cups/string.h ../config.h raster.h
 rastertoepson.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
@@ -73,3 +73,4 @@ texttops.o: ../config.h
 textcommon.o: textcommon.h common.h ../cups/cups.h ../cups/ipp.h
 textcommon.o: ../cups/http.h ../cups/md5.h ../cups/ppd.h ../cups/language.h
 textcommon.o: ../cups/string.h ../config.h
+testraster.o: raster.h ../cups/string.h ../config.h

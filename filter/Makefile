@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.41.2.9 2002/03/07 18:58:42 mike Exp $"
+# "$Id: Makefile,v 1.41.2.10 2002/03/08 20:23:03 mike Exp $"
 #
 #   Filter makefile for the Common UNIX Printing System (CUPS).
 #
@@ -58,10 +58,18 @@ clean:
 
 
 #
+# Update dependencies (without system header dependencies...)
+#
+
+depend:
+	makedepend -Y -I.. -fDependencies $(OBJS:.o=.c) >/dev/null 2>&1
+
+
+#
 # Install all targets...
 #
 
-install:
+install:	all
 	$(INSTALL_DIR) $(SERVERBIN)/filter
 	for file in $(TARGETS); do \
 		$(INSTALL_BIN) $$file $(SERVERBIN)/filter; \
@@ -76,6 +84,8 @@ install:
 		$(RM) $(LIBDIR)/libcupsimage.dylib; \
 		$(LN) $(LIBCUPSIMAGE) $(LIBDIR)/libcupsimage.dylib; \
 	fi
+
+installhdrs:
 	$(INSTALL_DIR) $(INCLUDEDIR)/cups
 	$(INSTALL_DATA) image.h $(INCLUDEDIR)/cups
 	$(INSTALL_DATA) raster.h $(INCLUDEDIR)/cups
@@ -88,7 +98,6 @@ install:
 formtops:	$(FORMOBJS) common.o ../Makedefs ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ $(FORMOBJS) common.o $(LIBS) -lm
-$(FORMOBJS):	form.h
 
 
 #
@@ -98,7 +107,6 @@ $(FORMOBJS):	form.h
 hpgltops:	$(HPGLOBJS) common.o ../Makedefs ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ $(HPGLOBJS) common.o $(LIBS) -lm
-$(HPGLOBJS):	hpgltops.h
 
 
 #
@@ -119,9 +127,9 @@ libcupsimage.so.3 libcupsimage.sl.3:	$(IMAGEOBJS) ../Makedefs
 libcupsimage.3.dylib:	$(IMAGEOBJS) ../Makedefs
 	echo Linking $@...
 	$(DSO) $(DSOFLAGS) -o $@ \
-		-dylib_install_name $(LIBDIR)/libcupsimage.dylib \
-		-dylib_current_version 3.0.0 \
-		-dylib_compatibility_version 3.0.0 \
+		-install_name $(libdir)/libcupsimage.dylib \
+		-current_version 3.0.0 \
+		-compatibility_version 3.0.0 \
 		$(IMAGEOBJS) $(DSOLIBS) $(LINKCUPS) -lm -lcc_dynamic
 	$(RM) libcupsimage.dylib
 	$(LN) $@ libcupsimage.dylib
@@ -159,9 +167,6 @@ libcupsimage.a:	$(IMAGEOBJS) ../Makedefs
 	$(AR) $(ARFLAGS) $@ $(IMAGEOBJS)
 	$(RANLIB) $@
 
-$(IMAGEOBJS):	image.h
-raster.o:	raster.h
-
 
 #
 # imagetops
@@ -172,7 +177,6 @@ imagetops:	imagetops.o common.o $(LIBCUPSIMAGE) ../Makedefs \
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ imagetops.o common.o $(LINKCUPSIMAGE) \
 		$(IMGLIBS) $(LIBS)
-imagetops.o:	common.h image.h
 
 
 #
@@ -184,7 +188,6 @@ imagetoraster:	imagetoraster.o common.o $(LIBCUPSIMAGE) ../Makedefs \
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ imagetoraster.o common.o $(LINKCUPSIMAGE) \
 		$(IMGLIBS) $(LIBS)
-imagetoraster.o:	common.h image.h raster.h
 
 
 #
@@ -194,7 +197,6 @@ imagetoraster.o:	common.h image.h raster.h
 pstops:	pstops.o common.o ../Makedefs ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ pstops.o common.o $(LIBS)
-pstops.o:	common.h
 
 
 #
@@ -204,7 +206,6 @@ pstops.o:	common.h
 rastertodymo:	rastertodymo.o ../Makedefs ../cups/$(LIBCUPS) $(LIBCUPSIMAGE)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ rastertodymo.o $(LINKCUPSIMAGE) $(IMGLIBS) $(LIBS)
-rastertodymo.o:	raster.h
 
 
 #
@@ -214,7 +215,6 @@ rastertodymo.o:	raster.h
 rastertoepson:	rastertoepson.o ../Makedefs ../cups/$(LIBCUPS) $(LIBCUPSIMAGE)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ rastertoepson.o $(LINKCUPSIMAGE) $(IMGLIBS) $(LIBS)
-rastertoepson.o:	raster.h
 
 
 #
@@ -224,7 +224,6 @@ rastertoepson.o:	raster.h
 rastertohp:	rastertohp.o ../Makedefs ../cups/$(LIBCUPS) $(LIBCUPSIMAGE)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ rastertohp.o $(LINKCUPSIMAGE) $(IMGLIBS) $(LIBS)
-rastertohp.o:	raster.h
 
 
 #
@@ -234,7 +233,6 @@ rastertohp.o:	raster.h
 testraster:	testraster.o raster.o
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ testraster.o raster.o
-testraster.o:	raster.h
 
 
 #
@@ -245,15 +243,15 @@ texttops:	texttops.o textcommon.o common.o ../Makedefs \
 		../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ texttops.o textcommon.o common.o $(LIBS)
-texttops.o:	common.h textcommon.h
-
-common.o:	common.h
-textcommon.o:	textcommon.h common.h
-
-
-$(OBJS):	../Makedefs ../cups/cups.h ../cups/ppd.h ../cups/language.h
 
 
 #
-# End of "$Id: Makefile,v 1.41.2.9 2002/03/07 18:58:42 mike Exp $".
+# Dependencies...
+#
+  
+include Dependencies
+
+
+#
+# End of "$Id: Makefile,v 1.41.2.10 2002/03/08 20:23:03 mike Exp $".
 #

@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.13.2.2 2002/01/02 18:04:19 mike Exp $"
+# "$Id: Makefile,v 1.13.2.3 2002/03/08 20:23:00 mike Exp $"
 #
 #   Berkeley commands makefile for the Common UNIX Printing System (CUPS).
 #
@@ -44,10 +44,18 @@ clean:
 
 
 #
+# Update dependencies (without system header dependencies...)
+#
+
+depend:
+	makedepend -Y -I.. -fDependencies $(OBJS:.o=.c) >/dev/null 2>&1
+
+
+#
 # Install all targets...
 #
 
-install:
+install:	all
 	$(INSTALL_DIR) $(BINDIR)
 	$(INSTALL_BIN) lpq $(BINDIR)
 	$(INSTALL_BIN) lpr $(BINDIR)
@@ -64,8 +72,6 @@ lpc:	lpc.o ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o lpc lpc.o $(LIBS)
 
-lpc.o:	../cups/cups.h ../Makedefs
-
 
 #
 # lpq
@@ -74,8 +80,6 @@ lpc.o:	../cups/cups.h ../Makedefs
 lpq:	lpq.o ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o lpq lpq.o $(LIBS)
-
-lpq.o:	../cups/cups.h ../Makedefs
 
 
 #
@@ -86,8 +90,6 @@ lpr:	lpr.o ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o lpr lpr.o $(LIBS)
 
-lpr.o:	../cups/cups.h ../Makedefs
-
 
 #
 # lprm
@@ -97,9 +99,14 @@ lprm:	lprm.o ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o lprm lprm.o $(LIBS)
 
-lprm.o:	../cups/cups.h ../Makedefs
-
 
 #
-# End of "$Id: Makefile,v 1.13.2.2 2002/01/02 18:04:19 mike Exp $".
+# Dependencies...
+#
+  
+include Dependencies
+
+  
+#
+# End of "$Id: Makefile,v 1.13.2.3 2002/03/08 20:23:00 mike Exp $".
 #

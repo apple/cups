@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.36.2.2 2002/01/02 18:04:57 mike Exp $"
+# "$Id: Makefile,v 1.36.2.3 2002/03/08 20:23:05 mike Exp $"
 #
 #   Scheduler Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -48,10 +48,18 @@ clean:
 
 
 #
+# Update dependencies (without system header dependencies...)
+#
+
+depend:
+	makedepend -Y -I.. -fDependencies $(OBJS:.o=.c) >/dev/null 2>&1
+
+
+#
 # Install the scheduler...
 #
 
-install:
+install:	all
 	$(INSTALL_DIR) $(SBINDIR)
 	$(INSTALL_BIN) cupsd $(SBINDIR)
 	$(INSTALL_DIR) $(SERVERBIN)/daemon
@@ -74,11 +82,6 @@ cupsd:	$(CUPSDOBJS) libmime.a ../cups/$(LIBCUPS)
 	$(CC) $(LDFLAGS) -o cupsd $(CUPSDOBJS) libmime.a \
 		$(LIBZ) $(SSLLIBS) $(LIBSLP) $(PAMLIBS) $(LIBS) $(LIBMALLOC)
 
-$(CUPSDOBJS):	auth.h banners.h cert.h classes.h client.h conf.h \
-		cupsd.h dirsvc.h job.h mime.h printers.h \
-		../cups/cups.h ../cups/http.h ../cups/ipp.h \
-		../cups/language.h ../cups/string.h
-
 
 #
 # Make the line printer daemon, "cups-lpd".
@@ -88,9 +91,6 @@ cups-lpd:	cups-lpd.o ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o cups-lpd cups-lpd.o $(LIBS)
 
-cups-lpd.o:	../cups/cups.h ../cups/http.h ../cups/ipp.h \
-		../cups/language.h ../cups/string.h
-
 
 #
 # Make the polling daemon, "cups-polld".
@@ -99,9 +99,6 @@ cups-lpd.o:	../cups/cups.h ../cups/http.h ../cups/ipp.h \
 cups-polld:	cups-polld.o ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o cups-polld cups-polld.o $(LIBS)
-
-cups-polld.o:	../cups/cups.h ../cups/http.h ../cups/ipp.h \
-		../cups/language.h ../cups/string.h
 
 
 #
@@ -114,8 +111,6 @@ libmime.a:	$(MIMEOBJS)
 	$(AR) $(ARFLAGS) $@ $(MIMEOBJS)
 	$(RANLIB) $@
 
-$(MIMEOBJS):	mime.h
-
 
 #
 # testmime
@@ -125,7 +120,6 @@ testmime:	testmime.o libmime.a
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ testmime.o libmime.a ../cups/libcups.a
 
-testmime.o:	mime.h
 
 #
 # Make the test program, "testspeed".
@@ -135,11 +129,14 @@ testspeed:	testspeed.o ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o testspeed testspeed.o $(LIBS)
 
-testspeed.o:	../cups/cups.h ../cups/http.h ../cups/ipp.h ../cups/language.h
 
-$(OBJS):	../config.h ../Makedefs
+#
+# Dependencies...
+#
+  
+include Dependencies
 
 
 #
-# End of "$Id: Makefile,v 1.36.2.2 2002/01/02 18:04:57 mike Exp $".
+# End of "$Id: Makefile,v 1.36.2.3 2002/03/08 20:23:05 mike Exp $".
 #

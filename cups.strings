@@ -2,8 +2,8 @@
 <!DOCTYPE plist SYSTEM "file://localhost/System/Library/DTDs/PropertyList.dtd">
 <plist version="0.9">
 <dict>
-	<key>Starting CUPS</key>
-	<string>Starting CUPS</string>
+	<key>Starting printing services</key>
+	<string>Starting printing services</string>
 </dict>
 </plist>
 

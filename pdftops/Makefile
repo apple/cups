@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.6.2.2 2002/01/02 18:04:54 mike Exp $"
+# "$Id: Makefile,v 1.6.2.3 2002/03/08 20:23:04 mike Exp $"
 #
 #   pdftops filter Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -39,10 +39,18 @@ clean:
 
 
 #
+# Update dependencies (without system header dependencies...)
+#
+
+depend:
+	makedepend -Y -I.. -fDependencies $(OBJS:.o=.cxx) gmem.c parseargs.c >/dev/null 2>&1
+
+
+#
 # Install the filter...
 #
 
-install:
+install:	all
 	$(INSTALL_DIR) $(SERVERBIN)/filter
 	$(INSTALL_BIN) pdftops $(SERVERBIN)/filter
 
@@ -55,10 +63,6 @@ pdftops:	libxpdf.a pdftops.o ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(CXX) $(LDFLAGS) -o $@ pdftops.o libxpdf.a $(LIBS) -lm
 
-pdftops.o:	parseargs.h gtypes.h GString.h gmem.h Object.h Array.h \
-		Dict.h Stream.h XRef.h Catalog.h Page.h PDFDoc.h Link.h \
-		PSOutputDev.h config.h OutputDev.h Params.h Error.h
-
 
 #
 # libxpdf.a
@@ -70,63 +74,14 @@ libxpdf.a:	$(LIBOBJS)
 	$(AR) $(ARFLAGS) $@ $(LIBOBJS)
 	$(RANLIB) $@
 
-GString.o:	GString.h
-gmempp.o:	gmem.h
-gfile.o:	GString.h gfile.h gtypes.h
-gmem.o:		gmem.h
-parseargs.o:	parseargs.h gtypes.h
-Array.o:	gmem.h Object.h gtypes.h GString.h Array.h Dict.h Stream.h
-Catalog.o:	gmem.h Object.h gtypes.h GString.h Array.h Dict.h Stream.h \
-		Page.h Error.h config.h Link.h Catalog.h
-Decrypt.o:	gmem.h Decrypt.h gtypes.h GString.h
-Dict.o:		gmem.h Object.h gtypes.h GString.h Array.h Dict.h Stream.h \
-		XRef.h
-Error.o:	gtypes.h Params.h Error.h config.h
-FontEncoding.o:	gmem.h FontEncoding.h gtypes.h
-FontFile.o:	gmem.h Error.h config.h FontFile.h gtypes.h GString.h \
-		FontEncoding.h StdFontInfo.h CompactFontInfo.h
-FormWidget.o:	FormWidget.h gmem.h Object.h Gfx.h
-Function.o:	gmem.h Object.h Dict.h Stream.h Error.h Function.h
-Gfx.o:		gmem.h Object.h gtypes.h GString.h Array.h Dict.h Stream.h \
-		Lexer.h Parser.h GfxFont.h FontEncoding.h GfxState.h \
-		OutputDev.h Params.h Error.h config.h Gfx.h
-GfxFont.o:	GString.h gmem.h gfile.h gtypes.h config.h Object.h Array.h \
-		Dict.h Stream.h Error.h Params.h FontFile.h FontEncoding.h \
-		GfxFont.h FontInfo.h
-GfxState.o:	gmem.h Error.h config.h Object.h gtypes.h GString.h Array.h \
-		Dict.h Stream.h GfxState.h
-ImageOutputDev.o: gmem.h config.h Error.h GfxState.h gtypes.h Object.h \
-		GString.h Array.h Dict.h Stream.h ImageOutputDev.h OutputDev.h
-Lexer.o:	Lexer.h Object.h gtypes.h gmem.h GString.h Array.h Dict.h \
-		Stream.h Error.h config.h
-Link.o:		gmem.h GString.h Error.h config.h Object.h gtypes.h Array.h \
-		Dict.h Stream.h Link.h
-Object.o:	Object.h gtypes.h gmem.h GString.h Array.h Dict.h Stream.h \
-		Error.h config.h XRef.h
-OutputDev.o:	Object.h gtypes.h gmem.h GString.h Array.h Dict.h Stream.h \
-		GfxState.h OutputDev.h
-Page.o:		Object.h gtypes.h gmem.h GString.h Array.h Dict.h Stream.h \
-		XRef.h OutputDev.h Gfx.h Error.h config.h Params.h Page.h
-Params.o:	gtypes.h gmem.h GString.h gfile.h Params.h
-Parser.o:	Object.h gtypes.h gmem.h GString.h Array.h Dict.h Stream.h \
-		Parser.h Lexer.h Error.h config.h
-PDFDoc.o:	GString.h config.h Page.h Object.h gtypes.h gmem.h Array.h \
-		Dict.h Stream.h Catalog.h XRef.h Link.h OutputDev.h Params.h \
-		Error.h PDFDoc.h
-PSOutputDev.o:	GString.h config.h Object.h gtypes.h gmem.h Array.h Dict.h \
-		Stream.h Error.h GfxState.h GfxFont.h FontEncoding.h \
-		FontFile.h Catalog.h Page.h PSOutputDev.h OutputDev.h
-SFont.o:	SFont.h gtypes.h
-Stream.o:	gmem.h config.h Error.h Object.h gtypes.h GString.h Array.h \
-		Dict.h Stream.h Stream-CCITT.h
-T1Font.o:	T1Font.h gmem.h FontEncoding.h
-TTFont.o:	TTFont.h gmem.h FontEncoding.h
-XRef.o:		gmem.h Object.h gtypes.h GString.h Array.h Dict.h Stream.h \
-		Lexer.h Parser.h Error.h config.h XRef.h
-
-
-$(OBJS):	../config.h ../Makedefs
 
 #
-# End of "$Id: Makefile,v 1.6.2.2 2002/01/02 18:04:54 mike Exp $".
+# Dependencies...
+#
+  
+include Dependencies
+
+
+#
+# End of "$Id: Makefile,v 1.6.2.3 2002/03/08 20:23:04 mike Exp $".
 #

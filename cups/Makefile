@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.53.2.5 2002/03/01 19:55:09 mike Exp $"
+# "$Id: Makefile,v 1.53.2.6 2002/03/08 20:23:02 mike Exp $"
 #
 #   Support library Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -66,14 +66,18 @@ clean:
 
 
 #
+# Update dependencies (without system header dependencies...)
+#
+
+depend:
+	makedepend -Y -I.. -fDependencies $(OBJS:.o=.c) >/dev/null 2>&1
+
+
+#
 # Install object and target files...
 #
 
 install:	all
-	$(INSTALL_DIR) $(INCLUDEDIR)/cups
-	for file in $(HEADERS); do \
-		$(INSTALL_DATA) $$file $(INCLUDEDIR)/cups; \
-	done
 	$(INSTALL_DIR) $(LIBDIR)
 	$(INSTALL_LIB) $(LIBCUPS) $(LIBDIR)
 	if test $(LIBCUPS) = "libcups.so.2" -o $(LIBCUPS) = "libcups.sl.2"; then \
@@ -89,6 +93,12 @@ install:	all
 	if test $(LIBCUPS) = "libcups_s.a"; then \
 		$(INSTALL_LIB) libcups.a $(LIBDIR); \
 	fi
+
+installhdrs:
+	$(INSTALL_DIR) $(INCLUDEDIR)/cups
+	for file in $(HEADERS); do \
+		$(INSTALL_DATA) $$file $(INCLUDEDIR)/cups; \
+	done
 
 
 #
@@ -109,9 +119,9 @@ libcups.so.3 libcups.sl.3:	$(LIBOBJS) ../Makedefs
 libcups.3.dylib:	$(LIBOBJS) ../Makedefs
 	echo Linking $@...
 	$(DSO) $(DSOFLAGS) -o $@ \
-		-dylib_install_name $(LIBDIR)/libcups.dylib \
-		-dylib_current_version 3.0.0 \
-		-dylib_compatibility_version 3.0.0 \
+		-install_name $(libdir)/libcups.dylib \
+		-current_version 3.0.0 \
+		-compatibility_version 3.0.0 \
 		$(LIBOBJS) $(SSLLIBS)
 	$(RM) libcups.dylib
 	$(LN) $@ libcups.dylib
@@ -160,24 +170,6 @@ cups_C.h:	../locale/C/cups_C
 	$(RM) cups_C.h
 	$(AWK) '{print "\"" $$0 "\","}' < ../locale/C/cups_C > cups_C.h
 
-dest.o:		cups.h http.h ipp.h language.h string.h
-emit.o:		ppd.h
-encode.o:	cups.h ipp.h string.h
-http.o:		http.h ipp.h md5.h string.h
-http-addr.o:	http.h string.h
-ipp.o:		http.h ipp.h string.h language.h
-language.o:	cups_C.h language.h string.h
-mark.o:		ppd.h
-md5.o:		md5.h
-options.o:	cups.h
-page.o:		ppd.h
-ppd.o:		language.h ppd.h
-snprintf.o:	string.h
-string.o:	string.h
-tempfile.o:	cups.h string.h
-usersys.o:	cups.h
-util.o:		cups.h http.h ipp.h
-
 
 #
 # testhttp (dependency on static CUPS library is intentional)
@@ -186,8 +178,6 @@ util.o:		cups.h http.h ipp.h
 testhttp:	testhttp.o libcups.a
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ testhttp.o libcups.a $(NETLIBS) $(SSLLIBS)
-
-testhttp.o:	http.h
 
 
 #
@@ -198,11 +188,14 @@ testppd:	testppd.o libcups.a
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ testppd.o libcups.a $(NETLIBS)
 
-testppd.o:	ppd.h
 
-$(OBJS):	../Makedefs ../config.h
+#
+# Dependencies...
+#
+  
+include Dependencies
 
 
 #
-# End of "$Id: Makefile,v 1.53.2.5 2002/03/01 19:55:09 mike Exp $".
+# End of "$Id: Makefile,v 1.53.2.6 2002/03/08 20:23:02 mike Exp $".
 #
