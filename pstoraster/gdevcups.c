@@ -1,5 +1,5 @@
 /*
- * "$Id: gdevcups.c,v 1.24 2000/04/12 14:39:32 mike Exp $"
+ * "$Id: gdevcups.c,v 1.25 2000/04/12 20:03:52 mike Exp $"
  *
  *   GNU Ghostscript raster output driver for the Common UNIX Printing
  *   System (CUPS).
@@ -291,13 +291,26 @@ cups_get_matrix(gx_device *pdev,	/* I - Device info */
   * Set the transform matrix...
   */
 
-  pmat->xx = (float)cups->header.HWResolution[0] / 72.0;
-  pmat->xy = 0.0;
-  pmat->yx = 0.0;
-  pmat->yy = -(float)cups->header.HWResolution[1] / 72.0;
-  pmat->tx = -(float)cups->header.HWResolution[0] * pdev->HWMargins[0] / 72.0;
-  pmat->ty = (float)cups->header.HWResolution[1] *
-             ((float)cups->header.PageSize[1] - pdev->HWMargins[3]) / 72.0;
+  if (cups->header.Duplex && cups->ppd->flip_duplex && !(cups->page & 1))
+  {
+    pmat->xx = (float)-cups->header.HWResolution[0] / 72.0;
+    pmat->xy = 0.0;
+    pmat->yx = 0.0;
+    pmat->yy = (float)cups->header.HWResolution[1] / 72.0;
+    pmat->tx = (float)cups->header.HWResolution[0] *
+               ((float)cups->header.PageSize[0] - pdev->HWMargins[2]) / 72.0;
+    pmat->ty = -(float)cups->header.HWResolution[1] * pdev->HWMargins[1] / 72.0;
+  }
+  else
+  {
+    pmat->xx = (float)cups->header.HWResolution[0] / 72.0;
+    pmat->xy = 0.0;
+    pmat->yx = 0.0;
+    pmat->yy = -(float)cups->header.HWResolution[1] / 72.0;
+    pmat->tx = -(float)cups->header.HWResolution[0] * pdev->HWMargins[0] / 72.0;
+    pmat->ty = (float)cups->header.HWResolution[1] *
+               ((float)cups->header.PageSize[1] - pdev->HWMargins[3]) / 72.0;
+  }
 
 #ifdef DEBUG
   fprintf(stderr, "DEBUG: width = %d, height = %d\n", cups->width,
@@ -2409,5 +2422,5 @@ cups_print_planar(gx_device_printer *pdev,	/* I - Printer device */
 
 
 /*
- * End of "$Id: gdevcups.c,v 1.24 2000/04/12 14:39:32 mike Exp $".
+ * End of "$Id: gdevcups.c,v 1.25 2000/04/12 20:03:52 mike Exp $".
  */

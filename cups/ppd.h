@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.h,v 1.19 2000/02/06 22:09:04 mike Exp $"
+ * "$Id: ppd.h,v 1.20 2000/04/12 20:03:50 mike Exp $"
  *
  *   PostScript Printer Description definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -198,6 +198,7 @@ typedef struct			/**** Files ****/
   ppd_profile_t	*profiles;	/* sRGB color profiles */
   int		num_filters;	/* Number of filters */
   char		**filters;	/* Filter strings... */
+  int		flip_duplex;	/* 1 = Flip page for back sides */
 } ppd_file_t;
 
 
@@ -236,5 +237,5 @@ extern float		ppdPageWidth(ppd_file_t *ppd, const char *name);
 #endif /* !_CUPS_PPD_H_ */
 
 /*
- * End of "$Id: ppd.h,v 1.19 2000/02/06 22:09:04 mike Exp $".
+ * End of "$Id: ppd.h,v 1.20 2000/04/12 20:03:50 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c,v 1.40 2000/02/06 22:09:04 mike Exp $"
+ * "$Id: ppd.c,v 1.41 2000/04/12 20:03:50 mike Exp $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -584,6 +584,8 @@ ppdOpen(FILE *fp)		/* I - File to read from */
       else
         ppd->colorspace = PPD_CS_GRAY;
     }
+    else if (strcmp(keyword, "cupsFlipDuplex") == 0)
+      ppd->flip_duplex = strcmp(string, "True") == 0;
     else if (strcmp(keyword, "cupsManualCopies") == 0)
       ppd->manual_copies = strcmp(string, "True") == 0;
     else if (strcmp(keyword, "cupsModelNumber") == 0)
@@ -1812,5 +1814,5 @@ ppd_fix(char *string)		/* IO - String to fix */
 
 
 /*
- * End of "$Id: ppd.c,v 1.40 2000/02/06 22:09:04 mike Exp $".
+ * End of "$Id: ppd.c,v 1.41 2000/04/12 20:03:50 mike Exp $".
  */
