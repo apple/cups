@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.69 2000/11/06 16:18:09 mike Exp $"
+ * "$Id: http.c,v 1.70 2000/12/18 21:38:55 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -77,6 +77,12 @@
 #if !defined(WIN32) && !defined(__EMX__)
 #  include <signal.h>
 #endif /* !WIN32 && !__EMX__ */
+
+#ifdef HAVE_LIBSSL
+#  include <openssl/rand.h>
+#  include <openssl/ssl.h>
+#endif /* HAVE_LIBSSL */
+
 
 /*
  * Some operating systems have done away with the Fxxxx constants for
@@ -166,6 +172,13 @@ static const char	*months[12] =
 void
 httpInitialize(void)
 {
+#ifdef HAVE_LIBSSL
+#  if defined(WIN32) || defined(__EMX__)
+#  else
+  struct timeval	curtime;	/* Current time in microseconds */
+#  endif /* WIN32 || __EMX__ */
+#endif /* HAVE_LIBSSL */
+
 #if defined(WIN32) || defined(__EMX__)
   WSADATA	winsockdata;	/* WinSock data */
   static int	initialized = 0;/* Has WinSock been initialized? */
@@ -189,6 +202,21 @@ httpInitialize(void)
 #else
   signal(SIGPIPE, SIG_IGN);
 #endif /* WIN32 || __EMX__ */
+
+#ifdef HAVE_LIBSSL
+  SSL_library_init();
+
+ /*
+  * Using the current time is a dubious random seed, but on some systems
+  * it is the best we can do (on others, this seed isn't even used...)
+  */
+
+#  if defined(WIN32) || defined(__EMX__)
+#  else
+  gettimeofday(&curtime, NULL);
+  RAND_seed(&curtime, sizeof(curtime));
+#  endif /* WIN32 || __EMX__ */
+#endif /* HAVE_LIBSSL */
 }
 
 
@@ -295,6 +323,18 @@ httpConnect(const char *host,	/* I - Host to connect to */
 #else
   http->hostaddr.sin_port   = htons(port);
 #endif /* WIN32 */
+
+ /*
+  * Set the default encryption status...
+  */
+
+  if (port == 443)
+    http->encryption = HTTP_ENCRYPT_ALWAYS;
+
+ /*
+  * Connect to the remote system...
+  */
+
   if (httpReconnect(http))
   {
     free(http);
@@ -312,8 +352,25 @@ httpConnect(const char *host,	/* I - Host to connect to */
 int				/* O - 0 on success, non-zero on failure */
 httpReconnect(http_t *http)	/* I - HTTP data */
 {
-  int	val;			/* Socket option value */
+  int		val;		/* Socket option value */
+#ifdef HAVE_LIBSSL
+  SSL_CTX	*context;	/* Context for encryption */
+  SSL		*conn;		/* Connection for encryption */
+  char		buffer[1024];	/* Status from server... */
 
+
+  if (http->tls)
+  {
+    conn    = (SSL *)(http->tls);
+    context = SSL_get_SSL_CTX(conn);
+
+    SSL_shutdown(conn);
+    SSL_CTX_free(context);
+    SSL_free(conn);
+
+    http->tls = NULL;
+  }
+#endif /* HAVE_LIBSSL */
 
  /*
   * Close any previously open socket...
@@ -379,6 +436,65 @@ httpReconnect(http_t *http)	/* I - HTTP data */
 
   http->error  = 0;
   http->status = HTTP_CONTINUE;
+
+#ifdef HAVE_LIBSSL
+  if (http->encryption == HTTP_ENCRYPT_ALWAYS)
+  {
+   /*
+    * Always do encryption on port 443 (https method); other ports use
+    * the HTTP Upgrade method...
+    */
+
+    if (ntohs(http->hostaddr.sin_port) != 443)
+    {
+     /*
+      * Send an OPTIONS request to the server, requiring SSL or TLS
+      * encryption on the link...
+      */
+
+      httpPrintf(http, "OPTIONS * HTTP/1.1\r\n");
+      httpPrintf(http, "Host: %s\r\n", http->hostname);
+      httpPrintf(http, "Connection: upgrade\r\n");
+      httpPrintf(http, "Upgrade: TLS/1.0, SSL/2.0, SSL/3.0\r\n");
+      httpPrintf(http, "\r\n");
+
+     /*
+      * Wait for the response data...
+      */
+
+      while (httpGets(buffer, sizeof(buffer), http) != NULL)
+        if (!buffer[0])
+	  break;
+    }
+
+    context = SSL_CTX_new(TLSv1_method());
+    conn    = SSL_new(context);
+
+    SSL_set_fd(conn, http->fd);
+    if (SSL_connect(conn) != 1)
+    {
+      SSL_CTX_free(context);
+      SSL_free(conn);
+
+#if defined(WIN32) || defined(__EMX__)
+      http->error  = WSAGetLastError();
+#else
+      http->error  = errno;
+#endif /* WIN32 || __EMX__ */
+      http->status = HTTP_ERROR;
+
+#ifdef WIN32
+      closesocket(http->fd);
+#else
+      close(http->fd);
+#endif
+
+      return (-1);
+    }
+
+    http->tls = conn;
+  }
+#endif /* HAVE_LIBSSL */
 
   return (0);
 }
@@ -885,6 +1001,10 @@ httpRead(http_t *http,			/* I - HTTP data */
     if (http->used > 0)
       memcpy(http->buffer, http->buffer + length, http->used);
   }
+#ifdef HAVE_LIBSSL
+  else if (http->tls)
+    bytes = SSL_read((SSL *)(http->tls), buffer, length);
+#endif /* HAVE_LIBSSL */
   else
   {
     DEBUG_printf(("httpRead: reading %d bytes from socket...\n", length));
@@ -967,7 +1087,13 @@ httpWrite(http_t     *http,		/* I - HTTP data */
 
   while (length > 0)
   {
+#ifdef HAVE_LIBSSL
+    if (http->tls)
+      bytes = SSL_write((SSL *)(http->tls), buffer, length);
+    else
+#endif /* HAVE_LIBSSL */
     bytes = send(http->fd, buffer, length, 0);
+
     if (bytes < 0)
     {
       DEBUG_puts("httpWrite: error writing data...\n");
@@ -1053,7 +1179,15 @@ httpGets(char   *line,			/* I - Line to read into */
       * No newline; see if there is more data to be read...
       */
 
-      if ((bytes = recv(http->fd, bufend, HTTP_MAX_BUFFER - http->used, 0)) < 0)
+#ifdef HAVE_LIBSSL
+      if (http->tls)
+        bytes = SSL_read((SSL *)(http->tls), bufend,
+	                 HTTP_MAX_BUFFER - http->used);
+      else
+#endif /* HAVE_LIBSSL */
+      bytes = recv(http->fd, bufend, HTTP_MAX_BUFFER - http->used, 0);
+
+      if (bytes < 0)
       {
        /*
 	* Nope, can't get a line this time...
@@ -1159,8 +1293,17 @@ httpPrintf(http_t     *http,		/* I - HTTP data */
   DEBUG_printf(("httpPrintf: %s", buf));
 
   for (tbytes = 0, bufptr = buf; tbytes < bytes; tbytes += nbytes, bufptr += nbytes)
-    if ((nbytes = send(http->fd, bufptr, bytes - tbytes, 0)) < 0)
+  {
+#ifdef HAVE_LIBSSL
+    if (http->tls)
+      nbytes = SSL_write((SSL *)(http->tls), bufptr, bytes - tbytes);
+    else
+#endif /* HAVE_LIBSSL */
+    nbytes = send(http->fd, bufptr, bytes - tbytes, 0);
+
+    if (nbytes < 0)
       return (-1);
+  }
 
   return (bytes);
 }
@@ -1275,6 +1418,10 @@ httpUpdate(http_t *http)		/* I - HTTP data */
   http_field_t	field;			/* Field index */
   int		major, minor;		/* HTTP version numbers */
   http_status_t	status;			/* Authorization status */
+#ifdef HAVE_LIBSSL
+  SSL_CTX	*context;		/* Context for encryption */
+  SSL		*conn;			/* Connection for encryption */
+#endif /* HAVE_LIBSSL */
 
 
   DEBUG_printf(("httpUpdate(%08x)\n", http));
@@ -1307,6 +1454,44 @@ httpUpdate(http_t *http)		/* I - HTTP data */
 
       if (http->status == HTTP_CONTINUE)
         return (http->status);
+
+#ifdef HAVE_LIBSSL
+      if (http->status == HTTP_UPGRADE_NOW && !http->tls)
+      {
+	context = SSL_CTX_new(TLSv1_method());
+	conn    = SSL_new(context);
+
+	SSL_set_fd(conn, http->fd);
+	if (SSL_connect(conn) != 1)
+	{
+	  SSL_CTX_free(context);
+	  SSL_free(conn);
+
+#if defined(WIN32) || defined(__EMX__)
+	  http->error  = WSAGetLastError();
+#else
+	  http->error  = errno;
+#endif /* WIN32 || __EMX__ */
+	  http->status = HTTP_ERROR;
+
+#ifdef WIN32
+	  closesocket(http->fd);
+#else
+	  close(http->fd);
+#endif
+
+	  return (HTTP_ERROR);
+	}
+
+	http->tls = conn;
+
+        return (HTTP_CONTINUE);
+      }
+      else if (http->status == HTTP_UPGRADE_REQUIRED &&
+               http->encryption != HTTP_ENCRYPT_NEVER)
+        http->encryption = HTTP_ENCRYPT_PREFERRED;
+
+#endif /* HAVE_LIBSSL */
 
       httpGetLength(http);
 
@@ -1637,6 +1822,14 @@ http_send(http_t       *http,	/* I - HTTP data */
 
   http->status = HTTP_CONTINUE;
 
+#ifdef HAVE_LIBSSL
+  if (http->encryption == HTTP_ENCRYPT_PREFERRED && !http->tls)
+  {
+    httpSetField(http, HTTP_FIELD_CONNECTION, "Upgrade");
+    httpSetField(http, HTTP_FIELD_UPGRADE, "TLS/1.0,SSL/2.0,SSL/3.0");
+  }
+#endif /* HAVE_LIBSSL */
+
   if (httpPrintf(http, "%s %s HTTP/1.1\r\n", codes[request], buf) < 1)
   {
     http->status = HTTP_ERROR;
@@ -1668,5 +1861,5 @@ http_send(http_t       *http,	/* I - HTTP data */
 
 
 /*
- * End of "$Id: http.c,v 1.69 2000/11/06 16:18:09 mike Exp $".
+ * End of "$Id: http.c,v 1.70 2000/12/18 21:38:55 mike Exp $".
  */

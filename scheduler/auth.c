@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.c,v 1.36 2000/11/03 14:13:27 mike Exp $"
+ * "$Id: auth.c,v 1.37 2000/12/18 21:38:58 mike Exp $"
  *
  *   Authorization routines for the Common UNIX Printing System (CUPS).
  *
@@ -479,6 +479,15 @@ IsAuthorized(client_t *con)	/* I - Connection */
   if (auth == AUTH_DENY)
     return (HTTP_FORBIDDEN);
 
+#ifdef HAVE_LIBSSL
+ /*
+  * See if encryption is required...
+  */
+
+  if (best->encryption == HTTP_ENCRYPT_ALWAYS && !con->http.tls)
+    return (HTTP_UPGRADE_REQUIRED);
+#endif /* HAVE_LIBSSL */
+
  /*
   * Now see what access level is required...
   */
@@ -900,5 +909,5 @@ pam_func(int                      num_msg,	/* I - Number of messages */
 
 
 /*
- * End of "$Id: auth.c,v 1.36 2000/11/03 14:13:27 mike Exp $".
+ * End of "$Id: auth.c,v 1.37 2000/12/18 21:38:58 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.63 2000/11/29 15:26:46 mike Exp $"
+ * "$Id: conf.c,v 1.64 2000/12/18 21:38:58 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -42,6 +42,11 @@
 #ifdef HAVE_VSYSLOG
 #  include <syslog.h>
 #endif /* HAVE_VSYSLOG */
+
+#ifdef HAVE_LIBSSL
+#  include <openssl/ssl.h>
+#  include <openssl/rand.h>
+#endif /* HAVE_LIBSSL */
 
 
 /*
@@ -94,6 +99,10 @@ static var_t	variables[] =
   { "Printcap",		Printcap,		VAR_STRING,	sizeof(Printcap) },
   { "FontPath",		FontPath,		VAR_STRING,	sizeof(FontPath) },
   { "RemoteRoot",	RemoteRoot,		VAR_STRING,	sizeof(RemoteRoot) },
+#ifdef HAVE_LIBSSL
+  { "ServerCertificate",ServerCertificate,	VAR_STRING,	sizeof(ServerCertificate) },
+  { "ServerKey",	ServerKey,		VAR_STRING,	sizeof(ServerKey) },
+#endif /* HAVE_LIBSSL */
   { "HostNameLookups",	&HostNameLookups,	VAR_BOOLEAN,	0 },
   { "Timeout",		&Timeout,		VAR_INTEGER,	0 },
   { "KeepAlive",	&KeepAlive,		VAR_BOOLEAN,	0 },
@@ -207,6 +216,11 @@ ReadConfiguration(void)
   strcpy(Printcap, "/etc/printcap");
   strcpy(FontPath, CUPS_FONTPATH);
   strcpy(RemoteRoot, "remroot");
+
+#ifdef HAVE_LIBSSL
+  strcpy(ServerCertificate, "ssl/server.crt");
+  strcpy(ServerKey, "ssl/server.key");
+#endif /* HAVE_LIBSSL */
 
   if ((language = DEFAULT_LANGUAGE) == NULL)
     language = "en";
@@ -366,6 +380,22 @@ ReadConfiguration(void)
     openlog("cupsd", LOG_PID | LOG_NOWAIT | LOG_NDELAY, LOG_LPR);
 #endif /* HAVE_VSYSLOG */
 
+#ifdef HAVE_LIBSSL
+  if (ServerCertificate[0] != '/')
+  {
+    snprintf(directory, sizeof(directory), "%s/%s", ServerRoot, ServerCertificate);
+    strncpy(ServerCertificate, directory, sizeof(ServerCertificate) - 1);
+    ServerCertificate[sizeof(ServerCertificate) - 1] = '\0';
+  }
+
+  if (ServerKey[0] != '/')
+  {
+    snprintf(directory, sizeof(directory), "%s/%s", ServerRoot, ServerKey);
+    strncpy(ServerKey, directory, sizeof(ServerKey) - 1);
+    ServerKey[sizeof(ServerKey) - 1] = '\0';
+  }
+#endif /* HAVE_LIBSSL */
+
   LogMessage(L_DEBUG, "ReadConfiguration() ConfigurationFile=\"%s\"",
              ConfigurationFile);
 
@@ -440,6 +470,14 @@ ReadConfiguration(void)
   StartListening();
   StartBrowsing();
   StartPolling();
+
+#ifdef HAVE_LIBSSL
+ /*
+  * Initialize the encryption libraries...
+  */
+
+  SSL_library_init();
+#endif /* HAVE_LIBSSL */
 
  /*
   * Check for queued jobs...
@@ -1121,6 +1159,24 @@ read_location(FILE *fp,		/* I - Configuration file */
 
     if (strcmp(name, "</Location>") == 0)
       return (linenum);
+    else if (strcmp(name, "Encryption") == 0)
+    {
+     /*
+      * "Encryption xxx" - set required encryption level...
+      */
+
+      if (strcasecmp(value, "never") == 0)
+        loc->encryption = HTTP_ENCRYPT_NEVER;
+      else if (strcasecmp(value, "always") == 0)
+        loc->encryption = HTTP_ENCRYPT_ALWAYS;
+      else if (strcasecmp(value, "preferred") == 0)
+        loc->encryption = HTTP_ENCRYPT_PREFERRED;
+      else if (strcasecmp(value, "ifrequested") == 0)
+        loc->encryption = HTTP_ENCRYPT_IF_REQUESTED;
+      else
+        LogMessage(L_ERROR, "Unknown Encryption value %s on line %d.",
+	           value, linenum);
+    }
     else if (strcmp(name, "Order") == 0)
     {
      /*
@@ -1407,5 +1463,5 @@ get_address(char               *value,		/* I - Value string */
 
 
 /*
- * End of "$Id: conf.c,v 1.63 2000/11/29 15:26:46 mike Exp $".
+ * End of "$Id: conf.c,v 1.64 2000/12/18 21:38:58 mike Exp $".
  */

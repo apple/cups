@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.75 2000/11/06 16:18:11 mike Exp $"
+ * "$Id: client.c,v 1.76 2000/12/18 21:38:58 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -26,6 +26,7 @@
  *   AcceptClient()        - Accept a new client.
  *   CloseAllClients()     - Close all remote clients immediately.
  *   CloseClient()         - Close a remote client.
+ *   EncryptClient()       - Enable encryption for the client...
  *   ReadClient()          - Read data from a client.
  *   SendCommand()         - Send output from a command via HTTP.
  *   SendError()           - Send an error message via HTTP.
@@ -43,6 +44,11 @@
  */
 
 #include "cupsd.h"
+
+#ifdef HAVE_LIBSSL
+#  include <openssl/ssl.h>
+#  include <openssl/rand.h>
+#endif /* HAVE_LIBSSL */
 
 
 /*
@@ -254,6 +260,39 @@ CloseClient(client_t *con)	/* I - Client to close */
 
 
 /*
+ * 'EncryptClient()' - Enable encryption for the client...
+ */
+
+int				/* O - 1 on success, 0 on error */
+EncryptClient(client_t *con)	/* I - Client to encrypt */
+{
+#ifdef HAVE_LIBSSL
+  SSL_CTX	*context;	/* Context for encryption */
+  SSL		*conn;		/* Connection for encryption */
+  
+  context = SSL_CTX_new(TLSv1_method());
+  conn    = SSL_new(context);
+
+  SSL_use_PrivateKey_file(conn, ServerKey, SSL_FILETYPE_PEM);
+  SSL_use_certificate_file(conn, ServerCertificate, SSL_FILETYPE_PEM);
+
+  SSL_set_fd(conn, con->http.fd);
+  if (SSL_accept(conn) != 1)
+  {
+    SSL_CTX_free(context);
+    SSL_free(conn);
+    return (0);
+  }
+
+  con->http.tls = conn;
+  return (1);
+#else
+  return (0);
+#endif /* HAVE_LIBSSL */
+}
+
+
+/*
  * 'ReadClient()' - Read data from a client.
  */
 
@@ -308,6 +347,12 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	con->http.keep_alive     = HTTP_KEEPALIVE_OFF;
 	con->http.data_encoding  = HTTP_ENCODE_LENGTH;
 	con->http.data_remaining = 0;
+#ifdef HAVE_LIBSSL
+	con->http.encryption     = HTTP_ENCRYPT_IF_REQUESTED;
+#else
+	con->http.encryption     = HTTP_ENCRYPT_NEVER;
+#endif /* HAVE_LIBSSL */
+	con->http.tls            = NULL;
 	con->operation           = HTTP_WAITING;
 	con->bytes               = 0;
 	con->file                = 0;
@@ -461,13 +506,40 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	  return (0);
 	}
       }
-      else
+
+      if ((strcasecmp(con->http.fields[HTTP_FIELD_CONNECTION], "Upgrade") == 0 ||
+           best != NULL && best->encryption == HTTP_ENCRYPT_ALWAYS) &&
+	  con->http.tls == NULL)
       {
-	if (!SendHeader(con, HTTP_OK, NULL))
+#ifdef HAVE_LIBSSL
+       /*
+        * Do encryption stuff...
+	*/
+
+	if (!SendHeader(con, HTTP_UPGRADE_NOW, NULL))
 	{
 	  CloseClient(con);
 	  return (0);
 	}
+
+	httpPrintf(HTTP(con), "Connection: Upgrade\r\n");
+	httpPrintf(HTTP(con), "Upgrade: TLS/1.0,SSL/2.0,SSL/3.0\r\n");
+	httpPrintf(HTTP(con), "\r\n");
+
+        EncryptClient(con);
+#else
+	if (!SendError(con, HTTP_NOT_IMPLEMENTED))
+	{
+	  CloseClient(con);
+          return (0);
+	}
+#endif /* HAVE_LIBSSL */
+      }
+
+      if (!SendHeader(con, HTTP_OK, NULL))
+      {
+	CloseClient(con);
+	return (0);
       }
 
       httpPrintf(HTTP(con), "Allow: GET, HEAD, OPTIONS, POST\r\n");
@@ -1061,6 +1133,17 @@ SendError(client_t      *con,	/* I - Connection */
 
   if (!SendHeader(con, code, NULL))
     return (0);
+
+#ifdef HAVE_LIBSSL
+  if (code == HTTP_UPGRADE_REQUIRED)
+  {
+    if (httpPrintf(HTTP(con), "Connection: Upgrade\r\n") < 0)
+      return (0);
+
+    if (httpPrintf(HTTP(con), "Upgrade: TLS/1.0,SSL/2.0,SSL/3.0\r\n") < 0)
+      return (0);
+  }
+#endif /* HAVE_LIBSSL */
 
   if (con->http.version >= HTTP_1_1 && !con->http.keep_alive)
   {
@@ -1811,5 +1894,5 @@ pipe_command(client_t *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.75 2000/11/06 16:18:11 mike Exp $".
+ * End of "$Id: client.c,v 1.76 2000/12/18 21:38:58 mike Exp $".
  */
