@@ -1,5 +1,5 @@
 /*
- * "$Id: dest.c,v 1.4 2000/02/28 20:38:14 mike Exp $"
+ * "$Id: dest.c,v 1.5 2000/03/02 16:32:03 mike Exp $"
  *
  *   User-defined destination (and option) support for the Common UNIX
  *   Printing System (CUPS).
@@ -24,11 +24,12 @@
  *
  * Contents:
  *
- *   cupsAddDest()   - Add a destination to the list of destinations.
- *   cupsFreeDests() - Free the memory used by the list of destinations.
- *   cupsGetDest()   - Get the named destination from the list.
- *   cupsGetDests()  - Get the list of destinations.
- *   cupsSetDests()  - Set the list of destinations.
+ *   cupsAddDest()    - Add a destination to the list of destinations.
+ *   cupsFreeDests()  - Free the memory used by the list of destinations.
+ *   cupsGetDest()    - Get the named destination from the list.
+ *   cupsGetDests()   - Get the list of destinations.
+ *   cupsSetDests()   - Set the list of destinations.
+ *   cups_get_dests() - Get destinations from a file.
  */
 
 /*
@@ -87,7 +88,7 @@ cupsAddDest(const char  *name,		/* I - Name of destination */
       break;
     else if (instance == NULL && dest->instance != NULL)
       break;
-    else if (instance != NULL && dest->instance == NULL &&
+    else if (instance != NULL && dest->instance != NULL &&
              strcasecmp(instance, dest->instance) < 0)
       break;
 
@@ -424,6 +425,18 @@ cups_get_dests(const char  *filename,	/* I - File to read from */
     * Add options until we hit the end of the line...
     */
 
+    if (dest->num_options)
+    {
+     /*
+      * Free old options...
+      */
+
+      cupsFreeOptions(dest->num_options, dest->options);
+
+      dest->num_options = 0;
+      dest->options     = (cups_option_t *)0;
+    }
+
     dest->num_options = cupsParseOptions(lineptr, dest->num_options,
                                          &(dest->options));
 
@@ -451,5 +464,5 @@ cups_get_dests(const char  *filename,	/* I - File to read from */
 
 
 /*
- * End of "$Id: dest.c,v 1.4 2000/02/28 20:38:14 mike Exp $".
+ * End of "$Id: dest.c,v 1.5 2000/03/02 16:32:03 mike Exp $".
  */
