@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.85 2000/08/01 17:40:00 mike Exp $"
+ * "$Id: ipp.c,v 1.86 2000/08/03 13:24:17 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -4629,7 +4629,7 @@ set_job_attrs(client_t        *con,	/* I - Client connection */
 
       SetJobPriority(jobid, attr->values[0].integer);
     }
-    else if ((attr2 = ippFindAttribute(job->attrs, attr->name, attr->value_tag)) != NULL)
+    else if ((attr2 = ippFindAttribute(job->attrs, attr->name, IPP_TAG_ZERO)) != NULL)
     {
      /*
       * Some other value...
@@ -4655,11 +4655,13 @@ set_job_attrs(client_t        *con,	/* I - Client connection */
       _ipp_free_attr(attr2);
             
      /*
-      * See if the job-name is being changed.
+      * See if the job-name or job-hold-until is being changed.
       */
 
       if (strcmp(attr->name, "job-name") == 0)
         strncpy(job->title, attr->values[0].string.text, sizeof(job->title) - 1);
+      else if (strcmp(attr->name, "job-hold-until") == 0)
+        SetJobHoldUntil(job->id, attr->values[0].string.text);
     }
     else if (attr->value_tag == IPP_TAG_DELETEATTR)
     {
@@ -5015,5 +5017,5 @@ validate_job(client_t        *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.85 2000/08/01 17:40:00 mike Exp $".
+ * End of "$Id: ipp.c,v 1.86 2000/08/03 13:24:17 mike Exp $".
  */
