@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.181 2004/03/02 20:54:33 mike Exp $"
+ * "$Id: client.c,v 1.182 2004/03/19 22:07:26 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -729,7 +729,7 @@ IsCGI(client_t    *con,				/* I - Client connection */
   * Check for known types...
   */
 
-  if (strcasecmp(type->super, "application"))
+  if (!type || strcasecmp(type->super, "application"))
   {
     LogMessage(L_DEBUG2, "IsCGI: Returning 0...");
     return (0);
@@ -3337,5 +3337,5 @@ CDSAWriteFunc(SSLConnectionRef connection,	/* I  - SSL/TLS connection */
 
 
 /*
- * End of "$Id: client.c,v 1.181 2004/03/02 20:54:33 mike Exp $".
+ * End of "$Id: client.c,v 1.182 2004/03/19 22:07:26 mike Exp $".
  */
