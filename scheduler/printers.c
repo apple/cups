@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.37 1999/09/22 21:13:12 mike Exp $"
+ * "$Id: printers.c,v 1.38 1999/09/23 16:31:47 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -129,7 +129,10 @@ AddPrinter(char *name)		/* I - Name of printer */
   {
     fputs("#!/bin/sh\n", fp);
     fprintf(fp, "NAME=\"%s\"\n", p->info);
-    fputs("TYPE=PostScript\n", fp);
+    if (p->type & CUPS_PRINTER_COLOR)
+      fputs("TYPE=ColorPostScript\n", fp);
+    else
+      fputs("TYPE=PostScript\n", fp);
     fclose(fp);
     chmod(filename, 0755);
   }
@@ -139,6 +142,18 @@ AddPrinter(char *name)		/* I - Name of printer */
   {
     fputs("#!/bin/sh\n", fp);
     fprintf(fp, "/usr/bin/glpoptions -d %s -o \"$*\"\n", p->name);
+    fclose(fp);
+    chmod(filename, 0755);
+  }
+
+  sprintf(filename, "/var/spool/lp/activeicons/%s", p->name);
+  if ((fp = fopen(filename, "w")) != NULL)
+  {
+    fputs("#!/bin/sh\n", fp);
+    if (p->type & CUPS_PRINTER_COLOR)
+      fputs("#Tag 66240\n", fp);
+    else
+      fputs("#Tag 66208\n", fp);
     fclose(fp);
     chmod(filename, 0755);
   }
@@ -302,6 +317,9 @@ DeletePrinter(printer_t *p)	/* I - Printer to delete */
   unlink(filename);
 
   sprintf(filename, "/var/spool/lp/gui_interface/ELF/%s.gui", p->name);
+  unlink(filename);
+
+  sprintf(filename, "/var/spool/lp/activeicons/%s", p->name);
   unlink(filename);
 #endif /* __sgi */
 }
@@ -1165,5 +1183,5 @@ write_printcap(void)
 
 
 /*
- * End of "$Id: printers.c,v 1.37 1999/09/22 21:13:12 mike Exp $".
+ * End of "$Id: printers.c,v 1.38 1999/09/23 16:31:47 mike Exp $".
  */
