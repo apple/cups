@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.78 2001/02/07 18:27:16 mike Exp $"
+ * "$Id: http.c,v 1.79 2001/02/07 20:09:06 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -578,7 +578,7 @@ httpSeparate(const char *uri,		/* I - Universal Resource Identifier */
   * longer than HTTP_MAX_URI characters long...
   */
 
-  strncpy(safeuri, url, sizeof(safeuri) - 1);
+  strncpy(safeuri, uri, sizeof(safeuri) - 1);
   safeuri[sizeof(safeuri) - 1] = '\0';
 
   uri = safeuri;
@@ -2025,5 +2025,5 @@ http_upgrade(http_t *http)	/* I - HTTP data */
 
 
 /*
- * End of "$Id: http.c,v 1.78 2001/02/07 18:27:16 mike Exp $".
+ * End of "$Id: http.c,v 1.79 2001/02/07 20:09:06 mike Exp $".
  */
