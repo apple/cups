@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.35 1999/12/07 18:10:18 mike Exp $"
+ * "$Id: conf.c,v 1.36 1999/12/29 02:15:41 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -75,7 +75,9 @@ static var_t	variables[] =
   { "ServerName",	ServerName,		VAR_STRING,	sizeof(ServerName) },
   { "ServerAdmin",	ServerAdmin,		VAR_STRING,	sizeof(ServerAdmin) },
   { "ServerRoot",	ServerRoot,		VAR_STRING,	sizeof(ServerRoot) },
+  { "ServerBin",	ServerBin,		VAR_STRING,	sizeof(ServerBin) },
   { "DocumentRoot",	DocumentRoot,		VAR_STRING,	sizeof(DocumentRoot) },
+  { "RequestRoot",	RequestRoot,		VAR_STRING,	sizeof(RequestRoot) },
   { "SystemGroup",	SystemGroup,		VAR_STRING,	sizeof(SystemGroup) },
   { "AccessLog",	AccessLog,		VAR_STRING,	sizeof(AccessLog) },
   { "ErrorLog",		ErrorLog,		VAR_STRING,	sizeof(ErrorLog) },
@@ -95,7 +97,9 @@ static var_t	variables[] =
   { "BrowseTimeout",	&BrowseTimeout,		VAR_INTEGER,	0 },
   { "MaxClients",	&MaxClients,		VAR_INTEGER,	0 },
   { "MaxLogSize",	&MaxLogSize,		VAR_INTEGER,	0 },
-  { "MaxRequestSize",	&MaxRequestSize,	VAR_INTEGER,	0 }
+  { "MaxRequestSize",	&MaxRequestSize,	VAR_INTEGER,	0 },
+  { "PreserveJobHistory", &JobHistory,		VAR_BOOLEAN,	0 },
+  { "PreserveJobFiles",	&JobFiles,		VAR_BOOLEAN,	0 }
 };
 #define NUM_VARS	(sizeof(variables) / sizeof(variables[0]))
 
@@ -140,6 +144,8 @@ ReadConfiguration(void)
     Clients = NULL;
   }
 
+  StopAllJobs();
+
   if (AccessFile != NULL)
   {
     fclose(AccessFile);
@@ -170,7 +176,9 @@ ReadConfiguration(void)
   gethostname(ServerName, sizeof(ServerName));
   sprintf(ServerAdmin, "root@%s", ServerName);
   strcpy(ServerRoot, CUPS_SERVERROOT);
-  strcpy(DocumentRoot, CUPS_DATADIR "/doc");
+  strcpy(ServerBin, CUPS_SERVERBIN);
+  strcpy(RequestRoot, CUPS_REQUESTS);
+  strcpy(DocumentRoot, CUPS_DOCDIR);
   strcpy(AccessLog, "logs/access_log");
   strcpy(ErrorLog, "logs/error_log");
 
@@ -270,6 +278,9 @@ ReadConfiguration(void)
   if (MimeDatabase != NULL)
     mimeDelete(MimeDatabase);
 
+  JobHistory       = DEFAULT_HISTORY;
+  JobFiles         = DEFAULT_FILES;
+
   if ((fp = fopen(ConfigurationFile, "r")) == NULL)
     return (0);
 
@@ -279,6 +290,24 @@ ReadConfiguration(void)
 
   if (!status)
     return (0);
+
+  if (DocumentRoot[0] != '/')
+  {
+    snprintf(directory, sizeof(directory), "%s/%s", ServerRoot, DocumentRoot);
+    strcpy(DocumentRoot, directory);
+  }
+
+  if (RequestRoot[0] != '/')
+  {
+    snprintf(directory, sizeof(directory), "%s/%s", ServerRoot, RequestRoot);
+    strcpy(RequestRoot, directory);
+  }
+
+  if (ServerBin[0] != '/')
+  {
+    snprintf(directory, sizeof(directory), "%s/%s", ServerRoot, ServerBin);
+    strcpy(ServerBin, directory);
+  }
 
   LogMessage(LOG_DEBUG, "ReadConfiguration() ConfigurationFile=\"%s\"",
              ConfigurationFile);
@@ -306,17 +335,18 @@ ReadConfiguration(void)
   * Read the MIME type and conversion database...
   */
 
-  sprintf(directory, "%s/conf", ServerRoot);
+  snprintf(directory, sizeof(directory), "%s/conf", ServerRoot);
 
   MimeDatabase = mimeNew();
   mimeMerge(MimeDatabase, directory);
 
  /*
-  * Load printers and classes...
+  * Load printers, classes, and jobs...
   */
 
   LoadAllPrinters();
   LoadAllClasses();
+  LoadAllJobs();
 
  /*
   * Add a default browser if browsing is enabled and no browser addresses
@@ -344,6 +374,7 @@ ReadConfiguration(void)
   * Check for queued jobs...
   */
 
+  LoadJobs();
   CheckJobs();
 
   return (1);
@@ -941,5 +972,5 @@ get_address(char               *value,		/* I - Value string */
 
 
 /*
- * End of "$Id: conf.c,v 1.35 1999/12/07 18:10:18 mike Exp $".
+ * End of "$Id: conf.c,v 1.36 1999/12/29 02:15:41 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.37 1999/12/14 20:41:27 mike Exp $"
+ * "$Id: ipp.c,v 1.38 1999/12/29 02:15:41 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -64,14 +64,20 @@ static void	add_printer(client_t *con, ipp_attribute_t *uri);
 static void	cancel_all_jobs(client_t *con, ipp_attribute_t *uri);
 static void	cancel_job(client_t *con, ipp_attribute_t *uri);
 static void	copy_attrs(ipp_t *to, ipp_t *from, ipp_attribute_t *req);
+static void	create_job(client_t *con, ipp_attribute_t *uri);
 static void	delete_printer(client_t *con, ipp_attribute_t *uri);
 static void	get_default(client_t *con);
+static void	get_devices(client_t *con);
 static void	get_jobs(client_t *con, ipp_attribute_t *uri);
 static void	get_job_attrs(client_t *con, ipp_attribute_t *uri);
+static void	get_ppds(client_t *con);
 static void	get_printers(client_t *con, int type);
 static void	get_printer_attrs(client_t *con, ipp_attribute_t *uri);
+static void	hold_job(client_t *con, ipp_attribute_t *uri);
 static void	print_job(client_t *con, ipp_attribute_t *uri);
 static void	reject_jobs(client_t *con, ipp_attribute_t *uri);
+static void	restart_job(client_t *con, ipp_attribute_t *uri);
+static void	send_document(client_t *con, ipp_attribute_t *uri);
 static void	send_ipp_error(client_t *con, ipp_status_t status);
 static void	set_default(client_t *con, ipp_attribute_t *uri);
 static void	start_printer(client_t *con, ipp_attribute_t *uri);
@@ -136,7 +142,7 @@ ProcessIPPRequest(client_t *con)	/* I - Client connection */
 	* Out of order; return an error...
 	*/
 
-	DEBUG_puts("ProcessIPPRequest: attribute groups are out of order!");
+	LogMessage(LOG_ERROR, "ProcessIPPRequest: attribute groups are out of order!");
 	send_ipp_error(con, IPP_BAD_REQUEST);
 	break;
       }
@@ -193,8 +199,15 @@ ProcessIPPRequest(client_t *con)	/* I - Client connection */
 	* for all operations.
 	*/
 
-	DEBUG_printf(("ProcessIPPRequest: missing attributes (%08x, %08x, %08x)!\n",
-                      charset, language, uri));
+        if (charset == NULL)
+	  LogMessage(LOG_ERROR, "ProcessIPPRequest: missing attributes-charset attribute!");
+
+        if (language == NULL)
+	  LogMessage(LOG_ERROR, "ProcessIPPRequest: missing attributes-natural-language attribute!");
+
+        if (uri == NULL)
+	  LogMessage(LOG_ERROR, "ProcessIPPRequest: missing printer-uri or job-uri attribute!");
+
 	send_ipp_error(con, IPP_BAD_REQUEST);
       }
       else
@@ -213,6 +226,14 @@ ProcessIPPRequest(client_t *con)	/* I - Client connection */
               validate_job(con, uri);
               break;
 
+	  case IPP_CREATE_JOB :
+              create_job(con, uri);
+              break;
+
+	  case IPP_SEND_DOCUMENT :
+              send_document(con, uri);
+              break;
+
 	  case IPP_CANCEL_JOB :
               cancel_job(con, uri);
               break;
@@ -227,6 +248,14 @@ ProcessIPPRequest(client_t *con)	/* I - Client connection */
 
 	  case IPP_GET_PRINTER_ATTRIBUTES :
               get_printer_attrs(con, uri);
+              break;
+
+	  case IPP_HOLD_JOB :
+              hold_job(con, uri);
+              break;
+
+	  case IPP_RESTART_JOB :
+              restart_job(con, uri);
               break;
 
 	  case IPP_PAUSE_PRINTER :
@@ -279,6 +308,14 @@ ProcessIPPRequest(client_t *con)	/* I - Client connection */
 
 	  case CUPS_SET_DEFAULT :
               set_default(con, uri);
+              break;
+
+	  case CUPS_GET_DEVICES :
+              get_devices(con);
+              break;
+
+	  case CUPS_GET_PPDS :
+              get_ppds(con);
               break;
 
 	  default :
@@ -929,8 +966,8 @@ cancel_all_jobs(client_t        *con,	/* I - Client connection */
 
   if (strcmp(uri->name, "printer-uri") != 0)
   {
-    DEBUG_printf(("cancel_all_jobs: bad %s attribute \'%s\'!\n",
-                  uri->name, uri->values[0].string.text));
+    LogMessage(LOG_ERROR, "cancel_all_jobs: bad %s attribute \'%s\'!",
+               uri->name, uri->values[0].string.text);
     send_ipp_error(con, IPP_BAD_REQUEST);
     return;
   }
@@ -1018,7 +1055,7 @@ cancel_job(client_t        *con,	/* I - Client connection */
 
     if ((attr = ippFindAttribute(con->request, "job-id", IPP_TAG_INTEGER)) == NULL)
     {
-      DEBUG_puts("cancel_job: got a printer-uri attribute but no job-id!");
+      LogMessage(LOG_ERROR, "cancel_job: got a printer-uri attribute but no job-id!");
       send_ipp_error(con, IPP_BAD_REQUEST);
       return;
     }
@@ -1039,8 +1076,8 @@ cancel_job(client_t        *con,	/* I - Client connection */
       * Not a valid URI!
       */
 
-      DEBUG_printf(("cancel_job: bad job-uri attribute \'%s\'!\n",
-                    uri->values[0].string.text));
+      LogMessage(LOG_ERROR, "cancel_job: bad job-uri attribute \'%s\'!",
+                 uri->values[0].string.text);
       send_ipp_error(con, IPP_BAD_REQUEST);
       return;
     }
@@ -1253,6 +1290,143 @@ copy_attrs(ipp_t           *to,		/* I - Destination request */
 
 
 /*
+ * 'create_job()' - Print a file to a printer or class.
+ */
+
+static void
+create_job(client_t        *con,	/* I - Client connection */
+	   ipp_attribute_t *uri)	/* I - Printer URI */
+{
+  ipp_attribute_t	*attr;		/* Current attribute */
+  char			*dest;		/* Destination */
+  cups_ptype_t		dtype;		/* Destination type (printer or class) */
+  int			priority;	/* Job priority */
+  char			*title;		/* Job name/title */
+  job_t			*job;		/* Current job */
+  char			job_uri[HTTP_MAX_URI],
+					/* Job URI */
+			method[HTTP_MAX_URI],
+					/* Method portion of URI */
+			username[HTTP_MAX_URI],
+					/* Username portion of URI */
+			host[HTTP_MAX_URI],
+					/* Host portion of URI */
+			resource[HTTP_MAX_URI];
+					/* Resource portion of URI */
+  int			port;		/* Port portion of URI */
+  printer_t		*printer;	/* Printer data */
+
+
+  DEBUG_printf(("create_job(%08x, %08x)\n", con, uri));
+
+ /*
+  * Verify that the POST operation was done to a valid URI.
+  */
+
+  if (strncmp(con->uri, "/classes/", 9) != 0 &&
+      strncmp(con->uri, "/printers/", 10) != 0)
+  {
+    LogMessage(LOG_ERROR, "create_job: cancel request on bad resource \'%s\'!",
+               con->uri);
+    send_ipp_error(con, IPP_NOT_AUTHORIZED);
+    return;
+  }
+
+ /*
+  * Is the destination valid?
+  */
+
+  httpSeparate(uri->values[0].string.text, method, username, host, &port, resource);
+
+  if ((dest = validate_dest(resource, &dtype)) == NULL)
+  {
+   /*
+    * Bad URI...
+    */
+
+    LogMessage(LOG_ERROR, "create_job: resource name \'%s\' no good!", resource);
+    send_ipp_error(con, IPP_NOT_FOUND);
+    return;
+  }
+
+ /*
+  * See if the printer is accepting jobs...
+  */
+
+  if (dtype == CUPS_PRINTER_CLASS)
+    printer = FindClass(dest);
+  else
+    printer = FindPrinter(dest);
+
+  if (!printer->accepting)
+  {
+    LogMessage(LOG_INFO, "create_job: destination \'%s\' is not accepting jobs.",
+               dest);
+    send_ipp_error(con, IPP_NOT_ACCEPTING);
+    return;
+  }
+
+ /*
+  * Create the job and set things up...
+  */
+
+  if ((attr = ippFindAttribute(con->request, "job-priority", IPP_TAG_INTEGER)) != NULL)
+    priority = attr->values[0].integer;
+  else
+    priority = 50;
+
+  if ((attr = ippFindAttribute(con->request, "job-name", IPP_TAG_NAME)) != NULL)
+    title = attr->values[0].string.text;
+  else
+    title = "Untitled";
+
+  if ((job = AddJob(priority, printer->name)) == NULL)
+  {
+    LogMessage(LOG_ERROR, "create_job: unable to add job for destination \'%s\'!",
+               dest);
+    send_ipp_error(con, IPP_INTERNAL_ERROR);
+    return;
+  }
+
+  job->dtype   = dtype;
+  job->attrs   = con->request;
+  con->request = NULL;
+
+  strncpy(job->title, title, sizeof(job->title) - 1);
+
+  strcpy(job->username, con->username);
+  if ((attr = ippFindAttribute(job->attrs, "requesting-user-name", IPP_TAG_NAME)) != NULL)
+  {
+    LogMessage(LOG_DEBUG, "create_job: requesting-user-name = \'%s\'",
+               attr->values[0].string.text);
+
+    strncpy(job->username, attr->values[0].string.text, sizeof(job->username) - 1);
+    job->username[sizeof(job->username) - 1] = '\0';
+  }
+
+  if (job->username[0] == '\0')
+    strcpy(job->username, "guest");
+
+  LogMessage(LOG_INFO, "Job %d created on \'%s\' by \'%s\'.", job->id,
+             job->dest, job->username);
+
+ /*
+  * Fill in the response info...
+  */
+
+  sprintf(job_uri, "http://%s:%d/jobs/%d", ServerName,
+	  ntohs(con->http.hostaddr.sin_port), job->id);
+  ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_URI, "job-uri", NULL, job_uri);
+
+  ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_INTEGER, "job-id", job->id);
+
+  ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_ENUM, "job-state", job->state);
+
+  con->response->request.status.status_code = IPP_OK;
+}
+
+
+/*
  * 'delete_printer()' - Remove a printer or class from the system.
  */
 
@@ -1367,6 +1541,26 @@ get_default(client_t *con)		/* I - Client connection */
 
 
 /*
+ * 'get_devices()' - Get the list of available devices on the local system.
+ */
+
+static void
+get_devices(client_t *con)		/* I - Client connection */
+{
+ /*
+  * Copy the device attributes to the response using the requested-attributes
+  * attribute that may be provided by the client.
+  */
+
+  copy_attrs(con->response, Devices,
+             ippFindAttribute(con->request, "requested-attributes",
+	                      IPP_TAG_KEYWORD));
+
+  con->response->request.status.status_code = IPP_OK;
+}
+
+
+/*
  * 'get_jobs()' - Get a list of jobs for the specified printer.
  */
 
@@ -1386,6 +1580,7 @@ get_jobs(client_t        *con,		/* I - Client connection */
 			resource[HTTP_MAX_URI];
 					/* Resource portion of URI */
   int			port;		/* Port portion of URI */
+  int			completed;	/* Completed jobs? */
   int			limit;		/* Maximum number of jobs to return */
   int			count;		/* Number of jobs that match */
   job_t			*job;		/* Current job pointer */
@@ -1433,10 +1628,9 @@ get_jobs(client_t        *con,		/* I - Client connection */
 
   if ((attr = ippFindAttribute(con->request, "which-jobs", IPP_TAG_KEYWORD)) != NULL &&
       strcmp(attr->values[0].string.text, "completed") == 0)
-  {
-    con->response->request.status.status_code = IPP_OK;
-    return;
-  }
+    completed = 1;
+  else
+    completed = 0;
 
  /*
   * See if they want to limit the number of jobs reported; if not, limit
@@ -1484,6 +1678,11 @@ get_jobs(client_t        *con,		/* I - Client connection */
         (username[0] == '\0' || strncmp(resource, "/jobs", 5) != 0))
       continue;
     if (username[0] != '\0' && strcmp(username, job->username) != 0)
+      continue;
+
+    if (completed && job->state <= IPP_JOB_STOPPED)
+      continue;
+    if (!completed && job->state > IPP_JOB_STOPPED)
       continue;
 
     count ++;
@@ -1596,7 +1795,7 @@ get_job_attrs(client_t        *con,		/* I - Client connection */
 
     if ((attr = ippFindAttribute(con->request, "job-id", IPP_TAG_INTEGER)) == NULL)
     {
-      DEBUG_puts("get_job_attrs: got a printer-uri attribute but no job-id!");
+      LogMessage(LOG_ERROR, "get_job_attrs: got a printer-uri attribute but no job-id!");
       send_ipp_error(con, IPP_BAD_REQUEST);
       return;
     }
@@ -1617,8 +1816,8 @@ get_job_attrs(client_t        *con,		/* I - Client connection */
       * Not a valid URI!
       */
 
-      DEBUG_printf(("get_job_attrs: bad job-uri attribute \'%s\'!\n",
-                    uri->values[0].string.text));
+      LogMessage(LOG_ERROR, "get_job_attrs: bad job-uri attribute \'%s\'!\n",
+                 uri->values[0].string.text);
       send_ipp_error(con, IPP_BAD_REQUEST);
       return;
     }
@@ -1636,7 +1835,7 @@ get_job_attrs(client_t        *con,		/* I - Client connection */
     * Nope - return a "not found" error...
     */
 
-    DEBUG_printf(("get_job_attrs: job #%d doesn't exist!\n", jobid));
+    LogMessage(LOG_ERROR, "get_job_attrs: job #%d doesn't exist!", jobid);
     send_ipp_error(con, IPP_NOT_FOUND);
     return;
   }
@@ -1685,6 +1884,26 @@ get_job_attrs(client_t        *con,		/* I - Client connection */
   */
 
   copy_attrs(con->response, job->attrs,
+             ippFindAttribute(con->request, "requested-attributes",
+	                      IPP_TAG_KEYWORD));
+
+  con->response->request.status.status_code = IPP_OK;
+}
+
+
+/*
+ * 'get_ppds()' - Get the list of PPD files on the local system.
+ */
+
+static void
+get_ppds(client_t *con)			/* I - Client connection */
+{
+ /*
+  * Copy the PPD attributes to the response using the requested-attributes
+  * attribute that may be provided by the client.
+  */
+
+  copy_attrs(con->response, PPDs,
              ippFindAttribute(con->request, "requested-attributes",
 	                      IPP_TAG_KEYWORD));
 
@@ -1843,6 +2062,164 @@ get_printer_attrs(client_t        *con,	/* I - Client connection */
 
 
 /*
+ * 'hold_job()' - Cancel a print job.
+ */
+
+static void
+hold_job(client_t        *con,	/* I - Client connection */
+         ipp_attribute_t *uri)	/* I - Job or Printer URI */
+{
+  int			i;		/* Looping var */
+  ipp_attribute_t	*attr;		/* Current attribute */
+  int			jobid;		/* Job ID */
+  char			method[HTTP_MAX_URI],
+					/* Method portion of URI */
+			username[HTTP_MAX_URI],
+					/* Username portion of URI */
+			host[HTTP_MAX_URI],
+					/* Host portion of URI */
+			resource[HTTP_MAX_URI];
+					/* Resource portion of URI */
+  int			port;		/* Port portion of URI */
+  job_t			*job;		/* Job information */
+  struct passwd		*user;		/* User info */
+  struct group		*group;		/* System group info */
+
+
+  DEBUG_printf(("hold_job(%08x, %08x)\n", con, uri));
+
+ /*
+  * Verify that the POST operation was done to a valid URI.
+  */
+
+  if (strncmp(con->uri, "/classes/", 9) != 0 &&
+      strncmp(con->uri, "/jobs/", 5) != 0 &&
+      strncmp(con->uri, "/printers/", 10) != 0)
+  {
+    LogMessage(LOG_ERROR, "hold_job: hold request on bad resource \'%s\'!",
+               con->uri);
+    send_ipp_error(con, IPP_NOT_AUTHORIZED);
+    return;
+  }
+
+ /*
+  * See if we have a job URI or a printer URI...
+  */
+
+  if (strcmp(uri->name, "printer-uri") == 0)
+  {
+   /*
+    * Got a printer URI; see if we also have a job-id attribute...
+    */
+
+    if ((attr = ippFindAttribute(con->request, "job-id", IPP_TAG_INTEGER)) == NULL)
+    {
+      LogMessage(LOG_ERROR, "hold_job: got a printer-uri attribute but no job-id!");
+      send_ipp_error(con, IPP_BAD_REQUEST);
+      return;
+    }
+
+    jobid = attr->values[0].integer;
+  }
+  else
+  {
+   /*
+    * Got a job URI; parse it to get the job ID...
+    */
+
+    httpSeparate(uri->values[0].string.text, method, username, host, &port, resource);
+ 
+    if (strncmp(resource, "/jobs/", 6) != 0)
+    {
+     /*
+      * Not a valid URI!
+      */
+
+      LogMessage(LOG_ERROR, "hold_job: bad job-uri attribute \'%s\'!",
+                 uri->values[0].string.text);
+      send_ipp_error(con, IPP_BAD_REQUEST);
+      return;
+    }
+
+    jobid = atoi(resource + 6);
+  }
+
+ /*
+  * See if the job exists...
+  */
+
+  if ((job = FindJob(jobid)) == NULL)
+  {
+   /*
+    * Nope - return a "not found" error...
+    */
+
+    LogMessage(LOG_ERROR, "hold_job: job #%d doesn't exist!", jobid);
+    send_ipp_error(con, IPP_NOT_FOUND);
+    return;
+  }
+
+ /*
+  * See if the job is owned by the requesting user...
+  */
+
+  if ((attr = ippFindAttribute(con->request, "requesting-user-name", IPP_TAG_NAME)) != NULL)
+  {
+    strncpy(username, attr->values[0].string.text, sizeof(username) - 1);
+    username[sizeof(username) - 1] = '\0';
+  }
+  else if (con->username[0])
+    strcpy(username, con->username);
+  else
+    username[0] = '\0';
+
+  if (strcmp(username, job->username) != 0 && strcmp(username, "root") != 0)
+  {
+   /*
+    * Not the owner or root; check to see if the user is a member of the
+    * system group...
+    */
+
+    user = getpwnam(username);
+    endpwent();
+
+    group = getgrnam(SystemGroup);
+    endgrent();
+
+    if (group != NULL)
+      for (i = 0; group->gr_mem[i]; i ++)
+        if (strcmp(username, group->gr_mem[i]) == 0)
+	  break;
+
+    if (user == NULL || group == NULL ||
+        (group->gr_mem[i] == NULL && group->gr_gid != user->pw_gid))
+    {
+     /*
+      * Username not found, group not found, or user is not part of the
+      * system group...
+      */
+
+      LogMessage(LOG_ERROR, "hold_job: \"%s\" not authorized to hold job id %d owned by \"%s\"!",
+        	 username, jobid, job->username);
+      send_ipp_error(con, IPP_FORBIDDEN);
+      return;
+    }
+  }
+
+ /*
+  * Hold the job and return...
+  */
+
+  HoldJob(jobid);
+
+  LogMessage(LOG_INFO, "Job %d was held by \'%s\'.", jobid,
+             con->username[0] ? con->username : "unknown");
+
+  con->response->request.status.status_code = IPP_OK;
+}
+
+
+/*
  * 'print_job()' - Print a file to a printer or class.
  */
 
@@ -1865,8 +2242,9 @@ print_job(client_t        *con,		/* I - Client connection */
 					/* Username portion of URI */
 			host[HTTP_MAX_URI],
 					/* Host portion of URI */
-			resource[HTTP_MAX_URI];
+			resource[HTTP_MAX_URI],
 					/* Resource portion of URI */
+			filename[1024];	/* Job filename */
   int			port;		/* Port portion of URI */
   mime_type_t		*filetype;	/* Type of file */
   char			super[MIME_MAX_SUPER],
@@ -1900,10 +2278,10 @@ print_job(client_t        *con,		/* I - Client connection */
 
   if ((attr = ippFindAttribute(con->request, "compression", IPP_TAG_KEYWORD)) != NULL)
   {
-    DEBUG_puts("print_job: Unsupported compression attribute!");
+    LogMessage(LOG_ERROR, "print_job: Unsupported compression attribute!");
     send_ipp_error(con, IPP_ATTRIBUTES);
-    attr = ippAddString(con->response, IPP_TAG_UNSUPPORTED_GROUP, IPP_TAG_KEYWORD,
-	                "compression", NULL, attr->values[0].string.text);
+    ippAddString(con->response, IPP_TAG_UNSUPPORTED_GROUP, IPP_TAG_KEYWORD,
+	         "compression", NULL, attr->values[0].string.text);
     return;
   }
 
@@ -1913,7 +2291,7 @@ print_job(client_t        *con,		/* I - Client connection */
 
   if (con->filename[0] == '\0')
   {
-    DEBUG_puts("print_job: No filename!?!");
+    LogMessage(LOG_ERROR, "print_job: No file!?!");
     send_ipp_error(con, IPP_BAD_REQUEST);
     return;
   }
@@ -1930,8 +2308,8 @@ print_job(client_t        *con,		/* I - Client connection */
 
     if (sscanf(format->values[0].string.text, "%15[^/]/%31[^;]", super, type) != 2)
     {
-      DEBUG_printf(("print_job: could not scan type \'%s\'!\n",
-	            format->values[0].string.text));
+      LogMessage(LOG_ERROR, "print_job: could not scan type \'%s\'!",
+	         format->values[0].string.text);
       send_ipp_error(con, IPP_BAD_REQUEST);
       return;
     }
@@ -1953,7 +2331,8 @@ print_job(client_t        *con,		/* I - Client connection */
     * Auto-type the file...
     */
 
-    DEBUG_puts("print_job: auto-typing request using magic rules.");
+    LogMessage(LOG_DEBUG, "print_job: auto-typing file...");
+
     filetype = mimeFileType(MimeDatabase, con->filename);
 
     if (filetype != NULL)
@@ -1979,16 +2358,16 @@ print_job(client_t        *con,		/* I - Client connection */
 
   if (filetype == NULL)
   {
-    DEBUG_printf(("print_job: Unsupported format \'%s\'!\n",
-	          format->values[0].string.text));
+    LogMessage(LOG_ERROR, "print_job: Unsupported format \'%s\'!",
+	       format->values[0].string.text);
     send_ipp_error(con, IPP_DOCUMENT_FORMAT);
-    attr = ippAddString(con->response, IPP_TAG_UNSUPPORTED_GROUP, IPP_TAG_MIMETYPE,
-                        "document-format", NULL, format->values[0].string.text);
+    ippAddString(con->response, IPP_TAG_UNSUPPORTED_GROUP, IPP_TAG_MIMETYPE,
+                 "document-format", NULL, format->values[0].string.text);
     return;
   }
 
-  DEBUG_printf(("print_job: request file type is %s/%s.\n",
-	        filetype->super, filetype->type));
+  LogMessage(LOG_DEBUG, "print_job: request file type is %s/%s.",
+	     filetype->super, filetype->type);
 
  /*
   * Is the destination valid?
@@ -2048,11 +2427,24 @@ print_job(client_t        *con,		/* I - Client connection */
 
   job->dtype    = dtype;
   job->state    = IPP_JOB_PENDING;
-  job->filetype = filetype;
   job->attrs    = con->request;
   con->request  = NULL;
 
-  strcpy(job->filename, con->filename);
+  if ((filetypes = (mimetype_t **)malloc(sizeof(mimetype_t *))) == NULL)
+  {
+    CancelJob(job->id);
+    LogMessage(LOG_ERROR, "print_job: unable to allocate memory for file types!");
+    send_ipp_error(con, IPP_INTERNAL_ERROR);
+    return;
+  }
+
+  job->filetypes = filetypes;
+  job->filetypes[job->num_files] = filetype;
+
+  job->num_files ++;
+  sprintf(filename, "%s/d%05d-%03d", RequestRoot, job->id, job->num_files);
+  rename(con->filename, filename);
+
   strncpy(job->title, title, sizeof(job->title) - 1);
 
   con->filename[0] = '\0';
@@ -2060,8 +2452,8 @@ print_job(client_t        *con,		/* I - Client connection */
   strcpy(job->username, con->username);
   if ((attr = ippFindAttribute(job->attrs, "requesting-user-name", IPP_TAG_NAME)) != NULL)
   {
-    DEBUG_printf(("print_job: requesting-user-name = \'%s\'\n",
-                  attr->values[0].string.text));
+    LogMessage(LOG_DEBUG, "print_job: requesting-user-name = \'%s\'",
+               attr->values[0].string.text);
 
     strncpy(job->username, attr->values[0].string.text, sizeof(job->username) - 1);
     job->username[sizeof(job->username) - 1] = '\0';
@@ -2070,8 +2462,8 @@ print_job(client_t        *con,		/* I - Client connection */
   if (job->username[0] == '\0')
     strcpy(job->username, "guest");
 
-  DEBUG_printf(("print_job: job->username = \'%s\', attr = %08x\n",
-                job->username, attr));
+  LogMessage(LOG_INFO, "Job %d queued on \'%s\' by \'%s\'.", job->id,
+             job->dest, job->username);
 
  /*
   * Start the job if possible...
@@ -2079,23 +2471,17 @@ print_job(client_t        *con,		/* I - Client connection */
 
   CheckJobs();
 
-  LogMessage(LOG_INFO, "Job %d queued on \'%s\' by \'%s\'.", job->id,
-             job->dest, job->username);
-
  /*
   * Fill in the response info...
   */
 
   sprintf(job_uri, "http://%s:%d/jobs/%d", ServerName,
 	  ntohs(con->http.hostaddr.sin_port), job->id);
-  attr = ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_URI, "job-uri",
-                      NULL, job_uri);
+  ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_URI, "job-uri", NULL, job_uri);
 
-  attr = ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_INTEGER,
-                       "job-id", job->id);
+  ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_INTEGER, "job-id", job->id);
 
-  attr = ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_ENUM,
-                       "job-state", job->state);
+  ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_ENUM, "job-state", job->state);
 
   con->response->request.status.status_code = IPP_OK;
 }
@@ -2186,6 +2572,469 @@ reject_jobs(client_t        *con,	/* I - Client connection */
  /*
   * Everything was ok, so return OK status...
   */
+
+  con->response->request.status.status_code = IPP_OK;
+}
+
+
+/*
+ * 'restart_job()' - Cancel a print job.
+ */
+
+static void
+restart_job(client_t        *con,	/* I - Client connection */
+         ipp_attribute_t *uri)	/* I - Job or Printer URI */
+{
+  int			i;		/* Looping var */
+  ipp_attribute_t	*attr;		/* Current attribute */
+  int			jobid;		/* Job ID */
+  char			method[HTTP_MAX_URI],
+					/* Method portion of URI */
+			username[HTTP_MAX_URI],
+					/* Username portion of URI */
+			host[HTTP_MAX_URI],
+					/* Host portion of URI */
+			resource[HTTP_MAX_URI];
+					/* Resource portion of URI */
+  int			port;		/* Port portion of URI */
+  job_t			*job;		/* Job information */
+  struct passwd		*user;		/* User info */
+  struct group		*group;		/* System group info */
+
+
+  DEBUG_printf(("restart_job(%08x, %08x)\n", con, uri));
+
+ /*
+  * Verify that the POST operation was done to a valid URI.
+  */
+
+  if (strncmp(con->uri, "/classes/", 9) != 0 &&
+      strncmp(con->uri, "/jobs/", 5) != 0 &&
+      strncmp(con->uri, "/printers/", 10) != 0)
+  {
+    LogMessage(LOG_ERROR, "restart_job: restart request on bad resource \'%s\'!",
+               con->uri);
+    send_ipp_error(con, IPP_NOT_AUTHORIZED);
+    return;
+  }
+
+ /*
+  * See if we have a job URI or a printer URI...
+  */
+
+  if (strcmp(uri->name, "printer-uri") == 0)
+  {
+   /*
+    * Got a printer URI; see if we also have a job-id attribute...
+    */
+
+    if ((attr = ippFindAttribute(con->request, "job-id", IPP_TAG_INTEGER)) == NULL)
+    {
+      LogMessage(LOG_ERROR, "restart_job: got a printer-uri attribute but no job-id!");
+      send_ipp_error(con, IPP_BAD_REQUEST);
+      return;
+    }
+
+    jobid = attr->values[0].integer;
+  }
+  else
+  {
+   /*
+    * Got a job URI; parse it to get the job ID...
+    */
+
+    httpSeparate(uri->values[0].string.text, method, username, host, &port, resource);
+ 
+    if (strncmp(resource, "/jobs/", 6) != 0)
+    {
+     /*
+      * Not a valid URI!
+      */
+
+      LogMessage(LOG_ERROR, "restart_job: bad job-uri attribute \'%s\'!",
+                 uri->values[0].string.text);
+      send_ipp_error(con, IPP_BAD_REQUEST);
+      return;
+    }
+
+    jobid = atoi(resource + 6);
+  }
+
+ /*
+  * See if the job exists...
+  */
+
+  if ((job = FindJob(jobid)) == NULL)
+  {
+   /*
+    * Nope - return a "not found" error...
+    */
+
+    LogMessage(LOG_ERROR, "restart_job: job #%d doesn't exist!", jobid);
+    send_ipp_error(con, IPP_NOT_FOUND);
+    return;
+  }
+
+ /*
+  * See if the job is owned by the requesting user...
+  */
+
+  if ((attr = ippFindAttribute(con->request, "requesting-user-name", IPP_TAG_NAME)) != NULL)
+  {
+    strncpy(username, attr->values[0].string.text, sizeof(username) - 1);
+    username[sizeof(username) - 1] = '\0';
+  }
+  else if (con->username[0])
+    strcpy(username, con->username);
+  else
+    username[0] = '\0';
+
+  if (strcmp(username, job->username) != 0 && strcmp(username, "root") != 0)
+  {
+   /*
+    * Not the owner or root; check to see if the user is a member of the
+    * system group...
+    */
+
+    user = getpwnam(username);
+    endpwent();
+
+    group = getgrnam(SystemGroup);
+    endgrent();
+
+    if (group != NULL)
+      for (i = 0; group->gr_mem[i]; i ++)
+        if (strcmp(username, group->gr_mem[i]) == 0)
+	  break;
+
+    if (user == NULL || group == NULL ||
+        (group->gr_mem[i] == NULL && group->gr_gid != user->pw_gid))
+    {
+     /*
+      * Username not found, group not found, or user is not part of the
+      * system group...
+      */
+
+      LogMessage(LOG_ERROR, "restart_job: \"%s\" not authorized to restart job id %d owned by \"%s\"!",
+        	 username, jobid, job->username);
+      send_ipp_error(con, IPP_FORBIDDEN);
+      return;
+    }
+  }
+
+ /*
+  * Restart the job and return...
+  */
+
+  RestartJob(jobid);
+
+  LogMessage(LOG_INFO, "Job %d was restarted by \'%s\'.", jobid,
+             con->username[0] ? con->username : "unknown");
+
+  con->response->request.status.status_code = IPP_OK;
+}
+
+
+/*
+ * 'send_document()' - Send a file to a printer or class.
+ */
+
+static void
+send_document(client_t        *con,	/* I - Client connection */
+	      ipp_attribute_t *uri)	/* I - Printer URI */
+{
+  ipp_attribute_t	*attr;		/* Current attribute */
+  ipp_attribute_t	*format;	/* Document-format attribute */
+  char			*dest;		/* Destination */
+  cups_ptype_t		dtype;		/* Destination type (printer or class) */
+  int			priority;	/* Job priority */
+  char			*title;		/* Job name/title */
+  int			jobid;		/* Job ID number */
+  job_t			*job;		/* Current job */
+  char			job_uri[HTTP_MAX_URI],
+					/* Job URI */
+			method[HTTP_MAX_URI],
+					/* Method portion of URI */
+			username[HTTP_MAX_URI],
+					/* Username portion of URI */
+			host[HTTP_MAX_URI],
+					/* Host portion of URI */
+			resource[HTTP_MAX_URI];
+					/* Resource portion of URI */
+  int			port;		/* Port portion of URI */
+  mime_type_t		*filetype,	/* Type of file */
+			**filetypes;	/* File types array */
+  char			super[MIME_MAX_SUPER],
+					/* Supertype of file */
+			type[MIME_MAX_TYPE],
+					/* Subtype of file */
+			mimetype[MIME_MAX_SUPER + MIME_MAX_TYPE + 2];
+					/* Textual name of mime type */
+  printer_t		*printer;	/* Printer data */
+
+
+  DEBUG_printf(("send_document(%08x, %08x)\n", con, uri));
+
+ /*
+  * Verify that the POST operation was done to a valid URI.
+  */
+
+  if (strncmp(con->uri, "/classes/", 9) != 0 &&
+      strncmp(con->uri, "/jobs/", 6) != 0 &&
+      strncmp(con->uri, "/printers/", 10) != 0)
+  {
+    LogMessage(LOG_ERROR, "send_document: print request on bad resource \'%s\'!",
+               con->uri);
+    send_ipp_error(con, IPP_NOT_AUTHORIZED);
+    return;
+  }
+
+ /*
+  * See if we have a job URI or a printer URI...
+  */
+
+  if (strcmp(uri->name, "printer-uri") == 0)
+  {
+   /*
+    * Got a printer URI; see if we also have a job-id attribute...
+    */
+
+    if ((attr = ippFindAttribute(con->request, "job-id", IPP_TAG_INTEGER)) == NULL)
+    {
+      LogMessage(LOG_ERROR, "send_document: got a printer-uri attribute but no job-id!");
+      send_ipp_error(con, IPP_BAD_REQUEST);
+      return;
+    }
+
+    jobid = attr->values[0].integer;
+  }
+  else
+  {
+   /*
+    * Got a job URI; parse it to get the job ID...
+    */
+
+    httpSeparate(uri->values[0].string.text, method, username, host, &port, resource);
+ 
+    if (strncmp(resource, "/jobs/", 6) != 0)
+    {
+     /*
+      * Not a valid URI!
+      */
+
+      LogMessage(LOG_ERROR, "send_document: bad job-uri attribute \'%s\'!",
+                 uri->values[0].string.text);
+      send_ipp_error(con, IPP_BAD_REQUEST);
+      return;
+    }
+
+    jobid = atoi(resource + 6);
+  }
+
+ /*
+  * See if the job exists...
+  */
+
+  if ((job = FindJob(jobid)) == NULL)
+  {
+   /*
+    * Nope - return a "not found" error...
+    */
+
+    LogMessage(LOG_ERROR, "send_document: job #%d doesn't exist!", jobid);
+    send_ipp_error(con, IPP_NOT_FOUND);
+    return;
+  }
+
+ /*
+  * See if the job is owned by the requesting user...
+  */
+
+  if ((attr = ippFindAttribute(con->request, "requesting-user-name", IPP_TAG_NAME)) != NULL)
+  {
+    strncpy(username, attr->values[0].string.text, sizeof(username) - 1);
+    username[sizeof(username) - 1] = '\0';
+  }
+  else if (con->username[0])
+    strcpy(username, con->username);
+  else
+    username[0] = '\0';
+
+  if (strcmp(username, job->username) != 0 && strcmp(username, "root") != 0)
+  {
+   /*
+    * Not the owner or root; check to see if the user is a member of the
+    * system group...
+    */
+
+    user = getpwnam(username);
+    endpwent();
+
+    group = getgrnam(SystemGroup);
+    endgrent();
+
+    if (group != NULL)
+      for (i = 0; group->gr_mem[i]; i ++)
+        if (strcmp(username, group->gr_mem[i]) == 0)
+	  break;
+
+    if (user == NULL || group == NULL ||
+        (group->gr_mem[i] == NULL && group->gr_gid != user->pw_gid))
+    {
+     /*
+      * Username not found, group not found, or user is not part of the
+      * system group...
+      */
+
+      LogMessage(LOG_ERROR, "send_document: \"%s\" not authorized to send document for job id %d owned by \"%s\"!",
+        	 username, jobid, job->username);
+      send_ipp_error(con, IPP_FORBIDDEN);
+      return;
+    }
+  }
+
+ /*
+  * OK, see if the client is sending the document compressed - CUPS
+  * doesn't support compression yet...
+  */
+
+  if ((attr = ippFindAttribute(con->request, "compression", IPP_TAG_KEYWORD)) != NULL)
+  {
+    LogMessage(LOG_ERROR, "send_document: Unsupported compression attribute!");
+    send_ipp_error(con, IPP_ATTRIBUTES);
+    ippAddString(con->response, IPP_TAG_UNSUPPORTED_GROUP, IPP_TAG_KEYWORD,
+	         "compression", NULL, attr->values[0].string.text);
+    return;
+  }
+
+ /*
+  * Do we have a file to print?
+  */
+
+  if (con->filename[0] == '\0')
+  {
+    LogMessage(LOG_ERROR, "send_document: No file!?!");
+    send_ipp_error(con, IPP_BAD_REQUEST);
+    return;
+  }
+
+ /*
+  * Is it a format we support?
+  */
+
+  if ((format = ippFindAttribute(con->request, "document-format", IPP_TAG_MIMETYPE)) != NULL)
+  {
+   /*
+    * Grab format from client...
+    */
+
+    if (sscanf(format->values[0].string.text, "%15[^/]/%31[^;]", super, type) != 2)
+    {
+      LogMessage(LOG_ERROR, "send_document: could not scan type \'%s\'!",
+	         format->values[0].string.text);
+      send_ipp_error(con, IPP_BAD_REQUEST);
+      return;
+    }
+  }
+  else
+  {
+   /*
+    * No document format attribute?  Auto-type it!
+    */
+
+    strcpy(super, "application");
+    strcpy(type, "octet-stream");
+  }
+
+  if (strcmp(super, "application") == 0 &&
+      strcmp(type, "octet-stream") == 0)
+  {
+   /*
+    * Auto-type the file...
+    */
+
+    LogMessage(LOG_DEBUG, "send_document: auto-typing file...");
+
+    filetype = mimeFileType(MimeDatabase, con->filename);
+
+    if (filetype != NULL)
+    {
+     /*
+      * Replace the document-format attribute value with the auto-typed one.
+      */
+
+      sprintf(mimetype, "%s/%s", filetype->super, filetype->type);
+
+      if (format != NULL)
+      {
+	free(format->values[0].string.text);
+	format->values[0].string.text = strdup(mimetype);
+      }
+      else
+        ippAddString(con->request, IPP_TAG_JOB, IPP_TAG_MIMETYPE,
+	             "document-format", NULL, mimetype);
+    }
+  }
+  else
+    filetype = mimeType(MimeDatabase, super, type);
+
+  if (filetype == NULL)
+  {
+    LogMessage(LOG_ERROR, "send_document: Unsupported format \'%s\'!",
+	       format->values[0].string.text);
+    send_ipp_error(con, IPP_DOCUMENT_FORMAT);
+    ippAddString(con->response, IPP_TAG_UNSUPPORTED_GROUP, IPP_TAG_MIMETYPE,
+                 "document-format", NULL, format->values[0].string.text);
+    return;
+  }
+
+  LogMessage(LOG_DEBUG, "send_document: request file type is %s/%s.",
+	     filetype->super, filetype->type);
+
+ /*
+  * Add the file to the job...
+  */
+
+  if (job->num_files == 0)
+    filetypes = (mimetype_t **)malloc(sizeof(mimetype_t *));
+  else
+    filetypes = (mimetype_t **)realloc(job->filetypes,
+                                       (job->num_files + 1) *
+				       sizeof(mimetype_t));
+
+  if (filetypes == NULL)
+  {
+    CancelJob(job->id);
+    LogMessage(LOG_ERROR, "send_document: unable to allocate memory for file types!");
+    send_ipp_error(con, IPP_INTERNAL_ERROR);
+    return;
+  }
+
+  job->filetypes = filetypes;
+  job->filetypes[job->num_files] = filetype;
+
+  job->num_files ++;
+  sprintf(filename, "%s/d%05d-%03d", RequestRoot, job->id, job->num_files);
+  rename(con->filename, filename);
+
+  strncpy(job->title, title, sizeof(job->title) - 1);
+
+  con->filename[0] = '\0';
+
+  LogMessage(LOG_INFO, "File queued in job #%d by \'%s\'.", job->id,
+             job->username);
+
+ /*
+  * Fill in the response info...
+  */
+
+  sprintf(job_uri, "http://%s:%d/jobs/%d", ServerName,
+	  ntohs(con->http.hostaddr.sin_port), job->id);
+  ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_URI, "job-uri", NULL, job_uri);
+
+  ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_INTEGER, "job-id", job->id);
+
+  ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_ENUM, "job-state", job->state);
 
   con->response->request.status.status_code = IPP_OK;
 }
@@ -2557,10 +3406,10 @@ validate_job(client_t        *con,	/* I - Client connection */
 
   if ((attr = ippFindAttribute(con->request, "compression", IPP_TAG_KEYWORD)) != NULL)
   {
-    DEBUG_puts("validate_job: Unsupported compression attribute!");
+    LogMessage(LOG_ERROR, "validate_job: Unsupported compression attribute!");
     send_ipp_error(con, IPP_ATTRIBUTES);
-    attr = ippAddString(con->response, IPP_TAG_UNSUPPORTED_GROUP, IPP_TAG_KEYWORD,
-	                "compression", NULL, attr->values[0].string.text);
+    ippAddString(con->response, IPP_TAG_UNSUPPORTED_GROUP, IPP_TAG_KEYWORD,
+	         "compression", NULL, attr->values[0].string.text);
     return;
   }
 
@@ -2570,15 +3419,15 @@ validate_job(client_t        *con,	/* I - Client connection */
 
   if ((format = ippFindAttribute(con->request, "document-format", IPP_TAG_MIMETYPE)) == NULL)
   {
-    DEBUG_puts("validate_job: missing document-format attribute!");
+    LogError(LOG_ERROR, "validate_job: missing document-format attribute!");
     send_ipp_error(con, IPP_BAD_REQUEST);
     return;
   }
 
   if (sscanf(format->values[0].string.text, "%15[^/]/%31[^;]", super, type) != 2)
   {
-    DEBUG_printf(("validate_job: could not scan type \'%s\'!\n",
-	          format->values[0].string.text));
+    LogMessage(LOG_ERROR, "validate_job: could not scan type \'%s\'!\n",
+	       format->values[0].string.text);
     send_ipp_error(con, IPP_BAD_REQUEST);
     return;
   }
@@ -2587,11 +3436,11 @@ validate_job(client_t        *con,	/* I - Client connection */
        strcmp(type, "octet-stream") != 0) &&
       mimeType(MimeDatabase, super, type) == NULL)
   {
-    DEBUG_printf(("validate_job: Unsupported format \'%s\'!\n",
-	          format->values[0].string.text));
+    LogMessage(LOG_ERROR, "validate_job: Unsupported format \'%s\'!\n",
+	       format->values[0].string.text);
     send_ipp_error(con, IPP_DOCUMENT_FORMAT);
-    attr = ippAddString(con->response, IPP_TAG_UNSUPPORTED_GROUP, IPP_TAG_MIMETYPE,
-                        "document-format", NULL, format->values[0].string.text);
+    ippAddString(con->response, IPP_TAG_UNSUPPORTED_GROUP, IPP_TAG_MIMETYPE,
+                 "document-format", NULL, format->values[0].string.text);
     return;
   }
 
@@ -2621,5 +3470,5 @@ validate_job(client_t        *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.37 1999/12/14 20:41:27 mike Exp $".
+ * End of "$Id: ipp.c,v 1.38 1999/12/29 02:15:41 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: job.h,v 1.9 1999/06/18 18:36:48 mike Exp $"
+ * "$Id: job.h,v 1.10 1999/12/29 02:15:43 mike Exp $"
  *
  *   Print job definitions for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -36,8 +36,9 @@ typedef struct job_str
   char		dest[IPP_MAX_NAME];	/* Destination printer or class */
   char		title[IPP_MAX_NAME];	/* Job name/title */
   cups_ptype_t	dtype;			/* Destination type (class/remote bits) */
-  char		filename[HTTP_MAX_URI];	/* Name of job file */
-  mime_type_t	*filetype;		/* File type */
+  int		num_files;		/* Number of files in job */
+  int		current_file;		/* Current file in job */
+  mime_type_t	**filetypes;		/* File types */
   ipp_t		*attrs;			/* Job attributes */
   int		pipe;			/* Status pipe for this job */
   int		procs[MAX_FILTERS + 2];	/* Process IDs, 0 terminated */
@@ -50,26 +51,34 @@ typedef struct job_str
  * Globals...
  */
 
+VAR int		JobHistory	VALUE(1);	/* Preserve job history? */
+VAR int		JobFiles	VALUE(0);	/* Preserve job files? */
 VAR int		NumJobs		VALUE(0);	/* Number of jobs in queue */
 VAR job_t	*Jobs		VALUE(NULL);	/* List of current jobs */
 VAR int		NextJobId	VALUE(1);	/* Next job ID to use */
+
 
 /*
  * Prototypes...
  */
 
-extern job_t	*AddJob(int priority, char *dest);
+extern job_t	*AddJob(int priority, const char *dest);
 extern void	CancelJob(int id);
-extern void	CancelJobs(char *dest);
+extern void	CancelJobs(const char *dest);
 extern void	CheckJobs(void);
 extern void	DeleteJob(int id);
 extern job_t	*FindJob(int id);
-extern void	LoadJobs(void);
-extern void	MoveJob(int id, char *dest);
+extern void	HoldJob(int id);
+extern void	LoadAllJobs(void);
+extern void	LoadJob(int id);
+extern void	MoveJob(int id, const char *dest);
+extern void	RestartJob(int id);
+extern void	SaveJob(int id);
 extern void	StartJob(int id, printer_t *printer);
+extern void	StopAllJobs(void);
 extern void	StopJob(int id);
 extern void	UpdateJob(job_t *job);
 
 /*
- * End of "$Id: job.h,v 1.9 1999/06/18 18:36:48 mike Exp $".
+ * End of "$Id: job.h,v 1.10 1999/12/29 02:15:43 mike Exp $".
  */

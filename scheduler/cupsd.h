@@ -1,5 +1,5 @@
 /*
- * "$Id: cupsd.h,v 1.15 1999/12/07 18:26:15 mike Exp $"
+ * "$Id: cupsd.h,v 1.16 1999/12/29 02:15:41 mike Exp $"
  *
  *   Main header file for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -73,10 +73,13 @@
 #define MAX_USERPASS		16	/* Maximum size of username/password */
 #define MAX_FILTERS		20	/* Maximum number of filters */
 
+
 /*
  * Defaults...
  */
 
+#define DEFAULT_HISTORY		1	/* Preserve job history? */
+#define DEFAULT_FILES		0	/* Preserve job files? */
 #define DEFAULT_TIMEOUT		300	/* Timeout during requests/updates */
 #define DEFAULT_KEEPALIVE	60	/* Timeout between requests */
 #define DEFAULT_INTERVAL	30	/* Interval between browse updates */
@@ -129,6 +132,11 @@ VAR int			NeedReload	VALUE(TRUE);
 VAR char		TZ[1024]	VALUE("TZ=GMT");
 					/* Timezone configuration */
 
+VAR ipp_t		*Devices	VALUE(NULL),
+					/* Available devices */
+			*PPDs		VALUE(NULL);
+					/* Available PPDs */
+
 
 /*
  * Prototypes...
@@ -136,5 +144,5 @@ VAR char		TZ[1024]	VALUE("TZ=GMT");
 
 
 /*
- * End of "$Id: cupsd.h,v 1.15 1999/12/07 18:26:15 mike Exp $".
+ * End of "$Id: cupsd.h,v 1.16 1999/12/29 02:15:41 mike Exp $".
  */

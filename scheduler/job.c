@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.43 1999/12/21 02:26:48 mike Exp $"
+ * "$Id: job.c,v 1.44 1999/12/29 02:15:42 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -23,17 +23,25 @@
  *
  * Contents:
  *
- *   AddJob()        - Add a new job to the job queue...
- *   CancelJob()     - Cancel the specified print job.
- *   CancelJobs()    - Cancel all jobs on the given printer or class.
- *   CheckJobs()     - Check the pending jobs and start any if the destination
- *                     is available.
- *   FindJob()       - Find the specified job.
- *   MoveJob()       - Move the specified job to a different destination.
- *   StartJob()      - Start a print job.
- *   StopJob()       - Stop a print job.
- *   UpdateJob()     - Read a status update from a job's filters.
- *   start_process() - Start a background process.
+ *   AddJob()         - Add a new job to the job queue...
+ *   CancelJob()      - Cancel the specified print job.
+ *   CancelJobs()     - Cancel all jobs on the given printer or class.
+ *   CheckJobs()      - Check the pending jobs and start any if the destination
+ *                      is available.
+ *   FindJob()        - Find the specified job.
+ *   HoldJob()        - Hold the specified job.
+ *   LoadAllJobs()    - Load all jobs from disk.
+ *   LoadJob()        - Load a job from disk.
+ *   MoveJob()        - Move the specified job to a different destination.
+ *   RestartJob()     - Resume the specified job.
+ *   SaveJob()        - Save a job to disk.
+ *   StartJob()       - Start a print job.
+ *   StopAllJobs()    - Stop all print jobs.
+ *   StopJob()        - Stop a print job.
+ *   UpdateJob()      - Read a status update from a job's filters.
+ *   ipp_read_file()  - Read an IPP request from a file.
+ *   ipp_write_file() - Write an IPP request to a file.
+ *   start_process()  - Start a background process.
  */
 
 /*
@@ -47,21 +55,23 @@
  * Local functions...
  */
 
-static int	start_process(char *command, char *argv[], char *envp[],
-		              int in, int out, int err);
+static ipp_state_t	ipp_read_file(const char *filename, ipp_t *request);
+static ipp_state_t	ipp_write_file(const char *filename, ipp_t *request);
+static int		start_process(const char *command, const char *argv[],
+			              const char *envp[], int in, int out, int err);
 
 
 /*
  * 'AddJob()' - Add a new job to the job queue...
  */
 
-job_t *			/* O - New job record */
-AddJob(int  priority,	/* I - Job priority */
-       char *dest)	/* I - Job destination */
+job_t *				/* O - New job record */
+AddJob(int        priority,	/* I - Job priority */
+       const char *dest)	/* I - Job destination */
 {
-  job_t	*job,		/* New job record */
-	*current,	/* Current job in queue */
-	*prev;		/* Previous job in queue */
+  job_t	*job,			/* New job record */
+	*current,		/* Current job in queue */
+	*prev;			/* Previous job in queue */
 
 
   job = calloc(sizeof(job_t), 1);
@@ -92,10 +102,12 @@ AddJob(int  priority,	/* I - Job priority */
  */
 
 void
-CancelJob(int id)	/* I - Job to cancel */
+CancelJob(int id)		/* I - Job to cancel */
 {
-  job_t	*current,	/* Current job */
-	*prev;		/* Previous job in list */
+  int	i;			/* Looping var */
+  job_t	*current,		/* Current job */
+	*prev;			/* Previous job in list */
+  char	filename[1024];		/* Job filename */
 
 
   DEBUG_printf(("CancelJob(%d)\n", id));
@@ -110,30 +122,53 @@ CancelJob(int id)	/* I - Job to cancel */
       DEBUG_puts("CancelJob: found job in list.");
 
       if (current->state == IPP_JOB_PROCESSING)
+      {
 	StopJob(current->id);
+	current->state = IPP_JOB_CANCELLED;
+      }
 
      /*
-      * Update pointers...
+      * Remove the print file for good if we aren't preserving jobs or
+      * files...
       */
 
-      if (prev == NULL)
-        Jobs = current->next;
+      if (!JobHistory || !JobFiles)
+        for (i = 1; i <= current->num_files; i ++)
+	{
+	  snprintf(filename, sizeof(filename), "%s/d%05d-%03d", RequestRoot,
+	           current->id, i);
+          unlink(filename);
+	}
+
+      if (JobHistory)
+      {
+       /*
+        * Save job state info...
+	*/
+
+        SaveJob(current->id);
+      }
       else
-        prev->next = current->next;
+      {
+       /*
+        * Update pointers if we aren't preserving jobs...
+        */
 
-     /*
-      * Free all memory used...
-      */
+        if (prev == NULL)
+          Jobs = current->next;
+        else
+          prev->next = current->next;
 
-      if (current->attrs != NULL)
-        ippDelete(current->attrs);
+       /*
+        * Free all memory used...
+        */
 
-     /*
-      * Remove the print file for good...
-      */
+        if (current->attrs != NULL)
+          ippDelete(current->attrs);
 
-      unlink(current->filename);
-      free(current);
+        free(current);
+      }
+
       return;
     }
 }
@@ -144,10 +179,10 @@ CancelJob(int id)	/* I - Job to cancel */
  */
 
 void
-CancelJobs(char *dest)	/* I - Destination to cancel */
+CancelJobs(const char *dest)	/* I - Destination to cancel */
 {
-  job_t	*current,	/* Current job */
-	*prev;		/* Previous job in list */
+  job_t	*current,		/* Current job */
+	*prev;			/* Previous job in list */
 
 
   for (current = Jobs, prev = NULL; current != NULL; prev = current)
@@ -179,9 +214,9 @@ CancelJobs(char *dest)	/* I - Destination to cancel */
 void
 CheckJobs(void)
 {
-  job_t		*current,
-		*prev;
-  printer_t	*printer;
+  job_t		*current,	/* Current job in queue */
+		*prev;		/* Previous job in queue */
+  printer_t	*printer;	/* Printer/class destination */
 
 
   DEBUG_puts("CheckJobs()");
@@ -190,7 +225,11 @@ CheckJobs(void)
   {
     DEBUG_printf(("CheckJobs: current->state = %d\n", current->state));
 
-    if (current->state != IPP_JOB_PROCESSING)
+   /*
+    * Start pending jobs if the destination is available...
+    */
+
+    if (current->state == IPP_JOB_PENDING)
     {
       DEBUG_printf(("CheckJobs: current->dest = \'%s\'\n", current->dest));
 
@@ -241,10 +280,10 @@ CheckJobs(void)
  * 'FindJob()' - Find the specified job.
  */
 
-job_t *			/* O - Job data */
-FindJob(int id)		/* I - Job ID */
+job_t *				/* O - Job data */
+FindJob(int id)			/* I - Job ID */
 {
-  job_t	*current;	/* Current job */
+  job_t	*current;		/* Current job */
 
 
   for (current = Jobs; current != NULL; current = current->next)
@@ -256,13 +295,56 @@ FindJob(int id)		/* I - Job ID */
 
 
 /*
+ * 'HoldJob()' - Hold the specified job.
+ */
+
+void
+HoldJob(int id)			/* I - Job ID */
+{
+  job_t	*job;			/* Job data */
+
+
+  if ((job = FindJob(id)) == NULL)
+    return;
+
+  if (job->state == IPP_JOB_PROCESSING)
+    StopJob(id);
+
+  job->state = IPP_JOB_HELD;
+
+  CheckJobs();
+}
+
+
+/*
+ * 'LoadAllJobs()' - Load all jobs from disk.
+ */
+
+void
+LoadAllJobs(void)
+{
+}
+
+
+/*
+ * 'LoadJob()' - Load a job from disk.
+ */
+
+void
+LoadJob(int id)			/* I - Job ID */
+{
+}
+
+
+/*
  * 'MoveJob()' - Move the specified job to a different destination.
  */
 
 void
-MoveJob(int id, char *dest)
+MoveJob(int        id,		/* I - Job ID */
+        const char *dest)	/* I - Destination */
 {
-  job_t	*current;	/* Current job */
+  job_t	*current;		/* Current job */
 
 
   for (current = Jobs; current != NULL; current = current->next)
@@ -273,6 +355,37 @@ MoveJob(int id, char *dest)
 
       return;
     }
+}
+
+
+/*
+ * 'RestartJob()' - Resume the specified job.
+ */
+
+void
+RestartJob(int id)		/* I - Job ID */
+{
+  job_t	*job;			/* Job data */
+
+
+  if ((job = FindJob(id)) == NULL)
+    return;
+
+  if (job->state == IPP_JOB_HELD)
+  {
+    job->state = IPP_JOB_PENDING;
+    CheckJobs();
+  }
+}
+
+
+/*
+ * 'SaveJob()' - Save a job to disk.
+ */
+
+void
+SaveJob(int id)			/* I - Job ID */
+{
 }
 
 
@@ -540,7 +653,7 @@ StartJob(int       id,		/* I - Job ID */
   sprintf(tmpdir, "TMPDIR=%s", TempDir);
 
   envp[0]  = "PATH=/bin:/usr/bin";
-  envp[1]  = "SOFTWARE=CUPS/1.0";
+  envp[1]  = "SOFTWARE=CUPS/1.1";
   envp[2]  = "TZ=GMT";
   envp[3]  = "USER=root";
   envp[4]  = charset;
@@ -719,14 +832,24 @@ StartJob(int       id,		/* I - Job ID */
 
 
 /*
+ * 'StopAllJobs()' - Stop all print jobs.
+ */
+
+void
+StopAllJobs(void)
+{
+}
+
+
+/*
  * 'StopJob()' - Stop a print job.
  */
 
 void
-StopJob(int id)
+StopJob(int id)			/* I - Job ID */
 {
-  int	i;		/* Looping var */
-  job_t	*current;	/* Current job */
+  int	i;			/* Looping var */
+  job_t	*current;		/* Current job */
 
 
   DEBUG_printf(("StopJob(%d)\n", id));
@@ -877,13 +1000,27 @@ UpdateJob(job_t *job)		/* I - Job to check */
   {
     DEBUG_printf(("UpdateJob: job %d is complete.\n", job->id));
 
-    if (job->status)
+    if (job->status > 0)
     {
      /*
-      * Job had errors; stop it...
+      * Backend had errors; stop it...
       */
 
       StopJob(job->id);
+      job->state = IPP_JOB_PENDING;
+    }
+    else if (job->status > 0)
+    {
+     /*
+      * Filter had errors; cancel it...
+      */
+
+      CancelJob(job->id);
+
+      if (JobHistory)
+        job->state = IPP_JOB_ABORTED;
+
+      CheckJobs();
     }
     else
     {
@@ -894,6 +1031,10 @@ UpdateJob(job_t *job)		/* I - Job to check */
       job->printer->state_message[0] = '\0';
 
       CancelJob(job->id);
+
+      if (JobHistory)
+        job->state = IPP_JOB_COMPLETED;
+
       CheckJobs();
     }
   }
@@ -901,19 +1042,718 @@ UpdateJob(job_t *job)		/* I - Job to check */
 
 
 /*
+ * 'ipp_read_file()' - Read an IPP request from a file.
+ */
+
+static ipp_state_t			/* O - State */
+ipp_read_file(const char *filename,	/* I - File to read from */
+              ipp_t      *request)	/* I - Request to read into */
+{
+  int			fd;		/* File descriptor for file */
+  int			n;		/* Length of data */
+  unsigned char		buffer[8192];	/* Data buffer */
+  ipp_attribute_t	*attr;		/* Current attribute */
+  ipp_tag_t		tag;		/* Current tag */
+
+
+ /*
+  * Open the file if possible...
+  */
+
+  if (filename == NULL || request == NULL)
+    return (IPP_ERROR);
+
+  if ((fd = open(filename, O_RDONLY)) == -1)
+    return (IPP_ERROR);
+
+ /*
+  * Read the IPP request...
+  */
+
+  ipp->state = IPP_IDLE;
+
+  switch (ipp->state)
+  {
+    case IPP_IDLE :
+        ipp->state ++; /* Avoid common problem... */
+
+    case IPP_HEADER :
+       /*
+        * Get the request header...
+	*/
+
+        if ((n = read(fd, buffer, 8)) < 8)
+	{
+	  DEBUG_printf(("ippRead: Unable to read header (%d bytes read)!\n", n));
+	  close(fd);
+	  return (n == 0 ? IPP_IDLE : IPP_ERROR);
+	}
+
+       /*
+        * Verify the major version number...
+	*/
+
+	if (buffer[0] != 1)
+	{
+	  DEBUG_printf(("ippRead: version number (%d.%d) is bad.\n", buffer[0],
+	                buffer[1]));
+	  close(fd);
+	  return (IPP_ERROR);
+	}
+
+       /*
+        * Then copy the request header over...
+	*/
+
+        ipp->request.any.version[0]  = buffer[0];
+        ipp->request.any.version[1]  = buffer[1];
+        ipp->request.any.op_status   = (buffer[2] << 8) | buffer[3];
+        ipp->request.any.request_id  = (((((buffer[4] << 8) | buffer[5]) << 8) |
+	                               buffer[6]) << 8) | buffer[7];
+
+        ipp->state   = IPP_ATTRIBUTE;
+	ipp->current = NULL;
+	ipp->curtag  = IPP_TAG_ZERO;
+
+    case IPP_ATTRIBUTE :
+        while (read(fd, buffer, 1) > 0)
+	{
+	 /*
+	  * Read this attribute...
+	  */
+
+          tag = (ipp_tag_t)buffer[0];
+
+	  if (tag == IPP_TAG_END)
+	  {
+	   /*
+	    * No more attributes left...
+	    */
+
+            DEBUG_puts("ippRead: IPP_TAG_END!");
+
+	    ipp->state = IPP_DATA;
+	    break;
+	  }
+          else if (tag < IPP_TAG_UNSUPPORTED_VALUE)
+	  {
+	   /*
+	    * Group tag...  Set the current group and continue...
+	    */
+
+            if (ipp->curtag == tag)
+	      ippAddSeparator(ipp);
+
+	    ipp->curtag  = tag;
+	    ipp->current = NULL;
+	    DEBUG_printf(("ippRead: group tag = %x\n", tag));
+	    continue;
+	  }
+
+          DEBUG_printf(("ippRead: value tag = %x\n", tag));
+
+         /*
+	  * Get the name...
+	  */
+
+          if (read(fd, buffer, 2) < 2)
+	  {
+	    DEBUG_puts("ippRead: unable to read name length!");
+	    close(fd);
+	    return (IPP_ERROR);
+	  }
+
+          n = (buffer[0] << 8) | buffer[1];
+
+          DEBUG_printf(("ippRead: name length = %d\n", n));
+
+          if (n == 0)
+	  {
+	   /*
+	    * More values for current attribute...
+	    */
+
+            if (ipp->current == NULL)
+	    {
+	      close(fd);
+              return (IPP_ERROR);
+	    }
+
+            attr = ipp->current;
+
+	    if (attr->num_values >= IPP_MAX_VALUES)
+	    {
+	      close(fd);
+              return (IPP_ERROR);
+	    }
+	  }
+	  else
+	  {
+	   /*
+	    * New attribute; read the name and add it...
+	    */
+
+	    if (read(fd, buffer, n) < n)
+	    {
+	      DEBUG_puts("ippRead: unable to read name!");
+	      close(fd);
+	      return (IPP_ERROR);
+	    }
+
+	    buffer[n] = '\0';
+	    DEBUG_printf(("ippRead: name = \'%s\'\n", buffer));
+
+	    attr = ipp->current = add_attr(ipp, IPP_MAX_VALUES);
+
+	    attr->group_tag  = ipp->curtag;
+	    attr->value_tag  = tag;
+	    attr->name       = strdup((char *)buffer);
+	    attr->num_values = 0;
+	  }
+
+	  if (read(fd, buffer, 2) < 2)
+	  {
+	    DEBUG_puts("ippRead: unable to read value length!");
+	    close(fd);
+	    return (IPP_ERROR);
+	  }
+
+	  n = (buffer[0] << 8) | buffer[1];
+          DEBUG_printf(("ippRead: value length = %d\n", n));
+
+	  switch (tag)
+	  {
+	    case IPP_TAG_INTEGER :
+	    case IPP_TAG_ENUM :
+	        if (read(fd, buffer, 4) < 4)
+	        {
+	          close(fd);
+                  return (IPP_ERROR);
+	        }
+
+		n = (((((buffer[0] << 8) | buffer[1]) << 8) | buffer[2]) << 8) |
+		    buffer[3];
+
+                attr->values[attr->num_values].integer = n;
+	        break;
+	    case IPP_TAG_BOOLEAN :
+	        if (read(fd, buffer, 1) < 1)
+	        {
+	          close(fd);
+                  return (IPP_ERROR);
+	        }
+
+                attr->values[attr->num_values].boolean = buffer[0];
+	        break;
+	    case IPP_TAG_TEXT :
+	    case IPP_TAG_NAME :
+	    case IPP_TAG_KEYWORD :
+	    case IPP_TAG_STRING :
+	    case IPP_TAG_URI :
+	    case IPP_TAG_URISCHEME :
+	    case IPP_TAG_CHARSET :
+	    case IPP_TAG_LANGUAGE :
+	    case IPP_TAG_MIMETYPE :
+	        if (read(fd, buffer, n) < n)
+	        {
+	          close(fd);
+                  return (IPP_ERROR);
+	        }
+
+                buffer[n] = '\0';
+		DEBUG_printf(("ippRead: value = \'%s\'\n", buffer));
+
+                attr->values[attr->num_values].string.text = strdup((char *)buffer);
+	        break;
+	    case IPP_TAG_DATE :
+	        if (read(fd, buffer, 11) < 11)
+	        {
+	          close(fd);
+                  return (IPP_ERROR);
+	        }
+
+                memcpy(attr->values[attr->num_values].date, buffer, 11);
+	        break;
+	    case IPP_TAG_RESOLUTION :
+	        if (read(fd, buffer, 9) < 9)
+	        {
+	          close(fd);
+                  return (IPP_ERROR);
+	        }
+
+                attr->values[attr->num_values].resolution.xres =
+		    (((((buffer[0] << 8) | buffer[1]) << 8) | buffer[2]) << 8) |
+		    buffer[3];
+                attr->values[attr->num_values].resolution.yres =
+		    (((((buffer[4] << 8) | buffer[5]) << 8) | buffer[6]) << 8) |
+		    buffer[7];
+                attr->values[attr->num_values].resolution.units =
+		    (ipp_res_t)buffer[8];
+	        break;
+	    case IPP_TAG_RANGE :
+	        if (read(fd, buffer, 8) < 8)
+	        {
+	          close(fd);
+                  return (IPP_ERROR);
+	        }
+
+                attr->values[attr->num_values].range.lower =
+		    (((((buffer[0] << 8) | buffer[1]) << 8) | buffer[2]) << 8) |
+		    buffer[3];
+                attr->values[attr->num_values].range.upper =
+		    (((((buffer[4] << 8) | buffer[5]) << 8) | buffer[6]) << 8) |
+		    buffer[7];
+	        break;
+	    case IPP_TAG_TEXTLANG :
+	    case IPP_TAG_NAMELANG :
+	        if (read(fd, buffer, n) < n)
+	        {
+	          close(fd);
+                  return (IPP_ERROR);
+	        }
+
+                buffer[n] = '\0';
+
+                attr->values[attr->num_values].string.charset = strdup((char *)buffer);
+
+	        if (read(fd, buffer, 2) < 2)
+	        {
+	          close(fd);
+                  return (IPP_ERROR);
+	        }
+
+		n = (buffer[0] << 8) | buffer[1];
+
+	        if (read(fd, buffer, n) < n)
+	        {
+	          close(fd);
+                  return (IPP_ERROR);
+	        }
+
+                buffer[n] = '\0';
+
+                attr->values[attr->num_values].string.text = strdup((char *)buffer);
+	        break;
+	  }
+
+          attr->num_values ++;
+	}
+        break;
+
+    case IPP_DATA :
+        break;
+  }
+
+ /*
+  * Close the file and return...
+  */
+
+  close(fd);
+
+  return (ipp->state);
+}
+
+
+/*
+ * 'ipp_write_file()' - Write an IPP request to a file.
+ */
+
+static ipp_state_t			/* O - State */
+ipp_write_file(const char *filename,	/* I - File to write to */
+               ipp_t      *request)	/* I - Request to write */
+{
+  int			fd;		/* File descriptor */
+  int			i;		/* Looping var */
+  int			n;		/* Length of data */
+  unsigned char		buffer[8192],	/* Data buffer */
+			*bufptr;	/* Pointer into buffer */
+  ipp_attribute_t	*attr;		/* Current attribute */
+
+
+ /*
+  * Open the file if possible...
+  */
+
+  if (filename == NULL || request == NULL)
+    return (IPP_ERROR);
+
+  if ((fd = open(filename, O_WRONLY | O_CREATE | O_TRUNC, 0640)) == -1)
+    return (IPP_ERROR);
+
+  fchmod(fd, 0640);
+  fchown(fd, User, Group);
+
+ /*
+  * Write the IPP request...
+  */
+
+  ipp->state = IPP_IDLE;
+
+  switch (ipp->state)
+  {
+    case IPP_IDLE :
+        ipp->state ++; /* Avoid common problem... */
+
+    case IPP_HEADER :
+       /*
+        * Send the request header...
+	*/
+
+        bufptr = buffer;
+
+	*bufptr++ = 1;
+	*bufptr++ = 0;
+	*bufptr++ = ipp->request.any.op_status >> 8;
+	*bufptr++ = ipp->request.any.op_status;
+	*bufptr++ = ipp->request.any.request_id >> 24;
+	*bufptr++ = ipp->request.any.request_id >> 16;
+	*bufptr++ = ipp->request.any.request_id >> 8;
+	*bufptr++ = ipp->request.any.request_id;
+
+        if (write(fd, (char *)buffer, bufptr - buffer) < 0)
+	{
+	  DEBUG_puts("ippWrite: Could not write IPP header...");
+	  close(fd);
+	  return (IPP_ERROR);
+	}
+
+        ipp->state   = IPP_ATTRIBUTE;
+	ipp->current = ipp->attrs;
+	ipp->curtag  = IPP_TAG_ZERO;
+
+    case IPP_ATTRIBUTE :
+        while (ipp->current != NULL)
+	{
+	 /*
+	  * Write this attribute...
+	  */
+
+	  bufptr = buffer;
+	  attr   = ipp->current;
+
+	  ipp->current = ipp->current->next;
+
+          if (ipp->curtag != attr->group_tag)
+	  {
+	   /*
+	    * Send a group operation tag...
+	    */
+
+	    ipp->curtag = attr->group_tag;
+
+            if (attr->group_tag == IPP_TAG_ZERO)
+	      continue;
+
+            DEBUG_printf(("ippWrite: wrote group tag = %x\n", attr->group_tag));
+	    *bufptr++ = attr->group_tag;
+	  }
+
+          n = strlen(attr->name);
+
+          DEBUG_printf(("ippWrite: writing value tag = %x\n", attr->value_tag));
+          DEBUG_printf(("ippWrite: writing name = %d, \'%s\'\n", n, attr->name));
+
+          *bufptr++ = attr->value_tag;
+	  *bufptr++ = n >> 8;
+	  *bufptr++ = n;
+	  memcpy(bufptr, attr->name, n);
+	  bufptr += n;
+
+	  switch (attr->value_tag)
+	  {
+	    case IPP_TAG_INTEGER :
+	    case IPP_TAG_ENUM :
+	        for (i = 0; i < attr->num_values; i ++)
+		{
+		  if (i)
+		  {
+		   /*
+		    * Arrays and sets are done by sending additional
+		    * values with a zero-length name...
+		    */
+
+                    *bufptr++ = attr->value_tag;
+		    *bufptr++ = 0;
+		    *bufptr++ = 0;
+		  }
+
+	          *bufptr++ = 0;
+		  *bufptr++ = 4;
+		  *bufptr++ = attr->values[i].integer >> 24;
+		  *bufptr++ = attr->values[i].integer >> 16;
+		  *bufptr++ = attr->values[i].integer >> 8;
+		  *bufptr++ = attr->values[i].integer;
+		}
+		break;
+
+	    case IPP_TAG_BOOLEAN :
+	        for (i = 0; i < attr->num_values; i ++)
+		{
+		  if (i)
+		  {
+		   /*
+		    * Arrays and sets are done by sending additional
+		    * values with a zero-length name...
+		    */
+
+                    *bufptr++ = attr->value_tag;
+		    *bufptr++ = 0;
+		    *bufptr++ = 0;
+		  }
+
+	          *bufptr++ = 0;
+		  *bufptr++ = 1;
+		  *bufptr++ = attr->values[i].boolean;
+		}
+		break;
+
+	    case IPP_TAG_TEXT :
+	    case IPP_TAG_NAME :
+	    case IPP_TAG_KEYWORD :
+	    case IPP_TAG_STRING :
+	    case IPP_TAG_URI :
+	    case IPP_TAG_URISCHEME :
+	    case IPP_TAG_CHARSET :
+	    case IPP_TAG_LANGUAGE :
+	    case IPP_TAG_MIMETYPE :
+	        for (i = 0; i < attr->num_values; i ++)
+		{
+		  if (i)
+		  {
+		   /*
+		    * Arrays and sets are done by sending additional
+		    * values with a zero-length name...
+		    */
+
+        	    DEBUG_printf(("ippWrite: writing value tag = %x\n",
+		                  attr->value_tag));
+        	    DEBUG_printf(("ippWrite: writing name = 0, \'\'\n"));
+
+                    *bufptr++ = attr->value_tag;
+		    *bufptr++ = 0;
+		    *bufptr++ = 0;
+		  }
+
+                  n = strlen(attr->values[i].string.text);
+
+                  DEBUG_printf(("ippWrite: writing string = %d, \'%s\'\n", n,
+		                attr->values[i].string.text));
+
+                  if ((sizeof(buffer) - (bufptr - buffer)) < (n + 2))
+		  {
+                    if (write(fd, (char *)buffer, bufptr - buffer) < 0)
+	            {
+	              DEBUG_puts("ippWrite: Could not write IPP attribute...");
+	              close(fd);
+	              return (IPP_ERROR);
+	            }
+
+		    bufptr = buffer;
+		  }
+
+	          *bufptr++ = n >> 8;
+		  *bufptr++ = n;
+		  memcpy(bufptr, attr->values[i].string.text, n);
+		  bufptr += n;
+		}
+		break;
+
+	    case IPP_TAG_DATE :
+	        for (i = 0; i < attr->num_values; i ++)
+		{
+		  if (i)
+		  {
+		   /*
+		    * Arrays and sets are done by sending additional
+		    * values with a zero-length name...
+		    */
+
+                    *bufptr++ = attr->value_tag;
+		    *bufptr++ = 0;
+		    *bufptr++ = 0;
+		  }
+
+	          *bufptr++ = 0;
+		  *bufptr++ = 11;
+		  memcpy(bufptr, attr->values[i].date, 11);
+		  bufptr += 11;
+		}
+		break;
+
+	    case IPP_TAG_RESOLUTION :
+	        for (i = 0; i < attr->num_values; i ++)
+		{
+		  if (i)
+		  {
+		   /*
+		    * Arrays and sets are done by sending additional
+		    * values with a zero-length name...
+		    */
+
+                    *bufptr++ = attr->value_tag;
+		    *bufptr++ = 0;
+		    *bufptr++ = 0;
+		  }
+
+	          *bufptr++ = 0;
+		  *bufptr++ = 9;
+		  *bufptr++ = attr->values[i].resolution.xres >> 24;
+		  *bufptr++ = attr->values[i].resolution.xres >> 16;
+		  *bufptr++ = attr->values[i].resolution.xres >> 8;
+		  *bufptr++ = attr->values[i].resolution.xres;
+		  *bufptr++ = attr->values[i].resolution.yres >> 24;
+		  *bufptr++ = attr->values[i].resolution.yres >> 16;
+		  *bufptr++ = attr->values[i].resolution.yres >> 8;
+		  *bufptr++ = attr->values[i].resolution.yres;
+		  *bufptr++ = attr->values[i].resolution.units;
+		}
+		break;
+
+	    case IPP_TAG_RANGE :
+	        for (i = 0; i < attr->num_values; i ++)
+		{
+		  if (i)
+		  {
+		   /*
+		    * Arrays and sets are done by sending additional
+		    * values with a zero-length name...
+		    */
+
+                    *bufptr++ = attr->value_tag;
+		    *bufptr++ = 0;
+		    *bufptr++ = 0;
+		  }
+
+	          *bufptr++ = 0;
+		  *bufptr++ = 8;
+		  *bufptr++ = attr->values[i].range.lower >> 24;
+		  *bufptr++ = attr->values[i].range.lower >> 16;
+		  *bufptr++ = attr->values[i].range.lower >> 8;
+		  *bufptr++ = attr->values[i].range.lower;
+		  *bufptr++ = attr->values[i].range.upper >> 24;
+		  *bufptr++ = attr->values[i].range.upper >> 16;
+		  *bufptr++ = attr->values[i].range.upper >> 8;
+		  *bufptr++ = attr->values[i].range.upper;
+		}
+		break;
+
+	    case IPP_TAG_TEXTLANG :
+	    case IPP_TAG_NAMELANG :
+	        for (i = 0; i < attr->num_values; i ++)
+		{
+		  if (i)
+		  {
+		   /*
+		    * Arrays and sets are done by sending additional
+		    * values with a zero-length name...
+		    */
+
+                    *bufptr++ = attr->value_tag;
+		    *bufptr++ = 0;
+		    *bufptr++ = 0;
+		  }
+
+                  n = strlen(attr->values[i].string.charset);
+
+                  if ((sizeof(buffer) - (bufptr - buffer)) < (n + 2))
+		  {
+                    if (write(fd, (char *)buffer, bufptr - buffer) < 0)
+	            {
+	              DEBUG_puts("ippWrite: Could not write IPP attribute...");
+	              close(fd);
+	              return (IPP_ERROR);
+	            }
+
+		    bufptr = buffer;
+		  }
+
+	          *bufptr++ = n >> 8;
+		  *bufptr++ = n;
+		  memcpy(bufptr, attr->values[i].string.charset, n);
+		  bufptr += n;
+
+                  n = strlen(attr->values[i].string.text);
+
+                  if ((sizeof(buffer) - (bufptr - buffer)) < (n + 2))
+		  {
+                    if (write(fd, (char *)buffer, bufptr - buffer) < 0)
+	            {
+	              DEBUG_puts("ippWrite: Could not write IPP attribute...");
+	              close(fd);
+	              return (IPP_ERROR);
+	            }
+
+		    bufptr = buffer;
+		  }
+
+	          *bufptr++ = n >> 8;
+		  *bufptr++ = n;
+		  memcpy(bufptr, attr->values[i].string.text, n);
+		  bufptr += n;
+		}
+		break;
+	  }
+
+         /*
+	  * Write the data out...
+	  */
+
+          if (write(fd, (char *)buffer, bufptr - buffer) < 0)
+	  {
+	    DEBUG_puts("ippWrite: Could not write IPP attribute...");
+	    close(fd);
+	    return (IPP_ERROR);
+	  }
+
+          DEBUG_printf(("ippWrite: wrote %d bytes\n", bufptr - buffer));
+	}
+
+	if (ipp->current == NULL)
+	{
+         /*
+	  * Done with all of the attributes; add the end-of-attributes tag...
+	  */
+
+          buffer[0] = IPP_TAG_END;
+	  if (write(fd, (char *)buffer, 1) < 0)
+	  {
+	    DEBUG_puts("ippWrite: Could not write IPP end-tag...");
+	    close(fd);
+	    return (IPP_ERROR);
+	  }
+
+	  ipp->state = IPP_DATA;
+	}
+        break;
+
+    case IPP_DATA :
+        break;
+  }
+
+ /*
+  * Close the file and return...
+  */
+
+  close(fd);
+
+  return (ipp->state);
+}
+
+
+/*
  * 'start_process()' - Start a background process.
  */
 
-static int			/* O - Process ID or 0 */
-start_process(char *command,	/* I - Full path to command */
-              char *argv[],	/* I - Command-line arguments */
-	      char *envp[],	/* I - Environment */
-              int  infd,	/* I - Standard input file descriptor */
-	      int  outfd,	/* I - Standard output file descriptor */
-	      int  errfd)	/* I - Standard error file descriptor */
+static int				/* O - Process ID or 0 */
+start_process(const char *command,	/* I - Full path to command */
+              const char *argv[],	/* I - Command-line arguments */
+	      const char *envp[],	/* I - Environment */
+              int        infd,		/* I - Standard input file descriptor */
+	      int        outfd,		/* I - Standard output file descriptor */
+	      int        errfd)		/* I - Standard error file descriptor */
 {
-  int	fd;			/* Looping var */
-  int	pid;			/* Process ID */
+  int	fd;				/* Looping var */
+  int	pid;				/* Process ID */
 
 
   DEBUG_printf(("start_process(\"%s\", %08x, %08x, %d, %d, %d)\n",
@@ -979,5 +1819,5 @@ start_process(char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.43 1999/12/21 02:26:48 mike Exp $".
+ * End of "$Id: job.c,v 1.44 1999/12/29 02:15:42 mike Exp $".
  */

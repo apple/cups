@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.27 1999/12/21 02:26:45 mike Exp $"
+ * "$Id: ipp.c,v 1.28 1999/12/29 02:15:40 mike Exp $"
  *
  *   Internet Printing Protocol support functions for the Common UNIX
  *   Printing System (CUPS).
@@ -1206,6 +1206,17 @@ ippWrite(http_t *http,		/* I - HTTP data */
                   DEBUG_printf(("ippWrite: writing string = %d, \'%s\'\n", n,
 		                attr->values[i].string.text));
 
+                  if ((sizeof(buffer) - (bufptr - buffer)) < (n + 2)
+		  {
+                    if (httpWrite(http, (char *)buffer, bufptr - buffer) < 0)
+	            {
+	              DEBUG_puts("ippWrite: Could not write IPP attribute...");
+	              return (IPP_ERROR);
+	            }
+
+		    bufptr = buffer;
+		  }
+
 	          *bufptr++ = n >> 8;
 		  *bufptr++ = n;
 		  memcpy(bufptr, attr->values[i].string.text, n);
@@ -1309,12 +1320,36 @@ ippWrite(http_t *http,		/* I - HTTP data */
 		  }
 
                   n = strlen(attr->values[i].string.charset);
+
+                  if ((sizeof(buffer) - (bufptr - buffer)) < (n + 2)
+		  {
+                    if (httpWrite(http, (char *)buffer, bufptr - buffer) < 0)
+	            {
+	              DEBUG_puts("ippWrite: Could not write IPP attribute...");
+	              return (IPP_ERROR);
+	            }
+
+		    bufptr = buffer;
+		  }
+
 	          *bufptr++ = n >> 8;
 		  *bufptr++ = n;
 		  memcpy(bufptr, attr->values[i].string.charset, n);
 		  bufptr += n;
 
                   n = strlen(attr->values[i].string.text);
+
+                  if ((sizeof(buffer) - (bufptr - buffer)) < (n + 2)
+		  {
+                    if (httpWrite(http, (char *)buffer, bufptr - buffer) < 0)
+	            {
+	              DEBUG_puts("ippWrite: Could not write IPP attribute...");
+	              return (IPP_ERROR);
+	            }
+
+		    bufptr = buffer;
+		  }
+
 	          *bufptr++ = n >> 8;
 		  *bufptr++ = n;
 		  memcpy(bufptr, attr->values[i].string.text, n);
@@ -1453,5 +1488,5 @@ ipp_read(http_t        *http,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.27 1999/12/21 02:26:45 mike Exp $".
+ * End of "$Id: ipp.c,v 1.28 1999/12/29 02:15:40 mike Exp $".
  */

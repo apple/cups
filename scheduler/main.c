@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c,v 1.30 1999/12/07 18:10:18 mike Exp $"
+ * "$Id: main.c,v 1.31 1999/12/29 02:15:43 mike Exp $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -391,14 +391,20 @@ sigchld_handler(int sig)	/* I - Signal number */
 
           job->procs[i] = -pid;
 
-          if (status && !job->procs[i + 1])
+          if (status && job->status >= 0)
 	  {
 	   /*
-	    * A fatal error occurred; save the exit status so we know to stop
-	    * the printer when all of the filters finish...
+	    * An error occurred; save the exit status so we know to stop
+	    * the printer or cancel the job when all of the filters finish...
+	    *
+	    * A negative status indicates that the backend failed and the
+	    * printer needs to be stopped.
 	    */
 
-	    job->status = status;
+            if (!job->procs[i + 1])
+ 	      job->status = -status;	/* Backend failed */
+	    else
+ 	      job->status = status;	/* Filter failed */
 	  }
 	  break;
 	}
@@ -439,5 +445,5 @@ usage(void)
 
 
 /*
- * End of "$Id: main.c,v 1.30 1999/12/07 18:10:18 mike Exp $".
+ * End of "$Id: main.c,v 1.31 1999/12/29 02:15:43 mike Exp $".
  */

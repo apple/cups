@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.46 1999/12/14 23:19:11 mike Exp $"
+ * "$Id: printers.c,v 1.47 1999/12/29 02:15:43 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -660,10 +660,14 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
 		{
 		  IPP_PRINT_JOB,
 		  IPP_VALIDATE_JOB,
+		  IPP_CREATE_JOB,
+		  IPP_SEND_DOCUMENT,
 		  IPP_CANCEL_JOB,
 		  IPP_GET_JOB_ATTRIBUTES,
 		  IPP_GET_JOBS,
 		  IPP_GET_PRINTER_ATTRIBUTES,
+		  IPP_HOLD_JOB,
+		  IPP_RELEASE_JOB,
 		  IPP_PAUSE_PRINTER,
 		  IPP_RESUME_PRINTER,
 		  IPP_PURGE_JOBS,
@@ -675,7 +679,9 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
 		  CUPS_ADD_CLASS,
 		  CUPS_DELETE_CLASS,
 		  CUPS_ACCEPT_JOBS,
-		  CUPS_REJECT_JOBS
+		  CUPS_REJECT_JOBS,
+		  CUPS_GET_DEVICES,
+		  CUPS_GET_PPDS
 		};
   const char	*charsets[] =		/* charset-supported values */
 		{
@@ -1233,5 +1239,5 @@ write_printcap(void)
 
 
 /*
- * End of "$Id: printers.c,v 1.46 1999/12/14 23:19:11 mike Exp $".
+ * End of "$Id: printers.c,v 1.47 1999/12/29 02:15:43 mike Exp $".
  */
