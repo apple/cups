@@ -3,6 +3,9 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.19
 
+	- The cups-lpd mini-daemon now sends jobs to the default
+	  queue when an empty queue name (or "lp" and there is
+	  no "lp" queue) is sent.
 	- The scheduler now supports fax queues identified by a
 	  "*cupsFax: True" attribute in the PPD file. When a job
 	  can't be sent, it is held for 5 minutes while other

@@ -1,5 +1,5 @@
 #
-# "$Id: cupsd.conf.in,v 1.2.2.9 2003/01/07 18:26:21 mike Exp $"
+# "$Id: cupsd.conf.in,v 1.2.2.10 2003/04/05 03:39:28 mike Exp $"
 #
 #   Sample configuration file for the Common UNIX Printing System (CUPS)
 #   scheduler.
@@ -441,7 +441,7 @@ Port @DEFAULT_IPP_PORT@
 # NOTE: If you choose to use SLPv2, it is *strongly* recommended that
 #       you have at least one SLP Directory Agent (DA) on your
 #       network.  Otherwise, browse updates can take several seconds,
-#       during which the scheduler will not response to client
+#       during which the scheduler will not respond to client
 #       requests.
 #
 
@@ -780,5 +780,5 @@ Allow From 127.0.0.1
 </Location>
 
 #
-# End of "$Id: cupsd.conf.in,v 1.2.2.9 2003/01/07 18:26:21 mike Exp $".
+# End of "$Id: cupsd.conf.in,v 1.2.2.10 2003/04/05 03:39:28 mike Exp $".
 #

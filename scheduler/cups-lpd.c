@@ -1,5 +1,5 @@
 /*
- * "$Id: cups-lpd.c,v 1.24.2.12 2003/01/24 20:45:19 mike Exp $"
+ * "$Id: cups-lpd.c,v 1.24.2.13 2003/04/05 03:39:29 mike Exp $"
  *
  *   Line Printer Daemon interface for the Common UNIX Printing System (CUPS).
  *
@@ -442,19 +442,30 @@ recv_print_job(const char    *dest,	/* I - Destination */
   num_dests = cupsGetDests(&dests);
   if ((destptr = cupsGetDest(queue, instance, num_dests, dests)) == NULL)
   {
-    if (instance)
-      syslog(LOG_ERR, "Unknown destination %s/%s!", queue, instance);
-    else
-      syslog(LOG_ERR, "Unknown destination %s!", queue);
+   /*
+    * If the queue name is blank or "lp" then use the default queue.
+    */
 
-    cupsFreeDests(num_dests, dests);
+    if (!queue[0] || !strcmp(queue, "lp"))
+      if ((destptr = cupsGetDest(NULL, NULL, num_dests, dests)) != NULL)
+	strlcpy(queue, destptr->name, sizeof(queue));
 
-    putchar(1);
+    if (destptr == NULL)
+    {
+      if (instance)
+	syslog(LOG_ERR, "Unknown destination %s/%s!", queue, instance);
+      else
+	syslog(LOG_ERR, "Unknown destination %s!", queue);
 
-    return (1);
+      cupsFreeDests(num_dests, dests);
+
+      putchar(1);
+
+      return (1);
+    }
   }
-  else
-    putchar(0);
+
+  putchar(0);
 
   while (smart_gets(line, sizeof(line), stdin) != NULL)
   {
@@ -1285,5 +1296,5 @@ smart_gets(char *s,	/* I - Pointer to line buffer */
 
 
 /*
- * End of "$Id: cups-lpd.c,v 1.24.2.12 2003/01/24 20:45:19 mike Exp $".
+ * End of "$Id: cups-lpd.c,v 1.24.2.13 2003/04/05 03:39:29 mike Exp $".
  */
