@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c,v 1.77 2002/08/21 02:04:04 mike Exp $"
+ * "$Id: main.c,v 1.78 2002/08/30 18:17:47 mike Exp $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -231,6 +231,8 @@ main(int  argc,			/* I - Number of command-line arguments */
 
   if (getenv("TZ") != NULL)
     snprintf(TZ, sizeof(TZ), "TZ=%s", getenv("TZ"));
+  else
+    TZ[0] = '\0';
 
   tzset();
 
@@ -879,5 +881,5 @@ usage(void)
 
 
 /*
- * End of "$Id: main.c,v 1.77 2002/08/21 02:04:04 mike Exp $".
+ * End of "$Id: main.c,v 1.78 2002/08/30 18:17:47 mike Exp $".
  */
