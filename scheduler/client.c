@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.89 2001/03/01 18:10:41 mike Exp $"
+ * "$Id: client.c,v 1.90 2001/03/04 03:03:42 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -1419,7 +1419,7 @@ SendHeader(client_t    *con,	/* I - Client to send to */
 
 
   if (httpPrintf(HTTP(con), "HTTP/%d.%d %d %s\r\n", con->http.version / 100,
-                con->http.version % 100, code, httpStatus(code)) < 0)
+                 con->http.version % 100, code, httpStatus(code)) < 0)
     return (0);
   if (httpPrintf(HTTP(con), "Date: %s\r\n", httpGetDateString(time(NULL))) < 0)
     return (0);
@@ -2111,5 +2111,5 @@ pipe_command(client_t *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.89 2001/03/01 18:10:41 mike Exp $".
+ * End of "$Id: client.c,v 1.90 2001/03/04 03:03:42 mike Exp $".
  */
