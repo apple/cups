@@ -1,5 +1,5 @@
 #
-# "$Id: Makedefs.in,v 1.14 1999/07/14 12:49:51 mike Exp $"
+# "$Id: Makedefs.in,v 1.15 1999/09/09 12:28:46 mike Exp $"
 #
 #   Common makefile definitions for the Common UNIX Printing System (CUPS).
 #
@@ -37,6 +37,7 @@ DSO	=	@DSO@
 HTMLDOC	=	@HTMLDOC@
 LN	=	/bin/ln -sf
 MKDIR	=	@MKDIR@ -p
+MV	=	@MV@
 NROFF	=	@NROFF@
 PACK	=	@PACK@
 RANLIB	=	@RANLIB@
@@ -134,5 +135,5 @@ SERVERROOT	= 	@CUPS_SERVERROOT@
 	-mv t.$(CAT) $@
 
 #
-# End of "$Id: Makedefs.in,v 1.14 1999/07/14 12:49:51 mike Exp $"
+# End of "$Id: Makedefs.in,v 1.15 1999/09/09 12:28:46 mike Exp $"
 #
