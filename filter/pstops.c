@@ -1,5 +1,5 @@
 /*
- * "$Id: pstops.c,v 1.54.2.48 2004/02/25 20:01:37 mike Exp $"
+ * "$Id: pstops.c,v 1.54.2.49 2004/04/26 19:25:48 mike Exp $"
  *
  *   PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -388,7 +388,7 @@ main(int  argc,			/* I - Number of command-line arguments */
   while (!strncmp(line, "\033%-12345X", 9))
   {
    /*
-    * Yup, we have leading PJL fun, so copy it until we hit the line
+    * Yup, we have leading PJL fun, so skip it until we hit the line
     * with "ENTER LANGUAGE"...
     */
 
@@ -399,8 +399,6 @@ main(int  argc,			/* I - Number of command-line arguments */
       len = sizeof(line);
       if (psgets(line, &len, fp) == NULL)
         break;
-
-      fwrite(line, 1, len, stdout);
     }
 
     len = sizeof(line);
@@ -1892,5 +1890,5 @@ start_nup(int number,			/* I - Page number */
 
 
 /*
- * End of "$Id: pstops.c,v 1.54.2.48 2004/02/25 20:01:37 mike Exp $".
+ * End of "$Id: pstops.c,v 1.54.2.49 2004/04/26 19:25:48 mike Exp $".
  */

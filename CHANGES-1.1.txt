@@ -3,6 +3,8 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.21rc1
 
+	- The pstops filter didn't properly skip leading PJL
+	  commands (STR #664)
 	- The reinterpret_cast keyword was not highlighted when
 	  printing C/C++ source files in prettyprint mode (STR
 	  #694)
