@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-main.c,v 1.10 1999/03/22 21:42:34 mike Exp $"
+ * "$Id: hpgl-main.c,v 1.11 1999/03/23 18:39:05 mike Exp $"
  *
  *   HP-GL/2 filter main entry for the Common UNIX Printing System (CUPS).
  *
@@ -128,6 +128,7 @@ main(int  argc,		/* I - Number of command-line arguments */
      char *argv[])	/* I - Command-line arguments */
 {
   FILE		*fp;		/* Input file */
+  float		temp;		/* Swapping variable */
   int		num_params;	/* Number of parameters */
   param_t	*params;	/* Command parameters */
   name_t	*command,	/* Command */
@@ -143,8 +144,7 @@ main(int  argc,		/* I - Number of command-line arguments */
 
   if (argc < 6 || argc > 7)
   {
-    fprintf(stderr, "Usage: %s job-id user title copies options [file]\n",
-            argv[0]);
+    fputs("ERROR: hpgltops job-id user title copies options [file]\n", stderr);
     return (1);
   }
 
@@ -207,6 +207,161 @@ main(int  argc,		/* I - Number of command-line arguments */
   if ((val = cupsGetOption("penwidth", num_options, options)) != NULL)
     penwidth = (float)atof(val);
 
+  if ((val = cupsGetOption("sides", num_options, options)) != NULL &&
+      strncmp(val, "two-", 4) == 0)
+    Duplex = 1;
+
+  if ((val = cupsGetOption("Duplex", num_options, options)) != NULL &&
+      strcmp(val, "NoTumble") == 0)
+    Duplex = 1;
+
+  if ((val = cupsGetOption("landscape", num_options, options)) != NULL)
+    Orientation = 1;
+
+  if ((val = cupsGetOption("orientation-requested", num_options, options)) != NULL)
+  {
+   /*
+    * Map IPP orientation values to 0 to 3:
+    *
+    *   3 = 0 degrees   = 0
+    *   4 = 90 degrees  = 1
+    *   5 = -90 degrees = 3
+    *   6 = 180 degrees = 2
+    */
+
+    Orientation = atoi(val) - 3;
+    if (Orientation >= 2)
+      Orientation ^= 1;
+  }
+
+  if ((val = cupsGetOption("page-left", num_options, options)) != NULL)
+  {
+    switch (Orientation)
+    {
+      case 0 :
+          PageLeft = (float)atof(val);
+	  break;
+      case 1 :
+          PageBottom = (float)atof(val);
+	  break;
+      case 2 :
+          PageRight = PageWidth - (float)atof(val);
+	  break;
+      case 3 :
+          PageTop = PageLength - (float)atof(val);
+	  break;
+    }
+  }
+
+  if ((val = cupsGetOption("page-right", num_options, options)) != NULL)
+  {
+    switch (Orientation)
+    {
+      case 0 :
+          PageRight = PageWidth - (float)atof(val);
+	  break;
+      case 1 :
+          PageTop = PageLength - (float)atof(val);
+	  break;
+      case 2 :
+          PageLeft = (float)atof(val);
+	  break;
+      case 3 :
+          PageBottom = (float)atof(val);
+	  break;
+    }
+  }
+
+  if ((val = cupsGetOption("page-bottom", num_options, options)) != NULL)
+  {
+    switch (Orientation)
+    {
+      case 0 :
+          PageBottom = (float)atof(val);
+	  break;
+      case 1 :
+          PageRight = PageWidth - (float)atof(val);
+	  break;
+      case 2 :
+          PageTop = PageLength - (float)atof(val);
+	  break;
+      case 3 :
+          PageLeft = (float)atof(val);
+	  break;
+    }
+  }
+
+  if ((val = cupsGetOption("page-top", num_options, options)) != NULL)
+  {
+    switch (Orientation)
+    {
+      case 0 :
+          PageTop = PageLength - (float)atof(val);
+	  break;
+      case 1 :
+          PageLeft = (float)atof(val);
+	  break;
+      case 2 :
+          PageBottom = (float)atof(val);
+	  break;
+      case 3 :
+          PageRight = PageWidth - (float)atof(val);
+	  break;
+    }
+  }
+
+  switch (Orientation)
+  {
+    case 0 : /* Portait */
+        break;
+
+    case 1 : /* Landscape */
+	temp       = PageLeft;
+	PageLeft   = PageBottom;
+	PageBottom = temp;
+
+	temp       = PageRight;
+	PageRight  = PageTop;
+	PageTop    = temp;
+
+	temp       = PageWidth;
+	PageWidth  = PageLength;
+	PageLength = temp;
+	break;
+
+    case 2 : /* Reverse Portrait */
+	temp       = PageWidth - PageLeft;
+	PageLeft   = PageWidth - PageRight;
+	PageRight  = temp;
+
+	temp       = PageLength - PageBottom;
+	PageBottom = PageLength - PageTop;
+	PageTop    = temp;
+        break;
+
+    case 3 : /* Reverse Landscape */
+	temp       = PageWidth - PageLeft;
+	PageLeft   = PageWidth - PageRight;
+	PageRight  = temp;
+
+	temp       = PageLength - PageBottom;
+	PageBottom = PageLength - PageTop;
+	PageTop    = temp;
+
+	temp       = PageLeft;
+	PageLeft   = PageBottom;
+	PageBottom = temp;
+
+	temp       = PageRight;
+	PageRight  = PageTop;
+	PageTop    = temp;
+
+	temp       = PageWidth;
+	PageWidth  = PageLength;
+	PageLength = temp;
+	break;
+  }
+
  /*
   * Write the PostScript prolog and initialize the plotting "engine"...
   */
@@ -229,13 +384,16 @@ main(int  argc,		/* I - Number of command-line arguments */
   while ((num_params = ParseCommand(fp, name.name, &params)) >= 0)
   {
 #ifdef DEBUG
-    fprintf(stderr, "DEBUG: %s(%d)", name.name, num_params);
-    for (i = 0; i < num_params; i ++)
-      if (params[i].type == PARAM_STRING)
-        fprintf(stderr, " \'%s\'", params[i].value.string);
-      else
-        fprintf(stderr, " %f", params[i].value.number);
-    fputs("\n", stderr);
+    {
+      int i;
+      fprintf(stderr, "DEBUG: %s(%d)", name.name, num_params);
+      for (i = 0; i < num_params; i ++)
+	if (params[i].type == PARAM_STRING)
+          fprintf(stderr, " \'%s\'", params[i].value.string);
+	else
+          fprintf(stderr, " %f", params[i].value.number);
+      fputs("\n", stderr);
+    }
 #endif /* DEBUG */
 
     if ((command = bsearch(&name, commands, NUM_COMMANDS, sizeof(name_t),
@@ -267,5 +425,5 @@ compare_names(const void *p1,	/* I - First name */
 
 
 /*
- * End of "$Id: hpgl-main.c,v 1.10 1999/03/22 21:42:34 mike Exp $".
+ * End of "$Id: hpgl-main.c,v 1.11 1999/03/23 18:39:05 mike Exp $".
  */

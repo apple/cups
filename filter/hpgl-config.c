@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-config.c,v 1.14 1999/03/22 21:42:34 mike Exp $"
+ * "$Id: hpgl-config.c,v 1.15 1999/03/23 18:39:05 mike Exp $"
  *
  *   HP-GL/2 configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -62,10 +62,8 @@ update_transform(void)
   * Get the page and input window sizes...
   */
 
-  width       = IW2[0] - IW1[0];
-  height      = IW2[1] - IW1[1];
-  page_width  = PageRight - PageLeft;
-  page_length = PageTop - PageBottom;
+  width  = IW2[0] - IW1[0];
+  height = IW2[1] - IW1[1];
 
   if (width == 0 || height == 0)
     return;
@@ -76,27 +74,32 @@ update_transform(void)
 
   if (FitPlot)
   {
+    page_width  = PageRight - PageLeft;
+    page_length = PageTop - PageBottom;
+
     if (Rotation == 0 || Rotation == 180)
     {
       scaling = page_width / width;
-
-      if (scaling > (page_length / height))
-        scaling = page_length / height;
-      else if ((page_length / height * width) <= page_width)
-        scaling = page_length / height;
+      if (scaling > (page_length / width))
+        scaling = page_length / width;
     }
     else
     {
       scaling = page_width / height;
-
-      if (scaling > (page_length / width))
-        scaling = page_length / width;
-      else if ((page_length / width * height) <= page_width)
-        scaling = page_length / width;
+      if (scaling > (page_length / height))
+        scaling = page_length / height;
     }
   }
   else
-    scaling = 72.0f / 1016.0f;
+  {
+    page_width  = PlotSize[0];
+    page_length = PlotSize[1];
+
+    if (Rotation == 0 || Rotation == 180)
+      scaling = page_width / width;
+    else
+      scaling = page_width / height;
+  }
 
  /*
   * Generate a new transformation matrix...
@@ -141,15 +144,10 @@ update_transform(void)
 	break;
   }
 
-  if (FitPlot)
-  {
-    PenScaling = Transform[0][0] + Transform[0][1];
+  PenScaling = Transform[0][0] + Transform[0][1];
 
-    if (PenScaling < 0.0)
-      PenScaling = -PenScaling;
-  }
-  else
-    PenScaling = 1.0;
+  if (PenScaling < 0.0)
+    PenScaling = -PenScaling;
 
   if (PageDirty)
     printf("/PenScaling %.3f def W%d\n", PenScaling, PenNumber);
@@ -218,7 +216,7 @@ IN_initialize(int     num_params,	/* I - Number of parameters */
   DF_default_values(0, NULL);
   PU_pen_up(0, NULL);
   RO_rotate(0, NULL);
-  IP_input_absolute(0, NULL);
+  PS_plot_size(0, NULL);
   WU_width_units(0, NULL);
   PW_pen_width(0, NULL);
   SP_select_pen(0, NULL);
@@ -287,17 +285,17 @@ IR_input_relative(int     num_params,	/* I - Number of parameters */
   {
     P2[0] -= P1[0];
     P2[1] -= P1[1];
-    P1[0] = params[0].value.number * (PageRight - PageLeft) / 72.0f * 1016.0f / 100.0f;
-    P1[1] = params[1].value.number * (PageTop - PageBottom) / 72.0f * 1016.0f / 100.0f;
+    P1[0] = params[0].value.number * PlotSize[0] / 72.0f * 1016.0f / 100.0f;
+    P1[1] = params[1].value.number * PlotSize[1] / 72.0f * 1016.0f / 100.0f;
     P2[0] += P1[0];
     P2[1] += P1[1];
   }
   else if (num_params == 4)
   {
-    P1[0] = params[0].value.number * (PageRight - PageLeft) / 72.0f * 1016.0f / 100.0f;
-    P1[1] = params[1].value.number * (PageTop - PageBottom) / 72.0f * 1016.0f / 100.0f;
-    P2[0] = params[2].value.number * (PageRight - PageLeft) / 72.0f * 1016.0f / 100.0f;
-    P2[1] = params[3].value.number * (PageTop - PageBottom) / 72.0f * 1016.0f / 100.0f;
+    P1[0] = params[0].value.number * PlotSize[0] / 72.0f * 1016.0f / 100.0f;
+    P1[1] = params[1].value.number * PlotSize[1] / 72.0f * 1016.0f / 100.0f;
+    P2[0] = params[2].value.number * PlotSize[0] / 72.0f * 1016.0f / 100.0f;
+    P2[1] = params[3].value.number * PlotSize[1] / 72.0f * 1016.0f / 100.0f;
   }
 
   IW1[0] = P1[0];
@@ -368,12 +366,16 @@ PS_plot_size(int     num_params,	/* I - Number of parameters */
   switch (num_params)
   {
     case 0 :
-       /*
-        * This is a hack for programs that assume a DesignJet's hard limits...
-        */
-
-        PlotSize[0] = 72.0f * 36.0f;
-        PlotSize[1] = 72.0f * 48.0f;
+        if (Rotation == 0 || Rotation == 180)
+        {
+          PlotSize[0] = PageRight - PageLeft;
+          PlotSize[1] = PageTop - PageBottom;
+	}
+	else
+	{
+          PlotSize[0] = PageTop - PageBottom;
+          PlotSize[1] = PageRight - PageLeft;
+	}
         break;
     case 1 :
         if (Rotation == 0 || Rotation == 180)
@@ -467,5 +469,5 @@ SC_scale(int     num_params,	/* I - Number of parameters */
 
 
 /*
- * End of "$Id: hpgl-config.c,v 1.14 1999/03/22 21:42:34 mike Exp $".
+ * End of "$Id: hpgl-config.c,v 1.15 1999/03/23 18:39:05 mike Exp $".
  */

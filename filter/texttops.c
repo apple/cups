@@ -1,5 +1,5 @@
 /*
- * "$Id: texttops.c,v 1.11 1999/03/22 21:42:36 mike Exp $"
+ * "$Id: texttops.c,v 1.12 1999/03/23 18:39:08 mike Exp $"
  *
  *   Text to PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -23,13 +23,14 @@
  *
  * Contents:
  *
- *   getutf8()        - Get a UTF-8 encoded wide character...
- *   write_epilogue() - Write the PostScript file epilogue.
- *   write_line()     - Write a row of text.
- *   write_page()     - Write a page of text.
- *   write_prolog()   - Write the PostScript file prolog with options.
- *   write_string()   - Write a string of text.
- *   main()           - Main entry and processing of driver.
+ *   main()             - Main entry and processing of driver.
+ *   compare_keywords() - Compare two C/C++ keywords.
+ *   getutf8()          - Get a UTF-8 encoded wide character...
+ *   write_epilogue()   - Write the PostScript file epilogue.
+ *   write_line()       - Write a row of text.
+ *   write_page()       - Write a page of text.
+ *   write_prolog()     - Write the PostScript file prolog with options.
+ *   write_string()     - Write a string of text.
  */
 
 /*
@@ -82,7 +83,7 @@ int	WrapLines = 0,		/* Wrap text in lines */
 	PageColumns = 1,	/* Number of columns on a page */
 	ColumnGutter = 0,	/* Number of characters between text columns */
 	ColumnWidth = 80,	/* Width of each column */
-	Landscape = 0,		/* Landscape orientation? */
+	Orientation = 0,	/* 0 = portrait, 1 = landscape, etc. */
 	Duplex = 0,		/* Duplexed? */
 	PrettyPrint = 0,	/* Do pretty code formatting */
 	ColorDevice = 0;	/* Do color text? */
@@ -155,592 +156,6 @@ static void	write_string(int col, int row, int len, lchar_t *s);
 
 
 /*
- * 'compare_keywords()' - Compare two C/C++ keywords.
- */
-
-static int				/* O - Result of strcmp */
-compare_keywords(const void *k1,	/* I - First keyword */
-                 const void *k2)	/* I - Second keyword */
-{
-  return (strcmp(*((const char **)k1), *((const char **)k2)));
-}
-
-
-/*
- * 'getutf8()' - Get a UTF-8 encoded wide character...
- */
-
-static int		/* O - Character or -1 on error */
-getutf8(FILE *fp)	/* I - File to read from */
-{
-  int	ch;		/* Current character value */
-  int	next;		/* Next character from file */
-
-
- /*
-  * Read the first character and process things accordingly...
-  *
-  * UTF-8 maps 16-bit characters to:
-  *
-  *        0 to 127 = 0xxxxxxx
-  *     128 to 2047 = 110xxxxx 10yyyyyy (xxxxxyyyyyy)
-  *   2048 to 65535 = 1110xxxx 10yyyyyy 10zzzzzz (xxxxyyyyyyzzzzzz)
-  *
-  * We also accept:
-  *
-  *      128 to 191 = 10xxxxxx
-  *
-  * since this range of values is otherwise undefined unless you are
-  * in the middle of a multi-byte character...
-  *
-  * This code currently does not support anything beyond 16-bit
-  * characters, in part because PostScript doesn't support more than
-  * 16-bit characters...
-  */
-
-  if ((ch = getc(fp)) == EOF)
-    return (EOF);
-
-  if (ch < 0xc0 || !UTF8)	/* One byte character? */
-    return (ch);
-  else if ((ch & 0xe0) == 0xc0)
-  {
-   /*
-    * Two byte character...
-    */
-
-    if ((next = getc(fp)) == EOF)
-      return (EOF);
-    else
-      return (((ch & 0x1f) << 6) | (next & 0x3f));
-  }
-  else if ((ch & 0xf0) == 0xe0)
-  {
-   /*
-    * Three byte character...
-    */
-
-    if ((next = getc(fp)) == EOF)
-      return (EOF);
-
-    ch = ((ch & 0x0f) << 6) | (next & 0x3f);
-
-    if ((next = getc(fp)) == EOF)
-      return (EOF);
-    else
-      return ((ch << 6) | (next & 0x3f));
-  }
-  else
-  {
-   /*
-    * More than three bytes...  We don't support that...
-    */
-
-    return (EOF);
-  }
-}
-
-
-/*
- * 'write_epilogue()' - Write the PostScript file epilogue.
- */
-
-static void
-write_epilogue(void)
-{
-  puts("%%BeginTrailer");
-  printf("%%%%Pages: %d\n", NumPages);
-  puts("%%EOF");
-
-  free(Page[0]);
-  free(Page);
-}
-
-
-/*
- * 'write_line()' - Write a row of text.
- */
-
-static void
-write_line(int     row,		/* I - Row number (0 to N) */
-           lchar_t *line)	/* I - Line to print */
-{
-  int		col;		/* Current column */
-  int		attr;		/* Current attribute */
-  lchar_t	*start;		/* First character in sequence */
-
-  
-  for (col = 0, start = line; col < SizeColumns;)
-  {
-    while (col < SizeColumns && (line->ch == ' ' || line->ch == 0))
-    {
-      col ++;
-      line ++;
-    }
-
-    if (col >= SizeColumns)
-      break;
-
-    attr  = line->attr;
-    start = line;
-
-    while (col < SizeColumns && line->ch != 0 && attr == line->attr)
-    {
-      col ++;
-      line ++;
-    }
-
-    write_string(col - (line - start), row, line - start, start);
-  }
-}
-
-
-/*
- * 'write_page()' - Write a page of text.
- */
-
-static void
-write_page(void)
-{
-  int	line;			/* Current line */
-
-
-  NumPages ++;
-  printf("%%%%Page: %d %d\n", NumPages, NumPages);
-
-  puts("gsave");
-
-  if (PrettyPrint)
-    printf("%d H\n", NumPages);
-
-  for (line = 0; line < SizeLines; line ++)
-    write_line(line, Page[line]);
-
-  puts("grestore");
-  puts("showpage");
-
-  memset(Page[0], 0, sizeof(lchar_t) * SizeColumns * SizeLines);
-}
-
-
-/*
- * 'write_prolog()' - Write the PostScript file prolog with options.
- */
-
-static void
-write_prolog(char       *title,		/* I - Title of job */
-	     char	*user)		/* I - Username */
-{
-  int		line;		/* Current output line */
-  float		temp;		/* Swapping variable */
-  char		*charset;	/* Character set string */
-  char		*server_root;	/* SERVER_ROOT variable */
-  char		filename[1024];	/* Glyph filenames */
-  FILE		*fp;		/* Glyph files */
-  int		ch, unicode;	/* Character values */
-  char		glyph[64];	/* Glyph name */
-  int		chars[256];	/* Character encoding array */
-  time_t	curtime;	/* Current time */
-  struct tm	*curtm;		/* Current date */
-  char		curdate[255];	/* Current date (text format) */
-
-
-  curtime = time(NULL);
-  curtm   = localtime(&curtime);
-  strftime(curdate, sizeof(curdate), "%c", curtm);
-
-  puts("%!PS-Adobe-3.0");
-  printf("%%%%BoundingBox: %.0f %.0f %.0f %.0f\n", PageLeft, PageBottom,
-         PageRight, PageTop);
-  puts("%%Creator: texttops/CUPS-" CUPS_SVERSION);
-  printf("%%%%CreationDate: %s\n", curdate);
-  printf("%%%%Title: %s\n", title);
-  printf("%%%%For: %s\n", user);
-  if (PrettyPrint)
-    puts("%%DocumentNeededResources: font Courier Courier-Bold Courier-Oblique");
-  else
-    puts("%%DocumentNeededResources: font Courier Courier-Bold");
-  puts("%%DocumentSuppliedResources: procset texttops 4.0 0");
-  puts("%%Pages: (atend)");
-
-  if (Landscape)
-  {
-    puts("%%Orientation: Landscape");
-
-    temp       = PageLeft;
-    PageLeft   = PageBottom;
-    PageBottom = temp;
-
-    temp       = PageRight;
-    PageRight  = PageTop;
-    PageTop    = temp;
-
-    temp       = PageWidth;
-    PageWidth  = PageLength;
-    PageLength = temp;
-  }
-
-  puts("%%EndComments");
-
-  SizeColumns = (PageRight - PageLeft) / 72.0 * CharsPerInch;
-  SizeLines   = (PageTop - PageBottom) / 72.0 * LinesPerInch;
-
-  Page    = calloc(sizeof(lchar_t *), SizeLines);
-  Page[0] = calloc(sizeof(lchar_t), SizeColumns * SizeLines);
-  for (line = 1; line < SizeLines; line ++)
-    Page[line] = Page[0] + line * SizeColumns;
-
-  if (PageColumns > 1)
-  {
-    ColumnGutter = CharsPerInch / 2;
-    ColumnWidth  = (SizeColumns - ColumnGutter * (PageColumns - 1)) / PageColumns;
-  }
-  else
-    ColumnWidth = SizeColumns;
-
- /*
-  * Get the output character set; if it is undefined or "us-ascii", do
-  * nothing because we can use the default encoding...
-  */
-
-  puts("%%BeginProlog");
-  puts("%%BeginResource procset texttops 4.0 0");
-
-  charset = getenv("CHARSET");
-  if (charset != NULL && strcmp(charset, "us-ascii") != 0)
-  {
-   /*
-    * Load the PostScript glyph names and the corresponding character
-    * set definition...
-    */
-
-    if ((server_root = getenv("SERVER_ROOT")) == NULL)
-      strcpy(filename, "psglyphs.dat");
-    else
-      sprintf(filename, "%s/filter/psglyphs.dat", server_root);
-
-    memset(Glyphs, 0, sizeof(Glyphs));
-
-    if ((fp = fopen(filename, "r")) != NULL)
-    {
-      while (fscanf(fp, "%x%s", &unicode, glyph) == 2)
-        Glyphs[unicode] = strdup(glyph);
-
-      fclose(fp);
-    }
-
-    if (strncmp(charset, "iso-", 4) == 0)
-    {
-      memset(chars, 0, sizeof(chars));
-
-      if (server_root == NULL)
-        sprintf(filename, "%s.dat", charset + 4);
-      else
-        sprintf(filename, "%s/filter/%s.dat", server_root, charset + 4);
-
-      if ((fp = fopen(filename, "r")) != NULL)
-      {
-        while (fscanf(fp, "%x%x", &ch, &unicode) == 2)
-          chars[ch] = unicode;
-
-        fclose(fp);
-      }
-    }
-    else
-    {
-     /*
-      * UTF-8 encoding - just pass the first 256 characters for now...
-      */
-
-      UTF8 = 1;
-
-      for (unicode = 0; unicode < 256; unicode ++)
-        chars[unicode] = unicode;
-    }
-
-   /*
-    * Write the encoding array...
-    */
-
-    printf("%% %s encoding\n", charset);
-    puts("/textEncoding [");
-
-    for (ch = 0; ch < 256; ch ++)
-    {
-      if (Glyphs[chars[ch]])
-	printf("/%s", Glyphs[chars[ch]]);
-      else
-	printf("/.notdef");
-
-      if ((ch & 7) == 7)
-        putchar('\n');
-    }
-
-    puts("] def");
-
-    puts("% Reencode fonts");
-    puts("/Courier findfont");
-    puts("dup length dict begin\n"
-         "	{ 1 index /FID ne { def } { pop pop } ifelse } forall\n"
-         "	/Encoding textEncoding def\n"
-         "	currentdict\n"
-         "end");
-    puts("/Courier exch definefont pop");
-
-    puts("/Courier-Bold findfont");
-    puts("dup length dict begin\n"
-         "	{ 1 index /FID ne { def } { pop pop } ifelse } forall\n"
-         "	/Encoding textEncoding def\n"
-         "	currentdict\n"
-         "end");
-    puts("/Courier-Bold exch definefont pop");
-  }
-
-  puts("% Define fonts");
-
-  printf("/FN /Courier findfont [%.1f 0 0 %.1f 0 0] makefont def\n",
-         120.0 / CharsPerInch, 68.0 / LinesPerInch);
-  printf("/FB /Courier-Bold findfont [%.1f 0 0 %.1f 0 0] makefont def\n",
-         120.0 / CharsPerInch, 68.0 / LinesPerInch);
-  if (PrettyPrint)
-    printf("/FI /Courier-Oblique findfont [%.1f 0 0 %.1f 0 0] makefont def\n",
-           120.0 / CharsPerInch, 68.0 / LinesPerInch);
-
-  puts("% Common procedures");
-
-  puts("/N { FN setfont moveto } bind def");
-  puts("/B { FB setfont moveto } bind def");
-  puts("/U { gsave 0 rlineto stroke grestore } bind def");
-
-  if (PrettyPrint)
-  {
-    if (ColorDevice)
-    {
-      puts("/S { 0.0 setgray show } bind def");
-      puts("/r { 0.5 0.0 0.0 setrgbcolor show } bind def");
-      puts("/g { 0.25 0.75 0.25 setrgbcolor show } bind def");
-      puts("/b { 0.0 0.25 0.75 setrgbcolor show } bind def");
-    }
-    else
-    {
-      puts("/S { 0.0 setgray show } bind def");
-      puts("/r { 0.2 setgray show } bind def");
-      puts("/g { 0.2 setgray show } bind def");
-      puts("/b { 0.2 setgray show } bind def");
-    }
-
-    puts("/I { FI setfont moveto } bind def");
-
-    puts("/P 20 string def");
-    printf("/T(");
-
-    while (*title != '\0')
-    {
-      if (*title == '(' || *title == ')' || *title == '\\')
-	putchar('\\');
-
-      putchar(*title++);
-    }
-
-    puts(")def");
-
-    puts("/H {");
-    puts("\t0.9 setgray");
-    printf("\t %.0f %.0f %.0f %.0f rectfill\n", PageLeft,
-           PageTop + 72.0f / LinesPerInch, PageRight - PageLeft,
-	   144.0f / LinesPerInch);
-    puts("\tFN setfont");
-    puts("\t0 setgray");
-
-    if (Duplex)
-    {
-      puts("\tdup 2 mod 0 eq {");
-      printf("\t\tT stringwidth pop neg %.0f add %.0f } {\n",
-             PageRight - 36.0f / LinesPerInch,
-             PageTop + 108.0f / LinesPerInch);
-      printf("\t\t%.0f %.0f } ifelse\n", PageLeft + 36.0f / LinesPerInch,
-             PageTop + 108.0f / LinesPerInch);
-    }
-    else
-      printf("\t%.0f %.0f\n", PageLeft + 36.0f / LinesPerInch,
-             PageTop + 108.0f / LinesPerInch);
-
-    puts("\tmoveto T show");
-
-    printf("\t(%s)\n", curdate);
-    printf("\tdup stringwidth pop neg 2 div %.0f add %.0f\n",
-           (PageLeft + PageRight) * 0.5, PageTop + 108.0f / LinesPerInch);
-    puts("\tmoveto show");
-
-    if (Duplex)
-    {
-      puts("\tdup P cvs exch 2 mod 1 eq {");
-      printf("\t\tdup stringwidth pop neg %.0f add %.0f } {\n",
-             PageRight - 36.0f / LinesPerInch,
-             PageTop + 108.0f / LinesPerInch);
-      printf("\t\t%.0f %.0f } ifelse\n", PageLeft + 36.0f / LinesPerInch,
-             PageTop + 108.0f / LinesPerInch);
-    }
-    else
-      printf("\tP cvs dup stringwidth pop neg %.0f add %.0f\n",
-             PageRight - 36.0f / LinesPerInch,
-             PageTop + 108.0f / LinesPerInch);
-
-    puts("\tmoveto show");
-    puts("} bind def");
-  }
-  else
-    puts("/S { show } bind def");
-
-  puts("%%EndResource");
-
-  puts("%%EndProlog");
-}
-
-
-/*
- * 'write_string()' - Write a string of text.
- */
-
-static void
-write_string(int     col,	/* I - Start column */
-             int     row,	/* I - Row */
-             int     len,	/* I - Number of characters */
-             lchar_t *s)	/* I - String to print */
-{
-  int		i;		/* Looping var */
-  float		x, y;		/* Position of text */
-  unsigned	attr;		/* Character attributes */
-
-
- /*
-  * Position the text and set the font...
-  */
-
-  if (Duplex && (NumPages & 1) == 0)
-  {
-    x = PageWidth - PageRight;
-    y = PageTop;
-  }
-  else
-  {
-    x = PageLeft;
-    y = PageTop;
-  }
-
-  x += (float)col * 72.0 / (float)CharsPerInch;
-  y -= (float)(row + 1) * 72.0 / (float)LinesPerInch;
-
-  attr = s->attr;
-
-  if (attr & ATTR_RAISED)
-    y += 36.0 / (float)LinesPerInch;
-  else if (attr & ATTR_LOWERED)
-    y -= 36.0 / (float)LinesPerInch;
-
-  if (x == (int)x)
-    printf("%.0f ", x);
-  else
-    printf("%.1f ", x);
-
-  if (y == (int)y)
-    printf("%.0f ", y);
-  else
-    printf("%.1f ", y);
-
-  if (attr & ATTR_BOLD)
-    putchar('B');
-  else if (attr & ATTR_ITALIC)
-    putchar('I');
-  else
-    putchar('N');
-
-  if (attr & ATTR_UNDERLINE)
-    printf(" %.1f U", (float)len * 72.0 / (float)CharsPerInch);
-
- /*
-  * See if the string contains 16-bit characters...
-  */
-
-  for (i = 0; i < len; i ++)
-    if (s[i].ch > 255)
-      break;
-
-  if (i < len)
-  {
-   /*
-    * Write a hex Unicode string...
-    */
-
-    fputs("<feff", stdout);
-
-    while (len > 0)
-    {
-      printf("%04x", s->ch);
-      len --;
-      s ++;
-    }
-
-    putchar('>');
-
-    if (attr & ATTR_RED)
-      puts("r");
-    else if (attr & ATTR_GREEN)
-      puts("g");
-    else if (attr & ATTR_BLUE)
-      puts("b");
-    else
-      puts("S");
-  }
-  else
-  {
-   /*
-    * Write a quoted string...
-    */
-
-    putchar('(');
-
-    while (len > 0)
-    {
-      if (s->ch > 126)
-      {
-       /*
-        * Quote 8-bit characters...
-	*/
-
-        printf("\\%03o", s->ch);
-      }
-      else
-      {
-       /*
-        * Quote the parenthesis and backslash as needed...
-	*/
-
-        if (s->ch == '(' || s->ch == ')' || s->ch == '\\')
-	  putchar('\\');
-
-	putchar(s->ch);
-      }
-
-      len --;
-      s ++;
-    }
-
-    putchar(')');
-
-    if (attr & ATTR_RED)
-      puts("r");
-    else if (attr & ATTR_GREEN)
-      puts("g");
-    else if (attr & ATTR_BLUE)
-      puts("b");
-    else
-      puts("S");
-  }
-}
-
-
-/*
  * 'main()' - Main entry and processing of driver.
  */
 
@@ -749,6 +164,7 @@ main(int  argc,			/* I - Number of command-line arguments */
      char *argv[])		/* I - Command-line arguments */
 {
   FILE		*fp;		/* Print file */
+  float		temp;		/* Swapping variable */
   int		i,		/* Looping var */
 		ch,		/* Current char from file */
 		lastch,		/* Previous char from file */
@@ -770,8 +186,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 
   if (argc < 6 || argc > 7)
   {
-    fprintf(stderr, "Usage: %s job-id user title copies options [file]\n",
-            argv[0]);
+    fputs("ERROR: texttops job-id user title copies options [file]\n", stderr);
     return (1);
   }
 
@@ -822,15 +237,152 @@ main(int  argc,			/* I - Number of command-line arguments */
 
   ppdClose(ppd);
 
+  if ((val = cupsGetOption("landscape", num_options, options)) != NULL)
+    Orientation = 1;
+
+  if ((val = cupsGetOption("orientation-requested", num_options, options)) != NULL)
+  {
+   /*
+    * Map IPP orientation values to 0 to 3:
+    *
+    *   3 = 0 degrees   = 0
+    *   4 = 90 degrees  = 1
+    *   5 = -90 degrees = 3
+    *   6 = 180 degrees = 2
+    */
+
+    Orientation = atoi(val) - 3;
+    if (Orientation >= 2)
+      Orientation ^= 1;
+  }
+
   if ((val = cupsGetOption("page-left", num_options, options)) != NULL)
-    PageLeft = (float)atof(val);
+  {
+    switch (Orientation)
+    {
+      case 0 :
+          PageLeft = (float)atof(val);
+	  break;
+      case 1 :
+          PageBottom = (float)atof(val);
+	  break;
+      case 2 :
+          PageRight = PageWidth - (float)atof(val);
+	  break;
+      case 3 :
+          PageTop = PageLength - (float)atof(val);
+	  break;
+    }
+  }
+
   if ((val = cupsGetOption("page-right", num_options, options)) != NULL)
-    PageRight = PageWidth - (float)atof(val);
+  {
+    switch (Orientation)
+    {
+      case 0 :
+          PageRight = PageWidth - (float)atof(val);
+	  break;
+      case 1 :
+          PageTop = PageLength - (float)atof(val);
+	  break;
+      case 2 :
+          PageLeft = (float)atof(val);
+	  break;
+      case 3 :
+          PageBottom = (float)atof(val);
+	  break;
+    }
+  }
+
   if ((val = cupsGetOption("page-bottom", num_options, options)) != NULL)
-    PageBottom = (float)atof(val);
+  {
+    switch (Orientation)
+    {
+      case 0 :
+          PageBottom = (float)atof(val);
+	  break;
+      case 1 :
+          PageRight = PageWidth - (float)atof(val);
+	  break;
+      case 2 :
+          PageTop = PageLength - (float)atof(val);
+	  break;
+      case 3 :
+          PageLeft = (float)atof(val);
+	  break;
+    }
+  }
+
   if ((val = cupsGetOption("page-top", num_options, options)) != NULL)
-    PageTop = PageLength - (float)atof(val);
-  Landscape = cupsGetOption("landscape", num_options, options) != NULL;
+  {
+    switch (Orientation)
+    {
+      case 0 :
+          PageTop = PageLength - (float)atof(val);
+	  break;
+      case 1 :
+          PageLeft = (float)atof(val);
+	  break;
+      case 2 :
+          PageBottom = (float)atof(val);
+	  break;
+      case 3 :
+          PageRight = PageWidth - (float)atof(val);
+	  break;
+    }
+  }
+
+  switch (Orientation)
+  {
+    case 0 : /* Portait */
+        break;
+
+    case 1 : /* Landscape */
+	temp       = PageLeft;
+	PageLeft   = PageBottom;
+	PageBottom = temp;
+
+	temp       = PageRight;
+	PageRight  = PageTop;
+	PageTop    = temp;
+
+	temp       = PageWidth;
+	PageWidth  = PageLength;
+	PageLength = temp;
+	break;
+
+    case 2 : /* Reverse Portrait */
+	temp       = PageWidth - PageLeft;
+	PageLeft   = PageWidth - PageRight;
+	PageRight  = temp;
+
+	temp       = PageLength - PageBottom;
+	PageBottom = PageLength - PageTop;
+	PageTop    = temp;
+        break;
+
+    case 3 : /* Reverse Landscape */
+	temp       = PageWidth - PageLeft;
+	PageLeft   = PageWidth - PageRight;
+	PageRight  = temp;
+
+	temp       = PageLength - PageBottom;
+	PageBottom = PageLength - PageTop;
+	PageTop    = temp;
+
+	temp       = PageLeft;
+	PageLeft   = PageBottom;
+	PageBottom = temp;
+
+	temp       = PageRight;
+	PageRight  = PageTop;
+	PageTop    = temp;
+
+	temp       = PageWidth;
+	PageWidth  = PageLength;
+	PageLength = temp;
+	break;
+  }
 
   WrapLines = cupsGetOption("wrap", num_options, options) != NULL;
 
@@ -1287,5 +839,595 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: texttops.c,v 1.11 1999/03/22 21:42:36 mike Exp $".
+ * 'compare_keywords()' - Compare two C/C++ keywords.
+ */
+
+static int				/* O - Result of strcmp */
+compare_keywords(const void *k1,	/* I - First keyword */
+                 const void *k2)	/* I - Second keyword */
+{
+  return (strcmp(*((const char **)k1), *((const char **)k2)));
+}
+
+
+/*
+ * 'getutf8()' - Get a UTF-8 encoded wide character...
+ */
+
+static int		/* O - Character or -1 on error */
+getutf8(FILE *fp)	/* I - File to read from */
+{
+  int	ch;		/* Current character value */
+  int	next;		/* Next character from file */
+
+
+ /*
+  * Read the first character and process things accordingly...
+  *
+  * UTF-8 maps 16-bit characters to:
+  *
+  *        0 to 127 = 0xxxxxxx
+  *     128 to 2047 = 110xxxxx 10yyyyyy (xxxxxyyyyyy)
+  *   2048 to 65535 = 1110xxxx 10yyyyyy 10zzzzzz (xxxxyyyyyyzzzzzz)
+  *
+  * We also accept:
+  *
+  *      128 to 191 = 10xxxxxx
+  *
+  * since this range of values is otherwise undefined unless you are
+  * in the middle of a multi-byte character...
+  *
+  * This code currently does not support anything beyond 16-bit
+  * characters, in part because PostScript doesn't support more than
+  * 16-bit characters...
+  */
+
+  if ((ch = getc(fp)) == EOF)
+    return (EOF);
+
+  if (ch < 0xc0 || !UTF8)	/* One byte character? */
+    return (ch);
+  else if ((ch & 0xe0) == 0xc0)
+  {
+   /*
+    * Two byte character...
+    */
+
+    if ((next = getc(fp)) == EOF)
+      return (EOF);
+    else
+      return (((ch & 0x1f) << 6) | (next & 0x3f));
+  }
+  else if ((ch & 0xf0) == 0xe0)
+  {
+   /*
+    * Three byte character...
+    */
+
+    if ((next = getc(fp)) == EOF)
+      return (EOF);
+
+    ch = ((ch & 0x0f) << 6) | (next & 0x3f);
+
+    if ((next = getc(fp)) == EOF)
+      return (EOF);
+    else
+      return ((ch << 6) | (next & 0x3f));
+  }
+  else
+  {
+   /*
+    * More than three bytes...  We don't support that...
+    */
+
+    return (EOF);
+  }
+}
+
+
+/*
+ * 'write_epilogue()' - Write the PostScript file epilogue.
+ */
+
+static void
+write_epilogue(void)
+{
+  puts("%%BeginTrailer");
+  printf("%%%%Pages: %d\n", NumPages);
+  puts("%%EOF");
+
+  free(Page[0]);
+  free(Page);
+}
+
+
+/*
+ * 'write_line()' - Write a row of text.
+ */
+
+static void
+write_line(int     row,		/* I - Row number (0 to N) */
+           lchar_t *line)	/* I - Line to print */
+{
+  int		col;		/* Current column */
+  int		attr;		/* Current attribute */
+  lchar_t	*start;		/* First character in sequence */
+
+  
+  for (col = 0, start = line; col < SizeColumns;)
+  {
+    while (col < SizeColumns && (line->ch == ' ' || line->ch == 0))
+    {
+      col ++;
+      line ++;
+    }
+
+    if (col >= SizeColumns)
+      break;
+
+    attr  = line->attr;
+    start = line;
+
+    while (col < SizeColumns && line->ch != 0 && attr == line->attr)
+    {
+      col ++;
+      line ++;
+    }
+
+    write_string(col - (line - start), row, line - start, start);
+  }
+}
+
+
+/*
+ * 'write_page()' - Write a page of text.
+ */
+
+static void
+write_page(void)
+{
+  int	line;			/* Current line */
+
+
+  NumPages ++;
+  printf("%%%%Page: %d %d\n", NumPages, NumPages);
+
+  puts("gsave");
+
+  if (PrettyPrint)
+    printf("%d H\n", NumPages);
+
+  for (line = 0; line < SizeLines; line ++)
+    write_line(line, Page[line]);
+
+  puts("grestore");
+  puts("showpage");
+
+  memset(Page[0], 0, sizeof(lchar_t) * SizeColumns * SizeLines);
+}
+
+
+/*
+ * 'write_prolog()' - Write the PostScript file prolog with options.
+ */
+
+static void
+write_prolog(char *title,	/* I - Title of job */
+	     char *user)	/* I - Username */
+{
+  int		line;		/* Current output line */
+  char		*charset;	/* Character set string */
+  char		*server_root;	/* SERVER_ROOT variable */
+  char		filename[1024];	/* Glyph filenames */
+  FILE		*fp;		/* Glyph files */
+  int		ch, unicode;	/* Character values */
+  char		glyph[64];	/* Glyph name */
+  int		chars[256];	/* Character encoding array */
+  time_t	curtime;	/* Current time */
+  struct tm	*curtm;		/* Current date */
+  char		curdate[255];	/* Current date (text format) */
+
+
+  curtime = time(NULL);
+  curtm   = localtime(&curtime);
+  strftime(curdate, sizeof(curdate), "%c", curtm);
+
+  puts("%!PS-Adobe-3.0");
+  printf("%%%%BoundingBox: %.0f %.0f %.0f %.0f\n", PageLeft, PageBottom,
+         PageRight, PageTop);
+  if (Orientation & 1)
+    puts("%%Orientation: Landscape");
+  puts("%%Creator: texttops/CUPS-" CUPS_SVERSION);
+  printf("%%%%CreationDate: %s\n", curdate);
+  printf("%%%%Title: %s\n", title);
+  printf("%%%%For: %s\n", user);
+  if (PrettyPrint)
+    puts("%%DocumentNeededResources: font Courier Courier-Bold Courier-Oblique");
+  else
+    puts("%%DocumentNeededResources: font Courier Courier-Bold");
+  puts("%%DocumentSuppliedResources: procset texttops 4.0 0");
+  puts("%%Pages: (atend)");
+
+  puts("%%EndComments");
+
+  SizeColumns = (PageRight - PageLeft) / 72.0 * CharsPerInch;
+  SizeLines   = (PageTop - PageBottom) / 72.0 * LinesPerInch;
+
+  Page    = calloc(sizeof(lchar_t *), SizeLines);
+  Page[0] = calloc(sizeof(lchar_t), SizeColumns * SizeLines);
+  for (line = 1; line < SizeLines; line ++)
+    Page[line] = Page[0] + line * SizeColumns;
+
+  if (PageColumns > 1)
+  {
+    ColumnGutter = CharsPerInch / 2;
+    ColumnWidth  = (SizeColumns - ColumnGutter * (PageColumns - 1)) /
+                   PageColumns;
+  }
+  else
+    ColumnWidth = SizeColumns;
+
+ /*
+  * Get the output character set; if it is undefined or "us-ascii", do
+  * nothing because we can use the default encoding...
+  */
+
+  puts("%%BeginProlog");
+  puts("%%BeginResource procset texttops 4.0 0");
+
+  charset = getenv("CHARSET");
+  if (charset != NULL && strcmp(charset, "us-ascii") != 0)
+  {
+   /*
+    * Load the PostScript glyph names and the corresponding character
+    * set definition...
+    */
+
+    if ((server_root = getenv("SERVER_ROOT")) == NULL)
+      strcpy(filename, "../data/psglyphs");
+    else
+      sprintf(filename, "%s/data/psglyphs", server_root);
+
+    memset(Glyphs, 0, sizeof(Glyphs));
+
+    if ((fp = fopen(filename, "r")) != NULL)
+    {
+      while (fscanf(fp, "%x%s", &unicode, glyph) == 2)
+        Glyphs[unicode] = strdup(glyph);
+
+      fclose(fp);
+    }
+
+    if (strncmp(charset, "iso-", 4) == 0)
+    {
+      memset(chars, 0, sizeof(chars));
+
+      if (server_root == NULL)
+        sprintf(filename, "../data/%s", charset + 4);
+      else
+        sprintf(filename, "%s/data/%s", server_root, charset + 4);
+
+      if ((fp = fopen(filename, "r")) != NULL)
+      {
+        while (fscanf(fp, "%x%x", &ch, &unicode) == 2)
+          chars[ch] = unicode;
+
+        fclose(fp);
+      }
+    }
+    else
+    {
+     /*
+      * UTF-8 encoding - just pass the first 256 characters for now...
+      */
+
+      UTF8 = 1;
+
+      for (unicode = 0; unicode < 256; unicode ++)
+        chars[unicode] = unicode;
+    }
+
+   /*
+    * Write the encoding array...
+    */
+
+    printf("%% %s encoding\n", charset);
+    puts("/textEncoding [");
+
+    for (ch = 0; ch < 256; ch ++)
+    {
+      if (Glyphs[chars[ch]])
+	printf("/%s", Glyphs[chars[ch]]);
+      else
+	printf("/.notdef");
+
+      if ((ch & 7) == 7)
+        putchar('\n');
+    }
+
+    puts("] def");
+
+    puts("% Reencode fonts");
+    puts("/Courier findfont");
+    puts("dup length dict begin\n"
+         "	{ 1 index /FID ne { def } { pop pop } ifelse } forall\n"
+         "	/Encoding textEncoding def\n"
+         "	currentdict\n"
+         "end");
+    puts("/Courier exch definefont pop");
+
+    puts("/Courier-Bold findfont");
+    puts("dup length dict begin\n"
+         "	{ 1 index /FID ne { def } { pop pop } ifelse } forall\n"
+         "	/Encoding textEncoding def\n"
+         "	currentdict\n"
+         "end");
+    puts("/Courier-Bold exch definefont pop");
+
+    puts("/Courier-Oblique findfont");
+    puts("dup length dict begin\n"
+         "	{ 1 index /FID ne { def } { pop pop } ifelse } forall\n"
+         "	/Encoding textEncoding def\n"
+         "	currentdict\n"
+         "end");
+    puts("/Courier-Oblique exch definefont pop");
+  }
+
+  puts("% Define fonts");
+
+  printf("/FN /Courier findfont [%.1f 0 0 %.1f 0 0] makefont def\n",
+         120.0 / CharsPerInch, 68.0 / LinesPerInch);
+  printf("/FB /Courier-Bold findfont [%.1f 0 0 %.1f 0 0] makefont def\n",
+         120.0 / CharsPerInch, 68.0 / LinesPerInch);
+  if (PrettyPrint)
+    printf("/FI /Courier-Oblique findfont [%.1f 0 0 %.1f 0 0] makefont def\n",
+           120.0 / CharsPerInch, 68.0 / LinesPerInch);
+
+  puts("% Common procedures");
+
+  puts("/N { FN setfont moveto } bind def");
+  puts("/B { FB setfont moveto } bind def");
+  puts("/U { gsave 0 rlineto stroke grestore } bind def");
+
+  if (PrettyPrint)
+  {
+    if (ColorDevice)
+    {
+      puts("/S { 0.0 setgray show } bind def");
+      puts("/r { 0.5 0.0 0.0 setrgbcolor show } bind def");
+      puts("/g { 0.0 0.5 0.0 setrgbcolor show } bind def");
+      puts("/b { 0.0 0.0 0.5 setrgbcolor show } bind def");
+    }
+    else
+    {
+      puts("/S { 0.0 setgray show } bind def");
+      puts("/r { 0.2 setgray show } bind def");
+      puts("/g { 0.2 setgray show } bind def");
+      puts("/b { 0.2 setgray show } bind def");
+    }
+
+    puts("/I { FI setfont moveto } bind def");
+
+    puts("/P 20 string def");
+    printf("/T(");
+
+    while (*title != '\0')
+    {
+      if (*title == '(' || *title == ')' || *title == '\\')
+	putchar('\\');
+
+      putchar(*title++);
+    }
+
+    puts(")def");
+
+    puts("/H {");
+    puts("gsave");
+    puts("\t0.9 setgray");
+
+    if (Duplex)
+    {
+      puts("\tdup 2 mod 0 eq {");
+      printf("\t\t%.1f %.1f translate } {\n",
+             PageWidth - PageRight, PageTop + 72.0f / LinesPerInch);
+      printf("\t\t%.1f %.1f translate } ifelse\n",
+             PageLeft, PageTop + 72.0f / LinesPerInch);
+    }
+
+    printf("\t0 0 %.1f %.1f rectfill\n", PageRight - PageLeft,
+	   144.0f / LinesPerInch);
+
+    puts("\tFN setfont");
+    puts("\t0 setgray");
+
+    if (Duplex)
+    {
+      puts("\tdup 2 mod 0 eq {");
+      printf("\t\tT stringwidth pop neg %.1f add %.1f } {\n",
+             PageRight - PageLeft - 36.0f / LinesPerInch, 36.0f / LinesPerInch);
+      printf("\t\t%.1f %.1f } ifelse\n", 36.0f / LinesPerInch,
+             36.0f / LinesPerInch);
+    }
+    else
+      printf("\t%.1f %.1f\n", 36.0f / LinesPerInch,
+             36.0f / LinesPerInch);
+
+    puts("\tmoveto T show");
+
+    printf("\t(%s)\n", curdate);
+    printf("\tdup stringwidth pop neg 2 div %.1f add %.1f\n",
+           (PageRight - PageLeft) * 0.5, 36.0f / LinesPerInch);
+    puts("\tmoveto show");
+
+    if (Duplex)
+    {
+      puts("\tdup P cvs exch 2 mod 0 eq {");
+      printf("\t\t%.1f %.1f } {\n", 36.0f / LinesPerInch,
+             36.0f / LinesPerInch);
+      printf("\t\tdup stringwidth pop neg %.1f add %.1f } ifelse\n",
+             PageRight - PageLeft - 36.0f / LinesPerInch,
+             36.0f / LinesPerInch);
+    }
+    else
+      printf("\tP cvs dup stringwidth pop neg %.1f add %.1f\n",
+             PageRight - PageLeft - 36.0f / LinesPerInch,
+             36.0f / LinesPerInch);
+
+    puts("\tmoveto show");
+    puts("\tgrestore");
+    puts("} bind def");
+  }
+  else
+    puts("/S { show } bind def");
+
+  puts("%%EndResource");
+
+  puts("%%EndProlog");
+}
+
+
+/*
+ * 'write_string()' - Write a string of text.
+ */
+
+static void
+write_string(int     col,	/* I - Start column */
+             int     row,	/* I - Row */
+             int     len,	/* I - Number of characters */
+             lchar_t *s)	/* I - String to print */
+{
+  int		i;		/* Looping var */
+  float		x, y;		/* Position of text */
+  unsigned	attr;		/* Character attributes */
+
+
+ /*
+  * Position the text and set the font...
+  */
+
+  if (Duplex && (NumPages & 1) == 0)
+  {
+    x = PageWidth - PageRight;
+    y = PageTop;
+  }
+  else
+  {
+    x = PageLeft;
+    y = PageTop;
+  }
+
+  x += (float)col * 72.0 / (float)CharsPerInch;
+  y -= (float)(row + 1) * 72.0 / (float)LinesPerInch;
+
+  attr = s->attr;
+
+  if (attr & ATTR_RAISED)
+    y += 36.0 / (float)LinesPerInch;
+  else if (attr & ATTR_LOWERED)
+    y -= 36.0 / (float)LinesPerInch;
+
+  if (x == (int)x)
+    printf("%.0f ", x);
+  else
+    printf("%.1f ", x);
+
+  if (y == (int)y)
+    printf("%.0f ", y);
+  else
+    printf("%.1f ", y);
+
+  if (attr & ATTR_BOLD)
+    putchar('B');
+  else if (attr & ATTR_ITALIC)
+    putchar('I');
+  else
+    putchar('N');
+
+  if (attr & ATTR_UNDERLINE)
+    printf(" %.1f U", (float)len * 72.0 / (float)CharsPerInch);
+
+ /*
+  * See if the string contains 16-bit characters...
+  */
+
+  for (i = 0; i < len; i ++)
+    if (s[i].ch > 255)
+      break;
+
+  if (i < len)
+  {
+   /*
+    * Write a hex Unicode string...
+    */
+
+    fputs("<feff", stdout);
+
+    while (len > 0)
+    {
+      printf("%04x", s->ch);
+      len --;
+      s ++;
+    }
+
+    putchar('>');
+
+    if (attr & ATTR_RED)
+      puts("r");
+    else if (attr & ATTR_GREEN)
+      puts("g");
+    else if (attr & ATTR_BLUE)
+      puts("b");
+    else
+      puts("S");
+  }
+  else
+  {
+   /*
+    * Write a quoted string...
+    */
+
+    putchar('(');
+
+    while (len > 0)
+    {
+      if (s->ch > 126)
+      {
+       /*
+        * Quote 8-bit characters...
+	*/
+
+        printf("\\%03o", s->ch);
+      }
+      else
+      {
+       /*
+        * Quote the parenthesis and backslash as needed...
+	*/
+
+        if (s->ch == '(' || s->ch == ')' || s->ch == '\\')
+	  putchar('\\');
+
+	putchar(s->ch);
+      }
+
+      len --;
+      s ++;
+    }
+
+    putchar(')');
+
+    if (attr & ATTR_RED)
+      puts("r");
+    else if (attr & ATTR_GREEN)
+      puts("g");
+    else if (attr & ATTR_BLUE)
+      puts("b");
+    else
+      puts("S");
+  }
+}
+
+
+/*
+ * End of "$Id: texttops.c,v 1.12 1999/03/23 18:39:08 mike Exp $".
  */

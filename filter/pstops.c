@@ -1,5 +1,5 @@
 /*
- * "$Id: pstops.c,v 1.9 1999/03/22 21:42:36 mike Exp $"
+ * "$Id: pstops.c,v 1.10 1999/03/23 18:39:07 mike Exp $"
  *
  *   PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -59,12 +59,370 @@
 
 int	NumPages = 0;		/* Number of pages in file */
 size_t	Pages[MAX_PAGES];	/* Offsets to each page */
+char	PageLabels[MAX_PAGES][64];
+				/* Page labels */
 char	*PageRanges = NULL;	/* Range of pages selected */
 char	*PageSet = NULL;	/* All, Even, Odd pages */
-int	Reversed = 0,		/* Reverse pages */
-	Flip = 0;		/* Flip/mirror pages */
-float	Width = 612.0f,		/* Total page width */
-	Height = 792.0f;	/* Total page height */
+int	Order = 0,		/* 0 = normal, 1 = reverse pages */
+	Flip = 0,		/* Flip/mirror pages */
+	Orientation = 0,	/* 0 = Portrait, 1 = Landscape, etc. */
+	NUp = 1,		/* Number of pages on each sheet (1, 2, 4) */
+	ColorDevice = 0,	/* Color printer? */
+	Collate = 0,		/* Collate copies? */
+	Copies = 1;		/* Number of copies */
+float	PageLeft = 18.0f,	/* Left margin */
+	PageRight = 594.0f,	/* Right margin */
+	PageBottom = 36.0f,	/* Bottom margin */
+	PageTop = 756.0f,	/* Top margin */
+	PageWidth = 612.0f,	/* Total page width */
+	PageLength = 792.0f;	/* Total page length */
+
+
+/*
+ * Local functions...
+ */
+
+static int	check_range(int page);
+static void	copy_bytes(FILE *fp, size_t length);
+static char	*psgets(char *buf, size_t len, FILE *fp);
+
+
+
+  if (Landscape)
+  {
+    if (Duplex && (NumPages & 1) == 0)
+      printf("0 %.1f translate -90 rotate\n", PageWidth);
+    else
+      printf("%.1f 0 translate 90 rotate\n", PageLength);
+  }
+
+
+/*
+ * 'main()' - Main entry...
+ */
+
+int				/* O - Exit status */
+main(int  argc,			/* I - Number of command-line arguments */
+     char *argv[])		/* I - Command-line arguments */
+{
+  FILE		*fp;		/* Print file */
+		*temp;		/* Temporary page cache */
+  ppd_file_t	*ppd;		/* PPD file */
+  ppd_size_t	*pagesize;	/* Current page size */
+  int		num_options;	/* Number of print options */
+  cups_option_t	*options;	/* Print options */
+  char		*val;		/* Option value */
+
+
+  if (argc < 6 || argc > 7)
+  {
+    fputs("ERROR: pstops job-id user title copies options [file]\n", stderr);
+    return (1);
+  }
+
+ /*
+  * If we have 7 arguments, print the file named on the command-line.
+  * Otherwise, send stdin instead...
+  */
+
+  if (argc == 6)
+    fp = stdin;
+  else
+  {
+   /*
+    * Try to open the print file...
+    */
+
+    if ((fp = fopen(argv[6], "rb")) == NULL)
+    {
+      perror("ERROR: unable to open print file - ");
+      return (1);
+    }
+  }
+
+ /*
+  * Process command-line options and write the prolog...
+  */
+
+  ppd = ppdOpenFile(getenv("PPD"));
+
+  options     = NULL;
+  num_options = cupsParseOptions(argv[5], 0, &options);
+
+  ppdMarkDefaults(ppd);
+  cupsMarkOptions(ppd, num_options, options);
+
+  if ((pagesize = ppdPageSize(ppd, NULL)) != NULL)
+  {
+    PageWidth  = pagesize->width;
+    PageLength = pagesize->length;
+    PageTop    = pagesize->top;
+    PageBottom = pagesize->bottom;
+    PageLeft   = pagesize->left;
+    PageRight  = pagesize->right;
+  }
+
+  if (ppd != NULL)
+    ColorDevice = ppd->color_device;
+
+  if ((val = cupsGetOption("page-ranges", num_options, options)) != NULL)
+    PageRanges = val;
+
+  if ((val = cupsGetOption("page-set", num_options, options)) != NULL)
+    PageSet = val;
+
+  if ((val = cupsGetOption("page-left", num_options, options)) != NULL)
+    PageLeft = (float)atof(val);
+
+  if ((val = cupsGetOption("page-right", num_options, options)) != NULL)
+    PageRight = PageWidth - (float)atof(val);
+
+  if ((val = cupsGetOption("page-bottom", num_options, options)) != NULL)
+    PageBottom = (float)atof(val);
+
+  if ((val = cupsGetOption("page-top", num_options, options)) != NULL)
+    PageTop = PageLength - (float)atof(val);
+
+  if ((val = cupsGetOption("landscape", num_options, options)) != NULL)
+    Orientation = 1;
+
+  if ((val = cupsGetOption("orientation-requested", num_options, options)) != NULL)
+  {
+   /*
+    * Map IPP orientation values to 0 to 3:
+    *
+    *   3 = 0 degrees   = 0
+    *   4 = 90 degrees  = 1
+    *   5 = -90 degrees = 3
+    *   6 = 180 degrees = 2
+    */
+
+    Orientation = atoi(val) - 3;
+    if (Orientation >= 2)
+      Orientation ^= 1;
+  }
+
+  if ((val = cupsGetOption("sides", num_options, options)) != NULL &&
+      strncmp(val, "two-", 4) == 0)
+    Duplex = 1;
+
+  if ((val = cupsGetOption("Duplex", num_options, options)) != NULL &&
+      strcmp(val, "NoTumble") == 0)
+    Duplex = 1;
+
+  write_prolog(argv[3], argv[2]);
+
+
+  int			i, n, nfiles;
+  char			*opt;
+  char			tempfile[255];
+  FILE			*temp;
+  char			buffer[8192];
+  float			gammaval[4];
+  int			brightness[4];
+  int			nup;
+  int			landscape;
+  PDInfoStruct		*info;
+  PDSizeTableStruct	*size;
+  time_t		modtime;
+
+
+  gammaval[0]   = 0.0;
+  gammaval[1]   = 0.0;
+  gammaval[2]   = 0.0;
+  gammaval[3]   = 0.0;
+  brightness[0] = 100;
+  brightness[1] = 100;
+  brightness[2] = 100;
+  brightness[3] = 100;
+
+  nup       = 1;
+  landscape = 0;
+
+  for (i = 1, nfiles = 0; i < argc; i ++)
+    if (argv[i][0] == '-')
+      for (opt = argv[i] + 1; *opt != '\0'; opt ++)
+        switch (*opt)
+        {
+          default :
+          case 'h' : /* Help */
+              usage();
+              break;
+
+          case 'P' : /* Printer */
+              i ++;
+              if (i >= argc)
+                usage();
+
+              PDLocalReadInfo(argv[i], &info, &modtime);
+              size = PDFindPageSize(info, PD_SIZE_CURRENT);
+
+              PrintColor  = strncasecmp(info->printer_class, "Color", 5) == 0;
+              PrintWidth  = 72.0 * size->width;
+              PrintLength = 72.0 * size->length;
+
+	      memcpy(ColorProfile, info->active_status->color_profile,
+	             sizeof(ColorProfile));
+              break;
+
+          case 'l' : /* Landscape printing... */
+              landscape = 1;
+              break;
+
+          case '1' : /* 1-up printing... */
+              nup = 1;
+              break;
+          case '2' : /* 2-up printing... */
+              nup = 2;
+              break;
+          case '4' : /* 4-up printing... */
+              nup = 4;
+              break;
+
+          case 'f' : /* Flip pages */
+              PrintFlip = 1;
+              break;
+
+          case 'e' : /* Print even pages */
+              PrintEvenPages = 1;
+              PrintOddPages  = 0;
+              break;
+          case 'o' : /* Print odd pages */
+              PrintEvenPages = 0;
+              PrintOddPages  = 1;
+              break;
+          case 'r' : /* Print pages reversed */
+              PrintReversed = 1;
+              break;
+          case 'p' : /* Print page range */
+              PrintRange = opt + 1;
+              opt += strlen(opt) - 1;
+              break;
+          case 'D' : /* Debug ... */
+              Verbosity ++;
+              break;
+
+          case 'g' :	/* Gamma correction */
+	      i ++;
+	      if (i < argc)
+	        switch (sscanf(argv[i], "%f,%f,%f,%f", gammaval + 0,
+	                       gammaval + 1, gammaval + 2, gammaval + 3))
+	        {
+	          case 1 :
+	              gammaval[1] = gammaval[0];
+	          case 2 :
+	              gammaval[2] = gammaval[1];
+	              gammaval[3] = gammaval[1];
+	              break;
+	        };
+	      break;
+
+          case 'b' :	/* Brightness */
+	      i ++;
+	      if (i < argc)
+	        switch (sscanf(argv[i], "%d,%d,%d,%d", brightness + 0,
+	                       brightness + 1, brightness + 2, brightness + 3))
+	        {
+	          case 1 :
+	              brightness[1] = brightness[0];
+	          case 2 :
+	              brightness[2] = brightness[1];
+	              brightness[3] = brightness[1];
+	              break;
+	        };
+	      break;
+
+          case 'c' : /* Color profile */
+              i ++;
+              if (i < argc)
+                sscanf(argv[i], "%f,%f,%f,%f,%f,%f",
+                       ColorProfile + 0,
+                       ColorProfile + 1,
+                       ColorProfile + 2,
+                       ColorProfile + 3,
+                       ColorProfile + 4,
+                       ColorProfile + 5);
+              break;
+        }
+    else
+    {
+      if (landscape && nfiles == 0)
+      {
+	n           = PrintWidth;
+	PrintWidth  = PrintLength;
+	PrintLength = n;
+      };
+
+      if (nup == 1 && PrintEvenPages && PrintOddPages && PrintRange == NULL &&
+	  !PrintReversed)
+      {
+       /*
+	* Just cat the file to stdout - we don't need to to any processing.
+	*/
+
+        print_header(gammaval, brightness);
+
+        if ((temp = fopen(argv[i], "r")) != NULL)
+        {
+	  copy_bytes(temp, -1);
+          fclose(temp);
+        };
+      }
+      else
+      {
+       /*
+        * Filter the file as necessary...
+        */
+
+        print_file(argv[i], gammaval, brightness, nup, landscape);
+      };
+
+      nfiles ++;
+    };
+
+  if (nfiles == 0)
+  {
+    if (landscape)
+    {
+      n           = PrintWidth;
+      PrintWidth  = PrintLength;
+      PrintLength = n;
+    };
+
+    if (nup == 1 && PrintEvenPages && PrintOddPages && PrintRange == NULL &&
+	!PrintReversed)
+    {
+     /*
+      * Just cat stdin to stdout - we don't need to to any processing.
+      */
+
+      print_header(gammaval, brightness);
+
+      copy_bytes(stdin, -1);
+    }
+    else
+    {
+     /*
+      * Copy stdin to a temporary file and filter the temporary file.
+      */
+
+      if ((temp = fopen(tmpnam(tempfile), "w")) == NULL)
+	exit(ERR_DATA_BUFFER);
+
+      while (fgets(buffer, sizeof(buffer), stdin) != NULL)
+	fputs(buffer, temp);
+      fclose(temp);
+
+      print_file(tempfile, gammaval, brightness, nup, landscape);
+
+      unlink(tempfile);
+    };
+  };
+
+  ppdClose(ppd);
+
+  return (0);
+}
 
 
 /*
@@ -73,7 +431,7 @@ float	Width = 612.0f,		/* Total page width */
  */
 
 static int		/* O - 1 if selected, 0 otherwise */
-check_range(void)
+check_range(int page)	/* I - Page number */
 {
   char	*range;		/* Pointer into range string */
   int	lower, upper;	/* Lower and upper page numbers */
@@ -85,9 +443,9 @@ check_range(void)
     * See if we only print even or odd pages...
     */
 
-    if (strcmp(PageSet, "even") == 0 && (PageNumber & 1))
+    if (strcmp(PageSet, "even") == 0 && (page & 1))
       return (0);
-    if (strcmp(PageSet, "odd") == 0 && !(PageNumber & 1))
+    if (strcmp(PageSet, "odd") == 0 && !(page & 1))
       return (0);
   }
 
@@ -118,7 +476,7 @@ check_range(void)
         upper = lower;
     }
 
-    if (PageNumber >= lower && PageNumber <= upper)
+    if (page >= lower && page <= upper)
       return (1);
 
     if (*range == ',')
@@ -131,104 +489,88 @@ check_range(void)
 }
 
 
-  if (Landscape)
-  {
-    if (Duplex && (NumPages & 1) == 0)
-      printf("0 %.1f translate -90 rotate\n", PageWidth);
-    else
-      printf("%.1f 0 translate 90 rotate\n", PageLength);
-  }
-
-
-/*
- * 'test_page()' - Test the given page number.  Returns TRUE if the page
- *                 should be printed, false otherwise...
- */
-
-int
-test_page(int number)
-{
-  char	*range;
-  int	lower, upper;
-
-
-  if (((number & 1) && !PrintOddPages) ||
-      (!(number & 1) && !PrintEvenPages))
-    return (FALSE);
-
-  if (PrintRange == NULL)
-    return (TRUE);
-
-  for (range = PrintRange; *range != '\0';)
-  {
-    if (*range == '-')
-      lower = 0;
-    else
-    {
-      lower = atoi(range);
-      while (isdigit(*range) || *range == ' ')
-        range ++;
-    };
-
-    if (*range == '-')
-    {
-      range ++;
-      if (*range == '\0')
-        upper = MAX_PAGES;
-      else
-        upper = atoi(range);
-
-      while (isdigit(*range) || *range == ' ')
-        range ++;
-
-      if (number >= lower && number <= upper)
-        return (TRUE);
-    };
-
-    if (number == lower)
-      return (TRUE);
-
-    if (*range != '\0')
-      range ++;
-  };
-
-  return (FALSE);
-}
-
-
 /*
  * 'copy_bytes()' - Copy bytes from the input file to stdout...
  */
 
-void
-copy_bytes(FILE *fp,
-           int  length)
+static void
+copy_bytes(FILE   *fp,		/* I - File to read from */
+           size_t length)	/* I - Length of page data */
 {
-  char	buffer[8192];
-  int	nbytes, nleft;
-  int	feature;
+  char		buffer[8192];	/* Data buffer */
+  size_t	nbytes,		/* Number of bytes read */
+		nleft;		/* Number of bytes left/remaining */
 
 
-  feature = 0;
-  nleft   = length;
+  nleft = length;
 
-  while (nleft > 0 || length == -1)
+  while (nleft > 0 || length == 0)
   {
-    if (fgets(buffer, sizeof(buffer), fp) == NULL)
+    if ((nbytes = fread(buffer, 1, sizeof(buffer), fp)) < 1)
       return;
 
-    nbytes = strlen(buffer);
-    nleft  -= nbytes;
+    nleft -= nbytes;
 
-    if (strncmp(buffer, "%%BeginFeature", 14) == 0)
-      feature = 1;
-    else if (strncmp(buffer, "%%EndFeature", 12) == 0 ||
-             strncmp(buffer, "%%EndSetup", 10) == 0)
-      feature = 0;
+    fwrite(buffer, 1, nbytes, stdout);
+  }
+}
 
-    if (!feature)
-      fputs(buffer, stdout);
-  };
+
+/*
+ * 'psgets()' - Get a line from a file.
+ *
+ * Note:
+ *
+ *   This function differs from the gets() function in that it
+ *   handles any combination of CR, LF, or CR LF to end input
+ *   lines.
+ */
+
+static char *		/* O - String or NULL if EOF */
+psgets(char   *buf,	/* I - Buffer to read into */
+       size_t len,	/* I - Length of buffer */
+       FILE   *fp)	/* I - File to read from */
+{
+  char	*bufptr;	/* Pointer into buffer */
+  int	ch;		/* Character from file */
+
+
+  len --;
+  bufptr = buf;
+
+  while ((bufptr - buf) < len)
+  {
+    if ((ch = getc(fp)) == EOF)
+      break;
+
+    if (ch == 0x0d)
+    {
+     /*
+      * Got a CR; see if there is a LF as well...
+      */
+
+      ch = getc(fp);
+      if (ch != EOF && ch != 0x0a)
+        ungetc(ch, fp);	/* Nope, save it for later... */
+
+      break;
+    }
+    else if (ch == 0x0a)
+      break;
+    else
+      *bufptr++ = ch;
+  }
+
+ /*
+  * Nul-terminate the string and return it (or NULL for EOF).
+  */
+
+  *bufptr = '\0';
+
+  if (ch == EOF && bufptr == buf)
+    return (NULL);
+  else
+    return (buf);
 }
 
 
@@ -270,7 +612,7 @@ print_page(FILE *fp,
 #define pushdoc(n)	{ if (doclevel < PS_MAX) { indent[doclevel] = '\t'; doclevel ++; docstack[doclevel] = (n); if (Verbosity) fprintf(stderr, "psfilter: pushdoc(%d), doclevel = %d\n", (n), doclevel); }; }
 #define popdoc(n)	{ if (doclevel >= 0 && docstack[doclevel] == (n)) doclevel --; indent[doclevel] = '\0'; if (Verbosity) fprintf(stderr, "psfilter: popdoc(%d), doclevel = %d\n", (n), doclevel); }
 
-void
+static void
 scan_file(FILE *fp)
 {
   char	line[8192];
@@ -682,232 +1024,6 @@ print_file(char  *filename,
 }
 
 
-void
-usage(void)
-{
-  fputs("Usage: psfilter [-e] [-o] [-r] [-p<pages>] [-h] [-D] infile\n", stderr);
-  exit(ERR_BAD_ARG);
-}
-
-
 /*
- * 'main()' - Main entry...
- */
-
-int
-main(int  argc,
-     char *argv[])
-{
-  int			i, n, nfiles;
-  char			*opt;
-  char			tempfile[255];
-  FILE			*temp;
-  char			buffer[8192];
-  float			gammaval[4];
-  int			brightness[4];
-  int			nup;
-  int			landscape;
-  PDInfoStruct		*info;
-  PDSizeTableStruct	*size;
-  time_t		modtime;
-
-
-  gammaval[0]   = 0.0;
-  gammaval[1]   = 0.0;
-  gammaval[2]   = 0.0;
-  gammaval[3]   = 0.0;
-  brightness[0] = 100;
-  brightness[1] = 100;
-  brightness[2] = 100;
-  brightness[3] = 100;
-
-  nup       = 1;
-  landscape = 0;
-
-  for (i = 1, nfiles = 0; i < argc; i ++)
-    if (argv[i][0] == '-')
-      for (opt = argv[i] + 1; *opt != '\0'; opt ++)
-        switch (*opt)
-        {
-          default :
-          case 'h' : /* Help */
-              usage();
-              break;
-
-          case 'P' : /* Printer */
-              i ++;
-              if (i >= argc)
-                usage();
-
-              PDLocalReadInfo(argv[i], &info, &modtime);
-              size = PDFindPageSize(info, PD_SIZE_CURRENT);
-
-              PrintColor  = strncasecmp(info->printer_class, "Color", 5) == 0;
-              PrintWidth  = 72.0 * size->width;
-              PrintLength = 72.0 * size->length;
-
-	      memcpy(ColorProfile, info->active_status->color_profile,
-	             sizeof(ColorProfile));
-              break;
-
-          case 'l' : /* Landscape printing... */
-              landscape = 1;
-              break;
-
-          case '1' : /* 1-up printing... */
-              nup = 1;
-              break;
-          case '2' : /* 2-up printing... */
-              nup = 2;
-              break;
-          case '4' : /* 4-up printing... */
-              nup = 4;
-              break;
-
-          case 'f' : /* Flip pages */
-              PrintFlip = 1;
-              break;
-
-          case 'e' : /* Print even pages */
-              PrintEvenPages = 1;
-              PrintOddPages  = 0;
-              break;
-          case 'o' : /* Print odd pages */
-              PrintEvenPages = 0;
-              PrintOddPages  = 1;
-              break;
-          case 'r' : /* Print pages reversed */
-              PrintReversed = 1;
-              break;
-          case 'p' : /* Print page range */
-              PrintRange = opt + 1;
-              opt += strlen(opt) - 1;
-              break;
-          case 'D' : /* Debug ... */
-              Verbosity ++;
-              break;
-
-          case 'g' :	/* Gamma correction */
-	      i ++;
-	      if (i < argc)
-	        switch (sscanf(argv[i], "%f,%f,%f,%f", gammaval + 0,
-	                       gammaval + 1, gammaval + 2, gammaval + 3))
-	        {
-	          case 1 :
-	              gammaval[1] = gammaval[0];
-	          case 2 :
-	              gammaval[2] = gammaval[1];
-	              gammaval[3] = gammaval[1];
-	              break;
-	        };
-	      break;
-
-          case 'b' :	/* Brightness */
-	      i ++;
-	      if (i < argc)
-	        switch (sscanf(argv[i], "%d,%d,%d,%d", brightness + 0,
-	                       brightness + 1, brightness + 2, brightness + 3))
-	        {
-	          case 1 :
-	              brightness[1] = brightness[0];
-	          case 2 :
-	              brightness[2] = brightness[1];
-	              brightness[3] = brightness[1];
-	              break;
-	        };
-	      break;
-
-          case 'c' : /* Color profile */
-              i ++;
-              if (i < argc)
-                sscanf(argv[i], "%f,%f,%f,%f,%f,%f",
-                       ColorProfile + 0,
-                       ColorProfile + 1,
-                       ColorProfile + 2,
-                       ColorProfile + 3,
-                       ColorProfile + 4,
-                       ColorProfile + 5);
-              break;
-        }
-    else
-    {
-      if (landscape && nfiles == 0)
-      {
-	n           = PrintWidth;
-	PrintWidth  = PrintLength;
-	PrintLength = n;
-      };
-
-      if (nup == 1 && PrintEvenPages && PrintOddPages && PrintRange == NULL &&
-	  !PrintReversed)
-      {
-       /*
-	* Just cat the file to stdout - we don't need to to any processing.
-	*/
-
-        print_header(gammaval, brightness);
-
-        if ((temp = fopen(argv[i], "r")) != NULL)
-        {
-	  copy_bytes(temp, -1);
-          fclose(temp);
-        };
-      }
-      else
-      {
-       /*
-        * Filter the file as necessary...
-        */
-
-        print_file(argv[i], gammaval, brightness, nup, landscape);
-      };
-
-      nfiles ++;
-    };
-
-  if (nfiles == 0)
-  {
-    if (landscape)
-    {
-      n           = PrintWidth;
-      PrintWidth  = PrintLength;
-      PrintLength = n;
-    };
-
-    if (nup == 1 && PrintEvenPages && PrintOddPages && PrintRange == NULL &&
-	!PrintReversed)
-    {
-     /*
-      * Just cat stdin to stdout - we don't need to to any processing.
-      */
-
-      print_header(gammaval, brightness);
-
-      copy_bytes(stdin, -1);
-    }
-    else
-    {
-     /*
-      * Copy stdin to a temporary file and filter the temporary file.
-      */
-
-      if ((temp = fopen(tmpnam(tempfile), "w")) == NULL)
-	exit(ERR_DATA_BUFFER);
-
-      while (fgets(buffer, sizeof(buffer), stdin) != NULL)
-	fputs(buffer, temp);
-      fclose(temp);
-
-      print_file(tempfile, gammaval, brightness, nup, landscape);
-
-      unlink(tempfile);
-    };
-  };
-
-  return (NO_ERROR);
-}
-
-
-/*
- * End of "$Id: pstops.c,v 1.9 1999/03/22 21:42:36 mike Exp $".
+ * End of "$Id: pstops.c,v 1.10 1999/03/23 18:39:07 mike Exp $".
  */

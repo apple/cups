@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgltops.h,v 1.8 1999/03/22 01:19:45 mike Exp $"
+ * "$Id: hpgltops.h,v 1.9 1999/03/23 18:39:06 mike Exp $"
  *
  *   HP-GL/2 to PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -72,7 +72,9 @@ typedef struct
 #endif /* _HPGL_MAIN_C_ */
 
 VAR int		ColorDevice	VALUE(1),	/* Color printer? */
-		LanguageLevel	VALUE(2);	/* PostScript level? */
+		LanguageLevel	VALUE(2),	/* PostScript level? */
+		Orientation	VALUE(0),	/* 0 = portrait, 1 = landscape, etc. */
+		Duplex		VALUE(0);	/* 1 = duplexed output */
 
 VAR float	P1[2],				/* Lower-lefthand physical limit */
 		P2[2],				/* Upper-righthand physical limit */
@@ -206,5 +208,5 @@ extern void	OutputTrailer(void);
 extern int	Outputf(const char *format, ...);
 
 /*
- * End of "$Id: hpgltops.h,v 1.8 1999/03/22 01:19:45 mike Exp $".
+ * End of "$Id: hpgltops.h,v 1.9 1999/03/23 18:39:06 mike Exp $".
  */

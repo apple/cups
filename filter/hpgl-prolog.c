@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-prolog.c,v 1.10 1999/03/22 01:19:45 mike Exp $"
+ * "$Id: hpgl-prolog.c,v 1.11 1999/03/23 18:39:06 mike Exp $"
  *
  *   HP-GL/2 prolog routines for for the Common UNIX Printing System (CUPS).
  *
@@ -62,7 +62,7 @@ OutputProlog(char  *title,	/* I - Job title */
   printf("%%%%BoundingBox: %.0f %.0f %.0f %.0f\n",
          PageLeft, PageBottom, PageRight, PageTop);
   puts("%%Pages: (atend)");
-  printf("%%LanguageLevel: %d\n", LanguageLevel);
+  printf("%%%%LanguageLevel: %d\n", LanguageLevel);
   puts("%%DocumentData: Clean7Bit");
   puts("%%DocumentSuppliedResources: procset hpgltops 4.0 0");
   puts("%%DocumentNeededResources: font Courier sHelvetica");
@@ -71,6 +71,8 @@ OutputProlog(char  *title,	/* I - Job title */
   puts(line);
   printf("%%%%Title: %s\n", title);
   printf("%%%%For: %s\n", user);
+  if (Orientation & 1)
+    puts("%%Orientation: Landscape");
   puts("%%EndComments");
   puts("%%BeginProlog");
   printf("/DefaultPenWidth %.2f def\n", penwidth * 72.0 / 25.4);
@@ -81,9 +83,9 @@ OutputProlog(char  *title,	/* I - Job title */
     puts("/setrgbcolor { 0.08 mul exch 0.61 mul add exch 0.31 mul add setgray } bind def\n");
 
   if ((server_root = getenv("SERVER_ROOT")) != NULL)
-    sprintf(filename, "%s/filter/HPGLprolog.dat", server_root);
+    sprintf(filename, "%s/data/HPGLprolog", server_root);
   else
-    strcpy(filename, "HPGLprolog.dat");
+    strcpy(filename, "../data/HPGLprolog");
 
   if ((prolog = fopen(filename, "r")) == NULL)
   {
@@ -145,22 +147,40 @@ Outputf(const char *format,	/* I - Printf-style string */
     printf("/PenScaling %.3f def\n", PenScaling);
     puts("gsave");
 
-    switch (PageRotation)
-    {
-      case 0 :
-          printf("%.1f %.1f translate\n", PageLeft, PageBottom);
-	  break;
-      case 90 :
-          printf("%.1f %.1f translate\n", PageBottom, PageWidth - PageRight);
-	  break;
-      case 180 :
-          printf("%.1f %.1f translate\n", PageWidth - PageRight,
-	          PageLength - PageTop);
-	  break;
-      case 270 :
-          printf("%.1f %.1f translate\n", PageLength - PageTop, PageLeft);
-	  break;
-    }
+    if (Duplex && (PageCount & 1) == 0)
+      switch ((PageRotation / 90) & 3)
+      {
+	case 0 :
+            printf("%.1f %.1f translate\n", PageWidth - PageRight, PageBottom);
+	    break;
+	case 1 :
+            printf("%.1f %.1f translate\n", PageLength - PageTop,
+	           PageWidth - PageRight);
+	    break;
+	case 2 :
+            printf("%.1f %.1f translate\n", PageLeft, PageLength - PageTop);
+	    break;
+	case 3 :
+            printf("%.1f %.1f translate\n", PageBottom, PageLeft);
+	    break;
+      }
+    else
+      switch ((PageRotation / 90) & 3)
+      {
+	case 0 :
+            printf("%.1f %.1f translate\n", PageLeft, PageBottom);
+	    break;
+	case 1 :
+            printf("%.1f %.1f translate\n", PageBottom, PageWidth - PageRight);
+	    break;
+	case 2 :
+            printf("%.1f %.1f translate\n", PageWidth - PageRight,
+	            PageLength - PageTop);
+	    break;
+	case 3 :
+            printf("%.1f %.1f translate\n", PageLength - PageTop, PageLeft);
+	    break;
+      }
   }
 
  /*
@@ -176,5 +196,5 @@ Outputf(const char *format,	/* I - Printf-style string */
 
 
 /*
- * End of "$Id: hpgl-prolog.c,v 1.10 1999/03/22 01:19:45 mike Exp $".
+ * End of "$Id: hpgl-prolog.c,v 1.11 1999/03/23 18:39:06 mike Exp $".
  */
