@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.71 2000/12/19 15:10:38 mike Exp $"
+ * "$Id: http.c,v 1.72 2000/12/20 10:50:59 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -489,7 +489,7 @@ httpReconnect(http_t *http)	/* I - HTTP data */
 	  break;
     }
 
-    context = SSL_CTX_new(TLSv1_method());
+    context = SSL_CTX_new(SSLv23_method());
     conn    = SSL_new(context);
 
     SSL_set_fd(conn, http->fd);
@@ -1486,7 +1486,7 @@ httpUpdate(http_t *http)		/* I - HTTP data */
 #ifdef HAVE_LIBSSL
       if (http->status == HTTP_SWITCHING_PROTOCOLS && !http->tls)
       {
-	context = SSL_CTX_new(TLSv1_method());
+	context = SSL_CTX_new(SSLv23_method());
 	conn    = SSL_new(context);
 
 	SSL_set_fd(conn, http->fd);
@@ -1889,5 +1889,5 @@ http_send(http_t       *http,	/* I - HTTP data */
 
 
 /*
- * End of "$Id: http.c,v 1.71 2000/12/19 15:10:38 mike Exp $".
+ * End of "$Id: http.c,v 1.72 2000/12/20 10:50:59 mike Exp $".
  */

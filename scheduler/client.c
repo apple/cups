@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.77 2000/12/19 15:10:41 mike Exp $"
+ * "$Id: client.c,v 1.78 2000/12/20 10:51:00 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -270,7 +270,7 @@ EncryptClient(client_t *con)	/* I - Client to encrypt */
   SSL_CTX	*context;	/* Context for encryption */
   SSL		*conn;		/* Connection for encryption */
   
-  context = SSL_CTX_new(TLSv1_method());
+  context = SSL_CTX_new(SSLv23_method());
   conn    = SSL_new(context);
 
   SSL_use_PrivateKey_file(conn, ServerKey, SSL_FILETYPE_PEM);
@@ -1924,5 +1924,5 @@ pipe_command(client_t *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.77 2000/12/19 15:10:41 mike Exp $".
+ * End of "$Id: client.c,v 1.78 2000/12/20 10:51:00 mike Exp $".
  */
