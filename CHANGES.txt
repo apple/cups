@@ -1,4 +1,4 @@
-CHANGES.txt - 05/22/2001
+CHANGES.txt - 05/31/2001
 ------------------------
 
 CHANGES IN CUPS V1.1.9
@@ -7,6 +7,10 @@ CHANGES IN CUPS V1.1.9
 	  files embedded in a PostScript document.  The %%EOF
 	  handling in 1.1.8 caused some dvips files not to
 	  print.
+	- Fixed yet another memory allocation bug in pstoraster
+	  that would cause it to crash.  This fix also ensures
+	  that all memory allocations are done on (at least) a
+	  64-bit boundary.
 
 
 CHANGES IN CUPS V1.1.8
