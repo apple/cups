@@ -1,10 +1,15 @@
-Index: lib/gs_setpd.ps
-===================================================================
-RCS file: /cvs/ghostscript/gs/lib/gs_setpd.ps,v
-retrieving revision 1.8.2.2
-diff -u -r1.8.2.2 gs_setpd.ps
---- lib/gs_setpd.ps	22 Feb 2002 19:45:55 -0000	1.8.2.2
-+++ lib/gs_setpd.ps	22 Apr 2002 18:17:52 -0000
+diff -ur ghostscript-7.05/lib/gs_setpd.ps espgs/lib/gs_setpd.ps
+--- ghostscript-7.05/lib/gs_setpd.ps	Fri Feb 22 14:45:55 2002
++++ espgs/lib/gs_setpd.ps	Tue Apr 23 08:37:55 2002
+@@ -13,7 +13,7 @@
+ % contact Artifex Software, Inc., 101 Lucas Valley Road #110,
+ % San Rafael, CA  94903, U.S.A., +1(415)492-9861.
+ 
+-% $Id: gs_setpd.ps,v 1.8.2.2 2002/02/22 19:45:55 ray Exp $
++% $Id: gs_setpd.ps,v 1.7 2002/04/23 12:37:55 easysw Exp $
+ % The current implementation of setpagedevice has the following limitations:
+ %	- It doesn't attempt to "interact with the user" for Policy = 2.
+ 
 @@ -321,21 +321,42 @@
      } bind
  .dicttomark readonly def
@@ -18,6 +23,11 @@ diff -u -r1.8.2.2 gs_setpd.ps
 -% Define other keys used in media selection.
 -/.inputselectionkeys [
 -  /MediaPosition /Orientation
+-] readonly def
+-
+-% Define the keys used in output attribute matching.
+-/.outputattrkeys [
+-  /OutputType
 -] readonly def
 +% M. Sweet, Easy Software Products:
 +%
@@ -35,11 +45,7 @@ diff -u -r1.8.2.2 gs_setpd.ps
 +  /.inputselectionkeys [
 +    /MediaPosition /Orientation
 +  ] readonly def
- 
--% Define the keys used in output attribute matching.
--/.outputattrkeys [
--  /OutputType
--] readonly def
++
 +  % Define the keys used in output attribute matching.
 +  /.outputattrkeys [
 +    /OutputType
@@ -62,13 +68,18 @@ diff -u -r1.8.2.2 gs_setpd.ps
  
  % Define all the parameters that should always be copied to the merged
  % dictionary.
-Index: src/Makefile.in
-===================================================================
-RCS file: /cvs/ghostscript/gs/src/Makefile.in,v
-retrieving revision 1.1.4.7
-diff -u -r1.1.4.7 Makefile.in
---- src/Makefile.in	19 Apr 2002 22:23:09 -0000	1.1.4.7
-+++ src/Makefile.in	22 Apr 2002 18:17:53 -0000
+diff -ur ghostscript-7.05/src/Makefile.in espgs/src/Makefile.in
+--- ghostscript-7.05/src/Makefile.in	Fri Apr 19 18:23:09 2002
++++ espgs/src/Makefile.in	Tue Apr 23 11:18:45 2002
+@@ -13,7 +13,7 @@
+ # contact Artifex Software, Inc., 101 Lucas Valley Road #110,
+ # San Rafael, CA  94903, U.S.A., +1(415)492-9861.
+ 
+-# $Id: Makefile.in,v 1.1.4.7 2002/04/19 22:23:09 giles Exp $
++# $Id: Makefile.in,v 1.10 2002/04/23 15:18:45 easysw Exp $
+ # makefile template for/from the autoconf build.
+ # @configure_input@
+ 
 @@ -70,7 +70,7 @@
  # Define the default directory/ies for the runtime
  # initialization and font files.  Separate multiple directories with a :.
@@ -78,15 +89,36 @@ diff -u -r1.1.4.7 Makefile.in
  
  # Define whether or not searching for initialization files should always
  # look in the current directory first.  This leads to well-known security
-@@ -231,7 +231,7 @@
+@@ -110,7 +110,7 @@
+ 
+ # Define the name of the executable file.
+ 
+-GS=gs
++GS=@GS@
+ 
+ # Define the name of a pre-built executable that can be invoked at build
+ # time.  Currently, this is only needed for compiled fonts.  The usual
+@@ -222,7 +222,7 @@
+ # defines from autoconf; note that we don't use these at present.
+ ACDEFS=@DEFS@
+ 
+-CFLAGS=$(CFLAGS_STANDARD) $(GCFLAGS) $(XCFLAGS)
++CFLAGS=@CFLAGS@ $(GCFLAGS) $(XCFLAGS)
+ 
+ # Define platform flags for ld.
+ # SunOS 4.n may need -Bstatic.
+@@ -231,9 +231,9 @@
  #	-R /usr/local/xxx/lib:/usr/local/lib
  # giving the full path names of the shared library directories.
  # XLDFLAGS can be set from the command line.
 -XLDFLAGS=
 +XLDFLAGS=@XLDFLAGS@
  
- LDFLAGS=$(XLDFLAGS)
+-LDFLAGS=$(XLDFLAGS)
++LDFLAGS=@LDFLAGS@ $(XLDFLAGS)
  
+ # Define any extra libraries to link into the executable.
+ # ISC Unix 2.2 wants -linet.
 @@ -242,7 +242,7 @@
  # Solaris may need -lnsl -lsocket -lposix4.
  # (Libraries required by individual drivers are handled automatically.)
@@ -96,6 +128,15 @@ diff -u -r1.1.4.7 Makefile.in
  
  # Define the standard libraries to search at the end of linking.
  # Most platforms require -lpthread for the POSIX threads library;
+@@ -317,7 +317,7 @@
+ # Choose whether to compile the .ps initialization files into the executable.
+ # See gs.mak for details.
+ 
+-COMPILE_INITS=0
++COMPILE_INITS=@COMPILE_INITS@
+ 
+ # Choose whether to store band lists on files or in memory.
+ # The choices are 'file' or 'memory'.
 @@ -353,30 +353,27 @@
  # devs.mak and contrib.mak for the list of available devices.
  
@@ -149,17 +190,28 @@ diff -u -r1.1.4.7 Makefile.in
  include $(GLSRCDIR)/unix-end.mak
  include $(GLSRCDIR)/unixinst.mak
 +@CUPSINCLUDE@
-Index: src/configure.ac
-===================================================================
-RCS file: /cvs/ghostscript/gs/src/configure.ac,v
-retrieving revision 1.4.4.9
-diff -u -r1.4.4.9 configure.ac
---- src/configure.ac	19 Apr 2002 22:23:09 -0000	1.4.4.9
-+++ src/configure.ac	22 Apr 2002 18:17:53 -0000
-@@ -167,6 +167,213 @@
+diff -ur ghostscript-7.05/src/configure.ac espgs/src/configure.ac
+--- ghostscript-7.05/src/configure.ac	Fri Apr 19 18:23:09 2002
++++ espgs/src/configure.ac	Tue Apr 23 11:08:36 2002
+@@ -167,6 +167,234 @@
  AC_SUBST(LIBPNGDIR)
  AC_SUBST(PNGDEVS)
  
++dnl check to see if we want a different name for the executable...
++AC_ARG_WITH(gs,
++	[  --with-gs=NAME          Name of the Ghostscript exectuable, default=gs ],
++	GS="$withval", GS="gs")
++
++AC_SUBST(GS)
++
++dnl do we compile the Ghostscript initialization files into Ghostscript?
++COMPILE_INITS="0"
++AC_ARG_ENABLE(compiled-inits,
++	[  --enable-compiled-inits compile initialization files into Ghostscript, default=no],
++	COMPILE_INITS="1")
++
++AC_SUBST(COMPILE_INITS)
++
 +dnl look for drivers to compile...
 +AC_ARG_WITH(drivers,
 +[  --with-drivers=LIST     Drivers to support, separated by commas.
@@ -344,11 +396,13 @@ diff -u -r1.4.4.9 configure.ac
 +AC_SUBST(fontpath)
 +
 +dnl look for CUPS...
-+AC_ARG_ENABLE(cups, [  --enable-cups           turn on CUPS support [default=yes]])
++AC_ARG_ENABLE(cups, [  --enable-cups           turn on CUPS support, default=yes])
 +
 +CUPSDEV=""
 +CUPSINCLUDE=""
 +CUPSCONFIG=":"
++cups_serverroot="/etc/cups"
++cups_serverbin="/usr/lib/cups"
 +
 +if test -d pstoraster; then
 +    if test x$enable_cups != xno; then
@@ -357,6 +411,8 @@ diff -u -r1.4.4.9 configure.ac
 +	    dnl Use values from CUPS config...
 +	    LIBS="`$CUPSCONFIG --ldflags` `$CUPSCONFIG --image --libs` $LIBS"
 +	    CFLAGS="`$CUPSCONFIG --cflags` $CFLAGS"
++	    cups_serverroot="`$CUPSCONFIG --serverroot`"
++	    cups_serverbin="`$CUPSCONFIG --serverbin`"
 +	    CUPSINCLUDE="include pstoraster/cups.mak"
 +	    CUPSDEV="\$(DD)cups.dev"
 +	fi
@@ -366,11 +422,13 @@ diff -u -r1.4.4.9 configure.ac
 +AC_SUBST(CUPSDEV)
 +AC_SUBST(CUPSCONFIG)
 +AC_SUBST(CUPSINCLUDE)
++AC_SUBST(cups_serverroot)
++AC_SUBST(cups_serverbin)
 +
  dnl look for IJS implementation
  AC_ARG_WITH(ijs, AC_HELP_STRING([--with-ijs],[include IJS driver support]))
  dnl set safe defaults
-@@ -202,15 +409,51 @@
+@@ -202,15 +430,52 @@
  AC_SUBST(STPDEVS)
  
  dnl optional X11 for display devices
@@ -378,57 +436,59 @@ diff -u -r1.4.4.9 configure.ac
 -if test x"$no_x" = x"yes"; then
 -	AC_MSG_NOTICE([disabling X11 output devices])
 -	X11DEVS=''
-+AC_PATH_X
-+if test "$x_libraries" = "/usr/lib"; then
-+	echo "Ignoring X library directory \"$x_libraries\" requested by configure."
-+	x_libraries="NONE"
-+fi
-+if test ! "$x_libraries" = "NONE" -a ! "$x_libraries" = ""; then
-+	LDFLAGS="-L$x_libraries $LDFLAGS"
-+	XLDFLAGS="-L$x_libraries"
-+	if test "$uname" = "SunOS"; then
-+		XLDFLAGS="$XLDFLAGS -R$x_libraries"
-+	fi
- else
+-else
 -	X11DEVS='$(DD)x11.dev $(DD)x11alpha.dev $(DD)x11cmyk.dev $(DD)x11gray2.dev $(DD)x11gray4.dev $(DD)x11mono.dev'
-+	XLDFLAGS=""
++AC_PATH_X
++
++XLDFLAGS=""
++X_CFLAGS=""
++X_DEVS=""
++X_LIBS=""
++
++if test x$no_x != xyes; then
++	if test "$x_libraries" = "/usr/lib"; then
++		echo "Ignoring X library directory \"$x_libraries\" requested by configure."
++		x_libraries="NONE"
++	fi
++	if test ! "$x_libraries" = "NONE" -a ! "$x_libraries" = ""; then
++		LDFLAGS="-L$x_libraries $LDFLAGS"
++		XLDFLAGS="-L$x_libraries"
++		if test "$uname" = "SunOS"; then
++			XLDFLAGS="$XLDFLAGS -R$x_libraries"
++		fi
++	fi
++
++	if test "$x_includes" = "/usr/include"; then
++		echo "Ignoring X include directory \"$x_includes\" requested by configure."
++		x_includes="NONE"
++	fi
++	if test ! "$x_includes" = "NONE" -a ! "$x_includes" = ""; then
++		X_CFLAGS="-I$x_includes"
++	fi
++
++	SAVELIBS="$LIBS"
++
++	AC_CHECK_LIB(X11,XOpenDisplay)
++	AC_CHECK_LIB(Xext,XdbeQueryExtension)
++	AC_CHECK_LIB(Xt,XtAppCreateShell)
++
++	LIBS="$SAVELIBS"
++
++	if test "$ac_cv_lib_Xt_XtAppCreateShell" = yes; then
++		X_DEVS="\$(DD)x11.dev \$(DD)x11alpha.dev \$(DD)x11cmyk.dev \$(DD)x11mono.dev \$(DD)x11_.dev \$(DD)x11alt_.dev \$(DD)x11cmyk2.dev \$(DD)x11cmyk4.dev \$(DD)x11cmyk8.dev \$(DD)x11rg16x.dev \$(DD)x11rg32x.dev"
++		X_LIBS="-lXt -lXext -lX11"
++	fi
  fi
 -AC_SUBST(X11DEVS)
-+AC_SUBST(XLDFLAGS)
-+
-+if test "$x_includes" = "/usr/include"; then
-+	echo "Ignoring X include directory \"$x_includes\" requested by configure."
-+	x_includes="NONE"
-+fi
-+if test ! "$x_includes" = "NONE" -a ! "$x_includes" = ""; then
-+	X_CFLAGS="-I$x_includes"
-+else
-+	X_CFLAGS=""
-+fi
-+
-+SAVELIBS="$LIBS"
  
-+AC_CHECK_LIB(X11,XOpenDisplay)
-+AC_CHECK_LIB(Xext,XdbeQueryExtension)
-+AC_CHECK_LIB(Xt,XtAppCreateShell)
-+
-+LIBS="$SAVELIBS"
-+
-+if test "$ac_cv_lib_Xt_XtAppCreateShell" = yes; then
-+	X_DEVS="\$(DD)x11.dev \$(DD)x11alpha.dev \$(DD)x11cmyk.dev \$(DD)x11mono.dev \$(DD)x11_.dev \$(DD)x11alt_.dev \$(DD)x11cmyk2.dev \$(DD)x11cmyk4.dev \$(DD)x11cmyk8.dev \$(DD)x11rg16x.dev \$(DD)x11rg32x.dev"
-+	X_LIBS="-lXt -lXext -lX11"
-+else
-+	X_DEVS=""
-+	X_LIBS=""
-+fi
-+
++AC_SUBST(XLDFLAGS)
 +AC_SUBST(X_CFLAGS)
 +AC_SUBST(X_LIBS)
 +AC_SUBST(X_DEVS)
  
  dnl --------------------------------------------------
  dnl Check for library functions
-@@ -233,4 +476,9 @@
+@@ -233,4 +498,9 @@
  dnl --------------------------------------------------
  
  AC_SUBST(GCFLAGS)
