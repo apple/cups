@@ -1,5 +1,5 @@
 /*
- * "$Id: langprintf.c,v 1.1.2.1 2002/06/06 02:01:38 mike Exp $"
+ * "$Id: langprintf.c,v 1.1.2.2 2002/09/26 17:24:50 mike Exp $"
  *
  *   Localized printf/puts functions for the Common UNIX Printing
  *   System (CUPS).
@@ -37,6 +37,7 @@
 #include <stdio.h>
 #include "string.h"
 #include "language.h"
+#include "transcode.h"
 
 
 /*
@@ -50,7 +51,8 @@ cupsLangPrintf(FILE        *fp,		/* I - File to write to */
 	       ...)			/* I - Additional arguments as needed */
 {
   int		bytes;			/* Number of bytes formatted */
-  char		buffer[2048];		/* Message buffer */
+  char		buffer[2048],		/* Message buffer */
+		output[8192];		/* Output buffer */
   va_list 	ap;			/* Pointer to additional arguments */
 
 
@@ -71,14 +73,17 @@ cupsLangPrintf(FILE        *fp,		/* I - File to write to */
   va_end(ap);
 
  /*
-  * IRA: Insert transcoding to destination charset here...
+  * Transcode to the destination charset...
   */
+
+  bytes = cupsUTF8ToCharset(output, (cups_utf8_t *)buffer, sizeof(output),
+                            language->encoding);
 
  /*
   * Write the string and return the number of bytes written...
   */
 
-  return (fwrite(buffer, 1, bytes, fp));
+  return (fwrite(output, 1, bytes, fp));
 }
 
 
@@ -92,7 +97,7 @@ cupsLangPuts(FILE        *fp,		/* I - File to write to */
 	     cups_msg_t  msg)		/* I - Message string to use */
 {
   int		bytes;			/* Number of bytes formatted */
-  char		buffer[2048];		/* Message buffer */
+  char		output[2048];		/* Message buffer */
 
 
  /*
@@ -104,26 +109,22 @@ cupsLangPuts(FILE        *fp,		/* I - File to write to */
     return (-1);
 
  /*
-  * Get length of message string...
+  * Transcode to the destination charset...
   */
 
-  strlcpy(buffer, cupsLangString(language, msg), sizeof(buffer));
-
-  bytes = strlen(buffer);
-
- /*
-  * IRA: Insert transcoding to destination charset here...
-  */
+  bytes = cupsUTF8ToCharset(output,
+                            (cups_utf8_t *)cupsLangString(language, msg),
+			    sizeof(output), language->encoding);
 
  /*
   * Write the string and return the number of bytes written...
   */
 
-  return (fwrite(buffer, 1, bytes, fp));
+  return (fwrite(output, 1, bytes, fp));
 }
 
 
 /*
- * End of "$Id: langprintf.c,v 1.1.2.1 2002/06/06 02:01:38 mike Exp $".
+ * End of "$Id: langprintf.c,v 1.1.2.2 2002/09/26 17:24:50 mike Exp $".
  */
 
