@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-compiler.m4,v 1.2 2001/06/27 19:44:48 mike Exp $"
+dnl "$Id: cups-compiler.m4,v 1.3 2001/06/29 14:19:09 mike Exp $"
 dnl
 dnl   Common configuration stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -26,9 +26,6 @@ dnl for them...
 
 OPTIM=""
 AC_SUBST(OPTIM)
-
-CFLAGS="${CFLAGS:=}"
-CXXFLAGS="${CXXFLAGS:=}"
 
 AC_ARG_ENABLE(debug, [  --enable-debug        turn on debugging [default=no]],
 	[if test x$enable_debug = xyes; then
@@ -112,5 +109,5 @@ else
 fi
 
 dnl
-dnl End of "$Id: cups-compiler.m4,v 1.2 2001/06/27 19:44:48 mike Exp $".
+dnl End of "$Id: cups-compiler.m4,v 1.3 2001/06/29 14:19:09 mike Exp $".
 dnl

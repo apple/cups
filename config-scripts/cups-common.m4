@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-common.m4,v 1.2 2001/06/27 21:53:08 mike Exp $"
+dnl "$Id: cups-common.m4,v 1.3 2001/06/29 14:19:09 mike Exp $"
 dnl
 dnl   Common configuration stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -23,6 +23,11 @@ dnl         WWW: http://www.cups.org
 dnl
 
 AC_CONFIG_HEADER(config.h)
+
+dnl Default compiler flags...
+CFLAGS="${CFLAGS:=}"
+CXXFLAGS="${CXXFLAGS:=}"
+LDFLAGS="${LDFLAGS:=}"
 
 dnl Checks for programs...
 AC_PROG_AWK
@@ -123,5 +128,5 @@ AC_CHECK_FUNCS(waitpid)
 AC_CHECK_FUNCS(wait3)
 
 dnl
-dnl End of "$Id: cups-common.m4,v 1.2 2001/06/27 21:53:08 mike Exp $".
+dnl End of "$Id: cups-common.m4,v 1.3 2001/06/29 14:19:09 mike Exp $".
 dnl
