@@ -1,4 +1,4 @@
-CHANGES.txt - 05/31/2001
+CHANGES.txt - 06/01/2001
 ------------------------
 
 CHANGES IN CUPS V1.1.9
@@ -11,6 +11,10 @@ CHANGES IN CUPS V1.1.9
 	  that would cause it to crash.  This fix also ensures
 	  that all memory allocations are done on (at least) a
 	  64-bit boundary.
+	- Fixed Digest authentication - httpGetSubField() didn't
+	  skip the Digest keyword.
+	- The scheduler did not properly handle Digest
+	  authentication with the new multiple-group support.
 
 
 CHANGES IN CUPS V1.1.8

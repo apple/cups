@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.93 2001/04/20 20:05:34 mike Exp $"
+ * "$Id: client.c,v 1.94 2001/06/01 15:09:17 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -1755,14 +1755,14 @@ decode_auth(client_t *con)		/* I - Client to decode to */
     * Get the username and password from the Digest attributes...
     */
 
-    if (httpGetSubField(&(con->http), HTTP_FIELD_WWW_AUTHENTICATE, "username",
+    if (httpGetSubField(&(con->http), HTTP_FIELD_AUTHORIZATION, "username",
                         value))
     {
       strncpy(con->username, value, sizeof(con->username) - 1);
       con->username[sizeof(con->username) - 1] = '\0';
     }
 
-    if (httpGetSubField(&(con->http), HTTP_FIELD_WWW_AUTHENTICATE, "response",
+    if (httpGetSubField(&(con->http), HTTP_FIELD_AUTHORIZATION, "response",
                         value))
     {
       strncpy(con->password, value, sizeof(con->password) - 1);
@@ -2118,5 +2118,5 @@ pipe_command(client_t *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.93 2001/04/20 20:05:34 mike Exp $".
+ * End of "$Id: client.c,v 1.94 2001/06/01 15:09:17 mike Exp $".
  */

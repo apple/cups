@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.83 2001/05/06 00:11:24 mike Exp $"
+ * "$Id: http.c,v 1.84 2001/06/01 15:09:17 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -34,6 +34,7 @@
  *   httpReconnect()      - Reconnect to a HTTP server...
  *   httpSeparate()       - Separate a Universal Resource Identifier into its
  *                          components.
+ *   httpGetSubField()    - Get a sub-field value.
  *   httpSetField()       - Set the value of an HTTP header.
  *   httpDelete()         - Send a DELETE request to the server.
  *   httpGet()            - Send a GET request to the server.
@@ -810,6 +811,9 @@ httpGetSubField(http_t       *http,	/* I - HTTP data */
       name == NULL || value == NULL)
     return (NULL);
 
+  DEBUG_printf(("httpGetSubField(%p, %d, \"%s\", %p)\n",
+                http, field, name, value));
+
   for (fptr = http->fields[field]; *fptr;)
   {
    /*
@@ -835,15 +839,20 @@ httpGetSubField(http_t       *http,	/* I - HTTP data */
 
     *ptr = '\0';
 
+    DEBUG_printf(("name = \"%s\"\n", temp));
+
    /*
     * Skip trailing chars up to the '='...
     */
 
-    while (*fptr && *fptr != '=')
+    while (isspace(*fptr))
       fptr ++;
 
     if (!*fptr)
       break;
+
+    if (*fptr != '=')
+      continue;
 
    /*
     * Skip = and leading whitespace...
@@ -887,6 +896,8 @@ httpGetSubField(http_t       *http,	/* I - HTTP data */
       while (*fptr && !isspace(*fptr) && *fptr != ',')
         fptr ++;
     }
+
+    DEBUG_printf(("value = \"%s\"\n", value));
 
    /*
     * See if this is the one...
@@ -2064,5 +2075,5 @@ http_upgrade(http_t *http)	/* I - HTTP data */
 
 
 /*
- * End of "$Id: http.c,v 1.83 2001/05/06 00:11:24 mike Exp $".
+ * End of "$Id: http.c,v 1.84 2001/06/01 15:09:17 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.c,v 1.44 2001/05/07 15:35:00 mike Exp $"
+ * "$Id: auth.c,v 1.45 2001/06/01 15:09:17 mike Exp $"
  *
  *   Authorization routines for the Common UNIX Printing System (CUPS).
  *
@@ -902,7 +902,7 @@ IsAuthorized(client_t *con)	/* I - Connection */
       * Do Digest authentication...
       */
 
-      if (!httpGetSubField(&(con->http), HTTP_FIELD_WWW_AUTHENTICATE, "nonce",
+      if (!httpGetSubField(&(con->http), HTTP_FIELD_AUTHORIZATION, "nonce",
                            nonce))
       {
         LogMessage(L_ERROR, "IsAuthorized: No nonce value for Digest authentication!");
@@ -918,10 +918,23 @@ IsAuthorized(client_t *con)	/* I - Connection */
         return (HTTP_UNAUTHORIZED);
       }
 
-      if (!get_md5_passwd(con->username, best->names[0], md5))
+      if (best->num_names && best->level == AUTH_GROUP)
       {
-        LogMessage(L_ERROR, "IsAuthorized: No user:group for \"%s:%s\" in passwd.md5!",
-	           con->username, best->names[0]);
+        for (i = 0; i < best->num_names; i ++)
+	  if (get_md5_passwd(con->username, best->names[i], md5))
+	    break;
+
+        if (i >= best->num_names)
+	  md5[0] = '\0';
+      }
+      else if (!get_md5_passwd(con->username, NULL, md5))
+	md5[0] = '\0';
+
+
+      if (!md5[0])
+      {
+        LogMessage(L_ERROR, "IsAuthorized: No matching user:group for \"%s\" in passwd.md5!",
+	           con->username);
         return (HTTP_UNAUTHORIZED);
       }
 
@@ -1118,7 +1131,7 @@ get_md5_passwd(const char *username,	/* I - Username */
       continue;
 
     if (strcmp(username, tempuser) == 0 &&
-        strcmp(group, tempgroup) == 0)
+        (group == NULL || strcmp(group, tempgroup) == 0))
     {
      /*
       * Found the password entry!
@@ -1231,5 +1244,5 @@ pam_func(int                      num_msg,	/* I - Number of messages */
 
 
 /*
- * End of "$Id: auth.c,v 1.44 2001/05/07 15:35:00 mike Exp $".
+ * End of "$Id: auth.c,v 1.45 2001/06/01 15:09:17 mike Exp $".
  */
