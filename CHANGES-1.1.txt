@@ -5,6 +5,11 @@ CHANGES IN CUPS V1.1.15
 
 	- Updated the CUPS license agreement for the new MacOS
 	  license exception.
+	- The Allow, Deny, BrowseAllow, BrowseDeny, and
+	  BrowseAddress directives now support the network
+	  interface names "@LOCAL" and "@IF(name)" for access
+	  control and browsing based on the current interface
+	  addresses instead of fixed names or IP addresses.
 	- The texttops filter did not properly recognize the
 	  "nowrap" (wrap=false) option.
 	- The InstallableOptions group name in a PPD file is now

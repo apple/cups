@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.h,v 1.12.2.4 2002/01/14 19:15:05 mike Exp $"
+ * "$Id: dirsvc.h,v 1.12.2.5 2002/03/27 22:10:24 mike Exp $"
  *
  *   Directory services definitions for the Common UNIX Printing System
  *   (CUPS) scheduler.
@@ -40,6 +40,17 @@
 #define	BROWSE_SLP	2		/* SLPv2 */
 #define BROWSE_LDAP	4		/* LDAP (not supported yet) */
 #define BROWSE_ALL	7		/* All protocols */
+
+
+/*
+ * Browse address...
+ */
+
+typedef struct
+{
+  char			iface[32];	/* Destination interface */
+  http_addr_t		to;		/* Destination address */
+} dirsvc_addr_t;
 
 
 /*
@@ -85,7 +96,7 @@ VAR int			Browsing	VALUE(TRUE),
 					/* Time out for printers in seconds */
 			NumBrowsers	VALUE(0);
 					/* Number of broadcast addresses */
-VAR http_addr_t		Browsers[MAX_BROWSERS];
+VAR dirsvc_addr_t	Browsers[MAX_BROWSERS];
 					/* Broadcast addresses */
 VAR location_t		*BrowseACL	VALUE(NULL);
 					/* Browser access control list */
@@ -128,5 +139,5 @@ extern void	UpdateSLPBrowse(void);
 
 
 /*
- * End of "$Id: dirsvc.h,v 1.12.2.4 2002/01/14 19:15:05 mike Exp $".
+ * End of "$Id: dirsvc.h,v 1.12.2.5 2002/03/27 22:10:24 mike Exp $".
  */

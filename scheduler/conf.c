@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.77.2.7 2002/01/23 17:32:13 mike Exp $"
+ * "$Id: conf.c,v 1.77.2.8 2002/03/27 22:10:23 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -797,19 +797,47 @@ read_configuration(FILE *fp)		/* I - File to read from */
 
       if (NumBrowsers < MAX_BROWSERS)
       {
-        if (get_address(value, INADDR_NONE, BrowsePort, AF_INET,
-	                Browsers + NumBrowsers))
+        memset(Browsers + NumBrowsers, 0, sizeof(dirsvc_addr_t));
+
+        if (strcasecmp(value, "@LOCAL") == 0)
+	{
+	 /*
+	  * Send browse data to all local interfaces...
+	  */
+
+	  strcpy(Browsers[NumBrowsers].iface, "*");
+	  NumBrowsers ++;
+	}
+	else if (strncasecmp(value, "@IF(", 4) == 0)
+	{
+	 /*
+	  * Send browse data to the named interface...
+	  */
+
+	  strncpy(Browsers[NumBrowsers].iface, value + 4,
+	          sizeof(Browsers[0].iface) - 1);
+
+          nameptr = Browsers[NumBrowsers].iface +
+	            strlen(Browsers[NumBrowsers].iface) - 1;
+          if (*nameptr == ')')
+	    *nameptr = '\0';
+
+	  NumBrowsers ++;
+	}
+	else if (get_address(value, INADDR_NONE, BrowsePort, AF_INET,
+	                     &(Browsers[NumBrowsers].to)))
         {
-          httpAddrString(Browsers + NumBrowsers, line, sizeof(line));
+          httpAddrString(&(Browsers[NumBrowsers].to), line, sizeof(line));
 
 #ifdef AF_INET6
-          if (Browsers[NumBrowsers].addr.sa_family == AF_INET6)
+          if (Browsers[NumBrowsers].to.addr.sa_family == AF_INET6)
             LogMessage(L_INFO, "Sending browsing info to %s:%d (IPv6)", line,
-                       ntohs(Browsers[NumBrowsers].ipv6.sin6_port));
+                       ntohs(Browsers[NumBrowsers].to.ipv6.sin6_port));
 	  else
 #endif /* AF_INET6 */
           LogMessage(L_INFO, "Sending browsing info to %s:%d", line,
-                     ntohs(Browsers[NumBrowsers].ipv4.sin_port));
+                     ntohs(Browsers[NumBrowsers].to.ipv4.sin_port));
+
 	  NumBrowsers ++;
         }
 	else
@@ -2004,5 +2032,5 @@ get_addr_and_mask(const char *value,	/* I - String from config file */
 
 
 /*
- * End of "$Id: conf.c,v 1.77.2.7 2002/01/23 17:32:13 mike Exp $".
+ * End of "$Id: conf.c,v 1.77.2.8 2002/03/27 22:10:23 mike Exp $".
  */

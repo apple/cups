@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.73.2.10 2002/02/12 19:23:11 mike Exp $"
+ * "$Id: dirsvc.c,v 1.73.2.11 2002/03/27 22:10:23 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -540,36 +540,139 @@ SendBrowseList(void)
  */
 
 void
-SendCUPSBrowse(printer_t *p)	/* I - Printer to send */
+SendCUPSBrowse(printer_t *p)		/* I - Printer to send */
 {
-  int			i;	/* Looping var */
-  int			bytes;	/* Length of packet */
-  char			packet[1453];
-				/* Browse data packet */
+  int			i;		/* Looping var */
+  dirsvc_addr_t		*b;		/* Browse address */
+  int			bytes;		/* Length of packet */
+  char			packet[1453];	/* Browse data packet */
+  cups_netif_t		*iface;		/* Network interface */
 
-
-  snprintf(packet, sizeof(packet), "%x %x %s \"%s\" \"%s\" \"%s\"\n",
-           p->type | CUPS_PRINTER_REMOTE, p->state, p->uri,
-	   p->location, p->info, p->make_model);
-
-  bytes = strlen(packet);
-  LogMessage(L_DEBUG2, "SendBrowseList: (%d bytes) %s", bytes, packet);
 
  /*
   * Send a packet to each browse address...
   */
 
-  for (i = 0; i < NumBrowsers; i ++)
-    if (sendto(BrowseSocket, packet, bytes, 0,
-	       (struct sockaddr *)Browsers + i, sizeof(Browsers[0])) <= 0)
+  for (i = NumBrowsers, b = Browsers; i > 0; i --, b ++)
+    if (b->iface[0])
     {
-      LogMessage(L_ERROR, "SendBrowseList: sendto failed for browser %d - %s.",
-	         i + 1, strerror(errno));
-      LogMessage(L_ERROR, "Browsing turned off.");
+     /*
+      * Send the browse packet to one or more interfaces...
+      */
 
-      StopBrowsing();
-      Browsing = 0;
-      return;
+      if (strcmp(b->iface, "*") == 0)
+      {
+       /*
+        * Send to all local interfaces...
+	*/
+
+        NetIFUpdate();
+
+        for (iface = NetIFList; iface != NULL; iface = iface->next)
+	{
+	 /*
+	  * Only send to local interfaces...
+	  */
+
+	  if (!iface->is_local)
+	    continue;
+
+	  snprintf(packet, sizeof(packet), "%x %x ipp://%s/%s/%s \"%s\" \"%s\" \"%s\"\n",
+        	   p->type | CUPS_PRINTER_REMOTE, p->state, iface->hostname,
+		   (p->type & CUPS_PRINTER_CLASS) ? "classes" : "printers",
+		   p->name, p->location, p->info, p->make_model);
+
+	  bytes = strlen(packet);
+
+	  LogMessage(L_DEBUG2, "SendBrowseList: (%d bytes to \"%s\") %s", bytes,
+        	     iface->name, packet);
+
+          if (iface->broadcast.addr.sa_family == AF_INET)
+	  {
+            iface->broadcast.ipv4.sin_port = htons(BrowsePort);
+
+	    sendto(BrowseSocket, packet, bytes, 0,
+		   (struct sockaddr *)&(iface->broadcast),
+		   sizeof(struct sockaddr_in));
+          }
+	  else
+	  {
+            iface->broadcast.ipv6.sin6_port = htons(BrowsePort);
+
+	    sendto(BrowseSocket, packet, bytes, 0,
+		   (struct sockaddr *)&(iface->broadcast),
+		   sizeof(struct sockaddr_in6));
+          }
+        }
+      }
+      else if ((iface = NetIFFind(b->iface)) != NULL)
+      {
+       /*
+        * Send to the named interface...
+	*/
+
+	snprintf(packet, sizeof(packet), "%x %x ipp://%s/%s/%s \"%s\" \"%s\" \"%s\"\n",
+        	 p->type | CUPS_PRINTER_REMOTE, p->state, iface->hostname,
+		 (p->type & CUPS_PRINTER_CLASS) ? "classes" : "printers",
+		 p->name, p->location, p->info, p->make_model);
+
+	bytes = strlen(packet);
+
+	LogMessage(L_DEBUG2, "SendBrowseList: (%d bytes to \"%s\") %s", bytes,
+        	   iface->name, packet);
+
+        if (iface->broadcast.addr.sa_family == AF_INET)
+	{
+          iface->broadcast.ipv4.sin_port = htons(BrowsePort);
+
+	  sendto(BrowseSocket, packet, bytes, 0,
+		 (struct sockaddr *)&(iface->broadcast),
+		 sizeof(struct sockaddr_in));
+        }
+	else
+	{
+          iface->broadcast.ipv6.sin6_port = htons(BrowsePort);
+
+	  sendto(BrowseSocket, packet, bytes, 0,
+		 (struct sockaddr *)&(iface->broadcast),
+		 sizeof(struct sockaddr_in6));
+        }
+      }
+    }
+    else
+    {
+     /*
+      * Send the browse packet to the indicated address using
+      * the default server name...
+      */
+
+      snprintf(packet, sizeof(packet), "%x %x %s \"%s\" \"%s\" \"%s\"\n",
+               p->type | CUPS_PRINTER_REMOTE, p->state, p->uri,
+	       p->location, p->info, p->make_model);
+
+      bytes = strlen(packet);
+      LogMessage(L_DEBUG2, "SendBrowseList: (%d bytes) %s", bytes, packet);
+
+      if (sendto(BrowseSocket, packet, bytes, 0,
+		 (struct sockaddr *)&(b->to),
+		 b->to.addr.sa_family == AF_INET ?
+		     sizeof(struct sockaddr_in) :
+		     sizeof(struct sockaddr_in6)) <= 0)
+      {
+       /*
+        * Unable to send browse packet, so remove this address from the
+	* list...
+	*/
+
+	LogMessage(L_ERROR, "SendBrowseList: sendto failed for browser %d - %s.",
+	           b - Browsers + 1, strerror(errno));
+
+        if (i > 1)
+	  memcpy(b, b + 1, (i - 1) * sizeof(dirsvc_addr_t));
+
+	b --;
+	NumBrowsers --;
+      }
     }
 }
 
@@ -917,6 +1020,7 @@ UpdateCUPSBrowse(void)
 		location[IPP_MAX_NAME],	/* Location string */
 		make_model[IPP_MAX_NAME];/* Make and model string */
   int		port;			/* Port portion of URI */
+  cups_netif_t	*iface;			/* Network interface */
 
 
  /*
@@ -1124,8 +1228,18 @@ UpdateCUPSBrowse(void)
 
   DEBUG_printf(("host=\"%s\", ServerName=\"%s\"\n", host, ServerName));
 
+ /*
+  * Check for packets from the local server...
+  */
+
   if (strcasecmp(host, ServerName) == 0)
     return;
+
+  NetIFUpdate();
+
+  for (iface = NetIFList; iface != NULL; iface = iface->next)
+    if (strcasecmp(host, iface->hostname) == 0)
+      return;
 
  /*
   * Do relaying...
@@ -1725,5 +1839,5 @@ UpdateSLPBrowse(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.73.2.10 2002/02/12 19:23:11 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.73.2.11 2002/03/27 22:10:23 mike Exp $".
  */
