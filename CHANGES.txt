@@ -42,6 +42,8 @@ CHANGES IN CUPS V1.1.6
 	  uses the resolved MIME type instead.
 	- The client.conf parsing code now removes trailing
 	  whitespace.
+	- The MaxJobs directive was being treated as a boolean
+	  instead of an integer.
 
 
 CHANGES IN CUPS V1.1.5-2
