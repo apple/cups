@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.125 2001/04/30 15:34:05 mike Exp $"
+ * "$Id: job.c,v 1.126 2001/04/30 18:23:01 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -1689,37 +1689,32 @@ UpdateJob(job_t *job)		/* I - Job to check */
     * Figure out the logging level...
     */
 
-    if (strncmp(buffer, "ERROR:", 6) == 0)
-    {
-      loglevel = L_ERROR;
-      message  = buffer + 6;
-    }
     if (strncmp(buffer, "EMERG:", 6) == 0)
     {
       loglevel = L_EMERG;
       message  = buffer + 6;
     }
-    if (strncmp(buffer, "ALERT:", 6) == 0)
+    else if (strncmp(buffer, "ALERT:", 6) == 0)
     {
       loglevel = L_ALERT;
       message  = buffer + 6;
     }
-    if (strncmp(buffer, "CRIT:", 5) == 0)
+    else if (strncmp(buffer, "CRIT:", 5) == 0)
     {
       loglevel = L_CRIT;
       message  = buffer + 5;
     }
-    if (strncmp(buffer, "ERROR:", 6) == 0)
+    else if (strncmp(buffer, "ERROR:", 6) == 0)
     {
       loglevel = L_ERROR;
       message  = buffer + 6;
     }
-    else if (strncmp(buffer, "WARNING:", 8) == 0)
+    else else if (strncmp(buffer, "WARNING:", 8) == 0)
     {
       loglevel = L_WARN;
       message  = buffer + 8;
     }
-    if (strncmp(buffer, "NOTICE:", 6) == 0)
+    else if (strncmp(buffer, "NOTICE:", 6) == 0)
     {
       loglevel = L_NOTICE;
       message  = buffer + 6;
@@ -2867,5 +2862,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.125 2001/04/30 15:34:05 mike Exp $".
+ * End of "$Id: job.c,v 1.126 2001/04/30 18:23:01 mike Exp $".
  */
