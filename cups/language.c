@@ -1,5 +1,5 @@
 /*
- * "$Id: language.c,v 1.20.2.12 2003/01/24 20:45:13 mike Exp $"
+ * "$Id: language.c,v 1.20.2.13 2003/02/04 05:36:15 mike Exp $"
  *
  *   I18N/language support for the Common UNIX Printing System (CUPS).
  *
@@ -43,6 +43,11 @@
 #include <ctype.h>
 #include "string.h"
 #include "language.h"
+
+#if defined(__APPLE__)
+#  include <CoreFoundation/CoreFoundation.h>
+static const char *appleLangDefault(void);
+#endif /* __APPLE__ */
 
 
 /*
@@ -217,6 +222,25 @@ cupsLangGet(const char *language) /* I - Language or locale */
   char		*text;		/* Message text */
   cups_lang_t	*lang;		/* Current language... */
 
+
+#ifdef __APPLE__
+ /*
+  * Apple's setlocale doesn't give us the user's localization 
+  * preference so we have to look it up this way...
+  */
+
+  if (language == NULL)
+  {
+    language = appleLangDefault();
+    setlocale(LC_ALL, language);
+  }
+#elif defined(LC_MESSAGES)
+  if (language == NULL)
+    language = setlocale(LC_MESSAGES, "");
+#else
+  if (language == NULL)
+    language = setlocale(LC_ALL, "");
+#endif /* __APPLE__ */
 
  /*
   * Convert the language string passed in to a locale string. "C" is the
@@ -479,6 +503,127 @@ cupsLangGet(const char *language) /* I - Language or locale */
 }
 
 
+#ifdef __APPLE__
 /*
- * End of "$Id: language.c,v 1.20.2.12 2003/01/24 20:45:13 mike Exp $".
+ * Code & data to translate OSX's language names to their ISO 639-1 locale.
+ *
+ * In Radar bug #2563420 there's a request to have CoreFoundation export a
+ * function to do this mapping. If this function gets implemented we should
+ * use it.
+ */
+
+typedef struct
+{
+  const char * const name;			/* Language name */
+  const char * const locale;			/* Locale name */
+} apple_name_locale_t;
+
+static const apple_name_locale_t apple_name_locale[] =
+{
+  { "English"    , "en_US" },{ "French"     , "fr" },  { "German"      , "de" },  { "Italian"   , "it" },  
+  { "Dutch"      , "nl" },   { "Swedish"    , "sv" },  { "Spanish"     , "es" },  { "Danish"    , "da" },  
+  { "Portuguese" , "pt" },   { "Norwegian"  , "no" },  { "Hebrew"      , "he" },  { "Japanese"  , "ja" },  
+  { "Arabic"     , "ar" },   { "Finnish"    , "fi" },  { "Greek"       , "el" },  { "Icelandic" , "is" },  
+  { "Maltese"    , "mt" },   { "Turkish"    , "tr" },  { "Croatian"    , "hr" },  { "Chinese"   , "zh" },  
+  { "Urdu"       , "ur" },   { "Hindi"      , "hi" },  { "Thai"        , "th" },  { "Korean"    , "ko" },  
+  { "Lithuanian" , "lt" },   { "Polish"     , "pl" },  { "Hungarian"   , "hu" },  { "Estonian"  , "et" },  
+  { "Latvian"    , "lv" },   { "Sami"       , "se" },  { "Faroese"     , "fo" },  { "Farsi"     , "fa" },  
+  { "Russian"    , "ru" },   { "Chinese"    , "zh" },  { "Dutch"       , "nl" },  { "Irish"     , "ga" },  
+  { "Albanian"   , "sq" },   { "Romanian"   , "ro" },  { "Czech"       , "cs" },  { "Slovak"    , "sk" },  
+  { "Slovenian"  , "sl" },   { "Yiddish"    , "yi" },  { "Serbian"     , "sr" },  { "Macedonian", "mk" },  
+  { "Bulgarian"  , "bg" },   { "Ukrainian"  , "uk" },  { "Byelorussian", "be" },  { "Uzbek"     , "uz" },  
+  { "Kazakh"     , "kk" },   { "Azerbaijani", "az" },  { "Azerbaijani" , "az" },  { "Armenian"  , "hy" },  
+  { "Georgian"   , "ka" },   { "Moldavian"  , "mo" },  { "Kirghiz"     , "ky" },  { "Tajiki"    , "tg" },  
+  { "Turkmen"    , "tk" },   { "Mongolian"  , "mn" },  { "Mongolian"   , "mn" },  { "Pashto"    , "ps" },  
+  { "Kurdish"    , "ku" },   { "Kashmiri"   , "ks" },  { "Sindhi"      , "sd" },  { "Tibetan"   , "bo" },  
+  { "Nepali"     , "ne" },   { "Sanskrit"   , "sa" },  { "Marathi"     , "mr" },  { "Bengali"   , "bn" },  
+  { "Assamese"   , "as" },   { "Gujarati"   , "gu" },  { "Punjabi"     , "pa" },  { "Oriya"     , "or" },  
+  { "Malayalam"  , "ml" },   { "Kannada"    , "kn" },  { "Tamil"       , "ta" },  { "Telugu"    , "te" },  
+  { "Sinhalese"  , "si" },   { "Burmese"    , "my" },  { "Khmer"       , "km" },  { "Lao"       , "lo" },  
+  { "Vietnamese" , "vi" },   { "Indonesian" , "id" },  { "Tagalog"     , "tl" },  { "Malay"     , "ms" },  
+  { "Malay"      , "ms" },   { "Amharic"    , "am" },  { "Tigrinya"    , "ti" },  { "Oromo"     , "om" },  
+  { "Somali"     , "so" },   { "Swahili"    , "sw" },  { "Kinyarwanda" , "rw" },  { "Rundi"     , "rn" },  
+  { "Nyanja"     , ""   },   { "Malagasy"   , "mg" },  { "Esperanto"   , "eo" },  { "Welsh"     , "cy" },  
+  { "Basque"     , "eu" },   { "Catalan"    , "ca" },  { "Latin"       , "la" },  { "Quechua"   , "qu" },  
+  { "Guarani"    , "gn" },   { "Aymara"     , "ay" },  { "Tatar"       , "tt" },  { "Uighur"    , "ug" },  
+  { "Dzongkha"   , "dz" },   { "Javanese"   , "jv" },  { "Sundanese"   , "su" },  { "Galician"  , "gl" },  
+  { "Afrikaans"  , "af" },   { "Breton"     , "br" },  { "Inuktitut"   , "iu" },  { "Scottish"  , "gd" },  
+  { "Manx"       , "gv" },   { "Irish"      , "ga" },  { "Tongan"      , "to" },  { "Greek"     , "el" },  
+  { "Greenlandic", "kl" },   { "Azerbaijani", "az" }
+};
+
+
+/*
+ * 'appleLangDefault()' - Get the default locale string.
+ */
+
+static const char *				/* O - Locale string */
+appleLangDefault(void)
+{
+  int			i;			/* Looping var */
+  CFPropertyListRef 	localizationList;	/* List of localization data */
+  CFStringRef		localizationName;	/* Current name */
+  char			buff[256];		/* Temporary buffer */
+  static const char	*language = NULL;	/* Cached language */
+
+
+ /*
+  * Only do the lookup and translation the first time.
+  */
+
+  if (language == NULL)
+  {
+    localizationList = CFPreferencesCopyAppValue(CFSTR("AppleLanguages"),
+                                                 kCFPreferencesCurrentApplication);
+
+    if (localizationList != NULL &&
+        CFGetTypeID(localizationList) == CFArrayGetTypeID())
+    {
+      localizationName = CFArrayGetValueAtIndex(localizationList, 0);
+
+      if (localizationName != NULL &&
+          CFGetTypeID(localizationName) == CFStringGetTypeID())
+      {
+	CFIndex length = CFStringGetLength(localizationName);
+
+	if (length <= sizeof(buff) &&
+	    CFStringGetCString(localizationName, buff, sizeof(buff), kCFStringEncodingASCII))
+	{
+	  buff[sizeof(buff) - 1] = '\0';
+
+	  for (i = 0;
+	       i < sizeof(apple_name_locale) / sizeof(apple_name_locale[0]);
+	       i++)
+	  {
+	    if (strcasecmp(buff, apple_name_locale[i].name) == 0)
+	    {
+	      language = nameToLocaleTable[i].locale;
+	      break;
+	    }
+	  }
+	}
+      }
+
+      CFRelease(localizationList);
+    }
+  
+   /*
+    * If we didn't find the language, default to en_US...
+    */
+
+    if (language == NULL)
+      language = apple_name_locale[0].locale;
+  }
+
+ /*
+  * Return the cached locale...
+  */
+
+  return (language);
+}
+#endif /* __APPLE__ */
+
+
+/*
+ * End of "$Id: language.c,v 1.20.2.13 2003/02/04 05:36:15 mike Exp $".
  */
