@@ -1,5 +1,5 @@
 /*
- * "$Id: lp.c,v 1.29.2.7 2002/08/12 18:53:36 mike Exp $"
+ * "$Id: lp.c,v 1.29.2.8 2002/09/15 12:02:44 mike Exp $"
  *
  *   "lp" command for the Common UNIX Printing System (CUPS).
  *
@@ -253,12 +253,6 @@ main(int  argc,		/* I - Number of command-line arguments */
               }
 
 	      num_copies = atoi(argv[i]);
-	    }
-
-	    if (num_copies < 1 || num_copies > 100)
-	    {
-	      fputs("lp: Number copies must be between 1 and 100.\n", stderr);
-	      return (1);
 	    }
 
             sprintf(buffer, "%d", num_copies);
@@ -655,5 +649,5 @@ sighandler(int s)	/* I - Signal number */
 
 
 /*
- * End of "$Id: lp.c,v 1.29.2.7 2002/08/12 18:53:36 mike Exp $".
+ * End of "$Id: lp.c,v 1.29.2.8 2002/09/15 12:02:44 mike Exp $".
  */

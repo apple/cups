@@ -1,5 +1,5 @@
 /*
- * "$Id: lpr.c,v 1.20.2.4 2002/04/22 21:10:25 mike Exp $"
+ * "$Id: lpr.c,v 1.20.2.5 2002/09/15 12:02:43 mike Exp $"
  *
  *   "lpr" command for the Common UNIX Printing System (CUPS).
  *
@@ -228,12 +228,6 @@ main(int  argc,		/* I - Number of command-line arguments */
 	      num_copies = atoi(argv[i]);
 	    }
 
-	    if (num_copies < 1 || num_copies > 100)
-	    {
-	      fputs("lpr: Number copies must be between 1 and 100.\n", stderr);
-	      return (1);
-	    }
-
             sprintf(buffer, "%d", num_copies);
             num_options = cupsAddOption("copies", buffer, num_options, &options);
 	    break;
@@ -426,5 +420,5 @@ sighandler(int s)	/* I - Signal number */
 
 
 /*
- * End of "$Id: lpr.c,v 1.20.2.4 2002/04/22 21:10:25 mike Exp $".
+ * End of "$Id: lpr.c,v 1.20.2.5 2002/09/15 12:02:43 mike Exp $".
  */
