@@ -1,5 +1,5 @@
 /*
- * "$Id: ieee1394.c,v 1.1 2002/05/04 16:58:23 mike Exp $"
+ * "$Id: ieee1394.c,v 1.1.2.1 2002/05/24 18:15:46 mike Exp $"
  *
  *   AppSocket backend for the Common UNIX Printing System (CUPS).
  *
@@ -259,5 +259,5 @@ list_devices(void)
 
 
 /*
- * End of "$Id: ieee1394.c,v 1.1 2002/05/04 16:58:23 mike Exp $".
+ * End of "$Id: ieee1394.c,v 1.1.2.1 2002/05/24 18:15:46 mike Exp $".
  */

@@ -1,0 +1,35 @@
+Easy Software Products
+44141 Airport View Drive
+Suite 204
+Hollywood, Maryland 20636
++1.301.373.9600
+March 8, 2002
+
+
+Subject: EPSON Firewire Printer Driver for Linux
+
+Currently, no Firewire printer support exists for Linux.  Since
+the latest EPSON printer products depend on the Firewire
+interface to print at full speed, a solution is needed to
+support customers using Linux as their server platform.
+
+The Linux Firewire subsystem provides a user-mode driver
+interface that allows driver programs to access Firewire
+devices.  Easy Software Products will utilize this interface to
+develop a "backend" program for the Common UNIX Printing System
+that will allow users to print to EPSON printers using the
+Firewire interface.
+
+After examining the Linux interface, we estimate that it will
+require approximately 30 hours of development time to write,
+test, and document the Firewire backend, for a total cost of
+$3,000. The new backend will become a standard part of the CUPS
+software distribution and will be included with at least the
+following Linux distributions:
+
+    - Caldera Linux
+    - Mandrake Linux
+    - Red Hat Linux
+    - SuSE Linux
+
+ESP will provide EPSON with binaries for Red Hat Linux 7.2.
