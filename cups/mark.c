@@ -1,5 +1,5 @@
 /*
- * "$Id: mark.c,v 1.12 1999/06/03 13:20:42 mike Exp $"
+ * "$Id: mark.c,v 1.13 1999/07/12 14:02:39 mike Exp $"
  *
  *   Option marking routines for the Common UNIX Printing System (CUPS).
  *
@@ -342,34 +342,46 @@ ppdMarkOption(ppd_file_t *ppd,		/* I - PPD file record */
 
   for (i = o->num_choices, c = o->choices; i > 0; i --, c ++)
     if (strcmp(c->choice, choice) == 0)
-      c->marked = 1;
-    else if (o->ui != PPD_UI_PICKMANY)
-      c->marked = 0;
+      break;
 
-  if (strcmp(option, "PageSize") == 0 || strcmp(option, "PageRegion") == 0)
+  if (i)
   {
    /*
-    * Mark current page size...
+    * Option found; mark it and then handle unmarking any other options.
     */
 
-    for (i = 0; i < ppd->num_sizes; i ++)
-      ppd->sizes[i].marked = strcmp(ppd->sizes[i].name, choice) == 0;
+    c->marked = 1;
 
-   /*
-    * Unmark the current PageSize or PageRegion setting, as appropriate...
-    */
+    if (o->ui != PPD_UI_PICKMANY)
+      for (i = o->num_choices, c = o->choices; i > 0; i --, c ++)
+	if (strcmp(c->choice, choice) != 0)
+          c->marked = 0;
 
-    if (strcmp(option, "PageSize") == 0)
+    if (strcmp(option, "PageSize") == 0 || strcmp(option, "PageRegion") == 0)
     {
-      o = ppdFindOption(ppd, "PageRegion");
-      for (i = 0; i < o->num_choices; i ++)
-        o->choices[i].marked = 0;
-    }
-    else
-    {
-      o = ppdFindOption(ppd, "PageSize");
-      for (i = 0; i < o->num_choices; i ++)
-        o->choices[i].marked = 0;
+     /*
+      * Mark current page size...
+      */
+
+      for (i = 0; i < ppd->num_sizes; i ++)
+	ppd->sizes[i].marked = strcmp(ppd->sizes[i].name, choice) == 0;
+
+     /*
+      * Unmark the current PageSize or PageRegion setting, as appropriate...
+      */
+
+      if (strcmp(option, "PageSize") == 0)
+      {
+	o = ppdFindOption(ppd, "PageRegion");
+	for (i = 0; i < o->num_choices; i ++)
+          o->choices[i].marked = 0;
+      }
+      else
+      {
+	o = ppdFindOption(ppd, "PageSize");
+	for (i = 0; i < o->num_choices; i ++)
+          o->choices[i].marked = 0;
+      }
     }
   }
 
@@ -424,5 +436,5 @@ ppd_default(ppd_option_t *o)	/* I - Option to default */
 
 
 /*
- * End of "$Id: mark.c,v 1.12 1999/06/03 13:20:42 mike Exp $".
+ * End of "$Id: mark.c,v 1.13 1999/07/12 14:02:39 mike Exp $".
  */

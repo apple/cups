@@ -1,5 +1,5 @@
 /*
- * "$Id: page.c,v 1.6 1999/04/09 14:21:24 mike Exp $"
+ * "$Id: page.c,v 1.7 1999/07/12 14:02:40 mike Exp $"
  *
  *   Page size functions for the Common UNIX Printing System (CUPS).
  *
@@ -57,9 +57,19 @@ ppdPageSize(ppd_file_t *ppd,	/* I - PPD file record */
 
   if (name != NULL)
   {
-    if (strncmp(name, "Custom.", 7) == 0 &&
-        strcmp(ppd->sizes[0].name, "Custom") == 0)
+    if (strncmp(name, "Custom.", 7) == 0 && ppd->variable_sizes)
     {
+     /*
+      * Find the custom page size...
+      */
+
+      for (i = 0; i < ppd->num_sizes; i ++)
+	if (strcmp("Custom", ppd->sizes[i].name) == 0)
+          break;
+
+      if (i == ppd->num_sizes)
+        return (NULL);
+
      /*
       * Variable size; size name can be one of the following:
       *
@@ -75,42 +85,42 @@ ppdPageSize(ppd_file_t *ppd,	/* I - PPD file record */
 
       if (strcasecmp(units, "in") == 0)
       {
-        ppd->sizes[0].width  = w * 72.0;
-	ppd->sizes[0].length = l * 72.0;
-	ppd->sizes[0].left   = ppd->custom_margins[0];
-	ppd->sizes[0].bottom = ppd->custom_margins[1];
-	ppd->sizes[0].right  = w * 72.0 - ppd->custom_margins[2];
-	ppd->sizes[0].top    = l * 72.0 - ppd->custom_margins[3];
+        ppd->sizes[i].width  = w * 72.0;
+	ppd->sizes[i].length = l * 72.0;
+	ppd->sizes[i].left   = ppd->custom_margins[0];
+	ppd->sizes[i].bottom = ppd->custom_margins[1];
+	ppd->sizes[i].right  = w * 72.0 - ppd->custom_margins[2];
+	ppd->sizes[i].top    = l * 72.0 - ppd->custom_margins[3];
       }
       else if (strcasecmp(units, "cm") == 0)
       {
-        ppd->sizes[0].width  = w * 2.54 * 72.0;
-	ppd->sizes[0].length = l * 2.54 * 72.0;
-	ppd->sizes[0].left   = ppd->custom_margins[0];
-	ppd->sizes[0].bottom = ppd->custom_margins[1];
-	ppd->sizes[0].right  = w * 2.54 * 72.0 - ppd->custom_margins[2];
-	ppd->sizes[0].top    = l * 2.54 * 72.0 - ppd->custom_margins[3];
+        ppd->sizes[i].width  = w * 2.54 * 72.0;
+	ppd->sizes[i].length = l * 2.54 * 72.0;
+	ppd->sizes[i].left   = ppd->custom_margins[0];
+	ppd->sizes[i].bottom = ppd->custom_margins[1];
+	ppd->sizes[i].right  = w * 2.54 * 72.0 - ppd->custom_margins[2];
+	ppd->sizes[i].top    = l * 2.54 * 72.0 - ppd->custom_margins[3];
       }
       else if (strcasecmp(units, "mm") == 0)
       {
-        ppd->sizes[0].width  = w * 25.4 * 72.0;
-	ppd->sizes[0].length = l * 25.4 * 72.0;
-	ppd->sizes[0].left   = ppd->custom_margins[0];
-	ppd->sizes[0].bottom = ppd->custom_margins[1];
-	ppd->sizes[0].right  = w * 25.4 * 72.0 - ppd->custom_margins[2];
-	ppd->sizes[0].top    = l * 25.4 * 72.0 - ppd->custom_margins[3];
+        ppd->sizes[i].width  = w * 25.4 * 72.0;
+	ppd->sizes[i].length = l * 25.4 * 72.0;
+	ppd->sizes[i].left   = ppd->custom_margins[0];
+	ppd->sizes[i].bottom = ppd->custom_margins[1];
+	ppd->sizes[i].right  = w * 25.4 * 72.0 - ppd->custom_margins[2];
+	ppd->sizes[i].top    = l * 25.4 * 72.0 - ppd->custom_margins[3];
       }
       else
       {
-        ppd->sizes[0].width  = w;
-	ppd->sizes[0].length = l;
-	ppd->sizes[0].left   = ppd->custom_margins[0];
-	ppd->sizes[0].bottom = ppd->custom_margins[1];
-	ppd->sizes[0].right  = w - ppd->custom_margins[2];
-	ppd->sizes[0].top    = l - ppd->custom_margins[3];
+        ppd->sizes[i].width  = w;
+	ppd->sizes[i].length = l;
+	ppd->sizes[i].left   = ppd->custom_margins[0];
+	ppd->sizes[i].bottom = ppd->custom_margins[1];
+	ppd->sizes[i].right  = w - ppd->custom_margins[2];
+	ppd->sizes[i].top    = l - ppd->custom_margins[3];
       }
 
-      return (ppd->sizes);
+      return (ppd->sizes + i);
     }
     else
     {
@@ -175,5 +185,5 @@ ppdPageLength(ppd_file_t *ppd,	/* I - PPD file */
 
 
 /*
- * End of "$Id: page.c,v 1.6 1999/04/09 14:21:24 mike Exp $".
+ * End of "$Id: page.c,v 1.7 1999/07/12 14:02:40 mike Exp $".
  */
