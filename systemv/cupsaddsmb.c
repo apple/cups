@@ -1,5 +1,5 @@
 /*
- * "$Id: cupsaddsmb.c,v 1.3.2.4 2002/03/14 20:28:16 mike Exp $"
+ * "$Id: cupsaddsmb.c,v 1.3.2.5 2002/04/05 15:37:55 mike Exp $"
  *
  *   "cupsaddsmb" command for the Common UNIX Printing System (CUPS).
  *
@@ -294,8 +294,9 @@ export_dest(const char *dest)	/* I - Destination to export */
     return (5);
   }
 
-  snprintf(subcmd, sizeof(subcmd), "addprinter %s %s \"%s\" \"\"",
-	   dest, dest, dest);
+  snprintf(subcmd, sizeof(subcmd),
+	   "adddriver \"Windows 4.0\" \"%s:ADOBEPS4.DRV:%s.PPD:NULL:ADOBEPS4.HLP:PSMON.DLL:RAW:ADFONTS.MFM,DEFPRTR2.PPD,ICONLIB.DLL\"",
+	   dest, dest);
 
   if ((status = do_samba_command(command, subcmd)) != 0)
   {
@@ -304,9 +305,7 @@ export_dest(const char *dest)	/* I - Destination to export */
     return (5);
   }
 
-  snprintf(subcmd, sizeof(subcmd),
-	   "adddriver \"Windows 4.0\" \"%s:ADOBEPS4.DRV:%s.PPD:NULL:ADOBEPS4.HLP:PSMON.DLL:RAW:ADFONTS.MFM,DEFPRTR2.PPD,ICONLIB.DLL\"",
-	   dest, dest);
+  snprintf(subcmd, sizeof(subcmd), "setdriver %s %s", dest, dest);
 
   if ((status = do_samba_command(command, subcmd)) != 0)
   {
@@ -340,5 +339,5 @@ usage()
 
 
 /*
- * End of "$Id: cupsaddsmb.c,v 1.3.2.4 2002/03/14 20:28:16 mike Exp $".
+ * End of "$Id: cupsaddsmb.c,v 1.3.2.5 2002/04/05 15:37:55 mike Exp $".
  */

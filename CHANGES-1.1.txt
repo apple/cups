@@ -5,6 +5,8 @@ CHANGES IN CUPS V1.1.15
 
 	- Updated the CUPS license agreement for the new MacOS
 	  license exception.
+	- The cupsaddsmb program was updated to use the
+	  setdriver command instead of addprinter.
 	- Banner pages were not handled properly for implicit
 	  classes.
 	- When tunneling to a remote system using SSH, the
