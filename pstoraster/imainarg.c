@@ -22,7 +22,7 @@
   GNU software to build or run it.
 */
 
-/*$Id: imainarg.c,v 1.4 2000/03/08 23:15:13 mike Exp $ */
+/*$Id: imainarg.c,v 1.5 2000/05/23 12:19:48 mike Exp $ */
 /* Command line parsing and dispatching */
 #include "ctype_.h"
 #include "memory_.h"
@@ -84,7 +84,7 @@ extern int zflushpage(P1(os_ptr));
 private void
 fpputs(const char *str)
 {
-    fprintf(stdout, "%s\n", str);
+    fprintf(stderr, "%s\n", str);
 }
 #define puts(str) fpputs(str)
 
@@ -194,7 +194,7 @@ gs_main_init_with_args(gs_main_instance * minst, int argc, char *argv[])
 	switch (*arg) {
 	    case '-':
 		if (swproc(minst, arg, &args) < 0)
-		    fprintf(stdout,
+		    fprintf(stderr,
 			    "Unknown switch %s - ignoring\n", arg);
 		break;
 	    default:
@@ -245,7 +245,7 @@ swproc(gs_main_instance * minst, const char *arg, arg_list * pal)
 		const char *psarg = arg_next(pal);
 
 		if (psarg == 0) {
-		    fprintf(stdout, "Usage: gs ... -%c file.ps arg1 ... argn\n", sw);
+		    fprintf(stderr, "Usage: gs ... -%c file.ps arg1 ... argn\n", sw);
 		    arg_finit(pal);
 		    gs_exit(1);
 		}
@@ -279,7 +279,7 @@ swproc(gs_main_instance * minst, const char *arg, arg_list * pal)
 		if (sscanf((const char *)arg, "%u", &bsize) != 1 ||
 		    bsize <= 0 || bsize > MAX_BUFFERED_SIZE
 		    ) {
-		    fprintf(stdout, "-B must be followed by - or size between 1 and %u\n", MAX_BUFFERED_SIZE);
+		    fprintf(stderr, "-B must be followed by - or size between 1 and %u\n", MAX_BUFFERED_SIZE);
 		    gs_exit(1);
 		}
 		minst->run_buffer_size = bsize;
@@ -365,7 +365,7 @@ swproc(gs_main_instance * minst, const char *arg, arg_list * pal)
 
 		sscanf((const char *)arg, "%ld", &msize);
 		if (msize <= 0 || msize > max_long >> 10) {
-		    fprintf(stdout, "-K<numK> must have 1 <= numK <= %ld\n",
+		    fprintf(stderr, "-K<numK> must have 1 <= numK <= %ld\n",
 			    max_long >> 10);
 		    gs_exit(1);
 		}
@@ -613,7 +613,7 @@ run_buffered(gs_main_instance * minst, const char *arg)
     int code;
 
     if (in == 0) {
-	fprintf(stdout, "Unable to open %s for reading", arg);
+	fprintf(stderr, "Unable to open %s for reading", arg);
 	gs_exit(1);
     }
     gs_main_init2(minst);
@@ -730,9 +730,9 @@ print_help(gs_main_instance * minst)
 private void
 print_revision(void)
 {
-    fprintf(stdout, "%s ", gs_product);
+    fprintf(stderr, "%s ", gs_product);
     print_version();
-    fprintf(stdout, " (%d-%d-%d)\n%s\n",
+    fprintf(stderr, " (%d-%d-%d)\n%s\n",
 	    (int)(gs_revisiondate / 10000),
 	    (int)(gs_revisiondate / 100 % 100),
 	    (int)(gs_revisiondate % 100),
@@ -743,7 +743,7 @@ print_revision(void)
 private void
 print_version(void)
 {
-    fprintf(stdout, "%d.%02d",
+    fprintf(stderr, "%d.%02d",
 	    (int)(gs_revision / 100),
 	    (int)(gs_revision % 100));
 }
@@ -752,15 +752,15 @@ print_version(void)
 private void
 print_usage(void)
 {
-    fprintf(stdout, "%s", help_usage1);
-    fprintf(stdout, "%s", help_usage2);
+    fprintf(stderr, "%s", help_usage1);
+    fprintf(stderr, "%s", help_usage2);
 }
 
 /* Print the list of available devices. */
 private void
 print_devices(void)
 {
-    fprintf(stdout, "%s", help_devices);
+    fprintf(stderr, "%s", help_devices);
     {
 	int i;
 	int pos = 100;
@@ -771,35 +771,35 @@ print_devices(void)
 	    int len = strlen(dname);
 
 	    if (pos + 1 + len > 76)
-		fprintf(stdout, "\n  "), pos = 2;
-	    fprintf(stdout, " %s", dname);
+		fprintf(stderr, "\n  "), pos = 2;
+	    fprintf(stderr, " %s", dname);
 	    pos += 1 + len;
 	}
     }
-    fprintf(stdout, "\n");
+    fprintf(stderr, "\n");
 }
 
 /* Print the list of language emulators. */
 private void
 print_emulators(void)
 {
-    fprintf(stdout, "%s", help_emulators);
+    fprintf(stderr, "%s", help_emulators);
     {
 	const ref *pes;
 
 	for (pes = gs_emulator_name_array;
 	     pes->value.const_bytes != 0; pes++
 	    )
-	    fprintf(stdout, " %s", pes->value.const_bytes);
+	    fprintf(stderr, " %s", pes->value.const_bytes);
     }
-    fprintf(stdout, "\n");
+    fprintf(stderr, "\n");
 }
 
 /* Print the search paths. */
 private void
 print_paths(gs_main_instance * minst)
 {
-    fprintf(stdout, "%s", help_paths);
+    fprintf(stderr, "%s", help_paths);
     gs_main_set_lib_paths(minst);
     {
 	uint count = r_size(&minst->lib_path.list);
@@ -816,8 +816,8 @@ print_paths(gs_main_instance * minst)
 	    const char *sepr = (i == count - 1 ? "" : fsepr);
 
 	    if (1 + pos + strlen(sepr) + len > 76)
-		fprintf(stdout, "\n  "), pos = 2;
-	    fprintf(stdout, " ");
+		fprintf(stderr, "\n  "), pos = 2;
+	    fprintf(stderr, " ");
 	    /*
 	     * This is really ugly, but it's necessary.
 	     * We wish we could just do:
@@ -828,20 +828,20 @@ print_paths(gs_main_instance * minst)
 		uint j;
 
 		for (j = len; j; j--)
-		    fprintf(stdout, "%c", *p++);
+		    fprintf(stderr, "%c", *p++);
 	    }
-	    fprintf(stdout, sepr);
+	    fprintf(stderr, sepr);
 	    pos += 1 + len + strlen(sepr);
 	}
     }
-    fprintf(stdout, "\n");
+    fprintf(stderr, "\n");
 }
 
 /* Print the help trailer. */
 private void
 print_help_trailer(void)
 {
-    fprintf(stdout, help_trailer, gs_doc_directory,
+    fprintf(stderr, help_trailer, gs_doc_directory,
 	    gp_file_name_concat_string(gs_doc_directory,
 				       strlen(gs_doc_directory),
 				       "Use.htm", 7),

@@ -24,7 +24,7 @@
   GNU software to build or run it.
 */
 
-/*$Id: gsmisc.c,v 1.4 2000/03/08 23:14:44 mike Exp $ */
+/*$Id: gsmisc.c,v 1.5 2000/05/23 12:19:48 mike Exp $ */
 /* Miscellaneous utilities for Ghostscript library */
 #include "ctype_.h"
 #include "malloc_.h"
@@ -688,9 +688,9 @@ double
 gs_sqrt(double x, const char *file, int line)
 {
     if (gs_debug_c('~')) {
-	fprintf(stdout, "[~]sqrt(%g) at %s:%d\n",
+	fprintf(stderr, "[~]sqrt(%g) at %s:%d\n",
 		x, (const char *)file, line);
-	fflush(stdout);
+	fflush(stderr);
     }
     return sqrt(x);
 }

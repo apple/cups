@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.23 2000/05/20 15:47:46 mike Exp $"
+# "$Id: Makefile,v 1.24 2000/05/23 12:19:48 mike Exp $"
 #
 #   GNU Ghostscript makefile for the Common UNIX Printing System (CUPS).
 #
@@ -29,6 +29,7 @@
 #
 
 include ../Makedefs
+OPTIONS	=	-DDEBUG
 
 #
 # Object files...
@@ -431,5 +432,5 @@ pstoraster:	pstoraster.o libgs.a ../Makedefs ../cups/$(LIBCUPS)
 pstoraster.o:	arch.h ../config.h ../Makedefs
 
 #
-# End of "$Id: Makefile,v 1.23 2000/05/20 15:47:46 mike Exp $".
+# End of "$Id: Makefile,v 1.24 2000/05/23 12:19:48 mike Exp $".
 #

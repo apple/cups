@@ -22,7 +22,7 @@
   GNU software to build or run it.
 */
 
-/*$Id: zfileio.c,v 1.3 2000/03/08 23:15:35 mike Exp $ */
+/*$Id: zfileio.c,v 1.4 2000/05/23 12:19:49 mike Exp $ */
 /* File I/O operators */
 #include "ghost.h"
 #include "gp.h"
@@ -514,7 +514,7 @@ int
 zflush(register os_ptr op)
 {
     stream *s;
-    int code = zget_stdout(&s);
+    int code = zget_stderr(&s);
 
     if (code < 0)
 	return code;
@@ -565,7 +565,7 @@ zprint(register os_ptr op)
     int code;
 
     check_read_type(*op, t_string);
-    code = zget_stdout(&s);
+    code = zget_stderr(&s);
     if (code < 0)
 	return code;
     status = write_string(op, s);

@@ -22,7 +22,7 @@
   GNU software to build or run it.
 */
 
-/*$Id: gsargs.c,v 1.1 2000/03/08 23:14:33 mike Exp $ */
+/*$Id: gsargs.c,v 1.2 2000/05/23 12:19:48 mike Exp $ */
 /* Command line argument list management */
 #include "ctype_.h"
 #include "stdio_.h"
@@ -114,7 +114,7 @@ arg_next(arg_list * pal)
 	if (c == endc) {
 	    if (in_quote) {
 		cstr[i] = 0;
-		fprintf(stdout, "Unterminated quote in @-file: %s\n", cstr);
+		fprintf(stderr, "Unterminated quote in @-file: %s\n", cstr);
 		gs_exit(1);
 	    }
 	    if (i == 0) {
@@ -165,7 +165,7 @@ arg_next(arg_list * pal)
 	    /* This is different from the Unix shells. */
 	    if (i == arg_str_max - 1) {
 		cstr[i] = 0;
-		fprintf(stdout, "Command too long: %s\n", cstr);
+		fprintf(stderr, "Command too long: %s\n", cstr);
 		gs_exit(1);
 	    }
 	    cstr[i++] = '\\';
@@ -175,7 +175,7 @@ arg_next(arg_list * pal)
 	/* c will become part of the argument */
 	if (i == arg_str_max - 1) {
 	    cstr[i] = 0;
-	    fprintf(stdout, "Command too long: %s\n", cstr);
+	    fprintf(stderr, "Command too long: %s\n", cstr);
 	    gs_exit(1);
 	}
 	/* If input is coming from an @-file, allow quotes */
@@ -198,7 +198,7 @@ arg_next(arg_list * pal)
 	result++;		/* skip @ */
 	f = (*pal->arg_fopen) (result, pal->fopen_data);
 	if (f == NULL) {
-	    fprintf(stdout, "Unable to open command line file %s\n", result);
+	    fprintf(stderr, "Unable to open command line file %s\n", result);
 	    gs_exit(1);
 	}
 	pal->depth++;
