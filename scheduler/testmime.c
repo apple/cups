@@ -1,5 +1,5 @@
 /*
- * "$Id: testmime.c,v 1.4.2.4 2003/03/30 21:49:23 mike Exp $"
+ * "$Id: testmime.c,v 1.4.2.5 2003/05/23 19:53:11 mike Exp $"
  *
  *   MIME test program for the Common UNIX Printing System (CUPS).
  *
@@ -52,6 +52,7 @@ main(int  argc,				/* I - Number of command-line args */
      char *argv[])			/* I - Command-line arguments */
 {
   int		i;			/* Looping var */
+  const char	*filter_path;		/* Filter path */
   char		super[MIME_MAX_SUPER],	/* Super-type name */
 		type[MIME_MAX_TYPE];	/* Type name */
   int		compression;		/* Compression of file */
@@ -63,9 +64,10 @@ main(int  argc,				/* I - Number of command-line args */
   int		num_filters;		/* Number of filters for the file */
 
 
-  mime = NULL;
-  src  = NULL;
-  dst  = NULL;
+  mime        = NULL;
+  src         = NULL;
+  dst         = NULL;
+  filter_path = "../filter";
 
   for (i = 1; i < argc; i ++)
     if (strcmp(argv[i], "-d") == 0)
@@ -73,12 +75,19 @@ main(int  argc,				/* I - Number of command-line args */
       i ++;
 
       if (i < argc)
-        mime = mimeLoad(argv[i], "../filter");
+        mime = mimeLoad(argv[i], filter_path);
+    }
+    else if (strcmp(argv[i], "-f") == 0)
+    {
+      i ++;
+
+      if (i < argc)
+        filter_path = argv[i];
     }
     else if (src == NULL)
     {
       if (!mime)
-	mime = mimeLoad("../conf", "../filter");
+	mime = mimeLoad("../conf", filter_path);
 
       src = mimeFileType(mime, argv[i], &compression);
 
@@ -118,7 +127,7 @@ main(int  argc,				/* I - Number of command-line args */
     }
 
   if (!mime)
-    mime = mimeLoad("../conf", "../filter");
+    mime = mimeLoad("../conf", filter_path);
 
   if (src == NULL)
   {
@@ -234,5 +243,5 @@ print_rules(mime_magic_t *rules)	/* I - Rules to print */
 
 
 /*
- * End of "$Id: testmime.c,v 1.4.2.4 2003/03/30 21:49:23 mike Exp $".
+ * End of "$Id: testmime.c,v 1.4.2.5 2003/05/23 19:53:11 mike Exp $".
  */
