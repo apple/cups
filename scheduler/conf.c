@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.74 2001/02/21 21:26:15 mike Exp $"
+ * "$Id: conf.c,v 1.75 2001/03/12 19:26:49 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -1593,20 +1593,15 @@ get_address(char               *value,		/* I - Value string */
 
   if (hostname[0] != '\0')
   {
-    if (isdigit(hostname[0]))
-      address->sin_addr.s_addr = inet_addr(hostname);
-    else
+    if ((host = gethostbyname(hostname)) == NULL)
     {
-      if ((host = gethostbyname(hostname)) == NULL)
-      {
-        LogMessage(L_ERROR, "gethostbyname(\"%s\") failed - %s!", hostname,
-                   strerror(errno));
-        return (0);
-      }
-
-      memcpy(&(address->sin_addr), host->h_addr, host->h_length);
-      address->sin_port = htons(defport);
+      LogMessage(L_ERROR, "gethostbyname(\"%s\") failed - %s!", hostname,
+                 strerror(errno));
+      return (0);
     }
+
+    memcpy(&(address->sin_addr), host->h_addr, host->h_length);
+    address->sin_port = htons(defport);
   }
 
   if (portname[0] != '\0')
@@ -1631,5 +1626,5 @@ get_address(char               *value,		/* I - Value string */
 
 
 /*
- * End of "$Id: conf.c,v 1.74 2001/02/21 21:26:15 mike Exp $".
+ * End of "$Id: conf.c,v 1.75 2001/03/12 19:26:49 mike Exp $".
  */
