@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp-var.c,v 1.45 2004/02/25 21:56:58 mike Exp $"
+ * "$Id: ipp-var.c,v 1.46 2004/03/24 21:05:21 mike Exp $"
  *
  *   IPP variable routines for the Common UNIX Printing System (CUPS).
  *
@@ -454,7 +454,7 @@ ippSetCGIVars(ipp_t      *response,	/* I - Response data to be copied... */
 
       if (!strcmp(name, "printer_uri_supported"))
       {
-	ippRewriteURL(attr->values[i].string.text, value, sizeof(value),
+	ippRewriteURL(attr->values[0].string.text, value, sizeof(value),
 	              "/admin/");
 
         cgiSetArray("admin_uri", element, value);
@@ -571,5 +571,5 @@ ippSetCGIVars(ipp_t      *response,	/* I - Response data to be copied... */
 
 
 /*
- * End of "$Id: ipp-var.c,v 1.45 2004/02/25 21:56:58 mike Exp $".
+ * End of "$Id: ipp-var.c,v 1.46 2004/03/24 21:05:21 mike Exp $".
  */
