@@ -3,6 +3,7 @@ CHANGES.txt - 01/26/2002
 
 CHANGES IN CUPS V1.1.13
 
+	- Added Simplified Chinese message catalog.
 	- Added PAM support for IRIX.
 	- The cupsGetPPD() function didn't remove the @server
 	  portion of the printer name, and since it would
