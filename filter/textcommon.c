@@ -1,5 +1,5 @@
 /*
- * "$Id: textcommon.c,v 1.17 2001/04/19 14:52:18 mike Exp $"
+ * "$Id: textcommon.c,v 1.18 2001/09/19 20:18:33 mike Exp $"
  *
  *   Common text filter routines for the Common UNIX Printing System (CUPS).
  *
@@ -970,10 +970,19 @@ TextMain(const char *name,	/* I - Name of filter */
 
             if (PrettyPrint)
               Page[line][i].attr = attr;
+	    else if (ch == ' ' && Page[line][i].ch)
+	      ch = Page[line][i].ch;
             else if (ch == Page[line][i].ch)
               Page[line][i].attr |= ATTR_BOLD;
             else if (Page[line][i].ch == '_')
               Page[line][i].attr |= ATTR_UNDERLINE;
+            else if (ch == '_')
+	    {
+              Page[line][i].attr |= ATTR_UNDERLINE;
+
+              if (Page[line][i].ch)
+	        ch = Page[line][i].ch;
+	    }
 	    else
               Page[line][i].attr = attr;
 
@@ -1142,5 +1151,5 @@ getutf8(FILE *fp)	/* I - File to read from */
 
 
 /*
- * End of "$Id: textcommon.c,v 1.17 2001/04/19 14:52:18 mike Exp $".
+ * End of "$Id: textcommon.c,v 1.18 2001/09/19 20:18:33 mike Exp $".
  */
