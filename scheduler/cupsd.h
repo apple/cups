@@ -1,5 +1,5 @@
 /*
- * "$Id: cupsd.h,v 1.16 1999/12/29 02:15:41 mike Exp $"
+ * "$Id: cupsd.h,v 1.17 2000/01/03 21:06:24 mike Exp $"
  *
  *   Main header file for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -110,6 +110,7 @@
  * Other stuff for the scheduler...
  */
 
+#include "cert.h"
 #include "client.h"
 #include "auth.h"
 #include "dirsvc.h"
@@ -144,5 +145,5 @@ VAR ipp_t		*Devices	VALUE(NULL),
 
 
 /*
- * End of "$Id: cupsd.h,v 1.16 1999/12/29 02:15:41 mike Exp $".
+ * End of "$Id: cupsd.h,v 1.17 2000/01/03 21:06:24 mike Exp $".
  */

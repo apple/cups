@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c,v 1.42 1999/12/21 02:26:46 mike Exp $"
+ * "$Id: util.c,v 1.43 2000/01/03 21:06:23 mike Exp $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -31,6 +31,8 @@
  *   cupsGetPrinters()   - Get a list of printers.
  *   cupsPrintFile()     - Print a file to a printer or class.
  *   cups_connect()      - Connect to the specified host...
+ *   cups_local_auth()   - Get the local authorization certificate if
+ *                         available/applicable...
  */
 
 /*
@@ -67,6 +69,7 @@ static char		authstring[255] = "";	/* Authorization string */
  */
 
 static char	*cups_connect(const char *name, char *printer, char *hostname);
+static int	cups_local_auth(http_t *http);
 
 
 /*
@@ -270,6 +273,17 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
       */
 
       httpFlush(http);
+
+     /*
+      * See if we can do local authentication...
+      */
+
+      if (cups_local_auth(http))
+        continue;
+
+     /*
+      * Nope - get a password from the user...
+      */
 
       printf("Authentication required for %s on %s...\n", cupsUser(),
              http->hostname);
@@ -603,6 +617,17 @@ cupsGetPPD(const char *name)	/* I - Printer name */
       */
 
       httpFlush(cups_server);
+
+     /*
+      * See if we can do local authentication...
+      */
+
+      if (cups_local_auth(cups_server))
+        continue;
+
+     /*
+      * Nope, get a password from the user...
+      */
 
       printf("Authentication required for %s on %s...\n", cupsUser(),
              cups_server->hostname);
@@ -1109,5 +1134,65 @@ cups_connect(const char *name,		/* I - Destination (printer[@host]) */
 
 
 /*
- * End of "$Id: util.c,v 1.42 1999/12/21 02:26:46 mike Exp $".
+ * 'cups_local_auth()' - Get the local authorization certificate if
+ *                       available/applicable...
+ */
+
+static int			/* O - 1 if available, 0 if not */
+cups_local_auth(http_t *http)	/* I - Connection */
+{
+#if defined(WIN32) || defined(__EMX__)
+ /*
+  * Currently WIN32 and OS-2 do not support the CUPS server...
+  */
+
+  return (0);
+#else
+  int	pid;			/* Current process ID */
+  FILE	*fp;			/* Certificate file */
+  char	filename[1024],		/* Certificate filename */
+	certificate[33];	/* Certificate string */
+
+
+ /*
+  * See if we are accessing localhost...
+  */
+
+  if (ntohl(http->hostaddr.sin_addr.s_addr) != 0x7f000001 &&
+      strcasecmp(http->hostname, "localhost") != 0)
+    return (0);
+
+ /*
+  * Try opening a certificate file for this PID.  If that fails,
+  * try the root certificate...
+  */
+
+  pid = getpid();
+  sprintf(filename, CUPS_SERVERROOT "/certs/%d", pid);
+  if ((fp = fopen(filename, "r")) == NULL && pid > 0)
+    fp = fopen(CUPS_SERVERROOT "/certs/0", "r");
+
+  if (fp == NULL)
+    return (0);
+
+ /*
+  * Read the certificate from the file...
+  */
+
+  fgets(certificate, sizeof(certificate), fp);
+  fclose(fp);
+
+ /*
+  * Set the authorization string and return...
+  */
+
+  sprintf(authstring, "Local %s", certificate);
+
+  return (1);
+#endif /* WIN32 || __EMX__ */
+}
+
+
+/*
+ * End of "$Id: util.c,v 1.43 2000/01/03 21:06:23 mike Exp $".
  */

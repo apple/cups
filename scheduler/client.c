@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.41 1999/12/29 02:15:40 mike Exp $"
+ * "$Id: client.c,v 1.42 2000/01/03 21:06:24 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -33,7 +33,7 @@
  *   SendHeader()          - Send an HTTP request.
  *   WriteClient()         - Write data to a client as needed.
  *   check_if_modified()   - Decode an "If-Modified-Since" line.
- *   decode_basic_auth()   - Decode a Basic authorization string.
+ *   decode_auth()         - Decode an authorization string.
  *   get_file()            - Get a filename and state info.
  *   pipe_command()        - Pipe the output of a command to the remote client.
  */
@@ -50,7 +50,7 @@
  */
 
 static int	check_if_modified(client_t *con, struct stat *filestats);
-static void	decode_basic_auth(client_t *con);
+static void	decode_auth(client_t *con);
 static char	*get_file(client_t *con, struct stat *filestats);
 static int	pipe_command(client_t *con, int infile, int *outfile, char *command, char *options);
 
@@ -396,7 +396,7 @@ ReadClient(client_t *con)	/* I - Client to read from */
   {
     con->language = cupsLangGet(con->http.fields[HTTP_FIELD_ACCEPT_LANGUAGE]);
 
-    decode_basic_auth(con);
+    decode_auth(con);
 
     if (con->http.fields[HTTP_FIELD_HOST][0] == '\0' &&
         con->http.version >= HTTP_1_0)
@@ -1229,14 +1229,15 @@ check_if_modified(client_t    *con,		/* I - Client connection */
 
 
 /*
- * 'decode_basic_auth()' - Decode a Basic authorization string.
+ * 'decode_auth()' - Decode an authorization string.
  */
 
 static void
-decode_basic_auth(client_t *con)	/* I - Client to decode to */
+decode_auth(client_t *con)		/* I - Client to decode to */
 {
-  char	*s,				/* Authorization string */
-	value[1024];			/* Value string */
+  char		*s,			/* Authorization string */
+		value[1024];		/* Value string */
+  const char	*username;		/* Certificate username */
 
 
  /*
@@ -1244,35 +1245,45 @@ decode_basic_auth(client_t *con)	/* I - Client to decode to */
   */
 
   s = con->http.fields[HTTP_FIELD_AUTHORIZATION];
-  if (strncmp(s, "Basic", 5) != 0)
-    return;
 
-  s += 5;
-  while (isspace(*s))
-    s ++;
-
-  httpDecode64(value, s);
-
- /*
-  * Pull the username and password out...
-  */
-
-  if ((s = strchr(value, ':')) == NULL)
+  if (strncmp(s, "Basic", 5) == 0)
   {
-    LogMessage(LOG_DEBUG, "decode_basic_auth() %d no colon in auth string \"%s\"",
-               con->http.fd, value);
-    return;
+    s += 5;
+    while (isspace(*s))
+      s ++;
+
+    httpDecode64(value, s);
+
+   /*
+    * Pull the username and password out...
+    */
+
+    if ((s = strchr(value, ':')) == NULL)
+    {
+      LogMessage(LOG_DEBUG, "decode_auth() %d no colon in auth string \"%s\"",
+        	 con->http.fd, value);
+      return;
+    }
+
+    *s++ = '\0';
+
+    strncpy(con->username, value, sizeof(con->username) - 1);
+    con->username[sizeof(con->username) - 1] = '\0';
+
+    strncpy(con->password, s, sizeof(con->password) - 1);
+    con->password[sizeof(con->password) - 1] = '\0';
+  }
+  else if (strncmp(s, "Local", 5) == 0)
+  {
+    s += 5;
+    while (isspace(*s))
+      s ++;
+
+    if ((username = FindCert(s)) != NULL)
+      strcpy(con->username, username);
   }
 
-  *s++ = '\0';
-
-  strncpy(con->username, value, sizeof(con->username) - 1);
-  con->username[sizeof(con->username) - 1] = '\0';
-
-  strncpy(con->password, s, sizeof(con->password) - 1);
-  con->password[sizeof(con->password) - 1] = '\0';
-
-  LogMessage(LOG_DEBUG, "decode_basic_auth() %d username=\"%s\"",
+  LogMessage(LOG_DEBUG, "decode_auth() %d username=\"%s\"",
              con->http.fd, con->username);
 }
 
@@ -1540,11 +1551,13 @@ pipe_command(client_t *con,	/* I - Client connection */
     *outfile = fds[0];
     close(fds[1]);
 
+    AddCert(pid, con->username);
+
     return (pid);
   }
 }
 
 
 /*
- * End of "$Id: client.c,v 1.41 1999/12/29 02:15:40 mike Exp $".
+ * End of "$Id: client.c,v 1.42 2000/01/03 21:06:24 mike Exp $".
  */

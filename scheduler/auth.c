@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.c,v 1.20 1999/12/14 22:02:53 mike Exp $"
+ * "$Id: auth.c,v 1.21 2000/01/03 21:06:24 mike Exp $"
  *
  *   Authorization routines for the Common UNIX Printing System (CUPS).
  *
@@ -379,101 +379,110 @@ IsAuthorized(client_t *con)	/* I - Connection */
     return (HTTP_UNAUTHORIZED);
   }
 
+  if ((address != 0x7f000001 &&
+       strcasecmp(con->http.hostname, "localhost") != 0) ||
+      strncmp(con->http.fields[HTTP_FIELD_AUTHORIZATION], "Local", 5) != 0)
+  {
+   /*
+    * Not doing local certificate-based authentication; check the password...
+    */
+
 #if HAVE_LIBPAM
-  /*
-   * Only use PAM to do authentication.  This allows MD5 passwords, among
-   * other things...
-   */
+   /*
+    * Only use PAM to do authentication.  This allows MD5 passwords, among
+    * other things...
+    */
 
-  pamdata.conv        = pam_func;
-  pamdata.appdata_ptr = con;
+    pamdata.conv        = pam_func;
+    pamdata.appdata_ptr = con;
 
-  pamerr = pam_start("passwd", con->username, &pamdata, &pamh);
-  if (pamerr != PAM_SUCCESS)
-  {
-    LogMessage(LOG_ERROR, "IsAuthorized: pam_start() returned %d!\n",
-               pamerr);
-    pam_end(pamh, 0);
-    return (HTTP_UNAUTHORIZED);
-  }
+    pamerr = pam_start("passwd", con->username, &pamdata, &pamh);
+    if (pamerr != PAM_SUCCESS)
+    {
+      LogMessage(LOG_ERROR, "IsAuthorized: pam_start() returned %d (%s)!\n",
+        	 pamerr, pam_strerror(pamerr));
+      pam_end(pamh, 0);
+      return (HTTP_UNAUTHORIZED);
+    }
 
-  pamerr = pam_authenticate(pamh, PAM_SILENT);
-  if (pamerr != PAM_SUCCESS)
-  {
-    LogMessage(LOG_ERROR, "IsAuthorized: pam_authenticate() returned %d!\n",
-               pamerr);
-    pam_end(pamh, 0);
-    return (HTTP_UNAUTHORIZED);
-  }
+    pamerr = pam_authenticate(pamh, PAM_SILENT);
+    if (pamerr != PAM_SUCCESS)
+    {
+      LogMessage(LOG_ERROR, "IsAuthorized: pam_authenticate() returned %d (%s)!\n",
+        	 pamerr, pam_strerror(pamerr));
+      pam_end(pamh, 0);
+      return (HTTP_UNAUTHORIZED);
+    }
 
-  pamerr = pam_acct_mgmt(pamh, PAM_SILENT);
-  if (pamerr != PAM_SUCCESS)
-  {
-    LogMessage(LOG_ERROR, "IsAuthorized: pam_acct_mgmt() returned %d!\n",
-               pamerr);
-    pam_end(pamh, 0);
-    return (HTTP_UNAUTHORIZED);
-  }
+    pamerr = pam_acct_mgmt(pamh, PAM_SILENT);
+    if (pamerr != PAM_SUCCESS)
+    {
+      LogMessage(LOG_ERROR, "IsAuthorized: pam_acct_mgmt() returned %d (%s)!\n",
+        	 pamerr, pam_strerror(pamerr));
+      pam_end(pamh, 0);
+      return (HTTP_UNAUTHORIZED);
+    }
 
-  pam_end(pamh, PAM_SUCCESS);
+    pam_end(pamh, PAM_SUCCESS);
 #else
 #  ifdef HAVE_SHADOW_H
-  spw = getspnam(con->username);
-  endspent();
+    spw = getspnam(con->username);
+    endspent();
 
-  if (spw == NULL && strcmp(pw->pw_passwd, "x") == 0)
-  {					/* Don't allow blank passwords! */
-    LogMessage(LOG_WARN, "IsAuthorized: Username \"%s\" has no shadow password; access denied.",
-               con->username);
-    return (HTTP_UNAUTHORIZED);		/* No such user or bad shadow file */
-  }
+    if (spw == NULL && strcmp(pw->pw_passwd, "x") == 0)
+    {					/* Don't allow blank passwords! */
+      LogMessage(LOG_WARN, "IsAuthorized: Username \"%s\" has no shadow password; access denied.",
+        	 con->username);
+      return (HTTP_UNAUTHORIZED);		/* No such user or bad shadow file */
+    }
 
 #    ifdef DEBUG
-  if (spw != NULL)
-    printf("spw->sp_pwdp = \"%s\"\n", spw->sp_pwdp);
-  else
-    puts("spw = NULL");
+    if (spw != NULL)
+      printf("spw->sp_pwdp = \"%s\"\n", spw->sp_pwdp);
+    else
+      puts("spw = NULL");
 #    endif /* DEBUG */
 
-  if (spw != NULL && spw->sp_pwdp[0] == '\0' && pw->pw_passwd[0] == '\0')
+    if (spw != NULL && spw->sp_pwdp[0] == '\0' && pw->pw_passwd[0] == '\0')
 #  else
-  if (pw->pw_passwd[0] == '\0')		/* Don't allow blank passwords! */
+    if (pw->pw_passwd[0] == '\0')		/* Don't allow blank passwords! */
 #  endif /* HAVE_SHADOW_H */
-  {					/* Don't allow blank passwords! */
-    LogMessage(LOG_WARN, "IsAuthorized: Username \"%s\" has no password; access denied.",
-               con->username);
-    return (HTTP_UNAUTHORIZED);
-  }
+    {					/* Don't allow blank passwords! */
+      LogMessage(LOG_WARN, "IsAuthorized: Username \"%s\" has no password; access denied.",
+        	 con->username);
+      return (HTTP_UNAUTHORIZED);
+    }
 
- /*
-  * OK, the password isn't blank, so compare with what came from the client...
-  */
+   /*
+    * OK, the password isn't blank, so compare with what came from the client...
+    */
 
-  DEBUG_printf(("IsAuthorized: pw_passwd = %s, crypt = %s\n",
-		pw->pw_passwd, crypt(con->password, pw->pw_passwd)));
+    DEBUG_printf(("IsAuthorized: pw_passwd = %s, crypt = %s\n",
+		  pw->pw_passwd, crypt(con->password, pw->pw_passwd)));
 
-  pass = crypt(con->password, pw->pw_passwd);
+    pass = crypt(con->password, pw->pw_passwd);
 
-  if (pass == NULL ||
-      strcmp(pw->pw_passwd, crypt(con->password, pw->pw_passwd)) != 0)
-  {
-#  ifdef HAVE_SHADOW_H
-    if (spw != NULL)
+    if (pass == NULL ||
+	strcmp(pw->pw_passwd, crypt(con->password, pw->pw_passwd)) != 0)
     {
-      DEBUG_printf(("IsAuthorized: sp_pwdp = %s, crypt = %s\n",
-		    spw->sp_pwdp, crypt(con->password, spw->sp_pwdp)));
+#  ifdef HAVE_SHADOW_H
+      if (spw != NULL)
+      {
+	DEBUG_printf(("IsAuthorized: sp_pwdp = %s, crypt = %s\n",
+		      spw->sp_pwdp, crypt(con->password, spw->sp_pwdp)));
 
-      pass = crypt(con->password, spw->sp_pwdp);
+	pass = crypt(con->password, spw->sp_pwdp);
 
-      if (pass == NULL ||
-          strcmp(spw->sp_pwdp, crypt(con->password, spw->sp_pwdp)) != 0)
+	if (pass == NULL ||
+            strcmp(spw->sp_pwdp, crypt(con->password, spw->sp_pwdp)) != 0)
+	  return (HTTP_UNAUTHORIZED);
+      }
+      else
+#  endif /* HAVE_SHADOW_H */
 	return (HTTP_UNAUTHORIZED);
     }
-    else
-#  endif /* HAVE_SHADOW_H */
-      return (HTTP_UNAUTHORIZED);
-  }
 #endif /* HAVE_LIBPAM */
+  }
 
  /*
   * OK, the password is good.  See if we need normal user access, or group
@@ -719,5 +728,5 @@ pam_func(int                      num_msg,	/* I - Number of messages */
 
 
 /*
- * End of "$Id: auth.c,v 1.20 1999/12/14 22:02:53 mike Exp $".
+ * End of "$Id: auth.c,v 1.21 2000/01/03 21:06:24 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c,v 1.32 2000/01/03 19:02:33 mike Exp $"
+ * "$Id: main.c,v 1.33 2000/01/03 21:06:25 mike Exp $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -167,6 +167,8 @@ main(int  argc,			/* I - Number of command-line arguments */
   * Read configuration...
   */
 
+  InitCerts();
+
   if (!ReadConfiguration())
   {
     fprintf(stderr, "cupsd: Unable to read configuration file \'%s\' - exiting!\n",
@@ -206,7 +208,7 @@ main(int  argc,			/* I - Number of command-line arguments */
       {
         fprintf(stderr, "cupsd: Unable to read configuration file \'%s\' - exiting!\n",
 	        ConfigurationFile);
-        exit(1);
+        break;
       }
     }
 
@@ -338,6 +340,16 @@ main(int  argc,			/* I - Number of command-line arguments */
 
       SendBrowseList();
     }
+
+   /*
+    * Update the root certificate once every 5 minutes...
+    */
+
+    if ((time(NULL) - RootCertTime) >= 300)
+    {
+      DeleteCert(0);
+      AddCert(0, "root");
+    }
   }
 
  /*
@@ -345,6 +357,7 @@ main(int  argc,			/* I - Number of command-line arguments */
   * immediately.
   */
 
+  DeleteAllCerts();
   CloseAllClients();
   StopListening();
 
@@ -376,6 +389,17 @@ sigchld_handler(int sig)	/* I - Signal number */
 #endif /* HAVE_WAITPID */
   {
     DEBUG_printf(("sigcld_handler: pid = %d, status = %d\n", pid, status));
+
+   /*
+    * Delete certificates for CGI processes...
+    */
+
+    if (pid)
+      DeleteCert(pid);
+
+   /*
+    * Ignore SIGTERM errors - that comes when a job is cancelled...
+    */
 
     if (status == SIGTERM)
       status = 0;
@@ -458,5 +482,5 @@ usage(void)
 
 
 /*
- * End of "$Id: main.c,v 1.32 2000/01/03 19:02:33 mike Exp $".
+ * End of "$Id: main.c,v 1.33 2000/01/03 21:06:25 mike Exp $".
  */
