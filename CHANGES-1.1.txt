@@ -5,6 +5,17 @@ CHANGES IN CUPS V1.1.15
 
 	- Updated the CUPS license agreement for the new MacOS
 	  license exception.
+	- The lpoptions command didn't set options properly when
+	  using the default printer.
+	- Added ConfigFilePerm and LogFilePerm directives.
+	- Increased maximum size of MIME types to IPP_MAX_NAME
+	  to allow for longer printer names.
+	- No longer create remote printers when loading job
+	  history data.
+	- The printer-make-and-model attribute wasn't set when
+	  the PPD file didn't contain a NickName attribute.
+	- Now handle PPD files with translation strings longer
+	  than 80 bytes - they are truncated if they go over...
 	- The scheduler didn't handle signals until after it
 	  loaded the configuration files the first time; this
 	  caused problems on some installations that would

@@ -1,5 +1,5 @@
 /*
- * "$Id: log.c,v 1.19.2.4 2002/01/29 22:05:40 mike Exp $"
+ * "$Id: log.c,v 1.19.2.5 2002/05/14 01:25:43 mike Exp $"
  *
  *   Log file routines for the Common UNIX Printing System (CUPS).
  *
@@ -406,6 +406,9 @@ check_log_file(FILE       **log,	/* IO - Log file */
 
     if ((*log = fopen(filename, "a")) == NULL)
       return (0);
+
+    fchown(fileno(*log), User, Group);
+    fchmod(fileno(*log), LogFilePerm);
   }
 
  /*
@@ -429,6 +432,9 @@ check_log_file(FILE       **log,	/* IO - Log file */
 
     if ((*log = fopen(filename, "a")) == NULL)
       return (0);
+
+    fchown(fileno(*log), User, Group);
+    fchmod(fileno(*log), LogFilePerm);
   }
 
   return (1);
@@ -436,5 +442,5 @@ check_log_file(FILE       **log,	/* IO - Log file */
 
 
 /*
- * End of "$Id: log.c,v 1.19.2.4 2002/01/29 22:05:40 mike Exp $".
+ * End of "$Id: log.c,v 1.19.2.5 2002/05/14 01:25:43 mike Exp $".
  */

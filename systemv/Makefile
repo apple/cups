@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.23.2.3 2002/03/08 20:23:06 mike Exp $"
+# "$Id: Makefile,v 1.23.2.4 2002/05/14 01:25:45 mike Exp $"
 #
 #   System V commands makefile for the Common UNIX Printing System (CUPS).
 #
@@ -42,7 +42,7 @@ all:	$(TARGETS)
 #
 
 clean:
-	$(RM) $(OBJS) $(TARGETS)
+	$(RM) $(OBJS) $(TARGETS) disable enable reject
 
 
 #
@@ -180,5 +180,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile,v 1.23.2.3 2002/03/08 20:23:06 mike Exp $".
+# End of "$Id: Makefile,v 1.23.2.4 2002/05/14 01:25:45 mike Exp $".
 #

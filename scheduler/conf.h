@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.h,v 1.36.2.3 2002/01/23 17:32:14 mike Exp $"
+ * "$Id: conf.h,v 1.36.2.4 2002/05/14 01:25:41 mike Exp $"
  *
  *   Configuration file definitions for the Common UNIX Printing System (CUPS)
  *   scheduler.
@@ -98,6 +98,10 @@ VAR char		SystemGroups[MAX_SYSTEM_GROUPS][32],
 					/* Classification of system */
 VAR int			ClassifyOverride	VALUE(0),
 					/* Allow overrides? */
+			ConfigFilePerm		VALUE(0600),
+					/* Permissions for config files */
+			LogFilePerm		VALUE(0644),
+					/* Permissions for log files */
 			User			VALUE(1),
 					/* User ID for server */
 			Group			VALUE(0),
@@ -165,5 +169,5 @@ extern int	LogPage(job_t *job, const char *page);
 
 
 /*
- * End of "$Id: conf.h,v 1.36.2.3 2002/01/23 17:32:14 mike Exp $".
+ * End of "$Id: conf.h,v 1.36.2.4 2002/05/14 01:25:41 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.124.2.15 2002/04/23 18:40:42 mike Exp $"
+ * "$Id: job.c,v 1.124.2.16 2002/05/14 01:25:42 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -547,6 +547,8 @@ LoadAllJobs(void)
 	close(fd);
       }
 
+      job->state = ippFindAttribute(job->attrs, "job-state", IPP_TAG_ENUM);
+
       if ((attr = ippFindAttribute(job->attrs, "job-printer-uri", IPP_TAG_URI)) == NULL)
       {
         LogMessage(L_ERROR, "LoadAllJobs: No job-printer-uri attribute in control file \"%s\"!",
@@ -560,7 +562,9 @@ LoadAllJobs(void)
       httpSeparate(attr->values[0].string.text, method, username, host,
                    &port, resource);
 
-      if ((dest = ValidateDest(host, resource, &(job->dtype))) == NULL)
+      if ((dest = ValidateDest(host, resource, &(job->dtype))) == NULL &&
+          job->state != NULL &&
+	  job->state->values[0].integer <= IPP_JOB_PROCESSING)
       {
        /*
 	* Job queued on remote printer or class, so add it...
@@ -603,7 +607,6 @@ LoadAllJobs(void)
 
       job->sheets     = ippFindAttribute(job->attrs, "job-media-sheets-completed",
                                          IPP_TAG_INTEGER);
-      job->state      = ippFindAttribute(job->attrs, "job-state", IPP_TAG_ENUM);
       job->job_sheets = ippFindAttribute(job->attrs, "job-sheets", IPP_TAG_NAME);
 
       attr = ippFindAttribute(job->attrs, "job-priority", IPP_TAG_INTEGER);
@@ -1085,11 +1088,15 @@ StartJob(int       id,		/* I - Job ID */
 		path[1024],	/* PATH environment variable */
 		language[255],	/* LANG environment variable */
 		charset[255],	/* CHARSET environment variable */
-		classification[1024],	/* CLASSIFICATION environment variable */
-		content_type[255],/* CONTENT_TYPE environment variable */
-		device_uri[1024],/* DEVICE_URI environment variable */
+		classification[1024],
+				/* CLASSIFICATION environment variable */
+		content_type[1024],
+				/* CONTENT_TYPE environment variable */
+		device_uri[1024],
+				/* DEVICE_URI environment variable */
 		ppd[1024],	/* PPD environment variable */
-		printer_name[255],/* PRINTER environment variable */
+		printer_name[255],
+				/* PRINTER environment variable */
 		root[1024],	/* CUPS_SERVERROOT environment variable */
 		cache[255],	/* RIP_MAX_CACHE environment variable */
 		tmpdir[1024],	/* TMPDIR environment variable */
@@ -2304,5 +2311,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.124.2.15 2002/04/23 18:40:42 mike Exp $".
+ * End of "$Id: job.c,v 1.124.2.16 2002/05/14 01:25:42 mike Exp $".
  */

@@ -1,4 +1,4 @@
-INSTALL - CUPS v1.2.0a1 - 03/22/2002
+INSTALL - CUPS v1.2.0a1 - 05/13/2002
 ------------------------------------
 
 This file describes how to compile and install CUPS from source
@@ -28,6 +28,15 @@ Besides these tools you'll want the following libraries:
 
 CUPS will compile and run without these, however you'll miss out on
 many of the features provided by CUPS.
+
+
+COMPILING FROM CVS
+
+The CUPS CVS repository doesn't hold a copy of the pre-built
+configure script.  You'll need to run the GNU autoconf software
+(2.52 or higher) before compiling the software from CVS:
+
+    autoconf ENTER
 
 
 CONFIGURATION

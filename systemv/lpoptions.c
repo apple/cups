@@ -1,5 +1,5 @@
 /*
- * "$Id: lpoptions.c,v 1.9.2.2 2002/02/12 19:23:13 mike Exp $"
+ * "$Id: lpoptions.c,v 1.9.2.3 2002/05/14 01:25:45 mike Exp $"
  *
  *   Printer option program for the Common UNIX Printing System (CUPS).
  *
@@ -119,9 +119,10 @@ main(int  argc,			/* I - Number of command-line arguments */
 	    cupsSetDests(num_dests, dests);
 
 	    for (j = 0; j < dest->num_options; j ++)
-	      num_options = cupsAddOption(dest->options[j].name,
-	                                  dest->options[j].value,
-	                                  num_options, &options);
+	      if (cupsGetOption(dest->options[j].name, num_options, options) == NULL)
+		num_options = cupsAddOption(dest->options[j].name,
+	                                    dest->options[j].value,
+	                                    num_options, &options);
 	    break;
 
 	case 'h' : /* -h server */
@@ -205,9 +206,10 @@ main(int  argc,			/* I - Number of command-line arguments */
 	    }
 
 	    for (j = 0; j < dest->num_options; j ++)
-	      num_options = cupsAddOption(dest->options[j].name,
-	                                  dest->options[j].value,
-	                                  num_options, &options);
+	      if (cupsGetOption(dest->options[j].name, num_options, options) == NULL)
+		num_options = cupsAddOption(dest->options[j].name,
+	                                    dest->options[j].value,
+	                                    num_options, &options);
 	    break;
 
 	case 'r' : /* -r option (remove) */
@@ -295,6 +297,12 @@ main(int  argc,			/* I - Number of command-line arguments */
       if (dests[i].is_default)
       {
         dest = dests + i;
+
+	for (j = 0; j < dest->num_options; j ++)
+	  if (cupsGetOption(dest->options[j].name, num_options, options) == NULL)
+	    num_options = cupsAddOption(dest->options[j].name,
+	                                dest->options[j].value,
+	                                num_options, &options);
 	break;
       }
 
@@ -424,5 +432,5 @@ usage(void)
 
 
 /*
- * End of "$Id: lpoptions.c,v 1.9.2.2 2002/02/12 19:23:13 mike Exp $".
+ * End of "$Id: lpoptions.c,v 1.9.2.3 2002/05/14 01:25:45 mike Exp $".
  */

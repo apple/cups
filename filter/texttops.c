@@ -1,5 +1,5 @@
 /*
- * "$Id: texttops.c,v 1.34.2.7 2002/03/14 22:22:40 mike Exp $"
+ * "$Id: texttops.c,v 1.34.2.8 2002/05/14 01:25:40 mike Exp $"
  *
  *   Text to PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -81,7 +81,7 @@ main(int  argc,		/* I - Number of command-line arguments */
 void
 WriteEpilogue(void)
 {
-  puts("%%BeginTrailer");
+  puts("%%Trailer");
   printf("%%%%Pages: %d\n", NumPages);
   puts("%%EOF");
 
@@ -1296,5 +1296,5 @@ write_text(const char *s)	/* I - String to write */
 
 
 /*
- * End of "$Id: texttops.c,v 1.34.2.7 2002/03/14 22:22:40 mike Exp $".
+ * End of "$Id: texttops.c,v 1.34.2.8 2002/05/14 01:25:40 mike Exp $".
  */

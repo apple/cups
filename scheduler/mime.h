@@ -1,5 +1,5 @@
 /*
- * "$Id: mime.h,v 1.3.2.1 2002/01/02 18:05:04 mike Exp $"
+ * "$Id: mime.h,v 1.3.2.2 2002/05/14 01:25:43 mike Exp $"
  *
  *   MIME type/conversion database definitions for the Common UNIX Printing System (CUPS).
  *
@@ -25,6 +25,9 @@
 #ifndef _MIME_H_
 #  define _MIME_H_
 
+#  include <cups/ipp.h>
+
+
 /*
  * C++ magic...
  */
@@ -38,10 +41,10 @@ extern "C" {
  * Constants...
  */
 
-#  define MIME_MAX_SUPER	16	/* Maximum size of supertype name */
-#  define MIME_MAX_TYPE		32	/* Maximum size of type name */
-#  define MIME_MAX_FILTER	256	/* Maximum size of filter pathname */
-#  define MIME_MAX_BUFFER	8192	/* Maximum size of file buffer */
+#  define MIME_MAX_SUPER	16		/* Maximum size of supertype name */
+#  define MIME_MAX_TYPE		IPP_MAX_NAME	/* Maximum size of type name */
+#  define MIME_MAX_FILTER	256		/* Maximum size of filter pathname */
+#  define MIME_MAX_BUFFER	8192		/* Maximum size of file buffer */
 
 
 /*
@@ -89,7 +92,7 @@ typedef struct mime_magic_str		/**** MIME Magic Data ****/
 typedef struct				/**** MIME Type Data ****/
 {
   char		super[MIME_MAX_SUPER],	/* Super-type name ("image", "application", etc.) */
-		type[MIME_MAX_TYPE];	/* Type name ("png", "postscript", etc.) */
+		*type;			/* Type name ("png", "postscript", etc.) */
   mime_magic_t	*rules;			/* Rules used to detect this type */
 } mime_type_t;
 
@@ -116,7 +119,8 @@ typedef struct				/**** MIME Database ****/
 
 extern void		mimeDelete(mime_t *mime);
 #define mimeLoad(pathname)	mimeMerge((mime_t *)0, (pathname));
-extern mime_t		*mimeMerge(mime_t *mime, const char *pathname);
+extern mime_t		*mimeMerge(mime_t *mime, const char *pathname,
+			           const char *filterpath);
 extern mime_t		*mimeNew(void);
 
 extern mime_type_t	*mimeAddType(mime_t *mime, const char *super, const char *type);
@@ -135,5 +139,5 @@ extern mime_filter_t	*mimeFilter(mime_t *mime, mime_type_t *src, mime_type_t *ds
 #endif /* !_MIME_H_ */
 
 /*
- * End of "$Id: mime.h,v 1.3.2.1 2002/01/02 18:05:04 mike Exp $".
+ * End of "$Id: mime.h,v 1.3.2.2 2002/05/14 01:25:43 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c,v 1.51.2.12 2002/05/09 03:31:08 mike Exp $"
+ * "$Id: ppd.c,v 1.51.2.13 2002/05/14 01:25:39 mike Exp $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -538,7 +538,7 @@ ppdOpen(FILE *fp)		/* I - File to read from */
   				/* Keyword from file */
 		name[PPD_MAX_NAME],
 				/* Option from file */
-		text[PPD_MAX_TEXT],
+		text[PPD_MAX_LINE],
 				/* Human-readable text from file */
 		*string,	/* Code/text from file */
 		*sptr,		/* Pointer into string */
@@ -955,7 +955,7 @@ ppdOpen(FILE *fp)		/* I - File to read from */
     {
       if (strcmp(string, "Minus90") == 0)
         ppd->landscape = -90;
-      else
+      else if (strcmp(string, "Plus90") == 0)
         ppd->landscape = 90;
     }
     else if (strcmp(keyword, "Emulators") == 0)
@@ -1951,9 +1951,9 @@ ppd_read(FILE *fp,		/* I - File to read from */
 
     keyptr = keyword;
 
-    while (*lineptr != '\0' && *lineptr != ':' && !isspace(*lineptr) &&
-	   (keyptr - keyword) < (PPD_MAX_NAME - 1))
-      *keyptr++ = *lineptr++;
+    while (*lineptr != '\0' && *lineptr != ':' && !isspace(*lineptr))
+      if ((keyptr - keyword) < (PPD_MAX_NAME - 1))
+	*keyptr++ = *lineptr++;
 
     *keyptr = '\0';
 
@@ -1976,8 +1976,9 @@ ppd_read(FILE *fp,		/* I - File to read from */
       optptr = option;
 
       while (*lineptr != '\0' && *lineptr != '\n' && *lineptr != ':' &&
-             *lineptr != '/' && (optptr - option) < (PPD_MAX_NAME - 1))
-	*optptr++ = *lineptr++;
+             *lineptr != '/')
+        if ((optptr - option) < (PPD_MAX_NAME - 1))
+	  *optptr++ = *lineptr++;
 
       *optptr = '\0';
       mask |= PPD_OPTION;
@@ -1994,9 +1995,9 @@ ppd_read(FILE *fp,		/* I - File to read from */
 	
 	textptr = text;
 
-	while (*lineptr != '\0' && *lineptr != '\n' && *lineptr != ':' &&
-               (textptr - text) < (PPD_MAX_TEXT - 1))
-	  *textptr++ = *lineptr++;
+	while (*lineptr != '\0' && *lineptr != '\n' && *lineptr != ':')
+	  if ((textptr - text) < (PPD_MAX_LINE - 1))
+	    *textptr++ = *lineptr++;
 
 	*textptr = '\0';
 	ppd_decode(text);
@@ -2146,5 +2147,5 @@ ppd_fix(char *string)		/* IO - String to fix */
 
 
 /*
- * End of "$Id: ppd.c,v 1.51.2.12 2002/05/09 03:31:08 mike Exp $".
+ * End of "$Id: ppd.c,v 1.51.2.13 2002/05/14 01:25:39 mike Exp $".
  */

@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# "$Id: run-stp-tests.sh,v 1.4.2.6 2002/05/09 03:31:09 mike Exp $"
+# "$Id: run-stp-tests.sh,v 1.4.2.7 2002/05/14 01:25:45 mike Exp $"
 #
 #   Perform the complete set of IPP compliance tests specified in the
 #   CUPS Software Test Plan.
@@ -109,7 +109,7 @@ TempDir /tmp/$user/spool/temp
 AccessLog /tmp/$user/log/access_log
 ErrorLog /tmp/$user/log/error_log
 PageLog /tmp/$user/log/page_log
-LogLevel debug2
+LogLevel debug
 PreserveJobHistory Yes
 <Location />
 Order deny,allow
@@ -339,5 +339,5 @@ echo "    $pdffile"
 echo ""
 
 #
-# End of "$Id: run-stp-tests.sh,v 1.4.2.6 2002/05/09 03:31:09 mike Exp $"
+# End of "$Id: run-stp-tests.sh,v 1.4.2.7 2002/05/14 01:25:45 mike Exp $"
 #

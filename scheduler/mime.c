@@ -1,5 +1,5 @@
 /*
- * "$Id: mime.c,v 1.7.2.3 2002/01/29 18:20:40 mike Exp $"
+ * "$Id: mime.c,v 1.7.2.4 2002/05/14 01:25:43 mike Exp $"
  *
  *   MIME database file routines for the Common UNIX Printing System (CUPS).
  *
@@ -67,8 +67,9 @@ typedef struct direct DIRENT;
  * Local functions...
  */
 
-static void	load_types(mime_t *mime, char *filename);
-static void	load_convs(mime_t *mime, char *filename);
+static void	load_types(mime_t *mime, const char *filename);
+static void	load_convs(mime_t *mime, const char *filename,
+		           const char *filterpath);
 static void	delete_rules(mime_magic_t *rules);
 
 
@@ -92,6 +93,7 @@ mimeDelete(mime_t *mime)	/* I - MIME database */
   for (i = 0; i < mime->num_types; i ++)
   {
     delete_rules(mime->types[i]->rules);
+    free(mime->types[i]->type);
     free(mime->types[i]);
   }
 
@@ -111,7 +113,8 @@ mimeDelete(mime_t *mime)	/* I - MIME database */
 
 mime_t *			/* O - Updated MIME database */
 mimeMerge(mime_t     *mime,	/* I - MIME database to add to */
-          const char *pathname)	/* I - Directory to load */
+          const char *pathname,	/* I - Directory to load */
+          const char *filterpath)/* I - Directory to load */
 {
 #ifdef WIN32
   HANDLE	dir;		/* Directory handle */
@@ -260,7 +263,7 @@ mimeMerge(mime_t     *mime,	/* I - MIME database to add to */
       */
 
       snprintf(filename, sizeof(filename), "%s/%s", pathname, dent->d_name);
-      load_convs(mime, filename);
+      load_convs(mime, filename, filterpath);
     }
   }
 
@@ -287,8 +290,8 @@ mimeNew(void)
  */
 
 static void
-load_types(mime_t *mime,		/* I - MIME database */
-           char   *filename)		/* I - Types file to load */
+load_types(mime_t     *mime,		/* I - MIME database */
+           const char *filename)	/* I - Types file to load */
 {
   FILE		*fp;			/* Types file */
   int		linelen;		/* Length of line */
@@ -392,8 +395,9 @@ load_types(mime_t *mime,		/* I - MIME database */
  */
 
 static void
-load_convs(mime_t *mime,		/* I - MIME database */
-           char   *filename)		/* I - Convs file to load */
+load_convs(mime_t     *mime,		/* I - MIME database */
+           const char *filename,	/* I - Convs file to load */
+           const char *filterpath)	/* I - Directory to load */
 {
   int		i;			/* Looping var */
   FILE		*fp;			/* Convs file */
@@ -406,6 +410,7 @@ load_convs(mime_t *mime,		/* I - MIME database */
   mime_type_t	**temptype,		/* MIME type looping var */
 		*dsttype;		/* Destination MIME type */
   int		cost;			/* Cost of filter */
+  char		filterprog[1024];	/* Full path of filter... */
 
 
  /*
@@ -496,8 +501,23 @@ load_convs(mime_t *mime,		/* I - MIME database */
       continue;
 
     filter = lineptr;
-    if (filter[strlen(filter) - 1] == '\n')
-      filter[strlen(filter) - 1] = '\0';
+
+#ifndef WIN32
+   /*
+    * Verify that the filter exists and is executable...
+    */
+
+    if (filter[0] == '/')
+    {
+      strncpy(filterprog, filter, sizeof(filterprog) - 1);
+      filterprog[sizeof(filterprog) - 1] = '\0';
+    }
+    else
+      snprintf(filterprog, sizeof(filterprog), "%s/%s", filterpath, filter);
+
+    if (access(filterprog, X_OK))
+      continue;
+#endif /* !WIN32 */
 
    /*
     * Finally, get the source super-type and type names from the beginning of
@@ -577,5 +597,5 @@ delete_rules(mime_magic_t *rules)	/* I - Rules to free */
 
 
 /*
- * End of "$Id: mime.c,v 1.7.2.3 2002/01/29 18:20:40 mike Exp $".
+ * End of "$Id: mime.c,v 1.7.2.4 2002/05/14 01:25:43 mike Exp $".
  */
