@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.41.2.1 2001/12/26 16:52:38 mike Exp $"
+# "$Id: Makefile,v 1.41.2.2 2001/12/26 17:22:19 mike Exp $"
 #
 #   Filter makefile for the Common UNIX Printing System (CUPS).
 #
@@ -51,7 +51,7 @@ all:	$(TARGETS)
 #
 
 clean:
-	$(RM) $(OBJS) $(TARGETS) $(LIBCUPSIMAGE) `basename $(LIBCUPSIMAGE) .2`
+	$(RM) $(OBJS) $(TARGETS) $(LIBCUPSIMAGE) `basename $(LIBCUPSIMAGE) .3`
 
 
 #
@@ -65,11 +65,11 @@ install:
 	done
 	$(INSTALL_DIR) $(LIBDIR)
 	$(INSTALL_LIB) $(LIBCUPSIMAGE) $(LIBDIR)
-	-if test $(LIBCUPSIMAGE) = "libcupsimage.so.2" -o $(LIBCUPSIMAGE) = "libcupsimage.sl.2"; then \
-		$(RM) $(LIBDIR)/`basename $(LIBCUPSIMAGE) .2`; \
-		$(LN) $(LIBCUPSIMAGE) $(LIBDIR)/`basename $(LIBCUPSIMAGE) .2`; \
+	-if test $(LIBCUPSIMAGE) = "libcupsimage.so.3" -o $(LIBCUPSIMAGE) = "libcupsimage.sl.3"; then \
+		$(RM) $(LIBDIR)/`basename $(LIBCUPSIMAGE) .3`; \
+		$(LN) $(LIBCUPSIMAGE) $(LIBDIR)/`basename $(LIBCUPSIMAGE) .3`; \
 	fi
-	-if test $(LIBCUPSIMAGE) = "libcupsimage.2.dylib"; then \
+	-if test $(LIBCUPSIMAGE) = "libcupsimage.3.dylib"; then \
 		$(RM) $(LIBDIR)/libcupsimage.dylib; \
 		$(LN) $(LIBCUPSIMAGE) $(LIBDIR)/libcupsimage.dylib; \
 	fi
@@ -98,21 +98,21 @@ $(HPGLOBJS):	hpgltops.h
 
 
 #
-# libcupsimage.so.2, libcupsimage.sl.2
+# libcupsimage.so.3, libcupsimage.sl.3
 #
 
-libcupsimage.so.2 libcupsimage.sl.2:	$(IMAGEOBJS) ../Makedefs
+libcupsimage.so.3 libcupsimage.sl.3:	$(IMAGEOBJS) ../Makedefs
 	echo Linking $@...
 	$(DSO) $(DSOFLAGS) -o $@ $(IMAGEOBJS) $(DSOLIBS) -lm
-	$(RM) `basename $@ .2`
-	$(LN) $@ `basename $@ .2`
+	$(RM) `basename $@ .3`
+	$(LN) $@ `basename $@ .3`
 
 
 #
-# libcupsimage.2.dylib
+# libcupsimage.3.dylib
 #
 
-libcupsimage.2.dylib:	$(IMAGEOBJS) ../Makedefs
+libcupsimage.3.dylib:	$(IMAGEOBJS) ../Makedefs
 	echo Linking $@...
 	$(DSO) $(DSOFLAGS) -o $@ $(IMAGEOBJS) $(DSOLIBS) $(LINKCUPS) -lm -lcc_dynamic
 	$(RM) libcupsimage.dylib
@@ -237,5 +237,5 @@ $(OBJS):	../Makedefs ../cups/cups.h ../cups/ppd.h ../cups/language.h
 
 
 #
-# End of "$Id: Makefile,v 1.41.2.1 2001/12/26 16:52:38 mike Exp $".
+# End of "$Id: Makefile,v 1.41.2.2 2001/12/26 17:22:19 mike Exp $".
 #

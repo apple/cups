@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.55.2.3 2001/12/26 16:52:12 mike Exp $"
+ * "$Id: ipp.c,v 1.55.2.4 2001/12/26 17:22:18 mike Exp $"
  *
  *   Internet Printing Protocol support functions for the Common UNIX
  *   Printing System (CUPS).
@@ -2074,14 +2074,15 @@ ippWrite(http_t *http,		/* I - HTTP data */
  */
 
 ipp_state_t				/* O - State */
-ippWriteFile(int   fd,		/* I - File to write to */
-               ipp_t *ipp)		/* I - Request to write */
+ippWriteFile(int   fd,			/* I - File to write to */
+             ipp_t *ipp)		/* I - Request to write */
 {
   int			i;		/* Looping var */
   int			n;		/* Length of data */
   unsigned char		buffer[8192],	/* Data buffer */
 			*bufptr;	/* Pointer into buffer */
   ipp_attribute_t	*attr;		/* Current attribute */
+  ipp_value_t		*value;		/* Current value */
 
 
  /*
@@ -2792,5 +2793,5 @@ ipp_read(http_t        *http,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.55.2.3 2001/12/26 16:52:12 mike Exp $".
+ * End of "$Id: ipp.c,v 1.55.2.4 2001/12/26 17:22:18 mike Exp $".
  */
