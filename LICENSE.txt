@@ -11,7 +11,7 @@
 
 INTRODUCTION
 
-The Common UNIX Printing System^TM , ("CUPS^TM "), is provided under
+The Common UNIX Printing System^TM, ("CUPS^TM"), is provided under
 the GNU General Public License ("GPL") and GNU Library General Public
 License ("LGPL"), Version 2, with exceptions for Apple operating
 systems. A copy of the exceptions and licenses follow this
@@ -87,6 +87,20 @@ following text at the top of each source file:
     This file is subject to the Apple OS-Developed Software exception.
 
 
+OPENSSL TOOLKIT LICENSE EXCEPTION
+
+In addition, as the copyright holder of CUPS, Easy Software Products
+grants the following special exception:
+
+    Easy Software Products explicitly allows the compilation and
+    distribution of the CUPS software with the OpenSSL Toolkit. The
+    requirement for disclosure of the use of OpenSSL in CUPS-derived
+    software is not deemed by Easy Software Products to constitute a
+    violation of the distribution terms of the GNU GPL, since the GNU GPL
+    specifically requires acknowledgement of the original copyright holder
+    in derived works.
+
+
 TRADEMARKS
 
 Easy Software Products has trademarked the Common UNIX Printing System,
@@ -104,22 +118,9 @@ binary distribution license for vendors that are unable to release source
 code for their drivers, additions, and modifications to CUPS under the GNU
 GPL and LGPL. For information please contact us at the address shown above.
 
-The Common UNIX Printing System provides a "pstoraster" filter that utilizes
-the GNU GhostScript 5.50 core to convert PostScript files into a stream of
-raster images. For binary distribution licensing of this software, please
-contact:
-
-     Miles Jones
-     Director of Marketing
-     Artifex Software Inc.
-     454 Las Gallinas Ave., Suite 108
-     San Rafael, CA 94903 USA
-     Voice: +1.415.492.9861
-     Fax: +1.415.492.9862
-     EMail: info@arsoft.com
-
-The "pdftops" filter is based on the Xpdf 0.93a software. For binary
-distribution licensing of this software, please contact:
+The Common UNIX Printing System provides a  "pdftops" filter is based on
+the Xpdf 0.93a software. For binary distribution licensing of this
+software, please contact:
 
      Derek B. Noonburg
      Email: derekn@foolabs.com
