@@ -2753,7 +2753,7 @@ void Gfx::doForm(Object *str) {
 void Gfx::doAnnot(Object *str, double xMin, double yMin,
 		  double xMax, double yMax) {
   Dict *dict, *resDict;
-  Object matrixObj, bboxObj, resObj, flagsObj;
+  Object matrixObj, bboxObj, resObj, flagsObj, subTypeObj;
   Object obj1;
   double m[6], bbox[6], ictm[6];
   double *ctm;
@@ -2771,9 +2771,15 @@ void Gfx::doAnnot(Object *str, double xMin, double yMin,
   if (flagsObj.isInt()) {
     flags = flagsObj.getInt();
   } else {
-    flags = 0;
+    // Print anything that doesn't have any flags set...
+    flags = 4;
   }
   flagsObj.free();
+
+  fprintf(stderr, "DEBUG: pdftops: doAnnot found annotation with flags = %x\n",
+          flags);
+
+  subTypeObj.free();
 
   if ((flags & 2) == 2 || (flags & 4) == 0) {
     // Don't print hidden or no-print annotations...
