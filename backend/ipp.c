@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.8 1999/07/24 10:59:33 mike Exp $"
+ * "$Id: ipp.c,v 1.9 1999/08/21 19:28:06 mike Exp $"
  *
  *   IPP backend for the Common UNIX Printing System (CUPS).
  *
@@ -294,12 +294,12 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
     */
 
     if (httpPost(http, resource))
-      if (httpPost(http, resource))
-      {
-        fputs("INFO: Unable to POST print request; retrying...\n", stderr);
-	sleep(10);
-	continue;
-      }
+    {
+      fputs("INFO: Unable to POST print request; retrying...\n", stderr);
+      sleep(10);
+      httpReconnect(http);
+      continue;
+    }
 
     fputs("INFO: POST successful, sending IPP request...\n", stderr);
 
@@ -335,8 +335,6 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
         break;
       }
     }
-
-    httpWrite(http, buffer, 0);
 
     fputs("INFO: Print file sent; checking status...\n", stderr);
 
@@ -397,5 +395,5 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
 
 /*
- * End of "$Id: ipp.c,v 1.8 1999/07/24 10:59:33 mike Exp $".
+ * End of "$Id: ipp.c,v 1.9 1999/08/21 19:28:06 mike Exp $".
  */
