@@ -1,5 +1,5 @@
 #
-# "$Id: cupsd.conf.in,v 1.15 2004/07/02 04:44:19 mike Exp $"
+# "$Id: cupsd.conf.in,v 1.16 2004/08/18 17:53:47 mike Exp $"
 #
 #   Sample configuration file for the Common UNIX Printing System (CUPS)
 #   scheduler.
@@ -16,9 +16,9 @@
 #       Attn: CUPS Licensing Information
 #       Easy Software Products
 #       44141 Airport View Drive, Suite 204
-#       Hollywood, Maryland 20636-3111 USA
+#       Hollywood, Maryland 20636 USA
 #
-#       Voice: (301) 373-9603
+#       Voice: (301) 373-9600
 #       EMail: cups-info@cups.org
 #         WWW: http://www.cups.org
 #
@@ -417,6 +417,10 @@ LogLevel info
 # NOTE: Unfortunately, most web browsers don't support TLS or HTTP Upgrades
 # for encryption.  If you want to support web-based encryption you'll
 # probably need to listen on port 443 (the "https" port...)
+#
+# NOTE 2: In order for the command-line and web interfaces to work, you
+# must have at least one Port or Listen line that allows access from the
+# local loopback address (localhost).
 #
 
 #Port 80
@@ -837,5 +841,5 @@ Allow From 127.0.0.1
 </Location>
 
 #
-# End of "$Id: cupsd.conf.in,v 1.15 2004/07/02 04:44:19 mike Exp $".
+# End of "$Id: cupsd.conf.in,v 1.16 2004/08/18 17:53:47 mike Exp $".
 #
