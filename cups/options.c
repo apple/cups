@@ -1,5 +1,5 @@
 /*
- * "$Id: options.c,v 1.13 2000/01/04 13:45:35 mike Exp $"
+ * "$Id: options.c,v 1.14 2000/01/27 19:28:51 mike Exp $"
  *
  *   Option routines for the Common UNIX Printing System (CUPS).
  *
@@ -354,7 +354,8 @@ cupsMarkOptions(ppd_file_t    *ppd,		/* I - PPD file */
 	  conflict = 1;
       }
     }
-    else if (strcasecmp(options->name, "resolution") == 0)
+    else if (strcasecmp(options->name, "resolution") == 0 ||
+             strcasecmp(options->name, "printer-resolution") == 0)
     {
       if (ppdMarkOption(ppd, "Resolution", options->value))
         conflict = 1;
@@ -374,5 +375,5 @@ cupsMarkOptions(ppd_file_t    *ppd,		/* I - PPD file */
 
 
 /*
- * End of "$Id: options.c,v 1.13 2000/01/04 13:45:35 mike Exp $".
+ * End of "$Id: options.c,v 1.14 2000/01/27 19:28:51 mike Exp $".
  */
