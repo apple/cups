@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c,v 1.31 1999/07/15 17:49:21 mike Exp $"
+ * "$Id: ppd.c,v 1.32 1999/07/27 16:49:02 mike Exp $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -601,7 +601,8 @@ ppdOpen(FILE *fp)		/* I - File to read from */
       memset(profile, 0, sizeof(ppd_profile_t));
       strncpy(profile->resolution, name, sizeof(profile->resolution) - 1);
       strncpy(profile->media_type, text, sizeof(profile->media_type) - 1);
-      sscanf(string, "%f%f%f%f%f%f%f%f%f%f", &(profile->density),
+      sscanf(string, "%f%f%f%f%f%f%f%f%f%f%f", &(profile->density),
+	     &(profile->gamma),
 	     profile->matrix[0] + 0, profile->matrix[0] + 1,
 	     profile->matrix[0] + 2, profile->matrix[1] + 0,
 	     profile->matrix[1] + 1, profile->matrix[1] + 2,
@@ -1764,5 +1765,5 @@ ppd_fix(char *string)		/* IO - String to fix */
 
 
 /*
- * End of "$Id: ppd.c,v 1.31 1999/07/15 17:49:21 mike Exp $".
+ * End of "$Id: ppd.c,v 1.32 1999/07/27 16:49:02 mike Exp $".
  */
