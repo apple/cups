@@ -3,6 +3,9 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.19
 
+	- The scheduler ignored child signals when gathering the
+	  list of available devices, when it should have been
+	  using the default signal handler.
 	- The cupsEncodeOptions() function could encode an
 	  option with a NULL last string.
 	- The socket backend could report the wrong number of
