@@ -1,5 +1,5 @@
 /*
- * "$Id: lpq.c,v 1.5 1999/10/10 15:40:16 mike Exp $"
+ * "$Id: lpq.c,v 1.6 1999/10/25 16:57:48 mike Exp $"
  *
  *   "lpq" command for the Common UNIX Printing System (CUPS).
  *
@@ -237,7 +237,7 @@ show_jobs(http_t     *http,	/* I - HTTP connection to server */
   */
 
   if (!longstatus)
-    puts("Rank\tPri   Owner  Job    Files              Total Size");
+    puts("Rank\tPri   Owner      Job    Files              Total Size");
 
   jobcount = 0;
 
@@ -338,7 +338,7 @@ show_jobs(http_t     *http,	/* I - HTTP connection to server */
 	}
 
         printf("[job %03dlocalhost]\n", jobid);
-        printf("\t%-33s%d bytes\n", jobname, jobsize);
+        printf("\t%-32.32s %d bytes\n", jobname, jobsize);
       }
       else
       {
@@ -350,8 +350,8 @@ show_jobs(http_t     *http,	/* I - HTTP connection to server */
 	  rank ++;
 	}
 
-        printf(" %-5d%-7.7s%-7d%-19s%d bytes\n", jobpriority, jobuser, jobid,
-	       jobname, jobsize);
+        printf(" %-4d %-10.10s %-6d %-18.18s %d bytes\n", jobpriority, jobuser,
+	       jobid, jobname, jobsize);
       }
       if (attr == NULL)
         break;
@@ -365,5 +365,5 @@ show_jobs(http_t     *http,	/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpq.c,v 1.5 1999/10/10 15:40:16 mike Exp $".
+ * End of "$Id: lpq.c,v 1.6 1999/10/25 16:57:48 mike Exp $".
  */
