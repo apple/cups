@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.64 2000/12/18 21:38:58 mike Exp $"
+ * "$Id: conf.c,v 1.65 2000/12/20 13:41:17 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -477,6 +477,7 @@ ReadConfiguration(void)
   */
 
   SSL_library_init();
+  SSL_load_error_strings();
 #endif /* HAVE_LIBSSL */
 
  /*
@@ -1169,8 +1170,8 @@ read_location(FILE *fp,		/* I - Configuration file */
         loc->encryption = HTTP_ENCRYPT_NEVER;
       else if (strcasecmp(value, "always") == 0)
         loc->encryption = HTTP_ENCRYPT_ALWAYS;
-      else if (strcasecmp(value, "preferred") == 0)
-        loc->encryption = HTTP_ENCRYPT_PREFERRED;
+      else if (strcasecmp(value, "required") == 0)
+        loc->encryption = HTTP_ENCRYPT_REQUIRED;
       else if (strcasecmp(value, "ifrequested") == 0)
         loc->encryption = HTTP_ENCRYPT_IF_REQUESTED;
       else
@@ -1463,5 +1464,5 @@ get_address(char               *value,		/* I - Value string */
 
 
 /*
- * End of "$Id: conf.c,v 1.64 2000/12/18 21:38:58 mike Exp $".
+ * End of "$Id: conf.c,v 1.65 2000/12/20 13:41:17 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: socket.c,v 1.13 2000/04/27 21:31:38 mike Exp $"
+ * "$Id: socket.c,v 1.14 2000/12/20 13:41:12 mike Exp $"
  *
  *   AppSocket backend for the Common UNIX Printing System (CUPS).
  *
@@ -137,7 +137,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
   if ((hostaddr = gethostbyname(hostname)) == NULL)
   {
-    fprintf(stderr, "ERROR: Unable to locate printer \'%s\' - %s",
+    fprintf(stderr, "ERROR: Unable to locate printer \'%s\' - %s\n",
             hostname, strerror(errno));
     return (1);
   }
@@ -277,5 +277,5 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
 
 /*
- * End of "$Id: socket.c,v 1.13 2000/04/27 21:31:38 mike Exp $".
+ * End of "$Id: socket.c,v 1.14 2000/12/20 13:41:12 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.72 2000/12/20 10:50:59 mike Exp $"
+ * "$Id: http.c,v 1.73 2000/12/20 13:41:13 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -57,6 +57,7 @@
  *   http_field()        - Return the field index for a field name.
  *   http_send()         - Send a request with all fields and the trailing
  *                         blank line.
+ *   http_upgrade()      - Force upgrade to TLS encryption.
  */
 
 /*
@@ -102,6 +103,7 @@
 static http_field_t	http_field(const char *name);
 static int		http_send(http_t *http, http_state_t request,
 			          const char *uri);
+static int		http_upgrade(http_t *http);
 
 
 /*
@@ -263,8 +265,28 @@ httpCheck(http_t *http)		/* I - HTTP connection */
 void
 httpClose(http_t *http)		/* I - Connection to close */
 {
-  if (http == NULL)
+#ifdef HAVE_LIBSSL
+  SSL_CTX	*context;	/* Context for encryption */
+  SSL		*conn;		/* Connection for encryption */
+#endif /* HAVE_LIBSSL */
+
+
+  if (!http)
     return;
+
+#ifdef HAVE_LIBSSL
+  if (http->tls)
+  {
+    conn    = (SSL *)(http->tls);
+    context = SSL_get_SSL_CTX(conn);
+
+    SSL_shutdown(conn);
+    SSL_CTX_free(context);
+    SSL_free(conn);
+
+    http->tls = NULL;
+  }
+#endif /* HAVE_LIBSSL */
 
 #ifdef WIN32
   closesocket(http->fd);
@@ -354,16 +376,25 @@ int					/* O - -1 on error, 0 on success */
 httpEncryption(http_t            *http,	/* I - HTTP data */
                http_encryption_t e)	/* I - New encryption preference */
 {
+#ifdef HAVE_LIBSSL
   if (!http)
-    return;
+    return (0);
 
   http->encryption = e;
 
   if ((http->encryption == HTTP_ENCRYPT_ALWAYS && !http->tls) ||
       (http->encryption == HTTP_ENCRYPT_NEVER && http->tls))
     return (httpReconnect(http));
+  else if (http->encryption == HTTP_ENCRYPT_REQUIRED && !http->tls)
+    return (http_upgrade(http));
   else
     return (0);
+#else
+  if (e == HTTP_ENCRYPT_ALWAYS || e == HTTP_ENCRYPT_REQUIRED)
+    return (-1);
+  else
+    return (0);
+#endif /* HAVE_LIBSSL */
 }
 
 
@@ -378,7 +409,6 @@ httpReconnect(http_t *http)	/* I - HTTP data */
 #ifdef HAVE_LIBSSL
   SSL_CTX	*context;	/* Context for encryption */
   SSL		*conn;		/* Connection for encryption */
-  char		buffer[1024];	/* Status from server... */
 
 
   if (http->tls)
@@ -463,31 +493,8 @@ httpReconnect(http_t *http)	/* I - HTTP data */
   if (http->encryption == HTTP_ENCRYPT_ALWAYS)
   {
    /*
-    * Always do encryption on port 443 (https method); other ports use
-    * the HTTP Upgrade method...
+    * Always do encryption via SSL.
     */
-
-    if (ntohs(http->hostaddr.sin_port) != 443)
-    {
-     /*
-      * Send an OPTIONS request to the server, requiring SSL or TLS
-      * encryption on the link...
-      */
-
-      httpPrintf(http, "OPTIONS * HTTP/1.1\r\n");
-      httpPrintf(http, "Host: %s\r\n", http->hostname);
-      httpPrintf(http, "Connection: upgrade\r\n");
-      httpPrintf(http, "Upgrade: TLS/1.0, SSL/2.0, SSL/3.0\r\n");
-      httpPrintf(http, "\r\n");
-
-     /*
-      * Wait for the response data...
-      */
-
-      while (httpGets(buffer, sizeof(buffer), http) != NULL)
-        if (!buffer[0])
-	  break;
-    }
 
     context = SSL_CTX_new(SSLv23_method());
     conn    = SSL_new(context);
@@ -516,6 +523,8 @@ httpReconnect(http_t *http)	/* I - HTTP data */
 
     http->tls = conn;
   }
+  else if (http->encryption == HTTP_ENCRYPT_REQUIRED)
+    return (http_upgrade(http));
 #endif /* HAVE_LIBSSL */
 
   return (0);
@@ -1517,8 +1526,7 @@ httpUpdate(http_t *http)		/* I - HTTP data */
       }
       else if (http->status == HTTP_UPGRADE_REQUIRED &&
                http->encryption != HTTP_ENCRYPT_NEVER)
-        http->encryption = HTTP_ENCRYPT_PREFERRED;
-
+        http->encryption = HTTP_ENCRYPT_REQUIRED;
 #endif /* HAVE_LIBSSL */
 
       httpGetLength(http);
@@ -1851,7 +1859,7 @@ http_send(http_t       *http,	/* I - HTTP data */
   http->status = HTTP_CONTINUE;
 
 #ifdef HAVE_LIBSSL
-  if (http->encryption == HTTP_ENCRYPT_PREFERRED && !http->tls)
+  if (http->encryption == HTTP_ENCRYPT_REQUIRED && !http->tls)
   {
     httpSetField(http, HTTP_FIELD_CONNECTION, "Upgrade");
     httpSetField(http, HTTP_FIELD_UPGRADE, "TLS/1.0,SSL/2.0,SSL/3.0");
@@ -1888,6 +1896,75 @@ http_send(http_t       *http,	/* I - HTTP data */
 }
 
 
+#ifdef HAVE_LIBSSL
 /*
- * End of "$Id: http.c,v 1.72 2000/12/20 10:50:59 mike Exp $".
+ * 'http_upgrade()' - Force upgrade to TLS encryption.
+ */
+
+static int			/* O - Status of connection */
+http_upgrade(http_t *http)	/* I - HTTP data */
+{
+  SSL_CTX	*context;	/* Context for encryption */
+  SSL		*conn;		/* Connection for encryption */
+  char		buffer[1024];	/* Status from server... */
+
+
+ /*
+  * Send an OPTIONS request to the server, requiring SSL or TLS
+  * encryption on the link...
+  */
+
+  if (httpPrintf(http, "OPTIONS * HTTP/1.1\r\n") < 0)
+    return (-1);
+  if (httpPrintf(http, "Host: %s\r\n", http->hostname) < 0)
+    return (-1);
+  if (httpPrintf(http, "Connection: upgrade\r\n") < 0)
+    return (-1);
+  if (httpPrintf(http, "Upgrade: TLS/1.0, SSL/2.0, SSL/3.0\r\n") < 0)
+    return (-1);
+  if (httpPrintf(http, "\r\n") < 0)
+    return (-1);
+
+ /*
+  * Wait for the response data...
+  */
+
+  while (httpGets(buffer, sizeof(buffer), http) != NULL)
+    if (!buffer[0])
+      break;
+
+  context = SSL_CTX_new(SSLv23_method());
+  conn    = SSL_new(context);
+
+  SSL_set_fd(conn, http->fd);
+  if (SSL_connect(conn) != 1)
+  {
+    SSL_CTX_free(context);
+    SSL_free(conn);
+
+#if defined(WIN32) || defined(__EMX__)
+    http->error  = WSAGetLastError();
+#else
+    http->error  = errno;
+#endif /* WIN32 || __EMX__ */
+    http->status = HTTP_ERROR;
+
+#ifdef WIN32
+    closesocket(http->fd);
+#else
+    close(http->fd);
+#endif
+
+    return (-1);
+  }
+
+  http->tls = conn;
+
+  return (0);
+}
+#endif /* HAVE_LIBSSL */
+
+
+/*
+ * End of "$Id: http.c,v 1.73 2000/12/20 13:41:13 mike Exp $".
  */

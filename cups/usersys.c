@@ -1,5 +1,5 @@
 /*
- * "$Id: usersys.c,v 1.11 2000/12/13 00:41:19 mike Exp $"
+ * "$Id: usersys.c,v 1.12 2000/12/20 13:41:13 mike Exp $"
  *
  *   User, system, and password routines for the Common UNIX Printing
  *   System (CUPS).
@@ -24,8 +24,10 @@
  *
  * Contents:
  *
+ *   cupsEncryption()    - Get the default encryption settings...
  *   cupsGetPassword()   - Get a password from the user...
  *   cupsServer()        - Return the hostname of the default server...
+ *   cupsSetEncryption() - Set the encryption preference.
  *   cupsSetPasswordCB() - Set the password callback for CUPS.
  *   cupsSetServer()     - Set the default server name...
  *   cupsSetUser()       - Set the default user name...
@@ -54,9 +56,103 @@ static const char	*cups_get_password(const char *prompt);
  * Local globals...
  */
 
+static http_encryption_t cups_encryption = (http_encryption_t)-1;
 static char		cups_user[65] = "",
 			cups_server[256] = "";
 static const char	*(*cups_pwdcb)(const char *) = cups_get_password;
+
+
+/*
+ * 'cupsEncryption()' - Get the default encryption settings...
+ */
+
+http_encryption_t
+cupsEncryption(void)
+{
+  FILE		*fp;			/* client.conf file */
+  char		*encryption;		/* CUPS_ENCRYPTION variable */
+  const char	*home;			/* Home directory of user */
+  static char	line[1024];		/* Line from file */
+
+
+ /*
+  * First see if we have already set the encryption stuff...
+  */
+
+  if (cups_encryption == (http_encryption_t)-1)
+  {
+   /*
+    * Then see if the CUPS_ENCRYPTION environment variable is set...
+    */
+
+    if ((encryption = getenv("CUPS_ENCRYPTION")) == NULL)
+    {
+     /*
+      * Next check to see if we have a $HOME/.cupsrc or client.conf file...
+      */
+
+      if ((home = getenv("HOME")) != NULL)
+      {
+	snprintf(line, sizeof(line), "%s/.cupsrc", home);
+	fp = fopen(line, "r");
+      }
+      else
+	fp = NULL;
+
+      if (fp == NULL)
+      {
+	if ((home = getenv("CUPS_SERVERROOT")) != NULL)
+	{
+	  snprintf(line, sizeof(line), "%s/client.conf", home);
+	  fp = fopen(line, "r");
+	}
+	else
+	  fp = fopen(CUPS_SERVERROOT "/client.conf", "r");
+      }
+
+      encryption = "IfRequested";
+
+      if (fp != NULL)
+      {
+       /*
+	* Read the config file and look for a ServerName line...
+	*/
+
+	while (fgets(line, sizeof(line), fp) != NULL)
+	  if (strncmp(line, "Encryption ", 11) == 0)
+	  {
+	   /*
+	    * Got it!  Drop any trailing newline and find the name...
+	    */
+
+	    encryption = line + strlen(line) - 1;
+	    if (*encryption == '\n')
+              *encryption = '\0';
+
+	    for (encryption = line + 11; isspace(*encryption); encryption ++);
+	    break;
+	  }
+
+	fclose(fp);
+      }
+    }
+
+   /*
+    * Set the encryption preference...
+    */
+
+    if (strcasecmp(encryption, "never") == 0)
+      cups_encryption = HTTP_ENCRYPT_NEVER;
+    else if (strcasecmp(encryption, "always") == 0)
+      cups_encryption = HTTP_ENCRYPT_ALWAYS;
+    else if (strcasecmp(encryption, "required") == 0)
+      cups_encryption = HTTP_ENCRYPT_REQUIRED;
+    else
+      cups_encryption = HTTP_ENCRYPT_IF_REQUESTED;
+  }
+
+  return (cups_encryption);
+}
 
 
 /*
@@ -67,6 +163,17 @@ const char *				/* O - Password */
 cupsGetPassword(const char *prompt)	/* I - Prompt string */
 {
   return ((*cups_pwdcb)(prompt));
+}
+
+
+/*
+ * 'cupsSetEncryption()' - Set the encryption preference.
+ */
+
+void
+cupsSetEncryption(http_encryption_t e)	/* I - New encryption preference */
+{
+  cups_encryption = e;
 }
 
 
@@ -300,5 +407,5 @@ cups_get_password(const char *prompt)	/* I - Prompt string */
 
 
 /*
- * End of "$Id: usersys.c,v 1.11 2000/12/13 00:41:19 mike Exp $".
+ * End of "$Id: usersys.c,v 1.12 2000/12/20 13:41:13 mike Exp $".
  */

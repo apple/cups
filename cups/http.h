@@ -1,5 +1,5 @@
 /*
- * "$Id: http.h,v 1.31 2000/12/19 15:10:38 mike Exp $"
+ * "$Id: http.h,v 1.32 2000/12/20 13:41:13 mike Exp $"
  *
  *   Hyper-Text Transport Protocol definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -132,10 +132,10 @@ typedef enum
 
 typedef enum
 {
-  HTTP_ENCRYPT_IF_REQUESTED,	/* Encrypt if requested */
+  HTTP_ENCRYPT_IF_REQUESTED,	/* Encrypt if requested (TLS upgrade) */
   HTTP_ENCRYPT_NEVER,		/* Never encrypt */
-  HTTP_ENCRYPT_PREFERRED,	/* Encryption is preferred */
-  HTTP_ENCRYPT_ALWAYS		/* Always encrypt */
+  HTTP_ENCRYPT_REQUIRED,	/* Encryption is required (TLS upgrade) */
+  HTTP_ENCRYPT_ALWAYS		/* Always encrypt (SSL) */
 } http_encryption_t;
 
 
@@ -338,5 +338,5 @@ extern char		*httpMD5String(const md5_byte_t *, char [33]);
 #endif /* !_CUPS_HTTP_H_ */
 
 /*
- * End of "$Id: http.h,v 1.31 2000/12/19 15:10:38 mike Exp $".
+ * End of "$Id: http.h,v 1.32 2000/12/20 13:41:13 mike Exp $".
  */

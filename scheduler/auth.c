@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.c,v 1.37 2000/12/18 21:38:58 mike Exp $"
+ * "$Id: auth.c,v 1.38 2000/12/20 13:41:16 mike Exp $"
  *
  *   Authorization routines for the Common UNIX Printing System (CUPS).
  *
@@ -484,7 +484,7 @@ IsAuthorized(client_t *con)	/* I - Connection */
   * See if encryption is required...
   */
 
-  if (best->encryption == HTTP_ENCRYPT_ALWAYS && !con->http.tls)
+  if (best->encryption >= HTTP_ENCRYPT_REQUIRED && !con->http.tls)
     return (HTTP_UPGRADE_REQUIRED);
 #endif /* HAVE_LIBSSL */
 
@@ -909,5 +909,5 @@ pam_func(int                      num_msg,	/* I - Number of messages */
 
 
 /*
- * End of "$Id: auth.c,v 1.37 2000/12/18 21:38:58 mike Exp $".
+ * End of "$Id: auth.c,v 1.38 2000/12/20 13:41:16 mike Exp $".
  */

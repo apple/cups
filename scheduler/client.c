@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.78 2000/12/20 10:51:00 mike Exp $"
+ * "$Id: client.c,v 1.79 2000/12/20 13:41:16 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -159,6 +159,21 @@ AcceptClient(listener_t *lis)	/* I - Listener socket */
 
   if (NumClients == MaxClients)
     PauseListening();
+
+#ifdef HAVE_LIBSSL
+ /*
+  * See if we are connecting on port 443...
+  */
+
+  if (ntohs(con->http.hostaddr.sin_port) == 443)
+  {
+   /*
+    * https connection; go secure...
+    */
+
+    EncryptClient(con);
+  }
+#endif /* HAVE_LIBSSL */
 }
 
 
@@ -182,9 +197,31 @@ void
 CloseClient(client_t *con)	/* I - Client to close */
 {
   int	status;			/* Exit status of pipe command */
+#ifdef HAVE_LIBSSL
+  SSL_CTX	*context;	/* Context for encryption */
+  SSL		*conn;		/* Connection for encryption */
+#endif /* HAVE_LIBSSL */
 
 
   LogMessage(L_DEBUG, "CloseClient() %d", con->http.fd);
+
+#ifdef HAVE_LIBSSL
+ /*
+  * Shutdown encryption as needed...
+  */
+
+  if (con->http.tls)
+  {
+    conn    = (SSL *)(con->http.tls);
+    context = SSL_get_SSL_CTX(conn);
+
+    SSL_shutdown(conn);
+    SSL_CTX_free(context);
+    SSL_free(conn);
+
+    con->http.tls = NULL;
+  }
+#endif /* HAVE_LIBSSL */
 
  /*
   * Close the socket and clear the file from the input set for select()...
@@ -347,12 +384,6 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	con->http.keep_alive     = HTTP_KEEPALIVE_OFF;
 	con->http.data_encoding  = HTTP_ENCODE_LENGTH;
 	con->http.data_remaining = 0;
-#ifdef HAVE_LIBSSL
-	con->http.encryption     = HTTP_ENCRYPT_IF_REQUESTED;
-#else
-	con->http.encryption     = HTTP_ENCRYPT_NEVER;
-#endif /* HAVE_LIBSSL */
-	con->http.tls            = NULL;
 	con->operation           = HTTP_WAITING;
 	con->bytes               = 0;
 	con->file                = 0;
@@ -508,7 +539,7 @@ ReadClient(client_t *con)	/* I - Client to read from */
       }
 
       if ((strcasecmp(con->http.fields[HTTP_FIELD_CONNECTION], "Upgrade") == 0 ||
-           best != NULL && best->encryption == HTTP_ENCRYPT_ALWAYS) &&
+           (best != NULL && best->encryption == HTTP_ENCRYPT_ALWAYS)) &&
 	  con->http.tls == NULL)
       {
 #ifdef HAVE_LIBSSL
@@ -1924,5 +1955,5 @@ pipe_command(client_t *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.78 2000/12/20 10:51:00 mike Exp $".
+ * End of "$Id: client.c,v 1.79 2000/12/20 13:41:16 mike Exp $".
  */
