@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.h,v 1.37 2004/02/25 20:14:53 mike Exp $"
+ * "$Id: printers.h,v 1.38 2004/06/28 23:31:34 mike Exp $"
  *
  *   Printer definitions for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -83,10 +83,15 @@ typedef struct printer_str
  * Globals...
  */
 
-VAR ipp_t		*CommonData VALUE(NULL);/* Common printer object attrs */
-VAR printer_t		*Printers VALUE(NULL);	/* Printer list */
+VAR ipp_t		*CommonData	VALUE(NULL);
+					/* Common printer object attrs */
+VAR int			NumPrinters	VALUE(0);
+					/* Number of printers */
+VAR printer_t		*Printers	VALUE(NULL);
+					/* Printer list */
 VAR printer_t		*DefaultPrinter VALUE(NULL);
-						/* Default printer */
+					/* Default printer */
+
 
 /*
  * Prototypes...
@@ -123,5 +128,5 @@ extern void		WritePrintcap(void);
 
 
 /*
- * End of "$Id: printers.h,v 1.37 2004/02/25 20:14:53 mike Exp $".
+ * End of "$Id: printers.h,v 1.38 2004/06/28 23:31:34 mike Exp $".
  */
