@@ -3,6 +3,8 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.19rc2
 
+	- Banner pages containing unescaped { characters would
+	  not work.
 	- The printer-state-time collection attribute was
 	  encoded as an enumeration instead of an integer.
 	- The printer-is-accepting-jobs collection attribute was
