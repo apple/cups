@@ -1,5 +1,5 @@
 /*
- * "$Id: cups.h,v 1.12 1999/05/19 18:00:52 mike Exp $"
+ * "$Id: cups.h,v 1.13 1999/06/21 18:46:12 mike Exp $"
  *
  *   API definitions for the Common UNIX Printing System (CUPS).
  *
@@ -125,6 +125,10 @@ extern int		cupsParseOptions(char *arg, int num_options,
 extern int		cupsMarkOptions(ppd_file_t *ppd, int num_options,
 			                cups_option_t *options);
 
+extern char		*cupsGetPassword(const char *prompt);
+extern char		*cupsServer();
+extern char		*cupsUser();
+
 #  ifdef __cplusplus
 }
 #  endif /* __cplusplus */
@@ -132,5 +136,5 @@ extern int		cupsMarkOptions(ppd_file_t *ppd, int num_options,
 #endif /* !_CUPS_CUPS_H_ */
 
 /*
- * End of "$Id: cups.h,v 1.12 1999/05/19 18:00:52 mike Exp $".
+ * End of "$Id: cups.h,v 1.13 1999/06/21 18:46:12 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c,v 1.21 1999/06/18 18:36:13 mike Exp $"
+ * "$Id: util.c,v 1.22 1999/06/21 18:46:16 mike Exp $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -149,12 +149,10 @@ cupsDoFileRequest(http_t *http,		/* I - HTTP connection to server */
   struct stat	fileinfo;	/* File information */
   int		bytes;		/* Number of bytes read/written */
   char		buffer[8192];	/* Output buffer */
-#if !defined(WIN32) && !defined(__EMX__)
   char		*password,	/* Password string */
 		plain[255],	/* Plaintext username:password */
 		encode[255];	/* Encoded username:password */
   char		junk[8192];	/* Junk buffer for error data */
-#endif /* !WIN32 && !__EMX__ */
   static char	authstring[255] = "";
 				/* Authorization string */
 
@@ -204,7 +202,7 @@ cupsDoFileRequest(http_t *http,		/* I - HTTP connection to server */
     */
 
     if (filename != NULL)
-      sprintf(length, "%u", ippLength(request) + fileinfo.st_size);
+      sprintf(length, "%u", ippLength(request) + (size_t)fileinfo.st_size);
     else
       sprintf(length, "%u", ippLength(request));
 
@@ -254,7 +252,6 @@ cupsDoFileRequest(http_t *http,		/* I - HTTP connection to server */
 
     while ((status = httpUpdate(http)) == HTTP_CONTINUE);
 
-#if !defined(WIN32) && !defined(__EMX__)
     if (status == HTTP_UNAUTHORIZED)
     {
       DEBUG_puts("cupsDoFileRequest: unauthorized...");
@@ -265,7 +262,7 @@ cupsDoFileRequest(http_t *http,		/* I - HTTP connection to server */
 
       httpFlush(http);
 
-      if ((password = getpass("Password:")) != NULL)
+      if ((password = cupsGetPassword("Password:")) != NULL)
       {
        /*
 	* Got a password; send it to the server...
@@ -273,7 +270,7 @@ cupsDoFileRequest(http_t *http,		/* I - HTTP connection to server */
 
         if (!password[0])
           break;
-	sprintf(plain, "%s:%s", cuserid(NULL), password);
+	sprintf(plain, "%s:%s", cupsUser(), password);
 	httpEncode64(encode, plain);
 	sprintf(authstring, "Basic %s", encode);
 
@@ -282,7 +279,6 @@ cupsDoFileRequest(http_t *http,		/* I - HTTP connection to server */
       else
         break;
     }
-#endif /* !WIN32 && !__EMX__ */
 
     if (status != HTTP_OK)
     {
@@ -945,5 +941,5 @@ cups_connect(char *name,	/* I - Destination (printer[@host]) */
 
 
 /*
- * End of "$Id: util.c,v 1.21 1999/06/18 18:36:13 mike Exp $".
+ * End of "$Id: util.c,v 1.22 1999/06/21 18:46:16 mike Exp $".
  */

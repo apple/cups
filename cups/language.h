@@ -1,5 +1,5 @@
 /*
- * "$Id: language.h,v 1.8 1999/06/18 18:36:10 mike Exp $"
+ * "$Id: language.h,v 1.9 1999/06/21 18:46:14 mike Exp $"
  *
  *   Multi-language support for the Common UNIX Printing System (CUPS).
  *
@@ -132,6 +132,13 @@ typedef enum			/**** Message Indices ****/
   CUPS_MSG_ORIENTATION,
   CUPS_MSG_PORTRAIT,
   CUPS_MSG_LANDSCAPE,
+  CUPS_MSG_JOB_STATE,
+  CUPS_MSG_JOB_NAME,
+  CUPS_MSG_USER_NAME,
+  CUPS_MSG_PRIORITY,
+  CUPS_MSG_COPIES,
+  CUPS_MSG_FILE_SIZE,
+  CUPS_MSG_PENDING,
   CUPS_MSG_HTTP_BASE = 200,
   CUPS_MSG_HTTP_END = 505,
   CUPS_MSG_MAX
@@ -182,5 +189,5 @@ extern cups_lang_t	*cupsLangGet(char *language);
 #endif /* !_CUPS_LANGUAGE_H_ */
 
 /*
- * End of "$Id: language.h,v 1.8 1999/06/18 18:36:10 mike Exp $".
+ * End of "$Id: language.h,v 1.9 1999/06/21 18:46:14 mike Exp $".
  */

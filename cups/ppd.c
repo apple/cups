@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c,v 1.25 1999/06/18 16:40:25 mike Exp $"
+ * "$Id: ppd.c,v 1.26 1999/06/21 18:46:14 mike Exp $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -865,13 +865,6 @@ ppdOpen(FILE *fp)		/* I - File to read from */
      /*
       * Find the JCL group, and add if needed...
       */
-
-      if (group != NULL)
-      {
-        ppdClose(ppd);
-	free(string);
-	return (NULL);
-      }
 
       group = ppd_get_group(ppd, "JCL");
 
@@ -1757,5 +1750,5 @@ ppd_fix(char *string)		/* IO - String to fix */
 
 
 /*
- * End of "$Id: ppd.c,v 1.25 1999/06/18 16:40:25 mike Exp $".
+ * End of "$Id: ppd.c,v 1.26 1999/06/21 18:46:14 mike Exp $".
  */
