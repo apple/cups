@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.130 2002/10/15 16:09:18 mike Exp $"
+ * "$Id: printers.c,v 1.131 2002/10/28 15:59:08 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -1091,6 +1091,8 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
 
   printer_type = p->type;
 
+  p->raw = 0;
+
   if (p->type & CUPS_PRINTER_REMOTE)
   {
    /*
@@ -1099,6 +1101,8 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
 
     ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_TEXT,
                  "printer-make-and-model", NULL, p->make_model);
+
+    p->raw = 1;
   }
   else
   {
@@ -1401,7 +1405,7 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
 	  * Print all files directly...
 	  */
 
-	  p->filetype = NULL;
+	  p->raw = 1;
 	}
 	else
 	{
@@ -1413,7 +1417,7 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
 	  ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_TEXT,
                        "printer-make-and-model", NULL, "Local Raw Printer");
 
-	  p->filetype = NULL;
+	  p->raw = 1;
 	}
       }
 
@@ -2077,5 +2081,5 @@ write_irix_state(printer_t *p)	/* I - Printer to update */
 
 
 /*
- * End of "$Id: printers.c,v 1.130 2002/10/15 16:09:18 mike Exp $".
+ * End of "$Id: printers.c,v 1.131 2002/10/28 15:59:08 mike Exp $".
  */
