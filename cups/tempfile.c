@@ -1,5 +1,5 @@
 /*
- * "$Id: tempfile.c,v 1.1.2.7 2003/01/07 18:26:30 mike Exp $"
+ * "$Id: tempfile.c,v 1.1.2.8 2003/01/15 16:08:44 mike Exp $"
  *
  *   Temp file utilities for the Common UNIX Printing System (CUPS).
  *
@@ -58,11 +58,11 @@ cupsTempFd(char *filename,		/* I - Pointer to buffer */
 {
   int		fd;			/* File descriptor for temp file */
   int		tries;			/* Number of tries */
+  const char	*tmpdir;		/* TMPDIR environment var */
 #ifdef WIN32
-  char		tmpdir[1024];		/* Windows temporary directory */
+  char		tmppath[1024];		/* Windows temporary directory */
   DWORD		curtime;		/* Current time */
 #else
-  char		*tmpdir;		/* TMPDIR environment var */
   struct timeval curtime;		/* Current time */
 #endif /* WIN32 */
   static char	buf[1024] = "";		/* Buffer if you pass in NULL and 0 */
@@ -83,7 +83,11 @@ cupsTempFd(char *filename,		/* I - Pointer to buffer */
   */
 
 #ifdef WIN32
-  GetTempPath(sizeof(tmpdir), tmpdir);
+  if ((tmpdir = getenv("TEMP")) == NULL)
+  {
+    GetTempPath(sizeof(tmppath), tmppath);
+    tmpdir = tmppath;
+  }
 #else
   if ((tmpdir = getenv("TMPDIR")) == NULL)
   {
@@ -139,11 +143,14 @@ cupsTempFd(char *filename,		/* I - Pointer to buffer */
     * stomp on an existing file or someone's symlink crack...
     */
 
-#ifdef O_NOFOLLOW
+#ifdef WIN32
+    fd = open(filename, _O_CREAT | _O_RDWR | _O_TRUNC | _O_BINARY,
+              _S_IREAD | _S_IWRITE);
+#elif defined(O_NOFOLLOW)
     fd = open(filename, O_RDWR | O_CREAT | O_EXCL | O_NOFOLLOW, 0600);
 #else
     fd = open(filename, O_RDWR | O_CREAT | O_EXCL, 0600);
-#endif /* O_NOFOLLOW */
+#endif /* WIN32 */
 
     if (fd < 0 && errno != EEXIST)
       break;
@@ -204,5 +211,5 @@ cupsTempFile(char *filename,		/* I - Pointer to buffer */
 
 
 /*
- * End of "$Id: tempfile.c,v 1.1.2.7 2003/01/07 18:26:30 mike Exp $".
+ * End of "$Id: tempfile.c,v 1.1.2.8 2003/01/15 16:08:44 mike Exp $".
  */
