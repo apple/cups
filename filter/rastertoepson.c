@@ -1,5 +1,5 @@
 /*
- * "$Id: rastertoepson.c,v 1.2 2000/01/21 02:23:26 mike Exp $"
+ * "$Id: rastertoepson.c,v 1.3 2000/01/21 03:45:10 mike Exp $"
  *
  *   EPSON ESC/P and ESC/P2 filter for the Common UNIX Printing System
  *   (CUPS).
@@ -228,11 +228,64 @@ CompressData(unsigned char *line,	/* I - Data to compress */
   unsigned char	*line_ptr,		/* Current byte pointer */
         	*line_end,		/* End-of-line byte pointer */
         	*comp_ptr,		/* Pointer into compression buffer */
-        	*start;			/* Start of compression sequence */
+        	*start,			/* Start of compression sequence */
+		temp;			/* Current byte */
   int           count;			/* Count of bytes for output */
   static int	ctable[6] = { 0, 2, 1, 4, 2, 1 };
 					/* KCMYcm color values */
 
+
+ /*
+  * Setup pointers...
+  */
+
+  line_ptr = line;
+  line_end = line + length;
+
+ /*
+  * Do depletion for 720 DPI printing...
+  */
+
+  if (ystep == 5)
+  {
+    for (comp_ptr = line; comp_ptr < line_end;)
+    {
+     /*
+      * Grab the current byte...
+      */
+
+      temp = *comp_ptr;
+
+     /*
+      * Check adjacent bits...
+      */
+
+      if ((temp & 0xc0) == 0xc0)
+        temp &= 0xbf;
+      if ((temp & 0x60) == 0x60)
+        temp &= 0xdf;
+      if ((temp & 0x30) == 0x30)
+        temp &= 0xef;
+      if ((temp & 0x18) == 0x18)
+        temp &= 0xf7;
+      if ((temp & 0x0c) == 0x0c)
+        temp &= 0xfb;
+      if ((temp & 0x06) == 0x06)
+        temp &= 0xfd;
+      if ((temp & 0x03) == 0x03)
+        temp &= 0xfe;
+
+      *comp_ptr++ = temp;
+
+     /*
+      * Check the last bit in the current byte and the first bit in the
+      * next byte...
+      */
+
+      if ((temp & 0x01) && comp_ptr < line_end && *comp_ptr & 0x80)
+        *comp_ptr &= 0x7f;
+    }
+  }
 
   switch (type)
   {
@@ -240,9 +293,6 @@ CompressData(unsigned char *line,	/* I - Data to compress */
        /*
 	* Do no compression...
 	*/
-
-	line_ptr = line;
-	line_end = line + length;
 	break;
 
     case 1 :
@@ -250,8 +300,6 @@ CompressData(unsigned char *line,	/* I - Data to compress */
         * Do TIFF pack-bits encoding...
         */
 
-	line_ptr = line;
-	line_end = line + length;
 	comp_ptr = CompBuffer;
 
 	while (line_ptr < line_end)
@@ -544,5 +592,5 @@ main(int  argc,		/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: rastertoepson.c,v 1.2 2000/01/21 02:23:26 mike Exp $".
+ * End of "$Id: rastertoepson.c,v 1.3 2000/01/21 03:45:10 mike Exp $".
  */

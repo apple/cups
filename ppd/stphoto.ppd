@@ -1,6 +1,6 @@
 *PPD-Adobe: "4.3"
 *%
-*% "$Id: stphoto.ppd,v 1.2 2000/01/21 02:23:27 mike Exp $"
+*% "$Id: stphoto.ppd,v 1.3 2000/01/21 03:45:10 mike Exp $"
 *%
 *%   Sample EPSON Stylus Photo driver PPD file for the Common UNIX Printing
 *%   System (CUPS).
@@ -35,7 +35,7 @@
 *cupsFilter:	"application/vnd.cups-raster 0 rastertoepson"
 *cupsColorProfile 180dpi/-: "1.0 1.0 1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0"
 *cupsColorProfile 360dpi/-: "1.0 1.5 1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0"
-*cupsColorProfile 720dpi/-: "0.5 1.5 1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0"
+*cupsColorProfile 720dpi/-: "1.0 2.5 1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0"
 *ModelName:     "EPSON Stylus Photo Series"
 *ShortNickName: "EPSON Stylus Photo Series"
 *NickName:      "EPSON Stylus Photo Series CUPS v1.1"
@@ -80,7 +80,7 @@
 *DefaultResolution: 360dpi
 *Resolution 180dpi/180 DPI: "<</HWResolution[180 180]>>setpagedevice"
 *Resolution 360dpi/360 DPI: "<</HWResolution[360 360]>>setpagedevice{0.6666 exp}bind settransfer"
-*Resolution 720dpi/720 DPI: "<</HWResolution[720 720]>>setpagedevice{0.6666 exp}bind settransfer"
+*Resolution 720dpi/720 DPI: "<</HWResolution[720 720]>>setpagedevice{0.4 exp}bind settransfer"
 *CloseUI: *Resolution
 
 *OpenUI *ColorModel/Output Mode: PickOne
@@ -127,5 +127,5 @@
 *Font ZapfChancery-MediumItalic: Standard "(001.007S)" Standard ROM
 *Font ZapfDingbats: Special "(001.004S)" Standard ROM
 *%
-*% End of "$Id: stphoto.ppd,v 1.2 2000/01/21 02:23:27 mike Exp $".
+*% End of "$Id: stphoto.ppd,v 1.3 2000/01/21 03:45:10 mike Exp $".
 *%
