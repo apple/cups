@@ -1,5 +1,5 @@
 /*
- * "$Id: var.c,v 1.4 1997/05/13 15:16:30 mike Exp $"
+ * "$Id: var.c,v 1.5 1997/05/13 16:38:07 mike Exp $"
  *
  *   CGI form variable functions.
  *
@@ -21,7 +21,10 @@
  * Revision History:
  *
  *   $Log: var.c,v $
- *   Revision 1.4  1997/05/13 15:16:30  mike
+ *   Revision 1.5  1997/05/13 16:38:07  mike
+ *   Fixed a bug in the cgi_initialize_string() code - was not sorting vars!
+ *
+ *   Revision 1.4  1997/05/13  15:16:30  mike
  *   Updated cgiCheckVariables() to see if the variable is blank.
  *
  *   Revision 1.3  1997/05/13  14:56:37  mike
@@ -35,6 +38,7 @@
  *   Initial revision
  */
 
+/*#define DEBUG*/
 #include "cgi.h"
 
 
@@ -78,6 +82,11 @@ cgiInitialize(int need_content)	/* I - True if input is required */
 {
   char	*method;		/* Form posting method */
  
+
+#ifdef DEBUG
+  setbuf(stdout, NULL);
+  puts("Content-type: text/plain\n");
+#endif /* DEBUG */
 
   method = getenv("REQUEST_METHOD");
 
@@ -155,6 +164,13 @@ cgiGetVariable(char *name)	/* I - Name of variable */
   var = bsearch(&key, form_vars, form_count, sizeof(var_t),
                 (int (*)(const void *, const void *))cgi_compare_variables);
 
+#ifdef DEBUG
+  if (var == NULL)
+    printf("cgiGetVariable(\"%s\") is returning NULL...\n", name);
+  else
+    printf("cgiGetVariable(\"%s\") is returning \"%s\"...\n", name, var->value);
+#endif /* DEBUG */
+
   return ((var == NULL) ? NULL : var->value);
 }
 
@@ -201,11 +217,24 @@ cgiSetVariable(char *name,	/* I - Name of variable */
 static void
 cgi_sort_variables(void)
 {
+#ifdef DEBUG
+  int	i;
+
+
+  puts("Sorting variables...");
+#endif /* DEBUG */
+
   if (form_count < 2)
     return;
 
   qsort(form_vars, form_count, sizeof(var_t),
         (int (*)(const void *, const void *))cgi_compare_variables);
+
+#ifdef DEBUG
+  puts("New variable list is:");
+  for (i = 0; i < form_count; i ++)
+    printf("%s = %s\n", form_vars[i].name, form_vars[i].value);
+#endif /* DEBUG */
 }
 
 
@@ -231,6 +260,10 @@ cgi_add_variable(char *name,		/* I - Variable name */
 {
   var_t	*var;
 
+
+#ifdef DEBUG
+  printf("Adding variable \'%s\' with value \'%s\'...\n", name, value);
+#endif /* DEBUG */
 
   if (form_count == 0)
     form_vars = malloc(sizeof(var_t));
@@ -332,6 +365,8 @@ cgi_initialize_string(char *data)	/* I - Form data string */
 
     cgi_add_variable(name, value);
   };
+
+  cgi_sort_variables();
 }
 
 
@@ -344,6 +379,10 @@ cgi_initialize_get(int need_content)	/* I - True if input is required */
 {
   char	*data;	/* Pointer to form data string */
 
+
+#ifdef DEBUG
+  puts("Initializing variables using GET method...");
+#endif /* DEBUG */
 
  /*
   * Check to see if there is anything for us to read...
@@ -380,6 +419,10 @@ cgi_initialize_post(int need_content)	/* I - True if input is required */
 	nbytes,			/* Number of bytes read this read() */
 	tbytes;			/* Total number of bytes read */
 
+
+#ifdef DEBUG
+  puts("Initializing variables using POST method...");
+#endif /* DEBUG */
 
  /*
   * Check to see if there is anything for us to read...
@@ -426,5 +469,5 @@ cgi_initialize_post(int need_content)	/* I - True if input is required */
 
 
 /*
- * End of "$Id: var.c,v 1.4 1997/05/13 15:16:30 mike Exp $".
+ * End of "$Id: var.c,v 1.5 1997/05/13 16:38:07 mike Exp $".
  */
