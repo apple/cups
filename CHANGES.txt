@@ -1,10 +1,23 @@
-CHANGES.txt - 09/18/2000
+CHANGES.txt - 09/26/2000
 ------------------------
 
 CHANGES IN CUPS v1.1.4
 
 	- The web admin interface now displays an error if it
 	  can't get the list of printer drivers from cupsd.
+	- The IPP backend was putting the copies option before
+	  the other job options were set. This caused the IPP
+	  request to contain attribute groups in the wrong
+	  order, which prevented remote printing.
+	- Added checks in scheduler to free memory used for
+	  IPP requests and language information when closing
+	  a client connection.
+	- Fixed the duplex option in the HP LaserJet driver.  It
+	  should now work with all LaserJet printers (and
+	  compatibles)
+	- The add-printer web interface didn't initialize the
+	  "old info" data pointer, which caused random crashes
+	  on many OS's.
 
 
 CHANGES IN CUPS v1.1.3
