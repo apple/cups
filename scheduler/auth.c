@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.c,v 1.41.2.14 2002/09/26 11:31:11 mike Exp $"
+ * "$Id: auth.c,v 1.41.2.15 2002/09/26 15:19:50 mike Exp $"
  *
  *   Authorization routines for the Common UNIX Printing System (CUPS).
  *
@@ -1038,7 +1038,7 @@ IsAuthorized(client_t *con)	/* I - Connection */
     return (HTTP_OK);
 
   LogMessage(L_DEBUG2, "IsAuthorized: username = \"%s\" password = %d chars",
-	     con->username, strlen(con->password));
+	     con->username, (int)strlen(con->password));
   DEBUG_printf(("IsAuthorized: username = \"%s\", password = \"%s\"\n",
 		con->username, con->password));
 
@@ -1726,5 +1726,5 @@ to64(char          *s,	/* O - Output string */
 
 
 /*
- * End of "$Id: auth.c,v 1.41.2.14 2002/09/26 11:31:11 mike Exp $".
+ * End of "$Id: auth.c,v 1.41.2.15 2002/09/26 15:19:50 mike Exp $".
  */

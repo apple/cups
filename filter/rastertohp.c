@@ -1,5 +1,5 @@
 /*
- * "$Id: rastertohp.c,v 1.15.2.4 2002/03/07 18:58:44 mike Exp $"
+ * "$Id: rastertohp.c,v 1.15.2.5 2002/09/26 15:16:22 mike Exp $"
  *
  *   Hewlett-Packard Page Control Language filter for the Common UNIX
  *   Printing System (CUPS).
@@ -561,7 +561,7 @@ CompressData(unsigned char *line,	/* I - Data to compress */
   * Set the length of the data and write a raster plane...
   */
 
-  printf("\033*b%d%c", line_end - line_ptr, plane);
+  printf("\033*b%d%c", (int)(line_end - line_ptr), plane);
   fwrite(line_ptr, line_end - line_ptr, 1, stdout);
 }
 
@@ -804,5 +804,5 @@ main(int  argc,		/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: rastertohp.c,v 1.15.2.4 2002/03/07 18:58:44 mike Exp $".
+ * End of "$Id: rastertohp.c,v 1.15.2.5 2002/09/26 15:16:22 mike Exp $".
  */

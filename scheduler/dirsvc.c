@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.73.2.17 2002/09/24 18:42:53 mike Exp $"
+ * "$Id: dirsvc.c,v 1.73.2.18 2002/09/26 15:19:51 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -1801,6 +1801,12 @@ UpdateSLPBrowse(void)
 
   for (; s; s = next)
   {
+   /*
+    * Save the "next" pointer...
+    */
+
+    next = s->next;
+
    /* 
     * Load a printer_t structure with the SLP service attributes...
     */
@@ -1839,10 +1845,9 @@ UpdateSLPBrowse(void)
     }
 
    /*
-    * Save the "next" pointer and free this listing...
+    * Free this listing...
     */
 
-    next = s->next;
     free(s);
   }       
 
@@ -1852,5 +1857,5 @@ UpdateSLPBrowse(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.73.2.17 2002/09/24 18:42:53 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.73.2.18 2002/09/26 15:19:51 mike Exp $".
  */

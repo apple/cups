@@ -1,5 +1,5 @@
 /*
- * "$Id: imagetoraster.c,v 1.56.2.11 2002/09/24 13:34:06 mike Exp $"
+ * "$Id: imagetoraster.c,v 1.56.2.12 2002/09/26 15:15:01 mike Exp $"
  *
  *   Image file to raster filter for the Common UNIX Printing System (CUPS).
  *
@@ -715,8 +715,8 @@ main(int  argc,		/* I - Number of command-line arguments */
   if (yppi == 0)
     yppi = xppi;
 
-  fprintf(stderr, "DEBUG: Before scaling: xprint=%.1f, yprint=%.1f, xppi=%d, yppi=%d, zoom=%.2f\n",
-          xprint, yprint, xppi, yppi, zoom);
+  fprintf(stderr, "DEBUG: Before scaling: xppi=%d, yppi=%d, zoom=%.2f\n",
+          xppi, yppi, zoom);
 
   if (xppi > 0)
   {
@@ -734,6 +734,9 @@ main(int  argc,		/* I - Number of command-line arguments */
       xprint = (PageRight - PageLeft) / 72.0;
       yprint = (PageTop - PageBottom) / 72.0;
     }
+
+    fprintf(stderr, "DEBUG: Before scaling: xprint=%.1f, yprint=%.1f\n",
+            xprint, yprint);
 
     xinches = (float)img->xsize / (float)xppi;
     yinches = (float)img->ysize / (float)yppi;
@@ -781,6 +784,9 @@ main(int  argc,		/* I - Number of command-line arguments */
     xprint = (PageRight - PageLeft) / 72.0;
     yprint = (PageTop - PageBottom) / 72.0;
     aspect = (float)img->yppi / (float)img->xppi;
+
+    fprintf(stderr, "DEBUG: Before scaling: xprint=%.1f, yprint=%.1f\n",
+            xprint, yprint);
 
     fprintf(stderr, "DEBUG: img->xppi = %d, img->yppi = %d, aspect = %f\n",
             img->xppi, img->yppi, aspect);
@@ -4535,5 +4541,5 @@ make_lut(ib_t  *lut,		/* I - Lookup table */
 
 
 /*
- * End of "$Id: imagetoraster.c,v 1.56.2.11 2002/09/24 13:34:06 mike Exp $".
+ * End of "$Id: imagetoraster.c,v 1.56.2.12 2002/09/26 15:15:01 mike Exp $".
  */
