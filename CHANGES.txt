@@ -36,6 +36,10 @@ CHANGES IN CUPS v1.1.4
 	  when the destination printer supported it.  This
 	  caused problems when printing text files to other
 	  CUPS servers.
+	- Updated the logic used to determine when to rebuild
+	  the PPD file database.  The scheduler now checks the
+	  dates and the number of PPD files (was just checking
+	  the dates.)
 
 
 CHANGES IN CUPS v1.1.3

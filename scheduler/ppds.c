@@ -1,5 +1,5 @@
 /*
- * "$Id: ppds.c,v 1.8 2000/08/04 15:43:34 mike Exp $"
+ * "$Id: ppds.c,v 1.9 2000/10/02 16:20:28 mike Exp $"
  *
  *   PPD scanning routines for the Common UNIX Printing System (CUPS).
  *
@@ -65,7 +65,7 @@ static ppd_info_t	*ppds;		/* PPD file info */
  * Local functions...
  */
 
-static int	check_ppds(const char *d, time_t mtime);
+static int	check_ppds(const char *d, time_t mtime, int *count);
 static int	compare_ppds(const ppd_info_t *p0, const ppd_info_t *p1);
 static void	load_ppds(const char *d, const char *p);
 
@@ -78,6 +78,7 @@ void
 LoadPPDs(const char *d)		/* I - Directory to scan... */
 {
   int		i;		/* Looping var */
+  int		count;		/* Number of PPD files seen */
   ppd_info_t	*ppd;		/* Current PPD file */
   FILE		*fp;		/* ppds.dat file */
   struct stat	fileinfo;	/* ppds.dat information */
@@ -92,7 +93,13 @@ LoadPPDs(const char *d)		/* I - Directory to scan... */
   if (stat(filename, &fileinfo))
     i = 1;
   else
-    i = check_ppds(d, fileinfo.st_mtime);
+  {
+    count = 0;
+    i     = check_ppds(d, fileinfo.st_mtime, &count);
+
+    if (fileinfo.st_size != (count * sizeof(ppd_info_t)))
+      i = 1;
+  }
 
   if (i)
   {
@@ -187,7 +194,8 @@ LoadPPDs(const char *d)		/* I - Directory to scan... */
 
 static int			/* O - 1 if reload needed, 0 otherwise */
 check_ppds(const char *d,	/* I - Directory to scan */
-           time_t     mtime)	/* I - Modification time of ppds.dat */
+           time_t     mtime,	/* I - Modification time of ppds.dat */
+           int        *count)	/* IO - Number of PPD files seen */
 {
   DIR		*dir;		/* Directory pointer */
   DIRENT	*dent;		/* Directory entry */
@@ -232,12 +240,14 @@ check_ppds(const char *d,	/* I - Directory to scan */
       * Do subdirectory...
       */
 
-      if (check_ppds(filename, mtime))
+      if (check_ppds(filename, mtime, count))
       {
         closedir(dir);
         return (1);
       }
     }
+    else
+      (*count) ++;
   }
 
   closedir(dir);
@@ -637,5 +647,5 @@ load_ppds(const char *d,		/* I - Actual directory */
 
 
 /*
- * End of "$Id: ppds.c,v 1.8 2000/08/04 15:43:34 mike Exp $".
+ * End of "$Id: ppds.c,v 1.9 2000/10/02 16:20:28 mike Exp $".
  */
