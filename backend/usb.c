@@ -1,5 +1,5 @@
 /*
- * "$Id: usb.c,v 1.18.2.31 2004/03/19 12:07:00 mike Exp $"
+ * "$Id: usb.c,v 1.18.2.32 2004/03/30 16:45:07 mike Exp $"
  *
  *   USB port backend for the Common UNIX Printing System (CUPS).
  *
@@ -88,24 +88,24 @@ int	open_device(const char *uri);
  *    printer-uri job-id user title copies options [file]
  */
 
-int			/* O - Exit status */
-main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
-     char *argv[])	/* I - Command-line arguments */
+int					/* O - Exit status */
+main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
+     char *argv[])			/* I - Command-line arguments */
 {
-  int		fp;		/* Print file */
-  int		copies;		/* Number of copies to print */
-  int		fd;		/* Parallel device */
-  int		wbytes;		/* Number of bytes written */
-  size_t	nbytes,		/* Number of bytes read */
-		tbytes;		/* Total number of bytes written */
-  char		buffer[8192],	/* Output buffer */
-		*bufptr;	/* Pointer into buffer */
-  struct termios opts;		/* Parallel port options */
+  int		fp;			/* Print file */
+  int		copies;			/* Number of copies to print */
+  int		fd;			/* Parallel device */
+  int		wbytes;			/* Number of bytes written */
+  size_t	nbytes,			/* Number of bytes read */
+		tbytes;			/* Total number of bytes written */
+  char		buffer[8192],		/* Output buffer */
+		*bufptr;		/* Pointer into buffer */
+  struct termios opts;			/* Parallel port options */
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
-  struct sigaction action;	/* Actions for POSIX signals */
+  struct sigaction action;		/* Actions for POSIX signals */
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET */
 #ifdef __linux
-  unsigned char	status;		/* Port status (off-line, out-of-paper, etc.) */
+  unsigned char	status;			/* Port status (off-line, out-of-paper, etc.) */
 #endif /* __linux */
 
 
@@ -243,7 +243,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   {
     fprintf(stderr, "DEBUG: LPGETSTATUS returned a port status of %02X...\n", status);
 
-    if (!(status & LP_POUTPA))
+    if (status & LP_POUTPA)
       fputs("WARNING: Media tray empty!\n", stderr);
     else if (!(status & LP_PERRORP))
       fputs("WARNING: Printer fault!\n", stderr);
@@ -877,5 +877,5 @@ open_device(const char *uri)		/* I - Device URI */
 
 
 /*
- * End of "$Id: usb.c,v 1.18.2.31 2004/03/19 12:07:00 mike Exp $".
+ * End of "$Id: usb.c,v 1.18.2.32 2004/03/30 16:45:07 mike Exp $".
  */
