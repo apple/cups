@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.h,v 1.17 1999/12/29 02:15:41 mike Exp $"
+ * "$Id: conf.h,v 1.18 2000/01/03 17:19:49 mike Exp $"
  *
  *   Configuration file definitions for the Common UNIX Printing System (CUPS)
  *   scheduler.
@@ -39,7 +39,7 @@
  * Globals...
  */
 
-VAR char		ConfigurationFile[256]	VALUE(CUPS_SERVERROOT "/conf/cupsd.conf"),
+VAR char		ConfigurationFile[256]	VALUE(CUPS_SERVERROOT "/cupsd.conf"),
 					/* Configuration file to use */
 			ServerName[256]		VALUE(""),
 					/* FQDN for server */
@@ -51,15 +51,15 @@ VAR char		ConfigurationFile[256]	VALUE(CUPS_SERVERROOT "/conf/cupsd.conf"),
 					/* Root directory for binaries */
 			RequestRoot[1024]	VALUE(CUPS_REQUESTS),
 					/* Directory for request files */
-			DocumentRoot[1024]	VALUE(CUPS_DATADIR "/doc"),
+			DocumentRoot[1024]	VALUE(CUPS_DOCROOT),
 					/* Root directory for documents */
 			SystemGroup[32],
 					/* System group name */
-			AccessLog[1024]		VALUE("logs/access_log"),
+			AccessLog[1024]		VALUE(CUPS_LOGDIR "/access_log"),
 					/* Access log filename */
-			ErrorLog[1024]		VALUE("logs/error_log"),
+			ErrorLog[1024]		VALUE(CUPS_LOGDIR "/error_log"),
 					/* Error log filename */
-			PageLog[1024]		VALUE("logs/page_log"),
+			PageLog[1024]		VALUE(CUPS_LOGDIR "/page_log"),
 					/* Page log filename */
 			DefaultLanguage[32]	VALUE("C"),
 					/* Default language encoding */
@@ -112,5 +112,5 @@ extern int	LogPage(job_t *job, char *page);
 
 
 /*
- * End of "$Id: conf.h,v 1.17 1999/12/29 02:15:41 mike Exp $".
+ * End of "$Id: conf.h,v 1.18 2000/01/03 17:19:49 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.28 1999/12/29 02:15:40 mike Exp $"
+ * "$Id: ipp.c,v 1.29 2000/01/03 17:19:46 mike Exp $"
  *
  *   Internet Printing Protocol support functions for the Common UNIX
  *   Printing System (CUPS).
@@ -44,7 +44,7 @@
  *   ippRead()           - Read data for an IPP request.
  *   ippTimeToDate()     - Convert from UNIX time to RFC 1903 format.
  *   ippWrite()          - Write data for an IPP request.
- *   add_attr()          - Add a new attribute to the request.
+ *   _ipp_add_attr()          - Add a new attribute to the request.
  *   ipp_read()          - Semi-blocking read on a HTTP connection...
  */
 
@@ -64,8 +64,7 @@
  * Local functions...
  */
 
-static ipp_attribute_t	*add_attr(ipp_t *ipp, int num_values);
-static int		ipp_read(http_t *http, unsigned char *buffer, int length);
+static int	ipp_read(http_t *http, unsigned char *buffer, int length);
 
 
 /*
@@ -86,7 +85,7 @@ ippAddBoolean(ipp_t      *ipp,		/* I - IPP request */
   if (ipp == NULL || name == NULL)
     return (NULL);
 
-  if ((attr = add_attr(ipp, 1)) == NULL)
+  if ((attr = _ipp_add_attr(ipp, 1)) == NULL)
     return (NULL);
 
   attr->name              = strdup(name);
@@ -119,7 +118,7 @@ ippAddBooleans(ipp_t      *ipp,		/* I - IPP request */
   if (ipp == NULL || name == NULL)
     return (NULL);
 
-  if ((attr = add_attr(ipp, num_values)) == NULL)
+  if ((attr = _ipp_add_attr(ipp, num_values)) == NULL)
     return (NULL);
 
   attr->name      = strdup(name);
@@ -153,7 +152,7 @@ ippAddDate(ipp_t             *ipp,	/* I - IPP request */
   if (ipp == NULL || name == NULL || value == NULL)
     return (NULL);
 
-  if ((attr = add_attr(ipp, 1)) == NULL)
+  if ((attr = _ipp_add_attr(ipp, 1)) == NULL)
     return (NULL);
 
   attr->name      = strdup(name);
@@ -185,7 +184,7 @@ ippAddInteger(ipp_t      *ipp,		/* I - IPP request */
   if (ipp == NULL || name == NULL)
     return (NULL);
 
-  if ((attr = add_attr(ipp, 1)) == NULL)
+  if ((attr = _ipp_add_attr(ipp, 1)) == NULL)
     return (NULL);
 
   attr->name              = strdup(name);
@@ -216,7 +215,7 @@ ippAddIntegers(ipp_t      *ipp,		/* I - IPP request */
   if (ipp == NULL || name == NULL)
     return (NULL);
 
-  if ((attr = add_attr(ipp, num_values)) == NULL)
+  if ((attr = _ipp_add_attr(ipp, num_values)) == NULL)
     return (NULL);
 
   attr->name      = strdup(name);
@@ -249,7 +248,7 @@ ippAddString(ipp_t      *ipp,		/* I - IPP request */
   if (ipp == NULL || name == NULL)
     return (NULL);
 
-  if ((attr = add_attr(ipp, 1)) == NULL)
+  if ((attr = _ipp_add_attr(ipp, 1)) == NULL)
     return (NULL);
 
   attr->name                      = strdup(name);
@@ -282,7 +281,7 @@ ippAddStrings(ipp_t      *ipp,		/* I - IPP request */
   if (ipp == NULL || name == NULL)
     return (NULL);
 
-  if ((attr = add_attr(ipp, num_values)) == NULL)
+  if ((attr = _ipp_add_attr(ipp, num_values)) == NULL)
     return (NULL);
 
   attr->name      = strdup(name);
@@ -321,7 +320,7 @@ ippAddRange(ipp_t      *ipp,		/* I - IPP request */
   if (ipp == NULL || name == NULL)
     return (NULL);
 
-  if ((attr = add_attr(ipp, 1)) == NULL)
+  if ((attr = _ipp_add_attr(ipp, 1)) == NULL)
     return (NULL);
 
   attr->name                  = strdup(name);
@@ -353,7 +352,7 @@ ippAddRanges(ipp_t      *ipp,		/* I - IPP request */
   if (ipp == NULL || name == NULL)
     return (NULL);
 
-  if ((attr = add_attr(ipp, num_values)) == NULL)
+  if ((attr = _ipp_add_attr(ipp, num_values)) == NULL)
     return (NULL);
 
   attr->name                  = strdup(name);
@@ -389,7 +388,7 @@ ippAddResolution(ipp_t      *ipp,	/* I - IPP request */
   if (ipp == NULL || name == NULL)
     return (NULL);
 
-  if ((attr = add_attr(ipp, 1)) == NULL)
+  if ((attr = _ipp_add_attr(ipp, 1)) == NULL)
     return (NULL);
 
   attr->name                       = strdup(name);
@@ -423,7 +422,7 @@ ippAddResolutions(ipp_t      *ipp,	/* I - IPP request */
   if (ipp == NULL || name == NULL)
     return (NULL);
 
-  if ((attr = add_attr(ipp, num_values)) == NULL)
+  if ((attr = _ipp_add_attr(ipp, num_values)) == NULL)
     return (NULL);
 
   attr->name                       = strdup(name);
@@ -457,7 +456,7 @@ ippAddSeparator(ipp_t *ipp)		/* I - IPP request */
   if (ipp == NULL)
     return (NULL);
 
-  if ((attr = add_attr(ipp, 0)) == NULL)
+  if ((attr = _ipp_add_attr(ipp, 0)) == NULL)
     return (NULL);
 
   attr->group_tag = IPP_TAG_ZERO;
@@ -861,7 +860,7 @@ ippRead(http_t *http,		/* I - HTTP data */
 	    buffer[n] = '\0';
 	    DEBUG_printf(("ippRead: name = \'%s\'\n", buffer));
 
-	    attr = ipp->current = add_attr(ipp, IPP_MAX_VALUES);
+	    attr = ipp->current = _ipp_add_attr(ipp, IPP_MAX_VALUES);
 
 	    attr->group_tag  = ipp->curtag;
 	    attr->value_tag  = tag;
@@ -1206,7 +1205,7 @@ ippWrite(http_t *http,		/* I - HTTP data */
                   DEBUG_printf(("ippWrite: writing string = %d, \'%s\'\n", n,
 		                attr->values[i].string.text));
 
-                  if ((sizeof(buffer) - (bufptr - buffer)) < (n + 2)
+                  if ((sizeof(buffer) - (bufptr - buffer)) < (n + 2))
 		  {
                     if (httpWrite(http, (char *)buffer, bufptr - buffer) < 0)
 	            {
@@ -1321,7 +1320,7 @@ ippWrite(http_t *http,		/* I - HTTP data */
 
                   n = strlen(attr->values[i].string.charset);
 
-                  if ((sizeof(buffer) - (bufptr - buffer)) < (n + 2)
+                  if ((sizeof(buffer) - (bufptr - buffer)) < (n + 2))
 		  {
                     if (httpWrite(http, (char *)buffer, bufptr - buffer) < 0)
 	            {
@@ -1339,7 +1338,7 @@ ippWrite(http_t *http,		/* I - HTTP data */
 
                   n = strlen(attr->values[i].string.text);
 
-                  if ((sizeof(buffer) - (bufptr - buffer)) < (n + 2)
+                  if ((sizeof(buffer) - (bufptr - buffer)) < (n + 2))
 		  {
                     if (httpWrite(http, (char *)buffer, bufptr - buffer) < 0)
 	            {
@@ -1424,17 +1423,17 @@ ippPort(void)
 
 
 /*
- * 'add_attr()' - Add a new attribute to the request.
+ * '_ipp_add_attr()' - Add a new attribute to the request.
  */
 
-static ipp_attribute_t *		/* O - New attribute */
-add_attr(ipp_t *ipp,			/* I - IPP request */
-         int   num_values)		/* I - Number of values */
+ipp_attribute_t *		/* O - New attribute */
+_ipp_add_attr(ipp_t *ipp,	/* I - IPP request */
+              int   num_values)	/* I - Number of values */
 {
-  ipp_attribute_t	*attr;		/* New attribute */
+  ipp_attribute_t	*attr;	/* New attribute */
 
 
-  DEBUG_printf(("add_attr(%08x, %d)\n", ipp, num_values));
+  DEBUG_printf(("_ipp_add_attr(%08x, %d)\n", ipp, num_values));
 
   if (ipp == NULL || num_values < 0)
     return (NULL);
@@ -1488,5 +1487,5 @@ ipp_read(http_t        *http,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.28 1999/12/29 02:15:40 mike Exp $".
+ * End of "$Id: ipp.c,v 1.29 2000/01/03 17:19:46 mike Exp $".
  */

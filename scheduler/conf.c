@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.36 1999/12/29 02:15:41 mike Exp $"
+ * "$Id: conf.c,v 1.37 2000/01/03 17:19:49 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -178,9 +178,10 @@ ReadConfiguration(void)
   strcpy(ServerRoot, CUPS_SERVERROOT);
   strcpy(ServerBin, CUPS_SERVERBIN);
   strcpy(RequestRoot, CUPS_REQUESTS);
-  strcpy(DocumentRoot, CUPS_DOCDIR);
-  strcpy(AccessLog, "logs/access_log");
-  strcpy(ErrorLog, "logs/error_log");
+  strcpy(DocumentRoot, CUPS_DOCROOT);
+  strcpy(AccessLog, CUPS_LOGDIR "/access_log");
+  strcpy(ErrorLog, CUPS_LOGDIR "/error_log");
+  strcpy(PageLog, CUPS_LOGDIR "/page_log");
 
   if ((language = DEFAULT_LANGUAGE) == NULL)
     language = "en";
@@ -374,7 +375,6 @@ ReadConfiguration(void)
   * Check for queued jobs...
   */
 
-  LoadJobs();
   CheckJobs();
 
   return (1);
@@ -972,5 +972,5 @@ get_address(char               *value,		/* I - Value string */
 
 
 /*
- * End of "$Id: conf.c,v 1.36 1999/12/29 02:15:41 mike Exp $".
+ * End of "$Id: conf.c,v 1.37 2000/01/03 17:19:49 mike Exp $".
  */

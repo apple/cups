@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.44 1999/12/29 02:15:42 mike Exp $"
+ * "$Id: job.c,v 1.45 2000/01/03 17:19:49 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -55,10 +55,10 @@
  * Local functions...
  */
 
-static ipp_state_t	ipp_read_file(const char *filename, ipp_t *request);
-static ipp_state_t	ipp_write_file(const char *filename, ipp_t *request);
-static int		start_process(const char *command, const char *argv[],
-			              const char *envp[], int in, int out, int err);
+static ipp_state_t	ipp_read_file(const char *filename, ipp_t *ipp);
+static ipp_state_t	ipp_write_file(const char *filename, ipp_t *ipp);
+static int		start_process(const char *command, char *argv[],
+			              char *envp[], int in, int out, int err);
 
 
 /*
@@ -131,6 +131,8 @@ CancelJob(int id)		/* I - Job to cancel */
       * Remove the print file for good if we aren't preserving jobs or
       * files...
       */
+
+      current->current_file = 0;
 
       if (!JobHistory || !JobFiles)
         for (i = 1; i <= current->num_files; i ++)
@@ -408,6 +410,7 @@ StartJob(int       id,		/* I - Job ID */
   int		statusfds[2],	/* Pipes used between the filters and scheduler */
 		filterfds[2][2];/* Pipes used between the filters */
   char		*argv[8],	/* Filter command-line arguments */
+		filename[1024],	/* Job filename */
 		command[1024],	/* Full path to filter/backend command */
 		jobid[255],	/* Job ID string */
 		title[IPP_MAX_NAME],
@@ -484,7 +487,7 @@ StartJob(int       id,		/* I - Job ID */
     * Local jobs get filtered...
     */
 
-    filters = mimeFilter(MimeDatabase, current->filetype,
+    filters = mimeFilter(MimeDatabase, current->filetypes[current->current_file],
                          printer->filetype, &num_filters);
 
     if (num_filters == 0)
@@ -610,7 +613,11 @@ StartJob(int       id,		/* I - Job ID */
   * printing interface to be used by CUPS.
   */
 
+  current->current_file ++;
+
   sprintf(jobid, "%d", current->id);
+  sprintf(filename, "%s/d%05d-%03d", RequestRoot, current->id,
+          current->current_file);
 
   argv[0] = printer->name;
   argv[1] = jobid;
@@ -618,7 +625,7 @@ StartJob(int       id,		/* I - Job ID */
   argv[3] = title;
   argv[4] = copies;
   argv[5] = options;
-  argv[6] = current->filename;
+  argv[6] = filename;
   argv[7] = NULL;
 
   DEBUG_printf(("StartJob: args = \'%s\',\'%s\',\'%s\',\'%s\',\'%s\',\'%s\',\'%s\'\n",
@@ -643,8 +650,9 @@ StartJob(int       id,		/* I - Job ID */
     sprintf(charset, "CHARSET=%s", attr->values[0].string.text);
   }
 
-  sprintf(content_type, "CONTENT_TYPE=%s/%s", current->filetype->super,
-          current->filetype->type);
+  sprintf(content_type, "CONTENT_TYPE=%s/%s",
+          current->filetypes[current->current_file]->super,
+          current->filetypes[current->current_file]->type);
   sprintf(device_uri, "DEVICE_URI=%s", printer->device_uri);
   sprintf(ppd, "PPD=%s/ppd/%s.ppd", ServerRoot, printer->name);
   sprintf(printer_name, "PRINTER=%s", printer->name);
@@ -742,7 +750,7 @@ StartJob(int       id,		/* I - Job ID */
          	  filterfds[i & 1][1]));
 
     pid = start_process(command, argv, envp, filterfds[!(i & 1)][0],
-	                filterfds[i & 1][1], statusfds[1]);
+                        filterfds[i & 1][1], statusfds[1]);
 
     close(filterfds[!(i & 1)][0]);
     close(filterfds[!(i & 1)][1]);
@@ -791,7 +799,7 @@ StartJob(int       id,		/* I - Job ID */
         	  filterfds[i & 1][1]));
 
     pid = start_process(command, argv, envp, filterfds[!(i & 1)][0],
-	                filterfds[i & 1][1], statusfds[1]);
+			filterfds[i & 1][1], statusfds[1]);
 
     close(filterfds[!(i & 1)][0]);
     close(filterfds[!(i & 1)][1]);
@@ -863,10 +871,12 @@ StopJob(int id)			/* I - Job ID */
       {
         DEBUG_puts("StopJob: job state is \'processing\'.");
 
-        if (current->status)
+        if (current->status > 0)
 	  SetPrinterState(current->printer, IPP_PRINTER_STOPPED);
-	else if (current->printer->state == IPP_PRINTER_BUSY)
+	else
 	  SetPrinterState(current->printer, IPP_PRINTER_IDLE);
+
+        DEBUG_printf(("StopJob: printer state is %d\n", current->printer->state));
 
 	current->state        = IPP_JOB_STOPPED;
         current->printer->job = NULL;
@@ -1008,6 +1018,7 @@ UpdateJob(job_t *job)		/* I - Job to check */
 
       StopJob(job->id);
       job->state = IPP_JOB_PENDING;
+      job->current_file --;
     }
     else if (job->status > 0)
     {
@@ -1015,12 +1026,17 @@ UpdateJob(job_t *job)		/* I - Job to check */
       * Filter had errors; cancel it...
       */
 
-      CancelJob(job->id);
+      if (job->current_file < job->num_files)
+        StartJob(job->id, job->printer);
+      else
+      {
+        CancelJob(job->id);
 
-      if (JobHistory)
-        job->state = IPP_JOB_ABORTED;
+        if (JobHistory)
+          job->state = IPP_JOB_ABORTED;
 
-      CheckJobs();
+        CheckJobs();
+      }
     }
     else
     {
@@ -1028,14 +1044,17 @@ UpdateJob(job_t *job)		/* I - Job to check */
       * Job printed successfully; cancel it...
       */
 
-      job->printer->state_message[0] = '\0';
+      if (job->current_file < job->num_files)
+        StartJob(job->id, job->printer);
+      else
+      {
+	CancelJob(job->id);
 
-      CancelJob(job->id);
+	if (JobHistory)
+          job->state = IPP_JOB_COMPLETED;
 
-      if (JobHistory)
-        job->state = IPP_JOB_COMPLETED;
-
-      CheckJobs();
+	CheckJobs();
+      }
     }
   }
 }
@@ -1047,7 +1066,7 @@ UpdateJob(job_t *job)		/* I - Job to check */
 
 static ipp_state_t			/* O - State */
 ipp_read_file(const char *filename,	/* I - File to read from */
-              ipp_t      *request)	/* I - Request to read into */
+              ipp_t      *ipp)		/* I - Request to read into */
 {
   int			fd;		/* File descriptor for file */
   int			n;		/* Length of data */
@@ -1060,7 +1079,7 @@ ipp_read_file(const char *filename,	/* I - File to read from */
   * Open the file if possible...
   */
 
-  if (filename == NULL || request == NULL)
+  if (filename == NULL || ipp == NULL)
     return (IPP_ERROR);
 
   if ((fd = open(filename, O_RDONLY)) == -1)
@@ -1203,7 +1222,7 @@ ipp_read_file(const char *filename,	/* I - File to read from */
 	    buffer[n] = '\0';
 	    DEBUG_printf(("ippRead: name = \'%s\'\n", buffer));
 
-	    attr = ipp->current = add_attr(ipp, IPP_MAX_VALUES);
+	    attr = ipp->current = _ipp_add_attr(ipp, IPP_MAX_VALUES);
 
 	    attr->group_tag  = ipp->curtag;
 	    attr->value_tag  = tag;
@@ -1360,7 +1379,7 @@ ipp_read_file(const char *filename,	/* I - File to read from */
 
 static ipp_state_t			/* O - State */
 ipp_write_file(const char *filename,	/* I - File to write to */
-               ipp_t      *request)	/* I - Request to write */
+               ipp_t      *ipp)		/* I - Request to write */
 {
   int			fd;		/* File descriptor */
   int			i;		/* Looping var */
@@ -1374,10 +1393,10 @@ ipp_write_file(const char *filename,	/* I - File to write to */
   * Open the file if possible...
   */
 
-  if (filename == NULL || request == NULL)
+  if (filename == NULL || ipp == NULL)
     return (IPP_ERROR);
 
-  if ((fd = open(filename, O_WRONLY | O_CREATE | O_TRUNC, 0640)) == -1)
+  if ((fd = open(filename, O_WRONLY | O_CREAT | O_TRUNC, 0640)) == -1)
     return (IPP_ERROR);
 
   fchmod(fd, 0640);
@@ -1746,8 +1765,8 @@ ipp_write_file(const char *filename,	/* I - File to write to */
 
 static int				/* O - Process ID or 0 */
 start_process(const char *command,	/* I - Full path to command */
-              const char *argv[],	/* I - Command-line arguments */
-	      const char *envp[],	/* I - Environment */
+              char       *argv[],	/* I - Command-line arguments */
+	      char       *envp[],	/* I - Environment */
               int        infd,		/* I - Standard input file descriptor */
 	      int        outfd,		/* I - Standard output file descriptor */
 	      int        errfd)		/* I - Standard error file descriptor */
@@ -1819,5 +1838,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.44 1999/12/29 02:15:42 mike Exp $".
+ * End of "$Id: job.c,v 1.45 2000/01/03 17:19:49 mike Exp $".
  */

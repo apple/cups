@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.38 1999/12/29 02:15:41 mike Exp $"
+ * "$Id: ipp.c,v 1.39 2000/01/03 17:19:49 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -1568,6 +1568,7 @@ static void
 get_jobs(client_t        *con,		/* I - Client connection */
 	 ipp_attribute_t *uri)		/* I - Printer URI */
 {
+  int			i;		/* Looping var */
   ipp_attribute_t	*attr;		/* Current attribute */
   char			*dest;		/* Destination */
   cups_ptype_t		dtype;		/* Destination type (printer or class) */
@@ -1588,7 +1589,9 @@ get_jobs(client_t        *con,		/* I - Client connection */
 					/* Job URI... */
 			printer_uri[HTTP_MAX_URI];
 					/* Printer URI... */
+  char			filename[1024];	/* Job filename */
   struct stat		filestats;	/* Print file information */
+  size_t		jobsize;	/* Total job sizes */
 
 
   DEBUG_printf(("get_jobs(%08x, %08x)\n", con, uri));
@@ -1725,9 +1728,15 @@ get_jobs(client_t        *con,		/* I - Client connection */
     ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_NAME, "job-name",
                   NULL, job->title);
 
-    stat(job->filename, &filestats);
+    for (i = 0, jobsize = 0; i < job->num_files; i ++)
+    {
+      sprintf(filename, "%s/d%05d-%03d", RequestRoot, job->id, i + 1);
+      stat(filename, &filestats);
+      jobsize += filestats.st_size;
+    }
+
     ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_INTEGER,
-                  "job-k-octets", (filestats.st_size + 1023) / 1024);
+                  "job-k-octets", (jobsize + 1023) / 1024);
 
     ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_URI,
                  "job-more-info", NULL, job_uri);
@@ -1762,6 +1771,7 @@ static void
 get_job_attrs(client_t        *con,		/* I - Client connection */
 	      ipp_attribute_t *uri)		/* I - Job URI */
 {
+  int			i;		/* Looping var */
   ipp_attribute_t	*attr;		/* Current attribute */
   int			jobid;		/* Job ID */
   job_t			*job;		/* Current job */
@@ -1778,7 +1788,9 @@ get_job_attrs(client_t        *con,		/* I - Client connection */
 					/* Job URI... */
 			printer_uri[HTTP_MAX_URI];
 					/* Printer URI... */
+  char			filename[1024];	/* Job filename */
   struct stat		filestats;	/* Print file information */
+  size_t		jobsize;	/* Total job sizes */
 
 
   DEBUG_printf(("get_job_attrs(%08x, %08x)\n", con, uri));
@@ -1857,11 +1869,17 @@ get_job_attrs(client_t        *con,		/* I - Client connection */
   ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_INTEGER, "job-id", job->id);
 
   ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_NAME, "job-name",
-                NULL, job->title);
+               NULL, job->title);
 
-  stat(job->filename, &filestats);
+  for (i = 0, jobsize = 0; i < job->num_files; i ++)
+  {
+    sprintf(filename, "%s/d%05d-%03d", RequestRoot, job->id, i + 1);
+    stat(filename, &filestats);
+    jobsize += filestats.st_size;
+  }
+
   ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_INTEGER,
-                "job-k-octets", (filestats.st_size + 1023) / 1024);
+                "job-k-octets", (jobsize + 1023) / 1024);
 
   ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_URI,
                "job-more-info", NULL, job_uri);
@@ -2430,7 +2448,7 @@ print_job(client_t        *con,		/* I - Client connection */
   job->attrs    = con->request;
   con->request  = NULL;
 
-  if ((filetypes = (mimetype_t **)malloc(sizeof(mimetype_t *))) == NULL)
+  if ((job->filetypes = (mime_type_t **)malloc(sizeof(mime_type_t *))) == NULL)
   {
     CancelJob(job->id);
     LogMessage(LOG_ERROR, "print_job: unable to allocate memory for file types!");
@@ -2438,10 +2456,9 @@ print_job(client_t        *con,		/* I - Client connection */
     return;
   }
 
-  job->filetypes = filetypes;
-  job->filetypes[job->num_files] = filetype;
+  job->filetypes[0] = filetype;
+  job->num_files    = 1;
 
-  job->num_files ++;
   sprintf(filename, "%s/d%05d-%03d", RequestRoot, job->id, job->num_files);
   rename(con->filename, filename);
 
@@ -2743,12 +2760,9 @@ static void
 send_document(client_t        *con,	/* I - Client connection */
 	      ipp_attribute_t *uri)	/* I - Printer URI */
 {
+  int			i;		/* Looping var */
   ipp_attribute_t	*attr;		/* Current attribute */
   ipp_attribute_t	*format;	/* Document-format attribute */
-  char			*dest;		/* Destination */
-  cups_ptype_t		dtype;		/* Destination type (printer or class) */
-  int			priority;	/* Job priority */
-  char			*title;		/* Job name/title */
   int			jobid;		/* Job ID number */
   job_t			*job;		/* Current job */
   char			job_uri[HTTP_MAX_URI],
@@ -2771,6 +2785,9 @@ send_document(client_t        *con,	/* I - Client connection */
 			mimetype[MIME_MAX_SUPER + MIME_MAX_TYPE + 2];
 					/* Textual name of mime type */
   printer_t		*printer;	/* Printer data */
+  struct passwd		*user;		/* User info */
+  struct group		*group;		/* System group info */
+  char			filename[1024];	/* Job filename */
 
 
   DEBUG_printf(("send_document(%08x, %08x)\n", con, uri));
@@ -2996,11 +3013,11 @@ send_document(client_t        *con,	/* I - Client connection */
   */
 
   if (job->num_files == 0)
-    filetypes = (mimetype_t **)malloc(sizeof(mimetype_t *));
+    filetypes = (mime_type_t **)malloc(sizeof(mime_type_t *));
   else
-    filetypes = (mimetype_t **)realloc(job->filetypes,
+    filetypes = (mime_type_t **)realloc(job->filetypes,
                                        (job->num_files + 1) *
-				       sizeof(mimetype_t));
+				       sizeof(mime_type_t));
 
   if (filetypes == NULL)
   {
@@ -3016,8 +3033,6 @@ send_document(client_t        *con,	/* I - Client connection */
   job->num_files ++;
   sprintf(filename, "%s/d%05d-%03d", RequestRoot, job->id, job->num_files);
   rename(con->filename, filename);
-
-  strncpy(job->title, title, sizeof(job->title) - 1);
 
   con->filename[0] = '\0';
 
@@ -3419,7 +3434,7 @@ validate_job(client_t        *con,	/* I - Client connection */
 
   if ((format = ippFindAttribute(con->request, "document-format", IPP_TAG_MIMETYPE)) == NULL)
   {
-    LogError(LOG_ERROR, "validate_job: missing document-format attribute!");
+    LogMessage(LOG_ERROR, "validate_job: missing document-format attribute!");
     send_ipp_error(con, IPP_BAD_REQUEST);
     return;
   }
@@ -3470,5 +3485,5 @@ validate_job(client_t        *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.38 1999/12/29 02:15:41 mike Exp $".
+ * End of "$Id: ipp.c,v 1.39 2000/01/03 17:19:49 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.h,v 1.20 1999/12/29 02:15:40 mike Exp $"
+ * "$Id: ipp.h,v 1.21 2000/01/03 17:19:46 mike Exp $"
  *
  *   Internet Printing Protocol definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -144,7 +144,7 @@ typedef enum			/**** Job States.... */
   IPP_JOB_HELD,
   IPP_JOB_PROCESSING,
   IPP_JOB_STOPPED,
-  IPP_JOB_CANCELED,
+  IPP_JOB_CANCELLED,
   IPP_JOB_ABORTED,
   IPP_JOB_COMPLETED
 } ipp_jstate_t;
@@ -194,6 +194,7 @@ typedef enum			/**** IPP operations... ****/
   CUPS_ACCEPT_JOBS,
   CUPS_REJECT_JOBS,
   CUPS_SET_DEFAULT,
+  CUPS_GET_BANNERS,
   CUPS_GET_DEVICES,
   CUPS_GET_PPDS
 } ipp_op_t;
@@ -331,6 +332,9 @@ extern const ipp_uchar_t *ippTimeToDate(time_t t);
 extern ipp_state_t	ippWrite(http_t *http, ipp_t *ipp);
 extern int		ippPort(void);
 
+extern ipp_attribute_t	*_ipp_add_attr(ipp_t *, int);
+
+
 /*
  * C++ magic...
  */
@@ -341,5 +345,5 @@ extern int		ippPort(void);
 #endif /* !_CUPS_IPP_H_ */
 
 /*
- * End of "$Id: ipp.h,v 1.20 1999/12/29 02:15:40 mike Exp $".
+ * End of "$Id: ipp.h,v 1.21 2000/01/03 17:19:46 mike Exp $".
  */
