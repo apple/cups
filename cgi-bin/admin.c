@@ -1,5 +1,5 @@
 /*
- * "$Id: admin.c,v 1.22.2.12 2002/08/01 01:17:38 mike Exp $"
+ * "$Id: admin.c,v 1.22.2.13 2002/08/15 03:17:19 mike Exp $"
  *
  *   Administration CGI for the Common UNIX Printing System (CUPS).
  *
@@ -952,18 +952,30 @@ do_config_printer(http_t      *http,	/* I - HTTP connection */
 
   ppdMarkDefaults(ppd);
 
-  for (i = ppd->num_groups, group = ppd->groups;
-       i > 0 && !have_options;
-       i --, group ++)
-    for (j = group->num_options, option = group->options;
-         j > 0;
-	 j --, option ++)
+  DEBUG_printf(("<P>ppd->num_groups = %d\n"
+                "<UL>\n", ppd->num_groups));
+
+  for (i = ppd->num_groups, group = ppd->groups; i > 0; i --, group ++)
+  {
+    DEBUG_printf(("<LI>%s<UL>\n", group->text));
+
+    for (j = group->num_options, option = group->options; j > 0; j --, option ++)
       if ((var = cgiGetVariable(option->keyword)) != NULL)
       {
+        DEBUG_printf(("<LI>%s = \"%s\"</LI>\n", option->keyword, var));
         have_options = 1;
 	ppdMarkOption(ppd, option->keyword, var);
-	break;
       }
+#ifdef DEBUG
+      else
+        printf("<LI>%s not defined!</LI>\n", option->keyword);
+#endif /* DEBUG */
+
+    DEBUG_puts("</UL></LI>");
+  }
+
+  DEBUG_printf(("</UL>\n"
+                "<P>ppdConflicts(ppd) = %d\n", ppdConflicts(ppd)));
 
   if (!have_options || ppdConflicts(ppd))
   {
@@ -1500,5 +1512,5 @@ get_line(char *buf,	/* I - Line buffer */
 
 
 /*
- * End of "$Id: admin.c,v 1.22.2.12 2002/08/01 01:17:38 mike Exp $".
+ * End of "$Id: admin.c,v 1.22.2.13 2002/08/15 03:17:19 mike Exp $".
  */
