@@ -1,5 +1,5 @@
 /*
- * "$Id: ipptest.c,v 1.9 2002/01/02 17:59:20 mike Exp $"
+ * "$Id: ipptest.c,v 1.10 2002/01/14 19:06:56 mike Exp $"
  *
  *   IPP test command for the Common UNIX Printing System (CUPS).
  *
@@ -400,10 +400,14 @@ do_tests(const char *uri,		/* I - URI to connect on */
 
     if (response == NULL)
     {
+      time_t curtime;
+
+      curtime = time(NULL);
+
       printf("\b\b\b\b\bFAIL]\n");
       printf("        ERROR %x\n", cupsLastError());
-      printf("        (%s)\n",
-	     ippErrorString(cupsLastError()));
+      printf("        (%s) @ %s\n",
+	     ippErrorString(cupsLastError()), ctime(&curtime));
       pass = 0;
     }
     else
@@ -797,5 +801,5 @@ print_attr(ipp_attribute_t *attr)	/* I - Attribute to print */
 
 
 /*
- * End of "$Id: ipptest.c,v 1.9 2002/01/02 17:59:20 mike Exp $".
+ * End of "$Id: ipptest.c,v 1.10 2002/01/14 19:06:56 mike Exp $".
  */
