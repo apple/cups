@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-pam.m4,v 1.10 2004/06/29 03:44:52 mike Exp $"
+dnl "$Id: cups-pam.m4,v 1.11 2004/08/11 14:39:26 mike Exp $"
 dnl
 dnl   PAM stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -65,7 +65,7 @@ if test x$enable_pam != xno; then
 			# Darwin, MacOS X
 			PAMFILE="pam.darwin"
 			;;
-		IRIX*)
+		IRIX)
 			# SGI IRIX
 			PAMFILE="pam.irix"
 			;;
@@ -90,5 +90,5 @@ AC_SUBST(PAMLIBS)
 AC_SUBST(PAMMOD)
 
 dnl
-dnl End of "$Id: cups-pam.m4,v 1.10 2004/06/29 03:44:52 mike Exp $".
+dnl End of "$Id: cups-pam.m4,v 1.11 2004/08/11 14:39:26 mike Exp $".
 dnl
