@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.6 1999/06/25 17:08:10 mike Exp $"
+ * "$Id: ipp.c,v 1.7 1999/07/20 14:05:45 mike Exp $"
  *
  *   IPP backend for the Common UNIX Printing System (CUPS).
  *
@@ -279,7 +279,9 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
     sprintf(buffer, "%u", ippLength(request) + (size_t)fileinfo.st_size);
     httpSetField(http, HTTP_FIELD_CONTENT_LENGTH, buffer);
   }
-  
+  else
+    httpSetField(http, HTTP_FIELD_TRANSFER_ENCODING, "chunked");
+
  /*
   * Do the request...
   */
@@ -394,5 +396,5 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
 
 /*
- * End of "$Id: ipp.c,v 1.6 1999/06/25 17:08:10 mike Exp $".
+ * End of "$Id: ipp.c,v 1.7 1999/07/20 14:05:45 mike Exp $".
  */
