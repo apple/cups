@@ -1,6 +1,6 @@
 *PPD-Adobe: "4.3"
 *%
-*% "$Id: deskjet.ppd,v 1.5 2000/01/20 22:33:12 mike Exp $"
+*% "$Id: deskjet.ppd,v 1.6 2000/05/09 21:44:03 mike Exp $"
 *%
 *%   Sample HP DeskJet driver PPD file for the Common UNIX Printing
 *%   System (CUPS).
@@ -135,7 +135,7 @@
 *DefaultResolution: 300dpi
 *Resolution 150dpi/150 DPI: "<</HWResolution[150 150]>>setpagedevice"
 *Resolution 300dpi/300 DPI: "<</HWResolution[300 300]>>setpagedevice"
-*Resolution 600dpi/600 DPI: "<</HWResolution[600 600]/cupsColorSpace 3>>setpagedevice"
+*Resolution 600dpi/600 DPI: "<</HWResolution[600 600]>>setpagedevice"
 *CloseUI: *Resolution
 
 *OpenUI *ColorModel/Output Mode: PickOne
@@ -182,5 +182,5 @@
 *Font ZapfChancery-MediumItalic: Standard "(001.007S)" Standard ROM
 *Font ZapfDingbats: Special "(001.004S)" Standard ROM
 *%
-*% End of "$Id: deskjet.ppd,v 1.5 2000/01/20 22:33:12 mike Exp $".
+*% End of "$Id: deskjet.ppd,v 1.6 2000/05/09 21:44:03 mike Exp $".
 *%
