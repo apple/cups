@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.82.2.18 2002/10/22 15:54:34 mike Exp $"
+ * "$Id: http.c,v 1.82.2.19 2002/10/30 20:05:28 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS).
  *
@@ -1036,7 +1036,7 @@ httpRead(http_t *http,			/* I - HTTP data */
     http->used -= length;
 
     if (http->used > 0)
-      memcpy(http->buffer, http->buffer + length, http->used);
+      memmove(http->buffer, http->buffer + length, http->used);
   }
 #ifdef HAVE_LIBSSL
   else if (http->tls)
@@ -1350,6 +1350,7 @@ httpGets(char   *line,			/* I - Line to read into */
 
       http->used += bytes;
       bufend     += bytes;
+      bufptr     = bufend;
     }
   }
   while (bufptr >= bufend && http->used < HTTP_MAX_BUFFER);
@@ -1386,7 +1387,7 @@ httpGets(char   *line,			/* I - Line to read into */
 
     http->used -= bytes;
     if (http->used > 0)
-      memcpy(http->buffer, bufptr, http->used);
+      memmove(http->buffer, bufptr, http->used);
 
     DEBUG_printf(("httpGets(): Returning \"%s\"\n", line));
     return (line);
@@ -2110,5 +2111,5 @@ http_upgrade(http_t *http)	/* I - HTTP data */
 
 
 /*
- * End of "$Id: http.c,v 1.82.2.18 2002/10/22 15:54:34 mike Exp $".
+ * End of "$Id: http.c,v 1.82.2.19 2002/10/30 20:05:28 mike Exp $".
  */

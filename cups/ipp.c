@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.55.2.19 2002/10/22 15:54:34 mike Exp $"
+ * "$Id: ipp.c,v 1.55.2.20 2002/10/30 20:05:29 mike Exp $"
  *
  *   Internet Printing Protocol support functions for the Common UNIX
  *   Printing System (CUPS).
@@ -2254,7 +2254,7 @@ ipp_read_http(http_t      *http,	/* I - Client connection */
       http->data_remaining -= bytes;
 
       if (http->used > 0)
-	memcpy(http->buffer, http->buffer + bytes, http->used);
+	memmove(http->buffer, http->buffer + bytes, http->used);
 
       if (http->data_remaining == 0)
       {
@@ -2366,5 +2366,5 @@ ipp_write_mem(ipp_mem_t   *m,		/* I - Memory buffer */
 
 
 /*
- * End of "$Id: ipp.c,v 1.55.2.19 2002/10/22 15:54:34 mike Exp $".
+ * End of "$Id: ipp.c,v 1.55.2.20 2002/10/30 20:05:29 mike Exp $".
  */
