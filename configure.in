@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: configure.in,v 1.45 2000/07/07 19:13:54 mike Exp $"
+dnl "$Id: configure.in,v 1.46 2000/07/10 19:14:26 mike Exp $"
 dnl
 dnl   Configuration script for the Common UNIX Printing System (CUPS).
 dnl
@@ -348,7 +348,7 @@ if test "$uname" = "IRIX" -a $uversion -ge 62; then
 fi
 
 dnl Fix "mandir" variable...
-if test "$mandir" == "\${prefix}/man" -a "$prefix" = "/"; then
+if test "$mandir" = "\${prefix}/man" -a "$prefix" = "/"; then
 	if test "$uname" = "IRIX"; then
 		mandir="/usr/share/catman"
 	else
@@ -447,5 +447,5 @@ AC_SUBST(CUPS_DOCROOT)
 AC_OUTPUT(Makedefs cups.sh)
 
 dnl
-dnl End of "$Id: configure.in,v 1.45 2000/07/07 19:13:54 mike Exp $".
+dnl End of "$Id: configure.in,v 1.46 2000/07/10 19:14:26 mike Exp $".
 dnl
