@@ -1,5 +1,5 @@
 /*
- * "$Id: imagetoraster.c,v 1.2 1998/02/24 21:06:28 mike Exp $"
+ * "$Id: imagetoraster.c,v 1.3 1998/04/02 21:06:54 mike Exp $"
  *
  *   Image file to STIFF conversion program for espPrint, a collection
  *   of printer drivers.
@@ -17,7 +17,10 @@
  * Revision History:
  *
  *   $Log: imagetoraster.c,v $
- *   Revision 1.2  1998/02/24 21:06:28  mike
+ *   Revision 1.3  1998/04/02 21:06:54  mike
+ *   Fixed problem with dither array (off by one).
+ *
+ *   Revision 1.2  1998/02/24  21:06:28  mike
  *   Updated to handle variable media sizes and adjust the output size
  *   accordingly.
  *
@@ -79,7 +82,7 @@ int	FloydDither[16][16] =
   { 15, 143, 47, 175, 7, 135, 39, 167, 13, 141, 45, 173, 5, 133, 37, 165 },
   { 207, 79, 239, 111, 199, 71, 231, 103, 205, 77, 237, 109, 197, 69, 229, 101 },
   { 63, 191, 31, 159, 55, 183, 23, 151, 61, 189, 29, 157, 53, 181, 21, 149 },
-  { 255, 127, 223, 95, 247, 119, 215, 87, 253, 125, 221, 93, 245, 117, 213, 85 }
+  { 254, 127, 223, 95, 247, 119, 215, 87, 253, 125, 221, 93, 245, 117, 213, 85 }
 };
 
 
@@ -95,15 +98,12 @@ static void	make_lut(ib_t *, int, float, float, float, float);
  * 'main()' - Main entry...
  */
 
-void
+int
 main(int  argc,		/* I - Number of command-line arguments */
      char *argv[])	/* I - Command-line arguments */
 {
   int			i;		/* Looping var */
-  FILE			*out;		/* Output file */
-  gzFile		ppdfile;	/* PPD file */
-  char			*pslevel,	/* Level of PostScript supported */
-			*opt,		/* Current option character */
+  char			*opt,		/* Current option character */
 			*infile,	/* Input filename */
 			*outfile,	/* Output filename */
 			*printer;	/* Printer */
@@ -152,9 +152,6 @@ main(int  argc,		/* I - Number of command-line arguments */
 			*rowptr,
 			*r0,
 			*r1,
-			cyan,
-			magenta,
-			yellow,
 			bitmask;
   int			bwidth,
 			bpp,
@@ -1042,6 +1039,8 @@ main(int  argc,		/* I - Number of command-line arguments */
 
   if (Verbosity)
     fputs("img2stiff: Exiting with no errors!\n", stderr);
+
+  return (NO_ERROR);
 }
 
 
@@ -1108,5 +1107,5 @@ make_lut(ib_t  *lut,		/* I - Lookup table */
 
 
 /*
- * End of "$Id: imagetoraster.c,v 1.2 1998/02/24 21:06:28 mike Exp $".
+ * End of "$Id: imagetoraster.c,v 1.3 1998/04/02 21:06:54 mike Exp $".
  */
