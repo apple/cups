@@ -1,5 +1,5 @@
 /*
- * "$Id: encode.c,v 1.1.2.7 2002/08/27 16:20:14 mike Exp $"
+ * "$Id: encode.c,v 1.1.2.8 2002/11/05 20:43:14 mike Exp $"
  *
  *   Option encoding routines for the Common UNIX Printing System (CUPS).
  *
@@ -197,9 +197,7 @@ cupsEncodeOptions(ipp_t         *ipp,		/* I - Request to add to */
     attr->group_tag = IPP_TAG_JOB;
 
     if (strcasecmp(options[i].value, "true") == 0 ||
-        strcasecmp(options[i].value, "false") == 0 ||
-	strcasecmp(options[i].value, "yes") == 0 ||
-        strcasecmp(options[i].value, "no") == 0)
+        strcasecmp(options[i].value, "false") == 0)
       attr->value_tag = IPP_TAG_BOOLEAN;
     else
       attr->value_tag = IPP_TAG_NAME;
@@ -287,7 +285,7 @@ cupsEncodeOptions(ipp_t         *ipp,		/* I - Request to add to */
             break;
 
 	case IPP_TAG_BOOLEAN :
-	    if (strcasecmp(val, "true") == 0 || strcasecmp(val, "yes") == 0)
+	    if (strcasecmp(val, "true") == 0)
 	    {
 	     /*
 	      * Boolean value - true...
@@ -379,5 +377,5 @@ cupsEncodeOptions(ipp_t         *ipp,		/* I - Request to add to */
 
 
 /*
- * End of "$Id: encode.c,v 1.1.2.7 2002/08/27 16:20:14 mike Exp $".
+ * End of "$Id: encode.c,v 1.1.2.8 2002/11/05 20:43:14 mike Exp $".
  */

@@ -3,6 +3,11 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.17
 
+	- The cupsEncodeOptions() and cupsParseOptions()
+	  functions now conform to the grammer defined by the
+	  current draft of the PAPI specification.  The main
+	  difference is that option=yes and option=no are no
+	  longer treated as boolean options.
 	- The IPP backend didn't honor the encryption settings
 	  in /etc/cups/client.conf.
 	- Fixed a potential bug in the HTTP code which was
