@@ -21,7 +21,7 @@
 % Ghostscript, as distributed by Aladdin Enterprises, does not require any
 % GNU software to build or run it.
 
-% $Id: gs_setpd.ps,v 1.3 2000/03/08 23:14:31 mike Exp $
+% $Id: gs_setpd.ps,v 1.4 2000/03/20 18:57:57 mike Exp $
 % The current implementation of setpagedevice has the following limitations:
 %	- It doesn't attempt to "interact with the user" for Policy = 2.
 
@@ -282,18 +282,29 @@ level2dict begin
 
 % Define the keys used in input attribute matching.
 /.inputattrkeys [
-  /PageSize /MediaColor /MediaWeight /MediaType /InsertSheet
+%%%% MRS - The current CUPS backend driver does not register any of
+%%%%       these attributes with GhostScript from the PPD file.  As
+%%%%       a result, we must comment out everything but PageSize
+%%%%       which is processed differently from all other attributes.
+%  /PageSize /MediaColor /MediaWeight /MediaType /InsertSheet
 	% The following are documented in Adobe's supplement for v2017.
-  /LeadingEdge /MediaClass
+%  /LeadingEdge /MediaClass
+  /PageSize
 ] readonly def
 % Define other keys used in media selection.
 /.inputselectionkeys [
-  /MediaPosition /Orientation
+%%%% MRS - The current CUPS backend driver does not register any of
+%%%%       these attributes with GhostScript from the PPD file.  As
+%%%%       a result, we must comment out everything.
+%  /MediaPosition /Orientation
 ] readonly def
 
 % Define the keys used in output attribute matching.
 /.outputattrkeys [
-  /OutputType
+%%%% MRS - The current CUPS backend driver does not register any of
+%%%%       these attributes with GhostScript from the PPD file.  As
+%%%%       a result, we must comment out everything.
+%  /OutputType
 ] readonly def
 
 % Define all the parameters that should always be copied to the merged
