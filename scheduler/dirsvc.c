@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.4 1999/04/22 20:20:50 mike Exp $"
+ * "$Id: dirsvc.c,v 1.5 1999/04/22 20:32:31 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -120,13 +120,16 @@ StopBrowsing(void)
   * Close the socket and remove it from the input selection set.
   */
 
+  if (BrowseSocket >= 0)
+  {
 #if defined(WIN32) || defined(__EMX__)
-  closesocket(BrowseSocket);
+    closesocket(BrowseSocket);
 #else
-  close(BrowseSocket);
+    close(BrowseSocket);
 #endif /* WIN32 || __EMX__ */
 
-  FD_CLR(BrowseSocket, &InputSet);
+    FD_CLR(BrowseSocket, &InputSet);
+  }
 }
 
 
@@ -285,5 +288,5 @@ SendBrowseList(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.4 1999/04/22 20:20:50 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.5 1999/04/22 20:32:31 mike Exp $".
  */
