@@ -1,7 +1,7 @@
 /*
- * "$Id: dirsvc.c,v 1.3 1999/01/24 14:25:11 mike Exp $"
+ * "$Id: dirsvc.c,v 1.4 1999/04/22 20:20:50 mike Exp $"
  *
- *   for the Common UNIX Printing System (CUPS).
+ *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
  *   Copyright 1997-1999 by Easy Software Products, all rights reserved.
  *
@@ -33,30 +33,257 @@
 #include "cupsd.h"
 
 
+/*
+ * 'StartBrowsing()' - Start sending and receiving broadcast information.
+ */
+
 void
 StartBrowsing(void)
 {
-}
+  int			val;	/* Socket option value */
+  struct sockaddr_in	addr;	/* Broadcast address */
 
 
-void
-StopBrowsing(void)
-{
-}
+  if (!Browsing)
+    return;
 
+ /*
+  * Create the broadcast socket...
+  */
 
-void
-UpdateBrowseList(void)
-{
-}
+  if ((BrowseSocket = socket(PF_INET, SOCK_DGRAM, 0)) < 0)
+  {
+    LogMessage(LOG_ERROR, "StartBrowsing: Unable to create broadcast socket - %s.",
+               strerror(errno));
+    return;
+  }
 
+ /*
+  * Set the "broadcast" and "allow port reuse" flags...
+  */
 
-void
-SendBrowseList(void)
-{
+  val = 1;
+  setsockopt(BrowseSocket, SOL_SOCKET, SO_BROADCAST, &val, sizeof(val));
+
+#ifdef SO_REUSEPORT
+  val = 1;
+  setsockopt(BrowseSocket, SOL_SOCKET, SO_REUSEPORT, &val, sizeof(val));
+#endif /* SO_REUSEPORT */
+
+ /*
+  * Bind the socket to browse port...
+  */
+
+ /*
+  * Setup the broadcast address...
+  */
+
+  memset(&addr, 0, sizeof(addr));
+  addr.sin_addr.s_addr = htonl(INADDR_ANY);
+  addr.sin_family      = AF_INET;
+  addr.sin_port        = htons(BrowsePort);
+
+  if (bind(BrowseSocket, &addr, sizeof(addr)))
+  {
+    LogMessage(LOG_ERROR, "StartBrowsing: Unable to bind broadcast socket - %s.",
+               strerror(errno));
+
+#if defined(WIN32) || defined(__EMX__)
+    closesocket(BrowseSocket);
+#else
+    close(BrowseSocket);
+#endif /* WIN32 || __EMX__ */
+
+    BrowseSocket = -1;
+    return;
+  }
+
+ /*
+  * Finally, add the socket to the input selection set...
+  */
+
+  FD_SET(BrowseSocket, &InputSet);
 }
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.3 1999/01/24 14:25:11 mike Exp $".
+ * 'StopBrowsing()' - Stop sending and receiving broadcast information.
+ */
+
+void
+StopBrowsing(void)
+{
+  if (!Browsing)
+    return;
+
+ /*
+  * Close the socket and remove it from the input selection set.
+  */
+
+#if defined(WIN32) || defined(__EMX__)
+  closesocket(BrowseSocket);
+#else
+  close(BrowseSocket);
+#endif /* WIN32 || __EMX__ */
+
+  FD_CLR(BrowseSocket, &InputSet);
+}
+
+
+/*
+ * 'UpdateBrowseList()' - Update the browse lists for any new browse data.
+ */
+
+void
+UpdateBrowseList(void)
+{
+  int		bytes;			/* Number of bytes left */
+  char		packet[1540];		/* Broadcast packet */
+  cups_ptype_t	type;			/* Printer type */
+  ipp_pstate_t	state;			/* Printer state */
+  char		uri[HTTP_MAX_URI],	/* Printer URI */
+		method[HTTP_MAX_URI],	/* Method portion of URI */
+		username[HTTP_MAX_URI],	/* Username portion of URI */
+		host[HTTP_MAX_URI],	/* Host portion of URI */
+		resource[HTTP_MAX_URI];	/* Resource portion of URI */
+  int		port;			/* Port portion of URI */
+  char		name[IPP_MAX_NAME],	/* Name of printer */
+		*ptr;			/* Pointer into hostname */
+  printer_t	*p;			/* Printer information */
+
+
+ /*
+  * Read a packet from the browse socket...
+  */
+
+  if ((bytes = recv(BrowseSocket, packet, sizeof(packet), 0)) <= 0)
+    return;
+
+  packet[bytes] = '\0';
+  fprintf(stderr, "UpdateBrowseList: %s", packet);
+
+  if (sscanf(packet, "%x%x%s", &type, &state, uri) != 3)
+  {
+    LogMessage(LOG_WARN, "UpdateBrowseList: Garbled browse packet - %s",
+               packet);
+    return;
+  }
+
+ /*
+  * Pull the URI apart to see if this is a local or remote printer...
+  */
+
+  httpSeparate(uri, method, username, host, &port, resource);
+
+  if (strcasecmp(host, ServerName) == 0)
+    return;
+
+ /*
+  * OK, this isn't a local printer; see if we already have it listed in
+  * the Printers list, and add it if not...
+  */
+
+  type += CUPS_PRINTER_REMOTE;
+
+  if ((ptr = strchr(host, '.')) != NULL)
+    *ptr = '\0';
+
+  if (strncmp(resource, "/printers/", 10) == 0)
+    sprintf(name, "%s@%s", resource + 10, host);
+  else if (strncmp(resource, "/classes/", 9) == 0)
+    sprintf(name, "%s@%s", resource + 9, host);
+  else
+    return;
+
+  if ((p = FindPrinter(name)) == NULL)
+  {
+   /*
+    * Printer doesn't exist; add it...
+    */
+
+    p = AddPrinter(name);
+
+   /*
+    * First the URI to point to the real server...
+    */
+
+    strcpy(p->uri, uri);
+    free(p->attrs->attrs->values[0].string.text);
+    p->attrs->attrs->values[0].string.text = strdup(uri);
+  }
+
+ /*
+  * Update the state...
+  */
+
+  p->type        = type;
+  p->state       = state;
+  p->browse_time = time(NULL);
+}
+
+
+/*
+ * 'SendBrowseList()' - Send new browsing information.
+ */
+
+void
+SendBrowseList(void)
+{
+  int			i;	/* Looping var */
+  printer_t		*p,	/* Current printer */
+			*np;	/* Next printer */
+  time_t		t;	/* Minimum update time */
+  int			bytes;	/* Length of packet */
+  char			packet[1540];
+				/* Browse data packet */
+
+
+ /*
+  * Compute the update time...
+  */
+
+  t = time(NULL) - BrowseTimeout;
+
+ /*
+  * Loop through all of the printers and send local updates as needed...
+  */
+
+  for (p = Printers; p != NULL; p = np)
+  {
+    np = p->next;
+
+    if (p->type & CUPS_PRINTER_REMOTE)
+    {
+     /*
+      * See if this printer needs to be timed out...
+      */
+
+      if (p->browse_time < (t - 2))
+        DeletePrinter(p);
+    }
+    else if (p->browse_time < t)
+    {
+     /*
+      * Need to send an update...
+      */
+
+      p->browse_time = time(NULL);
+
+      sprintf(packet, "%x %x %s\n", p->type, p->state, p->uri);
+      bytes = strlen(packet);
+      fprintf(stderr, "SendBrowseList: %s", packet);
+
+     /*
+      * Send a packet to each browse address...
+      */
+
+      for (i = 0; i < NumBrowsers; i ++)
+	sendto(BrowseSocket, packet, bytes, 0, Browsers + i, sizeof(Browsers[0]));
+    }
+  }
+}
+
+
+/*
+ * End of "$Id: dirsvc.c,v 1.4 1999/04/22 20:20:50 mike Exp $".
  */

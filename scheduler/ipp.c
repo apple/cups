@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.8 1999/04/21 14:14:56 mike Exp $"
+ * "$Id: ipp.c,v 1.9 1999/04/22 20:20:51 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -41,7 +41,7 @@ static void	add_class(client_t *con);
 static void	add_printer(client_t *con);
 static void	cancel_all_jobs(client_t *con, ipp_attribute_t *uri);
 static void	cancel_job(client_t *con, ipp_attribute_t *uri);
-static void	copy_attrs(ipp_t *to, ipp_t *from);
+static void	copy_attrs(ipp_t *to, ipp_t *from, ipp_attribute_t *req);
 static void	delete_class(client_t *con);
 static void	delete_printer(client_t *con);
 static void	get_classes(client_t *con);
@@ -551,8 +551,9 @@ cancel_job(client_t        *con,	/* I - Client connection */
  */
 
 static void
-copy_attrs(ipp_t *to,		/* I - Destination request */
-           ipp_t *from)		/* I - Source request */
+copy_attrs(ipp_t           *to,		/* I - Destination request */
+           ipp_t           *from,	/* I - Source request */
+           ipp_attribute_t *req)	/* I - Requested attributes */
 {
   int			i;		/* Looping var */
   ipp_attribute_t	*toattr,	/* Destination attribute */
@@ -566,6 +567,20 @@ copy_attrs(ipp_t *to,		/* I - Destination request */
 
   for (fromattr = from->attrs; fromattr != NULL; fromattr = fromattr->next)
   {
+   /*
+    * Filter attributes as needed...
+    */
+
+    if (req != NULL)
+    {
+      for (i = 0; i < req->num_values; i ++)
+        if (strcmp(fromattr->name, req->values[i].string.text) == 0)
+	  break;
+
+      if (i == req->num_values)
+        continue;
+    }
+
     DEBUG_printf(("copy_attrs: copying attribute \'%s\'...\n", fromattr->name));
 
     switch (fromattr->value_tag)
@@ -724,12 +739,11 @@ get_default(client_t *con)		/* I - Client connection */
   if ((printer = FindPrinter(DefaultPrinter)) == NULL)
     printer = Printers;
 
-  copy_attrs(con->response, printer->attrs);
+  copy_attrs(con->response, printer->attrs,
+             ippFindAttribute(con->request, "requested-attributes",
+	                      IPP_TAG_KEYWORD));
 
-  if (ippFindAttribute(con->request, "requested-attributes", IPP_TAG_KEYWORD) != NULL)
-    con->response->request.status.status_code = IPP_OK_SUBST;
-  else
-    con->response->request.status.status_code = IPP_OK;
+  con->response->request.status.status_code = IPP_OK;
 }
 
 
@@ -1002,16 +1016,15 @@ get_job_attrs(client_t        *con,		/* I - Client connection */
   }
 
  /*
-  * Copy the job attributes to the response, ignoring the requested-attributes
+  * Copy the job attributes to the response using the requested-attributes
   * attribute that may be provided by the client.
   */
 
-  copy_attrs(con->response, job->attrs);
+  copy_attrs(con->response, job->attrs,
+             ippFindAttribute(con->request, "requested-attributes",
+	                      IPP_TAG_KEYWORD));
 
-  if (ippFindAttribute(con->request, "requested-attributes", IPP_TAG_KEYWORD) != NULL)
-    con->response->request.status.status_code = IPP_OK_SUBST;
-  else
-    con->response->request.status.status_code = IPP_OK;
+  con->response->request.status.status_code = IPP_OK;
 }
 
 
@@ -1079,15 +1092,14 @@ get_printers(client_t *con)		/* I - Client connection */
     ippAddDate(con->response, IPP_TAG_PRINTER, "printer-current-time",
                ippTimeToDate(curtime));
 
-    copy_attrs(con->response, printer->attrs);
+    copy_attrs(con->response, printer->attrs,
+               ippFindAttribute(con->request, "requested-attributes",
+	                	IPP_TAG_KEYWORD));
 
     ippAddSeparator(con->response);
   }
 
-  if (ippFindAttribute(con->request, "requested-attributes", IPP_TAG_KEYWORD) != NULL)
-    con->response->request.status.status_code = IPP_OK_SUBST;
-  else
-    con->response->request.status.status_code = IPP_OK;
+  con->response->request.status.status_code = IPP_OK;
 }
 
 
@@ -1135,11 +1147,6 @@ get_printer_attrs(client_t        *con,	/* I - Client connection */
     return;
   }
 
- /*
-  * Copy the printer attributes to the response, ignoring requested-attributes
-  * and document-format attributes that may be provided by the client.
-  */
-
   if (dtype == CUPS_PRINTER_CLASS)
   {
    /*
@@ -1155,7 +1162,14 @@ get_printer_attrs(client_t        *con,	/* I - Client connection */
 
   curtime = time(NULL);
 
-  copy_attrs(con->response, printer->attrs);
+ /*
+  * Copy the printer attributes to the response using requested-attributes
+  * and document-format attributes that may be provided by the client.
+  */
+
+  copy_attrs(con->response, printer->attrs,
+             ippFindAttribute(con->request, "requested-attributes",
+	                      IPP_TAG_KEYWORD));
 
   ippAddInteger(con->response, IPP_TAG_PRINTER, IPP_TAG_ENUM, "printer-state",
                 printer->state);
@@ -1172,10 +1186,7 @@ get_printer_attrs(client_t        *con,	/* I - Client connection */
   ippAddDate(con->response, IPP_TAG_PRINTER, "printer-current-time",
              ippTimeToDate(curtime));
 
-  if (ippFindAttribute(con->request, "requested-attributes", IPP_TAG_KEYWORD) != NULL)
-    con->response->request.status.status_code = IPP_OK_SUBST;
-  else
-    con->response->request.status.status_code = IPP_OK;
+  con->response->request.status.status_code = IPP_OK;
 }
 
 
@@ -1771,5 +1782,5 @@ validate_job(client_t        *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.8 1999/04/21 14:14:56 mike Exp $".
+ * End of "$Id: ipp.c,v 1.9 1999/04/22 20:20:51 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.12 1999/04/21 21:19:37 mike Exp $"
+ * "$Id: printers.c,v 1.13 1999/04/22 20:20:52 mike Exp $"
  *
  *   for the Common UNIX Printing System (CUPS).
  *
@@ -410,21 +410,46 @@ LoadAllPrinters(void)
 }
 
 
+/*
+ * 'SaveAllPrinters()' - Save all printer definitions to the printers.conf
+ *                       file.
+ */
+
 void
 SaveAllPrinters(void)
 {
 }
 
 
-/*
- * 'StartPrinter()' - Start printing jobs on a printer.
- */
-
 void
-StartPrinter(printer_t *p)	/* I - Printer to start */
+SetPrinterState(printer_t    *p,	/* I - Printer to change */
+                ipp_pstate_t s)		/* I - New state */
 {
-  if (p->state == IPP_PRINTER_STOPPED)
-    p->state = IPP_PRINTER_IDLE;
+  ipp_pstate_t	old_state;		/* Old printer state */
+
+
+ /*
+  * Set the new state...
+  */
+
+  old_state      = p->state;
+  p->state       = s;
+  p->state_time  = time(NULL);
+
+  if (old_state != s)
+    p->browse_time = 0;
+
+ /*
+  * Save the printer configuration if a printer goes from idle or processing
+  * to stopped (or visa-versa)...
+  */
+
+  if ((old_state == IPP_PRINTER_STOPPED) != (s == IPP_PRINTER_STOPPED))
+    SaveAllPrinters();
+
+ /*
+  * Check to see if any pending jobs can now be printed...
+  */
 
   CheckJobs();
 }
@@ -512,6 +537,8 @@ set_printer_attrs(printer_t *p)	/* I - Printer to setup */
 		  "iso-8859-10",
 		  "utf-8"
 		};
+  int		num_finishings;
+  ipp_finish_t	finishings[5];
 
 
  /*
@@ -523,10 +550,10 @@ set_printer_attrs(printer_t *p)	/* I - Printer to setup */
 
   p->attrs = ippNew();
 
-  sprintf(uri, "ipp://%s:%d/printers/%s", ServerName,
+  sprintf(p->uri, "ipp://%s:%d/printers/%s", ServerName,
           ntohs(Listeners[0].address.sin_port), p->name);
   ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_URI, "printer-uri-supported",
-               NULL, uri);
+               NULL, p->uri);
   ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
                "uri-security-supported", NULL, "none");
   ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_NAME, "printer-name", NULL,
@@ -569,10 +596,16 @@ set_printer_attrs(printer_t *p)	/* I - Printer to setup */
                  "orientation-requested-supported", 4, (int *)orients);
   ippAddInteger(p->attrs, IPP_TAG_PRINTER, IPP_TAG_ENUM,
                 "orientation-requested-default", IPP_PORTRAIT);
+  ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_URI, "device-uri", NULL,
+               p->device_uri);
 
  /*
   * Assign additional attributes from the PPD file (if any)...
   */
+
+  p->type        = CUPS_PRINTER_LOCAL + CUPS_PRINTER_BW + CUPS_PRINTER_SMALL;
+  finishings[0]  = IPP_FINISH_NONE;
+  num_finishings = 1;
 
   sprintf(filename, "%s/ppd/%s.ppd", ServerRoot, p->name);
   if ((ppd = ppdOpenFile(filename)) != NULL)
@@ -580,6 +613,13 @@ set_printer_attrs(printer_t *p)	/* I - Printer to setup */
    /*
     * Add make/model and other various attributes...
     */
+
+    if (ppd->color_device)
+      p->type += CUPS_PRINTER_COLOR;
+    if (ppd->variable_sizes)
+      p->type += CUPS_PRINTER_VARIABLE;
+    if (!ppd->manual_copies)
+      p->type += CUPS_PRINTER_COPIES;
 
     ippAddBoolean(p->attrs, IPP_TAG_PRINTER, "color-supported",
                   ppd->color_device);
@@ -622,17 +662,51 @@ set_printer_attrs(printer_t *p)	/* I - Printer to setup */
 
     if (ppdFindOption(ppd, "Duplex") != NULL)
     {
+      p->type += CUPS_PRINTER_DUPLEX;
+
       ippAddStrings(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD, "sides-supported",
                     3, NULL, sides);
       ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD, "sides-default",
                    NULL, "one");
     }
 
+    if (ppdFindOption(ppd, "Collate") != NULL)
+      p->type += CUPS_PRINTER_COLLATE;
+
+    if (ppdFindOption(ppd, "StapleLocation") != NULL)
+    {
+      p->type += CUPS_PRINTER_STAPLE;
+      finishings[num_finishings++] = IPP_FINISH_STAPLE;
+    }
+
+    if (ppdFindOption(ppd, "BindEdge") != NULL)
+    {
+      p->type += CUPS_PRINTER_BIND;
+      finishings[num_finishings++] = IPP_FINISH_BIND;
+    }
+
+    p->type -= CUPS_PRINTER_SMALL;
+
+    for (i = 0; i < ppd->num_sizes; i ++)
+      if (ppd->sizes[i].length > 1728)
+        p->type += CUPS_PRINTER_LARGE;
+      else if (ppd->sizes[i].length > 1008)
+        p->type += CUPS_PRINTER_MEDIUM;
+      else
+        p->type += CUPS_PRINTER_SMALL;
+
     ppdClose(ppd);
   }
+
+  ippAddIntegers(p->attrs, IPP_TAG_PRINTER, IPP_TAG_ENUM,
+                 "finishings-supported", num_finishings, (int *)finishings);
+  ippAddInteger(p->attrs, IPP_TAG_PRINTER, IPP_TAG_ENUM,
+                "finishings-default", IPP_FINISH_NONE);
+
+  ippAddInteger(p->attrs, IPP_TAG_PRINTER, IPP_TAG_ENUM, "printer-type", p->type);
 }
 
 
 /*
- * End of "$Id: printers.c,v 1.12 1999/04/21 21:19:37 mike Exp $".
+ * End of "$Id: printers.c,v 1.13 1999/04/22 20:20:52 mike Exp $".
  */

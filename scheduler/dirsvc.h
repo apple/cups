@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.h,v 1.4 1999/04/21 22:41:28 mike Exp $"
+ * "$Id: dirsvc.h,v 1.5 1999/04/22 20:20:50 mike Exp $"
  *
  *   Directory services definitions for the Common UNIX Printing System
  *   (CUPS) scheduler.
@@ -24,27 +24,15 @@
  */
 
 /*
- * Browsing structure...
- */
-
-typedef struct
-{
-  char	name[256];			/* Name of printer or class */
-  int	type_code,			/* Printer type code */
-	status_code;			/* Printer status code */
-} browse_t;
-
-
-/*
  * Globals...
  */
 
 VAR int			Browsing	VALUE(TRUE),
 					/* Whether or not browsing is enabled */
+			BrowseSocket	VALUE(-1),
+					/* Socket for browsing */
 			BrowsePort	VALUE(IPP_PORT),
 					/* Port number for broadcasts */
-			BrowseSocket	VALUE(0),
-					/* Socket for broadcast */
 			BrowseInterval	VALUE(DEFAULT_INTERVAL),
 					/* Broadcast interval in seconds */
 			BrowseTimeout	VALUE(DEFAULT_TIMEOUT),
@@ -68,5 +56,5 @@ extern void	SendBrowseList(void);
 
 
 /*
- * End of "$Id: dirsvc.h,v 1.4 1999/04/21 22:41:28 mike Exp $".
+ * End of "$Id: dirsvc.h,v 1.5 1999/04/22 20:20:50 mike Exp $".
  */
