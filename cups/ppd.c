@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c,v 1.28 1999/07/12 16:09:40 mike Exp $"
+ * "$Id: ppd.c,v 1.29 1999/07/15 14:05:02 mike Exp $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -285,7 +285,7 @@ ppd_get_group(ppd_file_t *ppd,	/* I - PPD file */
     ppd->num_groups ++;
 
     memset(group, 0, sizeof(ppd_group_t));
-    strcpy(group->text, name);
+    strncpy(group->text, name, sizeof(group->text) - 1);
   }
 
   return (group);
@@ -324,7 +324,7 @@ ppd_get_option(ppd_group_t *group,	/* I - Group */
     group->num_options ++;
 
     memset(option, 0, sizeof(ppd_option_t));
-    strcpy(option->keyword, name);
+    strncpy(option->keyword, name, sizeof(option->keyword) - 1);
   }
 
   return (option);
@@ -356,7 +356,7 @@ ppd_add_choice(ppd_option_t *option,	/* I - Option */
   option->num_choices ++;
 
   memset(choice, 0, sizeof(ppd_choice_t));
-  strcpy(choice->choice, name);
+  strncpy(choice->choice, name, sizeof(choice->choice) - 1);
 
   return (choice);
 }
@@ -386,7 +386,7 @@ ppd_add_size(ppd_file_t *ppd,	/* I - PPD file */
   ppd->num_sizes ++;
 
   memset(size, 0, sizeof(ppd_size_t));
-  strcpy(size->name, name);
+  strncpy(size->name, name, sizeof(size->name) - 1);
 
   return (size);
 }
@@ -599,8 +599,8 @@ ppdOpen(FILE *fp)		/* I - File to read from */
       ppd->num_profiles ++;
 
       memset(profile, 0, sizeof(ppd_profile_t));
-      strcpy(profile->resolution, name);
-      strcpy(profile->media_type, text);
+      strncpy(profile->resolution, name, sizeof(profile->resolution) - 1);
+      strncpy(profile->media_type, text, sizeof(profile->media_type) - 1);
       sscanf(string, "%f%f%f%f%f%f%f%f%f%f", &(profile->density),
 	     profile->matrix[0] + 0, profile->matrix[0] + 1,
 	     profile->matrix[0] + 2, profile->matrix[1] + 0,
@@ -664,7 +664,8 @@ ppdOpen(FILE *fp)		/* I - File to read from */
 	return (NULL);
       }
 
-      strcpy(choice->text, cupsLangString(language, CUPS_MSG_VARIABLE));
+      strncpy(choice->text, cupsLangString(language, CUPS_MSG_VARIABLE),
+              sizeof(choice->text) - 1);
       group  = NULL;
       option = NULL;
     }
@@ -843,23 +844,28 @@ ppdOpen(FILE *fp)		/* I - File to read from */
 
       if (text[0])
       {
-        strcpy(option->text, text);
+        strncpy(option->text, text, sizeof(option->text) - 1);
 	ppd_fix(option->text);
       }
       else
       {
         if (strcmp(name, "PageSize") == 0)
-	  strcpy(option->text, cupsLangString(language, CUPS_MSG_MEDIA_SIZE));
+	  strncpy(option->text, cupsLangString(language, CUPS_MSG_MEDIA_SIZE),
+                  sizeof(option->text) - 1);
 	else if (strcmp(name, "MediaType") == 0)
-	  strcpy(option->text, cupsLangString(language, CUPS_MSG_MEDIA_TYPE));
+	  strncpy(option->text, cupsLangString(language, CUPS_MSG_MEDIA_TYPE),
+                  sizeof(option->text) - 1);
 	else if (strcmp(name, "InputSlot") == 0)
-	  strcpy(option->text, cupsLangString(language, CUPS_MSG_MEDIA_SOURCE));
+	  strncpy(option->text, cupsLangString(language, CUPS_MSG_MEDIA_SOURCE),
+                  sizeof(option->text) - 1);
 	else if (strcmp(name, "ColorModel") == 0)
-	  strcpy(option->text, cupsLangString(language, CUPS_MSG_OUTPUT_MODE));
+	  strncpy(option->text, cupsLangString(language, CUPS_MSG_OUTPUT_MODE),
+                  sizeof(option->text) - 1);
 	else if (strcmp(name, "Resolution") == 0)
-	  strcpy(option->text, cupsLangString(language, CUPS_MSG_RESOLUTION));
+	  strncpy(option->text, cupsLangString(language, CUPS_MSG_RESOLUTION),
+                  sizeof(option->text) - 1);
         else
-	  strcpy(option->text, name);
+	  strncpy(option->text, name, sizeof(option->text) - 1);
       }
 
       option->section = PPD_ORDER_ANY;
@@ -906,7 +912,7 @@ ppdOpen(FILE *fp)		/* I - File to read from */
       else
         option->ui = PPD_UI_PICKONE;
 
-      strcpy(option->text, text);
+      strncpy(option->text, text, sizeof(option->text) - 1);
 
       option->section = PPD_ORDER_JCL;
       group = NULL;
@@ -969,7 +975,7 @@ ppdOpen(FILE *fp)		/* I - File to read from */
       memset(subgroup, 0, sizeof(ppd_group_t));
       ppd_decode(string);
       ppd_fix(string);
-      strcpy(subgroup->text, string);
+      strncpy(subgroup->text, string, sizeof(subgroup->text) - 1);
     }
     else if (strcmp(keyword, "CloseSubGroup") == 0)
       subgroup = NULL;
@@ -1048,14 +1054,15 @@ ppdOpen(FILE *fp)		/* I - File to read from */
           for (i = 0; i < group->num_options; i ++)
 	    if (strcmp(keyword, group->options[i].keyword) == 0)
 	    {
-	      strcpy(group->options[i].defchoice, string);
+	      strncpy(group->options[i].defchoice, string,
+                      sizeof(group->options[i].defchoice) - 1);
 	      break;
 	    }
 
         group = NULL;
       }
       else
-        strcpy(option->defchoice, string);
+        strncpy(option->defchoice, string, sizeof(option->defchoice) - 1);
     }
     else if (strcmp(keyword, "UIConstraints") == 0 ||
              strcmp(keyword, "NonUIConstraints") == 0)
@@ -1077,7 +1084,7 @@ ppdOpen(FILE *fp)		/* I - File to read from */
       constraint += ppd->num_consts;
       ppd->num_consts ++;
 
-      switch (sscanf(string, "%s%s%s%s", constraint->option1,
+      switch (sscanf(string, "%40s%40s%40s%40s", constraint->option1,
                      constraint->choice1, constraint->option2,
 		     constraint->choice2))
       {
@@ -1160,7 +1167,7 @@ ppdOpen(FILE *fp)		/* I - File to read from */
 
       if (mask & PPD_TEXT)
       {
-        strcpy(choice->text, text);
+        strncpy(choice->text, text, sizeof(choice->text) - 1);
         ppd_fix(choice->text);
       }
       else if (strcmp(name, "True") == 0)
@@ -1168,7 +1175,7 @@ ppdOpen(FILE *fp)		/* I - File to read from */
       else if (strcmp(name, "False") == 0)
         strcpy(choice->text, "No");
       else
-        strcpy(choice->text, name);
+        strncpy(choice->text, name, sizeof(choice->text) - 1);
 
       if (strncmp(keyword, "JCL", 3) == 0)
         ppd_decode(string);		/* Decode quoted string */
@@ -1754,5 +1761,5 @@ ppd_fix(char *string)		/* IO - String to fix */
 
 
 /*
- * End of "$Id: ppd.c,v 1.28 1999/07/12 16:09:40 mike Exp $".
+ * End of "$Id: ppd.c,v 1.29 1999/07/15 14:05:02 mike Exp $".
  */
