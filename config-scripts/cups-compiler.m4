@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-compiler.m4,v 1.11 2002/01/14 20:29:16 mike Exp $"
+dnl "$Id: cups-compiler.m4,v 1.12 2002/01/26 20:59:43 mike Exp $"
 dnl
 dnl   Common configuration stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -49,15 +49,16 @@ if test -n "$GCC"; then
 	# Previous versions of GCC do not have the reliance on the stdc++
 	# or g++ libraries, so the extra supc++ library is not needed.
 
-	case "`$CXX --version`" in
-    		3*)
-			AC_MSG_WARN(GCC 3.0.x is known to produce incorrect code - use with caution!)
-			LIBS="$LIBS -lsupc++"
-			;;
-    		3.1*)
-			LIBS="$LIBS -lsupc++"
-			;;
-	esac
+	AC_MSG_CHECKING(if libsupc++ is required)
+
+ 	SUPC="`$CXX -print-file-name=libsupc++.a 2>/dev/null`"
+ 	if test -n "$SUPC" -a "$SUPC" != "libsupc++.a"; then
+ 		# This is gcc 3.x, and it knows of libsupc++, so we need it
+ 		LIBS="$LIBS -lsupc++"
+		AC_MSG_RESULT(yes)
+	else
+		AC_MSG_RESULT(no)
+ 	fi
 
 	CXX="$CC"
 
@@ -178,5 +179,5 @@ case $uname in
 esac
 
 dnl
-dnl End of "$Id: cups-compiler.m4,v 1.11 2002/01/14 20:29:16 mike Exp $".
+dnl End of "$Id: cups-compiler.m4,v 1.12 2002/01/26 20:59:43 mike Exp $".
 dnl
