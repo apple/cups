@@ -1,5 +1,5 @@
 /*
- * "$Id: lpd.c,v 1.44 2002/10/15 16:40:10 mike Exp $"
+ * "$Id: lpd.c,v 1.45 2002/10/15 21:01:42 mike Exp $"
  *
  *   Line Printer Daemon backend for the Common UNIX Printing System (CUPS).
  *
@@ -115,6 +115,10 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   int	reserve;	/* Reserve priviledged port? */
   int	manual_copies,	/* Do manual copies? */
 	copies;		/* Number of copies */
+#if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
+  struct sigaction action;
+			/* Actions for POSIX signals */
+#endif /* HAVE_SIGACTION && !HAVE_SIGSET */
 
 
  /*
@@ -921,5 +925,5 @@ rresvport(int *port)		/* IO - Port number to bind to */
 #endif /* !HAVE_RRESVPORT */
 
 /*
- * End of "$Id: lpd.c,v 1.44 2002/10/15 16:40:10 mike Exp $".
+ * End of "$Id: lpd.c,v 1.45 2002/10/15 21:01:42 mike Exp $".
  */
