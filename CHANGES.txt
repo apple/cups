@@ -1,8 +1,12 @@
 CHANGES.txt - 07/06/2001
 ------------------------
 
-CHANGES IN CUPS V1.1.10
+CHANGES IN CUPS V1.1.9-1
 
+	- The configure script did not substitute the
+	  correct user and group names.
+	- The configure script did not use the full path
+	  to the install-sh script when it was used.
 	- The pstoraster filter did not correctly support
 	  DuplexTumble mode for printers that used flip
 	  duplexing.
