@@ -1,5 +1,5 @@
 /*
- * "$Id: cups-polld.c,v 1.5.2.14 2003/02/11 19:21:00 mike Exp $"
+ * "$Id: cups-polld.c,v 1.5.2.15 2003/04/25 15:30:20 mike Exp $"
  *
  *   Polling daemon for the Common UNIX Printing System (CUPS).
  *
@@ -364,6 +364,7 @@ poll_server(http_t      *http,		/* I - HTTP connection */
 	if (sendto(sock, packet, strlen(packet), 0,
 	           (struct sockaddr *)&addr, sizeof(addr)) <= 0)
 	{
+	  ippDelete(response);
 	  perror("cups-polld");
 	  return (-1);
 	}
@@ -408,5 +409,5 @@ poll_server(http_t      *http,		/* I - HTTP connection */
 
 
 /*
- * End of "$Id: cups-polld.c,v 1.5.2.14 2003/02/11 19:21:00 mike Exp $".
+ * End of "$Id: cups-polld.c,v 1.5.2.15 2003/04/25 15:30:20 mike Exp $".
  */

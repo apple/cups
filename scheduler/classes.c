@@ -1,5 +1,5 @@
 /*
- * "$Id: classes.c,v 1.34.2.14 2003/03/30 21:49:15 mike Exp $"
+ * "$Id: classes.c,v 1.34.2.15 2003/04/25 15:30:19 mike Exp $"
  *
  *   Printer class routines for the Common UNIX Printing System (CUPS).
  *
@@ -607,7 +607,7 @@ SaveAllClasses(void)
   */
 
   curtime = time(NULL);
-  curdate = gmtime(&curtime);
+  curdate = localtime(&curtime);
   strftime(temp, sizeof(temp) - 1, CUPS_STRFTIME_FORMAT, curdate);
 
   cupsFilePuts(fp, "# Class configuration file for " CUPS_SVERSION "\n");
@@ -675,5 +675,5 @@ SaveAllClasses(void)
 
 
 /*
- * End of "$Id: classes.c,v 1.34.2.14 2003/03/30 21:49:15 mike Exp $".
+ * End of "$Id: classes.c,v 1.34.2.15 2003/04/25 15:30:19 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.h,v 1.22.2.12 2003/04/16 20:32:46 mike Exp $"
+ * "$Id: printers.h,v 1.22.2.13 2003/04/25 15:30:28 mike Exp $"
  *
  *   Printer definitions for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -112,10 +112,10 @@ extern void		LoadAllPrinters(void);
 extern void		SaveAllPrinters(void);
 extern void		SetPrinterAttrs(printer_t *p);
 extern void		SetPrinterReasons(printer_t *p, const char *s);
-extern void		SetPrinterState(printer_t *p, ipp_pstate_t s);
+extern void		SetPrinterState(printer_t *p, ipp_pstate_t s, int update);
 extern void		SortPrinters(void);
-#define			StartPrinter(p) SetPrinterState((p), IPP_PRINTER_IDLE)
-extern void		StopPrinter(printer_t *p);
+#define			StartPrinter(p,u) SetPrinterState((p), IPP_PRINTER_IDLE, (u))
+extern void		StopPrinter(printer_t *p, int update);
 extern quota_t		*UpdateQuota(printer_t *p, const char *username,
 			             int pages, int k);
 extern const char	*ValidateDest(const char *hostname,
@@ -125,5 +125,5 @@ extern void		WritePrintcap(void);
 
 
 /*
- * End of "$Id: printers.h,v 1.22.2.12 2003/04/16 20:32:46 mike Exp $".
+ * End of "$Id: printers.h,v 1.22.2.13 2003/04/25 15:30:28 mike Exp $".
  */

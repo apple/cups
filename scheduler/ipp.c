@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.127.2.64 2003/04/25 14:42:39 mike Exp $"
+ * "$Id: ipp.c,v 1.127.2.65 2003/04/25 15:30:20 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -739,7 +739,7 @@ add_class(client_t        *con,		/* I - Client connection */
     LogMessage(L_INFO, "Setting %s printer-state to %d (was %d.)", pclass->name,
                attr->values[0].integer, pclass->state);
 
-    SetPrinterState(pclass, attr->values[0].integer);
+    SetPrinterState(pclass, attr->values[0].integer, 0);
   }
   if ((attr = ippFindAttribute(con->request, "printer-state-message", IPP_TAG_TEXT)) != NULL)
   {
@@ -1231,7 +1231,7 @@ add_printer(client_t        *con,	/* I - Client connection */
     LogMessage(L_INFO, "Setting %s printer-state to %d (was %d.)", printer->name,
                attr->values[0].integer, printer->state);
 
-    SetPrinterState(printer, attr->values[0].integer);
+    SetPrinterState(printer, attr->values[0].integer, 0);
   }
   if ((attr = ippFindAttribute(con->request, "printer-state-message", IPP_TAG_TEXT)) != NULL)
   {
@@ -6306,7 +6306,7 @@ start_printer(client_t        *con,	/* I - Client connection */
 
   printer->state_message[0] = '\0';
 
-  StartPrinter(printer);
+  StartPrinter(printer, 1);
 
   if (dtype & CUPS_PRINTER_CLASS)
     LogMessage(L_INFO, "Class \'%s\' started by \'%s\'.", name,
@@ -6397,7 +6397,7 @@ stop_printer(client_t        *con,	/* I - Client connection */
             sizeof(printer->state_message));
   }
 
-  StopPrinter(printer);
+  StopPrinter(printer, 1);
 
   if (dtype & CUPS_PRINTER_CLASS)
     LogMessage(L_INFO, "Class \'%s\' stopped by \'%s\'.", name,
@@ -6621,5 +6621,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.127.2.64 2003/04/25 14:42:39 mike Exp $".
+ * End of "$Id: ipp.c,v 1.127.2.65 2003/04/25 15:30:20 mike Exp $".
  */
