@@ -6,6 +6,7 @@ CHANGES IN CUPS V1.1.14
 	- The ippRead() function did not verify that the
 	  attribute name length or string with language value
 	  was not larger than the read buffer.
+	- Added Swedish message catalog.
 	- The parallel backend now recognizes the /dev/printers
 	  device directory under Linux 2.4.x.
 	- MacOS X fixes.
