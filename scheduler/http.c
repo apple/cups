@@ -1,55 +1,50 @@
 /*
- * "$Id: http.c,v 1.5 1998/10/13 18:55:52 mike Exp $"
+ * "$Id: http.c,v 1.6 1998/10/16 18:28:01 mike Exp $"
  *
- *   HTTP server test code for CUPS.
+ *   HTTP routines for the Common UNIX Printing System (CUPS) scheduler.
+ *
+ *   Copyright 1997-1998 by Easy Software Products, all rights reserved.
+ *
+ *   These coded instructions, statements, and computer programs are the
+ *   property of Easy Software Products and are protected by Federal
+ *   copyright law.  Distribution and use rights are outlined in the file
+ *   "LICENSE.txt" which should have been included with this file.  If this
+ *   file is missing or damaged please contact Easy Software Products
+ *   at:
+ *
+ *       Attn: CUPS Licensing Information
+ *       Easy Software Products
+ *       44145 Airport View Drive, Suite 204
+ *       Hollywood, Maryland 20636-3111 USA
+ *
+ *       Voice: (301) 373-9603
+ *       EMail: cups-info@cups.org
+ *         WWW: http://www.cups.org
  *
  * Contents:
  *
- *   StartListening()     - Initialize networking and create a listening
- *                          socket...
- *   AcceptConnection()   - Accept a new connection.
- *   CloseConnection()    - Close a remote connection.
- *   ReadConnection()     - Read data from a connection.
- *   WriteConnection()    - Write data to a connection as needed.
+ *   AcceptClient()       - Accept a new client.
+ *   CloseAllClients()    - Close all remote clients immediately.
+ *   CloseClient()        - Close a remote client.
+ *   ReadClient()         - Read data from a client.
  *   SendCommand()        - Send output from a command via HTTP.
  *   SendError()          - Send an error message via HTTP.
  *   SendFile()           - Send a file via HTTP.
  *   SendHeader()         - Send an HTTP header.
- *   IsAuthorized()       - Check to see if the user is authorized...
- *   conprintf()          - Do a printf() to a connection...
+ *   StartListening()     - Create all listening sockets...
+ *   StopListening()      - Close all listening sockets...
+ *   WriteClient()        - Write data to a client as needed.
+ *   conprintf()          - Do a printf() to a client...
  *   decode_basic_auth()  - Decode a Basic authorization string.
  *   decode_digest_auth() - Decode an MD5 Digest authorization string.
  *   get_datetime()       - Get a data/time string for the given time.
  *   get_extension()      - Get the extension for a filename.
  *   get_file()           - Get a filename and state info.
  *   get_line()           - Get a request line terminated with a CR and LF.
+ *   get_message()        - Get a message string for the given HTTP code.
  *   get_type()           - Get MIME type from the given extension.
- *   signal_handler()     - Handle 'broken pipe' signals from lost network
- *                          connections.
- *
- * Revision History:
- *
- *   $Log: http.c,v $
- *   Revision 1.5  1998/10/13 18:55:52  mike
- *   Fixed error handling code so that all errors cause the connection to be
- *   closed.
- *
- *   Revision 1.4  1998/10/13  18:27:05  mike
- *   Added Host: line checking & enforcement.
- *
- *   Revision 1.3  1998/10/13  18:24:15  mike
- *   Added activity timeout code.
- *   Added Basic authorization code.
- *   Fixed problem with main loop that would cause a core dump.
- *
- *   Revision 1.2  1998/10/12  15:31:08  mike
- *   Switched from stdio files to file descriptors.
- *   Added FD_CLOEXEC flags to all non-essential files.
- *   Added pipe_command() function.
- *   Added write checks for all writes.
- *
- *   Revision 1.1  1998/10/12  13:57:19  mike
- *   Initial revision
+ *   sigpipe_handler()    - Handle 'broken pipe' signals from lost network
+ *                          clients.
  */
 
 /*
@@ -58,12 +53,6 @@
 
 #include "cupsd.h"
 #include <stdarg.h>
-#include <pwd.h>
-#include <grp.h>
-#ifdef HAVE_SHADOW_H
-#  include <shadow.h>
-#endif /* HAVE_SHADOW_H */
-#include <crypt.h>
 
 
 /*
@@ -79,151 +68,75 @@ static char	*months[12] = { "Jan", "Feb", "Mar", "Apr", "May", "Jun",
  * Local functions...
  */
 
-static int	conprintf(connection_t *con, char *format, ...);
-static void	decode_basic_auth(connection_t *con, char *line);
-static void	decode_if_modified(connection_t *con, char *line);
+static int	conprintf(client_t *con, char *format, ...);
+static void	decode_basic_auth(client_t *con, char *line);
+static void	decode_if_modified(client_t *con, char *line);
 static char	*get_datetime(time_t t);
 static char	*get_extension(char *filename);
-static char	*get_file(connection_t *con, struct stat *filestats);
-static char	*get_line(connection_t *con, char *line, int length);
+static char	*get_file(client_t *con, struct stat *filestats);
+static char	*get_line(client_t *con, char *line, int length);
+static char	*get_long_message(int code);
+static char	*get_message(int code);
 static char	*get_type(char *extension);
 static int	pipe_command(int infile, int *outfile, char *command);
-static void	signal_handler(int sig);
+static void	sigpipe_handler(int sig);
 
 
 /*
- * 'StartListening()' - Initialize networking and create a listening socket...
+ * 'AcceptClient()' - Accept a new client.
  */
 
 void
-StartListening(void)
+AcceptClient(listener_t *lis)	/* I - Listener socket */
 {
-  int			val;		/* Parameter value */
-  struct servent	*service;	/* Service definition */
-  struct sockaddr_in	sock;		/* Socket address */
-
-
-#ifdef WIN32
- /*
-  * Initialize Windows sockets...  This handles loading the DLL, etc. since
-  * Windows doesn't have built-in support for sockets like UNIX...
-  */
-
-  WSADATA wsadata;	/* Socket data for application from DLL */
-
-  val = WSAStartup(MAKEWORD(1,1), &wsadata);
-  if (val != 0)
-    exit(1);
-#else
- /*
-  * Setup a 'broken pipe' signal handler for lost connections.
-  */
-
-  sigset(SIGPIPE, signal_handler);
-#endif /* !WIN32 */
-
- /*
-  * Try to find the 'ipp' service in the /etc/services file...
-  */
-
-  service = getservbyname("ipp", NULL);
-
- /*
-  * Setup socket listener...
-  */
-
-  if ((Listener = socket(AF_INET, SOCK_STREAM, PF_UNSPEC)) == -1)
-  {
-    fprintf(stderr, "cupsd: Unable to open socket - %s\n", strerror(errno));
-    exit(errno);
-  }
-
-  fcntl(Listener, F_SETFD, fcntl(Listener, F_GETFD) | FD_CLOEXEC);
-
- /*
-  * Set things up to reuse the local address for this port.
-  */
-
-  val = 1;
-  setsockopt(Listener, SOL_SOCKET, SO_REUSEADDR, &val, sizeof(val));
-
- /*
-  * Bind to the port we found...
-  */
-
-  memset((char *)&sock, 0, sizeof(sock));
-  sock.sin_addr.s_addr = htonl(INADDR_ANY);
-  sock.sin_family      = AF_INET;
-
-  if (service == NULL)
-    sock.sin_port = htons(IPP_PORT);
-  else
-    sock.sin_port = htons(service->s_port);
-
-  if (bind(Listener, (struct sockaddr *)&sock, sizeof(sock)) < 0)
-  {
-    fprintf(stderr, "cupsd: Unable to bind the \'ipp\' service - %s\n",
-            strerror(errno));
-    exit(errno);
-  }
-
- /*
-  * Listen for new connections.
-  */
-
-  if (listen(Listener, SOMAXCONN) < 0)
-  {
-    fprintf(stderr, "cupsd: Unable to listen for connections - %s\n",
-            strerror(errno));
-    exit(errno);
-  }
-
- /*
-  * Setup the select() input mask to contain the listening socket we have.
-  */
-
-  FD_ZERO(&InputSet);
-  FD_SET(Listener, &InputSet);
-
-  FD_ZERO(&OutputSet);
-}
-
-
-/*
- * 'AcceptConnection()' - Accept a new connection.
- */
-
-void
-AcceptConnection(void)
-{
-  int		val;	/* Parameter value */
-  connection_t	*con;	/* New connection pointer */
+  int			i;	/* Looping var */
+  int			val;	/* Parameter value */
+  client_t		*con;	/* New client pointer */
+  unsigned		address;/* Address of client */
+  struct hostent	*host;	/* Host entry for address */
 
 
  /*
-  * Get a pointer to the next available connection...
+  * Get a pointer to the next available client...
   */
 
-  con = Connection + NumConnections;
+  con = Clients + NumClients;
 
-  memset(con, 0, sizeof(connection_t));
+  memset(con, 0, sizeof(client_t));
   con->activity = time(NULL);
 
  /*
-  * Accept the connection and get the remote address...
+  * Accept the client and get the remote address...
   */
 
   val = sizeof(struct sockaddr_in);
 
-  if ((con->fd = accept(Listener, (struct sockaddr *)&(con->remote), &val)) < 0)
+  if ((con->fd = accept(lis->fd, (struct sockaddr *)&(con->remote), &val)) < 0)
   {
-    fprintf(stderr, "cupsd: Connection acceptance failed - %s\n",
+    fprintf(stderr, "cupsd: Client acceptance failed - %s\n",
             strerror(errno));
     return;
   }
+
+ /*
+  * Get the hostname or format the IP address as needed...
+  */
+
+  address = ntohl(con->remote.sin_addr.s_addr);
+
+  if (HostNameLookups)
+    host = gethostbyaddr(&address, sizeof(address), AF_INET);
   else
-    fprintf(stderr, "cupsd: New connection %d from %08x accepted.\n",
-            con->fd, con->remote.sin_addr);
+    host = NULL;
+
+  if (host == NULL)
+    sprintf(con->remote_host, "%d.%d.%d.%d", (address >> 24) & 255,
+            (address >> 16) & 255, (address >> 8) & 255, address & 255);
+  else
+    strncpy(con->remote_host, host->h_name, sizeof(con->remote_host) - 1);
+
+  fprintf(stderr, "cupsd: New client %d from %s accepted.\n",
+          con->fd, con->remote_host);
 
  /*
   * Add the socket to the select() input mask.
@@ -233,28 +146,42 @@ AcceptConnection(void)
 
   FD_SET(con->fd, &InputSet);
 
-  NumConnections ++;
+  NumClients ++;
 
  /*
   * Temporarily suspend accept()'s until we lose a client...
   */
 
-  if (NumConnections == MAX_CLIENTS)
-    FD_CLR(Listener, &InputSet);
+  if (NumClients == MAX_CLIENTS)
+    for (i = 0; i < NumListeners; i ++)
+      FD_CLR(Listeners[i].fd, &InputSet);
 }
 
 
 /*
- * 'CloseConnection()' - Close a remote connection.
+ * 'CloseAllClients()' - Close all remote clients immediately.
  */
 
 void
-CloseConnection(connection_t *con)	/* I - Connection to close */
+CloseAllClients(void)
 {
-  int	status;				/* Exit status of pipe command */
+  while (NumClients > 0)
+    CloseClient(Clients);
+}
 
 
-  fprintf(stderr, "cupsd: Closed connection #%d\n", con->fd);
+/*
+ * 'CloseClient()' - Close a remote client.
+ */
+
+void
+CloseClient(client_t *con)	/* I - Client to close */
+{
+  int	i;			/* Looping var */
+  int	status;			/* Exit status of pipe command */
+
+
+  fprintf(stderr, "cupsd: Closed client #%d\n", con->fd);
 
  /*
   * Close the socket and clear the file from the input set for select()...
@@ -266,7 +193,9 @@ CloseConnection(connection_t *con)	/* I - Connection to close */
   close(con->fd);
 #endif /* WIN32 */
 
-  FD_SET(Listener, &InputSet);
+  for (i = 0; i < NumListeners; i ++)
+    FD_SET(Listeners[i].fd, &InputSet);
+
   FD_CLR(con->fd, &InputSet);
   if (con->pipe_pid != 0)
     FD_CLR(con->file, &InputSet);
@@ -288,23 +217,22 @@ CloseConnection(connection_t *con)	/* I - Connection to close */
   };
 
  /*
-  * Compact the list of connections as necessary...
+  * Compact the list of clients as necessary...
   */
 
-  NumConnections --;
+  NumClients --;
 
-  if (con < (Connection + NumConnections))
-    memcpy(con, con + 1, (Connection + NumConnections - con) *
-                         sizeof(connection_t));
+  if (con < (Clients + NumClients))
+    memcpy(con, con + 1, (Clients + NumClients - con) * sizeof(client_t));
 }
 
 
 /*
- * 'ReadConnection()' - Read data from a connection.
+ * 'ReadClient()' - Read data from a client.
  */
 
-int					/* O - 1 on success, 0 on error */
-ReadConnection(connection_t *con)	/* I - Connection to read from */
+int				/* O - 1 on success, 0 on error */
+ReadClient(client_t *con)	/* I - Client to read from */
 {
   char		line[1024],		/* Line from socket... */
 		name[256],		/* Name on request line */
@@ -313,6 +241,7 @@ ReadConnection(connection_t *con)	/* I - Connection to read from */
 		*valptr;		/* Pointer to value */
   int		major, minor;		/* HTTP version numbers */
   int		start;			/* TRUE if we need to start the transfer */
+  int		code;			/* Authorization code */
   char		*filename,		/* Name of file for GET/HEAD */
 		*extension,		/* Extension of file */
 		*type;			/* MIME type */
@@ -368,7 +297,7 @@ ReadConnection(connection_t *con)	/* I - Connection to read from */
 	{
 	  case 1 :
 	      SendError(con, HTTP_BAD_REQUEST);
-	      CloseConnection(con);
+	      CloseClient(con);
 	      return (0);
 	  case 2 :
 	      con->version = HTTP_0_9;
@@ -388,7 +317,7 @@ ReadConnection(connection_t *con)	/* I - Connection to read from */
 	      else
 	      {
 	        SendError(con, HTTP_NOT_SUPPORTED);
-	        CloseConnection(con);
+	        CloseClient(con);
 	        return (0);
 	      };
 	      break;
@@ -455,7 +384,7 @@ ReadConnection(connection_t *con)	/* I - Connection to read from */
 	else
 	{
 	  SendError(con, HTTP_BAD_REQUEST);
-	  CloseConnection(con);
+	  CloseClient(con);
 	}
         break;
 
@@ -491,7 +420,7 @@ ReadConnection(connection_t *con)	/* I - Connection to read from */
         if (sscanf(line, "%255[^:]:%1023s", name, value) < 2)
 	{
 	  SendError(con, HTTP_BAD_REQUEST);
-	  CloseConnection(con);
+	  CloseClient(con);
 	  return (0);
 	}
 
@@ -545,7 +474,7 @@ ReadConnection(connection_t *con)	/* I - Connection to read from */
 	  else
 	  {
 	    SendError(con, HTTP_NOT_IMPLEMENTED);
-	    CloseConnection(con);
+	    CloseClient(con);
 	    return (0);
 	  }
 	}
@@ -559,7 +488,7 @@ ReadConnection(connection_t *con)	/* I - Connection to read from */
 	  else
 	  {
 	    SendError(con, HTTP_NOT_IMPLEMENTED);
-	    CloseConnection(con);
+	    CloseClient(con);
 	    return (0);
 	  }
 	}
@@ -594,55 +523,61 @@ ReadConnection(connection_t *con)	/* I - Connection to read from */
   */
 
   if (start)
-    switch (con->state)
+  {
+    if (con->host[0] == '\0' && con->version >= HTTP_1_0)
+    {
+      if (!SendError(con, HTTP_BAD_REQUEST))
+      {
+	CloseClient(con);
+	return (0);
+      }
+    }
+    else if ((code = IsAuthorized(con)) != HTTP_OK)
+    {
+      if (!SendError(con, code))
+      {
+	CloseClient(con);
+        return (0);
+      }
+    }
+    else if (strncmp(con->uri, "..", 2) == 0)
+    {
+     /*
+      * Protect against malicious users!
+      */
+
+      if (!SendError(con, HTTP_FORBIDDEN))
+      {
+	CloseClient(con);
+        return (0);
+      }
+    }
+    else switch (con->state)
     {
       case HTTP_GET :
-          if (con->host[0] == '\0' && con->version >= HTTP_1_0)
-	  {
-	    if (!SendError(con, HTTP_BAD_REQUEST))
-	    {
-	      CloseConnection(con);
-	      return (0);
-	    }
-	  }
-	  else if (strncmp(con->uri, "/printers", 9) == 0)
+	  if (strncmp(con->uri, "/printers", 9) == 0)
 	  {
 	   /*
-	    * Check authorization...
+	    * Do a command...
 	    */
 
-	    if (!IsAuthorized(con, 1))
-	    {
-	      if (!SendError(con, HTTP_UNAUTHORIZED))
-	      {
-	        CloseConnection(con);
-		return (0);
-	      }
-	    }
+	    if (strlen(con->uri) > 9)
+	      sprintf(line, "lpstat -p %s -o %s", con->uri + 10, con->uri + 10);
 	    else
+	      strcpy(line, "lpstat -d -p -o");
+
+	    if (!SendCommand(con, HTTP_OK, line, "text/plain"))
 	    {
-	     /*
-	      * Do a command...
-	      */
-
-	      if (strlen(con->uri) > 9)
-		sprintf(line, "lpstat -p %s -o %s", con->uri + 10, con->uri + 10);
-	      else
-		strcpy(line, "lpstat -d -p -o");
-
-	      if (!SendCommand(con, HTTP_OK, line, "text/plain"))
-	      {
-		CloseConnection(con);
-		return (0);
-	      }
-
-              con->state = HTTP_GET_DATA;
-
-	      if (con->data_length == 0 &&
-	          con->data_encoding == HTTP_DATA_SINGLE &&
-		  con->version <= HTTP_1_0)
-		con->keep_alive = 0;
+	      CloseClient(con);
+	      return (0);
 	    }
+
+            con->state = HTTP_GET_DATA;
+
+	    if (con->data_length == 0 &&
+	        con->data_encoding == HTTP_DATA_SINGLE &&
+		con->version <= HTTP_1_0)
+	      con->keep_alive = 0;
 	  }
 	  else
 	  {
@@ -654,7 +589,7 @@ ReadConnection(connection_t *con)	/* I - Connection to read from */
 	    {
 	      if (!SendError(con, HTTP_NOT_FOUND))
 	      {
-	        CloseConnection(con);
+	        CloseClient(con);
 		return (0);
 	      }
 	    }
@@ -663,7 +598,7 @@ ReadConnection(connection_t *con)	/* I - Connection to read from */
             {
               if (!SendError(con, HTTP_NOT_MODIFIED))
 	      {
-		CloseConnection(con);
+		CloseClient(con);
 		return (0);
 	      }
 	    }
@@ -674,7 +609,7 @@ ReadConnection(connection_t *con)	/* I - Connection to read from */
 
               if (!SendFile(con, HTTP_OK, filename, type, &filestats))
 	      {
-		CloseConnection(con);
+		CloseClient(con);
 		return (0);
 	      }
 
@@ -690,45 +625,26 @@ ReadConnection(connection_t *con)	/* I - Connection to read from */
           SendError(con, HTTP_NOT_IMPLEMENTED);
 
       case HTTP_CLOSE :
-          CloseConnection(con);
+          CloseClient(con);
 	  return (0);
 
       case HTTP_HEAD :
-          if (con->host[0] == '\0' && con->version >= HTTP_1_0)
+	  if (strncmp(con->uri, "/printers/", 10) == 0)
 	  {
-	    if (!SendError(con, HTTP_BAD_REQUEST))
+	   /*
+	    * Do a command...
+	    */
+
+            if (!SendHeader(con, HTTP_OK, "text/plain"))
 	    {
-	      CloseConnection(con);
+	      CloseClient(con);
 	      return (0);
 	    }
-	  }
-	  else if (strncmp(con->uri, "/printers/", 10) == 0)
-	  {
-	    if (!IsAuthorized(con, 1))
-	    {
-	      if (!SendError(con, HTTP_UNAUTHORIZED))
-	      {
-	        CloseConnection(con);
-		return (0);
-	      }
-	    }
-	    else
-	    {
-	     /*
-	      * Do a command...
-	      */
 
-              if (!SendHeader(con, HTTP_OK, "text/plain"))
-	      {
-		CloseConnection(con);
-		return (0);
-	      }
-
-	      if (conprintf(con, "\r\n") < 0)
-	      {
-		CloseConnection(con);
-		return (0);
-	      }
+	    if (conprintf(con, "\r\n") < 0)
+	    {
+	      CloseClient(con);
+	      return (0);
 	    }
 	  }
 	  else if (filestats.st_size == con->remote_size &&
@@ -736,7 +652,7 @@ ReadConnection(connection_t *con)	/* I - Connection to read from */
           {
             if (!SendError(con, HTTP_NOT_MODIFIED))
 	    {
-              CloseConnection(con);
+              CloseClient(con);
 	      return (0);
 	    }
 	  }
@@ -750,7 +666,7 @@ ReadConnection(connection_t *con)	/* I - Connection to read from */
 	    {
 	      if (!SendHeader(con, HTTP_NOT_FOUND, "text/html"))
 	      {
-		CloseConnection(con);
+		CloseClient(con);
 		return (0);
 	      }
 	    }
@@ -761,20 +677,20 @@ ReadConnection(connection_t *con)	/* I - Connection to read from */
 
               if (!SendHeader(con, HTTP_OK, type))
 	      {
-		CloseConnection(con);
+		CloseClient(con);
 		return (0);
 	      }
 
 	      if (conprintf(con, "Last-Modified: %s\r\n",
 	                    get_datetime(filestats.st_mtime)) < 0)
 	      {
-		CloseConnection(con);
+		CloseClient(con);
 		return (0);
 	      }
 
 	      if (conprintf(con, "Content-Length: %d\r\n", filestats.st_size) < 0)
 	      {
-		CloseConnection(con);
+		CloseClient(con);
 		return (0);
 	      }
 	    }
@@ -782,13 +698,14 @@ ReadConnection(connection_t *con)	/* I - Connection to read from */
 
           if (conprintf(con, "\r\n") < 0)
 	  {
-	    CloseConnection(con);
+	    CloseClient(con);
 	    return (0);
 	  }
 
           con->state = HTTP_WAITING;
           break;
     }
+  }
 
  /*
   * Handle any incoming data...
@@ -805,7 +722,7 @@ ReadConnection(connection_t *con)	/* I - Connection to read from */
 
   if (!con->keep_alive && con->state == HTTP_WAITING)
   {
-    CloseConnection(con);
+    CloseClient(con);
     return (0);
   }
   else
@@ -814,94 +731,11 @@ ReadConnection(connection_t *con)	/* I - Connection to read from */
 
 
 /*
- * 'WriteConnection()' - Write data to a connection as needed.
- */
-
-int
-WriteConnection(connection_t *con)
-{
-  int	bytes;
-  int	status;
-  char	buf[MAX_BUFFER];
-
-
-  if (con->state != HTTP_GET_DATA &&
-      con->state != HTTP_POST_DATA)
-    return (1);
-
-  if ((bytes = read(con->file, buf, sizeof(buf))) > 0)
-  {
-    if (con->data_encoding == HTTP_DATA_CHUNKED)
-    {
-      if (conprintf(con, "%d\r\n", bytes) < 0)
-      {
-        CloseConnection(con);
-	return (0);
-      }
-
-      if (send(con->fd, buf, bytes, 0) < 0)
-      {
-        CloseConnection(con);
-	return (0);
-      }
-
-      if (conprintf(con, "\r\n") < 0)
-      {
-        CloseConnection(con);
-	return (0);
-      }
-    }
-    else if (send(con->fd, buf, bytes, 0) < 0)
-    {
-      CloseConnection(con);
-      return (0);
-    }
-  }
-  else
-  {
-    if (con->data_encoding == HTTP_DATA_CHUNKED)
-    {
-      if (conprintf(con, "0\r\n\r\n") < 0)
-      {
-        CloseConnection(con);
-	return (0);
-      }
-    }
-
-    FD_CLR(con->fd, &OutputSet);
-    FD_CLR(con->file, &InputSet);
-
-    if (con->pipe_pid)
-    {
-      kill(con->pipe_pid, SIGKILL);
-      waitpid(con->pipe_pid, &status, WNOHANG);
-    }
-
-    close(con->file);
-
-    if (!con->keep_alive)
-    {
-      CloseConnection(con);
-      return (0);
-    }
-
-    con->state = HTTP_WAITING;
-  }
-
-  fprintf(stderr, "cupsd: SEND %d bytes to #%d\n", bytes, con->fd);
-
-  con->activity = time(NULL);
-
-  return (1);
-}
-
-
-/*
  * 'SendCommand()' - Send output from a command via HTTP.
  */
 
 int
-SendCommand(connection_t *con,
+SendCommand(client_t *con,
             int          code,
 	    char         *command,
 	    char         *type)
@@ -920,8 +754,12 @@ SendCommand(connection_t *con,
     return (0);
 
   if (con->version == HTTP_1_1)
+  {
+    con->data_encoding = HTTP_DATA_CHUNKED;
+
     if (conprintf(con, "Transfer-Encoding: chunked\r\n") < 0)
       return (0);
+  }
 
   if (conprintf(con, "\r\n") < 0)
     return (0);
@@ -934,23 +772,65 @@ SendCommand(connection_t *con,
  * 'SendError()' - Send an error message via HTTP.
  */
 
-int
-SendError(connection_t *con,
-          int          code)
+int				/* O - 1 if successful, 0 otherwise */
+SendError(client_t *con,	/* I - Connection */
+          int      code)	/* I - Error code */
 {
+  char	message[1024];		/* Text version of error code */
+
+
+ /*
+  * To work around bugs in some proxies, don't use Keep-Alive for some
+  * error messages...
+  */
+
+  if (code >= 400)
+    con->keep_alive = 0;
+
+ /*
+  * Send an error message back to the client.  If the error code is a
+  * 400 or 500 series, make sure the message contains some text, too!
+  */
+
   if (!SendHeader(con, code, NULL))
     return (0);
+
   if (code == HTTP_UNAUTHORIZED)
+  {
     if (conprintf(con, "WWW-Authenticate: Basic realm=\"CUPS\"\r\n") < 0)
       return (0);
-  if (con->version >= HTTP_1_1)
+  }
+
+  if (con->version >= HTTP_1_1 && !con->keep_alive)
+  {
     if (conprintf(con, "Connection: close\r\n") < 0)
       return (0);
-  if (conprintf(con, "\r\n") < 0)
+  }
+
+  if (code >= 400)
+  {
+   /*
+    * Send a human-readable error message.
+    */
+
+    sprintf(message, "<HTML><HEAD><TITLE>%d %s</TITLE></HEAD>"
+                     "<BODY><H1>%s</H1>%s</BODY></HTML>\n",
+            code, get_message(code), get_message(code),
+	    get_long_message(code));
+
+    if (conprintf(con, "Content-Type: text/html\r\n") < 0)
+      return (0);
+    if (conprintf(con, "Content-Length: %d\r\n", strlen(message)) < 0)
+      return (0);
+    if (conprintf(con, "\r\n") < 0)
+      return (0);
+    if (send(con->fd, message, strlen(message), 0) < 0)
+      return (0);
+  }
+  else if (conprintf(con, "\r\n") < 0)
     return (0);
 
-  con->keep_alive = 0;
-  con->state      = HTTP_WAITING;
+  con->state = HTTP_WAITING;
 
   return (1);
 }
@@ -961,7 +841,7 @@ SendError(connection_t *con,
  */
 
 int
-SendFile(connection_t *con,
+SendFile(client_t *con,
          int          code,
 	 char         *filename,
 	 char         *type,
@@ -971,7 +851,7 @@ SendFile(connection_t *con,
 
   fprintf(stderr, "cupsd: filename=\'%s\', file = %d\n", filename, con->file);
 
-  if (con->file <= 0)
+  if (con->file < 0)
     return (0);
 
   fcntl(con->file, F_SETFD, fcntl(con->file, F_GETFD) | FD_CLOEXEC);
@@ -999,58 +879,12 @@ SendFile(connection_t *con,
  */
 
 int				/* O - 1 on success, 0 on failure */
-SendHeader(connection_t *con,	/* I - Connection to send to */
+SendHeader(client_t *con,	/* I - Client to send to */
            int          code,	/* I - HTTP status code */
 	   char         *type)	/* I - MIME type of document */
 {
-  char	*message;		/* Textual message for code */
-
-
-  switch (code)
-  {
-    case HTTP_OK :
-        message = "OK";
-	break;
-    case HTTP_CREATED :
-        message = "CREATED";
-	break;
-    case HTTP_ACCEPTED :
-        message = "ACCEPTED";
-	break;
-    case HTTP_NO_CONTENT :
-        message = "NO CONTENT";
-	break;
-    case HTTP_NOT_MODIFIED :
-        message = "NOT MODIFIED";
-	break;
-    case HTTP_BAD_REQUEST :
-        message = "BAD REQUEST";
-	break;
-    case HTTP_UNAUTHORIZED :
-        message = "UNAUTHORIZED";
-	break;
-    case HTTP_FORBIDDEN :
-        message = "FORBIDDEN";
-	break;
-    case HTTP_NOT_FOUND :
-        message = "NOT FOUND";
-	break;
-    case HTTP_URI_TOO_LONG :
-        message = "URI TOO LONG";
-	break;
-    case HTTP_NOT_IMPLEMENTED :
-        message = "NOT IMPLEMENTED";
-	break;
-    case HTTP_NOT_SUPPORTED :
-        message = "NOT SUPPORTED";
-	break;
-    default :
-        message = "UNKNOWN";
-	break;
-  }
-
   if (conprintf(con, "HTTP/%d.%d %d %s\r\n", con->version / 100,
-                con->version % 100, code, message) < 0)
+                con->version % 100, code, get_message(code)) < 0)
     return (0);
   if (conprintf(con, "Date: %s\r\n", get_datetime(time(NULL))) < 0)
     return (0);
@@ -1060,7 +894,7 @@ SendHeader(connection_t *con,	/* I - Connection to send to */
   {
     if (conprintf(con, "Connection: Keep-Alive\r\n") < 0)
       return (0);
-    if (conprintf(con, "Keep-Alive: timeout=30, max=100\r\n") < 0)
+    if (conprintf(con, "Keep-Alive: timeout=%d\r\n", KeepAliveTimeout) < 0)
       return (0);
   }
   if (type != NULL)
@@ -1072,100 +906,214 @@ SendHeader(connection_t *con,	/* I - Connection to send to */
 
 
 /*
- * 'IsAuthorized()' - Check to see if the user is authorized...
+ * 'StartListening()' - Create all listening sockets...
  */
 
-int				/* O - 1 if authorized, 0 otherwise */
-IsAuthorized(connection_t *con,	/* I - Connection */
-             int          level)/* I - Access level required */
+void
+StartListening(void)
 {
-  int		i;		/* Looping var */
-  struct passwd	*pw;		/* User password data */
-#ifdef HAVE_SHADOW_H
-  struct spwd	*spw;		/* Shadow password data */
-#endif /* HAVE_SHADOW_H */
-  struct group	*grp;		/* Group data */
+  int		i,		/* Looping var */
+		val;		/* Parameter value */
+  listener_t	*lis;		/* Current listening socket */
 
 
-  if (level == 0)
-    return (1);
-
-  if (con->username[0] == '\0' || con->password[0] == '\0')
-    return (0);
-
+#ifdef WIN32
  /*
-  * Check the user's password...
+  * Initialize Windows sockets...  This handles loading the DLL, etc. since
+  * Windows doesn't have built-in support for sockets like UNIX...
   */
 
-  pw = getpwnam(con->username);	/* Get the current password */
-  endpwent();			/* Close the password file */
+  WSADATA	wsadata;	/* Socket data for application from DLL */
+  static int	initialized = 0;/* Whether or not we've initialized things */
 
-  if (pw == NULL)		/* No such user... */
-    return (0);
 
-  if (pw->pw_passwd[0] == '\0')
-    return (0);			/* Don't allow blank passwords! */
-
-#ifdef HAVE_SHADOW_H
-  spw = getspnam(con->username);
-  endspent();
-
-  if (spw == NULL)		/* No such user or damaged shadow file */
-    return (0);
-
-  if (spw->sp_pwdp[0] == '\0')	/* Don't allow blank passwords! */
-    return (0);
-#endif /* HAVE_SHADOW_H */
-
- /*
-  * OK, the password isn't blank, so compare with what came from the client...
-  */
-
-  if (strcmp(pw->pw_passwd, crypt(con->password, pw->pw_passwd)) != 0)
+  if (!initialized)
   {
-#ifdef HAVE_SHADOW_H
-    if (spw != NULL)
+    initialized = 1;
+
+    if (WSAStartup(MAKEWORD(1,1), &wsadata) != 0)
+      exit(1);
+  }
+#else
+ /*
+  * Setup a 'broken pipe' signal handler for lost clients.
+  */
+
+  sigset(SIGPIPE, sigpipe_handler);
+#endif /* !WIN32 */
+
+ /*
+  * Setup socket listeners...
+  */
+
+  for (i = NumListeners, lis = Listeners; i > 0; i --, lis ++)
+  {
+    if ((lis->fd = socket(AF_INET, SOCK_STREAM, PF_UNSPEC)) == -1)
     {
-      if (strcmp(spw->sp_pwdp, crypt(con->password, spw->sp_pwdp)) != 0)
-        return (0);
+      fprintf(stderr, "cupsd: Unable to open socket - %s\n", strerror(errno));
+      exit(errno);
     }
-    else
-#endif /* HAVE_SHADOW_H */
-      return (0);
+
+    fcntl(lis->fd, F_SETFD, fcntl(lis->fd, F_GETFD) | FD_CLOEXEC);
+
+   /*
+    * Set things up to reuse the local address for this port.
+    */
+
+    val = 1;
+    setsockopt(lis->fd, SOL_SOCKET, SO_REUSEADDR, &val, sizeof(val));
+
+   /*
+    * Bind to the port we found...
+    */
+
+    if (bind(lis->fd, (struct sockaddr *)&(lis->address), sizeof(lis->address)) < 0)
+    {
+      fprintf(stderr, "cupsd: Unable to bind socket - %s\n", strerror(errno));
+      fprintf(stderr, "cupsd: address = %08x, port = %d\n",
+              lis->address.sin_addr.s_addr, lis->address.sin_port);
+      exit(errno);
+    }
+
+   /*
+    * Listen for new clients.
+    */
+
+    if (listen(lis->fd, SOMAXCONN) < 0)
+    {
+      fprintf(stderr, "cupsd: Unable to listen for clients - %s\n",
+              strerror(errno));
+      exit(errno);
+    }
+
+   /*
+    * Setup the select() input mask to contain the listening socket we have.
+    */
+
+    FD_SET(lis->fd, &InputSet);
   }
 
- /*
-  * OK, the password is good.  See if we need normal user access, or group
-  * sys access...
-  */
-
-  if (level == 1)
-    return (1);
-
- /*
-  * Check to see if this user is in the "sys" group...
-  */
-
-  grp = getgrgid(0);
-  endgrent();
-
-  if (grp == NULL)		/* No sys group??? */
-    return (0);
-
-  for (i = 0; grp->gr_mem[i] != NULL; i ++)
-    if (strcmp(con->username, grp->gr_mem[i]) == 0)
-      return (1);
-
-  return (0);
+  fprintf(stderr, "cupsd: Listening on %d sockets...\n", NumListeners);
 }
 
 
 /*
- * 'conprintf()' - Do a printf() to a connection...
+ * 'StopListening()' - Close all listening sockets...
+ */
+
+void
+StopListening(void)
+{
+  int		i;		/* Looping var */
+  listener_t	*lis;		/* Current listening socket */
+
+
+  for (i = NumListeners, lis = Listeners; i > 0; i --, lis ++)
+  {
+#ifdef WIN32
+    closesocket(lis->fd);
+#else
+    close(lis->fd);
+#endif /* WIN32 */
+
+    FD_CLR(lis->fd, &InputSet);
+  }
+
+  fputs("cupsd: No longer listening for connections...\n", stderr);
+}
+
+
+/*
+ * 'WriteClient()' - Write data to a client as needed.
+ */
+
+int
+WriteClient(client_t *con)
+{
+  int	bytes;
+  int	status;
+  char	buf[MAX_BUFFER];
+
+
+  if (con->state != HTTP_GET_DATA &&
+      con->state != HTTP_POST_DATA)
+    return (1);
+
+  if ((bytes = read(con->file, buf, sizeof(buf))) > 0)
+  {
+    if (con->data_encoding == HTTP_DATA_CHUNKED)
+    {
+      if (conprintf(con, "%d\r\n", bytes) < 0)
+      {
+        CloseClient(con);
+	return (0);
+      }
+
+      if (send(con->fd, buf, bytes, 0) < 0)
+      {
+        CloseClient(con);
+	return (0);
+      }
+
+      if (conprintf(con, "\r\n") < 0)
+      {
+        CloseClient(con);
+	return (0);
+      }
+    }
+    else if (send(con->fd, buf, bytes, 0) < 0)
+    {
+      CloseClient(con);
+      return (0);
+    }
+  }
+  else
+  {
+    if (con->data_encoding == HTTP_DATA_CHUNKED)
+    {
+      if (conprintf(con, "0\r\n\r\n") < 0)
+      {
+        CloseClient(con);
+	return (0);
+      }
+    }
+
+    FD_CLR(con->fd, &OutputSet);
+    FD_CLR(con->file, &InputSet);
+
+    if (con->pipe_pid)
+    {
+      kill(con->pipe_pid, SIGKILL);
+      waitpid(con->pipe_pid, &status, WNOHANG);
+    }
+
+    close(con->file);
+
+    if (!con->keep_alive)
+    {
+      CloseClient(con);
+      return (0);
+    }
+
+    con->state    = HTTP_WAITING;
+    con->file     = 0;
+    con->pipe_pid = 0;
+  }
+
+  fprintf(stderr, "cupsd: SEND %d bytes to #%d\n", bytes, con->fd);
+
+  con->activity = time(NULL);
+
+  return (1);
+}
+
+
+/*
+ * 'conprintf()' - Do a printf() to a client...
  */
 
 static int			/* O - Number of bytes written or -1 on error */
-conprintf(connection_t *con,	/* I - Connection to write to */
+conprintf(client_t *con,	/* I - Client to write to */
           char         *format,	/* I - printf()-style format string */
           ...)			/* I - Additional args as needed */
 {
@@ -1193,7 +1141,7 @@ conprintf(connection_t *con,	/* I - Connection to write to */
  */
 
 static void
-decode_basic_auth(connection_t *con,	/* I - Connection to decode to */
+decode_basic_auth(client_t *con,	/* I - Client to decode to */
                   char         *line)	/* I - Line to decode */
 {
   int	pos,				/* Bit position */
@@ -1270,7 +1218,7 @@ decode_basic_auth(connection_t *con,	/* I - Connection to decode to */
  */
 
 static void
-decode_if_modified(connection_t *con,
+decode_if_modified(client_t *con,
                    char         *line)
 {
   int		i;			/* Looping var */
@@ -1380,7 +1328,7 @@ get_extension(char *filename)
  */
 
 static char *
-get_file(connection_t *con,
+get_file(client_t *con,
          struct stat  *filestats)
 {
   int		status;
@@ -1444,9 +1392,9 @@ get_file(connection_t *con,
  */
 
 static char *
-get_line(connection_t *con,
-         char         *line,
-	 int          length)
+get_line(client_t *con,
+         char     *line,
+	 int      length)
 {
   char	*lineptr,
 	*bufptr,
@@ -1515,6 +1463,75 @@ get_line(connection_t *con,
 
 
 /*
+ * 'get_long_message()' - Get a long message string for the given HTTP code.
+ */
+
+static char *			/* O - Message string */
+get_long_message(int code)	/* I - Message code */
+{
+  switch (code)
+  {
+    case HTTP_BAD_REQUEST :
+        return ("The server reported that a bad or incomplete request was received.");
+    case HTTP_UNAUTHORIZED :
+        return ("You must provide a valid username and password to access this page.");
+    case HTTP_FORBIDDEN :
+        return ("You are not allowed to access this page.");
+    case HTTP_NOT_FOUND :
+        return ("The specified file or directory was not found.");
+    case HTTP_URI_TOO_LONG :
+        return ("The server reported that the URI is too long.");
+    case HTTP_NOT_IMPLEMENTED :
+        return ("That feature is not implemented");
+    case HTTP_NOT_SUPPORTED :
+        return ("That feature is not supported");
+    default :
+        return ("An unknown error occurred.");
+  }
+}
+
+
+/*
+ * 'get_message()' - Get a message string for the given HTTP code.
+ */
+
+static char *		/* O - Message string */
+get_message(int code)	/* I - Message code */
+{
+  switch (code)
+  {
+    case HTTP_OK :
+        return ("OK");
+    case HTTP_CREATED :
+        return ("Created");
+    case HTTP_ACCEPTED :
+        return ("Accepted");
+    case HTTP_NO_CONTENT :
+        return ("No Content");
+	break;
+    case HTTP_NOT_MODIFIED :
+        return ("Not Modified");
+    case HTTP_BAD_REQUEST :
+        return ("Bad Request");
+    case HTTP_UNAUTHORIZED :
+        return ("Unauthorized");
+    case HTTP_FORBIDDEN :
+        return ("Forbidden");
+    case HTTP_NOT_FOUND :
+        return ("Not Found");
+    case HTTP_URI_TOO_LONG :
+        return ("URI Too Long");
+    case HTTP_NOT_IMPLEMENTED :
+        return ("Not Implemented");
+    case HTTP_NOT_SUPPORTED :
+        return ("Not Supported");
+    default :
+        return ("Unknown");
+  }
+}
+
+
+/*
  * 'get_type()' - Get MIME type from the given extension.
  */
 
@@ -1543,7 +1560,7 @@ get_type(char *extension)
 
 
 /*
- * 'pipe_command()' - Pipe the output of a command to the remote connection.
+ * 'pipe_command()' - Pipe the output of a command to the remote client.
  */
 
 static int			/* O - Process ID */
@@ -1667,17 +1684,17 @@ pipe_command(int infile,	/* I - Standard input for command */
 
 
 /*
- * 'signal_handler()' - Handle 'broken pipe' signals from lost network
- *                      connections.
+ * 'sigpipe_handler()' - Handle 'broken pipe' signals from lost network
+ *                       clients.
  */
 
 static void
-signal_handler(int sig)	/* I - Signal number */
+sigpipe_handler(int sig)	/* I - Signal number */
 {
 /* IGNORE */
 }
 
 
 /*
- * End of "$Id: http.c,v 1.5 1998/10/13 18:55:52 mike Exp $".
+ * End of "$Id: http.c,v 1.6 1998/10/16 18:28:01 mike Exp $".
  */

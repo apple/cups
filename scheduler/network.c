@@ -1,5 +1,5 @@
 /*
- * "$Id: network.c,v 1.1 1998/01/05 20:49:52 mike Exp $"
+ * "$Id: network.c,v 1.2 1998/10/16 18:28:01 mike Exp $"
  *
  *   for the Common UNIX Printing System (CUPS).
  *
@@ -24,12 +24,6 @@
  * Contents:
  *
  *
- * Revision History:
- *
- *   $Log: network.c,v $
- *   Revision 1.1  1998/01/05 20:49:52  mike
- *   Initial revision
- *
  */
 
 /*
@@ -40,5 +34,5 @@
 
 
 /*
- * End of "$Id: network.c,v 1.1 1998/01/05 20:49:52 mike Exp $".
+ * End of "$Id: network.c,v 1.2 1998/10/16 18:28:01 mike Exp $".
  */

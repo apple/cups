@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.1 1998/10/09 14:12:39 mike Exp $"
+ * "$Id: printers.c,v 1.2 1998/10/16 18:28:01 mike Exp $"
  *
  *   for the Common UNIX Printing System (CUPS).
  *
@@ -24,21 +24,15 @@
  * Contents:
  *
  *
- * Revision History:
- *
- *   $Log: printers.c,v $
- *   Revision 1.1  1998/10/09 14:12:39  mike
- *   Initial revision
- *
  */
 
 /*
  * Include necessary headers...
  */
 
-#include
+#include "cupsd.h"
 
 
 /*
- * End of "$Id: printers.c,v 1.1 1998/10/09 14:12:39 mike Exp $".
+ * End of "$Id: printers.c,v 1.2 1998/10/16 18:28:01 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: classes.c,v 1.1 1998/10/09 14:13:18 mike Exp $"
+ * "$Id: classes.c,v 1.2 1998/10/16 18:28:01 mike Exp $"
  *
  *   for the Common UNIX Printing System (CUPS).
  *
@@ -24,21 +24,15 @@
  * Contents:
  *
  *
- * Revision History:
- *
- *   $Log: classes.c,v $
- *   Revision 1.1  1998/10/09 14:13:18  mike
- *   Initial revision
- *
  */
 
 /*
  * Include necessary headers...
  */
 
-#include
+#include "cupsd.h"
 
 
 /*
- * End of "$Id: classes.c,v 1.1 1998/10/09 14:13:18 mike Exp $".
+ * End of "$Id: classes.c,v 1.2 1998/10/16 18:28:01 mike Exp $".
  */

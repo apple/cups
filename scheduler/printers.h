@@ -1,7 +1,7 @@
 /*
- * "$Id: printers.h,v 1.1 1998/10/09 14:12:57 mike Exp $"
+ * "$Id: printers.h,v 1.2 1998/10/16 18:28:01 mike Exp $"
  *
- *   for the Common UNIX Printing System (CUPS).
+ *   Pirnter definitions for the Common UNIX Printing System (CUPS) scheduler.
  *
  *   Copyright 1997-1998 by Easy Software Products, all rights reserved.
  *
@@ -20,25 +20,23 @@
  *       Voice: (301) 373-9603
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
- *
- * Contents:
- *
- *
- * Revision History:
- *
- *   $Log: printers.h,v $
- *   Revision 1.1  1998/10/09 14:12:57  mike
- *   Initial revision
- *
  */
 
 /*
- * Include necessary headers...
+ * Printer types...
  */
 
-#include
+#define CUPS_LOCAL_PRINTER	0
+#define CUPS_LOCAL_CLASS	1
+#define CUPS_REMOTE_PRINTER	2
+#define CUPS_REMOTE_CLASS	3
+#define CUPS_IMPLICIT_CLASS	5
+
+/*
+ * Printer information structure...
+ */
 
 
 /*
- * End of "$Id: printers.h,v 1.1 1998/10/09 14:12:57 mike Exp $".
+ * End of "$Id: printers.h,v 1.2 1998/10/16 18:28:01 mike Exp $".
  */

@@ -1,7 +1,8 @@
 /*
- * "$Id: conf.h,v 1.1 1998/10/09 14:11:49 mike Exp $"
+ * "$Id: conf.h,v 1.2 1998/10/16 18:28:01 mike Exp $"
  *
- *   for the Common UNIX Printing System (CUPS).
+ *   Configuration file definitions for the Common UNIX Printing System (CUPS)
+ *   scheduler.
  *
  *   Copyright 1997-1998 by Easy Software Products, all rights reserved.
  *
@@ -20,25 +21,71 @@
  *       Voice: (301) 373-9603
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
- *
- * Contents:
- *
- *
- * Revision History:
- *
- *   $Log: conf.h,v $
- *   Revision 1.1  1998/10/09 14:11:49  mike
- *   Initial revision
- *
  */
 
 /*
- * Include necessary headers...
+ * Log levels...
  */
 
-#include
+#define LOG_NONE	0
+#define LOG_ERROR	1
+#define LOG_WARN	2
+#define LOG_DEBUG	3
 
 
 /*
- * End of "$Id: conf.h,v 1.1 1998/10/09 14:11:49 mike Exp $".
+ * Globals...
+ */
+
+VAR char		ConfigurationFile[256] VALUE("/var/spool/cups/cupsd.conf"),
+					/* Configuration file to use */
+			ServerName[256]	VALUE(""),
+					/* FQDN for server */
+			ServerAdmin[256] VALUE(""),
+					/* Administrator's email */
+			ServerRoot[1024] VALUE("."),
+					/* Root directory for scheduler */
+			DocumentRoot[1024] VALUE("."),
+					/* Root directory for documents */
+			SystemGroup[32]		VALUE(DEFAULT_GROUP),
+					/* System group name */
+			AccessLog[1024]	VALUE("logs/access_log"),
+					/* Access log filename */
+			ErrorLog[1024]	VALUE("logs/error_log"),
+					/* Error log filename */
+			DefaultLanguage[32] VALUE(DEFAULT_LANGUAGE);
+					/* Default language encoding */
+VAR int			User		VALUE(DEFAULT_UID),
+					/* User ID for server */
+			Group		VALUE(DEFAULT_GID),
+					/* Group ID for server */
+			LogLevel	VALUE(LOG_ERROR),
+					/* Log level */
+			HostNameLookups	VALUE(FALSE),
+					/* Do we do reverse lookups? */
+			Timeout		VALUE(DEFAULT_TIMEOUT),
+					/* Timeout during requests */
+			KeepAlive	VALUE(TRUE),
+					/* Support the Keep-Alive option? */
+			KeepAliveTimeout VALUE(DEFAULT_KEEPALIVE),
+					/* Timeout between requests */
+			ImplicitClasses	VALUE(TRUE);
+					/* Are classes implicitly created? */
+VAR FILE		*AccessFile	VALUE(NULL),
+					/* Access log file */
+			*ErrorFile	VALUE(NULL);
+					/* Error log file */
+
+
+/*
+ * Prototypes...
+ */
+
+extern int	ReadConfiguration(void);
+extern int	LogRequest(client_t *con, int code);
+extern int	LogMessage(int level, char *message, ...);
+
+
+/*
+ * End of "$Id: conf.h,v 1.2 1998/10/16 18:28:01 mike Exp $".
  */

@@ -1,28 +1,31 @@
 /*
- * "$Id: main.c,v 1.3 1998/10/13 18:24:15 mike Exp $"
+ * "$Id: main.c,v 1.4 1998/10/16 18:28:01 mike Exp $"
  *
- *   Main entry for the CUPS test program.
+ *   for the Common UNIX Printing System (CUPS).
+ *
+ *   Copyright 1997-1998 by Easy Software Products, all rights reserved.
+ *
+ *   These coded instructions, statements, and computer programs are the
+ *   property of Easy Software Products and are protected by Federal
+ *   copyright law.  Distribution and use rights are outlined in the file
+ *   "LICENSE" which should have been included with this file.  If this
+ *   file is missing or damaged please contact Easy Software Products
+ *   at:
+ *
+ *       Attn: CUPS Licensing Information
+ *       Easy Software Products
+ *       44145 Airport View Drive, Suite 204
+ *       Hollywood, Maryland 20636-3111 USA
+ *
+ *       Voice: (301) 373-9603
+ *       EMail: cups-info@cups.org
+ *         WWW: http://www.cups.org
  *
  * Contents:
  *
- *   main() - Main entry for the PCDS executive.
- *
- * Revision History:
- *
- *   $Log: main.c,v $
- *   Revision 1.3  1998/10/13 18:24:15  mike
- *   Added activity timeout code.
- *   Added Basic authorization code.
- *   Fixed problem with main loop that would cause a core dump.
- *
- *   Revision 1.2  1998/10/12  15:31:08  mike
- *   Switched from stdio files to file descriptors.
- *   Added FD_CLOEXEC flags to all non-essential files.
- *   Added pipe_command() function.
- *   Added write checks for all writes.
- *
- *   Revision 1.1  1998/10/12  13:57:19  mike
- *   Initial revision
+ *   main()           - Main entry for the CUPS scheduler.
+ *   sighup_handler() - Handle 'hangup' signals to reconfigure the scheduler.
+ *   usage()          - Show scheduler usage.
  */
 
 /*
@@ -34,7 +37,15 @@
 
 
 /*
- * 'main()' - Main entry for the PCDS executive.
+ * Local functions...
+ */
+
+static void	sighup_handler(int sig);
+static void	usage(void);
+
+
+/*
+ * 'main()' - Main entry for the CUPS scheduler.
  */
 
 int				/* O - Exit status */
@@ -42,13 +53,44 @@ main(int  argc,			/* I - Number of command-line arguments */
      char *argv[])		/* I - Command-line arguments */
 {
   int			i;		/* Looping var */
+  char			*opt;		/* Option character */
   int			bytes;		/* Number of bytes read */
   fd_set		input,		/* Input set for select() */
 			output;		/* Output set for select() */
-  connection_t		*con;		/* Current connection */
+  client_t		*con;		/* Current client */
+  listener_t		*lis;		/* Current listener */
   time_t		activity;	/* Activity timer */
   struct timeval	timeout;	/* select() timeout */
 
+
+ /*
+  * Check for command-line arguments...
+  */
+
+  for (i = 1; i < argc; i ++)
+    if (argv[i][0] == '-')
+      for (opt = argv[i] + 1; *opt != '\0'; opt ++)
+        switch (*opt)
+	{
+	  case 'c' : /* Configuration file */
+	      i ++;
+	      if (i >= argc)
+	        usage();
+
+	      strncpy(ConfigurationFile, argv[i], sizeof(ConfigurationFile) - 1);
+	      ConfigurationFile[sizeof(ConfigurationFile) - 1] = '\0';
+	      break;
+
+	  default : /* Unknown option */
+              fprintf(stderr, "cupsd: Unknown option \'%c\' - aborting!\n", *opt);
+	      usage();
+	      break;
+	}
+    else
+    {
+      fprintf(stderr, "cupsd: Unknown argument \'%s\' - aborting!\n", argv[i]);
+      usage();
+    }
 
  /*
   * Set the timezone to GMT...
@@ -58,10 +100,10 @@ main(int  argc,			/* I - Number of command-line arguments */
   tzset();
 
  /*
-  * Initialize 'ipp' socket for external connections...
+  * Catch hangup signals...
   */
 
-  StartListening();
+  sigset(SIGHUP, sighup_handler);
 
  /*
   * Loop forever...
@@ -69,6 +111,34 @@ main(int  argc,			/* I - Number of command-line arguments */
 
   while (TRUE)
   {
+   /*
+    * Check if we need to load the server configuration file...
+    */
+
+    if (NeedReload)
+    {
+      if (NumClients > 0)
+      {
+        for (i = NumClients, con = Clients; i > 0; i --, con ++)
+	  if (con->state == HTTP_WAITING)
+	  {
+	    CloseClient(con);
+	    con --;
+	  }
+	  else
+	    con->keep_alive = 0;
+
+	for (i = 0; i < NumListeners; i ++)
+	  FD_CLR(Listeners[i].fd, &InputSet);
+      }
+      else if (!ReadConfiguration())
+      {
+        fprintf(stderr, "cupsd: Unable to read configuration file \'%s\' - exiting!",
+	        ConfigurationFile);
+        exit(1);
+      }
+    }
+
    /*
     * Check for available input or ready output.  If select() returns
     * 0 or -1, something bad happened and we should exit immediately.
@@ -83,7 +153,7 @@ main(int  argc,			/* I - Number of command-line arguments */
     timeout.tv_sec  = 1;
     timeout.tv_usec = 0;
 
-    for (i = 0, con = Connection; i < NumConnections; i ++, con ++)
+    for (i = NumClients, con = Clients; i > 0; i --, con ++)
       if (con->bufused > 0)
       {
         timeout.tv_sec  = 0;
@@ -91,12 +161,19 @@ main(int  argc,			/* I - Number of command-line arguments */
       }
 
     if ((i = select(100, &input, &output, NULL, &timeout)) < 0)
+    {
+      if (errno == EINTR)
+        continue;
+
+      fprintf(stderr, "cupsd: select() failed - %s\n", strerror(errno));
       break;
+    }
 
-    if (FD_ISSET(Listener, &input))
-      AcceptConnection();
+    for (i = NumListeners, lis = Listeners; i > 0; i --, lis ++)
+      if (FD_ISSET(lis->fd, &input))
+        AcceptClient(lis);
 
-    for (i = 0, con = Connection; i < NumConnections; i ++, con ++)
+    for (i = NumClients, con = Clients; i > 0; i --, con ++)
     {
      /*
       * Read data as needed...
@@ -107,9 +184,9 @@ main(int  argc,			/* I - Number of command-line arguments */
         if ((bytes = recv(con->fd, con->buf + con->bufused,
                           MAX_BUFFER - con->bufused, 0)) <= 0)
         {
-          CloseConnection(con);
+	  fprintf(stderr, "cupsd: Lost client #%d\n", con->fd);
+          CloseClient(con);
 	  con --;
-	  i --;
 	  continue;
 	}
 
@@ -121,10 +198,9 @@ main(int  argc,			/* I - Number of command-line arguments */
       */
 
       if (con->bufused > 0)
-        if (!ReadConnection(con))
+        if (!ReadClient(con))
 	{
 	  con --;
-	  i --;
 	  continue;
 	}
 
@@ -134,23 +210,21 @@ main(int  argc,			/* I - Number of command-line arguments */
 
       if (FD_ISSET(con->fd, &output) ||
           FD_ISSET(con->file, &output))
-        if (!WriteConnection(con))
+        if (!WriteClient(con))
 	{
 	  con --;
-	  i --;
 	  continue;
 	}
 
      /*
-      * Check the activity and close old connections...
+      * Check the activity and close old clients...
       */
 
       activity = time(NULL) - 30;
       if (con->activity < activity)
       {
-        CloseConnection(con);
+        CloseClient(con);
         con --;
-        i --;
         continue;
       }
     }
@@ -161,18 +235,36 @@ main(int  argc,			/* I - Number of command-line arguments */
   * immediately.
   */
 
-  while (NumConnections > 0)
-    CloseConnection(Connection);
+  CloseAllClients();
+  StopListening();
 
-#ifdef WIN32
-  closesocket(Listener);
-#else
-  close(Listener);
-#endif /* WIN32 */
-
-  return (0);
+  return (1);
 }
 
+
 /*
- * End of "$Id: main.c,v 1.3 1998/10/13 18:24:15 mike Exp $".
+ * 'sighup_handler()' - Handle 'hangup' signals to reconfigure the scheduler.
+ */
+
+static void
+sighup_handler(int sig)	/* I - Signal number */
+{
+  NeedReload = TRUE;
+}
+
+
+/*
+ * 'usage()' - Show scheduler usage.
+ */
+
+static void
+usage(void)
+{
+  fputs("Usage: cupsd [-c config-file]", stderr);
+  exit(1);
+}
+
+
+/*
+ * End of "$Id: main.c,v 1.4 1998/10/16 18:28:01 mike Exp $".
  */

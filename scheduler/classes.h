@@ -1,7 +1,7 @@
 /*
- * "$Id: classes.h,v 1.1 1998/10/09 14:13:32 mike Exp $"
+ * "$Id: classes.h,v 1.2 1998/10/16 18:28:01 mike Exp $"
  *
- *   for the Common UNIX Printing System (CUPS).
+ *   Printer class definitions for the Common UNIX Printing System (CUPS).
  *
  *   Copyright 1997-1998 by Easy Software Products, all rights reserved.
  *
@@ -20,25 +20,11 @@
  *       Voice: (301) 373-9603
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
- *
- * Contents:
- *
- *
- * Revision History:
- *
- *   $Log: classes.h,v $
- *   Revision 1.1  1998/10/09 14:13:32  mike
- *   Initial revision
- *
  */
 
 /*
- * Include necessary headers...
- */
-
-#include
-
+ * 
 
 /*
- * End of "$Id: classes.h,v 1.1 1998/10/09 14:13:32 mike Exp $".
+ * End of "$Id: classes.h,v 1.2 1998/10/16 18:28:01 mike Exp $".
  */

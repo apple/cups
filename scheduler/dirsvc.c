@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.1 1998/10/09 14:10:02 mike Exp $"
+ * "$Id: dirsvc.c,v 1.2 1998/10/16 18:28:01 mike Exp $"
  *
  *   for the Common UNIX Printing System (CUPS).
  *
@@ -24,21 +24,39 @@
  * Contents:
  *
  *
- * Revision History:
- *
- *   $Log: dirsvc.c,v $
- *   Revision 1.1  1998/10/09 14:10:02  mike
- *   Initial revision
- *
  */
 
 /*
  * Include necessary headers...
  */
 
-#include
+#include "cupsd.h"
+
+
+void
+StartBrowsing(void)
+{
+}
+
+
+void
+StopBrowsing(void)
+{
+}
+
+
+void
+UpdateBrowseList(void)
+{
+}
+
+
+void
+SendBrowseList(void)
+{
+}
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.1 1998/10/09 14:10:02 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.2 1998/10/16 18:28:01 mike Exp $".
  */

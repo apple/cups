@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.1 1998/10/09 14:11:35 mike Exp $"
+ * "$Id: conf.c,v 1.2 1998/10/16 18:28:01 mike Exp $"
  *
  *   for the Common UNIX Printing System (CUPS).
  *
@@ -23,22 +23,704 @@
  *
  * Contents:
  *
- *
- * Revision History:
- *
- *   $Log: conf.c,v $
- *   Revision 1.1  1998/10/09 14:11:35  mike
- *   Initial revision
- *
+ *   ReadConfiguration()  - Read the cupsd.conf file.
+ *   LogRequest()         - Log an HTTP request in Common Log Format.
+ *   LogMessage()         - Log a message to the error log file.
+ *   read_configuration() - Read a configuration file.
+ *   read_location()      - Read a <Location path> definition.
+ *   get_address()        - Get an address + port number from a line.
  */
 
 /*
  * Include necessary headers...
  */
 
-#include
+#include "cupsd.h"
+#include <stdarg.h>
 
 
 /*
- * End of "$Id: conf.c,v 1.1 1998/10/09 14:11:35 mike Exp $".
+ * Configuration variable structure...
+ */
+
+typedef struct
+{
+  char	*name;		/* Name of variable */
+  void	*ptr;		/* Pointer to variable */
+  int	type,		/* Type (int, string, address) */
+	size;		/* Size of string */
+} var_t;
+
+#define VAR_INTEGER	0
+#define VAR_STRING	1
+#define VAR_BOOLEAN	2
+
+
+/*
+ * Local globals...
+ */
+
+static var_t	variables[] =
+{
+  { "ServerName",	ServerName,		VAR_STRING,	sizeof(ServerName) },
+  { "ServerAdmin",	ServerAdmin,		VAR_STRING,	sizeof(ServerAdmin) },
+  { "ServerRoot",	ServerRoot,		VAR_STRING,	sizeof(ServerRoot) },
+  { "DocumentRoot",	DocumentRoot,		VAR_STRING,	sizeof(DocumentRoot) },
+  { "SystemGroup",	SystemGroup,		VAR_STRING,	sizeof(SystemGroup) },
+  { "AccessLog",	AccessLog,		VAR_STRING,	sizeof(AccessLog) },
+  { "ErrorLog",		ErrorLog,		VAR_STRING,	sizeof(ErrorLog) },
+  { "DefaultLanguage",	DefaultLanguage,	VAR_STRING,	sizeof(DefaultLanguage) },
+  { "LogLevel",		&LogLevel,		VAR_INTEGER,	0 },
+  { "HostNameLookups",	&HostNameLookups,	VAR_BOOLEAN,	0 },
+  { "Timeout",		&Timeout,		VAR_INTEGER,	0 },
+  { "KeepAlive",	&KeepAlive,		VAR_BOOLEAN,	0 },
+  { "KeepAliveTimeout",	&KeepAliveTimeout,	VAR_INTEGER,	0 },
+  { "ImplicitClasses",	&ImplicitClasses,	VAR_BOOLEAN,	0 },
+  { "Browsing",		&Browsing,		VAR_BOOLEAN,	0 },
+  { "BrowsePort",	&BrowsePort,		VAR_INTEGER,	0 },
+  { "BrowseInterval",	&BrowseInterval,	VAR_INTEGER,	0 },
+  { "BrowseTimeout",	&BrowseTimeout,		VAR_INTEGER,	0 },
+};
+#define NUM_VARS	(sizeof(variables) / sizeof(variables[0]))
+
+
+/*
+ * Local functions...
+ */
+
+static int	read_configuration(FILE *fp);
+static int	read_location(FILE *fp, char *name, int linenum);
+static int	get_address(char *value, unsigned defaddress, int defport,
+		            struct sockaddr_in *address);
+
+
+/*
+ * 'ReadConfiguration()' - Read the cupsd.conf file.
+ */
+
+int			/* O - 1 if file read successfully, 0 otherwise */
+ReadConfiguration(void)
+{
+  FILE	*fp;		/* Configuration file */
+  int	status;		/* Return status */
+
+
+ /*
+  * Close all network clients and stop all jobs...
+  */
+
+  CloseAllClients();
+  StopListening();
+  StopBrowsing();
+#if 0
+  StopAllJobs();
+#endif /* 0 */
+
+  if (AccessFile != NULL)
+  {
+    fclose(AccessFile);
+    AccessFile = NULL;
+  }
+
+  if (ErrorFile != NULL)
+  {
+    fclose(ErrorFile);
+    ErrorFile = NULL;
+  }
+
+ /*
+  * Clear the current configuration...
+  */
+
+  NeedReload = FALSE;
+
+  FD_ZERO(&InputSet);
+  FD_ZERO(&OutputSet);
+
+  DeleteAllLocations();
+
+#if 0
+  DeleteAllClasses();
+#endif /* 0 */
+
+  gethostname(ServerName, sizeof(ServerName));
+  sprintf(ServerAdmin, "root@%s", ServerName);
+  strcpy(ServerRoot, ".");
+  strcpy(DocumentRoot, ".");
+  strcpy(SystemGroup, DEFAULT_GROUP);
+  strcpy(AccessLog, "logs/access_log");
+  strcpy(ErrorLog, "logs/error_log");
+  strcpy(DefaultLanguage, DEFAULT_LANGUAGE);
+  User             = DEFAULT_UID;
+  Group            = DEFAULT_GID;
+  LogLevel         = LOG_ERROR;
+  HostNameLookups  = FALSE;
+  Timeout          = DEFAULT_TIMEOUT;
+  KeepAlive        = TRUE;
+  KeepAliveTimeout = DEFAULT_KEEPALIVE;
+  ImplicitClasses  = TRUE;
+
+  Browsing         = TRUE;
+  BrowsePort       = DEFAULT_PORT;
+  BrowseInterval   = DEFAULT_INTERVAL;
+  BrowseTimeout    = DEFAULT_TIMEOUT;
+  NumBrowsers      = 0;
+  LastBrowseTime   = 0;
+
+  NumListeners     = 0;
+
+#if 0
+  DeleteAllPrinters();
+#endif /* 0 */
+
+  if ((fp = fopen(ConfigurationFile, "r")) == NULL)
+    return (0);
+
+  fprintf(stderr, "cupsd: Reading configuration file \'%s\'...\n",
+          ConfigurationFile);
+
+  status = read_configuration(fp);
+
+  fclose(fp);
+
+  if (!status)
+    return (0);
+
+  StartListening();
+  StartBrowsing();
+
+  return (1);
+}
+
+
+/*
+ * 'LogRequest()' - Log an HTTP request in Common Log Format.
+ */
+
+int				/* O - 1 on success, 0 on error */
+LogRequest(client_t *con,	/* I - Request to log */
+           int      code)	/* I - Response code */
+{
+}
+
+
+/*
+ * 'LogMessage()' - Log a message to the error log file.
+ */
+
+int				/* O - 1 on success, 0 on error */
+LogMessage(int  level,		/* I - Log level */
+           char *message,	/* I - printf-style message string */
+	   ...)			/* I - Additional args as needed */
+{
+}
+
+
+/*
+ * 'read_configuration()' - Read a configuration file.
+ */
+
+static int			/* O - 1 on success, 0 on failure */
+read_configuration(FILE *fp)	/* I - File to read from */
+{
+  int	i;			/* Looping var */
+  int	linenum;		/* Current line number */
+  int	len;			/* Length of line */
+  char	line[MAX_BUFFER],	/* Line from file */
+	name[256],		/* Parameter name */
+	*nameptr,		/* Pointer into name */
+	*value;			/* Pointer to value */
+  var_t	*var;			/* Current variable */
+
+ /*
+  * Loop through each line in the file...
+  */
+
+  linenum = 0;
+
+  while (fgets(line, sizeof(line), fp) != NULL)
+  {
+    linenum ++;
+
+   /*
+    * Skip comment lines...
+    */
+
+    if (line[0] == '#')
+      continue;
+
+   /*
+    * Strip trailing newline, if any...
+    */
+
+    len = strlen(line);
+
+    if (line[len - 1] == '\n')
+    {
+      len --;
+      line[len] = '\0';
+    }
+
+   /*
+    * Extract the name from the beginning of the line...
+    */
+
+    for (value = line; isspace(*value); value ++);
+
+    for (nameptr = name; *value != '\0' && !isspace(*value);)
+      *nameptr++ = *value++;
+    *nameptr = '\0';
+
+    while (isspace(*value))
+      value ++;
+
+    if (name[0] == '\0')
+      continue;
+
+   /*
+    * Decode the directive...
+    */
+
+    if (strcmp(name, "<Location") == 0)
+    {
+     /*
+      * <Location path>
+      */
+
+      if (line[len - 1] == '>')
+      {
+        line[len - 1] = '\0';
+
+	linenum = read_location(fp, value, linenum);
+	if (linenum == 0)
+	  return (0);
+      }
+      else
+      {
+        LogMessage(LOG_ERROR, "Syntax error on line %d of %s.", linenum,
+	         ConfigurationFile);
+        return (0);
+      }
+    }
+    else if (strcmp(name, "Port") == 0 ||
+             strcmp(name, "Listen") == 0)
+    {
+     /*
+      * Add a listening address to the list...
+      */
+
+      if (NumListeners < MAX_BROWSERS)
+      {
+        if (get_address(value, INADDR_ANY, DEFAULT_PORT,
+	                &(Listeners[NumListeners].address)))
+	  NumListeners ++;
+	else
+          LogMessage(LOG_ERROR, "Bad %s address %s at line %d of %s.", name,
+	           value, linenum, ConfigurationFile);
+      }
+      else
+        LogMessage(LOG_WARN, "Too many %s directives at line %d of %s.", name,
+	         linenum, ConfigurationFile);
+    }
+    else if (strcmp(name, "BrowseAddress") == 0)
+    {
+     /*
+      * Add a browse address to the list...
+      */
+
+      if (NumBrowsers < MAX_BROWSERS)
+      {
+        if (get_address(value, INADDR_NONE, BrowsePort, Browsers + NumBrowsers))
+	  NumBrowsers ++;
+	else
+          LogMessage(LOG_ERROR, "Bad BrowseAddress %s at line %d of %s.", value,
+	           linenum, ConfigurationFile);
+      }
+      else
+        LogMessage(LOG_WARN, "Too many BrowseAddress directives at line %d of %s.",
+	         linenum, ConfigurationFile);
+    }
+    else
+    {
+     /*
+      * Find a simple variable in the list...
+      */
+
+      for (i = NUM_VARS, var = variables; i > 0; i --, var ++)
+        if (strcmp(name, var->name) == 0)
+	  break;
+
+      if (i == 0)
+      {
+       /*
+        * Unknown directive!  Output an error message and continue...
+	*/
+
+        LogMessage(LOG_ERROR, "Unknown directive %s on line %d of %s.", name,
+	         linenum, ConfigurationFile);
+        continue;
+      }
+
+      switch (var->type)
+      {
+        case VAR_INTEGER :
+	    *((int *)var->ptr) = atoi(value);
+	    break;
+
+	case VAR_BOOLEAN :
+	    if (strcasecmp(value, "true") == 0 ||
+	        strcasecmp(value, "on") == 0 ||
+		strcasecmp(value, "enabled") == 0 ||
+		atoi(value) != 0)
+              *((int *)var->ptr) = TRUE;
+	    else if (strcasecmp(value, "false") == 0 ||
+	             strcasecmp(value, "off") == 0 ||
+		     strcasecmp(value, "disabled") == 0 ||
+		     strcasecmp(value, "0") == 0)
+              *((int *)var->ptr) = FALSE;
+	    else
+              LogMessage(LOG_ERROR, "Unknown boolean value %s on line %d of %s.",
+	               value, linenum, ConfigurationFile);
+	    break;
+
+	case VAR_STRING :
+	    strncpy((char *)var->ptr, value, var->size - 1);
+	    value[var->size - 1] = '\0';
+	    break;
+      }
+    }
+  }
+
+  return (1);
+}
+
+
+/*
+ * 'read_location()' - Read a <Location path> definition.
+ */
+
+static int			/* O - New line number or 0 on error */
+read_location(FILE *fp,		/* I - Configuration file */
+              char *location,	/* I - Location name/path */
+	      int  linenum)	/* I - Current line number */
+{
+  location_t	*loc;			/* New location */
+  int		len;			/* Length of line */
+  char		line[MAX_BUFFER],	/* Line buffer */
+		name[256],		/* Configuration directive */
+		*nameptr,		/* Pointer into name */
+		*value;			/* Value for directive */
+  unsigned	address,		/* Address value */
+		netmask;		/* Netmask value */
+  int		ip[4],			/* IP address components */
+		ipcount,		/* Number of components provided */
+ 		mask[4];		/* IP netmask components */
+  static unsigned	netmasks[4] =	/* Standard netmasks... */
+  {
+    0xff000000,
+    0xffff0000,
+    0xffffff00,
+    0xffffffff
+  };
+
+
+  if ((loc = AddLocation(location)) == NULL)
+    return (0);
+
+  while (fgets(line, sizeof(line), fp) != NULL)
+  {
+    linenum ++;
+
+   /*
+    * Skip comment lines...
+    */
+
+    if (line[0] == '#')
+      continue;
+
+   /*
+    * Strip trailing newline, if any...
+    */
+
+    len = strlen(line);
+
+    if (line[len - 1] == '\n')
+    {
+      len --;
+      line[len] = '\0';
+    }
+
+   /*
+    * Extract the name from the beginning of the line...
+    */
+
+    for (value = line; isspace(*value); value ++);
+
+    for (nameptr = name; *value != '\0' && !isspace(*value);)
+      *nameptr++ = *value++;
+    *nameptr = '\0';
+
+    while (isspace(*value))
+      value ++;
+
+    if (name[0] == '\0')
+      continue;
+
+   /*
+    * Decode the directive...
+    */
+
+    if (strcmp(name, "</Location>") == 0)
+      return (linenum);
+    else if (strcmp(name, "Order") == 0)
+    {
+     /*
+      * "Order Deny,Allow" or "Order Allow,Deny"...
+      */
+
+      if (strncasecmp(value, "deny", 4) == 0)
+        loc->order_type = AUTH_ALLOW;
+      else if (strncasecmp(value, "allow", 5) == 0)
+        loc->order_type = AUTH_DENY;
+      else
+        LogMessage(LOG_ERROR, "Unknown Order value %s on line %d of %s.",
+	           value, linenum, ConfigurationFile);
+    }
+    else if (strcmp(name, "Allow") == 0 ||
+             strcmp(name, "Deny") == 0)
+    {
+     /*
+      * Allow [From] host/ip...
+      * Deny [From] host/ip...
+      */
+
+      if (strncasecmp(value, "from", 4) == 0)
+      {
+       /*
+        * Strip leading "from"...
+	*/
+
+	value += 4;
+
+	while (isspace(*value))
+	  value ++;
+      }
+
+     /*
+      * Figure out what form the allow/deny address takes:
+      *
+      *    All
+      *    None
+      *    *.domain.com
+      *    .domain.com
+      *    host.domain.com
+      *    nnn.*
+      *    nnn.nnn.*
+      *    nnn.nnn.nnn.*
+      *    nnn.nnn.nnn.nnn
+      *    nnn.nnn.nnn.nnn/mm
+      *    nnn.nnn.nnn.nnn/mmm.mmm.mmm.mmm
+      */
+
+      if (strcasecmp(value, "all") == 0)
+      {
+       /*
+        * All hosts...
+	*/
+
+        if (strcmp(name, "Allow") == 0)
+	  AllowIP(loc, 0, 0);
+	else
+	  DenyIP(loc, 0, 0);
+      }
+      else  if (strcasecmp(value, "none") == 0)
+      {
+       /*
+        * No hosts...
+	*/
+
+        if (strcmp(name, "Allow") == 0)
+	  AllowIP(loc, ~0, 0);
+	else
+	  DenyIP(loc, ~0, 0);
+      }
+      else if (value[0] == '*' || value[0] == '.' || !isdigit(value[0]))
+      {
+       /*
+        * Host or domain name...
+	*/
+
+	if (value[0] == '*')
+	  value ++;
+
+        if (strcmp(name, "Allow") == 0)
+	  AllowHost(loc, value);
+	else
+	  DenyHost(loc, value);
+      }
+      else
+      {
+       /*
+        * One of many IP address forms...
+	*/
+
+        memset(ip, 0, sizeof(ip));
+        ipcount = sscanf(value, "%d.%d.%d.%d", ip + 0, ip + 1, ip + 2, ip + 3);
+	address = (((((ip[0] << 8) | ip[1]) << 8) | ip[2]) << 8) | ip[3];
+
+        if ((value = strchr(value, '/')) != NULL)
+	{
+	  value ++;
+	  memset(mask, 0, sizeof(mask));
+          switch (sscanf(value, "%d.%d.%d.%d", mask + 0, mask + 1,
+	                 mask + 2, mask + 3))
+	  {
+	    case 1 :
+	        netmask = (0xffffffff << (32 - mask[0])) & 0xffffffff;
+	        break;
+	    case 4 :
+	        netmask = (((((mask[0] << 8) | mask[1]) << 8) |
+		            mask[2]) << 8) | mask[3];
+                break;
+	    default :
+        	LogMessage(LOG_ERROR, "Bad netmask value %s on line %d of %s.",
+	        	   value, linenum, ConfigurationFile);
+		netmask = 0xffffffff;
+		break;
+	  }
+	}
+	else
+	  netmask = netmasks[ipcount - 1];
+
+        if (strcmp(name, "Allow") == 0)
+	  AllowIP(loc, address, netmask);
+	else
+	  DenyIP(loc, address, netmask);
+      }
+    }
+    else if (strcmp(name, "AuthType") == 0)
+    {
+     /*
+      * AuthType Basic
+      */
+
+      if (strcasecmp(value, "basic") != 0)
+        LogMessage(LOG_WARN, "Unknown authorization type %s on line %d of %s.",
+	           value, linenum, ConfigurationFile);
+    }
+    else if (strcmp(name, "AuthClass") == 0)
+    {
+     /*
+      * AuthClass anonymous, user, system, group
+      */
+
+      if (strcasecmp(value, "anonymous") == 0)
+        loc->level = AUTH_ANON;
+      else if (strcasecmp(value, "user") == 0)
+        loc->level = AUTH_USER;
+      else if (strcasecmp(value, "group") == 0)
+        loc->level = AUTH_GROUP;
+      else if (strcasecmp(value, "system") == 0)
+      {
+        loc->level = AUTH_GROUP;
+	strcpy(loc->group_name, SystemGroup);
+      }
+      else
+        LogMessage(LOG_WARN, "Unknown authorization class %s on line %d of %s.",
+	           value, linenum, ConfigurationFile);
+    }
+    else if (strcmp(name, "AuthGroupName") == 0)
+      strncpy(loc->group_name, value, sizeof(loc->group_name) - 1);
+    else
+      LogMessage(LOG_ERROR, "Unknown Location directive %s on line %d of %s.",
+	         name, linenum, ConfigurationFile);
+  }
+
+  return (0);
+}
+
+
+/*
+ * 'get_address()' - Get an address + port number from a line.
+ */
+
+static int					/* O - 1 if address good, 0 if bad */
+get_address(char               *value,		/* I - Value string */
+            unsigned           defaddress,	/* I - Default address */
+	    int                defport,		/* I - Default port */
+            struct sockaddr_in *address)	/* O - Socket address */
+{
+  char			hostname[256],		/* Hostname or IP */
+			portname[256];		/* Port number or name */
+  struct hostent	*host;			/* Host address */
+  struct servent	*port;			/* Port number */  
+
+
+ /*
+  * Initialize the socket address to the defaults...
+  */
+
+  address->sin_family      = AF_INET;
+  address->sin_addr.s_addr = htonl(defaddress);
+  address->sin_port        = htons(defport);
+
+ /*
+  * Try to grab a hostname and port number...
+  */
+
+  switch (sscanf(value, "%[^:]:%s", hostname, portname))
+  {
+    case 1 :
+        if (strchr(hostname, '.') == NULL)
+	{
+	 /*
+	  * Hostname is a port number...
+	  */
+
+	  strcpy(portname, hostname);
+	  hostname[0] = '\0';
+	}
+        break;
+    case 2 :
+        break;
+    default :
+        return (0);
+  }
+
+ /*
+  * Decode the hostname and port number as needed...
+  */
+
+  if (hostname[0] != '\0')
+  {
+    if (isdigit(hostname[0]))
+      address->sin_addr.s_addr = htonl(inet_addr(hostname));
+    else
+    {
+      if ((host = gethostbyname(hostname)) == NULL)
+        return (0);
+
+      memcpy(&(address->sin_addr), host->h_addr, host->h_length);
+    }
+  }
+
+  if (portname[0] != '\0')
+  {
+    if (isdigit(portname[0]))
+      address->sin_port = htons(atoi(portname));
+    else
+    {
+      if ((port = getservbyname(portname, NULL)) == NULL)
+        return (0);
+      else
+        address->sin_port = htons(port->s_port);
+    }
+  }
+
+  return (1);
+}
+
+
+/*
+ * End of "$Id: conf.c,v 1.2 1998/10/16 18:28:01 mike Exp $".
  */
