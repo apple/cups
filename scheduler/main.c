@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c,v 1.57.2.53 2003/10/09 19:13:53 mike Exp $"
+ * "$Id: main.c,v 1.57.2.54 2003/11/19 16:54:07 mike Exp $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -75,6 +75,7 @@ static int	holdcount = 0;		/* Number of times "hold" was called */
 static sigset_t	holdmask;		/* Old POSIX signal mask */
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET */
 static int	dead_children = 0;	/* Dead children? */
+static int	stop_scheduler = 0;	/* Should the scheduler stop? */
 
 
 /*
@@ -107,6 +108,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET */
 #ifdef __sgi
   cups_file_t		*fp;		/* Fake lpsched lock file */
+  struct stat		statbuf;	/* Needed for checking lpsched FIFO */
 #endif /* __sgi */
 
 
@@ -426,7 +428,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   mallinfo_time = 0;
 #endif /* HAVE_MALLINFO */
 
-  for (;;)
+  while (!stop_scheduler)
   {
    /*
     * Check if there are dead children to handle...
@@ -728,17 +730,35 @@ main(int  argc,				/* I - Number of command-line arguments */
   }
 
  /*
-  * If we get here something very bad happened and we need to exit
-  * immediately.
+  * Log a message based on what happened...
   */
 
-  StopBrowsing();
-  StopAllJobs();
-  DeleteAllCerts();
-  CloseAllClients();
-  StopListening();
+  if (stop_scheduler)
+    LogMessage(L_INFO, "Scheduler shutting down normally.");
+  else
+    LogMessage(L_ERROR, "Scheduler shutting down due to program error.");
 
-  return (1);
+ /*
+  * Close all network clients and stop all jobs...
+  */
+
+  StopServer();
+
+  StopAllJobs();
+
+#ifdef __sgi
+ /*
+  * Remove the fake IRIX lpsched lock file, but only if the existing
+  * file is not a FIFO which indicates that the real IRIX lpsched is
+  * running...
+  */
+
+  if (!stat("/var/spool/lp/FIFO", &statbuf))
+    if (!S_ISFIFO(statbuf.st_mode))
+      unlink("/var/spool/lp/SCHEDLOCK");
+#endif /* __sgi */
+
+  return (!stop_scheduler);
 }
 
 
@@ -1060,11 +1080,9 @@ sigchld_handler(int sig)	/* I - Signal number */
   * Reset the signal handler as needed...
   */
 
-#ifdef HAVE_SIGSET
-  sigset(SIGCHLD, sigchld_handler);
-#elif !defined(HAVE_SIGACTION)
+#if !defined(HAVE_SIGSET) && !defined(HAVE_SIGACTION)
   signal(SIGCLD, sigchld_handler);
-#endif /* HAVE_SIGSET */
+#endif /* !HAVE_SIGSET && !HAVE_SIGACTION */
 }
 
 
@@ -1080,11 +1098,9 @@ sighup_handler(int sig)	/* I - Signal number */
   NeedReload = RELOAD_ALL;
   ReloadTime = time(NULL);
 
-#ifdef HAVE_SIGSET
-  sigset(SIGHUP, sighup_handler);
-#elif !defined(HAVE_SIGACTION)
+#if !defined(HAVE_SIGSET) && !defined(HAVE_SIGACTION)
   signal(SIGHUP, sighup_handler);
-#endif /* HAVE_SIGSET */
+#endif /* !HAVE_SIGSET && !HAVE_SIGACTION */
 }
 
 
@@ -1095,46 +1111,13 @@ sighup_handler(int sig)	/* I - Signal number */
 static void
 sigterm_handler(int sig)		/* I - Signal */
 {
-#ifdef __sgi
-  struct stat	statbuf;		/* Needed for checking lpsched FIFO */
-#endif /* __sgi */
-
-
   (void)sig;	/* remove compiler warnings... */
 
  /*
-  * Bump the signal count...
+  * Flag that we should stop and return...
   */
 
-  SignalCount ++;
-
- /*
-  * Log an error...
-  */
-
-  LogMessage(L_ERROR, "Scheduler shutting down due to SIGTERM.");
-
- /*
-  * Close all network clients and stop all jobs...
-  */
-
-  StopServer();
-
-  StopAllJobs();
-
-#ifdef __sgi
- /*
-  * Remove the fake IRIX lpsched lock file, but only if the existing
-  * file is not a FIFO which indicates that the real IRIX lpsched is
-  * running...
-  */
-
-  if (!stat("/var/spool/lp/FIFO", &statbuf))
-    if (!S_ISFIFO(statbuf.st_mode))
-      unlink("/var/spool/lp/SCHEDLOCK");
-#endif /* __sgi */
-
-  exit(1);
+  stop_scheduler = 1;
 }
 
 
@@ -1151,5 +1134,5 @@ usage(void)
 
 
 /*
- * End of "$Id: main.c,v 1.57.2.53 2003/10/09 19:13:53 mike Exp $".
+ * End of "$Id: main.c,v 1.57.2.54 2003/11/19 16:54:07 mike Exp $".
  */

@@ -3,6 +3,12 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.20
 
+	- The signal handlers did not need to call sigset();
+	  this caused a recursion problem on some versions of
+	  IRIX (STR #422)
+	- Moved the scheduler termination code into the mainline
+	  to be consistent with the way other signals are
+	  handled (STR #423)
 	- The cupsaddsmb program didn't export the new CUPS
 	  driver for Windows properly (STR #390)
 	- The ppdOpen() functions did not issue an error when a
