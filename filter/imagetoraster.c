@@ -1,5 +1,5 @@
 /*
- * "$Id: imagetoraster.c,v 1.55 2001/02/06 23:40:08 mike Exp $"
+ * "$Id: imagetoraster.c,v 1.56 2001/03/15 17:48:07 mike Exp $"
  *
  *   Image file to raster filter for the Common UNIX Printing System (CUPS).
  *
@@ -45,6 +45,7 @@
 #include "common.h"
 #include "image.h"
 #include "raster.h"
+#include <unistd.h>
 #include <math.h>
 
 
@@ -221,6 +222,78 @@ main(int  argc,		/* I - Number of command-line arguments */
           argv[3], argv[4], argv[5], argv[6] ? argv[6] : "(null)");
 
  /*
+  * See if we need to use the imagetops and pstoraster filters instead...
+  */
+
+  options     = NULL;
+  num_options = cupsParseOptions(argv[5], 0, &options);
+
+  if (getenv("CLASSIFICATION") ||
+      cupsGetOption("page-label", num_options, options))
+  {
+   /*
+    * Yes, fork a copy of pstoraster and then transfer control to imagetops...
+    */
+
+    int	mypipes[2];		/* New pipes for imagetops | pstoraster */
+    int	pid;			/* PID of pstoraster */
+
+
+    cupsFreeOptions(num_options, options);
+
+    if (pipe(mypipes))
+    {
+      perror("ERROR: Unable to create pipes for imagetops | pstoraster");
+      return (errno);
+    }
+
+    if ((pid = fork()) == 0)
+    {
+     /*
+      * Child process for pstoraster...  Assign new pipe input to pstoraster...
+      */
+
+      close(0);
+      dup(mypipes[0]);
+      close(mypipes[0]);
+      close(mypipes[1]);
+
+      execlp("pstoraster", argv[0], argv[1], argv[2], argv[3], argv[4], argv[5],
+             NULL);
+      perror("ERROR: Unable to exec pstoraster");
+      return (errno);
+    }
+    else if (pid < 0)
+    {
+     /*
+      * Error!
+      */
+
+      perror("ERROR: Unable to fork pstoraster");
+      return (errno);
+    }
+
+   /*
+    * Update stdout so it points at the new pstoraster...
+    */
+
+    close(1);
+    dup(mypipes[1]);
+    close(mypipes[0]);
+    close(mypipes[1]);
+
+   /*
+    * Run imagetops to get the classification or page labelling that was
+    * requested...
+    */
+
+    execlp("imagetops", argv[0], argv[1], argv[2], argv[3], argv[4], argv[5],
+           argv[6], NULL);
+    perror("ERROR: Unable to exec imagetops");
+    return (errno);
+  }
+
+ /*
   * Copy stdin as needed...
   */
 
@@ -264,9 +337,6 @@ main(int  argc,		/* I - Number of command-line arguments */
   b    = 1.0;
 
   Copies = atoi(argv[4]);
-
-  options     = NULL;
-  num_options = cupsParseOptions(argv[5], 0, &options);
 
   ppd = SetCommonOptions(num_options, options, 0);
 
@@ -4319,5 +4389,5 @@ make_lut(ib_t  *lut,		/* I - Lookup table */
 
 
 /*
- * End of "$Id: imagetoraster.c,v 1.55 2001/02/06 23:40:08 mike Exp $".
+ * End of "$Id: imagetoraster.c,v 1.56 2001/03/15 17:48:07 mike Exp $".
  */

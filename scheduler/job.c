@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.119 2001/03/14 13:45:34 mike Exp $"
+ * "$Id: job.c,v 1.120 2001/03/15 17:48:08 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -980,6 +980,7 @@ StartJob(int       id,		/* I - Job ID */
 		copies[255],	/* # copies string */
 		options[16384],	/* Full list of options */
 		*envp[20],	/* Environment variables */
+		path[1024],	/* PATH environment variable */
 		language[255],	/* LANG environment variable */
 		charset[255],	/* CHARSET environment variable */
 		classification[1024],	/* CLASSIFICATION environmeent variable */
@@ -1290,6 +1291,7 @@ StartJob(int       id,		/* I - Job ID */
              attr->values[0].string.text);
   }
 
+  snprintf(path, sizeof(path), "PATH=%s/filter:/bin:/usr/bin", ServerBin);
   snprintf(content_type, sizeof(content_type), "CONTENT_TYPE=%s/%s",
            current->filetypes[current->current_file]->super,
            current->filetypes[current->current_file]->type);
@@ -1308,7 +1310,7 @@ StartJob(int       id,		/* I - Job ID */
   else
     ldpath[0] = '\0';
 
-  envp[0]  = "PATH=/bin:/usr/bin";
+  envp[0]  = path;
   envp[1]  = "SOFTWARE=CUPS/1.1";
   envp[2]  = "USER=root";
   envp[3]  = charset;
@@ -2789,5 +2791,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.119 2001/03/14 13:45:34 mike Exp $".
+ * End of "$Id: job.c,v 1.120 2001/03/15 17:48:08 mike Exp $".
  */
