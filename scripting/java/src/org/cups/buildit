@@ -1,0 +1,11 @@
+#!/bin/sh
+echo Removing old cups.jar...
+rm -f cups.jar
+for x in `cat class.list`; do
+	echo Compiling $x...
+#	javac -classpath /usr/java/classes $x.java
+	javac -d ../../../classes $x.java
+done
+echo Creating new cups.jar...
+jar cvf cups.jar ../../../../classes/org/cups
+mv -f cups.jar ../../../..
