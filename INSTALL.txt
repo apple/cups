@@ -1,0 +1,38 @@
+INSTALL - CUPS v1.1.5 - 11/12/2000
+----------------------------------
+
+This file describes how to compile and install CUPS from source code.
+For more information on CUPS see the file called "README.txt".  A
+complete change log can be found in "CHANGES.txt".
+
+
+BEFORE YOU BEGIN
+
+You'll need ANSI-compliant C and C++ compilers, plus a make program
+and Bourne shell.  The GNU compiler tools work well - we've tested
+the current CUPS code against GCC 2.95.x with excellent results.
+
+The makefiles used by the project should work with all versions of
+make.  We've tested them with GNU make as well as the make programs
+shipped by Compaq, HP, SGI, and Sun.
+
+Besides these tools you'll want the following libraries:
+
+    - JPEG 6b or higher
+    - PNG 1.0.6 or higher
+    - TIFF 3.4 or higher
+    - ZLIB 1.1.3 or higher
+
+CUPS will compile and run without these, however you'll miss out on
+many of the features provided by CUPS.
+
+
+CONFIGURATION
+
+CUPS uses GNU autoconf, so you should find the usual "configure"
+script in the main CUPS source directory.  To configure CUPS for
+your system, type:
+
+    ./configure
+
+

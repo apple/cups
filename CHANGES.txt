@@ -114,7 +114,9 @@ CHANGES IN CUPS V1.1.5
 	  the Solaris print options (some are simply ignored
 	  since they do not map)
 	- Updated the scheduler to limit the number of file
-	  descriptors to the maximum select() set size.
+	  descriptors to the maximum select() set size.  This
+          was causing problems on Solaris systems where the
+          max FD count was increased beyond 1024.
 
 
 CHANGES IN CUPS v1.1.4
