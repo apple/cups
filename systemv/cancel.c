@@ -1,5 +1,5 @@
 /*
- * "$Id: cancel.c,v 1.20 2001/05/06 00:11:26 mike Exp $"
+ * "$Id: cancel.c,v 1.21 2001/06/07 17:53:08 mike Exp $"
  *
  *   "cancel" command for the Common UNIX Printing System (CUPS).
  *
@@ -36,6 +36,7 @@
 
 #include <config.h>
 #include <cups/cups.h>
+#include <cups/string.h>
 #include <cups/language.h>
 
 
@@ -281,5 +282,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: cancel.c,v 1.20 2001/05/06 00:11:26 mike Exp $".
+ * End of "$Id: cancel.c,v 1.21 2001/06/07 17:53:08 mike Exp $".
  */

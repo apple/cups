@@ -1,5 +1,5 @@
 /*
- * "$Id: lpadmin.c,v 1.25 2001/06/06 21:38:22 mike Exp $"
+ * "$Id: lpadmin.c,v 1.26 2001/06/07 17:53:09 mike Exp $"
  *
  *   "lpadmin" command for the Common UNIX Printing System (CUPS).
  *
@@ -46,6 +46,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <cups/cups.h>
+#include <cups/string.h>
 #include <cups/language.h>
 #include <cups/debug.h>
 #include <config.h>
@@ -1794,5 +1795,5 @@ validate_name(const char *name)	/* I - Name to check */
 
 
 /*
- * End of "$Id: lpadmin.c,v 1.25 2001/06/06 21:38:22 mike Exp $".
+ * End of "$Id: lpadmin.c,v 1.26 2001/06/07 17:53:09 mike Exp $".
  */
