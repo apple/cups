@@ -1,5 +1,5 @@
 /*
- * "$Id: config.h.in,v 1.39.2.14 2003/01/15 04:25:46 mike Exp $"
+ * "$Id: config.h.in,v 1.39.2.15 2003/01/15 20:46:29 mike Exp $"
  *
  *   Configuration file for the Common UNIX Printing System (CUPS).
  *
@@ -172,7 +172,7 @@
 
 
 /*
- * Do we have the OpenSSL library?
+ * Which encryption libraries do we have?
  */
 
 #undef HAVE_SSL
@@ -238,5 +238,5 @@
 
 
 /*
- * End of "$Id: config.h.in,v 1.39.2.14 2003/01/15 04:25:46 mike Exp $".
+ * End of "$Id: config.h.in,v 1.39.2.15 2003/01/15 20:46:29 mike Exp $".
  */
