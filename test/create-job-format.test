@@ -1,5 +1,5 @@
-# Print a test page using create-job + send-document, but don't send
-# last-document = true
+# Print a test page using create-job + send-document, specifying the
+# document format.
 {
 	# The name of the test...
 	NAME "Print test page using create-job"
@@ -45,7 +45,8 @@
 	ATTR uri printer-uri $uri
 	ATTR integer job-id $job-id
 	ATTR name requesting-user-name $user
-	ATTR mimetype document-format application/octet-stream
+	ATTR mimetype document-format application/postscript
+	ATTR boolean last-document true
 
 	FILE ../data/testprint.ps
 

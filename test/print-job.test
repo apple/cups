@@ -1,4 +1,4 @@
-# Sample IPP test file
+# Print a test page using print-job
 {
 	# The name of the test...
 	NAME "Print test page using print-job"
@@ -15,7 +15,7 @@
 	ATTR language attributes-natural-language en
 	ATTR uri printer-uri $uri
 	ATTR name requesting-user-name $user
-	ATTR mimetype document-format application/octet-stream
+	ATTR mimetype document-format application/postscript
 
 	GROUP job
 	ATTR integer copies 1

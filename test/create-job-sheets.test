@@ -1,5 +1,4 @@
-# Print a test page using create-job + send-document, but don't send
-# last-document = true
+# Test create-job + send-document with job-sheets attribute
 {
 	# The name of the test...
 	NAME "Print test page using create-job"
@@ -19,6 +18,7 @@
 
 	GROUP job
 	ATTR integer copies 1
+	ATTR name job-sheets standard
 
 	# What statuses are OK?
 	STATUS ok
@@ -45,7 +45,7 @@
 	ATTR uri printer-uri $uri
 	ATTR integer job-id $job-id
 	ATTR name requesting-user-name $user
-	ATTR mimetype document-format application/octet-stream
+	ATTR boolean last-document true
 
 	FILE ../data/testprint.ps
 

@@ -1,4 +1,4 @@
-# Sample IPP test file
+# Print a test page using create-job + send-document
 {
 	# The name of the test...
 	NAME "Print test page using create-job"
@@ -44,8 +44,7 @@
 	ATTR uri printer-uri $uri
 	ATTR integer job-id $job-id
 	ATTR name requesting-user-name $user
-	ATTR mimetype document-format application/octet-stream
-	ATTR boolean last-document 1
+	ATTR boolean last-document true
 
 	FILE ../data/testprint.ps
 
