@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.6 1999/03/01 22:26:17 mike Exp $"
+ * "$Id: job.c,v 1.7 1999/03/05 14:51:40 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -498,7 +498,7 @@ StartJob(int       id,		/* I - Job ID */
 	else
 	{
 	  filterfds[i & 1][0] = -1;
-	  filterfds[i & 1][1] = open(printer->device_uri + 5, O_WRONLY);
+	  filterfds[i & 1][1] = open(printer->device_uri + 5, O_WRONLY | O_EXCL);
 	}
 
         if ((pid = fork()) == 0)
@@ -731,5 +731,5 @@ UpdateJob(job_t *job)	/* I - Job to check */
 
 
 /*
- * End of "$Id: job.c,v 1.6 1999/03/01 22:26:17 mike Exp $".
+ * End of "$Id: job.c,v 1.7 1999/03/05 14:51:40 mike Exp $".
  */
