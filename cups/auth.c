@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.c,v 1.1.2.1 2003/08/31 11:25:35 mike Exp $"
+ * "$Id: auth.c,v 1.1.2.2 2003/10/16 19:21:11 mike Exp $"
  *
  *   Authentication functions for the Common UNIX Printing System (CUPS).
  *
@@ -226,7 +226,7 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
   snprintf(http->authstring, sizeof(http->authstring), "Local %s", certificate);
 
   DEBUG_printf(("cups_local_auth: Returning authstring = \"%s\"\n",
-                authstring));
+                http->authstring));
 
   return (0);
 #endif /* WIN32 || __EMX__ */
@@ -234,5 +234,5 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: auth.c,v 1.1.2.1 2003/08/31 11:25:35 mike Exp $".
+ * End of "$Id: auth.c,v 1.1.2.2 2003/10/16 19:21:11 mike Exp $".
  */

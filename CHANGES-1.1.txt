@@ -1,6 +1,19 @@
 CHANGES-1.1.txt
 ---------------
 
+CHANGES IN CUPS V1.1.20rc4
+
+	- The scheduler did not move the incoming job attributes
+	  in the operation group to the job group (STR #335)
+	- The cupsDoFileRequest() function did not check for an
+	  early HTTP response while sending the file (STR #314)
+	- The web interfaces did not quote #, ?, or . in printer
+	  names, which caused some problems with the generated
+	  URLs (STR #320)
+	- CUPS couldn't be completely compiled with the -dDEBUG
+	  option (STR #331)
+
+
 CHANGES IN CUPS V1.1.20rc3
 
 	- More SLP changes (STR #259)

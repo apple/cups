@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c,v 1.81.2.26 2003/09/15 20:11:06 mike Exp $"
+ * "$Id: util.c,v 1.81.2.27 2003/10/16 19:21:11 mike Exp $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -296,8 +296,13 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
         rewind(file);
 
         while ((bytes = fread(buffer, 1, sizeof(buffer), file)) > 0)
+	{
+	  if (httpCheck(http))
+	    break;
+
   	  if (httpWrite(http, buffer, bytes) < bytes)
             break;
+        }
       }
 
    /*
@@ -1551,5 +1556,5 @@ cups_connect(const char *name,		/* I - Destination (printer[@host]) */
 
 
 /*
- * End of "$Id: util.c,v 1.81.2.26 2003/09/15 20:11:06 mike Exp $".
+ * End of "$Id: util.c,v 1.81.2.27 2003/10/16 19:21:11 mike Exp $".
  */

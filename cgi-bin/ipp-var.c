@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp-var.c,v 1.23.2.14 2003/09/02 20:17:37 mike Exp $"
+ * "$Id: ipp-var.c,v 1.23.2.15 2003/10/16 19:21:11 mike Exp $"
  *
  *   IPP variable routines for the Common UNIX Printing System (CUPS).
  *
@@ -419,7 +419,9 @@ ippSetCGIVars(ipp_t      *response,	/* I - Response data to be copied... */
 		  */
 
                   for (rawptr = rawresource, resptr = resource; *rawptr;)
-		    if (*rawptr & 128 || *rawptr == '%' || *rawptr == ' ')
+		    if ((*rawptr & 128) || *rawptr == '%' || *rawptr == ' ' ||
+		        *rawptr == '#' || *rawptr == '?' ||
+		        *rawptr == '.') /* For MSIE */
 		    {
 		      if (resptr < (resource + sizeof(resource) - 3))
 		      {
@@ -510,5 +512,5 @@ ippSetCGIVars(ipp_t      *response,	/* I - Response data to be copied... */
 
 
 /*
- * End of "$Id: ipp-var.c,v 1.23.2.14 2003/09/02 20:17:37 mike Exp $".
+ * End of "$Id: ipp-var.c,v 1.23.2.15 2003/10/16 19:21:11 mike Exp $".
  */
