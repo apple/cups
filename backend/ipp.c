@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.11 1999/10/10 15:40:07 mike Exp $"
+ * "$Id: ipp.c,v 1.12 1999/10/12 18:19:30 mike Exp $"
  *
  *   IPP backend for the Common UNIX Printing System (CUPS).
  *
@@ -166,7 +166,8 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_MIMETYPE, "document-format",
         	 NULL, "application/octet-stream");
 
-  ippAddInteger(request, IPP_TAG_JOB, IPP_TAG_INTEGER, "copies", atoi(argv[4]));
+  if (fp != stdin)
+    ippAddInteger(request, IPP_TAG_JOB, IPP_TAG_INTEGER, "copies", atoi(argv[4]));
 
   for (i = 0; i < num_options; i ++)
   {
@@ -272,8 +273,11 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
   httpClearFields(http);
   httpSetField(http, HTTP_FIELD_CONTENT_TYPE, "application/ipp");
-  httpEncode64(password, username);
-  httpSetField(http, HTTP_FIELD_AUTHORIZATION, password);
+  if (username[0])
+  {
+    httpEncode64(password, username);
+    httpSetField(http, HTTP_FIELD_AUTHORIZATION, password);
+  }
 
   if (fp != stdin)
   {
@@ -369,9 +373,15 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
     else
     {
       response = NULL;
-      httpFlush(http);
 
-      fprintf(stderr, "ERROR: Print request was not accepted (%d)!\n", status);
+      if (status == HTTP_ERROR)
+      {
+        fprintf(stderr, "WARNING: Did not receive the IPP response (%d)\n",
+	        errno);
+	status = HTTP_OK;
+      }
+      else
+        fprintf(stderr, "ERROR: Print request was not accepted (%d)!\n", status);
     }
 
     break;
@@ -403,5 +413,5 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
 
 /*
- * End of "$Id: ipp.c,v 1.11 1999/10/10 15:40:07 mike Exp $".
+ * End of "$Id: ipp.c,v 1.12 1999/10/12 18:19:30 mike Exp $".
  */

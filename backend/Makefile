@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.11 1999/09/27 17:45:18 mike Exp $"
+# "$Id: Makefile,v 1.12 1999/10/12 18:19:29 mike Exp $"
 #
 #   Backend makefile for the Common UNIX Printing System (CUPS).
 #
@@ -24,8 +24,8 @@
 
 include ../Makedefs
 
-TARGETS	=	ipp lpd parallel serial socket
-OBJS	=	ipp.o lpd.o parallel.o serial.o socket.o
+TARGETS	=	betest ipp lpd parallel serial socket
+OBJS	=	betest.o ipp.o lpd.o parallel.o serial.o socket.o
 
 #
 # Make all targets...
@@ -49,6 +49,16 @@ install:
 	$(CP) $(TARGETS) $(SERVERROOT)/backend
 	-$(LN) ipp $(SERVERROOT)/backend/http
 	$(CHMOD) u+s $(SERVERROOT)/backend/lpd
+
+#
+# betest
+#
+
+betest:	betest.o ../cups/$(LIBCUPS)
+	echo Linking $@...
+	$(CC) $(LDFLAGS) -o betest betest.o $(LIBS)
+
+betest.o:	../cups/string.h ../Makedefs
 
 #
 # ipp
@@ -102,5 +112,5 @@ socket:	socket.o ../cups/$(LIBCUPS)
 socket.o:	../cups/cups.h ../Makedefs
 
 #
-# End of "$Id: Makefile,v 1.11 1999/09/27 17:45:18 mike Exp $".
+# End of "$Id: Makefile,v 1.12 1999/10/12 18:19:29 mike Exp $".
 #
