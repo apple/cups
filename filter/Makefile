@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.41.2.17 2002/07/30 19:09:46 mike Exp $"
+# "$Id: Makefile,v 1.41.2.18 2002/09/26 09:56:17 mike Exp $"
 #
 #   Filter makefile for the Common UNIX Printing System (CUPS).
 #
@@ -27,7 +27,8 @@
 include ../Makedefs
 
 TARGETS	=	hpgltops texttops pstops imagetops imagetoraster \
-		rastertodymo rastertoepson rastertohp testraster
+		rastertodymo rastertoepson rastertohp rastertortl \
+		testraster
 
 HPGLOBJS =	hpgl-attr.o hpgl-config.o hpgl-main.o hpgl-prolog.o \
 		hpgl-char.o hpgl-input.o hpgl-polygon.o hpgl-vector.o
@@ -38,8 +39,8 @@ IMAGEOBJS =	image-bmp.o image-colorspace.o image-gif.o image-jpeg.o \
 FORMOBJS =	form-attr.o form-main.o form-ps.o form-text.o form-tree.o
 OBJS	=	$(HPGLOBJS) $(IMAGEOBJS) $(FORMOBJS) \
 		imagetops.o imagetoraster.o common.o pstops.o raster.o \
-		rastertodymo.o rastertoepson.o rastertohp.o texttops.o \
-		textcommon.o testraster.o
+		rastertodymo.o rastertoepson.o rastertohp.o rastertortl.o \
+		texttops.o textcommon.o testraster.o
 
 
 #
@@ -233,6 +234,15 @@ rastertohp:	rastertohp.o ../cups/$(LIBCUPS) $(LIBCUPSIMAGE)
 
 
 #
+# rastertortl
+#
+
+rastertortl:	rastertortl.o ../cups/$(LIBCUPS) $(LIBCUPSIMAGE)
+	echo Linking $@...
+	$(CC) $(LDFLAGS) -o $@ rastertortl.o $(LINKCUPSIMAGE) $(IMGLIBS) $(LIBS)
+
+
+#
 # testraster
 #
 
@@ -259,5 +269,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile,v 1.41.2.17 2002/07/30 19:09:46 mike Exp $".
+# End of "$Id: Makefile,v 1.41.2.18 2002/09/26 09:56:17 mike Exp $".
 #

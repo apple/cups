@@ -1,5 +1,5 @@
 /*
- * "$Id: rastertortl.c,v 1.1.2.1 2002/09/26 01:11:10 mike Exp $"
+ * "$Id: rastertortl.c,v 1.1.2.2 2002/09/26 09:56:17 mike Exp $"
  *
  *   Hewlett-Packard Raster Transfer Language filter for the Common UNIX
  *   Printing System (CUPS).
@@ -58,6 +58,8 @@
 #define MODEL_END_COLOR	4		/* Supports ESC * r C */
 #define MODEL_CID	8		/* Supports CID command */
 #define MODEL_CRD	16		/* Supports CRD command */
+#define MODEL_CMYK	32		/* Supports CMYK graphics */
+#define MODEL_ENCAD	64		/* Supports ENCAD quality modes */
 
 
 /*
@@ -73,6 +75,12 @@
 					/* Reset the printer */
 #define pcl_reset()\
 	printf("\033E")
+					/* Switch to PCL mode */
+#define pcl_set_pcl_mode(m)\
+	printf("\033%%%dA", (m))
+					/* Switch to HP-GL/2 mode */
+#define pcl_set_hpgl_mode(m)\
+	printf("\033%%%dB", (m))
 
 
 /*
@@ -179,85 +187,174 @@ StartPage(cups_page_header_t *header)	/* I - Page header */
   * Setup printer/job attributes...
   */
 
+  if (ModelNumber & MODEL_PJL)
+  {
+   /*
+    * Send PJL setup commands...
+    */
+
+    pjl_escape();
+
+    if (header->cupsColorSpace == CUPS_CSPACE_K)
+      puts("@PJL SET RENDERMODE = GRAYSCALE\r");
+    else
+      puts("@PJL SET RENDERMODE = COLOR\r");
+
+    if (strcmp(header->OutputType, "Best") == 0)
+      puts("@PJL SET MAXDETAIL = ON\r");
+    else
+      puts("@PJL SET MAXDETAIL = OFF\r");
+
+    printf("@PJL SET RESOLUTION = %d\r\n", header->HWResolution[0]);
+
+    if (ModelNumber & MODEL_PJL_EXT)
+    {
+      puts("@PJL SET COLORSPACE = SRGB\r");
+      puts("@PJL SET RENDERINTENT = PERCEPTUAL\r");
+
+      printf("@PJL SET PAPERLENGTH = %d\r\n", header->PageSize[1] * 10);
+      printf("@PJL SET PAPERWIDTH = %d\r\n", header->PageSize[0] * 10);
+    }
+
+   /*
+    * Set the print language...
+    */
+
+    if (ModelNumber & MODEL_CRD)
+      pjl_set_language("PCL3GUI");
+    else
+      pjl_set_language("HPGL2");
+  }
 
  /*
   * Set graphics mode...
   */
 
-  printf("\033*t%dR", header->HWResolution[0]);	/* Set resolution */
-
-  if (ppd->model_number == 2)
+  if (ModelNumber & MODEL_CRD)
   {
    /*
-    * Figure out the number of color planes...
+    * Set the print quality...
     */
 
-    if (header->cupsColorSpace == CUPS_CSPACE_KCMY)
-      NumPlanes = 4;
-    else
-      NumPlanes = 1;
+    if (strcmp(header->OutputType, "Draft") == 0)
+      printf("\033*o-1M");
+    else if (strcmp(header->OutputType, "Normal") == 0)
+      printf("\033*o0M");
+    else if (strcmp(header->OutputType, "Best") == 0)
+      printf("\033*o1M");
 
    /*
-    * Send 26-byte configure image data command with horizontal and
+    * Send 12-byte configure raster data command with horizontal and
     * vertical resolutions as well as a color count...
     */
 
-    printf("\033*g26W");
-    putchar(2);					/* Format 2 */
-    putchar(NumPlanes);				/* Output planes */
+    printf("\033&u%dD", header->HWResolution[0]);
+    printf("\033*p0Y\033*p0X");			/* Set top of form */
 
-    putchar(header->HWResolution[0] >> 8);	/* Black resolution */
-    putchar(header->HWResolution[0]);
-    putchar(header->HWResolution[1] >> 8);
-    putchar(header->HWResolution[1]);
-    putchar(0);
-    putchar(1 << ColorBits);			/* # of black levels */
+    printf("\033*g12W");
+    putchar(6);					/* Format 6 */
+    putchar(0x1f);				/* SP ???? */
+    putchar(0x00);				/* Number components */
+    putchar(0x01);				/* (1 for RGB) */
 
-    putchar(header->HWResolution[0] >> 8);	/* Cyan resolution */
+    putchar(header->HWResolution[0] >> 8);	/* Horizontal resolution */
     putchar(header->HWResolution[0]);
-    putchar(header->HWResolution[1] >> 8);
+    putchar(header->HWResolution[1] >> 8);	/* Vertical resolution */
     putchar(header->HWResolution[1]);
-    putchar(0);
-    putchar(1 << ColorBits);			/* # of cyan levels */
 
-    putchar(header->HWResolution[0] >> 8);	/* Magenta resolution */
-    putchar(header->HWResolution[0]);
-    putchar(header->HWResolution[1] >> 8);
-    putchar(header->HWResolution[1]);
-    putchar(0);
-    putchar(1 << ColorBits);			/* # of magenta levels */
+    putchar(header->cupsCompression);		/* Compression mode 3 or 10 */
+    putchar(0x01);				/* Portrait orientation */
+    putchar(0x20);				/* Bits per pixel (32 = RGB) */
+    putchar(0x01);				/* Planes per pixel (1 = chunky RGB) */
 
-    putchar(header->HWResolution[0] >> 8);	/* Yellow resolution */
-    putchar(header->HWResolution[0]);
-    putchar(header->HWResolution[1] >> 8);
-    putchar(header->HWResolution[1]);
-    putchar(0);
-    putchar(1 << ColorBits);			/* # of yellow levels */
+    NumPlanes = 1;
   }
   else
   {
-    if (header->cupsColorSpace == CUPS_CSPACE_KCMY)
+   /*
+    * Set the print quality...
+    */
+
+    if (ModelNumber & MODEL_ENCAD)
     {
-      NumPlanes = 4;
-      printf("\033*r-4U");			/* Set KCMY graphics */
-    }
-    else if (header->cupsColorSpace == CUPS_CSPACE_CMY)
-    {
-      NumPlanes = 3;
-      printf("\033*r-3U");			/* Set CMY graphics */
+      if (strcmp(header->OutputType, "Draft") == 0)
+	printf("QM,5698,25,1;");
+      else if (strcmp(header->OutputType, "Normal") == 0)
+	printf("QM,5698,25,2;");
+      else if (strcmp(header->OutputType, "Best") == 0)
+	printf("QM,5698,25,4;");
+
+      printf("QM,5698,30,%d,0;", header->cupsMediaType);
     }
     else
-      NumPlanes = 1;				/* Black&white graphics */
+    {
+      if (strcmp(header->OutputType, "Draft") == 0)
+	printf("QM0;");
+      else if (strcmp(header->OutputType, "Normal") == 0)
+	printf("QM50;");
+      else if (strcmp(header->OutputType, "Best") == 0)
+	printf("QM100;");
+    }
+
+   /*
+    * Set media size, position, type, etc...
+    */
+
+    printf("BP5,0;");
+    printf("PS%.0f,%.0f;",
+	   header->cupsHeight * 1016.0 / header->HWResolution[1],
+	   header->cupsWidth * 1016.0 / header->HWResolution[0]);
+    printf("PU;");
+    printf("PA0,0;");
+
+    printf("MT%d;", header->cupsMediaType);
+
+    if (header->CutMedia == CUPS_CUT_PAGE)
+      printf("EC;");
+    else
+      printf("EC0;");
+
+   /*
+    * Set the appropriate graphics mode...
+    */
+
+    if (ModelNumber & MODEL_ENCAD)
+      pcl_set_pcl_mode(2);
+    else
+      pcl_set_pcl_mode(0);
+
+    printf("\033&a1N");				/* Set negative motion */
+
+    printf("\033*t%dR", header->HWResolution[0]);/* Set resolution */
+
+    if (header->cupsColorSpace == CUPS_CSPACE_RGB)
+    {
+      NumPlanes = 3;
+
+      fwrite("\033*v6W\0\3\0\10\10\10", 11, 1, stdout);
+    }
+    else if (header->cupsColorSpace == CUPS_CSPACE_KCMY)
+    {
+      NumPlanes = 4;
+
+      if (ModelNumber & MODEL_CMYK)
+        printf("\033*r-4U");			/* Set KCMY graphics */
+    }
+    else
+      NumPlanes = 1;
   }
 
  /*
   * Set size and position of graphics...
   */
 
-  printf("\033*r%dS", header->cupsWidth);	/* Set width */
-  printf("\033*r%dT", header->cupsHeight);	/* Set height */
-
   printf("\033*r1A");				/* Start graphics */
+
+  if (!(ModelNumber & MODEL_CRD))
+  {
+    printf("\033*r%dS", header->cupsWidth);	/* Set width */
+    printf("\033*r%dT", header->cupsHeight);	/* Set height */
+  }
 
   printf("\033*b%dM", header->cupsCompression);	/* Set compression */
 
@@ -273,7 +370,12 @@ StartPage(cups_page_header_t *header)	/* I - Page header */
     CompBuffer = NULL;
 
   if (header->cupsCompression >= 3)
-    SeedBuffer = calloc(BytesPerLine, 1);
+  {
+    SeedBuffer = calloc(header->cupsBytesPerLine, 1);
+
+    if (header->cupsCompression == 10)
+      memset(SeedBuffer, 0xff, header->cupsBytesPerLine);
+  }
   else
     SeedBuffer = NULL;
 }
@@ -290,15 +392,26 @@ EndPage(void)
   struct sigaction action;	/* Actions for POSIX signals */
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET */
 
-
  /*
-  * Eject the current page...
+  * End graphics...
   */
 
   if (ModelNumber & MODEL_END_COLOR)
      printf("\033*rC");			/* End color GFX */
   else
      printf("\033*r0B");		/* End GFX */
+
+ /*
+  * Eject the current page...
+  */
+
+  if (ModelNumber & MODEL_CRD)
+    putchar(12);
+  else
+  {
+    pcl_set_hpgl_mode(0);
+    printf("PG;");
+  }
 
   fflush(stdout);
 
@@ -340,11 +453,16 @@ void
 Shutdown(void)
 {
  /*
-  * Send a PCL reset sequence.
+  * Reset and end the job...
   */
 
-  putchar(0x1b);
-  putchar('E');
+  pcl_reset();
+
+  if (ModelNumber & MODEL_PJL)
+  {
+    pjl_escape();
+    puts("@PJL EOJ\r");
+  }
 }
 
 
@@ -364,7 +482,7 @@ CancelJob(int sig)			/* I - Signal */
   * Send out lots of NUL bytes to clear out any pending raster data...
   */
 
-  for (i = 0; i < 600; i ++)
+  for (i = NumPlanes * 8000; i > 0; i --)
     putchar(0);
 
  /*
@@ -391,8 +509,12 @@ CompressData(unsigned char *line,	/* I - Data to compress */
   unsigned char	*line_ptr,		/* Current byte pointer */
         	*line_end,		/* End-of-line byte pointer */
         	*comp_ptr,		/* Pointer into compression buffer */
-        	*start;			/* Start of compression sequence */
-  int           count;			/* Count of bytes for output */
+        	*start,			/* Start of compression sequence */
+		*seed;			/* Seed buffer pointer */
+  int           count,			/* Count of bytes for output */
+		offset,			/* Offset of bytes for output */
+		temp;			/* Temporary count */
+  int		r, g, b;		/* RGB deltas for mode 10 compression */
 
 
   switch (type)
@@ -403,7 +525,7 @@ CompressData(unsigned char *line,	/* I - Data to compress */
 	*/
 
 	line_ptr = line;
-	line_end = line + length;
+        line_end = line + length;
 	break;
 
     case 1 :
@@ -498,6 +620,266 @@ CompressData(unsigned char *line,	/* I - Data to compress */
         line_ptr = CompBuffer;
         line_end = comp_ptr;
 	break;
+
+    case 3 :
+       /*
+	* Do delta-row compression...
+	*/
+
+	line_ptr = line;
+	line_end = line + length;
+
+	comp_ptr = CompBuffer;
+	seed     = SeedBuffer + plane * length;
+
+	while (line_ptr < line_end)
+        {
+         /*
+          * Find the next non-matching sequence...
+          */
+
+          start = line_ptr;
+          while (*line_ptr == *seed &&
+                 line_ptr < line_end)
+          {
+            line_ptr ++;
+            seed ++;
+          }
+
+          if (line_ptr == line_end)
+            break;
+
+          offset = line_ptr - start;
+
+         /*
+          * Find up to 8 non-matching bytes...
+          */
+
+          start = line_ptr;
+          count = 0;
+          while (*line_ptr != *seed &&
+                 line_ptr < line_end &&
+                 count < 8)
+          {
+            line_ptr ++;
+            seed ++;
+            count ++;
+          }
+
+         /*
+          * Place mode 3 compression data in the buffer; see HP manuals
+          * for details...
+          */
+
+          if (offset >= 31)
+          {
+           /*
+            * Output multi-byte offset...
+            */
+
+            *comp_ptr++ = ((count - 1) << 5) | 31;
+
+            offset -= 31;
+            while (offset >= 255)
+            {
+              *comp_ptr++ = 255;
+              offset    -= 255;
+            }
+
+            *comp_ptr++ = offset;
+          }
+          else
+          {
+           /*
+            * Output single-byte offset...
+            */
+
+            *comp_ptr++ = ((count - 1) << 5) | offset;
+          }
+
+          memcpy(comp_ptr, start, count);
+          comp_ptr += count;
+        }
+
+	line_ptr = CompBuffer;
+	line_end = comp_ptr;
+
+        memcpy(SeedBuffer + plane * length, line, length);
+	break;
+
+    case 10 :
+       /*
+        * Mode 10 "near lossless" RGB compression...
+	*/
+
+	line_ptr = line;
+	line_end = line + length;
+
+	comp_ptr = CompBuffer;
+	seed     = SeedBuffer;
+
+	while (line_ptr < line_end)
+        {
+         /*
+          * Find the next non-matching sequence...
+          */
+
+          start = line_ptr;
+          while (line_ptr[0] == seed[0] &&
+                 line_ptr[1] == seed[1] &&
+                 line_ptr[2] == seed[2] &&
+                 (line_ptr + 2) < line_end)
+          {
+            line_ptr += 3;
+            seed += 3;
+          }
+
+          if (line_ptr == line_end)
+            break;
+
+          offset = (line_ptr - start) / 3;
+
+         /*
+          * Find up to 8 non-matching RGB tuples...
+          */
+
+          start = line_ptr;
+          while ((line_ptr[0] != seed[0] ||
+                  line_ptr[1] != seed[1] ||
+                  line_ptr[2] != seed[2]) &&
+                 (line_ptr + 2) < line_end)
+          {
+            line_ptr += 3;
+            seed += 3;
+          }
+
+          count = (line_ptr - start) / 3;
+
+         /*
+          * Place mode 10 compression data in the buffer; each sequence
+	  * starts with a command byte that looks like:
+	  *
+	  *     CMD SRC SRC OFF OFF CNT CNT CNT
+	  *
+	  * For the purpose of this driver, CMD and SRC are always 0.
+	  *
+	  * If the offset >= 3 then additional offset bytes follow the
+	  * first command byte, each byte == 255 until the last one.
+	  *
+	  * If the count >= 7, then additional count bytes follow each
+	  * group of pixels, each byte == 255 until the last one.
+	  *
+	  * The offset and count are in RGB tuples (not bytes, as for
+	  * Mode 3 and 9)...
+          */
+
+          if (offset >= 3)
+          {
+           /*
+            * Output multi-byte offset...
+            */
+
+            if (count > 7)
+	      *comp_ptr++ = 0x1f;
+	    else
+	      *comp_ptr++ = 0x18 | (count - 1);
+
+            offset -= 3;
+            while (offset >= 255)
+            {
+              *comp_ptr++ = 255;
+              offset      -= 255;
+            }
+
+            *comp_ptr++ = offset;
+          }
+          else
+          {
+           /*
+            * Output single-byte offset...
+            */
+
+            if (count > 7)
+	      *comp_ptr++ = (offset << 3) | 0x07;
+	    else
+	      *comp_ptr++ = (offset << 3) | (count - 1);
+          }
+
+	  temp = count - 8;
+	  seed -= count * 3;
+
+          while (count > 0)
+	  {
+	    if (count <= temp)
+	    {
+	     /*
+	      * This is exceedingly lame...  The replacement counts
+	      * are intermingled with the data...
+	      */
+
+              if (temp >= 255)
+        	*comp_ptr++ = 255;
+              else
+        	*comp_ptr++ = temp;
+
+              temp -= 255;
+	    }
+
+           /*
+	    * Get difference between current and see pixels...
+	    */
+
+            r = start[0] - seed[0];
+	    g = start[1] - seed[1];
+	    b = ((start[2] & 0xfe) - (seed[2] & 0xfe)) / 2;
+
+            if (r < -16 || r > 15 || g < -16 || g > 15 || b < -16 || b > 15)
+	    {
+	     /*
+	      * Pack 24-bit RGB into 23 bits...  Lame...
+	      */
+
+	      *comp_ptr++ = start[0] >> 1;
+
+	      if (start[0] & 1)
+		*comp_ptr++ = 0x80 | (start[1] >> 1);
+	      else
+		*comp_ptr++ = start[1] >> 1;
+
+	      if (start[1] & 1)
+		*comp_ptr++ = 0x80 | (start[2] >> 1);
+	      else
+		*comp_ptr++ = start[2] >> 1;
+            }
+	    else
+	    {
+	     /*
+	      * Pack 15-bit RGB difference...
+	      */
+
+              *comp_ptr++ = 0x80 | ((r << 2) & 0x7c) | ((g >> 3) & 0x03);
+	      *comp_ptr++ = ((g << 5) & 0xe0) | (b & 0x1f);
+	    }
+
+            count --;
+	    start += 3;
+	    seed += 3;
+          }
+
+         /*
+	  * Make sure we have the ending count if the replacement count
+	  * was exactly 8 + 255n...
+	  */
+
+	  if (temp == 0)
+	    *comp_ptr++ = 0;
+        }
+
+	line_ptr = CompBuffer;
+	line_end = comp_ptr;
+
+        memcpy(SeedBuffer, line, length);
+	break;
   }
 
  /*
@@ -517,77 +899,20 @@ void
 OutputLine(cups_page_header_t *header)	/* I - Page header */
 {
   int		plane,			/* Current plane */
-		bytes,			/* Bytes to write */
-		count;			/* Bytes to convert */
-  unsigned char	bit,			/* Current plane data */
-		bit0,			/* Current low bit data */
-		bit1,			/* Current high bit data */
-		*plane_ptr,		/* Pointer into Planes */
-		*bit_ptr;		/* Pointer into BitBuffer */
+		bytes;			/* Bytes per plane */
+  unsigned char	*ptr;			/* Pointer into pixel buffer */
 
-
- /*
-  * Output whitespace as needed...
-  */
-
-  if (Feed > 0)
-  {
-    printf("\033*b%dY", Feed);
-    Feed = 0;
-  }
 
  /*
   * Write bitmap data as needed...
   */
 
-  bytes = (header->cupsWidth + 7) / 8;
+  bytes = header->cupsBytesPerLine / NumPlanes;
+  ptr   = PixelBuffer;
 
-  for (plane = 0; plane < NumPlanes; plane ++)
-    if (ColorBits == 1)
-    {
-     /*
-      * Send bits as-is...
-      */
-
-      CompressData(Planes[plane], bytes, plane < (NumPlanes - 1) ? 'V' : 'W',
-		   header->cupsCompression);
-    }
-    else
-    {
-     /*
-      * Separate low and high bit data into separate buffers.
-      */
-
-      for (count = header->cupsBytesPerLine / NumPlanes,
-               plane_ptr = Planes[plane], bit_ptr = BitBuffer;
-	   count > 0;
-	   count -= 2, plane_ptr += 2, bit_ptr ++)
-      {
-        bit = plane_ptr[0];
-
-        bit0 = ((bit & 64) << 1) | ((bit & 16) << 2) | ((bit & 4) << 3) | ((bit & 1) << 4);
-        bit1 = (bit & 128) | ((bit & 32) << 1) | ((bit & 8) << 2) | ((bit & 2) << 3);
-
-        if (count > 1)
-	{
-	  bit = plane_ptr[1];
-
-          bit0 |= (bit & 1) | ((bit & 4) >> 1) | ((bit & 16) >> 2) | ((bit & 64) >> 3);
-          bit1 |= ((bit & 2) >> 1) | ((bit & 8) >> 2) | ((bit & 32) >> 3) | ((bit & 128) >> 4);
-	}
-
-        bit_ptr[0]     = bit0;
-	bit_ptr[bytes] = bit1;
-      }
-
-     /*
-      * Send low and high bits...
-      */
-
-      CompressData(BitBuffer, bytes, 'V', header->cupsCompression);
-      CompressData(BitBuffer + bytes, bytes, plane < (NumPlanes - 1) ? 'V' : 'W',
-		   header->cupsCompression);
-    }
+  for (plane = 0; plane < NumPlanes; plane ++, ptr += bytes)
+    CompressData(ptr, bytes, plane < (NumPlanes - 1) ? 'V' : 'W',
+		 header->cupsCompression);
 
   fflush(stdout);
 }
@@ -651,9 +976,16 @@ main(int  argc,		/* I - Number of command-line arguments */
   * Initialize the print device...
   */
 
-  ppd = ppdOpenFile(getenv("PPD"));
+  if ((ppd = ppdOpenFile(getenv("PPD"))) == NULL)
+    ModelNumber = MODEL_CID;
+  else
+  {
+    ModelNumber = ppd->model_number;
 
-  Setup();
+    ppdClose(ppd);
+  }
+
+  Setup(atoi(argv[1]), argv[2], argv[3]);
 
  /*
   * Process pages as needed...
@@ -675,7 +1007,7 @@ main(int  argc,		/* I - Number of command-line arguments */
     * Start the page...
     */
 
-    StartPage(ppd, &header);
+    StartPage(&header);
 
    /*
     * Loop for each line on the page...
@@ -714,9 +1046,6 @@ main(int  argc,		/* I - Number of command-line arguments */
 
   Shutdown();
 
-  if (ppd)
-    ppdClose(ppd);
-
  /*
   * Close the raster stream...
   */
@@ -739,5 +1068,5 @@ main(int  argc,		/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: rastertortl.c,v 1.1.2.1 2002/09/26 01:11:10 mike Exp $".
+ * End of "$Id: rastertortl.c,v 1.1.2.2 2002/09/26 09:56:17 mike Exp $".
  */
