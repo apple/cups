@@ -1,8 +1,10 @@
-CHANGES.txt - 01/23/2003
+CHANGES.txt - 01/24/2003
 ------------------------
 
 CHANGES IN CUPS V1.1.19
 
+	- The scheduler now supports URIs in HTTP request lines
+	  to conform to the HTTP/1.1 specification.
 	- The time-at-xyz attributes were not recognized in
 	  banner files if prefixed by a question mark, e.g.
 	  "{?time-at-creation}".

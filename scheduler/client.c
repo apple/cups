@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.137 2003/01/17 14:42:27 mike Exp $"
+ * "$Id: client.c,v 1.138 2003/01/24 15:06:03 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -686,6 +686,52 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	}
 
        /*
+        * Handle full URLs in the request line...
+	*/
+
+        if (con->uri[0] != '/')
+	{
+	  char	method[HTTP_MAX_URI],		/* Method/scheme */
+		userpass[HTTP_MAX_URI],		/* Username:password */
+		hostname[HTTP_MAX_URI],		/* Hostname */
+		resource[HTTP_MAX_URI];		/* Resource path */
+          int	port;				/* Port number */
+
+
+         /*
+	  * Separate the URI into its components...
+	  */
+
+          httpSeparate(con->uri, method, userpass, hostname, &port, resource);
+
+         /*
+	  * Only allow URIs with the servername, localhost, or an IP
+	  * address...
+	  */
+
+	  if (strcasecmp(hostname, ServerName) &&
+	      strcasecmp(hostname, "localhost") &&
+	      !isdigit(hostname[0]))
+	  {
+	   /*
+	    * Nope, we don't do proxies...
+	    */
+
+	    LogMessage(L_ERROR, "Bad URI \"%s\" in request!", con->uri);
+	    SendError(con, HTTP_METHOD_NOT_ALLOWED);
+	    ShutdownClient(con);
+	    return (1);
+	  }
+
+         /*
+	  * Copy the resource portion back into the URI; both resource and
+	  * con->uri are HTTP_MAX_URI bytes in size...
+	  */
+
+          strcpy(con->uri, resource);
+	}
+
+       /*
         * Process the request...
 	*/
 
@@ -834,18 +880,6 @@ ReadClient(client_t *con)	/* I - Client to read from */
       */
 
       if (!SendError(con, HTTP_FORBIDDEN))
-      {
-	CloseClient(con);
-        return (0);
-      }
-    }
-    else if (con->uri[0] != '/')
-    {
-     /*
-      * Don't allow proxying (yet)...
-      */
-
-      if (!SendError(con, HTTP_METHOD_NOT_ALLOWED))
       {
 	CloseClient(con);
         return (0);
@@ -2755,5 +2789,5 @@ pipe_command(client_t *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.137 2003/01/17 14:42:27 mike Exp $".
+ * End of "$Id: client.c,v 1.138 2003/01/24 15:06:03 mike Exp $".
  */
