@@ -153,7 +153,7 @@ CMap::CMap(GString *collectionA, GString *cMapNameA, int wModeA) {
   refCnt = 1;
 }
 
-void CMap::useCMap(CMapCache *cache, char *useName) {
+void CMap::useCMap(CMapCache *cache, const char *useName) {
   GString *useNameStr;
   CMap *subCMap;
 
@@ -278,7 +278,7 @@ GBool CMap::match(GString *collectionA, GString *cMapNameA) {
   return !collection->cmp(collectionA) && !cMapName->cmp(cMapNameA);
 }
 
-CID CMap::getCID(char *s, int len, int *nUsed) {
+CID CMap::getCID(const char *s, int len, int *nUsed) {
   CMapVectorEntry *vec;
   int n, i;
 

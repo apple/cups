@@ -271,7 +271,7 @@ GfxResources::~GfxResources() {
   gStateDict.free();
 }
 
-GfxFont *GfxResources::lookupFont(char *name) {
+GfxFont *GfxResources::lookupFont(const char *name) {
   GfxFont *font;
   GfxResources *resPtr;
 
@@ -285,7 +285,7 @@ GfxFont *GfxResources::lookupFont(char *name) {
   return NULL;
 }
 
-GBool GfxResources::lookupXObject(char *name, Object *obj) {
+GBool GfxResources::lookupXObject(const char *name, Object *obj) {
   GfxResources *resPtr;
 
   for (resPtr = this; resPtr; resPtr = resPtr->next) {
@@ -299,7 +299,7 @@ GBool GfxResources::lookupXObject(char *name, Object *obj) {
   return gFalse;
 }
 
-GBool GfxResources::lookupXObjectNF(char *name, Object *obj) {
+GBool GfxResources::lookupXObjectNF(const char *name, Object *obj) {
   GfxResources *resPtr;
 
   for (resPtr = this; resPtr; resPtr = resPtr->next) {
@@ -313,7 +313,7 @@ GBool GfxResources::lookupXObjectNF(char *name, Object *obj) {
   return gFalse;
 }
 
-void GfxResources::lookupColorSpace(char *name, Object *obj) {
+void GfxResources::lookupColorSpace(const char *name, Object *obj) {
   GfxResources *resPtr;
 
   for (resPtr = this; resPtr; resPtr = resPtr->next) {
@@ -327,7 +327,7 @@ void GfxResources::lookupColorSpace(char *name, Object *obj) {
   obj->initNull();
 }
 
-GfxPattern *GfxResources::lookupPattern(char *name) {
+GfxPattern *GfxResources::lookupPattern(const char *name) {
   GfxResources *resPtr;
   GfxPattern *pattern;
   Object obj;
@@ -346,7 +346,7 @@ GfxPattern *GfxResources::lookupPattern(char *name) {
   return NULL;
 }
 
-GfxShading *GfxResources::lookupShading(char *name) {
+GfxShading *GfxResources::lookupShading(const char *name) {
   GfxResources *resPtr;
   GfxShading *shading;
   Object obj;
@@ -365,7 +365,7 @@ GfxShading *GfxResources::lookupShading(char *name) {
   return NULL;
 }
 
-GBool GfxResources::lookupGState(char *name, Object *obj) {
+GBool GfxResources::lookupGState(const char *name, Object *obj) {
   GfxResources *resPtr;
 
   for (resPtr = this; resPtr; resPtr = resPtr->next) {
@@ -576,7 +576,7 @@ void Gfx::go(GBool topLevel) {
 
 void Gfx::execOp(Object *cmd, Object args[], int numArgs) {
   Operator *op;
-  char *name;
+  const char *name;
   int i;
 
   // find operator
@@ -613,7 +613,7 @@ void Gfx::execOp(Object *cmd, Object args[], int numArgs) {
   (this->*op->func)(args, numArgs);
 }
 
-Operator *Gfx::findOp(char *name) {
+Operator *Gfx::findOp(const char *name) {
   int a, b, m, cmp;
 
   a = -1;
@@ -2665,7 +2665,7 @@ void Gfx::opBeginImage(Object args[], int numArgs) {
 Stream *Gfx::buildImageStream() {
   Object dict;
   Object obj;
-  char *key;
+  const char *key;
   Stream *str;
 
   // build dictionary
@@ -2680,7 +2680,7 @@ Stream *Gfx::buildImageStream() {
       obj.free();
       parser->getObj(&obj);
       if (obj.isEOF() || obj.isError()) {
-	gfree(key);
+	gfree((void *)key);
 	break;
       }
       dict.dictAdd(key, &obj);

@@ -18,7 +18,7 @@
 //------------------------------------------------------------------------
 
 struct NameToCharCodeEntry {
-  char *name;
+  const char *name;
   CharCode c;
 };
 
@@ -40,13 +40,13 @@ NameToCharCode::~NameToCharCode() {
 
   for (i = 0; i < size; ++i) {
     if (tab[i].name) {
-      gfree(tab[i].name);
+      gfree((void *)tab[i].name);
     }
   }
   gfree(tab);
 }
 
-void NameToCharCode::add(char *name, CharCode c) {
+void NameToCharCode::add(const char *name, CharCode c) {
   NameToCharCodeEntry *oldTab;
   int h, i, oldSize;
 
@@ -88,7 +88,7 @@ void NameToCharCode::add(char *name, CharCode c) {
   ++len;
 }
 
-CharCode NameToCharCode::lookup(char *name) {
+CharCode NameToCharCode::lookup(const char *name) {
   int h;
 
   h = hash(name);
@@ -103,8 +103,8 @@ CharCode NameToCharCode::lookup(char *name) {
   return 0;
 }
 
-int NameToCharCode::hash(char *name) {
-  char *p;
+int NameToCharCode::hash(const char *name) {
+  const char *p;
   unsigned int h;
 
   h = 0;

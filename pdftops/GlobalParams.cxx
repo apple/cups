@@ -61,7 +61,7 @@ DisplayFontParam::DisplayFontParam(GString *nameA,
   }
 }
 
-DisplayFontParam::DisplayFontParam(char *nameA, char *xlfdA, char *encodingA) {
+DisplayFontParam::DisplayFontParam(const char *nameA, const char *xlfdA, const char *encodingA) {
   name = new GString(nameA);
   kind = displayFontX;
   x.xlfd = new GString(xlfdA);
@@ -116,7 +116,7 @@ PSFontParam::~PSFontParam() {
 // parsing
 //------------------------------------------------------------------------
 
-GlobalParams::GlobalParams(char *cfgFileName) {
+GlobalParams::GlobalParams(const char *cfgFileName) {
   UnicodeMap *map;
   DisplayFontParam *dfp;
   GString *fileName;
@@ -600,7 +600,7 @@ void GlobalParams::parsePSFont(GList *tokens, GString *fileName, int line) {
   psFonts->add(param->pdfFontName, param);
 }
 
-void GlobalParams::parsePSFont16(char *cmdName, GList *fontList,
+void GlobalParams::parsePSFont16(const char *cmdName, GList *fontList,
 				 GList *tokens, GString *fileName, int line) {
   PSFontParam *param;
   int wMode;
@@ -680,7 +680,7 @@ void GlobalParams::parseInitialZoom(GList *tokens,
   initialZoom = ((GString *)tokens->get(1))->copy();
 }
 
-void GlobalParams::parseFontRastControl(char *cmdName, FontRastControl *val,
+void GlobalParams::parseFontRastControl(const char *cmdName, FontRastControl *val,
 					GList *tokens, GString *fileName,
 					int line) {
   GString *tok;
@@ -710,7 +710,7 @@ void GlobalParams::parseURLCommand(GList *tokens, GString *fileName,
   urlCommand = ((GString *)tokens->get(1))->copy();
 }
 
-void GlobalParams::parseYesNo(char *cmdName, GBool *flag,
+void GlobalParams::parseYesNo(const char *cmdName, GBool *flag,
 			      GList *tokens, GString *fileName, int line) {
   GString *tok;
 
@@ -775,11 +775,11 @@ GlobalParams::~GlobalParams() {
 // accessors
 //------------------------------------------------------------------------
 
-CharCode GlobalParams::getMacRomanCharCode(char *charName) {
+CharCode GlobalParams::getMacRomanCharCode(const char *charName) {
   return macRomanReverseMap->lookup(charName);
 }
 
-Unicode GlobalParams::mapNameToUnicode(char *charName) {
+Unicode GlobalParams::mapNameToUnicode(const char *charName) {
   return nameToUnicode->lookup(charName);
 }
 
@@ -893,7 +893,7 @@ PSFontParam *GlobalParams::getPSFont16(GString *fontName,
 }
 
 GString *GlobalParams::findFontFile(GString *fontName,
-				    char *ext1, char *ext2) {
+				    const char *ext1, const char *ext2) {
   GString *dir, *fileName;
   FILE *f;
   int i;
@@ -948,14 +948,14 @@ UnicodeMap *GlobalParams::getTextEncoding() {
 // functions to set parameters
 //------------------------------------------------------------------------
 
-void GlobalParams::setPSFile(char *file) {
+void GlobalParams::setPSFile(const char *file) {
   if (psFile) {
     delete psFile;
   }
   psFile = new GString(file);
 }
 
-GBool GlobalParams::setPSPaperSize(char *size) {
+GBool GlobalParams::setPSPaperSize(const char *size) {
   if (!strcmp(size, "letter")) {
     psPaperWidth = 612;
     psPaperHeight = 792;
@@ -1014,12 +1014,12 @@ void GlobalParams::setPSASCIIHex(GBool hex) {
   psASCIIHex = hex;
 }
 
-void GlobalParams::setTextEncoding(char *encodingName) {
+void GlobalParams::setTextEncoding(const char *encodingName) {
   delete textEncoding;
   textEncoding = new GString(encodingName);
 }
 
-GBool GlobalParams::setTextEOL(char *s) {
+GBool GlobalParams::setTextEOL(const char *s) {
   if (!strcmp(s, "unix")) {
     textEOL = eolUnix;
   } else if (!strcmp(s, "dos")) {
@@ -1032,20 +1032,20 @@ GBool GlobalParams::setTextEOL(char *s) {
   return gTrue;
 }
 
-void GlobalParams::setInitialZoom(char *s) {
+void GlobalParams::setInitialZoom(const char *s) {
   delete initialZoom;
   initialZoom = new GString(s);
 }
 
-GBool GlobalParams::setT1libControl(char *s) {
+GBool GlobalParams::setT1libControl(const char *s) {
   return setFontRastControl(&t1libControl, s);
 }
 
-GBool GlobalParams::setFreeTypeControl(char *s) {
+GBool GlobalParams::setFreeTypeControl(const char *s) {
   return setFontRastControl(&freetypeControl, s);
 }
 
-GBool GlobalParams::setFontRastControl(FontRastControl *val, char *s) {
+GBool GlobalParams::setFontRastControl(FontRastControl *val, const char *s) {
   if (!strcmp(s, "none")) {
     *val = fontRastNone;
   } else if (!strcmp(s, "plain")) {

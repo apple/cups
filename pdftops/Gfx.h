@@ -69,13 +69,13 @@ public:
   GfxResources(XRef *xref, Dict *resDict, GfxResources *nextA);
   ~GfxResources();
 
-  GfxFont *lookupFont(char *name);
-  GBool lookupXObject(char *name, Object *obj);
-  GBool lookupXObjectNF(char *name, Object *obj);
-  void lookupColorSpace(char *name, Object *obj);
-  GfxPattern *lookupPattern(char *name);
-  GfxShading *lookupShading(char *name);
-  GBool lookupGState(char *name, Object *obj);
+  GfxFont *lookupFont(const char *name);
+  GBool lookupXObject(const char *name, Object *obj);
+  GBool lookupXObjectNF(const char *name, Object *obj);
+  void lookupColorSpace(const char *name, Object *obj);
+  GfxPattern *lookupPattern(const char *name);
+  GfxShading *lookupShading(const char *name);
+  GBool lookupGState(const char *name, Object *obj);
 
   GfxResources *getNext() { return next; }
 
@@ -137,7 +137,7 @@ private:
 
   void go(GBool topLevel);
   void execOp(Object *cmd, Object args[], int numArgs);
-  Operator *findOp(char *name);
+  Operator *findOp(const char *name);
   GBool checkArg(Object *arg, TchkType type);
   int getPos();
 

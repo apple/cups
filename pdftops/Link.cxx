@@ -381,7 +381,7 @@ LinkNamed::~LinkNamed() {
 // LinkUnknown
 //------------------------------------------------------------------------
 
-LinkUnknown::LinkUnknown(char *actionA) {
+LinkUnknown::LinkUnknown(const char *actionA) {
   action = new GString(actionA);
 }
 

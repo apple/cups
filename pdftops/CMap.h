@@ -45,7 +45,7 @@ public:
   // Return the CID corresponding to the character code starting at
   // <s>, which contains <len> bytes.  Sets *<nUsed> to the number of
   // bytes used by the char code.
-  CID getCID(char *s, int len, int *nUsed);
+  CID getCID(const char *s, int len, int *nUsed);
 
   // Return the writing mode (0=horizontal, 1=vertical).
   int getWMode() { return wMode; }
@@ -54,7 +54,7 @@ private:
 
   CMap(GString *collectionA, GString *cMapNameA);
   CMap(GString *collectionA, GString *cMapNameA, int wModeA);
-  void useCMap(CMapCache *cache, char *useName);
+  void useCMap(CMapCache *cache, const char *useName);
   void copyVector(CMapVectorEntry *dest, CMapVectorEntry *src);
   void addCodeSpace(CMapVectorEntry *vec, Guint start, Guint end,
 		    Guint nBytes);
