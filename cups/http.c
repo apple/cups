@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.16 1999/02/09 22:01:24 mike Exp $"
+ * "$Id: http.c,v 1.17 1999/02/10 19:27:38 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -68,6 +68,15 @@
 #include <fcntl.h>
 
 #include "http.h"
+
+/*#define DEBUG*/
+#ifdef DEBUG
+#  define DEBUG_puts(x) puts(x)
+#  define DEBUG_printf(x) printf x
+#else
+#  define DEBUG_puts(x)
+#  define DEBUG_printf(x)
+#endif /* DEBUG */
 
 
 /*
@@ -918,7 +927,7 @@ httpGetDateTime(char *s)		/* I - Date/time string */
   int		hour, min, sec;		/* Time */
 
 
-  if (sscanf(s, "%*s%d%s%d%d:%d:%d", &day, mon, &year, &hour, &min, &sec) != 6)
+  if (sscanf(s, "%*s%d%s%d%d:%d:%d", &day, mon, &year, &hour, &min, &sec) < 6)
     return (0);
 
   for (i = 0; i < 12; i ++)
@@ -967,7 +976,7 @@ httpUpdate(http_t *http)		/* I - HTTP data */
 
   while (httpGets(line, sizeof(line), http) != NULL)
   {
-    puts(line);
+    DEBUG_puts(line);
 
     if (line[0] == '\0')
     {
@@ -1022,7 +1031,10 @@ httpUpdate(http_t *http)		/* I - HTTP data */
       */
 
       if ((field = http_field(line)) == HTTP_FIELD_UNKNOWN)
+      {
+        DEBUG_printf(("Unknown field %s seen!\n", line));
         continue;
+      }
 
       httpSetField(http, field, value);
     }
@@ -1300,5 +1312,5 @@ http_send(http_t       *http,	/* I - HTTP data */
 
 
 /*
- * End of "$Id: http.c,v 1.16 1999/02/09 22:01:24 mike Exp $".
+ * End of "$Id: http.c,v 1.17 1999/02/10 19:27:38 mike Exp $".
  */

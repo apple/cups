@@ -1,5 +1,5 @@
 /*
- * "$Id: language.c,v 1.1 1999/02/05 20:38:42 mike Exp $"
+ * "$Id: language.c,v 1.2 1999/02/10 19:27:38 mike Exp $"
  *
  *   for the Common UNIX Printing System (CUPS).
  *
@@ -23,6 +23,11 @@
  *
  * Contents:
  *
+ *   cupsLangEncoding() - Return the character encoding (us-ascii, etc.)
+ *                        for the given language.
+ *   cupsLangFlush()    - Flush all language data out of the cache.
+ *   cupsLangFree()     - Free language data.
+ *   cupsLangGet()      - Get a language.
  */
 
 /*
@@ -41,6 +46,7 @@
  */
 
 static cups_lang_t	*lang_cache = NULL;	/* Language string cache */
+static unsigned char	*lang_blank = "";	/* Blank constant string */
 static char		*lang_encodings[] =	/* Encoding strings */
 			{
 			  "us-ascii",
@@ -88,7 +94,7 @@ cupsLangFlush(void)
   for (lang = lang_cache; lang != NULL; lang = next)
   {
     for (i = 0; i < CUPS_MSG_MAX; i ++)
-      if (lang->messages[i] != NULL)
+      if (lang->messages[i] != NULL && lang->messages[i] != lang_blank)
         free(lang->messages[i]);
 
     next = lang->next;
@@ -132,7 +138,7 @@ cupsLangGet(char *language)	/* I - Language or locale */
   * First see if we already have this language loaded...
   */
 
-  if (language == NULL)
+  if (language == NULL || language[0] == '\0')
     language = "C";
 
   for (lang = lang_cache; lang != NULL; lang = lang->next)
@@ -157,15 +163,19 @@ cupsLangGet(char *language)	/* I - Language or locale */
     real[0] = tolower(language[0]);
     real[1] = tolower(language[1]);
 
-    if (strlen(language) > 3)
+    if (language[2] == '_' || language[2] == '-')
     {
-      real[2] = '_';
-      real[3] = toupper(language[3]);
-      real[4] = toupper(language[4]);
-      real[5] = '\0';
+      real[2]     = '_';
+      real[3]     = toupper(language[3]);
+      real[4]     = toupper(language[4]);
+      real[5]     = '\0';
+      language[5] = '\0';
     }
     else
-      real[2] = '\0';
+    {
+      language[2] = '\0';
+      real[2]     = '\0';
+    }
   }
 
  /*
@@ -174,7 +184,8 @@ cupsLangGet(char *language)	/* I - Language or locale */
   * will use the POSIX locale.
   */
 
-  sprintf(filename, "/usr/lib/locale/%s/cups_%s", real, real);
+  sprintf(filename, LOCALEDIR "/%s/cups_%s", real, real);
+
   if ((fp = fopen(filename, "r")) == NULL)
     if (strlen(real) > 2)
     {
@@ -183,7 +194,7 @@ cupsLangGet(char *language)	/* I - Language or locale */
       */
 
       real[2] = '\0';
-      sprintf(filename, "/usr/lib/locale/%s/cups_%s", real, real);
+      sprintf(filename, LOCALEDIR "/%s/cups_%s", real, real);
       fp = fopen(filename, "r");
     }
 
@@ -192,7 +203,7 @@ cupsLangGet(char *language)	/* I - Language or locale */
   */
 
   if (fp == NULL)
-    fp = fopen("/usr/lib/locale/C/cups_C", "r");
+    fp = fopen(LOCALEDIR "/C/cups_C", "r");
 
  /*
   * If we can't load anything, return NULL to signal an error!
@@ -207,6 +218,16 @@ cupsLangGet(char *language)	/* I - Language or locale */
   * be messages consisting of:
   *
   *    #### SP message text
+  *
+  * or:
+  *
+  *    message text
+  *
+  * If the line starts with a number, then message processing picks up
+  * where the number indicates.  Otherwise the last message number is
+  * incremented.
+  *
+  * All leading whitespace is deleted.
   */
 
   if (fgets(line, sizeof(line), fp) == NULL)
@@ -246,6 +267,22 @@ cupsLangGet(char *language)	/* I - Language or locale */
     lang_cache = lang;
   }
 
+ /*
+  * Free all old strings as needed...
+  */
+
+  for (i = 0; i < CUPS_MSG_MAX; i ++)
+  {
+    if (lang->messages[i] != NULL && lang->messages[i] != lang_blank)
+      free(lang->messages[i]);
+
+    lang->messages[i] = lang_blank;
+  }
+
+ /*
+  * Then assign the language and encoding fields...
+  */
+
   lang->used ++;
   strcpy(lang->language, language);
 
@@ -260,28 +297,35 @@ cupsLangGet(char *language)	/* I - Language or locale */
   * Read the strings from the file...
   */
 
+  msg = (cups_msg_t)-1;
+
   while (fgets(line, sizeof(line), fp) != NULL)
   {
    /*
     * Ignore lines not starting with a digit...
     */
 
-    line[strlen(line) - 1] = '\0';	/* Strip LF */
+    i = strlen(line) - 1;
+    if (line[i] == '\n')
+      line[i] = '\0';	/* Strip LF */
 
-    if (!isdigit(line[0]))
+    if (line[0] == '\0')
       continue;
 
    /*
     * Grab the message number and text...
     */
 
-    msg = (cups_msg_t)atoi(line);
+    if (isdigit(line[0]))
+      msg = (cups_msg_t)atoi(line);
+    else
+      msg ++;
 
     if (msg < 0 || msg >= CUPS_MSG_MAX)
       continue;
 
     text = line;
-    while (!isspace(*text) && *text != '\0')
+    while (isdigit(*text))
       text ++;
     while (isspace(*text))
       text ++;
@@ -300,5 +344,5 @@ cupsLangGet(char *language)	/* I - Language or locale */
 
 
 /*
- * End of "$Id: language.c,v 1.1 1999/02/05 20:38:42 mike Exp $".
+ * End of "$Id: language.c,v 1.2 1999/02/10 19:27:38 mike Exp $".
  */
