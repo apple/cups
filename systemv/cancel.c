@@ -1,5 +1,5 @@
 /*
- * "$Id: cancel.c,v 1.8 1999/07/30 15:36:00 mike Exp $"
+ * "$Id: cancel.c,v 1.9 1999/07/30 15:59:01 mike Exp $"
  *
  *   "cancel" command for the Common UNIX Printing System (CUPS).
  *
@@ -49,7 +49,7 @@ main(int  argc,			/* I - Number of command-line arguments */
   http_t	*http;		/* HTTP connection to server */
   int		i;		/* Looping var */
   int		job_id;		/* Job ID */
-  const char	*dest,		/* Destination printer */
+  char		*dest,		/* Destination printer */
 		*host;		/* Host name */
   char		name[255];	/* Printer name */
   char		uri[1024];	/* Printer or job URI */
@@ -216,5 +216,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: cancel.c,v 1.8 1999/07/30 15:36:00 mike Exp $".
+ * End of "$Id: cancel.c,v 1.9 1999/07/30 15:59:01 mike Exp $".
  */
