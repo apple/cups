@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c,v 1.21 1999/06/19 11:10:28 mike Exp $"
+ * "$Id: main.c,v 1.22 1999/06/19 12:30:11 mike Exp $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -237,14 +237,14 @@ main(int  argc,			/* I - Number of command-line arguments */
           fprintf(stderr, " %d", i);
       fputs("\n", stderr);
 
-      for (i = 0, con = Clients; i < Num_Clients; i ++, con ++)
+      for (i = 0, con = Clients; i < NumClients; i ++, con ++)
         fprintf(stderr, "cupsd: Clients[%d] = %d, file = %d, state = %d\n",
 	        i, con->http.fd, con->file, con->http.state);
 
       for (i = 0, lis = Listeners; i < NumListeners; i ++, lis ++)
         fprintf(stderr, "cupsd: Listeners[%d] = %d\n", i, lis->fd);
 
-      fprintf(strerr, "cupsd: BrowseSocket = %d\n", BrowseSocket);
+      fprintf(stderr, "cupsd: BrowseSocket = %d\n", BrowseSocket);
 
       for (job = Jobs; job != NULL; job = job->next)
         fprintf(stderr, "cupsd: Jobs[%d] = %d\n", job->id, job->pipe);
@@ -419,5 +419,5 @@ usage(void)
 
 
 /*
- * End of "$Id: main.c,v 1.21 1999/06/19 11:10:28 mike Exp $".
+ * End of "$Id: main.c,v 1.22 1999/06/19 12:30:11 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.23 1999/06/18 18:36:44 mike Exp $"
+ * "$Id: client.c,v 1.24 1999/06/19 12:30:09 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -173,19 +173,14 @@ CloseClient(client_t *con)	/* I - Client to close */
   * Close the socket and clear the file from the input set for select()...
   */
 
-#if defined(WIN32) || defined(__EMX__)
- /*
-  * Microsoft Windows and IBM OS/2 don't have a unified IO system...
-  */
-
-  closesocket(con->http.fd);
-#else
- /*
-  * UNIX *does*....
-  */
-
-  close(con->http.fd);
-#endif /* WIN32 || __EMX__ */
+  if (con->http.fd > 0)
+  {
+    DEBUG_printf(("CloseClient: Removing fd %d from InputSet...\n", con->http.fd));
+    close(con->http.fd);
+    FD_CLR(con->http.fd, &InputSet);
+    FD_CLR(con->http.fd, &OutputSet);
+    con->http.fd = 0;
+  }
 
   for (i = 0; i < NumListeners; i ++)
   {
@@ -193,15 +188,11 @@ CloseClient(client_t *con)	/* I - Client to close */
     FD_SET(Listeners[i].fd, &InputSet);
   }
 
-  DEBUG_printf(("CloseClient: Removing fd %d from InputSet...\n", con->http.fd));
-  FD_CLR(con->http.fd, &InputSet);
   if (con->pipe_pid != 0)
   {
     DEBUG_printf(("CloseClient: Removing fd %d from InputSet...\n", con->file));
     FD_CLR(con->file, &InputSet);
   }
-
-  FD_CLR(con->http.fd, &OutputSet);
 
  /*
   * If we have a data file open, close it...
@@ -215,6 +206,7 @@ CloseClient(client_t *con)	/* I - Client to close */
       waitpid(con->pipe_pid, &status, WNOHANG);
     }
 
+    FD_CLR(con->file, &InputSet);
     close(con->file);
     con->file = 0;
   }
@@ -1503,5 +1495,5 @@ pipe_command(client_t *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.23 1999/06/18 18:36:44 mike Exp $".
+ * End of "$Id: client.c,v 1.24 1999/06/19 12:30:09 mike Exp $".
  */

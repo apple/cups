@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.20 1999/06/18 18:36:49 mike Exp $"
+ * "$Id: printers.c,v 1.21 1999/06/19 12:30:11 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -148,7 +148,12 @@ AddPrinterFilter(printer_t *p,		/* I - Printer to add to */
        i --, temptype ++)
     if ((super[0] == '*' || strcmp((*temptype)->super, super) == 0) &&
         (type[0] == '*' || strcmp((*temptype)->type, type) == 0))
+    {
+      DEBUG_printf(("Adding filter %s/%s %s/%s %d %s\n", (*temptype)->super,
+                    (*temptype)->type, p->filetype->super, p->filetype->type,
+                    cost, program));
       mimeAddFilter(MimeDatabase, *temptype, p->filetype, cost, program);
+    }
 }
 
 
@@ -835,8 +840,12 @@ SetPrinterAttrs(printer_t *p)	/* I - Printer to setup */
       * Add any filters in the PPD file...
       */
 
+      DEBUG_printf(("ppd->num_filters = %d\n", ppd->num_filters));
       for (i = 0; i < ppd->num_filters; i ++)
+      {
+        DEBUG_printf(("ppd->filters[%d] = \"%s\"\n", i, ppd->filters[i]));
         AddPrinterFilter(p, ppd->filters[i]);
+      }
 
       if (ppd->num_filters == 0)
         AddPrinterFilter(p, "application/vnd.cups-postscript 0 -");
@@ -939,5 +948,5 @@ StopPrinter(printer_t *p)	/* I - Printer to stop */
 
 
 /*
- * End of "$Id: printers.c,v 1.20 1999/06/18 18:36:49 mike Exp $".
+ * End of "$Id: printers.c,v 1.21 1999/06/19 12:30:11 mike Exp $".
  */
