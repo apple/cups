@@ -3,6 +3,8 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.19
 
+	- Added a partial translation of the web interface to
+	  German.
 	- When printing using the OutputOrder=Reverse option
 	  with duplexing, the output order is now truly
 	  reversed; the order of sub-pages when printing N-up is
