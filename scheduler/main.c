@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c,v 1.85 2002/12/17 19:00:17 swdev Exp $"
+ * "$Id: main.c,v 1.86 2003/01/13 20:38:03 mike Exp $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -526,6 +526,9 @@ main(int  argc,			/* I - Number of command-line arguments */
       activity = time(NULL) - Timeout;
       if (con->http.activity < activity && !con->pipe_pid)
       {
+        LogMessage(L_DEBUG, "Closing client %d after %d seconds of inactivity...",
+	           con->http.fd, Timeout);
+
         CloseClient(con);
         con --;
         continue;
@@ -918,5 +921,5 @@ usage(void)
 
 
 /*
- * End of "$Id: main.c,v 1.85 2002/12/17 19:00:17 swdev Exp $".
+ * End of "$Id: main.c,v 1.86 2003/01/13 20:38:03 mike Exp $".
  */

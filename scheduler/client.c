@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.133 2003/01/13 18:38:53 mike Exp $"
+ * "$Id: client.c,v 1.134 2003/01/13 20:38:03 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -1790,6 +1790,14 @@ ShutdownClient(client_t *con)		/* I - Client connection */
   shutdown(con->http.fd, 0);
   con->http.used = 0;
 
+ /*
+  * Update the activity time so that we timeout after 30 seconds rather
+  * then the current Timeout setting (300 by default).  This prevents
+  * some DoS situations...
+  */
+
+  con->http.activity = time(NULL) - Timeout + 30;
+
   LogMessage(L_DEBUG2, "ShutdownClient: Removing fd %d from InputSet...",
              con->http.fd);
 
@@ -2673,5 +2681,5 @@ pipe_command(client_t *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.133 2003/01/13 18:38:53 mike Exp $".
+ * End of "$Id: client.c,v 1.134 2003/01/13 20:38:03 mike Exp $".
  */
