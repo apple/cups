@@ -1,5 +1,5 @@
 /*
- * "$Id: mark.c,v 1.22 2000/05/02 17:42:37 mike Exp $"
+ * "$Id: mark.c,v 1.23 2000/11/20 19:20:19 mike Exp $"
  *
  *   Option marking routines for the Common UNIX Printing System (CUPS).
  *
@@ -118,7 +118,9 @@ ppdConflicts(ppd_file_t *ppd)	/* I - PPD to check */
         if (c1->marked)
 	  break;
 
-      if (j == 0 || strcasecmp(c1->choice, "None") == 0 ||
+      if (j == 0 ||
+          strcasecmp(c1->choice, "None") == 0 ||
+          strcasecmp(c1->choice, "Off") == 0 ||
           strcasecmp(c1->choice, "False") == 0)
         c1 = NULL;
     }
@@ -149,7 +151,9 @@ ppdConflicts(ppd_file_t *ppd)	/* I - PPD to check */
         if (c2->marked)
 	  break;
 
-      if (j == 0 || strcasecmp(c2->choice, "None") == 0 ||
+      if (j == 0 ||
+          strcasecmp(c2->choice, "None") == 0 ||
+          strcasecmp(c2->choice, "Off") == 0 ||
           strcasecmp(c2->choice, "False") == 0)
         c2 = NULL;
     }
@@ -433,5 +437,5 @@ ppd_defaults(ppd_file_t  *ppd,	/* I - PPD file */
 
 
 /*
- * End of "$Id: mark.c,v 1.22 2000/05/02 17:42:37 mike Exp $".
+ * End of "$Id: mark.c,v 1.23 2000/11/20 19:20:19 mike Exp $".
  */
