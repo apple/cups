@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.14 2001/06/27 21:53:16 mike Exp $"
+# "$Id: Makefile,v 1.15 2001/06/29 13:07:48 mike Exp $"
 #
 #   Man page makefile for the Common UNIX Printing System (CUPS).
 #
@@ -91,13 +91,13 @@ install:
 	$(INSTALL_DIR) $(AMANDIR)/cat$(MAN8EXT)
 	$(INSTALL_MAN) $(CAT8) $(AMANDIR)/cat$(MAN8EXT)
 	$(RM) reject.$(CAT8EXT)
-	$(LN) accept.$(CAT1EXT) reject.$(CAT8EXT)
+	$(LN) accept.$(CAT8EXT) reject.$(CAT8EXT)
 	$(INSTALL_MAN) reject.$(CAT8EXT) $(AMANDIR)/cat$(MAN8EXT)
 	$(RM) disable.$(CAT8EXT)
-	$(LN) enable.$(CAT1EXT) disable.$(CAT8EXT)
+	$(LN) enable.$(CAT8EXT) disable.$(CAT8EXT)
 	$(INSTALL_MAN) disable.$(CAT8EXT) $(AMANDIR)/cat$(MAN8EXT)
 
 
 #
-# End of "$Id: Makefile,v 1.14 2001/06/27 21:53:16 mike Exp $".
+# End of "$Id: Makefile,v 1.15 2001/06/29 13:07:48 mike Exp $".
 #
