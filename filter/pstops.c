@@ -1,5 +1,5 @@
 /*
- * "$Id: pstops.c,v 1.59 2001/05/21 21:16:15 mike Exp $"
+ * "$Id: pstops.c,v 1.60 2001/05/23 15:28:02 mike Exp $"
  *
  *   PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -311,9 +311,12 @@ main(int  argc,			/* I - Number of command-line arguments */
     level = 0;
 
     while (psgets(line, sizeof(line), fp) != NULL)
+    {
+      if (strncmp(line, "%%", 2) == 0)
+        fprintf(stderr, "DEBUG: %d %s", level, line);
+
       if (strncmp(line, "%%BeginDocument:", 16) == 0 ||
-          strncmp(line, "%%BeginDocument ", 16) == 0 ||	/* Adobe Acrobat BUG */
-	  strncmp(line, "%!PS-Adobe", 10) == 0)		/* Non-conforming EPS */
+          strncmp(line, "%%BeginDocument ", 16) == 0)	/* Adobe Acrobat BUG */
         level ++;
       else if (strncmp(line, "%%EndDocument", 13) == 0 && level > 0)
         level --;
@@ -349,6 +352,7 @@ main(int  argc,			/* I - Number of command-line arguments */
       }
       else
         fputs(line, stdout);
+    }
 
    /*
     * Then read all of the pages, filtering as needed...
@@ -356,6 +360,9 @@ main(int  argc,			/* I - Number of command-line arguments */
 
     for (page = 1;;)
     {
+      if (strncmp(line, "%%", 2) == 0)
+        fprintf(stderr, "DEBUG: %d %s", level, line);
+
       if (strncmp(line, "%%BeginDocument:", 16) == 0 ||
           strncmp(line, "%%BeginDocument ", 16) == 0)	/* Adobe Acrobat BUG */
         level ++;
@@ -995,5 +1002,5 @@ start_nup(int number)	/* I - Page number */
 
 
 /*
- * End of "$Id: pstops.c,v 1.59 2001/05/21 21:16:15 mike Exp $".
+ * End of "$Id: pstops.c,v 1.60 2001/05/23 15:28:02 mike Exp $".
  */
