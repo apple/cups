@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c,v 1.85 2003/02/14 03:06:39 mike Exp $"
+ * "$Id: ppd.c,v 1.86 2003/02/14 20:01:24 mike Exp $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -299,10 +299,16 @@ ppdErrorString(ppd_status_t status)	/* I - PPD status */
 		  "OpenGroup without a CloseGroup first",
 		  "Bad OrderDependency",
 		  "Bad UIConstraints",
+		  "Missing asterisk in column 1",
+		  "Line longer than the maximum allowed (255 characters)",
+		  "Illegal control character",
+		  "Illegal main keyword string",
+		  "Illegal option keyword string",
+		  "Illegal translation string"
 		};
 
 
-  if (status < PPD_OK || status > PPD_BAD_UI_CONSTRAINTS)
+  if (status < PPD_OK || status > PPD_ILLEGAL_TRANSLATION)
     return ("Unknown");
   else
     return (messages[status]);
@@ -390,7 +396,8 @@ ppdOpen(FILE *fp)			/* I - File to read from */
     * Either this is not a PPD file, or it is not a 4.x PPD file.
     */
 
-    ppd_status = PPD_MISSING_PPDADOBE4;
+    if (ppd_status != PPD_OK)
+      ppd_status = PPD_MISSING_PPDADOBE4;
 
     ppd_free(string);
 
@@ -1366,16 +1373,49 @@ ppdOpen(FILE *fp)			/* I - File to read from */
 	    break;
 
         if (i > 0)
+	{
           for (i = 0; i < temp->num_options; i ++)
-	    if (strcmp(keyword, temp->options[i].keyword) == 0)
+	    if (strcmp(keyword + 7, temp->options[i].keyword) == 0)
 	    {
 	      strlcpy(temp->options[i].defchoice, string,
                       sizeof(temp->options[i].defchoice));
 	      break;
 	    }
+
+          if (i >= temp->num_options)
+	  {
+	   /*
+	    * Option not found; add this as an attribute...
+	    */
+
+            ppd_add_attr(ppd, keyword, "", string);
+
+            string = NULL;		/* Don't free this string below */
+	  }
+	}
+	else
+	{
+	 /*
+	  * Default group not found; add this as an attribute...
+	  */
+
+          ppd_add_attr(ppd, keyword, "", string);
+
+          string = NULL;		/* Don't free this string below */
+	}
       }
       else if (strcmp(keyword + 7, option->keyword) == 0)
         strlcpy(option->defchoice, string, sizeof(option->defchoice));
+      else
+      {
+       /*
+	* Default doesn't match this option; add as an attribute...
+	*/
+
+        ppd_add_attr(ppd, keyword, "", string);
+
+        string = NULL;			/* Don't free this string below */
+      }
     }
     else if (strcmp(keyword, "UIConstraints") == 0 ||
              strcmp(keyword, "NonUIConstraints") == 0)
@@ -1603,6 +1643,17 @@ ppdOpen(FILE *fp)			/* I - File to read from */
   if (!feof(fp))
     printf("Premature EOF at %lu...\n", (unsigned long)ftell(fp));
 #endif /* DEBUG */
+
+  if (ppd_status != PPD_OK)
+  {
+   /*
+    * Had an error reading the PPD file, cannot continue!
+    */
+
+    ppdClose(ppd);
+
+    return (NULL);
+  }
 
 #ifndef __APPLE__
  /*
@@ -2201,6 +2252,7 @@ ppd_read(FILE *fp,			/* I - File to read from */
 	 char **string)			/* O - Code/string data */
 {
   int		ch,			/* Character from file */
+		col,			/* Column in line */
 		colon,			/* Colon seen? */
 		endquote,		/* Waiting for an end quote */
 		mask;			/* Mask to be returned */
@@ -2225,6 +2277,7 @@ ppd_read(FILE *fp,			/* I - File to read from */
   */
 
   *string = NULL;
+  col     = 0;
 
   do
   {
@@ -2246,6 +2299,7 @@ ppd_read(FILE *fp,			/* I - File to read from */
 	*/
 
         ppd_line ++;
+	col = 0;
 
 	if (lineptr == line)		/* Skip blank lines */
           continue;
@@ -2269,6 +2323,16 @@ ppd_read(FILE *fp,			/* I - File to read from */
 
 	*lineptr++ = '\n';
       }
+      else if (ch < ' ' && ch != '\t')
+      {
+       /*
+        * Other control characters...
+	*/
+
+        ppd_status = PPD_ILLEGAL_CHARACTER;
+
+        return (0);
+      }
       else
       {
        /*
@@ -2276,6 +2340,18 @@ ppd_read(FILE *fp,			/* I - File to read from */
 	*/
 
 	*lineptr++ = ch;
+	col ++;
+
+	if (col > (PPD_MAX_LINE - 1))
+	{
+	 /*
+          * Line is too long...
+	  */
+
+          ppd_status = PPD_LINE_TOO_LONG;
+
+          return (0);
+	}
 
 	if (ch == ':' && strncmp(line, "*%", 2) != 0)
 	  colon = 1;
@@ -2294,6 +2370,7 @@ ppd_read(FILE *fp,			/* I - File to read from */
 	      if (ch == '\r' || ch == '\n')
 	      {
                 ppd_line ++;
+		col = 0;
 
 		if (ch == '\r')
 		{
@@ -2305,6 +2382,31 @@ ppd_read(FILE *fp,			/* I - File to read from */
 		}
 
 		break;
+	      }
+	      else if (ch < ' ' && ch != '\t')
+	      {
+	       /*
+        	* Other control characters...
+		*/
+
+        	ppd_status = PPD_ILLEGAL_CHARACTER;
+
+        	return (0);
+	      }
+	      else
+	      {
+	        col ++;
+
+		if (col > (PPD_MAX_LINE - 1))
+		{
+		 /*
+        	  * Line is too long...
+		  */
+
+        	  ppd_status = PPD_LINE_TOO_LONG;
+
+        	  return (0);
+		}
 	      }
 
             break;
@@ -2322,6 +2424,50 @@ ppd_read(FILE *fp,			/* I - File to read from */
       while ((ch = getc(fp)) != EOF)
         if (ch == '\"')
 	  break;
+	else if (ch == '\r' || ch == '\n')
+	{
+	  ppd_line ++;
+	  col = 0;
+
+	  if (ch == '\r')
+	  {
+	   /*
+            * Check for a trailing line feed...
+	    */
+
+	    if ((ch = getc(fp)) == EOF)
+	      break;
+	    if (ch != 0x0a)
+	      ungetc(ch, fp);
+	  }
+
+	  ch = '\n';
+	}
+	else if (ch < ' ' && ch != '\t')
+	{
+	 /*
+          * Other control characters...
+	  */
+
+          ppd_status = PPD_ILLEGAL_CHARACTER;
+
+          return (0);
+	}
+	else
+	{
+	  col ++;
+
+	  if (col > (PPD_MAX_LINE - 1))
+	  {
+	   /*
+            * Line is too long...
+	    */
+
+            ppd_status = PPD_LINE_TOO_LONG;
+
+            return (0);
+	  }
+	}
     }
 
     if (ch != '\n')
@@ -2338,6 +2484,7 @@ ppd_read(FILE *fp,			/* I - File to read from */
 	  */
 
           ppd_line ++;
+	  col = 0;
 
 	  if (ch == '\r')
 	  {
@@ -2352,6 +2499,31 @@ ppd_read(FILE *fp,			/* I - File to read from */
 	  }
 
 	  break;
+	}
+	else if (ch < ' ' && ch != '\t')
+	{
+	 /*
+          * Other control characters...
+	  */
+
+          ppd_status = PPD_ILLEGAL_CHARACTER;
+
+          return (0);
+	}
+	else
+	{
+	  col ++;
+
+	  if (col > (PPD_MAX_LINE - 1))
+	  {
+	   /*
+            * Line is too long...
+	    */
+
+            ppd_status = PPD_LINE_TOO_LONG;
+
+            return (0);
+	  }
 	}
     }
 
@@ -2377,14 +2549,19 @@ ppd_read(FILE *fp,			/* I - File to read from */
     text[0]    = '\0';
     *string    = NULL;
 
-    if (line[0] != '*')			/* All lines start with an asterisk */
-      continue;
-
-    if (strcmp(line, "*") == 0 ||	/* (Bad) comment line */
+    if (!line[0] ||			/* Blank line */
+        strcmp(line, "*") == 0 ||	/* (Bad) comment line */
         strncmp(line, "*%", 2) == 0 ||	/* Comment line */
         strncmp(line, "*?", 2) == 0 ||	/* Query line */
         strcmp(line, "*End") == 0)	/* End of multi-line string */
       continue;
+
+    if (line[0] != '*')			/* All lines start with an asterisk */
+    {
+      ppd_line --;
+      ppd_status = PPD_MISSING_ASTERISK;
+      return (0);
+    }
 
    /*
     * Get a keyword...
@@ -2392,10 +2569,18 @@ ppd_read(FILE *fp,			/* I - File to read from */
 
     keyptr = keyword;
 
-    for (; *lineptr != '\0' && *lineptr != ':' && !isspace(*lineptr);
-         lineptr ++)
-      if ((keyptr - keyword) < (PPD_MAX_NAME - 1))
-	*keyptr++ = *lineptr;
+    while (*lineptr != '\0' && *lineptr != ':' && !isspace(*lineptr))
+    {
+      if (*lineptr <= ' ' || *lineptr > 126 || *lineptr == '/' ||
+          (keyptr - keyword) >= (PPD_MAX_NAME - 1))
+      {
+	ppd_line --;
+        ppd_status = PPD_ILLEGAL_MAIN_KEYWORD;
+	return (0);
+      }
+
+      *keyptr++ = *lineptr++;
+    }
 
     *keyptr = '\0';
 
@@ -2417,10 +2602,19 @@ ppd_read(FILE *fp,			/* I - File to read from */
 
       optptr = option;
 
-      for (; *lineptr != '\0' && *lineptr != '\n' && *lineptr != ':' &&
-             *lineptr != '/'; lineptr ++)
-        if ((optptr - option) < (PPD_MAX_NAME - 1))
-	  *optptr++ = *lineptr;
+      while (*lineptr != '\0' && *lineptr != '\n' && *lineptr != ':' &&
+             *lineptr != '/')
+      {
+	if (*lineptr <= ' ' || *lineptr > 126 ||
+	    (optptr - option) >= (PPD_MAX_NAME - 1))
+        {
+	  ppd_line --;
+          ppd_status = PPD_ILLEGAL_OPTION_KEYWORD;
+	  return (0);
+	}
+
+        *optptr++ = *lineptr++;
+      }
 
       *optptr = '\0';
       mask |= PPD_OPTION;
@@ -2437,10 +2631,18 @@ ppd_read(FILE *fp,			/* I - File to read from */
 	
 	textptr = text;
 
-	for (; *lineptr != '\0' && *lineptr != '\n' && *lineptr != ':';
-	     lineptr ++)
-	  if ((textptr - text) < (PPD_MAX_LINE - 1))
-	    *textptr++ = *lineptr;
+	while (*lineptr != '\0' && *lineptr != '\n' && *lineptr != ':')
+	{
+	  if ((*lineptr < ' ' && *lineptr != '\t') ||
+	      (textptr - text) >= (PPD_MAX_LINE - 1))
+	  {
+	    ppd_line --;
+	    ppd_status = PPD_ILLEGAL_TRANSLATION;
+	    return (0);
+	  }
+
+	  *textptr++ = *lineptr++;
+        }
 
 	*textptr = '\0';
 	ppd_decode(text);
@@ -2482,5 +2684,5 @@ ppd_read(FILE *fp,			/* I - File to read from */
 
 
 /*
- * End of "$Id: ppd.c,v 1.85 2003/02/14 03:06:39 mike Exp $".
+ * End of "$Id: ppd.c,v 1.86 2003/02/14 20:01:24 mike Exp $".
  */
