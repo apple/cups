@@ -1,0 +1,74 @@
+.\"
+.\" "$Id: cupstestppd.man,v 1.1 2002/12/13 21:18:06 mike Exp $"
+.\"
+.\"   cupstestppd man page for the Common UNIX Printing System (CUPS).
+.\"
+.\"   Copyright 1997-2002 by Easy Software Products.
+.\"
+.\"   These coded instructions, statements, and computer programs are the
+.\"   property of Easy Software Products and are protected by Federal
+.\"   copyright law.  Distribution and use rights are outlined in the file
+.\"   "LICENSE.txt" which should have been included with this file.  If this
+.\"   file is missing or damaged please contact Easy Software Products
+.\"   at:
+.\"
+.\"       Attn: CUPS Licensing Information
+.\"       Easy Software Products
+.\"       44141 Airport View Drive, Suite 204
+.\"       Hollywood, Maryland 20636-3111 USA
+.\"
+.\"       Voice: (301) 373-9603
+.\"       EMail: cups-info@cups.org
+.\"         WWW: http://www.cups.org
+.\"
+.TH cupstestppd 1 "Common UNIX Printing System" "13 December 2002" "Easy Software Products"
+.SH NAME
+cupstestppd \- test conformance of ppd files
+.SH SYNOPSIS
+.B cupstestppd
+[ -v ] filename.ppd [ ... filenameN.ppd ]
+.br
+.B cupstestppd
+[ -v ] -
+.SH DESCRIPTION
+\fIcupstestppd\fR tests the conformance of PPD files to the
+Adobe PostScript Printer Description file format specification
+version 4.3. It can also be used to list the supported options
+and available fonts in a PPD file. The results of testing and
+any other output are sent to the standard output.
+.LP
+The first form of \fIcupstestppd\fR lists one or more PPD files
+on the command-line. The second form lists the PPD file provided
+on the standard input. The second form can be used to test
+compressed PPD files using the appropriate utility.
+.LP
+The \fI-v\fR option specifies that all information in the PPD file
+should be displayed in addition to the conformance testing results.
+.SH EXIT STATUS
+\fIcupstestppd\fR returns zero on success and non-zero on error. The
+error codes are as follows:
+.TP 5
+1
+.br
+Bad command-line arguments or missing PPD filename.
+.TP 5
+2
+.br
+Unable to open or read PPD file.
+.TP 5
+3
+.br
+The PPD file contains format errors that cannot be skipped.
+.TP 5
+4
+.br
+The PPD file does not conform to the Adobe PPD specification.
+.SH SEE ALSO
+CUPS Software Administrators Manual,
+CUPS Software Programmers Manual,
+http://localhost:631/documentation.html
+.SH COPYRIGHT
+Copyright 1993-2002 by Easy Software Products, All Rights Reserved.
+.\"
+.\" End of "$Id: cupstestppd.man,v 1.1 2002/12/13 21:18:06 mike Exp $".
+.\"
