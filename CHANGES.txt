@@ -57,6 +57,11 @@ CHANGES IN CUPS V1.1.11
 	  subdirectory under /usr/share/cups/banners is used for
 	  the Spanish banner files.
 	- Added support for Darwin/MacOS X builds.
+	- Updated the scheduler so it knows the correct
+	  language abbreviation to use for all supported
+	  PPD LanguageVersion values.  The new code also
+	  supports country codes as well, so "English-GB"
+	  maps to the "en_GB" locale.
 
 
 CHANGES IN CUPS V1.1.10-1
