@@ -1,5 +1,5 @@
 /*
- * "$Id: image-tiff.c,v 1.4 1998/08/12 15:21:56 mike Exp $"
+ * "$Id: image-tiff.c,v 1.5 1998/08/14 15:18:57 mike Exp $"
  *
  *   TIFF file routines for espPrint, a collection of printer drivers.
  *
@@ -16,7 +16,10 @@
  * Revision History:
  *
  *   $Log: image-tiff.c,v $
- *   Revision 1.4  1998/08/12 15:21:56  mike
+ *   Revision 1.5  1998/08/14 15:18:57  mike
+ *   Added alpha channel support.
+ *
+ *   Revision 1.4  1998/08/12  15:21:56  mike
  *   Added colormapped image support.
  *   Fixed bug in column-major color conversion code - was converting xsize
  *   pixels instead of ysize pixels...
@@ -70,7 +73,9 @@ ImageReadTIFF(image_t *img,
 		xcount, ycount,
 		pstep,
 		scanwidth,
-		r, g, b, k;
+		r, g, b, k,
+		alpha,
+		samples;
   ib_t		*in,
 		*out,
 		*p,
@@ -125,6 +130,13 @@ ImageReadTIFF(image_t *img,
   };
 
   td = &(tif->tif_dir);
+
+  samples = td->td_samplesperpixel;
+
+  if (samples == 2 || (samples == 4 && photometric == PHOTOMETRIC_RGB))
+    alpha = 1;
+  else
+    alpha = 0;
 
   img->xsize = width;
   img->ysize = height;
@@ -282,23 +294,45 @@ ImageReadTIFF(image_t *img,
         	};
               };
             }
-            else if (xdir < 0 || zero)
+            else if (xdir < 0 || zero || alpha)
             {
               TIFFReadScanline(tif, scanline, y, 0);
 
-              if (zero)
-              {
-                for (xcount = img->xsize, p = in + xstart, scanptr = scanline;
-                     xcount > 0;
-                     xcount --, p += pstep, scanptr ++)
-                  *p = 255 - *scanptr;
-              }
-              else
-              {
-                for (xcount = img->xsize, p = in + xstart, scanptr = scanline;
-                     xcount > 0;
-                     xcount --, p += pstep, scanptr ++)
-                  *p = *scanptr;
+              if (alpha)
+	      {
+        	if (zero)
+        	{
+                  for (xcount = img->xsize, p = in + xstart, scanptr = scanline;
+                       xcount > 0;
+                       xcount --, p += pstep, scanptr += 2)
+                    *p = (scanptr[1] * (255 - scanptr[0]) +
+		          (255 - scanptr[1]) * 255) / 255;
+        	}
+        	else
+        	{
+                  for (xcount = img->xsize, p = in + xstart, scanptr = scanline;
+                       xcount > 0;
+                       xcount --, p += pstep, scanptr += 2)
+                    *p = (scanptr[1] * scanptr[0] +
+		          (255 - scanptr[1]) * 255) / 255;
+        	};
+	      }
+	      else
+	      {
+        	if (zero)
+        	{
+                  for (xcount = img->xsize, p = in + xstart, scanptr = scanline;
+                       xcount > 0;
+                       xcount --, p += pstep, scanptr ++)
+                    *p = 255 - *scanptr;
+        	}
+        	else
+        	{
+                  for (xcount = img->xsize, p = in + xstart, scanptr = scanline;
+                       xcount > 0;
+                       xcount --, p += pstep, scanptr ++)
+                    *p = *scanptr;
+        	};
               };
             }
             else
@@ -401,24 +435,46 @@ ImageReadTIFF(image_t *img,
         	};
               };
             }
-            else if (ydir < 0 || zero)
+            else if (ydir < 0 || zero || alpha)
             {
               TIFFReadScanline(tif, scanline, x, 0);
 
-              if (zero)
-              {
-                for (ycount = img->ysize, p = in + ystart, scanptr = scanline;
-                     ycount > 0;
-                     ycount --, p += ydir, scanptr ++)
-                  *p = 255 - *scanptr;
+              if (alpha)
+	      {
+		if (zero)
+        	{
+                  for (ycount = img->ysize, p = in + ystart, scanptr = scanline;
+                       ycount > 0;
+                       ycount --, p += ydir, scanptr += 2)
+                    *p = (scanptr[1] * (255 - scanptr[0]) +
+		          (255 - scanptr[1]) * 255) / 255;
+        	}
+        	else
+        	{
+                  for (ycount = img->ysize, p = in + ystart, scanptr = scanline;
+                       ycount > 0;
+                       ycount --, p += ydir, scanptr += 2)
+                    *p = (scanptr[1] * scanptr[0] +
+		          (255 - scanptr[1]) * 255) / 255;
+        	};
               }
-              else
-              {
-                for (ycount = img->ysize, p = in + ystart, scanptr = scanline;
-                     ycount > 0;
-                     ycount --, p += ydir, scanptr ++)
-                  *p = *scanptr;
-              };
+	      else
+	      {
+		if (zero)
+        	{
+                  for (ycount = img->ysize, p = in + ystart, scanptr = scanline;
+                       ycount > 0;
+                       ycount --, p += ydir, scanptr ++)
+                    *p = 255 - *scanptr;
+        	}
+        	else
+        	{
+                  for (ycount = img->ysize, p = in + ystart, scanptr = scanline;
+                       ycount > 0;
+                       ycount --, p += ydir, scanptr ++)
+                    *p = *scanptr;
+        	};
+	      };
             }
             else
               TIFFReadScanline(tif, in, x, 0);
@@ -806,18 +862,32 @@ ImageReadTIFF(image_t *img,
                 };
               };
             }
-            else if (xdir < 0)
+            else if (xdir < 0 || alpha)
             {
               TIFFReadScanline(tif, scanline, y, 0);
 
-              for (xcount = img->xsize, p = in + xstart * 3, scanptr = scanline;
-                   xcount > 0;
-                   xcount --, p += pstep, scanptr += 3)
+              if (alpha)
+	      {
+        	for (xcount = img->xsize, p = in + xstart * 3, scanptr = scanline;
+                     xcount > 0;
+                     xcount --, p += pstep, scanptr += 4)
+        	{
+                  p[0] = (scanptr[0] * scanptr[3] + 255 * (255 - scanptr[3])) / 255;
+                  p[1] = (scanptr[1] * scanptr[3] + 255 * (255 - scanptr[3])) / 255;
+                  p[2] = (scanptr[2] * scanptr[3] + 255 * (255 - scanptr[3])) / 255;
+        	};
+              }
+	      else
               {
-                p[0] = scanptr[0];
-                p[1] = scanptr[1];
-                p[2] = scanptr[2];
-              };
+	      	for (xcount = img->xsize, p = in + xstart * 3, scanptr = scanline;
+                     xcount > 0;
+                     xcount --, p += pstep, scanptr += 3)
+        	{
+                  p[0] = scanptr[0];
+                  p[1] = scanptr[1];
+                  p[2] = scanptr[2];
+        	};
+	      };
             }
             else
               TIFFReadScanline(tif, in, y, 0);
@@ -929,18 +999,32 @@ ImageReadTIFF(image_t *img,
                 };
               };
             }
-            else if (ydir < 0)
+            else if (ydir < 0 || alpha)
             {
               TIFFReadScanline(tif, scanline, x, 0);
 
-              for (ycount = img->ysize, p = in + ystart * 3, scanptr = scanline;
-                   ycount > 0;
-                   ycount --, p += pstep, scanptr += 3)
-              {
-                p[0] = scanptr[0];
-                p[1] = scanptr[1];
-                p[2] = scanptr[2];
-              };
+              if (alpha)
+	      {
+		for (ycount = img->ysize, p = in + ystart * 3, scanptr = scanline;
+                     ycount > 0;
+                     ycount --, p += pstep, scanptr += 4)
+        	{
+                  p[0] = (scanptr[0] * scanptr[3] + 255 * (255 - scanptr[3])) / 255;
+                  p[1] = (scanptr[1] * scanptr[3] + 255 * (255 - scanptr[3])) / 255;
+                  p[2] = (scanptr[2] * scanptr[3] + 255 * (255 - scanptr[3])) / 255;
+        	};
+              }
+	      else
+	      {
+		for (ycount = img->ysize, p = in + ystart * 3, scanptr = scanline;
+                     ycount > 0;
+                     ycount --, p += pstep, scanptr += 3)
+        	{
+                  p[0] = scanptr[0];
+                  p[1] = scanptr[1];
+                  p[2] = scanptr[2];
+        	};
+	      };
             }
             else
               TIFFReadScanline(tif, in, x, 0);
@@ -1426,5 +1510,5 @@ ImageReadTIFF(image_t *img,
 
 
 /*
- * End of "$Id: image-tiff.c,v 1.4 1998/08/12 15:21:56 mike Exp $".
+ * End of "$Id: image-tiff.c,v 1.5 1998/08/14 15:18:57 mike Exp $".
  */
