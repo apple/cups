@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: configure.in,v 1.53 2000/08/29 21:23:07 mike Exp $"
+dnl "$Id: configure.in,v 1.54 2000/09/14 15:36:25 mike Exp $"
 dnl
 dnl   Configuration script for the Common UNIX Printing System (CUPS).
 dnl
@@ -144,9 +144,21 @@ dnl Architecture checks...
 AC_C_BIGENDIAN
 
 dnl Check for libraries...
-AC_CHECK_LIB(c,crypt,LIBS="$LIBS",AC_CHECK_LIB(crypt,crypt))
-AC_CHECK_HEADER(crypt.h, AC_DEFINE(HAVE_CRYPT_H))
+AC_CHECK_LIB(c,crypt,LIBS="$LIBS")
+if test "$ac_cv_lib_c_crypt" = "no"; then
+	AC_CHECK_LIB(crypt,crypt)
+fi
 AC_CHECK_LIB(sec,getspent)
+
+LIBMALLOC=""
+AC_CHECK_LIB(c,mallinfo,LIBS="$LIBS",LIBS="$LIBS")
+if test "$ac_cv_lib_c_mallinfo" = "no"; then
+	AC_CHECK_LIB(malloc,mallinfo,
+	             LIBS="$LIBS";LIBMALLOC="-lmalloc",
+		     LIBS="$LIBS")
+fi
+AC_SUBST(LIBMALLOC)
+
 if test "$enable_pam" != "no"; then
 	OLDLIBS="$LIBS"
 	AC_CHECK_LIB(dl,dlopen)
@@ -217,7 +229,11 @@ LIBS="$SAVELIBS"
 dnl Checks for header files.
 AC_HEADER_STDC
 AC_HEADER_DIRENT
+AC_CHECK_HEADER(crypt.h,AC_DEFINE(HAVE_CRYPT_H))
+AC_CHECK_HEADER(malloc.h,AC_DEFINE(HAVE_MALLOC_H))
 AC_CHECK_HEADER(shadow.h,AC_DEFINE(HAVE_SHADOW_H))
+AC_CHECK_HEADER(stddef.h,AC_DEFINE(HAVE_STDDEF_H))
+AC_CHECK_HEADER(stdlib.h,AC_DEFINE(HAVE_STDLIB_H))
 
 dnl Checks for string functions.
 AC_CHECK_FUNCS(strdup)
@@ -537,5 +553,5 @@ AC_DEFINE_UNQUOTED(CUPS_FONTPATH, "$fontpath")
 AC_OUTPUT(Makedefs cups.sh)
 
 dnl
-dnl End of "$Id: configure.in,v 1.53 2000/08/29 21:23:07 mike Exp $".
+dnl End of "$Id: configure.in,v 1.54 2000/09/14 15:36:25 mike Exp $".
 dnl

@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c,v 1.43 2000/09/07 20:33:21 mike Exp $"
+ * "$Id: main.c,v 1.44 2000/09/14 15:36:26 mike Exp $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -38,6 +38,10 @@
 #include "cupsd.h"
 #include <sys/resource.h>
 #include <syslog.h>
+
+#if defined(HAVE_MALLOC_H) && defined(HAVE_LIBMALLOC)
+#  include <malloc.h>
+#endif /* HAVE_MALLOC_H && HAVE_LIBMALLOC */
 
 
 /*
@@ -422,11 +426,29 @@ main(int  argc,			/* I - Number of command-line arguments */
     }
 
    /*
-    * Update the root certificate once every 5 minutes...
+    * Update the root certificate and log memory usage once every 5 minutes...
     */
 
     if ((time(NULL) - RootCertTime) >= 300)
     {
+#if defined(HAVE_MALLOC_H) && defined(HAVE_LIBMALLOC)
+      struct mallinfo mem;	/* Malloc information */
+
+
+     /*
+      * Log memory usage...
+      */
+
+      mem = mallinfo();
+      LogMessage(L_DEBUG, "mallinfo: arena = %d, used = %d, free = %d\n",
+                 mem.arena, mem.usmblks + mem.uordblks,
+		 mem.fsmblks + mem.fordblks);
+#endif /* HAVE_MALLOC_H && HAVE_LIBMALLOC */
+
+     /*
+      * Update the root certificate...
+      */
+
       DeleteCert(0);
       AddCert(0, "root");
     }
@@ -625,5 +647,5 @@ usage(void)
 
 
 /*
- * End of "$Id: main.c,v 1.43 2000/09/07 20:33:21 mike Exp $".
+ * End of "$Id: main.c,v 1.44 2000/09/14 15:36:26 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: config.h.in,v 1.29 2000/08/29 21:23:06 mike Exp $"
+ * "$Id: config.h.in,v 1.30 2000/09/14 15:36:24 mike Exp $"
  *
  *   Configuration file for the Common UNIX Printing System (CUPS).
  *
@@ -124,5 +124,12 @@
 #undef HAVE_WAIT3
 
 /*
- * End of "$Id: config.h.in,v 1.29 2000/08/29 21:23:06 mike Exp $".
+ * Do we have the mallinfo function in libmalloc and malloc.h?
+ */
+
+#undef HAVE_LIBMALLOC
+#undef HAVE_MALLOC_H
+
+/*
+ * End of "$Id: config.h.in,v 1.30 2000/09/14 15:36:24 mike Exp $".
  */
