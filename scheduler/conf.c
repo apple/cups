@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.29 1999/09/18 12:08:05 mike Exp $"
+ * "$Id: conf.c,v 1.30 1999/09/18 12:38:10 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -1154,6 +1154,8 @@ get_address(char               *value,		/* I - Value string */
 	  strcpy(portname, hostname);
 	  hostname[0] = '\0';
 	}
+        else
+          portname[0] = '\0';
         break;
     case 2 :
         break;
@@ -1174,7 +1176,8 @@ get_address(char               *value,		/* I - Value string */
     {
       if ((host = gethostbyname(hostname)) == NULL)
       {
-        perror("gethostbyname");
+        LogMessage(LOG_ERROR, "gethostbyname(\"%s\") failed - %s!", hostname,
+                   strerror(errno));
         return (0);
       }
 
@@ -1190,7 +1193,11 @@ get_address(char               *value,		/* I - Value string */
     else
     {
       if ((port = getservbyname(portname, NULL)) == NULL)
+      {
+        LogMessage(LOG_ERROR, "getservbyname(\"%s\") failed - %s!", portname,
+                   strerror(errno));
         return (0);
+      }
       else
         address->sin_port = htons(port->s_port);
     }
@@ -1201,5 +1208,5 @@ get_address(char               *value,		/* I - Value string */
 
 
 /*
- * End of "$Id: conf.c,v 1.29 1999/09/18 12:08:05 mike Exp $".
+ * End of "$Id: conf.c,v 1.30 1999/09/18 12:38:10 mike Exp $".
  */
