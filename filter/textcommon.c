@@ -1,5 +1,5 @@
 /*
- * "$Id: textcommon.c,v 1.12 2000/03/21 04:03:29 mike Exp $"
+ * "$Id: textcommon.c,v 1.13 2000/06/12 15:51:48 mike Exp $"
  *
  *   Common text filter routines for the Common UNIX Printing System (CUPS).
  *
@@ -204,8 +204,7 @@ TextMain(char *name,		/* I - Name of filter */
     LinesPerInch = 8;
   }
 
-  if ((ppd = SetCommonOptions(num_options, options, 1)) != NULL)
-    ppdClose(ppd);
+  ppd = SetCommonOptions(num_options, options, 1);
 
   WrapLines = cupsGetOption("nowrap", num_options, options) == NULL;
 
@@ -650,6 +649,9 @@ TextMain(char *name,		/* I - Name of filter */
 
   WriteEpilogue();
 
+  if (ppd != NULL)
+    ppdClose(ppd);
+
   return (0);
 }
 
@@ -742,5 +744,5 @@ getutf8(FILE *fp)	/* I - File to read from */
 
 
 /*
- * End of "$Id: textcommon.c,v 1.12 2000/03/21 04:03:29 mike Exp $".
+ * End of "$Id: textcommon.c,v 1.13 2000/06/12 15:51:48 mike Exp $".
  */

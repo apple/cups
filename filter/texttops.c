@@ -1,5 +1,5 @@
 /*
- * "$Id: texttops.c,v 1.27 2000/04/11 14:17:51 mike Exp $"
+ * "$Id: texttops.c,v 1.28 2000/06/12 15:51:49 mike Exp $"
  *
  *   Text to PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -186,7 +186,6 @@ WriteProlog(char       *title,	/* I - Title of job */
   printf("%%%%CreationDate: %s\n", curdate);
   printf("%%%%Title: %s\n", title);
   printf("%%%%For: %s\n", user);
-  puts("%%DocumentSuppliedResources: procset texttops 1.1 0");
   puts("%%Pages: (atend)");
 
  /*
@@ -650,13 +649,72 @@ WriteProlog(char       *title,	/* I - Title of job */
 
   for (i = 0; i < num_fonts; i ++)
     if (i == 0)
-      printf("%%DocumentNeededResources: font %s\n", fonts[i]);
+      printf("%%%%DocumentNeededResources: font %s\n", fonts[i]);
     else
-      printf("%%+ font %s\n", fonts[i]);
+      printf("%%%%+ font %s\n", fonts[i]);
+
+  puts("%%DocumentSuppliedResources: procset texttops 1.1 0");
+
+  for (i = 0; i < num_fonts; i ++)
+  {
+    if (ppd != NULL)
+    {
+      fprintf(stderr, "DEBUG: ppd->num_fonts = %d\n", ppd->num_fonts);
+
+      for (j = 0; j < ppd->num_fonts; j ++)
+      {
+        fprintf(stderr, "DEBUG: ppd->fonts[%d] = %s\n", j, ppd->fonts[j]);
+
+	if (strcmp(fonts[i], ppd->fonts[j]) == 0)
+          break;
+      }
+    }
+
+    if (ppd == NULL || j >= ppd->num_fonts)
+    {
+     /*
+      * Need to embed this font...
+      */
+
+      printf("%%%%+ font %s\n", fonts[i]);
+    }
+  }
 
   puts("%%EndComments");
 
   puts("%%BeginProlog");
+
+ /*
+  * Download any missing fonts...
+  */
+
+  for (i = 0; i < num_fonts; i ++)
+  {
+    if (ppd != NULL)
+      for (j = 0; j < ppd->num_fonts; j ++)
+	if (strcmp(fonts[i], ppd->fonts[j]) == 0)
+          break;
+
+    if (ppd == NULL || j >= ppd->num_fonts)
+    {
+     /*
+      * Need to embed this font...
+      */
+
+      printf("%%%%BeginResource: font %s\n", fonts[i]);
+
+      snprintf(filename, sizeof(filename), CUPS_DATADIR "/fonts/%s", fonts[i]);
+      if ((fp = fopen(filename, "rb")) != NULL)
+      {
+        while (fgets(line, sizeof(line), fp) != NULL)
+	  fputs(line, stdout);
+
+	fclose(fp);
+      }
+
+      puts("%%EndResource");
+    }
+  }
 
  /*
   * Write the encoding array(s)...
@@ -1201,5 +1259,5 @@ write_text(char *s)	/* I - String to write */
 
 
 /*
- * End of "$Id: texttops.c,v 1.27 2000/04/11 14:17:51 mike Exp $".
+ * End of "$Id: texttops.c,v 1.28 2000/06/12 15:51:49 mike Exp $".
  */
