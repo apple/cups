@@ -1,5 +1,5 @@
 /*
- * "$Id: usb.c,v 1.17 2001/02/08 18:41:05 mike Exp $"
+ * "$Id: usb.c,v 1.18 2001/02/08 18:46:00 mike Exp $"
  *
  *   USB port backend for the Common UNIX Printing System (CUPS).
  *
@@ -413,7 +413,6 @@ list_devices(void)
       printf("direct usb:%s \"Unknown\" \"USB Port #%d\"\n", device, i + 1);
     }
   }
-#endif
 #elif defined(__NetBSD__) || defined(__OpenBSD__)
   int   i;                      /* Looping var */
   int   fd;                     /* File descriptor */
@@ -434,5 +433,5 @@ list_devices(void)
 
 
 /*
- * End of "$Id: usb.c,v 1.17 2001/02/08 18:41:05 mike Exp $".
+ * End of "$Id: usb.c,v 1.18 2001/02/08 18:46:00 mike Exp $".
  */
