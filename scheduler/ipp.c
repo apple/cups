@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.61 2000/04/10 16:28:57 mike Exp $"
+ * "$Id: ipp.c,v 1.62 2000/04/26 20:47:08 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -37,6 +37,8 @@
  *   cancel_job()                - Cancel a print job.
  *   copy_attrs()                - Copy attributes from one request to another.
  *   create_job()                - Print a file to a printer or class.
+ *   copy_banner()               - Copy a banner file to the requests directory
+ *                                 for the specified job.
  *   copy_file()                 - Copy a PPD file or interface script...
  *   delete_printer()            - Remove a printer or class from the system.
  *   get_default()               - Get the default destination.
@@ -90,6 +92,7 @@ static void	cancel_all_jobs(client_t *con, ipp_attribute_t *uri);
 static void	cancel_job(client_t *con, ipp_attribute_t *uri);
 static void	copy_attrs(ipp_t *to, ipp_t *from, ipp_attribute_t *req,
 		           ipp_tag_t group);
+static void	copy_banner(client_t *con, job_t *job, const char *name);
 static int	copy_file(const char *from, const char *to);
 static void	create_job(client_t *con, ipp_attribute_t *uri);
 static void	delete_printer(client_t *con, ipp_attribute_t *uri);
@@ -1538,8 +1541,6 @@ create_job(client_t        *con,	/* I - Client connection */
 					/* Resource portion of URI */
   int			port;		/* Port portion of URI */
   printer_t		*printer;	/* Printer data */
-  char			filename[1024];	/* Banner filename */
-  banner_t		*banner;	/* Banner file */
 
 
   DEBUG_printf(("create_job(%08x, %08x)\n", con, uri));
@@ -1664,6 +1665,18 @@ create_job(client_t        *con,	/* I - Client connection */
                        "time-at-completed", 0);
   attr->value_tag = IPP_TAG_NOVALUE;
 
+ /*
+  * Add remaining job attributes...
+  */
+
+  ippAddInteger(job->attrs, IPP_TAG_JOB, IPP_TAG_INTEGER, "job-id", job->id);
+  job->state = ippAddInteger(job->attrs, IPP_TAG_JOB, IPP_TAG_ENUM,
+                             "job-state", IPP_JOB_STOPPED);
+  ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_URI, "job-printer-uri", NULL,
+               printer_uri);
+  ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_NAME, "job-name", NULL,
+               title);
+
   if (!(printer->type & CUPS_PRINTER_REMOTE))
   {
    /*
@@ -1686,37 +1699,17 @@ create_job(client_t        *con,	/* I - Client connection */
     * See if we need to add the starting sheet...
     */
 
-    if (strcasecmp(attr->values[0].string.text, "none") != 0 &&
-        (banner = FindBanner(attr->values[0].string.text)) != NULL)
-    {
-     /*
-      * Yes...
-      */
-
-      if (add_file(con, job, banner->filetype))
-        return;
-
-      sprintf(filename, "%s/d%05d-%03d", RequestRoot, job->id, job->num_files);
-      symlink(banner->filename, filename);
-    }
+    copy_banner(con, job, attr->values[0].string.text);
   }
+
+ /*
+  * Save and log the job...
+  */
    
   SaveJob(job->id);
 
   LogMessage(L_INFO, "Job %d created on \'%s\' by \'%s\'.", job->id,
              job->dest, job->username);
-
- /*
-  * Add remaining job attributes...
-  */
-
-  ippAddInteger(job->attrs, IPP_TAG_JOB, IPP_TAG_INTEGER, "job-id", job->id);
-  job->state = ippAddInteger(job->attrs, IPP_TAG_JOB, IPP_TAG_ENUM,
-                             "job-state", IPP_JOB_STOPPED);
-  ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_URI, "job-printer-uri", NULL,
-               printer_uri);
-  ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_NAME, "job-name", NULL,
-               title);
 
  /*
   * Fill in the response info...
@@ -1732,6 +1725,149 @@ create_job(client_t        *con,	/* I - Client connection */
                 job->state->values[0].integer);
 
   con->response->request.status.status_code = IPP_OK;
+}
+
+
+/*
+ * 'copy_banner()' - Copy a banner file to the requests directory for the
+ *                   specified job.
+ */
+
+static void
+copy_banner(client_t   *con,	/* I - Client connection */
+            job_t      *job,	/* I - Job information */
+            const char *name)	/* I - Name of banner */
+{
+  int		i;		/* Looping var */
+  char		filename[1024];	/* Job filename */
+  banner_t	*banner;	/* Pointer to banner */
+  FILE		*in;		/* Input file */
+  FILE		*out;		/* Output file */
+  int		ch;		/* Character from file */
+  char		attrname[255],	/* Name of attribute */
+		*s;		/* Pointer into name */
+  ipp_attribute_t *attr;	/* Attribute */
+
+
+ /*
+  * Find the banner; return if not found or "none"...
+  */
+
+  if (name == NULL ||
+      strcmp(name, "none") == 0 ||
+      (banner = FindBanner(name)) == NULL)
+    return;
+
+ /*
+  * Open the banner and job files...
+  */
+
+  if (add_file(con, job, banner->filetype))
+    return;
+
+  sprintf(filename, "%s/d%05d-%03d", RequestRoot, job->id, job->num_files);
+  if ((out = fopen(filename, "w")) == NULL)
+  {
+    LogMessage(L_ERROR, "copy_banner: Unable to create banner job file %s - %s",
+               filename, strerror(errno));
+    job->num_files --;
+    return;
+  }
+
+  if ((in = fopen(banner->filename, "r")) == NULL)
+  {
+    fclose(out);
+    unlink(filename);
+    LogMessage(L_ERROR, "copy_banner: Unable to open banner template file %s - %s",
+               filename, strerror(errno));
+    job->num_files --;
+    return;
+  }
+
+ /*
+  * Parse the file to the end...
+  */
+
+  while ((ch = getc(in)) != EOF)
+    if (ch == '{')
+    {
+     /*
+      * Get an attribute name...
+      */
+
+      for (s = attrname; (ch = getc(in)) != EOF;)
+        if (ch == '}')
+          break;
+	else if (s < (attrname + sizeof(attrname) - 1))
+          *s++ = ch;
+
+      *s = '\0';
+
+     /*
+      * See if it is defined...
+      */
+
+      if ((attr = ippFindAttribute(job->attrs, attrname, IPP_TAG_ZERO)) == NULL)
+        continue; /* Nope */
+
+     /*
+      * Output value(s)...
+      */
+
+      for (i = 0; i < attr->num_values; i ++)
+      {
+	if (i)
+	  putc(',', out);
+
+	switch (attr->value_tag)
+	{
+	  case IPP_TAG_INTEGER :
+	  case IPP_TAG_ENUM :
+	      fprintf(out, "%d", attr->values[i].integer);
+	      break;
+
+	  case IPP_TAG_BOOLEAN :
+	      fprintf(out, "%d", attr->values[i].boolean);
+	      break;
+
+	  case IPP_TAG_NOVALUE :
+	      fputs("novalue", out);
+	      break;
+
+	  case IPP_TAG_RANGE :
+	      fprintf(out, "%d-%d", attr->values[i].range.lower,
+		      attr->values[i].range.upper);
+	      break;
+
+	  case IPP_TAG_RESOLUTION :
+	      fprintf(out, "%dx%d%s", attr->values[i].resolution.xres,
+		      attr->values[i].resolution.yres,
+		      attr->values[i].resolution.units == IPP_RES_PER_INCH ?
+			  "dpi" : "dpc");
+	      break;
+
+	  case IPP_TAG_URI :
+          case IPP_TAG_STRING :
+	  case IPP_TAG_TEXT :
+	  case IPP_TAG_NAME :
+	  case IPP_TAG_KEYWORD :
+	  case IPP_TAG_CHARSET :
+	  case IPP_TAG_LANGUAGE :
+	      fputs(attr->values[i].string.text, out);
+	      break;
+
+          default :
+	      break; /* anti-compiler-warning-code */
+	}
+      }
+    }
+    else if (ch == '\\')	/* Quoted char */
+      putc(getc(in), out);
+    else
+      putc(ch, out);
+
+  fclose(in);
+  fclose(out);
 }
 
 
@@ -2862,7 +2998,6 @@ print_job(client_t        *con,		/* I - Client connection */
 			mimetype[MIME_MAX_SUPER + MIME_MAX_TYPE + 2];
 					/* Textual name of mime type */
   printer_t		*printer;	/* Printer data */
-  banner_t		*banner;	/* Current banner */
 
 
   DEBUG_printf(("print_job(%08x, %08x)\n", con, uri));
@@ -3052,93 +3187,6 @@ print_job(client_t        *con,		/* I - Client connection */
   job->attrs   = con->request;
   con->request = NULL;
 
-  if (!(printer->type & CUPS_PRINTER_REMOTE))
-  {
-   /*
-    * Add job sheets options...
-    */
-
-    if ((attr = ippFindAttribute(job->attrs, "job-sheets", IPP_TAG_NAME)) == NULL)
-      if ((attr = ippFindAttribute(job->attrs, "job-sheets", IPP_TAG_KEYWORD)) != NULL)
-        attr->value_tag = IPP_TAG_NAME;
-
-    if (attr == NULL)
-    {
-      attr = ippAddStrings(job->attrs, IPP_TAG_JOB, IPP_TAG_NAME, "job-sheets",
-                           2, NULL, NULL);
-      attr->values[0].string.text = strdup(printer->job_sheets[0]);
-      attr->values[1].string.text = strdup(printer->job_sheets[1]);
-    }
-
-   /*
-    * See if we need to add the starting sheet...
-    */
-
-    if (strcasecmp(attr->values[0].string.text, "none") != 0 &&
-        (banner = FindBanner(attr->values[0].string.text)) != NULL)
-    {
-     /*
-      * Yes...
-      */
-
-      if (add_file(con, job, banner->filetype))
-        return;
-
-      sprintf(filename, "%s/d%05d-%03d", RequestRoot, job->id, job->num_files);
-      symlink(banner->filename, filename);
-    }
-  }
-   
- /*
-  * See if we need to add the starting sheet...
-  */
-
-  if (strcasecmp(attr->values[0].string.text, "none") != 0 &&
-      (banner = FindBanner(attr->values[0].string.text)) != NULL)
-  {
-   /*
-    * Yes...
-    */
-
-    if (add_file(con, job, banner->filetype))
-      return;
-
-    sprintf(filename, "%s/d%05d-%03d", RequestRoot, job->id, job->num_files);
-    symlink(banner->filename, filename);
-  }
-
- /*
-  * Add the job file...
-  */
-
-  if (add_file(con, job, filetype))
-    return;
-
-  sprintf(filename, "%s/d%05d-%03d", RequestRoot, job->id, job->num_files);
-  rename(con->filename, filename);
-
- /*
-  * See if we need to add the ending sheet...
-  */
-
-  if (!(printer->type & CUPS_PRINTER_REMOTE))
-  {
-    if (attr->num_values > 1 &&
-	strcasecmp(attr->values[1].string.text, "none") != 0 &&
-	(banner = FindBanner(attr->values[1].string.text)) != NULL)
-    {
-     /*
-      * Yes...
-      */
-
-      if (add_file(con, job, banner->filetype))
-	return;
-
-      sprintf(filename, "%s/d%05d-%03d", RequestRoot, job->id, job->num_files);
-      symlink(banner->filename, filename);
-    }
-  }
-
  /*
   * Copy the rest of the job info...
   */
@@ -3172,9 +3220,6 @@ print_job(client_t        *con,		/* I - Client connection */
     attr->name = strdup("job-originating-user-name");
   }
 
-  LogMessage(L_INFO, "Job %d queued on \'%s\' by \'%s\'.", job->id,
-             job->dest, job->username);
-
  /*
   * Add remaining job attributes...
   */
@@ -3195,6 +3240,61 @@ print_job(client_t        *con,		/* I - Client connection */
   attr = ippAddInteger(job->attrs, IPP_TAG_JOB, IPP_TAG_INTEGER,
                        "time-at-completed", 0);
   attr->value_tag = IPP_TAG_NOVALUE;
+
+  if (!(printer->type & CUPS_PRINTER_REMOTE))
+  {
+   /*
+    * Add job sheets options...
+    */
+
+    if ((attr = ippFindAttribute(job->attrs, "job-sheets", IPP_TAG_NAME)) == NULL)
+      if ((attr = ippFindAttribute(job->attrs, "job-sheets", IPP_TAG_KEYWORD)) != NULL)
+        attr->value_tag = IPP_TAG_NAME;
+
+    if (attr == NULL)
+    {
+      attr = ippAddStrings(job->attrs, IPP_TAG_JOB, IPP_TAG_NAME, "job-sheets",
+                           2, NULL, NULL);
+      attr->values[0].string.text = strdup(printer->job_sheets[0]);
+      attr->values[1].string.text = strdup(printer->job_sheets[1]);
+    }
+
+   /*
+    * Add the starting sheet...
+    */
+
+    copy_banner(con, job, attr->values[0].string.text);
+  }
+   
+ /*
+  * Add the job file...
+  */
+
+  if (add_file(con, job, filetype))
+    return;
+
+  sprintf(filename, "%s/d%05d-%03d", RequestRoot, job->id, job->num_files);
+  rename(con->filename, filename);
+
+ /*
+  * See if we need to add the ending sheet...
+  */
+
+  if (!(printer->type & CUPS_PRINTER_REMOTE) && attr->num_values > 1)
+  {
+   /*
+    * Yes...
+    */
+
+    copy_banner(con, job, attr->values[1].string.text);
+  }
+
+ /*
+  * Log and save the job...
+  */
+
+  LogMessage(L_INFO, "Job %d queued on \'%s\' by \'%s\'.", job->id,
+             job->dest, job->username);
 
   SaveJob(job->id);
 
@@ -3721,7 +3821,6 @@ send_document(client_t        *con,	/* I - Client connection */
   struct group		*group;		/* System group info */
   char			filename[1024];	/* Job filename */
   printer_t		*printer;	/* Current printer */
-  banner_t		*banner;	/* Current banner */
 
 
   DEBUG_printf(("send_document(%08x, %08x)\n", con, uri));
@@ -3981,19 +4080,13 @@ send_document(client_t        *con,	/* I - Client connection */
 
     if (printer != NULL && !(printer->type & CUPS_PRINTER_REMOTE) &&
         (attr = ippFindAttribute(job->attrs, "job-sheets", IPP_TAG_NAME)) != NULL &&
-        attr->num_values > 1 &&
-	strcasecmp(attr->values[1].string.text, "none") != 0 &&
-	(banner = FindBanner(attr->values[1].string.text)) != NULL)
+        attr->num_values > 1)
     {
      /*
       * Yes...
       */
 
-      if (add_file(con, job, banner->filetype))
-	return;
-
-      sprintf(filename, "%s/d%05d-%03d", RequestRoot, job->id, job->num_files);
-      symlink(banner->filename, filename);
+      copy_banner(con, job, attr->values[1].string.text);
     }
 
     job->state->values[0].integer = IPP_JOB_PENDING;
@@ -4672,5 +4765,5 @@ validate_job(client_t        *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.61 2000/04/10 16:28:57 mike Exp $".
+ * End of "$Id: ipp.c,v 1.62 2000/04/26 20:47:08 mike Exp $".
  */

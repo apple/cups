@@ -1,5 +1,5 @@
 /*
- * "$Id: banners.c,v 1.1 2000/03/21 04:06:44 mike Exp $"
+ * "$Id: banners.c,v 1.2 2000/04/26 20:47:08 mike Exp $"
  *
  *   Banner routines for the Common UNIX Printing System (CUPS).
  *
@@ -212,8 +212,6 @@ compare(const banner_t *b0,	/* I - First banner */
 }
 
 
-
-
 /*
- * End of "$Id: banners.c,v 1.1 2000/03/21 04:06:44 mike Exp $".
+ * End of "$Id: banners.c,v 1.2 2000/04/26 20:47:08 mike Exp $".
  */
