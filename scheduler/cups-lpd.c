@@ -1,5 +1,5 @@
 /*
- * "$Id: cups-lpd.c,v 1.9 2000/08/29 17:01:46 mike Exp $"
+ * "$Id: cups-lpd.c,v 1.10 2000/08/29 18:41:21 mike Exp $"
  *
  *   Line Printer Daemon interface for the Common UNIX Printing System (CUPS).
  *
@@ -84,7 +84,6 @@ main(int  argc,			/* I - Number of command-line arguments */
      char *argv[])		/* I - Command-line arguments */
 {
   int		i;		/* Looping var */
-  char		*opt;		/* Option character */
   int		num_defaults;	/* Number of default options */
   cups_option_t	*defaults;	/* Default options */
   char		line[1024],	/* Command string */
@@ -117,20 +116,25 @@ main(int  argc,			/* I - Number of command-line arguments */
   for (i = 1; i < argc; i ++)
     if (argv[i][0] == '-')
     {
-      for (opt = argv[i] + 1; *opt; opt ++)
-        switch (*opt)
-	{
-	  case 'o' : /* Option */
+      switch (argv[i][1])
+      {
+	case 'o' : /* Option */
+	    if (argv[i][2])
+	      num_defaults = cupsParseOptions(argv[i] + 2, num_defaults,
+	                                      &defaults);
+	    else
+	    {
 	      i ++;
 	      if (i < argc)
-	        num_defaults = cupsParseOptions(argv[i], num_defaults, &defaults);
+		num_defaults = cupsParseOptions(argv[i], num_defaults, &defaults);
               else
-                syslog(LOG_WARNING, "Expected option string after -o option!");
-	      break;
-	  default :
-	      syslog(LOG_WARNING, "Unknown option \"%c\" ignored!", *opt);
-	      break;
-	}
+        	syslog(LOG_WARNING, "Expected option string after -o option!");
+            }
+	    break;
+	default :
+	    syslog(LOG_WARNING, "Unknown option \"%c\" ignored!", *opt);
+	    break;
+      }
     }
     else
       syslog(LOG_WARNING, "Unknown command-line option \"%s\" ignored!", argv[i]);
@@ -1185,5 +1189,5 @@ remove_jobs(const char *dest,		/* I - Destination */
 
 
 /*
- * End of "$Id: cups-lpd.c,v 1.9 2000/08/29 17:01:46 mike Exp $".
+ * End of "$Id: cups-lpd.c,v 1.10 2000/08/29 18:41:21 mike Exp $".
  */
