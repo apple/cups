@@ -1,14 +1,14 @@
 /*
- * "$Id: hpgl-config.c,v 1.3 1997/12/11 13:49:06 mike Exp $"
+ * "$Id: hpgl-config.c,v 1.4 1998/03/18 20:46:04 mike Exp $"
  *
  *   HPGL configuration routines for espPrint, a collection of printer drivers.
  *
- *   Copyright 1993-1996 by Easy Software Products
+ *   Copyright 1993-1998 by Easy Software Products
  *
- *   These coded instructions, statements, and computer  programs  contain
- *   unpublished  proprietary  information  of Easy Software Products, and
- *   are protected by Federal copyright law.  They may  not  be  disclosed
- *   to  third  parties  or  copied or duplicated in any form, in whole or
+ *   These coded instructions, statements, and computer programs contain
+ *   unpublished proprietary information of Easy Software Products, and
+ *   are protected by Federal copyright law. They may not be disclosed
+ *   to third parties or copied or duplicated in any form, in whole or
  *   in part, without the prior written consent of Easy Software Products.
  *
  * Contents:
@@ -16,7 +16,11 @@
  * Revision History:
  *
  *   $Log: hpgl-config.c,v $
- *   Revision 1.3  1997/12/11 13:49:06  mike
+ *   Revision 1.4  1998/03/18 20:46:04  mike
+ *   Updated to do optional page scaling.
+ *   Now support 0, 90, 180, and 270 degree rotations.
+ *
+ *   Revision 1.3  1997/12/11  13:49:06  mike
  *   Updated PS_plot_size() code - now if a single size is provide we scale
  *   to the smallest page dimension (not just the length as before).
  *
@@ -42,8 +46,45 @@ void
 update_transform(void)
 {
   float p1[2], p2[2];
-  float	transform[2][3];
+  float	width, height;
+  float	plotsize[2];
+  float	scaling[2];
 
+
+  if (FitPlot)
+  {
+    width  = PageWidth;
+    height = PageHeight;
+
+    if (Rotation == 0 || Rotation == 180)
+    {
+      scaling[0] = PageWidth / PlotSize[0];
+      scaling[1] = PageHeight / PlotSize[1];
+    }
+    else
+    {
+      scaling[0] = PageWidth / PlotSize[1];
+      scaling[1] = PageHeight / PlotSize[0];
+    };
+
+    if (scaling[0] < scaling[1])
+    {
+      plotsize[0] = PlotSize[0] * scaling[0];
+      plotsize[1] = PlotSize[1] * scaling[0];
+    }
+    else
+    {
+      plotsize[0] = PlotSize[0] * scaling[1];
+      plotsize[1] = PlotSize[1] * scaling[1];
+    };
+  }
+  else
+  {
+    width       = PlotSize[0];
+    height      = PlotSize[1];
+    plotsize[0] = PlotSize[0];
+    plotsize[1] = PlotSize[1];
+  };
 
   switch (ScalingType)
   {
@@ -75,24 +116,39 @@ update_transform(void)
   switch (Rotation)
   {
     case 0 :
-    case 180 :
-	Transform[0][0] = PlotSize[0] * PageWidth / (p2[0] - p1[0]);
+	Transform[0][0] = plotsize[0] / (p2[0] - p1[0]);
 	Transform[0][1] = 0.0;
-	Transform[0][2] = -p1[0] * PlotSize[0] * PageWidth / (p2[0] - p1[0]);
-	Transform[1][1] = 0.0;
-	Transform[1][1] = PlotSize[1] * PageHeight / (p2[1] - p1[1]);
-	Transform[1][2] = -p1[1] * PlotSize[1] * PageHeight / (p2[1] - p1[1]);
+	Transform[0][2] = p1[0] * Transform[0][0];
+	Transform[1][0] = 0.0;
+	Transform[1][1] = plotsize[1] / (p2[1] - p1[1]);
+	Transform[1][2] = p1[1] * Transform[1][1];
 	break;
 
     case 90 :
+	Transform[0][0] = 0.0;
+	Transform[0][1] = -plotsize[0] / (p2[0] - p1[0]);
+	Transform[0][2] = width + p1[0] * Transform[0][1];
+	Transform[1][0] = plotsize[1] / (p2[1] - p1[1]);
+	Transform[1][1] = 0.0;
+	Transform[1][2] = p1[1] * Transform[1][0];
+	break;
+
+    case 180 :
+	Transform[0][0] = -plotsize[0] / (p2[0] - p1[0]);
+	Transform[0][1] = 0.0;
+	Transform[0][2] = width + p1[0] * Transform[0][0];
+	Transform[1][0] = 0.0;
+	Transform[1][1] = -plotsize[1] / (p2[1] - p1[1]);
+	Transform[1][2] = height + p1[1] * Transform[1][1];
+	break;
+
     case 270 :
 	Transform[0][0] = 0.0;
-	Transform[0][1] = PlotSize[1] * PageHeight / (p2[1] - p1[1]);
-	Transform[0][2] = p1[0] * PlotSize[0] * PageWidth / (p1[0] - p2[0]);
-	Transform[1][0] = PlotSize[0] * PageWidth / (p1[0] - p2[0]);
+	Transform[0][1] = plotsize[0] / (p2[0] - p1[0]);
+	Transform[0][2] = p1[0] * Transform[0][1];
+	Transform[1][0] = -plotsize[1] / (p2[1] - p1[1]);
 	Transform[1][1] = 0.0;
-	Transform[1][2] = (PageHeight + PageTop + PageBottom) -
-	                  p1[1] * PlotSize[1] * PageHeight / (p2[1] - p1[1]);
+	Transform[1][2] = height + p1[1] * Transform[1][0];
 	break;
   };
 
@@ -157,10 +213,10 @@ IP_input_absolute(int num_params, param_t *params)
 {
   if (num_params == 0)
   {
-    P1[0] = PageLeft / 72.0 * 1016.0;
-    P1[1] = PageBottom / 72.0 * 1016.0;
-    P2[0] = (PageLeft + PageWidth) / 72.0 * 1016.0;
-    P2[1] = (PageBottom + PageHeight) / 72.0 * 1016.0;
+    P1[0] = 0.0;
+    P1[1] = 0.0;
+    P2[0] = PlotSize[0] / 72.0 * 1016.0;
+    P2[1] = PlotSize[1] / 72.0 * 1016.0;
   }
   else if (num_params == 2)
   {
@@ -231,7 +287,8 @@ PG_advance_page(int num_params, param_t *params)
   PageDirty = 0;
   fprintf(OutputFile, "%%%%Page: %d\n", PageCount);
   fputs("gsave\n", OutputFile);
-  fprintf(OutputFile, "%.1f %.1f translate\n", PageLeft, PageBottom);
+  if (FitPlot)
+    fprintf(OutputFile, "%.1f %.1f translate\n", PageLeft, PageBottom);
 }
 
 
@@ -245,42 +302,28 @@ PS_plot_size(int num_params, param_t *params)
         * This is a hack for programs that assume a DesignJet's hard limits...
         */
 
-        if (Rotation == 0 || Rotation == 180)
-        {
-          PlotSize[0] = PageWidth / (72.0 * 36.0);
-          PlotSize[1] = PageHeight / (72.0 * 48.0);
-        }
-        else
-        {
-          PlotSize[0] = PageHeight / (72.0 * 36.0);
-          PlotSize[1] = PageWidth / (72.0 * 48.0);
-        };
+        PlotSize[0] = 72.0 * 36.0;
+        PlotSize[1] = 72.0 * 48.0;
         break;
     case 1 :
-        if (PageWidth < PageHeight)
-        {
-          PlotSize[0] = PageWidth / (72.0 * params[0].value.number / 1016.0);
-          PlotSize[1] = PlotSize[0];
-        }
-        else
-        {
-          PlotSize[1] = PageHeight / (72.0 * params[0].value.number / 1016.0);
-          PlotSize[0] = PlotSize[1];
-        };
+        PlotSize[0] = 72.0 * params[0].value.number / 1016.0;
+        PlotSize[1] = PlotSize[0];
         break;
     case 2 :
         if (Rotation == 0 || Rotation == 180)
         {
-          PlotSize[0] = PageWidth / (72.0 * params[1].value.number / 1016.0);
-          PlotSize[1] = PageHeight / (72.0 * params[0].value.number / 1016.0);
+          PlotSize[0] = 72.0 * params[1].value.number / 1016.0;
+          PlotSize[1] = 72.0 * params[0].value.number / 1016.0;
         }
         else
         {
-          PlotSize[0] = PageHeight / (72.0 * params[1].value.number / 1016.0);
-          PlotSize[1] = PageWidth / (72.0 * params[0].value.number / 1016.0);
+          PlotSize[0] = 72.0 * params[0].value.number / 1016.0;
+          PlotSize[1] = 72.0 * params[1].value.number / 1016.0;
         };
         break;
   };
+
+  IP_input_absolute(0, NULL);
 
   update_transform();
 }
@@ -290,7 +333,7 @@ void
 RO_rotate(int num_params, param_t *params)
 {
   if (num_params == 0)
-    Rotation = PageRotation;
+    Rotation = 0;
   else
     Rotation = params[0].value.number;
 
@@ -328,5 +371,5 @@ SC_scale(int num_params, param_t *params)
 
 
 /*
- * End of "$Id: hpgl-config.c,v 1.3 1997/12/11 13:49:06 mike Exp $".
+ * End of "$Id: hpgl-config.c,v 1.4 1998/03/18 20:46:04 mike Exp $".
  */
