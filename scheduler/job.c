@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.184 2003/01/31 01:26:32 mike Exp $"
+ * "$Id: job.c,v 1.185 2003/02/04 05:27:23 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -1096,7 +1096,11 @@ StartJob(int       id,		/* I - Job ID */
 		title[IPP_MAX_NAME],
 				/* Job title string */
 		copies[255],	/* # copies string */
-		*envp[20],	/* Environment variables */
+		*envp[21],	/* Environment variables */
+#ifdef __APPLE__
+		processPath[1050],
+				/* CFProcessPath environment variable */
+#endif	/* __APPLE__ */
 		path[1024],	/* PATH environment variable */
 		language[255],	/* LANG environment variable */
 		charset[255],	/* CHARSET environment variable */
@@ -1625,15 +1629,20 @@ StartJob(int       id,		/* I - Job ID */
   envp[16] = nlspath;
   envp[17] = classification;
   envp[18] = class_name;
+#ifdef __APPLE__
+  envp[19] = processPath;
+  envp[20] = NULL;
+#else
   envp[19] = NULL;
+#endif	/* __APPLE__ */
 
   LogMessage(L_DEBUG, "StartJob: envp = \"%s\",\"%s\",\"%s\",\"%s\","
                       "\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\","
-		      "\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"",
+		      "\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"",
 	     envp[0], envp[1], envp[2], envp[3], envp[4],
 	     envp[5], envp[6], envp[7], envp[8], envp[9],
 	     envp[10], envp[11], envp[12], envp[13], envp[14],
-	     envp[15], envp[16], envp[17]);
+	     envp[15], envp[16], envp[17], envp[18]);
 
   current->current_file ++;
 
@@ -1690,6 +1699,16 @@ StartJob(int       id,		/* I - Job ID */
     else
       strlcpy(command, filters[i].filter, sizeof(command));
 
+#ifdef __APPLE__
+   /*
+    * Setting CFProcessPath lets OS X's Core Foundation code find
+    * the bundle that may be associated with a filter or backend.
+    */
+
+    snprintf(processPath, sizeof(processPath), "CFProcessPath=%s", command);
+    LogMessage(L_DEBUG, "StartJob: %s\n", processPath);
+#endif	/* __APPLE__ */
+
     if (i < (num_filters - 1) ||
 	strncmp(printer->device_uri, "file:", 5) != 0)
       pipe(filterfds[slot]);
@@ -1743,6 +1762,16 @@ StartJob(int       id,		/* I - Job ID */
   {
     sscanf(printer->device_uri, "%254[^:]", method);
     snprintf(command, sizeof(command), "%s/backend/%s", ServerBin, method);
+
+#ifdef __APPLE__
+   /*
+    * Setting CFProcessPath lets OS X's Core Foundation code find
+    * the bundle that may be associated with a filter or backend.
+    */
+
+    snprintf(processPath, sizeof(processPath), "CFProcessPath=%s", command);
+    LogMessage(L_DEBUG, "StartJob: %s\n", processPath);
+#endif	/* __APPLE__ */
 
     argv[0] = printer->device_uri;
 
@@ -3374,5 +3403,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.184 2003/01/31 01:26:32 mike Exp $".
+ * End of "$Id: job.c,v 1.185 2003/02/04 05:27:23 mike Exp $".
  */
