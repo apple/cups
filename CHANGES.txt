@@ -1,8 +1,10 @@
-CHANGES.txt - 02/06/2005
+CHANGES.txt - 02/18/2005
 ------------------------
 
 CHANGES IN CUPS V1.2.0b1
 
+	- Updated the Zebra ZPL label printer driver to use the
+	  run-length encoding and support more options.
 	- Updated serial backend to scan for /dev/ttyC* as well
 	  as /dev/ttyc* for Cyclades serial ports (STR #1049)
 	- The scheduler could hang reading the job status under

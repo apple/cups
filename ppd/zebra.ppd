@@ -90,21 +90,206 @@
 *Resolution 600dpi/600 DPI: "<</HWResolution[600 600]>>setpagedevice"
 *CloseUI: *Resolution
 
-*OpenUI *Darkness/Output Darkness: PickOne
+*OpenUI *zeMediaTracking/Media Tracking: PickOne
+*OrderDependency: 20 AnySetup *zeMediaTracking
+*DefaultzeMediaTracking: Web
+*zeMediaTracking Continuous: ""
+*zeMediaTracking Web/Non-continuous (Web sensing): ""
+*zeMediaTracking Mark/Non-continuous (Mark sensing): ""
+*CloseUI: *zeMediaTracking
+
+*OpenUI *MediaType/Media Type: PickOne
+*OrderDependency: 20 AnySetup *MediaType
+*DefaultMediaType: Saved
+*MediaType Saved/PrinterDefault: ""
+*MediaType Thermal/Thermal Transfer Media: "<</MediaType(Thermal)>>setpagedevice"
+*MediaType Direct/Direct Thermal Media: "<</MediaType(Direct)>>setpagedevice"
+*CloseUI: *zeMediaType
+
+*OpenUI *Darkness/Media Darkness: PickOne
 *OrderDependency: 20 AnySetup *Darkness
-*DefaultDarkness: Normal
-*Darkness Light: "<</cupsCompression 0>>setpagedevice"
-*Darkness Medium: "<</cupsCompression 33>>setpagedevice"
-*Darkness Normal: "<</cupsCompression 67>>setpagedevice"
-*Darkness Dark: "<</cupsCompression 100>>setpagedevice"
+*DefaultDarkness: -1
+*Darkness -1/PrinterDefault: "<<cupsCompression -1>>setpagedevice"
+*Darkness 1: "<</cupsCompression 4>>setpagedevice"
+*Darkness 2: "<</cupsCompression 7>>setpagedevice"
+*Darkness 3: "<</cupsCompression 10>>setpagedevice"
+*Darkness 4: "<</cupsCompression 14>>setpagedevice"
+*Darkness 5: "<</cupsCompression 17>>setpagedevice"
+*Darkness 6: "<</cupsCompression 20>>setpagedevice"
+*Darkness 7: "<</cupsCompression 24>>setpagedevice"
+*Darkness 8: "<</cupsCompression 27>>setpagedevice"
+*Darkness 9: "<</cupsCompression 30>>setpagedevice"
+*Darkness 10: "<</cupsCompression 34>>setpagedevice"
+*Darkness 11: "<</cupsCompression 37>>setpagedevice"
+*Darkness 12: "<</cupsCompression 40>>setpagedevice"
+*Darkness 13: "<</cupsCompression 44>>setpagedevice"
+*Darkness 14: "<</cupsCompression 47>>setpagedevice"
+*Darkness 15: "<</cupsCompression 50>>setpagedevice"
+*Darkness 16: "<</cupsCompression 54>>setpagedevice"
+*Darkness 17: "<</cupsCompression 57>>setpagedevice"
+*Darkness 18: "<</cupsCompression 60>>setpagedevice"
+*Darkness 19: "<</cupsCompression 64>>setpagedevice"
+*Darkness 20: "<</cupsCompression 67>>setpagedevice"
+*Darkness 21: "<</cupsCompression 70>>setpagedevice"
+*Darkness 22: "<</cupsCompression 74>>setpagedevice"
+*Darkness 23: "<</cupsCompression 77>>setpagedevice"
+*Darkness 24: "<</cupsCompression 80>>setpagedevice"
+*Darkness 25: "<</cupsCompression 84>>setpagedevice"
+*Darkness 26: "<</cupsCompression 87>>setpagedevice"
+*Darkness 27: "<</cupsCompression 90>>setpagedevice"
+*Darkness 28: "<</cupsCompression 94>>setpagedevice"
+*Darkness 29: "<</cupsCompression 97>>setpagedevice"
+*Darkness 30: "<</cupsCompression 100>>setpagedevice"
 *CloseUI: *Darkness
 
-*OpenUI *CutMedia/Cut Labels: Boolean
-*OrderDependency: 10 AnySetup *Cut
-*DefaultCutMedia: True
-*CutMedia False: "<</CutMedia 0>>setpagedevice"
-*CutMedia True: "<</CutMedia 4>>setpagedevice"
-*CloseUI: *CutMedia
+*OpenGroup: PrinterSettings/Printer Settings
+*OpenUI *zePrintRate/Print Rate: PickOne
+*OrderDependency: 20 AnySetup *zePrintRate
+*DefaultzePrintRate: Default
+*zePrintRate Default/PrinterDefault: Default
+*zePrintRate 1/1 inch/sec.: ""
+*zePrintRate 2/2 inches/sec.: ""
+*zePrintRate 3/3 inches/sec.: ""
+*zePrintRate 4/4 inches/sec.: ""
+*zePrintRate 5/5 inches/sec.: ""
+*zePrintRate 6/6 inches/sec.: ""
+*zePrintRate 7/7 inches/sec.: ""
+*zePrintRate 8/8 inches/sec.: ""
+*zePrintRate 9/9 inches/sec.: ""
+*zePrintRate 10/10 inches/sec.: ""
+*zePrintRate 11/11 inches/sec.: ""
+*zePrintRate 12/12 inches/sec.: ""
+*CloseUI: *zePrintRate
+
+*OpenUI *zeLabelTop/Label Top: PickOne
+*OrderDependency: 20 AnySetup *zeLabelTop
+*DefaultzeLabelTop: 200
+*zeLabelTop 200/PrinterDefault: "<</cupsRowStep 200>>setpagedevice"
+*zeLabelTop -120: "<</cupsRowStep -120>>setpagedevice"
+*zeLabelTop -115: "<</cupsRowStep -115>>setpagedevice"
+*zeLabelTop -110: "<</cupsRowStep -110>>setpagedevice"
+*zeLabelTop -105: "<</cupsRowStep -105>>setpagedevice"
+*zeLabelTop -100: "<</cupsRowStep -100>>setpagedevice"
+*zeLabelTop -95: "<</cupsRowStep -95>>setpagedevice"
+*zeLabelTop -90: "<</cupsRowStep -90>>setpagedevice"
+*zeLabelTop -85: "<</cupsRowStep -85>>setpagedevice"
+*zeLabelTop -80: "<</cupsRowStep -80>>setpagedevice"
+*zeLabelTop -75: "<</cupsRowStep -75>>setpagedevice"
+*zeLabelTop -70: "<</cupsRowStep -70>>setpagedevice"
+*zeLabelTop -65: "<</cupsRowStep -65>>setpagedevice"
+*zeLabelTop -60: "<</cupsRowStep -60>>setpagedevice"
+*zeLabelTop -55: "<</cupsRowStep -55>>setpagedevice"
+*zeLabelTop -50: "<</cupsRowStep -50>>setpagedevice"
+*zeLabelTop -45: "<</cupsRowStep -45>>setpagedevice"
+*zeLabelTop -40: "<</cupsRowStep -40>>setpagedevice"
+*zeLabelTop -35: "<</cupsRowStep -35>>setpagedevice"
+*zeLabelTop -30: "<</cupsRowStep -30>>setpagedevice"
+*zeLabelTop -25: "<</cupsRowStep -25>>setpagedevice"
+*zeLabelTop -20: "<</cupsRowStep -20>>setpagedevice"
+*zeLabelTop -15: "<</cupsRowStep -15>>setpagedevice"
+*zeLabelTop -10: "<</cupsRowStep -10>>setpagedevice"
+*zeLabelTop -5: "<</cupsRowStep -5>>setpagedevice"
+*zeLabelTop 0: "<</cupsRowStep 0>>setpagedevice"
+*zeLabelTop 5: "<</cupsRowStep 5>>setpagedevice"
+*zeLabelTop 10: "<</cupsRowStep 10>>setpagedevice"
+*zeLabelTop 15: "<</cupsRowStep 15>>setpagedevice"
+*zeLabelTop 20: "<</cupsRowStep 20>>setpagedevice"
+*zeLabelTop 25: "<</cupsRowStep 25>>setpagedevice"
+*zeLabelTop 30: "<</cupsRowStep 30>>setpagedevice"
+*zeLabelTop 35: "<</cupsRowStep 35>>setpagedevice"
+*zeLabelTop 40: "<</cupsRowStep 40>>setpagedevice"
+*zeLabelTop 45: "<</cupsRowStep 45>>setpagedevice"
+*zeLabelTop 50: "<</cupsRowStep 50>>setpagedevice"
+*zeLabelTop 55: "<</cupsRowStep 55>>setpagedevice"
+*zeLabelTop 60: "<</cupsRowStep 60>>setpagedevice"
+*zeLabelTop 65: "<</cupsRowStep 65>>setpagedevice"
+*zeLabelTop 70: "<</cupsRowStep 70>>setpagedevice"
+*zeLabelTop 75: "<</cupsRowStep 75>>setpagedevice"
+*zeLabelTop 80: "<</cupsRowStep 80>>setpagedevice"
+*zeLabelTop 85: "<</cupsRowStep 85>>setpagedevice"
+*zeLabelTop 90: "<</cupsRowStep 90>>setpagedevice"
+*zeLabelTop 95: "<</cupsRowStep 95>>setpagedevice"
+*zeLabelTop 100: "<</cupsRowStep 100>>setpagedevice"
+*zeLabelTop 105: "<</cupsRowStep 105>>setpagedevice"
+*zeLabelTop 110: "<</cupsRowStep 110>>setpagedevice"
+*zeLabelTop 115: "<</cupsRowStep 115>>setpagedevice"
+*zeLabelTop 120: "<</cupsRowStep 120>>setpagedevice"
+*CloseUI: *zeLabelTop
+
+*OpenUI *zePrintMode/Print Mode: PickOne
+*OrderDependency: 20 AnySetup *zePrintMode
+*DefaultzePrintMode: Saved
+*zePrintMode Saved/PrinterDefault: ""
+*zePrintMode Tear/Tear-off: ""
+*zePrintMode Peel/Peel-Off: ""
+*zePrintMode Rewind: ""
+*zePrintMode Applicator: ""
+*zePrintMode Cutter: ""
+*CloseUI: *MediaTracking
+
+*OpenUI *zeTearOffPosition/Tear-off Adjust Position: PickOne
+*OrderDependency: 20 AnySetup *zeTearOffPosition
+*DefaultzeTearOffPosition: 1000
+*zeTearOffPosition 1000/PrinterDefault: "<</AdvanceDistance 1000>>setpagedevice"
+*zeTearOffPosition -120: "<</AdvanceDistance -120>>setpagedevice"
+*zeTearOffPosition -115: "<</AdvanceDistance -115>>setpagedevice"
+*zeTearOffPosition -110: "<</AdvanceDistance -110>>setpagedevice"
+*zeTearOffPosition -105: "<</AdvanceDistance -105>>setpagedevice"
+*zeTearOffPosition -100: "<</AdvanceDistance -100>>setpagedevice"
+*zeTearOffPosition -95: "<</AdvanceDistance -95>>setpagedevice"
+*zeTearOffPosition -90: "<</AdvanceDistance -90>>setpagedevice"
+*zeTearOffPosition -85: "<</AdvanceDistance -85>>setpagedevice"
+*zeTearOffPosition -80: "<</AdvanceDistance -80>>setpagedevice"
+*zeTearOffPosition -75: "<</AdvanceDistance -75>>setpagedevice"
+*zeTearOffPosition -70: "<</AdvanceDistance -70>>setpagedevice"
+*zeTearOffPosition -65: "<</AdvanceDistance -65>>setpagedevice"
+*zeTearOffPosition -60: "<</AdvanceDistance -60>>setpagedevice"
+*zeTearOffPosition -55: "<</AdvanceDistance -55>>setpagedevice"
+*zeTearOffPosition -50: "<</AdvanceDistance -50>>setpagedevice"
+*zeTearOffPosition -45: "<</AdvanceDistance -45>>setpagedevice"
+*zeTearOffPosition -40: "<</AdvanceDistance -40>>setpagedevice"
+*zeTearOffPosition -35: "<</AdvanceDistance -35>>setpagedevice"
+*zeTearOffPosition -30: "<</AdvanceDistance -30>>setpagedevice"
+*zeTearOffPosition -25: "<</AdvanceDistance -25>>setpagedevice"
+*zeTearOffPosition -20: "<</AdvanceDistance -20>>setpagedevice"
+*zeTearOffPosition -15: "<</AdvanceDistance -15>>setpagedevice"
+*zeTearOffPosition -10: "<</AdvanceDistance -10>>setpagedevice"
+*zeTearOffPosition -5: "<</AdvanceDistance -5>>setpagedevice"
+*zeTearOffPosition 0: "<</AdvanceDistance 0>>setpagedevice"
+*zeTearOffPosition 5: "<</AdvanceDistance 5>>setpagedevice"
+*zeTearOffPosition 10: "<</AdvanceDistance 10>>setpagedevice"
+*zeTearOffPosition 15: "<</AdvanceDistance 15>>setpagedevice"
+*zeTearOffPosition 20: "<</AdvanceDistance 20>>setpagedevice"
+*zeTearOffPosition 25: "<</AdvanceDistance 25>>setpagedevice"
+*zeTearOffPosition 30: "<</AdvanceDistance 30>>setpagedevice"
+*zeTearOffPosition 35: "<</AdvanceDistance 35>>setpagedevice"
+*zeTearOffPosition 40: "<</AdvanceDistance 40>>setpagedevice"
+*zeTearOffPosition 45: "<</AdvanceDistance 45>>setpagedevice"
+*zeTearOffPosition 50: "<</AdvanceDistance 50>>setpagedevice"
+*zeTearOffPosition 55: "<</AdvanceDistance 55>>setpagedevice"
+*zeTearOffPosition 60: "<</AdvanceDistance 60>>setpagedevice"
+*zeTearOffPosition 65: "<</AdvanceDistance 65>>setpagedevice"
+*zeTearOffPosition 70: "<</AdvanceDistance 70>>setpagedevice"
+*zeTearOffPosition 75: "<</AdvanceDistance 75>>setpagedevice"
+*zeTearOffPosition 80: "<</AdvanceDistance 80>>setpagedevice"
+*zeTearOffPosition 85: "<</AdvanceDistance 85>>setpagedevice"
+*zeTearOffPosition 90: "<</AdvanceDistance 90>>setpagedevice"
+*zeTearOffPosition 95: "<</AdvanceDistance 95>>setpagedevice"
+*zeTearOffPosition 100: "<</AdvanceDistance 100>>setpagedevice"
+*zeTearOffPosition 105: "<</AdvanceDistance 105>>setpagedevice"
+*zeTearOffPosition 110: "<</AdvanceDistance 110>>setpagedevice"
+*zeTearOffPosition 115: "<</AdvanceDistance 115>>setpagedevice"
+*zeTearOffPosition 120: "<</AdvanceDistance 120>>setpagedevice"
+*CloseUI: *zeTearOffPosition
+
+*OpenUI *zeErrorReprint/Reprint After Error: PickOne
+*OrderDependency: 20 AnySetup *zeErrorReprint
+*DefaultzeErrorReprint: Saved
+*zeErrorReprint Saved/PrinterDefault: ""
+*zeErrorReprint Always: ""
+*zeErrorReprint Never: ""
+*CloseUI: *zeErrorReprint
+*CloseGroup: PrinterSettings
 
 *DefaultFont: Courier
 *Font AvantGarde-Book: Standard "(001.006S)" Standard ROM

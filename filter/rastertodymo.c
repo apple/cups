@@ -28,9 +28,9 @@
  *   Setup()        - Prepare the printer for printing.
  *   StartPage()    - Start a page of graphics.
  *   EndPage()      - Finish a page of graphics.
- *   Shutdown()     - Shutdown the printer.
  *   CancelJob()    - Cancel the current job...
  *   OutputLine()   - Output a line of graphics.
+ *   ZPLCompress()  - Output a run-length compression sequence.
  *   main()         - Main entry and processing of driver.
  */
 
@@ -75,6 +75,9 @@
  */
 
 unsigned char	*Buffer;		/* Output buffer */
+char		*CompBuffer;		/* Compression buffer */
+unsigned char	*LastBuffer;		/* Last buffer */
+int		LastSet;		/* Number of repeat characters */
 int		ModelNumber,		/* cupsModelNumber attribute */
 		Page,			/* Current page */
 		Feed,			/* Number of lines to skip */
@@ -85,11 +88,12 @@ int		ModelNumber,		/* cupsModelNumber attribute */
  * Prototypes...
  */
 
-void	Setup(void);
-void	StartPage(cups_page_header_t *header);
-void	EndPage(cups_page_header_t *header);
+void	Setup(ppd_file_t *ppd);
+void	StartPage(ppd_file_t *ppd, cups_page_header_t *header);
+void	EndPage(ppd_file_t *ppd, cups_page_header_t *header);
 void	CancelJob(int sig);
-void	OutputLine(cups_page_header_t *header, int y);
+void	OutputLine(ppd_file_t *ppd, cups_page_header_t *header, int y);
+void	ZPLCompress(char repeat_char, int repeat_count);
 
 
 /*
@@ -97,21 +101,17 @@ void	OutputLine(cups_page_header_t *header, int y);
  */
 
 void
-Setup(void)
+Setup(ppd_file_t *ppd)			/* I - PPD file */
 {
   int		i;			/* Looping var */
-  ppd_file_t	*ppd;			/* PPD file */
 
 
  /*
   * Get the model number from the PPD file...
   */
 
-  if ((ppd = ppdOpenFile(getenv("PPD"))) != NULL)
-  {
+  if (ppd)
     ModelNumber = ppd->model_number;
-    ppdClose(ppd);
-  }
 
  /*
   * Initialize based on the model number...
@@ -151,7 +151,8 @@ Setup(void)
  */
 
 void
-StartPage(cups_page_header_t *header)	/* I - Page header */
+StartPage(ppd_file_t *ppd,		/* I - PPD file */
+          cups_page_header_t *header)	/* I - Page header */
 {
   int	length;				/* Actual label length */
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
@@ -224,7 +225,8 @@ StartPage(cups_page_header_t *header)	/* I - Page header */
         * Set darkness...
 	*/
 
-	printf("~SD%02d\n", 30 * header->cupsCompression / 100);
+	if (header->cupsCompression > 0)
+	  printf("~SD%02d\n", 30 * header->cupsCompression / 100);
 
        /*
         * Start bitmap graphics...
@@ -233,6 +235,14 @@ StartPage(cups_page_header_t *header)	/* I - Page header */
         printf("~DGR:CUPS.GRF,%d,%d,\n",
 	       header->cupsHeight * header->cupsBytesPerLine,
 	       header->cupsBytesPerLine);
+
+       /*
+        * Allocate compression buffers...
+	*/
+
+	CompBuffer = malloc(2 * header->cupsBytesPerLine + 1);
+	LastBuffer = malloc(header->cupsBytesPerLine);
+	LastSet    = 0;
         break;
   }
 
@@ -250,8 +260,11 @@ StartPage(cups_page_header_t *header)	/* I - Page header */
  */
 
 void
-EndPage(cups_page_header_t *header)	/* I - Page header */
+EndPage(ppd_file_t *ppd,		/* I - PPD file */
+        cups_page_header_t *header)	/* I - Page header */
 {
+  int		val;			/* Option value */
+  ppd_choice_t	*choice;		/* Marked choice */
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
   struct sigaction action;		/* Actions for POSIX signals */
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET */
@@ -295,34 +308,129 @@ EndPage(cups_page_header_t *header)	/* I - Page header */
 	}
 
        /*
-        * Start label, set origin to 1/8,1/16", and set length...
+        * Start label...
 	*/
 
         puts("^XA");
-	printf("^LH%d,%d\n", header->HWResolution[0] / 8,
-	       header->HWResolution[1] / 16);
-	printf("^LL%d\n", header->cupsHeight);
 
        /*
-        * Cut labels if requested...
+        * Set print rate...
 	*/
 
-	if (header->CutMedia)
-	  puts("^MMC");
-	else
-	  puts("^MMT");
+	if ((choice = ppdFindMarkedChoice(ppd, "zePrintRate")) != NULL &&
+	    strcmp(choice->choice, "Default"))
+	{
+	  val = atoi(choice->choice);
+	  printf("^PR%d,%d,%d\n", val, val, val);
+	}
+
+       /*
+        * Put label home in default position (0,0)...
+        */
+
+	printf("^LH0,0\n");
+
+       /*
+        * Set media tracking...
+	*/
+
+	if (ppdIsMarked(ppd, "zeMediaTracking", "Continuous"))
+	{
+         /*
+	  * Add label length command for continuous...
+	  */
+
+	  printf("^LL%d\n", header->cupsHeight);
+	  printf("^MNN\n");
+	}
+	else if (ppdIsMarked(ppd, "zeMediaTracking", "Web"))
+          printf("^MNY\n");
+	else if (ppdIsMarked(ppd, "zeMediaTracking", "Mark"))
+	  printf("^MNM\n");
+
+       /*
+        * Set label top
+	*/
+
+	if (header->cupsRowStep != 200)
+	  printf("^LT%u\n", header->cupsRowStep);
+
+       /*
+        * Set media type...
+	*/
+
+	if (!strcmp(header->MediaType, "Thermal"))
+	  printf("^MTT\n");
+	else if (!strcmp(header->MediaType, "Direct"))
+	  printf("^MTD\n");
+
+       /*
+        * Set print mode...
+	*/
+
+	if ((choice = ppdFindMarkedChoice(ppd, "zePrintMode")) != NULL &&
+	    strcmp(choice->choice, "Saved"))
+	{
+	  printf("^MM");
+
+	  if (!strcmp(choice->choice, "Tear"))
+	    printf("T,Y\n");
+	  else if (!strcmp(choice->choice, "Peel"))
+	    printf("P,Y\n");
+	  else if (!strcmp(choice->choice, "Rewind"))
+	    printf("R,Y\n");
+	  else if (!strcmp(choice->choice, "Applicator"))
+	    printf("A,Y\n");
+	  else
+	    printf("C,Y\n");
+	}
+
+       /*
+        * Set tear-off adjust position...
+	*/
+
+	if (header->AdvanceDistance != 1000)
+	{
+	  if ((int)header->AdvanceDistance < 0)
+	    printf("~TA%04d\n", (int)header->AdvanceDistance);
+	  else
+	    printf("~TA%03d\n", (int)header->AdvanceDistance);
+	}
+
+       /*
+        * Allow for reprinting after an error...
+	*/
+
+	if (ppdIsMarked(ppd, "zeErrorReprint", "Always"))
+	  printf("^JZY\n");
+	else if (ppdIsMarked(ppd, "zeErrorReprint", "Never"))
+	  printf("^JZN\n");
+
+       /*
+        * Print multiple copies
+	*/
+
+	if (header->NumCopies > 1)
+	  printf("^PQ%d, 0, 0, N\n", header->NumCopies);
 
        /*
         * Display the label image...
 	*/
 
-	puts("~FO0,0^XGR:CUPS.GRF,1,1^FS");
+	puts("^FO0,0^XGR:CUPS.GRF,1,1^FS");
 
        /*
         * End the label and eject...
 	*/
 
         puts("^XZ");
+
+       /*
+        * Free compression buffers...
+	*/
+
+	free(CompBuffer);
+	free(LastBuffer);
         break;
   }
 
@@ -374,11 +482,17 @@ CancelJob(int sig)			/* I - Signal */
  */
 
 void
-OutputLine(cups_page_header_t *header,	/* I - Page header */
+OutputLine(ppd_file_t         *ppd,	/* I - PPD file */
+           cups_page_header_t *header,	/* I - Page header */
            int                y)	/* I - Line number */
 {
   int		i;			/* Looping var */
   unsigned char	*ptr;			/* Pointer into buffer */
+  char		*compptr;		/* Pointer into compression buffer */
+  char		repeat_char;		/* Repeated character */
+  int		repeat_count;		/* Number of repeated characters */
+  static const char *hex = "0123456789ABCDEF";
+					/* Hex digits */
 
 
   switch (ModelNumber)
@@ -436,18 +550,119 @@ OutputLine(cups_page_header_t *header,	/* I - Page header */
         break;
 
     case ZEBRA_ZPL :
-        for (i = header->cupsBytesPerLine, ptr = Buffer; i > 0; i --, ptr ++)
-	  if (!*ptr && (i == 1 || !memcmp(ptr, ptr + 1, i - 1)))
-	  {
-	    putchar(',');
-	    break;
-	  }
-	  else
-	    printf("%02X", *ptr);
+       /*
+	* Determine if this row is the same as the previous line.
+        * If so, output a ':' and return...
+        */
 
-        putchar('\n');
+        if (LastSet)
+	{
+	  if (!memcmp(Buffer, LastBuffer, header->cupsBytesPerLine))
+	  {
+	    putchar(':');
+	    return;
+	  }
+	}
+
+       /*
+        * Convert the line to hex digits...
+	*/
+
+	for (ptr = Buffer, compptr = CompBuffer, i = header->cupsBytesPerLine;
+	     i > 0;
+	     i --, ptr ++)
+        {
+	  *compptr++ = hex[*ptr >> 4];
+	  *compptr++ = hex[*ptr & 15];
+	}
+
+        *compptr = '\0';
+
+       /*
+        * Run-length compress the graphics...
+	*/
+
+	for (compptr = CompBuffer, repeat_char = CompBuffer[0], repeat_count = 1;
+	     *compptr;
+	     compptr ++)
+	  if (*compptr == repeat_char)
+	    repeat_count ++;
+	  else
+	  {
+	    ZPLCompress(repeat_char, repeat_count);
+	    repeat_char  = *compptr;
+	    repeat_count = 1;
+	  }
+
+        if (repeat_char == '0')
+	{
+	 /*
+	  * Handle 0's on the end of the line...
+	  */
+
+	  if (repeat_count & 1)
+	    putchar('0');
+
+	  putchar(',');
+	}
+	else
+	  ZPLCompress(repeat_char, repeat_count);
+
+       /*
+        * Save this line for the next round...
+	*/
+
+	memcpy(LastBuffer, Buffer, header->cupsBytesPerLine);
+	LastSet = 1;
         break;
   }
+}
+
+
+/*
+ * 'ZPLCompress()' - Output a run-length compression sequence.
+ */
+
+void
+ZPLCompress(char repeat_char,		/* I - Character to repeat */
+	    int  repeat_count)		/* I - Number of repeated characters */
+{
+  if (repeat_count > 1)
+  {
+   /*
+    * Print as many z's as possible - they are the largest denomination
+    * representing 400 characters (zC stands for 400 adjacent C's)	
+    */	
+
+    while (repeat_count >= 400)
+    {
+      putchar('z');
+      repeat_count -= 400;
+    }
+
+   /*
+    * Then print 'g' through 'y' as multiples of 20 characters...
+    */
+
+    if (repeat_count >= 20)
+    {
+      putchar('f' + repeat_count / 20);
+      repeat_count %= 20;
+    }
+
+   /*
+    * Finally, print 'G' through 'Y' as 1 through 19 characters...
+    */
+
+    if (repeat_count > 0)
+      putchar('F' + repeat_count);
+  }
+
+ /*
+  * Then the character to be repeated...
+  */
+
+  putchar(repeat_char);
 }
 
 
@@ -463,6 +678,9 @@ main(int  argc,				/* I - Number of command-line arguments */
   cups_raster_t		*ras;		/* Raster stream for printing */
   cups_page_header_t	header;		/* Page header from file */
   int			y;		/* Current line */
+  ppd_file_t		*ppd;		/* PPD file */
+  int			num_options;	/* Number of options */
+  cups_option_t		*options;	/* Options */
 
 
  /*
@@ -505,10 +723,22 @@ main(int  argc,				/* I - Number of command-line arguments */
   ras = cupsRasterOpen(fd, CUPS_RASTER_READ);
 
  /*
+  * Open the PPD file and apply options...
+  */
+
+  num_options = cupsParseOptions(argv[5], 0, &options);
+
+  if ((ppd = ppdOpenFile(getenv("PPD"))) != NULL)
+  {
+    ppdMarkDefaults(ppd);
+    cupsMarkOptions(ppd, num_options, options);
+  }
+
+ /*
   * Initialize the print device...
   */
 
-  Setup();
+  Setup(ppd);
 
  /*
   * Process pages as needed...
@@ -531,7 +761,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     * Start the page...
     */
 
-    StartPage(&header);
+    StartPage(ppd, &header);
 
    /*
     * Loop for each line on the page...
@@ -558,14 +788,14 @@ main(int  argc,				/* I - Number of command-line arguments */
       * Write it to the printer...
       */
 
-      OutputLine(&header, y);
+      OutputLine(ppd, &header, y);
     }
 
    /*
     * Eject the page...
     */
 
-    EndPage(&header);
+    EndPage(ppd, &header);
 
     if (Canceled)
       break;
@@ -578,6 +808,13 @@ main(int  argc,				/* I - Number of command-line arguments */
   cupsRasterClose(ras);
   if (fd != 0)
     close(fd);
+
+ /*
+  * Close the PPD file and free the options...
+  */
+
+  ppdClose(ppd);
+  cupsFreeOptions(num_options, options);
 
  /*
   * If no pages were printed, send an error message...
