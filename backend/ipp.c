@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.18 2000/01/25 03:50:47 mike Exp $"
+ * "$Id: ipp.c,v 1.19 2000/01/28 17:27:00 mike Exp $"
  *
  *   IPP backend for the Common UNIX Printing System (CUPS).
  *
@@ -627,6 +627,9 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
       fprintf(stderr, "PAGE: 1 %d\n", copies_sup ? atoi(argv[4]) : 1);
       copies --;
     }
+    else if (ipp_status != IPP_SERVICE_UNAVAILABLE &&
+	     ipp_status != IPP_PRINTER_BUSY)
+      break;
   }
 
  /*
@@ -653,5 +656,5 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
 
 /*
- * End of "$Id: ipp.c,v 1.18 2000/01/25 03:50:47 mike Exp $".
+ * End of "$Id: ipp.c,v 1.19 2000/01/28 17:27:00 mike Exp $".
  */
