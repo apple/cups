@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.91.2.15 2002/06/07 20:40:10 mike Exp $"
+ * "$Id: client.c,v 1.91.2.16 2002/08/21 02:06:22 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -2236,36 +2236,40 @@ install_conf_file(client_t *con)	/* I - Connection */
  * 'pipe_command()' - Pipe the output of a command to the remote client.
  */
 
-static int			/* O - Process ID */
-pipe_command(client_t *con,	/* I - Client connection */
-             int      infile,	/* I - Standard input for command */
-             int      *outfile,	/* O - Standard output for command */
-	     char     *command,	/* I - Command to run */
-	     char     *options)	/* I - Options for command */
+static int				/* O - Process ID */
+pipe_command(client_t *con,		/* I - Client connection */
+             int      infile,		/* I - Standard input for command */
+             int      *outfile,		/* O - Standard output for command */
+	     char     *command,		/* I - Command to run */
+	     char     *options)		/* I - Options for command */
 {
-  int	pid;			/* Process ID */
-  char	*commptr;		/* Command string pointer */
-  int	fd;			/* Looping var */
-  int	fds[2];			/* Pipe FDs */
-  int	argc;			/* Number of arguments */
-  int	envc;			/* Number of environment variables */
-  char	argbuf[10240],		/* Argument buffer */
-	*argv[100],		/* Argument strings */
-	*envp[100];		/* Environment variables */
-  char	lang[1024],		/* LANG env variable */
-	content_length[1024],	/* CONTENT_LENGTH env variable */
-	content_type[1024],	/* CONTENT_TYPE env variable */
-	ipp_port[1024],		/* Default listen port */
-	server_port[1024],	/* Default server port */
-	server_name[1024],	/* Default listen hostname */
-	remote_host[1024],	/* REMOTE_HOST env variable */
-	remote_user[1024],	/* REMOTE_USER env variable */
-	tmpdir[1024],		/* TMPDIR environment variable */
-	ldpath[1024],		/* LD_LIBRARY_PATH environment variable */
-	nlspath[1024],		/* NLSPATH environment variable */
-	datadir[1024],		/* CUPS_DATADIR environment variable */
-	root[1024],		/* CUPS_SERVERROOT environment variable */
-	query_string[10240];	/* QUERY_STRING env variable */
+  int		pid;			/* Process ID */
+  char		*commptr;		/* Command string pointer */
+  int		fd;			/* Looping var */
+  int		fds[2];			/* Pipe FDs */
+  int		argc;			/* Number of arguments */
+  int		envc;			/* Number of environment variables */
+  char		argbuf[10240],		/* Argument buffer */
+		*argv[100],		/* Argument strings */
+		*envp[100];		/* Environment variables */
+  char		lang[1024],		/* LANG env variable */
+		content_length[1024],	/* CONTENT_LENGTH env variable */
+		content_type[1024],	/* CONTENT_TYPE env variable */
+		ipp_port[1024],		/* Default listen port */
+		server_port[1024],	/* Default server port */
+		server_name[1024],	/* Default listen hostname */
+		remote_host[1024],	/* REMOTE_HOST env variable */
+		remote_user[1024],	/* REMOTE_USER env variable */
+		tmpdir[1024],		/* TMPDIR environment variable */
+		ldpath[1024],		/* LD_LIBRARY_PATH environment variable */
+		nlspath[1024],		/* NLSPATH environment variable */
+		datadir[1024],		/* CUPS_DATADIR environment variable */
+		root[1024],		/* CUPS_SERVERROOT environment variable */
+		query_string[10240];	/* QUERY_STRING env variable */
+#if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
+  sigset_t	oldmask,		/* POSIX signal masks */
+		newmask;
+#endif /* HAVE_SIGACTION && !HAVE_SIGSET */
 
 
  /*
@@ -2438,6 +2442,17 @@ pipe_command(client_t *con,	/* I - Client connection */
   }
 
  /*
+  * Block signals before forking...
+  */
+
+#if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
+  sigemptyset(&newmask);
+  sigaddset(&newmask, SIGTERM);
+  sigaddset(&newmask, SIGCHLD);
+  sigprocmask(SIG_BLOCK, &newmask, &oldmask);
+#endif /* HAVE_SIGACTION && !HAVE_SIGSET */
+
+ /*
   * Then execute the command...
   */
 
@@ -2531,11 +2546,15 @@ pipe_command(client_t *con,	/* I - Client connection */
     *outfile = fds[0];
     close(fds[1]);
 
+#if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
+    sigprocmask(SIG_SETMASK, &oldmask, NULL);
+#endif /* HAVE_SIGACTION && !HAVE_SIGSET */
+
     return (pid);
   }
 }
 
 
 /*
- * End of "$Id: client.c,v 1.91.2.15 2002/06/07 20:40:10 mike Exp $".
+ * End of "$Id: client.c,v 1.91.2.16 2002/08/21 02:06:22 mike Exp $".
  */

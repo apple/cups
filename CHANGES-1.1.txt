@@ -3,6 +3,10 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.16
 
+	- The scheduler now rejects jobs with copies outside the
+	  range of 1 to 100, inclusive.
+	- The scheduler didn't block signals while it processed
+	  others and when it forked processes.
 	- Updated the CUPS startup script to better support
 	  different timezones and to support the RedHat/Mandrake
 	  init script functions, if available.
