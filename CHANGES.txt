@@ -1,8 +1,10 @@
-CHANGES.txt - 05/16/2001
+CHANGES.txt - 05/18/2001
 ------------------------
 
 CHANGES IN CUPS V1.1.8
 
+	- Updated configure script to check for /etc/pam.d and
+	  to only set PAMDIR if it exists.
 	- Updated spec file to generate separate cups-pstoraster
 	  package for pstoraster.
 	- The spec file wasn't setting LOGDIR in the install.

@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: configure.in,v 1.90 2001/05/11 21:11:44 mike Exp $"
+dnl "$Id: configure.in,v 1.91 2001/05/18 17:50:24 mike Exp $"
 dnl
 dnl   Configuration script for the Common UNIX Printing System (CUPS).
 dnl
@@ -191,7 +191,9 @@ if test "$enable_pam" != "no"; then
 	AC_CHECK_LIB(dl,dlopen)
 	AC_CHECK_LIB(pam,pam_start)
 	if test "$ac_cv_lib_pam_pam_start" != "no"; then
-		PAMDIR="/etc/pam.d"
+		if test -d /etc/pam.d; then
+			PAMDIR="/etc/pam.d"
+		fi
 	else
 		PAMDIR=""
 		LIBS="$OLDLIBS"
@@ -698,5 +700,5 @@ AC_DEFINE_UNQUOTED(CUPS_FONTPATH, "$fontpath")
 AC_OUTPUT(Makedefs cups.sh)
 
 dnl
-dnl End of "$Id: configure.in,v 1.90 2001/05/11 21:11:44 mike Exp $".
+dnl End of "$Id: configure.in,v 1.91 2001/05/18 17:50:24 mike Exp $".
 dnl
