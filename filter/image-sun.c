@@ -1,5 +1,5 @@
 /*
- * "$Id: image-sun.c,v 1.8.2.3 2002/04/19 16:18:11 mike Exp $"
+ * "$Id: image-sun.c,v 1.8.2.4 2002/10/22 18:44:09 mike Exp $"
  *
  *   Sun Raster image file routines for the Common UNIX Printing System (CUPS).
  *
@@ -107,6 +107,8 @@ ImageReadSunRaster(image_t    *img,	/* IO - Image */
   * checks this) so we don't need to check the magic number again.
   */
 
+  fputs("DEBUG: Reading Sun Raster image...\n", stderr);
+
   read_unsigned(fp); /* Skip magic */
   img->xsize    = read_unsigned(fp);
   img->ysize    = read_unsigned(fp);
@@ -116,8 +118,15 @@ ImageReadSunRaster(image_t    *img,	/* IO - Image */
   /* ras_maptype*/read_unsigned(fp);
   ras_maplength = read_unsigned(fp);
 
+  fprintf(stderr, "DEBUG: ras_width=%d, ras_height=%d, ras_depth=%d, ras_type=%d, ras_maplength=%d\n",
+          img->xsize, img->ysize, ras_depth, ras_type, ras_maplength);
+
   if (ras_maplength > 0)
   {
+    memset(cmap[0], 255, sizeof(cmap[0]));
+    memset(cmap[1], 0, sizeof(cmap[1]));
+    memset(cmap[2], 0, sizeof(cmap[2]));
+
     fread(cmap[0], 1, ras_maplength / 3, fp);
     fread(cmap[1], 1, ras_maplength / 3, fp);
     fread(cmap[2], 1, ras_maplength / 3, fp);
@@ -147,6 +156,8 @@ ImageReadSunRaster(image_t    *img,	/* IO - Image */
   scanline  = malloc(scanwidth);
   run_count = 0;
   run_value = 0;
+
+  fprintf(stderr, "DEBUG: bpp=%d, scanwidth=%d\n", bpp, scanwidth);
 
   for (y = 0; y < img->ysize; y ++)
   {
@@ -271,7 +282,7 @@ ImageReadSunRaster(image_t    *img,	/* IO - Image */
       }
     }
 
-    if (bpp == 1)
+    if (ras_depth <= 8 && ras_maplength == 0)
     {
       if (img->colorspace == IMAGE_WHITE)
       {
@@ -375,5 +386,5 @@ read_unsigned(FILE *fp)	/* I - File to read from */
 
 
 /*
- * End of "$Id: image-sun.c,v 1.8.2.3 2002/04/19 16:18:11 mike Exp $".
+ * End of "$Id: image-sun.c,v 1.8.2.4 2002/10/22 18:44:09 mike Exp $".
  */
