@@ -1,5 +1,11 @@
-CHANGES.txt - 11/14/2001
+CHANGES.txt - 11/22/2001
 ------------------------
+
+CHANGES IN CUPS V1.1.13
+
+	- The cups-lpd mini-daemon now supports LPD clients that
+	  send multiple control files.
+
 
 CHANGES IN CUPS V1.1.12
 

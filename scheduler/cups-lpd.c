@@ -1,5 +1,5 @@
 /*
- * "$Id: cups-lpd.c,v 1.28 2001/10/31 01:49:13 mike Exp $"
+ * "$Id: cups-lpd.c,v 1.29 2001/11/22 13:43:46 mike Exp $"
  *
  *   Line Printer Daemon interface for the Common UNIX Printing System (CUPS).
  *
@@ -43,6 +43,8 @@
 #include <errno.h>
 #include <syslog.h>
 #include <ctype.h>
+#include <unistd.h>
+#include <fcntl.h>
 
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -419,6 +421,8 @@ recv_print_job(const char    *dest,	/* I - Destination */
   num_data = 0;
   fd       = -1;
 
+  control[0] = '\0';
+
   strncpy(queue, dest, sizeof(queue) - 1);
   queue[sizeof(queue) - 1] = '\0';
 
@@ -472,16 +476,38 @@ recv_print_job(const char    *dest,	/* I - Destination */
 	    break;
 	  }
 
-          if ((fd = cupsTempFd(control, sizeof(control))) < 0)
+          if (control[0])
 	  {
-	    syslog(LOG_ERR, "Unable to open temporary control file - %s",
-        	   strerror(errno));
-	    putchar(1);
-	    status = 1;
-	    break;
-	  }
+	   /*
+	    * Append to the existing control file - the LPD spec is
+	    * not entirely clear, but at least the OS/2 LPD code sends
+	    * multiple control files per connection...
+	    */
 
-	  strcpy(filename, control);
+	    if ((fd = open(control, O_WRONLY)) < 0)
+	    {
+	      syslog(LOG_ERR, "Unable to append to temporary control file - %s",
+        	     strerror(errno));
+	      putchar(1);
+	      status = 1;
+	      break;
+	    }
+
+	    lseek(fd, 0, SEEK_END);
+          }
+	  else
+	  {
+	    if ((fd = cupsTempFd(control, sizeof(control))) < 0)
+	    {
+	      syslog(LOG_ERR, "Unable to open temporary control file - %s",
+        	     strerror(errno));
+	      putchar(1);
+	      status = 1;
+	      break;
+	    }
+
+	    strcpy(filename, control);
+	  }
 	  break;
       case 0x03 : /* Receive data file */
           if (strlen(name) < 2)
@@ -1257,5 +1283,5 @@ smart_gets(char *s,	/* I - Pointer to line buffer */
 
 
 /*
- * End of "$Id: cups-lpd.c,v 1.28 2001/10/31 01:49:13 mike Exp $".
+ * End of "$Id: cups-lpd.c,v 1.29 2001/11/22 13:43:46 mike Exp $".
  */
