@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-sharedlibs.m4,v 1.6.2.11 2002/06/04 21:15:57 mike Exp $"
+dnl "$Id: cups-sharedlibs.m4,v 1.6.2.12 2002/06/07 21:02:56 mike Exp $"
 dnl
 dnl   Shared library support for the Common UNIX Printing System (CUPS).
 dnl
@@ -117,8 +117,8 @@ if test "$DSO" != ":"; then
 	case $uname in
                 HP-UX*)
 			# HP-UX
-                	DSOFLAGS="+b $libdir +fb $DSOFLAGS"
-                	LDFLAGS="$LDFLAGS -Wl,+b,$libdir,+fb"
+                	DSOFLAGS="+s +b $libdir $DSOFLAGS"
+                	LDFLAGS="$LDFLAGS -Wl,+s,+b,$libdir"
                 	;;
                 SunOS*)
                 	# Solaris
@@ -145,5 +145,5 @@ AC_SUBST(DSOLIBS)
 AC_SUBST(IMGLIBS)
 
 dnl
-dnl End of "$Id: cups-sharedlibs.m4,v 1.6.2.11 2002/06/04 21:15:57 mike Exp $".
+dnl End of "$Id: cups-sharedlibs.m4,v 1.6.2.12 2002/06/07 21:02:56 mike Exp $".
 dnl
