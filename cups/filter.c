@@ -1,5 +1,5 @@
 /*
- * "$Id: filter.c,v 1.5 1999/03/01 20:51:51 mike Exp $"
+ * "$Id: filter.c,v 1.6 1999/04/21 14:49:49 mike Exp $"
  *
  *   File type conversion routines for the Common UNIX Printing System (CUPS).
  *
@@ -31,6 +31,11 @@
  * Revision History:
  *
  *   $Log: filter.c,v $
+ *   Revision 1.6  1999/04/21 14:49:49  mike
+ *   cupsDoRequest() needed to retry requests when doing authorization.
+ *
+ *   mimeFilter() didn't always return the least-cost filter.
+ *
  *   Revision 1.5  1999/03/01 20:51:51  mike
  *   Code cleanup - removed extraneous semi-colons...
  *
@@ -175,7 +180,11 @@ mimeFilter(mime_t      *mime,		/* I - MIME database */
            int         *num_filters)	/* O - Number of filters to run */
 {
   int		i;			/* Looping var */
+  int		num_temp,		/* Number of temporary filters */
+		num_mintemp;		/* Current minimum */
   mime_filter_t	*temp,			/* Temporary filter */
+		*mintemp,		/* Current minimum */
+		*mincurrent,		/* Current filter for minimum */
 		*current,		/* Current filter */
 		*filters;		/* Filters to use */
 
@@ -211,6 +220,9 @@ mimeFilter(mime_t      *mime,		/* I - MIME database */
   * OK, now look for filters from the source type to any other type...
   */
 
+  num_mintemp = 100000;
+  mintemp     = NULL;
+
   for (i = mime->num_filters, current = mime->filters; i > 0; i --, current ++)
     if (current->src == src)
     {
@@ -219,30 +231,50 @@ mimeFilter(mime_t      *mime,		/* I - MIME database */
       * of this filter to the final type...
       */
 
-      if ((filters = mimeFilter(mime, current->dst, dst, num_filters)) == NULL)
+      if ((temp = mimeFilter(mime, current->dst, dst, &num_temp)) == NULL)
         continue;
 
      /*
-      * Hey, we got a match!  Add the current filter to the beginning of the
-      * filter list...
+      * Found a match; see if this one is less costly than the last (if
+      * any...)
       */
 
-      filters = (mime_filter_t *)realloc(filters, sizeof(mime_filter_t) *
-                                                  (*num_filters + 1));
-
-      if (filters == NULL)
+      if (num_temp < num_mintemp)
       {
-        *num_filters = 0;
-        continue;
+        if (mintemp != NULL)
+	  free(mintemp);
+
+	num_mintemp = num_temp;
+	mintemp     = temp;
+	mincurrent  = current;
       }
-
-      memmove(filters + 1, filters, *num_filters * sizeof(mime_filter_t));
-      memcpy(filters, current, sizeof(mime_filter_t));
-
-      (*num_filters) ++;
-
-      return (filters);
+      else
+        free(temp);
     }
+
+  if (mintemp != NULL)
+  {
+   /*
+    * Hey, we got a match!  Add the current filter to the beginning of the
+    * filter list...
+    */
+
+    filters = (mime_filter_t *)realloc(mintemp, sizeof(mime_filter_t) *
+                                                (num_mintemp + 1));
+
+    if (filters == NULL)
+    {
+      *num_filters = 0;
+      return (NULL);
+    }
+
+    memmove(filters + 1, filters, num_mintemp * sizeof(mime_filter_t));
+    memcpy(filters, mincurrent, sizeof(mime_filter_t));
+
+    *num_filters = num_mintemp + 1;
+
+    return (filters);
+  }
 
   return (NULL);
 }
@@ -293,5 +325,5 @@ lookup(mime_t      *mime,	/* I - MIME database */
 
 
 /*
- * End of "$Id: filter.c,v 1.5 1999/03/01 20:51:51 mike Exp $".
+ * End of "$Id: filter.c,v 1.6 1999/04/21 14:49:49 mike Exp $".
  */
