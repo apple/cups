@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.50 2000/06/27 20:04:56 mike Exp $"
+ * "$Id: conf.c,v 1.51 2000/06/27 21:07:10 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -86,6 +86,7 @@ static var_t	variables[] =
   { "AccessLog",	AccessLog,		VAR_STRING,	sizeof(AccessLog) },
   { "ErrorLog",		ErrorLog,		VAR_STRING,	sizeof(ErrorLog) },
   { "PageLog",		PageLog,		VAR_STRING,	sizeof(PageLog) },
+  { "DataDir",		DataDir,		VAR_STRING,	sizeof(DataDir) },
   { "DefaultCharset",	DefaultCharset,		VAR_STRING,	sizeof(DefaultCharset) },
   { "DefaultLanguage",	DefaultLanguage,	VAR_STRING,	sizeof(DefaultLanguage) },
   { "RIPCache",		RIPCache,		VAR_STRING,	sizeof(RIPCache) },
@@ -194,6 +195,7 @@ ReadConfiguration(void)
   strcpy(ServerBin, CUPS_SERVERBIN);
   strcpy(RequestRoot, CUPS_REQUESTS);
   strcpy(DocumentRoot, CUPS_DOCROOT);
+  strcpy(DataDir, CUPS_DATADIR);
   strcpy(AccessLog, CUPS_LOGDIR "/access_log");
   strcpy(ErrorLog, CUPS_LOGDIR "/error_log");
   strcpy(PageLog, CUPS_LOGDIR "/page_log");
@@ -386,7 +388,8 @@ ReadConfiguration(void)
   * Load banners...
   */
 
-  LoadBanners(CUPS_DATADIR "/banners");
+  snprintf(directory, sizeof(directory), "%s/banners", DataDir);
+  LoadBanners(directory);
 
  /*
   * Load printers and classes...
@@ -399,7 +402,8 @@ ReadConfiguration(void)
   * Load devices and PPDs...
   */
 
-  LoadPPDs(CUPS_DATADIR "/model");
+  snprintf(directory, sizeof(directory), "%s/model", DataDir);
+  LoadPPDs(directory);
 
   sprintf(directory, "%s/backend", ServerBin);
   LoadDevices(directory);
@@ -1389,5 +1393,5 @@ get_address(char               *value,		/* I - Value string */
 
 
 /*
- * End of "$Id: conf.c,v 1.50 2000/06/27 20:04:56 mike Exp $".
+ * End of "$Id: conf.c,v 1.51 2000/06/27 21:07:10 mike Exp $".
  */

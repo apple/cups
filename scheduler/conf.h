@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.h,v 1.23 2000/03/21 18:35:38 mike Exp $"
+ * "$Id: conf.h,v 1.24 2000/06/27 21:07:10 mike Exp $"
  *
  *   Configuration file definitions for the Common UNIX Printing System (CUPS)
  *   scheduler.
@@ -61,6 +61,8 @@ VAR char		ConfigurationFile[256]	VALUE(CUPS_SERVERROOT "/cupsd.conf"),
 					/* Error log filename */
 			PageLog[1024]		VALUE(CUPS_LOGDIR "/page_log"),
 					/* Page log filename */
+			DataDir[1024]		VALUE(CUPS_DATADIR),
+					/* Data file directory */
 			DefaultLanguage[32]	VALUE("C"),
 					/* Default language encoding */
 			DefaultCharset[32]	VALUE(DEFAULT_CHARSET),
@@ -114,5 +116,5 @@ extern int	LogPage(job_t *job, const char *page);
 
 
 /*
- * End of "$Id: conf.h,v 1.23 2000/03/21 18:35:38 mike Exp $".
+ * End of "$Id: conf.h,v 1.24 2000/06/27 21:07:10 mike Exp $".
  */

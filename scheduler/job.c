@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.73 2000/06/02 18:24:46 mike Exp $"
+ * "$Id: job.c,v 1.74 2000/06/27 21:07:11 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -891,7 +891,7 @@ StartJob(int       id,		/* I - Job ID */
 				/* Job title string */
 		copies[255],	/* # copies string */
 		options[16384],	/* Full list of options */
-		*envp[15],	/* Environment variables */
+		*envp[20],	/* Environment variables */
 		language[255],	/* LANG environment variable */
 		charset[255],	/* CHARSET environment variable */
 		content_type[255],/* CONTENT_TYPE environment variable */
@@ -900,7 +900,9 @@ StartJob(int       id,		/* I - Job ID */
 		printer_name[255],/* PRINTER environment variable */
 		root[1024],	/* SERVER_ROOT environment variable */
 		cache[255],	/* RIP_MAX_CACHE environment variable */
-		tmpdir[1024];	/* TMPDIR environment variable */
+		tmpdir[1024],	/* TMPDIR environment variable */
+		ldpath[1024],	/* LD_LIBRARY_PATH environment variable */
+		datadir[1024];	/* DATADIR environment variable */
 
 
   DEBUG_printf(("StartJob(%d, %08x)\n", id, printer));
@@ -1147,12 +1149,18 @@ StartJob(int       id,		/* I - Job ID */
   sprintf(content_type, "CONTENT_TYPE=%s/%s",
           current->filetypes[current->current_file]->super,
           current->filetypes[current->current_file]->type);
-  sprintf(device_uri, "DEVICE_URI=%s", printer->device_uri);
-  sprintf(ppd, "PPD=%s/ppd/%s.ppd", ServerRoot, printer->name);
+  snprintf(device_uri, sizeof(device_uri), "DEVICE_URI=%s", printer->device_uri);
+  snprintf(ppd, sizeof(ppd), "PPD=%s/ppd/%s.ppd", ServerRoot, printer->name);
   sprintf(printer_name, "PRINTER=%s", printer->name);
-  sprintf(cache, "RIP_MAX_CACHE=%s", RIPCache);
-  sprintf(root, "SERVER_ROOT=%s", ServerRoot);
-  sprintf(tmpdir, "TMPDIR=%s", TempDir);
+  snprintf(cache, sizeof(cache), "RIP_MAX_CACHE=%s", RIPCache);
+  snprintf(root, sizeof(root), "SERVER_ROOT=%s", ServerRoot);
+  snprintf(tmpdir, sizeof(tmpdir), "TMPDIR=%s", TempDir);
+  snprintf(datadir, sizeof(datadir), "DATADIR=%s", DataDir);
+
+  if (getenv("LD_LIBRARY_PATH") != NULL)
+    snprintf(ldpath, sizeof(ldpath), "LD_LIBRARY_PATH=%s", getenv("LD_LIBRARY_PATH"));
+  else
+    ldpath[0] = '\0';
 
   envp[0]  = "PATH=/bin:/usr/bin";
   envp[1]  = "SOFTWARE=CUPS/1.1";
@@ -1168,7 +1176,9 @@ StartJob(int       id,		/* I - Job ID */
   envp[11] = content_type;
   envp[12] = device_uri;
   envp[13] = printer_name;
-  envp[14] = NULL;
+  envp[14] = ldpath;
+  envp[15] = datadir;
+  envp[16] = NULL;
 
   DEBUG_puts(envp[0]);
   DEBUG_puts(envp[1]);
@@ -2511,5 +2521,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.73 2000/06/02 18:24:46 mike Exp $".
+ * End of "$Id: job.c,v 1.74 2000/06/27 21:07:11 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.58 2000/05/17 17:16:48 mike Exp $"
+ * "$Id: client.c,v 1.59 2000/06/27 21:07:10 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -1549,20 +1549,23 @@ pipe_command(client_t *con,	/* I - Client connection */
   char	*commptr;		/* Command string pointer */
   int	fds[2];			/* Pipe FDs */
   int	argc;			/* Number of arguments */
+  int	envc;			/* Number of environment variables */
   char	argbuf[10240],		/* Argument buffer */
 	*argv[100],		/* Argument strings */
 	*envp[100];		/* Environment variables */
-  char	hostname[1024];		/* Hostname string */
-  static char	lang[1024];		/* LANG env variable */
-  static char	content_length[1024];	/* CONTENT_LENGTH env variable */
-  static char	content_type[1024];	/* CONTENT_TYPE env variable */
-  static char	ipp_port[1024];		/* Default listen port */
-  static char	server_port[1024];	/* Default listen port */
-  static char	server_name[1024];	/* Default listen hostname */
-  static char	remote_host[1024];	/* REMOTE_HOST env variable */
-  static char	remote_user[1024];	/* REMOTE_HOST env variable */
-  static char	tmpdir[1024];		/* TMPDIR env variable */
-  static char	query_string[10240];	/* QUERY_STRING env variable */
+  char	hostname[1024],		/* Hostname string */
+	lang[1024],		/* LANG env variable */
+	content_length[1024],	/* CONTENT_LENGTH env variable */
+	content_type[1024],	/* CONTENT_TYPE env variable */
+	ipp_port[1024],		/* Default listen port */
+	server_port[1024],	/* Default listen port */
+	server_name[1024],	/* Default listen hostname */
+	remote_host[1024],	/* REMOTE_HOST env variable */
+	remote_user[1024],	/* REMOTE_HOST env variable */
+	tmpdir[1024],		/* TMPDIR environment variable */
+	ldpath[1024],		/* LD_LIBRARY_PATH environment variable */
+	datadir[1024],		/* DATADIR environment variable */
+	query_string[10240];	/* QUERY_STRING env variable */
 
 
  /*
@@ -1626,10 +1629,16 @@ pipe_command(client_t *con,	/* I - Client connection */
   sprintf(lang, "LANG=%s", con->language ? con->language->language : "C");
   sprintf(ipp_port, "IPP_PORT=%d", ntohs(con->http.hostaddr.sin_port));
   sprintf(server_port, "SERVER_PORT=%d", ntohs(con->http.hostaddr.sin_port));
-  sprintf(server_name, "SERVER_NAME=%s", hostname);
-  sprintf(remote_host, "REMOTE_HOST=%s", con->http.hostname);
-  sprintf(remote_user, "REMOTE_USER=%s", con->username);
-  sprintf(tmpdir, "TMPDIR=%s", TempDir);
+  snprintf(server_name, sizeof(server_name), "SERVER_NAME=%s", hostname);
+  snprintf(remote_host, sizeof(remote_host), "REMOTE_HOST=%s", con->http.hostname);
+  snprintf(remote_user, sizeof(remote_user), "REMOTE_USER=%s", con->username);
+  snprintf(tmpdir, sizeof(tmpdir), "TMPDIR=%s", TempDir);
+  snprintf(datadir, sizeof(datadir), "DATADIR=%s", DataDir);
+
+  if (getenv("LD_LIBRARY_PATH") != NULL)
+    snprintf(ldpath, sizeof(ldpath), "LD_LIBRARY_PATH=%s", getenv("LD_LIBRARY_PATH"));
+  else
+    ldpath[0] = '\0';
 
   envp[0]  = "PATH=/bin:/usr/bin";
   envp[1]  = "SERVER_SOFTWARE=CUPS/1.1";
@@ -1643,10 +1652,16 @@ pipe_command(client_t *con,	/* I - Client connection */
   envp[9]  = lang;
   envp[10] = TZ;
   envp[11] = tmpdir;
+  envp[12] = datadir;
+
+  envc = 13;
+
+  if (ldpath[0])
+    envp[envc ++] = ldpath;
 
   if (con->operation == HTTP_GET)
   {
-    envp[12] = "REQUEST_METHOD=GET";
+    envp[envc ++] = "REQUEST_METHOD=GET";
 
     if (*commptr)
     {
@@ -1657,11 +1672,8 @@ pipe_command(client_t *con,	/* I - Client connection */
       *commptr++ = '\0';
 
       snprintf(query_string, sizeof(query_string), "QUERY_STRING=%s", commptr);
-      envp[13] = query_string;
-      envp[14] = NULL;
+      envp[envc ++] = query_string;
     }
-    else
-      envp[13] = NULL;
   }
   else
   {
@@ -1669,11 +1681,12 @@ pipe_command(client_t *con,	/* I - Client connection */
     snprintf(content_type, sizeof(content_type), "CONTENT_TYPE=%s",
              con->http.fields[HTTP_FIELD_CONTENT_TYPE]);
 
-    envp[12] = "REQUEST_METHOD=POST";
-    envp[13] = content_length;
-    envp[14] = content_type;
-    envp[15] = NULL;
+    envp[envc ++] = "REQUEST_METHOD=POST";
+    envp[envc ++] = content_length;
+    envp[envc ++] = content_type;
   }
+
+  envp[envc] = NULL;
 
  /*
   * Create a pipe for the output...
@@ -1752,5 +1765,5 @@ pipe_command(client_t *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.58 2000/05/17 17:16:48 mike Exp $".
+ * End of "$Id: client.c,v 1.59 2000/06/27 21:07:10 mike Exp $".
  */
