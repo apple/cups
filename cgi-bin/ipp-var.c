@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp-var.c,v 1.14 2000/09/14 19:05:03 mike Exp $"
+ * "$Id: ipp-var.c,v 1.15 2000/10/04 12:29:42 mike Exp $"
  *
  *   IPP variable routines for the Common UNIX Printing System (CUPS).
  *
@@ -23,6 +23,7 @@
  *
  * Contents:
  *
+ *   ippGetTemplateDir()   - Get the templates directory...
  *   ippSetServerVersion() - Set the server name and CUPS version...
  *   ippSetCGIVars()       - Set CGI variables from an IPP response.
  */
@@ -119,6 +120,10 @@ ippSetCGIVars(ipp_t      *response,	/* I - Response data to be copied... */
            filter != NULL && filter->group_tag != IPP_TAG_ZERO;
            filter = filter->next)
         if (filter->name && strcmp(filter->name, filter_name) == 0 &&
+	    (filter->value_tag == IPP_TAG_STRING ||
+	     (filter->value_tag >= IPP_TAG_TEXTLANG &&
+	      filter->value_tag <= IPP_TAG_MIMETYPE)) &&
+	    filter->values[0].string.text != NULL &&
 	    strcasecmp(filter->values[0].string.text, filter_value) == 0)
 	  break;
 
@@ -254,5 +259,5 @@ ippSetCGIVars(ipp_t      *response,	/* I - Response data to be copied... */
 
 
 /*
- * End of "$Id: ipp-var.c,v 1.14 2000/09/14 19:05:03 mike Exp $".
+ * End of "$Id: ipp-var.c,v 1.15 2000/10/04 12:29:42 mike Exp $".
  */
