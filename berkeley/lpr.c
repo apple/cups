@@ -1,5 +1,5 @@
 /*
- * "$Id: lpr.c,v 1.5 1999/07/30 13:33:53 mike Exp $"
+ * "$Id: lpr.c,v 1.6 1999/08/04 13:08:36 mike Exp $"
  *
  *   "lpr" command for the Common UNIX Printing System (CUPS).
  *
@@ -234,6 +234,8 @@ main(int  argc,		/* I - Number of command-line arguments */
     else
       job_id = cupsPrintFile(dest, tempfile, "(stdin)", num_options, options);
 
+    unlink(tempfile);
+
     if (job_id < 1)
     {
       fputs("lpr: unable to print standard input.\n", stderr);
@@ -246,5 +248,5 @@ main(int  argc,		/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: lpr.c,v 1.5 1999/07/30 13:33:53 mike Exp $".
+ * End of "$Id: lpr.c,v 1.6 1999/08/04 13:08:36 mike Exp $".
  */
