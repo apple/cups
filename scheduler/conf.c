@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.4 1999/02/09 22:04:12 mike Exp $"
+ * "$Id: conf.c,v 1.5 1999/02/10 19:28:53 mike Exp $"
  *
  *   for the Common UNIX Printing System (CUPS).
  *
@@ -73,7 +73,6 @@ static var_t	variables[] =
   { "ErrorLog",		ErrorLog,		VAR_STRING,	sizeof(ErrorLog) },
   { "DefaultCharset",	DefaultCharset,		VAR_STRING,	sizeof(DefaultCharset) },
   { "DefaultLanguage",	DefaultLanguage,	VAR_STRING,	sizeof(DefaultLanguage) },
-  { "LogLevel",		&LogLevel,		VAR_INTEGER,	0 },
   { "HostNameLookups",	&HostNameLookups,	VAR_BOOLEAN,	0 },
   { "Timeout",		&Timeout,		VAR_INTEGER,	0 },
   { "KeepAlive",	&KeepAlive,		VAR_BOOLEAN,	0 },
@@ -121,13 +120,17 @@ ReadConfiguration(void)
 
   if (AccessFile != NULL)
   {
-    fclose(AccessFile);
+    if (AccessFile != stderr)
+      fclose(AccessFile);
+
     AccessFile = NULL;
   }
 
   if (ErrorFile != NULL)
   {
-    fclose(ErrorFile);
+    if (ErrorFile != stderr)
+      fclose(ErrorFile);
+
     ErrorFile = NULL;
   }
 
@@ -214,14 +217,26 @@ LogMessage(int  level,		/* I - Log level */
            char *message,	/* I - printf-style message string */
 	   ...)			/* I - Additional args as needed */
 {
+  char		filename[1024];	/* Name of error log file */
   va_list	ap;		/* Argument pointer */
 
 
   if (level <= LogLevel)
   {
+    if (ErrorFile == NULL)
+    {
+      if (ErrorLog[0] != '/')
+        sprintf(filename, "%s/%s", ServerRoot, ErrorLog);
+      else
+        strcpy(filename, ErrorLog);
+
+      if ((ErrorFile = fopen(filename, "a")) == NULL)
+        ErrorFile = stderr;
+    }
+
     va_start(ap, message);
-    vfprintf(stderr, message, ap);
-    fputs("\n", stderr);
+    vfprintf(ErrorFile, message, ap);
+    fputs("\n", ErrorFile);
     va_end(ap);
   }
 
@@ -397,6 +412,23 @@ read_configuration(FILE *fp)	/* I - File to read from */
 	  LogMessage(LOG_WARN, "ReadConfiguration() Unknown groupname \"%s\"",
 	             value);
       }
+    }
+    else if (strcmp(name, "LogLevel") == 0)
+    {
+     /*
+      * Amount of logging to do...
+      */
+
+      if (strcmp(value, "debug") == 0)
+        LogLevel = LOG_DEBUG;
+      else if (strcmp(value, "info") == 0)
+        LogLevel = LOG_INFO;
+      else if (strcmp(value, "warn") == 0)
+        LogLevel = LOG_WARN;
+      else if (strcmp(value, "error") == 0)
+        LogLevel = LOG_ERROR;
+      else if (strcmp(value, "none") == 0)
+        LogLevel = LOG_NONE;
     }
     else
     {
@@ -780,5 +812,5 @@ get_address(char               *value,		/* I - Value string */
 
 
 /*
- * End of "$Id: conf.c,v 1.4 1999/02/09 22:04:12 mike Exp $".
+ * End of "$Id: conf.c,v 1.5 1999/02/10 19:28:53 mike Exp $".
  */

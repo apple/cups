@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.1 1999/02/09 22:04:11 mike Exp $"
+ * "$Id: client.c,v 1.2 1999/02/10 19:28:53 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -343,8 +343,9 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	  return (0);
 	}
 
-        LogMessage(LOG_INFO, "ReadClient() %d %s %s", con->http.fd,
-	           operation, con->uri);
+        LogMessage(LOG_INFO, "ReadClient() %d %s %s HTTP/%d.%d", con->http.fd,
+	           operation, con->uri,
+		   con->http.version / 100, con->http.version % 100);
 
 	con->http.status = HTTP_OK;
         break;
@@ -751,7 +752,7 @@ SendError(client_t      *con,	/* I - Connection */
     sprintf(message, "<HTML><HEAD><TITLE>%d %s</TITLE></HEAD>"
                      "<BODY><H1>%s</H1>%s</BODY></HTML>\n",
             code, httpStatus(code), httpStatus(code),
-	    httpStatus(code));
+	    con->language ? con->language->messages[code] : httpStatus(code));
 
     if (httpPrintf(HTTP(con), "Content-Type: text/html\r\n") < 0)
       return (0);
@@ -1080,9 +1081,12 @@ check_if_modified(client_t    *con,		/* I - Client connection */
   if (*ptr == '\0')
     return (1);
 
+  LogMessage(LOG_DEBUG, "check_if_modified() %d If-Modified-Since=\"%s\"",
+             con->http.fd, ptr);
+
   while (*ptr != '\0')
   {
-    while (isspace(*ptr) || *ptr == ',')
+    while (isspace(*ptr) || *ptr == ';')
       ptr ++;
 
     if (strncasecmp(ptr, "length=", 7) == 0)
@@ -1093,16 +1097,20 @@ check_if_modified(client_t    *con,		/* I - Client connection */
       while (isdigit(*ptr))
         ptr ++;
     }
-    else
+    else if (isalpha(*ptr))
     {
       date = httpGetDateTime(ptr);
-      while (*ptr != '\0' && *ptr != ',')
+      while (*ptr != '\0' && *ptr != ';')
         ptr ++;
     }
   }
 
+  LogMessage(LOG_DEBUG, "check_if_modified() %d sizes=%d,%d dates=%d,%d",
+             con->http.fd, size, filestats->st_size, date, filestats->st_mtime);
+
   return ((size != filestats->st_size && size != 0) ||
-          (date < filestats->st_mtime && date != 0));
+          (date < filestats->st_mtime && date != 0) ||
+	  (size == 0 && date == 0));
 }
 
 
@@ -1462,5 +1470,5 @@ sigpipe_handler(int sig)	/* I - Signal number */
 
 
 /*
- * End of "$Id: client.c,v 1.1 1999/02/09 22:04:11 mike Exp $".
+ * End of "$Id: client.c,v 1.2 1999/02/10 19:28:53 mike Exp $".
  */
