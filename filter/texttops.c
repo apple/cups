@@ -1,5 +1,5 @@
 /*
- * "$Id: texttops.c,v 1.36 2001/06/06 05:18:25 mike Exp $"
+ * "$Id: texttops.c,v 1.37 2001/06/06 13:29:53 mike Exp $"
  *
  *   Text to PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -766,7 +766,7 @@ WriteProlog(const char *title,		/* I - Title of job */
       if (Glyphs[Codes[i * 256 + ch]])
 	printf("/%s", Glyphs[Codes[i * 256 + ch]]);
       else if (Codes[i * 256 + ch] > 255)
-        printf("/uni%04X", Codes[i * 256 + ch])
+        printf("/uni%04X", Codes[i * 256 + ch]);
       else
 	printf("/.notdef");
 
@@ -1296,5 +1296,5 @@ write_text(const char *s)	/* I - String to write */
 
 
 /*
- * End of "$Id: texttops.c,v 1.36 2001/06/06 05:18:25 mike Exp $".
+ * End of "$Id: texttops.c,v 1.37 2001/06/06 13:29:53 mike Exp $".
  */
