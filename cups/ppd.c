@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c,v 1.97 2003/02/20 14:49:50 mike Exp $"
+ * "$Id: ppd.c,v 1.98 2003/02/20 16:52:16 mike Exp $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -2519,7 +2519,8 @@ ppd_read(FILE *fp,			/* I - File to read from */
 		col,			/* Column in line */
 		colon,			/* Colon seen? */
 		endquote,		/* Waiting for an end quote */
-		mask;			/* Mask to be returned */
+		mask,			/* Mask to be returned */
+		startline;		/* Start line */
   char		*keyptr,		/* Keyword pointer */
 		*optptr,		/* Option pointer */
 		*textptr,		/* Text pointer */
@@ -2540,8 +2541,9 @@ ppd_read(FILE *fp,			/* I - File to read from */
   * Now loop until we have a valid line...
   */
 
-  *string = NULL;
-  col     = 0;
+  *string   = NULL;
+  col       = 0;
+  startline = ppd_line + 1;
 
   do
   {
@@ -2593,6 +2595,7 @@ ppd_read(FILE *fp,			/* I - File to read from */
         * Other control characters...
 	*/
 
+        ppd_line   = startline;
         ppd_status = PPD_ILLEGAL_CHARACTER;
 
         return (0);
@@ -2612,6 +2615,7 @@ ppd_read(FILE *fp,			/* I - File to read from */
           * Line is too long...
 	  */
 
+          ppd_line   = startline;
           ppd_status = PPD_LINE_TOO_LONG;
 
           return (0);
@@ -2653,6 +2657,7 @@ ppd_read(FILE *fp,			/* I - File to read from */
         	* Other control characters...
 		*/
 
+                ppd_line   = startline;
         	ppd_status = PPD_ILLEGAL_CHARACTER;
 
         	return (0);
@@ -2667,6 +2672,7 @@ ppd_read(FILE *fp,			/* I - File to read from */
         	  * Line is too long...
 		  */
 
+                  ppd_line   = startline;
         	  ppd_status = PPD_LINE_TOO_LONG;
 
         	  return (0);
@@ -2713,6 +2719,7 @@ ppd_read(FILE *fp,			/* I - File to read from */
           * Other control characters...
 	  */
 
+          ppd_line   = startline;
           ppd_status = PPD_ILLEGAL_CHARACTER;
 
           return (0);
@@ -2727,6 +2734,7 @@ ppd_read(FILE *fp,			/* I - File to read from */
             * Line is too long...
 	    */
 
+            ppd_line   = startline;
             ppd_status = PPD_LINE_TOO_LONG;
 
             return (0);
@@ -2770,6 +2778,7 @@ ppd_read(FILE *fp,			/* I - File to read from */
           * Other control characters...
 	  */
 
+          ppd_line   = startline;
           ppd_status = PPD_ILLEGAL_CHARACTER;
 
           return (0);
@@ -2784,6 +2793,7 @@ ppd_read(FILE *fp,			/* I - File to read from */
             * Line is too long...
 	    */
 
+            ppd_line   = startline;
             ppd_status = PPD_LINE_TOO_LONG;
 
             return (0);
@@ -2818,7 +2828,10 @@ ppd_read(FILE *fp,			/* I - File to read from */
         strncmp(line, "*%", 2) == 0 ||	/* Comment line */
         strncmp(line, "*?", 2) == 0 ||	/* Query line */
         strcmp(line, "*End") == 0)	/* End of multi-line string */
+    {
+      startline = ppd_line + 1;
       continue;
+    }
 
     if (line[0] != '*')			/* All lines start with an asterisk */
     {
@@ -2961,5 +2974,5 @@ ppd_read(FILE *fp,			/* I - File to read from */
 
 
 /*
- * End of "$Id: ppd.c,v 1.97 2003/02/20 14:49:50 mike Exp $".
+ * End of "$Id: ppd.c,v 1.98 2003/02/20 16:52:16 mike Exp $".
  */
