@@ -3,6 +3,9 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.20rc1
 
+	- The CGI programs now collect the list of needed
+	  attributes for the class, job, and printer template
+	  files (STR #192)
 	- The scheduler now passes the first port that is bound
 	  to the local loopback or "any" addresses to the CGI
 	  programs rather than the port that the browser
