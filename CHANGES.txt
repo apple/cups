@@ -125,6 +125,12 @@ CHANGES IN CUPS V1.1.5
 	- Removed black/CMY adjustment code from the PS and
 	  image file RIPs; it was interfering with some CUPS
 	  driver dithering code.
+	- The lpc program stopped listing the queue statuses
+	  after the first active printer.
+	- The cups-lpd program used an output format that the
+	  Solaris printing system did not understand.
+        - Updated the lpq program to use the Solaris format
+	  except under Tru64 UNIX.
 
 
 CHANGES IN CUPS v1.1.4

@@ -1,5 +1,5 @@
 /*
- * "$Id: lpc.c,v 1.8 2000/03/09 19:47:21 mike Exp $"
+ * "$Id: lpc.c,v 1.9 2000/11/20 00:22:54 mike Exp $"
  *
  *   "lpc" command for the Common UNIX Printing System (CUPS).
  *
@@ -216,7 +216,8 @@ show_status(http_t *http,	/* I - HTTP connection to server */
   ipp_t		*request,	/* IPP Request */
 		*response,	/* IPP Response */
 		*jobs;		/* IPP Get Jobs response */
-  ipp_attribute_t *attr;	/* Current attribute */
+  ipp_attribute_t *attr,	/* Current attribute */
+		*jattr;		/* Current job attribute */
   cups_lang_t	*language;	/* Default language */
   char		*printer,	/* Printer name */
 		*device;	/* Device URI */
@@ -228,6 +229,13 @@ show_status(http_t *http,	/* I - HTTP connection to server */
   int		match;		/* Non-zero if this job matches */
   char		printer_uri[HTTP_MAX_URI];
 				/* Printer URI */
+  static const char *requested[] =
+		{		/* Requested attributes */
+		  "printer-name",
+		  "device-uri",
+		  "printer-state",
+		  "printer-is-accepting-jobs"
+		};
 
 
   DEBUG_printf(("show_status(%08x, %08x)\n", http, dests));
@@ -250,11 +258,15 @@ show_status(http_t *http,	/* I - HTTP connection to server */
 
   language = cupsLangDefault();
 
-  attr = ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-                      "attributes-charset", NULL, cupsLangEncoding(language));
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
+               "attributes-charset", NULL, cupsLangEncoding(language));
 
-  attr = ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
-                      "attributes-natural-language", NULL, language->language);
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
+               "attributes-natural-language", NULL, language->language);
+
+  ippAddStrings(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
+                "requested-attributes", sizeof(requested) / sizeof(requested[0]),
+		NULL, requested);
 
  /*
   * Do the request and get back a response...
@@ -412,13 +424,16 @@ show_status(http_t *http,	/* I - HTTP connection to server */
 
           snprintf(printer_uri, sizeof(printer_uri),
                    "ipp://localhost/printers/%s", printer);
-	  attr = ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI,
-	                      "printer-uri", NULL, printer_uri);
+	  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI,
+	               "printer-uri", NULL, printer_uri);
+
+	  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
+	               "requested-attributes", NULL, "job-id");
 
           if ((jobs = cupsDoRequest(http, request, "/jobs/")) != NULL)
 	  {
-	    for (attr = jobs->attrs; attr != NULL; attr = attr->next)
-	      if (strcmp(attr->name, "job-id") == 0)
+	    for (jattr = jobs->attrs; jattr != NULL; jattr = jattr->next)
+	      if (jattr->name && strcmp(jattr->name, "job-id") == 0)
 	        jobcount ++;
 
             ippDelete(jobs);
@@ -462,5 +477,5 @@ show_status(http_t *http,	/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpc.c,v 1.8 2000/03/09 19:47:21 mike Exp $".
+ * End of "$Id: lpc.c,v 1.9 2000/11/20 00:22:54 mike Exp $".
  */

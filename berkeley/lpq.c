@@ -1,5 +1,5 @@
 /*
- * "$Id: lpq.c,v 1.13 2000/11/06 16:18:08 mike Exp $"
+ * "$Id: lpq.c,v 1.14 2000/11/20 00:22:55 mike Exp $"
  *
  *   "lpq" command for the Common UNIX Printing System (CUPS).
  *
@@ -365,7 +365,7 @@ show_jobs(http_t     *http,	/* I - HTTP connection to server */
 #ifdef __osf__
 	puts("Rank   Owner      Pri  Job        Files                       Total Size");
 #else
-	puts("Rank   Owner      Job             Files                       Total Size");
+	puts("Rank    Owner   Job     File(s)                         Total Size");
 #endif /* __osf__ */
 
       jobcount ++;
@@ -395,15 +395,15 @@ show_jobs(http_t     *http,	/* I - HTTP connection to server */
 	  namestr[sizeof(namestr) - 1] = '\0';
 	}
 
-        printf("%s: %-31s [job %d localhost]\n", jobuser, rankstr, jobid);
-        printf("        %-31.31s %d bytes\n", namestr, jobsize);
+        printf("%s: %-34.34s[job %d localhost]\n", jobuser, rankstr, jobid);
+        printf("        %-40.40s%d bytes\n", namestr, jobsize);
       }
       else
 #ifdef __osf__
         printf("%-6s %-10.10s %-4d %-10d %-27.27s %d bytes\n", rankstr, jobuser,
 	       jobpriority, jobid, jobname, jobsize);
 #else
-        printf("%-6s %-10.10s %-15d %-27.27s %d bytes\n", rankstr, jobuser,
+        printf("%-7s %-8.8s%-8d%-32.32s%d bytes\n", rankstr, jobuser,
 	       jobid, jobname, jobsize);
 #endif /* __osf */
 
@@ -513,5 +513,5 @@ show_printer(http_t     *http,	/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpq.c,v 1.13 2000/11/06 16:18:08 mike Exp $".
+ * End of "$Id: lpq.c,v 1.14 2000/11/20 00:22:55 mike Exp $".
  */

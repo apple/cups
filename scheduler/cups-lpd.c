@@ -1,5 +1,5 @@
 /*
- * "$Id: cups-lpd.c,v 1.15 2000/11/06 16:18:12 mike Exp $"
+ * "$Id: cups-lpd.c,v 1.16 2000/11/20 00:22:55 mike Exp $"
  *
  *   Line Printer Daemon interface for the Common UNIX Printing System (CUPS).
  *
@@ -693,6 +693,16 @@ send_state(const char *dest,		/* I - Destination */
 		  "th",
 		  "th"
 		};
+  static const char *requested[] =	/* Requested attributes */
+		{
+		  "job-id",
+		  "job-k-octets",
+		  "job-state",
+		  "job-printer-uri",
+		  "job-originating-user-name",
+		  "job-name",
+		  "copies"
+		};
 
 
  /*
@@ -737,6 +747,9 @@ send_state(const char *dest,		/* I - Destination */
   snprintf(uri, sizeof(uri), "ipp://localhost/printers/%s", queue);
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI,
                "printer-uri", NULL, uri);
+
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
+               "requested-attributes", NULL, "printer-state");
 
  /*
   * Do the request and get back a response...
@@ -794,11 +807,11 @@ send_state(const char *dest,		/* I - Destination */
   request->request.op.operation_id = id ? IPP_GET_JOB_ATTRIBUTES : IPP_GET_JOBS;
   request->request.op.request_id   = 1;
 
-  attr = ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-                      "attributes-charset", NULL, cupsLangEncoding(language));
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
+               "attributes-charset", NULL, cupsLangEncoding(language));
 
-  attr = ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
-                      "attributes-natural-language", NULL, language->language);
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
+               "attributes-natural-language", NULL, language->language);
 
   snprintf(uri, sizeof(uri), "ipp://localhost/printers/%s", queue);
 
@@ -813,6 +826,10 @@ send_state(const char *dest,		/* I - Destination */
                  "requesting-user-name", NULL, list);
     ippAddBoolean(request, IPP_TAG_OPERATION, "my-jobs", 1);
   }
+
+  ippAddStrings(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
+                "requested-attributes", sizeof(requested) / sizeof(requested[0]),
+		NULL, requested);
 
  /*
   * Do the request and get back a response...
@@ -842,7 +859,8 @@ send_state(const char *dest,		/* I - Destination */
       * Skip leading attributes until we hit a job...
       */
 
-      while (attr != NULL && attr->group_tag != IPP_TAG_JOB)
+      while (attr != NULL &&
+             (attr->group_tag != IPP_TAG_JOB || attr->name == NULL))
         attr = attr->next;
 
       if (attr == NULL)
@@ -907,7 +925,7 @@ send_state(const char *dest,		/* I - Destination */
       }
 
       if (!longstatus && jobcount == 0)
-	puts("Rank   Owner      Job             Files                       Total Size");
+	puts("Rank    Owner   Job     File(s)                         Total Size");
 
       jobcount ++;
 
@@ -936,11 +954,11 @@ send_state(const char *dest,		/* I - Destination */
 	  namestr[sizeof(namestr) - 1] = '\0';
 	}
 
-        printf("%s: %-31s [job %d localhost]\n", jobuser, rankstr, jobid);
-        printf("        %-31.31s %d bytes\n", namestr, jobsize);
+        printf("%s: %-34.34s[job %d localhost]\n", jobuser, rankstr, jobid);
+        printf("        %-40.40s%d bytes\n", namestr, jobsize);
       }
       else
-        printf("%-6s %-10.10s %-15d %-27.27s %d bytes\n", rankstr, jobuser,
+        printf("%-7s %-8.8s%-8d%-32.32s%d bytes\n", rankstr, jobuser,
 	       jobid, jobname, jobsize);
 
       if (attr == NULL)
@@ -1070,5 +1088,5 @@ remove_jobs(const char *dest,		/* I - Destination */
 
 
 /*
- * End of "$Id: cups-lpd.c,v 1.15 2000/11/06 16:18:12 mike Exp $".
+ * End of "$Id: cups-lpd.c,v 1.16 2000/11/20 00:22:55 mike Exp $".
  */
