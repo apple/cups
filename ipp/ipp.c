@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.1.2.1 2002/03/22 15:47:25 mike Exp $"
+ * "$Id: ipp.c,v 1.1.2.2 2002/04/06 09:42:41 mike Exp $"
  *
  *   Internet Printing Protocol support functions for the Common UNIX
  *   Printing System (CUPS).
@@ -299,6 +299,17 @@ ippAddString(ipp_t      *ipp,		/* I - IPP request */
   if ((attr = _ipp_add_attr(ipp, 1)) == NULL)
     return (NULL);
 
+ /*
+  * Force value to be English for the POSIX locale...
+  */
+
+  if (type == IPP_TAG_LANGUAGE && strcasecmp(value, "C") == 0)
+    value = "en";
+
+ /*
+  * Initialize the attribute data...
+  */
+
   attr->name                      = strdup(name);
   attr->group_tag                 = group;
   attr->value_tag                 = type;
@@ -307,13 +318,13 @@ ippAddString(ipp_t      *ipp,		/* I - IPP request */
   attr->values[0].string.text     = ((int)type & IPP_TAG_COPY) ? (char *)value :
                                     value ? strdup(value) : NULL;
 
+ /*
+  * Convert language values to lowercase and change _ to - as needed...
+  */
+
   if ((type == IPP_TAG_LANGUAGE || type == IPP_TAG_CHARSET) &&
       attr->values[0].string.text)
   {
-   /*
-    * Convert to lowercase and change _ to - as needed...
-    */
-
     char *p;
 
 
@@ -352,6 +363,10 @@ ippAddStrings(ipp_t      *ipp,		/* I - IPP request */
   if ((attr = _ipp_add_attr(ipp, num_values)) == NULL)
     return (NULL);
 
+ /*
+  * Initialize the attribute data...
+  */
+
   attr->name      = strdup(name);
   attr->group_tag = group;
   attr->value_tag = type;
@@ -367,8 +382,18 @@ ippAddStrings(ipp_t      *ipp,		/* I - IPP request */
       value->string.charset = attr->values[0].string.charset;
 
     if (values != NULL)
-      value->string.text = ((int)type & IPP_TAG_COPY) ? (char *)values[i] :
-                                    strdup(values[i]);
+    {
+     /*
+      * Force language to be English for the POSIX locale...
+      */
+
+      if (type == IPP_TAG_LANGUAGE && strcasecmp(values[i], "C") == 0)
+	value->string.text = ((int)type & IPP_TAG_COPY) ? "en" :
+                                      strdup("en");
+      else
+	value->string.text = ((int)type & IPP_TAG_COPY) ? (char *)values[i] :
+                                      strdup(values[i]);
+    }
   }
 
   return (attr);
@@ -2216,5 +2241,5 @@ ipp_write_mem(ipp_mem_t   *m,		/* I - Memory buffer */
 
 
 /*
- * End of "$Id: ipp.c,v 1.1.2.1 2002/03/22 15:47:25 mike Exp $".
+ * End of "$Id: ipp.c,v 1.1.2.2 2002/04/06 09:42:41 mike Exp $".
  */

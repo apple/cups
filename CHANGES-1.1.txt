@@ -5,6 +5,8 @@ CHANGES IN CUPS V1.1.15
 
 	- Updated the CUPS license agreement for the new MacOS
 	  license exception.
+	- The IPP code didn't always map the POSIX locale "C" to
+	  the proper IPP language code.
 	- The cupsaddsmb program was updated to use the
 	  setdriver command instead of addprinter.
 	- Banner pages were not handled properly for implicit
