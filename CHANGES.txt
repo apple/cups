@@ -1,10 +1,11 @@
-CHANGES.txt - 05/23/2002
+CHANGES.txt - 05/24/2002
 ------------------------
 
 CHANGES IN CUPS V1.1.15
 
 	- Updated the CUPS license agreement for the new MacOS
 	  and OpenSSL license exceptions.
+	- New SCSI printer backend.
 	- Cleaned up handling of locales with trailing character
 	  set definitions.
 	- Fixed handling of invalid PPD attributes inside
