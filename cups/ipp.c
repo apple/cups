@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.62 2001/10/17 15:54:17 mike Exp $"
+ * "$Id: ipp.c,v 1.63 2001/10/30 18:56:29 mike Exp $"
  *
  *   Internet Printing Protocol support functions for the Common UNIX
  *   Printing System (CUPS).
@@ -1049,16 +1049,14 @@ ippRead(http_t *http,		/* I - HTTP data */
 	      * Reset pointers in the list...
 	      */
 
-	      for (ptr = ipp->attrs;
-	           ptr && ptr->next != ipp->current;
-		   ptr = ptr->next);
+	      for (ptr = ipp->attrs; ptr && ptr->next != attr; ptr = ptr->next);
 
               if (ptr)
 	        ptr->next = temp;
-              else
+	      else
 	        ipp->attrs = temp;
 
-              attr = ipp->current = temp;
+              attr = ipp->current = ipp->last = temp;
 	    }
 	  }
 	  else
@@ -1983,5 +1981,5 @@ ipp_read(http_t        *http,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.62 2001/10/17 15:54:17 mike Exp $".
+ * End of "$Id: ipp.c,v 1.63 2001/10/30 18:56:29 mike Exp $".
  */

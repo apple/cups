@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.137 2001/10/17 15:54:19 mike Exp $"
+ * "$Id: job.c,v 1.138 2001/10/30 18:56:30 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -2142,16 +2142,14 @@ ipp_read_file(const char *filename,	/* I - File to read from */
 	      * Reset pointers in the list...
 	      */
 
-	      for (ptr = ipp->attrs;
-	           ptr && ptr->next != ipp->current;
-		   ptr = ptr->next);
+	      for (ptr = ipp->attrs; ptr && ptr->next != attr; ptr = ptr->next);
 
               if (ptr)
 	        ptr->next = temp;
-              else
+	      else
 	        ipp->attrs = temp;
 
-              attr = ipp->current = temp;
+              attr = ipp->current = ipp->last = temp;
 	    }
 	  }
 	  else
@@ -2983,5 +2981,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.137 2001/10/17 15:54:19 mike Exp $".
+ * End of "$Id: job.c,v 1.138 2001/10/30 18:56:30 mike Exp $".
  */
