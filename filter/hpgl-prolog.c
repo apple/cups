@@ -1,15 +1,15 @@
 /*
- * "$Id: hpgl-prolog.c,v 1.2 1996/10/14 16:50:14 mike Exp $"
+ * "$Id: hpgl-prolog.c,v 1.3 1998/03/10 16:49:58 mike Exp $"
  *
  *   PostScript prolog routines for the HPGL2PS program for espPrint, a
  *   collection of printer drivers.
  *
- *   Copyright 1993-1996 by Easy Software Products
+ *   Copyright 1993-1997 by Easy Software Products
  *
- *   These coded instructions, statements, and computer  programs  contain
- *   unpublished  proprietary  information  of Easy Software Products, and
- *   are protected by Federal copyright law.  They may  not  be  disclosed
- *   to  third  parties  or  copied or duplicated in any form, in whole or
+ *   These coded instructions, statements, and computer programs contain
+ *   unpublished proprietary information of Easy Software Products, and
+ *   are protected by Federal copyright law.  They may not be disclosed
+ *   to third parties or copied or duplicated in any form, in whole or
  *   in part, without the prior written consent of Easy Software Products.
  *
  * Contents:
@@ -17,7 +17,11 @@
  * Revision History:
  *
  *   $Log: hpgl-prolog.c,v $
- *   Revision 1.2  1996/10/14 16:50:14  mike
+ *   Revision 1.3  1998/03/10 16:49:58  mike
+ *   Changed cftime call to strftime for portability.
+ *   Added return values to OutputProlog and OutputTrailer.
+ *
+ *   Revision 1.2  1996/10/14  16:50:14  mike
  *   Updated for 3.2 release.
  *   Added 'blackplot', grayscale, and default pen width options.
  *   Added encoded polyline support.
@@ -44,15 +48,17 @@ OutputProlog(int   shading,
   FILE		*prolog;
   char		line[255];
   time_t	curtime;
+  struct tm	*curtm;
 
 
-  curtime  = time(NULL);
+  curtime = time(NULL);
+  curtm   = localtime(&curtime);
 
   fputs("%!PS-Adobe-3.0\n", OutputFile);
   fputs("%%Creator: hpgl2ps (ESP Print 3.2)\n", OutputFile);
-  cftime(line, "%%%%CreationDate: %c\n", &curtime);
+  strftime(line, sizeof(line), "%%%%CreationDate: %c\n", curtm);
   fputs(line, OutputFile);
-  fputs("%%LanguageLevel: 2\n", OutputFile);
+  fputs("%%LanguageLevel: 1\n", OutputFile);
   fputs("%%Pages: (atend)\n", OutputFile);
   fprintf(OutputFile, "%%%%BoundingBox: %.0f %.0f %.0f %.0f\n",
           PageLeft, PageBottom, PageWidth + PageLeft, PageHeight + PageBottom);
@@ -88,6 +94,8 @@ OutputProlog(int   shading,
   fprintf(OutputFile, "%.1f %.1f translate\n", PageLeft, PageBottom);
 
   IN_initialize(0, NULL);
+
+  return (0);
 }
 
 
@@ -106,9 +114,11 @@ OutputTrailer(void)
   fputs("%%EndTrailer\n", OutputFile);
 
   fputs("%%EOF\n", OutputFile);
+
+  return (0);
 }
 
 
 /*
- * End of "$Id: hpgl-prolog.c,v 1.2 1996/10/14 16:50:14 mike Exp $".
+ * End of "$Id: hpgl-prolog.c,v 1.3 1998/03/10 16:49:58 mike Exp $".
  */
