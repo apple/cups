@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.91.2.41 2003/01/29 00:21:53 mike Exp $"
+ * "$Id: client.c,v 1.91.2.42 2003/02/03 02:34:52 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -790,7 +790,7 @@ ReadClient(client_t *con)	/* I - Client to read from */
         * Handle full URLs in the request line...
 	*/
 
-        if (con->uri[0] != '/')
+        if (con->uri[0] != '/' && strcmp(con->uri, "*"))
 	{
 	  char	method[HTTP_MAX_URI],		/* Method/scheme */
 		userpass[HTTP_MAX_URI],		/* Username:password */
@@ -2965,5 +2965,5 @@ CDSAWriteFunc(SSLConnectionRef connection,	/* I  - SSL/TLS connection */
 
 
 /*
- * End of "$Id: client.c,v 1.91.2.41 2003/01/29 00:21:53 mike Exp $".
+ * End of "$Id: client.c,v 1.91.2.42 2003/02/03 02:34:52 mike Exp $".
  */
