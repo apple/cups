@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.15 1999/04/23 18:46:54 mike Exp $"
+ * "$Id: client.c,v 1.16 1999/04/28 15:53:51 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -1124,27 +1124,23 @@ StopListening(void)
  * 'WriteClient()' - Write data to a client as needed.
  */
 
-int
-WriteClient(client_t *con)
+int					/* O - 1 if success, 0 if fail */
+WriteClient(client_t *con)		/* I - Client connection */
 {
-  int	bytes;
-  int	status;
-  char	buf[HTTP_MAX_BUFFER];
+  int		bytes;			/* Number of bytes written */
+  char		buf[HTTP_MAX_BUFFER];	/* Data buffer */
+  ipp_state_t	ipp_state;		/* IPP state value */
 
 
   if (con->http.state != HTTP_GET_SEND &&
       con->http.state != HTTP_POST_SEND)
     return (1);
 
-  if (con->http.fd == 0)
-  {
-    printf("ERROR - con = %08x (%d), NumClients = %d\n", con, con - Clients,
-           NumClients);
-    abort();
-  }
-
   if (con->response != NULL)
-    bytes = ippWrite(&(con->http), con->response) != IPP_DATA;
+  {
+    ipp_state = ippWrite(&(con->http), con->response);
+    bytes     = ipp_state != IPP_ERROR && ipp_state != IPP_DATA;
+  }
   else if ((bytes = read(con->file, buf, sizeof(buf))) > 0)
   {
     if (httpWrite(HTTP(con), buf, bytes) < 0)
@@ -1552,5 +1548,5 @@ pipe_command(client_t *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.15 1999/04/23 18:46:54 mike Exp $".
+ * End of "$Id: client.c,v 1.16 1999/04/28 15:53:51 mike Exp $".
  */
