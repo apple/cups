@@ -1,5 +1,5 @@
 /*
- * "$Id: getputfile.c,v 1.1.2.1 2003/08/31 11:25:35 mike Exp $"
+ * "$Id: getputfile.c,v 1.1.2.2 2004/02/04 02:32:44 mike Exp $"
  *
  *   Get/put file functions for the Common UNIX Printing System (CUPS).
  *
@@ -69,6 +69,9 @@ cupsGetFd(http_t     *http,		/* I - HTTP connection to server */
  /*
   * Range check input...
   */
+
+  DEBUG_printf(("cupsGetFd(http=%p, resource=\"%s\", fd=%d)\n", http,
+                resource, fd));
 
   if (!http || !resource || fd < 0)
   {
@@ -264,6 +267,9 @@ cupsPutFd(http_t     *http,		/* I - HTTP connection to server */
   * Range check input...
   */
 
+  DEBUG_printf(("cupsPutFd(http=%p, resource=\"%s\", fd=%d)\n", http,
+                resource, fd));
+
   if (!http || !resource || fd < 0)
   {
     if (http)
@@ -431,5 +437,5 @@ cupsPutFile(http_t     *http,		/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: getputfile.c,v 1.1.2.1 2003/08/31 11:25:35 mike Exp $".
+ * End of "$Id: getputfile.c,v 1.1.2.2 2004/02/04 02:32:44 mike Exp $".
  */
