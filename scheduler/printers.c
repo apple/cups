@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.67 2000/08/18 16:43:00 mike Exp $"
+ * "$Id: printers.c,v 1.68 2000/08/30 20:12:50 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -34,6 +34,7 @@
  *   SortPrinters()      - Sort the printer list when a printer name is
  *                         changed.
  *   StopPrinter()       - Stop a printer from printing any jobs...
+ *   ValidateDest()      - Validate a printer/class destination.
  *   write_printcap()    - Write a pseudo-printcap file for older applications
  *                         that need it...
  */
@@ -1371,6 +1372,82 @@ StopPrinter(printer_t *p)	/* I - Printer to stop */
 
 
 /*
+ * 'ValidateDest()' - Validate a printer/class destination.
+ */
+
+const char *				/* O - Printer or class name */
+ValidateDest(const char   *hostname,	/* I - Host name */
+             const char   *resource,	/* I - Resource name */
+             cups_ptype_t *dtype)	/* O - Type (printer or class) */
+{
+  printer_t	*p;			/* Current printer */
+  int		rlen;			/* Length of name sans @ */
+  const char	*temp;			/* Pointer to @ */
+
+
+ /*
+  * See if the resource is a class or printer...
+  */
+
+  if (strncmp(resource, "/classes/", 9) == 0)
+  {
+   /*
+    * Class...
+    */
+
+    *dtype = CUPS_PRINTER_CLASS;
+    resource += 9;
+  }
+  else if (strncmp(resource, "/printers/", 10) == 0)
+  {
+   /*
+    * Printer...
+    */
+
+    *dtype = (cups_ptype_t)0;
+    resource += 10;
+  }
+  else
+  {
+   /*
+    * Bad resource name...
+    */
+
+    return (NULL);
+  }
+
+ /*
+  * Get the length of the printer or class name, sans @server if present.
+  */
+
+  if ((temp = strchr(resource, '@')) != NULL)
+    rlen = temp - resource;
+  else
+    rlen = strlen(resource);
+
+ /*
+  * Change localhost to the server name...
+  */
+
+  if (strcasecmp(hostname, "localhost") == 0)
+    hostname = ServerName;
+
+ /*
+  * Find a matching printer or class...
+  */
+
+  for (p = Printers; p != NULL; p = p->next)
+    if (strcasecmp(p->hostname, hostname) == 0 &&
+        (strcasecmp(p->name, resource) == 0 ||
+	 (strncasecmp(p->name, resource, rlen) == 0 &&
+	  p->name[rlen] == '@')))
+      return (p->name);
+
+  return (NULL);
+}
+
+
+/*
  * 'write_printcap()' - Write a pseudo-printcap file for older applications
  *                      that need it...
  */
@@ -1415,5 +1492,5 @@ write_printcap(void)
 
 
 /*
- * End of "$Id: printers.c,v 1.67 2000/08/18 16:43:00 mike Exp $".
+ * End of "$Id: printers.c,v 1.68 2000/08/30 20:12:50 mike Exp $".
  */

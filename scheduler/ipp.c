@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.92 2000/08/30 18:49:22 mike Exp $"
+ * "$Id: ipp.c,v 1.93 2000/08/30 20:12:49 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -63,6 +63,7 @@
  *   start_printer()             - Start a printer.
  *   stop_printer()              - Stop a printer.
  *   validate_job()              - Validate printer options and destination.
+ *   validate_user()             - Validate the user for the request.
  */
 
 /*
@@ -116,6 +117,8 @@ static void	set_job_attrs(client_t *con, ipp_attribute_t *uri);
 static void	start_printer(client_t *con, ipp_attribute_t *uri);
 static void	stop_printer(client_t *con, ipp_attribute_t *uri);
 static void	validate_job(client_t *con, ipp_attribute_t *uri);
+static int	validate_user(client_t *con, const char *owner, char *username,
+		              int userlen);
 
 
 /*
@@ -462,7 +465,7 @@ accept_jobs(client_t        *con,	/* I - Client connection */
 
   httpSeparate(uri->values[0].string.text, method, username, host, &port, resource);
 
-  if ((name = ValidateDest(resource, &dtype)) == NULL)
+  if ((name = ValidateDest(host, resource, &dtype)) == NULL)
   {
    /*
     * Bad URI...
@@ -711,7 +714,7 @@ add_class(client_t        *con,		/* I - Client connection */
       httpSeparate(attr->values[i].string.text, method, username, host,
                    &port, resource);
 
-      if ((dest = ValidateDest(resource, &dtype)) == NULL)
+      if ((dest = ValidateDest(host, resource, &dtype)) == NULL)
       {
        /*
 	* Bad URI...
@@ -1309,7 +1312,7 @@ cancel_all_jobs(client_t        *con,	/* I - Client connection */
   httpSeparate(uri->values[0].string.text, method, username, host, &port,
                resource);
 
-  if ((dest = ValidateDest(resource, &dtype)) == NULL)
+  if ((dest = ValidateDest(host, resource, &dtype)) == NULL)
   {
    /*
     * Bad URI...
@@ -1340,7 +1343,6 @@ static void
 cancel_job(client_t        *con,	/* I - Client connection */
 	   ipp_attribute_t *uri)	/* I - Job or Printer URI */
 {
-  int			i;		/* Looping var */
   ipp_attribute_t	*attr;		/* Current attribute */
   int			jobid;		/* Job ID */
   char			method[HTTP_MAX_URI],
@@ -1353,8 +1355,6 @@ cancel_job(client_t        *con,	/* I - Client connection */
 					/* Resource portion of URI */
   int			port;		/* Port portion of URI */
   job_t			*job;		/* Job information */
-  struct passwd		*user;		/* User info */
-  struct group		*group;		/* System group info */
 
 
   DEBUG_printf(("cancel_job(%08x, %08x)\n", con, uri));
@@ -1434,51 +1434,12 @@ cancel_job(client_t        *con,	/* I - Client connection */
   * See if the job is owned by the requesting user...
   */
 
-  if (con->username[0])
-    strcpy(username, con->username);
-  else if ((attr = ippFindAttribute(con->request, "requesting-user-name", IPP_TAG_NAME)) != NULL)
+  if (!validate_user(con, job->username, username, sizeof(username)))
   {
-    strncpy(username, attr->values[0].string.text, sizeof(username) - 1);
-    username[sizeof(username) - 1] = '\0';
-  }
-  else
-    strcpy(username, "anonymous");
-
-  if (strcmp(username, job->username) != 0 && strcmp(username, "root") != 0)
-  {
-   /*
-    * Not the owner or root; check to see if the user is a member of the
-    * system group...
-    */
-
-    user = getpwnam(username);
-    endpwent();
-
-    group = getgrnam(SystemGroup);
-    endgrent();
-
-    if (group != NULL)
-    {
-      for (i = 0; group->gr_mem[i]; i ++)
-        if (strcmp(username, group->gr_mem[i]) == 0)
-	  break;
-    }
-    else
-      i = 0;
-
-    if (user == NULL || group == NULL ||
-        (group->gr_mem[i] == NULL && group->gr_gid != user->pw_gid))
-    {
-     /*
-      * Username not found, group not found, or user is not part of the
-      * system group...
-      */
-
-      LogMessage(L_ERROR, "cancel_job: \"%s\" not authorized to delete job id %d owned by \"%s\"!",
-        	 username, jobid, job->username);
-      send_ipp_error(con, IPP_FORBIDDEN);
-      return;
-    }
+    LogMessage(L_ERROR, "cancel_job: \"%s\" not authorized to delete job id %d owned by \"%s\"!",
+               username, jobid, job->username);
+    send_ipp_error(con, IPP_FORBIDDEN);
+    return;
   }
 
  /*
@@ -1702,7 +1663,7 @@ create_job(client_t        *con,	/* I - Client connection */
 
   httpSeparate(uri->values[0].string.text, method, username, host, &port, resource);
 
-  if ((dest = ValidateDest(resource, &dtype)) == NULL)
+  if ((dest = ValidateDest(host, resource, &dtype)) == NULL)
   {
    /*
     * Bad URI...
@@ -2164,7 +2125,7 @@ delete_printer(client_t        *con,	/* I - Client connection */
 
   httpSeparate(uri->values[0].string.text, method, username, host, &port, resource);
 
-  if ((dest = ValidateDest(resource, &dtype)) == NULL)
+  if ((dest = ValidateDest(host, resource, &dtype)) == NULL)
   {
    /*
     * Bad URI...
@@ -2313,7 +2274,7 @@ get_jobs(client_t        *con,		/* I - Client connection */
     dest  = NULL;
     dtype = CUPS_PRINTER_CLASS;
   }
-  else if ((dest = ValidateDest(resource, &dtype)) == NULL)
+  else if ((dest = ValidateDest(host, resource, &dtype)) == NULL)
   {
    /*
     * Bad URI...
@@ -2644,7 +2605,7 @@ get_printer_attrs(client_t        *con,	/* I - Client connection */
 
   httpSeparate(uri->values[0].string.text, method, username, host, &port, resource);
 
-  if ((dest = ValidateDest(resource, &dtype)) == NULL)
+  if ((dest = ValidateDest(host, resource, &dtype)) == NULL)
   {
    /*
     * Bad URI...
@@ -2805,7 +2766,6 @@ static void
 hold_job(client_t        *con,	/* I - Client connection */
          ipp_attribute_t *uri)	/* I - Job or Printer URI */
 {
-  int			i;		/* Looping var */
   ipp_attribute_t	*attr,		/* Current job-hold-until */
 			*newattr;	/* New job-hold-until */
   int			jobid;		/* Job ID */
@@ -2819,8 +2779,6 @@ hold_job(client_t        *con,	/* I - Client connection */
 					/* Resource portion of URI */
   int			port;		/* Port portion of URI */
   job_t			*job;		/* Job information */
-  struct passwd		*user;		/* User info */
-  struct group		*group;		/* System group info */
 
 
   DEBUG_printf(("hold_job(%08x, %08x)\n", con, uri));
@@ -2900,51 +2858,12 @@ hold_job(client_t        *con,	/* I - Client connection */
   * See if the job is owned by the requesting user...
   */
 
-  if (con->username[0])
-    strcpy(username, con->username);
-  else if ((attr = ippFindAttribute(con->request, "requesting-user-name", IPP_TAG_NAME)) != NULL)
+  if (!validate_user(con, job->username, username, sizeof(username)))
   {
-    strncpy(username, attr->values[0].string.text, sizeof(username) - 1);
-    username[sizeof(username) - 1] = '\0';
-  }
-  else
-    strcpy(username, "anonymous");
-
-  if (strcmp(username, job->username) != 0 && strcmp(username, "root") != 0)
-  {
-   /*
-    * Not the owner or root; check to see if the user is a member of the
-    * system group...
-    */
-
-    user = getpwnam(username);
-    endpwent();
-
-    group = getgrnam(SystemGroup);
-    endgrent();
-
-    if (group != NULL)
-    {
-      for (i = 0; group->gr_mem[i]; i ++)
-        if (strcmp(username, group->gr_mem[i]) == 0)
-	  break;
-    }
-    else
-      i = 0;
-
-    if (user == NULL || group == NULL ||
-        (group->gr_mem[i] == NULL && group->gr_gid != user->pw_gid))
-    {
-     /*
-      * Username not found, group not found, or user is not part of the
-      * system group...
-      */
-
-      LogMessage(L_ERROR, "hold_job: \"%s\" not authorized to hold job id %d owned by \"%s\"!",
-        	 username, jobid, job->username);
-      send_ipp_error(con, IPP_FORBIDDEN);
-      return;
-    }
+    LogMessage(L_ERROR, "hold_job: \"%s\" not authorized to hold job id %d owned by \"%s\"!",
+               username, jobid, job->username);
+    send_ipp_error(con, IPP_FORBIDDEN);
+    return;
   }
 
  /*
@@ -2999,7 +2918,6 @@ static void
 move_job(client_t        *con,		/* I - Client connection */
 	 ipp_attribute_t *uri)		/* I - Job URI */
 {
-  int			i;		/* Looping var */
   ipp_attribute_t	*attr;		/* Current attribute */
   int			jobid;		/* Job ID */
   job_t			*job;		/* Current job */
@@ -3014,8 +2932,6 @@ move_job(client_t        *con,		/* I - Client connection */
 			resource[HTTP_MAX_URI];
 					/* Resource portion of URI */
   int			port;		/* Port portion of URI */
-  struct passwd		*user;		/* User info */
-  struct group		*group;		/* System group info */
 
 
   DEBUG_printf(("move_job(%08x, %08x)\n", con, uri));
@@ -3096,51 +3012,12 @@ move_job(client_t        *con,		/* I - Client connection */
   * See if the job is owned by the requesting user...
   */
 
-  if (con->username[0])
-    strcpy(username, con->username);
-  else if ((attr = ippFindAttribute(con->request, "requesting-user-name", IPP_TAG_NAME)) != NULL)
+  if (!validate_user(con, job->username, username, sizeof(username)))
   {
-    strncpy(username, attr->values[0].string.text, sizeof(username) - 1);
-    username[sizeof(username) - 1] = '\0';
-  }
-  else
-    strcpy(username, "anonymous");
-
-  if (strcmp(username, job->username) != 0 && strcmp(username, "root") != 0)
-  {
-   /*
-    * Not the owner or root; check to see if the user is a member of the
-    * system group...
-    */
-
-    user = getpwnam(username);
-    endpwent();
-
-    group = getgrnam(SystemGroup);
-    endgrent();
-
-    if (group != NULL)
-    {
-      for (i = 0; group->gr_mem[i]; i ++)
-        if (strcmp(username, group->gr_mem[i]) == 0)
-	  break;
-    }
-    else
-      i = 0;
-
-    if (user == NULL || group == NULL ||
-        (group->gr_mem[i] == NULL && group->gr_gid != user->pw_gid))
-    {
-     /*
-      * Username not found, group not found, or user is not part of the
-      * system group...
-      */
-
-      LogMessage(L_ERROR, "move_job: \"%s\" not authorized to delete job id %d owned by \"%s\"!",
-        	 username, jobid, job->username);
-      send_ipp_error(con, IPP_FORBIDDEN);
-      return;
-    }
+    LogMessage(L_ERROR, "move_job: \"%s\" not authorized to move job id %d owned by \"%s\"!",
+               username, jobid, job->username);
+    send_ipp_error(con, IPP_FORBIDDEN);
+    return;
   }
 
   if ((attr = ippFindAttribute(con->request, "job-printer-uri", IPP_TAG_URI)) == NULL)
@@ -3160,7 +3037,7 @@ move_job(client_t        *con,		/* I - Client connection */
 
   httpSeparate(attr->values[0].string.text, method, username, host, &port,
                resource);
-  if ((dest = ValidateDest(resource, &dtype)) == NULL)
+  if ((dest = ValidateDest(host, resource, &dtype)) == NULL)
   {
    /*
     * Bad URI...
@@ -3349,7 +3226,7 @@ print_job(client_t        *con,		/* I - Client connection */
 
   httpSeparate(uri->values[0].string.text, method, username, host, &port, resource);
 
-  if ((dest = ValidateDest(resource, &dtype)) == NULL)
+  if ((dest = ValidateDest(host, resource, &dtype)) == NULL)
   {
    /*
     * Bad URI...
@@ -3605,7 +3482,7 @@ reject_jobs(client_t        *con,	/* I - Client connection */
 
   httpSeparate(uri->values[0].string.text, method, username, host, &port, resource);
 
-  if ((name = ValidateDest(resource, &dtype)) == NULL)
+  if ((name = ValidateDest(host, resource, &dtype)) == NULL)
   {
    /*
     * Bad URI...
@@ -3665,7 +3542,6 @@ static void
 release_job(client_t        *con,	/* I - Client connection */
             ipp_attribute_t *uri)	/* I - Job or Printer URI */
 {
-  int			i;		/* Looping var */
   ipp_attribute_t	*attr;		/* Current attribute */
   int			jobid;		/* Job ID */
   char			method[HTTP_MAX_URI],
@@ -3678,8 +3554,6 @@ release_job(client_t        *con,	/* I - Client connection */
 					/* Resource portion of URI */
   int			port;		/* Port portion of URI */
   job_t			*job;		/* Job information */
-  struct passwd		*user;		/* User info */
-  struct group		*group;		/* System group info */
 
 
   DEBUG_printf(("release_job(%08x, %08x)\n", con, uri));
@@ -3774,51 +3648,12 @@ release_job(client_t        *con,	/* I - Client connection */
   * See if the job is owned by the requesting user...
   */
 
-  if (con->username[0])
-    strcpy(username, con->username);
-  else if ((attr = ippFindAttribute(con->request, "requesting-user-name", IPP_TAG_NAME)) != NULL)
+  if (!validate_user(con, job->username, username, sizeof(username)))
   {
-    strncpy(username, attr->values[0].string.text, sizeof(username) - 1);
-    username[sizeof(username) - 1] = '\0';
-  }
-  else
-    strcpy(username, "anonymous");
-
-  if (strcmp(username, job->username) != 0 && strcmp(username, "root") != 0)
-  {
-   /*
-    * Not the owner or root; check to see if the user is a member of the
-    * system group...
-    */
-
-    user = getpwnam(username);
-    endpwent();
-
-    group = getgrnam(SystemGroup);
-    endgrent();
-
-    if (group != NULL)
-    {
-      for (i = 0; group->gr_mem[i]; i ++)
-        if (strcmp(username, group->gr_mem[i]) == 0)
-	  break;
-    }
-    else
-      i = 0;
-
-    if (user == NULL || group == NULL ||
-        (group->gr_mem[i] == NULL && group->gr_gid != user->pw_gid))
-    {
-     /*
-      * Username not found, group not found, or user is not part of the
-      * system group...
-      */
-
-      LogMessage(L_ERROR, "release_job: \"%s\" not authorized to release job id %d owned by \"%s\"!",
-        	 username, jobid, job->username);
-      send_ipp_error(con, IPP_FORBIDDEN);
-      return;
-    }
+    LogMessage(L_ERROR, "release_job: \"%s\" not authorized to release job id %d owned by \"%s\"!",
+               username, jobid, job->username);
+    send_ipp_error(con, IPP_FORBIDDEN);
+    return;
   }
 
  /*
@@ -3855,7 +3690,6 @@ static void
 restart_job(client_t        *con,	/* I - Client connection */
          ipp_attribute_t *uri)	/* I - Job or Printer URI */
 {
-  int			i;		/* Looping var */
   ipp_attribute_t	*attr;		/* Current attribute */
   int			jobid;		/* Job ID */
   char			method[HTTP_MAX_URI],
@@ -3868,8 +3702,6 @@ restart_job(client_t        *con,	/* I - Client connection */
 					/* Resource portion of URI */
   int			port;		/* Port portion of URI */
   job_t			*job;		/* Job information */
-  struct passwd		*user;		/* User info */
-  struct group		*group;		/* System group info */
 
 
   DEBUG_printf(("restart_job(%08x, %08x)\n", con, uri));
@@ -3979,51 +3811,12 @@ restart_job(client_t        *con,	/* I - Client connection */
   * See if the job is owned by the requesting user...
   */
 
-  if (con->username[0])
-    strcpy(username, con->username);
-  else if ((attr = ippFindAttribute(con->request, "requesting-user-name", IPP_TAG_NAME)) != NULL)
+  if (!validate_user(con, job->username, username, sizeof(username)))
   {
-    strncpy(username, attr->values[0].string.text, sizeof(username) - 1);
-    username[sizeof(username) - 1] = '\0';
-  }
-  else
-    strcpy(username, "anonymous");
-
-  if (strcmp(username, job->username) != 0 && strcmp(username, "root") != 0)
-  {
-   /*
-    * Not the owner or root; check to see if the user is a member of the
-    * system group...
-    */
-
-    user = getpwnam(username);
-    endpwent();
-
-    group = getgrnam(SystemGroup);
-    endgrent();
-
-    if (group != NULL)
-    {
-      for (i = 0; group->gr_mem[i]; i ++)
-        if (strcmp(username, group->gr_mem[i]) == 0)
-	  break;
-    }
-    else
-      i = 0;
-
-    if (user == NULL || group == NULL ||
-        (group->gr_mem[i] == NULL && group->gr_gid != user->pw_gid))
-    {
-     /*
-      * Username not found, group not found, or user is not part of the
-      * system group...
-      */
-
-      LogMessage(L_ERROR, "restart_job: \"%s\" not authorized to restart job id %d owned by \"%s\"!",
-        	 username, jobid, job->username);
-      send_ipp_error(con, IPP_FORBIDDEN);
-      return;
-    }
+    LogMessage(L_ERROR, "restart_job: \"%s\" not authorized to restart job id %d owned by \"%s\"!",
+               username, jobid, job->username);
+    send_ipp_error(con, IPP_FORBIDDEN);
+    return;
   }
 
  /*
@@ -4046,7 +3839,6 @@ static void
 send_document(client_t        *con,	/* I - Client connection */
 	      ipp_attribute_t *uri)	/* I - Printer URI */
 {
-  int			i;		/* Looping var */
   ipp_attribute_t	*attr;		/* Current attribute */
   ipp_attribute_t	*format;	/* Document-format attribute */
   int			jobid;		/* Job ID number */
@@ -4069,8 +3861,6 @@ send_document(client_t        *con,	/* I - Client connection */
 					/* Subtype of file */
 			mimetype[MIME_MAX_SUPER + MIME_MAX_TYPE + 2];
 					/* Textual name of mime type */
-  struct passwd		*user;		/* User info */
-  struct group		*group;		/* System group info */
   char			filename[1024];	/* Job filename */
   printer_t		*printer;	/* Current printer */
 
@@ -4152,51 +3942,12 @@ send_document(client_t        *con,	/* I - Client connection */
   * See if the job is owned by the requesting user...
   */
 
-  if (con->username[0])
-    strcpy(username, con->username);
-  else if ((attr = ippFindAttribute(con->request, "requesting-user-name", IPP_TAG_NAME)) != NULL)
+  if (!validate_user(con, job->username, username, sizeof(username)))
   {
-    strncpy(username, attr->values[0].string.text, sizeof(username) - 1);
-    username[sizeof(username) - 1] = '\0';
-  }
-  else
-    strcpy(username, "anonymous");
-
-  if (strcmp(username, job->username) != 0 && strcmp(username, "root") != 0)
-  {
-   /*
-    * Not the owner or root; check to see if the user is a member of the
-    * system group...
-    */
-
-    user = getpwnam(username);
-    endpwent();
-
-    group = getgrnam(SystemGroup);
-    endgrent();
-
-    if (group != NULL)
-    {
-      for (i = 0; group->gr_mem[i]; i ++)
-        if (strcmp(username, group->gr_mem[i]) == 0)
-	  break;
-    }
-    else
-      i = 0;
-
-    if (user == NULL || group == NULL ||
-        (group->gr_mem[i] == NULL && group->gr_gid != user->pw_gid))
-    {
-     /*
-      * Username not found, group not found, or user is not part of the
-      * system group...
-      */
-
-      LogMessage(L_ERROR, "send_document: \"%s\" not authorized to send document for job id %d owned by \"%s\"!",
-        	 username, jobid, job->username);
-      send_ipp_error(con, IPP_FORBIDDEN);
-      return;
-    }
+    LogMessage(L_ERROR, "send_document: \"%s\" not authorized to send document for job id %d owned by \"%s\"!",
+               username, jobid, job->username);
+    send_ipp_error(con, IPP_FORBIDDEN);
+    return;
   }
 
  /*
@@ -4448,7 +4199,7 @@ set_default(client_t        *con,	/* I - Client connection */
 
   httpSeparate(uri->values[0].string.text, method, username, host, &port, resource);
 
-  if ((name = ValidateDest(resource, &dtype)) == NULL)
+  if ((name = ValidateDest(host, resource, &dtype)) == NULL)
   {
    /*
     * Bad URI...
@@ -4490,7 +4241,6 @@ static void
 set_job_attrs(client_t        *con,	/* I - Client connection */
 	      ipp_attribute_t *uri)	/* I - Job URI */
 {
-  int			i;		/* Looping var */
   ipp_attribute_t	*attr,		/* Current attribute */
 			*prev,		/* Previous attribute */
 			*attr2,		/* Job attribute */
@@ -4506,8 +4256,6 @@ set_job_attrs(client_t        *con,	/* I - Client connection */
 			resource[HTTP_MAX_URI];
 					/* Resource portion of URI */
   int			port;		/* Port portion of URI */
-  struct passwd		*user;		/* User info */
-  struct group		*group;		/* System group info */
 
 
   DEBUG_printf(("set_job_attrs(%08x, %08x)\n", con, uri));
@@ -4588,51 +4336,12 @@ set_job_attrs(client_t        *con,	/* I - Client connection */
   * See if the job is owned by the requesting user...
   */
 
-  if (con->username[0])
-    strcpy(username, con->username);
-  else if ((attr = ippFindAttribute(con->request, "requesting-user-name", IPP_TAG_NAME)) != NULL)
+  if (!validate_user(con, job->username, username, sizeof(username)))
   {
-    strncpy(username, attr->values[0].string.text, sizeof(username) - 1);
-    username[sizeof(username) - 1] = '\0';
-  }
-  else
-    strcpy(username, "anonymous");
-
-  if (strcmp(username, job->username) != 0 && strcmp(username, "root") != 0)
-  {
-   /*
-    * Not the owner or root; check to see if the user is a member of the
-    * system group...
-    */
-
-    user = getpwnam(username);
-    endpwent();
-
-    group = getgrnam(SystemGroup);
-    endgrent();
-
-    if (group != NULL)
-    {
-      for (i = 0; group->gr_mem[i]; i ++)
-        if (strcmp(username, group->gr_mem[i]) == 0)
-	  break;
-    }
-    else
-      i = 0;
-
-    if (user == NULL || group == NULL ||
-        (group->gr_mem[i] == NULL && group->gr_gid != user->pw_gid))
-    {
-     /*
-      * Username not found, group not found, or user is not part of the
-      * system group...
-      */
-
-      LogMessage(L_ERROR, "set_job_attrs: \"%s\" not authorized to delete job id %d owned by \"%s\"!",
-        	 username, jobid, job->username);
-      send_ipp_error(con, IPP_FORBIDDEN);
-      return;
-    }
+    LogMessage(L_ERROR, "set_job_attrs: \"%s\" not authorized to alter job id %d owned by \"%s\"!",
+               username, jobid, job->username);
+    send_ipp_error(con, IPP_FORBIDDEN);
+    return;
   }
 
  /*
@@ -4806,7 +4515,7 @@ start_printer(client_t        *con,	/* I - Client connection */
 
   httpSeparate(uri->values[0].string.text, method, username, host, &port, resource);
 
-  if ((name = ValidateDest(resource, &dtype)) == NULL)
+  if ((name = ValidateDest(host, resource, &dtype)) == NULL)
   {
    /*
     * Bad URI...
@@ -4895,7 +4604,7 @@ stop_printer(client_t        *con,	/* I - Client connection */
 
   httpSeparate(uri->values[0].string.text, method, username, host, &port, resource);
 
-  if ((name = ValidateDest(resource, &dtype)) == NULL)
+  if ((name = ValidateDest(host, resource, &dtype)) == NULL)
   {
    /*
     * Bad URI...
@@ -5037,7 +4746,7 @@ validate_job(client_t        *con,	/* I - Client connection */
 
   httpSeparate(uri->values[0].string.text, method, username, host, &port, resource);
 
-  if (ValidateDest(resource, &dtype) == NULL)
+  if (ValidateDest(host, resource, &dtype) == NULL)
   {
    /*
     * Bad URI...
@@ -5057,5 +4766,76 @@ validate_job(client_t        *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.92 2000/08/30 18:49:22 mike Exp $".
+ * 'validate_user()' - Validate the user for the request.
+ */
+
+static int				/* O - 1 if permitted, 0 otherwise */
+validate_user(client_t   *con,		/* I - Client connection */
+              const char *owner,	/* I - Owner of job/resource */
+              char       *username,	/* O - Authenticated username */
+	      int        userlen)	/* I - Length of username */
+{
+  int			i;		/* Looping var */
+  ipp_attribute_t	*attr;		/* requesting-user-name attribute */
+  struct passwd		*user;		/* User info */
+  struct group		*group;		/* System group info */
+
+
+ /*
+  * Get the best authenticated username that is available.
+  */
+
+  if (con->username[0])
+    strncpy(username, con->username, userlen - 1);
+  else if ((attr = ippFindAttribute(con->request, "requesting-user-name", IPP_TAG_NAME)) != NULL)
+    strncpy(username, attr->values[0].string.text, userlen - 1);
+  else
+    strncpy(username, "anonymous", userlen - 1);
+
+  username[userlen - 1] = '\0';
+
+ /*
+  * Check the username against the owner...
+  */
+
+  if (strcmp(username, owner) != 0 && strcmp(username, "root") != 0)
+  {
+   /*
+    * Not the owner or root; check to see if the user is a member of the
+    * system group...
+    */
+
+    user = getpwnam(username);
+    endpwent();
+
+    group = getgrnam(SystemGroup);
+    endgrent();
+
+    if (group != NULL)
+    {
+      for (i = 0; group->gr_mem[i]; i ++)
+        if (strcmp(username, group->gr_mem[i]) == 0)
+	  break;
+    }
+    else
+      i = 0;
+
+    if (user == NULL || group == NULL ||
+        (group->gr_mem[i] == NULL && group->gr_gid != user->pw_gid))
+    {
+     /*
+      * Username not found, group not found, or user is not part of the
+      * system group...
+      */
+
+      return (0);
+    }
+  }
+
+  return (1);
+}
+
+
+/*
+ * End of "$Id: ipp.c,v 1.93 2000/08/30 20:12:49 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.84 2000/08/30 18:49:22 mike Exp $"
+ * "$Id: job.c,v 1.85 2000/08/30 20:12:50 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -43,7 +43,6 @@
  *   StopAllJobs()     - Stop all print jobs.
  *   StopJob()         - Stop a print job.
  *   UpdateJob()       - Read a status update from a job's filters.
- *   ValidateDest()    - Validate a printer/class destination.
  *   ipp_read_file()   - Read an IPP request from a file.
  *   ipp_write_file()  - Write an IPP request to a file.
  *   start_process()   - Start a background process.
@@ -465,7 +464,7 @@ LoadAllJobs(void)
       httpSeparate(attr->values[0].string.text, method, username, host,
                    &port, resource);
 
-      if ((dest = ValidateDest(resource, &(job->dtype))) == NULL)
+      if ((dest = ValidateDest(host, resource, &(job->dtype))) == NULL)
         if (strchr(resource, '@') != NULL)
 	{
 	 /*
@@ -1701,50 +1700,6 @@ UpdateJob(job_t *job)		/* I - Job to check */
 
 
 /*
- * 'ValidateDest()' - Validate a printer/class destination.
- */
-
-const char *				/* O - Printer or class name */
-ValidateDest(const char   *resource,	/* I - Resource name */
-             cups_ptype_t *dtype)	/* O - Type (printer or class) */
-{
-  if (strncmp(resource, "/classes/", 9) == 0)
-  {
-   /*
-    * Print to a class...
-    */
-
-    *dtype = CUPS_PRINTER_CLASS;
-
-    if (FindClass(resource + 9) == NULL)
-      return (NULL);
-    else
-      return (resource + 9);
-  }
-  else if (strncmp(resource, "/printers/", 10) == 0)
-  {
-   /*
-    * Print to a specific printer...
-    */
-
-    *dtype = (cups_ptype_t)0;
-
-    if (FindPrinter(resource + 10) == NULL)
-    {
-      *dtype = CUPS_PRINTER_CLASS;
-
-      if (FindClass(resource + 10) == NULL)
-        return (NULL);
-    }
-
-    return (resource + 10);
-  }
-  else
-    return (NULL);
-}
-
-
-/*
  * 'ipp_read_file()' - Read an IPP request from a file.
  */
 
@@ -2613,5 +2568,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.84 2000/08/30 18:49:22 mike Exp $".
+ * End of "$Id: job.c,v 1.85 2000/08/30 20:12:50 mike Exp $".
  */
