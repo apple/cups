@@ -1,5 +1,5 @@
 /*
- * "$Id: lpadmin.c,v 1.6 1999/06/23 14:12:24 mike Exp $"
+ * "$Id: lpadmin.c,v 1.7 1999/07/07 18:25:05 mike Exp $"
  *
  *   "lpadmin" command for the Common UNIX Printing System (CUPS).
  *
@@ -161,13 +161,9 @@ main(int  argc,		/* I - Number of command-line arguments */
         case 'E' : /* Enable the printer */
 	    if (printer == NULL)
 	    {
-              if (argv[i][2])
-                printer = argv[i] + 2;
-              else
-              {
-                i ++;
-                printer = argv[i];
-              }
+	      fputs("lpadmin: Unable to enable the printer:\n", stderr);
+	      fputs("         You must specify a printer name first!\n", stderr);
+	      return (1);
 	    }
 
             enable_printer(http, printer);
@@ -1147,5 +1143,5 @@ set_printer_location(http_t *http,	/* I - Server connection */
 
 
 /*
- * End of "$Id: lpadmin.c,v 1.6 1999/06/23 14:12:24 mike Exp $".
+ * End of "$Id: lpadmin.c,v 1.7 1999/07/07 18:25:05 mike Exp $".
  */
