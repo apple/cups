@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c,v 1.61 2002/03/02 11:43:52 mike Exp $"
+ * "$Id: ppd.c,v 1.62 2002/03/25 17:51:18 mike Exp $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -1083,12 +1083,33 @@ ppdOpen(FILE *fp)		/* I - File to read from */
 	return (NULL);
       }
 
-      if (strchr(string, '/') != NULL)	/* Just show human readable text */
-        strcpy(string, strchr(string, '/') + 1);
+      if (strncasecmp(string, "InstallableOptions", 16) == 0)
+      {
+       /*
+        * Handle the InstallableOptions group differently than other
+	* groups; this is necessary so that UIs can correctly
+	* isolate them from normal user options.
+	*
+	* In CUPS 1.2 we have separate text and keyword fields,
+	* so this "hack" won't be needed...
+	*/
 
-      ppd_decode(string);
-      ppd_fix(string);
-      group = ppd_get_group(ppd, string);
+	group = ppd_get_group(ppd, "InstallableOptions");
+      }
+      else
+      {
+       /*
+        * For all other groups, just use the human readable text...
+        */
+
+	if (strchr(string, '/') != NULL)
+          strcpy(string, strchr(string, '/') + 1);
+
+	ppd_decode(string);
+	ppd_fix(string);
+
+	group = ppd_get_group(ppd, string);
+      }
     }
     else if (strcmp(keyword, "CloseGroup") == 0)
       group = NULL;
@@ -2004,5 +2025,5 @@ ppd_fix(char *string)		/* IO - String to fix */
 
 
 /*
- * End of "$Id: ppd.c,v 1.61 2002/03/02 11:43:52 mike Exp $".
+ * End of "$Id: ppd.c,v 1.62 2002/03/25 17:51:18 mike Exp $".
  */
