@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.93 2000/08/30 20:12:49 mike Exp $"
+ * "$Id: ipp.c,v 1.94 2000/08/30 22:00:36 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -35,6 +35,7 @@
  *   add_queued_job_count()      - Add the "queued-job-count" attribute for
  *   cancel_all_jobs()           - Cancel all print jobs.
  *   cancel_job()                - Cancel a print job.
+ *   copy_attribute()            - Copy a single attribute.
  *   copy_attrs()                - Copy attributes from one request to another.
  *   create_job()                - Print a file to a printer or class.
  *   copy_banner()               - Copy a banner file to the requests directory
@@ -91,6 +92,7 @@ static void	add_printer_state_reasons(client_t *con, printer_t *p);
 static void	add_queued_job_count(client_t *con, printer_t *p);
 static void	cancel_all_jobs(client_t *con, ipp_attribute_t *uri);
 static void	cancel_job(client_t *con, ipp_attribute_t *uri);
+static void	copy_attribute(ipp_t *to, ipp_attribute_t *attr);
 static void	copy_attrs(ipp_t *to, ipp_t *from, ipp_attribute_t *req,
 		           ipp_tag_t group);
 static void	copy_banner(client_t *con, job_t *job, const char *name);
@@ -1456,6 +1458,129 @@ cancel_job(client_t        *con,	/* I - Client connection */
 
 
 /*
+ * 'copy_attribute()' - Copy a single attribute.
+ */
+
+static void
+copy_attribute(ipp_t           *to,	/* O - Destination request/response */
+               ipp_attribute_t *attr)	/* I - Attribute to copy */
+{
+  int			i;		/* Looping var */
+  ipp_attribute_t	*toattr;	/* Destination attribute */
+
+
+  switch (attr->value_tag)
+  {
+    case IPP_TAG_ZERO :
+        ippAddSeparator(to);
+	break;
+
+    case IPP_TAG_INTEGER :
+    case IPP_TAG_ENUM :
+        toattr = ippAddIntegers(to, attr->group_tag, attr->value_tag,
+	                        attr->name, attr->num_values, NULL);
+
+        for (i = 0; i < attr->num_values; i ++)
+	  toattr->values[i].integer = attr->values[i].integer;
+        break;
+
+    case IPP_TAG_BOOLEAN :
+        toattr = ippAddBooleans(to, attr->group_tag, attr->name,
+	                        attr->num_values, NULL);
+
+        for (i = 0; i < attr->num_values; i ++)
+	  toattr->values[i].boolean = attr->values[i].boolean;
+        break;
+
+    case IPP_TAG_STRING :
+    case IPP_TAG_TEXT :
+    case IPP_TAG_NAME :
+    case IPP_TAG_KEYWORD :
+    case IPP_TAG_URI :
+    case IPP_TAG_URISCHEME :
+    case IPP_TAG_CHARSET :
+    case IPP_TAG_LANGUAGE :
+    case IPP_TAG_MIMETYPE :
+        toattr = ippAddStrings(to, attr->group_tag, attr->value_tag,
+	                       attr->name, attr->num_values, NULL,
+			       NULL);
+
+        for (i = 0; i < attr->num_values; i ++)
+	  toattr->values[i].string.text = strdup(attr->values[i].string.text);
+        break;
+
+    case IPP_TAG_DATE :
+        toattr = ippAddDate(to, attr->group_tag, attr->name,
+	                    attr->values[0].date);
+        break;
+
+    case IPP_TAG_RESOLUTION :
+        toattr = ippAddResolutions(to, attr->group_tag, attr->name,
+	                           attr->num_values, IPP_RES_PER_INCH,
+				   NULL, NULL);
+
+        for (i = 0; i < attr->num_values; i ++)
+	{
+	  toattr->values[i].resolution.xres  = attr->values[i].resolution.xres;
+	  toattr->values[i].resolution.yres  = attr->values[i].resolution.yres;
+	  toattr->values[i].resolution.units = attr->values[i].resolution.units;
+	}
+        break;
+
+    case IPP_TAG_RANGE :
+        toattr = ippAddRanges(to, attr->group_tag, attr->name,
+	                      attr->num_values, NULL, NULL);
+
+        for (i = 0; i < attr->num_values; i ++)
+	{
+	  toattr->values[i].range.lower = attr->values[i].range.lower;
+	  toattr->values[i].range.upper = attr->values[i].range.upper;
+	}
+        break;
+
+    case IPP_TAG_TEXTLANG :
+    case IPP_TAG_NAMELANG :
+        toattr = ippAddStrings(to, attr->group_tag, attr->value_tag,
+	                       attr->name, attr->num_values, NULL, NULL);
+
+        for (i = 0; i < attr->num_values; i ++)
+	{
+	  if (i == 0)
+	    toattr->values[0].string.charset =
+	        strdup(attr->values[0].string.charset);
+	  else
+	    toattr->values[i].string.charset =
+	        toattr->values[0].string.charset;
+
+	  toattr->values[i].string.text =
+	      strdup(attr->values[i].string.text);
+        }
+        break;
+
+     default :
+        toattr = ippAddIntegers(to, attr->group_tag, attr->value_tag,
+	                        attr->name, attr->num_values, NULL);
+
+        for (i = 0; i < attr->num_values; i ++)
+	{
+	  toattr->values[i].unknown.length = attr->values[i].unknown.length;
+
+	  if (toattr->values[i].unknown.length > 0)
+	  {
+	    if ((toattr->values[i].unknown.data = malloc(toattr->values[i].unknown.length)) == NULL)
+	      toattr->values[i].unknown.length = 0;
+	    else
+	      memcpy(toattr->values[i].unknown.data,
+		     attr->values[i].unknown.data,
+		     toattr->values[i].unknown.length);
+	  }
+	}
+        break; /* anti-compiler-warning-code */
+  }
+}
+
+
+/*
  * 'copy_attrs()' - Copy attributes from one request to another.
  */
 
@@ -1466,8 +1591,7 @@ copy_attrs(ipp_t           *to,		/* I - Destination request */
 	   ipp_tag_t       group)	/* I - Group to copy */
 {
   int			i;		/* Looping var */
-  ipp_attribute_t	*toattr,	/* Destination attribute */
-			*fromattr;	/* Source attribute */
+  ipp_attribute_t	*fromattr;	/* Source attribute */
 
 
   DEBUG_printf(("copy_attrs(%08x, %08x)\n", to, from));
@@ -1499,115 +1623,7 @@ copy_attrs(ipp_t           *to,		/* I - Destination request */
     }
 
     DEBUG_printf(("copy_attrs: copying attribute \'%s\'...\n", fromattr->name));
-
-    switch (fromattr->value_tag)
-    {
-      case IPP_TAG_ZERO :
-          ippAddSeparator(to);
-	  break;
-
-      case IPP_TAG_INTEGER :
-      case IPP_TAG_ENUM :
-          toattr = ippAddIntegers(to, fromattr->group_tag, fromattr->value_tag,
-	                          fromattr->name, fromattr->num_values, NULL);
-
-          for (i = 0; i < fromattr->num_values; i ++)
-	    toattr->values[i].integer = fromattr->values[i].integer;
-          break;
-
-      case IPP_TAG_BOOLEAN :
-          toattr = ippAddBooleans(to, fromattr->group_tag, fromattr->name,
-	                          fromattr->num_values, NULL);
-
-          for (i = 0; i < fromattr->num_values; i ++)
-	    toattr->values[i].boolean = fromattr->values[i].boolean;
-          break;
-
-      case IPP_TAG_STRING :
-      case IPP_TAG_TEXT :
-      case IPP_TAG_NAME :
-      case IPP_TAG_KEYWORD :
-      case IPP_TAG_URI :
-      case IPP_TAG_URISCHEME :
-      case IPP_TAG_CHARSET :
-      case IPP_TAG_LANGUAGE :
-      case IPP_TAG_MIMETYPE :
-          toattr = ippAddStrings(to, fromattr->group_tag, fromattr->value_tag,
-	                         fromattr->name, fromattr->num_values, NULL,
-				 NULL);
-
-          for (i = 0; i < fromattr->num_values; i ++)
-	    toattr->values[i].string.text = strdup(fromattr->values[i].string.text);
-          break;
-
-      case IPP_TAG_DATE :
-          toattr = ippAddDate(to, fromattr->group_tag, fromattr->name,
-	                      fromattr->values[0].date);
-          break;
-
-      case IPP_TAG_RESOLUTION :
-          toattr = ippAddResolutions(to, fromattr->group_tag, fromattr->name,
-	                             fromattr->num_values, IPP_RES_PER_INCH,
-				     NULL, NULL);
-
-          for (i = 0; i < fromattr->num_values; i ++)
-	  {
-	    toattr->values[i].resolution.xres  = fromattr->values[i].resolution.xres;
-	    toattr->values[i].resolution.yres  = fromattr->values[i].resolution.yres;
-	    toattr->values[i].resolution.units = fromattr->values[i].resolution.units;
-	  }
-          break;
-
-      case IPP_TAG_RANGE :
-          toattr = ippAddRanges(to, fromattr->group_tag, fromattr->name,
-	                        fromattr->num_values, NULL, NULL);
-
-          for (i = 0; i < fromattr->num_values; i ++)
-	  {
-	    toattr->values[i].range.lower = fromattr->values[i].range.lower;
-	    toattr->values[i].range.upper = fromattr->values[i].range.upper;
-	  }
-          break;
-
-      case IPP_TAG_TEXTLANG :
-      case IPP_TAG_NAMELANG :
-          toattr = ippAddStrings(to, fromattr->group_tag, fromattr->value_tag,
-	                         fromattr->name, fromattr->num_values, NULL, NULL);
-
-          for (i = 0; i < fromattr->num_values; i ++)
-	  {
-	    if (i == 0)
-	      toattr->values[0].string.charset =
-	          strdup(fromattr->values[0].string.charset);
-	    else
-	      toattr->values[i].string.charset =
-	          toattr->values[0].string.charset;
-
-	    toattr->values[i].string.text =
-	        strdup(fromattr->values[i].string.text);
-          }
-          break;
-
-       default :
-          toattr = ippAddIntegers(to, fromattr->group_tag, fromattr->value_tag,
-	                          fromattr->name, fromattr->num_values, NULL);
-
-          for (i = 0; i < fromattr->num_values; i ++)
-	  {
-	    toattr->values[i].unknown.length = fromattr->values[i].unknown.length;
-
-	    if (toattr->values[i].unknown.length > 0)
-	    {
-	      if ((toattr->values[i].unknown.data = malloc(toattr->values[i].unknown.length)) == NULL)
-	        toattr->values[i].unknown.length = 0;
-	      else
-	        memcpy(toattr->values[i].unknown.data,
-		       fromattr->values[i].unknown.data,
-		       toattr->values[i].unknown.length);
-	    }
-	  }
-          break; /* anti-compiler-warning-code */
-    }
+    copy_attribute(to, fromattr);
   }
 }
 
@@ -4242,7 +4258,6 @@ set_job_attrs(client_t        *con,	/* I - Client connection */
 	      ipp_attribute_t *uri)	/* I - Job URI */
 {
   ipp_attribute_t	*attr,		/* Current attribute */
-			*prev,		/* Previous attribute */
 			*attr2,		/* Job attribute */
 			*prev2;		/* Previous job attribute */
   int			jobid;		/* Job ID */
@@ -4348,9 +4363,7 @@ set_job_attrs(client_t        *con,	/* I - Client connection */
   * See what the user wants to change.
   */
 
-  for (attr = con->request->attrs, prev = NULL;
-       attr != NULL;
-       prev = attr, attr = attr->next)
+  for (attr = con->request->attrs; attr != NULL; attr = attr->next)
   {
     if (attr->group_tag != IPP_TAG_JOB || !attr->name)
       continue;
@@ -4368,28 +4381,26 @@ set_job_attrs(client_t        *con,	/* I - Client connection */
     else if ((attr2 = ippFindAttribute(job->attrs, attr->name, IPP_TAG_ZERO)) != NULL)
     {
      /*
-      * Some other value...
+      * Some other value; first free the old value...
       */
 
       for (prev2 = job->attrs->attrs; prev2 != NULL; prev2 = prev2->next)
 	if (prev2->next == attr2)
 	  break;
 
-      if (prev)
-        prev->next = attr->next;
-      else
-        con->request->attrs = attr->next;
-
       if (prev2)
-	prev2->next = attr;
+	prev2->next = attr2->next;
       else
-	job->attrs->attrs = attr;
-
-      attr->next = attr2->next;
-      attr       = prev;
+	job->attrs->attrs = attr2->next;
 
       _ipp_free_attr(attr2);
-            
+
+     /*
+      * Then copy the attribute...
+      */
+
+      copy_attribute(job->attrs, attr);
+
      /*
       * See if the job-name or job-hold-until is being changed.
       */
@@ -4431,25 +4442,10 @@ set_job_attrs(client_t        *con,	/* I - Client connection */
     else
     {
      /*
-      * Add new option by moving it from one request to another...
+      * Add new option by copying it...
       */
 
-      for (attr2 = job->attrs->attrs; attr2 != NULL; attr2 = attr2->next)
-        if (!attr2->next)
-	  break;
-
-      if (attr2)
-        attr2->next = attr;
-      else
-        job->attrs->attrs = attr;
-
-      if (prev)
-        prev->next = attr->next;
-      else
-        con->request->attrs = attr->next;
-
-      attr->next = NULL;
-      attr       = prev;
+      copy_attribute(job->attrs, attr);
     }
   }
 
@@ -4837,5 +4833,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.93 2000/08/30 20:12:49 mike Exp $".
+ * End of "$Id: ipp.c,v 1.94 2000/08/30 22:00:36 mike Exp $".
  */

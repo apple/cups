@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.85 2000/08/30 20:12:50 mike Exp $"
+ * "$Id: job.c,v 1.86 2000/08/30 22:00:37 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -349,11 +349,15 @@ HoldJob(int id)			/* I - Job ID */
   job_t	*job;			/* Job data */
 
 
+  DEBUG_printf(("HoldJob(%d)\n", id));
+
   if ((job = FindJob(id)) == NULL)
     return;
 
   if (job->state->values[0].integer == IPP_JOB_PROCESSING)
     StopJob(id);
+
+  DEBUG_puts("HoldJob: setting state to held...");
 
   job->state->values[0].integer = IPP_JOB_HELD;
 
@@ -661,11 +665,15 @@ ReleaseJob(int id)		/* I - Job ID */
   job_t	*job;			/* Job data */
 
 
+  DEBUG_printf(("ReleaseJob(%d)\n", id));
+
   if ((job = FindJob(id)) == NULL)
     return;
 
   if (job->state->values[0].integer == IPP_JOB_HELD)
   {
+    DEBUG_puts("ReleaseJob: setting state to pending...");
+
     job->state->values[0].integer = IPP_JOB_PENDING;
     SaveJob(id);
     CheckJobs();
@@ -729,6 +737,8 @@ SetJobHoldUntil(int        id,		/* I - Job ID */
   int		minute;			/* Hold minute */
   int		second;			/* Hold second */
 
+
+  DEBUG_printf(("SetJobHoldUntil(%d, \"%s\")\n", id, when));
 
   if ((job = FindJob(id)) == NULL)
     return;
@@ -844,6 +854,8 @@ SetJobHoldUntil(int        id,		/* I - Job ID */
     if (job->hold_until < curtime)
       job->hold_until += 24 * 60 * 60 * 60;
   }
+
+  DEBUG_printf(("SetJobHoldUntil: hold_until = %d\n", job->hold_until));
 }
 
 
@@ -2568,5 +2580,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.85 2000/08/30 20:12:50 mike Exp $".
+ * End of "$Id: job.c,v 1.86 2000/08/30 22:00:37 mike Exp $".
  */

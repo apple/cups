@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.69 2000/08/30 20:24:53 mike Exp $"
+ * "$Id: printers.c,v 1.70 2000/08/30 22:00:37 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -1388,6 +1388,8 @@ ValidateDest(const char   *hostname,	/* I - Host name */
 		*sptr;			/* Pointer into server name */
 
 
+  printf("ValidateDest(\"%s\", \"%s\", %p)\n", hostname, resource, dtype);
+
  /*
   * See if the resource is a class or printer...
   */
@@ -1398,7 +1400,6 @@ ValidateDest(const char   *hostname,	/* I - Host name */
     * Class...
     */
 
-    *dtype = CUPS_PRINTER_CLASS;
     resource += 9;
   }
   else if (strncmp(resource, "/printers/", 10) == 0)
@@ -1407,7 +1408,6 @@ ValidateDest(const char   *hostname,	/* I - Host name */
     * Printer...
     */
 
-    *dtype = (cups_ptype_t)0;
     resource += 10;
   }
   else
@@ -1429,39 +1429,44 @@ ValidateDest(const char   *hostname,	/* I - Host name */
     rlen = strlen(resource);
 
  /*
-  * Localize the hostname...
-  */
-
-  strncpy(localname, hostname, sizeof(localname) - 1);
-  localname[sizeof(localname) - 1] = '\0';
-
-  lptr = strchr(localname, '.');
-  sptr = strchr(ServerName, '.');
-
-  if (sptr != NULL && lptr != NULL)
-  {
-   /*
-    * Strip the common domain name components...
-    */
-
-    while (lptr != NULL)
-    {
-      if (strcasecmp(lptr, sptr) == 0)
-      {
-        *lptr = '\0';
-	break;
-      }
-      else
-        lptr = strchr(lptr + 1, '.');
-    }
-  }
-
- /*
   * Change localhost to the server name...
   */
 
   if (strcasecmp(hostname, "localhost") == 0)
     hostname = ServerName;
+
+  strncpy(localname, hostname, sizeof(localname) - 1);
+  localname[sizeof(localname) - 1] = '\0';
+
+  if (strcasecmp(hostname, ServerName) != 0)
+  {
+   /*
+    * Localize the hostname...
+    */
+
+    lptr = strchr(localname, '.');
+    sptr = strchr(ServerName, '.');
+
+    if (sptr != NULL && lptr != NULL)
+    {
+     /*
+      * Strip the common domain name components...
+      */
+
+      while (lptr != NULL)
+      {
+	if (strcasecmp(lptr, sptr) == 0)
+	{
+          *lptr = '\0';
+	  break;
+	}
+	else
+          lptr = strchr(lptr + 1, '.');
+      }
+    }
+  }
+
+  printf("localized hostname is \"%s\"...\n", localname);
 
  /*
   * Find a matching printer or class...
@@ -1472,7 +1477,10 @@ ValidateDest(const char   *hostname,	/* I - Host name */
         (strcasecmp(p->name, resource) == 0 ||
 	 (strncasecmp(p->name, resource, rlen) == 0 &&
 	  p->name[rlen] == '@')))
+    {
+      *dtype = p->type & CUPS_PRINTER_CLASS;
       return (p->name);
+    }
 
   return (NULL);
 }
@@ -1523,5 +1531,5 @@ write_printcap(void)
 
 
 /*
- * End of "$Id: printers.c,v 1.69 2000/08/30 20:24:53 mike Exp $".
+ * End of "$Id: printers.c,v 1.70 2000/08/30 22:00:37 mike Exp $".
  */
