@@ -343,6 +343,15 @@ most support the following options (case is not significant):
 in the <CODE>PageSize</CODE>, <CODE>InputSlot</CODE>, and
 <CODE>MediaType</CODE> options.
 
+<H3>Viewing Options for a Specific Printer</H3>
+
+<P>You can display the supported options using the <CODE>lpoptions</CODE>
+command with the <CODE>-l</CODE> option, as follows:
+
+<UL><PRE>
+<B>lpoptions -p laserjet -l ENTER</B>
+</UL></PRE>
+
 <H3>Printing On Both Sides of the Paper</H3>
 
 <P>The <CODE>-o sides=two-sided-short-edge</CODE> and <CODE>-o

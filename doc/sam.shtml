@@ -601,20 +601,9 @@ those that have been queued. This is useful for when you must perform
 maintenance on the printer and will not have it available to users for
 a long period of time.
 
-<H2>Managing Printers from the Web</H2>
-
-<P>The Web interface is located at:
-
-<UL><PRE>
-<A HREF="http://localhost:631/admin">http://localhost:631/admin</A>
-</PRE></UL>
-
-<P>From there you can perform all printer management tasks with a few
-simple mouse clicks.
-
 <H3>Setting Quotas on a Printer</A></H3>
 
-<P>ESP Print Pro supports page and size-based quotas for each printer.
+<P>CUPS supports page and size-based quotas for each printer.
 The quotas are tracked individually for each user, but a single set of
 limits applies to all users for a partiuclar printer. For example, you
 can limit every user to 5 pages per day on an expensive printer, but
@@ -634,8 +623,8 @@ quotas:</P>
 
 <UL>
 <PRE>
-<KBD>/usr/sbin/lpadmin -p <I>printer</I> -o job-quota-period=604800 -o job-k-limit=1024<I>ENTER</I></KBD>
-<KBD>/usr/sbin/lpadmin -p <I>printer</I> -o job-quota-period=604800 -o job-page-limit=100<I>ENTER</I></KBD>
+<B>/usr/sbin/lpadmin -p <I>printer</I> -o job-quota-period=604800 -o job-k-limit=1024<I>ENTER</I></B>
+<B>/usr/sbin/lpadmin -p <I>printer</I> -o job-quota-period=604800 -o job-page-limit=100<I>ENTER</I></B>
 </PRE>
 </UL>
 
@@ -651,18 +640,18 @@ to a printer:</P>
 
 <UL>
 <PRE>
-<KBD>/usr/sbin/lpadmin -p <I>printer</I> -u allow:all <I>ENTER</I></KBD>
+<B>/usr/sbin/lpadmin -p <I>printer</I> -u allow:all <I>ENTER</I></B>
 </PRE>
 </UL>
 
-<P>ESP Print Pro supports allow and deny lists so that you can specify a
+<P>CUPS supports allow and deny lists so that you can specify a
 list of users who are allowed to print or not allowed to print. Along
 with your list of users, you can specify whether they are allowed or
 not allowed to use the printer:</P>
 
 <UL>
 <PRE>
-<KBD>/usr/sbin/lpadmin -p <I>printer</I> -u allow:peter,paul,mary <I>ENTER</I></KBD>
+<B>/usr/sbin/lpadmin -p <I>printer</I> -u allow:peter,paul,mary <I>ENTER</I></B>
 </PRE>
 </UL>
 
@@ -671,7 +660,7 @@ printer, but all other users cannon print. The command:</P>
 
 <UL>
 <PRE>
-<KBD>/usr/sbin/lpadmin -p <I>printer</I> -u deny:peter,paul,mary <I>ENTER</I></KBD>
+<B>/usr/sbin/lpadmin -p <I>printer</I> -u deny:peter,paul,mary <I>ENTER</I></B>
 </PRE>
 </UL>
 
@@ -684,13 +673,25 @@ be able to print to the named printer.</P>
 <P>The<I> allow</I> and<I> deny</I> options are not cummulative. That
 is, you must provide the complete list of users to allow or deny each
 time.</P>
-<P>Also, ESP Print Pro only maintains one list of users - the list can
+<P>Also, CUPS only maintains one list of users - the list can
 allow or deny users from printing. If you specify an allow list and
 then specify a deny list, the deny list will replace the allow list -
 only one list is active at any time.</P>
 </TD></TR>
 </TABLE>
 </CENTER>
+
+<H2>Managing Printers from the Web</H2>
+
+<P>The Web interface is located at:
+
+<UL><PRE>
+<A HREF="http://localhost:631/admin">http://localhost:631/admin</A>
+</PRE></UL>
+
+<P>From there you can perform all printer management tasks with a few
+simple mouse clicks.
+
 
 <H1 ALIGN="RIGHT"><A NAME="PRINTER_CLASSES">4 - Printer Classes</A></H1>
 
@@ -3798,14 +3799,14 @@ Otherwise you will not be able to authenticate
 the printer drivers for one or more queues:
 
 <UL><PRE>
-<KBD>cupsaddsmb -U root printer1 ... printerN <I>ENTER</I></KBD>
+<B>cupsaddsmb -U root printer1 ... printerN <I>ENTER</I></B>
 </PRE></UL>
 
 <P>Running <CODE>cupsaddsmb</CODE> with the <CODE>-a</CODE> option
 will export all printers:
 
 <UL><PRE>
-<KBD>cupsaddsmb -U root -a <I>ENTER</I></KBD>
+<B>cupsaddsmb -U root -a <I>ENTER</I></B>
 </PRE></UL>
 
 <H2>Printing to Windows Servers</H2>
