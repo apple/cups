@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.82.2.32 2003/05/09 16:06:43 mike Exp $"
+ * "$Id: http.c,v 1.82.2.33 2003/05/09 18:35:37 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS).
  *
@@ -899,13 +899,13 @@ httpRead(http_t *http,			/* I - HTTP data */
     * Buffer small reads for better performance...
     */
 
+    if (!http->blocking && !httpWait(http, 1000))
+      return (0);
+
     if (http->data_remaining > sizeof(http->buffer))
       bytes = sizeof(http->buffer);
     else
       bytes = http->data_remaining;
-
-      if (!http->blocking && !httpWait(http, 1000))
-        return (0);
 
 #ifdef HAVE_SSL
     if (http->tls)
@@ -937,7 +937,7 @@ httpRead(http_t *http,			/* I - HTTP data */
       }
 #endif /* WIN32 */
     }
-    else if (bytes == 0)
+    else
     {
       http->error = EPIPE;
       return (0);
@@ -961,16 +961,13 @@ httpRead(http_t *http,			/* I - HTTP data */
   }
 #ifdef HAVE_SSL
   else if (http->tls)
-  {
-    if (!http->blocking && !httpWait(http, 1000))
-      return (0);
     bytes = http_read_ssl(http, buffer, length);
-  }
 #endif /* HAVE_SSL */
   else
   {
     if (!http->blocking && !httpWait(http, 1000))
       return (0);
+
     DEBUG_printf(("httpRead: reading %d bytes from socket...\n", length));
     bytes = recv(http->fd, buffer, length, 0);
     DEBUG_printf(("httpRead: read %d bytes from socket...\n", bytes));
@@ -989,10 +986,10 @@ httpRead(http_t *http,			/* I - HTTP data */
       http->error = errno;
 #endif /* WIN32 */
   }
-  else if (bytes == 0)
+  else
   {
     http->error = EPIPE;
-    return 0;
+    return (0);
   }
 
   if (http->data_remaining == 0)
@@ -1325,15 +1322,15 @@ httpGets(char   *line,			/* I - Line to read into */
       * No newline; see if there is more data to be read...
       */
 
-      if (!http->blocking && !httpWait(http, 1000))
-        return (NULL);
-
 #ifdef HAVE_SSL
       if (http->tls)
 	bytes = http_read_ssl(http, bufend, HTTP_MAX_BUFFER - http->used);
       else
 #endif /* HAVE_SSL */
-      bytes = recv(http->fd, bufend, HTTP_MAX_BUFFER - http->used, 0);
+      if (!http->blocking && !httpWait(http, 1000))
+        return (NULL);
+      else
+        bytes = recv(http->fd, bufend, HTTP_MAX_BUFFER - http->used, 0);
 
       if (bytes < 0)
       {
@@ -1365,7 +1362,7 @@ httpGets(char   *line,			/* I - Line to read into */
       }
       else if (bytes == 0)
       {
-	  http->error = EPIPE;
+	http->error = EPIPE;
 
         return (NULL);
       }
@@ -2407,5 +2404,5 @@ CDSAWriteFunc(SSLConnectionRef connection,	/* I  - SSL/TLS connection */
 
 
 /*
- * End of "$Id: http.c,v 1.82.2.32 2003/05/09 16:06:43 mike Exp $".
+ * End of "$Id: http.c,v 1.82.2.33 2003/05/09 18:35:37 mike Exp $".
  */
