@@ -3,8 +3,8 @@
 <HEAD>
 <TITLE>CUPS Translation Guide</TITLE>
 <META NAME="author" CONTENT="Easy Software Products">
-<META NAME="copyright" CONTENT="Copyright 2001-2003, All Rights Reserved">
-<META NAME="docnumber" CONTENT="CUPS-TRANS-1.1">
+<META NAME="copyright" CONTENT="Copyright 2001-2002, All Rights Reserved">
+<META NAME="docnumber" CONTENT="CUPS-TRANS-1.2">
 <META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-8859-1">
 <STYLE TYPE="text/css"><!--
 BODY { font-family: serif }
@@ -19,12 +19,12 @@ SUP { font-size: smaller }
 PRE { font-family: monospace }
 --></STYLE>
 </HEAD>
-<BODY BGCOLOR="white">
+<BODY>
 <CENTER><A HREF="#CONTENTS"><IMG SRC="images/cups-large.gif" BORDER="0" WIDTH="431" HEIGHT="511"><BR>
 <H1>CUPS Translation Guide</H1></A><BR>
-CUPS-TRANS-1.1<BR>
+CUPS-TRANS-1.2<BR>
 Easy Software Products<BR>
-Copyright 2001-2003, All Rights Reserved<BR>
+Copyright 2001-2002, All Rights Reserved<BR>
 </CENTER>
 <HR>
 <H1 ALIGN="CENTER"><A NAME="CONTENTS">Table of Contents</A></H1>
@@ -71,7 +71,7 @@ Copyright 2001-2003, All Rights Reserved<BR>
 <H2><A NAME="1_1">1.1 Identification</A></H2>
 <P>This translation guide provides instructions for creating
  translations of the CUPS message catalogs and web pages for the Common
- UNIX Printing System (&quot;CUPS&quot;) Version 1.1 software.</P>
+ UNIX Printing System (&quot;CUPS&quot;) Version 1.2 software.</P>
 <H2><A NAME="1_2">1.2 System Overview</A></H2>
 <P>CUPS provides a portable printing layer for UNIX&reg;-based operating
  systems. It has been developed by<A HREF="http://www.easysw.com"> Easy
@@ -102,16 +102,16 @@ Copyright 2001-2003, All Rights Reserved<BR>
 <H2><A NAME="2_1">2.1 CUPS Documentation</A></H2>
 <P>The following CUPS documentation is referenced by this document:</P>
 <UL>
-<LI>CUPS-CMP-1.1: CUPS Configuration Management Plan</LI>
-<LI>CUPS-IDD-1.1: CUPS System Interface Design Description</LI>
-<LI>CUPS-IPP-1.1: CUPS Implementation of IPP</LI>
-<LI>CUPS-SAM-1.1.x: CUPS Software Administrators Manual</LI>
-<LI>CUPS-SDD-1.1: CUPS Software Design Description</LI>
-<LI>CUPS-SPM-1.1.x: CUPS Software Programming Manual</LI>
-<LI>CUPS-SSR-1.1: CUPS Software Security Report</LI>
-<LI>CUPS-STP-1.1: CUPS Software Test Plan</LI>
-<LI>CUPS-SUM-1.1.x: CUPS Software Users Manual</LI>
-<LI>CUPS-SVD-1.1: CUPS Software Version Description</LI>
+<LI>CUPS-CMP-1.2: CUPS Configuration Management Plan</LI>
+<LI>CUPS-IDD-1.2: CUPS System Interface Design Description</LI>
+<LI>CUPS-IPP-1.2: CUPS Implementation of IPP</LI>
+<LI>CUPS-SAM-1.2.x: CUPS Software Administrators Manual</LI>
+<LI>CUPS-SDD-1.2: CUPS Software Design Description</LI>
+<LI>CUPS-SPM-1.2.x: CUPS Software Programming Manual</LI>
+<LI>CUPS-SSR-1.2: CUPS Software Security Report</LI>
+<LI>CUPS-STP-1.2: CUPS Software Test Plan</LI>
+<LI>CUPS-SUM-1.2.x: CUPS Software Users Manual</LI>
+<LI>CUPS-SVD-1.2: CUPS Software Version Description</LI>
 </UL>
 <H2><A NAME="2_2">2.2 Other Documents</A></H2>
 <P>The following non-CUPS documents are referenced by this document:</P>
@@ -121,11 +121,12 @@ Adobe PostScript Printer Description File Format Specification, Version
  4.3.</A></LI>
 <LI><A HREF="http://partners.adobe.com/asn/developer/PDFS/TN/PLRM.pdf">
 Adobe PostScript Language Reference, Third Edition.</A></LI>
+<LI>IPP: Job and Printer Set Operations</LI>
+<LI>IPP/1.1: Encoding and Transport</LI>
 <LI>IPP/1.1: Implementers Guide</LI>
+<LI>IPP/1.1: Model and Semantics</LI>
 <LI><A HREF="http://www.ietf.org/rfc/rfc1179.txt">RFC 1179, Line Printer
  Daemon Protocol</A></LI>
-<LI><A HREF="http://www.ietf.org/rfc/rfc2396.txt">RFC 2396, Uniform
- Resource Identifiers (URI): Generic Syntax</A></LI>
 <LI><A HREF="http://www.ietf.org/rfc/rfc2567.txt">RFC 2567, Design Goals
  for an Internet Printing Protocol</A></LI>
 <LI><A HREF="http://www.ietf.org/rfc/rfc2568.txt">RFC 2568, Rationale
@@ -137,12 +138,6 @@ Adobe PostScript Language Reference, Third Edition.</A></LI>
  Transfer Protocol -- HTTP/1.1</A></LI>
 <LI><A HREF="http://www.ietf.org/rfc/rfc2617.txt">RFC 2617, HTTP
  Authentication: Basic and Digest Access</A> Authentication</LI>
-<LI><A HREF="http://www.ietf.org/rfc/rfc2910.txt">RFC 2910, IPP/1.1:
- Encoding and Transport</A></LI>
-<LI><A HREF="http://www.ietf.org/rfc/rfc2911.txt">RFC 2911, IPP/1.1:
- Model and Semantics</A></LI>
-<LI><A HREF="http://www.ietf.org/rfc/rfc3380.txt">RFC 3380, IPP: Job and
- Printer Set Operations</A></LI>
 </UL>
 <H1><A NAME="3">3 Character Sets</A></H1>
 <P>CUPS uses character set files to define the mapping of local
@@ -153,7 +148,7 @@ Adobe PostScript Language Reference, Third Edition.</A></LI>
  Interface Design Description (IDD) document. Current character sets are
  enumerated in the CUPS API, so in order to add a new character set you
  must patch the CUPS source as well as provide a new charset file.</P>
-<P>CUPS 1.1 supports the following character sets:</P>
+<P>CUPS 1.2 supports the following character sets:</P>
 <UL>
 <LI>iso-8859-1</LI>
 <LI>iso-8859-2</LI>

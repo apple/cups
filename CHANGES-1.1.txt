@@ -3,6 +3,10 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.19
 
+	- The scheduler now supports fax queues identified by a
+	  "*cupsFax: True" attribute in the PPD file. When a job
+	  can't be sent, it is held for 5 minutes while other
+	  jobs are attempted.
 	- The scheduler now preserves the default options of PPD
 	  files when modifying/upgrading an existing PPD file.
 	  When installing a new printer, the scheduler sets the

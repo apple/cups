@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.93.2.45 2003/03/30 21:49:22 mike Exp $"
+ * "$Id: printers.c,v 1.93.2.46 2003/04/03 03:33:41 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -953,6 +953,7 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
 		*page_size,		/* PageSize options */
 		*output_bin,		/* OutputBin options */
 		*media_quality;		/* EFMediaQualityMode options */
+  ppd_attr_t	*ppdattr;		/* PPD attribute */
   ipp_attribute_t *attr;		/* Attribute data */
   ipp_value_t	*val;			/* Attribute value */
   int		nups[] =		/* number-up-supported values */
@@ -1356,6 +1357,9 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
 	  p->type |= CUPS_PRINTER_VARIABLE;
 	if (!ppd->manual_copies)
 	  p->type |= CUPS_PRINTER_COPIES;
+        if ((ppdattr = ppdFindAttr(ppd, "cupsFax", NULL)) != NULL)
+	  if (ppdattr->value && !strcasecmp(ppdattr->value, "true"))
+	    p->type |= CUPS_PRINTER_FAX;
 
 	ippAddBoolean(p->attrs, IPP_TAG_PRINTER, "color-supported",
                       ppd->color_device);
@@ -2370,5 +2374,5 @@ write_irix_state(printer_t *p)		/* I - Printer to update */
 
 
 /*
- * End of "$Id: printers.c,v 1.93.2.45 2003/03/30 21:49:22 mike Exp $".
+ * End of "$Id: printers.c,v 1.93.2.46 2003/04/03 03:33:41 mike Exp $".
  */
