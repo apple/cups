@@ -143,6 +143,8 @@ CHANGES IN CUPS v1.1.3
 	  /dev/null in "lpstat -v" output.
 	- Creating classes and adding printers to a class with
 	  the lpadmin command didn't work.
+	- The banner pages and test page should now format
+	  correctly in both portrait and landscape orientations.
 
 
 CHANGES IN CUPS v1.1.2

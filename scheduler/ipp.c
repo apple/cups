@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.98 2000/09/14 21:20:39 mike Exp $"
+ * "$Id: ipp.c,v 1.99 2000/09/18 17:12:42 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -1954,10 +1954,21 @@ copy_banner(client_t   *con,	/* I - Client connection */
       */
 
       for (s = attrname; (ch = getc(in)) != EOF;)
-        if (ch == '}')
+        if (ch == '}' || isspace(ch))
           break;
 	else if (s < (attrname + sizeof(attrname) - 1))
           *s++ = ch;
+
+      if (isspace(ch) && s == attrname)
+      {
+       /*
+        * Ignore { followed by whitespace...
+	*/
+
+        putc('{', out);
+	putc(ch, out);
+	continue;
+      }
 
       *s = '\0';
 
@@ -4828,5 +4839,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.98 2000/09/14 21:20:39 mike Exp $".
+ * End of "$Id: ipp.c,v 1.99 2000/09/18 17:12:42 mike Exp $".
  */

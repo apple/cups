@@ -22,28 +22,28 @@
 %   to third parties or copied or duplicated in any form, in whole or
 %   in part, without the prior written consent of Easy Software Products.
 %
-/CENTER \{			% Draw centered text
+/CENTER {			% Draw centered text
 				% (name) CENTER -
   dup stringwidth pop		% Get the width of the string
   0.5 mul neg 0 rmoveto		% Shift left 1/2 of the distance
   show				% Show the string
 } bind def
-/RIGHT \{			% Draw right-justified text
+/RIGHT {			% Draw right-justified text
 				% (name) RIGHT -
   dup stringwidth pop		% Get the width of the string
   neg 0 rmoveto			% Shift left the entire distance
   show				% Show the string
 } bind def
-/NUMBER \{			% Draw a number
+/NUMBER {			% Draw a number
 				% power n NUMBER -
-  1 index 1 eq \{		% power == 1?
+  1 index 1 eq {		% power == 1?
     round cvi exch pop		% Convert "n" to integer
-  } \{
+  } {
     1 index mul round exch div	% Truncate extra decimal places
   } ifelse
   100 string cvs show		% Convert to a string and show it...
 } bind def
-/CUPSLOGO \{			% Draw the CUPS logo
+/CUPSLOGO {			% Draw the CUPS logo
 				% height CUPSLOGO
   % Start with a big C...
   /Helvetica findfont 1 index scalefont setfont
@@ -61,14 +61,14 @@
   dup 1.2 mul moveto
   (System) show
 } bind def
-/ESPLOGO \{			% Draw the ESP logo
+/ESPLOGO {			% Draw the ESP logo
 				% height ESPLOGO
   % Compute the size of the logo...
   0 0
   2 index 1.5 mul 3 index
 
   % Do the "metallic" fill from 10% black to 40% black...
-  1 -0.001 0 \{
+  1 -0.001 0 {
     dup			% loopval
     -0.15 mul		% loopval * -0.15
     0.9 add		% 0.9 - loopval * 0.15
@@ -151,47 +151,39 @@ gsave
   /pageWidth pageRight pageLeft sub def	% pageWidth = pageRight - pageLeft
   /pageHeight pageTop pageBottom sub def% pageHeight = pageTop - pageBottom
 
+  /boxWidth				% width of text box
+  pageWidth pageHeight lt
+  { pageWidth 54 mul }
+  { pageHeight 42 mul }
+  ifelse def
+
   newpath				% Clear bounding path
 
   % Create fonts...
   /bigFont /Helvetica-Bold findfont	% bigFont = Helvetica-Bold
-  pageWidth 4 mul scalefont def		% size = pageWidth * 4 (nominally 34)
+  pageHeight 3 mul scalefont def	% size = pageHeight * 3 (nominally 33)
 
   /mediumFont /Helvetica findfont	% mediumFont = Helvetica
-  pageWidth 2 mul scalefont def		% size = pageWidth * 2 (nominally 17)
+  pageHeight 1.5 mul scalefont def	% size = pageHeight * 1.5 (nominally 16.5)
 
   % Offset page to account for lower-left margin...
   pageLeft 72 mul
   pageBottom 72 mul
   translate
 
-  % Draw the label at the top and bottom...
-  0 setgray				% Color
-
-  pageWidth 36 mul			% Center of page
-  pageHeight 72 mul			% Top of page
-  pageWidth -9 mul add			% - 1 line
-  moveto				% Position text
-  bigFont setfont			% Font
-  (Banner) CENTER			% Show text centered
-
-  pageWidth 36 mul			% Center of page
-  pageWidth 8 mul			% Bottom of page
-  moveto				% Position text
-  bigFont setfont			% Font
-  (Banner) CENTER			% Show text centered
-
   % Job information box...
-  pageWidth 18 mul 9 add		% x = pageWidth * 1/4 * 72 + 9
-  pageHeight 27 mul 9 sub		% y = pageHeight * 3/8 * 72 - 9
-  pageWidth 36 mul			% w = pageWidth * 1/2 * 72
-  pageHeight 18 mul			% h = pageHeight * 1/4 * 72
+  pageWidth 36 mul 9 add		% x = pageWidth * 1/2 * 72 + 9
+  boxWidth 0.5 mul sub			% x-= 1/2 box width
+  pageHeight 30 mul 9 sub		% y = pageHeight * 1/2 * 72 - 9
+  boxWidth				% w = box width
+  pageHeight 14 mul			% h = pageHeight * 1/2 * 72
   0.5 setgray rectfill			% Draw a shadow
 
-  pageWidth 18 mul			% x = pageWidth * 1/4 * 72
-  pageHeight 27 mul			% y = pageHeight * 3/8 * 72
-  pageWidth 36 mul			% w = pageWidth * 1/2 * 72
-  pageHeight 18 mul			% h = pageHeight * 1/4 * 72
+  pageWidth 36 mul			% x = pageWidth * 1/2 * 72
+  boxWidth 0.5 mul sub			% x-= 1/2 box width
+  pageHeight 30 mul			% y = pageHeight * 1/4 * 72
+  boxWidth				% w = box width
+  pageHeight 14 mul			% h = pageHeight * 1/2 * 72
 
   4 copy 1 setgray rectfill		% Clear the box to white
   0 setgray rectstroke			% Draw a black box around it...
@@ -201,7 +193,7 @@ gsave
 
   pageWidth 36 mul			% x = pageWidth * 1/2 * 72
   pageHeight 36 mul			% y = pageHeight * 1/2 * 72
-  pageWidth 4 mul add			% y += 2 lines
+  pageHeight 5 mul add			% y += 2 lines
   2 copy				% Copy X & Y
   moveto
   (Job ID: ) RIGHT
@@ -210,7 +202,7 @@ gsave
 
   pageWidth 36 mul			% x = pageWidth * 1/2 * 72
   pageHeight 36 mul			% y = pageHeight * 1/2 * 72
-  pageWidth 1 mul add			% y += 1 line
+  pageHeight 2 mul add			% y += 1 line
   2 copy				% Copy X & Y
   moveto
   (Title: ) RIGHT
@@ -219,7 +211,7 @@ gsave
 
   pageWidth 36 mul			% x = pageWidth * 1/2 * 72
   pageHeight 36 mul			% y = pageHeight * 1/2 * 72
-  pageWidth -2 mul add			% y -= 1 line
+  pageHeight -1 mul add			% y -= 1 line
   2 copy				% Copy X & Y
   moveto
   (Requesting User: ) RIGHT
@@ -228,7 +220,7 @@ gsave
 
   pageWidth 36 mul			% x = pageWidth * 1/2 * 72
   pageHeight 36 mul			% y = pageHeight * 1/2 * 72
-  pageWidth -5 mul add			% y -= 2 lines
+  pageHeight -4 mul add			% y -= 2 lines
   2 copy				% Copy X & Y
   moveto
   (Billing Info: ) RIGHT
@@ -254,6 +246,6 @@ gsave
 grestore
 showpage
 %
-% End of "$Id: standard,v 1.3 2000/05/11 20:02:19 mike Exp $".
+% End of "$Id: standard,v 1.4 2000/09/18 17:12:40 mike Exp $".
 %
 %%EOF

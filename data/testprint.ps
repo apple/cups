@@ -213,15 +213,22 @@ gsave
   /yResolution exch abs def		% yResolution = abs(yres)
   /xResolution exch abs def		% xResolution = abs(xres)
 
+  % Figure out the sizes of things...
+  /wheelSize				% size of wheels
+  pageWidth pageHeight lt
+  { pageWidth 9 mul }
+  { pageHeight 7 mul }
+  ifelse def
+
   % Create fonts...
   /bigFont /Helvetica-Bold findfont	% bigFont = Helvetica-Bold
-  pageWidth 4 mul scalefont def		% size = pageWidth * 4 (nominally 34)
+  pageHeight 3 mul scalefont def	% size = pageHeight * 3 (nominally 33)
 
   /mediumFont /Helvetica findfont	% mediumFont = Helvetica
-  pageWidth 2 mul scalefont def		% size = pageWidth * 2 (nominally 17)
+  pageHeight 1.5 mul scalefont def	% size = pageHeight * 1.5 (nominally 16.5)
 
   /smallFont /Times-Roman findfont	% smallFont = Times-Roman
-  pageWidth 1.5 mul scalefont def	% size = pageWidth * 1.5 (nominally 13)
+  pageHeight scalefont def		% size = pageHeight (nominally 11)
 
   % Offset page to account for lower-left margin...
   pageLeft 72 mul
@@ -239,7 +246,7 @@ gsave
     translate
 
     % Size the wheel...
-    pageWidth 9 mul			% radius = pageWidth * 1/8 * 72
+    wheelSize
 
     % Draw the colors...
     dup (C) exch 0 1 1 OCTANT 45 rotate
@@ -268,7 +275,7 @@ gsave
     translate
 
     % Size the wheel...
-    pageWidth 9 mul			% radius = pageWidth * 1/8 * 72
+    wheelSize
 
     % Loop at 1 degree increments
     0 1 359 {
@@ -290,7 +297,7 @@ gsave
   (1 Degree Radial Lines) CENTER	% Show the text centered
 
   % Imageable area...
-  pageWidth 19.5 mul			% Height of imageable area
+  pageHeight 15 mul			% Height of imageable area
 
   pageWidth 4.5 mul			% x = pageWidth * 1/16 * 72
   pageHeight 35.5 mul			% y = pageHeight * 1/2 * 72
@@ -319,7 +326,7 @@ gsave
   smallFont setfont			% Font
   pageWidth 14 mul			% x = pageWidth * 3/16 * 72
   pageHeight 36 mul			% y = pageWidth * 1/2 * 72
-  pageWidth -3 mul add			% y -= 2 * smallFont height
+  pageHeight -2 mul add			% y -= 2 * smallFont height
 
   % Page Size inches
   2 copy moveto				% Move to x & y
@@ -330,7 +337,7 @@ gsave
   (in) show				% "in"
 
   % Page Size millimeters
-  pageWidth -1.5 mul add		% Move down...
+  pageHeight sub			% Move down...
 
   2 copy moveto				% Move to x & y
   10 pageWidth 25.4 mul NUMBER		% pageWidth
@@ -339,7 +346,7 @@ gsave
   (mm) show				% "mm"
 
   % Lower-left inches
-  pageWidth -3 mul add			% Move down...
+  pageHeight 2 mul sub			% Move down...
 
   2 copy moveto				% Move to x & y
   (Lower-Left: ) RIGHT			% Label
@@ -349,7 +356,7 @@ gsave
   (in) show				% "in"
 
   % Lower-left millimeters
-  pageWidth -1.5 mul add		% Move down...
+  pageHeight sub			% Move down...
 
   2 copy moveto				% Move to x & y
   10 pageLeft 25.4 mul NUMBER		% pageLeft
@@ -358,7 +365,7 @@ gsave
   (mm) show				% "mm"
 
   % Upper-right inches
-  pageWidth -3 mul add			% Move down...
+  pageHeight 2 mul sub			% Move down...
 
   2 copy moveto				% Move to x & y
   (Upper-Right: ) RIGHT			% Label
@@ -368,7 +375,7 @@ gsave
   (in) show				% "in"
 
   % Upper-right millimeters
-  pageWidth -1.5 mul add		% Move down...
+  pageHeight sub			% Move down...
 
   2 copy moveto				% Move to x & y
   10 pageRight 25.4 mul NUMBER		% pageRight
@@ -377,7 +384,7 @@ gsave
   (mm) show				% "mm"
 
   % Resolution dots-per-inch
-  pageWidth -3 mul add			% Move down...
+  pageHeight 2 mul sub			% Move down...
 
   2 copy moveto				% Move to x & y
   (Resolution: ) RIGHT			% Label
@@ -387,7 +394,7 @@ gsave
   (dpi) show				% "dpi"
 
   % Resolution dots-per-meter
-  pageWidth -1.5 mul add		% Move down...
+  pageHeight sub			% Move down...
 
   moveto				% Move to x & y
   1 xResolution 39.27 mul NUMBER	% xResolution
@@ -396,7 +403,7 @@ gsave
   (dpm) show				% "dpm"
 
   % Interpreter Information...
-  pageWidth 19.5 mul			% Height of interpreter info
+  pageHeight 15 mul			% Height of interpreter information
 
   pageWidth 40.5 mul			% x = pageWidth * 9/16 * 72
   pageHeight 35.5 mul			% y = pageHeight * 1/2 * 72
@@ -425,7 +432,7 @@ gsave
   smallFont setfont			% Font
   pageWidth 49 mul			% x = pageWidth * 11/16 * 72
   pageHeight 36 mul			% y = pageWidth * 1/2 * 72
-  pageWidth -3 mul add			% y -= 2 * smallFont height
+  pageHeight 2 mul sub			% y -= 2 * smallFont height
 
   % Language level
   2 copy moveto				% Move to x & y
@@ -434,7 +441,7 @@ gsave
   1 languagelevel NUMBER		% Language level
 
   % Version
-  pageWidth -3 mul add			% Move down...
+  pageHeight 2 mul sub			% Move down...
   2 copy moveto				% Move to x & y
   (Version: ) RIGHT			% Label
   version show				% Version
@@ -443,13 +450,13 @@ gsave
   (\)) show				% ")"
 
   % Product
-  pageWidth -3 mul add			% Move down...
+  pageHeight 2 mul sub			% Move down...
   2 copy moveto				% Move to x & y
   (Product: ) RIGHT			% Label
   product show				% Product name
 
   % Serial Number
-  pageWidth -3 mul add			% Move down...
+  pageHeight 2 mul sub			% Move down...
   2 copy moveto				% Move to x & y
   (Serial #: ) RIGHT			% Label
   1 serialnumber NUMBER			% S/N
@@ -463,28 +470,28 @@ gsave
 
   % Draw the copyright notice at the bottom...
   pageWidth 36 mul			% Center of page
-  pageWidth 14 mul			% Bottom of page
+  pageHeight 10 mul			% Bottom of page
   2 copy moveto				% Position text
   (Printed Using CUPS v1.1.x) CENTER	% Show text centered
 
-  pageWidth 3 mul sub			% Move down...
+  pageHeight 2 mul sub			% Move down...
   2 copy moveto				% Position text
   smallFont setfont			% Font
   (Copyright 1993-2000 Easy Software Products, All Rights Reserved.) CENTER
-  pageWidth 1.5 mul sub			% Move down...
+  pageHeight sub			% Move down...
   2 copy moveto				% Position text
   (CUPS, and the CUPS logo are the trademark property of) CENTER
-  pageWidth 1.5 mul sub			% Move down...
+  pageHeight sub			% Move down...
   2 copy moveto				% Position text
   (Easy Software Products, 44141 Airport View Drive, Suite 204,) CENTER
-  pageWidth 1.5 mul sub			% Move down...
+  pageHeight sub			% Move down...
   2 copy moveto				% Position text
   (Hollywood, Maryland, 20636-3111, USA.) CENTER
 
   % Then the CUPS logo....
   gsave
     pageWidth 4 mul
-    pageWidth 6 mul
+    pageHeight 4 mul
     translate
     pageWidth 9 mul CUPSLOGO
   grestore
@@ -492,7 +499,7 @@ gsave
   % And the ESP logo....
   gsave
     pageWidth 59 mul
-    pageWidth 6 mul
+    pageHeight 4 mul
     translate
     pageWidth 6 mul ESPLOGO
   grestore
@@ -500,6 +507,6 @@ gsave
 grestore
 showpage
 %
-% End of "$Id: testprint.ps,v 1.10 2000/08/01 17:52:30 mike Exp $".
+% End of "$Id: testprint.ps,v 1.11 2000/09/18 17:12:40 mike Exp $".
 %
 %%EOF
