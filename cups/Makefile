@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.53.2.29 2004/06/29 13:15:08 mike Exp $"
+# "$Id: Makefile,v 1.53.2.30 2004/07/01 20:08:04 mike Exp $"
 #
 #   API library Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -199,7 +199,7 @@ testipp:	testipp.o libcups.a
 
 testi18n:	testi18n.o libcups.a
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ testi18n.o libcups.a $(NETLIBS) $(SSLLIBS)
+	$(CC) $(LDFLAGS) -o $@ testi18n.o libcups.a $(NETLIBS) $(SSLLIBS) $(COMMONLIBS)
 
 
 #
@@ -233,5 +233,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile,v 1.53.2.29 2004/06/29 13:15:08 mike Exp $".
+# End of "$Id: Makefile,v 1.53.2.30 2004/07/01 20:08:04 mike Exp $".
 #

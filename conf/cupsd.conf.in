@@ -1,5 +1,5 @@
 #
-# "$Id: cupsd.conf.in,v 1.2.2.13 2004/06/29 18:54:17 mike Exp $"
+# "$Id: cupsd.conf.in,v 1.2.2.14 2004/07/01 20:08:04 mike Exp $"
 #
 #   Sample configuration file for the Common UNIX Printing System (CUPS)
 #   scheduler.
@@ -378,8 +378,8 @@ LogLevel info
 #    Listen hostname:631
 #    Listen 1.2.3.4
 #    Listen 1.2.3.4:631
-#    Listen @CUPS_DEFAULT_DOMAINSOCKET@
-# 
+#    @CUPS_LISTEN_DOMAINSOCKET@
+#
 # NOTE: Unfortunately, most web browsers don't support TLS or HTTP Upgrades
 # for encryption.  If you want to support web-based encryption you'll
 # probably need to listen on port 443 (the "https" port...)
@@ -804,5 +804,5 @@ Allow From 127.0.0.1
 </Location>
 
 #
-# End of "$Id: cupsd.conf.in,v 1.2.2.13 2004/06/29 18:54:17 mike Exp $".
+# End of "$Id: cupsd.conf.in,v 1.2.2.14 2004/07/01 20:08:04 mike Exp $".
 #
