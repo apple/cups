@@ -1,5 +1,5 @@
 /*
- * "$Id: transcode.c,v 1.1.2.1 2002/08/19 01:15:20 mike Exp $"
+ * "$Id: transcode.c,v 1.1.2.2 2002/08/20 12:41:53 mike Exp $"
  *
  *   Transcoding support for the Common UNIX Printing System (CUPS).
  *
@@ -12,28 +12,28 @@
  *   If this file is missing or damaged please contact Easy Software
  *   Products at:
  *
- *       Attn: CUPS Licensing Information
- *       Easy Software Products
- *       44141 Airport View Drive, Suite 204
- *       Hollywood, Maryland 20636-3111 USA
+ *	 Attn: CUPS Licensing Information
+ *	 Easy Software Products
+ *	 44141 Airport View Drive, Suite 204
+ *	 Hollywood, Maryland 20636-3111 USA
  *
- *       Voice: (301) 373-9603
- *       EMail: cups-info@cups.org
- *         WWW: http://www.cups.org
+ *	 Voice: (301) 373-9603
+ *	 EMail: cups-info@cups.org
+ *	   WWW: http://www.cups.org
  *
  * Contents:
  *
- *   cupsCharmapGet()    - Get a character set map.
- *   cupsCharmapFree()   - Free a character set map.
- *   cupsCharmapFlush()  - Flush all character set maps out of cache.
- *   cupsUtf8ToCharset() - Convert UTF-8 to legacy character set.
- *   cupsCharsetToUtf8() - Convert legacy character set to UTF-8.
- *   cupsUtf8ToUtf16()   - Convert UTF-8 to UTF-16.
- *   cupsUtf16ToUtf8()   - Convert UTF-16 to UTF-8.
- *   cupsUtf8ToUtf32()   - Convert UTF-8 to UTF-32.
- *   cupsUtf32ToUtf8()   - Convert UTF-32 to UTF-8.
- *   cupsUtf16ToUtf32()  - Convert UTF-16 to UTF-32.
- *   cupsUtf32ToUtf16()  - Convert UTF-32 to UTF-16.
+ *   cupsCharmapGet()	 - Get a character set map.
+ *   cupsCharmapFree()	 - Free a character set map.
+ *   cupsCharmapFlush()	 - Flush all character set maps out of cache.
+ *   cupsUTF8ToCharset() - Convert UTF-8 to legacy character set.
+ *   cupsCharsetToUTF8() - Convert legacy character set to UTF-8.
+ *   cupsUTF8ToUTF16()	 - Convert UTF-8 to UTF-16.
+ *   cupsUTF16ToUTF8()	 - Convert UTF-16 to UTF-8.
+ *   cupsUTF8ToUTF32()	 - Convert UTF-8 to UTF-32.
+ *   cupsUTF32ToUTF8()	 - Convert UTF-32 to UTF-8.
+ *   cupsUTF16ToUTF32()	 - Convert UTF-16 to UTF-32.
+ *   cupsUTF32ToUTF16()	 - Convert UTF-32 to UTF-16.
  */
 
 /*
@@ -55,23 +55,23 @@
  * Globals...
  */
 
-int     TcFixMapNames = 1;  /* Fix map names to Unicode names */
-int     TcStrictUtf8 = 0;   /* Non-shortest-form is illegal */
-int     TcStrictUtf16 = 0;  /* Invalid surrogate pair is illegal */
-int     TcStrictUtf32 = 0;  /* Greater than 0x10ffff is illegal */
-int     TcRequireBOM = 0;   /* Require BOM for little/big-endian */
-int     TcSupportBOM = 0;   /* Support BOM for little/big-endian */
-int     TcSupport8859 = 1;  /* Support ISO 8859-x repertoires */
-int     TcSupportWin = 1;   /* Support Windows-x repertoires */
-int     TcSupportCJK = 0;   /* Support CJK Asian repertoires */
+int	_cupsFixMapNames = 1;  /* Fix map names to Unicode names */
+int	_cupsStrictUTF8 = 0;   /* Non-shortest-form is illegal */
+int	_cupsStrictUTF16 = 0;  /* Invalid surrogate pair is illegal */
+int	_cupsStrictUTF32 = 0;  /* Greater than 0x10ffff is illegal */
+int	_cupsRequireBOM = 0;   /* Require BOM for little/big-endian */
+int	_cupsSupportBOM = 0;   /* Support BOM for little/big-endian */
+int	_cupsSupport8859 = 1;  /* Support ISO 8859-x repertoires */
+int	_cupsSupportWin = 1;   /* Support Windows-x repertoires */
+int	_cupsSupportCJK = 0;   /* Support CJK Asian repertoires */
 
 /*
  * Local Globals...
  */
 
-static cups_cmap_t      *cmap_cache = NULL;    /* SBCS Charmap Cache */
+static cups_cmap_t	*cmap_cache = NULL;    /* SBCS Charmap Cache */
 #if 0
-static cups_dmap_t      *dmap_cache = NULL;    /* DBCS Charmap Cache */
+static cups_dmap_t	*dmap_cache = NULL;    /* DBCS Charmap Cache */
 #endif
 
 /*
@@ -81,20 +81,20 @@ static cups_dmap_t      *dmap_cache = NULL;    /* DBCS Charmap Cache */
  * This code does not handle double-byte character sets (DBCS) or
  * multiple-byte sets (MBCS) with charset switching via escapes...
  */
-void *                          /* O - Charset map pointer */
-cupsCharmapGet(const cups_encoding_t encoding)  /* I - Encoding */
+void *				/* O - Charset map pointer */
+cupsCharmapGet(const cups_encoding_t encoding)	/* I - Encoding */
 {
-  int           i, j;           /* Looping variables */
-  int           legchar;        /* Legacy character value */
-  utf32_t       unichar;        /* Unicode character value */
-  cups_cmap_t   *cmap;          /* Legacy SBCS / Unicode Charset Map */
-  char          *datadir;       /* CUPS_DATADIR environment variable */
-  char          mapname[80];    /* Name of charset map */
-  char          filename[256];  /* Filename for charset map file */
-  FILE          *fp;            /* Charset map file pointer */
-  char          *s;             /* Line parsing pointer */
-  sbcs_t        *row;           /* Pointer to row in 'uni2char' */
-  char          line[256];      /* Line from charset map file */
+  int		i, j;		/* Looping variables */
+  int		legchar;	/* Legacy character value */
+  cups_utf32_t	unichar;	/* Unicode character value */
+  cups_cmap_t	*cmap;		/* Legacy SBCS / Unicode Charset Map */
+  char		*datadir;	/* CUPS_DATADIR environment variable */
+  char		mapname[80];	/* Name of charset map */
+  char		filename[256];	/* Filename for charset map file */
+  FILE		*fp;		/* Charset map file pointer */
+  char		*s;		/* Line parsing pointer */
+  cups_sbcs_t	*row;		/* Pointer to row in 'uni2char' */
+  char		line[256];	/* Line from charset map file */
 
  /*
   * See if we already have this charset map loaded...
@@ -113,9 +113,8 @@ cupsCharmapGet(const cups_encoding_t encoding)  /* I - Encoding */
   */
   if ((datadir = getenv("CUPS_DATADIR")) == NULL)
     datadir = CUPS_DATADIR;
-  s = cupsEncodingName(encoding);
 
-  snprintf(mapname, sizeof(mapname), "%s.txt", s);
+  snprintf(mapname, sizeof(mapname), "%s.txt", cupsEncodingName(encoding));
 
  /*
   * Open charset map input file...
@@ -174,7 +173,7 @@ cupsCharmapGet(const cups_encoding_t encoding)  /* I - Encoding */
    /*
     * Save legacy to Unicode mapping in direct lookup table...
     */
-    cmap->char2uni[legchar] = (ucs2_t) (unichar & 0xffff);
+    cmap->char2uni[legchar] = (cups_ucs2_t) (unichar & 0xffff);
 
    /*
     * Save Unicode to legacy mapping in indirect lookup table...
@@ -182,11 +181,11 @@ cupsCharmapGet(const cups_encoding_t encoding)  /* I - Encoding */
     row = cmap->uni2char[(((int) unichar) >> 8) & 0xff];
     if (row == NULL)
     {
-      row = (sbcs_t *) calloc(256, sizeof(sbcs_t));
+      row = (cups_sbcs_t *) calloc(256, sizeof(cups_sbcs_t));
       if (row == NULL)
       {
-        cupsCharmapFlush();
-        return (NULL);
+	cupsCharmapFlush();
+	return (NULL);
       }
       cmap->uni2char[(((int) unichar) >> 8) & 0xff] = row;
       j ++;
@@ -199,7 +198,7 @@ cupsCharmapGet(const cups_encoding_t encoding)  /* I - Encoding */
     if (unichar == 0xfffd)
       *row = '?';
     else
-      *row = (sbcs_t) legchar;
+      *row = (cups_sbcs_t) legchar;
   }
   fclose(fp);
   return ((void *) cmap);
@@ -213,7 +212,7 @@ cupsCharmapGet(const cups_encoding_t encoding)  /* I - Encoding */
 void
 cupsCharmapFree(const cups_encoding_t encoding) /* I - Encoding */
 {
-  cups_cmap_t   *cmap;          /* Legacy SBCS / Unicode Charset Map */
+  cups_cmap_t	*cmap;		/* Legacy SBCS / Unicode Charset Map */
 
  /*
   * See if we already have this charset map loaded...
@@ -223,7 +222,7 @@ cupsCharmapFree(const cups_encoding_t encoding) /* I - Encoding */
     if (cmap->encoding == encoding)
     {
       if (cmap->used > 0)
-        cmap->used --;
+	cmap->used --;
       break;
     }
   }
@@ -236,10 +235,10 @@ cupsCharmapFree(const cups_encoding_t encoding) /* I - Encoding */
 void
 cupsCharmapFlush(void)
 {
-  int           i;              /* Looping variable */
-  cups_cmap_t   *cmap;          /* Legacy SBCS / Unicode Charset Map */
-  cups_cmap_t   *next;          /* Next Legacy Charset Map */
-  sbcs_t        *row;           /* Pointer to row in 'uni2char' */
+  int		i;		/* Looping variable */
+  cups_cmap_t	*cmap;		/* Legacy SBCS / Unicode Charset Map */
+  cups_cmap_t	*next;		/* Next Legacy Charset Map */
+  cups_sbcs_t	*row;		/* Pointer to row in 'uni2char' */
 
  /*
   * Loop through charset map cache, free all memory...
@@ -248,8 +247,8 @@ cupsCharmapFlush(void)
   {
     for (i = 0; i < 256; i ++)
     {
-      if (row = cmap->uni2char[i])
-        free(row);
+      if ((row = cmap->uni2char[i]) != NULL)
+	free(row);
     }
     next = cmap->next;
     free(cmap);
@@ -259,26 +258,26 @@ cupsCharmapFlush(void)
 }
 
 /*
- * 'cupsUtf8ToCharset()' - Convert UTF-8 to legacy character set.
+ * 'cupsUTF8ToCharset()' - Convert UTF-8 to legacy character set.
  *
  * This code only handles single-byte character sets (SBCS)...
  * This code does not handle double-byte character sets (DBCS) or
  * multiple-byte sets (MBCS) with charset switching via escapes...
  */
-int                             /* O - Count or -1 on error */
-cupsUtf8ToCharset(char *dest,   /* O - Target string */
-    const utf8_t *src,          /* I - Source string */
-    const int maxout,           /* I - Max output */
-    cups_encoding_t encoding)   /* I - Encoding */
+int				/* O - Count or -1 on error */
+cupsUTF8ToCharset(char *dest,	/* O - Target string */
+    const cups_utf8_t *src,	     /* I - Source string */
+    const int maxout,		/* I - Max output */
+    cups_encoding_t encoding)	/* I - Encoding */
 {
-  char          *start = dest;  /* Start of destination string */
-  cups_cmap_t   *cmap;          /* Legacy SBCS / Unicode Charset Map */
-  utf32_t       ch;             /* Character value */
-  int           i;              /* Looping variable */
-  int           worklen;        /* Internal UCS-4 string length */
-  utf32_t       work[CUPS_MAX_USTRING];
-                                /* Internal UCS-4 string */
-  sbcs_t        *row;           /* Pointer to row in 'uni2char' */
+  char		*start = dest;	/* Start of destination string */
+  cups_cmap_t	*cmap;		/* Legacy SBCS / Unicode Charset Map */
+  cups_utf32_t	     ch;	     /* Character value */
+  int		i;		/* Looping variable */
+  int		worklen;	/* Internal UCS-4 string length */
+  cups_utf32_t	     work[CUPS_MAX_USTRING];
+				/* Internal UCS-4 string */
+  cups_sbcs_t	     *row;	     /* Pointer to row in 'uni2char' */
 
  /*
   * Check for valid arguments and clear output...
@@ -301,7 +300,7 @@ cupsUtf8ToCharset(char *dest,   /* O - Target string */
  /*
   * Convert input UTF-8 to internal UCS-4 (and insert BOM)...
   */
-  worklen = cupsUtf8ToUtf32(work, src, CUPS_MAX_USTRING);
+  worklen = cupsUTF8ToUTF32(work, src, CUPS_MAX_USTRING);
   if (worklen < 0)
     return (-1);
 
@@ -350,23 +349,23 @@ cupsUtf8ToCharset(char *dest,   /* O - Target string */
 }
 
 /*
- * 'cupsCharsetToUtf8()' - Convert legacy character set to UTF-8.
+ * 'cupsCharsetToUTF8()' - Convert legacy character set to UTF-8.
  *
  * This code only handles single-byte character sets (SBCS)...
  * This code does not handle double-byte character sets (DBCS) or
  * multiple-byte sets (MBCS) with charset switching via escapes...
  */
-int                             /* O - Count or -1 on error */
-cupsCharsetToUtf8(utf8_t *dest, /* O - Target string */
-    const char *src,            /* I - Source string */
-    const int maxout,           /* I - Max output */
-    cups_encoding_t encoding)   /* I - Encoding */
+int				/* O - Count or -1 on error */
+cupsCharsetToUTF8(cups_utf8_t *dest, /* O - Target string */
+    const char *src,		/* I - Source string */
+    const int maxout,		/* I - Max output */
+    cups_encoding_t encoding)	/* I - Encoding */
 {
-  cups_cmap_t   *cmap;          /* Legacy SBCS / Unicode Charset Map */
-  int           i;              /* Looping variable */
-  int           worklen;        /* Internal UCS-4 string length */
-  utf32_t       work[CUPS_MAX_USTRING];
-                                /* Internal UCS-4 string */
+  cups_cmap_t	*cmap;		/* Legacy SBCS / Unicode Charset Map */
+  int		i;		/* Looping variable */
+  int		worklen;	/* Internal UCS-4 string length */
+  cups_utf32_t	     work[CUPS_MAX_USTRING];
+				/* Internal UCS-4 string */
 
  /*
   * Check for valid arguments and clear output...
@@ -390,7 +389,7 @@ cupsCharsetToUtf8(utf8_t *dest, /* O - Target string */
   * Convert input legacy charset to internal UCS-4 (and insert BOM)...
   */
   i = 0;
-  if (TcRequireBOM)
+  if (_cupsRequireBOM)
   {
     work[0] = 0xfeff;
     i ++;
@@ -399,10 +398,10 @@ cupsCharsetToUtf8(utf8_t *dest, /* O - Target string */
   {
     if (*src == '\0')
       break;
-    if (cmap->char2uni[(sbcs_t) *src] == 0)
+    if (cmap->char2uni[(cups_sbcs_t) *src] == 0)
       work[i] = 0xfffd;
     else
-      work[i] = (utf32_t) cmap->char2uni[(sbcs_t) *src];
+      work[i] = (cups_utf32_t) cmap->char2uni[(cups_sbcs_t) *src];
     i ++;
   }
   work[i] = 0;
@@ -410,24 +409,24 @@ cupsCharsetToUtf8(utf8_t *dest, /* O - Target string */
  /*
   * Convert internal UCS-4 to output UTF-8 (and delete BOM)...
   */
-  worklen = cupsUtf32ToUtf8(dest, work, maxout);
+  worklen = cupsUTF32ToUTF8(dest, work, maxout);
   cupsCharmapFree(encoding);
   return (worklen);
 }
 
 /*
- * 'cupsUtf8ToUtf16()' - Convert UTF-8 to UTF-16.
+ * 'cupsUTF8ToUTF16()' - Convert UTF-8 to UTF-16.
  *
  * This code does not support Unicode beyond 16-bits (Plane 0)...
  */
-int                             /* O - Count or -1 on error */
-cupsUtf8ToUtf16(utf16_t *dest,  /* O - Target string */
-    const utf8_t *src,          /* I - Source string */
-    const int maxout)           /* I - Max output */
+int				/* O - Count or -1 on error */
+cupsUTF8ToUTF16(cups_utf16_t *dest,  /* O - Target string */
+    const cups_utf8_t *src,	     /* I - Source string */
+    const int maxout)		/* I - Max output */
 {
-  int           worklen;        /* Internal UCS-4 string length */
-  utf32_t       work[CUPS_MAX_USTRING];
-                                /* Internal UCS-4 string */
+  int		worklen;	/* Internal UCS-4 string length */
+  cups_utf32_t	     work[CUPS_MAX_USTRING];
+				/* Internal UCS-4 string */
 
  /*
   * Check for valid arguments and clear output...
@@ -442,30 +441,30 @@ cupsUtf8ToUtf16(utf16_t *dest,  /* O - Target string */
  /*
   * Convert input UTF-8 to internal UCS-4 (and insert BOM)...
   */
-  worklen = cupsUtf8ToUtf32(work, src, CUPS_MAX_USTRING);
+  worklen = cupsUTF8ToUTF32(work, src, CUPS_MAX_USTRING);
   if (worklen < 0)
     return (-1);
 
  /*
   * Convert internal UCS-4 to output UTF-16...
   */
-  worklen = cupsUtf32ToUtf16(dest, work, maxout);
+  worklen = cupsUTF32ToUTF16(dest, work, maxout);
   return (worklen);
 }
 
 /*
- * 'cupsUtf16ToUtf8()' - Convert UTF-16 to UTF-8.
+ * 'cupsUTF16ToUTF8()' - Convert UTF-16 to UTF-8.
  *
  * This code does not support Unicode beyond 16-bits (Plane 0)...
  */
-int                             /* O - Count or -1 on error */
-cupsUtf16ToUtf8(utf8_t *dest,   /* O - Target string */
-    const utf16_t *src,         /* I - Source string */
-    const int maxout)           /* I - Max output */
+int				/* O - Count or -1 on error */
+cupsUTF16ToUTF8(cups_utf8_t *dest,   /* O - Target string */
+    const cups_utf16_t *src,	     /* I - Source string */
+    const int maxout)		/* I - Max output */
 {
-  int           worklen;        /* Internal UCS-4 string length */
-  utf32_t       work[CUPS_MAX_USTRING];
-                                /* Internal UCS-4 string */
+  int		worklen;	/* Internal UCS-4 string length */
+  cups_utf32_t	     work[CUPS_MAX_USTRING];
+				/* Internal UCS-4 string */
 
  /*
   * Check for valid arguments and clear output...
@@ -480,45 +479,45 @@ cupsUtf16ToUtf8(utf8_t *dest,   /* O - Target string */
  /*
   * Convert input UTF-16 to internal UCS-4 (and byte-swap)...
   */
-  worklen = cupsUtf16ToUtf32(work, src, CUPS_MAX_USTRING);
+  worklen = cupsUTF16ToUTF32(work, src, CUPS_MAX_USTRING);
   if (worklen < 0)
     return (-1);
 
  /*
   * Convert internal UCS-4 to output UTF-8 (and delete BOM)...
   */
-  worklen = cupsUtf32ToUtf8(dest, work, maxout);
+  worklen = cupsUTF32ToUTF8(dest, work, maxout);
   return (worklen);
 }
 
 /*
- * 'cupsUtf8ToUtf32()' - Convert UTF-8 to UTF-32.
+ * 'cupsUTF8ToUTF32()' - Convert UTF-8 to UTF-32.
  *
  * 32-bit UTF-32 (actually 21-bit) maps to UTF-8 as follows...
  *
  *   UTF-32 char     UTF-8 char(s)
  *   --------------------------------------------------
- *        0 to 127 = 0xxxxxxx (US-ASCII)
+ *	  0 to 127 = 0xxxxxxx (US-ASCII)
  *     128 to 2047 = 110xxxxx 10yyyyyy
  *   2048 to 65535 = 1110xxxx 10yyyyyy 10zzzzzz
- *         > 65535 = 11110xxx 10yyyyyy 10zzzzzz 10xxxxxx
+ *	   > 65535 = 11110xxx 10yyyyyy 10zzzzzz 10xxxxxx
  *
  * UTF-32 prohibits chars beyond Plane 16 (> 0x10ffff) in UCS-4,
  * which would convert to five- or six-octet UTF-8 sequences...
  *
  * This code does not support Unicode beyond 16-bits (Plane 0)...
  */
-int                             /* O - Count or -1 on error */
-cupsUtf8ToUtf32(utf32_t *dest,  /* O - Target string */
-    const utf8_t *src,          /* I - Source string */
-    const int maxout)           /* I - Max output */
+int				/* O - Count or -1 on error */
+cupsUTF8ToUTF32(cups_utf32_t *dest,  /* O - Target string */
+    const cups_utf8_t *src,	     /* I - Source string */
+    const int maxout)		/* I - Max output */
 {
-  utf8_t        *first = (utf8_t *) src;
-  int           srclen;         /* Source string length */
-  int           i;              /* Looping variable */
-  utf32_t       ch;             /* Character value */
-  utf32_t       next;           /* Next character value */
-  utf32_t       ch32;           /* UTF-32 character value */
+  cups_utf8_t	     *first = (cups_utf8_t *) src;
+  int		srclen;		/* Source string length */
+  int		i;		/* Looping variable */
+  cups_utf32_t	     ch;	     /* Character value */
+  cups_utf32_t	     next;	     /* Next character value */
+  cups_utf32_t	     ch32;	     /* UTF-32 character value */
 
  /*
   * Check for valid arguments and clear output...
@@ -534,7 +533,7 @@ cupsUtf8ToUtf32(utf32_t *dest,  /* O - Target string */
   * Convert input UTF-8 to output UTF-32 (and insert BOM)...
   */
   i = 0;
-  if (TcRequireBOM)
+  if (_cupsRequireBOM)
   {
     *dest = 0xfeff;
     dest ++;
@@ -543,7 +542,7 @@ cupsUtf8ToUtf32(utf32_t *dest,  /* O - Target string */
   srclen = strlen((char *) src);
   for (; i < (maxout - 1); src ++, dest ++)
   {
-    ch = (utf32_t) *src;
+    ch = (cups_utf32_t) *src;
     ch &= 0xff;
     if (ch == 0)
       break;
@@ -565,17 +564,17 @@ cupsUtf8ToUtf32(utf32_t *dest,  /* O - Target string */
       * Two-octet UTF-8 <= 2047 (Latin-x)...
       */
       src ++;
-      next = (utf32_t) *src;
+      next = (cups_utf32_t) *src;
       next &= 0xff;
       if (next == 0)
-        return (-1);
+	return (-1);
       ch32 = ((ch & 0x1f) << 6) | (next & 0x3f);
 
      /*
       * Check for non-shortest form (invalid UTF-8)...
       */
-      if ((TcStrictUtf8) && (ch32 <= 127))
-        return (-1);
+      if ((_cupsStrictUTF8) && (ch32 <= 127))
+	return (-1);
       *dest = ch32;
     }
     else if ((ch & 0xf0) == 0xe0)
@@ -584,23 +583,23 @@ cupsUtf8ToUtf32(utf32_t *dest,  /* O - Target string */
       * Three-octet UTF-8 <= 65535 (Plane 0 - BMP)...
       */
       src ++;
-      next = (utf32_t) *src;
+      next = (cups_utf32_t) *src;
       next &= 0xff;
       if (next == 0)
-        return (-1);
+	return (-1);
       ch32 = ((ch & 0x1f) << 6) | (next & 0x3f);
       src ++;
-      next = (utf32_t) *src;
+      next = (cups_utf32_t) *src;
       next &= 0xff;
       if (next == 0)
-        return (-1);
+	return (-1);
       ch32 = ((ch32 << 6) | (next & 0x3f));
 
      /*
       * Check for non-shortest form (invalid UTF-8)...
       */
-      if ((TcStrictUtf8) && (ch32 <= 2047))
-        return (-1);
+      if ((_cupsStrictUTF8) && (ch32 <= 2047))
+	return (-1);
       *dest = ch32;
     }
     else if ((ch & 0xf8) == 0xf0)
@@ -609,7 +608,7 @@ cupsUtf8ToUtf32(utf32_t *dest,  /* O - Target string */
       * Four-octet UTF-8 to Replacement Character...
       */
       if (((src - first) + 3) >= srclen)
-        return (-1);
+	return (-1);
       src += 3;
       *dest = 0xfffd;
     }
@@ -618,10 +617,10 @@ cupsUtf8ToUtf32(utf32_t *dest,  /* O - Target string */
      /*
       * Five-octet UTF-8 to Replacement Character...
       */
-      if (TcStrictUtf32)
-        return (-1);
+      if (_cupsStrictUTF32)
+	return (-1);
       if (((src - first) + 4) >= srclen)
-        return (-1);
+	return (-1);
       src += 4;
       *dest = 0xfffd;
     }
@@ -630,10 +629,10 @@ cupsUtf8ToUtf32(utf32_t *dest,  /* O - Target string */
      /*
       * Six-octet UTF-8 to Replacement Character...
       */
-      if (TcStrictUtf32)
-        return (-1);
+      if (_cupsStrictUTF32)
+	return (-1);
       if (((src - first) + 5) >= srclen)
-        return (-1);
+	return (-1);
       src += 5;
       *dest = 0xfffd;
     }
@@ -654,7 +653,7 @@ cupsUtf8ToUtf32(utf32_t *dest,  /* O - Target string */
    /*
     * Check for beyond Plane 16 (invalid UTF-8)...
     */
-    if ((TcStrictUtf8) && (*dest > 0x10ffff))
+    if ((_cupsStrictUTF8) && (*dest > 0x10ffff))
       return (-1);
   }
   *dest = 0;
@@ -662,33 +661,33 @@ cupsUtf8ToUtf32(utf32_t *dest,  /* O - Target string */
 }
 
 /*
- * 'cupsUtf32ToUtf8()' - Convert UTF-32 to UTF-8.
+ * 'cupsUTF32ToUTF8()' - Convert UTF-32 to UTF-8.
  *
  * 32-bit UTF-32 (actually 21-bit) maps to UTF-8 as follows...
  *
  *   UTF-32 char     UTF-8 char(s)
  *   --------------------------------------------------
- *        0 to 127 = 0xxxxxxx (US-ASCII)
+ *	  0 to 127 = 0xxxxxxx (US-ASCII)
  *     128 to 2047 = 110xxxxx 10yyyyyy
  *   2048 to 65535 = 1110xxxx 10yyyyyy 10zzzzzz
- *         > 65535 = 11110xxx 10yyyyyy 10zzzzzz 10xxxxxx
+ *	   > 65535 = 11110xxx 10yyyyyy 10zzzzzz 10xxxxxx
  *
  * UTF-32 prohibits chars beyond Plane 16 (> 0x10ffff) in UCS-4,
  * which would convert to five- or six-octet UTF-8 sequences...
  *
  * This code does not support Unicode beyond 16-bits (Plane 0)...
  */
-int                             /* O - Count or -1 on error */
-cupsUtf32ToUtf8(utf8_t *dest,   /* O - Target string */
-    const utf32_t *src,         /* I - Source string */
-    const int maxout)           /* I - Max output */
+int				/* O - Count or -1 on error */
+cupsUTF32ToUTF8(cups_utf8_t *dest,   /* O - Target string */
+    const cups_utf32_t *src,	     /* I - Source string */
+    const int maxout)		/* I - Max output */
 {
-  utf32_t       *first = (utf32_t *) src;
-                                /* First source char */
-  utf8_t        *start = dest;  /* Start of destination string */
-  int           i;              /* Looping variable */
-  int           swap = 0;       /* Byte-swap input to output */
-  utf32_t       ch;             /* Character value */
+  cups_utf32_t	     *first = (cups_utf32_t *) src;
+				/* First source char */
+  cups_utf8_t	     *start = dest;  /* Start of destination string */
+  int		i;		/* Looping variable */
+  int		swap = 0;	/* Byte-swap input to output */
+  cups_utf32_t	     ch;	     /* Character value */
 
  /*
   * Check for valid arguments and clear output...
@@ -702,21 +701,21 @@ cupsUtf32ToUtf8(utf8_t *dest,   /* O - Target string */
  /*
   * Check for leading BOM in UTF-32 and inverted BOM...
   */
-  if ((TcSupportBOM | TcRequireBOM)
+  if ((_cupsSupportBOM | _cupsRequireBOM)
   && (*src == 0xfffe0000))
     swap = 1;
 
  /*
   * Check for leading BOM in UTF-32 and unsupported...
   */
-  if ((TcSupportBOM == 0)
+  if ((_cupsSupportBOM == 0)
   && ((*src == 0xfeff) || (*src == 0xfffe0000)))
     return (-1);
 
  /*
   * Check for missing BOM in UTF-32 and required...
   */
-  if ((TcRequireBOM)
+  if ((_cupsRequireBOM)
   && ((*src != 0xfeff) && (*src != 0xfffe0000)))
     return (-1);
 
@@ -744,7 +743,7 @@ cupsUtf32ToUtf8(utf8_t *dest,   /* O - Target string */
    /*
     * Check for beyond Plane 16 (invalid UTF-32)...
     */
-    if ((TcStrictUtf32) && (ch > 0x10ffff))
+    if ((_cupsStrictUTF32) && (ch > 0x10ffff))
       return (-1);
 
    /*
@@ -761,7 +760,7 @@ cupsUtf32ToUtf8(utf8_t *dest,   /* O - Target string */
      /*
       * One-octet UTF-8 <= 127 (US-ASCII)...
       */
-      *dest = (utf8_t) ch;
+      *dest = (cups_utf8_t) ch;
       dest ++;
       i ++;
     }
@@ -771,11 +770,11 @@ cupsUtf32ToUtf8(utf8_t *dest,   /* O - Target string */
       * Two-octet UTF-8 <= 2047 (Latin-x)...
       */
       if (i > (maxout - 2))
-        break;
-      *dest = (utf8_t) (0xc0 | ((ch >> 6) & 0x1f));
+	break;
+      *dest = (cups_utf8_t) (0xc0 | ((ch >> 6) & 0x1f));
       dest ++;
       i ++;
-      *dest = (utf8_t) (0x80 | (ch & 0x3f));
+      *dest = (cups_utf8_t) (0x80 | (ch & 0x3f));
       dest ++;
       i ++;
     }
@@ -785,14 +784,14 @@ cupsUtf32ToUtf8(utf8_t *dest,   /* O - Target string */
       * Three-octet UTF-8 <= 65535 (Plane 0 - BMP)...
       */
       if (i > (maxout - 3))
-        break;
-      *dest = (utf8_t) (0xe0 | ((ch >> 12) & 0x0f));
+	break;
+      *dest = (cups_utf8_t) (0xe0 | ((ch >> 12) & 0x0f));
       dest ++;
       i ++;
-      *dest = (utf8_t) (0x80 | ((ch >> 6) & 0x3f));
+      *dest = (cups_utf8_t) (0x80 | ((ch >> 6) & 0x3f));
       dest ++;
       i ++;
-      *dest = (utf8_t) (0x80 | (ch & 0x3f));
+      *dest = (cups_utf8_t) (0x80 | (ch & 0x3f));
       dest ++;
       i ++;
     }
@@ -803,19 +802,19 @@ cupsUtf32ToUtf8(utf8_t *dest,   /* O - Target string */
 }
 
 /*
- * 'cupsUtf16ToUtf32()' - Convert UTF-16 to UTF-32.
+ * 'cupsUTF16ToUTF32()' - Convert UTF-16 to UTF-32.
  *
  * This code does not support Unicode beyond 16-bits (Plane 0)...
  */
-int                             /* O - Count or -1 on error */
-cupsUtf16ToUtf32(utf32_t *dest, /* O - Target string */
-    const utf16_t *src,         /* I - Source string */
-    const int maxout)           /* I - Max output */
+int				/* O - Count or -1 on error */
+cupsUTF16ToUTF32(cups_utf32_t *dest, /* O - Target string */
+    const cups_utf16_t *src,	     /* I - Source string */
+    const int maxout)		/* I - Max output */
 {
-  int           i;              /* Looping variable */
-  int           swap = 0;       /* Byte-swap input to output */
-  int           surrogate = 0;  /* Expecting low-half surrogate */
-  utf32_t       ch;             /* Character value */
+  int		i;		/* Looping variable */
+  int		swap = 0;	/* Byte-swap input to output */
+  int		surrogate = 0;	/* Expecting low-half surrogate */
+  cups_utf32_t	     ch;	     /* Character value */
 
  /*
   * Check for valid arguments and clear output...
@@ -830,21 +829,21 @@ cupsUtf16ToUtf32(utf32_t *dest, /* O - Target string */
  /*
   * Check for leading BOM in UTF-16 and inverted BOM...
   */
-  if ((TcSupportBOM | TcRequireBOM)
+  if ((_cupsSupportBOM | _cupsRequireBOM)
   && (*src == 0xfffe))
     swap = 1;
 
  /*
   * Check for leading BOM in UTF-16 and unsupported...
   */
-  if ((TcSupportBOM == 0)
+  if ((_cupsSupportBOM == 0)
   && ((*src == 0xfeff) || (*src == 0xfffe)))
     return (-1);
 
  /*
   * Check for missing BOM in UTF-16 and required...
   */
-  if ((TcRequireBOM)
+  if ((_cupsRequireBOM)
   && ((*src != 0xfeff) && (*src != 0xfffe)))
     return (-1);
 
@@ -853,7 +852,7 @@ cupsUtf16ToUtf32(utf32_t *dest, /* O - Target string */
   */
   for (i = 0; i < (maxout - 1); src ++)
   {
-    ch = (utf32_t) (*src & 0xffff);
+    ch = (cups_utf32_t) (*src & 0xffff);
     if (ch == 0)
       break;
     i ++;
@@ -862,15 +861,15 @@ cupsUtf16ToUtf32(utf32_t *dest, /* O - Target string */
     * Byte swap input UTF-16, if necessary...
     */
     if (swap)
-      ch = (utf32_t) ((ch << 8) | (ch >> 8));
+      ch = (cups_utf32_t) ((ch << 8) | (ch >> 8));
 
    /*
     * Discard expected UTF-16 low-half surrogate...
     */
     if ((ch >= 0xdc00) && (ch <= 0xdfff))
     {
-      if ((TcStrictUtf16) && (surrogate == 0))
-        return (-1);
+      if ((_cupsStrictUTF16) && (surrogate == 0))
+	return (-1);
       surrogate = 0;
       continue;
     }
@@ -880,8 +879,8 @@ cupsUtf16ToUtf32(utf32_t *dest, /* O - Target string */
     */
     if ((ch >= 0xd800) && (ch <= 0xdbff))
     {
-      if ((TcStrictUtf16) && (surrogate == 1))
-        return (-1);
+      if ((_cupsStrictUTF16) && (surrogate == 1))
+	return (-1);
       surrogate = 1;
       ch = 0xfffd;
     }
@@ -893,18 +892,18 @@ cupsUtf16ToUtf32(utf32_t *dest, /* O - Target string */
 }
 
 /*
- * 'cupsUtf32ToUtf16()' - Convert UTF-32 to UTF-16.
+ * 'cupsUTF32ToUTF16()' - Convert UTF-32 to UTF-16.
  *
  * This code does not support Unicode beyond 16-bits (Plane 0)...
  */
-int                             /* O - Count or -1 on error */
-cupsUtf32ToUtf16(utf16_t *dest, /* O - Target string */
-    const utf32_t *src,         /* I - Source string */
-    const int maxout)           /* I - Max output */
+int				/* O - Count or -1 on error */
+cupsUTF32ToUTF16(cups_utf16_t *dest, /* O - Target string */
+    const cups_utf32_t *src,	     /* I - Source string */
+    const int maxout)		/* I - Max output */
 {
-  int           i;              /* Looping variable */
-  int           swap = 0;       /* Byte-swap input to output */
-  utf32_t       ch;             /* Character value */
+  int		i;		/* Looping variable */
+  int		swap = 0;	/* Byte-swap input to output */
+  cups_utf32_t	     ch;	     /* Character value */
 
  /*
   * Check for valid arguments and clear output...
@@ -919,21 +918,21 @@ cupsUtf32ToUtf16(utf16_t *dest, /* O - Target string */
  /*
   * Check for leading BOM in UTF-32 and inverted BOM...
   */
-  if ((TcSupportBOM | TcRequireBOM)
+  if ((_cupsSupportBOM | _cupsRequireBOM)
   && (*src == 0xfffe0000))
     swap = 1;
 
  /*
   * Check for leading BOM in UTF-32 and unsupported...
   */
-  if ((TcSupportBOM == 0)
+  if ((_cupsSupportBOM == 0)
   && ((*src == 0xfeff) || (*src == 0xfffe0000)))
     return (-1);
 
  /*
   * Check for missing BOM in UTF-32 and required...
   */
-  if ((TcRequireBOM)
+  if ((_cupsRequireBOM)
   && ((*src != 0xfeff) && (*src != 0xfffe0000)))
     return (-1);
 
@@ -962,7 +961,7 @@ cupsUtf32ToUtf16(utf16_t *dest, /* O - Target string */
    /*
     * Check for beyond Plane 16 (invalid UTF-32)...
     */
-    if ((TcStrictUtf32) && (ch > 0x10ffff))
+    if ((_cupsStrictUTF32) && (ch > 0x10ffff))
       return (-1);
 
    /*
@@ -970,12 +969,12 @@ cupsUtf32ToUtf16(utf16_t *dest, /* O - Target string */
     */
     if (ch > 0xffff)
       ch = 0xfffd;
-    *dest = (utf16_t) ch;
+    *dest = (cups_utf16_t) ch;
   }
   *dest = 0;
   return (i);
 }
 
 /*
- * End of "$Id: transcode.c,v 1.1.2.1 2002/08/19 01:15:20 mike Exp $"
+ * End of "$Id: transcode.c,v 1.1.2.2 2002/08/20 12:41:53 mike Exp $"
  */

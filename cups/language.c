@@ -1,5 +1,5 @@
 /*
- * "$Id: language.c,v 1.20.2.8 2002/08/19 01:15:19 mike Exp $"
+ * "$Id: language.c,v 1.20.2.9 2002/08/20 12:41:52 mike Exp $"
  *
  *   I18N/language support for the Common UNIX Printing System (CUPS).
  *
@@ -355,7 +355,7 @@ cupsLangGet(const char *language) /* I - Language or locale */
     if (lang->messages[i] != NULL && lang->messages[i] != lang_blank)
       free(lang->messages[i]);
 
-    lang->messages[i] = lang_blank;
+    lang->messages[i] = (char *)lang_blank;
   }
 
  /*
@@ -441,5 +441,5 @@ cupsLangGet(const char *language) /* I - Language or locale */
 
 
 /*
- * End of "$Id: language.c,v 1.20.2.8 2002/08/19 01:15:19 mike Exp $".
+ * End of "$Id: language.c,v 1.20.2.9 2002/08/20 12:41:52 mike Exp $".
  */
