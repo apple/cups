@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.171 2002/09/15 22:54:23 mike Exp $"
+ * "$Id: job.c,v 1.172 2002/09/18 14:57:33 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -2698,7 +2698,10 @@ ipp_write_file(const char *filename,	/* I - File to write to */
 		    *bufptr++ = 0;
 		  }
 
-                  n = strlen(attr->values[i].string.text);
+                  if (attr->values[i].string.text != NULL)
+		    n = strlen(attr->values[i].string.text);
+		  else
+		    n = 0;
 
                   if (n > (sizeof(buffer) - 2))
 		    return (IPP_ERROR);
@@ -2720,8 +2723,12 @@ ipp_write_file(const char *filename,	/* I - File to write to */
 
 	          *bufptr++ = n >> 8;
 		  *bufptr++ = n;
-		  memcpy(bufptr, attr->values[i].string.text, n);
-		  bufptr += n;
+
+		  if (n > 0)
+		  {
+		    memcpy(bufptr, attr->values[i].string.text, n);
+		    bufptr += n;
+		  }
 		}
 		break;
 
@@ -2864,9 +2871,13 @@ ipp_write_file(const char *filename,	/* I - File to write to */
 		    *bufptr++ = 0;
 		  }
 
-                  n = strlen(attr->values[i].string.charset) +
-		      strlen(attr->values[i].string.text) +
-		      4;
+                  n = 4;
+
+		  if (attr->values[i].string.charset != NULL)
+                    n += strlen(attr->values[i].string.charset);
+
+		  if (attr->values[i].string.text != NULL)
+                    n += strlen(attr->values[i].string.text);
 
                   if (n > (sizeof(buffer) - 2))
 		    return (IPP_ERROR);
@@ -2887,22 +2898,36 @@ ipp_write_file(const char *filename,	/* I - File to write to */
 		  *bufptr++ = n;
 
                  /* Length of charset */
-                  n = strlen(attr->values[i].string.charset);
+                  if (attr->values[i].string.charset != NULL)
+		    n = strlen(attr->values[i].string.charset);
+		  else
+		    n = 0;
+
 	          *bufptr++ = n >> 8;
 		  *bufptr++ = n;
 
                  /* Charset */
-		  memcpy(bufptr, attr->values[i].string.charset, n);
-		  bufptr += n;
+		  if (n > 0)
+		  {
+		    memcpy(bufptr, attr->values[i].string.charset, n);
+		    bufptr += n;
+		  }
 
                  /* Length of text */
-                  n = strlen(attr->values[i].string.text);
+                  if (attr->values[i].string.text != NULL)
+		    n = strlen(attr->values[i].string.text);
+		  else
+		    n = 0;
+
 	          *bufptr++ = n >> 8;
 		  *bufptr++ = n;
 
                  /* Text */
-		  memcpy(bufptr, attr->values[i].string.text, n);
-		  bufptr += n;
+		  if (n > 0)
+		  {
+		    memcpy(bufptr, attr->values[i].string.text, n);
+		    bufptr += n;
+		  }
 		}
 		break;
 
@@ -3187,5 +3212,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.171 2002/09/15 22:54:23 mike Exp $".
+ * End of "$Id: job.c,v 1.172 2002/09/18 14:57:33 mike Exp $".
  */
