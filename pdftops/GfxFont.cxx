@@ -2,7 +2,7 @@
 //
 // GfxFont.cc
 //
-// Copyright 1996-2002 Glyph & Cog, LLC
+// Copyright 1996-2003 Glyph & Cog, LLC
 //
 //========================================================================
 
@@ -35,6 +35,11 @@ struct StdFontMapEntry {
   const char *properName;
 };
 
+// Acrobat 4.0 and earlier substituted Base14-compatible fonts without
+// providing Widths and a FontDescriptor, so we munge the names into
+// the proper Base14 names.  This table is from implementation note 44
+// in the PDF 1.4 spec, with some additions based on empirical
+// evidence.
 static StdFontMapEntry stdFontMap[] = {
   { "Arial",                        "Helvetica" },
   { "Arial,Bold",                   "Helvetica-Bold" },
@@ -304,11 +309,14 @@ CharCodeToUnicode *GfxFont::readToUnicodeCMap(Dict *fontDict, int nBits) {
 }
 
 void GfxFont::findExtFontFile() {
+  static const char *type1Exts[] = { ".pfa", ".pfb", ".ps", "", NULL };
+  static const char *ttExts[] = { ".ttf", NULL };
+
   if (name) {
     if (type == fontType1) {
-      extFontFile = globalParams->findFontFile(name, ".pfa", ".pfb");
+      extFontFile = globalParams->findFontFile(name, type1Exts);
     } else if (type == fontTrueType) {
-      extFontFile = globalParams->findFontFile(name, ".ttf", NULL);
+      extFontFile = globalParams->findFontFile(name, ttExts);
     }
   }
 }
@@ -396,10 +404,8 @@ Gfx8BitFont::Gfx8BitFont(XRef *xref, const char *tagA, Ref idA, GString *nameA,
   type = typeA;
   ctu = NULL;
 
-  // Acrobat 4.0 and earlier substituted Base14-compatible fonts
-  // without providing Widths and a FontDescriptor, so we munge the
-  // names into the proper Base14 names.  (This table is from
-  // implementation note 44 in the PDF 1.4 spec.)
+  // do font name substitution for various aliases of the Base 14 font
+  // names
   if (name) {
     a = 0;
     b = sizeof(stdFontMap) / sizeof(StdFontMapEntry);
@@ -553,14 +559,18 @@ Gfx8BitFont::Gfx8BitFont(XRef *xref, const char *tagA, Ref idA, GString *nameA,
 	fontFile = new Type1FontFile(buf, len);
       } else {
 	fontFile = new Type1CFontFile(buf, len);
+	if (!((Type1CFontFile *)fontFile)->isOk()) {
+	  delete fontFile;
+	  fontFile = NULL;
+	}
       }
-      if (fontFile->getName()) {
+      if (fontFile && fontFile->getName()) {
 	if (embFontName) {
 	  delete embFontName;
 	}
 	embFontName = new GString(fontFile->getName());
       }
-      if (!baseEnc) {
+      if (fontFile && !baseEnc) {
 	baseEnc = fontFile->getEncoding();
 	baseEncFromFontFile = gTrue;
       }
@@ -713,6 +723,9 @@ Gfx8BitFont::Gfx8BitFont(XRef *xref, const char *tagA, Ref idA, GString *nameA,
   fontDict->lookup("Widths", &obj1);
   if (obj1.isArray()) {
     flags |= fontFixedWidth;
+    if (obj1.arrayGetLength() < lastChar - firstChar + 1) {
+      lastChar = firstChar + obj1.arrayGetLength() - 1;
+    }
     for (code = firstChar; code <= lastChar; ++code) {
       obj1.arrayGet(code - firstChar, &obj2);
       if (obj2.isNum()) {
@@ -827,12 +840,12 @@ Dict *Gfx8BitFont::getResources() {
 // GfxCIDFont
 //------------------------------------------------------------------------
 
-static int cmpWidthExcep(const void *w1, const void *w2) {
+static int CDECL cmpWidthExcep(const void *w1, const void *w2) {
   return ((GfxFontCIDWidthExcep *)w1)->first -
          ((GfxFontCIDWidthExcep *)w2)->first;
 }
 
-static int cmpWidthExcepV(const void *w1, const void *w2) {
+static int CDECL cmpWidthExcepV(const void *w1, const void *w2) {
   return ((GfxFontCIDWidthExcepV *)w1)->first -
          ((GfxFontCIDWidthExcepV *)w2)->first;
 }

@@ -2,7 +2,7 @@
 //
 // OutputDev.cc
 //
-// Copyright 1996-2002 Glyph & Cog, LLC
+// Copyright 1996-2003 Glyph & Cog, LLC
 //
 //========================================================================
 
@@ -38,7 +38,7 @@ void OutputDev::setDefaultCTM(double *ctm) {
   defICTM[5] = (defCTM[1] * defCTM[4] - defCTM[0] * defCTM[5]) * det;
 }
 
-void OutputDev::cvtDevToUser(int dx, int dy, double *ux, double *uy) {
+void OutputDev::cvtDevToUser(double dx, double dy, double *ux, double *uy) {
   *ux = defICTM[0] * dx + defICTM[2] * dy + defICTM[4];
   *uy = defICTM[1] * dx + defICTM[3] * dy + defICTM[5];
 }

@@ -2,7 +2,7 @@
 //
 // ErrorCodes.h
 //
-// Copyright 2002 Glyph & Cog, LLC
+// Copyright 2002-2003 Glyph & Cog, LLC
 //
 //========================================================================
 
@@ -20,5 +20,7 @@
 
 #define errEncrypted        4	// file was encrypted and password was
 				// incorrect or not supplied
+
+#define errHighlightFile    5	// nonexistent or invalid highlight file
 
 #endif

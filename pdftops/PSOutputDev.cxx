@@ -2,7 +2,7 @@
 //
 // PSOutputDev.cc
 //
-// Copyright 1996-2002 Glyph & Cog, LLC
+// Copyright 1996-2003 Glyph & Cog, LLC
 //
 //========================================================================
 
@@ -18,6 +18,7 @@
 #include <signal.h>
 #include <math.h>
 #include "GString.h"
+#include "GList.h"
 #include "config.h"
 #include "GlobalParams.h"
 #include "Object.h"
@@ -104,7 +105,7 @@ static const char *prolog[] = {
   "  /customcolorimage {",
   "    gsave",
   "    [ exch /Separation exch dup 4 get exch /DeviceCMYK exch",
-  "      0 4 getinterval cvx",
+  "      0 4 getinterval",
   "      [ exch /dup load exch { mul exch dup } /forall load",
   "        /pop load dup ] cvx",
   "    ] setcolorspace",
@@ -332,11 +333,15 @@ static const char *prolog[] = {
   "/pdfImSep {",
   "  findcmykcustomcolor exch",
   "  dup /Width get /pdfImBuf1 exch string def",
+  "  dup /Decode get aload pop 1 index sub /pdfImDecodeRange exch def",
+  "  /pdfImDecodeLow exch def",
   "  begin Width Height BitsPerComponent ImageMatrix DataSource end",
   "  /pdfImData exch def",
   "  { pdfImData pdfImBuf1 readstring pop",
   "    0 1 2 index length 1 sub {",
-  "      1 index exch 2 copy get 255 exch sub put",
+  "      1 index exch 2 copy get",
+  "      pdfImDecodeRange mul 255 div pdfImDecodeLow add round cvi",
+  "      255 exch sub put",
   "    } for }",
   "  6 5 roll customcolorimage",
   "  { currentfile pdfImBuf readline",
@@ -507,6 +512,7 @@ PSOutputDev::PSOutputDev(const char *fileName, XRef *xrefA, Catalog *catalog,
   fontFileIDs = NULL;
   fontFileNames = NULL;
   font16Enc = NULL;
+  xobjStack = NULL;
   embFontList = NULL;
   customColors = NULL;
   t3String = NULL;
@@ -551,6 +557,7 @@ PSOutputDev::PSOutputDev(PSOutputFunc outputFuncA, void *outputStreamA,
   fontFileIDs = NULL;
   fontFileNames = NULL;
   font16Enc = NULL;
+  xobjStack = NULL;
   embFontList = NULL;
   customColors = NULL;
   t3String = NULL;
@@ -581,6 +588,11 @@ void PSOutputDev::init(PSOutputFunc outputFuncA, void *outputStreamA,
   mode = modeA;
   paperWidth = globalParams->getPSPaperWidth();
   paperHeight = globalParams->getPSPaperHeight();
+  if (paperWidth < 0 || paperHeight < 0) {
+    page = catalog->getPage(firstPage);
+    paperWidth = (int)(page->getWidth() + 0.5);
+    paperHeight = (int)(page->getHeight() + 0.5);
+  }
   if (mode == psModeForm) {
     lastPage = firstPage;
   }
@@ -605,6 +617,7 @@ void PSOutputDev::init(PSOutputFunc outputFuncA, void *outputStreamA,
   fontFileNames = (GString **)gmalloc(fontFileNameSize * sizeof(GString *));
   font16EncLen = 0;
   font16EncSize = 0;
+  xobjStack = new GList();
 
   // initialize embedded font resource comment list
   embFontList = new GString();
@@ -818,6 +831,9 @@ PSOutputDev::~PSOutputDev() {
     }
     gfree(font16Enc);
   }
+  if (xobjStack) {
+    delete xobjStack;
+  }
   while (customColors) {
     cc = customColors;
     customColors = cc->next;
@@ -826,8 +842,10 @@ PSOutputDev::~PSOutputDev() {
 }
 
 void PSOutputDev::setupResources(Dict *resDict) {
-  Object xObjDict, xObj, resObj;
-  int i;
+  Object xObjDict, xObjRef, xObj, resObj;
+  Ref ref0, ref1;
+  GBool skip;
+  int i, j;
 
   setupFonts(resDict);
   setupImages(resDict);
@@ -835,15 +853,40 @@ void PSOutputDev::setupResources(Dict *resDict) {
   resDict->lookup("XObject", &xObjDict);
   if (xObjDict.isDict()) {
     for (i = 0; i < xObjDict.dictGetLength(); ++i) {
-      xObjDict.dictGetVal(i, &xObj);
-      if (xObj.isStream()) {
-	xObj.streamGetDict()->lookup("Resources", &resObj);
-	if (resObj.isDict()) {
-	  setupResources(resObj.getDict());
+
+      // avoid infinite recursion on XObjects
+      skip = gFalse;
+      if ((xObjDict.dictGetValNF(i, &xObjRef)->isRef())) {
+	ref0 = xObjRef.getRef();
+	for (j = 0; j < xobjStack->getLength(); ++j) {
+	  ref1 = *(Ref *)xobjStack->get(j);
+	  if (ref1.num == ref0.num && ref1.gen == ref0.gen) {
+	    skip = gTrue;
+	    break;
+	  }
 	}
-	resObj.free();
+	if (!skip) {
+	  xobjStack->append(&ref0);
+	}
       }
-      xObj.free();
+      if (!skip) {
+
+	// process the XObject's resource dictionary
+	xObjDict.dictGetVal(i, &xObj);
+	if (xObj.isStream()) {
+	  xObj.streamGetDict()->lookup("Resources", &resObj);
+	  if (resObj.isDict()) {
+	    setupResources(resObj.getDict());
+	  }
+	  resObj.free();
+	}
+	xObj.free();
+      }
+
+      if (xObjRef.isRef() && !skip) {
+	xobjStack->del(xobjStack->getLength() - 1);
+      }
+      xObjRef.free();
     }
   }
   xObjDict.free();
@@ -874,6 +917,7 @@ void PSOutputDev::setupFont(GfxFont *font, Dict *parentResDict) {
   GString *psNameStr;
   const char *psName;
   char type3Name[64], buf[16];
+  GBool subst;
   UnicodeMap *uMap;
   const char *charName;
   double xs, ys;
@@ -899,6 +943,7 @@ void PSOutputDev::setupFont(GfxFont *font, Dict *parentResDict) {
 
   xs = ys = 1;
   psNameStr = NULL;
+  subst = gFalse;
 
   // check for resident 8-bit font
   if (font->getName() &&
@@ -969,6 +1014,7 @@ void PSOutputDev::setupFont(GfxFont *font, Dict *parentResDict) {
 
   // do 8-bit font substitution
   } else if (!font->isCIDFont()) {
+    subst = gTrue;
     name = font->getName();
     psName = NULL;
     if (name) {
@@ -1030,6 +1076,7 @@ void PSOutputDev::setupFont(GfxFont *font, Dict *parentResDict) {
 	        getPSFont16(font->getName(),
 			    ((GfxCIDFont *)font)->getCollection(),
 			    font->getWMode()))) {
+    subst = gTrue;
     psName = fontParam->psFontName->getCString();
     if (font16EncLen >= font16EncSize) {
       font16EncSize += 16;
@@ -1074,6 +1121,7 @@ void PSOutputDev::setupFont(GfxFont *font, Dict *parentResDict) {
       writePSFmt((i == 0) ? "[ " : "  ");
       for (j = 0; j < 8; ++j) {
 	if (font->getType() == fontTrueType &&
+	    !subst &&
 	    !((Gfx8BitFont *)font)->getHasEncoding()) {
 	  sprintf(buf, "c%02x", i+j);
 	  charName = buf;
@@ -1293,7 +1341,9 @@ void PSOutputDev::setupEmbeddedType1CFont(GfxFont *font, Ref *id,
   // convert it to a Type 1 font
   fontBuf = font->readEmbFontFile(xref, &fontLen);
   t1cFile = new Type1CFontFile(fontBuf, fontLen);
-  t1cFile->convertToType1(outputFunc, outputStream);
+  if (t1cFile->isOk()) {
+    t1cFile->convertToType1(outputFunc, outputStream);
+  }
   delete t1cFile;
   gfree(fontBuf);
 
@@ -1335,6 +1385,7 @@ void PSOutputDev::setupEmbeddedTrueTypeFont(GfxFont *font, Ref *id,
   ctu = ((Gfx8BitFont *)font)->getToUnicode();
   ttFile->convertToType42(psName, ((Gfx8BitFont *)font)->getEncoding(),
 			  ctu, ((Gfx8BitFont *)font)->getHasEncoding(),
+			  ((Gfx8BitFont *)font)->isSymbolic(),
 			  outputFunc, outputStream);
   ctu->decRefCnt();
   delete ttFile;
@@ -1380,6 +1431,7 @@ void PSOutputDev::setupExternalTrueTypeFont(GfxFont *font, const char *psName) {
   ctu = ((Gfx8BitFont *)font)->getToUnicode();
   ttFile->convertToType42(psName, ((Gfx8BitFont *)font)->getEncoding(),
 			  ctu, ((Gfx8BitFont *)font)->getHasEncoding(),
+			  ((Gfx8BitFont *)font)->isSymbolic(),
 			  outputFunc, outputStream);
   ctu->decRefCnt();
   delete ttFile;
@@ -1419,12 +1471,14 @@ void PSOutputDev::setupEmbeddedCIDType0Font(GfxFont *font, Ref *id,
   // convert it to a Type 0 font
   fontBuf = font->readEmbFontFile(xref, &fontLen);
   t1cFile = new Type1CFontFile(fontBuf, fontLen);
-  if (globalParams->getPSLevel() >= psLevel3) {
-    // Level 3: use a CID font
-    t1cFile->convertToCIDType0(psName, outputFunc, outputStream);
-  } else {
-    // otherwise: use a non-CID composite font
-    t1cFile->convertToType0(psName, outputFunc, outputStream);
+  if (t1cFile->isOk()) {
+    if (globalParams->getPSLevel() >= psLevel3) {
+      // Level 3: use a CID font
+      t1cFile->convertToCIDType0(psName, outputFunc, outputStream);
+    } else {
+      // otherwise: use a non-CID composite font
+      t1cFile->convertToType0(psName, outputFunc, outputStream);
+    }
   }
   delete t1cFile;
   gfree(fontBuf);

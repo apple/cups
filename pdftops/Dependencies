@@ -73,10 +73,11 @@ PDFDoc.o: Object.h gmem.h Array.h Dict.h Stream.h Catalog.h XRef.h Link.h
 PDFDoc.o: OutputDev.h Error.h ErrorCodes.h Lexer.h Parser.h Outline.h
 PDFDoc.o: PDFDoc.h
 PDFDocEncoding.o: PDFDocEncoding.h CharTypes.h
-PSOutputDev.o: ../config.h GString.h GlobalParams.h gtypes.h CharTypes.h
-PSOutputDev.o: Object.h gmem.h Array.h Dict.h Stream.h Error.h Function.h
-PSOutputDev.o: Gfx.h GfxState.h GfxFont.h CharCodeToUnicode.h UnicodeMap.h
-PSOutputDev.o: FontFile.h Catalog.h Page.h Annot.h PSOutputDev.h OutputDev.h
+PSOutputDev.o: ../config.h GString.h GList.h gtypes.h GlobalParams.h
+PSOutputDev.o: CharTypes.h Object.h gmem.h Array.h Dict.h Stream.h Error.h
+PSOutputDev.o: Function.h Gfx.h GfxState.h GfxFont.h CharCodeToUnicode.h
+PSOutputDev.o: UnicodeMap.h FontFile.h Catalog.h Page.h Annot.h PSOutputDev.h
+PSOutputDev.o: OutputDev.h
 PSTokenizer.o: ../config.h PSTokenizer.h gtypes.h
 Stream.o: ../config.h gmem.h gfile.h gtypes.h Error.h Object.h GString.h
 Stream.o: Array.h Dict.h Stream.h Decrypt.h JBIG2Stream.h Stream-CCITT.h

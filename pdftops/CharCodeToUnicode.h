@@ -4,7 +4,7 @@
 //
 // Mapping from character codes to Unicode.
 //
-// Copyright 2001-2002 Glyph & Cog, LLC
+// Copyright 2001-2003 Glyph & Cog, LLC
 //
 //========================================================================
 

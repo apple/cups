@@ -2,7 +2,7 @@
 //
 // Stream.cc
 //
-// Copyright 1996-2002 Glyph & Cog, LLC
+// Copyright 1996-2003 Glyph & Cog, LLC
 //
 //========================================================================
 
@@ -2141,7 +2141,7 @@ GBool DCTStream::readMCURow() {
 // Read one scan from a progressive or non-interleaved JPEG stream.
 void DCTStream::readScan() {
   int data[64];
-  int x1, y1, dy1, x2, y2, y3, cc, i;
+  int x1, y1, dx1, dy1, x2, y2, y3, cc, i;
   int h, v, horiz, vert, hSub, vSub;
   int *p1;
   int c;
@@ -2152,13 +2152,15 @@ void DCTStream::readScan() {
 	break;
       }
     }
+    dx1 = mcuWidth / compInfo[cc].hSample;
     dy1 = mcuHeight / compInfo[cc].vSample;
   } else {
+    dx1 = mcuWidth;
     dy1 = mcuHeight;
   }
 
-  for (y1 = 0; y1 < bufHeight; y1 += dy1) {
-    for (x1 = 0; x1 < bufWidth; x1 += mcuWidth) {
+  for (y1 = 0; y1 < height; y1 += dy1) {
+    for (x1 = 0; x1 < width; x1 += dx1) {
 
       // deal with restart marker
       if (restartInterval > 0 && restartCtr == 0) {
@@ -2186,7 +2188,7 @@ void DCTStream::readScan() {
 	hSub = horiz / 8;
 	vSub = vert / 8;
 	for (y2 = 0; y2 < dy1; y2 += vert) {
-	  for (x2 = 0; x2 < mcuWidth; x2 += horiz) {
+	  for (x2 = 0; x2 < dx1; x2 += horiz) {
 
 	    // pull out the current values
 	    p1 = &frameBuf[cc][(y1+y2) * bufWidth + (x1+x2)];
@@ -2282,8 +2284,10 @@ GBool DCTStream::readDataUnit(DCTHuffTable *dcHuffTable,
 	return gFalse;
       }
       i += run;
-      j = dctZigZag[i++];
-      data[j] = amp;
+      if (i < 64) {
+	j = dctZigZag[i++];
+	data[j] = amp;
+      }
     }
   }
   return gTrue;
@@ -2369,7 +2373,7 @@ GBool DCTStream::readProgressiveDataUnit(DCTHuffTable *dcHuffTable,
       eobRun = 0;
       for (k = 0; k < j; ++k) {
 	if ((bit = readBit()) == EOF) {
-	  return 9999;
+	  return gFalse;
 	}
 	eobRun = (eobRun << 1) | bit;
       }
@@ -3446,6 +3450,8 @@ GBool FlateStream::readDynamicCodes() {
   int len, repeat, code;
   int i;
 
+  codeLenCodeTab.codes = NULL;
+
   // read lengths
   if ((numLitCodes = getCodeWord(5)) == EOF) {
     goto err;
@@ -3488,23 +3494,35 @@ GBool FlateStream::readDynamicCodes() {
       if ((repeat = getCodeWord(2)) == EOF) {
 	goto err;
       }
-      for (repeat += 3; repeat > 0; --repeat) {
+      repeat += 3;
+      if (i + repeat > numLitCodes + numDistCodes) {
+	goto err;
+      }
+      for (; repeat > 0; --repeat) {
 	codeLengths[i++] = len;
       }
     } else if (code == 17) {
       if ((repeat = getCodeWord(3)) == EOF) {
 	goto err;
       }
+      repeat += 3;
+      if (i + repeat > numLitCodes + numDistCodes) {
+	goto err;
+      }
       len = 0;
-      for (repeat += 3; repeat > 0; --repeat) {
+      for (; repeat > 0; --repeat) {
 	codeLengths[i++] = 0;
       }
     } else if (code == 18) {
       if ((repeat = getCodeWord(7)) == EOF) {
 	goto err;
       }
+      repeat += 11;
+      if (i + repeat > numLitCodes + numDistCodes) {
+	goto err;
+      }
       len = 0;
-      for (repeat += 11; repeat > 0; --repeat) {
+      for (; repeat > 0; --repeat) {
 	codeLengths[i++] = 0;
       }
     } else {
