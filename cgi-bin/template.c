@@ -1,5 +1,5 @@
 /*
- * "$Id: template.c,v 1.8 1999/09/28 19:05:15 mike Exp $"
+ * "$Id: template.c,v 1.9 1999/10/29 15:51:22 mike Exp $"
  *
  *   CGI template function.
  *
@@ -24,6 +24,8 @@
  *   cgiCopyTemplateFile() - Copy a template file and replace all the
  *                           '{variable}' strings with the variable value.
  *   cgi_copy()            - Copy the template file, substituting as needed...
+ *   cgi_puts()            - Put a string to the output file, quoting as
+ *                           needed...
  */
 
 #include "cgi.h"
@@ -34,6 +36,7 @@
  */
 
 static void	cgi_copy(FILE *out, FILE *in, int element, char term);
+static void	cgi_puts(const char *s, FILE *out);
 
 
 /*
@@ -192,7 +195,7 @@ cgi_copy(FILE *out,		/* I - Output file */
         */
 
 	if (out)
-	  fputs(outval, out);
+	  cgi_puts(outval, out);
 
         continue;
       }
@@ -294,5 +297,25 @@ cgi_copy(FILE *out,		/* I - Output file */
 
 
 /*
- * End of "$Id: template.c,v 1.8 1999/09/28 19:05:15 mike Exp $".
+ * 'cgi_puts()' - Put a string to the output file, quoting as needed...
+ */
+
+static void
+cgi_puts(const char *s,
+         FILE       *out)
+{
+  while (*s)
+  {
+    if (s[0] == '<' && s[1] != '/' && !isalpha(s[1]))
+      fputs("&lt;", out);
+    else
+      putc(*s, out);
+
+    s ++;
+  }
+}
+
+
+/*
+ * End of "$Id: template.c,v 1.9 1999/10/29 15:51:22 mike Exp $".
  */
