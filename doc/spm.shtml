@@ -1,7 +1,7 @@
 <HTML>
 <HEAD>
 	<META NAME="COPYRIGHT" CONTENT="Copyright 1997-2001, All Rights Reserved">
-	<META NAME="DOCNUMBER" CONTENT="CUPS-SPM-1.1.6">
+	<META NAME="DOCNUMBER" CONTENT="CUPS-SPM-1.1.7">
 	<META NAME="Author" CONTENT="Easy Software Products">
 	<TITLE>CUPS Software Programmers Manual</TITLE>
 </HEAD>
@@ -9,8 +9,9 @@
 
 <H1 ALIGN="RIGHT">Preface</H1>
 
-<P>This software programmers manual provides software programming
-information for the Common UNIX Printing System ("CUPS") Version 1.1.6.
+<P>This software programmers manual provides software
+programming information for the Common UNIX Printing System
+("CUPS") Version 1.1.7.
 
 <EMBED SRC="system-overview.shtml">
 
@@ -7141,6 +7142,7 @@ ippDelete(ipp);
 <H3>Usage</H3>
 
 <PRE>
+ipp_attribute_t *ippFindAttribute(ipp_t *ipp, const char *name, ipp_tag_t tag);
 </PRE>
 
 <H3>Arguments</H3>
@@ -7151,21 +7153,48 @@ ippDelete(ipp);
 	<TH>Description</TH>
 </TR>
 <TR>
-	<TD></TD>
-	<TD></TD>
+	<TD>ipp</TD>
+	<TD>The IPP request or response</TD>
+</TR>
+<TR>
+	<TD>name</TD>
+	<TD>The name of the attribute</TD>
+</TR>
+<TR>
+	<TD>tag</TD>
+	<TD>The required value tag for the attribute or
+	<CODE>IPP_TAG_ZERO</CODE> for any type of value.</TD>
 </TR>
 </TABLE></CENTER>
 
 <H3>Returns</H3>
 
+<P>A pointer to the first occurrence of the requested attribute, or
+<CODE>NULL</CODE> if it was not found.
+
 <H3>Description</H3>
+
+<P><CODE>ippFindAttribute()</CODE> finds the first occurrence of the named
+attribute. The <CODE>tag</CODE> parameter restricts the search to a specific
+value type - use <CODE>IPP_TAG_ZERO</CODE> to find any value with the name.
+
+<P>The value tags <CODE>IPP_TAG_NAME</CODE> and <CODE>IPP_TAG_TEXT</CODE>
+match the name/text values with or without the language code.
 
 <H3>Example</H3>
 
 <PRE>
+ipp_attribute_t *attr;
+
+attr = ippFindAttribute(response, "printer-state-message", IPP_TAG_TEXT);
 </PRE>
 
 <H3>See Also</H3>
+
+<A HREF="#cupsDoFileRequest"><CODE>cupsDoFileRequest()</CODE></A>,
+<A HREF="#cupsDoRequest"><CODE>cupsDoRequest()</CODE></A>,
+<A HREF="#ippDelete"><CODE>ippDelete()</CODE></A>,
+<A HREF="#ippNew"><CODE>ippNew()</CODE></A>
 
 
 <!-- NEW PAGE --><H2><A NAME="ippLength">ippLength()</A></H2>
@@ -7173,6 +7202,7 @@ ippDelete(ipp);
 <H3>Usage</H3>
 
 <PRE>
+int ippLength(ipp_t *ipp);
 </PRE>
 
 <H3>Arguments</H3>
@@ -7183,21 +7213,30 @@ ippDelete(ipp);
 	<TH>Description</TH>
 </TR>
 <TR>
-	<TD></TD>
-	<TD></TD>
+	<TD>ipp</TD>
+	<TD>The IPP request or response</TD>
 </TR>
 </TABLE></CENTER>
 
 <H3>Returns</H3>
 
+<P>The total encoded length of the IPP request or response in bytes.
+
 <H3>Description</H3>
+
+<P><CODE>ippLength()</CODE> returns the length of the IPP request or
+response in bytes.
 
 <H3>Example</H3>
 
 <PRE>
+printf("The length of the response is %d bytes.\n", ippLength(response));
 </PRE>
 
 <H3>See Also</H3>
+
+<A HREF="#ippDelete"><CODE>ippDelete()</CODE></A>,
+<A HREF="#ippNew"><CODE>ippNew()</CODE></A>
 
 
 <!-- NEW PAGE --><H2><A NAME="ippNew">ippNew()</A></H2>
