@@ -1,0 +1,38 @@
+charset unicode
+
+#
+# This file defines the font mappings used for Unicode/UTF-8 text printing.
+#
+# Each line consists of:
+#
+#   first last direction width normal bold italic bold-italic
+#
+# First and last are the first and last glyphs in the font mapping
+# that correspond to that font; a maximum of 256 characters can be
+# mapped with each group, which a maximum of 256 mappings (this is a
+# PostScript limitation.) The glyph values are hexadecimal.
+#
+# Direction is the string "ltor" or "rtol", indicating left-to-right or
+# right-to-left text.
+#
+# Width is the string "single" or "double"; double means that the glyphs
+# are twice as wide as ASCII characters in the Courier typeface.
+#
+# "Normal", "bold", "italic", and "bold-italic" are the typefaces to use
+# for each presentation.  If characters are only available in a single
+# style then only one typeface should be listed (e.g. "Symbol")
+#
+# Each font that is listed will be used (and downloaded if needed) when
+# printing.
+#
+
+0000 00FF ltor single Courier Courier-Bold Courier-Italic Courier-Bold-Italic
+0100 01FF ltor single Courier Courier-Bold Courier-Italic Courier-Bold-Italic
+0200 02FF ltor single Courier Courier-Bold Courier-Italic Courier-Bold-Italic
+0300 03FF ltor single Symbol
+0400 04FF ltor single Courier-Cyrillic
+1E00 1EFF ltor single Courier Courier-Bold Courier-Italic Courier-Bold-Italic
+2000 20FF ltor single Courier Courier-Bold Courier-Italic Courier-Bold-Italic
+2100 21FF ltor single Courier Courier-Bold Courier-Italic Courier-Bold-Italic
+2200 22FF ltor single Symbol
+2300 23FF ltor single Symbol
