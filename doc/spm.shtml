@@ -847,25 +847,276 @@ are no conflicts.
 
 <H2>Overview</H2>
 
+<P>File filters are programs that convert from one or more MIME types to
+another type. Filters use a common command-line and environment interface
+that allows them to be joined as needed to print files to any type of
+printer.
+
 <H3>Security Considerations</H3>
+
+<P>Filters are normally run as a non-priviledged user, so the major
+security consideration is resource utilization - filters should not
+depend on unlimited amounts of memory and disk space.
 
 <H3>Users and Groups</H3>
 
+<P>The default CUPS configuration runs filters as user "lp" and group "other".
+
 <H3>Temporary Files</H3>
+
+<P>Temporary files should be created in the directory specified by the
+"TMPDIR" environment variable. The
+<A HREF="#cupsTempFile"><CODE>cupsTempFile()</CODE></A> function can be
+used to safely choose temporary files in this directory.
+
+<H3>Sending Messages to the User</H3>
+
+<P>The CUPS scheduler collects messages sent to the standard error file
+by the filter. These messages are relayed to the user based upon the
+scheduler <CODE>LogLevel</CODE> directive.
+
+<P>The type of message is determined by an initial prefix sent on each
+line:
+
+<UL>
+
+	<LI><CODE>DEBUG:</CODE> - a debug message
+
+	<LI><CODE>INFO:</CODE> - an informational message
+
+	<LI><CODE>WARNING:</CODE> - a warning message
+
+	<LI><CODE>ERROR:</CODE> - an error message
+
+	<LI><CODE>PAGE:</CODE> - a page accounting message
+
+</UL>
+
+<P>If the line of text does not begin with any of the above prefixes, it
+is treated as a debug message. Text following the prefix is copied to the
+<CODE>printer-state-message</CODE> attribute for the printer, and also
+added to the <VAR>error_log</VAR> unless it is an informational or page
+accounting message.
 
 <H3>Page Accounting</H3>
 
+<P>Page accounting messages are used to inform the server when one or more
+pages are printed. Each line has the form:
 
-<H2>Command-Line Arguments</H2>
+<UL><PRE>
+PAGE: page-number copy-count
+</PRE></UL>
+
+<P>The <I>page-number</I> field is the current page number, starting at 1.
+The <I>copy-count</I> field specifies the number of copies of that page
+that was produced.
+
+<P>Page account messages are added to the <VAR>page_log</VAR> file and
+cause the <CODE>job-sheets-completed</CODE> attribute to be updated for
+the job.
+
+<H3>Command-Line Arguments</H3>
+
+<P>Every filter accepts exactly 6 or 7 command-line arguments:
+
+<UL><PRE>
+printer job user title copies options [filename]
+</PRE>
+
+	<LI><CODE>printer</CODE> - The name of the printer queue (normally
+	this is the name of the program being run)
+
+	<LI><CODE>job</CODE> - The numeric job ID for the job being
+	printed
+
+	<LI><CODE>user</CODE> - The string from the
+	<CODE>originating-user-name</CODE> attribute
+
+	<LI><CODE>title</CODE> - The string from the
+	<CODE>job-name</CODE> attribute
+
+	<LI><CODE>copies</CODE> - The numeric value from the
+	<CODE>number-copies</CODE> attribute
+
+	<LI><CODE>options</CODE> - String representations of the
+	job template attributes, separated by spaces. Boolean attributes
+	are provided as "name" for true values and "noname" for false
+	values. All other attributes are provided as "name=value" for
+	single-valued attributes and "name=value1,value2,...,valueN" for
+	set attributes
+
+	<LI><CODE>filename</CODE> - The request file
+
+</UL>
+
+<P>The <I>filename</I> argument is only provided to the first filter in the
+chain; all filters <B>must</B> be prepared to read the print file from
+the standard input if the <I>filename</I> argument is omitted.
 
 <H3>Copy Generation</H3>
 
+<P>The <I>copies</I> argument specifies the number of copies to produce
+of the input file. In general, you should only generate copies if the
+<I>filename</I> argument is supplied. The only exception to this are
+filters that produce device-independent PostScript output (without any
+printer commands from the printer's PPD file), since the PostScript
+filter <CODE>pstops</CODE> is responsible for copy generation.
 
-<H2>Environment Variables</H2>
+<H3>Environment Variables</H3>
 
+<P>Every filter receives a fixed set of environment variables that can
+be used by the filter:
 
-<H2>Writing a HTML Filter</H2>
+<UL>
 
+	<LI><CODE>CHARSET</CODE> - The character set used by the client for
+	this print file
+
+	<LI><CODE>CONTENT_TYPE</CODE> - The original document type, such as
+	"application/postscript"
+
+	<LI><CODE>CUPS_DATADIR</CODE> - The location of CUPS data files
+
+	<LI><CODE>CUPS_SERVERROOT</CODE> - The location of CUPS configuration
+	files
+
+	<LI><CODE>DEVICE_URI</CODE> - The output device URI
+
+	<LI><CODE>LANG</CODE> - The language used by the client for
+	this print file
+
+	<LI><CODE>PATH</CODE> - The execution path exported to the filter
+
+	<LI><CODE>PPD</CODE> - The full filename of the printer's PPD file
+
+	<LI><CODE>PRINTER</CODE> - The name of the printer queue
+
+	<LI><CODE>RIP_CACHE</CODE> - The maximum amount of memory each filter
+	should use
+
+	<LI><CODE>SOFTWARE</CODE> - The name of the CUPS software, typically
+	"CUPS/1.1"
+
+	<LI><CODE>TZ</CODE> - The local timezone
+
+	<LI><CODE>USER</CODE> - The name of the current user
+
+</UL>
+
+<H2>Disecting the HP-GL/2 Filter</H2>
+
+<P>The HP-GL/2 filter (<CODE>hpgltops</CODE>) provided with CUPS is a
+complex program that converts HP-GL/2 files into device-independent PostScript
+output. Since it produces device-independent PostScript output, it does not
+need to handle copy generation or writing printer options from the printer's
+PPD file.
+
+<H3>Initializing the Filter</H3>
+
+<P>The first task of any filter is to ensure that the correct number of
+command-line arguments are present:
+
+<UL><PRE>
+if (argc &lt; 6 || argc > 7)
+{
+  fputs("ERROR: hpgltops job-id user title copies options [file]\n", stderr);
+  return (1);
+}
+</PRE></UL>
+
+<P>After this you open the print file or read from the standard input
+as needed:
+
+<UL><PRE>
+FILE *fp;
+
+/*
+ * If we have 7 arguments, print the file named on the command-line.
+ * Otherwise, send stdin instead...
+ */
+
+if (argc == 6)
+  fp = stdin;
+else
+{
+ /*
+  * Try to open the print file...
+  */
+
+  if ((fp = fopen(argv[6], "rb")) == NULL)
+  {
+    perror("ERROR: unable to open print file - ");
+    return (1);
+  }
+}
+</PRE></UL>
+
+<P>Once the print file has been opened, options can be processed using
+the <A HREF="#cupsParseOptions"><CODE>cupsParseOptions()</CODE></A> and
+<A HREF="#cupsGetOption"><CODE>cupsGetOption()</CODE></A> functions:
+
+<UL><PRE>
+int           num_options;
+cups_option_t *options;
+const char    *val;
+
+/*
+ * Process command-line options and write the prolog...
+ */
+
+options     = NULL;
+num_options = cupsParseOptions(argv[5], 0, &options);
+
+if ((val = cupsGetOption("blackplot", num_options, options)) != NULL)
+  shading = 0;
+
+if ((val = cupsGetOption("fitplot", num_options, options)) != NULL)
+  FitPlot = 1;
+
+if ((val = cupsGetOption("penwidth", num_options, options)) != NULL)
+  PenWidth = (float)atoi(val) * 0.001f;
+</PRE></UL>
+
+<P>After the options have been processed, the filter writes PostScript code
+to the standard output based on the print file, closes the print file (as
+needed), and returns 0 to the scheduler.
+
+<H2>PostScript Output</H2>
+
+<P>Filters that produce PostScript output must generate output conforming
+to the Adobe Document Structuring Conventions, 3.0. In general this means
+the beginning of each file must begin with:
+
+<UL><PRE>
+%!PS-Adobe-3.0
+%%BoundingBox: left bottom right top
+%%Pages: (atend)
+%%EndComments
+</PRE></UL>
+
+<P>The <I>left</I>, <I>bottom</I>, <I>right</I>, and <I>top</I> values
+are integers in points from the lower-lefthand corner of the page.
+
+<P>Pages must be surrounded by:
+
+<UL><PRE>
+%%Page: number number
+gsave
+...
+grestore
+showpage
+</PRE></UL>
+
+<P>And the end of each file must contain:
+
+<UL><PRE>
+%%Trailer
+%%Pages: number-pages
+%%EOF
+</PRE></UL>
+
+<P>These comments allow the PostScript filter to correctly perform page
+accounting, copy generation, N-up printing, and so forth.
 
 <H1 ALIGN="RIGHT"><A NAME="WRITING_DRIVERS">4 - Writing Printer Drivers</A></H1>
 
@@ -875,10 +1126,43 @@ appropriate commands and data required for a printer.
 
 <H2>Overview</H2>
 
+<P>Raster printers utilitize PPD files that specify one or more
+device-specific filters that handle converting print files for the
+printer. The simplest raster printer drivers provide a single filter
+that converts CUPS raster data to the printer's native format.
+
+<H3>CUPS Raster Data</H3>
+
+<P>CUPS raster data (<CODE>application/vnd.cups-raster</CODE>) consists of
+a stream of raster page descriptions produced by one of the RIP filters,
+such as <CODE>pstoraster</CODE> or <CODE>imagetoraster</CODE>.
+
+<P>Each page of data begins with a page dictionary structure called
+<A HREF="#cups_raster_header_t"><CODE>cups_raster_header_t</CODE></A>. This
+structure contains the colorspace, bits per color, media size, media type,
+hardware resolution, and so forth.
+
+<P>After the page dictionary comes the page data which is a full-resolution,
+uncompressed bitmap representing the page in the printer's output colorspace.
+
 <H3>Page Accounting</H3>
+
+<P>Printer drivers must handle all page accounting. This means they must
+send "PAGE:" messages to the standard error file for each page (and in many
+cases, copy) sent to the printer.
 
 <H3>Color Management</H3>
 
+<P>Printer drivers can implement their color management via the
+<CODE>cupsColorProfile</CODE> attributes in the PPD file or internally
+in the driver from a device-independent colorspace. In general, color
+management performed by the RIP filters is more efficient than that
+performed inside printer drivers.
+
+<P>For example, the <CODE>pstoraster</CODE> filter often only has to
+perform a color conversion once each time the color is used for
+multiple output pixels, while the raster filter must convert every
+pixel on the page.
 
 <H2>Raster Functions</H2>
 
