@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c,v 1.41 2000/04/12 20:03:50 mike Exp $"
+ * "$Id: ppd.c,v 1.42 2000/05/02 17:42:37 mike Exp $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -649,20 +649,26 @@ ppdOpen(FILE *fp)		/* I - File to read from */
       * Add a "Custom" page size option...
       */
 
-      if ((group = ppd_get_group(ppd,
-                                 cupsLangString(language,
-                                                CUPS_MSG_GENERAL))) == NULL)
+      if ((option = ppdFindOption(ppd, "PageSize")) == NULL)
       {
-        ppdClose(ppd);
-	safe_free(string);
-	return (NULL);
-      }
+        ppd_group_t	*temp;
 
-      if ((option = ppd_get_option(group, "PageSize")) == NULL)
-      {
-        ppdClose(ppd);
-	safe_free(string);
-	return (NULL);
+
+	if ((temp = ppd_get_group(ppd,
+                                  cupsLangString(language,
+                                                 CUPS_MSG_GENERAL))) == NULL)
+	{
+          ppdClose(ppd);
+	  safe_free(string);
+	  return (NULL);
+	}
+
+	if ((option = ppd_get_option(temp, "PageSize")) == NULL)
+	{
+          ppdClose(ppd);
+	  safe_free(string);
+	  return (NULL);
+	}
       }
 
       if ((choice = ppd_add_choice(option, "Custom")) == NULL)
@@ -674,7 +680,6 @@ ppdOpen(FILE *fp)		/* I - File to read from */
 
       strncpy(choice->text, cupsLangString(language, CUPS_MSG_VARIABLE),
               sizeof(choice->text) - 1);
-      group  = NULL;
       option = NULL;
     }
     else if (strcmp(keyword, "MaxMediaWidth") == 0)
@@ -711,24 +716,33 @@ ppdOpen(FILE *fp)		/* I - File to read from */
 	* Add a "Custom" page size option...
 	*/
 
-	if ((group = ppd_get_group(ppd,
-                                   cupsLangString(language,
-                                                  CUPS_MSG_GENERAL))) == NULL)
+        if ((option = ppdFindOption(ppd, "PageSize")) == NULL)
 	{
-          ppdClose(ppd);
-	  safe_free(string);
-	  return (NULL);
-	}
+	  ppd_group_t	*temp;
 
-	if ((option = ppd_get_option(group, "PageSize")) == NULL)
-	{
-          ppdClose(ppd);
-	  safe_free(string);
-	  return (NULL);
-	}
+
+	  if ((temp = ppd_get_group(ppd,
+                                    cupsLangString(language,
+                                                   CUPS_MSG_GENERAL))) == NULL)
+	  {
+	    DEBUG_puts("Unable to get general group!");
+            ppdClose(ppd);
+	    safe_free(string);
+	    return (NULL);
+	  }
+
+	  if ((option = ppd_get_option(temp, "PageSize")) == NULL)
+	  {
+	    DEBUG_puts("Unable to get PageSize option!");
+            ppdClose(ppd);
+	    safe_free(string);
+	    return (NULL);
+	  }
+        }
 
 	if ((choice = ppd_add_choice(option, "Custom")) == NULL)
 	{
+	  DEBUG_puts("Unable to add Custom choice!");
           ppdClose(ppd);
 	  safe_free(string);
 	  return (NULL);
@@ -736,12 +750,12 @@ ppdOpen(FILE *fp)		/* I - File to read from */
 
 	strncpy(choice->text, cupsLangString(language, CUPS_MSG_VARIABLE),
         	sizeof(choice->text) - 1);
-	group  = NULL;
 	option = NULL;
       }
 
       if ((option = ppdFindOption(ppd, "PageSize")) == NULL)
       {
+	DEBUG_puts("Unable to find PageSize option!");
 	ppdClose(ppd);
 	safe_free(string);
 	return (NULL);
@@ -749,6 +763,7 @@ ppdOpen(FILE *fp)		/* I - File to read from */
 
       if ((choice = ppdFindChoice(option, "Custom")) == NULL)
       {
+	DEBUG_puts("Unable to find Custom choice!");
         ppdClose(ppd);
 	safe_free(string);
 	return (NULL);
@@ -998,6 +1013,8 @@ ppdOpen(FILE *fp)		/* I - File to read from */
       * Open a new sub-group...
       */
 
+      DEBUG_printf(("group = %p, subgroup = %p\n", group, subgroup));
+
       if (group == NULL || subgroup != NULL)
       {
         ppdClose(ppd);
@@ -1057,24 +1074,25 @@ ppdOpen(FILE *fp)		/* I - File to read from */
 
       if (option == NULL)
       {
+        ppd_group_t	*temp;
+
+
        /*
         * Only valid for Non-UI options...
 	*/
 
-        for (i = ppd->num_groups, group = ppd->groups; i > 0; i --, group ++)
-          if (group->text[0] == '\0')
+        for (i = ppd->num_groups, temp = ppd->groups; i > 0; i --, temp ++)
+          if (temp->text[0] == '\0')
 	    break;
 
         if (i > 0)
-          for (i = 0; i < group->num_options; i ++)
-	    if (strcmp(keyword, group->options[i].keyword) == 0)
+          for (i = 0; i < temp->num_options; i ++)
+	    if (strcmp(keyword, temp->options[i].keyword) == 0)
 	    {
-	      group->options[i].section = section;
-	      group->options[i].order   = order;
+	      temp->options[i].section = section;
+	      temp->options[i].order   = order;
 	      break;
 	    }
-
-        group = NULL;
       }
       else
       {
@@ -1092,24 +1110,25 @@ ppdOpen(FILE *fp)		/* I - File to read from */
 
       if (option == NULL)
       {
+        ppd_group_t	*temp;
+
+
        /*
         * Only valid for Non-UI options...
 	*/
 
-        for (i = ppd->num_groups, group = ppd->groups; i > 0; i --, group ++)
-          if (group->text[0] == '\0')
+        for (i = ppd->num_groups, temp = ppd->groups; i > 0; i --, temp ++)
+          if (temp->text[0] == '\0')
 	    break;
 
         if (i > 0)
-          for (i = 0; i < group->num_options; i ++)
-	    if (strcmp(keyword, group->options[i].keyword) == 0)
+          for (i = 0; i < temp->num_options; i ++)
+	    if (strcmp(keyword, temp->options[i].keyword) == 0)
 	    {
-	      strncpy(group->options[i].defchoice, string,
-                      sizeof(group->options[i].defchoice) - 1);
+	      strncpy(temp->options[i].defchoice, string,
+                      sizeof(temp->options[i].defchoice) - 1);
 	      break;
 	    }
-
-        group = NULL;
       }
       else
         strncpy(option->defchoice, string, sizeof(option->defchoice) - 1);
@@ -1200,6 +1219,8 @@ ppdOpen(FILE *fp)		/* I - File to read from */
              (mask & (PPD_KEYWORD | PPD_OPTION | PPD_STRING)) ==
 	         (PPD_KEYWORD | PPD_OPTION | PPD_STRING))
     {
+      DEBUG_printf(("group = %p, subgroup = %p\n", group, subgroup));
+
       if (strcmp(keyword, "PageSize") == 0)
       {
        /*
@@ -1814,5 +1835,5 @@ ppd_fix(char *string)		/* IO - String to fix */
 
 
 /*
- * End of "$Id: ppd.c,v 1.41 2000/04/12 20:03:50 mike Exp $".
+ * End of "$Id: ppd.c,v 1.42 2000/05/02 17:42:37 mike Exp $".
  */

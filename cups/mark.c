@@ -1,5 +1,5 @@
 /*
- * "$Id: mark.c,v 1.21 2000/03/09 19:47:23 mike Exp $"
+ * "$Id: mark.c,v 1.22 2000/05/02 17:42:37 mike Exp $"
  *
  *   Option marking routines for the Common UNIX Printing System (CUPS).
  *
@@ -41,6 +41,7 @@
 
 #include "ppd.h"
 #include "string.h"
+#include "debug.h"
 
 
 /*
@@ -117,7 +118,8 @@ ppdConflicts(ppd_file_t *ppd)	/* I - PPD to check */
         if (c1->marked)
 	  break;
 
-      if (j == 0 || strcasecmp(c1->choice, "None") == 0)
+      if (j == 0 || strcasecmp(c1->choice, "None") == 0 ||
+          strcasecmp(c1->choice, "False") == 0)
         c1 = NULL;
     }
 
@@ -147,7 +149,8 @@ ppdConflicts(ppd_file_t *ppd)	/* I - PPD to check */
         if (c2->marked)
 	  break;
 
-      if (j == 0 || strcasecmp(c2->choice, "None") == 0)
+      if (j == 0 || strcasecmp(c2->choice, "None") == 0 ||
+          strcasecmp(c2->choice, "False") == 0)
         c2 = NULL;
     }
 
@@ -158,6 +161,9 @@ ppdConflicts(ppd_file_t *ppd)	/* I - PPD to check */
     if (c1 != NULL && c1->marked &&
         c2 != NULL && c2->marked)
     {
+      DEBUG_printf(("%s->%s conflicts with %s->%s (%s %s %s %s)\n",
+                    o1->keyword, c1->choice, o2->keyword, c2->choice,
+		    c->option1, c->choice1, c->option2, c->choice2));
       conflicts ++;
       o1->conflicted = 1;
       o2->conflicted = 1;
@@ -427,5 +433,5 @@ ppd_defaults(ppd_file_t  *ppd,	/* I - PPD file */
 
 
 /*
- * End of "$Id: mark.c,v 1.21 2000/03/09 19:47:23 mike Exp $".
+ * End of "$Id: mark.c,v 1.22 2000/05/02 17:42:37 mike Exp $".
  */
