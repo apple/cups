@@ -1,5 +1,5 @@
 /*
- * "$Id: admin.c,v 1.13 2000/09/14 20:34:47 mike Exp $"
+ * "$Id: admin.c,v 1.14 2000/09/19 16:37:00 mike Exp $"
  *
  *   Administration CGI for the Common UNIX Printing System (CUPS).
  *
@@ -793,7 +793,16 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
 
       ippDelete(response);
     }
+    else
+    {
+      char message[1024];
 
+
+      snprintf(message, sizeof(message), "Unable to get list of printer drivers: %s",
+               ippErrorString(cupsLastError()));
+      cgiSetVariable("ERROR", message);
+      cgiCopyTemplateLang(stdout, TEMPLATES, "error.tmpl", getenv("LANG"));
+    }
   }
   else
   {
@@ -1568,5 +1577,5 @@ get_line(char *buf,	/* I - Line buffer */
 
 
 /*
- * End of "$Id: admin.c,v 1.13 2000/09/14 20:34:47 mike Exp $".
+ * End of "$Id: admin.c,v 1.14 2000/09/19 16:37:00 mike Exp $".
  */
