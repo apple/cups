@@ -9,6 +9,8 @@ CHANGES IN CUPS V1.1.21rc3
 
 CHANGES IN CUPS V1.1.21rc2
 
+	- Fixed a denial-of-service bug in the CUPS browse
+	  protocol support (STR #863)
 	- The scheduler used a select() timeout of INT_MAX
 	  seconds when there was nothing to do, which doesn't
 	  work on IRIX (STR #864)

@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c,v 1.57.2.67 2004/08/23 18:43:12 mike Exp $"
+ * "$Id: main.c,v 1.57.2.68 2004/09/08 18:38:34 mike Exp $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -1243,7 +1243,7 @@ select_timeout(int fds)			/* I - Number of ready descriptors select returned */
       {
 	if (p->type & CUPS_PRINTER_REMOTE)
 	{
-	  if (p->browse_time + BrowseTimeout < timeout)
+	  if ((p->browse_time + BrowseTimeout) < timeout)
 	  {
 	    timeout = p->browse_time + BrowseTimeout;
 	    why     = "browse timeout a printer";
@@ -1251,7 +1251,7 @@ select_timeout(int fds)			/* I - Number of ready descriptors select returned */
 	}
 	else if (!(p->type & CUPS_PRINTER_IMPLICIT))
 	{
-	  if (BrowseInterval && p->browse_time + BrowseInterval < timeout)
+	  if (BrowseInterval && (p->browse_time + BrowseInterval) < timeout)
 	  {
 	    timeout = p->browse_time + BrowseInterval;
 	    why     = "send browse update";
@@ -1302,13 +1302,17 @@ select_timeout(int fds)			/* I - Number of ready descriptors select returned */
   * Adjust from absolute to relative time.  If p->browse_time above
   * was 0 then we can end up with a negative value here, so check.
   * We add 1 second to the timeout since events occur after the
-  * timeout expires...
+  * timeout expires, and limit the timeout to 86400 seconds (1 day)
+  * to avoid select() timeout limits present on some operating
+  * systems...
   */
 
   timeout = timeout - now + 1;
 
   if (timeout < 1)
     timeout = 1;
+  else if (timeout > 86400)
+    timeout = 86400;
 
  /*
   * Log and return the timeout value...
@@ -1333,5 +1337,5 @@ usage(void)
 
 
 /*
- * End of "$Id: main.c,v 1.57.2.67 2004/08/23 18:43:12 mike Exp $".
+ * End of "$Id: main.c,v 1.57.2.68 2004/09/08 18:38:34 mike Exp $".
  */
