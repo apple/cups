@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.77.2.21 2003/01/24 19:19:45 mike Exp $"
+ * "$Id: conf.c,v 1.77.2.22 2003/01/29 00:21:54 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -2110,7 +2110,7 @@ CDSAGetServerCerts(void)
 
   if (err)
     LogMessage(L_ERROR, "Cannot open keychain \"%s\", error %d.",
-               ServerCertficate, err);
+               ServerCertificate, err);
   else
   {
    /*
@@ -2165,5 +2165,5 @@ CDSAGetServerCerts(void)
 
 
 /*
- * End of "$Id: conf.c,v 1.77.2.21 2003/01/24 19:19:45 mike Exp $".
+ * End of "$Id: conf.c,v 1.77.2.22 2003/01/29 00:21:54 mike Exp $".
  */
