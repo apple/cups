@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.25 1999/08/23 15:19:56 mike Exp $"
+ * "$Id: conf.c,v 1.26 1999/08/28 16:17:50 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -138,6 +138,7 @@ ReadConfiguration(void)
   int		status;		/* Return status */
   char		directory[1024];/* Configuration directory */
   struct rlimit	limit;		/* Runtime limit */
+  char		*language;	/* Language string */
 
 
  /*
@@ -189,7 +190,14 @@ ReadConfiguration(void)
   strcpy(DocumentRoot, CUPS_DATADIR "/doc");
   strcpy(AccessLog, "logs/access_log");
   strcpy(ErrorLog, "logs/error_log");
-  strcpy(DefaultLanguage, DEFAULT_LANGUAGE);
+
+  if ((language = DEFAULT_LANGUAGE) == NULL)
+    language = "en";
+  else if (strcmp(language, "C") == 0 || strcmp(language, "POSIX") == 0)
+    language = "en";
+
+  strcpy(DefaultLanguage, language);
+
   strcpy(DefaultCharset, DEFAULT_CHARSET);
   strcpy(RIPCache, "8m");
   if (getenv("TMPDIR") == NULL)
@@ -1185,5 +1193,5 @@ get_address(char               *value,		/* I - Value string */
 
 
 /*
- * End of "$Id: conf.c,v 1.25 1999/08/23 15:19:56 mike Exp $".
+ * End of "$Id: conf.c,v 1.26 1999/08/28 16:17:50 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: cupsd.h,v 1.12 1999/08/06 16:48:43 mike Exp $"
+ * "$Id: cupsd.h,v 1.13 1999/08/28 16:17:51 mike Exp $"
  *
  *   Main header file for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -81,35 +81,34 @@
 #define DEFAULT_TIMEOUT		300	/* Timeout during requests/updates */
 #define DEFAULT_KEEPALIVE	60	/* Timeout between requests */
 #define DEFAULT_INTERVAL	30	/* Interval between browse updates */
-#define DEFAULT_LANGUAGE	setlocale(LC_ALL,NULL)
+#ifdef WIN32 /* Fix for broken Linux setlocale() */
+#  define DEFAULT_LANGUAGE	setlocale(LC_ALL,"")
 					/* Default language encoding */
+#else
+#  define DEFAULT_LANGUAGE	getenv("LANG")
+					/* Default language encoding */
+#endif /* !WIN32 */
 #define DEFAULT_CHARSET		"iso-8859-1"
 					/* Default charset */
 
 #ifdef __sgi
 #  define DEFAULT_UID		9	/* Default user ID */
 #  define DEFAULT_GID		0	/* Default group ID */
-#  define DEFAULT_GROUP		"sys"	/* Default system group */
 #elif defined(__hpux)
 #  define DEFAULT_UID		9	/* Default user ID */
 #  define DEFAULT_GID		0	/* Default group ID */
-#  define DEFAULT_GROUP		"sys"	/* Default system group */
 #elif defined(__sun)
 #  define DEFAULT_UID		71	/* Default user ID */
 #  define DEFAULT_GID		0	/* Default group ID */
-#  define DEFAULT_GROUP		"sys"	/* Default system group */
 #elif defined(__linux)
 #  define DEFAULT_UID		4	/* Default user ID */
 #  define DEFAULT_GID		0	/* Default group ID */
-#  define DEFAULT_GROUP		"sys"	/* Default system group */
 #elif defined(__osf__)
 #  define DEFAULT_UID		8	/* Default user ID */
 #  define DEFAULT_GID		0	/* Default group ID */
-#  define DEFAULT_GROUP		"system"/* Default system group */
 #else
 #  define DEFAULT_UID		9	/* Default user ID */
 #  define DEFAULT_GID		0	/* Default group ID */
-#  define DEFAULT_GROUP		"sys"	/* Default system group */
 #endif /* __sgi */
 
 
@@ -157,5 +156,5 @@ VAR int			NeedReload	VALUE(TRUE);
 
 
 /*
- * End of "$Id: cupsd.h,v 1.12 1999/08/06 16:48:43 mike Exp $".
+ * End of "$Id: cupsd.h,v 1.13 1999/08/28 16:17:51 mike Exp $".
  */

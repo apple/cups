@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.h,v 1.14 1999/07/07 18:24:37 mike Exp $"
+ * "$Id: conf.h,v 1.15 1999/08/28 16:17:51 mike Exp $"
  *
  *   Configuration file definitions for the Common UNIX Printing System (CUPS)
  *   scheduler.
@@ -49,7 +49,7 @@ VAR char		ConfigurationFile[256]	VALUE(CUPS_SERVERROOT "/conf/cupsd.conf"),
 					/* Root directory for scheduler */
 			DocumentRoot[1024]	VALUE(CUPS_DATADIR "/doc"),
 					/* Root directory for documents */
-			SystemGroup[32]		VALUE(DEFAULT_GROUP),
+			SystemGroup[32],
 					/* System group name */
 			AccessLog[1024]		VALUE("logs/access_log"),
 					/* Access log filename */
@@ -108,5 +108,5 @@ extern int	LogPage(job_t *job, char *page);
 
 
 /*
- * End of "$Id: conf.h,v 1.14 1999/07/07 18:24:37 mike Exp $".
+ * End of "$Id: conf.h,v 1.15 1999/08/28 16:17:51 mike Exp $".
  */
