@@ -1,5 +1,5 @@
 /*
- * "$Id: ieee1394-linux.c,v 1.2 2002/05/16 13:44:50 mike Exp $"
+ * "$Id: ieee1394-linux.c,v 1.3 2002/05/17 21:03:46 mike Exp $"
  *
  *   Linux IEEE-1394 glue for the Common UNIX Printing System (CUPS).
  *
@@ -95,6 +95,32 @@ typedef struct
   int			node;		/* Node number for printer device */
   unsigned long long	addr;		/* Management address */
 } linux1394_dev_t;
+
+
+/*
+ * ORB messages for communication with the device...
+ */
+
+typedef struct		/**** Login ORB Message */
+{
+  unsigned char		passwd_addr[8];	/* Password address */
+  unsigned char		resp_addr[8];	/* Login response address */
+  unsigned char		notify_excl;	/* Notify and exclusive bits */
+  unsigned char		recon_func;	/* Reconnect time and function */
+  unsigned char		lun[2];		/* Logical unit number */
+  unsigned char		passwd_len[2];	/* Length of password */
+  unsigned char		resp_len[2];	/* Length of login response */
+  unsigned char		fifo_addr[8];	/* Local status FIFO address */
+} login_orb_t;
+
+typedef struct		/**** Login Response Message ****/
+{
+  unsigned char		length[2];	/* Length of response */
+  unsigned char		login_id[2];	/* Login ID */
+  unsigned char		cmd_addr[8];	/* Command block agent address */
+  unsigned char		reserved[2];	/* Reserved (0) */
+  unsigned char		recon_hold[2];	/* Number of seconds to hold login */
+} login_resp_t;
 
 
 /*
@@ -847,5 +873,5 @@ ieee1394_error(void)
 
 
 /*
- * End of "$Id: ieee1394-linux.c,v 1.2 2002/05/16 13:44:50 mike Exp $".
+ * End of "$Id: ieee1394-linux.c,v 1.3 2002/05/17 21:03:46 mike Exp $".
  */
