@@ -1,5 +1,5 @@
-README - CUPS v1.0b9 - 09/03/1999
----------------------------------
+README - CUPS v1.0b10 - 09/27/1999
+----------------------------------
 
 BETA SOFTWARE BETA SOFTWARE BETA SOFTWARE BETA SOFTWARE BETA SOFTWARE
 
@@ -20,9 +20,8 @@ and users.  CUPS provides the System V and Berkeley command-line
 interfaces.
 
 CUPS uses the Internet Printing Protocol (IETF-IPP) as the basis for
-managing print jobs and queues.  The Line Printer Daemon (LPD,
-RFC1179), Server Message Block (SMB), and AppSocket protocols are also
-supported with reduced functionality.
+managing print jobs and queues.  The Line Printer Daemon (LPD, RFC1179)
+and AppSocket protocols are also supported with reduced functionality.
 
 CUPS adds network printer browsing and PostScript Printer Description
 ("PPD")-based printing options to support real world applications under
