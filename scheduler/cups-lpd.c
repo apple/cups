@@ -1,5 +1,5 @@
 /*
- * "$Id: cups-lpd.c,v 1.5 2000/08/03 17:20:19 mike Exp $"
+ * "$Id: cups-lpd.c,v 1.6 2000/08/18 16:46:06 mike Exp $"
  *
  *   Line Printer Daemon interface for the Common UNIX Printing System (CUPS).
  *
@@ -744,6 +744,8 @@ send_state(const char *dest,		/* I - Destination */
   char		rankstr[255];		/* Rank string */
   char		namestr[1024];		/* Job name string */
   char		uri[HTTP_MAX_URI];	/* Printer URI */
+  char		queue[256],		/* Printer/class queue */
+		*instance;		/* Printer/class instance */
   static const char *ranks[10] =	/* Ranking strings */
 		{
 		  "th",
@@ -758,6 +760,16 @@ send_state(const char *dest,		/* I - Destination */
 		  "th"
 		};
 
+
+ /*
+  * Remove instance from destination, if any...
+  */
+
+  strncpy(queue, dest, sizeof(queue) - 1);
+  queue[sizeof(queue) - 1] = '\0';
+
+  if ((instance = strrchr(queue, '/')) != NULL)
+    *instance++ = '\0';
 
  /*
   * Try connecting to the local server...
@@ -788,7 +800,7 @@ send_state(const char *dest,		/* I - Destination */
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
                "attributes-natural-language", NULL, language->language);
 
-  sprintf(uri, "ipp://localhost/printers/%s", dest);
+  sprintf(uri, "ipp://localhost/printers/%s", queue);
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI,
                "printer-uri", NULL, uri);
 
@@ -854,7 +866,7 @@ send_state(const char *dest,		/* I - Destination */
   attr = ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
                       "attributes-natural-language", NULL, language->language);
 
-  snprintf(uri, sizeof(uri), "ipp://localhost/printers/%s", dest);
+  snprintf(uri, sizeof(uri), "ipp://localhost/printers/%s", queue);
 
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
                NULL, uri);
@@ -1122,5 +1134,5 @@ remove_jobs(const char *dest,		/* I - Destination */
 
 
 /*
- * End of "$Id: cups-lpd.c,v 1.5 2000/08/03 17:20:19 mike Exp $".
+ * End of "$Id: cups-lpd.c,v 1.6 2000/08/18 16:46:06 mike Exp $".
  */
