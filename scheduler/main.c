@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c,v 1.57.2.61 2004/06/29 13:15:11 mike Exp $"
+ * "$Id: main.c,v 1.57.2.62 2004/06/29 16:59:21 mike Exp $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -1084,6 +1084,25 @@ process_children(void)
 	    else
  	      job->status = -status;	/* Backend failed */
 	  }
+
+	 /*
+	  * If this is not the last file in a job, see if all of the
+	  * filters are done, and if so move to the next file.
+	  */
+
+          if (job->current_file < job->num_files)
+	  {
+	    for (i = 0; job->filters[i] < 0; i ++);
+
+	    if (!job->filters[i])
+	    {
+	     /*
+	      * Process the next file...
+	      */
+
+	      FinishJob(job);
+	    }
+	  }
 	  break;
 	}
       }
@@ -1322,5 +1341,5 @@ usage(void)
 
 
 /*
- * End of "$Id: main.c,v 1.57.2.61 2004/06/29 13:15:11 mike Exp $".
+ * End of "$Id: main.c,v 1.57.2.62 2004/06/29 16:59:21 mike Exp $".
  */
