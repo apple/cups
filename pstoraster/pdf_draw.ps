@@ -21,7 +21,7 @@
 % Ghostscript, as distributed by Aladdin Enterprises, does not require any
 % GNU software to build or run it.
 
-% $Id: pdf_draw.ps,v 1.4 2000/03/09 15:09:29 mike Exp $
+% $Id: pdf_draw.ps,v 1.5 2000/03/13 16:20:01 mike Exp $
 % pdf_draw.ps
 % PDF drawing operations (graphics, text, and images).
 
@@ -463,8 +463,9 @@ end
 /makeimagedict
  { dup length dict
    1 index /ColorSpace knownoget
-    { resolvecolorspace
-      dup type /arraytype eq { dup length 1 eq { 0 get } if } if
+    %%%% MRS - fixed to work with indexed images...
+    { dup resolvecolorspace
+      dup type /arraytype eq { 0 get } {pop} ifelse
       exch begin /ColorSpace exch def
     }
     { begin
