@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.85 2001/09/14 16:52:08 mike Exp $"
+ * "$Id: dirsvc.c,v 1.86 2001/10/31 01:49:13 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -91,8 +91,9 @@ ProcessBrowseData(const char   *uri,	/* I - URI of printer/class */
   * the Printers list, and add it if not...
   */
 
-  hptr = strchr(host, '.');
-  sptr = strchr(ServerName, '.');
+  update = 0;
+  hptr   = strchr(host, '.');
+  sptr   = strchr(ServerName, '.');
 
   if (sptr != NULL && hptr != NULL)
   {
@@ -1583,5 +1584,5 @@ UpdateSLPBrowse(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.85 2001/09/14 16:52:08 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.86 2001/10/31 01:49:13 mike Exp $".
  */

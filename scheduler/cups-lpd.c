@@ -1,5 +1,5 @@
 /*
- * "$Id: cups-lpd.c,v 1.27 2001/10/24 00:13:26 mike Exp $"
+ * "$Id: cups-lpd.c,v 1.28 2001/10/31 01:49:13 mike Exp $"
  *
  *   Line Printer Daemon interface for the Common UNIX Printing System (CUPS).
  *
@@ -417,6 +417,7 @@ recv_print_job(const char    *dest,	/* I - Destination */
 
   status   = 0;
   num_data = 0;
+  fd       = -1;
 
   strncpy(queue, dest, sizeof(queue) - 1);
   queue[sizeof(queue) - 1] = '\0';
@@ -1256,5 +1257,5 @@ smart_gets(char *s,	/* I - Pointer to line buffer */
 
 
 /*
- * End of "$Id: cups-lpd.c,v 1.27 2001/10/24 00:13:26 mike Exp $".
+ * End of "$Id: cups-lpd.c,v 1.28 2001/10/31 01:49:13 mike Exp $".
  */

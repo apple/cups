@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.c,v 1.49 2001/08/09 13:05:38 mike Exp $"
+ * "$Id: auth.c,v 1.50 2001/10/31 01:49:13 mike Exp $"
  *
  *   Authorization routines for the Common UNIX Printing System (CUPS).
  *
@@ -784,6 +784,8 @@ IsAuthorized(client_t *con)	/* I - Connection */
   LogMessage(L_DEBUG2, "IsAuthorized: Checking \"%s\", address = %08x, hostname = \"%s\"",
              con->username, address, con->http.hostname);
 
+  pw = NULL;
+
   if ((address != 0x7f000001 &&
        strcasecmp(con->http.hostname, "localhost") != 0) ||
       strncmp(con->http.fields[HTTP_FIELD_AUTHORIZATION], "Local", 5) != 0)
@@ -1287,5 +1289,5 @@ pam_func(int                      num_msg,	/* I - Number of messages */
 
 
 /*
- * End of "$Id: auth.c,v 1.49 2001/08/09 13:05:38 mike Exp $".
+ * End of "$Id: auth.c,v 1.50 2001/10/31 01:49:13 mike Exp $".
  */
