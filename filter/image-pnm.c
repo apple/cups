@@ -1,5 +1,5 @@
 /*
- * "$Id: image-pnm.c,v 1.7.2.3 2002/04/19 16:18:10 mike Exp $"
+ * "$Id: image-pnm.c,v 1.7.2.4 2002/12/13 15:54:35 mike Exp $"
  *
  *   Portable Any Map file routines for the Common UNIX Printing System (CUPS).
  *
@@ -131,6 +131,22 @@ ImageReadPNM(image_t    *img,		/* IO - Image */
   }
   else
     maxval = 1;
+
+  if (img->xsize == 0 || img->xsize > IMAGE_MAX_WIDTH ||
+      img->ysize == 0 || img->ysize > IMAGE_MAX_HEIGHT)
+  {
+    fprintf(stderr, "ERROR: Bad PNM dimensions %dx%d!\n",
+            img->xsize, img->ysize);
+    fclose(fp);
+    return (1);
+  }
+
+  if (maxval == 0)
+  {
+    fprintf(stderr, "ERROR: Bad PNM max value %d!\n", maxval);
+    fclose(fp);
+    return (1);
+  }
 
   if (format == 1 || format == 2 || format == 4 || format == 5)
     img->colorspace = secondary;
@@ -286,5 +302,5 @@ ImageReadPNM(image_t    *img,		/* IO - Image */
 
 
 /*
- * End of "$Id: image-pnm.c,v 1.7.2.3 2002/04/19 16:18:10 mike Exp $".
+ * End of "$Id: image-pnm.c,v 1.7.2.4 2002/12/13 15:54:35 mike Exp $".
  */

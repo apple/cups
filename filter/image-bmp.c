@@ -1,5 +1,5 @@
 /*
- * "$Id: image-bmp.c,v 1.3.2.4 2002/04/19 16:18:09 mike Exp $"
+ * "$Id: image-bmp.c,v 1.3.2.5 2002/12/13 15:54:34 mike Exp $"
  *
  *   BMP image routines for the Common UNIX Printing System (CUPS).
  *
@@ -105,7 +105,14 @@ ImageReadBMP(image_t    *img,		/* IO - Image */
   read_word(fp);
   offset = read_dword(fp);
 
-  fprintf(stderr, "offset = %d\n", offset);
+  fprintf(stderr, "DEBUG: offset = %d\n", offset);
+
+  if (offset < 0)
+  {
+    fprintf(stderr, "ERROR: Bad BMP offset %d\n", offset);
+    fclose(fp);
+    return (1);
+  }
 
  /*
   * Then the bitmap information...
@@ -123,14 +130,33 @@ ImageReadBMP(image_t    *img,		/* IO - Image */
   colors_used      = read_dword(fp);
   colors_important = read_dword(fp);
 
+  if (img->xsize == 0 || img->xsize > IMAGE_MAX_WIDTH ||
+      img->ysize == 0 || img->ysize > IMAGE_MAX_HEIGHT ||
+      (depth != 1 && depth != 4 && depth != 8 && depth != 24))
+  {
+    fprintf(stderr, "ERROR: Bad BMP dimensions %ux%ux%d\n",
+            img->xsize, img->ysize, depth);
+    fclose(fp);
+    return (1);
+  }
+
+  if (colors_used < 0 || colors_used > 256)
+  {
+    fprintf(stderr, "ERROR: Bad BMP colormap size %d\n", colors_used);
+    fclose(fp);
+    return (1);
+  }
+
+  if (img->xppi == 0 || img->yppi == 0)
+  {
+    fprintf(stderr, "ERROR: Bad BMP resolution %dx%d PPI.\n",
+            img->xppi, img->yppi);
+    img->xppi = img->yppi = 128;
+  }
+
  /*
   * Make sure the resolution info is valid...
   */
-
-  if (img->xppi == 0)
-    img->xppi = 128;
-  if (img->yppi == 0)
-    img->yppi = 128;
 
   fprintf(stderr, "info_size = %d, xsize = %d, ysize = %d, planes = %d, depth = %d\n",
           info_size, img->xsize, img->ysize, planes, depth);
@@ -150,7 +176,8 @@ ImageReadBMP(image_t    *img,		/* IO - Image */
   if (colors_used == 0 && depth <= 8)
     colors_used = 1 << depth;
 
-  fread(colormap, colors_used, 4, fp);
+  if (colors_used > 0)
+    fread(colormap, colors_used, 4, fp);
 
  /*
   * Setup image and buffers...
@@ -508,5 +535,5 @@ read_long(FILE *fp)               /* I - File to read from */
 
 
 /*
- * End of "$Id: image-bmp.c,v 1.3.2.4 2002/04/19 16:18:09 mike Exp $".
+ * End of "$Id: image-bmp.c,v 1.3.2.5 2002/12/13 15:54:34 mike Exp $".
  */

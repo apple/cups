@@ -1,5 +1,5 @@
 /*
- * "$Id: image-pix.c,v 1.3.2.3 2002/04/19 16:18:10 mike Exp $"
+ * "$Id: image-pix.c,v 1.3.2.4 2002/12/13 15:54:34 mike Exp $"
  *
  *   Alias PIX image routines for the Common UNIX Printing System (CUPS).
  *
@@ -77,6 +77,21 @@ ImageReadPIX(image_t    *img,		/* IO - Image */
   read_short(fp);
   read_short(fp);
   depth  = read_short(fp);
+
+ /*
+  * Check the dimensions of the image.  Since the short values used for the
+  * width and height cannot exceed IMAGE_MAX_WIDTH or IMAGE_MAX_HEIGHT, we
+  * just need to verify they are positive integers.
+  */
+
+  if (width <= 0 || height <= 0 ||
+      (depth != 8 && depth != 24))
+  {
+    fprintf(stderr, "ERROR: Bad PIX image dimensions %dx%dx%d\n",
+            width, height, depth);
+    fclose(fp);
+    return (1);
+  }
 
   if (depth == 8)
     img->colorspace = secondary;
@@ -221,5 +236,5 @@ read_short(FILE *fp)		/* I - File to read from */
 
 
 /*
- * End of "$Id: image-pix.c,v 1.3.2.3 2002/04/19 16:18:10 mike Exp $".
+ * End of "$Id: image-pix.c,v 1.3.2.4 2002/12/13 15:54:34 mike Exp $".
  */

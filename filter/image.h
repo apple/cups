@@ -1,5 +1,5 @@
 /*
- * "$Id: image.h,v 1.11.2.4 2002/04/29 15:58:07 mike Exp $"
+ * "$Id: image.h,v 1.11.2.5 2002/12/13 15:54:35 mike Exp $"
  *
  *   Image library definitions for the Common UNIX Printing System (CUPS).
  *
@@ -40,6 +40,13 @@
 
 
 /*
+ * Maximum image dimensions that we can handle...
+ */
+
+#  define IMAGE_MAX_WIDTH	0x07ffffff	/* 2^27-1 to allow for 15-channel data */
+#  define IMAGE_MAX_HEIGHT	0x7fffffff	/* 2^31-1 */
+
+/*
  * Colorspaces...
  */
 
@@ -49,7 +56,6 @@
 #  define IMAGE_WHITE	1		/* White (luminance) */
 #  define IMAGE_RGB	3		/* Red, green, and blue */
 #  define IMAGE_RGB_CMYK 4		/* Use RGB or CMYK */
-
 
 /*
  * Tile definitions...
@@ -239,5 +245,5 @@ extern void	ImageZoomFree(izoom_t *z);
 #endif /* !_IMAGE_H_ */
 
 /*
- * End of "$Id: image.h,v 1.11.2.4 2002/04/29 15:58:07 mike Exp $".
+ * End of "$Id: image.h,v 1.11.2.5 2002/12/13 15:54:35 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: image-zoom.c,v 1.7.2.3 2002/08/27 16:20:15 mike Exp $"
+ * "$Id: image-zoom.c,v 1.7.2.4 2002/12/13 15:54:35 mike Exp $"
  *
  *   Image zoom routines for the Common UNIX Printing System (CUPS).
  *
@@ -57,6 +57,12 @@ ImageZoomAlloc(image_t *img,	/* I - Image to zoom */
   izoom_t	*z;		/* New zoom record */
   int		flip;		/* Flip on X axis? */
 
+
+  if (xsize > IMAGE_MAX_WIDTH ||
+      ysize > IMAGE_MAX_HEIGHT ||
+      (x1 - x0) > IMAGE_MAX_WIDTH ||
+      (y1 - y0) > IMAGE_MAX_HEIGHT)
+    return (NULL);		/* Protect against integer overflow */
 
   if ((z = (izoom_t *)calloc(1, sizeof(izoom_t))) == NULL)
     return (NULL);
@@ -325,5 +331,5 @@ ImageZoomFree(izoom_t *z)	/* I - Zoom record to free */
 
 
 /*
- * End of "$Id: image-zoom.c,v 1.7.2.3 2002/08/27 16:20:15 mike Exp $".
+ * End of "$Id: image-zoom.c,v 1.7.2.4 2002/12/13 15:54:35 mike Exp $".
  */

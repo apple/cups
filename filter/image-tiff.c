@@ -1,5 +1,5 @@
 /*
- * "$Id: image-tiff.c,v 1.17.2.6 2002/04/19 16:18:11 mike Exp $"
+ * "$Id: image-tiff.c,v 1.17.2.7 2002/12/13 15:54:35 mike Exp $"
  *
  *   TIFF file routines for the Common UNIX Printing System (CUPS).
  *
@@ -173,6 +173,12 @@ ImageReadTIFF(image_t    *img,		/* IO - Image */
       img->yppi = 128;
     }
 
+    if (img->xppi == 0 || img->yppi == 0)
+    {
+      fputs("ERROR: Bad TIFF resolution.\n", stderr);
+      img->xppi = img->yppi = 128;
+    }
+
     fprintf(stderr, "DEBUG: TIFF resolution = %fx%f, units=%d\n",
             xres, yres, resunit);
     fprintf(stderr, "DEBUG: Stored resolution = %dx%d PPI\n",
@@ -187,6 +193,23 @@ ImageReadTIFF(image_t    *img,		/* IO - Image */
     alpha = 1;
   else
     alpha = 0;
+
+ /*
+  * Check the size of the image...
+  */
+
+  if (width == 0 || width > IMAGE_MAX_WIDTH ||
+      height == 0 || height > IMAGE_MAX_HEIGHT ||
+      (bits != 1 && bits != 2 && bits != 4 && bits != 8) ||
+      samples < 1 || samples > 4)
+  {
+    fprintf(stderr, "ERROR: Bad TIFF dimensions %ux%ux%ux%u!\n",
+            (unsigned)width, (unsigned)height, (unsigned)bits,
+	    (unsigned)samples);
+    TIFFClose(tif);
+    fclose(fp);
+    return (1);
+  }
 
  /*
   * Setup the image size and colorspace...
@@ -1716,5 +1739,5 @@ ImageReadTIFF(image_t    *img,		/* IO - Image */
 
 
 /*
- * End of "$Id: image-tiff.c,v 1.17.2.6 2002/04/19 16:18:11 mike Exp $".
+ * End of "$Id: image-tiff.c,v 1.17.2.7 2002/12/13 15:54:35 mike Exp $".
  */

@@ -8,14 +8,12 @@ CHANGES IN CUPS V1.1.18
 	- SECURITY FIX: Race condition in certificate creation.
 	- SECURITY FIX: Bad URIs in browse packets could be used
 	  to exploint the web interface underflow/overflow bug.
-	- SECURITY FIX: Integer overflow in the Sun raster image
-	  loading code.
-	- SECURITY FIX: The GIF image loading code didn't check
-	  for an image with 0 width or height.
 	- SECURITY FIX: Some types of Denial of Service attacks
 	  were not handled properly, so once the attack was over
 	  the scheduler did not close the connections
 	  immediately on all platforms.
+	- SECURITY FIXES: Added integer overflow/underflow
+	  checks for all image formats.
 	- The pstops filter didn't reset the showpage operator
 	  back to its original at the end of a job; this
 	  prevented the concatenation of documents (used

@@ -1,5 +1,5 @@
 /*
- * "$Id: image-png.c,v 1.11.2.3 2002/04/19 16:18:10 mike Exp $"
+ * "$Id: image-png.c,v 1.11.2.4 2002/12/13 15:54:35 mike Exp $"
  *
  *   PNG image routines for the Common UNIX Printing System (CUPS).
  *
@@ -90,6 +90,15 @@ ImageReadPNG(image_t    *img,		/* IO - Image */
   else
     img->colorspace = (primary == IMAGE_RGB_CMYK) ? IMAGE_RGB : primary;
 
+  if (info->width == 0 || info->width > IMAGE_MAX_WIDTH ||
+      info->height == 0 || info->height > IMAGE_MAX_HEIGHT)
+  {
+    fprintf(stderr, "ERROR: PNG image has invalid dimensions %ux%u!\n",
+            (unsigned)info->width, (unsigned)info->height);
+    fclose(fp);
+    return (1);
+  }
+
   img->xsize = info->width;
   img->ysize = info->height;
 
@@ -98,6 +107,14 @@ ImageReadPNG(image_t    *img,		/* IO - Image */
   {
     img->xppi = (int)((float)info->x_pixels_per_unit * 0.0254);
     img->yppi = (int)((float)info->y_pixels_per_unit * 0.0254);
+
+    if (img->xppi == 0 || img->yppi == 0)
+    {
+      fprintf(stderr, "ERROR: PNG image has invalid resolution %dx%d PPI\n",
+              img->xppi, img->yppi);
+
+      img->xppi = img->yppi = 128;
+    }
   }
 
   ImageSetMaxTiles(img, 0);
@@ -248,5 +265,5 @@ ImageReadPNG(image_t    *img,		/* IO - Image */
 
 
 /*
- * End of "$Id: image-png.c,v 1.11.2.3 2002/04/19 16:18:10 mike Exp $".
+ * End of "$Id: image-png.c,v 1.11.2.4 2002/12/13 15:54:35 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: image-sgi.c,v 1.8.2.3 2002/04/19 16:18:11 mike Exp $"
+ * "$Id: image-sgi.c,v 1.8.2.4 2002/12/13 15:54:35 mike Exp $"
  *
  *   SGI image file routines for the Common UNIX Printing System (CUPS).
  *
@@ -72,6 +72,22 @@ ImageReadSGI(image_t    *img,		/* IO - Image */
  /*
   * Get the image dimensions and load the output image...
   */
+
+ /*
+  * Check the image dimensions; since xsize and ysize are unsigned shorts,
+  * just check if they are 0 since they can't exceed IMAGE_MAX_WIDTH or
+  * IMAGE_MAX_HEIGHT...
+  */
+
+  if (sgip->xsize == 0 || sgip->ysize == 0 ||
+      sgip->zsize == 0 || sgip->zsize > 4)
+  {
+    fprintf(stderr, "ERROR: Bad SGI image dimensions %ux%ux%u!\n",
+            sgip->xsize, sgip->ysize, sgip->zsize);
+    sgiClose(sgip);
+    fclose(fp);
+    return (1);
+  }
 
   if (sgip->zsize < 3)
     img->colorspace = secondary;
@@ -265,5 +281,5 @@ ImageReadSGI(image_t    *img,		/* IO - Image */
 
 
 /*
- * End of "$Id: image-sgi.c,v 1.8.2.3 2002/04/19 16:18:11 mike Exp $".
+ * End of "$Id: image-sgi.c,v 1.8.2.4 2002/12/13 15:54:35 mike Exp $".
  */

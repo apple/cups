@@ -1,5 +1,5 @@
 /*
- * "$Id: image-jpeg.c,v 1.11.2.4 2002/04/19 16:18:10 mike Exp $"
+ * "$Id: image-jpeg.c,v 1.11.2.5 2002/12/13 15:54:34 mike Exp $"
  *
  *   JPEG image routines for the Common UNIX Printing System (CUPS).
  *
@@ -126,6 +126,18 @@ ImageReadJPEG(image_t    *img,		/* IO - Image */
 
   jpeg_calc_output_dimensions(&cinfo);
 
+  if (cinfo.output_width <= 0 || cinfo.output_width > IMAGE_MAX_WIDTH ||
+      cinfo.output_height <= 0 || cinfo.output_height > IMAGE_MAX_HEIGHT)
+  {
+    fprintf(stderr, "ERROR: Bad JPEG dimensions %dx%d!\n",
+            cinfo.output_width, cinfo.output_height);
+
+    jpeg_destroy_decompress(&cinfo);
+
+    fclose(fp);
+    return (1);
+  }
+
   img->xsize      = cinfo.output_width;
   img->ysize      = cinfo.output_height;
 
@@ -140,6 +152,13 @@ ImageReadJPEG(image_t    *img,		/* IO - Image */
     {
       img->xppi = (int)((float)cinfo.X_density * 2.54);
       img->yppi = (int)((float)cinfo.Y_density * 2.54);
+    }
+
+    if (img->xppi == 0 || img->yppi == 0)
+    {
+      fprintf(stderr, "ERROR: Bad JPEG image resolution %dx%d PPI.\n",
+              img->xppi, img->yppi);
+      img->xppi = img->yppi = 128;
     }
   }
 
@@ -292,5 +311,5 @@ ImageReadJPEG(image_t    *img,		/* IO - Image */
 
 
 /*
- * End of "$Id: image-jpeg.c,v 1.11.2.4 2002/04/19 16:18:10 mike Exp $".
+ * End of "$Id: image-jpeg.c,v 1.11.2.5 2002/12/13 15:54:34 mike Exp $".
  */
