@@ -1,5 +1,5 @@
 /*
- * "$Id: jobs.c,v 1.6 1999/09/27 17:14:26 mike Exp $"
+ * "$Id: jobs.c,v 1.7 1999/09/27 17:36:29 mike Exp $"
  *
  *   Job status CGI for the Common UNIX Printing System (CUPS).
  *
@@ -38,6 +38,7 @@
 #include <cups/cups.h>
 #include <cups/language.h>
 #include <cups/debug.h>
+#include <config.h>
 
 
 /*
@@ -580,5 +581,5 @@ show_job_info(http_t      *http,	/* I - Server connection */
 
 
 /*
- * End of "$Id: jobs.c,v 1.6 1999/09/27 17:14:26 mike Exp $".
+ * End of "$Id: jobs.c,v 1.7 1999/09/27 17:36:29 mike Exp $".
  */

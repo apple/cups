@@ -1,5 +1,5 @@
 /*
- * "$Id: classes.c,v 1.7 1999/09/27 17:14:25 mike Exp $"
+ * "$Id: classes.c,v 1.8 1999/09/27 17:36:28 mike Exp $"
  *
  *   Class status CGI for the Common UNIX Printing System (CUPS).
  *
@@ -38,6 +38,7 @@
 #include <cups/cups.h>
 #include <cups/language.h>
 #include <cups/debug.h>
+#include <config.h>
 
 
 /*
@@ -480,5 +481,5 @@ show_class_info(http_t      *http,
 
 
 /*
- * End of "$Id: classes.c,v 1.7 1999/09/27 17:14:25 mike Exp $".
+ * End of "$Id: classes.c,v 1.8 1999/09/27 17:36:28 mike Exp $".
  */

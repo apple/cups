@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.9 1999/09/27 17:14:26 mike Exp $"
+ * "$Id: printers.c,v 1.10 1999/09/27 17:36:29 mike Exp $"
  *
  *   Printer status CGI for the Common UNIX Printing System (CUPS).
  *
@@ -38,6 +38,7 @@
 #include <cups/cups.h>
 #include <cups/language.h>
 #include <cups/debug.h>
+#include <config.h>
 
 
 /*
@@ -482,5 +483,5 @@ show_printer_info(http_t      *http,
 
 
 /*
- * End of "$Id: printers.c,v 1.9 1999/09/27 17:14:26 mike Exp $".
+ * End of "$Id: printers.c,v 1.10 1999/09/27 17:36:29 mike Exp $".
  */
