@@ -1,5 +1,5 @@
 /*
- * "$Id: cups-lpd.c,v 1.24.2.13 2003/04/05 03:39:29 mike Exp $"
+ * "$Id: cups-lpd.c,v 1.24.2.14 2003/05/22 12:48:35 mike Exp $"
  *
  *   Line Printer Daemon interface for the Common UNIX Printing System (CUPS).
  *
@@ -1212,11 +1212,11 @@ send_state(const char *dest,		/* I - Destination */
 	else
 	  strlcpy(namestr, jobname, sizeof(namestr));
 
-        printf("%s: %-34.34s[job %d localhost]\n", jobuser, rankstr, jobid);
-        printf("        %-40.40s%d bytes\n", namestr, jobsize);
+        printf("%s: %-33.33s [job %d localhost]\n", jobuser, rankstr, jobid);
+        printf("        %-39.39s %d bytes\n", namestr, jobsize);
       }
       else
-        printf("%-7s %-8.8s%-8d%-32.32s%d bytes\n", rankstr, jobuser,
+        printf("%-7s %-7.7s %-7d %-31.31s %d bytes\n", rankstr, jobuser,
 	       jobid, jobname, jobsize);
 
       if (attr == NULL)
@@ -1296,5 +1296,5 @@ smart_gets(char *s,	/* I - Pointer to line buffer */
 
 
 /*
- * End of "$Id: cups-lpd.c,v 1.24.2.13 2003/04/05 03:39:29 mike Exp $".
+ * End of "$Id: cups-lpd.c,v 1.24.2.14 2003/05/22 12:48:35 mike Exp $".
  */

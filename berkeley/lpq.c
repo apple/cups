@@ -1,5 +1,5 @@
 /*
- * "$Id: lpq.c,v 1.17.2.10 2003/05/14 18:35:15 mike Exp $"
+ * "$Id: lpq.c,v 1.17.2.11 2003/05/22 12:48:34 mike Exp $"
  *
  *   "lpq" command for the Common UNIX Printing System (CUPS).
  *
@@ -439,15 +439,15 @@ show_jobs(http_t     *http,	/* I - HTTP connection to server */
 	else
 	  strlcpy(namestr, jobname, sizeof(namestr));
 
-        printf("%s: %-34.34s[job %d localhost]\n", jobuser, rankstr, jobid);
-        printf("        %-40.40s%d bytes\n", namestr, jobsize);
+        printf("%s: %-33.33s [job %d localhost]\n", jobuser, rankstr, jobid);
+        printf("        %-39.39s %d bytes\n", namestr, jobsize);
       }
       else
 #ifdef __osf__
         printf("%-6s %-10.10s %-4d %-10d %-27.27s %d bytes\n", rankstr, jobuser,
 	       jobpriority, jobid, jobname, jobsize);
 #else
-        printf("%-7s %-8.8s%-8d%-32.32s%d bytes\n", rankstr, jobuser,
+        printf("%-7s %-7.7s %-7d %-31.31s %d bytes\n", rankstr, jobuser,
 	       jobid, jobname, jobsize);
 #endif /* __osf */
 
@@ -569,5 +569,5 @@ usage(void)
 
 
 /*
- * End of "$Id: lpq.c,v 1.17.2.10 2003/05/14 18:35:15 mike Exp $".
+ * End of "$Id: lpq.c,v 1.17.2.11 2003/05/22 12:48:34 mike Exp $".
  */
