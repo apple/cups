@@ -1,5 +1,5 @@
 /*
- * "$Id: texttops.c,v 1.34.2.3 2002/01/29 15:40:31 mike Exp $"
+ * "$Id: texttops.c,v 1.34.2.4 2002/01/30 16:34:08 mike Exp $"
  *
  *   Text to PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -108,13 +108,13 @@ WritePage(void)
     switch (Orientation)
     {
       case 1 : /* Landscape */
-          printf("%.1f 0.0 translate 90 rotate\n", PageLength);
+          printf("%.3f 0.0 translate 90 rotate\n", PageLength);
           break;
       case 2 : /* Reverse Portrait */
-          printf("%.1f %.1f translate 180 rotate\n", PageWidth, PageLength);
+          printf("%.3f %.3f translate 180 rotate\n", PageWidth, PageLength);
           break;
       case 3 : /* Reverse Landscape */
-          printf("0.0 %.1f translate -90 rotate\n", PageWidth);
+          printf("0.0 %.3f translate -90 rotate\n", PageWidth);
           break;
     }
   }
@@ -871,19 +871,19 @@ WriteProlog(const char *title,		/* I - Title of job */
 
   puts("% Define fonts");
 
-  printf("/FN /cupsNormal findfont [%.1f 0 0 %.1f 0 0] makefont def\n",
+  printf("/FN /cupsNormal findfont [%.3f 0 0 %.3f 0 0] makefont def\n",
          120.0 / CharsPerInch, 68.0 / LinesPerInch);
-  printf("/FB /cupsBold findfont [%.1f 0 0 %.1f 0 0] makefont def\n",
+  printf("/FB /cupsBold findfont [%.3f 0 0 %.3f 0 0] makefont def\n",
          120.0 / CharsPerInch, 68.0 / LinesPerInch);
   if (PrettyPrint)
-    printf("/FI /cupsItalic findfont [%.1f 0 0 %.1f 0 0] makefont def\n",
+    printf("/FI /cupsItalic findfont [%.3f 0 0 %.3f 0 0] makefont def\n",
            120.0 / CharsPerInch, 68.0 / LinesPerInch);
 
   puts("% Common procedures");
 
   puts("/N { FN setfont moveto } bind def");
   puts("/B { FB setfont moveto } bind def");
-  printf("/U { gsave 0.5 setlinewidth 0 %.2f rmoveto "
+  printf("/U { gsave 0.5 setlinewidth 0 %.3f rmoveto "
          "0 rlineto stroke grestore } bind def\n", -6.8 / LinesPerInch);
 
   if (PrettyPrint)
@@ -935,16 +935,16 @@ WriteProlog(const char *title,		/* I - Title of job */
     if (Duplex)
     {
       puts("\tdup 2 mod 0 eq {");
-      printf("\t\t%.1f %.1f translate } {\n",
+      printf("\t\t%.3f %.3f translate } {\n",
              PageWidth - PageRight, PageTop + 72.0f / LinesPerInch);
-      printf("\t\t%.1f %.1f translate } ifelse\n",
+      printf("\t\t%.3f %.3f translate } ifelse\n",
              PageLeft, PageTop + 72.0f / LinesPerInch);
     }
     else
-      printf("\t%.1f %.1f translate\n",
+      printf("\t%.3f %.3f translate\n",
              PageLeft, PageTop + 72.0f / LinesPerInch);
 
-    printf("\t0 0 %.1f %.1f rectfill\n", PageRight - PageLeft,
+    printf("\t0 0 %.3f %.3f rectfill\n", PageRight - PageLeft,
 	   144.0f / LinesPerInch);
 
     puts("\tFB setfont");
@@ -953,19 +953,19 @@ WriteProlog(const char *title,		/* I - Title of job */
     if (Duplex)
     {
       puts("\tdup 2 mod 0 eq {");
-      printf("\t\tT stringwidth pop neg %.1f add %.1f } {\n",
+      printf("\t\tT stringwidth pop neg %.3f add %.3f } {\n",
              PageRight - PageLeft - 36.0f / LinesPerInch,
 	     (0.5f + 0.157f) * 72.0f / LinesPerInch);
-      printf("\t\t%.1f %.1f } ifelse\n", 36.0f / LinesPerInch,
+      printf("\t\t%.3f %.3f } ifelse\n", 36.0f / LinesPerInch,
 	     (0.5f + 0.157f) * 72.0f / LinesPerInch);
     }
     else
-      printf("\t%.1f %.1f\n", 36.0f / LinesPerInch,
+      printf("\t%.3f %.3f\n", 36.0f / LinesPerInch,
 	     (0.5f + 0.157f) * 72.0f / LinesPerInch);
 
     puts("\tmoveto T show");
 
-    printf("\tD dup stringwidth pop neg 2 div %.1f add %.1f\n",
+    printf("\tD dup stringwidth pop neg 2 div %.3f add %.3f\n",
            (PageRight - PageLeft) * 0.5,
            (0.5f + 0.157f) * 72.0f / LinesPerInch);
     puts("\tmoveto show");
@@ -973,14 +973,14 @@ WriteProlog(const char *title,		/* I - Title of job */
     if (Duplex)
     {
       puts("\tdup n exch 2 mod 0 eq {");
-      printf("\t\t%.1f %.1f } {\n", 36.0f / LinesPerInch,
+      printf("\t\t%.3f %.3f } {\n", 36.0f / LinesPerInch,
 	     (0.5f + 0.157f) * 72.0f / LinesPerInch);
-      printf("\t\tdup stringwidth pop neg %.1f add %.1f } ifelse\n",
+      printf("\t\tdup stringwidth pop neg %.3f add %.3f } ifelse\n",
              PageRight - PageLeft - 36.0f / LinesPerInch,
 	     (0.5f + 0.157f) * 72.0f / LinesPerInch);
     }
     else
-      printf("\tn dup stringwidth pop neg %.1f add %.1f\n",
+      printf("\tn dup stringwidth pop neg %.3f add %.3f\n",
              PageRight - PageLeft - 36.0f / LinesPerInch,
 	     (0.5f + 0.157f) * 72.0f / LinesPerInch);
 
@@ -1139,12 +1139,12 @@ write_string(int     col,	/* I - Start column */
   if (x == (int)x)
     printf("%.0f ", x);
   else
-    printf("%.1f ", x);
+    printf("%.3f ", x);
 
   if (y == (int)y)
     printf("%.0f ", y);
   else
-    printf("%.1f ", y);
+    printf("%.3f ", y);
 
   if (attr & ATTR_BOLD)
     putchar('B');
@@ -1154,7 +1154,7 @@ write_string(int     col,	/* I - Start column */
     putchar('N');
 
   if (attr & ATTR_UNDERLINE)
-    printf(" %.1f U", (float)len * 72.0 / (float)CharsPerInch);
+    printf(" %.3f U", (float)len * 72.0 / (float)CharsPerInch);
 
   if (NumFonts > 1)
   {
@@ -1308,5 +1308,5 @@ write_text(const char *s)	/* I - String to write */
 
 
 /*
- * End of "$Id: texttops.c,v 1.34.2.3 2002/01/29 15:40:31 mike Exp $".
+ * End of "$Id: texttops.c,v 1.34.2.4 2002/01/30 16:34:08 mike Exp $".
  */

@@ -3,6 +3,9 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.13
 
+	- The texttops filter didn't use sufficient precision
+	  when positioning text with some values of cpi and lpi.
+	  This could cause the alignment of text to stray.
 	- cupsGetDests() didn't merge the options from the
 	  /etc/cups/lpoptions file with ~/.lpoptions - options
 	  in ~/.lpoptions overrode them completely.

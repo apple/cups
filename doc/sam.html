@@ -4,7 +4,7 @@
 <TITLE>CUPS Software Administrators Manual</TITLE>
 <META NAME="author" CONTENT="Easy Software Products">
 <META NAME="copyright" CONTENT="Copyright 1997-2002, All Rights Reserved">
-<META NAME="docnumber" CONTENT="CUPS-SAM-1.1.7">
+<META NAME="docnumber" CONTENT="CUPS-SAM-1.2.0">
 <META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-8859-1">
 <STYLE TYPE="text/css"><!--
 BODY { font-family: serif }
@@ -22,7 +22,7 @@ PRE { font-family: monospace }
 <BODY BGCOLOR="#ffffff">
 <CENTER><A HREF="#CONTENTS"><IMG SRC="images/cups-large.gif" BORDER="0" WIDTH="431" HEIGHT="511"><BR>
 <H1>CUPS Software Administrators Manual</H1></A><BR>
-CUPS-SAM-1.1.7<BR>
+CUPS-SAM-1.2.0<BR>
 Easy Software Products<BR>
 Copyright 1997-2002, All Rights Reserved<BR>
 </CENTER>
@@ -64,7 +64,7 @@ Copyright 1997-2002, All Rights Reserved<BR>
 <LI><A HREF="#DPKG-BINARY">Installing an Debian Distribution</A></LI>
 </UL>
 </UL>
-<B><A HREF="#PRINTER_MANAGEMENT">3 - Printer Management</A></B>
+<B><A HREF="#MANAGING_PRINTERS">3 - Managing Printers</A></B>
 <UL>
 <LI><A HREF="#4_1">The Basics</A></LI>
 <LI><A HREF="#4_2">Adding Your First Printer</A></LI>
@@ -161,7 +161,8 @@ Copyright 1997-2002, All Rights Reserved<BR>
 <LI><A HREF="#PreserveJobHistory">PreserveJobHistory</A></LI>
 <LI><A HREF="#PreserveJobFiles">PreserveJobFiles</A></LI>
 <LI><A HREF="#Printcap">Printcap</A></LI>
-<LI><A HREF="#Printcap">PrintcapFormat</A></LI>
+<LI><A HREF="#PrintcapFormat">PrintcapFormat</A></LI>
+<LI><A HREF="#PrintcapGUI">PrintcapGUI</A></LI>
 <LI><A HREF="#RemoteRoot">RemoteRoot</A></LI>
 <LI><A HREF="#RequestRoot">RequestRoot</A></LI>
 <LI><A HREF="#RIPCache">RIPCache</A></LI>
@@ -214,6 +215,9 @@ Copyright 1997-2002, All Rights Reserved<BR>
 </UL>
 <LI><A HREF="#8_5">Printing to Mac OS Servers</A></LI>
 <LI><A HREF="#8_6">Printing from Windows Clients</A></LI>
+<UL>
+<LI><A HREF="#8_6_1">Exporting Printer Drivers</A></LI>
+</UL>
 <LI><A HREF="#8_7">Printing to Windows Servers</A></LI>
 </UL>
 <B><A HREF="#LICENSE">A - Software License Agreement</A></B>
@@ -257,7 +261,7 @@ Copyright 1997-2002, All Rights Reserved<BR>
 <UL>
 <LI><A HREF="#13_1">My Applications Don't See the Available Printers</A></LI>
 <LI><A HREF="#13_2">CUPS Doesn't Recognize My Username or Password!</A></LI>
-<LI><A HREF="#13_3">I Can't Do Administration Tasks from Another
+<LI><A HREF="#ALLOW_REMOTE">I Can't Do Administration Tasks from Another
  Machine!</A></LI>
 <LI><A HREF="#13_4">I Can't Do Administration Tasks from My Web Browser!</A>
 </LI>
@@ -267,9 +271,8 @@ Copyright 1997-2002, All Rights Reserved<BR>
 <HR>
 <H1 ALIGN="RIGHT"><A NAME="1">Preface</A></H1>
 <P>This software administrators manual provides printer administration
- information for the Common UNIX Printing System<SUP>TM</SUP> &lt;&lt;&lt;&lt;&lt;&lt;&lt;
- sam.shtml (&quot;CUPS<SUP>TM</SUP>&quot;), version 1.1.7. ======= (&quot;CUPS<SUP>TM</SUP>
-&quot;), version 1.1.13. &gt;&gt;&gt;&gt;&gt;&gt;&gt; 1.48</P>
+ information for the Common UNIX Printing System<SUP>TM</SUP> (&quot;CUPS<SUP>
+TM</SUP>&quot;), version 1.2.0.</P>
 <H2><A NAME="1_1">System Overview</A></H2>
 <P>CUPS provides a portable printing layer for UNIX&reg;-based operating
  systems. It has been developed by<A HREF="http://www.easysw.com"> Easy
@@ -658,8 +661,7 @@ CXXFLAGS</CODE>, and <CODE>LDFLAGS</CODE> environment variables prior to
 </UL>
 <P>After a short delay the CUPS software will be installed and the
  scheduler will be started automatically.</P>
-<H1 ALIGN="RIGHT"><A NAME="PRINTER_MANAGEMENT">3 - Printer Management</A>
-</H1>
+<H1 ALIGN="RIGHT"><A NAME="MANAGING_PRINTERS">3 - Managing Printers</A></H1>
 <P>This chapter describes how to add your first printer and how to
  manage your printers.</P>
 <H2><A NAME="4_1">The Basics</A></H2>
@@ -996,7 +998,7 @@ ServerName <I>server</I>
  configuration information.</P>
 <P>Polling is enabled by specifying one or more<A HREF="#BrowsePoll"> <CODE>
 BrowsePoll</CODE></A> directives in the<VAR> /etc/cups/cupsd.conf</VAR>
- file. For information on making these changes, see<A HREF="PRINTING_MANAGEMENT">
+ file. For information on making these changes, see<A HREF="#PRINTING_MANAGEMENT">
  Chapter 6, &quot;Printing System Management&quot;</A>.</P>
 <H1 ALIGN="RIGHT"><A NAME="PRINTING_MANAGEMENT">6 - Printing System
  Management</A></H1>
@@ -1133,6 +1135,7 @@ HREF="#CLIENT_SETUP"> Chapter 5, &quot;Client Setup&quot;</A> for more
 <LI><A HREF="#PreserveJobHistory"><CODE>PreserveJobHistory</CODE></A></LI>
 <LI><A HREF="#Printcap"><CODE>Printcap</CODE></A></LI>
 <LI><A HREF="#PrintcapFormat"><CODE>PrintcapFormat</CODE></A></LI>
+<LI><A HREF="#PrintcapGUI"><CODE>PrintcapGUI</CODE></A></LI>
 <LI><A HREF="#RemoteRoot"><CODE>RemoteRoot</CODE></A></LI>
 <LI><A HREF="#RequestRoot"><CODE>RequestRoot</CODE></A></LI>
 <LI><A HREF="#Require"><CODE>Require</CODE></A></LI>
@@ -2344,7 +2347,7 @@ Printcap /etc/printers.conf
  look at the printcap file for the available printers.
 <!-- NEED 3in -->
 </P>
-<H3><A NAME="Printcap">PrintcapFormat</A></H3>
+<H3><A NAME="PrintcapFormat">PrintcapFormat</A></H3>
 <HR>
 <H4>Examples</H4>
 <UL>
@@ -2356,6 +2359,26 @@ PrintcapFormat Solaris
 <H4>Description</H4>
 <P>The <CODE>PrintcapFormat</CODE> directive controls the output format
  of the printcap file. The default is to generate a BSD printcap file.
+<!-- NEED 3in -->
+</P>
+<H3><A NAME="PrintcapGUI">PrintcapGUI</A></H3>
+<HR>
+<H4>Example</H4>
+<UL>
+<PRE>
+PrintcapGUI /usr/bin/glpoptions
+</PRE>
+</UL>
+<H4>Description</H4>
+<P>The <CODE>PrintcapGUI</CODE> directive sets the program to use when
+ displaying an option panel from an IRIX application that uses the
+ Impressario print API. The default program is the ESP Print Pro
+ &quot;glpoptions&quot; GUI.</P>
+<P>The program must accept the <CODE>-d</CODE> option to specify a
+ printer and the <CODE>-o</CODE> option to specify one or more options.
+ After allowing the user to select/change options, the program must then
+ write the list of printing options without the <CODE>-o</CODE> to the
+ standard output.
 <!-- NEED 3in -->
 </P>
 <H3><A NAME="RemoteRoot">RemoteRoot</A></H3>
@@ -2461,7 +2484,7 @@ ServerBin /foo/bar/lib/cups
  server-run executables. If an absolute path is not provided then it is
  assumed to be relative to the<A HREF="#ServerRoot"> <CODE>ServerRoot</CODE>
 </A> directory. The default executable directory is<VAR> /usr/lib/cups</VAR>
- or<VAR> /usr/lib32/cups</VAR> (IRIX 6.5).
+.
 <!-- NEED 3in -->
 </P>
 <H3><A NAME="ServerCertificate">ServerCertificate</A></H3>
@@ -3314,10 +3337,69 @@ exit 0
 <UL>
 <PRE>
 printing = cups
+printcap name = cups
 </PRE>
 </UL>
 <P>That's all there is to it! Remote users will now be able to browse
  and print to printers on your system.</P>
+<H3><A NAME="8_6_1">Exporting Printer Drivers</A></H3>
+<P>You can optionally export printer drivers from your CUPS server using
+ the <CODE>cupsaddsmb</CODE> command and the SAMBA 2.2.0 or higher
+ software.</P>
+<P>Before you can export the printers you must download the current
+ Adobe PostScript printer drivers from the Adobe web site (<A HREF="http://www.adobe.com/">
+http://www.adobe.com/</A>). Use the free <CODE>unzip</CODE> software to
+ extract the files from the self-extracting ZIP file containing the
+ drivers; you will need the following files:</P>
+<UL>
+<PRE>
+ADFONTS.MFM
+ADOBEPS4.DRV
+ADOBEPS4.HLP
+ADOBEPS5.DLL
+ADOBEPSU.DLL
+ADOBEPSU.HLP
+DEFPRTR2.PPD
+ICONLIB.DLL
+PSMON.DLL
+</PRE>
+</UL>
+<P>Copy these files to the<VAR> /usr/share/cups/drivers</VAR> directory
+ - you may need to rename some of the files so the filenames are all
+ UPPERCASE.</P>
+<P>Next, add a <CODE>print$</CODE> share for the printer drivers to your<VAR>
+ smb.conf</VAR> file:</P>
+<UL>
+<PRE>
+[print$]
+    comment = Printer Drivers
+    path = /etc/samba/drivers
+    browseable = yes
+    guest ok = no
+    read only = yes
+    write list = root
+</PRE>
+</UL>
+<P>The directory for your printer drivers can be anywhere on the system;
+ just make sure it is writable by the users specified by the <CODE>write
+ list</CODE> directive. Also, make sure that you have SAMBA passwords
+ defined for each user in the <CODE>write list</CODE> using the <CODE>
+smbpasswd(1)</CODE> command. Otherwise you will not be able to
+ authenticate</P>
+<P>Finally, run the <CODE>cupsaddsmb</CODE> command to export the
+ printer drivers for one or more queues:</P>
+<UL>
+<PRE>
+<KBD>cupsaddsmb -U root printer1 ... printerN <I>ENTER</I></KBD>
+</PRE>
+</UL>
+<P>Running <CODE>cupsaddsmb</CODE> with the <CODE>-a</CODE> option will
+ export all printers:</P>
+<UL>
+<PRE>
+<KBD>cupsaddsmb -U root -a <I>ENTER</I></KBD>
+</PRE>
+</UL>
 <H2><A NAME="8_7">Printing to Windows Servers</A></H2>
 <P>CUPS can print to Windows servers in one of two ways. The first way
  uses the LPD protocol on the CUPS system and the &quot;TCP/IP Printing
@@ -4658,7 +4740,7 @@ AuthClass System
 </PRE>
 </UL>
  for the<VAR> /admin</VAR> location. Then restart the CUPS server as
- described in<A HREF="PRINTING_MANAGEMENT"> Chapter 8, &quot;Printing System
+ described in<A HREF="#PRINTING_MANAGEMENT"> Chapter 6, &quot;Printing System
  Management&quot;</A>.
 <CENTER>
 <TABLE BGCOLOR="#cccccc" BORDER="1" CELLPADDING="5" WIDTH="80%">
@@ -4669,8 +4751,8 @@ AuthClass System
 </TD></TR>
 </TABLE>
 </CENTER>
-<H2><A NAME="13_3">I Can't Do Administration Tasks from Another Machine!</A>
-</H2>
+<H2><A NAME="ALLOW_REMOTE">I Can't Do Administration Tasks from Another
+ Machine!</A></H2>
 <P>The default CUPS configuration limits administration to the local
  machine. To open up access, edit the<VAR> /etc/cups/cupsd.conf</VAR>
  and comment out the lines reading:</P>
@@ -4682,7 +4764,7 @@ Allow from 127.0.0.1
 </PRE>
 </UL>
  for the<VAR> /admin</VAR> location. Then restart the CUPS server as
- described in<A HREF="PRINTING_MANAGEMENT"> Chapter 8, &quot;Printing System
+ described in<A HREF="#PRINTING_MANAGEMENT"> Chapter 6, &quot;Printing System
  Management&quot;</A>.
 <CENTER>
 <TABLE BGCOLOR="#cccccc" BORDER="1" CELLPADDING="5" WIDTH="80%">
