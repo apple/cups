@@ -37,6 +37,10 @@ CHANGES IN CUPS V1.1.11
 	  keyword; this caused a serious performance problem on
 	  slower systems since more information had to be
 	  transferred from server to client.
+	- The web interfaces did not always quote < and & in
+	  things like the job title.  This had the potential for
+	  browser-based security violations (on the browser's
+	  machine); bug report from SuSE.
 
 
 CHANGES IN CUPS V1.1.10-1
