@@ -1,5 +1,5 @@
 /*
- * "$Id: rastertodymo.c,v 1.2 2001/07/18 01:10:01 mike Exp $"
+ * "$Id: rastertodymo.c,v 1.3 2001/07/18 18:01:58 mike Exp $"
  *
  *   DYMO label printer filter for the Common UNIX Printing System (CUPS).
  *
@@ -120,6 +120,8 @@ StartPage(ppd_file_t         *ppd,	/* I - PPD file */
 
   printf("\033L%c%c", header->cupsHeight, header->cupsHeight >> 8);
   printf("\033D%c", header->cupsBytesPerLine);
+
+  printf("\033%c", header->cupsCompression + 'c'); /* Darkness */
 
  /*
   * Allocate memory for a line of graphics...
@@ -381,5 +383,5 @@ main(int  argc,		/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: rastertodymo.c,v 1.2 2001/07/18 01:10:01 mike Exp $".
+ * End of "$Id: rastertodymo.c,v 1.3 2001/07/18 18:01:58 mike Exp $".
  */
