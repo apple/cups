@@ -1,4 +1,4 @@
-CREDITS.txt - 12/12/2002
+CREDITS.txt - 04/23/2003
 ------------------------
 
 Few projects are completed by one person, and CUPS is no exception.  We'd
@@ -11,6 +11,7 @@ like to thank the following individuals for their contributions:
     L. Peter Deutsch    - MD5 code.
     Dr. ZP Han          - setgid()/setuid().
     Guy Harris          - *BSD shared libraries and lots of other fixes.
+    Bjoern Jacke        - I18N stuff.
     Wang Jian           - CUPS RPM corrections.
     Roderick Johnstone  - Beta tester of the millenium.
     Till Kamppeter      - Bug fixes, beta testing, evangelism.
