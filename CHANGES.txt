@@ -83,6 +83,14 @@ CHANGES IN CUPS v1.1.3
 	  and perl scripts as well as C/C++ source files.
 	- The top and bottom margins were reversed for landscape
 	  text printing.
+	- The lpq and lprm commands didn't understand printer
+	  instances.
+	- The scheduler only selected on the first 100 file
+	  descriptors instead of the maximum file descriptor
+	  limit.
+	- The scheduler client, listener, and mainline functions
+	  now share code to disable and enable monitoring for
+	  new client connections.
 
 
 CHANGES IN CUPS v1.1.2
