@@ -1,5 +1,5 @@
 /*
- * "$Id: lpmove.c,v 1.2 2000/05/10 19:44:10 mike Exp $"
+ * "$Id: lpmove.c,v 1.3 2000/12/06 13:19:07 mike Exp $"
  *
  *   "lpmove" command for the Common UNIX Printing System (CUPS).
  *
@@ -184,6 +184,9 @@ move_job(http_t     *http,	/* I - HTTP connection to server */
   snprintf(job_uri, sizeof(job_uri), "ipp://localhost/jobs/%d", jobid);
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "job-uri", NULL, job_uri);
 
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "requesting-user-name",
+               NULL, cupsUser());
+
   snprintf(printer_uri, sizeof(printer_uri), "ipp://localhost/printers/%s", dest);
   ippAddString(request, IPP_TAG_JOB, IPP_TAG_URI, "job-printer-uri",
                NULL, printer_uri);
@@ -211,5 +214,5 @@ move_job(http_t     *http,	/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpmove.c,v 1.2 2000/05/10 19:44:10 mike Exp $".
+ * End of "$Id: lpmove.c,v 1.3 2000/12/06 13:19:07 mike Exp $".
  */

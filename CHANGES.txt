@@ -143,6 +143,8 @@ CHANGES IN CUPS V1.1.5
 	  undocumented feature in Solaris.
 	- The HP-GL/2 filter now only sets the plot size if it
 	  is set in the plot file.
+	- The lpmove command wasn't sending the requesting
+	  user name, causing it to always fail.
 
 
 CHANGES IN CUPS v1.1.4
