@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.6 1999/04/21 21:19:32 mike Exp $"
+# "$Id: Makefile,v 1.7 1999/04/22 13:53:04 mike Exp $"
 #
 #   Support library Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -94,7 +94,7 @@ util.o:		cups.h http.h ipp.h ../config.h ../Makedefs
 #
 
 testhttp:	testhttp.o libcups.a
-	$(CC) $(LDFLAGS) -o $@ testhttp.o libcups.a
+	$(CC) $(LDFLAGS) -o $@ testhttp.o $(LIBS)
 
 testhttp.o:	http.h ../Makedefs
 
@@ -103,7 +103,7 @@ testhttp.o:	http.h ../Makedefs
 #
 
 testmime:	testmime.o libcups.a
-	$(CC) $(LDFLAGS) -o $@ testmime.o libcups.a
+	$(CC) $(LDFLAGS) -o $@ testmime.o $(LIBS)
 
 testmime.o:	mime.h ../Makedefs
 
@@ -112,10 +112,10 @@ testmime.o:	mime.h ../Makedefs
 #
 
 testppd:	testppd.o libcups.a
-	$(CC) $(LDFLAGS) -o $@ testppd.o libcups.a
+	$(CC) $(LDFLAGS) -o $@ testppd.o $(LIBS)
 
 testppd.o:	ppd.h ../Makedefs
 
 #
-# End of "$Id: Makefile,v 1.6 1999/04/21 21:19:32 mike Exp $".
+# End of "$Id: Makefile,v 1.7 1999/04/22 13:53:04 mike Exp $".
 #

@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.h,v 1.11 1999/04/21 22:40:42 mike Exp $"
+ * "$Id: ipp.h,v 1.12 1999/04/22 13:53:04 mike Exp $"
  *
  *   Internet Printing Protocol definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -225,10 +225,10 @@ typedef enum			/**** IPP status codes... ****/
 } ipp_status_t;
 
 typedef unsigned char uchar;	/**** Unsigned 8-bit integer/character ****/
-#  ifndef __hpux		/* HP-UX defines these as well */
+#  if !defined(__hpux) && !defined(__sun)
 typedef unsigned short ushort;	/**** Unsigned 16-bit integer ****/
 typedef unsigned int uint;	/**** Unsigned 32-bit integer ****/
-#  endif /* !__hpux */
+#  endif /* !__hpux && !__sun */
 
 typedef union			/**** Request Header ****/
 {
@@ -341,5 +341,5 @@ extern int		ippPort(void);
 #endif /* !_CUPS_IPP_H_ */
 
 /*
- * End of "$Id: ipp.h,v 1.11 1999/04/21 22:40:42 mike Exp $".
+ * End of "$Id: ipp.h,v 1.12 1999/04/22 13:53:04 mike Exp $".
  */

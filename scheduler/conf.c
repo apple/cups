@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.9 1999/04/21 22:41:27 mike Exp $"
+ * "$Id: conf.c,v 1.10 1999/04/22 13:53:06 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -39,6 +39,14 @@
 #include <stdarg.h>
 #include <pwd.h>
 #include <grp.h>
+
+/*
+ * Possibly missing network definitions...
+ */
+
+#ifndef INADDR_NONE
+#  define INADDR_NONE	0xffffffff
+#endif /* !INADDR_NONE */
 
 
 /*
@@ -920,5 +928,5 @@ get_address(char               *value,		/* I - Value string */
 
 
 /*
- * End of "$Id: conf.c,v 1.9 1999/04/21 22:41:27 mike Exp $".
+ * End of "$Id: conf.c,v 1.10 1999/04/22 13:53:06 mike Exp $".
  */

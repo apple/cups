@@ -1,5 +1,5 @@
 dnl#
-dnl# "$Id: configure.in,v 1.4 1999/04/21 22:50:18 mike Exp $"
+dnl# "$Id: configure.in,v 1.5 1999/04/22 13:53:02 mike Exp $"
 dnl#
 dnl#   Configuration script for the Common UNIX Printing System (CUPS).
 dnl#
@@ -54,22 +54,47 @@ AC_PATH_PROG(HTMLDOC,htmldoc)
 
 dnl# Architecture checks...
 AC_C_BIGENDIAN
+uname=`uname`
+if test "$uname" = "IRIX64"; then
+	uname=IRIX
+fi
 
 dnl# Check for libraries...
 AC_CHECK_LIB(sec,getspent)
+AC_CHECK_LIB(socket,socket,
+if test "$uname" != "IRIX"; then
+	LIBS="$LIBS -lsocket"
+else
+	echo "Not using -lsocket since you are running IRIX."
+fi)
+AC_CHECK_LIB(nsl,gethostbyaddr,
+if test "$uname" != "IRIX"; then
+	LIBS="$LIBS -lnsl"
+else
+	echo "Not using -lnsl since you are running IRIX."
+fi)
 
-AC_PATH_XTRA
-if test "$X_PRE_LIBS" != ""; then
-	echo "Ignoring libraries \"$X_PRE_LIBS\" requested by configure."
+AC_PATH_X
+if test "$x_libraries" = "/usr/lib"; then
+	echo "Ignoring X library directory \"$x_libraries\" requested by configure."
+	x_libraries=""
 fi
-if test "$X_LIBS" = " -L/usr/lib"; then
-	echo "Ignoring X library directory \"$X_LIBS\" requested by configure."
-	X_LIBS=""
+if test "$x_includes" = "/usr/include"; then
+	echo "Ignoring X include directory \"$x_includes\" requested by configure."
+	x_includes=""
 fi
 GUILIBS=""
 AC_SUBST(GUILIBS)
-AC_CHECK_HEADER(FL/Fl.H,GUILIBS="$X_LIBS -lfltk -lX11 -lXext"
-AC_DEFINE(HAVE_LIBFLTK))
+AC_CHECK_HEADER(FL/Fl.H,AC_DEFINE(HAVE_LIBFLTK)
+if test "$x_libraries" = ""; then
+	GUILIBS="-lfltk -lX11 -lXext"
+else
+	GUILIBS="-L$x_libraries -lfltk -lX11 -lXext"
+fi
+if test "$x_includes" != ""; then
+	CFLAGS="$CFLAGS -I$x_includes"
+	CXXFLAGS="$CXXFLAGS -I$x_includes"
+fi)
 
 IMGLIBS=""
 AC_SUBST(IMGLIBS)
@@ -110,5 +135,5 @@ AC_DEFINE_UNQUOTED(LOCALEDIR, "$prefix/lib/locale")
 AC_OUTPUT(Makedefs)
 
 dnl#
-dnl# End of "$Id: configure.in,v 1.4 1999/04/21 22:50:18 mike Exp $".
+dnl# End of "$Id: configure.in,v 1.5 1999/04/22 13:53:02 mike Exp $".
 dnl#
