@@ -1,66 +1,132 @@
 
 
 
-lpc(8)                Easy Software Products               lpc(8)
-
-
-NNAAMMEE
-       lpc - line printer control program
-
-SSYYNNOOPPSSIISS
-       llppcc [ _c_o_m_m_a_n_d [ _p_a_r_a_m_e_t_e_r_(_s_) ] ]
-
-DDEESSCCRRIIPPTTIIOONN
-       _l_p_c provides limited control over printer and class queues
-       provided by CUPS. It can also be used to query  the  state
-       of queues.
-
-       If  no  command is specified on the command-line, lpc will
-       display a prompt and accept  commands  from  the  standard
-       input.
-
-CCOOMMMMAANNDDSS
-       The  _l_p_c  program accepts a subset of commands accepted by
-       the Berkeley _l_p_c program of the same name:
-
-       _e_x_i_t
-            Exits the command interpreter.
-
-       help _[_c_o_m_m_a_n_d_]
-            Displays a short help message.
-
-       quit
-            Exits the command interpreter.
-
-       status _[_q_u_e_u_e_]
-            Displays the status of one or more printer  or  class
-            queues.
-
-       ? _[_c_o_m_m_a_n_d_]
-            Display a short help message.
-
-LLIIMMIITTAATTIIOONNSS
-       Since  _l_p_c is geared towards the Berkeley printing system,
-       it is impossible to use _l_p_c to configure printer or  class
-       queues  provided  by  CUPS.  To configure printer or class
-       queues you must use  the  _l_p_a_d_m_i_n_(_8_)  command  or  another
-       CUPS-compatible client with that functionality.
-
-CCOOMMPPAATTIIBBIILLIITTYY
-       The  CUPS  version  of  _l_p_c  does not implement all of the
-       standard Berkeley commands.
-
-SSEEEE AALLSSOO
-       accept(8),  cancel(1),   disable(8),   enable(8),   lp(1),
-       lpr(1),   lprm(1),  lpstat(1),  reject(8),  CUPS  Software
-       Administrators Manual
-
-CCOOPPYYRRIIGGHHTT
-       Copyright 1993-2000 by Easy Software Products, All  Rights
-       Reserved.
+Easy Software Products                                     lpc(8)
 
 
 
-22 September 1999  Common UNIX Printing System                  1
+NNNNAAAAMMMMEEEE
+     lpc - line printer control program
+
+SSSSYYYYNNNNOOOOPPPPSSSSIIIISSSS
+     llllppppcccc [ _c_o_m_m_a_n_d [ _p_a_r_a_m_e_t_e_r(_s) ] ]
+
+DDDDEEEESSSSCCCCRRRRIIIIPPPPTTTTIIIIOOOONNNN
+     _l_p_c provides limited control over printer and  class  queues
+     provided  by CUPS. It can also be used to query the state of
+     queues.
+
+     If no command is specified on  the  command-line,  lpc  will
+     display  a  prompt  and  accept  commands  from the standard
+     input.
+
+CCCCOOOOMMMMMMMMAAAANNNNDDDDSSSS
+     The _l_p_c program accepts a subset of commands accepted by the
+     Berkeley _l_p_c program of the same name:
+
+     _e_x_i_t
+          Exits the command interpreter.
+
+     help [_c_o_m_m_a_n_d]
+          Displays a short help message.
+
+     quit
+          Exits the command interpreter.
+
+     status [_q_u_e_u_e]
+          Displays the status of one or  more  printer  or  class
+          queues.
+
+     ? [_c_o_m_m_a_n_d]
+          Display a short help message.
+
+LLLLIIIIMMMMIIIITTTTAAAATTTTIIIIOOOONNNNSSSS
+     Since _l_p_c is geared towards the Berkeley printing system, it
+     is  impossible  to  use  _l_p_c  to  configure printer or class
+     queues provided by CUPS.   To  configure  printer  or  class
+     queues  you must use the _l_p_a_d_m_i_n(_8) command or another CUPS-
+     compatible client with that functionality.
+
+CCCCOOOOMMMMPPPPAAAATTTTIIIIBBBBIIIILLLLIIIITTTTYYYY
+     The CUPS version of _l_p_c does not implement all of the  stan-
+     dard Berkeley commands.
+
+SSSSEEEEEEEE AAAALLLLSSSSOOOO
+     accept(8), cancel(1), disable(8), enable(8), lp(1),  lpr(1),
+     lprm(1),  lpstat(1), reject(8), CUPS Software Administrators
+     Manual
+
+
+
+
+
+22 September 1999Last change: Common UNIX Printing System           1
+
+
+
+
+
+
+Easy Software Products                                     lpc(8)
+
+
+
+CCCCOOOOPPPPYYYYRRRRIIIIGGGGHHHHTTTT
+     Copyright 1993-2000 by Easy Software  Products,  All  Rights
+     Reserved.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+22 September 1999Last change: Common UNIX Printing System           2
+
 
 

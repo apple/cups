@@ -1,109 +1,106 @@
 
 
 
-filter(1)             Easy Software Products            filter(1)
-
-
-NNAAMMEE
-       filter - file conversion filter interfaces
-
-SSYYNNOOPPSSIISS
-       ffiilltteerr job user title num-copies options _[ _f_i_l_e_n_a_m_e _]
-
-DDEESSCCRRIIPPTTIIOONN
-       The  CUPS  filter interface provides a standard method for
-       adding support for new document types to CUPS. Each filter
-       is capable of converting from one or more input formats to
-       another format that can  either  be  printed  directly  or
-       piped into another filter to get it to a printable format.
-
-       Filters must be capable of reading from a filename on  the
-       command-line  or from the standard input, copying stdin to
-       a temporary if required by the file format.
-
-       The command name (argv[0]) is set to the name of the  des-
-       tination printer.
-
-EENNVVIIRROONNMMEENNTT VVAARRIIAABBLLEESS
-       The  following  environment  variables  are defined by the
-       CUPS server when executing each filter:
-
-       CHARSET
-            The default text character set (typically us-ascii or
-            iso-8859-1).
-
-       CONTENT_TYPE
-            The MIME type associated with the file (e.g. applica-
-            tion/postscript).
-
-       DEVICE_URI
-            The device-uri associated with the printer.
-
-       LANG
-            The default language locale (typically C or en).
-
-       PATH
-            The standard execution  path  for  external  programs
-            that may be run by the filter.
-
-       PPD
-            The  full pathname of the PostScript Printer Descrip-
-            tion (PPD) file for this printer.
-
-       PRINTER
-            The name of the printer; this is provided  for  shell
-            scripts  which  may  not  be  able  to get the passed
-            argv[0] string.
-
-       RIP_CACHE
-            The recommended amount of memory to  use  for  Raster
-            Image Processors (RIPs).
+Easy Software Products                                  filter(1)
 
 
 
-22 September 1999  Common UNIX Printing System                  1
+NNNNAAAAMMMMEEEE
+     filter - file conversion filter interfaces
+
+SSSSYYYYNNNNOOOOPPPPSSSSIIIISSSS
+     ffffiiiilllltttteeeerrrr job user title num-copies options [ _f_i_l_e_n_a_m_e ]
+
+DDDDEEEESSSSCCCCRRRRIIIIPPPPTTTTIIIIOOOONNNN
+     The CUPS filter interface provides  a  standard  method  for
+     adding  support  for new document types to CUPS. Each filter
+     is capable of converting from one or more input  formats  to
+     another  format that can either be printed directly or piped
+     into another filter to get it to a printable format.
+
+     Filters must be capable of reading from a  filename  on  the
+     command-line  or from the standard input, copying stdin to a
+     temporary if required by the file format.
+
+     The command name (argv[0]) is set to the name of the  desti-
+     nation printer.
+
+EEEENNNNVVVVIIIIRRRROOOONNNNMMMMEEEENNNNTTTT VVVVAAAARRRRIIIIAAAABBBBLLLLEEEESSSS
+     The following environment variables are defined by the  CUPS
+     server when executing each filter:
+
+     CHARSET
+          The default text character set (typically  us-ascii  or
+          iso-8859-1).
+
+     CONTENT_TYPE
+          The  MIME  type  associated   with   the   file   (e.g.
+          application/postscript).
+
+     DEVICE_URI
+          The device-uri associated with the printer.
+
+     LANG
+          The default language locale (typically C or en).
+
+     PATH
+          The standard execution path for external programs  that
+          may be run by the filter.
+
+     PPD
+          The full pathname of the PostScript Printer Description
+          (PPD) file for this printer.
+
+     PRINTER
+          The name of the printer; this  is  provided  for  shell
+          scripts which may not be able to get the passed argv[0]
+          string.
+
+     RIP_CACHE
 
 
 
-
-
-filter(1)             Easy Software Products            filter(1)
-
-
-       SERVER_ROOT
-            The root directory of the server.
-
-       SOFTWARE
-            The  name and version number of the server (typically
-            CUPS/1.0).
-
-       TZ
-            The timezone of the server.
-
-       USER
-            The user executing the filter (typically lp).
-
-CCOOMMPPAATTIIBBIILLIITTYY
-       While the filter interface is  compatible  with  System  V
-       interface  scripts,  it  will  only work with the System V
-       interface script as the only filter.  Typically the inter-
-       face  script  will  be provided via the llppaaddmmiinn((88)) command
-       using the _-_i option.
-
-SSEEEE AALLSSOO
-       backend(1), cupsd(8), CUPS Software Administrators Manual,
-       CUPS Interface Design Description
-
-CCOOPPYYRRIIGGHHTT
-       Copyright  1993-2000 by Easy Software Products, All Rights
-       Reserved.
+22 September 1999Last change: Common UNIX Printing System           1
 
 
 
 
 
 
+Easy Software Products                                  filter(1)
 
+
+
+          The recommended amount of  memory  to  use  for  Raster
+          Image Processors (RIPs).
+
+     SERVER_ROOT
+          The root directory of the server.
+
+     SOFTWARE
+          The name and version number of  the  server  (typically
+          CUPS/1.0).
+
+     TZ
+          The timezone of the server.
+
+     USER
+          The user executing the filter (typically lp).
+
+CCCCOOOOMMMMPPPPAAAATTTTIIIIBBBBIIIILLLLIIIITTTTYYYY
+     While the filter  interface  is  compatible  with  System  V
+     interface  scripts,  it  will  only  work  with the System V
+     interface script as the only filter.  Typically  the  inter-
+     face  script  will  be  provided  via the llllppppaaaaddddmmmmiiiinnnn((((8888)))) command
+     using the -_i option.
+
+SSSSEEEEEEEE AAAALLLLSSSSOOOO
+     backend(1), cupsd(8), CUPS Software  Administrators  Manual,
+     CUPS Interface Design Description
+
+CCCCOOOOPPPPYYYYRRRRIIIIGGGGHHHHTTTT
+     Copyright 1993-2000 by Easy Software  Products,  All  Rights
+     Reserved.
 
 
 
@@ -127,6 +124,9 @@ CCOOPPYYRRIIGGHHTT
 
 
 
-22 September 1999  Common UNIX Printing System                  2
+
+
+22 September 1999Last change: Common UNIX Printing System           2
+
 
 

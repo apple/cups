@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: configure.in,v 1.40 2000/05/20 15:47:45 mike Exp $"
+dnl "$Id: configure.in,v 1.41 2000/06/19 16:25:22 mike Exp $"
 dnl
 dnl   Configuration script for the Common UNIX Printing System (CUPS).
 dnl
@@ -415,8 +415,8 @@ CUPS_DOCROOT='${datadir}/doc/cups'
 AC_DEFINE_UNQUOTED(CUPS_DOCROOT, "$prefix/share/doc/cups")
 AC_SUBST(CUPS_DOCROOT)
 
-AC_OUTPUT(Makedefs)
+AC_OUTPUT(Makedefs cups.sh)
 
 dnl
-dnl End of "$Id: configure.in,v 1.40 2000/05/20 15:47:45 mike Exp $".
+dnl End of "$Id: configure.in,v 1.41 2000/06/19 16:25:22 mike Exp $".
 dnl
