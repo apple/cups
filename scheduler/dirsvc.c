@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.30 1999/06/24 12:41:17 mike Exp $"
+ * "$Id: dirsvc.c,v 1.31 1999/06/24 12:56:05 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -33,6 +33,7 @@
  * Include necessary headers...
  */
 
+#define DEBUG
 #include "cupsd.h"
 
 
@@ -174,7 +175,6 @@ UpdateBrowseList(void)
 
 #ifdef DEBUG
   struct sockaddr_in	addr;
-  int			len;
 
 
   len = sizeof(addr);
@@ -387,6 +387,9 @@ UpdateBrowseList(void)
 	{
 	  pclass = AddClass(name);
 	  pclass->type |= CUPS_PRINTER_IMPLICIT;
+
+          DEBUG_printf(("Added new class \"%s\", type = %x\n", name,
+	                pclass->type));
 	}
 
         if (first != NULL)
@@ -513,5 +516,5 @@ SendBrowseList(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.30 1999/06/24 12:41:17 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.31 1999/06/24 12:56:05 mike Exp $".
  */
