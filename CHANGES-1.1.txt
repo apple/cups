@@ -3,6 +3,9 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.17
 
+	- The scheduler never reset the NumJobs variable before
+	  loading the job list (previously this only happened on
+	  a full start, so the problem was never apparent...)
 	- The HTTP and IPP read/write code didn't handle EINTR
 	  (interrupted system call) errors.
 	- When under high load, the scheduler could abort due to
