@@ -1,5 +1,5 @@
 /*
- * "$Id: ipptest.c,v 1.10 2002/01/14 19:06:56 mike Exp $"
+ * "$Id: ipptest.c,v 1.11 2002/01/18 20:10:45 mike Exp $"
  *
  *   IPP test command for the Common UNIX Printing System (CUPS).
  *
@@ -452,6 +452,9 @@ do_tests(const char *uri,		/* I - URI to connect on */
 	else
 	{
 	  puts("        RECEIVED");
+	  printf("        status-code = %04x\n",
+	         response->request.status.status_code);
+
 	  for (attrptr = response->attrs; attrptr != NULL; attrptr = attrptr->next)
 	    print_attr(attrptr);
 	}
@@ -801,5 +804,5 @@ print_attr(ipp_attribute_t *attr)	/* I - Attribute to print */
 
 
 /*
- * End of "$Id: ipptest.c,v 1.10 2002/01/14 19:06:56 mike Exp $".
+ * End of "$Id: ipptest.c,v 1.11 2002/01/18 20:10:45 mike Exp $".
  */
