@@ -1,5 +1,5 @@
 #
-# "$Id: cups.list,v 1.65 2000/06/08 20:00:41 mike Exp $"
+# "$Id: cups.list,v 1.66 2000/06/18 00:37:11 mike Exp $"
 #
 #   ESP Package Manager (EPM) file list for the Common UNIX Printing
 #   System (CUPS).
@@ -28,7 +28,7 @@
 %vendor Easy Software Products
 %license LICENSE.txt
 %readme README.txt
-%version 1.1b5
+%version 1.1
 %incompat printpro
 
 %system all
@@ -283,6 +283,7 @@ f 0444 root sys /usr/share/cups/templates/classes.tmpl templates/classes.tmpl
 f 0444 root sys /usr/share/cups/templates/config-printer.tmpl templates/config-printer.tmpl
 f 0444 root sys /usr/share/cups/templates/config-printer2.tmpl templates/config-printer2.tmpl
 f 0444 root sys /usr/share/cups/templates/error.tmpl templates/error.tmpl
+f 0444 root sys /usr/share/cups/templates/header.tmpl templates/header.tmpl
 f 0444 root sys /usr/share/cups/templates/job-cancel.tmpl templates/job-cancel.tmpl
 f 0444 root sys /usr/share/cups/templates/job-hold.tmpl templates/job-hold.tmpl
 f 0444 root sys /usr/share/cups/templates/job-release.tmpl templates/job-release.tmpl
@@ -306,8 +307,6 @@ f 0444 root sys /usr/share/cups/templates/printer-start.tmpl templates/printer-s
 f 0444 root sys /usr/share/cups/templates/printer-stop.tmpl templates/printer-stop.tmpl
 f 0444 root sys /usr/share/cups/templates/printers.tmpl templates/printers.tmpl
 f 0444 root sys /usr/share/cups/templates/test-page.tmpl templates/test-page.tmpl
-
-f 0444 root sys /usr/share/cups/templates/header.tmpl templates/header.tmpl
 f 0444 root sys /usr/share/cups/templates/trailer.tmpl templates/trailer.tmpl
 
 # Config files
@@ -460,5 +459,5 @@ f 0444 root sys /usr/man/man5/printers.conf.5 man/printers.conf.man
 i 0555 root sys cups cups.sh
 
 #
-# End of "$Id: cups.list,v 1.65 2000/06/08 20:00:41 mike Exp $".
+# End of "$Id: cups.list,v 1.66 2000/06/18 00:37:11 mike Exp $".
 #
