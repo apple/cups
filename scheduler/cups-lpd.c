@@ -1,5 +1,5 @@
 /*
- * "$Id: cups-lpd.c,v 1.24.2.5 2002/03/22 15:47:27 mike Exp $"
+ * "$Id: cups-lpd.c,v 1.24.2.6 2002/04/29 17:27:19 mike Exp $"
  *
  *   Line Printer Daemon interface for the Common UNIX Printing System (CUPS).
  *
@@ -129,7 +129,10 @@ main(int  argc,			/* I - Number of command-line arguments */
   hostlen = sizeof(hostaddr);
 
   if (getpeername(0, (struct sockaddr *)&hostaddr, &hostlen))
+  {
     syslog(LOG_WARNING, "Unable to get client address - %s", strerror(errno));
+    strcpy(hostname, "unknown");
+  }
   else
   {
     httpAddrLookup(&hostaddr, hostname, sizeof(hostname));
@@ -151,6 +154,9 @@ main(int  argc,			/* I - Number of command-line arguments */
 
   num_defaults = 0;
   defaults     = NULL;
+
+  num_defaults = cupsAddOption("job-originating-host-name", hostname,
+                               num_defaults, &defaults);
 
   for (i = 1; i < argc; i ++)
     if (argv[i][0] == '-')
@@ -1288,5 +1294,5 @@ smart_gets(char *s,	/* I - Pointer to line buffer */
 
 
 /*
- * End of "$Id: cups-lpd.c,v 1.24.2.5 2002/03/22 15:47:27 mike Exp $".
+ * End of "$Id: cups-lpd.c,v 1.24.2.6 2002/04/29 17:27:19 mike Exp $".
  */
