@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c,v 1.45 2000/09/14 18:54:14 mike Exp $"
+ * "$Id: main.c,v 1.46 2000/10/02 12:45:36 mike Exp $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -518,7 +518,7 @@ sigchld_handler(int sig)	/* I - Signal number */
       if (status < 256)
 	LogMessage(L_ERROR, "PID %d crashed on signal %d!", pid, status);
       else
-	LogMessage(L_ERROR, "PID %d crashed with status %d!", pid,
+	LogMessage(L_ERROR, "PID %d stopped with status %d!", pid,
 	           status / 256);
     }
 
@@ -654,5 +654,5 @@ usage(void)
 
 
 /*
- * End of "$Id: main.c,v 1.45 2000/09/14 18:54:14 mike Exp $".
+ * End of "$Id: main.c,v 1.46 2000/10/02 12:45:36 mike Exp $".
  */
