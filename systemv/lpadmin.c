@@ -1,5 +1,5 @@
 /*
- * "$Id: lpadmin.c,v 1.28 2002/01/02 17:59:19 mike Exp $"
+ * "$Id: lpadmin.c,v 1.29 2002/03/14 19:11:12 mike Exp $"
  *
  *   "lpadmin" command for the Common UNIX Printing System (CUPS).
  *
@@ -541,6 +541,18 @@ main(int  argc,			/* I - Number of command-line arguments */
 	    }
 	    break;
 
+        case 'I' : /* Set the supported file types (ignored) */
+	    i ++;
+
+	    if (i >= argc)
+	    {
+	      fputs("lpadmin: Expected file type(s) after \'-I\' option!\n", stderr);
+	      return (1);
+	    }
+
+	    fputs("lpadmin: Warning - content type list ignored!\n", stderr);
+	    break;
+	    
         case 'L' : /* Set the printer-location attribute */
 	    if (!http)
 	    {
@@ -1852,5 +1864,5 @@ validate_name(const char *name)	/* I - Name to check */
 
 
 /*
- * End of "$Id: lpadmin.c,v 1.28 2002/01/02 17:59:19 mike Exp $".
+ * End of "$Id: lpadmin.c,v 1.29 2002/03/14 19:11:12 mike Exp $".
  */
