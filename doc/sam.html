@@ -102,6 +102,12 @@ Copyright 1997-1999, All Rights Reserved<BR>
 <LI><A HREF="#6_3">The error_log File</A></LI>
 <LI><A HREF="#6_4">The page_log File</A></LI>
 </UL>
+<B><A HREF="#7">A - Using CUPS with SAMBA</A></B>
+<UL>
+<LI><A HREF="#7_1">What is SAMBA?</A></LI>
+<LI><A HREF="#7_2">How Do I Configure SAMBA for CUPS?</A></LI>
+<LI><A HREF="#7_3">How Do I Configure CUPS for SAMBA?</A></LI>
+</UL>
 <HR>
 GIF89a&macr;&yuml;&ograve;&Igrave;&Igrave;&Igrave;™™™fff333&yuml;&yuml;&yuml;&yuml;&yuml;&yuml;&yuml;&yuml;&yuml;!&ugrave;,&macr;&yuml;B&thorn;X&ordm;&Uuml;&thorn;0&Ecirc;I&laquo;&frac12;8&euml;&Iacute;&raquo;&yuml;`(Ždižh&ordf;2€0p,&Iuml;tm&szlig;x&reg;&iuml;
 
@@ -218,6 +224,7 @@ sections:</P>
 <LI>3 - Printer Queue Management</LI>
 <LI>4 - Printing System Management</LI>
 <LI>5 - Printer Accounting</LI>
+<LI>A - Using CUPS with SAMBA</LI>
 </UL>
 <H1 ALIGN="RIGHT"><A NAME="2">1 - Printing System Overview</A></H1>
 <P>This chapter provides an overview of how the Common UNIX Printing 
@@ -970,5 +977,44 @@ data-time</I> field in the <CODE>access_log</CODE> file. </P>
 number and number of copies being printed of that page. For printer 
 that can not produce copies on their own, the <I>num-pages</I> field 
 will always be 1. </P>
+<H1 ALIGN="RIGHT"><A NAME="7">A - Using CUPS with SAMBA</A></H1>
+<P>This appendix describes how to use CUPS with SAMBA. </P>
+<H2><A NAME="7_1">What is SAMBA?</A></H2>
+<P>In case you haven't heard of SAMBA, it is basically a software 
+package that allows you to configure your UNIX system as a Windows file 
+and printer server. It also allows you to access files and printers on 
+a Windows system. Like CUPS, SAMBA is free software. </P>
+<P>SAMBA version 2.0.6 is the first release of SAMBA that supports 
+CUPS. You can download SAMBA from: </P>
+<P ALIGN="CENTER"><A HREF="http://www.samba.org">http://www.samba.org</A>
+</P>
+<H2><A NAME="7_2">How Do I Configure SAMBA for CUPS?</A></H2>
+<P>To configure SAMBA for CUPS, edit the <CODE>smb.conf</CODE> file and 
+replace the existing printing commands and options with the line: </P>
+<UL>
+<PRE>
+printing = cups
+</PRE>
+</UL>
+<P>That's all there is to it!  Remote users will now be able to browse 
+and print to printers on your system. </P>
+<H2><A NAME="7_3">How Do I Configure CUPS for SAMBA?</A></H2>
+<P>To configure CUPS for SAMBA, run the following command: </P>
+<UL>
+<PRE>
+% ln -s `which smbspool` /var/cups/backend/smb ENTER
+</PRE>
+</UL>
+<P>The <CODE>smbspool</CODE> program is provided with SAMBA starting 
+with SAMBA 2.0.6. Once you have made the link you can use the <CODE>smb</CODE>
+ method in the device URI for your printers: </P>
+<UL>
+<PRE>
+% lpadmin -p <I>printer</I> -v smb://<I>hostname/printer</I> ... ENTER
+% lpadmin -p <I>printer</I> -v smb://<I>workgroup/hostname/printer</I> ... ENTER
+</PRE>
+</UL>
+<P>The second form only needs to be used if the Windows system is in a 
+different workgroup. </P>
 </BODY>
 </HTML>

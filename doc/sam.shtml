@@ -42,6 +42,7 @@ can be used to support non-PostScript printers.
 	<LI>3 - Printer Queue Management</LI>
 	<LI>4 - Printing System Management</LI>
 	<LI>5 - Printer Accounting</LI>
+	<LI>A - Using CUPS with SAMBA</LI>
 </UL>
 
 <H1 ALIGN=RIGHT>1 - Printing System Overview</H1>
@@ -1034,6 +1035,54 @@ field in the <CODE>access_log</CODE> file.
 <P>The <I>page-number</I> and <I>num-pages</I> fields contain the page number
 and number of copies being printed of that page. For printer that can not
 produce copies on their own, the <I>num-pages</I> field will always be 1.
+
+<H1 ALIGN="RIGHT">A - Using CUPS with SAMBA</H1>
+
+<P>This appendix describes how to use CUPS with SAMBA.
+
+<H2>What is SAMBA?</H2>
+
+<P>In case you haven't heard of SAMBA, it is basically a software package
+that allows you to configure your UNIX system as a Windows file and printer
+server. It also allows you to access files and printers on a Windows system.
+Like CUPS, SAMBA is free software.
+
+<P>SAMBA version 2.0.6 is the first release of SAMBA that supports CUPS.
+You can download SAMBA from:
+
+<P ALIGN="CENTER"><A HREF="http://www.samba.org">http://www.samba.org</A></P>
+
+<H2>How Do I Configure SAMBA for CUPS?</H2>
+
+<P>To configure SAMBA for CUPS, edit the <CODE>smb.conf</CODE> file and
+replace the existing printing commands and options with the line:
+
+<UL><PRE>
+printing = cups
+</PRE></UL>
+
+<P>That's all there is to it!  Remote users will now be able to browse and
+print to printers on your system.
+
+<H2>How Do I Configure CUPS for SAMBA?</H2>
+
+<P>To configure CUPS for SAMBA, run the following command:
+
+<UL><PRE>
+% ln -s `which smbspool` /var/cups/backend/smb ENTER
+</PRE></UL>
+
+<P>The <CODE>smbspool</CODE> program is provided with SAMBA starting with
+SAMBA 2.0.6. Once you have made the link you can use the <CODE>smb</CODE>
+method in the device URI for your printers:
+
+<UL><PRE>
+% lpadmin -p <I>printer</I> -v smb://<I>hostname/printer</I> ... ENTER
+% lpadmin -p <I>printer</I> -v smb://<I>workgroup/hostname/printer</I> ... ENTER
+</PRE></UL>
+
+<P>The second form only needs to be used if the Windows system is in a
+different workgroup.
 
 </BODY>
 </HTML>
