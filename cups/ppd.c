@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c,v 1.51.2.49 2003/02/28 21:07:32 mike Exp $"
+ * "$Id: ppd.c,v 1.51.2.50 2003/04/10 03:01:48 mike Exp $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -51,7 +51,8 @@
  *                           0x9f to be valid ISO-8859-1 characters...
  *   ppd_free_group()      - Free a single UI group.
  *   ppd_free_option()     - Free a single option.
- *   ppd_get_extopt()      - Get an extended option record.
+ *   ppd_get_extoption()   - Get an extended option record.
+ *   ppd_get_extparam()    - Get an extended parameter record.
  *   ppd_get_group()       - Find or create the named group as needed.
  *   ppd_get_option()      - Find or create the named option as needed.
  *   ppd_read()            - Read a line from a PPD file, skipping comment
@@ -120,7 +121,10 @@ static void		ppd_fix(char *string);
 #endif /* !__APPLE__ */
 static void		ppd_free_group(ppd_group_t *group);
 static void		ppd_free_option(ppd_option_t *option);
-static ppd_ext_option_t	*ppd_get_extopt(ppd_file_t *ppd, const char *name);
+static ppd_ext_option_t	*ppd_get_extoption(ppd_file_t *ppd, const char *name);
+static ppd_ext_param_t	*ppd_get_extparam(ppd_ext_option_t *opt,
+			                  const char *param,
+					  const char *text);
 static ppd_group_t	*ppd_get_group(ppd_file_t *ppd, const char *name,
 			               const char *text);
 static ppd_option_t	*ppd_get_option(ppd_group_t *group, const char *name);
@@ -155,12 +159,14 @@ _ppd_attr_compare(ppd_attr_t **a,	/* I - First attribute */
 void
 ppdClose(ppd_file_t *ppd)		/* I - PPD file record */
 {
-  int		i;			/* Looping var */
-  ppd_emul_t	*emul;			/* Current emulation */
-  ppd_group_t	*group;			/* Current group */
-  char		**font;			/* Current font */
-  char		**filter;		/* Current filter */
-  ppd_attr_t	**attr;			/* Current attribute */
+  int			i, j;		/* Looping var */
+  ppd_emul_t		*emul;		/* Current emulation */
+  ppd_group_t		*group;		/* Current group */
+  char			**font;		/* Current font */
+  char			**filter;	/* Current filter */
+  ppd_attr_t		**attr;		/* Current attribute */
+  ppd_ext_option_t	**opt;		/* Current extended option */
+  ppd_ext_param_t	**param;	/* Current extended parameter */
 
 
  /*
@@ -271,6 +277,21 @@ ppdClose(ppd_file_t *ppd)		/* I - PPD file record */
     }
 
     ppd_free(ppd->attrs);
+  }
+
+  if (ppd->num_extended)
+  {
+    for (i = ppd->num_extended, opt = ppd->extended; i > 0; i --, opt ++)
+    {
+      ppd_free((*opt)->code);
+
+      for (j = (*opt)->num_params, param = (*opt)->params; j > 0; j --, param ++)
+        ppd_free((*param)->value);
+
+      ppd_free((*opt)->params);
+    }
+
+    ppd_free(ppd->extended);
   }
 
  /*
@@ -465,7 +486,7 @@ ppdOpen(FILE *fp)			/* I - File to read from */
   * Allocate memory for the PPD file record...
   */
 
-  if ((ppd = calloc(sizeof(ppd_file_t), 1)) == NULL)
+  if ((ppd = calloc(1, sizeof(ppd_file_t))) == NULL)
   {
     ppd_status = PPD_ALLOC_ERROR;
 
@@ -1146,7 +1167,7 @@ ppdOpen(FILE *fp)			/* I - File to read from */
 	}
 
       ppd->num_emulations = count;
-      ppd->emulations     = calloc(sizeof(ppd_emul_t), count);
+      ppd->emulations     = calloc(count, sizeof(ppd_emul_t));
 
       for (i = 0, sptr = string; i < count; i ++)
       {
@@ -1687,7 +1708,7 @@ ppdOpen(FILE *fp)			/* I - File to read from */
              strcmp(keyword, "NonUIConstraints") == 0)
     {
       if (ppd->num_consts == 0)
-	constraint = calloc(sizeof(ppd_const_t), 1);
+	constraint = calloc(1, sizeof(ppd_const_t));
       else
 	constraint = realloc(ppd->consts,
 	                     (ppd->num_consts + 1) * sizeof(ppd_const_t));
@@ -1879,6 +1900,7 @@ ppdOpen(FILE *fp)			/* I - File to read from */
       choice->code = string;
       string = NULL;			/* Don't free this string below */
     }
+#if 0
     else if (strcmp(keyword, "cupsUIType") == 0 &&
              (mask & (PPD_KEYWORD | PPD_STRING)) == (PPD_KEYWORD | PPD_STRING) &&
 	     option != NULL)
@@ -1887,7 +1909,7 @@ ppdOpen(FILE *fp)			/* I - File to read from */
       * Define an extended option value type...
       */
 
-      extopt = ppd_get_extopt(ppd, name);
+      extopt = ppd_get_extoption(ppd, name);
 
       if (strcmp(string, "Text") == 0)
         option->ui = PPD_UI_CUPS_TEXT;
@@ -1948,7 +1970,7 @@ ppdOpen(FILE *fp)			/* I - File to read from */
       * Define an extended option minimum value...
       */
 
-      extopt = ppd_get_extopt(ppd, name);
+      extopt = ppd_get_extoption(ppd, name);
 
       switch (option->ui)
       {
@@ -1994,7 +2016,7 @@ ppdOpen(FILE *fp)			/* I - File to read from */
       * Define an extended option minimum value...
       */
 
-      extopt = ppd_get_extopt(ppd, name);
+      extopt = ppd_get_extoption(ppd, name);
 
       switch (option->ui)
       {
@@ -2040,7 +2062,7 @@ ppdOpen(FILE *fp)			/* I - File to read from */
       * Define an extended option maximum value...
       */
 
-      extopt = ppd_get_extopt(ppd, name);
+      extopt = ppd_get_extoption(ppd, name);
 
       switch (option->ui)
       {
@@ -2086,11 +2108,12 @@ ppdOpen(FILE *fp)			/* I - File to read from */
       * Define an extended option command...
       */
 
-      extopt = ppd_get_extopt(ppd, name);
+      extopt = ppd_get_extoption(ppd, name);
 
       extopt->command = string;
       string = NULL;
     }
+#endif /* 0 */
     else if (strcmp(keyword, "OpenSubGroup") != 0 &&
              strcmp(keyword, "CloseSubGroup") != 0)
     {
@@ -2640,12 +2663,12 @@ ppd_free_option(ppd_option_t *option)	/* I - Option to free */
 
 
 /*
- * 'ppd_get_extopt()' - Get an extended option record.
+ * 'ppd_get_extoption()' - Get an extended option record.
  */
 
 static ppd_ext_option_t	*		/* O - Extended option... */
-ppd_get_extopt(ppd_file_t *ppd,		/* I - PPD file */
-               const char *name)	/* I - Name of option */
+ppd_get_extoption(ppd_file_t *ppd,	/* I - PPD file */
+                  const char *name)	/* I - Name of option */
 {
   ppd_ext_option_t	**temp,		/* New array pointer */
 			*extopt;	/* New extended option */
@@ -2662,7 +2685,7 @@ ppd_get_extopt(ppd_file_t *ppd,		/* I - PPD file */
   * Not found, so create the extended option record...
   */
 
-  if ((extopt = calloc(sizeof(ppd_ext_option_t), 1)) == NULL)
+  if ((extopt = calloc(1, sizeof(ppd_ext_option_t))) == NULL)
     return (NULL);
 
   strlcpy(extopt->keyword, name, sizeof(extopt->keyword));
@@ -2693,6 +2716,75 @@ ppd_get_extopt(ppd_file_t *ppd,		/* I - PPD file */
   */
 
   return (extopt);
+}
+
+
+/*
+ * 'ppd_get_extparam()' - Get an extended parameter record.
+ */
+
+static ppd_ext_param_t	*		/* O - Extended option... */
+ppd_get_extparam(ppd_ext_option_t *opt,	/* I - PPD file */
+                 const char      *param,/* I - Name of parameter */
+		 const char      *text)	/* I - Human-readable text */
+{
+  ppd_ext_param_t	**temp,		/* New array pointer */
+			*extparam;	/* New extended parameter */
+
+
+ /*
+  * See if the parameter already exists...
+  */
+
+  if ((extparam = ppdFindExtParam(opt, param)) != NULL)
+    return (extparam);
+
+ /*
+  * Not found, so create the extended parameter record...
+  */
+
+  if ((extparam = calloc(1, sizeof(ppd_ext_param_t))) == NULL)
+    return (NULL);
+
+  if ((extparam->value = calloc(4, sizeof(ppd_ext_value_t))) == NULL)
+  {
+    ppd_free(extparam);
+    return (NULL);
+  }
+
+  extparam->defval = extparam->value + 1;
+  extparam->minval = extparam->value + 2;
+  extparam->maxval = extparam->value + 3;
+
+  strlcpy(extparam->keyword, param, sizeof(extparam->keyword));
+  strlcpy(extparam->text, text, sizeof(extparam->text));
+
+ /*
+  * Add this record to the end of the array...
+  */
+
+  if (opt->num_params == 0)
+    temp = malloc(sizeof(ppd_ext_param_t *));
+  else
+    temp = realloc(opt->params, sizeof(ppd_ext_param_t *) *
+                                       (opt->num_params + 1));
+
+  if (temp == NULL)
+  {
+    free(extparam);
+    return (NULL);
+  }
+
+  opt->params           = temp;
+  temp[opt->num_params] = extparam;
+
+  opt->num_params ++;
+
+ /*
+  * Return the new record...
+  */
+
+  return (extparam);
 }
 
 
@@ -3251,5 +3343,5 @@ ppd_read(FILE *fp,			/* I - File to read from */
 
 
 /*
- * End of "$Id: ppd.c,v 1.51.2.49 2003/02/28 21:07:32 mike Exp $".
+ * End of "$Id: ppd.c,v 1.51.2.50 2003/04/10 03:01:48 mike Exp $".
  */

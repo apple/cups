@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.h,v 1.24.2.16 2003/03/13 05:45:29 mike Exp $"
+ * "$Id: ppd.h,v 1.24.2.17 2003/04/10 03:01:49 mike Exp $"
  *
  *   PostScript Printer Description definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -73,20 +73,11 @@ extern "C" {
  * Types and structures...
  */
 
-typedef enum			/**** UI types ****/
+typedef enum			/**** UI Types ****/
 {
   PPD_UI_BOOLEAN,		/* True or False option */
   PPD_UI_PICKONE,		/* Pick one from a list */
-  PPD_UI_PICKMANY,		/* Pick zero or more from a list */
-  /**** New in CUPS 1.2 ****/
-  PPD_UI_CUPS_TEXT,		/* Specify a string */
-  PPD_UI_CUPS_INTEGER,		/* Specify an integer number */
-  PPD_UI_CUPS_REAL,		/* Specify a real number */
-  PPD_UI_CUPS_GAMMA,		/* Specify a gamma number */
-  PPD_UI_CUPS_CURVE,		/* Specify start, end, and gamma numbers */
-  PPD_UI_CUPS_INTEGER_ARRAY,	/* Specify an array of integer numbers */
-  PPD_UI_CUPS_REAL_ARRAY,	/* Specify an array of real numbers */
-  PPD_UI_CUPS_XY_ARRAY		/* Specify an array of X/Y real numbers */
+  PPD_UI_PICKMANY		/* Pick zero or more from a list */
 } ppd_ui_t;
 
 typedef enum			/**** Order dependency sections ****/
@@ -187,49 +178,6 @@ typedef struct ppd_group_str	/**** Groups ****/
 				/* Sub-groups (max depth = 1) */
 } ppd_group_t;
 
-typedef union			/**** Extended Values ****/
-{
-  char		*text;		/* Text value */
-  int		integer;	/* Integer value */
-  float		real;		/* Real value */
-  float		gamma;		/* Gamma value */
-  /**** New in CUPS 1.2 ****/
-  struct
-  {
-    float	start,		/* Linear (density) start value for curve */
-		end,		/* Linear (density) end value for curve */
-		gamma;		/* Gamma correction */
-  }		curve;		/* Curve values */
-  struct
-  {
-    int		num_elements,	/* Number of array elements */
-		*elements;	/* Array of integer values */
-  }		integer_array;	/* Integer array value */
-  struct
-  {
-    int		num_elements;	/* Number of array elements */
-    float	*elements;	/* Array of real values */
-  }		real_array;	/* Real array value */
-  struct
-  {
-    int		num_elements;	/* Number of array elements */
-    float	*elements;	/* Array of XY values */
-  }		xy_array;	/* XY array value */
-} ppd_ext_value_t;
-
-/**** New in CUPS 1.2 ****/
-typedef struct			/**** Extended Options ****/
-{
-  char		keyword[PPD_MAX_NAME];
-				/* Name of option that is being extended... */
-  ppd_option_t	*option;	/* Option that is being extended... */
-  const char	*command;	/* Generic command for extended options */
-  ppd_ext_value_t value,	/* Current values */
-		defval,		/* Default values */
-		minval,		/* Minimum numeric values */
-		maxval;		/* Maximum numeric values */
-} ppd_ext_option_t;
-
 typedef struct			/**** Constraints ****/
 {
   char		option1[PPD_MAX_NAME],
@@ -273,6 +221,71 @@ typedef struct			/**** sRGB Color Profiles ****/
 		gamma,		/* Gamma correction to use */
 		matrix[3][3];	/* Transform matrix */
 } ppd_profile_t;
+
+/**** New in CUPS 1.1.19 ****/
+typedef enum			/**** Extended UI Types ****/
+{
+  PPD_UI_CUPS_TEXT,		/* Specify a string */
+  PPD_UI_CUPS_INTEGER,		/* Specify an integer number */
+  PPD_UI_CUPS_REAL,		/* Specify a real number */
+  PPD_UI_CUPS_GAMMA,		/* Specify a gamma number */
+  PPD_UI_CUPS_CURVE,		/* Specify start, end, and gamma numbers */
+  PPD_UI_CUPS_INTEGER_ARRAY,	/* Specify an array of integer numbers */
+  PPD_UI_CUPS_REAL_ARRAY,	/* Specify an array of real numbers */
+  PPD_UI_CUPS_XY_ARRAY		/* Specify an array of X/Y real numbers */
+} ppd_ext_ui_t;
+
+typedef union			/**** Extended Values ****/
+{
+  char		*text;		/* Text value */
+  int		integer;	/* Integer value */
+  float		real;		/* Real value */
+  float		gamma;		/* Gamma value */
+  struct
+  {
+    float	start,		/* Linear (density) start value for curve */
+		end,		/* Linear (density) end value for curve */
+		gamma;		/* Gamma correction */
+  }		curve;		/* Curve values */
+  struct
+  {
+    int		num_elements,	/* Number of array elements */
+		*elements;	/* Array of integer values */
+  }		integer_array;	/* Integer array value */
+  struct
+  {
+    int		num_elements;	/* Number of array elements */
+    float	*elements;	/* Array of real values */
+  }		real_array;	/* Real array value */
+  struct
+  {
+    int		num_elements;	/* Number of array elements */
+    float	*elements;	/* Array of XY values */
+  }		xy_array;	/* XY array value */
+} ppd_ext_value_t;
+
+typedef struct			/**** Extended Parameter ****/
+{
+  char		keyword[PPD_MAX_NAME],
+				/* Parameter name */
+		text[PPD_MAX_TEXT];
+				/* Human-readable text */
+  ppd_ext_value_t *value,	/* Current values */
+		*defval,	/* Default values */
+		*minval,	/* Minimum numeric values */
+		*maxval;	/* Maximum numeric values */
+} ppd_ext_param_t;
+
+typedef struct			/**** Extended Options ****/
+{
+  char		keyword[PPD_MAX_NAME];
+				/* Name of option that is being extended... */
+  ppd_option_t	*option;	/* Option that is being extended... */
+  int		marked;		/* Extended option is marked */
+  char		*code;		/* Generic PS code for extended options */
+  int		num_params;	/* Number of parameters */
+  ppd_ext_param_t **params;	/* Parameters */
+} ppd_ext_option_t;
 
 typedef struct			/**** Files ****/
 {
@@ -325,8 +338,6 @@ typedef struct			/**** Files ****/
   int		num_attrs,	/* Number of attributes */
 		cur_attr;	/* Current attribute */
   ppd_attr_t	**attrs;	/* Attributes */
-
-  /**** New in CUPS 1.2 ****/
   int		num_extended;	/* Number of extended options */
   ppd_ext_option_t **extended;	/* Extended options */
 } ppd_file_t;
@@ -368,25 +379,30 @@ extern ppd_attr_t	*ppdFindAttr(ppd_file_t *ppd, const char *name,
 extern ppd_attr_t	*ppdFindNextAttr(ppd_file_t *ppd, const char *name,
 			                 const char *spec);
 extern ppd_status_t	ppdLastError(int *line);
+extern ppd_ext_option_t	*ppdFindExtOption(ppd_file_t *ppd, const char *keyword);
+extern ppd_ext_param_t	*ppdFindExtParam(ppd_ext_option_t *opt, const char *param);
+extern int		ppdMarkCurve(ppd_file_t *ppd, const char *keyword,
+			             const char *param, float low, float high,
+				     float gvalue);
+extern int		ppdMarkGamma(ppd_file_t *ppd, const char *keyword,
+			             const char *param, float gvalue);
+extern int		ppdMarkInteger(ppd_file_t *ppd, const char *keyword,
+			               const char *param, int value);
+extern int		ppdMarkIntegerArray(ppd_file_t *ppd, const char *keyword,
+			                    const char *param, int num_values,
+					    const int *values);
+extern int		ppdMarkReal(ppd_file_t *ppd, const char *keyword,
+			            const char *param, float value);
+extern int		ppdMarkRealArray(ppd_file_t *ppd, const char *keyword,
+			                 const char *param, int num_values,
+					 const float *values);
+extern int		ppdMarkText(ppd_file_t *ppd, const char *keyword,
+			            const char *param, const char *value);
+extern int		ppdMarkXYArray(ppd_file_t *ppd, const char *keyword,
+			               const char *param, int num_values,
+				       const float *values);
 
 /**** New in CUPS 1.2 ****/
-extern ppd_ext_option_t	*ppdFindExtOption(ppd_file_t *ppd, const char *keyword);
-extern int		ppdMarkCurve(ppd_file_t *ppd, const char *keyword,
-			             float low, float high, float gvalue);
-extern int		ppdMarkGamma(ppd_file_t *ppd, const char *keyword,
-			             float gvalue);
-extern int		ppdMarkInteger(ppd_file_t *ppd, const char *keyword,
-			               int value);
-extern int		ppdMarkIntegerArray(ppd_file_t *ppd, const char *keyword,
-			                    int num_values, const int *values);
-extern int		ppdMarkReal(ppd_file_t *ppd, const char *keyword,
-			            float value);
-extern int		ppdMarkRealArray(ppd_file_t *ppd, const char *keyword,
-			                 int num_values, const float *values);
-extern int		ppdMarkText(ppd_file_t *ppd, const char *keyword,
-			            const char *value);
-extern int		ppdMarkXYArray(ppd_file_t *ppd, const char *keyword,
-			               int num_values, const float *values);
 extern int		ppdSave(ppd_file_t *ppd, FILE *fp);
 extern int		ppdSaveFd(ppd_file_t *ppd, int fd);
 extern int		ppdSaveFile(ppd_file_t *ppd, const char *filename);
@@ -402,5 +418,5 @@ extern int		ppdSaveFile(ppd_file_t *ppd, const char *filename);
 #endif /* !_CUPS_PPD_H_ */
 
 /*
- * End of "$Id: ppd.h,v 1.24.2.16 2003/03/13 05:45:29 mike Exp $".
+ * End of "$Id: ppd.h,v 1.24.2.17 2003/04/10 03:01:49 mike Exp $".
  */

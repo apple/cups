@@ -1,5 +1,5 @@
 /*
- * "$Id: extended.c,v 1.1.2.3 2003/01/07 18:26:24 mike Exp $"
+ * "$Id: extended.c,v 1.1.2.4 2003/04/10 03:01:48 mike Exp $"
  *
  *   Extended option routines for the Common UNIX Printing System (CUPS).
  *
@@ -57,12 +57,12 @@ static void	ppd_unmark_choices(ppd_option_t *option);
  * 'ppdFindExtOption()' - Return a pointer to the extended option.
  */
 
-ppd_ext_option_t *				/* O - Pointer to option or NULL */
-ppdFindExtOption(ppd_file_t *ppd,		/* I - PPD file data */
-                 const char *option)		/* I - Option/Keyword name */
+ppd_ext_option_t *			/* O - Pointer to option or NULL */
+ppdFindExtOption(ppd_file_t *ppd,	/* I - PPD file data */
+                 const char *option)	/* I - Option/Keyword name */
 {
-  int			i;			/* Looping var */
-  ppd_ext_option_t	**o;			/* Pointer to option */
+  int			i;		/* Looping var */
+  ppd_ext_option_t	**o;		/* Pointer to option */
 
 
   if (ppd == NULL || option == NULL)
@@ -77,20 +77,48 @@ ppdFindExtOption(ppd_file_t *ppd,		/* I - PPD file data */
 
 
 /*
+ * 'ppdFindExtParam()' - Find an extended parameter.
+ */
+
+ppd_ext_param_t *			/* O - Parameter or NULL */
+ppdFindExtParam(ppd_ext_option_t *opt,	/* I - Option */
+                const char       *param)/* I - Parameter name */
+{
+  int			i;		/* Looping var */
+  ppd_ext_param_t	**p;		/* Pointer to parameter */
+
+
+  if (opt == NULL || param == NULL)
+    return (NULL);
+
+  for (i = opt->num_params, p = opt->params; i > 0; i --, p ++)
+    if (strcasecmp(p[0]->keyword, param) == 0)
+      return (*p);
+
+  return (NULL);
+}
+
+
+/*
  * 'ppdMarkCurve()' - Mark an extended curve option.
  */
 
-int						/* O - Number of conflicts */
-ppdMarkCurve(ppd_file_t *ppd,			/* I - PPD file */
-             const char *keyword,		/* I - Option name */
-             float      low,			/* I - Lower (start) value */
-	     float      high,			/* I - Upper (end) value */
-	     float      gvalue)			/* I - Gamma value for range */
+int					/* O - Number of conflicts */
+ppdMarkCurve(ppd_file_t *ppd,		/* I - PPD file */
+             const char *keyword,	/* I - Option name */
+             const char *param,		/* I - Parameter name */
+             float      low,		/* I - Lower (start) value */
+	     float      high,		/* I - Upper (end) value */
+	     float      gvalue)		/* I - Gamma value for range */
 {
-  ppd_ext_option_t	*o;			/* Extended option */
+  ppd_ext_option_t	*o;		/* Extended option */
+  ppd_ext_param_t	*p;		/* Extended parameter */
 
 
   if ((o = ppdFindExtOption(ppd, keyword)) == NULL)
+    return (-1);
+
+  if ((p = ppdFindExtParam(o, param)) == NULL)
     return (-1);
 
   ppd_unmark_choices(o->option);
@@ -103,15 +131,20 @@ ppdMarkCurve(ppd_file_t *ppd,			/* I - PPD file */
  * 'ppdMarkGamma()' - Mark an extended gamma option.
  */
 
-int						/* O - Number of conflicts */
-ppdMarkGamma(ppd_file_t *ppd,			/* I - PPD file */
-             const char *keyword,		/* I - Option name */
-             float      gvalue)			/* I - Gamma value */
+int					/* O - Number of conflicts */
+ppdMarkGamma(ppd_file_t *ppd,		/* I - PPD file */
+             const char *keyword,	/* I - Option name */
+             const char *param,		/* I - Parameter name */
+             float      gvalue)		/* I - Gamma value */
 {
-  ppd_ext_option_t	*o;			/* Extended option */
+  ppd_ext_option_t	*o;		/* Extended option */
+  ppd_ext_param_t	*p;		/* Extended parameter */
 
 
   if ((o = ppdFindExtOption(ppd, keyword)) == NULL)
+    return (-1);
+
+  if ((p = ppdFindExtParam(o, param)) == NULL)
     return (-1);
 
   ppd_unmark_choices(o->option);
@@ -124,15 +157,20 @@ ppdMarkGamma(ppd_file_t *ppd,			/* I - PPD file */
  * 'ppdMarkInteger()' - Mark an extended integer option.
  */
 
-int						/* O - Number of conflicts */
-ppdMarkInteger(ppd_file_t *ppd,			/* I - PPD file */
-               const char *keyword,		/* I - Option name */
-               int        value)		/* I - Option value */
+int					/* O - Number of conflicts */
+ppdMarkInteger(ppd_file_t *ppd,		/* I - PPD file */
+               const char *keyword,	/* I - Option name */
+               const char *param,	/* I - Parameter name */
+               int        value)	/* I - Option value */
 {
-  ppd_ext_option_t	*o;			/* Extended option */
+  ppd_ext_option_t	*o;		/* Extended option */
+  ppd_ext_param_t	*p;		/* Extended parameter */
 
 
   if ((o = ppdFindExtOption(ppd, keyword)) == NULL)
+    return (-1);
+
+  if ((p = ppdFindExtParam(o, param)) == NULL)
     return (-1);
 
   ppd_unmark_choices(o->option);
@@ -145,16 +183,22 @@ ppdMarkInteger(ppd_file_t *ppd,			/* I - PPD file */
  * 'ppdMarkIntegerArray()' - Mark an extended integer array option.
  */
 
-int						/* O - Number of conflicts */
-ppdMarkIntegerArray(ppd_file_t *ppd,		/* I - PPD file */
-                    const char *keyword,	/* I - Option name */
-                    int        num_values,	/* I - Number of values */
-		    const int  *values)		/* I - Values */
+int					/* O - Number of conflicts */
+ppdMarkIntegerArray(ppd_file_t *ppd,	/* I - PPD file */
+                    const char *keyword,/* I - Option name */
+	            const char *param,	/* I - Parameter name */
+                    int        num_values,
+		    			/* I - Number of values */
+		    const int  *values)	/* I - Values */
 {
-  ppd_ext_option_t	*o;			/* Extended option */
+  ppd_ext_option_t	*o;		/* Extended option */
+  ppd_ext_param_t	*p;		/* Extended parameter */
 
 
   if ((o = ppdFindExtOption(ppd, keyword)) == NULL)
+    return (-1);
+
+  if ((p = ppdFindExtParam(o, param)) == NULL)
     return (-1);
 
   ppd_unmark_choices(o->option);
@@ -167,15 +211,20 @@ ppdMarkIntegerArray(ppd_file_t *ppd,		/* I - PPD file */
  * 'ppdMarkReal()' - Mark an extended real option.
  */
 
-int						/* O - Number of conflicts */
-ppdMarkReal(ppd_file_t *ppd,			/* I - PPD file */
-            const char *keyword,		/* I - Option name */
-            float      value)			/* I - Option value */
+int					/* O - Number of conflicts */
+ppdMarkReal(ppd_file_t *ppd,		/* I - PPD file */
+            const char *keyword,	/* I - Option name */
+            const char *param,		/* I - Parameter name */
+            float      value)		/* I - Option value */
 {
-  ppd_ext_option_t	*o;			/* Extended option */
+  ppd_ext_option_t	*o;		/* Extended option */
+  ppd_ext_param_t	*p;		/* Extended parameter */
 
 
   if ((o = ppdFindExtOption(ppd, keyword)) == NULL)
+    return (-1);
+
+  if ((p = ppdFindExtParam(o, param)) == NULL)
     return (-1);
 
   ppd_unmark_choices(o->option);
@@ -188,16 +237,21 @@ ppdMarkReal(ppd_file_t *ppd,			/* I - PPD file */
  * 'ppdMarkRealArray()' - Mark an extended real array option.
  */
 
-int						/* O - Number of conflicts */
-ppdMarkRealArray(ppd_file_t  *ppd,		/* I - PPD file */
-                 const char  *keyword,		/* I - Option name */
-                 int         num_values,	/* I - Number of values */
-		 const float *values)		/* I - Values */
+int					/* O - Number of conflicts */
+ppdMarkRealArray(ppd_file_t  *ppd,	/* I - PPD file */
+                 const char  *keyword,	/* I - Option name */
+                 const char  *param,	/* I - Parameter name */
+                 int         num_values,/* I - Number of values */
+		 const float *values)	/* I - Values */
 {
-  ppd_ext_option_t	*o;			/* Extended option */
+  ppd_ext_option_t	*o;		/* Extended option */
+  ppd_ext_param_t	*p;		/* Extended parameter */
 
 
   if ((o = ppdFindExtOption(ppd, keyword)) == NULL)
+    return (-1);
+
+  if ((p = ppdFindExtParam(o, param)) == NULL)
     return (-1);
 
   ppd_unmark_choices(o->option);
@@ -210,15 +264,20 @@ ppdMarkRealArray(ppd_file_t  *ppd,		/* I - PPD file */
  * 'ppdMarkText()' - Mark an extended text option.
  */
 
-int						/* O - Number of conflicts */
-ppdMarkText(ppd_file_t *ppd,			/* I - PPD file */
-            const char *keyword,		/* I - Option name */
-            const char *value)			/* I - Option value */
+int					/* O - Number of conflicts */
+ppdMarkText(ppd_file_t *ppd,		/* I - PPD file */
+            const char *keyword,	/* I - Option name */
+            const char *param,		/* I - Parameter name */
+            const char *value)		/* I - Option value */
 {
-  ppd_ext_option_t	*o;			/* Extended option */
+  ppd_ext_option_t	*o;		/* Extended option */
+  ppd_ext_param_t	*p;		/* Extended parameter */
 
 
   if ((o = ppdFindExtOption(ppd, keyword)) == NULL)
+    return (-1);
+
+  if ((p = ppdFindExtParam(o, param)) == NULL)
     return (-1);
 
   ppd_unmark_choices(o->option);
@@ -232,10 +291,10 @@ ppdMarkText(ppd_file_t *ppd,			/* I - PPD file */
  */
 
 static void
-ppd_unmark_choices(ppd_option_t *option)	/* I - Option choice */
+ppd_unmark_choices(ppd_option_t *option)/* I - Option choice */
 {
-  int		i;				/* Looping var */
-  ppd_choice_t	*c;				/* Current choice */
+  int		i;			/* Looping var */
+  ppd_choice_t	*c;			/* Current choice */
 
 
   for (i = option->num_choices, c = option->choices; i > 0; i --, c++)
@@ -244,5 +303,5 @@ ppd_unmark_choices(ppd_option_t *option)	/* I - Option choice */
 
 
 /*
- * End of "$Id: extended.c,v 1.1.2.3 2003/01/07 18:26:24 mike Exp $".
+ * End of "$Id: extended.c,v 1.1.2.4 2003/04/10 03:01:48 mike Exp $".
  */
