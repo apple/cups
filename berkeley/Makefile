@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.1 1999/05/13 20:39:58 mike Exp $"
+# "$Id: Makefile,v 1.2 1999/06/09 20:03:46 mike Exp $"
 #
 #   Berkeley commands makefile for the Common UNIX Printing System (CUPS).
 #
@@ -24,8 +24,8 @@
 
 include ../Makedefs
 
-TARGETS	=	lpc lpr lprm
-OBJS	=	lpc.o lpr.o lprm.o
+TARGETS	=	lpc lpq lpr lprm
+OBJS	=	lpc.o lpq.o lpr.o lprm.o
 
 #
 # Make all targets...
@@ -60,6 +60,15 @@ lpc:	lpc.o ../cups/libcups.a
 lpc.o:	../cups/cups.h ../Makedefs
 
 #
+# lpq
+#
+
+lpq:	lpq.o ../cups/libcups.a
+	$(CC) $(LDFLAGS) -o lpq lpq.o $(LIBS)
+
+lpq.o:	../cups/cups.h ../Makedefs
+
+#
 # lpr
 #
 
@@ -78,5 +87,5 @@ lprm:	lprm.o ../cups/libcups.a
 lprm.o:	../cups/cups.h ../Makedefs
 
 #
-# End of "$Id: Makefile,v 1.1 1999/05/13 20:39:58 mike Exp $".
+# End of "$Id: Makefile,v 1.2 1999/06/09 20:03:46 mike Exp $".
 #

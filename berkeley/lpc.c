@@ -1,5 +1,5 @@
 /*
- * "$Id: lpc.c,v 1.1 1999/05/13 20:39:59 mike Exp $"
+ * "$Id: lpc.c,v 1.2 1999/06/09 20:03:47 mike Exp $"
  *
  *   "lpc" command for the Common UNIX Printing System (CUPS).
  *
@@ -225,7 +225,7 @@ show_status(http_t *http,	/* I - HTTP connection to server */
 				/* Printer URI */
 
 
-  DEBUG_printf(("show_printers(%08x, %08x)\n", http, dests));
+  DEBUG_printf(("show_status(%08x, %08x)\n", http, dests));
 
   if (http == NULL)
     return;
@@ -257,7 +257,7 @@ show_status(http_t *http,	/* I - HTTP connection to server */
 
   if ((response = cupsDoRequest(http, request, "/printers/")) != NULL)
   {
-    DEBUG_puts("show_printers: request succeeded...");
+    DEBUG_puts("show_status: request succeeded...");
 
    /*
     * Loop through the printers returned in the list and display
@@ -397,15 +397,15 @@ show_status(http_t *http,	/* I - HTTP connection to server */
 
 	  language = cupsLangDefault();
 
-	  attr = ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-                	      "attributes-charset", NULL,
-			      cupsLangEncoding(language));
+	  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
+                       "attributes-charset", NULL,
+		       cupsLangEncoding(language));
 
-	  attr = ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
-                	      "attributes-natural-language", NULL,
-			      language->language);
+	  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
+                       "attributes-natural-language", NULL,
+		       language->language);
 
-          sprintf(printer_uri, "http://localhost/printers/%s", printer);
+          sprintf(printer_uri, "ipp://localhost/printers/%s", printer);
 	  attr = ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI,
 	                      "printer-uri", NULL, printer_uri);
 
@@ -448,5 +448,5 @@ show_status(http_t *http,	/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpc.c,v 1.1 1999/05/13 20:39:59 mike Exp $".
+ * End of "$Id: lpc.c,v 1.2 1999/06/09 20:03:47 mike Exp $".
  */
