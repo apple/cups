@@ -1,5 +1,5 @@
 /*
- * "$Id: cups-polld.c,v 1.6 2001/05/06 00:11:25 mike Exp $"
+ * "$Id: cups-polld.c,v 1.7 2001/06/11 20:11:43 mike Exp $"
  *
  *   Polling daemon for the Common UNIX Printing System (CUPS).
  *
@@ -118,11 +118,8 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   for (;;)
   {
-    if (poll_server(http, language, CUPS_GET_PRINTERS, sock, port))
-      continue;
-
-    if (poll_server(http, language, CUPS_GET_CLASSES, sock, port))
-      continue;
+    if (!poll_server(http, language, CUPS_GET_PRINTERS, sock, port))
+      poll_server(http, language, CUPS_GET_CLASSES, sock, port);
 
     sleep(interval);
   }
@@ -305,5 +302,5 @@ poll_server(http_t      *http,		/* I - HTTP connection */
 
 
 /*
- * End of "$Id: cups-polld.c,v 1.6 2001/05/06 00:11:25 mike Exp $".
+ * End of "$Id: cups-polld.c,v 1.7 2001/06/11 20:11:43 mike Exp $".
  */

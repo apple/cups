@@ -84,6 +84,9 @@ CHANGES IN CUPS V1.1.9
 	- Updated the PJL detection rules to allow the universal
 	  escape to occur anywhere in the first 128 bytes of the
 	  file.
+	- The cups-polld program would poll servers continuously
+	  with no delay if there was an error contacting the
+	  server.
 
 
 CHANGES IN CUPS V1.1.8
