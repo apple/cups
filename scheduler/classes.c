@@ -1,5 +1,5 @@
 /*
- * "$Id: classes.c,v 1.10 1999/06/25 17:37:40 mike Exp $"
+ * "$Id: classes.c,v 1.11 1999/07/08 17:42:03 mike Exp $"
  *
  *   Printer class routines for the Common UNIX Printing System (CUPS).
  *
@@ -508,7 +508,7 @@ SaveAllClasses(void)
       fputs("State Idle\n", fp);
 
     for (i = 0; i < pclass->num_printers; i ++)
-      fprintf(fp, "Printer %s\n", pclass->name);
+      fprintf(fp, "Printer %s\n", pclass->printers[i]->name);
 
     fputs("</Class>\n", fp);
   }
@@ -518,5 +518,5 @@ SaveAllClasses(void)
 
 
 /*
- * End of "$Id: classes.c,v 1.10 1999/06/25 17:37:40 mike Exp $".
+ * End of "$Id: classes.c,v 1.11 1999/07/08 17:42:03 mike Exp $".
  */
