@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.46 2000/01/27 02:25:45 mike Exp $"
+ * "$Id: ipp.c,v 1.47 2000/01/27 03:38:35 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -143,7 +143,7 @@ ProcessIPPRequest(client_t *con)	/* I - Client connection */
 	* Out of order; return an error...
 	*/
 
-	LogMessage(LOG_ERROR, "ProcessIPPRequest: attribute groups are out of order!");
+	LogMessage(L_ERROR, "ProcessIPPRequest: attribute groups are out of order!");
 	send_ipp_error(con, IPP_BAD_REQUEST);
 	break;
       }
@@ -201,13 +201,13 @@ ProcessIPPRequest(client_t *con)	/* I - Client connection */
 	*/
 
         if (charset == NULL)
-	  LogMessage(LOG_ERROR, "ProcessIPPRequest: missing attributes-charset attribute!");
+	  LogMessage(L_ERROR, "ProcessIPPRequest: missing attributes-charset attribute!");
 
         if (language == NULL)
-	  LogMessage(LOG_ERROR, "ProcessIPPRequest: missing attributes-natural-language attribute!");
+	  LogMessage(L_ERROR, "ProcessIPPRequest: missing attributes-natural-language attribute!");
 
         if (uri == NULL)
-	  LogMessage(LOG_ERROR, "ProcessIPPRequest: missing printer-uri or job-uri attribute!");
+	  LogMessage(L_ERROR, "ProcessIPPRequest: missing printer-uri or job-uri attribute!");
 
 	send_ipp_error(con, IPP_BAD_REQUEST);
       }
@@ -368,7 +368,7 @@ accept_jobs(client_t        *con,	/* I - Client connection */
 
   if (strncmp(con->uri, "/admin/", 7) != 0)
   {
-    LogMessage(LOG_ERROR, "accept_jobs: admin request on bad resource \'%s\'!",
+    LogMessage(L_ERROR, "accept_jobs: admin request on bad resource \'%s\'!",
                con->uri);
     send_ipp_error(con, IPP_NOT_AUTHORIZED);
     return;
@@ -386,7 +386,7 @@ accept_jobs(client_t        *con,	/* I - Client connection */
     * Bad URI...
     */
 
-    LogMessage(LOG_ERROR, "accept_jobs: resource name \'%s\' no good!", resource);
+    LogMessage(L_ERROR, "accept_jobs: resource name \'%s\' no good!", resource);
     send_ipp_error(con, IPP_NOT_FOUND);
     return;
   }
@@ -404,7 +404,7 @@ accept_jobs(client_t        *con,	/* I - Client connection */
   else
     SaveAllPrinters();
 
-  LogMessage(LOG_INFO, "Printer \'%s\' now accepting jobs (\'%s\').", name,
+  LogMessage(L_INFO, "Printer \'%s\' now accepting jobs (\'%s\').", name,
              con->username);
 
  /*
@@ -445,7 +445,7 @@ add_class(client_t        *con,		/* I - Client connection */
 
   if (strncmp(con->uri, "/admin/", 7) != 0)
   {
-    LogMessage(LOG_ERROR, "add_class: admin request on bad resource \'%s\'!",
+    LogMessage(L_ERROR, "add_class: admin request on bad resource \'%s\'!",
                con->uri);
     send_ipp_error(con, IPP_NOT_AUTHORIZED);
     return;
@@ -521,14 +521,14 @@ add_class(client_t        *con,		/* I - Client connection */
 
   if ((attr = ippFindAttribute(con->request, "printer-is-accepting-jobs", IPP_TAG_BOOLEAN)) != NULL)
   {
-    LogMessage(LOG_INFO, "Setting %s printer-is-accepting-jobs to %d (was %d.)",
+    LogMessage(L_INFO, "Setting %s printer-is-accepting-jobs to %d (was %d.)",
                pclass->name, attr->values[0].boolean, pclass->accepting);
 
     pclass->accepting = attr->values[0].boolean;
   }
   if ((attr = ippFindAttribute(con->request, "printer-state", IPP_TAG_ENUM)) != NULL)
   {
-    LogMessage(LOG_INFO, "Setting %s printer-state to %d (was %d.)", pclass->name,
+    LogMessage(L_INFO, "Setting %s printer-state to %d (was %d.)", pclass->name,
                attr->values[0].integer, pclass->state);
 
     if (pclass->state == IPP_PRINTER_STOPPED &&
@@ -583,7 +583,7 @@ add_class(client_t        *con,		/* I - Client connection */
 	* Bad URI...
 	*/
 
-        LogMessage(LOG_ERROR, "add_class: resource name \'%s\' no good!", resource);
+        LogMessage(L_ERROR, "add_class: resource name \'%s\' no good!", resource);
 	send_ipp_error(con, IPP_NOT_FOUND);
 	return;
       }
@@ -607,7 +607,7 @@ add_class(client_t        *con,		/* I - Client connection */
   SaveAllClasses();
   CheckJobs();
 
-  LogMessage(LOG_INFO, "New class \'%s\' added by \'%s\'.", pclass->name,
+  LogMessage(L_INFO, "New class \'%s\' added by \'%s\'.", pclass->name,
              con->username);
 
   con->response->request.status.status_code = IPP_OK;
@@ -644,7 +644,7 @@ add_printer(client_t        *con,	/* I - Client connection */
 
   if (strncmp(con->uri, "/admin/", 7) != 0)
   {
-    LogMessage(LOG_ERROR, "add_printer: admin request on bad resource \'%s\'!",
+    LogMessage(L_ERROR, "add_printer: admin request on bad resource \'%s\'!",
                con->uri);
     send_ipp_error(con, IPP_NOT_AUTHORIZED);
     return;
@@ -720,7 +720,7 @@ add_printer(client_t        *con,	/* I - Client connection */
 
   if ((attr = ippFindAttribute(con->request, "device-uri", IPP_TAG_URI)) != NULL)
   {
-    LogMessage(LOG_INFO, "Setting %s device-uri to \"%s\" (was \"%s\".)",
+    LogMessage(L_INFO, "Setting %s device-uri to \"%s\" (was \"%s\".)",
                printer->name, attr->values[0].string.text, printer->device_uri);
 
     strncpy(printer->device_uri, attr->values[0].string.text,
@@ -730,14 +730,14 @@ add_printer(client_t        *con,	/* I - Client connection */
 
   if ((attr = ippFindAttribute(con->request, "printer-is-accepting-jobs", IPP_TAG_BOOLEAN)) != NULL)
   {
-    LogMessage(LOG_INFO, "Setting %s printer-is-accepting-jobs to %d (was %d.)",
+    LogMessage(L_INFO, "Setting %s printer-is-accepting-jobs to %d (was %d.)",
                printer->name, attr->values[0].boolean, printer->accepting);
 
     printer->accepting = attr->values[0].boolean;
   }
   if ((attr = ippFindAttribute(con->request, "printer-state", IPP_TAG_ENUM)) != NULL)
   {
-    LogMessage(LOG_INFO, "Setting %s printer-state to %d (was %d.)", printer->name,
+    LogMessage(L_INFO, "Setting %s printer-state to %d (was %d.)", printer->name,
                attr->values[0].integer, printer->state);
 
     if (printer->state == IPP_PRINTER_STOPPED &&
@@ -807,7 +807,7 @@ add_printer(client_t        *con,	/* I - Client connection */
 
       if (copy_file(con->filename, filename))
       {
-        LogMessage(LOG_ERROR, "add_printer: Unable to copy interface script - %s!",
+        LogMessage(L_ERROR, "add_printer: Unable to copy interface script - %s!",
 	           strerror(errno));
         send_ipp_error(con, IPP_INTERNAL_ERROR);
 	return;
@@ -827,7 +827,7 @@ add_printer(client_t        *con,	/* I - Client connection */
 
       if (copy_file(con->filename, filename))
       {
-        LogMessage(LOG_ERROR, "add_printer: Unable to copy PPD file - %s!",
+        LogMessage(L_ERROR, "add_printer: Unable to copy PPD file - %s!",
 	           strerror(errno));
         send_ipp_error(con, IPP_INTERNAL_ERROR);
 	return;
@@ -871,7 +871,7 @@ add_printer(client_t        *con,	/* I - Client connection */
 
   CheckJobs();
 
-  LogMessage(LOG_INFO, "New printer \'%s\' added by \'%s\'.", printer->name,
+  LogMessage(L_INFO, "New printer \'%s\' added by \'%s\'.", printer->name,
              con->username);
 
   con->response->request.status.status_code = IPP_OK;
@@ -908,7 +908,7 @@ cancel_all_jobs(client_t        *con,	/* I - Client connection */
 
   if (strncmp(con->uri, "/admin/", 7) != 0)
   {
-    LogMessage(LOG_ERROR, "cancel_all_jobs: admin request on bad resource \'%s\'!",
+    LogMessage(L_ERROR, "cancel_all_jobs: admin request on bad resource \'%s\'!",
                con->uri);
     send_ipp_error(con, IPP_NOT_AUTHORIZED);
     return;
@@ -920,7 +920,7 @@ cancel_all_jobs(client_t        *con,	/* I - Client connection */
 
   if (strcmp(uri->name, "printer-uri") != 0)
   {
-    LogMessage(LOG_ERROR, "cancel_all_jobs: bad %s attribute \'%s\'!",
+    LogMessage(L_ERROR, "cancel_all_jobs: bad %s attribute \'%s\'!",
                uri->name, uri->values[0].string.text);
     send_ipp_error(con, IPP_BAD_REQUEST);
     return;
@@ -939,7 +939,7 @@ cancel_all_jobs(client_t        *con,	/* I - Client connection */
     * Bad URI...
     */
 
-    LogMessage(LOG_ERROR, "cancel_all_jobs: resource name \'%s\' no good!", resource);
+    LogMessage(L_ERROR, "cancel_all_jobs: resource name \'%s\' no good!", resource);
     send_ipp_error(con, IPP_NOT_FOUND);
     return;
   }
@@ -949,7 +949,7 @@ cancel_all_jobs(client_t        *con,	/* I - Client connection */
   */
 
   CancelJobs(dest);
-  LogMessage(LOG_INFO, "All jobs on \'%s\' were cancelled by \'%s\'.", dest,
+  LogMessage(L_INFO, "All jobs on \'%s\' were cancelled by \'%s\'.", dest,
              con->username);
 
   con->response->request.status.status_code = IPP_OK;
@@ -991,7 +991,7 @@ cancel_job(client_t        *con,	/* I - Client connection */
       strncmp(con->uri, "/jobs/", 5) != 0 &&
       strncmp(con->uri, "/printers/", 10) != 0)
   {
-    LogMessage(LOG_ERROR, "cancel_job: cancel request on bad resource \'%s\'!",
+    LogMessage(L_ERROR, "cancel_job: cancel request on bad resource \'%s\'!",
                con->uri);
     send_ipp_error(con, IPP_NOT_AUTHORIZED);
     return;
@@ -1009,7 +1009,7 @@ cancel_job(client_t        *con,	/* I - Client connection */
 
     if ((attr = ippFindAttribute(con->request, "job-id", IPP_TAG_INTEGER)) == NULL)
     {
-      LogMessage(LOG_ERROR, "cancel_job: got a printer-uri attribute but no job-id!");
+      LogMessage(L_ERROR, "cancel_job: got a printer-uri attribute but no job-id!");
       send_ipp_error(con, IPP_BAD_REQUEST);
       return;
     }
@@ -1030,7 +1030,7 @@ cancel_job(client_t        *con,	/* I - Client connection */
       * Not a valid URI!
       */
 
-      LogMessage(LOG_ERROR, "cancel_job: bad job-uri attribute \'%s\'!",
+      LogMessage(L_ERROR, "cancel_job: bad job-uri attribute \'%s\'!",
                  uri->values[0].string.text);
       send_ipp_error(con, IPP_BAD_REQUEST);
       return;
@@ -1049,7 +1049,7 @@ cancel_job(client_t        *con,	/* I - Client connection */
     * Nope - return a "not found" error...
     */
 
-    LogMessage(LOG_ERROR, "cancel_job: job #%d doesn't exist!", jobid);
+    LogMessage(L_ERROR, "cancel_job: job #%d doesn't exist!", jobid);
     send_ipp_error(con, IPP_NOT_FOUND);
     return;
   }
@@ -1094,7 +1094,7 @@ cancel_job(client_t        *con,	/* I - Client connection */
       * system group...
       */
 
-      LogMessage(LOG_ERROR, "cancel_job: \"%s\" not authorized to delete job id %d owned by \"%s\"!",
+      LogMessage(L_ERROR, "cancel_job: \"%s\" not authorized to delete job id %d owned by \"%s\"!",
         	 username, jobid, job->username);
       send_ipp_error(con, IPP_FORBIDDEN);
       return;
@@ -1108,7 +1108,7 @@ cancel_job(client_t        *con,	/* I - Client connection */
   CancelJob(jobid);
   CheckJobs();
 
-  LogMessage(LOG_INFO, "Job %d was cancelled by \'%s\'.", jobid,
+  LogMessage(L_INFO, "Job %d was cancelled by \'%s\'.", jobid,
              con->username[0] ? con->username : "unknown");
 
   con->response->request.status.status_code = IPP_OK;
@@ -1286,7 +1286,7 @@ create_job(client_t        *con,	/* I - Client connection */
   if (strncmp(con->uri, "/classes/", 9) != 0 &&
       strncmp(con->uri, "/printers/", 10) != 0)
   {
-    LogMessage(LOG_ERROR, "create_job: cancel request on bad resource \'%s\'!",
+    LogMessage(L_ERROR, "create_job: cancel request on bad resource \'%s\'!",
                con->uri);
     send_ipp_error(con, IPP_NOT_AUTHORIZED);
     return;
@@ -1304,7 +1304,7 @@ create_job(client_t        *con,	/* I - Client connection */
     * Bad URI...
     */
 
-    LogMessage(LOG_ERROR, "create_job: resource name \'%s\' no good!", resource);
+    LogMessage(L_ERROR, "create_job: resource name \'%s\' no good!", resource);
     send_ipp_error(con, IPP_NOT_FOUND);
     return;
   }
@@ -1329,7 +1329,7 @@ create_job(client_t        *con,	/* I - Client connection */
 
   if (!printer->accepting)
   {
-    LogMessage(LOG_INFO, "create_job: destination \'%s\' is not accepting jobs.",
+    LogMessage(L_INFO, "create_job: destination \'%s\' is not accepting jobs.",
                dest);
     send_ipp_error(con, IPP_NOT_ACCEPTING);
     return;
@@ -1353,7 +1353,7 @@ create_job(client_t        *con,	/* I - Client connection */
 
   if ((job = AddJob(priority, printer->name)) == NULL)
   {
-    LogMessage(LOG_ERROR, "create_job: unable to add job for destination \'%s\'!",
+    LogMessage(L_ERROR, "create_job: unable to add job for destination \'%s\'!",
                dest);
     send_ipp_error(con, IPP_INTERNAL_ERROR);
     return;
@@ -1368,7 +1368,7 @@ create_job(client_t        *con,	/* I - Client connection */
   strcpy(job->username, con->username);
   if ((attr = ippFindAttribute(job->attrs, "requesting-user-name", IPP_TAG_NAME)) != NULL)
   {
-    LogMessage(LOG_DEBUG, "create_job: requesting-user-name = \'%s\'",
+    LogMessage(L_DEBUG, "create_job: requesting-user-name = \'%s\'",
                attr->values[0].string.text);
 
     strncpy(job->username, attr->values[0].string.text, sizeof(job->username) - 1);
@@ -1390,7 +1390,7 @@ create_job(client_t        *con,	/* I - Client connection */
 
   SaveJob(job->id);
 
-  LogMessage(LOG_INFO, "Job %d created on \'%s\' by \'%s\'.", job->id,
+  LogMessage(L_INFO, "Job %d created on \'%s\' by \'%s\'.", job->id,
              job->dest, job->username);
 
  /*
@@ -1487,7 +1487,7 @@ delete_printer(client_t        *con,	/* I - Client connection */
 
   if (strncmp(con->uri, "/admin/", 7) != 0)
   {
-    LogMessage(LOG_ERROR, "delete_printer: admin request on bad resource \'%s\'!",
+    LogMessage(L_ERROR, "delete_printer: admin request on bad resource \'%s\'!",
                con->uri);
     send_ipp_error(con, IPP_NOT_AUTHORIZED);
     return;
@@ -1507,7 +1507,7 @@ delete_printer(client_t        *con,	/* I - Client connection */
     * Bad URI...
     */
 
-    LogMessage(LOG_ERROR, "delete_printer: resource name \'%s\' no good!", resource);
+    LogMessage(L_ERROR, "delete_printer: resource name \'%s\' no good!", resource);
     send_ipp_error(con, IPP_NOT_FOUND);
     return;
   }
@@ -1536,10 +1536,10 @@ delete_printer(client_t        *con,	/* I - Client connection */
   SaveAllPrinters();
 
   if (dtype == CUPS_PRINTER_CLASS)
-    LogMessage(LOG_INFO, "Class \'%s\' deleted by \'%s\'.", dest,
+    LogMessage(L_INFO, "Class \'%s\' deleted by \'%s\'.", dest,
                con->username);
   else
-    LogMessage(LOG_INFO, "Printer \'%s\' deleted by \'%s\'.", dest,
+    LogMessage(L_INFO, "Printer \'%s\' deleted by \'%s\'.", dest,
                con->username);
 
  /*
@@ -1651,7 +1651,7 @@ get_jobs(client_t        *con,		/* I - Client connection */
     * Bad URI...
     */
 
-    LogMessage(LOG_ERROR, "get_jobs: resource name \'%s\' no good!", resource);
+    LogMessage(L_ERROR, "get_jobs: resource name \'%s\' no good!", resource);
     send_ipp_error(con, IPP_NOT_FOUND);
     return;
   }
@@ -1827,7 +1827,7 @@ get_job_attrs(client_t        *con,		/* I - Client connection */
 
     if ((attr = ippFindAttribute(con->request, "job-id", IPP_TAG_INTEGER)) == NULL)
     {
-      LogMessage(LOG_ERROR, "get_job_attrs: got a printer-uri attribute but no job-id!");
+      LogMessage(L_ERROR, "get_job_attrs: got a printer-uri attribute but no job-id!");
       send_ipp_error(con, IPP_BAD_REQUEST);
       return;
     }
@@ -1848,7 +1848,7 @@ get_job_attrs(client_t        *con,		/* I - Client connection */
       * Not a valid URI!
       */
 
-      LogMessage(LOG_ERROR, "get_job_attrs: bad job-uri attribute \'%s\'!\n",
+      LogMessage(L_ERROR, "get_job_attrs: bad job-uri attribute \'%s\'!\n",
                  uri->values[0].string.text);
       send_ipp_error(con, IPP_BAD_REQUEST);
       return;
@@ -1867,7 +1867,7 @@ get_job_attrs(client_t        *con,		/* I - Client connection */
     * Nope - return a "not found" error...
     */
 
-    LogMessage(LOG_ERROR, "get_job_attrs: job #%d doesn't exist!", jobid);
+    LogMessage(L_ERROR, "get_job_attrs: job #%d doesn't exist!", jobid);
     send_ipp_error(con, IPP_NOT_FOUND);
     return;
   }
@@ -2043,7 +2043,7 @@ get_printer_attrs(client_t        *con,	/* I - Client connection */
     * Bad URI...
     */
 
-    LogMessage(LOG_ERROR, "get_printer_attrs: resource name \'%s\' no good!", resource);
+    LogMessage(L_ERROR, "get_printer_attrs: resource name \'%s\' no good!", resource);
     send_ipp_error(con, IPP_NOT_FOUND);
     return;
   }
@@ -2118,7 +2118,7 @@ hold_job(client_t        *con,	/* I - Client connection */
       strncmp(con->uri, "/jobs/", 5) != 0 &&
       strncmp(con->uri, "/printers/", 10) != 0)
   {
-    LogMessage(LOG_ERROR, "hold_job: hold request on bad resource \'%s\'!",
+    LogMessage(L_ERROR, "hold_job: hold request on bad resource \'%s\'!",
                con->uri);
     send_ipp_error(con, IPP_NOT_AUTHORIZED);
     return;
@@ -2136,7 +2136,7 @@ hold_job(client_t        *con,	/* I - Client connection */
 
     if ((attr = ippFindAttribute(con->request, "job-id", IPP_TAG_INTEGER)) == NULL)
     {
-      LogMessage(LOG_ERROR, "hold_job: got a printer-uri attribute but no job-id!");
+      LogMessage(L_ERROR, "hold_job: got a printer-uri attribute but no job-id!");
       send_ipp_error(con, IPP_BAD_REQUEST);
       return;
     }
@@ -2157,7 +2157,7 @@ hold_job(client_t        *con,	/* I - Client connection */
       * Not a valid URI!
       */
 
-      LogMessage(LOG_ERROR, "hold_job: bad job-uri attribute \'%s\'!",
+      LogMessage(L_ERROR, "hold_job: bad job-uri attribute \'%s\'!",
                  uri->values[0].string.text);
       send_ipp_error(con, IPP_BAD_REQUEST);
       return;
@@ -2176,7 +2176,7 @@ hold_job(client_t        *con,	/* I - Client connection */
     * Nope - return a "not found" error...
     */
 
-    LogMessage(LOG_ERROR, "hold_job: job #%d doesn't exist!", jobid);
+    LogMessage(L_ERROR, "hold_job: job #%d doesn't exist!", jobid);
     send_ipp_error(con, IPP_NOT_FOUND);
     return;
   }
@@ -2221,7 +2221,7 @@ hold_job(client_t        *con,	/* I - Client connection */
       * system group...
       */
 
-      LogMessage(LOG_ERROR, "hold_job: \"%s\" not authorized to hold job id %d owned by \"%s\"!",
+      LogMessage(L_ERROR, "hold_job: \"%s\" not authorized to hold job id %d owned by \"%s\"!",
         	 username, jobid, job->username);
       send_ipp_error(con, IPP_FORBIDDEN);
       return;
@@ -2234,7 +2234,7 @@ hold_job(client_t        *con,	/* I - Client connection */
 
   HoldJob(jobid);
 
-  LogMessage(LOG_INFO, "Job %d was held by \'%s\'.", jobid,
+  LogMessage(L_INFO, "Job %d was held by \'%s\'.", jobid,
              con->username[0] ? con->username : "unknown");
 
   con->response->request.status.status_code = IPP_OK;
@@ -2289,7 +2289,7 @@ print_job(client_t        *con,		/* I - Client connection */
   if (strncmp(con->uri, "/classes/", 9) != 0 &&
       strncmp(con->uri, "/printers/", 10) != 0)
   {
-    LogMessage(LOG_ERROR, "print_job: cancel request on bad resource \'%s\'!",
+    LogMessage(L_ERROR, "print_job: cancel request on bad resource \'%s\'!",
                con->uri);
     send_ipp_error(con, IPP_NOT_AUTHORIZED);
     return;
@@ -2302,7 +2302,7 @@ print_job(client_t        *con,		/* I - Client connection */
 
   if ((attr = ippFindAttribute(con->request, "compression", IPP_TAG_KEYWORD)) != NULL)
   {
-    LogMessage(LOG_ERROR, "print_job: Unsupported compression attribute!");
+    LogMessage(L_ERROR, "print_job: Unsupported compression attribute!");
     send_ipp_error(con, IPP_ATTRIBUTES);
     ippAddString(con->response, IPP_TAG_UNSUPPORTED_GROUP, IPP_TAG_KEYWORD,
 	         "compression", NULL, attr->values[0].string.text);
@@ -2315,7 +2315,7 @@ print_job(client_t        *con,		/* I - Client connection */
 
   if (con->filename[0] == '\0')
   {
-    LogMessage(LOG_ERROR, "print_job: No file!?!");
+    LogMessage(L_ERROR, "print_job: No file!?!");
     send_ipp_error(con, IPP_BAD_REQUEST);
     return;
   }
@@ -2332,7 +2332,7 @@ print_job(client_t        *con,		/* I - Client connection */
 
     if (sscanf(format->values[0].string.text, "%15[^/]/%31[^;]", super, type) != 2)
     {
-      LogMessage(LOG_ERROR, "print_job: could not scan type \'%s\'!",
+      LogMessage(L_ERROR, "print_job: could not scan type \'%s\'!",
 	         format->values[0].string.text);
       send_ipp_error(con, IPP_BAD_REQUEST);
       return;
@@ -2355,7 +2355,7 @@ print_job(client_t        *con,		/* I - Client connection */
     * Auto-type the file...
     */
 
-    LogMessage(LOG_DEBUG, "print_job: auto-typing file...");
+    LogMessage(L_DEBUG, "print_job: auto-typing file...");
 
     filetype = mimeFileType(MimeDatabase, con->filename);
 
@@ -2382,7 +2382,7 @@ print_job(client_t        *con,		/* I - Client connection */
 
   if (filetype == NULL)
   {
-    LogMessage(LOG_ERROR, "print_job: Unsupported format \'%s\'!",
+    LogMessage(L_ERROR, "print_job: Unsupported format \'%s\'!",
 	       format->values[0].string.text);
     send_ipp_error(con, IPP_DOCUMENT_FORMAT);
     ippAddString(con->response, IPP_TAG_UNSUPPORTED_GROUP, IPP_TAG_MIMETYPE,
@@ -2390,7 +2390,7 @@ print_job(client_t        *con,		/* I - Client connection */
     return;
   }
 
-  LogMessage(LOG_DEBUG, "print_job: request file type is %s/%s.",
+  LogMessage(L_DEBUG, "print_job: request file type is %s/%s.",
 	     filetype->super, filetype->type);
 
  /*
@@ -2405,7 +2405,7 @@ print_job(client_t        *con,		/* I - Client connection */
     * Bad URI...
     */
 
-    LogMessage(LOG_ERROR, "print_job: resource name \'%s\' no good!", resource);
+    LogMessage(L_ERROR, "print_job: resource name \'%s\' no good!", resource);
     send_ipp_error(con, IPP_NOT_FOUND);
     return;
   }
@@ -2430,7 +2430,7 @@ print_job(client_t        *con,		/* I - Client connection */
 
   if (!printer->accepting)
   {
-    LogMessage(LOG_INFO, "print_job: destination \'%s\' is not accepting jobs.",
+    LogMessage(L_INFO, "print_job: destination \'%s\' is not accepting jobs.",
                dest);
     send_ipp_error(con, IPP_NOT_ACCEPTING);
     return;
@@ -2454,7 +2454,7 @@ print_job(client_t        *con,		/* I - Client connection */
 
   if ((job = AddJob(priority, printer->name)) == NULL)
   {
-    LogMessage(LOG_ERROR, "print_job: unable to add job for destination \'%s\'!",
+    LogMessage(L_ERROR, "print_job: unable to add job for destination \'%s\'!",
                dest);
     send_ipp_error(con, IPP_INTERNAL_ERROR);
     return;
@@ -2467,7 +2467,7 @@ print_job(client_t        *con,		/* I - Client connection */
   if ((job->filetypes = (mime_type_t **)malloc(sizeof(mime_type_t *))) == NULL)
   {
     CancelJob(job->id);
-    LogMessage(LOG_ERROR, "print_job: unable to allocate memory for file types!");
+    LogMessage(L_ERROR, "print_job: unable to allocate memory for file types!");
     send_ipp_error(con, IPP_INTERNAL_ERROR);
     return;
   }
@@ -2485,7 +2485,7 @@ print_job(client_t        *con,		/* I - Client connection */
   strcpy(job->username, con->username);
   if ((attr = ippFindAttribute(job->attrs, "requesting-user-name", IPP_TAG_NAME)) != NULL)
   {
-    LogMessage(LOG_DEBUG, "print_job: requesting-user-name = \'%s\'",
+    LogMessage(L_DEBUG, "print_job: requesting-user-name = \'%s\'",
                attr->values[0].string.text);
 
     strncpy(job->username, attr->values[0].string.text, sizeof(job->username) - 1);
@@ -2505,7 +2505,7 @@ print_job(client_t        *con,		/* I - Client connection */
     attr->name = strdup("job-originating-user-name");
   }
 
-  LogMessage(LOG_INFO, "Job %d queued on \'%s\' by \'%s\'.", job->id,
+  LogMessage(L_INFO, "Job %d queued on \'%s\' by \'%s\'.", job->id,
              job->dest, job->username);
 
  /*
@@ -2574,7 +2574,7 @@ reject_jobs(client_t        *con,	/* I - Client connection */
 
   if (strncmp(con->uri, "/admin/", 7) != 0)
   {
-    LogMessage(LOG_ERROR, "reject_jobs: admin request on bad resource \'%s\'!",
+    LogMessage(L_ERROR, "reject_jobs: admin request on bad resource \'%s\'!",
                con->uri);
     send_ipp_error(con, IPP_NOT_AUTHORIZED);
     return;
@@ -2592,7 +2592,7 @@ reject_jobs(client_t        *con,	/* I - Client connection */
     * Bad URI...
     */
 
-    LogMessage(LOG_ERROR, "reject_jobs: resource name \'%s\' no good!", resource);
+    LogMessage(L_ERROR, "reject_jobs: resource name \'%s\' no good!", resource);
     send_ipp_error(con, IPP_NOT_FOUND);
     return;
   }
@@ -2624,10 +2624,10 @@ reject_jobs(client_t        *con,	/* I - Client connection */
     SaveAllPrinters();
 
   if (dtype == CUPS_PRINTER_CLASS)
-    LogMessage(LOG_INFO, "Class \'%s\' rejecting jobs (\'%s\').", name,
+    LogMessage(L_INFO, "Class \'%s\' rejecting jobs (\'%s\').", name,
                con->username);
   else
-    LogMessage(LOG_INFO, "Printer \'%s\' rejecting jobs (\'%s\').", name,
+    LogMessage(L_INFO, "Printer \'%s\' rejecting jobs (\'%s\').", name,
                con->username);
 
  /*
@@ -2673,7 +2673,7 @@ restart_job(client_t        *con,	/* I - Client connection */
       strncmp(con->uri, "/jobs/", 5) != 0 &&
       strncmp(con->uri, "/printers/", 10) != 0)
   {
-    LogMessage(LOG_ERROR, "restart_job: restart request on bad resource \'%s\'!",
+    LogMessage(L_ERROR, "restart_job: restart request on bad resource \'%s\'!",
                con->uri);
     send_ipp_error(con, IPP_NOT_AUTHORIZED);
     return;
@@ -2691,7 +2691,7 @@ restart_job(client_t        *con,	/* I - Client connection */
 
     if ((attr = ippFindAttribute(con->request, "job-id", IPP_TAG_INTEGER)) == NULL)
     {
-      LogMessage(LOG_ERROR, "restart_job: got a printer-uri attribute but no job-id!");
+      LogMessage(L_ERROR, "restart_job: got a printer-uri attribute but no job-id!");
       send_ipp_error(con, IPP_BAD_REQUEST);
       return;
     }
@@ -2712,7 +2712,7 @@ restart_job(client_t        *con,	/* I - Client connection */
       * Not a valid URI!
       */
 
-      LogMessage(LOG_ERROR, "restart_job: bad job-uri attribute \'%s\'!",
+      LogMessage(L_ERROR, "restart_job: bad job-uri attribute \'%s\'!",
                  uri->values[0].string.text);
       send_ipp_error(con, IPP_BAD_REQUEST);
       return;
@@ -2731,7 +2731,7 @@ restart_job(client_t        *con,	/* I - Client connection */
     * Nope - return a "not found" error...
     */
 
-    LogMessage(LOG_ERROR, "restart_job: job #%d doesn't exist!", jobid);
+    LogMessage(L_ERROR, "restart_job: job #%d doesn't exist!", jobid);
     send_ipp_error(con, IPP_NOT_FOUND);
     return;
   }
@@ -2776,7 +2776,7 @@ restart_job(client_t        *con,	/* I - Client connection */
       * system group...
       */
 
-      LogMessage(LOG_ERROR, "restart_job: \"%s\" not authorized to restart job id %d owned by \"%s\"!",
+      LogMessage(L_ERROR, "restart_job: \"%s\" not authorized to restart job id %d owned by \"%s\"!",
         	 username, jobid, job->username);
       send_ipp_error(con, IPP_FORBIDDEN);
       return;
@@ -2789,7 +2789,7 @@ restart_job(client_t        *con,	/* I - Client connection */
 
   RestartJob(jobid);
 
-  LogMessage(LOG_INFO, "Job %d was restarted by \'%s\'.", jobid,
+  LogMessage(L_INFO, "Job %d was restarted by \'%s\'.", jobid,
              con->username[0] ? con->username : "unknown");
 
   con->response->request.status.status_code = IPP_OK;
@@ -2844,7 +2844,7 @@ send_document(client_t        *con,	/* I - Client connection */
       strncmp(con->uri, "/jobs/", 6) != 0 &&
       strncmp(con->uri, "/printers/", 10) != 0)
   {
-    LogMessage(LOG_ERROR, "send_document: print request on bad resource \'%s\'!",
+    LogMessage(L_ERROR, "send_document: print request on bad resource \'%s\'!",
                con->uri);
     send_ipp_error(con, IPP_NOT_AUTHORIZED);
     return;
@@ -2862,7 +2862,7 @@ send_document(client_t        *con,	/* I - Client connection */
 
     if ((attr = ippFindAttribute(con->request, "job-id", IPP_TAG_INTEGER)) == NULL)
     {
-      LogMessage(LOG_ERROR, "send_document: got a printer-uri attribute but no job-id!");
+      LogMessage(L_ERROR, "send_document: got a printer-uri attribute but no job-id!");
       send_ipp_error(con, IPP_BAD_REQUEST);
       return;
     }
@@ -2883,7 +2883,7 @@ send_document(client_t        *con,	/* I - Client connection */
       * Not a valid URI!
       */
 
-      LogMessage(LOG_ERROR, "send_document: bad job-uri attribute \'%s\'!",
+      LogMessage(L_ERROR, "send_document: bad job-uri attribute \'%s\'!",
                  uri->values[0].string.text);
       send_ipp_error(con, IPP_BAD_REQUEST);
       return;
@@ -2902,7 +2902,7 @@ send_document(client_t        *con,	/* I - Client connection */
     * Nope - return a "not found" error...
     */
 
-    LogMessage(LOG_ERROR, "send_document: job #%d doesn't exist!", jobid);
+    LogMessage(L_ERROR, "send_document: job #%d doesn't exist!", jobid);
     send_ipp_error(con, IPP_NOT_FOUND);
     return;
   }
@@ -2947,7 +2947,7 @@ send_document(client_t        *con,	/* I - Client connection */
       * system group...
       */
 
-      LogMessage(LOG_ERROR, "send_document: \"%s\" not authorized to send document for job id %d owned by \"%s\"!",
+      LogMessage(L_ERROR, "send_document: \"%s\" not authorized to send document for job id %d owned by \"%s\"!",
         	 username, jobid, job->username);
       send_ipp_error(con, IPP_FORBIDDEN);
       return;
@@ -2961,7 +2961,7 @@ send_document(client_t        *con,	/* I - Client connection */
 
   if ((attr = ippFindAttribute(con->request, "compression", IPP_TAG_KEYWORD)) != NULL)
   {
-    LogMessage(LOG_ERROR, "send_document: Unsupported compression attribute!");
+    LogMessage(L_ERROR, "send_document: Unsupported compression attribute!");
     send_ipp_error(con, IPP_ATTRIBUTES);
     ippAddString(con->response, IPP_TAG_UNSUPPORTED_GROUP, IPP_TAG_KEYWORD,
 	         "compression", NULL, attr->values[0].string.text);
@@ -2974,7 +2974,7 @@ send_document(client_t        *con,	/* I - Client connection */
 
   if (con->filename[0] == '\0')
   {
-    LogMessage(LOG_ERROR, "send_document: No file!?!");
+    LogMessage(L_ERROR, "send_document: No file!?!");
     send_ipp_error(con, IPP_BAD_REQUEST);
     return;
   }
@@ -2991,7 +2991,7 @@ send_document(client_t        *con,	/* I - Client connection */
 
     if (sscanf(format->values[0].string.text, "%15[^/]/%31[^;]", super, type) != 2)
     {
-      LogMessage(LOG_ERROR, "send_document: could not scan type \'%s\'!",
+      LogMessage(L_ERROR, "send_document: could not scan type \'%s\'!",
 	         format->values[0].string.text);
       send_ipp_error(con, IPP_BAD_REQUEST);
       return;
@@ -3014,7 +3014,7 @@ send_document(client_t        *con,	/* I - Client connection */
     * Auto-type the file...
     */
 
-    LogMessage(LOG_DEBUG, "send_document: auto-typing file...");
+    LogMessage(L_DEBUG, "send_document: auto-typing file...");
 
     filetype = mimeFileType(MimeDatabase, con->filename);
 
@@ -3041,7 +3041,7 @@ send_document(client_t        *con,	/* I - Client connection */
 
   if (filetype == NULL)
   {
-    LogMessage(LOG_ERROR, "send_document: Unsupported format \'%s\'!",
+    LogMessage(L_ERROR, "send_document: Unsupported format \'%s\'!",
 	       format->values[0].string.text);
     send_ipp_error(con, IPP_DOCUMENT_FORMAT);
     ippAddString(con->response, IPP_TAG_UNSUPPORTED_GROUP, IPP_TAG_MIMETYPE,
@@ -3049,7 +3049,7 @@ send_document(client_t        *con,	/* I - Client connection */
     return;
   }
 
-  LogMessage(LOG_DEBUG, "send_document: request file type is %s/%s.",
+  LogMessage(L_DEBUG, "send_document: request file type is %s/%s.",
 	     filetype->super, filetype->type);
 
  /*
@@ -3066,7 +3066,7 @@ send_document(client_t        *con,	/* I - Client connection */
   if (filetypes == NULL)
   {
     CancelJob(job->id);
-    LogMessage(LOG_ERROR, "send_document: unable to allocate memory for file types!");
+    LogMessage(L_ERROR, "send_document: unable to allocate memory for file types!");
     send_ipp_error(con, IPP_INTERNAL_ERROR);
     return;
   }
@@ -3080,7 +3080,7 @@ send_document(client_t        *con,	/* I - Client connection */
 
   con->filename[0] = '\0';
 
-  LogMessage(LOG_INFO, "File queued in job #%d by \'%s\'.", job->id,
+  LogMessage(L_INFO, "File queued in job #%d by \'%s\'.", job->id,
              job->username);
 
  /*
@@ -3122,7 +3122,7 @@ send_ipp_error(client_t     *con,	/* I - Client connection */
 {
   DEBUG_printf(("send_ipp_error(%08x, %04x)\n", con, status));
 
-  LogMessage(LOG_DEBUG, "Sending IPP error code %x.", status);
+  LogMessage(L_DEBUG, "Sending IPP error code %x.", status);
   if (con->filename[0])
     unlink(con->filename);
 
@@ -3159,7 +3159,7 @@ set_default(client_t        *con,	/* I - Client connection */
 
   if (strncmp(con->uri, "/admin/", 7) != 0)
   {
-    LogMessage(LOG_ERROR, "set_default: admin request on bad resource \'%s\'!",
+    LogMessage(L_ERROR, "set_default: admin request on bad resource \'%s\'!",
                con->uri);
     send_ipp_error(con, IPP_NOT_AUTHORIZED);
     return;
@@ -3177,7 +3177,7 @@ set_default(client_t        *con,	/* I - Client connection */
     * Bad URI...
     */
 
-    LogMessage(LOG_ERROR, "set_default: resource name \'%s\' no good!", resource);
+    LogMessage(L_ERROR, "set_default: resource name \'%s\' no good!", resource);
     send_ipp_error(con, IPP_NOT_FOUND);
     return;
   }
@@ -3194,7 +3194,7 @@ set_default(client_t        *con,	/* I - Client connection */
   SaveAllPrinters();
   SaveAllClasses();
 
-  LogMessage(LOG_INFO, "Default destination set to \'%s\' by \'%s\'.", name,
+  LogMessage(L_INFO, "Default destination set to \'%s\' by \'%s\'.", name,
              con->username);
 
  /*
@@ -3235,7 +3235,7 @@ start_printer(client_t        *con,	/* I - Client connection */
 
   if (strncmp(con->uri, "/admin/", 7) != 0)
   {
-    LogMessage(LOG_ERROR, "start_printer: admin request on bad resource \'%s\'!",
+    LogMessage(L_ERROR, "start_printer: admin request on bad resource \'%s\'!",
                con->uri);
     send_ipp_error(con, IPP_NOT_AUTHORIZED);
     return;
@@ -3253,7 +3253,7 @@ start_printer(client_t        *con,	/* I - Client connection */
     * Bad URI...
     */
 
-    LogMessage(LOG_ERROR, "start_printer: resource name \'%s\' no good!", resource);
+    LogMessage(L_ERROR, "start_printer: resource name \'%s\' no good!", resource);
     send_ipp_error(con, IPP_NOT_FOUND);
     return;
   }
@@ -3275,10 +3275,10 @@ start_printer(client_t        *con,	/* I - Client connection */
     SaveAllPrinters();
 
   if (dtype == CUPS_PRINTER_CLASS)
-    LogMessage(LOG_INFO, "Class \'%s\' started by \'%s\'.", name,
+    LogMessage(L_INFO, "Class \'%s\' started by \'%s\'.", name,
                con->username);
   else
-    LogMessage(LOG_INFO, "Printer \'%s\' started by \'%s\'.", name,
+    LogMessage(L_INFO, "Printer \'%s\' started by \'%s\'.", name,
                con->username);
 
   printer->state_message[0] = '\0';
@@ -3322,7 +3322,7 @@ stop_printer(client_t        *con,	/* I - Client connection */
 
   if (strncmp(con->uri, "/admin/", 7) != 0)
   {
-    LogMessage(LOG_ERROR, "stop_printer: admin request on bad resource \'%s\'!",
+    LogMessage(L_ERROR, "stop_printer: admin request on bad resource \'%s\'!",
                con->uri);
     send_ipp_error(con, IPP_NOT_AUTHORIZED);
     return;
@@ -3340,7 +3340,7 @@ stop_printer(client_t        *con,	/* I - Client connection */
     * Bad URI...
     */
 
-    LogMessage(LOG_ERROR, "stop_printer: resource name \'%s\' no good!", resource);
+    LogMessage(L_ERROR, "stop_printer: resource name \'%s\' no good!", resource);
     send_ipp_error(con, IPP_NOT_FOUND);
     return;
   }
@@ -3372,10 +3372,10 @@ stop_printer(client_t        *con,	/* I - Client connection */
   }
 
   if (dtype == CUPS_PRINTER_CLASS)
-    LogMessage(LOG_INFO, "Class \'%s\' stopped by \'%s\'.", name,
+    LogMessage(L_INFO, "Class \'%s\' stopped by \'%s\'.", name,
                con->username);
   else
-    LogMessage(LOG_INFO, "Printer \'%s\' stopped by \'%s\'.", name,
+    LogMessage(L_INFO, "Printer \'%s\' stopped by \'%s\'.", name,
                con->username);
 
  /*
@@ -3421,7 +3421,7 @@ validate_job(client_t        *con,	/* I - Client connection */
   if (strncmp(con->uri, "/classes/", 9) != 0 &&
       strncmp(con->uri, "/printers/", 10) != 0)
   {
-    LogMessage(LOG_ERROR, "validate_job: request on bad resource \'%s\'!",
+    LogMessage(L_ERROR, "validate_job: request on bad resource \'%s\'!",
                con->uri);
     send_ipp_error(con, IPP_NOT_AUTHORIZED);
     return;
@@ -3434,7 +3434,7 @@ validate_job(client_t        *con,	/* I - Client connection */
 
   if ((attr = ippFindAttribute(con->request, "compression", IPP_TAG_KEYWORD)) != NULL)
   {
-    LogMessage(LOG_ERROR, "validate_job: Unsupported compression attribute!");
+    LogMessage(L_ERROR, "validate_job: Unsupported compression attribute!");
     send_ipp_error(con, IPP_ATTRIBUTES);
     ippAddString(con->response, IPP_TAG_UNSUPPORTED_GROUP, IPP_TAG_KEYWORD,
 	         "compression", NULL, attr->values[0].string.text);
@@ -3447,14 +3447,14 @@ validate_job(client_t        *con,	/* I - Client connection */
 
   if ((format = ippFindAttribute(con->request, "document-format", IPP_TAG_MIMETYPE)) == NULL)
   {
-    LogMessage(LOG_ERROR, "validate_job: missing document-format attribute!");
+    LogMessage(L_ERROR, "validate_job: missing document-format attribute!");
     send_ipp_error(con, IPP_BAD_REQUEST);
     return;
   }
 
   if (sscanf(format->values[0].string.text, "%15[^/]/%31[^;]", super, type) != 2)
   {
-    LogMessage(LOG_ERROR, "validate_job: could not scan type \'%s\'!\n",
+    LogMessage(L_ERROR, "validate_job: could not scan type \'%s\'!\n",
 	       format->values[0].string.text);
     send_ipp_error(con, IPP_BAD_REQUEST);
     return;
@@ -3464,7 +3464,7 @@ validate_job(client_t        *con,	/* I - Client connection */
        strcmp(type, "octet-stream") != 0) &&
       mimeType(MimeDatabase, super, type) == NULL)
   {
-    LogMessage(LOG_ERROR, "validate_job: Unsupported format \'%s\'!\n",
+    LogMessage(L_ERROR, "validate_job: Unsupported format \'%s\'!\n",
 	       format->values[0].string.text);
     send_ipp_error(con, IPP_DOCUMENT_FORMAT);
     ippAddString(con->response, IPP_TAG_UNSUPPORTED_GROUP, IPP_TAG_MIMETYPE,
@@ -3484,7 +3484,7 @@ validate_job(client_t        *con,	/* I - Client connection */
     * Bad URI...
     */
 
-    LogMessage(LOG_ERROR, "validate_job: resource name \'%s\' no good!", resource);
+    LogMessage(L_ERROR, "validate_job: resource name \'%s\' no good!", resource);
     send_ipp_error(con, IPP_NOT_FOUND);
     return;
   }
@@ -3498,5 +3498,5 @@ validate_job(client_t        *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.46 2000/01/27 02:25:45 mike Exp $".
+ * End of "$Id: ipp.c,v 1.47 2000/01/27 03:38:35 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: classes.c,v 1.15 2000/01/20 13:05:41 mike Exp $"
+ * "$Id: classes.c,v 1.16 2000/01/27 03:38:34 mike Exp $"
  *
  *   Printer class routines for the Common UNIX Printing System (CUPS).
  *
@@ -89,7 +89,7 @@ AddPrinterToClass(printer_t *c,	/* I - Class to add to */
 
   if (temp == NULL)
   {
-    LogMessage(LOG_ERROR, "Unable to add printer %s to class %s!",
+    LogMessage(L_ERROR, "Unable to add printer %s to class %s!",
                p->name, c->name);
     return;
   }
@@ -374,7 +374,7 @@ LoadAllClasses(void)
       }
       else
       {
-        LogMessage(LOG_ERROR, "Syntax error on line %d of classes.conf.",
+        LogMessage(L_ERROR, "Syntax error on line %d of classes.conf.",
 	           linenum);
         return;
       }
@@ -388,14 +388,14 @@ LoadAllClasses(void)
       }
       else
       {
-        LogMessage(LOG_ERROR, "Syntax error on line %d of classes.conf.",
+        LogMessage(L_ERROR, "Syntax error on line %d of classes.conf.",
 	           linenum);
         return;
       }
     }
     else if (p == NULL)
     {
-      LogMessage(LOG_ERROR, "Syntax error on line %d of classes.conf.",
+      LogMessage(L_ERROR, "Syntax error on line %d of classes.conf.",
 	         linenum);
       return;
     }
@@ -411,7 +411,7 @@ LoadAllClasses(void)
       if ((temp = FindPrinter(value)) != NULL)
         AddPrinterToClass(p, temp);
       else
-	LogMessage(LOG_WARN, "Unknown printer %s on line %d of classes.conf.",
+	LogMessage(L_WARN, "Unknown printer %s on line %d of classes.conf.",
 	           value, linenum);
     }
     else if (strcmp(name, "State") == 0)
@@ -442,7 +442,7 @@ LoadAllClasses(void)
       * Something else we don't understand...
       */
 
-      LogMessage(LOG_ERROR, "Unknown configuration directive %s on line %d of classes.conf.",
+      LogMessage(L_ERROR, "Unknown configuration directive %s on line %d of classes.conf.",
 	         name, linenum);
     }
   }
@@ -473,11 +473,11 @@ SaveAllClasses(void)
   sprintf(temp, "%s/classes.conf", ServerRoot);
   if ((fp = fopen(temp, "w")) == NULL)
   {
-    LogMessage(LOG_ERROR, "Unable to save classes.conf - %s", strerror(errno));
+    LogMessage(L_ERROR, "Unable to save classes.conf - %s", strerror(errno));
     return;
   }
   else
-    LogMessage(LOG_INFO, "Saving classes.conf...");
+    LogMessage(L_INFO, "Saving classes.conf...");
 
  /*
   * Write a small header to the file...
@@ -540,5 +540,5 @@ SaveAllClasses(void)
 
 
 /*
- * End of "$Id: classes.c,v 1.15 2000/01/20 13:05:41 mike Exp $".
+ * End of "$Id: classes.c,v 1.16 2000/01/27 03:38:34 mike Exp $".
  */

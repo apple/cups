@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.40 2000/01/20 13:05:41 mike Exp $"
+ * "$Id: conf.c,v 1.41 2000/01/27 03:38:34 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -259,7 +259,7 @@ ReadConfiguration(void)
 
   endpwent();
 
-  LogLevel         = LOG_ERROR;
+  LogLevel         = L_ERROR;
   HostNameLookups  = FALSE;
   Timeout          = DEFAULT_TIMEOUT;
   KeepAlive        = TRUE;
@@ -317,7 +317,7 @@ ReadConfiguration(void)
     strcpy(ServerBin, directory);
   }
 
-  LogMessage(LOG_DEBUG, "ReadConfiguration() ConfigurationFile=\"%s\"",
+  LogMessage(L_DEBUG, "ReadConfiguration() ConfigurationFile=\"%s\"",
              ConfigurationFile);
 
  /*
@@ -331,12 +331,12 @@ ReadConfiguration(void)
 
   if ((Clients = calloc(sizeof(client_t), MaxClients)) == NULL)
   {
-    LogMessage(LOG_ERROR, "ReadConfiguration() FATAL: unable to allocate memory for %d clients!",
+    LogMessage(L_ERROR, "ReadConfiguration() FATAL: unable to allocate memory for %d clients!",
                MaxClients);
     exit(1);
   }
   else
-    LogMessage(LOG_INFO, "ReadConfiguration() Configured for up to %d clients.",
+    LogMessage(L_INFO, "ReadConfiguration() Configured for up to %d clients.",
                MaxClients);
 
  /*
@@ -467,7 +467,7 @@ read_configuration(FILE *fp)	/* I - File to read from */
       }
       else
       {
-        LogMessage(LOG_ERROR, "ReadConfiguration() Syntax error on line %d.",
+        LogMessage(L_ERROR, "ReadConfiguration() Syntax error on line %d.",
 	           linenum);
         return (0);
       }
@@ -484,17 +484,17 @@ read_configuration(FILE *fp)	/* I - File to read from */
         if (get_address(value, INADDR_ANY, IPP_PORT,
 	                &(Listeners[NumListeners].address)))
         {
-          LogMessage(LOG_INFO, "Listening to %x:%d\n",
+          LogMessage(L_INFO, "Listening to %x:%d\n",
                      ntohl(Listeners[NumListeners].address.sin_addr.s_addr),
                      ntohs(Listeners[NumListeners].address.sin_port));
 	  NumListeners ++;
         }
 	else
-          LogMessage(LOG_ERROR, "Bad %s address %s at line %d.", name,
+          LogMessage(L_ERROR, "Bad %s address %s at line %d.", name,
 	             value, linenum);
       }
       else
-        LogMessage(LOG_WARN, "Too many %s directives at line %d.", name,
+        LogMessage(L_WARN, "Too many %s directives at line %d.", name,
 	           linenum);
     }
     else if (strcmp(name, "BrowseAddress") == 0)
@@ -507,17 +507,17 @@ read_configuration(FILE *fp)	/* I - File to read from */
       {
         if (get_address(value, INADDR_NONE, BrowsePort, Browsers + NumBrowsers))
         {
-          LogMessage(LOG_INFO, "Sending browsing info to %x:%d\n",
+          LogMessage(L_INFO, "Sending browsing info to %x:%d\n",
                      ntohl(Browsers[NumBrowsers].sin_addr.s_addr),
                      ntohs(Browsers[NumBrowsers].sin_port));
 	  NumBrowsers ++;
         }
 	else
-          LogMessage(LOG_ERROR, "Bad BrowseAddress %s at line %d.", value,
+          LogMessage(L_ERROR, "Bad BrowseAddress %s at line %d.", value,
 	             linenum);
       }
       else
-        LogMessage(LOG_WARN, "Too many BrowseAddress directives at line %d.",
+        LogMessage(L_WARN, "Too many BrowseAddress directives at line %d.",
 	           linenum);
     }
     else if (strcmp(name, "User") == 0)
@@ -538,7 +538,7 @@ read_configuration(FILE *fp)	/* I - File to read from */
 	if (p != NULL)
 	  User = p->pw_uid;
 	else
-	  LogMessage(LOG_WARN, "ReadConfiguration() Unknown username \"%s\"",
+	  LogMessage(L_WARN, "ReadConfiguration() Unknown username \"%s\"",
 	             value);
       }
     }
@@ -560,7 +560,7 @@ read_configuration(FILE *fp)	/* I - File to read from */
 	if (g != NULL)
 	  Group = g->gr_gid;
 	else
-	  LogMessage(LOG_WARN, "ReadConfiguration() Unknown groupname \"%s\"",
+	  LogMessage(L_WARN, "ReadConfiguration() Unknown groupname \"%s\"",
 	             value);
       }
     }
@@ -571,15 +571,15 @@ read_configuration(FILE *fp)	/* I - File to read from */
       */
 
       if (strcmp(value, "debug") == 0)
-        LogLevel = LOG_DEBUG;
+        LogLevel = L_DEBUG;
       else if (strcmp(value, "info") == 0)
-        LogLevel = LOG_INFO;
+        LogLevel = L_INFO;
       else if (strcmp(value, "warn") == 0)
-        LogLevel = LOG_WARN;
+        LogLevel = L_WARN;
       else if (strcmp(value, "error") == 0)
-        LogLevel = LOG_ERROR;
+        LogLevel = L_ERROR;
       else if (strcmp(value, "none") == 0)
-        LogLevel = LOG_NONE;
+        LogLevel = L_NONE;
     }
     else
     {
@@ -597,7 +597,7 @@ read_configuration(FILE *fp)	/* I - File to read from */
         * Unknown directive!  Output an error message and continue...
 	*/
 
-        LogMessage(LOG_ERROR, "Unknown directive %s on line %d.", name,
+        LogMessage(L_ERROR, "Unknown directive %s on line %d.", name,
 	           linenum);
         continue;
       }
@@ -620,7 +620,7 @@ read_configuration(FILE *fp)	/* I - File to read from */
 		     strcasecmp(value, "0") == 0)
               *((int *)var->ptr) = FALSE;
 	    else
-              LogMessage(LOG_ERROR, "Unknown boolean value %s on line %d.",
+              LogMessage(L_ERROR, "Unknown boolean value %s on line %d.",
 	                 value, linenum);
 	    break;
 
@@ -724,7 +724,7 @@ read_location(FILE *fp,		/* I - Configuration file */
       else if (strncasecmp(value, "allow", 5) == 0)
         loc->order_type = AUTH_DENY;
       else
-        LogMessage(LOG_ERROR, "Unknown Order value %s on line %d.",
+        LogMessage(L_ERROR, "Unknown Order value %s on line %d.",
 	           value, linenum);
     }
     else if (strcmp(name, "Allow") == 0 ||
@@ -824,7 +824,7 @@ read_location(FILE *fp,		/* I - Configuration file */
 		            mask[2]) << 8) | mask[3];
                 break;
 	    default :
-        	LogMessage(LOG_ERROR, "Bad netmask value %s on line %d.",
+        	LogMessage(L_ERROR, "Bad netmask value %s on line %d.",
 	        	   value, linenum);
 		netmask = 0xffffffff;
 		break;
@@ -846,7 +846,7 @@ read_location(FILE *fp,		/* I - Configuration file */
       */
 
       if (strcasecmp(value, "basic") != 0)
-        LogMessage(LOG_WARN, "Unknown authorization type %s on line %d.",
+        LogMessage(L_WARN, "Unknown authorization type %s on line %d.",
 	           value, linenum);
     }
     else if (strcmp(name, "AuthClass") == 0)
@@ -867,13 +867,13 @@ read_location(FILE *fp,		/* I - Configuration file */
 	strcpy(loc->group_name, SystemGroup);
       }
       else
-        LogMessage(LOG_WARN, "Unknown authorization class %s on line %d.",
+        LogMessage(L_WARN, "Unknown authorization class %s on line %d.",
 	           value, linenum);
     }
     else if (strcmp(name, "AuthGroupName") == 0)
       strncpy(loc->group_name, value, sizeof(loc->group_name) - 1);
     else
-      LogMessage(LOG_ERROR, "Unknown Location directive %s on line %d.",
+      LogMessage(L_ERROR, "Unknown Location directive %s on line %d.",
 	         name, linenum);
   }
 
@@ -928,7 +928,7 @@ get_address(char               *value,		/* I - Value string */
     case 2 :
         break;
     default :
-	LogMessage(LOG_ERROR, "Unable to decode address \"%s\"!", value);
+	LogMessage(L_ERROR, "Unable to decode address \"%s\"!", value);
         return (0);
   }
 
@@ -944,7 +944,7 @@ get_address(char               *value,		/* I - Value string */
     {
       if ((host = gethostbyname(hostname)) == NULL)
       {
-        LogMessage(LOG_ERROR, "gethostbyname(\"%s\") failed - %s!", hostname,
+        LogMessage(L_ERROR, "gethostbyname(\"%s\") failed - %s!", hostname,
                    strerror(errno));
         return (0);
       }
@@ -962,7 +962,7 @@ get_address(char               *value,		/* I - Value string */
     {
       if ((port = getservbyname(portname, NULL)) == NULL)
       {
-        LogMessage(LOG_ERROR, "getservbyname(\"%s\") failed - %s!", portname,
+        LogMessage(L_ERROR, "getservbyname(\"%s\") failed - %s!", portname,
                    strerror(errno));
         return (0);
       }
@@ -976,5 +976,5 @@ get_address(char               *value,		/* I - Value string */
 
 
 /*
- * End of "$Id: conf.c,v 1.40 2000/01/20 13:05:41 mike Exp $".
+ * End of "$Id: conf.c,v 1.41 2000/01/27 03:38:34 mike Exp $".
  */

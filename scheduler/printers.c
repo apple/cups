@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.50 2000/01/20 13:05:41 mike Exp $"
+ * "$Id: printers.c,v 1.51 2000/01/27 03:38:35 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -155,7 +155,7 @@ AddPrinterFilter(printer_t *p,		/* I - Printer to add to */
 
   if (sscanf(filter, "%15[^/]/%31s%d%1023s", super, type, &cost, program) != 4)
   {
-    LogMessage(LOG_ERROR, "AddPrinterFilter: Invalid filter string \"%s\"!",
+    LogMessage(L_ERROR, "AddPrinterFilter: Invalid filter string \"%s\"!",
                filter);
     return;
   }
@@ -171,7 +171,7 @@ AddPrinterFilter(printer_t *p,		/* I - Printer to add to */
          strcmp((*temptype)->super, super) == 0) &&
         (type[0] == '*' || strcmp((*temptype)->type, type) == 0))
     {
-      LogMessage(LOG_DEBUG, "Adding filter %s/%s %s/%s %d %s",
+      LogMessage(L_DEBUG, "Adding filter %s/%s %s/%s %d %s",
                  (*temptype)->super, (*temptype)->type,
 		 p->filetype->super, p->filetype->type,
                  cost, program);
@@ -243,7 +243,7 @@ DeletePrinter(printer_t *p)	/* I - Printer to delete */
 
   if (current == NULL)
   {
-    LogMessage(LOG_ERROR, "Tried to delete a non-existent printer %s!\n",
+    LogMessage(L_ERROR, "Tried to delete a non-existent printer %s!\n",
                p->name);
     return;
   }
@@ -461,7 +461,7 @@ LoadAllPrinters(void)
       }
       else
       {
-        LogMessage(LOG_ERROR, "Syntax error on line %d of printers.conf.",
+        LogMessage(L_ERROR, "Syntax error on line %d of printers.conf.",
 	           linenum);
         return;
       }
@@ -475,14 +475,14 @@ LoadAllPrinters(void)
       }
       else
       {
-        LogMessage(LOG_ERROR, "Syntax error on line %d of printers.conf.",
+        LogMessage(L_ERROR, "Syntax error on line %d of printers.conf.",
 	           linenum);
         return;
       }
     }
     else if (p == NULL)
     {
-      LogMessage(LOG_ERROR, "Syntax error on line %d of printers.conf.",
+      LogMessage(L_ERROR, "Syntax error on line %d of printers.conf.",
 	         linenum);
       return;
     }
@@ -523,7 +523,7 @@ LoadAllPrinters(void)
       * Something else we don't understand...
       */
 
-      LogMessage(LOG_ERROR, "Unknown configuration directive %s on line %d of printers.conf.",
+      LogMessage(L_ERROR, "Unknown configuration directive %s on line %d of printers.conf.",
 	         name, linenum);
     }
   }
@@ -555,11 +555,11 @@ SaveAllPrinters(void)
   sprintf(temp, "%s/printers.conf", ServerRoot);
   if ((fp = fopen(temp, "w")) == NULL)
   {
-    LogMessage(LOG_ERROR, "Unable to save printers.conf - %s", strerror(errno));
+    LogMessage(L_ERROR, "Unable to save printers.conf - %s", strerror(errno));
     return;
   }
   else
-    LogMessage(LOG_INFO, "Saving printers.conf...");
+    LogMessage(L_INFO, "Saving printers.conf...");
 
  /*
   * Write a small header to the file...
@@ -971,7 +971,7 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
       }
       else if (access(filename, 0) == 0)
       {
-	LogMessage(LOG_ERROR, "PPD file for %s cannot be loaded!", p->name);
+	LogMessage(L_ERROR, "PPD file for %s cannot be loaded!", p->name);
 
 	AddPrinterFilter(p, "application/vnd.cups-postscript 0 -");
       }
@@ -1239,5 +1239,5 @@ write_printcap(void)
 
 
 /*
- * End of "$Id: printers.c,v 1.50 2000/01/20 13:05:41 mike Exp $".
+ * End of "$Id: printers.c,v 1.51 2000/01/27 03:38:35 mike Exp $".
  */

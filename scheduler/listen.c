@@ -1,5 +1,5 @@
 /*
- * "$Id: listen.c,v 1.3 2000/01/04 13:46:10 mike Exp $"
+ * "$Id: listen.c,v 1.4 2000/01/27 03:38:35 mike Exp $"
  *
  *   Server listening routines for the Common UNIX Printing System (CUPS)
  *   scheduler.
@@ -53,13 +53,13 @@ StartListening(void)
 
   for (i = NumListeners, lis = Listeners; i > 0; i --, lis ++)
   {
-    LogMessage(LOG_DEBUG, "StartListening() address=%08x port=%d",
+    LogMessage(L_DEBUG, "StartListening() address=%08x port=%d",
                ntohl(lis->address.sin_addr.s_addr),
 	       ntohs(lis->address.sin_port));
 
     if ((lis->fd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
     {
-      LogMessage(LOG_ERROR, "StartListening() Unable to open listen socket - %s.",
+      LogMessage(L_ERROR, "StartListening() Unable to open listen socket - %s.",
                  strerror(errno));
       exit(errno);
     }
@@ -83,7 +83,7 @@ StartListening(void)
 
     if (bind(lis->fd, (struct sockaddr *)&(lis->address), sizeof(lis->address)) < 0)
     {
-      LogMessage(LOG_ERROR, "StartListening() Unable to bind socket - %s.", strerror(errno));
+      LogMessage(L_ERROR, "StartListening() Unable to bind socket - %s.", strerror(errno));
       exit(errno);
     }
 
@@ -93,7 +93,7 @@ StartListening(void)
 
     if (listen(lis->fd, SOMAXCONN) < 0)
     {
-      LogMessage(LOG_ERROR, "StartListening() Unable to listen for clients - %s.",
+      LogMessage(L_ERROR, "StartListening() Unable to listen for clients - %s.",
                  strerror(errno));
       exit(errno);
     }
@@ -106,7 +106,7 @@ StartListening(void)
     FD_SET(lis->fd, &InputSet);
   }
 
-  LogMessage(LOG_DEBUG, "StartListening() NumListeners=%d", NumListeners);
+  LogMessage(L_DEBUG, "StartListening() NumListeners=%d", NumListeners);
 }
 
 
@@ -133,10 +133,10 @@ StopListening(void)
     FD_CLR(lis->fd, &InputSet);
   }
 
-  LogMessage(LOG_DEBUG, "StopListening()");
+  LogMessage(L_DEBUG, "StopListening()");
 }
 
 
 /*
- * End of "$Id: listen.c,v 1.3 2000/01/04 13:46:10 mike Exp $".
+ * End of "$Id: listen.c,v 1.4 2000/01/27 03:38:35 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.46 2000/01/21 04:32:25 mike Exp $"
+ * "$Id: client.c,v 1.47 2000/01/27 03:38:34 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -90,7 +90,7 @@ AcceptClient(listener_t *lis)	/* I - Listener socket */
   if ((con->http.fd = accept(lis->fd, (struct sockaddr *)&(con->http.hostaddr),
                              &val)) < 0)
   {
-    LogMessage(LOG_ERROR, "accept() failed - %s.", strerror(errno));
+    LogMessage(L_ERROR, "accept() failed - %s.", strerror(errno));
     return;
   }
 
@@ -117,7 +117,7 @@ AcceptClient(listener_t *lis)	/* I - Listener socket */
   else
     strncpy(con->http.hostname, host->h_name, sizeof(con->http.hostname) - 1);
 
-  LogMessage(LOG_DEBUG, "accept() %d from %s:%d.", con->http.fd,
+  LogMessage(L_DEBUG, "accept() %d from %s:%d.", con->http.fd,
              con->http.hostname, ntohs(con->http.hostaddr.sin_port));
 
  /*
@@ -167,7 +167,7 @@ CloseClient(client_t *con)	/* I - Client to close */
   int	status;			/* Exit status of pipe command */
 
 
-  LogMessage(LOG_DEBUG, "CloseClient() %d", con->http.fd);
+  LogMessage(L_DEBUG, "CloseClient() %d", con->http.fd);
 
  /*
   * Close the socket and clear the file from the input set for select()...
@@ -360,7 +360,7 @@ ReadClient(client_t *con)	/* I - Client to read from */
         con->start     = time(NULL);
         con->operation = con->http.state;
 
-        LogMessage(LOG_DEBUG, "ReadClient() %d %s %s HTTP/%d.%d", con->http.fd,
+        LogMessage(L_DEBUG, "ReadClient() %d %s %s HTTP/%d.%d", con->http.fd,
 	           operation, con->uri,
 		   con->http.version / 100, con->http.version % 100);
 
@@ -756,7 +756,7 @@ ReadClient(client_t *con)	/* I - Client to read from */
         break;
 
     case HTTP_POST_RECV :
-        LogMessage(LOG_DEBUG, "ReadClient() %d con->data_encoding = %s con->data_remaining = %d",
+        LogMessage(L_DEBUG, "ReadClient() %d con->data_encoding = %s con->data_remaining = %d",
 		   con->http.fd,
 		   con->http.data_encoding == HTTP_ENCODE_CHUNKED ? "chunked" : "length",
 		   con->http.data_remaining);
@@ -773,7 +773,7 @@ ReadClient(client_t *con)	/* I - Client to read from */
 
 	  if ((ipp_state = ippRead(&(con->http), con->request)) == IPP_ERROR)
 	  {
-            LogMessage(LOG_ERROR, "ReadClient() %d IPP Read Error!",
+            LogMessage(L_ERROR, "ReadClient() %d IPP Read Error!",
 	               con->http.fd);
 	    CloseClient(con);
 	    return (0);
@@ -793,7 +793,7 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	    fchmod(con->file, 0640);
 	    fchown(con->file, User, Group);
 
-            LogMessage(LOG_DEBUG, "ReadClient() %d REQUEST %s", con->http.fd,
+            LogMessage(L_DEBUG, "ReadClient() %d REQUEST %s", con->http.fd,
 	               con->filename);
 
 	    if (con->file < 0)
@@ -818,7 +818,7 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	  {
 	    con->bytes += bytes;
 
-            LogMessage(LOG_DEBUG, "ReadClient() %d writing %d bytes",
+            LogMessage(L_DEBUG, "ReadClient() %d writing %d bytes",
 	               con->http.fd, bytes);
 
             if (write(con->file, line, bytes) < bytes)
@@ -903,7 +903,7 @@ SendCommand(client_t      *con,
 {
   con->pipe_pid = pipe_command(con, 0, &(con->file), command, options);
 
-  LogMessage(LOG_DEBUG, "SendCommand() %d command=\"%s\" file=%d pipe_pid=%d",
+  LogMessage(L_DEBUG, "SendCommand() %d command=\"%s\" file=%d pipe_pid=%d",
              con->http.fd, command, con->file, con->pipe_pid);
 
   if (con->pipe_pid == 0)
@@ -1020,7 +1020,7 @@ SendFile(client_t    *con,
 {
   con->file = open(filename, O_RDONLY);
 
-  LogMessage(LOG_DEBUG, "SendFile() %d file=%d", con->http.fd, con->file);
+  LogMessage(L_DEBUG, "SendFile() %d file=%d", con->http.fd, con->file);
 
   if (con->file < 0)
     return (0);
@@ -1068,6 +1068,10 @@ SendHeader(client_t    *con,	/* I - Client to send to */
     if (httpPrintf(HTTP(con), "Keep-Alive: timeout=%d\r\n", KeepAliveTimeout) < 0)
       return (0);
   }
+  /**** MRS - Need to store which kind of authentication to perform in the
+              client structure! ****/
+  if (code == HTTP_UNAUTHORIZED)
+    httpPrintf(HTTP(con), "WWW-Authenticate: Basic realm=\"CUPS\"\r\n");
   if (con->language != NULL)
   {
     if (httpPrintf(HTTP(con), "Content-Language: %s\r\n",
@@ -1169,7 +1173,7 @@ WriteClient(client_t *con)		/* I - Client connection */
   }
 
   if (bytes >= 1024)
-    LogMessage(LOG_DEBUG, "WriteClient() %d %d bytes", con->http.fd, bytes);
+    LogMessage(L_DEBUG, "WriteClient() %d %d bytes", con->http.fd, bytes);
 
   con->http.activity = time(NULL);
 
@@ -1197,7 +1201,7 @@ check_if_modified(client_t    *con,		/* I - Client connection */
   if (*ptr == '\0')
     return (1);
 
-  LogMessage(LOG_DEBUG, "check_if_modified() %d If-Modified-Since=\"%s\"",
+  LogMessage(L_DEBUG, "check_if_modified() %d If-Modified-Since=\"%s\"",
              con->http.fd, ptr);
 
   while (*ptr != '\0')
@@ -1221,7 +1225,7 @@ check_if_modified(client_t    *con,		/* I - Client connection */
     }
   }
 
-  LogMessage(LOG_DEBUG, "check_if_modified() %d sizes=%d,%d dates=%d,%d",
+  LogMessage(L_DEBUG, "check_if_modified() %d sizes=%d,%d dates=%d,%d",
              con->http.fd, size, filestats->st_size, date, filestats->st_mtime);
 
   return ((size != filestats->st_size && size != 0) ||
@@ -1265,7 +1269,7 @@ decode_auth(client_t *con)		/* I - Client to decode to */
 
     if ((s = strchr(value, ':')) == NULL)
     {
-      LogMessage(LOG_DEBUG, "decode_auth() %d no colon in auth string \"%s\"",
+      LogMessage(L_DEBUG, "decode_auth() %d no colon in auth string \"%s\"",
         	 con->http.fd, value);
       return;
     }
@@ -1288,7 +1292,7 @@ decode_auth(client_t *con)		/* I - Client to decode to */
       strcpy(con->username, username);
   }
 
-  LogMessage(LOG_DEBUG, "decode_auth() %d username=\"%s\"",
+  LogMessage(L_DEBUG, "decode_auth() %d username=\"%s\"",
              con->http.fd, con->username);
   DEBUG_printf(("decode_auth() %d username=\"%s\" password=\"%s\"\n",
                 con->http.fd, con->username, con->password));
@@ -1356,7 +1360,7 @@ get_file(client_t    *con,	/* I - Client connection */
     status = stat(filename, filestats);
   }
 
-  LogMessage(LOG_DEBUG, "get_file() %d filename=%s size=%d",
+  LogMessage(L_DEBUG, "get_file() %d filename=%s size=%d",
              con->http.fd, filename, status ? -1 : filestats->st_size);
 
   if (status)
@@ -1495,7 +1499,7 @@ pipe_command(client_t *con,	/* I - Client connection */
 
   if (pipe(fds))
   {
-    LogMessage(LOG_ERROR, "Unable to create pipes for CGI %s - %s",
+    LogMessage(L_ERROR, "Unable to create pipes for CGI %s - %s",
                argv[0], strerror(errno));
     return (0);
   }
@@ -1540,7 +1544,7 @@ pipe_command(client_t *con,	/* I - Client connection */
     * Error - can't fork!
     */
 
-    LogMessage(LOG_ERROR, "Unable to fork for CGI %s - %s", argv[0],
+    LogMessage(L_ERROR, "Unable to fork for CGI %s - %s", argv[0],
                strerror(errno));
 
     close(fds[0]);
@@ -1553,7 +1557,7 @@ pipe_command(client_t *con,	/* I - Client connection */
     * Fork successful - return the PID...
     */
 
-    LogMessage(LOG_DEBUG, "CGI %s started - PID = %d", argv[0], pid);
+    LogMessage(L_DEBUG, "CGI %s started - PID = %d", argv[0], pid);
 
     *outfile = fds[0];
     close(fds[1]);
@@ -1566,5 +1570,5 @@ pipe_command(client_t *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.46 2000/01/21 04:32:25 mike Exp $".
+ * End of "$Id: client.c,v 1.47 2000/01/27 03:38:34 mike Exp $".
  */

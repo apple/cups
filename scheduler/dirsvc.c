@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.45 2000/01/27 02:25:45 mike Exp $"
+ * "$Id: dirsvc.c,v 1.46 2000/01/27 03:38:34 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -56,7 +56,7 @@ StartBrowsing(void)
 
   if ((BrowseSocket = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
   {
-    LogMessage(LOG_ERROR, "StartBrowsing: Unable to create broadcast socket - %s.",
+    LogMessage(L_ERROR, "StartBrowsing: Unable to create broadcast socket - %s.",
                strerror(errno));
     return;
   }
@@ -68,7 +68,7 @@ StartBrowsing(void)
   val = 1;
   if (setsockopt(BrowseSocket, SOL_SOCKET, SO_BROADCAST, &val, sizeof(val)))
   {
-    LogMessage(LOG_ERROR, "StartBrowsing: Unable to set broadcast mode - %s.",
+    LogMessage(L_ERROR, "StartBrowsing: Unable to set broadcast mode - %s.",
                strerror(errno));
 
 #if defined(WIN32) || defined(__EMX__)
@@ -92,7 +92,7 @@ StartBrowsing(void)
 
   if (bind(BrowseSocket, (struct sockaddr *)&addr, sizeof(addr)))
   {
-    LogMessage(LOG_ERROR, "StartBrowsing: Unable to bind broadcast socket - %s.",
+    LogMessage(L_ERROR, "StartBrowsing: Unable to bind broadcast socket - %s.",
                strerror(errno));
 
 #if defined(WIN32) || defined(__EMX__)
@@ -180,9 +180,9 @@ UpdateBrowseList(void)
   if ((bytes = recvfrom(BrowseSocket, packet, sizeof(packet), 0, 
                         (struct sockaddr *)&addr, &len)) <= 0)
   {
-    LogMessage(LOG_ERROR, "Browse recv failed - %s.",
+    LogMessage(L_ERROR, "Browse recv failed - %s.",
                strerror(errno));
-    LogMessage(LOG_ERROR, "Browsing turned off.");
+    LogMessage(L_ERROR, "Browsing turned off.");
 
     StopBrowsing();
     Browsing = 0;
@@ -195,9 +195,9 @@ UpdateBrowseList(void)
 #else
   if ((bytes = recv(BrowseSocket, packet, sizeof(packet), 0)) <= 0)
   {
-    LogMessage(LOG_ERROR, "Browse recv failed - %s.",
+    LogMessage(L_ERROR, "Browse recv failed - %s.",
                strerror(errno));
-    LogMessage(LOG_ERROR, "Browsing turned off.");
+    LogMessage(L_ERROR, "Browsing turned off.");
 
     StopBrowsing();
     Browsing = 0;
@@ -209,7 +209,7 @@ UpdateBrowseList(void)
 
   if (sscanf(packet, "%x%x%1023s", &type, &state, uri) != 3)
   {
-    LogMessage(LOG_WARN, "UpdateBrowseList: Garbled browse packet - %s",
+    LogMessage(L_WARN, "UpdateBrowseList: Garbled browse packet - %s",
                packet);
     return;
   }
@@ -465,7 +465,7 @@ SendBrowseList(void)
 
       if (p->browse_time < to)
       {
-        LogMessage(LOG_INFO, "Remote destination \"%s\" has timed out; deleting it...",
+        LogMessage(L_INFO, "Remote destination \"%s\" has timed out; deleting it...",
 	           p->name);
         DeletePrinter(p);
       }
@@ -490,7 +490,7 @@ SendBrowseList(void)
       for (i = 0; i < NumBrowsers; i ++)
 	if (sendto(BrowseSocket, packet, bytes, 0,
 	           (struct sockaddr *)Browsers + i, sizeof(Browsers[0])) <= 0)
-	  LogMessage(LOG_ERROR, "SendBrowseList: sendto failed for browser %d - %s.",
+	  LogMessage(L_ERROR, "SendBrowseList: sendto failed for browser %d - %s.",
 	             i + 1, strerror(errno));
     }
   }
@@ -498,5 +498,5 @@ SendBrowseList(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.45 2000/01/27 02:25:45 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.46 2000/01/27 03:38:34 mike Exp $".
  */

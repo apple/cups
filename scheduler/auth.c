@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.c,v 1.24 2000/01/21 04:32:25 mike Exp $"
+ * "$Id: auth.c,v 1.25 2000/01/27 03:38:34 mike Exp $"
  *
  *   Authorization routines for the Common UNIX Printing System (CUPS).
  *
@@ -105,7 +105,7 @@ AddLocation(char *location)	/* I - Location path */
   strncpy(temp->location, location, sizeof(temp->location) - 1);
   temp->length = strlen(temp->location);
 
-  LogMessage(LOG_DEBUG, "AddLocation: added location \'%s\'", location);
+  LogMessage(L_DEBUG, "AddLocation: added location \'%s\'", location);
 
  /*
   * Return the new record...
@@ -133,7 +133,7 @@ AllowHost(location_t *loc,	/* I - Location to add to */
   temp->mask.name.name   = strdup(name);
   temp->mask.name.length = strlen(name);
 
-  LogMessage(LOG_DEBUG, "AllowHost: %s allow %s", loc->location, name);
+  LogMessage(L_DEBUG, "AllowHost: %s allow %s", loc->location, name);
 }
 
 
@@ -157,7 +157,7 @@ AllowIP(location_t *loc,	/* I - Location to add to */
   temp->mask.ip.address = address;
   temp->mask.ip.netmask = netmask;
 
-  LogMessage(LOG_DEBUG, "AllowIP: %s allow %08x/%08x", loc->location,
+  LogMessage(L_DEBUG, "AllowIP: %s allow %08x/%08x", loc->location,
              address, netmask);
 }
 
@@ -225,7 +225,7 @@ DenyHost(location_t *loc,	/* I - Location to add to */
   temp->mask.name.name   = strdup(name);
   temp->mask.name.length = strlen(name);
 
-  LogMessage(LOG_DEBUG, "DenyHost: %s deny %s", loc->location, name);
+  LogMessage(L_DEBUG, "DenyHost: %s deny %s", loc->location, name);
 }
 
 
@@ -249,7 +249,7 @@ DenyIP(location_t *loc,		/* I - Location to add to */
   temp->mask.ip.address = address;
   temp->mask.ip.netmask = netmask;
 
-  LogMessage(LOG_DEBUG, "DenyIP: %s deny %08x/%08x\n", loc->location,
+  LogMessage(L_DEBUG, "DenyIP: %s deny %08x/%08x\n", loc->location,
              address, netmask);
 }
 
@@ -374,7 +374,7 @@ IsAuthorized(client_t *con)	/* I - Connection */
 
   if (pw == NULL)			/* No such user... */
   {
-    LogMessage(LOG_WARN, "IsAuthorized: Unknown username \"%s\"; access denied.",
+    LogMessage(L_WARN, "IsAuthorized: Unknown username \"%s\"; access denied.",
                con->username);
     return (HTTP_UNAUTHORIZED);
   }
@@ -405,7 +405,7 @@ IsAuthorized(client_t *con)	/* I - Connection */
     pamerr = pam_start("passwd", con->username, &pamdata, &pamh);
     if (pamerr != PAM_SUCCESS)
     {
-      LogMessage(LOG_ERROR, "IsAuthorized: pam_start() returned %d (%s)!\n",
+      LogMessage(L_ERROR, "IsAuthorized: pam_start() returned %d (%s)!\n",
         	 pamerr, pam_strerror(pamh, pamerr));
       pam_end(pamh, 0);
       return (HTTP_UNAUTHORIZED);
@@ -414,7 +414,7 @@ IsAuthorized(client_t *con)	/* I - Connection */
     pamerr = pam_authenticate(pamh, PAM_SILENT);
     if (pamerr != PAM_SUCCESS)
     {
-      LogMessage(LOG_ERROR, "IsAuthorized: pam_authenticate() returned %d (%s)!\n",
+      LogMessage(L_ERROR, "IsAuthorized: pam_authenticate() returned %d (%s)!\n",
         	 pamerr, pam_strerror(pamh, pamerr));
       pam_end(pamh, 0);
       return (HTTP_UNAUTHORIZED);
@@ -423,7 +423,7 @@ IsAuthorized(client_t *con)	/* I - Connection */
     pamerr = pam_acct_mgmt(pamh, PAM_SILENT);
     if (pamerr != PAM_SUCCESS)
     {
-      LogMessage(LOG_ERROR, "IsAuthorized: pam_acct_mgmt() returned %d (%s)!\n",
+      LogMessage(L_ERROR, "IsAuthorized: pam_acct_mgmt() returned %d (%s)!\n",
         	 pamerr, pam_strerror(pamh, pamerr));
       pam_end(pamh, 0);
       return (HTTP_UNAUTHORIZED);
@@ -437,7 +437,7 @@ IsAuthorized(client_t *con)	/* I - Connection */
 
     if (spw == NULL && strcmp(pw->pw_passwd, "x") == 0)
     {					/* Don't allow blank passwords! */
-      LogMessage(LOG_WARN, "IsAuthorized: Username \"%s\" has no shadow password; access denied.",
+      LogMessage(L_WARN, "IsAuthorized: Username \"%s\" has no shadow password; access denied.",
         	 con->username);
       return (HTTP_UNAUTHORIZED);		/* No such user or bad shadow file */
     }
@@ -454,7 +454,7 @@ IsAuthorized(client_t *con)	/* I - Connection */
     if (pw->pw_passwd[0] == '\0')		/* Don't allow blank passwords! */
 #  endif /* HAVE_SHADOW_H */
     {					/* Don't allow blank passwords! */
-      LogMessage(LOG_WARN, "IsAuthorized: Username \"%s\" has no password; access denied.",
+      LogMessage(L_WARN, "IsAuthorized: Username \"%s\" has no password; access denied.",
         	 con->username);
       return (HTTP_UNAUTHORIZED);
     }
@@ -507,7 +507,7 @@ IsAuthorized(client_t *con)	/* I - Connection */
 
   if (grp == NULL)			/* No group by that name??? */
   {
-    LogMessage(LOG_WARN, "IsAuthorized: group name \"%s\" does not exist!",
+    LogMessage(L_WARN, "IsAuthorized: group name \"%s\" does not exist!",
                best->group_name);
     return (HTTP_UNAUTHORIZED);
   }
@@ -734,5 +734,5 @@ pam_func(int                      num_msg,	/* I - Number of messages */
 
 
 /*
- * End of "$Id: auth.c,v 1.24 2000/01/21 04:32:25 mike Exp $".
+ * End of "$Id: auth.c,v 1.25 2000/01/27 03:38:34 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.50 2000/01/21 03:58:45 mike Exp $"
+ * "$Id: job.c,v 1.51 2000/01/27 03:38:35 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -276,7 +276,7 @@ CheckJobs(void)
 	* cancel the job...
 	*/
 
-        LogMessage(LOG_WARN, "Printer/class %s has gone away; cancelling job %d!",
+        LogMessage(L_WARN, "Printer/class %s has gone away; cancelling job %d!",
 	           current->dest, current->id);
         CancelJob(current->id);
 
@@ -396,7 +396,7 @@ LoadAllJobs(void)
 
       if ((job = calloc(sizeof(job_t), 1)) == NULL)
       {
-        LogMessage(LOG_ERROR, "LoadAddJobs: Ran out of memory for jobs!");
+        LogMessage(L_ERROR, "LoadAddJobs: Ran out of memory for jobs!");
 	closedir(dir);
 	return;
       }
@@ -404,7 +404,7 @@ LoadAllJobs(void)
       if ((job->attrs = ippNew()) == NULL)
       {
         free(job);
-        LogMessage(LOG_ERROR, "LoadAddJobs: Ran out of memory for job attributes!");
+        LogMessage(L_ERROR, "LoadAddJobs: Ran out of memory for job attributes!");
 	closedir(dir);
 	return;
       }
@@ -425,7 +425,7 @@ LoadAllJobs(void)
       snprintf(filename, sizeof(filename), "%s/%s", RequestRoot, dent->d_name);
       if (ipp_read_file(filename, job->attrs) != IPP_DATA)
       {
-        LogMessage(LOG_ERROR, "LoadAllJobs: Unable to read job control file \"%s\"!",
+        LogMessage(L_ERROR, "LoadAllJobs: Unable to read job control file \"%s\"!",
 	           filename);
 	ippDelete(job->attrs);
 	free(job);
@@ -438,7 +438,7 @@ LoadAllJobs(void)
 
       if ((dest = ValidateDest(resource, &(job->dtype))) == NULL)
       {
-        LogMessage(LOG_ERROR, "LoadAllJobs: Unable to queue job for destination \"%s\"!",
+        LogMessage(L_ERROR, "LoadAllJobs: Unable to queue job for destination \"%s\"!",
 	           attr->values[0].string.text);
 	ippDelete(job->attrs);
 	free(job);
@@ -497,7 +497,7 @@ LoadAllJobs(void)
 
       if ((job = FindJob(jobid)) == NULL)
       {
-        LogMessage(LOG_ERROR, "LoadAddJobs: Orphaned print file \"%s\"!",
+        LogMessage(L_ERROR, "LoadAddJobs: Orphaned print file \"%s\"!",
 	           filename);
 	continue;
       }
@@ -512,7 +512,7 @@ LoadAllJobs(void)
 
         if (filetypes == NULL)
 	{
-          LogMessage(LOG_ERROR, "LoadAddJobs: Ran out of memory for job file types!");
+          LogMessage(L_ERROR, "LoadAddJobs: Ran out of memory for job file types!");
 	  continue;
 	}
 
@@ -696,7 +696,7 @@ StartJob(int       id,		/* I - Job ID */
 
     if (num_filters == 0)
     {
-      LogMessage(LOG_ERROR, "Unable to convert file to printable format for job %s-%d!",
+      LogMessage(L_ERROR, "Unable to convert file to printable format for job %s-%d!",
 	         printer->name, current->id);
       CancelJob(current->id);
       return;
@@ -901,7 +901,7 @@ StartJob(int       id,		/* I - Job ID */
 
   if (pipe(statusfds))
   {
-    LogMessage(LOG_ERROR, "StartJob: unable to create status pipes - %s.",
+    LogMessage(L_ERROR, "StartJob: unable to create status pipes - %s.",
 	       strerror(errno));
     StopPrinter(printer);
     sprintf(printer->state_message, "Unable to create status pipes - %s.",
@@ -961,7 +961,7 @@ StartJob(int       id,		/* I - Job ID */
 
     if (pid == 0)
     {
-      LogMessage(LOG_ERROR, "Unable to start filter \"%s\" - %s.",
+      LogMessage(L_ERROR, "Unable to start filter \"%s\" - %s.",
                  filters[i].filter, strerror(errno));
       StopPrinter(current->printer);
       sprintf(printer->state_message, "Unable to start filter \"%s\" - %s.",
@@ -972,7 +972,7 @@ StartJob(int       id,		/* I - Job ID */
     {
       current->procs[i] = pid;
 
-      LogMessage(LOG_DEBUG, "Started %s (PID %d) for job %d.", command, pid,
+      LogMessage(L_DEBUG, "Started %s (PID %d) for job %d.", command, pid,
                  current->id);
     }
   }
@@ -1010,7 +1010,7 @@ StartJob(int       id,		/* I - Job ID */
 
     if (pid == 0)
     {
-      LogMessage(LOG_ERROR, "Unable to start backend \"%s\" - %s.",
+      LogMessage(L_ERROR, "Unable to start backend \"%s\" - %s.",
                  method, strerror(errno));
       StopPrinter(current->printer);
       sprintf(printer->state_message, "Unable to start backend \"%s\" - %s.",
@@ -1021,7 +1021,7 @@ StartJob(int       id,		/* I - Job ID */
     {
       current->procs[i] = pid;
 
-      LogMessage(LOG_DEBUG, "Started %s (PID %d) for job %d.", command, pid,
+      LogMessage(L_DEBUG, "Started %s (PID %d) for job %d.", command, pid,
                  current->id);
     }
   }
@@ -1152,32 +1152,32 @@ UpdateJob(job_t *job)		/* I - Job to check */
 
       if (strncmp(buffer, "ERROR:", 6) == 0)
       {
-        loglevel = LOG_ERROR;
+        loglevel = L_ERROR;
 	message  = buffer + 6;
       }
       else if (strncmp(buffer, "WARNING:", 8) == 0)
       {
-        loglevel = LOG_WARN;
+        loglevel = L_WARN;
 	message  = buffer + 8;
       }
       else if (strncmp(buffer, "INFO:", 5) == 0)
       {
-        loglevel = LOG_INFO;
+        loglevel = L_INFO;
 	message  = buffer + 5;
       }
       else if (strncmp(buffer, "DEBUG:", 6) == 0)
       {
-        loglevel = LOG_DEBUG;
+        loglevel = L_DEBUG;
 	message  = buffer + 6;
       }
       else if (strncmp(buffer, "PAGE:", 5) == 0)
       {
-        loglevel = LOG_PAGE;
+        loglevel = L_PAGE;
 	message  = buffer + 5;
       }
       else
       {
-        loglevel = LOG_DEBUG;
+        loglevel = L_DEBUG;
 	message  = buffer;
       }
 
@@ -1192,7 +1192,7 @@ UpdateJob(job_t *job)		/* I - Job to check */
       * Send it to the log file and printer state message as needed...
       */
 
-      if (loglevel == LOG_PAGE)
+      if (loglevel == L_PAGE)
       {
        /*
         * Page message; send the message to the page_log file...
@@ -1206,11 +1206,11 @@ UpdateJob(job_t *job)		/* I - Job to check */
         * Other status message; send it to the error_log file...
 	*/
 
-	if (loglevel != LOG_INFO)
+	if (loglevel != L_INFO)
 	  LogMessage(loglevel, "%s", message);
 
-	if ((loglevel == LOG_INFO && !job->status) ||
-	    loglevel < LOG_INFO)
+	if ((loglevel == L_INFO && !job->status) ||
+	    loglevel < L_INFO)
           strncpy(job->printer->state_message, message,
                   sizeof(job->printer->state_message) - 1);
       }
@@ -2102,5 +2102,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.50 2000/01/21 03:58:45 mike Exp $".
+ * End of "$Id: job.c,v 1.51 2000/01/27 03:38:35 mike Exp $".
  */
