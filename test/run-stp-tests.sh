@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# "$Id: run-stp-tests.sh,v 1.22 2004/02/25 20:14:54 mike Exp $"
+# "$Id: run-stp-tests.sh,v 1.23 2004/04/28 19:23:46 mike Exp $"
 #
 #   Perform the complete set of IPP compliance tests specified in the
 #   CUPS Software Test Plan.
@@ -181,6 +181,7 @@ ln -s $root/templates /tmp/$user/share
 cat >/tmp/$user/cupsd.conf <<EOF
 Browsing Off
 FileDevice yes
+Printcap
 Listen 127.0.0.1:$port
 User $user
 ServerRoot /tmp/$user
@@ -465,5 +466,5 @@ echo "    $pdffile"
 echo ""
 
 #
-# End of "$Id: run-stp-tests.sh,v 1.22 2004/02/25 20:14:54 mike Exp $"
+# End of "$Id: run-stp-tests.sh,v 1.23 2004/04/28 19:23:46 mike Exp $"
 #
