@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c,v 1.125 2004/09/09 15:10:18 mike Exp $"
+ * "$Id: main.c,v 1.126 2004/09/09 15:53:00 mike Exp $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -656,7 +656,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     {
       next = job->next;
 
-      if (job->pipe && FD_ISSET(job->pipe, input))
+      if (job->pipe >= 0 && FD_ISSET(job->pipe, input))
       {
        /*
         * Clear the input bit to avoid updating the next job
@@ -1353,5 +1353,5 @@ usage(void)
 
 
 /*
- * End of "$Id: main.c,v 1.125 2004/09/09 15:10:18 mike Exp $".
+ * End of "$Id: main.c,v 1.126 2004/09/09 15:53:00 mike Exp $".
  */
