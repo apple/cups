@@ -1,5 +1,5 @@
 /*
- * "$Id: config.h,v 1.7 2002/01/02 17:59:21 mike Exp $"
+ * "$Id: config.h,v 1.8 2002/10/15 20:07:14 mike Exp $"
  *
  *   Configuration file for the Common UNIX Printing System (CUPS).
  *
@@ -28,7 +28,9 @@
  * Version of software...
  */
 
-#define CUPS_SVERSION	"CUPS v1.1.9"
+#define CUPS_SVERSION	"CUPS v1.1.17"
+#define ESP_SVERSION	"ESP Print Pro v4.3"
+
 
 /*
  * Where are files stored?
@@ -42,12 +44,15 @@
 #define CUPS_LOGDIR	"C:/CUPS/logs"
 #define CUPS_DATADIR    "C:/CUPS/share"
 #define CUPS_FONTPATH	"C:/CUPS/share/fonts"
+#define ESP_SOFTWARE	"C:/CUPS/etc/software"
+
 
 /*
  * What is the format string for strftime?
  */
 
 #define CUPS_STRFTIME_FORMAT	"%c"
+
 
 /*
  * Do we have various image libraries?
@@ -58,11 +63,21 @@
 #undef HAVE_LIBJPEG
 #undef HAVE_LIBTIFF
 
+
 /*
  * Does this machine store words in big-endian (MSB-first) order?
  */
 
 #undef WORDS_BIGENDIAN
+
+
+/*
+ * Compiler stuff...
+ */
+
+#undef const
+#undef __CHAR_UNSIGNED__
+
 
 /*
  * Which directory functions and headers do we use?
@@ -81,17 +96,39 @@
 #define HAVE_LIBPAM 0
 #endif /* !HAVE_LIBPAM */
 
+#undef HAVE_PAM_PAM_APPL_H
+
+
 /*
  * Do we have <shadow.h>?
  */
 
 #undef HAVE_SHADOW_H
 
+
 /*
  * Do we have <crypt.h>?
  */
 
 #undef HAVE_CRYPT_H
+
+
+/*
+ * How about standard C header files?
+ */
+
+#undef HAVE_STDDEF_H
+#define HAVE_STDLIB_H
+
+
+/*
+ * Use <string.h>, <strings.h>, and/or <bstring.h>?
+ */
+
+#define HAVE_STRING_H
+#undef HAVE_STRINGS_H
+#undef HAVE_BSTRING_H
+
 
 /*
  * Do we have the strXXX() functions?
@@ -100,6 +137,9 @@
 #define HAVE_STRDUP
 #define HAVE_STRCASECMP
 #define HAVE_STRNCASECMP
+#undef HAVE_STRLCAT
+#undef HAVE_STRLCPY
+
 
 /*
  * Do we have the vsyslog() function?
@@ -107,12 +147,14 @@
 
 #undef HAVE_VSYSLOG
 
+
 /*
  * Do we have the (v)snprintf() functions?
  */
 
 #undef HAVE_SNPRINTF
 #undef HAVE_VSNPRINTF
+
 
 /*
  * What signal functions to use?
@@ -128,6 +170,7 @@
 #undef HAVE_WAITPID
 #undef HAVE_WAIT3
 
+
 /*
  * Do we have the mallinfo function and malloc.h?
  */
@@ -135,13 +178,64 @@
 #undef HAVE_MALLINFO
 #undef HAVE_MALLOC_H
 
+
 /*
  * Do we have the OpenSSL library?
  */
 
-#undef HAVE_LIBSSL
+#define HAVE_LIBSSL
 
 
 /*
- * End of "$Id: config.h,v 1.7 2002/01/02 17:59:21 mike Exp $".
+ * Do we have the OpenSLP library?
+ */
+
+#undef HAVE_LIBSLP
+
+
+/*
+ * Do we have <sys/ioctl.h>?
+ */
+
+#undef HAVE_SYS_IOCTL_H
+
+
+/*
+ * Do we have mkstemp() and/or mkstemps()?
+ */
+
+#undef HAVE_MKSTEMP
+#undef HAVE_MKSTEMPS
+
+
+/*
+ * Does the "tm" structure contain the "tm_gmtoff" member?
+ */
+
+#undef HAVE_TM_GMTOFF
+
+
+/*
+ * Do we have getifaddrs()?
+ */
+
+#undef HAVE_GETIFADDRS
+
+
+/*
+ * Do we have the <sys/sockio.h> header file?
+ */
+
+#undef HAVE_SYS_SOCKIO_H
+
+
+/*
+ * Does the sockaddr structure contain an sa_len parameter?
+ */
+
+#undef HAVE_STRUCT_SOCKADDR_SA_LEN
+
+
+/*
+ * End of "$Id: config.h,v 1.8 2002/10/15 20:07:14 mike Exp $".
  */
