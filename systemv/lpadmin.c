@@ -1,5 +1,5 @@
 /*
- * "$Id: lpadmin.c,v 1.15 2000/07/10 15:02:25 mike Exp $"
+ * "$Id: lpadmin.c,v 1.16 2000/08/29 18:42:33 mike Exp $"
  *
  *   "lpadmin" command for the Common UNIX Printing System (CUPS).
  *
@@ -1453,6 +1453,17 @@ set_printer_location(http_t *http,	/* I - Server connection */
 static int			/* O - 0 if name is no good, 1 if name is good */
 validate_name(const char *name)	/* I - Name to check */
 {
+ /*
+  * Don't allow names to start with a digit...
+  */
+
+  if (isdigit(*name))
+    return (0);
+
+ /*
+  * Scan the whole name...
+  */
+
   while (*name)
     if (*name == '@')
       return (1);
@@ -1466,5 +1477,5 @@ validate_name(const char *name)	/* I - Name to check */
 
 
 /*
- * End of "$Id: lpadmin.c,v 1.15 2000/07/10 15:02:25 mike Exp $".
+ * End of "$Id: lpadmin.c,v 1.16 2000/08/29 18:42:33 mike Exp $".
  */
