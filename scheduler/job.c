@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.103 2000/12/14 22:21:59 mike Exp $"
+ * "$Id: job.c,v 1.104 2001/01/08 15:42:36 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -1176,11 +1176,10 @@ StartJob(int       id,		/* I - Job ID */
 	      break;
 
 	  case IPP_TAG_RESOLUTION :
-	      snprintf(optptr, sizeof(optptr), "%dx%d%s",
-	               attr->values[i].resolution.xres,
-		       attr->values[i].resolution.yres,
-		       attr->values[i].resolution.units == IPP_RES_PER_INCH ?
-			   "dpi" : "dpc");
+	      sprintf(optptr, "%dx%d%s", attr->values[i].resolution.xres,
+		      attr->values[i].resolution.yres,
+		      attr->values[i].resolution.units == IPP_RES_PER_INCH ?
+			  "dpi" : "dpc");
 	      break;
 
           case IPP_TAG_STRING :
@@ -2612,5 +2611,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.103 2000/12/14 22:21:59 mike Exp $".
+ * End of "$Id: job.c,v 1.104 2001/01/08 15:42:36 mike Exp $".
  */
