@@ -1,5 +1,5 @@
 /*
- * "$Id: raster.h,v 1.5 2002/03/05 18:42:09 mike Exp $"
+ * "$Id: raster.h,v 1.6 2002/04/22 16:26:47 mike Exp $"
  *
  *   Raster file definitions for the Common UNIX Printing System (CUPS).
  *
@@ -53,6 +53,15 @@ extern "C" {
 
 #  define CUPS_RASTER_SYNC	0x52615374	/* RaSt */
 #  define CUPS_RASTER_REVSYNC	0x74536152	/* tSaR */
+
+
+/*
+ * The following definition can be used to determine if the
+ * colorimetric colorspaces (CIEXYZ, CIELAB, and ICCn) are
+ * defined...
+ */
+
+#  define CUPS_RASTER_HAVE_COLORIMETRIC 1
 
 
 /*
@@ -140,7 +149,23 @@ typedef enum
   CUPS_CSPACE_SILVER,			/* Silver foil */
 
   CUPS_CSPACE_CIEXYZ,			/* CIE XYZ */
-  CUPS_CSPACE_CIELab			/* CIE Lab */
+  CUPS_CSPACE_CIELab,			/* CIE Lab */
+
+  CUPS_CSPACE_ICC1 = 32,		/* ICC-based, 1 color */
+  CUPS_CSPACE_ICC2,			/* ICC-based, 2 colors */
+  CUPS_CSPACE_ICC3,			/* ICC-based, 3 colors */
+  CUPS_CSPACE_ICC4,			/* ICC-based, 4 colors */
+  CUPS_CSPACE_ICC5,			/* ICC-based, 5 colors */
+  CUPS_CSPACE_ICC6,			/* ICC-based, 6 colors */
+  CUPS_CSPACE_ICC7,			/* ICC-based, 7 colors */
+  CUPS_CSPACE_ICC8,			/* ICC-based, 8 colors */
+  CUPS_CSPACE_ICC9,			/* ICC-based, 9 colors */
+  CUPS_CSPACE_ICCA,			/* ICC-based, 10 colors */
+  CUPS_CSPACE_ICCB,			/* ICC-based, 11 colors */
+  CUPS_CSPACE_ICCC,			/* ICC-based, 12 colors */
+  CUPS_CSPACE_ICCD,			/* ICC-based, 13 colors */
+  CUPS_CSPACE_ICCE,			/* ICC-based, 14 colors */
+  CUPS_CSPACE_ICCF			/* ICC-based, 15 colors */
 } cups_cspace_t;
 
 
@@ -234,5 +259,5 @@ extern unsigned		cupsRasterWritePixels(cups_raster_t *r,
 #endif /* !_CUPS_RASTER_H_ */
 
 /*
- * End of "$Id: raster.h,v 1.5 2002/03/05 18:42:09 mike Exp $".
+ * End of "$Id: raster.h,v 1.6 2002/04/22 16:26:47 mike Exp $".
  */
