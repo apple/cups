@@ -1,8 +1,12 @@
-README - CUPS v1.1.14 - 02/13/2002
+README - CUPS v1.1.16 - 07/02/2002
 ----------------------------------
 
 Looking for compile instructions?  Read the file "INSTALL.txt"
 instead...
+
+**** IF YOU HAVE A NON-POSTSCRIPT PRINTER, YOU WILL ALSO  ****
+**** NEED TO INSTALL ESP GHOSTSCRIPT OR A PATCHED VERSION ****
+**** OF THE STANDARD GHOSTSCRIPT RELEASES.                ****
 
 
 INTRODUCTION
@@ -21,11 +25,12 @@ functionality.  CUPS adds network printer browsing and
 PostScript Printer Description ("PPD") based printing options to
 support real-world printing under UNIX.
 
-CUPS also includes a customized version of GNU Ghostscript
-(currently based off GNU Ghostscript 5.50) and an image file RIP
-that are used to support non-PostScript printers.  Sample
-drivers for HP and EPSON printers are included that use these
-filters.
+CUPS includes an image file RIP that supports printing of image
+files to non-PostScript printers.  A customized version of GNU
+Ghostscript 7.05 for CUPS called ESP Ghostscript is available
+separately to support printing of PostScript files within the
+CUPS driver framework.  Sample drivers for Dymo, EPSON, HP, and
+OKIDATA printers are included that use these filters.
 
 Drivers for thousands of printers are provided with our ESP
 Print Pro software, available at:
