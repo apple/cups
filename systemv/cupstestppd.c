@@ -1,5 +1,5 @@
 /*
- * "$Id: cupstestppd.c,v 1.1.2.2 2003/01/07 18:27:29 mike Exp $"
+ * "$Id: cupstestppd.c,v 1.1.2.3 2003/01/24 21:32:33 mike Exp $"
  *
  *   PPD test program for the Common UNIX Printing System (CUPS).
  *
@@ -83,8 +83,28 @@ main(int  argc,			/* I - Number of command-line arguments */
   status  = ERROR_NONE;
 
   for (i = 1; i < argc; i ++)
-    if (strcmp(argv[i], "-v") == 0)
+    if (strcmp(argv[i], "-q") == 0)
+    {
+      if (verbose > 0)
+      {
+        fputs("cupstestppd: The -q option is incompatible with the -v option.\n",
+	      stderr);
+	return (1);
+      }
+
+      verbose --;
+    }
+    else if (strcmp(argv[i], "-v") == 0)
+    {
+      if (verbose < 0)
+      {
+        fputs("cupstestppd: The -v option is incompatible with the -q option.\n",
+	      stderr);
+	return (1);
+      }
+
       verbose ++;
+    }
     else if (argv[i][0] == '-' && argv[i][1])
     {
       ppd = NULL;
@@ -102,7 +122,8 @@ main(int  argc,			/* I - Number of command-line arguments */
         * Read from stdin...
 	*/
 
-        puts("FILE: (stdin)\n");
+        if (verbose >= 0)
+          puts("FILE: (stdin)\n");
 
         ppd = ppdOpen(stdin);
       }
@@ -112,7 +133,8 @@ main(int  argc,			/* I - Number of command-line arguments */
         * Read from a file...
 	*/
 
-        printf("FILE: %s\n\n", argv[i]);
+        if (verbose >= 0)
+          printf("FILE: %s\n\n", argv[i]);
 
         ppd = ppdOpenFile(argv[i]);
       }
@@ -122,12 +144,16 @@ main(int  argc,			/* I - Number of command-line arguments */
         if (errno)
 	{
 	  status = ERROR_FILE_OPEN;
-	  printf("    Unable to open PPD file - %s\n\n", strerror(errno));
+
+          if (verbose >= 0)
+	    printf("    Unable to open PPD file - %s\n\n", strerror(errno));
 	}
 	else
 	{
 	  status = ERROR_PPD_FORMAT;
-	  puts("    Unable to open PPD file using CUPS functions!\n");
+
+          if (verbose >= 0)
+	    puts("    Unable to open PPD file using CUPS functions!\n");
         }
 
 	continue;
@@ -138,7 +164,8 @@ main(int  argc,			/* I - Number of command-line arguments */
       * only by what the CUPS PPD functions actually load...)
       */
 
-      puts("    CONFORMANCE TESTS:");
+      if (verbose >= 0)
+        puts("    CONFORMANCE TESTS:");
 
       errors = 0;
 
@@ -146,107 +173,163 @@ main(int  argc,			/* I - Number of command-line arguments */
 	for (k = 0, option = group->options; k < group->num_options; k ++, option ++)
 	  if (option->defchoice[0])
 	  {
-	    printf("        PASS    Default%s\n", option->keyword);
+	    if (verbose >= 0)
+	      printf("        PASS    Default%s\n", option->keyword);
 	  }
 	  else
 	  {
 	    errors ++;
-	    printf("      **FAIL**  REQUIRED Default%s\n", option->keyword);
+
+	    if (verbose >= 0)
+	      printf("      **FAIL**  REQUIRED Default%s\n", option->keyword);
 	  }
 
       if (ppd->num_fonts)
-	puts("        PASS    Fonts");
+      {
+        if (verbose >= 0)
+	  puts("        PASS    Fonts");
+      }
       else
       {
 	errors ++;
-	puts("      **FAIL**  REQUIRED Fonts");
+
+	if (verbose >= 0)
+	  puts("      **FAIL**  REQUIRED Fonts");
       }
 
       if (ppd->lang_encoding != NULL)
-	puts("        PASS    LanguageEncoding");
+      {
+	if (verbose >= 0)
+	  puts("        PASS    LanguageEncoding");
+      }
       else
       {
 	errors ++;
-	puts("      **FAIL**  REQUIRED LanguageEncoding");
+
+	if (verbose >= 0)
+	  puts("      **FAIL**  REQUIRED LanguageEncoding");
       }
 
       if (ppd->lang_version != NULL)
-	puts("        PASS    LanguageVersion");
+      {
+	if (verbose >= 0)
+	  puts("        PASS    LanguageVersion");
+      }
       else
       {
 	errors ++;
-	puts("      **FAIL**  REQUIRED LanguageVersion");
+
+	if (verbose >= 0)
+	  puts("      **FAIL**  REQUIRED LanguageVersion");
       }
 
       if (ppd->manufacturer != NULL)
-	puts("        PASS    Manufacturer");
+      {
+	if (verbose >= 0)
+	  puts("        PASS    Manufacturer");
+      }
       else
       {
 	errors ++;
-	puts("      **FAIL**  REQUIRED Manufacturer");
+
+	if (verbose >= 0)
+	  puts("      **FAIL**  REQUIRED Manufacturer");
       }
 
       if (ppd->modelname != NULL)
-	puts("        PASS    ModelName");
+      {
+	if (verbose >= 0)
+	  puts("        PASS    ModelName");
+      }
       else
       {
 	errors ++;
-	puts("      **FAIL**  REQUIRED ModelName");
+
+	if (verbose >= 0)
+	  puts("      **FAIL**  REQUIRED ModelName");
       }
 
       if (ppd->nickname != NULL)
-	puts("        PASS    NickName");
+      {
+	if (verbose >= 0)
+	  puts("        PASS    NickName");
+      }
       else
       {
 	errors ++;
-	puts("      **FAIL**  REQUIRED NickName");
+
+	if (verbose >= 0)
+	  puts("      **FAIL**  REQUIRED NickName");
       }
 
       if (ppdFindOption(ppd, "PageSize") != NULL)
-	puts("        PASS    PageSize");
+      {
+	if (verbose >= 0)
+	  puts("        PASS    PageSize");
+      }
       else
       {
 	errors ++;
-	puts("      **FAIL**  REQUIRED PageSize");
+
+	if (verbose >= 0)
+	  puts("      **FAIL**  REQUIRED PageSize");
       }
 
       if (ppdFindOption(ppd, "PageRegion") != NULL)
-	puts("        PASS    PageRegion");
+      {
+	if (verbose >= 0)
+	  puts("        PASS    PageRegion");
+      }
       else
       {
 	errors ++;
-	puts("      **FAIL**  REQUIRED PageRegion");
+
+	if (verbose >= 0)
+	  puts("      **FAIL**  REQUIRED PageRegion");
       }
 
       if (ppd->product != NULL)
-	puts("        PASS    Product");
+      {
+	if (verbose >= 0)
+	  puts("        PASS    Product");
+      }
       else
       {
 	errors ++;
-	puts("      **FAIL**  REQUIRED Product");
+
+	if (verbose >= 0)
+	  puts("      **FAIL**  REQUIRED Product");
       }
 
       if (ppd->shortnickname != NULL)
-	puts("        PASS    ShortNickName");
+      {
+	if (verbose >= 0)
+	  puts("        PASS    ShortNickName");
+      }
       else
       {
 	errors ++;
-	puts("      **FAIL**  REQUIRED ShortNickName");
+
+	if (verbose >= 0)
+	  puts("      **FAIL**  REQUIRED ShortNickName");
       }
 
       if (errors)
       {
-        puts("\n    **** CONFORMANCE TESTING FAILED ****");
+        if (verbose >= 0)
+	  puts("\n    **** CONFORMANCE TESTING FAILED ****");
+
 	status = ERROR_CONFORMANCE;
       }
 
-      puts("");
+      if (verbose >= 0)
+	puts("");
 
      /*
       * Then list the options, if "-v" was provided...
       */ 
 
-      if (verbose)
+      if (verbose > 0)
       {
 	puts("");
 	puts("    OPTIONS:");     
@@ -363,8 +446,8 @@ main(int  argc,			/* I - Number of command-line arguments */
 
   if (!ppd)
   {
-    puts("Usage: cupstestppd [-v] filename1.ppd [... filenameN.ppd]");
-    puts("       program | cupstestppd [-v] -");
+    puts("Usage: cupstestppd [-q] [-v] filename1.ppd [... filenameN.ppd]");
+    puts("       program | cupstestppd [-q] [-v] -");
 
     return (ERROR_USAGE);
   }
@@ -374,5 +457,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: cupstestppd.c,v 1.1.2.2 2003/01/07 18:27:29 mike Exp $".
+ * End of "$Id: cupstestppd.c,v 1.1.2.3 2003/01/24 21:32:33 mike Exp $".
  */
