@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.94 2001/04/12 13:09:09 mike Exp $"
+ * "$Id: printers.c,v 1.95 2001/04/24 14:22:01 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -1535,9 +1535,13 @@ SortPrinters(void)
 	next          = current->next;
 	current->next = next->next;
 	next->next    = current;
+	prev          = next;
       }
       else
+      {
+        prev    = current;
 	current = current->next;
+      }
   }
   while (did_swap);
 }
@@ -1782,5 +1786,5 @@ write_printcap(void)
 
 
 /*
- * End of "$Id: printers.c,v 1.94 2001/04/12 13:09:09 mike Exp $".
+ * End of "$Id: printers.c,v 1.95 2001/04/24 14:22:01 mike Exp $".
  */

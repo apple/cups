@@ -1,4 +1,4 @@
-CHANGES.txt - 03/29/2001
+CHANGES.txt - 04/24/2001
 ------------------------
 
 CHANGES IN CUPS V1.1.7
@@ -175,6 +175,9 @@ CHANGES IN CUPS V1.1.7
 	  from authenticating users using PAM under HP-UX.  A
 	  workaround using a static variable has been added to
 	  address this problem.
+	- Fixed a bug in the scheduler SortPrinters() function
+	  that could cause printers to disappear or the
+	  scheduler to crash when adding a printer.
 
 
 CHANGES IN CUPS V1.1.6-3

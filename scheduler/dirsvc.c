@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.73 2001/03/28 16:55:54 mike Exp $"
+ * "$Id: dirsvc.c,v 1.74 2001/04/24 14:22:01 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -182,7 +182,8 @@ UpdateBrowseList(void)
 		*sptr;			/* Pointer into ServerName */
   printer_t	*p,			/* Printer information */
 		*pclass,		/* Printer class */
-		*first;			/* First printer in class */
+		*first,			/* First printer in class */
+		*next;			/* Next printer in list */
 
 
  /*
@@ -670,8 +671,14 @@ UpdateBrowseList(void)
 
     for (p = Printers, len = 0, offset = 0, first = NULL;
          p != NULL;
-	 p = p->next)
+	 p = next)
     {
+     /*
+      * Get next printer in list...
+      */
+
+      next = p->next;
+
      /*
       * Skip classes...
       */
@@ -948,5 +955,5 @@ StopPolling(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.73 2001/03/28 16:55:54 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.74 2001/04/24 14:22:01 mike Exp $".
  */
