@@ -1742,9 +1742,10 @@ void PSOutputDev::setupImage(Ref id, Stream *str) {
 }
 
 void PSOutputDev::startPage(int pageNum, GfxState *state) {
-  int x1, y1, x2, y2, width, height, t;
+  int x1, y1, x2, y2;
   int imageWidth, imageHeight;
   int left, bottom, right, top;
+  double width, height, t;
 
   if (globalParams->getPSFit()) {
     globalParams->getPSImageableArea(left, bottom, right, top);
@@ -1791,21 +1792,6 @@ void PSOutputDev::startPage(int pageNum, GfxState *state) {
 		 state->getCTM()[0] ? "Portrait" : "Landscape");
       writePS("pdfStartPage\n");
     }
-    if (globalParams->getPSFit()) {
-      tx -= x1;
-      ty -= y1;
-    }
-    tx += left;
-    ty += bottom;
-    if (width < imageWidth) {
-      tx += (imageWidth - width) / 2;
-    }
-    if (height < imageHeight) {
-      ty += (imageHeight - height) / 2;
-    }
-    if (tx != 0 || ty != 0) {
-      writePSFmt("%g %g translate\n", tx, ty);
-    }
     if ((width > imageWidth || height > imageHeight) && globalParams->getPSFit()) {
       xScale = (double)imageWidth / (double)width;
       yScale = (double)imageHeight / (double)height;
@@ -1814,9 +1800,36 @@ void PSOutputDev::startPage(int pageNum, GfxState *state) {
       } else {
 	yScale = xScale;
       }
-      writePSFmt("%0.4f %0.4f scale\n", xScale, xScale);
     } else {
       xScale = yScale = 1;
+    }
+    if (globalParams->getPSFit()) {
+      tx -= x1 * xScale;
+      ty -= y1 * yScale;
+      width *= xScale;
+      height *= yScale;
+    }
+    tx += left;
+    ty += bottom;
+    if (width < imageWidth) {
+      if(landscape) {
+        ty += (imageWidth - width) / 2;
+      } else {
+        tx += (imageWidth - width) / 2;
+      }
+    }
+    if (height < imageHeight) {
+      if(landscape) {
+        tx += (imageHeight - height) / 2;
+      } else {
+        ty += (imageHeight - height) / 2;
+      }
+    }
+    if (tx != 0 || ty != 0) {
+      writePSFmt("%g %g translate\n", tx, ty);
+    }
+    if (xScale != 1) {
+      writePSFmt("%0.4f %0.4f scale\n", xScale, xScale);
     }
 
     writePS("%%EndPageSetup\n");
