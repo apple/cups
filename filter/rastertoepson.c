@@ -1,5 +1,5 @@
 /*
- * "$Id: rastertoepson.c,v 1.15 2002/03/01 19:53:36 mike Exp $"
+ * "$Id: rastertoepson.c,v 1.16 2002/10/15 14:39:44 mike Exp $"
  *
  *   EPSON ESC/P and ESC/P2 filter for the Common UNIX Printing System
  *   (CUPS).
@@ -77,7 +77,8 @@ unsigned char	*Planes[6],		/* Output buffers */
 		*LineBuffers[2];	/* Line bitmap buffers */
 int		Model,			/* Model number */
 		NumPlanes,		/* Number of color planes */
-		Feed;			/* Number of lines to skip */
+		Feed,			/* Number of lines to skip */
+		EjectPage;		/* Eject the page when done? */
 int		DotBit,			/* Bit in buffers */
 		DotBytes,		/* # bytes in a dot column */
 		DotColumns,		/* # columns in 1/60 inch */
@@ -119,7 +120,7 @@ Setup(void)
   */
 
   if ((device_uri = getenv("DEVICE_URI")) != NULL &&
-      strncmp(device_uri, "usb:", 4) == 0)
+      strncmp(device_uri, "usb:", 4) == 0 && Model >= EPSON_ICOLOR)
     pwrite("\000\000\000\033\001@EJL 1284.4\n@EJL     \n\033@", 29);
 }
 
@@ -169,8 +170,8 @@ StartPage(const ppd_file_t         *ppd,	/* I - PPD file */
   * See which type of printer we are using...
   */
 
-  Model = ppd->model_number;
-
+  EjectPage = header->Margins[0] || header->Margins[1];
+    
   switch (ppd->model_number)
   {
     case EPSON_9PIN :
@@ -355,7 +356,8 @@ EndPage(const cups_page_header_t *header)	/* I - Page header */
   * Eject the current page...
   */
 
-  putchar(12);		/* Form feed */
+  if (EjectPage)
+    putchar(12);		/* Form feed */
   fflush(stdout);
 
  /*
@@ -1039,6 +1041,8 @@ main(int  argc,			/* I - Number of command-line arguments */
   */
 
   ppd = ppdOpenFile(getenv("PPD"));
+  if (ppd)
+    Model = ppd->model_number;
 
   Setup();
 
@@ -1129,5 +1133,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: rastertoepson.c,v 1.15 2002/03/01 19:53:36 mike Exp $".
+ * End of "$Id: rastertoepson.c,v 1.16 2002/10/15 14:39:44 mike Exp $".
  */
