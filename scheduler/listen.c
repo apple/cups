@@ -1,5 +1,5 @@
 /*
- * "$Id: listen.c,v 1.4 2000/01/27 03:38:35 mike Exp $"
+ * "$Id: listen.c,v 1.5 2000/09/07 19:54:05 mike Exp $"
  *
  *   Server listening routines for the Common UNIX Printing System (CUPS)
  *   scheduler.
@@ -24,8 +24,10 @@
  *
  * Contents:
  *
- *   StartListening() - Create all listening sockets...
- *   StopListening()  - Close all listening sockets...
+ *   PauseListening()  - Clear input polling on all listening sockets...
+ *   ResumeListening() - Set input polling on all listening sockets...
+ *   StartListening()  - Create all listening sockets...
+ *   StopListening()   - Close all listening sockets...
  */
 
 /*
@@ -33,6 +35,48 @@
  */
 
 #include "cupsd.h"
+
+
+/*
+ * 'PauseListening()' - Clear input polling on all listening sockets...
+ */
+
+void
+PauseListening(void)
+{
+  int		i;		/* Looping var */
+  listener_t	*lis;		/* Current listening socket */
+
+
+  if (!FD_ISSET(Listeners[0].fd, &InputSet))
+    return;
+
+  LogMessage(L_DEBUG, "PauseListening() clearing input bits...");
+
+  for (i = NumListeners, lis = Listeners; i > 0; i --, lis ++)
+    FD_CLR(lis->fd, &InputSet);
+}
+
+
+/*
+ * 'ResumeListening()' - Set input polling on all listening sockets...
+ */
+
+void
+ResumeListening(void)
+{
+  int		i;		/* Looping var */
+  listener_t	*lis;		/* Current listening socket */
+
+
+  if (FD_ISSET(Listeners[0].fd, &InputSet))
+    return;
+
+  LogMessage(L_DEBUG, "ResumeListening() setting input bits...");
+
+  for (i = NumListeners, lis = Listeners; i > 0; i --, lis ++)
+    FD_SET(lis->fd, &InputSet);
+}
 
 
 /*
@@ -46,6 +90,8 @@ StartListening(void)
 		val;		/* Parameter value */
   listener_t	*lis;		/* Current listening socket */
 
+
+  LogMessage(L_DEBUG, "StartListening() NumListeners=%d", NumListeners);
 
  /*
   * Setup socket listeners...
@@ -97,16 +143,9 @@ StartListening(void)
                  strerror(errno));
       exit(errno);
     }
-
-   /*
-    * Setup the select() input mask to contain the listening socket we have.
-    */
-
-    DEBUG_printf(("StartListening: Adding fd %d to InputSet...\n", lis->fd));
-    FD_SET(lis->fd, &InputSet);
   }
 
-  LogMessage(L_DEBUG, "StartListening() NumListeners=%d", NumListeners);
+  ResumeListening();
 }
 
 
@@ -121,22 +160,19 @@ StopListening(void)
   listener_t	*lis;		/* Current listening socket */
 
 
+  LogMessage(L_DEBUG, "StopListening()");
+
+  PauseListening();
+
   for (i = NumListeners, lis = Listeners; i > 0; i --, lis ++)
-  {
 #if defined(WIN32) || defined(__EMX__)
     closesocket(lis->fd);
 #else
     close(lis->fd);
 #endif /* WIN32 || __EMX__ */
-
-    DEBUG_printf(("StopListening: Removing fd %d from InputSet...\n", lis->fd));
-    FD_CLR(lis->fd, &InputSet);
-  }
-
-  LogMessage(L_DEBUG, "StopListening()");
 }
 
 
 /*
- * End of "$Id: listen.c,v 1.4 2000/01/27 03:38:35 mike Exp $".
+ * End of "$Id: listen.c,v 1.5 2000/09/07 19:54:05 mike Exp $".
  */

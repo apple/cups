@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c,v 1.41 2000/09/06 18:31:30 mike Exp $"
+ * "$Id: main.c,v 1.42 2000/09/07 19:54:05 mike Exp $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -59,6 +59,7 @@ main(int  argc,			/* I - Number of command-line arguments */
      char *argv[])		/* I - Command-line arguments */
 {
   int			i;		/* Looping var */
+  int			max_fds;	/* Max number of files */
   char			*opt;		/* Option character */
   int			fg;		/* Run in the foreground */
   fd_set		input,		/* Input set for select() */
@@ -179,7 +180,7 @@ main(int  argc,			/* I - Number of command-line arguments */
   */
 
   getrlimit(RLIMIT_NOFILE, &limit);
-  limit.rlim_cur = limit.rlim_max;
+  max_fds = limit.rlim_cur = limit.rlim_max;
   setrlimit(RLIMIT_NOFILE, &limit);
 
  /*
@@ -259,8 +260,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	  else
 	    con->http.keep_alive = HTTP_KEEPALIVE_OFF;
 
-	for (i = 0; i < NumListeners; i ++)
-	  FD_CLR(Listeners[i].fd, &InputSet);
+        PauseListening();
       }
       else if (!ReadConfiguration())
       {
@@ -291,8 +291,13 @@ main(int  argc,			/* I - Number of command-line arguments */
 	break;
       }
 
-    if ((i = select(100, &input, &output, NULL, &timeout)) < 0)
+    if ((i = select(max_fds, &input, &output, NULL, &timeout)) < 0)
     {
+      char	s[16384],	/* String buffer */
+		*sptr;		/* Pointer into buffer */
+      int	slen;		/* Length of string buffer */
+
+
      /*
       * Got an error from select!
       */
@@ -300,37 +305,43 @@ main(int  argc,			/* I - Number of command-line arguments */
       if (errno == EINTR)	/* Just interrupted by a signal */
         continue;
 
-#ifdef DEBUG
      /*
-      * Display all sorts of logging info to help track down the problem.
+      * Log all sorts of debug info to help track down the problem.
       */
 
-      perror("cupsd: select() failed");
+      LogMessage(L_ERROR, "select() failed - %s!", strerror(errno));
 
-      fprintf(stderr, "cupsd: InputSet =");
-      for (i = 0; i < 100; i ++)
-        if (FD_ISSET(i, &input))
-          fprintf(stderr, " %d", i);
-      fputs("\n", stderr);
+      strcpy(s, "InputSet =");
+      slen = 9;
+      sptr = s + 9;
 
-      fprintf(stderr, "cupsd: OutputSet =");
-      for (i = 0; i < 100; i ++)
-        if (FD_ISSET(i, &output))
-          fprintf(stderr, " %d", i);
-      fputs("\n", stderr);
+      for (i = 0; i < max_fds; i ++)
+        if (FD_ISSET(i, &InputSet))
+          snprintf(sptr, sizeof(s) - slen, " %d", i);
+
+      LogMessage(L_ERROR, s);
+
+      strcpy(s, "OutputSet =");
+      slen = 10;
+      sptr = s + 10;
+
+      for (i = 0; i < max_fds; i ++)
+        if (FD_ISSET(i, &OutputSet))
+          snprintf(sptr, sizeof(s) - slen, " %d", i);
+
+      LogMessage(L_ERROR, s);
 
       for (i = 0, con = Clients; i < NumClients; i ++, con ++)
-        fprintf(stderr, "cupsd: Clients[%d] = %d, file = %d, state = %d\n",
+        LogMessage(L_ERROR, "Clients[%d] = %d, file = %d, state = %d\n",
 	        i, con->http.fd, con->file, con->http.state);
 
       for (i = 0, lis = Listeners; i < NumListeners; i ++, lis ++)
-        fprintf(stderr, "cupsd: Listeners[%d] = %d\n", i, lis->fd);
+        LogMessage(L_ERROR, "Listeners[%d] = %d\n", i, lis->fd);
 
-      fprintf(stderr, "cupsd: BrowseSocket = %d\n", BrowseSocket);
+      LogMessage(L_ERROR, "BrowseSocket = %d\n", BrowseSocket);
 
       for (job = Jobs; job != NULL; job = job->next)
-        fprintf(stderr, "cupsd: Jobs[%d] = %d\n", job->id, job->pipe);
-#endif /* DEBUG */
+        LogMessage(L_ERROR, "Jobs[%d] = %d\n", job->id, job->pipe);
 
       break;
     }
@@ -615,5 +626,5 @@ usage(void)
 
 
 /*
- * End of "$Id: main.c,v 1.41 2000/09/06 18:31:30 mike Exp $".
+ * End of "$Id: main.c,v 1.42 2000/09/07 19:54:05 mike Exp $".
  */

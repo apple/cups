@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.66 2000/09/05 19:45:08 mike Exp $"
+ * "$Id: client.c,v 1.67 2000/09/07 19:54:04 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -62,7 +62,6 @@ static int	pipe_command(client_t *con, int infile, int *outfile, char *command, 
 void
 AcceptClient(listener_t *lis)	/* I - Listener socket */
 {
-  int			i;	/* Looping var */
   int			val;	/* Parameter value */
   client_t		*con;	/* New client pointer */
   unsigned		address;/* Address of client */
@@ -145,11 +144,7 @@ AcceptClient(listener_t *lis)	/* I - Listener socket */
   */
 
   if (NumClients == MaxClients)
-    for (i = 0; i < NumListeners; i ++)
-    {
-      DEBUG_printf(("AcceptClient: Removing fd %d from InputSet...\n", Listeners[i].fd));
-      FD_CLR(Listeners[i].fd, &InputSet);
-    }
+    PauseListening();
 }
 
 
@@ -172,7 +167,6 @@ CloseAllClients(void)
 void
 CloseClient(client_t *con)	/* I - Client to close */
 {
-  int	i;			/* Looping var */
   int	status;			/* Exit status of pipe command */
 
 
@@ -220,14 +214,7 @@ CloseClient(client_t *con)	/* I - Client to close */
   */
 
   if (NumClients == MaxClients)
-  {
-
-    for (i = 0; i < NumListeners; i ++)
-    {
-      DEBUG_printf(("CloseClient: Adding fd %d to InputSet...\n", Listeners[i].fd));
-      FD_SET(Listeners[i].fd, &InputSet);
-    }
-  }
+    ResumeListening();
 
  /*
   * Compact the list of clients as necessary...
@@ -1797,5 +1784,5 @@ pipe_command(client_t *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.66 2000/09/05 19:45:08 mike Exp $".
+ * End of "$Id: client.c,v 1.67 2000/09/07 19:54:04 mike Exp $".
  */
