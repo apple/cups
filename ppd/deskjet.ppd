@@ -1,6 +1,6 @@
 *PPD-Adobe: "4.3"
 *%
-*% "$Id: deskjet.ppd,v 1.7 2000/05/24 13:18:27 mike Exp $"
+*% "$Id: deskjet.ppd,v 1.8 2000/07/21 15:26:08 mike Exp $"
 *%
 *%   Sample HP DeskJet driver PPD file for the Common UNIX Printing
 *%   System (CUPS).
@@ -54,6 +54,7 @@
 *UIConstraints: *PageSize A4 *InputSlot Envelope
 *UIConstraints: *PageSize A5 *InputSlot Envelope
 *UIConstraints: *PageSize B5 *InputSlot Envelope
+*UIConstraints: *Resolution 600dpi *ColorModel CMYK
 
 *OpenUI *PageSize/Media Size: PickOne
 *OrderDependency: 10 AnySetup *PageSize
@@ -144,7 +145,7 @@
 *DefaultResolution: 300dpi
 *Resolution 150dpi/150 DPI: "<</HWResolution[150 150]>>setpagedevice"
 *Resolution 300dpi/300 DPI: "<</HWResolution[300 300]>>setpagedevice"
-*Resolution 600dpi/600 DPI: "<</HWResolution[600 600]>>setpagedevice"
+*Resolution 600dpi/600 DPI: "<</HWResolution[600 600]/cupsColorSpace 3>>setpagedevice"
 *CloseUI: *Resolution
 
 *OpenUI *ColorModel/Output Mode: PickOne
@@ -191,5 +192,5 @@
 *Font ZapfChancery-MediumItalic: Standard "(001.007S)" Standard ROM
 *Font ZapfDingbats: Special "(001.004S)" Standard ROM
 *%
-*% End of "$Id: deskjet.ppd,v 1.7 2000/05/24 13:18:27 mike Exp $".
+*% End of "$Id: deskjet.ppd,v 1.8 2000/07/21 15:26:08 mike Exp $".
 *%
