@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.91.2.24 2002/10/16 02:35:30 mike Exp $"
+ * "$Id: client.c,v 1.91.2.25 2002/10/16 22:13:01 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -1741,6 +1741,7 @@ ShutdownClient(client_t *con)		/* I - Client connection */
   */
 
   shutdown(con->http.fd, 0);
+  con->http.used = 0;
 
   LogMessage(L_DEBUG2, "ShutdownClient: Removing fd %d from InputSet...",
              con->http.fd);
@@ -2631,5 +2632,5 @@ pipe_command(client_t *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.91.2.24 2002/10/16 02:35:30 mike Exp $".
+ * End of "$Id: client.c,v 1.91.2.25 2002/10/16 22:13:01 mike Exp $".
  */

@@ -3,8 +3,9 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.17
 
-	- The web admin interface now reconnects to the CUPS
-	  server to avoid "unauthorized" errors.
+	- Fixed a problem in the scheduler that would cause the
+	  web interface problems when adding, modifying, or
+	  configuring a printer or class.
 	- The backends now ignore SIGPIPE so that failed job
 	  filters will not stop a print queue.
 	- The lpstat command did not allow for destination lists
