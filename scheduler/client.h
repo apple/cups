@@ -1,5 +1,5 @@
 /*
- * "$Id: client.h,v 1.17.2.8 2003/03/14 21:43:31 mike Exp $"
+ * "$Id: client.h,v 1.17.2.9 2003/03/31 16:48:26 mike Exp $"
  *
  *   Client definitions for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -69,7 +69,7 @@ typedef struct
 VAR int			ListenBackLog	VALUE(SOMAXCONN);
 VAR int			NumListeners	VALUE(0);
 					/* Number of listening sockets */
-VAR listener_t		Listeners[MAX_LISTENERS];
+VAR listener_t		*Listeners	VALUE(NULL);
 					/* Listening sockets */
 VAR int			NumClients	VALUE(0);
 					/* Number of HTTP clients */
@@ -107,5 +107,5 @@ extern int	WriteClient(client_t *con);
 
 
 /*
- * End of "$Id: client.h,v 1.17.2.8 2003/03/14 21:43:31 mike Exp $".
+ * End of "$Id: client.h,v 1.17.2.9 2003/03/31 16:48:26 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: listen.c,v 1.9.2.8 2003/02/05 21:14:56 mike Exp $"
+ * "$Id: listen.c,v 1.9.2.9 2003/03/31 16:48:27 mike Exp $"
  *
  *   Server listening routines for the Common UNIX Printing System (CUPS)
  *   scheduler.
@@ -48,7 +48,7 @@ PauseListening(void)
   listener_t	*lis;		/* Current listening socket */
 
 
-  if (!FD_ISSET(Listeners[0].fd, InputSet))
+  if (NumListeners < 1 || !FD_ISSET(Listeners[0].fd, InputSet))
     return;
 
   if (NumClients == MaxClients)
@@ -77,7 +77,7 @@ ResumeListening(void)
   listener_t	*lis;		/* Current listening socket */
 
 
-  if (FD_ISSET(Listeners[0].fd, InputSet))
+  if (NumListeners < 1 || FD_ISSET(Listeners[0].fd, InputSet))
     return;
 
   if (NumClients >= (MaxClients - 1))
@@ -227,5 +227,5 @@ StopListening(void)
 
 
 /*
- * End of "$Id: listen.c,v 1.9.2.8 2003/02/05 21:14:56 mike Exp $".
+ * End of "$Id: listen.c,v 1.9.2.9 2003/03/31 16:48:27 mike Exp $".
  */
