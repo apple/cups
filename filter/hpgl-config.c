@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-config.c,v 1.25 2000/06/16 20:20:32 mike Exp $"
+ * "$Id: hpgl-config.c,v 1.26 2000/08/03 19:02:34 mike Exp $"
  *
  *   HP-GL/2 configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -229,9 +229,9 @@ update_transform(void)
   if (FitPlot)
   {
     if (Rotation == 0 || Rotation == 180)
-      PenScaling *= page_width / PlotSize[1];
+      PenScaling = page_width / PlotSize[1];
     else
-      PenScaling *= page_width / PlotSize[0];
+      PenScaling = page_width / PlotSize[0];
   }
   else
     PenScaling = 1.0;
@@ -634,5 +634,5 @@ SC_scale(int     num_params,	/* I - Number of parameters */
 
 
 /*
- * End of "$Id: hpgl-config.c,v 1.25 2000/06/16 20:20:32 mike Exp $".
+ * End of "$Id: hpgl-config.c,v 1.26 2000/08/03 19:02:34 mike Exp $".
  */
