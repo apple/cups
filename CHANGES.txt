@@ -1,8 +1,10 @@
-CHANGES.txt - 04/28/2004
+CHANGES.txt - 05/11/2004
 ------------------------
 
 CHANGES IN CUPS V1.1.21rc1
 
+	- The rastertodymo driver now supports the Zebra ZPL
+	  language (STR #713)
 	- The test suite no longer generates a printcap file,
 	  which caused problems when testing as the root user
 	  (STR #693)

@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.15 2002/12/17 19:00:06 swdev Exp $"
+# "$Id: Makefile,v 1.16 2004/05/11 20:13:30 mike Exp $"
 #
 #   PPD file makefile for the Common UNIX Printing System (CUPS).
 #
@@ -30,7 +30,7 @@ include ../Makedefs
 
 FILES	=	deskjet.ppd deskjet2.ppd dymo.ppd epson9.ppd epson24.ppd \
 		laserjet.ppd okidata9.ppd okidat24.ppd stcolor.ppd \
-		stcolor2.ppd stphoto.ppd stphoto2.ppd
+		stcolor2.ppd stphoto.ppd stphoto2.ppd zebra.ppd
 
 
 #
@@ -59,5 +59,5 @@ install:
 
 
 #
-# End of "$Id: Makefile,v 1.15 2002/12/17 19:00:06 swdev Exp $".
+# End of "$Id: Makefile,v 1.16 2004/05/11 20:13:30 mike Exp $".
 #
