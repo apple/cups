@@ -5,6 +5,8 @@ CHANGES IN CUPS V1.1.15
 
 	- Updated the CUPS license agreement for the new MacOS
 	  license exception.
+	- Now pass NLSPATH and DYLD_LIBRARY_PATH environment
+	  variables, if defined, to CGI and job processes.
 	- Removed the pstoraster filter (based on GNU
 	  Ghostscript 5.50) and now provide the raster "driver"
 	  and patch file necessary to use the current GNU
