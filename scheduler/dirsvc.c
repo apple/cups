@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.57 2000/08/30 20:24:53 mike Exp $"
+ * "$Id: dirsvc.c,v 1.58 2000/09/07 20:34:41 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -380,6 +380,7 @@ UpdateBrowseList(void)
       return;
 
     if ((p = FindClass(name)) == NULL && BrowseShortNames)
+    {
       if ((p = FindClass(resource + 9)) != NULL)
       {
         if (strcasecmp(p->hostname, host) != 0)
@@ -406,6 +407,7 @@ UpdateBrowseList(void)
         strncpy(name, resource + 9, sizeof(name) - 1);
         name[sizeof(name) - 1] = '\0';
       }
+    }
 
     if (p == NULL)
     {
@@ -445,6 +447,7 @@ UpdateBrowseList(void)
       return;
 
     if ((p = FindPrinter(name)) == NULL && BrowseShortNames)
+    {
       if ((p = FindPrinter(resource + 10)) != NULL)
       {
         if (strcasecmp(p->hostname, host) != 0)
@@ -471,6 +474,7 @@ UpdateBrowseList(void)
         strncpy(name, resource + 10, sizeof(name) - 1);
         name[sizeof(name) - 1] = '\0';
       }
+    }
 
     if (p == NULL)
     {
@@ -800,5 +804,5 @@ StopPolling(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.57 2000/08/30 20:24:53 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.58 2000/09/07 20:34:41 mike Exp $".
  */
