@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.3 1998/10/13 18:24:15 mike Exp $"
+ * "$Id: http.c,v 1.4 1998/10/13 18:27:05 mike Exp $"
  *
  *   HTTP server test code for CUPS.
  *
@@ -30,7 +30,10 @@
  * Revision History:
  *
  *   $Log: http.c,v $
- *   Revision 1.3  1998/10/13 18:24:15  mike
+ *   Revision 1.4  1998/10/13 18:27:05  mike
+ *   Added Host: line checking & enforcement.
+ *
+ *   Revision 1.3  1998/10/13  18:24:15  mike
  *   Added activity timeout code.
  *   Added Basic authorization code.
  *   Fixed problem with main loop that would cause a core dump.
@@ -590,7 +593,7 @@ ReadConnection(connection_t *con)	/* I - Connection to read from */
     switch (con->state)
     {
       case HTTP_GET :
-          if (host[0] == '\0' && con->version >= HTTP_1_0)
+          if (con->host[0] == '\0' && con->version >= HTTP_1_0)
 	  {
 	    if (!SendError(con, HTTP_BAD_REQUEST))
 	    {
@@ -695,7 +698,7 @@ ReadConnection(connection_t *con)	/* I - Connection to read from */
 	  return (0);
 
       case HTTP_HEAD :
-          if (host[0] == '\0' && con->version >= HTTP_1_0)
+          if (con->host[0] == '\0' && con->version >= HTTP_1_0)
 	  {
 	    if (!SendError(con, HTTP_BAD_REQUEST))
 	    {
@@ -1693,5 +1696,5 @@ signal_handler(int sig)	/* I - Signal number */
 
 
 /*
- * End of "$Id: http.c,v 1.3 1998/10/13 18:24:15 mike Exp $".
+ * End of "$Id: http.c,v 1.4 1998/10/13 18:27:05 mike Exp $".
  */
