@@ -3,14 +3,6 @@ CHANGES.txt - 12/09/2004
 
 CHANGES IN CUPS V1.2.0b1
 
-	- The USB backend used the wrong size status variable
-	  when checking the printer status (STR #1017)
-	- The scheduler did not delete classes from other
-	  classes or implicit classes, which could cause a crash
-	  (STR #1015)
-	- The IPP backend now logs the remote print job ID at
-	  log level NOTICE instead of INFO (so it shows up in
-	  the error_log file...)
 	- Moved enable and disable commands to sbindir to be
 	  consistent.
 	- Updated pdftops filter to Xpdf 3.00.03.

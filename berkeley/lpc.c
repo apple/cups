@@ -1,5 +1,5 @@
 /*
- * "$Id: lpc.c,v 1.11.2.10 2004/06/29 13:15:08 mike Exp $"
+ * "$Id: lpc.c,v 1.11.2.11 2004/12/16 16:38:55 mike Exp $"
  *
  *   "lpc" command for the Common UNIX Printing System (CUPS).
  *
@@ -15,7 +15,7 @@
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
  *       44141 Airport View Drive, Suite 204
- *       Hollywood, Maryland 20636-3142 USA
+ *       Hollywood, Maryland 20636 USA
  *
  *       Voice: (301) 373-9600
  *       EMail: cups-info@cups.org
@@ -273,7 +273,7 @@ show_status(http_t *http,	/* I - HTTP connection to server */
   * Do the request and get back a response...
   */
 
-  if ((response = cupsDoRequest(http, request, "/printers/")) != NULL)
+  if ((response = cupsDoRequest(http, request, "/")) != NULL)
   {
     DEBUG_puts("show_status: request succeeded...");
 
@@ -431,7 +431,7 @@ show_status(http_t *http,	/* I - HTTP connection to server */
 	  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
 	               "requested-attributes", NULL, "job-id");
 
-          if ((jobs = cupsDoRequest(http, request, "/jobs/")) != NULL)
+          if ((jobs = cupsDoRequest(http, request, "/")) != NULL)
 	  {
 	    for (jattr = jobs->attrs; jattr != NULL; jattr = jattr->next)
 	      if (jattr->name && strcmp(jattr->name, "job-id") == 0)
@@ -481,5 +481,5 @@ show_status(http_t *http,	/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpc.c,v 1.11.2.10 2004/06/29 13:15:08 mike Exp $".
+ * End of "$Id: lpc.c,v 1.11.2.11 2004/12/16 16:38:55 mike Exp $".
  */

@@ -1,6 +1,23 @@
 CHANGES-1.1.txt
 ---------------
 
+CHANGES IN CUPS V1.1.23rc1
+
+	- The "lpc status" command used the wrong resource path
+	  when querying the list of printers and jobs, causing
+	  unnecessary authentication requests (STR #1018)
+	- The httpWait() function did not handle signal
+	  interruptions (STR #1020)
+	- The USB backend used the wrong size status variable
+	  when checking the printer status (STR #1017)
+	- The scheduler did not delete classes from other
+	  classes or implicit classes, which could cause a crash
+	  (STR #1015)
+	- The IPP backend now logs the remote print job ID at
+	  log level NOTICE instead of INFO (so it shows up in
+	  the error_log file...)
+
+
 CHANGES IN CUPS V1.1.22
 
 	- The lpstat man page incorrectly listed the "-s" option
