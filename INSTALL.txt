@@ -1,4 +1,4 @@
-INSTALL - CUPS v1.1.14 - 02/13/2002
+INSTALL - CUPS v1.1.15 - 03/22/2002
 -----------------------------------
 
 This file describes how to compile and install CUPS from source
@@ -118,9 +118,9 @@ You can find the RPM software at:
 
     http://www.rpm.org
 
-The RPM software is at:
+The EPM software is at:
 
-    http://www.easysw.com/epm
+    http://www.easysw.com/epm/
 
 
 CREATING BINARY DISTRIBUTIONS WITH EPM

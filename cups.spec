@@ -1,5 +1,5 @@
 #
-# "$Id: cups.spec,v 1.44 2002/03/14 02:53:10 mike Exp $"
+# "$Id: cups.spec,v 1.45 2002/03/22 16:02:06 mike Exp $"
 #
 #   RPM "spec" file for the Common UNIX Printing System (CUPS).
 #
@@ -214,7 +214,7 @@ rm -rf $RPM_BUILD_ROOT
 %dir /usr/share/man/cat3
 /usr/share/man/cat3/*
 %dir /usr/share/man/man3
-/usr/share/man/man1/*
+/usr/share/man/man3/*
 
 %files pstoraster
 %dir /usr/lib/cups/filter
@@ -225,5 +225,5 @@ rm -rf $RPM_BUILD_ROOT
 /usr/share/cups/pstoraster/*
 
 #
-# End of "$Id: cups.spec,v 1.44 2002/03/14 02:53:10 mike Exp $".
+# End of "$Id: cups.spec,v 1.45 2002/03/22 16:02:06 mike Exp $".
 #
