@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: mime.types.man,v 1.4.2.3 2003/01/07 18:27:07 mike Exp $"
+.\" "$Id: mime.types.man,v 1.4.2.4 2003/04/07 18:03:47 mike Exp $"
 .\"
 .\"   mime.types man page for the Common UNIX Printing System (CUPS).
 .\"
@@ -64,6 +64,10 @@ string(offset,"string")
 .br
 True if bytes are identical to string
 .TP 5
+istring(offset,"string")
+.br
+True if a case-insensitive comparison of the bytes is identical
+.TP 5
 char(offset,value)
 .br
 True if byte is identical
@@ -94,5 +98,5 @@ http://localhost:631/documentation.html
 .SH COPYRIGHT
 Copyright 1993-2003 by Easy Software Products, All Rights Reserved.
 .\"
-.\" End of "$Id: mime.types.man,v 1.4.2.3 2003/01/07 18:27:07 mike Exp $".
+.\" End of "$Id: mime.types.man,v 1.4.2.4 2003/04/07 18:03:47 mike Exp $".
 .\"

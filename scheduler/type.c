@@ -1,5 +1,5 @@
 /*
- * "$Id: type.c,v 1.11.2.10 2003/03/30 21:49:23 mike Exp $"
+ * "$Id: type.c,v 1.11.2.11 2003/04/07 18:03:48 mike Exp $"
  *
  *   MIME typing routines for the Common UNIX Printing System (CUPS).
  *
@@ -397,6 +397,8 @@ mimeAddTypeRule(mime_type_t *mt,	/* I - Type to add to */
 	  op = MIME_MAGIC_PRINTABLE;
 	else if (strcmp(name, "string") == 0)
 	  op = MIME_MAGIC_STRING;
+	else if (strcmp(name, "istring") == 0)
+	  op = MIME_MAGIC_ISTRING;
 	else if (strcmp(name, "char") == 0)
 	  op = MIME_MAGIC_CHAR;
 	else if (strcmp(name, "short") == 0)
@@ -485,6 +487,7 @@ mimeAddTypeRule(mime_type_t *mt,	/* I - Type to add to */
 	      temp->length = MIME_MAX_BUFFER;
 	    break;
 	case MIME_MAGIC_STRING :
+	case MIME_MAGIC_ISTRING :
 	    temp->offset = strtol(value[0], NULL, 0);
 	    if (length[1] > sizeof(temp->value.stringv))
 	      return (-1);
@@ -815,6 +818,35 @@ checkrules(const char   *filename,	/* I - Filename */
 	                     rules->value.stringv, rules->length) == 0);
 	  break;
 
+      case MIME_MAGIC_ISTRING :
+         /*
+	  * Load the buffer if necessary...
+	  */
+
+          if (bufoffset < 0 || rules->offset < bufoffset ||
+	      (rules->offset + rules->length) > (bufoffset + buflength))
+	  {
+	   /*
+	    * Reload file buffer...
+	    */
+
+            cupsFileSeek(fp, rules->offset);
+	    buflength = cupsFileRead(fp, buffer, sizeof(buffer));
+	    bufoffset = rules->offset;
+	  }
+
+         /*
+	  * Compare the buffer against the string.  If the file is too
+	  * short then don't compare - it can't match...
+	  */
+
+	  if ((rules->offset + rules->length) > (bufoffset + buflength))
+	    result = 0;
+	  else
+            result = (strncasecmp(buffer + rules->offset - bufoffset,
+	                          rules->value.stringv, rules->length) == 0);
+	  break;
+
       case MIME_MAGIC_CHAR :
          /*
 	  * Load the buffer if necessary...
@@ -1096,5 +1128,5 @@ patmatch(const char *s,		/* I - String to match against */
 
 
 /*
- * End of "$Id: type.c,v 1.11.2.10 2003/03/30 21:49:23 mike Exp $".
+ * End of "$Id: type.c,v 1.11.2.11 2003/04/07 18:03:48 mike Exp $".
  */

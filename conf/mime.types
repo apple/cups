@@ -1,5 +1,5 @@
 #
-# "$Id: mime.types,v 1.17.2.9 2003/01/28 20:37:06 mike Exp $"
+# "$Id: mime.types,v 1.17.2.10 2003/04/07 18:03:47 mike Exp $"
 #
 #   MIME types file for the Common UNIX Printing System (CUPS).
 #
@@ -41,6 +41,8 @@
 #   printable(offset,length)		True if bytes are printable 8-bit chars
 #					(CR, NL, TAB, BS, 32-126, 128-254)
 #   string(offset,"string")		True if bytes are identical to string
+#   istring(offset,"string")		True if bytes are identical to
+#                                       case-insensitive string
 #   char(offset,value)			True if byte is identical
 #   short(offset,value)			True if 16-bit integer is identical
 #   int(offset,value)			True if 32-bit integer is identical
@@ -68,7 +70,7 @@
 # Application-generated files...
 #
 
-application/msword		doc string(0,<D0CF11E0A1B11AE1>)
+#application/msword		doc string(0,<D0CF11E0A1B11AE1>)
 application/pdf			pdf string(0,%PDF)
 application/postscript		ai eps ps string(0,%!) string(0,<04>%!) \
 				contains(0,128,<1B>%-12345X) + \
@@ -105,7 +107,7 @@ image/x-portable-pixmap		ppm string(0,P3) string(0,P6)
 image/x-sgi-rgb			rgb sgi bw icon short(0,474)
 image/x-xbitmap			xbm
 image/x-xpixmap			xpm ascii(0,1024) + string(3,"XPM")
-image/x-xwindowdump		xwd string(4,<00000007>)
+#image/x-xwindowdump		xwd string(4,<00000007>)
 image/x-sun-raster		ras string(0,<59a66a95>)
 
 #image/fpx			fpx
@@ -118,7 +120,7 @@ image/x-bitmap			bmp string(0,BM) && !printable(2,14)
 #
 
 text/html			html htm printable(0,1024) +\
-				(string(0,"<HTML>") string(0,"<!DOCTYPE"))
+				(istring(0,"<HTML>") istring(0,"<!DOCTYPE"))
 application/x-cshell		csh printable(0,1024) + string(0,#!) +\
 				(contains(2,80,/csh) contains(2,80,/tcsh))
 application/x-perl		pl printable(0,1024) + string(0,#!) +\
@@ -155,5 +157,5 @@ application/vnd.cups-raw	(string(0,<1B>E) + !string(2,<1B>%0B)) \
 #application/octet-stream
 
 #
-# End of "$Id: mime.types,v 1.17.2.9 2003/01/28 20:37:06 mike Exp $".
+# End of "$Id: mime.types,v 1.17.2.10 2003/04/07 18:03:47 mike Exp $".
 #

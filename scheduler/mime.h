@@ -1,5 +1,5 @@
 /*
- * "$Id: mime.h,v 1.3.2.7 2003/03/30 21:49:22 mike Exp $"
+ * "$Id: mime.h,v 1.3.2.8 2003/04/07 18:03:48 mike Exp $"
  *
  *   MIME type/conversion database definitions for the Common UNIX Printing System (CUPS).
  *
@@ -65,7 +65,8 @@ typedef enum
   MIME_MAGIC_SHORT,	/* Short/16-bit word matches */
   MIME_MAGIC_INT,	/* Integer/32-bit word matches */
   MIME_MAGIC_LOCALE,	/* Current locale matches string */
-  MIME_MAGIC_CONTAINS	/* File contains a string */
+  MIME_MAGIC_CONTAINS,	/* File contains a string */
+  MIME_MAGIC_ISTRING	/* Case-insensitive string matches */
 } mime_op_t;
 
 typedef struct mime_magic_str		/**** MIME Magic Data ****/
@@ -142,5 +143,5 @@ extern mime_filter_t	*mimeFilter(mime_t *mime, mime_type_t *src, mime_type_t *ds
 #endif /* !_CUPS_MIME_H_ */
 
 /*
- * End of "$Id: mime.h,v 1.3.2.7 2003/03/30 21:49:22 mike Exp $".
+ * End of "$Id: mime.h,v 1.3.2.8 2003/04/07 18:03:48 mike Exp $".
  */
