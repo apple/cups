@@ -1,5 +1,5 @@
 /*
- * "$Id: mark.c,v 1.14 1999/07/12 16:09:38 mike Exp $"
+ * "$Id: mark.c,v 1.15 1999/08/20 14:13:25 mike Exp $"
  *
  *   Option marking routines for the Common UNIX Printing System (CUPS).
  *
@@ -33,7 +33,6 @@
  *   ppdMarkDefaults()     - Mark all default options in the PPD file.
  *   ppdMarkOption()       - Mark an option in a PPD file.
  *   ppd_defaults()        - Set the defaults for this group and all sub-groups.
- *   ppd_default()         - Set the default choice for an option.
  */
 
 /*
@@ -48,8 +47,7 @@
  * Local functions...
  */
 
-static void	ppd_defaults(ppd_group_t *g);
-static void	ppd_default(ppd_option_t *o);
+static void	ppd_defaults(ppd_file_t *ppd, ppd_group_t *g);
 
 
 /*
@@ -296,12 +294,7 @@ ppdMarkDefaults(ppd_file_t *ppd)/* I - PPD file record */
     return;
 
   for (i = ppd->num_groups, g = ppd->groups; i > 0; i --, g ++)
-    ppd_defaults(g);
-
-  o = ppdFindOption(ppd, "PageSize");
-
-  for (i = 0; i < ppd->num_sizes; i ++)
-    ppd->sizes[i].marked = strcmp(ppd->sizes[i].name, o->defchoice) == 0;
+    ppd_defaults(ppd, g);
 }
 
 
@@ -394,7 +387,8 @@ ppdMarkOption(ppd_file_t *ppd,		/* I - PPD file record */
  */
 
 static void
-ppd_defaults(ppd_group_t *g)	/* I - Group to default */
+ppd_defaults(ppd_file_t  *ppd,	/* I - PPD file */
+             ppd_group_t *g)	/* I - Group to default */
 {
   int		i;		/* Looping var */
   ppd_option_t	*o;		/* Current option */
@@ -406,35 +400,13 @@ ppd_defaults(ppd_group_t *g)	/* I - Group to default */
 
   for (i = g->num_options, o = g->options; i > 0; i --, o ++)
     if (strcmp(o->keyword, "PageRegion") != 0)
-      ppd_default(o);
+      ppdMarkOption(ppd, o->keyword, o->defchoice);
 
   for (i = g->num_subgroups, sg = g->subgroups; i > 0; i --, sg ++)
-    ppd_defaults(sg);
+    ppd_defaults(ppd, sg);
 }
 
 
 /*
- * 'ppd_default()' - Set the default choice for an option.
- */
-
-static void
-ppd_default(ppd_option_t *o)	/* I - Option to default */
-{
-  int		i;		/* Looping var */
-  ppd_choice_t	*c;		/* Current choice */
-
-
-  if (o == NULL)
-    return;
-
-  for (i = o->num_choices, c = o->choices; i > 0; i --, c ++)
-    if (strcmp(c->choice, o->defchoice) == 0)
-      c->marked = 1;
-    else
-      c->marked = 0;
-}
-
-
-/*
- * End of "$Id: mark.c,v 1.14 1999/07/12 16:09:38 mike Exp $".
+ * End of "$Id: mark.c,v 1.15 1999/08/20 14:13:25 mike Exp $".
  */
