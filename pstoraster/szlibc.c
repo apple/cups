@@ -20,6 +20,8 @@
   the GNU Project.  GNU Ghostscript, as distributed by Aladdin Enterprises,
   does not depend on any other GNU software.
 */
+#include <config.h>
+#ifdef HAVE_LIBZ
 
 /* szlibc.c */
 /* Code common to zlib encoding and decoding streams */
@@ -43,3 +45,4 @@ void
 s_zlib_free(void *mem, void *address)
 {	gs_free_object((gs_memory_t *)mem, address, "zlib");
 }
+#endif

@@ -20,6 +20,8 @@
   the GNU Project.  GNU Ghostscript, as distributed by Aladdin Enterprises,
   does not depend on any other GNU software.
 */
+#include <config.h>
+#ifdef HAVE_LIBZ
 
 /* szlibd.c */
 /* zlib decoding (decompression) filter stream */
@@ -85,3 +87,4 @@ const stream_template s_zlibD_template =
 };
 
 #undef ss
+#endif

@@ -1,5 +1,5 @@
 /*
- * "$Id: gconfig.h,v 1.4 1999/05/15 04:00:19 mike Exp $"
+ * "$Id: gconfig.h,v 1.5 1999/05/15 04:18:56 mike Exp $"
  *
  *   GNU GhostScript configuration file for the Common UNIX Printing
  *   System (CUPS).
@@ -33,7 +33,9 @@ device_(gs_cups_device)
 device_(gs_nullpage_device)
 #endif
 #ifdef oper_
+#  ifdef HAVE_LIBZ
 oper_(zfzlib_op_defs)
+#  endif /* HAVE_LIBZ */
 oper_(zcie_l2_op_defs)
 oper_(zcrd_l2_op_defs)
 oper_(zfont0_op_defs)
@@ -190,5 +192,5 @@ init_(gs_roplib_init)
 #define GS_INIT "gs_init.ps"
 
 /*
- * End of "$Id: gconfig.h,v 1.4 1999/05/15 04:00:19 mike Exp $".
+ * End of "$Id: gconfig.h,v 1.5 1999/05/15 04:18:56 mike Exp $".
  */

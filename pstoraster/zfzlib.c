@@ -20,6 +20,8 @@
   the GNU Project.  GNU Ghostscript, as distributed by Aladdin Enterprises,
   does not depend on any other GNU software.
 */
+#include <config.h>
+#ifdef HAVE_LIBZ
 
 /* zfzlib.c */
 /* zlib and Flate filter creation */
@@ -96,3 +98,4 @@ BEGIN_OP_DEFS(zfzlib_op_defs) {
 	{"1FlateEncode", zFlateE},
 	{"1FlateDecode", zFlateD},
 END_OP_DEFS(0) }
+#endif
