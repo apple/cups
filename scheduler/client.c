@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.91.2.49 2003/03/13 04:19:41 mike Exp $"
+ * "$Id: client.c,v 1.91.2.50 2003/03/13 06:28:25 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -371,6 +371,8 @@ CloseClient(client_t *con)	/* I - Client to close */
 
   if (con->http.input_set)
     free(con->http.input_set);
+
+  httpClearCookie(HTTP(con));
 
   ClearString(&con->filename);
   ClearString(&con->command);
@@ -2624,6 +2626,7 @@ pipe_command(client_t *con,		/* I - Client connection */
 	     char     *command,		/* I - Command to run */
 	     char     *options)		/* I - Options for command */
 {
+  int		i;			/* Looping var */
   int		pid;			/* Process ID */
   char		*commptr;		/* Command string pointer */
   int		fd;			/* Looping var */
@@ -2633,20 +2636,24 @@ pipe_command(client_t *con,		/* I - Client connection */
   char		argbuf[10240],		/* Argument buffer */
 		*argv[100],		/* Argument strings */
 		*envp[100];		/* Environment variables */
-  char		lang[1024],		/* LANG env variable */
-		content_length[1024],	/* CONTENT_LENGTH env variable */
-		content_type[1024],	/* CONTENT_TYPE env variable */
-		ipp_port[1024],		/* Default listen port */
-		server_port[1024],	/* Default server port */
-		server_name[1024],	/* Default listen hostname */
-		remote_host[1024],	/* REMOTE_HOST env variable */
-		remote_user[1024],	/* REMOTE_USER env variable */
-		tmpdir[1024],		/* TMPDIR environment variable */
-		ldpath[1024],		/* LD_LIBRARY_PATH environment variable */
+  char		content_length[1024],	/* CONTENT_LENGTH environment variable */
+		content_type[1024],	/* CONTENT_TYPE environment variable */
+		cups_datadir[1024],	/* CUPS_DATADIR environment variable */
+		cups_serverroot[1024],	/* CUPS_SERVERROOT environment variable */
+		http_cookie[1024],	/* HTTP_COOKIE environment variable */
+		http_user_agent[1024],	/* HTTP_USER_AGENT environment variable */
+		ipp_port[1024],		/* IPP_PORT environment variable */
+		lang[1024],		/* LANG environment variable */
+		ld_library_path[1024],	/* LD_LIBRARY_PATH environment variable */
 		nlspath[1024],		/* NLSPATH environment variable */
-		datadir[1024],		/* CUPS_DATADIR environment variable */
-		root[1024],		/* CUPS_SERVERROOT environment variable */
-		query_string[10240];	/* QUERY_STRING env variable */
+		query_string[10240],	/* QUERY_STRING env variable */
+		remote_addr[1024],	/* REMOTE_ADDR environment variable */
+		remote_host[1024],	/* REMOTE_HOST environment variable */
+		remote_user[1024],	/* REMOTE_USER environment variable */
+		script_name[1024],	/* SCRIPT_NAME environment variable */
+		server_name[1024],	/* SERVER_NAME environment variable */
+		server_port[1024],	/* SERVER_PORT environment variable */
+		tmpdir[1024];		/* TMPDIR environment variable */
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
   struct sigaction action;		/* POSIX signal handler */
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET */
@@ -2729,50 +2736,81 @@ pipe_command(client_t *con,		/* I - Client connection */
   else
     snprintf(server_name, sizeof(server_name), "SERVER_NAME=%s", ServerName);
   snprintf(remote_host, sizeof(remote_host), "REMOTE_HOST=%s", con->http.hostname);
+  strcpy(remote_addr, "REMOTE_ADDR=");
+  httpAddrString(&(con->http.hostaddr), remote_addr + 12,
+                 sizeof(remote_addr) - 12);
   snprintf(remote_user, sizeof(remote_user), "REMOTE_USER=%s", con->username);
   snprintf(tmpdir, sizeof(tmpdir), "TMPDIR=%s", TempDir);
-  snprintf(datadir, sizeof(datadir), "CUPS_DATADIR=%s", DataDir);
-  snprintf(root, sizeof(root), "CUPS_SERVERROOT=%s", ServerRoot);
+  snprintf(cups_datadir, sizeof(cups_datadir), "CUPS_DATADIR=%s", DataDir);
+  snprintf(cups_serverroot, sizeof(cups_serverroot), "CUPS_SERVERROOT=%s", ServerRoot);
+
+  envc = 0;
+
+  envp[envc ++] = "PATH=/bin:/usr/bin";
+  envp[envc ++] = "SERVER_SOFTWARE=CUPS/1.1";
+  envp[envc ++] = "GATEWAY_INTERFACE=CGI/1.1";
+  if (con->http.version == HTTP_1_1)
+    envp[envc ++] = "SERVER_PROTOCOL=HTTP/1.1";
+  else if (con->http.version == HTTP_1_0)
+    envp[envc ++] = "SERVER_PROTOCOL=HTTP/1.0";
+  else
+    envp[envc ++] = "SERVER_PROTOCOL=HTTP/0.9";
+  envp[envc ++] = "REDIRECT_STATUS=1";
+  envp[envc ++] = ipp_port;
+  envp[envc ++] = server_name;
+  envp[envc ++] = server_port;
+  envp[envc ++] = remote_addr;
+  envp[envc ++] = remote_host;
+  envp[envc ++] = remote_user;
+  envp[envc ++] = lang;
+  envp[envc ++] = TZ;
+  envp[envc ++] = tmpdir;
+  envp[envc ++] = cups_datadir;
+  envp[envc ++] = cups_serverroot;
 
   if (getenv("LD_LIBRARY_PATH") != NULL)
-    snprintf(ldpath, sizeof(ldpath), "LD_LIBRARY_PATH=%s",
+  {
+    snprintf(ld_library_path, sizeof(ld_library_path), "LD_LIBRARY_PATH=%s",
              getenv("LD_LIBRARY_PATH"));
+    envp[envc ++] = ld_library_path;
+  }
   else if (getenv("DYLD_LIBRARY_PATH") != NULL)
-    snprintf(ldpath, sizeof(ldpath), "DYLD_LIBRARY_PATH=%s",
+  {
+    snprintf(ld_library_path, sizeof(ld_library_path), "DYLD_LIBRARY_PATH=%s",
              getenv("DYLD_LIBRARY_PATH"));
+    envp[envc ++] = ld_library_path;
+  }
   else if (getenv("SHLIB_PATH") != NULL)
-    snprintf(ldpath, sizeof(ldpath), "SHLIB_PATH=%s",
+  {
+    snprintf(ld_library_path, sizeof(ld_library_path), "SHLIB_PATH=%s",
              getenv("SHLIB_PATH"));
-  else
-    ldpath[0] = '\0';
+    envp[envc ++] = ld_library_path;
+  }
 
   if (getenv("NLSPATH") != NULL)
+  {
     snprintf(nlspath, sizeof(nlspath), "NLSPATH=%s", getenv("NLSPATH"));
-  else
-    nlspath[0] = '\0';
-
-  envp[0]  = "PATH=/bin:/usr/bin";
-  envp[1]  = "SERVER_SOFTWARE=CUPS/1.2";
-  envp[2]  = "GATEWAY_INTERFACE=CGI/1.1";
-  envp[3]  = "SERVER_PROTOCOL=HTTP/1.1";
-  envp[4]  = ipp_port;
-  envp[5]  = server_name;
-  envp[6]  = server_port;
-  envp[7]  = remote_host;
-  envp[8]  = remote_user;
-  envp[9]  = lang;
-  envp[10] = TZ;
-  envp[11] = tmpdir;
-  envp[12] = datadir;
-  envp[13] = root;
-
-  envc = 14;
-
-  if (ldpath[0])
-    envp[envc ++] = ldpath;
-
-  if (nlspath[0])
     envp[envc ++] = nlspath;
+  }
+
+  if (con->http.cookie)
+  {
+    snprintf(http_cookie, sizeof(http_cookie), "HTTP_COOKIE=%s",
+             con->http.cookie);
+    envp[envc ++] = http_cookie;
+  }
+
+  if (con->http.fields[HTTP_FIELD_USER_AGENT][0])
+  {
+    snprintf(http_user_agent, sizeof(http_user_agent), "HTTP_USER_AGENT=%s",
+             con->http.fields[HTTP_FIELD_USER_AGENT]);
+    envp[envc ++] = http_user_agent;
+  }
+
+  snprintf(script_name, sizeof(script_name), "SCRIPT_NAME=%s", con->uri);
+  if ((commptr = strchr(script_name, '?')) != NULL)
+    *commptr = '\0';
+  envp[envc ++] = script_name;
 
   if (con->operation == HTTP_GET)
   {
@@ -2814,6 +2852,14 @@ pipe_command(client_t *con,		/* I - Client connection */
   }
 
   envp[envc] = NULL;
+
+  if (LogLevel == L_DEBUG2)
+  {
+    for (i = 0; i < argc; i ++)
+      LogMessage(L_DEBUG2, "argv[%d] = \"%s\"", i, argv[i]);
+    for (i = 0; i < envc; i ++)
+      LogMessage(L_DEBUG2, "envp[%d] = \"%s\"", i, envp[i]);
+  }
 
  /*
   * Create a pipe for the output...
@@ -3004,5 +3050,5 @@ CDSAWriteFunc(SSLConnectionRef connection,	/* I  - SSL/TLS connection */
 
 
 /*
- * End of "$Id: client.c,v 1.91.2.49 2003/03/13 04:19:41 mike Exp $".
+ * End of "$Id: client.c,v 1.91.2.50 2003/03/13 06:28:25 mike Exp $".
  */
