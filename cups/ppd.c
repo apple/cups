@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c,v 1.51.2.37 2003/02/18 18:25:38 mike Exp $"
+ * "$Id: ppd.c,v 1.51.2.38 2003/02/18 22:29:54 mike Exp $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -296,7 +296,10 @@ ppdErrorString(ppd_status_t status)	/* I - PPD status */
 		  "Memory allocation error",
 		  "Missing value string",
 		  "Internal error",
+		  "Bad OpenGroup",
 		  "OpenGroup without a CloseGroup first",
+		  "Bad OpenUI/JCLOpenUI",
+		  "OpenUI/JCLOpenUI without a CloseUI/JCLCLoseUI first",
 		  "Bad OrderDependency",
 		  "Bad UIConstraints",
 		  "Missing asterisk in column 1",
@@ -364,6 +367,57 @@ ppdOpen(FILE *fp)			/* I - File to read from */
   ppd_profile_t		*profile;	/* Pointer to color profile */
   char			**filter;	/* Pointer to filter */
   cups_lang_t		*language;	/* Default language */
+  static const char * const ui_keywords[] =
+			{
+			  /* Boolean keywords */
+			  "BlackSubstitution",
+			  "Booklet",
+			  "Collate",
+			  "ManualFeed",
+			  "MirrorPrint",
+			  "NegativePrint",
+			  "Sorter",
+			  "TraySwitch",
+
+			  /* PickOne keywords */
+			  "AdvanceMedia",
+			  "BindColor",
+			  "BindEdge",
+			  "BindType",
+			  "BindWhen",
+			  "BitsPerPixel",
+			  "ColorModel",
+			  "ColorRenderDict",
+			  "CutMedia",
+			  "Duplex",
+			  "FoldType",
+			  "FoldWhen",
+			  "InputSlot",
+			  "JCLFrameBufferSize",
+			  "JCLResolution",
+			  "Jog",
+			  "MediaColor",
+			  "MediaType",
+			  "MediaWeight",
+			  "OutputBin",
+			  "OutputMode",
+			  "OutputOrder",
+			  "PageRegion",
+			  "PageSize",
+			  "Resolution",
+			  "ScreenProc",
+			  "Separations",
+			  "SetResolution",
+			  "Signature",
+			  "Slipsheet",
+			  "Smoothing",
+			  "StapleLocation",
+			  "StapleOrientation",
+			  "StapleWhen",
+			  "StapleX",
+			  "StapleY",
+			  "Transfer"
+			};
 
 
  /*
@@ -468,12 +522,11 @@ ppdOpen(FILE *fp)			/* I - File to read from */
     puts("");
 #endif /* DEBUG */
 
-    if (strcmp(keyword, "CloseUI") != 0 &&
-        strcmp(keyword, "JCLCloseUI") != 0 &&
-        strcmp(keyword, "CloseGroup") != 0 &&
-	strcmp(keyword, "CloseSubGroup") != 0 &&
-	strncmp(keyword, "Default", 7) != 0 &&
-	string == NULL)
+    if (strcmp(keyword, "CloseUI") && strcmp(keyword, "CloseGroup") &&
+	strcmp(keyword, "CloseSubGroup") && strncmp(keyword, "Default", 7) &&
+        strcmp(keyword, "JCLCloseUI") && strcmp(keyword, "JCLOpenUI") &&
+	strcmp(keyword, "OpenUI") && strcmp(keyword, "OpenGroup") &&
+	strcmp(keyword, "OpenSubGroup") && string == NULL)
     {
      /*
       * Need a string value!
@@ -492,6 +545,106 @@ ppdOpen(FILE *fp)			/* I - File to read from */
       ppd_status = PPD_MISSING_VALUE;
 
       return (NULL);
+    }
+
+   /*
+    * Certain main keywords (as defined by the PPD spec) may be used
+    * without the usual OpenUI/CloseUI stuff.  Presumably this is just
+    * so that Adobe wouldn't completely break compatibility with PPD
+    * files prior to v4.0 of the spec, but it is hopelessly
+    * inconsistent...  Catch these main keywords and automatically
+    * create the corresponding option, as needed...
+    */
+
+    if (option == NULL)
+    {
+      for (i = 0; i < (int)(sizeof(ui_keywords) / sizeof(ui_keywords[0])); i ++)
+        if (!strcmp(name, ui_keywords[i]))
+	  break;
+
+      if (i < (int)(sizeof(ui_keywords) / sizeof(ui_keywords[0])))
+      {
+       /*
+        * Create the option in the appropriate group...
+	*/
+
+        if (!group)
+	{
+          if (strcmp(name, "Collate") && strcmp(name, "Duplex") &&
+              strcmp(name, "InputSlot") && strcmp(name, "ManualFeed") &&
+              strcmp(name, "MediaType") && strcmp(name, "MediaColor") &&
+              strcmp(name, "MediaWeight") && strcmp(name, "OutputBin") &&
+              strcmp(name, "OutputMode") && strcmp(name, "OutputOrder") &&
+	      strcmp(name, "PageSize") && strcmp(name, "PageRegion"))
+	    group = ppd_get_group(ppd, "Extra",
+	                          cupsLangString(language, CUPS_MSG_EXTRA));
+	  else
+	    group = ppd_get_group(ppd, "General",
+	                          cupsLangString(language, CUPS_MSG_GENERAL));
+
+          if (group == NULL)
+	  {
+            ppdClose(ppd);
+
+	    ppd_free(string);
+
+            cupsLangFree(language);
+
+#ifdef LC_NUMERIC
+            setlocale(LC_NUMERIC, oldlocale);
+#else
+            setlocale(LC_ALL, oldlocale);
+#endif /* LC_NUMERIC */
+
+            ppd_status = PPD_ALLOC_ERROR;
+
+	    return (NULL);
+	  }
+
+          DEBUG_printf(("Adding to group %s...\n", group->text));
+          option = ppd_get_option(group, name);
+	  group  = NULL;
+	}
+	else
+          option = ppd_get_option(group, name);
+
+	if (option == NULL)
+	{
+          ppdClose(ppd);
+
+	  ppd_free(string);
+
+          cupsLangFree(language);
+
+#ifdef LC_NUMERIC
+          setlocale(LC_NUMERIC, oldlocale);
+#else
+          setlocale(LC_ALL, oldlocale);
+#endif /* LC_NUMERIC */
+
+          ppd_status = PPD_ALLOC_ERROR;
+
+	  return (NULL);
+	}
+
+       /*
+	* Now fill in the initial information for the option...
+	*/
+
+	if (!strcmp(name, "SetResolution"))
+          option->section = PPD_ORDER_EXIT;
+	else if (!strncmp(name, "JCL", 3))
+          option->section = PPD_ORDER_JCL;
+	else
+          option->section = PPD_ORDER_ANY;
+
+	option->order = 10.0f;
+
+	if (i < 8)
+          option->ui = PPD_UI_BOOLEAN;
+	else
+          option->ui = PPD_UI_PICKONE;
+      }
     }
 
     if (strcmp(keyword, "LanguageLevel") == 0)
@@ -1045,6 +1198,29 @@ ppdOpen(FILE *fp)			/* I - File to read from */
     else if (strcmp(keyword, "OpenUI") == 0)
     {
      /*
+      * Don't allow nesting of options...
+      */
+
+      if (option)
+      {
+        ppdClose(ppd);
+
+	ppd_free(string);
+
+        cupsLangFree(language);
+
+#ifdef LC_NUMERIC
+        setlocale(LC_NUMERIC, oldlocale);
+#else
+        setlocale(LC_ALL, oldlocale);
+#endif /* LC_NUMERIC */
+
+        ppd_status = PPD_NESTED_OPEN_UI;
+
+	return (NULL);
+      }
+
+     /*
       * Add an option record to the current sub-group, group, or file...
       */
 
@@ -1061,18 +1237,12 @@ ppdOpen(FILE *fp)			/* I - File to read from */
         option = ppd_get_option(subgroup, name);
       else if (group == NULL)
       {
-        if (strcmp(name, "Collate") != 0 &&
-            strcmp(name, "Duplex") != 0 &&
-            strcmp(name, "InputSlot") != 0 &&
-            strcmp(name, "ManualFeed") != 0 &&
-            strcmp(name, "MediaType") != 0 &&
-            strcmp(name, "MediaColor") != 0 &&
-            strcmp(name, "MediaWeight") != 0 &&
-            strcmp(name, "OutputBin") != 0 &&
-            strcmp(name, "OutputMode") != 0 &&
-            strcmp(name, "OutputOrder") != 0 &&
-	    strcmp(name, "PageSize") != 0 &&
-            strcmp(name, "PageRegion") != 0)
+        if (strcmp(name, "Collate") && strcmp(name, "Duplex") &&
+            strcmp(name, "InputSlot") && strcmp(name, "ManualFeed") &&
+            strcmp(name, "MediaType") && strcmp(name, "MediaColor") &&
+            strcmp(name, "MediaWeight") && strcmp(name, "OutputBin") &&
+            strcmp(name, "OutputMode") && strcmp(name, "OutputOrder") &&
+	    strcmp(name, "PageSize") && strcmp(name, "PageRegion"))
 	  group = ppd_get_group(ppd, "Extra",
 	                        cupsLangString(language, CUPS_MSG_EXTRA));
 	else
@@ -1128,12 +1298,30 @@ ppdOpen(FILE *fp)			/* I - File to read from */
       * Now fill in the initial information for the option...
       */
 
-      if (strcmp(string, "PickMany") == 0)
+      if (string && strcmp(string, "PickMany") == 0)
         option->ui = PPD_UI_PICKMANY;
-      else if (strcmp(string, "Boolean") == 0)
+      else if (string && strcmp(string, "Boolean") == 0)
         option->ui = PPD_UI_BOOLEAN;
-      else
+      else if (string && strcmp(string, "PickOne") == 0)
         option->ui = PPD_UI_PICKONE;
+      else
+      {
+        ppdClose(ppd);
+
+	ppd_free(string);
+
+        cupsLangFree(language);
+
+#ifdef LC_NUMERIC
+        setlocale(LC_NUMERIC, oldlocale);
+#else
+        setlocale(LC_ALL, oldlocale);
+#endif /* LC_NUMERIC */
+
+        ppd_status = PPD_BAD_OPEN_UI;
+
+	return (NULL);
+      }
 
       if (text[0])
       {
@@ -1165,6 +1353,29 @@ ppdOpen(FILE *fp)			/* I - File to read from */
     }
     else if (strcmp(keyword, "JCLOpenUI") == 0)
     {
+     /*
+      * Don't allow nesting of options...
+      */
+
+      if (option)
+      {
+        ppdClose(ppd);
+
+	ppd_free(string);
+
+        cupsLangFree(language);
+
+#ifdef LC_NUMERIC
+        setlocale(LC_NUMERIC, oldlocale);
+#else
+        setlocale(LC_ALL, oldlocale);
+#endif /* LC_NUMERIC */
+
+        ppd_status = PPD_NESTED_OPEN_UI;
+
+	return (NULL);
+      }
+
      /*
       * Find the JCL group, and add if needed...
       */
@@ -1222,12 +1433,30 @@ ppdOpen(FILE *fp)			/* I - File to read from */
       * Now fill in the initial information for the option...
       */
 
-      if (strcmp(string, "PickMany") == 0)
+      if (string && strcmp(string, "PickMany") == 0)
         option->ui = PPD_UI_PICKMANY;
-      else if (strcmp(string, "Boolean") == 0)
+      else if (string && strcmp(string, "Boolean") == 0)
         option->ui = PPD_UI_BOOLEAN;
-      else
+      else if (string && strcmp(string, "PickOne") == 0)
         option->ui = PPD_UI_PICKONE;
+      else
+      {
+        ppdClose(ppd);
+
+	ppd_free(string);
+
+        cupsLangFree(language);
+
+#ifdef LC_NUMERIC
+        setlocale(LC_NUMERIC, oldlocale);
+#else
+        setlocale(LC_ALL, oldlocale);
+#endif /* LC_NUMERIC */
+
+        ppd_status = PPD_BAD_OPEN_UI;
+
+	return (NULL);
+      }
 
       strlcpy(option->text, text, sizeof(option->text));
 
@@ -1258,6 +1487,25 @@ ppdOpen(FILE *fp)			/* I - File to read from */
 #endif /* LC_NUMERIC */
 
         ppd_status = PPD_NESTED_OPEN_GROUP;
+
+	return (NULL);
+      }
+
+      if (!string)
+      {
+        ppdClose(ppd);
+
+	ppd_free(string);
+
+        cupsLangFree(language);
+
+#ifdef LC_NUMERIC
+        setlocale(LC_NUMERIC, oldlocale);
+#else
+        setlocale(LC_ALL, oldlocale);
+#endif /* LC_NUMERIC */
+
+        ppd_status = PPD_BAD_OPEN_GROUP;
 
 	return (NULL);
       }
@@ -2970,5 +3218,5 @@ ppd_read(FILE *fp,			/* I - File to read from */
 
 
 /*
- * End of "$Id: ppd.c,v 1.51.2.37 2003/02/18 18:25:38 mike Exp $".
+ * End of "$Id: ppd.c,v 1.51.2.38 2003/02/18 22:29:54 mike Exp $".
  */

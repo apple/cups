@@ -1,5 +1,5 @@
 /*
- * "$Id: cupstestppd.c,v 1.1.2.9 2003/02/14 21:24:12 mike Exp $"
+ * "$Id: cupstestppd.c,v 1.1.2.10 2003/02/18 22:29:56 mike Exp $"
  *
  *   PPD test program for the Common UNIX Printing System (CUPS).
  *
@@ -137,6 +137,9 @@ main(int  argc,			/* I - Number of command-line arguments */
       * Open the PPD file...
       */
 
+      if (files)
+        putchar('\n');
+
       files ++;
 
       if (argv[i][0] == '-')
@@ -187,24 +190,67 @@ main(int  argc,			/* I - Number of command-line arguments */
       {
         error = ppdLastError(&line);
 
-	if (error <= PPD_NULL_FILE)
+	if (error <= PPD_NULL_FILE || error == PPD_ALLOC_ERROR)
 	{
 	  status = ERROR_FILE_OPEN;
 
-          if (verbose == 0)
-	    puts(" ERROR");
-	  else if (verbose > 0)
-	    printf("\n    Unable to open PPD file - %s\n\n", strerror(errno));
+	  if (verbose >= 0)
+	    printf(" ERROR\n    Unable to open PPD file - %s\n\n",
+	           strerror(errno));
 	}
 	else
 	{
 	  status = ERROR_PPD_FORMAT;
 
-          if (verbose == 0)
-	    puts(" FAIL");
-          else if (verbose > 0)
-	    printf("\n    Unable to open PPD file - %s on line %d.\n",
+          if (verbose >= 0)
+	  {
+	    printf(" FAIL\n    Unable to open PPD file - %s on line %d.\n",
 	           ppdErrorString(error), line);
+
+            switch (error)
+	    {
+	      case PPD_MISSING_PPDADOBE4 :
+	          puts("    REF: Page 42, section 5.2.");
+	          break;
+	      case PPD_MISSING_VALUE :
+	          puts("    REF: Page 20, section 3.4.");
+	          break;
+	      case PPD_BAD_OPEN_GROUP :
+	      case PPD_NESTED_OPEN_GROUP :
+	          puts("    REF: Pages 45-46, section 5.2.");
+	          break;
+	      case PPD_BAD_OPEN_UI :
+	      case PPD_NESTED_OPEN_UI :
+	          puts("    REF: Pages 42-45, section 5.2.");
+	          break;
+	      case PPD_BAD_ORDER_DEPENDENCY :
+	          puts("    REF: Pages 48-49, section 5.2.");
+	          break;
+	      case PPD_BAD_UI_CONSTRAINTS :
+	          puts("    REF: Pages 52-54, section 5.2.");
+	          break;
+	      case PPD_MISSING_ASTERISK :
+	          puts("    REF: Page 15, section 3.2.");
+	          break;
+	      case PPD_LINE_TOO_LONG :
+	          puts("    REF: Page 15, section 3.1.");
+	          break;
+	      case PPD_ILLEGAL_CHARACTER :
+	          puts("    REF: Page 15, section 3.1.");
+	          break;
+	      case PPD_ILLEGAL_MAIN_KEYWORD :
+	          puts("    REF: Pages 16-17, section 3.2.");
+	          break;
+	      case PPD_ILLEGAL_OPTION_KEYWORD :
+	          puts("    REF: Page 19, section 3.3.");
+	          break;
+	      case PPD_ILLEGAL_TRANSLATION :
+	          puts("    REF: Page 27, section 3.5.");
+	          break;
+              default :
+	          break;
+	    }
+	  }
         }
 
 	continue;
@@ -215,19 +261,14 @@ main(int  argc,			/* I - Number of command-line arguments */
       * only by what the CUPS PPD functions actually load...)
       */
 
-      if (verbose > 0)
-        puts("\n    CONFORMANCE TESTS:");
-
       errors     = 0;
       ppdversion = 43;
-      
-      if ((ptr = ppdFindAttr(ppd, "FormatVersion", NULL)) != NULL)
-      {
-        ppdversion = (int)(10 * atof(ptr) + 0.5);
 
-	if (ppdversion < 43 && verbose > 0)
-	  printf("        WARN    Obsolete PPD version %s!\n", ptr);
-      }
+      if (verbose > 0)
+        puts("\n    DETAILED CONFORMANCE TEST RESULTS");
+
+      if ((ptr = ppdFindAttr(ppd, "FormatVersion", NULL)) != NULL)
+        ppdversion = (int)(10 * atof(ptr) + 0.5);
 
       if (ppdFindAttr(ppd, "DefaultImageableArea", NULL) != NULL)
       {
@@ -236,10 +277,16 @@ main(int  argc,			/* I - Number of command-line arguments */
       }
       else
       {
-	errors ++;
+	if (verbose >= 0)
+	{
+	  if (!errors && !verbose)
+	    puts(" FAIL");
 
-	if (verbose > 0)
 	  puts("      **FAIL**  REQUIRED DefaultImageableArea");
+	  puts("                REF: Page 102, section 5.15.");
+        }
+
+	errors ++;
       }
 
       if (ppdFindAttr(ppd, "DefaultPaperDimension", NULL) != NULL)
@@ -249,10 +296,16 @@ main(int  argc,			/* I - Number of command-line arguments */
       }
       else
       {
-	errors ++;
+	if (verbose >= 0)
+	{
+	  if (!errors && !verbose)
+	    puts(" FAIL");
 
-	if (verbose > 0)
 	  puts("      **FAIL**  REQUIRED DefaultPaperDimension");
+	  puts("                REF: Page 103, section 5.15.");
+        }
+
+	errors ++;
       }
 
       for (j = 0, group = ppd->groups; j < ppd->num_groups; j ++, group ++)
@@ -264,10 +317,16 @@ main(int  argc,			/* I - Number of command-line arguments */
 	  }
 	  else
 	  {
-	    errors ++;
+	    if (verbose >= 0)
+	    {
+	      if (!errors && !verbose)
+		puts(" FAIL");
 
-	    if (verbose > 0)
 	      printf("      **FAIL**  REQUIRED Default%s\n", option->keyword);
+	      puts("                REF: Page 40, section 4.5.");
+            }
+
+	    errors ++;
 	  }
 
       if (ppdFindAttr(ppd, "FileVersion", NULL) != NULL)
@@ -277,10 +336,16 @@ main(int  argc,			/* I - Number of command-line arguments */
       }
       else
       {
-	errors ++;
+	if (verbose >= 0)
+	{
+	  if (!errors && !verbose)
+	    puts(" FAIL");
 
-	if (verbose > 0)
 	  puts("      **FAIL**  REQUIRED FileVersion");
+	  puts("                REF: Page 56, section 5.3.");
+        }
+
+	errors ++;
       }
 
       if (ppdFindAttr(ppd, "FormatVersion", NULL) != NULL)
@@ -290,10 +355,16 @@ main(int  argc,			/* I - Number of command-line arguments */
       }
       else
       {
-	errors ++;
+	if (verbose >= 0)
+	{
+	  if (!errors && !verbose)
+	    puts(" FAIL");
 
-	if (verbose > 0)
 	  puts("      **FAIL**  REQUIRED FormatVersion");
+	  puts("                REF: Page 56, section 5.3.");
+        }
+
+	errors ++;
       }
 
       if (ppd->lang_encoding != NULL)
@@ -301,17 +372,18 @@ main(int  argc,			/* I - Number of command-line arguments */
 	if (verbose > 0)
 	  puts("        PASS    LanguageEncoding");
       }
-      else if (ppdversion < 41)
+      else if (ppdversion > 40)
       {
-	if (verbose > 0)
-	  puts("        WARN    REQUIRED LanguageEncoding");
-      }
-      else
-      {
-	errors ++;
+	if (verbose >= 0)
+	{
+	  if (!errors && !verbose)
+	    puts(" FAIL");
 
-	if (verbose > 0)
 	  puts("      **FAIL**  REQUIRED LanguageEncoding");
+	  puts("                REF: Pages 56-57, section 5.3.");
+        }
+
+	errors ++;
       }
 
       if (ppd->lang_version != NULL)
@@ -321,10 +393,16 @@ main(int  argc,			/* I - Number of command-line arguments */
       }
       else
       {
-	errors ++;
+	if (verbose >= 0)
+	{
+	  if (!errors && !verbose)
+	    puts(" FAIL");
 
-	if (verbose > 0)
 	  puts("      **FAIL**  REQUIRED LanguageVersion");
+	  puts("                REF: Pages 57-58, section 5.3.");
+        }
+
+	errors ++;
       }
 
       if (ppd->manufacturer != NULL)
@@ -332,17 +410,18 @@ main(int  argc,			/* I - Number of command-line arguments */
 	if (verbose > 0)
 	  puts("        PASS    Manufacturer");
       }
-      else if (ppdversion < 43)
+      else if (ppdversion >= 43)
       {
-	if (verbose > 0)
-	  puts("        WARN    REQUIRED Manufacturer");
-      }
-      else
-      {
-	errors ++;
+	if (verbose >= 0)
+	{
+	  if (!errors && !verbose)
+	    puts(" FAIL");
 
-	if (verbose > 0)
 	  puts("      **FAIL**  REQUIRED Manufacturer");
+	  puts("                REF: Pages 58-59, section 5.3.");
+        }
+
+	errors ++;
       }
 
       if (ppd->modelname != NULL)
@@ -353,20 +432,33 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 	if (*ptr)
 	{
-	  errors ++;
+	  if (verbose >= 0)
+	  {
+	    if (!errors && !verbose)
+	      puts(" FAIL");
 
-	  if (verbose > 0)
-	    puts("      **FAIL**  BAD ModelName");
+	    printf("      **FAIL**  BAD ModelName - \"%c\" not allowed in string.\n",
+	           *ptr);
+	    puts("                REF: Pages 59-60, section 5.3.");
+          }
+
+	  errors ++;
 	}
 	else if (verbose > 0)
 	  puts("        PASS    ModelName");
       }
       else
       {
-	errors ++;
+	if (verbose >= 0)
+	{
+	  if (!errors && !verbose)
+	    puts(" FAIL");
 
-	if (verbose > 0)
 	  puts("      **FAIL**  REQUIRED ModelName");
+	  puts("                REF: Pages 59-60, section 5.3.");
+        }
+
+	errors ++;
       }
 
       if (ppd->nickname != NULL)
@@ -376,10 +468,16 @@ main(int  argc,			/* I - Number of command-line arguments */
       }
       else
       {
-	errors ++;
+	if (verbose >= 0)
+	{
+	  if (!errors && !verbose)
+	    puts(" FAIL");
 
-	if (verbose > 0)
 	  puts("      **FAIL**  REQUIRED NickName");
+	  puts("                REF: Page 60, section 5.3.");
+        }
+
+	errors ++;
       }
 
       if (ppdFindOption(ppd, "PageSize") != NULL)
@@ -389,10 +487,16 @@ main(int  argc,			/* I - Number of command-line arguments */
       }
       else
       {
-	errors ++;
+	if (verbose >= 0)
+	{
+	  if (!errors && !verbose)
+	    puts(" FAIL");
 
-	if (verbose > 0)
 	  puts("      **FAIL**  REQUIRED PageSize");
+	  puts("                REF: Pages 99-100, section 5.14.");
+        }
+
+	errors ++;
       }
 
       if (ppdFindOption(ppd, "PageRegion") != NULL)
@@ -402,33 +506,35 @@ main(int  argc,			/* I - Number of command-line arguments */
       }
       else
       {
-	errors ++;
+	if (verbose >= 0)
+	{
+	  if (!errors && !verbose)
+	    puts(" FAIL");
 
-	if (verbose > 0)
 	  puts("      **FAIL**  REQUIRED PageRegion");
+	  puts("                REF: Page 100, section 5.14.");
+        }
+
+	errors ++;
       }
 
       if (ppd->pcfilename != NULL)
       {
 	if (verbose > 0)
-	{
-	 /*
-	  * Treat a PCFileName attribute longer than 12 characters as
-	  * a warning and not a hard error...
-	  */
-
-	  if (strlen(ppd->pcfilename) > 12)
-	    puts("        PASS    WARNING-TOO-LONG PCFileName");
-	  else
-	    puts("        PASS    PCFileName");
-	}
+          puts("        PASS    PCFileName");
       }
       else
       {
-	errors ++;
+	if (verbose >= 0)
+	{
+	  if (!errors && !verbose)
+	    puts(" FAIL");
 
-	if (verbose > 0)
 	  puts("      **FAIL**  REQUIRED PCFileName");
+	  puts("                REF: Pages 61-62, section 5.3.");
+        }
+
+	errors ++;
       }
 
       if (ppd->product != NULL)
@@ -436,20 +542,32 @@ main(int  argc,			/* I - Number of command-line arguments */
         if (ppd->product[0] != '(' ||
 	    ppd->product[strlen(ppd->product) - 1] != ')')
 	{
-	  errors ++;
+	  if (verbose >= 0)
+	  {
+	    if (!errors && !verbose)
+	      puts(" FAIL");
 
-	  if (verbose > 0)
-	    puts("      **FAIL**  BAD Product");
+	    puts("      **FAIL**  BAD Product - not \"(string)\".");
+	    puts("                REF: Page 62, section 5.3.");
+          }
+
+	  errors ++;
 	}
 	else if (verbose > 0)
 	  puts("        PASS    Product");
       }
       else
       {
-	errors ++;
+	if (verbose >= 0)
+	{
+	  if (!errors && !verbose)
+	    puts(" FAIL");
 
-	if (verbose > 0)
 	  puts("      **FAIL**  REQUIRED Product");
+	  puts("                REF: Page 62, section 5.3.");
+        }
+
+	errors ++;
       }
 
       if ((ptr = ppdFindAttr(ppd, "PSVersion", NULL)) != NULL)
@@ -460,57 +578,118 @@ main(int  argc,			/* I - Number of command-line arguments */
 
         if (sscanf(ptr, "(%[^)])%d", junkstr, &junkint) != 2)
 	{
-	  errors ++;
+	  if (verbose >= 0)
+	  {
+	    if (!errors && !verbose)
+	      puts(" FAIL");
 
-	  if (verbose > 0)
-	    puts("      **FAIL**  BAD PSVersion");
+	    puts("      **FAIL**  BAD PSVersion - not \"(string) int\".");
+	    puts("                REF: Pages 62-64, section 5.3.");
+          }
+
+	  errors ++;
 	}
 	else if (verbose > 0)
 	  puts("        PASS    PSVersion");
       }
       else
       {
-	errors ++;
+	if (verbose >= 0)
+	{
+	  if (!errors && !verbose)
+	    puts(" FAIL");
 
-	if (verbose > 0)
 	  puts("      **FAIL**  REQUIRED PSVersion");
+	  puts("                REF: Pages 62-64, section 5.3.");
+        }
+
+	errors ++;
       }
 
       if (ppd->shortnickname != NULL)
       {
         if (strlen(ppd->shortnickname) > 31)
 	{
-	  errors ++;
+	  if (verbose >= 0)
+	  {
+	    if (!errors && !verbose)
+	      puts(" FAIL");
 
-	  if (verbose > 0)
-	    puts("      **FAIL**  BAD ShortNickName");
+	    puts("      **FAIL**  BAD ShortNickName - longer than 31 chars.");
+	    puts("                REF: Pages 64-65, section 5.3.");
+          }
+
+	  errors ++;
 	}
 	else if (verbose > 0)
 	  puts("        PASS    ShortNickName");
       }
-      else if (ppdversion < 43)
+      else if (ppdversion >= 43)
       {
-	if (verbose > 0)
-	  puts("        WARN    REQUIRED ShortNickName");
-      }
-      else
-      {
-	errors ++;
+	if (verbose >= 0)
+	{
+	  if (!errors && !verbose)
+	    puts(" FAIL");
 
-	if (verbose > 0)
 	  puts("      **FAIL**  REQUIRED ShortNickName");
+	  puts("                REF: Page 64-65, section 5.3.");
+        }
+
+	errors ++;
       }
 
       if (errors)
-      {
-        if (verbose > 0)
-	  puts("\n    **** CONFORMANCE TESTING FAILED ****");
-
 	status = ERROR_CONFORMANCE;
+      else if (!verbose)
+	puts(" PASS");
+	 
+      if (verbose >= 0)
+      {
+        if (ppdversion < 43)
+	{
+          printf("        WARN    Obsolete PPD version %s!\n",
+	         ppdFindAttr(ppd, "FormatVersion", NULL));
+	  puts("                REF: Page 42, section 5.2.");
+	}
+
+        if (ppd->lang_encoding != NULL && ppdversion < 41)
+	{
+	  puts("        WARN    LanguageEncoding required by PPD 4.3 spec.");
+	  puts("                REF: Pages 56-57, section 5.3.");
+	}
+
+        if (!ppd->manufacturer && ppdversion < 43)
+	{
+	  puts("        WARN    Manufacturer required by PPD 4.3 spec.");
+	  puts("                REF: Pages 58-59, section 5.3.");
+	}
+
+       /*
+	* Treat a PCFileName attribute longer than 12 characters as
+	* a warning and not a hard error...
+	*/
+
+	if (ppd->pcfilename && strlen(ppd->pcfilename) > 12)
+	{
+	  puts("        WARN    PCFileName longer than 8.3 in violation of PPD spec.");
+	  puts("                REF: Pages 61-62, section 5.3.");
+        }
+
+        if (!ppd->shortnickname && ppdversion < 43)
+	{
+	  puts("        WARN    ShortNickName required by PPD 4.3 spec.");
+	  puts("                REF: Pages 64-65, section 5.3.");
+	}
       }
 
       if (verbose > 0)
-	puts("");
+      {
+        if (errors)
+          printf("    %d ERROR%s FOUND\n", errors, errors == 1 ? "" : "S");
+	else
+	  puts("    NO ERRORS FOUND");
+      }
+
 
      /*
       * Then list the options, if "-v" was provided...
@@ -519,7 +698,6 @@ main(int  argc,			/* I - Number of command-line arguments */
       if (verbose > 1)
       {
 	puts("");
-	puts("    OPTIONS:");     
 	printf("    language_level = %d\n", ppd->language_level);
 	printf("    color_device = %s\n", ppd->color_device ? "TRUE" : "FALSE");
 	printf("    variable_sizes = %s\n", ppd->variable_sizes ? "TRUE" : "FALSE");
@@ -628,14 +806,6 @@ main(int  argc,			/* I - Number of command-line arguments */
 	  printf("        fonts[%d] = %s\n", j, ppd->fonts[j]);
       }
 
-      if (verbose == 0)
-      {
-        if (errors)
-	  puts(" FAIL");
-	else
-	  puts(" PASS");
-      }
-
       ppdClose(ppd);
     }
 
@@ -661,5 +831,5 @@ usage(void)
 
 
 /*
- * End of "$Id: cupstestppd.c,v 1.1.2.9 2003/02/14 21:24:12 mike Exp $".
+ * End of "$Id: cupstestppd.c,v 1.1.2.10 2003/02/18 22:29:56 mike Exp $".
  */

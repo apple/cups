@@ -3,6 +3,11 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.19
 
+	- The ppdEmit() functions now support the
+	  RequiresPageRegion attribute when sending InputSlot
+	  and ManualFeed commands.
+	- The PPD loading code now supports standard options
+	  outside of OpenUI/CloseUI as required by the PPD spec.
 	- The cupstestppd program has been upgraded to provide a
 	  concise PASS/FAIL report, additional detailed
 	  conformance testing, and support for gzip'd PPD files.
