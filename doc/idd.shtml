@@ -156,6 +156,9 @@ operator := "+" |	[ logical AND ]
 	    "!"         [ unary NOT ]
 </PRE></UL>
 
+<P>The <CODE>int</CODE> and <CODE>short</CODE> rules match look for integers
+in network byte order (a.k.a. big-endian) with the most-significant byte first.
+
 <H3>mime.convs</H3>
 
 <P>The mime.types file defines the recognized file filters and consists
@@ -188,7 +191,8 @@ source/type cost program
 </PRE></UL>
 
 <P>The destination type is assumed to the printer's type. If a printer
-supports the source type directly the special filter program "-" may be used.
+supports the source type directly the special filter program "-" may be
+specified.
 
 <H4>cupsManualCopies</H4>
 

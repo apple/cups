@@ -202,6 +202,9 @@ operator := &quot;+&quot; |	[ logical AND ]
 	    &quot;!&quot;         [ unary NOT ]
 </PRE>
 </UL>
+<P>The <CODE>int</CODE> and <CODE>short</CODE> rules match look for 
+integers in network byte order (a.k.a. big-endian) with the 
+most-significant byte first. </P>
 <H3><A NAME=3_3_2>3.3.2 mime.convs</A></H3>
 <P>The mime.types file defines the recognized file filters and consists 
 of 1 or more lines of ASCII text. Comment lines start with the pound 
@@ -227,7 +230,7 @@ source/type cost program
 </UL>
 <P>The destination type is assumed to the printer's type. If a printer 
 supports the source type directly the special filter program &quot;-&quot; may be 
-used. </P>
+specified. </P>
 <H4>3.4.1.2 cupsManualCopies</H4>
 <P>This boolean attribute notifies the RIP filters that the destination 
 printer does not support copy generation in hardware. The default value 
