@@ -7,20 +7,25 @@ encode.o: cups.h ipp.h http.h string.h ../config.h md5.h ppd.h debug.h
 extended.o: ppd.h string.h ../config.h debug.h
 http.o: string.h ../config.h http.h md5.h ipp.h debug.h
 http-addr.o: http.h string.h ../config.h md5.h debug.h
+http-support.o: string.h ../config.h http.h md5.h ipp.h
 ipp.o: string.h ../config.h ipp.h http.h md5.h debug.h
 langprintf.o: string.h ../config.h language.h
 language.o: string.h ../config.h language.h cups_C.h
 mark.o: ppd.h string.h ../config.h debug.h
 md5.o: md5.h string.h ../config.h
 md5passwd.o: http.h string.h ../config.h md5.h
+normalize.o: string.h ../config.h language.h transcode.h normalize.h
 options.o: cups.h ipp.h http.h string.h ../config.h md5.h ppd.h debug.h
 page.o: ppd.h string.h ../config.h
 ppd.o: ppd.h string.h ../config.h language.h debug.h
 snprintf.o: string.h ../config.h
 string.o: string.h ../config.h
 tempfile.o: cups.h ipp.h http.h string.h ../config.h md5.h ppd.h debug.h
+transcode.o: string.h ../config.h language.h transcode.h
 usersys.o: cups.h ipp.h http.h string.h ../config.h md5.h ppd.h
 util.o: cups.h ipp.h http.h string.h ../config.h md5.h ppd.h language.h
 util.o: debug.h
 testhttp.o: http.h string.h ../config.h md5.h
+testi18n.o: language.h string.h ../config.h transcode.h normalize.h
+testlang.o: language.h
 testppd.o: cups.h ipp.h http.h string.h ../config.h md5.h ppd.h

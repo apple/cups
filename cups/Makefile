@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.53.2.17 2002/08/19 01:15:19 mike Exp $"
+# "$Id: Makefile,v 1.53.2.18 2002/09/04 02:38:41 mike Exp $"
 #
 #   API library Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -31,9 +31,9 @@ include ../Makedefs
 #
 
 LIBOBJS	=	attr.o dest.o emit.o encode.o extended.o http.o http-addr.o \
-		ipp.o langprintf.o language.o mark.o md5.o md5passwd.o \
-		normalize.o options.o page.o ppd.o snprintf.o string.o \
-		tempfile.o transcode.o usersys.o util.o
+		http-support.o ipp.o langprintf.o language.o mark.o md5.o \
+		md5passwd.o normalize.o options.o page.o ppd.o snprintf.o \
+		string.o tempfile.o transcode.o usersys.o util.o
 OBJS	=	$(LIBOBJS) testhttp.o testi18n.o testlang.o testppd.o
 
 
@@ -216,5 +216,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile,v 1.53.2.17 2002/08/19 01:15:19 mike Exp $".
+# End of "$Id: Makefile,v 1.53.2.18 2002/09/04 02:38:41 mike Exp $".
 #
