@@ -1,5 +1,5 @@
 /*
- * "$Id: raster.h,v 1.4 2002/03/01 19:53:36 mike Exp $"
+ * "$Id: raster.h,v 1.5 2002/03/05 18:42:09 mike Exp $"
  *
  *   Raster file definitions for the Common UNIX Printing System (CUPS).
  *
@@ -41,7 +41,7 @@ extern "C" {
 /*
  * Every non-PostScript printer driver that supports raster images should
  * use the application/vnd.cups-raster image file format.  Since both the
- * PostScript RIP (pstoraster, based on GNU Ghostscript 4.03) and Image RIP
+ * PostScript RIP (pstoraster, based on GNU Ghostscript) and Image RIP
  * (imagetoraster, located in the filter directory) use it, using this format
  * saves you a lot of work.  Also, the PostScript RIP passes any printer
  * options that are in a PS file to your driver this way as well...
@@ -137,7 +137,10 @@ typedef enum
   CUPS_CSPACE_GMCS,			/* Gold, magenta, yellow, silver */
   CUPS_CSPACE_WHITE,			/* White ink (as black) */
   CUPS_CSPACE_GOLD,			/* Gold foil */
-  CUPS_CSPACE_SILVER			/* Silver foil */
+  CUPS_CSPACE_SILVER,			/* Silver foil */
+
+  CUPS_CSPACE_CIEXYZ,			/* CIE XYZ */
+  CUPS_CSPACE_CIELab			/* CIE Lab */
 } cups_cspace_t;
 
 
@@ -231,5 +234,5 @@ extern unsigned		cupsRasterWritePixels(cups_raster_t *r,
 #endif /* !_CUPS_RASTER_H_ */
 
 /*
- * End of "$Id: raster.h,v 1.4 2002/03/01 19:53:36 mike Exp $".
+ * End of "$Id: raster.h,v 1.5 2002/03/05 18:42:09 mike Exp $".
  */
