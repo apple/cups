@@ -1,4 +1,4 @@
-CHANGES.txt - 09/14/2001
+CHANGES.txt - 09/17/2001
 ------------------------
 
 CHANGES IN CUPS V1.1.11
@@ -15,6 +15,13 @@ CHANGES IN CUPS V1.1.11
 	- Made some performance optimizations in the ippRead()
 	  functions to make IPP request/response processing
 	  faster.
+	- The accept/reject/enable/disable command did not
+	  support properly support the "-h" or default
+	  server name.
+	- The scheduler did not save the quota configuration
+	  when the job-quota-period attribute was set to 0.
+	- The LPDEST and PRINTER environment variables did not
+	  support printer instances.
 
 
 CHANGES IN CUPS V1.1.10-1
