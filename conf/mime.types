@@ -1,5 +1,5 @@
 #
-# "$Id: mime.types,v 1.2 1999/01/24 14:17:59 mike Exp $"
+# "$Id: mime.types,v 1.3 1999/02/20 16:04:30 mike Exp $"
 #
 #   MIME types file for the Common UNIX Printing System (CUPS).
 #
@@ -75,7 +75,7 @@
 application/msword		doc string(0,<D0CF11E0A1B11AE1>)
 application/pdf			pdf string(0,%PDF)
 application/postscript		ai eps ps string(0,%!) string(0,<04>%!)
-application/x-hpgl		hpgl string(0,<1b>%) string(0,<1b>&)\
+application/vnd.hp-HPGL		hpgl string(0,<1b>%) string(0,<1b>&)\
 				string(0,<1b>E) string(0,<201b>)\
 				string(0,BP;) string(0,IN;) string(0,DF;) 
 
@@ -93,17 +93,17 @@ image/x-portable-anymap		pnm
 image/x-portable-bitmap		pbm string(0,P1) string(0,P4)
 image/x-portable-graymap	pgm string(0,P2) string(0,P5)
 image/x-portable-pixmap		ppm string(0,P3) string(0,P6)
-image/x-rgb			rgb sgi bw icon short(0,474)
+image/x-sgi-rgb			rgb sgi bw icon short(0,474)
 image/x-xbitmap			xbm
 image/x-xpixmap			xpm ascii(0,1024) + string(3,"XPM")
 image/x-xwindowdump		xwd
 
 # TODO: Add Sun Raster, Alias, SoftImage, GIMP??? files
 
-#image/x-sun			ras
+#image/x-sun-raster		ras
 #image/x-alias			pix
 #image/x-softimage
-#image/x-gimp			xcf xcf.gz
+#image/x-gimp-xcf		xcf xcf.gz
 
 ########################################################################
 #
@@ -112,47 +112,17 @@ image/x-xwindowdump		xwd
 
 text/html			html htm printable(0,1024) +\
 				(string(0,"<HTML>") string(0,"<!DOCTYPE"))
-text/plain			txt ascii(0,1024)
-text/iso8859-1			printable(0,1024) +\
-				(locale("C") locale("POSIX") locale("af")\
-				 locale("ca") locale("da") locale("de")\
-				 locale("de_AT") locale("de_CH") locale("en")\
-				 locale("en_AU") locale("en_CA")\
-				 locale("en_US") locale("es") locale("es_AR")\
-				 locale("es_MX") locale("eu") locale("fi")\
-				 locale("fo") locale("fr") locale("fr_BE")\
-				 locale("fr_CA") locale("fr_CH") locale("ga")\
-				 locale("gd") locale("is") locale("it")\
-				 locale("it_CH") locale("nl") locale("nl_BE")\
-				 locale("no") locale("pt") locale("pt_BR")\
-				 locale("rm") locale("sq") locale("sv")\
-				 locale("sw"))
-
-# TODO: add text/iso8859-[23456789...] rules
-
-text/iso8859-2
-text/iso8859-3
-text/iso8859-4
-text/iso8859-5
-text/iso8859-6
-text/iso8859-7
-text/iso8859-8
-text/iso8859-9
-text/iso8859-10
-text/iso8859-13
-text/iso8859-14
-text/iso8859-15
-text/utf-8
-text/ucs-2
+text/plain			txt printable(0,1024)
 
 ########################################################################
 #
 # CUPS-specific types...
 #
 
-application/cups-postscript
-application/cups-raster
+application/vnd.cups-postscript
+application/vnd.cups-raster
+application/vnd.cups-raw
 
 #
-# End of "$Id: mime.types,v 1.2 1999/01/24 14:17:59 mike Exp $".
+# End of "$Id: mime.types,v 1.3 1999/02/20 16:04:30 mike Exp $".
 #

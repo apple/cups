@@ -1,5 +1,5 @@
 /*
- * "$Id: http.h,v 1.13 1999/02/09 22:01:25 mike Exp $"
+ * "$Id: http.h,v 1.14 1999/02/20 16:04:36 mike Exp $"
  *
  *   Hyper-Text Transport Protocol definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -31,21 +31,21 @@
  */
 
 #  include <string.h>
-
-#if defined(WIN32) || defined(__EMX__)
-#  include <winsock.h>
-#else
-#  include <unistd.h>
-#  include <sys/time.h>
-#  include <sys/types.h>
-#  include <sys/socket.h>
-#  include <netdb.h>
-#  include <netinet/in.h>
-#  include <arpa/inet.h>
-#  include <netinet/in_systm.h>
-#  include <netinet/ip.h>
-#  include <netinet/tcp.h>
-#endif /* WIN32 || __EMX__ */
+#  include <time.h>
+#  if defined(WIN32) || defined(__EMX__)
+#    include <winsock.h>
+#  else
+#    include <unistd.h>
+#    include <sys/time.h>
+#    include <sys/types.h>
+#    include <sys/socket.h>
+#    include <netdb.h>
+#    include <netinet/in.h>
+#    include <arpa/inet.h>
+#    include <netinet/in_systm.h>
+#    include <netinet/ip.h>
+#    include <netinet/tcp.h>
+#  endif /* WIN32 || __EMX__ */
 
 
 /*
@@ -309,5 +309,5 @@ extern char		*httpDecode64(char *out, char *in);
 #endif /* !_CUPS_HTTP_H_ */
 
 /*
- * End of "$Id: http.h,v 1.13 1999/02/09 22:01:25 mike Exp $".
+ * End of "$Id: http.h,v 1.14 1999/02/20 16:04:36 mike Exp $".
  */

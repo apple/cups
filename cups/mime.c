@@ -1,5 +1,5 @@
 /*
- * "$Id: mime.c,v 1.7 1999/02/05 17:40:53 mike Exp $"
+ * "$Id: mime.c,v 1.8 1999/02/20 16:04:38 mike Exp $"
  *
  *   MIME database file routines for the Common UNIX Printing System (CUPS).
  *
@@ -33,6 +33,16 @@
  * Revision History:
  *
  *   $Log: mime.c,v $
+ *   Revision 1.8  1999/02/20 16:04:38  mike
+ *   Updated mime.c to scan directories under WIN32.
+ *
+ *   Fixed some compiler warnings under WIN32.
+ *
+ *   Updated VC++ project files.
+ *
+ *   Updated mime.types and mime.convs files for actual registered
+ *   MIME type names.
+ *
  *   Revision 1.7  1999/02/05 17:40:53  mike
  *   Added IPP client read/write code.
  *
@@ -74,7 +84,9 @@
 #include "string.h"
 #include "mime.h"
 
-#ifdef HAVE_SYS_DIR_H
+#if defined(WIN32) || defined(__EMX__)
+#  include <windows.h>
+#elif defined(HAVE_SYS_DIR_H)
 #  include <sys/types.h>
 #  include <sys/dir.h>
 typedef struct direct DIRENT;
@@ -134,6 +146,84 @@ mime_t *			/* O - Updated MIME database */
 mimeMerge(mime_t *mime,		/* I - MIME database to add to */
           char   *pathname)	/* I - Directory to load */
 {
+#if defined(WIN32) || defined(__EMX__)
+  HANDLE	dir;		/* Directory handle */
+  WIN32_FIND_DATA dent;		/* Directory entry */
+  char		filename[1024],	/* Full filename of types/converts file */
+		*pathsep;	/* Last character in path */
+
+
+ /*
+  * First open the directory specified by pathname...  Return NULL if nothing
+  * was read or if the pathname is NULL...
+  */
+
+  if (pathname == NULL)
+    return (NULL);
+
+  strcpy(filename, pathname);
+  pathsep = filename + strlen(filename);
+  if (pathsep == filename ||
+      (pathsep[-1] != '/' && pathsep[-1] != '\\'))
+  {
+    strcpy(pathsep, "/");
+    pathsep ++;
+  }
+
+  strcpy(pathsep, "*.types");
+  
+  if ((dir = FindFirstFile(filename, &dent)) == 0)
+    return (NULL);
+
+ /*
+  * If "mime" is NULL, make a new, blank database...
+  */
+
+  if (mime == NULL)
+    if ((mime = mimeNew()) == NULL)
+      return (NULL);
+
+ /*
+  * Read all the .types files...
+  */
+
+  do
+  {
+   /*
+    * Load a mime.types file...
+    */
+
+    strcpy(pathsep, dent.cFileName);
+    load_types(mime, filename);
+  }
+  while (FindNextFile(dir, &dent));
+
+  FindClose(dir);
+
+ /*
+  * Read all the .convs files...
+  */
+
+  strcpy(pathsep, "*.convs");
+  
+  if ((dir = FindFirstFile(filename, &dent)) == 0)
+    return (mime);
+
+  do
+  {
+   /*
+    * Load a mime.convs file...
+    */
+
+    strcpy(pathsep, dent.cFileName);
+    load_convs(mime, filename);
+  }
+  while (FindNextFile(dir, &dent));
+
+  FindClose(dir);
+
+  return (mime);
+#else
   DIR		*dir;		/* Directory */
   DIRENT	*dent;		/* Directory entry */
   char		filename[1024];	/* Full filename of types/converts file */
@@ -173,8 +263,8 @@ mimeMerge(mime_t *mime,		/* I - MIME database to add to */
 
       sprintf(filename, "%s/%s", pathname, dent->d_name);
       load_types(mime, filename);
-    };
-  };
+    }
+  }
 
   rewinddir(dir);
 
@@ -193,12 +283,13 @@ mimeMerge(mime_t *mime,		/* I - MIME database to add to */
 
       sprintf(filename, "%s/%s", pathname, dent->d_name);
       load_convs(mime, filename);
-    };
-  };
+    }
+  }
 
   closedir(dir);
 
   return (mime);
+#endif /* WIN32 || __EMX__ */
 }
 
 
@@ -506,5 +597,5 @@ delete_rules(mime_magic_t *rules)	/* I - Rules to free */
 
 
 /*
- * End of "$Id: mime.c,v 1.7 1999/02/05 17:40:53 mike Exp $".
+ * End of "$Id: mime.c,v 1.8 1999/02/20 16:04:38 mike Exp $".
  */

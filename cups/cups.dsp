@@ -101,6 +101,10 @@ SOURCE=.\ipp.c
 # End Source File
 # Begin Source File
 
+SOURCE=.\language.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\mark.c
 # End Source File
 # Begin Source File
@@ -117,7 +121,15 @@ SOURCE=.\ppd.c
 # End Source File
 # Begin Source File
 
+SOURCE=.\string.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\type.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\util.c
 # End Source File
 # End Group
 # Begin Group "Header Files"
