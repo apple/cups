@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.14 1999/02/05 17:40:51 mike Exp $"
+ * "$Id: http.c,v 1.15 1999/02/09 17:12:08 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -43,7 +43,6 @@
  *   httpGets()          - Get a line of text from a HTTP connection.
  *   httpPrintf()        - Print a formatted string to a HTTP connection.
  *   httpStatus()        - Return a short string describing a HTTP status code.
- *   httpLongStatus()    - Return a long string describing a HTTP status code.
  *   httpGetDateString() - Get a formatted date/time string from a time value.
  *   httpGetDateTime()   - Get a time value from a formatted date/time string.
  *   httpUpdate()        - Update the current HTTP state for incoming data.
@@ -886,37 +885,6 @@ httpStatus(http_status_t status)	/* I - HTTP status code */
 
 
 /*
- * 'httpLongStatus()' - Return a long string describing a HTTP status code.
- */
-
-char *					/* O - String or NULL */
-httpLongStatus(http_status_t status)	/* I - HTTP status code */
-{
-  switch (status)
-  {
-    case HTTP_BAD_REQUEST :
-        return ("The server reported that a bad or incomplete request was received.");
-    case HTTP_UNAUTHORIZED :
-        return ("You must provide a valid username and password to access this page.");
-    case HTTP_FORBIDDEN :
-        return ("You are not allowed to access this page.");
-    case HTTP_NOT_FOUND :
-        return ("The specified file or directory was not found.");
-    case HTTP_REQUEST_TOO_LARGE :
-        return ("The server reported that the request is too large.");
-    case HTTP_URI_TOO_LONG :
-        return ("The server reported that the URI is too long.");
-    case HTTP_NOT_IMPLEMENTED :
-        return ("That feature is not implemented");
-    case HTTP_NOT_SUPPORTED :
-        return ("That feature is not supported");
-    default :
-        return ("An unknown error occurred.");
-  }
-}
-
-
-/*
  * 'httpGetDateString()' - Get a formatted date/time string from a time value.
  */
 
@@ -1331,5 +1299,5 @@ http_send(http_t       *http,	/* I - HTTP data */
 
 
 /*
- * End of "$Id: http.c,v 1.14 1999/02/05 17:40:51 mike Exp $".
+ * End of "$Id: http.c,v 1.15 1999/02/09 17:12:08 mike Exp $".
  */
