@@ -1,5 +1,5 @@
 /*
- * "$Id: client.h,v 1.27 2003/07/20 02:51:54 mike Exp $"
+ * "$Id: client.h,v 1.28 2004/02/25 16:20:04 mike Exp $"
  *
  *   Client definitions for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -41,6 +41,7 @@ typedef struct
 		*command,		/* Command to run */
 		*options;		/* Options for command */
   int		file;			/* Input/output file */
+  int		file_ready;		/* Input ready on file/pipe? */
   int		pipe_pid;		/* Pipe process ID (or 0 if not a pipe) */
   int		got_fields,		/* Non-zero if all fields seen */
 		field_col;		/* Column within line */
@@ -109,5 +110,5 @@ extern void	UpdateCGI(void);
 extern int	WriteClient(client_t *con);
 
 /*
- * End of "$Id: client.h,v 1.27 2003/07/20 02:51:54 mike Exp $".
+ * End of "$Id: client.h,v 1.28 2004/02/25 16:20:04 mike Exp $".
  */
