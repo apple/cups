@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.93.2.34 2003/01/29 20:08:27 mike Exp $"
+ * "$Id: printers.c,v 1.93.2.35 2003/02/05 21:20:08 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -103,6 +103,7 @@ AddPrinter(const char *name)	/* I - Name of printer */
 #endif /* AF_INET6 */
   SetStringf(&p->uri, "ipp://%s:%d/printers/%s", ServerName,
              ntohs(Listeners[0].address.ipv4.sin_port), name);
+  SetStringf(&p->device_uri, "file:/dev/null");
 
   p->state     = IPP_PRINTER_STOPPED;
   p->accepting = 0;
@@ -366,7 +367,6 @@ DeletePrinter(printer_t *p)	/* I - Printer to delete */
   ClearString(&p->job_sheets[0]);
   ClearString(&p->job_sheets[1]);
   ClearString(&p->device_uri);
-  ClearString(&p->backend);
 
   free(p);
 
@@ -2142,5 +2142,5 @@ write_irix_state(printer_t *p)	/* I - Printer to update */
 
 
 /*
- * End of "$Id: printers.c,v 1.93.2.34 2003/01/29 20:08:27 mike Exp $".
+ * End of "$Id: printers.c,v 1.93.2.35 2003/02/05 21:20:08 mike Exp $".
  */
