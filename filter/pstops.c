@@ -1,5 +1,5 @@
 /*
- * "$Id: pstops.c,v 1.51 2001/03/02 14:30:14 mike Exp $"
+ * "$Id: pstops.c,v 1.52 2001/03/09 18:23:36 mike Exp $"
  *
  *   PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -317,7 +317,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	}
       }
       else
-        puts(line);
+        fputs(line, stdout);
 
    /*
     * Then read all of the pages, filtering as needed...
@@ -404,13 +404,10 @@ main(int  argc,			/* I - Number of command-line arguments */
       else
       {
         if (!sloworder)
-	  puts(line);
+          fputs(line, stdout);
 
 	if (slowcollate || sloworder)
-	{
 	  fputs(line, temp);
-	  putc('\n', temp);
-	}
       }
 
       if (psgets(line, sizeof(line), fp) == NULL)
@@ -529,13 +526,10 @@ main(int  argc,			/* I - Number of command-line arguments */
 
     while (psgets(line, sizeof(line), fp) != NULL)
     {
-      puts(line);
+      fputs(line, stdout);
 
       if (slowcollate)
-      {
 	fputs(line, temp);
-	putc('\n', temp);
-      }
     }
 
     if (slowcollate)
@@ -747,6 +741,7 @@ psgets(char   *buf,	/* I - Buffer to read into */
       if (ch != EOF && ch != 0x0a)
         ungetc(ch, fp);	/* Nope, save it for later... */
 
+      ch = 0x0a;
       break;
     }
     else if (ch == 0x0a)
@@ -754,6 +749,13 @@ psgets(char   *buf,	/* I - Buffer to read into */
     else
       *bufptr++ = ch;
   }
+
+ /*
+  * Add a trailing newline if it is there...
+  */
+
+  if (ch == '\n')
+    *bufptr++ = '\n';
 
  /*
   * Nul-terminate the string and return it (or NULL for EOF).
@@ -903,5 +905,5 @@ start_nup(int number)	/* I - Page number */
 
 
 /*
- * End of "$Id: pstops.c,v 1.51 2001/03/02 14:30:14 mike Exp $".
+ * End of "$Id: pstops.c,v 1.52 2001/03/09 18:23:36 mike Exp $".
  */

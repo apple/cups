@@ -90,6 +90,8 @@ CHANGES IN CUPS V1.1.7
 	  potential problems on remote LPD servers.
 	- The lp command did not send the requesting-user-name
 	  attribute when altering a job.
+	- The pstops filter did not handle PostScript files with
+	  lines longer than 8191 bytes.
 
 
 CHANGES IN CUPS V1.1.6-3
