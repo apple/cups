@@ -1,5 +1,5 @@
 /*
- * "$Id: language.c,v 1.23 2002/01/30 17:44:08 mike Exp $"
+ * "$Id: language.c,v 1.24 2002/02/12 18:47:12 mike Exp $"
  *
  *   I18N/language support for the Common UNIX Printing System (CUPS).
  *
@@ -214,7 +214,7 @@ cupsLangGet(const char *language) /* I - Language or locale */
 
       strncpy(real + count, langname + count, sizeof(real) - count - 1);
       langname[count] = '\0';
-      count += strlen(langname + count);
+      count += strlen(real + count);
 
      /*
       * Make sure count stays within the bounds of langname and real
@@ -426,5 +426,5 @@ cupsLangGet(const char *language) /* I - Language or locale */
 
 
 /*
- * End of "$Id: language.c,v 1.23 2002/01/30 17:44:08 mike Exp $".
+ * End of "$Id: language.c,v 1.24 2002/02/12 18:47:12 mike Exp $".
  */
