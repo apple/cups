@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.h,v 1.17 1999/07/12 17:15:47 mike Exp $"
+ * "$Id: ipp.h,v 1.18 1999/07/24 10:44:29 mike Exp $"
  *
  *   Internet Printing Protocol definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -87,11 +87,12 @@ typedef enum			/**** Format tags for attribute formats... ****/
   IPP_TAG_DATE,
   IPP_TAG_RESOLUTION,
   IPP_TAG_RANGE,
+  IPP_TAG_COLLECTION,
   IPP_TAG_TEXTLANG,
   IPP_TAG_NAMELANG,
   IPP_TAG_TEXT = 0x41,
   IPP_TAG_NAME,
-  IPP_TAG_KEYWORD,
+  IPP_TAG_KEYWORD = 0x44,
   IPP_TAG_URI,
   IPP_TAG_URISCHEME,
   IPP_TAG_CHARSET,
@@ -338,5 +339,5 @@ extern int		ippPort(void);
 #endif /* !_CUPS_IPP_H_ */
 
 /*
- * End of "$Id: ipp.h,v 1.17 1999/07/12 17:15:47 mike Exp $".
+ * End of "$Id: ipp.h,v 1.18 1999/07/24 10:44:29 mike Exp $".
  */
