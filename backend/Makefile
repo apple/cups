@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.10 1999/09/20 14:15:59 mike Exp $"
+# "$Id: Makefile,v 1.11 1999/09/27 17:45:18 mike Exp $"
 #
 #   Backend makefile for the Common UNIX Printing System (CUPS).
 #
@@ -24,7 +24,7 @@
 
 include ../Makedefs
 
-TARGETS	=	ipp lpd parallel serial smb socket
+TARGETS	=	ipp lpd parallel serial socket
 OBJS	=	ipp.o lpd.o parallel.o serial.o socket.o
 
 #
@@ -102,5 +102,5 @@ socket:	socket.o ../cups/$(LIBCUPS)
 socket.o:	../cups/cups.h ../Makedefs
 
 #
-# End of "$Id: Makefile,v 1.10 1999/09/20 14:15:59 mike Exp $".
+# End of "$Id: Makefile,v 1.11 1999/09/27 17:45:18 mike Exp $".
 #
