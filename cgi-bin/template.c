@@ -1,5 +1,5 @@
 /*
- * "$Id: template.c,v 1.6 1999/09/27 18:40:16 mike Exp $"
+ * "$Id: template.c,v 1.7 1999/09/27 18:49:27 mike Exp $"
  *
  *   CGI template function.
  *
@@ -152,7 +152,9 @@ cgi_copy(FILE *out,		/* I - Output file */
 	  }
         }
 	else
-	  cgi_copy(NULL, in, i, '}');
+	  cgi_copy(NULL, in, 0, '}');
+
+        continue;
       }
       else
       {
@@ -274,5 +276,5 @@ cgi_copy(FILE *out,		/* I - Output file */
 
 
 /*
- * End of "$Id: template.c,v 1.6 1999/09/27 18:40:16 mike Exp $".
+ * End of "$Id: template.c,v 1.7 1999/09/27 18:49:27 mike Exp $".
  */
