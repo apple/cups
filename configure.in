@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: configure.in,v 1.7 1999/04/22 20:18:17 mike Exp $"
+dnl "$Id: configure.in,v 1.8 1999/04/23 14:06:13 mike Exp $"
 dnl
 dnl   Configuration script for the Common UNIX Printing System (CUPS).
 dnl
@@ -88,12 +88,12 @@ fi
 GUILIBS=""
 AC_SUBST(GUILIBS)
 AC_CHECK_HEADER(FL/Fl.H,AC_DEFINE(HAVE_LIBFLTK)
-if test "$x_libraries" = "NONE"; then
+if test "$x_libraries" = "NONE" -o "$x_libraries" = ""; then
 	GUILIBS="-lfltk -lX11 -lXext"
 else
 	GUILIBS="-L$x_libraries -lfltk -lX11 -lXext"
 fi
-if test "$x_includes" != "NONE"; then
+if test "$x_includes" != "NONE" -a "$x_includes" != ""; then
 	CFLAGS="$CFLAGS -I$x_includes"
 	CXXFLAGS="$CXXFLAGS -I$x_includes"
 fi)
@@ -102,9 +102,9 @@ IMGLIBS=""
 AC_SUBST(IMGLIBS)
 AC_CHECK_LIB(jpeg,jpeg_destroy_decompress,AC_DEFINE(HAVE_LIBJPEG)
 IMGLIBS="$IMGLIBS -ljpeg")
-AC_CHECK_LIB(png,png_init_io,AC_DEFINE(HAVE_LIBPNG)
+AC_CHECK_LIB(png,png_read_info,AC_DEFINE(HAVE_LIBPNG)
 IMGLIBS="$IMGLIBS -lpng")
-AC_CHECK_LIB(tiff,TIFFFdOpen,AC_DEFINE(HAVE_LIBTIFF)
+AC_CHECK_LIB(tiff,TIFFGetField,AC_DEFINE(HAVE_LIBTIFF)
 IMGLIBS="$IMGLIBS -ltiff")
 AC_CHECK_LIB(z,deflate,AC_DEFINE(HAVE_LIBZ)
 IMGLIBS="$IMGLIBS -lz")
@@ -137,5 +137,5 @@ AC_DEFINE_UNQUOTED(LOCALEDIR, "$prefix/lib/locale")
 AC_OUTPUT(Makedefs)
 
 dnl
-dnl End of "$Id: configure.in,v 1.7 1999/04/22 20:18:17 mike Exp $".
+dnl End of "$Id: configure.in,v 1.8 1999/04/23 14:06:13 mike Exp $".
 dnl

@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.c,v 1.8 1999/04/22 17:00:11 mike Exp $"
+ * "$Id: auth.c,v 1.9 1999/04/23 14:06:14 mike Exp $"
  *
  *   Authorization routines for the Common UNIX Printing System (CUPS).
  *
@@ -248,7 +248,7 @@ DenyIP(location_t *loc,		/* I - Location to add to */
  * 'IsAuthorized()' - Check to see if the user is authorized...
  */
 
-int				/* O - HTTP_OK if authorized or error code */
+http_status_t			/* O - HTTP_OK if authorized or error code */
 IsAuthorized(client_t *con)	/* I - Connection */
 {
   int		i,		/* Looping var */
@@ -566,5 +566,5 @@ check_auth(unsigned   ip,	/* I - Client address */
 
 
 /*
- * End of "$Id: auth.c,v 1.8 1999/04/22 17:00:11 mike Exp $".
+ * End of "$Id: auth.c,v 1.9 1999/04/23 14:06:14 mike Exp $".
  */

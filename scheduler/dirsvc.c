@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.9 1999/04/23 13:35:58 mike Exp $"
+ * "$Id: dirsvc.c,v 1.10 1999/04/23 14:06:15 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -70,6 +70,10 @@ StartBrowsing(void)
   len = sizeof(val);
   getsockopt(BrowseSocket, IPPROTO_IP, IP_TTL, &val, &len);
   printf("ttl = %d (%d)\n", val, len);
+
+  val = 64;
+  if (setsockopt(BrowseSocket, IPPROTO_IP, IP_TTL, &val, sizeof(val)))
+    perror("StartBrowsing/IP_TTL");
 
  /*
   * Bind the socket to browse port...
@@ -292,5 +296,5 @@ SendBrowseList(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.9 1999/04/23 13:35:58 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.10 1999/04/23 14:06:15 mike Exp $".
  */
