@@ -1,5 +1,5 @@
 /*
- * "$Id: cups-lpd.c,v 1.43 2004/02/25 21:18:43 mike Exp $"
+ * "$Id: cups-lpd.c,v 1.44 2004/03/15 17:55:36 mike Exp $"
  *
  *   Line Printer Daemon interface for the Common UNIX Printing System (CUPS).
  *
@@ -366,7 +366,7 @@ check_printer(const char *name)		/* I - Printer or class name */
   else if ((attr = ippFindAttribute(response, "printer-is-accepting-jobs",
                                     IPP_TAG_BOOLEAN)) == NULL)
   {
-    syslog(LOG_ERR, "No job-id attribute found in response from server!");
+    syslog(LOG_ERR, "No printer-is-accepting-jobs attribute found in response from server!");
     accepting = 0;
   }
   else
@@ -1417,5 +1417,5 @@ smart_gets(char *s,	/* I - Pointer to line buffer */
 
 
 /*
- * End of "$Id: cups-lpd.c,v 1.43 2004/02/25 21:18:43 mike Exp $".
+ * End of "$Id: cups-lpd.c,v 1.44 2004/03/15 17:55:36 mike Exp $".
  */
