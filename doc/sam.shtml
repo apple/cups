@@ -4014,25 +4014,42 @@ PSMON.DLL
 directory - you may need to rename some of the files so the
 filenames are all UPPERCASE.
 
-<P>Next, add a <CODE>print$</CODE> share for the printer
-drivers to your <VAR>smb.conf</VAR> file:
+<P>Next, configure SAMBA (via the <VAR>smb.conf</VAR> file) to support printing 
+through CUPS and provide a printer driver download share, as follows:
 
 <UL><PRE>
+[global]
+   load printers = yes
+   printing = cups
+   printcap name = cups
+
+[printers]
+   comment = All Printers
+   path = /var/spool/samba
+   browseable = no
+   public = yes
+   guest ok = yes
+   writable = no
+   printable = yes
+   printer admin = root
+
 [print$]
-    comment = Printer Drivers
-    path = /etc/samba/drivers
-    browseable = yes
-    guest ok = no
-    read only = yes
-    write list = root
+   comment = Printer Drivers
+   path = /etc/samba/drivers
+   browseable = yes
+   guest ok = no
+   read only = yes
+   write list = root
 </PRE></UL>
 
-<P>The directory for your printer drivers can be anywhere on the
+<P>This configuration assumes a FHS-compliant installation of SAMBA;
+adjust the [printers] and [print$] share paths accordingly on your system as needed.
+That is, the directory for your printer drivers can be anywhere on the
 system; just make sure it is writable by the users specified by
-the <CODE>write list</CODE> directive. Also, make sure that you
-have SAMBA passwords defined for each user in the <CODE>write
-list</CODE> using the <CODE>smbpasswd(1)</CODE> command.
-Otherwise you will not be able to authenticate 
+the <CODE>write list</CODE> directive plus readable and executable by all users.
+Also, make sure that you have SAMBA passwords defined for each user in the 
+<CODE>write list</CODE> using SAMBA's <CODE>smbpasswd(1)</CODE> command.
+Otherwise you will not be able to authenticate.
 
 <P>Finally, run the <CODE>cupsaddsmb</CODE> command to export
 the printer drivers for one or more queues:
@@ -4041,12 +4058,16 @@ the printer drivers for one or more queues:
 <B>cupsaddsmb -U root printer1 ... printerN <I>ENTER</I></B>
 </PRE></UL>
 
+
 <P>Running <CODE>cupsaddsmb</CODE> with the <CODE>-a</CODE> option
 will export all printers:
 
 <UL><PRE>
 <B>cupsaddsmb -U root -a <I>ENTER</I></B>
 </PRE></UL>
+
+<P>Notice in the above examples that the user <CODE>root</CODE> was used 
+which was defined in the <CODE>write list</CODE> of the <VAR>smb.conf</VAR> file.
 
 <H2>Printing to Windows Servers</H2>
 
