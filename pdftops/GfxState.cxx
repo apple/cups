@@ -818,8 +818,8 @@ GfxColorSpace *GfxIndexedColorSpace::parse(Array *arr) {
     goto err2;
   }
   indexHighA = obj1.getInt();
-  if (indexHighA > 256) {
-    error(-1, "Bad Indexed color space (hival > 256)");
+  if (indexHighA > 255) {
+    error(-1, "Bad Indexed color space (hival > 255)");
     goto err2;
   }
   if (indexHighA < 1) {
