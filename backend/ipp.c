@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.70 2003/01/28 19:26:43 mike Exp $"
+ * "$Id: ipp.c,v 1.71 2003/01/29 15:35:53 mike Exp $"
  *
  *   IPP backend for the Common UNIX Printing System (CUPS).
  *
@@ -45,6 +45,34 @@
 #include <cups/string.h>
 #include <signal.h>
 #include <sys/wait.h>
+
+
+/*
+ * Some OS's don't have hstrerror(), most notably Solaris...
+ */
+
+#ifndef HAVE_HSTRERROR
+#  define hstrerror cups_hstrerror
+
+const char *					/* O - Error string */
+cups_hstrerror(int error)			/* I - Error number */
+{
+  static const char * const errors[] =
+		{
+		  "OK",
+		  "Host not found.",
+		  "Try again.",
+		  "Unrecoverable lookup error.",
+		  "No data associated with name."
+		};
+
+
+  if (error < 0 || error > 4)
+    return ("Unknown hostname lookup error.");
+  else
+    return (errors[error]);
+}
+#endif /* !HAVE_HSTRERROR */
 
 
 /*
@@ -1081,5 +1109,5 @@ run_pictwps_filter(char **argv,			/* I - Command-line arguments */
 
 
 /*
- * End of "$Id: ipp.c,v 1.70 2003/01/28 19:26:43 mike Exp $".
+ * End of "$Id: ipp.c,v 1.71 2003/01/29 15:35:53 mike Exp $".
  */

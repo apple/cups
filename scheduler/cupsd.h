@@ -1,5 +1,5 @@
 /*
- * "$Id: cupsd.h,v 1.39 2003/01/24 19:16:33 mike Exp $"
+ * "$Id: cupsd.h,v 1.40 2003/01/29 15:35:56 mike Exp $"
  *
  *   Main header file for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -56,6 +56,17 @@
 #if defined(HAVE_CDSASSL)
 #  include <CoreFoundation/CoreFoundation.h>
 #endif /* HAVE_CDSASSL */
+
+
+/*
+ * Some OS's don't have hstrerror(), most notably Solaris...
+ */
+
+#ifndef HAVE_HSTRERROR
+#  define hstrerror cups_hstrerror
+
+extern const char *cups_hstrerror(int);
+#endif /* !HAVE_HSTRERROR */
 
 
 /*
@@ -177,5 +188,5 @@ extern void	StopServer(void);
 
 
 /*
- * End of "$Id: cupsd.h,v 1.39 2003/01/24 19:16:33 mike Exp $".
+ * End of "$Id: cupsd.h,v 1.40 2003/01/29 15:35:56 mike Exp $".
  */

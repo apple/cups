@@ -1,5 +1,5 @@
 /*
- * "$Id: config.h.in,v 1.67 2003/01/24 19:16:30 mike Exp $"
+ * "$Id: config.h.in,v 1.68 2003/01/29 15:35:53 mike Exp $"
  *
  *   Configuration file for the Common UNIX Printing System (CUPS).
  *
@@ -225,6 +225,13 @@
 
 
 /*
+ * Do we have hstrerror()?
+ */
+
+#undef HAVE_HSTRERROR
+
+
+/*
  * Do we have the <sys/sockio.h> header file?
  */
 
@@ -239,5 +246,5 @@
 
 
 /*
- * End of "$Id: config.h.in,v 1.67 2003/01/24 19:16:30 mike Exp $".
+ * End of "$Id: config.h.in,v 1.68 2003/01/29 15:35:53 mike Exp $".
  */

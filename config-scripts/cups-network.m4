@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-network.m4,v 1.7 2002/12/17 18:56:39 swdev Exp $"
+dnl "$Id: cups-network.m4,v 1.8 2003/01/29 15:35:54 mike Exp $"
 dnl
 dnl   Networking stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -29,7 +29,7 @@ if test "$uname" != "IRIX"; then
 	AC_CHECK_LIB(nsl,gethostbyaddr,NETLIBS="$NETLIBS -lnsl")
 fi
 
-AC_CHECK_FUNCS(rresvport getifaddrs)
+AC_CHECK_FUNCS(rresvport getifaddrs hstrerror)
 
 AC_CHECK_MEMBER(struct sockaddr.sa_len,,,[#include <sys/socket.h>])
 AC_CHECK_HEADER(sys/sockio.h,AC_DEFINE(HAVE_SYS_SOCKIO_H))
@@ -37,5 +37,5 @@ AC_CHECK_HEADER(sys/sockio.h,AC_DEFINE(HAVE_SYS_SOCKIO_H))
 AC_SUBST(NETLIBS)
 
 dnl
-dnl End of "$Id: cups-network.m4,v 1.7 2002/12/17 18:56:39 swdev Exp $".
+dnl End of "$Id: cups-network.m4,v 1.8 2003/01/29 15:35:54 mike Exp $".
 dnl
