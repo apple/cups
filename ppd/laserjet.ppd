@@ -1,6 +1,6 @@
 *PPD-Adobe: "4.3"
 *%
-*% "$Id: laserjet.ppd,v 1.2 1999/05/17 18:03:38 mike Exp $"
+*% "$Id: laserjet.ppd,v 1.3 1999/06/04 21:06:31 mike Exp $"
 *%
 *%   Sample HP LaserJet driver PPD file for the Common UNIX Printing
 *%   System (CUPS).
@@ -125,7 +125,7 @@
 
 *OpenUI *Resolution/Output Resolution: PickOne
 *OrderDependency: 20 AnySetup *Resolution
-*DefaultResolution: 600dpi
+*DefaultResolution: 300dpi
 *Resolution 150dpi/150 DPI: "<</HWResolution[150 150]/cupsColorOrder 0/cupsColorSpace 3/cupsCompression 2>>setpagedevice"
 *Resolution 300dpi/300 DPI: "<</HWResolution[300 300]/cupsColorOrder 0/cupsColorSpace 3/cupsCompression 2>>setpagedevice"
 *Resolution 600dpi/600 DPI: "<</HWResolution[600 600]/cupsColorOrder 0/cupsColorSpace 3/cupsCompression 2>>setpagedevice"
@@ -168,5 +168,5 @@
 *Font ZapfChancery-MediumItalic: Standard "(001.007S)" Standard ROM
 *Font ZapfDingbats: Special "(001.004S)" Standard ROM
 *%
-*% End of "$Id: laserjet.ppd,v 1.2 1999/05/17 18:03:38 mike Exp $".
+*% End of "$Id: laserjet.ppd,v 1.3 1999/06/04 21:06:31 mike Exp $".
 *%
