@@ -1,5 +1,5 @@
-README - CUPS v1.1.9 - 07/06/2001
----------------------------------
+README - CUPS v1.1.10 - 08/08/2001
+----------------------------------
 
 Looking for compile instructions?  Read the file "INSTALL.txt"
 instead...
@@ -27,8 +27,8 @@ that are used to support non-PostScript printers.  Sample
 drivers for HP and EPSON printers are included that use these
 filters.
 
-Drivers for over 2300 printers are provided with our ESP Print
-Pro software, available at:
+Drivers for thousands of printers are provided with our ESP
+Print Pro software, available at:
 
 	http://www.easysw.com/printpro
 
@@ -191,15 +191,18 @@ Similarly, for the other sample drivers you can use:
 
     Driver                         PPD File
     -----------------------------  ------------
-    HP DeskJet Series              deskjet.ppd
-    HP New DeskJet Series          deskjet2.ppd
-    HP LaserJet Series             laserjet.ppd
+    Dymo Label Printers            dymo.ppd
     EPSON Stylus Color Series      stcolor.ppd
     EPSON Stylus Photo Series      stphoto.ppd
     EPSON Stylus New Color Series  stcolor2.ppd
     EPSON Stylus New Photo Series  stphoto2.ppd
     EPSON 9-pin Series             epson9.ppd
     EPSON 24-pin Series            epson24.ppd
+    HP DeskJet Series              deskjet.ppd
+    HP New DeskJet Series          deskjet2.ppd
+    HP LaserJet Series             laserjet.ppd
+    OKIDATA 9-Pin Series           okidata9.ppd
+    OKIDATA 24-Pin Series          okidat24.ppd
 
 These sample drivers provide basic printing capabilities, but
 generally do not exercise the full potential of the printers or
