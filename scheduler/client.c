@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.62 2000/07/10 15:32:27 mike Exp $"
+ * "$Id: client.c,v 1.63 2000/07/12 19:25:17 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -1560,10 +1560,10 @@ pipe_command(client_t *con,	/* I - Client connection */
 	content_length[1024],	/* CONTENT_LENGTH env variable */
 	content_type[1024],	/* CONTENT_TYPE env variable */
 	ipp_port[1024],		/* Default listen port */
-	server_port[1024],	/* Default listen port */
+	server_port[1024],	/* Default server port */
 	server_name[1024],	/* Default listen hostname */
 	remote_host[1024],	/* REMOTE_HOST env variable */
-	remote_user[1024],	/* REMOTE_HOST env variable */
+	remote_user[1024],	/* REMOTE_USER env variable */
 	tmpdir[1024],		/* TMPDIR environment variable */
 	ldpath[1024],		/* LD_LIBRARY_PATH environment variable */
 	datadir[1024],		/* CUPS_DATADIR environment variable */
@@ -1770,5 +1770,5 @@ pipe_command(client_t *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.62 2000/07/10 15:32:27 mike Exp $".
+ * End of "$Id: client.c,v 1.63 2000/07/12 19:25:17 mike Exp $".
  */
