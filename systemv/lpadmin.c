@@ -1,5 +1,5 @@
 /*
- * "$Id: lpadmin.c,v 1.7 1999/07/07 18:25:05 mike Exp $"
+ * "$Id: lpadmin.c,v 1.8 1999/08/06 16:06:15 mike Exp $"
  *
  *   "lpadmin" command for the Common UNIX Printing System (CUPS).
  *
@@ -945,7 +945,7 @@ set_printer_file(http_t *http,		/* I - Server connection */
     * Yes, the file is compressed; uncompress to a temp file...
     */
 
-    if ((fp = fopen(tmpnam(tempfile), "wb")) == NULL)
+    if ((fp = fopen(cupsTempFile(tempfile, sizeof(tempfile)), "wb")) == NULL)
     {
       perror("lpadmin: Unable to create temporary file");
       return;
@@ -1143,5 +1143,5 @@ set_printer_location(http_t *http,	/* I - Server connection */
 
 
 /*
- * End of "$Id: lpadmin.c,v 1.7 1999/07/07 18:25:05 mike Exp $".
+ * End of "$Id: lpadmin.c,v 1.8 1999/08/06 16:06:15 mike Exp $".
  */

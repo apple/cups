@@ -1,5 +1,5 @@
 /*
- * "$Id: lp.c,v 1.10 1999/08/04 13:09:13 mike Exp $"
+ * "$Id: lp.c,v 1.11 1999/08/06 16:06:15 mike Exp $"
  *
  *   "lp" command for the Common UNIX Printing System (CUPS).
  *
@@ -201,7 +201,7 @@ main(int  argc,		/* I - Number of command-line arguments */
       return (1);
     }
 
-    temp = fopen(tmpnam(tempfile), "w");
+    temp = fopen(cupsTempFile(tempfile, sizeof(tempfile)), "w");
 
     if (temp == NULL)
     {
@@ -242,5 +242,5 @@ main(int  argc,		/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: lp.c,v 1.10 1999/08/04 13:09:13 mike Exp $".
+ * End of "$Id: lp.c,v 1.11 1999/08/06 16:06:15 mike Exp $".
  */
