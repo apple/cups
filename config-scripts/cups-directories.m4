@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-directories.m4,v 1.4 2001/10/30 20:37:14 mike Exp $"
+dnl "$Id: cups-directories.m4,v 1.5 2001/11/02 17:34:54 mike Exp $"
 dnl
 dnl   Directory stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -171,8 +171,8 @@ fi
 
 dnl See what directory to put server executables...
 case "$uname" in
-	FreeBSD* | NetBSD* | OpenBSD* | Darwin*)
-		# *BSD
+	*BSD* | Darwin*)
+		# *BSD and Darwin (MacOS X)
 		INSTALL_SYSV=""
 		CUPS_SERVERBIN='${exec_prefix}/libexec/cups'
 		AC_DEFINE_UNQUOTED(CUPS_SERVERBIN, "$exec_prefix/libexec/cups")
@@ -193,7 +193,7 @@ AC_SUBST(CUPS_REQUESTS)
 
 dnl Set the CUPS_LOCALE directory...
 case "$uname" in
-	Linux* | FreeBSD* | NetBSD* | OpenBSD* | Darwin*)
+	Linux* | *BSD* | Darwin*)
 		CUPS_LOCALEDIR='${datadir}/locale'
 		AC_DEFINE_UNQUOTED(CUPS_LOCALEDIR, "$datadir/locale")
 		;;
@@ -232,5 +232,5 @@ dnl Set the CUPS_FONTPATH directory...
 AC_DEFINE_UNQUOTED(CUPS_FONTPATH, "$fontpath")
 
 dnl
-dnl End of "$Id: cups-directories.m4,v 1.4 2001/10/30 20:37:14 mike Exp $".
+dnl End of "$Id: cups-directories.m4,v 1.5 2001/11/02 17:34:54 mike Exp $".
 dnl

@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-compiler.m4,v 1.8 2001/10/29 13:30:07 mike Exp $"
+dnl "$Id: cups-compiler.m4,v 1.9 2001/11/02 17:34:54 mike Exp $"
 dnl
 dnl   Common configuration stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -34,6 +34,29 @@ AC_ARG_ENABLE(debug, [  --enable-debug          turn on debugging [default=no]],
 
 dnl Update compiler options...
 if test -n "$GCC"; then
+	# Starting with GCC 3.0, you must link C++ programs against either
+	# libstdc++ (shared by default), or libsupc++ (always static).  If
+	# you care about binary portability between Linux distributions,
+	# you need to either 1) build your own GCC with static C++ libraries
+	# or 2) link using gcc and libsupc++.  We choose the latter since
+	# CUPS doesn't (currently) use any of the stdc++ library.
+	#
+	# Also, GCC 3.0.x still has problems compiling some code.  You may
+	# or may not have success with it.  USE 3.0.x WITH EXTREME CAUTION!
+	#
+	# Previous versions of GCC do not have the reliance on the stdc++
+	# or g++ libraries, so the extra supc++ library is not needed.
+
+	case "`$CXX --version`" in
+    		3*)
+			AC_MSG_WARN(GCC 3.0.x is known to produce incorrect code - use with caution!)
+			LIBS="$LIBS -lsupc++"
+			;;
+    		3.1*)
+			LIBS="$LIBS -lsupc++"
+			;;
+	esac
+
 	CXX="$CC"
 
 	if test -z "$OPTIM"; then
@@ -44,9 +67,11 @@ if test -n "$GCC"; then
 		       	OPTIM="-O2"
 		fi
 	fi
+
 	if test $PICFLAG = 1 -a $uname != AIX; then
     		OPTIM="-fPIC $OPTIM"
 	fi
+
 	OPTIM="-Wall $OPTIM"
 else
 	case $uname in
@@ -123,5 +148,5 @@ case $uname in
 esac
 
 dnl
-dnl End of "$Id: cups-compiler.m4,v 1.8 2001/10/29 13:30:07 mike Exp $".
+dnl End of "$Id: cups-compiler.m4,v 1.9 2001/11/02 17:34:54 mike Exp $".
 dnl

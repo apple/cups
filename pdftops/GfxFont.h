@@ -28,7 +28,8 @@ struct BuiltinFont;
 enum GfxFontCharSet16 {
   font16AdobeJapan12,		// Adobe-Japan1-2
   font16AdobeGB12,		// Adobe-GB1-2 (Chinese)
-  font16AdobeCNS13		// Adobe-CNS1-3 (Chinese)
+  font16AdobeCNS13,		// Adobe-CNS1-3 (Chinese)
+  font16AdobeIdentity		// Adobe-Identity (Unicode)
 };
 
 //------------------------------------------------------------------------

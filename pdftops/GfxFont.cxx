@@ -716,8 +716,14 @@ void GfxFont::getType0EncAndWidths(Dict *fontDict) {
       error(-1, "Xpdf was compiled without Chinese CNS font support");
       goto err4;
 #endif
+#if 0 // This needs a lot of work to support Identity (Unicode) mapping
+    } else if (obj4.getString()->cmp("Adobe") == 0 &&
+	       obj5.getString()->cmp("Identity") == 0) {
+      is16 = gTrue;
+      enc16.charSet = font16AdobeIdentity;
+#endif // 0
     } else {
-      error(-1, "Uknown Type 0 character set: %s-%s",
+      error(-1, "Unknown Type 0 character set: %s-%s",
 	    obj4.getString()->getCString(), obj5.getString()->getCString());
       goto err4;
     }
@@ -960,6 +966,9 @@ void GfxFont::getType0EncAndWidths(Dict *fontDict) {
     enc16.enc = gfxCNS13Tab[i].enc;
   }
 #  endif
+  if (enc16.charSet == font16AdobeIdentity) {
+    enc16.enc = NULL;
+  }
   obj1.free();
 
   return;

@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-common.m4,v 1.11 2001/10/31 21:32:41 mike Exp $"
+dnl "$Id: cups-common.m4,v 1.12 2001/11/02 17:34:54 mike Exp $"
 dnl
 dnl   Common configuration stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -36,8 +36,8 @@ AC_PROG_CXX
 AC_PROG_CPP
 AC_PROG_INSTALL
 if test "$INSTALL" = "$ac_install_sh"; then
-    # Use full path to install-sh script...
-    INSTALL="`pwd`/install-sh -c"
+	# Use full path to install-sh script...
+	INSTALL="`pwd`/install-sh -c"
 fi
 AC_PROG_RANLIB
 AC_PATH_PROG(AR,ar)
@@ -45,12 +45,12 @@ AC_PATH_PROG(HTMLDOC,htmldoc)
 AC_PATH_PROG(MV,mv)
 AC_PATH_PROG(NROFF,nroff)
 if test "$NROFF" = ""; then
-    AC_PATH_PROG(GROFF,groff)
-    if test "$GROFF" = ""; then
-        NROFF="echo"
-    else
-        NROFF="$GROFF -T ascii"
-    fi
+	AC_PATH_PROG(GROFF,groff)
+	if test "$GROFF" = ""; then
+        	NROFF="echo"
+	else
+        	NROFF="$GROFF -T ascii"
+	fi
 fi
 AC_PATH_PROG(RM,rm)
 AC_PATH_PROG(SED,sed)
@@ -132,10 +132,10 @@ AC_CHECK_FUNCS(wait3)
 dnl See if the tm structure has the tm_gmtoff member...
 AC_MSG_CHECKING(for tm_gmtoff member in tm structure)
 AC_TRY_COMPILE([#include <time.h>],[struct tm t;
-  int o = t.tm_gmtoff;],
-  AC_MSG_RESULT(yes)
-  AC_DEFINE(HAVE_TM_GMTOFF),
-  AC_MSG_RESULT(no))
+	int o = t.tm_gmtoff;],
+	AC_MSG_RESULT(yes)
+	AC_DEFINE(HAVE_TM_GMTOFF),
+	AC_MSG_RESULT(no))
 
 dnl Flags for "ar" command...
 case $uname in
@@ -150,5 +150,5 @@ esac
 AC_SUBST(ARFLAGS)
 
 dnl
-dnl End of "$Id: cups-common.m4,v 1.11 2001/10/31 21:32:41 mike Exp $".
+dnl End of "$Id: cups-common.m4,v 1.12 2001/11/02 17:34:54 mike Exp $".
 dnl

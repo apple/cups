@@ -112,6 +112,8 @@ CHANGES IN CUPS V1.1.11
 	- The IPP backend was sending a PAGE comment even when
 	  printing the output from a filter (it should only send
 	  page comments when printing files directly...)
+	- The pdftops filter didn't properly map glyph names of
+	  embedded Asian TrueType fonts.
 
 
 CHANGES IN CUPS V1.1.10-1
