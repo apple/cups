@@ -1,5 +1,5 @@
 /*
- * "$Id: image-colorspace.c,v 1.22.2.9 2003/01/24 20:45:16 mike Exp $"
+ * "$Id: image-colorspace.c,v 1.22.2.10 2003/02/05 03:19:51 mike Exp $"
  *
  *   Colorspace conversions for the Common UNIX Printing System (CUPS).
  *
@@ -235,9 +235,9 @@ ImageWhiteToRGB(const ib_t *in,		/* I - Input pixels */
       *out++ = *in;
       *out++ = *in++;
 
-      if (ImageColorSpace == CUPS_CSPACE_CIELab)
+      if (ImageColorSpace >= CUPS_CSPACE_CIELab)
         rgb_to_lab(out - 3);
-      else if (ImageColorSpace >= CUPS_CSPACE_CIEXYZ)
+      else if (ImageColorSpace == CUPS_CSPACE_CIEXYZ)
         rgb_to_xyz(out - 3);
 
       count --;
@@ -616,7 +616,7 @@ ImageRGBToRGB(const ib_t *in,	/* I - Input pixels */
     {
       while (count > 0)
       {
-	if (ImageColorSpace == CUPS_CSPACE_CIELab)
+	if (ImageColorSpace >= CUPS_CSPACE_CIELab)
           rgb_to_lab(out);
 	else
           rgb_to_xyz(out);
@@ -956,9 +956,9 @@ ImageCMYKToRGB(const ib_t *in,	/* I - Input pixels */
       else
         *out++ = 0;
 
-      if (ImageColorSpace == CUPS_CSPACE_CIELab)
+      if (ImageColorSpace >= CUPS_CSPACE_CIELab)
         rgb_to_lab(out - 3);
-      else if (ImageColorSpace >= CUPS_CSPACE_CIEXYZ)
+      else if (ImageColorSpace == CUPS_CSPACE_CIEXYZ)
         rgb_to_xyz(out - 3);
 
       count --;
@@ -1540,5 +1540,5 @@ zshear(float mat[3][3],	/* I - Matrix */
 
 
 /*
- * End of "$Id: image-colorspace.c,v 1.22.2.9 2003/01/24 20:45:16 mike Exp $".
+ * End of "$Id: image-colorspace.c,v 1.22.2.10 2003/02/05 03:19:51 mike Exp $".
  */

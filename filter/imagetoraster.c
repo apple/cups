@@ -1,5 +1,5 @@
 /*
- * "$Id: imagetoraster.c,v 1.56.2.13 2003/01/07 18:26:57 mike Exp $"
+ * "$Id: imagetoraster.c,v 1.56.2.14 2003/02/05 03:19:51 mike Exp $"
  *
  *   Image file to raster filter for the Common UNIX Printing System (CUPS).
  *
@@ -538,6 +538,15 @@ main(int  argc,		/* I - Number of command-line arguments */
     case CUPS_CSPACE_RGBA :
         primary   = IMAGE_RGB;
 	secondary = IMAGE_RGB;
+
+       /*
+        * Ensure that colorimetric colorspaces use at least 8 bits per
+	* component...
+	*/
+
+        if (header.cupsColorSpace >= CUPS_CSPACE_CIEXYZ &&
+	    header.cupsBitsPerColor < 8)
+	  header.cupsBitsPerColor = 8;
 
 	if (header.cupsColorOrder == CUPS_ORDER_CHUNKED)
 	{
@@ -4541,5 +4550,5 @@ make_lut(ib_t  *lut,		/* I - Lookup table */
 
 
 /*
- * End of "$Id: imagetoraster.c,v 1.56.2.13 2003/01/07 18:26:57 mike Exp $".
+ * End of "$Id: imagetoraster.c,v 1.56.2.14 2003/02/05 03:19:51 mike Exp $".
  */

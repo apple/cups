@@ -1,5 +1,5 @@
 /*
- * "$Id: gdevcups.c,v 1.43.2.16 2003/01/07 16:55:31 mike Exp $"
+ * "$Id: gdevcups.c,v 1.43.2.17 2003/02/05 03:19:53 mike Exp $"
  *
  *   GNU Ghostscript raster output driver for the Common UNIX Printing
  *   System (CUPS).
@@ -1620,7 +1620,7 @@ cups_map_rgb_color(gx_device      *pdev,	/* I - Device info */
 	ciey = 0.212671 * rr + 0.715160 * rg + 0.072169 * rb;
 	ciez = 0.019334 * rr + 0.119193 * rg + 0.950227 * rb;
 
-        if (cups->header.cupsColorSpace != CUPS_CSPACE_CIELab)
+        if (cups->header.cupsColorSpace == CUPS_CSPACE_CIEXYZ)
 	{
 	 /*
 	  * Convert to an integer XYZ color value...
@@ -2376,14 +2376,7 @@ cups_set_color_info(gx_device *pdev)	/* I - Device info */
 	 if (cups->header.cupsColorOrder != CUPS_ORDER_CHUNKED)
            cups->header.cupsBitsPerPixel = cups->header.cupsBitsPerColor;
 	 else
-	 {
-	   if (cups->header.cupsColorSpace < CUPS_CSPACE_ICC1)
-	     cups->header.cupsBitsPerPixel = 3 * cups->header.cupsBitsPerColor;
-	   else
-	     cups->header.cupsBitsPerPixel =
-	         (cups->header.cupsColorSpace - CUPS_CSPACE_ICC1 + 1) *
-		 cups->header.cupsBitsPerColor;
-         }
+           cups->header.cupsBitsPerPixel = 3 * cups->header.cupsBitsPerColor;
 
 	 cups->color_info.depth          = 24;
 	 cups->color_info.num_components = 3;
@@ -3649,5 +3642,5 @@ cups_print_planar(gx_device_printer *pdev,	/* I - Printer device */
 
 
 /*
- * End of "$Id: gdevcups.c,v 1.43.2.16 2003/01/07 16:55:31 mike Exp $".
+ * End of "$Id: gdevcups.c,v 1.43.2.17 2003/02/05 03:19:53 mike Exp $".
  */
