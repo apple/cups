@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c,v 1.81.2.25 2003/08/29 23:58:38 mike Exp $"
+ * "$Id: util.c,v 1.81.2.26 2003/09/15 20:11:06 mike Exp $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -422,15 +422,44 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
 
   if (response)
     last_error = response->request.status.status_code;
-  else if (status == HTTP_NOT_FOUND)
-    last_error = IPP_NOT_FOUND;
-  else if (status == HTTP_UNAUTHORIZED)
-    last_error = IPP_NOT_AUTHORIZED;
   else if (status != HTTP_OK)
   {
-    DEBUG_printf(("HTTP error %d mapped to IPP_SERVICE_UNAVAILABLE!\n",
-                  status));
-    last_error = IPP_SERVICE_UNAVAILABLE;
+    switch (status)
+    {
+      case HTTP_NOT_FOUND :
+          last_error = IPP_NOT_FOUND;
+	  break;
+
+      case HTTP_UNAUTHORIZED :
+          last_error = IPP_NOT_AUTHORIZED;
+	  break;
+
+      case HTTP_FORBIDDEN :
+          last_error = IPP_FORBIDDEN;
+	  break;
+
+      case HTTP_BAD_REQUEST :
+          last_error = IPP_BAD_REQUEST;
+	  break;
+
+      case HTTP_REQUEST_TOO_LARGE :
+          last_error = IPP_REQUEST_VALUE;
+	  break;
+
+      case HTTP_NOT_IMPLEMENTED :
+          last_error = IPP_OPERATION_NOT_SUPPORTED;
+	  break;
+
+      case HTTP_NOT_SUPPORTED :
+          last_error = IPP_VERSION_NOT_SUPPORTED;
+	  break;
+
+      default :
+	  DEBUG_printf(("HTTP error %d mapped to IPP_SERVICE_UNAVAILABLE!\n",
+                	status));
+	  last_error = IPP_SERVICE_UNAVAILABLE;
+	  break;
+    }
   }
 
   return (response);
@@ -926,9 +955,8 @@ cupsGetPPD(const char *name)		/* I - Printer name */
   ipp_attribute_t *attr;		/* Current attribute */
   cups_lang_t	*language;		/* Local language */
   int		fd;			/* PPD file */
-  int		bytes;			/* Number of bytes read */
-  char		buffer[8192];		/* Buffer for file */
-  char		printer[HTTP_MAX_URI],	/* Printer name */
+  char		uri[HTTP_MAX_URI],	/* Printer URI */
+		printer[HTTP_MAX_URI],	/* Printer name */
 		method[HTTP_MAX_URI],	/* Method/scheme name */
 		username[HTTP_MAX_URI],	/* Username:password */
 		hostname[HTTP_MAX_URI],	/* Hostname */
@@ -988,9 +1016,9 @@ cupsGetPPD(const char *name)		/* I - Printer name */
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
                "attributes-natural-language", NULL, language->language);
 
-  snprintf(buffer, sizeof(buffer), "ipp://localhost/printers/%s", printer);
+  snprintf(uri, sizeof(uri), "ipp://localhost/printers/%s", printer);
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI,
-               "printer-uri", NULL, buffer);
+               "printer-uri", NULL, uri);
 
   ippAddStrings(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
                 "requested-attributes",
@@ -1046,9 +1074,9 @@ cupsGetPPD(const char *name)		/* I - Printer name */
     * Remap local hostname to localhost...
     */
 
-    gethostname(buffer, sizeof(buffer));
+    gethostname(uri, sizeof(uri));
 
-    if (strcasecmp(buffer, hostname) == 0)
+    if (strcasecmp(uri, hostname) == 0)
       strcpy(hostname, "localhost");
   }
 
@@ -1523,5 +1551,5 @@ cups_connect(const char *name,		/* I - Destination (printer[@host]) */
 
 
 /*
- * End of "$Id: util.c,v 1.81.2.25 2003/08/29 23:58:38 mike Exp $".
+ * End of "$Id: util.c,v 1.81.2.26 2003/09/15 20:11:06 mike Exp $".
  */

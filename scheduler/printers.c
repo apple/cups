@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.93.2.51 2003/08/06 18:05:46 mike Exp $"
+ * "$Id: printers.c,v 1.93.2.52 2003/09/15 20:11:16 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -849,7 +849,7 @@ SaveAllPrinters(void)
   * Restrict access to the file...
   */
 
-  fchown(cupsFileNumber(fp), User, Group);
+  fchown(cupsFileNumber(fp), getuid(), Group);
   fchmod(cupsFileNumber(fp), ConfigFilePerm);
 
  /*
@@ -963,27 +963,27 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
   ppd_attr_t	*ppdattr;		/* PPD attribute */
   ipp_attribute_t *attr;		/* Attribute data */
   ipp_value_t	*val;			/* Attribute value */
-  int		nups[] =		/* number-up-supported values */
+  static const int nups[] =		/* number-up-supported values */
 		{ 1, 2, 4, 6, 9, 16 };
-  ipp_orient_t	orients[4] =		/* orientation-requested-supported values */
+  static const ipp_orient_t orients[4] =/* orientation-requested-supported values */
 		{
 		  IPP_PORTRAIT,
 		  IPP_LANDSCAPE,
 		  IPP_REVERSE_LANDSCAPE,
 		  IPP_REVERSE_PORTRAIT
 		};
-  const char	*sides[3] =		/* sides-supported values */
+  static const char * const sides[3] =	/* sides-supported values */
 		{
-		  "one-sided",
-		  "two-sided-long-edge",
-		  "two-sided-short-edge"
+		  "one",
+		  "two-long-edge",
+		  "two-short-edge"
 		};
-  const char	*versions[] =		/* ipp-versions-supported values */
+  static const char * const versions[] =/* ipp-versions-supported values */
 		{
 		  "1.0",
 		  "1.1"
 		};
-  ipp_op_t	ops[] =			/* operations-supported values */
+  static const ipp_op_t	ops[] =		/* operations-supported values */
 		{
 		  IPP_PRINT_JOB,
 		  IPP_VALIDATE_JOB,
@@ -1014,7 +1014,7 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
 		  CUPS_GET_PPDS,
 		  IPP_RESTART_JOB
 		};
-  const char	*charsets[] =		/* charset-supported values */
+  static const char * const charsets[] =/* charset-supported values */
 		{
 		  "us-ascii",
 		  "iso-8859-1",
@@ -1044,19 +1044,17 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
 		  "koi8-r",
 		  "koi8-u",
 		};
-  const char	*compressions[] =
-		{
-#ifdef HAVE_LIBZ
-		  "none",
-		  "gzip"
-#else
+  static const char * const compressions[] =
+		{			/* document-compression-supported values */
 		  "none"
+#ifdef HAVE_LIBZ
+		  ,"gzip"
 #endif /* HAVE_LIBZ */
 		};
   int		num_finishings;
-  ipp_finish_t	finishings[5];
-  const char	*multiple_document_handling[] =
-		{
+  ipp_finish_t	finishings[5];		/* finishings-supported values */
+  static const char * const multiple_document_handling[] =
+		{			/* multiple-document-handling-supported values */
 		  "separate-documents-uncollated-copies",
 		  "separate-documents-collated-copies"
 		};
@@ -2389,5 +2387,5 @@ write_irix_state(printer_t *p)		/* I - Printer to update */
 
 
 /*
- * End of "$Id: printers.c,v 1.93.2.51 2003/08/06 18:05:46 mike Exp $".
+ * End of "$Id: printers.c,v 1.93.2.52 2003/09/15 20:11:16 mike Exp $".
  */
