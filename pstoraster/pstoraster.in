@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# "$Id: pstoraster.in,v 1.2 2002/05/13 16:21:23 mike Exp $"
+# "$Id: pstoraster.in,v 1.3 2002/12/17 16:17:28 mike Exp $"
 #
 # CUPS filter script for Ghostscript.
 #
@@ -27,8 +27,8 @@ exec_prefix=@exec_prefix@
 bindir=@bindir@
 
 # Set the library/font path...
-GS_FONTPATH="$CUPS_FONTPATH"
-export GS_FONTPATH
+GS_LIB="${CUPS_FONTPATH:=/usr/share/cups/fonts}"
+export GS_LIB
 
 # Options we use with Ghostscript...
 gsopts="-dQUIET -dDEBUG -dPARANOIDSAFER -dNOPAUSE -dBATCH "
@@ -39,7 +39,7 @@ profile=""
 for option in $5; do
     case $option in
         profile=*)
-	    profile="-scupsProfile=`echo $option | awk -F= '{print $2}'`"
+	    profile="<</cupsProfile(`echo $option | awk -F= '{print $2}'`)>>setpagedevice"
 	    ;;
     esac
 done
@@ -51,9 +51,11 @@ else
 	ifile="$6"
 fi
 
+echo DEBUG: Running $bindir/@GS@ $gsopts -sOUTPUTFILE="%stdout" -c "$profile" $ifile 1>&2
+
 # Now run Ghostscript...
-$bindir/@GS@ $gsopts -sOUTPUTFILE="%stdout" $profile $ifile
+$bindir/@GS@ $gsopts -sOUTPUTFILE="%stdout" -c "$profile" $ifile
 
 #
-# End of "$Id: pstoraster.in,v 1.2 2002/05/13 16:21:23 mike Exp $".
+# End of "$Id: pstoraster.in,v 1.3 2002/12/17 16:17:28 mike Exp $".
 #
