@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.77 2000/06/28 14:00:48 mike Exp $"
+ * "$Id: ipp.c,v 1.78 2000/06/28 16:06:22 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -4377,8 +4377,8 @@ set_default(client_t        *con,	/* I - Client connection */
  */
 
 static void
-set_job_attrs(client_t        *con,		/* I - Client connection */
-	      ipp_attribute_t *uri)		/* I - Job URI */
+set_job_attrs(client_t        *con,	/* I - Client connection */
+	      ipp_attribute_t *uri)	/* I - Job URI */
 {
   int			i;		/* Looping var */
   ipp_attribute_t	*attr,		/* Current attribute */
@@ -4932,5 +4932,5 @@ validate_job(client_t        *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.77 2000/06/28 14:00:48 mike Exp $".
+ * End of "$Id: ipp.c,v 1.78 2000/06/28 16:06:22 mike Exp $".
  */

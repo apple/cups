@@ -1,5 +1,5 @@
 /*
- * "$Id: cups-lpd.c,v 1.2 2000/05/11 14:11:54 mike Exp $"
+ * "$Id: cups-lpd.c,v 1.3 2000/06/28 16:06:22 mike Exp $"
  *
  *   Line Printer Daemon interface for the Common UNIX Printing System (CUPS).
  *
@@ -63,6 +63,10 @@
  * Prototypes...
  */
 
+int	print_file(const char *name, const char *file,
+	           const char *title, const char *docname,
+	           const char *user, int num_options,
+		   cups_option_t *options);
 int	recv_print_job(const char *dest);
 int	send_state(const char *dest, const char *list, int longstatus);
 int	remove_jobs(const char *dest, const char *agent, const char *list);
@@ -176,6 +180,223 @@ main(int  argc,		/* I - Number of command-line arguments */
 
 
 /*
+ * 'prin_file()' - Print a file to a printer or class.
+ */
+
+int					/* O - Job ID */
+print_file(const char    *name,		/* I - Printer or class name */
+           const char    *file,		/* I - File to print */
+           const char    *title,	/* I - Title of job */
+           const char    *docname,	/* I - Name of job file */
+           const char    *user,		/* I - Title of job */
+           int           num_options,	/* I - Number of options */
+	   cups_option_t *options)	/* I - Options */
+{
+  int		i;			/* Looping var */
+  int		n, n2;			/* Attribute values */
+  char		*option,		/* Name of option */
+		*s;			/* Pointer into option value */
+  const char	*val;			/* Pointer to option value */
+  http_t	*http;			/* Connection to server */
+  ipp_t		*request;		/* IPP request */
+  ipp_t		*response;		/* IPP response */
+  ipp_attribute_t *attr;		/* IPP job-id attribute */
+  char		uri[HTTP_MAX_URI];	/* Printer URI */
+  cups_lang_t	*language;		/* Language to use */
+  int		jobid;			/* New job ID */
+
+
+ /*
+  * Setup a connection and request data...
+  */
+
+  if ((http = httpConnect(cupsServer(), ippPort())) == NULL)
+    return (0);
+
+  language = cupsLangDefault();
+
+ /*
+  * Build a standard CUPS URI for the printer and fill the standard IPP
+  * attributes...
+  */
+
+  if ((request = ippNew()) == NULL)
+    return (0);
+
+  request->request.op.operation_id = IPP_PRINT_JOB;
+  request->request.op.request_id   = 1;
+
+  snprintf(uri, sizeof(uri), "ipp://localhost/printers/%s", name);
+
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
+               "attributes-charset", NULL, cupsLangEncoding(language));
+
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
+               "attributes-natural-language", NULL,
+               language != NULL ? language->language : "C");
+
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
+               NULL, uri);
+
+ /*
+  * Handle raw print files...
+  */
+
+  if (cupsGetOption("raw", num_options, options))
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_MIMETYPE, "document-format",
+        	 NULL, "application/vnd.cups-raw");
+  else if ((val = cupsGetOption("document-format", num_options, options)) != NULL)
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_MIMETYPE, "document-format",
+        	 NULL, val);
+  else
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_MIMETYPE, "document-format",
+        	 NULL, "application/octet-stream");
+
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "requesting-user-name",
+               NULL, user);
+
+  if (title)
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "job-name", NULL, title);
+  if (docname)
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "document-name", NULL, docname);
+
+ /*
+  * Then add all options on the command-line...
+  */
+
+  for (i = 0; i < num_options; i ++)
+  {
+   /*
+    * Skip the "raw" option - handled above...
+    */
+
+    if (strcasecmp(options[i].name, "raw") == 0 ||
+        strcasecmp(options[i].name, "document-format") == 0)
+      continue;
+
+   /*
+    * See what the option value is; for compatibility with older interface
+    * scripts, we have to support single-argument options as well as
+    * option=value, option=low-high, and option=MxN.
+    */
+
+    option = options[i].name;
+    val    = options[i].value;
+
+    if (*val == '\0')
+      val = NULL;
+
+    if (val != NULL)
+    {
+      if (strcasecmp(val, "true") == 0 ||
+          strcasecmp(val, "on") == 0 ||
+	  strcasecmp(val, "yes") == 0)
+      {
+       /*
+	* Boolean value - true...
+	*/
+
+	n   = 1;
+	val = "";
+      }
+      else if (strcasecmp(val, "false") == 0 ||
+               strcasecmp(val, "off") == 0 ||
+	       strcasecmp(val, "no") == 0)
+      {
+       /*
+	* Boolean value - false...
+	*/
+
+	n   = 0;
+	val = "";
+      }
+
+      n = strtol(val, &s, 0);
+    }
+    else
+    {
+      if (strncasecmp(option, "no", 2) == 0)
+      {
+	option += 2;
+	n      = 0;
+      }
+      else
+        n = 1;
+
+      s = "";
+    }
+
+    if (*s != '\0' && *s != '-' && (*s != 'x' || s == val))
+    {
+     /*
+      * String value(s)...
+      */
+
+      ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD, option, NULL, val);
+    }
+    else if (val != NULL)
+    {
+     /*
+      * Numeric value, range, or resolution...
+      */
+
+      if (*s == '-')
+      {
+        n2 = strtol(s + 1, NULL, 0);
+        ippAddRange(request, IPP_TAG_JOB, option, n, n2);
+      }
+      else if (*s == 'x')
+      {
+        n2 = strtol(s + 1, &s, 0);
+
+	if (strcasecmp(s, "dpc") == 0)
+          ippAddResolution(request, IPP_TAG_JOB, option, IPP_RES_PER_CM, n, n2);
+        else if (strcasecmp(s, "dpi") == 0)
+          ippAddResolution(request, IPP_TAG_JOB, option, IPP_RES_PER_INCH, n, n2);
+        else
+          ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD, option, NULL, val);
+      }
+      else
+        ippAddInteger(request, IPP_TAG_JOB, IPP_TAG_INTEGER, option, n);
+    }
+    else
+    {
+     /*
+      * Boolean value...
+      */
+
+      ippAddBoolean(request, IPP_TAG_JOB, option, (char)n);
+    }
+  }
+
+ /*
+  * Do the request...
+  */
+
+  snprintf(uri, sizeof(uri), "/printers/%s", name);
+
+  response = cupsDoFileRequest(http, request, uri, file);
+
+  if (response == NULL)
+    jobid = 0;
+  else if (response->request.status.status_code > IPP_OK_CONFLICT)
+    jobid = 0;
+  else if ((attr = ippFindAttribute(response, "job-id", IPP_TAG_INTEGER)) == NULL)
+    jobid = 0;
+  else
+    jobid = attr->values[0].integer;
+
+  if (response != NULL)
+    ippDelete(response);
+
+  httpClose(http);
+  cupsLangFree(language);
+
+  return (jobid);
+}
+
+
+/*
  * 'recv_print_job()' - Receive a print job from the client.
  */
 
@@ -197,17 +418,24 @@ recv_print_job(const char *dest)	/* I - Destination */
   char		user[1024],		/* User name */
 		title[1024],		/* Job title */
 		docname[1024];		/* Document name */
-  http_t	*http;			/* HTTP server connection */
-  cups_lang_t	*language;		/* Language information */
-  ipp_t		*request,		/* IPP request */
-		*response;		/* IPP response */
-  char		uri[HTTP_MAX_URI];	/* Printer URI */
+  int		num_dests;		/* Number of destinations */
+  cups_dest_t	*dests,			/* Destinations */
+		*destptr;		/* Current destination */
+  int		num_options;		/* Number of options */
+  cups_option_t	*options;		/* Options */
 
 
   status   = 0;
   num_data = 0;
   if ((tmpdir = getenv("TMP")) == NULL)
     tmpdir = "/var/tmp";
+
+  num_dests = cupsGetDests(&dests);
+  if ((destptr = cupsGetDest(dest, NULL, num_dests, dests)) == NULL)
+  {
+    cupsFreeDests(num_dests, dests);
+    return (1);
+  }
 
   while (fgets(line, sizeof(line), stdin) != NULL)
   {
@@ -326,14 +554,11 @@ recv_print_job(const char *dest)	/* I - Destination */
     snprintf(filename, sizeof(filename), "%s/%06d-0", tmpdir, getpid());
     if ((fp = fopen(filename, "rb")) == NULL)
       status = 1;
-    else if ((http = httpConnect(cupsServer(), ippPort())) == NULL)
-      status = 1;
     else
     {
-      language    = cupsLangDefault();
-      title[0]    = '\0';
-      user[0]     = '\0';
-      docname[0]  = '\0';
+      title[0]   = '\0';
+      user[0]    = '\0';
+      docname[0] = '\0';
 
       while (fgets(line, sizeof(line), fp) != NULL)
       {
@@ -381,6 +606,27 @@ recv_print_job(const char *dest)	/* I - Destination */
 	      }
 
              /*
+	      * Copy the default options...
+	      */
+
+              num_options = 0;
+	      options     = NULL;
+	      for (i = 0; i < destptr->num_options; i ++)
+	        num_options = cupsAddOption(destptr->options[i].name,
+		                            destptr->options[i].value,
+		                            num_options, &options);
+             /*
+	      * Add additional options as needed...
+	      */
+
+	      if (line[0] == 'l')
+	        num_options = cupsAddOption("raw", "", num_options, &options);
+
+              if (line[0] == 'p')
+	        num_options = cupsAddOption("prettyprint", "", num_options,
+		                            &options);
+
+             /*
 	      * Figure out which file we are printing...
 	      */
 
@@ -395,69 +641,17 @@ recv_print_job(const char *dest)	/* I - Destination */
 	      }
 
              /*
-	      * Build an IPP_PRINT_JOB request...
+	      * Send the print request...
 	      */
-
-              if ((request = ippNew()) == NULL)
-	      {
-	        status = 1;
-		break;
-	      }
-
-	      request->request.op.operation_id = IPP_PRINT_JOB;
-              request->request.op.request_id   = 1;
-
-              snprintf(uri, sizeof(uri), "ipp://%s:%d/printers/%s",
-	               cupsServer(), ippPort(), dest);
-
-	      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-        		   "attributes-charset", NULL,
-			   cupsLangEncoding(language));
-
-	      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
-        		   "attributes-natural-language", NULL,
-        		   language != NULL ? language->language : "C");
-
-	      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI,
-	                   "printer-uri", NULL, uri);
-
-	      if (line[0] == 'l')
-		ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_MIMETYPE,
-		             "document-format", NULL, "application/vnd.cups-raw");
-	      else
-		ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_MIMETYPE,
-		             "document-format", NULL, "application/octet-stream");
-
-	      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
-	                   "requesting-user-name", NULL, user);
-
-	      if (title[0])
-		ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
-		             "job-name", NULL, title);
-
-	      if (docname[0])
-		ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
-		             "document-name", NULL, docname);
-
-              if (line[0] == 'p')
-	        ippAddBoolean(request, IPP_TAG_JOB, "prettyprint", 1);
 
               snprintf(filename, sizeof(filename), "%s/%06d-%d", tmpdir,
 	               getpid(), i + 1);
 
-             /*
-	      * Do the request...
-	      */
-
-	      snprintf(uri, sizeof(uri), "/printers/%s", dest);
-
-	      if ((response = cupsDoFileRequest(http, request, uri, filename)) == NULL)
-	        status = 1;
-	      else if (response->request.status.status_code > IPP_OK_CONFLICT)
-	        status = 1;
-
-              if (response != NULL)
-	        ippDelete(response);
+              if (print_file(dest, filename, title, docname, user, num_options,
+	                     options) == 0)
+                status = 1;
+	      else
+	        status = 0;
 	      break;
 	}
 
@@ -466,8 +660,6 @@ recv_print_job(const char *dest)	/* I - Destination */
       }
 
       fclose(fp);
-      httpClose(http);
-      cupsLangFree(language);
     }
   }
 
@@ -480,6 +672,8 @@ recv_print_job(const char *dest)	/* I - Destination */
     snprintf(filename, sizeof(filename), "%s/%06d-%d", tmpdir, getpid(), i + 1);
     unlink(filename);
   }
+
+  cupsFreeDests(num_dests, dests);
 
   return (status);
 }
@@ -891,5 +1085,5 @@ remove_jobs(const char *dest,		/* I - Destination */
 
 
 /*
- * End of "$Id: cups-lpd.c,v 1.2 2000/05/11 14:11:54 mike Exp $".
+ * End of "$Id: cups-lpd.c,v 1.3 2000/06/28 16:06:22 mike Exp $".
  */
