@@ -1,5 +1,5 @@
 /*
- * "$Id: image.c,v 1.12 1999/05/10 16:35:27 mike Exp $"
+ * "$Id: image.c,v 1.13 1999/07/22 20:59:02 mike Exp $"
  *
  *   Base image support for the Common UNIX Printing System (CUPS).
  *
@@ -298,7 +298,7 @@ ImageSetProfile(float density,		/* I - Ink/marker density */
       for (k = 0; k < 256; k ++)
         ImageMatrix[i][j][k] = (int)(k * matrix[i][j] + 0.5);
 
-  g = 1.0 / density;
+  g = 1.0 / (density * density);
 
   for (k = 0; k < 256; k ++)
     ImageDensity[k] = 255.0 * density * pow((float)k / 255.0, g) + 0.5;
@@ -741,5 +741,5 @@ flush_tile(image_t *img)
 
 
 /*
- * End of "$Id: image.c,v 1.12 1999/05/10 16:35:27 mike Exp $".
+ * End of "$Id: image.c,v 1.13 1999/07/22 20:59:02 mike Exp $".
  */
