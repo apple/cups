@@ -18,6 +18,17 @@ CHANGES IN CUPS V1.1.9
 	- The scheduler did not allow usernames that were
 	  not in the UNIX password file to be used for Digest
 	  authentication from passwd.md5.
+	- The scheduler could not scan PPD files that only used
+	  a carriage return (i.e. MacOS PPD files); the new code
+	  is also about 40% faster, so servers with thousands of
+	  PPD files should start much faster now.
+	- The lpinfo command did not return a non-zero status
+	  code if an error occurred.
+	- Fixed a bug in the scheduler's job status handling
+	  code that has been in there since 1.0; basically, all
+	  jobs shared the same status buffer, and the "buffer
+	  start" pointer could point to 1 byte before the
+	  beginning of the buffer.
 
 
 CHANGES IN CUPS V1.1.8

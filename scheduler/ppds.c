@@ -1,5 +1,5 @@
 /*
- * "$Id: ppds.c,v 1.15 2001/04/24 16:01:58 mike Exp $"
+ * "$Id: ppds.c,v 1.16 2001/06/05 21:32:02 mike Exp $"
  *
  *   PPD scanning routines for the Common UNIX Printing System (CUPS).
  *
@@ -23,8 +23,13 @@
  *
  * Contents:
  *
- *   LoadPPDs()  - Load PPD files from the specified directory...
- *   load_ppds() - Load PPD files recursively.
+ *   LoadPPDs()     - Load PPD files from the specified directory...
+ *   buf_read()     - Read a buffer of data into memory...
+ *   check_ppds()   - Check to see if we need to regenerate the PPD file
+ *                    list...
+ *   compare_ppds() - Compare PPD file make and model names for sorting.
+ *   load_ppds()    - Load PPD files recursively.
+ *   ppd_gets()     - Read a line from a PPD file.
  */
 
 /*
@@ -36,6 +41,11 @@
 
 #ifdef HAVE_LIBZ
 #  include <zlib.h>
+#else
+#  define gzFile	FILE *
+#  define gzclose	fclose
+#  define gzread(f,b,l)	fread((b), 1, (l), (f))
+#  define gzopen	fopen
 #endif /* HAVE_LIBZ */
 
 
@@ -53,6 +63,19 @@ typedef struct
 
 
 /*
+ * Buffered file structure...
+ */
+
+typedef struct
+{
+  gzFile	fp;			/* Pointer to file */
+  char		*ptr,			/* Pointer in buffer */
+		*end,			/* End of buffer */
+		buf[1024];		/* Buffer */
+} buf_t;
+
+
+/*
  * Local globals...
  */
 
@@ -65,9 +88,11 @@ static ppd_info_t	*ppds;		/* PPD file info */
  * Local functions...
  */
 
+static int	buf_read(buf_t *fp);
 static int	check_ppds(const char *d, time_t mtime, int *count);
 static int	compare_ppds(const ppd_info_t *p0, const ppd_info_t *p1);
 static void	load_ppds(const char *d, const char *p);
+static char	*ppd_gets(buf_t *fp, char *buf, int buflen);
 
 
 /*
@@ -192,6 +217,31 @@ LoadPPDs(const char *d)		/* I - Directory to scan... */
     free(ppds);
     alloc_ppds = 0;
   }
+}
+
+
+/*
+ * 'buf_read()' - Read a buffer of data into memory...
+ */
+
+static int			/* O - Number of bytes read */
+buf_read(buf_t *fp)		/* I - File to read from */
+{
+  int	count;			/* Number of bytes read */
+
+
+  if ((count = gzread(fp->fp, fp->buf, sizeof(fp->buf))) > 0)
+  {
+    fp->ptr = fp->buf;
+    fp->end = fp->buf + count;
+  }
+  else
+  {
+    fp->ptr = NULL;
+    fp->end = NULL;
+  }
+
+  return (count);
 }
 
 
@@ -399,21 +449,19 @@ static void
 load_ppds(const char *d,		/* I - Actual directory */
           const char *p)		/* I - Virtual path in name */
 {
-#ifdef HAVE_LIBZ
-  gzFile	fp;			/* Pointer to file */
-#else
-  FILE		*fp;			/* Pointer to file */
-#endif /* HAVE_LIBZ */
+  buf_t	fp;			/* Pointer to file */
   DIR		*dir;			/* Directory pointer */
   DIRENT	*dent;			/* Directory entry */
   struct stat	fileinfo;		/* File information */
   char		filename[1024],		/* Name of PPD or directory */
-		line[1024],		/* Line from backend */
+		line[256],		/* Line from backend */
 		*ptr,			/* Pointer into name */
 		name[128],		/* Name of PPD file */
 		language[64],		/* Device class */
-		manufacturer[1024],	/* Manufacturer */
-		make_model[256];	/* Make and model */
+		manufacturer[256],	/* Manufacturer */
+		make_model[256],	/* Make and Model */
+		model_name[256],	/* ModelName */
+		nick_name[256];		/* NickName */
   ppd_info_t	*ppd;			/* New PPD file */
 
 
@@ -460,23 +508,17 @@ load_ppds(const char *d,		/* I - Actual directory */
       continue;
     }
 
-#ifdef HAVE_LIBZ
-    if ((fp = gzopen(filename, "rb")) == NULL)
-#else
-    if ((fp = fopen(filename, "rb")) == NULL)
-#endif /* HAVE_LIBZ */
+    if ((fp.fp = gzopen(filename, "rb")) == NULL)
       continue;
+
+    fp.ptr = fp.end = NULL;
 
    /*
     * Yup, now see if this is a PPD file...
     */
 
     line[0] = '\0';
-#ifdef HAVE_LIBZ
-    gzgets(fp, line, sizeof(line));
-#else
-    fgets(line, sizeof(line), fp);
-#endif /* HAVE_LIBZ */
+    ppd_gets(&fp, line, sizeof(line));
 
     if (strncmp(line, "*PPD-Adobe:", 11) != 0)
     {
@@ -484,11 +526,7 @@ load_ppds(const char *d,		/* I - Actual directory */
       * Nope, close the file and continue...
       */
 
-#ifdef HAVE_LIBZ
-      gzclose(fp);
-#else
-      fclose(fp);
-#endif /* HAVE_LIBZ */
+      gzclose(fp.fp);
 
       continue;
     }
@@ -497,42 +535,55 @@ load_ppds(const char *d,		/* I - Actual directory */
     * Now read until we get the NickName field...
     */
 
-    make_model[0]   = '\0';
+    model_name[0]   = '\0';
+    nick_name[0]    = '\0';
     manufacturer[0] = '\0';
     strcpy(language, "en");
 
-#ifdef HAVE_LIBZ
-    while (gzgets(fp, line, sizeof(line)) != NULL)
-#else
-    while (fgets(line, sizeof(line), fp) != NULL)
-#endif /* HAVE_LIBZ */
+    while (ppd_gets(&fp, line, sizeof(line)) != NULL)
     {
       if (strncmp(line, "*Manufacturer:", 14) == 0)
 	sscanf(line, "%*[^\"]\"%255[^\"]", manufacturer);
       else if (strncmp(line, "*ModelName:", 11) == 0)
-	sscanf(line, "%*[^\"]\"%127[^\"]", make_model);
+	sscanf(line, "%*[^\"]\"%127[^\"]", model_name);
       else if (strncmp(line, "*LanguageVersion:", 17) == 0)
 	sscanf(line, "%*[^:]:%63s", language);
       else if (strncmp(line, "*NickName:", 10) == 0)
+	sscanf(line, "%*[^\"]\"%255[^\"]", nick_name);
+      else if (strncmp(line, "*OpenUI", 7) == 0)
       {
-	sscanf(line, "%*[^\"]\"%255[^\"]", make_model);
-	break;
+       /*
+        * Stop early if we have a NickName or ModelName attributes
+	* before the first OpenUI...
+	*/
+
+        if (model_name[0] || nick_name[0])
+	  break;
       }
+
+     /*
+      * Stop early if we have both the Manufacturer and NickName
+      * attributes...
+      */
+
+      if (manufacturer[0] && nick_name[0])
+        break;
     }
 
    /*
     * Close the file...
     */
 
-#ifdef HAVE_LIBZ
-    gzclose(fp);
-#else
-    fclose(fp);
-#endif /* HAVE_LIBZ */
+    gzclose(fp.fp);
 
    /*
     * See if we got all of the required info...
     */
+
+    if (nick_name[0])
+      strcpy(make_model, nick_name);
+    else
+      strcpy(make_model, model_name);
 
     while (isspace(make_model[0]))
       strcpy(make_model, make_model + 1);
@@ -661,5 +712,66 @@ load_ppds(const char *d,		/* I - Actual directory */
 
 
 /*
- * End of "$Id: ppds.c,v 1.15 2001/04/24 16:01:58 mike Exp $".
+ * 'ppd_gets()' - Read a line from a PPD file.
+ */
+
+static char *			/* O - Line from file or NULL on EOF */
+ppd_gets(buf_t *fp,		/* I - File to read from */
+         char  *buf,		/* I - Line buffer */
+	 int   buflen)		/* I - Length of buffer */
+{
+  int		ch;		/* Character from file */
+  char		*ptr,		/* Current position in line buffer */
+		*end;		/* End of line buffer */
+
+ /*
+  * Range check everything...
+  */
+
+  if (fp == NULL || buf == NULL || buflen < 2)
+    return (NULL);
+
+ /*
+  * Now loop until we have a valid line...
+  */
+
+  ptr = buf;
+  end = buf + buflen - 1;
+
+  for (;;)
+  {
+    if (fp->ptr >= fp->end)
+      if (buf_read(fp) <= 0)
+        break;
+
+    ch = *(fp->ptr)++;
+
+    if (ch == '\r' || ch == '\n')
+    {
+     /*
+      * Line feed or carriage return...
+      */
+
+      if (ptr == buf)		/* Skip blank lines */
+        continue;
+
+      break;
+    }
+    else if (ptr < end)
+      *ptr++ = ch;
+  }
+
+  if (ptr > buf)
+  {
+    *ptr = '\0';
+
+    return (buf);
+  }
+  else
+    return (NULL);
+}
+
+
+/*
+ * End of "$Id: ppds.c,v 1.16 2001/06/05 21:32:02 mike Exp $".
  */

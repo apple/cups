@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.131 2001/06/05 18:28:43 mike Exp $"
+ * "$Id: job.c,v 1.132 2001/06/05 21:32:01 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -1429,6 +1429,25 @@ StartJob(int       id,		/* I - Job ID */
   current->current_file ++;
 
  /*
+  * Make sure we have a buffer to read status info into...
+  */
+
+  if (current->buffer == NULL)
+  {
+    LogMessage(L_DEBUG2, "UpdateJob: Allocating status buffer...");
+
+    if ((current->buffer = malloc(JOB_BUFFER_SIZE)) == NULL)
+    {
+      LogMessage(L_EMERG, "Unable to allocate memory for job status buffer - %s",
+                 strerror(errno));
+      CancelJob(current->id, 0);
+      return;
+    }
+
+    current->bufused = 0;
+  }
+
+ /*
   * Now create processes for all of the filters...
   */
 
@@ -1652,6 +1671,19 @@ StopJob(int id)			/* I - Job ID */
 	  FD_CLR(current->pipe, &InputSet);
 	  current->pipe = 0;
         }
+
+        if (current->buffer)
+	{
+	 /*
+	  * Free the status buffer...
+	  */
+
+          LogMessage(L_DEBUG2, "StopJob: Freeing status buffer...");
+
+          free(current->buffer);
+	  current->buffer  = NULL;
+	  current->bufused = 0;
+	}
       }
       return;
     }
@@ -1670,21 +1702,20 @@ UpdateJob(job_t *job)		/* I - Job to check */
   char		*lineptr,	/* Pointer to end of line in buffer */
 		*message;	/* Pointer to message text */
   int		loglevel;	/* Log level for message */
-  static int	bufused = 0;	/* Amount of buffer used */
-  static char	buffer[8192];	/* Data buffer */
 
 
-  if ((bytes = read(job->pipe, buffer + bufused, sizeof(buffer) - bufused - 1)) > 0)
+  if ((bytes = read(job->pipe, job->buffer + job->bufused,
+                    JOB_BUFFER_SIZE - job->bufused - 1)) > 0)
   {
-    bufused += bytes;
-    buffer[bufused] = '\0';
-    lineptr = strchr(buffer, '\n');
+    job->bufused += bytes;
+    job->buffer[job->bufused] = '\0';
+    lineptr = strchr(job->buffer, '\n');
   }
   else if (bytes < 0 && errno == EINTR)
     return;
   else
   {
-    lineptr    = buffer + bufused;
+    lineptr    = job->buffer + job->bufused;
     lineptr[1] = 0;
   }
 
@@ -1700,60 +1731,60 @@ UpdateJob(job_t *job)		/* I - Job to check */
     * Figure out the logging level...
     */
 
-    if (strncmp(buffer, "EMERG:", 6) == 0)
+    if (strncmp(job->buffer, "EMERG:", 6) == 0)
     {
       loglevel = L_EMERG;
-      message  = buffer + 6;
+      message  = job->buffer + 6;
     }
-    else if (strncmp(buffer, "ALERT:", 6) == 0)
+    else if (strncmp(job->buffer, "ALERT:", 6) == 0)
     {
       loglevel = L_ALERT;
-      message  = buffer + 6;
+      message  = job->buffer + 6;
     }
-    else if (strncmp(buffer, "CRIT:", 5) == 0)
+    else if (strncmp(job->buffer, "CRIT:", 5) == 0)
     {
       loglevel = L_CRIT;
-      message  = buffer + 5;
+      message  = job->buffer + 5;
     }
-    else if (strncmp(buffer, "ERROR:", 6) == 0)
+    else if (strncmp(job->buffer, "ERROR:", 6) == 0)
     {
       loglevel = L_ERROR;
-      message  = buffer + 6;
+      message  = job->buffer + 6;
     }
-    else if (strncmp(buffer, "WARNING:", 8) == 0)
+    else if (strncmp(job->buffer, "WARNING:", 8) == 0)
     {
       loglevel = L_WARN;
-      message  = buffer + 8;
+      message  = job->buffer + 8;
     }
-    else if (strncmp(buffer, "NOTICE:", 6) == 0)
+    else if (strncmp(job->buffer, "NOTICE:", 6) == 0)
     {
       loglevel = L_NOTICE;
-      message  = buffer + 6;
+      message  = job->buffer + 6;
     }
-    else if (strncmp(buffer, "INFO:", 5) == 0)
+    else if (strncmp(job->buffer, "INFO:", 5) == 0)
     {
       loglevel = L_INFO;
-      message  = buffer + 5;
+      message  = job->buffer + 5;
     }
-    else if (strncmp(buffer, "DEBUG:", 6) == 0)
+    else if (strncmp(job->buffer, "DEBUG:", 6) == 0)
     {
       loglevel = L_DEBUG;
-      message  = buffer + 6;
+      message  = job->buffer + 6;
     }
-    else if (strncmp(buffer, "DEBUG2:", 7) == 0)
+    else if (strncmp(job->buffer, "DEBUG2:", 7) == 0)
     {
       loglevel = L_DEBUG2;
-      message  = buffer + 7;
+      message  = job->buffer + 7;
     }
-    else if (strncmp(buffer, "PAGE:", 5) == 0)
+    else if (strncmp(job->buffer, "PAGE:", 5) == 0)
     {
       loglevel = L_PAGE;
-      message  = buffer + 5;
+      message  = job->buffer + 5;
     }
     else
     {
       loglevel = L_DEBUG;
-      message  = buffer;
+      message  = job->buffer;
     }
 
    /*
@@ -1813,10 +1844,13 @@ UpdateJob(job_t *job)		/* I - Job to check */
     * Copy over the buffer data we've used up...
     */
 
-    strcpy(buffer, lineptr);
-    bufused -= lineptr - buffer;
+    strcpy(job->buffer, lineptr);
+    job->bufused -= lineptr - job->buffer;
 
-    lineptr = strchr(buffer, '\n');
+    if (job->bufused < 0)
+      job->bufused = 0;
+
+    lineptr = strchr(job->buffer, '\n');
   }
 
   if (bytes <= 0)
@@ -2876,5 +2910,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.131 2001/06/05 18:28:43 mike Exp $".
+ * End of "$Id: job.c,v 1.132 2001/06/05 21:32:01 mike Exp $".
  */

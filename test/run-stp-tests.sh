@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# "$Id: run-stp-tests.sh,v 1.4 2001/03/02 17:35:05 mike Exp $"
+# "$Id: run-stp-tests.sh,v 1.5 2001/06/05 21:32:02 mike Exp $"
 #
 #   Perform the complete set of IPP compliance tests specified in the
 #   CUPS Software Test Plan.
@@ -108,7 +108,7 @@ TempDir /tmp/$user/spool/temp
 AccessLog /tmp/$user/log/access_log
 ErrorLog /tmp/$user/log/error_log
 PageLog /tmp/$user/log/page_log
-LogLevel info
+LogLevel debug2
 PreserveJobHistory Yes
 <Location />
 Order deny,allow
@@ -152,6 +152,11 @@ echo "Starting scheduler..."
 
 ../scheduler/cupsd -c /tmp/$user/cupsd.conf -f &
 cupsd=$!
+
+echo "Scheduler is PID $cupsd; run debugger now if you need to."
+echo ""
+echo "Press ENTER to continue..."
+read $junk
 
 IPP_PORT=$port; export IPP_PORT
 
@@ -306,5 +311,5 @@ echo "    $pdffile"
 echo ""
 
 #
-# End of "$Id: run-stp-tests.sh,v 1.4 2001/03/02 17:35:05 mike Exp $"
+# End of "$Id: run-stp-tests.sh,v 1.5 2001/06/05 21:32:02 mike Exp $"
 #

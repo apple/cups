@@ -1,5 +1,5 @@
 /*
- * "$Id: job.h,v 1.25 2001/03/30 03:07:54 mike Exp $"
+ * "$Id: job.h,v 1.26 2001/06/05 21:32:02 mike Exp $"
  *
  *   Print job definitions for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -21,6 +21,13 @@
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
  */
+
+/*
+ * Constants...
+ */
+
+#define JOB_BUFFER_SIZE	1024	/* Bytes for job status buffer */
+
 
 /*
  * Job request structure...
@@ -48,6 +55,8 @@ typedef struct job_str
   int		procs[MAX_FILTERS + 2];	/* Process IDs, 0 terminated */
   int		status;			/* Status code from filters */
   printer_t	*printer;		/* Printer this job is assigned to */
+  char		*buffer;		/* Status buffer */
+  int		bufused;		/* Amount of buffer in use */
 } job_t;
 
 
@@ -94,5 +103,5 @@ extern void	UpdateJob(job_t *job);
 
 
 /*
- * End of "$Id: job.h,v 1.25 2001/03/30 03:07:54 mike Exp $".
+ * End of "$Id: job.h,v 1.26 2001/06/05 21:32:02 mike Exp $".
  */
