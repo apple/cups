@@ -1,5 +1,5 @@
 /*
- * "$Id: language.c,v 1.39 2003/05/15 20:00:32 mike Exp $"
+ * "$Id: language.c,v 1.40 2003/06/11 23:16:40 mike Exp $"
  *
  *   I18N/language support for the Common UNIX Printing System (CUPS).
  *
@@ -649,33 +649,37 @@ appleLangDefault(void)
 
   if (language == NULL)
   {
-    localizationList = CFPreferencesCopyAppValue(CFSTR("AppleLanguages"),
-                                                 kCFPreferencesCurrentApplication);
+    localizationList =
+        CFPreferencesCopyAppValue(CFSTR("AppleLanguages"),
+                                  kCFPreferencesCurrentApplication);
 
-    if (localizationList != NULL &&
-        CFGetTypeID(localizationList) == CFArrayGetTypeID() &&
-	CFArrayGetCount(localizationList) > 0)
+    if (localizationList != NULL)
     {
-      localizationName = CFArrayGetValueAtIndex(localizationList, 0);
-
-      if (localizationName != NULL &&
-          CFGetTypeID(localizationName) == CFStringGetTypeID())
+      if (CFGetTypeID(localizationList) == CFArrayGetTypeID() &&
+	  CFArrayGetCount(localizationList) > 0)
       {
-	CFIndex length = CFStringGetLength(localizationName);
+	localizationName = CFArrayGetValueAtIndex(localizationList, 0);
 
-	if (length <= sizeof(buff) &&
-	    CFStringGetCString(localizationName, buff, sizeof(buff), kCFStringEncodingASCII))
+	if (localizationName != NULL &&
+            CFGetTypeID(localizationName) == CFStringGetTypeID())
 	{
-	  buff[sizeof(buff) - 1] = '\0';
+	  CFIndex length = CFStringGetLength(localizationName);
 
-	  for (i = 0;
-	       i < sizeof(apple_name_locale) / sizeof(apple_name_locale[0]);
-	       i++)
+	  if (length <= sizeof(buff) &&
+	      CFStringGetCString(localizationName, buff, sizeof(buff),
+	                         kCFStringEncodingASCII))
 	  {
-	    if (strcasecmp(buff, apple_name_locale[i].name) == 0)
+	    buff[sizeof(buff) - 1] = '\0';
+
+	    for (i = 0;
+		 i < sizeof(apple_name_locale) / sizeof(apple_name_locale[0]);
+		 i++)
 	    {
-	      language = apple_name_locale[i].locale;
-	      break;
+	      if (strcasecmp(buff, apple_name_locale[i].name) == 0)
+	      {
+		language = apple_name_locale[i].locale;
+		break;
+	      }
 	    }
 	  }
 	}
@@ -730,5 +734,5 @@ cups_cache_lookup(const char      *name,/* I - Name of locale */
 
 
 /*
- * End of "$Id: language.c,v 1.39 2003/05/15 20:00:32 mike Exp $".
+ * End of "$Id: language.c,v 1.40 2003/06/11 23:16:40 mike Exp $".
  */
