@@ -1,5 +1,5 @@
 /*
- * "$Id: lpoptions.c,v 1.9.2.1 2002/01/02 18:05:08 mike Exp $"
+ * "$Id: lpoptions.c,v 1.9.2.2 2002/02/12 19:23:13 mike Exp $"
  *
  *   Printer option program for the Common UNIX Printing System (CUPS).
  *
@@ -34,6 +34,7 @@
  */
 
 #include <cups/cups.h>
+#include <cups/string.h>
 #include <stdlib.h>
 
 
@@ -423,5 +424,5 @@ usage(void)
 
 
 /*
- * End of "$Id: lpoptions.c,v 1.9.2.1 2002/01/02 18:05:08 mike Exp $".
+ * End of "$Id: lpoptions.c,v 1.9.2.2 2002/02/12 19:23:13 mike Exp $".
  */

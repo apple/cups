@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.82.2.8 2002/01/27 21:20:28 mike Exp $"
+ * "$Id: http.c,v 1.82.2.9 2002/02/12 19:23:07 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS).
  *
@@ -629,6 +629,12 @@ httpGetHostByName(const char *name)	/* I - Hostname or IP address */
   static char		*packed_ptr[2];	/* Pointer to packed address */
   static struct hostent	host_ip;	/* Host entry for IP address */
 
+#if defined(__APPLE__)
+  /* OS X hack to avoid it's ocassional long delay in lookupd */
+  static char sLoopback[] = "127.0.0.1";
+  if (strcmp(name, "localhost") == 0)
+    name = sLoopback;
+#endif /* __APPLE__ */
 
  /*
   * This function is needed because some operating systems have a
@@ -2204,5 +2210,5 @@ http_upgrade(http_t *http)	/* I - HTTP data */
 
 
 /*
- * End of "$Id: http.c,v 1.82.2.8 2002/01/27 21:20:28 mike Exp $".
+ * End of "$Id: http.c,v 1.82.2.9 2002/02/12 19:23:07 mike Exp $".
  */

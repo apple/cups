@@ -1,5 +1,5 @@
 #
-# "$Id: cupsd.conf.in,v 1.2.2.1 2002/01/25 16:51:13 mike Exp $"
+# "$Id: cupsd.conf.in,v 1.2.2.2 2002/02/12 19:23:05 mike Exp $"
 #
 #   Sample configuration file for the Common UNIX Printing System (CUPS)
 #   scheduler.
@@ -282,16 +282,16 @@ LogLevel info
 
 #
 # User/Group: the user and group the server runs under.  Normally this
-# must be lp and sys, however you can configure things for another user
-# or group as needed.
+# must be @CUPS_USER@ and @CUPS_GROUP@, however you can configure things for another
+# user or group as needed.
 #
 # Note: the server must be run initially as root to support the
 # default IPP port of 631.  It changes users whenever an external
-# program is run...
+# program is run, or if the RunAsUser directive is specified...
 #
 
-#User lp
-#Group sys
+#User @CUPS_USER@
+#Group @CUPS_GROUP@
 
 #
 # RIPCache: the amount of memory that each RIP should use to cache
@@ -716,5 +716,5 @@ Allow From 127.0.0.1
 </Location>
 
 #
-# End of "$Id: cupsd.conf.in,v 1.2.2.1 2002/01/25 16:51:13 mike Exp $".
+# End of "$Id: cupsd.conf.in,v 1.2.2.2 2002/02/12 19:23:05 mike Exp $".
 #

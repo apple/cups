@@ -1,5 +1,5 @@
 /*
- * "$Id: cupsaddsmb.c,v 1.3.2.1 2001/12/26 16:52:56 mike Exp $"
+ * "$Id: cupsaddsmb.c,v 1.3.2.2 2002/02/12 19:23:13 mike Exp $"
  *
  *   "cupsaddsmb" command for the Common UNIX Printing System (CUPS).
  *
@@ -50,7 +50,7 @@ int	Verbosity = 0;
  * Local functions...
  */
 
-int	do_samba_command(const char *, const char *, const char *);
+int	do_samba_command(const char *, const char *);
 int	export_dest(const char *);
 
 
@@ -121,7 +121,6 @@ main(int  argc,		/* I - Number of command-line arguments */
 
 int					/* O - Status of command */
 do_samba_command(const char *command,	/* I - Command to run */
-                 const char *args,	/* I - Argument(s) for command */
                  const char *subcmd)	/* I - Sub-command */
 {
   int		status;			/* Status of command */
@@ -131,12 +130,18 @@ do_samba_command(const char *command,	/* I - Command to run */
 
   for (status = 1;;)
   {
-    if (p)
-      snprintf(temp, sizeof(temp), "%s -N -U\'%s%%%s\' %s -c \'%s\'",
-               command, cupsUser(), p, args, subcmd);
-    else
-      snprintf(temp, sizeof(temp), "%s -N -U\'%s\' %s -c \'%s\'",
-               command, cupsUser(), args, subcmd);
+    if (p == NULL)
+    {
+      snprintf(temp, sizeof(temp),
+               "Password for %s required to access %s via SAMBA: ",
+	       cupsUser(), cupsServer());
+
+      if ((p = cupsGetPassword(temp)) == NULL)
+	break;
+    }
+
+    snprintf(temp, sizeof(temp), "%s -N -U\'%s%%%s\' -c \'%s\'",
+             command, cupsUser(), p, subcmd);
 
     if (Verbosity)
       printf("Running command: %s\n", temp);
@@ -146,25 +151,12 @@ do_samba_command(const char *command,	/* I - Command to run */
       temp[sizeof(temp) - 1] = '\0';
     }
 
-    if (Verbosity)
-      printf("Running the following command:\n\n    %s\n", temp);
-    else
-    {
-      strncat(temp, " >/dev/null 2>/dev/null", sizeof(temp) - 1);
-      temp[sizeof(temp) - 1] = '\0';
-    }
-
     if ((status = system(temp)) != 0)
     {
       if (Verbosity)
         puts("");
 
-      snprintf(temp, sizeof(temp),
-               "Password for %s required to access %s via SAMBA: ",
-	       cupsUser(), cupsServer());
-
-      if ((p = cupsGetPassword(temp)) == NULL)
-        break;
+      p = NULL;
     }
     else
     {
@@ -214,7 +206,7 @@ export_dest(const char *dest)	/* I - Destination to export */
 	   "put %s/drivers/ADOBEPSU.HLP W32X86/ADOBEPSU.HLP",
 	   ppdfile, dest, datadir, datadir, datadir);
 
-  if ((status = do_samba_command(command, "", subcmd)) != 0)
+  if ((status = do_samba_command(command, subcmd)) != 0)
   {
     fprintf(stderr, "ERROR: Unable to copy Windows printer driver files (%d)!\n",
             status);
@@ -234,7 +226,7 @@ export_dest(const char *dest)	/* I - Destination to export */
 	   ppdfile, dest, datadir, datadir, datadir,
 	   datadir, datadir, datadir);
 
-  if ((status = do_samba_command(command, "", subcmd)) != 0)
+  if ((status = do_samba_command(command, subcmd)) != 0)
   {
     fprintf(stderr, "ERROR: Unable to copy Windows printer driver files (%d)!\n",
             status);
@@ -249,7 +241,9 @@ export_dest(const char *dest)	/* I - Destination to export */
            "adddriver \"Windows NT x86\" \"%s:ADOBEPS5.DLL:%s.PPD:ADOBEPSU.DLL:ADOBEPSU.HLP:NULL:RAW:NULL\"",
 	   dest, dest);
 
-  if ((status = do_samba_command("rpcclient", cupsServer(), subcmd)) != 0)
+  snprintf(command, sizeof(command), "rpcclient %s", cupsServer());
+
+  if ((status = do_samba_command(command, subcmd)) != 0)
   {
     fprintf(stderr, "ERROR: Unable to install Windows printer driver files (%d)!\n",
             status);
@@ -259,7 +253,7 @@ export_dest(const char *dest)	/* I - Destination to export */
   snprintf(subcmd, sizeof(subcmd), "addprinter %s %s \"%s\" \"\"",
 	   dest, dest, dest);
 
-  if ((status = do_samba_command("rpcclient", cupsServer(), subcmd)) != 0)
+  if ((status = do_samba_command(command, subcmd)) != 0)
   {
     fprintf(stderr, "ERROR: Unable to install Windows printer driver files (%d)!\n",
             status);
@@ -270,7 +264,7 @@ export_dest(const char *dest)	/* I - Destination to export */
 	   "adddriver \"Windows 4.0\" \"%s:ADOBEPS4.DRV:%s.PPD:NULL:ADOBEPS4.HLP:PSMON.DLL:RAW:ADFONTS.MFM,DEFPRTR2.PPD,ICONLIB.DLL\"",
 	   dest, dest);
 
-  if ((status = do_samba_command("rpcclient", cupsServer(), subcmd)) != 0)
+  if ((status = do_samba_command(command, subcmd)) != 0)
   {
     fprintf(stderr, "ERROR: Unable to install Windows printer driver files (%d)!\n",
             status);
@@ -282,5 +276,5 @@ export_dest(const char *dest)	/* I - Destination to export */
 
 
 /*
- * End of "$Id: cupsaddsmb.c,v 1.3.2.1 2001/12/26 16:52:56 mike Exp $".
+ * End of "$Id: cupsaddsmb.c,v 1.3.2.2 2002/02/12 19:23:13 mike Exp $".
  */

@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: lpadmin.man,v 1.4.2.1 2002/01/02 18:04:53 mike Exp $"
+.\" "$Id: lpadmin.man,v 1.4.2.2 2002/02/12 19:23:10 mike Exp $"
 .\"
 .\"   lpadmin man page for the Common UNIX Printing System (CUPS).
 .\"
@@ -47,7 +47,8 @@ lpadmin \- configure cups printers and classes
 \fIlpadmin\fR configures printer and class queues provided by CUPS. It can also
 be used to set the system default printer or class.
 .LP
-The \fI-E\fR option forces encryption when connecting to the server.
+When specified before the \fI-d\fR, \fI-p\fR, or \fI-x\fR options,
+the \fI-E\fR option forces encryption when connecting to the server.
 .LP
 The first form of the command sets the default printer or class to
 \fIdestination\fR.  Subsequent print jobs submitted via the \fIlp(1)\fR or
@@ -136,5 +137,5 @@ http://localhost:631/documentation.html
 .SH COPYRIGHT
 Copyright 1993-2002 by Easy Software Products, All Rights Reserved.
 .\"
-.\" End of "$Id: lpadmin.man,v 1.4.2.1 2002/01/02 18:04:53 mike Exp $".
+.\" End of "$Id: lpadmin.man,v 1.4.2.2 2002/02/12 19:23:10 mike Exp $".
 .\"

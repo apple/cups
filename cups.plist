@@ -1,6 +1,6 @@
 {
-  Description     = "CUPS Printing";
-  Provides        = ("CUPS");
+  Description     = "Printing Services";
+  Provides        = ("Printing");
   Requires        = ("Resolver");
   OrderPreference = "None";
   Messages =

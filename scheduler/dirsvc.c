@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.73.2.9 2002/01/31 12:38:53 mike Exp $"
+ * "$Id: dirsvc.c,v 1.73.2.10 2002/02/12 19:23:11 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -872,7 +872,7 @@ StopPolling(void)
   dirsvc_poll_t	*poll;		/* Current polling server */
 
 
-  if (PollPipe)
+  if (PollPipe >= 0)
   {
     close(PollPipe);
 
@@ -1725,5 +1725,5 @@ UpdateSLPBrowse(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.73.2.9 2002/01/31 12:38:53 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.73.2.10 2002/02/12 19:23:11 mike Exp $".
  */

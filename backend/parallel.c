@@ -1,5 +1,5 @@
 /*
- * "$Id: parallel.c,v 1.29.2.4 2002/01/27 21:20:26 mike Exp $"
+ * "$Id: parallel.c,v 1.29.2.5 2002/02/12 19:23:04 mike Exp $"
  *
  *   Parallel port backend for the Common UNIX Printing System (CUPS).
  *
@@ -257,7 +257,8 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
       }
 
       if (argc > 6)
-	fprintf(stderr, "INFO: Sending print file, %u bytes...\n", tbytes);
+	fprintf(stderr, "INFO: Sending print file, %lu bytes...\n",
+	        (unsigned long)tbytes);
     }
   }
 
@@ -635,5 +636,5 @@ list_devices(void)
 
 
 /*
- * End of "$Id: parallel.c,v 1.29.2.4 2002/01/27 21:20:26 mike Exp $".
+ * End of "$Id: parallel.c,v 1.29.2.5 2002/02/12 19:23:04 mike Exp $".
  */

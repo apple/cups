@@ -4,8 +4,13 @@ CHANGES-1.1.txt
 CHANGES IN CUPS V1.1.14
 
 	- The ippRead() function did not verify that the
-	  attribute name length was not larger than the read
-	  buffer of 8192 bytes.
+	  attribute name length or string with language value
+	  was not larger than the read buffer.
+	- MacOS X fixes.
+	- The cupsaddsmb utility sent the server name after the
+	  user information when executing the rpcclient program.
+	  This caused problems with some versions of SAMBA
+	  2.2.x.
 	- The IPP backend did not pass the requesting user name
 	  when checking on the print job status. This prevented
 	  it from waiting for the job to complete when

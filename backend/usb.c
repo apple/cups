@@ -1,5 +1,5 @@
 /*
- * "$Id: usb.c,v 1.18.2.4 2002/01/27 21:20:26 mike Exp $"
+ * "$Id: usb.c,v 1.18.2.5 2002/02/12 19:23:05 mike Exp $"
  *
  *   USB port backend for the Common UNIX Printing System (CUPS).
  *
@@ -246,7 +246,8 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
       }
 
       if (argc > 6)
-	fprintf(stderr, "INFO: Sending print file, %u bytes...\n", tbytes);
+	fprintf(stderr, "INFO: Sending print file, %lu bytes...\n",
+	        (unsigned long)tbytes);
     }
   }
 
@@ -446,5 +447,5 @@ list_devices(void)
 
 
 /*
- * End of "$Id: usb.c,v 1.18.2.4 2002/01/27 21:20:26 mike Exp $".
+ * End of "$Id: usb.c,v 1.18.2.5 2002/02/12 19:23:05 mike Exp $".
  */
