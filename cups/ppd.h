@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.h,v 1.11 1999/04/05 14:04:45 mike Exp $"
+ * "$Id: ppd.h,v 1.12 1999/04/07 14:44:13 mike Exp $"
  *
  *   PostScript Printer Description definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -96,8 +96,6 @@ typedef struct			/**** Option choices ****/
   unsigned char	text[81],	/* Human-readable option name */
 		*code;		/* Code to send for this option */
   void		*option;	/* Pointer to parent option structure */
-  int		num_data,	/* Number of CUPS-specific data values */
-		*data;		/* CUPS-specific data values */
 } ppd_choice_t;
 
 typedef struct			/**** Options ****/
@@ -234,5 +232,5 @@ extern float		ppdPageWidth(ppd_file_t *ppd, char *name);
 #endif /* !_CUPS_PPD_H_ */
 
 /*
- * End of "$Id: ppd.h,v 1.11 1999/04/05 14:04:45 mike Exp $".
+ * End of "$Id: ppd.h,v 1.12 1999/04/07 14:44:13 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: testppd.c,v 1.9 1999/03/24 21:20:40 mike Exp $"
+ * "$Id: testppd.c,v 1.10 1999/04/07 14:44:14 mike Exp $"
  *
  *   PPD test program for the Common UNIX Printing System (CUPS).
  *
@@ -142,14 +142,6 @@ main(int  argc,			/* I - Number of command-line arguments */
 		     size->left / 72.0, size->bottom / 72.0,
 		     size->right / 72.0, size->top / 72.0);
 
-            if (choice->num_data > 0)
-	    {
-	      putchar('[');
-	      for (n = 0; n < choice->num_data; n ++)
-	        printf(" %d", choice->data[n]);
-	      printf(" ]");
-	    }
-
             if (strcmp(option->defchoice, choice->choice) == 0)
 	      puts(" *");
 	    else
@@ -163,14 +155,6 @@ main(int  argc,			/* I - Number of command-line arguments */
 	       m --, choice ++)
 	  {
 	    printf("                %s (%s)", choice->choice, choice->text);
-
-            if (choice->num_data > 0)
-	    {
-	      putchar('[');
-	      for (n = 0; n < choice->num_data; n ++)
-	        printf(" %d", choice->data[n]);
-	      printf(" ]");
-	    }
 
             if (strcmp(option->defchoice, choice->choice) == 0)
 	      puts(" *");
@@ -189,5 +173,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: testppd.c,v 1.9 1999/03/24 21:20:40 mike Exp $".
+ * End of "$Id: testppd.c,v 1.10 1999/04/07 14:44:14 mike Exp $".
  */

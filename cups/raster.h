@@ -1,5 +1,5 @@
 /*
- * "$Id: raster.h,v 1.7 1999/04/05 15:23:01 mike Exp $"
+ * "$Id: raster.h,v 1.8 1999/04/07 14:44:13 mike Exp $"
  *
  *   Raster file definitions for the Common UNIX Printing System (CUPS).
  *
@@ -183,6 +183,9 @@ typedef struct
   cups_order_t	cupsColorOrder;		/* Order of colors */
   cups_cspace_t	cupsColorSpace;		/* True colorspace */
   unsigned	cupsCompression;	/* Device compression to use */
+  unsigned	cupsRowCount;		/* Rows per band */
+  unsigned	cupsRowFeed;		/* Feed between bands */
+  unsigned	cupsRowStep;		/* Spacing between lines */
 } cups_page_header_t;
 
 
@@ -221,5 +224,5 @@ extern unsigned		cupsRasterWritePixels(cups_raster_t *r,
 #endif /* !_CUPS_RASTER_H_ */
 
 /*
- * End of "$Id: raster.h,v 1.7 1999/04/05 15:23:01 mike Exp $".
+ * End of "$Id: raster.h,v 1.8 1999/04/07 14:44:13 mike Exp $".
  */
