@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.160 2002/06/11 18:33:58 mike Exp $"
+ * "$Id: ipp.c,v 1.161 2002/06/27 15:10:23 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -811,6 +811,8 @@ add_class(client_t        *con,		/* I - Client connection */
   SaveAllClasses();
   CheckJobs();
 
+  WritePrintcap();
+
   if (modify)
     LogMessage(L_INFO, "Class \'%s\' modified by \'%s\'.", pclass->name,
                con->username);
@@ -1364,6 +1366,8 @@ add_printer(client_t        *con,	/* I - Client connection */
   }
 
   CheckJobs();
+
+  WritePrintcap();
 
   if (modify)
     LogMessage(L_INFO, "Printer \'%s\' modified by \'%s\'.", printer->name,
@@ -5741,5 +5745,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.160 2002/06/11 18:33:58 mike Exp $".
+ * End of "$Id: ipp.c,v 1.161 2002/06/27 15:10:23 mike Exp $".
  */
