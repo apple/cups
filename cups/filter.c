@@ -1,5 +1,5 @@
 /*
- * "$Id: filter.c,v 1.6 1999/04/21 14:49:49 mike Exp $"
+ * "$Id: filter.c,v 1.7 1999/05/21 20:53:30 mike Exp $"
  *
  *   File type conversion routines for the Common UNIX Printing System (CUPS).
  *
@@ -27,38 +27,6 @@
  *   mimeFilter()    - Find the fastest way to convert from one type to another.
  *   compare()       - Compare two filter types...
  *   lookup()        - Lookup a filter...
- *
- * Revision History:
- *
- *   $Log: filter.c,v $
- *   Revision 1.6  1999/04/21 14:49:49  mike
- *   cupsDoRequest() needed to retry requests when doing authorization.
- *
- *   mimeFilter() didn't always return the least-cost filter.
- *
- *   Revision 1.5  1999/03/01 20:51:51  mike
- *   Code cleanup - removed extraneous semi-colons...
- *
- *   Revision 1.4  1999/02/05 17:40:51  mike
- *   Added IPP client read/write code.
- *
- *   Added string functions missing from some UNIXs.
- *
- *   Added option parsing functions.
- *
- *   Added IPP convenience functions (not implemented yet).
- *
- *   Updated source files to use local string.h as needed (for
- *   missing string functions)
- *
- *   Revision 1.3  1999/01/24 14:18:43  mike
- *   Check-in prior to CVS use.
- *
- *   Revision 1.2  1998/08/06 14:38:38  mike
- *   Finished coding and testing for CUPS 1.0.
- *
- *   Revision 1.1  1998/06/11 20:50:53  mike
- *   Initial revision
  */
 
 /*
@@ -165,12 +133,6 @@ mimeAddFilter(mime_t      *mime,	/* I - MIME database */
 
 /*
  * 'mimeFilter()' - Find the fastest way to convert from one type to another.
- *
- * NOTE: Currently we do not use the "cost" field provided with each filter.
- *       This will be addressed in a future version of this function.  For
- *       now all filters are assumed to be equally costly and we find the
- *       smallest number of filters to run that satisfies the filter
- *       requirements.
  */
 
 mime_filter_t *				/* O - Array of filters to run */
@@ -179,9 +141,11 @@ mimeFilter(mime_t      *mime,		/* I - MIME database */
 	   mime_type_t *dst,		/* I - Destination file type */
            int         *num_filters)	/* O - Number of filters to run */
 {
-  int		i;			/* Looping var */
-  int		num_temp,		/* Number of temporary filters */
-		num_mintemp;		/* Current minimum */
+  int		i, j,			/* Looping vars */
+		num_temp,		/* Number of temporary filters */
+		num_mintemp,		/* Number of filters in the minimum */
+		cost,			/* Current cost */
+		mincost;		/* Current minimum */
   mime_filter_t	*temp,			/* Temporary filter */
 		*mintemp,		/* Current minimum */
 		*mincurrent,		/* Current filter for minimum */
@@ -220,8 +184,8 @@ mimeFilter(mime_t      *mime,		/* I - MIME database */
   * OK, now look for filters from the source type to any other type...
   */
 
-  num_mintemp = 100000;
-  mintemp     = NULL;
+  mincost = 9999999;
+  mintemp = NULL;
 
   for (i = mime->num_filters, current = mime->filters; i > 0; i --, current ++)
     if (current->src == src)
@@ -239,13 +203,17 @@ mimeFilter(mime_t      *mime,		/* I - MIME database */
       * any...)
       */
 
-      if (num_temp < num_mintemp)
+      for (j = 0, cost = 0; j < num_temp; j ++)
+        cost += temp->cost;
+
+      if (cost < mincost)
       {
         if (mintemp != NULL)
 	  free(mintemp);
 
-	num_mintemp = num_temp;
+	mincost     = cost;
 	mintemp     = temp;
+	num_mintemp = num_temp;
 	mincurrent  = current;
       }
       else
@@ -325,5 +293,5 @@ lookup(mime_t      *mime,	/* I - MIME database */
 
 
 /*
- * End of "$Id: filter.c,v 1.6 1999/04/21 14:49:49 mike Exp $".
+ * End of "$Id: filter.c,v 1.7 1999/05/21 20:53:30 mike Exp $".
  */
