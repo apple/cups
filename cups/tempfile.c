@@ -1,5 +1,5 @@
 /*
- * "$Id: tempfile.c,v 1.1.2.5 2002/08/16 17:43:05 mike Exp $"
+ * "$Id: tempfile.c,v 1.1.2.6 2002/10/22 20:13:50 mike Exp $"
  *
  *   Temp file utilities for the Common UNIX Printing System (CUPS).
  *
@@ -111,13 +111,14 @@ cupsTempFd(char *filename,		/* I - Pointer to buffer */
     * Get the current time of day...
     */
 
-    curtime = GetTickCount();
+    curtime =  GetTickCount() + tries;
 
    /*
     * Format a string using the hex time values...
     */
 
-    snprintf(filename, len - 1, "%s/%08lx", tmpdir, curtime);
+    snprintf(filename, len - 1, "%s/%05lx%08lx", tmpdir,
+             GetCurrentProcessId(), curtime);
 #else
    /*
     * Get the current time of day...
@@ -203,5 +204,5 @@ cupsTempFile(char *filename,		/* I - Pointer to buffer */
 
 
 /*
- * End of "$Id: tempfile.c,v 1.1.2.5 2002/08/16 17:43:05 mike Exp $".
+ * End of "$Id: tempfile.c,v 1.1.2.6 2002/10/22 20:13:50 mike Exp $".
  */
