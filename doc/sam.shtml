@@ -380,7 +380,6 @@ example, the first parallel port in Linux usually uses a device URI of
 
 <UL><PRE>
 <B>lpinfo -v ENTER</B>
-file file
 network socket
 network http
 network ipp
