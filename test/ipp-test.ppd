@@ -1,9 +1,8 @@
 *PPD-Adobe: "4.3"
 *%
-*% "$Id: laserjet.ppd,v 1.7 2001/02/22 16:48:12 mike Exp $"
+*% "$Id: ipp-test.ppd,v 1.1 2001/02/22 16:48:13 mike Exp $"
 *%
-*%   Sample HP LaserJet driver PPD file for the Common UNIX Printing
-*%   System (CUPS).
+*%   Test PPD file for the Common UNIX Printing System (CUPS).
 *%
 *%   Copyright 1997-2001 by Easy Software Products.
 *%
@@ -27,21 +26,21 @@
 *FileVersion:	"1.1"
 *LanguageVersion: English 
 *LanguageEncoding: ISOLatin1
-*PCFileName:	"LASERJET.PPD"
+*PCFileName:	"IPP_TEST.PPD"
 *Manufacturer:	"ESP"
 *Product:	"(CUPS v1.1)"
 *cupsVersion:	1.1
-*cupsManualCopies: False
-*cupsFilter:	"application/vnd.cups-raster 0 rastertohp"
-*ModelName:     "HP LaserJet Series"
-*ShortNickName: "HP LaserJet Series"
-*NickName:      "HP LaserJet Series CUPS v1.1"
+*cupsManualCopies: True
+*cupsFilter:	"application/vnd.cups-raster 50 rastertohp"
+*ModelName:     "IPP Test Printer"
+*ShortNickName: "IPP Test Printer"
+*NickName:      "IPP Test Printer CUPS v1.1"
 *PSVersion:	"(3010.000) 550"
 *LanguageLevel:	"3"
-*ColorDevice:	False
-*DefaultColorSpace: Gray
+*ColorDevice:	True
+*DefaultColorSpace: RGB
 *FileSystem:	False
-*Throughput:	"8"
+*Throughput:	"1"
 *LandscapeOrientation: Plus90
 *VariablePaperSize: False
 *TTRasterizer:	Type42
@@ -54,7 +53,7 @@
 *UIConstraints: *PageSize A4 *InputSlot Envelope
 *UIConstraints: *PageSize A5 *InputSlot Envelope
 *UIConstraints: *PageSize B5 *InputSlot Envelope
-*UIConstraints:	*Duplex *Option1 False
+*UIConstraints: *Resolution 600dpi *ColorModel CMYK
 
 *OpenUI *PageSize/Media Size: PickOne
 *OrderDependency: 10 AnySetup *PageSize
@@ -122,14 +121,20 @@
 *PaperDimension EnvDL/Envelope DL:	"312 624"
 *PaperDimension EnvMonarch/Envelope Monarch: "279 540"
 
+*OpenUI *MediaType/Media Type: PickOne
+*OrderDependency: 10 AnySetup *MediaType
+*DefaultMediaType: Plain
+*MediaType Plain/Plain Paper:	"<</MediaType(Plain)/cupsMediaType 0>>setpagedevice"
+*MediaType Bond/Bond Paper:	"<</MediaType(Bond)/cupsMediaType 1>>setpagedevice"
+*MediaType Special/Special Paper: "<</MediaType(Special)/cupsMediaType 2>>setpagedevice"
+*MediaType Transparency/Transparency: "<</MediaType(Transparency)/cupsMediaType 3>>setpagedevice"
+*MediaType Glossy/Glossy Paper:	"<</MediaType(Glossy)/cupsMediaType 4>>setpagedevice"
+*CloseUI: *MediaType
+
 *OpenUI *InputSlot/Media Source: PickOne
 *OrderDependency: 10 AnySetup *InputSlot
-*DefaultInputSlot: Default
-*InputSlot Default/Default: "<</cupsMediaPosition 0>>setpagedevice"
-*InputSlot Tray1/Tray 1: "<</cupsMediaPosition 8>>setpagedevice"
-*InputSlot Tray2/Tray 2: "<</cupsMediaPosition 1>>setpagedevice"
-*InputSlot Tray3/Tray 3: "<</cupsMediaPosition 4>>setpagedevice"
-*InputSlot Tray4/Tray 4: "<</cupsMediaPosition 5>>setpagedevice"
+*DefaultInputSlot: Tray
+*InputSlot Tray/Tray: "<</cupsMediaPosition 1>>setpagedevice"
 *InputSlot Manual/Manual Feed: "<</cupsMediaPosition 2>>setpagedevice"
 *InputSlot Envelope/Envelope Feed: "<</cupsMediaPosition 3>>setpagedevice"
 *CloseUI: *InputSlot
@@ -137,26 +142,17 @@
 *OpenUI *Resolution/Output Resolution: PickOne
 *OrderDependency: 20 AnySetup *Resolution
 *DefaultResolution: 300dpi
-*Resolution 150dpi/150 DPI: "<</HWResolution[150 150]/cupsColorOrder 0/cupsColorSpace 3/cupsCompression 2>>setpagedevice"
-*Resolution 300dpi/300 DPI: "<</HWResolution[300 300]/cupsColorOrder 0/cupsColorSpace 3/cupsCompression 2>>setpagedevice"
-*Resolution 600dpi/600 DPI: "<</HWResolution[600 600]/cupsColorOrder 0/cupsColorSpace 3/cupsCompression 2>>setpagedevice"
+*Resolution 75dpi/75 DPI: "<</HWResolution[75 75]>>setpagedevice"
+*Resolution 100dpi/100 DPI: "<</HWResolution[100 100]>>setpagedevice"
 *CloseUI: *Resolution
 
-*OpenUI *Duplex/Double-Sided Printing: PickOne
-*OrderDependency: 20 AnySetup *Duplex
-*DefaultDuplex: None
-*Duplex None/Off:	"<</Duplex false>>setpagedevice"
-*Duplex DuplexNoTumble/Long Edge (Standard):	"<</Duplex true/Tumble false>>setpagedevice"
-*Duplex DuplexTumble/Short Edge (Flip):	"<</Duplex true/Tumble true>>setpagedevice"
-*CloseUI:	*Duplex
-
-*OpenGroup: InstallableOptions
-*OpenUI *Option1/Duplexer: Boolean
-*DefaultOption1: False
-*Option1 True/Installed:	""
-*Option1 False/Not Installed:	""
-*CloseUI *Option1
-*CloseGroup: InstallableOptions
+*OpenUI *ColorModel/Output Mode: PickOne
+*OrderDependency: 10 AnySetup *ColorModel
+*DefaultColorModel: CMYK
+*ColorModel CMYK/CMYK Color: "<</cupsColorOrder 1/cupsColorSpace 8/cupsCompression 2>>setpagedevice"
+*ColorModel RGB/CMY Color: "<</cupsColorOrder 1/cupsColorSpace 4/cupsCompression 2>>setpagedevice"
+*ColorModel Gray/Grayscale: "<</cupsColorOrder 0/cupsColorSpace 3/cupsCompression 2>>setpagedevice"
+*CloseUI: *ColorModel
 
 *DefaultFont: Courier
 *Font AvantGarde-Book: Standard "(001.006S)" Standard ROM
@@ -195,5 +191,5 @@
 *Font ZapfChancery-MediumItalic: Standard "(001.007S)" Standard ROM
 *Font ZapfDingbats: Special "(001.004S)" Standard ROM
 *%
-*% End of "$Id: laserjet.ppd,v 1.7 2001/02/22 16:48:12 mike Exp $".
+*% End of "$Id: ipp-test.ppd,v 1.1 2001/02/22 16:48:13 mike Exp $".
 *%

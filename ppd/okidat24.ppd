@@ -1,11 +1,11 @@
 *PPD-Adobe: "4.3"
 *%
-*% "$Id: okidat24.ppd,v 1.1 2000/10/19 19:19:51 mike Exp $"
+*% "$Id: okidat24.ppd,v 1.2 2001/02/22 16:48:12 mike Exp $"
 *%
 *%   Sample OKIDATA 24-Pin driver PPD file for the Common UNIX Printing
 *%   System (CUPS).
 *%
-*%   Copyright 1997-2000 by Easy Software Products.
+*%   Copyright 1997-2001 by Easy Software Products.
 *%
 *%   These coded instructions, statements, and computer programs are the
 *%   property of Easy Software Products and are protected by Federal
@@ -124,5 +124,5 @@
 *Font ZapfChancery-MediumItalic: Standard "(001.007S)" Standard ROM
 *Font ZapfDingbats: Special "(001.004S)" Standard ROM
 *%
-*% End of "$Id: okidat24.ppd,v 1.1 2000/10/19 19:19:51 mike Exp $".
+*% End of "$Id: okidat24.ppd,v 1.2 2001/02/22 16:48:12 mike Exp $".
 *%

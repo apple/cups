@@ -1,0 +1,217 @@
+#
+# "$Id: 00010-cups-printer-ops.test,v 1.1 2001/02/22 16:48:13 mike Exp $"
+#
+#   Verify that the CUPS printer operations work.
+#
+{
+	# The name of the test...
+	NAME "Add Printer Test1"
+
+	# The operation to use
+	OPERATION cups-add-printer
+	RESOURCE /admin/
+
+	# The attributes to send
+	GROUP operation
+	ATTR charset attributes-charset utf-8
+	ATTR language attributes-natural-language en
+	ATTR uri printer-uri $method://$hostname:$port/printers/Test1
+
+	FILE ipp-test.ppd
+
+	# What statuses are OK?
+	STATUS successful-ok
+
+	# What attributes do we expect?
+	EXPECT attributes-charset
+	EXPECT attributes-natural-language
+	EXPECT printer-uri
+}
+{
+	# The name of the test...
+	NAME "Verify Printer Test1 Added"
+
+	# The operation to use
+	OPERATION get-printer-attributes
+	RESOURCE /
+
+	# The attributes to send
+	GROUP operation
+	ATTR charset attributes-charset utf-8
+	ATTR language attributes-natural-language en
+	ATTR uri printer-uri $method://$hostname:$port/printers/Test1
+
+	# What statuses are OK?
+	STATUS successful-ok
+
+	# What attributes do we expect?
+	EXPECT attributes-charset
+	EXPECT attributes-natural-language
+	EXPECT printer-uri
+}
+{
+	# The name of the test...
+	NAME "Delete Printer Test1"
+
+	# The operation to use
+	OPERATION cups-delete-printer
+	RESOURCE /admin/
+
+	# The attributes to send
+	GROUP operation
+	ATTR charset attributes-charset utf-8
+	ATTR language attributes-natural-language en
+	ATTR uri printer-uri $method://$hostname:$port/printers/Test1
+
+	# What statuses are OK?
+	STATUS successful-ok
+
+	# What attributes do we expect?
+	EXPECT attributes-charset
+	EXPECT attributes-natural-language
+}
+{
+	# The name of the test...
+	NAME "Verify Printer Test1 Deleted"
+
+	# The operation to use
+	OPERATION get-printer-attributes
+	RESOURCE /
+
+	# The attributes to send
+	GROUP operation
+	ATTR charset attributes-charset utf-8
+	ATTR language attributes-natural-language en
+	ATTR uri printer-uri $method://$hostname:$port/printers/Test1
+
+	# What statuses are OK?
+	STATUS client-error-not-found
+
+	# What attributes do we expect?
+	EXPECT attributes-charset
+	EXPECT attributes-natural-language
+}
+{
+	# The name of the test...
+	NAME "Add Printer Test2"
+
+	# The operation to use
+	OPERATION cups-add-printer
+	RESOURCE /admin/
+
+	# The attributes to send
+	GROUP operation
+	ATTR charset attributes-charset utf-8
+	ATTR language attributes-natural-language en
+	ATTR uri printer-uri $method://$hostname:$port/printers/Test2
+
+	FILE ipp-test.ppd
+
+	# What statuses are OK?
+	STATUS successful-ok
+
+	# What attributes do we expect?
+	EXPECT attributes-charset
+	EXPECT attributes-natural-language
+	EXPECT printer-uri
+}
+{
+	# The name of the test...
+	NAME "Verify Printer Test2 Added"
+
+	# The operation to use
+	OPERATION get-printer-attributes
+	RESOURCE /
+
+	# The attributes to send
+	GROUP operation
+	ATTR charset attributes-charset utf-8
+	ATTR language attributes-natural-language en
+	ATTR uri printer-uri $method://$hostname:$port/printers/Test2
+
+	# What statuses are OK?
+	STATUS successful-ok
+
+	# What attributes do we expect?
+	EXPECT attributes-charset
+	EXPECT attributes-natural-language
+	EXPECT printer-uri
+}
+{
+	# The name of the test...
+	NAME "Modify Printer Test2"
+
+	# The operation to use
+	OPERATION cups-add-printer
+	RESOURCE /admin/
+
+	# The attributes to send
+	GROUP operation
+	ATTR charset attributes-charset utf-8
+	ATTR language attributes-natural-language en
+	ATTR uri printer-uri $method://$hostname:$port/printers/Test2
+
+	GROUP printer
+	ATTR uri device-uri file:/tmp/Test2
+
+	# What statuses are OK?
+	STATUS successful-ok
+
+	# What attributes do we expect?
+	EXPECT attributes-charset
+	EXPECT attributes-natural-language
+	EXPECT printer-uri
+}
+{
+	# The name of the test...
+	NAME "Re-Add Printer Test1"
+
+	# The operation to use
+	OPERATION cups-add-printer
+	RESOURCE /admin/
+
+	# The attributes to send
+	GROUP operation
+	ATTR charset attributes-charset utf-8
+	ATTR language attributes-natural-language en
+	ATTR uri printer-uri $method://$hostname:$port/printers/Test1
+
+	GROUP printer
+	ATTR uri device-uri file:/tmp/Test1
+
+	FILE ipp-test.ppd
+
+	# What statuses are OK?
+	STATUS successful-ok
+
+	# What attributes do we expect?
+	EXPECT attributes-charset
+	EXPECT attributes-natural-language
+	EXPECT printer-uri
+}
+{
+	# The name of the test...
+	NAME "Verify Printer Test1 Re-Added"
+
+	# The operation to use
+	OPERATION get-printer-attributes
+	RESOURCE /
+
+	# The attributes to send
+	GROUP operation
+	ATTR charset attributes-charset utf-8
+	ATTR language attributes-natural-language en
+	ATTR uri printer-uri $method://$hostname:$port/printers/Test1
+
+	# What statuses are OK?
+	STATUS successful-ok
+
+	# What attributes do we expect?
+	EXPECT attributes-charset
+	EXPECT attributes-natural-language
+	EXPECT printer-uri
+}
+
+#
+# End of "$Id: 00010-cups-printer-ops.test,v 1.1 2001/02/22 16:48:13 mike Exp $"
+#

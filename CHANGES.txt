@@ -11,14 +11,27 @@ CHANGES IN CUPS V1.1.7
 	  Satisfy, <Limit>, <LimitExcept>, LimitRequestSize, and
 	  Options directives.
 	- Added support for all Apache log levels...
+	- Added support for "double" HostNameLookups.
 	- Added new "RunAsUser" directive to support non-root
 	  configurations on the standard (priviledged) ports.
+	- The startup script no longer sends a HUP signal
+	  to restart the scheduler (change to support
+	  RunAsUser directive properly)
 	- Added support for non-root invocation of the lpd
 	  backend (does no reserve a priviledged port, which
 	  might not work with some LPD servers...)
 	- Added new PrintcapFormat directive to control the
 	  output format of the printcap file (BSD or Solaris
 	  formats are supported at present.)
+	- The CUPS directory service routines now handle
+	  ECONNREFUSED errors gracefully rather than shutting
+	  all browsing off.
+	- ippErrorString() now returns the recommended error
+	  messages from the IPP/1.1 Model and Semantics
+	  document.
+	- Fixed a minor IPP compliance issue with responses
+	  to requests without the attributes-charset or
+	  attributes-natural-language attributes.
 
 
 CHANGES IN CUPS V1.1.6-3

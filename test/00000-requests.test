@@ -1,0 +1,140 @@
+#
+# "$Id: 00000-requests.test,v 1.1 2001/02/22 16:48:13 mike Exp $"
+#
+#   Verify that the server requires the following attributes:
+#
+#       attributes-charset
+#       attributes-natural-language
+#       printer-uri/job-uri
+#
+{
+	# The name of the test...
+	NAME "No Attributes"
+
+	# The operation to use
+	OPERATION get-jobs
+
+	# What statuses are OK?
+	STATUS client-error-bad-request
+
+	# What attributes do we expect?
+	EXPECT attributes-charset
+	EXPECT attributes-natural-language
+}
+{
+	# The name of the test...
+	NAME "Charset Attribute"
+
+	# The operation to use
+	OPERATION get-jobs
+
+	# The attributes to send
+	GROUP operation
+	ATTR charset attributes-charset utf-8
+
+	# What statuses are OK?
+	STATUS client-error-bad-request
+
+	# What attributes do we expect?
+	EXPECT attributes-charset
+	EXPECT attributes-natural-language
+}
+{
+	# The name of the test...
+	NAME "Language Attribute"
+
+	# The operation to use
+	OPERATION get-jobs
+
+	# The attributes to send
+	GROUP operation
+	ATTR language attributes-natural-language en
+
+	# What statuses are OK?
+	STATUS client-error-bad-request
+
+	# What attributes do we expect?
+	EXPECT attributes-charset
+	EXPECT attributes-natural-language
+}
+{
+	# The name of the test...
+	NAME "Language + Charset Attributes"
+
+	# The operation to use
+	OPERATION get-jobs
+
+	# The attributes to send
+	GROUP operation
+	ATTR language attributes-natural-language en
+	ATTR charset attributes-charset utf-8
+
+	# What statuses are OK?
+	STATUS client-error-bad-request
+
+	# What attributes do we expect?
+	EXPECT attributes-charset
+	EXPECT attributes-natural-language
+}
+{
+	# The name of the test...
+	NAME "Charset + Language Attributes"
+
+	# The operation to use
+	OPERATION get-jobs
+
+	# The attributes to send
+	GROUP operation
+	ATTR charset attributes-charset utf-8
+	ATTR language attributes-natural-language en
+
+	# What statuses are OK?
+	STATUS client-error-bad-request
+
+	# What attributes do we expect?
+	EXPECT attributes-charset
+	EXPECT attributes-natural-language
+}
+{
+	# The name of the test...
+	NAME "Charset + Language + Printer URI Attributes"
+
+	# The operation to use
+	OPERATION get-jobs
+
+	# The attributes to send
+	GROUP operation
+	ATTR charset attributes-charset utf-8
+	ATTR language attributes-natural-language en
+	ATTR uri printer-uri $uri
+
+	# What statuses are OK?
+	STATUS successful-ok
+
+	# What attributes do we expect?
+	EXPECT attributes-charset
+	EXPECT attributes-natural-language
+}
+{
+	# The name of the test...
+	NAME "Charset + Language + Job URI Attributes"
+
+	# The operation to use
+	OPERATION get-jobs
+
+	# The attributes to send
+	GROUP operation
+	ATTR charset attributes-charset utf-8
+	ATTR language attributes-natural-language en
+	ATTR uri job-uri $method://$hostname:$port/jobs
+
+	# What statuses are OK?
+	STATUS successful-ok
+
+	# What attributes do we expect?
+	EXPECT attributes-charset
+	EXPECT attributes-natural-language
+}
+#
+# End of "$Id: 00000-requests.test,v 1.1 2001/02/22 16:48:13 mike Exp $"
+#

@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.86 2001/02/21 20:16:46 mike Exp $"
+ * "$Id: client.c,v 1.87 2001/02/22 16:48:13 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -1097,8 +1097,8 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	  fchmod(con->file, 0640);
 	  fchown(con->file, User, Group);
 
-          LogMessage(L_DEBUG2, "ReadClient() %d REQUEST %s", con->http.fd,
-	             con->filename);
+          LogMessage(L_DEBUG2, "ReadClient() %d REQUEST %s=%d", con->http.fd,
+	             con->filename, con->file);
 
 	  if (con->file < 0)
 	  {
@@ -1121,11 +1121,14 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	  {
 	    con->bytes += bytes;
 
-            LogMessage(L_DEBUG2, "ReadClient() %d writing %d bytes",
-	               con->http.fd, bytes);
+            LogMessage(L_DEBUG2, "ReadClient() %d writing %d bytes to %d",
+	               con->http.fd, bytes, con->file);
 
             if (write(con->file, line, bytes) < bytes)
 	    {
+              LogMessage(L_ERROR, "ReadClient: Unable to write %d bytes to %s: %s",
+	        	 bytes, con->filename, strerror(errno));
+
 	      close(con->file);
 	      con->file = 0;
 	      unlink(con->filename);
@@ -1159,6 +1162,8 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	      * Request is too big; remove it and send an error...
 	      */
 
+              LogMessage(L_DEBUG2, "ReadClient() %d Removing temp file %s",
+	                 con->http.fd, con->filename);
 	      unlink(con->filename);
 
 	      if (con->request)
@@ -1280,6 +1285,8 @@ SendError(client_t      *con,	/* I - Connection */
 
   if (con->operation > HTTP_WAITING)
     LogRequest(con, code);
+
+  LogMessage(L_DEBUG2, "SendError() %d code=%d", con->http.fd, code);
 
  /*
   * To work around bugs in some proxies, don't use Keep-Alive for some
@@ -1573,7 +1580,11 @@ WriteClient(client_t *con)		/* I - Client connection */
     }
 
     if (con->filename[0])
+    {
+      LogMessage(L_DEBUG2, "WriteClient() %d Removing temp file %s",
+                 con->filename);
       unlink(con->filename);
+    }
 
     if (con->request != NULL)
     {
@@ -2078,5 +2089,5 @@ pipe_command(client_t *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.86 2001/02/21 20:16:46 mike Exp $".
+ * End of "$Id: client.c,v 1.87 2001/02/22 16:48:13 mike Exp $".
  */

@@ -12,8 +12,9 @@
 
 <H2>Identification</H2>
 
-<P>This software test plan provides detailed tests that are used to evaluate
-the stability of the Common UNIX Printing System ("CUPS") Version 1.1.
+<P>This software test plan provides detailed tests that are used
+to evaluate the stability and compliance of the Common UNIX
+Printing System ("CUPS") Version 1.1.
 
 <EMBED SRC="system-overview.shtml">
 
@@ -24,19 +25,40 @@ the stability of the Common UNIX Printing System ("CUPS") Version 1.1.
 <UL>
 	<LI>1 - Scope</LI>
 	<LI>2 - References</LI>
-	<LI>3 - Local Tests</LI>
-	<LI>4 - Remote Tests</LI>
+	<LI>3 - IPP Compliance Tests</LI>
+	<LI>4 - Command Tests</LI>
 	<LI>A - Glossary</LI>
 </UL>
 
 <EMBED SRC="references.shtml">
 
-<H1>Local Tests</H1>
+<H1>IPP Compliance Tests</H1>
+
+<P>This section describes the procedures and tests used to validate the
+IPP standards compliance of the CUPS server.
+
+<H2>Test Procedure</H2>
+
+<P>The test software and data files are located in the <VAR>test</VAR>
+subdirectory of the source distribution. A script is provided to compile
+the <CODE>ipptest</CODE> program and run all of the tests that follow,
+producing a success/fail report.
+
+<H2>00000-requests.test</H2>
+
+<P>This test verifies that the CUPS scheduler only accepts valid
+IPP requests that start with the <CODE>attributes-charset</CODE>
+and <CODE>attributes-natural-language</CODE> attributes and also
+contain a printer-uri or job-uri attribute.
+
+<P>It also verifies that the CUPS scheduler always responds with
+<CODE>attributes-charset</CODE> and
+<CODE>attributes-natural-language</CODE> attributes, using
+default values if they are not provided by the client.
 
 
 
-
-<H1>Remote Tests</H1>
+<H1>Command Tests</H1>
 
 
 

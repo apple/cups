@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.50 2001/02/09 16:23:35 mike Exp $"
+ * "$Id: ipp.c,v 1.51 2001/02/22 16:48:09 mike Exp $"
  *
  *   Internet Printing Protocol support functions for the Common UNIX
  *   Printing System (CUPS).
@@ -578,75 +578,68 @@ ippDelete(ipp_t *ipp)		/* I - IPP request */
 const char *				/* O - Text string */
 ippErrorString(ipp_status_t error)	/* I - Error status */
 {
-  static cups_lang_t	*language = 0;	/* Language info */
+  static char	unknown[255];		/* Unknown error statuses */
+  static const char *status_oks[] =	/* "OK" status codes */
+		{
+		  "successful-ok",
+		  "successful-ok-ignored-or-substituted-attributes",
+		  "successful-ok-conflicting-attributes"
+		},
+		*status_400s[] =	/* Client errors */
+		{
+		  "client-error-bad-request",
+		  "client-error-forbidden",
+		  "client-error-not-authenticated",
+		  "client-error-not-authorized",
+		  "client-error-not-possible",
+		  "client-error-timeout",
+		  "client-error-not-found",
+		  "client-error-gone",
+		  "client-error-request-entity-too-large",
+		  "client-error-request-value-too-long",
+		  "client-error-document-format-not-supported",
+		  "client-error-attributes-or-values-not-supported",
+		  "client-error-uri-scheme-not-supported",
+		  "client-error-charset-not-supported",
+		  "client-error-conflicting-attributes",
+		  "client-error-compression-not-supported",
+		  "client-error-compression-error",
+		  "client-error-document-format-error",
+		  "client-error-document-access-error"
+		},
+		*status_500s[] =	/* Server errors */
+		{
+		  "server-error-internal-error",
+		  "server-error-operation-not-supported",
+		  "server-error-service-unavailable",
+		  "server-error-version-not-supported",
+		  "server-error-device-error",
+		  "server-error-temporary-error",
+		  "server-error-not-accepting-jobs",
+		  "server-error-busy",
+		  "server-error-job-canceled",
+		  "server-error-multiple-document-jobs-not-supported"
+		};
 
 
  /*
-  * Load the localized message file as needed...
+  * See if the error code is a known value...
   */
 
-  if (!language)
-    language = cupsLangDefault();
+  if (error >= IPP_OK && error <= IPP_OK_CONFLICT)
+    return (status_oks[error]);
+  else if (error >= IPP_BAD_REQUEST && error <= IPP_DOCUMENT_ACCESS_ERROR)
+    return (status_400s[error - IPP_BAD_REQUEST]);
+  else if (error >= IPP_INTERNAL_ERROR && error <= IPP_MULTIPLE_JOBS_NOT_SUPPORTED)
+    return (status_500s[error - IPP_INTERNAL_ERROR]);
 
  /*
-  * Return the appropriate message...
+  * No, build an "unknown-xxxx" error string...
   */
 
-  switch (error)
-  {
-    case IPP_OK :
-    case IPP_OK_SUBST :
-    case IPP_OK_CONFLICT :
-        return ("OK");
+  sprintf(unknown, "unknown-%04x", error);
 
-    case IPP_BAD_REQUEST :
-        return (cupsLangString(language, HTTP_BAD_REQUEST));
-
-    case IPP_FORBIDDEN :
-        return (cupsLangString(language, HTTP_FORBIDDEN));
-
-    case IPP_NOT_AUTHENTICATED :
-    case IPP_NOT_AUTHORIZED :
-        return (cupsLangString(language, HTTP_UNAUTHORIZED));
-
-    case IPP_NOT_POSSIBLE :
-        return (cupsLangString(language, HTTP_METHOD_NOT_ALLOWED));
-
-    case IPP_TIMEOUT :
-        return (cupsLangString(language, HTTP_REQUEST_TIMEOUT));
-
-    case IPP_NOT_FOUND :
-        return (cupsLangString(language, HTTP_NOT_FOUND));
-
-    case IPP_GONE :
-        return (cupsLangString(language, HTTP_GONE));
-
-    case IPP_DOCUMENT_FORMAT :
-        return (cupsLangString(language, HTTP_UNSUPPORTED_MEDIATYPE));
-
-    case IPP_CONFLICT :
-        return (cupsLangString(language, HTTP_CONFLICT));
-
-    case IPP_INTERNAL_ERROR :
-        return (cupsLangString(language, HTTP_SERVER_ERROR));
-
-    case IPP_OPERATION_NOT_SUPPORTED :
-    case IPP_VERSION_NOT_SUPPORTED :
-        return (cupsLangString(language, HTTP_NOT_SUPPORTED));
-
-    case IPP_SERVICE_UNAVAILABLE :
-    case IPP_DEVICE_ERROR :
-    case IPP_TEMPORARY_ERROR :
-    case IPP_PRINTER_BUSY :
-        return (cupsLangString(language, HTTP_SERVICE_UNAVAILABLE));
-
-    case IPP_NOT_ACCEPTING :
-        return (cupsLangString(language, CUPS_MSG_NOT_ACCEPTING_JOBS));
-
-    default :
-        return ("ERROR");
-  }
-
+  return (unknown);
 }
 
 
@@ -1862,5 +1855,5 @@ ipp_read(http_t        *http,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.50 2001/02/09 16:23:35 mike Exp $".
+ * End of "$Id: ipp.c,v 1.51 2001/02/22 16:48:09 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: ipptest.c,v 1.6 2001/01/22 15:04:04 mike Exp $"
+ * "$Id: ipptest.c,v 1.7 2001/02/22 16:48:14 mike Exp $"
  *
  *   IPP test command for the Common UNIX Printing System (CUPS).
  *
@@ -91,7 +91,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   * Run tests...
   */
 
-  for (i = 2, status = 1; i < argc; i ++)
+  for (i = 2, status = 1; status && i < argc; i ++)
     status = status && do_tests(argv[1], argv[i]);
 
  /*
@@ -118,7 +118,10 @@ do_tests(const char *uri,		/* I - URI to connect on */
 		resource[HTTP_MAX_URI];	/* Resource path */
   int		port;			/* Port number */
   FILE		*fp;			/* Test file */
-  char		token[1024];		/* Token from file */
+  char		token[1024],		/* Token from file */
+		*tokenptr,		/* Pointer into token */
+		temp[1024],		/* Temporary string */
+		*tempptr;		/* Pointer into temp string */
   ipp_t		*request;		/* IPP request */
   ipp_t		*response;		/* IPP response */
   ipp_op_t	op;			/* Operation */
@@ -193,7 +196,9 @@ do_tests(const char *uri,		/* I - URI to connect on */
     num_expects  = 0;
     filename[0]  = '\0';
 
-    strcpy(name, "Unknown test");
+    strcpy(name, testfile);
+    if (strrchr(name, '.') != NULL)
+      *strrchr(name, '.') = '\0';
 
    /*
     * Parse until we see a close brace...
@@ -246,31 +251,73 @@ do_tests(const char *uri,		/* I - URI to connect on */
 	get_token(fp, token, sizeof(token));
 	value = get_tag(token);
 	get_token(fp, attr, sizeof(attr));
-	get_token(fp, token, sizeof(token));
+	get_token(fp, temp, sizeof(temp));
 
-        if (token[0] == '$')
-	{
-	 /*
-	  * Substitute a string/number...
-	  */
+        token[sizeof(token) - 1] = '\0';
 
-          if (strcasecmp(token + 1, "uri") == 0)
-	    strcpy(token, uri);
-	  else if (strcasecmp(token + 1, "method") == 0)
-	    strcpy(token, method);
-	  else if (strcasecmp(token + 1, "username") == 0)
-	    strcpy(token, userpass);
-	  else if (strcasecmp(token + 1, "hostname") == 0)
-	    strcpy(token, server);
-	  else if (strcasecmp(token + 1, "port") == 0)
-	    sprintf(token, "%d", port);
-	  else if (strcasecmp(token + 1, "resource") == 0)
-	    strcpy(token, resource);
-	  else if (strcasecmp(token + 1, "job-id") == 0)
-	    sprintf(token, "%d", job_id);
-	  else if (strcasecmp(token + 1, "user") == 0)
-	    strcpy(token, cupsUser());
-	}
+        for (tempptr = temp, tokenptr = token;
+	     *tempptr && tokenptr < (token + sizeof(token) - 1);)
+	  if (*tempptr == '$')
+	  {
+	   /*
+	    * Substitute a string/number...
+	    */
+
+            if (strncasecmp(tempptr + 1, "uri", 3) == 0)
+	    {
+	      strncpy(tokenptr, uri, sizeof(token) - 1 - (tokenptr - token));
+	      tempptr += 4;
+	    }
+	    else if (strncasecmp(tempptr + 1, "method", 6) == 0)
+	    {
+	      strncpy(tokenptr, method, sizeof(token) - 1 - (tokenptr - token));
+	      tempptr += 7;
+	    }
+	    else if (strncasecmp(tempptr + 1, "username", 8) == 0)
+	    {
+	      strncpy(tokenptr, userpass, sizeof(token) - 1 - (tokenptr - token));
+	      tempptr += 9;
+	    }
+	    else if (strncasecmp(tempptr + 1, "hostname", 8) == 0)
+	    {
+	      strncpy(tokenptr, server, sizeof(token) - 1 - (tokenptr - token));
+	      tempptr += 9;
+	    }
+	    else if (strncasecmp(tempptr + 1, "port", 4) == 0)
+	    {
+	      snprintf(tempptr, sizeof(token) - 1 - (tokenptr - token),
+	               "%d", port);
+	      tempptr += 5;
+	    }
+	    else if (strncasecmp(tempptr + 1, "resource", 8) == 0)
+	    {
+	      strncpy(tokenptr, resource, sizeof(token) - 1 - (tokenptr - token));
+	      tempptr += 9;
+	    }
+	    else if (strncasecmp(tempptr + 1, "job-id", 6) == 0)
+	    {
+	      snprintf(tempptr, sizeof(token) - 1 - (tokenptr - token),
+	               "%d", job_id);
+	      tempptr += 7;
+	    }
+	    else if (strncasecmp(tempptr + 1, "user", 4) == 0)
+	    {
+	      strncpy(tokenptr, cupsUser(), sizeof(token) - 1 - (tokenptr - token));
+	      tempptr += 5;
+	    }
+            else
+	    {
+	      *tokenptr++ = *tempptr ++;
+	      *tokenptr   = '\0';
+	    }
+
+            tokenptr += strlen(tokenptr);
+	  }
+	  else
+	  {
+	    *tokenptr++ = *tempptr++;
+	    *tokenptr   = '\0';
+	  }
 
         switch (value)
 	{
@@ -397,13 +444,10 @@ do_tests(const char *uri,		/* I - URI to connect on */
 	{
 	  printf("\b\b\b\b\bPASS]\n");
 	  printf("        (%d bytes in response)\n", ippLength(response));
-
-          for (i = 0; i < num_expects; i ++)
-	    if ((attrptr = ippFindAttribute(response, expects[i], IPP_TAG_ZERO)) != NULL)
-	      print_attr(attrptr);
 	}
 	else
 	{
+	  puts("        RECEIVED");
 	  for (attrptr = response->attrs; attrptr != NULL; attrptr = attrptr->next)
 	    print_attr(attrptr);
 	}
@@ -414,6 +458,9 @@ do_tests(const char *uri,		/* I - URI to connect on */
 
     for (i = 0; i < num_expects; i ++)
       free(expects[i]);
+
+    if (!pass)
+      break;
   }
 
   fclose(fp);
@@ -494,46 +541,46 @@ ipp_status_t
 get_status(const char *name)
 {
   int		i;
-  static char	*status_oks[] =
+  static const char *status_oks[] =	/* "OK" status codes */
 		{
-		  "ok",
-		  "ok-subst",
-		  "ok-conflict"
+		  "successful-ok",
+		  "successful-ok-ignored-or-substituted-attributes",
+		  "successful-ok-conflicting-attributes"
 		},
-		*status_400s[] =
+		*status_400s[] =	/* Client errors */
 		{
-		  "bad-request",
-		  "forbidden",
-		  "not-authenticated",
-		  "not-authorized",
-		  "not-possible",
-		  "timeout",
-		  "not-found",
-		  "gone",
-		  "request-entity",
-		  "request-value",
-		  "document-format",
-		  "attributes",
-		  "uri-scheme",
-		  "charset",
-		  "conflict",
-		  "compression-not-supported",
-		  "compression-error",
-		  "document-format-error",
-		  "document-access-error"
+		  "client-error-bad-request",
+		  "client-error-forbidden",
+		  "client-error-not-authenticated",
+		  "client-error-not-authorized",
+		  "client-error-not-possible",
+		  "client-error-timeout",
+		  "client-error-not-found",
+		  "client-error-gone",
+		  "client-error-request-entity-too-large",
+		  "client-error-request-value-too-long",
+		  "client-error-document-format-not-supported",
+		  "client-error-attributes-or-values-not-supported",
+		  "client-error-uri-scheme-not-supported",
+		  "client-error-charset-not-supported",
+		  "client-error-conflicting-attributes",
+		  "client-error-compression-not-supported",
+		  "client-error-compression-error",
+		  "client-error-document-format-error",
+		  "client-error-document-access-error"
 		},
-		*status_500s[] =
+		*status_500s[] =	/* Server errors */
 		{
-		  "internal-error",
-		  "operation-not-supported",
-		  "service-unavailable",
-		  "version-not-supported",
-		  "device-error",
-		  "temporary-error",
-		  "not-accepting",
-		  "printer-busy",
-		  "error-job-cancelled",
-		  "multiple-jobs-not-supported"
+		  "server-error-internal-error",
+		  "server-error-operation-not-supported",
+		  "server-error-service-unavailable",
+		  "server-error-version-not-supported",
+		  "server-error-device-error",
+		  "server-error-temporary-error",
+		  "server-error-not-accepting-jobs",
+		  "server-error-busy",
+		  "server-error-job-canceled",
+		  "server-error-multiple-document-jobs-not-supported"
 		};
 
 
@@ -750,5 +797,5 @@ print_attr(ipp_attribute_t *attr)	/* I - Attribute to print */
 
 
 /*
- * End of "$Id: ipptest.c,v 1.6 2001/01/22 15:04:04 mike Exp $".
+ * End of "$Id: ipptest.c,v 1.7 2001/02/22 16:48:14 mike Exp $".
  */
