@@ -1,5 +1,5 @@
 /*
- * "$Id: texttops.c,v 1.14 1999/05/10 16:35:29 mike Exp $"
+ * "$Id: texttops.c,v 1.15 1999/05/11 19:46:19 mike Exp $"
  *
  *   Text to PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -137,7 +137,7 @@ WriteProlog(char *title,	/* I - Title of job */
          PageRight, PageTop);
   if (Orientation & 1)
     puts("%%Orientation: Landscape");
-  puts("%%Creator: texttops/CUPS-" CUPS_SVERSION);
+  puts("%%Creator: texttops/" CUPS_SVERSION);
   printf("%%%%CreationDate: %s\n", curdate);
   printf("%%%%Title: %s\n", title);
   printf("%%%%For: %s\n", user);
@@ -145,7 +145,7 @@ WriteProlog(char *title,	/* I - Title of job */
     puts("%%DocumentNeededResources: font Courier Courier-Bold Courier-Oblique");
   else
     puts("%%DocumentNeededResources: font Courier Courier-Bold");
-  puts("%%DocumentSuppliedResources: procset texttops " CUPS_SVERSION " 0");
+  puts("%%DocumentSuppliedResources: procset texttops 1.0 0");
   puts("%%Pages: (atend)");
 
   puts("%%EndComments");
@@ -173,7 +173,7 @@ WriteProlog(char *title,	/* I - Title of job */
   */
 
   puts("%%BeginProlog");
-  puts("%%BeginResource procset texttops 4.0 0");
+  puts("%%BeginResource: procset texttops 1.0 0");
 
   charset = getenv("CHARSET");
   if (charset != NULL && strcmp(charset, "us-ascii") != 0)
@@ -565,5 +565,5 @@ write_string(int     col,	/* I - Start column */
 
 
 /*
- * End of "$Id: texttops.c,v 1.14 1999/05/10 16:35:29 mike Exp $".
+ * End of "$Id: texttops.c,v 1.15 1999/05/11 19:46:19 mike Exp $".
  */
