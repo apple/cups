@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c,v 1.57.2.51 2003/09/02 20:40:02 mike Exp $"
+ * "$Id: main.c,v 1.57.2.52 2003/09/05 20:36:34 mike Exp $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -291,7 +291,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   * Allocate memory for the input and output sets...
   */
 
-  SetSize   = (MaxFDs + 31) / 32;
+  SetSize   = (MaxFDs + 31) / 8;
   InputSet  = (fd_set *)calloc(1, SetSize);
   OutputSet = (fd_set *)calloc(1, SetSize);
   input     = (fd_set *)calloc(1, SetSize);
@@ -1137,5 +1137,5 @@ usage(void)
 
 
 /*
- * End of "$Id: main.c,v 1.57.2.51 2003/09/02 20:40:02 mike Exp $".
+ * End of "$Id: main.c,v 1.57.2.52 2003/09/05 20:36:34 mike Exp $".
  */
