@@ -3,6 +3,10 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.21rc1
 
+	- The scheduler did not check for a valid Listen/Port
+	  configuration (STR #499)
+	- The cupsPrintFiles() function did not always set the
+	  last IPP error message (STR #538)
 	- The pstops filter did not write the PostScript header
 	  line if the file began with a PJL escape sequence (STR
 	  #574)

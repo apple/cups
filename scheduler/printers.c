@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.93.2.54 2004/02/05 16:20:12 mike Exp $"
+ * "$Id: printers.c,v 1.93.2.55 2004/02/24 21:36:59 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -101,14 +101,16 @@ AddPrinter(const char *name)	/* I - Name of printer */
   SetString(&p->info, name);
   SetString(&p->hostname, ServerName);
 
+  if (NumListeners == 0)
+    SetStringf(&p->uri, "ipp://%s:%d/printers/%s", ServerName, ippPort(), name);
 #ifdef AF_INET6
-  if (Listeners[0].address.addr.sa_family == AF_INET6)
+  else if (Listeners[0].address.addr.sa_family == AF_INET6)
     SetStringf(&p->uri, "ipp://%s:%d/printers/%s", ServerName,
                ntohs(Listeners[0].address.ipv6.sin6_port), name);
-  else
 #endif /* AF_INET6 */
-  SetStringf(&p->uri, "ipp://%s:%d/printers/%s", ServerName,
-             ntohs(Listeners[0].address.ipv4.sin_port), name);
+  else
+    SetStringf(&p->uri, "ipp://%s:%d/printers/%s", ServerName,
+               ntohs(Listeners[0].address.ipv4.sin_port), name);
   SetStringf(&p->device_uri, "file:/dev/null");
 
   p->state     = IPP_PRINTER_STOPPED;
@@ -2413,5 +2415,5 @@ write_irix_state(printer_t *p)		/* I - Printer to update */
 
 
 /*
- * End of "$Id: printers.c,v 1.93.2.54 2004/02/05 16:20:12 mike Exp $".
+ * End of "$Id: printers.c,v 1.93.2.55 2004/02/24 21:36:59 mike Exp $".
  */

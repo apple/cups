@@ -1,5 +1,5 @@
 /*
- * "$Id: listen.c,v 1.9.2.11 2003/07/20 03:13:10 mike Exp $"
+ * "$Id: listen.c,v 1.9.2.12 2004/02/24 21:36:59 mike Exp $"
  *
  *   Server listening routines for the Common UNIX Printing System (CUPS)
  *   scheduler.
@@ -140,7 +140,7 @@ StartListening(void)
   * Setup socket listeners...
   */
 
-  for (i = NumListeners, lis = Listeners; i > 0; i --, lis ++)
+  for (i = NumListeners, lis = Listeners, LocalPort = 0; i > 0; i --, lis ++)
   {
     httpAddrString(&(lis->address), s, sizeof(s));
 
@@ -158,8 +158,9 @@ StartListening(void)
     * "any" address...
     */
 
-    if (httpAddrLocalhost(&(lis->address)) ||
-        httpAddrAny(&(lis->address)))
+    if (!LocalPort &&
+        (httpAddrLocalhost(&(lis->address)) ||
+         httpAddrAny(&(lis->address))))
     {
 #ifdef AF_INET6
       if (lis->address.addr.sa_family == AF_INET6)
@@ -226,6 +227,21 @@ StartListening(void)
     }
   }
 
+ /*
+  * Make sure that we are listening on localhost!
+  */
+
+  if (!LocalPort)
+  {
+    LogMessage(L_EMERG, "No Listen or Port lines were found to allow access via localhost!");
+
+   /*
+    * Commit suicide...
+    */
+
+    kill(getpid(), SIGTERM);
+  }
+
   ResumeListening();
 }
 
@@ -255,5 +271,5 @@ StopListening(void)
 
 
 /*
- * End of "$Id: listen.c,v 1.9.2.11 2003/07/20 03:13:10 mike Exp $".
+ * End of "$Id: listen.c,v 1.9.2.12 2004/02/24 21:36:59 mike Exp $".
  */
