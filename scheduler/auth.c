@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.c,v 1.55 2002/01/02 17:59:13 mike Exp $"
+ * "$Id: auth.c,v 1.56 2002/03/27 18:55:38 mike Exp $"
  *
  *   Authorization routines for the Common UNIX Printing System (CUPS).
  *
@@ -188,14 +188,54 @@ AllowHost(location_t *loc,	/* I - Location to add to */
           char       *name)	/* I - Name of host or domain to add */
 {
   authmask_t	*temp;		/* New host/domain mask */
+  char		ifname[32],	/* Interface name */
+		*ifptr;		/* Pointer to end of name */
 
 
   if ((temp = add_allow(loc)) == NULL)
     return;
 
-  temp->type             = AUTH_NAME;
-  temp->mask.name.name   = strdup(name);
-  temp->mask.name.length = strlen(name);
+  if (strcasecmp(name, "@LOCAL") == 0)
+  {
+   /*
+    * Allow *interface*...
+    */
+
+    temp->type             = AUTH_INTERFACE;
+    temp->mask.name.name   = strdup("@");
+    temp->mask.name.length = 1;
+  }
+  else if (strncasecmp(name, "@IF(", 4) == 0)
+  {
+   /*
+    * Allow *interface*...
+    */
+
+    strncpy(ifname, name + 4, sizeof(ifname) - 1);
+    ifname[sizeof(ifname) - 1] = '\0';
+
+    ifptr = ifname + strlen(ifname);
+
+    if (ifptr[-1] == ')')
+    {
+      ifptr --;
+      *ifptr = '\0';
+    }
+
+    temp->type             = AUTH_INTERFACE;
+    temp->mask.name.name   = strdup(ifname);
+    temp->mask.name.length = ifptr - ifname;
+  }
+  else
+  {
+   /*
+    * Allow name...
+    */
+
+    temp->type             = AUTH_NAME;
+    temp->mask.name.name   = strdup(name);
+    temp->mask.name.length = strlen(name);
+  }
 
   LogMessage(L_DEBUG, "AllowHost: %s allow %s", loc->location, name);
 }
@@ -237,10 +277,59 @@ CheckAuth(unsigned   ip,	/* I - Client address */
           int        num_masks, /* I - Number of masks */
           authmask_t *masks)	/* I - Masks */
 {
+  cups_netif_t	*iface;		/* Network interface */
+  unsigned	netip;		/* Network address */
+
+
   while (num_masks > 0)
   {
     switch (masks->type)
     {
+      case AUTH_INTERFACE :
+         /*
+	  * Check for a match with a network interface...
+	  */
+
+          netip = htonl(ip);
+
+          if (strcmp(masks->mask.name.name, "*") == 0)
+	  {
+	   /*
+	    * Check against all local interfaces...
+	    */
+
+            NetIFUpdate();
+
+	    for (iface = NetIFList; iface != NULL; iface = iface->next)
+	    {
+	     /*
+	      * Only check local interfaces...
+	      */
+
+	      if (!iface->is_local)
+	        continue;
+
+              if ((netip & iface->mask.sin_addr.s_addr) ==
+	          (iface->address.sin_addr.s_addr &
+		   iface->mask.sin_addr.s_addr))
+		return (1);
+	    }
+	  }
+	  else
+	  {
+	   /*
+	    * Check the named interface...
+	    */
+
+            iface = NetIFFind(masks->mask.name.name);
+
+            if ((netip & iface->mask.sin_addr.s_addr) ==
+	        (iface->address.sin_addr.s_addr &
+		 iface->mask.sin_addr.s_addr))
+	      return (1);
+	  }
+	  break;
+
       case AUTH_NAME :
          /*
 	  * Check for exact name match...
@@ -474,14 +563,54 @@ DenyHost(location_t *loc,	/* I - Location to add to */
          char       *name)	/* I - Name of host or domain to add */
 {
   authmask_t	*temp;		/* New host/domain mask */
+  char		ifname[32],	/* Interface name */
+		*ifptr;		/* Pointer to end of name */
 
 
   if ((temp = add_deny(loc)) == NULL)
     return;
 
-  temp->type             = AUTH_NAME;
-  temp->mask.name.name   = strdup(name);
-  temp->mask.name.length = strlen(name);
+  if (strcasecmp(name, "@LOCAL") == 0)
+  {
+   /*
+    * Deny *interface*...
+    */
+
+    temp->type             = AUTH_INTERFACE;
+    temp->mask.name.name   = strdup("@");
+    temp->mask.name.length = 1;
+  }
+  else if (strncasecmp(name, "@IF(", 4) == 0)
+  {
+   /*
+    * Deny *interface*...
+    */
+
+    strncpy(ifname, name + 4, sizeof(ifname) - 1);
+    ifname[sizeof(ifname) - 1] = '\0';
+
+    ifptr = ifname + strlen(ifname);
+
+    if (ifptr[-1] == ')')
+    {
+      ifptr --;
+      *ifptr = '\0';
+    }
+
+    temp->type             = AUTH_INTERFACE;
+    temp->mask.name.name   = strdup(ifname);
+    temp->mask.name.length = ifptr - ifname;
+  }
+  else
+  {
+   /*
+    * Deny name...
+    */
+
+    temp->type             = AUTH_NAME;
+    temp->mask.name.name   = strdup(name);
+    temp->mask.name.length = strlen(name);
+  }
 
   LogMessage(L_DEBUG, "DenyHost: %s deny %s", loc->location, name);
 }
@@ -1494,5 +1623,5 @@ to64(char          *s,	/* O - Output string */
 
 
 /*
- * End of "$Id: auth.c,v 1.55 2002/01/02 17:59:13 mike Exp $".
+ * End of "$Id: auth.c,v 1.56 2002/03/27 18:55:38 mike Exp $".
  */
