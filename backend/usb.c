@@ -1,5 +1,5 @@
 /*
- * "$Id: usb.c,v 1.18.2.33 2004/03/30 19:22:27 mike Exp $"
+ * "$Id: usb.c,v 1.18.2.34 2004/04/01 19:00:17 mike Exp $"
  *
  *   USB port backend for the Common UNIX Printing System (CUPS).
  *
@@ -45,6 +45,14 @@
 #include <errno.h>
 #include <cups/string.h>
 #include <signal.h>
+
+#ifdef WIN32
+#  include <io.h>
+#else
+#  include <unistd.h>
+#  include <fcntl.h>
+#  include <termios.h>
+#endif /* WIN32 */
 
 
 /*
@@ -113,7 +121,7 @@ print_device(const char *uri,		/* I - Device URI */
   (void)hostname;
   (void)resource;
   (void)options;
-  (void)fd;
+  (void)fp;
   (void)copies;
 
   return (1);
@@ -261,5 +269,5 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 
 
 /*
- * End of "$Id: usb.c,v 1.18.2.33 2004/03/30 19:22:27 mike Exp $".
+ * End of "$Id: usb.c,v 1.18.2.34 2004/04/01 19:00:17 mike Exp $".
  */
