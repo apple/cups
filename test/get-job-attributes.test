@@ -17,10 +17,11 @@
 	ATTR uri job-uri $uri
 
 	# What statuses are OK?
-	STATUS ok
-	STATUS ok-subst
+	#STATUS ok
+	#STATUS ok-subst
 
 	# What attributes do we expect?
 	EXPECT job-uri
 	EXPECT job-state
+	EXPECT bogus-attribute
 }

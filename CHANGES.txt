@@ -1,4 +1,4 @@
-CHANGES.txt - 04/24/2001
+CHANGES.txt - 04/30/2001
 ------------------------
 
 CHANGES IN CUPS V1.1.7
@@ -184,6 +184,8 @@ CHANGES IN CUPS V1.1.7
 	  to "fix" printing with broken apps.
 	- The image filters did not handle older TIFF files that
 	  lacked the samples-per-pixel and bits-per-pixel tags.
+	- Added new cupsGetJobs() and cupsFreeJobs() functions
+	  to manage print jobs.
 
 
 CHANGES IN CUPS V1.1.6-3
