@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.c,v 1.63 2002/09/26 15:19:30 mike Exp $"
+ * "$Id: auth.c,v 1.64 2002/11/20 21:36:32 mike Exp $"
  *
  *   Authorization routines for the Common UNIX Printing System (CUPS).
  *
@@ -993,15 +993,8 @@ IsAuthorized(client_t *con)	/* I - Connection */
 	  * Get the user info...
 	  */
 
-	  pw = getpwnam(con->username);	/* Get the current password */
+	  pw = getpwnam(con->username);		/* Get the current password */
 	  endpwent();				/* Close the password file */
-
-	  if (pw == NULL)			/* No such user... */
-	  {
-	    LogMessage(L_WARN, "IsAuthorized: Unknown username \"%s\"; access denied.",
-        	       con->username);
-	    return (HTTP_UNAUTHORIZED);
-	  }
 
 #if HAVE_LIBPAM
 	 /*
@@ -1067,6 +1060,17 @@ IsAuthorized(client_t *con)	/* I - Connection */
 	    return (HTTP_UNAUTHORIZED);
 	  }
 #else
+         /*
+	  * Use normal UNIX password file-based authentication...
+	  */
+
+	  if (pw == NULL)			/* No such user... */
+	  {
+	    LogMessage(L_WARN, "IsAuthorized: Unknown username \"%s\"; access denied.",
+        	       con->username);
+	    return (HTTP_UNAUTHORIZED);
+	  }
+
 #  ifdef HAVE_SHADOW_H
 	  spw = getspnam(con->username);
 	  endspent();
@@ -1282,7 +1286,7 @@ IsAuthorized(client_t *con)	/* I - Connection */
       * Check to see if the default group ID matches for the user...
       */
 
-      if (grp->gr_gid == pw->pw_gid)
+      if (pw != NULL && grp->gr_gid == pw->pw_gid)
 	return (HTTP_OK);
     }
 
@@ -1623,5 +1627,5 @@ to64(char          *s,	/* O - Output string */
 
 
 /*
- * End of "$Id: auth.c,v 1.63 2002/09/26 15:19:30 mike Exp $".
+ * End of "$Id: auth.c,v 1.64 2002/11/20 21:36:32 mike Exp $".
  */
