@@ -38,6 +38,13 @@
 #  include <cups/cups.h>
 #endif // HAVE_LIBCUPS
 
+#ifdef __sun
+// Solaris doesn't define mkstemp()...
+extern "C" {
+extern int mkstemp(char *);
+}
+#endif // __sun
+
 // Some systems don't define this, so just make it something reasonably
 // large.
 #ifndef PATH_MAX
