@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: filter.man,v 1.9 2002/12/17 18:59:56 swdev Exp $"
+.\" "$Id: filter.man,v 1.10 2003/01/24 19:31:58 mike Exp $"
 .\"
 .\"   filter man page for the Common UNIX Printing System (CUPS).
 .\"
@@ -103,7 +103,8 @@ The timezone of the server.
 .TP 5
 USER
 .br
-The user executing the filter (typically lp).
+The user executing the filter, typically lp; consult the cupsd.conf file for
+the current setting.
 .SH COMPATIBILITY
 While the filter interface is compatible with System V interface
 scripts, it will only work with the System V interface script as the
@@ -118,5 +119,5 @@ http://localhost:631/documentation.html
 .SH COPYRIGHT
 Copyright 1993-2003 by Easy Software Products, All Rights Reserved.
 .\"
-.\" End of "$Id: filter.man,v 1.9 2002/12/17 18:59:56 swdev Exp $".
+.\" End of "$Id: filter.man,v 1.10 2003/01/24 19:31:58 mike Exp $".
 .\"

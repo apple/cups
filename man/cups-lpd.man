@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: cups-lpd.man,v 1.9 2002/12/17 18:59:56 swdev Exp $"
+.\" "$Id: cups-lpd.man,v 1.10 2003/01/24 19:31:58 mike Exp $"
 .\"
 .\"   cups-lpd man page for the Common UNIX Printing System (CUPS).
 .\"
@@ -39,7 +39,7 @@ following line to the \fBinetd.conf\fR file to enable the
 .br
 .nf
 
-    printer stream tcp nowait lp /usr/lib/cups/daemon/cups-lpd cups-lpd
+    printer stream tcp nowait lp /path/to/cups/daemon/cups-lpd cups-lpd
 .fi
 .LP
 If you are using the newer \fIxinetd(8)\fR daemon, add the following
@@ -53,9 +53,13 @@ lines to the \fBxinetd.conf\fR file:
         protocol = tcp
         wait = no
         user = lp
-        server = /usr/lib/cups/daemon/cups-lpd
+        server = /path/to/cups/daemon/cups-lpd
     }
 .fi
+.LP
+The /path/to/cups/daemon is usually /usr/lib/cups/daemon or
+/usr/libexec/cups/daemon, depending on the operating system.
+Consult the cupsd.conf file for the local setting.
 .SH SECURITY
 \fBcups-lpd\fR currently does not perform any access control
 based on the settings in \fIcupsd.conf(5)\fR or in the
@@ -103,5 +107,5 @@ http://localhost:631/documentation.html
 .SH COPYRIGHT
 Copyright 1993-2003 by Easy Software Products, All Rights Reserved.
 .\"
-.\" End of "$Id: cups-lpd.man,v 1.9 2002/12/17 18:59:56 swdev Exp $".
+.\" End of "$Id: cups-lpd.man,v 1.10 2003/01/24 19:31:58 mike Exp $".
 .\"
