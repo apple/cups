@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.93 2001/03/30 14:56:57 mike Exp $"
+ * "$Id: printers.c,v 1.94 2001/04/12 13:09:09 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -845,6 +845,8 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
 		  IPP_RESUME_PRINTER,
 		  IPP_PURGE_JOBS,
 		  IPP_SET_JOB_ATTRIBUTES,
+		  IPP_ENABLE_PRINTER,
+		  IPP_DISABLE_PRINTER,
 		  CUPS_GET_DEFAULT,
 		  CUPS_GET_PRINTERS,
 		  CUPS_ADD_PRINTER,
@@ -890,10 +892,8 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
   ipp_finish_t	finishings[5];
   const char	*multiple_document_handling[] =
 		{
-		  "single-document",
 		  "separate-documents-uncollated-copies",
-		  "separate-documents-collated-copies",
-		  "single-document-new-sheet"
+		  "separate-documents-collated-copies"
 		};
 #ifdef __sgi
   FILE		*fp;		/* Interface script file */
@@ -1782,5 +1782,5 @@ write_printcap(void)
 
 
 /*
- * End of "$Id: printers.c,v 1.93 2001/03/30 14:56:57 mike Exp $".
+ * End of "$Id: printers.c,v 1.94 2001/04/12 13:09:09 mike Exp $".
  */

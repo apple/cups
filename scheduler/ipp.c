@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.127 2001/03/30 14:56:55 mike Exp $"
+ * "$Id: ipp.c,v 1.128 2001/04/12 13:09:08 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -391,10 +391,12 @@ ProcessIPPRequest(client_t *con)	/* I - Client connection */
               break;
 
 	  case CUPS_ACCEPT_JOBS :
+	  case IPP_ENABLE_PRINTER :
               accept_jobs(con, uri);
               break;
 
 	  case CUPS_REJECT_JOBS :
+	  case IPP_DISABLE_PRINTER :
               reject_jobs(con, uri);
               break;
 
@@ -5365,5 +5367,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.127 2001/03/30 14:56:55 mike Exp $".
+ * End of "$Id: ipp.c,v 1.128 2001/04/12 13:09:08 mike Exp $".
  */
