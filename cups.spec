@@ -1,5 +1,5 @@
 #
-# "$Id: cups.spec,v 1.4 1999/08/12 13:11:11 mike Exp $"
+# "$Id: cups.spec,v 1.5 1999/08/31 14:32:15 mike Exp $"
 #
 #   RPM "spec" file for the Common UNIX Printing System (CUPS).
 #
@@ -26,11 +26,11 @@
 
 Summary: Common Unix Printing System
 Name: cups
-Version: 1.0b7
+Version: 1.0b8
 Release: 0
 Copyright: GPL
 Group: System Environment/Daemons
-Source: ftp://ftp.easysw.com/pub/cups/beta/cups-1.0b7-source.tar.gz
+Source: ftp://ftp.easysw.com/pub/cups/beta/cups-1.0b8-source.tar.gz
 Url: http://www.cups.org
 Packager: Michael Sweet <mike@easysw.com>
 Vendor: Easy Software Products
@@ -66,21 +66,21 @@ make
 # these lines just make sure the directory structure in the
 # RPM_BUILD_ROOT exists
 rm -rf $RPM_BUILD_ROOT
-mkdir $RPM_BUILD_ROOT/etc
-mkdir $RPM_BUILD_ROOT/etc/rc.d
-mkdir $RPM_BUILD_ROOT/etc/rc.d/init.d
-mkdir $RPM_BUILD_ROOT/usr
-mkdir $RPM_BUILD_ROOT/usr/bin
-mkdir $RPM_BUILD_ROOT/usr/lib
-mkdir $RPM_BUILD_ROOT/usr/man
-mkdir $RPM_BUILD_ROOT/usr/man/man1
-mkdir $RPM_BUILD_ROOT/usr/man/man5
-mkdir $RPM_BUILD_ROOT/usr/man/man8
-mkdir $RPM_BUILD_ROOT/usr/share/locale
-mkdir $RPM_BUILD_ROOT/var/cups
-mkdir $RPM_BUILD_ROOT/var/cups/conf
-mkdir $RPM_BUILD_ROOT/var/cups/logs
-mkdir $RPM_BUILD_ROOT/var/logs
+mkdir -p $RPM_BUILD_ROOT/etc
+mkdir -p $RPM_BUILD_ROOT/etc/rc.d
+mkdir -p $RPM_BUILD_ROOT/etc/rc.d/init.d
+mkdir -p $RPM_BUILD_ROOT/usr
+mkdir -p $RPM_BUILD_ROOT/usr/bin
+mkdir -p $RPM_BUILD_ROOT/usr/lib
+mkdir -p $RPM_BUILD_ROOT/usr/man
+mkdir -p $RPM_BUILD_ROOT/usr/man/man1
+mkdir -p $RPM_BUILD_ROOT/usr/man/man5
+mkdir -p $RPM_BUILD_ROOT/usr/man/man8
+mkdir -p $RPM_BUILD_ROOT/usr/share/locale
+mkdir -p $RPM_BUILD_ROOT/var/cups
+mkdir -p $RPM_BUILD_ROOT/var/cups/conf
+mkdir -p $RPM_BUILD_ROOT/var/cups/logs
+mkdir -p $RPM_BUILD_ROOT/var/logs
 
 ln -sf /var/cups/logs $RPM_BUILD_ROOT/var/logs/cups
 ln -sf /var/cups/conf $RPM_BUILD_ROOT/etc/cups
@@ -303,9 +303,7 @@ rm -rf $RPM_BUILD_ROOT
 /usr/include/cups/mime.h
 /usr/include/cups/ppd.h
 /usr/include/cups/raster.h
-/usr/lib/libcups.so
-/usr/lib/libcupsimage.so
 
 #
-# End of "$Id: cups.spec,v 1.4 1999/08/12 13:11:11 mike Exp $".
+# End of "$Id: cups.spec,v 1.5 1999/08/31 14:32:15 mike Exp $".
 #
