@@ -745,6 +745,17 @@ file:/directory/filename</CODE> while network devices use the more
  with CUPS. You'll find a complete list of PPD files and the printers
  they will work with in<A HREF="#PRINTER_DRIVERS"> Appendix C, &quot;Printer
  Drivers&quot;</A>.</P>
+<P>For a dot matrix printer connected to the serial port this would
+ might look like:</P>
+<UL>
+<PRE>
+<B>/usr/sbin/lpadmin -p DotMatrix -E -v serial:/dev/ttyS0?baud=9600+size=8+parity=none+flow=soft deskjet.ppd ENTER</B>
+</PRE>
+</UL>
+<P>Here you specify the serial port (e.g. S0,S1, d0, d1), baud rate
+ (e.g. 9600, 19200, 38400, 115200, etc.), number of bits, parity, and
+ flow control. If you do not need flow control, delete the &quot;+flow=soft&quot;
+ portion.</P>
 <H3><A NAME="ADD_WEB">Adding Your First Printer from the Web</A></H3>
 <P>The CUPS web server provides a user-friendly &quot;wizard&quot; interface for
  adding your printers. Rather than figuring out which device URI and PPD
