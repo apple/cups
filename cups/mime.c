@@ -1,5 +1,5 @@
 /*
- * "$Id: mime.c,v 1.8 1999/02/20 16:04:38 mike Exp $"
+ * "$Id: mime.c,v 1.9 1999/02/26 22:00:51 mike Exp $"
  *
  *   MIME database file routines for the Common UNIX Printing System (CUPS).
  *
@@ -33,6 +33,14 @@
  * Revision History:
  *
  *   $Log: mime.c,v $
+ *   Revision 1.9  1999/02/26 22:00:51  mike
+ *   Added more debug statements.
+ *
+ *   Fixed bugs in cupsPrintFile() - wasn't setting the IPP_TAG_MIMETYPE
+ *   value tag for the file type.
+ *
+ *   Updated conversion filter code to handle wildcards for super-type.
+ *
  *   Revision 1.8  1999/02/20 16:04:38  mike
  *   Updated mime.c to scan directories under WIN32.
  *
@@ -423,8 +431,7 @@ load_convs(mime_t *mime,		/* I - MIME database */
 		type[MIME_MAX_TYPE],	/* Type name */
 		*temp,			/* Temporary pointer */
 		*filter;		/* Filter program */
-  mime_type_t	*srctype,		/* Source MIME type */
-		**temptype,		/* MIME type looping var */
+  mime_type_t	**temptype,		/* MIME type looping var */
 		*dsttype;		/* Destination MIME type */
   int		cost;			/* Cost of filter */
 
@@ -538,34 +545,14 @@ load_convs(mime_t *mime,		/* I - MIME database */
     *temp = '\0';
 
    /*
-    * Add the filter to the MIME database; if "type" is "*" (as in "super / *")
-    * then add a filter for each super type listed in the database.
+    * Add the filter to the MIME database, supporting wildcards as needed...
     */
 
-    if (strcmp(type, "*") == 0)
-    {
-     /*
-      * Add multiple filters, one for each super/type combination...
-      */
-
-      for (temptype = mime->types, i = 0; i < mime->num_types; i ++, temptype ++)
-        if (strcmp((*temptype)->super, super) == 0)
-	  mimeAddFilter(mime, *temptype, dsttype, cost, filter);
-	else if ((*temptype)->super[0] > super[0])
-	  break;
-    }
-    else
-    {
-     /*
-      * Add a single filter...
-      */
-
-      if ((srctype = mimeType(mime, super, type)) == NULL)
-        continue;
-
-      mimeAddFilter(mime, srctype, dsttype, cost, filter);
-    };
-  };
+    for (temptype = mime->types, i = 0; i < mime->num_types; i ++, temptype ++)
+      if ((super[0] == '*' || strcmp((*temptype)->super, super) == 0) &&
+          (type[0] == '*' || strcmp((*temptype)->type, type) == 0))
+	mimeAddFilter(mime, *temptype, dsttype, cost, filter);
+  }
 }
 
 
@@ -597,5 +584,5 @@ delete_rules(mime_magic_t *rules)	/* I - Rules to free */
 
 
 /*
- * End of "$Id: mime.c,v 1.8 1999/02/20 16:04:38 mike Exp $".
+ * End of "$Id: mime.c,v 1.9 1999/02/26 22:00:51 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c,v 1.2 1999/02/26 15:10:25 mike Exp $"
+ * "$Id: util.c,v 1.3 1999/02/26 22:00:52 mike Exp $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -165,6 +165,9 @@ cupsPrintFile(char          *printer,	/* I - Printer or class name */
 
   attr = ippAddString(request, IPP_TAG_JOB, "document-format",
                       "application/octet-stream");
+  attr->value_tag = IPP_TAG_MIMETYPE;
+
+ /**** ADD USERNAME ****/
 
  /*
   * Then add all options on the command-line...
@@ -256,5 +259,5 @@ cupsPrintFile(char          *printer,	/* I - Printer or class name */
 
 
 /*
- * End of "$Id: util.c,v 1.2 1999/02/26 15:10:25 mike Exp $".
+ * End of "$Id: util.c,v 1.3 1999/02/26 22:00:52 mike Exp $".
  */

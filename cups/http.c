@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.19 1999/02/26 15:10:23 mike Exp $"
+ * "$Id: http.c,v 1.20 1999/02/26 22:00:51 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -607,7 +607,7 @@ httpRead(http_t *http,			/* I - HTTP data */
   char		len[32];		/* Length string */
 
 
-  DEBUG_printf(("httpRead(%08x, %08d, %d)\n", http, buffer, length));
+  DEBUG_printf(("httpRead(%08x, %08x, %d)\n", http, buffer, length));
 
   if (http == NULL || buffer == NULL)
     return (-1);
@@ -1336,5 +1336,5 @@ http_send(http_t       *http,	/* I - HTTP data */
 
 
 /*
- * End of "$Id: http.c,v 1.19 1999/02/26 15:10:23 mike Exp $".
+ * End of "$Id: http.c,v 1.20 1999/02/26 22:00:51 mike Exp $".
  */

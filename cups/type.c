@@ -1,5 +1,5 @@
 /*
- * "$Id: type.c,v 1.4 1999/02/05 17:40:57 mike Exp $"
+ * "$Id: type.c,v 1.5 1999/02/26 22:00:52 mike Exp $"
  *
  *   MIME typing routines for the Common UNIX Printing System (CUPS).
  *
@@ -34,6 +34,14 @@
  * Revision History:
  *
  *   $Log: type.c,v $
+ *   Revision 1.5  1999/02/26 22:00:52  mike
+ *   Added more debug statements.
+ *
+ *   Fixed bugs in cupsPrintFile() - wasn't setting the IPP_TAG_MIMETYPE
+ *   value tag for the file type.
+ *
+ *   Updated conversion filter code to handle wildcards for super-type.
+ *
  *   Revision 1.4  1999/02/05 17:40:57  mike
  *   Added IPP client read/write code.
  *
@@ -648,7 +656,6 @@ checkrules(char         *filename,	/* I - Filename */
            mime_magic_t *rules)		/* I - Rules to check */
 {
   int		n;			/* Looping var */
-  int		isochar;		/* Non-zero if ISO (8-bit) char seen */
   int		logic,			/* Logic to apply */
 		result,			/* Result of test */
 		intv;			/* Integer value */
@@ -748,8 +755,7 @@ checkrules(char         *filename,	/* I - Filename */
 	  else
 	    n = rules->length;
 
-          bufptr  = buffer + rules->offset - bufoffset;
-	  isochar = 0;
+          bufptr = buffer + rules->offset - bufoffset;
 
 	  while (n > 0)
 	    if ((*bufptr >= 160 && *bufptr <= 254) ||
@@ -757,16 +763,13 @@ checkrules(char         *filename,	/* I - Filename */
 	        (*bufptr >= 8 && *bufptr <= 10) ||
 		*bufptr == 13 || *bufptr == 26)
 	    {
-	      if (*bufptr >= 160 && *bufptr <= 254)
-	        isochar = 1;
-
 	      n --;
 	      bufptr ++;
 	    }
 	    else
 	      break;
 
-	  result = ((n == 0) && isochar);
+	  result = (n == 0);
 	  break;
 
       case MIME_MAGIC_STRING :
@@ -1035,5 +1038,5 @@ patmatch(char *s,	/* I - String to match against */
 
 
 /*
- * End of "$Id: type.c,v 1.4 1999/02/05 17:40:57 mike Exp $".
+ * End of "$Id: type.c,v 1.5 1999/02/26 22:00:52 mike Exp $".
  */
