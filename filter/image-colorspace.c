@@ -1,5 +1,5 @@
 /*
- * "$Id: image-colorspace.c,v 1.6 1998/07/28 20:48:30 mike Exp $"
+ * "$Id: image-colorspace.c,v 1.7 1998/08/14 19:12:51 mike Exp $"
  *
  *   Colorspace conversions for espPrint, a collection of printer drivers.
  *
@@ -16,7 +16,10 @@
  * Revision History:
  *
  *   $Log: image-colorspace.c,v $
- *   Revision 1.6  1998/07/28 20:48:30  mike
+ *   Revision 1.7  1998/08/14 19:12:51  mike
+ *   Updated black generation to use diff*diff
+ *
+ *   Revision 1.6  1998/07/28  20:48:30  mike
  *   Even better CMYK generation code...
  *
  *   Revision 1.5  1998/07/23  20:42:04  mike
@@ -192,7 +195,7 @@ ImageRGBToCMYK(ib_t *in,
       if (diff <= 0)
         k = 0;
       else if (diff < 255)
-        k = diff * k / 255;
+        k = diff * diff * k / 65025;
     };
 
     divk = 255 - k;
@@ -590,5 +593,5 @@ huerotatemat(float mat[3][3],
 
 
 /*
- * End of "$Id: image-colorspace.c,v 1.6 1998/07/28 20:48:30 mike Exp $".
+ * End of "$Id: image-colorspace.c,v 1.7 1998/08/14 19:12:51 mike Exp $".
  */
