@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.41 1999/10/10 15:41:12 mike Exp $"
+ * "$Id: printers.c,v 1.42 1999/10/12 18:29:31 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -967,11 +967,11 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
 	else
 	{
 	 /*
-          * Otherwise we have neither - treat this as a "generic" PostScript
-	  * printer with no PPD file...
+          * Otherwise we have neither - treat this as a "dumb" printer
+	  * with no PPD file...
 	  */
 
-	  AddPrinterFilter(p, "application/vnd.cups-postscript 0 -");
+	  AddPrinterFilter(p, "*/* 0 -");
 	}
       }
 
@@ -1206,5 +1206,5 @@ write_printcap(void)
 
 
 /*
- * End of "$Id: printers.c,v 1.41 1999/10/10 15:41:12 mike Exp $".
+ * End of "$Id: printers.c,v 1.42 1999/10/12 18:29:31 mike Exp $".
  */

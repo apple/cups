@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.29 1999/10/10 15:41:11 mike Exp $"
+ * "$Id: ipp.c,v 1.30 1999/10/12 18:29:29 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -956,6 +956,20 @@ cancel_job(client_t        *con,	/* I - Client connection */
   DEBUG_printf(("cancel_job(%08x, %08x)\n", con, uri));
 
  /*
+  * Verify that the POST operation was done to a valid URI.
+  */
+
+  if (strncmp(con->uri, "/classes/", 9) != 0 &&
+      strncmp(con->uri, "/job/", 5) != 0 &&
+      strncmp(con->uri, "/printers/", 10) != 0)
+  {
+    LogMessage(LOG_ERROR, "cancel_job: cancel request on bad resource \'%s\'!",
+               resource);
+    send_ipp_error(con, IPP_NOT_AUTHORIZED);
+    return;
+  }
+
+ /*
   * See if we have a job URI or a printer URI...
   */
 
@@ -1783,6 +1797,19 @@ print_job(client_t        *con,		/* I - Client connection */
   DEBUG_printf(("print_job(%08x, %08x)\n", con, uri));
 
  /*
+  * Verify that the POST operation was done to a valid URI.
+  */
+
+  if (strncmp(con->uri, "/classes/", 9) != 0 &&
+      strncmp(con->uri, "/printers/", 10) != 0)
+  {
+    LogMessage(LOG_ERROR, "print_job: cancel request on bad resource \'%s\'!",
+               resource);
+    send_ipp_error(con, IPP_NOT_AUTHORIZED);
+    return;
+  }
+
+ /*
   * OK, see if the client is sending the document compressed - CUPS
   * doesn't support compression yet...
   */
@@ -1791,7 +1818,7 @@ print_job(client_t        *con,		/* I - Client connection */
   {
     DEBUG_puts("print_job: Unsupported compression attribute!");
     send_ipp_error(con, IPP_ATTRIBUTES);
-    attr = ippAddString(con->response, IPP_TAG_UNSUPPORTED, IPP_TAG_KEYWORD,
+    attr = ippAddString(con->response, IPP_TAG_UNSUPPORTED_GROUP, IPP_TAG_KEYWORD,
 	                "compression", NULL, attr->values[0].string.text);
     return;
   }
@@ -1871,7 +1898,7 @@ print_job(client_t        *con,		/* I - Client connection */
     DEBUG_printf(("print_job: Unsupported format \'%s\'!\n",
 	          format->values[0].string.text));
     send_ipp_error(con, IPP_DOCUMENT_FORMAT);
-    attr = ippAddString(con->response, IPP_TAG_UNSUPPORTED, IPP_TAG_MIMETYPE,
+    attr = ippAddString(con->response, IPP_TAG_UNSUPPORTED_GROUP, IPP_TAG_MIMETYPE,
                         "document-format", NULL, format->values[0].string.text);
     return;
   }
@@ -2427,6 +2454,19 @@ validate_job(client_t        *con,	/* I - Client connection */
   DEBUG_printf(("validate_job(%08x, %08x)\n", con, uri));
 
  /*
+  * Verify that the POST operation was done to a valid URI.
+  */
+
+  if (strncmp(con->uri, "/classes/", 9) != 0 &&
+      strncmp(con->uri, "/printers/", 10) != 0)
+  {
+    LogMessage(LOG_ERROR, "validate_job: request on bad resource \'%s\'!",
+               resource);
+    send_ipp_error(con, IPP_NOT_AUTHORIZED);
+    return;
+  }
+
+ /*
   * OK, see if the client is sending the document compressed - CUPS
   * doesn't support compression yet...
   */
@@ -2435,7 +2475,7 @@ validate_job(client_t        *con,	/* I - Client connection */
   {
     DEBUG_puts("validate_job: Unsupported compression attribute!");
     send_ipp_error(con, IPP_ATTRIBUTES);
-    attr = ippAddString(con->response, IPP_TAG_UNSUPPORTED, IPP_TAG_KEYWORD,
+    attr = ippAddString(con->response, IPP_TAG_UNSUPPORTED_GROUP, IPP_TAG_KEYWORD,
 	                "compression", NULL, attr->values[0].string.text);
     return;
   }
@@ -2466,7 +2506,7 @@ validate_job(client_t        *con,	/* I - Client connection */
     DEBUG_printf(("validate_job: Unsupported format \'%s\'!\n",
 	          format->values[0].string.text));
     send_ipp_error(con, IPP_DOCUMENT_FORMAT);
-    attr = ippAddString(con->response, IPP_TAG_UNSUPPORTED, IPP_TAG_MIMETYPE,
+    attr = ippAddString(con->response, IPP_TAG_UNSUPPORTED_GROUP, IPP_TAG_MIMETYPE,
                         "document-format", NULL, format->values[0].string.text);
     return;
   }
@@ -2497,5 +2537,5 @@ validate_job(client_t        *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.29 1999/10/10 15:41:11 mike Exp $".
+ * End of "$Id: ipp.c,v 1.30 1999/10/12 18:29:29 mike Exp $".
  */

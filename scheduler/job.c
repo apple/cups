@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.40 1999/10/10 15:41:11 mike Exp $"
+ * "$Id: job.c,v 1.41 1999/10/12 18:29:30 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -404,8 +404,7 @@ StartJob(int       id,		/* I - Job ID */
 	     (attr->value_tag == IPP_TAG_NAME ||
 	      attr->value_tag == IPP_TAG_NAMELANG))
       strcpy(title, attr->values[0].string.text);
-    else if ((attr->group_tag == IPP_TAG_JOB ||
-	      attr->group_tag == IPP_TAG_EXTENSION) &&
+    else if (attr->group_tag == IPP_TAG_JOB &&
 	     (optptr - options) < (sizeof(options) - 128))
     {
       if (attr->value_tag == IPP_TAG_MIMETYPE ||
@@ -977,5 +976,5 @@ start_process(char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.40 1999/10/10 15:41:11 mike Exp $".
+ * End of "$Id: job.c,v 1.41 1999/10/12 18:29:30 mike Exp $".
  */
