@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.23.2.8 2004/06/29 13:15:11 mike Exp $"
+# "$Id: Makefile,v 1.23.2.9 2004/08/11 14:11:07 mike Exp $"
 #
 #   System V commands makefile for the Common UNIX Printing System (CUPS).
 #
@@ -78,6 +78,9 @@ install:	all
 	$(INSTALL_BIN) lpoptions $(BINDIR)
 	$(INSTALL_BIN) lpstat $(BINDIR)
 	$(INSTALL_BIN) -m 4755 -o $(CUPS_USER) -g $(CUPS_GROUP) lppasswd $(BINDIR)
+	if test ! -x $(BINDIR)/lppasswd; then \
+		chmod 755 $(BINDIR)/lppasswd; \
+	fi
 
 
 #
@@ -191,5 +194,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile,v 1.23.2.8 2004/06/29 13:15:11 mike Exp $".
+# End of "$Id: Makefile,v 1.23.2.9 2004/08/11 14:11:07 mike Exp $".
 #
