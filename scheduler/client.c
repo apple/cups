@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.91.2.22 2002/09/26 15:19:50 mike Exp $"
+ * "$Id: client.c,v 1.91.2.23 2002/10/16 01:01:33 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -2381,7 +2381,10 @@ pipe_command(client_t *con,		/* I - Client connection */
             ntohs(con->http.hostaddr.ipv4.sin_port));
   }
 
-  snprintf(server_name, sizeof(server_name), "SERVER_NAME=%s", ServerName);
+  if (strcmp(con->http.hostname, "localhost") == 0)
+    strlcpy(server_name, "SERVER_NAME=localhost", sizeof(server_name));
+  else
+    snprintf(server_name, sizeof(server_name), "SERVER_NAME=%s", ServerName);
   snprintf(remote_host, sizeof(remote_host), "REMOTE_HOST=%s", con->http.hostname);
   snprintf(remote_user, sizeof(remote_user), "REMOTE_USER=%s", con->username);
   snprintf(tmpdir, sizeof(tmpdir), "TMPDIR=%s", TempDir);
@@ -2625,5 +2628,5 @@ pipe_command(client_t *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.91.2.22 2002/09/26 15:19:50 mike Exp $".
+ * End of "$Id: client.c,v 1.91.2.23 2002/10/16 01:01:33 mike Exp $".
  */
