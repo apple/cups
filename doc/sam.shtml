@@ -2536,8 +2536,7 @@ ServerBin /foo/bar/lib/cups
 server-run executables. If an absolute path is not provided then it is
 assumed to be relative to the
 <A HREF="#ServerRoot"><CODE>ServerRoot</CODE></A> directory. The
-default executable directory is <VAR>/usr/lib/cups</VAR> or
-<VAR>/usr/lib32/cups</VAR> (IRIX 6.5).
+default executable directory is <VAR>/usr/lib/cups</VAR>.
 
 <!-- NEED 3in -->
 <H3><A NAME="ServerCertificate">ServerCertificate</A></H3>
