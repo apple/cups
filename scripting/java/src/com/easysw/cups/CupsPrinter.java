@@ -154,35 +154,9 @@ public class CupsPrinter
     printer_name = name;
 
     //
-    //  The trys / reConnect is a hack until I can figure out why
-    //  I'm not getting a 401 error back on the first try.
     //
-    int trys = 0;
-    while ((!getStatus(c)) && trys++ < 3)
-    {
-       try
-       {
-         c.http.reConnect();
-       }
-       catch (IOException e)
-       {
-         System.out.println("CupsPrinter.getStatus failure # " + trys );
-       }
-    }
-
-    trys = 0;
-    while ((!getAttributes(c)) && trys++ < 3)
-    {
-       try
-       {
-         c.http.reConnect();
-       }
-       catch (IOException e)
-       {
-         System.out.println("CupsPrinter.getStatus failure # " + trys );
-       }
-    }
-
+    getStatus(c);
+    getAttributes(c);
   }
 
 

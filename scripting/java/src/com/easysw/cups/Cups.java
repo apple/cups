@@ -60,6 +60,26 @@ public class Cups
                           };
 
 
+    static final int FILEREQ_STATE_CREATE_HTTP       = 0;
+    static final int FILEREQ_STATE_WRITE_HTTP_HEADER = 1;
+    static final int FILEREQ_STATE_WRITE_IPP_HEADER  = 2;
+    static final int FILEREQ_STATE_WRITE_IPP_ATTRS   = 3;
+    static final int FILEREQ_STATE_FINISH_IPP_ATTRS  = 4;
+    static final int FILEREQ_STATE_WRITE_FILE_DATA   = 5;
+    static final int FILEREQ_STATE_READ_RESPONSE     = 6;
+    static final int FILEREQ_STATE_DONE              = 7;
+    static final String[] filereq_state_names =
+                          { "Create HTTP", 
+                            "Write Http Header", 
+                            "Write IPP Header",
+                            "Write IPP Attrs", 
+                            "Finish IPP Attrs", 
+                            "Write File Data", 
+                            "Read Response",
+                            "Done" 
+                          };
+
+
     IPP		ipp;               //  IPP Request
     IPPHttp     http;              //  Connection to server
 
@@ -312,10 +332,16 @@ public class Cups
                      errors++;
                      if (errors < 5)
                      {
-                       http.reConnect();
+                       if (!http.reConnect())
+                       {
+                         System.out.println("Could not reConnect(0)!");
+                         return(false);
+                       }
                      }
                      else
+                     {
                        return(false);
+                     }
                      break;
 
               default: state++;
@@ -343,11 +369,18 @@ public class Cups
                errors++;
                if (errors < 5)
                {
-                 http.reConnect();
-                 state = REQ_STATE_WRITE_HTTP_HEADER;
+                 if (http.reConnect())
+                   state = REQ_STATE_WRITE_HTTP_HEADER;
+                 else
+                 {
+                   System.out.println("Could not reConnect(1)\n");
+                   return(false);
+                 }
                }
                else
+               {
                  return(false);
+               }
             }
             else state++;
             break;
@@ -377,12 +410,18 @@ public class Cups
                  errors++;
                  if (errors < 5)
                  {
-                   http.reConnect();
+                   if (!http.reConnect())
+                   {
+                     System.out.println("Could not reConnect(2)");
+                     return(false);
+                   }
                    state = REQ_STATE_WRITE_HTTP_HEADER;
                    auth_error = true;
                  }
                  else
+                 {
                    return(false);
+                 }
               }
 
             }
@@ -408,11 +447,17 @@ public class Cups
               errors++;
               if (errors < 5)
               {
-                   http.reConnect();
+                   if (!http.reConnect())
+                   {
+                     System.out.println("Could not reConnect(3)");
+                     return(false);
+                   }
                    state = REQ_STATE_WRITE_HTTP_HEADER;
               }
               else
+              {
                 return(false);
+              }
             }
             else state++;
             break;
@@ -427,26 +472,40 @@ public class Cups
             read_length = http.read_header();
             switch( http.status )
             {
-               case 200: break;
+               case IPPHttp.HTTP_OK: 
+                 break;
+
+               case IPPHttp.HTTP_UNAUTHORIZED: 
+                    http.reConnect();
+                    state = REQ_STATE_WRITE_HTTP_HEADER;
+                    errors = 0;
+                 break;
+
                default:
                   errors++;
                   if (errors < 5)
                   {
-                    http.reConnect();
+                    if (!http.reConnect())
+                    {
+                      System.out.println("Could not reConnect(4)");
+                      return(false);
+                    }
                     state = REQ_STATE_WRITE_HTTP_HEADER;
                   }
                   else 
                   {
+                    System.out.println("Too many errors: " + errors );
                     return(false);
                   }
                   break;
             }
-            if (read_length > 0)
+
+            if ((read_length > 0) && (state == REQ_STATE_READ_RESPONSE))
             {
               http.read_buffer = http.read(read_length);
               ipp = http.processResponse();
+              state++;
             }
-            state++;
             break;
 
           case REQ_STATE_DONE:
@@ -470,120 +529,275 @@ public class Cups
      * @return  <code>boolean</code>            True on success, false otherwise
      * @throw   <code>IOException</code>
      */
-    public boolean doRequest( File file ) throws IOException
+    public boolean doRequest(File file) throws IOException
     {
       IPPAttribute     attr;
-      FileInputStream  fis;
+      int              state  = FILEREQ_STATE_CREATE_HTTP;
+      int              errors = 0;
+      FileInputStream  fis    = null;
 
-      //
-      //  Open an input stream to the file.
-      //
-      try
+      while (true)
       {
-        fis = new FileInputStream(file);
-      }
-      catch (IOException e)
-      {
-        last_error = -1;
-        error_text = "Error opening file input stream.";
-        throw(e);
-      }
-
-
-      //
-      //  Connect if needed.
-      //
-      if (http == null)
-      {
-        String url_str = site + dest;
-        try
+        switch( state )
         {
-          if (user.length() > 0 && passwd.length() > 0)
-            http = new IPPHttp(url_str, "basic", user, passwd );
-          else
-            http = new IPPHttp(url_str);
+
+          case FILEREQ_STATE_CREATE_HTTP:
+            String url_str = site + dest;
+            try
+            {
+              if (user.length() > 0 && passwd.length() > 0)
+                http = new IPPHttp(url_str, "", user, passwd );
+              else
+                http = new IPPHttp(url_str);
+              state++;
+            }
+            catch (IOException e)
+            {
+              throw(e);
+            }
+            break;
+
+
+
+          case FILEREQ_STATE_WRITE_HTTP_HEADER:
+
+            if (fis != null)
+            {
+              fis.close();
+            }
+
+            //
+            //  Open an input stream to the file.
+            //
+            try
+            {
+              fis = new FileInputStream(file);
+            }
+            catch (IOException e)
+            {
+              last_error = -1;
+              error_text = "Error opening file input stream.";
+              throw(e);
+            }
+
+            //
+            //  Send the HTTP header.
+            //
+            int ippSz = ipp.sizeInBytes() + (int)file.length();
+            switch( http.writeHeader( http.path, ippSz ))
+            {
+              case IPPHttp.HTTP_FORBIDDEN:
+              case IPPHttp.HTTP_NOT_FOUND:
+              case IPPHttp.HTTP_BAD_REQUEST:
+              case IPPHttp.HTTP_METHOD_NOT_ALLOWED:
+              case IPPHttp.HTTP_PAYMENT_REQUIRED:
+              case IPPHttp.HTTP_UPGRADE_REQUIRED:
+              case IPPHttp.HTTP_ERROR:
+              case IPPHttp.HTTP_UNAUTHORIZED:
+                     errors++;
+                     if (errors < 5)
+                     {
+                       http.reConnect();
+                     }
+                     else
+                       return(false);
+                     break;
+
+              default: state++;
+            }
+            break;
+
+
+
+          case FILEREQ_STATE_WRITE_IPP_HEADER:
+            //
+            //  Send the request header.
+            //
+            byte[] header = new byte[8];
+            header[0] = (byte)1; 
+            header[1] = (byte)1; 
+            header[2] = (byte)((ipp.request.operation_id & 0xff00) >> 8);
+            header[3] = (byte)(ipp.request.operation_id & 0xff);
+            header[4] = (byte)((ipp.request.request_id & 0xff000000) >> 24);
+            header[5] = (byte)((ipp.request.request_id & 0xff0000) >> 16);
+            header[6] = (byte)((ipp.request.request_id & 0xff00) >> 8);
+            header[7] = (byte)(ipp.request.request_id & 0xff);
+            http.write( header );
+            if (http.checkForResponse() >= IPPHttp.HTTP_BAD_REQUEST)
+            {
+               errors++;
+               if (errors < 5)
+               {
+                 http.reConnect();
+                 state = FILEREQ_STATE_WRITE_HTTP_HEADER;
+               }
+               else
+                 return(false);
+            }
+            else state++;
+            break;
+
+
+          case FILEREQ_STATE_WRITE_IPP_ATTRS:
+            //
+            //  Send the attributes list.
+            //
+            byte[]  bytes;
+            int     sz;
+            int     last_group = -1;
+            boolean auth_error = false;
+            for (int i=0; i < ipp.attrs.size() && !auth_error; i++)
+            {
+              attr = (IPPAttribute)ipp.attrs.get(i);
+              sz    = attr.sizeInBytes(last_group);
+              bytes = attr.getBytes(sz,last_group);
+              last_group = attr.group_tag;
+              http.write(bytes);
+
+              //
+              //  Check for server response between each attribute.
+              //
+              if (http.checkForResponse() >= IPPHttp.HTTP_BAD_REQUEST)
+              {
+                 errors++;
+                 if (errors < 5)
+                 {
+                   http.reConnect();
+                   state = FILEREQ_STATE_WRITE_HTTP_HEADER;
+                   auth_error = true;
+                 }
+                 else
+                   return(false);
+              }
+
+            }
+            if (!auth_error)
+              state++;
+            break;
+
+
+
+          case FILEREQ_STATE_FINISH_IPP_ATTRS:
+            //
+            //  Send the end of attributes tag.
+            //
+            byte[] footer = new byte[1];
+            footer[0] = (byte)IPPDefs.TAG_END; 
+            http.write( footer );
+
+            //
+            //  Keep checking .....
+            //
+            if (http.checkForResponse() >= IPPHttp.HTTP_BAD_REQUEST)
+            {
+              errors++;
+              if (errors < 5)
+              {
+                   http.reConnect();
+                   state = FILEREQ_STATE_WRITE_HTTP_HEADER;
+              }
+              else
+                return(false);
+            }
+            else state++;
+            break;
+
+
+
+          case FILEREQ_STATE_WRITE_FILE_DATA:
+            //
+            //  Send the file data - this could be improved on ALOT.
+            //
+            int    count; 
+            byte[] b      = new byte[1024];
+            while ((state == FILEREQ_STATE_WRITE_FILE_DATA) &&
+                   ((count = fis.read(b)) != -1))
+            {
+                //
+                //  Keep checking .....
+                //
+                if (http.checkForResponse() >= IPPHttp.HTTP_BAD_REQUEST)
+                {
+                  errors++;
+                  if (errors < 5)
+                  {
+                    http.reConnect();
+                    state = FILEREQ_STATE_WRITE_HTTP_HEADER;
+                  }
+                  else
+                  {
+                    return(false);
+                  }
+                }
+                else
+                {
+                  if (count > 0)
+                    http.write( b, count );
+                }
+
+            } // while 
+
+            if (state == FILEREQ_STATE_WRITE_FILE_DATA)
+            {
+                fis.close();
+                fis = null;
+                state++;
+            }
+            break;
+
+
+
+          case FILEREQ_STATE_READ_RESPONSE:
+            //
+            //   Now read back response
+            //
+            int read_length;
+            read_length = http.read_header();
+            switch( http.status )
+            {
+               case IPPHttp.HTTP_OK: 
+                 break;
+
+               case IPPHttp.HTTP_UNAUTHORIZED: 
+                    http.reConnect();
+                    state = FILEREQ_STATE_WRITE_HTTP_HEADER;
+                    errors = 0;
+                 break;
+
+               default:
+                  errors++;
+                  if (errors < 5)
+                  {
+                    http.reConnect();
+                    state = FILEREQ_STATE_WRITE_HTTP_HEADER;
+                  }
+                  else 
+                  {
+                    return(false);
+                  }
+                  break;
+            }
+
+            if ((read_length > 0) && (state == FILEREQ_STATE_READ_RESPONSE))
+            {
+              http.read_buffer = http.read(read_length);
+              ipp = http.processResponse();
+              state++;
+            }
+            break;
+
+          case FILEREQ_STATE_DONE:
+            //
+            //  success.
+            //
+            http.conn.close();
+            http = null;
+            return(true);
         }
-        catch (IOException e)
-        {
-          throw(e);
-        }        
       }
 
-      //
-      //  Send the HTTP header.
-      //
-      long ippSize = ipp.sizeInBytes() + file.length();
-      http.writeHeader( http.path, (int)ippSize );
+    }  // End of doRequest(file)
 
-      //
-      //  Send the request header.
-      //
-      byte[] header = new byte[8];
-      header[0] = (byte)1; 
-      header[1] = (byte)1; 
-      header[2] = (byte)((ipp.request.operation_id & 0xff00) >> 8);
-      header[3] = (byte)(ipp.request.operation_id & 0xff);
-      header[4] = (byte)((ipp.request.request_id & 0xff000000) >> 24);
-      header[5] = (byte)((ipp.request.request_id & 0xff0000) >> 16);
-      header[6] = (byte)((ipp.request.request_id & 0xff00) >> 8);
-      header[7] = (byte)(ipp.request.request_id & 0xff);
-      http.write( header );
-
-      //
-      //  Send the attributes list.
-      //
-      byte[] bytes;
-      int    sz;
-      int    last_group = -1;
-      for (int i=0; i < ipp.attrs.size(); i++)
-      {
-        attr = (IPPAttribute)ipp.attrs.get(i);
-        sz    = attr.sizeInBytes(last_group);
-        bytes = attr.getBytes(sz,last_group);
-        last_group = attr.group_tag;
-        http.write(bytes);
-      }
-
-      //
-      //  Send the end of attributes tag.
-      //
-      byte[] footer = new byte[1];
-      footer[0] = (byte)IPPDefs.TAG_END; 
-      http.write( footer );
-
-      //
-      //  Send the file data - this could be improved on ALOT.
-      //
-      int c;
-      byte[] b = new byte[1];
-      while ((c = fis.read()) != -1)
-      {
-        b[0] = (byte)c;
-        http.write( b );
-      } 
-      fis.close();
-
-      //  ------------------------------------------
-      //
-      //   Now read back response
-      //
-
-      int read_length;
-
-      read_length = http.read_header();
-      if (read_length > 0)
-      {
-        http.read_buffer = http.read(read_length);
-        http.conn.close();
-        ipp = http.processResponse();
-
-        return( true );
-      }
-      last_error = -1;
-      error_text = "No response from CUPS server!";
-      return( false );
-
-    }  // End of doRequest
 
 
 
@@ -1184,7 +1398,6 @@ public class Cups
       a.addString( "", p_uri );
       ipp.addAttribute(a);
             
-
       if (doRequest("cupsGetPrinterStatus"))
       {
         return(ipp.attrs);

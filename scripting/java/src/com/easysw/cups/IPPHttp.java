@@ -278,7 +278,7 @@ public class IPPHttp
   {
 
     encrypted   = false;
-    status      = HTTP_OK;
+    status      = 0;
     status_text = "";
     version     = "1.0";
     connected   = false;
@@ -306,7 +306,7 @@ public class IPPHttp
       //  Open the socket and set the options.
       //
       conn     = new Socket(hostname, port);
-      conn.setSoTimeout(100);
+      conn.setSoTimeout(200);
 
       //
       //  Create the input and output streams.
@@ -342,7 +342,7 @@ public class IPPHttp
         throws IOException, UnknownHostException
   {
     encrypted   = false;
-    status      = HTTP_OK;
+    status      = 0;
     status_text = "";
     version     = "1.0";
     connected   = false;
@@ -366,12 +366,11 @@ public class IPPHttp
       port     = url.getPort();
       path     = url.getPath();
 
-
       //
       //  Open the socket and set the options.
       //
       conn     = new Socket(hostname, port);
-      conn.setSoTimeout(100);
+      conn.setSoTimeout(200);
 
       //
       //  Create the input and output streams.
@@ -402,8 +401,9 @@ public class IPPHttp
    */
   public boolean reConnect() throws IOException
   {
-    connected = false;
-
+    connected   = false;
+    status      = 0;
+    status_text = "";
     try
     {
       //
@@ -476,6 +476,7 @@ public class IPPHttp
       s1 = "Content-type: application/ipp\r\n";
       os.write(s1.getBytes(), 0, s1.length());
 
+
       //
       //  Do basic style authorization if needed.
       //
@@ -510,7 +511,6 @@ public class IPPHttp
       s1 = "Content-length: " + content_length + "\r\n\r\n";
       os.write(s1.getBytes(), 0, s1.length());
       os.flush();
-
     }
     catch(IOException ioexception)
     {
@@ -591,6 +591,10 @@ public class IPPHttp
   }
 
 
+
+
+
+
   public int checkForResponse()
   {
     //
@@ -635,6 +639,7 @@ public class IPPHttp
               http_text.append(s2.charAt(i));
             }
             local_status      = Integer.parseInt(http_status.toString(), 10);
+            status = local_status;
           }
         }
         is.reset();
@@ -672,6 +677,29 @@ public class IPPHttp
     try
     {
       os.write(bytes, 0, bytes.length);
+      os.flush();
+    }
+    catch(IOException ioexception)
+    {
+      error = HTTP_ERROR;
+      throw ioexception;
+    }
+  }
+
+
+  /**
+   *  Write bytes to the output stream.
+   *
+   *  @param	bytes		Array of bytes to write to the stream.
+   *  @param	length		Number of bytes to write to the stream.
+   *  @throw	IOException
+   */
+  public void write(byte bytes[], int length )
+        throws IOException
+  {
+    try
+    {
+      os.write(bytes, 0, length);
       os.flush();
     }
     catch(IOException ioexception)

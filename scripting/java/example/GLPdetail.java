@@ -178,13 +178,18 @@ public class GLPdetail implements ActionListener
       {
         try
         {
+            //
+            //  Create connection
+            //
             u    = new URL("http://" + GLPvars.getServerName() + 
                            ":631/printers/" + GLPvars.selectedPrinterName );  
             cups = new Cups(u);
             cups.setUser(GLPvars.cupsUser);
             cups.setPasswd(GLPvars.cupsPasswd);
-            printer = new CupsPrinter( cups, GLPvars.selectedPrinterName );
+            //
+            //
 
+            printer = new CupsPrinter( cups, GLPvars.selectedPrinterName );
             detail  = new GLPprinterDetail( printer );
             joblist = new GLPjobList(printer);
 
@@ -200,7 +205,8 @@ public class GLPdetail implements ActionListener
         }
         catch (IOException e)
         {
-          tmp = new JLabel("Error loading printer: " + GLPvars.selectedPrinterName);
+          tmp = new JLabel("IOException while loading printer: " + 
+                GLPvars.selectedPrinterName);
           mainPanel.add(tmp);
           return;
         }
