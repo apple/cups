@@ -1,5 +1,5 @@
 /*
- * "$Id: raster.c,v 1.4 1999/03/29 22:05:11 mike Exp $"
+ * "$Id: raster.c,v 1.5 1999/04/06 16:23:01 mike Exp $"
  *
  *   Raster file routines for the Common UNIX Printing System (CUPS).
  *
@@ -138,7 +138,8 @@ cupsRasterReadHeader(cups_raster_t      *r,	/* I - Raster stream */
   if (r == NULL || r->mode != CUPS_RASTER_READ)
     return (0);
 
-  if (read(r->fd, h, sizeof(cups_page_header_t)) < sizeof(cups_page_header_t))
+  if (cupsRasterReadPixels(r, (unsigned char *)h, sizeof(cups_page_header_t)) <
+          sizeof(cups_page_header_t))
     return (0);
 
   if (r->sync == CUPS_RASTER_REVSYNC)
@@ -161,10 +162,26 @@ cupsRasterReadPixels(cups_raster_t *r,	/* I - Raster stream */
                      unsigned char *p,	/* I - Pointer to pixel buffer */
 		     unsigned      len)	/* I - Number of bytes to read */
 {
+  int		bytes;			/* Bytes read */
+  unsigned	remaining;		/* Bytes remaining */
+
+
   if (r == NULL || r->mode != CUPS_RASTER_READ)
     return (0);
-  else
-    return (read(r->fd, p, len));
+
+  remaining = len;
+
+  while (remaining > 0)
+  {
+    bytes = read(r->fd, p, remaining);
+    if (bytes < 0)
+      return (0);
+
+    remaining -= bytes;
+    p += bytes;
+  }
+
+  return (len);
 }
 
 
@@ -178,8 +195,9 @@ cupsRasterWriteHeader(cups_raster_t *r,
 {
   if (r == NULL || r->mode != CUPS_RASTER_WRITE)
     return (0);
-  else
-    return (write(r->fd, h, sizeof(cups_page_header_t)) ==
+
+  return (cupsRasterWritePixels(r, (unsigned char *)h,
+                                sizeof(cups_page_header_t)) ==
               sizeof(cups_page_header_t));
 }
 
@@ -188,18 +206,34 @@ cupsRasterWriteHeader(cups_raster_t *r,
  * 'cupsRasterWritePixels()' - Write raster pixels.
  */
 
-unsigned
-cupsRasterWritePixels(cups_raster_t *r,
-                      unsigned char *p,
-		      unsigned      len)
+unsigned				/* O - Number of bytes written */
+cupsRasterWritePixels(cups_raster_t *r,	/* I - Raster stream */
+                      unsigned char *p,	/* I - Bytes to write */
+		      unsigned      len)/* I - Number of bytes to write */
 {
+  int		bytes;			/* Bytes read */
+  unsigned	remaining;		/* Bytes remaining */
+
+
   if (r == NULL || r->mode != CUPS_RASTER_WRITE)
     return (0);
-  else
-    return (write(r->fd, p, len));
+
+  remaining = len;
+
+  while (remaining > 0)
+  {
+    bytes = write(r->fd, p, remaining);
+    if (bytes < 0)
+      return (0);
+
+    remaining -= bytes;
+    p += bytes;
+  }
+
+  return (len);
 }
 
 
 /*
- * End of "$Id: raster.c,v 1.4 1999/03/29 22:05:11 mike Exp $".
+ * End of "$Id: raster.c,v 1.5 1999/04/06 16:23:01 mike Exp $".
  */
