@@ -1,4 +1,4 @@
-CHANGES.txt - 06/01/2001
+CHANGES.txt - 06/05/2001
 ------------------------
 
 CHANGES IN CUPS V1.1.9
@@ -15,6 +15,9 @@ CHANGES IN CUPS V1.1.9
 	  skip the Digest keyword.
 	- The scheduler did not properly handle Digest
 	  authentication with the new multiple-group support.
+	- The scheduler did not allow usernames that were
+	  not in the UNIX password file to be used for Digest
+	  authentication from passwd.md5.
 
 
 CHANGES IN CUPS V1.1.8
