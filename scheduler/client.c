@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.91.2.87 2004/07/02 20:49:23 mike Exp $"
+ * "$Id: client.c,v 1.91.2.88 2004/07/02 21:36:57 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -461,7 +461,7 @@ CloseClient(client_t *con)	/* I - Client to close */
       close(con->http.fd);
       FD_CLR(con->http.fd, InputSet);
       FD_CLR(con->http.fd, OutputSet);
-      con->http.fd = 0;
+      con->http.fd = -1;
     }
   }
 
@@ -3297,7 +3297,7 @@ pipe_command(client_t *con,		/* I - Client connection */
     * Update stdin/stdout/stderr...
     */
 
-    if (infile)
+    if (infile > 0)
     {
       close(0);
       if (dup(infile) < 0)
@@ -3432,5 +3432,5 @@ CDSAWriteFunc(SSLConnectionRef connection,	/* I  - SSL/TLS connection */
 
 
 /*
- * End of "$Id: client.c,v 1.91.2.87 2004/07/02 20:49:23 mike Exp $".
+ * End of "$Id: client.c,v 1.91.2.88 2004/07/02 21:36:57 mike Exp $".
  */

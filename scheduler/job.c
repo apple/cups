@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.124.2.91 2004/07/02 20:49:23 mike Exp $"
+ * "$Id: job.c,v 1.124.2.92 2004/07/02 21:36:57 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -2307,8 +2307,10 @@ StopJob(int id,				/* I - Job ID */
 	LogMessage(L_DEBUG2, "StopJob: Closing print pipes [ %d %d ]...",
         	   current->print_pipes[0], current->print_pipes[1]);
 
-	close(current->print_pipes[0]);
-        close(current->print_pipes[1]);
+        if (current->print_pipes[0] >= 0)
+	  close(current->print_pipes[0]);
+        if (current->print_pipes[1] >= 0)
+          close(current->print_pipes[1]);
 
 	current->print_pipes[0] = -1;
 	current->print_pipes[1] = -1;
@@ -2766,5 +2768,5 @@ set_hold_until(job_t *job, 		/* I - Job to update */
 
 
 /*
- * End of "$Id: job.c,v 1.124.2.91 2004/07/02 20:49:23 mike Exp $".
+ * End of "$Id: job.c,v 1.124.2.92 2004/07/02 21:36:57 mike Exp $".
  */
