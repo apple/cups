@@ -3,6 +3,9 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.18
 
+	- The cupsaddsmb utility specified the wrong number of
+	  arguments to the adddriver command when adding the
+	  Win9x PostScript drivers.
 	- The web interface did not always report the correct
 	  error message.
 	- The scheduler did not clear the POSIX signal action
