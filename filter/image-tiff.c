@@ -1,5 +1,5 @@
 /*
- * "$Id: image-tiff.c,v 1.13 2000/03/21 04:03:27 mike Exp $"
+ * "$Id: image-tiff.c,v 1.14 2000/07/17 20:28:52 mike Exp $"
  *
  *   TIFF file routines for the Common UNIX Printing System (CUPS).
  *
@@ -139,6 +139,11 @@ ImageReadTIFF(image_t    *img,		/* IO - Image */
       img->xppi = 128;
       img->yppi = 128;
     }
+
+    fprintf(stderr, "DEBUG: TIFF resolution = %fx%f, units=%d\n",
+            xres, yres, resunit);
+    fprintf(stderr, "DEBUG: Stored resolution = %dx%d PPI\n",
+            img->xppi, img->yppi);
   }
 
  /*
@@ -1617,5 +1622,5 @@ ImageReadTIFF(image_t    *img,		/* IO - Image */
 
 
 /*
- * End of "$Id: image-tiff.c,v 1.13 2000/03/21 04:03:27 mike Exp $".
+ * End of "$Id: image-tiff.c,v 1.14 2000/07/17 20:28:52 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c,v 1.53 2000/07/17 12:31:54 mike Exp $"
+ * "$Id: util.c,v 1.54 2000/07/17 20:28:52 mike Exp $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -29,8 +29,10 @@
  *   cupsGetDefault()    - Get the default printer or class.
  *   cupsGetPPD()        - Get the PPD file for a printer.
  *   cupsGetPrinters()   - Get a list of printers.
+ *   cupsLastError()     - Return the last IPP error that occurred.
  *   cupsPrintFile()     - Print a file to a printer or class.
  *   cupsPrintFiles()    - Print one or more files to a printer or class.
+ *   cupsTempFile()      - Generate a temporary filename.
  *   cups_connect()      - Connect to the specified host...
  *   cups_local_auth()   - Get the local authorization certificate if
  *                         available/applicable...
@@ -1408,5 +1410,5 @@ cups_local_auth(http_t *http)	/* I - Connection */
 
 
 /*
- * End of "$Id: util.c,v 1.53 2000/07/17 12:31:54 mike Exp $".
+ * End of "$Id: util.c,v 1.54 2000/07/17 20:28:52 mike Exp $".
  */
