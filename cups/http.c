@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.60 2000/02/29 20:34:39 mike Exp $"
+ * "$Id: http.c,v 1.61 2000/03/02 20:19:08 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -458,7 +458,7 @@ httpSeparate(const char *uri,		/* I - Universal Resource Identifier */
 	}
       }
       else
-	*port = 80;
+	*port = 631;
 
       strcpy(method, "http");
       username[0] = '\0';
@@ -1539,5 +1539,5 @@ http_send(http_t       *http,	/* I - HTTP data */
 
 
 /*
- * End of "$Id: http.c,v 1.60 2000/02/29 20:34:39 mike Exp $".
+ * End of "$Id: http.c,v 1.61 2000/03/02 20:19:08 mike Exp $".
  */
