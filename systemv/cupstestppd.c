@@ -1,5 +1,5 @@
 /*
- * "$Id: cupstestppd.c,v 1.35 2005/01/03 19:29:59 mike Exp $"
+ * "$Id: cupstestppd.c,v 1.36 2005/01/12 18:38:31 mike Exp $"
  *
  *   PPD test program for the Common UNIX Printing System (CUPS).
  *
@@ -320,7 +320,8 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 	errors ++;
       }
-      else if (ppdPageSize(ppd, attr->value) == NULL)
+      else if (ppdPageSize(ppd, attr->value) == NULL &&
+               strcmp(attr->value, "Unknown"))
       {
 	if (verbose >= 0)
 	{
@@ -352,7 +353,8 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 	errors ++;
       }
-      else if (ppdPageSize(ppd, attr->value) == NULL)
+      else if (ppdPageSize(ppd, attr->value) == NULL &&
+               strcmp(attr->value, "Unknown"))
       {
 	if (verbose >= 0)
 	{
@@ -1233,5 +1235,5 @@ usage(void)
 
 
 /*
- * End of "$Id: cupstestppd.c,v 1.35 2005/01/03 19:29:59 mike Exp $".
+ * End of "$Id: cupstestppd.c,v 1.36 2005/01/12 18:38:31 mike Exp $".
  */
