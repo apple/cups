@@ -1,4 +1,4 @@
-CHANGES.txt - 11/02/2000
+CHANGES.txt - 11/06/2000
 ------------------------
 
 CHANGES IN CUPS V1.1.5
@@ -73,6 +73,10 @@ CHANGES IN CUPS V1.1.5
 	  comparing the remote printer info, resulting in
 	  unnecessary updates of the printer attributes for
 	  remote printers.
+	- Added new mime.types rules to allow automatic raw
+	  printing of PCL and ESC/P files; PJL headers are
+	  parsed to differentiate between PostScript and
+	  PCL job files.
 
 
 CHANGES IN CUPS v1.1.4
