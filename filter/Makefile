@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.48 2001/08/06 19:37:10 mike Exp $"
+# "$Id: Makefile,v 1.49 2001/08/17 14:12:12 mike Exp $"
 #
 #   Filter makefile for the Common UNIX Printing System (CUPS).
 #
@@ -60,7 +60,7 @@ clean:
 
 install:
 	$(INSTALL_DIR) $(SERVERROOT)/filter
-	for file in $(TARGETS); do
+	for file in $(TARGETS); do \
 		$(INSTALL_BIN) $$file $(SERVERROOT)/filter; \
 	done
 	$(INSTALL_DIR) $(LIBDIR)
@@ -222,5 +222,5 @@ $(OBJS):	../Makedefs ../cups/cups.h ../cups/ppd.h ../cups/language.h
 
 
 #
-# End of "$Id: Makefile,v 1.48 2001/08/06 19:37:10 mike Exp $".
+# End of "$Id: Makefile,v 1.49 2001/08/17 14:12:12 mike Exp $".
 #

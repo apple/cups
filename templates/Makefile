@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.8 2001/07/19 20:17:58 mike Exp $"
+# "$Id: Makefile,v 1.9 2001/08/17 14:12:12 mike Exp $"
 #
 #   Template makefile for the Common UNIX Printing System (CUPS).
 #
@@ -92,11 +92,11 @@ clean:
 
 install:
 	$(INSTALL_DIR) $(DATADIR)/templates
-	for file in $(FILE); do \
+	for file in $(FILES); do \
 		$(INSTALL_DATA) $$file $(DATADIR)/templates; \
 	done
 
 
 #
-# End of "$Id: Makefile,v 1.8 2001/07/19 20:17:58 mike Exp $".
+# End of "$Id: Makefile,v 1.9 2001/08/17 14:12:12 mike Exp $".
 #
