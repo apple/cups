@@ -90,6 +90,18 @@ Package=<4>
 
 ###############################################################################
 
+Project: "restartspooler"=.\visualc\restartspooler.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
 Project: "zlib"="..\htmldoc-1.8\visualc\zlib.dsp" - Package Owner=<4>
 
 Package=<5>
