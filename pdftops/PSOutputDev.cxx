@@ -49,6 +49,7 @@ static char *prolog[] = {
   "% PDF special state",
   "/pdfDictSize 14 def",
   "/pdfSetup {",
+#if 0 /* NOT FOR CUPS */
   "  3 1 roll 2 array astore",
   "  /setpagedevice where {",
   "    pop 3 dict begin",
@@ -60,6 +61,9 @@ static char *prolog[] = {
   "  } {",
   "    pop pop",
   "  } ifelse",
+#else
+  "  pop pop pop",
+#endif /* 0 */
   "} def",
   "/pdfStartPage {",
   "  pdfDictSize dict begin",
