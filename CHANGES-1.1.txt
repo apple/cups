@@ -1,6 +1,16 @@
 CHANGES-1.1.txt
 ---------------
 
+CHANGES IN CUPS V1.1.19
+
+	- Added an additional response check in the scheduler to
+	  more quickly recover from denial-of-service attacks.
+	- The cupstestppd file was incorrectly installed in the
+	  /usr/sbin directory instead of /usr/bin.
+	- The EPM list file did not include the cupstestppd
+	  program or man page files.
+
+
 CHANGES IN CUPS V1.1.18
 
 	- Fixed a bug in the Set-Job-Attributes code in the

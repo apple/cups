@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.91.2.29 2002/12/13 16:33:18 mike Exp $"
+ * "$Id: client.c,v 1.91.2.30 2003/01/03 15:03:36 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -1519,7 +1519,7 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	  }
 
           if (con->request)
-            ProcessIPPRequest(con);
+	    return (ProcessIPPRequest(con));
 	}
         break;
 
@@ -2690,5 +2690,5 @@ pipe_command(client_t *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.91.2.29 2002/12/13 16:33:18 mike Exp $".
+ * End of "$Id: client.c,v 1.91.2.30 2003/01/03 15:03:36 mike Exp $".
  */
