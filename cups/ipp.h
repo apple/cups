@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.h,v 1.34 2001/01/22 15:03:25 mike Exp $"
+ * "$Id: ipp.h,v 1.35 2001/03/30 03:07:51 mike Exp $"
  *
  *   Internet Printing Protocol definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -203,6 +203,11 @@ typedef enum			/**** IPP status codes... ****/
   IPP_OK = 0x0000,
   IPP_OK_SUBST,
   IPP_OK_CONFLICT,
+  IPP_OK_IGNORED_SUBSCRIPTIONS,
+  IPP_OK_IGNORED_NOTIFICATIONS,
+  IPP_OK_TOO_MANY_EVENTS,
+  IPP_OK_BUT_CANCEL_SUBSCRIPTION,
+  IPP_REDIRECTION_OTHER_SITE = 0x300,
   IPP_BAD_REQUEST = 0x0400,
   IPP_FORBIDDEN,
   IPP_NOT_AUTHENTICATED,
@@ -222,6 +227,12 @@ typedef enum			/**** IPP status codes... ****/
   IPP_COMPRESSION_ERROR,
   IPP_DOCUMENT_FORMAT_ERROR,
   IPP_DOCUMENT_ACCESS_ERROR,
+  IPP_ATTRIBUTES_NOT_SETTABLE,
+  IPP_IGNORED_ALL_SUBSCRIPTIONS,
+  IPP_TOO_MANY_SUBSCRIPTIONS,
+  IPP_IGNORED_ALL_NOTIFICATIONS,
+  IPP_PRINT_SUPPORT_FILE_NOT_FOUND,
+
   IPP_INTERNAL_ERROR = 0x0500,
   IPP_OPERATION_NOT_SUPPORTED,
   IPP_SERVICE_UNAVAILABLE,
@@ -231,7 +242,8 @@ typedef enum			/**** IPP status codes... ****/
   IPP_NOT_ACCEPTING,
   IPP_PRINTER_BUSY,
   IPP_ERROR_JOB_CANCELLED,
-  IPP_MULTIPLE_JOBS_NOT_SUPPORTED
+  IPP_MULTIPLE_JOBS_NOT_SUPPORTED,
+  IPP_PRINTER_IS_DEACTIVATED
 } ipp_status_t;
 
 typedef unsigned char ipp_uchar_t;/**** Unsigned 8-bit integer/character ****/
@@ -359,5 +371,5 @@ extern void		_ipp_free_attr(ipp_attribute_t *);
 #endif /* !_CUPS_IPP_H_ */
 
 /*
- * End of "$Id: ipp.h,v 1.34 2001/01/22 15:03:25 mike Exp $".
+ * End of "$Id: ipp.h,v 1.35 2001/03/30 03:07:51 mike Exp $".
  */

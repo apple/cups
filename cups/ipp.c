@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.53 2001/03/27 20:54:14 mike Exp $"
+ * "$Id: ipp.c,v 1.54 2001/03/30 03:07:51 mike Exp $"
  *
  *   Internet Printing Protocol support functions for the Common UNIX
  *   Printing System (CUPS).
@@ -583,7 +583,11 @@ ippErrorString(ipp_status_t error)	/* I - Error status */
 		{
 		  "successful-ok",
 		  "successful-ok-ignored-or-substituted-attributes",
-		  "successful-ok-conflicting-attributes"
+		  "successful-ok-conflicting-attributes",
+		  "successful-ok-ignored-subscriptions",
+		  "successful-ok-ignored-notifications",
+		  "successful-ok-too-many-events",
+		  "successful-ok-but-cancel-subscription"
 		},
 		*status_400s[] =	/* Client errors */
 		{
@@ -605,7 +609,12 @@ ippErrorString(ipp_status_t error)	/* I - Error status */
 		  "client-error-compression-not-supported",
 		  "client-error-compression-error",
 		  "client-error-document-format-error",
-		  "client-error-document-access-error"
+		  "client-error-document-access-error",
+		  "client-error-attributes-not-settable",
+		  "client-error-ignored-all-subscriptions",
+		  "client-error-too-many-subscriptions",
+		  "client-error-ignored-all-notifications",
+		  "client-error-print-support-file-not-found"
 		},
 		*status_500s[] =	/* Server errors */
 		{
@@ -618,7 +627,8 @@ ippErrorString(ipp_status_t error)	/* I - Error status */
 		  "server-error-not-accepting-jobs",
 		  "server-error-busy",
 		  "server-error-job-canceled",
-		  "server-error-multiple-document-jobs-not-supported"
+		  "server-error-multiple-document-jobs-not-supported",
+		  "server-error-printer-is-deactivated"
 		};
 
 
@@ -626,11 +636,13 @@ ippErrorString(ipp_status_t error)	/* I - Error status */
   * See if the error code is a known value...
   */
 
-  if (error >= IPP_OK && error <= IPP_OK_CONFLICT)
+  if (error >= IPP_OK && error <= IPP_OK_BUT_CANCEL_SUBSCRIPTION)
     return (status_oks[error]);
-  else if (error >= IPP_BAD_REQUEST && error <= IPP_DOCUMENT_ACCESS_ERROR)
+  else if (error == IPP_REDIRECTION_OTHER_SERVER)
+    return ("redirection-other-server");
+  else if (error >= IPP_BAD_REQUEST && error <= IPP_PRINT_SUPPORT_FILE_NOT_FOUND)
     return (status_400s[error - IPP_BAD_REQUEST]);
-  else if (error >= IPP_INTERNAL_ERROR && error <= IPP_MULTIPLE_JOBS_NOT_SUPPORTED)
+  else if (error >= IPP_INTERNAL_ERROR && error <= IPP_PRINTER_IS_DEACTIVATED)
     return (status_500s[error - IPP_INTERNAL_ERROR]);
 
  /*
@@ -1858,5 +1870,5 @@ ipp_read(http_t        *http,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.53 2001/03/27 20:54:14 mike Exp $".
+ * End of "$Id: ipp.c,v 1.54 2001/03/30 03:07:51 mike Exp $".
  */

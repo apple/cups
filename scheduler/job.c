@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.121 2001/03/28 16:55:55 mike Exp $"
+ * "$Id: job.c,v 1.122 2001/03/30 03:07:53 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -23,30 +23,35 @@
  *
  * Contents:
  *
- *   AddJob()          - Add a new job to the job queue...
- *   CancelJob()       - Cancel the specified print job.
- *   CancelJobs()      - Cancel all jobs on the given printer or class.
- *   CheckJobs()       - Check the pending jobs and start any if the
- *                       destination is available.
- *   CleanJobs()       - Clean out old jobs.
- *   FindJob()         - Find the specified job.
- *   HoldJob()         - Hold the specified job.
- *   LoadAllJobs()     - Load all jobs from disk.
- *   LoadJob()         - Load a job from disk.
- *   MoveJob()         - Move the specified job to a different destination.
- *   ReleaseJob()      - Release the specified job.
- *   RestartJob()      - Restart the specified job.
- *   SaveJob()         - Save a job to disk.
- *   SetJobHoldUntil() - Set the hold time for a job...
- *   SetJobPriority()  - Set the priority of a job, moving it up/down in the
- *                       list as needed.
- *   StartJob()        - Start a print job.
- *   StopAllJobs()     - Stop all print jobs.
- *   StopJob()         - Stop a print job.
- *   UpdateJob()       - Read a status update from a job's filters.
- *   ipp_read_file()   - Read an IPP request from a file.
- *   ipp_write_file()  - Write an IPP request to a file.
- *   start_process()   - Start a background process.
+ *   AddJob()             - Add a new job to the job queue...
+ *   CancelJob()          - Cancel the specified print job.
+ *   CancelJobs()         - Cancel all jobs on the given printer or class.
+ *   CheckJobs()          - Check the pending jobs and start any if the
+ *                          destination is available.
+ *   CleanJobs()          - Clean out old jobs.
+ *   FindJob()            - Find the specified job.
+ *   GetPrinterJobCount() - Get the number of pending, processing,
+ *                          or held jobs in a printer or class.
+ *   GetUserJobCount()    - Get the number of pending, processing,
+ *                          or held jobs for a user.
+ *   HoldJob()            - Hold the specified job.
+ *   LoadAllJobs()        - Load all jobs from disk.
+ *   LoadJob()            - Load a job from disk.
+ *   MoveJob()            - Move the specified job to a different
+ *                          destination.
+ *   ReleaseJob()         - Release the specified job.
+ *   RestartJob()         - Restart the specified job.
+ *   SaveJob()            - Save a job to disk.
+ *   SetJobHoldUntil()    - Set the hold time for a job...
+ *   SetJobPriority()     - Set the priority of a job, moving it up/down
+ *                          in the list as needed.
+ *   StartJob()           - Start a print job.
+ *   StopAllJobs()        - Stop all print jobs.
+ *   StopJob()            - Stop a print job.
+ *   UpdateJob()          - Read a status update from a job's filters.
+ *   ipp_read_file()      - Read an IPP request from a file.
+ *   ipp_write_file()     - Write an IPP request to a file.
+ *   start_process()      - Start a background process.
  */
 
 /*
@@ -348,6 +353,48 @@ FindJob(int id)			/* I - Job ID */
       break;
 
   return (current);
+}
+
+
+/*
+ * 'GetPrinterJobCount()' - Get the number of pending, processing,
+ *                          or held jobs in a printer or class.
+ */
+
+int					/* O - Job count */
+GetPrinterJobCount(const char *dest)	/* I - Printer or class name */
+{
+  int	count;				/* Job count */
+  job_t	*job;				/* Current job */
+
+
+  for (job = Jobs, count = 0; job != NULL, job = job->next)
+    if (job->state->values[0].integer <= IPP_JOB_PROCESSING &&
+        strcasecmp(job->dest, dest) == 0)
+      count ++;
+
+  return (count);
+}
+
+
+/*
+ * 'GetUserJobCount()' - Get the number of pending, processing,
+ *                       or held jobs for a user.
+ */
+
+int					/* O - Job count */
+GetUserJobCount(const char *username)	/* I - Username */
+{
+  int	count;				/* Job count */
+  job_t	*job;				/* Current job */
+
+
+  for (job = Jobs, count = 0; job != NULL, job = job->next)
+    if (job->state->values[0].integer <= IPP_JOB_PROCESSING &&
+        strcmp(job->username, username) == 0)
+      count ++;
+
+  return (count);
 }
 
 
@@ -2794,5 +2841,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.121 2001/03/28 16:55:55 mike Exp $".
+ * End of "$Id: job.c,v 1.122 2001/03/30 03:07:53 mike Exp $".
  */

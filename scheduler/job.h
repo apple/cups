@@ -1,5 +1,5 @@
 /*
- * "$Id: job.h,v 1.24 2001/01/22 15:04:00 mike Exp $"
+ * "$Id: job.h,v 1.25 2001/03/30 03:07:54 mike Exp $"
  *
  *   Print job definitions for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -57,7 +57,9 @@ typedef struct job_str
 
 VAR int		JobHistory	VALUE(1);	/* Preserve job history? */
 VAR int		JobFiles	VALUE(0);	/* Preserve job files? */
-VAR int		MaxJobs		VALUE(0);	/* Max number of jobs */
+VAR int		MaxJobs		VALUE(0),	/* Max number of jobs */
+		MaxJobsPerUser	VALUE(0),	/* Max jobs per user */
+		MaxJobsPerPrinter VALUE(0);	/* Max jobs per printer */
 VAR int		JobAutoPurge	VALUE(0);	/* Automatically purge jobs */
 VAR int		NumJobs		VALUE(0);	/* Number of jobs in queue */
 VAR job_t	*Jobs		VALUE(NULL);	/* List of current jobs */
@@ -75,6 +77,8 @@ extern void	CheckJobs(void);
 extern void	CleanJobs(void);
 extern void	DeleteJob(int id);
 extern job_t	*FindJob(int id);
+extern int	GetPrinterJobCount(const char *dest);
+extern int	GetUserJobCount(const char *username);
 extern void	HoldJob(int id);
 extern void	LoadAllJobs(void);
 extern void	MoveJob(int id, const char *dest);
@@ -90,5 +94,5 @@ extern void	UpdateJob(job_t *job);
 
 
 /*
- * End of "$Id: job.h,v 1.24 2001/01/22 15:04:00 mike Exp $".
+ * End of "$Id: job.h,v 1.25 2001/03/30 03:07:54 mike Exp $".
  */

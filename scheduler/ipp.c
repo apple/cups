@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.125 2001/03/28 16:55:54 mike Exp $"
+ * "$Id: ipp.c,v 1.126 2001/03/30 03:07:52 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -1396,10 +1396,7 @@ add_queued_job_count(client_t  *con,	/* I - Client connection */
 
   dtype = p->type & CUPS_PRINTER_CLASS;
 
-  for (count = 0, job = Jobs; job != NULL; job = job->next)
-    if (strcmp(job->dest, p->name) == 0 && job->dtype == dtype &&
-        job->state->values[0].integer < IPP_JOB_STOPPED)
-      count ++;
+  count = GetPrinterJobCount(p->name);
 
   ippAddInteger(con->response, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
                 "queued-job-count", count);
@@ -1714,9 +1711,6 @@ check_quotas(client_t  *con,	/* I - Client connection */
   if (con == NULL || p == NULL)
     return (0);
 
-  if (p->num_users == 0 && p->k_limit == 0 && p->page_limit == 0)
-    return (1);
-
  /*
   * Figure out who is printing...
   */
@@ -1740,8 +1734,41 @@ check_quotas(client_t  *con,	/* I - Client connection */
     strcpy(username, "anonymous");
 
  /*
+  * Check global active job limits for printers and users...
+  */
+
+  if (MaxJobsPerPrinter)
+  {
+   /*
+    * Check if there are too many pending jobs on this printer...
+    */
+
+    if (GetPrinterJobCount(p->name) >= MaxJobsPerPrinter)
+    {
+      LogMessage(L_INFO, "Too many jobs for printer \"%s\"...", p->name);
+      return (0);
+    }
+  }
+
+  if (MaxJobsPerUser)
+  {
+   /*
+    * Check if there are too many pending jobs for this user...
+    */
+
+    if (GetUserJobCount() >= MaxJobsPerUser)
+    {
+      LogMessage(L_INFO, "Too many jobs for user \"%s\"...", username);
+      return (0);
+    }
+  }
+
+ /*
   * Check against users...
   */
+
+  if (p->num_users == 0 && p->k_limit == 0 && p->page_limit == 0)
+    return (1);
 
   if (p->num_users)
   {
@@ -5339,5 +5366,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.125 2001/03/28 16:55:54 mike Exp $".
+ * End of "$Id: ipp.c,v 1.126 2001/03/30 03:07:52 mike Exp $".
  */
