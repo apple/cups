@@ -1,5 +1,5 @@
 /*
- * "$Id: pstops.c,v 1.31 1999/11/17 20:20:52 mike Exp $"
+ * "$Id: pstops.c,v 1.32 1999/12/07 19:05:45 mike Exp $"
  *
  *   PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -378,6 +378,8 @@ main(int  argc,			/* I - Number of command-line arguments */
 	  tbytes -= nbytes;
 	}
       }
+      else if (strcmp(line, "%%Trailer") == 0 && level == 0)
+        break;
       else
       {
         if (!sloworder)
@@ -485,6 +487,13 @@ main(int  argc,			/* I - Number of command-line arguments */
 	while (copy < Copies && slowcollate);
       }
     }
+
+   /*
+    * Copy the trailer, if any...
+    */
+
+    while ((nbytes = fread(line, 1, sizeof(line), fp)) > 0)
+      fwrite(line, 1, nbytes, stdout);
   }
   else
   {
@@ -859,5 +868,5 @@ start_nup(int number)	/* I - Page number */
 
 
 /*
- * End of "$Id: pstops.c,v 1.31 1999/11/17 20:20:52 mike Exp $".
+ * End of "$Id: pstops.c,v 1.32 1999/12/07 19:05:45 mike Exp $".
  */
