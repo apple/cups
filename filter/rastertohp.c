@@ -1,5 +1,5 @@
 /*
- * "$Id: rastertohp.c,v 1.5 2000/03/21 04:03:28 mike Exp $"
+ * "$Id: rastertohp.c,v 1.6 2000/05/24 18:40:38 mike Exp $"
  *
  *   Hewlett-Packard Page Control Language filter for the Common UNIX
  *   Printing System (CUPS).
@@ -99,14 +99,72 @@ StartPage(cups_page_header_t *header)	/* I - Page header */
   */
 
   printf("\033&l6D\033&k12H");			/* Set 6 LPI, 10 CPI */
-  printf("\033&l%.2fP",				/* Set page length */
-         header->PageSize[1] / 12.0);
+
+  switch (header->PageSize[1])
+  {
+    case 540 : /* Monarch Envelope */
+        printf("\033&l80A");			/* Set page size */
+	break;
+
+    case 624 : /* DL Envelope */
+        printf("\033&l90A");			/* Set page size */
+	break;
+
+    case 649 : /* C5 Envelope */
+        printf("\033&l91A");			/* Set page size */
+	break;
+
+    case 684 : /* COM-10 Envelope */
+        printf("\033&l81A");			/* Set page size */
+	break;
+
+    case 709 : /* B5 Envelope */
+        printf("\033&l100A");			/* Set page size */
+	break;
+
+    case 756 : /* Executive */
+        printf("\033&l1A");			/* Set page size */
+	break;
+
+    case 792 : /* Letter */
+        printf("\033&l2A");			/* Set page size */
+	break;
+
+    case 842 : /* A4 */
+        printf("\033&l26A");			/* Set page size */
+	break;
+
+    case 1008 : /* Legal */
+        printf("\033&l3A");			/* Set page size */
+	break;
+
+    case 1191 : /* A3 */
+        printf("\033&l27A");			/* Set page size */
+	break;
+
+    case 1224 : /* Tabloid */
+        printf("\033&l6A");			/* Set page size */
+	break;
+
+    default :
+        printf("\033&l%.2fP", length / 12.0);	/* Set page length */
+	break;
+  }
+
   printf("\033&l%dX", header->NumCopies);	/* Set number copies */
+
   if (header->MediaPosition)
     printf("\033&l%dH", header->MediaPosition);	/* Set media position */
+
   if (header->cupsMediaType)
     printf("\033&l%dM",				/* Set media type */
            header->cupsMediaType);
+
+  if (header->Duplex)
+    printf("\033&l%dS",				/* Set duplex mode */
+           header->Duplex + header->Tumble);
+
+  printf("\033&l0L");				/* Turn off perforation skip */
 
  /*
   * Set graphics mode...
@@ -499,5 +557,5 @@ main(int  argc,		/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: rastertohp.c,v 1.5 2000/03/21 04:03:28 mike Exp $".
+ * End of "$Id: rastertohp.c,v 1.6 2000/05/24 18:40:38 mike Exp $".
  */

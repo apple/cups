@@ -365,6 +365,56 @@ suitable for portrait pages:
 <B>lpr -o sides=one-sided filename ENTER</B>
 </PRE></UL>
 
+<H2>Banner Options</H2>
+
+<P>The following options apply when printing all types of files.
+
+<H3>Selecting the Banner Page(s)</H3>
+
+<P>The <CODE>-o jobsheets=start,end</CODE> option sets the banner page(s) to
+use for a job:
+
+<UL><PRE>
+<B>lp -o job-sheets=none filename ENTER</B>
+<B>lp -o job-sheets=standard filename ENTER</B>
+<B>lpr -o job-sheets=classified,classified filename ENTER</B>
+</PRE></UL>
+
+<P>If only one banner file is specified, it will be printed before the
+files in the job. If a second banner file is specified, it is printed after
+the files in the job.
+
+<P>The available banner pages depend on the local system configuration; CUPS
+includes the following banner files:
+
+<UL>
+
+	<LI><CODE>none</CODE> - Do not produce a banner page.
+
+	<LI><CODE>classified</CODE> - A banner page with a "classified"
+	label at the top and bottom.
+
+	<LI><CODE>confidential</CODE> - A banner page with a
+	"confidential" label at the top and bottom.
+
+	<LI><CODE>secret</CODE> - A banner page with a "secret" label
+	at the top and bottom.
+
+	<LI><CODE>standard</CODE> - A banner page with no label at the
+	top and bottom.
+
+	<LI><CODE>topsecret</CODE> - A banner page with a "top secret"
+	label at the top and bottom.
+
+	<LI><CODE>unclassified</CODE> - A banner page with an
+	"unclassified" label at the top and bottom.
+
+</UL>
+
+<H2>Document Options</H2>
+
+<P>The following options apply when printing all types of files.
+
 <H3>Selecting a Range of Pages</H3>
 
 <P>The <CODE>-o page-ranges=pages</CODE> option selects a range of
@@ -612,7 +662,7 @@ print, while a value of 200 will make the colors extremely intense.
 <P>The <CODE>-o blackplot</CODE> option specifies that all pens should
 plot in black:
 
-<U><PRE>
+<UL><PRE>
 <B>lp -o blackplot filename ENTER</B>
 <B>lpr -o blackplot filename ENTER</B>
 </PRE></UL>
@@ -626,7 +676,7 @@ Hewlett Packard.
 <P>The <CODE>-o fitplot</CODE> option specifies that the plot should be
 scaled to fit on the page:
 
-<U><PRE>
+<UL><PRE>
 <B>lp -o fitplot filename ENTER</B>
 <B>lpr -o fitplot filename ENTER</B>
 </PRE></UL>
@@ -670,6 +720,25 @@ Specifying a pen width of 0 produces lines that are exactly 1 pixel wide.
 	</TD>
 </TR>
 </TABLE></CENTER>
+
+<H2>Raw or Unfiltered Output</H2>
+
+<P>The <CODE>-o raw</CODE> option allows you to send files directly to
+a printer without filtering. This is sometimes required when printing
+from applications that provide their own "printer drivers" for your
+printer:
+
+<UL><PRE>
+<B>lp -o raw filename ENTER</B>
+<B>lpr -o raw filename ENTER</B>
+</PRE></UL>
+
+<P>The <CODE>-l</CODE> option can also be used with the
+<CODE>lpr</CODE> command to send files directly to a printer:
+
+<UL><PRE>
+<B>lpr -l filename ENTER</B>
+</PRE></UL>
 
 
 <H1 ALIGN="RIGHT"><A NAME="SAVING_OPTIONS">4 - Saving Printer Options and Defaults</A></H1>
