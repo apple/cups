@@ -1,5 +1,5 @@
 /*
- * "$Id: cupstestppd.c,v 1.1.2.13 2003/02/19 17:38:37 mike Exp $"
+ * "$Id: cupstestppd.c,v 1.1.2.14 2003/02/20 03:50:36 mike Exp $"
  *
  *   PPD test program for the Common UNIX Printing System (CUPS).
  *
@@ -67,7 +67,8 @@ int				/* O - Exit status */
 main(int  argc,			/* I - Number of command-line arguments */
      char *argv[])		/* I - Command-line arguments */
 {
-  int		i, j, k, m;	/* Looping vars */
+  int		i, j, k, m, n;	/* Looping vars */
+  int		len;		/* Length of option name */
   char		*opt;		/* Option character */
   const char	*ptr;		/* Pointer into string */
   int		files;		/* Number of files */
@@ -81,6 +82,8 @@ main(int  argc,			/* I - Number of command-line arguments */
   ppd_size_t	*size;		/* Size record */
   ppd_group_t	*group;		/* UI group */
   ppd_option_t	*option;	/* Standard UI option */
+  ppd_group_t	*group2;	/* UI group */
+  ppd_option_t	*option2;	/* Standard UI option */
   ppd_choice_t	*choice;	/* Standard UI option choice */
   static char	*uis[] = { "BOOLEAN", "PICKONE", "PICKMANY" };
   static char	*sections[] = { "ANY", "DOCUMENT", "EXIT",
@@ -310,6 +313,11 @@ main(int  argc,			/* I - Number of command-line arguments */
 
       for (j = 0, group = ppd->groups; j < ppd->num_groups; j ++, group ++)
 	for (k = 0, option = group->options; k < group->num_options; k ++, option ++)
+	{
+	 /*
+	  * Verify that we have a default choice...
+	  */
+
 	  if (option->defchoice[0])
 	  {
 	    if (verbose > 0)
@@ -328,6 +336,36 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 	    errors ++;
 	  }
+
+         /*
+	  * Then verify that no other options share a common root name.
+	  */
+
+	  len = strlen(option->keyword);
+
+	  for (m = 0, group2 = ppd->groups;
+	       m < ppd->num_groups;
+	       m ++, group2 ++)
+	    for (n = 0, option2 = group2->options;
+	         n < group2->num_options;
+		 n ++, option2 ++)
+	      if (option != option2 &&
+	          len < strlen(option2->keyword) &&
+	          !strncmp(option->keyword, option2->keyword, len))
+	      {
+		if (verbose >= 0)
+		{
+		  if (!errors && !verbose)
+		    puts(" FAIL");
+
+		  printf("      **FAIL**  %s shares a common prefix with %s\n",
+		         option->keyword, option2->keyword);
+		  puts("                REF: Page 15, section 3.2.");
+        	}
+
+		errors ++;
+	      }
+	}
 
       if (ppdFindAttr(ppd, "FileVersion", NULL) != NULL)
       {
@@ -831,5 +869,5 @@ usage(void)
 
 
 /*
- * End of "$Id: cupstestppd.c,v 1.1.2.13 2003/02/19 17:38:37 mike Exp $".
+ * End of "$Id: cupstestppd.c,v 1.1.2.14 2003/02/20 03:50:36 mike Exp $".
  */

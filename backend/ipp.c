@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.38.2.23 2003/02/07 12:05:00 mike Exp $"
+ * "$Id: ipp.c,v 1.38.2.24 2003/02/20 03:50:33 mike Exp $"
  *
  *   IPP backend for the Common UNIX Printing System (CUPS).
  *
@@ -231,23 +231,6 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
     close(fd);
   }
-#ifdef __APPLE__
-  else if (strcasecmp(content_type, "application/pictwps") == 0)
-  {
-   /*
-    * Convert to PostScript...
-    */
-
-    if (run_pictwps_filter(argv, filename, sizeof(filename)))
-      return (1);
-
-   /*
-    * Change the MIME type to application/vnd.cups-postscript...
-    */
-
-    content_type = "application/postscript";
-  }
-#endif /* __APPLE__ */
   else
     strlcpy(filename, argv[6], sizeof(filename));
 
@@ -611,6 +594,35 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
     options     = NULL;
     num_options = cupsParseOptions(argv[5], 0, &options);
+
+#ifdef __APPLE__
+    if (content_type != NULL && strcasecmp(content_type, "application/pictwps") == 0)
+    {
+      if (format_sup != NULL)
+      {
+	for (i = 0; i < format_sup->num_values; i ++)
+	  if (strcasecmp(content_type, format_sup->values[i].string.text) == 0)
+	    break;
+      }
+
+      if (format_sup == NULL || i >= format_sup->num_values)
+      {
+       /*
+	* Remote doesn't support "application/pictwps" (i.e. it's not MacOS X)
+	* so convert the document to PostScript...
+	*/
+
+	if (run_pictwps_filter(argv, filename, sizeof(filename)))
+	  return (1);
+
+       /*
+	* Change the MIME type to application/postscript...
+	*/
+
+	content_type = "application/postscript";
+      }
+    }
+#endif /* __APPLE__ */
 
     if (content_type != NULL && format_sup != NULL)
     {
@@ -1137,5 +1149,5 @@ run_pictwps_filter(char **argv,			/* I - Command-line arguments */
 
 
 /*
- * End of "$Id: ipp.c,v 1.38.2.23 2003/02/07 12:05:00 mike Exp $".
+ * End of "$Id: ipp.c,v 1.38.2.24 2003/02/20 03:50:33 mike Exp $".
  */
