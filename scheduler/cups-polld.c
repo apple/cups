@@ -1,7 +1,7 @@
 /*
- * "$Id: cups-polld.c,v 1.1 2000/03/10 18:54:37 mike Exp $"
+ * "$Id: cups-polld.c,v 1.2 2000/03/10 20:11:42 mike Exp $"
  *
- *   Directory services routines for the Common UNIX Printing System (CUPS).
+ *   Polling daemon for the Common UNIX Printing System (CUPS).
  *
  *   Copyright 1997-2000 by Easy Software Products, all rights reserved.
  *
@@ -23,44 +23,76 @@
  *
  * Contents:
  *
- *   StartBrowsing()    - Start sending and receiving broadcast information.
- *   StopBrowsing()     - Stop sending and receiving broadcast information.
- *   UpdateBrowseList() - Update the browse lists for any new browse data.
- *   SendBrowseList()   - Send new browsing information.
- *   StartPolling()     - Start polling servers as needed.
- *   StopPolling()      - Stop polling servers as needed.
  */
 
 /*
  * Include necessary headers...
  */
 
-#include "cupsd.h"
+#include <cups/cups.h>
+#include <stdlib.h>
+#include <cups/language.h>
+#include <cups/string.h>
 
 
 /*
- * 'StartBrowsing()' - Start sending and receiving broadcast information.
+ * Local functions...
  */
 
-void
-StartBrowsing(void)
+int	poll_server(http_t *http, cups_lang_t *language, ipp_op_t op,
+	            int sock, int port);
+
+
+/*
+ * 'main()' - Open socks and poll until we are killed...
+ */
+
+int					/* O - Exit status */
+main(int  argc,				/* I - Number of command-line arguments */
+     char *argv[])			/* I - Command-line arguments */
 {
-  int			val;	/* Socket option value */
-  struct sockaddr_in	addr;	/* Broadcast address */
+  http_t		*http;		/* HTTP connection */
+  cups_lang_t		*language;	/* Language info */
+  int			interval;	/* Polling interval */
+  int			sock;		/* Browser sock */
+  int			port;		/* Browser port */
+  int			val;		/* Socket option value */
 
-
-  if (!Browsing)
-    return;
 
  /*
-  * Create the broadcast socket...
+  * The command-line must contain the following:
+  *
+  *    cups-polld server server-port interval port
   */
 
-  if ((BrowseSocket = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
+  if (argc != 5)
   {
-    LogMessage(L_ERROR, "StartBrowsing: Unable to create broadcast socket - %s.",
-               strerror(errno));
-    return;
+    fputs("Usage: cups-polld server server-port interval port\n", stderr);
+    return (1);
+  }
+
+  interval = atoi(argv[3]);
+  port     = atoi(argv[4]);
+
+ /*
+  * Open a connection to the server...
+  */
+
+  if ((http = httpConnect(argv[1], atoi(argv[2]))) == NULL)
+  {
+    perror("cups-polld");
+    return (1);
+  }
+
+ /*
+  * Open a broadcast sock...
+  */
+
+  if ((sock = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
+  {
+    perror("cups-polld");
+    httpClose(http);
+    return (1);
   }
 
  /*
@@ -68,501 +100,209 @@ StartBrowsing(void)
   */
 
   val = 1;
-  if (setsockopt(BrowseSocket, SOL_SOCKET, SO_BROADCAST, &val, sizeof(val)))
+  if (setsockopt(sock, SOL_SOCKET, SO_BROADCAST, &val, sizeof(val)))
   {
-    LogMessage(L_ERROR, "StartBrowsing: Unable to set broadcast mode - %s.",
-               strerror(errno));
+    perror("cups-polld");
 
-#if defined(WIN32) || defined(__EMX__)
-    closesocket(BrowseSocket);
-#else
-    close(BrowseSocket);
-#endif /* WIN32 || __EMX__ */
-
-    BrowseSocket = -1;
-    return;
+    close(sock);
+    httpClose(http);
+    return (1);
   }
 
  /*
-  * Bind the socket to browse port...
+  * Loop forever, asking for available printers and classes...
+  */
+
+  language = cupsLangDefault();
+
+  for (;;)
+  {
+    if (poll_server(http, language, CUPS_GET_PRINTERS, sock, port))
+      continue;
+
+    if (poll_server(http, language, CUPS_GET_CLASSES, sock, port))
+      continue;
+
+    sleep(interval);
+  }
+}
+
+
+/*
+ * 'poll_server()' - Poll the server for the given set of printers or classes.
+ */
+
+int					/* O - 0 for success, -1 on error */
+poll_server(http_t      *http,		/* I - HTTP connection */
+            cups_lang_t *language,	/* I - Language */
+	    ipp_op_t    op,		/* I - Operation code */
+	    int         sock,		/* I - Broadcast sock */
+	    int         port)		/* I - Broadcast port */
+{
+  ipp_t			*request,	/* Request data */
+			*response;	/* Response data */
+  ipp_attribute_t	*attr;		/* Current attribute */
+  const char		*uri,		/* printer-uri */
+			*info,		/* printer-info */
+			*location,	/* printer-location */
+			*make_model;	/* printer-make-and-model */
+  cups_ptype_t		type;		/* printer-type */
+  ipp_pstate_t		state;		/* printer-state */
+  struct sockaddr_in	addr;		/* Broadcast address */
+  char			packet[1540];	/* Data packet */
+
+
+ /*
+  * Broadcast to 127.0.0.1 (localhost)
   */
 
   memset(&addr, 0, sizeof(addr));
-  addr.sin_addr.s_addr = htonl(INADDR_ANY);
+  addr.sin_addr.s_addr = htonl(0x7f000001);
   addr.sin_family      = AF_INET;
-  addr.sin_port        = htons(BrowsePort);
-
-  if (bind(BrowseSocket, (struct sockaddr *)&addr, sizeof(addr)))
-  {
-    LogMessage(L_ERROR, "StartBrowsing: Unable to bind broadcast socket - %s.",
-               strerror(errno));
-
-#if defined(WIN32) || defined(__EMX__)
-    closesocket(BrowseSocket);
-#else
-    close(BrowseSocket);
-#endif /* WIN32 || __EMX__ */
-
-    BrowseSocket = -1;
-    return;
-  }
+  addr.sin_port        = htons(port);
 
  /*
-  * Finally, add the socket to the input selection set...
+  * Build a CUPS_GET_PRINTERS or CUPS_GET_CLASSES request, which requires
+  * only the attributes-charset and attributes-natural-language attributes.
   */
 
-  FD_SET(BrowseSocket, &InputSet);
-}
+  request = ippNew();
 
+  request->request.op.operation_id = op;
+  request->request.op.request_id   = 1;
 
-/*
- * 'StopBrowsing()' - Stop sending and receiving broadcast information.
- */
+  language = cupsLangDefault();
 
-void
-StopBrowsing(void)
-{
-  if (!Browsing)
-    return;
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
+               "attributes-charset", NULL, cupsLangEncoding(language));
+
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
+               "attributes-natural-language", NULL, language->language);
 
  /*
-  * Close the socket and remove it from the input selection set.
+  * Do the request and get back a response...
   */
 
-  if (BrowseSocket >= 0)
+  if ((response = cupsDoRequest(http, request, "/")) != NULL)
   {
-#if defined(WIN32) || defined(__EMX__)
-    closesocket(BrowseSocket);
-#else
-    close(BrowseSocket);
-#endif /* WIN32 || __EMX__ */
+    if (response->request.status.status_code > IPP_OK_CONFLICT)
+    {
+      fprintf(stderr, "cups-polld: get-%s failed: %s\n",
+              op == CUPS_GET_PRINTERS ? "printers" : "classes",
+              ippErrorString(response->request.status.status_code));
+      ippDelete(response);
+      return (-1);
+    }
 
-    FD_CLR(BrowseSocket, &InputSet);
-    BrowseSocket = 0;
-  }
-}
-
-
-/*
- * 'UpdateBrowseList()' - Update the browse lists for any new browse data.
- */
-
-void
-UpdateBrowseList(void)
-{
-  int		i;			/* Looping var */
-  int		len,			/* Length of name string */
-		offset;			/* Offset in name string */
-  int		bytes;			/* Number of bytes left */
-  char		packet[1540];		/* Broadcast packet */
-  cups_ptype_t	type;			/* Printer type */
-  ipp_pstate_t	state;			/* Printer state */
-  char		uri[HTTP_MAX_URI],	/* Printer URI */
-		method[HTTP_MAX_URI],	/* Method portion of URI */
-		username[HTTP_MAX_URI],	/* Username portion of URI */
-		host[HTTP_MAX_URI],	/* Host portion of URI */
-		resource[HTTP_MAX_URI],	/* Resource portion of URI */
-		info[IPP_MAX_NAME],	/* Information string */
-		location[IPP_MAX_NAME],	/* Location string */
-		make_model[IPP_MAX_NAME];/* Make and model string */
-  int		port;			/* Port portion of URI */
-  char		name[IPP_MAX_NAME],	/* Name of printer */
-		*hptr,			/* Pointer into hostname */
-		*sptr;			/* Pointer into ServerName */
-  printer_t	*p,			/* Printer information */
-		*pclass,		/* Printer class */
-		*first;			/* First printer in class */
-
-
- /*
-  * Read a packet from the browse socket...
-  */
-
-#ifdef DEBUG
-  struct sockaddr_in	addr;
-
-
-  len = sizeof(addr);
-  if ((bytes = recvfrom(BrowseSocket, packet, sizeof(packet), 0, 
-                        (struct sockaddr *)&addr, &len)) <= 0)
-  {
-    LogMessage(L_ERROR, "Browse recv failed - %s.",
-               strerror(errno));
-    LogMessage(L_ERROR, "Browsing turned off.");
-
-    StopBrowsing();
-    Browsing = 0;
-    return;
-  }
-
-  packet[bytes] = '\0';
-  printf("UpdateBrowseList: (%d bytes from %08x) %s", bytes,
-         ntohl(addr.sin_addr.s_addr), packet);
-#else
-  if ((bytes = recv(BrowseSocket, packet, sizeof(packet), 0)) <= 0)
-  {
-    LogMessage(L_ERROR, "Browse recv failed - %s.",
-               strerror(errno));
-    LogMessage(L_ERROR, "Browsing turned off.");
-
-    StopBrowsing();
-    Browsing = 0;
-    return;
-  }
-
-  packet[bytes] = '\0';
-#endif /* DEBUG */
-
-  location[0]   = '\0';
-  info[0]       = '\0';
-  make_model[0] = '\0';
-
-  if (sscanf(packet,
-             "%x%x%1023s%*[^\"]\"%127[^\"]%*[^\"]\"%127[^\"]%*[^\"]\"%127[^\"]",
-             &type, &state, uri, location, info, make_model) < 3)
-  {
-    LogMessage(L_WARN, "UpdateBrowseList: Garbled browse packet - %s",
-               packet);
-    return;
-  }
-
-  DEBUG_printf(("type=%x, state=%x, uri=\"%s\"\n"
-                "location=\"%s\", info=\"%s\", make_model=\"%s\"\n",
-	        type, state, uri, location, info, make_model));
-
- /*
-  * Pull the URI apart to see if this is a local or remote printer...
-  */
-
-  httpSeparate(uri, method, username, host, &port, resource);
-
-  DEBUG_printf(("host=\"%s\", ServerName=\"%s\"\n", host, ServerName));
-
-  if (strcasecmp(host, ServerName) == 0)
-    return;
-
- /*
-  * OK, this isn't a local printer; see if we already have it listed in
-  * the Printers list, and add it if not...
-  */
-
-  hptr = strchr(host, '.');
-  sptr = strchr(ServerName, '.');
-
-  if (hptr != NULL && sptr != NULL &&
-      strcasecmp(hptr, sptr) == 0)
-    *hptr = '\0';
-
-  if (type & CUPS_PRINTER_CLASS)
-  {
    /*
-    * Remote destination is a class...
+    * Loop through the printers or classes returned in the list...
     */
 
-    if (strncmp(resource, "/classes/", 9) == 0)
-      snprintf(name, sizeof(name), "%s@%s", resource + 9, host);
-    else
-      return;
-
-    if ((p = FindClass(name)) == NULL)
+    for (attr = response->attrs; attr != NULL; attr = attr->next)
     {
      /*
-      * Class doesn't exist; add it...
+      * Skip leading attributes until we hit a printer...
       */
 
-      p = AddClass(name);
+      while (attr != NULL && attr->group_tag != IPP_TAG_PRINTER)
+        attr = attr->next;
+
+      if (attr == NULL)
+        break;
 
      /*
-      * Force the URI to point to the real server...
+      * Pull the needed attributes from this printer...
       */
 
-      p->type = type;
-      strcpy(p->uri, uri);
-      strcpy(p->device_uri, uri);
-      strcpy(p->hostname, host);
+      uri        = NULL;
+      info       = "";
+      location   = "";
+      make_model = "";
+      type       = CUPS_PRINTER_REMOTE;
+      state      = IPP_PRINTER_IDLE;
 
-      strcpy(p->location, "Location Unknown");
-      strcpy(p->info, "No Information Available");
-      snprintf(p->make_model, sizeof(p->make_model), "Remote Class on %s",
-               host);
+      while (attr != NULL && attr->group_tag == IPP_TAG_PRINTER)
+      {
+        if (strcmp(attr->name, "printer-uri-supported") == 0 &&
+	    attr->value_tag == IPP_TAG_URI)
+	  uri = attr->values[0].string.text;
 
-      SetPrinterAttrs(p);
+        if (strcmp(attr->name, "printer-info") == 0 &&
+	    attr->value_tag == IPP_TAG_TEXT)
+	  info = attr->values[0].string.text;
+
+        if (strcmp(attr->name, "printer-location") == 0 &&
+	    attr->value_tag == IPP_TAG_TEXT)
+	  location = attr->values[0].string.text;
+
+        if (strcmp(attr->name, "printer-make-and-model") == 0 &&
+	    attr->value_tag == IPP_TAG_TEXT)
+	  make_model = attr->values[0].string.text;
+
+        if (strcmp(attr->name, "printer-state") == 0 &&
+	    attr->value_tag == IPP_TAG_ENUM)
+	  state = (ipp_pstate_t)attr->values[0].integer;
+
+        if (strcmp(attr->name, "printer-type") == 0 &&
+	    attr->value_tag == IPP_TAG_ENUM)
+	  type = (cups_ptype_t)attr->values[0].integer;
+
+        attr = attr->next;
+      }
+
+     /*
+      * See if we have everything needed...
+      */
+
+      if (uri == NULL)
+      {
+        if (attr == NULL)
+	  break;
+	else
+          continue;
+      }
+
+     /*
+      * See if this is a local printer or class...
+      */
+
+      if (!(type & CUPS_PRINTER_REMOTE))
+      {
+       /*
+	* Send the printer information...
+	*/
+
+	snprintf(packet, sizeof(packet), "%x %x %s \"%s\" \"%s\" \"%s\"\n",
+        	 type | CUPS_PRINTER_REMOTE, state, uri,
+		 location, info, make_model);
+        puts(packet);
+
+	if (sendto(sock, packet, strlen(packet), 0,
+	           (struct sockaddr *)&addr, sizeof(addr)) <= 0)
+	{
+	  perror("cups-polld");
+	  return (-1);
+	}
+      }
+
+      if (attr == NULL)
+        break;
     }
+
+    ippDelete(response);
   }
   else
   {
-   /*
-    * Remote destination is a printer...
-    */
-
-    if (strncmp(resource, "/printers/", 10) == 0)
-      snprintf(name, sizeof(name), "%s@%s", resource + 10, host);
-    else
-      return;
-
-    if ((p = FindPrinter(name)) == NULL)
-    {
-     /*
-      * Printer doesn't exist; add it...
-      */
-
-      p = AddPrinter(name);
-
-     /*
-      * Force the URI to point to the real server...
-      */
-
-      p->type = type;
-      strcpy(p->uri, uri);
-      strcpy(p->device_uri, uri);
-      strcpy(p->hostname, host);
-
-      strcpy(p->location, "Location Unknown");
-      strcpy(p->info, "No Information Available");
-      snprintf(p->make_model, sizeof(p->make_model), "Remote Printer on %s",
-               host);
-
-      SetPrinterAttrs(p);
-    }
+    fprintf(stderr, "cups-polld: get-%s failed: %s\n",
+            op == CUPS_GET_PRINTERS ? "printers" : "classes",
+            ippErrorString(cupsLastError()));
+    return (-1);
   }
 
- /*
-  * Update the state...
-  */
-
-  p->type        = type;
-  p->state       = state;
-  p->accepting   = state != IPP_PRINTER_STOPPED;
-  p->browse_time = time(NULL);
-
-  if (location[0])
-    strcpy(p->location, location);
-  if (info[0])
-    strcpy(p->info, info);
-  if (make_model[0])
-    strcpy(p->make_model, make_model);
-
- /*
-  * See if we have a default printer...  If not, make the first printer the
-  * default.
-  */
-
-  if (DefaultPrinter == NULL && Printers != NULL)
-    DefaultPrinter = Printers;
-
- /*
-  * Do auto-classing if needed...
-  */
-
-  if (ImplicitClasses)
-  {
-   /*
-    * Loop through all available printers and create classes as needed...
-    */
-
-    for (p = Printers, len = 0, offset = 0; p != NULL; p = p->next)
-    {
-     /*
-      * Skip classes...
-      */
-
-      if (p->type & CUPS_PRINTER_CLASS)
-      {
-        len = 0;
-        continue;
-      }
-
-     /*
-      * If len == 0, get the length of this printer name up to the "@"
-      * sign (if any).
-      */
-
-      if (len > 0 &&
-	  strncasecmp(p->name, name + offset, len) == 0 &&
-	  (p->name[len] == '\0' || p->name[len] == '@'))
-      {
-       /*
-	* We have more than one printer with the same name; see if
-	* we have a class, and if this printer is a member...
-	*/
-
-        if ((pclass = FindPrinter(name)) == NULL)
-	{
-	 /*
-	  * Need to add the class...
-	  */
-
-	  pclass = AddPrinter(name);
-	  pclass->type      |= CUPS_PRINTER_IMPLICIT;
-	  pclass->accepting = 1;
-	  pclass->state     = IPP_PRINTER_IDLE;
-
-          SetPrinterAttrs(pclass);
-
-          DEBUG_printf(("Added new class \"%s\", type = %x\n", name,
-	                pclass->type));
-	}
-
-        if (first != NULL)
-	{
-          for (i = 0; i < pclass->num_printers; i ++)
-	    if (pclass->printers[i] == first)
-	      break;
-
-          if (i >= pclass->num_printers)
-	    AddPrinterToClass(pclass, first);
-
-	  first = NULL;
-	}
-
-        for (i = 0; i < pclass->num_printers; i ++)
-	  if (pclass->printers[i] == p)
-	    break;
-
-        if (i >= pclass->num_printers)
-	  AddPrinterToClass(pclass, p);
-      }
-      else
-      {
-       /*
-        * First time around; just get name length and mark it as first
-	* in the list...
-	*/
-
-	if ((hptr = strchr(p->name, '@')) != NULL)
-	  len = hptr - p->name;
-	else
-	  len = strlen(p->name);
-
-        strncpy(name, p->name, len);
-	name[len] = '\0';
-	offset    = 0;
-
-	if ((pclass = FindPrinter(name)) != NULL &&
-	    !(pclass->type & CUPS_PRINTER_IMPLICIT))
-	{
-	 /*
-	  * Can't use same name as printer; add "Any" to the front of the
-	  * name...
-	  */
-
-          strcpy(name, "Any");
-          strncpy(name + 3, p->name, len);
-	  name[len + 3] = '\0';
-	  offset        = 3;
-	}
-
-	first = p;
-      }
-    }
-  }
+  return (0);
 }
 
 
 /*
- * 'SendBrowseList()' - Send new browsing information.
- */
-
-void
-SendBrowseList(void)
-{
-  int			i;	/* Looping var */
-  printer_t		*p,	/* Current printer */
-			*np;	/* Next printer */
-  time_t		ut,	/* Minimum update time */
-			to;	/* Timeout time */
-  int			bytes;	/* Length of packet */
-  char			packet[1453];
-				/* Browse data packet */
-
-
-  if (!Browsing || BrowseInterval == 0)
-    return;
-
- /*
-  * Compute the update time...
-  */
-
-  ut = time(NULL) - BrowseInterval;
-  to = time(NULL) - BrowseTimeout;
-
- /*
-  * Loop through all of the printers and send local updates as needed...
-  */
-
-  for (p = Printers; p != NULL; p = np)
-  {
-    np = p->next;
-
-    if (p->type & CUPS_PRINTER_REMOTE)
-    {
-     /*
-      * See if this printer needs to be timed out...
-      */
-
-      if (p->browse_time < to)
-      {
-        LogMessage(L_INFO, "Remote destination \"%s\" has timed out; deleting it...",
-	           p->name);
-        DeletePrinter(p);
-      }
-    }
-    else if (p->browse_time < ut && !(p->type & CUPS_PRINTER_IMPLICIT))
-    {
-     /*
-      * Need to send an update...
-      */
-
-      p->browse_time = time(NULL);
-
-      snprintf(packet, sizeof(packet), "%x %x %s \"%s\" \"%s\" \"%s\"\n",
-               p->type | CUPS_PRINTER_REMOTE, p->state, p->uri,
-	       p->location, p->info, p->make_model);
-
-      bytes = strlen(packet);
-      DEBUG_printf(("SendBrowseList: (%d bytes) %s", bytes, packet));
-
-     /*
-      * Send a packet to each browse address...
-      */
-
-      for (i = 0; i < NumBrowsers; i ++)
-	if (sendto(BrowseSocket, packet, bytes, 0,
-	           (struct sockaddr *)Browsers + i, sizeof(Browsers[0])) <= 0)
-	{
-	  LogMessage(L_ERROR, "SendBrowseList: sendto failed for browser %d - %s.",
-	             i + 1, strerror(errno));
-	  LogMessage(L_ERROR, "Browsing turned off.");
-
-	  StopBrowsing();
-	  Browsing = 0;
-	  return;
-	}
-    }
-  }
-}
-
-
-/*
- * 'StartPolling()' - Start polling servers as needed.
- */
-
-void
-StartPolling(void)
-{
-}
-
-
-/*
- * 'StopPolling()' - Stop polling servers as needed.
- */
-
-void
-StopPolling(void)
-{
-}
-
-
-/*
- * End of "$Id: cups-polld.c,v 1.1 2000/03/10 18:54:37 mike Exp $".
+ * End of "$Id: cups-polld.c,v 1.2 2000/03/10 20:11:42 mike Exp $".
  */
