@@ -1,5 +1,5 @@
 /*
- * "$Id: ipptest.c,v 1.4 2000/06/14 19:05:41 mike Exp $"
+ * "$Id: ipptest.c,v 1.5 2000/07/01 16:36:16 mike Exp $"
  *
  *   IPP test command for the Common UNIX Printing System (CUPS).
  *
@@ -23,7 +23,13 @@
  *
  * Contents:
  *
- *   main() - Parse options and do tests.
+ *   main()          - Parse options and do tests.
+ *   do_tests()      - Do tests as specified in the test file.
+ *   get_operation() - Get an IPP opcode from an operation name...
+ *   get_status()    - Get an IPP status from a status name...
+ *   get_tag()       - Get an IPP value or group tag from a name...
+ *   get_token()     - Get a token from a file.
+ *   print_attr()    - Print an attribute on the screen.
  */
 
 /*
@@ -54,6 +60,7 @@ ipp_op_t	get_operation(const char *);
 ipp_status_t	get_status(const char *);
 ipp_tag_t	get_tag(const char *);
 char		*get_token(FILE *, char *, int);
+void		print_attr(ipp_attribute_t *);
 
 
 /*
@@ -103,7 +110,7 @@ int					/* 1 = success, 0 = failure */
 do_tests(const char *uri,		/* I - URI to connect on */
          const char *testfile)		/* I - Test file to use */
 {
-  int		i, j;			/* Looping vars */
+  int		i;			/* Looping var */
   http_t	*http;			/* HTTP connection to server */
   char		method[HTTP_MAX_URI],	/* URI method */
 		userpass[HTTP_MAX_URI],	/* username:password */
@@ -367,92 +374,40 @@ do_tests(const char *uri,		/* I - URI to connect on */
         printf("        STATUS %x\n", response->request.status.status_code);
         printf("        (%s)\n",
 	       ippErrorString(response->request.status.status_code));
+	printf("        (%d bytes in response)\n", ippLength(response));
+
 	pass = 0;
       }
       else
       {
         for (i = 0; i < num_expects; i ++)
 	  if (ippFindAttribute(response, expects[i], IPP_TAG_ZERO) == NULL)
-	    break;
-
-	if (i < num_expects)
-	{
-	  printf("\b\b\b\b\bFAIL]\n");
-	  printf("        EXPECTED %s\n", expects[i]);
-	  pass = 0;
-	}
-        else
-	  printf("\b\b\b\b\bPASS]\n");
-
-	printf("        (%d bytes in response)\n", ippLength(response));
-
-        for (i = 0; i < num_expects; i ++)
-	  if ((attrptr = ippFindAttribute(response, expects[i], IPP_TAG_ZERO)) != NULL)
 	  {
-	    printf("        %s = ", expects[i]);
-
-	    switch (attrptr->value_tag)
+	    if (pass)
 	    {
-	      case IPP_TAG_INTEGER :
-	      case IPP_TAG_ENUM :
-	          for (j = 0; j < attrptr->num_values; j ++)
-		    printf("%d ", attrptr->values[j].integer);
-		  break;
-
-	      case IPP_TAG_BOOLEAN :
-	          for (j = 0; j < attrptr->num_values; j ++)
-		    if (attrptr->values[j].boolean)
-		      printf("true ");
-		    else
-		      printf("false ");
-		  break;
-
-	      case IPP_TAG_NOVALUE :
-		  printf("novalue");
-		  break;
-
-	      case IPP_TAG_RANGE :
-	          for (j = 0; j < attrptr->num_values; j ++)
-		    printf("%d-%d ", attrptr->values[j].range.lower,
-			   attrptr->values[j].range.upper);
-		  break;
-
-	      case IPP_TAG_RESOLUTION :
-	          for (j = 0; j < attrptr->num_values; j ++)
-		    printf("%dx%d%s ", attrptr->values[j].resolution.xres,
-			   attrptr->values[j].resolution.yres,
-			   attrptr->values[j].resolution.units == IPP_RES_PER_INCH ?
-			       "dpi" : "dpc");
-		  break;
-
-              case IPP_TAG_STRING :
-	      case IPP_TAG_TEXT :
-	      case IPP_TAG_NAME :
-	      case IPP_TAG_KEYWORD :
-	      case IPP_TAG_CHARSET :
-	      case IPP_TAG_URI :
-	      case IPP_TAG_MIMETYPE :
-	      case IPP_TAG_LANGUAGE :
-	          for (j = 0; j < attrptr->num_values; j ++)
-		    printf("\"%s\" ", attrptr->values[j].string.text);
-		  break;
-
-	      case IPP_TAG_TEXTLANG :
-	      case IPP_TAG_NAMELANG :
-	          for (j = 0; j < attrptr->num_values; j ++)
-		    printf("\"%s\",%s ", attrptr->values[j].string.text,
-		           attrptr->values[j].string.charset);
-		  break;
-
-              default :
-		  break; /* anti-compiler-warning-code */
+	      printf("\b\b\b\b\bFAIL]\n");
+	      printf("        (%d bytes in response)\n", ippLength(response));
+	      pass = 0;
 	    }
 
-	    putchar('\n');
+	    printf("        EXPECTED %s\n", expects[i]);
 	  }
-	  else
-	    printf("        %s is missing from response!\n", expects[i]);
+
+	if (pass)
+	{
+	  printf("\b\b\b\b\bPASS]\n");
+	  printf("        (%d bytes in response)\n", ippLength(response));
+
+          for (i = 0; i < num_expects; i ++)
+	    if ((attrptr = ippFindAttribute(response, expects[i], IPP_TAG_ZERO)) != NULL)
+	      print_attr(attrptr);
 	}
+	else
+	{
+	  for (attrptr = response->attrs; attrptr != NULL; attrptr = attrptr->next)
+	    print_attr(attrptr);
+	}
+      }
 
       ippDelete(response);
     }
@@ -716,5 +671,84 @@ get_token(FILE *fp,		/* I - File to read from */
 
 
 /*
- * End of "$Id: ipptest.c,v 1.4 2000/06/14 19:05:41 mike Exp $".
+ * 'print_attr()' - Print an attribute on the screen.
+ */
+
+void
+print_attr(ipp_attribute_t *attr)	/* I - Attribute to print */
+{
+  int		i;			/* Looping var */
+
+
+  if (attr->name == NULL)
+  {
+    puts("        -- separator --");
+    return;
+  }
+
+  printf("        %s = ", attr->name);
+
+  switch (attr->value_tag)
+  {
+    case IPP_TAG_INTEGER :
+    case IPP_TAG_ENUM :
+	for (i = 0; i < attr->num_values; i ++)
+	  printf("%d ", attr->values[i].integer);
+	break;
+
+    case IPP_TAG_BOOLEAN :
+	for (i = 0; i < attr->num_values; i ++)
+	  if (attr->values[i].boolean)
+	    printf("true ");
+	  else
+	    printf("false ");
+	break;
+
+    case IPP_TAG_NOVALUE :
+	printf("novalue");
+	break;
+
+    case IPP_TAG_RANGE :
+	for (i = 0; i < attr->num_values; i ++)
+	  printf("%d-%d ", attr->values[i].range.lower,
+		 attr->values[i].range.upper);
+	break;
+
+    case IPP_TAG_RESOLUTION :
+	for (i = 0; i < attr->num_values; i ++)
+	  printf("%dx%d%s ", attr->values[i].resolution.xres,
+		 attr->values[i].resolution.yres,
+		 attr->values[i].resolution.units == IPP_RES_PER_INCH ?
+		     "dpi" : "dpc");
+	break;
+
+    case IPP_TAG_STRING :
+    case IPP_TAG_TEXT :
+    case IPP_TAG_NAME :
+    case IPP_TAG_KEYWORD :
+    case IPP_TAG_CHARSET :
+    case IPP_TAG_URI :
+    case IPP_TAG_MIMETYPE :
+    case IPP_TAG_LANGUAGE :
+	for (i = 0; i < attr->num_values; i ++)
+	  printf("\"%s\" ", attr->values[i].string.text);
+	break;
+
+    case IPP_TAG_TEXTLANG :
+    case IPP_TAG_NAMELANG :
+	for (i = 0; i < attr->num_values; i ++)
+	  printf("\"%s\",%s ", attr->values[i].string.text,
+		 attr->values[i].string.charset);
+	break;
+
+    default :
+	break; /* anti-compiler-warning-code */
+  }
+
+  putchar('\n');
+}
+
+
+/*
+ * End of "$Id: ipptest.c,v 1.5 2000/07/01 16:36:16 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.80 2000/06/28 16:26:02 mike Exp $"
+ * "$Id: ipp.c,v 1.81 2000/07/01 16:36:15 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -1602,6 +1602,23 @@ copy_attrs(ipp_t           *to,		/* I - Destination request */
           break;
 
        default :
+          toattr = ippAddIntegers(to, fromattr->group_tag, fromattr->value_tag,
+	                          fromattr->name, fromattr->num_values, NULL);
+
+          for (i = 0; i < fromattr->num_values; i ++)
+	  {
+	    toattr->values[i].unknown.length = fromattr->values[i].unknown.length;
+
+	    if (toattr->values[i].unknown.length > 0)
+	    {
+	      if ((toattr->values[i].unknown.data = malloc(toattr->values[i].unknown.length)) == NULL)
+	        toattr->values[i].unknown.length = 0;
+	      else
+	        memcpy(toattr->values[i].unknown.data,
+		       fromattr->values[i].unknown.data,
+		       toattr->values[i].unknown.length);
+	    }
+	  }
           break; /* anti-compiler-warning-code */
     }
   }
@@ -4972,5 +4989,5 @@ validate_job(client_t        *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.80 2000/06/28 16:26:02 mike Exp $".
+ * End of "$Id: ipp.c,v 1.81 2000/07/01 16:36:15 mike Exp $".
  */
