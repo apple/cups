@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.89 2000/08/18 17:43:23 mike Exp $"
+ * "$Id: ipp.c,v 1.90 2000/08/21 15:07:18 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -264,7 +264,7 @@ ProcessIPPRequest(client_t *con)	/* I - Client connection */
 	* not "root" from a remote host...
 	*/
 
-        if ((username = ippFindAttribute(con->request, "requesting-user-name", IPP_NAME)) != NULL)
+        if ((username = ippFindAttribute(con->request, "requesting-user-name", IPP_TAG_NAME)) != NULL)
 	{
 	 /*
 	  * Check for root user...
@@ -5055,5 +5055,5 @@ validate_job(client_t        *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.89 2000/08/18 17:43:23 mike Exp $".
+ * End of "$Id: ipp.c,v 1.90 2000/08/21 15:07:18 mike Exp $".
  */
