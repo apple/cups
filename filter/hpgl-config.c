@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-config.c,v 1.28 2000/10/19 19:19:50 mike Exp $"
+ * "$Id: hpgl-config.c,v 1.29 2000/11/27 15:24:45 mike Exp $"
  *
  *   HP-GL/2 configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -518,6 +518,8 @@ PS_plot_size(int     num_params,	/* I - Number of parameters */
           PlotSize[0] = PageLength;
           PlotSize[1] = PageWidth;
 	}
+
+	PlotSizeSet = 0;
         break;
     case 1 : /* PS length ; */
         if (Rotation == 0 || Rotation == 180)
@@ -530,6 +532,8 @@ PS_plot_size(int     num_params,	/* I - Number of parameters */
           PlotSize[0] = 72.0f * params[0].value.number / 1016.0f;
           PlotSize[1] = 0.75f * PlotSize[0];
         }
+
+	PlotSizeSet = 1;
         break;
     case 2 : /* PS length, width ; */
        /*
@@ -556,6 +560,8 @@ PS_plot_size(int     num_params,	/* I - Number of parameters */
           PlotSize[0] = 72.0f * params[1].value.number / 1016.0f;
           PlotSize[1] = 72.0f * params[0].value.number / 1016.0f;
         }
+
+	PlotSizeSet = 1;
         break;
   }
 
@@ -631,5 +637,5 @@ SC_scale(int     num_params,	/* I - Number of parameters */
 
 
 /*
- * End of "$Id: hpgl-config.c,v 1.28 2000/10/19 19:19:50 mike Exp $".
+ * End of "$Id: hpgl-config.c,v 1.29 2000/11/27 15:24:45 mike Exp $".
  */

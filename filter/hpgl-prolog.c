@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-prolog.c,v 1.27 2000/06/28 18:35:24 mike Exp $"
+ * "$Id: hpgl-prolog.c,v 1.28 2000/11/27 15:24:45 mike Exp $"
  *
  *   HP-GL/2 prolog routines for for the Common UNIX Printing System (CUPS).
  *
@@ -153,7 +153,7 @@ Outputf(const char *format,	/* I - Printf-style string */
 
     landscape = 0;
 
-    if (!FitPlot)
+    if (!FitPlot && PlotSizeSet)
     {
      /*
       * Set the page size for this page...
@@ -403,5 +403,5 @@ Outputf(const char *format,	/* I - Printf-style string */
 
 
 /*
- * End of "$Id: hpgl-prolog.c,v 1.27 2000/06/28 18:35:24 mike Exp $".
+ * End of "$Id: hpgl-prolog.c,v 1.28 2000/11/27 15:24:45 mike Exp $".
  */
