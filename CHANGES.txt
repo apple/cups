@@ -1,5 +1,13 @@
-CHANGES.txt - 02/13/2002
+CHANGES.txt - 02/14/2002
 ------------------------
+
+CHANGES IN CUPS V1.1.15
+
+	- The cupsEncodeOptions() function now handles mixed
+	  integers and ranges.
+	- New translation guide for developers to provide native
+	  language support for CUPS.
+
 
 CHANGES IN CUPS V1.1.14
 
