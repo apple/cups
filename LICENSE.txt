@@ -8,34 +8,36 @@
                           Email: cups-info@cups.org
                           WWW: http://www.cups.org
 
+
 INTRODUCTION
 
-The Common UNIX Printing System(tm), or CUPS(tm), is provided under the GNU
+The Common UNIX Printing SystemTM, ("CUPSTM"), is provided under the GNU
 General Public License ("GPL") and GNU Library General Public License
 ("LGPL"), Version 2. A copy of these licenses follow this introduction.
 
 The GNU LGPL applies to the CUPS API library, located in the "cups"
 subdirectory of the CUPS source distribution and in the "/usr/include/cups"
-directory and "/usr/lib/libcups.so" or "/usr/lib32/libcups.so" files in the
-binary distributions.
+directory and "libcups.a", "libcups.sl", or "libcups.so" files in the binary
+distributions.
 
 The GNU GPL applies to the remainder of the CUPS distribution, including the
-"pstoraster" filter which is based upon GNU Ghostscript 5.50.
+"pstoraster" filter which is based upon GNU Ghostscript 5.50 and the
+"pdftops" filter which is based upon Xpdf 0.90.
 
 For those not familiar with the GNU GPL, the license basically allows you
 to:
 
-   * Use the CUPS software at no charge.
-   * Distribute verbatim copies of the software in source or binary form.
-   * Sell verbatim copies of the software for a media fee, or sell support
+   - Use the CUPS software at no charge.
+   - Distribute verbatim copies of the software in source or binary form.
+   - Sell verbatim copies of the software for a media fee, or sell support
      for the software.
-   * Distribute or sell printer drivers and filters that use the CUPS API so
-     long as source code is made available under the GPL.
+   - Distribute or sell printer drivers and filters that use CUPS so long as
+     source code is made available under the GPL.
 
 What this license does not allow you to do is make changes or add features
 to CUPS and then sell a binary distribution without source code. You must
 provide source for any new drivers, changes, or additions to the software,
-and all code must be provided under the GPL.
+and all code must be provided under the GPL or LGPL as appropriate.
 
 The GNU LGPL relaxes the "link-to" restriction, allowing you to develop
 applications that use the CUPS API library under other licenses and/or
@@ -57,12 +59,12 @@ BINARY DISTRIBUTION RIGHTS
 Easy Software Products also sells rights to the CUPS source code under a
 binary distribution license for vendors that are unable to release source
 code for their drivers, additions, and modifications to CUPS under the GNU
-GPL and LGPL. For pricing information please contact us at the address shown
-above.
+GPL and LGPL. For information please contact us at the address shown above.
 
 The Common UNIX Printing System provides a "pstoraster" filter that utilizes
-GNU GhostScript 5.50 to convert PostScript files into a stream of raster
-images. For binary distribution licensing of this software, please contact:
+the GNU GhostScript 5.50 core to convert PostScript files into a stream of
+raster images. For binary distribution licensing of this software, please
+contact:
 
      Miles Jones
      Director of Marketing
@@ -72,6 +74,13 @@ images. For binary distribution licensing of this software, please contact:
      Voice: +1.415.492.9861
      Fax: +1.415.492.9862
      EMail: info@arsoft.com
+
+The "pdftops" filter is based on the Xpdf 0.90 software. For binary
+distribution licensing of this software, please contact:
+
+     Derek B. Noonburg
+     Email: derekn@foolabs.com
+     WWW: http://www.foolabs.com/xpdf/
 
 
 SUPPORT
