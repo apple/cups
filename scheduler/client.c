@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.91.2.94 2004/09/09 15:10:29 mike Exp $"
+ * "$Id: client.c,v 1.91.2.95 2004/09/12 18:50:10 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -2188,7 +2188,7 @@ SendHeader(client_t    *con,	/* I - Client to send to */
     }
     else
     {
-      if (httpPrintf(HTTP(con), "WWW-Authenticate: Digest realm=\"CUPS\" "
+      if (httpPrintf(HTTP(con), "WWW-Authenticate: Digest realm=\"CUPS\", "
                                 "nonce=\"%s\"\r\n", con->http.hostname) < 0)
 	return (0);
     }
@@ -3425,5 +3425,5 @@ CDSAWriteFunc(SSLConnectionRef connection,	/* I  - SSL/TLS connection */
 
 
 /*
- * End of "$Id: client.c,v 1.91.2.94 2004/09/09 15:10:29 mike Exp $".
+ * End of "$Id: client.c,v 1.91.2.95 2004/09/12 18:50:10 mike Exp $".
  */
