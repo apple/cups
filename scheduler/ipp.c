@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.127.2.45 2003/03/04 21:42:18 mike Exp $"
+ * "$Id: ipp.c,v 1.127.2.46 2003/03/05 21:12:15 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -98,7 +98,7 @@ static int	check_quotas(client_t *con, printer_t *p);
 static void	copy_attribute(ipp_t *to, ipp_attribute_t *attr,
 		               int quickcopy);
 static void	copy_attrs(ipp_t *to, ipp_t *from, ipp_attribute_t *req,
-		           ipp_tag_t group);
+		           ipp_tag_t group, int quickcopy);
 static int	copy_banner(client_t *con, job_t *job, const char *name);
 static int	copy_file(const char *from, const char *to);
 static void	create_job(client_t *con, ipp_attribute_t *uri);
@@ -2064,7 +2064,8 @@ static void
 copy_attrs(ipp_t           *to,		/* I - Destination request */
            ipp_t           *from,	/* I - Source request */
            ipp_attribute_t *req,	/* I - Requested attributes */
-	   ipp_tag_t       group)	/* I - Group to copy */
+	   ipp_tag_t       group,	/* I - Group to copy */
+	   int             quickcopy)	/* I - Do a quick copy? */
 {
   int			i;		/* Looping var */
   ipp_attribute_t	*fromattr;	/* Source attribute */
@@ -2098,7 +2099,7 @@ copy_attrs(ipp_t           *to,		/* I - Destination request */
         continue;
     }
 
-    copy_attribute(to, fromattr, IPP_TAG_COPY);
+    copy_attribute(to, fromattr, quickcopy);
   }
 }
 
@@ -2999,7 +3000,7 @@ get_default(client_t *con)		/* I - Client connection */
   {
     copy_attrs(con->response, DefaultPrinter->attrs,
                ippFindAttribute(con->request, "requested-attributes",
-	                	IPP_TAG_KEYWORD), IPP_TAG_ZERO);
+	                	IPP_TAG_KEYWORD), IPP_TAG_ZERO, 0);
 
     con->response->request.status.status_code = IPP_OK;
   }
@@ -3024,7 +3025,7 @@ get_devices(client_t *con)		/* I - Client connection */
 
   copy_attrs(con->response, Devices,
              ippFindAttribute(con->request, "requested-attributes",
-	                      IPP_TAG_KEYWORD), IPP_TAG_ZERO);
+	                      IPP_TAG_KEYWORD), IPP_TAG_ZERO, IPP_TAG_COPY);
 
   con->response->request.status.status_code = IPP_OK;
 }
@@ -3198,7 +3199,7 @@ get_jobs(client_t        *con,		/* I - Client connection */
     * attribute that may be provided by the client.
     */
 
-    copy_attrs(con->response, job->attrs, requested, IPP_TAG_JOB);
+    copy_attrs(con->response, job->attrs, requested, IPP_TAG_JOB, 0);
 
     add_job_state_reasons(con, job);
 
@@ -3331,7 +3332,7 @@ get_job_attrs(client_t        *con,		/* I - Client connection */
   requested = ippFindAttribute(con->request, "requested-attributes",
 	                       IPP_TAG_KEYWORD);
 
-  copy_attrs(con->response, job->attrs, requested, IPP_TAG_JOB);
+  copy_attrs(con->response, job->attrs, requested, IPP_TAG_JOB, 0);
 
   add_job_state_reasons(con, job);
 
@@ -3358,7 +3359,7 @@ get_ppds(client_t *con)			/* I - Client connection */
 
   copy_attrs(con->response, PPDs,
              ippFindAttribute(con->request, "requested-attributes",
-	                      IPP_TAG_KEYWORD), IPP_TAG_ZERO);
+	                      IPP_TAG_KEYWORD), IPP_TAG_ZERO, IPP_TAG_COPY);
 
   con->response->request.status.status_code = IPP_OK;
 }
@@ -3439,7 +3440,7 @@ get_printer_attrs(client_t        *con,	/* I - Client connection */
 
   copy_attrs(con->response, printer->attrs,
              ippFindAttribute(con->request, "requested-attributes",
-	                      IPP_TAG_KEYWORD), IPP_TAG_ZERO);
+	                      IPP_TAG_KEYWORD), IPP_TAG_ZERO, 0);
 
   con->response->request.status.status_code = IPP_OK;
 }
@@ -3583,7 +3584,7 @@ get_printers(client_t *con,		/* I - Client connection */
 
       add_queued_job_count(con, printer);
 
-      copy_attrs(con->response, printer->attrs, requested, IPP_TAG_ZERO);
+      copy_attrs(con->response, printer->attrs, requested, IPP_TAG_ZERO, 0);
     }
 
   con->response->request.status.status_code = IPP_OK;
@@ -6149,5 +6150,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.127.2.45 2003/03/04 21:42:18 mike Exp $".
+ * End of "$Id: ipp.c,v 1.127.2.46 2003/03/05 21:12:15 mike Exp $".
  */
