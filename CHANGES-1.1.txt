@@ -3,6 +3,8 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.16
 
+	- Added a FilterNice directive which sets the priority
+	  of job filter processes that are run by the scheduler.
 	- Added Solaris x86 USB printer support.
 	- The USB backend now reports both the ulpt and unlpt
 	  devices under *BSD.

@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.h,v 1.36.2.6 2002/06/14 19:48:55 mike Exp $"
+ * "$Id: conf.h,v 1.36.2.7 2002/08/12 17:47:45 mike Exp $"
  *
  *   Configuration file definitions for the Common UNIX Printing System (CUPS)
  *   scheduler.
@@ -132,6 +132,8 @@ VAR int			ClassifyOverride	VALUE(0),
 					/* Max filter cost at any time */
 			FilterLevel		VALUE(0),
 					/* Current filter level */
+			FilterNice		VALUE(0),
+					/* Nice value for filters */
 			RootCertDuration	VALUE(300),
 					/* Root certificate update interval */
 			RunAsUser		VALUE(FALSE),
@@ -175,5 +177,5 @@ extern int	LogPage(job_t *job, const char *page);
 
 
 /*
- * End of "$Id: conf.h,v 1.36.2.6 2002/06/14 19:48:55 mike Exp $".
+ * End of "$Id: conf.h,v 1.36.2.7 2002/08/12 17:47:45 mike Exp $".
  */

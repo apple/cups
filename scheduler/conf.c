@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.77.2.13 2002/07/18 10:52:08 mike Exp $"
+ * "$Id: conf.c,v 1.77.2.14 2002/08/12 17:47:44 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -93,6 +93,7 @@ static var_t	variables[] =
   { "DocumentRoot",	DocumentRoot,		VAR_STRING,	sizeof(DocumentRoot) },
   { "ErrorLog",		ErrorLog,		VAR_STRING,	sizeof(ErrorLog) },
   { "FilterLimit",	&FilterLimit,		VAR_INTEGER,	0 },
+  { "FilterNice",	&FilterNice,		VAR_INTEGER,	0 },
   { "FontPath",		FontPath,		VAR_STRING,	sizeof(FontPath) },
   { "HideImplicitMembers", &HideImplicitMembers, VAR_BOOLEAN,	0 },
   { "ImplicitClasses",	&ImplicitClasses,	VAR_BOOLEAN,	0 },
@@ -323,6 +324,7 @@ ReadConfiguration(void)
 
   FilterLevel       = 0;
   FilterLimit       = 0;
+  FilterNice        = 0;
   HostNameLookups   = FALSE;
   ImplicitClasses   = TRUE;
   KeepAlive         = TRUE;
@@ -2024,5 +2026,5 @@ get_addr_and_mask(const char *value,	/* I - String from config file */
 
 
 /*
- * End of "$Id: conf.c,v 1.77.2.13 2002/07/18 10:52:08 mike Exp $".
+ * End of "$Id: conf.c,v 1.77.2.14 2002/08/12 17:47:44 mike Exp $".
  */

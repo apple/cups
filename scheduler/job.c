@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.124.2.26 2002/07/23 21:20:30 mike Exp $"
+ * "$Id: job.c,v 1.124.2.27 2002/08/12 17:47:45 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -2312,6 +2312,14 @@ start_process(const char *command,	/* I - Full path to command */
       close(fd);
 
    /*
+    * Change the priority of the process based on the FilterNice setting.
+    * (this is not done for backends...)
+    */
+
+    if (!root)
+      nice(FilterNice);
+
+   /*
     * Change user to something "safe"...
     */
 
@@ -2367,5 +2375,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.124.2.26 2002/07/23 21:20:30 mike Exp $".
+ * End of "$Id: job.c,v 1.124.2.27 2002/08/12 17:47:45 mike Exp $".
  */
