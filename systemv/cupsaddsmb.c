@@ -1,5 +1,5 @@
 /*
- * "$Id: cupsaddsmb.c,v 1.2 2001/11/09 17:19:44 mike Exp $"
+ * "$Id: cupsaddsmb.c,v 1.3 2001/12/18 21:08:21 mike Exp $"
  *
  *   "cupsaddsmb" command for the Common UNIX Printing System (CUPS).
  *
@@ -122,37 +122,32 @@ main(int  argc,		/* I - Number of command-line arguments */
 int					/* O - Status of command */
 do_samba_command(const char *command,	/* I - Command to run */
                  const char *args,	/* I - Argument(s) for command */
-                 const char *filename)	/* I - File to use as input */
+                 const char *subcmd)	/* I - Sub-command */
 {
   int		status;			/* Status of command */
-  char		temp[1024];		/* Command/prompt string */
+  char		temp[4096];		/* Command/prompt string */
   static const char *p = NULL;		/* Password data */
 
 
   for (status = 1;;)
   {
     if (p)
-      snprintf(temp, sizeof(temp), "%s -N -U \'%s%%%s\' %s <%s",
-               command, cupsUser(), p, args, filename ? filename : "/dev/null");
+      snprintf(temp, sizeof(temp), "%s -N -U\'%s%%%s\' %s -c \'%s\'",
+               command, cupsUser(), p, args, subcmd);
     else
-      snprintf(temp, sizeof(temp), "%s -N -U \'%s\' %s <%s",
-               command, cupsUser(), args, filename ? filename : "/dev/null");
+      snprintf(temp, sizeof(temp), "%s -N -U\'%s\' %s -c \'%s\'",
+               command, cupsUser(), args, subcmd);
 
     if (Verbosity)
+      printf("Running command: %s\n", temp);
+    else
     {
-      printf("Running the following command:\n\n    %s\n", temp);
-
-      if (filename)
-      {
-        char cat[1024];
-
-
-        puts("\nwith the following input:\n");
-
-        snprintf(cat, sizeof(cat), "cat %s", filename);
-        system(cat);
-      }
+      strncat(temp, " </dev/null >/dev/null 2>/dev/null", sizeof(temp) - 1);
+      temp[sizeof(temp) - 1] = '\0';
     }
+
+    if (Verbosity)
+      printf("Running the following command:\n\n    %s\n", temp);
     else
     {
       strncat(temp, " >/dev/null 2>/dev/null", sizeof(temp) - 1);
@@ -192,15 +187,11 @@ int				/* O - 0 on success, non-zero on error */
 export_dest(const char *dest)	/* I - Destination to export */
 {
   int		status;		/* Status of smbclient/rpcclient commands */
-  FILE		*fp;		/* File pointer for temp file */
-  char		tempfile[1024];	/* Temporary file for print commands */
   const char	*ppdfile;	/* PPD file for printer drivers */
-  char		command[1024];	/* Command to run */
+  char		command[1024],	/* Command to run */
+		subcmd[1024];	/* Sub-command */
   const char	*datadir;	/* CUPS_DATADIR */
 
-
-  /* Get a temporary file for our smbclient and rpcclient commands... */
-  cupsTempFile(tempfile, sizeof(tempfile));
 
   if ((datadir = getenv("CUPS_DATADIR")) == NULL)
     datadir = CUPS_DATADIR;
@@ -212,100 +203,84 @@ export_dest(const char *dest)	/* I - Destination to export */
     return (1);
   }
 
-  /* Write the smbclient commands needed for the Windows drivers... */
-  if ((fp = fopen(tempfile, "w")) == NULL)
-  {
-    fprintf(stderr, "ERROR: Unable to create temporary file \"%s\" for export - %s\n",
-	    tempfile, strerror(errno));
-    unlink(ppdfile);
-    return (2);
-  }
-
-  fputs("mkdir W32X86\n", fp);
-  fprintf(fp, "put %s W32X86/%s.PPD\n", ppdfile, dest);
-  fprintf(fp, "put %s/drivers/ADOBEPS5.DLL W32X86/ADOBEPS5.DLL\n",
-          datadir);
-  fprintf(fp, "put %s/drivers/ADOBEPSU.DLL W32X86/ADOBEPSU.DLL\n",
-          datadir);
-  fprintf(fp, "put %s/drivers/ADOBEPSU.HLP W32X86/ADOBEPSU.HLP\n",
-          datadir);
-  fputs("mkdir WIN40\n", fp);
-  fprintf(fp, "put %s WIN40/%s.PPD\n", ppdfile, dest);
-  fprintf(fp, "put %s/drivers/ADFONTS.MFM WIN40/ADFONTS.MFM\n",
-          datadir);
-  fprintf(fp, "put %s/drivers/ADOBEPS4.DRV WIN40/ADOBEPS4.DRV\n",
-          datadir);
-  fprintf(fp, "put %s/drivers/ADOBEPS4.HLP WIN40/ADOBEPS4.HLP\n",
-          datadir);
-  fprintf(fp, "put %s/drivers/DEFPRTR2.PPD WIN40/DEFPRTR2.PPD\n",
-          datadir);
-  fprintf(fp, "put %s/drivers/ICONLIB.DLL WIN40/ICONLIB.DLL\n",
-          datadir);
-  fprintf(fp, "put %s/drivers/PSMON.DLL WIN40/PSMON.DLL\n",
-          datadir);
-  fputs("quit\n", fp);
-
-  fclose(fp);
-
-  /* Run the smbclient command to copy the Windows drivers... */
+  /* Do the smbclient commands needed for the Windows drivers... */
   snprintf(command, sizeof(command), "smbclient //%s/print\\$", cupsServer());
 
-  if ((status = do_samba_command(command, "", tempfile)) != 0)
+  snprintf(subcmd, sizeof(subcmd),
+           "mkdir W32X86;"
+	   "put %s W32X86/%s.PPD;"
+	   "put %s/drivers/ADOBEPS5.DLL W32X86/ADOBEPS5.DLL;"
+	   "put %s/drivers/ADOBEPSU.DLL W32X86/ADOBEPSU.DLL;"
+	   "put %s/drivers/ADOBEPSU.HLP W32X86/ADOBEPSU.HLP",
+	   ppdfile, dest, datadir, datadir, datadir);
+
+  if ((status = do_samba_command(command, "", subcmd)) != 0)
   {
     fprintf(stderr, "ERROR: Unable to copy Windows printer driver files (%d)!\n",
             status);
     unlink(ppdfile);
-    unlink(tempfile);
+    return (3);
+  }
+
+  snprintf(subcmd, sizeof(subcmd),
+           "mkdir WIN40;"
+	   "put %s WIN40/%s.PPD;"
+	   "put %s/drivers/ADFONTS.MFM WIN40/ADFONTS.MFM;"
+	   "put %s/drivers/ADOBEPS4.DRV WIN40/ADOBEPS4.DRV;"
+	   "put %s/drivers/ADOBEPS4.HLP WIN40/ADOBEPS4.HLP;"
+	   "put %s/drivers/DEFPRTR2.PPD WIN40/DEFPRTR2.PPD;"
+	   "put %s/drivers/ICONLIB.DLL WIN40/ICONLIB.DLL;"
+	   "put %s/drivers/PSMON.DLL WIN40/PSMON.DLL;",
+	   ppdfile, dest, datadir, datadir, datadir,
+	   datadir, datadir, datadir);
+
+  if ((status = do_samba_command(command, "", subcmd)) != 0)
+  {
+    fprintf(stderr, "ERROR: Unable to copy Windows printer driver files (%d)!\n",
+            status);
+    unlink(ppdfile);
     return (3);
   }
 
   unlink(ppdfile);
 
-  /* Write the rpcclient commands needed for the Windows drivers... */
-  if ((fp = fopen(tempfile, "w")) == NULL)
-  {
-    fprintf(stderr, "ERROR: Unable to create temporary file \"%s\" for export - %s\n",
-            tempfile, strerror(errno));
-    unlink(tempfile);
-    return (4);
-  }
+  /* Do the rpcclient commands needed for the Windows drivers... */
+  snprintf(subcmd, sizeof(subcmd),
+           "adddriver \"Windows NT x86\" \"%s:ADOBEPS5.DLL:%s.PPD:ADOBEPSU.DLL:ADOBEPSU.HLP:NULL:RAW:NULL\"",
+	   dest, dest);
 
-  fprintf(fp, "adddriver \"Windows NT x86\" "
-              "\"%s:ADOBEPS5.DLL:%s.PPD:ADOBEPSU.DLL:ADOBEPSU.HLP:"
-	      "NULL:RAW:NULL\"\n",
-          dest, dest);
-  fprintf(fp, "addprinter %s %s \"%s\" \"\"\n", dest, dest, dest);
-
- /*
-  * MRS: For some reason, SAMBA doesn't like to install Win9x drivers
-  *      with aux files.  They are currently commented out but further
-  *      investigation is required...
-  */
-
-  fprintf(fp, "adddriver \"Windows 4.0\" "
-              "\"%s:ADOBEPS4.DRV:%s.PPD:NULL:ADOBEPS4.HLP:"
-	      "PSMON.DLL:RAW:NULL\"\n",
-	      /*"PSMON.DLL:RAW:ADFONTS.MFM,DEFPRTR2.PPD,ICONLIB.DLL\"\n",*/
-	      dest, dest);
-  fputs("quit\n", fp);
-
-  fclose(fp);
-
-  /* Run the rpcclient command to install the Windows drivers... */
-  if ((status = do_samba_command("rpcclient", cupsServer(), tempfile)) != 0)
+  if ((status = do_samba_command("rpcclient", cupsServer(), subcmd)) != 0)
   {
     fprintf(stderr, "ERROR: Unable to install Windows printer driver files (%d)!\n",
             status);
-    unlink(tempfile);
     return (5);
   }
 
-  unlink(tempfile);
+  snprintf(subcmd, sizeof(subcmd), "addprinter %s %s \"%s\" \"\"",
+	   dest, dest, dest);
+
+  if ((status = do_samba_command("rpcclient", cupsServer(), subcmd)) != 0)
+  {
+    fprintf(stderr, "ERROR: Unable to install Windows printer driver files (%d)!\n",
+            status);
+    return (5);
+  }
+
+  snprintf(subcmd, sizeof(subcmd),
+	   "adddriver \"Windows 4.0\" \"%s:ADOBEPS4.DRV:%s.PPD:NULL:ADOBEPS4.HLP:PSMON.DLL:RAW:ADFONTS.MFM,DEFPRTR2.PPD,ICONLIB.DLL\"",
+	   dest, dest);
+
+  if ((status = do_samba_command("rpcclient", cupsServer(), subcmd)) != 0)
+  {
+    fprintf(stderr, "ERROR: Unable to install Windows printer driver files (%d)!\n",
+            status);
+    return (5);
+  }
 
   return (0);
 }
 
 
 /*
- * End of "$Id: cupsaddsmb.c,v 1.2 2001/11/09 17:19:44 mike Exp $".
+ * End of "$Id: cupsaddsmb.c,v 1.3 2001/12/18 21:08:21 mike Exp $".
  */

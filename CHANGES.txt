@@ -41,6 +41,9 @@ CHANGES IN CUPS V1.1.13
 	  restarting cupsd.
 	- Added some more minor performance tweeks to the IPP
 	  protocol code to reduce copying and array indexing.
+	- The cupsaddsmb utility now uses the -c option with
+	  smbclient and rpcclient to avoid the read length limit
+	  for commands on the standard input.
 
 
 CHANGES IN CUPS V1.1.12
