@@ -1,0 +1,58 @@
+CHANGES.txt - 02/06/2005
+------------------------
+
+CHANGES IN CUPS V1.2.0b1
+
+	- Updated serial backend to scan for /dev/ttyC* as well
+	  as /dev/ttyc* for Cyclades serial ports (STR #1049)
+	- The scheduler could hang reading the job status under
+	  certain circumstances (STR #1068)
+	- The USB backend termination signal code was inverted
+	  (STR #1046)
+	- Moved enable and disable commands to sbindir to be
+	  consistent.
+	- Updated pdftops filter to Xpdf 3.00.03.
+	- Added new cupsRasterInterpretPPD() function for RIP
+	  filters to setup the raster page header from
+	  PostScript commands in a PPD file.
+	- The CUPS browsing protocol now offers a "delete" bit
+	  to remove printers as soon as they are deleted on the
+	  server or as soon as the server shuts down gracefully
+	  (STR #793)
+	- The CUPS_SERVER and ServerName directives (client.conf
+	  and ~/.cupsrc) may now contain names of the form
+	  "server:port" and "/path/to/domain/socket".
+	- The "cancel -u user" command now works for ordinary
+	  users (STR #751)
+	- Added test run support to "make test" target (STR #64)
+	- Added domain socket support (STR #656)
+	- Added BrowseLocalOptions directive to allow the
+	  administrator to add printer URI options to the browse
+	  URI, e.g. "encryption=required" (STR #732)
+	- Added BrowseRemoteOptions directive to allow the
+	  administrator to add standard URI options to the
+	  remote printer URI, e.g. "encryption=required" (STR
+	  #732)
+	- Now put "-I.." compiler option in front of all others
+	  to ensure that local CUPS headers are used before
+	  installed headers (STR #437)
+	- New cupsLangPrintf() and cupsLangPuts() for localized
+	  interfaces.
+	- Now support custom attributes and extended options in
+	  PPD files.
+	- Now provide functions to save PPD files.
+	- New policy mechanism allows per-operation and
+	  per-printer control over what users and groups are
+	  allowed to do various IPP operations.
+	- New error policy mechanism to control how aborted
+	  backend errors are handled by the scheduler
+	  (abort-job, retry-job, requeue-job, stop-printer)
+	- Updated the printer test page with a better color
+	  wheel and a separate grayscale ramp.
+	- A single backend process is now run to send all print
+	  data for a job.
+	- Backends and filters can now send and receive
+	  backchannel data over file descriptor 3.
+	- Updated the raster stream format to support more
+	  user-defined attributes and to do compression of the
+	  page data.

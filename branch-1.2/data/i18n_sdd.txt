@@ -1,0 +1,2337 @@
+
+    
+    WORKING DRAFT                                               Ira McDonald
+    <i18n_sdd.txt>                                            High North Inc
+    
+                      Common UNIX Printing System ("CUPS")
+             Internationalization Software Design Description v0.3
+    
+       Copyright (C) Easy Software Products (2002) - All Rights Reserved
+    
+    
+    Status of this Document 
+    
+    This document is an unapproved working draft and is incomplete in some
+    sections (see 'Ed Note:' comments).  
+    
+    
+    Abstract 
+    
+    This document provides general information and high-level design for the
+    Internationalization extensions for the Common UNIX Printing System
+    ("CUPS") Version 1.2.  This document also provides C language header
+    files and high-level pseudo-code for all new modules and external
+    functions.  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    McDonald                     June 20, 2002                      [Page 1]
+
+           CUPS Internationalization Software Design Description v0.3       
+
+                               Table of Contents
+    
+    1.  Scope ......................................................       4
+      1.1.  Identification .........................................       4
+      1.2.  System Overview ........................................       4
+      1.3.  Document Overview ......................................       4
+    2.  References .................................................       5
+      2.1.  CUPS References ........................................       5
+      2.2.  Other Documents ........................................       5
+    3.  Design Overview ............................................       7
+      3.1.  Transcoding - New ......................................       7
+        3.1.1.  transcode.h - Transcoding header ...................       7
+          3.1.1.1.  cups_cmap_t - SBCS Charmap Structure ...........      10
+          3.1.1.2.  cups_dmap_t - DBCS Charmap Structure ...........      11
+        3.1.2.  transcode.c - Transcoding module ...................      11
+          3.1.2.1.  cupsUtf8ToCharset() ............................      11
+          3.1.2.2.  cupsCharsetToUtf8() ............................      12
+          3.1.2.3.  cupsUtf8ToUtf16() ..............................      12
+          3.1.2.4.  cupsUtf16ToUtf8() ..............................      12
+          3.1.2.5.  cupsUtf8ToUtf32() ..............................      12
+          3.1.2.6.  cupsUtf32ToUtf8() ..............................      13
+          3.1.2.7.  cupsUtf16ToUtf32() .............................      13
+          3.1.2.8.  cupsUtf32ToUtf16() .............................      13
+          3.1.2.9.  Transcoding Utility Functions ..................      13
+            3.1.2.9.1.  cupsCharmapGet() ...........................      14
+            3.1.2.9.2.  cupsCharmapFree() ..........................      14
+            3.1.2.9.3.  cupsCharmapFlush() .........................      14
+      3.2.  Normalization - New ....................................      15
+        3.2.1.  normalize.h - Normalization header .................      15
+          3.2.1.1.  cups_normmap_t - Normalize Map Structure .......      22
+          3.2.1.2.  cups_foldmap_t - Case Fold Map Structure .......      22
+          3.2.1.3.  cups_propmap_t - Char Property Map Structure ...      23
+          3.2.1.4.  cups_prop_t - Char Property Structure ..........      23
+          3.2.1.5.  cups_breakmap_t - Line Break Map Structure .....      23
+          3.2.1.6.  cups_combmap_t - Combining Class Map Structure .      24
+          3.2.1.7.  cups_comb_t - Combining Class Structure ........      24
+        3.2.2.  normalize.c - Normalization module .................      24
+          3.2.2.1.  cupsUtf8Normalize() ............................      24
+          3.2.2.2.  cupsUtf32Normalize() ...........................      25
+          3.2.2.3.  cupsUtf8CaseFold() .............................      25
+          3.2.2.4.  cupsUtf32CaseFold() ............................      26
+          3.2.2.5.  cupsUtf8CompareCaseless() ......................      26
+          3.2.2.6.  cupsUtf32CompareCaseless() .....................      26
+          3.2.2.7.  cupsUtf8CompareIdentifier() ....................      27
+          3.2.2.8.  cupsUtf32CompareIdentifier() ...................      27
+          3.2.2.9.  cupsUtf32CharacterProperty() ...................      27
+          3.2.2.10.  Normalization Utility Functions ...............      28
+            3.2.2.10.1.  cupsNormalizeMapsGet() ....................      28
+            3.2.2.10.2.  cupsNormalizeMapsFree() ...................      28
+            3.2.2.10.3.  cupsNormalizeMapsFlush() ..................      28
+      3.3.  Language - Existing ....................................      29
+        3.3.1.  language.h - Language header .......................      29
+
+    McDonald                     June 20, 2002                      [Page 2]
+
+           CUPS Internationalization Software Design Description v0.3       
+
+        3.3.2.  language.c - Language module .......................      29
+          3.3.2.1.  cupsLangEncoding() - Existing ..................      29
+          3.3.2.2.  cupsLangFlush() - Existing .....................      29
+          3.3.2.3.  cupsLangFree() - Existing ......................      29
+          3.3.2.4.  cupsLangGet() - Existing .......................      30
+          3.3.2.5.  cupsLangPrintf() - New .........................      30
+          3.3.2.6.  cupsLangPuts() - New ...........................      30
+          3.3.2.7.  cupsEncodingName() - New .......................      31
+      3.4.  Common Text Filter - Existing ..........................      31
+        3.4.1.  textcommon.h - Common text filter header ...........      31
+          3.4.1.1.  lchar_t - Character/Attribute Structure ........      31
+        3.4.2.  textcommon.c - Common text filter ..................      32
+          3.4.2.1.  TextMain() - Existing ..........................      32
+          3.4.2.2.  compare_keywords() - Existing ..................      33
+          3.4.2.3.  getutf8() - Existing ...........................      33
+      3.5.  Text to PostScript Filter - Existing ...................      33
+        3.5.1.  texttops.c - Text to PostScript filter .............      33
+          3.5.1.1.  main() - Existing ..............................      33
+          3.5.1.2.  WriteEpilogue () - Existing ....................      34
+          3.5.1.3.  WritePage () - Existing ........................      34
+          3.5.1.4.  WriteProlog () - Existing ......................      34
+          3.5.1.5.  write_line() - Existing ........................      34
+          3.5.1.6.  write_string() - Existing ......................      34
+          3.5.1.7.  write_text() - Existing ........................      35
+    A.  Glossary ...................................................   A-1
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    McDonald                     June 20, 2002                      [Page 3]
+
+           CUPS Internationalization Software Design Description v0.3       
+
+    
+    
+    1.  Scope
+    
+    
+    
+    1.1.  Identification
+    
+    This document provides general information and high-level design for the
+    Internationalization extensions for the Common UNIX Printing System
+    ("CUPS") Version 1.2.  This document also provides C language header
+    files and high-level pseudo-code for all new modules and external
+    functions.  
+    
+    
+    1.2.  System Overview
+    
+    The CUPS Internationalization extensions provide multilingual support
+    via Unicode 3.2:2002 [UNICODE3.2] / ISO-10646-1:2000 [ISO10646-1] and a 
+    suite of local character sets (including all adopted parts of ISO-8859
+    and many MS Windows code pages) for CUPS 1.2.  
+    
+    The CUPS Internationalization extensions support UTF-8 [RFC2279] as the 
+    common stream-oriented representation of all character data.  UTF-8 is
+    defined in [ISO10646-1] and is further constrained (for integrity and
+    security) by [UNICODE3.2].  
+    
+    UTF-8 is the native character set of LDAPv3 [RFC2251], SLPv2 [RFC2608], 
+    IPP/1.1 [RFC2910] [RFC2911], and many other Internet protocols.  
+    
+    
+    1.3.  Document Overview
+    
+    
+    This software design description document is organized into the
+    following sections:  
+    
+    o   1 - Scope 
+    o   2 - References 
+    o   3 - Design Overview 
+    o   A - Glossary 
+
+
+
+
+
+
+
+
+
+
+
+
+    McDonald                     June 20, 2002                      [Page 4]
+
+           CUPS Internationalization Software Design Description v0.3       
+
+    
+    
+    2.  References
+    
+    
+    
+    2.1.  CUPS References
+    
+    See:  Section 2.1 'CUPS Documentation' of CUPS Software Design
+    Description.  
+    
+    
+    2.2.  Other Documents
+    
+    The following non-CUPS documents are referenced by this document.  
+    
+    [ANSI-X3.4] ANSI Coded Character Set - 7-bit American National Standard 
+    Code for Information Interchange, ANSI X3.4, 1986 (aka US-ASCII).  
+    
+    [GB2312] Code of Chinese Graphic Character Set for Information
+    Interchange, Primary Set, GB 2312, 1980.  
+    
+    [ISO639-1] Codes for the Representation of Names of Languages -- Part 1:
+    Alpha-2 Code, ISO/IEC 639-1, 2000.  
+    
+    [ISO639-2] Codes for the Representation of Names of Languages -- Part 2:
+    Alpha-3 Code, ISO/IEC 639-2, 1998.  
+    
+    [ISO646] Information Technology - ISO 7-bit Coded Character Set for
+    Information Interchange, ISO/IEC 646, 1991.  
+    
+    [ISO2022] Information Processing - ISO 7-bit and 8-bit Coded Character
+    Sets - Code Extension Techniques, ISO/IEC 2022, 1994.  (Technically
+    identical to ECMA-35.) 
+    
+    [ISO3166-1] Codes for the Representation of Names of Countries and their
+    Subdivisions, Part 1:  Country Codes, ISO/ISO 3166-1, 1997.  
+    
+    [ISO8859] Information Processing - 8-bit Single-Byte Code Graphic
+    Character Sets, ISO/IEC 8859-n, 1987-2001.  
+    
+    [ISO10646-1] Information Technology - Universal Multiple-Octet Code
+    Character Set (UCS) - Part 1:  Architecture and Basic Multilingual
+    Plane, ISO/IEC 10646-1, September 2000.  
+    
+    [ISO10646-2] Information Technology - Universal Multiple-Octet Code
+    Character Set (UCS) - Part 2:  Supplemental Planes, ISO/IEC 10646-2,
+    January 2001.  
+    
+    [RFC2119] Bradner.  Key words for use in RFCs to Indicate Requirement
+    Levels, RFC 2119, March 1997.  
+
+
+    McDonald                     June 20, 2002                      [Page 5]
+
+           CUPS Internationalization Software Design Description v0.3       
+
+    
+    [RFC2251] Whal, Howes, Kille.  Lightweight Directory Access Protocol
+    Version 3 (LDAPv3), RFC 2251, December 1997.  
+    
+    [RFC2277] Alvestrand.  IETF Policy on Character Sets and Languages, RFC
+    2277, January 1998.  
+    
+    [RFC2279] Yergeau.  UTF-8, a Transformation Format of ISO 10646, RFC
+    2279, January 1998.  
+    
+    [RFC2608] Guttman, Perkins, Veizades, Day.  Service Location Protocol
+    Version 2 (SLPv2), RFC 2608, June 1999.  
+    
+    [RFC2910] Herriot, Butler, Moore, Turner, Wenn.  Internet Printing
+    Protocol/1.1:  Encoding and Transport, RFC 2910, September 2000.  
+    
+    [RFC2911] Hastings, Herriot, deBry, Isaacson, Powell.  Internet Printing
+    Protocol/1.1:  Model and Semantics, RFC 2911, September 2000.  
+    
+    [UNICODE3.0] Unicode Consortium, Unicode Standard Version 3.0,
+    Addison-Wesley Developers Press, ISBN 0-201-61633-5, 2000.  
+    
+    [UNICODE3.1] Unicode Consortium, Unicode Standard Version 3.1 (UAX-27), 
+    May 2001.  
+    
+    [UNICODE3.2] Unicode Consortium, Unicode Standard Version 3.2 (UAX-28), 
+    March 2002.  
+    
+    [US-ASCII] See [ANSI-X3.4] above.  
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    McDonald                     June 20, 2002                      [Page 6]
+
+           CUPS Internationalization Software Design Description v0.3       
+
+    
+    
+    3.  Design Overview
+    
+    The CUPS Internationalization extensions are composed of several header 
+    files and modules which extend the Language functions in the existing
+    CUPS Application Programmers Interface (API).  
+    
+    
+    3.1.  Transcoding - New
+    
+    Initially, the CUPS Internationalization extensions will only support
+    SBCS (single-byte character set) transcoding.  But the design allows
+    future support for DBCS (double-byte character set) transcoding for CJK
+    (Chinese/Japanese/Korean) languages and the MBCS (multiple-byte
+    character set) compound sets that use escapes for charset switching.  
+    
+    In order to reduce code size and increase performance all conventional
+    'mapping files' (tables of values in legacy characters sets with their
+    corresponding Unicode scalar values) will ALSO be sorted and stored in
+    memory as reverse maps (for efficient conversion from Unicode scalar
+    values to their corresponding legacy character set values).  Transcoding
+    will be done directly by 2-level lookup (without any searching or
+    sorting).  
+    
+    [Ed Note:  CJK languages will be fairly costly in mapping table sizes,
+    because they have thousands (or tens of thousands) of codepoints.] 
+    
+    
+    
+    3.1.1.  transcode.h - Transcoding header
+    
+    /*
+     * "$Id: i18n_sdd.txt,v 1.1.2.1 2002/08/19 01:15:22 mike Exp $"
+     *
+     *   Transcoding support for the Common UNIX Printing System (CUPS).
+     *
+     *   Copyright 1997-2002 by Easy Software Products.
+     *
+     *   These coded instructions, statements, and computer programs are
+     *   the property of Easy Software Products and are protected by Federal
+     *   copyright law.  Distribution and use rights are outlined in the
+     *   file "LICENSE.txt" which should have been included with this file.
+     *   If this file is missing or damaged please contact Easy Software
+     *   Products at:
+     *
+     *       Attn: CUPS Licensing Information
+     *       Easy Software Products
+     *       44141 Airport View Drive, Suite 204
+     *       Hollywood, Maryland 20636-3111 USA
+     *
+     *       Voice: (301) 373-9603
+
+    McDonald                     June 20, 2002                      [Page 7]
+
+           CUPS Internationalization Software Design Description v0.3       
+
+     *       EMail: cups-info@cups.org
+     *         WWW: http://www.cups.org
+     */
+    
+    #ifndef _CUPS_TRANSCODE_H_
+    #  define _CUPS_TRANSCODE_H_
+    
+    /*
+     * Include necessary headers...
+     */
+    
+    #  include "cups/language.h"
+    
+    #  ifdef __cplusplus
+    extern "C" {
+    #  endif /* __cplusplus */
+    
+    /*
+     * Types...
+     */
+    
+    typedef unsigned char  utf8_t;  /* UTF-8 Unicode/ISO-10646 code unit */
+    typedef unsigned short utf16_t; /* UTF-16 Unicode/ISO-10646 code unit */
+    typedef unsigned long  utf32_t; /* UTF-32 Unicode/ISO-10646 code unit */
+    typedef unsigned short ucs2_t;  /* UCS-2 Unicode/ISO-10646 code unit */
+    typedef unsigned long  ucs4_t;  /* UCS-4 Unicode/ISO-10646 code unit */
+    typedef unsigned char  sbcs_t;  /* SBCS Legacy 8-bit code unit */
+    typedef unsigned short dbcs_t;  /* DBCS Legacy 16-bit code unit */
+    
+    /*
+     * Structures...
+     */
+    
+    typedef struct cups_cmap_str    /**** SBCS Charmap Cache Structure ****/
+    {
+      struct cups_cmap_str  *next;          /* Next charmap in cache */
+      int                   used;           /* Number of times entry used */
+      cups_encoding_t       encoding;       /* Legacy charset encoding */
+      ucs2_t                char2uni[256];  /* Map Legacy SBCS -> UCS-2 */
+      sbcs_t                *uni2char[256]; /* Map UCS-2 -> Legacy SBCS */
+    } cups_cmap_t;
+    
+    #if 0
+    typedef struct cups_dmap_str    /**** DBCS Charmap Cache Structure ****/
+    {
+      struct cups_dmap_str  *next;          /* Next charmap in cache */
+      int                   used;           /* Number of times entry used */
+      cups_encoding_t       encoding;       /* Legacy charset encoding */
+      ucs2_t                *char2uni[256]; /* Map Legacy DBCS -> UCS-2 */
+      dbcs_t                *uni2char[256]; /* Map UCS-2 -> Legacy DBCS */
+    } cups_dmap_t;
+    #endif
+
+    McDonald                     June 20, 2002                      [Page 8]
+
+           CUPS Internationalization Software Design Description v0.3       
+
+    
+    /*
+     * Constants...
+     */
+    #define CUPS_MAX_USTRING    1024    /* Maximum size of Unicode string */
+    
+    /*
+     * Globals...
+     */
+    
+    extern int      TcFixMapNames;  /* Fix map names to Unicode names */
+    extern int      TcStrictUtf8;   /* Non-shortest-form is illegal */
+    extern int      TcStrictUtf16;  /* Invalid surrogate pair is illegal */
+    extern int      TcStrictUtf32;  /* Greater than 0x10FFFF is illegal */
+    extern int      TcRequireBOM;   /* Require BOM for little/big-endian */
+    extern int      TcSupportBOM;   /* Support BOM for little/big-endian */
+    extern int      TcSupport8859;  /* Support ISO 8859-x repertoires */
+    extern int      TcSupportWin;   /* Support Windows-x repertoires */
+    extern int      TcSupportCJK;   /* Support CJK (Asian) repertoires */
+    
+    /*
+     * Prototypes...
+     */
+    
+    /*
+     * Utility functions for character set maps
+     */
+    extern void     *cupsCharmapGet(const cups_encoding_t encoding);
+                                                    /* I - Encoding */
+    extern void     cupsCharmapFree(const cups_encoding_t encoding);
+                                                    /* I - Encoding */
+    extern void     cupsCharmapFlush(void);
+    
+    /*
+     * Convert UTF-8 to and from legacy character set
+     */
+    extern int      cupsUtf8ToCharset(char *dest,   /* O - Target string */
+                        const utf8_t *src,          /* I - Source string */
+                        const int maxout,           /* I - Max output */
+                        cups_encoding_t encoding);  /* I - Encoding */
+    extern int      cupsCharsetToUtf8(utf8_t *dest, /* O - Target string */
+                        const char *src,            /* I - Source string */
+                        const int maxout,           /* I - Max output */
+                        cups_encoding_t encoding);  /* I - Encoding */
+    
+    /*
+     * Convert UTF-8 to and from UTF-16
+     */
+    extern int      cupsUtf8ToUtf16(utf16_t *dest,  /* O - Target string */
+                        const utf8_t *src,          /* I - Source string */
+                        const int maxout);          /* I - Max output */
+    extern int      cupsUtf16ToUtf8(utf8_t *dest,   /* O - Target string */
+
+    McDonald                     June 20, 2002                      [Page 9]
+
+           CUPS Internationalization Software Design Description v0.3       
+
+                        const utf16_t *src,         /* I - Source string */
+                        const int maxout);          /* I - Max output */
+    
+    /*
+     * Convert UTF-8 to and from UTF-32
+     */
+    extern int      cupsUtf8ToUtf32(utf32_t *dest,  /* O - Target string */
+                        const utf8_t *src,          /* I - Source string */
+                        const int maxout);          /* I - Max output */
+    extern int      cupsUtf32ToUtf8(utf8_t *dest,   /* O - Target string */
+                        const utf32_t *src,         /* I - Source string */
+                        const int maxout);          /* I - Max output */
+    
+    /*
+     * Convert UTF-16 to and from UTF-32
+     */
+    extern int      cupsUtf16ToUtf32(utf32_t *dest, /* O - Target string */
+                        const utf16_t *src,         /* I - Source string */
+                        const int maxout);          /* I - Max output */
+    extern int      cupsUtf32ToUtf16(utf16_t *dest, /* O - Target string */
+                        const utf32_t *src,         /* I - Source string */
+                        const int maxout);          /* I - Max output */
+    
+    #  ifdef __cplusplus
+    }
+    #  endif /* __cplusplus */
+    
+    #endif /* !_CUPS_TRANSCODE_H_ */
+    
+    /*
+     * End of "$Id: i18n_sdd.txt,v 1.1.2.1 2002/08/19 01:15:22 mike Exp $"
+     */
+    
+    
+    
+    3.1.1.1.  cups_cmap_t - SBCS Charmap Structure
+    
+    typedef struct cups_cmap_str    /**** SBCS Charmap Cache Structure ****/
+    {
+      struct cups_cmap_str  *next;          /* Next charset map in cache */
+      int                   used;           /* Number of times entry used */
+      cups_encoding_t       encoding;       /* Legacy charset encoding */
+      ucs2_t                char2uni[256];  /* Map Legacy SBCS -> UCS-2 */
+      sbcs_t                *uni2char[256]; /* Map UCS-2 -> Legacy SBCS */
+    } cups_cmap_t;
+    
+    'char2uni[]' is a (complete) array of UCS-2 values that supports direct 
+    one-level lookup from an input SBCS legacy charset code point, for use
+    by 'cupsCharsetToUtf8()'.  
+    
+    'uni2char[]' is a (sparse) array of pointers to arrays of (256 each)
+    SBCS values, that supports direct two-level lookup from an input UCS-2
+
+    McDonald                     June 20, 2002                     [Page 10]
+
+           CUPS Internationalization Software Design Description v0.3       
+
+    code point, for use by 'cupsUtf8ToCharset()'.  
+    
+    
+    
+    3.1.1.2.  cups_dmap_t - DBCS Charmap Structure
+    
+    typedef struct cups_dmap_str    /**** DBCS Charmap Cache Structure ****/
+    {
+      struct cups_dmap_str  *next;          /* Next charset map in cache */
+      int                   used;           /* Number of times entry used */
+      cups_encoding_t       encoding;       /* Legacy charset encoding */
+      ucs2_t                *char2uni[256]; /* Map Legacy DBCS -> UCS-2 */
+      dbcs_t                *uni2char[256]; /* Map UCS-2 -> Legacy DBCS */
+    } cups_dmap_t;
+    
+    'char2uni[]' is a (sparse) array of pointers to arrays of (256 each)
+    UCS-2 values that supports direct two-level lookup from an input DBCS
+    legacy charset code point, for (future) use by 'cupsCharsetToUtf8()'.  
+    
+    'uni2char[]' is a (sparse) array of pointers to arrays of (256 each)
+    DBCS values, that supports direct two-level lookup from an input UCS-2
+    code point, for (future) use by 'cupsUtf8ToCharset()'.  
+    
+    
+    
+    3.1.2.  transcode.c - Transcoding module
+    
+    All of the transcoding functions are modelled on the C standard library 
+    function 'strncpy()', except that they return the count of output, like
+    'strlen()', rather than the (redundant) pointer to the output.  
+    
+    If the transcoding functions detect invalid input parameters or they
+    detect an encoding error in their input, then they return '-1', rather
+    than the count of output.  
+    
+    All of the transcoding functions take an input parameter indicating the 
+    maximum output units (for safe operation).  The functions that return
+    16-bit (UTF-16) or 32-bit (UTF-32/UCS-4) output always return the output
+    string count (not including the final null) and NOT the memory size in
+    bytes.  
+    
+    
+    
+    3.1.2.1.  cupsUtf8ToCharset()
+    
+    extern int      cupsUtf8ToCharset(char *dest,   /* O - Target string */
+                        const utf8_t *src,          /* I - Source string */
+                        const int maxout,           /* I - Max output */
+                        cups_encoding_t encoding);  /* I - Encoding */
+    
+    <Find charset map by calling 'cupsCharmapGet()'>
+    <Convert input UTF-8 to internal UCS-4 by calling 'cupsUtf8ToUtf32()'>
+
+    McDonald                     June 20, 2002                     [Page 11]
+
+           CUPS Internationalization Software Design Description v0.3       
+
+    <Convert internal UCS-4 to legacy charset via charset map>
+    <Release charset map by calling 'cupsCharmapFree()'>
+    <Return length of output legacy charset string -- size in butes>
+    
+    
+    
+    3.1.2.2.  cupsCharsetToUtf8()
+    
+    extern int      cupsCharsetToUtf8(utf8_t *dest, /* O - Target string */
+                        const char *src,            /* I - Source string */
+                        const int maxout,           /* I - Max output */
+                        cups_encoding_t encoding);  /* I - Encoding */
+    
+    <Find charset map by calling 'cupsCharmapGet()'>
+    <Convert input legacy charset to internal UCS-4 via charset map>
+    <Convert internal UCS-4 to UTF-8 by calling 'cupsUtf32ToUtf8()'>
+    <Release charset map by calling 'cupsCharmapFree()'>
+    <Return length of output UTF-8 string -- size in bytes>
+    
+    
+    
+    3.1.2.3.  cupsUtf8ToUtf16()
+    
+    extern int      cupsUtf8ToUtf16(utf16_t *dest,  /* O - Target string */
+                        const utf8_t *src,          /* I - Source string */
+                        const int maxout);          /* I - Max output */
+    
+    <...to avoid duplicate code to handle surrogate pairs...>
+    <Convert input UTF-8 to internal UCS-4 by calling 'cupsUtf8ToUtf32()'>
+    <Convert internal UCS-4 to UTF-16 by calling 'cupsUtf32ToUtf16()'>
+    <Return count of output UTF-16 string -- NOT memory size in bytes>
+    
+    
+    
+    3.1.2.4.  cupsUtf16ToUtf8()
+    
+    extern int      cupsUtf16ToUtf8(utf8_t *dest,   /* O - Target string */
+                        const utf16_t *src,         /* I - Source string */
+                        const int maxout);          /* I - Max output */
+    
+    <...to avoid duplicate code to handle surrogate pairs...>
+    <Convert input UTF-16 to internal UCS-4 by calling 'cupsUtf16ToUtf32()'>
+    <Convert internal UCS-4 to UTF-8 by calling 'cupsUtf32ToUtf8()'>
+    <Return length of output UTF-8 string -- size in bytes>
+    
+    
+    
+    3.1.2.5.  cupsUtf8ToUtf32()
+    
+    extern int      cupsUtf8ToUtf32(utf32_t *dest,  /* O - Target string */
+                        const utf8_t *src,          /* I - Source string */
+                        const int maxout);          /* I - Max output */
+
+    McDonald                     June 20, 2002                     [Page 12]
+
+           CUPS Internationalization Software Design Description v0.3       
+
+    
+    <Convert input UTF-8 directly to output UCS-4...>
+    <...checking for valid range, shortest-form, etc.>
+    <Return count of output UTF-32 string -- NOT memory size in bytes>
+    
+    
+    
+    3.1.2.6.  cupsUtf32ToUtf8()
+    
+    extern int      cupsUtf32ToUtf8(utf8_t *dest,   /* O - Target string */
+                        const utf32_t *src,         /* I - Source string */
+                        const int maxout);          /* I - Max output */
+    
+    <Convert input UCS-4 directly to output UTF-8...>
+    <...checking for valid range, etc.>
+    <Return length of output UTF-8 string -- size in bytes>
+    
+    
+    
+    3.1.2.7.  cupsUtf16ToUtf32()
+    
+    extern int      cupsUtf16ToUtf32(utf32_t *dest, /* O - Target string */
+                        const utf16_t *src,         /* I - Source string */
+                        const int maxout);          /* I - Max output */
+    
+    <Convert input UTF-16 directly to output UCS-4...>
+    <...handling surrogate pairs decoding from UTF-16>
+    <Return count of output UTF-32 string -- NOT memory size in bytes>
+    
+    
+    
+    3.1.2.8.  cupsUtf32ToUtf16()
+    
+    extern int      cupsUtf32ToUtf16(utf16_t *dest, /* O - Target string */
+                        const utf32_t *src,         /* I - Source string */
+                        const int maxout);          /* I - Max output */
+    
+    <Convert input UCS-4 directly to output UTF-16...>
+    <...handling surrogate pairs encoding to UTF-16>
+    <Return count of output UTF-16 string -- NOT memory size in bytes>
+    
+    
+    
+    3.1.2.9.  Transcoding Utility Functions
+    
+    The transcoding utility functions are used to load (from a file into
+    memory), free (logically, without freeing memory), and flush (actually
+    free memory) character maps for SBCS (single-byte character set) and
+    (future) DBCS (double-byte character set) transcoding to and from UTF-8.
+    
+
+
+
+    McDonald                     June 20, 2002                     [Page 13]
+
+           CUPS Internationalization Software Design Description v0.3       
+
+    
+    
+    3.1.2.9.1.  cupsCharmapGet()
+    
+    extern void     *cupsCharmapGet(const cups_encoding_t encoding);
+                                                    /* I - Encoding */
+    
+    <Find SBSC or DBCS charset map in cache>
+    <...If found, increment 'used'>
+    <...and return pointer to SBCS or DBCS charset map>
+    <Get charset map file name by calling 'cupsEncodingName()'>
+    <Open charset map file>
+    <...If not found, return void>
+    <Allocate memory for SBCS or DBCS charset map in cache>
+    <...If no memory, return void>
+    <Add to SBCS or DBCS cache by assigning 'next' field>
+    <Assign 'encoding' field>
+    <Increment 'used' field>
+    <Read charset map file into memory in loop...>
+    <If SBCS, then 'char2uni[]' is an array of 'ucs2_t' values>
+    <...and 'uni2char[]' is an array of pointers to 'sbcs_t' arrays>
+    <If DBCS, then char2uni[]' is an array of pointers to 'ucs2_t' arrays>
+    <...and 'uni2char[]' is an array of pointers to 'dbcs_t' arrays>
+    <Close charset map file>
+    <Return pointer to SBCS or DBCS charset map>
+    
+    
+    
+    3.1.2.9.2.  cupsCharmapFree()
+    
+    extern void     cupsCharmapFree(const cups_encoding_t encoding);
+                                                    /* I - Encoding */
+    
+    <Find SBSC or DBCS charset map in cache>
+    <...If found, decrement 'used'>
+    <Return void>
+    
+    
+    
+    3.1.2.9.3.  cupsCharmapFlush()
+    
+    extern void     cupsCharmapFlush(void);
+    
+    <Loop through SBCS charset map cache...>
+    <...Free 'uni2char[]' memory>
+    <...Free SBCS charset map memory>
+    <Loop through DBCS charset map cache...>
+    <...Free 'char2uni[]' memory>
+    <...Free 'uni2char[]' memory>
+    <...Free DBCS charset map memory>
+    <Return void>
+
+
+    McDonald                     June 20, 2002                     [Page 14]
+
+           CUPS Internationalization Software Design Description v0.3       
+
+    
+    
+    
+    3.2.  Normalization - New
+    
+    
+    
+    3.2.1.  normalize.h - Normalization header
+    
+    /*
+     * "$Id: i18n_sdd.txt,v 1.1.2.1 2002/08/19 01:15:22 mike Exp $"
+     *
+     *   Unicode normalization for the Common UNIX Printing System (CUPS).
+     *
+     *   Copyright 1997-2002 by Easy Software Products.
+     *
+     *   These coded instructions, statements, and computer programs are
+     *   the property of Easy Software Products and are protected by Federal
+     *   copyright law.  Distribution and use rights are outlined in the
+     *   file "LICENSE.txt" which should have been included with this file.
+     *   If this file is missing or damaged please contact Easy Software
+     *   Products at:
+     *
+     *       Attn: CUPS Licensing Information
+     *       Easy Software Products
+     *       44141 Airport View Drive, Suite 204
+     *       Hollywood, Maryland 20636-3111 USA
+     *
+     *       Voice: (301) 373-9603
+     *       EMail: cups-info@cups.org
+     *         WWW: http://www.cups.org
+     */
+    
+    #ifndef _CUPS_NORMALIZE_H_
+    #  define _CUPS_NORMALIZE_H_
+    
+    /*
+     * Include necessary headers...
+     */
+    
+    #  include "transcod.h"
+    
+    #  ifdef __cplusplus
+    extern "C" {
+    #  endif /* __cplusplus */
+    
+    /*
+     * Types...
+     */
+    
+    typedef enum                    /**** Normalizataion Types ****/
+    {
+
+    McDonald                     June 20, 2002                     [Page 15]
+
+           CUPS Internationalization Software Design Description v0.3       
+
+      CUPS_NORM_NFD,                /* Canonical Decomposition */
+      CUPS_NORM_NFKD,               /* Compatibility Decomposition */
+      CUPS_NORM_NFC,                /* NFD, them Canonical Composition */
+      CUPS_NORM_NFKC                /* NFKD, them Canonical Composition */
+    } cups_normalize_t;
+    
+    typedef enum                    /**** Case Folding Types ****/
+    {
+      CUPS_FOLD_SIMPLE,             /* Simple - no expansion in size */
+      CUPS_FOLD_FULL                /* Full - possible expansion in size */
+    } cups_folding_t;
+    
+    typedef enum                    /**** Unicode Char Property Types ****/
+    {
+      CUPS_PROP_GENERAL_CATEGORY,   /* See 'cups_gencat_t' enum */
+      CUPS_PROP_BIDI_CATEGORY,      /* See 'cups_bidicat_t' enum */
+      CUPS_PROP_COMBINING_CLASS,    /* See 'cups_combclass_t' type */
+      CUPS_PROP_BREAK_CLASS         /* See 'cups_breakclass_t' enum */
+    } cups_property_t;
+    
+    /*
+     * Note - parse Unicode char general category from 'UnicodeData.txt'
+     * into sparse local table in 'normalize.c'.
+     * Use major classes for logic optimizations throughout (by mask).
+     */
+    
+    typedef enum                    /**** Unicode General Category ****/
+    {
+      CUPS_GENCAT_L  = 0x10, /* Letter major class */
+      CUPS_GENCAT_LU = 0x11, /* Lu Letter, Uppercase */
+      CUPS_GENCAT_LL = 0x12, /* Ll Letter, Lowercase */
+      CUPS_GENCAT_LT = 0x13, /* Lt Letter, Titlecase */
+      CUPS_GENCAT_LM = 0x14, /* Lm Letter, Modifier */
+      CUPS_GENCAT_LO = 0x15, /* Lo Letter, Other */
+      CUPS_GENCAT_M  = 0x20, /* Mark major class */
+      CUPS_GENCAT_MN = 0x21, /* Mn Mark, Non-Spacing */
+      CUPS_GENCAT_MC = 0x22, /* Mc Mark, Spacing Combining */
+      CUPS_GENCAT_ME = 0x23, /* Me Mark, Enclosing */
+      CUPS_GENCAT_N  = 0x30, /* Number major class */
+      CUPS_GENCAT_ND = 0x31, /* Nd Number, Decimal Digit */
+      CUPS_GENCAT_NL = 0x32, /* Nl Number, Letter */
+      CUPS_GENCAT_NO = 0x33, /* No Number, Other */
+      CUPS_GENCAT_P  = 0x40, /* Punctuation major class */
+      CUPS_GENCAT_PC = 0x41, /* Pc Punctuation, Connector */
+      CUPS_GENCAT_PD = 0x42, /* Pd Punctuation, Dash */
+      CUPS_GENCAT_PS = 0x43, /* Ps Punctuation, Open (start) */
+      CUPS_GENCAT_PE = 0x44, /* Pe Punctuation, Close (end) */
+      CUPS_GENCAT_PI = 0x45, /* Pi Punctuation, Initial Quote */
+      CUPS_GENCAT_PF = 0x46, /* Pf Punctuation, Final Quote */
+      CUPS_GENCAT_PO = 0x47, /* Po Punctuation, Other */
+      CUPS_GENCAT_S  = 0x50, /* Symbol major class */
+      CUPS_GENCAT_SM = 0x51, /* Sm Symbol, Math */
+
+    McDonald                     June 20, 2002                     [Page 16]
+
+           CUPS Internationalization Software Design Description v0.3       
+
+      CUPS_GENCAT_SC = 0x52, /* Sc Symbol, Currency */
+      CUPS_GENCAT_SK = 0x53, /* Sk Symbol, Modifier */
+      CUPS_GENCAT_SO = 0x54, /* So Symbol, Other */
+      CUPS_GENCAT_Z  = 0x60, /* Separator major class */
+      CUPS_GENCAT_ZS = 0x61, /* Zs Separator, Space */
+      CUPS_GENCAT_ZL = 0x62, /* Zl Separator, Line */
+      CUPS_GENCAT_ZP = 0x63, /* Zp Separator, Paragraph */
+      CUPS_GENCAT_C  = 0x70, /* Other (miscellaneous) major class */
+      CUPS_GENCAT_CC = 0x71, /* Cc Other, Control */
+      CUPS_GENCAT_CF = 0x72, /* Cf Other, Format */
+      CUPS_GENCAT_CS = 0x73, /* Cs Other, Surrogate */
+      CUPS_GENCAT_CO = 0x74, /* Co Other, Private Use */
+      CUPS_GENCAT_CN = 0x75  /* Cn Other, Not Assigned */
+    } cups_gencat_t;
+    
+    /*
+     * Note - parse Unicode char bidi category from 'UnicodeData.txt'
+     * into sparse local table in 'normalize.c'.
+     * Add bidirectional support to 'textcommon.c' - per Mike
+     */
+    
+    typedef enum                    /**** Unicode Bidi Category ****/
+    {
+      CUPS_BIDI_L,   /* Left-to-Right (Alpha, Syllabic, Ideographic) */
+      CUPS_BIDI_LRE, /* Left-to-Right Embedding (explicit) */
+      CUPS_BIDI_LRO, /* Left-to-Right Override (explicit) */
+      CUPS_BIDI_R,   /* Right-to-Left (Hebrew alphabet and most punct) */
+      CUPS_BIDI_AL,  /* Right-to-Left Arabic (Arabic, Thaana, Syriac) */
+      CUPS_BIDI_RLE, /* Right-to-Left Embedding (explicit) */
+      CUPS_BIDI_RLO, /* Right-to-Left Override (explicit) */
+      CUPS_BIDI_PDF, /* Pop Directional Format */
+      CUPS_BIDI_EN,  /* Euro Number (Euro and East Arabic-Indic digits) */
+      CUPS_BIDI_ES,  /* Euro Number Separator (Slash) */
+      CUPS_BIDI_ET,  /* Euro Number Termintor (Plus, Minus, Degree, etc) */
+      CUPS_BIDI_AN,  /* Arabic Number (Arabic-Indic digits, separators) */
+      CUPS_BIDI_CS,  /* Common Number Separator (Colon, Comma, Dot, etc) */
+      CUPS_BIDI_NSM, /* Non-Spacing Mark (category Mn / Me in UCD) */
+      CUPS_BIDI_BN,  /* Boundary Neutral (Formatting / Control chars) */
+      CUPS_BIDI_B,   /* Paragraph Separator */
+      CUPS_BIDI_S,   /* Segment Separator (Tab) */
+      CUPS_BIDI_WS,  /* Whitespace Space (Space, Line Separator, etc) */
+      CUPS_BIDI_ON   /* Other Neutrals */
+    } cups_bidicat_t;
+    
+    /*
+     * Note - parse Unicode line break class from 'DerivedLineBreak.txt'
+     * into sparse local table (list of class ranges) in 'normalize.c'.
+     * Note - add state table from UAX-14, section 7.3 - Ira
+     * Remember to do BK and SP in outer loop (not in state table).
+     * Consider optimization for CM (combining mark).
+     * See 'LineBreak.txt' (12,875) and 'DerivedLineBreak.txt' (1,350).
+     */
+
+    McDonald                     June 20, 2002                     [Page 17]
+
+           CUPS Internationalization Software Design Description v0.3       
+
+    
+    typedef enum                    /**** Unicode Line Break Class ****/
+    {
+     /*
+      * (A) - Allow Break AFTER
+      * (XA) - Prevent Break AFTER
+      * (B) - Allow Break BEFORE
+      * (XB) - Prevent Break BEFORE
+      * (P) - Allow Break For Pair
+      * (XP) - Prevent Break For Pair
+      */
+      CUPS_BREAK_AI, /* Ambiguous (Alphabetic or Ideograph) */
+      CUPS_BREAK_AL, /* Ordinary Alphabetic / Symbol Chars (XP) */
+      CUPS_BREAK_BA, /* Break Opportunity After Chars (A) */
+      CUPS_BREAK_BB, /* Break Opportunities Before Chars (B) */
+      CUPS_BREAK_B2, /* Break Opportunity Before / After (B/A/XP) */
+      CUPS_BREAK_BK, /* Mandatory Break (A) (normative) */
+      CUPS_BREAK_CB, /* Contingent Break (B/A) (normative) */
+      CUPS_BREAK_CL, /* Closing Punctuation (XB) */
+      CUPS_BREAK_CM, /* Attached Chars / Combining (XB) (normative) */
+      CUPS_BREAK_CR, /* Carriage Return (A) (normative) */
+      CUPS_BREAK_EX, /* Exclamation / Interrogation (XB) */
+      CUPS_BREAK_GL, /* Non-breaking ("Glue") (XB/XA) (normative) */
+      CUPS_BREAK_HY, /* Hyphen (XA) */
+      CUPS_BREAK_ID, /* Ideographic (B/A) */
+      CUPS_BREAK_IN, /* Inseparable chars (XP) */
+      CUPS_BREAK_IS, /* Numeric Separator (Infix) (XB) */
+      CUPS_BREAK_LF, /* Line Feed (A) (normative) */
+      CUPS_BREAK_NS, /* Non-starters (XB) */
+      CUPS_BREAK_NU, /* Numeric (XP) */
+      CUPS_BREAK_OP, /* Opening Punctuation (XA) */
+      CUPS_BREAK_PO, /* Postfix (Numeric) (XB) */
+      CUPS_BREAK_PR, /* Prefix (Numeric) (XA) */
+      CUPS_BREAK_QU, /* Ambiguous Quotation (XB/XA) */
+      CUPS_BREAK_SA, /* Context Dependent (South East Asian) (P) */
+      CUPS_BREAK_SG, /* Surrogates (XP) (normative) */
+      CUPS_BREAK_SP, /* Space (A) (normative) */
+      CUPS_BREAK_SY, /* Symbols Allowing Break After (A) */
+      CUPS_BREAK_XX, /* Unknown (XP) */
+      CUPS_BREAK_ZW  /* Zero Width Space (A) (normative) */
+    } cups_breakclass_t;
+    
+    typedef int cups_combclass_t;   /**** Unicode Combining Class ****/
+                                    /* 0=base / 1..254=combining char */
+    
+    /*
+     * Structures...
+     */
+    
+    typedef struct cups_normmap_str /**** Normalize Map Cache Struct ****/
+    {
+      struct cups_normmap_str *next;        /* Next normalize in cache */
+
+    McDonald                     June 20, 2002                     [Page 18]
+
+           CUPS Internationalization Software Design Description v0.3       
+
+      int                   used;           /* Number of times entry used */
+      cups_normalize_t      normalize;      /* Normalization type */
+      int                   normcount;      /* Count of Source Chars */
+      ucs2_t                *uni2norm;      /* Char -> Normalization */
+                                            /* ...only supports UCS-2 */
+    } cups_normmap_t;
+    
+    typedef struct cups_foldmap_str /**** Case Fold Map Cache Struct ****/
+    {
+      struct cups_foldmap_str *next;        /* Next case fold in cache */
+      int                   used;           /* Number of times entry used */
+      cups_folding_t        fold;           /* Case folding type */
+      int                   foldcount;      /* Count of Source Chars */
+      ucs2_t                *uni2fold;      /* Char -> Folded Char(s) */
+                                            /* ...only supports UCS-2 */
+    } cups_foldmap_t;
+    
+    typedef struct cups_prop_str    /**** Char Property Struct ****/
+    {
+      ucs2_t                ch;             /* Unicode Char as UCS-2 */
+      unsigned char         gencat;         /* General Category */
+      unsigned char         bidicat;        /* Bidirectional Category */
+    } cups_prop_t;
+    
+    typedef struct                  /**** Char Property Map Struct ****/
+    {
+      int                   used;           /* Number of times entry used */
+      int                   propcount;      /* Count of Source Chars */
+      cups_prop_t           *uni2prop;      /* Char -> Properties */
+    } cups_propmap_t;
+    
+    typedef struct                  /**** Line Break Class Map Struct ****/
+    {
+      int                   used;           /* Number of times entry used */
+      int                   breakcount;     /* Count of Source Chars */
+      ucs2_t                *uni2break;     /* Char -> Line Break Class */
+    } cups_breakmap_t;
+    
+    typedef struct cups_comb_str    /**** Char Combining Class Struct ****/
+    {
+      ucs2_t                ch;             /* Unicode Char as UCS-2 */
+      unsigned char         combclass;      /* Combining Class */
+      unsigned char         reserved;       /* Reserved for alignment */
+    } cups_comb_t;
+    
+    typedef struct                  /**** Combining Class Map Struct ****/
+    {
+      int                   used;           /* Number of times entry used */
+      int                   combcount;      /* Count of Source Chars */
+      cups_comb_t           *uni2comb;      /* Char -> Combining Class */
+    } cups_combmap_t;
+
+
+    McDonald                     June 20, 2002                     [Page 19]
+
+           CUPS Internationalization Software Design Description v0.3       
+
+    
+    /*
+     * Globals...
+     */
+    
+    extern int      NzSupportUcs2;  /* Support UCS-2 (16-bit) mapping */
+    extern int      NzSupportUcs4;  /* Support UCS-4 (32-bit) mapping */
+    
+    /*
+     * Prototypes...
+     */
+    
+    /*
+     * Utility functions for normalization module
+     */
+    extern int      cupsNormalizeMapsGet(void);
+    extern int      cupsNormalizeMapsFree(void);
+    extern void     cupsNormalizeMapsFlush(void);
+    
+    /*
+     * Normalize UTF-8 string to Unicode UAX-15 Normalization Form
+     * Note - Compatibility Normalization Forms (NFKD/NFKC) are
+     * unsafe for subsequent transcoding to legacy charsets
+     */
+    extern int      cupsUtf8Normalize(utf8_t *dest, /* O - Target string */
+                        const utf8_t *src,          /* I - Source string */
+                        const int maxout,           /* I - Max output */
+                        const cups_normalize_t normalize);
+                                                    /* I - Normalization */
+    
+    /*
+     * Normalize UTF-32 string to Unicode UAX-15 Normalization Form
+     * Note - Compatibility Normalization Forms (NFKD/NFKC) are
+     * unsafe for subsequent transcoding to legacy charsets
+     */
+    extern int      cupsUtf32Normalize(utf32_t *dest,
+                                                    /* O - Target string */
+                        const utf32_t *src,         /* I - Source string */
+                        const int maxout,           /* I - Max output */
+                        const cups_normalize_t normalize);
+                                                    /* I - Normalization */
+    
+    /*
+     * Case Fold UTF-8 string per Unicode UAX-21 Section 2.3
+     * Note - Case folding output is
+     * unsafe for subsequent transcoding to legacy charsets
+     */
+    extern int      cupsUtf8CaseFold(utf8_t *dest,  /* O - Target string */
+                        const utf8_t *src,          /* I - Source string */
+                        const int maxout,           /* I - Max output */
+                        const cups_folding_t fold); /* I - Fold Mode */
+
+
+    McDonald                     June 20, 2002                     [Page 20]
+
+           CUPS Internationalization Software Design Description v0.3       
+
+    
+    /*
+     * Case Fold UTF-32 string per Unicode UAX-21 Section 2.3
+     * Note - Case folding output is
+     * unsafe for subsequent transcoding to legacy charsets
+     */
+    extern int      cupsUtf32CaseFold(utf32_t *dest,/* O - Target string */
+                        const utf32_t *src,         /* I - Source string */
+                        const int maxout,           /* I - Max output */
+                        const cups_folding_t fold); /* I - Fold Mode */
+    
+    /*
+     * Compare UTF-8 strings after case folding
+     */
+    extern int      cupsUtf8CompareCaseless(const utf8_t *s1,
+                                                    /* I - String1 */
+                        const utf8_t *s2);          /* I - String2 */
+    
+    /*
+     * Compare UTF-32 strings after case folding
+     */
+    extern int      cupsUtf32CompareCaseless(const utf32_t *s1,
+                                                    /* I - String1 */
+                        const utf32_t *s2);         /* I - String2 */
+    
+    /*
+     * Compare UTF-8 strings after case folding and NFKC normalization
+     */
+    extern int      cupsUtf8CompareIdentifier(const utf8_t *s1,
+                                                    /* I - String1 */
+                        const utf8_t *s2);          /* I - String2 */
+    
+    /*
+     * Compare UTF-32 strings after case folding and NFKC normalization
+     */
+    extern int      cupsUtf32CompareIdentifier(const utf32_t *s1,
+                                                    /* I - String1 */
+                        const utf32_t *s2);         /* I - String2 */
+    
+    /*
+     * Get UTF-32 character property
+     */
+    extern int      cupsUtf32CharacterProperty(const utf32_t ch,
+                                                    /* I - Source char */
+                        const cups_property_t property);
+                                                    /* I - Char Property */
+    
+    #  ifdef __cplusplus
+    }
+    #  endif /* __cplusplus */
+    
+    #endif /* !_CUPS_NORMALIZE_H_ */
+
+    McDonald                     June 20, 2002                     [Page 21]
+
+           CUPS Internationalization Software Design Description v0.3       
+
+    
+    /*
+     * End of "$Id: i18n_sdd.txt,v 1.1.2.1 2002/08/19 01:15:22 mike Exp $"
+     */
+    
+    
+    
+    3.2.1.1.  cups_normmap_t - Normalize Map Structure
+    
+    typedef struct cups_normmap_str /**** Normalize Map Cache Struct ****/
+    {
+      struct cups_normmap_str *next;        /* Next normalize in cache */
+      int                   used;           /* Number of times entry used */
+      cups_normalize_t      normalize;      /* Normalization type */
+      int                   normcount;      /* Count of Source Chars */
+      ucs2_t                *uni2norm;      /* Char -> Normalization */
+                                            /* ...only supports UCS-2 */
+    } cups_normmap_t;
+    
+    'uni2norm' is a pointer to an array of _triplets_ of UCS-2 values.
+    'normcount' is a count of _triplets_ in the 'uni2norm[]' array.  
+    
+    For decompositions (NFD and NFKD), the triplets are:  composed base
+    character, decomposed base character, and decomposed accent character.  
+    These are used by 'cupsUtf8Normalize()' and 'cupsUtf32Normalize()' in
+    performing canonical (NFD) or compatibility (NFKD) decomposition.  
+    
+    For compositions (NFC and NFKC), the triplets are:  decomposed base
+    character, decomposed accent character, and composed base character.
+    These are used by 'cupsUtf8Normalize()' and 'cupsUtf32Normalize()' in
+    performing canonical composition (for NFC or NFKC).  
+    
+    
+    
+    3.2.1.2.  cups_foldmap_t - Case Fold Map Structure
+    
+    typedef struct cups_foldmap_str /**** Case Fold Map Cache Struct ****/
+    {
+      int                   used;           /* Number of times entry used */
+      cups_folding_t        fold;           /* Case folding type */
+      int                   foldcount;      /* Count of Source Chars */
+      ucs2_t                *uni2fold;      /* Char -> Folded Char(s) */
+                                            /* ...only supports UCS-2 */
+    } cups_foldmap_t;
+    
+    'uni2fold' is a pointer to an array of _quadruplets_ of UCS-2 values.
+    'foldcount' is a count of _quadruplets_ in the 'uni2fold[]' array.  
+    
+    For simple case folding (without expansion of the size of the output
+    string), the quadruplets are:  input base character, output case folded 
+    character, zero (unused), and zero (unused).  
+
+
+    McDonald                     June 20, 2002                     [Page 22]
+
+           CUPS Internationalization Software Design Description v0.3       
+
+    
+    For full case folding (with possible expansion of the size of the output
+    string), the quadruplets are:  input base character, output case folded 
+    character, second output character or zero, third output character or
+    zero.  
+    
+    
+    
+    3.2.1.3.  cups_propmap_t - Char Property Map Structure
+    
+    typedef struct                  /**** Char Property Map Struct ****/
+    {
+      int                   used;           /* Number of times entry used */
+      int                   propcount;      /* Count of Source Chars */
+      cups_prop_t           *uni2prop;      /* Char -> Properties */
+    } cups_propmap_t;
+    
+    'uni2prop' is a pointer to an array of 'cups_prop_t' (see below).
+    'propcount' is a count of elements in the 'uni2prop[]' array.  
+    
+    
+    
+    3.2.1.4.  cups_prop_t - Char Property Structure
+    
+    typedef struct cups_prop_str    /**** Char Property Struct ****/
+    {
+      ucs2_t                ch;             /* Unicode Char as UCS-2 */
+      unsigned char         gencat;         /* General Category */
+      unsigned char         bidicat;        /* Bidirectional Category */
+    } cups_prop_t;
+    
+    
+    
+    3.2.1.5.  cups_breakmap_t - Line Break Map Structure
+    
+    typedef struct                  /**** Line Break Class Map Struct ****/
+    {
+      int                   used;           /* Number of times entry used */
+      int                   breakcount;     /* Count of Source Chars */
+      ucs2_t                *uni2break;     /* Char -> Line Break Class */
+    } cups_breakmap_t;
+    
+    'uni2break' is a pointer to an array of _triplets_ of UCS-2 values.
+    'breakcount' is a count of _triplets_ in the 'uni2break[]' array.  
+    
+    The triplets in 'uni2break' are:  first UCS-2 value in a range, last
+    UCS-2 value in a range, and line break class stored as UCS-2.  
+    
+
+
+
+
+
+    McDonald                     June 20, 2002                     [Page 23]
+
+           CUPS Internationalization Software Design Description v0.3       
+
+    
+    
+    3.2.1.6.  cups_combmap_t - Combining Class Map Structure
+    
+    typedef struct                  /**** Combining Class Map Struct ****/
+    {
+      int                   used;           /* Number of times entry used */
+      int                   combcount;      /* Count of Source Chars */
+      cups_comb_t           *uni2comb;      /* Char -> Combining Class */
+    } cups_combmap_t;
+    
+    'uni2comb' is a pointer to an array of 'cups_comb_t' (see below).
+    'combcount' is a count of elements in the 'uni2comb[]' array.  
+    
+    
+    
+    3.2.1.7.  cups_comb_t - Combining Class Structure
+    
+    typedef struct cups_comb_str    /**** Char Combining Class Struct ****/
+    {
+      unsigned short        ch;             /* Unicode Char as UCS-2 */
+      unsigned char         combclass;      /* Combining Class */
+      unsigned char         reserved;       /* Reserved for alignment */
+    } cups_comb_t;
+    
+    
+    
+    3.2.2.  normalize.c - Normalization module
+    
+    The normalization function 'cupsUtf8Normalize()' and the case folding
+    function 'cupsUtf8CaseFold()' are modelled on the C standard library
+    function 'strncpy()', except that they return the count of the output,
+    like 'strlen()', rather than the (redundant) pointer to the output.  
+    
+    If the normalization or case folding functions detect invalid input
+    parameters or they detect an encoding error in their input, then they
+    return '-1', rather than the count of output.  
+    
+    The normalization and case folding functions take an input parameter
+    indicating the maximum output units (for safe operation).  
+    
+    
+    
+    3.2.2.1.  cupsUtf8Normalize()
+    
+    /*
+     * Normalize UTF-8 string to Unicode UAX-15 Normalization Form
+     * Note - Compatibility Normalization Forms (NFKD/NFKC) are
+     * unsafe for subsequent transcoding to legacy charsets
+     */
+    extern int      cupsUtf8Normalize(utf8_t *dest, /* O - Target string */
+                        const utf8_t *src,          /* I - Source string */
+
+    McDonald                     June 20, 2002                     [Page 24]
+
+           CUPS Internationalization Software Design Description v0.3       
+
+                        const int maxout,           /* I - Max output */
+                        const cups_normalize_t normalize);
+                                                    /* I - Normalization */
+    
+    <Convert input UTF-8 to internal UCS-4 by calling 'cupsUtf8ToUtf32()'>
+    <Normalize by calling 'cupsUtf32Normalize()'>
+    <Convert normalized UCS-4 to UTF-8 by calling 'cupsUtf32ToUtf8()>
+    <Return length of output UTF-8 string -- size in butes>
+    
+    
+    
+    3.2.2.2.  cupsUtf32Normalize()
+    
+    extern int      cupsUtf32Normalize(utf32_t *dest,
+                                                    /* O - Target string */
+                        const utf32_t *src,         /* I - Source string */
+                        const int maxout,           /* I - Max output */
+                        const cups_normalize_t normalize);
+                                                    /* I - Normalization */
+    
+    <Find normalize maps by calling 'cupsNormalizeMapsGet()'>
+    <...if not found, return '-1'>
+    <Repeatedly traverse internal UCS-4, decomposing (NFD or NFKD)...>
+    <...with 'bsearch()' of 'uni2norm[]' using local 'compare_decompose()'>
+    <...until one pass yields no further decomposition>
+    <Repeatedly traverse internal UCS-4, doing canonical reordering>
+    <...with 'bsearch()' of 'uni2comb[]' using local 'compare_combchar()'>
+    <...until one pass yields no further canonical reordering>
+    <If 'normalize' requests composition (NFC or NFKC)...>
+    <...repeatedly traverse internal UCS-4, composing (NFC or NFKC)...>
+    <...with 'bsearch()' of 'uni2norm[]' using local 'compare_compose()'>
+    <...until one pass yields no further composition>
+    <Release normalize maps by calling 'cupsNormalizeMapsFree()'>
+    <Return count of output UTF-32 string -- NOT memory size in butes>
+    
+    
+    
+    3.2.2.3.  cupsUtf8CaseFold()
+    
+    /*
+     * Case Fold UTF-8 string per Unicode UAX-21 Section 2.3
+     * Note - Case folding output is
+     * unsafe for subsequent transcoding to legacy charsets
+     */
+    extern int      cupsUtf8CaseFold(utf8_t *dest,  /* O - Target string */
+                        const utf8_t *src,          /* I - Source string */
+                        const int maxout,           /* I - Max output */
+                        const cups_folding_t fold); /* I - Fold Mode */
+    
+    <Find normalize maps by calling 'cupsNormalizeMapsGet()'>
+    <...if not found, return '-1'>
+    <Convert input UTF-8 to internal UCS-4 by calling 'cupsUtf8ToUtf32()'>
+
+    McDonald                     June 20, 2002                     [Page 25]
+
+           CUPS Internationalization Software Design Description v0.3       
+
+    <Case fold internal UCS-4 by calling 'cupsUtf32CaseFold()'>
+    <Convert internal UCS-4 to output UTF-8 by calling 'cupsUtf32ToUtf8()>
+    <Release normalize maps by calling 'cupsNormalizeMapsFree()'>
+    <Return length of output UTF-8 string -- size in butes>
+    
+    
+    
+    3.2.2.4.  cupsUtf32CaseFold()
+    
+    /*
+     * Case Fold UTF-32 string per Unicode UAX-21 Section 2.3
+     * Note - Case folding output is
+     * unsafe for subsequent transcoding to legacy charsets
+     */
+    extern int      cupsUtf32CaseFold(utf32_t *dest,    /* Target string */
+                        const utf32_t *src,            /* Source string */
+                        const int maxout);            /* Max output units */
+    
+    <Find case fold maps by calling 'cupsNormalizeMapsGet()'>
+    <...if not found, return '-1'>
+    <Traverse internal UCS-4 once, performing case folding...>
+    <...with 'bsearch()' of 'uni2fold[]' using local 'compare_foldchar()'>
+    <Copy internal UCS-4 to output UTF-32 string>
+    <Release normalize maps by calling 'cupsNormalizeMapsFree()'>
+    <Return count of output UTF-32 string -- NOT memory size in bytes>
+    
+    
+    
+    3.2.2.5.  cupsUtf8CompareCaseless()
+    
+    /*
+     * Compare UTF-8 strings after case folding
+     */
+    extern int      cupsUtf8CompareCaseless(const utf8_t *s1,
+                                                    /* I - String1 */
+                        const utf8_t *s2);          /* I - String2 */
+    
+    <Case fold both input UTF-8 strings by calling 'cupsUtf8CaseFold()'>
+    <Return compare of case folded first and second strings>
+    
+    
+    
+    3.2.2.6.  cupsUtf32CompareCaseless()
+    
+    /*
+     * Compare UTF-32 strings after case folding
+     */
+    extern int      cupsUtf32CompareCaseless(const utf32_t *s1,
+                                                    /* I - String1 */
+                        const utf32_t *s2);         /* I - String2 */
+    
+    <Case fold both input UTF-32 strings by calling 'cupsUtf32CaseFold()'>
+
+    McDonald                     June 20, 2002                     [Page 26]
+
+           CUPS Internationalization Software Design Description v0.3       
+
+    <Return compare of case folded first and second strings>
+    
+    
+    
+    3.2.2.7.  cupsUtf8CompareIdentifier()
+    
+    /*
+     * Compare UTF-8 strings after case folding and NFKC normalization
+     */
+    extern int      cupsUtf8CompareIdentifier(const utf8_t *s1,
+                                                    /* I - String1 */
+                        const utf8_t *s2);          /* I - String2 */
+    
+    <Convert input UTF-8 to internal UCS-4 by calling 'cupsUtf8ToUtf32()'>
+    <Case fold both strings by calling 'cupsUtf32CaseFold()'>
+    <Normalize both strings to NFKC by calling 'cupsUtf32Normalize()'>
+    <Return compare of case folded/normalized first and second strings>
+    
+    
+    
+    3.2.2.8.  cupsUtf32CompareIdentifier()
+    
+    /*
+     * Compare UTF-32 strings after case folding and NFKC normalization
+     */
+    extern int      cupsUtf32CompareIdentifier(const utf32_t *s1,
+                                                    /* I - String1 */
+                        const utf32_t *s2);         /* I - String2 */
+    
+    <Case fold both strings by calling 'cupsUtf32CaseFold()'>
+    <Normalize both strings to NFKC by calling 'cupsUtf32Normalize()'>
+    <Return compare of case folded/normalized first and second strings>
+    
+    
+    
+    3.2.2.9.  cupsUtf32CharacterProperty()
+    
+    /*
+     * Get UTF-32 character property
+     */
+    extern int      cupsUtf32CharacterProperty(const utf32_t ch,
+                                                    /* I - Source char */
+                        const cups_property_t property);
+                                                    /* I - Char Property */
+    
+    <Lookup UTF-32 character property in appropriate map...> <...internal
+    functions for each different map lookup> 
+    
+
+
+
+
+
+    McDonald                     June 20, 2002                     [Page 27]
+
+           CUPS Internationalization Software Design Description v0.3       
+
+    
+    
+    3.2.2.10.  Normalization Utility Functions
+    
+    
+    
+    
+    3.2.2.10.1.  cupsNormalizeMapsGet()
+    
+    extern void     cupsNormalizeMapsMapsGet(void);
+    
+    <Find normalize maps in cache>
+    <...If found, increment 'used'>
+    <...and return void>
+    <For each map (normalization, case fold, combining class, etc.)...>
+    <Open (preprocessed form of) Unicode data file...>
+    <...If not found, return void>
+    <Count lines in preprocessed form, for mapping memory alloc>
+    <...Close (preprocessed form of) Unicode data file>
+    <Open (preprocessed form of) Unicode data file...>
+    <...If not found, return void>
+    <Allocate memory for approriate map in cache...>
+    <...If no memory, return void>
+    <Add to appropriate cache by assigning 'next' field>
+    <Assign map type field and count field>
+    <Increment 'used' field>
+    <Read normalize map into memory in loop...>
+    <...Add values to 'uni2xxx[]' array>
+    <Close (preprocessed form of) Unicode data file>
+    <Return void>
+    
+    
+    
+    3.2.2.10.2.  cupsNormalizeMapsFree()
+    
+    extern void     cupsNormalizeMapsFree(void);
+    
+    <Find normalize maps in cache>
+    <...If found, decrement 'used'>
+    <Return void>
+    
+    
+    
+    3.2.2.10.3.  cupsNormalizeMapsFlush()
+    
+    extern void     cupsNormalizeMapsFlush(void);
+    
+    <Loop through normalize maps cache...>
+    <...Free 'uni2norm[]' memory>
+    <...Free normalize map memory>
+    <Loop through case folding cache...>
+    <...Free 'uni2fold[]' memory>
+
+    McDonald                     June 20, 2002                     [Page 28]
+
+           CUPS Internationalization Software Design Description v0.3       
+
+    <...Free case folding memory>
+    <Loop through char property map cache...>
+    <...Free 'uni2prop[]' memory>
+    <...Free char property map memory>
+    <Loop through line break class map cache...>
+    <...Free 'uni2break[]' memory>
+    <...Free line break class map memory>
+    <Loop through combining class map cache...>
+    <...Free 'uni2comb[]' memory>
+    <...Free combining class map memory>
+    <Return void>
+    
+    
+    
+    3.3.  Language - Existing
+    
+    
+    
+    3.3.1.  language.h - Language header
+    
+    Required Changes:  
+    
+    (1) Change definition of 'cups_lang_t' to correct length of 'language[]'
+        to 32 characters per [RFC3066] and [ISO639-2] and [ISO3166-1].  
+    
+    
+    
+    3.3.2.  language.c - Language module
+    
+    
+    
+    3.3.2.1.  cupsLangEncoding() - Existing
+    
+    [No Change] 
+    
+    
+    
+    3.3.2.2.  cupsLangFlush() - Existing
+    
+    [No Change] 
+    
+    
+    
+    3.3.2.3.  cupsLangFree() - Existing
+    
+    [No Change] 
+    
+
+
+
+
+
+
+    McDonald                     June 20, 2002                     [Page 29]
+
+           CUPS Internationalization Software Design Description v0.3       
+
+    
+    
+    3.3.2.4.  cupsLangGet() - Existing
+    
+    Required Changes:  
+    
+    (1) Change length of 'langname[]' and 'real[]' to 64 characters per
+        [RFC3066] and potential length of encoding (charset) names; 
+    (2) Change language string normalization to support:  
+        (a) 8-character language codes per [RFC3066] and 3-character
+        language codes per [ISO639-2]; 
+        (b) 8-character country codes per [RFC3066] and 3-character country 
+        codes per [ISO3166-1]; 
+        (c) Support for 'i' (IANA registered) and 'x' (private) language
+        prefixes per [RFC3066]; 
+        (d) Invariant use of 'utf-8' for encoding in message catalog, but
+        save actual requested encoding name for later use.  
+    (3) Correct broken do/while statement for message catalog lookup (while
+        condition is _never_ satisfied).  
+    
+    
+    
+    3.3.2.5.  cupsLangPrintf() - New
+    
+    extern  int     cupsLangPrintf(FILE *fp,        /* I - File to write */
+                        const cups_lang_t *lang,    /* I - Language/locale*/
+                        const cups_msg_t msg,       /* I - Msg to format */
+                        ...);                       /* I - Args to format */
+    
+    <Set up variable args by calling 'va_start()'>
+    <Format CUPS message with variable args by calling 'vsnprintf()'>
+    <Clean up variable args by calling 'va_end()'>
+    <Transcode CUPS message by calling 'cupsUtf8ToCharset()'>
+    <Write CUPS message by calling 'fputs()'>
+    <Return transcoded output CUPS message length>
+    
+    
+    
+    3.3.2.6.  cupsLangPuts() - New
+    
+    extern  int     cupsLangPuts(FILE *fp,          /* I - File to write */
+                        const cups_lang_t *lang,    /* I - Language/locale*/
+                        const cups_msg_t msg);      /* I - Msg to write */
+    
+    <Transcode CUPS message by calling 'cupsUtf8ToCharset()'>
+    <Write CUPS message by calling 'fputs()'>
+    <Return transcoded output CUPS message length>
+    
+
+
+
+
+
+    McDonald                     June 20, 2002                     [Page 30]
+
+           CUPS Internationalization Software Design Description v0.3       
+
+    
+    
+    3.3.2.7.  cupsEncodingName() - New
+    
+    extern  char    *cupsEncodingName(cups_encoding_t encoding);
+    
+    <Lookup encoding name in static 'lang_encodings[]' array>
+    <Return pointer to encoding name (charset map file name)>
+    
+    
+    
+    3.4.  Common Text Filter - Existing
+    
+    
+    
+    3.4.1.  textcommon.h - Common text filter header
+    
+    Required changes:  
+    
+    (1) Revise 'lchar_t' as specified below, adding 'attrx' bit-mask for
+        selected Unicode character properties; 
+    (2) Revise 'lchar_t' as specified below, adding 'comblen' and 'combch[]'
+        for Unicode combining/attached chars (accents); 
+    (3) Add 'COMBLEN_MAX' limit as specified below; 
+    (4) Add 'ATTRX_...' selected Unicode character properties as specified
+        below.  
+    
+    
+    
+    3.4.1.1.  lchar_t - Character/Attribute Structure
+    
+    typedef struct lchar_str    /**** Character / Attribute Structure ****/
+    {
+      unsigned short        ch;             /* Unicode Char as UCS-2 */
+                                            /* or 8/16-bit Legacy Char */
+      unsigned short        attr;           /* Attributes of Char */
+      unsigned short        attrx;          /* Extended Attributes */
+      unsigned short        comblen;        /* Combining Char Count */
+      unsigned short        combch[8];      /* Combining Chars as UCS-2 */
+    } lchar_t;
+    
+    'ch' is a 16-bit UCS-2 character or a 8/16-bit legacy char.  'attr' is
+    the character attributes defined for the existing 'lchar_t' structure
+    (defined in 'textcommon.h').  'attrx' is the extended character
+    attributes defined for future selected Unicode character properties (see
+    below).  'comblen' is the number of attached/combining characters.
+    'combch' is an array of 16-bit UCS-2 attached/combining characters.  
+    
+    Add to 'textcommon.h' constants:  
+    
+    COMBLEN_MAX 8
+
+
+    McDonald                     June 20, 2002                     [Page 31]
+
+           CUPS Internationalization Software Design Description v0.3       
+
+    
+    ATTRX_RIGHT2LEFT 0x0001
+    
+    
+    
+    3.4.2.  textcommon.c - Common text filter
+    
+    Required Changes:  
+    
+    (1) Revise 'TextMain()' function as described below.  
+    
+    
+    
+    3.4.2.1.  TextMain() - Existing
+    
+    Required Changes:  
+    
+    [Ed Note:  Pseudo code below needs more work on bidi handling.] 
+    
+    (1) In main loop at the _beginning_ of the 'default' clause, add the
+        following code for combining marks:  
+        lchar_t *cp;
+        
+        cp = Page[line];
+        cp += column;
+        /*
+         * Check for Unicode combining mark (accent)
+         */
+        if (UTF-8 && cupsUtf32CombiningClass(ch) > 0)
+        {
+        
+         /*
+          * Save Unicode combining mark in SAME character
+          */
+          if (cp->comblen > COMBLEN_MAX)
+            break;
+          cp->combch[cp->comblen] = ch;
+          cp->comblen ++;
+          break;
+        }
+        
+    (2) In main loop _after_ combining chars section in 'default' clause,
+        add the following code for Unicode bidi control characters 
+        cups_bidicat_t bidicat;
+        
+        /*
+         * Check for Unicode bidi control character
+         */
+        if (UTF-8)
+        {
+          bidicat = (cups_bidicat_t)
+            cupsUtf32CharacterProperty(ch, CUPS_PROP_BIDI_CATEGORY);
+
+    McDonald                     June 20, 2002                     [Page 32]
+
+           CUPS Internationalization Software Design Description v0.3       
+
+          if ((bidicat == CUPS_BIDI_LRE)        /* Left-to-Right Embedding *
+          || (bidicat == CUPS_BIDI_LRO)         /* Left-to-Right Override */
+          || (bidicat == CUPS_BIDI_RLE)         /* Right-to-Left Embedding *
+          || (bidicat == CUPS_BIDI_RLO)         /* Right-to-Left Override */
+          || (bidicat == CUPS_BIDI_PDF))        /* Pop Directional Format */
+          {
+            /* Do bidi stuff here with memory for NEXT char's direction
+            /* Discard bidi control character and break */
+          }
+          if ((bidicat == CUPS_BIDI_R)           /* Right-to-Left Hebrew */
+          || (bidicat == CUPS_BIDI_AL))          /* Right-to-Left Arabic */
+          {
+            /* Set attrx for right-to-left */
+            cp->attrx |= ATTRX_RIGHT2LEFT
+          }
+        }
+    
+    
+    
+    3.4.2.2.  compare_keywords() - Existing
+    
+    [No Change] 
+    
+    
+    
+    3.4.2.3.  getutf8() - Existing
+    
+    [No Change] 
+    
+    [Ed Note:  Future - allow 20-bit UTF-32 code points - requires updates
+    in both 'textcommon.c' and 'texttops.c' for extended PostScript.] 
+    
+    
+    
+    3.5.  Text to PostScript Filter - Existing
+    
+    
+    
+    3.5.1.  texttops.c - Text to PostScript filter
+    
+    Required Changes:  
+    
+    (1) Revise local 'write_string()' function as described below.  
+    
+    
+    
+    3.5.1.1.  main() - Existing
+    
+    [No Change] 
+    
+
+
+
+    McDonald                     June 20, 2002                     [Page 33]
+
+           CUPS Internationalization Software Design Description v0.3       
+
+    
+    
+    3.5.1.2.  WriteEpilogue () - Existing
+    
+    [No Change] 
+    
+    
+    
+    3.5.1.3.  WritePage () - Existing
+    
+    [No Change] 
+    
+    
+    
+    3.5.1.4.  WriteProlog () - Existing
+    
+    [No Change] 
+    
+    
+    
+    3.5.1.5.  write_line() - Existing
+    
+    [No Change] 
+    
+    
+    
+    3.5.1.6.  write_string() - Existing
+    
+    Required Changes:  
+    
+    (1) At the _beginning_ of Multiple Fonts section, _replace_ the while() 
+        loop and surrounding 'putchar()' calls with the following code:  
+        
+        for (; len > 0; len --, s ++)
+        {
+          utf32_t decstr[COMBLEN_MAX * 2];
+          utf32_t cmpstr[COMBLEN_MAX * 2];
+          int     cmplen;
+          int     i;
+        
+          if (s->comblen == 0)
+          {
+            printf("<%04x>", Chars[s->ch]);
+            continue;
+          }
+        
+         /*
+          * Normalize decomposed Unicode character to NFKC
+          * (compatibility decomposition, then canonical composition)
+          */
+          decstr[0] = (utf32_t) s->ch;
+          for (i = 0; i < s->comblen; i ++)
+
+    McDonald                     June 20, 2002                     [Page 34]
+
+           CUPS Internationalization Software Design Description v0.3       
+
+            decstr[i + 1] = (utf32_t) s->combch[i];
+          decstr[i] = 0;
+          cmplen = cupsUtf32Normalize (&cmpstr[0],
+                       &decstr[0], COMBLEN_MAX * 2, CUPS_NORM_NFKC);
+          if (cmplen < 1)
+            continue;
+        
+         /*
+          * Write combining chars, then composed base, to same location
+          */
+          for (i = 1; i < cmplen; i ++)
+          {
+            printf("<%04x>", Chars[(int) cmpstr[i]);
+           /*
+            * Superimpose glyphs by backing up one column width
+            */
+            printf (" -%.3f ", (72.0f / (float) CharsPerInch));
+          }
+          printf("<%04x>", Chars[(int) cmpstr[0]);
+        }
+    
+    [Ed Note:  Future - Bidi support - When writing Unicode characters
+    (checking for explicit bidi) convert input string (lchar_t) to display
+    order???] 
+    
+    
+    
+    3.5.1.7.  write_text() - Existing
+    
+    [No Change] 
+    
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    McDonald                     June 20, 2002                     [Page 35]
+
+           CUPS Internationalization Software Design Description v0.3       
+                                   APPENDIX A                               
+                                    Glossary                                
+
+    
+    
+    A.  Glossary
+    
+    Abstract Character:  A unit of information used for the organization,
+    control, or representation of textual data.  
+    
+    Accent Mark:  A mark placed above, below, or to the side of a character 
+    to alter its phonetic value (also 'diacritic').  
+    
+    Alphabet:  A collection of symbols that, in the context of a particular 
+    written language, represent the sounds of that language.  
+    
+    Base Character:  A character that does not graphically combine with
+    preceding characters, and that is neither a control nor a format
+    character.  
+    
+    Basic Multilingual Plane:  The Unicode (or UCS) code values 0x0000
+    through 0xFFFF, specified by [ISO10646] (also 'Plane 0').  
+    
+    BIDI:  Abbreviation for Bidirectional, in reference to mixed
+    left-to-right and right-to-left text.  
+    
+    Bidirectional Display:  The process or result of mixing left-to-right
+    oriented text and right-to-left oriented text in a single line.  
+    
+    Big-endian:  A computer architecture that stores multiple-byte numerical
+    values with the most significant byte (MSB) values first.  
+    
+    BMP:  Abbreviation for Basic Multilingual Plane.  
+    
+    BOM:  Acronym for byte order mark (also 'ZWNBSP').  
+    
+    Byte Order Mark:  The Unicode character U+FEFF Zero Width No-Break Space
+    (ZWNBSP) when used to indicate the byte order of text.  
+    
+    Canonical:  (1) Conforming to the general rules for encoding -- that is,
+    not compressed, compacted, or in any other form specified by a higher
+    protocol.  (2) Characteristic of a normative mapping and form of
+    equivalence.  
+    
+    Canonical Decomposition:  The decomposition of a character that results 
+    from recursively applying the canonical mappings defined in the Unicode 
+    Character Database until no characters can be further decomposed, then
+    reordering nonspacing marks according to section 3.10 of [UNICODE3.2].  
+    
+    Canonical Equivalent:  Two characters are canonical equivalents if their
+    full canonical decompositions are identical.  
+    
+    Case:  (1) Feature of certain alphabets wheere the letters have two
+
+    McDonald                    June 20, 2002                     [Page A-1]
+
+           CUPS Internationalization Software Design Description v0.3       
+                                   APPENDIX A                               
+                                    Glossary                                
+
+    distinct forms.  These variants are called the 'uppercase' letter (also 
+    known as 'capital' or 'majuscule') and the 'lowercase' letter (also
+    known as 'small' or 'minuscule').  (2) Normative property of Unicode
+    characters, consisting of uppercase, lowercase, and titlecase.  
+    
+    Character:  (1) The smallest component of written language that has
+    semantic value; refers to the abstract meaning and/or shape, rather than
+    a specific shape (see also 'glyph').  (2) Synonym for 'abstract
+    character'.  (3) The basic unit of encoding for the Unicode character
+    encoding.  (4) The English name for the ideographic written elements of 
+    Chinese origin (see 'ideograph').  
+    
+    Character Encoding Form (CEF):  Mapping from a character set definition 
+    to the actual bits used to represent the data.  
+    
+    Character Encoding Scheme (CES):  A 'character encoding form' plus byte 
+    serialization.  [UNICODE3.2] defines seven character encoding schemes:  
+    UTF-8, UTF-16, UTF-16BE, UTF-16LE, UTF-32, UTF-32BE, and UTF32-LE.  
+    
+    Character Properties:  A set of property names and property values
+    associated with individual characters defined in [UNICODE3.2].  
+    
+    Character Repertoire:  (1) The collection of characters included in a
+    character set.  (2) The SUBSET of characters included in a large
+    character set, e.g., [UNICODE3.2], that are necessary to support a
+    complete mapping to another smaller character set, e.g., ISO8859-1 (also
+    called 'Latin-1').  
+    
+    Character Set:  A collection of elements used to represent textual
+    information.  
+    
+    Coded Character Set:  A character set in which each character is
+    assigned a numeric code value.  Frequently abbreviated as 'character
+    set', 'charset', or 'code set'.  
+    
+    Code Point:  (1) A numerical index (or position) in an encoding table
+    used for encoding characters.  (2) Synonym for 'Unicode scalar value'.  
+    
+    Collation:  The process of ordering units of textual information.
+    Collation is usually specific to a particular language.  Also known as
+    'alphabetizing' or 'alphabetic sorting'.  
+    
+    Combining Character:  A character that graphically combines with a
+    preceding 'base character'.  The combining character is said to 'apply' 
+    to that base character.  (See also 'nonspacing mark'.) 
+    
+    Compatibility:  (1) Consistency with existing practice or preexisting
+    character encoding standards.  (2) Characterisitic of a normative
+    mapping and form of equivalence (see 'compatibility decomposition').  
+
+
+    McDonald                    June 20, 2002                     [Page A-2]
+
+           CUPS Internationalization Software Design Description v0.3       
+                                   APPENDIX A                               
+                                    Glossary                                
+
+    
+    Compatibility Character:  A character that has a compatibility
+    decomposition.  
+    
+    Compatibility Decomposition:  The decomposition of a character that
+    results from recursively applying BOTH the compatibility mappings AND
+    the canonical mappings found in the Unicode Character Database until no
+    characters can be further decomposed, then reordering nonspacing marks
+    according to section 3.10 of [UNICODE3.2].  
+    
+    Compatibility Equivalent:  Two characters are compatibility equivalents 
+    if their full compatibility decompositions are identical.  
+    
+    Composed Character:  (See 'descomposable character'.) 
+    
+    DBCS:  Acronym for 'double-byte character set'.  
+    
+    Decomposable Character:  A character that is equivalent to a sequence of
+    one or more other characters, according to the decomposition mappings
+    found in [UNICODE3.2].  It may also be known as a 'precomposed
+    character' or a 'composite character'.  
+    
+    Decomposition:  (1) The process of separating or analyzing a text
+    element into component units.  (2) A sequence of one or more characters 
+    that is equivalent to a 'decomposable character'.  
+    
+    Diacritic:  (See 'accent mark'.) 
+    
+    Double-Byte Character Set (DBCS):  One of a number of character sets
+    defined for representing Chinese, Japanese, or Korean text (for example,
+    JIS X 0208-1990).  These character sets are often encoded in such a way 
+    as to allow double-byte character encodings to be mixed with single-byte
+    character encodings.  (See also 'multiple-byte character set'.) 
+    
+    Font:  A collection of glyphs used for visual depication of character
+    data.  
+    
+    FSS-UTF:  Abbreviation for 'File System Safe UCS Transformation Format',
+    originally published by X/Open.  Now called 'UTF-8'.  
+    
+    Fullwidth:  Characters of East Asian character sets whose glyph image
+    extends across the entire character display cell.  In legacy character
+    sets, fullwidth characters are normally encoded in two or three bytes.  
+    
+    Glyph:  (1) An abstract form that represents one or more glyph images.  
+    (2) A synonym for 'glyph image'.  
+    
+    Glyph Image:  The actual, concrete image of a glyph representation
+    having been rasterized or otherwise images onto some display surface.  
+
+
+    McDonald                    June 20, 2002                     [Page A-3]
+
+           CUPS Internationalization Software Design Description v0.3       
+                                   APPENDIX A                               
+                                    Glossary                                
+
+    
+    Halfwidth:  Characters of East Asian character sets whose glyph image
+    occupies half of the character display cell.  In legacy character sets, 
+    halfwidth characters are normally encoded in a single byte.  
+    
+    Han Characters:  Ideographic characters of Chinese origin.  
+    
+    Hangul:  The name of the script used to write the Korean language.  
+    
+    High-Surrogate:  A Unicode code value in the range U+D800 to U+DBFF.  
+    
+    Hiragana:  One of two standard syllabaries associated with the Japanese 
+    writing system.  Use to write particles, grammatical affixes, and words 
+    that have no 'kanji' form.  
+    
+    IANA:  Internet Assigned Numbers Authority.  
+    
+    Ideograph:  (1) Any symbol that denotes an idea (or meaning) in contrast
+    to a sound or pronunciation (for example, a 'smiley face').  (2) A
+    common term used to refer to Han characters.  
+    
+    IPA:  International Phonetic Alphabet.  
+    
+    IRG:  Abbreviation for Ideographic Rapporteur Group, a subgroup of
+    ISO/IEC JTC1/SC2/WG2 (who work on Han unification and submission of new 
+    Han characters for inclusion in revised versions of Unicode/ISO 10646).
+    
+    Jamo:  The Korean name for a single letter of the Hangul script.  Jamos 
+    are used to form Hangul syllables.  
+    
+    Joiner:  An invisible character that affects the joining behavior of
+    surrounding characters.  
+    
+    JTC1:  Abbreviation for Joint Technical Committee 1 of ISO/IEC,
+    responsible for information technology standardization.  
+    
+    Kana:  The name of a primarily syllabic script used by the Japanese
+    writing system, composed of 'hiragana' and 'katakana'.  
+    
+    Kanji:  The Japanese name for Han characters; derived from the Chinese
+    word 'hanzi'.  Also romanized as 'kanzi'.  
+    
+    Katakana:  One of two standard syllabaries associated with the Japanese 
+    writing system, typically used in representation of borrowed vocabulary.
+    
+    Ligature:  A glyph representing a combination of two or more characters,
+    for example in the Latin script the ligature between 'f' and 'i' as
+    'fi'.  
+    
+    Logical Order:  The order in which text is typed on a keyboard.  For the
+
+    McDonald                    June 20, 2002                     [Page A-4]
+
+           CUPS Internationalization Software Design Description v0.3       
+                                   APPENDIX A                               
+                                    Glossary                                
+
+    most part, logical order corresponds to phonetic order.  
+    
+    Lowercase:  (See 'case'.) 
+    
+    Low-Surrogate:  A Unicode code value in the range U+DC00 to U+DFFF.  
+    
+    MBCS:  Acronym for 'multiple-byte character set'.  
+    
+    Multiple-Byte Character Set (MBCS):  A character set encoded with a
+    variable number of bytes per character.  Many large character sets have 
+    been defined as MBCS so as to keep strict compatibility with the
+    US-ASCII subset and/or [ISO2022].  
+    
+    Normalization:  Transformation of data to a normal form.  
+    
+    Plain Text:  Computer-encoded text that consists ONLY of a sequence of
+    code values from a given standard, with no other formatting or
+    structural information.  
+    
+    Precomposed Character:  (See 'decomposable character'.) 
+    
+    Rendering:  (1) The process of selecting and laying out glyphs for the
+    purpose of depicting characters.  (2) The process of making glyphs
+    visible on a display device.  
+    
+    Repertoire:  (See 'character repertoire'.) 
+    
+    Replacement Character:  A character used as a substitute for an
+    uninterpretable character from another encoding.  [UNICODE3.2] defines
+    U+FFFD REPLACEMENT CHARACTER for this function.  
+    
+    Rich Text:  The result of adding information such as font data, color,
+    formatting, phonetic annotations, etc. to 'plain text' (e.g., HTML).  
+    
+    SBCS:  Acronym for 'single-byte character set'.  
+    
+    Scalar Value:  (See 'Unicode scalar value'.) 
+    
+    Script:  A collection of symbols used to represent textual information
+    in one or more writing systems.  
+    
+    Single-Byte Character Set (SBCS):  One of a number of one-byte character
+    sets defined for representing (mostly) Western languages (for example,
+    ISO 8859-1 'Latin-1').  These character sets are often encoded in such a
+    way as to be strict supersets of 7-bit [US-ASCII].  
+    
+    Sorting:  (See 'collation'.) 
+    
+    Transcoding:  Conversion of character data between different character
+    sets.  
+
+    McDonald                    June 20, 2002                     [Page A-5]
+
+           CUPS Internationalization Software Design Description v0.3       
+                                   APPENDIX A                               
+                                    Glossary                                
+
+    
+    Transformation Format:  A mapping from a coded character sequence to a
+    unique sequence of code values (typically octets).  
+    
+    UCS:  Abbreviation for Universal Character Set, specified by [ISO10646].
+    
+    UCS-2:  UCS encoded in 2 octets, specified by [ISO10646].  
+    
+    UCS-4:  UCS encoded in 4 octets, specified by [ISO10646].  
+    
+    Unicode Scalar Value:  A number between 0 to 0x10FFFF.  
+    
+    Uppercase:  (See 'case'.) 
+    
+    UTF:  Abbreviation for Unicode (or UCS) Transformation Format.  
+    
+    UTF-8:  Unicode (or UCS) Transformation Format, 8-bit encoding form.
+    Serializes a Unicode (or UCS) scalar value (code point) as a sequence of
+    one to four octets.  Does NOT suffer from byte-ordering ambiguities.  
+    
+    UTF-16:  Unicode (or UCS) Transformation Format, 16-bit encoding form.  
+    Serializes a Unicode (or UCS) scalar value (code point) as a sequence of
+    two octets, in either big-endian or little-endian format.  Uses an
+    (optional) prefix of BOM to disambiguate byte-ordering.  
+    
+    UTF-32:  Unicode (or UCS) Transformation Format, 32-bit encoding form.  
+    Serializes a Unicode (or UCS) scalar value (code point) as a sequence of
+    four octets, in either big-endian or little-endian format.  Uses an
+    (optional) prefix of BOM to disambiguate byte-ordering.  
+    
+    Zero Width:  Characteristic of some spaces or format control characters 
+    that do not advance text along the horizontal baseline.  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    McDonald                    June 20, 2002                     [Page A-6]
