@@ -1,5 +1,5 @@
 /*
- * "$Id: gdevcups.c,v 1.30 2000/06/26 15:50:17 mike Exp $"
+ * "$Id: gdevcups.c,v 1.31 2000/08/16 18:56:00 mike Exp $"
  *
  *   GNU Ghostscript raster output driver for the Common UNIX Printing
  *   System (CUPS).
@@ -1418,11 +1418,48 @@ cups_put_params(gx_device     *pdev,	/* I - Device info */
     * accordingly.
     */
 
-    size       = cups->ppd->sizes;
-    margins[0] = size->left / 72.0;
-    margins[1] = size->bottom / 72.0;
-    margins[2] = (size->width - size->right) / 72.0;
-    margins[3] = (size->length - size->top) / 72.0;
+    for (i = cups->ppd->num_sizes, size = cups->ppd->sizes;
+         i > 0;
+         i --, size ++)
+      if ((fabs(cups->PageSize[1] - size->length) < 18.0 &&
+           fabs(cups->PageSize[0] - size->width) < 18.0) ||
+          (fabs(cups->PageSize[0] - size->length) < 18.0 &&
+           fabs(cups->PageSize[1] - size->width) < 18.0))
+	break;
+
+    if (i == 0 && !cups->ppd->variable_sizes)
+    {
+      i    = 1;
+      size = cups->ppd->sizes;
+    }
+
+    if (i > 0)
+    {
+     /*
+      * Standard size...
+      */
+
+      fprintf(stderr, "DEBUG: size = %s\n", size->name);
+
+      margins[0] = size->left / 72.0;
+      margins[1] = size->bottom / 72.0;
+      margins[2] = (size->width - size->right) / 72.0;
+      margins[3] = (size->length - size->top) / 72.0;
+    }
+    else
+    {
+     /*
+      * Custom size...
+      */
+
+      fputs("DEBUG: size = Custom\n", stderr);
+
+      for (i = 0; i < 4; i ++)
+        margins[i] = cups->ppd->custom_margins[i] / 72.0;
+    }
+
+    fprintf(stderr, "DEBUG: margins[] = [ %f %f %f %f ]\n",
+	    margins[0], margins[1], margins[2], margins[3]);
   }
   else
   {
@@ -2514,5 +2551,5 @@ cups_print_planar(gx_device_printer *pdev,	/* I - Printer device */
 
 
 /*
- * End of "$Id: gdevcups.c,v 1.30 2000/06/26 15:50:17 mike Exp $".
+ * End of "$Id: gdevcups.c,v 1.31 2000/08/16 18:56:00 mike Exp $".
  */
