@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c,v 1.57.2.12 2002/05/03 21:18:27 mike Exp $"
+ * "$Id: main.c,v 1.57.2.13 2002/05/12 11:55:08 mike Exp $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -204,17 +204,6 @@ main(int  argc,			/* I - Number of command-line arguments */
   setrlimit(RLIMIT_NOFILE, &limit);
 
  /*
-  * Read configuration...
-  */
-
-  if (!ReadConfiguration())
-  {
-    syslog(LOG_LPR, "Unable to read configuration file \'%s\' - exiting!",
-           ConfigurationFile);
-    return (1);
-  }
-
- /*
   * Catch hangup and child signals and ignore broken pipes...
   */
 
@@ -255,6 +244,17 @@ main(int  argc,			/* I - Number of command-line arguments */
   signal(SIGPIPE, SIG_IGN);
   signal(SIGTERM, sigterm_handler);
 #endif /* HAVE_SIGSET */
+
+ /*
+  * Read configuration...
+  */
+
+  if (!ReadConfiguration())
+  {
+    syslog(LOG_LPR, "Unable to read configuration file \'%s\' - exiting!",
+           ConfigurationFile);
+    return (1);
+  }
 
 #ifdef __sgi
  /*
@@ -815,5 +815,5 @@ usage(void)
 
 
 /*
- * End of "$Id: main.c,v 1.57.2.12 2002/05/03 21:18:27 mike Exp $".
+ * End of "$Id: main.c,v 1.57.2.13 2002/05/12 11:55:08 mike Exp $".
  */

@@ -5,6 +5,12 @@ CHANGES IN CUPS V1.1.15
 
 	- Updated the CUPS license agreement for the new MacOS
 	  license exception.
+	- The scheduler didn't handle signals until after it
+	  loaded the configuration files the first time; this
+	  caused problems on some installations that would
+	  restart the scheduler as the system booted into run
+	  level 3.
+	- Now throttle broadcasts like we do for polling.
 	- Fixed a bug in the reading of PPD files using CR's
 	  instead of CR LF's or LF's.
 	- The scheduler would crash if cupsd.conf contained a

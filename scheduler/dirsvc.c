@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.73.2.11 2002/03/27 22:10:23 mike Exp $"
+ * "$Id: dirsvc.c,v 1.73.2.12 2002/05/12 11:55:07 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -477,6 +477,7 @@ ProcessBrowseData(const char   *uri,	/* I - URI of printer/class */
 void
 SendBrowseList(void)
 {
+  int			count;	/* Number of dests to update */
   printer_t		*p,	/* Current printer */
 			*np;	/* Next printer */
   time_t		ut,	/* Minimum update time */
@@ -492,6 +493,27 @@ SendBrowseList(void)
 
   ut = time(NULL) - BrowseInterval;
   to = time(NULL) - BrowseTimeout;
+
+ /*
+  * Figure out how many printers need an update...
+  */
+
+  if (BrowseInterval > 0)
+  {
+    for (count = 0, p = Printers; p != NULL; p = p->next)
+      if (!(p->type & (CUPS_PRINTER_REMOTE | CUPS_PRINTER_IMPLICIT)) &&
+          p->browse_time < ut)
+        count ++;
+
+   /*
+    * Throttle the number of printers we'll be updating this time
+    * around...
+    */
+
+    count = 2 * count / BrowseInterval + 1;
+  }
+  else
+    count = 0;
 
  /*
   * Loop through all of the printers and send local updates as needed...
@@ -514,12 +536,14 @@ SendBrowseList(void)
         DeletePrinter(p);
       }
     }
-    else if (p->browse_time < ut &&  BrowseInterval > 0 &&
-            !(p->type & CUPS_PRINTER_IMPLICIT))
+    else if (p->browse_time < ut && count > 0 &&
+             !(p->type & CUPS_PRINTER_IMPLICIT))
     {
      /*
       * Need to send an update...
       */
+
+      count --;
 
       p->browse_time = time(NULL);
 
@@ -1839,5 +1863,5 @@ UpdateSLPBrowse(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.73.2.11 2002/03/27 22:10:23 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.73.2.12 2002/05/12 11:55:07 mike Exp $".
  */
