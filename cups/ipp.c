@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.20 1999/07/12 16:09:36 mike Exp $"
+ * "$Id: ipp.c,v 1.21 1999/07/12 17:15:46 mike Exp $"
  *
  *   Internet Printing Protocol support functions for the Common UNIX
  *   Printing System (CUPS).
@@ -139,10 +139,10 @@ ippAddBooleans(ipp_t      *ipp,		/* I - IPP request */
  */
 
 ipp_attribute_t *			/* O - New attribute */
-ippAddDate(ipp_t       *ipp,		/* I - IPP request */
-           ipp_tag_t   group,		/* I - IPP group */
-	   const char  *name,		/* I - Name of attribute */
-	   ipp_uchar_t *value)		/* I - Value */
+ippAddDate(ipp_t             *ipp,	/* I - IPP request */
+           ipp_tag_t         group,	/* I - IPP group */
+	   const char        *name,	/* I - Name of attribute */
+	   const ipp_uchar_t *value)	/* I - Value */
 {
   ipp_attribute_t	*attr;		/* New attribute */
 
@@ -1455,5 +1455,5 @@ ipp_read(http_t *http,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.20 1999/07/12 16:09:36 mike Exp $".
+ * End of "$Id: ipp.c,v 1.21 1999/07/12 17:15:46 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.h,v 1.16 1999/07/12 16:09:37 mike Exp $"
+ * "$Id: ipp.h,v 1.17 1999/07/12 17:15:47 mike Exp $"
  *
  *   Internet Printing Protocol definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -309,7 +309,7 @@ typedef struct			/**** Request State ****/
 extern time_t		ippDateToTime(const ipp_uchar_t *date);
 extern ipp_attribute_t	*ippAddBoolean(ipp_t *ipp, ipp_tag_t group, const char *name, char value);
 extern ipp_attribute_t	*ippAddBooleans(ipp_t *ipp, ipp_tag_t group, const char *name, int num_values, const char *values);
-extern ipp_attribute_t	*ippAddDate(ipp_t *ipp, ipp_tag_t group, const char *name, ipp_uchar_t *value);
+extern ipp_attribute_t	*ippAddDate(ipp_t *ipp, ipp_tag_t group, const char *name, const ipp_uchar_t *value);
 extern ipp_attribute_t	*ippAddInteger(ipp_t *ipp, ipp_tag_t group, ipp_tag_t type, const char *name, int value);
 extern ipp_attribute_t	*ippAddIntegers(ipp_t *ipp, ipp_tag_t group, ipp_tag_t type, const char *name, int num_values, const int *values);
 extern ipp_attribute_t	*ippAddRange(ipp_t *ipp, ipp_tag_t group, const char *name, int lower, int upper);
@@ -338,5 +338,5 @@ extern int		ippPort(void);
 #endif /* !_CUPS_IPP_H_ */
 
 /*
- * End of "$Id: ipp.h,v 1.16 1999/07/12 16:09:37 mike Exp $".
+ * End of "$Id: ipp.h,v 1.17 1999/07/12 17:15:47 mike Exp $".
  */
