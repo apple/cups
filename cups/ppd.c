@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c,v 1.81 2003/01/28 20:21:53 mike Exp $"
+ * "$Id: ppd.c,v 1.82 2003/01/29 17:03:37 mike Exp $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -36,6 +36,8 @@
  *
  *   _ppd_attr_compare()   - Compare two attributes.
  *   ppdClose()            - Free all memory used by the PPD file.
+ *   ppdErrorString()      - Returns the text assocated with a status.
+ *   ppdLastError()        - Return the status from the last ppdOpen*().
  *   ppdOpen()             - Read a PPD file into memory.
  *   ppdOpenFd()           - Read a PPD file into memory.
  *   ppdOpenFile()         - Read a PPD file into memory.
@@ -85,6 +87,15 @@
 #define PPD_OPTION	2		/* Line contained an option name */
 #define PPD_TEXT	4		/* Line contained human-readable text */
 #define PPD_STRING	8		/* Line contained a string or code */
+
+
+/*
+ * Local globals...
+ */
+
+static ppd_status_t	ppd_status = PPD_OK;
+					/* Status of last ppdOpen*() */
+static int		ppd_line = 1;	/* Current line number */
 
 
 /*
@@ -270,6 +281,49 @@ ppdClose(ppd_file_t *ppd)		/* I - PPD file record */
 
 
 /*
+ * 'ppdErrorString()' - Returns the text assocated with a status.
+ */
+
+const char *				/* O - Status string */
+ppdErrorString(ppd_status_t status)	/* I - PPD status */
+{
+  static const char * const messages[] =/* Status messages */
+		{
+		  "OK",
+		  "Unable to open PPD file",
+		  "NULL PPD file pointer",
+		  "Missing PPD-Adobe-4.x header",
+		  "Memory allocation error",
+		  "Missing value string",
+		  "Internal error",
+		  "OpenGroup without a CloseGroup first",
+		  "Bad OrderDependency",
+		  "Bad UIConstraints",
+		};
+
+
+  if (status < PPD_OK || status > PPD_BAD_UI_CONSTRAINTS)
+    return ("Unknown");
+  else
+    return (messages[status]);
+}
+
+
+/*
+ * 'ppdLastError()' - Return the status from the last ppdOpen*().
+ */
+
+ppd_status_t				/* O - Status code */
+ppdLastError(int *line)			/* O - Line number */
+{
+  if (line)
+    *line = ppd_line;
+
+  return (ppd_status);
+}
+
+
+/*
  * 'ppdOpen()' - Read a PPD file into memory.
  */
 
@@ -306,11 +360,21 @@ ppdOpen(FILE *fp)			/* I - File to read from */
 
 
  /*
+  * Default to "OK" status...
+  */
+
+  ppd_status = PPD_OK;
+  ppd_line   = 1;
+
+ /*
   * Range check input...
   */
 
   if (fp == NULL)
+  {
+    ppd_status = PPD_NULL_FILE;
     return (NULL);
+  }
 
  /*
   * Grab the first line and make sure it reads '*PPD-Adobe: "major.minor"'...
@@ -326,6 +390,8 @@ ppdOpen(FILE *fp)			/* I - File to read from */
     * Either this is not a PPD file, or it is not a 4.x PPD file.
     */
 
+    ppd_status = PPD_MISSING_PPDADOBE4;
+
     ppd_free(string);
 
     return (NULL);
@@ -340,7 +406,11 @@ ppdOpen(FILE *fp)			/* I - File to read from */
   */
 
   if ((ppd = calloc(sizeof(ppd_file_t), 1)) == NULL)
+  {
+    ppd_status = PPD_ALLOC_ERROR;
+
     return (NULL);
+  }
 
   ppd->language_level = 1;
   ppd->color_device   = 0;
@@ -410,6 +480,8 @@ ppdOpen(FILE *fp)			/* I - File to read from */
 #else
       setlocale(LC_ALL, oldlocale);
 #endif /* LC_NUMERIC */
+
+      ppd_status = PPD_MISSING_VALUE;
 
       return (NULL);
     }
@@ -577,6 +649,8 @@ ppdOpen(FILE *fp)			/* I - File to read from */
         setlocale(LC_ALL, oldlocale);
 #endif /* LC_NUMERIC */
 
+        ppd_status = PPD_ALLOC_ERROR;
+
 	return (NULL);
       }
 
@@ -618,6 +692,8 @@ ppdOpen(FILE *fp)			/* I - File to read from */
 #else
         setlocale(LC_ALL, oldlocale);
 #endif /* LC_NUMERIC */
+
+        ppd_status = PPD_ALLOC_ERROR;
 
 	return (NULL);
       }
@@ -663,6 +739,8 @@ ppdOpen(FILE *fp)			/* I - File to read from */
           setlocale(LC_ALL, oldlocale);
 #endif /* LC_NUMERIC */
 
+          ppd_status = PPD_ALLOC_ERROR;
+
 	  return (NULL);
 	}
 
@@ -679,6 +757,8 @@ ppdOpen(FILE *fp)			/* I - File to read from */
 #else
           setlocale(LC_ALL, oldlocale);
 #endif /* LC_NUMERIC */
+
+          ppd_status = PPD_ALLOC_ERROR;
 
 	  return (NULL);
 	}
@@ -697,6 +777,8 @@ ppdOpen(FILE *fp)			/* I - File to read from */
 #else
         setlocale(LC_ALL, oldlocale);
 #endif /* LC_NUMERIC */
+
+        ppd_status = PPD_ALLOC_ERROR;
 
 	return (NULL);
       }
@@ -762,6 +844,8 @@ ppdOpen(FILE *fp)			/* I - File to read from */
             setlocale(LC_ALL, oldlocale);
 #endif /* LC_NUMERIC */
 
+            ppd_status = PPD_ALLOC_ERROR;
+
 	    return (NULL);
 	  }
 
@@ -780,6 +864,8 @@ ppdOpen(FILE *fp)			/* I - File to read from */
 #else
             setlocale(LC_ALL, oldlocale);
 #endif /* LC_NUMERIC */
+
+            ppd_status = PPD_ALLOC_ERROR;
 
 	    return (NULL);
 	  }
@@ -800,6 +886,8 @@ ppdOpen(FILE *fp)			/* I - File to read from */
 #else
           setlocale(LC_ALL, oldlocale);
 #endif /* LC_NUMERIC */
+
+          ppd_status = PPD_ALLOC_ERROR;
 
 	  return (NULL);
 	}
@@ -825,6 +913,8 @@ ppdOpen(FILE *fp)			/* I - File to read from */
         setlocale(LC_ALL, oldlocale);
 #endif /* LC_NUMERIC */
 
+        ppd_status = PPD_INTERNAL_ERROR;
+
 	return (NULL);
       }
 
@@ -843,6 +933,8 @@ ppdOpen(FILE *fp)			/* I - File to read from */
 #else
         setlocale(LC_ALL, oldlocale);
 #endif /* LC_NUMERIC */
+
+        ppd_status = PPD_INTERNAL_ERROR;
 
 	return (NULL);
       }
@@ -932,6 +1024,8 @@ ppdOpen(FILE *fp)			/* I - File to read from */
           setlocale(LC_ALL, oldlocale);
 #endif /* LC_NUMERIC */
 
+          ppd_status = PPD_ALLOC_ERROR;
+
 	  return (NULL);
 	}
 
@@ -991,6 +1085,8 @@ ppdOpen(FILE *fp)			/* I - File to read from */
           setlocale(LC_ALL, oldlocale);
 #endif /* LC_NUMERIC */
 
+          ppd_status = PPD_ALLOC_ERROR;
+
 	  return (NULL);
 	}
 
@@ -1014,6 +1110,8 @@ ppdOpen(FILE *fp)			/* I - File to read from */
 #else
         setlocale(LC_ALL, oldlocale);
 #endif /* LC_NUMERIC */
+
+        ppd_status = PPD_ALLOC_ERROR;
 
 	return (NULL);
       }
@@ -1079,6 +1177,8 @@ ppdOpen(FILE *fp)			/* I - File to read from */
         setlocale(LC_ALL, oldlocale);
 #endif /* LC_NUMERIC */
 
+        ppd_status = PPD_ALLOC_ERROR;
+
 	return (NULL);
       }
 
@@ -1104,6 +1204,8 @@ ppdOpen(FILE *fp)			/* I - File to read from */
 #else
         setlocale(LC_ALL, oldlocale);
 #endif /* LC_NUMERIC */
+
+        ppd_status = PPD_ALLOC_ERROR;
 
 	return (NULL);
       }
@@ -1146,6 +1248,8 @@ ppdOpen(FILE *fp)			/* I - File to read from */
 #else
         setlocale(LC_ALL, oldlocale);
 #endif /* LC_NUMERIC */
+
+        ppd_status = PPD_NESTED_OPEN_GROUP;
 
 	return (NULL);
       }
@@ -1190,6 +1294,8 @@ ppdOpen(FILE *fp)			/* I - File to read from */
 #else
         setlocale(LC_ALL, oldlocale);
 #endif /* LC_NUMERIC */
+
+        ppd_status = PPD_BAD_ORDER_DEPENDENCY;
 
 	return (NULL);
       }
@@ -1294,6 +1400,8 @@ ppdOpen(FILE *fp)			/* I - File to read from */
         setlocale(LC_ALL, oldlocale);
 #endif /* LC_NUMERIC */
 
+        ppd_status = PPD_ALLOC_ERROR;
+
 	return (NULL);
       }
 
@@ -1309,7 +1417,8 @@ ppdOpen(FILE *fp)			/* I - File to read from */
 	case 1 : /* Error */
 	    ppdClose(ppd);
   	    ppd_free(string);
-	    break;
+	    ppd_status = PPD_BAD_UI_CONSTRAINTS;
+	    return (NULL);
 
 	case 2 : /* Two options... */
 	   /*
@@ -1385,6 +1494,8 @@ ppdOpen(FILE *fp)			/* I - File to read from */
         setlocale(LC_ALL, oldlocale);
 #endif /* LC_NUMERIC */
 
+        ppd_status = PPD_ALLOC_ERROR;
+
 	return (NULL);
       }
 
@@ -1412,6 +1523,8 @@ ppdOpen(FILE *fp)			/* I - File to read from */
 #else
         setlocale(LC_ALL, oldlocale);
 #endif /* LC_NUMERIC */
+
+        ppd_status = PPD_ALLOC_ERROR;
 
 	return (NULL);
       }
@@ -1576,6 +1689,10 @@ ppdOpen(FILE *fp)			/* I - File to read from */
     qsort(ppd->attrs, ppd->num_attrs, sizeof(ppd_attr_t *),
           (int (*)(const void *, const void *))_ppd_attr_compare);
 
+ /*
+  * Return the PPD file structure...
+  */
+
   return (ppd);
 }
 
@@ -1592,11 +1709,21 @@ ppdOpenFd(int fd)			/* I - File to read from */
 
 
  /*
+  * Set the line number to 1...
+  */
+
+  ppd_line = 1;
+
+ /*
   * Range check input...
   */
 
   if (fd < 0)
+  {
+    ppd_status = PPD_NULL_FILE;
+
     return (NULL);
+  }
 
  /*
   * Try to open the file and parse it...
@@ -1608,10 +1735,13 @@ ppdOpenFd(int fd)			/* I - File to read from */
 
     ppd = ppdOpen(fp);
 
-    ppd_free(fp);
+    fclose(fp);
   }
   else
-    ppd = NULL;
+  {
+    ppd_status = PPD_FILE_OPEN_ERROR;
+    ppd        = NULL;
+  }
 
   return (ppd);
 }
@@ -1629,11 +1759,21 @@ ppdOpenFile(const char *filename)	/* I - File to read from */
 
 
  /*
+  * Set the line number to 1...
+  */
+
+  ppd_line = 1;
+
+ /*
   * Range check input...
   */
 
   if (filename == NULL)
+  {
+    ppd_status = PPD_NULL_FILE;
+
     return (NULL);
+  }
 
  /*
   * Try to open the file and parse it...
@@ -1646,7 +1786,10 @@ ppdOpenFile(const char *filename)	/* I - File to read from */
     fclose(fp);
   }
   else
-    ppd = NULL;
+  {
+    ppd_status = PPD_FILE_OPEN_ERROR;
+    ppd        = NULL;
+  }
 
   return (ppd);
 }
@@ -2102,6 +2245,8 @@ ppd_read(FILE *fp,			/* I - File to read from */
 	* Line feed or carriage return...
 	*/
 
+        ppd_line ++;
+
 	if (lineptr == line)		/* Skip blank lines */
           continue;
 
@@ -2331,5 +2476,5 @@ ppd_read(FILE *fp,			/* I - File to read from */
 
 
 /*
- * End of "$Id: ppd.c,v 1.81 2003/01/28 20:21:53 mike Exp $".
+ * End of "$Id: ppd.c,v 1.82 2003/01/29 17:03:37 mike Exp $".
  */
