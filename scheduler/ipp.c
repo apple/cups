@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.26 1999/09/23 18:21:55 mike Exp $"
+ * "$Id: ipp.c,v 1.27 1999/09/29 17:08:35 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -323,6 +323,8 @@ accept_jobs(client_t        *con,	/* I - Client connection */
 
   if (strncmp(con->uri, "/admin/", 7) != 0)
   {
+    LogMessage(LOG_ERROR, "accept_jobs: admin request on bad resource \'%s\'!",
+               resource);
     send_ipp_error(con, IPP_NOT_AUTHORIZED);
     return;
   }
@@ -339,8 +341,7 @@ accept_jobs(client_t        *con,	/* I - Client connection */
     * Bad URI...
     */
 
-    DEBUG_printf(("accept_jobs: resource name \'%s\' no good!\n",
-	          resource));
+    LogMessage(LOG_ERROR, "accept_jobs: resource name \'%s\' no good!", resource);
     send_ipp_error(con, IPP_NOT_FOUND);
     return;
   }
@@ -394,6 +395,8 @@ add_class(client_t        *con,		/* I - Client connection */
 
   if (strncmp(con->uri, "/admin/", 7) != 0)
   {
+    LogMessage(LOG_ERROR, "add_class: admin request on bad resource \'%s\'!",
+               resource);
     send_ipp_error(con, IPP_NOT_AUTHORIZED);
     return;
   }
@@ -544,8 +547,7 @@ add_class(client_t        *con,		/* I - Client connection */
 	* Bad URI...
 	*/
 
-	DEBUG_printf(("add_class: resource name \'%s\' no good!\n",
-	              resource));
+        LogMessage(LOG_ERROR, "add_class: resource name \'%s\' no good!", resource);
 	send_ipp_error(con, IPP_NOT_FOUND);
 	return;
       }
@@ -605,6 +607,8 @@ add_printer(client_t        *con,	/* I - Client connection */
 
   if (strncmp(con->uri, "/admin/", 7) != 0)
   {
+    LogMessage(LOG_ERROR, "add_printer: admin request on bad resource \'%s\'!",
+               resource);
     send_ipp_error(con, IPP_NOT_AUTHORIZED);
     return;
   }
@@ -853,6 +857,8 @@ cancel_all_jobs(client_t        *con,	/* I - Client connection */
 
   if (strncmp(con->uri, "/admin/", 7) != 0)
   {
+    LogMessage(LOG_ERROR, "cancel_all_jobs: admin request on bad resource \'%s\'!",
+               resource);
     send_ipp_error(con, IPP_NOT_AUTHORIZED);
     return;
   }
@@ -882,8 +888,7 @@ cancel_all_jobs(client_t        *con,	/* I - Client connection */
     * Bad URI...
     */
 
-    DEBUG_printf(("cancel_all_jobs: resource name \'%s\' no good!\n",
-	          resource));
+    LogMessage(LOG_ERROR, "cancel_all_jobs: resource name \'%s\' no good!", resource);
     send_ipp_error(con, IPP_NOT_FOUND);
     return;
   }
@@ -1151,6 +1156,8 @@ delete_printer(client_t        *con,	/* I - Client connection */
 
   if (strncmp(con->uri, "/admin/", 7) != 0)
   {
+    LogMessage(LOG_ERROR, "delete_printer: admin request on bad resource \'%s\'!",
+               resource);
     send_ipp_error(con, IPP_NOT_AUTHORIZED);
     return;
   }
@@ -1169,8 +1176,7 @@ delete_printer(client_t        *con,	/* I - Client connection */
     * Bad URI...
     */
 
-    DEBUG_printf(("get_printer_attrs: resource name \'%s\' no good!\n",
-	          resource));
+    LogMessage(LOG_ERROR, "delete_printer: resource name \'%s\' no good!", resource);
     send_ipp_error(con, IPP_NOT_FOUND);
     return;
   }
@@ -1290,8 +1296,7 @@ get_jobs(client_t        *con,		/* I - Client connection */
     * Bad URI...
     */
 
-    DEBUG_printf(("get_jobs: resource name \'%s\' no good!\n",
-	          resource));
+    LogMessage(LOG_ERROR, "get_jobs: resource name \'%s\' no good!", resource);
     send_ipp_error(con, IPP_NOT_FOUND);
     return;
   }
@@ -1672,8 +1677,7 @@ get_printer_attrs(client_t        *con,	/* I - Client connection */
     * Bad URI...
     */
 
-    DEBUG_printf(("get_printer_attrs: resource name \'%s\' no good!\n",
-	          resource));
+    LogMessage(LOG_ERROR, "get_printer_attrs: resource name \'%s\' no good!", resource);
     send_ipp_error(con, IPP_NOT_FOUND);
     return;
   }
@@ -1844,8 +1848,7 @@ print_job(client_t        *con,		/* I - Client connection */
     * Bad URI...
     */
 
-    DEBUG_printf(("print_job: resource name \'%s\' no good!\n",
-	          resource));
+    LogMessage(LOG_ERROR, "print_job: resource name \'%s\' no good!", resource);
     send_ipp_error(con, IPP_NOT_FOUND);
     return;
   }
@@ -1861,6 +1864,8 @@ print_job(client_t        *con,		/* I - Client connection */
 
   if (!printer->accepting)
   {
+    LogMessage(LOG_INFO, "print_job: destination \'%s\' is not accepting jobs.",
+               dest);
     send_ipp_error(con, IPP_NOT_ACCEPTING);
     return;
   }
@@ -1881,6 +1886,8 @@ print_job(client_t        *con,		/* I - Client connection */
 
   if ((job = AddJob(priority, printer->name)) == NULL)
   {
+    LogMessage(LOG_ERROR, "print_job: unable to add job for destination \'%s\'!",
+               dest);
     send_ipp_error(con, IPP_INTERNAL_ERROR);
     return;
   }
@@ -1970,6 +1977,8 @@ reject_jobs(client_t        *con,	/* I - Client connection */
 
   if (strncmp(con->uri, "/admin/", 7) != 0)
   {
+    LogMessage(LOG_ERROR, "reject_jobs: admin request on bad resource \'%s\'!",
+               resource);
     send_ipp_error(con, IPP_NOT_AUTHORIZED);
     return;
   }
@@ -1986,8 +1995,7 @@ reject_jobs(client_t        *con,	/* I - Client connection */
     * Bad URI...
     */
 
-    DEBUG_printf(("reject_jobs: resource name \'%s\' no good!\n",
-	          resource));
+    LogMessage(LOG_ERROR, "reject_jobs: resource name \'%s\' no good!", resource);
     send_ipp_error(con, IPP_NOT_FOUND);
     return;
   }
@@ -2034,6 +2042,7 @@ send_ipp_error(client_t     *con,	/* I - Client connection */
 {
   DEBUG_printf(("send_ipp_error(%08x, %04x)\n", con, status));
 
+  LogMessage(LOG_DEBUG, "Sending IPP error code %x.", status);
   if (con->filename[0])
     unlink(con->filename);
 
@@ -2070,6 +2079,8 @@ set_default(client_t        *con,	/* I - Client connection */
 
   if (strncmp(con->uri, "/admin/", 7) != 0)
   {
+    LogMessage(LOG_ERROR, "set_default: admin request on bad resource \'%s\'!",
+               resource);
     send_ipp_error(con, IPP_NOT_AUTHORIZED);
     return;
   }
@@ -2086,8 +2097,7 @@ set_default(client_t        *con,	/* I - Client connection */
     * Bad URI...
     */
 
-    DEBUG_printf(("set_default: resource name \'%s\' no good!\n",
-	          resource));
+    LogMessage(LOG_ERROR, "set_default: resource name \'%s\' no good!", resource);
     send_ipp_error(con, IPP_NOT_FOUND);
     return;
   }
@@ -2145,6 +2155,8 @@ start_printer(client_t        *con,	/* I - Client connection */
 
   if (strncmp(con->uri, "/admin/", 7) != 0)
   {
+    LogMessage(LOG_ERROR, "start_printer: admin request on bad resource \'%s\'!",
+               resource);
     send_ipp_error(con, IPP_NOT_AUTHORIZED);
     return;
   }
@@ -2161,8 +2173,7 @@ start_printer(client_t        *con,	/* I - Client connection */
     * Bad URI...
     */
 
-    DEBUG_printf(("start_printer: resource name \'%s\' no good!\n",
-	          resource));
+    LogMessage(LOG_ERROR, "start_printer: resource name \'%s\' no good!", resource);
     send_ipp_error(con, IPP_NOT_FOUND);
     return;
   }
@@ -2231,6 +2242,8 @@ stop_printer(client_t        *con,	/* I - Client connection */
 
   if (strncmp(con->uri, "/admin/", 7) != 0)
   {
+    LogMessage(LOG_ERROR, "stop_printer: admin request on bad resource \'%s\'!",
+               resource);
     send_ipp_error(con, IPP_NOT_AUTHORIZED);
     return;
   }
@@ -2247,8 +2260,7 @@ stop_printer(client_t        *con,	/* I - Client connection */
     * Bad URI...
     */
 
-    DEBUG_printf(("stop_printer: resource name \'%s\' no good!\n",
-	          resource));
+    LogMessage(LOG_ERROR, "stop_printer: resource name \'%s\' no good!", resource);
     send_ipp_error(con, IPP_NOT_FOUND);
     return;
   }
@@ -2419,8 +2431,7 @@ validate_job(client_t        *con,	/* I - Client connection */
     * Bad URI...
     */
 
-    DEBUG_printf(("validate_job: resource name \'%s\' no good!\n",
-	          resource));
+    LogMessage(LOG_ERROR, "validate_job: resource name \'%s\' no good!", resource);
     send_ipp_error(con, IPP_NOT_FOUND);
     return;
   }
@@ -2434,5 +2445,5 @@ validate_job(client_t        *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.26 1999/09/23 18:21:55 mike Exp $".
+ * End of "$Id: ipp.c,v 1.27 1999/09/29 17:08:35 mike Exp $".
  */
