@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.124.2.32 2002/09/06 12:23:40 mike Exp $"
+ * "$Id: job.c,v 1.124.2.33 2002/09/15 12:41:44 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -2377,6 +2377,17 @@ start_process(const char *command,	/* I - Full path to command */
     umask(077);
 
    /*
+    * Unblock signals before doing the exec...
+    */
+
+#ifdef HAVE_SIGSET
+    sigrelse(SIGTERM);
+    sigrelse(SIGCHLD);
+#elif defined(HAVE_SIGACTION)
+    sigprocmask(SIG_SETMASK, &oldmask, NULL);
+#endif /* HAVE_SIGSET */
+
+   /*
     * Execute the command; if for some reason this doesn't work,
     * return the error code...
     */
@@ -2410,5 +2421,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.124.2.32 2002/09/06 12:23:40 mike Exp $".
+ * End of "$Id: job.c,v 1.124.2.33 2002/09/15 12:41:44 mike Exp $".
  */
