@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.53.2.23 2003/03/20 02:45:47 mike Exp $"
+# "$Id: Makefile,v 1.53.2.24 2003/04/01 15:22:29 swdev Exp $"
 #
 #   API library Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -136,7 +136,9 @@ libcups.2.dylib:	$(LIBOBJS)
 
 libcups_s.a:	$(LIBOBJS)
 	echo Creating $@...
-	$(DSO) $(DSOFLAGS) -o libcups_s.o $(LIBOBJS) $(SSLLIBS) $(COMMONLIBS) -lm
+	$(RM) libcups_s.exp
+	(echo _ipp_add_attr; echo _ipp_free_attr) >libcups_s.exp
+	$(DSO) $(DSOFLAGS) -Wl,-bexport:libcups_s.exp -o libcups_s.o $(LIBOBJS) $(SSLLIBS) $(COMMONLIBS) -lm
 	$(RM) $@
 	$(AR) $(ARFLAGS) $@ libcups_s.o
 
@@ -216,5 +218,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile,v 1.53.2.23 2003/03/20 02:45:47 mike Exp $".
+# End of "$Id: Makefile,v 1.53.2.24 2003/04/01 15:22:29 swdev Exp $".
 #
