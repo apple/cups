@@ -3,6 +3,16 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.19
 
+	- The scheduler optimization to reference IPP attribute
+	  data instead of performing a full copy caused problems
+	  when the referenced data was deleted before it was
+	  sent.  It now only references attributes that change
+	  only when the scheduler is restarted.  The change also
+	  reduced the memory footprint of a printer object to
+	  2k.
+	- The scheduler now holds signals while logging messages
+	  to avoid potential deadlock issues when handling
+	  signals on Solaris 8.
 	- The lpadmin command now allows printer access control
 	  by group name as well as user name.
 	- "lpoptions -l" got in an infinite loop if no default
