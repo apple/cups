@@ -1,5 +1,5 @@
 /*
- * "$Id: cupstestppd.c,v 1.16 2003/02/20 14:19:30 mike Exp $"
+ * "$Id: cupstestppd.c,v 1.17 2003/02/20 16:00:16 mike Exp $"
  *
  *   PPD test program for the Common UNIX Printing System (CUPS).
  *
@@ -193,7 +193,8 @@ main(int  argc,			/* I - Number of command-line arguments */
       {
         error = ppdLastError(&line);
 
-        printf(" FAIL\n      **FAIL**  Unable to open PPD file - ");
+        if (verbose >= 0)
+          printf(" FAIL\n      **FAIL**  Unable to open PPD file - ");
 
 	if (error <= PPD_ALLOC_ERROR)
 	{
@@ -867,5 +868,5 @@ usage(void)
 
 
 /*
- * End of "$Id: cupstestppd.c,v 1.16 2003/02/20 14:19:30 mike Exp $".
+ * End of "$Id: cupstestppd.c,v 1.17 2003/02/20 16:00:16 mike Exp $".
  */
