@@ -1,5 +1,5 @@
 /*
- * "$Id: parallel.c,v 1.31 2001/06/27 06:24:17 mike Exp $"
+ * "$Id: parallel.c,v 1.32 2001/12/03 13:29:24 mike Exp $"
  *
  *   Parallel port backend for the Common UNIX Printing System (CUPS).
  *
@@ -608,14 +608,14 @@ list_devices(void)
     if ((fd = open(device, O_WRONLY)) >= 0)
     {
       close(fd);
-      printf("direct parallel:%s \"Unknown\" \"Parallel Port #%d\"\n", device, i + 1);
+      printf("direct parallel:%s \"Unknown\" \"Parallel Port #%d (interrupt-driven)\"\n", device, i + 1);
     }
 
     sprintf(device, "/dev/lpa%d", i);
     if ((fd = open(device, O_WRONLY)) >= 0)
     {
       close(fd);
-      printf("direct parallel:%s \"Unknown\" \"Parallel Port #%d\"\n", device, i + 1);
+      printf("direct parallel:%s \"Unknown\" \"Parallel Port #%d (polled)\"\n", device, i + 1);
     }
   }
 #elif defined(_AIX)
@@ -638,5 +638,5 @@ list_devices(void)
 
 
 /*
- * End of "$Id: parallel.c,v 1.31 2001/06/27 06:24:17 mike Exp $".
+ * End of "$Id: parallel.c,v 1.32 2001/12/03 13:29:24 mike Exp $".
  */
