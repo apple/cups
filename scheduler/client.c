@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.4 1999/02/19 22:07:04 mike Exp $"
+ * "$Id: client.c,v 1.5 1999/02/26 15:11:11 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -23,26 +23,25 @@
  *
  * Contents:
  *
- *   AcceptClient()       - Accept a new client.
- *   CloseAllClients()    - Close all remote clients immediately.
- *   CloseClient()        - Close a remote client.
- *   ReadClient()         - Read data from a client.
- *   SendCommand()        - Send output from a command via HTTP.
- *   SendError()          - Send an error message via HTTP.
- *   SendFile()           - Send a file via HTTP.
- *   SendHeader()         - Send an HTTP header.
- *   StartListening()     - Create all listening sockets...
- *   StopListening()      - Close all listening sockets...
- *   WriteClient()        - Write data to a client as needed.
- *   decode_basic_auth()  - Decode a Basic authorization string.
- *   get_datetime()       - Get a data/time string for the given time.
- *   get_extension()      - Get the extension for a filename.
- *   get_file()           - Get a filename and state info.
- *   get_line()           - Get a request line terminated with a CR and LF.
- *   get_message()        - Get a message string for the given HTTP code.
- *   get_type()           - Get MIME type from the given extension.
- *   sigpipe_handler()    - Handle 'broken pipe' signals from lost network
- *                          clients.
+ *   AcceptClient()        - Accept a new client.
+ *   CloseAllClients()     - Close all remote clients immediately.
+ *   CloseClient()         - Close a remote client.
+ *   ReadClient()          - Read data from a client.
+ *   SendCommand()         - Send output from a command via HTTP.
+ *   SendError()           - Send an error message via HTTP.
+ *   SendFile()            - Send a file via HTTP.
+ *   SendHeader()          - Send an HTTP request.
+ *   StartListening()      - Create all listening sockets...
+ *   StopListening()       - Close all listening sockets...
+ *   WriteClient()         - Write data to a client as needed.
+ *   check_if_modified()   - Decode an "If-Modified-Since" line.
+ *   decode_basic_auth()   - Decode a Basic authorization string.
+ *   get_file()            - Get a filename and state info.
+ *   pipe_command()        - Pipe the output of a command to the remote client.
+ *   process_ipp_request() - Process an incoming IPP request...
+ *   send_ipp_error()      - Send an error status back to the IPP client.
+ *   sigpipe_handler()     - Handle 'broken pipe' signals from lost network
+ *                           clients.
  */
 
 /*
@@ -50,19 +49,24 @@
  */
 
 #include "cupsd.h"
+#include <cups/debug.h>
 
 
 /*
  * Local functions...
  */
 
-static void	decode_basic_auth(client_t *con);
 static int	check_if_modified(client_t *con, struct stat *filestats);
-static char	*get_extension(char *filename);
-static char	*get_type(char *extension);
+static void	decode_basic_auth(client_t *con);
 static char	*get_file(client_t *con, struct stat *filestats);
 static int	pipe_command(client_t *con, int infile, int *outfile, char *command, char *options);
+static void	process_ipp_request(client_t *con);
+static void	send_ipp_error(client_t *con, ipp_status_t status);
 static void	sigpipe_handler(int sig);
+
+/**** OBSOLETE ****/
+static char	*get_extension(char *filename);
+static char	*get_type(char *extension);
 
 
 /*
@@ -247,7 +251,10 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	*/
 
         if (httpGets(line, sizeof(line) - 1, HTTP(con)) == NULL)
-	  break;
+	{
+          CloseClient(con);
+	  return (0);
+	}
 
        /*
         * Ignore blank request lines...
@@ -515,27 +522,10 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	  * content-type field will be "application/ipp"...
 	  */
 
+          httpGetLength(&(con->http));
+
 	  if (strcmp(con->http.fields[HTTP_FIELD_CONTENT_TYPE], "application/ipp") == 0)
-	  {
-#if 0
-            sprintf(con->filename, "%s/requests/XXXXXX", ServerRoot);
-	    con->file = mkstemp(con->filename);
-
-            LogMessage(LOG_INFO, "ReadClient() %d REQUEST %s", con->http.fd,
-	               con->filename);
-
-	    if (con->file < 0)
-	    {
-	      if (!SendError(con, HTTP_REQUEST_TOO_LARGE))
-	      {
-		CloseClient(con);
-		return (0);
-	      }
-	    }
-#else
             con->request = ippNew();
-#endif /* 0 */
-          }
 	  else if (strcmp(con->http.fields[HTTP_FIELD_CONTENT_TYPE], "application/ipp") == 0 &&
 	           (strncmp(con->uri, "/printers", 9) == 0 ||
 	            strncmp(con->uri, "/classes", 8) == 0 ||
@@ -691,6 +681,7 @@ ReadClient(client_t *con)	/* I - Client to read from */
 
     case HTTP_POST_RECV :
         LogMessage(LOG_DEBUG, "ReadClient() %d con->data_encoding = %s con->data_remaining = %d\n",
+		   con->http.fd,
 		   con->http.data_encoding == HTTP_ENCODE_CHUNKED ? "chunked" : "length",
 		   con->http.data_remaining);
 
@@ -733,24 +724,7 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	  CloseClient(con);
 	  return (0);
 	}
-	else if (con->http.state == HTTP_POST_SEND)
-	{
-	  close(con->file);
-
-          if (con->request)
-	  {
-	   /*
-	    * Add IPP processing/response stuff...
-	    */
-
-            if (!SendError(con, HTTP_ACCEPTED))
-	    {
-	      CloseClient(con);
-	      return (0);
-	    }
-	  }
-	}
-	else
+	else if (bytes > 0)
 	{
 	  con->bytes += bytes;
 
@@ -767,6 +741,14 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	      return (0);
 	    }
 	  }
+	}
+
+	if (con->http.state == HTTP_POST_SEND)
+	{
+	  close(con->file);
+
+          if (con->request)
+            process_ipp_request(con);
 	}
         break;
   }
@@ -934,7 +916,7 @@ SendFile(client_t    *con,
 
 
 /*
- * 'SendHeader()' - Send an HTTP header.
+ * 'SendHeader()' - Send an HTTP request.
  */
 
 int				/* O - 1 on success, 0 on failure */
@@ -1181,29 +1163,6 @@ WriteClient(client_t *con)
 
 
 /*
- * 'decode_basic_auth()' - Decode a Basic authorization string.
- */
-
-static void
-decode_basic_auth(client_t *con)	/* I - Client to decode to */
-{
-  char	value[1024];			/* Value string */
-
-
- /*
-  * Decode the string and pull the username and password out...
-  */
-
-  httpDecode64(value, con->http.fields[HTTP_FIELD_AUTHORIZATION]);
-
-  LogMessage(LOG_DEBUG, "decode_basic_auth() %d Authorization=\"%s\"",
-             con->http.fd, value);
-
-  sscanf(value, "%[^:]:%[^\n]", con->username, con->password);
-}
-
-
-/*
  * 'check_if_modified()' - Decode an "If-Modified-Since" line.
  */
 
@@ -1257,118 +1216,25 @@ check_if_modified(client_t    *con,		/* I - Client connection */
 
 
 /*
- * 'get_extension()' - Get the extension for a filename.
+ * 'decode_basic_auth()' - Decode a Basic authorization string.
  */
 
-static char *			/* O - Pointer to extension */
-get_extension(char *filename)	/* I - Filename or URI */
+static void
+decode_basic_auth(client_t *con)	/* I - Client to decode to */
 {
-  char	*ext;			/* Pointer to extension */
-
-
-  ext = filename + strlen(filename) - 1;
-
-  while (ext > filename && *ext != '/')
-    if (*ext == '.')
-      return (ext + 1);
-    else
-      ext --;
-
-  return ("");
-}
-
-
-/*
- * 'get_file()' - Get a filename and state info.
- */
-
-static char *			/* O - Real filename */
-get_file(client_t    *con,	/* I - Client connection */
-         struct stat *filestats)/* O - File information */
-{
-  int		status;		/* Status of filesystem calls */
-  char		*params;	/* Pointer to parameters in URI */
-  static char	filename[1024];	/* Filename buffer */
+  char	value[1024];			/* Value string */
 
 
  /*
-  * Need to add DocumentRoot global...
+  * Decode the string and pull the username and password out...
   */
 
-  if (con->language != NULL)
-    sprintf(filename, "%s/%s%s", DocumentRoot, con->language->language,
-            con->uri);
-  else
-    sprintf(filename, "%s%s", DocumentRoot, con->uri);
+  httpDecode64(value, con->http.fields[HTTP_FIELD_AUTHORIZATION]);
 
-  if ((params = strchr(filename, '?')) != NULL)
-    *params = '\0';
+  LogMessage(LOG_DEBUG, "decode_basic_auth() %d Authorization=\"%s\"",
+             con->http.fd, value);
 
- /*
-  * Grab the status for this language; if there isn't a language-specific file
-  * then fallback to the default one...
-  */
-
-  if ((status = stat(filename, filestats)) != 0 && con->language != NULL)
-  {
-   /*
-    * Drop the language prefix and try the current directory...
-    */
-
-    sprintf(filename, "%s%s", DocumentRoot, con->uri);
-
-    status = stat(filename, filestats);
-  }
-
- /*
-  * If we're found a directory, get the index.html file instead...
-  */
-
-  if (!status && S_ISDIR(filestats->st_mode))
-  {
-    if (filename[strlen(filename) - 1] == '/')
-      strcat(filename, "index.html");
-    else
-      strcat(filename, "/index.html");
-
-    status = stat(filename, filestats);
-  }
-
-  LogMessage(LOG_DEBUG, "get_filename() %d filename=%s size=%d",
-             con->http.fd, filename, filestats->st_size);
-
-  if (status)
-    return (NULL);
-  else
-    return (filename);
-}
-
-
-/*
- * 'get_type()' - Get MIME type from the given extension.
- */
-
-static char *
-get_type(char *extension)
-{
-  if (strcmp(extension, "html") == 0 || strcmp(extension, "htm") == 0)
-    return ("text/html");
-  else if (strcmp(extension, "txt") == 0)
-    return ("text/plain");
-  else if (strcmp(extension, "gif") == 0)
-    return ("image/gif");
-  else if (strcmp(extension, "jpg") == 0)
-    return ("image/jpg");
-  else if (strcmp(extension, "png") == 0)
-    return ("image/png");
-  else if (strcmp(extension, "ps") == 0)
-    return ("application/postscript");
-  else if (strcmp(extension, "pdf") == 0)
-    return ("application/pdf");
-  else if (strcmp(extension, "gz") == 0)
-    return ("application/gzip");
-  else
-    return ("application/unknown");
+  sscanf(value, "%[^:]:%[^\n]", con->username, con->password);
 }
 
 
@@ -1549,6 +1415,484 @@ pipe_command(client_t *con,	/* I - Client connection */
 
 
 /*
+ * 'process_ipp_request()' - Process an incoming IPP request...
+ */
+
+static void
+process_ipp_request(client_t *con)	/* I - Client connection */
+{
+  ipp_tag_t		group;		/* Current group tag */
+  ipp_attribute_t	*attr;		/* Current attribute */
+  ipp_attribute_t	*charset;	/* Character set attribute */
+  ipp_attribute_t	*language;	/* Language attribute */
+  ipp_attribute_t	*uri;		/* Printer URI attribute */
+  char			*dest;		/* Destination */
+  cups_ptype_t		dtype;		/* Destination type (printer or class) */
+  int			priority;	/* Job priority */
+  job_t			*job;		/* Current job */
+  char			job_uri[HTTP_MAX_URI],
+					/* Job URI */
+			method[HTTP_MAX_URI],
+					/* Method portion of URI */
+			username[HTTP_MAX_URI],
+					/* Username portion of URI */
+			host[HTTP_MAX_URI],
+					/* Host portion of URI */
+			resource[HTTP_MAX_URI];
+					/* Resource portion of URI */
+  int			port;		/* Port portion of URI */
+
+
+  DEBUG_printf(("process_ipp_request(%08x)\n", con));
+  DEBUG_printf(("process_ipp_request: operation_id = %04x\n",
+                con->request->request.op.operation_id));
+
+ /*
+  * First build an empty response message for this request...
+  */
+
+  con->response = ippNew();
+
+  con->response->request.status.version[0] = 1;
+  con->response->request.status.version[1] = 0;
+  con->response->request.status.request_id = con->request->request.op.request_id;
+
+ /*
+  * Then validate the request header and required attributes...
+  */
+  
+  if (con->request->request.any.version[0] != 1)
+  {
+   /*
+    * Return an error, since we only support IPP 1.x.
+    */
+
+    send_ipp_error(con, IPP_VERSION_NOT_SUPPORTED);
+
+    return;
+  }  
+
+ /*
+  * Make sure that the attributes are provided in the correct order and
+  * don't repeat groups...
+  */
+
+  for (attr = con->request->attrs, group = attr->group_tag;
+       attr != NULL;
+       attr = attr->next)
+    if (attr->group_tag < group)
+    {
+     /*
+      * Out of order; return an error...
+      */
+
+      DEBUG_puts("process_ipp_request: attribute groups are out of order!");
+      send_ipp_error(con, IPP_BAD_REQUEST);
+      return;
+    }
+    else
+      group = attr->group_tag;
+
+ /*
+  * Then make sure that the first three attributes are:
+  *
+  *     attributes-charset
+  *     attributes-natural-language
+  *     printer-uri
+  */
+
+  attr = con->request->attrs;
+  if (attr != NULL && strcmp(attr->name, "attributes-charset") == 0)
+    charset = attr;
+  else
+    charset = NULL;
+
+  attr = attr->next;
+  if (attr != NULL && strcmp(attr->name, "attributes-natural-language") == 0)
+    language = attr;
+  else
+    language = NULL;
+
+  attr = attr->next;
+  if (attr != NULL && strcmp(attr->name, "printer-uri") == 0)
+    uri = attr;
+  else if (attr != NULL && strcmp(attr->name, "job-uri") == 0)
+    uri = attr;
+  else
+    uri = NULL;
+
+  if (charset == NULL || language == NULL || uri == NULL)
+  {
+   /*
+    * Return an error, since attributes-charset,
+    * attributes-natural-language, and printer-uri/job-uri are required
+    * for all operations.
+    */
+
+    DEBUG_printf(("process_ipp_request: missing attributes (%08x, %08x, %08x)!\n",
+                  charset, language, uri));
+    send_ipp_error(con, IPP_BAD_REQUEST);
+    return;
+  }
+
+  attr = ippAddString(con->response, IPP_TAG_OPERATION, "attributes-charset",
+                      charset->values[0].string);
+  attr->value_tag = IPP_TAG_CHARSET;
+
+  attr = ippAddString(con->response, IPP_TAG_OPERATION,
+                      "attributes-natural-language", language->values[0].string);
+  attr->value_tag = IPP_TAG_LANGUAGE;
+
+  httpSeparate(uri->values[0].string, method, username, host, &port, resource);
+
+ /*
+  * OK, all the checks pass so far; try processing the operation...
+  */
+
+  switch (con->request->request.op.operation_id)
+  {
+    case IPP_PRINT_JOB :
+       /*
+        * OK, see if the client is sending the document compressed - CUPS
+	* doesn't support compression yet...
+	*/
+
+        if ((attr = ippFindAttribute(con->request, "compression")) != NULL)
+	{
+	  DEBUG_puts("process_ipp_request: Unsupported compression attribute!");
+	  send_ipp_error(con, IPP_ATTRIBUTES);
+	  attr            = ippAddString(con->response, IPP_TAG_UNSUPPORTED,
+	                                 "compression", attr->values[0].string);
+	  attr->value_tag = IPP_TAG_KEYWORD;
+
+	  return;
+	}
+
+       /*
+        * Do we have a file to print?
+	*/
+
+        if (con->filename[0] == '\0')
+	{
+	  DEBUG_puts("process_ipp_request: No filename!?!");
+	  send_ipp_error(con, IPP_BAD_REQUEST);
+	  return;
+	}
+
+       /*
+        * Is the destination valid?
+	*/
+
+	if (strncmp(resource, "/classes/", 9) == 0)
+	{
+	 /*
+	  * Print to a class...
+	  */
+
+	  dest  = resource + 9;
+	  dtype = CUPS_PRINTER_CLASS;
+
+	  if (FindClass(dest) == NULL)
+	  {
+	    send_ipp_error(con, IPP_NOT_FOUND);
+	    return;
+	  }
+	}
+	else if (strncmp(resource, "/printers/", 10) == 0)
+	{
+	 /*
+	  * Print to a specific printer...
+	  */
+
+	  dest  = resource + 10;
+	  dtype = (cups_ptype_t)0;
+
+	  if (FindPrinter(dest) == NULL && FindClass(dest) == NULL)
+	  {
+	    send_ipp_error(con, IPP_NOT_FOUND);
+	    return;
+	  }
+	}
+	else
+	{
+	 /*
+	  * Bad URI...
+	  */
+
+          DEBUG_printf(("process_ipp_request: resource name \'%s\' no good!\n",
+	                resource));
+          send_ipp_error(con, IPP_BAD_REQUEST);
+	  return;
+	}
+
+       /*
+        * Create the job and set things up...
+	*/
+
+        if ((attr = ippFindAttribute(con->request, "job-priority")) != NULL)
+          priority = attr->values[0].integer;
+	else
+	  priority = 50;
+
+        if ((job = AddJob(priority, dest)) == NULL)
+	{
+	  send_ipp_error(con, IPP_INTERNAL_ERROR);
+	  return;
+	}
+
+	job->dtype = dtype;
+
+	job->attrs   = con->request;
+	con->request = NULL;
+
+	strcpy(con->filename, job->filename);
+	con->filename[0] = '\0';
+
+	job->state = IPP_JOB_PENDING;
+
+       /*
+        * Start the job if possible...
+	*/
+
+	CheckJobs();
+
+       /*
+        * Fill in the response info...
+	*/
+
+        sprintf(job_uri, "http://%s:%d/jobs/%d", ServerName,
+	        ntohs(con->http.hostaddr.sin_port), job->id);
+        attr = ippAddString(con->response, IPP_TAG_JOB, "job-uri", job_uri);
+	attr->value_tag = IPP_TAG_URI;
+
+        attr = ippAddInteger(con->response, IPP_TAG_JOB, "job-id", job->id);
+	attr->value_tag = IPP_TAG_INTEGER;
+
+        attr = ippAddInteger(con->response, IPP_TAG_JOB, "job-state", job->state);
+	attr->value_tag = IPP_TAG_ENUM;
+
+        con->response->request.status.status_code = IPP_OK;
+        break;
+
+    case IPP_VALIDATE_JOB :
+        send_ipp_error(con, IPP_OPERATION_NOT_SUPPORTED);
+        break;
+
+    case IPP_CANCEL_JOB :
+        send_ipp_error(con, IPP_OPERATION_NOT_SUPPORTED);
+        break;
+
+    case IPP_GET_JOB_ATTRIBUTES :
+        send_ipp_error(con, IPP_OPERATION_NOT_SUPPORTED);
+        break;
+
+    case IPP_GET_JOBS :
+        send_ipp_error(con, IPP_OPERATION_NOT_SUPPORTED);
+        break;
+
+    case IPP_GET_PRINTER_ATTRIBUTES :
+        send_ipp_error(con, IPP_OPERATION_NOT_SUPPORTED);
+        break;
+
+    case CUPS_GET_DEFAULT :
+        send_ipp_error(con, IPP_OPERATION_NOT_SUPPORTED);
+        break;
+
+    case CUPS_GET_PRINTERS :
+        send_ipp_error(con, IPP_OPERATION_NOT_SUPPORTED);
+        break;
+
+    case CUPS_ADD_PRINTER :
+        send_ipp_error(con, IPP_OPERATION_NOT_SUPPORTED);
+        break;
+
+    case CUPS_DELETE_PRINTER :
+        send_ipp_error(con, IPP_OPERATION_NOT_SUPPORTED);
+        break;
+
+    case CUPS_GET_CLASSES :
+        send_ipp_error(con, IPP_OPERATION_NOT_SUPPORTED);
+        break;
+
+    case CUPS_ADD_CLASS :
+        send_ipp_error(con, IPP_OPERATION_NOT_SUPPORTED);
+        break;
+
+    case CUPS_DELETE_CLASS :
+        send_ipp_error(con, IPP_OPERATION_NOT_SUPPORTED);
+        break;
+
+    default :
+        send_ipp_error(con, IPP_OPERATION_NOT_SUPPORTED);
+	return;
+  }
+
+  FD_SET(con->http.fd, &OutputSet);
+}
+
+
+/*
+ * 'send_ipp_error()' - Send an error status back to the IPP client.
+ */
+
+static void
+send_ipp_error(client_t     *con,	/* I - Client connection */
+               ipp_status_t status)	/* I - IPP status code */
+{
+  ipp_attribute_t	*attr;		/* Current attribute */
+
+
+  if (con->filename[0])
+    unlink(con->filename);
+
+  con->response->request.status.status_code = status;
+
+  attr = ippAddString(con->response, IPP_TAG_OPERATION, "attributes-charset",
+                      DefaultCharset);
+  attr->value_tag = IPP_TAG_CHARSET;
+
+  attr = ippAddString(con->response, IPP_TAG_OPERATION,
+                      "attributes-natural-language", DefaultLanguage);
+  attr->value_tag = IPP_TAG_LANGUAGE;
+
+  FD_SET(con->http.fd, &OutputSet);
+}
+
+
+/*
+ * 'sigpipe_handler()' - Handle 'broken pipe' signals from lost network
+ *                       clients.
+ */
+
+static void
+sigpipe_handler(int sig)	/* I - Signal number */
+{
+  (void)sig;
+/* IGNORE */
+}
+
+
+
+
+/**** OBSOLETE ****/
+
+/*
+ * 'get_extension()' - Get the extension for a filename.
+ */
+
+static char *			/* O - Pointer to extension */
+get_extension(char *filename)	/* I - Filename or URI */
+{
+  char	*ext;			/* Pointer to extension */
+
+
+  ext = filename + strlen(filename) - 1;
+
+  while (ext > filename && *ext != '/')
+    if (*ext == '.')
+      return (ext + 1);
+    else
+      ext --;
+
+  return ("");
+}
+
+
+/*
+ * 'get_file()' - Get a filename and state info.
+ */
+
+static char *			/* O - Real filename */
+get_file(client_t    *con,	/* I - Client connection */
+         struct stat *filestats)/* O - File information */
+{
+  int		status;		/* Status of filesystem calls */
+  char		*params;	/* Pointer to parameters in URI */
+  static char	filename[1024];	/* Filename buffer */
+
+
+ /*
+  * Need to add DocumentRoot global...
+  */
+
+  if (con->language != NULL)
+    sprintf(filename, "%s/%s%s", DocumentRoot, con->language->language,
+            con->uri);
+  else
+    sprintf(filename, "%s%s", DocumentRoot, con->uri);
+
+  if ((params = strchr(filename, '?')) != NULL)
+    *params = '\0';
+
+ /*
+  * Grab the status for this language; if there isn't a language-specific file
+  * then fallback to the default one...
+  */
+
+  if ((status = stat(filename, filestats)) != 0 && con->language != NULL)
+  {
+   /*
+    * Drop the language prefix and try the current directory...
+    */
+
+    sprintf(filename, "%s%s", DocumentRoot, con->uri);
+
+    status = stat(filename, filestats);
+  }
+
+ /*
+  * If we're found a directory, get the index.html file instead...
+  */
+
+  if (!status && S_ISDIR(filestats->st_mode))
+  {
+    if (filename[strlen(filename) - 1] == '/')
+      strcat(filename, "index.html");
+    else
+      strcat(filename, "/index.html");
+
+    status = stat(filename, filestats);
+  }
+
+  LogMessage(LOG_DEBUG, "get_filename() %d filename=%s size=%d",
+             con->http.fd, filename, filestats->st_size);
+
+  if (status)
+    return (NULL);
+  else
+    return (filename);
+}
+
+
+/*
+ * 'get_type()' - Get MIME type from the given extension.
+ */
+
+static char *
+get_type(char *extension)
+{
+  if (strcmp(extension, "html") == 0 || strcmp(extension, "htm") == 0)
+    return ("text/html");
+  else if (strcmp(extension, "txt") == 0)
+    return ("text/plain");
+  else if (strcmp(extension, "gif") == 0)
+    return ("image/gif");
+  else if (strcmp(extension, "jpg") == 0)
+    return ("image/jpg");
+  else if (strcmp(extension, "png") == 0)
+    return ("image/png");
+  else if (strcmp(extension, "ps") == 0)
+    return ("application/postscript");
+  else if (strcmp(extension, "pdf") == 0)
+    return ("application/pdf");
+  else if (strcmp(extension, "gz") == 0)
+    return ("application/gzip");
+  else
+    return ("application/unknown");
+}
+
+
+/*
  * 'show_printer_status()' - Show the current printer status.
  */
 
@@ -1652,17 +1996,5 @@ show_printer_status(client_t *con)
 
 
 /*
- * 'sigpipe_handler()' - Handle 'broken pipe' signals from lost network
- *                       clients.
- */
-
-static void
-sigpipe_handler(int sig)	/* I - Signal number */
-{
-/* IGNORE */
-}
-
-
-/*
- * End of "$Id: client.c,v 1.4 1999/02/19 22:07:04 mike Exp $".
+ * End of "$Id: client.c,v 1.5 1999/02/26 15:11:11 mike Exp $".
  */

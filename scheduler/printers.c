@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.4 1999/02/09 22:04:16 mike Exp $"
+ * "$Id: printers.c,v 1.5 1999/02/26 15:11:13 mike Exp $"
  *
  *   for the Common UNIX Printing System (CUPS).
  *
@@ -180,7 +180,6 @@ FindPrinter(char *name)		/* I - Name of printer to find */
 void
 LoadAllPrinters(void)
 {
-  int		i;			/* Looping var */
   FILE		*fp;			/* printers.conf file */
   int		linenum;		/* Current line number */
   int		len;			/* Length of line */
@@ -344,5 +343,5 @@ StopPrinter(printer_t *p)
 
 
 /*
- * End of "$Id: printers.c,v 1.4 1999/02/09 22:04:16 mike Exp $".
+ * End of "$Id: printers.c,v 1.5 1999/02/26 15:11:13 mike Exp $".
  */

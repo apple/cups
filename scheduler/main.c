@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c,v 1.6 1999/02/09 22:04:15 mike Exp $"
+ * "$Id: main.c,v 1.7 1999/02/26 15:11:12 mike Exp $"
  *
  *   for the Common UNIX Printing System (CUPS).
  *
@@ -54,7 +54,6 @@ main(int  argc,			/* I - Number of command-line arguments */
 {
   int			i;		/* Looping var */
   char			*opt;		/* Option character */
-  int			bytes;		/* Number of bytes read */
   fd_set		input,		/* Input set for select() */
 			output;		/* Output set for select() */
   client_t		*con;		/* Current client */
@@ -126,7 +125,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	    con --;
 	  }
 	  else
-	    con->http.keep_alive = 0;
+	    con->http.keep_alive = HTTP_KEEPALIVE_OFF;
 
 	for (i = 0; i < NumListeners; i ++)
 	  FD_CLR(Listeners[i].fd, &InputSet);
@@ -231,6 +230,8 @@ main(int  argc,			/* I - Number of command-line arguments */
 static void
 sighup_handler(int sig)	/* I - Signal number */
 {
+  (void)sig;
+
   NeedReload = TRUE;
 }
 
@@ -248,5 +249,5 @@ usage(void)
 
 
 /*
- * End of "$Id: main.c,v 1.6 1999/02/09 22:04:15 mike Exp $".
+ * End of "$Id: main.c,v 1.7 1999/02/26 15:11:12 mike Exp $".
  */

@@ -1,7 +1,7 @@
 /*
- * "$Id: job.c,v 1.3 1999/02/09 22:04:14 mike Exp $"
+ * "$Id: job.c,v 1.4 1999/02/26 15:11:12 mike Exp $"
  *
- *   for the Common UNIX Printing System (CUPS).
+ *   Job management routines for the Common UNIX Printing System (CUPS).
  *
  *   Copyright 1997-1999 by Easy Software Products, all rights reserved.
  *
@@ -23,7 +23,15 @@
  *
  * Contents:
  *
- *
+ *   AddJob()     - Add a new job to the job queue...
+ *   CancelJob()  - Cancel the specified print job.
+ *   CancelJobs() - Cancel all jobs on the given printer or class.
+ *   CheckJobs()  - Check the pending jobs and start any if the destination
+ *                  is available.
+ *   FindJob()    - Find the specified job.
+ *   MoveJob()    - Move the specified job to a different destination.
+ *   StartJob()   - Start a print job.
+ *   StopJob()    - Stop a print job.
  */
 
 /*
@@ -32,6 +40,10 @@
 
 #include "cupsd.h"
 
+
+/*
+ * 'AddJob()' - Add a new job to the job queue...
+ */
 
 job_t *			/* O - New job record */
 AddJob(int  priority,	/* I - Job priority */
@@ -46,7 +58,8 @@ AddJob(int  priority,	/* I - Job priority */
 
   job->id       = NextJobId ++;
   job->priority = priority;
-  strcpy(job->dest, dest);
+  strncpy(job->dest, dest, sizeof(job->dest) - 1);
+  job->state    = IPP_JOB_HELD;
 
   NumJobs ++;
 
@@ -64,10 +77,13 @@ AddJob(int  priority,	/* I - Job priority */
 }
 
 
+/*
+ * 'CancelJob()' - Cancel the specified print job.
+ */
+
 void
 CancelJob(int id)	/* I - Job to cancel */
 {
-  int	i;		/* Looping var */
   job_t	*current,	/* Current job */
 	*prev;		/* Previous job in list */
 
@@ -95,16 +111,11 @@ CancelJob(int id)	/* I - Job to cancel */
       * Free all memory used...
       */
 
-      if (current->options != NULL)
-      {
-        for (i = 0; current->options[0] != NULL; i ++)
-	  free(current->options[i]);
-
-	free(current->options);
-      }
+      if (current->attrs != NULL)
+        ippDelete(current->attrs);
 
      /*
-      * Remove the current for good...
+      * Remove the print file for good...
       */
 
       unlink(current->filename);
@@ -114,10 +125,13 @@ CancelJob(int id)	/* I - Job to cancel */
 }
 
 
+/*
+ * 'CancelJobs()' - Cancel all jobs on the given printer or class.
+ */
+
 void
 CancelJobs(char *dest)	/* I - Destination to cancel */
 {
-  int	i;		/* Looping var */
   job_t	*current,	/* Current job */
 	*prev;		/* Previous job in list */
 
@@ -138,96 +152,13 @@ CancelJobs(char *dest)	/* I - Destination to cancel */
     }
     else
       current = current->next;
- }
-
-
-job_t *			/* O - Job data */
-FindJob(int id)		/* I - Job ID */
-{
-  job_t	*current,	/* Current job */
-	*prev;		/* Previous job in list */
-
-
-  for (current = Jobs, prev = NULL; current != NULL; prev = current, current = current->next)
-    if (current->id == id)
-      break;
-
-  return (current);
 }
 
 
-void
-LoadJobs(void)
-{
-}
-
-
-void
-MoveJob(int id, char *dest)
-{
-  job_t	*current,	/* Current job */
-	*prev;		/* Previous job in list */
-
-
-  for (current = Jobs, prev = NULL; current != NULL; prev = current, current = current->next)
-    if (current->id == id)
-    {
-      if (current->state == IPP_JOB_PENDING)
-        strcpy(current->dest, dest);
-
-      return;
-    }
-}
-
-
-void
-StopJob(int id)
-{
-  int	i;		/* Looping var */
-  job_t	*current,	/* Current job */
-	*prev;		/* Previous job in list */
-
-
-  for (current = Jobs, prev = NULL; current != NULL; prev = current, current = current->next)
-    if (current->id == id)
-    {
-      if (current->state == IPP_JOB_PROCESSING)
-      {
-	current->state = IPP_JOB_PENDING;
-
-        for (i = 0; current->procs[i]; i ++)
-	  kill(current->procs[i], SIGTERM);
-
-	free(current->procs);
-	current->procs        = NULL;
-        current->printer->job = NULL;
-      }
-
-      return;
-    }
-}
-
-
-void
-StartJob(int       id,
-         printer_t *printer)
-{
-  job_t	*current,	/* Current job */
-	*prev;		/* Previous job in list */
-
-
-  for (current = Jobs, prev = NULL; current != NULL; prev = current, current = current->next)
-    if (current->id == id)
-    {
-      current->state   = IPP_JOB_PROCESSING;
-      current->printer = printer;
-      printer->job     = current;
-      printer->state   = IPP_PRINTER_PROCESSING;
-
-      /**** DO FORK/EXEC STUFF HERE, TOO! ****/
-    }
-}
-
+/*
+ * 'CheckJobs()' - Check the pending jobs and start any if the destination
+ *                 is available.
+ */
 
 void
 CheckJobs(void)
@@ -275,5 +206,99 @@ CheckJobs(void)
 
 
 /*
- * End of "$Id: job.c,v 1.3 1999/02/09 22:04:14 mike Exp $".
+ * 'FindJob()' - Find the specified job.
+ */
+
+job_t *			/* O - Job data */
+FindJob(int id)		/* I - Job ID */
+{
+  job_t	*current;	/* Current job */
+
+
+  for (current = Jobs; current != NULL; current = current->next)
+    if (current->id == id)
+      break;
+
+  return (current);
+}
+
+
+/*
+ * 'MoveJob()' - Move the specified job to a different destination.
+ */
+
+void
+MoveJob(int id, char *dest)
+{
+  job_t	*current;	/* Current job */
+
+
+  for (current = Jobs; current != NULL; current = current->next)
+    if (current->id == id)
+    {
+      if (current->state == IPP_JOB_PENDING)
+        strcpy(current->dest, dest);
+
+      return;
+    }
+}
+
+
+/*
+ * 'StartJob()' - Start a print job.
+ */
+
+void
+StartJob(int       id,		/* I - Job ID */
+         printer_t *printer)	/* I - Printer to print job */
+{
+  job_t		*current;	/* Current job */
+
+
+  for (current = Jobs; current != NULL; current = current->next)
+    if (current->id == id)
+    {
+      current->state   = IPP_JOB_PROCESSING;
+      current->printer = printer;
+      printer->job     = current;
+      printer->state   = IPP_PRINTER_PROCESSING;
+
+      /**** DO FORK/EXEC STUFF HERE, TOO! ****/
+    }
+}
+
+
+/*
+ * 'StopJob()' - Stop a print job.
+ */
+
+void
+StopJob(int id)
+{
+  int	i;		/* Looping var */
+  job_t	*current;	/* Current job */
+
+
+  for (current = Jobs; current != NULL; current = current->next)
+    if (current->id == id)
+    {
+      if (current->state == IPP_JOB_PROCESSING)
+      {
+	current->state = IPP_JOB_PENDING;
+
+        for (i = 0; current->procs[i]; i ++)
+	  kill(current->procs[i], SIGTERM);
+
+	free(current->procs);
+	current->procs        = NULL;
+        current->printer->job = NULL;
+      }
+
+      return;
+    }
+}
+
+
+/*
+ * End of "$Id: job.c,v 1.4 1999/02/26 15:11:12 mike Exp $".
  */
