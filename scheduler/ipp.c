@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.86 2000/08/03 13:24:17 mike Exp $"
+ * "$Id: ipp.c,v 1.87 2000/08/03 18:15:41 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -3299,6 +3299,8 @@ print_job(client_t        *con,		/* I - Client connection */
         ippAddString(con->request, IPP_TAG_JOB, IPP_TAG_MIMETYPE,
 	             "document-format", NULL, mimetype);
     }
+    else
+      filetype = mimeType(MimeDatabase, super, type);
   }
   else
     filetype = mimeType(MimeDatabase, super, type);
@@ -4257,6 +4259,8 @@ send_document(client_t        *con,	/* I - Client connection */
         ippAddString(con->request, IPP_TAG_JOB, IPP_TAG_MIMETYPE,
 	             "document-format", NULL, mimetype);
     }
+    else
+      filetype = mimeType(MimeDatabase, super, type);
   }
   else
     filetype = mimeType(MimeDatabase, super, type);
@@ -5017,5 +5021,5 @@ validate_job(client_t        *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.86 2000/08/03 13:24:17 mike Exp $".
+ * End of "$Id: ipp.c,v 1.87 2000/08/03 18:15:41 mike Exp $".
  */
