@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c,v 1.23 1999/06/15 21:27:09 mike Exp $"
+ * "$Id: ppd.c,v 1.24 1999/06/16 15:29:51 mike Exp $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -87,6 +87,7 @@ static int		compare_choices(ppd_choice_t *c0, ppd_choice_t *c1);
 static int		ppd_read(FILE *fp, char *keyword, char *option,
 			         char *text, char **string);
 static void		ppd_decode(char *string);
+static void		ppd_fix(char *string);
 static void		ppd_free_group(ppd_group_t *group);
 static void		ppd_free_option(ppd_option_t *option);
 static ppd_group_t	*ppd_get_group(ppd_file_t *ppd, char *name);
@@ -841,7 +842,10 @@ ppdOpen(FILE *fp)		/* I - File to read from */
         option->ui = PPD_UI_PICKONE;
 
       if (text[0])
+      {
         strcpy(option->text, text);
+	ppd_fix(option->text);
+      }
       else
       {
         if (strcmp(name, "PageSize") == 0)
@@ -930,6 +934,7 @@ ppdOpen(FILE *fp)		/* I - File to read from */
         strcpy(string, strchr(string, '/') + 1);
 
       ppd_decode(string);
+      ppd_fix(string);
       group = ppd_get_group(ppd, string);
     }
     else if (strcmp(keyword, "CloseGroup") == 0)
@@ -965,6 +970,8 @@ ppdOpen(FILE *fp)		/* I - File to read from */
       group->num_subgroups ++;
 
       memset(subgroup, 0, sizeof(ppd_group_t));
+      ppd_decode(string);
+      ppd_fix(string);
       strcpy(subgroup->text, string);
     }
     else if (strcmp(keyword, "CloseSubGroup") == 0)
@@ -1152,7 +1159,10 @@ ppdOpen(FILE *fp)		/* I - File to read from */
       choice = ppd_add_choice(option, name);
 
       if (mask & PPD_TEXT)
+      {
         strcpy(choice->text, text);
+        ppd_fix(choice->text);
+      }
       else if (strcmp(name, "True") == 0)
         strcpy(choice->text, "Yes");
       else if (strcmp(name, "False") == 0)
@@ -1692,5 +1702,57 @@ ppd_decode(char *string)	/* I - String to decode */
 
 
 /*
- * End of "$Id: ppd.c,v 1.23 1999/06/15 21:27:09 mike Exp $".
+ * 'ppd_fix()' - Fix WinANSI characters in the range 0x80 to 0x9f to be
+ *               valid ISO-8859-1 characters...
+ */
+
+static void
+ppd_fix(char *string)		/* IO - String to fix */
+{
+  unsigned char		*p;	/* Pointer into string */
+  static unsigned char	lut[32] =/* Lookup table for characters */
+			{
+			  0x20,
+			  0x20,
+			  0x20,
+			  0x20,
+			  0x20,
+			  0x20,
+			  0x20,
+			  0x20,
+			  0x20,
+			  0x20,
+			  0x20,
+			  0x20,
+			  0x20,
+			  0x20,
+			  0x20,
+			  0x20,
+			  'l',
+			  '`',
+			  '\'',
+			  '^',
+			  '~',
+			  0x20, /* bar */
+			  0x20, /* circumflex */
+			  0x20, /* dot */
+			  0x20, /* double dot */
+			  0x20,
+			  0x20, /* circle */
+			  0x20, /* ??? */
+			  0x20,
+			  '\"', /* should be right quotes */
+			  0x20, /* ??? */
+			  0x20  /* accent */
+			};
+
+
+  for (p = (unsigned char *)string; *p; p ++)
+    if (*p >= 0x80 && *p < 0xa0)
+      *p = lut[*p - 0x80];
+}
+
+
+/*
+ * End of "$Id: ppd.c,v 1.24 1999/06/16 15:29:51 mike Exp $".
  */
