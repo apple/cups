@@ -3,6 +3,8 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.20
 
+	- The web admin interface did not display an error
+	  message if the PPD file could not be loaded (STR #308)
 	- The ppdEmit() functions did not use the correct
 	  orientation value position for custom page sizes (STR
 	  #292)
