@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.3 1999/02/09 22:04:10 mike Exp $"
+# "$Id: Makefile,v 1.4 1999/02/19 22:07:01 mike Exp $"
 #
 #   Scheduler Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -27,6 +27,10 @@ include ../Makedefs
 OBJS	=	auth.o classes.o client.o conf.o dirsvc.o main.o job.o \
 		printers.o
 
+#
+# Make the scheduler executable, "cupsd".
+#
+
 cupsd:	$(OBJS) ../cups/libcups.a
 	$(CC) $(LDFLAGS) -o cupsd $(OBJS) $(LIBS)
 
@@ -35,5 +39,18 @@ $(OBJS):	auth.h classes.h client.h conf.h cupsd.h dirsvc.h job.h \
 		../cups/mime.h ../cups/string.h ../Makedefs
 
 #
-# End of "$Id: Makefile,v 1.3 1999/02/09 22:04:10 mike Exp $".
+# Clean all object files...
+#
+
+clean:
+	rm -f $(OBJS) cupsd
+
+#
+# Install the scheduler...
+#
+
+install:
+
+#
+# End of "$Id: Makefile,v 1.4 1999/02/19 22:07:01 mike Exp $".
 #

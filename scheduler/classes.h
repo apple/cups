@@ -1,5 +1,5 @@
 /*
- * "$Id: classes.h,v 1.4 1999/02/09 22:04:10 mike Exp $"
+ * "$Id: classes.h,v 1.5 1999/02/19 22:07:03 mike Exp $"
  *
  *   Printer class definitions for the Common UNIX Printing System (CUPS).
  *
@@ -31,8 +31,8 @@ typedef struct class_str
 {
   struct class_str *next;		/* Next class in list */
   char		uri[HTTP_MAX_URI],	/* Class URI */
-		hostname[HTTP_MAX_HOST];/* Host class resides on */
-  unsigned char	name[IPP_MAX_NAME],	/* Class name */
+		hostname[HTTP_MAX_HOST],/* Host class resides on */
+		name[IPP_MAX_NAME],	/* Class name */
 		location[IPP_MAX_NAME],	/* Location */
 		info[IPP_MAX_NAME],	/* Description */
 		more_info[HTTP_MAX_URI];/* URL for site-specific info */
@@ -63,5 +63,5 @@ extern void		SaveAllClasses(void);
 
 
 /*
- * End of "$Id: classes.h,v 1.4 1999/02/09 22:04:10 mike Exp $".
+ * End of "$Id: classes.h,v 1.5 1999/02/19 22:07:03 mike Exp $".
  */

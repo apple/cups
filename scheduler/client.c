@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.3 1999/02/10 21:15:52 mike Exp $"
+ * "$Id: client.c,v 1.4 1999/02/19 22:07:04 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -61,8 +61,7 @@ static int	check_if_modified(client_t *con, struct stat *filestats);
 static char	*get_extension(char *filename);
 static char	*get_type(char *extension);
 static char	*get_file(client_t *con, struct stat *filestats);
-static int	pipe_command(int infile, int *outfile, char *command);
-static int	show_printer_status(client_t *con);
+static int	pipe_command(client_t *con, int infile, int *outfile, char *command, char *options);
 static void	sigpipe_handler(int sig);
 
 
@@ -234,6 +233,8 @@ ReadClient(client_t *con)	/* I - Client to read from */
 		*extension,	/* Extension of file */
 		*type;		/* MIME type */
   struct stat	filestats;	/* File information */
+  char		command[1024],	/* Command to run */
+		*options;	/* Options/CGI data */
 
 
   status = HTTP_CONTINUE;
@@ -431,13 +432,34 @@ ReadClient(client_t *con)	/* I - Client to read from */
     else switch (con->http.state)
     {
       case HTTP_GET_SEND :
-	  if (strncmp(con->uri, "/printers", 9) == 0)
+	  if (strncmp(con->uri, "/printers", 9) == 0 ||
+	      strncmp(con->uri, "/classes", 8) == 0 ||
+	      strncmp(con->uri, "/jobs", 5) == 0)
 	  {
 	   /*
-	    * Show printer status...
+	    * Send CGI output...
 	    */
 
-            if (!show_printer_status(con))
+            if (strncmp(con->uri, "/printers", 9) == 0)
+	    {
+	      sprintf(command, "%s/cgi-bin/printers", ServerRoot);
+	      options = con->uri + 9;
+	    }
+	    else if (strncmp(con->uri, "/classes", 8) == 0)
+	    {
+	      sprintf(command, "%s/cgi-bin/classes", ServerRoot);
+	      options = con->uri + 8;
+	    }
+	    else
+	    {
+	      sprintf(command, "%s/cgi-bin/jobs", ServerRoot);
+	      options = con->uri + 5;
+	    }
+
+	    if (*options == '/')
+	      options ++;
+
+            if (!SendCommand(con, command, options))
 	    {
 	      if (!SendError(con, HTTP_NOT_FOUND))
 	      {
@@ -448,11 +470,7 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	    else
               LogRequest(con, HTTP_OK);
 
-            con->http.state = HTTP_WAITING;
-
-	    if (con->http.data_remaining == 0 &&
-	        con->http.data_encoding == HTTP_ENCODE_LENGTH &&
-		con->http.version <= HTTP_1_0)
+	    if (con->http.version <= HTTP_1_0)
 	      con->http.keep_alive = HTTP_KEEPALIVE_OFF;
 	  }
 	  else
@@ -492,19 +510,78 @@ ReadClient(client_t *con)	/* I - Client to read from */
           break;
 
       case HTTP_POST_RECV :
-          sprintf(con->filename, "%s/requests/XXXXXX", ServerRoot);
-	  con->file = mkstemp(con->filename);
+         /*
+	  * See what kind of POST request this is; for IPP requests the
+	  * content-type field will be "application/ipp"...
+	  */
 
-          LogMessage(LOG_INFO, "ReadClient() %d REQUEST %s", con->http.fd,
-	             con->filename);
-
-	  if (con->file < 0)
+	  if (strcmp(con->http.fields[HTTP_FIELD_CONTENT_TYPE], "application/ipp") == 0)
 	  {
-	    if (!SendError(con, HTTP_REQUEST_TOO_LARGE))
+#if 0
+            sprintf(con->filename, "%s/requests/XXXXXX", ServerRoot);
+	    con->file = mkstemp(con->filename);
+
+            LogMessage(LOG_INFO, "ReadClient() %d REQUEST %s", con->http.fd,
+	               con->filename);
+
+	    if (con->file < 0)
 	    {
-	      CloseClient(con);
-	      return (0);
+	      if (!SendError(con, HTTP_REQUEST_TOO_LARGE))
+	      {
+		CloseClient(con);
+		return (0);
+	      }
 	    }
+#else
+            con->request = ippNew();
+#endif /* 0 */
+          }
+	  else if (strcmp(con->http.fields[HTTP_FIELD_CONTENT_TYPE], "application/ipp") == 0 &&
+	           (strncmp(con->uri, "/printers", 9) == 0 ||
+	            strncmp(con->uri, "/classes", 8) == 0 ||
+	            strncmp(con->uri, "/jobs", 5) == 0))
+	  {
+	   /*
+	    * CGI request...
+	    */
+
+            if (strncmp(con->uri, "/printers", 9) == 0)
+	    {
+	      sprintf(command, "%s/cgi-bin/printers", ServerRoot);
+	      options = con->uri + 9;
+	    }
+	    else if (strncmp(con->uri, "/classes", 8) == 0)
+	    {
+	      sprintf(command, "%s/cgi-bin/classes", ServerRoot);
+	      options = con->uri + 8;
+	    }
+	    else
+	    {
+	      sprintf(command, "%s/cgi-bin/jobs", ServerRoot);
+	      options = con->uri + 5;
+	    }
+
+	    if (*options == '/')
+	      options ++;
+
+            if (!SendCommand(con, command, options))
+	    {
+	      if (!SendError(con, HTTP_NOT_FOUND))
+	      {
+	        CloseClient(con);
+		return (0);
+	      }
+            }
+	    else
+              LogRequest(con, HTTP_OK);
+
+	    if (con->http.version <= HTTP_1_0)
+	      con->http.keep_alive = HTTP_KEEPALIVE_OFF;
+	  }
+	  else if (!SendError(con, HTTP_UNAUTHORIZED))
+	  {
+	    CloseClient(con);
+	    return (0);
 	  }
 	  break;
 
@@ -518,10 +595,12 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	  return (0);
 
       case HTTP_HEAD :
-	  if (strncmp(con->uri, "/printers/", 10) == 0)
+	  if (strncmp(con->uri, "/printers/", 10) == 0 ||
+	      strncmp(con->uri, "/classes/", 9) == 0 ||
+	      strncmp(con->uri, "/jobs/", 6) == 0)
 	  {
 	   /*
-	    * Do a command...
+	    * CGI output...
 	    */
 
             if (!SendHeader(con, HTTP_OK, "text/html"))
@@ -615,6 +694,40 @@ ReadClient(client_t *con)	/* I - Client to read from */
 		   con->http.data_encoding == HTTP_ENCODE_CHUNKED ? "chunked" : "length",
 		   con->http.data_remaining);
 
+        if (con->request != NULL)
+	{
+	 /*
+	  * Grab any request data from the connection...
+	  */
+
+	  if (ippRead(&(con->http), con->request) != IPP_DATA)
+	    break;
+
+         /*
+	  * Then create a file as needed for the request data...
+	  */
+
+          if (con->file == 0 &&
+	      (con->http.data_remaining > 0 ||
+	       con->http.data_encoding == HTTP_ENCODE_CHUNKED))
+	  {
+            sprintf(con->filename, "%s/requests/XXXXXX", ServerRoot);
+	    con->file = mkstemp(con->filename);
+
+            LogMessage(LOG_INFO, "ReadClient() %d REQUEST %s", con->http.fd,
+	               con->filename);
+
+	    if (con->file < 0)
+	    {
+	      if (!SendError(con, HTTP_REQUEST_TOO_LARGE))
+	      {
+		CloseClient(con);
+		return (0);
+	      }
+	    }
+	  }
+        }
+
         if ((bytes = httpRead(HTTP(con), line, sizeof(line))) < 0)
 	{
 	  CloseClient(con);
@@ -624,15 +737,18 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	{
 	  close(con->file);
 
-          if (!SendError(con, HTTP_ACCEPTED))
+          if (con->request)
 	  {
-	    CloseClient(con);
-	    return (0);
-	  }
+	   /*
+	    * Add IPP processing/response stuff...
+	    */
 
-         /*
-	  * Do POST stuff HERE!
-	  */
+            if (!SendError(con, HTTP_ACCEPTED))
+	    {
+	      CloseClient(con);
+	      return (0);
+	    }
+	  }
 	}
 	else
 	{
@@ -666,31 +782,15 @@ ReadClient(client_t *con)	/* I - Client to read from */
 
 
 /*
- * 'SendCGI()' - Launch a CGI script...
- */
-
-int				/* O - 1 on success, 0 on failure */
-SendCGI(client_t *con)		/* I - Connection to use */
-{
- /**** Insert pipe code - need to read data from request file, and then
-       set state to HTTP_POST_SEND ****/
-
- /**** When program is done need to remove temp file and so forth ****/
- /**** Don't forget to put CONTENT_TYPE and REQUEST_METHOD... ****/
-}
-
-
-/*
  * 'SendCommand()' - Send output from a command via HTTP.
  */
 
 int
 SendCommand(client_t      *con,
-            http_status_t code,
 	    char          *command,
-	    char          *type)
+	    char          *options)
 {
-  con->pipe_pid = pipe_command(0, &(con->file), command);
+  con->pipe_pid = pipe_command(con, 0, &(con->file), command, options);
 
   LogMessage(LOG_DEBUG, "SendCommand() %d command=\"%s\" file=%d pipe_pid=%d",
              con->http.fd, command, con->file, con->pipe_pid);
@@ -703,7 +803,7 @@ SendCommand(client_t      *con,
   FD_SET(con->file, &InputSet);
   FD_SET(con->http.fd, &OutputSet);
 
-  if (!SendHeader(con, code, type))
+  if (!SendHeader(con, HTTP_OK, "text/html"))
     return (0);
 
   if (con->http.version == HTTP_1_1)
@@ -775,7 +875,7 @@ SendError(client_t      *con,	/* I - Connection */
     sprintf(message, "<HTML><HEAD><TITLE>%d %s</TITLE></HEAD>"
                      "<BODY><H1>%s</H1>%s</BODY></HTML>\n",
             code, httpStatus(code), httpStatus(code),
-	    con->language ? con->language->messages[code] : httpStatus(code));
+	    con->language ? (char *)con->language->messages[code] : httpStatus(code));
 
     if (httpPrintf(HTTP(con), "Content-Type: text/html\r\n") < 0)
       return (0);
@@ -1012,7 +1112,9 @@ WriteClient(client_t *con)
       con->http.state != HTTP_POST_SEND)
     return (1);
 
-  if ((bytes = read(con->file, buf, sizeof(buf))) > 0)
+  if (con->response != NULL)
+    bytes = ippWrite(&(con->http), con->response) != IPP_DATA;
+  else if ((bytes = read(con->file, buf, sizeof(buf))) > 0)
   {
     if (httpWrite(HTTP(con), buf, bytes) < 0)
     {
@@ -1022,7 +1124,8 @@ WriteClient(client_t *con)
 
     con->bytes += bytes;
   }
-  else
+
+  if (bytes <= 0)
   {
     LogRequest(con, HTTP_OK);
 
@@ -1055,6 +1158,18 @@ WriteClient(client_t *con)
     con->http.state = HTTP_WAITING;
     con->file       = 0;
     con->pipe_pid   = 0;
+
+    if (con->request != NULL)
+    {
+      ippDelete(con->request);
+      con->request = NULL;
+    }
+
+    if (con->response != NULL)
+    {
+      ippDelete(con->response);
+      con->response = NULL;
+    }
   }
 
   LogMessage(LOG_DEBUG, "WriteClient() %d %d bytes", con->http.fd, bytes);
@@ -1262,23 +1377,32 @@ get_type(char *extension)
  */
 
 static int			/* O - Process ID */
-pipe_command(int infile,	/* I - Standard input for command */
-             int *outfile,	/* O - Standard output for command */
-	     char *command)	/* I - Command to run */
+pipe_command(client_t *con,	/* I - Client connection */
+             int      infile,	/* I - Standard input for command */
+             int      *outfile,	/* O - Standard output for command */
+	     char     *command,	/* I - Command to run */
+	     char     *options)	/* I - Options for command */
 {
   int	pid;			/* Process ID */
   char	*commptr;		/* Command string pointer */
   int	fds[2];			/* Pipe FDs */
   int	argc;			/* Number of arguments */
   char	argbuf[1024],		/* Argument buffer */
-	*argv[100];		/* Argument strings */
+	*argv[100],		/* Argument strings */
+	*envp[100];		/* Environment variables */
+  static char	lang[1024];		/* LANG env variable */
+  static char	content_length[1024];	/* CONTENT_LENGTH env variable */
+  static char	content_type[1024];	/* CONTENT_TYPE env variable */
+  static char	server_port[1024];	/* Default listen port */
+  static char	remote_host[1024];	/* REMOTE_HOST env variable */
+  static char	remote_user[1024];	/* REMOTE_HOST env variable */
 
 
  /*
   * Copy the command string...
   */
 
-  strncpy(argbuf, command, sizeof(argbuf) - 1);
+  strncpy(argbuf, options, sizeof(argbuf) - 1);
   argbuf[sizeof(argbuf) - 1] = '\0';
 
  /*
@@ -1320,6 +1444,46 @@ pipe_command(int infile,	/* I - Standard input for command */
 
   argv[argc] = NULL;
 
+  if (argv[1][0] == '\0')
+    argv[1] = strrchr(command, '/') + 1;
+
+ /*
+  * Setup the environment variables as needed...
+  */
+
+  sprintf(lang, "LANG=%s", con->language ? con->language->language : "C");
+  sprintf(server_port, "SERVER_PORT=%d", ntohs(con->http.hostaddr.sin_port));
+  sprintf(remote_host, "REMOTE_HOST=%s", con->http.hostname);
+  sprintf(remote_user, "REMOTE_USER=%s", con->username);
+
+  envp[0] = "PATH=/bin:/usr/bin";
+  envp[1] = "SERVER_SOFTWARE=CUPS/1.0";
+  envp[2] = "SERVER_NAME=localhost";	/* This isn't 100% correct... */
+  envp[3] = "GATEWAY_INTERFACE=CGI/1.1";
+  envp[4] = "SERVER_PROTOCOL=HTTP/1.1";
+  envp[5] = server_port;
+  envp[6] = remote_host;
+  envp[7] = remote_user;
+  envp[8] = lang;
+  envp[9] = "TZ=GMT";
+
+  if (con->operation == HTTP_GET)
+  {
+    envp[10] = "REQUEST_METHOD=GET";
+    envp[11] = NULL;
+  }
+  else
+  {
+    sprintf(content_length, "CONTENT_LENGTH=%d", con->http.data_remaining);
+    sprintf(content_type, "CONTENT_TYPE=%s",
+            con->http.fields[HTTP_FIELD_CONTENT_TYPE]);
+
+    envp[10] = "REQUEST_METHOD=POST";
+    envp[11] = content_length;
+    envp[12] = content_type;
+    envp[13] = NULL;
+  }
+
  /*
   * Create a pipe for the output...
   */
@@ -1337,6 +1501,9 @@ pipe_command(int infile,	/* I - Standard input for command */
     * Child comes here...  Close stdin if necessary and dup the pipe to stdout.
     */
 
+    setuid(User);
+    setgid(Group);
+
     if (infile)
     {
       close(0);
@@ -1353,7 +1520,7 @@ pipe_command(int infile,	/* I - Standard input for command */
     * Execute the pipe program; if an error occurs, exit with status 1...
     */
 
-    execvp(argv[0], argv);
+    execve(command, argv, envp);
     exit(1);
     return (0);
   }
@@ -1497,5 +1664,5 @@ sigpipe_handler(int sig)	/* I - Signal number */
 
 
 /*
- * End of "$Id: client.c,v 1.3 1999/02/10 21:15:52 mike Exp $".
+ * End of "$Id: client.c,v 1.4 1999/02/19 22:07:04 mike Exp $".
  */
