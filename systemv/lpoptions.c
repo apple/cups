@@ -1,5 +1,5 @@
 /*
- * "$Id: lpoptions.c,v 1.8 2001/01/22 15:04:02 mike Exp $"
+ * "$Id: lpoptions.c,v 1.9 2001/03/05 22:09:19 mike Exp $"
  *
  *   Printer option program for the Common UNIX Printing System (CUPS).
  *
@@ -155,7 +155,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	    else
 	      list_options(dest);
 
-            changes = 1;
+            changes = -1;
 	    break;
 
 	case 'o' : /* -o option[=value] */
@@ -300,7 +300,7 @@ main(int  argc,			/* I - Number of command-line arguments */
   if (dest == NULL)
     return (0);
 
-  if (changes)
+  if (changes > 0)
   {
    /*
     * Set printer options...
@@ -313,7 +313,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 
     cupsSetDests(num_dests, dests);
   }
-  else
+  else if (changes == 0)
   {
     num_options = dest->num_options;
     options     = dest->options;
@@ -423,5 +423,5 @@ usage(void)
 
 
 /*
- * End of "$Id: lpoptions.c,v 1.8 2001/01/22 15:04:02 mike Exp $".
+ * End of "$Id: lpoptions.c,v 1.9 2001/03/05 22:09:19 mike Exp $".
  */

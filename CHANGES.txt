@@ -62,6 +62,9 @@ CHANGES IN CUPS V1.1.7
 	- The admin CGI was passing a printer make string to
 	  ippSetCGIVars() that was being replaced in that
 	  function.
+	- "lpoptions -l" would resave the options...
+	- The EPSON drivers now send the "end packet mode"
+	  command when printing to USB devices.
 
 
 CHANGES IN CUPS V1.1.6-3

@@ -1,5 +1,5 @@
 /*
- * "$Id: rastertoepson.c,v 1.9 2001/01/24 17:18:57 mike Exp $"
+ * "$Id: rastertoepson.c,v 1.10 2001/03/05 22:09:18 mike Exp $"
  *
  *   EPSON ESC/P and ESC/P2 filter for the Common UNIX Printing System
  *   (CUPS).
@@ -105,6 +105,17 @@ void	OutputRows(const cups_page_header_t *header, int row);
 void
 Setup(void)
 {
+  const char	*device_uri;	/* The device for the printer... */
+
+
+ /*
+  * EPSON USB printers need an additional command issued at the
+  * beginning of each job to exit from "packet" mode...
+  */
+
+  if ((device_uri = getenv("DEVICE_URI")) != NULL &&
+      strncmp(device_uri, "usb:", 4) == 0)
+    pwrite("\000\000\000\033\001@EJL 1284.4\n@EJL     \n\033@", 29);
 }
 
 
@@ -1078,5 +1089,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: rastertoepson.c,v 1.9 2001/01/24 17:18:57 mike Exp $".
+ * End of "$Id: rastertoepson.c,v 1.10 2001/03/05 22:09:18 mike Exp $".
  */
