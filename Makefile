@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.31.2.4 2002/01/02 18:04:16 mike Exp $"
+# "$Id: Makefile,v 1.31.2.5 2002/01/24 18:54:45 mike Exp $"
 #
 #   Top-level Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -36,6 +36,7 @@ DIRS	=	cups backend berkeley cgi-bin filter man pdftops \
 #
 
 all:
+	chmod +x cups-config
 	for dir in $(DIRS); do\
 		echo Making all in $$dir... ;\
 		(cd $$dir ; $(MAKE) $(MFLAGS)) || exit 1;\
@@ -141,5 +142,5 @@ tardist:
 	epm $(EPMFLAGS) -f tardist cups
 
 #
-# End of "$Id: Makefile,v 1.31.2.4 2002/01/02 18:04:16 mike Exp $".
+# End of "$Id: Makefile,v 1.31.2.5 2002/01/24 18:54:45 mike Exp $".
 #

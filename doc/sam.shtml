@@ -355,7 +355,7 @@ Once you are the root user, run dpkg with:
 scheduler will be started automatically.
 
 
-<H1 ALIGN="RIGHT"><A NAME="PRINTER_MANAGEMENT">3 - Printer Management</A></H1>
+<H1 ALIGN="RIGHT"><A NAME="MANAGING_PRINTERS">3 - Managing Printers</A></H1>
 
 <P>This chapter describes how to add your first printer and how to
 manage your printers.
@@ -767,7 +767,7 @@ clients on the same subnet can share the same configuration information.
 <P>Polling is enabled by specifying one or more
 <A HREF="#BrowsePoll"><CODE>BrowsePoll</CODE></A> directives in the
 <VAR>/etc/cups/cupsd.conf</VAR> file. For information on making these
-changes, see <A HREF="PRINTING_MANAGEMENT">Chapter 6, "Printing System
+changes, see <A HREF="#PRINTING_MANAGEMENT">Chapter 6, "Printing System
 Management"</A>.
 
 
@@ -4434,7 +4434,7 @@ AuthClass System
 </UL></PRE>
 
 for the <VAR>/admin</VAR> location. Then restart the CUPS server as
-described in <A HREF="PRINTING_MANAGEMENT">Chapter 8, "Printing System
+described in <A HREF="#PRINTING_MANAGEMENT">Chapter 6, "Printing System
 Management"</A>.
 
 <CENTER><TABLE WIDTH="80%" BORDER="1" CELLPADDING="5" BGCOLOR="#cccccc">
@@ -4449,7 +4449,7 @@ Management"</A>.
 </TR>
 </TABLE></CENTER>
 
-<H2>I Can't Do Administration Tasks from Another Machine!</H2>
+<H2><A NAME="ALLOW_REMOTE">I Can't Do Administration Tasks from Another Machine!</A></H2>
 
 <P>The default CUPS configuration limits administration to the local
 machine. To open up access, edit the <VAR>/etc/cups/cupsd.conf</VAR>
@@ -4462,7 +4462,7 @@ Allow from 127.0.0.1
 </PRE></UL>
 
 for the <VAR>/admin</VAR> location. Then restart the CUPS server as
-described in <A HREF="PRINTING_MANAGEMENT">Chapter 8, "Printing System
+described in <A HREF="#PRINTING_MANAGEMENT">Chapter 6, "Printing System
 Management"</A>.
 
 <CENTER><TABLE WIDTH="80%" BORDER="1" CELLPADDING="5" BGCOLOR="#cccccc">

@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-directories.m4,v 1.5.2.2 2002/01/02 18:50:23 mike Exp $"
+dnl "$Id: cups-directories.m4,v 1.5.2.3 2002/01/24 18:54:46 mike Exp $"
 dnl
 dnl   Directory stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -155,14 +155,14 @@ AC_SUBST(INITDIR)
 AC_SUBST(INITDDIR)
 
 dnl Setup default locations...
-CUPS_SERVERROOT='${sysconfdir}/cups'
-CUPS_REQUESTS='${localstatedir}/spool/cups'
+CUPS_SERVERROOT="$sysconfdir/cups"
+CUPS_REQUESTS="$localstatedir/spool/cups"
 
 AC_DEFINE_UNQUOTED(CUPS_SERVERROOT, "$sysconfdir/cups")
 AC_DEFINE_UNQUOTED(CUPS_REQUESTS, "$localstatedir/spool/cups")
 
 if test x$logdir = x; then
-	CUPS_LOGDIR='${localstatedir}/log/cups'
+	CUPS_LOGDIR="$localstatedir/log/cups"
 	AC_DEFINE_UNQUOTED(CUPS_LOGDIR, "$localstatedir/log/cups")
 else
 	CUPS_LOGDIR="$logdir"
@@ -174,13 +174,13 @@ case "$uname" in
 	*BSD* | Darwin*)
 		# *BSD and Darwin (MacOS X)
 		INSTALL_SYSV=""
-		CUPS_SERVERBIN='${exec_prefix}/libexec/cups'
+		CUPS_SERVERBIN="$exec_prefix/libexec/cups"
 		AC_DEFINE_UNQUOTED(CUPS_SERVERBIN, "$exec_prefix/libexec/cups")
 		;;
 	*)
 		# All others
 		INSTALL_SYSV="install-sysv"
-		CUPS_SERVERBIN='${exec_prefix}/lib/cups'
+		CUPS_SERVERBIN="$exec_prefix/lib/cups"
 		AC_DEFINE_UNQUOTED(CUPS_SERVERBIN, "$exec_prefix/lib/cups")
 		;;
 esac
@@ -194,18 +194,18 @@ AC_SUBST(CUPS_REQUESTS)
 dnl Set the CUPS_LOCALE directory...
 case "$uname" in
 	Linux* | *BSD* | Darwin*)
-		CUPS_LOCALEDIR='${datadir}/locale'
+		CUPS_LOCALEDIR="$datadir/locale"
 		AC_DEFINE_UNQUOTED(CUPS_LOCALEDIR, "$datadir/locale")
 		;;
 
 	OSF1* | AIX*)
-		CUPS_LOCALEDIR='${exec_prefix}/lib/nls/msg'
+		CUPS_LOCALEDIR="$exec_prefix/lib/nls/msg"
 		AC_DEFINE_UNQUOTED(CUPS_LOCALEDIR, "$exec_prefix/lib/nls/msg")
 		;;
 
 	*)
 		# This is the standard System V location...
-		CUPS_LOCALEDIR='${exec_prefix}/lib/locale'
+		CUPS_LOCALEDIR="$exec_prefix/lib/locale"
 		AC_DEFINE_UNQUOTED(CUPS_LOCALEDIR, "$exec_prefix/lib/locale")
 		;;
 esac
@@ -213,13 +213,13 @@ esac
 AC_SUBST(CUPS_LOCALEDIR)
 
 dnl Set the CUPS_DATADIR directory...
-CUPS_DATADIR='${datadir}/cups'
+CUPS_DATADIR="$datadir/cups"
 AC_DEFINE_UNQUOTED(CUPS_DATADIR, "$datadir/cups")
 AC_SUBST(CUPS_DATADIR)
 
 dnl Set the CUPS_DOCROOT directory...
 if test x$docdir = x; then
-	CUPS_DOCROOT='${datadir}/doc/cups'
+	CUPS_DOCROOT="$datadir/doc/cups"
 	docdir="$datadir/doc/cups"
 else
 	CUPS_DOCROOT="$docdir"
@@ -229,8 +229,10 @@ AC_DEFINE_UNQUOTED(CUPS_DOCROOT, "$docdir")
 AC_SUBST(CUPS_DOCROOT)
 
 dnl Set the CUPS_FONTPATH directory...
+CUPS_FONTPATH="$fontpath"
+AC_SUBST(CUPS_FONTPATH)
 AC_DEFINE_UNQUOTED(CUPS_FONTPATH, "$fontpath")
 
 dnl
-dnl End of "$Id: cups-directories.m4,v 1.5.2.2 2002/01/02 18:50:23 mike Exp $".
+dnl End of "$Id: cups-directories.m4,v 1.5.2.3 2002/01/24 18:54:46 mike Exp $".
 dnl

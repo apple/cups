@@ -463,11 +463,11 @@ Graphical User Interfaces ("GUIs"), the CUPS API provides
 functions to set the default username and to register a callback
 function that returns a password string.
 
-<P>The <A HREF="cupsSetPasswordCB"><CODE>cupsSetPasswordCB()</CODE></A>
+<P>The <A HREF="#cupsSetPasswordCB"><CODE>cupsSetPasswordCB()</CODE></A>
 function is used to set a password callback in your program. Only one
 function can be used at any time.
 
-<P>The <A HREF="cupsSetUser"><CODE>cupsSetUser()</CODE></A> function sets
+<P>The <A HREF="#cupsSetUser"><CODE>cupsSetUser()</CODE></A> function sets
 the current username for authentication. This function can be called by
 your password callback function to change the current username as needed.
 
@@ -2529,15 +2529,349 @@ value orderings:
 
 <H1 ALIGN="RIGHT"><A NAME="STRUCTURES">C - Structures</A></H1>
 
-<P>This appendix describes all of the structures that are defined by the CUPS
-API.
+<P>This appendix describes all of the structures that are
+defined by the CUPS API.
+
+<H2>CUPS Structures</H2>
+
+<H3><A NAME="cups_job_t">CUPS Destinations</A></H3>
+
+<P>The CUPS destination structure (<CODE>cups_dest_t</CODE>)
+contains information on a specific destination or instance:
+
+<CENTER><TABLE WIDTH="90%" BORDER="1">
+<TR>
+	<TH>Member</TH>
+	<TH>Type</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD>name</TD>
+	<TD>char *</TD>
+	<TD>The name of the printer or class.</TD>
+</TR>
+<TR>
+	<TD>instance</TD>
+	<TD>char *</TD>
+	<TD>The instance of the printer or class; NULL for the primary
+	instance.</TD>
+</TR>
+<TR>
+	<TD>is_default</TD>
+	<TD>int</TD>
+	<TD>1 if the destination is set as the default, 0 otherwise.</TD>
+</TR>
+<TR>
+	<TD>num_options</TD>
+	<TD>int</TD>
+	<TD>The number of options associated with this destination.</TD>
+</TR>
+<TR>
+	<TD>options</TD>
+	<TD><A HREF="#cups_option_t">cups_option_t *</A></TD>
+	<TD>The options associated with this destination.</TD>
+</TR>
+</TABLE></CENTER>
+
+<H3><A NAME="cups_job_t">CUPS Jobs</A></H3>
+
+<P>The CUPS job structure (<CODE>cups_job_t</CODE>) contains
+information on a specific job:
+
+<CENTER><TABLE WIDTH="90%" BORDER="1">
+<TR>
+	<TH>Member</TH>
+	<TH>Type</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD>id</TD>
+	<TD>int</TD>
+	<TD>The job ID for this job.</TD>
+</TR>
+<TR>
+	<TD>dest</TD>
+	<TD>char *</TD>
+	<TD>The destination for this job (printer or class name).</TD>
+</TR>
+<TR>
+	<TD>title</TD>
+	<TD>char *</TD>
+	<TD>The job-name for this job (title).</TD>
+</TR>
+<TR>
+	<TD>user</TD>
+	<TD>char *</TD>
+	<TD>The job-originating-user-name for this job (username).</TD>
+</TR>
+<TR>
+	<TD>format</TD>
+	<TD>char *</TD>
+	<TD>The document-format for this job (MIME type string).</TD>
+</TR>
+<TR>
+	<TD>state</TD>
+	<TD>ipp_jstate</TD>
+	<TD>The current state of the job.</TD>
+</TR>
+<TR>
+	<TD>size</TD>
+	<TD>int</TD>
+	<TD>The size of this job in kilobytes.</TD>
+</TR>
+<TR>
+	<TD>priority</TD>
+	<TD>int</TD>
+	<TD>The priority of this job from 1 to 100 (50 is normal).</TD>
+</TR>
+<TR>
+	<TD>completed_time</TD>
+	<TD>time_t</TD>
+	<TD>The time the job was completed, or 0 if not yet completed.</TD>
+</TR>
+<TR>
+	<TD>creation_time</TD>
+	<TD>time_t</TD>
+	<TD>The time the job was queued.</TD>
+</TR>
+<TR>
+	<TD>processing_time</TD>
+	<TD>time_t</TD>
+	<TD>The time the job started printing.</TD>
+</TR>
+</TABLE></CENTER>
+
+<H3><A NAME="cups_lang_t">CUPS Messages</A></H3>
+
+<P>The CUPS messages structure (<CODE>cups_lang_t</CODE>)
+contains the character set, locale name, and messages array:
+
+<CENTER><TABLE WIDTH="90%" BORDER="1">
+<TR>
+	<TH>Member</TH>
+	<TH>Type</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD>next</TD>
+	<TD>cups_lang_t *</TD>
+	<TD>Pointer to the next messages structure in memory.</TD>
+</TR>
+<TR>
+	<TD>used</TD>
+	<TD>int</TD>
+	<TD>The number of active users of this messages structure.</TD>
+</TR>
+<TR>
+	<TD>encoding</TD>
+	<TD>cups_encoding_t</TD>
+	<TD>The character encoding of the message strings.</TD>
+</TR>
+<TR>
+	<TD>language</TD>
+	<TD>char [16]</TD>
+	<TD>The language/locale name.</TD>
+</TR>
+<TR>
+	<TD>messages</TD>
+	<TD>char *[]</TD>
+	<TD>The array of message strings.</TD>
+</TR>
+</TABLE></CENTER>
+
+<H3><A NAME="cups_option_t">CUPS Options</A></H3>
+
+<P>The CUPS option structure (<CODE>cups_option_t</CODE>)
+contains the option name and string value:
+
+<CENTER><TABLE WIDTH="90%" BORDER="1">
+<TR>
+	<TH>Member</TH>
+	<TH>Type</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD>name</TD>
+	<TD>char *</TD>
+	<TD>The name of the option.</TD>
+</TR>
+<TR>
+	<TD>value</TD>
+	<TD>char *</TD>
+	<TD>The string value of the option.</TD>
+</TR>
+</TABLE></CENTER>
+
+<H2>Networking Structures</H2>
+
+<H3><A NAME="http_t">HTTP State</A></H3>
+
+<P>The HTTP state structure (<CODE>http_t</CODE>) contains the
+current state of a HTTP request or response:
+
+<CENTER><TABLE WIDTH="90%" BORDER="1">
+<TR>
+	<TH>Member</TH>
+	<TH>Type</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD>fd</TD>
+	<TD>int</TD>
+	<TD>The socket for the HTTP connection.</TD>
+</TR>
+<TR>
+	<TD>blocking</TD>
+	<TD>int</TD>
+	<TD>1 if the HTTP functions should block, 0 if not.</TD>
+</TR>
+<TR>
+	<TD>error</TD>
+	<TD>int</TD>
+	<TD>The last OS error that occurred on the socket.</TD>
+</TR>
+<TR>
+	<TD>activity</TD>
+	<TD>time_t</TD>
+	<TD>The last time the HTTP connection was used.</TD>
+</TR>
+<TR>
+	<TD>state</TD>
+	<TD>http_state_t</TD>
+	<TD>The current HTTP request/response state.</TD>
+</TR>
+<TR>
+	<TD>status</TD>
+	<TD>int</TD>
+	<TD>The last HTTP status seen.</TD>
+</TR>
+<TR>
+	<TD>version</TD>
+	<TD>http_version_t</TD>
+	<TD>The HTTP protocol version in use.</TD>
+</TR>
+<TR>
+	<TD>keep_alive</TD>
+	<TD>http_keep_alive_t</TD>
+	<TD>Whether or not to use Keep-Alive</TD>
+</TR>
+<TR>
+	<TD>hostaddr</TD>
+	<TD>struct sockaddr_in</TD>
+	<TD>The IPv4 address of the HTTP server.</TD>
+</TR>
+<TR>
+	<TD>hostname</TD>
+	<TD>char []</TD>
+	<TD>The hostname of the HTTP server.</TD>
+</TR>
+<TR>
+	<TD>fields</TD>
+	<TD>char [][]</TD>
+	<TD>The string values of all HTTP request/response
+	fields.</TD>
+</TR>
+<TR>
+	<TD>data</TD>
+	<TD>char *</TD>
+	<TD>Current byte in data buffer.</TD>
+</TR>
+<TR>
+	<TD>data_encoding</TD>
+	<TD>http_encoding_t</TD>
+	<TD>The transfer encoding for the request/response.</TD>
+</TR>
+<TR>
+	<TD>data_remaining</TD>
+	<TD>int</TD>
+	<TD>The number of bytes remaining in the current request,
+	response, or chunk.</TD>
+</TR>
+<TR>
+	<TD>used</TD>
+	<TD>int</TD>
+	<TD>The number of bytes that are used in the buffer.</TD>
+</TR>
+<TR>
+	<TD>buffer</TD>
+	<TD>char []</TD>
+	<TD>The read/write buffer.</TD>
+</TR>
+<TR>
+	<TD>auth_type</TD>
+	<TD>int</TD>
+	<TD>The type of authentication in use.</TD>
+</TR>
+<TR>
+	<TD>md5_state</TD>
+	<TD>md5_state_t</TD>
+	<TD>The current MD5 digest state.</TD>
+</TR>
+<TR>
+	<TD>nonce</TD>
+	<TD>char []</TD>
+	<TD>The nonce value for Digest authentication.</TD>
+</TR>
+<TR>
+	<TD>nonce_count</TD>
+	<TD>int</TD>
+	<TD>The nonce count value.</TD>
+</TR>
+<TR>
+	<TD>tls</TD>
+	<TD>void *</TD>
+	<TD>A pointer to private encryption data.</TD>
+</TR>
+<TR>
+	<TD>encryption</TD>
+	<TD>http_encryption_t</TD>
+	<TD>The current encryption mode.</TD>
+</TR>
+</TABLE></CENTER>
+
+<H3><A NAME="ipp_t">IPP State</A></H3>
+
+<P>The IPP state structure (<CODE>ipp_t</CODE>) contains the
+current state of a IPP request or response:
+
+<CENTER><TABLE WIDTH="90%" BORDER="1">
+<TR>
+	<TH>Member</TH>
+	<TH>Type</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3><A NAME="cups_option_t">CUPS Options</A></H3>
+
+<P>The CUPS option structure (<CODE>cups_option_t</CODE>)
+contains the option name and string value:
+
+<CENTER><TABLE WIDTH="90%" BORDER="1">
+<TR>
+	<TH>Member</TH>
+	<TH>Type</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
 
 <H2>Raster Structures</H2>
 
-<H3>Raster Page Header</H3>
+<H3><A NAME="cups_raster_header_t">Raster Page Header</A></H3>
 
-<P>The raster page header consists of the PostScript page device dictionary
-for the page:
+<P>The raster page header (<CODE>cups_raster_header_t</CODE>)
+consists of the PostScript page device dictionary for the page:
 
 <CENTER><TABLE WIDTH="90%" BORDER="1">
 <TR>
@@ -2747,7 +3081,8 @@ for the page:
 </TR>
 </TABLE></CENTER>
 
-<H1 ALIGN="RIGHT"><A HREF="FUNCTIONS">D - Functions</A></H1>
+
+<H1 ALIGN="RIGHT"><A NAME="FUNCTIONS">D - Functions</A></H1>
 
 <P>This appendix provides a reference for all of the CUPS API functions.
 
