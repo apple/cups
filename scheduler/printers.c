@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.93.2.27 2002/09/19 12:00:31 mike Exp $"
+ * "$Id: printers.c,v 1.93.2.28 2002/10/15 16:19:57 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -112,12 +112,6 @@ AddPrinter(const char *name)	/* I - Name of printer */
   strcpy(p->job_sheets[1], "none");
 
  /*
-  * Setup required filters and IPP attributes...
-  */
-
-  SetPrinterAttrs(p);
-
- /*
   * Insert the printer in the printer list alphabetically...
   */
 
@@ -168,7 +162,7 @@ AddPrinterFilter(printer_t  *p,		/* I - Printer to add to */
   * Range check input...
   */
 
-  if (p == NULL || filter == NULL)
+  if (p == NULL || p->filetype == NULL || filter == NULL)
     return;
 
  /*
@@ -488,7 +482,11 @@ LoadAllPrinters(void)
 
   snprintf(line, sizeof(line), "%s/printers.conf", ServerRoot);
   if ((fp = fopen(line, "r")) == NULL)
+  {
+    LogMessage(L_ERROR, "LoadAllPrinters: Unable to open %s - %s", line,
+               strerror(errno));
     return;
+  }
 
  /*
   * Read printer configurations until we hit EOF...
@@ -555,6 +553,8 @@ LoadAllPrinters(void)
 	*/
 
         line[len - 1] = '\0';
+
+        LogMessage(L_DEBUG, "LoadAllPrinters: Loading printer %s...", value);
 
         p = AddPrinter(value);
 	p->accepting = 1;
@@ -1410,7 +1410,7 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
 	  * Print all files directly...
 	  */
 
-	  AddPrinterFilter(p, "*/* 0 -");
+	  p->filetype = NULL;
 	}
 	else
 	{
@@ -1422,7 +1422,7 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
 	  ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_TEXT,
                        "printer-make-and-model", NULL, "Local Raw Printer");
 
-	  AddPrinterFilter(p, "*/* 0 -");
+	  p->filetype = NULL;
 	}
       }
 
@@ -2086,5 +2086,5 @@ write_irix_state(printer_t *p)	/* I - Printer to update */
 
 
 /*
- * End of "$Id: printers.c,v 1.93.2.27 2002/09/19 12:00:31 mike Exp $".
+ * End of "$Id: printers.c,v 1.93.2.28 2002/10/15 16:19:57 mike Exp $".
  */

@@ -3,6 +3,15 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.17
 
+	- The lpstat command did not allow for destination lists
+	  ("lpstat -v printer1,printer2")
+	- Fixed parsing of long filter status messages in the
+	  scheduler.
+	- Added some startup performance enhancements to the
+	  scheduler so that the printer object information is
+	  regenerated fewer times and the MIME type database is
+	  not filled with lots of empty filters for raw/direct
+	  queues.
 	- The LPD backend now sends the job title as the print
 	  filename.
 	- Added support for variable sizes in the EPSON dot

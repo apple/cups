@@ -1,5 +1,5 @@
 /*
- * "$Id: lpadmin.c,v 1.22.2.15 2002/10/02 19:15:08 mike Exp $"
+ * "$Id: lpadmin.c,v 1.22.2.16 2002/10/15 16:20:00 mike Exp $"
  *
  *   "lpadmin" command for the Common UNIX Printing System (CUPS).
  *
@@ -1250,13 +1250,13 @@ enable_printer(http_t *http,		/* I - Server connection */
 
   if ((response = cupsDoRequest(http, request, "/admin/")) == NULL)
   {
-    fprintf(stderr, "lpadmin: add-printer failed: %s\n",
+    fprintf(stderr, "lpadmin: add-printer (enable) failed: %s\n",
             ippErrorString(cupsLastError()));
     return (1);
   }
   else if (response->request.status.status_code > IPP_OK_CONFLICT)
   {
-    fprintf(stderr, "lpadmin: add-printer failed: %s\n",
+    fprintf(stderr, "lpadmin: add-printer (enable) failed: %s\n",
             ippErrorString(response->request.status.status_code));
 
     ippDelete(response);
@@ -1389,13 +1389,13 @@ set_printer_device(http_t *http,	/* I - Server connection */
 
   if ((response = cupsDoRequest(http, request, "/admin/")) == NULL)
   {
-    fprintf(stderr, "lpadmin: add-printer failed: %s\n",
+    fprintf(stderr, "lpadmin: add-printer (set device) failed: %s\n",
             ippErrorString(cupsLastError()));
     return (1);
   }
   else if (response->request.status.status_code > IPP_OK_CONFLICT)
   {
-    fprintf(stderr, "lpadmin: add-printer failed: %s\n",
+    fprintf(stderr, "lpadmin: add-printer (set device) failed: %s\n",
             ippErrorString(response->request.status.status_code));
 
     ippDelete(response);
@@ -1521,7 +1521,7 @@ set_printer_file(http_t *http,		/* I - Server connection */
 
   if (status > IPP_OK_CONFLICT)
   {
-    fprintf(stderr, "lpadmin: add-printer failed: %s\n",
+    fprintf(stderr, "lpadmin: add-printer (set model) failed: %s\n",
             ippErrorString(status));
 
     return (1);
@@ -1589,13 +1589,13 @@ set_printer_info(http_t *http,		/* I - Server connection */
 
   if ((response = cupsDoRequest(http, request, "/admin/")) == NULL)
   {
-    fprintf(stderr, "lpadmin: add-printer failed: %s\n",
+    fprintf(stderr, "lpadmin: add-printer (set description) failed: %s\n",
             ippErrorString(cupsLastError()));
     return (1);
   }
   else if (response->request.status.status_code > IPP_OK_CONFLICT)
   {
-    fprintf(stderr, "lpadmin: add-printer failed: %s\n",
+    fprintf(stderr, "lpadmin: add-printer (set description) failed: %s\n",
             ippErrorString(response->request.status.status_code));
 
     ippDelete(response);
@@ -1669,14 +1669,14 @@ set_printer_location(http_t *http,	/* I - Server connection */
 
   if ((response = cupsDoRequest(http, request, "/admin/")) == NULL)
   {
-    fprintf(stderr, "lpadmin: add-printer failed: %s\n",
+    fprintf(stderr, "lpadmin: add-printer (set location) failed: %s\n",
             ippErrorString(cupsLastError()));
 
     return (1);
   }
   else if (response->request.status.status_code > IPP_OK_CONFLICT)
   {
-    fprintf(stderr, "lpadmin: add-printer failed: %s\n",
+    fprintf(stderr, "lpadmin: add-printer (set location) failed: %s\n",
             ippErrorString(response->request.status.status_code));
 
     ippDelete(response);
@@ -1744,14 +1744,14 @@ set_printer_model(http_t *http,		/* I - Server connection */
 
   if ((response = cupsDoRequest(http, request, "/admin/")) == NULL)
   {
-    fprintf(stderr, "lpadmin: add-printer failed: %s\n",
+    fprintf(stderr, "lpadmin: add-printer (set model) failed: %s\n",
             ippErrorString(cupsLastError()));
 
     return (1);
   }
   else if (response->request.status.status_code > IPP_OK_CONFLICT)
   {
-    fprintf(stderr, "lpadmin: add-printer failed: %s\n",
+    fprintf(stderr, "lpadmin: add-printer (set model) failed: %s\n",
             ippErrorString(response->request.status.status_code));
 
     ippDelete(response);
@@ -2018,5 +2018,5 @@ validate_name(const char *name)	/* I - Name to check */
 
 
 /*
- * End of "$Id: lpadmin.c,v 1.22.2.15 2002/10/02 19:15:08 mike Exp $".
+ * End of "$Id: lpadmin.c,v 1.22.2.16 2002/10/15 16:20:00 mike Exp $".
  */

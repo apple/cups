@@ -1,5 +1,5 @@
 /*
- * "$Id: lpstat.c,v 1.37.2.11 2002/10/02 16:39:43 mike Exp $"
+ * "$Id: lpstat.c,v 1.37.2.12 2002/10/15 16:20:02 mike Exp $"
  *
  *   "lpstat" command for the Common UNIX Printing System (CUPS).
  *
@@ -24,7 +24,7 @@
  * Contents:
  *
  *   main()           - Parse options and show status information.
- *   check_dest()     - Verify that the named destination exists.
+ *   check_dest()     - Verify that the named destination(s) exists.
  *   show_accepting() - Show acceptance status.
  *   show_classes()   - Show printer classes.
  *   show_default()   - Show default destination.
@@ -551,21 +551,68 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * 'check_dest()' - Verify that the named destination exists.
+ * 'check_dest()' - Verify that the named destination(s) exists.
  */
 
 static void
-check_dest(const char  *name,		/* I  - Name of printer/class */
+check_dest(const char  *name,		/* I  - Name of printer/class(es) */
            int         *num_dests,	/* IO - Number of destinations */
 	   cups_dest_t **dests)		/* IO - Destinations */
 {
+  const char	*dptr;
+  char		*pptr,
+		printer[128];
+
+
+ /*
+  * Load the destination list as necessary...
+  */
+
   if (*num_dests == 0)
     *num_dests = cupsGetDests(dests);
 
-  if (cupsGetDest(name, NULL, *num_dests, *dests) == NULL)
+ /*
+  * Scan the name string for printer/class name(s)...
+  */
+
+  for (dptr = name; *dptr != '\0';) 
   {
-    fprintf(stderr, "lpstat: Unknown destination \"%s\"!\n", name);
-    exit(1);
+   /*
+    * Skip leading whitespace and commas...
+    */
+
+    while (isspace(*dptr) || *dptr == ',')
+      dptr ++;
+
+    if (*dptr == '\0')
+      break;
+
+   /*
+    * Extract a single destination name from the name string...
+    */
+
+    for (pptr = printer; !isspace(*dptr) && *dptr != ',' && *dptr != '\0';)
+    {
+      if ((pptr - printer) < (sizeof(printer) - 1))
+        *pptr++ = *dptr++;
+      else
+      {
+        fprintf(stderr, "lpstat: Invalid destination name in list \"%s\"!\n", name);
+        exit(1);
+      }
+    }
+
+    *pptr = '\0';
+
+   /*
+    * Check the destination...
+    */
+
+    if (cupsGetDest(printer, NULL, *num_dests, *dests) == NULL)
+    {
+      fprintf(stderr, "lpstat: Unknown destination \"%s\"!\n", printer);
+      exit(1);
+    }
   }
 }
 
@@ -741,7 +788,7 @@ show_accepting(http_t      *http,	/* I - HTTP connection to server */
 	  * Skip trailing junk...
 	  */
 
-          while (!isspace(*dptr) && *dptr != '\0')
+          while (!isspace(*dptr) && *dptr != ',' && *dptr != '\0')
 	    dptr ++;
 	  while (isspace(*dptr) || *dptr == ',')
 	    dptr ++;
@@ -1020,7 +1067,7 @@ show_classes(http_t     *http,		/* I - HTTP connection to server */
 	  * Skip trailing junk...
 	  */
 
-          while (!isspace(*dptr) && *dptr != '\0')
+          while (!isspace(*dptr) && *dptr != ',' && *dptr != '\0')
 	    dptr ++;
 	  while (isspace(*dptr) || *dptr == ',')
 	    dptr ++;
@@ -1266,7 +1313,7 @@ show_devices(http_t      *http,		/* I - HTTP connection to server */
 	  * Skip trailing junk...
 	  */
 
-          while (!isspace(*dptr) && *dptr != '\0')
+          while (!isspace(*dptr) && *dptr != ',' && *dptr != '\0')
 	    dptr ++;
 	  while (isspace(*dptr) || *dptr == ',')
 	    dptr ++;
@@ -1556,7 +1603,7 @@ show_jobs(http_t     *http,		/* I - HTTP connection to server */
 	  * Skip trailing junk...
 	  */
 
-          while (!isspace(*dptr) && *dptr != '\0')
+          while (!isspace(*dptr) && *dptr != ',' && *dptr != '\0')
 	    dptr ++;
 	  while (isspace(*dptr) || *dptr == ',')
 	    dptr ++;
@@ -1598,7 +1645,7 @@ show_jobs(http_t     *http,		/* I - HTTP connection to server */
 	  * Skip trailing junk...
 	  */
 
-          while (!isspace(*dptr) && *dptr != '\0')
+          while (!isspace(*dptr) && *dptr != ',' && *dptr != '\0')
 	    dptr ++;
 	  while (isspace(*dptr) || *dptr == ',')
 	    dptr ++;
@@ -1867,7 +1914,7 @@ show_printers(http_t      *http,	/* I - HTTP connection to server */
 	  * Skip trailing junk...
 	  */
 
-          while (!isspace(*dptr) && *dptr != '\0')
+          while (!isspace(*dptr) && *dptr != ',' && *dptr != '\0')
 	    dptr ++;
 	  while (isspace(*dptr) || *dptr == ',')
 	    dptr ++;
@@ -2063,5 +2110,5 @@ show_scheduler(http_t *http)	/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpstat.c,v 1.37.2.11 2002/10/02 16:39:43 mike Exp $".
+ * End of "$Id: lpstat.c,v 1.37.2.12 2002/10/15 16:20:02 mike Exp $".
  */
