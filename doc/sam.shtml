@@ -670,7 +670,7 @@ be able to print to the named printer.</P>
 <TR>
 	<TD><B>NOTE:</B>
 
-	<P>The<I> allow</I> and<I> deny</I> options are not cummulative. That
+	<P>The <I>allow</I> and <I>deny</I> options are not cummulative. That
 	is, you must provide the complete list of users to allow or deny each
 	time.</P>
 
@@ -894,19 +894,56 @@ polling method is inefficient. CUPS provides a
 <A HREF="#BrowseRelay"><CODE>BrowseRelay</CODE></A> directive that enables a 
 single client to relay (broadcast) the polled printer information to the local subnet.</P>
 
+<P>For example, Server A and Server B are on subnet 1 and subnet 2,
+while theclients are on subnet 3.
+To provide printers to all of the clients in subnet 3,
+client C will be configured with the following directives in <VAR>/etc/cups/cupsd.conf</VAR>:</P>
+
+<UL><PRE>
+# Poll the two servers
+<B>
+BrowsePoll ServerA ENTER
+BrowsePoll ServerB ENTER
+</B>
+
+# Relay the printers to the local subnet
+<B>
+BrowseRelay 127.0.0.1 192.168.3.255 ENTER
+</B></PRE></UL>
+
+<P>The <A HREF="#BrowseRelay"><CODE>BrowseRelay</CODE></A> line specifies a source address and mask.
+Any browse packets coming from a matching address wil be sent to the given broadcast address.
+In this case, we want the packets from the local machine (127.0.0.1) relayed to the other clients.</P>
+
+<P>As printers are found using polling, 
+they are relayed from client C to the rest of the clients through a broadcast on subnet 3.
+The rest of the clients can use the standard <VAR>cupsd.conf</VAR> configuration.</P>
+
+<P>The <A HREF="#BrowseRelay"><CODE>BrowseRelay</CODE></A> directive can also be used to relay
+browsing packets from one network interface to another.
+For example, if client C in the previous example had network interfaces attaches to both
+subnet 1 and subnet 2, it could use the <A HREF="#BrowseRelay"><CODE>BrowseRelay</CODE></A> directive exclusively:
+
+<UL><PRE>
+# Relay the printers from subnet 1 and 2 to subnet 3
+<B>
+BrowseRelay 192.168.1 192.168.3.255 ENTER
+BrowseRelay 192.168.2 192.168.3.255 ENTER
+</B></PRE></UL>
+
 <H2>Load Balancing and Failsafe Operation</H2>
 
 <P>When using server polling or broadcasting, CUPS clients can
 automatically merge identical printers on multiple servers into a
-single<I> implicit class</I> queue. Clients assume that printers with
+single <I>implicit class</I> queue. Clients assume that printers with
 the same name on multiple servers are in fact the same printer or type
 of printer being served by multiple machines.</P>
 
 <P>If you have two printers, LaserJet@ServerA and LaserJet@ServerB, a
-third implicit class called<I> LaserJet</I> will be created
+third implicit class called <I>LaserJet</I> will be created
 automatically on the client that refers to both printers. If the client
 also has a local printer with the name LaserJet then an implicit class
-named<I> AnyLaserJet</I> will be created instead.</P>
+named <I>AnyLaserJet</I> will be created instead.</P>
 
 <P>The client will alternate between servers and automatically stop
 sending jobs to a server if it goes down, providing a load-balancing
@@ -2182,7 +2219,19 @@ access to specific interfaces or networks.
 ...
 &lt;/Location&gt;
 
+&lt;Location /printers&gt;
+...
+&lt;/Location&gt;
+
 &lt;Location /printers/name&gt;
+...
+&lt;/Location&gt;
+
+&lt;Location /classes&gt;
+...
+&lt;/Location&gt;
+
+&lt;Location /classes/name&gt;
 ...
 &lt;/Location&gt;
 </PRE></UL>
@@ -2190,8 +2239,21 @@ access to specific interfaces or networks.
 <H4>Description</H4>
 
 <P>The <CODE>Location</CODE> directive specifies access control and
-authentication options for the specified HTTP resource or path. More
-information can be found later in this chapter in
+authentication options for the specified HTTP resource or path. 
+The 
+<A HREF="#Allow"><CODE>Allow</CODE></A>,
+<A HREF="#AuthClass"><CODE>AuthClass</CODE></A>,
+<A HREF="#AuthGroupName"><CODE>AuthGroupName</CODE></A>,
+<A HREF="#AuthType"><CODE>AuthType</CODE></A>,
+<A HREF="#Deny"><CODE>Deny</CODE></A>,
+<A HREF="#Encryption"><CODE>Encryption</CODE></A>,
+<A HREF="#Limit"><CODE>Limit</CODE></A>,
+<A HREF="#LimitExcept"><CODE>LimitExcept</CODE></A>,
+<A HREF="#Order"><CODE>Order</CODE></A>,
+<A HREF="#Require"><CODE>Require</CODE></A>, and
+<A HREF="#Satisfy"><CODE>Satisfy</CODE></A>
+directives may all appear inside a location.
+More information can be found later in this chapter in
 <A HREF="#PRINTING_SECURITY">"Printing System Security"</A>.
 
 <!-- NEED 3in -->
