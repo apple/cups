@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.132 2001/06/05 21:32:01 mike Exp $"
+ * "$Id: job.c,v 1.133 2001/06/28 19:29:44 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -1495,10 +1495,10 @@ StartJob(int       id,		/* I - Job ID */
       filterfds[slot][0] = -1;
       if (strncmp(printer->device_uri, "file:/dev/", 10) == 0)
 	filterfds[slot][1] = open(printer->device_uri + 5,
-	                           O_WRONLY | O_EXCL);
+	                          O_WRONLY | O_EXCL);
       else
 	filterfds[slot][1] = open(printer->device_uri + 5,
-	                           O_WRONLY | O_CREAT, 0600);
+	                          O_WRONLY | O_CREAT | O_TRUNC, 0600);
     }
 
     LogMessage(L_DEBUG, "StartJob: filter = \"%s\"", command);
@@ -2910,5 +2910,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.132 2001/06/05 21:32:01 mike Exp $".
+ * End of "$Id: job.c,v 1.133 2001/06/28 19:29:44 mike Exp $".
  */

@@ -163,6 +163,7 @@ CHANGES IN CUPS V1.1.9
 	  size options.
 	- The mime.types file now checks for the PJL "LANGUAGE =
 	  Postscript" command for PostScript files.
+	- The scheduler did not truncate file: output files.
 
 
 CHANGES IN CUPS V1.1.8
