@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.66 2000/08/18 16:41:55 mike Exp $"
+ * "$Id: printers.c,v 1.67 2000/08/18 16:43:00 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -1363,6 +1363,7 @@ StopPrinter(printer_t *p)	/* I - Printer to stop */
   {
     StopJob(((job_t *)p->job)->id);
     ((job_t *)p->job)->state->values[0].integer = IPP_JOB_PENDING;
+    SaveJob(((job_t *)p->job)->id);
   }
 
   p->state = IPP_PRINTER_STOPPED;
@@ -1414,5 +1415,5 @@ write_printcap(void)
 
 
 /*
- * End of "$Id: printers.c,v 1.66 2000/08/18 16:41:55 mike Exp $".
+ * End of "$Id: printers.c,v 1.67 2000/08/18 16:43:00 mike Exp $".
  */
