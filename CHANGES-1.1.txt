@@ -5,6 +5,8 @@ CHANGES IN CUPS V1.1.15
 
 	- Updated the CUPS license agreement for the new MacOS
 	  license exception.
+	- The cupsGetDests() function no longer lists options
+	  and instances for printers that no longer exist.
 	- The scheduler now converts the document language to
 	  the correct LANG string.
 	- The cupsaddsmb program now supports alternative CUPS
