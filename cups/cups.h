@@ -1,5 +1,5 @@
 /*
- * "$Id: cups.h,v 1.20 2000/01/04 13:45:34 mike Exp $"
+ * "$Id: cups.h,v 1.21 2000/01/26 00:03:25 mike Exp $"
  *
  *   API definitions for the Common UNIX Printing System (CUPS).
  *
@@ -79,29 +79,22 @@ enum					/* Not a typedef'd enum so we can OR */
   CUPS_PRINTER_OPTIONS = 0xfffc		/* ~(CLASS | REMOTE | IMPLICIT) */
 };
 
-
-/*
- * Types & structures...
- */
-
-typedef struct				/**** Printer Information ****/
-{
-  char		name[IPP_MAX_NAME],	/* Printer or class name */
-		uri[HTTP_MAX_URI];	/* Universal resource identifier */
-  unsigned char	info[IPP_MAX_NAME],	/* Printer or class info/description */
-		location[IPP_MAX_NAME];	/* Location text */
-  ipp_pstate_t	state;			/* Printer state */
-  unsigned char	message[IPP_MAX_NAME];	/* State text */
-  cups_ptype_t	type;			/* Printer type/capability codes */
-} cups_browse_t;
-
 typedef struct				/**** Printer Options ****/
 {
   char		*name;			/* Name of option */
   char		*value;			/* Value of option */
 } cups_option_t;
 
+typedef struct				/**** Destination ****/
+{
+  char		*name;			/* Printer or class name */
+		*instance;		/* Local instance name */
+  int		is_default;		/* Is this printer the default? */
+  int		num_options;		/* Number of options */
+  cups_option_t	*options;		/* Options */
+} cups_dest_t;
 
+  
 /*
  * Functions...
  */
@@ -119,6 +112,15 @@ extern int		cupsPrintFile(const char *printer, const char *filename,
 			              const char *title, int num_options,
 				      cups_option_t *options);
 extern char		*cupsTempFile(char *filename, int len);
+
+extern int		cupsAddDest(const char *name, int num_dests,
+			            cups_dest_t **dests);
+extern void		cupsFreeDests(int num_dests, cups_dest_t **dests);
+extern cups_dest_t	*cupsGetDest(const char *name, int num_dests,
+			             cups_dest_t **dests);
+extern int		cupsGetDests(cups_dest_t **dests);
+extern void		cupsSetDests(int num_dests, cups_dest_t **dests);
+
 extern int		cupsAddOption(const char *name, const char *value,
 			              int num_options, cups_option_t **options);
 extern void		cupsFreeOptions(int num_options, cups_option_t *options);
@@ -140,5 +142,5 @@ extern const char	*cupsUser(void);
 #endif /* !_CUPS_CUPS_H_ */
 
 /*
- * End of "$Id: cups.h,v 1.20 2000/01/04 13:45:34 mike Exp $".
+ * End of "$Id: cups.h,v 1.21 2000/01/26 00:03:25 mike Exp $".
  */
