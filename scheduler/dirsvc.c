@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.78 2001/07/12 18:10:13 mike Exp $"
+ * "$Id: dirsvc.c,v 1.79 2001/07/23 15:05:00 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -40,148 +40,23 @@
 
 
 /*
- * 'StartBrowsing()' - Start sending and receiving broadcast information.
+ * 'ProcessBrowseData()' - Process new browse data.
  */
 
 void
-StartBrowsing(void)
-{
-  int			val;	/* Socket option value */
-  struct sockaddr_in	addr;	/* Broadcast address */
-
-
-  if (!Browsing)
-    return;
-
- /*
-  * Create the broadcast socket...
-  */
-
-  if ((BrowseSocket = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
-  {
-    LogMessage(L_ERROR, "StartBrowsing: Unable to create broadcast socket - %s.",
-               strerror(errno));
-    Browsing = 0;
-    return;
-  }
-
- /*
-  * Set the "broadcast" flag...
-  */
-
-  val = 1;
-  if (setsockopt(BrowseSocket, SOL_SOCKET, SO_BROADCAST, &val, sizeof(val)))
-  {
-    LogMessage(L_ERROR, "StartBrowsing: Unable to set broadcast mode - %s.",
-               strerror(errno));
-
-#if defined(WIN32) || defined(__EMX__)
-    closesocket(BrowseSocket);
-#else
-    close(BrowseSocket);
-#endif /* WIN32 || __EMX__ */
-
-    BrowseSocket = -1;
-    Browsing     = 0;
-    return;
-  }
-
- /*
-  * Bind the socket to browse port...
-  */
-
-  memset(&addr, 0, sizeof(addr));
-  addr.sin_addr.s_addr = htonl(INADDR_ANY);
-  addr.sin_family      = AF_INET;
-  addr.sin_port        = htons(BrowsePort);
-
-  if (bind(BrowseSocket, (struct sockaddr *)&addr, sizeof(addr)))
-  {
-    LogMessage(L_ERROR, "StartBrowsing: Unable to bind broadcast socket - %s.",
-               strerror(errno));
-
-#if defined(WIN32) || defined(__EMX__)
-    closesocket(BrowseSocket);
-#else
-    close(BrowseSocket);
-#endif /* WIN32 || __EMX__ */
-
-    BrowseSocket = -1;
-    Browsing     = 0;
-    return;
-  }
-
- /*
-  * Finally, add the socket to the input selection set...
-  */
-
-  LogMessage(L_DEBUG2, "StartBrowsing: Adding fd %d to InputSet...",
-             BrowseSocket);
-
-  FD_SET(BrowseSocket, &InputSet);
-}
-
-
-/*
- * 'StopBrowsing()' - Stop sending and receiving broadcast information.
- */
-
-void
-StopBrowsing(void)
-{
-  if (!Browsing)
-    return;
-
- /*
-  * Close the socket and remove it from the input selection set.
-  */
-
-  if (BrowseSocket >= 0)
-  {
-#if defined(WIN32) || defined(__EMX__)
-    closesocket(BrowseSocket);
-#else
-    close(BrowseSocket);
-#endif /* WIN32 || __EMX__ */
-
-    LogMessage(L_DEBUG2, "StopBrowsing: Removing fd %d from InputSet...",
-               BrowseSocket);
-
-    FD_CLR(BrowseSocket, &InputSet);
-    BrowseSocket = 0;
-  }
-}
-
-
-/*
- * 'UpdateBrowseList()' - Update the browse lists for any new browse data.
- */
-
-void
-UpdateBrowseList(void)
+ProcessBrowseData(const char   *uri,
+                  cups_ptype_t type,
+		  ipp_pstate_t state,
+                  const char   *location,
+		  const char   *info,
+                  const char   *make_model)
 {
   int		i;			/* Looping var */
   int		update;			/* Update printer attributes? */
-  int		auth;			/* Authorization status */
-  int		len,			/* Length of name string */
-		offset;			/* Offset in name string */
-  int		bytes;			/* Number of bytes left */
-  char		packet[1540],		/* Broadcast packet */
-		*pptr;			/* Pointer into packet */
-  struct sockaddr_in srcaddr;		/* Source address */
-  char		srcname[1024];		/* Source hostname */
-  unsigned	address;		/* Source address (host order) */
-  struct hostent *srchost;		/* Host entry for source address */
-  cups_ptype_t	type;			/* Printer type */
-  ipp_pstate_t	state;			/* Printer state */
-  char		uri[HTTP_MAX_URI],	/* Printer URI */
-		method[HTTP_MAX_URI],	/* Method portion of URI */
+  char		method[HTTP_MAX_URI],	/* Method portion of URI */
 		username[HTTP_MAX_URI],	/* Username portion of URI */
 		host[HTTP_MAX_URI],	/* Host portion of URI */
-		resource[HTTP_MAX_URI],	/* Resource portion of URI */
-		info[IPP_MAX_NAME],	/* Information string */
-		location[IPP_MAX_NAME],	/* Location string */
-		make_model[IPP_MAX_NAME];/* Make and model string */
+		resource[HTTP_MAX_URI];	/* Resource portion of URI */
   int		port;			/* Port portion of URI */
   char		name[IPP_MAX_NAME],	/* Name of printer */
 		*hptr,			/* Pointer into hostname */
@@ -193,224 +68,10 @@ UpdateBrowseList(void)
 
 
  /*
-  * Read a packet from the browse socket...
-  */
-
-  len = sizeof(srcaddr);
-  if ((bytes = recvfrom(BrowseSocket, packet, sizeof(packet), 0, 
-                        (struct sockaddr *)&srcaddr, &len)) <= 0)
-  {
-   /*
-    * "Connection refused" is returned under Linux if the destination port
-    * or address is unreachable from a previous sendto(); check for the
-    * error here and ignore it for now...
-    */
-
-    if (errno != ECONNREFUSED)
-    {
-      LogMessage(L_ERROR, "Browse recv failed - %s.", strerror(errno));
-      LogMessage(L_ERROR, "Browsing turned off.");
-
-      StopBrowsing();
-      Browsing = 0;
-    }
-
-    return;
-  }
-
-  packet[bytes] = '\0';
-
- /*
-  * Figure out where it came from...
-  */
-
-  address = ntohl(srcaddr.sin_addr.s_addr);
-
-  if (HostNameLookups)
-#ifndef __sgi
-    srchost = gethostbyaddr((char *)&(srcaddr.sin_addr), sizeof(struct in_addr),
-                            AF_INET);
-#else
-    srchost = gethostbyaddr(&(srcaddr.sin_addr), sizeof(struct in_addr),
-                            AF_INET);
-#endif /* !__sgi */
-  else
-    srchost = NULL;
-
-  if (srchost == NULL)
-    sprintf(srcname, "%d.%d.%d.%d", address >> 24, (address >> 16) & 255,
-            (address >> 8) & 255, address & 255);
-  else
-  {
-    strncpy(srcname, srchost->h_name, sizeof(srcname) - 1);
-    srcname[sizeof(srcname) - 1] = '\0';
-  }
-
-  len = strlen(srcname);
-
- /*
-  * Do ACL stuff...
-  */
-
-  if (BrowseACL && (BrowseACL->num_allow || BrowseACL->num_deny))
-  {
-    if (address == 0x7f000001 || strcasecmp(srcname, "localhost") == 0)
-    {
-     /*
-      * Access from localhost (127.0.0.1) is always allowed...
-      */
-
-      auth = AUTH_ALLOW;
-    }
-    else
-    {
-     /*
-      * Do authorization checks on the domain/address...
-      */
-
-      switch (BrowseACL->order_type)
-      {
-        default :
-	    auth = AUTH_DENY;	/* anti-compiler-warning-code */
-	    break;
-
-	case AUTH_ALLOW : /* Order Deny,Allow */
-            auth = AUTH_ALLOW;
-
-            if (CheckAuth(address, srcname, len,
-	        	  BrowseACL->num_deny, BrowseACL->deny))
-	      auth = AUTH_DENY;
-
-            if (CheckAuth(address, srcname, len,
-	        	  BrowseACL->num_allow, BrowseACL->allow))
-	      auth = AUTH_ALLOW;
-	    break;
-
-	case AUTH_DENY : /* Order Allow,Deny */
-            auth = AUTH_DENY;
-
-            if (CheckAuth(address, srcname, len,
-	        	  BrowseACL->num_allow, BrowseACL->allow))
-	      auth = AUTH_ALLOW;
-
-            if (CheckAuth(address, srcname, len,
-	        	  BrowseACL->num_deny, BrowseACL->deny))
-	      auth = AUTH_DENY;
-	    break;
-      }
-    }
-  }
-  else
-    auth = AUTH_ALLOW;
-
-  if (auth == AUTH_DENY)
-  {
-    LogMessage(L_DEBUG, "UpdateBrowseList: Refused %d bytes from %s", bytes,
-               srcname);
-    return;
-  }
-
-  LogMessage(L_DEBUG2, "UpdateBrowseList: (%d bytes from %s) %s", bytes, srcname,
-             packet);
-
- /*
-  * Parse packet...
-  */
-
-  update = 0;
-
-  if (sscanf(packet, "%x%x%1023s", (unsigned *)&type, (unsigned *)&state,
-             uri) < 3)
-  {
-    LogMessage(L_WARN, "UpdateBrowseList: Garbled browse packet - %s",
-               packet);
-    return;
-  }
-
-  strcpy(location, "Location Unknown");
-  strcpy(info, "No Information Available");
-  make_model[0] = '\0';
-
-  if ((pptr = strchr(packet, '\"')) != NULL)
-  {
-   /*
-    * Have extended information; can't use sscanf for it because not all
-    * sscanf's allow empty strings with %[^\"]...
-    */
-
-    for (i = 0, pptr ++;
-         i < (sizeof(location) - 1) && *pptr && *pptr != '\"';
-         i ++, pptr ++)
-      location[i] = *pptr;
-
-    if (i)
-      location[i] = '\0';
-
-    if (*pptr == '\"')
-      pptr ++;
-
-    while (*pptr && isspace(*pptr))
-      pptr ++;
-
-    if (*pptr == '\"')
-    {
-      for (i = 0, pptr ++;
-           i < (sizeof(info) - 1) && *pptr && *pptr != '\"';
-           i ++, pptr ++)
-	info[i] = *pptr;
-
-      if (i)
-	info[i] = '\0';
-
-      if (*pptr == '\"')
-	pptr ++;
-
-      while (*pptr && isspace(*pptr))
-	pptr ++;
-
-      if (*pptr == '\"')
-      {
-	for (i = 0, pptr ++;
-             i < (sizeof(make_model) - 1) && *pptr && *pptr != '\"';
-             i ++, pptr ++)
-	  make_model[i] = *pptr;
-
-	if (i)
-	  make_model[i] = '\0';
-      }
-    }
-  }
-
-  DEBUG_puts(packet);
-  DEBUG_printf(("type=%x, state=%x, uri=\"%s\"\n"
-                "location=\"%s\", info=\"%s\", make_model=\"%s\"\n",
-	        type, state, uri, location, info, make_model));
-
- /*
   * Pull the URI apart to see if this is a local or remote printer...
   */
 
   httpSeparate(uri, method, username, host, &port, resource);
-
-  DEBUG_printf(("host=\"%s\", ServerName=\"%s\"\n", host, ServerName));
-
-  if (strcasecmp(host, ServerName) == 0)
-    return;
-
- /*
-  * Do relaying...
-  */
-
-  for (i = 0; i < NumRelays; i ++)
-    if (CheckAuth(address, srcname, len, 1, &(Relays[i].from)))
-      if (sendto(BrowseSocket, packet, bytes, 0,
-                 (struct sockaddr *)&(Relays[i].to),
-		 sizeof(struct sockaddr_in)) <= 0)
-      {
-	LogMessage(L_ERROR, "UpdateBrowseList: sendto failed for relay %d - %s.",
-	           i + 1, strerror(errno));
-	return;
-      }
 
  /*
   * OK, this isn't a local printer; see if we already have it listed in
@@ -804,27 +465,23 @@ UpdateBrowseList(void)
 
 
 /*
- * 'SendBrowseList()' - Send new browsing information.
+ * 'SendBrowseList()' - Send new browsing information as necessary.
  */
 
 void
 SendBrowseList(void)
 {
-  int			i;	/* Looping var */
   printer_t		*p,	/* Current printer */
 			*np;	/* Next printer */
   time_t		ut,	/* Minimum update time */
 			to;	/* Timeout time */
-  int			bytes;	/* Length of packet */
-  char			packet[1453];
-				/* Browse data packet */
 
 
-  if (!Browsing)
+  if (!Browsing || !(BrowseProtocols & BROWSE_CUPS))
     return;
 
  /*
-  * Compute the update time...
+  * Compute the update and timeout times...
   */
 
   ut = time(NULL) - BrowseInterval;
@@ -851,8 +508,8 @@ SendBrowseList(void)
         DeletePrinter(p);
       }
     }
-    else if (p->browse_time < ut && !(p->type & CUPS_PRINTER_IMPLICIT) &&
-             BrowseInterval > 0)
+    else if (p->browse_time < ut &&  BrowseInterval > 0 &&
+            !(p->type & CUPS_PRINTER_IMPLICIT))
     {
      /*
       * Need to send an update...
@@ -860,31 +517,137 @@ SendBrowseList(void)
 
       p->browse_time = time(NULL);
 
-      snprintf(packet, sizeof(packet), "%x %x %s \"%s\" \"%s\" \"%s\"\n",
-               p->type | CUPS_PRINTER_REMOTE, p->state, p->uri,
-	       p->location, p->info, p->make_model);
+      if (BrowseProtocols & BROWSE_CUPS)
+        SendCUPSBrowse(p);
 
-      bytes = strlen(packet);
-      LogMessage(L_DEBUG2, "SendBrowseList: (%d bytes) %s", bytes, packet);
-
-     /*
-      * Send a packet to each browse address...
-      */
-
-      for (i = 0; i < NumBrowsers; i ++)
-	if (sendto(BrowseSocket, packet, bytes, 0,
-	           (struct sockaddr *)Browsers + i, sizeof(Browsers[0])) <= 0)
-	{
-	  LogMessage(L_ERROR, "SendBrowseList: sendto failed for browser %d - %s.",
-	             i + 1, strerror(errno));
-	  LogMessage(L_ERROR, "Browsing turned off.");
-
-	  StopBrowsing();
-	  Browsing = 0;
-	  return;
-	}
+#ifdef HAVE_LIBSLP
+      if (BrowseProtocols & BROWSE_SLP)
+        SendSLPBrowse(p);
+#endif /* HAVE_LIBSLP */
     }
   }
+}
+
+
+/*
+ * 'SendCUPSBrowse()' - Send new browsing information using the CUPS protocol.
+ */
+
+void
+SendCUPSBrowse(printer_t *p)	/* I - Printer to send */
+{
+  int			i;	/* Looping var */
+  int			bytes;	/* Length of packet */
+  char			packet[1453];
+				/* Browse data packet */
+
+
+  snprintf(packet, sizeof(packet), "%x %x %s \"%s\" \"%s\" \"%s\"\n",
+           p->type | CUPS_PRINTER_REMOTE, p->state, p->uri,
+	   p->location, p->info, p->make_model);
+
+  bytes = strlen(packet);
+  LogMessage(L_DEBUG2, "SendBrowseList: (%d bytes) %s", bytes, packet);
+
+ /*
+  * Send a packet to each browse address...
+  */
+
+  for (i = 0; i < NumBrowsers; i ++)
+    if (sendto(BrowseSocket, packet, bytes, 0,
+	       (struct sockaddr *)Browsers + i, sizeof(Browsers[0])) <= 0)
+    {
+      LogMessage(L_ERROR, "SendBrowseList: sendto failed for browser %d - %s.",
+	         i + 1, strerror(errno));
+      LogMessage(L_ERROR, "Browsing turned off.");
+
+      StopBrowsing();
+      Browsing = 0;
+      return;
+    }
+}
+
+
+/*
+ * 'StartBrowsing()' - Start sending and receiving broadcast information.
+ */
+
+void
+StartBrowsing(void)
+{
+  int			val;	/* Socket option value */
+  struct sockaddr_in	addr;	/* Broadcast address */
+
+
+  if (!Browsing)
+    return;
+
+ /*
+  * Create the broadcast socket...
+  */
+
+  if ((BrowseSocket = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
+  {
+    LogMessage(L_ERROR, "StartBrowsing: Unable to create broadcast socket - %s.",
+               strerror(errno));
+    Browsing = 0;
+    return;
+  }
+
+ /*
+  * Set the "broadcast" flag...
+  */
+
+  val = 1;
+  if (setsockopt(BrowseSocket, SOL_SOCKET, SO_BROADCAST, &val, sizeof(val)))
+  {
+    LogMessage(L_ERROR, "StartBrowsing: Unable to set broadcast mode - %s.",
+               strerror(errno));
+
+#if defined(WIN32) || defined(__EMX__)
+    closesocket(BrowseSocket);
+#else
+    close(BrowseSocket);
+#endif /* WIN32 || __EMX__ */
+
+    BrowseSocket = -1;
+    Browsing     = 0;
+    return;
+  }
+
+ /*
+  * Bind the socket to browse port...
+  */
+
+  memset(&addr, 0, sizeof(addr));
+  addr.sin_addr.s_addr = htonl(INADDR_ANY);
+  addr.sin_family      = AF_INET;
+  addr.sin_port        = htons(BrowsePort);
+
+  if (bind(BrowseSocket, (struct sockaddr *)&addr, sizeof(addr)))
+  {
+    LogMessage(L_ERROR, "StartBrowsing: Unable to bind broadcast socket - %s.",
+               strerror(errno));
+
+#if defined(WIN32) || defined(__EMX__)
+    closesocket(BrowseSocket);
+#else
+    close(BrowseSocket);
+#endif /* WIN32 || __EMX__ */
+
+    BrowseSocket = -1;
+    Browsing     = 0;
+    return;
+  }
+
+ /*
+  * Finally, add the socket to the input selection set...
+  */
+
+  LogMessage(L_DEBUG2, "StartBrowsing: Adding fd %d to InputSet...",
+             BrowseSocket);
+
+  FD_SET(BrowseSocket, &InputSet);
 }
 
 
@@ -965,6 +728,37 @@ StartPolling(void)
 
 
 /*
+ * 'StopBrowsing()' - Stop sending and receiving broadcast information.
+ */
+
+void
+StopBrowsing(void)
+{
+  if (!Browsing)
+    return;
+
+ /*
+  * Close the socket and remove it from the input selection set.
+  */
+
+  if (BrowseSocket >= 0)
+  {
+#if defined(WIN32) || defined(__EMX__)
+    closesocket(BrowseSocket);
+#else
+    close(BrowseSocket);
+#endif /* WIN32 || __EMX__ */
+
+    LogMessage(L_DEBUG2, "StopBrowsing: Removing fd %d from InputSet...",
+               BrowseSocket);
+
+    FD_CLR(BrowseSocket, &InputSet);
+    BrowseSocket = 0;
+  }
+}
+
+
+/*
  * 'StopPolling()' - Stop polling servers as needed.
  */
 
@@ -982,5 +776,755 @@ StopPolling(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.78 2001/07/12 18:10:13 mike Exp $".
+ * 'UpdateCUPSBrowse()' - Update the browse lists using the CUPS protocol.
+ */
+
+void
+UpdateCUPSBrowse(void)
+{
+  int		i;			/* Looping var */
+  int		auth;			/* Authorization status */
+  int		len,			/* Length of name string */
+		offset;			/* Offset in name string */
+  int		bytes;			/* Number of bytes left */
+  char		packet[1540],		/* Broadcast packet */
+		*pptr;			/* Pointer into packet */
+  struct sockaddr_in srcaddr;		/* Source address */
+  char		srcname[1024];		/* Source hostname */
+  unsigned	address;		/* Source address (host order) */
+  struct hostent *srchost;		/* Host entry for source address */
+  cups_ptype_t	type;			/* Printer type */
+  ipp_pstate_t	state;			/* Printer state */
+  char		uri[HTTP_MAX_URI],	/* Printer URI */
+		method[HTTP_MAX_URI],	/* Method portion of URI */
+		username[HTTP_MAX_URI],	/* Username portion of URI */
+		host[HTTP_MAX_URI],	/* Host portion of URI */
+		resource[HTTP_MAX_URI],	/* Resource portion of URI */
+		info[IPP_MAX_NAME],	/* Information string */
+		location[IPP_MAX_NAME],	/* Location string */
+		make_model[IPP_MAX_NAME];/* Make and model string */
+  int		port;			/* Port portion of URI */
+
+
+ /*
+  * Read a packet from the browse socket...
+  */
+
+  len = sizeof(srcaddr);
+  if ((bytes = recvfrom(BrowseSocket, packet, sizeof(packet), 0, 
+                        (struct sockaddr *)&srcaddr, &len)) <= 0)
+  {
+   /*
+    * "Connection refused" is returned under Linux if the destination port
+    * or address is unreachable from a previous sendto(); check for the
+    * error here and ignore it for now...
+    */
+
+    if (errno != ECONNREFUSED)
+    {
+      LogMessage(L_ERROR, "Browse recv failed - %s.", strerror(errno));
+      LogMessage(L_ERROR, "Browsing turned off.");
+
+      StopBrowsing();
+      Browsing = 0;
+    }
+
+    return;
+  }
+
+  packet[bytes] = '\0';
+
+ /*
+  * Figure out where it came from...
+  */
+
+  address = ntohl(srcaddr.sin_addr.s_addr);
+
+  if (HostNameLookups)
+#ifndef __sgi
+    srchost = gethostbyaddr((char *)&(srcaddr.sin_addr), sizeof(struct in_addr),
+                            AF_INET);
+#else
+    srchost = gethostbyaddr(&(srcaddr.sin_addr), sizeof(struct in_addr),
+                            AF_INET);
+#endif /* !__sgi */
+  else
+    srchost = NULL;
+
+  if (srchost == NULL)
+    sprintf(srcname, "%d.%d.%d.%d", address >> 24, (address >> 16) & 255,
+            (address >> 8) & 255, address & 255);
+  else
+  {
+    strncpy(srcname, srchost->h_name, sizeof(srcname) - 1);
+    srcname[sizeof(srcname) - 1] = '\0';
+  }
+
+  len = strlen(srcname);
+
+ /*
+  * Do ACL stuff...
+  */
+
+  if (BrowseACL && (BrowseACL->num_allow || BrowseACL->num_deny))
+  {
+    if (address == 0x7f000001 || strcasecmp(srcname, "localhost") == 0)
+    {
+     /*
+      * Access from localhost (127.0.0.1) is always allowed...
+      */
+
+      auth = AUTH_ALLOW;
+    }
+    else
+    {
+     /*
+      * Do authorization checks on the domain/address...
+      */
+
+      switch (BrowseACL->order_type)
+      {
+        default :
+	    auth = AUTH_DENY;	/* anti-compiler-warning-code */
+	    break;
+
+	case AUTH_ALLOW : /* Order Deny,Allow */
+            auth = AUTH_ALLOW;
+
+            if (CheckAuth(address, srcname, len,
+	        	  BrowseACL->num_deny, BrowseACL->deny))
+	      auth = AUTH_DENY;
+
+            if (CheckAuth(address, srcname, len,
+	        	  BrowseACL->num_allow, BrowseACL->allow))
+	      auth = AUTH_ALLOW;
+	    break;
+
+	case AUTH_DENY : /* Order Allow,Deny */
+            auth = AUTH_DENY;
+
+            if (CheckAuth(address, srcname, len,
+	        	  BrowseACL->num_allow, BrowseACL->allow))
+	      auth = AUTH_ALLOW;
+
+            if (CheckAuth(address, srcname, len,
+	        	  BrowseACL->num_deny, BrowseACL->deny))
+	      auth = AUTH_DENY;
+	    break;
+      }
+    }
+  }
+  else
+    auth = AUTH_ALLOW;
+
+  if (auth == AUTH_DENY)
+  {
+    LogMessage(L_DEBUG, "UpdateBrowseList: Refused %d bytes from %s", bytes,
+               srcname);
+    return;
+  }
+
+  LogMessage(L_DEBUG2, "UpdateBrowseList: (%d bytes from %s) %s", bytes, srcname,
+             packet);
+
+ /*
+  * Parse packet...
+  */
+
+  if (sscanf(packet, "%x%x%1023s", (unsigned *)&type, (unsigned *)&state,
+             uri) < 3)
+  {
+    LogMessage(L_WARN, "UpdateBrowseList: Garbled browse packet - %s",
+               packet);
+    return;
+  }
+
+  strcpy(location, "Location Unknown");
+  strcpy(info, "No Information Available");
+  make_model[0] = '\0';
+
+  if ((pptr = strchr(packet, '\"')) != NULL)
+  {
+   /*
+    * Have extended information; can't use sscanf for it because not all
+    * sscanf's allow empty strings with %[^\"]...
+    */
+
+    for (i = 0, pptr ++;
+         i < (sizeof(location) - 1) && *pptr && *pptr != '\"';
+         i ++, pptr ++)
+      location[i] = *pptr;
+
+    if (i)
+      location[i] = '\0';
+
+    if (*pptr == '\"')
+      pptr ++;
+
+    while (*pptr && isspace(*pptr))
+      pptr ++;
+
+    if (*pptr == '\"')
+    {
+      for (i = 0, pptr ++;
+           i < (sizeof(info) - 1) && *pptr && *pptr != '\"';
+           i ++, pptr ++)
+	info[i] = *pptr;
+
+      if (i)
+	info[i] = '\0';
+
+      if (*pptr == '\"')
+	pptr ++;
+
+      while (*pptr && isspace(*pptr))
+	pptr ++;
+
+      if (*pptr == '\"')
+      {
+	for (i = 0, pptr ++;
+             i < (sizeof(make_model) - 1) && *pptr && *pptr != '\"';
+             i ++, pptr ++)
+	  make_model[i] = *pptr;
+
+	if (i)
+	  make_model[i] = '\0';
+      }
+    }
+  }
+
+  DEBUG_puts(packet);
+  DEBUG_printf(("type=%x, state=%x, uri=\"%s\"\n"
+                "location=\"%s\", info=\"%s\", make_model=\"%s\"\n",
+	        type, state, uri, location, info, make_model));
+
+ /*
+  * Pull the URI apart to see if this is a local or remote printer...
+  */
+
+  httpSeparate(uri, method, username, host, &port, resource);
+
+  DEBUG_printf(("host=\"%s\", ServerName=\"%s\"\n", host, ServerName));
+
+  if (strcasecmp(host, ServerName) == 0)
+    return;
+
+ /*
+  * Do relaying...
+  */
+
+  for (i = 0; i < NumRelays; i ++)
+    if (CheckAuth(address, srcname, len, 1, &(Relays[i].from)))
+      if (sendto(BrowseSocket, packet, bytes, 0,
+                 (struct sockaddr *)&(Relays[i].to),
+		 sizeof(struct sockaddr_in)) <= 0)
+      {
+	LogMessage(L_ERROR, "UpdateBrowseList: sendto failed for relay %d - %s.",
+	           i + 1, strerror(errno));
+	return;
+      }
+
+ /*
+  * Process the browse data...
+  */
+
+  ProcessBrowseData(uri, type, state, location, info, make_model);
+}
+
+
+/***********************************************************************
+ **** SLP Support Code *************************************************
+ ***********************************************************************/
+
+#ifdef HAVE_LIBSLP 
+/*
+ * SLP service name for CUPS...
+ */
+
+#  define SLP_CUPS_SRVTYPE	"service:printer"
+
+
+/* 
+ * Printer service URL structure
+ */
+
+typedef struct _slpsrvurl
+{
+  struct _slpsrvurl	*next;
+  char			url[HTTP_MAX_URI],
+			printer_name[HTTP_MAX_URI],
+			printer_uri[HTTP_MAX_URI];
+} slpsrvurl_t;
+
+
+/*
+ * 'RegReportCallback()' - Empty SLPRegReport.
+ */
+
+void
+RegReportCallback(SLPHandle hslp,
+                  SLPError  errcode,
+		  void      *cookie)
+{
+  (void)hslp;
+  (void)errcode;
+  (void)cookie;
+
+  return;
+}
+
+
+/*
+ * 'SendSLPBrowse()' - Register the specified printer with SLP.
+ */
+
+void 
+SendSLPBrowse(printer_t *p)
+{
+  int   copied;
+  char* srvurl    = 0;
+  int   srvurllen = 0;
+  char* attrs     = 0;
+  int   attrslen  = 0;
+
+
+ /*
+  * Make the SLP service URL that conforms to the IANA 
+  * 'printer:' template
+  */
+  srvurllen =  strlen(SLP_CUPS_SRVTYPE) + strlen(p->uri) + 2;
+  srvurl = (char*)malloc(srvurllen);
+  if(srvurl == NULL)
+  {
+    return; /* Yikes! Out of memory */
+  }
+  snprintf(srvurl, srvurllen, "%s:%s",SLP_CUPS_SRVTYPE,p->uri);
+
+  /*
+   * Make the SLP attribute string list that conforms to
+   * the IANA 'printer:' template
+   */
+  do
+  {
+    attrslen += 4096;
+    attrs = (char*)realloc(attrs,attrslen);  
+    if(attrs == NULL)
+    {
+      return; /* Yikes, Out of memory */
+    }
+    
+    /* Yucky big snprintf that builds attrlist */
+    copied = snprintf(attrs,
+                      attrslen,
+                      "(printer-xri-supported=%s),"
+                      "(printer-name=%s),"
+                      "(printer-location=%s),"
+                      "(printer-info=%s),"
+                      "(printer-more-info=%s),"
+                      "(printer-make-and-model=%s),"
+                      "(printer-color-supported=%s),"
+                      "(printer-finishings-supported=%s),"
+                      "(printer-sides-supported=%s),"
+                      "(printer-media-supported=%s),"
+                      "(printer-copies-supported=%i)",
+                      p->uri,
+                      *(p->name) ? p->name : "unknown",
+                      *(p->location) ? p->location : "unknown",
+                      *(p->info) ? p->info :"unknown",
+                      *(p->more_info) ? p->more_info : "unknown",
+                      *(p->make_model) ? p->make_model : "unknown",
+                      p->type & CUPS_PRINTER_COLOR ? "true" : "false",
+                      p->type & CUPS_PRINTER_STAPLE ? "staple" : "none",
+                      p->type & CUPS_PRINTER_DUPLEX ? "two-sided-long-edge" : "none",
+                      "small", /* Fix when ISO/IEC 10175 */
+                      p->type & CUPS_PRINTER_COPIES ? 0 : -1 );
+  }while(copied < 0 && copied >= attrslen);
+
+  /* 
+   * Open SLP handle if it is not open and Make call to SLP Api SLPReg()
+   */
+  if(BrowseSLPHandle == 0)
+  {
+    SLPOpen("en",0,&BrowseSLPHandle);
+  }
+
+  SLPReg(BrowseSLPHandle,
+         srvurl,
+         SlpTimeout,
+         SLP_CUPS_SRVTYPE, 
+         attrs, 
+         1,
+         RegReportCallback,
+         0);
+
+  free(srvurl);
+  free(attrs);
+}
+
+
+/*
+ * 'SLPDeregPrinter()' - SLPDereg() the specified printer
+ */
+
+void 
+SLPDeregPrinter(printer_t *p)
+{
+  int   srvurllen;
+  char* srvurl;
+
+  if((p->type & CUPS_PRINTER_REMOTE) == 0)
+  {
+    /*
+     * Make the SLP service URL that conforms to the IANA 
+     * 'printer:' template
+     */
+    srvurllen =  strlen(SLP_CUPS_SRVTYPE) + strlen(p->uri) + 2;
+    srvurl = (char*)malloc(srvurllen);
+    if(srvurl == NULL)
+    {
+      return; /* Yikes! Out of memory */
+    }
+
+    snprintf(srvurl, srvurllen, "%s:%s",SLP_CUPS_SRVTYPE,p->uri);
+
+    /* 
+     * Open SLP handle if it is not open and Make call to SLP Api SLPDereg()
+     */
+
+    if(BrowseSLPHandle == 0)
+    {
+      SLPOpen("en",0,&BrowseSLPHandle);
+    }
+    SLPDereg(BrowseSLPHandle,
+             srvurl,
+             RegReportCallback,
+             0);
+
+    free(srvurl);
+  }
+}
+
+
+/*
+ * 'GetSlpAttrVal()' - ???
+ */
+
+int 
+GetSlpAttrVal(const char* attrlist,
+              const char* tag,
+              char* valbuf,
+              int valbuflen)
+{
+  char* slider1;
+  char* slider2;
+
+  slider1 = strstr(attrlist,tag);
+  if(slider1)
+  {
+    slider1 += strlen(tag);
+    slider2 = strchr(slider1,')');
+    if(slider2)
+    {
+      if(valbuflen > slider2-slider1)
+      {
+        strncpy(valbuf,slider1,slider2-slider1);
+        return 0;
+      }
+    }
+  }
+  return -1;
+}
+
+
+/*
+ * 'AttrCallback()' - SLP attribute callback 
+ */
+
+SLPBoolean
+AttrCallback(SLPHandle  hslp, 
+             const char *attrlist, 
+             SLPError   errcode, 
+             void       *cookie)
+{
+  char         tmp[IPP_MAX_NAME];
+  printer_t    *p = (printer_t*) cookie;
+
+
+ /*
+  * Bail if there was an error
+  */
+
+  if (errcode != SLP_OK)
+  {
+    return 1;
+  }
+
+ /*
+  * parse the attrlist to obtain things needed to build CUPS browse packet
+  */
+
+  GetSlpAttrVal(attrlist,"(printer-name=",p->name,sizeof(p->name));
+  GetSlpAttrVal(attrlist,"(printer-location=",p->location,sizeof(p->location));
+  GetSlpAttrVal(attrlist,"(printer-info=",p->info,sizeof(p->info));
+  GetSlpAttrVal(attrlist,"(printer-more-info=",p->more_info,sizeof(p->more_info));
+  GetSlpAttrVal(attrlist,"(printer-make-and-model=",p->make_model,sizeof(p->make_model));
+  GetSlpAttrVal(attrlist,"(printer-color-supported=",tmp,sizeof(tmp));
+  if(strcasecmp(tmp,"true") == 0) p->type |= CUPS_PRINTER_COLOR;
+  GetSlpAttrVal(attrlist,"(finishings-supported=",tmp,sizeof(tmp));
+  if(strstr(tmp,"staple")) p->type |= CUPS_PRINTER_STAPLE;
+  if(strstr(tmp,"bind")) p->type |= CUPS_PRINTER_BIND;
+  if(strstr(tmp,"punch")) p->type |= CUPS_PRINTER_PUNCH;
+  GetSlpAttrVal(attrlist,"(printer-sides-supported=",tmp,sizeof(tmp));
+  if(strstr(tmp,"two-sided")) p->type |= CUPS_PRINTER_DUPLEX;
+  /* TODO: Finish printer-media-supported when I know DPA (ISO/IEC values
+  GetSlpAttrVal(attrlist,"(printer-media-supported=",tmp,sizeof(tmp));*/
+  GetSlpAttrVal(attrlist,"(printer-copies-supported=",tmp,sizeof(tmp));
+  if(atoi(tmp) >= 0)  p->type |= CUPS_PRINTER_COPIES;
+  GetSlpAttrVal(attrlist,"(printer-output-features-supported=",tmp,sizeof(tmp));
+  if(strstr(tmp,"collating")) p->type |= CUPS_PRINTER_COLLATE;
+
+  return 0;
+}
+
+
+/*
+ * 'SrvUrlCallback()' - SLP service url callback
+ */
+
+SLPBoolean
+SrvUrlCallback(SLPHandle      hslp, 
+               const char     *srvurl, 
+               unsigned short lifetime, 
+               SLPError       errcode, 
+               void           *cookie)
+{
+  slpsrvurl_t *s;
+  slpsrvurl_t **head = (slpsrvurl_t**)cookie;
+  char         *slider1;
+
+  /*
+   * Bail if there was an error
+   */
+  if(errcode != SLP_OK)
+  {
+    return 1;
+  }
+
+  /*
+   * Allocate a *temporary* slpsrvurl_t 
+   */
+  s = (slpsrvurl_t*)malloc(sizeof(slpsrvurl_t));
+  if(s == 0)
+  {
+    return 1;
+  }
+  memset(s,0,sizeof(slpsrvurl_t));
+
+  /*
+   * set the full URL
+   */
+  strncpy(s->url,srvurl,sizeof(s->url)); /* full service url */
+
+  /*
+   * set the printer URI
+   */
+  slider1=strstr(srvurl,"://");
+  if(slider1)
+  {
+    slider1 --;
+    while(slider1 != srvurl)
+    {
+      if(*slider1 == ':')
+      {
+        slider1++;
+        break;
+      }
+      slider1--;
+    }
+    strcpy(s->printer_uri,slider1); /* printer uri */
+  }
+
+  /*
+   * set the printer name
+   */
+  slider1 = (char*)srvurl + strlen(srvurl);
+  while(slider1 != srvurl)
+  {
+    slider1 --;
+    if(*slider1 == '/')
+    {
+      slider1++;
+      break;
+    }
+  }
+  strcpy(s->printer_name,slider1);
+
+
+  /* 
+   *link the srvurl into the head of the list
+   */
+  if(*head != 0)
+  {
+    s->next = *head;
+  }
+  *head = s;
+
+  return 1;
+}
+
+
+/*
+ * 'UpdateSLPBrowse()' - Get browsing information via SLP.
+ */
+
+void
+UpdateSLPBrowseList(void)
+{
+  slpsrvurl_t     *s     = 0;             /* temporary list of urls */
+  slpsrvurl_t     *sdel  = 0;             /* used for list cleanup */
+  printer_t       *p     = 0;             /* temporary list of printer*/
+  printer_t       *pdel  = 0;             /* used for list cleanup */
+  printer_t       *phead = 0;             /* head of the printer list */
+
+  int             port;                   /* Port portion of URI */
+  struct hostent* hostaddr;               /* Looked up address */
+  char            method[HTTP_MAX_URI],   /* Method portion of URI */
+  username[HTTP_MAX_URI], /* Username portion of URI */
+  host[HTTP_MAX_URI],     /* Host portion of URI */
+  resource[HTTP_MAX_URI]; /* Resource portion of URI */
+  unsigned        address = 0;            /* 32 bit network address */
+  int             bytes;                  /* Length of packet */
+  char            packet[1453];           /* a CUPS browse packet */
+
+
+
+  /*
+   * Check to see if it is time...
+   */
+  if((time(NULL) - SlpTimeout) < SlpLastRefresh)
+  {
+    return;
+  }
+
+
+  /* 
+   * Open SLP handle if it is not open and Make call to SLP Api SLPFindSrv()
+   */
+  if(BrowseSLPHandle == 0)
+  {
+    SLPOpen("en",0,&BrowseSLPHandle);
+  }
+
+  /* 
+   * Call SLP Api.  Note that the callback generates a list of of SLP service
+   * URLs
+   */
+  SLPFindSrvs(BrowseSLPHandle,
+              SLP_CUPS_SRVTYPE,
+              "",
+              "",
+              SrvUrlCallback,
+              &s);
+  /*
+   * process the list of service URLS
+   */
+  while(s)
+  {
+    /*
+     * check to se if we already know about this printer
+     */
+    p = FindPrinter(s->printer_name);
+    if(p == 0)
+    {
+      /* 
+       * allocate a *temporary* printer_t that is used (for lack of a
+       * better structure) for holding data until we can make a CUPS
+       * browse packet
+       */
+      p = (printer_t*)malloc(sizeof(printer_t));
+      if(p == 0)
+      {
+        break;
+      }
+      memset(p,0,sizeof(printer_t));
+
+      /* 
+       * Set up the printer_t with the attributes from the SLP attributes
+       */
+      SLPFindAttrs(BrowseSLPHandle,
+                   s->url,
+                   "",
+                   "",
+                   AttrCallback,
+                   p);
+
+      /*
+       * Set the uri from the SLP service URL
+       */
+      strcpy(p->uri,s->printer_uri);
+      /* All SLP discovered printers will be remote */
+      p->type |= CUPS_PRINTER_REMOTE;  
+
+      /* 
+       * link the printer onto the head of the list 
+       */
+      if(phead != 0)
+      {
+        p->next = phead;
+      }
+      phead = p;
+    }
+    else
+    {
+      /* 
+       * already know about this printer set browse time
+       */
+      p->browse_time = time(NULL);
+    }
+
+    /*
+     * clean up the current SLP service URL and move to the next item
+     */
+    sdel = s;
+    s = s->next;                         
+    free(sdel);
+  }       
+
+  /*
+   * Make CUPS browse packets for each of our temporary printer entries
+   * and process them through the normal browse code path
+   */
+  p = phead;
+  while(p)
+  {
+    /* 
+     * get the host from the URI and look up the address
+     */
+    httpSeparate(p->uri, method, username, host, &port, resource);
+    if((hostaddr = gethostbyname(host)))
+    {
+      address = (unsigned)hostaddr->h_addr;
+    }
+
+    /*
+    * Build CUPS browse packet and process it
+    */
+    snprintf(packet, sizeof(packet), "%x %x %s \"%s\" \"%s\" \"%s\"\n",
+             p->type | CUPS_PRINTER_REMOTE, IPP_PRINTER_IDLE, p->uri,
+             p->location, p->info, p->make_model);
+    bytes = strlen(packet);
+
+    ProcessBrowsePacket(packet,bytes,address,host,strlen(host));
+
+    pdel = p;
+    p = p->next;
+
+    free(pdel);
+  }
+}
+#endif /* HAVE_LIBSLP */
+
+
+/*
+ * End of "$Id: dirsvc.c,v 1.79 2001/07/23 15:05:00 mike Exp $".
  */

@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-openssl.m4,v 1.2 2001/07/17 12:38:48 mike Exp $"
+dnl "$Id: cups-openssl.m4,v 1.3 2001/07/23 15:04:59 mike Exp $"
 dnl
 dnl   OpenSSL stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -33,36 +33,37 @@ AC_ARG_WITH(openssl-includes, [  --with-openssl-includes    set directory for Op
 SSLLIBS=""
 
 if test x$enable_ssl != xno; then
-    dnl Save the current libraries so the crypto stuff isn't always
-    dnl included...
-    SAVELIBS="$LIBS"
+    AC_CHECK_HEADER(openssl/ssl.h,
+	dnl Save the current libraries so the crypto stuff isn't always
+	dnl included...
+	SAVELIBS="$LIBS"
 
-    dnl Some ELF systems can't resolve all the symbols in libcrypto
-    dnl if libcrypto was linked against RSAREF, and fail to link the
-    dnl test program correctly, even though a correct installation
-    dnl of OpenSSL exists.  So we test the linking three times in
-    dnl case the RSAREF libraries are needed.
+	dnl Some ELF systems can't resolve all the symbols in libcrypto
+	dnl if libcrypto was linked against RSAREF, and fail to link the
+	dnl test program correctly, even though a correct installation
+	dnl of OpenSSL exists.  So we test the linking three times in
+	dnl case the RSAREF libraries are needed.
 
-    for libcrypto in \
-	"-lcrypto" \
-	"-lcrypto -lrsaref" \
-	"-lcrypto -lRSAglue -lrsaref"
-    do
-	AC_CHECK_LIB(ssl,SSL_new,
-	    [SSLLIBS="-lssl $libcrypto"
-	     AC_DEFINE(HAVE_LIBSSL)],,
-	    $libcrypto)
+	for libcrypto in \
+	    "-lcrypto" \
+	    "-lcrypto -lrsaref" \
+	    "-lcrypto -lRSAglue -lrsaref"
+	do
+	    AC_CHECK_LIB(ssl,SSL_new,
+		[SSLLIBS="-lssl $libcrypto"
+		 AC_DEFINE(HAVE_LIBSSL)],,
+		$libcrypto)
 
-	if test "x${SSLLIBS}" != "x"; then
-	    break
-	fi
-    done
+	    if test "x${SSLLIBS}" != "x"; then
+		break
+	    fi
+	done
 
-    LIBS="$SAVELIBS"
+	LIBS="$SAVELIBS")
 fi
 
 AC_SUBST(SSLLIBS)
 
 dnl
-dnl End of "$Id: cups-openssl.m4,v 1.2 2001/07/17 12:38:48 mike Exp $".
+dnl End of "$Id: cups-openssl.m4,v 1.3 2001/07/23 15:04:59 mike Exp $".
 dnl

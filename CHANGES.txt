@@ -1,9 +1,14 @@
-CHANGES.txt - 07/20/2001
+CHANGES.txt - 07/23/2001
 ------------------------
 
 CHANGES IN CUPS V1.1.10
 
 	- Added a driver for DYMO label printers.
+	- Added new ClassifyOverride directive to allow users
+	  to override the classification of individual jobs.
+	- Added new BrowseProtocols directive to control which
+	  browse protocols are used (currently CUPS and SLP).
+	- Added SLPv2 support.
 	- The serial backend now limits writes to 1/10th
 	  second worth of data to avoid buffer overflows
 	  with some types of flow control.

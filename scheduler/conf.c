@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.88 2001/07/17 12:38:49 mike Exp $"
+ * "$Id: conf.c,v 1.89 2001/07/23 15:04:59 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -84,6 +84,7 @@ static var_t	variables[] =
   { "BrowseTimeout",	&BrowseTimeout,		VAR_INTEGER,	0 },
   { "Browsing",		&Browsing,		VAR_BOOLEAN,	0 },
   { "Classification",	Classification,		VAR_STRING,	sizeof(Classification) },
+  { "ClassifyOverride",	&ClassifyOverride,	VAR_BOOLEAN,	0 },
   { "DataDir",		DataDir,		VAR_STRING,	sizeof(DataDir) },
   { "DefaultCharset",	DefaultCharset,		VAR_STRING,	sizeof(DefaultCharset) },
   { "DefaultLanguage",	DefaultLanguage,	VAR_STRING,	sizeof(DefaultLanguage) },
@@ -229,6 +230,7 @@ ReadConfiguration(void)
     *slash = '\0';
 
   Classification[0] = '\0';
+  ClassifyOverride  = 0;
 
 #ifdef HAVE_LIBSSL
   strcpy(ServerCertificate, "ssl/server.crt");
@@ -319,6 +321,7 @@ ReadConfiguration(void)
 
   BrowseInterval      = DEFAULT_INTERVAL;
   BrowsePort          = ippPort();
+  BrowseProtocols     = BROWSE_ALL;
   BrowseShortNames    = TRUE;
   BrowseTimeout       = DEFAULT_TIMEOUT;
   Browsing            = TRUE;
@@ -539,6 +542,7 @@ read_configuration(FILE *fp)		/* I - File to read from */
 		name[256],		/* Parameter name */
 		*nameptr,		/* Pointer into name */
 		*value;			/* Pointer to value */
+  int		valuelen;		/* Length of value */
   var_t		*var;			/* Current variable */
   unsigned	address,		/* Address value */
 		netmask;		/* Netmask value */
@@ -748,6 +752,46 @@ read_configuration(FILE *fp)		/* I - File to read from */
       else
         LogMessage(L_ERROR, "Unknown BrowseOrder value %s on line %d.",
 	           value, linenum);
+    }
+    else if (strcasecmp(name, "BrowseProtocols") == 0)
+    {
+     /*
+      * "BrowseProtocol name [... name]"
+      */
+
+      BrowseProtocols = 0;
+
+      for (; *value;)
+      {
+        for (valuelen = 0; value[valuelen]; valuelen ++)
+	  if (isspace(value[valuelen]) || value[valuelen] == ',')
+	    break;
+
+        if (value[valuelen])
+        {
+	  value[valuelen] = '\0';
+	  valuelen ++;
+	}
+
+        if (strcasecmp(value, "cups") == 0)
+	  BrowseProtocols |= BROWSE_CUPS;
+        else if (strcasecmp(value, "slp") == 0)
+	  BrowseProtocols |= BROWSE_SLP;
+        else if (strcasecmp(value, "ldap") == 0)
+	  BrowseProtocols |= BROWSE_LDAP;
+        else if (strcasecmp(value, "all") == 0)
+	  BrowseProtocols |= BROWSE_ALL;
+	else
+	{
+	  LogMessage(L_ERROR, "Unknown browse protocol \"%s\" on line %d.",
+	             value, linenum);
+          break;
+	}
+
+        for (value += valuelen; *value; value ++)
+	  if (!isspace(*value) || *value != ',')
+	    break;
+      }
     }
     else if (strcasecmp(name, "BrowseAllow") == 0 ||
              strcasecmp(name, "BrowseDeny") == 0)
@@ -1750,5 +1794,5 @@ get_address(char               *value,		/* I - Value string */
 
 
 /*
- * End of "$Id: conf.c,v 1.88 2001/07/17 12:38:49 mike Exp $".
+ * End of "$Id: conf.c,v 1.89 2001/07/23 15:04:59 mike Exp $".
  */
