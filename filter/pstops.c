@@ -1,5 +1,5 @@
 /*
- * "$Id: pstops.c,v 1.17 1999/05/18 21:21:46 mike Exp $"
+ * "$Id: pstops.c,v 1.18 1999/06/04 21:05:43 mike Exp $"
  *
  *   PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -242,6 +242,9 @@ main(int  argc,			/* I - Number of command-line arguments */
 
   puts(line);
 
+  if (ppd != NULL && ppd->patches != NULL)
+    puts(ppd->patches);
+
   ppdEmit(ppd, stdout, PPD_ORDER_DOCUMENT);
   ppdEmit(ppd, stdout, PPD_ORDER_ANY);
   ppdEmit(ppd, stdout, PPD_ORDER_PROLOG);
@@ -253,7 +256,8 @@ main(int  argc,			/* I - Number of command-line arguments */
          "end");
 
   if (g != 1.0 || b != 1.0)
-    printf("{ neg 1 add %.3f exp neg 1 add %.3f mul } bind settransfer\n", g, b);
+    printf("{ neg 1 add dup 0 lt { pop 1 } { %.3f exp neg 1 add } "
+           "ifelse %.3f mul } bind settransfer\n", g, b);
 
   if (Copies > 1 && (!Collate || !slowcollate))
     printf("/#copies %d def\n", Copies);
@@ -716,5 +720,5 @@ start_nup(int number)	/* I - Page number */
 
 
 /*
- * End of "$Id: pstops.c,v 1.17 1999/05/18 21:21:46 mike Exp $".
+ * End of "$Id: pstops.c,v 1.18 1999/06/04 21:05:43 mike Exp $".
  */
