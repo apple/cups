@@ -1,5 +1,5 @@
 /*
- * "$Id: pstoraster.c,v 1.8 1999/08/23 18:28:04 mike Exp $"
+ * "$Id: pstoraster.c,v 1.9 1999/09/27 17:36:09 mike Exp $"
  *
  *   PostScript RIP filter main entry for the Common UNIX Printing System
  *   (CUPS).
@@ -40,7 +40,17 @@
  */
 
 #include <cups/string.h>
+#define bool bool_              /* (maybe not needed) */
+#define uchar uchar_
+#define uint uint_
+#define ushort ushort_
+#define ulong ulong_
 #include <stdlib.h>
+#undef bool
+#undef uchar
+#undef uint
+#undef ushort
+#undef ulong
 #include "ghost.h"
 #include "imain.h"
 #include "iminst.h"
@@ -192,5 +202,5 @@ define_string(char *name,	/* I - Variable to set */
 
 
 /*
- * End of "$Id: pstoraster.c,v 1.8 1999/08/23 18:28:04 mike Exp $".
+ * End of "$Id: pstoraster.c,v 1.9 1999/09/27 17:36:09 mike Exp $".
  */
