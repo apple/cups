@@ -3,6 +3,15 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.19rc3
 
+	- The test suite sent text files to a non-PS print queue,
+	  which requires ESP Ghostscript (provided separately).
+	  Now send the JPEG test file (STR #33)
+	- The test suite did not show the estimated disk space
+	  requirements (STR #33)
+	- The test suite did not set the MaxLogSize directive to
+	  0 to prevent log file rotation (STR #33)
+	- The test suite still setup the old CUPS Ghostscript
+	  symlinks (STR #33)
 	- The pstops filter did not report the correct number of
 	  copies for the page_log file when printing collated
 	  copies to a printer that doesn't support them in
