@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c,v 1.57.2.38 2003/03/17 20:13:52 mike Exp $"
+ * "$Id: main.c,v 1.57.2.39 2003/03/20 21:24:31 mike Exp $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -67,7 +67,8 @@ static void	usage(void);
  */
 
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
-static sigset_t	oldmask;		/* Old POSIX signal mask */
+static sigset_t	holdmask;		/* Old POSIX signal mask */
+static int	holdcount = 0;		/* Number of time "hold" was called */
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET */
 
 
@@ -740,7 +741,11 @@ HoldSignals(void)
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
   sigset_t		newmask;	/* New POSIX signal mask */
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET */
-  
+
+
+  holdcount ++;
+  if (holdcount > 1)
+    return;
 
 #ifdef HAVE_SIGSET
   sighold(SIGTERM);
@@ -749,7 +754,7 @@ HoldSignals(void)
   sigemptyset(&newmask);
   sigaddset(&newmask, SIGTERM);
   sigaddset(&newmask, SIGCHLD);
-  sigprocmask(SIG_BLOCK, &newmask, &oldmask);
+  sigprocmask(SIG_BLOCK, &newmask, &holdmask);
 #endif /* HAVE_SIGSET */
 }
 
@@ -791,11 +796,15 @@ IgnoreChildSignals(void)
 void
 ReleaseSignals(void)
 {
+  holdcount --;
+  if (holdcount > 0)
+    return;
+
 #ifdef HAVE_SIGSET
   sigrelse(SIGTERM);
   sigrelse(SIGCHLD);
 #elif defined(HAVE_SIGACTION)
-  sigprocmask(SIG_SETMASK, &oldmask, NULL);
+  sigprocmask(SIG_SETMASK, &holdmask, NULL);
 #endif /* HAVE_SIGSET */
 }
 
@@ -1091,5 +1100,5 @@ usage(void)
 
 
 /*
- * End of "$Id: main.c,v 1.57.2.38 2003/03/17 20:13:52 mike Exp $".
+ * End of "$Id: main.c,v 1.57.2.39 2003/03/20 21:24:31 mike Exp $".
  */
