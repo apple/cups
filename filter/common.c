@@ -1,5 +1,5 @@
 /*
- * "$Id: common.c,v 1.14 2001/03/15 17:48:07 mike Exp $"
+ * "$Id: common.c,v 1.15 2001/03/27 20:54:15 mike Exp $"
  *
  *   Common filter routines for the Common UNIX Printing System (CUPS).
  *
@@ -275,7 +275,7 @@ WriteLabelProlog(const char *label)	/* I - Page label */
   * and return...
   */
 
-  if (!classification[0] && label == NULL || !label[0])
+  if (!classification[0] && (label == NULL || !label[0]))
   {
     puts("/espWL{}bind def");
     return;
@@ -333,5 +333,5 @@ WriteLabelProlog(const char *label)	/* I - Page label */
 
 
 /*
- * End of "$Id: common.c,v 1.14 2001/03/15 17:48:07 mike Exp $".
+ * End of "$Id: common.c,v 1.15 2001/03/27 20:54:15 mike Exp $".
  */

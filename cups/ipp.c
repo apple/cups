@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.52 2001/03/01 20:40:14 mike Exp $"
+ * "$Id: ipp.c,v 1.53 2001/03/27 20:54:14 mike Exp $"
  *
  *   Internet Printing Protocol support functions for the Common UNIX
  *   Printing System (CUPS).
@@ -1842,7 +1842,7 @@ ipp_read(http_t        *http,	/* I - Client connection */
   * Loop until all bytes are read...
   */
 
-  for (tbytes = 0; tbytes < length; tbytes += bytes, buffer += bytes)
+  for (tbytes = 0, bytes = 0; tbytes < length; tbytes += bytes, buffer += bytes)
     if ((bytes = httpRead(http, (char *)buffer, length - tbytes)) <= 0)
       break;
 
@@ -1858,5 +1858,5 @@ ipp_read(http_t        *http,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.52 2001/03/01 20:40:14 mike Exp $".
+ * End of "$Id: ipp.c,v 1.53 2001/03/27 20:54:14 mike Exp $".
  */
