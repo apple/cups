@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.48 2000/02/02 00:50:42 mike Exp $"
+ * "$Id: ipp.c,v 1.49 2000/02/03 21:25:49 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -772,6 +772,8 @@ add_printer(client_t        *con,	/* I - Client connection */
   * See if we have an interface script or PPD file attached to the request...
   */
 
+  LogMessage(L_DEBUG, "add_printer: filename = \"%s\"", con->filename);
+
   if (con->filename[0] &&
       (fp = fopen(con->filename, "r")) != NULL)
   {
@@ -813,7 +815,10 @@ add_printer(client_t        *con,	/* I - Client connection */
 	return;
       }
       else
+      {
+        LogMessage(L_DEBUG, "add_printer: Copied interface script successfully!");
         chmod(filename, 0755);
+      }
     }
 
     sprintf(filename, "%s/ppd/%s.ppd", ServerRoot, printer->name);
@@ -833,7 +838,10 @@ add_printer(client_t        *con,	/* I - Client connection */
 	return;
       }
       else
+      {
+        LogMessage(L_DEBUG, "add_printer: Copied PPD file successfully!");
         chmod(filename, 0644);
+      }
     }
     else
     {
@@ -3502,5 +3510,5 @@ validate_job(client_t        *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.48 2000/02/02 00:50:42 mike Exp $".
+ * End of "$Id: ipp.c,v 1.49 2000/02/03 21:25:49 mike Exp $".
  */
