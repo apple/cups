@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.c,v 1.33 2000/07/20 19:00:52 mike Exp $"
+ * "$Id: auth.c,v 1.34 2000/08/24 16:10:11 mike Exp $"
  *
  *   Authorization routines for the Common UNIX Printing System (CUPS).
  *
@@ -701,7 +701,7 @@ IsAuthorized(client_t *con)	/* I - Connection */
 
   DEBUG_puts("IsAuthorized: user not in group!");
 
-  return (HTTP_FORBIDDEN);
+  return (HTTP_UNAUTHORIZED);
 }
 
 
@@ -900,5 +900,5 @@ pam_func(int                      num_msg,	/* I - Number of messages */
 
 
 /*
- * End of "$Id: auth.c,v 1.33 2000/07/20 19:00:52 mike Exp $".
+ * End of "$Id: auth.c,v 1.34 2000/08/24 16:10:11 mike Exp $".
  */
