@@ -1,5 +1,5 @@
 /*
- * "$Id: lpstat.c,v 1.8 1999/06/09 20:07:36 mike Exp $"
+ * "$Id: lpstat.c,v 1.9 1999/06/10 16:16:10 mike Exp $"
  *
  *   "lpstat" command for the Common UNIX Printing System (CUPS).
  *
@@ -102,6 +102,24 @@ main(int  argc,		/* I - Number of command-line arguments */
 
         case 'd' : /* Show default destination */
 	    show_default(http);
+	    break;
+
+        case 'h' : /* Connect to host */
+	    httpClose(http);
+
+	    if (argv[i][2] != '\0')
+	      http = httpConnect(argv[i] + 2, ippPort());
+	    else
+	    {
+	      i ++;
+	      http = httpConnect(argv[i], ippPort());
+	    }
+
+	    if (http == NULL)
+	    {
+	      perror("lpstat: Unable to connect to server");
+	      return (1);
+	    }
 	    break;
 
         case 'o' : /* Show jobs by destination */
@@ -1244,5 +1262,5 @@ show_scheduler(http_t *http)	/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpstat.c,v 1.8 1999/06/09 20:07:36 mike Exp $".
+ * End of "$Id: lpstat.c,v 1.9 1999/06/10 16:16:10 mike Exp $".
  */

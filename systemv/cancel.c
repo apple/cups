@@ -1,5 +1,5 @@
 /*
- * "$Id: cancel.c,v 1.3 1999/06/09 20:07:35 mike Exp $"
+ * "$Id: cancel.c,v 1.4 1999/06/10 16:16:09 mike Exp $"
  *
  *   "cancel" command for the Common UNIX Printing System (CUPS).
  *
@@ -49,7 +49,8 @@ main(int  argc,			/* I - Number of command-line arguments */
   http_t	*http;		/* HTTP connection to server */
   int		i;		/* Looping var */
   int		job_id;		/* Job ID */
-  char		*dest;		/* Destination printer */
+  char		*dest,		/* Destination printer */
+		*host;		/* Host name */
   char		name[255];	/* Printer name */
   char		uri[1024];	/* Printer or job URI */
   ipp_t		*request;	/* IPP request */
@@ -88,6 +89,24 @@ main(int  argc,			/* I - Number of command-line arguments */
 	    op = IPP_PURGE_JOBS;
 	    break;
 
+        case 'h' : /* Connect to host */
+	    httpClose(http);
+
+	    if (argv[i][2] != '\0')
+	      http = httpConnect(argv[i] + 2, ippPort());
+	    else
+	    {
+	      i ++;
+	      http = httpConnect(argv[i], ippPort());
+	    }
+
+	    if (http == NULL)
+	    {
+	      perror("cancel: Unable to connect to server");
+	      return (1);
+	    }
+	    break;
+
 	default :
 	    fprintf(stderr, "cancel: Unknown option \'%c\'!\n", argv[i][1]);
 	    return (1);
@@ -111,6 +130,23 @@ main(int  argc,			/* I - Number of command-line arguments */
 	sscanf(argv[i], "%[^-]-%d", name, &job_id);
 	if (job_id)
 	  op = IPP_CANCEL_JOB;
+
+        if ((host = strchr(name, '@')) != NULL)
+	{
+	 /*
+	  * Reconnect to the named host...
+	  */
+
+          httpClose(http);
+
+	  *host++ = '\0';
+
+	  if ((http = httpConnect(host, ippPort())) == NULL)
+	  {
+	    perror("cancel: Unable to connect to server");
+	    return (1);
+	  }
+	}
       }
 
      /*
@@ -173,5 +209,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: cancel.c,v 1.3 1999/06/09 20:07:35 mike Exp $".
+ * End of "$Id: cancel.c,v 1.4 1999/06/10 16:16:09 mike Exp $".
  */

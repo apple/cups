@@ -1,5 +1,5 @@
 /*
- * "$Id: accept.c,v 1.2 1999/06/09 20:07:35 mike Exp $"
+ * "$Id: accept.c,v 1.3 1999/06/10 16:16:09 mike Exp $"
  *
  *   "accept", "disable", "enable", and "reject" commands for the Common
  *   UNIX Printing System (CUPS).
@@ -96,6 +96,26 @@ main(int  argc,			/* I - Number of command-line arguments */
     if (argv[i][0] == '-')
       switch (argv[i][1])
       {
+        case 'h' : /* Connect to host */
+	    if (http != NULL)
+	      httpClose(http);
+
+	    if (argv[i][2] != '\0')
+	      http = httpConnect(argv[i] + 2, ippPort());
+	    else
+	    {
+	      i ++;
+	      http = httpConnect(argv[i], ippPort());
+	    }
+
+	    if (http == NULL)
+	    {
+	      fputs(argv[0], stderr);
+	      perror(": Unable to connect to server");
+	      return (1);
+	    }
+	    break;
+
         case 'r' : /* Reason for cancellation */
 	    if (argv[i][2] != '\0')
 	      reason = argv[i] + 2;
@@ -194,5 +214,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: accept.c,v 1.2 1999/06/09 20:07:35 mike Exp $".
+ * End of "$Id: accept.c,v 1.3 1999/06/10 16:16:09 mike Exp $".
  */

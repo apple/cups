@@ -1,5 +1,5 @@
 /*
- * "$Id: lpadmin.c,v 1.3 1999/05/26 20:05:20 mike Exp $"
+ * "$Id: lpadmin.c,v 1.4 1999/06/10 16:16:10 mike Exp $"
  *
  *   "lpadmin" command for the Common UNIX Printing System (CUPS).
  *
@@ -75,6 +75,7 @@ main(int  argc,		/* I - Number of command-line arguments */
   int	i;		/* Looping var */
   http_t *http;		/* Connection to server */
   char	*printer,	/* Destination printer */
+	*host,		/* Pointer to hostname */
 	filename[1024];	/* Model filename */
 
 
@@ -118,6 +119,24 @@ main(int  argc,		/* I - Number of command-line arguments */
 
             default_printer(http, printer);
 	    i = argc;
+	    break;
+
+        case 'h' : /* Connect to host */
+	    httpClose(http);
+
+	    if (argv[i][2] != '\0')
+	      http = httpConnect(argv[i] + 2, ippPort());
+	    else
+	    {
+	      i ++;
+	      http = httpConnect(argv[i], ippPort());
+	    }
+
+	    if (http == NULL)
+	    {
+	      perror("lpadmin: Unable to connect to server");
+	      return (1);
+	    }
 	    break;
 
         case 'i' : /* Use the specified interface script */
@@ -164,6 +183,22 @@ main(int  argc,		/* I - Number of command-line arguments */
 	      i ++;
 	      printer = argv[i];
 	    }
+
+	    if ((host = strchr(printer, '@')) != NULL)
+	    {
+	     /*
+	      * printer@host - reconnect to the named host...
+	      */
+
+	      httpClose(http);
+
+              *host++ = '\0';
+              if ((http = httpConnect(host, ippPort())) == NULL)
+	      {
+		perror("lpadmin: Unable to connect to server");
+		return (1);
+	      }
+	    }
 	    break;
 
         case 'r' : /* Remove printer from class */
@@ -207,6 +242,22 @@ main(int  argc,		/* I - Number of command-line arguments */
 	    {
 	      i ++;
 	      printer = argv[i];
+	    }
+
+	    if ((host = strchr(printer, '@')) != NULL)
+	    {
+	     /*
+	      * printer@host - reconnect to the named host...
+	      */
+
+	      httpClose(http);
+
+              *host++ = '\0';
+              if ((http = httpConnect(host, ippPort())) == NULL)
+	      {
+		perror("lpadmin: Unable to connect to server");
+		return (1);
+	      }
 	    }
 
             delete_printer(http, printer);
@@ -278,9 +329,9 @@ main(int  argc,		/* I - Number of command-line arguments */
   {
     puts("Usage:");
     puts("");
-    puts("    lpadmin -d destination");
-    puts("    lpadmin -x destination");
-    puts("    lpadmin -p printer [-c add-class] [-i interface] [-m model]");
+    puts("    lpadmin [-h server] -d destination");
+    puts("    lpadmin [-h server] -x destination");
+    puts("    lpadmin [-h server] -p printer [-c add-class] [-i interface] [-m model]");
     puts("                       [-r remove-class] [-v device] [-D description]");
     puts("                       [-P ppd-file]");
     puts("");
@@ -991,5 +1042,5 @@ set_printer_location(http_t *http,	/* I - Server connection */
 
 
 /*
- * End of "$Id: lpadmin.c,v 1.3 1999/05/26 20:05:20 mike Exp $".
+ * End of "$Id: lpadmin.c,v 1.4 1999/06/10 16:16:10 mike Exp $".
  */
