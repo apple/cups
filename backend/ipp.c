@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.38.2.5 2002/01/29 02:29:46 mike Exp $"
+ * "$Id: ipp.c,v 1.38.2.6 2002/01/30 18:31:23 mike Exp $"
  *
  *   IPP backend for the Common UNIX Printing System (CUPS).
  *
@@ -476,7 +476,6 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
     cupsFreeOptions(num_options, options);
 
-
    /*
     * Do the request...
     */
@@ -696,19 +695,21 @@ password_cb(const char *prompt)	/* I - Prompt (not used) */
  * 'report_printer_state()' - Report the printer state.
  */
 
-int					/* O - Number of reasons found */
+int					/* O - Number of reasons shown */
 report_printer_state(ipp_t *ipp)	/* I - IPP response */
 {
   int			i;		/* Looping var */
+  int			count;		/* Count of reasons shown... */
   ipp_attribute_t	*reasons;	/* printer-state-reasons */
   const char		*message;	/* Message to show */
+  char			unknown[1024];	/* Unknown message string */
 
 
   if ((reasons = ippFindAttribute(ipp, "printer-state-reasons",
                                   IPP_TAG_KEYWORD)) == NULL)
     return (0);
 
-  for (i = 0; i < reasons->num_values; i ++)
+  for (i = 0, count = 0; i < reasons->num_values; i ++)
   {
     message = NULL;
 
@@ -762,11 +763,17 @@ report_printer_state(ipp_t *ipp)	/* I - IPP response */
       message = "Developer almost empty.";
     else if (strncmp(reasons->values[i].string.text, "developer-empty", 15) == 0)
       message = "Developer empty!";
-    else if (strstr(reasons->values[i].string.text, "error") == 0)
-      message = "Printer error, type unknown!";
+    else if (strstr(reasons->values[i].string.text, "error") != NULL)
+    {
+      message = unknown;
+
+      snprintf(unknown, sizeof(unknown), "Unknown printer error (%s)!",
+               reasons->values[i].string.text);
+    }
 
     if (message)
     {
+      count ++;
       if (strstr(reasons->values[i].string.text, "error"))
         fprintf(stderr, "ERROR: %s\n", message);
       else if (strstr(reasons->values[i].string.text, "warning"))
@@ -776,11 +783,11 @@ report_printer_state(ipp_t *ipp)	/* I - IPP response */
     }
   }
 
-  return (reasons->num_values);
+  return (count);
 }
 
 
 
 /*
- * End of "$Id: ipp.c,v 1.38.2.5 2002/01/29 02:29:46 mike Exp $".
+ * End of "$Id: ipp.c,v 1.38.2.6 2002/01/30 18:31:23 mike Exp $".
  */
