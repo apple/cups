@@ -95,6 +95,11 @@ CHANGES IN CUPS V1.1.9
 	  error if an empty name attribute value is received.
 	  The new code only sends these attributes if they are
 	  not the empty string.
+	- At least some versions of the HP JetDirect firmware
+	  do not correctly implement IPP.  Added additional
+	  checks to the IPP backend to eliminate extra,
+	  unsupported attributes which should normally be
+	  ignored by a compliant IPP device.
 
 
 CHANGES IN CUPS V1.1.8

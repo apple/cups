@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.45 2001/06/19 20:58:41 mike Exp $"
+ * "$Id: ipp.c,v 1.46 2001/06/21 15:33:08 mike Exp $"
  *
  *   IPP backend for the Common UNIX Printing System (CUPS).
  *
@@ -442,11 +442,24 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 	                            num_options, &options);
     }
 
-    cupsEncodeOptions(request, num_options, options);
+    if (copies_sup)
+    {
+     /*
+      * Only send options if the destination printer supports the copies
+      * attribute.  This is a hack for the HP JetDirect implementation of
+      * IPP, which does not accept extension attributes and incorrectly
+      * reports a client-error-bad-request error instead of the
+      * successful-ok-unsupported-attributes status.  In short, at least
+      * some HP implementations of IPP are non-compliant.
+      */
+
+      cupsEncodeOptions(request, num_options, options);
+      ippAddInteger(request, IPP_TAG_JOB, IPP_TAG_INTEGER, "copies",
+                    atoi(argv[4]));
+    }
+
     cupsFreeOptions(num_options, options);
 
-    if (copies_sup)
-      ippAddInteger(request, IPP_TAG_JOB, IPP_TAG_INTEGER, "copies", atoi(argv[4]));
 
    /*
     * Do the request...
@@ -628,5 +641,5 @@ password_cb(const char *prompt)	/* I - Prompt (not used) */
 
 
 /*
- * End of "$Id: ipp.c,v 1.45 2001/06/19 20:58:41 mike Exp $".
+ * End of "$Id: ipp.c,v 1.46 2001/06/21 15:33:08 mike Exp $".
  */
