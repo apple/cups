@@ -1,5 +1,5 @@
 /*
- * "$Id: cups-lpd.c,v 1.6 2000/08/18 16:46:06 mike Exp $"
+ * "$Id: cups-lpd.c,v 1.7 2000/08/18 17:49:39 mike Exp $"
  *
  *   Line Printer Daemon interface for the Common UNIX Printing System (CUPS).
  *
@@ -445,6 +445,7 @@ recv_print_job(const char *dest)	/* I - Destination */
 		*destptr;		/* Current destination */
   int		num_options;		/* Number of options */
   cups_option_t	*options;		/* Options */
+  int		banner;			/* Print banner? */
 
 
   status   = 0;
@@ -596,6 +597,7 @@ recv_print_job(const char *dest)	/* I - Destination */
       title[0]   = '\0';
       user[0]    = '\0';
       docname[0] = '\0';
+      banner     = 0;
 
       while (fgets(line, sizeof(line), fp) != NULL)
       {
@@ -620,6 +622,9 @@ recv_print_job(const char *dest)	/* I - Destination */
 	      break;
 	  case 'P' : /* User identification */
 	      strcpy(user, line + 1);
+	      break;
+	  case 'L' : /* Print banner page */
+	      banner = 1;
 	      break;
 	  case 'c' : /* Plot CIF file */
 	  case 'd' : /* Print DVI file */
@@ -655,6 +660,10 @@ recv_print_job(const char *dest)	/* I - Destination */
              /*
 	      * Add additional options as needed...
 	      */
+
+              if (!banner)
+	        num_options = cupsAddOption("job-sheets", "none",
+		                            num_options, &options);
 
 	      if (line[0] == 'l')
 	        num_options = cupsAddOption("raw", "", num_options, &options);
@@ -1134,5 +1143,5 @@ remove_jobs(const char *dest,		/* I - Destination */
 
 
 /*
- * End of "$Id: cups-lpd.c,v 1.6 2000/08/18 16:46:06 mike Exp $".
+ * End of "$Id: cups-lpd.c,v 1.7 2000/08/18 17:49:39 mike Exp $".
  */
