@@ -5,7 +5,7 @@
 <META NAME="author" CONTENT="Easy Software Products">
 <META NAME="copyright" CONTENT="Copyright 1997-2004, All Rights Reserved">
 <META NAME="docnumber" CONTENT="CUPS-IDD-1.1">
-<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-8859-1">
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
 <STYLE TYPE="text/css"><!--
 BODY { font-family: serif }
 H1 { font-family: sans-serif }
@@ -20,7 +20,7 @@ PRE { font-family: monospace }
 --></STYLE>
 </HEAD>
 <BODY BGCOLOR="white">
-<CENTER><A HREF="#CONTENTS"><IMG SRC="images/cups-large.gif" BORDER="0" WIDTH="431" HEIGHT="511"><BR>
+<CENTER><A HREF="#CONTENTS"><IMG SRC="images/cups-large.gif" BORDER="0" WIDTH="431" HEIGHT="511" ALT="CUPS Interface Design Description"><BR>
 <H1>CUPS Interface Design Description</H1></A><BR>
 CUPS-IDD-1.1<BR>
 Easy Software Products<BR>
@@ -29,51 +29,56 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <HR NOSHADE>
 <H1 ALIGN="CENTER"><A NAME="CONTENTS">Table of Contents</A></H1>
 <BR>
-<BR><B><A HREF="#1">1 Scope</A></B>
+<BR><B><A HREF="#1">1 Scope</A>
 <UL>
 <LI><A HREF="#1_1">1.1 Identification</A></LI>
 <LI><A HREF="#1_2">1.2 System Overview</A></LI>
 <LI><A HREF="#1_3">1.3 Document Overview</A></LI>
 </UL>
-<B><A HREF="#2">2 References</A></B>
+</B><B><A HREF="#2">2 References</A>
 <UL>
 <LI><A HREF="#2_1">2.1 CUPS Documentation</A></LI>
 <LI><A HREF="#2_2">2.2 Other Documents</A></LI>
 </UL>
-<B><A HREF="#3">3 Internal Interfaces</A></B>
+</B><B><A HREF="#3">3 Internal Interfaces</A>
 <UL>
-<LI><A HREF="#3_1">3.1 Character Set Files</A></LI>
+<LI><A HREF="#3_1">3.1 Character Set Files</A>
 <UL>
 <LI><A HREF="#3_1_1">3.1.1 8-Bit Character Set Files</A></LI>
 <LI><A HREF="#3_1_2">3.1.2 Unicode Character Set Files</A></LI>
 </UL>
+</LI>
 <LI><A HREF="#3_2">3.2 Language Files</A></LI>
-<LI><A HREF="#3_3">3.3 MIME Files</A></LI>
+<LI><A HREF="#3_3">3.3 MIME Files</A>
 <UL>
 <LI><A HREF="#3_3_1">3.3.1 mime.types</A></LI>
 <LI><A HREF="#3_3_2">3.3.2 mime.convs</A></LI>
 </UL>
+</LI>
 <LI><A HREF="#3_4">3.4 Option Files</A></LI>
-<LI><A HREF="#3_5">3.5 PostScript Printer Description Files</A></LI>
+<LI><A HREF="#3_5">3.5 PostScript Printer Description Files</A>
 <UL>
 <LI><A HREF="#3_5_1">3.5.1 PPD Specification</A></LI>
 <LI><A HREF="#3_5_2">3.5.2 CUPS Extensions to PPD Files</A></LI>
 </UL>
-<LI><A HREF="#3_6">3.6 Scheduler Configuration Files</A></LI>
+</LI>
+<LI><A HREF="#3_6">3.6 Scheduler Configuration Files</A>
 <UL>
 <LI><A HREF="#3_6_1">3.6.1 classes.conf</A></LI>
 <LI><A HREF="#3_6_2">3.6.2 cupsd.conf</A></LI>
 <LI><A HREF="#3_6_3">3.6.3 printers.conf</A></LI>
 </UL>
+</LI>
 </UL>
-<B><A HREF="#4">4 External Interfaces</A></B>
+</B><B><A HREF="#4">4 External Interfaces</A>
 <UL>
 <LI><A HREF="#4_1">4.1 AppSocket Protocol</A></LI>
 <LI><A HREF="#4_2">4.2 CUPS Browsing Protocol</A></LI>
-<LI><A HREF="#4_3">4.3 CUPS Form File</A></LI>
+<LI><A HREF="#4_3">4.3 CUPS Form File</A>
 <UL>
 <LI><A HREF="#4_3_1">4.3.1 CUPS Form DTD</A></LI>
 </UL>
+</LI>
 <LI><A HREF="#4_4">4.4 CUPS PostScript File</A></LI>
 <LI><A HREF="#4_5">4.5 CUPS Raster File</A></LI>
 <LI><A HREF="#4_6">4.6 CUPS Raw Files</A></LI>
@@ -81,14 +86,14 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#4_8">4.8 Line Printer Daemon Protocol</A></LI>
 <LI><A HREF="#4_9">4.9 Server Message Block Protocol</A></LI>
 </UL>
-<B><A HREF="#5">5 Directories</A></B>
+</B><B><A HREF="#5">5 Directories</A></B>
 <BR>
-<BR><B><A HREF="#6">A Glossary</A></B>
+<BR><B><A HREF="#6">A Glossary</A>
 <UL>
 <LI><A HREF="#6_1">A.1 Terms</A></LI>
 <LI><A HREF="#6_2">A.2 Acronyms</A></LI>
 </UL>
-<HR NOSHADE>
+</B><HR NOSHADE>
 <H1><A NAME="1">1 Scope</A></H1>
 <H2><A NAME="1_1">1.1 Identification</A></H2>
 <P>This interface design description document provides detailed file

@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.142 2004/08/18 15:36:34 mike Exp $"
+ * "$Id: http.c,v 1.143 2004/12/16 16:38:37 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS).
  *
@@ -2156,17 +2156,25 @@ http_wait(http_t *http,			/* I - HTTP data */
       return (0);
   }
 
-  FD_SET(http->fd, http->input_set);
-
-  if (msec >= 0)
+  do
   {
-    timeout.tv_sec  = msec / 1000;
-    timeout.tv_usec = (msec % 1000) * 1000;
+    FD_SET(http->fd, http->input_set);
 
-    nfds = select(http->fd + 1, http->input_set, NULL, NULL, &timeout);
+    if (msec >= 0)
+    {
+      timeout.tv_sec  = msec / 1000;
+      timeout.tv_usec = (msec % 1000) * 1000;
+
+      nfds = select(http->fd + 1, http->input_set, NULL, NULL, &timeout);
+    }
+    else
+      nfds = select(http->fd + 1, http->input_set, NULL, NULL, NULL);
   }
-  else
-    nfds = select(http->fd + 1, http->input_set, NULL, NULL, NULL);
+#ifdef WIN32
+  while (nfds < 0 && WSAGetLastError() == WSAEINTR);
+#else
+  while (nfds < 0 && errno == EINTR);
+#endif /* WIN32 */
 
   FD_CLR(http->fd, http->input_set);
 
@@ -2549,5 +2557,5 @@ CDSAWriteFunc(SSLConnectionRef connection,	/* I  - SSL/TLS connection */
 
 
 /*
- * End of "$Id: http.c,v 1.142 2004/08/18 15:36:34 mike Exp $".
+ * End of "$Id: http.c,v 1.143 2004/12/16 16:38:37 mike Exp $".
  */

@@ -4,8 +4,8 @@
 <TITLE>CUPS Software Programmers Manual</TITLE>
 <META NAME="author" CONTENT="Easy Software Products">
 <META NAME="copyright" CONTENT="Copyright 1997-2004, All Rights Reserved">
-<META NAME="docnumber" CONTENT="CUPS-SPM-1.1.21">
-<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-8859-1">
+<META NAME="docnumber" CONTENT="CUPS-SPM-1.1.22">
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
 <STYLE TYPE="text/css"><!--
 BODY { font-family: serif }
 H1 { font-family: sans-serif }
@@ -20,16 +20,16 @@ PRE { font-family: monospace }
 --></STYLE>
 </HEAD>
 <BODY BGCOLOR="white">
-<CENTER><A HREF="#CONTENTS"><IMG SRC="images/cups-large.gif" BORDER="0" WIDTH="431" HEIGHT="511"><BR>
+<CENTER><A HREF="#CONTENTS"><IMG SRC="images/cups-large.gif" BORDER="0" WIDTH="431" HEIGHT="511" ALT="CUPS Software Programmers Manual"><BR>
 <H1>CUPS Software Programmers Manual</H1></A><BR>
-CUPS-SPM-1.1.21<BR>
+CUPS-SPM-1.1.22<BR>
 Easy Software Products<BR>
 Copyright 1997-2004, All Rights Reserved<BR>
 </CENTER>
 <HR NOSHADE>
 <H1 ALIGN="CENTER"><A NAME="CONTENTS">Table of Contents</A></H1>
 <BR>
-<BR><B><A HREF="#1">Preface</A></B>
+<BR><B><A HREF="#1">Preface</A>
 <UL>
 <LI><A HREF="#1_1">System Overview</A></LI>
 <LI><A HREF="#1_2">Document Overview</A></LI>
@@ -37,7 +37,7 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#1_4">Abbreviations</A></LI>
 <LI><A HREF="#1_5">Other References</A></LI>
 </UL>
-<B><A HREF="#OVERVIEW">1 - Printing System Overview</A></B>
+</B><B><A HREF="#OVERVIEW">1 - Printing System Overview</A>
 <UL>
 <LI><A HREF="#2_1">The Printing Problem</A></LI>
 <LI><A HREF="#2_2">The Technology</A></LI>
@@ -48,13 +48,14 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#2_7">Printer Drivers</A></LI>
 <LI><A HREF="#2_8">Networking</A></LI>
 </UL>
-<B><A HREF="#CUPS_API">2 - The CUPS API</A></B>
+</B><B><A HREF="#CUPS_API">2 - The CUPS API</A>
 <UL>
-<LI><A HREF="#3_1">The CUPS API Library</A></LI>
+<LI><A HREF="#3_1">The CUPS API Library</A>
 <UL>
 <LI><A HREF="#3_1_1">Detecting the CUPS API Library in GNU Autoconf</A></LI>
 </UL>
-<LI><A HREF="#3_2">Printing Services</A></LI>
+</LI>
+<LI><A HREF="#3_2">Printing Services</A>
 <UL>
 <LI><A HREF="#3_2_1">Include Files</A></LI>
 <LI><A HREF="#3_2_2">Printing a File</A></LI>
@@ -66,7 +67,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#3_2_8">Getting Errors</A></LI>
 <LI><A HREF="#3_2_9">Passwords and Authentication</A></LI>
 </UL>
-<LI><A HREF="#3_3">PPD Services</A></LI>
+</LI>
+<LI><A HREF="#3_3">PPD Services</A>
 <UL>
 <LI><A HREF="#3_3_1">Include Files</A></LI>
 <LI><A HREF="#3_3_2">Getting a PPD File for a Printer</A></LI>
@@ -76,10 +78,11 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#3_3_6">Marking Options</A></LI>
 <LI><A HREF="#3_3_7">Checking for Conflicts</A></LI>
 </UL>
+</LI>
 </UL>
-<B><A HREF="#WRITING_FILTERS">3 - Writing Filters</A></B>
+</B><B><A HREF="#WRITING_FILTERS">3 - Writing Filters</A>
 <UL>
-<LI><A HREF="#4_1">Overview</A></LI>
+<LI><A HREF="#4_1">Overview</A>
 <UL>
 <LI><A HREF="#4_1_1">Security Considerations</A></LI>
 <LI><A HREF="#4_1_2">Users and Groups</A></LI>
@@ -90,30 +93,34 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#4_1_7">Copy Generation</A></LI>
 <LI><A HREF="#4_1_8">Environment Variables</A></LI>
 </UL>
-<LI><A HREF="#4_2">Dissecting the HP-GL/2 Filter</A></LI>
+</LI>
+<LI><A HREF="#4_2">Dissecting the HP-GL/2 Filter</A>
 <UL>
 <LI><A HREF="#4_2_1">Initializing the Filter</A></LI>
 </UL>
+</LI>
 <LI><A HREF="#4_3">PostScript Output</A></LI>
 </UL>
-<B><A HREF="#WRITING_DRIVERS">4 - Writing Printer Drivers</A></B>
+</B><B><A HREF="#WRITING_DRIVERS">4 - Writing Printer Drivers</A>
 <UL>
-<LI><A HREF="#5_1">Overview</A></LI>
+<LI><A HREF="#5_1">Overview</A>
 <UL>
 <LI><A HREF="#5_1_1">CUPS Raster Data</A></LI>
 <LI><A HREF="#5_1_2">Page Accounting</A></LI>
 <LI><A HREF="#5_1_3">Color Management</A></LI>
 <LI><A HREF="#5_1_4">Device and Bitmap Variables</A></LI>
 </UL>
-<LI><A HREF="#5_2">Dissecting the HP-PCL Driver</A></LI>
+</LI>
+<LI><A HREF="#5_2">Dissecting the HP-PCL Driver</A>
 <UL>
 <LI><A HREF="#5_2_1">PPD Files</A></LI>
 <LI><A HREF="#5_2_2">Reading Raster Data</A></LI>
 </UL>
+</LI>
 </UL>
-<B><A HREF="#WRITING_BACKENDS">5 - Writing Backends</A></B>
+</B><B><A HREF="#WRITING_BACKENDS">5 - Writing Backends</A>
 <UL>
-<LI><A HREF="#6_1">Overview</A></LI>
+<LI><A HREF="#6_1">Overview</A>
 <UL>
 <LI><A HREF="#6_1_1">Security Considerations</A></LI>
 <LI><A HREF="#6_1_2">Command-Line Arguments</A></LI>
@@ -122,17 +129,19 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#6_1_5">Exclusive Access</A></LI>
 <LI><A HREF="#6_1_6">Retries</A></LI>
 </UL>
-<LI><A HREF="#6_2">Dissecting the Serial Port Backend</A></LI>
+</LI>
+<LI><A HREF="#6_2">Dissecting the Serial Port Backend</A>
 <UL>
 <LI><A HREF="#6_2_1">Supporting Device Discovery</A></LI>
 <LI><A HREF="#6_2_2">Opening the Serial Port</A></LI>
 <LI><A HREF="#6_2_3">Writing Data to the Port</A></LI>
 <LI><A HREF="#6_2_4">Finishing Up</A></LI>
 </UL>
+</LI>
 </UL>
-<B><A HREF="#LICENSE">A - Software License Agreement</A></B>
+</B><B><A HREF="#LICENSE">A - Software License Agreement</A>
 <UL>
-<LI><A HREF="#7_1">Common UNIX Printing System License Agreement</A></LI>
+<LI><A HREF="#7_1">Common UNIX Printing System License Agreement</A>
 <UL>
 <LI><A HREF="#7_1_1">Introduction</A></LI>
 <LI><A HREF="#7_1_2">License Exceptions</A></LI>
@@ -140,30 +149,35 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#7_1_4">Binary Distribution Rights</A></LI>
 <LI><A HREF="#7_1_5">Support</A></LI>
 </UL>
-<LI><A HREF="#7_2">GNU GENERAL PUBLIC LICENSE</A></LI>
+</LI>
+<LI><A HREF="#7_2">GNU GENERAL PUBLIC LICENSE</A>
 <UL>
 <LI><A HREF="#7_2_1">Preamble</A></LI>
 </UL>
-<LI><A HREF="#7_3">GNU LIBRARY GENERAL PUBLIC LICENSE</A></LI>
+</LI>
+<LI><A HREF="#7_3">GNU LIBRARY GENERAL PUBLIC LICENSE</A>
 <UL>
 <LI><A HREF="#7_3_1">Preamble</A></LI>
 </UL>
+</LI>
 </UL>
-<B><A HREF="#CONSTANTS">B - Constants</A></B>
+</B><B><A HREF="#CONSTANTS">B - Constants</A>
 <UL>
-<LI><A HREF="#8_1">CUPS Constants</A></LI>
+<LI><A HREF="#8_1">CUPS Constants</A>
 <UL>
 <LI><A HREF="#8_1_1">Version Number</A></LI>
 <LI><A HREF="#8_1_2">Printer Capabilities</A></LI>
 <LI><A HREF="#8_1_3">Encodings</A></LI>
 </UL>
-<LI><A HREF="#8_2">HTTP Constants</A></LI>
+</LI>
+<LI><A HREF="#8_2">HTTP Constants</A>
 <UL>
 <LI><A HREF="#8_2_1">Limits</A></LI>
 <LI><A HREF="#8_2_2">Status Codes</A></LI>
 <LI><A HREF="#8_2_3">Fields</A></LI>
 </UL>
-<LI><A HREF="#8_3">IPP Constants</A></LI>
+</LI>
+<LI><A HREF="#8_3">IPP Constants</A>
 <UL>
 <LI><A HREF="#8_3_1">Limits</A></LI>
 <LI><A HREF="#8_3_2">Tags</A></LI>
@@ -176,14 +190,16 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#8_3_9">Operations</A></LI>
 <LI><A HREF="#8_3_10">Status Codes</A></LI>
 </UL>
-<LI><A HREF="#8_4">PPD Constants</A></LI>
+</LI>
+<LI><A HREF="#8_4">PPD Constants</A>
 <UL>
 <LI><A HREF="#8_4_1">PPD Format Version</A></LI>
 <LI><A HREF="#8_4_2">PPD User-Interface Types</A></LI>
 <LI><A HREF="#8_4_3">PPD Sections</A></LI>
 <LI><A HREF="#8_4_4">PPD Colorspaces</A></LI>
 </UL>
-<LI><A HREF="#8_5">Raster Constants</A></LI>
+</LI>
+<LI><A HREF="#8_5">Raster Constants</A>
 <UL>
 <LI><A HREF="#8_5_1">Raster Sync Words</A></LI>
 <LI><A HREF="#8_5_2">Raster Stream Modes</A></LI>
@@ -196,36 +212,41 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#8_5_9">Raster Color Order Values</A></LI>
 <LI><A HREF="#8_5_10">Raster Colorspace Values</A></LI>
 </UL>
+</LI>
 </UL>
-<B><A HREF="#STRUCTURES">C - Structures</A></B>
+</B><B><A HREF="#STRUCTURES">C - Structures</A>
 <UL>
-<LI><A HREF="#9_1">CUPS Structures</A></LI>
+<LI><A HREF="#9_1">CUPS Structures</A>
 <UL>
 <LI><A HREF="#cups_dest_t">CUPS Destinations</A></LI>
 <LI><A HREF="#cups_job_t">CUPS Jobs</A></LI>
 <LI><A HREF="#cups_lang_t">CUPS Messages</A></LI>
 <LI><A HREF="#cups_option_t">CUPS Options</A></LI>
 </UL>
-<LI><A HREF="#9_2">Networking Structures</A></LI>
+</LI>
+<LI><A HREF="#9_2">Networking Structures</A>
 <UL>
 <LI><A HREF="#http_t">HTTP State</A></LI>
 <LI><A HREF="#ipp_t">IPP State</A></LI>
 <LI><A HREF="#ipp_attribute_t">IPP Attribute</A></LI>
 </UL>
-<LI><A HREF="#9_3">PPD Structures</A></LI>
+</LI>
+<LI><A HREF="#9_3">PPD Structures</A>
 <UL>
 <LI><A HREF="#ppd_file_t">PPD File</A></LI>
 <LI><A HREF="#ppd_choice_t">PPD Choice</A></LI>
 </UL>
-<LI><A HREF="#9_4">Raster Structures</A></LI>
+</LI>
+<LI><A HREF="#9_4">Raster Structures</A>
 <UL>
 <LI><A HREF="#cups_raster_t">Raster Stream</A></LI>
 <LI><A HREF="#cups_raster_header_t">Raster Page Header</A></LI>
 </UL>
+</LI>
 </UL>
-<B><A HREF="#FUNCTIONS">D - Functions</A></B>
+</B><B><A HREF="#FUNCTIONS">D - Functions</A>
 <UL>
-<LI><A HREF="#cupsAddDest">cupsAddDest()</A></LI>
+<LI><A HREF="#cupsAddDest">cupsAddDest()</A>
 <UL>
 <LI><A HREF="#10_1_1">Usage</A></LI>
 <LI><A HREF="#10_1_2">Arguments</A></LI>
@@ -234,7 +255,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_1_5">Example</A></LI>
 <LI><A HREF="#10_1_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#cupsAddOption">cupsAddOption()</A></LI>
+</LI>
+<LI><A HREF="#cupsAddOption">cupsAddOption()</A>
 <UL>
 <LI><A HREF="#10_2_1">Usage</A></LI>
 <LI><A HREF="#10_2_2">Arguments</A></LI>
@@ -243,7 +265,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_2_5">Example</A></LI>
 <LI><A HREF="#10_2_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#cupsCancelJob">cupsCancelJob()</A></LI>
+</LI>
+<LI><A HREF="#cupsCancelJob">cupsCancelJob()</A>
 <UL>
 <LI><A HREF="#10_3_1">Usage</A></LI>
 <LI><A HREF="#10_3_2">Arguments</A></LI>
@@ -252,7 +275,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_3_5">Example</A></LI>
 <LI><A HREF="#10_3_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#cupsDoAuthentication">cupsDoAuthentication()</A></LI>
+</LI>
+<LI><A HREF="#cupsDoAuthentication">cupsDoAuthentication()</A>
 <UL>
 <LI><A HREF="#10_4_1">Usage</A></LI>
 <LI><A HREF="#10_4_2">Arguments</A></LI>
@@ -261,7 +285,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_4_5">Example</A></LI>
 <LI><A HREF="#10_4_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#cupsDoFileRequest">cupsDoFileRequest()</A></LI>
+</LI>
+<LI><A HREF="#cupsDoFileRequest">cupsDoFileRequest()</A>
 <UL>
 <LI><A HREF="#10_5_1">Usage</A></LI>
 <LI><A HREF="#10_5_2">Arguments</A></LI>
@@ -270,7 +295,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_5_5">Example</A></LI>
 <LI><A HREF="#10_5_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#cupsDoRequest">cupsDoRequest()</A></LI>
+</LI>
+<LI><A HREF="#cupsDoRequest">cupsDoRequest()</A>
 <UL>
 <LI><A HREF="#10_6_1">Usage</A></LI>
 <LI><A HREF="#10_6_2">Arguments</A></LI>
@@ -279,7 +305,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_6_5">Example</A></LI>
 <LI><A HREF="#10_6_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#cupsEncodeOptions">cupsEncodeOptions()</A></LI>
+</LI>
+<LI><A HREF="#cupsEncodeOptions">cupsEncodeOptions()</A>
 <UL>
 <LI><A HREF="#10_7_1">Usage</A></LI>
 <LI><A HREF="#10_7_2">Arguments</A></LI>
@@ -287,7 +314,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_7_4">Example</A></LI>
 <LI><A HREF="#10_7_5">See Also</A></LI>
 </UL>
-<LI><A HREF="#cupsEncryption">cupsEncryption()</A></LI>
+</LI>
+<LI><A HREF="#cupsEncryption">cupsEncryption()</A>
 <UL>
 <LI><A HREF="#10_8_1">Usage</A></LI>
 <LI><A HREF="#10_8_2">Returns</A></LI>
@@ -295,7 +323,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_8_4">Example</A></LI>
 <LI><A HREF="#10_8_5">See Also</A></LI>
 </UL>
-<LI><A HREF="#cupsFreeDests">cupsFreeDests()</A></LI>
+</LI>
+<LI><A HREF="#cupsFreeDests">cupsFreeDests()</A>
 <UL>
 <LI><A HREF="#10_9_1">Usage</A></LI>
 <LI><A HREF="#10_9_2">Arguments</A></LI>
@@ -303,7 +332,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_9_4">Example</A></LI>
 <LI><A HREF="#10_9_5">See Also</A></LI>
 </UL>
-<LI><A HREF="#cupsFreeJobs">cupsFreeJobs()</A></LI>
+</LI>
+<LI><A HREF="#cupsFreeJobs">cupsFreeJobs()</A>
 <UL>
 <LI><A HREF="#10_10_1">Usage</A></LI>
 <LI><A HREF="#10_10_2">Arguments</A></LI>
@@ -311,7 +341,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_10_4">Example</A></LI>
 <LI><A HREF="#10_10_5">See Also</A></LI>
 </UL>
-<LI><A HREF="#cupsFreeOptions">cupsFreeOptions()</A></LI>
+</LI>
+<LI><A HREF="#cupsFreeOptions">cupsFreeOptions()</A>
 <UL>
 <LI><A HREF="#10_11_1">Usage</A></LI>
 <LI><A HREF="#10_11_2">Arguments</A></LI>
@@ -319,7 +350,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_11_4">Example</A></LI>
 <LI><A HREF="#10_11_5">See Also</A></LI>
 </UL>
-<LI><A HREF="#cupsGetClasses">cupsGetClasses()</A></LI>
+</LI>
+<LI><A HREF="#cupsGetClasses">cupsGetClasses()</A>
 <UL>
 <LI><A HREF="#10_12_1">Usage</A></LI>
 <LI><A HREF="#10_12_2">Arguments</A></LI>
@@ -328,7 +360,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_12_5">Example</A></LI>
 <LI><A HREF="#10_12_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#cupsGetDefault">cupsGetDefault()</A></LI>
+</LI>
+<LI><A HREF="#cupsGetDefault">cupsGetDefault()</A>
 <UL>
 <LI><A HREF="#10_13_1">Usage</A></LI>
 <LI><A HREF="#10_13_2">Returns</A></LI>
@@ -336,7 +369,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_13_4">Example</A></LI>
 <LI><A HREF="#10_13_5">See Also</A></LI>
 </UL>
-<LI><A HREF="#cupsGetDest">cupsGetDest()</A></LI>
+</LI>
+<LI><A HREF="#cupsGetDest">cupsGetDest()</A>
 <UL>
 <LI><A HREF="#10_14_1">Usage</A></LI>
 <LI><A HREF="#10_14_2">Arguments</A></LI>
@@ -345,7 +379,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_14_5">Example</A></LI>
 <LI><A HREF="#10_14_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#cupsGetDests">cupsGetDests()</A></LI>
+</LI>
+<LI><A HREF="#cupsGetDests">cupsGetDests()</A>
 <UL>
 <LI><A HREF="#10_15_1">Usage</A></LI>
 <LI><A HREF="#10_15_2">Arguments</A></LI>
@@ -354,7 +389,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_15_5">Example</A></LI>
 <LI><A HREF="#10_15_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#cupsGetFd">cupsGetFd()</A></LI>
+</LI>
+<LI><A HREF="#cupsGetFd">cupsGetFd()</A>
 <UL>
 <LI><A HREF="#10_16_1">Usage</A></LI>
 <LI><A HREF="#10_16_2">Arguments</A></LI>
@@ -363,7 +399,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_16_5">Example</A></LI>
 <LI><A HREF="#10_16_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#cupsGetFile">cupsGetFile()</A></LI>
+</LI>
+<LI><A HREF="#cupsGetFile">cupsGetFile()</A>
 <UL>
 <LI><A HREF="#10_17_1">Usage</A></LI>
 <LI><A HREF="#10_17_2">Arguments</A></LI>
@@ -372,7 +409,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_17_5">Example</A></LI>
 <LI><A HREF="#10_17_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#cupsGetJobs">cupsGetJobs()</A></LI>
+</LI>
+<LI><A HREF="#cupsGetJobs">cupsGetJobs()</A>
 <UL>
 <LI><A HREF="#10_18_1">Usage</A></LI>
 <LI><A HREF="#10_18_2">Arguments</A></LI>
@@ -381,7 +419,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_18_5">Example</A></LI>
 <LI><A HREF="#10_18_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#cupsGetOption">cupsGetOption()</A></LI>
+</LI>
+<LI><A HREF="#cupsGetOption">cupsGetOption()</A>
 <UL>
 <LI><A HREF="#10_19_1">Usage</A></LI>
 <LI><A HREF="#10_19_2">Arguments</A></LI>
@@ -389,7 +428,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_19_4">Description</A></LI>
 <LI><A HREF="#10_19_5">See Also</A></LI>
 </UL>
-<LI><A HREF="#cupsGetPassword">cupsGetPassword()</A></LI>
+</LI>
+<LI><A HREF="#cupsGetPassword">cupsGetPassword()</A>
 <UL>
 <LI><A HREF="#10_20_1">Usage</A></LI>
 <LI><A HREF="#10_20_2">Arguments</A></LI>
@@ -398,7 +438,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_20_5">Example</A></LI>
 <LI><A HREF="#10_20_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#cupsGetPPD">cupsGetPPD()</A></LI>
+</LI>
+<LI><A HREF="#cupsGetPPD">cupsGetPPD()</A>
 <UL>
 <LI><A HREF="#10_21_1">Usage</A></LI>
 <LI><A HREF="#10_21_2">Arguments</A></LI>
@@ -406,7 +447,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_21_4">Description</A></LI>
 <LI><A HREF="#10_21_5">Example</A></LI>
 </UL>
-<LI><A HREF="#cupsGetPrinters">cupsGetPrinters()</A></LI>
+</LI>
+<LI><A HREF="#cupsGetPrinters">cupsGetPrinters()</A>
 <UL>
 <LI><A HREF="#10_22_1">Usage</A></LI>
 <LI><A HREF="#10_22_2">Arguments</A></LI>
@@ -415,7 +457,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_22_5">Example</A></LI>
 <LI><A HREF="#10_22_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#cupsLangDefault">cupsLangDefault()</A></LI>
+</LI>
+<LI><A HREF="#cupsLangDefault">cupsLangDefault()</A>
 <UL>
 <LI><A HREF="#10_23_1">Usage</A></LI>
 <LI><A HREF="#10_23_2">Returns</A></LI>
@@ -423,7 +466,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_23_4">Example</A></LI>
 <LI><A HREF="#10_23_5">See Also</A></LI>
 </UL>
-<LI><A HREF="#cupsLangEncoding">cupsLangEncoding()</A></LI>
+</LI>
+<LI><A HREF="#cupsLangEncoding">cupsLangEncoding()</A>
 <UL>
 <LI><A HREF="#10_24_1">Usage</A></LI>
 <LI><A HREF="#10_24_2">Arguments</A></LI>
@@ -432,14 +476,16 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_24_5">Example</A></LI>
 <LI><A HREF="#10_24_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#cupsLangFlush">cupsLangFlush()</A></LI>
+</LI>
+<LI><A HREF="#cupsLangFlush">cupsLangFlush()</A>
 <UL>
 <LI><A HREF="#10_25_1">Usage</A></LI>
 <LI><A HREF="#10_25_2">Description</A></LI>
 <LI><A HREF="#10_25_3">Example</A></LI>
 <LI><A HREF="#10_25_4">See Also</A></LI>
 </UL>
-<LI><A HREF="#cupsLangFree">cupsLangFree()</A></LI>
+</LI>
+<LI><A HREF="#cupsLangFree">cupsLangFree()</A>
 <UL>
 <LI><A HREF="#10_26_1">Usage</A></LI>
 <LI><A HREF="#10_26_2">Arguments</A></LI>
@@ -447,7 +493,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_26_4">Example</A></LI>
 <LI><A HREF="#10_26_5">See Also</A></LI>
 </UL>
-<LI><A HREF="#cupsLangGet">cupsLangGet()</A></LI>
+</LI>
+<LI><A HREF="#cupsLangGet">cupsLangGet()</A>
 <UL>
 <LI><A HREF="#10_27_1">Usage</A></LI>
 <LI><A HREF="#10_27_2">Arguments</A></LI>
@@ -456,7 +503,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_27_5">Example</A></LI>
 <LI><A HREF="#10_27_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#cupsLangString">cupsLangString()</A></LI>
+</LI>
+<LI><A HREF="#cupsLangString">cupsLangString()</A>
 <UL>
 <LI><A HREF="#10_28_1">Usage</A></LI>
 <LI><A HREF="#10_28_2">Arguments</A></LI>
@@ -465,7 +513,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_28_5">Example</A></LI>
 <LI><A HREF="#10_28_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#cupsLastError">cupsLastError()</A></LI>
+</LI>
+<LI><A HREF="#cupsLastError">cupsLastError()</A>
 <UL>
 <LI><A HREF="#10_29_1">Usage</A></LI>
 <LI><A HREF="#10_29_2">Returns</A></LI>
@@ -473,7 +522,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_29_4">Example</A></LI>
 <LI><A HREF="#10_29_5">See Also</A></LI>
 </UL>
-<LI><A HREF="#cupsMarkOptions">cupsMarkOptions()</A></LI>
+</LI>
+<LI><A HREF="#cupsMarkOptions">cupsMarkOptions()</A>
 <UL>
 <LI><A HREF="#10_30_1">Usage</A></LI>
 <LI><A HREF="#10_30_2">Arguments</A></LI>
@@ -482,7 +532,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_30_5">Example</A></LI>
 <LI><A HREF="#10_30_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#cupsParseOptions">cupsParseOptions()</A></LI>
+</LI>
+<LI><A HREF="#cupsParseOptions">cupsParseOptions()</A>
 <UL>
 <LI><A HREF="#10_31_1">Usage</A></LI>
 <LI><A HREF="#10_31_2">Arguments</A></LI>
@@ -491,7 +542,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_31_5">Example</A></LI>
 <LI><A HREF="#10_31_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#cupsPrintFile">cupsPrintFile()</A></LI>
+</LI>
+<LI><A HREF="#cupsPrintFile">cupsPrintFile()</A>
 <UL>
 <LI><A HREF="#10_32_1">Usage</A></LI>
 <LI><A HREF="#10_32_2">Arguments</A></LI>
@@ -500,7 +552,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_32_5">Example</A></LI>
 <LI><A HREF="#10_32_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#cupsPrintFiles">cupsPrintFiles()</A></LI>
+</LI>
+<LI><A HREF="#cupsPrintFiles">cupsPrintFiles()</A>
 <UL>
 <LI><A HREF="#10_33_1">Usage</A></LI>
 <LI><A HREF="#10_33_2">Arguments</A></LI>
@@ -509,7 +562,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_33_5">Example</A></LI>
 <LI><A HREF="#10_33_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#cupsPutFd">cupsPutFd()</A></LI>
+</LI>
+<LI><A HREF="#cupsPutFd">cupsPutFd()</A>
 <UL>
 <LI><A HREF="#10_34_1">Usage</A></LI>
 <LI><A HREF="#10_34_2">Arguments</A></LI>
@@ -518,7 +572,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_34_5">Example</A></LI>
 <LI><A HREF="#10_34_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#cupsPutFile">cupsPutFile()</A></LI>
+</LI>
+<LI><A HREF="#cupsPutFile">cupsPutFile()</A>
 <UL>
 <LI><A HREF="#10_35_1">Usage</A></LI>
 <LI><A HREF="#10_35_2">Arguments</A></LI>
@@ -527,7 +582,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_35_5">Example</A></LI>
 <LI><A HREF="#10_35_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#cupsRasterClose">cupsRasterClose()</A></LI>
+</LI>
+<LI><A HREF="#cupsRasterClose">cupsRasterClose()</A>
 <UL>
 <LI><A HREF="#10_36_1">Usage</A></LI>
 <LI><A HREF="#10_36_2">Arguments</A></LI>
@@ -535,7 +591,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_36_4">Example</A></LI>
 <LI><A HREF="#10_36_5">See Also</A></LI>
 </UL>
-<LI><A HREF="#cupsRasterOpen">cupsRasterOpen()</A></LI>
+</LI>
+<LI><A HREF="#cupsRasterOpen">cupsRasterOpen()</A>
 <UL>
 <LI><A HREF="#10_37_1">Usage</A></LI>
 <LI><A HREF="#10_37_2">Arguments</A></LI>
@@ -544,7 +601,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_37_5">Example</A></LI>
 <LI><A HREF="#10_37_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#cupsRasterReadHeader">cupsRasterReadHeader()</A></LI>
+</LI>
+<LI><A HREF="#cupsRasterReadHeader">cupsRasterReadHeader()</A>
 <UL>
 <LI><A HREF="#10_38_1">Usage</A></LI>
 <LI><A HREF="#10_38_2">Arguments</A></LI>
@@ -553,7 +611,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_38_5">Example</A></LI>
 <LI><A HREF="#10_38_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#cupsRasterReadPixels">cupsRasterReadPixels()</A></LI>
+</LI>
+<LI><A HREF="#cupsRasterReadPixels">cupsRasterReadPixels()</A>
 <UL>
 <LI><A HREF="#10_39_1">Usage</A></LI>
 <LI><A HREF="#10_39_2">Arguments</A></LI>
@@ -562,7 +621,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_39_5">Example</A></LI>
 <LI><A HREF="#10_39_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#cupsRasterWriteHeader">cupsRasterWriteHeader()</A></LI>
+</LI>
+<LI><A HREF="#cupsRasterWriteHeader">cupsRasterWriteHeader()</A>
 <UL>
 <LI><A HREF="#10_40_1">Usage</A></LI>
 <LI><A HREF="#10_40_2">Arguments</A></LI>
@@ -571,7 +631,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_40_5">Example</A></LI>
 <LI><A HREF="#10_40_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#cupsRasterWritePixels">cupsRasterWritePixels()</A></LI>
+</LI>
+<LI><A HREF="#cupsRasterWritePixels">cupsRasterWritePixels()</A>
 <UL>
 <LI><A HREF="#10_41_1">Usage</A></LI>
 <LI><A HREF="#10_41_2">Arguments</A></LI>
@@ -580,7 +641,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_41_5">Example</A></LI>
 <LI><A HREF="#10_41_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#cupsServer">cupsServer()</A></LI>
+</LI>
+<LI><A HREF="#cupsServer">cupsServer()</A>
 <UL>
 <LI><A HREF="#10_42_1">Usage</A></LI>
 <LI><A HREF="#10_42_2">Returns</A></LI>
@@ -588,7 +650,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_42_4">Example</A></LI>
 <LI><A HREF="#10_42_5">See Also</A></LI>
 </UL>
-<LI><A HREF="#cupsSetDests">cupsSetDests()</A></LI>
+</LI>
+<LI><A HREF="#cupsSetDests">cupsSetDests()</A>
 <UL>
 <LI><A HREF="#10_43_1">Usage</A></LI>
 <LI><A HREF="#10_43_2">Arguments</A></LI>
@@ -596,7 +659,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_43_4">Example</A></LI>
 <LI><A HREF="#10_43_5">See Also</A></LI>
 </UL>
-<LI><A HREF="#cupsSetEncryption">cupsSetEncryption()</A></LI>
+</LI>
+<LI><A HREF="#cupsSetEncryption">cupsSetEncryption()</A>
 <UL>
 <LI><A HREF="#10_44_1">Usage</A></LI>
 <LI><A HREF="#10_44_2">Arguments</A></LI>
@@ -604,7 +668,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_44_4">Example</A></LI>
 <LI><A HREF="#10_44_5">See Also</A></LI>
 </UL>
-<LI><A HREF="#cupsSetPasswordCB">cupsSetPasswordCB()</A></LI>
+</LI>
+<LI><A HREF="#cupsSetPasswordCB">cupsSetPasswordCB()</A>
 <UL>
 <LI><A HREF="#10_45_1">Usage</A></LI>
 <LI><A HREF="#10_45_2">Arguments</A></LI>
@@ -612,7 +677,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_45_4">Example</A></LI>
 <LI><A HREF="#10_45_5">See Also</A></LI>
 </UL>
-<LI><A HREF="#cupsSetServer">cupsSetServer()</A></LI>
+</LI>
+<LI><A HREF="#cupsSetServer">cupsSetServer()</A>
 <UL>
 <LI><A HREF="#10_46_1">Usage</A></LI>
 <LI><A HREF="#10_46_2">Arguments</A></LI>
@@ -620,7 +686,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_46_4">Example</A></LI>
 <LI><A HREF="#10_46_5">See Also</A></LI>
 </UL>
-<LI><A HREF="#cupsSetUser">cupsSetUser()</A></LI>
+</LI>
+<LI><A HREF="#cupsSetUser">cupsSetUser()</A>
 <UL>
 <LI><A HREF="#10_47_1">Usage</A></LI>
 <LI><A HREF="#10_47_2">Arguments</A></LI>
@@ -628,7 +695,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_47_4">Example</A></LI>
 <LI><A HREF="#10_47_5">See Also</A></LI>
 </UL>
-<LI><A HREF="#cupsTempFd">cupsTempFd()</A></LI>
+</LI>
+<LI><A HREF="#cupsTempFd">cupsTempFd()</A>
 <UL>
 <LI><A HREF="#10_48_1">Usage</A></LI>
 <LI><A HREF="#10_48_2">Arguments</A></LI>
@@ -637,7 +705,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_48_5">Example</A></LI>
 <LI><A HREF="#10_48_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#cupsTempFile">cupsTempFile()</A></LI>
+</LI>
+<LI><A HREF="#cupsTempFile">cupsTempFile()</A>
 <UL>
 <LI><A HREF="#10_49_1">Usage</A></LI>
 <LI><A HREF="#10_49_2">Arguments</A></LI>
@@ -646,7 +715,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_49_5">Example</A></LI>
 <LI><A HREF="#10_49_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#cupsUser">cupsUser()</A></LI>
+</LI>
+<LI><A HREF="#cupsUser">cupsUser()</A>
 <UL>
 <LI><A HREF="#10_50_1">Usage</A></LI>
 <LI><A HREF="#10_50_2">Returns</A></LI>
@@ -654,7 +724,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_50_4">Example</A></LI>
 <LI><A HREF="#10_50_5">See Also</A></LI>
 </UL>
-<LI><A HREF="#httpBlocking">httpBlocking()</A></LI>
+</LI>
+<LI><A HREF="#httpBlocking">httpBlocking()</A>
 <UL>
 <LI><A HREF="#10_51_1">Usage</A></LI>
 <LI><A HREF="#10_51_2">Arguments</A></LI>
@@ -662,7 +733,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_51_4">Example</A></LI>
 <LI><A HREF="#10_51_5">See Also</A></LI>
 </UL>
-<LI><A HREF="#httpCheck">httpCheck()</A></LI>
+</LI>
+<LI><A HREF="#httpCheck">httpCheck()</A>
 <UL>
 <LI><A HREF="#10_52_1">Usage</A></LI>
 <LI><A HREF="#10_52_2">Arguments</A></LI>
@@ -671,7 +743,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_52_5">Example</A></LI>
 <LI><A HREF="#10_52_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#httpClearFields">httpClearFields()</A></LI>
+</LI>
+<LI><A HREF="#httpClearFields">httpClearFields()</A>
 <UL>
 <LI><A HREF="#10_53_1">Usage</A></LI>
 <LI><A HREF="#10_53_2">Arguments</A></LI>
@@ -679,7 +752,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_53_4">Example</A></LI>
 <LI><A HREF="#10_53_5">See Also</A></LI>
 </UL>
-<LI><A HREF="#httpClose">httpClose()</A></LI>
+</LI>
+<LI><A HREF="#httpClose">httpClose()</A>
 <UL>
 <LI><A HREF="#10_54_1">Usage</A></LI>
 <LI><A HREF="#10_54_2">Arguments</A></LI>
@@ -687,7 +761,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_54_4">Example</A></LI>
 <LI><A HREF="#10_54_5">See Also</A></LI>
 </UL>
-<LI><A HREF="#httpConnect">httpConnect()</A></LI>
+</LI>
+<LI><A HREF="#httpConnect">httpConnect()</A>
 <UL>
 <LI><A HREF="#10_55_1">Usage</A></LI>
 <LI><A HREF="#10_55_2">Arguments</A></LI>
@@ -696,7 +771,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_55_5">Example</A></LI>
 <LI><A HREF="#10_55_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#httpConnectEncrypt">httpConnectEncrypt()</A></LI>
+</LI>
+<LI><A HREF="#httpConnectEncrypt">httpConnectEncrypt()</A>
 <UL>
 <LI><A HREF="#10_56_1">Usage</A></LI>
 <LI><A HREF="#10_56_2">Arguments</A></LI>
@@ -705,7 +781,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_56_5">Example</A></LI>
 <LI><A HREF="#10_56_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#httpDecode64">httpDecode64()</A></LI>
+</LI>
+<LI><A HREF="#httpDecode64">httpDecode64()</A>
 <UL>
 <LI><A HREF="#10_57_1">Usage</A></LI>
 <LI><A HREF="#10_57_2">Arguments</A></LI>
@@ -714,7 +791,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_57_5">Example</A></LI>
 <LI><A HREF="#10_57_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#httpDelete">httpDelete()</A></LI>
+</LI>
+<LI><A HREF="#httpDelete">httpDelete()</A>
 <UL>
 <LI><A HREF="#10_58_1">Usage</A></LI>
 <LI><A HREF="#10_58_2">Arguments</A></LI>
@@ -723,7 +801,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_58_5">Example</A></LI>
 <LI><A HREF="#10_58_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#httpEncode64">httpEncode64()</A></LI>
+</LI>
+<LI><A HREF="#httpEncode64">httpEncode64()</A>
 <UL>
 <LI><A HREF="#10_59_1">Usage</A></LI>
 <LI><A HREF="#10_59_2">Arguments</A></LI>
@@ -732,7 +811,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_59_5">Example</A></LI>
 <LI><A HREF="#10_59_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#httpEncryption">httpEncryption()</A></LI>
+</LI>
+<LI><A HREF="#httpEncryption">httpEncryption()</A>
 <UL>
 <LI><A HREF="#10_60_1">Usage</A></LI>
 <LI><A HREF="#10_60_2">Arguments</A></LI>
@@ -741,7 +821,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_60_5">Example</A></LI>
 <LI><A HREF="#10_60_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#httpError">httpError()</A></LI>
+</LI>
+<LI><A HREF="#httpError">httpError()</A>
 <UL>
 <LI><A HREF="#10_61_1">Usage</A></LI>
 <LI><A HREF="#10_61_2">Arguments</A></LI>
@@ -750,7 +831,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_61_5">Example</A></LI>
 <LI><A HREF="#10_61_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#httpFlush">httpFlush()</A></LI>
+</LI>
+<LI><A HREF="#httpFlush">httpFlush()</A>
 <UL>
 <LI><A HREF="#10_62_1">Usage</A></LI>
 <LI><A HREF="#10_62_2">Arguments</A></LI>
@@ -758,7 +840,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_62_4">Example</A></LI>
 <LI><A HREF="#10_62_5">See Also</A></LI>
 </UL>
-<LI><A HREF="#httpGet">httpGet()</A></LI>
+</LI>
+<LI><A HREF="#httpGet">httpGet()</A>
 <UL>
 <LI><A HREF="#10_63_1">Usage</A></LI>
 <LI><A HREF="#10_63_2">Arguments</A></LI>
@@ -767,7 +850,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_63_5">Example</A></LI>
 <LI><A HREF="#10_63_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#httpGets">httpGets()</A></LI>
+</LI>
+<LI><A HREF="#httpGets">httpGets()</A>
 <UL>
 <LI><A HREF="#10_64_1">Usage</A></LI>
 <LI><A HREF="#10_64_2">Arguments</A></LI>
@@ -776,7 +860,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_64_5">Example</A></LI>
 <LI><A HREF="#10_64_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#httpGetDateString">httpGetDateString()</A></LI>
+</LI>
+<LI><A HREF="#httpGetDateString">httpGetDateString()</A>
 <UL>
 <LI><A HREF="#10_65_1">Usage</A></LI>
 <LI><A HREF="#10_65_2">Arguments</A></LI>
@@ -785,7 +870,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_65_5">Example</A></LI>
 <LI><A HREF="#10_65_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#httpGetDateTime">httpGetDateTime()</A></LI>
+</LI>
+<LI><A HREF="#httpGetDateTime">httpGetDateTime()</A>
 <UL>
 <LI><A HREF="#10_66_1">Usage</A></LI>
 <LI><A HREF="#10_66_2">Arguments</A></LI>
@@ -794,7 +880,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_66_5">Example</A></LI>
 <LI><A HREF="#10_66_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#httpGetField">httpGetField()</A></LI>
+</LI>
+<LI><A HREF="#httpGetField">httpGetField()</A>
 <UL>
 <LI><A HREF="#10_67_1">Usage</A></LI>
 <LI><A HREF="#10_67_2">Arguments</A></LI>
@@ -803,7 +890,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_67_5">Example</A></LI>
 <LI><A HREF="#10_67_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#httpGetHostByName">httpGetHostByName()</A></LI>
+</LI>
+<LI><A HREF="#httpGetHostByName">httpGetHostByName()</A>
 <UL>
 <LI><A HREF="#10_68_1">Usage</A></LI>
 <LI><A HREF="#10_68_2">Arguments</A></LI>
@@ -811,7 +899,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_68_4">Description</A></LI>
 <LI><A HREF="#10_68_5">Example</A></LI>
 </UL>
-<LI><A HREF="#httpGetLength">httpGetLength()</A></LI>
+</LI>
+<LI><A HREF="#httpGetLength">httpGetLength()</A>
 <UL>
 <LI><A HREF="#10_69_1">Usage</A></LI>
 <LI><A HREF="#10_69_2">Arguments</A></LI>
@@ -820,7 +909,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_69_5">Example</A></LI>
 <LI><A HREF="#10_69_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#httpGetSubField">httpGetSubField()</A></LI>
+</LI>
+<LI><A HREF="#httpGetSubField">httpGetSubField()</A>
 <UL>
 <LI><A HREF="#10_70_1">Usage</A></LI>
 <LI><A HREF="#10_70_2">Arguments</A></LI>
@@ -829,7 +919,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_70_5">Example</A></LI>
 <LI><A HREF="#10_70_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#httpHead">httpHead()</A></LI>
+</LI>
+<LI><A HREF="#httpHead">httpHead()</A>
 <UL>
 <LI><A HREF="#10_71_1">Usage</A></LI>
 <LI><A HREF="#10_71_2">Arguments</A></LI>
@@ -838,14 +929,16 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_71_5">Example</A></LI>
 <LI><A HREF="#10_71_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#httpInitialize">httpInitialize()</A></LI>
+</LI>
+<LI><A HREF="#httpInitialize">httpInitialize()</A>
 <UL>
 <LI><A HREF="#10_72_1">Usage</A></LI>
 <LI><A HREF="#10_72_2">Description</A></LI>
 <LI><A HREF="#10_72_3">Example</A></LI>
 <LI><A HREF="#10_72_4">See Also</A></LI>
 </UL>
-<LI><A HREF="#httpMD5">httpMD5()</A></LI>
+</LI>
+<LI><A HREF="#httpMD5">httpMD5()</A>
 <UL>
 <LI><A HREF="#10_73_1">Usage</A></LI>
 <LI><A HREF="#10_73_2">Arguments</A></LI>
@@ -854,7 +947,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_73_5">Example</A></LI>
 <LI><A HREF="#10_73_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#httpMD5Final">httpMD5Final()</A></LI>
+</LI>
+<LI><A HREF="#httpMD5Final">httpMD5Final()</A>
 <UL>
 <LI><A HREF="#10_74_1">Usage</A></LI>
 <LI><A HREF="#10_74_2">Arguments</A></LI>
@@ -863,7 +957,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_74_5">Example</A></LI>
 <LI><A HREF="#10_74_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#httpMD5String">httpMD5String()</A></LI>
+</LI>
+<LI><A HREF="#httpMD5String">httpMD5String()</A>
 <UL>
 <LI><A HREF="#10_75_1">Usage</A></LI>
 <LI><A HREF="#10_75_2">Arguments</A></LI>
@@ -872,7 +967,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_75_5">Example</A></LI>
 <LI><A HREF="#10_75_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#httpOptions">httpOptions()</A></LI>
+</LI>
+<LI><A HREF="#httpOptions">httpOptions()</A>
 <UL>
 <LI><A HREF="#10_76_1">Usage</A></LI>
 <LI><A HREF="#10_76_2">Arguments</A></LI>
@@ -881,7 +977,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_76_5">Example</A></LI>
 <LI><A HREF="#10_76_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#httpPost">httpPost()</A></LI>
+</LI>
+<LI><A HREF="#httpPost">httpPost()</A>
 <UL>
 <LI><A HREF="#10_77_1">Usage</A></LI>
 <LI><A HREF="#10_77_2">Arguments</A></LI>
@@ -890,7 +987,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_77_5">Example</A></LI>
 <LI><A HREF="#10_77_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#httpPrintf">httpPrintf()</A></LI>
+</LI>
+<LI><A HREF="#httpPrintf">httpPrintf()</A>
 <UL>
 <LI><A HREF="#10_78_1">Usage</A></LI>
 <LI><A HREF="#10_78_2">Arguments</A></LI>
@@ -899,7 +997,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_78_5">Example</A></LI>
 <LI><A HREF="#10_78_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#httpPut">httpPut()</A></LI>
+</LI>
+<LI><A HREF="#httpPut">httpPut()</A>
 <UL>
 <LI><A HREF="#10_79_1">Usage</A></LI>
 <LI><A HREF="#10_79_2">Arguments</A></LI>
@@ -908,7 +1007,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_79_5">Example</A></LI>
 <LI><A HREF="#10_79_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#httpRead">httpRead()</A></LI>
+</LI>
+<LI><A HREF="#httpRead">httpRead()</A>
 <UL>
 <LI><A HREF="#10_80_1">Usage</A></LI>
 <LI><A HREF="#10_80_2">Arguments</A></LI>
@@ -917,7 +1017,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_80_5">Example</A></LI>
 <LI><A HREF="#10_80_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#httpReconnect">httpReconnect()</A></LI>
+</LI>
+<LI><A HREF="#httpReconnect">httpReconnect()</A>
 <UL>
 <LI><A HREF="#10_81_1">Usage</A></LI>
 <LI><A HREF="#10_81_2">Arguments</A></LI>
@@ -926,7 +1027,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_81_5">Example</A></LI>
 <LI><A HREF="#10_81_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#httpSeparate">httpSeparate()</A></LI>
+</LI>
+<LI><A HREF="#httpSeparate">httpSeparate()</A>
 <UL>
 <LI><A HREF="#10_82_1">Usage</A></LI>
 <LI><A HREF="#10_82_2">Arguments</A></LI>
@@ -934,7 +1036,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_82_4">Example</A></LI>
 <LI><A HREF="#10_82_5">See Also</A></LI>
 </UL>
-<LI><A HREF="#httpSetField">httpSetField()</A></LI>
+</LI>
+<LI><A HREF="#httpSetField">httpSetField()</A>
 <UL>
 <LI><A HREF="#10_83_1">Usage</A></LI>
 <LI><A HREF="#10_83_2">Arguments</A></LI>
@@ -942,7 +1045,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_83_4">Example</A></LI>
 <LI><A HREF="#10_83_5">See Also</A></LI>
 </UL>
-<LI><A HREF="#httpStatus">httpStatus()</A></LI>
+</LI>
+<LI><A HREF="#httpStatus">httpStatus()</A>
 <UL>
 <LI><A HREF="#10_84_1">Usage</A></LI>
 <LI><A HREF="#10_84_2">Arguments</A></LI>
@@ -950,7 +1054,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_84_4">Description</A></LI>
 <LI><A HREF="#10_84_5">Example</A></LI>
 </UL>
-<LI><A HREF="#httpTrace">httpTrace()</A></LI>
+</LI>
+<LI><A HREF="#httpTrace">httpTrace()</A>
 <UL>
 <LI><A HREF="#10_85_1">Usage</A></LI>
 <LI><A HREF="#10_85_2">Arguments</A></LI>
@@ -959,7 +1064,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_85_5">Example</A></LI>
 <LI><A HREF="#10_85_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#httpUpdate">httpUpdate()</A></LI>
+</LI>
+<LI><A HREF="#httpUpdate">httpUpdate()</A>
 <UL>
 <LI><A HREF="#10_86_1">Usage</A></LI>
 <LI><A HREF="#10_86_2">Arguments</A></LI>
@@ -968,7 +1074,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_86_5">Example</A></LI>
 <LI><A HREF="#10_86_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#httpWrite">httpWrite()</A></LI>
+</LI>
+<LI><A HREF="#httpWrite">httpWrite()</A>
 <UL>
 <LI><A HREF="#10_87_1">Usage</A></LI>
 <LI><A HREF="#10_87_2">Arguments</A></LI>
@@ -977,7 +1084,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_87_5">Example</A></LI>
 <LI><A HREF="#10_87_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#ippAddBoolean">ippAddBoolean()</A></LI>
+</LI>
+<LI><A HREF="#ippAddBoolean">ippAddBoolean()</A>
 <UL>
 <LI><A HREF="#10_88_1">Usage</A></LI>
 <LI><A HREF="#10_88_2">Arguments</A></LI>
@@ -986,7 +1094,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_88_5">Example</A></LI>
 <LI><A HREF="#10_88_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#ippAddBooleans">ippAddBooleans()</A></LI>
+</LI>
+<LI><A HREF="#ippAddBooleans">ippAddBooleans()</A>
 <UL>
 <LI><A HREF="#10_89_1">Usage</A></LI>
 <LI><A HREF="#10_89_2">Arguments</A></LI>
@@ -995,7 +1104,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_89_5">Example</A></LI>
 <LI><A HREF="#10_89_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#ippAddDate">ippAddDate()</A></LI>
+</LI>
+<LI><A HREF="#ippAddDate">ippAddDate()</A>
 <UL>
 <LI><A HREF="#10_90_1">Usage</A></LI>
 <LI><A HREF="#10_90_2">Arguments</A></LI>
@@ -1004,7 +1114,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_90_5">Example</A></LI>
 <LI><A HREF="#10_90_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#ippAddInteger">ippAddInteger()</A></LI>
+</LI>
+<LI><A HREF="#ippAddInteger">ippAddInteger()</A>
 <UL>
 <LI><A HREF="#10_91_1">Usage</A></LI>
 <LI><A HREF="#10_91_2">Arguments</A></LI>
@@ -1013,7 +1124,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_91_5">Example</A></LI>
 <LI><A HREF="#10_91_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#ippAddIntegers">ippAddIntegers()</A></LI>
+</LI>
+<LI><A HREF="#ippAddIntegers">ippAddIntegers()</A>
 <UL>
 <LI><A HREF="#10_92_1">Usage</A></LI>
 <LI><A HREF="#10_92_2">Arguments</A></LI>
@@ -1022,7 +1134,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_92_5">Example</A></LI>
 <LI><A HREF="#10_92_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#ippAddRange">ippAddRange()</A></LI>
+</LI>
+<LI><A HREF="#ippAddRange">ippAddRange()</A>
 <UL>
 <LI><A HREF="#10_93_1">Usage</A></LI>
 <LI><A HREF="#10_93_2">Arguments</A></LI>
@@ -1031,7 +1144,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_93_5">Example</A></LI>
 <LI><A HREF="#10_93_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#ippAddRanges">ippAddRanges()</A></LI>
+</LI>
+<LI><A HREF="#ippAddRanges">ippAddRanges()</A>
 <UL>
 <LI><A HREF="#10_94_1">Usage</A></LI>
 <LI><A HREF="#10_94_2">Arguments</A></LI>
@@ -1040,7 +1154,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_94_5">Example</A></LI>
 <LI><A HREF="#10_94_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#ippAddResolution">ippAddResolution()</A></LI>
+</LI>
+<LI><A HREF="#ippAddResolution">ippAddResolution()</A>
 <UL>
 <LI><A HREF="#10_95_1">Usage</A></LI>
 <LI><A HREF="#10_95_2">Arguments</A></LI>
@@ -1049,7 +1164,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_95_5">Example</A></LI>
 <LI><A HREF="#10_95_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#ippAddResolutions">ippAddResolutions()</A></LI>
+</LI>
+<LI><A HREF="#ippAddResolutions">ippAddResolutions()</A>
 <UL>
 <LI><A HREF="#10_96_1">Usage</A></LI>
 <LI><A HREF="#10_96_2">Arguments</A></LI>
@@ -1058,7 +1174,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_96_5">Example</A></LI>
 <LI><A HREF="#10_96_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#ippAddSeparator">ippAddSeparator()</A></LI>
+</LI>
+<LI><A HREF="#ippAddSeparator">ippAddSeparator()</A>
 <UL>
 <LI><A HREF="#10_97_1">Usage</A></LI>
 <LI><A HREF="#10_97_2">Arguments</A></LI>
@@ -1067,7 +1184,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_97_5">Example</A></LI>
 <LI><A HREF="#10_97_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#ippAddString">ippAddString()</A></LI>
+</LI>
+<LI><A HREF="#ippAddString">ippAddString()</A>
 <UL>
 <LI><A HREF="#10_98_1">Usage</A></LI>
 <LI><A HREF="#10_98_2">Arguments</A></LI>
@@ -1076,7 +1194,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_98_5">Example</A></LI>
 <LI><A HREF="#10_98_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#ippAddStrings">ippAddStrings()</A></LI>
+</LI>
+<LI><A HREF="#ippAddStrings">ippAddStrings()</A>
 <UL>
 <LI><A HREF="#10_99_1">Usage</A></LI>
 <LI><A HREF="#10_99_2">Arguments</A></LI>
@@ -1085,7 +1204,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_99_5">Example</A></LI>
 <LI><A HREF="#10_99_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#ippDateToTime">ippDateToTime()</A></LI>
+</LI>
+<LI><A HREF="#ippDateToTime">ippDateToTime()</A>
 <UL>
 <LI><A HREF="#10_100_1">Usage</A></LI>
 <LI><A HREF="#10_100_2">Arguments</A></LI>
@@ -1094,7 +1214,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_100_5">Example</A></LI>
 <LI><A HREF="#10_100_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#ippDelete">ippDelete()</A></LI>
+</LI>
+<LI><A HREF="#ippDelete">ippDelete()</A>
 <UL>
 <LI><A HREF="#10_101_1">Usage</A></LI>
 <LI><A HREF="#10_101_2">Arguments</A></LI>
@@ -1102,7 +1223,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_101_4">Example</A></LI>
 <LI><A HREF="#10_101_5">See Also</A></LI>
 </UL>
-<LI><A HREF="#ippErrorString">ippErrorString()</A></LI>
+</LI>
+<LI><A HREF="#ippErrorString">ippErrorString()</A>
 <UL>
 <LI><A HREF="#10_102_1">Usage</A></LI>
 <LI><A HREF="#10_102_2">Arguments</A></LI>
@@ -1111,7 +1233,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_102_5">Example</A></LI>
 <LI><A HREF="#10_102_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#ippFindAttribute">ippFindAttribute()</A></LI>
+</LI>
+<LI><A HREF="#ippFindAttribute">ippFindAttribute()</A>
 <UL>
 <LI><A HREF="#10_103_1">Usage</A></LI>
 <LI><A HREF="#10_103_2">Arguments</A></LI>
@@ -1120,7 +1243,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_103_5">Example</A></LI>
 <LI><A HREF="#10_103_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#ippFindNextAttribute">ippFindNextAttribute()</A></LI>
+</LI>
+<LI><A HREF="#ippFindNextAttribute">ippFindNextAttribute()</A>
 <UL>
 <LI><A HREF="#10_104_1">Usage</A></LI>
 <LI><A HREF="#10_104_2">Arguments</A></LI>
@@ -1129,7 +1253,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_104_5">Example</A></LI>
 <LI><A HREF="#10_104_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#ippLength">ippLength()</A></LI>
+</LI>
+<LI><A HREF="#ippLength">ippLength()</A>
 <UL>
 <LI><A HREF="#10_105_1">Usage</A></LI>
 <LI><A HREF="#10_105_2">Arguments</A></LI>
@@ -1138,7 +1263,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_105_5">Example</A></LI>
 <LI><A HREF="#10_105_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#ippNew">ippNew()</A></LI>
+</LI>
+<LI><A HREF="#ippNew">ippNew()</A>
 <UL>
 <LI><A HREF="#10_106_1">Usage</A></LI>
 <LI><A HREF="#10_106_2">Returns</A></LI>
@@ -1146,7 +1272,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_106_4">Example</A></LI>
 <LI><A HREF="#10_106_5">See Also</A></LI>
 </UL>
-<LI><A HREF="#ippPort">ippPort()</A></LI>
+</LI>
+<LI><A HREF="#ippPort">ippPort()</A>
 <UL>
 <LI><A HREF="#10_107_1">Usage</A></LI>
 <LI><A HREF="#10_107_2">Returns</A></LI>
@@ -1154,7 +1281,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_107_4">Example</A></LI>
 <LI><A HREF="#10_107_5">See Also</A></LI>
 </UL>
-<LI><A HREF="#ippRead">ippRead()</A></LI>
+</LI>
+<LI><A HREF="#ippRead">ippRead()</A>
 <UL>
 <LI><A HREF="#10_108_1">Usage</A></LI>
 <LI><A HREF="#10_108_2">Arguments</A></LI>
@@ -1163,7 +1291,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_108_5">Example</A></LI>
 <LI><A HREF="#10_108_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#ippSetPort">ippSetPort()</A></LI>
+</LI>
+<LI><A HREF="#ippSetPort">ippSetPort()</A>
 <UL>
 <LI><A HREF="#10_109_1">Usage</A></LI>
 <LI><A HREF="#10_109_2">Arguments</A></LI>
@@ -1171,7 +1300,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_109_4">Example</A></LI>
 <LI><A HREF="#10_109_5">See Also</A></LI>
 </UL>
-<LI><A HREF="#ippTimeToDate">ippTimeToDate()</A></LI>
+</LI>
+<LI><A HREF="#ippTimeToDate">ippTimeToDate()</A>
 <UL>
 <LI><A HREF="#10_110_1">Usage</A></LI>
 <LI><A HREF="#10_110_2">Arguments</A></LI>
@@ -1180,7 +1310,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_110_5">Example</A></LI>
 <LI><A HREF="#10_110_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#ippWrite">ippWrite()</A></LI>
+</LI>
+<LI><A HREF="#ippWrite">ippWrite()</A>
 <UL>
 <LI><A HREF="#10_111_1">Usage</A></LI>
 <LI><A HREF="#10_111_2">Arguments</A></LI>
@@ -1189,7 +1320,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_111_5">Example</A></LI>
 <LI><A HREF="#10_111_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#ppdClose">ppdClose()</A></LI>
+</LI>
+<LI><A HREF="#ppdClose">ppdClose()</A>
 <UL>
 <LI><A HREF="#10_112_1">Usage</A></LI>
 <LI><A HREF="#10_112_2">Arguments</A></LI>
@@ -1197,7 +1329,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_112_4">Example</A></LI>
 <LI><A HREF="#10_112_5">See Also</A></LI>
 </UL>
-<LI><A HREF="#ppdCollect">ppdCollect()</A></LI>
+</LI>
+<LI><A HREF="#ppdCollect">ppdCollect()</A>
 <UL>
 <LI><A HREF="#10_113_1">Usage</A></LI>
 <LI><A HREF="#10_113_2">Arguments</A></LI>
@@ -1206,7 +1339,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_113_5">Example</A></LI>
 <LI><A HREF="#10_113_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#ppdConflicts">ppdConflicts()</A></LI>
+</LI>
+<LI><A HREF="#ppdConflicts">ppdConflicts()</A>
 <UL>
 <LI><A HREF="#10_114_1">Usage</A></LI>
 <LI><A HREF="#10_114_2">Arguments</A></LI>
@@ -1215,7 +1349,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_114_5">Example</A></LI>
 <LI><A HREF="#10_114_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#ppdEmit">ppdEmit()</A></LI>
+</LI>
+<LI><A HREF="#ppdEmit">ppdEmit()</A>
 <UL>
 <LI><A HREF="#10_115_1">Usage</A></LI>
 <LI><A HREF="#10_115_2">Arguments</A></LI>
@@ -1224,7 +1359,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_115_5">Example</A></LI>
 <LI><A HREF="#10_115_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#ppdEmitFd">ppdEmitFd()</A></LI>
+</LI>
+<LI><A HREF="#ppdEmitFd">ppdEmitFd()</A>
 <UL>
 <LI><A HREF="#10_116_1">Usage</A></LI>
 <LI><A HREF="#10_116_2">Arguments</A></LI>
@@ -1233,7 +1369,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_116_5">Example</A></LI>
 <LI><A HREF="#10_116_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#ppdEmitJCL">ppdEmitJCL()</A></LI>
+</LI>
+<LI><A HREF="#ppdEmitJCL">ppdEmitJCL()</A>
 <UL>
 <LI><A HREF="#10_117_1">Usage</A></LI>
 <LI><A HREF="#10_117_2">Arguments</A></LI>
@@ -1242,7 +1379,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_117_5">Example</A></LI>
 <LI><A HREF="#10_117_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#ppdFindAttr">ppdFindAttr()</A></LI>
+</LI>
+<LI><A HREF="#ppdFindAttr">ppdFindAttr()</A>
 <UL>
 <LI><A HREF="#10_118_1">Usage</A></LI>
 <LI><A HREF="#10_118_2">Arguments</A></LI>
@@ -1251,7 +1389,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_118_5">Example</A></LI>
 <LI><A HREF="#10_118_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#ppdFindChoice">ppdFindChoice()</A></LI>
+</LI>
+<LI><A HREF="#ppdFindChoice">ppdFindChoice()</A>
 <UL>
 <LI><A HREF="#10_119_1">Usage</A></LI>
 <LI><A HREF="#10_119_2">Arguments</A></LI>
@@ -1260,7 +1399,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_119_5">Example</A></LI>
 <LI><A HREF="#10_119_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#ppdFindMarkedChoice">ppdFindMarkedChoice()</A></LI>
+</LI>
+<LI><A HREF="#ppdFindMarkedChoice">ppdFindMarkedChoice()</A>
 <UL>
 <LI><A HREF="#10_120_1">Usage</A></LI>
 <LI><A HREF="#10_120_2">Arguments</A></LI>
@@ -1269,7 +1409,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_120_5">Example</A></LI>
 <LI><A HREF="#10_120_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#ppdFindNextAttr">ppdFindNextAttr()</A></LI>
+</LI>
+<LI><A HREF="#ppdFindNextAttr">ppdFindNextAttr()</A>
 <UL>
 <LI><A HREF="#10_121_1">Usage</A></LI>
 <LI><A HREF="#10_121_2">Arguments</A></LI>
@@ -1278,7 +1419,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_121_5">Example</A></LI>
 <LI><A HREF="#10_121_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#ppdFindOption">ppdFindOption()</A></LI>
+</LI>
+<LI><A HREF="#ppdFindOption">ppdFindOption()</A>
 <UL>
 <LI><A HREF="#10_122_1">Usage</A></LI>
 <LI><A HREF="#10_122_2">Arguments</A></LI>
@@ -1287,7 +1429,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_122_5">Example</A></LI>
 <LI><A HREF="#10_122_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#ppdIsMarked">ppdIsMarked()</A></LI>
+</LI>
+<LI><A HREF="#ppdIsMarked">ppdIsMarked()</A>
 <UL>
 <LI><A HREF="#10_123_1">Usage</A></LI>
 <LI><A HREF="#10_123_2">Arguments</A></LI>
@@ -1296,7 +1439,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_123_5">Example</A></LI>
 <LI><A HREF="#10_123_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#ppdMarkDefaults">ppdMarkDefaults()</A></LI>
+</LI>
+<LI><A HREF="#ppdMarkDefaults">ppdMarkDefaults()</A>
 <UL>
 <LI><A HREF="#10_124_1">Usage</A></LI>
 <LI><A HREF="#10_124_2">Arguments</A></LI>
@@ -1304,7 +1448,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_124_4">Example</A></LI>
 <LI><A HREF="#10_124_5">See Also</A></LI>
 </UL>
-<LI><A HREF="#ppdMarkOption">ppdMarkOption()</A></LI>
+</LI>
+<LI><A HREF="#ppdMarkOption">ppdMarkOption()</A>
 <UL>
 <LI><A HREF="#10_125_1">Usage</A></LI>
 <LI><A HREF="#10_125_2">Arguments</A></LI>
@@ -1313,7 +1458,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_125_5">Example</A></LI>
 <LI><A HREF="#10_125_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#ppdOpen">ppdOpen()</A></LI>
+</LI>
+<LI><A HREF="#ppdOpen">ppdOpen()</A>
 <UL>
 <LI><A HREF="#10_126_1">Usage</A></LI>
 <LI><A HREF="#10_126_2">Arguments</A></LI>
@@ -1322,7 +1468,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_126_5">Example</A></LI>
 <LI><A HREF="#10_126_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#ppdOpenFd">ppdOpenFd()</A></LI>
+</LI>
+<LI><A HREF="#ppdOpenFd">ppdOpenFd()</A>
 <UL>
 <LI><A HREF="#10_127_1">Usage</A></LI>
 <LI><A HREF="#10_127_2">Arguments</A></LI>
@@ -1331,7 +1478,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_127_5">Example</A></LI>
 <LI><A HREF="#10_127_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#ppdOpenFile">ppdOpenFile()</A></LI>
+</LI>
+<LI><A HREF="#ppdOpenFile">ppdOpenFile()</A>
 <UL>
 <LI><A HREF="#10_128_1">Usage</A></LI>
 <LI><A HREF="#10_128_2">Arguments</A></LI>
@@ -1340,7 +1488,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_128_5">Example</A></LI>
 <LI><A HREF="#10_128_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#ppdPageLength">ppdPageLength()</A></LI>
+</LI>
+<LI><A HREF="#ppdPageLength">ppdPageLength()</A>
 <UL>
 <LI><A HREF="#10_129_1">Usage</A></LI>
 <LI><A HREF="#10_129_2">Arguments</A></LI>
@@ -1349,7 +1498,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_129_5">Example</A></LI>
 <LI><A HREF="#10_129_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#ppdPageSize">ppdPageSize()</A></LI>
+</LI>
+<LI><A HREF="#ppdPageSize">ppdPageSize()</A>
 <UL>
 <LI><A HREF="#10_130_1">Usage</A></LI>
 <LI><A HREF="#10_130_2">Arguments</A></LI>
@@ -1358,7 +1508,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_130_5">Example</A></LI>
 <LI><A HREF="#10_130_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#ppdPageWidth">ppdPageWidth()</A></LI>
+</LI>
+<LI><A HREF="#ppdPageWidth">ppdPageWidth()</A>
 <UL>
 <LI><A HREF="#10_131_1">Usage</A></LI>
 <LI><A HREF="#10_131_2">Arguments</A></LI>
@@ -1367,12 +1518,13 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#10_131_5">Example</A></LI>
 <LI><A HREF="#10_131_6">See Also</A></LI>
 </UL>
+</LI>
 </UL>
-<HR NOSHADE>
+</B><HR NOSHADE>
 <H1 ALIGN="RIGHT"><A NAME="1">Preface</A></H1>
 <P>This software programmers manual provides software programming
  information for the Common UNIX Printing System (&quot;CUPS&quot;) Version
- 1.1.21.</P>
+ 1.1.22.</P>
 <H2><A NAME="1_1">System Overview</A></H2>
 <P>CUPS provides a portable printing layer for UNIX&reg;-based operating
  systems. It has been developed by <A HREF="http://www.easysw.com">Easy

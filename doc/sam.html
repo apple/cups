@@ -4,8 +4,8 @@
 <TITLE>CUPS Software Administrators Manual</TITLE>
 <META NAME="author" CONTENT="Easy Software Products">
 <META NAME="copyright" CONTENT="Copyright 1997-2004, All Rights Reserved">
-<META NAME="docnumber" CONTENT="CUPS-SAM-1.1.21">
-<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-8859-1">
+<META NAME="docnumber" CONTENT="CUPS-SAM-1.1.22">
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
 <STYLE TYPE="text/css"><!--
 BODY { font-family: serif }
 H1 { font-family: sans-serif }
@@ -22,14 +22,14 @@ PRE { font-family: monospace }
 <BODY BGCOLOR="white">
 <CENTER><A HREF="#CONTENTS"><IMG SRC="images/cups-large.gif" BORDER="0" WIDTH="431" HEIGHT="511" ALT="CUPS Software Administrators Manual"><BR>
 <H1>CUPS Software Administrators Manual</H1></A><BR>
-CUPS-SAM-1.1.21<BR>
+CUPS-SAM-1.1.22<BR>
 Easy Software Products<BR>
 Copyright 1997-2004, All Rights Reserved<BR>
 </CENTER>
 <HR NOSHADE>
 <H1 ALIGN="CENTER"><A NAME="CONTENTS">Table of Contents</A></H1>
 <BR>
-<BR><B><A HREF="#1">Preface</A></B>
+<BR><B><A HREF="#1">Preface</A>
 <UL>
 <LI><A HREF="#1_1">System Overview</A></LI>
 <LI><A HREF="#1_2">Document Overview</A></LI>
@@ -37,7 +37,7 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#1_4">Abbreviations</A></LI>
 <LI><A HREF="#1_5">Other References</A></LI>
 </UL>
-<B><A HREF="#OVERVIEW">1 - Printing System Overview</A></B>
+</B><B><A HREF="#OVERVIEW">1 - Printing System Overview</A>
 <UL>
 <LI><A HREF="#2_1">The Printing Problem</A></LI>
 <LI><A HREF="#2_2">The Technology</A></LI>
@@ -48,7 +48,7 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#2_7">Printer Drivers</A></LI>
 <LI><A HREF="#2_8">Networking</A></LI>
 </UL>
-<B><A HREF="#BUILDING_INSTALLING">2 - Building and Installing CUPS</A></B>
+</B><B><A HREF="#BUILDING_INSTALLING">2 - Building and Installing CUPS</A>
 <UL>
 <LI><A HREF="#3_1">Installing a Source Distribution</A>
 <UL>
@@ -66,7 +66,7 @@ Copyright 1997-2004, All Rights Reserved<BR>
 </UL>
 </LI>
 </UL>
-<B><A HREF="#MANAGING_PRINTERS">3 - Managing Printers</A></B>
+</B><B><A HREF="#MANAGING_PRINTERS">3 - Managing Printers</A>
 <UL>
 <LI><A HREF="#4_1">The Basics</A></LI>
 <LI><A HREF="#4_2">Adding Your First Printer</A>
@@ -88,14 +88,14 @@ Copyright 1997-2004, All Rights Reserved<BR>
 </LI>
 <LI><A HREF="#4_4">Managing Printers from the Web</A></LI>
 </UL>
-<B><A HREF="#PRINTER_CLASSES">4 - Printer Classes</A></B>
+</B><B><A HREF="#PRINTER_CLASSES">4 - Printer Classes</A>
 <UL>
 <LI><A HREF="#5_1">The Basics</A></LI>
 <LI><A HREF="#5_2">Managing Printer Classes from the Command-Line</A></LI>
 <LI><A HREF="#5_3">Managing Printer Classes from the Web Interface</A></LI>
 <LI><A HREF="#5_4">Implicit Classes</A></LI>
 </UL>
-<B><A HREF="#CLIENT_SETUP">5 - Client Setup</A></B>
+</B><B><A HREF="#CLIENT_SETUP">5 - Client Setup</A>
 <UL>
 <LI><A HREF="#6_1">The Basics</A>
 <UL>
@@ -108,7 +108,7 @@ Copyright 1997-2004, All Rights Reserved<BR>
 </LI>
 <LI><A HREF="#6_2">Load Balancing and Failsafe Operation</A></LI>
 </UL>
-<B><A HREF="#PRINTING_MANAGEMENT">6 - Printing System Management</A></B>
+</B><B><A HREF="#PRINTING_MANAGEMENT">6 - Printing System Management</A>
 <UL>
 <LI><A HREF="#7_1">The Basics</A></LI>
 <LI><A HREF="#RESTARTING">Restarting the CUPS Server</A></LI>
@@ -273,7 +273,7 @@ Copyright 1997-2004, All Rights Reserved<BR>
 </UL>
 </LI>
 </UL>
-<B><A HREF="#PRINTING_OTHER">7 - Printing with Other Systems</A></B>
+</B><B><A HREF="#PRINTING_OTHER">7 - Printing with Other Systems</A>
 <UL>
 <LI><A HREF="#8_1">The Basics</A></LI>
 <LI><A HREF="#8_2">Printing from LPD Clients</A></LI>
@@ -295,7 +295,7 @@ Copyright 1997-2004, All Rights Reserved<BR>
 </LI>
 <LI><A HREF="#8_9">Printing to Windows Servers</A></LI>
 </UL>
-<B><A HREF="#LICENSE">A - Software License Agreement</A></B>
+</B><B><A HREF="#LICENSE">A - Software License Agreement</A>
 <UL>
 <LI><A HREF="#9_1">Common UNIX Printing System License Agreement</A>
 <UL>
@@ -317,7 +317,7 @@ Copyright 1997-2004, All Rights Reserved<BR>
 </UL>
 </LI>
 </UL>
-<B><A HREF="#COMMON_NETWORK">B - Common Network Settings</A></B>
+</B><B><A HREF="#COMMON_NETWORK">B - Common Network Settings</A>
 <UL>
 <LI><A HREF="#10_1">Configuring a Network Interface</A>
 <UL>
@@ -332,7 +332,7 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#LINKSYS">Configuring Linksys Print Servers</A></LI>
 <LI><A HREF="#LPD_OPTIONS">Configuring LPD Printing Options</A></LI>
 </UL>
-<B><A HREF="#PRINTER_DRIVERS">C - Printer Drivers</A></B>
+</B><B><A HREF="#PRINTER_DRIVERS">C - Printer Drivers</A>
 <UL>
 <LI><A HREF="#11_1">Printer Drivers</A></LI>
 <LI><A HREF="#DYMO">DYMO Label Printer</A></LI>
@@ -343,9 +343,9 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#DESKJET">HP DeskJet</A></LI>
 <LI><A HREF="#LASERJET">HP LaserJet</A></LI>
 </UL>
-<B><A HREF="#FILES">D - List of Files</A></B>
+</B><B><A HREF="#FILES">D - List of Files</A></B>
 <BR>
-<BR><B><A HREF="#FAQ">E - Troubleshooting Common Problems</A></B>
+<BR><B><A HREF="#FAQ">E - Troubleshooting Common Problems</A>
 <UL>
 <LI><A HREF="#13_1">My Applications Don't See the Available Printers</A></LI>
 <LI><A HREF="#13_2">CUPS Doesn't Recognize My Username or Password!</A></LI>
@@ -356,11 +356,11 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#13_5">Connection Refused Messages</A></LI>
 <LI><A HREF="#13_6">Write Error Messages</A></LI>
 </UL>
-<HR NOSHADE>
+</B><HR NOSHADE>
 <H1 ALIGN="RIGHT"><A NAME="1">Preface</A></H1>
 <P>This software administrators manual provides printer administration
  information for the Common UNIX Printing System<SUP>TM</SUP> (&quot;CUPS<SUP>
-TM</SUP>&quot;), version 1.1.21.</P>
+TM</SUP>&quot;), version 1.1.22.</P>
 <H2><A NAME="1_1">System Overview</A></H2>
 <P>CUPS provides a portable printing layer for UNIX&reg;-based operating
  systems. It has been developed by <A HREF="http://www.easysw.com">Easy
@@ -1220,13 +1220,13 @@ BrowseRelay</CODE></A> directive that enables a single client to relay
 <PRE>
 # Poll the two servers
 <B>
-BrowsePoll ServerA ENTER
-BrowsePoll ServerB ENTER
+BrowsePoll ServerA
+BrowsePoll ServerB
 </B>
 
 # Relay the printers to the local subnet
 <B>
-BrowseRelay 127.0.0.1 192.168.3.255 ENTER
+BrowseRelay 127.0.0.1 192.168.3.255
 </B></PRE>
 </UL>
 <P>The <A HREF="#BrowseRelay"><CODE>BrowseRelay</CODE></A> line
@@ -1246,8 +1246,8 @@ BrowseRelay 127.0.0.1 192.168.3.255 ENTER
 <PRE>
 # Relay the printers from subnet 1 and 2 to subnet 3
 <B>
-BrowseRelay 192.168.1 192.168.3.255 ENTER
-BrowseRelay 192.168.2 192.168.3.255 ENTER
+BrowseRelay 192.168.1 192.168.3.255
+BrowseRelay 192.168.2 192.168.3.255
 </B></PRE>
 </UL>
 
@@ -2948,7 +2948,7 @@ Require valid-user
  required for the resource. The <CODE>group</CODE> keyword specifies
  that the authenticated user must be a member of one or more of the
  named groups that follow.</P>
-<P>The <CODE>user</CODE> keyboard specifies that the authenticated user
+<P>The <CODE>user</CODE> keyword specifies that the authenticated user
  must be one of the named users that follow.</P>
 <P>The <CODE>valid-user</CODE> keyword specifies that any authenticated
  user may access the resource.</P>

@@ -1,7 +1,7 @@
 <HTML>
 <HEAD>
 	<META NAME="COPYRIGHT" CONTENT="Copyright 1997-2004, All Rights Reserved">
-	<META NAME="DOCNUMBER" CONTENT="CUPS-SAM-1.1.21">
+	<META NAME="DOCNUMBER" CONTENT="CUPS-SAM-1.1.22">
 	<META NAME="Author" CONTENT="Easy Software Products">
 	<TITLE>CUPS Software Administrators Manual</TITLE>
 </HEAD>
@@ -11,7 +11,7 @@
 
 <P>This software administrators manual provides printer administration
 information for the Common UNIX Printing System<SUP>TM</SUP>
-("CUPS<SUP>TM</SUP>"), version 1.1.21.
+("CUPS<SUP>TM</SUP>"), version 1.1.22.
 
 <EMBED SRC="system-overview.shtml">
 
@@ -918,13 +918,13 @@ client C will be configured with the following directives in <VAR>/etc/cups/cups
 <UL><PRE>
 # Poll the two servers
 <B>
-BrowsePoll ServerA ENTER
-BrowsePoll ServerB ENTER
+BrowsePoll ServerA
+BrowsePoll ServerB
 </B>
 
 # Relay the printers to the local subnet
 <B>
-BrowseRelay 127.0.0.1 192.168.3.255 ENTER
+BrowseRelay 127.0.0.1 192.168.3.255
 </B></PRE></UL>
 
 <P>The <A HREF="#BrowseRelay"><CODE>BrowseRelay</CODE></A> line specifies a source address and mask.
@@ -943,8 +943,8 @@ subnet 1 and subnet 2, it could use the <A HREF="#BrowseRelay"><CODE>BrowseRelay
 <UL><PRE>
 # Relay the printers from subnet 1 and 2 to subnet 3
 <B>
-BrowseRelay 192.168.1 192.168.3.255 ENTER
-BrowseRelay 192.168.2 192.168.3.255 ENTER
+BrowseRelay 192.168.1 192.168.3.255
+BrowseRelay 192.168.2 192.168.3.255
 </B></PRE></UL>
 
 <!-- NEED 3in -->
@@ -2985,7 +2985,7 @@ authentication is required for the resource. The
 <CODE>group</CODE> keyword specifies that the authenticated user
 must be a member of one or more of the named groups that follow.
 
-<P>The <CODE>user</CODE> keyboard specifies that the
+<P>The <CODE>user</CODE> keyword specifies that the
 authenticated user must be one of the named users that follow.
 
 <P>The <CODE>valid-user</CODE> keyword specifies that any
