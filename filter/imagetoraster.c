@@ -1,5 +1,5 @@
 /*
- * "$Id: imagetoraster.c,v 1.13 1999/04/05 15:22:00 mike Exp $"
+ * "$Id: imagetoraster.c,v 1.14 1999/04/06 19:37:14 mike Exp $"
  *
  *   Image file to raster filter for the Common UNIX Printing System (CUPS).
  *
@@ -213,7 +213,7 @@ main(int  argc,		/* I - Number of command-line arguments */
   options     = NULL;
   num_options = cupsParseOptions(argv[5], 0, &options);
 
-  ppd = SetCommonOptions(num_options, options);
+  ppd = SetCommonOptions(num_options, options, 0);
 
   ppdMarkDefaults(ppd);
   cupsMarkOptions(ppd, num_options, options);
@@ -3610,5 +3610,5 @@ make_lut(ib_t  *lut,		/* I - Lookup table */
 
 
 /*
- * End of "$Id: imagetoraster.c,v 1.13 1999/04/05 15:22:00 mike Exp $".
+ * End of "$Id: imagetoraster.c,v 1.14 1999/04/06 19:37:14 mike Exp $".
  */

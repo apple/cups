@@ -1,5 +1,5 @@
 /*
- * "$Id: common.c,v 1.3 1999/03/24 18:01:41 mike Exp $"
+ * "$Id: common.c,v 1.4 1999/04/06 19:37:11 mike Exp $"
  *
  *   Common filter routines for the Common UNIX Printing System (CUPS).
  *
@@ -55,7 +55,8 @@ float	PageLeft = 18.0f,	/* Left margin */
 
 ppd_file_t *					/* O - PPD file */
 SetCommonOptions(int           num_options,	/* I - Number of options */
-                 cups_option_t *options)	/* I - Options */
+                 cups_option_t *options,	/* I - Options */
+		 int           change_size)	/* I - Change page size? */
 {
   float		temp;		/* Swapping variable */
   ppd_file_t	*ppd;		/* PPD file */
@@ -179,57 +180,58 @@ SetCommonOptions(int           num_options,	/* I - Number of options */
     }
   }
 
-  switch (Orientation)
-  {
-    case 0 : /* Portait */
-        break;
+  if (change_size)
+    switch (Orientation)
+    {
+      case 0 : /* Portait */
+          break;
 
-    case 1 : /* Landscape */
-	temp       = PageLeft;
-	PageLeft   = PageBottom;
-	PageBottom = temp;
+      case 1 : /* Landscape */
+	  temp       = PageLeft;
+	  PageLeft   = PageBottom;
+	  PageBottom = temp;
 
-	temp       = PageRight;
-	PageRight  = PageTop;
-	PageTop    = temp;
+	  temp       = PageRight;
+	  PageRight  = PageTop;
+	  PageTop    = temp;
 
-	temp       = PageWidth;
-	PageWidth  = PageLength;
-	PageLength = temp;
-	break;
+	  temp       = PageWidth;
+	  PageWidth  = PageLength;
+	  PageLength = temp;
+	  break;
 
-    case 2 : /* Reverse Portrait */
-	temp       = PageWidth - PageLeft;
-	PageLeft   = PageWidth - PageRight;
-	PageRight  = temp;
+      case 2 : /* Reverse Portrait */
+	  temp       = PageWidth - PageLeft;
+	  PageLeft   = PageWidth - PageRight;
+	  PageRight  = temp;
 
-	temp       = PageLength - PageBottom;
-	PageBottom = PageLength - PageTop;
-	PageTop    = temp;
-        break;
+	  temp       = PageLength - PageBottom;
+	  PageBottom = PageLength - PageTop;
+	  PageTop    = temp;
+          break;
 
-    case 3 : /* Reverse Landscape */
-	temp       = PageWidth - PageLeft;
-	PageLeft   = PageWidth - PageRight;
-	PageRight  = temp;
+      case 3 : /* Reverse Landscape */
+	  temp       = PageWidth - PageLeft;
+	  PageLeft   = PageWidth - PageRight;
+	  PageRight  = temp;
 
-	temp       = PageLength - PageBottom;
-	PageBottom = PageLength - PageTop;
-	PageTop    = temp;
+	  temp       = PageLength - PageBottom;
+	  PageBottom = PageLength - PageTop;
+	  PageTop    = temp;
 
-	temp       = PageLeft;
-	PageLeft   = PageBottom;
-	PageBottom = temp;
+	  temp       = PageLeft;
+	  PageLeft   = PageBottom;
+	  PageBottom = temp;
 
-	temp       = PageRight;
-	PageRight  = PageTop;
-	PageTop    = temp;
+	  temp       = PageRight;
+	  PageRight  = PageTop;
+	  PageTop    = temp;
 
-	temp       = PageWidth;
-	PageWidth  = PageLength;
-	PageLength = temp;
-	break;
-  }
+	  temp       = PageWidth;
+	  PageWidth  = PageLength;
+	  PageLength = temp;
+	  break;
+    }
 
   if ((val = cupsGetOption("sides", num_options, options)) != NULL &&
       strncmp(val, "two-", 4) == 0)
@@ -244,5 +246,5 @@ SetCommonOptions(int           num_options,	/* I - Number of options */
 
 
 /*
- * End of "$Id: common.c,v 1.3 1999/03/24 18:01:41 mike Exp $".
+ * End of "$Id: common.c,v 1.4 1999/04/06 19:37:11 mike Exp $".
  */

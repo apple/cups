@@ -1,5 +1,5 @@
 /*
- * "$Id: imagetops.c,v 1.9 1999/04/01 18:25:04 mike Exp $"
+ * "$Id: imagetops.c,v 1.10 1999/04/06 19:37:14 mike Exp $"
  *
  *   Image file to PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -113,7 +113,7 @@ main(int  argc,		/* I - Number of command-line arguments */
   options     = NULL;
   num_options = cupsParseOptions(argv[5], 0, &options);
 
-  ppd = SetCommonOptions(num_options, options);
+  ppd = SetCommonOptions(num_options, options, 1);
 
   ppdMarkDefaults(ppd);
   cupsMarkOptions(ppd, num_options, options);
@@ -483,5 +483,5 @@ ps_ascii85(ib_t *data,		/* I - Data to print */
 
 
 /*
- * End of "$Id: imagetops.c,v 1.9 1999/04/01 18:25:04 mike Exp $".
+ * End of "$Id: imagetops.c,v 1.10 1999/04/06 19:37:14 mike Exp $".
  */

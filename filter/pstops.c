@@ -1,5 +1,5 @@
 /*
- * "$Id: pstops.c,v 1.13 1999/04/01 18:31:11 mike Exp $"
+ * "$Id: pstops.c,v 1.14 1999/04/06 19:37:15 mike Exp $"
  *
  *   PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -134,7 +134,7 @@ main(int  argc,			/* I - Number of command-line arguments */
   options     = NULL;
   num_options = cupsParseOptions(argv[5], 0, &options);
 
-  ppd = SetCommonOptions(num_options, options);
+  ppd = SetCommonOptions(num_options, options, 1);
 
   ppdMarkDefaults(ppd);
   cupsMarkOptions(ppd, num_options, options);
@@ -703,5 +703,5 @@ start_nup(int number)	/* I - Page number */
 
 
 /*
- * End of "$Id: pstops.c,v 1.13 1999/04/01 18:31:11 mike Exp $".
+ * End of "$Id: pstops.c,v 1.14 1999/04/06 19:37:15 mike Exp $".
  */
