@@ -1,4 +1,4 @@
-README - CUPS v1.1b3 - 04/19/2000
+README - CUPS v1.1b4 - 04/19/2000
 ---------------------------------
 
 ************************************************************************
@@ -14,10 +14,6 @@ System.  Since this is a beta release, we do not recommend that you
 use this software on a production system.  Instead, please use the
 current 1.0.x release for your production systems.
 
-Also, currently we are only providing source code for the beta releases.
-As we approach a final production ("gold") release of CUPS 1.1 we will
-provide binary distributions as well.
-
 Please report all problems in the CUPS 1.1 beta releases to
 "cups-beta@cups.org" or to the CUPS mailing list.
 
@@ -26,27 +22,31 @@ Thanks for using CUPS!
 
 INTRODUCTION
 
-The Common UNIX Printing System provides a portable printing layer for
-UNIX® operating systems.  It has been developed by Easy Software
-Products to promote a standard printing solution for all UNIX vendors
-and users.  CUPS provides the System V and Berkeley command-line
-interfaces.
+CUPS provides a portable printing layer for UNIX(r)-based operating
+systems.  It has been developed by Easy Software Products to promote a
+standard printing solution for all UNIX vendors and users.  CUPS
+provides the System V and Berkeley command-line interfaces.
 
-CUPS uses the Internet Printing Protocol (IETF-IPP) as the basis for
-managing print jobs and queues.  The Line Printer Daemon (LPD, RFC1179)
-and AppSocket protocols are also supported with reduced functionality.
+CUPS uses the Internet Printing Protocol ("IPP") as the basis for
+managing print jobs and queues.  The Line Printer Daemon ("LPD") Server
+Message Block ("SMB"), and AppSocket (a.k.a. JetDirect) protocols are
+also supported with reduced functionality.  CUPS adds network printer
+browsing and PostScript Printer Description ("PPD") based printing
+options to support real-world printing under UNIX.
 
-CUPS adds network printer browsing and PostScript Printer Description
-("PPD")-based printing options to support real world applications under
-UNIX.
+CUPS also includes a customized version of GNU Ghostscript (currently
+based off GNU Ghostscript 5.50) and an image file RIP that are used to
+support non-PostScript printers.  Sample drivers for HP and EPSON
+printers are included that use these filters.
 
-CUPS also includes a customized version of GNU GhostScript (currently
-based off GNU GhostScript 5.50) and an image file RIP that can be used
-to support non-PostScript printers.
+Drivers for over 2300 printers are provided with our ESP Print Pro
+software, available at:
 
-CUPS is Copyright 1993-2000 by Easy Software Products, All Rights
-Reserved.  CUPS is currently licensed under the terms of the GNU
-General Public License.  Please see the license file for details.
+	http://www.easysw.com/printpro
+
+CUPS is licensed under the GNU General Public License and GNU Library
+General Public License.  Please contact Easy Software Products for
+commercial support and "binary distribution" rights.
 
 
 SYSTEM REQUIREMENTS
@@ -55,10 +55,11 @@ Binary distributions require a minimum of 10MB of free disk space. We
 do not recommend using CUPS on a workstation with less than 32MB of RAM
 or a PC with less than 16MB of RAM.
 
-If you are installing from source you'll need an ANSI C compiler and
-optionally one or more image file support libraries.  Complete source
-installation instructions can be found in the CUPS System
-Administrator's Manual in the files "doc/sam.html" or "doc/sam.pdf".
+If you are installing from source you'll need an ANSI-compliant C
+compiler and optionally one or more image file support libraries. 
+Complete source installation instructions can be found in the CUPS
+System Administrator's Manual in the files "doc/sam.html" or
+"doc/sam.pdf".
 
 
 SOFTWARE REQUIREMENTS
@@ -106,7 +107,7 @@ Once you have installed the software you can access the documentation
     http://localhost:631
 
 If you're having trouble getting that far, the documentation is located
-in the "/usr/share/cups/doc" directory in the binary distributions, and
+in the "/usr/share/doc/cups" directory in the binary distributions, and
 under the "doc" directory in the source archives.
 
 Please read the documentation before asking questions.
@@ -166,8 +167,8 @@ Similarly, for the other sample drivers you can use:
     HP LaserJet Series          laserjet.ppd
     EPSON Stylus Color Series   stcolor.ppd
     EPSON Stylus Photo Series   stphoto.ppd
-    EPSON 9-pin Series          epson9.ppd [not in beta 3]
-    EPSON 24-pin Series         epson24.ppd [not in beta 3]
+    EPSON 9-pin Series          epson9.ppd
+    EPSON 24-pin Series         epson24.ppd
 
 These sample drivers provide basic printing capabilities, but generally
 do not exercise the full potential of the printers or CUPS.  For
@@ -205,10 +206,12 @@ This will prevent the filters from misinterpreting your print file.
 
 REPORTING PROBLEMS
 
-If you have problems, please send an email to cups-support@cups.org. 
-Include your operating system and version, compiler and version, and
-any errors or problems you've run into.  If you are running a version
-of Linux, be sure to provide the Linux distribution you have, too.
+If you have problems, READ THE DOCUMENTATION FIRST!  If the
+documentation does not solve your problems please send an email to
+cups-support@cups.org.  Include your operating system and version,
+compiler and version, and any errors or problems you've run into.  If
+you are running a version of Linux, be sure to provide the Linux
+distribution you have, too.
 
 
 OTHER RESOURCES
@@ -227,10 +230,14 @@ CUPS is Copyright 1993-2000 by Easy Software Products.  CUPS, the CUPS
 logo, and the Common UNIX Printing System are the trademark property of
 Easy Software Products.
 
-CUPS is provided under the terms of the GNU General Public License
-which is located in the files "LICENSE.html" and "LICENSE.txt" (or the
-file "cups.license" for a binary distribution.)  For commercial
-licensing information, please contact:
+CUPS is provided under the terms of the GNU General Public License and
+GNU Library General Public License. This program is distributed in the
+hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE.  See the "LICENSE.html", "LICENSE.txt", "cups.license" file
+for more information.
+
+For commercial licensing information, please contact:
 
     Attn: CUPS Licensing Information
     Easy Software Products
@@ -240,3 +247,7 @@ licensing information, please contact:
     Voice: +1.301.373.9603
     Email: cups-info@cups.org
     WWW: http://www.cups.org
+
+Note that commercial licensors may also require license from Artifex
+Software Inc. which handles commercial licensing of the Ghostscript
+software.

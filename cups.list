@@ -1,5 +1,5 @@
 #
-# "$Id: cups.list,v 1.60 2000/05/04 21:17:19 mike Exp $"
+# "$Id: cups.list,v 1.61 2000/05/11 17:36:44 mike Exp $"
 #
 #   ESP Package Manager (EPM) file list for the Common UNIX Printing
 #   System (CUPS).
@@ -162,6 +162,7 @@ f 0444 root sys /usr/share/cups/charsets/utf-8 data/utf-8
 f 0444 root sys /usr/share/cups/data/HPGLprolog data/HPGLprolog
 f 0444 root sys /usr/share/cups/data/psglyphs data/psglyphs
 f 0444 root sys /usr/share/cups/data/testprint.ps data/testprint.ps
+
 f 0444 root sys /usr/share/cups/fonts/AvantGarde-Book fonts/AvantGarde-Book
 f 0444 root sys /usr/share/cups/fonts/AvantGarde-BookOblique fonts/AvantGarde-BookOblique
 f 0444 root sys /usr/share/cups/fonts/AvantGarde-Demi fonts/AvantGarde-Demi
@@ -205,6 +206,7 @@ f 0444 root sys /usr/share/cups/fonts/Utopia-Italic fonts/Utopia-Italic
 f 0444 root sys /usr/share/cups/fonts/Utopia-Regular fonts/Utopia-Regular
 f 0444 root sys /usr/share/cups/fonts/ZapfChancery-MediumItalic fonts/ZapfChancery-MediumItalic
 f 0444 root sys /usr/share/cups/fonts/ZapfDingbats fonts/ZapfDingbats
+
 f 0444 root sys /usr/share/cups/pstoraster/Fontmap pstoraster/Fontmap
 f 0444 root sys /usr/share/cups/pstoraster/gs_btokn.ps pstoraster/gs_btokn.ps
 f 0444 root sys /usr/share/cups/pstoraster/gs_ccfnt.ps pstoraster/gs_ccfnt.ps
@@ -253,8 +255,11 @@ f 0444 root sys /usr/share/cups/pstoraster/pdf_font.ps pstoraster/pdf_font.ps
 f 0444 root sys /usr/share/cups/pstoraster/pdf_main.ps pstoraster/pdf_main.ps
 f 0444 root sys /usr/share/cups/pstoraster/pdf_ops.ps pstoraster/pdf_ops.ps
 f 0444 root sys /usr/share/cups/pstoraster/pdf_sec.ps pstoraster/pdf_sec.ps
+
 f 0444 root sys /usr/share/cups/model/deskjet.ppd ppd/deskjet.ppd
 f 0444 root sys /usr/share/cups/model/laserjet.ppd ppd/laserjet.ppd
+f 0444 root sys /usr/share/cups/model/epson9.ppd ppd/epson9.ppd
+f 0444 root sys /usr/share/cups/model/epson24.ppd ppd/epson24.ppd
 f 0444 root sys /usr/share/cups/model/stcolor.ppd ppd/stcolor.ppd
 f 0444 root sys /usr/share/cups/model/stphoto.ppd ppd/stphoto.ppd
 
@@ -276,7 +281,6 @@ f 0444 root sys /usr/share/cups/templates/classes.tmpl templates/classes.tmpl
 f 0444 root sys /usr/share/cups/templates/config-printer.tmpl templates/config-printer.tmpl
 f 0444 root sys /usr/share/cups/templates/config-printer2.tmpl templates/config-printer2.tmpl
 f 0444 root sys /usr/share/cups/templates/error.tmpl templates/error.tmpl
-f 0444 root sys /usr/share/cups/templates/header.tmpl templates/header.tmpl
 f 0444 root sys /usr/share/cups/templates/job-cancel.tmpl templates/job-cancel.tmpl
 f 0444 root sys /usr/share/cups/templates/job-hold.tmpl templates/job-hold.tmpl
 f 0444 root sys /usr/share/cups/templates/job-release.tmpl templates/job-release.tmpl
@@ -299,6 +303,8 @@ f 0444 root sys /usr/share/cups/templates/printer-start.tmpl templates/printer-s
 f 0444 root sys /usr/share/cups/templates/printer-stop.tmpl templates/printer-stop.tmpl
 f 0444 root sys /usr/share/cups/templates/printers.tmpl templates/printers.tmpl
 f 0444 root sys /usr/share/cups/templates/test-page.tmpl templates/test-page.tmpl
+
+f 0444 root sys /usr/share/cups/templates/header.tmpl templates/header.tmpl
 f 0444 root sys /usr/share/cups/templates/trailer.tmpl templates/trailer.tmpl
 
 # Config files
@@ -396,6 +402,8 @@ f 0444 root sys /usr/share/catman/a_man/cat1/accept.1 man/accept.8
 l 0444 root sys /usr/share/catman/a_man/cat1/reject.1 accept.1
 f 0444 root sys /usr/share/catman/u_man/cat1/backend.1 man/backend.1
 f 0444 root sys /usr/share/catman/u_man/cat5/classes.conf.5 man/classes.conf.5
+f 0444 root sys /usr/share/catman/a_man/cat1/cups-lpd.1 man/cups-lpd.8
+f 0444 root sys /usr/share/catman/a_man/cat1/cups-polld.1 man/cups-polld.8
 f 0444 root sys /usr/share/catman/u_man/cat5/cupsd.conf.5 man/cupsd.conf.5
 f 0444 root sys /usr/share/catman/a_man/cat1/cupsd.1 man/cupsd.8
 f 0444 root sys /usr/share/catman/a_man/cat1/enable.1 man/enable.8
@@ -403,6 +411,9 @@ l 0444 root sys /usr/share/catman/a_man/cat1/disable.1 enable.1
 f 0444 root sys /usr/share/catman/u_man/cat1/filter.1 man/filter.1
 f 0444 root sys /usr/share/catman/a_man/cat1/lpadmin.1 man/lpadmin.8
 f 0444 root sys /usr/share/catman/a_man/cat1/lpc.1 man/lpc.8
+f 0444 root sys /usr/share/catman/a_man/cat1/lpinfo.1 man/lpinfo.8
+f 0444 root sys /usr/share/catman/a_man/cat1/lpmove.1 man/lpmove.8
+f 0444 root sys /usr/share/catman/u_man/cat1/lpoptions.1 man/lpoptions.1
 f 0444 root sys /usr/share/catman/u_man/cat1/lpq.1 man/lpq.1
 f 0444 root sys /usr/share/catman/u_man/cat1/lprm.1 man/lprm.1
 f 0444 root sys /usr/share/catman/u_man/cat1/lpr.1 man/lpr.1
@@ -417,6 +428,8 @@ f 0444 root sys /usr/man/man8/accept.8 man/accept.man
 l 0444 root sys /usr/man/man8/reject.8 accept.man
 f 0444 root sys /usr/man/man1/backend.1 man/backend.man
 f 0444 root sys /usr/man/man1/classes.conf.5 man/classes.conf.man
+f 0444 root sys /usr/man/man8/cups-lpd.8 man/cups-lpd.man
+f 0444 root sys /usr/man/man8/cups-polld.8 man/cups-polld.man
 f 0444 root sys /usr/man/man8/cupsd.8 man/cupsd.man
 f 0444 root sys /usr/man/man5/cupsd.conf.5 man/cupsd.conf.man
 f 0444 root sys /usr/man/man8/enable.8 man/enable.man
@@ -425,6 +438,9 @@ l 0444 root sys /usr/man/man8/disable.8 enable.man
 f 0444 root sys /usr/man/man1/filter.1 man/filter.man
 f 0444 root sys /usr/man/man8/lpadmin.8 man/lpadmin.man
 f 0444 root sys /usr/man/man8/lpc.8 man/lpc.man
+f 0444 root sys /usr/man/man8/lpinfo.8 man/lpinfo.man
+f 0444 root sys /usr/man/man8/lpmove.8 man/lpmove.man
+f 0444 root sys /usr/man/man1/lpoptions.1 man/lpoptions.man
 f 0444 root sys /usr/man/man1/lpq.1 man/lpq.man
 f 0444 root sys /usr/man/man1/lprm.1 man/lprm.man
 f 0444 root sys /usr/man/man1/lpr.1 man/lpr.man
@@ -440,5 +456,5 @@ f 0444 root sys /usr/man/man5/printers.conf.5 man/printers.conf.man
 i 0555 root sys cups cups.sh
 
 #
-# End of "$Id: cups.list,v 1.60 2000/05/04 21:17:19 mike Exp $".
+# End of "$Id: cups.list,v 1.61 2000/05/11 17:36:44 mike Exp $".
 #
