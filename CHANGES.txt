@@ -6,8 +6,8 @@ CHANGES IN CUPS V1.1.5
 	- Security updates - new default configuration does
 	  not broadcast printer information and only allows
 	  access from the local system.
-	- Encryption support - CUPS now supports TLS/SSL
-	  encryption via the OpenSSL library.
+	- EXPERIMENTAL encryption support - CUPS now optionally
+	  supports TLS/SSL encryption via the OpenSSL library.
 	- Documentation updates.
 	- Makefile/configure script updates.
 	- The RPM spec file didn't work out-of-the-box under

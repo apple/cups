@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: configure.in,v 1.61 2000/12/20 17:56:31 mike Exp $"
+dnl "$Id: configure.in,v 1.62 2000/12/20 18:46:14 mike Exp $"
 dnl
 dnl   Configuration script for the Common UNIX Printing System (CUPS).
 dnl
@@ -460,48 +460,43 @@ AC_SUBST(CAT5EXT)
 AC_SUBST(CAT8EXT)
 
 dnl Setup init.d locations...
-if test $prefix = "/"; then
-	case "$uname" in
-		FreeBSD* | NetBSD* | OpenBSD*)
-			# *BSD
-			INITDIR=""
-			INITDDIR=""
-			;;
+case "$uname" in
+	FreeBSD* | NetBSD* | OpenBSD*)
+		# *BSD
+		INITDIR=""
+		INITDDIR=""
+		;;
 
-		Linux*)
-			# Linux seems to choose an init.d directory at random...
-			if test -d /sbin/init.d; then
-				# SuSE
-				INITDIR="/sbin/init.d"
-				INITDDIR=".."
+	Linux*)
+		# Linux seems to choose an init.d directory at random...
+		if test -d /sbin/init.d; then
+			# SuSE
+			INITDIR="/sbin/init.d"
+			INITDDIR=".."
+		else
+			if test -d /etc/rc.d; then
+				# RedHat
+				INITDIR="/etc/rc.d"
+				INITDDIR="../init.d"
 			else
-				if test -d /etc/rc.d; then
-					# RedHat
-					INITDIR="/etc/rc.d"
-					INITDDIR="../init.d"
-				else
-					# Others
-					INITDIR="/etc"
-					INITDDIR="../init.d"
-				fi
+				# Others
+				INITDIR="/etc"
+				INITDDIR="../init.d"
 			fi
-			;;
+		fi
+		;;
 
-		OSF1* | HP-UX*)
-			INITDIR="/sbin"
-			INITDDIR="../init.d"
-			;;
+	OSF1* | HP-UX*)
+		INITDIR="/sbin"
+		INITDDIR="../init.d"
+		;;
 
-		*)
-			INITDIR="/etc"
-			INITDDIR="../init.d"
-			;;
+	*)
+		INITDIR="/etc"
+		INITDDIR="../init.d"
+		;;
 
-	esac
-else
-	INITDIR="/etc"
-	INITDDIR="../init.d"
-fi
+esac
 
 AC_SUBST(INITDIR)
 AC_SUBST(INITDDIR)
@@ -574,5 +569,5 @@ AC_DEFINE_UNQUOTED(CUPS_FONTPATH, "$fontpath")
 AC_OUTPUT(Makedefs cups.sh)
 
 dnl
-dnl End of "$Id: configure.in,v 1.61 2000/12/20 17:56:31 mike Exp $".
+dnl End of "$Id: configure.in,v 1.62 2000/12/20 18:46:14 mike Exp $".
 dnl
