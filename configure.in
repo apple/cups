@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: configure.in,v 1.17 1999/07/08 14:58:09 mike Exp $"
+dnl "$Id: configure.in,v 1.18 1999/07/09 14:45:57 mike Exp $"
 dnl
 dnl   Configuration script for the Common UNIX Printing System (CUPS).
 dnl
@@ -61,7 +61,7 @@ else
 		HP-UX*)
 			LIBCUPS="libcups.sl.1"
 			LIBCUPSIMAGE="libcupsimage.sl.1"
-			DSO="ld -b -z +h \$@ \$(OPTIM) -o"
+			DSO="ld -b -z +h \$@ -o"
 			;;
 		OSF1* | Linux*)
 			LIBCUPS="libcups.so.1"
@@ -295,5 +295,5 @@ AC_SUBST(CUPS_DATADIR)
 AC_OUTPUT(Makedefs)
 
 dnl
-dnl End of "$Id: configure.in,v 1.17 1999/07/08 14:58:09 mike Exp $".
+dnl End of "$Id: configure.in,v 1.18 1999/07/09 14:45:57 mike Exp $".
 dnl
