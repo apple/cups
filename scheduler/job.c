@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.70 2000/06/01 20:28:51 mike Exp $"
+ * "$Id: job.c,v 1.71 2000/06/02 13:51:49 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -23,29 +23,30 @@
  *
  * Contents:
  *
- *   AddJob()         - Add a new job to the job queue...
- *   CancelJob()      - Cancel the specified print job.
- *   CancelJobs()     - Cancel all jobs on the given printer or class.
- *   CheckJobs()      - Check the pending jobs and start any if the destination
- *                      is available.
- *   FindJob()        - Find the specified job.
- *   HoldJob()        - Hold the specified job.
- *   LoadAllJobs()    - Load all jobs from disk.
- *   LoadJob()        - Load a job from disk.
- *   MoveJob()        - Move the specified job to a different destination.
- *   ReleaseJob()     - Release the specified job.
- *   RestartJob()     - Restart the specified job.
- *   SaveJob()        - Save a job to disk.
- *   SetJobPriority() - Set the priority of a job, moving it up/down in the
- *                      list as needed.
- *   StartJob()       - Start a print job.
- *   StopAllJobs()    - Stop all print jobs.
- *   StopJob()        - Stop a print job.
- *   UpdateJob()      - Read a status update from a job's filters.
- *   ValidateDest()   - Validate a printer/class destination.
- *   ipp_read_file()  - Read an IPP request from a file.
- *   ipp_write_file() - Write an IPP request to a file.
- *   start_process()  - Start a background process.
+ *   AddJob()          - Add a new job to the job queue...
+ *   CancelJob()       - Cancel the specified print job.
+ *   CancelJobs()      - Cancel all jobs on the given printer or class.
+ *   CheckJobs()       - Check the pending jobs and start any if the
+ *                       destination is available.
+ *   FindJob()         - Find the specified job.
+ *   HoldJob()         - Hold the specified job.
+ *   LoadAllJobs()     - Load all jobs from disk.
+ *   LoadJob()         - Load a job from disk.
+ *   MoveJob()         - Move the specified job to a different destination.
+ *   ReleaseJob()      - Release the specified job.
+ *   RestartJob()      - Restart the specified job.
+ *   SaveJob()         - Save a job to disk.
+ *   SetJobHoldUntil() - Set the hold time for a job...
+ *   SetJobPriority()  - Set the priority of a job, moving it up/down in the
+ *                       list as needed.
+ *   StartJob()        - Start a print job.
+ *   StopAllJobs()     - Stop all print jobs.
+ *   StopJob()         - Stop a print job.
+ *   UpdateJob()       - Read a status update from a job's filters.
+ *   ValidateDest()    - Validate a printer/class destination.
+ *   ipp_read_file()   - Read an IPP request from a file.
+ *   ipp_write_file()  - Write an IPP request to a file.
+ *   start_process()   - Start a background process.
  */
 
 /*
@@ -486,10 +487,16 @@ LoadAllJobs(void)
       strncpy(job->username, attr->values[0].string.text,
               sizeof(job->username) - 1);
 
-      if (job->state->values[0].integer == IPP_JOB_HELD &&
-          ippFindAttribute(job->attrs, "job-hold-until", IPP_TAG_KEYWORD) == NULL &&
-	  ippFindAttribute(job->attrs, "job-hold-until", IPP_TAG_NAME) == NULL)
-        job->state->values[0].integer = IPP_JOB_PENDING;
+      if (job->state->values[0].integer == IPP_JOB_HELD)
+      {
+	if ((attr = ippFindAttribute(job->attrs, "job-hold-until", IPP_TAG_KEYWORD)) == NULL)
+          attr = ippFindAttribute(job->attrs, "job-hold-until", IPP_TAG_NAME);
+
+        if (attr == NULL)
+          job->state->values[0].integer = IPP_JOB_PENDING;
+	else
+          SetJobHoldUntil(job->id, attr->values[0].string.text);
+      }
 
      /*
       * Insert the job into the array, sorting by job priority and ID...
@@ -648,6 +655,139 @@ SaveJob(int id)			/* I - Job ID */
 
   snprintf(filename, sizeof(filename), "%s/c%05d", RequestRoot, id);
   ipp_write_file(filename, job->attrs);
+}
+
+
+/*
+ * 'SetJobHoldUntil()' - Set the hold time for a job...
+ */
+
+void
+SetJobHoldUntil(int        id,		/* I - Job ID */
+                const char *when)	/* I - When to resume */
+{
+  job_t		*job;			/* Pointer to job */
+  time_t	curtime;		/* Current time */
+  struct tm	*curdate;		/* Current date */
+  int		hour;			/* Hold hour */
+  int		minute;			/* Hold minute */
+  int		second;			/* Hold second */
+
+
+  if ((job = FindJob(id)) == NULL)
+    return;
+
+  second = 0;
+
+  if (strcmp(when, "indefinite") == 0)
+  {
+   /*
+    * Hold indefinitely...
+    */
+
+    job->hold_until = 0;
+  }
+  else if (strcmp(when, "day-time") == 0)
+  {
+   /*
+    * Hold to 6am the next morning unless local time is < 6pm.
+    */
+
+    curtime = time(NULL);
+    curdate = localtime(&curtime);
+
+    if (curdate->tm_hour < 18)
+      job->hold_until = curtime;
+    else
+      job->hold_until = curtime +
+                        ((29 - curdate->tm_hour) * 60 + 59 -
+			 curdate->tm_min) * 60 + 60 - curdate->tm_sec;
+  }
+  else if (strcmp(when, "evening") == 0 || strcmp(when, "night") == 0)
+  {
+   /*
+    * Hold to 6pm unless local time is > 6pm or < 6am.
+    */
+
+    curtime = time(NULL);
+    curdate = localtime(&curtime);
+
+    if (curdate->tm_hour < 6 || curdate->tm_hour >= 18)
+      job->hold_until = curtime;
+    else
+      job->hold_until = curtime +
+                        ((17 - curdate->tm_hour) * 60 + 59 -
+			 curdate->tm_min) * 60 + 60 - curdate->tm_sec;
+  }  
+  else if (strcmp(when, "second-shift") == 0)
+  {
+   /*
+    * Hold to 4pm unless local time is > 4pm.
+    */
+
+    curtime = time(NULL);
+    curdate = localtime(&curtime);
+
+    if (curdate->tm_hour >= 16)
+      job->hold_until = curtime;
+    else
+      job->hold_until = curtime +
+                        ((15 - curdate->tm_hour) * 60 + 59 -
+			 curdate->tm_min) * 60 + 60 - curdate->tm_sec;
+  }  
+  else if (strcmp(when, "third-shift") == 0)
+  {
+   /*
+    * Hold to 12am unless local time is < 8am.
+    */
+
+    curtime = time(NULL);
+    curdate = localtime(&curtime);
+
+    if (curdate->tm_hour < 8)
+      job->hold_until = curtime;
+    else
+      job->hold_until = curtime +
+                        ((23 - curdate->tm_hour) * 60 + 59 -
+			 curdate->tm_min) * 60 + 60 - curdate->tm_sec;
+  }  
+  else if (strcmp(when, "weekend") == 0)
+  {
+   /*
+    * Hold to weekend unless we are in the weekend.
+    */
+
+    curtime = time(NULL);
+    curdate = localtime(&curtime);
+
+    if (curdate->tm_wday == 0 || curdate->tm_wday == 6)
+      job->hold_until = curtime;
+    else
+      job->hold_until = curtime +
+                        (((5 - curdate->tm_wday) * 24 +
+                          (17 - curdate->tm_hour)) * 60 + 59 -
+			   curdate->tm_min) * 60 + 60 - curdate->tm_sec;
+  }  
+  else if (sscanf(when, "%d:%d:%d", &hour, &minute, &second) >= 2)
+  {
+   /*
+    * Hold to specified time...
+    */
+
+    curtime = time(NULL);
+    curdate = localtime(&curtime);
+
+    job->hold_until = curtime +
+                      ((hour - curdate->tm_hour) * 60 + minute -
+		       curdate->tm_min) * 60 + second - curdate->tm_sec;
+
+   /*
+    * Hold until next day as needed...
+    */
+
+    if (job->hold_until < curtime)
+      job->hold_until += 24 * 60 * 60 * 60;
+  }
 }
 
 
@@ -2356,5 +2496,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.70 2000/06/01 20:28:51 mike Exp $".
+ * End of "$Id: job.c,v 1.71 2000/06/02 13:51:49 mike Exp $".
  */
