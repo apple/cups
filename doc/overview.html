@@ -11,7 +11,7 @@
 	<TD><H1 ALIGN=right>An Overview of the<BR>
 	Common UNIX Printing System</H1></DIV>
 
-	<P ALIGN=right>May 11, 1999<BR>
+	<P ALIGN=right>September 14, 1999<BR>
 	Michael Sweet, Easy Software Products<BR>
 	Copyright 1998-1999, All Rights Reserved.</P>
 	</TD>
@@ -163,7 +163,9 @@ Apache server configuration file and defines all of the access control
 properties for the server.
 
 <P>The printer and class definition files list the available printer
-queues and classes.
+queues and classes. Printer classes are collections of printers. Jobs
+sent to a class are forwarded to the first available printer in the
+class, round-robin fashion.
 
 <P>The MIME type files list the supported MIME types (text/plain,
 application/postscript, etc.) and "magic" rules for automatically
@@ -174,13 +176,16 @@ when a <I>Print-Job</I> request is received with a
 <I>document-format</I> of <I>application/octet-stream</I>.
 
 <P>The MIME conversion rule files list the available filters. These
-files are augmented by <I>AddFilter</I> entries in the printer
-definition files. The filters are used when a job is dispatched so that
-an application can send a convenient file format to the printing system
+files are augmented by <I>cupsFilter</I> entries in the printer PPD
+files. The filters are used when a job is dispatched so that an
+application can send a convenient file format to the printing system
 which then converts the document into a printable format as needed.
+Each filter has a relative cost associated with it, and the filtering
+algorithm chooses the set of filters that will convert the file to the
+needed format with the lowest total "cost".
 
-<P>The PPD files describe the capabilities of PostScript printers.  There is
-one PPD file for each printer.
+<P>The PPD files describe the capabilities of PostScript printers. 
+There is one PPD file for each printer.
 
 <H3>CUPS Interface Library</H3>
 
@@ -199,8 +204,8 @@ and job options. All output is sent to the standard output.
 <H3>Backends</H3>
 
 A backend program is a special filter that writes incoming data to a
-device or network connection. Backends for serial, parallel, LPD, TFTP,
-FTP, IPP, SMB, and AppSocket (JetDirect) connections are provided in
+device or network connection. Backends for serial, parallel, LPD,
+IPP, SMB, and AppSocket (JetDirect) connections are provided in
 CUPS 1.0.
 
 <H2>Berkeley and System V Commands</H2>

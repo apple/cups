@@ -71,10 +71,10 @@ The following non-CUPS documents are referenced by this document:
 <UL>
 	<LI>IEEE 1387.4, System Administration: Printing (draft) 
 	<LI>IPP/1.0: Additional Optional Operations - Set 1
-	<LI>IPP/1.0: Encoding and Transport 
-	<LI>IPP/1.0: Implementers Guide
-	<LI>IPP/1.0: Model and Semantics
 	<LI>RFC 1179, Line Printer Daemon Protocol 
+	<LI>RFC 2565, IPP/1.0: Encoding and Transport 
+	<LI>RFC 2566, IPP/1.0: Model and Semantics
+	<LI>RFC 2639, IPP/1.0: Implementers Guide
 </UL>
 
 <H1>Local Access Risks</H1>
@@ -86,12 +86,32 @@ system.
 
 <H2>Security Breaches</H2>
 
-<P>Since the default installation creates a world-readable request directory,
-it is possible for local users to read the contents of print files before they
-are printed.
+<P>There are two known security vulnerabilities with local access:
 
-<P>This problem can be alleviated by making the request directory readable only
-by the user specified in the CUPS configuration file.
+<OL>
+
+	<LI>Since the default installation creates a world-readable
+	request directory, it is possible for local users to read the
+	contents of print files before they are printed.
+
+	<P>This problem can be alleviated by making the request
+	directory readable only by the user specified in the CUPS
+	configuration file.
+
+	<LI>Device URIs are passed to backend filters in argv[0] and in
+	an environment variable. Since device URIs can contain
+	usernames and passwords it may be possible for a local user to
+	gain access to a remote resource.
+
+	<P>We recommend that any password-protected accounts used for
+	remote printing have limited access priviledges so that the
+	possible damages can be minimized.
+
+	<P>The device URI is "sanitized" (the username and password are
+	removed) when sent to an IPP client so that a remote user
+	cannot exploit this vulnerability.
+
+</OL>
 
 <H1>Remote Access Risks</H1>
 
@@ -101,7 +121,7 @@ related to network or firewall security.
 
 <H2>Denial of Service Attacks</H2>
 
-<P>Like all internet services, the CUPS server is vulnerable to denial of
+<P>Like all Internet services, the CUPS server is vulnerable to denial of
 service attacks, including:
 
 <OL>

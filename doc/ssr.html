@@ -91,10 +91,10 @@ sections:</P>
 <UL>
 <LI>IEEE 1387.4, System Administration: Printing (draft) </LI>
 <LI>IPP/1.0: Additional Optional Operations - Set 1 </LI>
-<LI>IPP/1.0: Encoding and Transport </LI>
-<LI>IPP/1.0: Implementers Guide </LI>
-<LI>IPP/1.0: Model and Semantics </LI>
 <LI>RFC 1179, Line Printer Daemon Protocol </LI>
+<LI>RFC 2565, IPP/1.0: Encoding and Transport </LI>
+<LI>RFC 2566, IPP/1.0: Model and Semantics </LI>
+<LI>RFC 2639, IPP/1.0: Implementers Guide </LI>
 </UL>
 <H1><A NAME=3>3 Local Access Risks</A></H1>
 <P>Local access risks are those that can be exploited only with a local 
@@ -102,17 +102,32 @@ user account. This section does not address issues related to
 dissemination of the root password or other security issues associated 
 with the UNIX operating system. </P>
 <H2><A NAME=3_1>3.1 Security Breaches</A></H2>
-<P>Since the default installation creates a world-readable request 
-directory, it is possible for local users to read the contents of print 
-files before they are printed. </P>
-<P>This problem can be alleviated by making the request directory 
-readable only by the user specified in the CUPS configuration file. </P>
+<P>There are two known security vulnerabilities with local access: </P>
+<OL>
+<LI>Since the default installation creates a world-readable  request 
+directory, it is possible for local users to read the  contents of 
+print files before they are printed. 
+<P>This problem can be alleviated by making the request  directory 
+readable only by the user specified in the CUPS  configuration file. </P>
+</LI>
+<LI>Device URIs are passed to backend filters in argv[0] and in  an 
+environment variable. Since device URIs can contain  usernames and 
+passwords it may be possible for a local user to  gain access to a 
+remote resource. 
+<P>We recommend that any password-protected accounts used for  remote 
+printing have limited access priviledges so that the  possible damages 
+can be minimized. </P>
+<P>The device URI is &quot;sanitized&quot; (the username and password are 
+ removed) when sent to an IPP client so that a remote user  cannot 
+exploit this vulnerability. </P>
+</LI>
+</OL>
 <H1><A NAME=4>4 Remote Access Risks</A></H1>
 <P>Remote access risks are those that can be exploited without a local 
 user account and/or from a remote system. This section does not address 
 issues related to network or firewall security. </P>
 <H2><A NAME=4_1>4.1 Denial of Service Attacks</A></H2>
-<P>Like all internet services, the CUPS server is vulnerable to denial 
+<P>Like all Internet services, the CUPS server is vulnerable to denial 
 of service attacks, including: </P>
 <OL>
 <LI>Establishing multiple connections to the server until the server 

@@ -1,13 +1,13 @@
 <HTML>
 <HEAD>
-<TITLE>DRAFT - CUPS Interface Design Description</TITLE>
+<TITLE>CUPS Interface Design Description</TITLE>
 <META NAME="AUTHOR" CONTENT="Easy Software Products">
 <META NAME="COPYRIGHT" CONTENT="Copyright 1997-1999, All Rights Reserved">
 <META NAME="DOCNUMBER" CONTENT="CUPS-IDD-1.0">
 </HEAD>
 <BODY>
 <CENTER><A HREF=#contents><IMG SRC="images/cups-large.gif" BORDER=0><BR>
-<H1>DRAFT - CUPS Interface Design Description</H1></A><BR>
+<H1>CUPS Interface Design Description</H1></A><BR>
 CUPS-IDD-1.0<BR>
 Easy Software Products<BR>
 Copyright 1997-1999, All Rights Reserved<BR>
@@ -53,26 +53,24 @@ Copyright 1997-1999, All Rights Reserved<BR>
 <LI><A HREF=#4_3>4.3 CUPS PostScript File</A></LI>
 <LI><A HREF=#4_4>4.4 CUPS Raster File</A></LI>
 <LI><A HREF=#4_5>4.5 CUPS Raw Files</A></LI>
-<LI><A HREF=#4_6>4.6 File Transfer Protocol</A></LI>
-<LI><A HREF=#4_7>4.7 Internet Printing Protocol</A></LI>
+<LI><A HREF=#4_6>4.6 Internet Printing Protocol</A></LI>
 <UL>
-<LI><A HREF=#4_7_1>4.7.1 Get Default Destination (CUPS_GET_DEFAULT = 
+<LI><A HREF=#4_6_1>4.6.1 Get Default Destination (CUPS_GET_DEFAULT = 
 0x4001)</A></LI>
-<LI><A HREF=#4_7_2>4.7.2 Get Printers (CUPS_GET_PRINTERS = 0x4002)</A></LI>
-<LI><A HREF=#4_7_3>4.7.3 Add Printer (CUPS_ADD_PRINTER = 0x4003)</A></LI>
-<LI><A HREF=#4_7_4>4.7.4 Delete Printer (CUPS_DELETE_PRINTER = 0x4004)</A>
+<LI><A HREF=#4_6_2>4.6.2 Get Printers (CUPS_GET_PRINTERS = 0x4002)</A></LI>
+<LI><A HREF=#4_6_3>4.6.3 Add Printer (CUPS_ADD_PRINTER = 0x4003)</A></LI>
+<LI><A HREF=#4_6_4>4.6.4 Delete Printer (CUPS_DELETE_PRINTER = 0x4004)</A>
 </LI>
-<LI><A HREF=#4_7_5>4.7.5 Get Classes (CUPS_GET_CLASSES = 0x4005)</A></LI>
-<LI><A HREF=#4_7_6>4.7.6 Add Class (CUPS_ADD_CLASS = 0x4006)</A></LI>
-<LI><A HREF=#4_7_7>4.7.7 Delete Class (CUPS_DELETE_CLASS = 0x4007)</A></LI>
-<LI><A HREF=#4_7_8>4.7.8 Accept Jobs (CUPS_ACCEPT_JOBS = 0x4008)</A></LI>
-<LI><A HREF=#4_7_9>4.7.9 Reject Jobs (CUPS_REJECT_JOBS = 0x4009)</A></LI>
-<LI><A HREF=#4_7_10>4.7.10 Set Default Destination (CUPS_SET_DEFAULT = 
+<LI><A HREF=#4_6_5>4.6.5 Get Classes (CUPS_GET_CLASSES = 0x4005)</A></LI>
+<LI><A HREF=#4_6_6>4.6.6 Add Class (CUPS_ADD_CLASS = 0x4006)</A></LI>
+<LI><A HREF=#4_6_7>4.6.7 Delete Class (CUPS_DELETE_CLASS = 0x4007)</A></LI>
+<LI><A HREF=#4_6_8>4.6.8 Accept Jobs (CUPS_ACCEPT_JOBS = 0x4008)</A></LI>
+<LI><A HREF=#4_6_9>4.6.9 Reject Jobs (CUPS_REJECT_JOBS = 0x4009)</A></LI>
+<LI><A HREF=#4_6_10>4.6.10 Set Default Destination (CUPS_SET_DEFAULT = 
 0x400A)</A></LI>
 </UL>
-<LI><A HREF=#4_8>4.8 Line Printer Daemon Protocol</A></LI>
-<LI><A HREF=#4_9>4.9 Server Message Block Protocol</A></LI>
-<LI><A HREF=#4_10>4.10 Trivial File Transfer Protocol</A></LI>
+<LI><A HREF=#4_7>4.7 Line Printer Daemon Protocol</A></LI>
+<LI><A HREF=#4_8>4.8 Server Message Block Protocol</A></LI>
 </UL>
 <B><A HREF=#5>5 5 - Directories</A></B>
 <BR>
@@ -133,10 +131,10 @@ following sections: </P>
 <UL>
 <LI>IEEE 1387.4, System Administration: Printing (draft) </LI>
 <LI>IPP/1.0: Additional Optional Operations - Set 1 </LI>
-<LI>IPP/1.0: Encoding and Transport </LI>
-<LI>IPP/1.0: Implementers Guide </LI>
-<LI>IPP/1.0: Model and Semantics </LI>
 <LI>RFC 1179, Line Printer Daemon Protocol </LI>
+<LI>RFC 2565, IPP/1.0: Encoding and Transport </LI>
+<LI>RFC 2566, IPP/1.0: Model and Semantics </LI>
+<LI>RFC 2639, IPP/1.0: Implementers Guide </LI>
 </UL>
 <H1><A NAME=3>3 Internal Interfaces</A></H1>
 <H2><A NAME=3_1>3.1 Character Set Files</A></H2>
@@ -285,13 +283,18 @@ understood:
 <TABLE BORDER=1 WIDTH=90%>
 <TR><TH WIDTH=25%>Directive</TH><TH>Description</TH></TR>
 <TR><TD>&lt;Class name&gt;
-<BR> &lt;/Class&gt;</TD><TD></TR>
+<BR> &lt;/Class&gt;</TD><TD>Surrounds a class definition.</TD></TR>
 <TR><TD>&lt;DefaultClass name&gt;
-<BR> &lt;/Class&gt;</TD><TD></TR>
-<TR><TD>Info</TD><TD></TR>
-<TR><TD>Location</TD><TD></TR>
-<TR><TD>MoreInfo</TD><TD></TR>
-<TR><TD>Printer</TD><TD></TR>
+<BR> &lt;/Class&gt;</TD><TD>Surrounds a class definition for the default 
+destination.</TD></TR>
+<TR><TD>Accepting</TD><TD>Specifies whether the class is accepting new 
+jobs. May be  the names &quot;Yes&quot; or &quot;No&quot;.</TD></TR>
+<TR><TD>Info</TD><TD>A textual description of the class.</TD></TR>
+<TR><TD>Location</TD><TD>A textual location of the class.</TD></TR>
+<TR><TD>MoreInfo</TD><TD>A URL pointing to additional information on 
+the class.</TD></TR>
+<TR><TD>Printer</TD><TD>Specifies a printer that is a member of the 
+class.</TD></TR>
 </TABLE>
 </CENTER>
 </P>
@@ -304,43 +307,92 @@ understood:
 <CENTER>
 <TABLE BORDER=1 WIDTH=90%>
 <TR><TH WIDTH=25%>Directive</TH><TH>Default</TH><TH>Description</TH></TR>
-<TR><TD>AccessLog</TD><TD><TD>Specifies the location of the access log 
-file (default  &quot;logs/access_log&quot;).</TD></TR>
-<TR><TD>Allow</TD><TD><TD></TR>
-<TR><TD>AuthClass</TD><TD><TD></TR>
-<TR><TD>AuthType</TD><TD><TD></TR>
-<TR><TD>BrowseAddress</TD><TD><TD></TR>
-<TR><TD>BrowseInterval</TD><TD><TD></TR>
-<TR><TD>BrowsePort</TD><TD><TD></TR>
-<TR><TD>BrowseTimeout</TD><TD><TD></TR>
-<TR><TD>Browsing</TD><TD><TD></TR>
-<TR><TD>DefaultCharset</TD><TD><TD></TR>
-<TR><TD>DefaultLanguage</TD><TD><TD></TR>
-<TR><TD>Deny</TD><TD><TD></TR>
-<TR><TD>DocumentRoot</TD><TD><TD></TR>
-<TR><TD>ErrorLog</TD><TD><TD></TR>
-<TR><TD>Group</TD><TD><TD></TR>
-<TR><TD>HostNameLookups</TD><TD><TD></TR>
-<TR><TD>ImplicitClasses</TD><TD><TD></TR>
-<TR><TD>KeepAlive</TD><TD><TD></TR>
-<TR><TD>KeepAliveTimeout</TD><TD><TD></TR>
+<TR><TD>AccessLog</TD><TD>logs/access_log</TD><TD>Specifies the 
+location of the access log file.</TD></TR>
+<TR><TD>Allow</TD><TD>-</TD><TD>Allows connections from the specified 
+host, network, or  domain.</TD></TR>
+<TR><TD>AuthClass</TD><TD>-</TD><TD>Specifies what level of 
+authentication is required; may be either  &quot;User&quot;, &quot;System&quot;, or &quot;Group&quot;.</TD>
+</TR>
+<TR><TD>AuthType</TD><TD>None</TD><TD>Specifies the type of 
+authentication to perform; may be either  &quot;None&quot; or &quot;Basic&quot;.</TD></TR>
+<TR><TD>BrowseAddress</TD><TD>255.255.255.255</TD><TD>Specifies a 
+broadcast address to send CUPS browsing packets to.</TD></TR>
+<TR><TD>BrowseInterval</TD><TD>30</TD><TD>Specifies the number of 
+seconds between browsing updates.</TD></TR>
+<TR><TD>BrowsePort</TD><TD>631</TD><TD>Specifies the UDP port number to 
+use for browse packets.</TD></TR>
+<TR><TD>BrowseTimeout</TD><TD>300</TD><TD>Specifies the number of 
+seconds to wait until remote destinations  are removed from the local 
+destination list.</TD></TR>
+<TR><TD>Browsing</TD><TD>On</TD><TD>Specifies whether or not printer 
+and class browsing is enabled; can  be &quot;On&quot; or &quot;Off&quot;.</TD></TR>
+<TR><TD>DefaultCharset</TD><TD>iso-8859-1</TD><TD>Specifies the default 
+character set.</TD></TR>
+<TR><TD>DefaultLanguage</TD><TD>current locale</TD><TD>Specifies the 
+default language.</TD></TR>
+<TR><TD>Deny</TD><TD>-</TD><TD>Refuses connections from the specified 
+host, network, or  domain.</TD></TR>
+<TR><TD>DocumentRoot</TD><TD>/usr/share/cups/doc</TD><TD>Specifies the 
+document data root directory.</TD></TR>
+<TR><TD>ErrorLog</TD><TD>logs/error_log</TD><TD>Specifies the error log 
+file location.</TD></TR>
+<TR><TD>Group</TD><TD>root, sys, system</TD><TD>Specifies the group 
+name or ID that is used when running  external programs.</TD></TR>
+<TR><TD>HostNameLookups</TD><TD>Off</TD><TD>Specifies whether or not to 
+perform reverse IP address lookups to  get the actual hostname; may be 
+&quot;On&quot; or &quot;Off&quot;. Hostname lookups can  significantly degrade the 
+performance of the CUPS server if one or  more DNS servers is not 
+functioning properly.</TD></TR>
+<TR><TD>ImplicitClasses</TD><TD>On</TD><TD>Specifies whether or not to 
+automatically create printer classes  when more than one printer or 
+class of the same name is detected on  the network; may be &quot;On&quot; or 
+&quot;Off&quot;.</TD></TR>
+<TR><TD>KeepAlive</TD><TD>On</TD><TD>Specifies whether or not to use 
+the HTTP Keep-Alive feature; may  be &quot;On&quot; or &quot;Off&quot;.</TD></TR>
+<TR><TD>KeepAliveTimeout</TD><TD>30</TD><TD>Specifies the amount of 
+time to keep the HTTP connection alive  before closing it.</TD></TR>
 <TR><TD>&lt;Location path&gt;
-<BR> &lt;/Location&gt;</TD><TD><TD></TR>
-<TR><TD>LogLevel</TD><TD><TD></TR>
-<TR><TD>MaxClients</TD><TD><TD></TR>
-<TR><TD>MaxLogSize</TD><TD><TD></TR>
-<TR><TD>MaxRequestSize</TD><TD><TD></TR>
-<TR><TD>Order</TD><TD><TD></TR>
-<TR><TD>PageLog</TD><TD><TD></TR>
-<TR><TD>Port</TD><TD><TD></TR>
-<TR><TD>RIPCache</TD><TD><TD></TR>
-<TR><TD>ServerAdmin</TD><TD><TD></TR>
-<TR><TD>ServerName</TD><TD><TD></TR>
-<TR><TD>ServerRoot</TD><TD><TD></TR>
-<TR><TD>SystemGroup</TD><TD><TD></TR>
-<TR><TD>TempDir</TD><TD><TD></TR>
-<TR><TD>Timeout</TD><TD><TD></TR>
-<TR><TD>User</TD><TD><TD></TR>
+<BR> &lt;/Location&gt;</TD><TD>-</TD><TD>Specifies a location to restrict 
+access to.</TD></TR>
+<TR><TD>LogLevel</TD><TD>info</TD><TD>Controls the amount of 
+information that is logged in the  error log file. Can be one of 
+&quot;debug&quot;, &quot;info&quot;, &quot;warn&quot;, &quot;error&quot;,  or &quot;none&quot;, in decreasing order or 
+verbosity.</TD></TR>
+<TR><TD>MaxClients</TD><TD>100</TD><TD>Specifies the maximum number of 
+simultaneous active clients.  This value is internally limited to 1/3 
+of the total number of  availabel file descriptors.</TD></TR>
+<TR><TD>MaxLogSize</TD><TD>0</TD><TD>Specifies the maximum size of the 
+access, error, and page  log files in bytes. If set to 0 then no 
+maximum size is set.  Log files are rotated automatically when this 
+size is  exceeded.</TD></TR>
+<TR><TD>MaxRequestSize</TD><TD>0</TD><TD>Specifies the maximum size of 
+HTTP requests in bytes. If set to 0  then there is no maximum.</TD></TR>
+<TR><TD>Order</TD><TD>Allow,Deny</TD><TD>Specifies the order of Allow 
+and Deny directive processing; can  be &quot;Deny,Allow&quot; to implicitly deny 
+hosts unless they are allowed by  an Allow line, or &quot;Allow,Deny&quot; to 
+implicitly allow hosts unless they  are denied by a Deny line.</TD></TR>
+<TR><TD>PageLog</TD><TD>logs/page_log</TD><TD>Specifies the location of 
+the page log file.</TD></TR>
+<TR><TD>Port</TD><TD>631</TD><TD>Specifies a port number to listen to 
+for HTTP connections.</TD></TR>
+<TR><TD>RIPCache</TD><TD>8m</TD><TD>Specifies the size of the memory 
+cache in bytes that is used by  RIP filters.</TD></TR>
+<TR><TD>ServerAdmin</TD><TD>root@ServerName</TD><TD>Specifies the 
+person to contact with problems.</TD></TR>
+<TR><TD>ServerName</TD><TD>hostname</TD><TD>Specifies the hostname that 
+is supplied to HTTP clients. This  is also used to determine the 
+default CUPS server for the CUPS IPP  client applications.</TD></TR>
+<TR><TD>ServerRoot</TD><TD>/var/cups</TD><TD>Specifies the root 
+directory for server data files.</TD></TR>
+<TR><TD>SystemGroup</TD><TD>root, sys, system</TD><TD>Specifies the 
+group name used for System class authentication.</TD></TR>
+<TR><TD>TempDir</TD><TD>/var/tmp</TD><TD>Specifies the temporary 
+directory to use.</TD></TR>
+<TR><TD>Timeout</TD><TD>300</TD><TD>The timeout in seconds before 
+client connections are closed  in the middle of a request.</TD></TR>
+<TR><TD>User</TD><TD>lp</TD><TD>Specifies the user that is used when 
+running external programs.</TD></TR>
 </TABLE>
 </CENTER>
 </P>
@@ -353,22 +405,28 @@ understood:
 <CENTER>
 <TABLE BORDER=1 WIDTH=90%>
 <TR><TH WIDTH=25%>Directive</TH><TH>Description</TH></TR>
+<TR><TD>Accepting</TD><TD>Specifies whether the printer is accepting 
+new jobs. May be  the names &quot;Yes&quot; or &quot;No&quot;.</TD></TR>
 <TR><TD>&lt;DefaultPrinter name&gt;
-<BR> &lt;/Printer&gt;</TD><TD></TR>
-<TR><TD>DeviceURI</TD><TD></TR>
-<TR><TD>Info</TD><TD></TR>
-<TR><TD>Location</TD><TD></TR>
-<TR><TD>MoreInfo</TD><TD></TR>
+<BR> &lt;/Printer&gt;</TD><TD>Surrounds the printer definition for a default 
+destination.</TD></TR>
+<TR><TD>DeviceURI</TD><TD>Specifies the device-uri attribute for the 
+printer.</TD></TR>
+<TR><TD>Info</TD><TD>A textual description of the printer.</TD></TR>
+<TR><TD>Location</TD><TD>A textual location of the printer.</TD></TR>
+<TR><TD>MoreInfo</TD><TD>A URL pointing to additional information on 
+the printer.</TD></TR>
 <TR><TD>&lt;Printer name&gt;
-<BR> &lt;/Printer&gt;</TD><TD></TR>
-<TR><TD>State</TD><TD></TR>
+<BR> &lt;/Printer&gt;</TD><TD>Surrounds the printer definition.</TD></TR>
+<TR><TD>State</TD><TD>Specifies the initial state of the printer; can 
+be &quot;Idle&quot; or  &quot;Stopped&quot;.</TD></TR>
 </TABLE>
 </CENTER>
 </P>
 <H1><A NAME=4>4 External Interfaces</A></H1>
 <H2><A NAME=4_1>4.1 AppSocket Protocol</A></H2>
 <P>The AppSocket protocol is an 8-bit clean TCP/IP socket connection. 
-The default IP service port is 9100. </P>
+The default IP service port is 9100. The URI method name is &quot;socket&quot;. </P>
 <H2><A NAME=4_2>4.2 CUPS Browsing Protocol</A></H2>
 <P>The CUPS Browsing Protocol is a UDP/IP-based broadcast service. By 
 default this service operates on IP service port 631. </P>
@@ -545,10 +603,7 @@ application/vnd.cups-raster</CODE>. </P>
 <P>Raw files are printer-dependent print files that are in a format 
 suitable to the destination printer (e.g. HP-PCL, HP-RTL, etc.) The 
 MIME type for CUPS Raw files is <CODE>application/vnd.cups-raw</CODE>. </P>
-<H2><A NAME=4_6>4.6 File Transfer Protocol</A></H2>
-<P>The File Transfer Protocol (FTP) is described by <A HREF=http://www.ietf.org/rfc/rfc959.txt>
-RFC 959: File Transfer Protocol</A>. </P>
-<H2><A NAME=4_7>4.7 Internet Printing Protocol</A></H2>
+<H2><A NAME=4_6>4.6 Internet Printing Protocol</A></H2>
 <P>The Internet Printing Protocol is described by the following RFCs: </P>
 <UL>
 <LI><A HREF=http://www.ietf.org/rfc/rfc2565.txt>RFC 2565: Internet 
@@ -563,20 +618,21 @@ Protocol</A></LI>
 <LI><A HREF=http://www.ietf.org/rfc/rfc2569.txt>RFC 2569: Mapping 
 between LPD and IPP Protocols</A></LI>
 </UL>
+<P>The URI method name for IPP is &quot;ipp&quot;. </P>
 <P>CUPS defines the following extension operations to IPP. </P>
-<H3><A NAME=4_7_1>4.7.1 Get Default Destination (CUPS_GET_DEFAULT = 
+<H3><A NAME=4_6_1>4.6.1 Get Default Destination (CUPS_GET_DEFAULT = 
 0x4001)</A></H3>
 <P>The get default destination operation returns the printer attributes 
 for the system default printer or class. The only required attributes 
 are <CODE>attributes-charset</CODE> and <CODE>
 attributes-natural-language</CODE>. </P>
 <P>Get default destination will only return <CODE>ipp-ok</CODE>. </P>
-<H3><A NAME=4_7_2>4.7.2 Get Printers (CUPS_GET_PRINTERS = 0x4002)</A></H3>
+<H3><A NAME=4_6_2>4.6.2 Get Printers (CUPS_GET_PRINTERS = 0x4002)</A></H3>
 <P>The get printers operation returns the printer attributes for all 
 printers known to the system. The only required attributes are <CODE>
 attributes-charset</CODE> and <CODE>attributes-natural-language</CODE>. </P>
 <P>Get printers will only return <CODE>ipp-ok</CODE>. </P>
-<H3><A NAME=4_7_3>4.7.3 Add Printer (CUPS_ADD_PRINTER = 0x4003)</A></H3>
+<H3><A NAME=4_6_3>4.6.3 Add Printer (CUPS_ADD_PRINTER = 0x4003)</A></H3>
 <P>The add printer operation adds or replaces the specified printer. 
 The <CODE>attributes-charset</CODE>, <CODE>attributes-natural-language</CODE>
  and <CODE>printer-uri</CODE> attributes are required. </P>
@@ -589,19 +645,19 @@ body. If a valid interface script or PPD file is not provided then the
 printer is treated as a generic PostScript device. </P>
 <P>Add printer will return <CODE>ipp-ok</CODE>, <CODE>ipp-not-authorized</CODE>
 , <CODE>ipp-bad-request</CODE>, or <CODE>ipp-attributes</CODE>. </P>
-<H3><A NAME=4_7_4>4.7.4 Delete Printer (CUPS_DELETE_PRINTER = 0x4004)</A>
+<H3><A NAME=4_6_4>4.6.4 Delete Printer (CUPS_DELETE_PRINTER = 0x4004)</A>
 </H3>
 <P>The delete printer operation removes the specified printer. The only 
 required attributes are <CODE>attributes-charset</CODE>, <CODE>
 attributes-natural-language</CODE>, and <CODE>printer-uri</CODE>. </P>
 <P>Delete printer will return <CODE>ipp-ok</CODE>, <CODE>ipp-not-found</CODE>
 , or <CODE>ipp-not-authorized</CODE>. </P>
-<H3><A NAME=4_7_5>4.7.5 Get Classes (CUPS_GET_CLASSES = 0x4005)</A></H3>
+<H3><A NAME=4_6_5>4.6.5 Get Classes (CUPS_GET_CLASSES = 0x4005)</A></H3>
 <P>The get classes operation returns the printer attributes for all 
 classes known to the system. The only required attributes are <CODE>
 attributes-charset</CODE> and <CODE>attributes-natural-language</CODE>. </P>
 <P>Get classes will only return <CODE>ipp-ok</CODE>. </P>
-<H3><A NAME=4_7_6>4.7.6 Add Class (CUPS_ADD_CLASS = 0x4006)</A></H3>
+<H3><A NAME=4_6_6>4.6.6 Add Class (CUPS_ADD_CLASS = 0x4006)</A></H3>
 <P>The add class operation adds or replaces the specified class. The <CODE>
 attributes-charset</CODE>, <CODE>attributes-natural-language</CODE>, 
 and <CODE>printer-uri</CODE> attributes are required. </P>
@@ -611,27 +667,27 @@ required when initially adding a printer and optional when modifying a
 printer. </P>
 <P>Add class will return <CODE>ipp-ok</CODE>, <CODE>ipp-not-authorized</CODE>
 , <CODE>ipp-bad-request</CODE>, or <CODE>ipp-attributes</CODE>. </P>
-<H3><A NAME=4_7_7>4.7.7 Delete Class (CUPS_DELETE_CLASS = 0x4007)</A></H3>
+<H3><A NAME=4_6_7>4.6.7 Delete Class (CUPS_DELETE_CLASS = 0x4007)</A></H3>
 <P>The delete class operation removes the specified class. The only 
 required attributes are <CODE>attributes-charset</CODE>, <CODE>
 attributes-natural-language</CODE>, and <CODE>printer-uri</CODE>. </P>
 <P>Delete class will return <CODE>ipp-ok</CODE>, <CODE>ipp-not-found</CODE>
 , or <CODE>ipp-not-authorized</CODE>. </P>
-<H3><A NAME=4_7_8>4.7.8 Accept Jobs (CUPS_ACCEPT_JOBS = 0x4008)</A></H3>
+<H3><A NAME=4_6_8>4.6.8 Accept Jobs (CUPS_ACCEPT_JOBS = 0x4008)</A></H3>
 <P>The accept jobs operation allows jobs to be accepted by the 
 specified destination. The only required attributes are <CODE>
 attributes-charset</CODE>, <CODE>attributes-natural-language</CODE>, 
 and <CODE>printer-uri</CODE>. </P>
 <P>Accept jobs will return <CODE>ipp-ok</CODE>, <CODE>ipp-not-found</CODE>
 , or <CODE>ipp-not-authorized</CODE>. </P>
-<H3><A NAME=4_7_9>4.7.9 Reject Jobs (CUPS_REJECT_JOBS = 0x4009)</A></H3>
+<H3><A NAME=4_6_9>4.6.9 Reject Jobs (CUPS_REJECT_JOBS = 0x4009)</A></H3>
 <P>The reject jobs operation prevents jobs from being accepted by the 
 specified destination. The only required attributes are <CODE>
 attributes-charset</CODE>, <CODE>attributes-natural-language</CODE>, 
 and <CODE>printer-uri</CODE>. </P>
 <P>Reject jobs will return <CODE>ipp-ok</CODE>, <CODE>ipp-not-found</CODE>
 , or <CODE>ipp-not-authorized</CODE>. </P>
-<H3><A NAME=4_7_10>4.7.10 Set Default Destination (CUPS_SET_DEFAULT = 
+<H3><A NAME=4_6_10>4.6.10 Set Default Destination (CUPS_SET_DEFAULT = 
 0x400A)</A></H3>
 <P>The set default destination operation returns the printer attributes 
 for the system default printer or class. The only required attributes 
@@ -640,27 +696,24 @@ are <CODE>attributes-charset</CODE>, <CODE>attributes-natural-language</CODE>
 <P>Set default destination will return <CODE>ipp-ok</CODE>, <CODE>
 ipp-not-authorized</CODE>, <CODE>ipp-bad-request</CODE>, or <CODE>
 ipp-not-found</CODE>. </P>
-<H2><A NAME=4_8>4.8 Line Printer Daemon Protocol</A></H2>
+<H2><A NAME=4_7>4.7 Line Printer Daemon Protocol</A></H2>
 <P>The Line Printer Daemon (LPD) protocol is described by <A HREF=http://www.ietf.org/rfc/rfc1179.txt>
 RFC 1179: Line Printer Daemon Protocol</A>. </P>
-<H2><A NAME=4_9>4.9 Server Message Block Protocol</A></H2>
+<P>The URI method name for LPD is &quot;lpd&quot;. </P>
+<H2><A NAME=4_8>4.8 Server Message Block Protocol</A></H2>
 <P>The Server Message Block (SMB) and related Common Internet File 
 System (CIFS) protocols are described at <A HREF=http://anu.samba.org/cifs>
 http://anu.samba.org/cifs</A>. </P>
-<H2><A NAME=4_10>4.10 Trivial File Transfer Protocol</A></H2>
-<P>The Trivial File Transfer Protocol (TFTP) is described by <A HREF=http://www.ietf.org/rfc/rfc1350.txt>
-RFC 1350: The TFTP Protocol (Revision 2)</A>. </P>
+<P>The URI method name for SMB is &quot;smb&quot;. </P>
 <H1><A NAME=5>5 5 - Directories</A></H1>
 <DL>
 <DT>/usr/bin </DT>
 <DD>The <CODE>cancel</CODE>, <CODE>lp</CODE>, <CODE>lpq</CODE>, <CODE>
 lpr</CODE>, <CODE>lprm</CODE>, and <CODE>lpstat</CODE> commands  reside 
 here. </DD>
-<DT>/usr/lib </DT>
-<DD>The <CODE>accept</CODE>, <CODE>disable</CODE>, <CODE>enable</CODE>, <CODE>
-lpadmin</CODE>, and <CODE>reject</CODE> commands reside here. </DD>
 <DT>/usr/sbin </DT>
-<DD>The <CODE>lpc</CODE> and <CODE>cupsd</CODE> commands resize here. </DD>
+<DD>The <CODE>accept</CODE>, <CODE>cupsd</CODE>, <CODE>lpadmin</CODE>, <CODE>
+lpc</CODE>, and <CODE>reject</CODE> commands reside here. </DD>
 <DT>/usr/share/cups </DT>
 <DD>This is the root directory of the CUPS static data. </DD>
 <DT>/usr/share/cups/data </DT>

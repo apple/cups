@@ -3,7 +3,7 @@
 	<META NAME="COPYRIGHT" CONTENT="Copyright 1997-1999, All Rights Reserved">
 	<META NAME="DOCNUMBER" CONTENT="CUPS-IDD-1.0">
 	<META NAME="Author" CONTENT="Easy Software Products">
-	<TITLE>DRAFT - CUPS Interface Design Description</TITLE>
+	<TITLE>CUPS Interface Design Description</TITLE>
 </HEAD>
 <BODY>
 
@@ -74,10 +74,10 @@ sections:
 <UL>
 	<LI>IEEE 1387.4, System Administration: Printing (draft) 
 	<LI>IPP/1.0: Additional Optional Operations - Set 1
-	<LI>IPP/1.0: Encoding and Transport 
-	<LI>IPP/1.0: Implementers Guide
-	<LI>IPP/1.0: Model and Semantics
 	<LI>RFC 1179, Line Printer Daemon Protocol 
+	<LI>RFC 2565, IPP/1.0: Encoding and Transport 
+	<LI>RFC 2566, IPP/1.0: Model and Semantics
+	<LI>RFC 2639, IPP/1.0: Implementers Guide
 </UL>
 
 <H1>Internal Interfaces</H1>
@@ -269,28 +269,33 @@ followed by its value. The following directives are understood:
 <TR>
 	<TD>&lt;Class name&gt;<BR>
 	&lt;/Class&gt;</TD>
-	<TD></TD>
+	<TD>Surrounds a class definition.</TD>
 </TR>
 <TR>
 	<TD>&lt;DefaultClass name&gt;<BR>
 	&lt;/Class&gt;</TD>
-	<TD></TD>
+	<TD>Surrounds a class definition for the default destination.</TD>
+</TR>
+<TR>
+	<TD>Accepting</TD>
+	<TD>Specifies whether the class is accepting new jobs. May be
+	the names "Yes" or "No".</TD>
 </TR>
 <TR>
 	<TD>Info</TD>
-	<TD></TD>
+	<TD>A textual description of the class.</TD>
 </TR>
 <TR>
 	<TD>Location</TD>
-	<TD></TD>
+	<TD>A textual location of the class.</TD>
 </TR>
 <TR>
 	<TD>MoreInfo</TD>
-	<TD></TD>
+	<TD>A URL pointing to additional information on the class.</TD>
 </TR>
 <TR>
 	<TD>Printer</TD>
-	<TD></TD>
+	<TD>Specifies a printer that is a member of the class.</TD>
 </TR>
 </TABLE></CENTER>
 
@@ -310,180 +315,208 @@ followed by its value. The following directives are understood:
 </TR>
 <TR>
 	<TD>AccessLog</TD>
-	<TD></TD>
-	<TD>Specifies the location of the access log file (default
-	"logs/access_log").</TD>
+	<TD>logs/access_log</TD>
+	<TD>Specifies the location of the access log file.</TD>
 </TR>
 <TR>
 	<TD>Allow</TD>
-	<TD></TD>
-	<TD></TD>
+	<TD>-</TD>
+	<TD>Allows connections from the specified host, network, or
+	domain.</TD>
 </TR>
 <TR>
 	<TD>AuthClass</TD>
-	<TD></TD>
-	<TD></TD>
+	<TD>-</TD>
+	<TD>Specifies what level of authentication is required; may be either
+	"User", "System", or "Group".</TD>
 </TR>
 <TR>
 	<TD>AuthType</TD>
-	<TD></TD>
-	<TD></TD>
+	<TD>None</TD>
+	<TD>Specifies the type of authentication to perform; may be either
+	"None" or "Basic".</TD>
 </TR>
 <TR>
 	<TD>BrowseAddress</TD>
-	<TD></TD>
-	<TD></TD>
+	<TD>255.255.255.255</TD>
+	<TD>Specifies a broadcast address to send CUPS browsing packets to.</TD>
 </TR>
 <TR>
 	<TD>BrowseInterval</TD>
-	<TD></TD>
-	<TD></TD>
+	<TD>30</TD>
+	<TD>Specifies the number of seconds between browsing updates.</TD>
 </TR>
 <TR>
 	<TD>BrowsePort</TD>
-	<TD></TD>
-	<TD></TD>
+	<TD>631</TD>
+	<TD>Specifies the UDP port number to use for browse packets.</TD>
 </TR>
 <TR>
 	<TD>BrowseTimeout</TD>
-	<TD></TD>
-	<TD></TD>
+	<TD>300</TD>
+	<TD>Specifies the number of seconds to wait until remote destinations
+	are removed from the local destination list.</TD>
 </TR>
 <TR>
 	<TD>Browsing</TD>
-	<TD></TD>
-	<TD></TD>
+	<TD>On</TD>
+	<TD>Specifies whether or not printer and class browsing is enabled; can
+	be "On" or "Off".</TD>
 </TR>
 <TR>
 	<TD>DefaultCharset</TD>
-	<TD></TD>
-	<TD></TD>
+	<TD>iso-8859-1</TD>
+	<TD>Specifies the default character set.</TD>
 </TR>
 <TR>
 	<TD>DefaultLanguage</TD>
-	<TD></TD>
-	<TD></TD>
+	<TD>current locale</TD>
+	<TD>Specifies the default language.</TD>
 </TR>
 <TR>
 	<TD>Deny</TD>
-	<TD></TD>
-	<TD></TD>
+	<TD>-</TD>
+	<TD>Refuses connections from the specified host, network, or
+	domain.</TD>
 </TR>
 <TR>
 	<TD>DocumentRoot</TD>
-	<TD></TD>
-	<TD></TD>
+	<TD>/usr/share/cups/doc</TD>
+	<TD>Specifies the document data root directory.</TD>
 </TR>
 <TR>
 	<TD>ErrorLog</TD>
-	<TD></TD>
-	<TD></TD>
+	<TD>logs/error_log</TD>
+	<TD>Specifies the error log file location.</TD>
 </TR>
 <TR>
 	<TD>Group</TD>
-	<TD></TD>
-	<TD></TD>
+	<TD>root, sys, system</TD>
+	<TD>Specifies the group name or ID that is used when running
+	external programs.</TD>
 </TR>
 <TR>
 	<TD>HostNameLookups</TD>
-	<TD></TD>
-	<TD></TD>
+	<TD>Off</TD>
+	<TD>Specifies whether or not to perform reverse IP address lookups to
+	get the actual hostname; may be "On" or "Off". Hostname lookups can
+	significantly degrade the performance of the CUPS server if one or
+	more DNS servers is not functioning properly.</TD>
 </TR>
 <TR>
 	<TD>ImplicitClasses</TD>
-	<TD></TD>
-	<TD></TD>
+	<TD>On</TD>
+	<TD>Specifies whether or not to automatically create printer classes
+	when more than one printer or class of the same name is detected on
+	the network; may be "On" or "Off".</TD>
 </TR>
 <TR>
 	<TD>KeepAlive</TD>
-	<TD></TD>
-	<TD></TD>
+	<TD>On</TD>
+	<TD>Specifies whether or not to use the HTTP Keep-Alive feature; may
+	be "On" or "Off".</TD>
 </TR>
 <TR>
 	<TD>KeepAliveTimeout</TD>
-	<TD></TD>
-	<TD></TD>
+	<TD>30</TD>
+	<TD>Specifies the amount of time to keep the HTTP connection alive
+	before closing it.</TD>
 </TR>
 <TR>
 	<TD>&lt;Location path&gt;<BR>
 	&lt;/Location&gt;</TD>
-	<TD></TD>
-	<TD></TD>
+	<TD>-</TD>
+	<TD>Specifies a location to restrict access to.</TD>
 </TR>
 <TR>
 	<TD>LogLevel</TD>
-	<TD></TD>
-	<TD></TD>
+	<TD>info</TD>
+	<TD>Controls the amount of information that is logged in the
+	error log file. Can be one of "debug", "info", "warn", "error",
+	or "none", in decreasing order or verbosity.</TD>
 </TR>
 <TR>
 	<TD>MaxClients</TD>
-	<TD></TD>
-	<TD></TD>
+	<TD>100</TD>
+	<TD>Specifies the maximum number of simultaneous active clients.
+	This value is internally limited to 1/3 of the total number of
+	availabel file descriptors.</TD>
 </TR>
 <TR>
 	<TD>MaxLogSize</TD>
-	<TD></TD>
-	<TD></TD>
+	<TD>0</TD>
+	<TD>Specifies the maximum size of the access, error, and page
+	log files in bytes. If set to 0 then no maximum size is set.
+	Log files are rotated automatically when this size is
+	exceeded.</TD>
 </TR>
 <TR>
 	<TD>MaxRequestSize</TD>
-	<TD></TD>
-	<TD></TD>
+	<TD>0</TD>
+	<TD>Specifies the maximum size of HTTP requests in bytes. If set to 0
+	then there is no maximum.</TD>
 </TR>
 <TR>
 	<TD>Order</TD>
-	<TD></TD>
-	<TD></TD>
+	<TD>Allow,Deny</TD>
+	<TD>Specifies the order of Allow and Deny directive processing; can
+	be "Deny,Allow" to implicitly deny hosts unless they are allowed by
+	an Allow line, or "Allow,Deny" to implicitly allow hosts unless they
+	are denied by a Deny line.</TD>
 </TR>
 <TR>
 	<TD>PageLog</TD>
-	<TD></TD>
-	<TD></TD>
+	<TD>logs/page_log</TD>
+	<TD>Specifies the location of the page log file.</TD>
 </TR>
 <TR>
 	<TD>Port</TD>
-	<TD></TD>
-	<TD></TD>
+	<TD>631</TD>
+	<TD>Specifies a port number to listen to for HTTP connections.</TD>
 </TR>
 <TR>
 	<TD>RIPCache</TD>
-	<TD></TD>
-	<TD></TD>
+	<TD>8m</TD>
+	<TD>Specifies the size of the memory cache in bytes that is used by
+	RIP filters.</TD>
 </TR>
 <TR>
 	<TD>ServerAdmin</TD>
-	<TD></TD>
-	<TD></TD>
+	<TD>root@ServerName</TD>
+	<TD>Specifies the person to contact with problems.</TD>
 </TR>
 <TR>
 	<TD>ServerName</TD>
-	<TD></TD>
-	<TD></TD>
+	<TD>hostname</TD>
+	<TD>Specifies the hostname that is supplied to HTTP clients. This
+	is also used to determine the default CUPS server for the CUPS IPP
+	client applications.</TD>
 </TR>
 <TR>
 	<TD>ServerRoot</TD>
-	<TD></TD>
-	<TD></TD>
+	<TD>/var/cups</TD>
+	<TD>Specifies the root directory for server data files.</TD>
 </TR>
 <TR>
 	<TD>SystemGroup</TD>
-	<TD></TD>
-	<TD></TD>
+	<TD>root, sys, system</TD>
+	<TD>Specifies the group name used for System class authentication.</TD>
 </TR>
 <TR>
 	<TD>TempDir</TD>
-	<TD></TD>
-	<TD></TD>
+	<TD>/var/tmp</TD>
+	<TD>Specifies the temporary directory to use.</TD>
 </TR>
 <TR>
 	<TD>Timeout</TD>
-	<TD></TD>
-	<TD></TD>
+	<TD>300</TD>
+	<TD>The timeout in seconds before client connections are closed
+	in the middle of a request.</TD>
 </TR>
 <TR>
 	<TD>User</TD>
-	<TD></TD>
-	<TD></TD>
+	<TD>lp</TD>
+	<TD>Specifies the user that is used when running external programs.</TD>
 </TR>
 </TABLE></CENTER>
 
@@ -501,34 +534,40 @@ followed by its value. The following directives are understood:
 	<TH>Description</TH>
 </TR>
 <TR>
+	<TD>Accepting</TD>
+	<TD>Specifies whether the printer is accepting new jobs. May be
+	the names "Yes" or "No".</TD>
+</TR>
+<TR>
 	<TD>&lt;DefaultPrinter name&gt;<BR>
 	&lt;/Printer&gt;</TD>
-	<TD></TD>
+	<TD>Surrounds the printer definition for a default destination.</TD>
 </TR>
 <TR>
 	<TD>DeviceURI</TD>
-	<TD></TD>
+	<TD>Specifies the device-uri attribute for the printer.</TD>
 </TR>
 <TR>
 	<TD>Info</TD>
-	<TD></TD>
+	<TD>A textual description of the printer.</TD>
 </TR>
 <TR>
 	<TD>Location</TD>
-	<TD></TD>
+	<TD>A textual location of the printer.</TD>
 </TR>
 <TR>
 	<TD>MoreInfo</TD>
-	<TD></TD>
+	<TD>A URL pointing to additional information on the printer.</TD>
 </TR>
 <TR>
 	<TD>&lt;Printer name&gt;<BR>
 	&lt;/Printer&gt;</TD>
-	<TD></TD>
+	<TD>Surrounds the printer definition.</TD>
 </TR>
 <TR>
 	<TD>State</TD>
-	<TD></TD>
+	<TD>Specifies the initial state of the printer; can be "Idle" or
+	"Stopped".</TD>
 </TR>
 </TABLE></CENTER>
 
@@ -537,7 +576,7 @@ followed by its value. The following directives are understood:
 <H2>AppSocket Protocol</H2>
 
 <P>The AppSocket protocol is an 8-bit clean TCP/IP socket connection.
-The default IP service port is 9100.
+The default IP service port is 9100. The URI method name is "socket".
 
 <H2>CUPS Browsing Protocol</H2>
 
@@ -912,12 +951,6 @@ raster data for that page.
 to the destination printer (e.g. HP-PCL, HP-RTL, etc.) The MIME type for CUPS
 Raw files is <CODE>application/vnd.cups-raw</CODE>.
 
-<H2>File Transfer Protocol</H2>
-
-<P>The File Transfer Protocol (FTP) is described by
-<A HREF="http://www.ietf.org/rfc/rfc959.txt">RFC 959: File Transfer
-Protocol</A>.
-
 <H2>Internet Printing Protocol</H2>
 
 <P>The Internet Printing Protocol is described by the following RFCs:
@@ -941,6 +974,8 @@ Protocol</A>.
 	RFC 2569: Mapping between LPD and IPP Protocols</A>
 
 </UL>
+
+<P>The URI method name for IPP is "ipp".
 
 <P>CUPS defines the following extension operations to IPP.
 
@@ -1062,17 +1097,15 @@ are <CODE>attributes-charset</CODE>,
 <A HREF="http://www.ietf.org/rfc/rfc1179.txt">RFC 1179: Line Printer Daemon
 Protocol</A>.
 
+<P>The URI method name for LPD is "lpd".
+
 <H2>Server Message Block Protocol</H2>
 
 <P>The Server Message Block (SMB) and related Common Internet File
 System (CIFS) protocols are described at
 <A HREF="http://anu.samba.org/cifs">http://anu.samba.org/cifs</A>.
 
-<H2>Trivial File Transfer Protocol</H2>
-
-<P>The Trivial File Transfer Protocol (TFTP) is described by
-<A HREF="http://www.ietf.org/rfc/rfc1350.txt">RFC 1350: The TFTP Protocol
-(Revision 2)</A>.
+<P>The URI method name for SMB is "smb".
 
 <H1>5 - Directories</H1>
 
@@ -1083,12 +1116,10 @@ System (CIFS) protocols are described at
 	<CODE>lpr</CODE>, <CODE>lprm</CODE>, and <CODE>lpstat</CODE> commands
 	reside here.
 
-	<DT>/usr/lib
-	<DD>The <CODE>accept</CODE>, <CODE>disable</CODE>, <CODE>enable</CODE>,
-	<CODE>lpadmin</CODE>, and <CODE>reject</CODE> commands reside here.
-
 	<DT>/usr/sbin
-	<DD>The <CODE>lpc</CODE> and <CODE>cupsd</CODE> commands resize here.
+	<DD>The <CODE>accept</CODE>, <CODE>cupsd</CODE>,
+	<CODE>lpadmin</CODE>, <CODE>lpc</CODE>, and <CODE>reject</CODE>
+	commands reside here.
 
 	<DT>/usr/share/cups
 	<DD>This is the root directory of the CUPS static data.
