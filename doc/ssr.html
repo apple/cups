@@ -19,7 +19,7 @@ SUP { font-size: smaller }
 PRE { font-family: monospace }
 --></STYLE>
 </HEAD>
-<BODY>
+<BODY BGCOLOR="white">
 <CENTER><A HREF="#CONTENTS"><IMG SRC="images/cups-large.gif" BORDER="0" WIDTH="431" HEIGHT="511"><BR>
 <H1>CUPS Software Security Report</H1></A><BR>
 CUPS-SSR-1.1<BR>
@@ -162,10 +162,9 @@ Adobe PostScript Language Reference, Third Edition.</A></LI>
 <OL>
 <LI>Establishing multiple connections to the server until the server
  will accept no more.
-<P>This cannot be protected against by the current software. It is
- possible that future versions of the CUPS software could be configured
- to limit the number of connections allowed from a single host, however
- that still would not prevent a distributed attack.</P>
+<P>Starting with CUPS 1.1.18, the <CODE>MaxClientsPerHost</CODE>
+ provides limited protection against DoS attacks, however it is not
+ effective against large-scale distributed attacks.</P>
 <LI>Repeatedly opening and closing connections to the server as fast as
  possible.
 <P>There is no easy way of protecting against this in the CUPS software.

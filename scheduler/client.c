@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.129 2002/12/12 20:56:32 mike Exp $"
+ * "$Id: client.c,v 1.130 2002/12/13 16:24:05 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -77,6 +77,7 @@ void
 AcceptClient(listener_t *lis)	/* I - Listener socket */
 {
   int			i;	/* Looping var */
+  int			count;	/* Count of connections on a host */
   int			val;	/* Parameter value */
   client_t		*con;	/* New client pointer */
   unsigned		address;/* Address of client */
@@ -117,6 +118,33 @@ AcceptClient(listener_t *lis)	/* I - Listener socket */
   }
 
   con->http.hostaddr.sin_port = lis->address.sin_port;
+
+ /*
+  * Check the number of clients on the same address...
+  */
+
+  for (i = 0, count = 0; i < NumClients; i ++)
+    if (memcmp(&(Clients[i].http.hostaddr), &(con->http.hostaddr),
+               sizeof(con->http.hostaddr)) == 0)
+    {
+      count ++;
+      if (count >= MaxClientsPerHost)
+        break;
+    }
+
+  if (count >= MaxClientsPerHost)
+  {
+    LogMessage(L_WARN, "Possible DoS attack - more than %d clients connecting from %s!",
+               MaxClientsPerHost, Clients[i].http.hostname);
+
+#ifdef WIN32
+    closesocket(con->http.fd);
+#else
+    close(con->http.fd);
+#endif /* WIN32 */
+
+    return;
+  }
 
  /*
   * Get the hostname or format the IP address as needed...
@@ -2639,5 +2667,5 @@ pipe_command(client_t *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.129 2002/12/12 20:56:32 mike Exp $".
+ * End of "$Id: client.c,v 1.130 2002/12/13 16:24:05 mike Exp $".
  */

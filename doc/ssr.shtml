@@ -74,11 +74,9 @@ service attacks, including:
 	<LI>Establishing multiple connections to the server until the server
 	will accept no more.
 
-	<P>This cannot be protected against by the current software. It
-	is possible that future versions of the CUPS software could be
-	configured to limit the number of connections allowed from a
-	single host, however that still would not prevent a distributed
-	attack.
+	<P>Starting with CUPS 1.1.18, the <CODE>MaxClientsPerHost</CODE>
+	provides limited protection against DoS attacks, however it is
+	not effective against large-scale distributed attacks.
 
 	<LI>Repeatedly opening and closing connections to the server as fast
 	as possible.

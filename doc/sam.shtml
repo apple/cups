@@ -1,7 +1,7 @@
 <HTML>
 <HEAD>
 	<META NAME="COPYRIGHT" CONTENT="Copyright 1997-2002, All Rights Reserved">
-	<META NAME="DOCNUMBER" CONTENT="CUPS-SAM-1.1.17">
+	<META NAME="DOCNUMBER" CONTENT="CUPS-SAM-1.1.18">
 	<META NAME="Author" CONTENT="Easy Software Products">
 	<TITLE>CUPS Software Administrators Manual</TITLE>
 </HEAD>
@@ -11,7 +11,7 @@
 
 <P>This software administrators manual provides printer administration
 information for the Common UNIX Printing System<SUP>TM</SUP>
-("CUPS<SUP>TM</SUP>"), version 1.1.17.
+("CUPS<SUP>TM</SUP>"), version 1.1.18.
 
 <EMBED SRC="system-overview.shtml">
 
@@ -1103,6 +1103,7 @@ determine how the server operates:
 	<LI><A HREF="#LogFilePerm"><CODE>LogFilePerm</CODE></A>
 	<LI><A HREF="#LogLevel"><CODE>LogLevel</CODE></A>
 	<LI><A HREF="#MaxClients"><CODE>MaxClients</CODE></A>
+	<LI><A HREF="#MaxClientsPerHost"><CODE>MaxClientsPerHost</CODE></A>
 	<LI><A HREF="#MaxCopies"><CODE>MaxCopies</CODE></A>
 	<LI><A HREF="#MaxJobs"><CODE>MaxJobs</CODE></A>
 	<LI><A HREF="#MaxJobsPerPrinter"><CODE>MaxJobsPerPrinter</CODE></A>
@@ -2452,6 +2453,31 @@ simultaneous clients that will be allowed by the server. The default is
 	</TD>
 </TR>
 </TABLE></CENTER>
+
+
+<!-- NEED 3in -->
+<H3><A NAME="MaxClientsPerHost">MaxClientsPerHost</A></H3>
+<HR>
+
+<H4>Examples</H4>
+
+<UL><PRE>
+MaxClientsPerHost 0
+MaxClientsPerHost 10
+</PRE></UL>
+
+<H4>Description</H4>
+
+<P>The <CODE>MaxClientsPerHost</CODE> directive controls the
+maximum number of simultaneous clients that will be allowed from
+a single host by the server. The default is 10 or 1/10th the
+<CODE>MaxClients</CODE> value, whichever is greater. A value of
+0 uses the automatic setting based on the
+<CODE>MaxClients</CODE> value.</P>
+
+<P>This directive provides a small measure of protection against
+Denial of Service attacks from a single host.
+
 
 <!-- NEED 3in -->
 <H3><A NAME="MaxCopies">MaxCopies</A></H3>

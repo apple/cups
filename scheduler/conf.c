@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.108 2002/08/22 17:06:31 mike Exp $"
+ * "$Id: conf.c,v 1.109 2002/12/13 16:24:06 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -103,6 +103,7 @@ static var_t	variables[] =
   { "ListenBackLog",	&ListenBackLog,		VAR_INTEGER,	0 },
   { "LogFilePerm",	&LogFilePerm,		VAR_INTEGER,	0 },
   { "MaxClients",	&MaxClients,		VAR_INTEGER,	0 },
+  { "MaxClientsPerHost",&MaxClientsPerHost,	VAR_INTEGER,	0 },
   { "MaxCopies",	&MaxCopies,		VAR_INTEGER,	0 },
   { "MaxJobs",		&MaxJobs,		VAR_INTEGER,	0 },
   { "MaxJobsPerPrinter",&MaxJobsPerPrinter,	VAR_INTEGER,	0 },
@@ -322,6 +323,7 @@ ReadConfiguration(void)
   ListenBackLog       = SOMAXCONN;
   LogLevel            = L_ERROR;
   MaxClients          = 100;
+  MaxClientsPerHost   = 0;
   MaxLogSize          = 1024 * 1024;
   MaxRequestSize      = 0;
   RootCertDuration    = 300;
@@ -512,6 +514,24 @@ ReadConfiguration(void)
 
   if (Classification[0])
     LogMessage(L_INFO, "Security set to \"%s\"", Classification);
+
+ /*
+  * Update the MaxClientsPerHost value, as needed...
+  */
+
+  if (MaxClientsPerHost <= 0)
+  {
+    MaxClientsPerHost = MaxClients / 10;
+
+    if (MaxClientsPerHost < 4)
+      MaxClientsPerHost = 4;
+  }
+
+  if (MaxClientsPerHost > MaxClients)
+    MaxClientsPerHost = MaxClients;
+
+  LogMessage(L_INFO, "Allowing up to %d client connections per host.",
+             MaxClientsPerHost);
 
  /*
   * Read the MIME type and conversion database...
@@ -1890,5 +1910,5 @@ get_address(char               *value,		/* I - Value string */
 
 
 /*
- * End of "$Id: conf.c,v 1.108 2002/08/22 17:06:31 mike Exp $".
+ * End of "$Id: conf.c,v 1.109 2002/12/13 16:24:06 mike Exp $".
  */
