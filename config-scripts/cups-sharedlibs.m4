@@ -1,9 +1,9 @@
 dnl
-dnl "$Id: cups-sharedlibs.m4,v 1.6.2.12 2002/06/07 21:02:56 mike Exp $"
+dnl "$Id: cups-sharedlibs.m4,v 1.6.2.13 2003/01/17 15:30:27 mike Exp $"
 dnl
 dnl   Shared library support for the Common UNIX Printing System (CUPS).
 dnl
-dnl   Copyright 1997-2002 by Easy Software Products, all rights reserved.
+dnl   Copyright 1997-2003 by Easy Software Products, all rights reserved.
 dnl
 dnl   These coded instructions, statements, and computer programs are the
 dnl   property of Easy Software Products and are protected by Federal
@@ -45,7 +45,7 @@ if test x$enable_shared != xno; then
 			LIBCUPS="libcups.so.2"
 			LIBCUPSIMAGE="libcupsimage.so.2"
 			DSO="\$(CC)"
-			DSOFLAGS="$DSOFLAGS -Wl,-rpath,\$(libdir),-set_version,sgi3.0,-soname,\$@ -shared \$(OPTIM)"
+			DSOFLAGS="$DSOFLAGS -Wl,-rpath,\$(libdir),-set_version,sgi2.4,-soname,\$@ -shared \$(OPTIM)"
 			;;
 		OSF1* | Linux* | *BSD*)
 			LIBCUPS="libcups.so.2"
@@ -57,7 +57,7 @@ if test x$enable_shared != xno; then
 			LIBCUPS="libcups.2.dylib"
 			LIBCUPSIMAGE="libcupsimage.2.dylib"
 			DSO="\$(CC)"
-			DSOFLAGS="$DSOFLAGS \$(RC_FLAGS) -dynamiclib -lc"
+			DSOFLAGS="$DSOFLAGS \$(RC_CFLAGS) -dynamiclib -lc"
 			;;
 		AIX*)
 			LIBCUPS="libcups_s.a"
@@ -103,6 +103,8 @@ AC_SUBST(LINKCUPS)
 AC_SUBST(LINKCUPSIMAGE)
 
 dnl Update libraries for DSOs...
+EXPORT_LDFLAGS=""
+
 if test "$DSO" != ":"; then
 	# When using DSOs the image libraries are linked to libcupsimage.so
 	# rather than to the executables.  This makes things smaller if you
@@ -119,21 +121,25 @@ if test "$DSO" != ":"; then
 			# HP-UX
                 	DSOFLAGS="+s +b $libdir $DSOFLAGS"
                 	LDFLAGS="$LDFLAGS -Wl,+s,+b,$libdir"
+                	EXPORT_LDFLAGS="-Wl,+s,+b,$libdir"
                 	;;
                 SunOS*)
                 	# Solaris
                 	DSOFLAGS="-R$libdir $DSOFLAGS"
                 	LDFLAGS="$LDFLAGS -R$libdir"
+                	EXPORT_LDFLAGS="-R$libdir"
                 	;;
                 *BSD*)
                         # *BSD
                 	DSOFLAGS="-Wl,-R$libdir $DSOFLAGS"
                         LDFLAGS="$LDFLAGS -Wl,-R$libdir"
+                        EXPORT_LDFLAGS="-Wl,-R$libdir"
                         ;;
                 Linux*)
                         # Linux
                 	DSOFLAGS="-Wl,-rpath,$libdir $DSOFLAGS"
                         LDFLAGS="$LDFLAGS -Wl,-rpath,$libdir"
+                        EXPORT_LDFLAGS="-Wl,-rpath,$libdir"
                         ;;
 	esac
 else
@@ -143,7 +149,8 @@ fi
 
 AC_SUBST(DSOLIBS)
 AC_SUBST(IMGLIBS)
+AC_SUBST(EXPORT_LDFLAGS)
 
 dnl
-dnl End of "$Id: cups-sharedlibs.m4,v 1.6.2.12 2002/06/07 21:02:56 mike Exp $".
+dnl End of "$Id: cups-sharedlibs.m4,v 1.6.2.13 2003/01/17 15:30:27 mike Exp $".
 dnl
