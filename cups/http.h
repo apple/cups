@@ -1,14 +1,19 @@
 /*
- * "$Id: http.h,v 1.1 1998/10/12 13:57:19 mike Exp $"
+ * "$Id: http.h,v 1.2 1998/10/12 15:31:08 mike Exp $"
  *
  *   HTTP test program definitions for CUPS.
  *
  * Revision History:
  *
  *   $Log: http.h,v $
- *   Revision 1.1  1998/10/12 13:57:19  mike
- *   Initial revision
+ *   Revision 1.2  1998/10/12 15:31:08  mike
+ *   Switched from stdio files to file descriptors.
+ *   Added FD_CLOEXEC flags to all non-essential files.
+ *   Added pipe_command() function.
+ *   Added write checks for all writes.
  *
+ *   Revision 1.1  1998/10/12  13:57:19  mike
+ *   Initial revision
  */
 
 /*
@@ -17,6 +22,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <ctype.h>
 #include <limits.h>
 #include <string.h>
 #include <errno.h>
@@ -24,12 +30,14 @@
 #include <signal.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/wait.h>
 
 #ifdef WIN32
 #  include <windows.h>
 #  include <process.h>
 #  include <winsock.h>
 #else
+#  include <unistd.h>
 #  include <fcntl.h>
 #  include <bstring.h>
 #  include <sys/time.h>
@@ -117,8 +125,8 @@ typedef struct	/**** Network connection data ****/
 			language[16];	/* Accept-Language: line (first available) */
   int			data_encoding,	/* Chunked or not */
 			data_length;	/* Content-Length: or chunk length line */
-  FILE			*file;		/* Input/output file */
-  int			ispipe;		/* TRUE if file is a pipe */
+  int			file;		/* Input/output file */
+  int			pipe_pid;	/* Pipe process ID (or 0 if not a pipe) */
   int			bufused;	/* Number of bytes used in input buffer */
   char			buf[MAX_BUFFER];/* Buffer for incoming messages */
 } connection_t;
@@ -152,13 +160,13 @@ extern void	AcceptConnection(void);
 extern void	CloseConnection(connection_t *con);
 extern int	ReadConnection(connection_t *con);
 extern int	WriteConnection(connection_t *con);
-extern void	SendCommand(connection_t *con, int code, char *command, char *type);
-extern void	SendError(connection_t *con, int code);
-extern void	SendFile(connection_t *con, int code, char *filename,
+extern int	SendCommand(connection_t *con, int code, char *command, char *type);
+extern int	SendError(connection_t *con, int code);
+extern int	SendFile(connection_t *con, int code, char *filename,
 		         char *type, struct stat *filestats);
-extern void	SendHeader(connection_t *con, int code, char *type);
+extern int	SendHeader(connection_t *con, int code, char *type);
 
 
 /*
- * End of "$Id: http.h,v 1.1 1998/10/12 13:57:19 mike Exp $".
+ * End of "$Id: http.h,v 1.2 1998/10/12 15:31:08 mike Exp $".
  */

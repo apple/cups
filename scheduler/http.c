@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.1 1998/10/12 13:57:19 mike Exp $"
+ * "$Id: http.c,v 1.2 1998/10/12 15:31:08 mike Exp $"
  *
  *   HTTP server test code for CUPS.
  *
@@ -29,9 +29,14 @@
  * Revision History:
  *
  *   $Log: http.c,v $
- *   Revision 1.1  1998/10/12 13:57:19  mike
- *   Initial revision
+ *   Revision 1.2  1998/10/12 15:31:08  mike
+ *   Switched from stdio files to file descriptors.
+ *   Added FD_CLOEXEC flags to all non-essential files.
+ *   Added pipe_command() function.
+ *   Added write checks for all writes.
  *
+ *   Revision 1.1  1998/10/12  13:57:19  mike
+ *   Initial revision
  */
 
 /*
@@ -54,6 +59,7 @@ static char	*get_extension(char *filename);
 static char	*get_file(connection_t *con, struct stat *filestats);
 static char	*get_line(connection_t *con, char *line, int length);
 static char	*get_type(char *extension);
+static int	pipe_command(int infile, int *outfile, char *command);
 static void	signal_handler(int sig);
 
 
@@ -103,6 +109,8 @@ StartListening(void)
     fprintf(stderr, "cupsd: Unable to open socket - %s\n", strerror(errno));
     exit(errno);
   }
+
+  fcntl(Listener, F_SETFD, fcntl(Listener, F_GETFD) | FD_CLOEXEC);
 
  /*
   * Set things up to reuse the local address for this port.
@@ -192,6 +200,8 @@ AcceptConnection(void)
   * Add the socket to the select() input mask.
   */
 
+  fcntl(con->fd, F_SETFD, fcntl(con->fd, F_GETFD) | FD_CLOEXEC);
+
   FD_SET(con->fd, &InputSet);
 
   NumConnections ++;
@@ -212,7 +222,7 @@ AcceptConnection(void)
 void
 CloseConnection(connection_t *con)	/* I - Connection to close */
 {
-  int	i;				/* Looping var */
+  int	status;				/* Exit status of pipe command */
 
 
   fprintf(stderr, "cupsd: Closed connection #%d\n", con->fd);
@@ -229,18 +239,23 @@ CloseConnection(connection_t *con)	/* I - Connection to close */
 
   FD_SET(Listener, &InputSet);
   FD_CLR(con->fd, &InputSet);
+  if (con->pipe_pid != 0)
+    FD_CLR(con->file, &InputSet);
   FD_CLR(con->fd, &OutputSet);
 
  /*
   * If we have a data file open, close it...
   */
 
-  if (con->file != NULL)
+  if (con->file > 0)
   {
-    if (con->ispipe)
-      pclose(con->file);
-    else
-      fclose(con->file);
+    if (con->pipe_pid)
+    {
+      kill(con->pipe_pid, SIGKILL);
+      waitpid(con->pipe_pid, &status, WNOHANG);
+    }
+
+    close(con->file);
   };
 
  /*
@@ -301,8 +316,8 @@ ReadConnection(connection_t *con)	/* I - Connection to read from */
         con->version         = HTTP_1_0;
 	con->data_encoding   = HTTP_DATA_SINGLE;
 	con->data_length     = 0;
-	con->file            = NULL;
-	con->ispipe          = 0;
+	con->file            = 0;
+	con->pipe_pid        = 0;
         con->host[0]         = '\0';
 	con->user_agent[0]   = '\0';
 	con->username[0]     = '\0';
@@ -462,6 +477,17 @@ ReadConnection(connection_t *con)	/* I - Connection to read from */
 	{
 	  strncpy(con->language, value, sizeof(con->language) - 1);
 	  con->language[sizeof(con->language) - 1] = '\0';
+
+         /*
+	  * Strip trailing data in language string...
+	  */
+
+	  for (valptr = con->language; *valptr != '\0'; valptr ++)
+	    if (!isalnum(*valptr) && *valptr != '-')
+	    {
+	      *valptr = '\0';
+	      break;
+	    }
 	}
 	else if (strcmp(name, "Authorization") == 0)
 	{
@@ -535,7 +561,11 @@ ReadConnection(connection_t *con)	/* I - Connection to read from */
 	    else
 	      strcpy(line, "lpstat -d -p -o");
 
-	    SendCommand(con, HTTP_OK, line, "text/plain");
+	    if (!SendCommand(con, HTTP_OK, line, "text/plain"))
+	    {
+	      CloseConnection(con);
+	      return (0);
+	    }
 	  }
 	  else
 	  {
@@ -544,13 +574,23 @@ ReadConnection(connection_t *con)	/* I - Connection to read from */
 	    */
 
             if ((filename = get_file(con, &filestats)) == NULL)
-	      SendError(con, HTTP_NOT_FOUND);
+	    {
+	      if (!SendError(con, HTTP_NOT_FOUND))
+	      {
+	        CloseConnection(con);
+		return (0);
+	      }
+	    }
 	    else
             {
 	      extension = get_extension(filename);
 	      type      = get_type(extension);
 
-              SendFile(con, HTTP_OK, filename, type, &filestats);
+              if (!SendFile(con, HTTP_OK, filename, type, &filestats))
+	      {
+		CloseConnection(con);
+		return (0);
+	      }
 	    }
 	  }
 
@@ -574,8 +614,17 @@ ReadConnection(connection_t *con)	/* I - Connection to read from */
 	    * Do a command...
 	    */
 
-            SendHeader(con, HTTP_OK, "text/plain");
-	    conprintf(con, "\r\n");
+            if (!SendHeader(con, HTTP_OK, "text/plain"))
+	    {
+	      CloseConnection(con);
+	      return (0);
+	    }
+
+	    if (conprintf(con, "\r\n") < 0)
+	    {
+	      CloseConnection(con);
+	      return (0);
+	    }
 	  }
 	  else
 	  {
@@ -584,20 +633,44 @@ ReadConnection(connection_t *con)	/* I - Connection to read from */
 	    */
 
             if ((filename = get_file(con, &filestats)) == NULL)
-	      SendHeader(con, HTTP_NOT_FOUND, "text/html");
+	    {
+	      if (!SendHeader(con, HTTP_NOT_FOUND, "text/html"))
+	      {
+		CloseConnection(con);
+		return (0);
+	      }
+	    }
 	    else
             {
 	      extension = get_extension(filename);
 	      type      = get_type(extension);
 
-              SendHeader(con, HTTP_OK, type);
-	      conprintf(con, "Last-Modified: %s\r\n",
-	                get_datetime(filestats.st_mtime));
-	      conprintf(con, "Content-Length: %d\r\n", filestats.st_size);
+              if (!SendHeader(con, HTTP_OK, type))
+	      {
+		CloseConnection(con);
+		return (0);
+	      }
+
+	      if (conprintf(con, "Last-Modified: %s\r\n",
+	                    get_datetime(filestats.st_mtime)) < 0)
+	      {
+		CloseConnection(con);
+		return (0);
+	      }
+
+	      if (conprintf(con, "Content-Length: %d\r\n", filestats.st_size) < 0)
+	      {
+		CloseConnection(con);
+		return (0);
+	      }
 	    }
 	  }
 
-          conprintf(con, "\r\n");
+          if (conprintf(con, "\r\n") < 0)
+	  {
+	    CloseConnection(con);
+	    return (0);
+	  }
 
           if (con->version <= HTTP_1_0)
 	  {
@@ -634,6 +707,7 @@ int
 WriteConnection(connection_t *con)
 {
   int	bytes;
+  int	status;
   char	buf[MAX_BUFFER];
 
 
@@ -641,7 +715,7 @@ WriteConnection(connection_t *con)
       con->state != HTTP_POST_DATA)
     return (1);
 
-  if ((bytes = fread(buf, 1, sizeof(buf), con->file)) > 0)
+  if ((bytes = read(con->file, buf, sizeof(buf))) > 0)
   {
     if (con->data_encoding == HTTP_DATA_CHUNKED)
     {
@@ -680,19 +754,24 @@ WriteConnection(connection_t *con)
       }
     }
 
+    FD_CLR(con->fd, &OutputSet);
+    FD_CLR(con->file, &InputSet);
+
+    if (con->pipe_pid)
+    {
+      kill(con->pipe_pid, SIGKILL);
+      waitpid(con->pipe_pid, &status, WNOHANG);
+    }
+
+    close(con->file);
+
     if (con->version <= HTTP_1_0)
     {
       CloseConnection(con);
       return (0);
     }
-    else if (con->ispipe)
-      pclose(con->file);
-    else
-      fclose(con->file);
 
     con->state = HTTP_WAITING;
-
-    FD_CLR(con->fd, &OutputSet);
   }
 
   fprintf(stderr, "cupsd: SEND %d bytes to #%d\n", bytes, con->fd);
@@ -705,26 +784,33 @@ WriteConnection(connection_t *con)
  * 'SendCommand()' - Send output from a command via HTTP.
  */
 
-void
+int
 SendCommand(connection_t *con,
             int          code,
 	    char         *command,
 	    char         *type)
 {
-  SendHeader(con, HTTP_OK, type);
-  if (con->version == HTTP_1_1)
-    conprintf(con, "Transfer-Encoding: chunked\r\n");
-  conprintf(con, "\r\n");
+  con->pipe_pid = pipe_command(0, &(con->file), command);
 
-#ifdef WIN32
-  con->file = popen(command, "rb");
-#else
-  con->file = popen(command, "r");
-#endif /* WIN32 */
+  if (con->pipe_pid == 0)
+    return (0);
 
-  con->ispipe = 1;
+  fcntl(con->file, F_SETFD, fcntl(con->file, F_GETFD) | FD_CLOEXEC);
 
+  FD_SET(con->file, &InputSet);
   FD_SET(con->fd, &OutputSet);
+
+  if (!SendHeader(con, HTTP_OK, type))
+    return (0);
+
+  if (con->version == HTTP_1_1)
+    if (conprintf(con, "Transfer-Encoding: chunked\r\n") < 0)
+      return (0);
+
+  if (conprintf(con, "\r\n") < 0)
+    return (0);
+
+  return (1);
 }
 
 
@@ -732,7 +818,7 @@ SendCommand(connection_t *con,
  * 'SendError()' - Send an error message via HTTP.
  */
 
-void
+int
 SendError(connection_t *con,
           int          code)
 {
@@ -740,7 +826,8 @@ SendError(connection_t *con,
 
 
   sprintf(con->uri, "/errors/%d.html", code);
-  SendFile(con, code, get_file(con, &filestats), "text/html", &filestats);
+  return (SendFile(con, code, get_file(con, &filestats), "text/html",
+                   &filestats));
 }
 
 
@@ -748,25 +835,37 @@ SendError(connection_t *con,
  * 'SendFile()' - Send a file via HTTP.
  */
 
-void
+int
 SendFile(connection_t *con,
          int          code,
 	 char         *filename,
 	 char         *type,
 	 struct stat  *filestats)
 {
-  SendHeader(con, HTTP_OK, type);
-  conprintf(con, "Last-Modified: %s\r\n", get_datetime(filestats->st_mtime));
-  conprintf(con, "Content-Length: %d\r\n", filestats->st_size);
-  conprintf(con, "\r\n");
+  con->file = open(filename, O_RDONLY);
 
-#ifdef WIN32
-  con->file = fopen(filename, "rb");
-#else
-  con->file = fopen(filename, "r");
-#endif /* WIN32 */
+  fprintf(stderr, "cupsd: filename=\'%s\', file = %d\n", filename, con->file);
+
+  if (con->file == 0)
+    return (0);
+
+  fcntl(con->file, F_SETFD, fcntl(con->file, F_GETFD) | FD_CLOEXEC);
+
+  con->pipe_pid = 0;
+
+  if (!SendHeader(con, HTTP_OK, type))
+    return (0);
+
+  if (conprintf(con, "Last-Modified: %s\r\n", get_datetime(filestats->st_mtime)) < 0)
+    return (0);
+  if (conprintf(con, "Content-Length: %d\r\n", filestats->st_size) < 0)
+    return (0);
+  if (conprintf(con, "\r\n") < 0)
+    return (0);
 
   FD_SET(con->fd, &OutputSet);
+
+  return (1);
 }
 
 
@@ -774,7 +873,7 @@ SendFile(connection_t *con,
  * 'SendHeader()' - Send an HTTP header.
  */
 
-void
+int				/* O - 1 on success, 0 on failure */
 SendHeader(connection_t *con,	/* I - Connection to send to */
            int          code,	/* I - HTTP status code */
 	   char         *type)	/* I - MIME type of document */
@@ -822,10 +921,16 @@ SendHeader(connection_t *con,	/* I - Connection to send to */
 	break;
   }
 
-  conprintf(con, "HTTP/1.%d %d %s\r\n", con->version == HTTP_1_1, code, message);
-  conprintf(con, "Date: %s\r\n", get_datetime(time(NULL)));
-  conprintf(con, "Server: CUPS/1.0\r\n");
-  conprintf(con, "Content-Type: %s\r\n", type);
+  if (conprintf(con, "HTTP/1.%d %d %s\r\n", con->version == HTTP_1_1, code, message) < 0)
+    return (0);
+  if (conprintf(con, "Date: %s\r\n", get_datetime(time(NULL))) < 0)
+    return (0);
+  if (conprintf(con, "Server: CUPS/1.0\r\n") < 0)
+    return (0);
+  if (conprintf(con, "Content-Type: %s\r\n", type) < 0)
+    return (0);
+
+  return (1);
 }
 
 
@@ -1085,6 +1190,130 @@ get_type(char *extension)
 
 
 /*
+ * 'pipe_command()' - Pipe the output of a command to the remote connection.
+ */
+
+static int			/* O - Process ID */
+pipe_command(int infile,	/* I - Standard input for command */
+             int *outfile,	/* O - Standard output for command */
+	     char *command)	/* I - Command to run */
+{
+  int	pid;			/* Process ID */
+  char	*commptr;		/* Command string pointer */
+  int	fds[2];			/* Pipe FDs */
+  int	argc;			/* Number of arguments */
+  char	argbuf[1024],		/* Argument buffer */
+	*argv[100];		/* Argument strings */
+
+
+ /*
+  * Copy the command string...
+  */
+
+  strncpy(argbuf, command, sizeof(argbuf) - 1);
+  argbuf[sizeof(argbuf) - 1] = '\0';
+
+ /*
+  * Parse the string; arguments can be separated by spaces or by ? or +...
+  */
+
+  argv[0] = argbuf;
+
+  for (commptr = argbuf, argc = 1; *commptr != '\0'; commptr ++)
+    if (*commptr == ' ' || *commptr == '?' || *commptr == '+')
+    {
+      *commptr++ = '\0';
+
+      while (*commptr == ' ')
+        commptr ++;
+
+      if (*commptr != '\0')
+      {
+        argv[argc] = commptr;
+	argc ++;
+      }
+
+      commptr --;
+    }
+    else if (*commptr == '%')
+    {
+      if (commptr[1] >= '0' && commptr[1] <= '9')
+        *commptr = (commptr[1] - '0') << 4;
+      else
+        *commptr = (tolower(commptr[1]) - 'a' + 10) << 4;
+
+      if (commptr[2] >= '0' && commptr[2] <= '9')
+        *commptr |= commptr[2] - '0';
+      else
+        *commptr |= tolower(commptr[2]) - 'a' + 10;
+
+      strcpy(commptr + 1, commptr + 3);
+    }
+
+  argv[argc] = NULL;
+
+ /*
+  * Create a pipe for the output...
+  */
+
+  if (pipe(fds))
+    return (0);
+
+ /*
+  * Then execute the pipe command...
+  */
+
+  if ((pid = fork()) == 0)
+  {
+   /*
+    * Child comes here...  Close stdin if necessary and dup the pipe to stdout.
+    */
+
+    if (infile)
+    {
+      close(0);
+      dup(infile);
+    }
+
+    close(1);
+    dup(fds[1]);
+
+    close(fds[0]);
+    close(fds[1]);
+
+   /*
+    * Execute the pipe program; if an error occurs, exit with status 1...
+    */
+
+    execvp(argv[0], argv);
+    exit(1);
+    return (0);
+  }
+  else if (pid < 0)
+  {
+   /*
+    * Error - can't fork!
+    */
+
+    close(fds[0]);
+    close(fds[1]);
+    return (0);
+  }
+  else
+  {
+   /*
+    * Fork successful - return the PID...
+    */
+
+    *outfile = fds[0];
+    close(fds[1]);
+
+    return (pid);
+  }
+}
+
+
+/*
  * 'signal_handler()' - Handle 'broken pipe' signals from lost network
  *                      connections.
  */
@@ -1097,5 +1326,5 @@ signal_handler(int sig)	/* I - Signal number */
 
 
 /*
- * End of "$Id: http.c,v 1.1 1998/10/12 13:57:19 mike Exp $".
+ * End of "$Id: http.c,v 1.2 1998/10/12 15:31:08 mike Exp $".
  */

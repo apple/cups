@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c,v 1.1 1998/10/12 13:57:19 mike Exp $"
+ * "$Id: main.c,v 1.2 1998/10/12 15:31:08 mike Exp $"
  *
  *   Main entry for the CUPS test program.
  *
@@ -10,9 +10,14 @@
  * Revision History:
  *
  *   $Log: main.c,v $
- *   Revision 1.1  1998/10/12 13:57:19  mike
- *   Initial revision
+ *   Revision 1.2  1998/10/12 15:31:08  mike
+ *   Switched from stdio files to file descriptors.
+ *   Added FD_CLOEXEC flags to all non-essential files.
+ *   Added pipe_command() function.
+ *   Added write checks for all writes.
  *
+ *   Revision 1.1  1998/10/12  13:57:19  mike
+ *   Initial revision
  */
 
 /*
@@ -62,26 +67,15 @@ main(int  argc,			/* I - Number of command-line arguments */
     input  = InputSet;
     output = OutputSet;
 
-    for (i = 0, con = Connection; i < NumConnections; i ++, con ++)
-#if 0
-      if (con->bufused > 0 ||
-          con->state == HTTP_GET_DATA ||
-          con->state == HTTP_POST_DATA)
-#else
-      if (con->bufused > 0)
-#endif /* 0 */
-	break;
+    timeout.tv_sec  = 1;
+    timeout.tv_usec = 0;
 
-    if (i < NumConnections)
-    {
-      timeout.tv_sec  = 0;
-      timeout.tv_usec = 0;
-    }
-    else
-    {
-      timeout.tv_sec  = 1;
-      timeout.tv_usec = 0;
-    }
+    for (i = 0, con = Connection; i < NumConnections; i ++, con ++)
+      if (con->bufused > 0)
+      {
+        timeout.tv_sec  = 0;
+	break;
+      }
 
     if ((i = select(100, &input, &output, NULL, &timeout)) < 0)
       break;
@@ -125,9 +119,8 @@ main(int  argc,			/* I - Number of command-line arguments */
       * Write data as needed...
       */
 
-      if (FD_ISSET(Connection[i].fd, &output) ||
-          Connection[i].state == HTTP_GET_DATA ||
-	  Connection[i].state == HTTP_POST_DATA)
+      if (FD_ISSET(con->fd, &output) ||
+          FD_ISSET(con->file, &output))
         if (!WriteConnection(Connection + i))
 	{
 	  con --;
@@ -154,5 +147,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 }
 
 /*
- * End of "$Id: main.c,v 1.1 1998/10/12 13:57:19 mike Exp $".
+ * End of "$Id: main.c,v 1.2 1998/10/12 15:31:08 mike Exp $".
  */
