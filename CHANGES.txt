@@ -1,8 +1,12 @@
-CHANGES.txt - 07/12/2001
+CHANGES.txt - 07/18/2001
 ------------------------
 
 CHANGES IN CUPS V1.1.10
 
+	- Added a driver for DYMO label printers.
+	- The serial backend now limits writes to 1/10th
+	  second worth of data to avoid buffer overflows
+	  with some types of flow control.
 	- The scheduler did not properly process PUT requests,
 	  so configuration files could not be uploaded to the
 	  server.
