@@ -91,7 +91,7 @@ ObjectStream::ObjectStream(XRef *xref, int objStrNumA) {
   }
   nObjects = obj1.getInt();
   obj1.free();
-  if (nObjects == 0) {
+  if (nObjects <= 0) {
     goto err1;
   }
 
@@ -101,7 +101,15 @@ ObjectStream::ObjectStream(XRef *xref, int objStrNumA) {
   }
   first = obj1.getInt();
   obj1.free();
+  if (first < 0) {
+    goto err1;
+  }
 
+  if (nObjects*sizeof(int)/sizeof(int) != nObjects) {
+    error(-1, "Invalid 'nObjects'");
+    goto err1;
+  }
+ 
   objs = new Object[nObjects];
   objNums = (int *)gmalloc(nObjects * sizeof(int));
   offsets = (int *)gmalloc(nObjects * sizeof(int));
@@ -125,6 +133,12 @@ ObjectStream::ObjectStream(XRef *xref, int objStrNumA) {
     offsets[i] = obj2.getInt();
     obj1.free();
     obj2.free();
+    if (objNums[i] < 0 || offsets[i] < 0 ||
+	(i > 0 && offsets[i] < offsets[i-1])) {
+      delete parser;
+      gfree(offsets);
+      goto err1;
+    }
   }
   while (str->getChar() != EOF) ;
   delete parser;
@@ -358,10 +372,21 @@ GBool XRef::readXRefTable(Parser *parser, Guint *pos) {
     }
     n = obj.getInt();
     obj.free();
+    if (first < 0 || n < 0 || first + n < 0) {
+      goto err1;
+    }
     if (first + n > size) {
       for (newSize = size ? 2 * size : 1024;
-	   first + n > newSize;
+	   first + n > newSize && newSize > 0;
 	   newSize <<= 1) ;
+      if (newSize < 0) {
+	goto err1;
+      }
+      if (newSize*sizeof(XRefEntry)/sizeof(XRefEntry) != newSize) {
+        error(-1, "Invalid 'obj' parameters'");
+        goto err1;
+      }
+ 
       entries = (XRefEntry *)grealloc(entries, newSize * sizeof(XRefEntry));
       for (i = size; i < newSize; ++i) {
 	entries[i].offset = 0xffffffff;
@@ -432,7 +457,7 @@ GBool XRef::readXRefTable(Parser *parser, Guint *pos) {
 
   // check for an 'XRefStm' key
   if (obj.getDict()->lookup("XRefStm", &obj2)->isInt()) {
-    pos2 = obj2.getInt();
+    pos2 = (Guint)obj2.getInt();
     readXRef(&pos2);
     if (!ok) {
       goto err1;
@@ -463,7 +488,14 @@ GBool XRef::readXRefStream(Stream *xrefStr, Guint *pos) {
   }
   newSize = obj.getInt();
   obj.free();
+  if (newSize < 0) {
+    goto err1;
+  }
   if (newSize > size) {
+    if (newSize * sizeof(XRefEntry)/sizeof(XRefEntry) != newSize) {
+      error(-1, "Invalid 'size' parameter.");
+      return gFalse;
+    }
     entries = (XRefEntry *)grealloc(entries, newSize * sizeof(XRefEntry));
     for (i = size; i < newSize; ++i) {
       entries[i].offset = 0xffffffff;
@@ -483,6 +515,9 @@ GBool XRef::readXRefStream(Stream *xrefStr, Guint *pos) {
     }
     w[i] = obj2.getInt();
     obj2.free();
+    if (w[i] < 0 || w[i] > 4) {
+      goto err1;
+    }
   }
   obj.free();
 
@@ -502,13 +537,14 @@ GBool XRef::readXRefStream(Stream *xrefStr, Guint *pos) {
       }
       n = obj.getInt();
       obj.free();
-      if (!readXRefStreamSection(xrefStr, w, first, n)) {
+      if (first < 0 || n < 0 ||
+	  !readXRefStreamSection(xrefStr, w, first, n)) {
 	idx.free();
 	goto err0;
       }
     }
   } else {
-    if (!readXRefStreamSection(xrefStr, w, 0, size)) {
+    if (!readXRefStreamSection(xrefStr, w, 0, newSize)) {
       idx.free();
       goto err0;
     }
@@ -540,10 +576,20 @@ GBool XRef::readXRefStreamSection(Stream *xrefStr, int *w, int first, int n) {
   Guint offset;
   int type, gen, c, newSize, i, j;
 
+  if (first + n < 0) {
+    return gFalse;
+  }
   if (first + n > size) {
     for (newSize = size ? 2 * size : 1024;
-	 first + n > newSize;
+	 first + n > newSize && newSize > 0;
 	 newSize <<= 1) ;
+    if (newSize < 0) {
+      return gFalse;
+    }
+    if (newSize*sizeof(XRefEntry)/sizeof(XRefEntry) != newSize) {
+      error(-1, "Invalid 'size' inside xref table.");
+      return gFalse;
+    }
     entries = (XRefEntry *)grealloc(entries, newSize * sizeof(XRefEntry));
     for (i = size; i < newSize; ++i) {
       entries[i].offset = 0xffffffff;
@@ -574,24 +620,26 @@ GBool XRef::readXRefStreamSection(Stream *xrefStr, int *w, int first, int n) {
       }
       gen = (gen << 8) + c;
     }
-    switch (type) {
-    case 0:
-      entries[i].offset = offset;
-      entries[i].gen = gen;
-      entries[i].type = xrefEntryFree;
-      break;
-    case 1:
-      entries[i].offset = offset;
-      entries[i].gen = gen;
-      entries[i].type = xrefEntryUncompressed;
-      break;
-    case 2:
-      entries[i].offset = offset;
-      entries[i].gen = gen;
-      entries[i].type = xrefEntryCompressed;
-      break;
-    default:
-      return gFalse;
+    if (entries[i].offset == 0xffffffff) {
+      switch (type) {
+      case 0:
+	entries[i].offset = offset;
+	entries[i].gen = gen;
+	entries[i].type = xrefEntryFree;
+	break;
+      case 1:
+	entries[i].offset = offset;
+	entries[i].gen = gen;
+	entries[i].type = xrefEntryUncompressed;
+	break;
+      case 2:
+	entries[i].offset = offset;
+	entries[i].gen = gen;
+	entries[i].type = xrefEntryCompressed;
+	break;
+      default:
+	return gFalse;
+      }
     }
   }
 
@@ -653,38 +701,48 @@ GBool XRef::constructXRef() {
     // look for object
     } else if (isdigit(*p)) {
       num = atoi(p);
-      do {
-	++p;
-      } while (*p && isdigit(*p));
-      if (isspace(*p)) {
+      if (num > 0) {
 	do {
 	  ++p;
-	} while (*p && isspace(*p));
-	if (isdigit(*p)) {
-	  gen = atoi(p);
+	} while (*p && isdigit(*p));
+	if (isspace(*p)) {
 	  do {
 	    ++p;
-	  } while (*p && isdigit(*p));
-	  if (isspace(*p)) {
+	  } while (*p && isspace(*p));
+	  if (isdigit(*p)) {
+	    gen = atoi(p);
 	    do {
 	      ++p;
-	    } while (*p && isspace(*p));
-	    if (!strncmp(p, "obj", 3)) {
-	      if (num >= size) {
-		newSize = (num + 1 + 255) & ~255;
-		entries = (XRefEntry *)
-		            grealloc(entries, newSize * sizeof(XRefEntry));
-		for (i = size; i < newSize; ++i) {
-		  entries[i].offset = 0xffffffff;
-		  entries[i].type = xrefEntryFree;
+	    } while (*p && isdigit(*p));
+	    if (isspace(*p)) {
+	      do {
+		++p;
+	      } while (*p && isspace(*p));
+	      if (!strncmp(p, "obj", 3)) {
+		if (num >= size) {
+		  newSize = (num + 1 + 255) & ~255;
+		  if (newSize < 0) {
+		    error(-1, "Bad object number");
+		    return gFalse;
+		  }
+                  if (newSize*sizeof(XRefEntry)/sizeof(XRefEntry) != newSize) {
+                    error(-1, "Invalid 'obj' parameters.");
+                    return gFalse;
+                  }
+		  entries = (XRefEntry *)
+		      grealloc(entries, newSize * sizeof(XRefEntry));
+		  for (i = size; i < newSize; ++i) {
+		    entries[i].offset = 0xffffffff;
+		    entries[i].type = xrefEntryFree;
+		  }
+		  size = newSize;
 		}
-		size = newSize;
-	      }
-	      if (entries[num].type == xrefEntryFree ||
-		  gen >= entries[num].gen) {
-		entries[num].offset = pos - start;
-		entries[num].gen = gen;
-		entries[num].type = xrefEntryUncompressed;
+		if (entries[num].type == xrefEntryFree ||
+		    gen >= entries[num].gen) {
+		  entries[num].offset = pos - start;
+		  entries[num].gen = gen;
+		  entries[num].type = xrefEntryUncompressed;
+		}
 	      }
 	    }
 	  }
@@ -694,6 +752,10 @@ GBool XRef::constructXRef() {
     } else if (!strncmp(p, "endstream", 9)) {
       if (streamEndsLen == streamEndsSize) {
 	streamEndsSize += 64;
+        if (streamEndsSize*sizeof(int)/sizeof(int) != streamEndsSize) {
+          error(-1, "Invalid 'endstream' parameter.");
+          return gFalse;
+        }
 	streamEnds = (Guint *)grealloc(streamEnds,
 				       streamEndsSize * sizeof(int));
       }
