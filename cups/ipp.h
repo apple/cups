@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.h,v 1.36.2.12 2003/01/07 18:26:26 mike Exp $"
+ * "$Id: ipp.h,v 1.36.2.13 2003/01/07 21:58:04 mike Exp $"
  *
  *   Internet Printing Protocol definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -319,6 +319,13 @@ typedef union			/**** Request Header ****/
     int		request_id;	/* Request ID */
   }		any;
 
+  struct			/* Event Header */
+  {
+    ipp_uchar_t	version[2];	/* Protocol version number */
+    int		status_code;	/* Status code */
+    int		request_id;	/* Request ID */
+  }		event;
+
   struct			/* Operation Header */
   {
     ipp_uchar_t	version[2];	/* Protocol version number */
@@ -334,12 +341,15 @@ typedef union			/**** Request Header ****/
   }		status;
 } ipp_header_t;
 
+typedef struct ipp_str ipp_t;
 
 typedef union			/**** Attribute Value ****/
 {
   int		integer;	/* Integer/enumerated value */
 
   char		boolean;	/* Boolean value */
+
+  ipp_t		*collection;	/* Collection value */
 
   ipp_uchar_t	date[11];	/* Date/time value */
 
@@ -379,7 +389,7 @@ typedef struct ipp_attribute_s	/**** Attribute ****/
   ipp_value_t	values[1];	/* Values */
 } ipp_attribute_t;
 
-typedef struct			/**** Request State ****/
+struct ipp_str			/**** IPP Request/Response/Notification ****/
 {
   ipp_state_t	state;		/* State of request */
   ipp_header_t	request;	/* Request header */
@@ -387,7 +397,7 @@ typedef struct			/**** Request State ****/
 		*last,		/* Last attribute in list */
 		*current;	/* Current attribute (for read/write) */
   ipp_tag_t	curtag;		/* Current attribute group tag */
-} ipp_t;
+};
 
 
 /*
@@ -396,6 +406,8 @@ typedef struct			/**** Request State ****/
 
 extern ipp_attribute_t	*ippAddBoolean(ipp_t *ipp, ipp_tag_t group, const char *name, char value);
 extern ipp_attribute_t	*ippAddBooleans(ipp_t *ipp, ipp_tag_t group, const char *name, int num_values, const char *values);
+extern ipp_attribute_t	*ippAddCollection(ipp_t *ipp, ipp_tag_t group, const char *name, ipp_t *value);
+extern ipp_attribute_t	*ippAddCollections(ipp_t *ipp, ipp_tag_t group, const char *name, int num_values, const ipp_t **values);
 extern ipp_attribute_t	*ippAddDate(ipp_t *ipp, ipp_tag_t group, const char *name, const ipp_uchar_t *value);
 extern ipp_attribute_t	*ippAddInteger(ipp_t *ipp, ipp_tag_t group, ipp_tag_t type, const char *name, int value);
 extern ipp_attribute_t	*ippAddIntegers(ipp_t *ipp, ipp_tag_t group, ipp_tag_t type, const char *name, int num_values, const int *values);
@@ -408,6 +420,7 @@ extern ipp_attribute_t	*ippAddString(ipp_t *ipp, ipp_tag_t group, ipp_tag_t type
 extern ipp_attribute_t	*ippAddStrings(ipp_t *ipp, ipp_tag_t group, ipp_tag_t type, const char *name, int num_values, const char *charset, const char **values);
 extern time_t		ippDateToTime(const ipp_uchar_t *date);
 extern void		ippDelete(ipp_t *ipp);
+extern void		ippDeleteAttribute(ipp_t *ipp, ipp_attribute_t *attr);
 extern const char	*ippErrorString(ipp_status_t error);
 extern ipp_attribute_t	*ippFindAttribute(ipp_t *ipp, const char *name,
 			                  ipp_tag_t type);
@@ -444,5 +457,5 @@ extern void		_ipp_free_attr(ipp_attribute_t *);
 #endif /* !_IPP_IPP_H_ */
 
 /*
- * End of "$Id: ipp.h,v 1.36.2.12 2003/01/07 18:26:26 mike Exp $".
+ * End of "$Id: ipp.h,v 1.36.2.13 2003/01/07 21:58:04 mike Exp $".
  */

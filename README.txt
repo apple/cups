@@ -1,4 +1,4 @@
-README - CUPS v1.2.0a1 - 03/22/2002
+README - CUPS v1.2.0a1 - 01/07/2003
 -----------------------------------
 
 *****************************************************************
@@ -13,6 +13,10 @@ README - CUPS v1.2.0a1 - 03/22/2002
 
 Looking for compile instructions?  Read the file "INSTALL.txt"
 instead...
+
+**** IF YOU HAVE A NON-POSTSCRIPT PRINTER, YOU WILL ALSO  ****
+**** NEED TO INSTALL ESP GHOSTSCRIPT OR A PATCHED VERSION ****
+**** OF THE STANDARD GHOSTSCRIPT RELEASES.                ****
 
 
 INTRODUCTION
@@ -41,7 +45,7 @@ OKIDATA printers are included that use these filters.
 Drivers for thousands of printers are provided with our ESP
 Print Pro software, available at:
 
-	http://www.easysw.com/printpro
+	http://www.easysw.com/printpro/
 
 CUPS is licensed under the GNU General Public License and GNU
 Library General Public License.  Please contact Easy Software
@@ -260,12 +264,8 @@ trademark property of Easy Software Products.
 
 The MD5 Digest code is Copyright 1999 Aladdin Enterprises.
 
-The PostScript RIP software (pstoraster) is based on the GNU
-Ghostscript 5.50 core, Copyright 1986-1998 by Aladdin
-Enterprises.
-
-The PDF filter (pdftops) is based on the Xpdf 0.92 software,
-Copyright 1996-2003 by Derek B. Noonburg.
+The PDF filter (pdftops) is based on the Xpdf software,
+Copyright 1996-2002 by Derek B. Noonburg.
 
 This software is based in part on the work of the Independent
 JPEG Group.

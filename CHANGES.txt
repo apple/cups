@@ -1,8 +1,9 @@
-CHANGES.txt - 06/05/2002
+CHANGES.txt - 01/07/2003
 ------------------------
 
 CHANGES IN CUPS V1.2.0a1
 
+	- New IPP collection attribute support.
 	- New cupsLangPrintf() and cupsLangPuts() for localized
 	  interfaces.
 	- Now support custom attributes and extended options in
