@@ -85,6 +85,12 @@ CHANGES IN CUPS V1.1.13
 	- Added an include file to the CRD handling code in
 	  pstoraster so that it would compile properly on 64-bit
 	  pointer platforms...
+	- The cups-config script reported the wrong version
+	  number.
+	- The cups-config script was installed in $(bindir)
+	  instead of $(BINDIR).
+	- The init script did not correctly check for a running
+	  cupsd under IRIX 5.x.
 
 
 CHANGES IN CUPS V1.1.12

@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# "$Id: cups.sh.in,v 1.17 2002/01/02 17:58:33 mike Exp $"
+# "$Id: cups.sh.in,v 1.18 2002/01/18 22:10:15 mike Exp $"
 #
 #   Startup/shutdown script for the Common UNIX Printing System (CUPS).
 #
@@ -106,10 +106,10 @@ fi
 #
 
 case "`uname`" in
-	IRIX* | HP-UX* | AIX* | SINIX*)
+	HP-UX* | AIX* | SINIX*)
 		pid=`ps -e | awk '{if (match($4, ".*/cupsd$") || $4 == "cupsd") print $1}'`
 		;;
-	SunOS*)
+	IRIX* | SunOS*)
 		pid=`ps -e | nawk '{if (match($4, ".*/cupsd$") || $4 == "cupsd") print $1}'`
 		;;
 	UnixWare*)
@@ -176,5 +176,5 @@ exit 0
 
 
 #
-# End of "$Id: cups.sh.in,v 1.17 2002/01/02 17:58:33 mike Exp $".
+# End of "$Id: cups.sh.in,v 1.18 2002/01/18 22:10:15 mike Exp $".
 #
