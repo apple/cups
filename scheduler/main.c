@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c,v 1.44 2000/09/14 15:36:26 mike Exp $"
+ * "$Id: main.c,v 1.45 2000/09/14 18:54:14 mike Exp $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -39,9 +39,9 @@
 #include <sys/resource.h>
 #include <syslog.h>
 
-#if defined(HAVE_MALLOC_H) && defined(HAVE_LIBMALLOC)
+#if defined(HAVE_MALLOC_H) && defined(HAVE_MALLINFO)
 #  include <malloc.h>
-#endif /* HAVE_MALLOC_H && HAVE_LIBMALLOC */
+#endif /* HAVE_MALLOC_H && HAVE_MALLINFO */
 
 
 /*
@@ -73,6 +73,9 @@ main(int  argc,			/* I - Number of command-line arguments */
   listener_t		*lis;		/* Current listener */
   time_t		activity;	/* Activity timer */
   time_t		senddoc_time;	/* Send-Document time */
+#ifdef HAVE_MALLINFO
+  time_t		mallinfo_time;	/* Malloc information time */
+#endif /* HAVE_MALLINFO */
   struct timeval	timeout;	/* select() timeout */
   struct rlimit		limit;		/* Runtime limit */
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
@@ -425,26 +428,30 @@ main(int  argc,			/* I - Number of command-line arguments */
       senddoc_time = time(NULL);
     }
 
+#ifdef HAVE_MALLINFO
    /*
-    * Update the root certificate and log memory usage once every 5 minutes...
+    * Log memory usage every minute...
     */
 
-    if ((time(NULL) - RootCertTime) >= 300)
+    if ((time(NULL) - mallinfo_time) >= 60 && LogLevel >= L_DEBUG)
     {
-#if defined(HAVE_MALLOC_H) && defined(HAVE_LIBMALLOC)
       struct mallinfo mem;	/* Malloc information */
 
-
-     /*
-      * Log memory usage...
-      */
 
       mem = mallinfo();
       LogMessage(L_DEBUG, "mallinfo: arena = %d, used = %d, free = %d\n",
                  mem.arena, mem.usmblks + mem.uordblks,
 		 mem.fsmblks + mem.fordblks);
-#endif /* HAVE_MALLOC_H && HAVE_LIBMALLOC */
+      mallinfo_time = time(NULL);
+    }
+#endif /* HAVE_MALLINFO */
 
+   /*
+    * Update the root certificate once every 5 minutes...
+    */
+
+    if ((time(NULL) - RootCertTime) >= 300)
+    {
      /*
       * Update the root certificate...
       */
@@ -647,5 +654,5 @@ usage(void)
 
 
 /*
- * End of "$Id: main.c,v 1.44 2000/09/14 15:36:26 mike Exp $".
+ * End of "$Id: main.c,v 1.45 2000/09/14 18:54:14 mike Exp $".
  */

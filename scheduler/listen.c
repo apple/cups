@@ -1,5 +1,5 @@
 /*
- * "$Id: listen.c,v 1.5 2000/09/07 19:54:05 mike Exp $"
+ * "$Id: listen.c,v 1.6 2000/09/14 18:54:14 mike Exp $"
  *
  *   Server listening routines for the Common UNIX Printing System (CUPS)
  *   scheduler.
@@ -89,9 +89,37 @@ StartListening(void)
   int		i,		/* Looping var */
 		val;		/* Parameter value */
   listener_t	*lis;		/* Current listening socket */
+  struct hostent *host;		/* Host entry for server address */
 
 
   LogMessage(L_DEBUG, "StartListening() NumListeners=%d", NumListeners);
+
+ /*
+  * Get the server's IP address...
+  */
+
+  memset(&ServerAddr, 0, sizeof(ServerAddr));
+
+  if ((host = gethostbyname(ServerName)) != NULL)
+  {
+   /*
+    * Found the server's address!
+    */
+
+    memcpy((char *)&(ServerAddr.sin_addr), host->h_addr, host->h_length);
+    ServerAddr.sin_family = host->h_addrtype;
+  }
+  else
+  {
+   /*
+    * Didn't find it!  Use an address of 0...
+    */
+
+    LogMessage(L_ERROR, "StartListening() Unable to find IP address for server name \"%s\"!\n",
+               ServerName);
+
+    ServerAddr.sin_family = AF_INET;
+  }
 
  /*
   * Setup socket listeners...
@@ -174,5 +202,5 @@ StopListening(void)
 
 
 /*
- * End of "$Id: listen.c,v 1.5 2000/09/07 19:54:05 mike Exp $".
+ * End of "$Id: listen.c,v 1.6 2000/09/14 18:54:14 mike Exp $".
  */

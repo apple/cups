@@ -114,11 +114,15 @@ CHANGES IN CUPS v1.1.3
 	  option values separated by commas.
 	- Added new scheduler malloc logging in debug mode
 	  (provides summary of total arena size, allocated,
-	   and free bytes once every 5 minutes)
+	   and free bytes once a minute)
 	- The EPM-based distributions didn't install the
 	  correct symlinks for a few man pages.
-	- Fixed a memory leak in DeletePrinter() in the
-	  scheduler - wasn't freeing filters.
+	- Fixed a memory leak in the scheduler - wasn't
+	  freeing old filters when deleting or renaming
+	  printers.
+	- The web interfaces now correctly link to the
+	  localhost address when accessing printers from
+	  the local system.
 
 
 CHANGES IN CUPS v1.1.2

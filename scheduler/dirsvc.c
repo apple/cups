@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.60 2000/09/12 18:35:01 mike Exp $"
+ * "$Id: dirsvc.c,v 1.61 2000/09/14 18:54:13 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -440,6 +440,7 @@ UpdateBrowseList(void)
 
 	  if (p->type & CUPS_PRINTER_REMOTE)
 	  {
+            DeletePrinterFilters(p);
             strcat(p->name, "@");
 	    strcat(p->name, p->hostname);
 	    SetPrinterAttrs(p);
@@ -502,6 +503,7 @@ UpdateBrowseList(void)
 
 	  if (p->type & CUPS_PRINTER_REMOTE)
 	  {
+            DeletePrinterFilters(p);
             strcat(p->name, "@");
 	    strcat(p->name, p->hostname);
 	    SetPrinterAttrs(p);
@@ -876,5 +878,5 @@ StopPolling(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.60 2000/09/12 18:35:01 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.61 2000/09/14 18:54:13 mike Exp $".
  */

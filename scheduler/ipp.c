@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.96 2000/09/13 12:49:55 mike Exp $"
+ * "$Id: ipp.c,v 1.97 2000/09/14 18:54:13 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -608,9 +608,10 @@ add_class(client_t        *con,		/* I - Client connection */
   else if (pclass->type & CUPS_PRINTER_REMOTE)
   {
    /*
-    * Rename the remote class to "Class@server"...
+    * Rename the remote class to "Class"...
     */
 
+    DeletePrinterFilters(pclass);
     snprintf(pclass->name, sizeof(pclass->name), "%s@%s", resource + 10,
              pclass->hostname);
     SetPrinterAttrs(pclass);
@@ -973,6 +974,7 @@ add_printer(client_t        *con,	/* I - Client connection */
     * Rename the remote printer to "Printer@server"...
     */
 
+    DeletePrinterFilters(printer);
     snprintf(printer->name, sizeof(printer->name), "%s@%s", resource + 10,
              printer->hostname);
     SetPrinterAttrs(printer);
@@ -4849,5 +4851,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.96 2000/09/13 12:49:55 mike Exp $".
+ * End of "$Id: ipp.c,v 1.97 2000/09/14 18:54:13 mike Exp $".
  */
