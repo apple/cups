@@ -1,5 +1,5 @@
 /*
- * "$Id: image.c,v 1.23 2000/04/24 20:47:49 mike Exp $"
+ * "$Id: image.c,v 1.24 2000/04/24 20:52:04 mike Exp $"
  *
  *   Base image support for the Common UNIX Printing System (CUPS).
  *
@@ -158,7 +158,7 @@ ImageOpen(char       *filename,	/* I - Filename of image */
 #endif /* HAVE_LIBPNG && HAVE_LIBZ */
 #ifdef HAVE_LIBJPEG
   else if (memcmp(header, "\377\330\377", 3) == 0 &&	/* Start-of-Image */
-	   header[3] >= 0xd0 && header[3] <= 0xd7)	/* Resource */
+	   header[3] >= 0xe0 && header[3] <= 0xef)	/* APPn */
     status = ImageReadJPEG(img, fp, primary, secondary, saturation, hue, lut);
 #endif /* HAVE_LIBJPEG */
 #ifdef HAVE_LIBTIFF
@@ -791,5 +791,5 @@ flush_tile(image_t *img)	/* I - Image */
 
 
 /*
- * End of "$Id: image.c,v 1.23 2000/04/24 20:47:49 mike Exp $".
+ * End of "$Id: image.c,v 1.24 2000/04/24 20:52:04 mike Exp $".
  */
