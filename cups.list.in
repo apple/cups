@@ -1,5 +1,5 @@
 #
-# "$Id: cups.list.in,v 1.13.2.7 2002/01/26 21:46:09 mike Exp $"
+# "$Id: cups.list.in,v 1.13.2.8 2002/03/22 15:54:23 mike Exp $"
 #
 #   ESP Package Manager (EPM) file list for the Common UNIX Printing
 #   System (CUPS).
@@ -40,7 +40,6 @@
 %provides cupsys-devel
 %provides cups-pstoraster
 %provides libcups1
-%provides libcups.so.3
 
 #
 # GNU variables...
@@ -177,14 +176,19 @@ f 0555 root sys $LIBDIR/libcups.sl.3 cups/libcups.sl.3
 l 0555 root sys $LIBDIR/libcups.sl libcups.sl.3
 f 0555 root sys $LIBDIR/libcupsimage.sl.3 filter/libcupsimage.sl.3
 l 0555 root sys $LIBDIR/libcupsimage.sl libcupsimage.sl.3
+f 0555 root sys $LIBDIR/libipp.sl.3 ipp/libipp.sl.3
+l 0555 root sys $LIBDIR/libipp.sl libipp.sl.3
 %system aix
 f 0555 root sys $LIBDIR/libcups_s.a cups/libcups_s.a
 f 0555 root sys $LIBDIR/libcupsimage_s.a filter/libcupsimage_s.a
+f 0555 root sys $LIBDIR/libipp_s.a ipp/libipp_s.a
 %system !hpux !aix
 f 0555 root sys $LIBDIR/libcups.so.3 cups/libcups.so.3
 l 0555 root sys $LIBDIR/libcups.so libcups.so.3
 f 0555 root sys $LIBDIR/libcupsimage.so.3 filter/libcupsimage.so.3
 l 0555 root sys $LIBDIR/libcupsimage.so libcupsimage.so.3
+f 0555 root sys $LIBDIR/libipp.so.3 ipp/libipp.so.3
+l 0555 root sys $LIBDIR/libipp.so libipp.so.3
 %system all
 
 # Directories
@@ -278,16 +282,19 @@ c 0644 root sys $PAMDIR/cups data/cups.irix
 f 0555 root sys $BINDIR/cups-config cups-config
 d 0555 root sys $INCLUDEDIR/cups -
 f 0444 root sys $INCLUDEDIR/cups/cups.h cups/cups.h
-f 0444 root sys $INCLUDEDIR/cups/http.h cups/http.h
 f 0444 root sys $INCLUDEDIR/cups/image.h filter/image.h
-f 0444 root sys $INCLUDEDIR/cups/ipp.h cups/ipp.h
 f 0444 root sys $INCLUDEDIR/cups/language.h cups/language.h
-f 0444 root sys $INCLUDEDIR/cups/md5.h cups/md5.h
 f 0444 root sys $INCLUDEDIR/cups/ppd.h cups/ppd.h
 f 0444 root sys $INCLUDEDIR/cups/raster.h filter/raster.h
 
+d 0555 root sys $INCLUDEDIR/ipp -
+f 0444 root sys $INCLUDEDIR/ipp/http.h ipp/http.h
+f 0444 root sys $INCLUDEDIR/ipp/ipp.h ipp/ipp.h
+f 0444 root sys $INCLUDEDIR/ipp/md5.h ipp/md5.h
+
 f 0444 root sys $LIBDIR/libcups.a cups/libcups.a
 f 0444 root sys $LIBDIR/libcupsimage.a filter/libcupsimage.a
+f 0444 root sys $LIBDIR/libipp.a ipp/libipp.a
 
 # Documentation files
 d 0555 root sys $DOCDIR -
@@ -378,5 +385,5 @@ f 0444 root sys $AMANDIR/man$MAN8DIR/lpmove.$MAN8EXT man/lpmove.man
 i 0555 root sys cups cups.sh
 
 #
-# End of "$Id: cups.list.in,v 1.13.2.7 2002/01/26 21:46:09 mike Exp $".
+# End of "$Id: cups.list.in,v 1.13.2.8 2002/03/22 15:54:23 mike Exp $".
 #

@@ -1,5 +1,5 @@
 #
-# "$Id: cups.spec,v 1.30.2.5 2002/03/14 02:58:20 mike Exp $"
+# "$Id: cups.spec,v 1.30.2.6 2002/03/22 15:54:23 mike Exp $"
 #
 #   RPM "spec" file for the Common UNIX Printing System (CUPS).
 #
@@ -38,10 +38,13 @@ Vendor: Easy Software Products
 # Use buildroot so as not to disturb the version already installed
 BuildRoot: /var/tmp/%{name}-root
 
+Provides: ipp
+
 %package devel
 Summary: Common Unix Printing System - development environment
 Group: Development/Libraries
 Provides: libcups1
+Provides: ipp-devel
 
 %description
 The Common UNIX Printing System provides a portable printing layer for
@@ -185,6 +188,8 @@ rm -rf $RPM_BUILD_ROOT
 /usr/bin/cups-config
 %dir /usr/include/cups
 /usr/include/cups/*
+%dir /usr/include/ipp
+/usr/include/ipp/*
 /usr/lib/*.a
 %dir /usr/share/man/cat3
 /usr/share/man/cat3/*
@@ -192,5 +197,5 @@ rm -rf $RPM_BUILD_ROOT
 /usr/share/man/man1/*
 
 #
-# End of "$Id: cups.spec,v 1.30.2.5 2002/03/14 02:58:20 mike Exp $".
+# End of "$Id: cups.spec,v 1.30.2.6 2002/03/22 15:54:23 mike Exp $".
 #
