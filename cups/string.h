@@ -1,5 +1,5 @@
 /*
- * "$Id: string.h,v 1.11 2002/03/01 19:53:30 mike Exp $"
+ * "$Id: string.h,v 1.12 2002/05/15 01:52:16 mike Exp $"
  *
  *   String definitions for the Common UNIX Printing System (CUPS).
  *
@@ -82,7 +82,11 @@ extern int	strncasecmp(const char *, const char *, size_t n);
 #  endif /* !HAVE_STRNCASECMP */
 
 #  ifndef HAVE_SNPRINTF
-extern int	snprintf(char *, size_t, const char *, ...);
+extern int	snprintf(char *, size_t, const char *, ...)
+#    ifdef __GNUC__
+__attribute__ ((__format__ (__printf__, 3, 4)))
+#    endif /* __GNUC__ */
+;
 #  endif /* !HAVE_SNPRINTF */
 
 #  ifndef HAVE_VSNPRINTF
@@ -101,5 +105,5 @@ extern int	vsnprintf(char *, size_t, const char *, va_list);
 #endif /* !_CUPS_STRING_H_ */
 
 /*
- * End of "$Id: string.h,v 1.11 2002/03/01 19:53:30 mike Exp $".
+ * End of "$Id: string.h,v 1.12 2002/05/15 01:52:16 mike Exp $".
  */

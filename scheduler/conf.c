@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.101 2002/05/14 01:14:28 mike Exp $"
+ * "$Id: conf.c,v 1.102 2002/05/15 01:52:17 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -1130,6 +1130,7 @@ read_configuration(FILE *fp)		/* I - File to read from */
       {
         if (relay->from.type == AUTH_NAME)
           LogMessage(L_INFO, "Relaying from %s to %x:%d",
+	             relay->from.mask.name.name,
                      ntohl(relay->to.sin_addr.s_addr),
                      ntohs(relay->to.sin_port));
         else
@@ -1896,5 +1897,5 @@ get_address(char               *value,		/* I - Value string */
 
 
 /*
- * End of "$Id: conf.c,v 1.101 2002/05/14 01:14:28 mike Exp $".
+ * End of "$Id: conf.c,v 1.102 2002/05/15 01:52:17 mike Exp $".
  */
