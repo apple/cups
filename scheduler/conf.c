@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.128 2003/03/30 19:50:34 mike Exp $"
+ * "$Id: conf.c,v 1.129 2003/03/31 16:31:36 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -243,11 +243,37 @@ ReadConfiguration(void)
     free(MimeTypes);
   }
 
-  for (i = 0; i < NumRelays; i ++)
-    if (Relays[i].from.type == AUTH_NAME)
-      free(Relays[i].from.mask.name.name);
+  if (NumBrowsers > 0)
+  {
+    free(Browsers);
 
-  NumRelays = 0;
+    NumBrowsers = 0;
+  }
+
+  if (NumPolled > 0)
+  {
+    free(Polled);
+
+    NumPolled = 0;
+  }
+
+  if (NumRelays > 0)
+  {
+    for (i = 0; i < NumRelays; i ++)
+      if (Relays[i].from.type == AUTH_NAME)
+	free(Relays[i].from.mask.name.name);
+
+    free(Relays);
+
+    NumRelays = 0;
+  }
+
+  if (NumListeners > 0)
+  {
+    free(Listeners);
+
+    NumListeners = 0;
+  }
 
  /*
   * Reset the current configuration to the defaults...
@@ -390,10 +416,6 @@ ReadConfiguration(void)
   BrowseShortNames    = TRUE;
   BrowseTimeout       = DEFAULT_TIMEOUT;
   Browsing            = TRUE;
-  NumBrowsers         = 0;
-  NumPolled           = 0;
-
-  NumListeners        = 0;
 
   JobHistory          = DEFAULT_HISTORY;
   JobFiles            = DEFAULT_FILES;
@@ -795,23 +817,34 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
       * Add a listening address to the list...
       */
 
-      if (NumListeners < MAX_LISTENERS)
+      listener_t	*temp;		/* New listeners array */
+
+
+      if (NumListeners == 0)
+        temp = malloc(sizeof(listener_t));
+      else
+        temp = realloc(Listeners, (NumListeners + 1) * sizeof(listener_t));
+
+      if (!temp)
       {
-        if (get_address(value, INADDR_ANY, IPP_PORT,
-	                &(Listeners[NumListeners].address)))
-        {
-          LogMessage(L_INFO, "Listening to %x:%d",
-                     (unsigned)ntohl(Listeners[NumListeners].address.sin_addr.s_addr),
-                     ntohs(Listeners[NumListeners].address.sin_port));
-	  NumListeners ++;
-        }
-	else
-          LogMessage(L_ERROR, "Bad %s address %s at line %d.", name,
-	             value, linenum);
+        LogMessage(L_ERROR, "Unable to allocate %s at line %d - %s.",
+	           name, linenum, strerror(errno));
+        continue;
+      }
+
+      Listeners = temp;
+      temp      += NumListeners;
+
+      if (get_address(value, INADDR_ANY, IPP_PORT, &(temp->address)))
+      {
+        LogMessage(L_INFO, "Listening to %x:%d",
+                   (unsigned)ntohl(temp->address.sin_addr.s_addr),
+                   ntohs(temp->address.sin_port));
+	NumListeners ++;
       }
       else
-        LogMessage(L_WARN, "Too many %s directives at line %d.", name,
-	           linenum);
+        LogMessage(L_ERROR, "Bad %s address %s at line %d.", name,
+	           value, linenum);
     }
 #ifdef HAVE_SSL
     else if (strcasecmp(name, "SSLPort") == 0 ||
@@ -821,24 +854,35 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
       * Add a listening address to the list...
       */
 
-      if (NumListeners < MAX_LISTENERS)
+      listener_t	*temp;		/* New listeners array */
+
+
+      if (NumListeners == 0)
+        temp = malloc(sizeof(listener_t));
+      else
+        temp = realloc(Listeners, (NumListeners + 1) * sizeof(listener_t));
+
+      if (!temp)
       {
-        if (get_address(value, INADDR_ANY, IPP_PORT,
-	                &(Listeners[NumListeners].address)))
-        {
-          LogMessage(L_INFO, "Listening to %x:%d (SSL)",
-                     (unsigned)ntohl(Listeners[NumListeners].address.sin_addr.s_addr),
-                     ntohs(Listeners[NumListeners].address.sin_port));
-          Listeners[NumListeners].encryption = HTTP_ENCRYPT_ALWAYS;
-	  NumListeners ++;
-        }
-	else
-          LogMessage(L_ERROR, "Bad %s address %s at line %d.", name,
-	             value, linenum);
+        LogMessage(L_ERROR, "Unable to allocate %s at line %d - %s.",
+	           name, linenum, strerror(errno));
+        continue;
+      }
+
+      Listeners = temp;
+      temp      += NumListeners;
+
+      if (get_address(value, INADDR_ANY, IPP_PORT, &(temp->address)))
+      {
+        LogMessage(L_INFO, "Listening to %x:%d (SSL)",
+                   (unsigned)ntohl(temp->address.sin_addr.s_addr),
+                   ntohs(temp->address.sin_port));
+        temp->encryption = HTTP_ENCRYPT_ALWAYS;
+	NumListeners ++;
       }
       else
-        LogMessage(L_WARN, "Too many %s directives at line %d.", name,
-	           linenum);
+        LogMessage(L_ERROR, "Bad %s address %s at line %d.", name,
+	           value, linenum);
     }
 #endif /* HAVE_SSL */
     else if (strcasecmp(name, "BrowseAddress") == 0)
@@ -847,9 +891,20 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
       * Add a browse address to the list...
       */
 
-      if (NumBrowsers < MAX_BROWSERS)
+      dirsvc_addr_t	*temp;		/* New browse address array */
+
+
+      if (NumBrowsers == 0)
+        temp = malloc(sizeof(dirsvc_addr_t));
+      else
+        temp = realloc(Browsers, (NumBrowsers + 1) * sizeof(dirsvc_addr_t));
+
+      if (temp)
       {
-        memset(Browsers + NumBrowsers, 0, sizeof(dirsvc_addr_t));
+        Browsers = temp;
+	temp     += NumBrowsers;
+
+        memset(temp, 0, sizeof(dirsvc_addr_t));
 
         if (strcasecmp(value, "@LOCAL") == 0)
 	{
@@ -857,7 +912,7 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 	  * Send browse data to all local interfaces...
 	  */
 
-	  strcpy(Browsers[NumBrowsers].iface, "*");
+	  strcpy(temp->iface, "*");
 	  NumBrowsers ++;
 	}
 	else if (strncasecmp(value, "@IF(", 4) == 0)
@@ -866,22 +921,19 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 	  * Send browse data to the named interface...
 	  */
 
-	  strlcpy(Browsers[NumBrowsers].iface, value + 4,
-	          sizeof(Browsers[0].iface));
+	  strlcpy(temp->iface, value + 4, sizeof(Browsers[0].iface));
 
-          nameptr = Browsers[NumBrowsers].iface +
-	            strlen(Browsers[NumBrowsers].iface) - 1;
+          nameptr = temp->iface + strlen(temp->iface) - 1;
           if (*nameptr == ')')
 	    *nameptr = '\0';
 
 	  NumBrowsers ++;
 	}
-	else if (get_address(value, INADDR_NONE, BrowsePort,
-	                     &(Browsers[NumBrowsers].to)))
+	else if (get_address(value, INADDR_NONE, BrowsePort, &(temp->to)))
         {
           LogMessage(L_INFO, "Sending browsing info to %x:%d",
-                     (unsigned)ntohl(Browsers[NumBrowsers].to.sin_addr.s_addr),
-                     ntohs(Browsers[NumBrowsers].to.sin_port));
+                     (unsigned)ntohl(temp->to.sin_addr.s_addr),
+                     ntohs(temp->to.sin_port));
 
 	  NumBrowsers ++;
         }
@@ -890,8 +942,8 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 	             linenum);
       }
       else
-        LogMessage(L_WARN, "Too many BrowseAddress directives at line %d.",
-	           linenum);
+        LogMessage(L_ERROR, "Unable to allocate BrowseAddress at line %d - %s.",
+	           linenum, strerror(errno));
     }
     else if (strcasecmp(name, "BrowseOrder") == 0)
     {
@@ -1078,14 +1130,20 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
       * BrowseRelay [from] source [to] destination
       */
 
-      if (NumRelays >= MAX_BROWSERS)
+      if (NumRelays == 0)
+        relay = malloc(sizeof(dirsvc_relay_t));
+      else
+        relay = realloc(Relays, (NumRelays + 1) * sizeof(dirsvc_relay_t));
+
+      if (!relay)
       {
-        LogMessage(L_WARN, "Too many BrowseRelay directives at line %d.",
-	           linenum);
+        LogMessage(L_ERROR, "Unable to allocate BrowseRelay at line %d - %s.",
+	           linenum, strerror(errno));
         continue;
       }
 
-      relay = Relays + NumRelays;
+      Relays = relay;
+      relay  += NumRelays;
 
       memset(relay, 0, sizeof(dirsvc_relay_t));
 
@@ -1227,12 +1285,20 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
       * BrowsePoll address[:port]
       */
 
-      if (NumPolled >= MAX_BROWSERS)
+      if (NumPolled == 0)
+        poll = malloc(sizeof(dirsvc_poll_t));
+      else
+        poll = realloc(Polled, (NumPolled + 1) * sizeof(dirsvc_poll_t));
+
+      if (!poll)
       {
-        LogMessage(L_WARN, "Too many BrowsePoll directives at line %d.",
-	           linenum);
+        LogMessage(L_ERROR, "Unable to allocate BrowsePoll at line %d - %s.",
+	           linenum, strerror(errno));
         continue;
       }
+
+      Polled = poll;
+      poll   += NumPolled;
 
      /*
       * Get poll address and port...
@@ -1244,7 +1310,6 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 	           (unsigned)ntohl(polladdr.sin_addr.s_addr),
                    ntohs(polladdr.sin_port));
 
-        poll = Polled + NumPolled;
 	NumPolled ++;
 	memset(poll, 0, sizeof(dirsvc_poll_t));
 
@@ -2058,5 +2123,5 @@ CDSAGetServerCerts(void)
 
 
 /*
- * End of "$Id: conf.c,v 1.128 2003/03/30 19:50:34 mike Exp $".
+ * End of "$Id: conf.c,v 1.129 2003/03/31 16:31:36 mike Exp $".
  */
