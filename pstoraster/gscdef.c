@@ -1,5 +1,5 @@
 /*
-  Copyright 1993-1999 by Easy Software Products.
+  Copyright 1993-2000 by Easy Software Products.
   Copyright (C) 1996 Aladdin Enterprises.  All rights reserved.
   
   This file is part of GNU Ghostscript.
@@ -42,7 +42,7 @@ long gs_buildtime = GS_BUILDTIME;
 
 #ifndef GS_COPYRIGHT
 #  define GS_COPYRIGHT\
-	"Copyright 1993-1999 Easy Software Products, All Rights Reserved.\n"\
+	"Copyright 1993-2000 Easy Software Products, All Rights Reserved.\n"\
 	"Copyright 1996 Aladdin Enterprises, Menlo Park, CA.  All rights reserved."
 #endif
 const char *gs_copyright = GS_COPYRIGHT;	

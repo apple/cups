@@ -1,9 +1,9 @@
 /*
- * "$Id: hpgl-attr.c,v 1.13 1999/12/07 21:55:51 mike Exp $"
+ * "$Id: hpgl-attr.c,v 1.14 2000/01/04 13:45:43 mike Exp $"
  *
  *   HP-GL/2 attribute processing for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1993-1999 by Easy Software Products.
+ *   Copyright 1993-2000 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -438,5 +438,5 @@ WU_width_units(int     num_params,	/* I - Number of parameters */
 
 
 /*
- * End of "$Id: hpgl-attr.c,v 1.13 1999/12/07 21:55:51 mike Exp $".
+ * End of "$Id: hpgl-attr.c,v 1.14 2000/01/04 13:45:43 mike Exp $".
  */

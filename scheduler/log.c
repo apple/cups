@@ -1,9 +1,9 @@
 /*
- * "$Id: log.c,v 1.4 1999/12/07 18:10:18 mike Exp $"
+ * "$Id: log.c,v 1.5 2000/01/04 13:46:10 mike Exp $"
  *
  *   Log file routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-1999 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2000 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -368,5 +368,5 @@ get_datetime(time_t t)		/* I - Time value */
 
 
 /*
- * End of "$Id: log.c,v 1.4 1999/12/07 18:10:18 mike Exp $".
+ * End of "$Id: log.c,v 1.5 2000/01/04 13:46:10 mike Exp $".
  */

@@ -1,9 +1,9 @@
 /*
- * "$Id: image-png.c,v 1.7 1999/08/30 15:50:12 mike Exp $"
+ * "$Id: image-png.c,v 1.8 2000/01/04 13:45:45 mike Exp $"
  *
  *   PNG image routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1993-1999 by Easy Software Products.
+ *   Copyright 1993-2000 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -201,5 +201,5 @@ ImageReadPNG(image_t    *img,		/* IO - Image */
 
 
 /*
- * End of "$Id: image-png.c,v 1.7 1999/08/30 15:50:12 mike Exp $".
+ * End of "$Id: image-png.c,v 1.8 2000/01/04 13:45:45 mike Exp $".
  */

@@ -1,9 +1,9 @@
 /*
- * "$Id: image.h,v 1.8 1999/08/30 15:50:16 mike Exp $"
+ * "$Id: image.h,v 1.9 2000/01/04 13:45:46 mike Exp $"
  *
  *   Image library definitions for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1993-1999 by Easy Software Products.
+ *   Copyright 1993-2000 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -221,5 +221,5 @@ extern void	ImageZoomFree(izoom_t *z);
 #endif /* !_IMAGE_H_ */
 
 /*
- * End of "$Id: image.h,v 1.8 1999/08/30 15:50:16 mike Exp $".
+ * End of "$Id: image.h,v 1.9 2000/01/04 13:45:46 mike Exp $".
  */

@@ -1,9 +1,9 @@
 /*
- * "$Id: mime.c,v 1.15 1999/10/10 15:40:23 mike Exp $"
+ * "$Id: mime.c,v 1.16 2000/01/04 13:45:35 mike Exp $"
  *
  *   MIME database file routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-1999 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2000 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -33,6 +33,9 @@
  * Revision History:
  *
  *   $Log: mime.c,v $
+ *   Revision 1.16  2000/01/04 13:45:35  mike
+ *   Y2k copyright changes.
+ *
  *   Revision 1.15  1999/10/10 15:40:23  mike
  *   Scanf, strcpy, and sprintf security changes.
  *
@@ -618,5 +621,5 @@ delete_rules(mime_magic_t *rules)	/* I - Rules to free */
 
 
 /*
- * End of "$Id: mime.c,v 1.15 1999/10/10 15:40:23 mike Exp $".
+ * End of "$Id: mime.c,v 1.16 2000/01/04 13:45:35 mike Exp $".
  */

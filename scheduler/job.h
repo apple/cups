@@ -1,9 +1,9 @@
 /*
- * "$Id: job.h,v 1.11 2000/01/03 19:02:33 mike Exp $"
+ * "$Id: job.h,v 1.12 2000/01/04 13:46:10 mike Exp $"
  *
  *   Print job definitions for the Common UNIX Printing System (CUPS) scheduler.
  *
- *   Copyright 1997-1999 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2000 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -81,5 +81,5 @@ extern const char *ValidateDest(const char *resource, cups_ptype_t *dtype);
 
 
 /*
- * End of "$Id: job.h,v 1.11 2000/01/03 19:02:33 mike Exp $".
+ * End of "$Id: job.h,v 1.12 2000/01/04 13:46:10 mike Exp $".
  */

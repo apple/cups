@@ -1,9 +1,9 @@
 /*
- * "$Id: image-tiff.c,v 1.10 1999/12/03 20:01:42 mike Exp $"
+ * "$Id: image-tiff.c,v 1.11 2000/01/04 13:45:45 mike Exp $"
  *
  *   TIFF file routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1993-1999 by Easy Software Products.
+ *   Copyright 1993-2000 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -1616,5 +1616,5 @@ ImageReadTIFF(image_t    *img,		/* IO - Image */
 
 
 /*
- * End of "$Id: image-tiff.c,v 1.10 1999/12/03 20:01:42 mike Exp $".
+ * End of "$Id: image-tiff.c,v 1.11 2000/01/04 13:45:45 mike Exp $".
  */

@@ -1,9 +1,9 @@
 /*
- * "$Id: auth.c,v 1.21 2000/01/03 21:06:24 mike Exp $"
+ * "$Id: auth.c,v 1.22 2000/01/04 13:46:08 mike Exp $"
  *
  *   Authorization routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-1999 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2000 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -728,5 +728,5 @@ pam_func(int                      num_msg,	/* I - Number of messages */
 
 
 /*
- * End of "$Id: auth.c,v 1.21 2000/01/03 21:06:24 mike Exp $".
+ * End of "$Id: auth.c,v 1.22 2000/01/04 13:46:08 mike Exp $".
  */

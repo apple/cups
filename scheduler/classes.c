@@ -1,9 +1,9 @@
 /*
- * "$Id: classes.c,v 1.13 2000/01/03 19:02:32 mike Exp $"
+ * "$Id: classes.c,v 1.14 2000/01/04 13:46:08 mike Exp $"
  *
  *   Printer class routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-1999 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2000 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -540,5 +540,5 @@ SaveAllClasses(void)
 
 
 /*
- * End of "$Id: classes.c,v 1.13 2000/01/03 19:02:32 mike Exp $".
+ * End of "$Id: classes.c,v 1.14 2000/01/04 13:46:08 mike Exp $".
  */

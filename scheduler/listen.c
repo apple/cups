@@ -1,10 +1,10 @@
 /*
- * "$Id: listen.c,v 1.2 1999/06/18 18:36:48 mike Exp $"
+ * "$Id: listen.c,v 1.3 2000/01/04 13:46:10 mike Exp $"
  *
  *   Server listening routines for the Common UNIX Printing System (CUPS)
  *   scheduler.
  *
- *   Copyright 1997-1999 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2000 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -138,5 +138,5 @@ StopListening(void)
 
 
 /*
- * End of "$Id: listen.c,v 1.2 1999/06/18 18:36:48 mike Exp $".
+ * End of "$Id: listen.c,v 1.3 2000/01/04 13:46:10 mike Exp $".
  */

@@ -1,9 +1,9 @@
 /*
- * "$Id: lpadmin.c,v 1.10 1999/10/10 15:41:15 mike Exp $"
+ * "$Id: lpadmin.c,v 1.11 2000/01/04 13:46:11 mike Exp $"
  *
  *   "lpadmin" command for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-1999 by Easy Software Products.
+ *   Copyright 1997-2000 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -1150,5 +1150,5 @@ set_printer_location(http_t *http,	/* I - Server connection */
 
 
 /*
- * End of "$Id: lpadmin.c,v 1.10 1999/10/10 15:41:15 mike Exp $".
+ * End of "$Id: lpadmin.c,v 1.11 2000/01/04 13:46:11 mike Exp $".
  */

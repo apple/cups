@@ -1,9 +1,9 @@
 /*
- * "$Id: mark.c,v 1.19 1999/12/21 02:26:45 mike Exp $"
+ * "$Id: mark.c,v 1.20 2000/01/04 13:45:35 mike Exp $"
  *
  *   Option marking routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-1999 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2000 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -407,5 +407,5 @@ ppd_defaults(ppd_file_t  *ppd,	/* I - PPD file */
 
 
 /*
- * End of "$Id: mark.c,v 1.19 1999/12/21 02:26:45 mike Exp $".
+ * End of "$Id: mark.c,v 1.20 2000/01/04 13:45:35 mike Exp $".
  */

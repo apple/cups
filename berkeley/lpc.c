@@ -1,9 +1,9 @@
 /*
- * "$Id: lpc.c,v 1.6 1999/10/10 15:40:15 mike Exp $"
+ * "$Id: lpc.c,v 1.7 2000/01/04 13:45:33 mike Exp $"
  *
  *   "lpc" command for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-1999 by Easy Software Products.
+ *   Copyright 1997-2000 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -463,5 +463,5 @@ show_status(http_t *http,	/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpc.c,v 1.6 1999/10/10 15:40:15 mike Exp $".
+ * End of "$Id: lpc.c,v 1.7 2000/01/04 13:45:33 mike Exp $".
  */

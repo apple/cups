@@ -1,10 +1,10 @@
 /*
- * "$Id: rastertohp.c,v 1.1 1999/05/17 18:03:36 mike Exp $"
+ * "$Id: rastertohp.c,v 1.2 2000/01/04 13:45:48 mike Exp $"
  *
  *   Hewlett-Packard Page Control Language and Raster Transfer Language
  *   filter for ESP Print.
  *
- *   Copyright 1993-1999 by Easy Software Products
+ *   Copyright 1993-2000 by Easy Software Products
  *
  *   These coded instructions, statements, and computer programs contain
  *   unpublished proprietary information of Easy Software Products, and
@@ -489,5 +489,5 @@ main(int  argc,		/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: rastertohp.c,v 1.1 1999/05/17 18:03:36 mike Exp $".
+ * End of "$Id: rastertohp.c,v 1.2 2000/01/04 13:45:48 mike Exp $".
  */

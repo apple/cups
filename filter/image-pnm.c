@@ -1,9 +1,9 @@
 /*
- * "$Id: image-pnm.c,v 1.5 1999/08/30 15:50:13 mike Exp $"
+ * "$Id: image-pnm.c,v 1.6 2000/01/04 13:45:45 mike Exp $"
  *
  *   Portable Any Map file routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1993-1999 by Easy Software Products.
+ *   Copyright 1993-2000 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -284,5 +284,5 @@ ImageReadPNM(image_t    *img,		/* IO - Image */
 
 
 /*
- * End of "$Id: image-pnm.c,v 1.5 1999/08/30 15:50:13 mike Exp $".
+ * End of "$Id: image-pnm.c,v 1.6 2000/01/04 13:45:45 mike Exp $".
  */

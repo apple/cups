@@ -334,16 +334,16 @@ extension of ".h".
 The top of each source file shall contain a header giving the name of the
 file, the purpose or nature of the source file, the copyright and licensing
 notice, and the functions contained in the file.  The file name and revision
-information is provided by the CVS "$Id: cmp.shtml,v 1.4 1999/09/22 20:06:18 mike Exp $" tag:
+information is provided by the CVS "$Id: cmp.shtml,v 1.5 2000/01/04 13:45:38 mike Exp $" tag:
 
 <UL>
 <PRE>
 /*
- * "$Id: cmp.shtml,v 1.4 1999/09/22 20:06:18 mike Exp $"
+ * "$Id: cmp.shtml,v 1.5 2000/01/04 13:45:38 mike Exp $"
  *
  *   Description of file contents.
  *
- *   Copyright 1997-1999 by Easy Software Products, all rights
+ *   Copyright 1997-2000 by Easy Software Products, all rights
  *   reserved.
  *
  *   These coded instructions, statements, and computer programs are
@@ -372,14 +372,14 @@ information is provided by the CVS "$Id: cmp.shtml,v 1.4 1999/09/22 20:06:18 mik
 </UL>
 
 The bottom of each source file shall contain a trailer giving the name
-of the file using the CVS "$Id: cmp.shtml,v 1.4 1999/09/22 20:06:18 mike Exp $" tag. The primary purpose of this is to
+of the file using the CVS "$Id: cmp.shtml,v 1.5 2000/01/04 13:45:38 mike Exp $" tag. The primary purpose of this is to
 mark the end of a source file; if the trailer is missing it is possible
 that code has been lost near the end of the file:
 
 <UL>
 <PRE>
 /*
- * End of "$Id: cmp.shtml,v 1.4 1999/09/22 20:06:18 mike Exp $".
+ * End of "$Id: cmp.shtml,v 1.5 2000/01/04 13:45:38 mike Exp $".
  */
 </PRE>
 </UL>

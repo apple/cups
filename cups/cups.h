@@ -1,9 +1,9 @@
 /*
- * "$Id: cups.h,v 1.19 1999/10/21 20:51:55 mike Exp $"
+ * "$Id: cups.h,v 1.20 2000/01/04 13:45:34 mike Exp $"
  *
  *   API definitions for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-1999 by Easy Software Products.
+ *   Copyright 1997-2000 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -140,5 +140,5 @@ extern const char	*cupsUser(void);
 #endif /* !_CUPS_CUPS_H_ */
 
 /*
- * End of "$Id: cups.h,v 1.19 1999/10/21 20:51:55 mike Exp $".
+ * End of "$Id: cups.h,v 1.20 2000/01/04 13:45:34 mike Exp $".
  */

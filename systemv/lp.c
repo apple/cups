@@ -1,9 +1,9 @@
 /*
- * "$Id: lp.c,v 1.14 1999/12/21 02:26:48 mike Exp $"
+ * "$Id: lp.c,v 1.15 2000/01/04 13:46:11 mike Exp $"
  *
  *   "lp" command for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-1999 by Easy Software Products.
+ *   Copyright 1997-2000 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -327,5 +327,5 @@ sighandler(int s)	/* I - Signal number */
 
 
 /*
- * End of "$Id: lp.c,v 1.14 1999/12/21 02:26:48 mike Exp $".
+ * End of "$Id: lp.c,v 1.15 2000/01/04 13:46:11 mike Exp $".
  */

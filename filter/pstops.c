@@ -1,9 +1,9 @@
 /*
- * "$Id: pstops.c,v 1.32 1999/12/07 19:05:45 mike Exp $"
+ * "$Id: pstops.c,v 1.33 2000/01/04 13:45:47 mike Exp $"
  *
  *   PostScript filter for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1993-1999 by Easy Software Products.
+ *   Copyright 1993-2000 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -868,5 +868,5 @@ start_nup(int number)	/* I - Page number */
 
 
 /*
- * End of "$Id: pstops.c,v 1.32 1999/12/07 19:05:45 mike Exp $".
+ * End of "$Id: pstops.c,v 1.33 2000/01/04 13:45:47 mike Exp $".
  */

@@ -1,9 +1,9 @@
 /*
- * "$Id: image-sun.c,v 1.5 1999/08/30 15:50:14 mike Exp $"
+ * "$Id: image-sun.c,v 1.6 2000/01/04 13:45:45 mike Exp $"
  *
  *   Sun Raster image file routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1993-1999 by Easy Software Products.
+ *   Copyright 1993-2000 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -372,5 +372,5 @@ read_unsigned(FILE *fp)	/* I - File to read from */
 
 
 /*
- * End of "$Id: image-sun.c,v 1.5 1999/08/30 15:50:14 mike Exp $".
+ * End of "$Id: image-sun.c,v 1.6 2000/01/04 13:45:45 mike Exp $".
  */
