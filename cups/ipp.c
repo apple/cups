@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.55.2.24 2003/01/14 22:09:43 mike Exp $"
+ * "$Id: ipp.c,v 1.55.2.25 2003/01/15 21:03:57 mike Exp $"
  *
  *   Internet Printing Protocol support functions for the Common UNIX
  *   Printing System (CUPS).
@@ -152,7 +152,7 @@ ippAddBooleans(ipp_t      *ipp,			/* I - IPP request */
   DEBUG_printf(("ippAddBooleans(%p, %02x, \'%s\', %d, %p)\n", ipp,
                 group, name, num_values, values));
 
-  if (ipp == NULL || name == NULL)
+  if (ipp == NULL || name == NULL || num_values < 1)
     return (NULL);
 
   if ((attr = _ipp_add_attr(ipp, num_values)) == NULL)
@@ -322,7 +322,7 @@ ippAddIntegers(ipp_t      *ipp,			/* I - IPP request */
   ipp_value_t		*value;			/* Current value */
 
 
-  if (ipp == NULL || name == NULL)
+  if (ipp == NULL || name == NULL || num_values < 1)
     return (NULL);
 
   if ((attr = _ipp_add_attr(ipp, num_values)) == NULL)
@@ -421,7 +421,7 @@ ippAddStrings(ipp_t      *ipp,			/* I - IPP request */
   ipp_value_t		*value;			/* Current value */
 
 
-  if (ipp == NULL || name == NULL)
+  if (ipp == NULL || name == NULL || num_values < 1)
     return (NULL);
 
   if ((attr = _ipp_add_attr(ipp, num_values)) == NULL)
@@ -478,7 +478,7 @@ ippAddRange(ipp_t      *ipp,			/* I - IPP request */
   ipp_attribute_t	*attr;			/* New attribute */
 
 
-  if (ipp == NULL || name == NULL)
+  if (ipp == NULL || name == NULL || num_values < 1)
     return (NULL);
 
   if ((attr = _ipp_add_attr(ipp, 1)) == NULL)
@@ -511,7 +511,7 @@ ippAddRanges(ipp_t      *ipp,			/* I - IPP request */
   ipp_value_t		*value;			/* Current value */
 
 
-  if (ipp == NULL || name == NULL)
+  if (ipp == NULL || name == NULL || num_values < 1)
     return (NULL);
 
   if ((attr = _ipp_add_attr(ipp, num_values)) == NULL)
@@ -2143,7 +2143,7 @@ _ipp_add_attr(ipp_t *ipp,			/* I - IPP request */
 
   DEBUG_printf(("_ipp_add_attr(%p, %d)\n", ipp, num_values));
 
-  if (ipp == NULL || num_values < 0)
+  if (ipp == NULL || num_values < 1)
     return (NULL);
 
   attr = calloc(sizeof(ipp_attribute_t) +
@@ -2562,5 +2562,5 @@ ipp_write_mem(ipp_mem_t   *m,			/* I - Memory buffer */
 
 
 /*
- * End of "$Id: ipp.c,v 1.55.2.24 2003/01/14 22:09:43 mike Exp $".
+ * End of "$Id: ipp.c,v 1.55.2.25 2003/01/15 21:03:57 mike Exp $".
  */

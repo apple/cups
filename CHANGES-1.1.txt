@@ -3,6 +3,8 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.19
 
+	- The ippAddXYZ functions no longer allow the
+	  application to add less than 1 value.
 	- Fixed a URL rewrite bug in the web interface - local
 	  access was sometimes redirected away from localhost...
 	- The ppdOpen() functions could get in an infinite loop
