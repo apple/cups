@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.2 1999/05/19 18:00:55 mike Exp $"
+# "$Id: Makefile,v 1.3 1999/06/21 15:27:44 mike Exp $"
 #
 #   Man page makefile for the Common UNIX Printing System (CUPS).
 #
@@ -33,9 +33,9 @@ MAN5	=	classes.conf.5 cupsd.conf.5 mime.convs.5 mime.types.5 \
 		printers.conf.5
 MAN8	=	accept.8 cupsd.8 enable.8 lpadmin.8 lpc.8
 
-CAT1	=	$(MAN1:.1=.z)
-CAT5	=	$(MAN5:.5=.z)
-CAT8	=	$(MAN8:.8=.z)
+CAT1	=	$(MAN1:.1=.$(CAT))
+CAT5	=	$(MAN5:.5=.$(CAT))
+CAT8	=	$(MAN8:.8=.$(CAT))
 
 #
 # Make everything...
@@ -65,14 +65,14 @@ install:
 	$(LN) enable.8 $(MANDIR)/man8/disable.8
 	-$(MKDIR) $(MANDIR)/cat1
 	$(CP) $(CAT1) $(MANDIR)/cat1
-	$(LN) lp.z $(MANDIR)/cat1/cancel.z
+	$(LN) lp.$(CAT) $(MANDIR)/cat1/cancel.$(CAT)
 	-$(MKDIR) $(MANDIR)/cat5
 	$(CP) $(CAT5) $(MANDIR)/cat5
 	-$(MKDIR) $(MANDIR)/cat8
 	$(CP) $(CAT8) $(MANDIR)/cat8
-	$(LN) accept.z $(MANDIR)/cat8/reject.z
-	$(LN) enable.z $(MANDIR)/cat8/disable.z
+	$(LN) accept.$(CAT) $(MANDIR)/cat8/reject.$(CAT)
+	$(LN) enable.$(CAT) $(MANDIR)/cat8/disable.$(CAT)
 
 #
-# End of "$Id: Makefile,v 1.2 1999/05/19 18:00:55 mike Exp $".
+# End of "$Id: Makefile,v 1.3 1999/06/21 15:27:44 mike Exp $".
 #

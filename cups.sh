@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# "$Id: cups.sh,v 1.1 1999/05/20 16:16:47 mike Exp $"
+# "$Id: cups.sh,v 1.2 1999/06/21 15:27:42 mike Exp $"
 #
 #   Startup/shutdown script for the Common UNIX Printing System (CUPS).
 #
@@ -40,15 +40,17 @@ case "`uname`" in
 esac
 
 if test "$pid" != ""; then
+	echo "Stopping CUPS scheduler..."
 	kill $pid
 	sleep 1
 fi
-	
+
 # Restart the CUPS daemon as necessary...
 if test "$1" = "start"; then
+	echo "Starting CUPS scheduler..."
 	/usr/sbin/cupsd 2>&1 >/dev/null &
 fi
 
 #
-# End of "$Id: cups.sh,v 1.1 1999/05/20 16:16:47 mike Exp $".
+# End of "$Id: cups.sh,v 1.2 1999/06/21 15:27:42 mike Exp $".
 #

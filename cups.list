@@ -1,7 +1,11 @@
 #
-# "$Id: cups.list,v 1.6 1999/06/17 20:02:21 mike Exp $"
+# "$Id: cups.list,v 1.7 1999/06/21 15:27:42 mike Exp $"
 #
-#   Installation list for the Common UNIX Printing System (CUPS).
+#   ESP Package Manager (EPM) file list for the Common UNIX Printing
+#   System (CUPS).
+#
+#   EPM can be found in the "epm" subdirectory of this distribution.
+#   Please report problems and fixes to Michael Sweet (mike@easysw.com).
 #
 #   Copyright 1997-1999 by Easy Software Products, all rights reserved.
 #
@@ -14,7 +18,7 @@
 #
 #       Attn: CUPS Licensing Information
 #       Easy Software Products
-#       44145 Airport View Drive, Suite 204
+#       44141 Airport View Drive, Suite 204
 #       Hollywood, Maryland 20636-3111 USA
 #
 #       Voice: (301) 373-9603
@@ -27,9 +31,7 @@
 %vendor Easy Software Products
 %license LICENSE.cups
 %readme README.cups
-%version 1.0b3
-%incompat print
-%incompat printpro
+%version 1.0b4
 
 %system all
 # Server files
@@ -217,7 +219,7 @@ f 0444 root sys /usr/share/cups/doc/svd.html doc/svd.html
 f 0444 root sys /usr/share/cups/doc/svd.pdf doc/svd.pdf
 
 # Man pages
-%system irix64
+%system irix irix64
 f 0444 root sys /usr/share/catman/a_man/cat1/accept.z man/accept.z
 l 0444 root sys /usr/share/catman/a_man/cat1/reject.z accept.z
 f 0444 root sys /usr/share/catman/u_man/cat1/backend.z man/backend.z
@@ -237,7 +239,7 @@ l 0444 root sys /usr/share/catman/u_man/cat1/cancel.z lp.z
 f 0444 root sys /usr/share/catman/u_man/cat5/mime.convs.z man/mime.convs.z
 f 0444 root sys /usr/share/catman/u_man/cat5/mime.types.z man/mime.types.z
 f 0444 root sys /usr/share/catman/u_man/cat5/printers.conf.z man/printers.conf.z
-%system hpux linux dunix sunos
+%system hpux linux dunix solaris sunos
 f 0444 root sys /usr/man/man8/accept.8 man/accept.8
 l 0444 root sys /usr/man/man8/reject.8 accept.8
 f 0444 root sys /usr/man/man1/backend.1 man/backend.1
@@ -263,21 +265,21 @@ f 0444 root sys /usr/man/man5/printers.conf.5 man/printers.conf.5
 %install /sbin/init.d/lp start
 %remove /sbin/init.d/lp stop
 %patch /sbin/init.d/lp stop
-f 0555 root sys /sbin/init.d/lp packages/cups.sh
+f 0555 root sys /sbin/init.d/lp cups.sh
 l 0555 root sys /sbin/rc1.d/K280lp ../init.d/lp
 l 0555 root sys /sbin/rc2.d/S720lp ../init.d/lp
-%system irix64
+%system irix irix64
 %install /etc/init.d/lp start
 %remove /etc/init.d/lp stop
 %patch /etc/init.d/lp stop
-f 0555 root sys /etc/init.d/lp packages/cups.sh
+f 0555 root sys /etc/init.d/lp cups.sh
 l 0555 root sys /etc/rc0.d/K25lp ../init.d/lp
 l 0555 root sys /etc/rc2.d/S60lp ../init.d/lp
 %system linux
 %install /etc/rc.d/init.d/lpd start
 %remove /etc/rc.d/init.d/lpd stop
 %patch /etc/rc.d/init.d/lpd stop
-f 0555 root sys /etc/rc.d/init.d/lpd packages/cups.sh
+f 0555 root sys /etc/rc.d/init.d/lpd cups.sh
 l 0555 root sys /etc/rc.d/rc2.d/S60lpd ../init.d/lpd
 l 0555 root sys /etc/rc.d/rc3.d/S60lpd ../init.d/lpd
 l 0555 root sys /etc/rc.d/rc4.d/S60lpd ../init.d/lpd
@@ -289,18 +291,18 @@ l 0555 root sys /etc/rc.d/rc6.d/K60lpd ../init.d/lpd
 %install /sbin/init.d/lpd start
 %remove /sbin/init.d/lpd stop
 %patch /sbin/init.d/lpd stop
-f 0555 root sys /sbin/init.d/lpd packages/cups.sh
+f 0555 root sys /sbin/init.d/lpd cups.sh
 l 0555 root sys /sbin/rc0.d/K05lpd ../init.d/lpd
 l 0555 root sys /sbin/rc2.d/K00lpd ../init.d/lpd
 l 0555 root sys /sbin/rc3.d/S65lpd ../init.d/lpd
-%system sunos
+%system solaris sunos
 %install /etc/init.d/lp start
 %remove /etc/init.d/lp stop
 %patch /etc/init.d/lp stop
-f 0555 root sys /etc/init.d/lp packages/cups.sh
+f 0555 root sys /etc/init.d/lp cups.sh
 l 0555 root sys /etc/rc0.d/K20lp ../init.d/lp
 l 0555 root sys /etc/rc2.d/S80lp ../init.d/lp
 
 #
-# End of "$Id: cups.list,v 1.6 1999/06/17 20:02:21 mike Exp $".
+# End of "$Id: cups.list,v 1.7 1999/06/21 15:27:42 mike Exp $".
 #

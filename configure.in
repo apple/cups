@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: configure.in,v 1.15 1999/06/11 20:23:49 mike Exp $"
+dnl "$Id: configure.in,v 1.16 1999/06/21 15:27:41 mike Exp $"
 dnl
 dnl   Configuration script for the Common UNIX Printing System (CUPS).
 dnl
@@ -14,7 +14,7 @@ dnl   at:
 dnl
 dnl       Attn: CUPS Licensing Information
 dnl       Easy Software Products
-dnl       44145 Airport View Drive, Suite 204
+dnl       44141 Airport View Drive, Suite 204
 dnl       Hollywood, Maryland 20636-3111 USA
 dnl
 dnl       Voice: (301) 373-9603
@@ -60,9 +60,32 @@ AC_PROG_RANLIB
 AC_PATH_PROG(AR,ar)
 AC_PATH_PROG(CHMOD,chmod)
 AC_PATH_PROG(CP,cp)
-AC_PATH_PROG(GROFF,groff)
+AC_PATH_PROG(NROFF,nroff)
+if test "$NROFF" = ""; then
+    AC_PATH_PROG(NROFF,groff)
+    if test "$NROFF" = ""; then
+        NROFF="echo"
+    else
+        NROFF="$NROFF -T ascii"
+    fi
+fi
 AC_PATH_PROG(HTMLDOC,htmldoc)
 AC_PATH_PROG(MKDIR,mkdir)
+AC_PATH_PROG(PACK,pack)
+if test "$PACK" = ""; then
+    AC_PATH_PROG(PACK,gzip)
+    if test "$PACK" = ""; then
+        PACK="echo"
+	CAT="dummy"
+    else
+        PACK="$PACK -fv9"
+	CAT="gz"
+    fi
+else
+    PACK="$PACK -f"
+    CAT="z"
+fi
+AC_SUBST(CAT)
 AC_PATH_PROG(RM,rm)
 AC_PATH_PROG(SED,sed)
 AC_PATH_PROG(SMBCLIENT,smbclient)
@@ -156,5 +179,5 @@ AC_SUBST(CUPS_DATADIR)
 AC_OUTPUT(Makedefs)
 
 dnl
-dnl End of "$Id: configure.in,v 1.15 1999/06/11 20:23:49 mike Exp $".
+dnl End of "$Id: configure.in,v 1.16 1999/06/21 15:27:41 mike Exp $".
 dnl

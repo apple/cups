@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.13 1999/05/17 18:03:36 mike Exp $"
+# "$Id: Makefile,v 1.14 1999/06/21 15:27:43 mike Exp $"
 #
 #   Filter makefile for the Common UNIX Printing System (CUPS).
 #
@@ -14,7 +14,7 @@
 #
 #       Attn: CUPS Licensing Information
 #       Easy Software Products
-#       44145 Airport View Drive, Suite 204
+#       44141 Airport View Drive, Suite 204
 #       Hollywood, Maryland 20636-3111 USA
 #
 #       Voice: (301) 373-9603
@@ -119,5 +119,5 @@ textcommon.o:	textcommon.h common.h
 $(OBJS):	../Makedefs ../cups/cups.h ../cups/ppd.h ../cups/language.h
 
 #
-# End of "$Id: Makefile,v 1.13 1999/05/17 18:03:36 mike Exp $".
+# End of "$Id: Makefile,v 1.14 1999/06/21 15:27:43 mike Exp $".
 #

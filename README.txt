@@ -1,6 +1,7 @@
-README - CUPS v1.0b3
+README - CUPS v1.0b4
+--------------------
 
-Contents
+CONTENTS
 
    * Introduction
    * Requirements
@@ -10,7 +11,8 @@ Contents
    * Other Resources
    * Legal Stuff
 
-Introduction
+
+INTRODUCTION
 
 The Common UNIX Printing System provides a portable printing layer for UNIX®
 operating systems. It has been developed by Easy Software Products to
@@ -30,7 +32,8 @@ CUPS also includes a customized version of GNU GhostScript (currently based
 off GNU GhostScript 4.03) and an image file RIP that can be used to support
 non-PostScript printers.
 
-Requirements
+
+REQUIREMENTS
 
 You'll need an ANSI C compiler to build CUPS on your system. As its name
 implies, CUPS is designed to run on the UNIX operating system, however the
@@ -46,7 +49,8 @@ nroff-like package.
 The documentation is formatted using the HTMLDOC software (again, not needed
 unless you make changes.)
 
-Using CUPS
+
+USING CUPS
 
 Pre-compiled binary distributions are available for CUPS from our web site
 at http://www.cups.org/software.html. If you'd like to build CUPS from the
@@ -55,14 +59,14 @@ source, please read the Software Administrator's Manual.
 Once you have installed CUPS, the Software Administrator's Manual and
 Software User's Manual are excellent places to start setting things up.
 
-Known Problems
+
+KNOWN PROBLEMS
 
 The following known problems are being worked on and should be resolved for
 the fourth beta release of CUPS:
 
    * Documentation is not completed.
    * The lpc command currently only supports the help and status commands.
-   * The class and job CGIs are currently not provided.
 
 CUPS has been built and tested on the following operating systems:
 
@@ -75,13 +79,15 @@ CUPS has been built and tested on the following operating systems:
 The client libraries and filters have been successfully compiled under
 Microsoft Windows using Visual C++ 6.0.
 
-Reporting Problems
+
+REPORTING PROBLEMS
 
 If you have problems, please send an email to cups-support@cups.org. Include
 your operating system and version, compiler and version, and any errors or
 problems you've run into.
 
-Other Resources
+
+OTHER RESOURCES
 
 See the CUPS web site at "http://www.cups.org" for other site links.
 
@@ -90,7 +96,8 @@ You can subscribe to the CUPS mailing list by sending a message containing
 problems, questions, and improvements to the CUPS software. New releases of
 CUPS are announced to this list as well.
 
-Legal Stuff
+
+LEGAL STUFF
 
 CUPS is Copyright 1993-1999 by Easy Software Products. CUPS, the CUPS logo,
 and the Common UNIX Printing System are the trademark property of Easy

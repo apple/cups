@@ -1,5 +1,5 @@
 #
-# "$Id: Makedefs.in,v 1.7 1999/06/11 20:23:48 mike Exp $"
+# "$Id: Makedefs.in,v 1.8 1999/06/21 15:27:40 mike Exp $"
 #
 #   Common makefile definitions for the Common UNIX Printing System (CUPS).
 #
@@ -16,7 +16,7 @@
 #
 #       Attn: CUPS Licensing Information
 #       Easy Software Products
-#       44145 Airport View Drive, Suite 204
+#       44141 Airport View Drive, Suite 204
 #       Hollywood, Maryland 20636-3111 USA
 #
 #       Voice: (301) 373-9603
@@ -36,7 +36,8 @@ CP	=	@CP@
 HTMLDOC	=	@HTMLDOC@
 LN	=	/bin/ln -sf
 MKDIR	=	@MKDIR@ -p
-NROFF	=	@GROFF@ -T ascii
+NROFF	=	@NROFF@
+PACK	=	@PACK@
 RANLIB	=	@RANLIB@
 RM	=	@RM@ -f
 SED	=	@SED@
@@ -58,6 +59,12 @@ LDFLAGS	=	@LDFLAGS@ $(OPTIM)
 LIBS	=	@LIBS@ -L../cups -lcups
 OPTIM	=	@OPTIM@
 OPTIONS	=
+
+#
+# Formatted man page extension...
+#
+
+CAT	=	@CAT@
 
 #
 # Directories...
@@ -101,14 +108,14 @@ SERVERROOT	= 	@CUPS_SERVERROOT@
 # Rules...
 #
 
-.SUFFIXES:	.a .c .h .1 .2 .3 .4 .5 .6 .7 .8 .o .z
+.SUFFIXES:	.a .c .h .1 .2 .3 .4 .5 .6 .7 .8 .o .$(CAT)
 .c.o:
 	$(CC) $(CFLAGS) -c $<
-.1.z .2.z .3.z .4.z .5.z .6.z .7.z .8.z:
+.1.$(CAT) .2.$(CAT) .3.$(CAT) .4.$(CAT) .5.$(CAT) .6.$(CAT) .7.$(CAT) .8.$(CAT):
 	$(NROFF) -man $< >t
-	pack -f t
-	mv t.z $@
+	$(PACK) t
+	-mv t.$(CAT) $@
 
 #
-# End of "$Id: Makedefs.in,v 1.7 1999/06/11 20:23:48 mike Exp $"
+# End of "$Id: Makedefs.in,v 1.8 1999/06/21 15:27:40 mike Exp $"
 #

@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.9 1999/05/19 18:00:49 mike Exp $"
+# "$Id: Makefile,v 1.10 1999/06/21 15:27:41 mike Exp $"
 #
 #   Top-level Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -14,7 +14,7 @@
 #
 #       Attn: CUPS Licensing Information
 #       Easy Software Products
-#       44145 Airport View Drive, Suite 204
+#       44141 Airport View Drive, Suite 204
 #       Hollywood, Maryland 20636-3111 USA
 #
 #       Voice: (301) 373-9603
@@ -64,5 +64,5 @@ install:
 	(cd ppd; make install)
 
 #
-# End of "$Id: Makefile,v 1.9 1999/05/19 18:00:49 mike Exp $".
+# End of "$Id: Makefile,v 1.10 1999/06/21 15:27:41 mike Exp $".
 #
