@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.42 1999/10/12 18:29:31 mike Exp $"
+ * "$Id: printers.c,v 1.43 1999/10/13 16:50:13 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -816,9 +816,9 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
 
         httpSeparate(p->device_uri, method, username, host, &port, resource);
 	if (port)
-	  sprintf(uri, "%s://%s:%d/%s", method, host, port, resource);
+	  sprintf(uri, "%s://%s:%d%s", method, host, port, resource);
 	else
-	  sprintf(uri, "%s://%s/%s", method, host, resource);
+	  sprintf(uri, "%s://%s%s", method, host, resource);
       }
       else
       {
@@ -1206,5 +1206,5 @@ write_printcap(void)
 
 
 /*
- * End of "$Id: printers.c,v 1.42 1999/10/12 18:29:31 mike Exp $".
+ * End of "$Id: printers.c,v 1.43 1999/10/13 16:50:13 mike Exp $".
  */
