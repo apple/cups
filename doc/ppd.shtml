@@ -1,0 +1,220 @@
+<html>
+<head>
+	<title>CUPS PostScript Printer Description (PPD) File Specification</title>
+	<meta name='COPYRIGHT' content='Copyright 2004, All Rights Reserved'/>
+	<meta name='DOCNUMBER' content='CUPS-PPD-1.2'/>
+	<meta name='Auther' content='Easy Software Products'/>
+</head>
+<body>
+
+
+<h1>Scope</h1>
+
+<h2>Identification</h2>
+
+<p>This document describes the PostScript Printer Description
+(PPD) file format and the supported extensions for the Common
+UNIX Printing System ("CUPS") Version 1.2. It should be used in
+conjunction with the Adobe PostScript Printer Description File
+Format Specification, Version 4.3 when creating PPD files for
+CUPS.</p>
+
+<embed src="system-overview.shtml"/>
+
+<h2>Document Overview</h2>
+
+<p>This interface design description document is organized into the following
+sections:
+
+<ul>
+
+	<li>1 - Scope</li>
+
+	<li>2 - References</li>
+
+	<li>3 - PPD File Syntax</li>
+
+	<li>4 - General Attributes</li>
+
+	<li>5 - Custom Options</li>
+
+	<li>6 - Color Profiles</li>
+
+	<li>7 - I18N Support</li>
+
+	<li>A - Glossary</li>
+
+	<li>B - Change History</li>
+
+</ul>
+
+<embed src="references.shtml"/>
+
+
+<h1>PPD File Syntax</h1>
+
+<p>PostScript Printer Description ("PPD") files describe the
+capabilities of each printer and are used by CUPS to support
+printer-specific features and intelligent filtering.</p>
+
+<p>The PPD file format is described in <a
+href="http://partners.adobe.com/asn/developer/PDFS/TN/5003.PPD_Spec_v4.3.pdf">
+Adobe TechNote #5003: PostScript Printer Description File Format
+Specification Version 4.3</a>.</p>
+
+<p>The format is text-based and uses lines of up to 255
+characters terminated by a carriage return, linefeed, or
+combination of carriage return and line feed. The following ABNF
+definition [RFC2234] defines the general format of lines in a
+PPD file:</p>
+
+<pre>
+    PPD-FILE = HEADER +(DATA / COMMENT / LINE-END)
+    HEADER   = "*PPD-Adobe: " DQUOTE "4.3" DQUOTE LINE-END
+    COMMENT  = "*%" *TCHAR LINE-END
+    DATA     = "*" 1*KCHAR [ SPACE 1*KCHAR [ "/" 1*TCHAR ] ] ":"
+               VALUE *(SPACE VALUE) LINE-END
+    VALUE    = 1*TCHAR / DQUOTE 1*SCHAR DQUOTE
+
+    KCHAR    = ALPHA / DIGIT / "_" / "." / "-"
+    SCHAR    = LINE-END / %x09 / %x20 / %x21 / %x23-%x7E / %xA0-%xFF
+    TCHAR    = %x20-%x7E / %xA0-%xFF
+    LINE-END = %x0A / %x0D / %x0D %x0A
+</pre>
+
+
+<h1>General Attributes</h1>
+
+<h2>cupsFilter</h2>
+
+<p>This string attribute provides a conversion rule of the
+form:</p>
+
+<pre>
+    source/type cost program
+</pre>
+
+<p>The destination type is assumed to the printer's type. If a
+printer supports the source type directly the special filter
+program "-" may be specified.</p>
+
+<h2>cupsFlipDuplex</h2>
+
+<p>This boolean attribute notifies the RIP filters that the
+destination printer requires an upside-down image for the back
+page. The default value is false.</p>
+
+<h2>cupsManualCopies</h2>
+
+<p>This boolean attribute notifies the RIP filters that the
+destination printer does not support copy generation in
+hardware. The default value is false.</p>
+
+<h2>cupsModelNumber</h2>
+
+<p>This integer attribute specifies a printer-specific model
+number. This number can be used by a filter program to adjust
+the output for a specific model of printer.</p>
+
+<h2>cupsProtocol</h2>
+
+<p>This optional attribute describes which binary communication
+protocol to use when printing binary PostScript data. The
+strings "None", "BCP", and "TBCP" are recognized, corresponding
+to no encoding, BCP, and TBCP respectively.</p>
+
+<h2>cupsVersion</h2>
+
+<p>This required attribute describes which version of the CUPS
+IDD was used for the PPD file extensions. Currently it must be
+the string "1.0", "1.1", or "1.2".</p>
+
+
+<h1>Custom Options</h1>
+
+
+<h1>Color Profiles</h1>
+
+<h4>cupsProfile</h4>
+
+<p>This string attribute specifies a color profile of the
+form:</p>
+
+<pre>
+    resolution/type density gamma m00 m01 m02 m10 m11 m12 m20 m21 m22
+</pre>
+
+<p>The <i>resolution</i> and <i>type</i> values may be "-" to
+act as a wildcard. Otherwise they must match one of the
+<CODE>Resolution</CODE> or <CODE>MediaType</CODE> attributes
+defined in the PPD file.</p>
+
+<p>The <i>density</i> and <i>gamma</i> values define gamma and
+density adjustment function such that:</p>
+
+<pre>
+f(x) = density * x<SUp>gamma</SUp>
+</pre>
+
+<p>The <i>m00</i> through <i>m22</i> values define a 3x3
+transformation matrix for the CMY color values. The density
+function is applied <i>after</i> the CMY transformation.</p>
+
+
+<h1>I18N Support</h1>
+
+
+<embed src="glossary.shtml"/>
+
+<h1>Change History</h1>
+
+<h2>Changes in CUPS 1.2</h2>
+
+<ul>
+
+	<li><tt>cupsICCProfile</tt></li>
+
+	<li></li>
+
+	<li></li>
+
+	<li></li>
+
+	<li></li>
+
+	<li></li>
+
+	<li></li>
+
+	<li></li>
+
+	<li></li>
+
+</ul>
+
+<h2>Changes in CUPS 1.1</h2>
+
+<ul>
+
+	<li><tt>cupsProtocol</tt></li>
+
+	<li><tt>cupsFlipDuplex</tt></li>
+
+	<li></li>
+
+	<li></li>
+
+	<li></li>
+
+	<li></li>
+
+	<li></li>
+
+	<li></li>
+
+	<li></li>
+
+</ul>
+
+</body>
+</html>
