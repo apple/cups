@@ -3,6 +3,8 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.19rc2
 
+	- The configure script now aborts if the "ar" command or
+	  compilers cannot be found.
 	- The static cupsimage library was not built by default.
 	- The path for the "ln" command was hardcoded in
 	  Makedefs.in instead of being checked at configure time
