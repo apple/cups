@@ -1,5 +1,5 @@
 /*
- * "$Id: testmime.c,v 1.8 2000/01/04 13:45:37 mike Exp $"
+ * "$Id: testmime.c,v 1.1 2000/01/25 03:50:49 mike Exp $"
  *
  *   MIME test program for the Common UNIX Printing System (CUPS).
  *
@@ -195,5 +195,5 @@ print_rules(mime_magic_t *rules)	/* I - Rules to print */
 
 
 /*
- * End of "$Id: testmime.c,v 1.8 2000/01/04 13:45:37 mike Exp $".
+ * End of "$Id: testmime.c,v 1.1 2000/01/25 03:50:49 mike Exp $".
  */

@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.27 2000/01/21 20:33:16 mike Exp $"
+# "$Id: Makefile,v 1.28 2000/01/25 03:50:47 mike Exp $"
 #
 #   Support library Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -28,22 +28,21 @@ include ../Makedefs
 # Object files...
 #
 
-LIBOBJS	=	emit.o filter.o http.o ipp.o language.o mark.o mime.o \
-		options.o page.o ppd.o snprintf.o string.o type.o \
-		usersys.o util.o
-OBJS	=	$(LIBOBJS) testhttp.o testmime.o testppd.o
+LIBOBJS	=	emit.o http.o ipp.o language.o mark.o options.o page.o ppd.o \
+		snprintf.o string.o usersys.o util.o
+OBJS	=	$(LIBOBJS) testhttp.o testppd.o
 
 #
 # Header files to install...
 #
 
-HEADERS	=	cups.h http.h ipp.h language.h mime.h ppd.h
+HEADERS	=	cups.h http.h ipp.h language.h ppd.h
 
 #
 # Targets in this directory...
 #
 
-TARGETS	=	$(LIBCUPS) testhttp testmime testppd
+TARGETS	=	$(LIBCUPS) testhttp testppd
 
 #
 # Make all targets...
@@ -100,21 +99,18 @@ cups_C.h:	../locale/C/cups_C
 	$(RM) cups_C.h
 	$(AWK) '{print "\"" $$0 "\","}' < ../locale/C/cups_C > cups_C.h
 
-emit.o:		ppd.h ../config.h ../Makedefs
-filter.o:	mime.h ../config.h ../Makedefs
-http.o:		http.h ipp.h string.h ../config.h ../Makedefs
-ipp.o:		http.h ipp.h string.h language.h ../config.h ../Makedefs
-language.o:	cups_C.h language.h string.h ../config.h ../Makedefs
-mark.o:		ppd.h ../config.h ../Makedefs
-mime.o:		mime.h ../config.h ../Makedefs
-options.o:	cups.h ../config.h ../Makedefs
-page.o:		ppd.h ../config.h ../Makedefs
-ppd.o:		language.h ppd.h ../config.h ../Makedefs
-snprintf.o:	string.h ../config.h ../Makedefs
-string.o:	string.h ../config.h ../Makedefs
-type.o:		mime.h ../config.h ../Makedefs
-usersys.o:	cups.h ../config.h ../Makedefs
-util.o:		cups.h http.h ipp.h ../config.h ../Makedefs
+emit.o:		ppd.h
+http.o:		http.h ipp.h string.h
+ipp.o:		http.h ipp.h string.h language.h
+language.o:	cups_C.h language.h string.h
+mark.o:		ppd.h
+options.o:	cups.h
+page.o:		ppd.h
+ppd.o:		language.h ppd.h
+snprintf.o:	string.h
+string.o:	string.h
+usersys.o:	cups.h
+util.o:		cups.h http.h ipp.h
 
 #
 # testhttp (dependency on static CUPS library is intentional)
@@ -124,17 +120,7 @@ testhttp:	testhttp.o libcups.a
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ testhttp.o libcups.a $(NETLIBS)
 
-testhttp.o:	http.h ../Makedefs
-
-#
-# testmime (dependency on static CUPS library is intentional)
-#
-
-testmime:	testmime.o libcups.a
-	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ testmime.o libcups.a
-
-testmime.o:	mime.h ../Makedefs
+testhttp.o:	http.h
 
 #
 # testppd (dependency on static CUPS library is intentional)
@@ -144,8 +130,10 @@ testppd:	testppd.o libcups.a
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ testppd.o libcups.a $(NETLIBS)
 
-testppd.o:	ppd.h ../Makedefs
+testppd.o:	ppd.h
+
+$(OBJS):	../Makedefs ../config.h
 
 #
-# End of "$Id: Makefile,v 1.27 2000/01/21 20:33:16 mike Exp $".
+# End of "$Id: Makefile,v 1.28 2000/01/25 03:50:47 mike Exp $".
 #

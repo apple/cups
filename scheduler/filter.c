@@ -1,5 +1,5 @@
 /*
- * "$Id: filter.c,v 1.11 2000/01/04 13:45:34 mike Exp $"
+ * "$Id: filter.c,v 1.1 2000/01/25 03:50:48 mike Exp $"
  *
  *   File type conversion routines for the Common UNIX Printing System (CUPS).
  *
@@ -37,7 +37,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 
-#include "string.h"
+#include <cups/string.h>
 #include "mime.h"
 
 
@@ -295,5 +295,5 @@ lookup(mime_t      *mime,	/* I - MIME database */
 
 
 /*
- * End of "$Id: filter.c,v 1.11 2000/01/04 13:45:34 mike Exp $".
+ * End of "$Id: filter.c,v 1.1 2000/01/25 03:50:48 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: socket.c,v 1.9 2000/01/04 13:45:33 mike Exp $"
+ * "$Id: socket.c,v 1.10 2000/01/25 03:50:47 mike Exp $"
  *
  *   AppSocket backend for the Common UNIX Printing System (CUPS).
  *
@@ -81,7 +81,12 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   fd_set	input;		/* Input set for select() */
 
 
-  if (argc < 6 || argc > 7)
+  if (argc == 1)
+  {
+    fputs("network socket \"\" \"AppSocket/HP JetDirect\"\n", stderr);
+    return (0);
+  }
+  else if (argc < 6 || argc > 7)
   {
     fprintf(stderr, "Usage: %s job-id user title copies options [file]\n",
             argv[0]);
@@ -250,5 +255,5 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
 
 /*
- * End of "$Id: socket.c,v 1.9 2000/01/04 13:45:33 mike Exp $".
+ * End of "$Id: socket.c,v 1.10 2000/01/25 03:50:47 mike Exp $".
  */

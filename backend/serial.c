@@ -1,5 +1,5 @@
 /*
- * "$Id: serial.c,v 1.8 2000/01/04 13:45:32 mike Exp $"
+ * "$Id: serial.c,v 1.9 2000/01/25 03:50:47 mike Exp $"
  *
  *   Serial port backend for the Common UNIX Printing System (CUPS).
  *
@@ -45,6 +45,13 @@
 
 
 /*
+ * Local functions...
+ */
+
+void	list_devices(void);
+
+
+/*
  * 'main()' - Send a file to the printer or server.
  *
  * Usage:
@@ -75,7 +82,12 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   struct termios opts;		/* Parallel port options */
 
 
-  if (argc < 6 || argc > 7)
+  if (argc == 1)
+  {
+    list_devices();
+    return (0);
+  }
+  else if (argc < 6 || argc > 7)
   {
     fputs("Usage: serial job-id user title copies options [file]\n", stderr);
     return (1);
@@ -310,5 +322,33 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
 
 /*
- * End of "$Id: serial.c,v 1.8 2000/01/04 13:45:32 mike Exp $".
+ * 'list_devices()' - List all serial devices.
+ */
+
+void
+list_devices(void)
+{
+#ifdef __linux
+  int	i;		/* Looping var */
+  char	device[255];	/* Device filename */
+
+
+  for (i = 0; i < 4; i ++)
+  {
+    sprintf(device, "/dev/ttyS%d", i);
+    if (access(device, F_OK) == 0)
+      fprintf(stderr, "serial serial:/dev/ttyS%d \"\" \"Serial Port #%d\"\n", i,
+              i + 1);
+  }
+#elif defined(__sgi)
+#elif defined(__sun)
+#elif defined(__hpux)
+#elif defined(__osf)
+#elif defined(FreeBSD) || defined(OpenBSD) || defined(NetBSD)
+#endif
+}
+
+
+/*
+ * End of "$Id: serial.c,v 1.9 2000/01/25 03:50:47 mike Exp $".
  */

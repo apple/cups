@@ -1,9 +1,9 @@
 #
-# "$Id: Makefile,v 1.17 2000/01/20 13:05:41 mike Exp $"
+# "$Id: Makefile,v 1.18 2000/01/25 03:50:48 mike Exp $"
 #
 #   Scheduler Makefile for the Common UNIX Printing System (CUPS).
 #
-#   Copyright 1997-1999 by Easy Software Products, all rights reserved.
+#   Copyright 1997-2000 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
 #   property of Easy Software Products and are protected by Federal
@@ -26,20 +26,23 @@ include ../Makedefs
 
 CUPSDOBJS =	auth.o cert.o classes.o client.o conf.o dirsvc.o main.o ipp.o \
 		listen.o job.o log.o printers.o
-OBJS	=	$(CUPSDOBJS) testspeed.o
+MIMEOBJS =	filter.o mime.o type.o
+OBJS	=	$(CUPSDOBJS) $(MIMEOBJS) testmime.o testspeed.o
 
 #
 # Make everything...
 #
 
-all:	cupsd testspeed
+all:	cupsd libmime.a testmime testspeed
+
 
 #
 # Clean all object files...
 #
 
 clean:
-	rm -f $(OBJS) cupsd testspeed
+	rm -f $(OBJS) cupsd libmime.a testmime testspeed
+
 
 #
 # Install the scheduler...
@@ -53,17 +56,42 @@ install:
 	-$(MKDIR) $(SERVERROOT)/ppd
 	-$(MKDIR) $(SERVERROOT)/requests
 
+
 #
 # Make the scheduler executable, "cupsd".
 #
 
-cupsd:	$(CUPSDOBJS) ../cups/$(LIBCUPS)
+cupsd:	$(CUPSDOBJS) libmime.a ../cups/$(LIBCUPS)
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o cupsd $(CUPSDOBJS) $(LIBS)
+	$(CC) $(LDFLAGS) -o cupsd $(CUPSDOBJS) libmime.a $(LIBS)
 
 $(CUPSDOBJS):	auth.h cert.h classes.h client.h conf.h cupsd.h dirsvc.h job.h \
-		printers.h ../cups/cups.h ../cups/http.h ../cups/ipp.h \
-		../cups/language.h ../cups/mime.h ../cups/string.h
+		mime.h printers.h ../cups/cups.h ../cups/http.h ../cups/ipp.h \
+		../cups/language.h ../cups/string.h
+
+
+#
+# libmime.a
+#
+
+libmime.a:	$(MIMEOBJS)
+	echo Archiving $@...
+	$(RM) $@
+	$(AR) $(ARFLAGS) $@ $(MIMEOBJS)
+	$(RANLIB) $@
+
+$(MIMEOBJS):	mime.h
+
+
+#
+# testmime
+#
+
+testmime:	testmime.o libmime.a
+	echo Linking $@...
+	$(CC) $(LDFLAGS) -o $@ testmime.o libmime.a
+
+testmime.o:	mime.h
 
 #
 # Make the test program, "testspeed".
@@ -78,5 +106,5 @@ testspeed.o:	../cups/cups.h ../cups/http.h ../cups/ipp.h ../cups/language.h
 $(OBJS):	../config.h ../Makedefs
 
 #
-# End of "$Id: Makefile,v 1.17 2000/01/20 13:05:41 mike Exp $".
+# End of "$Id: Makefile,v 1.18 2000/01/25 03:50:48 mike Exp $".
 #

@@ -1,5 +1,5 @@
 /*
- * "$Id: type.c,v 1.12 2000/01/04 13:45:37 mike Exp $"
+ * "$Id: type.c,v 1.1 2000/01/25 03:50:49 mike Exp $"
  *
  *   MIME typing routines for the Common UNIX Printing System (CUPS).
  *
@@ -41,7 +41,7 @@
 #include <ctype.h>
 #include <locale.h>
 
-#include "string.h"
+#include <cups/string.h>
 #include "mime.h"
 
 
@@ -1010,5 +1010,5 @@ patmatch(const char *s,		/* I - String to match against */
 
 
 /*
- * End of "$Id: type.c,v 1.12 2000/01/04 13:45:37 mike Exp $".
+ * End of "$Id: type.c,v 1.1 2000/01/25 03:50:49 mike Exp $".
  */

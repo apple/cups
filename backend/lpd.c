@@ -1,5 +1,5 @@
 /*
- * "$Id: lpd.c,v 1.14 2000/01/04 13:45:32 mike Exp $"
+ * "$Id: lpd.c,v 1.15 2000/01/25 03:50:47 mike Exp $"
  *
  *   Line Printer Daemon backend for the Common UNIX Printing System (CUPS).
  *
@@ -83,7 +83,12 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   int	status;		/* Status of LPD job */
 
 
-  if (argc < 6 || argc > 7)
+  if (argc == 1)
+  {
+    fputs("network lpd \"\" \"LPD/LPR Host or Printer\"\n", stderr);
+    return (0);
+  }
+  else if (argc < 6 || argc > 7)
   {
     fprintf(stderr, "Usage: %s job-id user title copies options [file]\n",
             argv[0]);
@@ -405,5 +410,5 @@ lpd_queue(char *hostname,	/* I - Host to connect to */
 
 
 /*
- * End of "$Id: lpd.c,v 1.14 2000/01/04 13:45:32 mike Exp $".
+ * End of "$Id: lpd.c,v 1.15 2000/01/25 03:50:47 mike Exp $".
  */

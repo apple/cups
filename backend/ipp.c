@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.17 2000/01/04 13:45:32 mike Exp $"
+ * "$Id: ipp.c,v 1.18 2000/01/25 03:50:47 mike Exp $"
  *
  *   IPP backend for the Common UNIX Printing System (CUPS).
  *
@@ -83,7 +83,12 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   int		copies;		/* Number of copies remaining */
 
 
-  if (argc < 6 || argc > 7)
+  if (argc == 1)
+  {
+    fputs("network ipp \"\" \"Internet Printing Protocol\"\n", stderr);
+    return (0);
+  }
+  else if (argc < 6 || argc > 7)
   {
     fprintf(stderr, "Usage: %s job-id user title copies options [file]\n",
             argv[0]);
@@ -648,5 +653,5 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
 
 /*
- * End of "$Id: ipp.c,v 1.17 2000/01/04 13:45:32 mike Exp $".
+ * End of "$Id: ipp.c,v 1.18 2000/01/25 03:50:47 mike Exp $".
  */
