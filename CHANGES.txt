@@ -1,4 +1,4 @@
-CHANGES.txt - 09/17/2001
+CHANGES.txt - 09/28/2001
 ------------------------
 
 CHANGES IN CUPS V1.1.11
@@ -32,6 +32,11 @@ CHANGES IN CUPS V1.1.11
 	  (-1).
 	- Stopping (disabling) a printer class did not stop jobs
 	  from printing to printers in that class.
+	- The cupsGetDests() function was sending the
+	  requested-attributes attribute as a name instead of a
+	  keyword; this caused a serious performance problem on
+	  slower systems since more information had to be
+	  transferred from server to client.
 
 
 CHANGES IN CUPS V1.1.10-1

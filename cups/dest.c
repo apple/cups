@@ -1,5 +1,5 @@
 /*
- * "$Id: dest.c,v 1.22 2001/09/17 20:35:19 mike Exp $"
+ * "$Id: dest.c,v 1.23 2001/09/28 14:14:02 mike Exp $"
  *
  *   User-defined destination (and option) support for the Common UNIX
  *   Printing System (CUPS).
@@ -647,7 +647,7 @@ cups_get_sdests(ipp_op_t    op,		/* I - get-printers or get-classes */
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
                "attributes-natural-language", NULL, language->language);
 
-  ippAddStrings(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
+  ippAddStrings(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
                 "requested-attributes", sizeof(pattrs) / sizeof(pattrs[0]),
 		NULL, pattrs);
 
@@ -737,5 +737,5 @@ cups_get_sdests(ipp_op_t    op,		/* I - get-printers or get-classes */
 
 
 /*
- * End of "$Id: dest.c,v 1.22 2001/09/17 20:35:19 mike Exp $".
+ * End of "$Id: dest.c,v 1.23 2001/09/28 14:14:02 mike Exp $".
  */
