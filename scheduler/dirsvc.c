@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.39 1999/07/21 19:39:09 mike Exp $"
+ * "$Id: dirsvc.c,v 1.40 1999/07/30 13:31:52 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -90,7 +90,7 @@ StartBrowsing(void)
   addr.sin_family      = AF_INET;
   addr.sin_port        = htons(BrowsePort);
 
-  if (bind(BrowseSocket, &addr, sizeof(addr)))
+  if (bind(BrowseSocket, (struct sockaddr *)&addr, sizeof(addr)))
   {
     LogMessage(LOG_ERROR, "StartBrowsing: Unable to bind broadcast socket - %s.",
                strerror(errno));
@@ -177,7 +177,8 @@ UpdateBrowseList(void)
 
 
   len = sizeof(addr);
-  if ((bytes = recvfrom(BrowseSocket, packet, sizeof(packet), 0, &addr, &len)) <= 0)
+  if ((bytes = recvfrom(BrowseSocket, packet, sizeof(packet), 0, 
+                        (struct sockaddr *)&addr, &len)) <= 0)
   {
     LogMessage(LOG_ERROR, "UpdateBrowseList: recv failed - %s.",
                strerror(errno));
@@ -529,8 +530,8 @@ SendBrowseList(void)
       */
 
       for (i = 0; i < NumBrowsers; i ++)
-	if (sendto(BrowseSocket, packet, bytes, 0, Browsers + i,
-	           sizeof(Browsers[0])) <= 0)
+	if (sendto(BrowseSocket, packet, bytes, 0,
+	           (struct sockaddr *)Browsers + i, sizeof(Browsers[0])) <= 0)
 	  LogMessage(LOG_ERROR, "SendBrowseList: sendto failed for browser %d - %s.",
 	             i + 1, strerror(errno));
     }
@@ -539,5 +540,5 @@ SendBrowseList(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.39 1999/07/21 19:39:09 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.40 1999/07/30 13:31:52 mike Exp $".
  */
