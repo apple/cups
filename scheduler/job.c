@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.69 2000/06/01 20:05:38 mike Exp $"
+ * "$Id: job.c,v 1.70 2000/06/01 20:28:51 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -471,6 +471,7 @@ LoadAllJobs(void)
 
       strncpy(job->dest, dest, sizeof(job->dest) - 1);
 
+      job->sheets     = ippFindAttribute(job->attrs, "job-sheets-completed", IPP_TAG_INTEGER);
       job->state      = ippFindAttribute(job->attrs, "job-state", IPP_TAG_ENUM);
       job->job_sheets = ippFindAttribute(job->attrs, "job-sheets", IPP_TAG_NAME);
 
@@ -993,7 +994,8 @@ StartJob(int       id,		/* I - Job ID */
 
   attr = ippFindAttribute(current->attrs, "document-format",
                           IPP_TAG_MIMETYPE);
-  if ((optptr = strstr(attr->values[0].string.text, "charset=")) != NULL)
+  if (attr != NULL &&
+      (optptr = strstr(attr->values[0].string.text, "charset=")) != NULL)
     sprintf(charset, "CHARSET=%s", optptr + 8);
   else
   {
@@ -1357,10 +1359,13 @@ UpdateJob(job_t *job)		/* I - Job to check */
       * job sheet count...
       */
 
-      if (!sscanf(message, "%*d%d", &copies))
-        job->sheets->values[0].integer ++;
-      else
-        job->sheets->values[0].integer += copies;
+      if (job->sheets != NULL)
+      {
+	if (!sscanf(message, "%*d%d", &copies))
+          job->sheets->values[0].integer ++;
+	else
+          job->sheets->values[0].integer += copies;
+      }
 
       LogPage(job, message);
     }
@@ -2351,5 +2356,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.69 2000/06/01 20:05:38 mike Exp $".
+ * End of "$Id: job.c,v 1.70 2000/06/01 20:28:51 mike Exp $".
  */
