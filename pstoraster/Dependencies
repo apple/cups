@@ -1,0 +1,2213 @@
+# DO NOT DELETE
+
+gconfig.o: memory_.h std.h stdpre.h arch.h gx.h stdio_.h gserror.h gsio.h
+gconfig.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h gscdefs.h gconfigv.h
+gconfig.o: gconf.h gconfig.h ../config.h gxdevice.h gxdevcli.h gscompt.h
+gconfig.o: gsdcolor.h gsccolor.h gsstruct.h gxarith.h gxbitmap.h gsbitmap.h
+gconfig.o: gxhttile.h gxcindex.h gsbitops.h gsmatrix.h gsiparam.h gsrefct.h
+gconfig.o: gsropt.h gsxfont.h gxcvalue.h gxfixed.h gxtext.h gstext.h
+gconfig.o: gsccode.h gsparam.h gsmalloc.h gxiodev.h stat_.h
+
+gdevabuf.o: memory_.h std.h stdpre.h arch.h gx.h stdio_.h gserror.h gsio.h
+gdevabuf.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h gserrors.h gxdevice.h
+gdevabuf.o: gxdevcli.h gscompt.h gsdcolor.h gsccolor.h gsstruct.h gxarith.h
+gdevabuf.o: gxbitmap.h gsbitmap.h gxhttile.h gxcindex.h gsbitops.h gsmatrix.h
+gdevabuf.o: gsiparam.h gsrefct.h gsropt.h gsxfont.h gxcvalue.h gxfixed.h
+gdevabuf.o: gxtext.h gstext.h gsccode.h gsparam.h gsmalloc.h gxdevmem.h
+gdevabuf.o: gdevmem.h gxbitops.h
+
+gdevbbox.o: math_.h std.h stdpre.h arch.h memory_.h gx.h stdio_.h gserror.h
+gdevbbox.o: gsio.h gstypes.h gsmemory.h gsmemraw.h gdebug.h gserrors.h
+gdevbbox.o: gsparam.h gxdevice.h gxdevcli.h gscompt.h gsdcolor.h gsccolor.h
+gdevbbox.o: gsstruct.h gxarith.h gxbitmap.h gsbitmap.h gxhttile.h gxcindex.h
+gdevbbox.o: gsbitops.h gsmatrix.h gsiparam.h gsrefct.h gsropt.h gsxfont.h
+gdevbbox.o: gxcvalue.h gxfixed.h gxtext.h gstext.h gsccode.h gsmalloc.h
+gdevbbox.o: gsdevice.h gdevbbox.h gxdcolor.h gscsel.h gxiparam.h gxistate.h
+gdevbbox.o: gxline.h gslparam.h gxmatrix.h gxtmap.h gxpaint.h gxpath.h
+gdevbbox.o: gscpm.h gspenum.h gsrect.h gxcpath.h
+
+gdevcups.o: std.h stdpre.h arch.h gdevprn.h memory_.h string_.h gx.h stdio_.h
+gdevcups.o: gserror.h gsio.h gstypes.h gsmemory.h gsmemraw.h gdebug.h gp.h
+gdevcups.o: gpgetenv.h gserrors.h gsmatrix.h gsutil.h gxdevice.h gxdevcli.h
+gdevcups.o: gscompt.h gsdcolor.h gsccolor.h gsstruct.h gxarith.h gxbitmap.h
+gdevcups.o: gsbitmap.h gxhttile.h gxcindex.h gsbitops.h gsiparam.h gsrefct.h
+gdevcups.o: gsropt.h gsxfont.h gxcvalue.h gxfixed.h gxtext.h gstext.h
+gdevcups.o: gsccode.h gsparam.h gsmalloc.h gxdevmem.h gxcldev.h gxht.h
+gdevcups.o: gscsepnm.h gsht1.h gsht.h gxhttype.h gxtmap.h gxdht.h strimpl.h
+gdevcups.o: scommon.h scfx.h shc.h gsbittab.h srlx.h gxclist.h gscspace.h
+gdevcups.o: gxband.h gxclio.h gxbcache.h gxistate.h gscsel.h gxline.h
+gdevcups.o: gslparam.h gxmatrix.h gsexit.h ../filter/raster.h ../cups/ppd.h
+
+gdevdbit.o: gx.h stdio_.h std.h stdpre.h arch.h gserror.h gsio.h gstypes.h
+gdevdbit.o: gsmemory.h gsmemraw.h gdebug.h gpcheck.h gserrors.h gsbittab.h
+gdevdbit.o: gsrect.h gsropt.h gxdcolor.h gscsel.h gsdcolor.h gsccolor.h
+gdevdbit.o: gsstruct.h gxarith.h gxbitmap.h gsbitmap.h gxhttile.h gxcindex.h
+gdevdbit.o: gsbitops.h gxdevice.h gxdevcli.h gscompt.h gsmatrix.h gsiparam.h
+gdevdbit.o: gsrefct.h gsxfont.h gxcvalue.h gxfixed.h gxtext.h gstext.h
+gdevdbit.o: gsccode.h gsparam.h gsmalloc.h gxdevmem.h gdevmem.h gxbitops.h
+gdevdbit.o: gxcpath.h
+
+gdevddrw.o: math_.h std.h stdpre.h arch.h memory_.h gx.h stdio_.h gserror.h
+gdevddrw.o: gsio.h gstypes.h gsmemory.h gsmemraw.h gdebug.h gpcheck.h
+gdevddrw.o: gserrors.h gxfixed.h gxmatrix.h gsmatrix.h gxdcolor.h gscsel.h
+gdevddrw.o: gsdcolor.h gsccolor.h gsstruct.h gxarith.h gxbitmap.h gsbitmap.h
+gdevddrw.o: gxhttile.h gxcindex.h gsbitops.h gsropt.h gxdevice.h gxdevcli.h
+gdevddrw.o: gscompt.h gsiparam.h gsrefct.h gsxfont.h gxcvalue.h gxtext.h
+gdevddrw.o: gstext.h gsccode.h gsparam.h gsmalloc.h gxiparam.h gxistate.h
+gdevddrw.o: gxline.h gslparam.h gxtmap.h
+
+gdevdflt.o: gx.h stdio_.h std.h stdpre.h arch.h gserror.h gsio.h gstypes.h
+gdevdflt.o: gsmemory.h gsmemraw.h gdebug.h gserrors.h gsropt.h gxcomp.h
+gdevdflt.o: gscompt.h gsrefct.h gxbitfmt.h gxdevice.h gxdevcli.h gsdcolor.h
+gdevdflt.o: gsccolor.h gsstruct.h gxarith.h gxbitmap.h gsbitmap.h gxhttile.h
+gdevdflt.o: gxcindex.h gsbitops.h gsmatrix.h gsiparam.h gsxfont.h gxcvalue.h
+gdevdflt.o: gxfixed.h gxtext.h gstext.h gsccode.h gsparam.h gsmalloc.h
+gdevdflt.o: gxdevmem.h
+
+gdevdgbr.o: gx.h stdio_.h std.h stdpre.h arch.h gserror.h gsio.h gstypes.h
+gdevdgbr.o: gsmemory.h gsmemraw.h gdebug.h gserrors.h gxdevice.h gxdevcli.h
+gdevdgbr.o: gscompt.h gsdcolor.h gsccolor.h gsstruct.h gxarith.h gxbitmap.h
+gdevdgbr.o: gsbitmap.h gxhttile.h gxcindex.h gsbitops.h gsmatrix.h gsiparam.h
+gdevdgbr.o: gsrefct.h gsropt.h gsxfont.h gxcvalue.h gxfixed.h gxtext.h
+gdevdgbr.o: gstext.h gsccode.h gsparam.h gsmalloc.h gxdevmem.h gxgetbit.h
+gdevdgbr.o: gxbitfmt.h gxlum.h gdevmem.h gxbitops.h
+
+gdevhit.o: std.h stdpre.h arch.h gserror.h gserrors.h gstypes.h gsmemory.h
+gdevhit.o: gsmemraw.h gxdevice.h stdio_.h gxdevcli.h gscompt.h gsdcolor.h
+gdevhit.o: gsccolor.h gsstruct.h gxarith.h gxbitmap.h gsbitmap.h gxhttile.h
+gdevhit.o: gxcindex.h gsbitops.h gsmatrix.h gsiparam.h gsrefct.h gsropt.h
+gdevhit.o: gsxfont.h gxcvalue.h gxfixed.h gxtext.h gstext.h gsccode.h
+gdevhit.o: gsparam.h gsmalloc.h
+
+gdevm16.o: memory_.h std.h stdpre.h arch.h gx.h stdio_.h gserror.h gsio.h
+gdevm16.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h gxdevice.h gxdevcli.h
+gdevm16.o: gscompt.h gsdcolor.h gsccolor.h gsstruct.h gxarith.h gxbitmap.h
+gdevm16.o: gsbitmap.h gxhttile.h gxcindex.h gsbitops.h gsmatrix.h gsiparam.h
+gdevm16.o: gsrefct.h gsropt.h gsxfont.h gxcvalue.h gxfixed.h gxtext.h
+gdevm16.o: gstext.h gsccode.h gsparam.h gsmalloc.h gxdevmem.h gdevmem.h
+gdevm16.o: gxbitops.h
+
+gdevm1.o: memory_.h std.h stdpre.h arch.h gx.h stdio_.h gserror.h gsio.h
+gdevm1.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h gxdevice.h gxdevcli.h
+gdevm1.o: gscompt.h gsdcolor.h gsccolor.h gsstruct.h gxarith.h gxbitmap.h
+gdevm1.o: gsbitmap.h gxhttile.h gxcindex.h gsbitops.h gsmatrix.h gsiparam.h
+gdevm1.o: gsrefct.h gsropt.h gsxfont.h gxcvalue.h gxfixed.h gxtext.h gstext.h
+gdevm1.o: gsccode.h gsparam.h gsmalloc.h gxdevmem.h gdevmem.h gxbitops.h
+
+gdevm24.o: memory_.h std.h stdpre.h arch.h gx.h stdio_.h gserror.h gsio.h
+gdevm24.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h gxdevice.h gxdevcli.h
+gdevm24.o: gscompt.h gsdcolor.h gsccolor.h gsstruct.h gxarith.h gxbitmap.h
+gdevm24.o: gsbitmap.h gxhttile.h gxcindex.h gsbitops.h gsmatrix.h gsiparam.h
+gdevm24.o: gsrefct.h gsropt.h gsxfont.h gxcvalue.h gxfixed.h gxtext.h
+gdevm24.o: gstext.h gsccode.h gsparam.h gsmalloc.h gxdevmem.h gdevmem.h
+gdevm24.o: gxbitops.h
+
+gdevm2.o: memory_.h std.h stdpre.h arch.h gx.h stdio_.h gserror.h gsio.h
+gdevm2.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h gxdevice.h gxdevcli.h
+gdevm2.o: gscompt.h gsdcolor.h gsccolor.h gsstruct.h gxarith.h gxbitmap.h
+gdevm2.o: gsbitmap.h gxhttile.h gxcindex.h gsbitops.h gsmatrix.h gsiparam.h
+gdevm2.o: gsrefct.h gsropt.h gsxfont.h gxcvalue.h gxfixed.h gxtext.h gstext.h
+gdevm2.o: gsccode.h gsparam.h gsmalloc.h gxdevmem.h gdevmem.h gxbitops.h
+
+gdevm32.o: memory_.h std.h stdpre.h arch.h gx.h stdio_.h gserror.h gsio.h
+gdevm32.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h gxdevice.h gxdevcli.h
+gdevm32.o: gscompt.h gsdcolor.h gsccolor.h gsstruct.h gxarith.h gxbitmap.h
+gdevm32.o: gsbitmap.h gxhttile.h gxcindex.h gsbitops.h gsmatrix.h gsiparam.h
+gdevm32.o: gsrefct.h gsropt.h gsxfont.h gxcvalue.h gxfixed.h gxtext.h
+gdevm32.o: gstext.h gsccode.h gsparam.h gsmalloc.h gxdevmem.h gdevmem.h
+gdevm32.o: gxbitops.h
+
+gdevm4.o: memory_.h std.h stdpre.h arch.h gx.h stdio_.h gserror.h gsio.h
+gdevm4.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h gxdevice.h gxdevcli.h
+gdevm4.o: gscompt.h gsdcolor.h gsccolor.h gsstruct.h gxarith.h gxbitmap.h
+gdevm4.o: gsbitmap.h gxhttile.h gxcindex.h gsbitops.h gsmatrix.h gsiparam.h
+gdevm4.o: gsrefct.h gsropt.h gsxfont.h gxcvalue.h gxfixed.h gxtext.h gstext.h
+gdevm4.o: gsccode.h gsparam.h gsmalloc.h gxdevmem.h gdevmem.h gxbitops.h
+
+gdevm8.o: memory_.h std.h stdpre.h arch.h gx.h stdio_.h gserror.h gsio.h
+gdevm8.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h gxdevice.h gxdevcli.h
+gdevm8.o: gscompt.h gsdcolor.h gsccolor.h gsstruct.h gxarith.h gxbitmap.h
+gdevm8.o: gsbitmap.h gxhttile.h gxcindex.h gsbitops.h gsmatrix.h gsiparam.h
+gdevm8.o: gsrefct.h gsropt.h gsxfont.h gxcvalue.h gxfixed.h gxtext.h gstext.h
+gdevm8.o: gsccode.h gsparam.h gsmalloc.h gxdevmem.h gdevmem.h gxbitops.h
+
+gdevmem.o: memory_.h std.h stdpre.h arch.h gx.h stdio_.h gserror.h gsio.h
+gdevmem.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h gserrors.h gsrect.h
+gdevmem.o: gsstruct.h gxarith.h gxdevice.h gxdevcli.h gscompt.h gsdcolor.h
+gdevmem.o: gsccolor.h gxbitmap.h gsbitmap.h gxhttile.h gxcindex.h gsbitops.h
+gdevmem.o: gsmatrix.h gsiparam.h gsrefct.h gsropt.h gsxfont.h gxcvalue.h
+gdevmem.o: gxfixed.h gxtext.h gstext.h gsccode.h gsparam.h gsmalloc.h
+gdevmem.o: gxgetbit.h gxbitfmt.h gxdevmem.h gdevmem.h gxbitops.h
+
+gdevmpla.o: memory_.h std.h stdpre.h arch.h gx.h stdio_.h gserror.h gsio.h
+gdevmpla.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h gxdevice.h gxdevcli.h
+gdevmpla.o: gscompt.h gsdcolor.h gsccolor.h gsstruct.h gxarith.h gxbitmap.h
+gdevmpla.o: gsbitmap.h gxhttile.h gxcindex.h gsbitops.h gsmatrix.h gsiparam.h
+gdevmpla.o: gsrefct.h gsropt.h gsxfont.h gxcvalue.h gxfixed.h gxtext.h
+gdevmpla.o: gstext.h gsccode.h gsparam.h gsmalloc.h gxdevmem.h gdevmem.h
+gdevmpla.o: gxbitops.h
+
+gdevnfwd.o: gx.h stdio_.h std.h stdpre.h arch.h gserror.h gsio.h gstypes.h
+gdevnfwd.o: gsmemory.h gsmemraw.h gdebug.h gserrors.h gxdevice.h gxdevcli.h
+gdevnfwd.o: gscompt.h gsdcolor.h gsccolor.h gsstruct.h gxarith.h gxbitmap.h
+gdevnfwd.o: gsbitmap.h gxhttile.h gxcindex.h gsbitops.h gsmatrix.h gsiparam.h
+gdevnfwd.o: gsrefct.h gsropt.h gsxfont.h gxcvalue.h gxfixed.h gxtext.h
+gdevnfwd.o: gstext.h gsccode.h gsparam.h gsmalloc.h
+
+gdevpipe.o: errno_.h std.h stdpre.h arch.h pipe_.h stdio_.h string_.h
+gdevpipe.o: gserror.h gstypes.h gsmemory.h gsmemraw.h stream.h scommon.h
+gdevpipe.o: gsstruct.h gxiodev.h stat_.h
+
+gdevprn.o: ctype_.h std.h stdpre.h arch.h gdevprn.h memory_.h string_.h gx.h
+gdevprn.o: stdio_.h gserror.h gsio.h gstypes.h gsmemory.h gsmemraw.h gdebug.h
+gdevprn.o: gp.h gpgetenv.h gserrors.h gsmatrix.h gsutil.h gxdevice.h
+gdevprn.o: gxdevcli.h gscompt.h gsdcolor.h gsccolor.h gsstruct.h gxarith.h
+gdevprn.o: gxbitmap.h gsbitmap.h gxhttile.h gxcindex.h gsbitops.h gsiparam.h
+gdevprn.o: gsrefct.h gsropt.h gsxfont.h gxcvalue.h gxfixed.h gxtext.h
+gdevprn.o: gstext.h gsccode.h gsparam.h gsmalloc.h gxdevmem.h gxcldev.h
+gdevprn.o: gxht.h gscsepnm.h gsht1.h gsht.h gxhttype.h gxtmap.h gxdht.h
+gdevprn.o: strimpl.h scommon.h scfx.h shc.h gsbittab.h srlx.h gxclist.h
+gdevprn.o: gscspace.h gxband.h gxclio.h gxbcache.h gxistate.h gscsel.h
+gdevprn.o: gxline.h gslparam.h gxmatrix.h
+
+gp_getnv.o: stdio_.h std.h stdpre.h arch.h string_.h gsmemory.h gsmemraw.h
+gp_getnv.o: gstypes.h gp.h gpgetenv.h
+
+gp_nofb.o: gx.h stdio_.h std.h stdpre.h arch.h gserror.h gsio.h gstypes.h
+gp_nofb.o: gsmemory.h gsmemraw.h gdebug.h gp.h gpgetenv.h gxdevice.h
+gp_nofb.o: gxdevcli.h gscompt.h gsdcolor.h gsccolor.h gsstruct.h gxarith.h
+gp_nofb.o: gxbitmap.h gsbitmap.h gxhttile.h gxcindex.h gsbitops.h gsmatrix.h
+gp_nofb.o: gsiparam.h gsrefct.h gsropt.h gsxfont.h gxcvalue.h gxfixed.h
+gp_nofb.o: gxtext.h gstext.h gsccode.h gsparam.h gsmalloc.h
+
+gp_nsync.o: std.h stdpre.h arch.h gserror.h gserrors.h gpsync.h
+
+gp_unifn.o: gx.h stdio_.h std.h stdpre.h arch.h gserror.h gsio.h gstypes.h
+gp_unifn.o: gsmemory.h gsmemraw.h gdebug.h gp.h gpgetenv.h
+
+gp_unifs.o: memory_.h std.h stdpre.h arch.h string_.h gx.h stdio_.h gserror.h
+gp_unifs.o: gsio.h gstypes.h gsmemory.h gsmemraw.h gdebug.h gp.h gpgetenv.h
+gp_unifs.o: gsstruct.h gsutil.h stat_.h dirent_.h ../config.h ../cups/cups.h
+gp_unifs.o: ../cups/ipp.h ../cups/http.h ../cups/string.h ../cups/md5.h
+gp_unifs.o: ../cups/ppd.h
+
+gp_unix.o: pipe_.h stdio_.h std.h stdpre.h arch.h string_.h time_.h
+gp_unix.o: ../config.h gx.h gserror.h gsio.h gstypes.h gsmemory.h gsmemraw.h
+gp_unix.o: gdebug.h gsexit.h gp.h gpgetenv.h
+
+gsalloc.o: gx.h stdio_.h std.h stdpre.h arch.h gserror.h gsio.h gstypes.h
+gsalloc.o: gsmemory.h gsmemraw.h gdebug.h memory_.h gserrors.h gsmdebug.h
+gsalloc.o: gsstruct.h gxalloc.h gsalloc.h gxobj.h gxbitmap.h gsbitmap.h
+gsalloc.o: stream.h scommon.h
+
+gsalpha.o: gx.h stdio_.h std.h stdpre.h arch.h gserror.h gsio.h gstypes.h
+gsalpha.o: gsmemory.h gsmemraw.h gdebug.h gsalpha.h gxdcolor.h gscsel.h
+gsalpha.o: gsdcolor.h gsccolor.h gsstruct.h gxarith.h gxbitmap.h gsbitmap.h
+gsalpha.o: gxhttile.h gxcindex.h gsbitops.h gsropt.h gzstate.h gscpm.h
+gsalpha.o: gsrefct.h gxistate.h gxcvalue.h gxfixed.h gxline.h gslparam.h
+gsalpha.o: gxmatrix.h gsmatrix.h gxtmap.h gsstate.h gsdevice.h gsline.h
+gsalpha.o: gscolor.h gsht.h gxstate.h
+
+gsargs.o: ctype_.h std.h stdpre.h arch.h stdio_.h string_.h gsexit.h
+gsargs.o: gsmemory.h gsmemraw.h gsargs.h
+
+gsbitops.o: stdio_.h std.h stdpre.h arch.h memory_.h gdebug.h gstypes.h
+gsbitops.o: gxbitops.h gsbitops.h
+
+gsbittab.o: stdpre.h gsbittab.h
+
+gscdefs.o: stdpre.h gscdefs.h gconfigv.h gconf.h gconfig.h ../config.h
+
+gscdevn.o: gx.h stdio_.h std.h stdpre.h arch.h gserror.h gsio.h gstypes.h
+gscdevn.o: gsmemory.h gsmemraw.h gdebug.h gserrors.h gsrefct.h gsmatrix.h
+gscdevn.o: gxcspace.h gscspace.h gsccolor.h gsstruct.h gscsel.h gxfrac.h
+
+gschar0.o: memory_.h std.h stdpre.h arch.h gx.h stdio_.h gserror.h gsio.h
+gschar0.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h gserrors.h gsstruct.h
+gschar0.o: gsfcmap.h gsccode.h gxfixed.h gxdevice.h gxdevcli.h gscompt.h
+gschar0.o: gsdcolor.h gsccolor.h gxarith.h gxbitmap.h gsbitmap.h gxhttile.h
+gschar0.o: gxcindex.h gsbitops.h gsmatrix.h gsiparam.h gsrefct.h gsropt.h
+gschar0.o: gsxfont.h gxcvalue.h gxtext.h gstext.h gsparam.h gsmalloc.h
+gschar0.o: gxdevmem.h gxchar.h gschar.h gscpm.h gxfont.h gsfont.h gsuid.h
+gschar0.o: gxftype.h gxfont0.h
+
+gschar.o: gx.h stdio_.h std.h stdpre.h arch.h gserror.h gsio.h gstypes.h
+gschar.o: gsmemory.h gsmemraw.h gdebug.h memory_.h string_.h gserrors.h
+gschar.o: gsstruct.h gxfixed.h gxarith.h gxmatrix.h gsmatrix.h gzstate.h
+gschar.o: gscpm.h gsrefct.h gxdcolor.h gscsel.h gsdcolor.h gsccolor.h
+gschar.o: gxbitmap.h gsbitmap.h gxhttile.h gxcindex.h gsbitops.h gsropt.h
+gschar.o: gxistate.h gxcvalue.h gxline.h gslparam.h gxtmap.h gsstate.h
+gschar.o: gsdevice.h gsline.h gscolor.h gsht.h gxstate.h gxcoord.h gscoord.h
+gschar.o: gxdevice.h gxdevcli.h gscompt.h gsiparam.h gsxfont.h gxtext.h
+gschar.o: gstext.h gsccode.h gsparam.h gsmalloc.h gxdevmem.h gxchar.h
+gschar.o: gschar.h gxfont.h gsfont.h gsuid.h gxftype.h gxfont0.h gxfcache.h
+gschar.o: gxbcache.h gspath.h gspenum.h gzpath.h gxpath.h gsrect.h
+
+gscie.o: math_.h std.h stdpre.h arch.h gx.h stdio_.h gserror.h gsio.h
+gscie.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h gserrors.h gsstruct.h
+gscie.o: gsmatrix.h gxcspace.h gscspace.h gsccolor.h gscsel.h gxfrac.h
+gscie.o: gscolor2.h gsptype1.h gspcolor.h gsuid.h gxbitmap.h gsbitmap.h
+gscie.o: gscie.h gsrefct.h gxctable.h gxfixed.h gxarith.h gxdevice.h
+gscie.o: gxdevcli.h gscompt.h gsdcolor.h gxhttile.h gxcindex.h gsbitops.h
+gscie.o: gsiparam.h gsropt.h gsxfont.h gxcvalue.h gxtext.h gstext.h gsccode.h
+gscie.o: gsparam.h gsmalloc.h gxcmap.h gxfmap.h gxtmap.h gzstate.h gscpm.h
+gscie.o: gxdcolor.h gxistate.h gxline.h gslparam.h gxmatrix.h gsstate.h
+gscie.o: gsdevice.h gsline.h gscolor.h gsht.h gxstate.h
+
+gsclipsr.o: gx.h stdio_.h std.h stdpre.h arch.h gserror.h gsio.h gstypes.h
+gsclipsr.o: gsmemory.h gsmemraw.h gdebug.h gserrors.h gsclipsr.h
+
+gscolor1.o: gx.h stdio_.h std.h stdpre.h arch.h gserror.h gsio.h gstypes.h
+gscolor1.o: gsmemory.h gsmemraw.h gdebug.h gserrors.h gsstruct.h gsutil.h
+gscolor1.o: gsccolor.h gxcspace.h gscspace.h gscsel.h gxfrac.h gxdcconv.h
+gscolor1.o: gxdevice.h gxdevcli.h gscompt.h gsdcolor.h gxarith.h gxbitmap.h
+gscolor1.o: gsbitmap.h gxhttile.h gxcindex.h gsbitops.h gsmatrix.h gsiparam.h
+gscolor1.o: gsrefct.h gsropt.h gsxfont.h gxcvalue.h gxfixed.h gxtext.h
+gscolor1.o: gstext.h gsccode.h gsparam.h gsmalloc.h gxcmap.h gxfmap.h
+gscolor1.o: gxtmap.h gzstate.h gscpm.h gxdcolor.h gxistate.h gxline.h
+gscolor1.o: gslparam.h gxmatrix.h gsstate.h gsdevice.h gsline.h gscolor.h
+gscolor1.o: gsht.h gxstate.h gscolor1.h
+
+gscolor2.o: memory_.h std.h stdpre.h arch.h gx.h stdio_.h gserror.h gsio.h
+gscolor2.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h gserrors.h gxarith.h
+gscolor2.o: gxfixed.h gxmatrix.h gsmatrix.h gxcspace.h gscspace.h gsccolor.h
+gscolor2.o: gsstruct.h gscsel.h gxfrac.h gxcolor2.h gscolor2.h gsptype1.h
+gscolor2.o: gspcolor.h gsuid.h gxbitmap.h gsbitmap.h gsrefct.h gzstate.h
+gscolor2.o: gscpm.h gxdcolor.h gsdcolor.h gxhttile.h gxcindex.h gsbitops.h
+gscolor2.o: gsropt.h gxistate.h gxcvalue.h gxline.h gslparam.h gxtmap.h
+gscolor2.o: gsstate.h gsdevice.h gsline.h gscolor.h gsht.h gxstate.h
+
+gscolor3.o: gx.h stdio_.h std.h stdpre.h arch.h gserror.h gsio.h gstypes.h
+gscolor3.o: gsmemory.h gsmemraw.h gdebug.h gserrors.h gscspace.h gsmatrix.h
+gscolor3.o: gscolor2.h gsptype1.h gspcolor.h gsccolor.h gsstruct.h gsuid.h
+gscolor3.o: gxbitmap.h gsbitmap.h gscolor3.h gspath.h gspenum.h gzstate.h
+gscolor3.o: gscpm.h gsrefct.h gxdcolor.h gscsel.h gsdcolor.h gxarith.h
+gscolor3.o: gxhttile.h gxcindex.h gsbitops.h gsropt.h gxistate.h gxcvalue.h
+gscolor3.o: gxfixed.h gxline.h gslparam.h gxmatrix.h gxtmap.h gsstate.h
+gscolor3.o: gsdevice.h gsline.h gscolor.h gsht.h gxstate.h gxshade.h
+gscolor3.o: gsshade.h gsdsrc.h gsfunc.h stream.h scommon.h
+
+gscolor.o: gx.h stdio_.h std.h stdpre.h arch.h gserror.h gsio.h gstypes.h
+gscolor.o: gsmemory.h gsmemraw.h gdebug.h gserrors.h gsstruct.h gsutil.h
+gscolor.o: gsccolor.h gxcspace.h gscspace.h gscsel.h gxfrac.h gxdcconv.h
+gscolor.o: gxdevice.h gxdevcli.h gscompt.h gsdcolor.h gxarith.h gxbitmap.h
+gscolor.o: gsbitmap.h gxhttile.h gxcindex.h gsbitops.h gsmatrix.h gsiparam.h
+gscolor.o: gsrefct.h gsropt.h gsxfont.h gxcvalue.h gxfixed.h gxtext.h
+gscolor.o: gstext.h gsccode.h gsparam.h gsmalloc.h gxcmap.h gxfmap.h gxtmap.h
+gscolor.o: gzstate.h gscpm.h gxdcolor.h gxistate.h gxline.h gslparam.h
+gscolor.o: gxmatrix.h gsstate.h gsdevice.h gsline.h gscolor.h gsht.h
+gscolor.o: gxstate.h
+
+gscoord.o: math_.h std.h stdpre.h arch.h gx.h stdio_.h gserror.h gsio.h
+gscoord.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h gserrors.h gsccode.h
+gscoord.o: gxfarith.h gconfigv.h gxarith.h gxfixed.h gxmatrix.h gsmatrix.h
+gscoord.o: gxfont.h gsfont.h gsuid.h gsstruct.h gxftype.h gxpath.h gscpm.h
+gscoord.o: gslparam.h gspenum.h gsrect.h gzstate.h gsrefct.h gxdcolor.h
+gscoord.o: gscsel.h gsdcolor.h gsccolor.h gxbitmap.h gsbitmap.h gxhttile.h
+gscoord.o: gxcindex.h gsbitops.h gsropt.h gxistate.h gxcvalue.h gxline.h
+gscoord.o: gxtmap.h gsstate.h gsdevice.h gsline.h gscolor.h gsht.h gxstate.h
+gscoord.o: gxcoord.h gscoord.h gxdevice.h gxdevcli.h gscompt.h gsiparam.h
+gscoord.o: gsxfont.h gxtext.h gstext.h gsparam.h gsmalloc.h
+
+gscparam.o: memory_.h std.h stdpre.h arch.h string_.h gx.h stdio_.h gserror.h
+gscparam.o: gsio.h gstypes.h gsmemory.h gsmemraw.h gdebug.h gserrors.h
+gscparam.o: gsparam.h gsstruct.h
+
+gscpixel.o: gx.h stdio_.h std.h stdpre.h arch.h gserror.h gsio.h gstypes.h
+gscpixel.o: gsmemory.h gsmemraw.h gdebug.h gserrors.h gsrefct.h gxcspace.h
+gscpixel.o: gscspace.h gsccolor.h gsstruct.h gscsel.h gxfrac.h gscpixel.h
+gscpixel.o: gxdevice.h gxdevcli.h gscompt.h gsdcolor.h gxarith.h gxbitmap.h
+gscpixel.o: gsbitmap.h gxhttile.h gxcindex.h gsbitops.h gsmatrix.h gsiparam.h
+gscpixel.o: gsropt.h gsxfont.h gxcvalue.h gxfixed.h gxtext.h gstext.h
+gscpixel.o: gsccode.h gsparam.h gsmalloc.h
+
+gscrdp.o: math_.h std.h stdpre.h arch.h memory_.h gx.h stdio_.h gserror.h
+gscrdp.o: gsio.h gstypes.h gsmemory.h gsmemraw.h gdebug.h gsdevice.h
+gscrdp.o: gserrors.h gsmatrix.h gxcspace.h gscspace.h gsccolor.h gsstruct.h
+gscrdp.o: gscsel.h gxfrac.h gscolor2.h gsptype1.h gspcolor.h gsuid.h
+gscrdp.o: gxbitmap.h gsbitmap.h gscrdp.h gscie.h gsrefct.h gxctable.h
+gscrdp.o: gxfixed.h gsparam.h gxarith.h
+
+gscrd.o: math_.h std.h stdpre.h arch.h memory_.h string_.h gx.h stdio_.h
+gscrd.o: gserror.h gsio.h gstypes.h gsmemory.h gsmemraw.h gdebug.h gscdefs.h
+gscrd.o: gconfigv.h gsdevice.h gserrors.h gsmatrix.h gsparam.h gxcspace.h
+gscrd.o: gscspace.h gsccolor.h gsstruct.h gscsel.h gxfrac.h gscolor2.h
+gscrd.o: gsptype1.h gspcolor.h gsuid.h gxbitmap.h gsbitmap.h gscrd.h gscie.h
+gscrd.o: gsrefct.h gxctable.h gxfixed.h
+
+gscscie.o: math_.h std.h stdpre.h arch.h gx.h stdio_.h gserror.h gsio.h
+gscscie.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h gserrors.h gsstruct.h
+gscscie.o: gsmatrix.h gxcspace.h gscspace.h gsccolor.h gscsel.h gxfrac.h
+gscscie.o: gscolor2.h gsptype1.h gspcolor.h gsuid.h gxbitmap.h gsbitmap.h
+gscscie.o: gscie.h gsrefct.h gxctable.h gxfixed.h gxarith.h gxdevice.h
+gscscie.o: gxdevcli.h gscompt.h gsdcolor.h gxhttile.h gxcindex.h gsbitops.h
+gscscie.o: gsiparam.h gsropt.h gsxfont.h gxcvalue.h gxtext.h gstext.h
+gscscie.o: gsccode.h gsparam.h gsmalloc.h gxcmap.h gxfmap.h gxtmap.h
+gscscie.o: gzstate.h gscpm.h gxdcolor.h gxistate.h gxline.h gslparam.h
+gscscie.o: gxmatrix.h gsstate.h gsdevice.h gsline.h gscolor.h gsht.h
+gscscie.o: gxstate.h
+
+gscsepr.o: gx.h stdio_.h std.h stdpre.h arch.h gserror.h gsio.h gstypes.h
+gscsepr.o: gsmemory.h gsmemraw.h gdebug.h gserrors.h gsrefct.h gsmatrix.h
+gscsepr.o: gscsepr.h gscspace.h gxcspace.h gsccolor.h gsstruct.h gscsel.h
+gscsepr.o: gxfrac.h gxfixed.h gxcolor2.h gscolor2.h gsptype1.h gspcolor.h
+gscsepr.o: gsuid.h gxbitmap.h gsbitmap.h gzstate.h gscpm.h gxdcolor.h
+gscsepr.o: gsdcolor.h gxarith.h gxhttile.h gxcindex.h gsbitops.h gsropt.h
+gscsepr.o: gxistate.h gxcvalue.h gxline.h gslparam.h gxmatrix.h gxtmap.h
+gscsepr.o: gsstate.h gsdevice.h gsline.h gscolor.h gsht.h gxstate.h
+
+gscspace.o: memory_.h std.h stdpre.h arch.h gx.h stdio_.h gserror.h gsio.h
+gscspace.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h gserrors.h gsstruct.h
+gscspace.o: gsccolor.h gxcspace.h gscspace.h gscsel.h gxfrac.h gxistate.h
+gscspace.o: gsrefct.h gsropt.h gxcvalue.h gxfixed.h gxline.h gslparam.h
+gscspace.o: gxmatrix.h gsmatrix.h gxtmap.h
+
+gsdevice.o: ctype_.h std.h stdpre.h arch.h memory_.h string_.h gx.h stdio_.h
+gsdevice.o: gserror.h gsio.h gstypes.h gsmemory.h gsmemraw.h gdebug.h
+gsdevice.o: gscdefs.h gconfigv.h gserrors.h gp.h gpgetenv.h gsstruct.h
+gsdevice.o: gspath.h gspenum.h gspaint.h gsmatrix.h gscoord.h gzstate.h
+gsdevice.o: gscpm.h gsrefct.h gxdcolor.h gscsel.h gsdcolor.h gsccolor.h
+gsdevice.o: gxarith.h gxbitmap.h gsbitmap.h gxhttile.h gxcindex.h gsbitops.h
+gsdevice.o: gsropt.h gxistate.h gxcvalue.h gxfixed.h gxline.h gslparam.h
+gsdevice.o: gxmatrix.h gxtmap.h gsstate.h gsdevice.h gsline.h gscolor.h
+gsdevice.o: gsht.h gxstate.h gxcmap.h gxfmap.h gxfrac.h gxdevice.h gxdevcli.h
+gsdevice.o: gscompt.h gsiparam.h gsxfont.h gxtext.h gstext.h gsccode.h
+gsdevice.o: gsparam.h gsmalloc.h gxdevmem.h
+
+gsdevmem.o: math_.h std.h stdpre.h arch.h memory_.h gx.h stdio_.h gserror.h
+gsdevmem.o: gsio.h gstypes.h gsmemory.h gsmemraw.h gdebug.h gserrors.h
+gsdevmem.o: gxarith.h gxdevice.h gxdevcli.h gscompt.h gsdcolor.h gsccolor.h
+gsdevmem.o: gsstruct.h gxbitmap.h gsbitmap.h gxhttile.h gxcindex.h gsbitops.h
+gsdevmem.o: gsmatrix.h gsiparam.h gsrefct.h gsropt.h gsxfont.h gxcvalue.h
+gsdevmem.o: gxfixed.h gxtext.h gstext.h gsccode.h gsparam.h gsmalloc.h
+gsdevmem.o: gxdevmem.h
+
+gsdparam.o: memory_.h std.h stdpre.h arch.h string_.h gx.h stdio_.h gserror.h
+gsdparam.o: gsio.h gstypes.h gsmemory.h gsmemraw.h gdebug.h gserrors.h
+gsdparam.o: gsparam.h gxdevice.h gxdevcli.h gscompt.h gsdcolor.h gsccolor.h
+gsdparam.o: gsstruct.h gxarith.h gxbitmap.h gsbitmap.h gxhttile.h gxcindex.h
+gsdparam.o: gsbitops.h gsmatrix.h gsiparam.h gsrefct.h gsropt.h gsxfont.h
+gsdparam.o: gxcvalue.h gxfixed.h gxtext.h gstext.h gsccode.h gsmalloc.h
+
+gsdps1.o: math_.h std.h stdpre.h arch.h gx.h stdio_.h gserror.h gsio.h
+gsdps1.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h gserrors.h gsmatrix.h
+gsdps1.o: gscoord.h gspaint.h gxdevice.h gxdevcli.h gscompt.h gsdcolor.h
+gsdps1.o: gsccolor.h gsstruct.h gxarith.h gxbitmap.h gsbitmap.h gxhttile.h
+gsdps1.o: gxcindex.h gsbitops.h gsiparam.h gsrefct.h gsropt.h gsxfont.h
+gsdps1.o: gxcvalue.h gxfixed.h gxtext.h gstext.h gsccode.h gsparam.h
+gsdps1.o: gsmalloc.h gxmatrix.h gspath.h gspenum.h gspath2.h gzpath.h
+gsdps1.o: gxpath.h gscpm.h gslparam.h gsrect.h gzcpath.h gxcpath.h gzstate.h
+gsdps1.o: gxdcolor.h gscsel.h gxistate.h gxline.h gxtmap.h gsstate.h
+gsdps1.o: gsdevice.h gsline.h gscolor.h gsht.h gxstate.h
+
+gsdsrc.o: memory_.h std.h stdpre.h arch.h gx.h stdio_.h gserror.h gsio.h
+gsdsrc.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h gsdsrc.h gsstruct.h
+gsdsrc.o: gserrors.h stream.h scommon.h
+
+gsfcmap.o: gx.h stdio_.h std.h stdpre.h arch.h gserror.h gsio.h gstypes.h
+gsfcmap.o: gsmemory.h gsmemraw.h gdebug.h gserrors.h gsstruct.h gxfcmap.h
+gsfcmap.o: gsfcmap.h gsccode.h gsuid.h
+
+gsfont0.o: memory_.h std.h stdpre.h arch.h gx.h stdio_.h gserror.h gsio.h
+gsfont0.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h gserrors.h gsstruct.h
+gsfont0.o: gxfixed.h gsmatrix.h gxdevice.h gxdevcli.h gscompt.h gsdcolor.h
+gsfont0.o: gsccolor.h gxarith.h gxbitmap.h gsbitmap.h gxhttile.h gxcindex.h
+gsfont0.o: gsbitops.h gsiparam.h gsrefct.h gsropt.h gsxfont.h gxcvalue.h
+gsfont0.o: gxtext.h gstext.h gsccode.h gsparam.h gsmalloc.h gxdevmem.h
+gsfont0.o: gxchar.h gschar.h gscpm.h gxfcache.h gsuid.h gxbcache.h gxftype.h
+gsfont0.o: gxfont.h gsfont.h gxfont0.h
+
+gsfont.o: gx.h stdio_.h std.h stdpre.h arch.h gserror.h gsio.h gstypes.h
+gsfont.o: gsmemory.h gsmemraw.h gdebug.h memory_.h gserrors.h gsstruct.h
+gsfont.o: gxfixed.h gxmatrix.h gsmatrix.h gzstate.h gscpm.h gsrefct.h
+gsfont.o: gxdcolor.h gscsel.h gsdcolor.h gsccolor.h gxarith.h gxbitmap.h
+gsfont.o: gsbitmap.h gxhttile.h gxcindex.h gsbitops.h gsropt.h gxistate.h
+gsfont.o: gxcvalue.h gxline.h gslparam.h gxtmap.h gsstate.h gsdevice.h
+gsfont.o: gsline.h gscolor.h gsht.h gxstate.h gxdevice.h gxdevcli.h gscompt.h
+gsfont.o: gsiparam.h gsxfont.h gxtext.h gstext.h gsccode.h gsparam.h
+gsfont.o: gsmalloc.h gschar.h gxfont.h gsfont.h gsuid.h gxftype.h gxfcache.h
+gsfont.o: gxbcache.h
+
+gsfunc0.o: math_.h std.h stdpre.h arch.h gx.h stdio_.h gserror.h gsio.h
+gsfunc0.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h gserrors.h gsfunc0.h
+gsfunc0.o: gsfunc.h gsdsrc.h gsstruct.h gxfarith.h gconfigv.h gxarith.h
+gsfunc0.o: gxfunc.h
+
+gsfunc3.o: math_.h std.h stdpre.h arch.h gx.h stdio_.h gserror.h gsio.h
+gsfunc3.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h gserrors.h gsfunc3.h
+gsfunc3.o: gsfunc.h gsdsrc.h gsstruct.h gxfunc.h
+
+gsfunc.o: gx.h stdio_.h std.h stdpre.h arch.h gserror.h gsio.h gstypes.h
+gsfunc.o: gsmemory.h gsmemraw.h gdebug.h gserrors.h gxfunc.h gsfunc.h
+gsfunc.o: gsstruct.h
+
+gshsb.o: gx.h stdio_.h std.h stdpre.h arch.h gserror.h gsio.h gstypes.h
+gshsb.o: gsmemory.h gsmemraw.h gdebug.h gscolor.h gxtmap.h gshsb.h gxfrac.h
+
+gsht1.o: memory_.h std.h stdpre.h arch.h gx.h stdio_.h gserror.h gsio.h
+gsht1.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h gserrors.h gsstruct.h
+gsht1.o: gsutil.h gzstate.h gscpm.h gsrefct.h gxdcolor.h gscsel.h gsdcolor.h
+gsht1.o: gsccolor.h gxarith.h gxbitmap.h gsbitmap.h gxhttile.h gxcindex.h
+gsht1.o: gsbitops.h gsropt.h gxistate.h gxcvalue.h gxfixed.h gxline.h
+gsht1.o: gslparam.h gxmatrix.h gsmatrix.h gxtmap.h gsstate.h gsdevice.h
+gsht1.o: gsline.h gscolor.h gsht.h gxstate.h gxdevice.h gxdevcli.h gscompt.h
+gsht1.o: gsiparam.h gsxfont.h gxtext.h gstext.h gsccode.h gsparam.h
+gsht1.o: gsmalloc.h gzht.h gxht.h gscsepnm.h gsht1.h gxhttype.h gxfmap.h
+gsht1.o: gxfrac.h gxdht.h
+
+gshtscr.o: math_.h std.h stdpre.h arch.h gx.h stdio_.h gserror.h gsio.h
+gshtscr.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h gserrors.h gsstruct.h
+gshtscr.o: gxarith.h gzstate.h gscpm.h gsrefct.h gxdcolor.h gscsel.h
+gshtscr.o: gsdcolor.h gsccolor.h gxbitmap.h gsbitmap.h gxhttile.h gxcindex.h
+gshtscr.o: gsbitops.h gsropt.h gxistate.h gxcvalue.h gxfixed.h gxline.h
+gshtscr.o: gslparam.h gxmatrix.h gsmatrix.h gxtmap.h gsstate.h gsdevice.h
+gshtscr.o: gsline.h gscolor.h gsht.h gxstate.h gxdevice.h gxdevcli.h
+gshtscr.o: gscompt.h gsiparam.h gsxfont.h gxtext.h gstext.h gsccode.h
+gshtscr.o: gsparam.h gsmalloc.h gzht.h gxht.h gscsepnm.h gsht1.h gxhttype.h
+gshtscr.o: gxfmap.h gxfrac.h gxdht.h
+
+gsht.o: memory_.h std.h stdpre.h arch.h gx.h stdio_.h gserror.h gsio.h
+gsht.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h gserrors.h gsstruct.h
+gsht.o: gsutil.h gxarith.h gzstate.h gscpm.h gsrefct.h gxdcolor.h gscsel.h
+gsht.o: gsdcolor.h gsccolor.h gxbitmap.h gsbitmap.h gxhttile.h gxcindex.h
+gsht.o: gsbitops.h gsropt.h gxistate.h gxcvalue.h gxfixed.h gxline.h
+gsht.o: gslparam.h gxmatrix.h gsmatrix.h gxtmap.h gsstate.h gsdevice.h
+gsht.o: gsline.h gscolor.h gsht.h gxstate.h gxdevice.h gxdevcli.h gscompt.h
+gsht.o: gsiparam.h gsxfont.h gxtext.h gstext.h gsccode.h gsparam.h gsmalloc.h
+gsht.o: gzht.h gxht.h gscsepnm.h gsht1.h gxhttype.h gxfmap.h gxfrac.h gxdht.h
+
+gsimage.o: memory_.h std.h stdpre.h arch.h gx.h stdio_.h gserror.h gsio.h
+gsimage.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h gserrors.h gsstruct.h
+gsimage.o: gscspace.h gsmatrix.h gsimage.h gsiparam.h gxarith.h gxdevice.h
+gsimage.o: gxdevcli.h gscompt.h gsdcolor.h gsccolor.h gxbitmap.h gsbitmap.h
+gsimage.o: gxhttile.h gxcindex.h gsbitops.h gsrefct.h gsropt.h gsxfont.h
+gsimage.o: gxcvalue.h gxfixed.h gxtext.h gstext.h gsccode.h gsparam.h
+gsimage.o: gsmalloc.h gxiparam.h gxpath.h gscpm.h gslparam.h gspenum.h
+gsimage.o: gsrect.h gzstate.h gxdcolor.h gscsel.h gxistate.h gxline.h
+gsimage.o: gxmatrix.h gxtmap.h gsstate.h gsdevice.h gsline.h gscolor.h gsht.h
+gsimage.o: gxstate.h
+
+gsimpath.o: gx.h stdio_.h std.h stdpre.h arch.h gserror.h gsio.h gstypes.h
+gsimpath.o: gsmemory.h gsmemraw.h gdebug.h gserrors.h gsmatrix.h gsstate.h
+gsimpath.o: gsdevice.h gsline.h gslparam.h gscolor.h gxtmap.h gsht.h gscsel.h
+gsimpath.o: gspath.h gspenum.h
+
+gsinit.o: stdio_.h std.h stdpre.h arch.h memory_.h gdebug.h gscdefs.h
+gsinit.o: gconfigv.h gsmemory.h gsmemraw.h gsmalloc.h gp.h gpgetenv.h gslib.h
+
+gsiodev.o: errno_.h std.h stdpre.h arch.h string_.h gx.h stdio_.h gserror.h
+gsiodev.o: gsio.h gstypes.h gsmemory.h gsmemraw.h gdebug.h gserrors.h gp.h
+gsiodev.o: gpgetenv.h gscdefs.h gconfigv.h gsparam.h gsstruct.h gxiodev.h
+gsiodev.o: stat_.h
+
+gsline.o: math_.h std.h stdpre.h arch.h memory_.h gx.h stdio_.h gserror.h
+gsline.o: gsio.h gstypes.h gsmemory.h gsmemraw.h gdebug.h gserrors.h
+gsline.o: gxfixed.h gxmatrix.h gsmatrix.h gzstate.h gscpm.h gsrefct.h
+gsline.o: gxdcolor.h gscsel.h gsdcolor.h gsccolor.h gsstruct.h gxarith.h
+gsline.o: gxbitmap.h gsbitmap.h gxhttile.h gxcindex.h gsbitops.h gsropt.h
+gsline.o: gxistate.h gxcvalue.h gxline.h gslparam.h gxtmap.h gsstate.h
+gsline.o: gsdevice.h gsline.h gscolor.h gsht.h gxstate.h gzline.h
+
+gsmalloc.o: malloc_.h std.h stdpre.h arch.h gdebug.h gstypes.h gsmemory.h
+gsmalloc.o: gsmemraw.h gsmdebug.h gsstruct.h gsmalloc.h
+
+gsmatrix.o: math_.h std.h stdpre.h arch.h gx.h stdio_.h gserror.h gsio.h
+gsmatrix.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h gserrors.h gxfarith.h
+gsmatrix.o: gconfigv.h gxarith.h gxfixed.h gxmatrix.h gsmatrix.h
+
+gsmemory.o: memory_.h std.h stdpre.h arch.h gstypes.h gsmemory.h gsmemraw.h
+gsmemory.o: gsmdebug.h gsrefct.h gsstruct.h
+
+gsmisc.o: ctype_.h std.h stdpre.h arch.h malloc_.h math_.h memory_.h
+gsmisc.o: string_.h gx.h stdio_.h gserror.h gsio.h gstypes.h gsmemory.h
+gsmisc.o: gsmemraw.h gdebug.h gpcheck.h gserrors.h gconfigv.h gxfarith.h
+gsmisc.o: gxarith.h gxfixed.h
+
+gsnorop.o: gx.h stdio_.h std.h stdpre.h arch.h gserror.h gsio.h gstypes.h
+gsnorop.o: gsmemory.h gsmemraw.h gdebug.h gserrors.h gsrop.h gsropt.h
+gsnorop.o: gxdevcli.h gscompt.h gsdcolor.h gsccolor.h gsstruct.h gxarith.h
+gsnorop.o: gxbitmap.h gsbitmap.h gxhttile.h gxcindex.h gsbitops.h gsmatrix.h
+gsnorop.o: gsiparam.h gsrefct.h gsxfont.h gxcvalue.h gxfixed.h gxtext.h
+gsnorop.o: gstext.h gsccode.h gdevmrop.h
+
+gspaint.o: math_.h std.h stdpre.h arch.h gx.h stdio_.h gserror.h gsio.h
+gspaint.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h gpcheck.h gserrors.h
+gspaint.o: gsropt.h gxfixed.h gxmatrix.h gsmatrix.h gspaint.h gspath.h
+gspaint.o: gspenum.h gzpath.h gxpath.h gscpm.h gslparam.h gsrect.h gsrefct.h
+gspaint.o: gsstruct.h gxpaint.h gzstate.h gxdcolor.h gscsel.h gsdcolor.h
+gspaint.o: gsccolor.h gxarith.h gxbitmap.h gsbitmap.h gxhttile.h gxcindex.h
+gspaint.o: gsbitops.h gxistate.h gxcvalue.h gxline.h gxtmap.h gsstate.h
+gspaint.o: gsdevice.h gsline.h gscolor.h gsht.h gxstate.h gxdevice.h
+gspaint.o: gxdevcli.h gscompt.h gsiparam.h gsxfont.h gxtext.h gstext.h
+gspaint.o: gsccode.h gsparam.h gsmalloc.h gxdevmem.h gxcpath.h
+
+gsparams.o: gx.h stdio_.h std.h stdpre.h arch.h gserror.h gsio.h gstypes.h
+gsparams.o: gsmemory.h gsmemraw.h gdebug.h memory_.h gserrors.h gsparams.h
+gsparams.o: stream.h scommon.h gsstruct.h gsparam.h
+
+gsparam.o: memory_.h std.h stdpre.h arch.h string_.h gx.h stdio_.h gserror.h
+gsparam.o: gsio.h gstypes.h gsmemory.h gsmemraw.h gdebug.h gserrors.h
+gsparam.o: gsparam.h gsstruct.h
+
+gspath1.o: math_.h std.h stdpre.h arch.h gx.h stdio_.h gserror.h gsio.h
+gspath1.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h gserrors.h gsstruct.h
+gspath1.o: gxfixed.h gxfarith.h gconfigv.h gxarith.h gxmatrix.h gsmatrix.h
+gspath1.o: gzstate.h gscpm.h gsrefct.h gxdcolor.h gscsel.h gsdcolor.h
+gspath1.o: gsccolor.h gxbitmap.h gsbitmap.h gxhttile.h gxcindex.h gsbitops.h
+gspath1.o: gsropt.h gxistate.h gxcvalue.h gxline.h gslparam.h gxtmap.h
+gspath1.o: gsstate.h gsdevice.h gsline.h gscolor.h gsht.h gxstate.h gspath.h
+gspath1.o: gspenum.h gzpath.h gxpath.h gsrect.h gscoord.h
+
+gspath.o: gx.h stdio_.h std.h stdpre.h arch.h gserror.h gsio.h gstypes.h
+gspath.o: gsmemory.h gsmemraw.h gdebug.h gserrors.h gxfixed.h gxmatrix.h
+gspath.o: gsmatrix.h gscoord.h gzstate.h gscpm.h gsrefct.h gxdcolor.h
+gspath.o: gscsel.h gsdcolor.h gsccolor.h gsstruct.h gxarith.h gxbitmap.h
+gspath.o: gsbitmap.h gxhttile.h gxcindex.h gsbitops.h gsropt.h gxistate.h
+gspath.o: gxcvalue.h gxline.h gslparam.h gxtmap.h gsstate.h gsdevice.h
+gspath.o: gsline.h gscolor.h gsht.h gxstate.h gzpath.h gxpath.h gspenum.h
+gspath.o: gsrect.h gxdevice.h gxdevcli.h gscompt.h gsiparam.h gsxfont.h
+gspath.o: gxtext.h gstext.h gsccode.h gsparam.h gsmalloc.h gxdevmem.h
+gspath.o: gzcpath.h gxcpath.h
+
+gspcolor.o: math_.h std.h stdpre.h arch.h gx.h stdio_.h gserror.h gsio.h
+gspcolor.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h gserrors.h gsrop.h
+gspcolor.o: gsropt.h gsstruct.h gsutil.h gxarith.h gxfixed.h gxmatrix.h
+gspcolor.o: gsmatrix.h gxcoord.h gscoord.h gxcspace.h gscspace.h gsccolor.h
+gspcolor.o: gscsel.h gxfrac.h gxcolor2.h gscolor2.h gsptype1.h gspcolor.h
+gspcolor.o: gsuid.h gxbitmap.h gsbitmap.h gsrefct.h gxdcolor.h gsdcolor.h
+gspcolor.o: gxhttile.h gxcindex.h gsbitops.h gxdevice.h gxdevcli.h gscompt.h
+gspcolor.o: gsiparam.h gsxfont.h gxcvalue.h gxtext.h gstext.h gsccode.h
+gspcolor.o: gsparam.h gsmalloc.h gxdevmem.h gxclip2.h gxmclip.h gxclip.h
+gspcolor.o: gspath.h gspenum.h gxpath.h gscpm.h gslparam.h gsrect.h
+gspcolor.o: gxp1fill.h gxpcolor.h gxpcache.h gzstate.h gxistate.h gxline.h
+gspcolor.o: gxtmap.h gsstate.h gsdevice.h gsline.h gscolor.h gsht.h gxstate.h
+gspcolor.o: gsimage.h gsiparm4.h
+
+gsshade.o: gx.h stdio_.h std.h stdpre.h arch.h gserror.h gsio.h gstypes.h
+gsshade.o: gsmemory.h gsmemraw.h gdebug.h gscspace.h gserrors.h gsstruct.h
+gsshade.o: gxdevcli.h gscompt.h gsdcolor.h gsccolor.h gxarith.h gxbitmap.h
+gsshade.o: gsbitmap.h gxhttile.h gxcindex.h gsbitops.h gsmatrix.h gsiparam.h
+gsshade.o: gsrefct.h gsropt.h gsxfont.h gxcvalue.h gxfixed.h gxtext.h
+gsshade.o: gstext.h gsccode.h gxcpath.h gxistate.h gscsel.h gxline.h
+gsshade.o: gslparam.h gxmatrix.h gxtmap.h gxpath.h gscpm.h gspenum.h gsrect.h
+gsshade.o: gxshade.h gsshade.h gsdsrc.h gsfunc.h stream.h scommon.h
+
+gsstate.o: gx.h stdio_.h std.h stdpre.h arch.h gserror.h gsio.h gstypes.h
+gsstate.o: gsmemory.h gsmemraw.h gdebug.h memory_.h gserrors.h gsstruct.h
+gsstate.o: gsutil.h gzstate.h gscpm.h gsrefct.h gxdcolor.h gscsel.h
+gsstate.o: gsdcolor.h gsccolor.h gxarith.h gxbitmap.h gsbitmap.h gxhttile.h
+gsstate.o: gxcindex.h gsbitops.h gsropt.h gxistate.h gxcvalue.h gxfixed.h
+gsstate.o: gxline.h gslparam.h gxmatrix.h gsmatrix.h gxtmap.h gsstate.h
+gsstate.o: gsdevice.h gsline.h gscolor.h gsht.h gxstate.h gxcspace.h
+gsstate.o: gscspace.h gxfrac.h gsalpha.h gscolor2.h gsptype1.h gspcolor.h
+gsstate.o: gsuid.h gscoord.h gscie.h gxctable.h gxcmap.h gxfmap.h gxdevice.h
+gsstate.o: gxdevcli.h gscompt.h gsiparam.h gsxfont.h gxtext.h gstext.h
+gsstate.o: gsccode.h gsparam.h gsmalloc.h gxpcache.h gzht.h gxht.h gscsepnm.h
+gsstate.o: gsht1.h gxhttype.h gxdht.h gzline.h gspath.h gspenum.h gzpath.h
+gsstate.o: gxpath.h gsrect.h gzcpath.h gxcpath.h
+
+gstext.o: std.h stdpre.h arch.h gstypes.h gdebug.h gserror.h gserrors.h
+gstext.o: gsmemory.h gsmemraw.h gsstruct.h gxdevcli.h gscompt.h gsdcolor.h
+gstext.o: gsccolor.h gxarith.h gxbitmap.h gsbitmap.h gxhttile.h gxcindex.h
+gstext.o: gsbitops.h gsmatrix.h gsiparam.h gsrefct.h gsropt.h gsxfont.h
+gstext.o: gxcvalue.h gxfixed.h gxtext.h gstext.h gsccode.h gxpath.h gscpm.h
+gstext.o: gslparam.h gspenum.h gsrect.h gzstate.h gxdcolor.h gscsel.h
+gstext.o: gxistate.h gxline.h gxmatrix.h gxtmap.h gsstate.h gsdevice.h
+gstext.o: gsline.h gscolor.h gsht.h gxstate.h
+
+gstrap.o: string_.h std.h stdpre.h arch.h gx.h stdio_.h gserror.h gsio.h
+gstrap.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h gserrors.h gstrap.h
+gstrap.o: gsparam.h
+
+gstype1.o: math_.h std.h stdpre.h arch.h memory_.h gx.h stdio_.h gserror.h
+gstype1.o: gsio.h gstypes.h gsmemory.h gsmemraw.h gdebug.h gserrors.h
+gstype1.o: gsstruct.h gxarith.h gxfixed.h gxmatrix.h gsmatrix.h gxcoord.h
+gstype1.o: gscoord.h gxistate.h gscsel.h gsrefct.h gsropt.h gxcvalue.h
+gstype1.o: gxline.h gslparam.h gxtmap.h gzpath.h gxpath.h gscpm.h gspenum.h
+gstype1.o: gsrect.h gxfont.h gsccode.h gsfont.h gsuid.h gxftype.h gxfont1.h
+gstype1.o: gxtype1.h gscrypt1.h gstype1.h gxop1.h
+
+gstype2.o: math_.h std.h stdpre.h arch.h memory_.h gx.h stdio_.h gserror.h
+gstype2.o: gsio.h gstypes.h gsmemory.h gsmemraw.h gdebug.h gserrors.h
+gstype2.o: gsstruct.h gxarith.h gxfixed.h gxmatrix.h gsmatrix.h gxcoord.h
+gstype2.o: gscoord.h gxistate.h gscsel.h gsrefct.h gsropt.h gxcvalue.h
+gstype2.o: gxline.h gslparam.h gxtmap.h gzpath.h gxpath.h gscpm.h gspenum.h
+gstype2.o: gsrect.h gxfont.h gsccode.h gsfont.h gsuid.h gxftype.h gxfont1.h
+gstype2.o: gxtype1.h gscrypt1.h gstype1.h gxop1.h
+
+gstype42.o: memory_.h std.h stdpre.h arch.h gx.h stdio_.h gserror.h gsio.h
+gstype42.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h gserrors.h gsstruct.h
+gstype42.o: gsccode.h gsmatrix.h gxfixed.h gxpath.h gscpm.h gslparam.h
+gstype42.o: gspenum.h gsrect.h gxfont.h gsfont.h gsuid.h gxftype.h gxfont42.h
+gstype42.o: gxistate.h gscsel.h gsrefct.h gsropt.h gxcvalue.h gxline.h
+gstype42.o: gxmatrix.h gxtmap.h
+
+gsutil.o: string_.h std.h stdpre.h arch.h memory_.h gstypes.h gconfigv.h
+gsutil.o: gsmemory.h gsmemraw.h gsrect.h gsuid.h gsutil.h
+
+gxacpath.o: gx.h stdio_.h std.h stdpre.h arch.h gserror.h gsio.h gstypes.h
+gxacpath.o: gsmemory.h gsmemraw.h gdebug.h gserrors.h gsrop.h gsropt.h
+gxacpath.o: gsstruct.h gsutil.h gsdcolor.h gsccolor.h gxarith.h gxbitmap.h
+gxacpath.o: gsbitmap.h gxhttile.h gxcindex.h gsbitops.h gxdevice.h gxdevcli.h
+gxacpath.o: gscompt.h gsmatrix.h gsiparam.h gsrefct.h gsxfont.h gxcvalue.h
+gxacpath.o: gxfixed.h gxtext.h gstext.h gsccode.h gsparam.h gsmalloc.h
+gxacpath.o: gzpath.h gxpath.h gscpm.h gslparam.h gspenum.h gsrect.h gxpaint.h
+gxacpath.o: gzcpath.h gxcpath.h gzacpath.h
+
+gxbcache.o: memory_.h std.h stdpre.h arch.h gx.h stdio_.h gserror.h gsio.h
+gxbcache.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h gsmdebug.h gxbcache.h
+gxbcache.o: gxbitmap.h gsbitmap.h gsstruct.h
+
+gxccache.o: gx.h stdio_.h std.h stdpre.h arch.h gserror.h gsio.h gstypes.h
+gxccache.o: gsmemory.h gsmemraw.h gdebug.h gpcheck.h gserrors.h gsstruct.h
+gxccache.o: gxfixed.h gxmatrix.h gsmatrix.h gzstate.h gscpm.h gsrefct.h
+gxccache.o: gxdcolor.h gscsel.h gsdcolor.h gsccolor.h gxarith.h gxbitmap.h
+gxccache.o: gsbitmap.h gxhttile.h gxcindex.h gsbitops.h gsropt.h gxistate.h
+gxccache.o: gxcvalue.h gxline.h gslparam.h gxtmap.h gsstate.h gsdevice.h
+gxccache.o: gsline.h gscolor.h gsht.h gxstate.h gzpath.h gxpath.h gspenum.h
+gxccache.o: gsrect.h gxdevice.h gxdevcli.h gscompt.h gsiparam.h gsxfont.h
+gxccache.o: gxtext.h gstext.h gsccode.h gsparam.h gsmalloc.h gxdevmem.h
+gxccache.o: gzcpath.h gxcpath.h gxchar.h gschar.h gxfont.h gsfont.h gsuid.h
+gxccache.o: gxftype.h gxfcache.h gxbcache.h gxxfont.h gscspace.h gsimage.h
+
+gxccman.o: gx.h stdio_.h std.h stdpre.h arch.h gserror.h gsio.h gstypes.h
+gxccman.o: gsmemory.h gsmemraw.h gdebug.h memory_.h gpcheck.h gserrors.h
+gxccman.o: gsstruct.h gsbitops.h gsutil.h gxfixed.h gxmatrix.h gsmatrix.h
+gxccman.o: gzstate.h gscpm.h gsrefct.h gxdcolor.h gscsel.h gsdcolor.h
+gxccman.o: gsccolor.h gxarith.h gxbitmap.h gsbitmap.h gxhttile.h gxcindex.h
+gxccman.o: gsropt.h gxistate.h gxcvalue.h gxline.h gslparam.h gxtmap.h
+gxccman.o: gsstate.h gsdevice.h gsline.h gscolor.h gsht.h gxstate.h gzpath.h
+gxccman.o: gxpath.h gspenum.h gsrect.h gxdevice.h gxdevcli.h gscompt.h
+gxccman.o: gsiparam.h gsxfont.h gxtext.h gstext.h gsccode.h gsparam.h
+gxccman.o: gsmalloc.h gxdevmem.h gxchar.h gschar.h gxfont.h gsfont.h gsuid.h
+gxccman.o: gxftype.h gxfcache.h gxbcache.h gxxfont.h
+
+gxcht.o: memory_.h std.h stdpre.h arch.h gx.h stdio_.h gserror.h gsio.h
+gxcht.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h gserrors.h gsutil.h
+gxcht.o: gxarith.h gxfixed.h gxmatrix.h gsmatrix.h gxdevice.h gxdevcli.h
+gxcht.o: gscompt.h gsdcolor.h gsccolor.h gsstruct.h gxbitmap.h gsbitmap.h
+gxcht.o: gxhttile.h gxcindex.h gsbitops.h gsiparam.h gsrefct.h gsropt.h
+gxcht.o: gsxfont.h gxcvalue.h gxtext.h gstext.h gsccode.h gsparam.h
+gxcht.o: gsmalloc.h gxcmap.h gscsel.h gxfmap.h gxfrac.h gxtmap.h gxdcolor.h
+gxcht.o: gxistate.h gxline.h gslparam.h gzht.h gxht.h gscsepnm.h gsht1.h
+gxcht.o: gsht.h gxhttype.h gxdht.h
+
+gxclbits.o: memory_.h std.h stdpre.h arch.h gx.h stdio_.h gserror.h gsio.h
+gxclbits.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h gpcheck.h gserrors.h
+gxclbits.o: gsbitops.h gxdevice.h gxdevcli.h gscompt.h gsdcolor.h gsccolor.h
+gxclbits.o: gsstruct.h gxarith.h gxbitmap.h gsbitmap.h gxhttile.h gxcindex.h
+gxclbits.o: gsmatrix.h gsiparam.h gsrefct.h gsropt.h gsxfont.h gxcvalue.h
+gxclbits.o: gxfixed.h gxtext.h gstext.h gsccode.h gsparam.h gsmalloc.h
+gxclbits.o: gxdevmem.h gxcldev.h gxht.h gscsepnm.h gsht1.h gsht.h gxhttype.h
+gxclbits.o: gxtmap.h gxdht.h strimpl.h scommon.h scfx.h shc.h gsbittab.h
+gxclbits.o: srlx.h gxclist.h gscspace.h gxband.h gxclio.h gp.h gpgetenv.h
+gxclbits.o: gxbcache.h gxistate.h gscsel.h gxline.h gslparam.h gxmatrix.h
+gxclbits.o: gxfmap.h gxfrac.h
+
+gxclimag.o: math_.h std.h stdpre.h arch.h memory_.h gx.h stdio_.h gserror.h
+gxclimag.o: gsio.h gstypes.h gsmemory.h gsmemraw.h gdebug.h gserrors.h
+gxclimag.o: gscspace.h gxarith.h gxdevice.h gxdevcli.h gscompt.h gsdcolor.h
+gxclimag.o: gsccolor.h gsstruct.h gxbitmap.h gsbitmap.h gxhttile.h gxcindex.h
+gxclimag.o: gsbitops.h gsmatrix.h gsiparam.h gsrefct.h gsropt.h gsxfont.h
+gxclimag.o: gxcvalue.h gxfixed.h gxtext.h gstext.h gsccode.h gsparam.h
+gxclimag.o: gsmalloc.h gxdevmem.h gxcldev.h gxht.h gscsepnm.h gsht1.h gsht.h
+gxclimag.o: gxhttype.h gxtmap.h gxdht.h strimpl.h scommon.h scfx.h shc.h
+gxclimag.o: gsbittab.h srlx.h gxclist.h gxband.h gxclio.h gp.h gpgetenv.h
+gxclimag.o: gxbcache.h gxistate.h gscsel.h gxline.h gslparam.h gxmatrix.h
+gxclimag.o: gxclpath.h gxfmap.h gxfrac.h gxiparam.h gxpath.h gscpm.h
+gxclimag.o: gspenum.h gsrect.h siscale.h gconfigv.h
+
+gxclip2.o: memory_.h std.h stdpre.h arch.h gx.h stdio_.h gserror.h gsio.h
+gxclip2.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h gserrors.h gsstruct.h
+gxclip2.o: gxdevice.h gxdevcli.h gscompt.h gsdcolor.h gsccolor.h gxarith.h
+gxclip2.o: gxbitmap.h gsbitmap.h gxhttile.h gxcindex.h gsbitops.h gsmatrix.h
+gxclip2.o: gsiparam.h gsrefct.h gsropt.h gsxfont.h gxcvalue.h gxfixed.h
+gxclip2.o: gxtext.h gstext.h gsccode.h gsparam.h gsmalloc.h gxdevmem.h
+gxclip2.o: gxclip2.h gxmclip.h gxclip.h
+
+gxclipm.o: memory_.h std.h stdpre.h arch.h gx.h stdio_.h gserror.h gsio.h
+gxclipm.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h gxdevice.h gxdevcli.h
+gxclipm.o: gscompt.h gsdcolor.h gsccolor.h gsstruct.h gxarith.h gxbitmap.h
+gxclipm.o: gsbitmap.h gxhttile.h gxcindex.h gsbitops.h gsmatrix.h gsiparam.h
+gxclipm.o: gsrefct.h gsropt.h gsxfont.h gxcvalue.h gxfixed.h gxtext.h
+gxclipm.o: gstext.h gsccode.h gsparam.h gsmalloc.h gxdevmem.h gxclipm.h
+gxclipm.o: gxmclip.h gxclip.h
+
+gxclip.o: gx.h stdio_.h std.h stdpre.h arch.h gserror.h gsio.h gstypes.h
+gxclip.o: gsmemory.h gsmemraw.h gdebug.h gxdevice.h gxdevcli.h gscompt.h
+gxclip.o: gsdcolor.h gsccolor.h gsstruct.h gxarith.h gxbitmap.h gsbitmap.h
+gxclip.o: gxhttile.h gxcindex.h gsbitops.h gsmatrix.h gsiparam.h gsrefct.h
+gxclip.o: gsropt.h gsxfont.h gxcvalue.h gxfixed.h gxtext.h gstext.h gsccode.h
+gxclip.o: gsparam.h gsmalloc.h gxclip.h gzpath.h gxpath.h gscpm.h gslparam.h
+gxclip.o: gspenum.h gsrect.h gzcpath.h gxcpath.h
+
+gxclist.o: memory_.h std.h stdpre.h arch.h string_.h gx.h stdio_.h gserror.h
+gxclist.o: gsio.h gstypes.h gsmemory.h gsmemraw.h gdebug.h gp.h gpgetenv.h
+gxclist.o: gpcheck.h gserrors.h gxdevice.h gxdevcli.h gscompt.h gsdcolor.h
+gxclist.o: gsccolor.h gsstruct.h gxarith.h gxbitmap.h gsbitmap.h gxhttile.h
+gxclist.o: gxcindex.h gsbitops.h gsmatrix.h gsiparam.h gsrefct.h gsropt.h
+gxclist.o: gsxfont.h gxcvalue.h gxfixed.h gxtext.h gstext.h gsccode.h
+gxclist.o: gsparam.h gsmalloc.h gxdevmem.h gxcldev.h gxht.h gscsepnm.h
+gxclist.o: gsht1.h gsht.h gxhttype.h gxtmap.h gxdht.h strimpl.h scommon.h
+gxclist.o: scfx.h shc.h gsbittab.h srlx.h gxclist.h gscspace.h gxband.h
+gxclist.o: gxclio.h gxbcache.h gxistate.h gscsel.h gxline.h gslparam.h
+gxclist.o: gxmatrix.h gxclpath.h gsparams.h stream.h
+
+gxclmem.o: memory_.h std.h stdpre.h arch.h gx.h stdio_.h gserror.h gsio.h
+gxclmem.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h gserrors.h gsmalloc.h
+gxclmem.o: gxclmem.h gxclio.h gp.h gpgetenv.h strimpl.h scommon.h gsstruct.h
+gxclmem.o: ../config.h
+
+gxclpage.o: gdevprn.h memory_.h std.h stdpre.h arch.h string_.h gx.h stdio_.h
+gxclpage.o: gserror.h gsio.h gstypes.h gsmemory.h gsmemraw.h gdebug.h gp.h
+gxclpage.o: gpgetenv.h gserrors.h gsmatrix.h gsutil.h gxdevice.h gxdevcli.h
+gxclpage.o: gscompt.h gsdcolor.h gsccolor.h gsstruct.h gxarith.h gxbitmap.h
+gxclpage.o: gsbitmap.h gxhttile.h gxcindex.h gsbitops.h gsiparam.h gsrefct.h
+gxclpage.o: gsropt.h gsxfont.h gxcvalue.h gxfixed.h gxtext.h gstext.h
+gxclpage.o: gsccode.h gsparam.h gsmalloc.h gxdevmem.h gxcldev.h gxht.h
+gxclpage.o: gscsepnm.h gsht1.h gsht.h gxhttype.h gxtmap.h gxdht.h strimpl.h
+gxclpage.o: scommon.h scfx.h shc.h gsbittab.h srlx.h gxclist.h gscspace.h
+gxclpage.o: gxband.h gxclio.h gxbcache.h gxistate.h gscsel.h gxline.h
+gxclpage.o: gslparam.h gxmatrix.h gxclpage.h
+
+gxclpath.o: math_.h std.h stdpre.h arch.h memory_.h gx.h stdio_.h gserror.h
+gxclpath.o: gsio.h gstypes.h gsmemory.h gsmemraw.h gdebug.h gpcheck.h
+gxclpath.o: gserrors.h gxdevice.h gxdevcli.h gscompt.h gsdcolor.h gsccolor.h
+gxclpath.o: gsstruct.h gxarith.h gxbitmap.h gsbitmap.h gxhttile.h gxcindex.h
+gxclpath.o: gsbitops.h gsmatrix.h gsiparam.h gsrefct.h gsropt.h gsxfont.h
+gxclpath.o: gxcvalue.h gxfixed.h gxtext.h gstext.h gsccode.h gsparam.h
+gxclpath.o: gsmalloc.h gxdevmem.h gxcldev.h gxht.h gscsepnm.h gsht1.h gsht.h
+gxclpath.o: gxhttype.h gxtmap.h gxdht.h strimpl.h scommon.h scfx.h shc.h
+gxclpath.o: gsbittab.h srlx.h gxclist.h gscspace.h gxband.h gxclio.h gp.h
+gxclpath.o: gpgetenv.h gxbcache.h gxistate.h gscsel.h gxline.h gslparam.h
+gxclpath.o: gxmatrix.h gxclpath.h gxcolor2.h gscolor2.h gsptype1.h gspcolor.h
+gxclpath.o: gsuid.h gxpaint.h gzpath.h gxpath.h gscpm.h gspenum.h gsrect.h
+gxclpath.o: gzcpath.h gxcpath.h
+
+gxclrast.o: memory_.h std.h stdpre.h arch.h gx.h stdio_.h gserror.h gsio.h
+gxclrast.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h gp.h gpgetenv.h
+gxclrast.o: gpcheck.h gserrors.h gsbitops.h gsparams.h stream.h scommon.h
+gxclrast.o: gsstruct.h gsparam.h gsstate.h gsdevice.h gsline.h gslparam.h
+gxclrast.o: gscolor.h gxtmap.h gsht.h gscsel.h gxdcolor.h gsdcolor.h
+gxclrast.o: gsccolor.h gxarith.h gxbitmap.h gsbitmap.h gxhttile.h gxcindex.h
+gxclrast.o: gsropt.h gxdevice.h gxdevcli.h gscompt.h gsmatrix.h gsiparam.h
+gxclrast.o: gsrefct.h gsxfont.h gxcvalue.h gxfixed.h gxtext.h gstext.h
+gxclrast.o: gsccode.h gsmalloc.h gscoord.h gxdevmem.h gxcldev.h gxht.h
+gxclrast.o: gscsepnm.h gsht1.h gxhttype.h gxdht.h strimpl.h scfx.h shc.h
+gxclrast.o: gsbittab.h srlx.h gxclist.h gscspace.h gxband.h gxclio.h
+gxclrast.o: gxbcache.h gxistate.h gxline.h gxmatrix.h gxclpath.h gxcmap.h
+gxclrast.o: gxfmap.h gxfrac.h gxcspace.h gxgetbit.h gxbitfmt.h gxpaint.h
+gxclrast.o: gdevht.h gzht.h gzpath.h gxpath.h gscpm.h gspenum.h gsrect.h
+gxclrast.o: gzcpath.h gxcpath.h gzacpath.h
+
+gxclread.o: memory_.h std.h stdpre.h arch.h gx.h stdio_.h gserror.h gsio.h
+gxclread.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h gp.h gpgetenv.h
+gxclread.o: gpcheck.h gserrors.h gxdevice.h gxdevcli.h gscompt.h gsdcolor.h
+gxclread.o: gsccolor.h gsstruct.h gxarith.h gxbitmap.h gsbitmap.h gxhttile.h
+gxclread.o: gxcindex.h gsbitops.h gsmatrix.h gsiparam.h gsrefct.h gsropt.h
+gxclread.o: gsxfont.h gxcvalue.h gxfixed.h gxtext.h gstext.h gsccode.h
+gxclread.o: gsparam.h gsmalloc.h gscoord.h gsdevice.h gxdevmem.h gxcldev.h
+gxclread.o: gxht.h gscsepnm.h gsht1.h gsht.h gxhttype.h gxtmap.h gxdht.h
+gxclread.o: strimpl.h scommon.h scfx.h shc.h gsbittab.h srlx.h gxclist.h
+gxclread.o: gscspace.h gxband.h gxclio.h gxbcache.h gxistate.h gscsel.h
+gxclread.o: gxline.h gslparam.h gxmatrix.h gxgetbit.h gxbitfmt.h gdevht.h
+gxclread.o: gzht.h gxfmap.h gxfrac.h stream.h
+
+gxclrect.o: gx.h stdio_.h std.h stdpre.h arch.h gserror.h gsio.h gstypes.h
+gxclrect.o: gsmemory.h gsmemraw.h gdebug.h gserrors.h gsutil.h gxdevice.h
+gxclrect.o: gxdevcli.h gscompt.h gsdcolor.h gsccolor.h gsstruct.h gxarith.h
+gxclrect.o: gxbitmap.h gsbitmap.h gxhttile.h gxcindex.h gsbitops.h gsmatrix.h
+gxclrect.o: gsiparam.h gsrefct.h gsropt.h gsxfont.h gxcvalue.h gxfixed.h
+gxclrect.o: gxtext.h gstext.h gsccode.h gsparam.h gsmalloc.h gxdevmem.h
+gxclrect.o: gxcldev.h gxht.h gscsepnm.h gsht1.h gsht.h gxhttype.h gxtmap.h
+gxclrect.o: gxdht.h strimpl.h scommon.h scfx.h shc.h gsbittab.h srlx.h
+gxclrect.o: gxclist.h gscspace.h gxband.h gxclio.h gp.h gpgetenv.h gxbcache.h
+gxclrect.o: gxistate.h gscsel.h gxline.h gslparam.h gxmatrix.h
+
+gxclutil.o: memory_.h std.h stdpre.h arch.h string_.h gx.h stdio_.h gserror.h
+gxclutil.o: gsio.h gstypes.h gsmemory.h gsmemraw.h gdebug.h gp.h gpgetenv.h
+gxclutil.o: gpcheck.h gserrors.h gxdevice.h gxdevcli.h gscompt.h gsdcolor.h
+gxclutil.o: gsccolor.h gsstruct.h gxarith.h gxbitmap.h gsbitmap.h gxhttile.h
+gxclutil.o: gxcindex.h gsbitops.h gsmatrix.h gsiparam.h gsrefct.h gsropt.h
+gxclutil.o: gsxfont.h gxcvalue.h gxfixed.h gxtext.h gstext.h gsccode.h
+gxclutil.o: gsparam.h gsmalloc.h gxdevmem.h gxcldev.h gxht.h gscsepnm.h
+gxclutil.o: gsht1.h gsht.h gxhttype.h gxtmap.h gxdht.h strimpl.h scommon.h
+gxclutil.o: scfx.h shc.h gsbittab.h srlx.h gxclist.h gscspace.h gxband.h
+gxclutil.o: gxclio.h gxbcache.h gxistate.h gscsel.h gxline.h gslparam.h
+gxclutil.o: gxmatrix.h gxclpath.h gsparams.h stream.h
+
+gxclzlib.o: ../config.h std.h stdpre.h arch.h gstypes.h gsmemory.h gsmemraw.h
+gxclzlib.o: gxclmem.h gxclio.h gp.h gpgetenv.h strimpl.h scommon.h gsstruct.h
+gxclzlib.o: szlibx.h
+
+gxcmap.o: gx.h stdio_.h std.h stdpre.h arch.h gserror.h gsio.h gstypes.h
+gxcmap.o: gsmemory.h gsmemraw.h gdebug.h gserrors.h gsccolor.h gsstruct.h
+gxcmap.o: gxalpha.h gxcspace.h gscspace.h gscsel.h gxfrac.h gxfarith.h
+gxcmap.o: gconfigv.h gxarith.h gxdcconv.h gxdevice.h gxdevcli.h gscompt.h
+gxcmap.o: gsdcolor.h gxbitmap.h gsbitmap.h gxhttile.h gxcindex.h gsbitops.h
+gxcmap.o: gsmatrix.h gsiparam.h gsrefct.h gsropt.h gsxfont.h gxcvalue.h
+gxcmap.o: gxfixed.h gxtext.h gstext.h gsccode.h gsparam.h gsmalloc.h gxcmap.h
+gxcmap.o: gxfmap.h gxtmap.h gxlum.h gzstate.h gscpm.h gxdcolor.h gxistate.h
+gxcmap.o: gxline.h gslparam.h gxmatrix.h gsstate.h gsdevice.h gsline.h
+gxcmap.o: gscolor.h gsht.h gxstate.h gxdither.h
+
+gxcpath.o: gx.h stdio_.h std.h stdpre.h arch.h gserror.h gsio.h gstypes.h
+gxcpath.o: gsmemory.h gsmemraw.h gdebug.h gserrors.h gsstruct.h gsutil.h
+gxcpath.o: gsline.h gslparam.h gxdevice.h gxdevcli.h gscompt.h gsdcolor.h
+gxcpath.o: gsccolor.h gxarith.h gxbitmap.h gsbitmap.h gxhttile.h gxcindex.h
+gxcpath.o: gsbitops.h gsmatrix.h gsiparam.h gsrefct.h gsropt.h gsxfont.h
+gxcpath.o: gxcvalue.h gxfixed.h gxtext.h gstext.h gsccode.h gsparam.h
+gxcpath.o: gsmalloc.h gscoord.h gxstate.h gzpath.h gxpath.h gscpm.h gspenum.h
+gxcpath.o: gsrect.h gzcpath.h gxcpath.h
+
+gxctable.o: gx.h stdio_.h std.h stdpre.h arch.h gserror.h gsio.h gstypes.h
+gxctable.o: gsmemory.h gsmemraw.h gdebug.h gxfixed.h gxfrac.h gxctable.h
+
+gxdcconv.o: gx.h stdio_.h std.h stdpre.h arch.h gserror.h gsio.h gstypes.h
+gxdcconv.o: gsmemory.h gsmemraw.h gdebug.h gsdcolor.h gsccolor.h gsstruct.h
+gxdcconv.o: gxarith.h gxbitmap.h gsbitmap.h gxhttile.h gxcindex.h gsbitops.h
+gxdcconv.o: gxdcconv.h gxfrac.h gxdevice.h gxdevcli.h gscompt.h gsmatrix.h
+gxdcconv.o: gsiparam.h gsrefct.h gsropt.h gsxfont.h gxcvalue.h gxfixed.h
+gxdcconv.o: gxtext.h gstext.h gsccode.h gsparam.h gsmalloc.h gxcmap.h
+gxdcconv.o: gscsel.h gxfmap.h gxtmap.h gxfarith.h gconfigv.h gxlum.h
+gxdcconv.o: gxistate.h gxline.h gslparam.h gxmatrix.h
+
+gxdcolor.o: gx.h stdio_.h std.h stdpre.h arch.h gserror.h gsio.h gstypes.h
+gxdcolor.o: gsmemory.h gsmemraw.h gdebug.h gserrors.h gsbittab.h gxdcolor.h
+gxdcolor.o: gscsel.h gsdcolor.h gsccolor.h gsstruct.h gxarith.h gxbitmap.h
+gxdcolor.o: gsbitmap.h gxhttile.h gxcindex.h gsbitops.h gsropt.h gxdevice.h
+gxdcolor.o: gxdevcli.h gscompt.h gsmatrix.h gsiparam.h gsrefct.h gsxfont.h
+gxdcolor.o: gxcvalue.h gxfixed.h gxtext.h gstext.h gsccode.h gsparam.h
+gxdcolor.o: gsmalloc.h
+
+gxdither.o: gx.h stdio_.h std.h stdpre.h arch.h gserror.h gsio.h gstypes.h
+gxdither.o: gsmemory.h gsmemraw.h gdebug.h gsstruct.h gsdcolor.h gsccolor.h
+gxdither.o: gxarith.h gxbitmap.h gsbitmap.h gxhttile.h gxcindex.h gsbitops.h
+gxdither.o: gxdevice.h gxdevcli.h gscompt.h gsmatrix.h gsiparam.h gsrefct.h
+gxdither.o: gsropt.h gsxfont.h gxcvalue.h gxfixed.h gxtext.h gstext.h
+gxdither.o: gsccode.h gsparam.h gsmalloc.h gxlum.h gxcmap.h gscsel.h gxfmap.h
+gxdither.o: gxfrac.h gxtmap.h gxdither.h gzht.h gxht.h gscsepnm.h gsht1.h
+gxdither.o: gsht.h gxhttype.h gxdht.h
+
+gxfill.o: math_.h std.h stdpre.h arch.h gx.h stdio_.h gserror.h gsio.h
+gxfill.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h gserrors.h gsstruct.h
+gxfill.o: gxfixed.h gxdevice.h gxdevcli.h gscompt.h gsdcolor.h gsccolor.h
+gxfill.o: gxarith.h gxbitmap.h gsbitmap.h gxhttile.h gxcindex.h gsbitops.h
+gxfill.o: gsmatrix.h gsiparam.h gsrefct.h gsropt.h gsxfont.h gxcvalue.h
+gxfill.o: gxtext.h gstext.h gsccode.h gsparam.h gsmalloc.h gzpath.h gxpath.h
+gxfill.o: gscpm.h gslparam.h gspenum.h gsrect.h gzcpath.h gxcpath.h
+gxfill.o: gxdcolor.h gscsel.h gxistate.h gxline.h gxmatrix.h gxtmap.h
+gxfill.o: gxpaint.h
+
+gxhint1.o: gx.h stdio_.h std.h stdpre.h arch.h gserror.h gsio.h gstypes.h
+gxhint1.o: gsmemory.h gsmemraw.h gdebug.h gserrors.h gxarith.h gxfixed.h
+gxhint1.o: gxmatrix.h gsmatrix.h gxfont.h gsccode.h gsfont.h gsuid.h
+gxhint1.o: gsstruct.h gxftype.h gxfont1.h gxtype1.h gscrypt1.h gstype1.h
+gxhint1.o: gxop1.h
+
+gxhint2.o: memory_.h std.h stdpre.h arch.h gx.h stdio_.h gserror.h gsio.h
+gxhint2.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h gserrors.h gxarith.h
+gxhint2.o: gxfixed.h gxmatrix.h gsmatrix.h gxfont.h gsccode.h gsfont.h
+gxhint2.o: gsuid.h gsstruct.h gxftype.h gxfont1.h gxtype1.h gscrypt1.h
+gxhint2.o: gstype1.h gxop1.h
+
+gxhint3.o: math_.h std.h stdpre.h arch.h gx.h stdio_.h gserror.h gsio.h
+gxhint3.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h gserrors.h gxarith.h
+gxhint3.o: gxfixed.h gxmatrix.h gsmatrix.h gxfont.h gsccode.h gsfont.h
+gxhint3.o: gsuid.h gsstruct.h gxftype.h gxfont1.h gxtype1.h gscrypt1.h
+gxhint3.o: gstype1.h gxop1.h gzpath.h gxpath.h gscpm.h gslparam.h gspenum.h
+gxhint3.o: gsrect.h gsrefct.h
+
+gxht.o: memory_.h std.h stdpre.h arch.h gx.h stdio_.h gserror.h gsio.h
+gxht.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h gserrors.h gsstruct.h
+gxht.o: gsbitops.h gsutil.h gxdcolor.h gscsel.h gsdcolor.h gsccolor.h
+gxht.o: gxarith.h gxbitmap.h gsbitmap.h gxhttile.h gxcindex.h gsropt.h
+gxht.o: gxfixed.h gxdevice.h gxdevcli.h gscompt.h gsmatrix.h gsiparam.h
+gxht.o: gsrefct.h gsxfont.h gxcvalue.h gxtext.h gstext.h gsccode.h gsparam.h
+gxht.o: gsmalloc.h gxistate.h gxline.h gslparam.h gxmatrix.h gxtmap.h gzht.h
+gxht.o: gxht.h gscsepnm.h gsht1.h gsht.h gxhttype.h gxfmap.h gxfrac.h gxdht.h
+
+gxi12bit.o: gx.h stdio_.h std.h stdpre.h arch.h gserror.h gsio.h gstypes.h
+gxi12bit.o: gsmemory.h gsmemraw.h gdebug.h memory_.h gpcheck.h gserrors.h
+gxi12bit.o: gxfixed.h gxfrac.h gxarith.h gxmatrix.h gsmatrix.h gsccolor.h
+gxi12bit.o: gsstruct.h gspaint.h gxdevice.h gxdevcli.h gscompt.h gsdcolor.h
+gxi12bit.o: gxbitmap.h gsbitmap.h gxhttile.h gxcindex.h gsbitops.h gsiparam.h
+gxi12bit.o: gsrefct.h gsropt.h gsxfont.h gxcvalue.h gxtext.h gstext.h
+gxi12bit.o: gsccode.h gsparam.h gsmalloc.h gxcmap.h gscsel.h gxfmap.h
+gxi12bit.o: gxtmap.h gxdcolor.h gxistate.h gxline.h gslparam.h gzpath.h
+gxi12bit.o: gxpath.h gscpm.h gspenum.h gsrect.h gxdevmem.h gxcpath.h
+gxi12bit.o: gximage.h gxcspace.h gscspace.h strimpl.h scommon.h siscale.h
+gxi12bit.o: gconfigv.h gxdda.h gxiparam.h gxsample.h
+
+gxicolor.o: gx.h stdio_.h std.h stdpre.h arch.h gserror.h gsio.h gstypes.h
+gxicolor.o: gsmemory.h gsmemraw.h gdebug.h memory_.h gpcheck.h gserrors.h
+gxicolor.o: gxfixed.h gxfrac.h gxarith.h gxmatrix.h gsmatrix.h gsccolor.h
+gxicolor.o: gsstruct.h gspaint.h gzstate.h gscpm.h gsrefct.h gxdcolor.h
+gxicolor.o: gscsel.h gsdcolor.h gxbitmap.h gsbitmap.h gxhttile.h gxcindex.h
+gxicolor.o: gsbitops.h gsropt.h gxistate.h gxcvalue.h gxline.h gslparam.h
+gxicolor.o: gxtmap.h gsstate.h gsdevice.h gsline.h gscolor.h gsht.h gxstate.h
+gxicolor.o: gxdevice.h gxdevcli.h gscompt.h gsiparam.h gsxfont.h gxtext.h
+gxicolor.o: gstext.h gsccode.h gsparam.h gsmalloc.h gxcmap.h gxfmap.h
+gxicolor.o: gxdcconv.h gzpath.h gxpath.h gspenum.h gsrect.h gxdevmem.h
+gxicolor.o: gxcpath.h gximage.h gxcspace.h gscspace.h strimpl.h scommon.h
+gxicolor.o: siscale.h gconfigv.h gxdda.h gxiparam.h gxsample.h
+
+gxidata.o: gx.h stdio_.h std.h stdpre.h arch.h gserror.h gsio.h gstypes.h
+gxidata.o: gsmemory.h gsmemraw.h gdebug.h memory_.h gserrors.h gxdevice.h
+gxidata.o: gxdevcli.h gscompt.h gsdcolor.h gsccolor.h gsstruct.h gxarith.h
+gxidata.o: gxbitmap.h gsbitmap.h gxhttile.h gxcindex.h gsbitops.h gsmatrix.h
+gxidata.o: gsiparam.h gsrefct.h gsropt.h gsxfont.h gxcvalue.h gxfixed.h
+gxidata.o: gxtext.h gstext.h gsccode.h gsparam.h gsmalloc.h gxcpath.h
+gxidata.o: gximage.h gxcspace.h gscspace.h gscsel.h gxfrac.h strimpl.h
+gxidata.o: scommon.h siscale.h gconfigv.h gxdda.h gxiparam.h gxsample.h
+
+gxifast.o: gx.h stdio_.h std.h stdpre.h arch.h gserror.h gsio.h gstypes.h
+gxifast.o: gsmemory.h gsmemraw.h gdebug.h memory_.h gpcheck.h gsbittab.h
+gxifast.o: gserrors.h gxfixed.h gxarith.h gxmatrix.h gsmatrix.h gsccolor.h
+gxifast.o: gsstruct.h gspaint.h gsutil.h gxdevice.h gxdevcli.h gscompt.h
+gxifast.o: gsdcolor.h gxbitmap.h gsbitmap.h gxhttile.h gxcindex.h gsbitops.h
+gxifast.o: gsiparam.h gsrefct.h gsropt.h gsxfont.h gxcvalue.h gxtext.h
+gxifast.o: gstext.h gsccode.h gsparam.h gsmalloc.h gxcmap.h gscsel.h gxfmap.h
+gxifast.o: gxfrac.h gxtmap.h gxdcolor.h gxistate.h gxline.h gslparam.h
+gxifast.o: gzpath.h gxpath.h gscpm.h gspenum.h gsrect.h gxdevmem.h gdevmem.h
+gxifast.o: gxbitops.h gxcpath.h gximage.h gxcspace.h gscspace.h strimpl.h
+gxifast.o: scommon.h siscale.h gconfigv.h gxdda.h gxiparam.h gxsample.h
+gxifast.o: gzht.h gxht.h gscsepnm.h gsht1.h gsht.h gxhttype.h gxdht.h
+
+gxiinit.o: gx.h stdio_.h std.h stdpre.h arch.h gserror.h gsio.h gstypes.h
+gxiinit.o: gsmemory.h gsmemraw.h gdebug.h math_.h memory_.h gpcheck.h
+gxiinit.o: gserrors.h gsstruct.h gsutil.h gxfixed.h gxfrac.h gxarith.h
+gxiinit.o: gxmatrix.h gsmatrix.h gsccolor.h gspaint.h gzstate.h gscpm.h
+gxiinit.o: gsrefct.h gxdcolor.h gscsel.h gsdcolor.h gxbitmap.h gsbitmap.h
+gxiinit.o: gxhttile.h gxcindex.h gsbitops.h gsropt.h gxistate.h gxcvalue.h
+gxiinit.o: gxline.h gslparam.h gxtmap.h gsstate.h gsdevice.h gsline.h
+gxiinit.o: gscolor.h gsht.h gxstate.h gxdevice.h gxdevcli.h gscompt.h
+gxiinit.o: gsiparam.h gsxfont.h gxtext.h gstext.h gsccode.h gsparam.h
+gxiinit.o: gsmalloc.h gzpath.h gxpath.h gspenum.h gsrect.h gzcpath.h
+gxiinit.o: gxcpath.h gxdevmem.h gximage.h gxcspace.h gscspace.h strimpl.h
+gxiinit.o: scommon.h siscale.h gconfigv.h gxdda.h gxiparam.h gxsample.h
+gxiinit.o: gdevmrop.h
+
+gximage3.o: math_.h std.h stdpre.h arch.h memory_.h gx.h stdio_.h gserror.h
+gximage3.o: gsio.h gstypes.h gsmemory.h gsmemraw.h gdebug.h gserrors.h
+gximage3.o: gsbitops.h gscspace.h gsiparm3.h gsiparam.h gsmatrix.h gsstruct.h
+gximage3.o: gxdevice.h gxdevcli.h gscompt.h gsdcolor.h gsccolor.h gxarith.h
+gximage3.o: gxbitmap.h gsbitmap.h gxhttile.h gxcindex.h gsrefct.h gsropt.h
+gximage3.o: gsxfont.h gxcvalue.h gxfixed.h gxtext.h gstext.h gsccode.h
+gximage3.o: gsparam.h gsmalloc.h gxdevmem.h gxclipm.h gxmclip.h gxclip.h
+gximage3.o: gxiparam.h gxistate.h gscsel.h gxline.h gslparam.h gxmatrix.h
+gximage3.o: gxtmap.h
+
+gximage4.o: memory_.h std.h stdpre.h arch.h gx.h stdio_.h gserror.h gsio.h
+gximage4.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h gserrors.h gscspace.h
+gximage4.o: gsiparm3.h gsiparam.h gsmatrix.h gsiparm4.h gxiparam.h gxdevcli.h
+gximage4.o: gscompt.h gsdcolor.h gsccolor.h gsstruct.h gxarith.h gxbitmap.h
+gximage4.o: gsbitmap.h gxhttile.h gxcindex.h gsbitops.h gsrefct.h gsropt.h
+gximage4.o: gsxfont.h gxcvalue.h gxfixed.h gxtext.h gstext.h gsccode.h
+
+gximono.o: gx.h stdio_.h std.h stdpre.h arch.h gserror.h gsio.h gstypes.h
+gximono.o: gsmemory.h gsmemraw.h gdebug.h memory_.h gpcheck.h gserrors.h
+gximono.o: gxfixed.h gxarith.h gxmatrix.h gsmatrix.h gsccolor.h gsstruct.h
+gximono.o: gspaint.h gsutil.h gxdevice.h gxdevcli.h gscompt.h gsdcolor.h
+gximono.o: gxbitmap.h gsbitmap.h gxhttile.h gxcindex.h gsbitops.h gsiparam.h
+gximono.o: gsrefct.h gsropt.h gsxfont.h gxcvalue.h gxtext.h gstext.h
+gximono.o: gsccode.h gsparam.h gsmalloc.h gxcmap.h gscsel.h gxfmap.h gxfrac.h
+gximono.o: gxtmap.h gxdcolor.h gxistate.h gxline.h gslparam.h gzpath.h
+gximono.o: gxpath.h gscpm.h gspenum.h gsrect.h gxdevmem.h gdevmem.h
+gximono.o: gxbitops.h gxcpath.h gximage.h gxcspace.h gscspace.h strimpl.h
+gximono.o: scommon.h siscale.h gconfigv.h gxdda.h gxiparam.h gxsample.h
+gximono.o: gzht.h gxht.h gscsepnm.h gsht1.h gsht.h gxhttype.h gxdht.h
+
+gxiscale.o: gx.h stdio_.h std.h stdpre.h arch.h gserror.h gsio.h gstypes.h
+gxiscale.o: gsmemory.h gsmemraw.h gdebug.h math_.h memory_.h gpcheck.h
+gxiscale.o: gserrors.h gxfixed.h gxfrac.h gxarith.h gxmatrix.h gsmatrix.h
+gxiscale.o: gsccolor.h gsstruct.h gspaint.h gxdevice.h gxdevcli.h gscompt.h
+gxiscale.o: gsdcolor.h gxbitmap.h gsbitmap.h gxhttile.h gxcindex.h gsbitops.h
+gxiscale.o: gsiparam.h gsrefct.h gsropt.h gsxfont.h gxcvalue.h gxtext.h
+gxiscale.o: gstext.h gsccode.h gsparam.h gsmalloc.h gxcmap.h gscsel.h
+gxiscale.o: gxfmap.h gxtmap.h gxdcolor.h gxistate.h gxline.h gslparam.h
+gxiscale.o: gzpath.h gxpath.h gscpm.h gspenum.h gsrect.h gxdevmem.h gxcpath.h
+gxiscale.o: gximage.h gxcspace.h gscspace.h strimpl.h scommon.h siscale.h
+gxiscale.o: gconfigv.h gxdda.h gxiparam.h gxsample.h
+
+gxmclip.o: gx.h stdio_.h std.h stdpre.h arch.h gserror.h gsio.h gstypes.h
+gxmclip.o: gsmemory.h gsmemraw.h gdebug.h gxdevice.h gxdevcli.h gscompt.h
+gxmclip.o: gsdcolor.h gsccolor.h gsstruct.h gxarith.h gxbitmap.h gsbitmap.h
+gxmclip.o: gxhttile.h gxcindex.h gsbitops.h gsmatrix.h gsiparam.h gsrefct.h
+gxmclip.o: gsropt.h gsxfont.h gxcvalue.h gxfixed.h gxtext.h gstext.h
+gxmclip.o: gsccode.h gsparam.h gsmalloc.h gxdevmem.h gxmclip.h gxclip.h
+
+gxp1fill.o: math_.h std.h stdpre.h arch.h gx.h stdio_.h gserror.h gsio.h
+gxp1fill.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h gserrors.h gsrop.h
+gxp1fill.o: gsropt.h gsmatrix.h gxcspace.h gscspace.h gsccolor.h gsstruct.h
+gxp1fill.o: gscsel.h gxfrac.h gxcolor2.h gscolor2.h gsptype1.h gspcolor.h
+gxp1fill.o: gsuid.h gxbitmap.h gsbitmap.h gsrefct.h gxdcolor.h gsdcolor.h
+gxp1fill.o: gxarith.h gxhttile.h gxcindex.h gsbitops.h gxdevcli.h gscompt.h
+gxp1fill.o: gsiparam.h gsxfont.h gxcvalue.h gxfixed.h gxtext.h gstext.h
+gxp1fill.o: gsccode.h gxdevmem.h gxclip2.h gxmclip.h gxclip.h gxpcolor.h
+gxp1fill.o: gxpcache.h gxp1fill.h
+
+gxpaint.o: gx.h stdio_.h std.h stdpre.h arch.h gserror.h gsio.h gstypes.h
+gxpaint.o: gsmemory.h gsmemraw.h gdebug.h gzstate.h gscpm.h gsrefct.h
+gxpaint.o: gxdcolor.h gscsel.h gsdcolor.h gsccolor.h gsstruct.h gxarith.h
+gxpaint.o: gxbitmap.h gsbitmap.h gxhttile.h gxcindex.h gsbitops.h gsropt.h
+gxpaint.o: gxistate.h gxcvalue.h gxfixed.h gxline.h gslparam.h gxmatrix.h
+gxpaint.o: gsmatrix.h gxtmap.h gsstate.h gsdevice.h gsline.h gscolor.h gsht.h
+gxpaint.o: gxstate.h gxdevice.h gxdevcli.h gscompt.h gsiparam.h gsxfont.h
+gxpaint.o: gxtext.h gstext.h gsccode.h gsparam.h gsmalloc.h gxpaint.h
+gxpaint.o: gxpath.h gspenum.h gsrect.h
+
+gxpath2.o: math_.h std.h stdpre.h arch.h gx.h stdio_.h gserror.h gsio.h
+gxpath2.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h gserrors.h gxfixed.h
+gxpath2.o: gxarith.h gzpath.h gxpath.h gscpm.h gslparam.h gspenum.h gsrect.h
+gxpath2.o: gsmatrix.h gsrefct.h gsstruct.h
+
+gxpath.o: gx.h stdio_.h std.h stdpre.h arch.h gserror.h gsio.h gstypes.h
+gxpath.o: gsmemory.h gsmemraw.h gdebug.h gserrors.h gsstruct.h gxfixed.h
+gxpath.o: gzpath.h gxpath.h gscpm.h gslparam.h gspenum.h gsrect.h gsmatrix.h
+gxpath.o: gsrefct.h
+
+gxpcmap.o: math_.h std.h stdpre.h arch.h memory_.h gx.h stdio_.h gserror.h
+gxpcmap.o: gsio.h gstypes.h gsmemory.h gsmemraw.h gdebug.h gserrors.h
+gxpcmap.o: gsstruct.h gsutil.h gxfixed.h gxmatrix.h gsmatrix.h gxcspace.h
+gxpcmap.o: gscspace.h gsccolor.h gscsel.h gxfrac.h gxcolor2.h gscolor2.h
+gxpcmap.o: gsptype1.h gspcolor.h gsuid.h gxbitmap.h gsbitmap.h gsrefct.h
+gxpcmap.o: gxdcolor.h gsdcolor.h gxarith.h gxhttile.h gxcindex.h gsbitops.h
+gxpcmap.o: gsropt.h gxdevice.h gxdevcli.h gscompt.h gsiparam.h gsxfont.h
+gxpcmap.o: gxcvalue.h gxtext.h gstext.h gsccode.h gsparam.h gsmalloc.h
+gxpcmap.o: gxdevmem.h gxpcolor.h gxpcache.h gzstate.h gscpm.h gxistate.h
+gxpcmap.o: gxline.h gslparam.h gxtmap.h gsstate.h gsdevice.h gsline.h
+gxpcmap.o: gscolor.h gsht.h gxstate.h gzpath.h gxpath.h gspenum.h gsrect.h
+gxpcmap.o: gzcpath.h gxcpath.h
+
+gxpcopy.o: math_.h std.h stdpre.h arch.h gx.h stdio_.h gserror.h gsio.h
+gxpcopy.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h gserrors.h gconfigv.h
+gxpcopy.o: gxfixed.h gxfarith.h gxarith.h gzpath.h gxpath.h gscpm.h
+gxpcopy.o: gslparam.h gspenum.h gsrect.h gsmatrix.h gsrefct.h gsstruct.h
+
+gxpdash.o: math_.h std.h stdpre.h arch.h gx.h stdio_.h gserror.h gsio.h
+gxpdash.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h gsmatrix.h gscoord.h
+gxpdash.o: gxfixed.h gsline.h gslparam.h gzline.h gxline.h gzpath.h gxpath.h
+gxpdash.o: gscpm.h gspenum.h gsrect.h gsrefct.h gsstruct.h
+
+gxpflat.o: gx.h stdio_.h std.h stdpre.h arch.h gserror.h gsio.h gstypes.h
+gxpflat.o: gsmemory.h gsmemraw.h gdebug.h gxarith.h gxfixed.h gzpath.h
+gxpflat.o: gxpath.h gscpm.h gslparam.h gspenum.h gsrect.h gsmatrix.h
+gxpflat.o: gsrefct.h gsstruct.h
+
+gxsample.o: gx.h stdio_.h std.h stdpre.h arch.h gserror.h gsio.h gstypes.h
+gxsample.o: gsmemory.h gsmemraw.h gdebug.h gxsample.h
+
+gxshade1.o: math_.h std.h stdpre.h arch.h gx.h stdio_.h gserror.h gsio.h
+gxshade1.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h gserrors.h gsmatrix.h
+gxshade1.o: gscoord.h gspath.h gspenum.h gxcspace.h gscspace.h gsccolor.h
+gxshade1.o: gsstruct.h gscsel.h gxfrac.h gxdcolor.h gsdcolor.h gxarith.h
+gxshade1.o: gxbitmap.h gsbitmap.h gxhttile.h gxcindex.h gsbitops.h gsropt.h
+gxshade1.o: gxfarith.h gconfigv.h gxfixed.h gxistate.h gsrefct.h gxcvalue.h
+gxshade1.o: gxline.h gslparam.h gxmatrix.h gxtmap.h gxpath.h gscpm.h gsrect.h
+gxshade1.o: gxshade.h gsshade.h gsdsrc.h gsfunc.h stream.h scommon.h
+
+gxshade4.o: memory_.h std.h stdpre.h arch.h gx.h stdio_.h gserror.h gsio.h
+gxshade4.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h gserrors.h gsmatrix.h
+gxshade4.o: gscoord.h gxcspace.h gscspace.h gsccolor.h gsstruct.h gscsel.h
+gxshade4.o: gxfrac.h gxdcolor.h gsdcolor.h gxarith.h gxbitmap.h gsbitmap.h
+gxshade4.o: gxhttile.h gxcindex.h gsbitops.h gsropt.h gxdevcli.h gscompt.h
+gxshade4.o: gsiparam.h gsrefct.h gsxfont.h gxcvalue.h gxfixed.h gxtext.h
+gxshade4.o: gstext.h gsccode.h gxistate.h gxline.h gslparam.h gxmatrix.h
+gxshade4.o: gxtmap.h gxpath.h gscpm.h gspenum.h gsrect.h gxshade.h gsshade.h
+gxshade4.o: gsdsrc.h gsfunc.h stream.h scommon.h gxshade4.h
+
+gxshade6.o: memory_.h std.h stdpre.h arch.h gx.h stdio_.h gserror.h gsio.h
+gxshade6.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h gserrors.h gsmatrix.h
+gxshade6.o: gscoord.h gxcspace.h gscspace.h gsccolor.h gsstruct.h gscsel.h
+gxshade6.o: gxfrac.h gxdcolor.h gsdcolor.h gxarith.h gxbitmap.h gsbitmap.h
+gxshade6.o: gxhttile.h gxcindex.h gsbitops.h gsropt.h gxistate.h gsrefct.h
+gxshade6.o: gxcvalue.h gxfixed.h gxline.h gslparam.h gxmatrix.h gxtmap.h
+gxshade6.o: gxshade.h gsshade.h gsdsrc.h gsfunc.h stream.h scommon.h
+gxshade6.o: gxshade4.h gzpath.h gxpath.h gscpm.h gspenum.h gsrect.h
+
+gxshade.o: math_.h std.h stdpre.h arch.h gx.h stdio_.h gserror.h gsio.h
+gxshade.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h gserrors.h gsrect.h
+gxshade.o: gxcspace.h gscspace.h gsccolor.h gsstruct.h gscsel.h gxfrac.h
+gxshade.o: gscie.h gsrefct.h gxctable.h gxfixed.h gxdevcli.h gscompt.h
+gxshade.o: gsdcolor.h gxarith.h gxbitmap.h gsbitmap.h gxhttile.h gxcindex.h
+gxshade.o: gsbitops.h gsmatrix.h gsiparam.h gsropt.h gsxfont.h gxcvalue.h
+gxshade.o: gxtext.h gstext.h gsccode.h gxistate.h gxline.h gslparam.h
+gxshade.o: gxmatrix.h gxtmap.h gxdht.h gscsepnm.h gxhttype.h gxpaint.h
+gxshade.o: gxshade.h gsshade.h gsdsrc.h gsfunc.h stream.h scommon.h
+
+gxstroke.o: math_.h std.h stdpre.h arch.h gx.h stdio_.h gserror.h gsio.h
+gxstroke.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h gpcheck.h gserrors.h
+gxstroke.o: gsdcolor.h gsccolor.h gsstruct.h gxarith.h gxbitmap.h gsbitmap.h
+gxstroke.o: gxhttile.h gxcindex.h gsbitops.h gxfixed.h gxfarith.h gconfigv.h
+gxstroke.o: gxmatrix.h gsmatrix.h gscoord.h gsdevice.h gxdevice.h gxdevcli.h
+gxstroke.o: gscompt.h gsiparam.h gsrefct.h gsropt.h gsxfont.h gxcvalue.h
+gxstroke.o: gxtext.h gstext.h gsccode.h gsparam.h gsmalloc.h gxistate.h
+gxstroke.o: gscsel.h gxline.h gslparam.h gxtmap.h gzline.h gzpath.h gxpath.h
+gxstroke.o: gscpm.h gspenum.h gsrect.h gzcpath.h gxcpath.h gxpaint.h
+
+gxtype1.o: math_.h std.h stdpre.h arch.h gx.h stdio_.h gserror.h gsio.h
+gxtype1.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h gserrors.h gsccode.h
+gxtype1.o: gsline.h gslparam.h gsstruct.h gxarith.h gxfixed.h gxistate.h
+gxtype1.o: gscsel.h gsrefct.h gsropt.h gxcvalue.h gxline.h gxmatrix.h
+gxtype1.o: gsmatrix.h gxtmap.h gxcoord.h gscoord.h gxfont.h gsfont.h gsuid.h
+gxtype1.o: gxftype.h gxfont1.h gxtype1.h gscrypt1.h gstype1.h gxop1.h
+gxtype1.o: gzpath.h gxpath.h gscpm.h gspenum.h gsrect.h
+
+ialloc.o: gx.h stdio_.h std.h stdpre.h arch.h gserror.h gsio.h gstypes.h
+ialloc.o: gsmemory.h gsmemraw.h gdebug.h memory_.h errors.h gsstruct.h
+ialloc.o: gxarith.h iref.h iastate.h gxalloc.h gsalloc.h gxobj.h gxbitmap.h
+ialloc.o: gsbitmap.h istruct.h ialloc.h imemory.h ivmspace.h gsgc.h ipacked.h
+ialloc.o: iutil.h store.h
+
+ibnum.o: math_.h std.h stdpre.h arch.h memory_.h ghost.h gx.h stdio_.h
+ibnum.o: gserror.h gsio.h gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h
+ibnum.o: errors.h stream.h scommon.h gsstruct.h ibnum.h imemory.h ivmspace.h
+ibnum.o: gsgc.h gsalloc.h iutil.h
+
+iccinit0.o: stdpre.h
+
+iconfig.o: stdio_.h std.h stdpre.h arch.h gstypes.h gsmemory.h gsmemraw.h
+iconfig.o: gconf.h gconfig.h ../config.h iref.h ivmspace.h gsgc.h opdef.h
+iconfig.o: iminst.h
+
+icontext.o: ghost.h gx.h stdio_.h std.h stdpre.h arch.h gserror.h gsio.h
+icontext.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h gsstruct.h
+icontext.o: gxalloc.h gsalloc.h gxobj.h gxbitmap.h gsbitmap.h errors.h
+icontext.o: stream.h scommon.h files.h idict.h igstate.h gsstate.h gsdevice.h
+icontext.o: gsline.h gslparam.h gscolor.h gxtmap.h gsht.h gscsel.h gxstate.h
+icontext.o: istruct.h icontext.h icstate.h imemory.h ivmspace.h gsgc.h
+icontext.o: interp.h isave.h dstack.h idstack.h istack.h estack.h iestack.h
+icontext.o: ostack.h iostack.h store.h ialloc.h
+
+idebug.o: string_.h std.h stdpre.h arch.h ghost.h gx.h stdio_.h gserror.h
+idebug.o: gsio.h gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h ialloc.h
+idebug.o: imemory.h ivmspace.h gsgc.h gsalloc.h idebug.h idict.h iname.h
+idebug.o: inames.h ipacked.h istack.h iutil.h opdef.h
+
+idict.o: string_.h std.h stdpre.h arch.h ghost.h gx.h stdio_.h gserror.h
+idict.o: gsio.h gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h errors.h
+idict.o: imemory.h ivmspace.h gsgc.h gsalloc.h idebug.h inamedef.h inames.h
+idict.o: gconfigv.h gsstruct.h iname.h ipacked.h isave.h store.h ialloc.h
+idict.o: idict.h idictdef.h iutil.h idstack.h istack.h
+
+idparam.o: memory_.h std.h stdpre.h arch.h string_.h ghost.h gx.h stdio_.h
+idparam.o: gserror.h gsio.h gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h
+idparam.o: errors.h gsmatrix.h gsuid.h idict.h idparam.h ilevel.h imemory.h
+idparam.o: ivmspace.h gsgc.h gsalloc.h iname.h inames.h iutil.h oper.h
+idparam.o: ostack.h iostack.h istack.h opdef.h opextern.h opcheck.h store.h
+idparam.o: ialloc.h
+
+idstack.o: ghost.h gx.h stdio_.h std.h stdpre.h arch.h gserror.h gsio.h
+idstack.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h idict.h idictdef.h
+idstack.o: idstack.h istack.h inamedef.h inames.h gconfigv.h gsstruct.h
+idstack.o: iname.h ipacked.h iutil.h ivmspace.h gsgc.h
+
+igcref.o: memory_.h std.h stdpre.h arch.h ghost.h gx.h stdio_.h gserror.h
+igcref.o: gsio.h gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h gsexit.h
+igcref.o: gsstruct.h iname.h inames.h iastate.h gxalloc.h gsalloc.h gxobj.h
+igcref.o: gxbitmap.h gsbitmap.h istruct.h ialloc.h imemory.h ivmspace.h
+igcref.o: gsgc.h idebug.h igc.h ipacked.h store.h
+
+igcstr.o: memory_.h std.h stdpre.h arch.h ghost.h gx.h stdio_.h gserror.h
+igcstr.o: gsio.h gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h gsmdebug.h
+igcstr.o: gsstruct.h iastate.h gxalloc.h gsalloc.h gxobj.h gxbitmap.h
+igcstr.o: gsbitmap.h istruct.h ialloc.h imemory.h ivmspace.h gsgc.h igcstr.h
+
+igc.o: memory_.h std.h stdpre.h arch.h ghost.h gx.h stdio_.h gserror.h gsio.h
+igc.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h errors.h gsexit.h
+igc.o: gsmdebug.h gsstruct.h gsutil.h iastate.h gxalloc.h gsalloc.h gxobj.h
+igc.o: gxbitmap.h gsbitmap.h istruct.h ialloc.h imemory.h ivmspace.h gsgc.h
+igc.o: isave.h isstate.h idict.h ipacked.h igc.h igcstr.h inamedef.h inames.h
+igc.o: gconfigv.h opdef.h
+
+iinit.o: string_.h std.h stdpre.h arch.h ghost.h gx.h stdio_.h gserror.h
+iinit.o: gsio.h gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h gscdefs.h
+iinit.o: gconfigv.h gsexit.h gsstruct.h errors.h ialloc.h imemory.h
+iinit.o: ivmspace.h gsgc.h gsalloc.h idict.h dstack.h idstack.h istack.h
+iinit.o: ilevel.h iname.h inames.h interp.h ipacked.h iparray.h iutil.h
+iinit.o: opdef.h store.h
+
+ilocate.o: ghost.h gx.h stdio_.h std.h stdpre.h arch.h gserror.h gsio.h
+ilocate.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h memory_.h errors.h
+ilocate.o: gsexit.h gsstruct.h iastate.h gxalloc.h gsalloc.h gxobj.h
+ilocate.o: gxbitmap.h gsbitmap.h istruct.h ialloc.h imemory.h ivmspace.h
+ilocate.o: gsgc.h idict.h igc.h igcstr.h iname.h inames.h ipacked.h isstate.h
+ilocate.o: iutil.h store.h
+
+imainarg.o: ctype_.h std.h stdpre.h arch.h memory_.h string_.h ghost.h gx.h
+imainarg.o: stdio_.h gserror.h gsio.h gstypes.h gsmemory.h gsmemraw.h
+imainarg.o: gdebug.h iref.h gp.h gpgetenv.h gsargs.h gscdefs.h gconfigv.h
+imainarg.o: gsmalloc.h gsmdebug.h gxdevice.h gxdevcli.h gscompt.h gsdcolor.h
+imainarg.o: gsccolor.h gsstruct.h gxarith.h gxbitmap.h gsbitmap.h gxhttile.h
+imainarg.o: gxcindex.h gsbitops.h gsmatrix.h gsiparam.h gsrefct.h gsropt.h
+imainarg.o: gsxfont.h gxcvalue.h gxfixed.h gxtext.h gstext.h gsccode.h
+imainarg.o: gsparam.h gxdevmem.h gsdevice.h stream.h scommon.h errors.h
+imainarg.o: estack.h iestack.h istack.h ialloc.h imemory.h ivmspace.h gsgc.h
+imainarg.o: gsalloc.h strimpl.h sfilter.h ostack.h iostack.h iscan.h sa85x.h
+imainarg.o: sstring.h imain.h gsexit.h imainarg.h iminst.h iname.h inames.h
+imainarg.o: store.h files.h interp.h iutil.h
+
+imain.o: memory_.h std.h stdpre.h arch.h string_.h ghost.h gx.h stdio_.h
+imain.o: gserror.h gsio.h gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h
+imain.o: gp.h gpgetenv.h gslib.h gsmatrix.h gsutil.h gxdevice.h gxdevcli.h
+imain.o: gscompt.h gsdcolor.h gsccolor.h gsstruct.h gxarith.h gxbitmap.h
+imain.o: gsbitmap.h gxhttile.h gxcindex.h gsbitops.h gsiparam.h gsrefct.h
+imain.o: gsropt.h gsxfont.h gxcvalue.h gxfixed.h gxtext.h gstext.h gsccode.h
+imain.o: gsparam.h gsmalloc.h errors.h oper.h ostack.h iostack.h istack.h
+imain.o: opdef.h opextern.h opcheck.h iutil.h idebug.h idict.h iname.h
+imain.o: inames.h dstack.h idstack.h estack.h iestack.h stream.h scommon.h
+imain.o: files.h ialloc.h imemory.h ivmspace.h gsgc.h gsalloc.h strimpl.h
+imain.o: sfilter.h iscan.h sa85x.h sstring.h main.h imain.h gsexit.h iminst.h
+imain.o: store.h isave.h interp.h
+
+iname.o: memory_.h std.h stdpre.h arch.h string_.h ghost.h gx.h stdio_.h
+iname.o: gserror.h gsio.h gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h
+iname.o: gsstruct.h gxobj.h gxbitmap.h gsbitmap.h errors.h inamedef.h
+iname.o: inames.h gconfigv.h imemory.h ivmspace.h gsgc.h gsalloc.h isave.h
+iname.o: store.h ialloc.h
+
+interp.o: memory_.h std.h stdpre.h arch.h string_.h ghost.h gx.h stdio_.h
+interp.o: gserror.h gsio.h gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h
+interp.o: gsstruct.h stream.h scommon.h errors.h estack.h iestack.h istack.h
+interp.o: ialloc.h imemory.h ivmspace.h gsgc.h gsalloc.h iastruct.h gxobj.h
+interp.o: gxbitmap.h gsbitmap.h icontext.h icstate.h inamedef.h inames.h
+interp.o: gconfigv.h iname.h interp.h ipacked.h ostack.h iostack.h strimpl.h
+interp.o: sfilter.h iscan.h sa85x.h sstring.h idict.h isave.h iutil.h
+interp.o: dstack.h idstack.h files.h oper.h opdef.h opextern.h opcheck.h
+interp.o: store.h
+
+iparam.o: memory_.h std.h stdpre.h arch.h string_.h ghost.h gx.h stdio_.h
+iparam.o: gserror.h gsio.h gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h
+iparam.o: errors.h oper.h ostack.h iostack.h istack.h opdef.h opextern.h
+iparam.o: opcheck.h iutil.h ialloc.h imemory.h ivmspace.h gsgc.h gsalloc.h
+iparam.o: idict.h iname.h inames.h iparam.h gsparam.h store.h
+
+ireclaim.o: ghost.h gx.h stdio_.h std.h stdpre.h arch.h gserror.h gsio.h
+ireclaim.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h errors.h
+ireclaim.o: gsstruct.h iastate.h gxalloc.h gsalloc.h gxobj.h gxbitmap.h
+ireclaim.o: gsbitmap.h istruct.h ialloc.h imemory.h ivmspace.h gsgc.h
+ireclaim.o: icontext.h icstate.h interp.h isave.h isstate.h dstack.h
+ireclaim.o: idstack.h istack.h estack.h iestack.h ostack.h iostack.h opdef.h
+ireclaim.o: store.h
+
+isave.o: ghost.h gx.h stdio_.h std.h stdpre.h arch.h gserror.h gsio.h
+isave.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h memory_.h errors.h
+isave.o: gsexit.h gsstruct.h stream.h scommon.h iastate.h gxalloc.h gsalloc.h
+isave.o: gxobj.h gxbitmap.h gsbitmap.h istruct.h ialloc.h imemory.h
+isave.o: ivmspace.h gsgc.h inamedef.h inames.h gconfigv.h iname.h ipacked.h
+isave.o: isave.h isstate.h store.h gsutil.h
+
+iscanbin.o: math_.h std.h stdpre.h arch.h memory_.h ghost.h gx.h stdio_.h
+iscanbin.o: gserror.h gsio.h gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h
+iscanbin.o: gsutil.h stream.h scommon.h gsstruct.h strimpl.h sfilter.h
+iscanbin.o: errors.h ialloc.h imemory.h ivmspace.h gsgc.h gsalloc.h idict.h
+iscanbin.o: dstack.h idstack.h istack.h ostack.h iostack.h iname.h inames.h
+iscanbin.o: iscan.h sa85x.h sstring.h iutil.h store.h btoken.h ibnum.h
+
+iscannum.o: math_.h std.h stdpre.h arch.h ghost.h gx.h stdio_.h gserror.h
+iscannum.o: gsio.h gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h errors.h
+iscannum.o: scommon.h gsstruct.h iscannum.h scanchar.h store.h ialloc.h
+iscannum.o: imemory.h ivmspace.h gsgc.h gsalloc.h
+
+iscan.o: ghost.h gx.h stdio_.h std.h stdpre.h arch.h gserror.h gsio.h
+iscan.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h memory_.h stream.h
+iscan.o: scommon.h gsstruct.h errors.h files.h ialloc.h imemory.h ivmspace.h
+iscan.o: gsgc.h gsalloc.h idict.h dstack.h idstack.h istack.h ilevel.h
+iscan.o: iname.h inames.h ipacked.h iparray.h strimpl.h sfilter.h ostack.h
+iscan.o: iostack.h iscan.h sa85x.h sstring.h iscannum.h istream.h istruct.h
+iscan.o: iutil.h store.h scanchar.h
+
+istack.o: memory_.h std.h stdpre.h arch.h ghost.h gx.h stdio_.h gserror.h
+istack.o: gsio.h gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h gsstruct.h
+istack.o: gsutil.h errors.h ialloc.h imemory.h ivmspace.h gsgc.h gsalloc.h
+istack.o: istack.h istruct.h iutil.h store.h
+
+iutil2.o: memory_.h std.h stdpre.h arch.h string_.h ghost.h gx.h stdio_.h
+iutil2.o: gserror.h gsio.h gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h
+iutil2.o: errors.h opcheck.h gsparam.h gsutil.h idict.h imemory.h ivmspace.h
+iutil2.o: gsgc.h gsalloc.h iutil.h iutil2.h
+
+iutil.o: math_.h std.h stdpre.h arch.h memory_.h string_.h ghost.h gx.h
+iutil.o: stdio_.h gserror.h gsio.h gstypes.h gsmemory.h gsmemraw.h gdebug.h
+iutil.o: iref.h errors.h idict.h imemory.h ivmspace.h gsgc.h gsalloc.h
+iutil.o: iname.h inames.h ipacked.h iutil.h oper.h ostack.h iostack.h
+iutil.o: istack.h opdef.h opextern.h opcheck.h store.h ialloc.h gsccode.h
+iutil.o: gsmatrix.h gsutil.h gxfont.h gsfont.h gsuid.h gsstruct.h gxftype.h
+
+sbcp.o: stdio_.h std.h stdpre.h arch.h strimpl.h scommon.h gsmemory.h
+sbcp.o: gsmemraw.h gstypes.h gsstruct.h sfilter.h
+
+sbhc.o: memory_.h std.h stdpre.h arch.h stdio_.h gdebug.h strimpl.h scommon.h
+sbhc.o: gsmemory.h gsmemraw.h gstypes.h gsstruct.h sbhc.h shc.h gsbittab.h
+sbhc.o: shcgen.h
+
+sbwbs.o: stdio_.h std.h stdpre.h arch.h memory_.h gdebug.h strimpl.h
+sbwbs.o: scommon.h gsmemory.h gsmemraw.h gstypes.h gsstruct.h sfilter.h
+sbwbs.o: sbwbs.h
+
+scantab.o: stdpre.h scommon.h gsmemory.h gsmemraw.h gstypes.h gsstruct.h
+scantab.o: scanchar.h
+
+scfdtab.o: std.h stdpre.h arch.h scommon.h gsmemory.h gsmemraw.h gstypes.h
+scfdtab.o: gsstruct.h scf.h shc.h gsbittab.h
+
+scfd.o: stdio_.h std.h stdpre.h arch.h memory_.h gdebug.h strimpl.h scommon.h
+scfd.o: gsmemory.h gsmemraw.h gstypes.h gsstruct.h scf.h shc.h gsbittab.h
+scfd.o: scfx.h
+
+scfetab.o: std.h stdpre.h arch.h scommon.h gsmemory.h gsmemraw.h gstypes.h
+scfetab.o: gsstruct.h scf.h shc.h gsbittab.h
+
+scfe.o: stdio_.h std.h stdpre.h arch.h memory_.h gdebug.h strimpl.h scommon.h
+scfe.o: gsmemory.h gsmemraw.h gstypes.h gsstruct.h scf.h shc.h gsbittab.h
+scfe.o: scfx.h
+
+scfparam.o: std.h stdpre.h arch.h gserror.h gserrors.h gstypes.h gsmemory.h
+scfparam.o: gsmemraw.h gsparam.h scommon.h gsstruct.h scf.h shc.h gsbittab.h
+scfparam.o: scfx.h
+
+sdcparam.o: ../config.h memory_.h std.h stdpre.h arch.h gserror.h gserrors.h
+sdcparam.o: gstypes.h gsmemory.h gsmemraw.h gsparam.h strimpl.h scommon.h
+sdcparam.o: gsstruct.h sdct.h sdcparam.h sjpeg.h
+
+sdctc.o: ../config.h stdio_.h std.h stdpre.h arch.h gsmemory.h gsmemraw.h
+sdctc.o: gsmalloc.h strimpl.h scommon.h gstypes.h gsstruct.h sdct.h
+
+sdctd.o: ../config.h memory_.h std.h stdpre.h arch.h stdio_.h gdebug.h
+sdctd.o: gsmemory.h gsmemraw.h gsmalloc.h strimpl.h scommon.h gstypes.h
+sdctd.o: gsstruct.h sdct.h sjpeg.h
+
+sdcte.o: ../config.h memory_.h std.h stdpre.h arch.h stdio_.h gdebug.h
+sdcte.o: gsmemory.h gsmemraw.h gsmalloc.h strimpl.h scommon.h gstypes.h
+sdcte.o: gsstruct.h sdct.h sjpeg.h
+
+sddparam.o: ../config.h std.h stdpre.h arch.h gserror.h gserrors.h gstypes.h
+sddparam.o: gsmemory.h gsmemraw.h gsparam.h strimpl.h scommon.h gsstruct.h
+sddparam.o: sdct.h sdcparam.h sjpeg.h
+
+sdeparam.o: ../config.h memory_.h std.h stdpre.h arch.h gserror.h gserrors.h
+sdeparam.o: gstypes.h gsmemory.h gsmemraw.h gsparam.h strimpl.h scommon.h
+sdeparam.o: gsstruct.h sdct.h sdcparam.h sjpeg.h
+
+seexec.o: stdio_.h std.h stdpre.h arch.h strimpl.h scommon.h gsmemory.h
+seexec.o: gsmemraw.h gstypes.h gsstruct.h sfilter.h gscrypt1.h scanchar.h
+
+sfilter1.o: stdio_.h std.h stdpre.h arch.h memory_.h strimpl.h scommon.h
+sfilter1.o: gsmemory.h gsmemraw.h gstypes.h gsstruct.h sfilter.h
+
+sfilter2.o: stdio_.h std.h stdpre.h arch.h memory_.h strimpl.h scommon.h
+sfilter2.o: gsmemory.h gsmemraw.h gstypes.h gsstruct.h sa85x.h sbtx.h
+sfilter2.o: scanchar.h
+
+sfxstdio.o: stdio_.h std.h stdpre.h arch.h memory_.h gdebug.h gpcheck.h
+sfxstdio.o: stream.h scommon.h gsmemory.h gsmemraw.h gstypes.h gsstruct.h
+sfxstdio.o: strimpl.h
+
+shcgen.o: memory_.h std.h stdpre.h arch.h stdio_.h gdebug.h gserror.h
+shcgen.o: gserrors.h gsmemory.h gsmemraw.h scommon.h gstypes.h gsstruct.h
+shcgen.o: shc.h gsbittab.h shcgen.h
+
+shc.o: std.h stdpre.h arch.h scommon.h gsmemory.h gsmemraw.h gstypes.h
+shc.o: gsstruct.h shc.h gsbittab.h
+
+siscale.o: math_.h std.h stdpre.h arch.h memory_.h stdio_.h strimpl.h
+siscale.o: scommon.h gsmemory.h gsmemraw.h gstypes.h gsstruct.h siscale.h
+siscale.o: gconfigv.h
+
+sjpegc.o: ../config.h stdio_.h std.h stdpre.h arch.h string_.h gx.h gserror.h
+sjpegc.o: gsio.h gstypes.h gsmemory.h gsmemraw.h gdebug.h gserrors.h
+sjpegc.o: strimpl.h scommon.h gsstruct.h sdct.h sjpeg.h
+
+sjpegd.o: ../config.h stdio_.h std.h stdpre.h arch.h string_.h gx.h gserror.h
+sjpegd.o: gsio.h gstypes.h gsmemory.h gsmemraw.h gdebug.h gserrors.h
+sjpegd.o: strimpl.h scommon.h gsstruct.h sdct.h sjpeg.h
+
+sjpegerr.o: ../config.h stdio_.h std.h stdpre.h arch.h
+
+sjpege.o: ../config.h stdio_.h std.h stdpre.h arch.h string_.h gx.h gserror.h
+sjpege.o: gsio.h gstypes.h gsmemory.h gsmemraw.h gdebug.h gserrors.h
+sjpege.o: strimpl.h scommon.h gsstruct.h sdct.h sjpeg.h
+
+slzwce.o: stdio_.h std.h stdpre.h arch.h gdebug.h strimpl.h scommon.h
+slzwce.o: gsmemory.h gsmemraw.h gstypes.h gsstruct.h slzwx.h
+
+slzwc.o: std.h stdpre.h arch.h strimpl.h scommon.h gsmemory.h gsmemraw.h
+slzwc.o: gstypes.h gsstruct.h slzwx.h
+
+slzwd.o: stdio_.h std.h stdpre.h arch.h gdebug.h strimpl.h scommon.h
+slzwd.o: gsmemory.h gsmemraw.h gstypes.h gsstruct.h slzwx.h
+
+smtf.o: stdio_.h std.h stdpre.h arch.h strimpl.h scommon.h gsmemory.h
+smtf.o: gsmemraw.h gstypes.h gsstruct.h smtf.h
+
+spcxd.o: stdio_.h std.h stdpre.h arch.h memory_.h strimpl.h scommon.h
+spcxd.o: gsmemory.h gsmemraw.h gstypes.h gsstruct.h spcxx.h
+
+spdiff.o: stdio_.h std.h stdpre.h arch.h strimpl.h scommon.h gsmemory.h
+spdiff.o: gsmemraw.h gstypes.h gsstruct.h spdiffx.h
+
+spngp.o: memory_.h std.h stdpre.h arch.h strimpl.h scommon.h gsmemory.h
+spngp.o: gsmemraw.h gstypes.h gsstruct.h spngpx.h
+
+srld.o: stdio_.h std.h stdpre.h arch.h memory_.h strimpl.h scommon.h
+srld.o: gsmemory.h gsmemraw.h gstypes.h gsstruct.h srlx.h
+
+srle.o: stdio_.h std.h stdpre.h arch.h memory_.h strimpl.h scommon.h
+srle.o: gsmemory.h gsmemraw.h gstypes.h gsstruct.h srlx.h
+
+sstring.o: stdio_.h std.h stdpre.h arch.h memory_.h string_.h strimpl.h
+sstring.o: scommon.h gsmemory.h gsmemraw.h gstypes.h gsstruct.h sstring.h
+sstring.o: scanchar.h
+
+stream.o: stdio_.h std.h stdpre.h arch.h memory_.h gdebug.h gpcheck.h
+stream.o: stream.h scommon.h gsmemory.h gsmemraw.h gstypes.h gsstruct.h
+stream.o: strimpl.h
+
+szlibc.o: ../config.h std.h stdpre.h arch.h gserror.h gserrors.h gstypes.h
+szlibc.o: gsmemory.h gsmemraw.h gsmalloc.h gsstruct.h strimpl.h scommon.h
+szlibc.o: szlibxx.h szlibx.h
+
+szlibd.o: ../config.h std.h stdpre.h arch.h gsmemory.h gsmemraw.h gsmalloc.h
+szlibd.o: strimpl.h scommon.h gstypes.h gsstruct.h szlibxx.h szlibx.h
+
+szlibe.o: ../config.h std.h stdpre.h arch.h gsmemory.h gsmemraw.h gsmalloc.h
+szlibe.o: strimpl.h scommon.h gstypes.h gsstruct.h szlibxx.h szlibx.h
+
+zarith.o: math_.h std.h stdpre.h arch.h ghost.h gx.h stdio_.h gserror.h
+zarith.o: gsio.h gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h oper.h
+zarith.o: errors.h ostack.h iostack.h istack.h opdef.h opextern.h opcheck.h
+zarith.o: iutil.h store.h ialloc.h imemory.h ivmspace.h gsgc.h gsalloc.h
+
+zarray.o: memory_.h std.h stdpre.h arch.h ghost.h gx.h stdio_.h gserror.h
+zarray.o: gsio.h gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h ialloc.h
+zarray.o: imemory.h ivmspace.h gsgc.h gsalloc.h ipacked.h oper.h errors.h
+zarray.o: ostack.h iostack.h istack.h opdef.h opextern.h opcheck.h iutil.h
+zarray.o: store.h
+
+zbseq.o: memory_.h std.h stdpre.h arch.h ghost.h gx.h stdio_.h gserror.h
+zbseq.o: gsio.h gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h oper.h
+zbseq.o: errors.h ostack.h iostack.h istack.h opdef.h opextern.h opcheck.h
+zbseq.o: iutil.h ialloc.h imemory.h ivmspace.h gsgc.h gsalloc.h btoken.h
+zbseq.o: store.h
+
+zcfont.o: ghost.h gx.h stdio_.h std.h stdpre.h arch.h gserror.h gsio.h
+zcfont.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h oper.h errors.h
+zcfont.o: ostack.h iostack.h istack.h opdef.h opextern.h opcheck.h iutil.h
+zcfont.o: gschar.h gsccode.h gscpm.h gsmatrix.h gxfixed.h gxfont.h gsfont.h
+zcfont.o: gsuid.h gsstruct.h gxftype.h gxchar.h gxtext.h gstext.h gsrefct.h
+zcfont.o: estack.h iestack.h ichar.h ifont.h igstate.h gsstate.h gsdevice.h
+zcfont.o: gsline.h gslparam.h gscolor.h gxtmap.h gsht.h gscsel.h gxstate.h
+zcfont.o: istruct.h store.h ialloc.h imemory.h ivmspace.h gsgc.h gsalloc.h
+
+zchar1.o: ghost.h gx.h stdio_.h std.h stdpre.h arch.h gserror.h gsio.h
+zchar1.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h oper.h errors.h
+zchar1.o: ostack.h iostack.h istack.h opdef.h opextern.h opcheck.h iutil.h
+zchar1.o: gsstruct.h gxfixed.h gxmatrix.h gsmatrix.h gxchar.h gschar.h
+zchar1.o: gsccode.h gscpm.h gxtext.h gstext.h gsrefct.h gxdevice.h gxdevcli.h
+zchar1.o: gscompt.h gsdcolor.h gsccolor.h gxarith.h gxbitmap.h gsbitmap.h
+zchar1.o: gxhttile.h gxcindex.h gsbitops.h gsiparam.h gsropt.h gsxfont.h
+zchar1.o: gxcvalue.h gsparam.h gsmalloc.h gxfont.h gsfont.h gsuid.h gxftype.h
+zchar1.o: gxfont1.h gxtype1.h gscrypt1.h gstype1.h gxop1.h gzstate.h
+zchar1.o: gxdcolor.h gscsel.h gxistate.h gxline.h gslparam.h gxtmap.h
+zchar1.o: gsstate.h gsdevice.h gsline.h gscolor.h gsht.h gxstate.h gspaint.h
+zchar1.o: gspath.h gspenum.h estack.h iestack.h ialloc.h imemory.h ivmspace.h
+zchar1.o: gsgc.h gsalloc.h ichar.h icharout.h idict.h ifont.h igstate.h
+zchar1.o: istruct.h iname.h inames.h store.h
+
+zchar2.o: ghost.h gx.h stdio_.h std.h stdpre.h arch.h gserror.h gsio.h
+zchar2.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h oper.h errors.h
+zchar2.o: ostack.h iostack.h istack.h opdef.h opextern.h opcheck.h iutil.h
+zchar2.o: gschar.h gsccode.h gscpm.h gsmatrix.h gsstruct.h gxfixed.h gxfont.h
+zchar2.o: gsfont.h gsuid.h gxftype.h gxchar.h gxtext.h gstext.h gsrefct.h
+zchar2.o: estack.h iestack.h ialloc.h imemory.h ivmspace.h gsgc.h gsalloc.h
+zchar2.o: ichar.h ifont.h igstate.h gsstate.h gsdevice.h gsline.h gslparam.h
+zchar2.o: gscolor.h gxtmap.h gsht.h gscsel.h gxstate.h istruct.h iname.h
+zchar2.o: inames.h store.h stream.h scommon.h ibnum.h gspath.h gspenum.h
+
+zchar32.o: ghost.h gx.h stdio_.h std.h stdpre.h arch.h gserror.h gsio.h
+zchar32.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h oper.h errors.h
+zchar32.o: ostack.h iostack.h istack.h opdef.h opextern.h opcheck.h iutil.h
+zchar32.o: gsccode.h gsmatrix.h gsutil.h gxfixed.h gxchar.h gschar.h gscpm.h
+zchar32.o: gxtext.h gstext.h gsrefct.h gxfont.h gsfont.h gsuid.h gsstruct.h
+zchar32.o: gxftype.h gxfcache.h gsxfont.h gxbcache.h gxbitmap.h gsbitmap.h
+zchar32.o: ifont.h igstate.h gsstate.h gsdevice.h gsline.h gslparam.h
+zchar32.o: gscolor.h gxtmap.h gsht.h gscsel.h gxstate.h istruct.h store.h
+zchar32.o: ialloc.h imemory.h ivmspace.h gsgc.h gsalloc.h
+
+zchar42.o: ghost.h gx.h stdio_.h std.h stdpre.h arch.h gserror.h gsio.h
+zchar42.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h oper.h errors.h
+zchar42.o: ostack.h iostack.h istack.h opdef.h opextern.h opcheck.h iutil.h
+zchar42.o: gsmatrix.h gspaint.h gspath.h gspenum.h gxfixed.h gxchar.h
+zchar42.o: gschar.h gsccode.h gscpm.h gxtext.h gstext.h gsrefct.h gxfont.h
+zchar42.o: gsfont.h gsuid.h gsstruct.h gxftype.h gxfont42.h gxistate.h
+zchar42.o: gscsel.h gsropt.h gxcvalue.h gxline.h gslparam.h gxmatrix.h
+zchar42.o: gxtmap.h gxpath.h gsrect.h gzstate.h gxdcolor.h gsdcolor.h
+zchar42.o: gsccolor.h gxarith.h gxbitmap.h gsbitmap.h gxhttile.h gxcindex.h
+zchar42.o: gsbitops.h gsstate.h gsdevice.h gsline.h gscolor.h gsht.h
+zchar42.o: gxstate.h dstack.h idstack.h estack.h iestack.h ichar.h icharout.h
+zchar42.o: ifont.h igstate.h istruct.h store.h ialloc.h imemory.h ivmspace.h
+zchar42.o: gsgc.h gsalloc.h
+
+zcharout.o: ghost.h gx.h stdio_.h std.h stdpre.h arch.h gserror.h gsio.h
+zcharout.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h oper.h errors.h
+zcharout.o: ostack.h iostack.h istack.h opdef.h opextern.h opcheck.h iutil.h
+zcharout.o: gschar.h gsccode.h gscpm.h gxdevice.h gxdevcli.h gscompt.h
+zcharout.o: gsdcolor.h gsccolor.h gsstruct.h gxarith.h gxbitmap.h gsbitmap.h
+zcharout.o: gxhttile.h gxcindex.h gsbitops.h gsmatrix.h gsiparam.h gsrefct.h
+zcharout.o: gsropt.h gsxfont.h gxcvalue.h gxfixed.h gxtext.h gstext.h
+zcharout.o: gsparam.h gsmalloc.h gxfont.h gsfont.h gsuid.h gxftype.h dstack.h
+zcharout.o: idstack.h estack.h iestack.h ichar.h icharout.h idict.h ifont.h
+zcharout.o: igstate.h gsstate.h gsdevice.h gsline.h gslparam.h gscolor.h
+zcharout.o: gxtmap.h gsht.h gscsel.h gxstate.h istruct.h store.h ialloc.h
+zcharout.o: imemory.h ivmspace.h gsgc.h gsalloc.h
+
+zchar.o: ghost.h gx.h stdio_.h std.h stdpre.h arch.h gserror.h gsio.h
+zchar.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h oper.h errors.h
+zchar.o: ostack.h iostack.h istack.h opdef.h opextern.h opcheck.h iutil.h
+zchar.o: gsstruct.h gxarith.h gxfixed.h gxmatrix.h gsmatrix.h gxchar.h
+zchar.o: gschar.h gsccode.h gscpm.h gxtext.h gstext.h gsrefct.h gxdevice.h
+zchar.o: gxdevcli.h gscompt.h gsdcolor.h gsccolor.h gxbitmap.h gsbitmap.h
+zchar.o: gxhttile.h gxcindex.h gsbitops.h gsiparam.h gsropt.h gsxfont.h
+zchar.o: gxcvalue.h gsparam.h gsmalloc.h gxfont.h gsfont.h gsuid.h gxftype.h
+zchar.o: gzpath.h gxpath.h gslparam.h gspenum.h gsrect.h gzstate.h gxdcolor.h
+zchar.o: gscsel.h gxistate.h gxline.h gxtmap.h gsstate.h gsdevice.h gsline.h
+zchar.o: gscolor.h gsht.h gxstate.h dstack.h idstack.h estack.h iestack.h
+zchar.o: ialloc.h imemory.h ivmspace.h gsgc.h gsalloc.h ichar.h idict.h
+zchar.o: ifont.h igstate.h istruct.h ilevel.h iname.h inames.h ipacked.h
+zchar.o: store.h
+
+zcid.o: ghost.h gx.h stdio_.h std.h stdpre.h arch.h gserror.h gsio.h
+zcid.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h oper.h errors.h
+zcid.o: ostack.h iostack.h istack.h opdef.h opextern.h opcheck.h iutil.h
+zcid.o: gsmatrix.h gsccode.h gxfont.h gsfont.h gsuid.h gsstruct.h gxftype.h
+zcid.o: bfont.h ifont.h iname.h inames.h store.h ialloc.h imemory.h
+zcid.o: ivmspace.h gsgc.h gsalloc.h
+
+zcie.o: math_.h std.h stdpre.h arch.h memory_.h ghost.h gx.h stdio_.h
+zcie.o: gserror.h gsio.h gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h
+zcie.o: oper.h errors.h ostack.h iostack.h istack.h opdef.h opextern.h
+zcie.o: opcheck.h iutil.h gsstruct.h gxcspace.h gscspace.h gsccolor.h
+zcie.o: gscsel.h gxfrac.h gscolor2.h gsptype1.h gspcolor.h gsuid.h gxbitmap.h
+zcie.o: gsbitmap.h gscie.h gsrefct.h gxctable.h gxfixed.h estack.h iestack.h
+zcie.o: ialloc.h imemory.h ivmspace.h gsgc.h gsalloc.h idict.h idparam.h
+zcie.o: igstate.h gsstate.h gsdevice.h gsline.h gslparam.h gscolor.h gxtmap.h
+zcie.o: gsht.h gxstate.h istruct.h icie.h isave.h store.h
+
+zcolor1.o: ghost.h gx.h stdio_.h std.h stdpre.h arch.h gserror.h gsio.h
+zcolor1.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h oper.h errors.h
+zcolor1.o: ostack.h iostack.h istack.h opdef.h opextern.h opcheck.h iutil.h
+zcolor1.o: estack.h iestack.h ialloc.h imemory.h ivmspace.h gsgc.h gsalloc.h
+zcolor1.o: igstate.h gsstate.h gsdevice.h gsline.h gslparam.h gscolor.h
+zcolor1.o: gxtmap.h gsht.h gscsel.h gxstate.h istruct.h gsstruct.h store.h
+zcolor1.o: gxfixed.h gxmatrix.h gsmatrix.h gzstate.h gscpm.h gsrefct.h
+zcolor1.o: gxdcolor.h gsdcolor.h gsccolor.h gxarith.h gxbitmap.h gsbitmap.h
+zcolor1.o: gxhttile.h gxcindex.h gsbitops.h gsropt.h gxistate.h gxcvalue.h
+zcolor1.o: gxline.h gxdevice.h gxdevcli.h gscompt.h gsiparam.h gsxfont.h
+zcolor1.o: gxtext.h gstext.h gsccode.h gsparam.h gsmalloc.h gxcmap.h gxfmap.h
+zcolor1.o: gxfrac.h gscolor1.h gxcspace.h gscspace.h icolor.h iimage.h
+
+zcolor2.o: ghost.h gx.h stdio_.h std.h stdpre.h arch.h gserror.h gsio.h
+zcolor2.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h oper.h errors.h
+zcolor2.o: ostack.h iostack.h istack.h opdef.h opextern.h opcheck.h iutil.h
+zcolor2.o: gscolor.h gxtmap.h gsmatrix.h gsstruct.h gxcspace.h gscspace.h
+zcolor2.o: gsccolor.h gscsel.h gxfrac.h gxfixed.h gxcolor2.h gscolor2.h
+zcolor2.o: gsptype1.h gspcolor.h gsuid.h gxbitmap.h gsbitmap.h gsrefct.h
+zcolor2.o: gxdcolor.h gsdcolor.h gxarith.h gxhttile.h gxcindex.h gsbitops.h
+zcolor2.o: gsropt.h gxdevice.h gxdevcli.h gscompt.h gsiparam.h gsxfont.h
+zcolor2.o: gxcvalue.h gxtext.h gstext.h gsccode.h gsparam.h gsmalloc.h
+zcolor2.o: gxdevmem.h gxpcolor.h gxpcache.h estack.h iestack.h ialloc.h
+zcolor2.o: imemory.h ivmspace.h gsgc.h gsalloc.h istruct.h idict.h idparam.h
+zcolor2.o: igstate.h gsstate.h gsdevice.h gsline.h gslparam.h gsht.h
+zcolor2.o: gxstate.h store.h
+
+zcolor.o: ghost.h gx.h stdio_.h std.h stdpre.h arch.h gserror.h gsio.h
+zcolor.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h oper.h errors.h
+zcolor.o: ostack.h iostack.h istack.h opdef.h opextern.h opcheck.h iutil.h
+zcolor.o: estack.h iestack.h ialloc.h imemory.h ivmspace.h gsgc.h gsalloc.h
+zcolor.o: igstate.h gsstate.h gsdevice.h gsline.h gslparam.h gscolor.h
+zcolor.o: gxtmap.h gsht.h gscsel.h gxstate.h istruct.h gsstruct.h store.h
+zcolor.o: gxfixed.h gxmatrix.h gsmatrix.h gzstate.h gscpm.h gsrefct.h
+zcolor.o: gxdcolor.h gsdcolor.h gsccolor.h gxarith.h gxbitmap.h gsbitmap.h
+zcolor.o: gxhttile.h gxcindex.h gsbitops.h gsropt.h gxistate.h gxcvalue.h
+zcolor.o: gxline.h gxdevice.h gxdevcli.h gscompt.h gsiparam.h gsxfont.h
+zcolor.o: gxtext.h gstext.h gsccode.h gsparam.h gsmalloc.h gxcmap.h gxfmap.h
+zcolor.o: gxfrac.h icolor.h
+
+zcontrol.o: string_.h std.h stdpre.h arch.h ghost.h gx.h stdio_.h gserror.h
+zcontrol.o: gsio.h gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h stream.h
+zcontrol.o: scommon.h gsstruct.h oper.h errors.h ostack.h iostack.h istack.h
+zcontrol.o: opdef.h opextern.h opcheck.h iutil.h estack.h iestack.h files.h
+zcontrol.o: ipacked.h store.h ialloc.h imemory.h ivmspace.h gsgc.h gsalloc.h
+
+zcrd.o: math_.h std.h stdpre.h arch.h ghost.h gx.h stdio_.h gserror.h gsio.h
+zcrd.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h oper.h errors.h
+zcrd.o: ostack.h iostack.h istack.h opdef.h opextern.h opcheck.h iutil.h
+zcrd.o: gsstruct.h gscspace.h gscolor2.h gsptype1.h gspcolor.h gsccolor.h
+zcrd.o: gsuid.h gxbitmap.h gsbitmap.h gscrd.h gscie.h gsrefct.h gxctable.h
+zcrd.o: gxfixed.h gxfrac.h estack.h iestack.h ialloc.h imemory.h ivmspace.h
+zcrd.o: gsgc.h gsalloc.h idict.h idparam.h igstate.h gsstate.h gsdevice.h
+zcrd.o: gsline.h gslparam.h gscolor.h gxtmap.h gsht.h gscsel.h gxstate.h
+zcrd.o: istruct.h icie.h store.h
+
+zcsdevn.o: ghost.h gx.h stdio_.h std.h stdpre.h arch.h gserror.h gsio.h
+zcsdevn.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h oper.h errors.h
+zcsdevn.o: ostack.h iostack.h istack.h opdef.h opextern.h opcheck.h iutil.h
+zcsdevn.o: gxcspace.h gscspace.h gsccolor.h gsstruct.h gscsel.h gxfrac.h
+zcsdevn.o: gscolor2.h gsptype1.h gspcolor.h gsuid.h gxbitmap.h gsbitmap.h
+zcsdevn.o: igstate.h gsstate.h gsdevice.h gsline.h gslparam.h gscolor.h
+zcsdevn.o: gxtmap.h gsht.h gxstate.h istruct.h ialloc.h imemory.h ivmspace.h
+zcsdevn.o: gsgc.h gsalloc.h iname.h inames.h
+
+zcsindex.o: memory_.h std.h stdpre.h arch.h ghost.h gx.h stdio_.h gserror.h
+zcsindex.o: gsio.h gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h oper.h
+zcsindex.o: errors.h ostack.h iostack.h istack.h opdef.h opextern.h opcheck.h
+zcsindex.o: iutil.h gsstruct.h gscolor.h gxtmap.h gsmatrix.h gxcspace.h
+zcsindex.o: gscspace.h gsccolor.h gscsel.h gxfrac.h gxfixed.h gxcolor2.h
+zcsindex.o: gscolor2.h gsptype1.h gspcolor.h gsuid.h gxbitmap.h gsbitmap.h
+zcsindex.o: gsrefct.h estack.h iestack.h ialloc.h imemory.h ivmspace.h gsgc.h
+zcsindex.o: gsalloc.h icsmap.h igstate.h gsstate.h gsdevice.h gsline.h
+zcsindex.o: gslparam.h gsht.h gxstate.h istruct.h store.h
+
+zcspixel.o: ghost.h gx.h stdio_.h std.h stdpre.h arch.h gserror.h gsio.h
+zcspixel.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h oper.h errors.h
+zcspixel.o: ostack.h iostack.h istack.h opdef.h opextern.h opcheck.h iutil.h
+zcspixel.o: igstate.h gsstate.h gsdevice.h gsline.h gslparam.h gscolor.h
+zcspixel.o: gxtmap.h gsht.h gscsel.h gxstate.h istruct.h gsstruct.h
+zcspixel.o: gscspace.h gsmatrix.h gscolor2.h gsptype1.h gspcolor.h gsccolor.h
+zcspixel.o: gsuid.h gxbitmap.h gsbitmap.h gscpixel.h
+
+zcssepr.o: ghost.h gx.h stdio_.h std.h stdpre.h arch.h gserror.h gsio.h
+zcssepr.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h oper.h errors.h
+zcssepr.o: ostack.h iostack.h istack.h opdef.h opextern.h opcheck.h iutil.h
+zcssepr.o: gsstruct.h gscolor.h gxtmap.h gsmatrix.h gscsepr.h gscspace.h
+zcssepr.o: gxcspace.h gsccolor.h gscsel.h gxfrac.h gxfixed.h gxcolor2.h
+zcssepr.o: gscolor2.h gsptype1.h gspcolor.h gsuid.h gxbitmap.h gsbitmap.h
+zcssepr.o: gsrefct.h estack.h iestack.h ialloc.h imemory.h ivmspace.h gsgc.h
+zcssepr.o: gsalloc.h icsmap.h igstate.h gsstate.h gsdevice.h gsline.h
+zcssepr.o: gslparam.h gsht.h gxstate.h istruct.h store.h
+
+zdevcal.o: time_.h std.h stdpre.h arch.h ../config.h ghost.h gx.h stdio_.h
+zdevcal.o: gserror.h gsio.h gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h
+zdevcal.o: gxiodev.h stat_.h istack.h iparam.h gsparam.h
+
+zdevice2.o: math_.h std.h stdpre.h arch.h memory_.h ghost.h gx.h stdio_.h
+zdevice2.o: gserror.h gsio.h gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h
+zdevice2.o: oper.h errors.h ostack.h iostack.h istack.h opdef.h opextern.h
+zdevice2.o: opcheck.h iutil.h dstack.h idstack.h estack.h iestack.h idict.h
+zdevice2.o: idparam.h igstate.h gsstate.h gsdevice.h gsline.h gslparam.h
+zdevice2.o: gscolor.h gxtmap.h gsht.h gscsel.h gxstate.h istruct.h gsstruct.h
+zdevice2.o: iname.h inames.h store.h ialloc.h imemory.h ivmspace.h gsgc.h
+zdevice2.o: gsalloc.h gxdevice.h gxdevcli.h gscompt.h gsdcolor.h gsccolor.h
+zdevice2.o: gxarith.h gxbitmap.h gsbitmap.h gxhttile.h gxcindex.h gsbitops.h
+zdevice2.o: gsmatrix.h gsiparam.h gsrefct.h gsropt.h gsxfont.h gxcvalue.h
+zdevice2.o: gxfixed.h gxtext.h gstext.h gsccode.h gsparam.h gsmalloc.h
+
+zdevice.o: string_.h std.h stdpre.h arch.h ghost.h gx.h stdio_.h gserror.h
+zdevice.o: gsio.h gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h oper.h
+zdevice.o: errors.h ostack.h iostack.h istack.h opdef.h opextern.h opcheck.h
+zdevice.o: iutil.h ialloc.h imemory.h ivmspace.h gsgc.h gsalloc.h idict.h
+zdevice.o: igstate.h gsstate.h gsdevice.h gsline.h gslparam.h gscolor.h
+zdevice.o: gxtmap.h gsht.h gscsel.h gxstate.h istruct.h gsstruct.h iname.h
+zdevice.o: inames.h interp.h iparam.h gsparam.h gsmatrix.h gxdevice.h
+zdevice.o: gxdevcli.h gscompt.h gsdcolor.h gsccolor.h gxarith.h gxbitmap.h
+zdevice.o: gsbitmap.h gxhttile.h gxcindex.h gsbitops.h gsiparam.h gsrefct.h
+zdevice.o: gsropt.h gsxfont.h gxcvalue.h gxfixed.h gxtext.h gstext.h
+zdevice.o: gsccode.h gsmalloc.h gxgetbit.h gxbitfmt.h store.h
+
+zdict.o: ghost.h gx.h stdio_.h std.h stdpre.h arch.h gserror.h gsio.h
+zdict.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h oper.h errors.h
+zdict.o: ostack.h iostack.h istack.h opdef.h opextern.h opcheck.h iutil.h
+zdict.o: idict.h dstack.h idstack.h ilevel.h iname.h inames.h ipacked.h
+zdict.o: ivmspace.h gsgc.h store.h ialloc.h imemory.h gsalloc.h
+
+zdps1.o: ghost.h gx.h stdio_.h std.h stdpre.h arch.h gserror.h gsio.h
+zdps1.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h oper.h errors.h
+zdps1.o: ostack.h iostack.h istack.h opdef.h opextern.h opcheck.h iutil.h
+zdps1.o: gsmatrix.h gspath.h gspenum.h gspath2.h gsstate.h gsdevice.h
+zdps1.o: gsline.h gslparam.h gscolor.h gxtmap.h gsht.h gscsel.h ialloc.h
+zdps1.o: imemory.h ivmspace.h gsgc.h gsalloc.h igstate.h gxstate.h istruct.h
+zdps1.o: gsstruct.h store.h stream.h scommon.h ibnum.h
+
+zfbcp.o: memory_.h std.h stdpre.h arch.h ghost.h gx.h stdio_.h gserror.h
+zfbcp.o: gsio.h gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h oper.h
+zfbcp.o: errors.h ostack.h iostack.h istack.h opdef.h opextern.h opcheck.h
+zfbcp.o: iutil.h gsstruct.h ialloc.h imemory.h ivmspace.h gsgc.h gsalloc.h
+zfbcp.o: stream.h scommon.h strimpl.h sfilter.h ifilter.h istream.h
+
+zfcmap.o: ghost.h gx.h stdio_.h std.h stdpre.h arch.h gserror.h gsio.h
+zfcmap.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h oper.h errors.h
+zfcmap.o: ostack.h iostack.h istack.h opdef.h opextern.h opcheck.h iutil.h
+zfcmap.o: gsmatrix.h gsstruct.h gsutil.h gxfcmap.h gsfcmap.h gsccode.h
+zfcmap.o: gsuid.h gxfont.h gsfont.h gxftype.h ialloc.h imemory.h ivmspace.h
+zfcmap.o: gsgc.h gsalloc.h idict.h idparam.h ifont.h iname.h inames.h store.h
+
+zfdctd.o: ../config.h memory_.h std.h stdpre.h arch.h stdio_.h ghost.h gx.h
+zfdctd.o: gserror.h gsio.h gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h
+zfdctd.o: oper.h errors.h ostack.h iostack.h istack.h opdef.h opextern.h
+zfdctd.o: opcheck.h iutil.h gsmalloc.h strimpl.h scommon.h gsstruct.h sdct.h
+zfdctd.o: sjpeg.h ialloc.h imemory.h ivmspace.h gsgc.h gsalloc.h ifilter.h
+zfdctd.o: istream.h iparam.h gsparam.h
+
+zfdcte.o: ../config.h memory_.h std.h stdpre.h arch.h stdio_.h ghost.h gx.h
+zfdcte.o: gserror.h gsio.h gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h
+zfdcte.o: oper.h errors.h ostack.h iostack.h istack.h opdef.h opextern.h
+zfdcte.o: opcheck.h iutil.h gsmalloc.h ialloc.h imemory.h ivmspace.h gsgc.h
+zfdcte.o: gsalloc.h idict.h idparam.h strimpl.h scommon.h gsstruct.h sdct.h
+zfdcte.o: sjpeg.h ifilter.h istream.h iparam.h gsparam.h
+
+zfdecode.o: memory_.h std.h stdpre.h arch.h ghost.h gx.h stdio_.h gserror.h
+zfdecode.o: gsio.h gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h oper.h
+zfdecode.o: errors.h ostack.h iostack.h istack.h opdef.h opextern.h opcheck.h
+zfdecode.o: iutil.h gsparam.h gsstruct.h ialloc.h imemory.h ivmspace.h gsgc.h
+zfdecode.o: gsalloc.h idict.h idparam.h ilevel.h iparam.h store.h stream.h
+zfdecode.o: scommon.h strimpl.h sfilter.h sa85x.h scfx.h shc.h gsbittab.h
+zfdecode.o: scf.h slzwx.h spdiffx.h spngpx.h ifilter.h istream.h
+
+zfileio.o: ghost.h gx.h stdio_.h std.h stdpre.h arch.h gserror.h gsio.h
+zfileio.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h gp.h gpgetenv.h
+zfileio.o: oper.h errors.h ostack.h iostack.h istack.h opdef.h opextern.h
+zfileio.o: opcheck.h iutil.h stream.h scommon.h gsstruct.h files.h store.h
+zfileio.o: ialloc.h imemory.h ivmspace.h gsgc.h gsalloc.h strimpl.h ifilter.h
+zfileio.o: istream.h gsmatrix.h gxdevice.h gxdevcli.h gscompt.h gsdcolor.h
+zfileio.o: gsccolor.h gxarith.h gxbitmap.h gsbitmap.h gxhttile.h gxcindex.h
+zfileio.o: gsbitops.h gsiparam.h gsrefct.h gsropt.h gsxfont.h gxcvalue.h
+zfileio.o: gxfixed.h gxtext.h gstext.h gsccode.h gsparam.h gsmalloc.h
+zfileio.o: gxdevmem.h
+
+zfile.o: memory_.h std.h stdpre.h arch.h string_.h ghost.h gx.h stdio_.h
+zfile.o: gserror.h gsio.h gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h
+zfile.o: gscdefs.h gconfigv.h gp.h gpgetenv.h gsstruct.h gxalloc.h gsalloc.h
+zfile.o: gxobj.h gxbitmap.h gsbitmap.h oper.h errors.h ostack.h iostack.h
+zfile.o: istack.h opdef.h opextern.h opcheck.h iutil.h estack.h iestack.h
+zfile.o: ialloc.h imemory.h ivmspace.h gsgc.h ilevel.h interp.h isave.h
+zfile.o: stream.h scommon.h strimpl.h sfilter.h gxiodev.h stat_.h files.h
+zfile.o: fname.h main.h imain.h gsexit.h iminst.h store.h
+
+zfilter2.o: memory_.h std.h stdpre.h arch.h ghost.h gx.h stdio_.h gserror.h
+zfilter2.o: gsio.h gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h oper.h
+zfilter2.o: errors.h ostack.h iostack.h istack.h opdef.h opextern.h opcheck.h
+zfilter2.o: iutil.h gsstruct.h ialloc.h imemory.h ivmspace.h gsgc.h gsalloc.h
+zfilter2.o: idict.h idparam.h store.h strimpl.h scommon.h sfilter.h scfx.h
+zfilter2.o: shc.h gsbittab.h slzwx.h spdiffx.h spngpx.h ifilter.h istream.h
+
+zfilterx.o: memory_.h std.h stdpre.h arch.h ghost.h gx.h stdio_.h gserror.h
+zfilterx.o: gsio.h gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h oper.h
+zfilterx.o: errors.h ostack.h iostack.h istack.h opdef.h opextern.h opcheck.h
+zfilterx.o: iutil.h gsstruct.h ialloc.h imemory.h ivmspace.h gsgc.h gsalloc.h
+zfilterx.o: idict.h idparam.h store.h strimpl.h scommon.h sfilter.h sbwbs.h
+zfilterx.o: sbhc.h shc.h gsbittab.h sbtx.h shcgen.h smtf.h spcxx.h ifilter.h
+zfilterx.o: istream.h
+
+zfilter.o: memory_.h std.h stdpre.h arch.h ghost.h gx.h stdio_.h gserror.h
+zfilter.o: gsio.h gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h oper.h
+zfilter.o: errors.h ostack.h iostack.h istack.h opdef.h opextern.h opcheck.h
+zfilter.o: iutil.h gsstruct.h ialloc.h imemory.h ivmspace.h gsgc.h gsalloc.h
+zfilter.o: idict.h idparam.h ilevel.h stream.h scommon.h strimpl.h sfilter.h
+zfilter.o: srlx.h sstring.h ifilter.h istream.h files.h
+
+zfname.o: memory_.h std.h stdpre.h arch.h ghost.h gx.h stdio_.h gserror.h
+zfname.o: gsio.h gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h oper.h
+zfname.o: errors.h ostack.h iostack.h istack.h opdef.h opextern.h opcheck.h
+zfname.o: iutil.h ialloc.h imemory.h ivmspace.h gsgc.h gsalloc.h stream.h
+zfname.o: scommon.h gsstruct.h gxiodev.h stat_.h fname.h
+
+zfont0.o: ghost.h gx.h stdio_.h std.h stdpre.h arch.h gserror.h gsio.h
+zfont0.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h oper.h errors.h
+zfont0.o: ostack.h iostack.h istack.h opdef.h opextern.h opcheck.h iutil.h
+zfont0.o: gsstruct.h gxfixed.h gxmatrix.h gsmatrix.h gzstate.h gscpm.h
+zfont0.o: gsrefct.h gxdcolor.h gscsel.h gsdcolor.h gsccolor.h gxarith.h
+zfont0.o: gxbitmap.h gsbitmap.h gxhttile.h gxcindex.h gsbitops.h gsropt.h
+zfont0.o: gxistate.h gxcvalue.h gxline.h gslparam.h gxtmap.h gsstate.h
+zfont0.o: gsdevice.h gsline.h gscolor.h gsht.h gxstate.h gxdevice.h
+zfont0.o: gxdevcli.h gscompt.h gsiparam.h gsxfont.h gxtext.h gstext.h
+zfont0.o: gsccode.h gsparam.h gsmalloc.h gschar.h gxfcmap.h gsfcmap.h gsuid.h
+zfont0.o: gxfont.h gsfont.h gxftype.h gxfont0.h bfont.h ifont.h ialloc.h
+zfont0.o: imemory.h ivmspace.h gsgc.h gsalloc.h idict.h idparam.h igstate.h
+zfont0.o: istruct.h iname.h inames.h store.h
+
+zfont1.o: ghost.h gx.h stdio_.h std.h stdpre.h arch.h gserror.h gsio.h
+zfont1.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h oper.h errors.h
+zfont1.o: ostack.h iostack.h istack.h opdef.h opextern.h opcheck.h iutil.h
+zfont1.o: gxfixed.h gsmatrix.h gxdevice.h gxdevcli.h gscompt.h gsdcolor.h
+zfont1.o: gsccolor.h gsstruct.h gxarith.h gxbitmap.h gsbitmap.h gxhttile.h
+zfont1.o: gxcindex.h gsbitops.h gsiparam.h gsrefct.h gsropt.h gsxfont.h
+zfont1.o: gxcvalue.h gxtext.h gstext.h gsccode.h gsparam.h gsmalloc.h
+zfont1.o: gschar.h gscpm.h gxfont.h gsfont.h gsuid.h gxftype.h gxfont1.h
+zfont1.o: bfont.h ifont.h ialloc.h imemory.h ivmspace.h gsgc.h gsalloc.h
+zfont1.o: idict.h idparam.h store.h
+
+zfont2.o: memory_.h std.h stdpre.h arch.h string_.h ghost.h gx.h stdio_.h
+zfont2.o: gserror.h gsio.h gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h
+zfont2.o: oper.h errors.h ostack.h iostack.h istack.h opdef.h opextern.h
+zfont2.o: opcheck.h iutil.h gxfixed.h gsmatrix.h gxdevice.h gxdevcli.h
+zfont2.o: gscompt.h gsdcolor.h gsccolor.h gsstruct.h gxarith.h gxbitmap.h
+zfont2.o: gsbitmap.h gxhttile.h gxcindex.h gsbitops.h gsiparam.h gsrefct.h
+zfont2.o: gsropt.h gsxfont.h gxcvalue.h gxtext.h gstext.h gsccode.h gsparam.h
+zfont2.o: gsmalloc.h gschar.h gscpm.h gxfont.h gsfont.h gsuid.h gxftype.h
+zfont2.o: bfont.h ifont.h ialloc.h imemory.h ivmspace.h gsgc.h gsalloc.h
+zfont2.o: idict.h idparam.h ilevel.h iname.h inames.h interp.h ipacked.h
+zfont2.o: istruct.h store.h
+
+zfont32.o: ghost.h gx.h stdio_.h std.h stdpre.h arch.h gserror.h gsio.h
+zfont32.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h oper.h errors.h
+zfont32.o: ostack.h iostack.h istack.h opdef.h opextern.h opcheck.h iutil.h
+zfont32.o: gsccode.h gsmatrix.h gsutil.h gxfixed.h gxchar.h gschar.h gscpm.h
+zfont32.o: gxtext.h gstext.h gsrefct.h gxfont.h gsfont.h gsuid.h gsstruct.h
+zfont32.o: gxftype.h bfont.h ifont.h store.h ialloc.h imemory.h ivmspace.h
+zfont32.o: gsgc.h gsalloc.h
+
+zfont42.o: memory_.h std.h stdpre.h arch.h ghost.h gx.h stdio_.h gserror.h
+zfont42.o: gsio.h gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h oper.h
+zfont42.o: errors.h ostack.h iostack.h istack.h opdef.h opextern.h opcheck.h
+zfont42.o: iutil.h gsccode.h gsmatrix.h gxfont.h gsfont.h gsuid.h gsstruct.h
+zfont42.o: gxftype.h gxfont42.h bfont.h ifont.h idict.h idparam.h store.h
+zfont42.o: ialloc.h imemory.h ivmspace.h gsgc.h gsalloc.h
+
+zfont.o: ghost.h gx.h stdio_.h std.h stdpre.h arch.h gserror.h gsio.h
+zfont.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h oper.h errors.h
+zfont.o: ostack.h iostack.h istack.h opdef.h opextern.h opcheck.h iutil.h
+zfont.o: gsstruct.h gzstate.h gscpm.h gsrefct.h gxdcolor.h gscsel.h
+zfont.o: gsdcolor.h gsccolor.h gxarith.h gxbitmap.h gsbitmap.h gxhttile.h
+zfont.o: gxcindex.h gsbitops.h gsropt.h gxistate.h gxcvalue.h gxfixed.h
+zfont.o: gxline.h gslparam.h gxmatrix.h gsmatrix.h gxtmap.h gsstate.h
+zfont.o: gsdevice.h gsline.h gscolor.h gsht.h gxstate.h gxdevice.h gxdevcli.h
+zfont.o: gscompt.h gsiparam.h gsxfont.h gxtext.h gstext.h gsccode.h gsparam.h
+zfont.o: gsmalloc.h gschar.h gxfont.h gsfont.h gsuid.h gxftype.h gxfcache.h
+zfont.o: gxbcache.h bfont.h ifont.h ialloc.h imemory.h ivmspace.h gsgc.h
+zfont.o: gsalloc.h idict.h igstate.h istruct.h iname.h inames.h isave.h
+zfont.o: store.h
+
+zfproc.o: memory_.h std.h stdpre.h arch.h ghost.h gx.h stdio_.h gserror.h
+zfproc.o: gsio.h gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h oper.h
+zfproc.o: errors.h ostack.h iostack.h istack.h opdef.h opextern.h opcheck.h
+zfproc.o: iutil.h estack.h iestack.h gsstruct.h ialloc.h imemory.h ivmspace.h
+zfproc.o: gsgc.h gsalloc.h istruct.h stream.h scommon.h strimpl.h ifilter.h
+zfproc.o: istream.h files.h store.h
+
+zfreuse.o: memory_.h std.h stdpre.h arch.h ghost.h gx.h stdio_.h gserror.h
+zfreuse.o: gsio.h gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h oper.h
+zfreuse.o: errors.h ostack.h iostack.h istack.h opdef.h opextern.h opcheck.h
+zfreuse.o: iutil.h stream.h scommon.h gsstruct.h strimpl.h sfilter.h files.h
+zfreuse.o: idict.h idparam.h iname.h inames.h store.h ialloc.h imemory.h
+zfreuse.o: ivmspace.h gsgc.h gsalloc.h
+
+zfunc0.o: memory_.h std.h stdpre.h arch.h ghost.h gx.h stdio_.h gserror.h
+zfunc0.o: gsio.h gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h oper.h
+zfunc0.o: errors.h ostack.h iostack.h istack.h opdef.h opextern.h opcheck.h
+zfunc0.o: iutil.h gsdsrc.h gsstruct.h gsfunc.h gsfunc0.h stream.h scommon.h
+zfunc0.o: files.h ialloc.h imemory.h ivmspace.h gsgc.h gsalloc.h idict.h
+zfunc0.o: idparam.h ifunc.h
+
+zfunc3.o: memory_.h std.h stdpre.h arch.h ghost.h gx.h stdio_.h gserror.h
+zfunc3.o: gsio.h gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h oper.h
+zfunc3.o: errors.h ostack.h iostack.h istack.h opdef.h opextern.h opcheck.h
+zfunc3.o: iutil.h gsfunc3.h gsfunc.h gsdsrc.h gsstruct.h stream.h scommon.h
+zfunc3.o: files.h ialloc.h imemory.h ivmspace.h gsgc.h gsalloc.h idict.h
+zfunc3.o: idparam.h ifunc.h store.h
+
+zfunc.o: memory_.h std.h stdpre.h arch.h ghost.h gx.h stdio_.h gserror.h
+zfunc.o: gsio.h gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h oper.h
+zfunc.o: errors.h ostack.h iostack.h istack.h opdef.h opextern.h opcheck.h
+zfunc.o: iutil.h gsfunc.h gsstruct.h ialloc.h imemory.h ivmspace.h gsgc.h
+zfunc.o: gsalloc.h idict.h idparam.h ifunc.h store.h
+
+zfzlib.o: ../config.h ghost.h gx.h stdio_.h std.h stdpre.h arch.h gserror.h
+zfzlib.o: gsio.h gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h oper.h
+zfzlib.o: errors.h ostack.h iostack.h istack.h opdef.h opextern.h opcheck.h
+zfzlib.o: iutil.h idict.h strimpl.h scommon.h gsstruct.h spdiffx.h spngpx.h
+zfzlib.o: szlibx.h ifilter.h istream.h ivmspace.h gsgc.h
+
+zgeneric.o: memory_.h std.h stdpre.h arch.h ghost.h gx.h stdio_.h gserror.h
+zgeneric.o: gsio.h gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h oper.h
+zgeneric.o: errors.h ostack.h iostack.h istack.h opdef.h opextern.h opcheck.h
+zgeneric.o: iutil.h estack.h iestack.h idict.h iname.h inames.h ipacked.h
+zgeneric.o: ivmspace.h gsgc.h store.h ialloc.h imemory.h gsalloc.h
+
+zgstate.o: math_.h std.h stdpre.h arch.h ghost.h gx.h stdio_.h gserror.h
+zgstate.o: gsio.h gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h oper.h
+zgstate.o: errors.h ostack.h iostack.h istack.h opdef.h opextern.h opcheck.h
+zgstate.o: iutil.h ialloc.h imemory.h ivmspace.h gsgc.h gsalloc.h idict.h
+zgstate.o: istruct.h gsstruct.h igstate.h gsstate.h gsdevice.h gsline.h
+zgstate.o: gslparam.h gscolor.h gxtmap.h gsht.h gscsel.h gxstate.h gsmatrix.h
+zgstate.o: store.h
+
+zhsb.o: ghost.h gx.h stdio_.h std.h stdpre.h arch.h gserror.h gsio.h
+zhsb.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h oper.h errors.h
+zhsb.o: ostack.h iostack.h istack.h opdef.h opextern.h opcheck.h iutil.h
+zhsb.o: igstate.h gsstate.h gsdevice.h gsline.h gslparam.h gscolor.h gxtmap.h
+zhsb.o: gsht.h gscsel.h gxstate.h istruct.h gsstruct.h store.h ialloc.h
+zhsb.o: imemory.h ivmspace.h gsgc.h gsalloc.h gshsb.h
+
+zht1.o: ghost.h gx.h stdio_.h std.h stdpre.h arch.h gserror.h gsio.h
+zht1.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h memory_.h oper.h
+zht1.o: errors.h ostack.h iostack.h istack.h opdef.h opextern.h opcheck.h
+zht1.o: iutil.h estack.h iestack.h gsstruct.h ialloc.h imemory.h ivmspace.h
+zht1.o: gsgc.h gsalloc.h igstate.h gsstate.h gsdevice.h gsline.h gslparam.h
+zht1.o: gscolor.h gxtmap.h gsht.h gscsel.h gxstate.h istruct.h gsmatrix.h
+zht1.o: gxdevice.h gxdevcli.h gscompt.h gsdcolor.h gsccolor.h gxarith.h
+zht1.o: gxbitmap.h gsbitmap.h gxhttile.h gxcindex.h gsbitops.h gsiparam.h
+zht1.o: gsrefct.h gsropt.h gsxfont.h gxcvalue.h gxfixed.h gxtext.h gstext.h
+zht1.o: gsccode.h gsparam.h gsmalloc.h gzht.h gxht.h gscsepnm.h gsht1.h
+zht1.o: gxhttype.h gxfmap.h gxfrac.h gxdht.h iht.h store.h
+
+zht2.o: ghost.h gx.h stdio_.h std.h stdpre.h arch.h gserror.h gsio.h
+zht2.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h oper.h errors.h
+zht2.o: ostack.h iostack.h istack.h opdef.h opextern.h opcheck.h iutil.h
+zht2.o: gsstruct.h gxdevice.h gxdevcli.h gscompt.h gsdcolor.h gsccolor.h
+zht2.o: gxarith.h gxbitmap.h gsbitmap.h gxhttile.h gxcindex.h gsbitops.h
+zht2.o: gsmatrix.h gsiparam.h gsrefct.h gsropt.h gsxfont.h gxcvalue.h
+zht2.o: gxfixed.h gxtext.h gstext.h gsccode.h gsparam.h gsmalloc.h gzht.h
+zht2.o: gscsel.h gxht.h gscsepnm.h gsht1.h gsht.h gxhttype.h gxtmap.h
+zht2.o: gxfmap.h gxfrac.h gxdht.h estack.h iestack.h ialloc.h imemory.h
+zht2.o: ivmspace.h gsgc.h gsalloc.h idict.h idparam.h igstate.h gsstate.h
+zht2.o: gsdevice.h gsline.h gslparam.h gscolor.h gxstate.h istruct.h icolor.h
+zht2.o: iht.h store.h
+
+zht.o: ghost.h gx.h stdio_.h std.h stdpre.h arch.h gserror.h gsio.h gstypes.h
+zht.o: gsmemory.h gsmemraw.h gdebug.h iref.h memory_.h oper.h errors.h
+zht.o: ostack.h iostack.h istack.h opdef.h opextern.h opcheck.h iutil.h
+zht.o: estack.h iestack.h gsstruct.h ialloc.h imemory.h ivmspace.h gsgc.h
+zht.o: gsalloc.h igstate.h gsstate.h gsdevice.h gsline.h gslparam.h gscolor.h
+zht.o: gxtmap.h gsht.h gscsel.h gxstate.h istruct.h gsmatrix.h gxdevice.h
+zht.o: gxdevcli.h gscompt.h gsdcolor.h gsccolor.h gxarith.h gxbitmap.h
+zht.o: gsbitmap.h gxhttile.h gxcindex.h gsbitops.h gsiparam.h gsrefct.h
+zht.o: gsropt.h gsxfont.h gxcvalue.h gxfixed.h gxtext.h gstext.h gsccode.h
+zht.o: gsparam.h gsmalloc.h gzht.h gxht.h gscsepnm.h gsht1.h gxhttype.h
+zht.o: gxfmap.h gxfrac.h gxdht.h iht.h store.h
+
+zimage2.o: math_.h std.h stdpre.h arch.h memory_.h ghost.h gx.h stdio_.h
+zimage2.o: gserror.h gsio.h gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h
+zimage2.o: oper.h errors.h ostack.h iostack.h istack.h opdef.h opextern.h
+zimage2.o: opcheck.h iutil.h gscolor.h gxtmap.h gscspace.h gscolor2.h
+zimage2.o: gsptype1.h gspcolor.h gsccolor.h gsstruct.h gsuid.h gxbitmap.h
+zimage2.o: gsbitmap.h gsmatrix.h gsimage.h gsiparam.h gxfixed.h idict.h
+zimage2.o: idparam.h iimage.h iimage2.h ilevel.h igstate.h gsstate.h
+zimage2.o: gsdevice.h gsline.h gslparam.h gsht.h gscsel.h gxstate.h istruct.h
+
+zimage3.o: memory_.h std.h stdpre.h arch.h ghost.h gx.h stdio_.h gserror.h
+zimage3.o: gsio.h gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h oper.h
+zimage3.o: errors.h ostack.h iostack.h istack.h opdef.h opextern.h opcheck.h
+zimage3.o: iutil.h gscspace.h gscolor2.h gsptype1.h gspcolor.h gsccolor.h
+zimage3.o: gsstruct.h gsuid.h gxbitmap.h gsbitmap.h gsiparm3.h gsiparam.h
+zimage3.o: gsmatrix.h gsiparm4.h gxiparam.h gxdevcli.h gscompt.h gsdcolor.h
+zimage3.o: gxarith.h gxhttile.h gxcindex.h gsbitops.h gsrefct.h gsropt.h
+zimage3.o: gsxfont.h gxcvalue.h gxfixed.h gxtext.h gstext.h gsccode.h idict.h
+zimage3.o: idparam.h igstate.h gsstate.h gsdevice.h gsline.h gslparam.h
+zimage3.o: gscolor.h gxtmap.h gsht.h gscsel.h gxstate.h istruct.h iimage.h
+zimage3.o: iimage2.h
+
+zimage.o: ghost.h gx.h stdio_.h std.h stdpre.h arch.h gserror.h gsio.h
+zimage.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h oper.h errors.h
+zimage.o: ostack.h iostack.h istack.h opdef.h opextern.h opcheck.h iutil.h
+zimage.o: estack.h iestack.h gsstruct.h ialloc.h imemory.h ivmspace.h gsgc.h
+zimage.o: gsalloc.h igstate.h gsstate.h gsdevice.h gsline.h gslparam.h
+zimage.o: gscolor.h gxtmap.h gsht.h gscsel.h gxstate.h istruct.h ilevel.h
+zimage.o: store.h gscspace.h gsmatrix.h gsimage.h gsiparam.h gxiparam.h
+zimage.o: gxdevcli.h gscompt.h gsdcolor.h gsccolor.h gxarith.h gxbitmap.h
+zimage.o: gsbitmap.h gxhttile.h gxcindex.h gsbitops.h gsrefct.h gsropt.h
+zimage.o: gsxfont.h gxcvalue.h gxfixed.h gxtext.h gstext.h gsccode.h stream.h
+zimage.o: scommon.h ifilter.h istream.h iimage.h
+
+ziodev2.o: string_.h std.h stdpre.h arch.h ghost.h gx.h stdio_.h gserror.h
+ziodev2.o: gsio.h gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h gp.h
+ziodev2.o: gpgetenv.h oper.h errors.h ostack.h iostack.h istack.h opdef.h
+ziodev2.o: opextern.h opcheck.h iutil.h stream.h scommon.h gsstruct.h
+ziodev2.o: gxiodev.h stat_.h dstack.h idstack.h files.h iparam.h gsparam.h
+ziodev2.o: iutil2.h store.h ialloc.h imemory.h ivmspace.h gsgc.h gsalloc.h
+
+ziodev.o: memory_.h std.h stdpre.h arch.h stdio_.h string_.h ghost.h gx.h
+ziodev.o: gserror.h gsio.h gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h
+ziodev.o: gp.h gpgetenv.h gpcheck.h gsstruct.h oper.h errors.h ostack.h
+ziodev.o: iostack.h istack.h opdef.h opextern.h opcheck.h iutil.h stream.h
+ziodev.o: scommon.h ialloc.h imemory.h ivmspace.h gsgc.h gsalloc.h iscan.h
+ziodev.o: sa85x.h sstring.h gxiodev.h stat_.h files.h scanchar.h store.h
+
+zmath.o: math_.h std.h stdpre.h arch.h ghost.h gx.h stdio_.h gserror.h gsio.h
+zmath.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h gxfarith.h
+zmath.o: gconfigv.h gxarith.h oper.h errors.h ostack.h iostack.h istack.h
+zmath.o: opdef.h opextern.h opcheck.h iutil.h store.h ialloc.h imemory.h
+zmath.o: ivmspace.h gsgc.h gsalloc.h
+
+zmatrix.o: ghost.h gx.h stdio_.h std.h stdpre.h arch.h gserror.h gsio.h
+zmatrix.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h oper.h errors.h
+zmatrix.o: ostack.h iostack.h istack.h opdef.h opextern.h opcheck.h iutil.h
+zmatrix.o: igstate.h gsstate.h gsdevice.h gsline.h gslparam.h gscolor.h
+zmatrix.o: gxtmap.h gsht.h gscsel.h gxstate.h istruct.h gsstruct.h gsmatrix.h
+zmatrix.o: gscoord.h store.h ialloc.h imemory.h ivmspace.h gsgc.h gsalloc.h
+
+zmedia2.o: math_.h std.h stdpre.h arch.h memory_.h ghost.h gx.h stdio_.h
+zmedia2.o: gserror.h gsio.h gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h
+zmedia2.o: gsmatrix.h oper.h errors.h ostack.h iostack.h istack.h opdef.h
+zmedia2.o: opextern.h opcheck.h iutil.h idict.h idparam.h iname.h inames.h
+zmedia2.o: store.h ialloc.h imemory.h ivmspace.h gsgc.h gsalloc.h
+
+zmisc1.o: memory_.h std.h stdpre.h arch.h ghost.h gx.h stdio_.h gserror.h
+zmisc1.o: gsio.h gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h oper.h
+zmisc1.o: errors.h ostack.h iostack.h istack.h opdef.h opextern.h opcheck.h
+zmisc1.o: iutil.h gscrypt1.h stream.h scommon.h gsstruct.h strimpl.h
+zmisc1.o: sfilter.h idict.h idparam.h ifilter.h istream.h ivmspace.h gsgc.h
+
+zmisc2.o: memory_.h std.h stdpre.h arch.h string_.h ghost.h gx.h stdio_.h
+zmisc2.o: gserror.h gsio.h gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h
+zmisc2.o: oper.h errors.h ostack.h iostack.h istack.h opdef.h opextern.h
+zmisc2.o: opcheck.h iutil.h estack.h iestack.h idict.h idparam.h iparam.h
+zmisc2.o: gsparam.h dstack.h idstack.h ilevel.h iname.h inames.h iutil2.h
+zmisc2.o: ivmspace.h gsgc.h store.h ialloc.h imemory.h gsalloc.h
+
+zmisc3.o: ghost.h gx.h stdio_.h std.h stdpre.h arch.h gserror.h gsio.h
+zmisc3.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h gsclipsr.h oper.h
+zmisc3.o: errors.h ostack.h iostack.h istack.h opdef.h opextern.h opcheck.h
+zmisc3.o: iutil.h igstate.h gsstate.h gsdevice.h gsline.h gslparam.h
+zmisc3.o: gscolor.h gxtmap.h gsht.h gscsel.h gxstate.h istruct.h gsstruct.h
+zmisc3.o: store.h ialloc.h imemory.h ivmspace.h gsgc.h gsalloc.h
+
+zmisc.o: errno_.h std.h stdpre.h arch.h memory_.h string_.h ghost.h gx.h
+zmisc.o: stdio_.h gserror.h gsio.h gstypes.h gsmemory.h gsmemraw.h gdebug.h
+zmisc.o: iref.h gscdefs.h gconfigv.h gp.h gpgetenv.h oper.h errors.h ostack.h
+zmisc.o: iostack.h istack.h opdef.h opextern.h opcheck.h iutil.h ialloc.h
+zmisc.o: imemory.h ivmspace.h gsgc.h gsalloc.h idict.h dstack.h idstack.h
+zmisc.o: iname.h inames.h ipacked.h store.h
+
+zpacked.o: ghost.h gx.h stdio_.h std.h stdpre.h arch.h gserror.h gsio.h
+zpacked.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h ialloc.h imemory.h
+zpacked.o: ivmspace.h gsgc.h gsalloc.h idict.h iname.h inames.h istack.h
+zpacked.o: ipacked.h iparray.h oper.h errors.h ostack.h iostack.h opdef.h
+zpacked.o: opextern.h opcheck.h iutil.h store.h
+
+zpaint.o: ghost.h gx.h stdio_.h std.h stdpre.h arch.h gserror.h gsio.h
+zpaint.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h oper.h errors.h
+zpaint.o: ostack.h iostack.h istack.h opdef.h opextern.h opcheck.h iutil.h
+zpaint.o: gspaint.h igstate.h gsstate.h gsdevice.h gsline.h gslparam.h
+zpaint.o: gscolor.h gxtmap.h gsht.h gscsel.h gxstate.h istruct.h gsstruct.h
+
+zpath1.o: memory_.h std.h stdpre.h arch.h ghost.h gx.h stdio_.h gserror.h
+zpath1.o: gsio.h gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h oper.h
+zpath1.o: errors.h ostack.h iostack.h istack.h opdef.h opextern.h opcheck.h
+zpath1.o: iutil.h estack.h iestack.h ialloc.h imemory.h ivmspace.h gsgc.h
+zpath1.o: gsalloc.h igstate.h gsstate.h gsdevice.h gsline.h gslparam.h
+zpath1.o: gscolor.h gxtmap.h gsht.h gscsel.h gxstate.h istruct.h gsstruct.h
+zpath1.o: gspath.h gspenum.h store.h
+
+zpath.o: math_.h std.h stdpre.h arch.h ghost.h gx.h stdio_.h gserror.h gsio.h
+zpath.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h oper.h errors.h
+zpath.o: ostack.h iostack.h istack.h opdef.h opextern.h opcheck.h iutil.h
+zpath.o: igstate.h gsstate.h gsdevice.h gsline.h gslparam.h gscolor.h
+zpath.o: gxtmap.h gsht.h gscsel.h gxstate.h istruct.h gsstruct.h gsmatrix.h
+zpath.o: gspath.h gspenum.h store.h ialloc.h imemory.h ivmspace.h gsgc.h
+zpath.o: gsalloc.h
+
+zpcolor.o: ghost.h gx.h stdio_.h std.h stdpre.h arch.h gserror.h gsio.h
+zpcolor.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h oper.h errors.h
+zpcolor.o: ostack.h iostack.h istack.h opdef.h opextern.h opcheck.h iutil.h
+zpcolor.o: gscolor.h gxtmap.h gsmatrix.h gsstruct.h gxcspace.h gscspace.h
+zpcolor.o: gsccolor.h gscsel.h gxfrac.h gxfixed.h gxcolor2.h gscolor2.h
+zpcolor.o: gsptype1.h gspcolor.h gsuid.h gxbitmap.h gsbitmap.h gsrefct.h
+zpcolor.o: gxdcolor.h gsdcolor.h gxarith.h gxhttile.h gxcindex.h gsbitops.h
+zpcolor.o: gsropt.h gxdevice.h gxdevcli.h gscompt.h gsiparam.h gsxfont.h
+zpcolor.o: gxcvalue.h gxtext.h gstext.h gsccode.h gsparam.h gsmalloc.h
+zpcolor.o: gxdevmem.h gxpcolor.h gxpcache.h estack.h iestack.h ialloc.h
+zpcolor.o: imemory.h ivmspace.h gsgc.h gsalloc.h istruct.h idict.h idparam.h
+zpcolor.o: igstate.h gsstate.h gsdevice.h gsline.h gslparam.h gsht.h
+zpcolor.o: gxstate.h store.h
+
+zrelbit.o: ghost.h gx.h stdio_.h std.h stdpre.h arch.h gserror.h gsio.h
+zrelbit.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h oper.h errors.h
+zrelbit.o: ostack.h iostack.h istack.h opdef.h opextern.h opcheck.h iutil.h
+zrelbit.o: gsutil.h idict.h store.h ialloc.h imemory.h ivmspace.h gsgc.h
+zrelbit.o: gsalloc.h
+
+zshade.o: memory_.h std.h stdpre.h arch.h ghost.h gx.h stdio_.h gserror.h
+zshade.o: gsio.h gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h oper.h
+zshade.o: errors.h ostack.h iostack.h istack.h opdef.h opextern.h opcheck.h
+zshade.o: iutil.h gscolor3.h gscspace.h gscolor2.h gsptype1.h gspcolor.h
+zshade.o: gsccolor.h gsstruct.h gsuid.h gxbitmap.h gsbitmap.h gsfunc3.h
+zshade.o: gsfunc.h gsdsrc.h gsshade.h gsmatrix.h stream.h scommon.h files.h
+zshade.o: ialloc.h imemory.h ivmspace.h gsgc.h gsalloc.h idict.h idparam.h
+zshade.o: ifunc.h igstate.h gsstate.h gsdevice.h gsline.h gslparam.h
+zshade.o: gscolor.h gxtmap.h gsht.h gscsel.h gxstate.h istruct.h store.h
+
+zstack.o: memory_.h std.h stdpre.h arch.h ghost.h gx.h stdio_.h gserror.h
+zstack.o: gsio.h gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h ialloc.h
+zstack.o: imemory.h ivmspace.h gsgc.h gsalloc.h istack.h oper.h errors.h
+zstack.o: ostack.h iostack.h opdef.h opextern.h opcheck.h iutil.h store.h
+
+zstring.o: memory_.h std.h stdpre.h arch.h ghost.h gx.h stdio_.h gserror.h
+zstring.o: gsio.h gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h gsutil.h
+zstring.o: ialloc.h imemory.h ivmspace.h gsgc.h gsalloc.h iname.h inames.h
+zstring.o: oper.h errors.h ostack.h iostack.h istack.h opdef.h opextern.h
+zstring.o: opcheck.h iutil.h store.h
+
+zsysvm.o: ghost.h gx.h stdio_.h std.h stdpre.h arch.h gserror.h gsio.h
+zsysvm.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h oper.h errors.h
+zsysvm.o: ostack.h iostack.h istack.h opdef.h opextern.h opcheck.h iutil.h
+zsysvm.o: ialloc.h imemory.h ivmspace.h gsgc.h gsalloc.h store.h
+
+ztoken.o: ghost.h gx.h stdio_.h std.h stdpre.h arch.h gserror.h gsio.h
+ztoken.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h oper.h errors.h
+ztoken.o: ostack.h iostack.h istack.h opdef.h opextern.h opcheck.h iutil.h
+ztoken.o: estack.h iestack.h gsstruct.h stream.h scommon.h files.h store.h
+ztoken.o: ialloc.h imemory.h ivmspace.h gsgc.h gsalloc.h strimpl.h sfilter.h
+ztoken.o: iscan.h sa85x.h sstring.h
+
+ztrap.o: ghost.h gx.h stdio_.h std.h stdpre.h arch.h gserror.h gsio.h
+ztrap.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h oper.h errors.h
+ztrap.o: ostack.h iostack.h istack.h opdef.h opextern.h opcheck.h iutil.h
+ztrap.o: ialloc.h imemory.h ivmspace.h gsgc.h gsalloc.h iparam.h gsparam.h
+ztrap.o: gstrap.h
+
+ztype.o: math_.h std.h stdpre.h arch.h memory_.h string_.h gsexit.h ghost.h
+ztype.o: gx.h stdio_.h gserror.h gsio.h gstypes.h gsmemory.h gsmemraw.h
+ztype.o: gdebug.h iref.h oper.h errors.h ostack.h iostack.h istack.h opdef.h
+ztype.o: opextern.h opcheck.h iutil.h imemory.h ivmspace.h gsgc.h gsalloc.h
+ztype.o: idict.h iname.h inames.h stream.h scommon.h gsstruct.h strimpl.h
+ztype.o: sfilter.h iscan.h sa85x.h sstring.h dstack.h idstack.h store.h
+ztype.o: ialloc.h
+
+zupath.o: ghost.h gx.h stdio_.h std.h stdpre.h arch.h gserror.h gsio.h
+zupath.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h oper.h errors.h
+zupath.o: ostack.h iostack.h istack.h opdef.h opextern.h opcheck.h iutil.h
+zupath.o: idict.h dstack.h idstack.h igstate.h gsstate.h gsdevice.h gsline.h
+zupath.o: gslparam.h gscolor.h gxtmap.h gsht.h gscsel.h gxstate.h istruct.h
+zupath.o: gsstruct.h iname.h inames.h store.h ialloc.h imemory.h ivmspace.h
+zupath.o: gsgc.h gsalloc.h stream.h scommon.h ibnum.h gsmatrix.h gscoord.h
+zupath.o: gspaint.h gxfixed.h gxdevice.h gxdevcli.h gscompt.h gsdcolor.h
+zupath.o: gsccolor.h gxarith.h gxbitmap.h gsbitmap.h gxhttile.h gxcindex.h
+zupath.o: gsbitops.h gsiparam.h gsrefct.h gsropt.h gsxfont.h gxcvalue.h
+zupath.o: gxtext.h gstext.h gsccode.h gsparam.h gsmalloc.h gspath.h gspenum.h
+zupath.o: gzpath.h gxpath.h gscpm.h gsrect.h gzstate.h gxdcolor.h gxistate.h
+zupath.o: gxline.h gxmatrix.h
+
+zusparam.o: memory_.h std.h stdpre.h arch.h string_.h ghost.h gx.h stdio_.h
+zusparam.o: gserror.h gsio.h gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h
+zusparam.o: oper.h errors.h ostack.h iostack.h istack.h opdef.h opextern.h
+zusparam.o: opcheck.h iutil.h gscdefs.h gconfigv.h gsstruct.h gsfont.h gxht.h
+zusparam.o: gscsepnm.h gsht1.h gsht.h gsrefct.h gxhttype.h gxtmap.h gsutil.h
+zusparam.o: estack.h iestack.h ialloc.h imemory.h ivmspace.h gsgc.h gsalloc.h
+zusparam.o: icontext.h icstate.h idict.h idparam.h iparam.h gsparam.h
+zusparam.o: dstack.h idstack.h iname.h inames.h iutil2.h store.h
+
+zvmem2.o: ghost.h gx.h stdio_.h std.h stdpre.h arch.h gserror.h gsio.h
+zvmem2.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h oper.h errors.h
+zvmem2.o: ostack.h iostack.h istack.h opdef.h opextern.h opcheck.h iutil.h
+zvmem2.o: estack.h iestack.h ialloc.h imemory.h ivmspace.h gsgc.h gsalloc.h
+zvmem2.o: store.h
+
+zvmem.o: ghost.h gx.h stdio_.h std.h stdpre.h arch.h gserror.h gsio.h
+zvmem.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h gsstruct.h oper.h
+zvmem.o: errors.h ostack.h iostack.h istack.h opdef.h opextern.h opcheck.h
+zvmem.o: iutil.h estack.h iestack.h ialloc.h imemory.h ivmspace.h gsgc.h
+zvmem.o: gsalloc.h idict.h igstate.h gsstate.h gsdevice.h gsline.h gslparam.h
+zvmem.o: gscolor.h gxtmap.h gsht.h gscsel.h gxstate.h istruct.h isave.h
+zvmem.o: dstack.h idstack.h stream.h scommon.h files.h store.h gsmalloc.h
+zvmem.o: gsmatrix.h
+
+genarch.o: stdpre.h
+
+pstoraster.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/string.h
+pstoraster.o: ../config.h ../cups/md5.h ../cups/ppd.h ../cups/string.h
+pstoraster.o: ghost.h gx.h stdio_.h std.h stdpre.h arch.h gserror.h gsio.h
+pstoraster.o: gstypes.h gsmemory.h gsmemraw.h gdebug.h iref.h imain.h
+pstoraster.o: gsexit.h iminst.h istack.h interp.h ostack.h iostack.h
+pstoraster.o: opextern.h gscdefs.h gconfigv.h store.h ialloc.h imemory.h
+pstoraster.o: ivmspace.h gsgc.h gsalloc.h
