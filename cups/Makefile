@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.53.2.25 2003/08/31 11:25:34 mike Exp $"
+# "$Id: Makefile,v 1.53.2.26 2003/12/03 03:57:19 mike Exp $"
 #
 #   API library Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -212,6 +212,18 @@ testlang:	testlang.o libcups.a
 
 
 #
+# Automatic API reference manual...
+#
+
+apirm.xml:	$(HEADERS) $(LIBOBJS:.o=.c)
+	echo Generating CUPS API Reference Manual...
+	$(RM) apirm.xml
+	mxmldoc apirm.xml $(HEADERS) $(LIBOBJS:.o=.c) >../doc/apirm.html
+#	valgrind --leak-check=yes ~/c/mxml/mxmldoc apirm.xml \
+#		$(HEADERS) $(LIBOBJS:.o=.c) >../doc/apirm.html 2>apirm.out
+
+
+#
 # Dependencies...
 #
 
@@ -219,5 +231,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile,v 1.53.2.25 2003/08/31 11:25:34 mike Exp $".
+# End of "$Id: Makefile,v 1.53.2.26 2003/12/03 03:57:19 mike Exp $".
 #
