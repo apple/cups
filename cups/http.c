@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.11 1999/01/29 22:01:48 mike Exp $"
+ * "$Id: http.c,v 1.12 1999/01/30 13:25:55 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -64,6 +64,10 @@
 
 #include "http.h"
 #include <stdarg.h>
+
+#ifdef WIN32
+#  define strcasecmp(s,t) stricmp(s,t)
+#endif /* WIN32 */
 
 
 /*
@@ -234,8 +238,11 @@ httpConnect(char *host,		/* I - Host to connect to */
   memset((char *)&(http->hostaddr), 0, sizeof(http->hostaddr));
   memcpy((char *)&(http->hostaddr.sin_addr), hostaddr->h_addr, hostaddr->h_length);
   http->hostaddr.sin_family = hostaddr->h_addrtype;
+#ifdef WIN32
+  http->hostaddr.sin_port   = htons((u_short)port);
+#else
   http->hostaddr.sin_port   = htons(port);
-
+#endif /* WIN32 */
   if (httpReconnect(http))
   {
     free(http);
@@ -280,7 +287,7 @@ httpReconnect(http_t *http)	/* I - HTTP data */
 #endif /* FD_CLOEXEC */
 
   val = 1;
-  setsockopt(http->fd, SOL_SOCKET, SO_REUSEADDR, &val, sizeof(val));
+  setsockopt(http->fd, SOL_SOCKET, SO_REUSEADDR, (char *)&val, sizeof(val));
 
 #ifdef SO_REUSEPORT
   val = 1;
@@ -317,14 +324,25 @@ void
 httpBlocking(http_t *http,	/* I - HTTP data */
              int    blocking)	/* I - 1 = block on reads, 0 = don't block */
 {
+#ifdef WIN32
+  u_long val;
+
   if (http == NULL)
     return;
 
-  http->blocking = blocking;
+  val = !blocking;
+  ioctlsocket(http->fd, FIONBIO, &val);
+#else
+  if (http == NULL)
+    return;
+
   if (blocking)
     fcntl(http->fd, F_SETFL, fcntl(http->fd, F_GETFL) & ~FNONBLK);
   else
     fcntl(http->fd, F_SETFL, fcntl(http->fd, F_GETFL) | FNONBLK);
+#endif /* WIN32 */
+
+  http->blocking = blocking;
 }
 
 
@@ -579,8 +597,7 @@ httpRead(http_t *http,			/* I - HTTP data */
          char   *buffer,		/* I - Buffer for data */
 	 int    length)			/* I - Maximum number of bytes */
 {
-  int		tbytes,			/* Total bytes read */
-		bytes;			/* Bytes read */
+  int		bytes;			/* Bytes read */
   char		len[32];		/* Length string */
 
 
@@ -1313,5 +1330,5 @@ http_sighandler(int sig)	/* I - Signal number */
 
 
 /*
- * End of "$Id: http.c,v 1.11 1999/01/29 22:01:48 mike Exp $".
+ * End of "$Id: http.c,v 1.12 1999/01/30 13:25:55 mike Exp $".
  */

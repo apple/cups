@@ -1,5 +1,5 @@
 /*
- * "$Id: emit.c,v 1.5 1999/01/28 22:00:44 mike Exp $"
+ * "$Id: emit.c,v 1.6 1999/01/30 13:25:54 mike Exp $"
  *
  *   PPD code emission routines for the Common UNIX Printing System (CUPS).
  *
@@ -34,6 +34,11 @@
  */
 
 #include "ppd.h"
+#ifdef WIN32
+#  include <io.h>
+#else
+#  include <unistd.h>
+#endif /* WIN32 */
 
 
 /*
@@ -279,5 +284,5 @@ ppd_collect(ppd_file_t    *ppd,		/* I - PPD file data */
 
 
 /*
- * End of "$Id: emit.c,v 1.5 1999/01/28 22:00:44 mike Exp $".
+ * End of "$Id: emit.c,v 1.6 1999/01/30 13:25:54 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c,v 1.4 1999/01/27 18:31:57 mike Exp $"
+ * "$Id: ppd.c,v 1.5 1999/01/30 13:25:57 mike Exp $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -40,6 +40,7 @@
  */
 
 #include "ppd.h"
+#include <ctype.h>
 /*#define DEBUG*/
 
 
@@ -1318,5 +1319,5 @@ ppd_decode(unsigned char *string)	/* I - String to decode */
 
 
 /*
- * End of "$Id: ppd.c,v 1.4 1999/01/27 18:31:57 mike Exp $".
+ * End of "$Id: ppd.c,v 1.5 1999/01/30 13:25:57 mike Exp $".
  */

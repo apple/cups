@@ -3,7 +3,7 @@ Microsoft Developer Studio Workspace File, Format Version 6.00
 
 ###############################################################################
 
-Project: "cups"=.\cups.dsp - Package Owner=<4>
+Project: "cups"=.\cups\cups.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -11,6 +11,36 @@ Package=<5>
 
 Package=<4>
 {{{
+}}}
+
+###############################################################################
+
+Project: "testmime"=.\cups\testmime.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name cups
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "testppd"=.\cups\testppd.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name cups
+    End Project Dependency
 }}}
 
 ###############################################################################
