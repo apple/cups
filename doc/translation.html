@@ -1,0 +1,610 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<TITLE>CUPS Translation Guide</TITLE>
+<META NAME="author" CONTENT="Easy Software Products">
+<META NAME="copyright" CONTENT="Copyright 2001-2003, All Rights Reserved">
+<META NAME="docnumber" CONTENT="CUPS-TRANS-1.1">
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-8859-1">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+--></STYLE>
+</HEAD>
+<BODY BGCOLOR="white">
+<CENTER><A HREF="#CONTENTS"><IMG SRC="images/cups-large.gif" BORDER="0" WIDTH="431" HEIGHT="511"><BR>
+<H1>CUPS Translation Guide</H1></A><BR>
+CUPS-TRANS-1.1<BR>
+Easy Software Products<BR>
+Copyright 2001-2003, All Rights Reserved<BR>
+</CENTER>
+<HR>
+<H1 ALIGN="CENTER"><A NAME="CONTENTS">Table of Contents</A></H1>
+<BR>
+<BR><B><A HREF="#1">1 Scope</A></B>
+<UL>
+<LI><A HREF="#1_1">1.1 Identification</A></LI>
+<LI><A HREF="#1_2">1.2 System Overview</A></LI>
+<LI><A HREF="#1_3">1.3 Document Overview</A></LI>
+</UL>
+<B><A HREF="#2">2 References</A></B>
+<UL>
+<LI><A HREF="#2_1">2.1 CUPS Documentation</A></LI>
+<LI><A HREF="#2_2">2.2 Other Documents</A></LI>
+</UL>
+<B><A HREF="#3">3 Character Sets</A></B>
+<BR>
+<BR><B><A HREF="#4">4 Message Catalogs</A></B>
+<BR>
+<BR><B><A HREF="#5">5 Web Interfaces</A></B>
+<UL>
+<LI><A HREF="#5_1">5.1 Template Files</A></LI>
+<UL>
+<LI><A HREF="#5_1_1">5.1.1 Inserting Attributes and Values</A></LI>
+<LI><A HREF="#5_1_2">5.1.2 Array Substitutions</A></LI>
+<LI><A HREF="#5_1_3">5.1.3 Conditional Tests</A></LI>
+<LI><A HREF="#5_1_4">5.1.4 Template File List</A></LI>
+</UL>
+<LI><A HREF="#5_2">5.2 CGI Programs</A></LI>
+<UL>
+<LI><A HREF="#5_2_1">5.2.1 admin.cgi</A></LI>
+<LI><A HREF="#5_2_2">5.2.2 classes.cgi</A></LI>
+<LI><A HREF="#5_2_3">5.2.3 jobs.cgi</A></LI>
+<LI><A HREF="#5_2_4">5.2.4 printers.cgi</A></LI>
+</UL>
+</UL>
+<B><A HREF="#6">A Glossary</A></B>
+<UL>
+<LI><A HREF="#6_1">A.1 Terms</A></LI>
+<LI><A HREF="#6_2">A.2 Acronyms</A></LI>
+</UL>
+<HR>
+<H1><A NAME="1">1 Scope</A></H1>
+<H2><A NAME="1_1">1.1 Identification</A></H2>
+<P>This translation guide provides instructions for creating
+ translations of the CUPS message catalogs and web pages for the Common
+ UNIX Printing System (&quot;CUPS&quot;) Version 1.1 software.</P>
+<H2><A NAME="1_2">1.2 System Overview</A></H2>
+<P>CUPS provides a portable printing layer for UNIX&reg;-based operating
+ systems. It has been developed by<A HREF="http://www.easysw.com"> Easy
+ Software Products</A> to promote a standard printing solution for all
+ UNIX vendors and users. CUPS provides the System V and Berkeley
+ command-line interfaces.</P>
+<P>CUPS uses the Internet Printing Protocol (&quot;IPP&quot;) as the basis for
+ managing print jobs and queues. The Line Printer Daemon (&quot;LPD&quot;) Server
+ Message Block (&quot;SMB&quot;), and AppSocket (a.k.a. JetDirect) protocols are
+ also supported with reduced functionality. CUPS adds network printer
+ browsing and PostScript Printer Description (&quot;PPD&quot;) based printing
+ options to support real-world printing under UNIX.</P>
+<P>CUPS also includes a customized version of GNU Ghostscript (currently
+ based off GNU Ghostscript 5.50) and an image file RIP that are used to
+ support non-PostScript printers. Sample drivers for HP and EPSON
+ printers are included that use these filters.</P>
+<H2><A NAME="1_3">1.3 Document Overview</A></H2>
+<P>This translation guide is organized into the following sections:</P>
+<UL>
+<LI>1 - Scope</LI>
+<LI>2 - References</LI>
+<LI>3 - Character Sets</LI>
+<LI>4 - Message Catalogs</LI>
+<LI>5 - Web Interfaces</LI>
+<LI>A - Glossary</LI>
+</UL>
+<H1><A NAME="2">2 References</A></H1>
+<H2><A NAME="2_1">2.1 CUPS Documentation</A></H2>
+<P>The following CUPS documentation is referenced by this document:</P>
+<UL>
+<LI>CUPS-CMP-1.1: CUPS Configuration Management Plan</LI>
+<LI>CUPS-IDD-1.1: CUPS System Interface Design Description</LI>
+<LI>CUPS-IPP-1.1: CUPS Implementation of IPP</LI>
+<LI>CUPS-SAM-1.1.x: CUPS Software Administrators Manual</LI>
+<LI>CUPS-SDD-1.1: CUPS Software Design Description</LI>
+<LI>CUPS-SPM-1.1.x: CUPS Software Programming Manual</LI>
+<LI>CUPS-SSR-1.1: CUPS Software Security Report</LI>
+<LI>CUPS-STP-1.1: CUPS Software Test Plan</LI>
+<LI>CUPS-SUM-1.1.x: CUPS Software Users Manual</LI>
+<LI>CUPS-SVD-1.1: CUPS Software Version Description</LI>
+</UL>
+<H2><A NAME="2_2">2.2 Other Documents</A></H2>
+<P>The following non-CUPS documents are referenced by this document:</P>
+<UL>
+<LI><A HREF="http://partners.adobe.com/asn/developer/PDFS/TN/5003.PPD_Spec_v4.3.pdf">
+Adobe PostScript Printer Description File Format Specification, Version
+ 4.3.</A></LI>
+<LI><A HREF="http://partners.adobe.com/asn/developer/PDFS/TN/PLRM.pdf">
+Adobe PostScript Language Reference, Third Edition.</A></LI>
+<LI>IPP/1.1: Implementers Guide</LI>
+<LI><A HREF="http://www.ietf.org/rfc/rfc1179.txt">RFC 1179, Line Printer
+ Daemon Protocol</A></LI>
+<LI><A HREF="http://www.ietf.org/rfc/rfc2396.txt">RFC 2396, Uniform
+ Resource Identifiers (URI): Generic Syntax</A></LI>
+<LI><A HREF="http://www.ietf.org/rfc/rfc2567.txt">RFC 2567, Design Goals
+ for an Internet Printing Protocol</A></LI>
+<LI><A HREF="http://www.ietf.org/rfc/rfc2568.txt">RFC 2568, Rationale
+ for the Structure of the Model and Protocol for the Internet Printing
+ Protocol</A></LI>
+<LI><A HREF="http://www.ietf.org/rfc/rfc2569.txt">RFC 2569, Mapping
+ between LPD and IPP Protocols</A></LI>
+<LI><A HREF="http://www.ietf.org/rfc/rfc2616.txt">RFC 2616, Hypertext
+ Transfer Protocol -- HTTP/1.1</A></LI>
+<LI><A HREF="http://www.ietf.org/rfc/rfc2617.txt">RFC 2617, HTTP
+ Authentication: Basic and Digest Access</A> Authentication</LI>
+<LI><A HREF="http://www.ietf.org/rfc/rfc2910.txt">RFC 2910, IPP/1.1:
+ Encoding and Transport</A></LI>
+<LI><A HREF="http://www.ietf.org/rfc/rfc2911.txt">RFC 2911, IPP/1.1:
+ Model and Semantics</A></LI>
+<LI><A HREF="http://www.ietf.org/rfc/rfc3380.txt">RFC 3380, IPP: Job and
+ Printer Set Operations</A></LI>
+</UL>
+<H1><A NAME="3">3 Character Sets</A></H1>
+<P>CUPS uses character set files to define the mapping of local
+ character sets to Unicode code points, as well as the fonts that should
+ be used for different ranges of characters.</P>
+<P>CUPS includes files for common 8-bit encodings as well as UTF-8 for
+ Unicode text. The format of these files is described in the CUPS
+ Interface Design Description (IDD) document. Current character sets are
+ enumerated in the CUPS API, so in order to add a new character set you
+ must patch the CUPS source as well as provide a new charset file.</P>
+<P>CUPS 1.1 supports the following character sets:</P>
+<UL>
+<LI>iso-8859-1</LI>
+<LI>iso-8859-2</LI>
+<LI>iso-8859-3</LI>
+<LI>iso-8859-4</LI>
+<LI>iso-8859-5</LI>
+<LI>iso-8859-6</LI>
+<LI>iso-8859-7</LI>
+<LI>iso-8859-8</LI>
+<LI>iso-8859-9</LI>
+<LI>iso-8859-10</LI>
+<LI>iso-8859-13</LI>
+<LI>iso-8859-14</LI>
+<LI>iso-8859-15</LI>
+<LI>koi8-r</LI>
+<LI>koi8-u</LI>
+<LI>us-ascii</LI>
+<LI>utf-8</LI>
+<LI>windows-874</LI>
+<LI>windows-1250</LI>
+<LI>windows-1251</LI>
+<LI>windows-1252</LI>
+<LI>windows-1253</LI>
+<LI>windows-1254</LI>
+<LI>windows-1255</LI>
+<LI>windows-1256</LI>
+<LI>windows-1257</LI>
+<LI>windows-1258</LI>
+</UL>
+<H1><A NAME="4">4 Message Catalogs</A></H1>
+<P>CUPS message catalogs are text files that identify the default
+ character set for the locale and a list of localized message strings
+ for the CUPS software. The format of the message catalog files is
+ described in the CUPS IDD.</P>
+<P>Message catalogs are named<VAR> cups_ll</VAR>,<VAR> cups_ll_CC</VAR>,
+ or<VAR> cups_ll_CC.charset</VAR>, where &quot;ll&quot; is the standard 2-letter
+ abbreviation for the language, &quot;CC&quot; is the standard 2-letter
+ abbreviation for the country, and &quot;charset&quot; is the charset name which
+ may differ from the list above.</P>
+<P>Each message catalog file is stored in a subdirectory named<VAR> ll</VAR>
+,<VAR> ll_CC</VAR>, or<VAR> ll_CC.charset</VAR> to match the trailing
+ portion of the message catalog filename.</P>
+<P>When translating a new message catalog, copy the<VAR> cups_C</VAR>
+ message catalog file to a new subdirectory; to translate the message
+ catalog to Canadian French, you would type the following commands:</P>
+<UL>
+<PRE>
+<KBD>cd locale <I>ENTER</I></KBD>
+<KBD>mkdir fr_CA <I>ENTER</I></KBD>
+<KBD>cp C/cups_C fr_CA/cups_fr_CA <I>ENTER</I></KBD>
+</PRE>
+</UL>
+<P>Alternatively, you could copy the existing<VAR> cups_fr</VAR> message
+ catalog and then make any changes necessary.</P>
+<P>Once you have make your copy of the file, edit it using your favorite
+ text editor to translate the text to the desired language. Be sure to
+ preserve any numbers starting in the first column, as they indicate a
+ new message number - you'll see this for the HTTP status messages.</P>
+<P>Finally, add your locale to the list of locales in the makefile and
+ run the following command to install it:</P>
+<UL>
+<PRE>
+<KBD>make install <I>ENTER</I></KBD>
+</PRE>
+</UL>
+<H1><A NAME="5">5 Web Interfaces</A></H1>
+<P>The CUPS scheduler provides a web interface that can be used to do
+ many common printing and administration tasks. The built-in web server
+ supports localization of web pages through the use of subdirectories
+ for each locale, e.g. &quot;fr&quot; for French, &quot;de&quot; for German, &quot;fr_ca&quot; for
+ French in Canada, and so forth.</P>
+<H2><A NAME="5_1">5.1 Template Files</A></H2>
+<P>Template files are HTML files with special formatting characters in
+ them that allow substition of variables and arrays. The CUPS CGI
+ programs (<CODE>admin.cgi</CODE>, <CODE>classes.cgi</CODE>, <CODE>
+jobs.cgi</CODE>, and <CODE>printers.cgi</CODE>) use these template file
+ to provide dynamic content for the web interface. Template files are
+ installed in the<VAR> /usr/share/cups/templates</VAR> directory by
+ default.</P>
+<P>Translated versions of the template files should be installed in the
+ appropriate subdirectories under<VAR> /usr/share/cups/templates</VAR>.
+ For example, Canadian French template files should be stored in the<VAR>
+ /usr/share/cups/templates/fr_CA</VAR> directory.</P>
+<H3><A NAME="5_1_1">5.1.1 Inserting Attributes and Values</A></H3>
+<P>Template files consist of HTML with variable substitutions for named
+ inside curley braces &quot;{name}&quot;. Variable names are generally the IPP
+ attribute names with the hyphen (&quot;-&quot;) replaced by the underscore (&quot;_&quot;)
+ character. For example, the <TT>job-printer-uri</TT> attribute is
+ renamed to <TT>job_printer_uri</TT>.</P>
+<P>Curley braces (&quot;{&quot; and &quot;}&quot;) to indicate substitutions, and the
+ backslash (&quot;\&quot;) character for quoting. To insert any of these special
+ characters as-is you need to use the HTML <CODE>&amp;name;</CODE> mechanism
+ or prefix each special character with the backslash (&quot;\&quot;.)</P>
+<P>You substitute the value of a variable using <CODE>{NAME}</CODE> in
+ your template file. If the variable is undefined then the <CODE>{NAME}</CODE>
+ string is output as-is.</P>
+<P>To substitute an empty string if the variable is undefined, use <CODE>
+{?NAME}</CODE> instead.</P>
+<H3><A NAME="5_1_2">5.1.2 Array Substitutions</A></H3>
+<P>The number of array elements can be inserted using <CODE>{#NAME}</CODE>
+. If the array is undefined then 0 is output. The current array element
+ (starting at 1) is inserted with <CODE>{#}</CODE>.</P>
+<P>Arrays are handled using <CODE>{[NAME]</CODE> at the beginning of a
+ section and <CODE>}</CODE> at the end. The information between the
+ closing bracket (&quot;]&quot;) and closing brace (&quot;}&quot;) is repeated for as many
+ elements as are in the named array. For example, the following template
+ will display a list of each job in the <CODE>job_id</CODE> array:</P>
+<UL>
+<PRE>
+&lt;TABLE&gt;
+&lt;TR&gt;
+	&lt;TH&gt;Job ID&lt;/TH&gt;
+	&lt;TH&gt;Destination&lt;/TH&gt;
+	&lt;TH&gt;Title&lt;/TH&gt;
+&lt;/TR&gt;
+
+{[job_id]
+&lt;TR&gt;
+	&lt;TD&gt;{?job_id}&lt;/TD&gt;
+	&lt;TD&gt;{?job_printer_name}&lt;/TD&gt;
+	&lt;TD&gt;{?job_name}&lt;/TD&gt;
+&lt;/TR&gt;
+}
+&lt;/TABLE&gt;
+</PRE>
+</UL>
+<P>Arrays can be nested, however all elements within the curley braces
+ (&quot;{&quot; and &quot;}&quot;) are indexed using the innermost array.</P>
+<H3><A NAME="5_1_3">5.1.3 Conditional Tests</A></H3>
+<P>Templates can also test variables against specific values and
+ conditionally include text in the template. The format is:</P>
+<UL>
+<PRE>
+{<I>variable</I>?<I>true</I>:<I>false</I>}
+{<I>variable</I>=<I>value</I>?<I>true</I>:<I>false</I>}
+{<I>variable</I>!<I>value</I>?<I>true</I>:<I>false</I>}
+{<I>variable</I>&lt;<I>value</I>?<I>true</I>:<I>false</I>}
+{<I>variable</I>&gt;<I>value</I>?<I>true</I>:<I>false</I>}
+</PRE>
+</UL>
+<P>where<VAR> true</VAR> is the text that is included if the condition
+ is true and<VAR> false</VAR> is the text that is included if the
+ condition is false. A value of <CODE>#</CODE> is replaced with the
+ current element number (starting at 1.)</P>
+<P>The character after the variable name specifies the condition to
+ test:
+<CENTER>
+<TABLE BORDER="1">
+<TR><TH WIDTH="5%">Char</TH><TH WIDTH="50%">Condition</TH></TR>
+<TR><TD>?</TD><TD>True if<VAR> variable</VAR> exists.</TD></TR>
+<TR><TD>=</TD><TD>True if<VAR> variable</VAR> is equal to<VAR> value</VAR>
+.</TD></TR>
+<TR><TD>!</TD><TD>True if<VAR> variable</VAR> is not equal to<VAR> value</VAR>
+.</TD></TR>
+<TR><TD>&lt;</TD><TD>True if<VAR> variable</VAR> is less than<VAR> value</VAR>
+.</TD></TR>
+<TR><TD>&gt;</TD><TD>True if<VAR> variable</VAR> is greater than<VAR> value</VAR>
+.</TD></TR>
+</TABLE>
+</CENTER>
+</P>
+<H3><A NAME="5_1_4">5.1.4 Template File List</A></H3>
+<P>The following template files are used by the web interface:</P>
+<DL>
+<DT>add-class.tmpl</DT>
+<DD>This is the initial form that is shown to add a new printer class.</DD>
+<DT>add-printer.tmpl</DT>
+<DD>This is the initial form that is shown to add a new printer.</DD>
+<DT>admin-op.tmpl</DT>
+<DD>This is the template that is used to display an error message when
+ the admin interface sees an undefined operation name.</DD>
+<DT>admin.tmpl</DT>
+<DD>This is the template that shows the initial menu of operations (add
+ a class, manage classes, etc.)</DD>
+<DT>choose-device.tmpl</DT>
+<DD>This is the form that shows the list of available devices.</DD>
+<DT>choose-make.tmpl</DT>
+<DD>This is the form that shows the list of available manufacturers.</DD>
+<DT>choose-members.tmpl</DT>
+<DD>This is the form that shows the list of available printers that can
+ be added to a class.</DD>
+<DT>choose-model.tmpl</DT>
+<DD>This is the form that shows the list of available printer
+ models/drivers.</DD>
+<DT>choose-serial.tmpl</DT>
+<DD>This is the form that allows the user to choose a serial port and
+ any options.</DD>
+<DT>choose-uri.tmpl</DT>
+<DD>This is the form that allows the user to enter a device URI for
+ network printers.</DD>
+<DT>class-added.tmpl</DT>
+<DD>This template shows the &quot;class added&quot; message.</DD>
+<DT>class-confirm.tmpl</DT>
+<DD>This is the template used to confirm the deletion of a class.</DD>
+<DT>class-deleted.tmpl</DT>
+<DD>This template shows the &quot;class deleted&quot; message.</DD>
+<DT>classes.tmpl</DT>
+<DD>This template shows one or more printer classes.</DD>
+<DT>class-modified.tmpl</DT>
+<DD>This template shows the &quot;class modified&quot; message.</DD>
+<DT>config-printer.tmpl</DT>
+<DD>This template starts the printer configuration form.</DD>
+<DT>config-printer2.tmpl</DT>
+<DD>This template ends the printer configuration form.</DD>
+<DT>error.tmpl</DT>
+<DD>This template displays a generic error message.</DD>
+<DT>header.tmpl</DT>
+<DD>This template is used as the standard header on all dynamic content.</DD>
+<DT>job-cancel.tmpl</DT>
+<DD>This template shows &quot;job cancelled&quot;.</DD>
+<DT>job-hold.tmpl</DT>
+<DD>This template shows &quot;job held&quot;.</DD>
+<DT>job-op.tmpl</DT>
+<DD>This is the template that is used to display an error message when
+ the job interface sees an undefined operation name.</DD>
+<DT>job-release.tmpl</DT>
+<DD>This template shows &quot;job released&quot;.</DD>
+<DT>job-restart.tmpl</DT>
+<DD>This template shows &quot;job restarted&quot;.</DD>
+<DT>jobs.tmpl</DT>
+<DD>This template is used to list the print jobs on a server, class, or
+ printer.</DD>
+<DT>modify-class.tmpl</DT>
+<DD>This template is used as the first form when modifying a class.</DD>
+<DT>modify-printer.tmpl</DT>
+<DD>This template is used as the first form when modifying a printer.</DD>
+<DT>option-boolean.tmpl</DT>
+<DD>This template is used to select a boolean PPD option.</DD>
+<DT>option-header.tmpl</DT>
+<DD>This template is used to start a PPD option group.</DD>
+<DT>option-pickmany.tmpl</DT>
+<DD>This template is used to select a multi-valued PPD option.</DD>
+<DT>option-pickone.tmpl</DT>
+<DD>This template is used to select a single-valued PPD option.</DD>
+<DT>option-trailer.tmpl</DT>
+<DD>This template is used to end a PPD option group.</DD>
+<DT>printer-accept.tmpl</DT>
+<DD>This template shows &quot;printer now accepting jobs&quot;.</DD>
+<DT>printer-added.tmpl</DT>
+<DD>This template shows &quot;printer added&quot;.</DD>
+<DT>printer-configured.tmpl</DT>
+<DD>This template shows &quot;printer configured&quot;.</DD>
+<DT>printer-confirm.tmpl</DT>
+<DD>This template asks the user to confirm the deletion of a printer.</DD>
+<DT>printer-deleted.tmpl</DT>
+<DD>This template shows &quot;printer deleted&quot;.</DD>
+<DT>printer-modified.tmpl</DT>
+<DD>This template shows &quot;printer modified&quot;.</DD>
+<DT>printer-purge.tmpl</DT>
+<DD>This template shows &quot;printer has been purged of all jobs&quot;.</DD>
+<DT>printer-reject.tmpl</DT>
+<DD>This template shows &quot;printer now rejecting jobs&quot;.</DD>
+<DT>printer-start.tmpl</DT>
+<DD>This template shows &quot;printer started&quot;.</DD>
+<DT>printers.tmpl</DT>
+<DD>This template is used to list information on one or more printers.</DD>
+<DT>printer-stop.tmpl</DT>
+<DD>This template shows &quot;printer stopped&quot;.</DD>
+<DT>test-page.tmpl</DT>
+<DD>This template shows &quot;test page printed&quot;.</DD>
+<DT>trailer.tmpl</DT>
+<DD>This template is used as the standard trailer on all dynamic
+ content.</DD>
+</DL>
+<H2><A NAME="5_2">5.2 CGI Programs</A></H2>
+<P>CUPS uses four CGI programs to manage the dynamic web interfaces:</P>
+<UL>
+<LI><CODE>admin.cgi</CODE></LI>
+<LI><CODE>classes.cgi</CODE></LI>
+<LI><CODE>jobs.cgi</CODE></LI>
+<LI><CODE>printers.cgi</CODE></LI>
+</UL>
+<H3><A NAME="5_2_1">5.2.1 admin.cgi</A></H3>
+<P>The <CODE>admin.cgi</CODE> program handles all of the printer and
+ class administration functions and is run for all direct accesses to
+ the<VAR> /admin</VAR> resource. For most operations it uses the <CODE>
+PRINTER_NAME</CODE> and <CODE>OP</CODE> form variables to specify the
+ action requested.</P>
+<P>The following <CODE>OP</CODE> values are supported:</P>
+<DL>
+<DT>accept-jobs</DT>
+<DD>Accepts jobs on the named destination.</DD>
+<DT>add-class</DT>
+<DD>Adds a new printer class. This operation also adds several other
+ form variables:
+<DL>
+<DT>MEMBER_URIS</DT>
+<DD>Sets the members of the class. Multiple <CODE>MEMBER_URIS</CODE>
+ values can be provided.</DD>
+<DT>PRINTER_INFO</DT>
+<DD>Sets the printer-info attribute for the printer class, which is
+ usually the printer description.</DD>
+<DT>PRINTER_LOCATION</DT>
+<DD>Sets the printer-location attribute for the printer class.</DD>
+</DL>
+</DD>
+<DT>add-printer</DT>
+<DD>Adds a new printer. This operation also adds several other form
+ variables:
+<DL>
+<DT>BAUDRATE</DT>
+<DD>Sets the baud rate for serial devices.</DD>
+<DT>BITS</DT>
+<DD>Sets the number of data bits for serial devices.</DD>
+<DT>DEVICE_URI</DT>
+<DD>Sets the device URI for the printer.</DD>
+<DT>FLOW</DT>
+<DD>Sets the flow control for serial devices.</DD>
+<DT>PARITY</DT>
+<DD>Sets the parity checking for serial devices.</DD>
+<DT>PPD_NAME</DT>
+<DD>Sets the driver name for the printer (&quot;raw&quot; for a raw queue.)</DD>
+<DT>PRINTER_INFO</DT>
+<DD>Sets the printer-info attribute for the printer, which is usually
+ the printer description.</DD>
+<DT>PRINTER_LOCATION</DT>
+<DD>Sets the printer-location attribute for the printer.</DD>
+</DL>
+</DD>
+<DT>config-printer</DT>
+<DD>Configures an existing printer. This operation uses form variables
+ of the same name as the options in the printer's PPD file.</DD>
+<DT>delete-class</DT>
+<DD>Deletes a printer class. The form variable <CODE>CONFIRM</CODE> may
+ be set to any value to bypass the confirmation page.</DD>
+<DT>delete-printer</DT>
+<DD>Deletes a printer. The form variable <CODE>CONFIRM</CODE> may be set
+ to any value to bypass the confirmation page.</DD>
+<DT>modify-class</DT>
+<DD>Modifies a printer class. See the add-class operation for a list of
+ form variables.</DD>
+<DT>modify-printer</DT>
+<DD>Modifies a printer. See the add-printer operation for a list of form
+ variables.</DD>
+<DT>purge-jobs</DT>
+<DD>Purges all jobs on the named destination.</DD>
+<DT>reject-jobs</DT>
+<DD>Rejects new jobs on the named destination.</DD>
+<DT>start-printer</DT>
+<DD>Starts the named destination.</DD>
+<DT>stop-printer</DT>
+<DD>Stops the named destination.</DD>
+</DL>
+<H3><A NAME="5_2_2">5.2.2 classes.cgi</A></H3>
+<P>The <CODE>classes.cgi</CODE> program is responsible for listing class
+ information, including jobs destined for that class. It is for all
+ direct accesses to the<VAR> /classes</VAR> resource and supports the
+ optional form variables <CODE>OP</CODE> and <CODE>WHICH_JOBS</CODE>. If
+ no form variables are supplied then the CGI lists all or a specific
+ class and the active jobs on each class.</P>
+<P>The following <CODE>WHICH_JOBS</CODE> values are supported:</P>
+<DL>
+<DT>completed</DT>
+<DD>Show only the completed jobs.</DD>
+<DT>not-completed</DT>
+<DD>Show only the active jobs.</DD>
+</DL>
+<P>The following <CODE>OP</CODE> values are supported:</P>
+<DL>
+<DT>print-test-page</DT>
+<DD>Print a PostScript test page.</DD>
+</DL>
+<H3><A NAME="5_2_3">5.2.3 jobs.cgi</A></H3>
+<P>The <CODE>jobs.cgi</CODE> program handles all of the job functions
+ and is run for all direct accesses to the<VAR> /jobs</VAR> resource.
+ For most operations it uses the <CODE>JOB_ID</CODE>, <CODE>OP</CODE>,
+ and <CODE>WHICH_JOBS</CODE> form variables to specify the action
+ requested.</P>
+<P>The following <CODE>WHICH_JOBS</CODE> values are supported:</P>
+<DL>
+<DT>completed</DT>
+<DD>Show only the completed jobs.</DD>
+<DT>not-completed</DT>
+<DD>Show only the active jobs.</DD>
+</DL>
+<P>The following <CODE>OP</CODE> values are supported:</P>
+<DL>
+<DT>job-cancel</DT>
+<DD>Cancels a job.</DD>
+<DT>job-hold</DT>
+<DD>Holds a job indefinitely.</DD>
+<DT>job-release</DT>
+<DD>Releases a job for printing.</DD>
+<DT>job-restart</DT>
+<DD>Restarts a stopped, cancelled, completed, or aborted print job.</DD>
+</DL>
+<H3><A NAME="5_2_4">5.2.4 printers.cgi</A></H3>
+<P>The <CODE>printers.cgi</CODE> program is responsible for listing
+ printer information, including jobs destined for that printer. It is
+ for all direct accesses to the<VAR> /printers</VAR> resource and
+ supports the optional form variables <CODE>OP</CODE> and <CODE>
+WHICH_JOBS</CODE>. If no form variables are supplied then the CGI lists
+ all or a specific printer and the active jobs on each printer.</P>
+<P>The following <CODE>WHICH_JOBS</CODE> values are supported:</P>
+<DL>
+<DT>completed</DT>
+<DD>Show only the completed jobs.</DD>
+<DT>not-completed</DT>
+<DD>Show only the active jobs.</DD>
+</DL>
+<P>The following <CODE>OP</CODE> values are supported:</P>
+<DL>
+<DT>print-test-page</DT>
+<DD>Print a PostScript test page.</DD>
+</DL>
+<H1 TYPE="A" VALUE="1"><A NAME="6">A Glossary</A></H1>
+<H2><A NAME="6_1">A.1 Terms</A></H2>
+<DL>
+<DT>C</DT>
+<DD>A computer language.</DD>
+<DT>parallel</DT>
+<DD>Sending or receiving data more than 1 bit at a time.</DD>
+<DT>pipe</DT>
+<DD>A one-way communications channel between two programs.</DD>
+<DT>serial</DT>
+<DD>Sending or receiving data 1 bit at a time.</DD>
+<DT>socket</DT>
+<DD>A two-way network communications channel.</DD>
+</DL>
+<H2><A NAME="6_2">A.2 Acronyms</A></H2>
+<DL>
+<DT>ASCII</DT>
+<DD>American Standard Code for Information Interchange</DD>
+<DT>CUPS</DT>
+<DD>Common UNIX Printing System</DD>
+<DT>ESC/P</DT>
+<DD>EPSON Standard Code for Printers</DD>
+<DT>FTP</DT>
+<DD>File Transfer Protocol</DD>
+<DT>HP-GL</DT>
+<DD>Hewlett-Packard Graphics Language</DD>
+<DT>HP-PCL</DT>
+<DD>Hewlett-Packard Page Control Language</DD>
+<DT>HP-PJL</DT>
+<DD>Hewlett-Packard Printer Job Language</DD>
+<DT>IETF</DT>
+<DD>Internet Engineering Task Force</DD>
+<DT>IPP</DT>
+<DD>Internet Printing Protocol</DD>
+<DT>ISO</DT>
+<DD>International Standards Organization</DD>
+<DT>LPD</DT>
+<DD>Line Printer Daemon</DD>
+<DT>MIME</DT>
+<DD>Multimedia Internet Mail Exchange</DD>
+<DT>PPD</DT>
+<DD>PostScript Printer Description</DD>
+<DT>SMB</DT>
+<DD>Server Message Block</DD>
+<DT>TFTP</DT>
+<DD>Trivial File Transfer Protocol</DD>
+</DL>
+</BODY>
+</HTML>
