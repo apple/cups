@@ -1,5 +1,5 @@
 /*
- * "$Id: type.c,v 1.4 2000/04/18 19:41:12 mike Exp $"
+ * "$Id: type.c,v 1.5 2000/04/24 21:00:57 mike Exp $"
  *
  *   MIME typing routines for the Common UNIX Printing System (CUPS).
  *
@@ -132,10 +132,10 @@ mimeAddTypeRule(mime_type_t *mt,	/* I - Type to add to */
 		logic,			/* Logic for next rule */
 		invert;			/* Invert following rule? */
   char		name[255],		/* Name in rule string */
-		value[2][255],		/* Value in rule string */
+		value[3][255],		/* Value in rule string */
 		*ptr,			/* Position in name or value */
 		quote;			/* Quote character */
-  int		length[2];		/* Length of each parameter */
+  int		length[3];		/* Length of each parameter */
   mime_magic_t	*temp,			/* New rule */
 		*current;  		/* Current rule */
 
@@ -452,32 +452,32 @@ mimeAddTypeRule(mime_type_t *mt,	/* I - Type to add to */
 	    break;
 	case MIME_MAGIC_ASCII :
 	case MIME_MAGIC_PRINTABLE :
-	    temp->offset = atoi(value[0]);
-	    temp->length = atoi(value[1]);
+	    temp->offset = strtol(value[0], NULL, 0);
+	    temp->length = strtol(value[1], NULL, 0);
 	    if (temp->length > MIME_MAX_BUFFER)
 	      temp->length = MIME_MAX_BUFFER;
 	    break;
 	case MIME_MAGIC_STRING :
-	    temp->offset = atoi(value[0]);
+	    temp->offset = strtol(value[0], NULL, 0);
 	    if (length[1] > sizeof(temp->value.stringv))
 	      return (-1);
 	    temp->length = length[1];
 	    memcpy(temp->value.stringv, value[1], length[1]);
 	    break;
 	case MIME_MAGIC_CHAR :
-	    temp->offset = atoi(value[0]);
+	    temp->offset = strtol(value[0], NULL, 0);
 	    if (length[1] == 1)
 	      temp->value.charv = value[1][0];
 	    else
-	      temp->value.charv = atoi(value[1]);
+	      temp->value.charv = strtol(value[1], NULL, 0);
 	    break;
 	case MIME_MAGIC_SHORT :
-	    temp->offset       = atoi(value[0]);
-	    temp->value.shortv = atoi(value[1]);
+	    temp->offset       = strtol(value[0], NULL, 0);
+	    temp->value.shortv = strtol(value[1], NULL, 0);
 	    break;
 	case MIME_MAGIC_INT :
-	    temp->offset     = atoi(value[0]);
-	    temp->value.intv = atoi(value[1]);
+	    temp->offset     = strtol(value[0], NULL, 0);
+	    temp->value.intv = strtol(value[1], NULL, 0);
 	    break;
 	case MIME_MAGIC_LOCALE :
 	    if (length[0] > (sizeof(temp->value.localev) - 1))
@@ -486,8 +486,8 @@ mimeAddTypeRule(mime_type_t *mt,	/* I - Type to add to */
 	    strcpy(temp->value.localev, value[0]);
 	    break;
 	case MIME_MAGIC_CONTAINS :
-	    temp->offset = atoi(value[0]);
-	    temp->region = atoi(value[1]);
+	    temp->offset = strtol(value[0], NULL, 0);
+	    temp->region = strtol(value[1], NULL, 0);
 	    if (length[2] > sizeof(temp->value.stringv))
 	      return (-1);
 	    temp->length = length[2];
@@ -1061,5 +1061,5 @@ patmatch(const char *s,		/* I - String to match against */
 
 
 /*
- * End of "$Id: type.c,v 1.4 2000/04/18 19:41:12 mike Exp $".
+ * End of "$Id: type.c,v 1.5 2000/04/24 21:00:57 mike Exp $".
  */
