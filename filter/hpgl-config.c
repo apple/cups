@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-config.c,v 1.2 1996/10/14 16:50:14 mike Exp $"
+ * "$Id: hpgl-config.c,v 1.3 1997/12/11 13:49:06 mike Exp $"
  *
  *   HPGL configuration routines for espPrint, a collection of printer drivers.
  *
@@ -16,7 +16,11 @@
  * Revision History:
  *
  *   $Log: hpgl-config.c,v $
- *   Revision 1.2  1996/10/14 16:50:14  mike
+ *   Revision 1.3  1997/12/11 13:49:06  mike
+ *   Updated PS_plot_size() code - now if a single size is provide we scale
+ *   to the smallest page dimension (not just the length as before).
+ *
+ *   Revision 1.2  1996/10/14  16:50:14  mike
  *   Updated for 3.2 release.
  *   Added 'blackplot', grayscale, and default pen width options.
  *   Added encoded polyline support.
@@ -38,6 +42,7 @@ void
 update_transform(void)
 {
   float p1[2], p2[2];
+  float	transform[2][3];
 
 
   switch (ScalingType)
@@ -93,8 +98,9 @@ update_transform(void)
 
   if (Verbosity)
     fprintf(stderr, "hpgl2ps: transform matrix = [ %f %f %f %f %f %f ]\n",
-            Transform[0][0], Transform[0][1], Transform[0][2],
-            Transform[1][0], Transform[1][1], Transform[1][2]);
+            Transform[0][0], Transform[1][0], 
+            Transform[0][1], Transform[1][1], 
+            Transform[0][2], Transform[1][2]);
 }
 
 
@@ -235,10 +241,32 @@ PS_plot_size(int num_params, param_t *params)
   switch (num_params)
   {
     case 0 :
+       /*
+        * This is a hack for programs that assume a DesignJet's hard limits...
+        */
+
+        if (Rotation == 0 || Rotation == 180)
+        {
+          PlotSize[0] = PageWidth / (72.0 * 36.0);
+          PlotSize[1] = PageHeight / (72.0 * 48.0);
+        }
+        else
+        {
+          PlotSize[0] = PageHeight / (72.0 * 36.0);
+          PlotSize[1] = PageWidth / (72.0 * 48.0);
+        };
         break;
     case 1 :
-        PlotSize[1] = PageHeight / (72.0 * params[0].value.number / 1016.0);
-        PlotSize[0] = PlotSize[1];
+        if (PageWidth < PageHeight)
+        {
+          PlotSize[0] = PageWidth / (72.0 * params[0].value.number / 1016.0);
+          PlotSize[1] = PlotSize[0];
+        }
+        else
+        {
+          PlotSize[1] = PageHeight / (72.0 * params[0].value.number / 1016.0);
+          PlotSize[0] = PlotSize[1];
+        };
         break;
     case 2 :
         if (Rotation == 0 || Rotation == 180)
@@ -300,5 +328,5 @@ SC_scale(int num_params, param_t *params)
 
 
 /*
- * End of "$Id: hpgl-config.c,v 1.2 1996/10/14 16:50:14 mike Exp $".
+ * End of "$Id: hpgl-config.c,v 1.3 1997/12/11 13:49:06 mike Exp $".
  */
