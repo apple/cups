@@ -1,5 +1,5 @@
 #
-# "$Id: cups.spec,v 1.18 2000/06/22 18:25:28 mike Exp $"
+# "$Id: cups.spec,v 1.19 2000/07/10 20:58:19 mike Exp $"
 #
 #   RPM "spec" file for the Common UNIX Printing System (CUPS).
 #
@@ -68,9 +68,16 @@ make
 rm -rf $RPM_BUILD_ROOT
 mkdir -p $RPM_BUILD_ROOT/etc/rc.d/init.d
 
-make prefix=$RPM_BUILD_ROOT/usr LOGDIR=$RPM_BUILD_ROOT/var/log/cups \
-	REQUESTS=$RPM_BUILD_ROOT/var/spool/cups \
-	SERVERROOT=$RPM_BUILD_ROOT/etc/cups install
+make	datadir=$RPM_BUILD_ROOT/usr/share \
+	exec_prefix=$RPM_BUILD_ROOT/usr \
+	includedir=$RPM_BUILD_ROOT/usr/include \
+	infodir=$RPM_BUILD_ROOT/usr/info \
+	libdir=$RPM_BUILD_ROOT/usr/lib \
+	localestatedir=$RPM_BUILD_ROOT/var \
+	prefix=$RPM_BUILD_ROOT \
+	sharedstatedir=$RPM_BUILD_ROOT/usr/com \
+	sysconfdir=$RPM_BUILD_ROOT/etc \
+	install
 
 install -m 755 -o root -g root cups.sh $RPM_BUILD_ROOT/etc/rc.d/init.d/cups
 
@@ -102,5 +109,5 @@ rm -rf $RPM_BUILD_ROOT
 /usr/lib/*.a
 
 #
-# End of "$Id: cups.spec,v 1.18 2000/06/22 18:25:28 mike Exp $".
+# End of "$Id: cups.spec,v 1.19 2000/07/10 20:58:19 mike Exp $".
 #
