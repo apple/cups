@@ -1,8 +1,10 @@
-CHANGES.txt - 01/27/2002
+CHANGES.txt - 01/28/2002
 ------------------------
 
 CHANGES IN CUPS V1.1.13
 
+	- The cupsParseOptions() function didn't skip trailing
+	  whitespace after quoted values.
 	- More changes to support CUPS on OS/2.
 	- Added Simplified Chinese message catalog.
 	- Added PAM support for IRIX.
