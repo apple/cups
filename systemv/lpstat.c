@@ -1,5 +1,5 @@
 /*
- * "$Id: lpstat.c,v 1.29 2000/11/11 19:56:24 mike Exp $"
+ * "$Id: lpstat.c,v 1.30 2000/11/21 16:52:59 mike Exp $"
  *
  *   "lpstat" command for the Common UNIX Printing System (CUPS).
  *
@@ -361,10 +361,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	    return (1);
       }
     else
-    {
-      fprintf(stderr, "lpstat: Unknown argument \'%s\'!\n", argv[i]);
-      return (1);
-    }
+      show_jobs(http, argv[i], NULL, long_status, ranking);
 
   if (argc == 1)
   {
@@ -1744,5 +1741,5 @@ show_scheduler(http_t *http)	/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpstat.c,v 1.29 2000/11/11 19:56:24 mike Exp $".
+ * End of "$Id: lpstat.c,v 1.30 2000/11/21 16:52:59 mike Exp $".
  */

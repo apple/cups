@@ -136,6 +136,8 @@ CHANGES IN CUPS V1.1.5
 	  accepted null values.
 	- Changed the *BSD define constants to __*BSD__ for all
 	  of the backends.
+	- Added support for "lpstat printername", which is an
+	  undocumented feature in Solaris.
 
 
 CHANGES IN CUPS v1.1.4
