@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: filter.man,v 1.5 2003/04/26 17:09:54 mike Exp $"
+.\" "$Id: filter.man,v 1.6 2003/04/28 01:42:07 mike Exp $"
 .\"
 .\"   filter man page for the Common UNIX Printing System (CUPS).
 .\"   Based on cvs revision 1.10
@@ -49,7 +49,7 @@ lors de l'exécution d'un filtre\ :
 CHARSET
 .br
 Le jeu de caractères par défaut (généralement us-ascii ou iso-8859-1).
-.TP5
+.TP 5
 CLASS
 .br
 Contient le nom de la classe lorsqu'un travail d'impression est envoyé à une cla
@@ -123,5 +123,5 @@ Copyright 1993-2003 Easy Software Products, Tous droits réservés.
 .SH TRADUCTION
 Gilles QUERRET <gilles.querret@nerim.net>
 .\"
-.\" End of "$Id: filter.man,v 1.5 2003/04/26 17:09:54 mike Exp $".
+.\" End of "$Id: filter.man,v 1.6 2003/04/28 01:42:07 mike Exp $".
 .\"
