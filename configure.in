@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: configure.in,v 1.38 2000/04/20 19:56:36 mike Exp $"
+dnl "$Id: configure.in,v 1.39 2000/05/12 19:18:40 mike Exp $"
 dnl
 dnl   Configuration script for the Common UNIX Printing System (CUPS).
 dnl
@@ -198,7 +198,7 @@ AC_CHECK_LIB(z, deflate,
 dnl PNG library uses math library functions...
 AC_CHECK_LIB(m, pow)
 
-AC_CHECK_LIB(png, png_read_info,
+AC_CHECK_LIB(png, png_set_tRNS_to_alpha,
     AC_DEFINE(HAVE_LIBPNG)
     LIBPNG="-lpng")
 
@@ -418,5 +418,5 @@ AC_SUBST(CUPS_DOCROOT)
 AC_OUTPUT(Makedefs)
 
 dnl
-dnl End of "$Id: configure.in,v 1.38 2000/04/20 19:56:36 mike Exp $".
+dnl End of "$Id: configure.in,v 1.39 2000/05/12 19:18:40 mike Exp $".
 dnl
