@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-image.m4,v 1.1 2001/06/27 19:06:45 mike Exp $"
+dnl "$Id: cups-image.m4,v 1.2 2001/10/04 16:50:18 mike Exp $"
 dnl
 dnl   Image library stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -65,6 +65,8 @@ AC_CHECK_HEADER(tiff.h,
 dnl Restore original LIBS settings...
 LIBS="$SAVELIBS"
 
+AC_CHECK_HEADER(stdlib.h,AC_DEFINE(HAVE_STDLIB_H))
+
 dnl
-dnl End of "$Id: cups-image.m4,v 1.1 2001/06/27 19:06:45 mike Exp $".
+dnl End of "$Id: cups-image.m4,v 1.2 2001/10/04 16:50:18 mike Exp $".
 dnl

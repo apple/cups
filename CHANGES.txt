@@ -48,6 +48,10 @@ CHANGES IN CUPS V1.1.11
 	  to stderr instead of stdout...
 	- The PostScript filter (pstops) now handles EPS files,
 	  adding a showpage command to the files as needed.
+	- The configure script checked for the <stdlib.h> header
+	  file before the JPEG libraries; since the JPEG headers
+	  can define HAVE_STDLIB_H, the configure check would
+	  cause the JPEG check to fail on some systems.
 
 
 CHANGES IN CUPS V1.1.10-1
