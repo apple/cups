@@ -1,5 +1,5 @@
 /*
- * "$Id: usb.c,v 1.35 2002/09/06 14:45:30 mike Exp $"
+ * "$Id: usb.c,v 1.36 2002/09/25 18:07:19 mike Exp $"
  *
  *   USB port backend for the Common UNIX Printing System (CUPS).
  *
@@ -154,20 +154,6 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   */
 
   strlcpy(uri, argv[0], sizeof(uri));
-
- /*
-  * See if there are any options...
-  */
-
-  if ((options = strchr(uri, '?')) != NULL)
-  {
-   /*
-    * Yup, terminate the device name string and move to the first
-    * character of the options...
-    */
-
-    *options++ = '\0';
-  }
 
  /*
   * Open the USB port device...
@@ -649,5 +635,5 @@ open_device(const char *uri)		/* I - Device URI */
 
 
 /*
- * End of "$Id: usb.c,v 1.35 2002/09/06 14:45:30 mike Exp $".
+ * End of "$Id: usb.c,v 1.36 2002/09/25 18:07:19 mike Exp $".
  */
