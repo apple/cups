@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.c,v 1.41 2001/02/21 17:01:17 mike Exp $"
+ * "$Id: auth.c,v 1.42 2001/04/13 20:58:54 mike Exp $"
  *
  *   Authorization routines for the Common UNIX Printing System (CUPS).
  *
@@ -532,7 +532,8 @@ FindBest(client_t *con)		/* I - Connection */
 
   for (i = NumLocations, loc = Locations; i > 0; i --, loc ++)
   {
-    DEBUG_printf(("Location %s Limit %x\n", loc->location, loc->limit));
+    LogMessage(L_DEBUG2, "FindBest: Location %s Limit %x",
+               loc->location, loc->limit);
 
     if (loc->length > bestlen &&
         strncmp(con->uri, loc->location, loc->length) == 0 &&
@@ -547,6 +548,8 @@ FindBest(client_t *con)		/* I - Connection */
  /*
   * Return the match, if any...
   */
+
+  LogMessage(L_DEBUG2, "FindBest: best = %s", best ? best->location : "NONE");
 
   return (best);
 }
@@ -620,18 +623,15 @@ IsAuthorized(client_t *con)	/* I - Connection */
 		};
 
 
+  LogMessage(L_DEBUG2, "IsAuthorized: URI = %s", con->uri);
+
  /*
   * Find a matching location; if there is no match then access is
   * not authorized...
   */
 
   if ((best = FindBest(con)) == NULL)
-  {
-    DEBUG_printf(("FindBest(%s, %s) failed!\n", states[con->http.state],
-                  con->uri));
-
     return (HTTP_FORBIDDEN);
-  }
 
  /*
   * Check host/ip-based accesses...
@@ -686,6 +686,9 @@ IsAuthorized(client_t *con)	/* I - Connection */
     }
   }
 
+  LogMessage(L_DEBUG2, "IsAuthorized: auth = %d, satisfy=%d...",
+             auth, best->satisfy);
+
   if (auth == AUTH_DENY && best->satisfy == AUTH_SATISFY_ALL)
     return (HTTP_FORBIDDEN);
 
@@ -695,7 +698,10 @@ IsAuthorized(client_t *con)	/* I - Connection */
   */
 
   if (best->encryption >= HTTP_ENCRYPT_REQUIRED && !con->http.tls)
+  {
+    LogMessage(L_DEBUG2, "IsAuthorized: Need upgrade to TLS...");
     return (HTTP_UPGRADE_REQUIRED);
+  }
 #endif /* HAVE_LIBSSL */
 
  /*
@@ -705,6 +711,8 @@ IsAuthorized(client_t *con)	/* I - Connection */
   if (best->level == AUTH_ANON)		/* Anonymous access - allow it */
     return (HTTP_OK);
 
+  LogMessage(L_DEBUG2, "IsAuthorized: username = \"%s\" password = %d chars",
+	     con->username, strlen(con->password));
   DEBUG_printf(("IsAuthorized: username = \"%s\", password = \"%s\"\n",
 		con->username, con->password));
 
@@ -730,8 +738,8 @@ IsAuthorized(client_t *con)	/* I - Connection */
     return (HTTP_UNAUTHORIZED);
   }
 
-  DEBUG_printf(("IsAuthorized: Checking \"%s\", address = %08x, hostname = \"%s\"\n",
-                con->username, address, con->http.hostname));
+  LogMessage(L_DEBUG2, "IsAuthorized: Checking \"%s\", address = %08x, hostname = \"%s\"",
+             con->username, address, con->http.hostname);
 
   if ((address != 0x7f000001 &&
        strcasecmp(con->http.hostname, "localhost") != 0) ||
@@ -820,8 +828,8 @@ IsAuthorized(client_t *con)	/* I - Connection */
       * OK, the password isn't blank, so compare with what came from the client...
       */
 
-      DEBUG_printf(("IsAuthorized: pw_passwd = %s, crypt = %s\n",
-		    pw->pw_passwd, crypt(con->password, pw->pw_passwd)));
+      LogMessage(L_DEBUG2, "IsAuthorized: pw_passwd = %s, crypt = %s",
+		 pw->pw_passwd, crypt(con->password, pw->pw_passwd));
 
       pass = crypt(con->password, pw->pw_passwd);
 
@@ -831,8 +839,8 @@ IsAuthorized(client_t *con)	/* I - Connection */
 #  ifdef HAVE_SHADOW_H
 	if (spw != NULL)
 	{
-	  DEBUG_printf(("IsAuthorized: sp_pwdp = %s, crypt = %s\n",
-			spw->sp_pwdp, crypt(con->password, spw->sp_pwdp)));
+	  LogMessage(L_DEBUG2, "IsAuthorized: sp_pwdp = %s, crypt = %s",
+		     spw->sp_pwdp, crypt(con->password, spw->sp_pwdp));
 
 	  pass = crypt(con->password, spw->sp_pwdp);
 
@@ -901,6 +909,8 @@ IsAuthorized(client_t *con)	/* I - Connection */
     * any valid user is OK...
     */
 
+    LogMessage(L_DEBUG2, "IsAuthorized: Checking user membership...");
+
     if (best->num_names == 0)
       return (HTTP_OK);
 
@@ -919,6 +929,8 @@ IsAuthorized(client_t *con)	/* I - Connection */
  /*
   * Check to see if this user is in any of the named groups...
   */
+
+  LogMessage(L_DEBUG2, "IsAuthorized: Checking group membership...");
 
   for (i = 0; i < best->num_names; i ++)
   {
@@ -948,7 +960,7 @@ IsAuthorized(client_t *con)	/* I - Connection */
   * The user isn't part of the specified group, so deny access...
   */
 
-  DEBUG_puts("IsAuthorized: user not in group!");
+  LogMessage(L_DEBUG2, "IsAuthorized: user not in group!");
 
   return (HTTP_UNAUTHORIZED);
 }
@@ -1149,5 +1161,5 @@ pam_func(int                      num_msg,	/* I - Number of messages */
 
 
 /*
- * End of "$Id: auth.c,v 1.41 2001/02/21 17:01:17 mike Exp $".
+ * End of "$Id: auth.c,v 1.42 2001/04/13 20:58:54 mike Exp $".
  */

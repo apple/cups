@@ -376,7 +376,7 @@ void Gfx::go() {
 
 void Gfx::execOp(Object *cmd, Object args[], int numArgs) {
   Operator *op;
-  char *name;
+  const char *name;
   int i;
 
   // find operator
@@ -413,7 +413,7 @@ void Gfx::execOp(Object *cmd, Object args[], int numArgs) {
   (this->*op->func)(args, numArgs);
 }
 
-Operator *Gfx::findOp(char *name) {
+Operator *Gfx::findOp(const char *name) {
   int a, b, m, cmp;
 
   a = -1;
@@ -453,7 +453,7 @@ int Gfx::getPos() {
   return parser ? parser->getPos() : -1;
 }
 
-GfxFont *Gfx::lookupFont(char *name) {
+GfxFont *Gfx::lookupFont(const char *name) {
   GfxFont *font;
   GfxResources *resPtr;
 
@@ -467,7 +467,7 @@ GfxFont *Gfx::lookupFont(char *name) {
   return NULL;
 }
 
-GBool Gfx::lookupXObject(char *name, Object *obj) {
+GBool Gfx::lookupXObject(const char *name, Object *obj) {
   GfxResources *resPtr;
 
   for (resPtr = res; resPtr; resPtr = resPtr->next) {
@@ -481,7 +481,7 @@ GBool Gfx::lookupXObject(char *name, Object *obj) {
   return gFalse;
 }
 
-void Gfx::lookupColorSpace(char *name, Object *obj) {
+void Gfx::lookupColorSpace(const char *name, Object *obj) {
   GfxResources *resPtr;
 
   for (resPtr = res; resPtr; resPtr = resPtr->next) {
@@ -1632,7 +1632,7 @@ void Gfx::opBeginImage(Object args[], int numArgs) {
 Stream *Gfx::buildImageStream() {
   Object dict;
   Object obj;
-  char *key;
+  const char *key;
   Stream *str;
 
   // build dictionary

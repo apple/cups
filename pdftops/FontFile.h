@@ -30,7 +30,7 @@ public:
 
   // Returns the font name, as specified internally by the font file.
   // Returns NULL if no name is available.
-  virtual char *getName() = 0;
+  virtual const char *getName() = 0;
 
   // Returns the custom font encoding, or NULL if the encoding is
   // not available.  If <taken> is set, the caller of this function
@@ -45,14 +45,14 @@ public:
 class Type1FontFile: public FontFile {
 public:
 
-  Type1FontFile(char *file, int len);
+  Type1FontFile(const char *file, int len);
   virtual ~Type1FontFile();
-  virtual char *getName() { return name; }
+  virtual const char *getName() { return name; }
   virtual FontEncoding *getEncoding(GBool taken);
 
 private:
 
-  char *name;
+  const char *name;
   FontEncoding *encoding;
   GBool freeEnc;
 };
@@ -64,14 +64,14 @@ private:
 class Type1CFontFile: public FontFile {
 public:
 
-  Type1CFontFile(char *file, int len);
+  Type1CFontFile(const char *file, int len);
   virtual ~Type1CFontFile();
-  virtual char *getName() { return name; }
+  virtual const char *getName() { return name; }
   virtual FontEncoding *getEncoding(GBool taken);
 
 private:
 
-  char *name;
+  const char *name;
   FontEncoding *encoding;
   GBool freeEnc;
 };
@@ -83,23 +83,23 @@ private:
 class Type1CFontConverter {
 public:
 
-  Type1CFontConverter(char *file, int len, FILE *out);
+  Type1CFontConverter(const char *file, int len, FILE *out);
   ~Type1CFontConverter();
   void convert();
 
 private:
 
-  void eexecWrite(char *s);
-  void cvtGlyph(char *name, Guchar *s, int n);
+  void eexecWrite(const char *s);
+  void cvtGlyph(const char *name, Guchar *s, int n);
   void cvtGlyphWidth(GBool useOp);
   void eexecDumpNum(double x, GBool fp);
   void eexecDumpOp1(int op);
   void eexecDumpOp2(int op);
   void eexecWriteCharstring(Guchar *s, int n);
-  void getDeltaInt(char *buf, char *name, double *op, int n);
-  void getDeltaReal(char *buf, char *name, double *op, int n);
+  void getDeltaInt(char *buf, const char *name, double *op, int n);
+  void getDeltaReal(char *buf, const char *name, double *op, int n);
 
-  char *file;
+  const char *file;
   int len;
   FILE *out;
   double op[48];		// operands

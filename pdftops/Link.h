@@ -226,7 +226,7 @@ class LinkUnknown: public LinkAction {
 public:
 
   // Build a LinkUnknown with the specified action type.
-  LinkUnknown(char *action1);
+  LinkUnknown(const char *action1);
 
   // Destructor.
   virtual ~LinkUnknown();

@@ -16,12 +16,12 @@ extern GBool printCommands;
 extern GBool errQuiet;
 
 // Font search path.
-extern char **fontPath;
+extern const char **fontPath;
 
 // Mapping from PDF font name to device font name.
 struct DevFontMapEntry {
-  char *pdfFont;
-  char *devFont;
+  const char *pdfFont;
+  const char *devFont;
 };
 extern DevFontMapEntry *devFontMap;
 

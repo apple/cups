@@ -145,6 +145,8 @@ CHANGES IN CUPS V1.1.7
 	- The BMP loading code did not handle resolution values
 	  of 0.  This is a problem with BMP image files produced
 	  by the GIMP.
+	- The HTTP Upgrade code (upgrade to TLS encryption)
+	  bypassed the authentication checks.
 
 
 CHANGES IN CUPS V1.1.6-3

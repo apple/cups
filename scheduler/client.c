@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.91 2001/03/10 15:19:36 mike Exp $"
+ * "$Id: client.c,v 1.92 2001/04/13 20:58:55 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -718,6 +718,8 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	httpPrintf(HTTP(con), "\r\n");
 
         EncryptClient(con);
+
+        status = IsAuthorized(con);
 #else
 	if (!SendError(con, HTTP_NOT_IMPLEMENTED))
 	{
@@ -726,7 +728,8 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	}
 #endif /* HAVE_LIBSSL */
       }
-      else if (status != HTTP_OK)
+
+      if (status != HTTP_OK)
       {
 	SendError(con, status);
 	CloseClient(con);
@@ -1249,8 +1252,9 @@ SendCommand(client_t      *con,
 
   close(fd);
 
-  LogMessage(L_DEBUG, "SendCommand() %d command=\"%s\" file=%d pipe_pid=%d",
-             con->http.fd, command, con->file, con->pipe_pid);
+  LogMessage(L_INFO, "Started \"%s\" (pid=%d)", command, con->pipe_pid);
+
+  LogMessage(L_DEBUG, "SendCommand() %d file=%d", con->http.fd, con->file);
 
   if (con->pipe_pid == 0)
     return (0);
@@ -2118,5 +2122,5 @@ pipe_command(client_t *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.91 2001/03/10 15:19:36 mike Exp $".
+ * End of "$Id: client.c,v 1.92 2001/04/13 20:58:55 mike Exp $".
  */

@@ -54,7 +54,7 @@ class PSOutputDev: public OutputDev {
 public:
 
   // Open a PostScript output file, and write the prolog.
-  PSOutputDev(char *fileName, Catalog *catalog,
+  PSOutputDev(const char *fileName, Catalog *catalog,
 	      int firstPage, int lastPage,
 	      GBool embedType11, GBool doForm1);
 
@@ -139,9 +139,9 @@ private:
 
   void setupFonts(Dict *resDict);
   void setupFont(GfxFont *font);
-  void setupEmbeddedType1Font(Ref *id, char *psName);
-  void setupEmbeddedType1Font(GString *fileName, char *psName);
-  void setupEmbeddedType1CFont(GfxFont *font, Ref *id, char *psName);
+  void setupEmbeddedType1Font(Ref *id, const char *psName);
+  void setupEmbeddedType1Font(GString *fileName, const char *psName);
+  void setupEmbeddedType1CFont(GfxFont *font, Ref *id, const char *psName);
   void doPath(GfxPath *path);
   void doImageL1(GfxImageColorMap *colorMap,
 		 GBool invert, GBool inlineImg,

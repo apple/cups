@@ -44,49 +44,13 @@
 //------------------------------------------------------------------------
 
 GString *getHomeDir() {
-#ifdef VMS
-  //---------- VMS ----------
-  return new GString("SYS$LOGIN:");
+// Updated to use CUPS_SERVERROOT...
+  const char *s;
 
-#elif defined(__EMX__) || defined(WIN32)
-  //---------- OS/2+EMX and Win32 ----------
-  char *s;
-  GString *ret;
-
-  if ((s = getenv("HOME")))
-    ret = new GString(s);
+  if ((s = getenv("CUPS_SERVERROOT")))
+    return new GString(s);
   else
-    ret = new GString(".");
-  return ret;
-
-#elif defined(ACORN)
-  //---------- RISCOS ----------
-  return new GString("@");
-
-#elif defined(MACOS)
-  //---------- MacOS ----------
-  return new GString(":");
-
-#else
-  //---------- Unix ----------
-  char *s;
-  struct passwd *pw;
-  GString *ret;
-
-  if ((s = getenv("HOME"))) {
-    ret = new GString(s);
-  } else {
-    if ((s = getenv("USER")))
-      pw = getpwnam(s);
-    else
-      pw = getpwuid(getuid());
-    if (pw)
-      ret = new GString(pw->pw_dir);
-    else
-      ret = new GString(".");
-  }
-  return ret;
-#endif
+    return new GString(CUPS_SERVERROOT);
 }
 
 GString *getCurrentDir() {
@@ -107,7 +71,7 @@ GString *getCurrentDir() {
   return new GString();
 }
 
-GString *appendToPath(GString *path, char *fileName) {
+GString *appendToPath(GString *path, const char *fileName) {
 #if defined(VMS)
   //---------- VMS ----------
   //~ this should handle everything necessary for file
@@ -273,10 +237,10 @@ GString *appendToPath(GString *path, char *fileName) {
 #endif
 }
 
-GString *grabPath(char *fileName) {
+GString *grabPath(const char *fileName) {
 #ifdef VMS
   //---------- VMS ----------
-  char *p;
+  const char *p;
 
   if ((p = strrchr(fileName, ']')))
     return new GString(fileName, p + 1 - fileName);
@@ -286,7 +250,7 @@ GString *grabPath(char *fileName) {
 
 #elif defined(__EMX__) || defined(WIN32)
   //---------- OS/2+EMX and Win32 ----------
-  char *p;
+  const char *p;
 
   if ((p = strrchr(fileName, '/')))
     return new GString(fileName, p - fileName);
@@ -298,7 +262,7 @@ GString *grabPath(char *fileName) {
 
 #elif defined(ACORN)
   //---------- RISCOS ----------
-  char *p;
+  const char *p;
 
   if ((p = strrchr(fileName, '.')))
     return new GString(fileName, p - fileName);
@@ -306,7 +270,7 @@ GString *grabPath(char *fileName) {
 
 #elif defined(MACOS)
   //---------- MacOS ----------
-  char *p;
+  const char *p;
 
   if ((p = strrchr(fileName, ':')))
     return new GString(fileName, p - fileName);
@@ -314,7 +278,7 @@ GString *grabPath(char *fileName) {
 
 #else
   //---------- Unix ----------
-  char *p;
+  const char *p;
 
   if ((p = strrchr(fileName, '/')))
     return new GString(fileName, p - fileName);
@@ -322,7 +286,7 @@ GString *grabPath(char *fileName) {
 #endif
 }
 
-GBool isAbsolutePath(char *path) {
+GBool isAbsolutePath(const char *path) {
 #ifdef VMS
   //---------- VMS ----------
   return strchr(path, ':') ||
@@ -428,7 +392,7 @@ GString *makePathAbsolute(GString *path) {
 #endif
 }
 
-time_t getModTime(char *fileName) {
+time_t getModTime(const char *fileName) {
 #ifdef WIN32
   //~ should implement this, but it's (currently) only used in xpdf
   return 0;
@@ -442,7 +406,7 @@ time_t getModTime(char *fileName) {
 #endif
 }
 
-GBool openTempFile(GString **name, FILE **f, char *mode, char *ext) {
+GBool openTempFile(GString **name, FILE **f, const char *mode, const char *ext) {
   char	filename[1024];	// Name of temporary file...
   int	fd;		// File descriptor...
 
@@ -462,7 +426,7 @@ GBool openTempFile(GString **name, FILE **f, char *mode, char *ext) {
 // GDir and GDirEntry
 //------------------------------------------------------------------------
 
-GDirEntry::GDirEntry(char *dirPath, char *name1, GBool doStat) {
+GDirEntry::GDirEntry(const char *dirPath, const char *name1, GBool doStat) {
 #ifdef VMS
   char *p;
 #elif defined(WIN32)
@@ -501,7 +465,7 @@ GDirEntry::~GDirEntry() {
   delete name;
 }
 
-GDir::GDir(char *name, GBool doStat1) {
+GDir::GDir(const char *name, GBool doStat1) {
   path = new GString(name);
   doStat = doStat1;
 #if defined(WIN32)

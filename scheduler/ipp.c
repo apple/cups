@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.128 2001/04/12 13:09:08 mike Exp $"
+ * "$Id: ipp.c,v 1.129 2001/04/13 20:58:55 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -1827,7 +1827,8 @@ copy_attribute(ipp_t           *to,	/* O - Destination request/response */
   ipp_attribute_t	*toattr;	/* Destination attribute */
 
 
-  LogMessage(L_DEBUG2, "copy_attribute(%p, %s)\n", to, attr->name);
+  LogMessage(L_DEBUG2, "copy_attribute(%p, %s)\n", to,
+             attr->name ? attr->name : "(null)");
 
   switch (attr->value_tag)
   {
@@ -5367,5 +5368,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.128 2001/04/12 13:09:08 mike Exp $".
+ * End of "$Id: ipp.c,v 1.129 2001/04/13 20:58:55 mike Exp $".
  */

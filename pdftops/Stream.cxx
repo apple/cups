@@ -85,7 +85,7 @@ char *Stream::getLine(char *buf, int size) {
   return buf;
 }
 
-GString *Stream::getPSFilter(char *indent) {
+GString *Stream::getPSFilter(const char *indent) {
   return new GString();
 }
 
@@ -133,7 +133,7 @@ Stream *Stream::addFilters(Object *dict) {
   return str;
 }
 
-Stream *Stream::makeFilter(char *name, Stream *str, Object *params) {
+Stream *Stream::makeFilter(const char *name, Stream *str, Object *params) {
   int pred;			// parameters
   int colors;
   int bits;
@@ -262,8 +262,8 @@ Stream *Stream::makeFilter(char *name, Stream *str, Object *params) {
 // BaseStream
 //------------------------------------------------------------------------
 
-BaseStream::BaseStream(Object *dict) {
-  this->dict = *dict;
+BaseStream::BaseStream(Object *ndict) {
+  dict = *ndict;
 #ifndef NO_DECRYPTION
   decrypt = NULL;
 #endif
@@ -287,8 +287,8 @@ void BaseStream::doDecryption(Guchar *fileKey, int objNum, int objGen) {
 // FilterStream
 //------------------------------------------------------------------------
 
-FilterStream::FilterStream(Stream *str) {
-  this->str = str;
+FilterStream::FilterStream(Stream *nstr) {
+  str = nstr;
 }
 
 FilterStream::~FilterStream() {
@@ -302,13 +302,13 @@ void FilterStream::setPos(int pos) {
 // ImageStream
 //------------------------------------------------------------------------
 
-ImageStream::ImageStream(Stream *str, int width, int nComps, int nBits) {
+ImageStream::ImageStream(Stream *nstr, int nwidth, int nnComps, int nnBits) {
   int imgLineSize;
 
-  this->str = str;
-  this->width = width;
-  this->nComps = nComps;
-  this->nBits = nBits;
+  str = nstr;
+  width = nwidth;
+  nComps = nnComps;
+  nBits = nnBits;
 
   nVals = width * nComps;
   if (nBits == 1) {
@@ -389,13 +389,13 @@ void ImageStream::skipLine() {
 // StreamPredictor
 //------------------------------------------------------------------------
 
-StreamPredictor::StreamPredictor(Stream *str, int predictor,
-				 int width, int nComps, int nBits) {
-  this->str = str;
-  this->predictor = predictor;
-  this->width = width;
-  this->nComps = nComps;
-  this->nBits = nBits;
+StreamPredictor::StreamPredictor(Stream *nstr, int npredictor,
+				 int nwidth, int nnComps, int nnBits) {
+  str = nstr;
+  predictor = npredictor;
+  width = nwidth;
+  nComps = nnComps;
+  nBits = nnBits;
 
   nVals = width * nComps;
   pixBytes = (nComps * nBits + 7) >> 3;
@@ -545,11 +545,11 @@ GBool StreamPredictor::getNextLine() {
 // FileStream
 //------------------------------------------------------------------------
 
-FileStream::FileStream(FILE *f, int start, int length, Object *dict):
+FileStream::FileStream(FILE *nf, int nstart, int nlength, Object *dict):
     BaseStream(dict) {
-  this->f = f;
-  this->start = start;
-  this->length = length;
+  f = nf;
+  start = nstart;
+  length = nlength;
   bufPtr = bufEnd = buf;
   bufPos = start;
   savePos = -1;
@@ -561,8 +561,8 @@ FileStream::~FileStream() {
   }
 }
 
-Stream *FileStream::makeSubStream(int start, int length, Object *dict) {
-  return new FileStream(f, start, length, dict);
+Stream *FileStream::makeSubStream(int nstart, int nlength, Object *ndict) {
+  return new FileStream(f, nstart, nlength, ndict);
 }
 
 void FileStream::reset() {
@@ -630,15 +630,15 @@ void FileStream::moveStart(int delta) {
 // EmbedStream
 //------------------------------------------------------------------------
 
-EmbedStream::EmbedStream(Stream *str, Object *dict):
-    BaseStream(dict) {
-  this->str = str;
+EmbedStream::EmbedStream(Stream *nstr, Object *ndict):
+    BaseStream(ndict) {
+  str = nstr;
 }
 
 EmbedStream::~EmbedStream() {
 }
 
-Stream *EmbedStream::makeSubStream(int start, int length, Object *dict) {
+Stream *EmbedStream::makeSubStream(int start, int length, Object *ndict) {
   error(-1, "Internal: called makeSubStream() on EmbedStream");
   return NULL;
 }
@@ -729,7 +729,7 @@ int ASCIIHexStream::lookChar() {
   return buf;
 }
 
-GString *ASCIIHexStream::getPSFilter(char *indent) {
+GString *ASCIIHexStream::getPSFilter(const char *indent) {
   GString *s;
 
   s = str->getPSFilter(indent);
@@ -805,7 +805,7 @@ int ASCII85Stream::lookChar() {
   return b[index];
 }
 
-GString *ASCII85Stream::getPSFilter(char *indent) {
+GString *ASCII85Stream::getPSFilter(const char *indent) {
   GString *s;
 
   s = str->getPSFilter(indent);
@@ -1117,7 +1117,7 @@ GBool LZWStream::fillBuf() {
   return n > 0;
 }
 
-GString *LZWStream::getPSFilter(char *indent) {
+GString *LZWStream::getPSFilter(const char *indent) {
   GString *s;
 
   if (pred) {
@@ -1152,7 +1152,7 @@ void RunLengthStream::reset() {
   eof = gFalse;
 }
 
-GString *RunLengthStream::getPSFilter(char *indent) {
+GString *RunLengthStream::getPSFilter(const char *indent) {
   GString *s;
 
   s = str->getPSFilter(indent);
@@ -1194,17 +1194,17 @@ GBool RunLengthStream::fillBuf() {
 // CCITTFaxStream
 //------------------------------------------------------------------------
 
-CCITTFaxStream::CCITTFaxStream(Stream *str, int encoding, GBool endOfLine,
-			       GBool byteAlign, int columns, int rows,
-			       GBool endOfBlock, GBool black):
+CCITTFaxStream::CCITTFaxStream(Stream *nstr, int nencoding, GBool nendOfLine,
+			       GBool nbyteAlign, int ncolumns, int nrows,
+			       GBool nendOfBlock, GBool nblack):
     FilterStream(str) {
-  this->encoding = encoding;
-  this->endOfLine = endOfLine;
-  this->byteAlign = byteAlign;
-  this->columns = columns;
-  this->rows = rows;
-  this->endOfBlock = endOfBlock;
-  this->black = black;
+  encoding = nencoding;
+  endOfLine = nendOfLine;
+  byteAlign = nbyteAlign;
+  columns = ncolumns;
+  rows = nrows;
+  endOfBlock = nendOfBlock;
+  black = nblack;
   refLine = (short *)gmalloc((columns + 3) * sizeof(short));
   codingLine = (short *)gmalloc((columns + 2) * sizeof(short));
 
@@ -1691,7 +1691,7 @@ short CCITTFaxStream::lookBits(int n) {
   return (inputBuf >> (inputBits - n)) & (0xffff >> (16 - n));
 }
 
-GString *CCITTFaxStream::getPSFilter(char *indent) {
+GString *CCITTFaxStream::getPSFilter(const char *indent) {
   GString *s;
   char s1[50];
 
@@ -2682,7 +2682,7 @@ int DCTStream::read16() {
   return (c1 << 8) + c2;
 }
 
-GString *DCTStream::getPSFilter(char *indent) {
+GString *DCTStream::getPSFilter(const char *indent) {
   GString *s;
 
   s = str->getPSFilter(indent);
@@ -2865,7 +2865,7 @@ int FlateStream::getRawChar() {
   return c;
 }
 
-GString *FlateStream::getPSFilter(char *indent) {
+GString *FlateStream::getPSFilter(const char *indent) {
   return NULL;
 }
 

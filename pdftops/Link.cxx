@@ -367,7 +367,7 @@ LinkURI::~LinkURI() {
 // LinkUnknown
 //------------------------------------------------------------------------
 
-LinkUnknown::LinkUnknown(char *action1) {
+LinkUnknown::LinkUnknown(const char *action1) {
   action = new GString(action1);
 }
 

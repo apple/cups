@@ -59,7 +59,7 @@ int paperHeight = 792;
 // PostScript prolog and setup
 //------------------------------------------------------------------------
 
-static char *prolog[] = {
+static const char *prolog[] = {
   "/xpdf 75 dict def xpdf begin",
   "% PDF special state",
   "/pdfDictSize 14 def",
@@ -204,12 +204,12 @@ static char *prolog[] = {
 //------------------------------------------------------------------------
 
 struct PSFont {
-  char *name;			// PDF name
-  char *psName;			// PostScript name
+  const char *name;		// PDF name
+  const char *psName;		// PostScript name
 };
 
 struct PSSubstFont {
-  char *psName;			// PostScript name
+  const char *psName;		// PostScript name
   double mWidth;		// width of 'm' character
 };
 
@@ -250,13 +250,13 @@ static PSSubstFont psSubstFonts[] = {
 // PSOutputDev
 //------------------------------------------------------------------------
 
-PSOutputDev::PSOutputDev(char *fileName, Catalog *catalog,
+PSOutputDev::PSOutputDev(const char *fileName, Catalog *catalog,
 			 int firstPage, int lastPage,
 			 GBool embedType11, GBool doForm1) {
   Page *page;
   Dict *resDict;
   FormWidgets *formWidgets;
-  char **p;
+  const char **p;
   int pg;
   Object obj1, obj2;
   int i;
@@ -281,7 +281,7 @@ PSOutputDev::PSOutputDev(char *fileName, Catalog *catalog,
     fileType = psPipe;
 #ifdef HAVE_POPEN
 #ifndef WIN32
-    signal(SIGPIPE, (void (*)(int))SIG_IGN);
+    signal(SIGPIPE, SIG_IGN);
 #endif
     if (!(f = popen(fileName + 1, "w"))) {
       error(-1, "Couldn't run print command '%s'", fileName);
@@ -451,7 +451,7 @@ PSOutputDev::~PSOutputDev() {
     else if (fileType == psPipe) {
       pclose(f);
 #ifndef WIN32
-      signal(SIGPIPE, (void (*)(int))SIG_DFL);
+      signal(SIGPIPE, SIG_DFL);
 #endif
     }
 #endif
@@ -509,8 +509,8 @@ void PSOutputDev::setupFonts(Dict *resDict) {
 void PSOutputDev::setupFont(GfxFont *font) {
   Ref fontFileID;
   GString *name;
-  char *psName;
-  char *charName;
+  const char *psName;
+  const char *charName;
   double xs, ys;
   GBool do16Bit;
   int code;
@@ -627,7 +627,7 @@ void PSOutputDev::setupFont(GfxFont *font) {
   }
 }
 
-void PSOutputDev::setupEmbeddedType1Font(Ref *id, char *psName) {
+void PSOutputDev::setupEmbeddedType1Font(Ref *id, const char *psName) {
   static char hexChar[17] = "0123456789abcdef";
   Object refObj, strObj, obj1, obj2;
   Dict *dict;
@@ -748,7 +748,7 @@ void PSOutputDev::setupEmbeddedType1Font(Ref *id, char *psName) {
 
 //~ This doesn't handle .pfb files or binary eexec data (which only
 //~ happens in pfb files?).
-void PSOutputDev::setupEmbeddedType1Font(GString *fileName, char *psName) {
+void PSOutputDev::setupEmbeddedType1Font(GString *fileName, const char *psName) {
   FILE *fontFile;
   int c;
   int i;
@@ -792,8 +792,8 @@ void PSOutputDev::setupEmbeddedType1Font(GString *fileName, char *psName) {
 }
 
 void PSOutputDev::setupEmbeddedType1CFont(GfxFont *font, Ref *id,
-					  char *psName) {
-  char *fontBuf;
+					  const char *psName) {
+  const char *fontBuf;
   int fontLen;
   Type1CFontConverter *cvt;
   int i;
@@ -825,7 +825,7 @@ void PSOutputDev::setupEmbeddedType1CFont(GfxFont *font, Ref *id,
   cvt = new Type1CFontConverter(fontBuf, fontLen, f);
   cvt->convert();
   delete cvt;
-  gfree(fontBuf);
+  gfree((void *)fontBuf);
 
   // ending comment
   if (psOutEPS) {

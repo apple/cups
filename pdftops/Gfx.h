@@ -103,12 +103,12 @@ private:
 
   void go();
   void execOp(Object *cmd, Object args[], int numArgs);
-  Operator *findOp(char *name);
+  Operator *findOp(const char *name);
   GBool checkArg(Object *arg, TchkType type);
   int getPos();
-  GfxFont *lookupFont(char *name);
-  GBool lookupXObject(char *name, Object *obj);
-  void lookupColorSpace(char *name, Object *obj);
+  GfxFont *lookupFont(const char *name);
+  GBool lookupXObject(const char *name, Object *obj);
+  void lookupColorSpace(const char *name, Object *obj);
 
   // graphics state operators
   void opSave(Object args[], int numArgs);

@@ -37,8 +37,10 @@
 
 //------------------------------------------------------------------------
 
-static int CDECL cmpWidthExcep(const void *w1, const void *w2);
-static int CDECL cmpWidthExcepV(const void *w1, const void *w2);
+extern "C" {
+static int cmpWidthExcep(const void *w1, const void *w2);
+static int cmpWidthExcepV(const void *w1, const void *w2);
+}
 
 //------------------------------------------------------------------------
 
@@ -61,11 +63,11 @@ static Gushort *defCharWidths[12] = {
 // GfxFont
 //------------------------------------------------------------------------
 
-GfxFont::GfxFont(char *tag1, Ref id1, Dict *fontDict) {
+GfxFont::GfxFont(const char *tag1, Ref id1, Dict *fontDict) {
   BuiltinFont *builtinFont;
   Object obj1, obj2, obj3, obj4;
   int missingWidth;
-  char *name2, *p;
+  const char *name2, *p;
   int i;
 
   // get font tag and ID
@@ -386,7 +388,7 @@ Object *GfxFont::getCharProc(int code, Object *proc) {
 void GfxFont::getEncAndWidths(Dict *fontDict, BuiltinFont *builtinFont,
 			      int missingWidth) {
   Object obj1, obj2, obj3;
-  char *buf;
+  const char *buf;
   int len;
   FontFile *fontFile;
   int code, i;
@@ -445,7 +447,7 @@ void GfxFont::getEncAndWidths(Dict *fontDict, BuiltinFont *builtinFont,
       if (!encoding)
 	encoding = fontFile->getEncoding(gTrue);
       delete fontFile;
-      gfree(buf);
+      gfree((void *)buf);
     }
   }
 
@@ -493,7 +495,7 @@ void GfxFont::getEncAndWidths(Dict *fontDict, BuiltinFont *builtinFont,
 }
 
 void GfxFont::findExtFontFile() {
-  char **path;
+  const char **path;
   FILE *f;
 
   for (path = fontPath; *path; ++path) {
@@ -517,7 +519,7 @@ void GfxFont::findExtFontFile() {
   }
 }
 
-char *GfxFont::readExtFontFile(int *len) {
+const char *GfxFont::readExtFontFile(int *len) {
   FILE *f;
   char *buf;
 
@@ -535,7 +537,7 @@ char *GfxFont::readExtFontFile(int *len) {
   return buf;
 }
 
-char *GfxFont::readEmbFontFile(int *len) {
+const char *GfxFont::readEmbFontFile(int *len) {
   char *buf;
   Object obj1, obj2;
   Stream *str;
@@ -576,7 +578,7 @@ void GfxFont::makeWidths(Dict *fontDict, FontEncoding *builtinEncoding,
   Object obj1, obj2;
   int firstChar, lastChar;
   int code, code2;
-  char *charName;
+  const char *charName;
   Gushort *defWidths;
   int index;
   double mult;
@@ -939,11 +941,11 @@ void GfxFont::getType0EncAndWidths(Dict *fontDict) {
   makeWidths(fontDict, NULL, NULL, 0);
 }
 
-static int CDECL cmpWidthExcep(const void *w1, const void *w2) {
+static int cmpWidthExcep(const void *w1, const void *w2) {
   return ((GfxFontWidthExcep *)w1)->first - ((GfxFontWidthExcep *)w2)->first;
 }
 
-static int CDECL cmpWidthExcepV(const void *w1, const void *w2) {
+static int cmpWidthExcepV(const void *w1, const void *w2) {
   return ((GfxFontWidthExcepV *)w1)->first - ((GfxFontWidthExcepV *)w2)->first;
 }
 
@@ -980,7 +982,7 @@ GfxFontDict::~GfxFontDict() {
   gfree(fonts);
 }
 
-GfxFont *GfxFontDict::lookup(char *tag) {
+GfxFont *GfxFontDict::lookup(const char *tag) {
   int i;
 
   for (i = 0; i < numFonts; ++i) {

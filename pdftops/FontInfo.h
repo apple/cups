@@ -16,7 +16,7 @@
 //------------------------------------------------------------------------
 
 #define standardEncodingSize 335
-static char *standardEncodingNames[standardEncodingSize] = {
+static const char *standardEncodingNames[standardEncodingSize] = {
   NULL,
   NULL,
   NULL,
@@ -357,7 +357,7 @@ static FontEncoding standardEncoding(standardEncodingNames,
                                      standardEncodingSize);
 
 #define symbolEncodingSize 257
-static char *symbolEncodingNames[symbolEncodingSize] = {
+static const char *symbolEncodingNames[symbolEncodingSize] = {
   NULL,
   NULL,
   NULL,
@@ -620,7 +620,7 @@ static FontEncoding symbolEncoding(symbolEncodingNames,
                                    symbolEncodingSize);
 
 #define zapfDingbatsEncodingSize 270
-static char *zapfDingbatsEncodingNames[zapfDingbatsEncodingSize] = {
+static const char *zapfDingbatsEncodingNames[zapfDingbatsEncodingSize] = {
   NULL,
   NULL,
   NULL,
@@ -896,7 +896,7 @@ static FontEncoding zapfDingbatsEncoding(zapfDingbatsEncodingNames,
                                          zapfDingbatsEncodingSize);
 
 #define macRomanEncodingSize 256
-static char *macRomanEncodingNames[macRomanEncodingSize] = {
+static const char *macRomanEncodingNames[macRomanEncodingSize] = {
   NULL,
   NULL,
   NULL,
@@ -1158,7 +1158,7 @@ static FontEncoding macRomanEncoding(macRomanEncodingNames,
                                      macRomanEncodingSize);
 
 #define winAnsiEncodingSize 256
-static char *winAnsiEncodingNames[winAnsiEncodingSize] = {
+static const char *winAnsiEncodingNames[winAnsiEncodingSize] = {
   NULL,
   NULL,
   NULL,
@@ -2041,7 +2041,7 @@ static Gushort zapfDingbatsWidths[270] = {
 //------------------------------------------------------------------------
 
 struct BuiltinFont {
-  char *name;
+  const char *name;
   Gushort *widths;
   FontEncoding *encoding;
 };

@@ -80,11 +80,11 @@ PDFDoc::PDFDoc(GString *fileName1, GString *userPassword) {
   ok = setup(userPassword);
 }
 
-PDFDoc::PDFDoc(BaseStream *str, GString *userPassword) {
+PDFDoc::PDFDoc(BaseStream *nstr, GString *userPassword) {
   ok = gFalse;
   fileName = NULL;
   file = NULL;
-  this->str = str;
+  str = nstr;
   xref = NULL;
   catalog = NULL;
   links = NULL;

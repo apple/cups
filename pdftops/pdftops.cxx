@@ -38,6 +38,7 @@ int main(int argc, char *argv[]) {
   ppd_file_t	*ppd;
   ppd_size_t	*size;
   FILE		*fp;
+  const char	*server_root;
   char		tempfile[1024];
   char		buffer[8192];
   int		bytes;
@@ -105,7 +106,10 @@ int main(int argc, char *argv[]) {
   errorInit();
 
   // read config file
-  initParams(CUPS_SERVERROOT "/xpdf.conf");
+  if ((server_root = getenv("CUPS_SERVERROOT")) == NULL)
+    server_root = CUPS_SERVERROOT;
+  sprintf(tempfile, "%s/xpdf.conf", server_root);
+  initParams(tempfile);
 
   // open PDF file
   xref = NULL;

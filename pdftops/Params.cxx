@@ -16,20 +16,20 @@
 #include "gfile.h"
 #include "Params.h"
 
-char **fontPath = NULL;
+const char **fontPath = NULL;
 static int fontPathLen, fontPathSize;
 
 DevFontMapEntry *devFontMap = NULL;
 static int devFontMapLen, devFontMapSize;
 
-void initParams(char *configFile) {
+void initParams(const char *configFile) {
   GString *fileName;
   FILE *f;
   char buf[256];
   char *p, *q;
 
   // initialize font path and font map
-  fontPath = (char **)gmalloc((fontPathSize = 8) * sizeof(char *));
+  fontPath = (const char **)gmalloc((fontPathSize = 8) * sizeof(const char *));
   fontPath[fontPathLen = 0] = NULL;
   devFontMap = (DevFontMapEntry *)gmalloc((devFontMapSize = 8) *
 					  sizeof(DevFontMapEntry));
@@ -43,8 +43,8 @@ void initParams(char *configFile) {
       p = strtok(buf, " \t\n\r");
       if (p && !strcmp(p, "fontpath")) {
 	if (fontPathLen+1 >= fontPathSize)
-	  fontPath = (char **)
-	      grealloc(fontPath, (fontPathSize += 8) * sizeof(char *));
+	  fontPath = (const char **)
+	      grealloc(fontPath, (fontPathSize += 8) * sizeof(const char *));
 	p = strtok(NULL, " \t\n\r");
 	fontPath[fontPathLen++] = copyString(p);
       } else if (p && !strcmp(p, "fontmap")) {
@@ -74,14 +74,14 @@ void freeParams() {
 
   if (fontPath) {
     for (i = 0; i < fontPathLen; ++i)
-      gfree(fontPath[i]);
-    gfree(fontPath);
+      gfree((void *)fontPath[i]);
+    gfree((void *)fontPath);
   }
   if (devFontMap) {
     for (i = 0; i < devFontMapLen; ++i) {
-      gfree(devFontMap[i].pdfFont);
-      gfree(devFontMap[i].devFont);
+      gfree((void *)devFontMap[i].pdfFont);
+      gfree((void *)devFontMap[i].devFont);
     }
-    gfree(devFontMap);
+    gfree((void *)devFontMap);
   }
 }
