@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.24 1999/07/27 12:49:08 mike Exp $"
+ * "$Id: ipp.c,v 1.25 1999/09/03 14:45:44 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -427,7 +427,8 @@ add_class(client_t        *con,		/* I - Client connection */
     * Class doesn't exist; see if we have a printer of the same name...
     */
 
-    if (FindPrinter(resource + 9) != NULL)
+    if ((pclass = FindPrinter(resource + 9)) != NULL &&
+        !(pclass->type & CUPS_PRINTER_REMOTE))
     {
      /*
       * Yes, return an error...
@@ -436,14 +437,25 @@ add_class(client_t        *con,		/* I - Client connection */
       send_ipp_error(con, IPP_NOT_POSSIBLE);
       return;
     }
-    else
-    {
-     /*
-      * No, add the pclass...
-      */
 
-      pclass = AddClass(resource + 9);
+   /*
+    * If we found a printer but didn't error out, then rename the printer to
+    * printer@host...
+    */
+
+    if (pclass != NULL)
+    {
+      strcat(pclass->name, "@");
+      strcat(pclass->name, pclass->hostname);
+      SetPrinterAttrs(pclass);
+      SortPrinters();
     }
+
+   /*
+    * No, add the pclass...
+    */
+
+    pclass = AddClass(resource + 9);
   }
   else if (pclass->type & CUPS_PRINTER_REMOTE)
   {
@@ -626,7 +638,8 @@ add_printer(client_t        *con,	/* I - Client connection */
     * Printer doesn't exist; see if we have a class of the same name...
     */
 
-    if (FindClass(resource + 10) != NULL)
+    if ((printer = FindClass(resource + 10)) != NULL &&
+        !(printer->type & CUPS_PRINTER_REMOTE))
     {
      /*
       * Yes, return an error...
@@ -635,14 +648,25 @@ add_printer(client_t        *con,	/* I - Client connection */
       send_ipp_error(con, IPP_NOT_POSSIBLE);
       return;
     }
-    else
-    {
-     /*
-      * No, add the printer...
-      */
 
-      printer = AddPrinter(resource + 10);
+   /*
+    * If we found a class but didn't error out, then rename the class to
+    * class@host...
+    */
+
+    if (printer != NULL)
+    {
+      strcat(printer->name, "@");
+      strcat(printer->name, printer->hostname);
+      SetPrinterAttrs(printer);
+      SortPrinters();
     }
+
+   /*
+    * No, add the printer...
+    */
+
+    printer = AddPrinter(resource + 10);
   }
   else if (printer->type & CUPS_PRINTER_REMOTE)
   {
@@ -2417,5 +2441,5 @@ validate_job(client_t        *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.24 1999/07/27 12:49:08 mike Exp $".
+ * End of "$Id: ipp.c,v 1.25 1999/09/03 14:45:44 mike Exp $".
  */
