@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.41 1999/10/12 18:29:30 mike Exp $"
+ * "$Id: job.c,v 1.42 1999/12/14 20:41:28 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -742,17 +742,19 @@ StopJob(int id)
 
         if (current->status)
 	  SetPrinterState(current->printer, IPP_PRINTER_STOPPED);
-	else
+	else if (current->printer->state == IPP_PRINTER_BUSY)
 	  SetPrinterState(current->printer, IPP_PRINTER_IDLE);
 
-	current->state          = IPP_JOB_STOPPED;
-        current->printer->job   = NULL;
-        current->printer        = NULL;
+	current->state        = IPP_JOB_STOPPED;
+        current->printer->job = NULL;
+        current->printer      = NULL;
 
         for (i = 0; current->procs[i]; i ++)
 	  if (current->procs[i] > 0)
+	  {
 	    kill(current->procs[i], SIGTERM);
-	current->procs[0] = 0;
+	    current->procs[i] = 0;
+	  }
 
         if (current->pipe)
         {
@@ -976,5 +978,5 @@ start_process(char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.41 1999/10/12 18:29:30 mike Exp $".
+ * End of "$Id: job.c,v 1.42 1999/12/14 20:41:28 mike Exp $".
  */
