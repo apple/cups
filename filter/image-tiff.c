@@ -1,5 +1,5 @@
 /*
- * "$Id: image-tiff.c,v 1.3 1998/07/28 20:51:43 mike Exp $"
+ * "$Id: image-tiff.c,v 1.4 1998/08/12 15:21:56 mike Exp $"
  *
  *   TIFF file routines for espPrint, a collection of printer drivers.
  *
@@ -16,7 +16,12 @@
  * Revision History:
  *
  *   $Log: image-tiff.c,v $
- *   Revision 1.3  1998/07/28 20:51:43  mike
+ *   Revision 1.4  1998/08/12 15:21:56  mike
+ *   Added colormapped image support.
+ *   Fixed bug in column-major color conversion code - was converting xsize
+ *   pixels instead of ysize pixels...
+ *
+ *   Revision 1.3  1998/07/28  20:51:43  mike
  *   Fixed default orientation code.
  *
  *   Revision 1.2  1998/03/19  17:00:21  mike
@@ -25,7 +30,6 @@
  *
  *   Revision 1.1  1998/02/19  20:44:58  mike
  *   Initial revision
- *
  */
 
 /*
@@ -54,7 +58,12 @@ ImageReadTIFF(image_t *img,
 		resunit;
   float		xres,
 		yres;
-  int		bpp,
+  uint16	*redcmap,
+		*greencmap,
+		*bluecmap;
+  int		c,
+		num_colors,
+		bpp,
 		x, y,
 		xstart, ystart,
 		xdir, ydir,
@@ -167,7 +176,7 @@ ImageReadTIFF(image_t *img,
 
   if (orientation < ORIENTATION_LEFTTOP)
   {
-    if (td->td_samplesperpixel > 1)
+    if (td->td_samplesperpixel > 1 || photometric == PHOTOMETRIC_PALETTE)
       pstep = xdir * 3;
     else
       pstep = xdir;
@@ -177,7 +186,7 @@ ImageReadTIFF(image_t *img,
   }
   else
   {
-    if (td->td_samplesperpixel > 1)
+    if (td->td_samplesperpixel > 1 || photometric == PHOTOMETRIC_PALETTE)
       pstep = ydir * 3;
     else
       pstep = ydir;
@@ -421,16 +430,292 @@ ImageReadTIFF(image_t *img,
 	      switch (img->colorspace)
 	      {
 		case IMAGE_RGB :
-		    ImageWhiteToRGB(in, out, img->xsize);
+		    ImageWhiteToRGB(in, out, img->ysize);
 		    break;
 		case IMAGE_BLACK :
-		    ImageWhiteToBlack(in, out, img->xsize);
+		    ImageWhiteToBlack(in, out, img->ysize);
 		    break;
 		case IMAGE_CMY :
-		    ImageWhiteToCMY(in, out, img->xsize);
+		    ImageWhiteToCMY(in, out, img->ysize);
 		    break;
 		case IMAGE_CMYK :
-		    ImageWhiteToCMYK(in, out, img->xsize);
+		    ImageWhiteToCMYK(in, out, img->ysize);
+		    break;
+	      };
+
+              ImagePutCol(img, x, 0, img->ysize, out);
+	    };
+          };
+        };
+        break;
+
+    case PHOTOMETRIC_PALETTE :
+	if (!TIFFGetField(tif, TIFFTAG_COLORMAP, &redcmap, &greencmap, &bluecmap))
+	{
+	  fclose(fp);
+	  return (-1);
+	};
+
+        num_colors = 1 << td->td_bitspersample;
+
+        for (c = 0; c < num_colors; c ++)
+	{
+	  redcmap[c]   >>= 8;
+	  greencmap[c] >>= 8;
+	  bluecmap[c]  >>= 8;
+	};
+
+        if (orientation < ORIENTATION_LEFTTOP)
+        {
+         /*
+          * Row major order...
+          */
+
+          for (y = ystart, ycount = img->ysize;
+               ycount > 0;
+               ycount --, y += ydir)
+          {
+            if (td->td_bitspersample == 1)
+            {
+              TIFFReadScanline(tif, scanline, y, 0);
+              for (xcount = img->xsize, scanptr = scanline,
+	               p = in + xstart * 3, bit = 128;
+                   xcount > 0;
+                   xcount --, p += pstep)
+              {
+        	if (*scanptr & bit)
+		{
+                  p[0] = redcmap[1];
+                  p[1] = greencmap[1];
+                  p[2] = bluecmap[1];
+		}
+                else
+		{
+                  p[0] = redcmap[0];
+                  p[1] = greencmap[0];
+                  p[2] = bluecmap[0];
+		};
+
+        	if (bit > 1)
+                  bit >>= 1;
+        	else
+        	{
+                  bit = 128;
+                  scanptr ++;
+        	};
+              };
+            }
+            else if (td->td_bitspersample == 2)
+            {
+              TIFFReadScanline(tif, scanline, y, 0);
+              for (xcount = img->xsize, scanptr = scanline,
+	               p = in + xstart * 3, bit = 0xc0;
+                   xcount > 0;
+                   xcount --, p += pstep)
+              {
+                pixel = *scanptr & bit;
+                while (pixel > 3)
+                  pixel >>= 2;
+
+                p[0] = redcmap[pixel];
+                p[1] = greencmap[pixel];
+                p[2] = bluecmap[pixel];
+
+        	if (bit > 3)
+                  bit >>= 2;
+        	else
+        	{
+                  bit = 0xc0;
+                  scanptr ++;
+        	};
+              };
+            }
+            else if (td->td_bitspersample == 4)
+            {
+              TIFFReadScanline(tif, scanline, y, 0);
+              for (xcount = img->xsize, scanptr = scanline,
+	               p = in + 3 * xstart, bit = 0xf0;
+                   xcount > 0;
+                   xcount --, p += pstep)
+              {
+                if (bit == 0xf0)
+                {
+		  pixel = (*scanptr & 0xf0) >> 4;
+                  p[0]  = redcmap[pixel];
+                  p[1]  = greencmap[pixel];
+                  p[2]  = bluecmap[pixel];
+                  bit   = 0x0f;
+                }
+                else
+        	{
+		  pixel = *scanptr++ & 0x0f;
+                  p[0]  = redcmap[pixel];
+                  p[1]  = greencmap[pixel];
+                  p[2]  = bluecmap[pixel];
+                  bit   = 0xf0;
+        	};
+              };
+            }
+            else
+            {
+              TIFFReadScanline(tif, scanline, y, 0);
+
+              for (xcount = img->xsize, p = in + 3 * xstart, scanptr = scanline;
+                   xcount > 0;
+                   xcount --, p += pstep)
+              {
+	        p[0] = redcmap[*scanptr];
+	        p[1] = greencmap[*scanptr];
+	        p[2] = bluecmap[*scanptr++];
+	      };
+            };
+
+            if (img->colorspace == IMAGE_RGB)
+              ImagePutRow(img, 0, y, img->xsize, in);
+            else
+            {
+	      switch (img->colorspace)
+	      {
+		case IMAGE_WHITE :
+		    ImageRGBToWhite(in, out, img->xsize);
+		    break;
+		case IMAGE_BLACK :
+		    ImageRGBToBlack(in, out, img->xsize);
+		    break;
+		case IMAGE_CMY :
+		    ImageRGBToCMY(in, out, img->xsize);
+		    break;
+		case IMAGE_CMYK :
+		    ImageRGBToCMYK(in, out, img->xsize);
+		    break;
+	      };
+
+              ImagePutRow(img, 0, y, img->xsize, out);
+	    };
+          };
+        }
+        else
+        {
+         /*
+          * Column major order...
+          */
+
+          for (x = xstart, xcount = img->xsize;
+               xcount > 0;
+               xcount --, x += xdir)
+          {
+            if (td->td_bitspersample == 1)
+            {
+              TIFFReadScanline(tif, scanline, x, 0);
+              for (ycount = img->ysize, scanptr = scanline,
+	               p = in + 3 * ystart, bit = 128;
+                   ycount > 0;
+                   ycount --, p += ydir)
+              {
+        	if (*scanptr & bit)
+		{
+                  p[0] = redcmap[1];
+                  p[1] = greencmap[1];
+                  p[2] = bluecmap[1];
+		}
+                else
+		{
+                  p[0] = redcmap[0];
+                  p[1] = greencmap[0];
+                  p[2] = bluecmap[0];
+		};
+
+        	if (bit > 1)
+                  bit >>= 1;
+        	else
+        	{
+                  bit = 128;
+                  scanptr ++;
+        	};
+              };
+            }
+            else if (td->td_bitspersample == 2)
+            {
+              TIFFReadScanline(tif, scanline, x, 0);
+              for (ycount = img->ysize, scanptr = scanline,
+	               p = in + 3 * ystart, bit = 0xc0;
+                   ycount > 0;
+                   ycount --, p += ydir)
+              {
+                pixel = *scanptr & 0xc0;
+                while (pixel > 3)
+                  pixel >>= 2;
+
+                p[0] = redcmap[pixel];
+                p[1] = greencmap[pixel];
+                p[2] = bluecmap[pixel];
+
+        	if (bit > 3)
+                  bit >>= 2;
+        	else
+        	{
+                  bit = 0xc0;
+                  scanptr ++;
+        	};
+              };
+            }
+            else if (td->td_bitspersample == 4)
+            {
+              TIFFReadScanline(tif, scanline, x, 0);
+              for (ycount = img->ysize, scanptr = scanline,
+	               p = in + 3 * ystart, bit = 0xf0;
+                   ycount > 0;
+                   ycount --, p += ydir)
+              {
+                if (bit == 0xf0)
+                {
+		  pixel = (*scanptr & 0xf0) >> 4;
+                  p[0]  = redcmap[pixel];
+                  p[1]  = greencmap[pixel];
+                  p[2]  = bluecmap[pixel];
+                  bit   = 0x0f;
+                }
+                else
+        	{
+		  pixel = *scanptr++ & 0x0f;
+                  p[0]  = redcmap[pixel];
+                  p[1]  = greencmap[pixel];
+                  p[2]  = bluecmap[pixel];
+                  bit   = 0xf0;
+        	};
+              };
+            }
+            else
+            {
+              TIFFReadScanline(tif, scanline, x, 0);
+
+              for (ycount = img->ysize, p = in + 3 * ystart, scanptr = scanline;
+                   ycount > 0;
+                   ycount --, p += ydir)
+              {
+	        p[0] = redcmap[*scanptr];
+	        p[1] = greencmap[*scanptr];
+	        p[2] = bluecmap[*scanptr++];
+	      };
+            };
+
+            if (img->colorspace == IMAGE_RGB)
+              ImagePutCol(img, x, 0, img->ysize, in);
+            else
+            {
+	      switch (img->colorspace)
+	      {
+		case IMAGE_WHITE :
+		    ImageRGBToWhite(in, out, img->ysize);
+		    break;
+		case IMAGE_BLACK :
+		    ImageRGBToBlack(in, out, img->ysize);
+		    break;
+		case IMAGE_CMY :
+		    ImageRGBToCMY(in, out, img->ysize);
+		    break;
+		case IMAGE_CMYK :
+		    ImageRGBToCMYK(in, out, img->ysize);
 		    break;
 	      };
 
@@ -670,16 +955,16 @@ ImageReadTIFF(image_t *img,
 	      switch (img->colorspace)
 	      {
 		case IMAGE_WHITE :
-		    ImageRGBToWhite(in, out, img->xsize);
+		    ImageRGBToWhite(in, out, img->ysize);
 		    break;
 		case IMAGE_BLACK :
-		    ImageRGBToBlack(in, out, img->xsize);
+		    ImageRGBToBlack(in, out, img->ysize);
 		    break;
 		case IMAGE_CMY :
-		    ImageRGBToCMY(in, out, img->xsize);
+		    ImageRGBToCMY(in, out, img->ysize);
 		    break;
 		case IMAGE_CMYK :
-		    ImageRGBToCMYK(in, out, img->xsize);
+		    ImageRGBToCMYK(in, out, img->ysize);
 		    break;
 	      };
 
@@ -1101,16 +1386,16 @@ ImageReadTIFF(image_t *img,
 		switch (img->colorspace)
 		{
 		  case IMAGE_WHITE :
-		      ImageRGBToWhite(in, out, img->xsize);
+		      ImageRGBToWhite(in, out, img->ysize);
 		      break;
 		  case IMAGE_BLACK :
-		      ImageRGBToBlack(in, out, img->xsize);
+		      ImageRGBToBlack(in, out, img->ysize);
 		      break;
 		  case IMAGE_CMY :
-		      ImageRGBToCMY(in, out, img->xsize);
+		      ImageRGBToCMY(in, out, img->ysize);
 		      break;
 		  case IMAGE_CMYK :
-		      ImageRGBToCMYK(in, out, img->xsize);
+		      ImageRGBToCMYK(in, out, img->ysize);
 		      break;
 		};
 
@@ -1141,5 +1426,5 @@ ImageReadTIFF(image_t *img,
 
 
 /*
- * End of "$Id: image-tiff.c,v 1.3 1998/07/28 20:51:43 mike Exp $".
+ * End of "$Id: image-tiff.c,v 1.4 1998/08/12 15:21:56 mike Exp $".
  */
