@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.41 2001/05/05 11:35:54 mike Exp $"
+ * "$Id: ipp.c,v 1.42 2001/05/21 21:24:48 mike Exp $"
  *
  *   IPP backend for the Common UNIX Printing System (CUPS).
  *
@@ -535,10 +535,12 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
       if (ipp_status == IPP_NOT_FOUND)
       {
        /*
-        * Job has gone away and the server has no job history...
+        * Job has gone away and/or the server has no job history...
 	*/
 
         ippDelete(response);
+
+	ipp_status = IPP_OK;
         break;
       }
 
@@ -620,5 +622,5 @@ password_cb(const char *prompt)	/* I - Prompt (not used) */
 
 
 /*
- * End of "$Id: ipp.c,v 1.41 2001/05/05 11:35:54 mike Exp $".
+ * End of "$Id: ipp.c,v 1.42 2001/05/21 21:24:48 mike Exp $".
  */

@@ -1,4 +1,4 @@
-CHANGES.txt - 05/18/2001
+CHANGES.txt - 05/21/2001
 ------------------------
 
 CHANGES IN CUPS V1.1.8
@@ -46,6 +46,11 @@ CHANGES IN CUPS V1.1.8
 	  for printers to the current classification setting.
 	- Added a new ippFindNextAttribute() function to the
 	  CUPS API.
+	- ppdEmitJCL() now strips any leading path info from
+	  the title string.  This is only an issue for non-CUPS
+	  clients that don't do this already...
+	- Other pstops fixed from Helge Blischke for printing
+	  non-conforming documents.
 
 
 CHANGES IN CUPS V1.1.7

@@ -1,5 +1,5 @@
 /*
- * "$Id: emit.c,v 1.23 2001/03/21 17:58:12 mike Exp $"
+ * "$Id: emit.c,v 1.24 2001/05/21 21:24:49 mike Exp $"
  *
  *   PPD code emission routines for the Common UNIX Printing System (CUPS).
  *
@@ -329,8 +329,16 @@ ppdEmitJCL(ppd_file_t *ppd,		/* I - PPD file record */
   const char	*ptr;			/* Pointer into JCL string */
 
 
+ /*
+  * Range check the input...
+  */
+
   if (ppd == NULL || ppd->jcl_begin == NULL || ppd->jcl_ps == NULL)
     return (0);
+
+ /*
+  * See if the printer supports HP PJL...
+  */
 
   if (strncmp(ppd->jcl_begin, "\033%-12345X@", 10) == 0)
   {
@@ -372,6 +380,13 @@ ppdEmitJCL(ppd_file_t *ppd,		/* I - PPD file record */
       }
 
    /*
+    * Eliminate any path info from the job title...
+    */
+
+    if ((ptr = strrchr(title, '/')) != NULL)
+      title = ptr + 1;
+
+   /*
     * Send PJL JOB command before we enter PostScript mode...
     */
 
@@ -406,5 +421,5 @@ ppd_sort(ppd_choice_t **c1,	/* I - First choice */
 
 
 /*
- * End of "$Id: emit.c,v 1.23 2001/03/21 17:58:12 mike Exp $".
+ * End of "$Id: emit.c,v 1.24 2001/05/21 21:24:49 mike Exp $".
  */
