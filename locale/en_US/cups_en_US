@@ -1,4 +1,4 @@
-koi8-r
+iso-8859-1
 OK
 Cancel
 Help
@@ -14,7 +14,7 @@ Default
 Options
 More Info
 Black
-Colour
+Color
 Cyan
 Magenta
 Yellow
@@ -39,8 +39,8 @@ Use Natural Image Size
 Zoom by Percent
 Zoom by PPI
 Mirror Image: 
-Colour Saturation: 
-Colour Hue: 
+Color Saturation: 
+Color Hue: 
 Fit to Page: 
 Shading: 
 Pen Width: 
@@ -108,7 +108,7 @@ Bottom
 Top
 Filename(s)
 Print
-Installed Options
+Options Installed
 Auto
 400 Your browser sent a request that this server could not understand.
 This server could not verify that you are authorized to access the resource.
@@ -126,6 +126,7 @@ The precondition on the request evaluated to false.
 The request is too large for this server to process.
 The request URI is too large for this server to process.
 The request format is not understood by this server.
+426 An upgrade to a secure connection is required. If you are seeing this message in a web browser then it does not support HTTP encryption upgrades.
 500 The server has detected an unrecoverable error and cannot process your request.
 The requested method is not implemented by this server.
 The proxy server received an invalid response from an upstream server.
