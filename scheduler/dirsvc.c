@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.24 1999/06/23 15:33:14 mike Exp $"
+ * "$Id: dirsvc.c,v 1.25 1999/06/23 15:38:25 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -238,6 +238,7 @@ UpdateBrowseList(void)
 	  {
             strcat(p->name, "@");
 	    strcat(p->name, p->hostname);
+	    SetPrinterAttrs(p);
 	  }
 
           p = NULL;
@@ -291,6 +292,7 @@ UpdateBrowseList(void)
 	  {
             strcat(p->name, "@");
 	    strcat(p->name, p->hostname);
+	    SetPrinterAttrs(p);
 	  }
 
           p = NULL;
@@ -490,5 +492,5 @@ SendBrowseList(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.24 1999/06/23 15:33:14 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.25 1999/06/23 15:38:25 mike Exp $".
  */
