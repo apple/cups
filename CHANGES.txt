@@ -1,5 +1,11 @@
-CHANGES.txt - 08/23/2004
+CHANGES.txt - 08/28/2004
 ------------------------
+
+CHANGES IN CUPS V1.1.21rc3
+
+	- Queue names with 2 periods (e.g. "printer..2") were
+	  not supported (STR #866)
+
 
 CHANGES IN CUPS V1.1.21rc2
 
