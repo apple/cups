@@ -1,5 +1,5 @@
 /*
- * "$Id: image-tiff.c,v 1.17.2.4 2002/03/01 19:55:19 mike Exp $"
+ * "$Id: image-tiff.c,v 1.17.2.5 2002/03/04 14:20:41 mike Exp $"
  *
  *   TIFF file routines for the Common UNIX Printing System (CUPS).
  *
@@ -1212,8 +1212,14 @@ ImageReadTIFF(image_t    *img,		/* IO - Image */
         break;
 
     case PHOTOMETRIC_SEPARATED :
+        numinks = 4;
+
+#ifdef TIFFTAG_NUMBEROFINKS
         if (!TIFFGetField(tif, TIFFTAG_INKSET, &inkset) &&
 	    !TIFFGetField(tif, TIFFTAG_NUMBEROFINKS, &numinks))
+#else
+        if (!TIFFGetField(tif, TIFFTAG_INKSET, &inkset))
+#endif /* TIFFTAG_NUMBEROFINKS */
 	{
           fputs("ERROR: No inkset or number-of-inks tag in the file!\n", stderr);
 	  fclose(fp);
@@ -1705,5 +1711,5 @@ ImageReadTIFF(image_t    *img,		/* IO - Image */
 
 
 /*
- * End of "$Id: image-tiff.c,v 1.17.2.4 2002/03/01 19:55:19 mike Exp $".
+ * End of "$Id: image-tiff.c,v 1.17.2.5 2002/03/04 14:20:41 mike Exp $".
  */
