@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.228 2004/03/24 21:31:52 mike Exp $"
+ * "$Id: ipp.c,v 1.229 2004/04/20 13:34:49 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -2282,7 +2282,7 @@ copy_banner(client_t   *con,	/* I - Client connection */
   }
 
   fchmod(cupsFileNumber(out), 0640);
-  fchown(cupsFileNumber(out), getuid(), Group);
+  fchown(cupsFileNumber(out), RunUser, Group);
 
   if (con->language)
   {
@@ -6869,5 +6869,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.228 2004/03/24 21:31:52 mike Exp $".
+ * End of "$Id: ipp.c,v 1.229 2004/04/20 13:34:49 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: cert.c,v 1.18 2004/02/25 20:14:53 mike Exp $"
+ * "$Id: cert.c,v 1.19 2004/04/20 13:34:49 mike Exp $"
  *
  *   Authentication certificate routines for the Common UNIX
  *   Printing System (CUPS).
@@ -101,9 +101,9 @@ AddCert(int        pid,			/* I - Process ID */
     fchmod(fd, 0440);
 
     if ((grp = getgrnam(SystemGroups[0])) == NULL)
-      fchown(fd, getuid(), 0);
+      fchown(fd, RunUser, 0);
     else
-      fchown(fd, getuid(), grp->gr_gid);
+      fchown(fd, RunUser, grp->gr_gid);
 
     endgrent();
 
@@ -293,5 +293,5 @@ InitCerts(void)
 
 
 /*
- * End of "$Id: cert.c,v 1.18 2004/02/25 20:14:53 mike Exp $".
+ * End of "$Id: cert.c,v 1.19 2004/04/20 13:34:49 mike Exp $".
  */

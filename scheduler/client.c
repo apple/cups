@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.183 2004/03/24 21:23:03 mike Exp $"
+ * "$Id: client.c,v 1.184 2004/04/20 13:34:49 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -1529,7 +1529,7 @@ ReadClient(client_t *con)		/* I - Client to read from */
             SetStringf(&con->filename, "%s/%08x", RequestRoot, request_id ++);
 	    con->file = open(con->filename, O_WRONLY | O_CREAT | O_TRUNC, 0640);
 	    fchmod(con->file, 0640);
-	    fchown(con->file, getuid(), Group);
+	    fchown(con->file, RunUser, Group);
 
             LogMessage(L_DEBUG2, "ReadClient: %d REQUEST %s=%d", con->http.fd,
 	               con->filename, con->file);
@@ -1769,7 +1769,7 @@ ReadClient(client_t *con)		/* I - Client to read from */
           SetStringf(&con->filename, "%s/%08x", RequestRoot, request_id ++);
 	  con->file = open(con->filename, O_WRONLY | O_CREAT | O_TRUNC, 0640);
 	  fchmod(con->file, 0640);
-	  fchown(con->file, getuid(), Group);
+	  fchown(con->file, RunUser, Group);
 
           LogMessage(L_DEBUG2, "ReadClient: %d REQUEST %s=%d", con->http.fd,
 	             con->filename, con->file);
@@ -3185,7 +3185,7 @@ pipe_command(client_t *con,		/* I - Client connection */
     * Child comes here...  Close stdin if necessary and dup the pipe to stdout.
     */
 
-    if (getuid() == 0)
+    if (!RunUser)
     {
      /*
       * Running as root, so change to a non-priviledged user...
@@ -3352,5 +3352,5 @@ CDSAWriteFunc(SSLConnectionRef connection,	/* I  - SSL/TLS connection */
 
 
 /*
- * End of "$Id: client.c,v 1.183 2004/03/24 21:23:03 mike Exp $".
+ * End of "$Id: client.c,v 1.184 2004/04/20 13:34:49 mike Exp $".
  */

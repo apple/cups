@@ -1,5 +1,5 @@
 /*
- * "$Id: classes.c,v 1.56 2004/02/26 20:11:54 mike Exp $"
+ * "$Id: classes.c,v 1.57 2004/04/20 13:34:49 mike Exp $"
  *
  *   Printer class routines for the Common UNIX Printing System (CUPS).
  *
@@ -611,7 +611,7 @@ SaveAllClasses(void)
   * Restrict access to the file...
   */
 
-  fchown(cupsFileNumber(fp), getuid(), Group);
+  fchown(cupsFileNumber(fp), RunUser, Group);
   fchmod(cupsFileNumber(fp), ConfigFilePerm);
 
  /*
@@ -690,5 +690,5 @@ SaveAllClasses(void)
 
 
 /*
- * End of "$Id: classes.c,v 1.56 2004/02/26 20:11:54 mike Exp $".
+ * End of "$Id: classes.c,v 1.57 2004/04/20 13:34:49 mike Exp $".
  */
