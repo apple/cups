@@ -3,6 +3,7 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.19rc2
 
+	- The static cupsimage library was not built by default.
 	- The path for the "ln" command was hardcoded in
 	  Makedefs.in instead of being checked at configure time
 	  (STR #28).

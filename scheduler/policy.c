@@ -1,5 +1,5 @@
 /*
- * "$Id: policy.c,v 1.1.2.3 2003/01/07 18:27:26 mike Exp $"
+ * "$Id: policy.c,v 1.1.2.4 2003/04/17 23:10:35 mike Exp $"
  *
  *   Policy routines for the Common UNIX Printing System (CUPS).
  *
@@ -77,7 +77,7 @@ AddPolicy(const char *policy)		/* I - Name of policy */
     NumPolicies ++;
 
     memset(temp, 0, sizeof(policy_t));
-    strlcpy(temp->name, policy, sizeof(temp->name));
+    temp->name           = strdup(policy);
     temp->default_result = 1;
   }
 
@@ -332,6 +332,7 @@ check_group(const char *username,	/* I - Authenticated username */
   int			i;		/* Looping var */
   struct passwd		*user;		/* User info */
   struct group		*group;		/* System group info */
+  char			junk[33];	/* MD5 password (not used) */
 
 
   LogMessage(L_DEBUG2, "check_group(%s, %s)\n", username, groupname);
@@ -373,8 +374,13 @@ check_group(const char *username,	/* I - Authenticated username */
     return (1);
 
  /*
-  * TODO: Check the lppasswd user:group mapping...
+  * Username not found, group not found, or user is not part of the
+  * system group...  Check for a user and group in the MD5 password
+  * file...
   */
+
+  if (GetMD5Passwd(username, groupname, junk) != NULL)
+    return (1);
 
  /*
   * If we get this far, then the user isn't part of the named group...
@@ -385,5 +391,5 @@ check_group(const char *username,	/* I - Authenticated username */
 
 
 /*
- * End of "$Id: policy.c,v 1.1.2.3 2003/01/07 18:27:26 mike Exp $".
+ * End of "$Id: policy.c,v 1.1.2.4 2003/04/17 23:10:35 mike Exp $".
  */

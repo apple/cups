@@ -1,5 +1,5 @@
 /*
- * "$Id: policy.h,v 1.1.2.4 2003/01/07 18:27:26 mike Exp $"
+ * "$Id: policy.h,v 1.1.2.5 2003/04/17 23:10:35 mike Exp $"
  *
  *   Policy definitions for the Common UNIX Printing System (CUPS)
  *   scheduler.
@@ -54,7 +54,7 @@ typedef struct
 
 typedef struct
 {
-  char		name[IPP_MAX_NAME];	/* Policy name */
+  char		*name;			/* Policy name */
   int		default_result;		/* Default policy result */
   int		num_ops;		/* Number of operations */
   policyop_t	*ops;			/* Operations */
@@ -86,5 +86,5 @@ extern policyop_t	*FindPolicyOp(policy_t *p, ipp_op_t op);
 
 
 /*
- * End of "$Id: policy.h,v 1.1.2.4 2003/01/07 18:27:26 mike Exp $".
+ * End of "$Id: policy.h,v 1.1.2.5 2003/04/17 23:10:35 mike Exp $".
  */
