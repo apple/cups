@@ -1,5 +1,5 @@
 /*
- * "$Id: common.h,v 1.11 2002/05/14 16:13:49 mike Exp $"
+ * "$Id: common.h,v 1.12 2002/08/05 17:00:00 mike Exp $"
  *
  *   Common filter definitions for the Common UNIX Printing System (CUPS).
  *
@@ -41,6 +41,15 @@
 
 
 /*
+ * C++ magic...
+ */
+
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
+
+/*
  * Globals...
  */
 
@@ -70,5 +79,14 @@ extern void	WriteLabels(int orient);
 
 
 /*
- * End of "$Id: common.h,v 1.11 2002/05/14 16:13:49 mike Exp $".
+ * C++ magic...
+ */
+
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
+
+
+/*
+ * End of "$Id: common.h,v 1.12 2002/08/05 17:00:00 mike Exp $".
  */

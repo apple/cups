@@ -1,5 +1,5 @@
 /*
- * "$Id: textcommon.h,v 1.10 2002/03/01 19:53:37 mike Exp $"
+ * "$Id: textcommon.h,v 1.11 2002/08/05 17:00:00 mike Exp $"
  *
  *   Common text filter definitions for the Common UNIX Printing System (CUPS).
  *
@@ -29,6 +29,15 @@
  */
 
 #include "common.h"
+
+
+/*
+ * C++ magic...
+ */
+
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
 
 
 /*
@@ -100,5 +109,14 @@ extern void	WriteProlog(const char *title, const char *user,
 
 
 /*
- * End of "$Id: textcommon.h,v 1.10 2002/03/01 19:53:37 mike Exp $".
+ * C++ magic...
+ */
+
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
+
+
+/*
+ * End of "$Id: textcommon.h,v 1.11 2002/08/05 17:00:00 mike Exp $".
  */
