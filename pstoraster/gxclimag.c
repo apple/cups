@@ -22,7 +22,7 @@
   GNU software to build or run it.
 */
 
-/*$Id: gxclimag.c,v 1.3 2000/03/09 15:09:29 mike Exp $ */
+/*$Id: gxclimag.c,v 1.4 2000/04/20 19:56:42 mike Exp $ */
 /* Higher-level image operations for band lists */
 #include "math_.h"
 #include "memory_.h"
@@ -274,16 +274,12 @@ private int write_image_end_all(P2(gx_device *dev,
 private bool
 image_matrix_ok_to_band(const gs_matrix * pmat)
 {
-    double t;
-
     /* Don't band if the matrix is (nearly) singular. */
     if (fabs(pmat->xx * pmat->yy - pmat->xy * pmat->yx) < 0.001)
 	return false;
     if (is_xxyy(pmat) || is_xyyx(pmat))
 	return true;
-    t = (fabs(pmat->xx) + fabs(pmat->yy)) /
-	(fabs(pmat->xy) + fabs(pmat->yx));
-    return (t < 0.2 || t > 5);
+    return false;
 }
 
 /* Start processing an image. */

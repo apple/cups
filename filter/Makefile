@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.29 2000/03/30 05:19:22 mike Exp $"
+# "$Id: Makefile,v 1.30 2000/04/20 19:56:38 mike Exp $"
 #
 #   Filter makefile for the Common UNIX Printing System (CUPS).
 #
@@ -64,7 +64,7 @@ install:
 	$(INSTALL_DATA) raster.h $(INCLUDEDIR)/cups
 	-$(MKDIR) $(LIBDIR)
 	$(INSTALL_DATA) $(LIBCUPSIMAGE) $(LIBDIR)
-	-if test $(LIBCUPSIMAGE) != "libcupsimage.a"; then \
+	-if test $(LIBCUPSIMAGE) != "libcupsimage.a" -a $(LIBCUPSIMAGE) != "libcupsimage.la"; then \
 		$(RM) `basename $(LIBCUPSIMAGE) .2`; \
 		$(LN) $(LIBCUPSIMAGE) `basename $(LIBCUPSIMAGE) .2`; \
 	fi
@@ -102,6 +102,16 @@ libcupsimage.so.2 libcupsimage.sl.2:	$(IMAGEOBJS) raster.o ../Makedefs
 
 
 #
+# libcupsimage.la
+#
+
+libcupsimage.la:       $(IMAGEOBJS) raster.o ../Makedefs
+	echo Linking $@...
+	$(CC) -o $@ $(IMAGEOBJS:.o=.lo) raster.lo -rpath $(LIBDIR) \
+		-version-info 2:0
+
+
+#
 # libcupsimage.a
 #
 
@@ -122,7 +132,7 @@ raster.o:	raster.h
 imagetops:	imagetops.o common.o $(LIBCUPSIMAGE) ../Makedefs \
 		../cups/$(LIBCUPS)
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ imagetops.o common.o -L. -lcupsimage \
+	$(CC) $(LDFLAGS) -o $@ imagetops.o common.o $(LINKCUPSIMAGE) \
 		$(IMGLIBS) $(LIBS)
 imagetops:	common.h image.h
 
@@ -134,7 +144,7 @@ imagetops:	common.h image.h
 imagetoraster:	imagetoraster.o common.o $(LIBCUPSIMAGE) ../Makedefs \
 		../cups/$(LIBCUPS)
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ imagetoraster.o common.o -L. -lcupsimage \
+	$(CC) $(LDFLAGS) -o $@ imagetoraster.o common.o $(LINKCUPSIMAGE) \
 		$(IMGLIBS) $(LIBS)
 imagetoraster:	common.h image.h raster.h
 
@@ -153,9 +163,9 @@ pstops.o:	common.h
 # rastertoepson
 #
 
-rastertoepson:	rastertoepson.o ../Makedefs ../cups/$(LIBCUPS)
+rastertoepson:	rastertoepson.o ../Makedefs ../cups/$(LIBCUPS) $(LIBCUPSIMAGE)
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ rastertoepson.o -L. -lcupsimage $(LIBS)
+	$(CC) $(LDFLAGS) -o $@ rastertoepson.o $(LINKCUPSIMAGE) $(LIBS)
 rastertoepson.o:	raster.h
 
 
@@ -163,9 +173,9 @@ rastertoepson.o:	raster.h
 # rastertohp
 #
 
-rastertohp:	rastertohp.o ../Makedefs ../cups/$(LIBCUPS)
+rastertohp:	rastertohp.o ../Makedefs ../cups/$(LIBCUPS) $(LIBCUPSIMAGE)
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ rastertohp.o -L. -lcupsimage $(LIBS)
+	$(CC) $(LDFLAGS) -o $@ rastertohp.o $(LINKCUPSIMAGE) $(LIBS)
 rastertohp.o:	raster.h
 
 
@@ -187,5 +197,5 @@ $(OBJS):	../Makedefs ../cups/cups.h ../cups/ppd.h ../cups/language.h
 
 
 #
-# End of "$Id: Makefile,v 1.29 2000/03/30 05:19:22 mike Exp $".
+# End of "$Id: Makefile,v 1.30 2000/04/20 19:56:38 mike Exp $".
 #

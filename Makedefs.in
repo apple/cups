@@ -1,5 +1,5 @@
 #
-# "$Id: Makedefs.in,v 1.21 2000/03/30 05:19:15 mike Exp $"
+# "$Id: Makedefs.in,v 1.22 2000/04/20 19:56:34 mike Exp $"
 #
 #   Common makefile definitions for the Common UNIX Printing System (CUPS).
 #
@@ -47,12 +47,13 @@ SHELL	=	/bin/sh
 # Installation programs...
 #
 
+INSTALL_BIN	=	$(LIBTOOL) $(CP)
 INSTALL_CAT	=	@INSTALL_CAT@
 INSTALL_DATA	=	$(CP)
 INSTALL_LIB	=	$(LIBTOOL) $(CP)
 INSTALL_MAN	=	$(CP)
-INSTALL_PROGRAM	=	$(LIBTOOL) $(CP)
 INSTALL_SCRIPT	=	$(CP)
+INSTALL_SYSV	=	@INSTALL_SYSV@
 
 #
 # Libraries...
@@ -116,7 +117,7 @@ top_srcdir	=	@top_srcdir@
 
 BINDIR		=	@bindir@
 DATADIR		=	@CUPS_DATADIR@
-DOCDIR		=	@CUPS_DOCDIR@
+DOCDIR		=	@CUPS_DOCROOT@
 INCLUDEDIR	=	$(includedir)
 LIBDIR		=	$(libdir)
 LOCALEDIR	= 	@CUPS_LOCALEDIR@
@@ -143,5 +144,5 @@ SERVERROOT	= 	@CUPS_SERVERROOT@
 	$(NROFF) -man $< >$@
 
 #
-# End of "$Id: Makedefs.in,v 1.21 2000/03/30 05:19:15 mike Exp $"
+# End of "$Id: Makedefs.in,v 1.22 2000/04/20 19:56:34 mike Exp $"
 #

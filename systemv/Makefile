@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.19 2000/03/30 05:19:31 mike Exp $"
+# "$Id: Makefile,v 1.20 2000/04/20 19:56:44 mike Exp $"
 #
 #   System V commands makefile for the Common UNIX Printing System (CUPS).
 #
@@ -47,24 +47,26 @@ clean:
 # Install all targets...
 #
 
-install:
+install:	$(INSTALL_SYSV)
 	-$(MKDIR) $(BINDIR)
 	-$(MKDIR) $(LIBDIR)
-	$(INSTALL_PROGRAM) accept lpadmin $(SBINDIR)
-	$(INSTALL_PROGRAM) cancel lp lpoptions lppasswd lpstat $(BINDIR)
+	$(INSTALL_BIN) accept lpadmin $(SBINDIR)
+	$(INSTALL_BIN) cancel lp lpoptions lppasswd lpstat $(BINDIR)
 	$(CHMOD) u+s $(BINDIR)/lppasswd
 	$(RM) $(SBINDIR)/reject
 	$(LN) accept $(SBINDIR)/reject
+	$(RM) $(BINDIR)/disable
+	$(LN) ../sbin/accept $(BINDIR)/disable
+	$(RM) $(BINDIR)/enable
+	$(LN) ../sbin/accept $(BINDIR)/enable
+
+install-sysv:
 	$(RM) $(LIBDIR)/lpadmin
 	$(LN) ../sbin/lpadmin $(LIBDIR)
 	$(RM) $(LIBDIR)/accept
 	$(LN) ../sbin/accept $(LIBDIR)
 	$(RM) $(LIBDIR)/reject
 	$(LN) ../sbin/accept $(LIBDIR)/reject
-	$(RM) $(BINDIR)/disable
-	$(LN) ../sbin/accept $(BINDIR)/disable
-	$(RM) $(BINDIR)/enable
-	$(LN) ../sbin/accept $(BINDIR)/enable
 
 
 #
@@ -147,5 +149,5 @@ lpstat.o:	../cups/cups.h
 $(OBJS):	../Makedefs
 
 #
-# End of "$Id: Makefile,v 1.19 2000/03/30 05:19:31 mike Exp $".
+# End of "$Id: Makefile,v 1.20 2000/04/20 19:56:44 mike Exp $".
 #

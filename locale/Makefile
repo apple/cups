@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.5 2000/03/30 05:19:25 mike Exp $"
+# "$Id: Makefile,v 1.6 2000/04/20 19:56:38 mike Exp $"
 #
 #   Locale file makefile for the Common UNIX Printing System (CUPS).
 #
@@ -52,10 +52,10 @@ clean:
 install:
 	-$(MKDIR) $(LIBDIR)/locale
 	for dir in $(LOCALES) ; do \
-		if test ! -d $(LIBDIR)/locale/$$dir ; then \
-			$(MKDIR) $(LIBDIR)/locale/$$dir ; \
+		if test ! -d $(LOCALEDIR)/$$dir ; then \
+			$(MKDIR) $(LOCALEDIR)/$$dir ; \
 		fi ; \
-		$(INSTALL_DATA) $$dir/cups_$$dir $(LIBDIR)/locale/$$dir ; \
+		$(INSTALL_DATA) $$dir/cups_$$dir $(LOCALEDIR)/$$dir ; \
 	done
 
 
@@ -66,7 +66,7 @@ install:
 # translate outfile language
 #
 
-translate:	translate.o ../cups/libcups.a
+translate:	translate.o ../cups/$(LIBCUPS)
 	echo Linking $<...
 	$(CC) $(LDFLAGS) -o translate translate.o $(LIBS)
 
@@ -74,5 +74,5 @@ translate.o:	../cups/http.h
 
 
 #
-# End of "$Id: Makefile,v 1.5 2000/03/30 05:19:25 mike Exp $".
+# End of "$Id: Makefile,v 1.6 2000/04/20 19:56:38 mike Exp $".
 #

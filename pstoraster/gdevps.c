@@ -22,7 +22,7 @@
   GNU software to build or run it.
 */
 
-/*$Id: gdevps.c,v 1.3 2000/03/13 18:30:14 mike Exp $ */
+/*$Id: gdevps.c,v 1.4 2000/04/20 19:56:41 mike Exp $ */
 /* PostScript-writing driver */
 #include "math_.h"
 #include "memory_.h"
@@ -526,7 +526,39 @@ psw_beginpage(gx_device_vector * vdev)
 	psw_put_lines(s, psw_end_prolog);
     }
     pprintld2(s, "%%%%Page: %ld %ld\n%%%%BeginPageSetup\n", page, page);
-    pprintg2(s, "/pagesave save def GS_pswrite_ProcSet begin %g %g scale\n%%%%EndPageSetup\n",
+    pputs(s, "/pagesave save def GS_pswrite_ProcSet begin\n");
+    if (!pdev->ProduceEPS) {
+	int width = (int)(vdev->width * 72.0 / vdev->HWResolution[0] + 0.5);
+	int height = (int)(vdev->height * 72.0 / vdev->HWResolution[1] + 0.5);
+
+	if (pdev->LanguageLevel > 1.5)
+	    pprintd2(s, "<< /PageSize [%d %d] >> setpagedevice\n",
+		     width, height);
+	else {
+	    typedef struct ps_ {
+		const char *size_name;
+		int width, height;
+	    } page_size;
+	    static const page_size sizes[] = {
+		{"/11x17", 792, 1224},
+		{"/a3", 842, 1190},
+		{"/a4", 595, 842},
+		{"/b5", 501, 709},
+		{"/ledger", 1224, 792},
+		{"/legal", 612, 1008},
+		{"/letter", 612, 792},
+		{"null", 0, 0}
+	    };
+	    const page_size *p = sizes;
+
+	    while (p->size_name[0] == '/' &&
+		   (p->width != width || p->height != height))
+		++p;
+	    pprintd2(s, "%d %d ", width, height);
+	    pprints1(s, "%s PS\n", p->size_name);
+	}
+    }
+    pprintg2(s, "%g %g scale\n%%%%EndPageSetup\n",
 	     72.0 / vdev->HWResolution[0], 72.0 / vdev->HWResolution[1]);
     return 0;
 }
@@ -615,7 +647,7 @@ psw_moveto(gx_device_vector * vdev, floatp x0, floatp y0, floatp x, floatp y,
 {
     stream *s = gdev_vector_stream(vdev);
 
-    if (pdev->path_state.num_points > 1)
+    if (pdev->path_state.num_points > pdev->path_state.move)
 	pputs(s, (pdev->path_state.move ? "P\n" : "p\n"));
     print_coord2(s, x, y, NULL);
     pdev->path_state.num_points = 1;
@@ -699,7 +731,7 @@ psw_endpath(gx_device_vector * vdev, gx_path_type_t type)
     stream *s = vdev->strm;
     const char *star = (type & gx_path_type_even_odd ? "*" : "");
 
-    if (pdev->path_state.num_points > 1 && !pdev->path_state.move)
+    if (pdev->path_state.num_points > 0 && !pdev->path_state.move)
 	pputs(s, "p ");
     if (type & gx_path_type_fill) {
 	if (type & (gx_path_type_stroke | gx_path_type_clip))

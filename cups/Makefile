@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.34 2000/03/30 05:19:20 mike Exp $"
+# "$Id: Makefile,v 1.35 2000/04/20 19:56:37 mike Exp $"
 #
 #   Support library Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -37,14 +37,14 @@ OBJS	=	$(LIBOBJS) testhttp.o testppd.o
 # Header files to install...
 #
 
-HEADERS	=	cups.h http.h ipp.h language.h ppd.h
+HEADERS	=	cups.h http.h ipp.h language.h md5.h ppd.h
 
 
 #
 # Targets in this directory...
 #
 
-TARGETS	=	$(LIBCUPS) testhttp testppd
+TARGETS	=	$(LIBCUPS)
 
 
 #
@@ -71,7 +71,7 @@ install:	all
 	$(INSTALL_DATA) $(HEADERS) $(INCLUDEDIR)/cups
 	-$(MKDIR) $(LIBDIR)
 	$(INSTALL_LIB) $(LIBCUPS) $(LIBDIR)
-	if test $(LIBCUPS) != "libcups.a"; then \
+	if test $(LIBCUPS) != "libcups.a" -a $(LIBCUPS) != "libcups.la"; then \
 		$(RM) `basename $(LIBCUPS) .2`; \
 		$(LN) $(LIBCUPS) `basename $(LIBCUPS) .2`; \
 	fi
@@ -86,6 +86,15 @@ libcups.so.2 libcups.sl.2:	$(LIBOBJS) ../Makedefs
 	$(DSO) $@ $(LIBOBJS)
 	$(RM) `basename $@ .2`
 	$(LN) $@ `basename $@ .2`
+
+
+#
+# libcups.la
+#
+
+libcups.la:    $(LIBOBJS) ../Makedefs
+	echo Linking $@...
+	$(CC) -o $@ $(LIBOBJS:.o=.lo) -rpath $(LIBDIR) -version-info 2:0
 
 
 #
@@ -149,5 +158,5 @@ $(OBJS):	../Makedefs ../config.h
 
 
 #
-# End of "$Id: Makefile,v 1.34 2000/03/30 05:19:20 mike Exp $".
+# End of "$Id: Makefile,v 1.35 2000/04/20 19:56:37 mike Exp $".
 #

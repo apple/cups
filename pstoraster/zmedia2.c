@@ -1,4 +1,6 @@
-/* Copyright (C) 1993, 1995, 1996, 1997, 1998 Aladdin Enterprises.  All rights reserved.
+/*
+  Copyright 2000 by Easy Software Products.
+  Copyright 1993, 1995, 1996, 1997, 1998 Aladdin Enterprises.  All rights reserved.
   
   This file is part of GNU Ghostscript.
   
@@ -22,7 +24,7 @@
   GNU software to build or run it.
 */
 
-/*$Id: zmedia2.c,v 1.4 2000/03/08 23:15:40 mike Exp $ */
+/*$Id: zmedia2.c,v 1.5 2000/04/20 19:56:42 mike Exp $ */
 /* Media matching for setpagedevice */
 #include "math_.h"
 #include "memory_.h"
@@ -87,6 +89,7 @@ zmatchmedia(register os_ptr op)
     check_dict_read(*ppol);
     check_array(*pkeys);
     check_read(*pkeys);
+#if 0 /* MRS - this code breaks the MediaPosition option */
     switch (code = dict_int_null_param(preq, "MediaPosition", 0, 0x7fff,
 				       0, &mepos)) {
 	default:
@@ -108,6 +111,7 @@ zmatchmedia(register os_ptr op)
     code = dict_bool_param(preq, "RollFedMedia", false, &roll);
     if (code < 0)
 	return code;
+#endif /* 0 */
     code = dict_int_param(ppol, "PolicyNotFound", 0, 7, 0,
 			  &policy_default);
     if (code < 0)

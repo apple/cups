@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.62 2000/04/19 18:36:52 mike Exp $"
+ * "$Id: job.c,v 1.63 2000/04/20 19:56:43 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -1265,93 +1265,102 @@ UpdateJob(job_t *job)		/* I - Job to check */
   {
     bufused += bytes;
     buffer[bufused] = '\0';
-
-    while ((lineptr = strchr(buffer, '\n')) != NULL)
-    {
-     /*
-      * Terminate each line and process it...
-      */
-
-      *lineptr++ = '\0';
-
-     /*
-      * Figure out the logging level...
-      */
-
-      if (strncmp(buffer, "ERROR:", 6) == 0)
-      {
-        loglevel = L_ERROR;
-	message  = buffer + 6;
-      }
-      else if (strncmp(buffer, "WARNING:", 8) == 0)
-      {
-        loglevel = L_WARN;
-	message  = buffer + 8;
-      }
-      else if (strncmp(buffer, "INFO:", 5) == 0)
-      {
-        loglevel = L_INFO;
-	message  = buffer + 5;
-      }
-      else if (strncmp(buffer, "DEBUG:", 6) == 0)
-      {
-        loglevel = L_DEBUG;
-	message  = buffer + 6;
-      }
-      else if (strncmp(buffer, "PAGE:", 5) == 0)
-      {
-        loglevel = L_PAGE;
-	message  = buffer + 5;
-      }
-      else
-      {
-        loglevel = L_DEBUG;
-	message  = buffer;
-      }
-
-     /*
-      * Skip leading whitespace in the message...
-      */
-
-      while (isspace(*message))
-        message ++;
-
-     /*
-      * Send it to the log file and printer state message as needed...
-      */
-
-      if (loglevel == L_PAGE)
-      {
-       /*
-        * Page message; send the message to the page_log file...
-	*/
-
-	LogPage(job, message);
-      }
-      else
-      {
-       /*
-        * Other status message; send it to the error_log file...
-	*/
-
-	if (loglevel != L_INFO)
-	  LogMessage(loglevel, "%s", message);
-
-	if ((loglevel == L_INFO && !job->status) ||
-	    loglevel < L_INFO)
-          strncpy(job->printer->state_message, message,
-                  sizeof(job->printer->state_message) - 1);
-      }
-
-     /*
-      * Update the input buffer...
-      */
-
-      strcpy(buffer, lineptr);
-      bufused -= lineptr - buffer;
-    }
+    lineptr = strchr(buffer, '\n');
   }
   else
+  {
+    lineptr    = buffer + bufused;
+    lineptr[1] = 0;
+  }
+
+  while (lineptr != NULL)
+  {
+   /*
+    * Terminate each line and process it...
+    */
+
+    *lineptr++ = '\0';
+
+   /*
+    * Figure out the logging level...
+    */
+
+    if (strncmp(buffer, "ERROR:", 6) == 0)
+    {
+      loglevel = L_ERROR;
+      message  = buffer + 6;
+    }
+    else if (strncmp(buffer, "WARNING:", 8) == 0)
+    {
+      loglevel = L_WARN;
+      message  = buffer + 8;
+    }
+    else if (strncmp(buffer, "INFO:", 5) == 0)
+    {
+      loglevel = L_INFO;
+      message  = buffer + 5;
+    }
+    else if (strncmp(buffer, "DEBUG:", 6) == 0)
+    {
+      loglevel = L_DEBUG;
+      message  = buffer + 6;
+    }
+    else if (strncmp(buffer, "PAGE:", 5) == 0)
+    {
+      loglevel = L_PAGE;
+      message  = buffer + 5;
+    }
+    else
+    {
+      loglevel = L_DEBUG;
+      message  = buffer;
+    }
+
+   /*
+    * Skip leading whitespace in the message...
+    */
+
+    while (isspace(*message))
+      message ++;
+
+   /*
+    * Send it to the log file and printer state message as needed...
+    */
+
+    if (loglevel == L_PAGE)
+    {
+     /*
+      * Page message; send the message to the page_log file...
+      */
+
+      LogPage(job, message);
+    }
+    else
+    {
+     /*
+      * Other status message; send it to the error_log file...
+      */
+
+      if (loglevel != L_INFO)
+	LogMessage(loglevel, "%s", message);
+
+      if ((loglevel == L_INFO && !job->status) ||
+	  loglevel < L_INFO)
+        strncpy(job->printer->state_message, message,
+                sizeof(job->printer->state_message) - 1);
+    }
+
+   /*
+    * Update the input buffer...
+    */
+
+    strcpy(buffer, lineptr);
+    bufused -= lineptr - buffer;
+
+    lineptr = strchr(buffer, '\n');
+  }
+
+  if (bytes <= 0)
   {
     DEBUG_printf(("UpdateJob: job %d is complete.\n", job->id));
 
@@ -2313,5 +2322,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.62 2000/04/19 18:36:52 mike Exp $".
+ * End of "$Id: job.c,v 1.63 2000/04/20 19:56:43 mike Exp $".
  */
