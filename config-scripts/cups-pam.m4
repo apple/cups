@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-pam.m4,v 1.2.2.2 2002/01/02 18:50:23 mike Exp $"
+dnl "$Id: cups-pam.m4,v 1.2.2.3 2002/05/29 16:39:17 mike Exp $"
 dnl
 dnl   PAM stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -34,8 +34,10 @@ PAMLIBS=""
 
 if test x$enable_pam != xno; then
 	SAVELIBS="$LIBS"
+
 	AC_CHECK_LIB(dl,dlopen)
 	AC_CHECK_LIB(pam,pam_start)
+	AC_CHECK_HEADER(pam/pam_appl.h,AC_DEFINE(HAVE_PAM_PAM_APPL_H))
 
 	if test x$ac_cv_lib_pam_pam_start != xno; then
 		if test x$ac_cv_lib_dl_dlopen != xno; then
@@ -55,5 +57,5 @@ AC_SUBST(PAMDIR)
 AC_SUBST(PAMLIBS)
 
 dnl
-dnl End of "$Id: cups-pam.m4,v 1.2.2.2 2002/01/02 18:50:23 mike Exp $".
+dnl End of "$Id: cups-pam.m4,v 1.2.2.3 2002/05/29 16:39:17 mike Exp $".
 dnl

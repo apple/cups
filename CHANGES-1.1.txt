@@ -5,6 +5,13 @@ CHANGES IN CUPS V1.1.15
 
 	- Updated the CUPS license agreement for the new MacOS
 	  license exception.
+	- Updated the ppdEmit() and ppdEmitFd() functions to
+	  (re)mark the correct PageSize or PageRegion option
+	  depending on the selected ManualFeed or InputSlot
+	  options.
+	- ppdEmitFd() didn't handle custom page sizes.
+	- Darwin uses <pam/pam_appl.h> instead of
+	  <security/pam_appl.h>.
 	- The jobs.cgi web interface now handles all job
 	  operations, allowing the administrator to allow "job
 	  administrators" or operators to manage jobs (but not
@@ -29,7 +36,7 @@ CHANGES IN CUPS V1.1.15
 	  have a small comment header explaining where the file
 	  comes from...
 	- The PostScript filter now supports 6, 9, and 16-up
-	  output, as well as new number-up-border and
+	  output, as well as new page-border and
 	  number-up-layout options.
 	- The lpoptions command didn't set options properly when
 	  using the default printer.

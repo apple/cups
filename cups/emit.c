@@ -1,5 +1,5 @@
 /*
- * "$Id: emit.c,v 1.23.2.3 2002/05/28 19:43:04 mike Exp $"
+ * "$Id: emit.c,v 1.23.2.4 2002/05/29 16:39:17 mike Exp $"
  *
  *   PPD code emission routines for the Common UNIX Printing System (CUPS).
  *
@@ -27,11 +27,13 @@
  *
  * Contents:
  *
- *   ppdCollect() - Collect all marked options that reside in the specified
- *   ppdEmit()    - Emit code for marked options to a file.
- *   ppdEmitFd()  - Emit code for marked options to a file.
- *   ppdEmitJCL() - Emit code for JCL options to a file.
- *   ppd_sort()   - Sort options by ordering numbers...
+ *   ppdCollect()       - Collect all marked options that reside in the
+ *                        specified section.
+ *   ppdEmit()          - Emit code for marked options to a file.
+ *   ppdEmitFd()        - Emit code for marked options to a file.
+ *   ppdEmitJCL()       - Emit code for JCL options to a file.
+ *   ppd_handle_media() - Handle media selection...
+ *   ppd_sort()         - Sort options by ordering numbers...
  */
 
 /*
@@ -53,7 +55,17 @@
  * Local functions...
  */
 
+static void	ppd_handle_media(ppd_file_t *ppd);
 static int	ppd_sort(ppd_choice_t **c1, ppd_choice_t **c2);
+
+
+/*
+ * Local globals...
+ */
+
+static const char *ppd_custom_code =
+		"pop pop pop\n"
+		"<</PageSize[5 -2 roll]/ImagingBBox null>>setpagedevice\n";
 
 
 /*
@@ -153,6 +165,16 @@ ppdEmit(ppd_file_t    *ppd,		/* I - PPD file record */
   ppd_size_t	*size;			/* Custom page size */
 
 
+ /*
+  * Use PageSize or PageRegion as required...
+  */
+
+  ppd_handle_media(ppd);
+
+ /*
+  * Collect the options we need to emit and emit them!
+  */
+
   if ((count = ppdCollect(ppd, section, &choices)) == 0)
     return (0);
 
@@ -182,7 +204,8 @@ ppdEmit(ppd_file_t    *ppd,		/* I - PPD file record */
         return (-1);
       }
 
-      if (strcasecmp(((ppd_option_t *)choices[i]->option)->keyword, "PageSize") == 0 &&
+      if ((strcasecmp(((ppd_option_t *)choices[i]->option)->keyword, "PageSize") == 0 ||
+           strcasecmp(((ppd_option_t *)choices[i]->option)->keyword, "PageRegion") == 0) &&
           strcasecmp(choices[i]->choice, "Custom") == 0)
       {
        /*
@@ -202,8 +225,7 @@ ppdEmit(ppd_file_t    *ppd,		/* I - PPD file record */
 	  * Level 2 command sequence...
 	  */
 
-	  fputs("pop pop pop\n", fp);
-	  fputs("<</PageSize[5 -2 roll]/ImagingBBox null>>setpagedevice\n", fp);
+	  fputs(ppd_custom_code, fp);
 	}
       }
 
@@ -254,8 +276,19 @@ ppdEmitFd(ppd_file_t    *ppd,		/* I - PPD file record */
   int		i,			/* Looping var */
 		count;			/* Number of choices */
   ppd_choice_t	**choices;		/* Choices */
+  ppd_size_t	*size;			/* Custom page size */
   char		buf[1024];		/* Output buffer for feature */
 
+
+ /*
+  * Use PageSize or PageRegion as required...
+  */
+
+  ppd_handle_media(ppd);
+
+ /*
+  * Collect the options we need to emit and emit them!
+  */
 
   if ((count = ppdCollect(ppd, section, &choices)) == 0)
     return (0);
@@ -288,10 +321,49 @@ ppdEmitFd(ppd_file_t    *ppd,		/* I - PPD file record */
         return (-1);
       }
 
-      if (write(fd, choices[i]->code, strlen(choices[i]->code)) < 1)
+      if ((strcasecmp(((ppd_option_t *)choices[i]->option)->keyword, "PageSize") == 0 ||
+           strcasecmp(((ppd_option_t *)choices[i]->option)->keyword, "PageRegion") == 0) &&
+          strcasecmp(choices[i]->choice, "Custom") == 0)
       {
-        free(choices);
-        return (-1);
+       /*
+        * Variable size; write out standard size options (this should
+	* eventually be changed to use the parameter positions defined
+	* in the PPD file...)
+	*/
+
+        size = ppdPageSize(ppd, "Custom");
+        snprintf(buf, sizeof(buf), "%.0f %.0f 0 0 0\n", size->width,
+	         size->length);
+
+	if (write(fd, buf, strlen(buf)) < 1)
+	{
+          free(choices);
+          return (-1);
+	}
+
+	if (choices[i]->code == NULL)
+	{
+	 /*
+	  * This can happen with certain buggy PPD files that don't include
+	  * a CustomPageSize command sequence...  We just use a generic
+	  * Level 2 command sequence...
+	  */
+
+	  if (write(fd, ppd_custom_code, strlen(ppd_custom_code)) < 1)
+	  {
+            free(choices);
+            return (-1);
+	  }
+	}
+      }
+
+      if (choices[i]->code != NULL && choices[i]->code[0] != '\0')
+      {
+	if (write(fd, choices[i]->code, strlen(choices[i]->code)) < 1)
+	{
+          free(choices);
+          return (-1);
+	}
       }
 
       if (write(fd, "%%EndFeature\n", 13) < 1)
@@ -391,6 +463,55 @@ ppdEmitJCL(ppd_file_t *ppd,		/* I - PPD file record */
 
 
 /*
+ * 'ppd_handle_media()' - Handle media selection...
+ */
+
+static void
+ppd_handle_media(ppd_file_t *ppd)
+{
+  ppd_choice_t	*manual_feed,		/* ManualFeed choice, if any */
+		*input_slot;		/* InputSlot choice, if any */
+  ppd_size_t	*size;			/* Current media size */
+
+
+ /*
+  * This function determines if the user has selected a media source
+  * via the InputSlot or ManualFeed options; if so, it marks the
+  * PageRegion option corresponding to the current media size.
+  * Otherwise it marks the PageSize option.
+  */
+
+  if ((size = ppdPageSize(ppd, NULL)) == NULL)
+    return;
+
+  manual_feed = ppdFindMarkedChoice(ppd, "ManualFeed");
+  input_slot  = ppdFindMarkedChoice(ppd, "InputSlot");
+
+  if (strcasecmp(size->name, "Custom") == 0 ||
+      (manual_feed == NULL && input_slot == NULL) ||
+      (manual_feed != NULL && strcasecmp(manual_feed->choice, "False") == 0) ||
+      (input_slot != NULL && (input_slot->code == NULL || !input_slot->code[0])))
+  {
+   /*
+    * Manual feed was not selected and/or the input slot selection does
+    * not contain any PostScript code.  Use the PageSize option...
+    */
+
+    ppdMarkOption(ppd, "PageSize", size->name);
+  }
+  else
+  {
+   /*
+    * Manual feed was selected and/or the input slot selection contains
+    * PostScript code.  Use the PageRegion option...
+    */
+
+    ppdMarkOption(ppd, "PageRegion", size->name);
+  }
+}
+
+
+/*
  * 'ppd_sort()' - Sort options by ordering numbers...
  */
 
@@ -408,5 +529,5 @@ ppd_sort(ppd_choice_t **c1,	/* I - First choice */
 
 
 /*
- * End of "$Id: emit.c,v 1.23.2.3 2002/05/28 19:43:04 mike Exp $".
+ * End of "$Id: emit.c,v 1.23.2.4 2002/05/29 16:39:17 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.c,v 1.41.2.10 2002/05/16 14:00:05 mike Exp $"
+ * "$Id: auth.c,v 1.41.2.11 2002/05/29 16:39:18 mike Exp $"
  *
  *   Authorization routines for the Common UNIX Printing System (CUPS).
  *
@@ -63,7 +63,11 @@
 #  include <crypt.h>
 #endif /* HAVE_CRYPT_H */
 #if HAVE_LIBPAM
-#  include <security/pam_appl.h>
+#  ifdef HAVE_PAM_PAM_APPL_H
+#    include <pam/pam_appl.h>
+#  else
+#    include <security/pam_appl.h>
+#  endif /* HAVE_PAM_PAM_APPL_H */
 #endif /* HAVE_LIBPAM */
 #ifdef HAVE_USERSEC_H
 #  include <usersec.h>
@@ -1719,5 +1723,5 @@ to64(char          *s,	/* O - Output string */
 
 
 /*
- * End of "$Id: auth.c,v 1.41.2.10 2002/05/16 14:00:05 mike Exp $".
+ * End of "$Id: auth.c,v 1.41.2.11 2002/05/29 16:39:18 mike Exp $".
  */
