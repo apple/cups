@@ -1,6 +1,6 @@
 %PDF-1.2
 %âãÏÓ
-1 0 obj<</Producer(htmldoc 2.0b1 Copyright 1997-1999 Michael Sweet, All Rights Reserved.)/CreationDate(D:19990709142832Z)/Title(DRAFT - CUPS Interface Design Description)/Author(Easy Software Products)>>endobj
+1 0 obj<</Producer(htmldoc 2.0b1 Copyright 1997-1999 Michael Sweet, All Rights Reserved.)/CreationDate(D:19990730151722Z)/Title(DRAFT - CUPS Interface Design Description)/Author(Easy Software Products)>>endobj
 2 0 obj<</Type/Encoding/BaseEncoding/WinAnsiEncoding>>endobj
 3 0 obj<</Type/Font/Subtype/Type1/BaseFont/Courier/Encoding 2 0 R>>endobj
 4 0 obj<</Type/Font/Subtype/Type1/BaseFont/Times-Roman/Encoding 2 0 R>>endobj
@@ -794,13 +794,11 @@ endobj
 endobj
 433 0 obj<</Type/Page/Parent 408 0 R/Contents 434 0 R/Resources<</ProcSet[/PDF/Text]/Font<</F0 3 0 R/F4 4 0 R/F6 6 0 R/F8 7 0 R/F9 8 0 R>>>>>>endobj
 434 0 obj<</Length 435 0 R/Filter/FlateDecode>>stream
-xÚVMoã6½ûWr©·€Krœ¤@m¼rHë¦Þ
-ì…–(›‰Ôò#¶ÿ}gHÑÚ4nÃ%Íß¼y3Ô·Qüep›C1ƒ²ýº]?ÞC–Á²Æ7³»izËj\¤Ó4K3(]gEc¹þ°üŠ¦ÓƒiRÜ§32]n„cµk`¯+g9tZ½ŠŠ`P*ùÊµJ‚vUƒÝp¨•n
-Q'pŸæA%YAëjL¯pÚ¯åtÉ¯í¾ãÏXŠ¿Ö¬=G•ÿ`…d–öö¾•ãZ^UF‡À1½Œ7Há©FÈýC0®ë”¶Æ[!N%4/m³/:^
-ÖDÀ=þÚÓÂUr-ÛÃª·¯¯Ò ÿÈ’ÏÒé‘ÿÜóÿÌ¤cÍƒê7ïWa¥TÃ™<)ƒT–v
-	¼<-  ¢{fýÃSŠbÚ•Btù#åÝÖ\r…$»aºÚ2üÚkæ¯¬qžóš5†_Ê¶ÙªŠ7¿¹vuIru`ÉF^Í±‚Iÿ¬„–â‚ô	%F7P"cXgP«=úžWn)Ê†U_	ì)g;gIËè7ØuÞ£¸”ùÔg¾Ð
-wæÿ±ÑN“.U£<nŠó¿úLs£G5½Vqi„ÝC;™à?Ãm†k4o3\ç¸ÎqçZ1¼žõ¯O6:÷“ÕÐ˜ Í¼¶Ll)ê.ªLi±¿‘‰­hª5™ÂïÈÞ
-Ã‰L„*×2[n@ÉÈQdç@yäæåQ"Ïç^ãg^	¶|é¡V†CH”™¾4‹ÅœÄ:ãDoðÕâMú°”÷šµ-óÆÊ±¶\¢J,}û‡éÓø×º¨¿Œw_>ÀÏPÁ°‹^·TÞfthLÈ,»®³)¦4‰ñNô‘e7hñžDPsÃtíF+·Þ|g9TßA$¦Ø`5“†Ú!1¼h±ó½KÅxxþ«o àGÙ÷ÓÙ™¤ó¤ëœåCL¬þîÐö9Gri<Üøñð9œ¡ïÍ¿9<šª“¾Ä%’±Ý¬{<‹ûñððiñ'<Íç°ÅÆñ30Õ	|g‰%M:àáÁiÊÂsPØÐZ+ŽÄ0¦®²trÕ§w×CÎŠfÅMøÎ˜¿üò¸„¤GA³²fxÆÎ¹kI„ÞÅþKÈ5¹Í'j‚ßÇ>š?YÂY9½›¤÷A·tÿq9úcô7yÑ³´endstream
+xÚVßÚF~ç¯ÝKI%;Øæàˆ”‡äÈI÷p-½ÒJ•ò²ØkØÈÞuöÇÿ}gvmNr¤B¬½3»ß|óÍ_G	Lð“À<…ly=ú¸½}X@’ÀºÄÙÝ4¾ƒu1ÎâiœÄ	ä®1¢²\¿YAÓioe‹xF¦ë0`¬rÌâïÆYV/¢àäJ¾pm„’ ]ÅA•`wJ¥ëwáÔ	,â”ŽEPQ’ÑºÓ^C÷c£œÎù[{l8žg,¿Õ¬¾D‘ÿ	`…d–îö¾•ãj^€UFƒÀ1¼_Œ7ˆá±DÈíK0®i”¶Æ[áœBhžÛê6žVu€[ü¥§­
+7ÑÔì›Ö¾¼ˆüÿQ:‹§'þSÏÿ“ŽU÷ªÜ¼ž…Rgò,RYº)ðü¸‚€Šž™õ/Ï)êÂ.z k?RÞaË%×ÁPÈA°;¦‹=ÓÈ_ ½d®²ðÂ*ç9/Yeøµh³­*xõ›«7×$GP·ölÇ«9e0jßåPÓ¹ ýÁ„O#c˜gP›#ú^fn)Ê†_œ	ì)ggIËè7¸uÞ¢¸ùÔG¾Ò
+oæÿ±ÐÎƒÎU¥<n:çÕ™æFUŽrj­àÒ‹¹guÍ žLð›à7…:Á5:Õ	®S\§¸NÓ+¶gíöÙu—~c`² ¡™W˜é
+‹jŒò“[¬räc/ª"GeÆð;2¡÷Âp¢ä5å¯f6ß’SG=ñCÏ?D‰l_zŸx!Øú;HûŒ*!QlBú­VK’\¨3m|‡¯6?A–OØØ
+÷·9%ß.ËAØ5—¨h's_êÆ!IÔ-~ZCåçñáóxßû+:ß9I¡„Åý&d|†³?9†½–’[òzMN¨ÏaÈv§•Ûî¾±*uHƒìÕL* ÐöðG‹ƒ¯vJÜýÓ?mÉß®ùõ9:ŸŸ4š¦Âî?ÄÄÊoÆì¸¿çÉµ†rëÊßaê¾ÞP4ÿêp˜g-GBŽK$c¿˜ýnz·åþ¯ÕŸð¸\Â‹ÌwÍŽNÉÀ–XPÒÄîÖ¨/œœÂ†2Üð0DCc»IâÉMÞ]9É2˜e·áŸÉòùÃÃ¢u×’áT^r#¶’~zÓÕjD®Ñ<ôÔ¿O=>êÿä„é:½›Ä‹ ¿9=Zþý®æÂÊendstream
 endobj
 435 0 obj
 916
@@ -929,19 +927,21 @@ endobj
 endobj
 469 0 obj<</Type/Page/Parent 408 0 R/Contents 470 0 R/Resources<</ProcSet[/PDF/Text]/Font<</F0 3 0 R/F4 4 0 R/F6 6 0 R/F8 7 0 R/F9 8 0 R>>>>>>endobj
 470 0 obj<</Length 471 0 R/Filter/FlateDecode>>stream
-xÚ­•Énƒ0†ï<ÅS©„Ð’íÚtQ•R•>€c‰S/Ô6•Ú§¯ÉR)d’
-À|ö?ó{Œ?ƒzþŠax· 2¸KƒèqñÒÌGÃRÖéCB¸ç©Ó†£½J—ž@—œÞº+4*¬‰f\­‰ä ‘.ÖÑÞ&Ú¡DQ»C:×UJäõÄg=b r!ŠísÖW!j)=lÁ åa»»~…{†	>ke¡sWWã–ÌÖa¨šP"'LV×õ°1—¾QþÅÛ¶•DN«Â2¤EnÙÉš&¸ £r¾ÓiRÏêÐ€E·J)ã¢|eÄ‘ò[ó§eZ9ÛÊ$ß¸Úëå«”s]–Ô¬º•«ÙX"s0Þ_&u¬Œ³«?c-¾ˆ©]}nÁßÎgb´vÀ6ÿÑoÐÙêëä}ú–.M#¹hFè*vºð´iµöEEtÎÃÚ8yz†Üè¹!ò	­²švÙ:%Ëç…!ŽkµÚD/Ï/g®XÄ4m*ìÑB¢rkácz£­ž?NÃ¤×=~v&Ã¤;òç«ÇãòÃC¼¿âê˜endstream
+xÚ­•ÍnÂ0Çï}
+™´RÊÊ×uÀ&HLë $.„¥MIÂ¤íé— ÓD–jmýKlÿm7k/„–½Bèµá©4õžc/x@8€8±–n/‚˜5:ÐF\!5RqÔñÊr]CÇÙ¥~»ÛÜ¢ÁF«`Î³ â%ÂÎÚÚ[”dÅá’Æc‘y5±®FÔHzÄŒsÚS Ê4µ°…š3„%*lêå	&ø¼–`„RÌMU"Œk2X…av	%rÂÒb]O£peå.Âèº­$rZt|"BºÉ5+ðçÒ —Daàö+“k°·±á*)°ý$}ƒL¶_‡³wpÝÄ)0bH·ãË%¢&Ô f+GÂ…{uKÝ3Ö,Ê¿óDfF×*©ˆ¶î‹ú»½n‹&•¬ø)F£Iš„Ùlt›«si\ýµø"êNG—È6ÕEî‚9¡Ÿ˜±òÄ÷Ð¾Õê'Ð÷+§ø:\É…"é5.d–T´ËŸ2àX¾Ø(;£2ÛÑt2Ÿ­XÿÏ³=Zý¨Õ<ŽF½¨Ù·g­µ‡÷a{oÞ/½endstream
 endobj
 471 0 obj
-434
+433
 endobj
 472 0 obj<</Type/Page/Parent 408 0 R/Contents 473 0 R/Resources<</ProcSet[/PDF/Text]/Font<</F0 3 0 R/F4 4 0 R/F6 6 0 R/F8 7 0 R>>>>>>endobj
 473 0 obj<</Length 474 0 R/Filter/FlateDecode>>stream
-xÚ’ßOÂ0Çß÷WÜ#&î'£ðªNßPª¯¦v·Qmi‡	ÿ½í6	%]ºäúùÞ÷îr› …Ä†Ä|ÜÓ žHS •‘IM€–ƒø“™˜oµ+±jÐÜÐ¥#óf$Ê=IŽi/Z0hE‰°@ƒQ'û6u!®bíï.ómpo°‡Ár#ts…ßJÕör?ÝkÒ¿wµÙw§û)Üž’hŒ2gA&ËSX³Ï°í4¯hKëòRWÂB)òF™p%&¤…Ù¬èý*e _€6íŒÿfjp³EÛØÿ;k”¥ugKõÑÕÑÛNúL$…lœu;Y¼ÜM)„ðð:›ÃÓ~
-7¨Zú_»BIŸ"L‡CÇYâ•YâCyB"m`#—¨è«Ýæ=Òà9øN›ãcendstream
+xÚ“ßOÂ0Çß÷WÜ#&î'£òªNßP¦¯f¶·­ÚÒv&ü÷¶l‚$JÖdÉõ{ßÏ]{Ý)$îKaLü¢ëà®â4…²ö!2Í£)”lT:¦21“ôª\:Y~…‰r/+[C[dÝ
+58i·Fa+Ë¥€š¯Ð€FÃB‹£Þç~7:ð\šE}é­¡^@àÂåÕEó;e±5×ð
+{±ëSse/à­dcÎ÷Óï&Ãî¨¢®6óæò~¦®•¨µÔ'…•`ÇbU5xB{éE)ÅÎuÅ0®‘Z©·@¥›
+.ÌçÅÀ«¥¬hJïÎøoP›5ÿ'+Œ‹¦ÇÁR¾÷uØéàDÜãÈ&ñNÅóí¬„î_æxÜÏAáªþ·7êÞ"LÇco²Ägf‰å	qF»À&Î¨ªâýä=”ÁSð	o|ìendstream
 endobj
 474 0 obj
-315
+338
 endobj
 475 0 obj<</Type/Page/Parent 408 0 R/Contents 476 0 R/Resources<</ProcSet[/PDF/Text]/Font<</F4 4 0 R/F6 6 0 R/F8 7 0 R/F9 8 0 R>>>>>>endobj
 476 0 obj<</Length 477 0 R/Filter/FlateDecode>>stream
@@ -1507,71 +1507,71 @@ xref
 0000064211 00000 n 
 0000064232 00000 n 
 0000064381 00000 n 
-0000064886 00000 n 
-0000064907 00000 n 
-0000065047 00000 n 
-0000065433 00000 n 
-0000065454 00000 n 
-0000065594 00000 n 
-0000066090 00000 n 
-0000066111 00000 n 
-0000066242 00000 n 
-0000066689 00000 n 
-0000066710 00000 n 
-0000066865 00000 n 
-0000070046 00000 n 
+0000064885 00000 n 
+0000064906 00000 n 
+0000065046 00000 n 
+0000065455 00000 n 
+0000065476 00000 n 
+0000065616 00000 n 
+0000066112 00000 n 
+0000066133 00000 n 
+0000066264 00000 n 
+0000066711 00000 n 
+0000066732 00000 n 
+0000066887 00000 n 
 0000070068 00000 n 
-0000070214 00000 n 
-0000070558 00000 n 
-0000070579 00000 n 
-0000070634 00000 n 
-0000070739 00000 n 
-0000070883 00000 n 
-0000070989 00000 n 
-0000071109 00000 n 
-0000071218 00000 n 
-0000071367 00000 n 
-0000071477 00000 n 
-0000071584 00000 n 
-0000071742 00000 n 
-0000071853 00000 n 
-0000071972 00000 n 
-0000072123 00000 n 
-0000072227 00000 n 
-0000072331 00000 n 
-0000072508 00000 n 
-0000072617 00000 n 
-0000072774 00000 n 
-0000072880 00000 n 
-0000072997 00000 n 
-0000073104 00000 n 
-0000073263 00000 n 
-0000073373 00000 n 
-0000073500 00000 n 
-0000073625 00000 n 
-0000073746 00000 n 
-0000073865 00000 n 
-0000073992 00000 n 
-0000074160 00000 n 
-0000074307 00000 n 
-0000074457 00000 n 
-0000074605 00000 n 
-0000074759 00000 n 
-0000074907 00000 n 
-0000075051 00000 n 
-0000075201 00000 n 
-0000075349 00000 n 
-0000075497 00000 n 
-0000075645 00000 n 
-0000075778 00000 n 
-0000075912 00000 n 
-0000076035 00000 n 
-0000076153 00000 n 
-0000076287 00000 n 
-0000076384 00000 n 
-0000076484 00000 n 
+0000070090 00000 n 
+0000070236 00000 n 
+0000070580 00000 n 
+0000070601 00000 n 
+0000070656 00000 n 
+0000070761 00000 n 
+0000070905 00000 n 
+0000071011 00000 n 
+0000071131 00000 n 
+0000071240 00000 n 
+0000071389 00000 n 
+0000071499 00000 n 
+0000071606 00000 n 
+0000071764 00000 n 
+0000071875 00000 n 
+0000071994 00000 n 
+0000072145 00000 n 
+0000072249 00000 n 
+0000072353 00000 n 
+0000072530 00000 n 
+0000072639 00000 n 
+0000072796 00000 n 
+0000072902 00000 n 
+0000073019 00000 n 
+0000073126 00000 n 
+0000073285 00000 n 
+0000073395 00000 n 
+0000073522 00000 n 
+0000073647 00000 n 
+0000073768 00000 n 
+0000073887 00000 n 
+0000074014 00000 n 
+0000074182 00000 n 
+0000074329 00000 n 
+0000074479 00000 n 
+0000074627 00000 n 
+0000074781 00000 n 
+0000074929 00000 n 
+0000075073 00000 n 
+0000075223 00000 n 
+0000075371 00000 n 
+0000075519 00000 n 
+0000075667 00000 n 
+0000075800 00000 n 
+0000075934 00000 n 
+0000076057 00000 n 
+0000076175 00000 n 
+0000076309 00000 n 
+0000076406 00000 n 
+0000076506 00000 n 
 trailer
 <</Size 534/Root 533 0 R/Info 1 0 R>>
 startxref
-76670
+76692
 %%EOF

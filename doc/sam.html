@@ -345,8 +345,8 @@ installation of CUPS: </P>
 <DT>file:/dev/filename </DT>
 <DT>/dev/filename </DT>
 <DD>Sends all output to the specified file. </DD>
-<DT>http://hostname[:port]/resource </DT>
-<DT>ipp://hostname[:port]/resource </DT>
+<DT>http://[username:password@]hostname[:port]/resource </DT>
+<DT>ipp://[username:password@]hostname[:port]/resource </DT>
 <DD>Sends all output to the specified IPP printer or server.  The <I>
 port</I> parameters defaults to 631. </DD>
 <DT>lpd://hostname/queue </DT>
@@ -365,6 +365,9 @@ character:
 <LI><CODE>parity=<I>none</I></CODE> - Turns parity  checking off. </LI>
 </UL>
 </DD>
+<DT>smb://[username:password@]hostname/queue </DT>
+<DD>Sends all output to the specified SMB (Windows) printer queue 
+ using the SAMBA software. </DD>
 <DT>socket://hostname[:port] </DT>
 <DD>Sends all output to the specified printer using the  AppSocket 
 protocol. The <I>port</I> parameter defaults to 9100. </DD>
@@ -598,7 +601,21 @@ Allow from nnn.nnn.nnn.nnn/mmm.mmm.mmm.mmm
 </UL>
 <P><CODE>Allow</CODE> directives are cummulative, so multiple <CODE>
 Allow</CODE> directives can be used to allow access for multiple hosts 
-or networks. </P>
+or networks.  The <CODE>/mm</CODE> notation specifies a CIDR netmask: 
+<CENTER>
+<TABLE BORDER=1 WIDTH=80%>
+<TR><TH>mm</TH><TH>netmask</TH></TR>
+<TR><TD>0</TD><TD>0.0.0.0</TD></TR>
+<TR><TD>1</TD><TD>128.0.0.0</TD></TR>
+<TR><TD>2</TD><TD>192.0.0.0</TD></TR>
+<TR><TD>...</TD><TD>...</TD></TR>
+<TR><TD>8</TD><TD>255.0.0.0</TD></TR>
+<TR><TD>16</TD><TD>255.255.0.0</TD></TR>
+<TR><TD>24</TD><TD>255.255.255.0</TD></TR>
+<TR><TD>32</TD><TD>255.255.255.255</TD></TR>
+</TABLE>
+</CENTER>
+</P>
 <P>The <CODE>Allow</CODE> directive must appear inside a <CODE>Location</CODE>
  directive. </P>
 <H3><A NAME=5_4_4>Deny</A></H3>
@@ -620,7 +637,22 @@ Deny from nnn.nnn.nnn.nnn/mmm.mmm.mmm.mmm
 </PRE>
 </UL>
 <P><CODE>Deny</CODE> directives are cummulative, so multiple <CODE>Deny</CODE>
- directives can be used to allow access for multiple hosts or networks. </P>
+ directives can be used to allow access for multiple hosts or networks. 
+ The <CODE>/mm</CODE> notation specifies a CIDR netmask: 
+<CENTER>
+<TABLE BORDER=1 WIDTH=80%>
+<TR><TH>mm</TH><TH>netmask</TH></TR>
+<TR><TD>0</TD><TD>0.0.0.0</TD></TR>
+<TR><TD>1</TD><TD>128.0.0.0</TD></TR>
+<TR><TD>2</TD><TD>192.0.0.0</TD></TR>
+<TR><TD>...</TD><TD>...</TD></TR>
+<TR><TD>8</TD><TD>255.0.0.0</TD></TR>
+<TR><TD>16</TD><TD>255.255.0.0</TD></TR>
+<TR><TD>24</TD><TD>255.255.255.0</TD></TR>
+<TR><TD>32</TD><TD>255.255.255.255</TD></TR>
+</TABLE>
+</CENTER>
+</P>
 <P>The <CODE>Deny</CODE> directive must appear inside a <CODE>Location</CODE>
  directive. </P>
 <H3><A NAME=5_4_5>AuthType</A></H3>

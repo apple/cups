@@ -243,17 +243,17 @@ specific model of printer. </P>
 <P>This string attribute specifies a color profile of the form: </P>
 <UL>
 <PRE>
-resolution/type density m00 m01 m02 m10 m11 m12 m20 m21 m22
+resolution/type density gamma m00 m01 m02 m10 m11 m12 m20 m21 m22
 </PRE>
 </UL>
 <P>The <I>resolution</I> and <I>type</I> values may be &quot;-&quot; to act as a 
 wildcard. Otherwise they must match one of the <CODE>Resolution</CODE>
  or <CODE>MediaType</CODE> attributes defined in the PPD file. </P>
-<P>The <I>density</I> value defines a gamma and density adjustment 
-function such that: </P>
+<P>The <I>density</I> and <I>gamma</I> values define gamma and density 
+adjustment function such that: </P>
 <UL>
 <PRE>
-f(x) = d * x<SUP>1/d</SUP>
+f(x) = density * x<SUP>gamma</SUP>
 </PRE>
 </UL>
 <P>The <I>m00</I> through <I>m22</I> values define a 3x3 transformation 
@@ -662,6 +662,8 @@ lpadmin</CODE>, and <CODE>reject</CODE> commands reside here. </DD>
 <DT>/usr/sbin </DT>
 <DD>The <CODE>lpc</CODE> and <CODE>cupsd</CODE> commands resize here. </DD>
 <DT>/usr/share/cups </DT>
+<DD>This is the root directory of the CUPS static data. </DD>
+<DT>/usr/share/cups/data </DT>
 <DD>The character set and filter data files reside here. </DD>
 <DT>/usr/share/cups/fonts </DT>
 <DD>The <CODE>pstoraster</CODE> font files reside here. </DD>
