@@ -1,5 +1,5 @@
 /*
- * "$Id: texttops.c,v 1.26 2000/04/10 16:28:57 mike Exp $"
+ * "$Id: texttops.c,v 1.27 2000/04/11 14:17:51 mike Exp $"
  *
  *   Text to PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -902,6 +902,7 @@ write_line(int     row,		/* I - Row number (0 to N) */
   int		col;		/* Current column */
   int		attr;		/* Current attribute */
   int		font,		/* Font to use */
+		lastfont,	/* Last font */
 		mono;		/* Monospaced? */
   lchar_t	*start;		/* First character in sequence */
 
@@ -940,10 +941,10 @@ write_line(int     row,		/* I - Row number (0 to N) */
       * Multiple fonts; break up based on the font...
       */
 
-      attr  = line->attr;
-      start = line;
-      font  = Chars[line->ch] / 256;
-      mono  = strncmp(Fonts[font][0], "Courier", 7) == 0;
+      attr     = line->attr;
+      start    = line;
+      lastfont = Chars[line->ch] / 256;
+      mono     = strncmp(Fonts[lastfont][0], "Courier", 7) == 0;
       col ++;
       line ++;
 
@@ -952,7 +953,8 @@ write_line(int     row,		/* I - Row number (0 to N) */
 	while (col < SizeColumns && line->ch != 0 && attr == line->attr)
 	{
           font = Chars[line->ch] / 256;
-          if (strncmp(Fonts[font][0], "Courier", 7) != 0)
+          if (strncmp(Fonts[font][0], "Courier", 7) != 0 ||
+	      font != lastfont)
 	    break;
 
 	  col ++;
@@ -960,7 +962,7 @@ write_line(int     row,		/* I - Row number (0 to N) */
 	}
       }
 
-      if (Directions[font] > 0)
+      if (Directions[lastfont] > 0)
         write_string(col - (line - start), row, line - start, start);
       else
       {
@@ -978,7 +980,7 @@ write_line(int     row,		/* I - Row number (0 to N) */
 	  line ++;
 	}
 
-        for (i = 1; start < line; start ++)
+        for (i = 1; start < line; i ++, start ++)
 	  if (!isspace(start->ch))
 	    write_string(col - i, row, 1, start);
       }
@@ -1199,5 +1201,5 @@ write_text(char *s)	/* I - String to write */
 
 
 /*
- * End of "$Id: texttops.c,v 1.26 2000/04/10 16:28:57 mike Exp $".
+ * End of "$Id: texttops.c,v 1.27 2000/04/11 14:17:51 mike Exp $".
  */
