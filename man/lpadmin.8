@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: lpadmin.8,v 1.6 1999/06/10 16:15:04 mike Exp $"
+.\" "$Id: lpadmin.8,v 1.7 1999/06/24 17:44:18 mike Exp $"
 .\"
 .\"   lpadmin man page for the Common UNIX Printing System (CUPS).
 .\"
@@ -21,7 +21,7 @@
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
-.TH lpadmin 8 "Common UNIX Printing System" "14 May 1999" "Easy Software Products"
+.TH lpadmin 8 "Common UNIX Printing System" "22 June 1999" "Easy Software Products"
 .SH NAME
 lpadmin \- configure cups printers and classes
 .SH SYNOPSIS
@@ -91,6 +91,11 @@ is a filename it is automatically converted to the form \fBfile:/file/name\fR.
 .br
 Provides a textual description of the printer.
 .TP 5
+\-E
+.br
+Enables the printer; this is the same as running the \fIaccept(8)\fR and
+\fIenable(8)\fR programs on the printer.
+.TP 5
 \-L \fIlocation\fR
 .br
 Provides a textual location of the printer.
@@ -115,5 +120,5 @@ CUPS Software Administrator's Manual
 .SH COPYRIGHT
 Copyright 1993-1999 by Easy Software Products, All Rights Reserved.
 .\"
-.\" End of "$Id: lpadmin.8,v 1.6 1999/06/10 16:15:04 mike Exp $".
+.\" End of "$Id: lpadmin.8,v 1.7 1999/06/24 17:44:18 mike Exp $".
 .\"

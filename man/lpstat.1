@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: lpstat.1,v 1.2 1999/06/10 16:15:04 mike Exp $"
+.\" "$Id: lpstat.1,v 1.3 1999/06/24 17:44:18 mike Exp $"
 .\"
 .\"   lpstat man page for the Common UNIX Printing System (CUPS).
 .\"
@@ -21,7 +21,7 @@
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
-.TH lpstat 1 "Common UNIX Printing System" "14 May 1999" "Easy Software Products"
+.TH lpstat 1 "Common UNIX Printing System" "24 June 1999" "Easy Software Products"
 .SH NAME
 lpstat \- print cups status information
 .SH SYNOPSIS
@@ -44,16 +44,72 @@ lpstat \- print cups status information
 .SH DESCRIPTION
 \fBlpstat\fR displays status information about the current classes, jobs, and
 printers. When run with no arguments, \fBlpstat\fR will list jobs queued by
-the user.
+the user. Other options include:
+.TP 5
+\-a [\fIprinter(s)\fR]
+.br
+Shows the accepting state of printer queues. If no printers are
+specified then all printers are listed.
+.TP 5
+\-c [\fIclass(es)\fR]
+.br
+Shows the printer classes and the printers that belong to them. If no
+classes are specified then all classes are listed.
+.TP 5
+\-d
+.br
+Shows the current default destination.
+.TP 5
+\-h \fIserver\fR
+.br
+Specifies the CUPS server to communicate with.
+.TP 5
+\-o [\fIdestination(s)\fR]
+.br
+Shows the jobs queue on the specified destinations. If no destinations are
+specified all jobs are shown.
+.TP 5
+\-p [\fIprinter(s)\fR]
+.br
+Shows the printers and whether or not they are enabled for printing. If
+no printers are specified then all printers are listed.
+.TP 5
+\-r
+.br
+Shows whether or not the CUPS server is running.
+.TP 5
+\-s
+.br
+Shows a status summary, including the system default destination, a
+list of classes and their member printers, and a list of printers and
+their associated devices. This is equivalent to using the "-d", "-c",
+and "-p" options.
+.TP 5
+\-t
+.br
+Shows all status information. This is equivalent to using the "-r",
+"-d", "-c", "-d", "-v", "-a", "-p", and "-o" options.
+.TP 5
+\-u [\fIuser(s)\fR]
+.br
+Shows a list of print jobs queued by the specified users. If no users
+are specified, lists the jobs queued by the current user.
+.TP 5
+\-v [\fIprinter(s)\fR]
+.br
+Shows the printers and what device they are attached to. If no printers
+are specified then all printers are listed.
 .SH COMPATIBILITY
 Unlike the System V printing system, CUPS allows printer names to contain
 any printable character except SPACE and TAB. Also, printer and class names are
 \fBnot\fR case-sensitive.
+.LP
+The "-h" option is not a standard System V option.
 .SH SEE ALSO
 cancel(1), lp(1),
 CUPS Software User's Manual
 .SH COPYRIGHT
 Copyright 1993-1999 by Easy Software Products, All Rights Reserved.
 .\"
-.\" End of "$Id: lpstat.1,v 1.2 1999/06/10 16:15:04 mike Exp $".
+.\" End of "$Id: lpstat.1,v 1.3 1999/06/24 17:44:18 mike Exp $".
 .\"
