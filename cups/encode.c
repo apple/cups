@@ -1,5 +1,5 @@
 /*
- * "$Id: encode.c,v 1.1.2.2 2002/01/02 18:04:23 mike Exp $"
+ * "$Id: encode.c,v 1.1.2.3 2002/02/14 16:18:03 mike Exp $"
  *
  *   Option encoding routines for the Common UNIX Printing System (CUPS).
  *
@@ -46,14 +46,15 @@ cupsEncodeOptions(ipp_t         *ipp,		/* I - Request to add to */
         	  int           num_options,	/* I - Number of options */
 		  cups_option_t *options)	/* I - Options */
 {
-  int		i, j;			/* Looping vars */
-  int		count;			/* Number of values */
-  int		n;			/* Attribute value */
-  char		*s,			/* Pointer into option value */
-		*val,			/* Pointer to option value */
-		*copy,			/* Copy of option value */
-		*sep;			/* Option separator */
-  ipp_attribute_t *attr;		/* IPP job-id attribute */
+  int		i, j, k;			/* Looping vars */
+  int		count;				/* Number of values */
+  int		n;				/* Attribute value */
+  int		numbers;			/* 1 if all number values */
+  char		*s,				/* Pointer into option value */
+		*val,				/* Pointer to option value */
+		*copy,				/* Copy of option value */
+		*sep;				/* Option separator */
+  ipp_attribute_t *attr;			/* IPP job-id attribute */
 
 
   DEBUG_printf(("cupsEncodeOptions(%p, %d, %p)\n", ipp, num_options, options));
@@ -94,9 +95,50 @@ cupsEncodeOptions(ipp_t         *ipp,		/* I - Request to add to */
     * Count the number of values...
     */
 
-    for (count = 1, sep = options[i].value;
-         (sep = strchr(sep + 1, ',')) != NULL;
-	 count ++);
+    for (count = 1, sep = options[i].value, numbers = 1; *sep; sep ++)
+    {
+      if (*sep == '\'')
+      {
+       /*
+        * Skip quoted option value...
+	*/
+
+        sep ++;
+	numbers = 0;
+
+        while (*sep && *sep != '\'')
+	  sep ++;
+
+	if (!*sep)
+	  sep --;
+      }
+      else if (*sep == '\"')
+      {
+       /*
+        * Skip quoted option value...
+	*/
+
+        sep ++;
+	numbers = 0;
+
+        while (*sep && *sep != '\"')
+	  sep ++;
+
+	if (!*sep)
+	  sep --;
+      }
+      else if (*sep == ',')
+        count ++;
+      else if (!isdigit(*sep) && *sep != '-')
+      {
+       /*
+        * Isn't a standard numeric value, check for "NxMdpi" values...
+	*/
+        if (*sep != 'x' ||
+	    (strstr(sep, "dpc") == NULL && strstr(sep, "dpi") == NULL))
+	  numbers = 0;
+      }
+    }
 
     DEBUG_printf(("cupsEncodeOptions: option = \'%s\', count = %d\n",
                   options[i].name, count));
@@ -232,7 +274,7 @@ cupsEncodeOptions(ipp_t         *ipp,		/* I - Request to add to */
 
 	  n = strtol(val, &s, 0);
 
-	  if (*s != '\0' && *s != '-' && (*s != 'x' || s == val))
+	  if (!numbers)
 	  {
 	   /*
 	    * String value(s)...
@@ -254,6 +296,16 @@ cupsEncodeOptions(ipp_t         *ipp,		/* I - Request to add to */
 	  }
 	  else if (*s == '-')
 	  {
+	    if (j > 0 && attr->value_tag == IPP_TAG_INTEGER)
+	    {
+	     /*
+	      * Reset previous integer values to N-N ranges...
+	      */
+
+              for (k = 0; k < j; k ++)
+	        attr->values[k].range.upper = attr->values[k].range.lower;
+	    }
+
             attr->value_tag             = IPP_TAG_RANGE;
 	    attr->values[j].range.lower = n;
 	    attr->values[j].range.upper = strtol(s + 1, NULL, 0);
@@ -294,8 +346,24 @@ cupsEncodeOptions(ipp_t         *ipp,		/* I - Request to add to */
 	  }
 	  else
 	  {
-            attr->value_tag         = IPP_TAG_INTEGER;
-	    attr->values[j].integer = n;
+	    if (j && attr->value_tag == IPP_TAG_RANGE)
+	    {
+	     /*
+	      * Set this value as a range...
+	      */
+
+	      attr->values[j].range.lower = n;
+	      attr->values[j].range.upper = n;
+	    }
+	    else
+	    {
+	     /*
+	      * Set this value as an integer...
+	      */
+
+              attr->value_tag         = IPP_TAG_INTEGER;
+	      attr->values[j].integer = n;
+            }
 
 	    DEBUG_printf(("cupsEncodeOptions: Adding integer option value %d...\n", n));
 	  }
@@ -307,5 +375,5 @@ cupsEncodeOptions(ipp_t         *ipp,		/* I - Request to add to */
 
 
 /*
- * End of "$Id: encode.c,v 1.1.2.2 2002/01/02 18:04:23 mike Exp $".
+ * End of "$Id: encode.c,v 1.1.2.3 2002/02/14 16:18:03 mike Exp $".
  */

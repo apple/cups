@@ -1,6 +1,14 @@
 CHANGES-1.1.txt
 ---------------
 
+CHANGES IN CUPS V1.1.15
+
+	- The cupsEncodeOptions() function now handles mixed
+	  integers and ranges.
+	- New translation guide for developers to provide native
+	  language support for CUPS.
+
+
 CHANGES IN CUPS V1.1.14
 
 	- The ippRead() function did not verify that the
