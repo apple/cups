@@ -1,5 +1,5 @@
 /*
- * "$Id: image-photocd.c,v 1.1 1998/02/19 20:43:33 mike Exp $"
+ * "$Id: image-photocd.c,v 1.2 1998/07/28 20:48:30 mike Exp $"
  *
  *   PhotoCD routines for espPrint, a collection of printer drivers.
  *
@@ -16,7 +16,10 @@
  * Revision History:
  *
  *   $Log: image-photocd.c,v $
- *   Revision 1.1  1998/02/19 20:43:33  mike
+ *   Revision 1.2  1998/07/28 20:48:30  mike
+ *   Updated for HP-UX.
+ *
+ *   Revision 1.1  1998/02/19  20:43:33  mike
  *   Initial revision
  *
  */
@@ -42,10 +45,9 @@ ImageReadPhotoCD(image_t *img,
 		res,		/* Image resolution */
 		left, top,	/* Left and top of image area */
 		width, height;	/* Width and height of image */
-  int		i, y;		/* Looping vars */
+  int		y;		/* Looping vars */
   int		bpp;		/* Bytes per pixel */
   ib_t		*in,		/* Input pixels */
-		*inptr,		/* Current input pixel */
 		*out;		/* Output pixels */
 
 
@@ -142,5 +144,5 @@ ImageReadPhotoCD(image_t *img,
 
 
 /*
- * End of "$Id: image-photocd.c,v 1.1 1998/02/19 20:43:33 mike Exp $".
+ * End of "$Id: image-photocd.c,v 1.2 1998/07/28 20:48:30 mike Exp $".
  */

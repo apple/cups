@@ -1,5 +1,5 @@
 /*
- * "$Id: image-gif.c,v 1.1 1998/02/19 20:43:33 mike Exp $"
+ * "$Id: image-gif.c,v 1.2 1998/07/28 20:48:30 mike Exp $"
  *
  *   GIF image routines for espPrint, a collection of printer drivers.
  *
@@ -16,7 +16,10 @@
  * Revision History:
  *
  *   $Log: image-gif.c,v $
- *   Revision 1.1  1998/02/19 20:43:33  mike
+ *   Revision 1.2  1998/07/28 20:48:30  mike
+ *   Updated for HP-UX.
+ *
+ *   Revision 1.1  1998/02/19  20:43:33  mike
  *   Initial revision
  *
  */
@@ -221,9 +224,7 @@ gif_read_cmap(FILE       *fp,
 	      gif_cmap_t cmap,
 	      int        *gray)
 {
-  int		i;
-  unsigned char rgb[3];
-  int		flag;
+  int	i;
 
 
  /*
@@ -549,7 +550,6 @@ gif_read_image(FILE       *fp,		/* I - Input file */
 	       gif_cmap_t cmap,		/* I - Colormap */
 	       int        interlace)	/* I - Non-zero = interlaced image */
 {
-  int		i, j;			/* Looping vars */
   unsigned char	code_size;		/* Code size */
   ib_t		*pixels,		/* Pixel buffer */
 		*temp;			/* Current pixel */
@@ -558,7 +558,7 @@ gif_read_image(FILE       *fp,		/* I - Input file */
 		pass;			/* Current pass */
   int		pixel;			/* Current pixel */
   int		bpp;			/* Bytes per pixel */
-  static	xpasses[4] = { 8, 8, 4, 2 },
+  static int	xpasses[4] = { 8, 8, 4, 2 },
 		ypasses[5] = { 0, 4, 2, 1, 999999 };
 
 
@@ -623,5 +623,5 @@ gif_read_image(FILE       *fp,		/* I - Input file */
 
 
 /*
- * End of "$Id: image-gif.c,v 1.1 1998/02/19 20:43:33 mike Exp $".
+ * End of "$Id: image-gif.c,v 1.2 1998/07/28 20:48:30 mike Exp $".
  */
