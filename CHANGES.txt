@@ -3,6 +3,9 @@ CHANGES.txt - 06/05/2001
 
 CHANGES IN CUPS V1.1.9
 
+	- Added AIX shared library support.
+	- Added AIX device discovery for the serial and
+	  parallel ports.
 	- Updated pstops filter to use strict handling of EPS
 	  files embedded in a PostScript document.  The %%EOF
 	  handling in 1.1.8 caused some dvips files not to

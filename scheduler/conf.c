@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.84 2001/06/22 20:10:14 mike Exp $"
+ * "$Id: conf.c,v 1.85 2001/06/27 06:24:18 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -301,7 +301,11 @@ ReadConfiguration(void)
   * Find the default user...
   */
 
+#ifdef _AIX
+  if ((user = getpwnam("lpd")) == NULL)
+#else
   if ((user = getpwnam("lp")) == NULL)
+#endif /* _AIX */
     User = 1;	/* Force to a non-priviledged account */
   else
     User = user->pw_uid;
@@ -1734,5 +1738,5 @@ get_address(char               *value,		/* I - Value string */
 
 
 /*
- * End of "$Id: conf.c,v 1.84 2001/06/22 20:10:14 mike Exp $".
+ * End of "$Id: conf.c,v 1.85 2001/06/27 06:24:18 mike Exp $".
  */
