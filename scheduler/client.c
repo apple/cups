@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.16 1999/04/28 15:53:51 mike Exp $"
+ * "$Id: client.c,v 1.17 1999/05/03 18:35:35 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -89,11 +89,14 @@ AcceptClient(listener_t *lis)	/* I - Listener socket */
 
   val = sizeof(struct sockaddr_in);
 
-  if ((con->http.fd = accept(lis->fd, (struct sockaddr *)&(con->http.hostaddr), &val)) < 0)
+  if ((con->http.fd = accept(lis->fd, (struct sockaddr *)&(con->http.hostaddr),
+                             &val)) < 0)
   {
     LogMessage(LOG_ERROR, "accept() failed - %s.", strerror(errno));
     return;
   }
+
+  con->http.hostaddr.sin_port = lis->address.sin_port;
 
  /*
   * Get the hostname or format the IP address as needed...
@@ -116,7 +119,8 @@ AcceptClient(listener_t *lis)	/* I - Listener socket */
   else
     strncpy(con->http.hostname, host->h_name, sizeof(con->http.hostname) - 1);
 
-  LogMessage(LOG_INFO, "accept() %d from %s.", con->http.fd, con->http.hostname);
+  LogMessage(LOG_INFO, "accept() %d from %s:%d.", con->http.fd,
+             con->http.hostname, ntohs(con->http.hostaddr.sin_port));
 
  /*
   * Add the socket to the select() input mask.
@@ -1548,5 +1552,5 @@ pipe_command(client_t *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.16 1999/04/28 15:53:51 mike Exp $".
+ * End of "$Id: client.c,v 1.17 1999/05/03 18:35:35 mike Exp $".
  */
