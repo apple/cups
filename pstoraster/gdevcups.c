@@ -1,5 +1,5 @@
 /*
- * "$Id: gdevcups.c,v 1.43.2.19 2003/07/20 22:54:44 mike Exp $"
+ * "$Id: gdevcups.c,v 1.43.2.20 2003/08/26 21:15:48 mike Exp $"
  *
  *   GNU Ghostscript raster output driver for the Common UNIX Printing
  *   System (CUPS).
@@ -1935,6 +1935,8 @@ cups_put_params(gx_device     *pdev,	/* I - Device info */
   int			old_depth;	/* Old color depth */
   int			size_set;	/* Was the size set? */
   gdev_prn_space_params	sp;		/* Space parameter data */
+  int			width,		/* New width of page */
+			height;		/* New height of page */
 
 
 #ifdef DEBUG
@@ -2228,26 +2230,25 @@ cups_put_params(gx_device     *pdev,	/* I - Device info */
 
     if (cups->landscape)
     {
-      pdev->width  = (pdev->MediaSize[1] - pdev->HWMargins[0] - pdev->HWMargins[2]) *
-                     pdev->HWResolution[0] / 72.0f + 0.499f;
-      pdev->height = (pdev->MediaSize[0] - pdev->HWMargins[1] - pdev->HWMargins[3]) *
-                     pdev->HWResolution[1] / 72.0f + 0.499f;
+      width  = (pdev->MediaSize[1] - pdev->HWMargins[0] - pdev->HWMargins[2]) *
+               pdev->HWResolution[0] / 72.0f + 0.499f;
+      height = (pdev->MediaSize[0] - pdev->HWMargins[1] - pdev->HWMargins[3]) *
+               pdev->HWResolution[1] / 72.0f + 0.499f;
     }
     else
     {
-      pdev->width  = (pdev->MediaSize[0] - pdev->HWMargins[0] - pdev->HWMargins[2]) *
-                     pdev->HWResolution[0] / 72.0f + 0.499f;
-      pdev->height = (pdev->MediaSize[1] - pdev->HWMargins[1] - pdev->HWMargins[3]) *
-                     pdev->HWResolution[1] / 72.0f + 0.499f;
+      width  = (pdev->MediaSize[0] - pdev->HWMargins[0] - pdev->HWMargins[2]) *
+               pdev->HWResolution[0] / 72.0f + 0.499f;
+      height = (pdev->MediaSize[1] - pdev->HWMargins[1] - pdev->HWMargins[3]) *
+               pdev->HWResolution[1] / 72.0f + 0.499f;
     }
 
     fprintf(stderr, "DEBUG: Reallocating memory, [%.0f %.0f] = %dx%d pixels...\n",
-            pdev->MediaSize[0], pdev->MediaSize[1], pdev->width, pdev->height);
+            pdev->MediaSize[0], pdev->MediaSize[1], width, height);
 
     sp = ((gx_device_printer *)pdev)->space_params;
 
-    if ((code = gdev_prn_reallocate_memory(pdev, &sp, pdev->width,
-                                           pdev->height)) < 0)
+    if ((code = gdev_prn_reallocate_memory(pdev, &sp, width, height)) < 0)
       return (code);
   }
 
@@ -3648,5 +3649,5 @@ cups_print_planar(gx_device_printer *pdev,	/* I - Printer device */
 
 
 /*
- * End of "$Id: gdevcups.c,v 1.43.2.19 2003/07/20 22:54:44 mike Exp $".
+ * End of "$Id: gdevcups.c,v 1.43.2.20 2003/08/26 21:15:48 mike Exp $".
  */
