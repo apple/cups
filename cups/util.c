@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c,v 1.51 2000/05/11 18:46:29 mike Exp $"
+ * "$Id: util.c,v 1.52 2000/06/28 16:40:52 mike Exp $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -549,7 +549,12 @@ cupsGetDefault(void)
   * Next check to see if we have a client.conf file...
   */
 
-  if ((fp = fopen(CUPS_SERVERROOT "/client.conf", "r")) != NULL)
+  if ((var = getenv("CUPS_SERVERROOT")) != NULL)
+    snprintf(line, sizeof(line), "%s/client.conf", var);
+  else
+    strcpy(line, CUPS_SERVERROOT "/client.conf");
+
+  if ((fp = fopen(line, "r")) != NULL)
   {
    /*
     * Read the client.conf file and look for a DefaultPrinter line...
@@ -966,7 +971,6 @@ cupsPrintFiles(const char    *name,	/* I - Printer or class name */
     DEBUG_printf(("cupsPrintFile: Unable to open connection - %s.\n",
                   strerror(errno)));
     last_error = IPP_SERVICE_UNAVAILABLE;
-    ippDelete(request);
     return (0);
   }
 
@@ -1413,5 +1417,5 @@ cups_local_auth(http_t *http)	/* I - Connection */
 
 
 /*
- * End of "$Id: util.c,v 1.51 2000/05/11 18:46:29 mike Exp $".
+ * End of "$Id: util.c,v 1.52 2000/06/28 16:40:52 mike Exp $".
  */

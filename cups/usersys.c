@@ -1,5 +1,5 @@
 /*
- * "$Id: usersys.c,v 1.5 2000/04/18 19:41:08 mike Exp $"
+ * "$Id: usersys.c,v 1.6 2000/06/28 16:40:52 mike Exp $"
  *
  *   User, system, and password routines for the Common UNIX Printing
  *   System (CUPS).
@@ -149,7 +149,15 @@ cupsServer(void)
     fp = NULL;
 
   if (fp == NULL)
-    fp = fopen(CUPS_SERVERROOT "/client.conf", "r");
+  {
+    if ((home = getenv("CUPS_SERVERROOT")) != NULL)
+    {
+      snprintf(line, sizeof(line), "%s/client.conf", home);
+      fp = fopen(line, "r");
+    }
+    else
+      fp = fopen(CUPS_SERVERROOT "/client.conf", "r");
+  }
 
   if (fp == NULL)
     return ("localhost");
@@ -189,5 +197,5 @@ cupsServer(void)
 
 
 /*
- * End of "$Id: usersys.c,v 1.5 2000/04/18 19:41:08 mike Exp $".
+ * End of "$Id: usersys.c,v 1.6 2000/06/28 16:40:52 mike Exp $".
  */

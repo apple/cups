@@ -1,5 +1,5 @@
 /*
- * "$Id: dest.c,v 1.8 2000/05/12 18:55:13 mike Exp $"
+ * "$Id: dest.c,v 1.9 2000/06/28 16:40:52 mike Exp $"
  *
  *   User-defined destination (and option) support for the Common UNIX
  *   Printing System (CUPS).
@@ -261,7 +261,13 @@ cupsGetDests(cups_dest_t **dests)	/* O - Destinations */
   * Load the /etc/cups/lpoptions and ~/.lpoptions files...
   */
 
-  num_dests = cups_get_dests(CUPS_SERVERROOT "/lpoptions", num_dests, dests);
+  if ((home = getenv("CUPS_SERVERROOT")) != NULL)
+  {
+    snprintf(filename, sizeof(filename), "%s/lpoptions", home);
+    num_dests = cups_get_dests(filename, num_dests, dests);
+  }
+  else
+    num_dests = cups_get_dests(CUPS_SERVERROOT "/lpoptions", num_dests, dests);
 
   if ((home = getenv("HOME")) != NULL)
   {
@@ -298,7 +304,12 @@ cupsSetDests(int         num_dests,	/* I - Number of destinations */
   */
 
   if (getuid() == 0)
-    strcpy(filename, CUPS_SERVERROOT "/lpoptions");
+  {
+    if ((home = getenv("CUPS_SERVERROOT")) != NULL)
+      snprintf(filename, sizeof(filename), "%s/lpoptions", home);
+    else
+      strcpy(filename, CUPS_SERVERROOT "/lpoptions");
+  }
   else if ((home = getenv("HOME")) != NULL)
     snprintf(filename, sizeof(filename), "%s/.lpoptions", home);
   else
@@ -490,5 +501,5 @@ cups_get_dests(const char  *filename,	/* I - File to read from */
 
 
 /*
- * End of "$Id: dest.c,v 1.8 2000/05/12 18:55:13 mike Exp $".
+ * End of "$Id: dest.c,v 1.9 2000/06/28 16:40:52 mike Exp $".
  */
