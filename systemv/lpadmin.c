@@ -1,5 +1,5 @@
 /*
- * "$Id: lpadmin.c,v 1.12 2000/01/21 20:28:00 mike Exp $"
+ * "$Id: lpadmin.c,v 1.13 2000/02/22 20:09:30 mike Exp $"
  *
  *   "lpadmin" command for the Common UNIX Printing System (CUPS).
  *
@@ -1163,7 +1163,7 @@ set_printer_file(http_t *http,		/* I - Server connection */
   * Do the request and get back a response...
   */
 
-  if ((response = cupsDoRequest(http, request, "/admin/")) == NULL)
+  if ((response = cupsDoFileRequest(http, request, "/admin/", file)) == NULL)
     fprintf(stderr, "lpadmin: add-printer failed: %s\n",
             ippErrorString(cupsLastError()));
   else
@@ -1327,5 +1327,5 @@ set_printer_location(http_t *http,	/* I - Server connection */
 
 
 /*
- * End of "$Id: lpadmin.c,v 1.12 2000/01/21 20:28:00 mike Exp $".
+ * End of "$Id: lpadmin.c,v 1.13 2000/02/22 20:09:30 mike Exp $".
  */

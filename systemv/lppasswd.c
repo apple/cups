@@ -1,5 +1,5 @@
 /*
- * "$Id: lppasswd.c,v 1.1 2000/02/18 17:48:09 mike Exp $"
+ * "$Id: lppasswd.c,v 1.2 2000/02/22 20:09:30 mike Exp $"
  *
  *   MD5 password program for the Common UNIX Printing System (CUPS).
  *
@@ -392,7 +392,7 @@ md5_passwd(const char *username,	/* I - User name */
 
   sprintf(line, "%s:%s:%s", username, groupname, passwd);
   md5_init(&state);
-  md5_append(&state, line, strlen(line));
+  md5_append(&state, (md5_byte_t *)line, strlen(line));
   md5_finish(&state, sum);
 
  /*
@@ -438,5 +438,5 @@ usage(FILE *fp)		/* I - File to send usage to */
 
 
 /*
- * End of "$Id: lppasswd.c,v 1.1 2000/02/18 17:48:09 mike Exp $".
+ * End of "$Id: lppasswd.c,v 1.2 2000/02/22 20:09:30 mike Exp $".
  */
