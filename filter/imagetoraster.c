@@ -1,5 +1,5 @@
 /*
- * "$Id: imagetoraster.c,v 1.46 2000/07/18 19:45:53 mike Exp $"
+ * "$Id: imagetoraster.c,v 1.47 2000/07/19 17:18:42 mike Exp $"
  *
  *   Image file to raster filter for the Common UNIX Printing System (CUPS).
  *
@@ -394,7 +394,7 @@ main(int  argc,		/* I - Number of command-line arguments */
 
     default :
         primary   = IMAGE_CMYK;
-	secondary = IMAGE_BLACK;
+	secondary = IMAGE_CMYK;
 
 	if (header.cupsColorOrder == CUPS_ORDER_CHUNKED)
           header.cupsBitsPerPixel = header.cupsBitsPerColor * 4;
@@ -422,7 +422,7 @@ main(int  argc,		/* I - Number of command-line arguments */
 	if (header.cupsBitsPerPixel == 1)
 	{
           primary   = IMAGE_CMY;
-	  secondary = IMAGE_BLACK;
+	  secondary = IMAGE_CMY;
 
 	  if (header.cupsColorOrder == CUPS_ORDER_CHUNKED)
 	    header.cupsBitsPerPixel = 8;
@@ -432,7 +432,7 @@ main(int  argc,		/* I - Number of command-line arguments */
 	else
 	{
           primary   = IMAGE_CMYK;
-	  secondary = IMAGE_BLACK;
+	  secondary = IMAGE_CMYK;
 
 	  if (header.cupsColorOrder == CUPS_ORDER_CHUNKED)
 	    header.cupsBitsPerPixel = header.cupsBitsPerColor * 4;
@@ -4231,5 +4231,5 @@ make_lut(ib_t  *lut,		/* I - Lookup table */
 
 
 /*
- * End of "$Id: imagetoraster.c,v 1.46 2000/07/18 19:45:53 mike Exp $".
+ * End of "$Id: imagetoraster.c,v 1.47 2000/07/19 17:18:42 mike Exp $".
  */
