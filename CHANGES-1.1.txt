@@ -5,6 +5,8 @@ CHANGES IN CUPS V1.1.15
 
 	- Updated the CUPS license agreement for the new MacOS
 	  license exception.
+	- Fixed a bug in the reading of PPD files using CR's
+	  instead of CR LF's or LF's.
 	- The scheduler would crash if cupsd.conf contained a
 	  BrowseProtocols line with no protocols listed.
 	- The HTML job operation templates now link back to the
