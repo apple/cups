@@ -7,6 +7,16 @@ CHANGES IN CUPS v1.1.3
 	  (only logged when LogLevel set to "debug")
 	- Changed the Input/OutputAttributes fix in
 	  pstoraster so that it works on all platforms.
+	- The HP-GL/2 filter didn't set the right green
+	  color value in encoded polylines or text.
+	- Updated the "fitplot" code to handle plot sizes
+	  specified as "PSwidth,length" and "PSlength,width".
+	- Updated the Linux parallel and USB backends to open
+	  the device files prior to looking in /proc for
+	  autoprobe info. This makes sure that loadable device
+	  driver modules are in fact loaded...
+	- Added new FilterLimit directive to limit the number
+	  of processing jobs/filters on a system.
 
 
 CHANGES IN CUPS v1.1.2
