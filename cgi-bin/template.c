@@ -1,5 +1,5 @@
 /*
- * "$Id: template.c,v 1.2 1997/05/08 20:14:19 mike Exp $"
+ * "$Id: template.c,v 1.3 1997/05/13 14:46:54 mike Exp $"
  *
  *   CGI template function.
  *
@@ -13,7 +13,10 @@
  * Revision History:
  *
  *   $Log: template.c,v $
- *   Revision 1.2  1997/05/08 20:14:19  mike
+ *   Revision 1.3  1997/05/13 14:46:54  mike
+ *   Added "{?name}" syntax to conditionally include variables.
+ *
+ *   Revision 1.2  1997/05/08  20:14:19  mike
  *   Renamed CGI_Name functions to cgiName functions.
  *   Updated documentation.
  *
@@ -70,11 +73,18 @@ cgiCopyTemplateFile(FILE *out,		/* I - Output file */
       * See if it has a value...
       */
 
-      value = cgiGetVariable(name);
-      if (value == NULL)
-        fprintf(out, "{%s}", name);
+      if (name[0] == '?')
+      	value = cgiGetVariable(name + 1);
       else
-        fprintf(out, "%s", value);
+      {
+	value = cgiGetVariable(name);
+
+	if (value == NULL)
+          fprintf(out, "{%s}", name);
+      };
+
+      if (value != NULL)
+        fputs(value, out);
     }
     else if (ch == '\\')	/* Quoted char */
       putc(getc(in), out);
@@ -90,5 +100,5 @@ cgiCopyTemplateFile(FILE *out,		/* I - Output file */
 
 
 /*
- * End of "$Id: template.c,v 1.2 1997/05/08 20:14:19 mike Exp $".
+ * End of "$Id: template.c,v 1.3 1997/05/13 14:46:54 mike Exp $".
  */
