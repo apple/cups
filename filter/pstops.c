@@ -1,5 +1,5 @@
 /*
- * "$Id: pstops.c,v 1.15 1999/04/16 17:10:52 mike Exp $"
+ * "$Id: pstops.c,v 1.16 1999/04/21 14:12:47 mike Exp $"
  *
  *   PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -220,9 +220,9 @@ main(int  argc,			/* I - Number of command-line arguments */
 
   if (ppd != NULL && ppd->jcl_begin && ppd->jcl_ps)
   {
-    fputs((char *)ppd->jcl_begin, stdout);
+    fputs(ppd->jcl_begin, stdout);
     ppdEmit(ppd, stdout, PPD_ORDER_JCL);
-    fputs((char *)ppd->jcl_ps, stdout);
+    fputs(ppd->jcl_ps, stdout);
   }
 
  /*
@@ -399,7 +399,7 @@ main(int  argc,			/* I - Number of command-line arguments */
   */
 
   if (ppd != NULL && ppd->jcl_end)
-    fputs((char *)ppd->jcl_end, stdout);
+    fputs(ppd->jcl_end, stdout);
   else
     putchar(0x04);
 
@@ -702,5 +702,5 @@ start_nup(int number)	/* I - Page number */
 
 
 /*
- * End of "$Id: pstops.c,v 1.15 1999/04/16 17:10:52 mike Exp $".
+ * End of "$Id: pstops.c,v 1.16 1999/04/21 14:12:47 mike Exp $".
  */

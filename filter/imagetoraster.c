@@ -1,5 +1,5 @@
 /*
- * "$Id: imagetoraster.c,v 1.17 1999/04/19 21:14:45 mike Exp $"
+ * "$Id: imagetoraster.c,v 1.18 1999/04/21 14:12:46 mike Exp $"
  *
  *   Image file to raster filter for the Common UNIX Printing System (CUPS).
  *
@@ -876,7 +876,7 @@ exec_choice(cups_page_header_t *header,	/* I - Page header */
 	value[1024];			/* Value of pagedevice entry */
 
 
-  for (code = (char *)choice->code; *code != '\0';)
+  for (code = choice->code; *code != '\0';)
   {
    /*
     * Search for the start of a dictionary name...
@@ -4094,5 +4094,5 @@ make_lut(ib_t  *lut,		/* I - Lookup table */
 
 
 /*
- * End of "$Id: imagetoraster.c,v 1.17 1999/04/19 21:14:45 mike Exp $".
+ * End of "$Id: imagetoraster.c,v 1.18 1999/04/21 14:12:46 mike Exp $".
  */
