@@ -1,5 +1,5 @@
 /*
- * "$Id: listen.c,v 1.14 2002/12/17 19:00:17 swdev Exp $"
+ * "$Id: listen.c,v 1.15 2003/01/04 15:29:22 mike Exp $"
  *
  *   Server listening routines for the Common UNIX Printing System (CUPS)
  *   scheduler.
@@ -144,7 +144,7 @@ StartListening(void)
   for (i = NumListeners, lis = Listeners; i > 0; i --, lis ++)
   {
     LogMessage(L_DEBUG, "StartListening: address=%08x port=%d",
-               ntohl(lis->address.sin_addr.s_addr),
+               (unsigned)ntohl(lis->address.sin_addr.s_addr),
 	       ntohs(lis->address.sin_port));
 
     if ((lis->fd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
@@ -218,5 +218,5 @@ StopListening(void)
 
 
 /*
- * End of "$Id: listen.c,v 1.14 2002/12/17 19:00:17 swdev Exp $".
+ * End of "$Id: listen.c,v 1.15 2003/01/04 15:29:22 mike Exp $".
  */
