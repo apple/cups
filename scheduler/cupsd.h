@@ -1,5 +1,5 @@
 /*
- * "$Id: cupsd.h,v 1.46 2003/03/31 16:31:36 mike Exp $"
+ * "$Id: cupsd.h,v 1.47 2003/04/10 20:14:05 mike Exp $"
  *
  *   Main header file for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -167,6 +167,15 @@ typedef struct direct DIRENT;
 
 
 /*
+ * Reload types...
+ */
+
+#define RELOAD_NONE	0		/* No reload needed */
+#define RELOAD_ALL	1		/* Reload everything */
+#define RELOAD_CUPSD	2		/* Reload only cupsd.conf */
+
+
+/*
  * Globals...
  */
 
@@ -175,7 +184,7 @@ VAR int			MaxFDs,		/* Maximum number of files */
 VAR fd_set		*InputSet,	/* Input files for select() */
 			*OutputSet;	/* Output files for select() */
 
-VAR int			NeedReload	VALUE(TRUE);
+VAR int			NeedReload	VALUE(RELOAD_ALL);
 					/* Need to load configuration? */
 VAR char		*TZ		VALUE(NULL);
 					/* Timezone configuration */
@@ -204,5 +213,5 @@ extern void	StopServer(void);
 
 
 /*
- * End of "$Id: cupsd.h,v 1.46 2003/03/31 16:31:36 mike Exp $".
+ * End of "$Id: cupsd.h,v 1.47 2003/04/10 20:14:05 mike Exp $".
  */
