@@ -1,5 +1,5 @@
 /*
- * "$Id: pstops.c,v 1.19 1999/06/09 20:04:48 mike Exp $"
+ * "$Id: pstops.c,v 1.20 1999/06/15 20:40:33 mike Exp $"
  *
  *   PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -94,6 +94,9 @@ main(int  argc,			/* I - Number of command-line arguments */
   char		line[8192];	/* Line buffer */
   float		g;		/* Gamma correction value */
   float		b;		/* Brightness factor */
+  int		level;		/* Nesting level for embedded files */
+  int		nbytes,		/* Number of bytes read */
+		tbytes;		/* Total bytes to read for binary data */
 
 
   if (argc < 6 || argc > 7)
@@ -267,9 +270,32 @@ main(int  argc,			/* I - Number of command-line arguments */
     * OK, we have DSC comments; read until we find a %%Page comment...
     */
 
+    level = 0;
+
     while (psgets(line, sizeof(line), fp) != NULL)
-      if (strncmp(line, "%%Page:", 7) == 0)
+      if (strncmp(line, "%%BeginDocument:", 16) == 0 ||
+          strncmp(line, "%%BeginDocument ", 16) == 0)	/* Adobe Acrobat BUG */
+        level ++;
+      else if (strcmp(line, "%%EndDocument") == 0)
+        level --;
+      else if (strncmp(line, "%%Page:", 7) == 0 && level == 0)
         break;
+      else if (strncmp(line, "%%BeginBinary:", 14) == 0 ||
+               (strncmp(line, "%%BeginData:", 12) == 0 &&
+	        strstr(line, "Binary") != NULL))
+      {
+       /*
+        * Copy binary data...
+	*/
+
+        tbytes = atoi(strchr(line, ':') + 1);
+	while (tbytes > 0)
+	{
+	  nbytes = fread(line, 1, sizeof(line), fp);
+	  fwrite(line, 1, nbytes, stdout);
+	  tbytes -= nbytes;
+	}
+      }
       else
         puts(line);
 
@@ -279,15 +305,26 @@ main(int  argc,			/* I - Number of command-line arguments */
 
     for (;;)
     {
-      if (strncmp(line, "%%Page:", 7) == 0)
+      if (strncmp(line, "%%BeginDocument:", 16) == 0 ||
+          strncmp(line, "%%BeginDocument ", 16) == 0)	/* Adobe Acrobat BUG */
+        level ++;
+      else if (strcmp(line, "%%EndDocument") == 0)
+        level --;
+      else if (strncmp(line, "%%Page:", 7) == 0 && level == 0)
       {
         if (sscanf(line, "%*s%*s%d", &number) == 1)
 	{
 	  if (!check_range(number))
 	  {
 	    while (psgets(line, sizeof(line), fp) != NULL)
-	      if (strncmp(line, "%%Page:", 7) == 0)
+	      if (strncmp(line, "%%BeginDocument:", 16) == 0 ||
+        	  strncmp(line, "%%BeginDocument ", 16) == 0)	/* Adobe Acrobat BUG */
+        	level ++;
+	      else if (strcmp(line, "%%EndDocument") == 0)
+        	level --;
+	      else if (strncmp(line, "%%Page:", 7) == 0 && level == 0)
 	        break;
+
             continue;
           }
 
@@ -307,6 +344,28 @@ main(int  argc,			/* I - Number of command-line arguments */
 	    ppdEmit(ppd, stdout, PPD_ORDER_PAGE);
 	    start_nup(NumPages - 1);
 	  }
+	}
+      }
+      else if (strncmp(line, "%%BeginBinary:", 14) == 0 ||
+               (strncmp(line, "%%BeginData:", 12) == 0 &&
+	        strstr(line, "Binary") != NULL))
+      {
+       /*
+        * Copy binary data...
+	*/
+
+        tbytes = atoi(strchr(line, ':') + 1);
+	while (tbytes > 0)
+	{
+	  nbytes = fread(line, 1, sizeof(line), fp);
+
+          if (!sloworder)
+	    fwrite(line, 1, nbytes, stdout);
+
+          if (slowcollate || sloworder)
+	    fwrite(line, 1, nbytes, stdout);
+
+	  tbytes -= nbytes;
 	}
       }
       else
@@ -719,5 +778,5 @@ start_nup(int number)	/* I - Page number */
 
 
 /*
- * End of "$Id: pstops.c,v 1.19 1999/06/09 20:04:48 mike Exp $".
+ * End of "$Id: pstops.c,v 1.20 1999/06/15 20:40:33 mike Exp $".
  */
