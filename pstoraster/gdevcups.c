@@ -1,5 +1,5 @@
 /*
- * "$Id: gdevcups.c,v 1.43.2.21 2003/08/27 18:12:48 mike Exp $"
+ * "$Id: gdevcups.c,v 1.43.2.22 2003/11/14 22:23:55 mike Exp $"
  *
  *   GNU Ghostscript raster output driver for the Common UNIX Printing
  *   System (CUPS).
@@ -16,11 +16,11 @@
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
  *       44141 Airport View Drive, Suite 204
- *       Hollywood, Maryland 20636-3111 USA
+ *       Hollywood, Maryland 20636-3142 USA
  *
- *       Voice: (301) 373-9603
+ *       Voice: (301) 373-9600
  *       EMail: cups-info@cups.org
- *         WWW: http://www.cups.org
+ *         WWW: http://www.cups.org/
  *
  *   This code and any derivative of it may be used and distributed
  *   freely under the terms of the GNU General Public License when
@@ -82,10 +82,40 @@
 
 
 /*
- * Globals...
+ * Newer versions of Ghostscript don't provide gs_exit() function anymore.
+ * It has been renamed to gs_to_exit()...
  */
 
-char	*cupsProfile = NULL;
+#ifdef dev_t_proc_encode_color
+#  define gs_exit gs_to_exit
+#endif /* dev_t_proc_encode_color */
+
+
+/*
+ * CIE XYZ color constants...
+ */
+
+#define D65_X	(0.412453 + 0.357580 + 0.180423)
+#define D65_Y	(0.212671 + 0.715160 + 0.072169)
+#define D65_Z	(0.019334 + 0.119193 + 0.950227)
+
+
+/*
+ * Size of a tile in pixels...
+ */
+
+#define CUPS_TILE_SIZE	256
+
+
+/*
+ * Size of profile LUTs...
+ */
+
+#ifdef dev_t_proc_encode_color
+#  define CUPS_MAX_VALUE	frac_1
+#else
+#  define CUPS_MAX_VALUE	gx_max_color_value
+#endif /* dev_t_proc_encode_color */
 
 
 /*
@@ -121,15 +151,32 @@ char	*cupsProfile = NULL;
 private dev_proc_close_device(cups_close);
 private dev_proc_get_initial_matrix(cups_get_matrix);
 private int cups_get_params(gx_device *, gs_param_list *);
-private dev_proc_map_cmyk_color(cups_map_cmyk_color);
-private dev_proc_map_color_rgb(cups_map_color_rgb);
-private dev_proc_map_rgb_color(cups_map_rgb_color);
 private dev_proc_open_device(cups_open);
 private int cups_print_pages(gx_device_printer *, FILE *, int);
 private int cups_put_params(gx_device *, gs_param_list *);
 private void cups_set_color_info(gx_device *);
 private dev_proc_sync_output(cups_sync_output);
 private prn_dev_proc_get_space_params(cups_get_space_params);
+
+#ifdef dev_t_proc_encode_color
+private cm_map_proc_gray(cups_map_gray);
+private cm_map_proc_rgb(cups_map_rgb);
+private cm_map_proc_cmyk(cups_map_cmyk);
+private dev_proc_decode_color(cups_decode_color);
+private dev_proc_encode_color(cups_encode_color);
+private dev_proc_get_color_mapping_procs(cups_get_color_mapping_procs);
+
+static const gx_cm_color_map_procs cups_color_mapping_procs =
+{
+  cups_map_gray,
+  cups_map_rgb,
+  cups_map_cmyk
+};
+#else
+private dev_proc_map_cmyk_color(cups_map_cmyk_color);
+private dev_proc_map_color_rgb(cups_map_color_rgb);
+private dev_proc_map_rgb_color(cups_map_rgb_color);
+#endif /* dev_t_proc_encode_color */
 
 
 /*
@@ -142,7 +189,6 @@ typedef struct gx_device_cups_s
   gx_prn_device_common;			/* Standard printer device stuff */
   int			page;		/* Page number */
   cups_raster_t		*stream;	/* Raster stream */
-  ppd_file_t		*ppd;		/* PPD file for this printer */
   cups_page_header_t	header;		/* PostScript page device info */
   int			landscape;	/* Non-zero if this is landscape */
 } gx_device_cups;
@@ -154,37 +200,66 @@ private gx_device_procs	cups_procs =
    cups_sync_output,
    gdev_prn_output_page,
    cups_close,
+#ifdef dev_t_proc_encode_color
+   NULL,				/* map_rgb_color */
+   NULL,				/* map_color_rgb */
+#else
    cups_map_rgb_color,
    cups_map_color_rgb,
-   NULL,	/* fill_rectangle */
-   NULL,	/* tile_rectangle */
-   NULL,	/* copy_mono */
-   NULL,	/* copy_color */
-   NULL,	/* draw_line */
+#endif /* dev_t_proc_encode_color */
+   NULL,				/* fill_rectangle */
+   NULL,				/* tile_rectangle */
+   NULL,				/* copy_mono */
+   NULL,				/* copy_color */
+   NULL,				/* draw_line */
    gx_default_get_bits,
    cups_get_params,
    cups_put_params,
-   NULL,	/* map_cmyk_color */
-   NULL,	/* get_xfont_procs */
-   NULL,	/* get_xfont_device */
-   NULL,	/* map_rgb_alpha_color */
+#ifdef dev_t_proc_encode_color
+   NULL,				/* map_cmyk_color */
+#else
+   cups_map_cmyk_color,
+#endif /* dev_t_proc_encode_color */
+   NULL,				/* get_xfont_procs */
+   NULL,				/* get_xfont_device */
+   NULL,				/* map_rgb_alpha_color */
    gx_page_device_get_page_device,
-   NULL,	/* get_alpha_bits */
-   NULL,	/* copy_alpha */
-   NULL,	/* get_band */
-   NULL,	/* copy_rop */
-   NULL,	/* fill_path */
-   NULL,	/* stroke_path */
-   NULL,	/* fill_mask */
-   NULL,	/* fill_trapezoid */
-   NULL,	/* fill_parallelogram */
-   NULL,	/* fill_triangle */
-   NULL,	/* draw_thin_line */
-   NULL,	/* begin_image */
-   NULL,	/* image_data */
-   NULL,	/* end_image */
-   NULL,	/* strip_tile_rectangle */
-   NULL		/* strip_copy_rop */
+   NULL,				/* get_alpha_bits */
+   NULL,				/* copy_alpha */
+   NULL,				/* get_band */
+   NULL,				/* copy_rop */
+   NULL,				/* fill_path */
+   NULL,				/* stroke_path */
+   NULL,				/* fill_mask */
+   NULL,				/* fill_trapezoid */
+   NULL,				/* fill_parallelogram */
+   NULL,				/* fill_triangle */
+   NULL,				/* draw_thin_line */
+   NULL,				/* begin_image */
+   NULL,				/* image_data */
+   NULL,				/* end_image */
+   NULL,				/* strip_tile_rectangle */
+   NULL					/* strip_copy_rop */
+#ifdef dev_t_proc_encode_color
+   ,
+   NULL,				/* get_clipping_box */
+   NULL,				/* begin_typed_image */
+   NULL,				/* get_bits_rectangle */
+   NULL,				/* map_color_rgb_alpha */
+   NULL,				/* create_compositor */
+   NULL,				/* get_hardware_params */
+   NULL,				/* text_begin */
+   NULL,				/* finish_copydevice */
+   NULL,				/* begin_transparency_group */
+   NULL,				/* end_transparency_group */
+   NULL,				/* begin_transparency_mask */
+   NULL,				/* end_transparency_mask */
+   NULL,				/* discard_transparency_layer */
+   cups_get_color_mapping_procs,
+   NULL,				/* get_color_comp_index */
+   cups_encode_color,
+   cups_decode_color
+#endif /* dev_t_proc_encode_color */
 };
 
 #define prn_device_body_copies(dtype, procs, dname, w10, h10, xdpi, ydpi, lo, to, lm, bm, rm, tm, ncomp, depth, mg, mc, dg, dc, print_pages)\
@@ -201,98 +276,107 @@ private gx_device_procs	cups_procs =
 
 gx_device_cups	gs_cups_device =
 {
-  prn_device_body_copies(gx_device_cups,	/* type */
-                         cups_procs,		/* procedures */
-			 "cups",		/* device name */
-			 85,			/* initial width */
-			 110,			/* initial height */
-			 100,			/* initial x resolution */
-			 100,			/* initial y resolution */
-                         0,			/* initial left offset */
-			 0,			/* initial top offset */
-			 0,			/* initial left margin */
-			 0,			/* initial bottom margin */
-			 0,			/* initial right margin */
-			 0,			/* initial top margin */
-			 1,			/* number of color components */
-			 1,			/* number of color bits */
-			 1,			/* maximum gray value */
-			 0,			/* maximum color value */
-			 2,			/* number of gray values */
-			 0,			/* number of color values */
-			 cups_print_pages),	/* print procedure */
-  0,				/* page */
-  NULL,				/* stream */
-  NULL,				/* ppd */
-  {				/* header */
-    "",				/* MediaClass */
-    "",				/* MediaColor */
-    "",				/* MediaType */
-    "",				/* OutputType */
-    0,				/* AdvanceDistance */
-    CUPS_ADVANCE_NONE,		/* AdvanceMedia */
-    CUPS_FALSE,			/* Collate */
-    CUPS_CUT_NONE,		/* CutMedia */
-    CUPS_FALSE,			/* Duplex */
-    { 100, 100 },		/* HWResolution */
-    { 0, 0, 612, 792 },		/* ImagingBoundingBox */
-    CUPS_FALSE,			/* InsertSheet */
-    CUPS_JOG_NONE,		/* Jog */
-    CUPS_EDGE_TOP,		/* LeadingEdge */
-    { 0, 0 },			/* Margins */
-    CUPS_FALSE,			/* ManualFeed */
-    0,				/* MediaPosition */
-    0,				/* MediaWeight */
-    CUPS_FALSE,			/* MirrorPrint */
-    CUPS_FALSE,			/* NegativePrint */
-    1,				/* NumCopies */
-    CUPS_ORIENT_0,		/* Orientation */
-    CUPS_FALSE,			/* OutputFaceUp */
-    { 612, 792 },		/* PageSize */
-    CUPS_FALSE,			/* Separations */
-    CUPS_FALSE,			/* TraySwitch */
-    CUPS_FALSE,			/* Tumble */
-    850,			/* cupsWidth */
-    1100,			/* cupsHeight */
-    0,				/* cupsMediaType */
-    1,				/* cupsBitsPerColor */
-    1,				/* cupsBitsPerPixel */
-    107,			/* cupsBytesPerLine */
-    CUPS_ORDER_CHUNKED,		/* cupsColorOrder */
-    CUPS_CSPACE_K,		/* cupsColorSpace */
-    0,				/* cupsCompression */
-    0,				/* cupsRowCount */
-    0,				/* cupsRowFeed */
-    0				/* cupsRowStep */
+  prn_device_body_copies(gx_device_cups,/* type */
+                         cups_procs,	/* procedures */
+			 "cups",	/* device name */
+			 85,		/* initial width */
+			 110,		/* initial height */
+			 100,		/* initial x resolution */
+			 100,		/* initial y resolution */
+                         0,		/* initial left offset */
+			 0,		/* initial top offset */
+			 0,		/* initial left margin */
+			 0,		/* initial bottom margin */
+			 0,		/* initial right margin */
+			 0,		/* initial top margin */
+			 1,		/* number of color components */
+			 1,		/* number of color bits */
+			 1,		/* maximum gray value */
+			 0,		/* maximum color value */
+			 2,		/* number of gray values */
+			 0,		/* number of color values */
+			 cups_print_pages),
+					/* print procedure */
+  0,					/* page */
+  NULL,					/* stream */
+  {					/* header */
+    "",					/* MediaClass */
+    "",					/* MediaColor */
+    "",					/* MediaType */
+    "",					/* OutputType */
+    0,					/* AdvanceDistance */
+    CUPS_ADVANCE_NONE,			/* AdvanceMedia */
+    CUPS_FALSE,				/* Collate */
+    CUPS_CUT_NONE,			/* CutMedia */
+    CUPS_FALSE,				/* Duplex */
+    { 100, 100 },			/* HWResolution */
+    { 0, 0, 612, 792 },			/* ImagingBoundingBox */
+    CUPS_FALSE,				/* InsertSheet */
+    CUPS_JOG_NONE,			/* Jog */
+    CUPS_EDGE_TOP,			/* LeadingEdge */
+    { 0, 0 },				/* Margins */
+    CUPS_FALSE,				/* ManualFeed */
+    0,					/* MediaPosition */
+    0,					/* MediaWeight */
+    CUPS_FALSE,				/* MirrorPrint */
+    CUPS_FALSE,				/* NegativePrint */
+    1,					/* NumCopies */
+    CUPS_ORIENT_0,			/* Orientation */
+    CUPS_FALSE,				/* OutputFaceUp */
+    { 612, 792 },			/* PageSize */
+    CUPS_FALSE,				/* Separations */
+    CUPS_FALSE,				/* TraySwitch */
+    CUPS_FALSE,				/* Tumble */
+    850,				/* cupsWidth */
+    1100,				/* cupsHeight */
+    0,					/* cupsMediaType */
+    1,					/* cupsBitsPerColor */
+    1,					/* cupsBitsPerPixel */
+    107,				/* cupsBytesPerLine */
+    CUPS_ORDER_CHUNKED,			/* cupsColorOrder */
+    CUPS_CSPACE_K,			/* cupsColorSpace */
+    0,					/* cupsCompression */
+    0,					/* cupsRowCount */
+    0,					/* cupsRowFeed */
+    0					/* cupsRowStep */
   }
 };
 
 /*
- * Color lookup tables...
+ * Globals...
  */
 
-static gx_color_value	lut_color_rgb[256];
-static unsigned char	lut_rgb_color[gx_max_color_value + 1];
+static gx_color_value	cupsDecodeLUT[256];
+					/* Output color to RGB value LUT */
+static unsigned char	cupsEncodeLUT[gx_max_color_value + 1];
+					/* RGB value to output color LUT */
+
+static ppd_file_t	*cupsPPD = 0;	/* PPD file for this device */
+static char		*cupsProfile = NULL;
+					/* Current simple color profile string */
 static int		cupsHaveProfile = 0;
-static int		cupsMatrix[3][3][gx_max_color_value + 1];
-static int		cupsDensity[gx_max_color_value + 1];
-static unsigned char	rev_lower1[16] =
-			{
+					/* Has a color profile been defined? */
+static int		cupsMatrix[3][3][CUPS_MAX_VALUE + 1];
+					/* Color transform matrix LUT */
+static int		cupsDensity[CUPS_MAX_VALUE + 1];
+					/* Density LUT */
+static unsigned char	cupsRevLower1[16] =
+			{		/* Lower 1-bit reversal table */
 			  0x00, 0x08, 0x04, 0x0c, 0x02, 0x0a, 0x06, 0x0e,
 			  0x01, 0x09, 0x05, 0x0d, 0x03, 0x0b, 0x07, 0x0f
 			},
-			rev_upper1[16] =
-			{
+			cupsRevUpper1[16] =
+			{		/* Upper 1-bit reversal table */
 			  0x00, 0x80, 0x40, 0xc0, 0x20, 0xa0, 0x60, 0xe0,
 			  0x10, 0x90, 0x50, 0xd0, 0x30, 0xb0, 0x70, 0xf0
 			},
-			rev_lower2[16] = /* 2-bit colors */
-			{
+			cupsRevLower2[16] =
+			{		/* Lower 2-bit reversal table */
 			  0x00, 0x04, 0x08, 0x0c, 0x01, 0x05, 0x09, 0x0d,
 			  0x02, 0x06, 0x0a, 0x0e, 0x03, 0x07, 0x0b, 0x0f
 			},
-			rev_upper2[16] = /* 2-bit colors */
-			{
+			cupsRevUpper2[16] =
+			{		/* Upper 2-bit reversal table */
 			  0x00, 0x40, 0x80, 0xc0, 0x10, 0x50, 0x90, 0xd0,
 			  0x20, 0x60, 0xa0, 0xe0, 0x30, 0x70, 0xb0, 0xf0
 			};
@@ -318,11 +402,9 @@ static void	cups_print_planar(gx_device_printer *, unsigned char *,
  */
 
 private int
-cups_close(gx_device *pdev)	/* I - Device info */
+cups_close(gx_device *pdev)		/* I - Device info */
 {
-#ifdef DEBUG
-  fprintf(stderr, "DEBUG: cups_close(%p)\n", pdev);
-#endif /* DEBUG */
+  fprintf(stderr, "DEBUG2: cups_close(%p)\n", pdev);
 
   if (cups->stream != NULL)
   {
@@ -331,10 +413,10 @@ cups_close(gx_device *pdev)	/* I - Device info */
   }
 
 #if 0 /* Can't do this here because put_params() might close the device */
-  if (cups->ppd != NULL)
+  if (cupsPPD != NULL)
   {
-    ppdClose(cups->ppd);
-    cups->ppd = NULL;
+    ppdClose(cupsPPD);
+    cupsPPD = NULL;
   }
 
   if (cupsProfile != NULL)
@@ -348,6 +430,123 @@ cups_close(gx_device *pdev)	/* I - Device info */
 }
 
 
+#ifdef dev_t_proc_encode_color
+/*
+ * 'cups_decode_color()' - Decode a color value.
+ */
+
+private int				/* O - Status (0 = OK) */
+cups_decode_color(gx_device      *pdev,	/* I - Device info */
+                  gx_color_index ci,	/* I - Color index */
+                  gx_color_value *cv)	/* O - Colors */
+{
+  int			i;		/* Looping var */
+  int			shift;		/* Bits to shift */
+  int			mask;		/* Bits to mask */
+
+
+  if (cups->header.cupsColorSpace == CUPS_CSPACE_KCMYcm &&
+      cups->header.cupsBitsPerColor == 1)
+  {
+   /*
+    * KCMYcm data is represented internally by Ghostscript as CMYK...
+    */
+
+    cv[0] = (ci & 0x20) ? frac_1 : frac_0;
+    cv[1] = (ci & 0x12) ? frac_1 : frac_0;
+    cv[2] = (ci & 0x09) ? frac_1 : frac_0;
+    cv[3] = (ci & 0x04) ? frac_1 : frac_0;
+  }
+  else
+  {
+    shift = cups->header.cupsBitsPerColor;
+    mask  = (1 << shift) - 1;
+
+    for (i = cups->color_info.num_components - 1; i > 0; i --, ci >>= shift)
+      cv[i] = cupsDecodeLUT[ci & mask];
+
+    cv[0] = cupsDecodeLUT[ci & mask];
+  }
+
+  return (0);
+}
+
+
+/*
+ * 'cups_encode_color()' - Encode a color value.
+ */
+
+private gx_color_index			/* O - Color index */
+cups_encode_color(gx_device            *pdev,
+					/* I - Device info */
+                  const gx_color_value *cv)
+					/* I - Colors */
+{
+  int			i;		/* Looping var */
+  gx_color_index	ci;		/* Color index */
+  int			shift;		/* Bits to shift */
+
+
+ /*
+  * Encode the color index...
+  */
+
+  shift = cups->header.cupsBitsPerColor;
+
+  for (ci = cupsEncodeLUT[cv[0]], i = 1;
+       i < cups->color_info.num_components;
+       i ++)
+    ci = (ci << shift) | cupsEncodeLUT[cv[i]];
+
+ /*
+  * Handle 6-color output...
+  */
+
+  if (cups->header.cupsColorSpace == CUPS_CSPACE_KCMYcm &&
+      cups->header.cupsBitsPerColor == 1)
+  {
+   /*
+    * Welcome to hackville, where we map CMYK data to the
+    * light inks in draft mode...  Map blue to light magenta and
+    * cyan and green to light cyan and yellow...
+    */
+
+    ci <<= 2;				/* Leave room for light inks */
+
+    if (ci == 0x18)			/* Blue */
+      ci = 0x11;			/* == cyan + light magenta */
+    else if (ci == 0x14)		/* Green */
+      ci = 0x06;			/* == light cyan + yellow */
+  }
+
+ /*
+  * Range check the return value...
+  */
+
+  if (ci == gx_no_color_index)
+    ci --;
+
+ /*
+  * Return the color index...
+  */
+
+  return (ci);
+}
+
+
+/*
+ * 'cups_get_color_mapping_procs()' - Get the list of color mapping procedures.
+ */
+
+private const gx_cm_color_map_procs *	/* O - List of device procedures */
+cups_get_color_mapping_procs(const gx_device *pdev)
+					/* I - Device info */
+{
+  return (&cups_color_mapping_procs);
+}
+#endif /* dev_t_proc_encode_color */
+
+
 /*
  * 'cups_get_matrix()' - Generate the default page matrix.
  */
@@ -356,9 +555,7 @@ private void
 cups_get_matrix(gx_device *pdev,	/* I - Device info */
                 gs_matrix *pmat)	/* O - Physical transform matrix */
 {
-#ifdef DEBUG
-  fprintf(stderr, "DEBUG: cups_get_matrix(%p, %p)\n", pdev, pmat);
-#endif /* DEBUG */
+  fprintf(stderr, "DEBUG2: cups_get_matrix(%p, %p)\n", pdev, pmat);
 
  /*
   * Set the raster width and height...
@@ -373,10 +570,11 @@ cups_get_matrix(gx_device *pdev,	/* I - Device info */
 
   fprintf(stderr, "DEBUG: cups->header.Duplex = %d\n", cups->header.Duplex);
   fprintf(stderr, "DEBUG: cups->page = %d\n", cups->page);
-  if (cups->ppd)
+
+  if (cupsPPD)
   {
-    fprintf(stderr, "DEBUG: cups->ppd = %p\n", cups->ppd);
-    fprintf(stderr, "DEBUG: cups->ppd->flip_duplex = %d\n", cups->ppd->flip_duplex);
+    fprintf(stderr, "DEBUG: cupsPPD = %p\n", cupsPPD);
+    fprintf(stderr, "DEBUG: cupsPPD->flip_duplex = %d\n", cupsPPD->flip_duplex);
   }
 
   if (cups->landscape)
@@ -386,7 +584,7 @@ cups_get_matrix(gx_device *pdev,	/* I - Device info */
     */
 
     if (cups->header.Duplex && !cups->header.Tumble &&
-	cups->ppd && cups->ppd->flip_duplex && !(cups->page & 1))
+	cupsPPD && cupsPPD->flip_duplex && !(cups->page & 1))
     {
       pmat->xx = 0.0;
       pmat->xy = (float)cups->header.HWResolution[0] / 72.0;
@@ -407,7 +605,7 @@ cups_get_matrix(gx_device *pdev,	/* I - Device info */
     }
   }
   else if (cups->header.Duplex && !cups->header.Tumble &&
-           cups->ppd && cups->ppd->flip_duplex && !(cups->page & 1))
+           cupsPPD && cupsPPD->flip_duplex && !(cups->page & 1))
   {
     pmat->xx = (float)cups->header.HWResolution[0] / 72.0;
     pmat->xy = 0.0;
@@ -457,295 +655,199 @@ cups_get_params(gx_device     *pdev,	/* I - Device info */
   bool			b;		/* Temporary boolean value */
 
 
-#ifdef DEBUG
-  fprintf(stderr, "DEBUG: cups_get_params(%p, %p)\n", pdev, plist);
-#endif /* DEBUG */
+  fprintf(stderr, "DEBUG2: cups_get_params(%p, %p)\n", pdev, plist);
 
  /*
   * First process the "standard" page device parameters...
   */
 
-#ifdef DEBUG
-  fputs("DEBUG: before gdev_prn_get_params()\n", stderr);
-#endif /* DEBUG */
+  fputs("DEBUG2: before gdev_prn_get_params()\n", stderr);
 
   if ((code = gdev_prn_get_params(pdev, plist)) < 0)
     return (code);
 
-#ifdef DEBUG
-  fputs("DEBUG: after gdev_prn_get_params()\n", stderr);
-#endif /* DEBUG */
+  fputs("DEBUG2: after gdev_prn_get_params()\n", stderr);
 
  /*
   * Then write the CUPS parameters...
   */
 
-#ifdef DEBUG
-  if (gs_log_errors > 1)
-    fputs("DEBUG: MediaClass\n", stderr);
-#endif /* DEBUG */
+  fputs("DEBUG2: Adding MediaClass\n", stderr);
 
   param_string_from_string(s, cups->header.MediaClass);
   if ((code = param_write_string(plist, "MediaClass", &s)) < 0)
     return (code);
 
-#ifdef DEBUG
-  if (gs_log_errors > 1)
-    fputs("DEBUG: AdvanceDistance\n", stderr);
-#endif /* DEBUG */
+  fputs("DEBUG2: Adding AdvanceDistance\n", stderr);
 
   if ((code = param_write_int(plist, "AdvanceDistance",
                               (int *)&(cups->header.AdvanceDistance))) < 0)
     return (code);
 
-#ifdef DEBUG
-  if (gs_log_errors > 1)
-    fputs("DEBUG: AdvanceDistance\n", stderr);
-#endif /* DEBUG */
+  fputs("DEBUG2: Adding AdvanceDistance\n", stderr);
 
   if ((code = param_write_int(plist, "AdvanceMedia",
                               (int *)&(cups->header.AdvanceMedia))) < 0)
     return (code);
 
-#ifdef DEBUG
-  if (gs_log_errors > 1)
-    fputs("DEBUG: Collate\n", stderr);
-#endif /* DEBUG */
+  fputs("DEBUG2: Adding Collate\n", stderr);
 
   b = cups->header.Collate;
   if ((code = param_write_bool(plist, "Collate", &b)) < 0)
     return (code);
 
-#ifdef DEBUG
-  if (gs_log_errors > 1)
-    fputs("DEBUG: CutMedia\n", stderr);
-#endif /* DEBUG */
+  fputs("DEBUG2: Adding CutMedia\n", stderr);
 
   if ((code = param_write_int(plist, "CutMedia",
                               (int *)&(cups->header.CutMedia))) < 0)
     return (code);
 
-#ifdef DEBUG
-  if (gs_log_errors > 1)
-    fputs("DEBUG: InsertSheet\n", stderr);
-#endif /* DEBUG */
+  fputs("DEBUG2: Adding InsertSheet\n", stderr);
 
   b = cups->header.InsertSheet;
   if ((code = param_write_bool(plist, "InsertSheet", &b)) < 0)
     return (code);
 
-#ifdef DEBUG
-  if (gs_log_errors > 1)
-    fputs("DEBUG: Jog\n", stderr);
-#endif /* DEBUG */
+  fputs("DEBUG2: Adding Jog\n", stderr);
 
   if ((code = param_write_int(plist, "Jog",
                               (int *)&(cups->header.Jog))) < 0)
     return (code);
 
-#ifdef DEBUG
-  if (gs_log_errors > 1)
-    fputs("DEBUG: LeadingEdge\n", stderr);
-#endif /* DEBUG */
+  fputs("DEBUG2: Adding LeadingEdge\n", stderr);
 
   if ((code = param_write_int(plist, "LeadingEdge",
                               (int *)&(cups->header.LeadingEdge))) < 0)
     return (code);
 
-#ifdef DEBUG
-  if (gs_log_errors > 1)
-    fputs("DEBUG: ManualFeed\n", stderr);
-#endif /* DEBUG */
+  fputs("DEBUG2: Adding ManualFeed\n", stderr);
 
   b = cups->header.ManualFeed;
   if ((code = param_write_bool(plist, "ManualFeed", &b)) < 0)
     return (code);
 
-#ifdef DEBUG
-  if (gs_log_errors > 1)
-    fputs("DEBUG: MediaPosition\n", stderr);
-#endif /* DEBUG */
+  fputs("DEBUG2: Adding MediaPosition\n", stderr);
 
   if ((code = param_write_int(plist, "MediaPosition",
                               (int *)&(cups->header.MediaPosition))) < 0)
     return (code);
 
-#ifdef DEBUG
-  if (gs_log_errors > 1)
-    fputs("DEBUG: MirrorPrint\n", stderr);
-#endif /* DEBUG */
+  fputs("DEBUG2: Adding MirrorPrint\n", stderr);
 
   b = cups->header.MirrorPrint;
   if ((code = param_write_bool(plist, "MirrorPrint", &b)) < 0)
     return (code);
 
-#ifdef DEBUG
-  if (gs_log_errors > 1)
-    fputs("DEBUG: NegativePrint\n", stderr);
-#endif /* DEBUG */
+  fputs("DEBUG2: Adding NegativePrint\n", stderr);
 
   b = cups->header.NegativePrint;
   if ((code = param_write_bool(plist, "NegativePrint", &b)) < 0)
     return (code);
 
-#ifdef DEBUG
-  if (gs_log_errors > 1)
-    fputs("DEBUG: OutputFaceUp\n", stderr);
-#endif /* DEBUG */
+  fputs("DEBUG2: Adding OutputFaceUp\n", stderr);
 
   b = cups->header.OutputFaceUp;
   if ((code = param_write_bool(plist, "OutputFaceUp", &b)) < 0)
     return (code);
 
-#ifdef DEBUG
-  if (gs_log_errors > 1)
-    fputs("DEBUG: Separations\n", stderr);
-#endif /* DEBUG */
+  fputs("DEBUG2: Adding Separations\n", stderr);
 
   b = cups->header.Separations;
   if ((code = param_write_bool(plist, "Separations", &b)) < 0)
     return (code);
 
-#ifdef DEBUG
-  if (gs_log_errors > 1)
-    fputs("DEBUG: TraySwitch\n", stderr);
-#endif /* DEBUG */
+  fputs("DEBUG2: Adding TraySwitch\n", stderr);
 
   b = cups->header.TraySwitch;
   if ((code = param_write_bool(plist, "TraySwitch", &b)) < 0)
     return (code);
 
-#ifdef DEBUG
-  if (gs_log_errors > 1)
-    fputs("DEBUG: Tumble\n", stderr);
-#endif /* DEBUG */
+  fputs("DEBUG2: Adding Tumble\n", stderr);
 
   b = cups->header.Tumble;
   if ((code = param_write_bool(plist, "Tumble", &b)) < 0)
     return (code);
 
-#ifdef DEBUG
-  if (gs_log_errors > 1)
-    fputs("DEBUG: cupsWidth\n", stderr);
-#endif /* DEBUG */
+  fputs("DEBUG2: Adding cupsWidth\n", stderr);
 
   if ((code = param_write_int(plist, "cupsWidth",
                               (int *)&(cups->header.cupsWidth))) < 0)
     return (code);
 
-#ifdef DEBUG
-  if (gs_log_errors > 1)
-    fputs("DEBUG: cupsHeight\n", stderr);
-#endif /* DEBUG */
+  fputs("DEBUG2: Adding cupsHeight\n", stderr);
 
   if ((code = param_write_int(plist, "cupsHeight",
                               (int *)&(cups->header.cupsHeight))) < 0)
     return (code);
 
-#ifdef DEBUG
-  if (gs_log_errors > 1)
-    fputs("DEBUG: cupsMediaType\n", stderr);
-#endif /* DEBUG */
+  fputs("DEBUG2: Adding cupsMediaType\n", stderr);
 
   if ((code = param_write_int(plist, "cupsMediaType",
                               (int *)&(cups->header.cupsMediaType))) < 0)
     return (code);
 
-#ifdef DEBUG
-  if (gs_log_errors > 1)
-    fputs("DEBUG: cupsBitsPerColor\n", stderr);
-#endif /* DEBUG */
+  fputs("DEBUG2: Adding cupsBitsPerColor\n", stderr);
 
   if ((code = param_write_int(plist, "cupsBitsPerColor",
                               (int *)&(cups->header.cupsBitsPerColor))) < 0)
     return (code);
 
-#ifdef DEBUG
-  if (gs_log_errors > 1)
-    fputs("DEBUG: cupsBitsPerPixel\n", stderr);
-#endif /* DEBUG */
+  fputs("DEBUG2: Adding cupsBitsPerPixel\n", stderr);
 
   if ((code = param_write_int(plist, "cupsBitsPerPixel",
                               (int *)&(cups->header.cupsBitsPerPixel))) < 0)
     return (code);
 
-#ifdef DEBUG
-  if (gs_log_errors > 1)
-    fputs("DEBUG: cupsBytesPerLine\n", stderr);
-#endif /* DEBUG */
+  fputs("DEBUG2: Adding cupsBytesPerLine\n", stderr);
 
   if ((code = param_write_int(plist, "cupsBytesPerLine",
                               (int *)&(cups->header.cupsBytesPerLine))) < 0)
     return (code);
 
-#ifdef DEBUG
-  if (gs_log_errors > 1)
-    fputs("DEBUG: cupsColorOrder\n", stderr);
-#endif /* DEBUG */
+  fputs("DEBUG2: Adding cupsColorOrder\n", stderr);
 
   if ((code = param_write_int(plist, "cupsColorOrder",
                               (int *)&(cups->header.cupsColorOrder))) < 0)
     return (code);
 
-#ifdef DEBUG
-  if (gs_log_errors > 1)
-    fputs("DEBUG: cupsColorSpace\n", stderr);
-#endif /* DEBUG */
+  fputs("DEBUG2: Adding cupsColorSpace\n", stderr);
 
   if ((code = param_write_int(plist, "cupsColorSpace",
                               (int *)&(cups->header.cupsColorSpace))) < 0)
     return (code);
 
-#ifdef DEBUG
-  if (gs_log_errors > 1)
-    fputs("DEBUG: cupsCompression\n", stderr);
-#endif /* DEBUG */
+  fputs("DEBUG2: Adding cupsCompression\n", stderr);
 
   if ((code = param_write_int(plist, "cupsCompression",
                               (int *)&(cups->header.cupsCompression))) < 0)
     return (code);
 
-#ifdef DEBUG
-  if (gs_log_errors > 1)
-    fputs("DEBUG: cupsRowCount\n", stderr);
-#endif /* DEBUG */
+  fputs("DEBUG2: Adding cupsRowCount\n", stderr);
 
   if ((code = param_write_int(plist, "cupsRowCount",
                               (int *)&(cups->header.cupsRowCount))) < 0)
     return (code);
 
-#ifdef DEBUG
-  if (gs_log_errors > 1)
-    fputs("DEBUG: cupsRowFeed\n", stderr);
-#endif /* DEBUG */
+  fputs("DEBUG2: Adding cupsRowFeed\n", stderr);
 
   if ((code = param_write_int(plist, "cupsRowFeed",
                               (int *)&(cups->header.cupsRowFeed))) < 0)
     return (code);
 
-#ifdef DEBUG
-  if (gs_log_errors > 1)
-    fputs("DEBUG: cupsRowStep\n", stderr);
-#endif /* DEBUG */
+  fputs("DEBUG2: Adding cupsRowStep\n", stderr);
 
   if ((code = param_write_int(plist, "cupsRowStep",
                               (int *)&(cups->header.cupsRowStep))) < 0)
     return (code);
 
 #ifdef CUPS_RASTER_SYNCv1
-#  ifdef DEBUG
-  if (gs_log_errors > 1)
-    fputs("DEBUG: cupsNumColors\n", stderr);
-#  endif /* DEBUG */
+  fputs("DEBUG2: Adding cupsNumColors\n", stderr);
 
   if ((code = param_write_int(plist, "cupsNumColors",
                               (int *)&(cups->header.cupsNumColors))) < 0)
     return (code);
 
-#  ifdef DEBUG
-  if (gs_log_errors > 1)
-    fputs("DEBUG: cupsInteger\n", stderr);
-#  endif /* DEBUG */
+  fputs("DEBUG2: Adding cupsInteger\n", stderr);
 
   for (i = 0; i < 16; i ++)
   {
@@ -755,10 +857,7 @@ cups_get_params(gx_device     *pdev,	/* I - Device info */
       return (code);
   }
 
-#  ifdef DEBUG
-  if (gs_log_errors > 1)
-    fputs("DEBUG: cupsReal\n", stderr);
-#  endif /* DEBUG */
+  fputs("DEBUG2: Adding cupsReal\n", stderr);
 
   for (i = 0; i < 16; i ++)
   {
@@ -768,10 +867,7 @@ cups_get_params(gx_device     *pdev,	/* I - Device info */
       return (code);
   }
 
-#  ifdef DEBUG
-  if (gs_log_errors > 1)
-    fputs("DEBUG: cupsString\n", stderr);
-#  endif /* DEBUG */
+  fputs("DEBUG2: Adding cupsString\n", stderr);
 
   for (i = 0; i < 16; i ++)
   {
@@ -781,29 +877,20 @@ cups_get_params(gx_device     *pdev,	/* I - Device info */
       return (code);
   }
 
-#  ifdef DEBUG
-  if (gs_log_errors > 1)
-    fputs("DEBUG: cupsMarkerType\n", stderr);
-#  endif /* DEBUG */
+  fputs("DEBUG2: Adding cupsMarkerType\n", stderr);
 
   param_string_from_string(s, cups->header.cupsMarkerType);
   if ((code = param_write_string(plist, "cupsMarkerType", &s)) < 0)
     return (code);
 
-#  ifdef DEBUG
-  if (gs_log_errors > 1)
-    fputs("DEBUG: cupsRenderingIntent\n", stderr);
-#  endif /* DEBUG */
+  fputs("DEBUG2: Adding cupsRenderingIntent\n", stderr);
 
   param_string_from_string(s, cups->header.cupsRenderingIntent);
   if ((code = param_write_string(plist, "cupsRenderingIntent", &s)) < 0)
     return (code);
-
 #endif /* CUPS_RASTER_SYNCv1 */
 
-#ifdef DEBUG
-  fputs("DEBUG: Leaving cups_get_params()\n", stderr);
-#endif /* DEBUG */
+  fputs("DEBUG2: Leaving cups_get_params()\n", stderr);
 
   return (0);
 }
@@ -812,8 +899,6 @@ cups_get_params(gx_device     *pdev,	/* I - Device info */
 /*
  * 'cups_get_space_params()' - Get space parameters from the RIP_CACHE env var.
  */
-
-#define TILE_SIZE	256
 
 void
 cups_get_space_params(const gx_device_printer *pdev,
@@ -826,9 +911,7 @@ cups_get_space_params(const gx_device_printer *pdev,
 	cache_units[255];		/* Cache size units */
 
 
-#ifdef DEBUG
-  fprintf(stderr, "DEBUG: cups_get_space_params(%p, %p)\n", pdev, space_params);
-#endif /* DEBUG */
+  fprintf(stderr, "DEBUG2: cups_get_space_params(%p, %p)\n", pdev, space_params);
 
   if ((cache_env = getenv("RIP_MAX_CACHE")) != NULL)
   {
@@ -838,7 +921,7 @@ cups_get_space_params(const gx_device_printer *pdev,
           cache_size = 8 * 1024 * 1024;
 	  break;
       case 1 :
-          cache_size *= 4 * TILE_SIZE * TILE_SIZE;
+          cache_size *= 4 * CUPS_TILE_SIZE * CUPS_TILE_SIZE;
 	  break;
       case 2 :
           if (tolower(cache_units[0]) == 'g')
@@ -848,7 +931,7 @@ cups_get_space_params(const gx_device_printer *pdev,
 	  else if (tolower(cache_units[0]) == 'k')
 	    cache_size *= 1024;
 	  else if (tolower(cache_units[0]) == 't')
-	    cache_size *= 4 * TILE_SIZE * TILE_SIZE;
+	    cache_size *= 4 * CUPS_TILE_SIZE * CUPS_TILE_SIZE;
 	  break;
     }
   }
@@ -863,6 +946,529 @@ cups_get_space_params(const gx_device_printer *pdev,
 
 
 /*
+ * 'cups_map_cielab()' - Map CIE Lab transformation...
+ */
+
+static double				/* O - Adjusted color value */
+cups_map_cielab(double x,		/* I - Raw color value */
+                double xn)		/* I - Whitepoint color value */
+{
+  double x_xn;				/* Fraction of whitepoint */
+
+
+  x_xn = x / xn;
+
+  if (x_xn > 0.008856)
+    return (cbrt(x_xn));
+  else
+    return (7.787 * x_xn + 16.0 / 116.0);
+}
+
+
+#ifdef dev_t_proc_encode_color
+/*
+ * 'cups_map_cmyk()' - Map a CMYK color value to device colors.
+ */
+
+private void
+cups_map_cmyk(gx_device *pdev,		/* I - Device info */
+              frac      c,		/* I - Cyan value */
+	      frac      m,		/* I - Magenta value */
+	      frac      y,		/* I - Yellow value */
+	      frac      k,		/* I - Black value */
+	      frac      *out)		/* O - Device colors */
+{
+  int	c0, c1, c2;			/* Temporary color values */
+  float	rr, rg, rb,			/* Real RGB colors */
+	ciex, ciey, ciez,		/* CIE XYZ colors */
+	ciey_yn,			/* Normalized luminance */
+	ciel, ciea, cieb;		/* CIE Lab colors */
+
+
+  fprintf(stderr, "DEBUG2: cups_map_cmyk(%p, %d, %d, %d, %d, %p)\n",
+          pdev, c, m, y, k, out);
+
+ /*
+  * Convert the CMYK color to the destination colorspace...
+  */
+
+  switch (cups->header.cupsColorSpace)
+  {
+    case CUPS_CSPACE_W :
+        c0 = frac_1 - (c * 31 + m * 61 + y * 8) / 100 - k;
+
+	if (c0 < 0)
+	  out[0] = 0;
+	else if (c0 > frac_1)
+	  out[0] = (frac)cupsDensity[frac_1];
+	else
+	  out[0] = (frac)cupsDensity[c0];
+        break;
+
+    case CUPS_CSPACE_RGBA :
+        out[3] = frac_1;
+
+    case CUPS_CSPACE_RGB :
+        c0 = frac_1 - c - k;
+	c1 = frac_1 - m - k;
+	c2 = frac_1 - y - k;
+
+        if (c0 < 0)
+	  out[0] = 0;
+	else if (c0 > frac_1)
+	  out[0] = (frac)cupsDensity[frac_1];
+	else
+	  out[0] = (frac)cupsDensity[c0];
+
+        if (c1 < 0)
+	  out[1] = 0;
+	else if (c1 > frac_1)
+	  out[1] = (frac)cupsDensity[frac_1];
+	else
+	  out[1] = (frac)cupsDensity[c1];
+
+        if (c2 < 0)
+	  out[2] = 0;
+	else if (c2 > frac_1)
+	  out[2] = (frac)cupsDensity[frac_1];
+	else
+	  out[2] = (frac)cupsDensity[c2];
+        break;
+
+    default :
+    case CUPS_CSPACE_K :
+        c0 = (c * 31 + m * 61 + y * 8) / 100 + k;
+
+	if (c0 < 0)
+	  out[0] = 0;
+	else if (c0 > frac_1)
+	  out[0] = (frac)cupsDensity[frac_1];
+	else
+	  out[0] = (frac)cupsDensity[c0];
+        break;
+
+    case CUPS_CSPACE_CMY :
+        c0 = c + k;
+	c1 = m + k;
+	c2 = y + k;
+
+        if (c0 < 0)
+	  out[0] = 0;
+	else if (c0 > frac_1)
+	  out[0] = (frac)cupsDensity[frac_1];
+	else
+	  out[0] = (frac)cupsDensity[c0];
+
+        if (c1 < 0)
+	  out[1] = 0;
+	else if (c1 > frac_1)
+	  out[1] = (frac)cupsDensity[frac_1];
+	else
+	  out[1] = (frac)cupsDensity[c1];
+
+        if (c2 < 0)
+	  out[2] = 0;
+	else if (c2 > frac_1)
+	  out[2] = (frac)cupsDensity[frac_1];
+	else
+	  out[2] = (frac)cupsDensity[c2];
+        break;
+
+    case CUPS_CSPACE_YMC :
+        c0 = y + k;
+	c1 = m + k;
+	c2 = c + k;
+
+        if (c0 < 0)
+	  out[0] = 0;
+	else if (c0 > frac_1)
+	  out[0] = (frac)cupsDensity[frac_1];
+	else
+	  out[0] = (frac)cupsDensity[c0];
+
+        if (c1 < 0)
+	  out[1] = 0;
+	else if (c1 > frac_1)
+	  out[1] = (frac)cupsDensity[frac_1];
+	else
+	  out[1] = (frac)cupsDensity[c1];
+
+        if (c2 < 0)
+	  out[2] = 0;
+	else if (c2 > frac_1)
+	  out[2] = (frac)cupsDensity[frac_1];
+	else
+	  out[2] = (frac)cupsDensity[c2];
+        break;
+
+    case CUPS_CSPACE_CMYK :
+        if (c < 0)
+	  out[0] = 0;
+	else if (c > frac_1)
+	  out[0] = (frac)cupsDensity[frac_1];
+	else
+	  out[0] = (frac)cupsDensity[c];
+
+        if (m < 0)
+	  out[1] = 0;
+	else if (m > frac_1)
+	  out[1] = (frac)cupsDensity[frac_1];
+	else
+	  out[1] = (frac)cupsDensity[m];
+
+        if (y < 0)
+	  out[2] = 0;
+	else if (y > frac_1)
+	  out[2] = (frac)cupsDensity[frac_1];
+	else
+	  out[2] = (frac)cupsDensity[y];
+
+        if (k < 0)
+	  out[3] = 0;
+	else if (k > frac_1)
+	  out[3] = (frac)cupsDensity[frac_1];
+	else
+	  out[3] = (frac)cupsDensity[k];
+        break;
+
+    case CUPS_CSPACE_YMCK :
+    case CUPS_CSPACE_GMCK :
+    case CUPS_CSPACE_GMCS :
+        if (y < 0)
+	  out[0] = 0;
+	else if (y > frac_1)
+	  out[0] = (frac)cupsDensity[frac_1];
+	else
+	  out[0] = (frac)cupsDensity[y];
+
+        if (m < 0)
+	  out[1] = 0;
+	else if (m > frac_1)
+	  out[1] = (frac)cupsDensity[frac_1];
+	else
+	  out[1] = (frac)cupsDensity[m];
+
+        if (c < 0)
+	  out[2] = 0;
+	else if (c > frac_1)
+	  out[2] = (frac)cupsDensity[frac_1];
+	else
+	  out[2] = (frac)cupsDensity[c];
+
+        if (k < 0)
+	  out[3] = 0;
+	else if (k > frac_1)
+	  out[3] = (frac)cupsDensity[frac_1];
+	else
+	  out[3] = (frac)cupsDensity[k];
+        break;
+
+    case CUPS_CSPACE_KCMYcm :
+    case CUPS_CSPACE_KCMY :
+        if (k < 0)
+	  out[0] = 0;
+	else if (k > frac_1)
+	  out[0] = (frac)cupsDensity[frac_1];
+	else
+	  out[0] = (frac)cupsDensity[k];
+
+        if (c < 0)
+	  out[1] = 0;
+	else if (c > frac_1)
+	  out[1] = (frac)cupsDensity[frac_1];
+	else
+	  out[1] = (frac)cupsDensity[c];
+
+        if (m < 0)
+	  out[2] = 0;
+	else if (m > frac_1)
+	  out[2] = (frac)cupsDensity[frac_1];
+	else
+	  out[2] = (frac)cupsDensity[m];
+
+        if (y < 0)
+	  out[3] = 0;
+	else if (y > frac_1)
+	  out[3] = (frac)cupsDensity[frac_1];
+	else
+	  out[3] = (frac)cupsDensity[y];
+        break;
+
+#  ifdef CUPS_RASTER_HAVE_COLORIMETRIC
+    case CUPS_CSPACE_CIEXYZ :
+    case CUPS_CSPACE_CIELab :
+    case CUPS_CSPACE_ICC1 :
+    case CUPS_CSPACE_ICC2 :
+    case CUPS_CSPACE_ICC3 :
+    case CUPS_CSPACE_ICC4 :
+    case CUPS_CSPACE_ICC5 :
+    case CUPS_CSPACE_ICC6 :
+    case CUPS_CSPACE_ICC7 :
+    case CUPS_CSPACE_ICC8 :
+    case CUPS_CSPACE_ICC9 :
+    case CUPS_CSPACE_ICCA :
+    case CUPS_CSPACE_ICCB :
+    case CUPS_CSPACE_ICCC :
+    case CUPS_CSPACE_ICCD :
+    case CUPS_CSPACE_ICCE :
+    case CUPS_CSPACE_ICCF :
+       /*
+        * Convert CMYK to sRGB...
+	*/
+
+        c0 = frac_1 - c - k;
+	c1 = frac_1 - m - k;
+	c2 = frac_1 - y - k;
+
+        if (c0 < 0)
+	  c0 = 0;
+	else if (c0 > frac_1)
+	  c0 = frac_1;
+
+        if (c1 < 0)
+	  c1 = 0;
+	else if (c1 > frac_1)
+	  c1 = frac_1;
+
+        if (c2 < 0)
+	  c2 = 0;
+	else if (c2 > frac_1)
+	  c2 = frac_1;
+
+       /*
+        * Convert sRGB to linear RGB...
+	*/
+
+	rr = pow((double)c0 / (double)frac_1, 0.58823529412);
+	rg = pow((double)c1 / (double)frac_1, 0.58823529412);
+	rb = pow((double)c2 / (double)frac_1, 0.58823529412);
+
+       /*
+        * Convert to CIE XYZ...
+	*/
+
+	ciex = 0.412453 * rr + 0.357580 * rg + 0.180423 * rb;
+	ciey = 0.212671 * rr + 0.715160 * rg + 0.072169 * rb;
+	ciez = 0.019334 * rr + 0.119193 * rg + 0.950227 * rb;
+
+        if (cups->header.cupsColorSpace == CUPS_CSPACE_CIEXYZ)
+	{
+	 /*
+	  * Convert to an integer XYZ color value...
+	  */
+
+          if (ciex > 1.0)
+	    c0 = frac_1;
+	  else if (ciex > 0.0)
+	    c0 = (int)(ciex * frac_1);
+	  else
+	    c0 = 0;
+
+          if (ciey > 1.0)
+	    c1 = frac_1;
+	  else if (ciey > 0.0)
+	    c1 = (int)(ciey * frac_1);
+	  else
+	    c1 = 0;
+
+          if (ciez > 1.0)
+	    c2 = frac_1;
+	  else if (ciez > 0.0)
+	    c2 = (int)(ciez * frac_1);
+	  else
+	    c2 = 0;
+	}
+	else
+	{
+	 /*
+	  * Convert CIE XYZ to Lab...
+	  */
+
+	  ciey_yn = ciey / D65_Y;
+
+	  if (ciey_yn > 0.008856)
+	    ciel = 116 * cbrt(ciey_yn) - 16;
+	  else
+	    ciel = 903.3 * ciey_yn;
+
+	  ciea = 500 * (cups_map_cielab(ciex, D65_X) -
+	                cups_map_cielab(ciey, D65_Y));
+	  cieb = 200 * (cups_map_cielab(ciey, D65_Y) -
+	                cups_map_cielab(ciez, D65_Z));
+
+         /*
+	  * Scale the L value and bias the a and b values by 128
+	  * so that all values are in the range of 0 to 255.
+	  */
+
+	  ciel *= 2.55;
+	  ciea += 128;
+	  cieb += 128;
+
+         /*
+	  * Convert to frac values...
+	  */
+
+          if (ciel < 0.0)
+	    c0 = 0;
+	  else if (ciel < 255.0)
+	    c0 = (int)(ciel * frac_1 / 255.0);
+	  else
+	    c0 = frac_1;
+
+          if (ciea < 0.0)
+	    c1 = 0;
+	  else if (ciea < 255.0)
+	    c1 = (int)(ciea * frac_1 / 255.0);
+	  else
+	    c1 = frac_1;
+
+          if (cieb < 0.0)
+	    c2 = 0;
+	  else if (cieb < 255.0)
+	    c2 = (int)(cieb * frac_1 / 255.0);
+	  else
+	    c2 = frac_1;
+	}
+
+       /*
+        * Put the final color value together...
+	*/
+
+        out[0] = c0;
+	out[1] = c1;
+	out[2] = c2;
+        break;
+#  endif /* CUPS_RASTER_HAVE_COLORIMETRIC */
+  }
+
+  switch (cups->color_info.num_components)
+  {
+    default :
+    case 1 :
+        fprintf(stderr, "DEBUG2:   \\=== COLOR %d\n", out[0]);
+	break;
+
+    case 3 :
+        fprintf(stderr, "DEBUG2:   \\=== COLOR %d, %d, %d\n",
+	        out[0], out[1], out[2]);
+	break;
+
+    case 4 :
+        fprintf(stderr, "DEBUG2:   \\=== COLOR %d, %d, %d, %d\n",
+	        out[0], out[1], out[2], out[3]);
+	break;
+  }
+}
+
+
+/*
+ * 'cups_map_gray()' - Map a grayscale value to device colors.
+ */
+
+private void
+cups_map_gray(gx_device *pdev,		/* I - Device info */
+              frac      g,		/* I - Grayscale value */
+	      frac      *out)		/* O - Device colors */
+{
+  fprintf(stderr, "DEBUG2: cups_map_gray(%p, %d, %p)\n",
+          pdev, g, out);
+
+ /*
+  * Just use the CMYK mapper...
+  */
+
+  cups_map_cmyk(pdev, 0, 0, 0, frac_1 - g, out);
+}
+
+
+/*
+ * 'cups_map_rgb()' - Map a RGB color value to device colors.
+ */
+
+private void
+cups_map_rgb(gx_device             *pdev,
+					/* I - Device info */
+             const gs_imager_state *pis,/* I - Device state */
+             frac                  r,	/* I - Red value */
+	     frac                  g,	/* I - Green value */
+	     frac                  b,	/* I - Blue value */
+	     frac                  *out)/* O - Device colors */
+{
+  frac		c, m, y, k;		/* CMYK values */
+  frac		mk;			/* Maximum K value */
+  int		tc, tm, ty;		/* Temporary color values */
+
+
+  fprintf(stderr, "DEBUG2: cups_map_rgb(%p, %p, %d, %d, %d, %p)\n",
+          pdev, pis, r, g, b, out);
+
+ /*
+  * Compute CMYK values...
+  */
+
+  c = frac_1 - r;
+  m = frac_1 - g;
+  y = frac_1 - b;
+  k = min(c, min(m, y));
+
+  if ((mk = max(c, max(m, y))) > k)
+    k = (int)((float)k * (float)k * (float)k / ((float)mk * (float)mk));
+
+  c -= k;
+  m -= k;
+  y -= k;
+
+ /*
+  * Do color correction as needed...
+  */
+
+  if (cupsHaveProfile)
+  {
+   /*
+    * Color correct CMY...
+    */
+
+    tc = cupsMatrix[0][0][c] +
+         cupsMatrix[0][1][m] +
+	 cupsMatrix[0][2][y];
+    tm = cupsMatrix[1][0][c] +
+         cupsMatrix[1][1][m] +
+	 cupsMatrix[1][2][y];
+    ty = cupsMatrix[2][0][c] +
+         cupsMatrix[2][1][m] +
+	 cupsMatrix[2][2][y];
+
+    if (tc < 0)
+      c = 0;
+    else if (tc > frac_1)
+      c = frac_1;
+    else
+      c = (frac)tc;
+
+    if (tm < 0)
+      m = 0;
+    else if (tm > frac_1)
+      m = frac_1;
+    else
+      m = (frac)tm;
+
+    if (ty < 0)
+      y = 0;
+    else if (ty > frac_1)
+      y = frac_1;
+    else
+      y = (frac)ty;
+  }
+
+ /*
+  * Use the CMYK mapping function to produce the device colors...
+  */
+
+  cups_map_cmyk(pdev, c, m, y, k, out);
+}
+#else
+/*
  * 'cups_map_cmyk_color()' - Map a CMYK color to a color index.
  *
  * This function is only called when a 4 or 6 color colorspace is
@@ -870,22 +1476,20 @@ cups_get_space_params(const gx_device_printer *pdev,
  * density adjusted.
  */
 
-private gx_color_index				/* O - Color index */
-cups_map_cmyk_color(gx_device      *pdev,	/* I - Device info */
-                    gx_color_value c,		/* I - Cyan value */
-                    gx_color_value m,		/* I - Magenta value */
-                    gx_color_value y,		/* I - Yellow value */
-		    gx_color_value k)		/* I - Black value */
+private gx_color_index			/* O - Color index */
+cups_map_cmyk_color(gx_device      *pdev,
+					/* I - Device info */
+                    gx_color_value c,	/* I - Cyan value */
+                    gx_color_value m,	/* I - Magenta value */
+                    gx_color_value y,	/* I - Yellow value */
+		    gx_color_value k)	/* I - Black value */
 {
-  gx_color_index	i;			/* Temporary index */
-  gx_color_value	ic, im, iy, ik;		/* Integral CMYK values */
+  gx_color_index	i;		/* Temporary index */
+  gx_color_value	ic, im, iy, ik;	/* Integral CMYK values */
 
 
-#ifdef DEBUG
-  if (gs_log_errors > 1)
-    fprintf(stderr, "DEBUG: cups_map_cmyk_color(%p, %d, %d, %d, %d)\n", pdev,
-            c, m, y, k);
-#endif /* DEBUG */
+  fprintf(stderr, "DEBUG2: cups_map_cmyk_color(%p, %d, %d, %d, %d)\n", pdev,
+          c, m, y, k);
 
  /*
   * Setup the color info data as needed...
@@ -900,16 +1504,16 @@ cups_map_cmyk_color(gx_device      *pdev,	/* I - Device info */
 
   if (cupsHaveProfile)
   {
-    c  = cupsDensity[c];
-    m  = cupsDensity[m];
-    y  = cupsDensity[y];
-    k  = cupsDensity[k];
+    c = cupsDensity[c];
+    m = cupsDensity[m];
+    y = cupsDensity[y];
+    k = cupsDensity[k];
   }
 
-  ic = lut_rgb_color[c];
-  im = lut_rgb_color[m];
-  iy = lut_rgb_color[y];
-  ik = lut_rgb_color[k];
+  ic = cupsEncodeLUT[c];
+  im = cupsEncodeLUT[m];
+  iy = cupsEncodeLUT[y];
+  ik = cupsEncodeLUT[k];
 
  /*
   * Convert the CMYK color to a color index...
@@ -997,9 +1601,8 @@ cups_map_cmyk_color(gx_device      *pdev,	/* I - Device info */
         break;
   }
 
-  if (gs_log_errors > 1)
-    fprintf(stderr, "DEBUG: CMYK (%d,%d,%d,%d) -> CMYK %08x (%d,%d,%d,%d)\n",
-	    c, m, y, k, (unsigned)i, ic, im, iy, ik);
+  fprintf(stderr, "DEBUG2: CMYK (%d,%d,%d,%d) -> CMYK %08x (%d,%d,%d,%d)\n",
+          c, m, y, k, (unsigned)i, ic, im, iy, ik);
 
  /*
   * Make sure we don't get a CMYK color of 255, 255, 255, 255...
@@ -1010,25 +1613,24 @@ cups_map_cmyk_color(gx_device      *pdev,	/* I - Device info */
 
   return (i);
 }
-    
+
 
 /*
  * 'cups_map_color_rgb()' - Map a color index to an RGB color.
  */
 
 private int
-cups_map_color_rgb(gx_device      *pdev,	/* I - Device info */
-                   gx_color_index color,	/* I - Color index */
-		   gx_color_value prgb[3])	/* O - RGB values */
+cups_map_color_rgb(gx_device      *pdev,/* I - Device info */
+                   gx_color_index color,/* I - Color index */
+		   gx_color_value prgb[3])
+					/* O - RGB values */
 {
-  unsigned char		c0, c1, c2, c3;		/* Color index components */
-  gx_color_value	k, divk;		/* Black & divisor */
+  unsigned char		c0, c1, c2, c3;	/* Color index components */
+  gx_color_value	k, divk;	/* Black & divisor */
 
 
-#ifdef DEBUG
-  fprintf(stderr, "DEBUG: cups_map_color_rgb(%p, %d, %p)\n", pdev,
+  fprintf(stderr, "DEBUG2: cups_map_color_rgb(%p, %d, %p)\n", pdev,
           (unsigned)color, prgb);
-#endif /* DEBUG */
 
  /*
   * Setup the color info data as needed...
@@ -1037,10 +1639,7 @@ cups_map_color_rgb(gx_device      *pdev,	/* I - Device info */
   if (pdev->color_info.num_components == 0)
     cups_set_color_info(pdev);
 
-#ifdef DEBUG
-  if (gs_log_errors > 1)
-    fprintf(stderr, "DEBUG: COLOR %08x = ", (unsigned)color);
-#endif /* DEBUG */
+  fprintf(stderr, "DEBUG2: COLOR %08x = ", (unsigned)color);
 
  /*
   * Extract the color components from the color index...
@@ -1098,42 +1697,42 @@ cups_map_color_rgb(gx_device      *pdev,	/* I - Device info */
     case CUPS_CSPACE_SILVER :
         prgb[0] =
         prgb[1] =
-        prgb[2] = lut_color_rgb[c3];
+        prgb[2] = cupsDecodeLUT[c3];
         break;
 
     case CUPS_CSPACE_W :
         prgb[0] =
         prgb[1] =
-        prgb[2] = lut_color_rgb[c3];
+        prgb[2] = cupsDecodeLUT[c3];
         break;
 
     case CUPS_CSPACE_RGB :
-        prgb[0] = lut_color_rgb[c1];
-        prgb[1] = lut_color_rgb[c2];
-        prgb[2] = lut_color_rgb[c3];
+        prgb[0] = cupsDecodeLUT[c1];
+        prgb[1] = cupsDecodeLUT[c2];
+        prgb[2] = cupsDecodeLUT[c3];
         break;
 
     case CUPS_CSPACE_RGBA :
-        prgb[0] = lut_color_rgb[c0];
-        prgb[1] = lut_color_rgb[c1];
-        prgb[2] = lut_color_rgb[c2];
+        prgb[0] = cupsDecodeLUT[c0];
+        prgb[1] = cupsDecodeLUT[c1];
+        prgb[2] = cupsDecodeLUT[c2];
         break;
 
     case CUPS_CSPACE_CMY :
-        prgb[0] = lut_color_rgb[c1];
-        prgb[1] = lut_color_rgb[c2];
-        prgb[2] = lut_color_rgb[c3];
+        prgb[0] = cupsDecodeLUT[c1];
+        prgb[1] = cupsDecodeLUT[c2];
+        prgb[2] = cupsDecodeLUT[c3];
         break;
 
     case CUPS_CSPACE_YMC :
-        prgb[0] = lut_color_rgb[c3];
-        prgb[1] = lut_color_rgb[c2];
-        prgb[2] = lut_color_rgb[c1];
+        prgb[0] = cupsDecodeLUT[c3];
+        prgb[1] = cupsDecodeLUT[c2];
+        prgb[2] = cupsDecodeLUT[c1];
         break;
 
     case CUPS_CSPACE_KCMY :
     case CUPS_CSPACE_KCMYcm :
-        k    = lut_color_rgb[c0];
+        k    = cupsDecodeLUT[c0];
         divk = gx_max_color_value - k;
         if (divk == 0)
         {
@@ -1153,7 +1752,7 @@ cups_map_color_rgb(gx_device      *pdev,	/* I - Device info */
         break;
 
     case CUPS_CSPACE_CMYK :
-        k    = lut_color_rgb[c3];
+        k    = cupsDecodeLUT[c3];
         divk = gx_max_color_value - k;
         if (divk == 0)
         {
@@ -1175,7 +1774,7 @@ cups_map_color_rgb(gx_device      *pdev,	/* I - Device info */
     case CUPS_CSPACE_YMCK :
     case CUPS_CSPACE_GMCK :
     case CUPS_CSPACE_GMCS :
-        k    = lut_color_rgb[c3];
+        k    = cupsDecodeLUT[c3];
         divk = gx_max_color_value - k;
         if (divk == 0)
         {
@@ -1194,7 +1793,7 @@ cups_map_color_rgb(gx_device      *pdev,	/* I - Device info */
         }
         break;
 
-#ifdef CUPS_RASTER_HAVE_COLORIMETRIC
+#  ifdef CUPS_RASTER_HAVE_COLORIMETRIC
     case CUPS_CSPACE_CIEXYZ :
     case CUPS_CSPACE_CIELab :
     case CUPS_CSPACE_ICC1 :
@@ -1213,35 +1812,12 @@ cups_map_color_rgb(gx_device      *pdev,	/* I - Device info */
     case CUPS_CSPACE_ICCE :
     case CUPS_CSPACE_ICCF :
         break;
-#endif /* CUPS_RASTER_HAVE_COLORIMETRIC */
+#  endif /* CUPS_RASTER_HAVE_COLORIMETRIC */
   }
 
-#ifdef DEBUG
-  if (gs_log_errors > 1)
-    fprintf(stderr, "%d,%d,%d\n", prgb[0], prgb[1], prgb[2]);
-#endif /* DEBUG */
+  fprintf(stderr, "%d,%d,%d\n", prgb[0], prgb[1], prgb[2]);
 
   return (0);
-}
-
-
-/*
- * 'cups_map_cielab()' - Map CIE Lab transformation...
- */
-
-static double					/* O - Adjusted color value */
-cups_map_cielab(double x,			/* I - Raw color value */
-                double xn)			/* I - Whitepoint color value */
-{
-  double x_xn;					/* Fraction of whitepoint */
-
-
-  x_xn = x / xn;
-
-  if (x_xn > 0.008856)
-    return (cbrt(x_xn));
-  else
-    return (7.787 * x_xn + 16.0 / 116.0);
 }
 
 
@@ -1251,25 +1827,25 @@ cups_map_cielab(double x,			/* I - Raw color value */
  *                          figure out the format when we output a page).
  */
 
-private gx_color_index				/* O - Color index */
-cups_map_rgb_color(gx_device      *pdev,	/* I - Device info */
-                   gx_color_value r,		/* I - Red value */
-                   gx_color_value g,		/* I - Green value */
-                   gx_color_value b)		/* I - Blue value */
+private gx_color_index			/* O - Color index */
+cups_map_rgb_color(gx_device      *pdev,/* I - Device info */
+                   gx_color_value r,	/* I - Red value */
+                   gx_color_value g,	/* I - Green value */
+                   gx_color_value b)	/* I - Blue value */
 {
-  gx_color_index	i;			/* Temporary index */
-  gx_color_value	ic, im, iy, ik;		/* Integral CMYK values */
-  gx_color_value	mk;			/* Maximum K value */
-  int			tc, tm, ty;		/* Temporary color values */
-  float			rr, rg, rb,		/* Real RGB colors */
-			ciex, ciey, ciez,	/* CIE XYZ colors */
-			ciey_yn,		/* Normalized luminance */
-			ciel, ciea, cieb;	/* CIE Lab colors */
+  gx_color_index	i;		/* Temporary index */
+  gx_color_value	ic, im, iy, ik;	/* Integral CMYK values */
+  gx_color_value	mk;		/* Maximum K value */
+  int			tc, tm, ty;	/* Temporary color values */
+  float			rr, rg, rb,	/* Real RGB colors */
+			ciex, ciey, ciez,
+					/* CIE XYZ colors */
+			ciey_yn,	/* Normalized luminance */
+			ciel, ciea, cieb;
+					/* CIE Lab colors */
 
 
-#ifdef DEBUG
-  fprintf(stderr, "DEBUG: cups_map_rgb_color(%p, %d, %d, %d)\n", pdev, r, g, b);
-#endif /* DEBUG */
+  fprintf(stderr, "DEBUG2: cups_map_rgb_color(%p, %d, %d, %d)\n", pdev, r, g, b);
 
  /*
   * Setup the color info data as needed...
@@ -1342,7 +1918,7 @@ cups_map_rgb_color(gx_device      *pdev,	/* I - Device info */
     else
       b = gx_max_color_value - cupsDensity[ty];
   }
-    
+
  /*
   * Convert the RGB color to a color index...
   */
@@ -1350,13 +1926,13 @@ cups_map_rgb_color(gx_device      *pdev,	/* I - Device info */
   switch (cups->header.cupsColorSpace)
   {
     case CUPS_CSPACE_W :
-        i = lut_rgb_color[(r * 31 + g * 61 + b * 8) / 100];
+        i = cupsEncodeLUT[(r * 31 + g * 61 + b * 8) / 100];
         break;
 
     case CUPS_CSPACE_RGB :
-        ic = lut_rgb_color[r];
-        im = lut_rgb_color[g];
-        iy = lut_rgb_color[b];
+        ic = cupsEncodeLUT[r];
+        im = cupsEncodeLUT[g];
+        iy = cupsEncodeLUT[b];
 
         switch (cups->header.cupsBitsPerColor)
         {
@@ -1376,9 +1952,9 @@ cups_map_rgb_color(gx_device      *pdev,	/* I - Device info */
         break;
 
     case CUPS_CSPACE_RGBA :
-        ic = lut_rgb_color[r];
-        im = lut_rgb_color[g];
-        iy = lut_rgb_color[b];
+        ic = cupsEncodeLUT[r];
+        im = cupsEncodeLUT[g];
+        iy = cupsEncodeLUT[b];
 
         switch (cups->header.cupsBitsPerColor)
         {
@@ -1398,13 +1974,13 @@ cups_map_rgb_color(gx_device      *pdev,	/* I - Device info */
         break;
 
     default :
-        i = lut_rgb_color[gx_max_color_value - (r * 31 + g * 61 + b * 8) / 100];
+        i = cupsEncodeLUT[gx_max_color_value - (r * 31 + g * 61 + b * 8) / 100];
         break;
 
     case CUPS_CSPACE_CMY :
-        ic = lut_rgb_color[gx_max_color_value - r];
-        im = lut_rgb_color[gx_max_color_value - g];
-        iy = lut_rgb_color[gx_max_color_value - b];
+        ic = cupsEncodeLUT[gx_max_color_value - r];
+        im = cupsEncodeLUT[gx_max_color_value - g];
+        iy = cupsEncodeLUT[gx_max_color_value - b];
 
         switch (cups->header.cupsBitsPerColor)
         {
@@ -1424,9 +2000,9 @@ cups_map_rgb_color(gx_device      *pdev,	/* I - Device info */
         break;
 
     case CUPS_CSPACE_YMC :
-        ic = lut_rgb_color[gx_max_color_value - r];
-        im = lut_rgb_color[gx_max_color_value - g];
-        iy = lut_rgb_color[gx_max_color_value - b];
+        ic = cupsEncodeLUT[gx_max_color_value - r];
+        im = cupsEncodeLUT[gx_max_color_value - g];
+        iy = cupsEncodeLUT[gx_max_color_value - b];
 
         switch (cups->header.cupsBitsPerColor)
         {
@@ -1455,10 +2031,10 @@ cups_map_rgb_color(gx_device      *pdev,	/* I - Device info */
 	  ik = (int)((float)ik * (float)ik * (float)ik /
 	             ((float)mk * (float)mk));
 
-        ic = lut_rgb_color[ic - ik];
-        im = lut_rgb_color[im - ik];
-        iy = lut_rgb_color[iy - ik];
-        ik = lut_rgb_color[ik];
+        ic = cupsEncodeLUT[ic - ik];
+        im = cupsEncodeLUT[im - ik];
+        iy = cupsEncodeLUT[iy - ik];
+        ik = cupsEncodeLUT[ik];
 
         switch (cups->header.cupsBitsPerColor)
         {
@@ -1476,9 +2052,8 @@ cups_map_rgb_color(gx_device      *pdev,	/* I - Device info */
               break;
         }
 
-        if (gs_log_errors > 1)
-	  fprintf(stderr, "DEBUG: CMY (%d,%d,%d) -> CMYK %08x (%d,%d,%d,%d)\n",
-	          r, g, b, (unsigned)i, ic, im, iy, ik);
+	fprintf(stderr, "DEBUG2: CMY (%d,%d,%d) -> CMYK %08x (%d,%d,%d,%d)\n",
+	        r, g, b, (unsigned)i, ic, im, iy, ik);
         break;
 
     case CUPS_CSPACE_YMCK :
@@ -1493,10 +2068,10 @@ cups_map_rgb_color(gx_device      *pdev,	/* I - Device info */
 	  ik = (int)((float)ik * (float)ik * (float)ik /
 	             ((float)mk * (float)mk));
 
-        ic = lut_rgb_color[ic - ik];
-        im = lut_rgb_color[im - ik];
-        iy = lut_rgb_color[iy - ik];
-        ik = lut_rgb_color[ik];
+        ic = cupsEncodeLUT[ic - ik];
+        im = cupsEncodeLUT[im - ik];
+        iy = cupsEncodeLUT[iy - ik];
+        ik = cupsEncodeLUT[ik];
 
         switch (cups->header.cupsBitsPerColor)
         {
@@ -1527,10 +2102,10 @@ cups_map_rgb_color(gx_device      *pdev,	/* I - Device info */
 	    ik = (int)((float)ik * (float)ik * (float)ik /
 	               ((float)mk * (float)mk));
 
-          ic = lut_rgb_color[ic - ik];
-          im = lut_rgb_color[im - ik];
-          iy = lut_rgb_color[iy - ik];
-          ik = lut_rgb_color[ik];
+          ic = cupsEncodeLUT[ic - ik];
+          im = cupsEncodeLUT[im - ik];
+          iy = cupsEncodeLUT[iy - ik];
+          ik = cupsEncodeLUT[ik];
 	  if (ik)
 	    i = 32;
 	  else if (ic && im)
@@ -1560,10 +2135,10 @@ cups_map_rgb_color(gx_device      *pdev,	/* I - Device info */
 	  ik = (int)((float)ik * (float)ik * (float)ik /
 	             ((float)mk * (float)mk));
 
-        ic = lut_rgb_color[ic - ik];
-        im = lut_rgb_color[im - ik];
-        iy = lut_rgb_color[iy - ik];
-        ik = lut_rgb_color[ik];
+        ic = cupsEncodeLUT[ic - ik];
+        im = cupsEncodeLUT[im - ik];
+        iy = cupsEncodeLUT[iy - ik];
+        ik = cupsEncodeLUT[ik];
 
         switch (cups->header.cupsBitsPerColor)
         {
@@ -1582,7 +2157,7 @@ cups_map_rgb_color(gx_device      *pdev,	/* I - Device info */
         }
         break;
 
-#ifdef CUPS_RASTER_HAVE_COLORIMETRIC
+#  ifdef CUPS_RASTER_HAVE_COLORIMETRIC
     case CUPS_CSPACE_CIEXYZ :
     case CUPS_CSPACE_CIELab :
     case CUPS_CSPACE_ICC1 :
@@ -1612,11 +2187,7 @@ cups_map_rgb_color(gx_device      *pdev,	/* I - Device info */
         * Convert to CIE XYZ...
 	*/
 
-#  define D65_X	(0.412453 + 0.357580 + 0.180423)
-#  define D65_Y	(0.212671 + 0.715160 + 0.072169)
-#  define D65_Z	(0.019334 + 0.119193 + 0.950227)
-
-	ciex = 0.412453 * rr + 0.357580 * rg + 0.180423 * rb; 
+	ciex = 0.412453 * rr + 0.357580 * rg + 0.180423 * rb;
 	ciey = 0.212671 * rr + 0.715160 * rg + 0.072169 * rb;
 	ciez = 0.019334 * rr + 0.119193 * rg + 0.950227 * rb;
 
@@ -1720,31 +2291,27 @@ cups_map_rgb_color(gx_device      *pdev,	/* I - Device info */
               break;
         }
         break;
-#endif /* CUPS_RASTER_HAVE_COLORIMETRIC */
+#  endif /* CUPS_RASTER_HAVE_COLORIMETRIC */
   }
 
-#ifdef DEBUG
-  if (gs_log_errors > 1)
-    fprintf(stderr, "DEBUG: RGB %d,%d,%d = %08x\n", r, g, b, (unsigned)i);
-#endif /* DEBUG */
+  fprintf(stderr, "DEBUG2: RGB %d,%d,%d = %08x\n", r, g, b, (unsigned)i);
 
   return (i);
 }
-    
+#endif /* dev_t_proc_encode_color */
+
 
 /*
  * 'cups_open()' - Open the output file and initialize things.
  */
 
-private int			/* O - Error status */
-cups_open(gx_device *pdev)	/* I - Device info */
+private int				/* O - Error status */
+cups_open(gx_device *pdev)		/* I - Device info */
 {
-  int	code;			/* Return status */
+  int	code;				/* Return status */
 
 
-#ifdef DEBUG
-  fprintf(stderr, "DEBUG: cups_open(%p)\n", pdev);
-#endif /* DEBUG */
+  fprintf(stderr, "DEBUG2: cups_open(%p)\n", pdev);
 
   cups->printer_procs.get_space_params = cups_get_space_params;
 
@@ -1754,14 +2321,13 @@ cups_open(gx_device *pdev)	/* I - Device info */
     cups->page = 1;
   }
 
-  if (pdev->color_info.num_components == 0)
-    cups_set_color_info(pdev);
+  cups_set_color_info(pdev);
 
   if ((code = gdev_prn_open(pdev)) != 0)
     return (code);
 
-  if (cups->ppd == NULL)
-    cups->ppd = ppdOpenFile(getenv("PPD"));
+  if (cupsPPD == NULL)
+    cupsPPD = ppdOpenFile(getenv("PPD"));
 
   return (0);
 }
@@ -1771,23 +2337,23 @@ cups_open(gx_device *pdev)	/* I - Device info */
  * 'cups_print_pages()' - Send one or more pages to the output file.
  */
 
-private int					/* O - 0 if everything is OK */
-cups_print_pages(gx_device_printer *pdev,	/* I - Device info */
-                 FILE              *fp,		/* I - Output file */
-		 int               num_copies)	/* I - Number of copies */
+private int				/* O - 0 if everything is OK */
+cups_print_pages(gx_device_printer *pdev,
+					/* I - Device info */
+                 FILE              *fp,	/* I - Output file */
+		 int               num_copies)
+					/* I - Number of copies */
 {
-  int		copy;		/* Copy number */
-  int		srcbytes;	/* Byte width of scanline */
-  unsigned char	*src,		/* Scanline data */
-		*dst;		/* Bitmap data */
+  int		copy;			/* Copy number */
+  int		srcbytes;		/* Byte width of scanline */
+  unsigned char	*src,			/* Scanline data */
+		*dst;			/* Bitmap data */
 
 
   (void)fp; /* reference unused file pointer to prevent compiler warning */
 
-#ifdef DEBUG
-  fprintf(stderr, "DEBUG: cups_print_pages(%p, %p, %d)\n", pdev, fp,
+  fprintf(stderr, "DEBUG2: cups_print_pages(%p, %p, %d)\n", pdev, fp,
           num_copies);
-#endif /* DEBUG */
 
  /*
   * Figure out the number of bytes per line...
@@ -1823,11 +2389,9 @@ cups_print_pages(gx_device_printer *pdev,	/* I - Device info */
 
   srcbytes = gdev_prn_raster(pdev);
 
-#ifdef DEBUG
-  fprintf(stderr, "DEBUG: cupsBitsPerPixel = %d, cupsWidth = %d, cupsBytesPerLine = %d, srcbytes = %d\n",
+  fprintf(stderr, "DEBUG2: cupsBitsPerPixel = %d, cupsWidth = %d, cupsBytesPerLine = %d, srcbytes = %d\n",
           cups->header.cupsBitsPerPixel, cups->header.cupsWidth,
 	  cups->header.cupsBytesPerLine, srcbytes);
-#endif /* DEBUG */
 
   src = (unsigned char *)gs_malloc(srcbytes, 1, "cups_print_pages");
 
@@ -1865,17 +2429,15 @@ cups_print_pages(gx_device_printer *pdev,	/* I - Device info */
   if (num_copies < 1)
     num_copies = 1;
 
-  if (cups->ppd != NULL && !cups->ppd->manual_copies)
+  if (cupsPPD != NULL && !cupsPPD->manual_copies)
   {
     cups->header.NumCopies = num_copies;
     num_copies = 1;
   }
 
-#ifdef DEBUG
-  fprintf(stderr, "DEBUG: cupsWidth = %d, cupsHeight = %d, cupsBytesPerLine = %d\n",
+  fprintf(stderr, "DEBUG2: cupsWidth = %d, cupsHeight = %d, cupsBytesPerLine = %d\n",
           cups->header.cupsWidth, cups->header.cupsHeight,
 	  cups->header.cupsBytesPerLine);
-#endif /* DEBUG */
 
   for (copy = num_copies; copy > 0; copy --)
   {
@@ -1932,16 +2494,14 @@ cups_put_params(gx_device     *pdev,	/* I - Device info */
   float			floatval;	/* Floating point value */
   gs_param_string	stringval;	/* String value */
   gs_param_float_array	arrayval;	/* Float array value */
-  int			old_depth;	/* Old color depth */
   int			size_set;	/* Was the size set? */
+  int			color_set;	/* Were the color attrs set? */
   gdev_prn_space_params	sp;		/* Space parameter data */
   int			width,		/* New width of page */
 			height;		/* New height of page */
 
 
-#ifdef DEBUG
-  fprintf(stderr, "DEBUG: cups_put_params(%p, %p)\n", pdev, plist);
-#endif /* DEBUG */
+  fprintf(stderr, "DEBUG2: cups_put_params(%p, %p)\n", pdev, plist);
 
  /*
   * Process other options for CUPS...
@@ -2013,9 +2573,10 @@ cups_put_params(gx_device     *pdev,	/* I - Device info */
       cups->header.name[i] = (unsigned)arrayval.data[i]; \
   }
 
-  old_depth = pdev->color_info.depth;
   size_set  = param_read_float_array(plist, ".MediaSize", &arrayval) == 0 ||
               param_read_float_array(plist, "PageSize", &arrayval) == 0;
+  color_set = param_read_int(plist, "cupsColorSpace", &intval) == 0 ||
+              param_read_int(plist, "cupsBitsPerColor", &intval) == 0;
 
   stringoption(MediaClass, "MediaClass")
   stringoption(MediaColor, "MediaColor")
@@ -2113,13 +2674,13 @@ cups_put_params(gx_device     *pdev,	/* I - Device info */
 
     cups->landscape = 0;
 
-    if (cups->ppd != NULL)
+    if (cupsPPD != NULL)
     {
      /*
       * Find the matching page size...
       */
 
-      for (i = cups->ppd->num_sizes, size = cups->ppd->sizes;
+      for (i = cupsPPD->num_sizes, size = cupsPPD->sizes;
            i > 0;
            i --, size ++)
 	if (fabs(cups->MediaSize[1] - size->length) < 5.0 &&
@@ -2148,7 +2709,7 @@ cups_put_params(gx_device     *pdev,	/* I - Device info */
 	* landscape orientation...
 	*/
 
-	for (i = cups->ppd->num_sizes, size = cups->ppd->sizes;
+	for (i = cupsPPD->num_sizes, size = cupsPPD->sizes;
              i > 0;
              i --, size ++)
 	  if (fabs(cups->MediaSize[0] - size->length) < 5.0 &&
@@ -2181,7 +2742,7 @@ cups_put_params(gx_device     *pdev,	/* I - Device info */
 	  fputs("DEBUG: size = Custom\n", stderr);
 
 	  for (i = 0; i < 4; i ++)
-            margins[i] = cups->ppd->custom_margins[i] / 72.0;
+            margins[i] = cupsPPD->custom_margins[i] / 72.0;
 	}
       }
 
@@ -2218,10 +2779,7 @@ cups_put_params(gx_device     *pdev,	/* I - Device info */
   * Reallocate memory if the size or color depth was changed...
   */
 
-  fprintf(stderr, "DEBUG: old_depth = %d, depth = %d, size_set = %d\n",
-          old_depth, pdev->color_info.depth, size_set);
-
-  if (old_depth != pdev->color_info.depth || size_set)
+  if (color_set || size_set)
   {
    /*
     * Make sure the page image is the correct size - current Ghostscript
@@ -2275,20 +2833,18 @@ cups_put_params(gx_device     *pdev,	/* I - Device info */
     }
   }
 
-#ifdef DEBUG
-  fprintf(stderr, "DEBUG: ppd = %p\n", cups->ppd);
-  fprintf(stderr, "DEBUG: PageSize = [ %.3f %.3f ]\n",
+  fprintf(stderr, "DEBUG2: ppd = %p\n", cupsPPD);
+  fprintf(stderr, "DEBUG2: PageSize = [ %.3f %.3f ]\n",
           pdev->MediaSize[0], pdev->MediaSize[1]);
-  fprintf(stderr, "DEBUG: margins = [ %.3f %.3f %.3f %.3f ]\n",
+  fprintf(stderr, "DEBUG2: margins = [ %.3f %.3f %.3f %.3f ]\n",
           margins[0], margins[1], margins[2], margins[3]);
-  fprintf(stderr, "DEBUG: HWResolution = [ %.3f %.3f ]\n",
+  fprintf(stderr, "DEBUG2: HWResolution = [ %.3f %.3f ]\n",
           pdev->HWResolution[0], pdev->HWResolution[1]);
-  fprintf(stderr, "DEBUG: width = %d, height = %d\n",
+  fprintf(stderr, "DEBUG2: width = %d, height = %d\n",
           pdev->width, pdev->height);
-  fprintf(stderr, "DEBUG: HWMargins = [ %.3f %.3f %.3f %.3f ]\n",
+  fprintf(stderr, "DEBUG2: HWMargins = [ %.3f %.3f %.3f %.3f ]\n",
           pdev->HWMargins[0], pdev->HWMargins[1],
 	  pdev->HWMargins[2], pdev->HWMargins[3]);
-#endif /* DEBUG */
 
   return (0);
 }
@@ -2303,15 +2859,14 @@ private void
 cups_set_color_info(gx_device *pdev)	/* I - Device info */
 {
   int		i, j, k;		/* Looping vars */
+  int		max_lut;		/* Maximum LUT value */
   float		d, g;			/* Density and gamma correction */
   float		m[3][3];		/* Color correction matrix */
   char		resolution[41];		/* Resolution string */
   ppd_profile_t	*profile;		/* Color profile information */
 
 
-#ifdef DEBUG
-  fprintf(stderr, "DEBUG: cups_set_color_info(%p)\n", pdev);
-#endif /* DEBUG */
+  fprintf(stderr, "DEBUG2: cups_set_color_info(%p)\n", pdev);
 
   switch (cups->header.cupsColorSpace)
   {
@@ -2368,72 +2923,154 @@ cups_set_color_info(gx_device *pdev)	/* I - Device info */
         break;
 
 #ifdef CUPS_RASTER_HAVE_COLORIMETRIC
-     case CUPS_CSPACE_CIEXYZ :
-     case CUPS_CSPACE_CIELab :
-     case CUPS_CSPACE_ICC1 :
-     case CUPS_CSPACE_ICC2 :
-     case CUPS_CSPACE_ICC3 :
-     case CUPS_CSPACE_ICC4 :
-     case CUPS_CSPACE_ICC5 :
-     case CUPS_CSPACE_ICC6 :
-     case CUPS_CSPACE_ICC7 :
-     case CUPS_CSPACE_ICC8 :
-     case CUPS_CSPACE_ICC9 :
-     case CUPS_CSPACE_ICCA :
-     case CUPS_CSPACE_ICCB :
-     case CUPS_CSPACE_ICCC :
-     case CUPS_CSPACE_ICCD :
-     case CUPS_CSPACE_ICCE :
-     case CUPS_CSPACE_ICCF :
-	/*
-	 * Colorimetric color spaces currently are implemented as 24-bit
-	 * mapping to XYZ or Lab, which are then converted as needed to
-	 * the final representation...
-	 *
-	 * This code enforces a minimum output depth of 8 bits per
-	 * component...
-	 */
+    case CUPS_CSPACE_CIEXYZ :
+    case CUPS_CSPACE_CIELab :
+    case CUPS_CSPACE_ICC1 :
+    case CUPS_CSPACE_ICC2 :
+    case CUPS_CSPACE_ICC3 :
+    case CUPS_CSPACE_ICC4 :
+    case CUPS_CSPACE_ICC5 :
+    case CUPS_CSPACE_ICC6 :
+    case CUPS_CSPACE_ICC7 :
+    case CUPS_CSPACE_ICC8 :
+    case CUPS_CSPACE_ICC9 :
+    case CUPS_CSPACE_ICCA :
+    case CUPS_CSPACE_ICCB :
+    case CUPS_CSPACE_ICCC :
+    case CUPS_CSPACE_ICCD :
+    case CUPS_CSPACE_ICCE :
+    case CUPS_CSPACE_ICCF :
+       /*
+	* Colorimetric color spaces currently are implemented as 24-bit
+	* mapping to XYZ or Lab, which are then converted as needed to
+	* the final representation...
+	*
+	* This code enforces a minimum output depth of 8 bits per
+	* component...
+	*/
 
-	 if (cups->header.cupsBitsPerColor < 8)
-           cups->header.cupsBitsPerColor = 8;
+	if (cups->header.cupsBitsPerColor < 8)
+          cups->header.cupsBitsPerColor = 8;
 
-	 if (cups->header.cupsColorOrder != CUPS_ORDER_CHUNKED)
-           cups->header.cupsBitsPerPixel = cups->header.cupsBitsPerColor;
-	 else
-           cups->header.cupsBitsPerPixel = 3 * cups->header.cupsBitsPerColor;
+	if (cups->header.cupsColorOrder != CUPS_ORDER_CHUNKED)
+          cups->header.cupsBitsPerPixel = cups->header.cupsBitsPerColor;
+	else
+          cups->header.cupsBitsPerPixel = 3 * cups->header.cupsBitsPerColor;
 
-	 cups->color_info.depth          = 24;
-	 cups->color_info.num_components = 3;
-	 break;
+	cups->color_info.depth          = 24;
+	cups->color_info.num_components = 3;
+	break;
 #endif /* CUPS_RASTER_HAVE_COLORIMETRIC */
   }
+
+#ifdef dev_t_proc_encode_color
+  switch (cups->header.cupsColorSpace)
+  {
+    default :
+        cups->color_info.gray_index = GX_CINFO_COMP_NO_INDEX;
+	break;
+
+    case CUPS_CSPACE_W :
+    case CUPS_CSPACE_WHITE :
+    case CUPS_CSPACE_K :
+    case CUPS_CSPACE_GOLD :
+    case CUPS_CSPACE_SILVER :
+    case CUPS_CSPACE_KCMYcm :
+    case CUPS_CSPACE_KCMY :
+        cups->color_info.gray_index = 0;
+	break;
+
+    case CUPS_CSPACE_CMYK :
+    case CUPS_CSPACE_YMCK :
+    case CUPS_CSPACE_GMCK :
+    case CUPS_CSPACE_GMCS :
+        cups->color_info.gray_index = 3;
+	break;
+  }
+
+  switch (cups->header.cupsColorSpace)
+  {
+    default :
+    case CUPS_CSPACE_W :
+    case CUPS_CSPACE_WHITE :
+    case CUPS_CSPACE_RGB :
+#  ifdef CUPS_RASTER_HAVE_COLORIMETRIC
+    case CUPS_CSPACE_CIEXYZ :
+    case CUPS_CSPACE_CIELab :
+    case CUPS_CSPACE_ICC1 :
+    case CUPS_CSPACE_ICC2 :
+    case CUPS_CSPACE_ICC3 :
+    case CUPS_CSPACE_ICC4 :
+    case CUPS_CSPACE_ICC5 :
+    case CUPS_CSPACE_ICC6 :
+    case CUPS_CSPACE_ICC7 :
+    case CUPS_CSPACE_ICC8 :
+    case CUPS_CSPACE_ICC9 :
+    case CUPS_CSPACE_ICCA :
+    case CUPS_CSPACE_ICCB :
+    case CUPS_CSPACE_ICCC :
+    case CUPS_CSPACE_ICCD :
+    case CUPS_CSPACE_ICCE :
+    case CUPS_CSPACE_ICCF :
+#  endif /* CUPS_RASTER_HAVE_COLORIMETRIC */
+        cups->color_info.polarity = GX_CINFO_POLARITY_ADDITIVE;
+        break;
+
+    case CUPS_CSPACE_K :
+    case CUPS_CSPACE_GOLD :
+    case CUPS_CSPACE_SILVER :
+    case CUPS_CSPACE_CMY :
+    case CUPS_CSPACE_YMC :
+    case CUPS_CSPACE_KCMYcm :
+    case CUPS_CSPACE_CMYK :
+    case CUPS_CSPACE_YMCK :
+    case CUPS_CSPACE_KCMY :
+    case CUPS_CSPACE_GMCK :
+    case CUPS_CSPACE_GMCS :
+        cups->color_info.polarity = GX_CINFO_POLARITY_SUBTRACTIVE;
+        break;
+  }
+
+  cups->color_info.separable_and_linear = GX_CINFO_SEP_LIN_NONE;
+#endif /* dev_t_proc_encode_color */
 
   if ((i = cups->header.cupsBitsPerColor) > 8)
     i = 8;
 
-  if (cups->color_info.num_components > 1)
+  max_lut = (1 << i) - 1;
+
+  switch (cups->color_info.num_components)
   {
-    cups->color_info.max_gray      = (1 << i) - 1;
-    cups->color_info.max_color     = (1 << i) - 1;
-    cups->color_info.dither_grays  = (1 << i);
-    cups->color_info.dither_colors = (1 << i);
-  }
-  else
-  {
-    cups->color_info.max_gray      = (1 << i) - 1;
-    cups->color_info.max_color     = 0;
-    cups->color_info.dither_grays  = (1 << i);
-    cups->color_info.dither_colors = 0;
+    default :
+    case 1 :
+	cups->color_info.max_gray      = max_lut;
+	cups->color_info.max_color     = 0;
+	cups->color_info.dither_grays  = max_lut + 1;
+	cups->color_info.dither_colors = 0;
+        break;
+
+    case 3 :
+	cups->color_info.max_gray      = 0;
+	cups->color_info.max_color     = max_lut;
+	cups->color_info.dither_grays  = 0;
+	cups->color_info.dither_colors = max_lut + 1;
+	break;
+
+    case 4 :
+	cups->color_info.max_gray      = max_lut;
+	cups->color_info.max_color     = max_lut;
+	cups->color_info.dither_grays  = max_lut + 1;
+	cups->color_info.dither_colors = max_lut + 1;
+	break;
   }
 
  /*
   * Enable/disable CMYK color support...
   */
 
-  if (cups->color_info.num_components == 4)
-    cups->procs.map_cmyk_color = cups_map_cmyk_color;
-  else
-    cups->procs.map_cmyk_color = NULL;
+#ifdef dev_t_proc_encode_color
+  cups->color_info.max_components = cups->color_info.num_components;
+#endif /* dev_t_proc_encode_color */
 
  /*
   * Tell Ghostscript to forget any colors it has cached...
@@ -2447,15 +3084,15 @@ cups_set_color_info(gx_device *pdev)	/* I - Device info */
 
   for (i = 0; i <= gx_max_color_value; i ++)
   {
-    lut_rgb_color[i] = (cups->color_info.max_gray * i + gx_max_color_value / 2) /
+    cupsEncodeLUT[i] = (max_lut * i + gx_max_color_value / 2) /
                        gx_max_color_value;
 
-    if (i == 0 || lut_rgb_color[i] != lut_rgb_color[i - 1])
-      fprintf(stderr, "DEBUG2: lut_rgb_color[%d] = %d\n", i, lut_rgb_color[i]);
+    if (i == 0 || cupsEncodeLUT[i] != cupsEncodeLUT[i - 1])
+      fprintf(stderr, "DEBUG2: cupsEncodeLUT[%d] = %d\n", i, cupsEncodeLUT[i]);
   }
 
   for (i = 0; i < cups->color_info.dither_grays; i ++)
-    lut_color_rgb[i] = gx_max_color_value * i / cups->color_info.max_gray;
+    cupsDecodeLUT[i] = gx_max_color_value * i / max_lut;
 
   fprintf(stderr, "DEBUG: num_components = %d, depth = %d\n",
           cups->color_info.num_components, cups->color_info.depth);
@@ -2474,7 +3111,11 @@ cups_set_color_info(gx_device *pdev)	/* I - Device info */
 
   cupsHaveProfile = 0;
 
+#ifdef dev_t_proc_encode_color
+  if (cupsProfile)
+#else
   if (cupsProfile && cups->header.cupsBitsPerColor == 8)
+#endif /* dev_t_proc_encode_color */
   {
     fprintf(stderr, "DEBUG: Using user-defined profile \"%s\"...\n", cupsProfile);
 
@@ -2500,7 +3141,11 @@ cups_set_color_info(gx_device *pdev)	/* I - Device info */
       m[2][2] *= 0.001f;
     }
   }
-  else if (cups->ppd != NULL && cups->header.cupsBitsPerColor == 8)
+#ifdef dev_t_proc_encode_color
+  else if (cupsPPD)
+#else
+  else if (cupsPPD && cups->header.cupsBitsPerColor == 8)
+#endif /* dev_t_proc_encode_color */
   {
    /*
     * Find the appropriate color profile...
@@ -2512,8 +3157,8 @@ cups_set_color_info(gx_device *pdev)	/* I - Device info */
     else
       sprintf(resolution, "%.0fdpi", pdev->HWResolution[0]);
 
-    for (i = 0, profile = cups->ppd->profiles;
-         i < cups->ppd->num_profiles;
+    for (i = 0, profile = cupsPPD->profiles;
+         i < cupsPPD->num_profiles;
 	 i ++, profile ++)
       if ((strcmp(profile->resolution, resolution) == 0 ||
            profile->resolution[0] == '-') &&
@@ -2525,7 +3170,7 @@ cups_set_color_info(gx_device *pdev)	/* I - Device info */
     * If we found a color profile, use it!
     */
 
-    if (i < cups->ppd->num_profiles)
+    if (i < cupsPPD->num_profiles)
     {
       fputs("DEBUG: Using color profile in PPD file!\n", stderr);
 
@@ -2533,7 +3178,7 @@ cups_set_color_info(gx_device *pdev)	/* I - Device info */
 
       d = profile->density;
       g = profile->gamma;
-      
+
       memcpy(m, profile->matrix, sizeof(m));
     }
   }
@@ -2542,29 +3187,30 @@ cups_set_color_info(gx_device *pdev)	/* I - Device info */
   {
     for (i = 0; i < 3; i ++)
       for (j = 0; j < 3; j ++)
-	for (k = 0; k <= gx_max_color_value; k ++)
+	for (k = 0; k <= CUPS_MAX_VALUE; k ++)
 	{
           cupsMatrix[i][j][k] = (int)((float)k * m[i][j] + 0.5);
 
-#ifdef DEBUG
           if ((k & 4095) == 0)
-            fprintf(stderr, "DEBUG: cupsMatrix[%d][%d][%d] = %d\n",
+            fprintf(stderr, "DEBUG2: cupsMatrix[%d][%d][%d] = %d\n",
 	            i, j, k, cupsMatrix[i][j][k]);
-#endif /* DEBUG */
         }
 
 
-    for (k = 0; k <= gx_max_color_value; k ++)
+    for (k = 0; k <= CUPS_MAX_VALUE; k ++)
     {
-      cupsDensity[k] = (int)((float)gx_max_color_value * d *
-	                     pow((float)k / (float)gx_max_color_value, g) +
+      cupsDensity[k] = (int)((float)CUPS_MAX_VALUE * d *
+	                     pow((float)k / (float)CUPS_MAX_VALUE, g) +
 			     0.5);
 
-#ifdef DEBUG
       if ((k & 4095) == 0)
-        fprintf(stderr, "DEBUG: cupsDensity[%d] = %d\n", k, cupsDensity[k]);
-#endif /* DEBUG */
+        fprintf(stderr, "DEBUG2: cupsDensity[%d] = %d\n", k, cupsDensity[k]);
     }
+  }
+  else
+  {
+    for (k = 0; k <= CUPS_MAX_VALUE; k ++)
+      cupsDensity[k] = k;
   }
 }
 
@@ -2587,20 +3233,24 @@ cups_sync_output(gx_device *pdev)	/* I - Device info */
  */
 
 static void
-cups_print_chunked(gx_device_printer *pdev,	/* I - Printer device */
-                   unsigned char     *src,	/* I - Scanline buffer */
-		   unsigned char     *dst,	/* I - Bitmap buffer */
-		   int               srcbytes)	/* I - Number of bytes in src */
+cups_print_chunked(gx_device_printer *pdev,
+					/* I - Printer device */
+                   unsigned char     *src,
+					/* I - Scanline buffer */
+		   unsigned char     *dst,
+					/* I - Bitmap buffer */
+		   int               srcbytes)
+					/* I - Number of bytes in src */
 {
-  int		y;				/* Looping var */
-  unsigned char	*srcptr,			/* Pointer to data */
-		*dstptr;			/* Pointer to bits */
-  int		count;				/* Count for loop */
-  int		flip;				/* Flip scanline? */
+  int		y;			/* Looping var */
+  unsigned char	*srcptr,		/* Pointer to data */
+		*dstptr;		/* Pointer to bits */
+  int		count;			/* Count for loop */
+  int		flip;			/* Flip scanline? */
 
 
   if (cups->header.Duplex && !cups->header.Tumble &&
-      cups->ppd && cups->ppd->flip_duplex && !(cups->page & 1))
+      cupsPPD && cupsPPD->flip_duplex && !(cups->page & 1))
     flip = 1;
   else
     flip = 0;
@@ -2645,8 +3295,8 @@ cups_print_chunked(gx_device_printer *pdev,	/* I - Printer device */
 	           count > 0;
 		   count --, srcptr --, dstptr ++)
 	      {
-	        *dstptr = rev_upper1[*srcptr & 15] |
-		          rev_lower1[*srcptr >> 4];
+	        *dstptr = cupsRevUpper1[*srcptr & 15] |
+		          cupsRevLower1[*srcptr >> 4];
               }
 	      break;
 
@@ -2655,8 +3305,8 @@ cups_print_chunked(gx_device_printer *pdev,	/* I - Printer device */
 	           count > 0;
 		   count --, srcptr --, dstptr ++)
 	      {
-	        *dstptr = rev_upper2[*srcptr & 15] |
-		          rev_lower2[*srcptr >> 4];
+	        *dstptr = cupsRevUpper2[*srcptr & 15] |
+		          cupsRevLower2[*srcptr >> 4];
               }
 	      break;
 
@@ -2732,24 +3382,28 @@ cups_print_chunked(gx_device_printer *pdev,	/* I - Printer device */
  */
 
 static void
-cups_print_banded(gx_device_printer *pdev,	/* I - Printer device */
-                  unsigned char     *src,	/* I - Scanline buffer */
-		  unsigned char     *dst,	/* I - Bitmap buffer */
-		  int               srcbytes)	/* I - Number of bytes in src */
+cups_print_banded(gx_device_printer *pdev,
+					/* I - Printer device */
+                  unsigned char     *src,
+					/* I - Scanline buffer */
+		  unsigned char     *dst,
+					/* I - Bitmap buffer */
+		  int               srcbytes)
+					/* I - Number of bytes in src */
 {
-  int		x;				/* Looping var */
-  int		y;				/* Looping var */
-  int		bandbytes;			/* Bytes per band */
-  unsigned char	bit;				/* Current bit */
-  unsigned char	temp;				/* Temporary variable */
-  unsigned char	*srcptr;			/* Pointer to data */
-  unsigned char	*cptr, *mptr, *yptr, *kptr;	/* Pointer to components */
-  unsigned char	*lcptr, *lmptr;			/* ... */
-  int		flip;				/* Flip scanline? */
+  int		x;			/* Looping var */
+  int		y;			/* Looping var */
+  int		bandbytes;		/* Bytes per band */
+  unsigned char	bit;			/* Current bit */
+  unsigned char	temp;			/* Temporary variable */
+  unsigned char	*srcptr;		/* Pointer to data */
+  unsigned char	*cptr, *mptr, *yptr,	/* Pointer to components */
+		*kptr, *lcptr, *lmptr;	/* ... */
+  int		flip;			/* Flip scanline? */
 
 
   if (cups->header.Duplex && !cups->header.Tumble &&
-      cups->ppd && cups->ppd->flip_duplex && !(cups->page & 1))
+      cupsPPD && cupsPPD->flip_duplex && !(cups->page & 1))
     flip = 1;
   else
     flip = 0;
@@ -3322,19 +3976,23 @@ cups_print_banded(gx_device_printer *pdev,	/* I - Printer device */
  */
 
 static void
-cups_print_planar(gx_device_printer *pdev,	/* I - Printer device */
-                  unsigned char     *src,	/* I - Scanline buffer */
-		  unsigned char     *dst,	/* I - Bitmap buffer */
-		  int               srcbytes)	/* I - Number of bytes in src */
+cups_print_planar(gx_device_printer *pdev,
+					/* I - Printer device */
+                  unsigned char     *src,
+					/* I - Scanline buffer */
+		  unsigned char     *dst,
+					/* I - Bitmap buffer */
+		  int               srcbytes)
+					/* I - Number of bytes in src */
 {
-  int		x;				/* Looping var */
-  int		y;				/* Looping var */
-  int		z;				/* Looping var */
-  unsigned char	srcbit;				/* Current source bit */
-  unsigned char	dstbit;				/* Current destination bit */
-  unsigned char	temp;				/* Temporary variable */
-  unsigned char	*srcptr;			/* Pointer to data */
-  unsigned char	*dstptr;			/* Pointer to bitmap */
+  int		x;			/* Looping var */
+  int		y;			/* Looping var */
+  int		z;			/* Looping var */
+  unsigned char	srcbit;			/* Current source bit */
+  unsigned char	dstbit;			/* Current destination bit */
+  unsigned char	temp;			/* Temporary variable */
+  unsigned char	*srcptr;		/* Pointer to data */
+  unsigned char	*dstptr;		/* Pointer to bitmap */
 
 
  /**** NOTE: Currently planar output doesn't support flipped duplex!!! ****/
@@ -3672,5 +4330,5 @@ cups_print_planar(gx_device_printer *pdev,	/* I - Printer device */
 
 
 /*
- * End of "$Id: gdevcups.c,v 1.43.2.21 2003/08/27 18:12:48 mike Exp $".
+ * End of "$Id: gdevcups.c,v 1.43.2.22 2003/11/14 22:23:55 mike Exp $".
  */

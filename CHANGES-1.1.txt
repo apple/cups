@@ -3,6 +3,8 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.20
 
+	- Updated the pstoraster patch files and CUPS driver to
+	  work with Ghostscript 8 (STR #402)
 	- The hpgltops filter did not skip PJL commands (STR
 	  #379)
 
