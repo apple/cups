@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.6 1999/07/08 14:20:38 mike Exp $"
+# "$Id: Makefile,v 1.7 2000/01/30 13:38:16 mike Exp $"
 #
 #   CGI makefile for the Common UNIX Printing System (CUPS).
 #
@@ -24,14 +24,17 @@
 
 include ../Makedefs
 
-TARGETS	=	classes.cgi jobs.cgi printers.cgi
-OBJS	=	classes.o jobs.o printers.o
+TARGETS	=	libcgi.a admin.cgi classes.cgi jobs.cgi printers.cgi
+LIBOBJS	=	abort.o email.o html.o template.o var.o
+OBJS	=	$(LIBOBJS) admin.o classes.o jobs.o printers.o
+
 
 #
 # Make all targets...
 #
 
 all:	$(TARGETS)
+
 
 #
 # Clean all object files...
@@ -40,44 +43,74 @@ all:	$(TARGETS)
 clean:
 	rm -f $(OBJS) $(TARGETS)
 
+
 #
 # Install all targets...
 #
 
 install:
 	-$(MKDIR) $(SERVERROOT)/cgi-bin
-	$(CP) $(TARGETS) $(SERVERROOT)/cgi-bin
+	$(CP)  $(SERVERROOT)/cgi-bin
+
+
+#
+# libcgi.a
+#
+
+libcgi.a:	$(LIBOBJS)
+	echo Archiving $@...
+	$(RM) $@
+	$(AR) $(ARFLAGS) $@ $(OBJS)
+	$(RANLIB) $@
+
+$(LIBOBJS):	cgi.h
+
+
+#
+# admin.cgi
+#
+
+admin.cgi:	admin.o ../Makedefs ../cups/$(LIBCUPS) libcgi.a
+	echo Linking $@...
+	$(CC) $(LDFLAGS) -o $@ admin.o libcgi.a $(LIBS)
+
+admin.o:	cgi.h ../cups/cups.h ../cups/ipp.h ../cups/language.h
+
 
 #
 # classes.cgi
 #
 
-classes.cgi:	classes.o ../Makedefs ../cups/$(LIBCUPS)
+classes.cgi:	classes.o ../Makedefs ../cups/$(LIBCUPS) libcgi.a
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ classes.o $(LIBS)
+	$(CC) $(LDFLAGS) -o $@ classes.o libcgi.a $(LIBS)
 
-$(OBJS):	../Makedefs ../cups/cups.h ../cups/ipp.h ../cups/language.h
+classes.o:	cgi.h ../cups/cups.h ../cups/ipp.h ../cups/language.h
+
 
 #
 # jobs.cgi
 #
 
-jobs.cgi:	jobs.o ../Makedefs ../cups/$(LIBCUPS)
+jobs.cgi:	jobs.o ../Makedefs ../cups/$(LIBCUPS) libcgi.a
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ jobs.o $(LIBS)
+	$(CC) $(LDFLAGS) -o $@ jobs.o libcgi.a $(LIBS)
 
-$(OBJS):	../Makedefs ../cups/cups.h ../cups/ipp.h ../cups/language.h
+jobs.o:	cgi.h ../cups/cups.h ../cups/ipp.h ../cups/language.h
+
 
 #
 # printers.cgi
 #
 
-printers.cgi:	printers.o ../Makedefs ../cups/$(LIBCUPS)
+printers.cgi:	printers.o ../Makedefs ../cups/$(LIBCUPS) libcgi.a
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ printers.o $(LIBS)
+	$(CC) $(LDFLAGS) -o $@ printers.o libcgi.a $(LIBS)
 
-$(OBJS):	../Makedefs ../cups/cups.h ../cups/ipp.h ../cups/language.h
+printers.o:	cgi.h ../cups/cups.h ../cups/ipp.h ../cups/language.h
+
+$(OBJS):	../Makedefs
 
 #
-# End of "$Id: Makefile,v 1.6 1999/07/08 14:20:38 mike Exp $".
+# End of "$Id: Makefile,v 1.7 2000/01/30 13:38:16 mike Exp $".
 #
