@@ -25,22 +25,22 @@
 	<A HREF="{printer_uri_supported}?op=print-test-page">
 	<IMG SRC="/images/print-test-page.gif" ALT="Print Test Page" BORDER="0"></A>
 	{printer_state=5?
-	<A HREF="/admin/?op=start-printer&printer_name={printer_name}">
+	<A HREF="{admin_uri}?op=start-printer&printer_name={printer_name}">
 	<IMG SRC="/images/start-class.gif" ALT="Start Class" BORDER="0"></A>
 	:
-	<A HREF="/admin/?op=stop-printer&printer_name={printer_name}">
+	<A HREF="{admin_uri}?op=stop-printer&printer_name={printer_name}">
 	<IMG SRC="/images/stop-class.gif" ALT="Stop Class" BORDER="0"></A>
 	}
 	{printer_is_accepting_jobs=0?
-	<A HREF="/admin/?op=accept-jobs&printer_name={printer_name}">
+	<A HREF="{admin_uri}?op=accept-jobs&printer_name={printer_name}">
 	<IMG SRC="/images/accept-jobs.gif" ALT="Accept Jobs" BORDER="0"></A>
 	:
-	<A HREF="/admin/?op=reject-jobs&printer_name={printer_name}">
+	<A HREF="{admin_uri}?op=reject-jobs&printer_name={printer_name}">
 	<IMG SRC="/images/reject-jobs.gif" ALT="Reject Jobs" BORDER="0"></A>
 	}
-	<A HREF="/admin/?op=modify-class&printer_name={printer_name}">
+	<A HREF="{admin_uri}?op=modify-class&printer_name={printer_name}">
 	<IMG SRC="/images/modify-class.gif" ALT="Modify Class" BORDER="0"></A>
-	<A HREF="/admin/?op=delete-class&printer_name={printer_name}">
+	<A HREF="{admin_uri}?op=delete-class&printer_name={printer_name}">
 	<IMG SRC="/images/delete-class.gif" ALT="Delete Class" BORDER="0"></A>
 	</TD>
 </TR>

@@ -30,24 +30,24 @@
 	<A HREF="{printer_uri_supported}?op=print-test-page">
 	<IMG SRC="/images/print-test-page.gif" ALT="Imprimer une page de test" BORDER="0"></A>
 	{printer_state=5?
-	<A HREF="/admin/?op=start-printer&printer_name={printer_name}">
+	<A HREF="{admin_uri}?op=start-printer&printer_name={printer_name}">
 	<IMG SRC="/images/start-printer.gif" ALT="Démarrer l'imprimante" BORDER="0"></A>
 	:
-	<A HREF="/admin/?op=stop-printer&printer_name={printer_name}">
+	<A HREF="{admin_uri}?op=stop-printer&printer_name={printer_name}">
 	<IMG SRC="/images/stop-printer.gif" ALT="Arrêter l'imprimante" BORDER="0"></A>
 	}
 	{printer_is_accepting_jobs=0?
-	<A HREF="/admin/?op=accept-jobs&printer_name={printer_name}">
+	<A HREF="{admin_uri}?op=accept-jobs&printer_name={printer_name}">
 	<IMG SRC="/images/accept-jobs.gif" ALT="Accepter les travaux d'impression" BORDER="0"></A>
 	:
-	<A HREF="/admin/?op=reject-jobs&printer_name={printer_name}">
+	<A HREF="{admin_uri}?op=reject-jobs&printer_name={printer_name}">
 	<IMG SRC="/images/reject-jobs.gif" ALT="Rejeter les travaux d'impression" BORDER="0"></A>
 	}
-	<A HREF="/admin/?op=modify-printer&printer_name={printer_name}">
+	<A HREF="{admin_uri}?op=modify-printer&printer_name={printer_name}">
 	<IMG SRC="/images/modify-printer.gif" ALT="Modifier l'imprimante" BORDER="0"></A>
-	<A HREF="/admin/?op=config-printer&printer_name={printer_name}">
+	<A HREF="{admin_uri}?op=config-printer&printer_name={printer_name}">
 	<IMG SRC="/images/config-printer.gif" ALT="Configurer l'imprimante" BORDER="0"></A>
-	<A HREF="/admin/?op=delete-printer&printer_name={printer_name}">
+	<A HREF="{admin_uri}?op=delete-printer&printer_name={printer_name}">
 	<IMG SRC="/images/delete-printer.gif" ALT="Supprimer l'imprimante" BORDER="0"></A>
 	</TD>
 </TR>
