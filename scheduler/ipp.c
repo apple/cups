@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.55 2000/03/01 21:55:49 mike Exp $"
+ * "$Id: ipp.c,v 1.56 2000/03/02 22:12:37 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -1631,7 +1631,7 @@ copy_file(const char *from,		/* I - Source file */
 
 
 #ifdef HAVE_LIBZ
-  if ((src = gzopen(from, "rb")) < 0)
+  if ((src = gzopen(from, "rb")) == NULL)
     return (-1);
 #else
   if ((src = open(from, O_RDONLY)) < 0)
@@ -3960,5 +3960,5 @@ validate_job(client_t        *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.55 2000/03/01 21:55:49 mike Exp $".
+ * End of "$Id: ipp.c,v 1.56 2000/03/02 22:12:37 mike Exp $".
  */
