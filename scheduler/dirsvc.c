@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.134 2004/07/17 02:29:59 mike Exp $"
+ * "$Id: dirsvc.c,v 1.135 2004/08/18 16:02:44 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -672,11 +672,11 @@ SendCUPSBrowse(printer_t *p)		/* I - Printer to send */
 	  * Only send to local interfaces...
 	  */
 
-	  if (!iface->is_local)
+	  if (!iface->is_local || !iface->port)
 	    continue;
 
-	  snprintf(packet, sizeof(packet), "%x %x ipp://%s/%s/%s \"%s\" \"%s\" \"%s\"\n",
-        	   type, p->state, iface->hostname,
+	  snprintf(packet, sizeof(packet), "%x %x ipp://%s:%d/%s/%s \"%s\" \"%s\" \"%s\"\n",
+        	   type, p->state, iface->hostname, iface->port,
 		   (p->type & CUPS_PRINTER_CLASS) ? "classes" : "printers",
 		   p->name, p->location ? p->location : "",
 		   p->info ? p->info : "",
@@ -700,8 +700,11 @@ SendCUPSBrowse(printer_t *p)		/* I - Printer to send */
         * Send to the named interface...
 	*/
 
-	snprintf(packet, sizeof(packet), "%x %x ipp://%s/%s/%s \"%s\" \"%s\" \"%s\"\n",
-        	 type, p->state, iface->hostname,
+	if (!iface->port)
+	  continue;
+
+	snprintf(packet, sizeof(packet), "%x %x ipp://%s:%d/%s/%s \"%s\" \"%s\" \"%s\"\n",
+        	 type, p->state, iface->hostname, iface->port,
 		 (p->type & CUPS_PRINTER_CLASS) ? "classes" : "printers",
 		 p->name, p->location ? p->location : "",
 		 p->info ? p->info : "",
@@ -1965,5 +1968,5 @@ UpdateSLPBrowse(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.134 2004/07/17 02:29:59 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.135 2004/08/18 16:02:44 mike Exp $".
  */

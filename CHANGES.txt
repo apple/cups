@@ -3,6 +3,9 @@ CHANGES.txt - 08/18/2004
 
 CHANGES IN CUPS V1.1.21rc2
 
+	- The IPP backend incorrectly used the local port when
+	  communicating with a remote server; this caused
+	  problems with some custom configurations (STR #852)
 	- The cups-lpd mini-daemon wasn't using the right
 	  default banner option (STR #851)
 	- Updated the new httpDecode64_2() and httpEncode64_2()

@@ -1,5 +1,5 @@
 /*
- * "$Id: network.c,v 1.13 2004/06/29 03:27:35 mike Exp $"
+ * "$Id: network.c,v 1.14 2004/08/18 16:02:44 mike Exp $"
  *
  *   Network interface functions for the Common UNIX Printing System
  *   (CUPS) scheduler.
@@ -129,6 +129,8 @@ NetIFFree(void)
 void
 NetIFUpdate(void)
 {
+  int		i;		/* Looping var */
+  listener_t	*lis;		/* Listen address */
   cups_netif_t	*temp;		/* Current interface */
   struct ifaddrs *addrs,	/* Interface address list */
 		*addr;		/* Current interface address */
@@ -192,6 +194,19 @@ NetIFUpdate(void)
     if (!(addr->ifa_flags & IFF_POINTOPOINT) &&
         ntohl(temp->address.sin_addr.s_addr) != 0x7f000001)
       temp->is_local = 1;
+
+   /*
+    * Determine which port to use when advertising printers...
+    */
+
+    for (i = NumListeners, lis = Listeners; i > 0; i --, lis ++)
+      if (lis->address.sin_addr.s_addr == 0x00000000 ||
+          (lis->address.sin_addr.s_addr & temp->mask.sin_addr.s_addr) ==
+	      temp->address.sin_addr.s_addr)
+      {
+        temp->port = ntohs(lis->address.sin_port);
+	break;
+      }
 
    /*
     * Finally, try looking up the hostname for the address as needed...
@@ -472,5 +487,5 @@ freeifaddrs(struct ifaddrs *addrs)	/* I - Interface list to free */
 
 
 /*
- * End of "$Id: network.c,v 1.13 2004/06/29 03:27:35 mike Exp $".
+ * End of "$Id: network.c,v 1.14 2004/08/18 16:02:44 mike Exp $".
  */
