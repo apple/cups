@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.32 1999/06/25 17:37:43 mike Exp $"
+ * "$Id: printers.c,v 1.33 1999/06/27 12:30:36 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -881,20 +881,31 @@ SetPrinterAttrs(printer_t *p)	/* I - Printer to setup */
       ippAddInteger(p->attrs, IPP_TAG_PRINTER, IPP_TAG_ENUM,
                     "finishings-default", IPP_FINISH_NONE);
     }
-
-   /*
-    * If we have an interface script, add a filter entry for it...
-    */
-
-    sprintf(filename, "%s/interfaces/%s", ServerRoot, p->name);
-    if (access(filename, X_OK) == 0)
+    else
     {
      /*
-      * Yes, we have a System V style interface script; use it!
+      * If we have an interface script, add a filter entry for it...
       */
 
-      sprintf(filename, "*/* 0 %s/interfaces/%s", ServerRoot, p->name);
-      AddPrinterFilter(p, filename);
+      sprintf(filename, "%s/interfaces/%s", ServerRoot, p->name);
+      if (access(filename, X_OK) == 0)
+      {
+       /*
+	* Yes, we have a System V style interface script; use it!
+	*/
+
+	sprintf(filename, "*/* 0 %s/interfaces/%s", ServerRoot, p->name);
+	AddPrinterFilter(p, filename);
+      }
+      else
+      {
+       /*
+        * Otherwise we have neither - treat this as a "generic" PostScript
+	* printer with no PPD file...
+	*/
+
+	AddPrinterFilter(p, "application/vnd.cups-postscript 0 -");
+      }
     }
   }
 
@@ -1012,5 +1023,5 @@ StopPrinter(printer_t *p)	/* I - Printer to stop */
 
 
 /*
- * End of "$Id: printers.c,v 1.32 1999/06/25 17:37:43 mike Exp $".
+ * End of "$Id: printers.c,v 1.33 1999/06/27 12:30:36 mike Exp $".
  */
