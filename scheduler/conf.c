@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.103 2002/05/16 13:44:59 mike Exp $"
+ * "$Id: conf.c,v 1.104 2002/05/22 19:11:24 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -1658,7 +1658,7 @@ read_location(FILE *fp,		/* I - Configuration file */
     else if (strcasecmp(name, "AuthType") == 0)
     {
      /*
-      * AuthType {none,basic,digest}
+      * AuthType {none,basic,digest,basicdigest}
       */
 
       if (strcasecmp(value, "none") == 0)
@@ -1747,9 +1747,9 @@ read_location(FILE *fp,		/* I - Configuration file */
 
       if (strcasecmp(value, "valid-user") == 0 ||
           strcasecmp(value, "user") == 0)
-        loc->type = AUTH_USER;
+        loc->level = AUTH_USER;
       else if (strcasecmp(value, "group") == 0)
-        loc->type = AUTH_GROUP;
+        loc->level = AUTH_GROUP;
       else
       {
         LogMessage(L_WARN, "Unknown Require type %s on line %d.",
@@ -1882,5 +1882,5 @@ get_address(char               *value,		/* I - Value string */
 
 
 /*
- * End of "$Id: conf.c,v 1.103 2002/05/16 13:44:59 mike Exp $".
+ * End of "$Id: conf.c,v 1.104 2002/05/22 19:11:24 mike Exp $".
  */
