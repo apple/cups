@@ -1,5 +1,5 @@
 /*
- * "$Id: emit.c,v 1.29 2002/12/17 18:56:41 swdev Exp $"
+ * "$Id: emit.c,v 1.30 2003/02/18 22:23:38 mike Exp $"
  *
  *   PPD code emission routines for the Common UNIX Printing System (CUPS).
  *
@@ -485,8 +485,10 @@ static void
 ppd_handle_media(ppd_file_t *ppd)
 {
   ppd_choice_t	*manual_feed,		/* ManualFeed choice, if any */
-		*input_slot;		/* InputSlot choice, if any */
+		*input_slot,		/* InputSlot choice, if any */
+		*page;			/* PageSize/PageRegion */
   ppd_size_t	*size;			/* Current media size */
+  const char	*rpr;			/* RequiresPageRegion value */
 
 
  /*
@@ -501,6 +503,14 @@ ppd_handle_media(ppd_file_t *ppd)
 
   manual_feed = ppdFindMarkedChoice(ppd, "ManualFeed");
   input_slot  = ppdFindMarkedChoice(ppd, "InputSlot");
+
+  if (input_slot != NULL)
+    rpr = ppdFindAttr(ppd, "RequiresPageRegion", input_slot->choice);
+  else
+    rpr = NULL;
+
+  if (!rpr)
+    rpr = ppdFindAttr(ppd, "RequiresPageRegion", "All");
 
   if (strcasecmp(size->name, "Custom") == 0 ||
       (manual_feed == NULL && input_slot == NULL) ||
@@ -522,6 +532,21 @@ ppd_handle_media(ppd_file_t *ppd)
     */
 
     ppdMarkOption(ppd, "PageRegion", size->name);
+
+    if ((rpr && !strcmp(rpr, "False")) || (!rpr && !ppd->num_filters))
+    {
+     /*
+      * Either the PPD file specifies no PageRegion code or the PPD file
+      * not for a CUPS raster driver and thus defaults to no PageRegion
+      * code...  Unmark the PageRegion choice so that we don't output the
+      * code...
+      */
+
+      page = ppdFindMarkedChoice(ppd, "PageRegion");
+
+      if (page)
+        page->marked = 0;
+    }
   }
 }
 
@@ -544,5 +569,5 @@ ppd_sort(ppd_choice_t **c1,	/* I - First choice */
 
 
 /*
- * End of "$Id: emit.c,v 1.29 2002/12/17 18:56:41 swdev Exp $".
+ * End of "$Id: emit.c,v 1.30 2003/02/18 22:23:38 mike Exp $".
  */
