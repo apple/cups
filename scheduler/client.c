@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.91.2.89 2004/07/02 22:15:51 mike Exp $"
+ * "$Id: client.c,v 1.91.2.90 2004/08/05 20:53:12 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -1354,6 +1354,11 @@ ReadClient(client_t *con)		/* I - Client to read from */
 
               if (IsCGI(con, filename, &filestats, type))
 	      {
+	       /*
+	        * Note: con->command and con->options were set by
+		* IsCGI()...
+		*/
+
         	if (!SendCommand(con, con->command, con->options))
 		{
 		  if (!SendError(con, HTTP_NOT_FOUND))
@@ -2819,7 +2824,6 @@ pipe_command(client_t *con,		/* I - Client connection */
   int		i;			/* Looping var */
   int		pid;			/* Process ID */
   char		*commptr;		/* Command string pointer */
-  char		*query;			/* Query string pointer */
   char		*uriptr;		/* URI string pointer */
   int		fds[2];			/* Pipe FDs */
   int		argc;			/* Number of arguments */
@@ -2840,7 +2844,7 @@ pipe_command(client_t *con,		/* I - Client connection */
 		dyld_library_path[1024],/* DYLD_LIBRARY_PATH environment variable */
 		shlib_path[1024],	/* SHLIB_PATH environment variable */
 		nlspath[1024],		/* NLSPATH environment variable */
-		query_string[10240],	/* QUERY_STRING env variable */
+		*query_string,		/* QUERY_STRING env variable */
 		remote_addr[1024],	/* REMOTE_ADDR environment variable */
 		remote_host[1024],	/* REMOTE_HOST environment variable */
 		remote_user[1024],	/* REMOTE_USER environment variable */
@@ -2903,46 +2907,74 @@ pipe_command(client_t *con,		/* I - Client connection */
 
 
  /*
-  * Copy the command string...
+  * Parse a copy of the options string, which is of the form:
+  *
+  *     name argument+argument+argument
+  *     name param=value&param=value
+  *
+  * If the string contains an "=" character after the initial name,
+  * then we treat it as a HTTP GET form request and make a copy of
+  * the remaining string for the environment variable.
+  *
+  * The string is always parsed out as command-line arguments, to
+  * be consistent with Apache...
   */
 
   strlcpy(argbuf, options, sizeof(argbuf));
 
- /*
-  * Parse the string; arguments can be separated by + and are terminated
-  * by ?...
-  */
-
-  argv[0] = argbuf;
-  query   = NULL;
+  argv[0]      = argbuf;
+  query_string = NULL;
 
   for (commptr = argbuf, argc = 1; *commptr != '\0' && argc < 99; commptr ++)
+  {
+   /*
+    * Break arguments whenever we see a + or space...
+    */
+
     if (*commptr == ' ' || *commptr == '+')
     {
+     /*
+      * Terminate the current string and skip trailing whitespace...
+      */
+
       *commptr++ = '\0';
 
       while (*commptr == ' ')
         commptr ++;
 
-      if (*commptr != '\0')
+     /*
+      * If we don't have a blank string, save it as another argument...
+      */
+
+      if (*commptr)
       {
         argv[argc] = commptr;
 	argc ++;
       }
-
+      else
+        break;
 
      /*
-      * Copy query data, if any, from arguments...
+      * If we see an "=" in the remaining string, make a copy of it since
+      * it will be query data...
       */
 
       if (argc == 2 && strchr(commptr, '=') && con->operation == HTTP_GET)
-	query = strdup(commptr);
+	SetStringf(&query_string, "QUERY_STRING=%s", commptr);
+
+     /*
+      * Don't skip the first non-blank character...
+      */
 
       commptr --;
     }
     else if (*commptr == '%' && isxdigit(commptr[1] & 255) &&
              isxdigit(commptr[2] & 255))
     {
+     /*
+      * Convert the %xx notation to the individual character.
+      */
+
       if (commptr[1] >= '0' && commptr[1] <= '9')
         *commptr = (commptr[1] - '0') << 4;
       else
@@ -2954,7 +2986,15 @@ pipe_command(client_t *con,		/* I - Client connection */
         *commptr |= tolower(commptr[2]) - 'a' + 10;
 
       cups_strcpy(commptr + 1, commptr + 3);
+
+     /*
+      * Check for a %00 and break if that is the case...
+      */
+
+      if (!*commptr)
+        break;
     }
+  }
 
   argv[argc] = NULL;
 
@@ -3091,15 +3131,13 @@ pipe_command(client_t *con,		/* I - Client connection */
       LogMessage(L_DEBUG2, "argv[%d] = \"%s\"", i, argv[i]);
     envp[envc ++] = "REQUEST_METHOD=GET";
 
-    if (query)
+    if (query_string)
     {
      /*
       * Add GET form variables after ?...
       */
 
-      snprintf(query_string, sizeof(query_string), "QUERY_STRING=%s", query);
       envp[envc ++] = query_string;
-      free(query);
     }
   }
   else
@@ -3142,6 +3180,8 @@ pipe_command(client_t *con,		/* I - Client connection */
 
   if (pipe(fds))
   {
+    ClearString(&query_string);
+
     LogMessage(L_ERROR, "Unable to create pipes for CGI %s - %s",
                argv[0], strerror(errno));
     return (0);
@@ -3273,6 +3313,8 @@ pipe_command(client_t *con,		/* I - Client connection */
 
   ReleaseSignals();
 
+  ClearString(&query_string);
+
   return (pid);
 }
 
@@ -3326,5 +3368,5 @@ CDSAWriteFunc(SSLConnectionRef connection,	/* I  - SSL/TLS connection */
 
 
 /*
- * End of "$Id: client.c,v 1.91.2.89 2004/07/02 22:15:51 mike Exp $".
+ * End of "$Id: client.c,v 1.91.2.90 2004/08/05 20:53:12 mike Exp $".
  */
