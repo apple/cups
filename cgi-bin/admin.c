@@ -1,5 +1,5 @@
 /*
- * "$Id: admin.c,v 1.9 2000/05/22 18:18:53 mike Exp $"
+ * "$Id: admin.c,v 1.10 2000/06/27 16:26:43 mike Exp $"
  *
  *   Administration CGI for the Common UNIX Printing System (CUPS).
  *
@@ -783,6 +783,7 @@ do_config_printer(http_t      *http,	/* I - HTTP connection */
   int		have_options;		/* Have options? */
   ipp_t		*request,		/* IPP request */
 		*response;		/* IPP response */
+  ipp_attribute_t *attr;		/* IPP attribute */
   char		uri[HTTP_MAX_URI];	/* Job URI */
   const char	*var;			/* Variable value */
   const char	*printer;		/* Printer printer name */
@@ -825,8 +826,14 @@ do_config_printer(http_t      *http,	/* I - HTTP connection */
 
   ppd = ppdOpenFile(filename);
 
-  for (have_options = 0, i = ppd->num_groups, group = ppd->groups;
-       i > 0;
+  if (cgiGetVariable("job_sheets_start") != NULL ||
+      cgiGetVariable("job_sheets_end") != NULL)
+    have_options = 1;
+  else
+    have_options = 0;
+
+  for (i = ppd->num_groups, group = ppd->groups;
+       i > 0 && !have_options;
        i --, group ++)
     for (j = group->num_options, option = group->options;
          j > 0;
@@ -894,6 +901,80 @@ do_config_printer(http_t      *http,	/* I - HTTP connection */
                           getenv("LANG"));
     }
 
+   /*
+    * Build an IPP_GET_PRINTER_ATTRIBUTES request, which requires the
+    * following attributes:
+    *
+    *    attributes-charset
+    *    attributes-natural-language
+    *    printer-uri
+    */
+
+    request = ippNew();
+
+    request->request.op.operation_id = IPP_GET_PRINTER_ATTRIBUTES;
+    request->request.op.request_id   = 1;
+
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
+        	 "attributes-charset", NULL, cupsLangEncoding(language));
+
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
+        	 "attributes-natural-language", NULL, language->language);
+
+    snprintf(uri, sizeof(uri), "ipp://localhost/printers/%s",
+             cgiGetVariable("PRINTER_NAME"));
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
+                 NULL, uri);
+
+   /*
+    * Do the request and get back a response...
+    */
+
+    if ((response = cupsDoRequest(http, request, "/")) != NULL)
+    {
+      if ((attr = ippFindAttribute(response, "job-sheets-supported", IPP_TAG_ZERO)) != NULL)
+      {
+       /*
+	* Add the job sheets options...
+	*/
+
+	cgiSetVariable("GROUP", "Banners");
+	cgiCopyTemplateLang(stdout, TEMPLATES, "option-header.tmpl",
+                            getenv("LANG"));
+
+	cgiSetSize("CHOICES", attr->num_values);
+	cgiSetSize("TEXT", attr->num_values);
+	for (k = 0; k < attr->num_values; k ++)
+	{
+	  cgiSetArray("CHOICES", k, attr->values[k].string.text);
+	  cgiSetArray("TEXT", k, attr->values[k].string.text);
+	}
+
+        attr = ippFindAttribute(response, "job-sheets-default", IPP_TAG_ZERO);
+
+        cgiSetVariable("KEYWORD", "job_sheets_start");
+        cgiSetVariable("KEYTEXT", "Starting Banner");
+        cgiSetVariable("DEFCHOICE", attr == NULL ?
+	                            "" : attr->values[0].string.text);
+
+	cgiCopyTemplateLang(stdout, TEMPLATES, "option-pickone.tmpl",
+	                    getenv("LANG"));
+
+        cgiSetVariable("KEYWORD", "job_sheets_end");
+        cgiSetVariable("KEYTEXT", "Ending Banner");
+        cgiSetVariable("DEFCHOICE", attr == NULL && attr->num_values > 1 ?
+	                            "" : attr->values[1].string.text);
+
+	cgiCopyTemplateLang(stdout, TEMPLATES, "option-pickone.tmpl",
+	                    getenv("LANG"));
+
+	cgiCopyTemplateLang(stdout, TEMPLATES, "option-trailer.tmpl",
+                            getenv("LANG"));
+      }
+
+      ippDelete(response);
+    }
+
     cgiCopyTemplateLang(stdout, TEMPLATES, "config-printer2.tmpl",
                         getenv("LANG"));
   }
@@ -948,6 +1029,7 @@ do_config_printer(http_t      *http,	/* I - HTTP connection */
     *    attributes-charset
     *    attributes-natural-language
     *    printer-uri
+    *    job-sheets-default
     *    [ppd file]
     */
 
@@ -966,6 +1048,11 @@ do_config_printer(http_t      *http,	/* I - HTTP connection */
              cgiGetVariable("PRINTER_NAME"));
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
                  NULL, uri);
+
+    attr = ippAddStrings(request, IPP_TAG_PRINTER, IPP_TAG_NAME,
+                         "job-sheets-default", 2, NULL, NULL);
+    attr->values[0].string.text = strdup(cgiGetVariable("job_sheets_start"));
+    attr->values[1].string.text = strdup(cgiGetVariable("job_sheets_end"));
 
    /*
     * Do the request and get back a response...
@@ -1364,5 +1451,5 @@ get_line(char *buf,	/* I - Line buffer */
 
 
 /*
- * End of "$Id: admin.c,v 1.9 2000/05/22 18:18:53 mike Exp $".
+ * End of "$Id: admin.c,v 1.10 2000/06/27 16:26:43 mike Exp $".
  */
