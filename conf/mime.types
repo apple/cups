@@ -1,5 +1,5 @@
 #
-# "$Id: mime.types,v 1.1 1998/08/06 14:39:36 mike Exp $"
+# "$Id: mime.types,v 1.2 1999/01/24 14:17:59 mike Exp $"
 #
 #   MIME types file for the Common UNIX Printing System (CUPS).
 #
@@ -20,12 +20,6 @@
 #       Voice: (301) 373-9603
 #       EMail: cups-info@cups.org
 #         WWW: http://www.cups.org
-#
-# Revision History:
-#
-#   $Log: mime.types,v $
-#   Revision 1.1  1998/08/06 14:39:36  mike
-#   Initial revision
 #
 
 ########################################################################
@@ -78,28 +72,38 @@
 # Application-generated files...
 #
 
-application/msword		doc
-application/pdf			pdf string(0,"%PDF")
-application/postscript		ai eps ps string(0,"%!")
-application/x-hpgl		hpgl
+application/msword		doc string(0,<D0CF11E0A1B11AE1>)
+application/pdf			pdf string(0,%PDF)
+application/postscript		ai eps ps string(0,%!) string(0,<04>%!)
+application/x-hpgl		hpgl string(0,<1b>%) string(0,<1b>&)\
+				string(0,<1b>E) string(0,<201b>)\
+				string(0,BP;) string(0,IN;) string(0,DF;) 
 
 ########################################################################
 #
 # Image files...
 #
 
-image/gif			gif
-image/png			png
-image/jpeg			jpeg jpg jpe
-image/tiff			tiff tif        
+image/gif			gif string(0,GIF87a) string(0,GIF89a)
+image/png			png string(0,<89>PNG)
+image/jpeg			jpeg jpg jpe string(6,JFIF)
+image/tiff			tiff tif string(0,MM) string(0,II)
+image/x-photocd			pcd string(2048,PCD_IPI)
 image/x-portable-anymap		pnm
-image/x-portable-bitmap		pbm
-image/x-portable-graymap	pgm
-image/x-portable-pixmap		ppm
-image/x-rgb			rgb
+image/x-portable-bitmap		pbm string(0,P1) string(0,P4)
+image/x-portable-graymap	pgm string(0,P2) string(0,P5)
+image/x-portable-pixmap		ppm string(0,P3) string(0,P6)
+image/x-rgb			rgb sgi bw icon short(0,474)
 image/x-xbitmap			xbm
-image/x-xpixmap			xpm
+image/x-xpixmap			xpm ascii(0,1024) + string(3,"XPM")
 image/x-xwindowdump		xwd
+
+# TODO: Add Sun Raster, Alias, SoftImage, GIMP??? files
+
+#image/x-sun			ras
+#image/x-alias			pix
+#image/x-softimage
+#image/x-gimp			xcf xcf.gz
 
 ########################################################################
 #
@@ -123,16 +127,32 @@ text/iso8859-1			printable(0,1024) +\
 				 locale("no") locale("pt") locale("pt_BR")\
 				 locale("rm") locale("sq") locale("sv")\
 				 locale("sw"))
+
 # TODO: add text/iso8859-[23456789...] rules
+
+text/iso8859-2
+text/iso8859-3
+text/iso8859-4
+text/iso8859-5
+text/iso8859-6
+text/iso8859-7
+text/iso8859-8
+text/iso8859-9
+text/iso8859-10
+text/iso8859-13
+text/iso8859-14
+text/iso8859-15
+text/utf-8
+text/ucs-2
 
 ########################################################################
 #
 # CUPS-specific types...
 #
 
-cups/postscript
-cups/raster
+application/cups-postscript
+application/cups-raster
 
 #
-# End of "$Id: mime.types,v 1.1 1998/08/06 14:39:36 mike Exp $".
+# End of "$Id: mime.types,v 1.2 1999/01/24 14:17:59 mike Exp $".
 #

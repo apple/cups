@@ -1,5 +1,5 @@
 #
-# "$Id: mime.convs,v 1.1 1998/08/06 14:39:36 mike Exp $"
+# "$Id: mime.convs,v 1.2 1999/01/24 14:17:59 mike Exp $"
 #
 #   MIME converts file for the Common UNIX Printing System (CUPS).
 #
@@ -24,6 +24,9 @@
 # Revision History:
 #
 #   $Log: mime.convs,v $
+#   Revision 1.2  1999/01/24 14:17:59  mike
+#   Updated prior to CVS use.
+#
 #   Revision 1.1  1998/08/06 14:39:36  mike
 #   Initial revision
 #
@@ -39,7 +42,7 @@
 #   Currently the "cost" field is not used (all filters are assumed to
 #   be equally costly in terms of speed/memory).  Also, a filter program
 #   *must* accept the standard command-line arguments (job-id, user, title,
-#   copies,options,[filename or stdin]) or this won't work.
+#   copies,options,[filenames or stdin]) or this won't work.
 #
 
 ########################################################################
@@ -47,23 +50,32 @@
 # PostScript filters
 #
 
-application/msword	application/postscript	50	msword2ps
-application/pdf		application/postscript	50	pdf2ps
-application/postscript	cups/postscript		50	ps2ps
-application/x-hpgl	application/postscript	50	hpgl2ps
-image/*			application/postscript	50	img2ps
-text/html		application/postscript	50	html2ps
-text/plain		application/postscript	50	text2ps
-text/iso8859-1		application/postscript	50	iso2ps
+application/msword	application/postscript	50	mswordtops
+application/pdf		application/postscript	50	pdftops
+application/postscript	application/cups-postscript		50	pstops
+application/x-hpgl	application/postscript	50	hpgltops
+image/*			application/postscript	50	imgtops
+text/html		application/postscript	50	htmltops
+text/plain		application/postscript	50	texttops
+text/iso8859-1		application/postscript	50	iso1tops
+text/iso8859-2		application/postscript	50	iso2tops
+text/iso8859-3		application/postscript	50	iso3tops
+text/iso8859-4		application/postscript	50	iso4tops
+text/iso8859-5		application/postscript	50	iso5tops
+text/iso8859-6		application/postscript	50	iso6tops
+text/iso8859-7		application/postscript	50	iso7tops
+text/iso8859-8		application/postscript	50	iso8tops
+text/iso8859-9		application/postscript	50	iso9tops
+text/iso8859-10		application/postscript	50	iso10tops
 
 ########################################################################
 #
 # Raster filters...
 #
 
-image/*			cups/raster		50	imgrip
-cups/postscript		cups/raster		50	gsrip
+image/*			application/cups-raster		50	imgrip
+application/cups-postscript		application/cups-raster		50	gsrip
 
 #
-# End of "$Id: mime.convs,v 1.1 1998/08/06 14:39:36 mike Exp $".
+# End of "$Id: mime.convs,v 1.2 1999/01/24 14:17:59 mike Exp $".
 #
