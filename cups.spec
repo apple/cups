@@ -1,5 +1,5 @@
 #
-# "$Id: cups.spec,v 1.2 1999/07/08 15:00:20 mike Exp $"
+# "$Id: cups.spec,v 1.3 1999/08/11 13:59:15 mike Exp $"
 #
 #   RPM "spec" file for the Common UNIX Printing System (CUPS).
 #
@@ -26,11 +26,11 @@
 
 Summary: Common Unix Printing System
 Name: cups
-Version: 1.0b5
+Version: 1.0b7
 Release: 0
 Copyright: GPL
 Group: System Environment/Daemons
-Source: ftp://ftp.easysw.com/pub/cups/beta/cups-1.0b5-source.tar.gz
+Source: ftp://ftp.easysw.com/pub/cups/beta/cups-1.0b7-source.tar.gz
 Url: http://www.cups.org
 Packager: Michael Sweet <mike@easysw.com>
 Vendor: Easy Software Products
@@ -87,7 +87,8 @@ ln -sf /var/cups/conf $RPM_BUILD_ROOT/etc/cups
 
 make prefix=$RPM_BUILD_ROOT/usr DATADIR=$RPM_BUILD_ROOT/usr/share/cups LOCALEDIR=$RPM_BUILD_ROOT/usr/share/locale SERVERROOT=$RPM_BUILD_ROOT/var/cups install
 
-install -m 755 -o root -g root $RPM_SOURCE_DIR/cups.sh $RPM_BUILD_ROOT/etc/rc.d/init.d/cups
+$RPM_BUILD_ROOT/etc/rc.d/init.d/cups
+install -m 755 -o root -g root cups.sh $RPM_BUILD_ROOT/etc/rc.d/init.d/cups
 
 %post
 /sbin/chkconfig --add cups
@@ -139,18 +140,18 @@ rm -rf $RPM_BUILD_ROOT
 /usr/lib/libcups.so.1
 /usr/lib/libcupsimage.so.1
 %dir /usr/share/cups
-/usr/share/cups/8859-1
-/usr/share/cups/8859-14
-/usr/share/cups/8859-15
-/usr/share/cups/8859-2
-/usr/share/cups/8859-3
-/usr/share/cups/8859-4
-/usr/share/cups/8859-5
-/usr/share/cups/8859-6
-/usr/share/cups/8859-7
-/usr/share/cups/8859-8
-/usr/share/cups/8859-9
-/usr/share/cups/HPGLprolog
+/usr/share/cups/data/8859-1
+/usr/share/cups/data/8859-14
+/usr/share/cups/data/8859-15
+/usr/share/cups/data/8859-2
+/usr/share/cups/data/8859-3
+/usr/share/cups/data/8859-4
+/usr/share/cups/data/8859-5
+/usr/share/cups/data/8859-6
+/usr/share/cups/data/8859-7
+/usr/share/cups/data/8859-8
+/usr/share/cups/data/8859-9
+/usr/share/cups/data/HPGLprolog
 /usr/share/cups/doc/cmp.html
 /usr/share/cups/doc/cmp.pdf
 /usr/share/cups/doc/cups.css
@@ -303,5 +304,5 @@ rm -rf $RPM_BUILD_ROOT
 /usr/lib/libcupsimage.so
 
 #
-# End of "$Id: cups.spec,v 1.2 1999/07/08 15:00:20 mike Exp $".
+# End of "$Id: cups.spec,v 1.3 1999/08/11 13:59:15 mike Exp $".
 #
