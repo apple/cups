@@ -1,5 +1,5 @@
 /*
- * "$Id: lpr.c,v 1.3 1999/07/07 18:21:11 mike Exp $"
+ * "$Id: lpr.c,v 1.4 1999/07/13 12:03:20 mike Exp $"
  *
  *   "lpr" command for the Common UNIX Printing System (CUPS).
  *
@@ -45,7 +45,7 @@ main(int  argc,		/* I - Number of command-line arguments */
 {
   int		i;		/* Looping var */
   int		job_id;		/* Job ID */
-  char		*dest;		/* Destination printer */
+  const char	*dest;		/* Destination printer */
   char		*title;		/* Job title */
   int		priority;	/* Job priority (1-100) */
   int		num_copies;	/* Number of copies per file */
@@ -246,5 +246,5 @@ main(int  argc,		/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: lpr.c,v 1.3 1999/07/07 18:21:11 mike Exp $".
+ * End of "$Id: lpr.c,v 1.4 1999/07/13 12:03:20 mike Exp $".
  */
