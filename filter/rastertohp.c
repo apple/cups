@@ -1,5 +1,5 @@
 /*
- * "$Id: rastertohp.c,v 1.15 2001/03/02 14:30:15 mike Exp $"
+ * "$Id: rastertohp.c,v 1.16 2001/04/23 17:17:24 mike Exp $"
  *
  *   Hewlett-Packard Page Control Language filter for the Common UNIX
  *   Printing System (CUPS).
@@ -657,12 +657,12 @@ main(int  argc,		/* I - Number of command-line arguments */
   if (Page == 0)
     fputs("ERROR: No pages found!\n", stderr);
   else
-    fputs("INFO: Ready to print.\n", stderr);
+    fputs("INFO: " CUPS_SVERSION " is ready to print.\n", stderr);
 
   return (Page == 0);
 }
 
 
 /*
- * End of "$Id: rastertohp.c,v 1.15 2001/03/02 14:30:15 mike Exp $".
+ * End of "$Id: rastertohp.c,v 1.16 2001/04/23 17:17:24 mike Exp $".
  */

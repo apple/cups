@@ -1,5 +1,5 @@
 /*
- * "$Id: socket.c,v 1.19 2001/04/18 16:28:34 mike Exp $"
+ * "$Id: socket.c,v 1.20 2001/04/23 17:17:24 mike Exp $"
  *
  *   AppSocket backend for the Common UNIX Printing System (CUPS).
  *
@@ -332,10 +332,12 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   if (fp != stdin)
     fclose(fp);
 
+  fputs("INFO: " CUPS_SVERSION " is ready to print.\n", stderr);
+
   return (0);
 }
 
 
 /*
- * End of "$Id: socket.c,v 1.19 2001/04/18 16:28:34 mike Exp $".
+ * End of "$Id: socket.c,v 1.20 2001/04/23 17:17:24 mike Exp $".
  */
