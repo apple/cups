@@ -1,5 +1,5 @@
 /*
- * "$Id: lpr.c,v 1.19 2001/02/13 15:16:52 mike Exp $"
+ * "$Id: lpr.c,v 1.20 2001/02/13 20:37:43 mike Exp $"
  *
  *   "lpr" command for the Common UNIX Printing System (CUPS).
  *
@@ -67,6 +67,7 @@ main(int  argc,		/* I - Number of command-line arguments */
 {
   int		i, j;		/* Looping var */
   int		job_id;		/* Job ID */
+  char		ch;		/* Option character */
   char		*printer,	/* Destination printer or class */
 		*instance;	/* Instance */
   const char	*title;		/* Job title */
@@ -97,7 +98,7 @@ main(int  argc,		/* I - Number of command-line arguments */
 
   for (i = 1; i < argc; i ++)
     if (argv[i][0] == '-')
-      switch (argv[i][1])
+      switch (ch = argv[i][1])
       {
         case 'E' : /* Encrypt */
 #ifdef HAVE_LIBSSL
@@ -115,7 +116,16 @@ main(int  argc,		/* I - Number of command-line arguments */
 	case 'i' : /* indent */
 	case 'w' : /* width */
 	    if (argv[i][2] == '\0')
+	    {
 	      i ++;
+
+	      if (i >= argc)
+	      {
+		fprintf(stderr, "lpr: Expected value after -%c option!\n", ch);
+		return (1);
+	      }
+	    }
+
         case 'c' : /* CIFPLOT */
 	case 'd' : /* DVI */
 	case 'f' : /* FORTRAN */
@@ -124,7 +134,7 @@ main(int  argc,		/* I - Number of command-line arguments */
 	case 't' : /* Troff */
 	case 'v' : /* Raster image */
 	    fprintf(stderr, "Warning: \'%c\' format modifier not supported - output may not be correct!\n",
-	            argv[i][1]);
+	            ch);
 	    break;
 
 	case 'o' : /* Option */
@@ -133,6 +143,12 @@ main(int  argc,		/* I - Number of command-line arguments */
 	    else
 	    {
 	      i ++;
+	      if (i >= argc)
+	      {
+	        fputs("lpr: Expected option=value after -o option!\n", stderr);
+		return (1);
+	      }
+
 	      num_options = cupsParseOptions(argv[i], num_options, &options);
 	    }
 	    break;
@@ -156,6 +172,11 @@ main(int  argc,		/* I - Number of command-line arguments */
 	    fputs("Warning: email notification is not supported!\n", stderr);
 	    break;
 
+	case 'q' : /* Queue file but don't print */
+            num_options = cupsAddOption("job-hold-until", "indefinite",
+	                                num_options, &options);
+	    break;
+
 	case 'r' : /* Remove file after printing */
 	    deletefile = 1;
 	    break;
@@ -166,6 +187,12 @@ main(int  argc,		/* I - Number of command-line arguments */
 	    else
 	    {
 	      i ++;
+	      if (i >= argc)
+	      {
+	        fputs("lpr: Expected destination after -P option!\n", stderr);
+		return (1);
+	      }
+
 	      printer = argv[i];
 	    }
 
@@ -191,6 +218,12 @@ main(int  argc,		/* I - Number of command-line arguments */
 	    else
 	    {
 	      i ++;
+	      if (i >= argc)
+	      {
+	        fputs("lpr: Expected copy count after -# option!\n", stderr);
+		return (1);
+	      }
+
 	      num_copies = atoi(argv[i]);
 	    }
 
@@ -212,7 +245,29 @@ main(int  argc,		/* I - Number of command-line arguments */
 	    else
 	    {
 	      i ++;
+	      if (i >= argc)
+	      {
+		fprintf(stderr, "lpr: Expected name after -%c option!\n", ch);
+		return (1);
+	      }
+
 	      title = argv[i];
+	    }
+	    break;
+
+	case 'U' : /* User */
+	    if (argv[i][2] != '\0')
+	      cupsSetUser(argv[i] + 2);
+	    else
+	    {
+	      i ++;
+	      if (i >= argc)
+	      {
+	        fputs("lpr: Expected username after -U option!\n", stderr);
+		return (1);
+	      }
+
+	      cupsSetUser(argv[i]);
 	    }
 	    break;
 
@@ -366,5 +421,5 @@ sighandler(int s)	/* I - Signal number */
 
 
 /*
- * End of "$Id: lpr.c,v 1.19 2001/02/13 15:16:52 mike Exp $".
+ * End of "$Id: lpr.c,v 1.20 2001/02/13 20:37:43 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: lpq.c,v 1.16 2001/01/23 17:36:20 mike Exp $"
+ * "$Id: lpq.c,v 1.17 2001/02/13 20:37:42 mike Exp $"
  *
  *   "lpq" command for the Common UNIX Printing System (CUPS).
  *
@@ -131,6 +131,10 @@ main(int  argc,		/* I - Number of command-line arguments */
 
 	    if ((instance = strchr(dest, '/')) != NULL)
 	      *instance = '\0';
+	    break;
+
+	case 'a' : /* All printers */
+	    dest = NULL;
 	    break;
 
 	case 'l' : /* Long status */
@@ -531,5 +535,5 @@ show_printer(http_t     *http,	/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpq.c,v 1.16 2001/01/23 17:36:20 mike Exp $".
+ * End of "$Id: lpq.c,v 1.17 2001/02/13 20:37:42 mike Exp $".
  */

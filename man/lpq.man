@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: lpq.man,v 1.4 2001/01/23 17:36:21 mike Exp $"
+.\" "$Id: lpq.man,v 1.5 2001/02/13 20:37:43 mike Exp $"
 .\"
 .\"   lpq man page for the Common UNIX Printing System (CUPS).
 .\"
@@ -21,14 +21,14 @@
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
-.TH lpq 1 "Common UNIX Printing System" "23 January 2001" "Easy Software Products"
+.TH lpq 1 "Common UNIX Printing System" "13 February 2001" "Easy Software Products"
 .SH NAME
 lpq \- show printer queue status
 .SH SYNOPSIS
 .B lpq
 [ -E ] [ \-P
 .I dest
-] [ \-l ] [
+] [ \-a ] [ \-l ] [
 .I +interval
 ]
 .SH DESCRIPTION
@@ -42,7 +42,9 @@ every \fIinterval\fR seconds.
 .LP
 The \fI-E\fR option forces encryption when connecting to the server.
 .LP
-The \fI-l\fR option requests a more verbose reporting format.
+The \fI-a\fR option reports jobs on all printers.
+.LP
+The \fI-l\fR option requests a more verbose (long) reporting format.
 .SH SEE ALSO
 cancel(1), lp(1), lpr(1), lprm(1), lpstat(1)
 .br
@@ -51,5 +53,5 @@ http://localhost:631/documentation.html
 .SH COPYRIGHT
 Copyright 1993-2001 by Easy Software Products, All Rights Reserved.
 .\"
-.\" End of "$Id: lpq.man,v 1.4 2001/01/23 17:36:21 mike Exp $".
+.\" End of "$Id: lpq.man,v 1.5 2001/02/13 20:37:43 mike Exp $".
 .\"

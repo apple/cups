@@ -1,5 +1,5 @@
 /*
- * "$Id: lpc.c,v 1.10 2001/01/22 15:03:20 mike Exp $"
+ * "$Id: lpc.c,v 1.11 2001/02/13 20:37:42 mike Exp $"
  *
  *   "lpc" command for the Common UNIX Printing System (CUPS).
  *
@@ -178,7 +178,7 @@ do_command(http_t *http,	/* I - HTTP connection to server */
            strcmp(command, "?") == 0)
     show_help(params);
   else
-    puts("?Invalid command");
+    printf("%s is not implemented by the CUPS version of lpc.\n", command);
 }
 
 
@@ -477,5 +477,5 @@ show_status(http_t *http,	/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpc.c,v 1.10 2001/01/22 15:03:20 mike Exp $".
+ * End of "$Id: lpc.c,v 1.11 2001/02/13 20:37:42 mike Exp $".
  */
