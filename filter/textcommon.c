@@ -1,5 +1,5 @@
 /*
- * "$Id: textcommon.c,v 1.3 1999/04/06 19:37:15 mike Exp $"
+ * "$Id: textcommon.c,v 1.4 1999/04/29 19:24:24 mike Exp $"
  *
  *   Common text filter routines for the Common UNIX Printing System (CUPS).
  *
@@ -441,7 +441,8 @@ TextMain(char *name,		/* I - Name of filter */
 	      *keyptr = '\0';
 	      keyptr  = keyword;
 
-	      if (bsearch(&keyptr, Keywords, sizeof(Keywords) / sizeof(Keywords[0]),
+	      if (!(attr & ATTR_ITALIC) &&
+	          bsearch(&keyptr, Keywords, sizeof(Keywords) / sizeof(Keywords[0]),
 	                  sizeof(Keywords[0]), compare_keywords))
               {
 	       /*
@@ -702,5 +703,5 @@ getutf8(FILE *fp)	/* I - File to read from */
 
 
 /*
- * End of "$Id: textcommon.c,v 1.3 1999/04/06 19:37:15 mike Exp $".
+ * End of "$Id: textcommon.c,v 1.4 1999/04/29 19:24:24 mike Exp $".
  */
