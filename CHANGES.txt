@@ -1,8 +1,10 @@
-CHANGES.txt - 07/30/2004
+CHANGES.txt - 10/20/2004
 ------------------------
 
 CHANGES IN CUPS V1.2.0b1
 
+	- Moved enable and disable commands to sbindir to be
+	  consistent.
 	- Updated pdftops filter to Xpdf 3.00.03.
 	- Added new cupsRasterInterpretPPD() function for RIP
 	  filters to setup the raster page header from
