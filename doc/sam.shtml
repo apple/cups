@@ -630,7 +630,7 @@ quotas:</P>
 
 <P>Or, you can combine all three options on the same line.</P>
 
-<H3>Restricting Access to a Printer</A></H3>
+<H3>Restricting User Access to a Printer</A></H3>
 
 <P>The <CODE>-u</CODE> option of the <CODE>lpadmin</CODE> command controls which users can
 print to a printer. The default configuration allows all users to print
