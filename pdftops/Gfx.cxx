@@ -2939,7 +2939,9 @@ void Gfx::doImage(Object *ref, Stream *str, GBool inlineImg) {
     dict->lookup("Mask", &maskObj);
     if (maskObj.isArray()) {
       // color key mask
-      for (i = 0; i < maskObj.arrayGetLength(); ++i) {
+      for (i = 0;
+           i < maskObj.arrayGetLength() && i < 2*gfxColorMaxComps;
+	   ++i) {
 	maskObj.arrayGet(i, &obj1);
 	maskColors[i] = obj1.getInt();
 	obj1.free();
