@@ -23,10 +23,11 @@
 	FILE ../data/testprint.ps
 
 	# What statuses are OK?
-	STATUS ok
-	STATUS ok-subst
+	#STATUS ok
+	#STATUS ok-subst
 
 	# What attributes do we expect?
 	EXPECT job-id
 	EXPECT job-uri
+	EXPECT bogus
 }

@@ -13,7 +13,8 @@
 	GROUP operation
 	ATTR charset attributes-charset utf-8
 	ATTR language attributes-natural-language en
-	ATTR uri job-uri $uri
+	ATTR uri printer-uri $uri
+	ATTR integer job-id 293
 
 	# What statuses are OK?
 	STATUS ok
