@@ -3,6 +3,8 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.20rc1
 
+	- The httpGets() function could, in certain states,
+	  block waiting for data (STR #132)
 	- The cupsEmitJCL() function not outputs an empty @PJL
 	  command after the PJL language escape to work around
 	  bugs in certain PJL implementations (STR #131)

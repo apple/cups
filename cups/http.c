@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.82.2.35 2003/05/27 14:03:47 mike Exp $"
+ * "$Id: http.c,v 1.82.2.36 2003/06/02 20:24:19 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS).
  *
@@ -61,6 +61,7 @@
  *   http_field()         - Return the field index for a field name.
  *   http_send()          - Send a request with all fields and the trailing
  *                          blank line.
+ *   http_wait()          - Wait for data available on a connection.
  *   http_upgrade()       - Force upgrade to TLS encryption.
  *   http_setup_ssl()     - Set up SSL/TLS on a connection.
  *   http_shutdown_ssl()  - Shut down SSL/TLS on a connection.
@@ -110,6 +111,7 @@
 static http_field_t	http_field(const char *name);
 static int		http_send(http_t *http, http_state_t request,
 			          const char *uri);
+static int		http_wait(http_t *http, int msec);
 #ifdef HAVE_SSL
 static int		http_upgrade(http_t *http);
 static int		http_setup_ssl(http_t *http);
@@ -1052,8 +1054,8 @@ httpRead(http_t *http,			/* I - HTTP data */
  */
 
 void
-httpSetCookie(http_t     *http,			/* I - Connection */
-              const char *cookie)		/* I - Cookie string */
+httpSetCookie(http_t     *http,		/* I - Connection */
+              const char *cookie)	/* I - Cookie string */
 {
   if (!http)
     return;
@@ -1076,13 +1078,6 @@ int					/* O - 1 if data is available, 0 otherwise */
 httpWait(http_t *http,			/* I - HTTP data */
          int    msec)			/* I - Milliseconds to wait */
 {
-#ifndef WIN32
-  struct rlimit		limit;          /* Runtime limit */
-#endif /* !WIN32 */
-  struct timeval	timeout;	/* Timeout */
-  int			nfds;		/* Result from select() */
-
-
  /*
   * First see if there is data in the buffer...
   */
@@ -1093,68 +1088,11 @@ httpWait(http_t *http,			/* I - HTTP data */
   if (http->used)
     return (1);
 
-#ifdef HAVE_SSL
-  if (http->tls)
-  {
-#  ifdef HAVE_LIBSSL
-    if (SSL_pending((SSL *)(http->tls)))
-      return (1);
-#  elif defined(HAVE_GNUTLS)
-    if (gnutls_record_check_pending(((http_tls_t *)(http->tls))->session))
-      return (1);
-#  elif defined(HAVE_CDSASSL)
-    size_t bytes;			/* Bytes that are available */
-
-    if (!SSLGetBufferedReadSize((SSLContextRef)http->tls, &bytes) && bytes > 0)
-      return;
-#  endif /* HAVE_LIBSSL */
-  }
-#endif /* HAVE_SSL */
-
  /*
-  * Then try doing a select() to poll the socket...
+  * If not, check the SSL/TLS buffers and do a select() on the connection...
   */
 
-  if (!http->input_set)
-  {
-#ifdef WIN32
-   /*
-    * Windows has a fixed-size select() structure, different (surprise,
-    * surprise!) from all UNIX implementations.  Just allocate this
-    * fixed structure...
-    */
-
-    http->input_set = calloc(1, sizeof(fd_set));
-#else
-   /*
-    * Allocate the select() input set based upon the max number of file
-    * descriptors available for this process...
-    */
-
-    getrlimit(RLIMIT_NOFILE, &limit);
-
-    http->input_set = calloc(1, (limit.rlim_cur + 7) / 8);
-#endif /* WIN32 */
-
-    if (!http->input_set)
-      return (0);
-  }
-
-  FD_SET(http->fd, http->input_set);
-
-  if (msec >= 0)
-  {
-    timeout.tv_sec  = msec / 1000;
-    timeout.tv_usec = (msec % 1000) * 1000;
-
-    nfds = select(http->fd + 1, http->input_set, NULL, NULL, &timeout);
-  }
-  else
-    nfds = select(http->fd + 1, http->input_set, NULL, NULL, NULL);
-
-  FD_CLR(http->fd, http->input_set);
-
-  return (nfds > 0);
+  return (http_wait(http, msec));
 }
 
 
@@ -1345,7 +1283,7 @@ httpGets(char   *line,			/* I - Line to read into */
       * No newline; see if there is more data to be read...
       */
 
-      if (!http->blocking && !httpWait(http, 1000))
+      if (!http->blocking && !http_wait(http, 1000))
         return (NULL);
 
 #ifdef HAVE_SSL
@@ -2061,6 +1999,90 @@ http_send(http_t       *http,	/* I - HTTP data */
 }
 
 
+/*
+ * 'http_wait()' - Wait for data available on a connection.
+ */
+
+static int				/* O - 1 if data is available, 0 otherwise */
+http_wait(http_t *http,			/* I - HTTP data */
+          int    msec)			/* I - Milliseconds to wait */
+{
+#ifndef WIN32
+  struct rlimit		limit;          /* Runtime limit */
+#endif /* !WIN32 */
+  struct timeval	timeout;	/* Timeout */
+  int			nfds;		/* Result from select() */
+
+
+ /*
+  * Check the SSL/TLS buffers for data first...
+  */
+
+#ifdef HAVE_SSL
+  if (http->tls)
+  {
+#  ifdef HAVE_LIBSSL
+    if (SSL_pending((SSL *)(http->tls)))
+      return (1);
+#  elif defined(HAVE_GNUTLS)
+    if (gnutls_record_check_pending(((http_tls_t *)(http->tls))->session))
+      return (1);
+#  elif defined(HAVE_CDSASSL)
+    size_t bytes;			/* Bytes that are available */
+
+    if (!SSLGetBufferedReadSize((SSLContextRef)http->tls, &bytes) && bytes > 0)
+      return;
+#  endif /* HAVE_LIBSSL */
+  }
+#endif /* HAVE_SSL */
+
+ /*
+  * Then try doing a select() to poll the socket...
+  */
+
+  if (!http->input_set)
+  {
+#ifdef WIN32
+   /*
+    * Windows has a fixed-size select() structure, different (surprise,
+    * surprise!) from all UNIX implementations.  Just allocate this
+    * fixed structure...
+    */
+
+    http->input_set = calloc(1, sizeof(fd_set));
+#else
+   /*
+    * Allocate the select() input set based upon the max number of file
+    * descriptors available for this process...
+    */
+
+    getrlimit(RLIMIT_NOFILE, &limit);
+
+    http->input_set = calloc(1, (limit.rlim_cur + 7) / 8);
+#endif /* WIN32 */
+
+    if (!http->input_set)
+      return (0);
+  }
+
+  FD_SET(http->fd, http->input_set);
+
+  if (msec >= 0)
+  {
+    timeout.tv_sec  = msec / 1000;
+    timeout.tv_usec = (msec % 1000) * 1000;
+
+    nfds = select(http->fd + 1, http->input_set, NULL, NULL, &timeout);
+  }
+  else
+    nfds = select(http->fd + 1, http->input_set, NULL, NULL, NULL);
+
+  FD_CLR(http->fd, http->input_set);
+
+  return (nfds > 0);
+}
+
+
 #ifdef HAVE_SSL
 /*
  * 'http_upgrade()' - Force upgrade to TLS encryption.
@@ -2427,5 +2449,5 @@ CDSAWriteFunc(SSLConnectionRef connection,	/* I  - SSL/TLS connection */
 
 
 /*
- * End of "$Id: http.c,v 1.82.2.35 2003/05/27 14:03:47 mike Exp $".
+ * End of "$Id: http.c,v 1.82.2.36 2003/06/02 20:24:19 mike Exp $".
  */
