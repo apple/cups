@@ -1,5 +1,5 @@
 /*
- * "$Id: classes.c,v 1.42 2002/05/16 13:44:58 mike Exp $"
+ * "$Id: classes.c,v 1.43 2002/10/15 16:09:17 mike Exp $"
  *
  *   Printer class routines for the Common UNIX Printing System (CUPS).
  *
@@ -64,12 +64,6 @@ AddClass(const char *name)	/* I - Name of class */
     c->type = CUPS_PRINTER_CLASS;
     snprintf(c->uri, sizeof(c->uri), "ipp://%s:%d/classes/%s", ServerName,
              ntohs(Listeners[0].address.sin_port), name);
-
-   /*
-    * Set the printer attributes to make this a class.
-    */
-
-    SetPrinterAttrs(c);
   }
 
   return (c);
@@ -350,7 +344,11 @@ LoadAllClasses(void)
 
   snprintf(line, sizeof(line), "%s/classes.conf", ServerRoot);
   if ((fp = fopen(line, "r")) == NULL)
+  {
+    LogMessage(L_ERROR, "LoadAllClasses: Unable to open %s - %s", line,
+               strerror(errno));
     return;
+  }
 
  /*
   * Read class configurations until we hit EOF...
@@ -413,6 +411,8 @@ LoadAllClasses(void)
       if (line[len - 1] == '>' && p == NULL)
       {
         line[len - 1] = '\0';
+
+        LogMessage(L_DEBUG, "LoadAllClasses: Loading class %s...", value);
 
         p = AddClass(value);
 	p->accepting = 1;
@@ -691,5 +691,5 @@ SaveAllClasses(void)
 
 
 /*
- * End of "$Id: classes.c,v 1.42 2002/05/16 13:44:58 mike Exp $".
+ * End of "$Id: classes.c,v 1.43 2002/10/15 16:09:17 mike Exp $".
  */

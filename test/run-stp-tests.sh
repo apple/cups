@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# "$Id: run-stp-tests.sh,v 1.11 2002/06/07 21:05:25 mike Exp $"
+# "$Id: run-stp-tests.sh,v 1.12 2002/10/15 16:09:20 mike Exp $"
 #
 #   Perform the complete set of IPP compliance tests specified in the
 #   CUPS Software Test Plan.
@@ -125,6 +125,47 @@ EOF
 
 touch /tmp/$user/classes.conf
 touch /tmp/$user/printers.conf
+
+#
+# Setup lots of test queues - 500 with PPD files, 500 without...
+#
+
+i=1
+while test $i -le 500; do
+	cat >>/tmp/$user/printers.conf <<EOF
+<Printer test-$i>
+Accepting Yes
+DeviceURI file:/dev/null
+Info Test PS printer $i
+JobSheets none none
+Location CUPS test suite
+State Idle
+StateMessage Printer $1 is idle.
+</Printer>
+EOF
+
+	cp testps.ppd /tmp/$user/ppd/test-$i.ppd
+
+	i=`expr $i + 1`
+done
+
+while test $i -le 1000; do
+	cat >>/tmp/$user/printers.conf <<EOF
+<Printer test-$i>
+Accepting Yes
+DeviceURI file:/dev/null
+Info Test raw printer $i
+JobSheets none none
+Location CUPS test suite
+State Idle
+StateMessage Printer $1 is idle.
+</Printer>
+EOF
+
+	i=`expr $i + 1`
+done
+
+cp /tmp/$user/printers.conf /tmp/$user/printers.conf.orig
 
 cp $root/conf/mime.types /tmp/$user/mime.types
 cp $root/conf/mime.convs /tmp/$user/mime.convs
@@ -334,5 +375,5 @@ echo "    $pdffile"
 echo ""
 
 #
-# End of "$Id: run-stp-tests.sh,v 1.11 2002/06/07 21:05:25 mike Exp $"
+# End of "$Id: run-stp-tests.sh,v 1.12 2002/10/15 16:09:20 mike Exp $"
 #
