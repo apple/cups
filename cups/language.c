@@ -1,5 +1,5 @@
 /*
- * "$Id: language.c,v 1.46 2003/10/31 23:10:17 mike Exp $"
+ * "$Id: language.c,v 1.47 2003/11/19 18:25:35 mike Exp $"
  *
  *   I18N/language support for the Common UNIX Printing System (CUPS).
  *
@@ -250,7 +250,7 @@ cupsLangGet(const char *language)	/* I - Language or locale */
 
     language = setlocale(LC_MESSAGES, NULL);
 
-    if (!strcmp(language, "C") || !strcmp(language, "POSIX"))
+    if (!language || !strcmp(language, "C") || !strcmp(language, "POSIX"))
       language = setlocale(LC_MESSAGES, "");
   }
 #else
@@ -263,10 +263,26 @@ cupsLangGet(const char *language)	/* I - Language or locale */
 
     language = setlocale(LC_ALL, NULL);
 
-    if (!strcmp(language, "C") || !strcmp(language, "POSIX"))
+    if (!language || !strcmp(language, "C") || !strcmp(language, "POSIX"))
       language = setlocale(LC_ALL, "");
   }
 #endif /* __APPLE__ */
+
+ /*
+  * If "language" is NULL at this point, then chances are we are using
+  * a language that is not installed for the base OS.
+  */
+
+  if (!language)
+  {
+   /*
+    * Switch to the value of the "LANG" environment variable, and if
+    * that is NULL as well, use "C".
+    */
+
+    if ((language = getenv("LANG")) == NULL)
+      language = "C";
+  }
 
  /*
   * Set the locale back to POSIX while we do string ops, since
@@ -911,5 +927,5 @@ cups_cache_lookup(const char      *name,/* I - Name of locale */
 
 
 /*
- * End of "$Id: language.c,v 1.46 2003/10/31 23:10:17 mike Exp $".
+ * End of "$Id: language.c,v 1.47 2003/11/19 18:25:35 mike Exp $".
  */
