@@ -1,5 +1,5 @@
 /*
- * "$Id: image.c,v 1.14 1999/07/27 16:46:25 mike Exp $"
+ * "$Id: image.c,v 1.15 1999/08/06 16:04:53 mike Exp $"
  *
  *   Base image support for the Common UNIX Printing System (CUPS).
  *
@@ -699,7 +699,7 @@ flush_tile(image_t *img)
 
   if (img->cachefile == NULL)
   {
-    tmpnam(img->cachename);
+    cupsTempFile(img->cachename, sizeof(img->cachename));
 
 #ifdef DEBUG
     fprintf(stderr, "flush_tile: Creating cache file %s...\n", img->cachename);
@@ -739,5 +739,5 @@ flush_tile(image_t *img)
 
 
 /*
- * End of "$Id: image.c,v 1.14 1999/07/27 16:46:25 mike Exp $".
+ * End of "$Id: image.c,v 1.15 1999/08/06 16:04:53 mike Exp $".
  */
