@@ -1068,11 +1068,13 @@ determine how the server operates:
 	<LI><A HREF="#Browsing"><CODE>Browsing</CODE></A>
 	<LI><A HREF="#Classification"><CODE>Classification</CODE></A>
 	<LI><A HREF="#ClassifyOverride"><CODE>ClassifyOverride</CODE></A>
+	<LI><A HREF="#ConfigFilePerm"><CODE>ConfigFilePerm</CODE></A>
 	<LI><A HREF="#DataDir"><CODE>DataDir</CODE></A>
 	<LI><A HREF="#DefaultCharset"><CODE>DefaultCharset</CODE></A>
 	<LI><A HREF="#DefaultLanguage"><CODE>DefaultLanguage</CODE></A>
 	<LI><A HREF="#Deny"><CODE>Deny</CODE></A>
 	<LI><A HREF="#DocumentRoot"><CODE>DocumentRoot</CODE></A>
+	<LI><A HREF="#Encryption"><CODE>Encryption</CODE></A>
 
 </TD>
 <TD VALIGN="TOP">
@@ -1080,7 +1082,6 @@ determine how the server operates:
 </TD>
 <TD VALIGN="TOP">
 
-	<LI><A HREF="#Encryption"><CODE>Encryption</CODE></A>
 	<LI><A HREF="#ErrorLog"><CODE>ErrorLog</CODE></A>
 	<LI><A HREF="#FilterLimit"><CODE>FilterLimit</CODE></A>
 	<LI><A HREF="#FontPath"><CODE>FontPath</CODE></A>
@@ -1097,6 +1098,7 @@ determine how the server operates:
 	<LI><A HREF="#LimitRequestBody"><CODE>LimitRequestBody</CODE></A>
 	<LI><A HREF="#Listen"><CODE>Listen</CODE></A>
 	<LI><A HREF="#Location"><CODE>Location</CODE></A>
+	<LI><A HREF="#LogFilePerm"><CODE>LogFilePerm</CODE></A>
 	<LI><A HREF="#LogLevel"><CODE>LogLevel</CODE></A>
 	<LI><A HREF="#MaxClients"><CODE>MaxClients</CODE></A>
 	<LI><A HREF="#MaxJobs"><CODE>MaxJobs</CODE></A>
@@ -1105,6 +1107,7 @@ determine how the server operates:
 	<LI><A HREF="#MaxLogSize"><CODE>MaxLogSize</CODE></A>
 	<LI><A HREF="#MaxRequestSize"><CODE>MaxRequestSize</CODE></A>
 	<LI><A HREF="#Order"><CODE>Order</CODE></A>
+	<LI><A HREF="#PageLog"><CODE>PageLog</CODE></A>
 
 </TD>
 <TD VALIGN="TOP">
@@ -1112,7 +1115,6 @@ determine how the server operates:
 </TD>
 <TD VALIGN="TOP">
 
-	<LI><A HREF="#PageLog"><CODE>PageLog</CODE></A>
 	<LI><A HREF="#Port"><CODE>Port</CODE></A>
 	<LI><A HREF="#PreserveJobFiles"><CODE>PreserveJobFiles</CODE></A>
 	<LI><A HREF="#PreserveJobHistory"><CODE>PreserveJobHistory</CODE></A>
@@ -1751,6 +1753,22 @@ is used.
 <P>The default is to not allow classification overrides.
 
 <!-- NEED 3in -->
+<H3><A NAME="ConfigFilePerm">ConfigFilePerm</A></H3>
+<HR>
+
+<H4>Examples</H4>
+
+<UL><PRE>
+ConfigFilePerm 0644
+ConfigFilePerm 0600
+</PRE></UL>
+
+<H4>Description</H4>
+
+<P>The <CODE>ConfigFilePerm</CODE> directive specifies the permissions
+to use when writing configuration files. The default is 0600.
+
+<!-- NEED 3in -->
 <H3><A NAME="DataDir">DataDir</A></H3>
 <HR>
 
@@ -2310,6 +2328,22 @@ So the directives inside the <CODE>/printers/name</CODE> location will override 
 Directives inside <CODE>/printers</CODE> will override ones from <CODE>/</CODE>. &nbsp;
 None of the directives are inherited.
 More information can be found in section <A HREF="#PRINTING_SECURITY">"Printing System Security"</A>.
+
+<!-- NEED 3in -->
+<H3><A NAME="LogFilePerm">LogFilePerm</A></H3>
+<HR>
+
+<H4>Examples</H4>
+
+<UL><PRE>
+LogFilePerm 0644
+LogFilePerm 0600
+</PRE></UL>
+
+<H4>Description</H4>
+
+<P>The <CODE>LogFilePerm</CODE> directive specifies the permissions
+to use when writing configuration files. The default is 0644.
 
 <!-- NEED 3in -->
 <H3><A NAME="LogLevel">LogLevel</A></H3>

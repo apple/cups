@@ -130,6 +130,7 @@ Copyright 1997-2002, All Rights Reserved<BR>
 <LI><A HREF="#Browsing">Browsing</A></LI>
 <LI><A HREF="#Classification">Classification</A></LI>
 <LI><A HREF="#ClassifyOverride">ClassifyOverride</A></LI>
+<LI><A HREF="#ConfigFilePerm">ConfigFilePerm</A></LI>
 <LI><A HREF="#DataDir">DataDir</A></LI>
 <LI><A HREF="#DefaultCharset">DefaultCharset</A></LI>
 <LI><A HREF="#DefaultLanguage">DefaultLanguage</A></LI>
@@ -152,6 +153,7 @@ Copyright 1997-2002, All Rights Reserved<BR>
 <LI><A HREF="#LimitRequestBody">LimitRequestBody</A></LI>
 <LI><A HREF="#Listen">Listen</A></LI>
 <LI><A HREF="#Location">Location</A></LI>
+<LI><A HREF="#LogFilePerm">LogFilePerm</A></LI>
 <LI><A HREF="#LogLevel">LogLevel</A></LI>
 <LI><A HREF="#MaxClients">MaxClients</A></LI>
 <LI><A HREF="#MaxJobs">MaxJobs</A></LI>
@@ -231,12 +233,10 @@ Copyright 1997-2002, All Rights Reserved<BR>
 <LI><A HREF="#9_1">Common UNIX Printing System License Agreement</A></LI>
 <UL>
 <LI><A HREF="#9_1_1">Introduction</A></LI>
-<LI><A HREF="#9_1_2">Apple Operating System Development License
- Exception</A></LI>
-<LI><A HREF="#9_1_3">OpenSSL Toolkit License Exception</A></LI>
-<LI><A HREF="#9_1_4">Trademarks</A></LI>
-<LI><A HREF="#9_1_5">Binary Distribution Rights</A></LI>
-<LI><A HREF="#9_1_6">Support</A></LI>
+<LI><A HREF="#9_1_2">License Exceptions</A></LI>
+<LI><A HREF="#9_1_3">Trademarks</A></LI>
+<LI><A HREF="#9_1_4">Binary Distribution Rights</A></LI>
+<LI><A HREF="#9_1_5">Support</A></LI>
 </UL>
 <LI><A HREF="#9_2">GNU GENERAL PUBLIC LICENSE</A></LI>
 <LI><A HREF="#9_3">GNU LIBRARY GENERAL PUBLIC LICENSE</A></LI>
@@ -1267,13 +1267,14 @@ HREF="#CLIENT_SETUP"> Chapter 5, &quot;Client Setup&quot;</A> for more
 <LI><A HREF="#Browsing"><CODE>Browsing</CODE></A></LI>
 <LI><A HREF="#Classification"><CODE>Classification</CODE></A></LI>
 <LI><A HREF="#ClassifyOverride"><CODE>ClassifyOverride</CODE></A></LI>
+<LI><A HREF="#ConfigFilePerm"><CODE>ConfigFilePerm</CODE></A></LI>
 <LI><A HREF="#DataDir"><CODE>DataDir</CODE></A></LI>
 <LI><A HREF="#DefaultCharset"><CODE>DefaultCharset</CODE></A></LI>
 <LI><A HREF="#DefaultLanguage"><CODE>DefaultLanguage</CODE></A></LI>
 <LI><A HREF="#Deny"><CODE>Deny</CODE></A></LI>
 <LI><A HREF="#DocumentRoot"><CODE>DocumentRoot</CODE></A></LI>
-</TD><TD VALIGN="TOP"> &nbsp;&nbsp;&nbsp;</TD><TD VALIGN="TOP">
 <LI><A HREF="#Encryption"><CODE>Encryption</CODE></A></LI>
+</TD><TD VALIGN="TOP"> &nbsp;&nbsp;&nbsp;</TD><TD VALIGN="TOP">
 <LI><A HREF="#ErrorLog"><CODE>ErrorLog</CODE></A></LI>
 <LI><A HREF="#FilterLimit"><CODE>FilterLimit</CODE></A></LI>
 <LI><A HREF="#FontPath"><CODE>FontPath</CODE></A></LI>
@@ -1290,6 +1291,7 @@ HREF="#CLIENT_SETUP"> Chapter 5, &quot;Client Setup&quot;</A> for more
 <LI><A HREF="#LimitRequestBody"><CODE>LimitRequestBody</CODE></A></LI>
 <LI><A HREF="#Listen"><CODE>Listen</CODE></A></LI>
 <LI><A HREF="#Location"><CODE>Location</CODE></A></LI>
+<LI><A HREF="#LogFilePerm"><CODE>LogFilePerm</CODE></A></LI>
 <LI><A HREF="#LogLevel"><CODE>LogLevel</CODE></A></LI>
 <LI><A HREF="#MaxClients"><CODE>MaxClients</CODE></A></LI>
 <LI><A HREF="#MaxJobs"><CODE>MaxJobs</CODE></A></LI>
@@ -1298,8 +1300,8 @@ HREF="#CLIENT_SETUP"> Chapter 5, &quot;Client Setup&quot;</A> for more
 <LI><A HREF="#MaxLogSize"><CODE>MaxLogSize</CODE></A></LI>
 <LI><A HREF="#MaxRequestSize"><CODE>MaxRequestSize</CODE></A></LI>
 <LI><A HREF="#Order"><CODE>Order</CODE></A></LI>
-</TD><TD VALIGN="TOP"> &nbsp;&nbsp;&nbsp;</TD><TD VALIGN="TOP">
 <LI><A HREF="#PageLog"><CODE>PageLog</CODE></A></LI>
+</TD><TD VALIGN="TOP"> &nbsp;&nbsp;&nbsp;</TD><TD VALIGN="TOP">
 <LI><A HREF="#Port"><CODE>Port</CODE></A></LI>
 <LI><A HREF="#PreserveJobFiles"><CODE>PreserveJobFiles</CODE></A></LI>
 <LI><A HREF="#PreserveJobHistory"><CODE>PreserveJobHistory</CODE></A></LI>
@@ -1823,6 +1825,20 @@ ClassifyOverride No
 <P>The default is to not allow classification overrides.
 <!-- NEED 3in -->
 </P>
+<H3><A NAME="ConfigFilePerm">ConfigFilePerm</A></H3>
+<HR>
+<H4>Examples</H4>
+<UL>
+<PRE>
+ConfigFilePerm 0644
+ConfigFilePerm 0600
+</PRE>
+</UL>
+<H4>Description</H4>
+<P>The <CODE>ConfigFilePerm</CODE> directive specifies the permissions
+ to use when writing configuration files. The default is 0600.
+<!-- NEED 3in -->
+</P>
 <H3><A NAME="DataDir">DataDir</A></H3>
 <HR>
 <H4>Examples</H4>
@@ -2304,6 +2320,20 @@ name</CODE></TD></TR>
 /printers</CODE> will override ones from <CODE>/</CODE>. &nbsp; None of the
  directives are inherited. More information can be found in section<A HREF="#PRINTING_SECURITY">
  &quot;Printing System Security&quot;</A>.
+<!-- NEED 3in -->
+</P>
+<H3><A NAME="LogFilePerm">LogFilePerm</A></H3>
+<HR>
+<H4>Examples</H4>
+<UL>
+<PRE>
+LogFilePerm 0644
+LogFilePerm 0600
+</PRE>
+</UL>
+<H4>Description</H4>
+<P>The <CODE>LogFilePerm</CODE> directive specifies the permissions to
+ use when writing configuration files. The default is 0644.
 <!-- NEED 3in -->
 </P>
 <H3><A NAME="LogLevel">LogLevel</A></H3>
@@ -3760,15 +3790,13 @@ smb://user:pass@server/sharename
 <P>The Common UNIX Printing System<SUP>TM</SUP>, (&quot;CUPS<SUP>TM</SUP>&quot;),
  is provided under the GNU General Public License (&quot;GPL&quot;) and GNU
  Library General Public License (&quot;LGPL&quot;), Version 2, with exceptions for
- Apple operating systems. A copy of the exceptions and licenses follow
- this introduction.</P>
+ Apple operating systems and the OpenSSL toolkit. A copy of the
+ exceptions and licenses follow this introduction.</P>
 <P>The GNU LGPL applies to the CUPS API library, located in the &quot;cups&quot;
- subdirectory of the CUPS source distribution and in the
- &quot;/usr/include/cups&quot; directory and &quot;libcups.a&quot;, &quot;libcups_s.a&quot;,
- &quot;libcups.sl&quot;, &quot;libcups.so&quot;, or &quot;libcups.dylib&quot; files in the binary
- distributions.</P>
-<P>The GNU GPL applies to the remainder of the CUPS distribution,
- including the &quot;pdftops&quot; filter which is based upon Xpdf 0.93a.</P>
+ subdirectory of the CUPS source distribution and in the &quot;cups&quot; include
+ directory and library files in the binary distributions. The GNU GPL
+ applies to the remainder of the CUPS distribution, including the
+ &quot;pdftops&quot; filter which is based upon Xpdf and the CUPS imaging library.</P>
 <P>For those not familiar with the GNU GPL, the license basically allows
  you to:</P>
 <UL>
@@ -3789,66 +3817,74 @@ smb://user:pass@server/sharename
 <P>The GNU LGPL relaxes the &quot;link-to&quot; restriction, allowing you to
  develop applications that use the CUPS API library under other licenses
  and/or conditions as appropriate for your application.</P>
-<H3><A NAME="9_1_2">Apple Operating System Development License Exception</A>
-</H3>
+<H3><A NAME="9_1_2">License Exceptions</A></H3>
 <P>In addition, as the copyright holder of CUPS, Easy Software Products
- grants the following special exception:<BLOCKQUOTE>Software that is
- developed by any person or entity for an Apple Operating System (&quot;Apple
- OS-Developed Software&quot;), including but not limited to Apple and third
- party printer drivers, filters, and backends for an Apple Operating
- System, that is linked to the CUPS imaging library or based on any
- sample filters or backends provided with CUPS shall not be considered
- to be a derivative work or collective work based on the CUPS program
- and is exempt from the mandatory source code release clauses of the GNU
- GPL. You may therefore distribute linked combinations of the CUPS
- imaging library with Apple OS-Developed Software without releasing the
- source code of the Apple OS-Developed Software. You may also use sample
- filters and backends provided with CUPS to develop Apple OS-Developed
+ grants the following special exceptions:</P>
+<OL>
+<LI><B>Apple Operating System Development License Exception</B>;
+<OL TYPE="a">
+<LI>Software that is developed by any person or entity for an Apple
+ Operating System (&quot;Apple OS-Developed Software&quot;), including but not
+ limited to Apple and third party printer drivers, filters, and backends
+ for an Apple Operating System, that is linked to the CUPS imaging
+ library or based on any sample filters or backends provided with CUPS
+ shall not be considered to be a derivative work or collective work
+ based on the CUPS program and is exempt from the mandatory source code
+ release clauses of the GNU GPL. You may therefore distribute linked
+ combinations of the CUPS imaging library with Apple OS-Developed
  Software without releasing the source code of the Apple OS-Developed
- Software.</BLOCKQUOTE></P>
-<P>An Apple Operating System means any operating system software
+ Software. You may also use sample filters and backends provided with
+ CUPS to develop Apple OS-Developed Software without releasing the
+ source code of the Apple OS-Developed Software.</LI>
+<LI>An Apple Operating System means any operating system software
  developed and/or marketed by Apple Computer, Inc., including but not
  limited to all existing releases and versions of Apple's Darwin, Mac OS
  X, and Mac OS X Server products and all follow-on releases and future
- versions thereof.</P>
-<P>This exception is only available for Apple OS-Developed Software and
+ versions thereof.</LI>
+<LI>This exception is only available for Apple OS-Developed Software and
  does not apply to software that is distributed for use on other
- operating systems.</P>
-<P>All CUPS software that falls under this license exception have the
+ operating systems.</LI>
+<LI>All CUPS software that falls under this license exception have the
  following text at the top of each source file:<BLOCKQUOTE>This file is
- subject to the Apple OS-Developed Software exception.</BLOCKQUOTE></P>
-<H3><A NAME="9_1_3">OpenSSL Toolkit License Exception</A></H3>
-<P>In addition, as the copyright holder of CUPS, Easy Software Products
- grants the following special exception:<BLOCKQUOTE>Easy Software
- Products explicitly allows the compilation and distribution of the CUPS
- software with the OpenSSL Toolkit.</BLOCKQUOTE></P>
-<H3><A NAME="9_1_4">Trademarks</A></H3>
+ subject to the Apple OS-Developed Software exception.</BLOCKQUOTE></LI>
+</OL>
+</LI>
+<LI><B>OpenSSL Toolkit License Exception</B>;
+<OL TYPE="a">
+<LI>Easy Software Products explicitly allows the compilation and
+ distribution of the CUPS software with the OpenSSL Toolkit.</LI>
+</OL>
+</LI>
+</OL>
+<P>No developer is required to provide these exceptions in a derived
+ work.</P>
+<H3><A NAME="9_1_3">Trademarks</A></H3>
 <P>Easy Software Products has trademarked the Common UNIX Printing
  System, CUPS, and CUPS logo. These names and logos may be used freely
- in any direct port or binary distribution of CUPS. To use them in
- derivative products, please contract Easy Software Products for written
- permission. Our intention is to protect the value of these trademarks
- and ensure that any derivative product meets the same high-quality
+ in any direct port or binary distribution of CUPS. Please contract Easy
+ Software Products for written permission to use them in derivative
+ products. Our intention is to protect the value of these trademarks and
+ ensure that any derivative product meets the same high-quality
  standards as the original.</P>
-<H3><A NAME="9_1_5">Binary Distribution Rights</A></H3>
+<H3><A NAME="9_1_4">Binary Distribution Rights</A></H3>
 <P>Easy Software Products also sells rights to the CUPS source code
  under a binary distribution license for vendors that are unable to
  release source code for their drivers, additions, and modifications to
  CUPS under the GNU GPL and LGPL. For information please contact us at
  the address shown above.</P>
-<P>The Common UNIX Printing System provides a &quot;pdftops&quot; filter is based
- on the Xpdf 0.93a software. For binary distribution licensing of this
+<P>The Common UNIX Printing System provides a &quot;pdftops&quot; filter that is
+ based on the Xpdf software. For binary distribution licensing of this
  software, please contact:<BLOCKQUOTE> Derek B. Noonburg
 <BR> Email:<A HREF="mailto:derekn@foolabs.com"> derekn@foolabs.com</A>
 <BR> WWW:<A HREF="http://www.foolabs.com/xpdf/">
  http://www.foolabs.com/xpdf/</A></BLOCKQUOTE></P>
-<H3><A NAME="9_1_6">Support</A></H3>
+<H3><A NAME="9_1_5">Support</A></H3>
 <P>Easy Software Products sells software support for CUPS as well as a
  commercial printing product based on CUPS called ESP Print Pro. You can
  find out more at our web site:</P>
 <UL>
 <PRE>
-<A HREF="http://www.easysw.com">http://www.easysw.com</A>
+<A HREF="http://www.easysw.com/">http://www.easysw.com/</A>
 </PRE>
 </UL>
 

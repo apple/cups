@@ -117,12 +117,10 @@ Copyright 1997-2002, All Rights Reserved<BR>
 <LI><A HREF="#6_1">Common UNIX Printing System License Agreement</A></LI>
 <UL>
 <LI><A HREF="#6_1_1">Introduction</A></LI>
-<LI><A HREF="#6_1_2">Apple Operating System Development License
- Exception</A></LI>
-<LI><A HREF="#6_1_3">OpenSSL Toolkit License Exception</A></LI>
-<LI><A HREF="#6_1_4">Trademarks</A></LI>
-<LI><A HREF="#6_1_5">Binary Distribution Rights</A></LI>
-<LI><A HREF="#6_1_6">Support</A></LI>
+<LI><A HREF="#6_1_2">License Exceptions</A></LI>
+<LI><A HREF="#6_1_3">Trademarks</A></LI>
+<LI><A HREF="#6_1_4">Binary Distribution Rights</A></LI>
+<LI><A HREF="#6_1_5">Support</A></LI>
 </UL>
 <LI><A HREF="#6_2">GNU GENERAL PUBLIC LICENSE</A></LI>
 <LI><A HREF="#6_3">GNU LIBRARY GENERAL PUBLIC LICENSE</A></LI>
@@ -586,16 +584,43 @@ printer DeskJet now printing DeskJet-1.
 <H3><A NAME="4_3_3">N-Up Printing</A></H3>
 <P>The <CODE>-o number-up=value</CODE> option selects N-Up printing.
  N-Up printing places multiple document pages on a single printed page.
- CUPS supports 1-Up, 2-Up, and 4-Up formats:</P>
+ CUPS supports 1, 2, 4, 6, 9, and 16-Up formats; the default format is
+ 1-Up:</P>
 <UL>
 <PRE>
 <B>lp -o number-up=1 filename ENTER</B>
 <B>lp -o number-up=2 filename ENTER</B>
 <B>lp -o number-up=4 filename ENTER</B>
-<B>lpr -o number-up=4 filename ENTER</B>
+<B>lpr -o number-up=16 filename ENTER</B>
 </PRE>
 </UL>
-<P>The default format is 1-Up.</P>
+<P>The <CODE>-o number-up-border=value</CODE> option chooses the border
+ to draw around each page:</P>
+<UL>
+<LI><CODE>-o number-up-border=double</CODE>; draw two hairline borders
+ around each page</LI>
+<LI><CODE>-o number-up-border=double-thick</CODE>; draw two 1pt borders
+ around each page</LI>
+<LI><CODE>-o number-up-border=none</CODE>; do not draw a border
+ (default)</LI>
+<LI><CODE>-o number-up-border=single</CODE>; draw one hairline border
+ around each page</LI>
+<LI><CODE>-o number-up-border=single-thick</CODE>; draw one 1pt border
+ around each page</LI>
+</UL>
+<P>The <CODE>-o number-up-layout=value</CODE> option chooses the layout
+ of the pages on each output page:</P>
+<UL>
+<LI><CODE>-o number-up-layout=btlr</CODE>; Bottom to top, left to right</LI>
+<LI><CODE>-o number-up-layout=btrl</CODE>; Bottom to top, right to left</LI>
+<LI><CODE>-o number-up-layout=lrbt</CODE>; Left to right, bottom to top</LI>
+<LI><CODE>-o number-up-layout=lrtb</CODE>; Left to right, top to bottom
+ (default)</LI>
+<LI><CODE>-o number-up-layout=rlbt</CODE>; Right to left, bottom to top</LI>
+<LI><CODE>-o number-up-layout=rltb</CODE>; Right to left, top to bottom</LI>
+<LI><CODE>-o number-up-layout=tblr</CODE>; Top to bottom, left to right</LI>
+<LI><CODE>-o number-up-layout=tbrl</CODE>; Top to bottom, right to left</LI>
+</UL>
 <H3><A NAME="4_3_4">Setting the Brightness</A></H3>
 <P>You can control the overall brightness of the printed output using
  the <CODE>-o brightness=percent</CODE> option:</P>
@@ -961,15 +986,13 @@ deskjet@server</CODE>).</P>
 <P>The Common UNIX Printing System<SUP>TM</SUP>, (&quot;CUPS<SUP>TM</SUP>&quot;),
  is provided under the GNU General Public License (&quot;GPL&quot;) and GNU
  Library General Public License (&quot;LGPL&quot;), Version 2, with exceptions for
- Apple operating systems. A copy of the exceptions and licenses follow
- this introduction.</P>
+ Apple operating systems and the OpenSSL toolkit. A copy of the
+ exceptions and licenses follow this introduction.</P>
 <P>The GNU LGPL applies to the CUPS API library, located in the &quot;cups&quot;
- subdirectory of the CUPS source distribution and in the
- &quot;/usr/include/cups&quot; directory and &quot;libcups.a&quot;, &quot;libcups_s.a&quot;,
- &quot;libcups.sl&quot;, &quot;libcups.so&quot;, or &quot;libcups.dylib&quot; files in the binary
- distributions.</P>
-<P>The GNU GPL applies to the remainder of the CUPS distribution,
- including the &quot;pdftops&quot; filter which is based upon Xpdf 0.93a.</P>
+ subdirectory of the CUPS source distribution and in the &quot;cups&quot; include
+ directory and library files in the binary distributions. The GNU GPL
+ applies to the remainder of the CUPS distribution, including the
+ &quot;pdftops&quot; filter which is based upon Xpdf and the CUPS imaging library.</P>
 <P>For those not familiar with the GNU GPL, the license basically allows
  you to:</P>
 <UL>
@@ -990,66 +1013,74 @@ deskjet@server</CODE>).</P>
 <P>The GNU LGPL relaxes the &quot;link-to&quot; restriction, allowing you to
  develop applications that use the CUPS API library under other licenses
  and/or conditions as appropriate for your application.</P>
-<H3><A NAME="6_1_2">Apple Operating System Development License Exception</A>
-</H3>
+<H3><A NAME="6_1_2">License Exceptions</A></H3>
 <P>In addition, as the copyright holder of CUPS, Easy Software Products
- grants the following special exception:<BLOCKQUOTE>Software that is
- developed by any person or entity for an Apple Operating System (&quot;Apple
- OS-Developed Software&quot;), including but not limited to Apple and third
- party printer drivers, filters, and backends for an Apple Operating
- System, that is linked to the CUPS imaging library or based on any
- sample filters or backends provided with CUPS shall not be considered
- to be a derivative work or collective work based on the CUPS program
- and is exempt from the mandatory source code release clauses of the GNU
- GPL. You may therefore distribute linked combinations of the CUPS
- imaging library with Apple OS-Developed Software without releasing the
- source code of the Apple OS-Developed Software. You may also use sample
- filters and backends provided with CUPS to develop Apple OS-Developed
+ grants the following special exceptions:</P>
+<OL>
+<LI><B>Apple Operating System Development License Exception</B>;
+<OL TYPE="a">
+<LI>Software that is developed by any person or entity for an Apple
+ Operating System (&quot;Apple OS-Developed Software&quot;), including but not
+ limited to Apple and third party printer drivers, filters, and backends
+ for an Apple Operating System, that is linked to the CUPS imaging
+ library or based on any sample filters or backends provided with CUPS
+ shall not be considered to be a derivative work or collective work
+ based on the CUPS program and is exempt from the mandatory source code
+ release clauses of the GNU GPL. You may therefore distribute linked
+ combinations of the CUPS imaging library with Apple OS-Developed
  Software without releasing the source code of the Apple OS-Developed
- Software.</BLOCKQUOTE></P>
-<P>An Apple Operating System means any operating system software
+ Software. You may also use sample filters and backends provided with
+ CUPS to develop Apple OS-Developed Software without releasing the
+ source code of the Apple OS-Developed Software.</LI>
+<LI>An Apple Operating System means any operating system software
  developed and/or marketed by Apple Computer, Inc., including but not
  limited to all existing releases and versions of Apple's Darwin, Mac OS
  X, and Mac OS X Server products and all follow-on releases and future
- versions thereof.</P>
-<P>This exception is only available for Apple OS-Developed Software and
+ versions thereof.</LI>
+<LI>This exception is only available for Apple OS-Developed Software and
  does not apply to software that is distributed for use on other
- operating systems.</P>
-<P>All CUPS software that falls under this license exception have the
+ operating systems.</LI>
+<LI>All CUPS software that falls under this license exception have the
  following text at the top of each source file:<BLOCKQUOTE>This file is
- subject to the Apple OS-Developed Software exception.</BLOCKQUOTE></P>
-<H3><A NAME="6_1_3">OpenSSL Toolkit License Exception</A></H3>
-<P>In addition, as the copyright holder of CUPS, Easy Software Products
- grants the following special exception:<BLOCKQUOTE>Easy Software
- Products explicitly allows the compilation and distribution of the CUPS
- software with the OpenSSL Toolkit.</BLOCKQUOTE></P>
-<H3><A NAME="6_1_4">Trademarks</A></H3>
+ subject to the Apple OS-Developed Software exception.</BLOCKQUOTE></LI>
+</OL>
+</LI>
+<LI><B>OpenSSL Toolkit License Exception</B>;
+<OL TYPE="a">
+<LI>Easy Software Products explicitly allows the compilation and
+ distribution of the CUPS software with the OpenSSL Toolkit.</LI>
+</OL>
+</LI>
+</OL>
+<P>No developer is required to provide these exceptions in a derived
+ work.</P>
+<H3><A NAME="6_1_3">Trademarks</A></H3>
 <P>Easy Software Products has trademarked the Common UNIX Printing
  System, CUPS, and CUPS logo. These names and logos may be used freely
- in any direct port or binary distribution of CUPS. To use them in
- derivative products, please contract Easy Software Products for written
- permission. Our intention is to protect the value of these trademarks
- and ensure that any derivative product meets the same high-quality
+ in any direct port or binary distribution of CUPS. Please contract Easy
+ Software Products for written permission to use them in derivative
+ products. Our intention is to protect the value of these trademarks and
+ ensure that any derivative product meets the same high-quality
  standards as the original.</P>
-<H3><A NAME="6_1_5">Binary Distribution Rights</A></H3>
+<H3><A NAME="6_1_4">Binary Distribution Rights</A></H3>
 <P>Easy Software Products also sells rights to the CUPS source code
  under a binary distribution license for vendors that are unable to
  release source code for their drivers, additions, and modifications to
  CUPS under the GNU GPL and LGPL. For information please contact us at
  the address shown above.</P>
-<P>The Common UNIX Printing System provides a &quot;pdftops&quot; filter is based
- on the Xpdf 0.93a software. For binary distribution licensing of this
+<P>The Common UNIX Printing System provides a &quot;pdftops&quot; filter that is
+ based on the Xpdf software. For binary distribution licensing of this
  software, please contact:<BLOCKQUOTE> Derek B. Noonburg
 <BR> Email:<A HREF="mailto:derekn@foolabs.com"> derekn@foolabs.com</A>
 <BR> WWW:<A HREF="http://www.foolabs.com/xpdf/">
  http://www.foolabs.com/xpdf/</A></BLOCKQUOTE></P>
-<H3><A NAME="6_1_6">Support</A></H3>
+<H3><A NAME="6_1_5">Support</A></H3>
 <P>Easy Software Products sells software support for CUPS as well as a
  commercial printing product based on CUPS called ESP Print Pro. You can
  find out more at our web site:</P>
 <UL>
 <PRE>
-<A HREF="http://www.easysw.com">http://www.easysw.com</A>
+<A HREF="http://www.easysw.com/">http://www.easysw.com/</A>
 </PRE>
 </UL>
 
