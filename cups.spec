@@ -1,5 +1,5 @@
 #
-# "$Id: cups.spec,v 1.46 2002/03/26 20:38:12 mike Exp $"
+# "$Id: cups.spec,v 1.47 2002/04/23 17:54:04 mike Exp $"
 #
 #   RPM "spec" file for the Common UNIX Printing System (CUPS).
 #
@@ -42,17 +42,11 @@ BuildRoot: /var/tmp/%{name}-root
 Conflicts: lpr, LPRng
 Provides: libcups.so.2
 Provides: libcupsimage.so.2
-Provides: cups
 
 %package devel
 Summary: Common Unix Printing System - development environment
 Group: Development/Libraries
 Provides: libcups1
-
-%package pstoraster
-Summary: Common Unix Printing System - PostScript RIP
-Group: System Environment/Daemons
-Provides: pstoraster
 
 %description
 The Common UNIX Printing System provides a portable printing layer for 
@@ -159,33 +153,10 @@ rm -rf $RPM_BUILD_ROOT
 /usr/bin/lp*
 /usr/lib/*.so*
 %dir /usr/lib/cups
-%dir /usr/lib/cups/backend
-/usr/lib/cups/backend/*
-%dir /usr/lib/cups/cgi-bin
-/usr/lib/cups/cgi-bin/*
-%dir /usr/lib/cups/daemon
-/usr/lib/cups/daemon/*
-%dir /usr/lib/cups/filter
-/usr/lib/cups/filter/hpgltops
-/usr/lib/cups/filter/imagetops
-/usr/lib/cups/filter/imagetoraster
-/usr/lib/cups/filter/pdftops
-/usr/lib/cups/filter/pstops
-/usr/lib/cups/filter/rastertoepson
-/usr/lib/cups/filter/rastertohp
-/usr/lib/cups/filter/texttops
+/usr/lib/cups/*
 /usr/sbin/*
 %dir /usr/share/cups
-%dir /usr/share/cups/banners
-/usr/share/cups/banners/*
-%dir /usr/share/cups/charsets
-/usr/share/cups/charsets/*
-%dir /usr/share/cups/data
-/usr/share/cups/data/*
-%dir /usr/share/cups/model
-/usr/share/cups/model/*
-%dir /usr/share/cups/templates
-/usr/share/cups/templates/*
+/usr/share/cups/*
 %dir /usr/share/doc/cups
 /usr/share/doc/cups/*
 %dir /usr/share/locale
@@ -216,14 +187,6 @@ rm -rf $RPM_BUILD_ROOT
 %dir /usr/share/man/man3
 /usr/share/man/man3/*
 
-%files pstoraster
-%dir /usr/lib/cups/filter
-/usr/lib/cups/filter/pstoraster
-%dir /usr/share/cups/fonts
-/usr/share/cups/fonts/*
-%dir /usr/share/cups/pstoraster
-/usr/share/cups/pstoraster/*
-
 #
-# End of "$Id: cups.spec,v 1.46 2002/03/26 20:38:12 mike Exp $".
+# End of "$Id: cups.spec,v 1.47 2002/04/23 17:54:04 mike Exp $".
 #

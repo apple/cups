@@ -1,5 +1,5 @@
 #
-# "$Id: mime.convs,v 1.15 2002/01/23 22:30:41 mike Exp $"
+# "$Id: mime.convs,v 1.16 2002/04/23 17:54:04 mike Exp $"
 #
 #   MIME converts file for the Common UNIX Printing System (CUPS).
 #
@@ -69,7 +69,9 @@ text/html		application/postscript	33	texttops
 #
 
 image/*			application/vnd.cups-raster	100	imagetoraster
-application/vnd.cups-postscript	application/vnd.cups-raster	100	pstoraster
+
+# pstoraster is now part of ESP Ghostscript...
+#application/vnd.cups-postscript	application/vnd.cups-raster	100	pstoraster
 
 ########################################################################
 #
@@ -83,5 +85,5 @@ application/vnd.cups-postscript	application/vnd.cups-raster	100	pstoraster
 #application/octet-stream	application/vnd.cups-raw	0	-
 
 #
-# End of "$Id: mime.convs,v 1.15 2002/01/23 22:30:41 mike Exp $".
+# End of "$Id: mime.convs,v 1.16 2002/04/23 17:54:04 mike Exp $".
 #
