@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.232 2004/08/19 12:46:17 mike Exp $"
+ * "$Id: ipp.c,v 1.233 2004/08/23 18:36:50 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -15,7 +15,7 @@
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
  *       44141 Airport View Drive, Suite 204
- *       Hollywood, Maryland 20636-3142 USA
+ *       Hollywood, Maryland 20636 USA
  *
  *       Voice: (301) 373-9600
  *       EMail: cups-info@cups.org
@@ -748,7 +748,7 @@ add_class(client_t        *con,		/* I - Client connection */
     LogMessage(L_INFO, "Setting %s printer-state to %d (was %d.)", pclass->name,
                attr->values[0].integer, pclass->state);
 
-    SetPrinterState(pclass, attr->values[0].integer, 0);
+    SetPrinterState(pclass, (ipp_pstate_t)(attr->values[0].integer), 0);
   }
   if ((attr = ippFindAttribute(con->request, "printer-state-message", IPP_TAG_TEXT)) != NULL)
   {
@@ -1249,7 +1249,7 @@ add_printer(client_t        *con,	/* I - Client connection */
     LogMessage(L_INFO, "Setting %s printer-state to %d (was %d.)", printer->name,
                attr->values[0].integer, printer->state);
 
-    SetPrinterState(printer, attr->values[0].integer, 0);
+    SetPrinterState(printer, (ipp_pstate_t)(attr->values[0].integer), 0);
   }
   if ((attr = ippFindAttribute(con->request, "printer-state-message", IPP_TAG_TEXT)) != NULL)
   {
@@ -6871,5 +6871,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.232 2004/08/19 12:46:17 mike Exp $".
+ * End of "$Id: ipp.c,v 1.233 2004/08/23 18:36:50 mike Exp $".
  */
