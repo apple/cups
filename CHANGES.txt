@@ -103,6 +103,8 @@ CHANGES IN CUPS V1.1.7
 	- The scheduler now sets the HTTPS environment variable
 	  for CGI programs when a client connects using
 	  encryption.
+	- Fixed a recursion bug in the scheduler that could
+	  cause cupsd to crash when a printer was removed.
 
 
 CHANGES IN CUPS V1.1.6-3
