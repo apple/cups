@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.136 2001/06/21 22:00:54 mike Exp $"
+ * "$Id: ipp.c,v 1.137 2001/06/22 15:50:53 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -613,17 +613,22 @@ add_class(client_t        *con,		/* I - Client connection */
   else if (pclass->type & CUPS_PRINTER_IMPLICIT)
   {
    /*
-    * Rename the implicit class to "AnyClass"...
+    * Rename the implicit class to "AnyClass" or remove it...
     */
 
-    snprintf(pclass->name, sizeof(pclass->name), "Any%s", resource + 10);
-    SortPrinters();
+    if (ImplicitAnyClasses)
+    {
+      snprintf(pclass->name, sizeof(pclass->name), "Any%s", resource + 9);
+      SortPrinters();
+    }
+    else
+      DeletePrinter(pclass);
 
    /*
     * Add the class as a new local class...
     */
 
-    pclass = AddClass(resource + 10);
+    pclass = AddClass(resource + 9);
     modify = 0;
   }
   else if (pclass->type & CUPS_PRINTER_REMOTE)
@@ -633,7 +638,7 @@ add_class(client_t        *con,		/* I - Client connection */
     */
 
     DeletePrinterFilters(pclass);
-    snprintf(pclass->name, sizeof(pclass->name), "%s@%s", resource + 10,
+    snprintf(pclass->name, sizeof(pclass->name), "%s@%s", resource + 9,
              pclass->hostname);
     SetPrinterAttrs(pclass);
     SortPrinters();
@@ -642,7 +647,7 @@ add_class(client_t        *con,		/* I - Client connection */
     * Add the class as a new local class...
     */
 
-    pclass = AddClass(resource + 10);
+    pclass = AddClass(resource + 9);
     modify = 0;
   }
   else
@@ -1054,11 +1059,16 @@ add_printer(client_t        *con,	/* I - Client connection */
   else if (printer->type & CUPS_PRINTER_IMPLICIT)
   {
    /*
-    * Rename the implicit printer to "AnyPrinter"...
+    * Rename the implicit printer to "AnyPrinter" or delete it...
     */
 
-    snprintf(printer->name, sizeof(printer->name), "Any%s", resource + 10);
-    SortPrinters();
+    if (ImplicitAnyClasses)
+    {
+      snprintf(printer->name, sizeof(printer->name), "Any%s", resource + 10);
+      SortPrinters();
+    }
+    else
+      DeletePrinter(printer);
 
    /*
     * Add the printer as a new local printer...
@@ -3136,6 +3146,10 @@ get_printers(client_t *con,		/* I - Client connection */
   int			printer_type,	/* printer-type attribute */
 			printer_mask;	/* printer-type-mask attribute */
   char			*location;	/* Location string */
+  char			name[IPP_MAX_NAME],
+					/* Printer name */
+			*nameptr;	/* Pointer into name */
+  printer_t		*iclass;	/* Implicit class */
 
 
   LogMessage(L_DEBUG2, "get_printers(%p[%d], %x)\n", con, con->http.fd, type);
@@ -3184,6 +3198,45 @@ get_printers(client_t *con,		/* I - Client connection */
         (printer->type & printer_mask) == printer_type &&
 	(location == NULL || strcasecmp(printer->location, location) == 0))
     {
+     /*
+      * If HideImplicitMembers is enabled, see if this printer or class
+      * is a member of an implicit class...
+      */
+
+      if (ImplicitClasses && HideImplicitMembers &&
+          (printer->type & CUPS_PRINTER_REMOTE))
+      {
+       /*
+        * Make a copy of the printer name...
+	*
+	* Note: name and printer->name are both IPP_MAX_NAME characters
+	*       in size, so strcpy() is safe...
+	*/
+
+        strcpy(name, printer->name);
+
+	if ((nameptr = strchr(name, '@')) != NULL)
+	{
+	 /*
+	  * Strip trailing @server...
+	  */
+
+	  *nameptr = '\0';
+
+         /*
+	  * Find the core printer, if any...
+	  */
+
+          if ((iclass = FindPrinter(name)) != NULL &&
+	      (iclass->type & CUPS_PRINTER_IMPLICIT))
+	    continue;
+	}
+      }
+
+     /*
+      * Add the group separator as needed...
+      */
+
       if (count > 0)
         ippAddSeparator(con->response);
 
@@ -5409,5 +5462,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.136 2001/06/21 22:00:54 mike Exp $".
+ * End of "$Id: ipp.c,v 1.137 2001/06/22 15:50:53 mike Exp $".
  */

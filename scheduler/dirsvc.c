@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.76 2001/06/06 21:38:20 mike Exp $"
+ * "$Id: dirsvc.c,v 1.77 2001/06/22 15:50:53 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -768,14 +768,32 @@ UpdateBrowseList(void)
 	    !(pclass->type & CUPS_PRINTER_IMPLICIT))
 	{
 	 /*
-	  * Can't use same name as printer; add "Any" to the front of the
-	  * name...
+	  * Can't use same name as a local printer; add "Any" to the
+	  * front of the name, unless we have explicitly disabled
+	  * the "ImplicitAnyClasses"...
 	  */
 
-          strcpy(name, "Any");
-          strncpy(name + 3, p->name, len);
-	  name[len + 3] = '\0';
-	  offset        = 3;
+          if (ImplicitAnyClasses)
+	  {
+	   /*
+	    * Add "Any" to the class name...
+	    */
+
+            strcpy(name, "Any");
+            strncpy(name + 3, p->name, len);
+	    name[len + 3] = '\0';
+	    offset        = 3;
+	  }
+	  else
+	  {
+	   /*
+	    * Don't create an implicit class if we have a local printer
+	    * with the same name...
+	    */
+
+	    len = 0;
+	    continue;
+	  }
 	}
 
 	first = p;
@@ -964,5 +982,5 @@ StopPolling(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.76 2001/06/06 21:38:20 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.77 2001/06/22 15:50:53 mike Exp $".
  */

@@ -115,6 +115,12 @@ CHANGES IN CUPS V1.1.9
 	  specified.
 	- The IPP backend now returns as soon as a job is
 	  completed or reported as "pending-held".
+	- Added new ImplicitAnyClasses and HideImplicitMembers
+	  directives to the cupsd.conf file to make implicit
+	  classes more usable/transparent to the user.
+	- Clients can now (with the appropriate authentication)
+	  retrieve and update the server configuration files
+	  using HTTP GET and PUT requests.
 
 
 CHANGES IN CUPS V1.1.8

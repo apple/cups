@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.81 2001/06/21 22:00:54 mike Exp $"
+ * "$Id: conf.c,v 1.82 2001/06/22 15:50:53 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -91,7 +91,9 @@ static var_t	variables[] =
   { "ErrorLog",		ErrorLog,		VAR_STRING,	sizeof(ErrorLog) },
   { "FilterLimit",	&FilterLimit,		VAR_INTEGER,	0 },
   { "FontPath",		FontPath,		VAR_STRING,	sizeof(FontPath) },
+  { "HideImplicitMembers", &HideImplicitMembers, VAR_BOOLEAN,	0 },
   { "ImplicitClasses",	&ImplicitClasses,	VAR_BOOLEAN,	0 },
+  { "ImplicitAnyClasses", &ImplicitAnyClasses,	VAR_BOOLEAN,	0 },
   { "KeepAliveTimeout",	&KeepAliveTimeout,	VAR_INTEGER,	0 },
   { "KeepAlive",	&KeepAlive,		VAR_BOOLEAN,	0 },
   { "LimitRequestBody",	&MaxRequestSize,	VAR_INTEGER,	0 },
@@ -305,36 +307,38 @@ ReadConfiguration(void)
   * Numeric options...
   */
 
-  FilterLevel       = 0;
-  FilterLimit       = 0;
-  HostNameLookups   = FALSE;
-  ImplicitClasses   = TRUE;
-  KeepAlive         = TRUE;
-  KeepAliveTimeout  = DEFAULT_KEEPALIVE;
-  ListenBackLog     = SOMAXCONN;
-  LogLevel          = L_ERROR;
-  MaxClients        = 100;
-  MaxLogSize        = 1024 * 1024;
-  MaxRequestSize    = 0;
-  RunAsUser         = FALSE;
-  Timeout           = DEFAULT_TIMEOUT;
+  FilterLevel         = 0;
+  FilterLimit         = 0;
+  HostNameLookups     = FALSE;
+  ImplicitClasses     = TRUE;
+  ImplicitAnyClasses  = FALSE;
+  HideImplicitMembers = TRUE;
+  KeepAlive           = TRUE;
+  KeepAliveTimeout    = DEFAULT_KEEPALIVE;
+  ListenBackLog       = SOMAXCONN;
+  LogLevel            = L_ERROR;
+  MaxClients          = 100;
+  MaxLogSize          = 1024 * 1024;
+  MaxRequestSize      = 0;
+  RunAsUser           = FALSE;
+  Timeout             = DEFAULT_TIMEOUT;
 
-  BrowseInterval    = DEFAULT_INTERVAL;
-  BrowsePort        = ippPort();
-  BrowseShortNames  = TRUE;
-  BrowseTimeout     = DEFAULT_TIMEOUT;
-  Browsing          = TRUE;
-  NumBrowsers       = 0;
-  NumPolled         = 0;
+  BrowseInterval      = DEFAULT_INTERVAL;
+  BrowsePort          = ippPort();
+  BrowseShortNames    = TRUE;
+  BrowseTimeout       = DEFAULT_TIMEOUT;
+  Browsing            = TRUE;
+  NumBrowsers         = 0;
+  NumPolled           = 0;
 
-  NumListeners      = 0;
+  NumListeners        = 0;
 
-  JobHistory        = DEFAULT_HISTORY;
-  JobFiles          = DEFAULT_FILES;
-  JobAutoPurge      = 0;
-  MaxJobs           = 0;
-  MaxJobsPerUser    = 0;
-  MaxJobsPerPrinter = 0;
+  JobHistory          = DEFAULT_HISTORY;
+  JobFiles            = DEFAULT_FILES;
+  JobAutoPurge        = 0;
+  MaxJobs             = 0;
+  MaxJobsPerUser      = 0;
+  MaxJobsPerPrinter   = 0;
 
  /*
   * Read the configuration file...
@@ -1669,5 +1673,5 @@ get_address(char               *value,		/* I - Value string */
 
 
 /*
- * End of "$Id: conf.c,v 1.81 2001/06/21 22:00:54 mike Exp $".
+ * End of "$Id: conf.c,v 1.82 2001/06/22 15:50:53 mike Exp $".
  */
