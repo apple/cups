@@ -3,13 +3,19 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.21rc1
 
+	- The printer-is-accepting-jobs status of remote
+	  printers was not sent to clients via browsing or
+	  polling (STR #571)
+	- Browse packets did not indicate whether a printer
+	  was accepting or rejecting jobs.
 	- The web interface did not show the printer state
 	  history information (STR #592)
 	- The rastertoepson filter would crash under certain
 	  cirsumstances (STR #583)
 	- The USB backend did not handle serial numbers using
 	  the (incorrect) SN keyword and did not terminate the
-	  make and model name strings properly (STR #588)
+	  make and model name strings properly (STR #471, STR
+	  #588)
 	- The USB backend did not build on Solaris x86 (STR
 	  #585)
 	- The cupsDoAuthentication() function did not use the

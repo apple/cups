@@ -1,5 +1,5 @@
 /*
- * "$Id: cups-polld.c,v 1.5.2.17 2004/02/03 04:08:18 mike Exp $"
+ * "$Id: cups-polld.c,v 1.5.2.18 2004/02/24 19:04:05 mike Exp $"
  *
  *   Polling daemon for the Common UNIX Printing System (CUPS).
  *
@@ -189,11 +189,13 @@ poll_server(http_t      *http,		/* I - HTTP connection */
 			*make_model;	/* printer-make-and-model */
   cups_ptype_t		type;		/* printer-type */
   ipp_pstate_t		state;		/* printer-state */
+  int			accepting;	/* printer-is-accepting-jobs */
   struct sockaddr_in	addr;		/* Broadcast address */
   char			packet[1540];	/* Data packet */
   static const char * const attrs[] =	/* Requested attributes */
 			{
 			  "printer-info",
+			  "printer-is-accepting-jobs",
 			  "printer-location",
 			  "printer-make-and-model",
 			  "printer-name",
@@ -289,6 +291,7 @@ poll_server(http_t      *http,		/* I - HTTP connection */
       location   = "";
       make_model = "";
       type       = CUPS_PRINTER_REMOTE;
+      accepting  = 1;
       state      = IPP_PRINTER_IDLE;
 
       while (attr != NULL && attr->group_tag == IPP_TAG_PRINTER)
@@ -300,6 +303,10 @@ poll_server(http_t      *http,		/* I - HTTP connection */
         if (strcmp(attr->name, "printer-info") == 0 &&
 	    attr->value_tag == IPP_TAG_TEXT)
 	  info = attr->values[0].string.text;
+
+        if (strcmp(attr->name, "printer-is-accepting-jobs") == 0 &&
+	    attr->value_tag == IPP_TAG_BOOLEAN)
+	  accepting = attr->values[0].boolean;
 
         if (strcmp(attr->name, "printer-location") == 0 &&
 	    attr->value_tag == IPP_TAG_TEXT)
@@ -342,9 +349,13 @@ poll_server(http_t      *http,		/* I - HTTP connection */
 	* Send the printer information...
 	*/
 
+        type |= CUPS_PRINTER_REMOTE;
+
+	if (!accepting)
+	  type |= CUPS_PRINTER_REJECTING;
+
 	snprintf(packet, sizeof(packet), "%x %x %s \"%s\" \"%s\" \"%s\"\n",
-        	 type | CUPS_PRINTER_REMOTE, state, uri,
-		 location, info, make_model);
+        	 type, state, uri, location, info, make_model);
 
         fprintf(stderr, "DEBUG2: %s Sending %s", prefix, packet);
 
@@ -396,5 +407,5 @@ poll_server(http_t      *http,		/* I - HTTP connection */
 
 
 /*
- * End of "$Id: cups-polld.c,v 1.5.2.17 2004/02/03 04:08:18 mike Exp $".
+ * End of "$Id: cups-polld.c,v 1.5.2.18 2004/02/24 19:04:05 mike Exp $".
  */
