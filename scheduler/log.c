@@ -1,5 +1,5 @@
 /*
- * "$Id: log.c,v 1.19.2.2 2002/01/02 18:05:04 mike Exp $"
+ * "$Id: log.c,v 1.19.2.3 2002/01/29 18:20:40 mike Exp $"
  *
  *   Log file routines for the Common UNIX Printing System (CUPS).
  *
@@ -95,9 +95,9 @@ GetDateTime(time_t t)		/* I - Time value */
 	   date->tm_mday, months[date->tm_mon], 1900 + date->tm_year,
 	   date->tm_hour, date->tm_min, date->tm_sec,
 #ifdef HAVE_TM_GMTOFF
-           -date->tm_gmtoff / 3600, (date->tm_gmtoff / 60) % 60);
+           date->tm_gmtoff / 3600, (date->tm_gmtoff / 60) % 60);
 #else
-           -timezone / 3600, (timezone / 60) % 60);
+           timezone / 3600, (timezone / 60) % 60);
 #endif /* HAVE_TM_GMTOFF */
  
   return (s);
@@ -436,5 +436,5 @@ check_log_file(FILE       **log,	/* IO - Log file */
 
 
 /*
- * End of "$Id: log.c,v 1.19.2.2 2002/01/02 18:05:04 mike Exp $".
+ * End of "$Id: log.c,v 1.19.2.3 2002/01/29 18:20:40 mike Exp $".
  */

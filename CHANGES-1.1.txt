@@ -3,6 +3,10 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.13
 
+	- The scheduler put the wrong timezone offset in the log
+	  files (e.g. +0500 instead of -0500 for EST...)
+	- The scheduler did not ignore trailing whitespace in
+	  *.convs files.
 	- The scheduler now forces all processes to exit (kill
 	  -9) when it is stopped.  This prevents parallel and
 	  USB devices from running in the background after cupsd
