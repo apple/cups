@@ -1,5 +1,5 @@
 /*
- * "$Id: gdevcups.c,v 1.38 2000/11/28 23:59:28 mike Exp $"
+ * "$Id: gdevcups.c,v 1.39 2000/12/14 16:55:15 mike Exp $"
  *
  *   GNU Ghostscript raster output driver for the Common UNIX Printing
  *   System (CUPS).
@@ -228,13 +228,34 @@ static unsigned char	lut_rgb_color[gx_max_color_value + 1];
 static int		cupsHaveProfile = 0;
 static int		cupsMatrix[3][3][gx_max_color_value + 1];
 static int		cupsDensity[gx_max_color_value + 1];
+static unsigned char	rev_lower1[16] =
+			{
+			  0x00, 0x08, 0x04, 0x0c, 0x02, 0x0a, 0x06, 0x0e,
+			  0x01, 0x09, 0x05, 0x0d, 0x03, 0x0b, 0x07, 0x0f
+			},
+			rev_upper1[16] =
+			{
+			  0x00, 0x80, 0x40, 0xc0, 0x20, 0xa0, 0x60, 0xe0,
+			  0x10, 0x90, 0x50, 0xd0, 0x30, 0xb0, 0x70, 0xf0
+			},
+			rev_lower2[16] = /* 2-bit colors */
+			{
+			  0x00, 0x04, 0x08, 0x0c, 0x01, 0x05, 0x09, 0x0d,
+			  0x02, 0x06, 0x0a, 0x0e, 0x03, 0x07, 0x0b, 0x0f
+			},
+			rev_upper2[16] = /* 2-bit colors */
+			{
+			  0x00, 0x40, 0x80, 0xc0, 0x10, 0x50, 0x90, 0xd0,
+			  0x20, 0x60, 0xa0, 0xe0, 0x30, 0x70, 0xb0, 0xf0
+			};
 
 
 /*
  * Local functions...
  */
 
-static void	cups_print_chunked(gx_device_printer *, unsigned char *);
+static void	cups_print_chunked(gx_device_printer *, unsigned char *,
+		                   unsigned char *, int);
 static void	cups_print_banded(gx_device_printer *, unsigned char *,
 		                  unsigned char *, int);
 static void	cups_print_planar(gx_device_printer *, unsigned char *,
@@ -303,13 +324,12 @@ cups_get_matrix(gx_device *pdev,	/* I - Device info */
   if (cups->header.Duplex && cups->ppd && cups->ppd->flip_duplex &&
       !(cups->page & 1))
   {
-    pmat->xx = -(float)cups->header.HWResolution[0] / 72.0;
+    pmat->xx = (float)cups->header.HWResolution[0] / 72.0;
     pmat->xy = 0.0;
     pmat->yx = 0.0;
     pmat->yy = (float)cups->header.HWResolution[1] / 72.0;
-    pmat->tx = (float)cups->header.HWResolution[0] *
-               ((float)cups->header.PageSize[0] - pdev->HWMargins[2]) / 72.0;
-    pmat->ty = -(float)cups->header.HWResolution[1] * pdev->HWMargins[1] / 72.0;
+    pmat->tx = -(float)cups->header.HWResolution[0] * pdev->HWMargins[2] / 72.0;
+    pmat->ty = -(float)cups->header.HWResolution[1] * pdev->HWMargins[3] / 72.0;
   }
   else
   {
@@ -1353,20 +1373,15 @@ cups_print_pages(gx_device_printer *pdev,	/* I - Device info */
   if (src == NULL)	/* can't allocate input buffer */
     return_error(gs_error_VMerror);
 
-  if (cups->header.cupsColorOrder != CUPS_ORDER_CHUNKED)
-  {
-   /*
-    * Need an output buffer, too...
-    */
+ /*
+  * Need an output buffer, too...
+  */
 
-    dst = (unsigned char *)gs_malloc(cups->header.cupsBytesPerLine, 2,
-                                     "cups_print_pages");
+  dst = (unsigned char *)gs_malloc(cups->header.cupsBytesPerLine, 2,
+                                   "cups_print_pages");
 
-    if (dst == NULL)	/* can't allocate working area */
-      return_error(gs_error_VMerror);
-  }
-  else
-    dst = NULL;
+  if (dst == NULL)	/* can't allocate working area */
+    return_error(gs_error_VMerror);
 
  /*
   * See if the stream has been initialized yet...
@@ -1405,12 +1420,12 @@ cups_print_pages(gx_device_printer *pdev,	/* I - Device info */
     cupsRasterWriteHeader(cups->stream, &(cups->header));
 
     if (pdev->color_info.num_components == 1)
-      cups_print_chunked(pdev, src);
+      cups_print_chunked(pdev, src, dst, srcbytes);
     else
       switch (cups->header.cupsColorOrder)
       {
 	case CUPS_ORDER_CHUNKED :
-            cups_print_chunked(pdev, src);
+            cups_print_chunked(pdev, src, dst, srcbytes);
 	    break;
 	case CUPS_ORDER_BANDED :
             cups_print_banded(pdev, src, dst, srcbytes);
@@ -1426,8 +1441,7 @@ cups_print_pages(gx_device_printer *pdev,	/* I - Device info */
   */
 
   gs_free((char *)src, srcbytes, 1, "cups_print_pages");
-  if (dst)
-    gs_free((char *)dst, cups->header.cupsBytesPerLine, 1, "cups_print_pages");
+  gs_free((char *)dst, cups->header.cupsBytesPerLine, 1, "cups_print_pages");
 
   cups->page ++;
   fprintf(stderr, "INFO: Processing page %d...\n", cups->page);
@@ -1925,15 +1939,26 @@ cups_sync_output(gx_device *pdev)	/* I - Device info */
 
 static void
 cups_print_chunked(gx_device_printer *pdev,	/* I - Printer device */
-                   unsigned char     *src)	/* I - Scanline buffer */
+                   unsigned char     *src,	/* I - Scanline buffer */
+		   unsigned char     *dst,	/* I - Bitmap buffer */
+		   int               srcbytes)	/* I - Number of bytes in src */
 {
   int		y;				/* Looping var */
-  unsigned char	*srcptr;			/* Pointer to data */
+  unsigned char	*srcptr,			/* Pointer to data */
+		*dstptr;			/* Pointer to bits */
+  int		count;				/* Count for loop */
+  int		flip;				/* Flip scanline? */
 
+
+  if (cups->header.Duplex && cups->ppd && cups->ppd->flip_duplex &&
+      !(cups->page & 1))
+    flip = 1;
+  else
+    flip = 0;
 
  /*
-  * Loop through the page bitmap and write chunked pixels (the format
-  * is identical to GhostScript's...
+  * Loop through the page bitmap and write chunked pixels, reversing as
+  * needed...
   */
 
   for (y = 0; y < cups->height; y ++)
@@ -1948,11 +1973,104 @@ cups_print_chunked(gx_device_printer *pdev,	/* I - Printer device */
       gs_exit(1);
     }
 
-   /*
-    * Write the scanline data to the raster stream...
-    */
+    if (flip)
+    {
+     /*
+      * Flip the raster data before writing it...
+      */
 
-    cupsRasterWritePixels(cups->stream, srcptr, cups->header.cupsBytesPerLine);
+      if (srcptr[0] == 0 && memcmp(srcptr, srcptr + 1, srcbytes - 1) == 0)
+	memset(dst, 0, cups->header.cupsBytesPerLine);
+      else
+      {
+        dstptr = dst;
+	count  = srcbytes;
+
+	switch (cups->color_info.depth)
+	{
+          case 1 : /* B&W bitmap */
+	      for (srcptr += srcbytes - 1;
+	           count > 0;
+		   count --, srcptr --, dstptr ++)
+	      {
+	        *dstptr = rev_upper1[*srcptr & 15] |
+		          rev_lower1[*srcptr >> 4];
+              }
+	      break;
+
+	  case 2 : /* 2-bit grayscale */
+	      for (srcptr += srcbytes - 1;
+	           count > 0;
+		   count --, srcptr --, dstptr ++)
+	      {
+	        *dstptr = rev_upper2[*srcptr & 15] |
+		          rev_lower2[*srcptr >> 4];
+              }
+	      break;
+
+	  case 4 : /* 4-bit grayscale, or RGB, CMY, or CMYK bitmap */
+	      for (srcptr += srcbytes - 1;
+	           count > 0;
+		   count --, srcptr --, dstptr ++)
+	        *dstptr = (*srcptr >> 4) | (*srcptr << 4);
+	      break;
+
+          case 8 : /* 8-bit grayscale, or 2-bit RGB, CMY, or CMYK image */
+	      for (srcptr += srcbytes - 1;
+	           count > 0;
+		   count --, srcptr --, dstptr ++)
+	        *dstptr = *srcptr;
+	      break;
+
+          case 16 : /* 4-bit RGB, CMY or CMYK image */
+	      for (srcptr += srcbytes - 2;
+	           count > 0;
+		   count -= 2, srcptr -= 2, dstptr += 2)
+	      {
+	        dstptr[0] = srcptr[0];
+	        dstptr[1] = srcptr[1];
+              }
+	      break;
+
+          case 24 : /* 8-bit RGB or CMY image */
+	      for (srcptr += srcbytes - 3;
+	           count > 0;
+		   count -= 3, srcptr -= 3, dstptr += 3)
+	      {
+	        dstptr[0] = srcptr[0];
+	        dstptr[1] = srcptr[1];
+	        dstptr[2] = srcptr[2];
+              }
+	      break;
+
+          case 32 : /* 4-bit RGB, CMY or CMYK bitmap */
+	      for (srcptr += srcbytes - 4;
+	           count > 0;
+		   count -= 4, srcptr -= 4, dstptr += 4)
+	      {
+	        dstptr[0] = srcptr[0];
+	        dstptr[1] = srcptr[1];
+	        dstptr[2] = srcptr[2];
+	        dstptr[3] = srcptr[3];
+              }
+	      break;
+        }
+      }
+
+     /*
+      * Write the bitmap data to the raster stream...
+      */
+
+      cupsRasterWritePixels(cups->stream, dst, cups->header.cupsBytesPerLine);
+    }
+    else
+    {
+     /*
+      * Write the scanline data to the raster stream...
+      */
+
+      cupsRasterWritePixels(cups->stream, srcptr, cups->header.cupsBytesPerLine);
+    }
   }
 }
 
@@ -1975,7 +2093,14 @@ cups_print_banded(gx_device_printer *pdev,	/* I - Printer device */
   unsigned char	*srcptr;			/* Pointer to data */
   unsigned char	*cptr, *mptr, *yptr, *kptr;	/* Pointer to components */
   unsigned char	*lcptr, *lmptr;			/* ... */
+  int		flip;				/* Flip scanline? */
 
+
+  if (cups->header.Duplex && cups->ppd && cups->ppd->flip_duplex &&
+      !(cups->page & 1))
+    flip = 1;
+  else
+    flip = 0;
 
  /*
   * Loop through the page bitmap and write banded pixels...  We have
@@ -2003,6 +2128,18 @@ cups_print_banded(gx_device_printer *pdev,	/* I - Printer device */
     if (srcptr[0] == 0 && memcmp(srcptr, srcptr + 1, srcbytes - 1) == 0)
       memset(dst, 0, cups->header.cupsBytesPerLine);
     else
+    {
+      if (flip)
+        cptr = dst + bandbytes - 1;
+      else
+        cptr = dst;
+
+      mptr  = cptr + bandbytes;
+      yptr  = mptr + bandbytes;
+      kptr  = yptr + bandbytes;
+      lcptr = yptr + bandbytes;
+      lmptr = lcptr + bandbytes;
+
       switch (cups->header.cupsBitsPerColor)
       {
 	default :
@@ -2011,8 +2148,7 @@ cups_print_banded(gx_device_printer *pdev,	/* I - Printer device */
             switch (cups->header.cupsColorSpace)
 	    {
 	      default :
-	          for (x = cups->width, cptr = dst, mptr = cptr + bandbytes,
-		           yptr = mptr + bandbytes, bit = 128;
+	          for (x = cups->width, bit = flip ? 1 << (x & 7) : 128;
 		       x > 0;
 		       x --, srcptr ++)
 		  {
@@ -2023,7 +2159,21 @@ cups_print_banded(gx_device_printer *pdev,	/* I - Printer device */
 		    if (*srcptr & 0x10)
 		      *yptr |= bit;
 
-		    bit >>= 1;
+                    if (flip)
+		    {
+		      if (bit < 128)
+			bit <<= 1;
+		      else
+		      {
+			cptr --;
+			mptr --;
+			yptr --;
+			bit = 1;
+		      }
+		    }
+		    else
+		      bit >>= 1;
+
 		    x --;
 		    if (x == 0)
 		      break;
@@ -2035,7 +2185,19 @@ cups_print_banded(gx_device_printer *pdev,	/* I - Printer device */
 		    if (*srcptr & 0x1)
 		      *yptr |= bit;
 
-                    if (bit > 1)
+                    if (flip)
+		    {
+		      if (bit < 128)
+			bit <<= 1;
+		      else
+		      {
+			cptr --;
+			mptr --;
+			yptr --;
+			bit = 1;
+		      }
+		    }
+		    else if (bit > 1)
 		      bit >>= 1;
 		    else
 		    {
@@ -2052,9 +2214,7 @@ cups_print_banded(gx_device_printer *pdev,	/* I - Printer device */
 	      case CUPS_CSPACE_CMYK :
 	      case CUPS_CSPACE_YMCK :
 	      case CUPS_CSPACE_KCMY :
-	          for (x = cups->width, cptr = dst, mptr = cptr + bandbytes,
-		           yptr = mptr + bandbytes, kptr = yptr + bandbytes,
-			   bit = 128;
+	          for (x = cups->width, bit = flip ? 1 << (x & 7) : 128;
 		       x > 0;
 		       x --, srcptr ++)
 		  {
@@ -2067,7 +2227,22 @@ cups_print_banded(gx_device_printer *pdev,	/* I - Printer device */
 		    if (*srcptr & 0x10)
 		      *kptr |= bit;
 
-		    bit >>= 1;
+                    if (flip)
+		    {
+		      if (bit < 128)
+			bit <<= 1;
+		      else
+		      {
+			cptr --;
+			mptr --;
+			yptr --;
+			kptr --;
+			bit = 1;
+		      }
+		    }
+		    else
+		      bit >>= 1;
+
 		    x --;
 		    if (x == 0)
 		      break;
@@ -2081,7 +2256,20 @@ cups_print_banded(gx_device_printer *pdev,	/* I - Printer device */
 		    if (*srcptr & 0x1)
 		      *kptr |= bit;
 
-                    if (bit > 1)
+                    if (flip)
+		    {
+		      if (bit < 128)
+			bit <<= 1;
+		      else
+		      {
+			cptr --;
+			mptr --;
+			yptr --;
+			kptr --;
+			bit = 1;
+		      }
+		    }
+		    else if (bit > 1)
 		      bit >>= 1;
 		    else
 		    {
@@ -2094,10 +2282,7 @@ cups_print_banded(gx_device_printer *pdev,	/* I - Printer device */
 		  }
 	          break;
 	      case CUPS_CSPACE_KCMYcm :
-	          for (x = cups->width, kptr = dst, cptr = kptr + bandbytes,
-		           mptr = cptr + bandbytes, yptr = mptr + bandbytes,
-			   lcptr = yptr + bandbytes, lmptr = lcptr + bandbytes,
-			   bit = 128;
+	          for (x = cups->width, bit = flip ? 1 << (x & 7) : 128;
 		       x > 0;
 		       x --, srcptr ++)
 		  {
@@ -2114,7 +2299,22 @@ cups_print_banded(gx_device_printer *pdev,	/* I - Printer device */
 		    if (*srcptr & 0x01)
 		      *lmptr |= bit;
 
-                    if (bit > 1)
+                    if (flip)
+		    {
+		      if (bit < 128)
+			bit <<= 1;
+		      else
+		      {
+			cptr --;
+			mptr --;
+			yptr --;
+			kptr --;
+			lcptr --;
+			lmptr --;
+			bit = 1;
+		      }
+		    }
+		    else if (bit > 1)
 		      bit >>= 1;
 		    else
 		    {
@@ -2137,8 +2337,7 @@ cups_print_banded(gx_device_printer *pdev,	/* I - Printer device */
             switch (cups->header.cupsColorSpace)
 	    {
 	      default :
-	          for (x = cups->width, cptr = dst, mptr = cptr + bandbytes,
-		           yptr = mptr + bandbytes, bit = 0xc0;
+	          for (x = cups->width, bit = flip ? 3 << (2 * (x & 3)) : 0xc0;
 		       x > 0;
 		       x --, srcptr ++)
 		    switch (bit)
@@ -2151,7 +2350,15 @@ cups_print_banded(gx_device_printer *pdev,	/* I - Printer device */
 			  if ((temp = *srcptr & 0x03) != 0)
 			    *yptr |= temp << 6;
 
-			  bit = 0x30;
+                          if (flip)
+			  {
+			    bit = 0x03;
+			    cptr --;
+			    mptr --;
+			    yptr --;
+			  }
+			  else
+			    bit = 0x30;
 			  break;
 		      case 0x30 :
 			  if ((temp = *srcptr & 0x30) != 0)
@@ -2161,7 +2368,10 @@ cups_print_banded(gx_device_printer *pdev,	/* I - Printer device */
 			  if ((temp = *srcptr & 0x03) != 0)
 			    *yptr |= temp << 4;
 
-			  bit = 0x0c;
+			  if (flip)
+			    bit = 0xc0;
+			  else
+			    bit = 0x0c;
 			  break;
 		      case 0x0c :
 			  if ((temp = *srcptr & 0x30) != 0)
@@ -2171,7 +2381,10 @@ cups_print_banded(gx_device_printer *pdev,	/* I - Printer device */
 			  if ((temp = *srcptr & 0x03) != 0)
 			    *yptr |= temp << 2;
 
-			  bit = 0x03;
+			  if (flip)
+			    bit = 0x30;
+			  else
+			    bit = 0x03;
 			  break;
 		      case 0x03 :
 			  if ((temp = *srcptr & 0x30) != 0)
@@ -2181,10 +2394,15 @@ cups_print_banded(gx_device_printer *pdev,	/* I - Printer device */
 			  if ((temp = *srcptr & 0x03) != 0)
 			    *yptr |= temp;
 
-			  bit = 0xc0;
-			  cptr ++;
-			  mptr ++;
-			  yptr ++;
+			  if (flip)
+			    bit = 0x0c;
+			  else
+			  {
+			    bit = 0xc0;
+			    cptr ++;
+			    mptr ++;
+			    yptr ++;
+			  }
 			  break;
                     }
 	          break;
@@ -2195,9 +2413,7 @@ cups_print_banded(gx_device_printer *pdev,	/* I - Printer device */
 	      case CUPS_CSPACE_YMCK :
 	      case CUPS_CSPACE_KCMY :
 	      case CUPS_CSPACE_KCMYcm :
-	          for (x = cups->width, cptr = dst, mptr = cptr + bandbytes,
-		           yptr = mptr + bandbytes, kptr = yptr + bandbytes,
-			   bit = 0xc0;
+	          for (x = cups->width, bit = flip ? 3 << (2 * (x & 3)) : 0xc0;
 		       x > 0;
 		       x --, srcptr ++)
 		    switch (bit)
@@ -2212,7 +2428,16 @@ cups_print_banded(gx_device_printer *pdev,	/* I - Printer device */
 			  if ((temp = *srcptr & 0x03) != 0)
 			    *kptr |= temp << 6;
 
-			  bit = 0x30;
+                          if (flip)
+			  {
+			    bit = 0x03;
+			    cptr --;
+			    mptr --;
+			    yptr --;
+			    kptr --;
+			  }
+			  else
+			    bit = 0x30;
 			  break;
 		      case 0x30 :
 		          if ((temp = *srcptr & 0xc0) != 0)
@@ -2224,7 +2449,10 @@ cups_print_banded(gx_device_printer *pdev,	/* I - Printer device */
 			  if ((temp = *srcptr & 0x03) != 0)
 			    *kptr |= temp << 4;
 
-			  bit = 0x0c;
+			  if (flip)
+			    bit = 0xc0;
+			  else
+			    bit = 0x0c;
 			  break;
 		      case 0x0c :
 		          if ((temp = *srcptr & 0xc0) != 0)
@@ -2236,7 +2464,10 @@ cups_print_banded(gx_device_printer *pdev,	/* I - Printer device */
 			  if ((temp = *srcptr & 0x03) != 0)
 			    *kptr |= temp << 2;
 
-			  bit = 0x03;
+			  if (flip)
+			    bit = 0x30;
+			  else
+			    bit = 0x03;
 			  break;
 		      case 0x03 :
 		          if ((temp = *srcptr & 0xc0) != 0)
@@ -2248,11 +2479,16 @@ cups_print_banded(gx_device_printer *pdev,	/* I - Printer device */
 			  if ((temp = *srcptr & 0x03) != 0)
 			    *kptr |= temp;
 
-			  bit = 0xc0;
-			  cptr ++;
-			  mptr ++;
-			  yptr ++;
-			  kptr ++;
+			  if (flip)
+			    bit = 0x0c;
+			  else
+			  {
+			    bit = 0xc0;
+			    cptr ++;
+			    mptr ++;
+			    yptr ++;
+			    kptr ++;
+			  }
 			  break;
                     }
 	          break;
@@ -2265,8 +2501,7 @@ cups_print_banded(gx_device_printer *pdev,	/* I - Printer device */
             switch (cups->header.cupsColorSpace)
 	    {
 	      default :
-	          for (x = cups->width, cptr = dst, mptr = cptr + bandbytes,
-		           yptr = mptr + bandbytes, bit = 0xf0;
+	          for (x = cups->width, bit = flip && (x & 1) ? 0xf0 : 0x0f;
 		       x > 0;
 		       x --, srcptr += 2)
 		    switch (bit)
@@ -2280,6 +2515,13 @@ cups_print_banded(gx_device_printer *pdev,	/* I - Printer device */
 			    *yptr |= temp << 4;
 
 			  bit = 0x0f;
+
+                          if (flip)
+			  {
+			    cptr --;
+			    mptr --;
+			    yptr --;
+			  }
 			  break;
 		      case 0x0f :
 			  if ((temp = srcptr[0] & 0x0f) != 0)
@@ -2290,10 +2532,13 @@ cups_print_banded(gx_device_printer *pdev,	/* I - Printer device */
 			    *yptr |= temp;
 
 			  bit = 0xf0;
-			  cptr ++;
-			  mptr ++;
-			  yptr ++;
-			  kptr ++;
+
+                          if (!flip)
+			  {
+			    cptr ++;
+			    mptr ++;
+			    yptr ++;
+			  }
 			  break;
                     }
 	          break;
@@ -2304,9 +2549,7 @@ cups_print_banded(gx_device_printer *pdev,	/* I - Printer device */
 	      case CUPS_CSPACE_YMCK :
 	      case CUPS_CSPACE_KCMY :
 	      case CUPS_CSPACE_KCMYcm :
-	          for (x = cups->width, cptr = dst, mptr = cptr + bandbytes,
-		           yptr = mptr + bandbytes, kptr = yptr + bandbytes,
-			   bit = 0xf0;
+	          for (x = cups->width, bit = flip && (x & 1) ? 0xf0 : 0x0f;
 		       x > 0;
 		       x --, srcptr += 2)
 		    switch (bit)
@@ -2322,6 +2565,14 @@ cups_print_banded(gx_device_printer *pdev,	/* I - Printer device */
 			    *kptr |= temp << 4;
 
 			  bit = 0x0f;
+
+                          if (flip)
+			  {
+			    cptr --;
+			    mptr --;
+			    yptr --;
+			    kptr --;
+			  }
 			  break;
 		      case 0x0f :
 		          if ((temp = srcptr[0] & 0xf0) != 0)
@@ -2334,10 +2585,14 @@ cups_print_banded(gx_device_printer *pdev,	/* I - Printer device */
 			    *kptr |= temp;
 
 			  bit = 0xf0;
-			  cptr ++;
-			  mptr ++;
-			  yptr ++;
-			  kptr ++;
+
+                          if (!flip)
+			  {
+			    cptr ++;
+			    mptr ++;
+			    yptr ++;
+			    kptr ++;
+			  }
 			  break;
                     }
 	          break;
@@ -2348,14 +2603,16 @@ cups_print_banded(gx_device_printer *pdev,	/* I - Printer device */
             switch (cups->header.cupsColorSpace)
 	    {
 	      default :
-	          for (x = cups->width, cptr = dst, mptr = cptr + bandbytes,
-		           yptr = mptr + bandbytes;
-		       x > 0;
-		       x --)
+	          for (x = cups->width; x > 0; x --)
 		  {
-		    *cptr++ = *srcptr++;
-		    *mptr++ = *srcptr++;
-		    *yptr++ = *srcptr++;
+		    *cptr++ = srcptr[0];
+		    *mptr++ = srcptr[1];
+		    *yptr++ = srcptr[2];
+
+		    if (flip)
+		      srcptr += 3;
+		    else
+		      srcptr -= 3;
 		  }
 	          break;
 	      case CUPS_CSPACE_GMCK :
@@ -2365,20 +2622,23 @@ cups_print_banded(gx_device_printer *pdev,	/* I - Printer device */
 	      case CUPS_CSPACE_YMCK :
 	      case CUPS_CSPACE_KCMY :
 	      case CUPS_CSPACE_KCMYcm :
-	          for (x = cups->width, cptr = dst, mptr = cptr + bandbytes,
-		           yptr = mptr + bandbytes, kptr = yptr + bandbytes;
-		       x > 0;
-		       x --)
+	          for (x = cups->width; x > 0; x --)
 		  {
-		    *cptr++ = *srcptr++;
-		    *mptr++ = *srcptr++;
-		    *yptr++ = *srcptr++;
-		    *kptr++ = *srcptr++;
+		    *cptr++ = srcptr[0];
+		    *mptr++ = srcptr[1];
+		    *yptr++ = srcptr[2];
+		    *kptr++ = srcptr[3];
+
+		    if (flip)
+		      srcptr += 4;
+		    else
+		      srcptr -= 4;
 		  }
 	          break;
 	    }
             break;
       }
+    }
 
    /*
     * Write the bitmap data to the raster stream...
@@ -2408,6 +2668,8 @@ cups_print_planar(gx_device_printer *pdev,	/* I - Printer device */
   unsigned char	*srcptr;			/* Pointer to data */
   unsigned char	*dstptr;			/* Pointer to bitmap */
 
+
+ /**** NOTE: Currently planar output doesn't support flipped duplex!!! ****/
 
  /*
   * Loop through the page bitmap and write planar pixels...  We have
@@ -2742,5 +3004,5 @@ cups_print_planar(gx_device_printer *pdev,	/* I - Printer device */
 
 
 /*
- * End of "$Id: gdevcups.c,v 1.38 2000/11/28 23:59:28 mike Exp $".
+ * End of "$Id: gdevcups.c,v 1.39 2000/12/14 16:55:15 mike Exp $".
  */
