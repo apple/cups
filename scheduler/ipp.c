@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.127.2.32 2002/12/17 22:09:25 mike Exp $"
+ * "$Id: ipp.c,v 1.127.2.33 2002/12/18 19:20:16 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -5574,14 +5574,14 @@ set_job_attrs(client_t        *con,	/* I - Client connection */
       * Some other value; first free the old value...
       */
 
-      if (con->request->attrs == attr2)
+      if (job->attrs->attrs == attr2)
       {
-	con->request->attrs = attr2->next;
-	prev2               = NULL;
+	job->attrs->attrs = attr2->next;
+	prev2             = NULL;
       }
       else
       {
-	for (prev2 = con->request->attrs; prev2 != NULL; prev2 = prev2->next)
+	for (prev2 = job->attrs->attrs; prev2 != NULL; prev2 = prev2->next)
 	  if (prev2->next == attr2)
 	  {
 	    prev2->next = attr2->next;
@@ -5589,8 +5589,8 @@ set_job_attrs(client_t        *con,	/* I - Client connection */
 	  }
       }
 
-      if (con->request->last == attr2)
-        con->request->last = prev2;
+      if (job->attrs->last == attr2)
+        job->attrs->last = prev2;
 
       _ipp_free_attr(attr2);
 
@@ -6068,5 +6068,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.127.2.32 2002/12/17 22:09:25 mike Exp $".
+ * End of "$Id: ipp.c,v 1.127.2.33 2002/12/18 19:20:16 mike Exp $".
  */
