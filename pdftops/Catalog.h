@@ -9,7 +9,9 @@
 #ifndef CATALOG_H
 #define CATALOG_H
 
-#ifdef __GNUC__
+#include <config.h>
+
+#ifdef USE_GCC_PRAGMAS
 #pragma interface
 #endif
 
@@ -28,7 +30,7 @@ class Catalog {
 public:
 
   // Constructor.
-  Catalog(XRef *xrefA, GBool printCommands = gFalse);
+  Catalog(XRef *xrefA);
 
   // Destructor.
   ~Catalog();
@@ -63,6 +65,8 @@ public:
   // NULL if <name> is not a destination.
   LinkDest *findDest(GString *name);
 
+  Object *getOutline() { return &outline; }
+
 private:
 
   XRef *xref;			// the xref table for this PDF file
@@ -75,10 +79,10 @@ private:
   GString *baseURI;		// base URI for URI-type links
   Object metadata;		// metadata stream
   Object structTreeRoot;	// structure tree root dictionary
+  Object outline;		// outline dictionary
   GBool ok;			// true if catalog is valid
 
-  int readPageTree(Dict *pages, PageAttrs *attrs, int start,
-		   GBool printCommands);
+  int readPageTree(Dict *pages, PageAttrs *attrs, int start);
   Object *findDestInTree(Object *tree, GString *name, Object *obj);
 };
 

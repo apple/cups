@@ -6,17 +6,19 @@
 //
 //========================================================================
 
-#ifdef __GNUC__
+#include <config.h>
+
+#ifdef USE_GCC_PRAGMAS
 #pragma implementation
 #endif
 
-#include <config.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stddef.h>
 #include <string.h>
 #include "GString.h"
 #include "config.h"
+#include "GlobalParams.h"
 #include "Page.h"
 #include "Catalog.h"
 #include "Stream.h"
@@ -27,6 +29,9 @@
 #include "ErrorCodes.h"
 #include "Lexer.h"
 #include "Parser.h"
+#ifndef DISABLE_OUTLINE
+#include "Outline.h"
+#endif
 #include "PDFDoc.h"
 
 //------------------------------------------------------------------------
@@ -39,9 +44,9 @@
 //------------------------------------------------------------------------
 
 PDFDoc::PDFDoc(GString *fileNameA, GString *ownerPassword,
-	       GString *userPassword, GBool printCommandsA) {
+	       GString *userPassword) {
   Object obj;
-  GString *fileName2;
+  GString *fileName1, *fileName2;
 
   ok = gFalse;
   errCode = errNone;
@@ -51,19 +56,24 @@ PDFDoc::PDFDoc(GString *fileNameA, GString *ownerPassword,
   xref = NULL;
   catalog = NULL;
   links = NULL;
-  printCommands = printCommandsA;
+#ifndef DISABLE_OUTLINE
+  outline = NULL;
+#endif
+
+  fileName = fileNameA;
+  fileName1 = fileName;
+
 
   // try to open file
-  fileName = fileNameA;
   fileName2 = NULL;
 #ifdef VMS
-  if (!(file = fopen(fileName->getCString(), "rb", "ctx=stm"))) {
-    error(-1, "Couldn't open file '%s'", fileName->getCString());
+  if (!(file = fopen(fileName1->getCString(), "rb", "ctx=stm"))) {
+    error(-1, "Couldn't open file '%s'", fileName1->getCString());
     errCode = errOpenFile;
     return;
   }
 #else
-  if (!(file = fopen(fileName->getCString(), "rb"))) {
+  if (!(file = fopen(fileName1->getCString(), "rb"))) {
     fileName2 = fileName->copy();
     fileName2->lowerCase();
     if (!(file = fopen(fileName2->getCString(), "rb"))) {
@@ -87,7 +97,7 @@ PDFDoc::PDFDoc(GString *fileNameA, GString *ownerPassword,
 }
 
 PDFDoc::PDFDoc(BaseStream *strA, GString *ownerPassword,
-	       GString *userPassword, GBool printCommandsA) {
+	       GString *userPassword) {
   ok = gFalse;
   errCode = errNone;
   fileName = NULL;
@@ -96,7 +106,9 @@ PDFDoc::PDFDoc(BaseStream *strA, GString *ownerPassword,
   xref = NULL;
   catalog = NULL;
   links = NULL;
-  printCommands = printCommandsA;
+#ifndef DISABLE_OUTLINE
+  outline = NULL;
+#endif
   ok = setup(ownerPassword, userPassword);
 }
 
@@ -113,18 +125,28 @@ GBool PDFDoc::setup(GString *ownerPassword, GString *userPassword) {
   }
 
   // read catalog
-  catalog = new Catalog(xref, printCommands);
+  catalog = new Catalog(xref);
   if (!catalog->isOk()) {
     error(-1, "Couldn't read page catalog");
     errCode = errBadCatalog;
     return gFalse;
   }
 
+#ifndef DISABLE_OUTLINE
+  // read outline
+  outline = new Outline(catalog->getOutline(), xref);
+#endif
+
   // done
   return gTrue;
 }
 
 PDFDoc::~PDFDoc() {
+#ifndef DISABLE_OUTLINE
+  if (outline) {
+    delete outline;
+  }
+#endif
   if (catalog) {
     delete catalog;
   }
@@ -177,10 +199,12 @@ void PDFDoc::checkHeader() {
 }
 
 void PDFDoc::displayPage(OutputDev *out, int page, double zoom,
-			 int rotate, GBool doLinks) {
+			 int rotate, GBool doLinks,
+			 GBool (*abortCheckCbk)(void *data),
+			 void *abortCheckCbkData) {
   Page *p;
 
-  if (printCommands) {
+  if (globalParams->getPrintCommands()) {
     printf("***** page %d *****\n", page);
   }
   p = catalog->getPage(page);
@@ -189,19 +213,36 @@ void PDFDoc::displayPage(OutputDev *out, int page, double zoom,
       delete links;
     }
     getLinks(p);
-    p->display(out, zoom, rotate, links, catalog);
+    p->display(out, zoom, rotate, links, catalog,
+	       abortCheckCbk, abortCheckCbkData);
   } else {
-    p->display(out, zoom, rotate, NULL, catalog);
+    p->display(out, zoom, rotate, NULL, catalog,
+	       abortCheckCbk, abortCheckCbkData);
   }
 }
 
 void PDFDoc::displayPages(OutputDev *out, int firstPage, int lastPage,
-			  int zoom, int rotate, GBool doLinks) {
+			  int zoom, int rotate, GBool doLinks,
+			  GBool (*abortCheckCbk)(void *data),
+			  void *abortCheckCbkData) {
   int page;
 
   for (page = firstPage; page <= lastPage; ++page) {
-    displayPage(out, page, zoom, rotate, doLinks);
+    displayPage(out, page, zoom, rotate, doLinks,
+		abortCheckCbk, abortCheckCbkData);
   }
+}
+
+void PDFDoc::displayPageSlice(OutputDev *out, int page, double zoom,
+			      int rotate, int sliceX, int sliceY,
+			      int sliceW, int sliceH,
+			      GBool (*abortCheckCbk)(void *data),
+			      void *abortCheckCbkData) {
+  Page *p;
+
+  p = catalog->getPage(page);
+  p->displaySlice(out, zoom, rotate, sliceX, sliceY, sliceW, sliceH,
+		  NULL, catalog, abortCheckCbk, abortCheckCbkData);
 }
 
 GBool PDFDoc::isLinearized() {

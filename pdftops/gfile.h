@@ -11,7 +11,6 @@
 #ifndef GFILE_H
 #define GFILE_H
 
-#include <config.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stddef.h>
@@ -61,14 +60,14 @@ extern GString *getCurrentDir();
 
 // Append a file name to a path string.  <path> may be an empty
 // string, denoting the current directory).  Returns <path>.
-extern GString *appendToPath(GString *path, const char *fileName);
+extern GString *appendToPath(GString *path, char *fileName);
 
 // Grab the path from the front of the file name.  If there is no
 // directory component in <fileName>, returns an empty string.
-extern GString *grabPath(const char *fileName);
+extern GString *grabPath(char *fileName);
 
 // Is this an absolute path or file name?
-extern GBool isAbsolutePath(const char *path);
+extern GBool isAbsolutePath(char *path);
 
 // Make this path absolute by prepending current directory (if path is
 // relative) or prepending user's directory (if path starts with '~').
@@ -76,7 +75,7 @@ extern GString *makePathAbsolute(GString *path);
 
 // Get the modification time for <fileName>.  Returns 0 if there is an
 // error.
-extern time_t getModTime(const char *fileName);
+extern time_t getModTime(char *fileName);
 
 // Create a temporary file and open it for writing.  If <ext> is not
 // NULL, it will be used as the file name extension.  Returns both the
@@ -84,7 +83,7 @@ extern time_t getModTime(const char *fileName);
 // should be done to the returned file pointer; the file may be
 // reopened later for reading, but not for writing.  The <mode> string
 // should be "w" or "wb".  Returns true on success.
-extern GBool openTempFile(GString **name, FILE **f, const char *mode, const char *ext);
+extern GBool openTempFile(GString **name, FILE **f, char *mode, char *ext);
 
 // Execute <command>.  Returns true on success.
 extern GBool executeCommand(char *cmd);
@@ -100,7 +99,7 @@ extern char *getLine(char *buf, int size, FILE *f);
 class GDirEntry {
 public:
 
-  GDirEntry(const char *dirPath, const char *name1, GBool doStat);
+  GDirEntry(char *dirPath, char *nameA, GBool doStat);
   ~GDirEntry();
   GString *getName() { return name; }
   GBool isDir() { return dir; }
@@ -114,7 +113,7 @@ private:
 class GDir {
 public:
 
-  GDir(const char *name, GBool doStat1 = gTrue);
+  GDir(char *name, GBool doStatA = gTrue);
   ~GDir();
   GDirEntry *getNextEntry();
   void rewind();

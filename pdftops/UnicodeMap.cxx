@@ -6,11 +6,12 @@
 //
 //========================================================================
 
-#ifdef __GNUC__
+#include <config.h>
+
+#ifdef USE_GCC_PRAGMAS
 #pragma implementation
 #endif
 
-#include <config.h>
 #include <stdio.h>
 #include <string.h>
 #include "gmem.h"
@@ -101,11 +102,14 @@ UnicodeMap *UnicodeMap::parse(GString *encodingNameA) {
     ++line;
   }
 
+  fclose(f);
+
   return map;
 }
 
 UnicodeMap::UnicodeMap(GString *encodingNameA) {
   encodingName = encodingNameA;
+  unicodeOut = gFalse;
   kind = unicodeMapUser;
   ranges = NULL;
   len = 0;
@@ -114,9 +118,10 @@ UnicodeMap::UnicodeMap(GString *encodingNameA) {
   refCnt = 1;
 }
 
-UnicodeMap::UnicodeMap(char *encodingNameA,
+UnicodeMap::UnicodeMap(char *encodingNameA, GBool unicodeOutA,
 		       UnicodeMapRange *rangesA, int lenA) {
   encodingName = new GString(encodingNameA);
+  unicodeOut = unicodeOutA;
   kind = unicodeMapResident;
   ranges = rangesA;
   len = lenA;
@@ -125,8 +130,10 @@ UnicodeMap::UnicodeMap(char *encodingNameA,
   refCnt = 1;
 }
 
-UnicodeMap::UnicodeMap(char *encodingNameA, UnicodeMapFunc funcA) {
+UnicodeMap::UnicodeMap(char *encodingNameA, GBool unicodeOutA,
+		       UnicodeMapFunc funcA) {
   encodingName = new GString(encodingNameA);
+  unicodeOut = unicodeOutA;
   kind = unicodeMapFunc;
   func = funcA;
   eMaps = NULL;

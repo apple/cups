@@ -36,17 +36,6 @@
 #include "GString.h"
 #include "gfile.h"
 
-#ifdef HAVE_LIBCUPS
-#  include <cups/cups.h>
-#endif // HAVE_LIBCUPS
-
-#ifdef __sun
-// Solaris doesn't define mkstemp()...
-extern "C" {
-extern int mkstemp(char *);
-}
-#endif // __sun
-
 // Some systems don't define this, so just make it something reasonably
 // large.
 #ifndef PATH_MAX
@@ -87,10 +76,6 @@ GString *getHomeDir() {
 
   if ((s = getenv("HOME"))) {
     ret = new GString(s);
-#  ifdef HAVE_LIBCUPS
-  } else if ((s = getenv("CUPS_SERVERROOT"))) {
-    ret = new GString(s);
-#  endif // HAVE_LIBCUPS
   } else {
     if ((s = getenv("USER")))
       pw = getpwnam(s);
@@ -123,7 +108,7 @@ GString *getCurrentDir() {
   return new GString();
 }
 
-GString *appendToPath(GString *path, const char *fileName) {
+GString *appendToPath(GString *path, char *fileName) {
 #if defined(VMS)
   //---------- VMS ----------
   //~ this should handle everything necessary for file
@@ -289,10 +274,10 @@ GString *appendToPath(GString *path, const char *fileName) {
 #endif
 }
 
-GString *grabPath(const char *fileName) {
+GString *grabPath(char *fileName) {
 #ifdef VMS
   //---------- VMS ----------
-  const char *p;
+  char *p;
 
   if ((p = strrchr(fileName, ']')))
     return new GString(fileName, p + 1 - fileName);
@@ -302,7 +287,7 @@ GString *grabPath(const char *fileName) {
 
 #elif defined(__EMX__) || defined(WIN32)
   //---------- OS/2+EMX and Win32 ----------
-  const char *p;
+  char *p;
 
   if ((p = strrchr(fileName, '/')))
     return new GString(fileName, p - fileName);
@@ -314,7 +299,7 @@ GString *grabPath(const char *fileName) {
 
 #elif defined(ACORN)
   //---------- RISCOS ----------
-  const char *p;
+  char *p;
 
   if ((p = strrchr(fileName, '.')))
     return new GString(fileName, p - fileName);
@@ -322,7 +307,7 @@ GString *grabPath(const char *fileName) {
 
 #elif defined(MACOS)
   //---------- MacOS ----------
-  const char *p;
+  char *p;
 
   if ((p = strrchr(fileName, ':')))
     return new GString(fileName, p - fileName);
@@ -330,7 +315,7 @@ GString *grabPath(const char *fileName) {
 
 #else
   //---------- Unix ----------
-  const char *p;
+  char *p;
 
   if ((p = strrchr(fileName, '/')))
     return new GString(fileName, p - fileName);
@@ -338,7 +323,7 @@ GString *grabPath(const char *fileName) {
 #endif
 }
 
-GBool isAbsolutePath(const char *path) {
+GBool isAbsolutePath(char *path) {
 #ifdef VMS
   //---------- VMS ----------
   return strchr(path, ':') ||
@@ -444,7 +429,7 @@ GString *makePathAbsolute(GString *path) {
 #endif
 }
 
-time_t getModTime(const char *fileName) {
+time_t getModTime(char *fileName) {
 #ifdef WIN32
   //~ should implement this, but it's (currently) only used in xpdf
   return 0;
@@ -458,12 +443,10 @@ time_t getModTime(const char *fileName) {
 #endif
 }
 
-GBool openTempFile(GString **name, FILE **f, const char *mode, const char *ext) {
+GBool openTempFile(GString **name, FILE **f, char *mode, char *ext) {
 #if defined(WIN32)
   //---------- Win32 ----------
   char *s;
-  char buf[_MAX_PATH];
-  char *fp;
 
   if (!(s = _tempnam(getenv("TEMP"), NULL))) {
     return gFalse;
@@ -529,13 +512,13 @@ GBool openTempFile(GString **name, FILE **f, const char *mode, const char *ext) 
     }
     (*name)->append("/XXXXXX");
     fd = mkstemp((*name)->getCString());
-#  else // HAVE_MKSTEMP
+#else // HAVE_MKSTEMP
     if (!(s = tmpnam(NULL))) {
       return gFalse;
     }
     *name = new GString(s);
     fd = open((*name)->getCString(), O_WRONLY | O_CREAT | O_EXCL, 0600);
-#  endif // HAVE_MKSTEMP
+#endif // HAVE_MKSTEMP
   }
   if (fd < 0 || !(*f = fdopen(fd, mode))) {
     delete *name;
@@ -586,7 +569,7 @@ char *getLine(char *buf, int size, FILE *f) {
 // GDir and GDirEntry
 //------------------------------------------------------------------------
 
-GDirEntry::GDirEntry(const char *dirPath, const char *name1, GBool doStat) {
+GDirEntry::GDirEntry(char *dirPath, char *nameA, GBool doStat) {
 #ifdef VMS
   char *p;
 #elif defined(WIN32)
@@ -598,17 +581,17 @@ GDirEntry::GDirEntry(const char *dirPath, const char *name1, GBool doStat) {
   GString *s;
 #endif
 
-  name = new GString(name1);
+  name = new GString(nameA);
   dir = gFalse;
   if (doStat) {
 #ifdef VMS
-    if (!strcmp(name1, "-") ||
-	((p = strrchr(name1, '.')) && !strncmp(p, ".DIR;", 5)))
+    if (!strcmp(nameA, "-") ||
+	((p = strrchr(nameA, '.')) && !strncmp(p, ".DIR;", 5)))
       dir = gTrue;
 #elif defined(ACORN)
 #else
     s = new GString(dirPath);
-    appendToPath(s, name1);
+    appendToPath(s, nameA);
 #ifdef WIN32
     fa = GetFileAttributes(s->getCString());
     dir = (fa != 0xFFFFFFFF && (fa & FILE_ATTRIBUTE_DIRECTORY));
@@ -625,9 +608,9 @@ GDirEntry::~GDirEntry() {
   delete name;
 }
 
-GDir::GDir(const char *name, GBool doStat1) {
+GDir::GDir(char *name, GBool doStatA) {
   path = new GString(name);
-  doStat = doStat1;
+  doStat = doStatA;
 #if defined(WIN32)
   GString *tmp;
 
@@ -661,10 +644,8 @@ GDir::~GDir() {
 }
 
 GDirEntry *GDir::getNextEntry() {
-  struct dirent *ent;
   GDirEntry *e;
 
-  e = NULL;
 #if defined(WIN32)
   e = new GDirEntry(path->getCString(), ffd.cFileName, doStat);
   if (hnd  && !FindNextFile(hnd, &ffd)) {
@@ -673,24 +654,34 @@ GDirEntry *GDir::getNextEntry() {
   }
 #elif defined(ACORN)
 #elif defined(MACOS)
-#else
+#elif defined(VMS)
+  struct dirent *ent;
+  e = NULL;
   if (dir) {
-#ifdef VMS
     if (needParent) {
       e = new GDirEntry(path->getCString(), "-", doStat);
       needParent = gFalse;
       return e;
     }
-#endif
     ent = readdir(dir);
-#ifndef VMS
-    if (ent && !strcmp(ent->d_name, "."))
-      ent = readdir(dir);
-#endif
-    if (ent)
+    if (ent) {
       e = new GDirEntry(path->getCString(), ent->d_name, doStat);
+    }
+  }
+#else
+  struct dirent *ent;
+  e = NULL;
+  if (dir) {
+    ent = readdir(dir);
+    if (ent && !strcmp(ent->d_name, ".")) {
+      ent = readdir(dir);
+    }
+    if (ent) {
+      e = new GDirEntry(path->getCString(), ent->d_name, doStat);
+    }
   }
 #endif
+
   return e;
 }
 

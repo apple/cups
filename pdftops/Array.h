@@ -9,7 +9,9 @@
 #ifndef ARRAY_H
 #define ARRAY_H
 
-#ifdef __GNUC__
+#include <config.h>
+
+#ifdef USE_GCC_PRAGMAS
 #pragma interface
 #endif
 

@@ -6,11 +6,12 @@
 //
 //========================================================================
 
-#ifdef __GNUC__
+#include <config.h>
+
+#ifdef USE_GCC_PRAGMAS
 #pragma implementation
 #endif
 
-#include <config.h>
 #include <stdlib.h>
 #include <string.h>
 #include "gmem.h"
@@ -38,7 +39,7 @@ BuiltinFontWidths::~BuiltinFontWidths() {
   gfree(tab);
 }
 
-GBool BuiltinFontWidths::getWidth(const char *name, Gushort *width) {
+GBool BuiltinFontWidths::getWidth(char *name, Gushort *width) {
   int h;
   BuiltinFontWidth *p;
 
@@ -52,8 +53,8 @@ GBool BuiltinFontWidths::getWidth(const char *name, Gushort *width) {
   return gFalse;
 }
 
-int BuiltinFontWidths::hash(const char *name) {
-  const char *p;
+int BuiltinFontWidths::hash(char *name) {
+  char *p;
   unsigned int h;
 
   h = 0;

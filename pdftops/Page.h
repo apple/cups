@@ -9,7 +9,9 @@
 #ifndef PAGE_H
 #define PAGE_H
 
-#ifdef __GNUC__
+#include <config.h>
+
+#ifdef USE_GCC_PRAGMAS
 #pragma interface
 #endif
 
@@ -23,8 +25,14 @@ class Catalog;
 
 //------------------------------------------------------------------------
 
-struct PDFRectangle {
+class PDFRectangle {
+public:
   double x1, y1, x2, y2;
+
+  PDFRectangle() { x1 = y1 = x2 = y2 = 0; }
+  PDFRectangle(double x1A, double y1A, double x2A, double y2A)
+    { x1 = x1A; y1 = y1A; x2 = x2A; y2 = y2A; }
+  GBool isValid() { return x1 != 0 || y1 != 0 || x2 != 0 || y2 != 0; }
 };
 
 //------------------------------------------------------------------------
@@ -97,8 +105,7 @@ class Page {
 public:
 
   // Constructor.
-  Page(XRef *xrefA, int numA, Dict *pageDict, PageAttrs *attrsA,
-       GBool printCommandsA);
+  Page(XRef *xrefA, int numA, Dict *pageDict, PageAttrs *attrsA);
 
   // Destructor.
   ~Page();
@@ -135,7 +142,16 @@ public:
 
   // Display a page.
   void display(OutputDev *out, double dpi, int rotate,
-	       Links *links, Catalog *catalog);
+	       Links *links, Catalog *catalog,
+	       GBool (*abortCheckCbk)(void *data) = NULL,
+	       void *abortCheckCbkData = NULL);
+
+  // Display part of a page.
+  void displaySlice(OutputDev *out, double dpi, int rotate,
+		    int sliceX, int sliceY, int sliceW, int sliceH,
+		    Links *links, Catalog *catalog,
+		    GBool (*abortCheckCbk)(void *data) = NULL,
+		    void *abortCheckCbkData = NULL);
 
 private:
 
@@ -144,7 +160,6 @@ private:
   PageAttrs *attrs;		// page attributes
   Object annots;		// annotations array
   Object contents;		// page contents
-  GBool printCommands;		// print the drawing commands (for debugging)
   GBool ok;			// true if page is valid
 };
 

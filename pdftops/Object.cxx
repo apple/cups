@@ -6,11 +6,12 @@
 //
 //========================================================================
 
-#ifdef __GNUC__
+#include <config.h>
+
+#ifdef USE_GCC_PRAGMAS
 #pragma implementation
 #endif
 
-#include <config.h>
 #include <stddef.h>
 #include "Object.h"
 #include "Array.h"
@@ -23,7 +24,7 @@
 // Object
 //------------------------------------------------------------------------
 
-const char *objTypeNames[numObjTypes] = {
+char *objTypeNames[numObjTypes] = {
   "boolean",
   "integer",
   "real",
@@ -104,7 +105,7 @@ void Object::free() {
     delete string;
     break;
   case objName:
-    gfree((void *)name);
+    gfree(name);
     break;
   case objArray:
     if (!array->decRef()) {
@@ -122,7 +123,7 @@ void Object::free() {
     }
     break;
   case objCmd:
-    gfree((void *)cmd);
+    gfree(cmd);
     break;
   default:
     break;
@@ -133,7 +134,7 @@ void Object::free() {
   type = objNone;
 }
 
-const char *Object::getTypeName() {
+char *Object::getTypeName() {
   return objTypeNames[type];
 }
 

@@ -6,11 +6,12 @@
 //
 //========================================================================
 
-#ifdef __GNUC__
+#include <config.h>
+
+#ifdef USE_GCC_PRAGMAS
 #pragma implementation
 #endif
 
-#include <config.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stddef.h>
@@ -28,6 +29,7 @@
 #include "Decrypt.h"
 #endif
 #include "Stream.h"
+#include "JBIG2Stream.h"
 #include "Stream-CCITT.h"
 
 #ifdef __DJGPP__
@@ -35,18 +37,11 @@ static GBool setDJSYSFLAGS = gFalse;
 #endif
 
 #ifdef VMS
-#if (__VMS_VER < 70000000)
-extern "C" int unlink(const char *filename);
-#endif
 #ifdef __GNUC__
 #define SEEK_SET 0
 #define SEEK_CUR 1
 #define SEEK_END 2
 #endif
-#endif
-
-#ifdef MACOS
-#include "StuffItEngineLib.h"
 #endif
 
 //------------------------------------------------------------------------
@@ -89,7 +84,7 @@ char *Stream::getLine(char *buf, int size) {
   return buf;
 }
 
-GString *Stream::getPSFilter(const char *indent) {
+GString *Stream::getPSFilter(char *indent) {
   return new GString();
 }
 
@@ -137,7 +132,7 @@ Stream *Stream::addFilters(Object *dict) {
   return str;
 }
 
-Stream *Stream::makeFilter(const char *name, Stream *str, Object *params) {
+Stream *Stream::makeFilter(char *name, Stream *str, Object *params) {
   int pred;			// parameters
   int colors;
   int bits;
@@ -145,7 +140,7 @@ Stream *Stream::makeFilter(const char *name, Stream *str, Object *params) {
   int encoding;
   GBool endOfLine, byteAlign, endOfBlock, black;
   int columns, rows;
-  Object obj;
+  Object globals, obj;
 
   if (!strcmp(name, "ASCIIHexDecode") || !strcmp(name, "AHx")) {
     str = new ASCIIHexStream(str);
@@ -255,6 +250,12 @@ Stream *Stream::makeFilter(const char *name, Stream *str, Object *params) {
       obj.free();
     }
     str = new FlateStream(str, pred, columns, colors, bits);
+  } else if (!strcmp(name, "JBIG2Decode")) {
+    if (params->isDict()) {
+      params->dictLookup("JBIG2Globals", &globals);
+    }
+    str = new JBIG2Stream(str, &globals);
+    globals.free();
   } else {
     error(getPos(), "Unknown filter '%s'", name);
     str = new EOFStream(str);
@@ -338,51 +339,54 @@ void ImageStream::reset() {
 }
 
 GBool ImageStream::getPixel(Guchar *pix) {
+  int i;
+
+  if (imgIdx >= nVals) {
+    getLine();
+    imgIdx = 0;
+  }
+  for (i = 0; i < nComps; ++i) {
+    pix[i] = imgLine[imgIdx++];
+  }
+  return gTrue;
+}
+
+Guchar *ImageStream::getLine() {
   Gulong buf, bitMask;
   int bits;
   int c;
   int i;
 
-  if (imgIdx >= nVals) {
-
-    // read one line of image pixels
-    if (nBits == 1) {
-      for (i = 0; i < nVals; i += 8) {
-	c = str->getChar();
-	imgLine[i+0] = (Guchar)((c >> 7) & 1);
-	imgLine[i+1] = (Guchar)((c >> 6) & 1);
-	imgLine[i+2] = (Guchar)((c >> 5) & 1);
-	imgLine[i+3] = (Guchar)((c >> 4) & 1);
-	imgLine[i+4] = (Guchar)((c >> 3) & 1);
-	imgLine[i+5] = (Guchar)((c >> 2) & 1);
-	imgLine[i+6] = (Guchar)((c >> 1) & 1);
-	imgLine[i+7] = (Guchar)(c & 1);
-      }
-    } else if (nBits == 8) {
-      for (i = 0; i < nVals; ++i) {
-	imgLine[i] = str->getChar();
-      }
-    } else {
-      bitMask = (1 << nBits) - 1;
-      buf = 0;
-      bits = 0;
-      for (i = 0; i < nVals; ++i) {
-	if (bits < nBits) {
-	  buf = (buf << 8) | (str->getChar() & 0xff);
-	  bits += 8;
-	}
-	imgLine[i] = (Guchar)((buf >> (bits - nBits)) & bitMask);
-	bits -= nBits;
-      }
+  if (nBits == 1) {
+    for (i = 0; i < nVals; i += 8) {
+      c = str->getChar();
+      imgLine[i+0] = (Guchar)((c >> 7) & 1);
+      imgLine[i+1] = (Guchar)((c >> 6) & 1);
+      imgLine[i+2] = (Guchar)((c >> 5) & 1);
+      imgLine[i+3] = (Guchar)((c >> 4) & 1);
+      imgLine[i+4] = (Guchar)((c >> 3) & 1);
+      imgLine[i+5] = (Guchar)((c >> 2) & 1);
+      imgLine[i+6] = (Guchar)((c >> 1) & 1);
+      imgLine[i+7] = (Guchar)(c & 1);
     }
-
-    // reset to start of line
-    imgIdx = 0;
+  } else if (nBits == 8) {
+    for (i = 0; i < nVals; ++i) {
+      imgLine[i] = str->getChar();
+    }
+  } else {
+    bitMask = (1 << nBits) - 1;
+    buf = 0;
+    bits = 0;
+    for (i = 0; i < nVals; ++i) {
+      if (bits < nBits) {
+	buf = (buf << 8) | (str->getChar() & 0xff);
+	bits += 8;
+      }
+      imgLine[i] = (Guchar)((buf >> (bits - nBits)) & bitMask);
+      bits -= nBits;
+    }
   }
-
-  for (i = 0; i < nComps; ++i)
-    pix[i] = imgLine[imgIdx++];
-  return gTrue;
+  return imgLine;
 }
 
 void ImageStream::skipLine() {
@@ -463,7 +467,7 @@ GBool StreamPredictor::getNextLine() {
     upLeftBuf[1] = upLeftBuf[0];
     upLeftBuf[0] = predLine[i];
     if ((c = str->getRawChar()) == EOF) {
-      break;
+      return gFalse;
     }
     switch (curPred) {
     case 11:			// PNG sub
@@ -502,7 +506,6 @@ GBool StreamPredictor::getNextLine() {
   }
 
   // apply TIFF (component) predictor
-  //~ this is completely untested
   if (predictor == 2) {
     if (nBits == 1) {
       inBuf = predLine[pixBytes - 1];
@@ -577,7 +580,10 @@ Stream *FileStream::makeSubStream(Guint startA, GBool limitedA,
 }
 
 void FileStream::reset() {
-#if HAVE_FSEEK64
+#if HAVE_FSEEKO
+  savePos = (Guint)ftello(f);
+  fseeko(f, start, SEEK_SET);
+#elif HAVE_FSEEK64
   savePos = (Guint)ftell64(f);
   fseek64(f, start, SEEK_SET);
 #else
@@ -595,7 +601,9 @@ void FileStream::reset() {
 
 void FileStream::close() {
   if (saved) {
-#if HAVE_FSEEK64
+#if HAVE_FSEEKO
+    fseeko(f, savePos, SEEK_SET);
+#elif HAVE_FSEEK64
     fseek64(f, savePos, SEEK_SET);
 #else
     fseek(f, savePos, SEEK_SET);
@@ -639,14 +647,19 @@ void FileStream::setPos(Guint pos, int dir) {
   Guint size;
 
   if (dir >= 0) {
-#if HAVE_FSEEK64
+#if HAVE_FSEEKO
+    fseeko(f, pos, SEEK_SET);
+#elif HAVE_FSEEK64
     fseek64(f, pos, SEEK_SET);
 #else
     fseek(f, pos, SEEK_SET);
 #endif
     bufPos = pos;
   } else {
-#if HAVE_FSEEK64
+#if HAVE_FSEEKO
+    fseeko(f, 0, SEEK_END);
+    size = (Guint)ftello(f);
+#elif HAVE_FSEEK64
     fseek64(f, 0, SEEK_END);
     size = (Guint)ftell64(f);
 #else
@@ -659,7 +672,10 @@ void FileStream::setPos(Guint pos, int dir) {
     //~ work around a bug in cygwin's implementation of fseek
     rewind(f);
 #endif
-#if HAVE_FSEEK64
+#if HAVE_FSEEKO
+    fseeko(f, -(int)pos, SEEK_END);
+    bufPos = (Guint)ftello(f);
+#elif HAVE_FSEEK64
     fseek64(f, -(int)pos, SEEK_END);
     bufPos = (Guint)ftell64(f);
 #else
@@ -680,7 +696,7 @@ void FileStream::moveStart(int delta) {
 // MemStream
 //------------------------------------------------------------------------
 
-MemStream::MemStream(const char *bufA, Guint lengthA, Object *dictA):
+MemStream::MemStream(char *bufA, Guint lengthA, Object *dictA):
     BaseStream(dictA) {
   buf = bufA;
   needFree = gFalse;
@@ -691,7 +707,7 @@ MemStream::MemStream(const char *bufA, Guint lengthA, Object *dictA):
 
 MemStream::~MemStream() {
   if (needFree) {
-    gfree((void *)buf);
+    gfree(buf);
   }
 }
 
@@ -744,8 +760,7 @@ void MemStream::moveStart(int delta) {
 void MemStream::doDecryption(Guchar *fileKey, int keyLength,
 			     int objNum, int objGen) {
   char *newBuf;
-  const char *p;
-  char *q;
+  char *p, *q;
 
   this->BaseStream::doDecryption(fileKey, keyLength, objNum, objGen);
   if (decrypt) {
@@ -865,7 +880,7 @@ int ASCIIHexStream::lookChar() {
   return buf;
 }
 
-GString *ASCIIHexStream::getPSFilter(const char *indent) {
+GString *ASCIIHexStream::getPSFilter(char *indent) {
   GString *s;
 
   if (!(s = str->getPSFilter(indent))) {
@@ -943,7 +958,7 @@ int ASCII85Stream::lookChar() {
   return b[index];
 }
 
-GString *ASCII85Stream::getPSFilter(const char *indent) {
+GString *ASCII85Stream::getPSFilter(char *indent) {
   GString *s;
 
   if (!(s = str->getPSFilter(indent))) {
@@ -970,21 +985,12 @@ LZWStream::LZWStream(Stream *strA, int predictor, int columns, int colors,
     pred = NULL;
   }
   early = earlyA;
-  zPipe = NULL;
-  bufPtr = bufEnd = buf;
+  eof = gFalse;
+  inputBits = 0;
+  clearTable();
 }
 
 LZWStream::~LZWStream() {
-  if (zPipe) {
-#ifdef HAVE_POPEN
-    pclose(zPipe);
-#else
-    fclose(zPipe);
-#endif
-    zPipe = NULL;
-    unlink(zName->getCString());
-    delete zName;
-  }
   if (pred) {
     delete pred;
   }
@@ -995,265 +1001,143 @@ int LZWStream::getChar() {
   if (pred) {
     return pred->getChar();
   }
-  return (bufPtr >= bufEnd && !fillBuf()) ? EOF : (*bufPtr++ & 0xff);
+  if (eof) {
+    return EOF;
+  }
+  if (seqIndex >= seqLength) {
+    if (!processNextCode()) {
+      return EOF;
+    }
+  }
+  return seqBuf[seqIndex++];
 }
 
 int LZWStream::lookChar() {
   if (pred) {
     return pred->lookChar();
   }
-  return (bufPtr >= bufEnd && !fillBuf()) ? EOF : (*bufPtr & 0xff);
+  if (eof) {
+    return EOF;
+  }
+  if (seqIndex >= seqLength) {
+    if (!processNextCode()) {
+      return EOF;
+    }
+  }
+  return seqBuf[seqIndex];
 }
 
 int LZWStream::getRawChar() {
-  return (bufPtr >= bufEnd && !fillBuf()) ? EOF : (*bufPtr++ & 0xff);
+  if (eof) {
+    return EOF;
+  }
+  if (seqIndex >= seqLength) {
+    if (!processNextCode()) {
+      return EOF;
+    }
+  }
+  return seqBuf[seqIndex++];
 }
 
 void LZWStream::reset() {
-  FILE *f;
-  GString *zCmd;
-
-  //----- close old LZW stream
-  if (zPipe) {
-#ifdef HAVE_POPEN
-    pclose(zPipe);
-#else
-    fclose(zPipe);
-#endif
-    zPipe = NULL;
-    unlink(zName->getCString());
-    delete zName;
-  }
-
-  //----- tell Delorie runtime to spawn a new instance of COMMAND.COM
-  //      to run gzip
-#if __DJGPP__
-  if (!setDJSYSFLAGS) {
-    setenv("DJSYSFLAGS", "0x0002", 0);
-    setDJSYSFLAGS = gTrue;
-  }
-#endif
-
-  //----- create the .Z file
-  if (!openTempFile(&zName, &f, "wb", ".Z")) {
-    error(getPos(), "Couldn't create temporary file for LZW stream");
-    return;
-  }
-  dumpFile(f);
-  fclose(f);
-
-  //----- execute uncompress / gzip
-  zCmd = new GString(uncompressCmd);
-  zCmd->append(' ');
-  zCmd->append(zName);
-#if defined(MACOS)
-  long magicCookie;
-  // first we open the engine up
-  OSErr err = OpenSITEngine(kUseExternalEngine, &magicCookie);
-  // if we found it - let's use it!
-  if (!err && magicCookie) {
-    // make sure we have the correct version of the Engine
-    if (GetSITEngineVersion(magicCookie) >= kFirstSupportedEngine) {
-      FSSpec myFSS;
-      Str255 pName;
-      strcpy((char *)pName, zName->getCString());
-      c2pstr((char *)pName);
-      FSMakeFSSpec(0, 0, pName, &myFSS);
-      short ftype = DetermineFileType(magicCookie, &myFSS);
-      OSErr expandErr = ExpandFSSpec(magicCookie, ftype, &myFSS,
-				     NULL, NULL, kCreateFolderNever,
-				     kDeleteOriginal, kTextConvertSmart);
-    }
-  }
-#elif defined(HAVE_POPEN)
-  if (!(zPipe = popen(zCmd->getCString(), POPEN_READ_MODE))) {
-    error(getPos(), "Couldn't popen '%s'", zCmd->getCString());
-    unlink(zName->getCString());
-    delete zName;
-    return;
-  }
-#else // HAVE_POPEN
-  if (!executeCommand(zCmd->getCString())) {
-    error(getPos(), "Couldn't execute '%s'", zCmd->getCString());
-    unlink(zName->getCString());
-    delete zName;
-    return;
-  }
-  zName->del(zName->getLength() - 2, 2);
-  if (!(zPipe = fopen(zName->getCString(), "rb"))) {
-    error(getPos(), "Couldn't open uncompress file '%s'", zName->getCString());
-    unlink(zName->getCString());
-    delete zName;
-    return;
-  }
-#endif // HAVE_POPEN
-
-  //----- clean up
-  delete zCmd;
-
-  //----- initialize buffer
-  bufPtr = bufEnd = buf;
+  str->reset();
+  eof = gFalse;
+  inputBits = 0;
+  clearTable();
 }
 
-void LZWStream::dumpFile(FILE *f) {
-  int outCodeBits;		// size of output code
-  int outBits;			// max output code
-  int outBuf[8];		// output buffer
-  int outData;			// temporary output buffer
-  int inCode, outCode;		// input and output codes
-  int nextCode;			// next code index
-  GBool eof;			// set when EOF is reached
-  GBool clear;			// set if table needs to be cleared
-  GBool first;			// indicates first code word after clear
+GBool LZWStream::processNextCode() {
+  int code;
+  int nextLength;
   int i, j;
 
-  str->reset();
+  // check for EOF
+  if (eof) {
+    return gFalse;
+  }
 
-  // magic number
-  fputc(0x1f, f);
-  fputc(0x9d, f);
+  // check for eod and clear-table codes
+ start:
+  code = getCode();
+  if (code == EOF || code == 257) {
+    eof = gTrue;
+    return gFalse;
+  }
+  if (code == 256) {
+    clearTable();
+    goto start;
+  }
+  if (nextCode >= 4097) {
+    error(getPos(), "Bad LZW stream - expected clear-table code");
+    clearTable();
+  }
 
-  // max code length, block mode flag
-  fputc(0x8c, f);
+  // process the next code
+  nextLength = seqLength + 1;
+  if (code < 256) {
+    seqBuf[0] = code;
+    seqLength = 1;
+  } else if (code < nextCode) {
+    seqLength = table[code].length;
+    for (i = seqLength - 1, j = code; i > 0; --i) {
+      seqBuf[i] = table[j].tail;
+      j = table[j].head;
+    }
+    seqBuf[0] = j;
+  } else if (code == nextCode) {
+    seqBuf[seqLength] = newChar;
+    ++seqLength;
+  } else {
+    error(getPos(), "Bad LZW stream - unexpected code");
+    eof = gTrue;
+    return gFalse;
+  }
+  newChar = seqBuf[0];
+  if (first) {
+    first = gFalse;
+  } else {
+    table[nextCode].length = nextLength;
+    table[nextCode].head = prevCode;
+    table[nextCode].tail = newChar;
+    ++nextCode;
+    if (nextCode + early == 512)
+      nextBits = 10;
+    else if (nextCode + early == 1024)
+      nextBits = 11;
+    else if (nextCode + early == 2048)
+      nextBits = 12;
+  }
+  prevCode = code;
 
-  // init input side
-  inCodeBits = 9;
-  inputBuf = 0;
-  inputBits = 0;
-  eof = gFalse;
+  // reset buffer
+  seqIndex = 0;
 
-  // init output side
-  outCodeBits = 9;
+  return gTrue;
+}
 
-  // clear table
-  first = gTrue;
+void LZWStream::clearTable() {
   nextCode = 258;
-
-  clear = gFalse;
-  do {
-    for (i = 0; i < 8; ++i) {
-      // check for table overflow
-      if (nextCode + early > 0x1001) {
-	inCode = 256;
-
-      // read input code
-      } else {
-	do {
-	  inCode = getCode();
-	  if (inCode == EOF) {
-	    eof = gTrue;
-	    inCode = 0;
-	  }
-	} while (first && inCode == 256);
-      }
-
-      // compute output code
-      if (inCode < 256) {
-	outCode = inCode;
-      } else if (inCode == 256) {
-	outCode = 256;
-	clear = gTrue;
-      } else if (inCode == 257) {
-	outCode = 0;
-	eof = gTrue;
-      } else {
-	outCode = inCode - 1;
-      }
-      outBuf[i] = outCode;
-
-      // next code index
-      if (first)
-	first = gFalse;
-      else
-	++nextCode;
-
-      // check input code size
-      if (nextCode + early == 0x200)
-	inCodeBits = 10;
-      else if (nextCode + early == 0x400) {
-	inCodeBits = 11;
-      } else if (nextCode + early == 0x800) {
-	inCodeBits = 12;
-      }
-
-      // check for eof/clear
-      if (eof)
-	break;
-      if (clear) {
-	i = 8;
-	break;
-      }
-    }
-
-    // write output block
-    outData = 0;
-    outBits = 0;
-    j = 0;
-    while (j < i || outBits > 0) {
-      if (outBits < 8 && j < i) {
-	outData = outData | (outBuf[j++] << outBits);
-	outBits += outCodeBits;
-      }
-      fputc(outData & 0xff, f);
-      outData >>= 8;
-      outBits -= 8;
-    }
-
-    // check output code size
-    if (nextCode - 1 == 512 ||
-	nextCode - 1 == 1024 ||
-	nextCode - 1 == 2048 ||
-	nextCode - 1 == 4096) {
-      outCodeBits = inCodeBits;
-    }
-
-    // clear table if necessary
-    if (clear) {
-      inCodeBits = 9;
-      outCodeBits = 9;
-      first = gTrue;
-      nextCode = 258;
-      clear = gFalse;
-    }
-  } while (!eof);
+  nextBits = 9;
+  seqIndex = seqLength = 0;
+  first = gTrue;
 }
 
 int LZWStream::getCode() {
   int c;
   int code;
 
-  while (inputBits < inCodeBits) {
+  while (inputBits < nextBits) {
     if ((c = str->getChar()) == EOF)
       return EOF;
     inputBuf = (inputBuf << 8) | (c & 0xff);
     inputBits += 8;
   }
-  code = (inputBuf >> (inputBits - inCodeBits)) & ((1 << inCodeBits) - 1);
-  inputBits -= inCodeBits;
+  code = (inputBuf >> (inputBits - nextBits)) & ((1 << nextBits) - 1);
+  inputBits -= nextBits;
   return code;
 }
 
-GBool LZWStream::fillBuf() {
-  int n;
-
-  if (!zPipe)
-    return gFalse;
-  if ((n = fread(buf, 1, 256, zPipe)) < 256) {
-#ifdef HAVE_POPEN
-    pclose(zPipe);
-#else
-    fclose(zPipe);
-#endif
-    zPipe = NULL;
-    unlink(zName->getCString());
-    delete zName;
-  }
-  bufPtr = buf;
-  bufEnd = buf + n;
-  return n > 0;
-}
-
-GString *LZWStream::getPSFilter(const char *indent) {
+GString *LZWStream::getPSFilter(char *indent) {
   GString *s;
 
   if (pred) {
@@ -1290,7 +1174,7 @@ void RunLengthStream::reset() {
   eof = gFalse;
 }
 
-GString *RunLengthStream::getPSFilter(const char *indent) {
+GString *RunLengthStream::getPSFilter(char *indent) {
   GString *s;
 
   if (!(s = str->getPSFilter(indent))) {
@@ -1840,7 +1724,7 @@ short CCITTFaxStream::lookBits(int n) {
   return (inputBuf >> (inputBits - n)) & (0xffff >> (16 - n));
 }
 
-GString *CCITTFaxStream::getPSFilter(const char *indent) {
+GString *CCITTFaxStream::getPSFilter(char *indent) {
   GString *s;
   char s1[50];
 
@@ -1883,7 +1767,6 @@ GBool CCITTFaxStream::isBinary(GBool last) {
 //------------------------------------------------------------------------
 
 // IDCT constants (20.12 fixed point format)
-#ifndef FP_IDCT
 #define dctCos1    4017		// cos(pi/16)
 #define dctSin1     799		// sin(pi/16)
 #define dctCos3    3406		// cos(3*pi/16)
@@ -1892,19 +1775,6 @@ GBool CCITTFaxStream::isBinary(GBool last) {
 #define dctSin6    3784		// sin(6*pi/16)
 #define dctSqrt2   5793		// sqrt(2)
 #define dctSqrt1d2 2896		// sqrt(2) / 2
-#endif
-
-// IDCT constants
-#ifdef FP_IDCT
-#define dctCos1    0.98078528	// cos(pi/16)
-#define dctSin1    0.19509032	// sin(pi/16)
-#define dctCos3    0.83146961	// cos(3*pi/16)
-#define dctSin3    0.55557023	// sin(3*pi/16)
-#define dctCos6    0.38268343	// cos(6*pi/16)
-#define dctSin6    0.92387953	// sin(6*pi/16)
-#define dctSqrt2   1.41421356	// sqrt(2)
-#define dctSqrt1d2 0.70710678	// sqrt(2) / 2
-#endif
 
 // color conversion parameters (16.16 fixed point format)
 #define dctCrToR   91881	//  1.4020
@@ -1940,14 +1810,18 @@ DCTStream::DCTStream(Stream *strA):
     FilterStream(strA) {
   int i, j;
 
+  progressive = interleaved = gFalse;
   width = height = 0;
   mcuWidth = mcuHeight = 0;
   numComps = 0;
   comp = 0;
   x = y = dy = 0;
-  for (i = 0; i < 4; ++i)
-    for (j = 0; j < 32; ++j)
+  for (i = 0; i < 4; ++i) {
+    for (j = 0; j < 32; ++j) {
       rowBuf[i][j] = NULL;
+    }
+    frameBuf[i] = NULL;
+  }
 
   if (!dctClipInit) {
     for (i = -256; i < 0; ++i)
@@ -1964,53 +1838,172 @@ DCTStream::~DCTStream() {
   int i, j;
 
   delete str;
-  for (i = 0; i < numComps; ++i)
-    for (j = 0; j < mcuHeight; ++j)
-      gfree(rowBuf[i][j]);
+  if (progressive || !interleaved) {
+    for (i = 0; i < numComps; ++i) {
+      gfree(frameBuf[i]);
+    }
+  } else {
+    for (i = 0; i < numComps; ++i) {
+      for (j = 0; j < mcuHeight; ++j) {
+	gfree(rowBuf[i][j]);
+      }
+    }
+  }
 }
 
 void DCTStream::reset() {
+  int minHSample, minVSample;
+  int i, j;
+
   str->reset();
+
+  progressive = interleaved = gFalse;
+  width = height = 0;
+  numComps = 0;
+  numQuantTables = 0;
+  numDCHuffTables = 0;
+  numACHuffTables = 0;
+  colorXform = 0;
+  gotAdobeMarker = gFalse;
+  restartInterval = 0;
+
   if (!readHeader()) {
     y = height;
     return;
   }
-  restartMarker = 0xd0;
-  restart();
+
+  // compute MCU size
+  mcuWidth = minHSample = compInfo[0].hSample;
+  mcuHeight = minVSample = compInfo[0].vSample;
+  for (i = 1; i < numComps; ++i) {
+    if (compInfo[i].hSample < minHSample)
+      minHSample = compInfo[i].hSample;
+    if (compInfo[i].vSample < minVSample)
+      minVSample = compInfo[i].vSample;
+    if (compInfo[i].hSample > mcuWidth)
+      mcuWidth = compInfo[i].hSample;
+    if (compInfo[i].vSample > mcuHeight)
+      mcuHeight = compInfo[i].vSample;
+  }
+  for (i = 0; i < numComps; ++i) {
+    compInfo[i].hSample /= minHSample;
+    compInfo[i].vSample /= minVSample;
+  }
+  mcuWidth = (mcuWidth / minHSample) * 8;
+  mcuHeight = (mcuHeight / minVSample) * 8;
+
+  // figure out color transform
+  if (!gotAdobeMarker && numComps == 3) {
+    if (compInfo[0].id == 1 && compInfo[1].id == 2 && compInfo[2].id == 3) {
+      colorXform = 1;
+    }
+  }
+
+  if (progressive || !interleaved) {
+
+    // allocate a buffer for the whole image
+    bufWidth = ((width + mcuWidth - 1) / mcuWidth) * mcuWidth;
+    bufHeight = ((height + mcuHeight - 1) / mcuHeight) * mcuHeight;
+    for (i = 0; i < numComps; ++i) {
+      frameBuf[i] = (int *)gmalloc(bufWidth * bufHeight * sizeof(int));
+      memset(frameBuf[i], 0, bufWidth * bufHeight * sizeof(int));
+    }
+
+    // read the image data
+    do {
+      restartMarker = 0xd0;
+      restart();
+      readScan();
+    } while (readHeader());
+
+    // decode
+    decodeImage();
+
+    // initialize counters
+    comp = 0;
+    x = 0;
+    y = 0;
+
+  } else {
+
+    // allocate a buffer for one row of MCUs
+    bufWidth = ((width + mcuWidth - 1) / mcuWidth) * mcuWidth;
+    for (i = 0; i < numComps; ++i) {
+      for (j = 0; j < mcuHeight; ++j) {
+	rowBuf[i][j] = (Guchar *)gmalloc(bufWidth * sizeof(Guchar));
+      }
+    }
+
+    // initialize counters
+    comp = 0;
+    x = 0;
+    y = 0;
+    dy = mcuHeight;
+
+    restartMarker = 0xd0;
+    restart();
+  }
 }
 
 int DCTStream::getChar() {
   int c;
 
-  c = lookChar();
-  if (c == EOF)
+  if (y >= height) {
     return EOF;
-  if (++comp == numComps) {
-    comp = 0;
-    if (++x == width) {
+  }
+  if (progressive || !interleaved) {
+    c = frameBuf[comp][y * bufWidth + x];
+    if (++comp == numComps) {
+      comp = 0;
+      if (++x == width) {
+	x = 0;
+	++y;
+      }
+    }
+  } else {
+    if (dy >= mcuHeight) {
+      if (!readMCURow()) {
+	y = height;
+	return EOF;
+      }
+      comp = 0;
       x = 0;
-      ++y;
-      ++dy;
+      dy = 0;
+    }
+    c = rowBuf[comp][dy][x];
+    if (++comp == numComps) {
+      comp = 0;
+      if (++x == width) {
+	x = 0;
+	++y;
+	++dy;
+	if (y == height) {
+	  readTrailer();
+	}
+      }
     }
   }
-  if (y == height)
-    readTrailer();
   return c;
 }
 
 int DCTStream::lookChar() {
-  if (y >= height)
+  if (y >= height) {
     return EOF;
-  if (dy >= mcuHeight) {
-    if (!readMCURow()) {
-      y = height;
-      return EOF;
-    }
-    comp = 0;
-    x = 0;
-    dy = 0;
   }
-  return rowBuf[comp][dy][x];
+  if (progressive || !interleaved) {
+    return frameBuf[comp][y * bufWidth + x];
+  } else {
+    if (dy >= mcuHeight) {
+      if (!readMCURow()) {
+	y = height;
+	return EOF;
+      }
+      comp = 0;
+      x = 0;
+      dy = 0;
+    }
+    return rowBuf[comp][dy][x];
+  }
 }
 
 void DCTStream::restart() {
@@ -2018,12 +2011,16 @@ void DCTStream::restart() {
 
   inputBits = 0;
   restartCtr = restartInterval;
-  for (i = 0; i < numComps; ++i)
+  for (i = 0; i < numComps; ++i) {
     compInfo[i].prevDC = 0;
+  }
+  eobRun = 0;
 }
 
+// Read one row of MCUs from a sequential JPEG stream.
 GBool DCTStream::readMCURow() {
-  Guchar data[64];
+  int data1[64];
+  Guchar data2[64];
   Guchar *p1, *p2;
   int pY, pCb, pCr, pR, pG, pB;
   int h, v, horiz, vert, hSub, vSub;
@@ -2054,36 +2051,38 @@ GBool DCTStream::readMCURow() {
       vSub = vert / 8;
       for (y2 = 0; y2 < mcuHeight; y2 += vert) {
 	for (x2 = 0; x2 < mcuWidth; x2 += horiz) {
-	  if (!readDataUnit(&dcHuffTables[compInfo[cc].dcHuffTable],
-			    &acHuffTables[compInfo[cc].acHuffTable],
-			    quantTables[compInfo[cc].quantTable],
+	  if (!readDataUnit(&dcHuffTables[scanInfo.dcHuffTable[cc]],
+			    &acHuffTables[scanInfo.acHuffTable[cc]],
 			    &compInfo[cc].prevDC,
-			    data))
+			    data1)) {
 	    return gFalse;
+	  }
+	  transformDataUnit(quantTables[compInfo[cc].quantTable],
+			    data1, data2);
 	  if (hSub == 1 && vSub == 1) {
 	    for (y3 = 0, i = 0; y3 < 8; ++y3, i += 8) {
 	      p1 = &rowBuf[cc][y2+y3][x1+x2];
-	      p1[0] = data[i];
-	      p1[1] = data[i+1];
-	      p1[2] = data[i+2];
-	      p1[3] = data[i+3];
-	      p1[4] = data[i+4];
-	      p1[5] = data[i+5];
-	      p1[6] = data[i+6];
-	      p1[7] = data[i+7];
+	      p1[0] = data2[i];
+	      p1[1] = data2[i+1];
+	      p1[2] = data2[i+2];
+	      p1[3] = data2[i+3];
+	      p1[4] = data2[i+4];
+	      p1[5] = data2[i+5];
+	      p1[6] = data2[i+6];
+	      p1[7] = data2[i+7];
 	    }
 	  } else if (hSub == 2 && vSub == 2) {
 	    for (y3 = 0, i = 0; y3 < 16; y3 += 2, i += 8) {
 	      p1 = &rowBuf[cc][y2+y3][x1+x2];
 	      p2 = &rowBuf[cc][y2+y3+1][x1+x2];
-	      p1[0] = p1[1] = p2[0] = p2[1] = data[i];
-	      p1[2] = p1[3] = p2[2] = p2[3] = data[i+1];
-	      p1[4] = p1[5] = p2[4] = p2[5] = data[i+2];
-	      p1[6] = p1[7] = p2[6] = p2[7] = data[i+3];
-	      p1[8] = p1[9] = p2[8] = p2[9] = data[i+4];
-	      p1[10] = p1[11] = p2[10] = p2[11] = data[i+5];
-	      p1[12] = p1[13] = p2[12] = p2[13] = data[i+6];
-	      p1[14] = p1[15] = p2[14] = p2[15] = data[i+7];
+	      p1[0] = p1[1] = p2[0] = p2[1] = data2[i];
+	      p1[2] = p1[3] = p2[2] = p2[3] = data2[i+1];
+	      p1[4] = p1[5] = p2[4] = p2[5] = data2[i+2];
+	      p1[6] = p1[7] = p2[6] = p2[7] = data2[i+3];
+	      p1[8] = p1[9] = p2[8] = p2[9] = data2[i+4];
+	      p1[10] = p1[11] = p2[10] = p2[11] = data2[i+5];
+	      p1[12] = p1[13] = p2[12] = p2[13] = data2[i+6];
+	      p1[14] = p1[15] = p2[14] = p2[15] = data2[i+7];
 	    }
 	  } else {
 	    i = 0;
@@ -2091,7 +2090,7 @@ GBool DCTStream::readMCURow() {
 	      for (x3 = 0, x4 = 0; x3 < 8; ++x3, x4 += hSub) {
 		for (y5 = 0; y5 < vSub; ++y5)
 		  for (x5 = 0; x5 < hSub; ++x5)
-		    rowBuf[cc][y2+y4+y5][x1+x2+x4+x5] = data[i];
+		    rowBuf[cc][y2+y4+y5][x1+x2+x4+x5] = data2[i];
 		++i;
 	      }
 	    }
@@ -2139,71 +2138,466 @@ GBool DCTStream::readMCURow() {
   return gTrue;
 }
 
-// This IDCT algorithm is taken from:
-//   Christoph Loeffler, Adriaan Ligtenberg, George S. Moschytz,
-//   "Practical Fast 1-D DCT Algorithms with 11 Multiplications",
-//   IEEE Intl. Conf. on Acoustics, Speech & Signal Processing, 1989,
-//   988-991.
-// The stage numbers mentioned in the comments refer to Figure 1 in this
-// paper.
-#ifndef FP_IDCT
+// Read one scan from a progressive or non-interleaved JPEG stream.
+void DCTStream::readScan() {
+  int data[64];
+  int x1, y1, dy1, x2, y2, y3, cc, i;
+  int h, v, horiz, vert, hSub, vSub;
+  int *p1;
+  int c;
+
+  if (scanInfo.numComps == 1) {
+    for (cc = 0; cc < numComps; ++cc) {
+      if (scanInfo.comp[cc]) {
+	break;
+      }
+    }
+    dy1 = mcuHeight / compInfo[cc].vSample;
+  } else {
+    dy1 = mcuHeight;
+  }
+
+  for (y1 = 0; y1 < bufHeight; y1 += dy1) {
+    for (x1 = 0; x1 < bufWidth; x1 += mcuWidth) {
+
+      // deal with restart marker
+      if (restartInterval > 0 && restartCtr == 0) {
+	c = readMarker();
+	if (c != restartMarker) {
+	  error(getPos(), "Bad DCT data: incorrect restart marker");
+	  return;
+	}
+	if (++restartMarker == 0xd8) {
+	  restartMarker = 0xd0;
+	}
+	restart();
+      }
+
+      // read one MCU
+      for (cc = 0; cc < numComps; ++cc) {
+	if (!scanInfo.comp[cc]) {
+	  continue;
+	}
+
+	h = compInfo[cc].hSample;
+	v = compInfo[cc].vSample;
+	horiz = mcuWidth / h;
+	vert = mcuHeight / v;
+	hSub = horiz / 8;
+	vSub = vert / 8;
+	for (y2 = 0; y2 < dy1; y2 += vert) {
+	  for (x2 = 0; x2 < mcuWidth; x2 += horiz) {
+
+	    // pull out the current values
+	    p1 = &frameBuf[cc][(y1+y2) * bufWidth + (x1+x2)];
+	    for (y3 = 0, i = 0; y3 < 8; ++y3, i += 8) {
+	      data[i] = p1[0];
+	      data[i+1] = p1[1];
+	      data[i+2] = p1[2];
+	      data[i+3] = p1[3];
+	      data[i+4] = p1[4];
+	      data[i+5] = p1[5];
+	      data[i+6] = p1[6];
+	      data[i+7] = p1[7];
+	      p1 += bufWidth * vSub;
+	    }
+
+	    // read one data unit
+	    if (progressive) {
+	      if (!readProgressiveDataUnit(
+		       &dcHuffTables[scanInfo.dcHuffTable[cc]],
+		       &acHuffTables[scanInfo.acHuffTable[cc]],
+		       &compInfo[cc].prevDC,
+		       data)) {
+		return;
+	      }
+	    } else {
+	      if (!readDataUnit(&dcHuffTables[scanInfo.dcHuffTable[cc]],
+				&acHuffTables[scanInfo.acHuffTable[cc]],
+				&compInfo[cc].prevDC,
+				data)) {
+		return;
+	      }
+	    }
+
+	    // add the data unit into frameBuf
+	    p1 = &frameBuf[cc][(y1+y2) * bufWidth + (x1+x2)];
+	    for (y3 = 0, i = 0; y3 < 8; ++y3, i += 8) {
+	      p1[0] = data[i];
+	      p1[1] = data[i+1];
+	      p1[2] = data[i+2];
+	      p1[3] = data[i+3];
+	      p1[4] = data[i+4];
+	      p1[5] = data[i+5];
+	      p1[6] = data[i+6];
+	      p1[7] = data[i+7];
+	      p1 += bufWidth * vSub;
+	    }
+	  }
+	}
+      }
+      --restartCtr;
+    }
+  }
+}
+
+// Read one data unit from a sequential JPEG stream.
 GBool DCTStream::readDataUnit(DCTHuffTable *dcHuffTable,
 			      DCTHuffTable *acHuffTable,
-			      Guchar quantTable[64], int *prevDC,
-			      Guchar data[64]) {
-  int tmp1[64];
-  int v0, v1, v2, v3, v4, v5, v6, v7, t;
+			      int *prevDC, int data[64]) {
   int run, size, amp;
   int c;
   int i, j;
 
-  // Huffman decode and dequantize
-  size = readHuffSym(dcHuffTable);
-  if (size == 9999)
+  if ((size = readHuffSym(dcHuffTable)) == 9999) {
     return gFalse;
+  }
   if (size > 0) {
-    amp = readAmp(size);
-    if (amp == 9999)
+    if ((amp = readAmp(size)) == 9999) {
       return gFalse;
+    }
   } else {
     amp = 0;
   }
-  tmp1[0] = (*prevDC += amp) * quantTable[0];
-  for (i = 1; i < 64; ++i)
-    tmp1[i] = 0;
+  data[0] = *prevDC += amp;
+  for (i = 1; i < 64; ++i) {
+    data[i] = 0;
+  }
   i = 1;
   while (i < 64) {
     run = 0;
-    while ((c = readHuffSym(acHuffTable)) == 0xf0 && run < 0x30)
+    while ((c = readHuffSym(acHuffTable)) == 0xf0 && run < 0x30) {
       run += 0x10;
-    if (c == 9999)
+    }
+    if (c == 9999) {
       return gFalse;
+    }
     if (c == 0x00) {
       break;
     } else {
       run += (c >> 4) & 0x0f;
       size = c & 0x0f;
       amp = readAmp(size);
-      if (amp == 9999)
+      if (amp == 9999) {
 	return gFalse;
+      }
       i += run;
       j = dctZigZag[i++];
-      tmp1[j] = amp * quantTable[j];
+      data[j] = amp;
     }
+  }
+  return gTrue;
+}
+
+// Read one data unit from a sequential JPEG stream.
+GBool DCTStream::readProgressiveDataUnit(DCTHuffTable *dcHuffTable,
+					 DCTHuffTable *acHuffTable,
+					 int *prevDC, int data[64]) {
+  int run, size, amp, bit, c;
+  int i, j, k;
+
+  // get the DC coefficient
+  i = scanInfo.firstCoeff;
+  if (i == 0) {
+    if (scanInfo.ah == 0) {
+      if ((size = readHuffSym(dcHuffTable)) == 9999) {
+	return gFalse;
+      }
+      if (size > 0) {
+	if ((amp = readAmp(size)) == 9999) {
+	  return gFalse;
+	}
+      } else {
+	amp = 0;
+      }
+      data[0] += (*prevDC += amp) << scanInfo.al;
+    } else {
+      if ((bit = readBit()) == 9999) {
+	return gFalse;
+      }
+      data[0] += bit << scanInfo.al;
+    }
+    ++i;
+  }
+  if (scanInfo.lastCoeff == 0) {
+    return gTrue;
+  }
+
+  // check for an EOB run
+  if (eobRun > 0) {
+    while (i <= scanInfo.lastCoeff) {
+      j = dctZigZag[i++];
+      if (data[j] != 0) {
+	if ((bit = readBit()) == EOF) {
+	  return gFalse;
+	}
+	if (bit) {
+	  data[j] += 1 << scanInfo.al;
+	}
+      }
+    }
+    --eobRun;
+    return gTrue;
+  }
+
+  // read the AC coefficients
+  while (i <= scanInfo.lastCoeff) {
+    if ((c = readHuffSym(acHuffTable)) == 9999) {
+      return gFalse;
+    }
+
+    // ZRL
+    if (c == 0xf0) {
+      k = 0;
+      while (k < 16) {
+	j = dctZigZag[i++];
+	if (data[j] == 0) {
+	  ++k;
+	} else {
+	  if ((bit = readBit()) == EOF) {
+	    return gFalse;
+	  }
+	  if (bit) {
+	    data[j] += 1 << scanInfo.al;
+	  }
+	}
+      }
+
+    // EOB run
+    } else if ((c & 0x0f) == 0x00) {
+      j = c >> 4;
+      eobRun = 0;
+      for (k = 0; k < j; ++k) {
+	if ((bit = readBit()) == EOF) {
+	  return 9999;
+	}
+	eobRun = (eobRun << 1) | bit;
+      }
+      eobRun += 1 << j;
+      while (i <= scanInfo.lastCoeff) {
+	j = dctZigZag[i++];
+	if (data[j] != 0) {
+	  if ((bit = readBit()) == EOF) {
+	    return gFalse;
+	  }
+	  if (bit) {
+	    data[j] += 1 << scanInfo.al;
+	  }
+	}
+      }
+      --eobRun;
+      break;
+
+    // zero run and one AC coefficient
+    } else {
+      run = (c >> 4) & 0x0f;
+      size = c & 0x0f;
+      if ((amp = readAmp(size)) == 9999) {
+	return gFalse;
+      }
+      k = 0;
+      do {
+	j = dctZigZag[i++];
+	while (data[j] != 0) {
+	  if ((bit = readBit()) == EOF) {
+	    return gFalse;
+	  }
+	  if (bit) {
+	    data[j] += 1 << scanInfo.al;
+	  }
+	  j = dctZigZag[i++];
+	}
+	++k;
+      } while (k <= run);
+      data[j] = amp << scanInfo.al;
+    }
+  }
+
+  return gTrue;
+}
+
+// Decode a progressive JPEG image.
+void DCTStream::decodeImage() {
+  int dataIn[64];
+  Guchar dataOut[64];
+  Guchar *quantTable;
+  int pY, pCb, pCr, pR, pG, pB;
+  int x1, y1, x2, y2, x3, y3, x4, y4, x5, y5, cc, i;
+  int h, v, horiz, vert, hSub, vSub;
+  int *p0, *p1, *p2;
+
+  for (y1 = 0; y1 < bufHeight; y1 += mcuHeight) {
+    for (x1 = 0; x1 < bufWidth; x1 += mcuWidth) {
+      for (cc = 0; cc < numComps; ++cc) {
+	quantTable = quantTables[compInfo[cc].quantTable];
+	h = compInfo[cc].hSample;
+	v = compInfo[cc].vSample;
+	horiz = mcuWidth / h;
+	vert = mcuHeight / v;
+	hSub = horiz / 8;
+	vSub = vert / 8;
+	for (y2 = 0; y2 < mcuHeight; y2 += vert) {
+	  for (x2 = 0; x2 < mcuWidth; x2 += horiz) {
+
+	    // pull out the coded data unit
+	    p1 = &frameBuf[cc][(y1+y2) * bufWidth + (x1+x2)];
+	    for (y3 = 0, i = 0; y3 < 8; ++y3, i += 8) {
+	      dataIn[i]   = p1[0];
+	      dataIn[i+1] = p1[1];
+	      dataIn[i+2] = p1[2];
+	      dataIn[i+3] = p1[3];
+	      dataIn[i+4] = p1[4];
+	      dataIn[i+5] = p1[5];
+	      dataIn[i+6] = p1[6];
+	      dataIn[i+7] = p1[7];
+	      p1 += bufWidth * vSub;
+	    }
+
+	    // transform
+	    transformDataUnit(quantTable, dataIn, dataOut);
+
+	    // store back into frameBuf, doing replication for
+	    // subsampled components
+	    p1 = &frameBuf[cc][(y1+y2) * bufWidth + (x1+x2)];
+	    if (hSub == 1 && vSub == 1) {
+	      for (y3 = 0, i = 0; y3 < 8; ++y3, i += 8) {
+		p1[0] = dataOut[i] & 0xff;
+		p1[1] = dataOut[i+1] & 0xff;
+		p1[2] = dataOut[i+2] & 0xff;
+		p1[3] = dataOut[i+3] & 0xff;
+		p1[4] = dataOut[i+4] & 0xff;
+		p1[5] = dataOut[i+5] & 0xff;
+		p1[6] = dataOut[i+6] & 0xff;
+		p1[7] = dataOut[i+7] & 0xff;
+		p1 += bufWidth;
+	      }
+	    } else if (hSub == 2 && vSub == 2) {
+	      p2 = p1 + bufWidth;
+	      for (y3 = 0, i = 0; y3 < 16; y3 += 2, i += 8) {
+		p1[0] = p1[1] = p2[0] = p2[1] = dataOut[i] & 0xff;
+		p1[2] = p1[3] = p2[2] = p2[3] = dataOut[i+1] & 0xff;
+		p1[4] = p1[5] = p2[4] = p2[5] = dataOut[i+2] & 0xff;
+		p1[6] = p1[7] = p2[6] = p2[7] = dataOut[i+3] & 0xff;
+		p1[8] = p1[9] = p2[8] = p2[9] = dataOut[i+4] & 0xff;
+		p1[10] = p1[11] = p2[10] = p2[11] = dataOut[i+5] & 0xff;
+		p1[12] = p1[13] = p2[12] = p2[13] = dataOut[i+6] & 0xff;
+		p1[14] = p1[15] = p2[14] = p2[15] = dataOut[i+7] & 0xff;
+		p1 += bufWidth * 2;
+		p2 += bufWidth * 2;
+	      }
+	    } else {
+	      i = 0;
+	      for (y3 = 0, y4 = 0; y3 < 8; ++y3, y4 += vSub) {
+		for (x3 = 0, x4 = 0; x3 < 8; ++x3, x4 += hSub) {
+		  p2 = p1 + x4;
+		  for (y5 = 0; y5 < vSub; ++y5) {
+		    for (x5 = 0; x5 < hSub; ++x5) {
+		      p2[x5] = dataOut[i] & 0xff;
+		    }
+		    p2 += bufWidth;
+		  }
+		  ++i;
+		}
+		p1 += bufWidth * vSub;
+	      }
+	    }
+	  }
+	}
+      }
+
+      // color space conversion
+      if (colorXform) {
+	// convert YCbCr to RGB
+	if (numComps == 3) {
+	  for (y2 = 0; y2 < mcuHeight; ++y2) {
+	    p0 = &frameBuf[0][(y1+y2) * bufWidth + x1];
+	    p1 = &frameBuf[1][(y1+y2) * bufWidth + x1];
+	    p2 = &frameBuf[2][(y1+y2) * bufWidth + x1];
+	    for (x2 = 0; x2 < mcuWidth; ++x2) {
+	      pY = *p0;
+	      pCb = *p1 - 128;
+	      pCr = *p2 - 128;
+	      pR = ((pY << 16) + dctCrToR * pCr + 32768) >> 16;
+	      *p0++ = dctClip[dctClipOffset + pR];
+	      pG = ((pY << 16) + dctCbToG * pCb + dctCrToG * pCr +
+		    32768) >> 16;
+	      *p1++ = dctClip[dctClipOffset + pG];
+	      pB = ((pY << 16) + dctCbToB * pCb + 32768) >> 16;
+	      *p2++ = dctClip[dctClipOffset + pB];
+	    }
+	  }
+	// convert YCbCrK to CMYK (K is passed through unchanged)
+	} else if (numComps == 4) {
+	  for (y2 = 0; y2 < mcuHeight; ++y2) {
+	    p0 = &frameBuf[0][(y1+y2) * bufWidth + x1];
+	    p1 = &frameBuf[1][(y1+y2) * bufWidth + x1];
+	    p2 = &frameBuf[2][(y1+y2) * bufWidth + x1];
+	    for (x2 = 0; x2 < mcuWidth; ++x2) {
+	      pY = *p0;
+	      pCb = *p1 - 128;
+	      pCr = *p2 - 128;
+	      pR = ((pY << 16) + dctCrToR * pCr + 32768) >> 16;
+	      *p0++ = 255 - dctClip[dctClipOffset + pR];
+	      pG = ((pY << 16) + dctCbToG * pCb + dctCrToG * pCr +
+		    32768) >> 16;
+	      *p1++ = 255 - dctClip[dctClipOffset + pG];
+	      pB = ((pY << 16) + dctCbToB * pCb + 32768) >> 16;
+	      *p2++ = 255 - dctClip[dctClipOffset + pB];
+	    }
+	  }
+	}
+      }
+    }
+  }
+}
+
+// Transform one data unit -- this performs the dequantization and
+// IDCT steps.  This IDCT algorithm is taken from:
+//   Christoph Loeffler, Adriaan Ligtenberg, George S. Moschytz,
+//   "Practical Fast 1-D DCT Algorithms with 11 Multiplications",
+//   IEEE Intl. Conf. on Acoustics, Speech & Signal Processing, 1989,
+//   988-991.
+// The stage numbers mentioned in the comments refer to Figure 1 in this
+// paper.
+void DCTStream::transformDataUnit(Guchar *quantTable,
+				  int dataIn[64], Guchar dataOut[64]) {
+  int v0, v1, v2, v3, v4, v5, v6, v7, t;
+  int *p;
+  int i;
+
+  // dequant
+  for (i = 0; i < 64; ++i) {
+    dataIn[i] *= quantTable[i];
   }
 
   // inverse DCT on rows
   for (i = 0; i < 64; i += 8) {
+    p = dataIn + i;
+
+    // check for all-zero AC coefficients
+    if (p[1] == 0 && p[2] == 0 && p[3] == 0 &&
+	p[4] == 0 && p[5] == 0 && p[6] == 0 && p[7] == 0) {
+      t = (dctSqrt2 * p[0] + 512) >> 10;
+      p[0] = t;
+      p[1] = t;
+      p[2] = t;
+      p[3] = t;
+      p[4] = t;
+      p[5] = t;
+      p[6] = t;
+      p[7] = t;
+      continue;
+    }
 
     // stage 4
-    v0 = (dctSqrt2 * tmp1[i+0] + 128) >> 8;
-    v1 = (dctSqrt2 * tmp1[i+4] + 128) >> 8;
-    v2 = tmp1[i+2];
-    v3 = tmp1[i+6];
-    v4 = (dctSqrt1d2 * (tmp1[i+1] - tmp1[i+7]) + 128) >> 8;
-    v7 = (dctSqrt1d2 * (tmp1[i+1] + tmp1[i+7]) + 128) >> 8;
-    v5 = tmp1[i+3] << 4;
-    v6 = tmp1[i+5] << 4;
+    v0 = (dctSqrt2 * p[0] + 128) >> 8;
+    v1 = (dctSqrt2 * p[4] + 128) >> 8;
+    v2 = p[2];
+    v3 = p[6];
+    v4 = (dctSqrt1d2 * (p[1] - p[7]) + 128) >> 8;
+    v7 = (dctSqrt1d2 * (p[1] + p[7]) + 128) >> 8;
+    v5 = p[3] << 4;
+    v6 = p[5] << 4;
 
     // stage 3
     t = (v0 - v1+ 1) >> 1;
@@ -2234,28 +2628,44 @@ GBool DCTStream::readDataUnit(DCTHuffTable *dcHuffTable,
     v6 = t;
 
     // stage 1
-    tmp1[i+0] = v0 + v7;
-    tmp1[i+7] = v0 - v7;
-    tmp1[i+1] = v1 + v6;
-    tmp1[i+6] = v1 - v6;
-    tmp1[i+2] = v2 + v5;
-    tmp1[i+5] = v2 - v5;
-    tmp1[i+3] = v3 + v4;
-    tmp1[i+4] = v3 - v4;
+    p[0] = v0 + v7;
+    p[7] = v0 - v7;
+    p[1] = v1 + v6;
+    p[6] = v1 - v6;
+    p[2] = v2 + v5;
+    p[5] = v2 - v5;
+    p[3] = v3 + v4;
+    p[4] = v3 - v4;
   }
 
   // inverse DCT on columns
   for (i = 0; i < 8; ++i) {
+    p = dataIn + i;
+
+    // check for all-zero AC coefficients
+    if (p[1*8] == 0 && p[2*8] == 0 && p[3*8] == 0 &&
+	p[4*8] == 0 && p[5*8] == 0 && p[6*8] == 0 && p[7*8] == 0) {
+      t = (dctSqrt2 * dataIn[i+0] + 8192) >> 14;
+      p[0*8] = t;
+      p[1*8] = t;
+      p[2*8] = t;
+      p[3*8] = t;
+      p[4*8] = t;
+      p[5*8] = t;
+      p[6*8] = t;
+      p[7*8] = t;
+      continue;
+    }
 
     // stage 4
-    v0 = (dctSqrt2 * tmp1[0*8+i] + 2048) >> 12;
-    v1 = (dctSqrt2 * tmp1[4*8+i] + 2048) >> 12;
-    v2 = tmp1[2*8+i];
-    v3 = tmp1[6*8+i];
-    v4 = (dctSqrt1d2 * (tmp1[1*8+i] - tmp1[7*8+i]) + 2048) >> 12;
-    v7 = (dctSqrt1d2 * (tmp1[1*8+i] + tmp1[7*8+i]) + 2048) >> 12;
-    v5 = tmp1[3*8+i];
-    v6 = tmp1[5*8+i];
+    v0 = (dctSqrt2 * p[0*8] + 2048) >> 12;
+    v1 = (dctSqrt2 * p[4*8] + 2048) >> 12;
+    v2 = p[2*8];
+    v3 = p[6*8];
+    v4 = (dctSqrt1d2 * (p[1*8] - p[7*8]) + 2048) >> 12;
+    v7 = (dctSqrt1d2 * (p[1*8] + p[7*8]) + 2048) >> 12;
+    v5 = p[3*8];
+    v6 = p[5*8];
 
     // stage 3
     t = (v0 - v1 + 1) >> 1;
@@ -2286,181 +2696,21 @@ GBool DCTStream::readDataUnit(DCTHuffTable *dcHuffTable,
     v6 = t;
 
     // stage 1
-    tmp1[0*8+i] = v0 + v7;
-    tmp1[7*8+i] = v0 - v7;
-    tmp1[1*8+i] = v1 + v6;
-    tmp1[6*8+i] = v1 - v6;
-    tmp1[2*8+i] = v2 + v5;
-    tmp1[5*8+i] = v2 - v5;
-    tmp1[3*8+i] = v3 + v4;
-    tmp1[4*8+i] = v3 - v4;
+    p[0*8] = v0 + v7;
+    p[7*8] = v0 - v7;
+    p[1*8] = v1 + v6;
+    p[6*8] = v1 - v6;
+    p[2*8] = v2 + v5;
+    p[5*8] = v2 - v5;
+    p[3*8] = v3 + v4;
+    p[4*8] = v3 - v4;
   }
 
   // convert to 8-bit integers
-  for (i = 0; i < 64; ++i)
-    data[i] = dctClip[dctClipOffset + 128 + ((tmp1[i] + 8) >> 4)];
-
-  return gTrue;
+  for (i = 0; i < 64; ++i) {
+    dataOut[i] = dctClip[dctClipOffset + 128 + ((dataIn[i] + 8) >> 4)];
+  }
 }
-#endif
-
-#ifdef FP_IDCT
-GBool DCTStream::readDataUnit(DCTHuffTable *dcHuffTable,
-			      DCTHuffTable *acHuffTable,
-			      Guchar quantTable[64], int *prevDC,
-			      Guchar data[64]) {
-  double tmp1[64];
-  double v0, v1, v2, v3, v4, v5, v6, v7, t;
-  int run, size, amp;
-  int c;
-  int i, j;
-
-  // Huffman decode and dequantize
-  size = readHuffSym(dcHuffTable);
-  if (size == 9999)
-    return gFalse;
-  if (size > 0) {
-    amp = readAmp(size);
-    if (amp == 9999)
-      return gFalse;
-  } else {
-    amp = 0;
-  }
-  tmp1[0] = (*prevDC += amp) * quantTable[0];
-  for (i = 1; i < 64; ++i)
-    tmp1[i] = 0;
-  i = 1;
-  while (i < 64) {
-    run = 0;
-    while ((c = readHuffSym(acHuffTable)) == 0xf0 && run < 0x30)
-      run += 0x10;
-    if (c == 9999)
-      return gFalse;
-    if (c == 0x00) {
-      break;
-    } else {
-      run += (c >> 4) & 0x0f;
-      size = c & 0x0f;
-      amp = readAmp(size);
-      if (amp == 9999)
-	return gFalse;
-      i += run;
-      j = dctZigZag[i++];
-      tmp1[j] = amp * quantTable[j];
-    }
-  }
-
-  // inverse DCT on rows
-  for (i = 0; i < 64; i += 8) {
-
-    // stage 4
-    v0 = dctSqrt2 * tmp1[i+0];
-    v1 = dctSqrt2 * tmp1[i+4];
-    v2 = tmp1[i+2];
-    v3 = tmp1[i+6];
-    v4 = dctSqrt1d2 * (tmp1[i+1] - tmp1[i+7]);
-    v7 = dctSqrt1d2 * (tmp1[i+1] + tmp1[i+7]);
-    v5 = tmp1[i+3];
-    v6 = tmp1[i+5];
-
-    // stage 3
-    t = 0.5 * (v0 - v1);
-    v0 = 0.5 * (v0 + v1);
-    v1 = t;
-    t = v2 * dctSin6 + v3 * dctCos6;
-    v2 = v2 * dctCos6 - v3 * dctSin6;
-    v3 = t;
-    t = 0.5 * (v4 - v6);
-    v4 = 0.5 * (v4 + v6);
-    v6 = t;
-    t = 0.5 * (v7 + v5);
-    v5 = 0.5 * (v7 - v5);
-    v7 = t;
-
-    // stage 2
-    t = 0.5 * (v0 - v3);
-    v0 = 0.5 * (v0 + v3);
-    v3 = t;
-    t = 0.5 * (v1 - v2);
-    v1 = 0.5 * (v1 + v2);
-    v2 = t;
-    t = v4 * dctSin3 + v7 * dctCos3;
-    v4 = v4 * dctCos3 - v7 * dctSin3;
-    v7 = t;
-    t = v5 * dctSin1 + v6 * dctCos1;
-    v5 = v5 * dctCos1 - v6 * dctSin1;
-    v6 = t;
-
-    // stage 1
-    tmp1[i+0] = v0 + v7;
-    tmp1[i+7] = v0 - v7;
-    tmp1[i+1] = v1 + v6;
-    tmp1[i+6] = v1 - v6;
-    tmp1[i+2] = v2 + v5;
-    tmp1[i+5] = v2 - v5;
-    tmp1[i+3] = v3 + v4;
-    tmp1[i+4] = v3 - v4;
-  }
-
-  // inverse DCT on columns
-  for (i = 0; i < 8; ++i) {
-
-    // stage 4
-    v0 = dctSqrt2 * tmp1[0*8+i];
-    v1 = dctSqrt2 * tmp1[4*8+i];
-    v2 = tmp1[2*8+i];
-    v3 = tmp1[6*8+i];
-    v4 = dctSqrt1d2 * (tmp1[1*8+i] - tmp1[7*8+i]);
-    v7 = dctSqrt1d2 * (tmp1[1*8+i] + tmp1[7*8+i]);
-    v5 = tmp1[3*8+i];
-    v6 = tmp1[5*8+i];
-
-    // stage 3
-    t = 0.5 * (v0 - v1);
-    v0 = 0.5 * (v0 + v1);
-    v1 = t;
-    t = v2 * dctSin6 + v3 * dctCos6;
-    v2 = v2 * dctCos6 - v3 * dctSin6;
-    v3 = t;
-    t = 0.5 * (v4 - v6);
-    v4 = 0.5 * (v4 + v6);
-    v6 = t;
-    t = 0.5 * (v7 + v5);
-    v5 = 0.5 * (v7 - v5);
-    v7 = t;
-
-    // stage 2
-    t = 0.5 * (v0 - v3);
-    v0 = 0.5 * (v0 + v3);
-    v3 = t;
-    t = 0.5 * (v1 - v2);
-    v1 = 0.5 * (v1 + v2);
-    v2 = t;
-    t = v4 * dctSin3 + v7 * dctCos3;
-    v4 = v4 * dctCos3 - v7 * dctSin3;
-    v7 = t;
-    t = v5 * dctSin1 + v6 * dctCos1;
-    v5 = v5 * dctCos1 - v6 * dctSin1;
-    v6 = t;
-
-    // stage 1
-    tmp1[0*8+i] = v0 + v7;
-    tmp1[7*8+i] = v0 - v7;
-    tmp1[1*8+i] = v1 + v6;
-    tmp1[6*8+i] = v1 - v6;
-    tmp1[2*8+i] = v2 + v5;
-    tmp1[5*8+i] = v2 - v5;
-    tmp1[3*8+i] = v3 + v4;
-    tmp1[4*8+i] = v3 - v4;
-  }
-
-  // convert to 8-bit integers
-  for (i = 0; i < 64; ++i)
-    data[i] = dctClip[dctClipOffset + (int)(tmp1[i] + 128.5)];
-
-  return gTrue;
-}
-#endif
 
 int DCTStream::readHuffSym(DCTHuffTable *table) {
   Gushort code;
@@ -2528,20 +2778,9 @@ int DCTStream::readBit() {
 
 GBool DCTStream::readHeader() {
   GBool doScan;
-  int minHSample, minVSample;
-  int bufWidth;
   int n;
   int c = 0;
-  int i, j;
-
-  width = height = 0;
-  numComps = 0;
-  numQuantTables = 0;
-  numDCHuffTables = 0;
-  numACHuffTables = 0;
-  colorXform = 0;
-  gotAdobeMarker = gFalse;
-  restartInterval = 0;
+  int i;
 
   // read headers
   doScan = gFalse;
@@ -2549,31 +2788,45 @@ GBool DCTStream::readHeader() {
     c = readMarker();
     switch (c) {
     case 0xc0:			// SOF0
-      if (!readFrameInfo())
+      if (!readBaselineSOF()) {
 	return gFalse;
+      }
+      break;
+    case 0xc2:			// SOF2
+      if (!readProgressiveSOF()) {
+	return gFalse;
+      }
       break;
     case 0xc4:			// DHT
-      if (!readHuffmanTables())
+      if (!readHuffmanTables()) {
 	return gFalse;
+      }
       break;
     case 0xd8:			// SOI
       break;
+    case 0xd9:			// EOI
+      return gFalse;
+      break;
     case 0xda:			// SOS
-      if (!readScanInfo())
+      if (!readScanInfo()) {
 	return gFalse;
+      }
       doScan = gTrue;
       break;
     case 0xdb:			// DQT
-      if (!readQuantTables())
+      if (!readQuantTables()) {
 	return gFalse;
+      }
       break;
     case 0xdd:			// DRI
-      if (!readRestartInterval())
+      if (!readRestartInterval()) {
 	return gFalse;
+      }
       break;
     case 0xee:			// APP14
-      if (!readAdobeMarker())
+      if (!readAdobeMarker()) {
 	return gFalse;
+      }
       break;
     case EOF:
       error(getPos(), "Bad DCT header");
@@ -2582,8 +2835,9 @@ GBool DCTStream::readHeader() {
       // skip APPn / COM / etc.
       if (c >= 0xe0) {
 	n = read16() - 2;
-	for (i = 0; i < n; ++i)
+	for (i = 0; i < n; ++i) {
 	  str->getChar();
+	}
       } else {
 	error(getPos(), "Unknown DCT marker <%02x>", c);
 	return gFalse;
@@ -2592,107 +2846,98 @@ GBool DCTStream::readHeader() {
     }
   }
 
-  // compute MCU size
-  mcuWidth = minHSample = compInfo[0].hSample;
-  mcuHeight = minVSample = compInfo[0].vSample;
-  for (i = 1; i < numComps; ++i) {
-    if (compInfo[i].hSample < minHSample)
-      minHSample = compInfo[i].hSample;
-    if (compInfo[i].vSample < minVSample)
-      minVSample = compInfo[i].vSample;
-    if (compInfo[i].hSample > mcuWidth)
-      mcuWidth = compInfo[i].hSample;
-    if (compInfo[i].vSample > mcuHeight)
-      mcuHeight = compInfo[i].vSample;
-  }
-  for (i = 0; i < numComps; ++i) {
-    compInfo[i].hSample /= minHSample;
-    compInfo[i].vSample /= minVSample;
-  }
-  mcuWidth = (mcuWidth / minHSample) * 8;
-  mcuHeight = (mcuHeight / minVSample) * 8;
-
-  // allocate buffers
-  bufWidth = ((width + mcuWidth - 1) / mcuWidth) * mcuWidth;
-  for (i = 0; i < numComps; ++i)
-    for (j = 0; j < mcuHeight; ++j)
-      rowBuf[i][j] = (Guchar *)gmalloc(bufWidth * sizeof(Guchar));
-
-  // figure out color transform
-  if (!gotAdobeMarker && numComps == 3) {
-    if (compInfo[0].id == 1 && compInfo[1].id == 2 && compInfo[2].id == 3) {
-      colorXform = 1;
-    }
-  }
-
-  // initialize counters
-  comp = 0;
-  x = 0;
-  y = 0;
-  dy = mcuHeight;
-
   return gTrue;
 }
 
-GBool DCTStream::readFrameInfo() {
+GBool DCTStream::readBaselineSOF() {
   int length;
   int prec;
   int i;
   int c;
 
-  length = read16() - 2;
+  length = read16();
   prec = str->getChar();
   height = read16();
   width = read16();
   numComps = str->getChar();
-  length -= 6;
   if (prec != 8) {
     error(getPos(), "Bad DCT precision %d", prec);
     return gFalse;
   }
   for (i = 0; i < numComps; ++i) {
     compInfo[i].id = str->getChar();
-    compInfo[i].inScan = gFalse;
     c = str->getChar();
     compInfo[i].hSample = (c >> 4) & 0x0f;
     compInfo[i].vSample = c & 0x0f;
     compInfo[i].quantTable = str->getChar();
-    compInfo[i].dcHuffTable = 0;
-    compInfo[i].acHuffTable = 0;
   }
+  progressive = gFalse;
+  return gTrue;
+}
+
+GBool DCTStream::readProgressiveSOF() {
+  int length;
+  int prec;
+  int i;
+  int c;
+
+  length = read16();
+  prec = str->getChar();
+  height = read16();
+  width = read16();
+  numComps = str->getChar();
+  if (prec != 8) {
+    error(getPos(), "Bad DCT precision %d", prec);
+    return gFalse;
+  }
+  for (i = 0; i < numComps; ++i) {
+    compInfo[i].id = str->getChar();
+    c = str->getChar();
+    compInfo[i].hSample = (c >> 4) & 0x0f;
+    compInfo[i].vSample = c & 0x0f;
+    compInfo[i].quantTable = str->getChar();
+  }
+  progressive = gTrue;
   return gTrue;
 }
 
 GBool DCTStream::readScanInfo() {
   int length;
-  int scanComps, id, c;
+  int id, c;
   int i, j;
 
   length = read16() - 2;
-  scanComps = str->getChar();
+  scanInfo.numComps = str->getChar();
   --length;
-  if (length != 2 * scanComps + 3) {
+  if (length != 2 * scanInfo.numComps + 3) {
     error(getPos(), "Bad DCT scan info block");
     return gFalse;
   }
-  for (i = 0; i < scanComps; ++i) {
+  interleaved = scanInfo.numComps == numComps;
+  for (j = 0; j < numComps; ++j) {
+    scanInfo.comp[j] = gFalse;
+  }
+  for (i = 0; i < scanInfo.numComps; ++i) {
     id = str->getChar();
     for (j = 0; j < numComps; ++j) {
-      if (id == compInfo[j].id)
+      if (id == compInfo[j].id) {
 	break;
+      }
     }
     if (j == numComps) {
       error(getPos(), "Bad DCT component ID in scan info block");
       return gFalse;
     }
-    compInfo[j].inScan = gTrue;
+    scanInfo.comp[j] = gTrue;
     c = str->getChar();
-    compInfo[j].dcHuffTable = (c >> 4) & 0x0f;
-    compInfo[j].acHuffTable = c & 0x0f;
+    scanInfo.dcHuffTable[j] = (c >> 4) & 0x0f;
+    scanInfo.acHuffTable[j] = c & 0x0f;
   }
-  str->getChar();
-  str->getChar();
-  str->getChar();
+  scanInfo.firstCoeff = str->getChar();
+  scanInfo.lastCoeff = str->getChar();
+  c = str->getChar();
+  scanInfo.ah = (c >> 4) & 0x0f;
+  scanInfo.al = c & 0x0f;
   return gTrue;
 }
 
@@ -2780,17 +3025,25 @@ GBool DCTStream::readAdobeMarker() {
   int c;
 
   length = read16();
-  if (length != 14)
+  if (length < 14) {
     goto err;
+  }
   for (i = 0; i < 12; ++i) {
-    if ((c = str->getChar()) == EOF)
+    if ((c = str->getChar()) == EOF) {
       goto err;
+    }
     buf[i] = c;
   }
-  if (strncmp(buf, "Adobe", 5))
+  if (strncmp(buf, "Adobe", 5)) {
     goto err;
+  }
   colorXform = buf[11];
   gotAdobeMarker = gTrue;
+  for (i = 14; i < length; ++i) {
+    if (str->getChar() == EOF) {
+      goto err;
+    }
+  }
   return gTrue;
 
  err:
@@ -2833,7 +3086,7 @@ int DCTStream::read16() {
   return (c1 << 8) + c2;
 }
 
-GString *DCTStream::getPSFilter(const char *indent) {
+GString *DCTStream::getPSFilter(char *indent) {
   GString *s;
 
   if (!(s = str->getPSFilter(indent))) {
@@ -2928,9 +3181,13 @@ FlateStream::FlateStream(Stream *strA, int predictor, int columns,
   } else {
     pred = NULL;
   }
+  litCodeTab.codes = NULL;
+  distCodeTab.codes = NULL;
 }
 
 FlateStream::~FlateStream() {
+  gfree(litCodeTab.codes);
+  gfree(distCodeTab.codes);
   if (pred) {
     delete pred;
   }
@@ -3019,7 +3276,7 @@ int FlateStream::getRawChar() {
   return c;
 }
 
-GString *FlateStream::getPSFilter(const char *indent) {
+GString *FlateStream::getPSFilter(char *indent) {
   return NULL;
 }
 
@@ -3097,6 +3354,12 @@ GBool FlateStream::startBlock() {
   int c;
   int check;
 
+  // free the code tables from the previous block
+  gfree(litCodeTab.codes);
+  litCodeTab.codes = NULL;
+  gfree(distCodeTab.codes);
+  distCodeTab.codes = NULL;
+
   // read block header
   blockHdr = getCodeWord(3);
   if (blockHdr & 1)
@@ -3131,8 +3394,9 @@ GBool FlateStream::startBlock() {
   // compressed block with dynamic codes
   } else if (blockHdr == 2) {
     compressedBlock = gTrue;
-    if (!readDynamicCodes())
+    if (!readDynamicCodes()) {
       goto err;
+    }
 
   // unknown block type
   } else {
@@ -3151,186 +3415,182 @@ err:
 void FlateStream::loadFixedCodes() {
   int i;
 
-  // set up code arrays
-  litCodeTab.codes = allCodes;
-  distCodeTab.codes = allCodes + flateMaxLitCodes;
-
-  // initialize literal code table
-  for (i = 0; i <= 143; ++i)
-    litCodeTab.codes[i].len = 8;
-  for (i = 144; i <= 255; ++i)
-    litCodeTab.codes[i].len = 9;
-  for (i = 256; i <= 279; ++i)
-    litCodeTab.codes[i].len = 7;
-  for (i = 280; i <= 287; ++i)
-    litCodeTab.codes[i].len = 8;
-  compHuffmanCodes(&litCodeTab, flateMaxLitCodes);
-
-  // initialize distance code table
-  for (i = 0; i <= 5; ++i) {
-    distCodeTab.start[i] = 0;
+  // build the literal code table
+  for (i = 0; i <= 143; ++i) {
+    codeLengths[i] = 8;
   }
-  for (i = 6; i <= flateMaxHuffman+1; ++i) {
-    distCodeTab.start[i] = flateMaxDistCodes;
+  for (i = 144; i <= 255; ++i) {
+    codeLengths[i] = 9;
   }
+  for (i = 256; i <= 279; ++i) {
+    codeLengths[i] = 7;
+  }
+  for (i = 280; i <= 287; ++i) {
+    codeLengths[i] = 8;
+  }
+  compHuffmanCodes(codeLengths, flateMaxLitCodes, &litCodeTab);
+
+  // build the distance code table
   for (i = 0; i < flateMaxDistCodes; ++i) {
-    distCodeTab.codes[i].len = 5;
-    distCodeTab.codes[i].code = i;
-    distCodeTab.codes[i].val = i;
+    codeLengths[i] = 5;
   }
+  compHuffmanCodes(codeLengths, flateMaxDistCodes, &distCodeTab);
 }
 
 GBool FlateStream::readDynamicCodes() {
   int numCodeLenCodes;
   int numLitCodes;
   int numDistCodes;
-  FlateCode codeLenCodes[flateMaxCodeLenCodes];
+  int codeLenCodeLengths[flateMaxCodeLenCodes];
   FlateHuffmanTab codeLenCodeTab;
   int len, repeat, code;
   int i;
 
   // read lengths
-  if ((numLitCodes = getCodeWord(5)) == EOF)
+  if ((numLitCodes = getCodeWord(5)) == EOF) {
     goto err;
+  }
   numLitCodes += 257;
-  if ((numDistCodes = getCodeWord(5)) == EOF)
+  if ((numDistCodes = getCodeWord(5)) == EOF) {
     goto err;
+  }
   numDistCodes += 1;
-  if ((numCodeLenCodes = getCodeWord(4)) == EOF)
+  if ((numCodeLenCodes = getCodeWord(4)) == EOF) {
     goto err;
+  }
   numCodeLenCodes += 4;
   if (numLitCodes > flateMaxLitCodes ||
       numDistCodes > flateMaxDistCodes ||
-      numCodeLenCodes > flateMaxCodeLenCodes)
+      numCodeLenCodes > flateMaxCodeLenCodes) {
     goto err;
-
-  // read code length code table
-  codeLenCodeTab.codes = codeLenCodes;
-  for (i = 0; i < flateMaxCodeLenCodes; ++i)
-    codeLenCodes[i].len = 0;
-  for (i = 0; i < numCodeLenCodes; ++i) {
-    if ((codeLenCodes[codeLenCodeMap[i]].len = getCodeWord(3)) == -1)
-      goto err;
   }
-  compHuffmanCodes(&codeLenCodeTab, flateMaxCodeLenCodes);
 
-  // set up code arrays
-  litCodeTab.codes = allCodes;
-  distCodeTab.codes = allCodes + numLitCodes;
+  // build the code length code table
+  for (i = 0; i < flateMaxCodeLenCodes; ++i) {
+    codeLenCodeLengths[i] = 0;
+  }
+  for (i = 0; i < numCodeLenCodes; ++i) {
+    if ((codeLenCodeLengths[codeLenCodeMap[i]] = getCodeWord(3)) == -1) {
+      goto err;
+    }
+  }
+  compHuffmanCodes(codeLenCodeLengths, flateMaxCodeLenCodes, &codeLenCodeTab);
 
-  // read literal and distance code tables
+  // build the literal and distance code tables
   len = 0;
   repeat = 0;
   i = 0;
   while (i < numLitCodes + numDistCodes) {
-    if ((code = getHuffmanCodeWord(&codeLenCodeTab)) == EOF)
+    if ((code = getHuffmanCodeWord(&codeLenCodeTab)) == EOF) {
       goto err;
+    }
     if (code == 16) {
-      if ((repeat = getCodeWord(2)) == EOF)
+      if ((repeat = getCodeWord(2)) == EOF) {
 	goto err;
-      for (repeat += 3; repeat > 0; --repeat)
-	allCodes[i++].len = len;
+      }
+      for (repeat += 3; repeat > 0; --repeat) {
+	codeLengths[i++] = len;
+      }
     } else if (code == 17) {
-      if ((repeat = getCodeWord(3)) == EOF)
+      if ((repeat = getCodeWord(3)) == EOF) {
 	goto err;
+      }
       len = 0;
-      for (repeat += 3; repeat > 0; --repeat)
-	allCodes[i++].len = 0;
+      for (repeat += 3; repeat > 0; --repeat) {
+	codeLengths[i++] = 0;
+      }
     } else if (code == 18) {
-      if ((repeat = getCodeWord(7)) == EOF)
+      if ((repeat = getCodeWord(7)) == EOF) {
 	goto err;
+      }
       len = 0;
-      for (repeat += 11; repeat > 0; --repeat)
-	allCodes[i++].len = 0;
+      for (repeat += 11; repeat > 0; --repeat) {
+	codeLengths[i++] = 0;
+      }
     } else {
-      allCodes[i++].len = len = code;
+      codeLengths[i++] = len = code;
     }
   }
-  compHuffmanCodes(&litCodeTab, numLitCodes);
-  compHuffmanCodes(&distCodeTab, numDistCodes);
+  compHuffmanCodes(codeLengths, numLitCodes, &litCodeTab);
+  compHuffmanCodes(codeLengths + numLitCodes, numDistCodes, &distCodeTab);
 
+  gfree(codeLenCodeTab.codes);
   return gTrue;
 
 err:
   error(getPos(), "Bad dynamic code table in flate stream");
+  gfree(codeLenCodeTab.codes);
   return gFalse;
 }
 
-// On entry, the <tab->codes> array contains the lengths of each code,
-// stored in code value order.  This function computes the code words.
-// The result is sorted in order of (1) code length and (2) code word.
-// The length values are no longer valid.  The <tab->start> array is
-// filled with the indexes of the first code of each length.
-void FlateStream::compHuffmanCodes(FlateHuffmanTab *tab, int n) {
-  int numLengths[flateMaxHuffman+1];
-  int nextCode[flateMaxHuffman+1];
-  int nextIndex[flateMaxHuffman+2];
-  int code;
-  int i, j;
+// Convert an array <lengths> of <n> lengths, in value order, into a
+// Huffman code lookup table.
+void FlateStream::compHuffmanCodes(int *lengths, int n, FlateHuffmanTab *tab) {
+  int tabSize, len, code, code2, skip, val, i, t;
 
-  // count number of codes for each code length
-  for (i = 0; i <= flateMaxHuffman; ++i)
-    numLengths[i] = 0;
-  for (i = 0; i < n; ++i)
-    ++numLengths[tab->codes[i].len];
-
-  // compute first index for each length
-  tab->start[0] = nextIndex[0] = 0;
-  for (i = 1; i <= flateMaxHuffman + 1; ++i)
-    tab->start[i] = nextIndex[i] = tab->start[i-1] + numLengths[i-1];
-
-  // compute first code for each length
-  code = 0;
-  numLengths[0] = 0;
-  for (i = 1; i <= flateMaxHuffman; ++i) {
-    code = (code + numLengths[i-1]) << 1;
-    nextCode[i] = code;
+  // find max code length
+  tab->maxLen = 0;
+  for (val = 0; val < n; ++val) {
+    if (lengths[val] > tab->maxLen) {
+      tab->maxLen = lengths[val];
+    }
   }
 
-  // compute the codes -- this permutes the codes array from value
-  // order to length/code order
-  for (i = 0; i < n; ++i) {
-    j = nextIndex[tab->codes[i].len]++;
-    if (tab->codes[i].len == 0)
-      tab->codes[j].code = 0;
-    else
-      tab->codes[j].code = nextCode[tab->codes[i].len]++;
-    tab->codes[j].val = i;
+  // allocate the table
+  tabSize = 1 << tab->maxLen;
+  tab->codes = (FlateCode *)gmalloc(tabSize * sizeof(FlateCode));
+
+  // clear the table
+  for (i = 0; i < tabSize; ++i) {
+    tab->codes[i].len = 0;
+    tab->codes[i].val = 0;
+  }
+
+  // build the table
+  for (len = 1, code = 0, skip = 2;
+       len <= tab->maxLen;
+       ++len, code <<= 1, skip <<= 1) {
+    for (val = 0; val < n; ++val) {
+      if (lengths[val] == len) {
+
+	// bit-reverse the code
+	code2 = 0;
+	t = code;
+	for (i = 0; i < len; ++i) {
+	  code2 = (code2 << 1) | (t & 1);
+	  t >>= 1;
+	}
+
+	// fill in the table entries
+	for (i = code2; i < tabSize; i += skip) {
+	  tab->codes[i].len = (Gushort)len;
+	  tab->codes[i].val = (Gushort)val;
+	}
+
+	++code;
+      }
+    }
   }
 }
 
 int FlateStream::getHuffmanCodeWord(FlateHuffmanTab *tab) {
-  int len;
-  int code;
+  FlateCode *code;
   int c;
-  int i, j;
 
-  code = 0;
-  for (len = 1; len <= flateMaxHuffman; ++len) {
-
-    // add a bit to the code
-    if (codeSize == 0) {
-      if ((c = str->getChar()) == EOF)
-	return EOF;
-      codeBuf = c & 0xff;
-      codeSize = 8;
+  while (codeSize < tab->maxLen) {
+    if ((c = str->getChar()) == EOF) {
+      break;
     }
-    code = (code << 1) | (codeBuf & 1);
-    codeBuf >>= 1;
-    --codeSize;
-
-    // look for code
-    i = tab->start[len];
-    j = tab->start[len + 1];
-    if (i < j && code >= tab->codes[i].code && code <= tab->codes[j-1].code) {
-      i += code - tab->codes[i].code;
-      return tab->codes[i].val;
-    }
+    codeBuf |= (c & 0xff) << codeSize;
+    codeSize += 8;
   }
-
-  // not found
-  error(getPos(), "Bad code (%04x) in flate stream", code);
-  return EOF;
+  code = &tab->codes[codeBuf & ((1 << tab->maxLen) - 1)];
+  if (codeSize == 0 || codeSize < code->len || code->len == 0) {
+    return EOF;
+  }
+  codeBuf >>= code->len;
+  codeSize -= code->len;
+  return (int)code->val;
 }
 
 int FlateStream::getCodeWord(int bits) {
@@ -3424,7 +3684,7 @@ void ASCIIHexEncoder::close() {
 }
 
 GBool ASCIIHexEncoder::fillBuf() {
-  static const char *hex = "0123456789abcdef";
+  static char *hex = "0123456789abcdef";
   int c;
 
   if (eof) {
