@@ -1,5 +1,5 @@
 /*
- * "$Id: language.c,v 1.20.2.22 2003/07/20 01:33:10 mike Exp $"
+ * "$Id: language.c,v 1.20.2.23 2003/07/20 01:39:58 mike Exp $"
  *
  *   I18N/language support for the Common UNIX Printing System (CUPS).
  *
@@ -306,16 +306,33 @@ cupsLangGet(const char *language)	/* I - Language or locale */
   */
 
   if (language == NULL)
-  {
     language = appleLangDefault();
-    setlocale(LC_ALL, language);
-  }
 #elif defined(LC_MESSAGES)
   if (language == NULL)
-    language = setlocale(LC_MESSAGES, "");
+  {
+   /*
+    * First see if the locale has been set; if it is still "C" or
+    * "POSIX", set the locale to the default...
+    */
+
+    language = setlocale(LC_MESSAGES, NULL);
+
+    if (!strcmp(language, "C") || !strcmp(language, "POSIX"))
+      language = setlocale(LC_MESSAGES, "");
+  }
 #else
   if (language == NULL)
-    language = setlocale(LC_ALL, "");
+  {
+   /*
+    * First see if the locale has been set; if it is still "C" or
+    * "POSIX", set the locale to the default...
+    */
+
+    language = setlocale(LC_ALL, NULL);
+
+    if (!strcmp(language, "C") || !strcmp(language, "POSIX"))
+      language = setlocale(LC_ALL, "");
+  }
 #endif /* __APPLE__ */
 
  /*
@@ -842,5 +859,5 @@ cups_cache_lookup(const char      *name,/* I - Name of locale */
 
 
 /*
- * End of "$Id: language.c,v 1.20.2.22 2003/07/20 01:33:10 mike Exp $".
+ * End of "$Id: language.c,v 1.20.2.23 2003/07/20 01:39:58 mike Exp $".
  */
