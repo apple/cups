@@ -2254,7 +2254,7 @@ The
 <A HREF="#Satisfy"><CODE>Satisfy</CODE></A>
 directives may all appear inside a location.
 
-<TABLE BORDER="1"><CAPTION>Locations on the Server.</CAPTION>
+<CENTER><TABLE BORDER="1"><CAPTION>Locations on the Server.</CAPTION>
 <TR><TH>Location</TH><TH>Description</TH></TR>
 <TR><TD>/</TD><TD>The path for all get operations (get-printers, get-jobs, etc.)</TD></TR>
 <TR><TD>/admin</TD><TD>The path for all administration operations (add-printer, delete-printer, start-printer, etc.)</TD></TR>
@@ -2266,7 +2266,7 @@ directives may all appear inside a location.
 <TR><TD>/printers</TD><TD>The path for all printers</TD></TR>
 <TR><TD>/printers/name</TD><TD>The path for printer <CODE>name</CODE></TD></TR>
 <TR><TD>/printers/name.ppd</TD><TD>The PPD file path for printer <CODE>name</CODE></TD></TR>
-</TABLE>
+</TABLE></CENTER>
 
 <P>Note that more specific resources override the less specific ones.
 So the directives inside the <CODE>/printers/name</CODE> location will override ones from <CODE>/printers</CODE>.

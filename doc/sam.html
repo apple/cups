@@ -2247,7 +2247,8 @@ Port</CODE></A> directive but allows you to restrict access to specific
  <CODE>Encryption</CODE></A>,<A HREF="#Limit"> <CODE>Limit</CODE></A>,<A HREF="#LimitExcept">
  <CODE>LimitExcept</CODE></A>,<A HREF="#Order"> <CODE>Order</CODE></A>,<A
 HREF="#Require"> <CODE>Require</CODE></A>, and<A HREF="#Satisfy"> <CODE>
-Satisfy</CODE></A> directives may all appear inside a location.</P>
+Satisfy</CODE></A> directives may all appear inside a location.
+<CENTER>
 <TABLE BORDER="1"><CAPTION>Locations on the Server.</CAPTION>
 <TR><TH>Location</TH><TH>Description</TH></TR>
 <TR><TD>/</TD><TD>The path for all get operations (get-printers,
@@ -2268,6 +2269,8 @@ Satisfy</CODE></A> directives may all appear inside a location.</P>
 <TR><TD>/printers/name.ppd</TD><TD>The PPD file path for printer <CODE>
 name</CODE></TD></TR>
 </TABLE>
+</CENTER>
+</P>
 <P>Note that more specific resources override the less specific ones. So
  the directives inside the <CODE>/printers/name</CODE> location will
  override ones from <CODE>/printers</CODE>. Directives inside <CODE>
