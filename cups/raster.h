@@ -1,5 +1,5 @@
 /*
- * "$Id: raster.h,v 1.4 1999/03/29 22:05:11 mike Exp $"
+ * "$Id: raster.h,v 1.5 1999/04/01 18:24:03 mike Exp $"
  *
  *   Raster file definitions for the Common UNIX Printing System (CUPS).
  *
@@ -31,6 +31,10 @@
 
 #ifndef _CUPS_RASTER_H_
 #  define _CUPS_RASTER_H_
+
+#  ifdef __cplusplus
+extern "C" {
+#  endif /* __cplusplus */
 
 /*
  * Every non-PostScript printer driver that supports raster images should
@@ -164,12 +168,14 @@ typedef struct
   unsigned	NumCopies;		/* Number of copies to produce */
   cups_orient_t	Orientation;		/* Orientation value (see above) */
   cups_bool_t	OutputFaceUp;		/* OutputFaceUp value */
+  unsigned	PageSize[2];		/* Width and length of page in pixels */
   cups_bool_t	Separations;		/* Separations value */
   cups_bool_t	TraySwitch;		/* TraySwitch value */
   cups_bool_t	Tumble;			/* Tumble value */
-  unsigned	PageSize[2];		/* Width and length of page in pixels */
 
   /**** CUPS Page Device Dictionary Values ****/
+  unsigned	cupsWidth;		/* Width of page image in pixels */
+  unsigned	cupsHeight;		/* Height of page image in pixels */
   unsigned	cupsBitsPerColor;	/* Number of bits for each color */
   unsigned	cupsBitsPerPixel;	/* Number of bits for each pixel */
   unsigned	cupsBytesPerLine;	/* Number of bytes per line */
@@ -206,8 +212,12 @@ extern unsigned		cupsRasterWriteHeader(cups_raster_t *r,
 extern unsigned		cupsRasterWritePixels(cups_raster_t *r,
 			                      unsigned char *p, unsigned len);
 
+#  ifdef __cplusplus
+}
+#  endif /* __cplusplus */
+
 #endif /* !_CUPS_RASTER_H_ */
 
 /*
- * End of "$Id: raster.h,v 1.4 1999/03/29 22:05:11 mike Exp $".
+ * End of "$Id: raster.h,v 1.5 1999/04/01 18:24:03 mike Exp $".
  */
