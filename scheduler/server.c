@@ -1,5 +1,5 @@
 /*
- * "$Id: server.c,v 1.1 2001/02/21 17:01:18 mike Exp $"
+ * "$Id: server.c,v 1.2 2001/03/28 16:55:56 mike Exp $"
  *
  *   Server start/stop routines for the Common UNIX Printing System (CUPS).
  *
@@ -32,6 +32,8 @@
  */
 
 #include "cupsd.h"
+
+#include <grp.h>
 
 #ifdef HAVE_LIBSSL
 #  include <openssl/ssl.h>
@@ -156,5 +158,5 @@ StopServer(void)
 
 
 /*
- * End of "$Id: server.c,v 1.1 2001/02/21 17:01:18 mike Exp $".
+ * End of "$Id: server.c,v 1.2 2001/03/28 16:55:56 mike Exp $".
  */

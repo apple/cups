@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.124 2001/03/27 14:26:26 mike Exp $"
+ * "$Id: ipp.c,v 1.125 2001/03/28 16:55:54 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -3880,6 +3880,7 @@ print_job(client_t        *con,		/* I - Client connection */
 
   LogMessage(L_INFO, "Job %d queued on \'%s\' by \'%s\'.", job->id,
              job->dest, job->username);
+  LogMessage(L_DEBUG, "Job %d hold_until = %d", job->id, job->hold_until);
 
   SaveJob(job->id);
 
@@ -5338,5 +5339,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.124 2001/03/27 14:26:26 mike Exp $".
+ * End of "$Id: ipp.c,v 1.125 2001/03/28 16:55:54 mike Exp $".
  */

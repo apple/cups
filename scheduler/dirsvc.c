@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.72 2001/02/21 17:01:17 mike Exp $"
+ * "$Id: dirsvc.c,v 1.73 2001/03/28 16:55:54 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -36,6 +36,7 @@
  */
 
 #include "cupsd.h"
+#include <grp.h>
 
 
 /*
@@ -947,5 +948,5 @@ StopPolling(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.72 2001/02/21 17:01:17 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.73 2001/03/28 16:55:54 mike Exp $".
  */
