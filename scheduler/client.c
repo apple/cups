@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.28 1999/07/07 18:24:35 mike Exp $"
+ * "$Id: client.c,v 1.29 1999/07/09 14:23:02 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -931,7 +931,8 @@ SendError(client_t      *con,	/* I - Connection */
   * Put the request in the access_log file...
   */
 
-  LogRequest(con, code);
+  if (con->operation > HTTP_WAITING)
+    LogRequest(con, code);
 
  /*
   * To work around bugs in some proxies, don't use Keep-Alive for some
@@ -1504,5 +1505,5 @@ pipe_command(client_t *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.28 1999/07/07 18:24:35 mike Exp $".
+ * End of "$Id: client.c,v 1.29 1999/07/09 14:23:02 mike Exp $".
  */

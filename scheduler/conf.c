@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.23 1999/07/07 18:24:37 mike Exp $"
+ * "$Id: conf.c,v 1.24 1999/07/09 14:23:03 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -207,9 +207,7 @@ ReadConfiguration(void)
   KeepAliveTimeout = DEFAULT_KEEPALIVE;
   ImplicitClasses  = TRUE;
 
-  getrlimit(RLIMIT_NOFILE, &limit);
-
-  MaxClients       = limit.rlim_max / 3;
+  MaxClients       = 100;
 
   MaxLogSize       = 1024 * 1024;
   MaxRequestSize   = 0;
@@ -245,6 +243,8 @@ ReadConfiguration(void)
  /*
   * Check the MaxClients setting, and then allocate memory for it...
   */
+
+  getrlimit(RLIMIT_NOFILE, &limit);
 
   if (MaxClients > (limit.rlim_max / 3))
     MaxClients = limit.rlim_max / 3;
@@ -1169,5 +1169,5 @@ get_address(char               *value,		/* I - Value string */
 
 
 /*
- * End of "$Id: conf.c,v 1.23 1999/07/07 18:24:37 mike Exp $".
+ * End of "$Id: conf.c,v 1.24 1999/07/09 14:23:03 mike Exp $".
  */
