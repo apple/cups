@@ -1,5 +1,5 @@
 /*
- * "$Id: usersys.c,v 1.14.2.4 2002/10/22 19:58:37 mike Exp $"
+ * "$Id: usersys.c,v 1.14.2.5 2002/12/10 18:45:55 mike Exp $"
  *
  *   User, system, and password routines for the Common UNIX Printing
  *   System (CUPS).
@@ -127,7 +127,8 @@ cupsEncryption(void)
 	*/
 
 	while (cups_get_line(line, sizeof(line), fp) != NULL)
-	  if (strncmp(line, "Encryption ", 11) == 0)
+	  if (strncmp(line, "Encryption ", 11) == 0 ||
+	      strncmp(line, "Encryption\t", 11) == 0)
 	  {
 	   /*
 	    * Got it!  Drop any trailing newline and find the name...
@@ -242,7 +243,8 @@ cupsServer(void)
 	*/
 
 	while (cups_get_line(line, sizeof(line), fp) != NULL)
-	  if (strncmp(line, "ServerName ", 11) == 0)
+	  if (strncmp(line, "ServerName ", 11) == 0 ||
+	      strncmp(line, "ServerName\t", 11) == 0)
 	  {
 	   /*
 	    * Got it!  Drop any trailing newline and find the name...
@@ -454,5 +456,5 @@ cups_get_line(char *buf,	/* I - Line buffer */
 
 
 /*
- * End of "$Id: usersys.c,v 1.14.2.4 2002/10/22 19:58:37 mike Exp $".
+ * End of "$Id: usersys.c,v 1.14.2.5 2002/12/10 18:45:55 mike Exp $".
  */

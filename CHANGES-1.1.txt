@@ -1,6 +1,15 @@
 CHANGES-1.1.txt
 ---------------
 
+CHANGES IN CUPS V1.1.18
+
+	- The scheduler did not clear the POSIX signal action
+	  structure when waiting for the child to send it a
+	  SIGUSR1 signal; this could cause the signal handler
+	  not to be called properly, preventing the parent
+	  process from returning.
+
+
 CHANGES IN CUPS V1.1.17
 
 	- The "manual_copies" option did not work when the LPD

@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c,v 1.57.2.24 2002/11/23 01:06:17 mike Exp $"
+ * "$Id: main.c,v 1.57.2.25 2002/12/10 18:45:56 mike Exp $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -167,6 +167,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 
       sigset(SIGHUP, SIG_IGN);
 #elif defined(HAVE_SIGACTION)
+      memset(&action, 0, sizeof(action));
       sigemptyset(&action.sa_mask);
       sigaddset(&action.sa_mask, SIGUSR1);
       action.sa_handler = sigusr1_handler;
@@ -925,5 +926,5 @@ usage(void)
 
 
 /*
- * End of "$Id: main.c,v 1.57.2.24 2002/11/23 01:06:17 mike Exp $".
+ * End of "$Id: main.c,v 1.57.2.25 2002/12/10 18:45:56 mike Exp $".
  */
