@@ -34,13 +34,10 @@ void CDECL error(int pos, const char *msg, ...) {
   if (errQuiet) {
     return;
   }
-  if (printCommands) {
-    fflush(stdout);
-  }
   if (pos >= 0) {
-    fprintf(errFile, "ERROR: (%d): ", pos);
+    fprintf(errFile, "Error (%d): ", pos);
   } else {
-    fprintf(errFile, "ERROR: ");
+    fprintf(errFile, "Error: ");
   }
   va_start(args, msg);
   vfprintf(errFile, msg, args);

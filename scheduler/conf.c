@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.77.2.1 2001/04/02 19:51:48 mike Exp $"
+ * "$Id: conf.c,v 1.77.2.2 2001/12/26 16:52:51 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -85,6 +85,7 @@ static var_t	variables[] =
   { "BrowseTimeout",	&BrowseTimeout,		VAR_INTEGER,	0 },
   { "Browsing",		&Browsing,		VAR_BOOLEAN,	0 },
   { "Classification",	Classification,		VAR_STRING,	sizeof(Classification) },
+  { "ClassifyOverride",	&ClassifyOverride,	VAR_BOOLEAN,	0 },
   { "DataDir",		DataDir,		VAR_STRING,	sizeof(DataDir) },
   { "DefaultCharset",	DefaultCharset,		VAR_STRING,	sizeof(DefaultCharset) },
   { "DefaultLanguage",	DefaultLanguage,	VAR_STRING,	sizeof(DefaultLanguage) },
@@ -92,7 +93,9 @@ static var_t	variables[] =
   { "ErrorLog",		ErrorLog,		VAR_STRING,	sizeof(ErrorLog) },
   { "FilterLimit",	&FilterLimit,		VAR_INTEGER,	0 },
   { "FontPath",		FontPath,		VAR_STRING,	sizeof(FontPath) },
+  { "HideImplicitMembers", &HideImplicitMembers, VAR_BOOLEAN,	0 },
   { "ImplicitClasses",	&ImplicitClasses,	VAR_BOOLEAN,	0 },
+  { "ImplicitAnyClasses", &ImplicitAnyClasses,	VAR_BOOLEAN,	0 },
   { "KeepAliveTimeout",	&KeepAliveTimeout,	VAR_INTEGER,	0 },
   { "KeepAlive",	&KeepAlive,		VAR_BOOLEAN,	0 },
   { "LimitRequestBody",	&MaxRequestSize,	VAR_INTEGER,	0 },
@@ -120,7 +123,6 @@ static var_t	variables[] =
 #endif /* HAVE_LIBSSL */
   { "ServerName",	ServerName,		VAR_STRING,	sizeof(ServerName) },
   { "ServerRoot",	ServerRoot,		VAR_STRING,	sizeof(ServerRoot) },
-  { "SystemGroup",	SystemGroup,		VAR_STRING,	sizeof(SystemGroup) },
   { "TempDir",		TempDir,		VAR_STRING,	sizeof(TempDir) },
   { "Timeout",		&Timeout,		VAR_INTEGER,	0 }
 };
@@ -158,7 +160,10 @@ ReadConfiguration(void)
   int		i;		/* Looping var */
   FILE		*fp;		/* Configuration file */
   int		status;		/* Return status */
-  char		directory[1024];/* Configuration directory */
+  char		directory[1024],/* Configuration directory */
+		*slash;		/* Directory separator */
+  char		type[MIME_MAX_SUPER + MIME_MAX_TYPE];
+				/* MIME type name */
   struct rlimit	limit;		/* Runtime limit */
   char		*language;	/* Language string */
   struct passwd	*user;		/* Default user */
@@ -196,6 +201,14 @@ ReadConfiguration(void)
   if (MimeDatabase != NULL)
     mimeDelete(MimeDatabase);
 
+  if (NumMimeTypes)
+  {
+    for (i = 0; i < NumMimeTypes; i ++)
+      free((void *)MimeTypes[i]);
+
+    free(MimeTypes);
+  }
+
   for (i = 0; i < NumRelays; i ++)
     if (Relays[i].from.type == AUTH_NAME)
       free(Relays[i].from.mask.name.name);
@@ -214,7 +227,6 @@ ReadConfiguration(void)
 
   gethostname(ServerName, sizeof(ServerName));
   snprintf(ServerAdmin, sizeof(ServerAdmin), "root@%s", ServerName);
-  strcpy(ServerRoot, CUPS_SERVERROOT);
   strcpy(ServerBin, CUPS_SERVERBIN);
   strcpy(RequestRoot, CUPS_REQUESTS);
   strcpy(DocumentRoot, CUPS_DOCROOT);
@@ -226,7 +238,12 @@ ReadConfiguration(void)
   strcpy(FontPath, CUPS_FONTPATH);
   strcpy(RemoteRoot, "remroot");
 
+  strcpy(ServerRoot, ConfigurationFile);
+  if ((slash = strrchr(ServerRoot, '/')) != NULL)
+    *slash = '\0';
+
   Classification[0] = '\0';
+  ClassifyOverride  = 0;
 
 #ifdef HAVE_LIBSSL
   strcpy(ServerCertificate, "ssl/server.crt");
@@ -257,39 +274,30 @@ ReadConfiguration(void)
   * Find the default system group: "sys", "system", or "root"...
   */
 
-  group = getgrnam("sys");
+  group = getgrnam(CUPS_DEFAULT_GROUP);
   endgrent();
+
+  NumSystemGroups = 0;
 
   if (group != NULL)
   {
-    strcpy(SystemGroup, "sys");
+    strcpy(SystemGroups[0], CUPS_DEFAULT_GROUP);
     Group = group->gr_gid;
   }
   else
   {
-    group = getgrnam("system");
+    group = getgrgid(0);
     endgrent();
 
     if (group != NULL)
     {
-      strcpy(SystemGroup, "system");
-      Group = group->gr_gid;
+      strcpy(SystemGroups[0], group->gr_name);
+      Group = 0;
     }
     else
     {
-      group = getgrnam("root");
-      endgrent();
-
-      if (group != NULL)
-      {
-	strcpy(SystemGroup, "root");
-	Group = group->gr_gid;
-      }
-      else
-      {
-	strcpy(SystemGroup, "unknown");
-	Group = 0;
-      }
+      strcpy(SystemGroups[0], "unknown");
+      Group = 0;
     }
   }
 
@@ -297,7 +305,7 @@ ReadConfiguration(void)
   * Find the default user...
   */
 
-  if ((user = getpwnam("lp")) == NULL)
+  if ((user = getpwnam(CUPS_DEFAULT_USER)) == NULL)
     User = 1;	/* Force to a non-priviledged account */
   else
     User = user->pw_uid;
@@ -412,13 +420,55 @@ ReadConfiguration(void)
     ServerCertificate[sizeof(ServerCertificate) - 1] = '\0';
   }
 
+  chown(ServerCertificate, User, Group);
+  chmod(ServerCertificate, 0600);
+
   if (ServerKey[0] != '/')
   {
     snprintf(directory, sizeof(directory), "%s/%s", ServerRoot, ServerKey);
     strncpy(ServerKey, directory, sizeof(ServerKey) - 1);
     ServerKey[sizeof(ServerKey) - 1] = '\0';
   }
+
+  chown(ServerKey, User, Group);
+  chmod(ServerKey, 0600);
 #endif /* HAVE_LIBSSL */
+
+ /*
+  * Make sure that ServerRoot and the config files are owned and
+  * writable by the user and group in the cupsd.conf file...
+  */
+
+  chown(ServerRoot, User, Group);
+  chmod(ServerRoot, 0755);
+
+  snprintf(directory, sizeof(directory), "%s/certs", ServerRoot);
+  chown(directory, User, Group);
+  chmod(directory, 0711);
+
+  snprintf(directory, sizeof(directory), "%s/ppd", ServerRoot);
+  chown(directory, User, Group);
+  chmod(directory, 0755);
+
+  snprintf(directory, sizeof(directory), "%s/ssl", ServerRoot);
+  chown(directory, User, Group);
+  chmod(directory, 0700);
+
+  snprintf(directory, sizeof(directory), "%s/cupsd.conf", ServerRoot);
+  chown(directory, User, Group);
+  chmod(directory, 0600);
+
+  snprintf(directory, sizeof(directory), "%s/classes.conf", ServerRoot);
+  chown(directory, User, Group);
+  chmod(directory, 0600);
+
+  snprintf(directory, sizeof(directory), "%s/printers.conf", ServerRoot);
+  chown(directory, User, Group);
+  chmod(directory, 0600);
+
+  snprintf(directory, sizeof(directory), "%s/passwd.md5", ServerRoot);
+  chown(directory, User, Group);
+  chmod(directory, 0600);
 
  /*
   * Make sure the request and temporary directories have the right
@@ -445,7 +495,7 @@ ReadConfiguration(void)
 
   getrlimit(RLIMIT_NOFILE, &limit);
 
-  if (MaxClients > (limit.rlim_max / 3))
+  if (MaxClients > (limit.rlim_max / 3) || MaxClients <= 0)
     MaxClients = limit.rlim_max / 3;
 
   if ((Clients = calloc(sizeof(client_t), MaxClients)) == NULL)
@@ -465,12 +515,40 @@ ReadConfiguration(void)
   if (MaxActiveJobs > (limit.rlim_max / 3))
     MaxActiveJobs = limit.rlim_max / 3;
 
+  if (strcasecmp(Classification, "none") == 0)
+    Classification[0] = '\0';
+
+  if (Classification[0])
+    LogMessage(L_INFO, "Security set to \"%s\"", Classification);
+
  /*
   * Read the MIME type and conversion database...
   */
 
   MimeDatabase = mimeNew();
   mimeMerge(MimeDatabase, ServerRoot);
+
+ /*
+  * Create a list of MIME types for the document-format-supported
+  * attribute...
+  */
+
+  NumMimeTypes = MimeDatabase->num_types;
+  if (!mimeType(MimeDatabase, "application", "octet-stream"))
+    NumMimeTypes ++;
+
+  MimeTypes = calloc(NumMimeTypes, sizeof(const char *));
+
+  for (i = 0; i < MimeDatabase->num_types; i ++)
+  {
+    snprintf(type, sizeof(type), "%s/%s", MimeDatabase->types[i]->super,
+             MimeDatabase->types[i]->type);
+
+    MimeTypes[i] = strdup(type);
+  }
+
+  if (i < NumMimeTypes)
+    MimeTypes[i] = strdup("application/octet-stream");
 
  /*
   * Load banners...
@@ -526,6 +604,7 @@ read_configuration(FILE *fp)		/* I - File to read from */
 		name[256],		/* Parameter name */
 		*nameptr,		/* Pointer into name */
 		*value;			/* Pointer to value */
+  int		valuelen;		/* Length of value */
   var_t		*var;			/* Current variable */
   unsigned	ip[4],			/* Address value */
 		mask[4];		/* Netmask value */
@@ -533,6 +612,15 @@ read_configuration(FILE *fp)		/* I - File to read from */
   dirsvc_poll_t	*poll;			/* Polling data */
   http_addr_t	polladdr;		/* Polling address */
   location_t	*location;		/* Browse location */
+  FILE		*incfile;		/* Include file */
+  char		incname[1024];		/* Include filename */
+  static unsigned netmasks[4] =		/* Standard netmasks... */
+  {
+    0xff000000,
+    0xffff0000,
+    0xffffff00,
+    0xffffffff
+  };
 
 
  /*
@@ -553,12 +641,12 @@ read_configuration(FILE *fp)		/* I - File to read from */
       continue;
 
    /*
-    * Strip trailing newline, if any...
+    * Strip trailing whitespace, if any...
     */
 
     len = strlen(line);
 
-    if (line[len - 1] == '\n')
+    while (len > 0 && isspace(line[len - 1]))
     {
       len --;
       line[len] = '\0';
@@ -585,7 +673,30 @@ read_configuration(FILE *fp)		/* I - File to read from */
     * Decode the directive...
     */
 
-    if (strcasecmp(name, "<Location") == 0)
+    if (strcasecmp(name, "Include") == 0)
+    {
+     /*
+      * Include filename
+      */
+
+      if (value[0] == '/')
+      {
+        strncpy(incname, value, sizeof(incname) - 1);
+	incname[sizeof(incname) - 1] = '\0';
+      }
+      else
+        snprintf(incname, sizeof(incname), "%s/%s", ServerRoot, value);
+
+      if ((incfile = fopen(incname, "rb")) == NULL)
+        LogMessage(L_ERROR, "Unable to include config file \"%s\" - %s",
+	           incname, strerror(errno));
+      else
+      {
+        read_configuration(incfile);
+	fclose(incfile);
+      }
+    }
+    else if (strcasecmp(name, "<Location") == 0)
     {
      /*
       * <Location path>
@@ -725,6 +836,46 @@ read_configuration(FILE *fp)		/* I - File to read from */
       else
         LogMessage(L_ERROR, "Unknown BrowseOrder value %s on line %d.",
 	           value, linenum);
+    }
+    else if (strcasecmp(name, "BrowseProtocols") == 0)
+    {
+     /*
+      * "BrowseProtocol name [... name]"
+      */
+
+      BrowseProtocols = 0;
+
+      for (; *value;)
+      {
+        for (valuelen = 0; value[valuelen]; valuelen ++)
+	  if (isspace(value[valuelen]) || value[valuelen] == ',')
+	    break;
+
+        if (value[valuelen])
+        {
+	  value[valuelen] = '\0';
+	  valuelen ++;
+	}
+
+        if (strcasecmp(value, "cups") == 0)
+	  BrowseProtocols |= BROWSE_CUPS;
+        else if (strcasecmp(value, "slp") == 0)
+	  BrowseProtocols |= BROWSE_SLP;
+        else if (strcasecmp(value, "ldap") == 0)
+	  BrowseProtocols |= BROWSE_LDAP;
+        else if (strcasecmp(value, "all") == 0)
+	  BrowseProtocols |= BROWSE_ALL;
+	else
+	{
+	  LogMessage(L_ERROR, "Unknown browse protocol \"%s\" on line %d.",
+	             value, linenum);
+          break;
+	}
+
+        for (value += valuelen; *value; value ++)
+	  if (!isspace(*value) || *value != ',')
+	    break;
+      }
     }
     else if (strcasecmp(name, "BrowseAllow") == 0 ||
              strcasecmp(name, "BrowseDeny") == 0)
@@ -1048,6 +1199,34 @@ read_configuration(FILE *fp)		/* I - File to read from */
 	             value);
       }
     }
+    else if (strcasecmp(name, "SystemGroup") == 0)
+    {
+     /*
+      * System (admin) group(s)...
+      */
+
+      char *valueptr; /* Pointer into value */
+
+
+      for (i = 0; i < MAX_SYSTEM_GROUPS; i ++)
+      {
+        for (valueptr = value; *valueptr; valueptr ++)
+	  if (isspace(*valueptr) || *valueptr == ',')
+	    break;
+
+        if (*valueptr)
+          *valueptr++ = '\0';
+
+        strncpy(SystemGroups[i], value, sizeof(SystemGroups[0]));
+	SystemGroups[i][sizeof(SystemGroups[0]) - 1] = '\0';
+
+        while (*value == ',' || isspace(*value))
+	  value ++;
+      }
+
+      if (i)
+        NumSystemGroups = i;
+    }
     else if (strcasecmp(name, "HostNameLookups") == 0)
     {
      /*
@@ -1131,7 +1310,31 @@ read_configuration(FILE *fp)		/* I - File to read from */
       switch (var->type)
       {
         case VAR_INTEGER :
-	    *((int *)var->ptr) = atoi(value);
+	    {
+	      float	n;		/* Number */
+	      char	units[255];	/* Units */
+
+
+	      switch (sscanf(value, "%f%254s", &n, units))
+	      {
+		case 0 :
+        	    n = 0.0;
+		case 1 :
+		    break;
+		case 2 :
+        	    if (tolower(units[0]) == 'g')
+		      n *= 1024.0 * 1024.0 * 1024.0;
+        	    else if (tolower(units[0]) == 'm')
+		      n *= 1024.0 * 1024.0;
+		    else if (tolower(units[0]) == 'k')
+		      n *= 1024.0;
+		    else if (tolower(units[0]) == 't')
+		      n *= 262144.0;
+		    break;
+	      }
+
+	      *((int *)var->ptr) = (int)n;
+	    }
 	    break;
 
 	case VAR_BOOLEAN :
@@ -1173,6 +1376,7 @@ read_location(FILE *fp,		/* I - Configuration file */
               char *location,	/* I - Location name/path */
 	      int  linenum)	/* I - Current line number */
 {
+  int		i;			/* Looping var */
   location_t	*loc,			/* New location */
 		*parent;		/* Parent location */
   int		len;			/* Length of line */
@@ -1203,12 +1407,12 @@ read_location(FILE *fp,		/* I - Configuration file */
       continue;
 
    /*
-    * Strip trailing newline, if any...
+    * Strip trailing whitespace, if any...
     */
 
     len = strlen(line);
 
-    if (line[len - 1] == '\n')
+    while (len > 0 && isspace(line[len - 1]))
     {
       len --;
       line[len] = '\0';
@@ -1290,7 +1494,12 @@ read_location(FILE *fp,		/* I - Configuration file */
       if (strcasecmp(value, "never") == 0)
         loc->encryption = HTTP_ENCRYPT_NEVER;
       else if (strcasecmp(value, "always") == 0)
-        loc->encryption = HTTP_ENCRYPT_ALWAYS;
+      {
+        LogMessage(L_ERROR, "Encryption value \"%s\" on line %d is invalid in this context. "
+	                    "Using \"required\" instead.", value, linenum);
+
+        loc->encryption = HTTP_ENCRYPT_REQUIRED;
+      }
       else if (strcasecmp(value, "required") == 0)
         loc->encryption = HTTP_ENCRYPT_REQUIRED;
       else if (strcasecmp(value, "ifrequested") == 0)
@@ -1429,6 +1638,13 @@ read_location(FILE *fp,		/* I - Configuration file */
         if (loc->level == AUTH_ANON)
 	  loc->level = AUTH_USER;
       }
+      else if (strcasecmp(value, "basicdigest") == 0)
+      {
+	loc->type = AUTH_BASICDIGEST;
+
+        if (loc->level == AUTH_ANON)
+	  loc->level = AUTH_USER;
+      }
       else
         LogMessage(L_WARN, "Unknown authorization type %s on line %d.",
 	           value, linenum);
@@ -1451,7 +1667,9 @@ read_location(FILE *fp,		/* I - Configuration file */
       else if (strcasecmp(value, "system") == 0)
       {
         loc->level = AUTH_GROUP;
-	AddName(loc, SystemGroup);
+
+	for (i = 0; i < NumSystemGroups; i ++)
+	  AddName(loc, SystemGroups[i]);
       }
       else
         LogMessage(L_WARN, "Unknown authorization class %s on line %d.",
@@ -1510,7 +1728,7 @@ read_location(FILE *fp,		/* I - Configuration file */
     {
       if (strcasecmp(value, "all") == 0)
         loc->satisfy = AUTH_SATISFY_ALL;
-      if (strcasecmp(value, "any") == 0)
+      else if (strcasecmp(value, "any") == 0)
         loc->satisfy = AUTH_SATISFY_ANY;
       else
         LogMessage(L_WARN, "Unknown Satisfy value %s on line %d.", value,
@@ -1599,11 +1817,11 @@ get_address(const char  *value,		/* I - Value string */
   * Decode the hostname and port number as needed...
   */
 
-  if (hostname[0] != '\0')
+  if (hostname[0] && strcmp(hostname, "*") != 0)
   {
-    if ((host = gethostbyname(hostname)) == NULL)
+    if ((host = httpGetHostByName(hostname)) == NULL)
     {
-      LogMessage(L_ERROR, "gethostbyname(\"%s\") failed - %s!", hostname,
+      LogMessage(L_ERROR, "httpGetHostByName(\"%s\") failed - %s!", hostname,
                  strerror(errno));
       return (0);
     }
@@ -1777,5 +1995,5 @@ get_addr_and_mask(const char *value,	/* I - String from config file */
 
 
 /*
- * End of "$Id: conf.c,v 1.77.2.1 2001/04/02 19:51:48 mike Exp $".
+ * End of "$Id: conf.c,v 1.77.2.2 2001/12/26 16:52:51 mike Exp $".
  */

@@ -1,11 +1,11 @@
-xpdf
+Xpdf
 ====
 
-version 0.90
-99-aug-02
+version 0.93
+2001-oct-25
 
-The xpdf software and documentation are
-copyright 1996-1999 Derek B. Noonburg.
+The Xpdf software and documentation are
+copyright 1996-2001 Derek B. Noonburg.
 
 Email: derekn@foolabs.com
 WWW: http://www.foolabs.com/xpdf/
@@ -14,7 +14,7 @@ The PDF data structures, operators, and specification are
 copyright 1995 Adobe Systems Inc.
 
 
-What is xpdf?
+What is Xpdf?
 -------------
 
 Xpdf is a viewer for Portable Document Format (PDF) files.  (These are
@@ -24,8 +24,8 @@ OS/2.  The non-X components of the package (pdftops, pdftotext, etc.)
 also run on Win32 systems and should run on pretty much any system
 with a decent C++ compiler.
 
-Xpdf is designed to be small and efficient.  It does not use the Motif
-or Xt libraries.  It can use standard X fonts.
+Xpdf is designed to be small and efficient.  It can use Type 1,
+TrueType, or standard X fonts.
 
 
 Distribution
@@ -39,16 +39,16 @@ confusing, the basic idea is good.
 In order to cut down on the confusion a little bit, here are some
 informal clarifications:
 
-- I don't mind if you redistribute xpdf in source and/or binary form,
+- I don't mind if you redistribute Xpdf in source and/or binary form,
   as long as you include all of the documentation: README, man pages
   (or help files), and COPYING.  (Note that the README file contains a
   pointer to a web page with the source code.)
 
-- Selling a CD-ROM that contains xpdf is fine with me, as long as it
+- Selling a CD-ROM that contains Xpdf is fine with me, as long as it
   includes the documentation.  I wouldn't mind receiving a sample
   copy, but it's not necessary.
 
-- If you make useful changes to xpdf, please make the source code
+- If you make useful changes to Xpdf, please make the source code
   available -- post it on a web site, email it to me, whatever.
 
 If you're interested in commercial licensing, please contact me by
@@ -58,7 +58,7 @@ email: derekn@foolabs.com .
 Compatibility
 -------------
 
-Xpdf is developed and tested on a Linux 2.0 x86 system.
+Xpdf is developed and tested on a Linux 2.2 x86 system.
 
 In addition, it has been compiled by others on Solaris, AIX, HP-UX,
 SCO UnixWare, Digital Unix, Irix, and numerous other Unix
@@ -66,24 +66,24 @@ implementations, as well as VMS and OS/2.  It should work on pretty
 much any system which runs X11 and has Unix-like libraries.  You'll
 need ANSI C++ and C compilers to compile it.
 
-The non-X components of xpdf (pdftops, pdftotext, pdfinfo, pdfimages)
-can also be compiled on Win32 systems.  See the xpdf web page for
+The non-X components of Xpdf (pdftops, pdftotext, pdfinfo, pdfimages)
+can also be compiled on Win32 systems.  See the Xpdf web page for
 details.
 
-If you compiled xpdf for a system not listed on the web page, please
+If you compile Xpdf for a system not listed on the web page, please
 let me know.  If you're willing to make your binary available by ftp
-or on the web, I'll be happy to add a link from the xpdf web page.  I
+or on the web, I'll be happy to add a link from the Xpdf web page.  I
 have decided not to host any binaries I didn't compile myself (for
 disk space and support reasons).
 
-If you can't get xpdf to compile on your system, send me email and
+If you can't get Xpdf to compile on your system, send me email and
 I'll try to help.
 
-Xpdf has been ported to the Acorn, Amiga, and BeOS.  See the xpdf web
-page for links.
+Xpdf has been ported to the Acorn, Amiga, BeOS, and EPOC.  See the
+Xpdf web page for links.
 
 
-Getting xpdf
+Getting Xpdf
 ------------
 
 The latest version is available from:
@@ -102,7 +102,7 @@ list of people.  If you'd like to receive email notification of new
 versions, just let me know.
 
 
-Running xpdf
+Running Xpdf
 ------------
 
 To run xpdf, simply type:
@@ -168,7 +168,22 @@ For Japanese support, you will need a Japanese font of the form:
 
     -*-fixed-medium-r-normal-*-NN-*-*-*-*-*-jisx0208.1983-0
 
-and an X server that can handle 16-bit fonts.
+and an X server that can handle 16-bit fonts.  You can also set this
+font using the xpdf.japaneseFont resource.
+
+For Chinese GB (simplified Chinese) support, you will need a font of
+the form:
+
+    -*-fangsong ti-medium-r-normal-*-%s-*-*-*-*-*-gb2312.1980-0
+
+You can replace this font using the xpdf.chineseGBFont resource.
+
+For Chinese CNS (traditional Chinese) support, you will need a font of
+the form:
+
+    -*-fixed-medium-r-normal--*-%s-*-*-*-*-big5-0
+
+You can replace this font using the xpdf.chineseCNSFont resource.
 
 If compiled with t1lib support, xpdf will use t1lib to render embedded
 Type 1 and Type 1C fonts.  In addition, xpdf can be configured to use
@@ -191,6 +206,28 @@ example:
     xpdf.t1Symbol:               /usr/local/fonts/Symbol.pfa
     xpdf.t1ZapfDingbats:         /usr/local/fonts/ZapfDingbats.pfa
 
+Ghostscript comes with a set of free, high-quality Type 1 fonts,
+donated by URW++ Design and Development Incorporated.  The xpdf X
+resources needed for these fonts are:
+
+    xpdf.t1TimesRoman:           /usr/ghostscript/fonts/n021003l.pfb
+    xpdf.t1TimesItalic:          /usr/ghostscript/fonts/n021023l.pfb
+    xpdf.t1TimesBold:            /usr/ghostscript/fonts/n021004l.pfb
+    xpdf.t1TimesBoldItalic:      /usr/ghostscript/fonts/n021024l.pfb
+    xpdf.t1Helvetica:            /usr/ghostscript/fonts/n019003l.pfb
+    xpdf.t1HelveticaOblique:     /usr/ghostscript/fonts/n019023l.pfb
+    xpdf.t1HelveticaBold:        /usr/ghostscript/fonts/n019004l.pfb
+    xpdf.t1HelveticaBoldOblique: /usr/ghostscript/fonts/n019024l.pfb
+    xpdf.t1Courier:              /usr/ghostscript/fonts/n022003l.pfb
+    xpdf.t1CourierOblique:       /usr/ghostscript/fonts/n022023l.pfb
+    xpdf.t1CourierBold:          /usr/ghostscript/fonts/n022004l.pfb
+    xpdf.t1CourierBoldOblique:   /usr/ghostscript/fonts/n022024l.pfb
+    xpdf.t1Symbol:               /usr/ghostscript/fonts/s050000l.pfb
+    xpdf.t1ZapfDingbats:         /usr/ghostscript/fonts/d050000l.pfb
+
+You will obviously need to replace '/usr/ghostscript/fonts' with the
+appropriate path on your system.
+
 
 The Unisys LZW Patent
 ---------------------
@@ -198,13 +235,13 @@ The Unisys LZW Patent
 Nearly all PDF files include data which has been compressed with the
 LZW compression algorithm.  Unfortunately, LZW is covered by a
 software patent which is owned by Unisys Corporation.  Unisys refuses
-to license this patent for PDF-related use in software such as xpdf
+to license this patent for PDF-related use in software such as Xpdf
 which is released for free and which may be freely redistributed.
 (This is same algorithm which is used by GIF.  However, Unisys is not
 doing licensing for free PDF viwers in the same way as for free GIF
 viewers.)
 
-As a workaround, xpdf converts PDF-format LZW data to compress-format
+As a workaround, Xpdf converts PDF-format LZW data to compress-format
 LZW data.  (The standard UNIX compress utility also uses LZW, but with
 a slightly different file format.)  This conversion does *not*
 decompress the data; it simply converts it to a different file format.
@@ -221,7 +258,7 @@ For Unisys's slant on things (mostly regarding GIF), see
 an email address for feedback.
 
 
-Compiling xpdf
+Compiling Xpdf
 --------------
 
 See the separate file, INSTALL.
@@ -230,10 +267,9 @@ See the separate file, INSTALL.
 Bugs
 ----
 
-This release of xpdf should improve the situation with embedded
-fonts.  However, Type 3 and TrueType fonts are still not handled.
+Type 3 fonts are still not well supported by Xpdf.
 
-If you find a bug in xpdf, i.e., if it prints an error message,
+If you find a bug in Xpdf, i.e., if it prints an error message,
 crashes, or incorrectly displays a document, and you don't see that
 bug listed here, please send me email, with a pointer (URL, ftp site,
 etc.) to the PDF file.
@@ -245,7 +281,8 @@ Acknowledgments
 Thanks to:
 
 * Patrick Voigt for help with the remote server code.
-* Patrick Moreau and Martin P.J. Zinser for the VMS port.
+* Patrick Moreau, Martin P.J. Zinser, and David Mathog for the VMS
+  port.
 * David Boldt and Rick Rodgers for sample man pages.
 * Brendan Miller for the icon idea.
 * Olly Betts for help testing pdftotext.
@@ -255,39 +292,72 @@ Thanks to:
 * Leo Smiers for the decryption patches.
 * Rainer Menzner for creating t1lib, and for helping me adapt it to
   xpdf.
+* Pine Tree Systems A/S for funding the OPI and EPS support in
+  pdftops.
+* Easy Software Products for funding the "sh" operator support.
 
 
 References
 ----------
 
-Adobe Systems Inc., _Portable Document Format Reference Manual_.
-Addison-Wesley, 1993, ISBN 0-201-62628-4.
-[The printed manual for PDF version 1.0.]
+Adobe Systems Inc., _PDF Reference_, 2nd ed.
+Addison-Wesley, 2000, ISBN 0-201-61588-6.
+[The printed manual for PDF version 1.3.]
 
-Adobe Systems Inc., _Portable Document Format Reference Manual_,
-Version 1.3.  March 11, 1999.
-http://partners.adobe.com/asn/developer/PDFS/TN/PDFSPEC.PDF
-[Updated manual for PDF 1.3.]
+Adobe Systems Inc., _Portable Document Format: Changes from Version
+1.3 to 1.4_, Adobe Developer Support Technical Note #5409.
+June 11, 2001.
+http://partners.adobe.com/asn/developer/acrosdk/docs/filefmtspecs/PDF14Deltas.pdf
+[Updates for PDF 1.4.]
 
-Adobe Systems Inc., _PostScript Language Reference Manual_, 2nd ed.
-Addison-Wesley, 1990, ISBN 0-201-18127-4.
+Adobe Systems Inc., _PostScript Language Reference_, 3rd ed.
+Addison-Wesley, 1999, ISBN 0-201-37922-8.
 [The official PostScript manual.]
+
+Adobe Systems, Inc., _The Type 42 Font Format Specification_,
+Adobe Developer Support Technical Specification #5012.  1998.
+http://partners.adobe.com/asn/developer/pdfs/tn/5012.Type42_Spec.pdf
+[Type 42 is the format used to embed TrueType fonts in PostScript
+files.]
 
 Adobe Systems, Inc., _Adobe CMap and CIDFont Files Specification_,
 Adobe Developer Support Technical Specification #5014.  1995.
 http://www.adobe.com/supportservice/devrelations/PDFS/TN/5014.CIDFont_Spec.pdf
-[CMap file format needed for Japanese font support.]
+[CMap file format needed for Japanese and Chinese font support.]
 
 Adobe Systems, Inc., _Adobe-Japan1-2 Character Collection for
-CID-Keyed Fonts_ (Bitmap Character Image Version), Adobe Developer
-Support Technical Note #5078-b.  1994. 
-http://www.adobe.com/supportservice/devrelations/PDFS/TN/5078b.pdf
-[The complete Adobe Japanese character set.]
+CID-Keyed Fonts_, Adobe Developer Support Technical Note #5078.
+1994.
+http://partners.adobe.com/asn/developer/PDFS/TN/5078.CID_Glyph.pdf
+[The Adobe Japanese character set.]
+
+Adobe Systems, Inc., _Adobe-GB1-3 Character Collection for
+CID-Keyed Fonts_, Adobe Developer Support Technical Note #5079.
+1998.
+http://partners.adobe.com/asn/developer/PDFS/TN/5079.GB_CharColl.pdf
+[The Adobe Chinese GB character set.]
+
+Adobe Systems, Inc., _Adobe-CNS1-3 Character Collection for
+CID-Keyed Fonts_, Adobe Developer Support Technical Note #5080.
+2000.
+http://partners.adobe.com/asn/developer/PDFS/TN/5080.CNS_CharColl.pdf
+[The Adobe Chinese CNS character set.]
 
 Adobe Systems Inc., _Supporting the DCT Filters in PostScript Level
 2_, Adobe Developer Support Technical Note #5116.  1992.
 http://www.adobe.com/supportservice/devrelations/PDFS/TN/5116.PS2_DCT.PDF
 [Description of the DCTDecode filter parameters.]
+
+Adobe Systems Inc., _Open Prepress Interface (OPI) Specification -
+Version 2.0_, Adobe Developer Support Technical Note #5660.  2000.
+http://partners.adobe.com/asn/developer/PDFS/TN/5660.OPI_2.0.pdf
+
+Adobe Systems Inc., CMap files.
+ftp://ftp.oreilly.com/pub/examples/nutshell/cjkv/adobe/
+[The actual CMap files for the 16-bit CJK encodings.]
+
+Aldus Corp., _OPI: Open Prepress Interface Specification 1.3_.  1993.
+http://partners.adobe.com/asn/developer/PDFS/TN/OPI_13.pdf
 
 Anonymous, RC4 source code.
 ftp://ftp.ox.ac.uk/pub/crypto/misc/rc4.tar.gz
@@ -328,6 +398,14 @@ Christoph Loeffler, Adriaan Ligtenberg, George S. Moschytz, "Practical
 Fast 1-D DCT Algorithms with 11 Multiplications".  IEEE Intl. Conf. on
 Acoustics, Speech & Signal Processing, 1989, 988-991.
 [The fast IDCT algorithm used in the DCTDecode filter.]
+
+Microsoft, _TrueType 1.0 Font Files_, rev. 1.66.  1995.
+http://www.microsoft.com/typography/tt/tt.htm
+[The TrueType font spec (in MS Word format, naturally).]
+
+Charles Poynton, "Color FAQ".
+http://www.inforamp.net/~poynton/ColorFAQ.html
+[The mapping from the CIE 1931 (XYZ) color space to RGB.]
 
 R. Rivest, "The MD5 Message-Digest Algorithm".  RFC 1321.
 [MD5 is used in PDF document encryption.]

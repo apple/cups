@@ -1,5 +1,5 @@
 /*
- * "$Id: cups-polld.c,v 1.5.2.1 2001/05/13 18:38:35 mike Exp $"
+ * "$Id: cups-polld.c,v 1.5.2.2 2001/12/26 16:52:52 mike Exp $"
  *
  *   Polling daemon for the Common UNIX Printing System (CUPS).
  *
@@ -23,6 +23,8 @@
  *
  * Contents:
  *
+ *   main()        - Open socks and poll until we are killed...
+ *   poll_server() - Poll the server for the given set of printers or classes.
  */
 
 /*
@@ -118,11 +120,8 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   for (;;)
   {
-    if (poll_server(http, language, CUPS_GET_PRINTERS, sock, port))
-      continue;
-
-    if (poll_server(http, language, CUPS_GET_CLASSES, sock, port))
-      continue;
+    if (!poll_server(http, language, CUPS_GET_PRINTERS, sock, port))
+      poll_server(http, language, CUPS_GET_CLASSES, sock, port);
 
     sleep(interval);
   }
@@ -151,6 +150,15 @@ poll_server(http_t      *http,		/* I - HTTP connection */
   ipp_pstate_t		state;		/* printer-state */
   struct sockaddr_in	addr;		/* Broadcast address */
   char			packet[1540];	/* Data packet */
+  static const char	*attrs[] =	/* Requested attributes */
+			{
+			  "printer-info",
+			  "printer-location",
+			  "printer-make-and-model",
+			  "printer-state",
+			  "printer-type",
+			  "printer-uri-supported"
+			};
 
 
  /*
@@ -179,6 +187,10 @@ poll_server(http_t      *http,		/* I - HTTP connection */
 
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
                "attributes-natural-language", NULL, language->language);
+
+  ippAddStrings(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
+               "requested-attributes", sizeof(attrs) / sizeof(attrs[0]),
+	       NULL, attrs);
 
  /*
   * Do the request and get back a response...
@@ -305,5 +317,5 @@ poll_server(http_t      *http,		/* I - HTTP connection */
 
 
 /*
- * End of "$Id: cups-polld.c,v 1.5.2.1 2001/05/13 18:38:35 mike Exp $".
+ * End of "$Id: cups-polld.c,v 1.5.2.2 2001/12/26 16:52:52 mike Exp $".
  */

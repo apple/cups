@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.93.2.3 2001/05/13 18:38:38 mike Exp $"
+ * "$Id: printers.c,v 1.93.2.4 2001/12/26 16:52:55 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -500,12 +500,12 @@ LoadAllPrinters(void)
       continue;
 
    /*
-    * Strip trailing newline, if any...
+    * Strip trailing whitespace, if any...
     */
 
     len = strlen(line);
 
-    if (line[len - 1] == '\n')
+    while (len > 0 && isspace(line[len - 1]))
     {
       len --;
       line[len] = '\0';
@@ -754,10 +754,13 @@ SaveAllPrinters(void)
 
     if (printer->info[0])
       fprintf(fp, "Info %s\n", printer->info);
-    if (printer->more_info[0])
+
+    if (printer->location[0])
       fprintf(fp, "Location %s\n", printer->location);
+
     if (printer->device_uri[0])
       fprintf(fp, "DeviceURI %s\n", printer->device_uri);
+
     if (printer->state == IPP_PRINTER_STOPPED)
     {
       fputs("State Stopped\n", fp);
@@ -765,19 +768,18 @@ SaveAllPrinters(void)
     }
     else
       fputs("State Idle\n", fp);
+
     if (printer->accepting)
       fputs("Accepting Yes\n", fp);
     else
       fputs("Accepting No\n", fp);
+
     fprintf(fp, "JobSheets %s %s\n", printer->job_sheets[0],
             printer->job_sheets[1]);
 
-    if (printer->quota_period)
-    {
-      fprintf(fp, "QuotaPeriod %d\n", printer->quota_period);
-      fprintf(fp, "PageLimit %d\n", printer->page_limit);
-      fprintf(fp, "KLimit %d\n", printer->k_limit);
-    }
+    fprintf(fp, "QuotaPeriod %d\n", printer->quota_period);
+    fprintf(fp, "PageLimit %d\n", printer->page_limit);
+    fprintf(fp, "KLimit %d\n", printer->k_limit);
 
     for (i = 0; i < printer->num_users; i ++)
       fprintf(fp, "%sUser %s\n", printer->deny_users ? "Deny" : "Allow",
@@ -807,8 +809,8 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
   char		filename[1024];		/* Name of PPD file */
   int		num_media;		/* Number of media options */
   location_t	*auth;			/* Pointer to authentication element */
-  int		auth_len;		/* Length of class or printer resource */
   const char	*auth_supported;	/* Authentication supported */
+  cups_ptype_t	printer_type;		/* Printer type data */
   ppd_file_t	*ppd;			/* PPD file data */
   ppd_option_t	*input_slot,		/* InputSlot options */
 		*media_type,		/* MediaType options */
@@ -926,15 +928,9 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
   if (!(p->type & CUPS_PRINTER_REMOTE))
   {
     if (p->type & CUPS_PRINTER_CLASS)
-    {
-      auth_len = 8;
       snprintf(resource, sizeof(resource), "/classes/%s", p->name);
-    }
     else
-    {
-      auth_len = 9;
       snprintf(resource, sizeof(resource), "/printers/%s", p->name);
-    }
 
     for (i = NumLocations, auth = Locations; i > 0; i --, auth ++)
       if (strcmp(auth->location, resource) == 0)
@@ -987,7 +983,7 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
   ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_TEXT, "printer-info",
                NULL, p->info);
   ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_URI, "printer-more-info",
-               NULL, p->more_info);
+               NULL, p->uri);
   ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
                "pdl-override-supported", NULL, "not-attempted");
   ippAddStrings(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
@@ -1013,8 +1009,9 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
                "generated-natural-language-supported", NULL, DefaultLanguage);
   ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_MIMETYPE,
                "document-format-default", NULL, "application/octet-stream");
-  ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_MIMETYPE,
-               "document-format-supported", NULL, "application/octet-stream");
+  ippAddStrings(p->attrs, IPP_TAG_PRINTER,
+                (ipp_tag_t)(IPP_TAG_MIMETYPE | IPP_TAG_COPY),
+                "document-format-supported", NumMimeTypes, NULL, MimeTypes);
   ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
                "compression-supported", NULL, "none");
   ippAddInteger(p->attrs, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
@@ -1059,9 +1056,9 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
     * Setup the job-sheets-supported and job-sheets-default attributes...
     */
 
-    if (Classification[0])
-      attr = ippAddStrings(p->attrs, IPP_TAG_PRINTER, IPP_TAG_NAME,
-                	   "job-sheets-supported", 2, NULL, NULL);
+    if (Classification[0] && !ClassifyOverride)
+      attr = ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_NAME,
+                	  "job-sheets-supported", NULL, Classification);
     else
       attr = ippAddStrings(p->attrs, IPP_TAG_PRINTER, IPP_TAG_NAME,
                 	   "job-sheets-supported", NumBanners + 1, NULL, NULL);
@@ -1070,7 +1067,7 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
       LogMessage(L_EMERG, "SetPrinterAttrs: Unable to allocate memory for "
                           "job-sheets-supported attribute: %s!",
 	         strerror(errno));
-    else
+    else if (!Classification[0] || ClassifyOverride)
     {
       attr->values[0].string.text = strdup("none");
 
@@ -1083,15 +1080,20 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
       }
     }
 
-    attr = ippAddStrings(p->attrs, IPP_TAG_PRINTER, IPP_TAG_NAME,
-                	 "job-sheets-default", 2, NULL, NULL);
-
-    if (attr != NULL)
+    if (!(p->type & CUPS_PRINTER_REMOTE))
     {
-      attr->values[0].string.text = strdup(p->job_sheets[0]);
-      attr->values[1].string.text = strdup(p->job_sheets[1]);
+      attr = ippAddStrings(p->attrs, IPP_TAG_PRINTER, IPP_TAG_NAME,
+                	   "job-sheets-default", 2, NULL, NULL);
+
+      if (attr != NULL)
+      {
+	attr->values[0].string.text = strdup(p->job_sheets[0]);
+	attr->values[1].string.text = strdup(p->job_sheets[1]);
+      }
     }
   }
+
+  printer_type = p->type;
 
   if (p->type & CUPS_PRINTER_REMOTE)
   {
@@ -1216,7 +1218,12 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
 	ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_TEXT,
                      "printer-make-and-model", NULL, ppd->nickname);
 
-        strncpy(p->make_model, ppd->nickname, sizeof(p->make_model) - 1);
+        if (ppd->nickname)
+          strncpy(p->make_model, ppd->nickname, sizeof(p->make_model) - 1);
+	else if (ppd->modelname)
+          strncpy(p->make_model, ppd->modelname, sizeof(p->make_model) - 1);
+	else
+	  strcpy(p->make_model, "Bad PPD File");
 
        /*
 	* Add media options from the PPD file...
@@ -1337,6 +1344,8 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
           AddPrinterFilter(p, "application/vnd.cups-postscript 0 -");
 
 	ppdClose(ppd);
+
+        printer_type = p->type;
       }
       else if (access(filename, 0) == 0)
       {
@@ -1365,6 +1374,38 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
 	           ServerRoot, p->name);
 	  AddPrinterFilter(p, filename);
 	}
+	else if (strncmp(p->device_uri, "ipp://", 6) == 0 &&
+	         (strstr(p->device_uri, "/printers/") != NULL ||
+		  strstr(p->device_uri, "/classes/") != NULL))
+        {
+	 /*
+	  * Tell the client this is really a hard-wired remote printer.
+	  */
+
+          printer_type |= CUPS_PRINTER_REMOTE;
+
+         /*
+	  * Reset the printer-uri-supported attribute to point at the
+	  * remote printer...
+	  */
+
+	  attr = ippFindAttribute(p->attrs, "printer-uri-supported", IPP_TAG_URI);
+	  free(attr->values[0].string.text);
+	  attr->values[0].string.text = strdup(p->device_uri);
+
+         /*
+	  * Then set the make-and-model accordingly...
+	  */
+
+	  ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_TEXT,
+                       "printer-make-and-model", NULL, "Remote Printer");
+
+         /*
+	  * Print all files directly...
+	  */
+
+	  AddPrinterFilter(p, "*/* 0 -");
+	}
 	else
 	{
 	 /*
@@ -1390,7 +1431,8 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
   * Add the CUPS-specific printer-type attribute...
   */
 
-  ippAddInteger(p->attrs, IPP_TAG_PRINTER, IPP_TAG_ENUM, "printer-type", p->type);
+  ippAddInteger(p->attrs, IPP_TAG_PRINTER, IPP_TAG_ENUM, "printer-type",
+                printer_type);
 
   DEBUG_printf(("SetPrinterAttrs: leaving name = %s, type = %x\n", p->name,
                 p->type));
@@ -1793,5 +1835,5 @@ write_printcap(void)
 
 
 /*
- * End of "$Id: printers.c,v 1.93.2.3 2001/05/13 18:38:38 mike Exp $".
+ * End of "$Id: printers.c,v 1.93.2.4 2001/12/26 16:52:55 mike Exp $".
  */

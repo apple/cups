@@ -2,27 +2,27 @@
 <TABLE CELLPADDING="0" CELLSPACING="0" BORDER="0" WIDTH="100%">
 <TR BGCOLOR="#999966">
 	<TH WIDTH="16"><IMG SRC="/images/left.gif" ALT=""></TH>
-	<TH>ID</TH>
-	<TH>Name</TH>
-	<TH>User</TH>
-	<TH>Size</TH>
-	<TH>State</TH>
-	<TH>Control</TH>
+	<TH>ID&nbsp;</TH>
+	<TH>Name&nbsp;</TH>
+	<TH>User&nbsp;</TH>
+	<TH>Size&nbsp;</TH>
+	<TH>State&nbsp;</TH>
+	<TH>Control&nbsp;</TH>
 	<TH BGCOLOR="#cccc99" WIDTH="16"><IMG SRC="/images/right.gif" ALT=""></TH>
 </TR>
 <TR>
 	<TD HEIGHT="4"></TD>
 </TR>
 {[job_id]
-<TR>
+<TR VALIGN="TOP">
 	<TD HEIGHT="28"></TD>
-	<TD>{job_id}</TD>
-	<TD>{?job_name=?Unknown:{job_name}}</TD>
-	<TD>{job_originating_user_name}</TD>
-	<TD>{job_k_octets}k</TD>
-	<TD>{job_state=3?pending:{job_state=4?held:
-	{job_state=5?processing:{job_state=6?stopped:
-	{job_state=7?cancelled:{job_state=8?aborted:completed}}}}}}</TD>
+	<TD><A HREF="{job_printer_uri}">{job_printer_name}</A>-{job_id}&nbsp;</TD>
+	<TD>{?job_name=?Unknown:{job_name}}&nbsp;</TD>
+	<TD>{job_originating_user_name}&nbsp;</TD>
+	<TD>{job_k_octets}k&nbsp;</TD>
+	<TD>{job_state=3?pending since<BR>{time_at_creation}:{job_state=4?held since<BR>{time_at_creation}:
+	{job_state=5?processing since<BR>{time_at_processing}:{job_state=6?stopped at<BR>{time_at_completed}:
+	{job_state=7?cancelled at<BR>{time_at_completed}:{job_state=8?aborted:completed at<BR>{time_at_completed}}}}}}}&nbsp;</TD>
 	<TD>
 	{job_state>5?
 	{job_k_octets>0?
@@ -40,8 +40,7 @@
 	<A HREF="/admin/?op=cancel-job&job_id={job_id}">
 	<IMG SRC="/images/cancel-job.gif" ALT="Cancel Job" BORDER="0"></A>
 	}
-	</FORM>
-	</TD>
+	&nbsp;</TD>
 </TR>
 }
 </TABLE>

@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.10 2001/01/22 15:03:23 mike Exp $"
+# "$Id: Makefile,v 1.10.2.1 2001/12/26 16:52:09 mike Exp $"
 #
 #   Configuration file makefile for the Common UNIX Printing System (CUPS).
 #
@@ -51,8 +51,7 @@ clean:
 #
 
 install:
-	-$(MKDIR) $(SERVERROOT)
-	$(CHMOD) ugo+rx $(SERVERROOT)
+	$(INSTALL_DIR) $(SERVERROOT)
 	for file in $(KEEP); do \
 		if test -r $(SERVERROOT)/$$file ; then \
 			$(INSTALL_DATA) $$file $(SERVERROOT)/$$file.N ; \
@@ -69,5 +68,5 @@ install:
 
 
 #
-# End of "$Id: Makefile,v 1.10 2001/01/22 15:03:23 mike Exp $".
+# End of "$Id: Makefile,v 1.10.2.1 2001/12/26 16:52:09 mike Exp $".
 #

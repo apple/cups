@@ -1,5 +1,5 @@
 /*
- * "$Id: pstoraster.c,v 1.19 2001/01/24 17:20:05 mike Exp $"
+ * "$Id: pstoraster.c,v 1.19.2.1 2001/12/26 16:52:49 mike Exp $"
  *
  *   PostScript RIP filter main entry for the Common UNIX Printing System
  *   (CUPS).
@@ -48,6 +48,10 @@
 #include <cups/cups.h>
 #include <cups/string.h>
 #include <stdlib.h>
+
+#ifdef __sgi
+#  include <sys/sysmips.h>
+#endif /* __sgi */
 
 #undef bool
 #undef uchar
@@ -99,6 +103,16 @@ main(int  argc,		/* I - Number of command-line arguments */
   const char		*datadir;	/* CUPS_DATADIR env variable */
   const char		*fontpath;	/* CUPS_FONTPATH env variable */
 
+
+#ifdef __sgi
+ /*
+  * Force unaligned memory access handling on R12K processors...
+  * (this should be done by default...)  Ghostscript is not 64-bit
+  * safe...
+  */
+
+  sysmips(MIPS_FIXADE, 1, 0, 0);
+#endif /* __sgi */
 
  /*
   * Force the locale to "C" to avoid bugs...
@@ -235,5 +249,5 @@ define_string(const char *name,	/* I - Variable to set */
 
 
 /*
- * End of "$Id: pstoraster.c,v 1.19 2001/01/24 17:20:05 mike Exp $".
+ * End of "$Id: pstoraster.c,v 1.19.2.1 2001/12/26 16:52:49 mike Exp $".
  */

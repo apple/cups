@@ -16,7 +16,7 @@
 //------------------------------------------------------------------------
 
 #define standardEncodingSize 335
-static const char *standardEncodingNames[standardEncodingSize] = {
+static char *standardEncodingNames[standardEncodingSize] = {
   NULL,
   NULL,
   NULL,
@@ -357,7 +357,7 @@ static FontEncoding standardEncoding(standardEncodingNames,
                                      standardEncodingSize);
 
 #define symbolEncodingSize 257
-static const char *symbolEncodingNames[symbolEncodingSize] = {
+static char *symbolEncodingNames[symbolEncodingSize] = {
   NULL,
   NULL,
   NULL,
@@ -620,7 +620,7 @@ static FontEncoding symbolEncoding(symbolEncodingNames,
                                    symbolEncodingSize);
 
 #define zapfDingbatsEncodingSize 270
-static const char *zapfDingbatsEncodingNames[zapfDingbatsEncodingSize] = {
+static char *zapfDingbatsEncodingNames[zapfDingbatsEncodingSize] = {
   NULL,
   NULL,
   NULL,
@@ -896,7 +896,7 @@ static FontEncoding zapfDingbatsEncoding(zapfDingbatsEncodingNames,
                                          zapfDingbatsEncodingSize);
 
 #define macRomanEncodingSize 256
-static const char *macRomanEncodingNames[macRomanEncodingSize] = {
+static char *macRomanEncodingNames[macRomanEncodingSize] = {
   NULL,
   NULL,
   NULL,
@@ -1158,7 +1158,7 @@ static FontEncoding macRomanEncoding(macRomanEncodingNames,
                                      macRomanEncodingSize);
 
 #define winAnsiEncodingSize 256
-static const char *winAnsiEncodingNames[winAnsiEncodingSize] = {
+static char *winAnsiEncodingNames[winAnsiEncodingSize] = {
   NULL,
   NULL,
   NULL,
@@ -1287,7 +1287,7 @@ static const char *winAnsiEncodingNames[winAnsiEncodingSize] = {
   "braceright",
   "asciitilde",
   "bullet",
-  "bullet",
+  "Euro",
   "bullet",
   "quotesinglbase",
   "florin",
@@ -2041,28 +2041,30 @@ static Gushort zapfDingbatsWidths[270] = {
 //------------------------------------------------------------------------
 
 struct BuiltinFont {
-  const char *name;
+  char *name;
   Gushort *widths;
   FontEncoding *encoding;
+  short ascent;
+  short descent;
 };
 
 #define numBuiltinFonts ((int)(sizeof(builtinFonts)/sizeof(BuiltinFont)))
 
 static BuiltinFont builtinFonts[] = {
-  {"Courier",               courierWidths,              &standardEncoding},
-  {"Courier-Bold",          courierBoldWidths,          &standardEncoding},
-  {"Courier-BoldOblique",   courierBoldObliqueWidths,   &standardEncoding},
-  {"Courier-Oblique",       courierObliqueWidths,       &standardEncoding},
-  {"Helvetica",             helveticaWidths,            &standardEncoding},
-  {"Helvetica-Bold",        helveticaBoldWidths,        &standardEncoding},
-  {"Helvetica-BoldOblique", helveticaBoldObliqueWidths, &standardEncoding},
-  {"Helvetica-Oblique",     helveticaObliqueWidths,     &standardEncoding},
-  {"Symbol",                symbolWidths,               &symbolEncoding},
-  {"Times-Bold",            timesBoldWidths,            &standardEncoding},
-  {"Times-BoldItalic",      timesBoldItalicWidths,      &standardEncoding},
-  {"Times-Italic",          timesItalicWidths,          &standardEncoding},
-  {"Times-Roman",           timesRomanWidths,           &standardEncoding},
-  {"ZapfDingbats",          zapfDingbatsWidths,         &zapfDingbatsEncoding}
+  {"Courier",               courierWidths,              &standardEncoding,       624,  -207},
+  {"Courier-Bold",          courierBoldWidths,          &standardEncoding,       674,  -257},
+  {"Courier-BoldOblique",   courierBoldObliqueWidths,   &standardEncoding,       674,  -257},
+  {"Courier-Oblique",       courierObliqueWidths,       &standardEncoding,       624,  -207},
+  {"Helvetica",             helveticaWidths,            &standardEncoding,       729,  -219},
+  {"Helvetica-Bold",        helveticaBoldWidths,        &standardEncoding,       729,  -219},
+  {"Helvetica-BoldOblique", helveticaBoldObliqueWidths, &standardEncoding,       729,  -219},
+  {"Helvetica-Oblique",     helveticaObliqueWidths,     &standardEncoding,       729,  -219},
+  {"Symbol",                symbolWidths,               &symbolEncoding,        1010,  -293},
+  {"Times-Bold",            timesBoldWidths,            &standardEncoding,       670,  -210},
+  {"Times-BoldItalic",      timesBoldItalicWidths,      &standardEncoding,       682,  -203},
+  {"Times-Italic",          timesItalicWidths,          &standardEncoding,       684,  -206},
+  {"Times-Roman",           timesRomanWidths,           &standardEncoding,       682,  -217},
+  {"ZapfDingbats",          zapfDingbatsWidths,         &zapfDingbatsEncoding,   820,  -143}
 };
 
 #endif

@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-pam.m4,v 1.2 2001/07/24 20:23:03 mike Exp $"
+dnl "$Id: cups-pam.m4,v 1.2.2.1 2001/12/26 16:52:11 mike Exp $"
 dnl
 dnl   PAM stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -55,5 +55,5 @@ AC_SUBST(PAMDIR)
 AC_SUBST(PAMLIBS)
 
 dnl
-dnl End of "$Id: cups-pam.m4,v 1.2 2001/07/24 20:23:03 mike Exp $".
+dnl End of "$Id: cups-pam.m4,v 1.2.2.1 2001/12/26 16:52:11 mike Exp $".
 dnl

@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.82.2.2 2001/05/13 18:38:03 mike Exp $"
+ * "$Id: http.c,v 1.82.2.3 2001/12/26 16:52:11 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS).
  *
@@ -32,6 +32,8 @@
  *   httpConnectEncrypt() - Connect to a HTTP server using encryption.
  *   httpEncryption()     - Set the required encryption on the link.
  *   httpReconnect()      - Reconnect to a HTTP server...
+ *   httpGetHostByName()  - Lookup a hostname or IP address, and return
+ *                          address records for the specified name.
  *   httpSeparate()       - Separate a Universal Resource Identifier into its
  *                          components.
  *   httpSetField()       - Set the value of an HTTP header.
@@ -352,7 +354,7 @@ httpConnectEncrypt(const char *host,	/* I - Host to connect to */
   * Lookup the host...
   */
 
-  if ((hostaddr = gethostbyname(host)) == NULL)
+  if ((hostaddr = httpGetHostByName(host)) == NULL)
   {
    /*
     * This hack to make users that don't have a localhost entry in
@@ -361,7 +363,7 @@ httpConnectEncrypt(const char *host,	/* I - Host to connect to */
 
     if (strcasecmp(host, "localhost") != 0)
       return (NULL);
-    else if ((hostaddr = gethostbyname("127.0.0.1")) == NULL)
+    else if ((hostaddr = httpGetHostByName("127.0.0.1")) == NULL)
       return (NULL);
   }
 
@@ -396,24 +398,22 @@ httpConnectEncrypt(const char *host,	/* I - Host to connect to */
   */
 
   strncpy(http->hostname, host, sizeof(http->hostname) - 1);
-  memset(&(http->hostaddr), 0, sizeof(http->hostaddr));
 
-  http->hostaddr.addr.sa_family = hostaddr->h_addrtype;
-
-  if (port == 443)
-  {
-   /*
-    * Set the default encryption status...
-    */
-
-    http->encryption = HTTP_ENCRYPT_ALWAYS;
-  }
+  http->hostaddr.sin_family = hostaddr->h_addrtype;
+#ifdef WIN32
+  http->hostaddr.sin_port   = htons((u_short)port);
+#else
+  http->hostaddr.sin_port   = htons(port);
+#endif /* WIN32 */
 
  /*
   * Set the encryption status...
   */
 
-  http->encryption = encrypt;
+  if (port == 443)	/* Always use encryption for https */
+    http->encryption = HTTP_ENCRYPT_ALWAYS;
+  else
+    http->encryption = encrypt;
 
  /*
   * Loop through the addresses we have until one of them connects...
@@ -611,6 +611,69 @@ httpReconnect(http_t *http)	/* I - HTTP data */
 #endif /* HAVE_LIBSSL */
 
   return (0);
+}
+
+
+/*
+ * 'httpGetHostByName()' - Lookup a hostname or IP address, and return
+ *                         address records for the specified name.
+ */
+
+struct hostent *			/* O - Host entry */
+httpGetHostByName(const char *name)	/* I - Hostname or IP address */
+{
+  unsigned		ip[4];		/* IP address components */
+  static unsigned	packed_ip;	/* Packed IPv4 address */
+  static char		*packed_ptr[2];	/* Pointer to packed address */
+  static struct hostent	host_ip;	/* Host entry for IP address */
+
+
+ /*
+  * This function is needed because some operating systems have a
+  * buggy implementation of httpGetHostByName() that does not support
+  * IP addresses.  If the first character of the name string is a
+  * number, then sscanf() is used to extract the IP components.
+  * We then pack the components into an IPv4 address manually,
+  * since the inet_aton() function is deprecated.  We use the
+  * htonl() macro to get the right byte order for the address.
+  */
+
+  if (isdigit(name[0]))
+  {
+   /*
+    * We have an IP address; break it up and provide the host entry
+    * to the caller.  Currently only supports IPv4 addresses, although
+    * it should be trivial to support IPv6 in CUPS 1.2.
+    */
+
+    if (sscanf(name, "%u.%u.%u.%u", ip, ip + 1, ip + 2, ip + 3) != 4)
+      return (NULL); /* Must have 4 numbers */
+
+    packed_ip = htonl(((((((ip[0] << 8) | ip[1]) << 8) | ip[2]) << 8) | ip[3]));
+
+   /*
+    * Fill in the host entry and return it...
+    */
+
+    host_ip.h_name      = (char *)name;
+    host_ip.h_aliases   = NULL;
+    host_ip.h_addrtype  = AF_INET;
+    host_ip.h_length    = 4;
+    host_ip.h_addr_list = packed_ptr;
+    packed_ptr[0]       = (char *)(&packed_ip);
+    packed_ptr[1]       = NULL;
+
+    return (&host_ip);
+  }
+  else
+  {
+   /*
+    * Use the gethostbyname() function to get the IP address for
+    * the name...
+    */
+
+    return (gethostbyname(name));
+  }
 }
 
 
@@ -1115,6 +1178,47 @@ httpRead(http_t *http,			/* I - HTTP data */
   else if (length > http->data_remaining)
     length = http->data_remaining;
 
+  if (http->used == 0 && length <= 256)
+  {
+   /*
+    * Buffer small reads for better performance...
+    */
+
+    if (http->data_remaining > sizeof(http->buffer))
+      bytes = sizeof(http->buffer);
+    else
+      bytes = http->data_remaining;
+
+#ifdef HAVE_LIBSSL
+    if (http->tls)
+      bytes = SSL_read((SSL *)(http->tls), http->buffer, bytes);
+    else
+#endif /* HAVE_LIBSSL */
+    {
+      DEBUG_printf(("httpRead: reading %d bytes from socket into buffer...\n",
+                    bytes));
+
+      bytes = recv(http->fd, http->buffer, bytes, 0);
+
+      DEBUG_printf(("httpRead: read %d bytes from socket into buffer...\n",
+                    bytes));
+    }
+
+    if (bytes > 0)
+      http->used = bytes;
+    else if (bytes < 0)
+    {
+#if defined(WIN32) || defined(__EMX__)
+      http->error = WSAGetLastError();
+#else
+      http->error = errno;
+#endif /* WIN32 || __EMX__ */
+      return (-1);
+    }
+    else
+      return (0);
+  }
+
   if (http->used > 0)
   {
     if (length > http->used)
@@ -1202,6 +1306,8 @@ httpWrite(http_t     *http,		/* I - HTTP data */
 
       if (http->state == HTTP_POST_RECV)
 	http->state ++;
+      else if (http->state == HTTP_PUT_RECV)
+        http->state = HTTP_STATUS;
       else
 	http->state = HTTP_WAITING;
 
@@ -2096,5 +2202,5 @@ http_upgrade(http_t *http)	/* I - HTTP data */
 
 
 /*
- * End of "$Id: http.c,v 1.82.2.2 2001/05/13 18:38:03 mike Exp $".
+ * End of "$Id: http.c,v 1.82.2.3 2001/12/26 16:52:11 mike Exp $".
  */

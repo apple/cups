@@ -1,5 +1,5 @@
 /*
- * "$Id: pstops.c,v 1.54.2.1 2001/05/13 18:38:20 mike Exp $"
+ * "$Id: pstops.c,v 1.54.2.2 2001/12/26 16:52:39 mike Exp $"
  *
  *   PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -100,6 +100,7 @@ main(int  argc,			/* I - Number of command-line arguments */
   int		nbytes,		/* Number of bytes read */
 		tbytes;		/* Total bytes to read for binary data */
   int		page;		/* Current page sequence number */
+  int		real_page;	/* "Real" page number in document */
   int		page_count;	/* Page count for NUp */
   int		subpage;	/* Sub-page number */
   int		copy;		/* Current copy */
@@ -249,6 +250,12 @@ main(int  argc,			/* I - Number of command-line arguments */
   }
 
  /*
+  * See if this is an EPS file...
+  */
+
+  UseESPsp = strstr(line, "EPS") != NULL;
+
+ /*
   * Start sending the document with any commands needed...
   */
 
@@ -280,14 +287,15 @@ main(int  argc,			/* I - Number of command-line arguments */
     */
 
     UseESPsp = 1;
+  }
 
-    WriteLabelProlog(val);
+  WriteLabelProlog(val);
 
+  if (UseESPsp)
     puts("userdict begin\n"
 	 "/ESPshowpage /showpage load def\n"
 	 "/showpage { } def\n"
 	 "end");
-  }
 
   if (Copies > 1 && (!Collate || !slowcollate))
   {
@@ -345,7 +353,7 @@ main(int  argc,			/* I - Number of command-line arguments */
     * Then read all of the pages, filtering as needed...
     */
 
-    for (page = 1;;)
+    for (page = 1, real_page = 1;;)
     {
       if (strncmp(line, "%%BeginDocument:", 16) == 0 ||
           strncmp(line, "%%BeginDocument ", 16) == 0)	/* Adobe Acrobat BUG */
@@ -362,7 +370,7 @@ main(int  argc,			/* I - Number of command-line arguments */
       }
       else if (strncmp(line, "%%Page:", 7) == 0 && level == 0)
       {
-	if (!check_range(NumPages + 1))
+	if (!check_range(real_page))
 	{
 	  while (psgets(line, sizeof(line), fp) != NULL)
 	    if (strncmp(line, "%%BeginDocument:", 16) == 0 ||
@@ -371,7 +379,10 @@ main(int  argc,			/* I - Number of command-line arguments */
 	    else if (strcmp(line, "%%EndDocument") == 0 && level > 0)
               level --;
 	    else if (strncmp(line, "%%Page:", 7) == 0 && level == 0)
+	    {
+	      real_page ++;
 	      break;
+	    }
 
           continue;
         }
@@ -398,6 +409,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	}
 
 	NumPages ++;
+	real_page ++;
       }
       else if (strncmp(line, "%%BeginBinary:", 14) == 0 ||
                (strncmp(line, "%%BeginData:", 12) == 0 &&
@@ -963,5 +975,5 @@ start_nup(int number)	/* I - Page number */
 
 
 /*
- * End of "$Id: pstops.c,v 1.54.2.1 2001/05/13 18:38:20 mike Exp $".
+ * End of "$Id: pstops.c,v 1.54.2.2 2001/12/26 16:52:39 mike Exp $".
  */

@@ -22,7 +22,7 @@
   GNU software to build or run it.
 */
 
-/*$Id: isave.c,v 1.2 2000/03/08 23:15:15 mike Exp $ */
+/*$Id: isave.c,v 1.2.2.1 2001/12/26 16:52:49 mike Exp $ */
 /* Save/restore manager for Ghostscript interpreter */
 #include "ghost.h"
 #include "memory_.h"
@@ -447,9 +447,11 @@ alloc_save_change(gs_dual_memory_t * dmem, const ref * pcont,
 	gs_abort();
     }
     if (r_is_packed(where))
-	*(ref_packed *) & cp->contents = *where;
+	*(ref_packed *)(&(cp->contents)) = *where;
     else {
-	ref_assign_inline(&cp->contents, (ref *) where);
+/* MRS - the following inline assign didn't work...
+	ref_assign_inline(&cp->contents, (ref *) where);*/
+	ref_assign((&(cp->contents)), (ref *) where);
 	r_set_attrs((ref *) where, l_new);
     }
     mem->changes = cp;

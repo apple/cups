@@ -1,5 +1,5 @@
 /*
- * "$Id: imagetoraster.c,v 1.56.2.1 2001/05/13 18:38:19 mike Exp $"
+ * "$Id: imagetoraster.c,v 1.56.2.2 2001/12/26 16:52:39 mike Exp $"
  *
  *   Image file to raster filter for the Common UNIX Printing System (CUPS).
  *
@@ -676,6 +676,12 @@ main(int  argc,		/* I - Number of command-line arguments */
 
     xinches = (float)img->xsize / (float)xppi;
     yinches = (float)img->ysize / (float)yppi;
+
+    if ((val = cupsGetOption("natural-scaling", num_options, options)) != NULL)
+    {
+      xinches = xinches * atoi(val) / 100;
+      yinches = yinches * atoi(val) / 100;
+    }
 
     if (cupsGetOption("orientation", num_options, options) == NULL &&
         cupsGetOption("landscape", num_options, options) == NULL)
@@ -4442,5 +4448,5 @@ make_lut(ib_t  *lut,		/* I - Lookup table */
 
 
 /*
- * End of "$Id: imagetoraster.c,v 1.56.2.1 2001/05/13 18:38:19 mike Exp $".
+ * End of "$Id: imagetoraster.c,v 1.56.2.2 2001/12/26 16:52:39 mike Exp $".
  */

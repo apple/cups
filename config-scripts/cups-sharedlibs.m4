@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-sharedlibs.m4,v 1.6 2001/10/26 03:16:47 mike Exp $"
+dnl "$Id: cups-sharedlibs.m4,v 1.6.2.1 2001/12/26 16:52:11 mike Exp $"
 dnl
 dnl   Shared library support for the Common UNIX Printing System (CUPS).
 dnl
@@ -30,26 +30,26 @@ AC_ARG_ENABLE(shared, [  --enable-shared         turn on shared libraries [defau
 if test x$enable_shared != xno; then
 	case "$uname" in
 		SunOS* | UNIX_S*)
-			LIBCUPS="libcups.so.2"
-			LIBCUPSIMAGE="libcupsimage.so.2"
+			LIBCUPS="libcups.so.3"
+			LIBCUPSIMAGE="libcupsimage.so.3"
 			DSO="\$(CC)"
 			DSOFLAGS="$DSOFLAGS -Wl,-h,\$@ -G \$(OPTIM)"
 			;;
 		HP-UX*)
-			LIBCUPS="libcups.sl.2"
-			LIBCUPSIMAGE="libcupsimage.sl.2"
+			LIBCUPS="libcups.sl.3"
+			LIBCUPSIMAGE="libcupsimage.sl.3"
 			DSO="ld"
 			DSOFLAGS="$DSOFLAGS -b -z +h \$@"
 			;;
 		OSF1* | Linux* | IRIX* | FreeBSD* | NetBSD* | OpenBSD*)
-			LIBCUPS="libcups.so.2"
-			LIBCUPSIMAGE="libcupsimage.so.2"
+			LIBCUPS="libcups.so.3"
+			LIBCUPSIMAGE="libcupsimage.so.3"
 			DSO="\$(CC)"
 			DSOFLAGS="$DSOFLAGS -Wl,-soname,\$@ -shared \$(OPTIM)"
 			;;
 		Darwin*)
-			LIBCUPS="libcups.2.dylib"
-			LIBCUPSIMAGE="libcupsimage.2.dylib"
+			LIBCUPS="libcups.3.dylib"
+			LIBCUPSIMAGE="libcupsimage.3.dylib"
 			DSO="ld"
 			DSOFLAGS="$DSOFLAGS -dylib /usr/lib/dylib1.o -lc"
 			;;
@@ -62,8 +62,8 @@ if test x$enable_shared != xno; then
 		*)
 			echo "Warning: shared libraries may not be supported.  Trying -shared"
 			echo "         option with compiler."
-			LIBCUPS="libcups.so.2"
-			LIBCUPSIMAGE="libcupsimage.so.2"
+			LIBCUPS="libcups.so.3"
+			LIBCUPSIMAGE="libcupsimage.so.3"
 			DSO="\$(CC)"
 			DSOFLAGS="$DSOFLAGS -Wl,-soname,\$@ -shared \$(OPTIM)"
 			;;
@@ -141,5 +141,5 @@ AC_SUBST(DSOLIBS)
 AC_SUBST(IMGLIBS)
 
 dnl
-dnl End of "$Id: cups-sharedlibs.m4,v 1.6 2001/10/26 03:16:47 mike Exp $".
+dnl End of "$Id: cups-sharedlibs.m4,v 1.6.2.1 2001/12/26 16:52:11 mike Exp $".
 dnl

@@ -1,5 +1,5 @@
 /*
- * "$Id: testppd.c,v 1.18 2001/01/22 15:03:31 mike Exp $"
+ * "$Id: testppd.c,v 1.18.2.1 2001/12/26 16:52:13 mike Exp $"
  *
  *   PPD test program for the Common UNIX Printing System (CUPS).
  *
@@ -55,6 +55,8 @@ main(int  argc,			/* I - Number of command-line arguments */
   static char	*sections[] = { "ANY", "DOCUMENT", "EXIT",
                                 "JCL", "PAGE", "PROLOG" };
 
+
+  setbuf(stdout, NULL);
 
  /*
   * Display PPD files for each file listed on the command-line...
@@ -127,9 +129,10 @@ main(int  argc,			/* I - Number of command-line arguments */
 
       for (k = 0, option = group->options; k < group->num_options; k ++, option ++)
       {
-	printf("            options[%d] = %s (%s) %s %s %.0f\n", k,
+	printf("            options[%d] = %s (%s) %s %s %.0f (%d choices)\n", k,
 	       option->keyword, option->text, uis[option->ui],
-	       sections[option->section], option->order);
+	       sections[option->section], option->order,
+	       option->num_choices);
 
         if (strcmp(option->keyword, "PageSize") == 0 ||
             strcmp(option->keyword, "PageRegion") == 0)
@@ -194,5 +197,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: testppd.c,v 1.18 2001/01/22 15:03:31 mike Exp $".
+ * End of "$Id: testppd.c,v 1.18.2.1 2001/12/26 16:52:13 mike Exp $".
  */

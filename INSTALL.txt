@@ -1,4 +1,4 @@
-INSTALL - CUPS v1.1.7 - 05/01/2001
+INSTALL - CUPS v1.2.0 - 12/26/2001
 ----------------------------------
 
 This file describes how to compile and install CUPS from source
@@ -48,11 +48,12 @@ another location:
 
 If the PNG, JPEG, TIFF, and ZLIB libraries are not installed in
 a system default location (typically "/usr/include" and
-"/usr/lib") you'll need to set the CFLAGS, CXXFLAGS, and LDFLAGS
-environment variables prior to running configure:
+"/usr/lib") you'll need to set the CFLAGS, CXXFLAGS, DSOFLAGS,
+and LDFLAGS environment variables prior to running configure:
 
     setenv CFLAGS "-I/some/directory" ENTER
     setenv CXXFLAGS "-I/some/directory" ENTER
+    setenv DSOFLAGS "-L/some/directory" ENTER
     setenv LDFLAGS "-L/some/directory" ENTER
     ./configure ... ENTER
 
@@ -60,6 +61,7 @@ or:
 
     CFLAGS="-I/some/directory"; export CFLAGS ENTER
     CXXFLAGS="-I/some/directory"; export CXXFLAGS ENTER
+    DSOFLAGS="-L/some/directory"; export DSOFLAGS ENTER
     LDFLAGS="-L/some/directory"; export LDFLAGS ENTER
     ./configure ... ENTER
 
@@ -72,6 +74,14 @@ SSL and TLS support require the OpenSSL library, available at:
 
     http://www.openssl.org
 
+If the OpenSSL header files and libraries are not in a standard
+location, specify the locations of these files using the
+--with-openssl-includes and --with-openssl-libs directives:
+
+    ./configure --enable-ssl \
+        --with-openssl-includes=/foo/bar/include \
+        --with-openssl-libs=/foo/bar/lib
+
 See the file "ENCRYPTION.txt" for information on using the
 encryption support in CUPS.
 
@@ -79,7 +89,7 @@ Once you have configured things, just type:
 
     make ENTER
 
-or if you have FreeBSD:
+or if you have FreeBSD, NetBSD, or OpenBSD type:
 
     gmake ENTER
 
@@ -94,7 +104,7 @@ your local system:
 
     make install ENTER
 
-or for FreeBSD:
+or for FreeBSD, NetBSD, or OpenBSD:
 
     gmake install ENTER
 
@@ -124,16 +134,19 @@ or
 
     gmake <format> ENTER
 
-for FreeBSD, where <format> is one of the following:
+for FreeBSD, NetBSD, and OpenBSD.  The <format> target is one of
+the following:
 
     epm      - Builds a portable shell script and tar file based
                distribution.  This format will also backup your
 	       existing printing system if you decide to remove
 	       CUPS at some future time.
-    rpm      - Builds a RPM binary distribution.
+    aix      - Builds an AIX binary distribution.
+    bsd      - Builds a *BSD binary distribution.
     deb      - Builds a Debian binary distribution.
     depot    - Builds a HP-UX binary distribution.
     pkg      - Builds a Solaris binary distribution.
+    rpm      - Builds a RPM binary distribution.
     tardist  - Builds an IRIX binary distribution.
 
 

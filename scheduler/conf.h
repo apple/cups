@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.h,v 1.36 2001/03/14 13:45:34 mike Exp $"
+ * "$Id: conf.h,v 1.36.2.1 2001/12/26 16:52:51 mike Exp $"
  *
  *   Configuration file definitions for the Common UNIX Printing System (CUPS)
  *   scheduler.
@@ -64,10 +64,12 @@ VAR char		ConfigurationFile[256]	VALUE(CUPS_SERVERROOT "/cupsd.conf"),
 					/* Root directory for binaries */
 			RequestRoot[1024]	VALUE(CUPS_REQUESTS),
 					/* Directory for request files */
-			DocumentRoot[1024]	VALUE(CUPS_DOCROOT),
+			DocumentRoot[1024]	VALUE(CUPS_DOCROOT);
 					/* Root directory for documents */
-			SystemGroup[32],
-					/* System group name */
+VAR int			NumSystemGroups		VALUE(0);
+					/* Number of system group names */
+VAR char		SystemGroups[MAX_SYSTEM_GROUPS][32],
+					/* System group names */
 			AccessLog[1024]		VALUE(CUPS_LOGDIR "/access_log"),
 					/* Access log filename */
 			ErrorLog[1024]		VALUE(CUPS_LOGDIR "/error_log"),
@@ -92,7 +94,9 @@ VAR char		ConfigurationFile[256]	VALUE(CUPS_SERVERROOT "/cupsd.conf"),
 					/* Remote root user */
 			Classification[IPP_MAX_NAME]	VALUE("");
 					/* Classification of system */
-VAR int			User			VALUE(1),
+VAR int			ClassifyOverride	VALUE(0),
+					/* Allow overrides? */
+			User			VALUE(1),
 					/* User ID for server */
 			Group			VALUE(0),
 					/* Group ID for server */
@@ -114,6 +118,10 @@ VAR int			User			VALUE(1),
 					/* Timeout between requests */
 			ImplicitClasses		VALUE(TRUE),
 					/* Are classes implicitly created? */
+			ImplicitAnyClasses	VALUE(FALSE),
+					/* Create AnyPrinter classes? */
+			HideImplicitMembers	VALUE(TRUE),
+					/* Hide implicit class members? */
 			FilterLimit		VALUE(0),
 					/* Max filter cost at any time */
 			FilterLevel		VALUE(0),
@@ -130,6 +138,10 @@ VAR FILE		*AccessFile		VALUE(NULL),
 					/* Page log file */
 VAR mime_t		*MimeDatabase		VALUE(NULL);
 					/* MIME type database */
+VAR int			NumMimeTypes		VALUE(0);
+					/* Number of MIME types */
+VAR const char		**MimeTypes		VALUE(NULL);
+					/* Array of MIME types */
 
 #ifdef HAVE_LIBSSL
 VAR char		ServerCertificate[1024]	VALUE("ssl/server.crt"),
@@ -151,5 +163,5 @@ extern int	LogPage(job_t *job, const char *page);
 
 
 /*
- * End of "$Id: conf.h,v 1.36 2001/03/14 13:45:34 mike Exp $".
+ * End of "$Id: conf.h,v 1.36.2.1 2001/12/26 16:52:51 mike Exp $".
  */

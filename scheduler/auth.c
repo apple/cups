@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.c,v 1.41.2.2 2001/05/13 18:38:33 mike Exp $"
+ * "$Id: auth.c,v 1.41.2.3 2001/12/26 16:52:50 mike Exp $"
  *
  *   Authorization routines for the Common UNIX Printing System (CUPS).
  *
@@ -42,8 +42,11 @@
  *   IsAuthorized()       - Check to see if the user is authorized...
  *   add_allow()          - Add an allow mask to the location.
  *   add_deny()           - Add a deny mask to the location.
+ *   cups_crypt()         - Encrypt the password using the DES or MD5
+ *                          algorithms, as needed.
  *   get_md5_passwd()     - Get an MD5 password.
  *   pam_func()           - PAM conversation function.
+ *   to64()               - Base64-encode an integer value...
  */
 
 /*
@@ -53,6 +56,7 @@
 #include "cupsd.h"
 #include <pwd.h>
 #include <grp.h>
+#include <cups/md5.h>
 #ifdef HAVE_SHADOW_H
 #  include <shadow.h>
 #endif /* HAVE_SHADOW_H */
@@ -73,11 +77,16 @@
 
 static authmask_t	*add_allow(location_t *loc);
 static authmask_t	*add_deny(location_t *loc);
+#if !HAVE_LIBPAM
+static char		*cups_crypt(const char *pw, const char *salt);
+#endif /* !HAVE_LIBPAM */
 static char		*get_md5_passwd(const char *username, const char *group,
 			                char passwd[33]);
 #if HAVE_LIBPAM
 static int		pam_func(int, const struct pam_message **,
 			         struct pam_response **, void *);
+#else
+static void		to64(char *s, unsigned long v, int n);
 #endif /* HAVE_LIBPAM */
 
 
@@ -515,7 +524,8 @@ DenyIP(location_t *loc,		/* I - Location to add to */
  */
 
 location_t *			/* O - Location that matches */
-FindBest(client_t *con)		/* I - Connection */
+FindBest(const char   *path,	/* I - Resource path */
+         http_state_t state)	/* I - HTTP state/request */
 {
   int		i;		/* Looping var */
   location_t	*loc,		/* Current location */
@@ -542,10 +552,34 @@ FindBest(client_t *con)		/* I - Connection */
 
 
  /*
+  * First copy the connection URI to a local string so we have drop
+  * any .ppd extension from the pathname in /printers or /classes
+  * URIs...
+  */
+
+  strncpy(uri, path, sizeof(uri) - 1);
+  uri[sizeof(uri) - 1] = '\0';
+
+  if (strncmp(uri, "/printers/", 10) == 0 ||
+      strncmp(uri, "/classes/", 9) == 0)
+  {
+   /*
+    * Check if the URI has .ppd on the end...
+    */
+
+    uriptr = uri + strlen(uri) - 4; /* len > 4 if we get here... */
+
+    if (strcmp(uriptr, ".ppd") == 0)
+      *uriptr = '\0';
+  }
+
+  LogMessage(L_DEBUG2, "FindBest: uri = \"%s\"...", uri);
+
+ /*
   * Loop through the list of locations to find a match...
   */
 
-  limit   = limits[con->http.state];
+  limit   = limits[state];
   best    = NULL;
   bestlen = 0;
 
@@ -612,7 +646,8 @@ IsAuthorized(client_t *con)	/* I - Connection */
   struct group	*grp;		/* Group data */
   char		nonce[HTTP_MAX_VALUE],
 				/* Nonce value from client */
-		md5[33];	/* MD5 password */
+		md5[33],	/* MD5 password */
+		basicmd5[33];	/* MD5 of Basic password */
 #if HAVE_LIBPAM
   pam_handle_t	*pamh;		/* PAM authentication handle */
   int		pamerr;		/* PAM error code */
@@ -653,7 +688,7 @@ IsAuthorized(client_t *con)	/* I - Connection */
   * not authorized...
   */
 
-  if ((best = FindBest(con)) == NULL)
+  if ((best = FindBest(con->uri, con->http.state)) == NULL)
     return (HTTP_FORBIDDEN);
 
  /*
@@ -698,6 +733,14 @@ IsAuthorized(client_t *con)	/* I - Connection */
   {
    /*
     * Access from localhost (127.0.0.1 or 0.0.0.1) is always allowed...
+    */
+
+    auth = AUTH_ALLOW;
+  }
+  else if (best->num_allow == 0 && best->num_deny == 0)
+  {
+   /*
+    * No allow/deny lines - allow access...
     */
 
     auth = AUTH_ALLOW;
@@ -795,7 +838,10 @@ IsAuthorized(client_t *con)	/* I - Connection */
   LogMessage(L_DEBUG2, "IsAuthorized: Checking \"%s\", address = %08x, hostname = \"%s\"",
              con->username, address, con->http.hostname);
 
-  if (strcasecmp(con->http.hostname, "localhost") != 0 ||
+  pw = NULL;
+
+  if ((address != 0x7f000001 &&
+       strcasecmp(con->http.hostname, "localhost") != 0) ||
       strncmp(con->http.fields[HTTP_FIELD_AUTHORIZATION], "Local", 5) != 0)
   {
    /*
@@ -806,171 +852,242 @@ IsAuthorized(client_t *con)	/* I - Connection */
       return (HTTP_UNAUTHORIZED);
 
    /*
-    * See if we are doing Digest or Basic authentication...
+    * See what kind of authentication we are doing...
     */
 
-    if (best->type == AUTH_BASIC)
+    switch (best->type)
     {
-#if HAVE_LIBPAM
-     /*
-      * Only use PAM to do authentication.  This allows MD5 passwords, among
-      * other things...
-      */
+      case AUTH_BASIC :
+	 /*
+	  * Get the user info...
+	  */
 
-      pamdata.conv        = pam_func;
-      pamdata.appdata_ptr = con;
+	  pw = getpwnam(con->username);	/* Get the current password */
+	  endpwent();				/* Close the password file */
+
+	  if (pw == NULL)			/* No such user... */
+	  {
+	    LogMessage(L_WARN, "IsAuthorized: Unknown username \"%s\"; access denied.",
+        	       con->username);
+	    return (HTTP_UNAUTHORIZED);
+	  }
+
+#if HAVE_LIBPAM
+	 /*
+	  * Only use PAM to do authentication.  This allows MD5 passwords, among
+	  * other things...
+	  */
+
+	  pamdata.conv        = pam_func;
+	  pamdata.appdata_ptr = con;
 
 #  ifdef __hpux
-     /*
-      * Workaround for HP-UX bug in pam_unix; see pam_conv() below for
-      * more info...
-      */
+	 /*
+	  * Workaround for HP-UX bug in pam_unix; see pam_conv() below for
+	  * more info...
+	  */
 
-      auth_client = con;
+	  auth_client = con;
 #  endif /* __hpux */
 
-      DEBUG_printf(("IsAuthorized: Setting appdata_ptr = %p\n", con));
+	  DEBUG_printf(("IsAuthorized: Setting appdata_ptr = %p\n", con));
 
-      pamerr = pam_start("cups", con->username, &pamdata, &pamh);
-      if (pamerr != PAM_SUCCESS)
-      {
-	LogMessage(L_ERROR, "IsAuthorized: pam_start() returned %d (%s)!\n",
-        	   pamerr, pam_strerror(pamh, pamerr));
-	pam_end(pamh, 0);
-	return (HTTP_UNAUTHORIZED);
-      }
+	  pamerr = pam_start("cups", con->username, &pamdata, &pamh);
+	  if (pamerr != PAM_SUCCESS)
+	  {
+	    LogMessage(L_ERROR, "IsAuthorized: pam_start() returned %d (%s)!\n",
+        	       pamerr, pam_strerror(pamh, pamerr));
+	    pam_end(pamh, 0);
+	    return (HTTP_UNAUTHORIZED);
+	  }
 
-      pamerr = pam_authenticate(pamh, PAM_SILENT);
-      if (pamerr != PAM_SUCCESS)
-      {
-	LogMessage(L_ERROR, "IsAuthorized: pam_authenticate() returned %d (%s)!\n",
-        	   pamerr, pam_strerror(pamh, pamerr));
-	pam_end(pamh, 0);
-	return (HTTP_UNAUTHORIZED);
-      }
+	  pamerr = pam_authenticate(pamh, PAM_SILENT);
+	  if (pamerr != PAM_SUCCESS)
+	  {
+	    LogMessage(L_ERROR, "IsAuthorized: pam_authenticate() returned %d (%s)!\n",
+        	       pamerr, pam_strerror(pamh, pamerr));
+	    pam_end(pamh, 0);
+	    return (HTTP_UNAUTHORIZED);
+	  }
 
-      pamerr = pam_acct_mgmt(pamh, PAM_SILENT);
-      if (pamerr != PAM_SUCCESS)
-      {
-	LogMessage(L_ERROR, "IsAuthorized: pam_acct_mgmt() returned %d (%s)!\n",
-        	   pamerr, pam_strerror(pamh, pamerr));
-	pam_end(pamh, 0);
-	return (HTTP_UNAUTHORIZED);
-      }
+	  pamerr = pam_acct_mgmt(pamh, PAM_SILENT);
+	  if (pamerr != PAM_SUCCESS)
+	  {
+	    LogMessage(L_ERROR, "IsAuthorized: pam_acct_mgmt() returned %d (%s)!\n",
+        	       pamerr, pam_strerror(pamh, pamerr));
+	    pam_end(pamh, 0);
+	    return (HTTP_UNAUTHORIZED);
+	  }
 
-      pam_end(pamh, PAM_SUCCESS);
+	  pam_end(pamh, PAM_SUCCESS);
 #elif defined(HAVE_USERSEC_H)
-     /*
-      * Use AIX authentication interface...
-      */
+	 /*
+	  * Use AIX authentication interface...
+	  */
 
-      LogMessage(L_DEBUG, "IsAuthorized: AIX authenticate of username \"%s\"",
-                 con->username);
+	  LogMessage(L_DEBUG, "IsAuthorized: AIX authenticate of username \"%s\"",
+                     con->username);
 
-      reenter = 1;
-      if (authenticate(con->username, con->password, &reenter, &authmsg) != 0)
-      {
-	LogMessage(L_DEBUG, "IsAuthorized: Unable to authenticate username \"%s\": %s",
-	           con->username, strerror(errno));
-	return (HTTP_UNAUTHORIZED);
-      }
+	  reenter = 1;
+	  if (authenticate(con->username, con->password, &reenter, &authmsg) != 0)
+	  {
+	    LogMessage(L_DEBUG, "IsAuthorized: Unable to authenticate username \"%s\": %s",
+	               con->username, strerror(errno));
+	    return (HTTP_UNAUTHORIZED);
+	  }
 #else
 #  ifdef HAVE_SHADOW_H
-      spw = getspnam(con->username);
-      endspent();
+	  spw = getspnam(con->username);
+	  endspent();
 
-      if (spw == NULL && strcmp(pw->pw_passwd, "x") == 0)
-      {					/* Don't allow blank passwords! */
-	LogMessage(L_WARN, "IsAuthorized: Username \"%s\" has no shadow password; access denied.",
-        	   con->username);
-	return (HTTP_UNAUTHORIZED);		/* No such user or bad shadow file */
-      }
+	  if (spw == NULL && strcmp(pw->pw_passwd, "x") == 0)
+	  {					/* Don't allow blank passwords! */
+	    LogMessage(L_WARN, "IsAuthorized: Username \"%s\" has no shadow password; access denied.",
+        	       con->username);
+	    return (HTTP_UNAUTHORIZED);	/* No such user or bad shadow file */
+	  }
 
 #    ifdef DEBUG
-      if (spw != NULL)
-	printf("spw->sp_pwdp = \"%s\"\n", spw->sp_pwdp);
-      else
-	puts("spw = NULL");
+	  if (spw != NULL)
+	    printf("spw->sp_pwdp = \"%s\"\n", spw->sp_pwdp);
+	  else
+	    puts("spw = NULL");
 #    endif /* DEBUG */
 
-      if (spw != NULL && spw->sp_pwdp[0] == '\0' && pw->pw_passwd[0] == '\0')
+	  if (spw != NULL && spw->sp_pwdp[0] == '\0' && pw->pw_passwd[0] == '\0')
 #  else
-      if (pw->pw_passwd[0] == '\0')		/* Don't allow blank passwords! */
+	  if (pw->pw_passwd[0] == '\0')
 #  endif /* HAVE_SHADOW_H */
-      {					/* Don't allow blank passwords! */
-	LogMessage(L_WARN, "IsAuthorized: Username \"%s\" has no password; access denied.",
-        	   con->username);
-	return (HTTP_UNAUTHORIZED);
-      }
-
-     /*
-      * OK, the password isn't blank, so compare with what came from the client...
-      */
-
-      LogMessage(L_DEBUG2, "IsAuthorized: pw_passwd = %s, crypt = %s",
-		 pw->pw_passwd, crypt(con->password, pw->pw_passwd));
-
-      pass = crypt(con->password, pw->pw_passwd);
-
-      if (pass == NULL ||
-	  strcmp(pw->pw_passwd, crypt(con->password, pw->pw_passwd)) != 0)
-      {
-#  ifdef HAVE_SHADOW_H
-	if (spw != NULL)
-	{
-	  LogMessage(L_DEBUG2, "IsAuthorized: sp_pwdp = %s, crypt = %s",
-		     spw->sp_pwdp, crypt(con->password, spw->sp_pwdp));
-
-	  pass = crypt(con->password, spw->sp_pwdp);
-
-	  if (pass == NULL ||
-              strcmp(spw->sp_pwdp, crypt(con->password, spw->sp_pwdp)) != 0)
+	  {					/* Don't allow blank passwords! */
+	    LogMessage(L_WARN, "IsAuthorized: Username \"%s\" has no password; access denied.",
+        	       con->username);
 	    return (HTTP_UNAUTHORIZED);
-	}
-	else
+	  }
+
+	 /*
+	  * OK, the password isn't blank, so compare with what came from the client...
+	  */
+
+	  pass = cups_crypt(con->password, pw->pw_passwd);
+
+	  LogMessage(L_DEBUG2, "IsAuthorized: pw_passwd = %s, crypt = %s",
+		     pw->pw_passwd, pass);
+
+	  if (pass == NULL || strcmp(pw->pw_passwd, pass) != 0)
+	  {
+#  ifdef HAVE_SHADOW_H
+	    if (spw != NULL)
+	    {
+	      pass = cups_crypt(con->password, spw->sp_pwdp);
+
+	      LogMessage(L_DEBUG2, "IsAuthorized: sp_pwdp = %s, crypt = %s",
+			 spw->sp_pwdp, pass);
+
+	      if (pass == NULL || strcmp(spw->sp_pwdp, pass) != 0)
+		return (HTTP_UNAUTHORIZED);
+	    }
+	    else
 #  endif /* HAVE_SHADOW_H */
-	  return (HTTP_UNAUTHORIZED);
-      }
+	      return (HTTP_UNAUTHORIZED);
+	  }
 #endif /* HAVE_LIBPAM */
+          break;
+      case AUTH_DIGEST :
+	 /*
+	  * Do Digest authentication...
+	  */
+
+	  if (!httpGetSubField(&(con->http), HTTP_FIELD_AUTHORIZATION, "nonce",
+                               nonce))
+	  {
+            LogMessage(L_ERROR, "IsAuthorized: No nonce value for Digest authentication!");
+            return (HTTP_UNAUTHORIZED);
+	  }
+
+	  if (strcmp(con->http.hostname, nonce) != 0)
+	  {
+            LogMessage(L_ERROR, "IsAuthorized: Nonce value error!");
+            LogMessage(L_ERROR, "IsAuthorized: Expected \"%s\",",
+	               con->http.hostname);
+            LogMessage(L_ERROR, "IsAuthorized: Got \"%s\"!", nonce);
+            return (HTTP_UNAUTHORIZED);
+	  }
+
+	  LogMessage(L_DEBUG2, "IsAuthorized: nonce = \"%s\"", nonce);
+
+	  if (best->num_names && best->level == AUTH_GROUP)
+	  {
+            for (i = 0; i < best->num_names; i ++)
+	      if (get_md5_passwd(con->username, best->names[i], md5))
+		break;
+
+            if (i >= best->num_names)
+	      md5[0] = '\0';
+	  }
+	  else if (!get_md5_passwd(con->username, NULL, md5))
+	    md5[0] = '\0';
+
+
+	  if (!md5[0])
+	  {
+            LogMessage(L_ERROR, "IsAuthorized: No matching user:group for \"%s\" in passwd.md5!",
+	               con->username);
+            return (HTTP_UNAUTHORIZED);
+	  }
+
+	  httpMD5Final(nonce, states[con->http.state], con->uri, md5);
+
+	  if (strcmp(md5, con->password) != 0)
+	  {
+            LogMessage(L_ERROR, "IsAuthorized: MD5s \"%s\" and \"%s\" don't match!",
+	               md5, con->password);
+            return (HTTP_UNAUTHORIZED);
+	  }
+          break;
+
+      case AUTH_BASICDIGEST :
+         /*
+	  * Do Basic authentication with the Digest password file...
+	  */
+
+	  if (best->num_names && best->level == AUTH_GROUP)
+	  {
+            for (i = 0; i < best->num_names; i ++)
+	      if (get_md5_passwd(con->username, best->names[i], md5))
+		break;
+
+            if (i >= best->num_names)
+	      md5[0] = '\0';
+	  }
+	  else if (!get_md5_passwd(con->username, NULL, md5))
+	    md5[0] = '\0';
+
+	  if (!md5[0])
+	  {
+            LogMessage(L_ERROR, "IsAuthorized: No matching user:group for \"%s\" in passwd.md5!",
+	               con->username);
+            return (HTTP_UNAUTHORIZED);
+	  }
+
+	  httpMD5(con->username, "CUPS", con->password, basicmd5);
+
+	  if (strcmp(md5, basicmd5) != 0)
+	  {
+            LogMessage(L_ERROR, "IsAuthorized: MD5s \"%s\" and \"%s\" don't match!",
+	               md5, basicmd5);
+            return (HTTP_UNAUTHORIZED);
+	  }
+	  break;
     }
-    else
-    {
-     /*
-      * Do Digest authentication...
-      */
+  }
+  else
+  {
+   /*
+    * Get password entry for certificate-based auth...
+    */
 
-      if (!httpGetSubField(&(con->http), HTTP_FIELD_WWW_AUTHENTICATE, "nonce",
-                           nonce))
-      {
-        LogMessage(L_ERROR, "IsAuthorized: No nonce value for Digest authentication!");
-        return (HTTP_UNAUTHORIZED);
-      }
-
-      if (strcmp(con->http.hostname, nonce) != 0)
-      {
-        LogMessage(L_ERROR, "IsAuthorized: Nonce value error!");
-        LogMessage(L_ERROR, "IsAuthorized: Expected \"%s\",",
-	           con->http.hostname);
-        LogMessage(L_ERROR, "IsAuthorized: Got \"%s\"!", nonce);
-        return (HTTP_UNAUTHORIZED);
-      }
-
-      if (!get_md5_passwd(con->username, best->names[0], md5))
-      {
-        LogMessage(L_ERROR, "IsAuthorized: No user:group for \"%s:%s\" in passwd.md5!",
-	           con->username, best->names[0]);
-        return (HTTP_UNAUTHORIZED);
-      }
-
-      httpMD5Final(nonce, states[con->http.state], con->uri, md5);
-
-      if (strcmp(md5, con->password) != 0)
-      {
-        LogMessage(L_ERROR, "IsAuthorized: MD5s \"%s\" and \"%s\" don't match!",
-	           md5, con->password);
-        return (HTTP_UNAUTHORIZED);
-      }
-    }
+    pw = getpwnam(con->username);	/* Get the current password */
+    endpwent();				/* Close the password file */
   }
 
  /*
@@ -1011,37 +1128,52 @@ IsAuthorized(client_t *con)	/* I - Connection */
 
   LogMessage(L_DEBUG2, "IsAuthorized: Checking group membership...");
 
-  for (i = 0; i < best->num_names; i ++)
+  if (best->type == AUTH_BASIC)
   {
-    grp = getgrnam(best->names[i]);
-    endgrent();
-
-    if (grp == NULL)			/* No group by that name??? */
-    {
-      LogMessage(L_WARN, "IsAuthorized: group name \"%s\" does not exist!",
-        	 best->names[i]);
-      return (HTTP_FORBIDDEN);
-    }
-
-    for (j = 0; grp->gr_mem[j] != NULL; j ++)
-      if (strcmp(con->username, grp->gr_mem[j]) == 0)
-	return (HTTP_OK);
-
    /*
-    * Check to see if the default group ID matches for the user...
+    * Check to see if this user is in any of the named groups...
     */
 
-    if (grp->gr_gid == pw->pw_gid)
-      return (HTTP_OK);
+    LogMessage(L_DEBUG2, "IsAuthorized: Checking group membership...");
+
+    for (i = 0; i < best->num_names; i ++)
+    {
+      grp = getgrnam(best->names[i]);
+      endgrent();
+
+      if (grp == NULL)			/* No group by that name??? */
+      {
+	LogMessage(L_WARN, "IsAuthorized: group name \"%s\" does not exist!",
+        	   best->names[i]);
+	return (HTTP_FORBIDDEN);
+      }
+
+      for (j = 0; grp->gr_mem[j] != NULL; j ++)
+	if (strcmp(con->username, grp->gr_mem[j]) == 0)
+	  return (HTTP_OK);
+
+     /*
+      * Check to see if the default group ID matches for the user...
+      */
+
+      if (grp->gr_gid == pw->pw_gid)
+	return (HTTP_OK);
+    }
+
+   /*
+    * The user isn't part of the specified group, so deny access...
+    */
+
+    LogMessage(L_DEBUG2, "IsAuthorized: user not in group!");
+
+    return (HTTP_UNAUTHORIZED);
   }
 
  /*
-  * The user isn't part of the specified group, so deny access...
+  * All checks passed...
   */
 
-  LogMessage(L_DEBUG2, "IsAuthorized: user not in group!");
-
-  return (HTTP_UNAUTHORIZED);
+  return (HTTP_OK);
 }
 
 
@@ -1127,6 +1259,129 @@ add_deny(location_t *loc)	/* I - Location to add to */
   memset(temp, 0, sizeof(authmask_t));
   return (temp);
 }
+
+
+#if !HAVE_LIBPAM
+/*
+ * 'cups_crypt()' - Encrypt the password using the DES or MD5 algorithms,
+ *                  as needed.
+ */
+
+static char *			/* O - Encrypted password */
+cups_crypt(const char *pw,	/* I - Password string */
+           const char *salt)	/* I - Salt (key) string */
+{
+  if (strncmp(salt, "$1$", 3) == 0)
+  {
+   /*
+    * Use MD5 passwords without the benefit of PAM; this is for
+    * Slackware Linux, and the algorithm was taken from the
+    * old shadow-19990827/lib/md5crypt.c source code... :(
+    */
+
+    int		i;		/* Looping var */
+    unsigned long n;		/* Output number */
+    int		pwlen;		/* Length of password string */
+    const char	*salt_end;	/* End of "salt" data for MD5 */
+    char	*ptr;		/* Pointer into result string */
+    md5_state_t state;		/* Primary MD5 state info */
+    md5_state_t state2;		/* Secondary MD5 state info */
+    md5_byte_t	digest[16];	/* MD5 digest result */
+    static char	result[120];	/* Final password string */
+
+
+   /*
+    * Get the salt data between dollar signs, e.g. $1$saltdata$md5.
+    * Get a maximum of 8 characters of salt data after $1$...
+    */
+
+    for (salt_end = salt + 3; *salt_end && (salt_end - salt) < 11; salt_end ++)
+      if (*salt_end == '$')
+        break;
+
+   /*
+    * Compute the MD5 sum we need...
+    */
+
+    pwlen = strlen(pw);
+
+    md5_init(&state);
+    md5_append(&state, pw, pwlen);
+    md5_append(&state, salt, salt_end - salt);
+
+    md5_init(&state2);
+    md5_append(&state2, pw, pwlen);
+    md5_append(&state2, salt + 3, salt_end - salt - 3);
+    md5_append(&state2, pw, pwlen);
+    md5_finish(&state, digest);
+
+    for (i = pwlen; i > 0; i -= 16)
+      md5_append(&state, digest, i > 16 ? 16 : i);
+
+    for (i = pwlen; i > 0; i >>= 1)
+      md5_append(&state, (i & 1) ? "" : pw, 1);
+
+    md5_finish(&state, digest);
+
+    for (i = 0; i < 1000; i ++)
+    {
+      md5_init(&state);
+
+      if (i & 1)
+        md5_append(&state, pw, pwlen);
+      else
+        md5_append(&state, digest, 16);
+
+      if (i % 3)
+        md5_append(&state, salt + 3, salt_end - salt - 3);
+
+      if (i % 7)
+        md5_append(&state, pw, pwlen);
+
+      if (i & 1)
+        md5_append(&state, digest, 16);
+      else
+        md5_append(&state, pw, pwlen);
+
+      md5_finish(&state, digest);
+    }
+
+   /*
+    * Copy the final sum to the result string and return...
+    */
+
+    memcpy(result, salt, salt_end - salt);
+    ptr = result + (salt_end - salt);
+    *ptr++ = '$';
+
+    for (i = 0; i < 5; i ++, ptr += 4)
+    {
+      n = (((digest[i] << 8) | digest[i + 6]) << 8);
+
+      if (i < 4)
+        n |= digest[i + 12];
+      else
+        n |= digest[5];
+
+      to64(ptr, n, 4);
+    }
+
+    to64(ptr, digest[11], 2);
+    ptr += 2;
+    *ptr = '\0';
+
+    return (result);
+  }
+  else
+  {
+   /*
+    * Use the standard crypt() function...
+    */
+
+    return (crypt(pw, salt));
+  }
+}
+#endif /* !HAVE_LIBPAM */
 
 
 /*
@@ -1264,9 +1519,29 @@ pam_func(int                      num_msg,	/* I - Number of messages */
 
   return (PAM_SUCCESS);
 }
+#else
+
+
+/*
+ * 'to64()' - Base64-encode an integer value...
+ */
+
+static void
+to64(char          *s,	/* O - Output string */
+     unsigned long v,	/* I - Value to encode */
+     int           n)	/* I - Number of digits */
+{
+  const char	*itoa64 = "./0123456789"
+                          "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                          "abcdefghijklmnopqrstuvwxyz";
+
+
+  for (; n > 0; n --, v >>= 6)
+    *s++ = itoa64[v & 0x3f];
+}
 #endif /* HAVE_LIBPAM */
 
 
 /*
- * End of "$Id: auth.c,v 1.41.2.2 2001/05/13 18:38:33 mike Exp $".
+ * End of "$Id: auth.c,v 1.41.2.3 2001/12/26 16:52:50 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: devices.c,v 1.14 2001/03/23 13:58:17 mike Exp $"
+ * "$Id: devices.c,v 1.14.2.1 2001/12/26 16:52:52 mike Exp $"
  *
  *   Device scanning routines for the Common UNIX Printing System (CUPS).
  *
@@ -184,10 +184,13 @@ LoadDevices(const char *d)	/* I - Directory to scan */
 	  * Bad format; strip trailing newline and write an error message.
 	  */
 
-	  line[strlen(line) - 1] = '\0';
+          if (line[strlen(line) - 1] == '\n')
+	    line[strlen(line) - 1] = '\0';
+
 	  LogMessage(L_ERROR, "LoadDevices: Bad line from \"%s\": %s",
 	             dent->d_name, line);
           compat = 1;
+	  break;
         }
 	else
 	{
@@ -475,5 +478,5 @@ sigalrm_handler(int sig)	/* I - Signal number */
 
 
 /*
- * End of "$Id: devices.c,v 1.14 2001/03/23 13:58:17 mike Exp $".
+ * End of "$Id: devices.c,v 1.14.2.1 2001/12/26 16:52:52 mike Exp $".
  */

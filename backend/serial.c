@@ -1,5 +1,5 @@
 /*
- * "$Id: serial.c,v 1.32 2001/03/13 14:05:35 mike Exp $"
+ * "$Id: serial.c,v 1.32.2.1 2001/12/26 16:52:07 mike Exp $"
  *
  *   Serial port backend for the Common UNIX Printing System (CUPS).
  *
@@ -189,7 +189,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
   do
   {
-    if ((fd = open(resource, O_WRONLY | O_NOCTTY | O_EXCL)) == -1)
+    if ((fd = open(resource, O_WRONLY | O_NOCTTY | O_EXCL | O_NDELAY)) == -1)
     {
       if (errno == EBUSY)
       {
@@ -212,8 +212,9 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   tcgetattr(fd, &opts);
 
   opts.c_lflag &= ~(ICANON | ECHO | ISIG);	/* Raw mode */
+  opts.c_oflag &= ~OPOST;			/* Don't post-process */
 
-  bufsize = 480;	/* 9600 baud / 10 bits/char / 2Hz */
+  bufsize = 96;		/* 9600 baud / 10 bits/char / 10Hz */
   dtrdsr  = 0;		/* No dtr/dsr flow control */
 
   if (options != NULL)
@@ -255,7 +256,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
         * Set the baud rate...
 	*/
 
-        bufsize = atoi(value) / 20;
+        bufsize = atoi(value) / 100;
 
 #if B19200 == 19200
         cfsetispeed(&opts, atoi(value));
@@ -378,6 +379,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
     }
 
   tcsetattr(fd, TCSANOW, &opts);
+  fcntl(fd, F_SETFL, 0);
 
  /*
   * Now that we are "connected" to the port, ignore SIGTERM so that we
@@ -476,7 +478,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   }
 
  /*
-  * Close the socket connection and input file and return...
+  * Close the serial port and input file and return...
   */
 
   close(fd);
@@ -852,5 +854,5 @@ list_devices(void)
 
 
 /*
- * End of "$Id: serial.c,v 1.32 2001/03/13 14:05:35 mike Exp $".
+ * End of "$Id: serial.c,v 1.32.2.1 2001/12/26 16:52:07 mike Exp $".
  */

@@ -98,7 +98,7 @@ class GfxFont {
 public:
 
   // Constructor.
-  GfxFont(const char *tag1, Ref id1, Dict *fontDict);
+  GfxFont(XRef *xref, char *tagA, Ref idA, Dict *fontDict);
 
   // Destructor.
   ~GfxFont();
@@ -110,7 +110,7 @@ public:
   Ref getID() { return id; }
 
   // Does this font match the tag?
-  GBool matches(const char *tag1) { return !tag->cmp(tag1); }
+  GBool matches(char *tagA) { return !tag->cmp(tagA); }
 
   // Get base font name.
   GString *getName() { return name; }
@@ -128,8 +128,8 @@ public:
 
   // Get the PostScript font name for the embedded font.  Returns
   // NULL if there is no embedded font.
-  const char *getEmbeddedFontName()
-    { return embFontName ? embFontName->getCString() : (const char *)NULL; }
+  char *getEmbeddedFontName()
+    { return embFontName ? embFontName->getCString() : (char *)NULL; }
 
   // Get the name of the external font file.  Returns NULL if there
   // is no external font file.
@@ -156,10 +156,10 @@ public:
   FontEncoding *getEncoding() { return encoding; }
 
   // Return the character name associated with <code>.
-  const char *getCharName(int code) { return encoding->getCharName(code); }
+  char *getCharName(int code) { return encoding->getCharName(code); }
 
   // Return the code associated with <name>.
-  int getCharCode(const char *charName) { return encoding->getCharCode(charName); }
+  int getCharCode(char *charName) { return encoding->getCharCode(charName); }
 
   // Return the Type 3 CharProc for the character associated with <code>.
   Object *getCharProc(int code, Object *proc);
@@ -174,14 +174,21 @@ public:
   // Return the font matrix.
   double *getFontMatrix() { return fontMat; }
 
+  // Return the font bounding box.
+  double *getFontBBox() { return fontBBox; }
+
+  // Return the ascent and descent values.
+  double getAscent() { return ascent; }
+  double getDescent() { return descent; }
+
   // Read an external or embedded font file into a buffer.
-  const char *readExtFontFile(int *len);
-  const char *readEmbFontFile(int *len);
+  char *readExtFontFile(int *len);
+  char *readEmbFontFile(XRef *xref, int *len);
 
 private:
 
-  void getEncAndWidths(Dict *fontDict, BuiltinFont *builtinFont,
-		       int missingWidth);
+  void getEncAndWidths(XRef *xref, Dict *fontDict,
+		       BuiltinFont *builtinFont, int missingWidth);
   void findExtFontFile();
   void makeWidths(Dict *fontDict, FontEncoding *builtinEncoding,
 		  Gushort *builtinWidths, int missingWidth);
@@ -198,6 +205,9 @@ private:
   GString *extFontFile;		// external font file name
   Object charProcs;		// Type3 CharProcs dictionary
   double fontMat[6];		// font matrix
+  double fontBBox[4];		// font bounding box
+  double ascent;		// max height above baseline
+  double descent;		// max depth below baseline
   union {
     FontEncoding *encoding;	// 8-bit font encoding
     struct {
@@ -219,13 +229,13 @@ class GfxFontDict {
 public:
 
   // Build the font dictionary, given the PDF font dictionary.
-  GfxFontDict(Dict *fontDict);
+  GfxFontDict(XRef *xref, Dict *fontDict);
 
   // Destructor.
   ~GfxFontDict();
 
   // Get the specified font.
-  GfxFont *lookup(const char *tag);
+  GfxFont *lookup(char *tag);
 
   // Iterative access.
   int getNumFonts() { return numFonts; }

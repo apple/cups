@@ -1,5 +1,5 @@
 /*
- * "$Id: lpq.c,v 1.17.2.1 2001/05/13 18:38:00 mike Exp $"
+ * "$Id: lpq.c,v 1.17.2.2 2001/12/26 16:52:08 mike Exp $"
  *
  *   "lpq" command for the Common UNIX Printing System (CUPS).
  *
@@ -72,7 +72,9 @@ main(int  argc,		/* I - Number of command-line arguments */
 		longstatus;	/* Show file details */
   int		num_dests;	/* Number of destinations */
   cups_dest_t	*dests;		/* Destinations */
+#ifdef HAVE_LIBSSL
   http_encryption_t encryption;	/* Encryption? */
+#endif /* HAVE_LIBSSL */
 
 
  /*
@@ -536,5 +538,5 @@ show_printer(http_t     *http,	/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpq.c,v 1.17.2.1 2001/05/13 18:38:00 mike Exp $".
+ * End of "$Id: lpq.c,v 1.17.2.2 2001/12/26 16:52:08 mike Exp $".
  */

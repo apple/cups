@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c,v 1.81.2.2 2001/05/13 18:38:05 mike Exp $"
+ * "$Id: util.c,v 1.81.2.3 2001/12/26 16:52:13 mike Exp $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -172,7 +172,7 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
   FILE		*file;			/* File to send */
   struct stat	fileinfo;		/* File information */
   int		bytes;			/* Number of bytes read/written */
-  char		buffer[8192];		/* Output buffer */
+  char		buffer[32768];		/* Output buffer */
   const char	*password;		/* Password string */
   char		realm[HTTP_MAX_VALUE],	/* realm="xyz" string */
 		nonce[HTTP_MAX_VALUE],	/* nonce="xyz" string */
@@ -240,9 +240,10 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
     */
 
     if (filename != NULL)
-      sprintf(length, "%u", ippLength(request) + (size_t)fileinfo.st_size);
+      sprintf(length, "%lu", (unsigned long)(ippLength(request) +
+                                             (size_t)fileinfo.st_size));
     else
-      sprintf(length, "%u", ippLength(request));
+      sprintf(length, "%lu", (unsigned long)ippLength(request));
 
     httpClearFields(http);
     httpSetField(http, HTTP_FIELD_CONTENT_LENGTH, length);
@@ -1677,5 +1678,5 @@ cups_local_auth(http_t *http)	/* I - Connection */
 
 
 /*
- * End of "$Id: util.c,v 1.81.2.2 2001/05/13 18:38:05 mike Exp $".
+ * End of "$Id: util.c,v 1.81.2.3 2001/12/26 16:52:13 mike Exp $".
  */

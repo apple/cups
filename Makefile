@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.31.2.1 2001/05/13 18:37:58 mike Exp $"
+# "$Id: Makefile,v 1.31.2.2 2001/12/26 16:52:05 mike Exp $"
 #
 #   Top-level Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -74,30 +74,32 @@ install:
 	(cd ppd; $(MAKE) $(MFLAGS) install)
 	echo Installing in templates...
 	(cd templates; $(MAKE) $(MFLAGS) install)
+	echo Installing cups-config script...
+	$(INSTALL_DIR) $(BINDIR)
+	$(INSTALL_SCRIPT) cups-config $(BINDIR)/cups-config
 	echo Installing startup script...
 	if test "x$(INITDIR)" != "x"; then \
-		$(MKDIR) $(prefix)/$(INITDIR)/init.d; \
-		$(RM) $(prefix)/$(INITDIR)/init.d/cups; \
-		$(INSTALL_SCRIPT) cups.sh $(prefix)/$(INITDIR)/init.d/cups; \
-		$(CHMOD) ugo+rx $(prefix)/$(INITDIR)/init.d/cups; \
-		$(MKDIR) $(prefix)/$(INITDIR)/rc0.d; \
-		$(RM) $(prefix)/$(INITDIR)/rc0.d/K00cups; \
-		ln -s $(INITDDIR)/cups $(prefix)/$(INITDIR)/rc0.d/K00cups; \
-		$(MKDIR) $(prefix)/$(INITDIR)/rc2.d; \
-		$(RM) $(prefix)/$(INITDIR)/rc2.d/S99cups; \
-		ln -s $(INITDDIR)/cups $(prefix)/$(INITDIR)/rc2.d/S99cups; \
-		$(MKDIR) $(prefix)/$(INITDIR)/rc3.d; \
-		$(RM) $(prefix)/$(INITDIR)/rc3.d/S99cups; \
-		ln -s $(INITDDIR)/cups $(prefix)/$(INITDIR)/rc3.d/S99cups; \
-		$(MKDIR) $(prefix)/$(INITDIR)/rc5.d; \
-		$(RM) $(prefix)/$(INITDIR)/rc5.d/S99cups; \
-		ln -s $(INITDDIR)/cups $(prefix)/$(INITDIR)/rc5.d/S99cups; \
+		$(INSTALL_DIR) $(BUILDROOT)$(INITDIR)/init.d; \
+		$(INSTALL_SCRIPT) cups.sh $(BUILDROOT)$(INITDIR)/init.d/cups; \
+		$(INSTALL_DIR) $(BUILDROOT)$(INITDIR)/rc0.d; \
+		$(INSTALL_SCRIPT) cups.sh  $(BUILDROOT)$(INITDIR)/rc0.d/K00cups; \
+		$(INSTALL_DIR) $(BUILDROOT)$(INITDIR)/rc2.d; \
+		$(INSTALL_SCRIPT) cups.sh $(BUILDROOT)$(INITDIR)/rc2.d/S99cups; \
+		$(INSTALL_DIR) $(BUILDROOT)$(INITDIR)/rc3.d; \
+		$(INSTALL_SCRIPT) cups.sh $(BUILDROOT)$(INITDIR)/rc3.d/S99cups; \
+		$(INSTALL_DIR) $(BUILDROOT)$(INITDIR)/rc5.d; \
+		$(INSTALL_SCRIPT) cups.sh $(BUILDROOT)$(INITDIR)/rc5.d/S99cups; \
 	fi
 	if test "x$(INITDIR)" = "x" -a "x$(INITDDIR)" != "x"; then \
-		$(MKDIR) $(prefix)/$(INITDDIR); \
-		$(RM) $(prefix)/$(INITDDIR)/cups; \
-		$(INSTALL_SCRIPT) cups.sh $(prefix)/$(INITDDIR)/cups; \
-		$(CHMOD) ugo+rx $(prefix)/$(INITDDIR)/cups; \
+		$(INSTALL_DIR) $(BUILDROOT)$(INITDDIR); \
+		if test "$(INITDDIR)" = "/System/Library/StartupItems/CUPS"; then \
+			$(INSTALL_SCRIPT) cups.sh $(BUILDROOT)$(INITDDIR)/CUPS; \
+			$(INSTALL_DATA) cups.plist $(BUILDROOT)$(INITDDIR)/StartupParameters.plist; \
+			$(INSTALL_DIR) $(BUILDROOT)$(INITDDIR)/Resources/English.lproj; \
+			$(INSTALL_DATA) cups.strings $(BUILDROOT)$(INITDDIR)/Resources/English.lproj/Localizable.strings; \
+		else \
+			$(INSTALL_SCRIPT) cups.sh $(BUILDROOT)$(INITDDIR)/cups; \
+		fi \
 	fi
 
 
@@ -114,15 +116,13 @@ test:	all
 # Make software distributions using EPM (http://www.easysw.com/epm)...
 #
 
-EPMFLAGS	=	-v \
-			AMANDIR=$(AMANDIR) \
-			BINDIR=$(BINDIR) DATADIR=$(DATADIR) \
-			DOCDIR=$(DOCDIR) INCLUDEDIR=$(INCLUDEDIR) \
-			LIBDIR=$(LIBDIR) LOCALEDIR=$(LOCALEDIR) \
-			LOGDIR=$(LOGDIR) MANDIR=$(MANDIR) \
-			PAMDIR=$(PAMDIR) REQUESTS=$(REQUESTS) \
-			SBINDIR=$(SBINDIR) SERVERBIN=$(SERVERBIN) \
-			SERVERROOT=$(SERVERROOT)
+EPMFLAGS	=	-v
+
+aix:
+	epm $(EPMFLAGS) -f aix cups
+
+bsd:
+	epm $(EPMFLAGS) -f bsd cups
 
 epm:
 	epm $(EPMFLAGS) cups
@@ -143,5 +143,5 @@ tardist:
 	epm $(EPMFLAGS) -f tardist cups
 
 #
-# End of "$Id: Makefile,v 1.31.2.1 2001/05/13 18:37:58 mike Exp $".
+# End of "$Id: Makefile,v 1.31.2.2 2001/12/26 16:52:05 mike Exp $".
 #

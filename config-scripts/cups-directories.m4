@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-directories.m4,v 1.5 2001/11/02 17:34:54 mike Exp $"
+dnl "$Id: cups-directories.m4,v 1.5.2.1 2001/12/26 16:52:10 mike Exp $"
 dnl
 dnl   Directory stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -232,5 +232,5 @@ dnl Set the CUPS_FONTPATH directory...
 AC_DEFINE_UNQUOTED(CUPS_FONTPATH, "$fontpath")
 
 dnl
-dnl End of "$Id: cups-directories.m4,v 1.5 2001/11/02 17:34:54 mike Exp $".
+dnl End of "$Id: cups-directories.m4,v 1.5.2.1 2001/12/26 16:52:10 mike Exp $".
 dnl

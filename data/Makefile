@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.12 2001/01/22 15:03:32 mike Exp $"
+# "$Id: Makefile,v 1.12.2.1 2001/12/26 16:52:14 mike Exp $"
 #
 #   Datafile makefile for the Common UNIX Printing System (CUPS).
 #
@@ -81,19 +81,20 @@ clean:
 #
 
 install:
-	-$(MKDIR) $(DATADIR)/banners
-	$(CHMOD) ugo+rx $(DATADIR)
-	$(CHMOD) ugo+rx $(DATADIR)/banners
-	$(INSTALL_DATA) $(BANNERS) $(DATADIR)/banners
-	-$(MKDIR) $(DATADIR)/charsets
-	$(CHMOD) ugo+rx $(DATADIR)/charsets
-	$(INSTALL_DATA) $(CHARSETS) $(DATADIR)/charsets
-	-$(MKDIR) $(DATADIR)/data
-	$(CHMOD) ugo+rx $(DATADIR)/data
-	$(INSTALL_DATA) $(DATAFILES) $(DATADIR)/data
-	-if test "$(PAMDIR)" != ""; then \
-		$(MKDIR) $(PAMDIR); \
-		$(CHMOD) ugo+rx $(PAMDIR); \
+	$(INSTALL_DIR) $(DATADIR)/banners
+	for file in $(BANNERS); do \
+		$(INSTALL_DATA) $$file $(DATADIR)/banners; \
+	done
+	$(INSTALL_DIR) $(DATADIR)/charsets
+	for file in $(CHARSETS); do \
+		$(INSTALL_DATA) $$file $(DATADIR)/charsets; \
+	done
+	$(INSTALL_DIR) $(DATADIR)/data
+	for file in $(DATAFILES); do \
+		$(INSTALL_DATA) $$file $(DATADIR)/data; \
+	done
+	-if test x$(PAMDIR) != x; then \
+		$(INSTALL_DIR) $(PAMDIR); \
 		if test -f /lib/security/pam_unix.so; then \
 			$(INSTALL_DATA) cups.suse $(PAMDIR)/cups; \
 		else \
@@ -103,5 +104,5 @@ install:
 
 
 #
-# End of "$Id: Makefile,v 1.12 2001/01/22 15:03:32 mike Exp $".
+# End of "$Id: Makefile,v 1.12.2.1 2001/12/26 16:52:14 mike Exp $".
 #

@@ -1,5 +1,5 @@
 /*
- * "$Id: image-colorspace.c,v 1.22 2001/03/29 14:58:52 mike Exp $"
+ * "$Id: image-colorspace.c,v 1.22.2.1 2001/12/26 16:52:38 mike Exp $"
  *
  *   Colorspace conversions for the Common UNIX Printing System (CUPS).
  *
@@ -23,6 +23,7 @@
  *
  * Contents:
  *
+ *   ImageSetProfile()   - Set the device color profile.
  *   ImageWhiteToWhite() - Convert luminance colors to device-dependent
  *   ImageWhiteToRGB()   - Convert luminance data to RGB.
  *   ImageWhiteToBlack() - Convert luminance colors to black.
@@ -56,12 +57,13 @@
 
 
 /*
- * Globals...
+ * Local globals...
  */
 
-extern int	ImageHaveProfile;
-extern int	ImageDensity[256];
-extern int	ImageMatrix[3][3][256];
+static int	ImageHaveProfile = 0;	/* Do we have a color profile? */
+static int	ImageDensity[256];	/* Ink/marker density LUT */
+static int	ImageMatrix[3][3][256];	/* Color transform matrix LUT */
+
 
 /*
  * Local functions...
@@ -76,6 +78,31 @@ static void	xrotate(float [3][3], float, float);
 static void	yrotate(float [3][3], float, float);
 static void	zrotate(float [3][3], float, float);
 static void	zshear(float [3][3], float, float);
+
+
+/*
+ * 'ImageSetProfile()' - Set the device color profile.
+ */
+
+void
+ImageSetProfile(float d,		/* I - Ink/marker density */
+                float g,		/* I - Ink/marker gamma */
+                float matrix[3][3])	/* I - Color transform matrix */
+{
+  int		i, j, k;		/* Looping vars */
+  float		m;			/* Current matrix value */
+  int		*im;			/* Pointer into ImageMatrix */
+
+  ImageHaveProfile  = 1;
+
+  for (i = 0, im = ImageMatrix[0][0]; i < 3; i ++)
+    for (j = 0; j < 3; j ++)
+      for (k = 0, m = matrix[i][j]; k < 256; k ++)
+        *im++ = (int)(k * m + 0.5);
+
+  for (k = 0, im = ImageDensity; k < 256; k ++)
+    *im++ = 255.0 * d * pow((float)k / 255.0, g) + 0.5;
+}
 
 
 /*
@@ -878,5 +905,5 @@ zshear(float mat[3][3],	/* I - Matrix */
 
 
 /*
- * End of "$Id: image-colorspace.c,v 1.22 2001/03/29 14:58:52 mike Exp $".
+ * End of "$Id: image-colorspace.c,v 1.22.2.1 2001/12/26 16:52:38 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: cupsd.h,v 1.28 2001/02/21 17:01:17 mike Exp $"
+ * "$Id: cupsd.h,v 1.28.2.1 2001/12/26 16:52:52 mike Exp $"
  *
  *   Main header file for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -72,6 +72,7 @@
 #define MAX_LISTENERS		10	/* Maximum number of listener sockets */
 #define MAX_USERPASS		33	/* Maximum size of username/password */
 #define MAX_FILTERS		20	/* Maximum number of filters */
+#define MAX_SYSTEM_GROUPS	32	/* Maximum number of system groups */
 
 
 /*
@@ -83,15 +84,9 @@
 #define DEFAULT_TIMEOUT		300	/* Timeout during requests/updates */
 #define DEFAULT_KEEPALIVE	60	/* Timeout between requests */
 #define DEFAULT_INTERVAL	30	/* Interval between browse updates */
-#ifdef WIN32 /* Fix for broken Linux setlocale() */
-#  define DEFAULT_LANGUAGE	setlocale(LC_ALL,"")
+#define DEFAULT_LANGUAGE	setlocale(LC_ALL,"")
 					/* Default language encoding */
-#else
-#  define DEFAULT_LANGUAGE	getenv("LANG")
-					/* Default language encoding */
-#endif /* !WIN32 */
-#define DEFAULT_CHARSET		"utf-8"
-					/* Default charset */
+#define DEFAULT_CHARSET		"utf-8"	/* Default charset */
 
 
 /*
@@ -114,12 +109,12 @@
 #include "cert.h"
 #include "client.h"
 #include "auth.h"
-#include "dirsvc.h"
 #include "printers.h"
 #include "classes.h"
 #include "job.h"
 #include "conf.h"
 #include "banners.h"
+#include "dirsvc.h"
 
 
 /*
@@ -177,5 +172,5 @@ extern void	StopServer(void);
 
 
 /*
- * End of "$Id: cupsd.h,v 1.28 2001/02/21 17:01:17 mike Exp $".
+ * End of "$Id: cupsd.h,v 1.28.2.1 2001/12/26 16:52:52 mike Exp $".
  */

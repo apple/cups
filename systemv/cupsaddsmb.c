@@ -1,5 +1,5 @@
 /*
- * "$Id: cupsaddsmb.c,v 1.3 2001/12/18 21:08:21 mike Exp $"
+ * "$Id: cupsaddsmb.c,v 1.3.2.1 2001/12/26 16:52:56 mike Exp $"
  *
  *   "cupsaddsmb" command for the Common UNIX Printing System (CUPS).
  *
@@ -282,5 +282,5 @@ export_dest(const char *dest)	/* I - Destination to export */
 
 
 /*
- * End of "$Id: cupsaddsmb.c,v 1.3 2001/12/18 21:08:21 mike Exp $".
+ * End of "$Id: cupsaddsmb.c,v 1.3.2.1 2001/12/26 16:52:56 mike Exp $".
  */

@@ -17,14 +17,14 @@
 //------------------------------------------------------------------------
 
 // xpdf version
-#define xpdfVersion "0.92"
+#define xpdfVersion "0.93a"
 
 // supported PDF version
-#define supportedPDFVersionStr "1.3"
-#define supportedPDFVersionNum 1.3
+#define supportedPDFVersionStr "1.4"
+#define supportedPDFVersionNum 1.4
 
 // copyright notice
-#define xpdfCopyright "Copyright 1996-2000 Derek B. Noonburg"
+#define xpdfCopyright "Copyright 1996-2001 Derek B. Noonburg"
 
 // default paper size (in points) for PostScript output
 #ifdef A4_PAPER
@@ -35,12 +35,24 @@
 #define defPaperHeight 792
 #endif
 
-// config file name
+// user config file name, relative to the user's home directory
 #if defined(VMS)
-#define xpdfConfigFile "xpdfrc"
+#define xpdfUserConfigFile "xpdfrc"
 #else
-#define xpdfConfigFile ".xpdfrc"
+#define xpdfUserConfigFile ".xpdfrc"
 #endif
+
+#ifndef SYSTEM_XPDFRC
+#  define SYSTEM_XPDFRC	CUPS_SERVERROOT "/pdftops.conf"
+#endif // SYSTEM_XPDFRC
+
+// system config file name (set via the configure script)
+#define xpdfSysConfigFile SYSTEM_XPDFRC
+
+// Support Unicode/etc.
+#define JAPANESE_SUPPORT 1
+#define CHINESE_GB_SUPPORT 1
+#define CHINESE_CNS_SUPPORT 1
 
 //------------------------------------------------------------------------
 // X-related constants
@@ -58,6 +70,9 @@
 // number of TrueType (FreeType) fonts to cache
 #define ttFontCacheSize 32
 
+// number of FreeType (TrueType and Type 1) fonts to cache
+#define ftFontCacheSize 32
+
 //------------------------------------------------------------------------
 // popen
 //------------------------------------------------------------------------
@@ -67,7 +82,7 @@
 #define pclose _pclose
 #endif
 
-#if defined(VMS) || defined(VMCMS) || defined(DOS) || defined(OS2) || defined(WIN32) || defined(__DJGPP__) || defined(__CYGWIN32) || defined(MACOS)
+#if defined(VMS) || defined(VMCMS) || defined(DOS) || defined(OS2) || defined(__EMX__) || defined(WIN32) || defined(__DJGPP__) || defined(__CYGWIN32__) || defined(MACOS)
 #define POPEN_READ_MODE "rb"
 #else
 #define POPEN_READ_MODE "r"

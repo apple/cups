@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.31.2.1 2001/05/13 18:38:31 mike Exp $"
+# "$Id: Makefile,v 1.31.2.2 2001/12/26 16:52:48 mike Exp $"
 #
 #   GNU Ghostscript makefile for the Common UNIX Printing System (CUPS).
 #
@@ -376,14 +376,12 @@ clean:
 #
 
 install:	$(TARGETS)
-	-$(MKDIR) $(SERVERBIN)/filter
-	$(CHMOD) ugo+rx $(SERVERBIN)
-	$(CHMOD) ugo+rx $(SERVERBIN)/filter
+	$(INSTALL_DIR) $(SERVERBIN)/filter
 	$(INSTALL_BIN) pstoraster $(SERVERBIN)/filter
-	-$(MKDIR) $(DATADIR)/pstoraster
-	$(CHMOD) ugo+rx $(DATADIR)
-	$(CHMOD) ugo+rx $(DATADIR)/pstoraster
-	$(INSTALL_DATA) $(DFILES) $(DATADIR)/pstoraster
+	$(INSTALL_DIR) $(DATADIR)/pstoraster
+	for file in $(DFILES); do \
+		$(INSTALL_DATA) $$file $(DATADIR)/pstoraster; \
+	done
 
 
 #
@@ -420,6 +418,16 @@ pstoraster:	pstoraster.o libgs.a ../Makedefs ../cups/$(LIBCUPS)
 
 
 #
+# purify - target to test Ghostscript to see how leaky it is...
+#
+
+purify:	pstoraster.o libgs.a ../Makedefs ../cups/$(LIBCUPS)
+	echo Linking $@...
+	purify $(CC) $(LDFLAGS) -o pstoraster.pure pstoraster.o libgs.a \
+		$(LINKCUPSIMAGE) $(IMGLIBS) $(DSOLIBS) $(LIBS) -lm
+
+
+#
 # Generate dependencies for Ghostscript source files...
 #
 
@@ -442,5 +450,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile,v 1.31.2.1 2001/05/13 18:38:31 mike Exp $".
+# End of "$Id: Makefile,v 1.31.2.2 2001/12/26 16:52:48 mike Exp $".
 #

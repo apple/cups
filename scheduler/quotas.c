@@ -1,5 +1,5 @@
 /*
- * "$Id: quotas.c,v 1.4 2001/01/22 15:04:01 mike Exp $"
+ * "$Id: quotas.c,v 1.4.2.1 2001/12/26 16:52:55 mike Exp $"
  *
  *   Quota routines for the Common UNIX Printing System (CUPS).
  *
@@ -182,7 +182,7 @@ UpdateQuota(printer_t  *p,		/* I - Printer */
     next = job->next;
 
     if (strcasecmp(job->dest, p->name) != 0 ||
-        strcmp(job->username, q->username) != 0)
+        strcasecmp(job->username, q->username) != 0)
       continue;
 
     if ((attr = ippFindAttribute(job->attrs, "time-at-completion",
@@ -227,10 +227,10 @@ static int				/* O - Result of comparison */
 compare(const quota_t *q1,		/* I - First quota record */
         const quota_t *q2)		/* I - Second quota record */
 {
-  return (strcmp(q1->username, q2->username));
+  return (strcasecmp(q1->username, q2->username));
 }
 
 
 /*
- * End of "$Id: quotas.c,v 1.4 2001/01/22 15:04:01 mike Exp $".
+ * End of "$Id: quotas.c,v 1.4.2.1 2001/12/26 16:52:55 mike Exp $".
  */

@@ -13,6 +13,7 @@
 #pragma interface
 #endif
 
+class XRef;
 class Object;
 class Page;
 class PageAttrs;
@@ -27,7 +28,7 @@ class Catalog {
 public:
 
   // Constructor.
-  Catalog(Object *catDict);
+  Catalog(XRef *xrefA, GBool printCommands = gFalse);
 
   // Destructor.
   ~Catalog();
@@ -57,6 +58,7 @@ public:
 
 private:
 
+  XRef *xref;			// the xref table for this PDF file
   Page **pages;			// array of pages
   Ref *pageRefs;		// object ID for each page
   int numPages;			// number of pages
@@ -66,7 +68,8 @@ private:
   GString *baseURI;		// base URI for URI-type links
   GBool ok;			// true if catalog is valid
 
-  int readPageTree(Dict *pages, PageAttrs *attrs, int start);
+  int readPageTree(Dict *pages, PageAttrs *attrs, int start,
+		   GBool printCommands);
   Object *findDestInTree(Object *tree, GString *name, Object *obj);
 };
 

@@ -19,11 +19,12 @@
 // FormWidget
 //------------------------------------------------------------------------
 
-FormWidget::FormWidget(Dict *dict) {
+FormWidget::FormWidget(XRef *xrefA, Dict *dict) {
   Object obj1, obj2;
   double t;
 
   ok = gFalse;
+  xref = xrefA;
 
   if (dict->lookup("AP", &obj1)->isDict()) {
     obj1.dictLookupNF("N", &obj2);
@@ -74,7 +75,7 @@ FormWidget::~FormWidget() {
 void FormWidget::draw(Gfx *gfx) {
   Object obj;
 
-  if (appearance.fetch(&obj)->isStream()) {
+  if (appearance.fetch(xref, &obj)->isStream()) {
     gfx->doWidgetForm(&obj, xMin, yMin, xMax, yMax);
   }
   obj.free();
@@ -84,7 +85,7 @@ void FormWidget::draw(Gfx *gfx) {
 // FormWidgets
 //------------------------------------------------------------------------
 
-FormWidgets::FormWidgets(Object *annots) {
+FormWidgets::FormWidgets(XRef *xref, Object *annots) {
   FormWidget *widget;
   Object obj1, obj2;
   int size;
@@ -100,7 +101,7 @@ FormWidgets::FormWidgets(Object *annots) {
 	obj1.dictLookup("Subtype", &obj2);
 	if (obj2.isName("Widget") ||
 	    obj2.isName("Stamp")) {
-	  widget = new FormWidget(obj1.getDict());
+	  widget = new FormWidget(xref, obj1.getDict());
 	  if (widget->isOk()) {
 	    if (nWidgets >= size) {
 	      size += 16;

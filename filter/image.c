@@ -1,5 +1,5 @@
 /*
- * "$Id: image.c,v 1.28 2001/03/01 22:51:30 mike Exp $"
+ * "$Id: image.c,v 1.28.2.1 2001/12/26 16:52:38 mike Exp $"
  *
  *   Base image support for the Common UNIX Printing System (CUPS).
  *
@@ -26,7 +26,6 @@
  *   ImageOpen()        - Open an image file and read it into memory.
  *   ImageClose()       - Close an image file.
  *   ImageSetMaxTiles() - Set the maximum number of tiles to cache.
- *   ImageSetProfile()  - Set the device color profile.
  *   ImageGetCol()      - Get a column of pixels from an image.
  *   ImageGetRow()      - Get a row of pixels from an image.
  *   ImagePutCol()      - Put a column of pixels to an image.
@@ -44,15 +43,6 @@
 #include <ctype.h>
 #include <math.h>
 #include <cups/cups.h>
-
-
-/*
- * Globals...
- */
-
-int	ImageHaveProfile = 0;	/* Do we have a color profile? */
-int	ImageDensity[256];	/* Ink/marker density LUT */
-int	ImageMatrix[3][3][256];	/* Color transform matrix LUT */
 
 
 /*
@@ -308,31 +298,6 @@ ImageSetMaxTiles(image_t *img,		/* I - Image to set */
   img->max_ics = max_tiles;
 
   fprintf(stderr, "DEBUG: max_ics=%d...\n", img->max_ics);
-}
-
-
-/*
- * 'ImageSetProfile()' - Set the device color profile.
- */
-
-void
-ImageSetProfile(float d,		/* I - Ink/marker density */
-                float g,		/* I - Ink/marker gamma */
-                float matrix[3][3])	/* I - Color transform matrix */
-{
-  int		i, j, k;		/* Looping vars */
-  float		m;			/* Current matrix value */
-  int		*im;			/* Pointer into ImageMatrix */
-
-  ImageHaveProfile  = 1;
-
-  for (i = 0, im = ImageMatrix[0][0]; i < 3; i ++)
-    for (j = 0; j < 3; j ++)
-      for (k = 0, m = matrix[i][j]; k < 256; k ++)
-        *im++ = (int)(k * m + 0.5);
-
-  for (k = 0, im = ImageDensity; k < 256; k ++)
-    *im++ = 255.0 * d * pow((float)k / 255.0, g) + 0.5;
 }
 
 
@@ -804,5 +769,5 @@ flush_tile(image_t *img)	/* I - Image */
 
 
 /*
- * End of "$Id: image.c,v 1.28 2001/03/01 22:51:30 mike Exp $".
+ * End of "$Id: image.c,v 1.28.2.1 2001/12/26 16:52:38 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: options.c,v 1.21.2.1 2001/05/13 18:38:04 mike Exp $"
+ * "$Id: options.c,v 1.21.2.2 2001/12/26 16:52:13 mike Exp $"
  *
  *   Option routines for the Common UNIX Printing System (CUPS).
  *
@@ -366,6 +366,8 @@ cupsMarkOptions(ppd_file_t    *ppd,		/* I - PPD file */
       {
         if (ppdMarkOption(ppd, "Duplex", "None"))
 	  conflict = 1;
+        if (ppdMarkOption(ppd, "JCLDuplex", "None"))	/* Samsung */
+	  conflict = 1;
         if (ppdMarkOption(ppd, "EFDuplex", "None"))	/* EFI */
 	  conflict = 1;
         if (ppdMarkOption(ppd, "KD03Duplex", "None"))	/* Kodak */
@@ -375,6 +377,8 @@ cupsMarkOptions(ppd_file_t    *ppd,		/* I - PPD file */
       {
         if (ppdMarkOption(ppd, "Duplex", "DuplexNoTumble"))
 	  conflict = 1;
+        if (ppdMarkOption(ppd, "JCLDuplex", "DuplexNoTumble"))	/* Samsung */
+	  conflict = 1;
         if (ppdMarkOption(ppd, "EFDuplex", "DuplexNoTumble"))	/* EFI */
 	  conflict = 1;
         if (ppdMarkOption(ppd, "KD03Duplex", "DuplexNoTumble"))	/* Kodak */
@@ -383,6 +387,8 @@ cupsMarkOptions(ppd_file_t    *ppd,		/* I - PPD file */
       else if (strcasecmp(options->value, "two-sided-short-edge") == 0)
       {
         if (ppdMarkOption(ppd, "Duplex", "DuplexTumble"))
+	  conflict = 1;
+        if (ppdMarkOption(ppd, "JCLDuplex", "DuplexTumble"))	/* Samsung */
 	  conflict = 1;
         if (ppdMarkOption(ppd, "EFDuplex", "DuplexTumble"))	/* EFI */
 	  conflict = 1;
@@ -416,5 +422,5 @@ cupsMarkOptions(ppd_file_t    *ppd,		/* I - PPD file */
 
 
 /*
- * End of "$Id: options.c,v 1.21.2.1 2001/05/13 18:38:04 mike Exp $".
+ * End of "$Id: options.c,v 1.21.2.2 2001/12/26 16:52:13 mike Exp $".
  */

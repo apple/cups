@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.h,v 1.22 2001/01/22 15:04:01 mike Exp $"
+ * "$Id: printers.h,v 1.22.2.1 2001/12/26 16:52:55 mike Exp $"
  *
  *   Printer definitions for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -47,8 +47,7 @@ typedef struct printer_str
 		name[IPP_MAX_NAME],	/* Printer name */
 		location[IPP_MAX_NAME],	/* Location code */
 		make_model[IPP_MAX_NAME],/* Make and model */
-		info[IPP_MAX_NAME],	/* Description */
-		more_info[HTTP_MAX_URI];/* URL for site-specific info */
+		info[IPP_MAX_NAME];	/* Description */
   int		accepting;		/* Accepting jobs? */
   ipp_pstate_t	state;			/* Printer state */
   char		state_message[1024];	/* Printer state message */
@@ -114,5 +113,5 @@ extern const char	*ValidateDest(const char *hostname,
 
 
 /*
- * End of "$Id: printers.h,v 1.22 2001/01/22 15:04:01 mike Exp $".
+ * End of "$Id: printers.h,v 1.22.2.1 2001/12/26 16:52:55 mike Exp $".
  */

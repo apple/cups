@@ -1,7 +1,7 @@
 <HTML>
 <HEAD>
 	<META NAME="COPYRIGHT" CONTENT="Copyright 1997-2001, All Rights Reserved">
-	<META NAME="DOCNUMBER" CONTENT="CUPS-SAM-1.1.7">
+	<META NAME="DOCNUMBER" CONTENT="CUPS-SAM-1.2.0">
 	<META NAME="Author" CONTENT="Easy Software Products">
 	<TITLE>CUPS Software Administrators Manual</TITLE>
 </HEAD>
@@ -11,7 +11,7 @@
 
 <P>This software administrators manual provides printer administration
 information for the Common UNIX Printing System<SUP>TM</SUP>
-("CUPS<SUP>TM</SUP>"), version 1.1.7.
+("CUPS<SUP>TM</SUP>"), version 1.2.0.
 
 <EMBED SRC="system-overview.shtml">
 
@@ -177,6 +177,11 @@ make changes you can get the HTMLDOC software from:
 <A HREF="http://www.easysw.com/htmldoc">http://www.easysw.com/htmldoc</A>
 </PRE></UL>
 
+<P>Finally, you'll need a <CODE>make</CODE> program that
+understands the <CODE>include</CODE> directive - FreeBSD,
+NetBSD, and OpenBSD developers should use the <CODE>gmake</CODE>
+program.
+
 <H3><A NAME="COMPILING">Compiling CUPS</A></H3>
 
 <P>CUPS uses GNU autoconf to configure the makefiles and source code
@@ -232,6 +237,16 @@ prior to running configure:
 
 <UL><PRE>
 <A HREF="http://www.openssl.org">http://www.openssl.org</A>
+</PRE></UL>
+
+<P>If the OpenSSL headers and libraries are not installed in the
+standard directories, use the <CODE>--with-openssl-includes</CODE>
+and <CODE>--with-openssl-libs</CODE> options:</P>
+
+<UL><PRE>
+./configure --enable-ssl \
+    --with-openssl-includes=/foo/bar/include \
+    --with-openssl-libs=/foo/bar/lib
 </PRE></UL>
 
 <P>Once you have configured things, just type:
@@ -433,6 +448,18 @@ IP address 11.22.33.44 would be added with the command:
 the PPD files for the HP DeskJet and HP LaserJet drivers included with CUPS.
 You'll find a complete list of PPD files and the printers they will work with
 in <A HREF="#PRINTER_DRIVERS">Appendix C, "Printer Drivers"</A>.
+
+
+<P>For a dot matrix printer connected to the serial port this would might look like:
+
+<UL><PRE>
+<B>/usr/sbin/lpadmin -p DotMatrix -E -v serial:/dev/ttyS0?baud=9600+size=8+parity=none+flow=soft deskjet.ppd ENTER</B>
+</PRE></UL>
+
+<P>Here you specify the serial port (e.g. S0,S1, d0, d1), baud rate 
+(e.g. 9600, 19200, 38400, 115200, etc.), number of bits, parity, and flow control.
+If you do not need flow control, delete the "+flow=soft" portion.
+
 
 <H3><A NAME="ADD_WEB">Adding Your First Printer from the Web</A></H3>
 
@@ -829,7 +856,6 @@ can use your favorite text editor to make changes to it.
 determine how the server operates:
 
 <UL>
-
 <TABLE CELLPADDING="0" CELLSPACING="0" BORDER="0">
 <TR>
 <TD VALIGN="TOP">
@@ -847,11 +873,13 @@ determine how the server operates:
 	<LI><A HREF="#BrowseOrder"><CODE>BrowseOrder</CODE></A>
 	<LI><A HREF="#BrowsePoll"><CODE>BrowsePoll</CODE></A>
 	<LI><A HREF="#BrowsePort"><CODE>BrowsePort</CODE></A>
+	<LI><A HREF="#BrowseProtocols"><CODE>BrowseProtocols</CODE></A>
 	<LI><A HREF="#BrowseRelay"><CODE>BrowseRelay</CODE></A>
 	<LI><A HREF="#BrowseShortNames"><CODE>BrowseShortNames</CODE></A>
 	<LI><A HREF="#BrowseTimeout"><CODE>BrowseTimeout</CODE></A>
 	<LI><A HREF="#Browsing"><CODE>Browsing</CODE></A>
 	<LI><A HREF="#Classification"><CODE>Classification</CODE></A>
+	<LI><A HREF="#ClassifyOverride"><CODE>ClassifyOverride</CODE></A>
 	<LI><A HREF="#DataDir"><CODE>DataDir</CODE></A>
 	<LI><A HREF="#DefaultCharset"><CODE>DefaultCharset</CODE></A>
 	<LI><A HREF="#DefaultLanguage"><CODE>DefaultLanguage</CODE></A>
@@ -869,8 +897,11 @@ determine how the server operates:
 	<LI><A HREF="#FilterLimit"><CODE>FilterLimit</CODE></A>
 	<LI><A HREF="#FontPath"><CODE>FontPath</CODE></A>
 	<LI><A HREF="#Group"><CODE>Group</CODE></A>
+	<LI><A HREF="#HideImplicitMembers"><CODE>HideImplicitMembers</CODE></A>
 	<LI><A HREF="#HostNameLookups"><CODE>HostNameLookups</CODE></A>
 	<LI><A HREF="#ImplicitClasses"><CODE>ImplicitClasses</CODE></A>
+	<LI><A HREF="#ImplicitAnyClasses"><CODE>ImplicitAnyClasses</CODE></A>
+	<LI><A HREF="#Include"><CODE>Include</CODE></A>
 	<LI><A HREF="#KeepAliveTimeout"><CODE>KeepAliveTimeout</CODE></A>
 	<LI><A HREF="#KeepAlive"><CODE>KeepAlive</CODE></A>
 	<LI><A HREF="#Limit"><CODE>Limit</CODE></A>
@@ -886,7 +917,6 @@ determine how the server operates:
 	<LI><A HREF="#MaxLogSize"><CODE>MaxLogSize</CODE></A>
 	<LI><A HREF="#MaxRequestSize"><CODE>MaxRequestSize</CODE></A>
 	<LI><A HREF="#Order"><CODE>Order</CODE></A>
-	<LI><A HREF="#PageLog"><CODE>PageLog</CODE></A>
 
 </TD>
 <TD VALIGN="TOP">
@@ -894,6 +924,7 @@ determine how the server operates:
 </TD>
 <TD VALIGN="TOP">
 
+	<LI><A HREF="#PageLog"><CODE>PageLog</CODE></A>
 	<LI><A HREF="#Port"><CODE>Port</CODE></A>
 	<LI><A HREF="#PreserveJobFiles"><CODE>PreserveJobFiles</CODE></A>
 	<LI><A HREF="#PreserveJobHistory"><CODE>PreserveJobHistory</CODE></A>
@@ -1083,6 +1114,7 @@ AuthGroupName lp
 AuthType None
 AuthType Basic
 AuthType Digest
+AuthType BasicDigest
 </PRE></UL>
 
 <H4>Description</H4>
@@ -1101,10 +1133,14 @@ perform:
 	<LI><CODE>Digest</CODE> - Digest authentication should be
 	performed using the <VAR>/etc/cups/passwd.md5</VAR> file.
 
+	<LI><CODE>BasicDigest</CODE> - Basic authentication should be
+	performed using the <VAR>/etc/cups/passwd.md5</VAR> file.
+
 </UL>
 
-<P>When using <CODE>Basic</CODE> or <CODE>Digest</CODE> authentication,
-clients connecting through the <CODE>localhost</CODE> interface can also
+<P>When using <CODE>Basic</CODE>, <CODE>Digest</CODE>, or
+<CODE>BasicDigest</CODE> authentication, clients connecting
+through the <CODE>localhost</CODE> interface can also
 authenticate using <A HREF="#CERTIFICATES">certificates</A>.
 
 <P>The <CODE>AuthType</CODE> directive must appear inside a
@@ -1315,6 +1351,39 @@ used for browse packets. The default port number is 631.
 </TR>
 </TABLE></CENTER>
 
+<!-- NEED 3in -->
+<H3><A NAME="BrowseProtocols">BrowseProtocols</A></H3>
+<HR>
+
+<H4>Examples</H4>
+
+<UL><PRE>
+BrowseProtocols CUPS
+BrowseProtocols SLP
+BrowseProtocols CUPS SLP
+BrowseProtocols all
+</PRE></UL>
+
+<H4>Description</H4>
+
+<P>The <CODE>BrowseProtocols</CODE> directive specifies the protocols to
+use when collecting and distributing shared printers on the local network.
+The default protocol is <CODE>CUPS</CODE>, which is a broadcast-based
+protocol.
+
+<CENTER><TABLE WIDTH="80%" BORDER="1" CELLPADDING="5" BGCOLOR="#cccccc">
+<TR>
+	<TD>
+	<B>NOTE:</B>
+
+	<P>When using the <CODE>SLP</CODE> protocol, you must have at least
+	one Directory Agent (DA) server on your network. Otherwise the
+	CUPS scheduler (<CODE>cupsd</CODE>) will not respond to client
+	requests for several seconds while polling the network.
+	</TD>
+</TR>
+</TABLE></CENTER>
+
 <!-- NEED 4in -->
 <H3><A NAME="BrowseRelay">BrowseRelay</A></H3>
 <HR>
@@ -1440,6 +1509,29 @@ Classification unclassified
 on the server. When this option is set, at least one of the banner pages
 is forced to the classification level, and the classification is placed
 on each page of output. The default is no classification level.
+
+<!-- NEED 3in -->
+<H3><A NAME="ClassifyOverride">ClassifyOverride</A></H3>
+<HR>
+
+<H4>Examples</H4>
+
+<UL><PRE>
+ClassifyOverride Yes
+ClassifyOverride No
+</PRE></UL>
+
+<H4>Description</H4>
+
+<P>The <CODE>ClassifyOverride</CODE> directive specifies whether users
+can override the default classification level on the server. When the
+server classification is set, users can change the classification using
+the <CODE>job-sheets</CODE> option and can choose to only print one
+security banner before or after the job. If the <CODE>job-sheets</CODE>
+option is set to <CODE>none</CODE> then the server default classification
+is used.
+
+<P>The default is to not allow classification overrides.
 
 <!-- NEED 3in -->
 <H3><A NAME="DataDir">DataDir</A></H3>
@@ -1694,6 +1786,26 @@ filter and CGI programs run as. The default group is <CODE>sys</CODE>,
 system.
 
 <!-- NEED 3in -->
+<H3><A NAME="HideImplicitMembers">HideImplicitMembers</A></H3>
+<HR>
+
+<H4>Examples</H4>
+
+<UL><PRE>
+HideImplicitMembers Yes
+HideImplicitMembers No
+</PRE></UL>
+
+<H4>Description</H4>
+
+<P>The <CODE>HideImplicitMembers</CODE> directive controls
+whether the individual printers in an implicit class are shown
+to the user. The default is <CODE>No</CODE>.</P>
+
+<P><A HREF="#ImplicitClasses"><CODE>ImplicitClasses</CODE></A>
+must be enabled for this directive to have any effect.</P>
+
+<!-- NEED 3in -->
 <H3><A NAME="HostNameLookups">HostNameLookups</A></H3>
 <HR>
 
@@ -1738,6 +1850,45 @@ classes are created based upon the available network printers and classes.
 The default setting is <CODE>On</CODE> but is automatically turned
 <CODE>Off</CODE> if <A HREF="#Browsing"><CODE>Browsing</CODE></A> is
 turned <CODE>Off</CODE>.
+
+<!-- NEED 3in -->
+<H3><A NAME="ImplicitAnyClasses">ImplicitAnyClasses</A></H3>
+<HR>
+
+<H4>Examples</H4>
+
+<UL><PRE>
+ImplicitAnyClasses On
+ImplicitAnyClasses Off
+</PRE></UL>
+
+<H4>Description</H4>
+
+<P>The <CODE>ImplicitAnyClasses</CODE> directive controls
+whether implicit classes for local and remote printers are
+created with the name <CODE>AnyPrinter</CODE>. The default
+setting is <CODE>Off</CODE>.</P>
+
+<P><A HREF="#ImplicitClasses"><CODE>ImplicitClasses</CODE></A>
+must be enabled for this directive to have any effect.</P>
+
+<!-- NEED 3in -->
+<H3><A NAME="Include">Include</A></H3>
+<HR>
+
+<H4>Examples</H4>
+
+<UL><PRE>
+Include filename
+Include /foo/bar/filename
+</PRE></UL>
+
+<H4>Description</H4>
+
+<P>The <CODE>Include</CODE> directive includes the named file in
+the <CODE>cupsd.conf</CODE> file. If no leading path is
+provided, the file is assumed to be relative to the
+<A HREF="#ServerRoot"><CODE>ServerRoot</CODE></A> directory.</P>
 
 <!-- NEED 3in -->
 <H3><A NAME="KeepAlive">KeepAlive</A></H3>

@@ -1,5 +1,5 @@
 /*
- * "$Id: usb.c,v 1.18 2001/02/08 18:46:00 mike Exp $"
+ * "$Id: usb.c,v 1.18.2.1 2001/12/26 16:52:07 mike Exp $"
  *
  *   USB port backend for the Common UNIX Printing System (CUPS).
  *
@@ -363,35 +363,55 @@ list_devices(void)
     }
 
     fclose(probe);
+
+   /*
+    * Write empty device listings for unused USB devices...
+    */
+
+    for (; i < 16; i ++)
+    {
+      sprintf(device, "/dev/usb/lp%d", i);
+
+      if (access(device, 0))
+      {
+	sprintf(device, "/dev/usb/usblp%d", i);
+
+	if (access(device, 0))
+	{
+	  sprintf(device, "/dev/usblp%d", i);
+
+	  if (access(device, 0))
+	    continue;
+	}
+      }
+
+      printf("direct usb:%s \"Unknown\" \"USB Printer #%d\"\n", device, i + 1);
+    }
   }
   else
   {
    /*
-    * Just probe manually for USB devices...
+    * Just check manually for USB devices...
     */
 
-    for (i = 0; i < 8; i ++)
+    for (i = 0; i < 16; i ++)
     {
       sprintf(device, "/dev/usb/lp%d", i);
-      if ((fd = open(device, O_WRONLY)) >= 0)
+
+      if (access(device, 0))
       {
-	close(fd);
-	printf("direct usb:%s \"Unknown\" \"USB Printer #%d\"\n", device, i + 1);
+	sprintf(device, "/dev/usb/usblp%d", i);
+
+	if (access(device, 0))
+	{
+	  sprintf(device, "/dev/usblp%d", i);
+
+	  if (access(device, 0))
+	    continue;
+	}
       }
 
-      sprintf(device, "/dev/usb/usblp%d", i);
-      if ((fd = open(device, O_WRONLY)) >= 0)
-      {
-	close(fd);
-	printf("direct usb:%s \"Unknown\" \"USB Printer #%d\"\n", device, i + 1);
-      }
-
-      sprintf(device, "/dev/usblp%d", i);
-      if ((fd = open(device, O_WRONLY)) >= 0)
-      {
-	close(fd);
-	printf("direct usb:%s \"Unknown\" \"USB Printer #%d\"\n", device, i + 1);
-      }
+      printf("direct usb:%s \"Unknown\" \"USB Printer #%d\"\n", device, i + 1);
     }
   }
 #elif defined(__sgi)
@@ -400,38 +420,30 @@ list_devices(void)
 #elif defined(__osf)
 #elif defined(__FreeBSD__)
   int   i;                      /* Looping var */
-  int   fd;                     /* File descriptor */
   char  device[255];            /* Device filename */
 
 
   for (i = 0; i < 3; i ++)
   {
     sprintf(device, "/dev/unlpt%d", i);
-    if ((fd = open(device, O_WRONLY)) >= 0)
-    {
-      close(fd);
-      printf("direct usb:%s \"Unknown\" \"USB Port #%d\"\n", device, i + 1);
-    }
+    if (!access(device, 0))
+      printf("direct usb:%s \"Unknown\" \"USB Printer #%d\"\n", device, i + 1);
   }
 #elif defined(__NetBSD__) || defined(__OpenBSD__)
   int   i;                      /* Looping var */
-  int   fd;                     /* File descriptor */
   char  device[255];            /* Device filename */
 
 
   for (i = 0; i < 3; i ++)
   {
     sprintf(device, "/dev/ulpt%d", i);
-    if ((fd = open(device, O_WRONLY)) >= 0)
-    {
-      close(fd);
-      printf("direct usb:%s \"Unknown\" \"USB Port #%d\"\n", device, i + 1);
-    }
+    if (!access(device, 0))
+      printf("direct usb:%s \"Unknown\" \"USB Printer #%d\"\n", device, i + 1);
   }
 #endif
 }
 
 
 /*
- * End of "$Id: usb.c,v 1.18 2001/02/08 18:46:00 mike Exp $".
+ * End of "$Id: usb.c,v 1.18.2.1 2001/12/26 16:52:07 mike Exp $".
  */

@@ -21,32 +21,25 @@
 class GfxPath;
 class GfxFont;
 class GfxColorSpace;
-
-//------------------------------------------------------------------------
-// Parameters
-//------------------------------------------------------------------------
-
-// Generate Level 1 PostScript?
-extern GBool psOutLevel1;
-
-// Generate Level 1 separable PostScript?
-extern GBool psOutLevel1Sep;
-
-// Generate Encapsulated PostScript?
-extern GBool psOutEPS;
-
-#if OPI_SUPPORT
-// Generate OPI comments?
-extern GBool psOutOPI;
-#endif
-
-// Paper size.
-extern int paperWidth;
-extern int paperHeight;
+class GfxSeparationColorSpace;
+class PSOutCustomColor;
 
 //------------------------------------------------------------------------
 // PSOutputDev
 //------------------------------------------------------------------------
+
+enum PSOutLevel {
+  psLevel1,
+  psLevel1Sep,
+  psLevel2,
+  psLevel2Sep
+};
+
+enum PSOutMode {
+  psModePS,
+  psModeEPS,
+  psModeForm
+};
 
 enum PSFileType {
   psFile,			// write to file
@@ -58,9 +51,11 @@ class PSOutputDev: public OutputDev {
 public:
 
   // Open a PostScript output file, and write the prolog.
-  PSOutputDev(const char *fileName, Catalog *catalog,
+  PSOutputDev(char *fileName, XRef *xrefA, Catalog *catalog,
 	      int firstPage, int lastPage,
-	      GBool embedType11, GBool doForm1);
+	      PSOutLevel levelA, PSOutMode modeA, GBool doOPIA,
+	      GBool embedType1A, GBool embedTrueTypeA,
+	      int paperWidthA, int paperHeightA);
 
   // Destructor -- writes the trailer and closes the file.
   virtual ~PSOutputDev();
@@ -131,7 +126,7 @@ public:
 			     GBool inlineImg);
   virtual void drawImage(GfxState *state, Object *ref, Stream *str,
 			 int width, int height, GfxImageColorMap *colorMap,
-			 GBool inlineImg);
+			 int *maskColors, GBool inlineImg);
 
 #if OPI_SUPPORT
   //----- OPI functions
@@ -144,11 +139,14 @@ private:
   void setupResources(Dict *resDict);
   void setupFonts(Dict *resDict);
   void setupFont(GfxFont *font);
-  void setupEmbeddedType1Font(Ref *id, const char *psName);
-  void setupEmbeddedType1Font(GString *fileName, const char *psName);
-  void setupEmbeddedType1CFont(GfxFont *font, Ref *id, const char *psName);
+  void setupEmbeddedType1Font(Ref *id, char *psName);
+  void setupEmbeddedType1Font(GString *fileName, char *psName);
+  void setupEmbeddedType1CFont(GfxFont *font, Ref *id, char *psName);
+  void setupEmbeddedTrueTypeFont(GfxFont *font, Ref *id, char *psName);
   void setupImages(Dict *resDict);
   void setupImage(Ref id, Stream *str);
+  void addProcessColor(double c, double m, double y, double k);
+  void addCustomColor(GfxSeparationColorSpace *sepCS);
   void doPath(GfxPath *path);
   void doImageL1(GfxImageColorMap *colorMap,
 		 GBool invert, GBool inlineImg,
@@ -160,20 +158,29 @@ private:
 		 GBool invert, GBool inlineImg,
 		 Stream *str, int width, int height, int len);
   void dumpColorSpaceL2(GfxColorSpace *colorSpace);
+#if OPI_SUPPORT
   void opiBegin20(GfxState *state, Dict *dict);
   void opiBegin13(GfxState *state, Dict *dict);
   void opiTransform(GfxState *state, double x0, double y0,
 		    double *x1, double *y1);
   GBool getFileSpec(Object *fileSpec, Object *fileName);
+#endif
   void writePS(const char *fmt, ...);
   void writePSString(GString *s);
 
+  PSOutLevel level;		// PostScript level (1, 2, separation)
+  PSOutMode mode;		// PostScript mode (PS, EPS, form)
+  GBool doOPI;			// generate OPI comments?
   GBool embedType1;		// embed Type 1 fonts?
-  GBool doForm;			// generate a form?
+  GBool embedTrueType;		// embed TrueType fonts?
+  int paperWidth;		// width of paper, in pts
+  int paperHeight;		// height of paper, in pts
 
   FILE *f;			// PostScript file
   PSFileType fileType;		// file / pipe / stdout
   int seqPage;			// current sequential page number
+
+  XRef *xref;			// the xref table for this PDF file
 
   Ref *fontIDs;			// list of object IDs of all used fonts
   int fontIDLen;		// number of entries in fontIDs array
@@ -190,6 +197,10 @@ private:
   GBool landscape;		// true for landscape, false for portrait
 
   GString *embFontList;		// resource comments for embedded fonts
+
+  int processColors;		// used process colors
+  PSOutCustomColor		// used custom colors
+    *customColors;
 
 #if OPI_SUPPORT
   int opi13Nest;		// nesting level of OPI 1.3 objects

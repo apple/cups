@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-libtool.m4,v 1.2 2001/08/06 19:37:09 mike Exp $"
+dnl "$Id: cups-libtool.m4,v 1.2.2.1 2001/12/26 16:52:10 mike Exp $"
 dnl
 dnl   Libtool stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -45,5 +45,5 @@ if test x$LIBTOOL != x; then
 fi
 
 dnl
-dnl End of "$Id: cups-libtool.m4,v 1.2 2001/08/06 19:37:09 mike Exp $".
+dnl End of "$Id: cups-libtool.m4,v 1.2.2.1 2001/12/26 16:52:10 mike Exp $".
 dnl

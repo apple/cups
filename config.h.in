@@ -1,5 +1,5 @@
 /*
- * "$Id: config.h.in,v 1.39.2.2 2001/05/13 18:37:58 mike Exp $"
+ * "$Id: config.h.in,v 1.39.2.3 2001/12/26 16:52:05 mike Exp $"
  *
  *   Configuration file for the Common UNIX Printing System (CUPS).
  *
@@ -30,6 +30,15 @@
 
 #define CUPS_SVERSION	"CUPS v1.2.0"
 
+
+/*
+ * Default user and group...
+ */
+
+#define CUPS_DEFAULT_USER	"lp"
+#define CUPS_DEFAULT_GROUP	"sys"
+
+
 /*
  * Where are files stored?
  */
@@ -43,11 +52,13 @@
 #define CUPS_DATADIR    "/usr/share/cups"
 #define CUPS_FONTPATH	"/usr/share/cups/fonts"
 
+
 /*
  * What is the format string for strftime?
  */
 
 #define CUPS_STRFTIME_FORMAT	NULL
+
 
 /*
  * Do we have various image libraries?
@@ -58,11 +69,13 @@
 #undef HAVE_LIBJPEG
 #undef HAVE_LIBTIFF
 
+
 /*
  * Does this machine store words in big-endian (MSB-first) order?
  */
 
 #undef WORDS_BIGENDIAN
+
 
 /*
  * Which directory functions and headers do we use?
@@ -73,6 +86,7 @@
 #undef HAVE_SYS_NDIR_H
 #undef HAVE_NDIR_H
 
+
 /*
  * Do we have PAM stuff?
  */
@@ -81,11 +95,13 @@
 #define HAVE_LIBPAM 0
 #endif /* !HAVE_LIBPAM */
 
+
 /*
  * Do we have <shadow.h>?
  */
 
 #undef HAVE_SHADOW_H
+
 
 /*
  * Do we have <crypt.h>?
@@ -93,12 +109,14 @@
 
 #undef HAVE_CRYPT_H
 
+
 /*
  * Use <string.h>, <strings.h>, or both?
  */
 
 #undef HAVE_STRING_H
 #undef HAVE_STRINGS_H
+
 
 /*
  * Do we have the strXXX() functions?
@@ -108,11 +126,13 @@
 #undef HAVE_STRCASECMP
 #undef HAVE_STRNCASECMP
 
+
 /*
  * Do we have the vsyslog() function?
  */
 
 #undef HAVE_VSYSLOG
+
 
 /*
  * Do we have the (v)snprintf() functions?
@@ -121,12 +141,14 @@
 #undef HAVE_SNPRINTF
 #undef HAVE_VSNPRINTF
 
+
 /*
  * What signal functions to use?
  */
 
 #undef HAVE_SIGSET
 #undef HAVE_SIGACTION
+
 
 /*
  * What wait functions to use?
@@ -135,6 +157,7 @@
 #undef HAVE_WAITPID
 #undef HAVE_WAIT3
 
+
 /*
  * Do we have the mallinfo function and malloc.h?
  */
@@ -142,11 +165,20 @@
 #undef HAVE_MALLINFO
 #undef HAVE_MALLOC_H
 
+
 /*
  * Do we have the OpenSSL library?
  */
 
 #undef HAVE_LIBSSL
+
+
+/*
+ * Do we have the OpenSLP library?
+ */
+
+#undef HAVE_LIBSLP
+
 
 /*
  * Do we have <sys/ioctl.h>?
@@ -154,6 +186,22 @@
 
 #undef HAVE_SYS_IOCTL_H
 
+
 /*
- * End of "$Id: config.h.in,v 1.39.2.2 2001/05/13 18:37:58 mike Exp $".
+ * Do we have mkstemp() and/or mkstemps()?
+ */
+
+#undef HAVE_MKSTEMP
+#undef HAVE_MKSTEMPS
+
+
+/*
+ * Does the "tm" structure contain the "tm_gmtoff" member?
+ */
+
+#undef HAVE_TM_GMTOFF
+
+
+/*
+ * End of "$Id: config.h.in,v 1.39.2.3 2001/12/26 16:52:05 mike Exp $".
  */

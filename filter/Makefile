@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.41 2001/02/02 16:37:44 mike Exp $"
+# "$Id: Makefile,v 1.41.2.1 2001/12/26 16:52:38 mike Exp $"
 #
 #   Filter makefile for the Common UNIX Printing System (CUPS).
 #
@@ -25,7 +25,7 @@
 include ../Makedefs
 
 TARGETS	=	hpgltops texttops pstops imagetops imagetoraster \
-		rastertoepson rastertohp
+		rastertodymo rastertoepson rastertohp
 
 HPGLOBJS =	hpgl-attr.o hpgl-config.o hpgl-main.o hpgl-prolog.o \
 		hpgl-char.o hpgl-input.o hpgl-polygon.o hpgl-vector.o
@@ -36,8 +36,8 @@ IMAGEOBJS =	image-bmp.o image-colorspace.o image-gif.o image-jpeg.o \
 FORMOBJS =	form-attr.o form-main.o form-ps.o form-text.o form-tree.o
 OBJS	=	$(HPGLOBJS) $(IMAGEOBJS) $(FORMOBJS) \
 		imagetops.o imagetoraster.o common.o pstops.o raster.o \
-		rastertoepson.o rastertohp.o texttops.o textcommon.o
-
+		rastertodymo.o rastertoepson.o rastertohp.o texttops.o \
+		textcommon.o 
 
 #
 # Make all targets...
@@ -59,20 +59,21 @@ clean:
 #
 
 install:
-	-$(MKDIR) $(LIBDIR)
-	$(CHMOD) ugo+rx $(LIBDIR)
+	$(INSTALL_DIR) $(SERVERBIN)/filter
+	for file in $(TARGETS); do \
+		$(INSTALL_BIN) $$file $(SERVERBIN)/filter; \
+	done
+	$(INSTALL_DIR) $(LIBDIR)
 	$(INSTALL_LIB) $(LIBCUPSIMAGE) $(LIBDIR)
-	-if test $(LIBCUPSIMAGE) != "libcupsimage.a" -a $(LIBCUPSIMAGE) != "libcupsimage.la"; then \
+	-if test $(LIBCUPSIMAGE) = "libcupsimage.so.2" -o $(LIBCUPSIMAGE) = "libcupsimage.sl.2"; then \
 		$(RM) $(LIBDIR)/`basename $(LIBCUPSIMAGE) .2`; \
 		$(LN) $(LIBCUPSIMAGE) $(LIBDIR)/`basename $(LIBCUPSIMAGE) .2`; \
 	fi
-	-$(MKDIR) $(SERVERBIN)/filter
-	$(CHMOD) ugo+rx $(SERVERBIN)
-	$(CHMOD) ugo+rx $(SERVERBIN)/filter
-	$(INSTALL_BIN) $(TARGETS) $(SERVERBIN)/filter
-	-$(MKDIR) $(INCLUDEDIR)/cups
-	$(CHMOD) ugo+rx $(INCLUDEDIR)
-	$(CHMOD) ugo+rx $(INCLUDEDIR)/cups
+	-if test $(LIBCUPSIMAGE) = "libcupsimage.2.dylib"; then \
+		$(RM) $(LIBDIR)/libcupsimage.dylib; \
+		$(LN) $(LIBCUPSIMAGE) $(LIBDIR)/libcupsimage.dylib; \
+	fi
+	$(INSTALL_DIR) $(INCLUDEDIR)/cups
 	$(INSTALL_DATA) raster.h $(INCLUDEDIR)/cups
 
 
@@ -108,13 +109,36 @@ libcupsimage.so.2 libcupsimage.sl.2:	$(IMAGEOBJS) ../Makedefs
 
 
 #
+# libcupsimage.2.dylib
+#
+
+libcupsimage.2.dylib:	$(IMAGEOBJS) ../Makedefs
+	echo Linking $@...
+	$(DSO) $(DSOFLAGS) -o $@ $(IMAGEOBJS) $(DSOLIBS) $(LINKCUPS) -lm -lcc_dynamic
+	$(RM) libcupsimage.dylib
+	$(LN) $@ libcupsimage.dylib
+
+
+#
+# libcupsimage_s.a
+#
+
+libcupsimage_s.a:	$(IMAGEOBJS) ../Makedefs
+	echo Linking $@...
+	$(DSO) $(DSOFLAGS) -o libcupsimage_s.o $(IMAGEOBJS) $(DSOLIBS) \
+		$(LINKCUPS) -lm
+	$(RM) $@
+	$(AR) $(ARFLAGS) $@ libcupsimage_s.o
+
+
+#
 # libcupsimage.la
 #
 
 libcupsimage.la:       $(IMAGEOBJS) ../Makedefs
 	echo Linking $@...
-	$(CC) -o $@ $(IMAGEOBJS:.o=.lo) -rpath $(LIBDIR) \
-		-version-info 2:0
+	$(DSO) -o $(DSOFLAGS) $@ $(IMAGEOBJS:.o=.lo) $(DSOLIBS) \
+		-rpath $(LIBDIR) -version-info 2:0
 
 
 #
@@ -166,6 +190,16 @@ pstops.o:	common.h
 
 
 #
+# rastertodymo
+#
+
+rastertodymo:	rastertodymo.o ../Makedefs ../cups/$(LIBCUPS) libcupsimage.a
+	echo Linking $@...
+	$(CC) $(LDFLAGS) -o $@ rastertodymo.o libcupsimage.a $(LIBS)
+rastertodymo.o:	raster.h
+
+
+#
 # rastertoepson
 #
 
@@ -203,5 +237,5 @@ $(OBJS):	../Makedefs ../cups/cups.h ../cups/ppd.h ../cups/language.h
 
 
 #
-# End of "$Id: Makefile,v 1.41 2001/02/02 16:37:44 mike Exp $".
+# End of "$Id: Makefile,v 1.41.2.1 2001/12/26 16:52:38 mike Exp $".
 #

@@ -1,4 +1,4 @@
-README - CUPS v1.1.7 - 05/01/2001
+README - CUPS v1.2.0 - 12/26/2001
 ---------------------------------
 
 Looking for compile instructions?  Read the file "INSTALL.txt"
@@ -27,8 +27,8 @@ that are used to support non-PostScript printers.  Sample
 drivers for HP and EPSON printers are included that use these
 filters.
 
-Drivers for over 2300 printers are provided with our ESP Print
-Pro software, available at:
+Drivers for thousands of printers are provided with our ESP
+Print Pro software, available at:
 
 	http://www.easysw.com/printpro
 
@@ -55,7 +55,8 @@ SOFTWARE REQUIREMENTS
 The following operating system software is required to install
 one of the binary distributions from Easy Software Products:
 
-    - Digital UNIX (aka OSF1 aka Compaq Tru64 UNIX) 4.0 or higher
+    - AIX 4.3 or higher
+    - Compaq Tru64 UNIX (aka OSF1 aka Digital UNIX) 4.0 or higher
     - HP-UX 10.20 or higher
     - IRIX 5.3 or higher
     - Linux 2.0 with glibc2 or higher
@@ -188,14 +189,20 @@ the following commands:
 
 Similarly, for the other sample drivers you can use:
 
-    Driver                      PPD File
-    --------------------------  ------------
-    HP DeskJet Series           deskjet.ppd
-    HP LaserJet Series          laserjet.ppd
-    EPSON Stylus Color Series   stcolor.ppd
-    EPSON Stylus Photo Series   stphoto.ppd
-    EPSON 9-pin Series          epson9.ppd
-    EPSON 24-pin Series         epson24.ppd
+    Driver                         PPD File
+    -----------------------------  ------------
+    Dymo Label Printers            dymo.ppd
+    EPSON Stylus Color Series      stcolor.ppd
+    EPSON Stylus Photo Series      stphoto.ppd
+    EPSON Stylus New Color Series  stcolor2.ppd
+    EPSON Stylus New Photo Series  stphoto2.ppd
+    EPSON 9-pin Series             epson9.ppd
+    EPSON 24-pin Series            epson24.ppd
+    HP DeskJet Series              deskjet.ppd
+    HP New DeskJet Series          deskjet2.ppd
+    HP LaserJet Series             laserjet.ppd
+    OKIDATA 9-Pin Series           okidata9.ppd
+    OKIDATA 24-Pin Series          okidat24.ppd
 
 These sample drivers provide basic printing capabilities, but
 generally do not exercise the full potential of the printers or
@@ -246,8 +253,8 @@ The PostScript RIP software (pstoraster) is based on the GNU
 Ghostscript 5.50 core, Copyright 1986-1998 by Aladdin
 Enterprises.
 
-The PDF filter (pdftops) is based on the Xpdf 0.90 software,
-Copyright 1996-1999 by Derek B. Noonburg.
+The PDF filter (pdftops) is based on the Xpdf 0.92 software,
+Copyright 1996-2001 by Derek B. Noonburg.
 
 This software is based in part on the work of the Independent
 JPEG Group.

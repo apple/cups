@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.53.2.1 2001/04/02 19:51:43 mike Exp $"
+# "$Id: Makefile,v 1.53.2.2 2001/12/26 16:52:11 mike Exp $"
 #
 #   Support library Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -68,17 +68,24 @@ clean:
 #
 
 install:	all
-	-$(MKDIR) $(INCLUDEDIR)/cups
-	$(CHMOD) ugo+rx $(INCLUDEDIR)
-	$(CHMOD) ugo+rx $(INCLUDEDIR)/cups
-	$(INSTALL_DATA) $(HEADERS) $(INCLUDEDIR)/cups
-	-$(MKDIR) $(LIBDIR)
-	$(CHMOD) ugo+rx $(LIBDIR)
+	$(INSTALL_DIR) $(INCLUDEDIR)/cups
+	for file in $(HEADERS); do \
+		$(INSTALL_DATA) $$file $(INCLUDEDIR)/cups; \
+	done
+	$(INSTALL_DIR) $(LIBDIR)
 	$(INSTALL_LIB) $(LIBCUPS) $(LIBDIR)
-	if test $(LIBCUPS) != "libcups.a" -a $(LIBCUPS) != "libcups.la"; then \
+	if test $(LIBCUPS) = "libcups.so.2" -o $(LIBCUPS) = "libcups.sl.2"; then \
 		$(INSTALL_LIB) libcups.a $(LIBDIR); \
 		$(RM) $(LIBDIR)/`basename $(LIBCUPS) .3`; \
 		$(LN) $(LIBCUPS) $(LIBDIR)/`basename $(LIBCUPS) .3`; \
+	fi
+	if test $(LIBCUPS) = "libcups.2.dylib"; then \
+		$(INSTALL_LIB) libcups.a $(LIBDIR); \
+		$(RM) $(LIBDIR)/libcups.dylib; \
+		$(LN) $(LIBCUPS) $(LIBDIR)/libcups.dylib; \
+	fi
+	if test $(LIBCUPS) = "libcups_s.a"; then \
+		$(INSTALL_LIB) libcups.a $(LIBDIR); \
 	fi
 
 
@@ -91,6 +98,30 @@ libcups.so.3 libcups.sl.3:	$(LIBOBJS) ../Makedefs
 	$(DSO) $(DSOFLAGS) -o $@ $(LIBOBJS) $(SSLLIBS)
 	$(RM) `basename $@ .3`
 	$(LN) $@ `basename $@ .3`
+
+
+#
+# libcups.2.dylib
+#
+
+libcups.3.dylib:	$(LIBOBJS) ../Makedefs
+	echo Linking $@...
+	$(DSO) $(DSOFLAGS) -o $@ $(LIBOBJS) $(SSLLIBS)
+	$(RM) libcups.dylib
+	$(LN) $@ libcups.dylib
+
+
+#
+# libcups_s.a
+#
+
+libcups_s.a:	$(LIBOBJS) ../Makedefs
+	echo Creating $@...
+	$(RM) libcups_s.exp
+	(echo _ipp_add_attr; echo _ipp_free_attr) >libcups_s.exp
+	$(DSO) $(DSOFLAGS) -Wl,-bexport:libcups_s.exp -o libcups_s.o $(LIBOBJS) $(SSLLIBS) -lm
+	$(RM) $@
+	$(AR) $(ARFLAGS) $@ libcups_s.o
 
 
 #
@@ -167,5 +198,5 @@ $(OBJS):	../Makedefs ../config.h
 
 
 #
-# End of "$Id: Makefile,v 1.53.2.1 2001/04/02 19:51:43 mike Exp $".
+# End of "$Id: Makefile,v 1.53.2.2 2001/12/26 16:52:11 mike Exp $".
 #

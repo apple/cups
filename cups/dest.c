@@ -1,5 +1,5 @@
 /*
- * "$Id: dest.c,v 1.18 2001/03/30 22:23:00 mike Exp $"
+ * "$Id: dest.c,v 1.18.2.1 2001/12/26 16:52:11 mike Exp $"
  *
  *   User-defined destination (and option) support for the Common UNIX
  *   Printing System (CUPS).
@@ -275,6 +275,15 @@ cupsGetDests(cups_dest_t **dests)	/* O - Destinations */
     if ((dest = cupsGetDest(name, instance, num_dests, *dests)) != NULL)
       dest->is_default = 1;
   }
+  else
+  {
+   /*
+    * This initialization of "instance" is unnecessary, but avoids a
+    * compiler warning...
+    */
+
+    instance = NULL;
+  }
 
  /*
   * Load the /etc/cups/lpoptions and ~/.lpoptions files...
@@ -292,6 +301,21 @@ cupsGetDests(cups_dest_t **dests)	/* O - Destinations */
   {
     snprintf(filename, sizeof(filename), "%s/.lpoptions", home);
     num_dests = cups_get_dests(filename, num_dests, dests);
+  }
+
+ /*
+  * Reset the default destination if the LPDEST or PRINTER environment
+  * variables are set...
+  */
+
+  if (getenv("LPDEST") != NULL || getenv("PRINTER") != NULL)
+  {
+   /*
+    * Lookup the printer and instance and make it the default...
+    */
+
+    if ((dest = cupsGetDest(name, instance, num_dests, *dests)) != NULL)
+      dest->is_default = 1;
   }
 
  /*
@@ -542,5 +566,147 @@ cups_get_dests(const char  *filename,	/* I - File to read from */
 
 
 /*
- * End of "$Id: dest.c,v 1.18 2001/03/30 22:23:00 mike Exp $".
+ * 'cups_get_sdests()' - Get destinations from a server.
+ */
+
+static int				/* O - Number of destinations */
+cups_get_sdests(ipp_op_t    op,		/* I - get-printers or get-classes */
+                int         num_dests,	/* I - Number of destinations */
+                cups_dest_t **dests)	/* IO - Destinations */
+{
+  cups_dest_t	*dest;			/* Current destination */
+  http_t	*http;			/* HTTP connection */
+  ipp_t		*request,		/* IPP Request */
+		*response;		/* IPP Response */
+  ipp_attribute_t *attr;		/* Current attribute */
+  cups_lang_t	*language;		/* Default language */
+  const char	*name;			/* printer-name attribute */
+  char		job_sheets[1024];	/* job-sheets option */
+  static const char	*pattrs[] =	/* Attributes we're interested in */
+		{
+		  "printer-name",
+		  "job-sheets-default"
+		};
+
+
+ /*
+  * Connect to the CUPS server...
+  */
+
+  if ((http = httpConnect(cupsServer(), ippPort())) == NULL)
+    return (num_dests);
+
+ /*
+  * Build a CUPS_GET_PRINTERS or CUPS_GET_CLASSES request, which require
+  * the following attributes:
+  *
+  *    attributes-charset
+  *    attributes-natural-language
+  */
+
+  request = ippNew();
+
+  request->request.op.operation_id = op;
+  request->request.op.request_id   = 1;
+
+  language = cupsLangDefault();
+
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
+               "attributes-charset", NULL, cupsLangEncoding(language));
+
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
+               "attributes-natural-language", NULL, language->language);
+
+  ippAddStrings(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
+                "requested-attributes", sizeof(pattrs) / sizeof(pattrs[0]),
+		NULL, pattrs);
+
+ /*
+  * Do the request and get back a response...
+  */
+
+  if ((response = cupsDoRequest(http, request, "/")) != NULL)
+  {
+    for (attr = response->attrs; attr != NULL; attr = attr->next)
+    {
+     /*
+      * Skip leading attributes until we hit a printer...
+      */
+
+      while (attr != NULL && attr->group_tag != IPP_TAG_PRINTER)
+        attr = attr->next;
+
+      if (attr == NULL)
+        break;
+
+     /*
+      * Pull the needed attributes from this job...
+      */
+
+      name = NULL;
+
+      strcpy(job_sheets, "");
+
+      while (attr != NULL && attr->group_tag == IPP_TAG_PRINTER)
+      {
+        if (strcmp(attr->name, "printer-name") == 0 &&
+	    attr->value_tag == IPP_TAG_NAME)
+	  name = attr->values[0].string.text;
+
+        if (strcmp(attr->name, "job-sheets-default") == 0 &&
+	    (attr->value_tag == IPP_TAG_KEYWORD ||
+	     attr->value_tag == IPP_TAG_NAME))
+        {
+	  if (attr->num_values == 2)
+	    snprintf(job_sheets, sizeof(job_sheets), "%s,%s",
+	             attr->values[0].string.text, attr->values[1].string.text);
+	  else
+	    strcpy(job_sheets, attr->values[0].string.text);
+        }
+
+        attr = attr->next;
+      }
+
+     /*
+      * See if we have everything needed...
+      */
+
+      if (!name)
+      {
+        if (attr == NULL)
+	  break;
+	else
+          continue;
+      }
+
+      num_dests = cupsAddDest(name, NULL, num_dests, dests);
+
+      if ((dest = cupsGetDest(name, NULL, num_dests, *dests)) != NULL)
+        if (job_sheets[0])
+          dest->num_options = cupsAddOption("job-sheets", job_sheets, 0,
+	                                    &(dest->options));
+
+      if (attr == NULL)
+	break;
+    }
+
+    ippDelete(response);
+  }
+
+ /*
+  * Close the server connection...
+  */
+
+  httpClose(http);
+
+ /*
+  * Return the count...
+  */
+
+  return (num_dests);
+}
+
+
+/*
+ * End of "$Id: dest.c,v 1.18.2.1 2001/12/26 16:52:11 mike Exp $".
  */

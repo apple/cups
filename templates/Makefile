@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.6 2001/01/22 15:04:03 mike Exp $"
+# "$Id: Makefile,v 1.6.2.1 2001/12/26 16:52:57 mike Exp $"
 #
 #   Template makefile for the Common UNIX Printing System (CUPS).
 #
@@ -51,6 +51,7 @@ FILES	=	add-class.tmpl \
 		job-cancel.tmpl \
 		job-hold.tmpl \
 		job-release.tmpl \
+		job-restart.tmpl \
 		modify-class.tmpl \
 		modify-printer.tmpl \
 		option-boolean.tmpl \
@@ -91,12 +92,12 @@ clean:
 #
 
 install:
-	-$(MKDIR) $(DATADIR)/templates
-	$(CHMOD) ugo+rx $(DATADIR)
-	$(CHMOD) ugo+rx $(DATADIR)/templates
-	$(INSTALL_DATA) $(FILES) $(DATADIR)/templates
+	$(INSTALL_DIR) $(DATADIR)/templates
+	for file in $(FILES); do \
+		$(INSTALL_DATA) $$file $(DATADIR)/templates; \
+	done
 
 
 #
-# End of "$Id: Makefile,v 1.6 2001/01/22 15:04:03 mike Exp $".
+# End of "$Id: Makefile,v 1.6.2.1 2001/12/26 16:52:57 mike Exp $".
 #

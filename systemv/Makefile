@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.23 2001/01/22 15:04:02 mike Exp $"
+# "$Id: Makefile,v 1.23.2.1 2001/12/26 16:52:56 mike Exp $"
 #
 #   System V commands makefile for the Common UNIX Printing System (CUPS).
 #
@@ -24,10 +24,10 @@
 
 include ../Makedefs
 
-TARGETS	=	accept cancel lp lpadmin lpinfo lpmove lpoptions lppasswd \
-		lpstat
-OBJS	=	accept.o cancel.o lp.o lpadmin.o lpinfo.o lpmove.o \
-		lpoptions.o lppasswd.o lpstat.o
+TARGETS	=	accept cancel cupsaddsmb lp lpadmin lpinfo lpmove \
+		lpoptions lppasswd lpstat
+OBJS	=	accept.o cancel.o cupsaddsmb.o lp.o lpadmin.o \
+		lpinfo.o lpmove.o lpoptions.o lppasswd.o lpstat.o
 
 
 #
@@ -49,30 +49,24 @@ clean:
 # Install all targets...
 #
 
-install:	$(INSTALL_SYSV)
-	-$(MKDIR) $(BINDIR)
-	$(CHMOD) ugo+rx $(BINDIR)
-	$(INSTALL_BIN) accept lpadmin lpinfo lpmove $(SBINDIR)
-	$(INSTALL_BIN) cancel lp lpoptions lppasswd lpstat $(BINDIR)
-	$(CHMOD) u+s $(BINDIR)/lppasswd
+install:
+	$(INSTALL_DIR) $(BINDIR)
+	$(INSTALL_BIN) accept $(SBINDIR)
 	$(RM) $(SBINDIR)/reject
 	$(LN) accept $(SBINDIR)/reject
+	$(INSTALL_BIN) cupsaddsmb $(SBINDIR)
+	$(INSTALL_BIN) lpadmin $(SBINDIR)
+	$(INSTALL_BIN) lpinfo $(SBINDIR)
+	$(INSTALL_BIN) lpmove $(SBINDIR)
+	$(INSTALL_BIN) cancel $(BINDIR)
 	$(RM) $(BINDIR)/disable
 	$(LN) ../sbin/accept $(BINDIR)/disable
 	$(RM) $(BINDIR)/enable
 	$(LN) ../sbin/accept $(BINDIR)/enable
-
-install-sysv:
-	-$(MKDIR) $(LIBDIR)
-	$(CHMOD) ugo+rx $(LIBDIR)
-	$(RM) $(LIBDIR)/lpadmin
-	$(LN) ../sbin/lpadmin $(LIBDIR)
-	$(RM) $(LIBDIR)/lpmove
-	$(LN) ../sbin/lpmove $(LIBDIR)
-	$(RM) $(LIBDIR)/accept
-	$(LN) ../sbin/accept $(LIBDIR)
-	$(RM) $(LIBDIR)/reject
-	$(LN) ../sbin/accept $(LIBDIR)/reject
+	$(INSTALL_BIN) lp $(BINDIR)
+	$(INSTALL_BIN) lpoptions $(BINDIR)
+	$(INSTALL_BIN) lpstat $(BINDIR)
+	$(INSTALL_BIN) -m 4755 -o $(CUPS_USER) -g $(CUPS_GROUP) lppasswd $(BINDIR)
 
 
 #
@@ -82,6 +76,10 @@ install-sysv:
 accept:	accept.o ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o accept accept.o $(LIBS)
+	$(RM) reject enable disable
+	$(LN) accept reject
+	$(LN) accept enable
+	$(LN) accept disable
 
 accept.o:	../cups/cups.h
 
@@ -95,6 +93,17 @@ cancel:	cancel.o ../cups/$(LIBCUPS)
 	$(CC) $(LDFLAGS) -o cancel cancel.o $(LIBS)
 
 cancel.o:	../cups/cups.h
+
+
+#
+# cupsaddsmb
+#
+
+cupsaddsmb:	cupsaddsmb.o ../cups/$(LIBCUPS)
+	echo Linking $@...
+	$(CC) $(LDFLAGS) -o cupsaddsmb cupsaddsmb.o $(LIBS)
+
+cupsaddsmb.o:	../cups/cups.h ../cups/string.h
 
 
 #
@@ -177,5 +186,5 @@ lpstat.o:	../cups/cups.h
 $(OBJS):	../Makedefs
 
 #
-# End of "$Id: Makefile,v 1.23 2001/01/22 15:04:02 mike Exp $".
+# End of "$Id: Makefile,v 1.23.2.1 2001/12/26 16:52:56 mike Exp $".
 #

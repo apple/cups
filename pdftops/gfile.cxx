@@ -38,6 +38,13 @@
 #  include <cups/cups.h>
 #endif // HAVE_LIBCUPS
 
+#ifdef __sun
+// Solaris doesn't define mkstemp()...
+extern "C" {
+extern int mkstemp(char *);
+}
+#endif // __sun
+
 // Some systems don't define this, so just make it something reasonably
 // large.
 #ifndef PATH_MAX
@@ -450,23 +457,7 @@ time_t getModTime(const char *fileName) {
 }
 
 GBool openTempFile(GString **name, FILE **f, const char *mode, const char *ext) {
-#ifdef HAVE_LIBCUPS
-  char	filename[1024];	// Name of temporary file...
-  int	fd;		// File descriptor...
-
-
-  (void)ext;
-
-  // Use the CUPS temporary file function on all platforms...
-  if ((fd = cupsTempFd(filename, sizeof(filename))) < 0)
-    return (gFalse);
-
-  // Make the file descriptor a FILE *, and copy the temp filename...
-  *f    = fdopen(fd, mode);
-  *name = new GString(filename);
-
-  return (gTrue);
-#elif defined(VMS) || defined(__EMX__) || defined(WIN32) || defined(ACORN) || defined(MACOS)
+#if defined(VMS) || defined(__EMX__) || defined(WIN32) || defined(ACORN) || defined(MACOS)
   //---------- non-Unix ----------
   char *s;
 
@@ -488,10 +479,36 @@ GBool openTempFile(GString **name, FILE **f, const char *mode, const char *ext) 
   return gTrue;
 #else
   //---------- Unix ----------
-  char *s, *p;
+  char *s;
   int fd;
 
+  // MRS: Currently there is no standard function for creating a temporary
+  //      file with an extension; this is required when uncompressing
+  //      LZW data using the uncompress program on some UNIX, which is
+  //      looking for a ".Z" extension on the temporary filename.  Sooo,
+  //      when you print an *OLD* PDF file that uses LZW compression,
+  //      the tmpnam() function is usually the one that is called to
+  //      create the temporary file.  Under *BSD, the safer mkstemps()
+  //      function is used instead.
+  //
+  //      That said, all CUPS filters are run with TMPDIR pointing to
+  //      a private temporary directory, which by default is only
+  //      accessible to the 'lp' user.  Also, most files use Flate
+  //      compression now and will be able to use the (safer)
+  //      mkstemp() function for any temporary files...
+
   if (ext) {
+#  if HAVE_MKSTEMPS
+    if ((s = getenv("TMPDIR"))) {
+      *name = new GString(s);
+    } else {
+      *name = new GString("/tmp");
+    }
+    (*name)->append("/XXXXXX");
+    (*name)->append(ext);
+    fd = mkstemps((*name)->getCString(), strlen(ext));
+# else // HAVE_MKSTEMPS
+  char *p;
     if (!(s = tmpnam(NULL))) {
       return gFalse;
     }
@@ -502,6 +519,7 @@ GBool openTempFile(GString **name, FILE **f, const char *mode, const char *ext) 
     }
     (*name)->append(ext);
     fd = open((*name)->getCString(), O_WRONLY | O_CREAT | O_EXCL, 0600);
+#  endif // HAVE_MKSTEMPS
   } else {
 #  if HAVE_MKSTEMP
     if ((s = getenv("TMPDIR"))) {

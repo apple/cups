@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.38.2.1 2001/05/13 18:37:59 mike Exp $"
+ * "$Id: ipp.c,v 1.38.2.2 2001/12/26 16:52:06 mike Exp $"
  *
  *   IPP backend for the Common UNIX Printing System (CUPS).
  *
@@ -408,13 +408,15 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
     fprintf(stderr, "DEBUG: printer-uri = \"%s\"\n", uri);
 
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "requesting-user-name",
-        	 NULL, argv[2]);
+    if (argv[2][0])
+      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "requesting-user-name",
+        	   NULL, argv[2]);
 
     fprintf(stderr, "DEBUG: requesting-user-name = \"%s\"\n", argv[2]);
 
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "job-name", NULL,
-        	 argv[3]);
+    if (argv[3][0])
+      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "job-name", NULL,
+        	   argv[3]);
 
     fprintf(stderr, "DEBUG: job-name = \"%s\"\n", argv[3]);
 
@@ -425,7 +427,12 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
     options     = NULL;
     num_options = cupsParseOptions(argv[5], 0, &options);
 
-    if ((content_type = getenv("CONTENT_TYPE")) != NULL && format_sup != NULL)
+    if (argc > 6)
+      content_type = getenv("CONTENT_TYPE");
+    else
+      content_type = "application/vnd.cups-raw";
+
+    if (content_type != NULL && format_sup != NULL)
     {
       for (i = 0; i < format_sup->num_values; i ++)
         if (strcasecmp(content_type, format_sup->values[i].string.text) == 0)
@@ -436,11 +443,24 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 	                            num_options, &options);
     }
 
-    cupsEncodeOptions(request, num_options, options);
+    if (copies_sup)
+    {
+     /*
+      * Only send options if the destination printer supports the copies
+      * attribute.  This is a hack for the HP JetDirect implementation of
+      * IPP, which does not accept extension attributes and incorrectly
+      * reports a client-error-bad-request error instead of the
+      * successful-ok-unsupported-attributes status.  In short, at least
+      * some HP implementations of IPP are non-compliant.
+      */
+
+      cupsEncodeOptions(request, num_options, options);
+      ippAddInteger(request, IPP_TAG_JOB, IPP_TAG_INTEGER, "copies",
+                    atoi(argv[4]));
+    }
+
     cupsFreeOptions(num_options, options);
 
-    if (copies_sup)
-      ippAddInteger(request, IPP_TAG_JOB, IPP_TAG_INTEGER, "copies", atoi(argv[4]));
 
    /*
     * Do the request...
@@ -453,6 +473,8 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
     if (ipp_status > IPP_OK_CONFLICT)
     {
+      job_id = 0;
+
       if (ipp_status == IPP_SERVICE_UNAVAILABLE ||
 	  ipp_status == IPP_PRINTER_BUSY)
       {
@@ -478,7 +500,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
     if (response)
       ippDelete(response);
 
-    if (ipp_status <= IPP_OK_CONFLICT)
+    if (ipp_status <= IPP_OK_CONFLICT && argc > 6)
     {
       fprintf(stderr, "PAGE: 1 %d\n", copies_sup ? atoi(argv[4]) : 1);
       copies --;
@@ -558,10 +580,11 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
       else if ((job_state = ippFindAttribute(response, "job-state", IPP_TAG_ENUM)) != NULL)
       {
        /*
-        * Stop polling if the job is finished...
+        * Stop polling if the job is finished or pending-held...
 	*/
 
-        if (job_state->values[0].integer > IPP_JOB_PROCESSING)
+        if (job_state->values[0].integer > IPP_JOB_PROCESSING ||
+	    job_state->values[0].integer == IPP_JOB_HELD)
 	{
 	  ippDelete(response);
 	  break;
@@ -600,7 +623,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   */
 
   if (ipp_status <= IPP_OK_CONFLICT)
-    fputs("INFO: " CUPS_SVERSION " is ready to print.\n", stderr);
+    fputs("INFO: Ready to print.\n", stderr);
 
   return (ipp_status > IPP_OK_CONFLICT);
 }
@@ -620,5 +643,5 @@ password_cb(const char *prompt)	/* I - Prompt (not used) */
 
 
 /*
- * End of "$Id: ipp.c,v 1.38.2.1 2001/05/13 18:37:59 mike Exp $".
+ * End of "$Id: ipp.c,v 1.38.2.2 2001/12/26 16:52:06 mike Exp $".
  */

@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.36 2001/02/21 17:01:16 mike Exp $"
+# "$Id: Makefile,v 1.36.2.1 2001/12/26 16:52:49 mike Exp $"
 #
 #   Scheduler Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -52,25 +52,17 @@ clean:
 #
 
 install:
-	-$(MKDIR) $(SBINDIR)
-	$(CHMOD) ugo+rx $(SBINDIR)
+	$(INSTALL_DIR) $(SBINDIR)
 	$(INSTALL_BIN) cupsd $(SBINDIR)
-	-$(MKDIR) $(SERVERBIN)/daemon
-	$(CHMOD) ugo+rx $(SERVERBIN)/daemon
+	$(INSTALL_DIR) $(SERVERBIN)/daemon
 	$(INSTALL_BIN) cups-lpd $(SERVERBIN)/daemon
 	$(INSTALL_BIN) cups-polld $(SERVERBIN)/daemon
-	-$(MKDIR) $(SERVERROOT)/certs
-	$(CHMOD) ugo+x,go-rw $(SERVERROOT)/certs
-	-$(MKDIR) $(SERVERROOT)/interfaces
-	$(CHMOD) ugo+rx $(SERVERROOT)/interfaces
-	-$(MKDIR) $(SERVERROOT)/ppd
-	$(CHMOD) ugo+rx $(SERVERROOT)/ppd
-	-$(MKDIR) $(LOGDIR)
-	$(CHMOD) ugo+rx $(LOGDIR)
-	-$(MKDIR) $(REQUESTS)
-	$(CHMOD) u+rwx,go-rwx $(REQUESTS)
-	-$(MKDIR) $(REQUESTS)/tmp
-	$(CHMOD) u+rwx,go-rwx,+t $(REQUESTS)/tmp
+	$(INSTALL_DIR) -m 711 -o $(CUPS_USER) -g $(CUPS_GROUP) $(SERVERROOT)/certs
+	$(INSTALL_DIR) $(SERVERROOT)/interfaces
+	$(INSTALL_DIR) $(SERVERROOT)/ppd
+	$(INSTALL_DIR) $(LOGDIR)
+	$(INSTALL_DIR) -m 700 -o $(CUPS_USER) -g $(CUPS_GROUP) $(REQUESTS)
+	$(INSTALL_DIR) -m 1700 -o $(CUPS_USER) -g $(CUPS_GROUP) $(REQUESTS)/tmp
 
 
 #
@@ -80,7 +72,7 @@ install:
 cupsd:	$(CUPSDOBJS) libmime.a ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o cupsd $(CUPSDOBJS) libmime.a \
-		$(LIBZ) $(SSLLIBS) $(LIBS) $(LIBMALLOC)
+		$(LIBZ) $(SSLLIBS) $(LIBSLP) $(PAMLIBS) $(LIBS) $(LIBMALLOC)
 
 $(CUPSDOBJS):	auth.h banners.h cert.h classes.h client.h conf.h \
 		cupsd.h dirsvc.h job.h mime.h printers.h \
@@ -149,5 +141,5 @@ $(OBJS):	../config.h ../Makedefs
 
 
 #
-# End of "$Id: Makefile,v 1.36 2001/02/21 17:01:16 mike Exp $".
+# End of "$Id: Makefile,v 1.36.2.1 2001/12/26 16:52:49 mike Exp $".
 #

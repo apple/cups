@@ -1,5 +1,5 @@
 /*
- * "$Id: tempfile.c,v 1.1 2001/03/09 20:06:07 mike Exp $"
+ * "$Id: tempfile.c,v 1.1.2.1 2001/12/26 16:52:13 mike Exp $"
  *
  *   Temp file utilities for the Common UNIX Printing System (CUPS).
  *
@@ -139,8 +139,8 @@ cupsTempFd(char *filename,		/* I - Pointer to buffer */
     fd = open(filename, O_RDWR | O_CREAT | O_EXCL, 0600);
 #endif /* O_NOFOLLOW */
 
-    if (fd < 0 && errno == EPERM)
-      break; /* Stop immediately if permission denied! */
+    if (fd < 0 && (errno == EPERM || errno == ENOENT))
+      break; /* Stop immediately if permission denied or the dir doesn't exist! */
   }
   while (fd < 0);
 
@@ -196,5 +196,5 @@ cupsTempFile(char *filename,		/* I - Pointer to buffer */
 
 
 /*
- * End of "$Id: tempfile.c,v 1.1 2001/03/09 20:06:07 mike Exp $".
+ * End of "$Id: tempfile.c,v 1.1.2.1 2001/12/26 16:52:13 mike Exp $".
  */

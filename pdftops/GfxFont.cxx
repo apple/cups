@@ -40,12 +40,10 @@
 
 //------------------------------------------------------------------------
 
-#if defined(JAPANESE_SUPPORT) || defined(CHINESE_GB_SUPPORT) || defined(CHINESE_CNS_SUPPORT)
 extern "C" {
-static int cmpWidthExcep(const void *w1, const void *w2);
-static int cmpWidthExcepV(const void *w1, const void *w2);
+static int CDECL cmpWidthExcep(const void *w1, const void *w2);
+static int CDECL cmpWidthExcepV(const void *w1, const void *w2);
 }
-#endif /* JAPANESE_SUPPORT || CHINESE_GB_SUPPORT || CHINESE_CNS_SUPPORT */
 
 //------------------------------------------------------------------------
 
@@ -68,16 +66,16 @@ static Gushort *defCharWidths[12] = {
 // GfxFont
 //------------------------------------------------------------------------
 
-GfxFont::GfxFont(const char *tag1, Ref id1, Dict *fontDict) {
+GfxFont::GfxFont(XRef *xref, char *tagA, Ref idA, Dict *fontDict) {
   BuiltinFont *builtinFont;
   Object obj1, obj2, obj3, obj4;
   int missingWidth;
-  const char *name2, *p;
+  char *name2, *p;
   int i;
 
   // get font tag and ID
-  tag = new GString(tag1);
-  id = id1;
+  tag = new GString(tagA);
+  id = idA;
 
   // get font type
   type = fontUnknownType;
@@ -106,7 +104,7 @@ GfxFont::GfxFont(const char *tag1, Ref id1, Dict *fontDict) {
   // without embedding them, so munge the names into the equivalent
   // PostScript names.  This is a kludge -- it would be nice if Adobe
   // followed their own spec.
-  if (type == fontTrueType) {
+  if (type == fontTrueType && name) {
     p = name->getCString();
     name2 = NULL;
     if (!strncmp(p, "Arial", 5)) {
@@ -160,12 +158,39 @@ GfxFont::GfxFont(const char *tag1, Ref id1, Dict *fontDict) {
   // assume Times-Roman by default (for substitution purposes)
   flags = fontSerif;
 
+  // default ascent/descent values
+  if (builtinFont) {
+    ascent = 0.001 * builtinFont->ascent;
+    descent = 0.001 * builtinFont->descent;
+  } else {
+    ascent = 0.95;
+    descent = -0.35;
+  }
+
   // get info from font descriptor
   embFontName = NULL;
   embFontID.num = -1;
   embFontID.gen = -1;
   missingWidth = 0;
-  fontDict->lookup("FontDescriptor", &obj1);
+  if (type == fontType0) {
+    fontDict->lookup("DescendantFonts", &obj2);
+    if (obj2.isArray()) {
+      obj2.arrayGet(0, &obj3);
+      if (obj3.isDict()) {
+	obj3.dictLookup("FontDescriptor", &obj1);
+      } else {
+	error(-1, "Bad descendant font in Type 0 font");
+	obj1.initNull();
+      }
+      obj3.free();
+    } else {
+      error(-1, "Missing DescendantFonts entry in Type 0 font");
+      obj1.initNull();
+    }
+    obj2.free();
+  } else {
+    fontDict->lookup("FontDescriptor", &obj1);
+  }
   if (obj1.isDict()) {
 
     // get flags
@@ -197,7 +222,7 @@ GfxFont::GfxFont(const char *tag1, Ref id1, Dict *fontDict) {
       obj1.dictLookupNF("FontFile3", &obj2);
       if (obj2.isRef()) {
 	embFontID = obj2.getRef();
-	obj2.fetch(&obj3);
+	obj2.fetch(xref, &obj3);
 	if (obj3.isStream()) {
 	  obj3.streamGetDict()->lookup("Subtype", &obj4);
 	  if (obj4.isName("Type1"))
@@ -221,6 +246,30 @@ GfxFont::GfxFont(const char *tag1, Ref id1, Dict *fontDict) {
     obj1.dictLookup("MissingWidth", &obj2);
     if (obj2.isInt()) {
       missingWidth = obj2.getInt();
+    }
+    obj2.free();
+
+    // get Ascent and Descent
+    obj1.dictLookup("Ascent", &obj2);
+    if (obj2.isNum()) {
+      ascent = 0.001 * obj2.getNum();
+    }
+    obj2.free();
+    obj1.dictLookup("Descent", &obj2);
+    if (obj2.isNum()) {
+      descent = 0.001 * obj2.getNum();
+    }
+    obj2.free();
+
+    // font FontBBox
+    fontBBox[0] = fontBBox[1] = fontBBox[2] = fontBBox[3] = 0;
+    if (obj1.dictLookup("FontBBox", &obj2)->isArray()) {
+      for (i = 0; i < 4 && i < obj2.arrayGetLength(); ++i) {
+	if (obj2.arrayGet(i, &obj3)->isNum()) {
+	  fontBBox[i] = obj3.getNum();
+	}
+	obj3.free();
+      }
     }
     obj2.free();
   }
@@ -256,7 +305,7 @@ GfxFont::GfxFont(const char *tag1, Ref id1, Dict *fontDict) {
   if (type == fontType0) {
     getType0EncAndWidths(fontDict);
   } else {
-    getEncAndWidths(fontDict, builtinFont, missingWidth);
+    getEncAndWidths(xref, fontDict, builtinFont, missingWidth);
   }
 }
 
@@ -390,10 +439,10 @@ Object *GfxFont::getCharProc(int code, Object *proc) {
   return proc;
 }
 
-void GfxFont::getEncAndWidths(Dict *fontDict, BuiltinFont *builtinFont,
-			      int missingWidth) {
+void GfxFont::getEncAndWidths(XRef *xref, Dict *fontDict,
+			      BuiltinFont *builtinFont, int missingWidth) {
   Object obj1, obj2, obj3;
-  const char *buf;
+  char *buf;
   int len;
   FontFile *fontFile;
   int code, i;
@@ -433,26 +482,31 @@ void GfxFont::getEncAndWidths(Dict *fontDict, BuiltinFont *builtinFont,
   obj1.free();
 
   // check embedded or external font file for base encoding
-  if ((type == fontType1 || type == fontType1C) &&
+  if ((type == fontType1 || type == fontType1C || type == fontTrueType) &&
       (extFontFile || embFontID.num >= 0)) {
-    if (extFontFile)
+    if (extFontFile) {
       buf = readExtFontFile(&len);
-    else
-      buf = readEmbFontFile(&len);
+    } else {
+      buf = readEmbFontFile(xref, &len);
+    }
     if (buf) {
-      if (type == fontType1)
+      if (type == fontType1) {
 	fontFile = new Type1FontFile(buf, len);
-      else
+      } else if (type == fontType1C) {
 	fontFile = new Type1CFontFile(buf, len);
+      } else {
+	fontFile = new TrueTypeFontFile(buf, len);
+      }
       if (fontFile->getName()) {
 	if (embFontName)
 	  delete embFontName;
 	embFontName = new GString(fontFile->getName());
       }
-      if (!encoding)
+      if (!encoding) {
 	encoding = fontFile->getEncoding(gTrue);
+      }
       delete fontFile;
-      gfree((void *)buf);
+      gfree(buf);
     }
   }
 
@@ -500,7 +554,7 @@ void GfxFont::getEncAndWidths(Dict *fontDict, BuiltinFont *builtinFont,
 }
 
 void GfxFont::findExtFontFile() {
-  const char **path;
+  char **path;
   FILE *f;
 
   for (path = fontPath; *path; ++path) {
@@ -524,7 +578,7 @@ void GfxFont::findExtFontFile() {
   }
 }
 
-const char *GfxFont::readExtFontFile(int *len) {
+char *GfxFont::readExtFontFile(int *len) {
   FILE *f;
   char *buf;
 
@@ -542,7 +596,7 @@ const char *GfxFont::readExtFontFile(int *len) {
   return buf;
 }
 
-const char *GfxFont::readEmbFontFile(int *len) {
+char *GfxFont::readEmbFontFile(XRef *xref, int *len) {
   char *buf;
   Object obj1, obj2;
   Stream *str;
@@ -550,7 +604,7 @@ const char *GfxFont::readEmbFontFile(int *len) {
   int size, i;
 
   obj1.initRef(embFontID.num, embFontID.gen);
-  obj1.fetch(&obj2);
+  obj1.fetch(xref, &obj2);
   if (!obj2.isStream()) {
     error(-1, "Embedded font file is not a stream");
     obj2.free();
@@ -584,7 +638,7 @@ void GfxFont::makeWidths(Dict *fontDict, FontEncoding *builtinEncoding,
   Object obj1, obj2;
   int firstChar, lastChar;
   int code, code2;
-  const char *charName;
+  char *charName;
   Gushort *defWidths;
   int index;
   double mult;
@@ -594,72 +648,73 @@ void GfxFont::makeWidths(Dict *fontDict, FontEncoding *builtinEncoding,
     widths[code] = missingWidth * 0.001;
   }
 
+  // use widths from font dict, if present
+  fontDict->lookup("FirstChar", &obj1);
+  firstChar = obj1.isInt() ? obj1.getInt() : 0;
+  obj1.free();
+  fontDict->lookup("LastChar", &obj1);
+  lastChar = obj1.isInt() ? obj1.getInt() : 255;
+  obj1.free();
+  if (type == fontType3)
+    mult = fontMat[0];
+  else
+    mult = 0.001;
+  fontDict->lookup("Widths", &obj1);
+  if (obj1.isArray()) {
+    for (code = firstChar; code <= lastChar; ++code) {
+      obj1.arrayGet(code - firstChar, &obj2);
+      if (obj2.isNum())
+	widths[code] = obj2.getNum() * mult;
+      obj2.free();
+    }
+
   // use widths from built-in font
-  if (builtinEncoding) {
+  } else if (builtinEncoding) {
     code2 = 0; // to make gcc happy
     for (code = 0; code < 256; ++code) {
       if ((charName = encoding->getCharName(code)) &&
-	  (code2 = builtinEncoding->getCharCode(charName)) >= 0)
+	  (code2 = builtinEncoding->getCharCode(charName)) >= 0) {
 	widths[code] = builtinWidths[code2] * 0.001;
+      } else if (code == 32) {
+	// this is a kludge for broken PDF files that encode char 32
+	// as .notdef
+	widths[code] = builtinWidths[' '] * 0.001;
+      }
     }
 
-  // get widths from font dict
+  // couldn't find widths -- use defaults 
   } else {
-    fontDict->lookup("FirstChar", &obj1);
-    firstChar = obj1.isInt() ? obj1.getInt() : 0;
-    obj1.free();
-    fontDict->lookup("LastChar", &obj1);
-    lastChar = obj1.isInt() ? obj1.getInt() : 255;
-    obj1.free();
-    if (type == fontType3)
-      mult = fontMat[0];
-    else
-      mult = 0.001;
-    fontDict->lookup("Widths", &obj1);
-    if (obj1.isArray()) {
-      for (code = firstChar; code <= lastChar; ++code) {
-	obj1.arrayGet(code - firstChar, &obj2);
-	if (obj2.isNum())
-	  widths[code] = obj2.getNum() * mult;
-	obj2.free();
-      }
-    } else {
-
-      // couldn't find widths -- use defaults 
 #if 0 //~
-      //~ certain PDF generators apparently don't include widths
-      //~ for Arial and TimesNewRoman -- and this error message
-      //~ is a nuisance
-      error(-1, "No character widths resource for non-builtin font");
+    //~ certain PDF generators apparently don't include widths
+    //~ for Arial and TimesNewRoman -- and this error message
+    //~ is a nuisance
+    error(-1, "No character widths resource for non-builtin font");
 #endif
-      if (isFixedWidth())
-	index = 0;
-      else if (isSerif())
-	index = 8;
-      else
-	index = 4;
-      if (isBold())
-	index += 2;
-      if (isItalic())
-	index += 1;
-      defWidths = defCharWidths[index];
-      code2 = 0; // to make gcc happy
-      for (code = 0; code < 256; ++code) {
-	if ((charName = encoding->getCharName(code)) &&
-	    (code2 = standardEncoding.getCharCode(charName)) >= 0)
-	  widths[code] = defWidths[code2] * 0.001;
-      }
+    if (isFixedWidth())
+      index = 0;
+    else if (isSerif())
+      index = 8;
+    else
+      index = 4;
+    if (isBold())
+      index += 2;
+    if (isItalic())
+      index += 1;
+    defWidths = defCharWidths[index];
+    code2 = 0; // to make gcc happy
+    for (code = 0; code < 256; ++code) {
+      if ((charName = encoding->getCharName(code)) &&
+	  (code2 = standardEncoding.getCharCode(charName)) >= 0)
+	widths[code] = defWidths[code2] * 0.001;
     }
-    obj1.free();
   }
+  obj1.free();
 }
 
 void GfxFont::getType0EncAndWidths(Dict *fontDict) {
   Object obj1, obj2, obj3, obj4, obj5, obj6, obj7, obj8;
-#if defined(JAPANESE_SUPPORT) || defined(CHINESE_GB_SUPPORT) || defined(CHINESE_CNS_SUPPORT)
   int excepsSize;
   int i, j, k, n;
-#endif /* JAPANESE_SUPPORT || CHINESE_GB_SUPPORT || CHINESE_CNS_SUPPORT */
 
   widths16.exceps = NULL;
   widths16.excepsV = NULL;
@@ -713,7 +768,7 @@ void GfxFont::getType0EncAndWidths(Dict *fontDict) {
       goto err4;
 #endif
     } else {
-      error(-1, "Uknown Type 0 character set: %s-%s",
+      error(-1, "Unknown Type 0 character set: %s-%s",
 	    obj4.getString()->getCString(), obj5.getString()->getCString());
       goto err4;
     }
@@ -721,8 +776,6 @@ void GfxFont::getType0EncAndWidths(Dict *fontDict) {
     error(-1, "Unknown Type 0 character set");
     goto err4;
   }
-
-#if defined(JAPANESE_SUPPORT) || defined(CHINESE_GB_SUPPORT) || defined(CHINESE_CNS_SUPPORT)
   obj5.free();
   obj4.free();
   obj3.free();
@@ -914,7 +967,7 @@ void GfxFont::getType0EncAndWidths(Dict *fontDict) {
     error(-1, "Bad encoding for Type 0 font");
     goto err1;
   }
-#  if JAPANESE_SUPPORT
+#if JAPANESE_SUPPORT
   if (enc16.charSet == font16AdobeJapan12) {
     for (i = 0; gfxJapan12Tab[i].name; ++i) {
       if (!strcmp(obj1.getName(), gfxJapan12Tab[i].name))
@@ -927,8 +980,8 @@ void GfxFont::getType0EncAndWidths(Dict *fontDict) {
     }
     enc16.enc = gfxJapan12Tab[i].enc;
   }
-#  endif
-#  if CHINESE_GB_SUPPORT
+#endif
+#if CHINESE_GB_SUPPORT
   if (enc16.charSet == font16AdobeGB12) {
     for (i = 0; gfxGB12Tab[i].name; ++i) {
       if (!strcmp(obj1.getName(), gfxGB12Tab[i].name))
@@ -941,8 +994,8 @@ void GfxFont::getType0EncAndWidths(Dict *fontDict) {
     }
     enc16.enc = gfxGB12Tab[i].enc;
   }
-#  endif
-#  if CHINESE_CNS_SUPPORT
+#endif
+#if CHINESE_CNS_SUPPORT
   if (enc16.charSet == font16AdobeCNS13) {
     for (i = 0; gfxCNS13Tab[i].name; ++i) {
       if (!strcmp(obj1.getName(), gfxCNS13Tab[i].name))
@@ -955,11 +1008,10 @@ void GfxFont::getType0EncAndWidths(Dict *fontDict) {
     }
     enc16.enc = gfxCNS13Tab[i].enc;
   }
-#  endif
+#endif
   obj1.free();
 
   return;
-#endif /* JAPANESE_SUPPORT || CHINESE_GB_SUPPORT || CHINESE_CNS_SUPPORT */
 
  err4:
   obj5.free();
@@ -975,21 +1027,21 @@ void GfxFont::getType0EncAndWidths(Dict *fontDict) {
   makeWidths(fontDict, NULL, NULL, 0);
 }
 
-#if defined(JAPANESE_SUPPORT) || defined(CHINESE_GB_SUPPORT) || defined(CHINESE_CNS_SUPPORT)
-static int cmpWidthExcep(const void *w1, const void *w2) {
+extern "C" {
+static int CDECL cmpWidthExcep(const void *w1, const void *w2) {
   return ((GfxFontWidthExcep *)w1)->first - ((GfxFontWidthExcep *)w2)->first;
 }
 
-static int cmpWidthExcepV(const void *w1, const void *w2) {
+static int CDECL cmpWidthExcepV(const void *w1, const void *w2) {
   return ((GfxFontWidthExcepV *)w1)->first - ((GfxFontWidthExcepV *)w2)->first;
 }
-#endif /* JAPANESE_SUPPORT || CHINESE_GB_SUPPORT || CHINESE_CNS_SUPPORT */
+}
 
 //------------------------------------------------------------------------
 // GfxFontDict
 //------------------------------------------------------------------------
 
-GfxFontDict::GfxFontDict(Dict *fontDict) {
+GfxFontDict::GfxFontDict(XRef *xref, Dict *fontDict) {
   int i;
   Object obj1, obj2;
 
@@ -997,10 +1049,10 @@ GfxFontDict::GfxFontDict(Dict *fontDict) {
   fonts = (GfxFont **)gmalloc(numFonts * sizeof(GfxFont *));
   for (i = 0; i < numFonts; ++i) {
     fontDict->getValNF(i, &obj1);
-    obj1.fetch(&obj2);
+    obj1.fetch(xref, &obj2);
     if (obj1.isRef() && obj2.isDict()) {
-      fonts[i] = new GfxFont(fontDict->getKey(i), obj1.getRef(),
-			     obj2.getDict());
+      fonts[i] = new GfxFont(xref, fontDict->getKey(i),
+			     obj1.getRef(), obj2.getDict());
     } else {
       error(-1, "font resource is not a dictionary");
       fonts[i] = NULL;
@@ -1018,7 +1070,7 @@ GfxFontDict::~GfxFontDict() {
   gfree(fonts);
 }
 
-GfxFont *GfxFontDict::lookup(const char *tag) {
+GfxFont *GfxFontDict::lookup(char *tag) {
   int i;
 
   for (i = 0; i < numFonts; ++i) {

@@ -20,7 +20,7 @@
 //------------------------------------------------------------------------
 
 struct DictEntry {
-  const char *key;
+  char *key;
   Object val;
 };
 
@@ -28,7 +28,7 @@ class Dict {
 public:
 
   // Constructor.
-  Dict();
+  Dict(XRef *xrefA);
 
   // Destructor.
   ~Dict();
@@ -41,29 +41,35 @@ public:
   int getLength() { return length; }
 
   // Add an entry.  NB: does not copy key.
-  void add(const char *key, Object *val);
+  void add(char *key, Object *val);
 
   // Check if dictionary is of specified type.
-  GBool is(const char *type);
+  GBool is(char *type);
 
   // Look up an entry and return the value.  Returns a null object
   // if <key> is not in the dictionary.
-  Object *lookup(const char *key, Object *obj);
-  Object *lookupNF(const char *key, Object *obj);
+  Object *lookup(char *key, Object *obj);
+  Object *lookupNF(char *key, Object *obj);
 
   // Iterative accessors.
-  const char *getKey(int i);
+  char *getKey(int i);
   Object *getVal(int i, Object *obj);
   Object *getValNF(int i, Object *obj);
 
+  // Set the xref pointer.  This is only used in one special case: the
+  // trailer dictionary, which is read before the xref table is
+  // parsed.
+  void setXRef(XRef *xrefA) { xref = xrefA; }
+
 private:
 
+  XRef *xref;			// the xref table for this PDF file
   DictEntry *entries;		// array of entries
   int size;			// size of <entries> array
   int length;			// number of entries in dictionary
   int ref;			// reference count
 
-  DictEntry *find(const char *key);
+  DictEntry *find(char *key);
 };
 
 #endif

@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.12 2001/02/20 17:33:00 mike Exp $"
+# "$Id: Makefile,v 1.12.2.1 2001/12/26 16:52:41 mike Exp $"
 #
 #   Man page makefile for the Common UNIX Printing System (CUPS).
 #
@@ -28,23 +28,26 @@ include ../Makedefs
 # Man pages...
 #
 
-MAN1	=	backend.man filter.man lp.man lpoptions.man lpq.man lprm.man \
-		lpr.man lpstat.man
+MAN1	=	backend.man filter.man lp.man lpoptions.man lppasswd.man \
+		lpq.man lprm.man lpr.man lpstat.man
+MAN3	=	cups-config.man
 MAN5	=	classes.conf.man cupsd.conf.man mime.convs.man mime.types.man \
 		printers.conf.man
-MAN8	=	accept.man cups-lpd.man cups-polld.man cupsd.man enable.man \
-		lpadmin.man lpinfo.man lpmove.man lpc.man
+MAN8	=	accept.man cupsaddsmb.man cups-lpd.man cups-polld.man \
+		cupsd.man enable.man lpadmin.man lpinfo.man lpmove.man \
+		lpc.man
 
 CAT1	=	$(MAN1:.man=.$(CAT1EXT))
-CAT5	=	$(MAN5:.man=.$(CAT1EXT))
-CAT8	=	$(MAN8:.man=.$(CAT1EXT))
+CAT3	=	$(MAN3:.man=.$(CAT3EXT))
+CAT5	=	$(MAN5:.man=.$(CAT5EXT))
+CAT8	=	$(MAN8:.man=.$(CAT8EXT))
 
 
 #
 # Make everything...
 #
 
-all:	$(CAT1) $(CAT5) $(CAT8)
+all:	$(CAT1) $(CAT3) $(CAT5) $(CAT8)
 
 
 #
@@ -52,7 +55,7 @@ all:	$(CAT1) $(CAT5) $(CAT8)
 #
 
 clean:
-	$(RM) $(CAT1) $(CAT5) $(CAT8)
+	$(RM) $(CAT1) $(CAT3) $(CAT5) $(CAT8)
 
 
 #
@@ -60,21 +63,21 @@ clean:
 #
 
 install:
-	-$(MKDIR) $(MANDIR)/man1
-	-$(CHMOD) ugo+rx $(MANDIR)
-	-$(CHMOD) ugo+rx $(MANDIR)/man1
+	$(INSTALL_DIR) $(MANDIR)/man1
 	for file in $(MAN1); do \
 		$(INSTALL_MAN) $$file $(MANDIR)/man1/`basename $$file man`1; \
 	done
 	$(RM) $(MANDIR)/man1/cancel.1
 	$(LN) lp.1 $(MANDIR)/man1/cancel.1
-	-$(MKDIR) $(MANDIR)/man5
-	-$(CHMOD) ugo+rx $(MANDIR)/man5
+	$(INSTALL_DIR) $(PMANDIR)/man3
+	for file in $(MAN3); do \
+		$(INSTALL_MAN) $$file $(PMANDIR)/man3/`basename $$file man`3; \
+	done
+	$(INSTALL_DIR) $(MANDIR)/man5
 	for file in $(MAN5); do \
 		$(INSTALL_MAN) $$file $(MANDIR)/man5/`basename $$file man`5; \
 	done
-	-$(MKDIR) $(AMANDIR)/man$(MAN8EXT)
-	-$(CHMOD) ugo+rx $(AMANDIR)/man$(MAN8EXT)
+	$(INSTALL_DIR) $(AMANDIR)/man$(MAN8EXT)
 	for file in $(MAN8); do \
 		$(INSTALL_MAN) $$file $(AMANDIR)/man$(MAN8EXT)/`basename $$file man`$(MAN8EXT); \
 	done
@@ -82,23 +85,30 @@ install:
 	$(LN) accept.$(MAN8EXT) $(AMANDIR)/man$(MAN8EXT)/reject.$(MAN8EXT)
 	$(RM) $(AMANDIR)/man$(MAN8EXT)/disable.$(MAN8EXT)
 	$(LN) enable.$(MAN8EXT) $(AMANDIR)/man$(MAN8EXT)/disable.$(MAN8EXT)
-	-$(MKDIR) $(MANDIR)/cat1
-	-$(CHMOD) ugo+rx $(MANDIR)/cat1
-	$(INSTALL_MAN) $(CAT1) $(MANDIR)/cat1
+	$(INSTALL_DIR) $(MANDIR)/cat1
+	for file in $(CAT1); do \
+		$(INSTALL_MAN) $$file $(MANDIR)/cat1; \
+	done
 	$(RM) $(MANDIR)/cat1/cancel.$(CAT1EXT)
 	$(LN) lp.$(CAT1EXT) $(MANDIR)/cat1/cancel.$(CAT1EXT)
-	-$(MKDIR) $(MANDIR)/cat5
-	-$(CHMOD) ugo+rx $(MANDIR)/cat5
-	$(INSTALL_MAN) $(CAT5) $(MANDIR)/cat5
-	-$(MKDIR) $(AMANDIR)/cat$(MAN8EXT)
-	-$(CHMOD) ugo+rx $(AMANDIR)/cat$(MAN8EXT)
-	$(INSTALL_MAN) $(CAT8) $(AMANDIR)/cat$(MAN8EXT)
+	$(INSTALL_DIR) $(PMANDIR)/cat3
+	for file in $(CAT3); do \
+		$(INSTALL_MAN) $$file $(PMANDIR)/cat3; \
+	done
+	$(INSTALL_DIR) $(MANDIR)/cat5
+	for file in $(CAT5); do \
+		$(INSTALL_MAN) $$file $(MANDIR)/cat5; \
+	done
+	$(INSTALL_DIR) $(AMANDIR)/cat$(MAN8EXT)
+	for file in $(CAT8); do \
+		$(INSTALL_MAN) $$file $(AMANDIR)/cat$(MAN8EXT); \
+	done
 	$(RM) $(AMANDIR)/cat$(MAN8EXT)/reject.$(CAT8EXT)
-	$(LN) accept.$(CAT1EXT) $(AMANDIR)/cat$(MAN8EXT)/reject.$(CAT8EXT)
+	$(LN) accept.$(CAT8EXT) $(AMANDIR)/cat$(MAN8EXT)/reject.$(CAT8EXT)
 	$(RM) $(AMANDIR)/cat$(MAN8EXT)/disable.$(CAT8EXT)
-	$(LN) enable.$(CAT1EXT) $(AMANDIR)/cat$(MAN8EXT)/disable.$(CAT8EXT)
+	$(LN) enable.$(CAT8EXT) $(AMANDIR)/cat$(MAN8EXT)/disable.$(CAT8EXT)
 
 
 #
-# End of "$Id: Makefile,v 1.12 2001/02/20 17:33:00 mike Exp $".
+# End of "$Id: Makefile,v 1.12.2.1 2001/12/26 16:52:41 mike Exp $".
 #

@@ -1,5 +1,5 @@
 /*
- * "$Id: ppds.c,v 1.14.2.1 2001/05/13 18:38:38 mike Exp $"
+ * "$Id: ppds.c,v 1.14.2.2 2001/12/26 16:52:55 mike Exp $"
  *
  *   PPD scanning routines for the Common UNIX Printing System (CUPS).
  *
@@ -168,10 +168,26 @@ LoadPPDs(const char *d)		/* I - Directory to scan... */
 
   PPDs = ippNew();
 
+ /*
+  * First the raw driver...
+  */
+
+  ippAddString(PPDs, IPP_TAG_PRINTER, IPP_TAG_NAME,
+               "ppd-name", NULL, "raw");
+  ippAddString(PPDs, IPP_TAG_PRINTER, IPP_TAG_TEXT,
+               "ppd-make", NULL, "Raw");
+  ippAddString(PPDs, IPP_TAG_PRINTER, IPP_TAG_TEXT,
+               "ppd-make-and-model", NULL, "Raw Queue");
+  ippAddString(PPDs, IPP_TAG_PRINTER, IPP_TAG_LANGUAGE,
+               "ppd-natural-language", NULL, "en");
+
+ /*
+  * Then the PPD files...
+  */
+
   for (i = num_ppds, ppd = ppds; i > 0; i --, ppd ++)
   {
-    if (i)
-      ippAddSeparator(PPDs);
+    ippAddSeparator(PPDs);
 
     ippAddString(PPDs, IPP_TAG_PRINTER, IPP_TAG_NAME,
                  "ppd-name", NULL, ppd->ppd_name);
@@ -399,11 +415,8 @@ static void
 load_ppds(const char *d,		/* I - Actual directory */
           const char *p)		/* I - Virtual path in name */
 {
-#ifdef HAVE_LIBZ
-  gzFile	fp;			/* Pointer to file */
-#else
-  FILE		*fp;			/* Pointer to file */
-#endif /* HAVE_LIBZ */
+  int		i;			/* Looping var */
+  buf_t		fp;			/* Pointer to file */
   DIR		*dir;			/* Directory pointer */
   DIRENT	*dent;			/* Directory entry */
   struct stat	fileinfo;		/* File information */
@@ -411,10 +424,37 @@ load_ppds(const char *d,		/* I - Actual directory */
 		line[1024],		/* Line from backend */
 		*ptr,			/* Pointer into name */
 		name[128],		/* Name of PPD file */
-		language[64],		/* Device class */
-		manufacturer[1024],	/* Manufacturer */
-		make_model[256];	/* Make and model */
-  ppd_info_t	*ppd;			/* New PPD file */
+		language[64],		/* PPD language version */
+		country[64],		/* Country code */
+		manufacturer[256],	/* Manufacturer */
+		make_model[256],	/* Make and Model */
+		model_name[256],	/* ModelName */
+		nick_name[256];		/* NickName */
+  ppd_info_t	*ppd,			/* New PPD file */
+		key;			/* Search key */
+  int		new_ppd;		/* Is this a new PPD? */
+  struct				/* LanguageVersion translation table */
+  {
+    const char	*version,		/* LanguageVersion string */
+		*language;		/* Language code */
+  }		languages[] =
+  {
+    { "chinese",	"cn" },
+    { "english",	"en" },
+    { "french",		"fr" },
+    { "german",		"de" },
+    { "danish",		"da" },
+    { "finnish",	"fi" },
+    { "italian",	"it" },
+    { "dutch",		"du" },
+    { "japanese",	"jp" },
+    { "norwegian",	"no" },
+    { "polish",		"pl" },
+    { "portugese",	"pt" },
+    { "russian",	"ru" },
+    { "swedish",	"sv" },
+    { "turkish",	"tr" }
+  };
 
 
   if ((dir = opendir(d)) == NULL)
@@ -568,8 +608,9 @@ load_ppds(const char *d,		/* I - Actual directory */
 	*ptr = '\0';
       else if (strncasecmp(manufacturer, "agfa", 4) == 0)
 	strcpy(manufacturer, "AGFA");
-      else if (strncasecmp(manufacturer, "herk", 4) == 0)
-	strcpy(manufacturer, "Linotype");
+      else if (strncasecmp(manufacturer, "herk", 4) == 0 ||
+               strncasecmp(manufacturer, "linotype", 8) == 0)
+	strcpy(manufacturer, "LHAG");
       else
 	strcpy(manufacturer, "Other");
 
@@ -595,24 +636,57 @@ load_ppds(const char *d,		/* I - Actual directory */
       else if (strcasecmp(manufacturer, "designjet") == 0)
 	strcpy(manufacturer, "HP");
     }
+    else if (strncasecmp(manufacturer, "LHAG", 4) == 0 ||
+             strncasecmp(manufacturer, "linotype", 8) == 0)
+      strcpy(manufacturer, "LHAG");
 
    /*
     * Fix the language as needed...
     */
 
-    if (strcasecmp(language, "german") == 0)
-      strcpy(language, "de");
-    else if (strcasecmp(language, "spanish") == 0)
-      strcpy(language, "es");
-    else if (strlen(language) > 2)
+    if ((ptr = strchr(language, '-')) != NULL)
+      *ptr++ = '\0';
+    else if ((ptr = strchr(language, '_')) != NULL)
+      *ptr++ = '\0';
+
+    if (ptr)
     {
      /*
-      * en, fr, it, etc.
+      * Setup the country suffix...
       */
 
-      language[0] = tolower(language[0]);
-      language[1] = tolower(language[1]);
-      language[2] = '\0';
+      country[0] = '_';
+      strcpy(country + 1, ptr);
+    }
+    else
+    {
+     /*
+      * No country suffix...
+      */
+
+      country[0] = '\0';
+    }
+
+    for (i = 0; i < (int)(sizeof(languages) / sizeof(languages[0])); i ++)
+      if (strcasecmp(languages[i].version, language) == 0)
+        break;
+
+    if (i < (int)(sizeof(languages) / sizeof(languages[0])))
+    {
+     /*
+      * Found a known language...
+      */
+
+      snprintf(language, sizeof(language), "%s%s", languages[i].language, 
+               country);
+    }
+    else
+    {
+     /*
+      * Unknown language; use "xx"...
+      */
+
+      strcpy(language, "xx");
     }
 
    /*
@@ -661,5 +735,5 @@ load_ppds(const char *d,		/* I - Actual directory */
 
 
 /*
- * End of "$Id: ppds.c,v 1.14.2.1 2001/05/13 18:38:38 mike Exp $".
+ * End of "$Id: ppds.c,v 1.14.2.2 2001/12/26 16:52:55 mike Exp $".
  */

@@ -32,7 +32,7 @@ static char *getString(int sid, Guchar *stringIdxPtr,
 
 //------------------------------------------------------------------------
 
-static inline const char *nextLine(const char *line, const char *end) {
+static inline char *nextLine(char *line, char *end) {
   while (line < end && *line != '\n' && *line != '\r')
     ++line;
   while (line < end && *line == '\n' || *line == '\r')
@@ -56,9 +56,8 @@ FontFile::~FontFile() {
 // Type1FontFile
 //------------------------------------------------------------------------
 
-Type1FontFile::Type1FontFile(const char *file, int len) {
-  const char *line, *line1;
-  char *p, *p2;
+Type1FontFile::Type1FontFile(char *file, int len) {
+  char *line, *line1, *p, *p2;
   char buf[256];
   char c;
   int n, code, i;
@@ -125,7 +124,7 @@ Type1FontFile::Type1FontFile(const char *file, int len) {
 
 Type1FontFile::~Type1FontFile() {
   if (name)
-    gfree((void *)name);
+    gfree(name);
   if (encoding && freeEnc)
     delete encoding;
 }
@@ -140,11 +139,11 @@ FontEncoding *Type1FontFile::getEncoding(GBool taken) {
 // Type1CFontFile
 //------------------------------------------------------------------------
 
-Type1CFontFile::Type1CFontFile(const char *file, int len) {
+Type1CFontFile::Type1CFontFile(char *file, int len) {
   char buf[256];
   Guchar *topPtr, *idxStartPtr, *idxPtr0, *idxPtr1;
   Guchar *stringIdxPtr, *stringStartPtr;
-  int idxOffSize, stringOffSize;
+  int topOffSize, idxOffSize, stringOffSize;
   int nFonts, nStrings, nGlyphs;
   int nCodes, nRanges, nLeft, nSups;
   Gushort *glyphNames;
@@ -157,14 +156,13 @@ Type1CFontFile::Type1CFontFile(const char *file, int len) {
   int key;
   int i, j, n;
 
-  (void)len;
-
   name = NULL;
   encoding = NULL;
   freeEnc = gTrue;
 
   // read header
   topPtr = (Guchar *)file + (file[2] & 0xff);
+  topOffSize = file[3] & 0xff;
 
   // read name index (first font only)
   nFonts = getWord(topPtr, 2);
@@ -175,7 +173,7 @@ Type1CFontFile::Type1CFontFile(const char *file, int len) {
   idxPtr1 = idxStartPtr + getWord(topPtr + idxOffSize, idxOffSize);
   if ((n = idxPtr1 - idxPtr0) > 255)
     n = 255;
-  strncpy(buf, (const char *)idxPtr0, n);
+  strncpy(buf, (char *)idxPtr0, n);
   buf[n] = '\0';
   name = copyString(buf);
   topPtr = idxStartPtr + getWord(topPtr + nFonts * idxOffSize, idxOffSize);
@@ -318,7 +316,7 @@ Type1CFontFile::Type1CFontFile(const char *file, int len) {
 
 Type1CFontFile::~Type1CFontFile() {
   if (name)
-    gfree((void *)name);
+    gfree(name);
   if (encoding && freeEnc)
     delete encoding;
 }
@@ -415,7 +413,7 @@ static char *getString(int sid, Guchar *stringIdxPtr,
 				       stringOffSize);
     if ((len = idxPtr1 - idxPtr0) > 255)
       len = 255;
-    strncpy(buf, (const char *)idxPtr0, len);
+    strncpy(buf, (char *)idxPtr0, len);
     buf[len] = '\0';
   }
   return buf;
@@ -425,10 +423,10 @@ static char *getString(int sid, Guchar *stringIdxPtr,
 // Type1CFontConverter
 //------------------------------------------------------------------------
 
-Type1CFontConverter::Type1CFontConverter(const char *nfile, int nlen, FILE *nout) {
-  file = nfile;
-  len = nlen;
-  out = nout;
+Type1CFontConverter::Type1CFontConverter(char *fileA, int lenA, FILE *outA) {
+  file = fileA;
+  len = lenA;
+  out = outA;
   r1 = 55665;
   line = 0;
 }
@@ -437,7 +435,7 @@ Type1CFontConverter::~Type1CFontConverter() {
 }
 
 void Type1CFontConverter::convert() {
-  const char *fontName;
+  char *fontName;
   struct {
     int version;
     int notice;
@@ -464,7 +462,7 @@ void Type1CFontConverter::convert() {
   char buf[256], eBuf[256];
   Guchar *topPtr, *idxStartPtr, *idxPtr0, *idxPtr1;
   Guchar *stringIdxPtr, *stringStartPtr;
-  int idxOffSize, stringOffSize;
+  int topOffSize, idxOffSize, stringOffSize;
   int nFonts, nStrings, nGlyphs;
   int nCodes, nRanges, nLeft, nSups;
   Gushort *glyphNames;
@@ -479,6 +477,7 @@ void Type1CFontConverter::convert() {
 
   // read header
   topPtr = (Guchar *)file + (file[2] & 0xff);
+  topOffSize = file[3] & 0xff;
 
   // read name (first font only)
   nFonts = getWord(topPtr, 2);
@@ -489,7 +488,7 @@ void Type1CFontConverter::convert() {
   idxPtr1 = idxStartPtr + getWord(topPtr + idxOffSize, idxOffSize);
   if ((n = idxPtr1 - idxPtr0) > 255)
     n = 255;
-  strncpy(buf, (const char *)idxPtr0, n);
+  strncpy(buf, (char *)idxPtr0, n);
   buf[n] = '\0';
   fontName = copyString(buf);
   topPtr = idxStartPtr + getWord(topPtr + nFonts * idxOffSize, idxOffSize);
@@ -587,8 +586,15 @@ void Type1CFontConverter::convert() {
   topPtr = stringStartPtr + getWord(topPtr + nStrings * stringOffSize,
 				    stringOffSize);
 
-  // skip global subrs
+#if 1 //~
+  // get global subrs
+  int nGSubrs;
+  int gSubrOffSize;
+
+  nGSubrs = getWord(topPtr, 2);
+  gSubrOffSize = topPtr[2];
   topPtr += 3;
+#endif
 
   // write header and font dictionary, up to encoding
   fprintf(out, "%%!FontType1-1.0: %s", fontName);
@@ -845,7 +851,7 @@ void Type1CFontConverter::convert() {
 	nominalWidthXFP = fp[0];
 	break;
       default:
-	error(-1, "Uknown Type 1C private dict entry %04x", key);
+	error(-1, "Unknown Type 1C private dict entry %04x", key);
 	break;
       }
       i = 0;
@@ -918,11 +924,11 @@ void Type1CFontConverter::convert() {
 
   // clean up
   if (dict.charset > 2)
-    gfree((void *)glyphNames);
-  gfree((void *)fontName);
+    gfree(glyphNames);
+  gfree(fontName);
 }
 
-void Type1CFontConverter::eexecWrite(const char *s) {
+void Type1CFontConverter::eexecWrite(char *s) {
   Guchar *p;
   Guchar x;
 
@@ -939,7 +945,7 @@ void Type1CFontConverter::eexecWrite(const char *s) {
   }
 }
 
-void Type1CFontConverter::cvtGlyph(const char *name, Guchar *s, int n) {
+void Type1CFontConverter::cvtGlyph(char *name, Guchar *s, int n) {
   int nHints;
   int x;
   GBool first = gTrue;
@@ -1509,12 +1515,12 @@ void Type1CFontConverter::cvtGlyphWidth(GBool useOp) {
   eexecDumpOp1(13);
 }
 
-void Type1CFontConverter::eexecDumpNum(double x, GBool nfp) {
+void Type1CFontConverter::eexecDumpNum(double x, GBool fpA) {
   Guchar buf[12];
   int y, n;
 
   n = 0;
-  if (nfp) {
+  if (fpA) {
     if (x >= -32768 && x < 32768) {
       y = (int)(x * 256.0);
       buf[0] = 255;
@@ -1557,16 +1563,16 @@ void Type1CFontConverter::eexecDumpNum(double x, GBool nfp) {
       n = 5;
     }
   }
-  charBuf->append((const char *)buf, n);
+  charBuf->append((char *)buf, n);
 }
 
-void Type1CFontConverter::eexecDumpOp1(int nop) {
-  charBuf->append((char)nop);
+void Type1CFontConverter::eexecDumpOp1(int opA) {
+  charBuf->append((char)opA);
 }
 
-void Type1CFontConverter::eexecDumpOp2(int nop) {
+void Type1CFontConverter::eexecDumpOp2(int opA) {
   charBuf->append((char)12);
-  charBuf->append((char)nop);
+  charBuf->append((char)opA);
 }
 
 void Type1CFontConverter::eexecWriteCharstring(Guchar *s, int n) {
@@ -1595,7 +1601,7 @@ void Type1CFontConverter::eexecWriteCharstring(Guchar *s, int n) {
   }
 }
 
-void Type1CFontConverter::getDeltaInt(char *buf, const char *name, double *nop,
+void Type1CFontConverter::getDeltaInt(char *buf, char *name, double *opA,
 				      int n) {
   int x, i;
 
@@ -1603,14 +1609,14 @@ void Type1CFontConverter::getDeltaInt(char *buf, const char *name, double *nop,
   buf += strlen(buf);
   x = 0;
   for (i = 0; i < n; ++i) {
-    x += (int)nop[i];
+    x += (int)opA[i];
     sprintf(buf, "%s%d", i > 0 ? " " : "", x);
     buf += strlen(buf);
   }
   sprintf(buf, "] def\n");
 }
 
-void Type1CFontConverter::getDeltaReal(char *buf, const char *name, double *nop,
+void Type1CFontConverter::getDeltaReal(char *buf, char *name, double *opA,
 				       int n) {
   double x;
   int i;
@@ -1619,9 +1625,906 @@ void Type1CFontConverter::getDeltaReal(char *buf, const char *name, double *nop,
   buf += strlen(buf);
   x = 0;
   for (i = 0; i < n; ++i) {
-    x += nop[i];
+    x += opA[i];
     sprintf(buf, "%s%g", i > 0 ? " " : "", x);
     buf += strlen(buf);
   }
   sprintf(buf, "] def\n");
+}
+
+//------------------------------------------------------------------------
+// TrueTypeFontFile
+//------------------------------------------------------------------------
+
+//
+// Terminology
+// -----------
+//
+// character code = number used as an element of a text string
+//
+// character name = glyph name = name for a particular glyph within a
+//                  font
+//
+// glyph index = position (within some internal table in the font)
+//               where the instructions to draw a particular glyph are
+//               stored
+//
+// Type 1 fonts
+// ------------
+//
+// Type 1 fonts contain:
+//
+// Encoding: array of glyph names, maps char codes to glyph names
+//
+//           Encoding[charCode] = charName
+//
+// CharStrings: dictionary of instructions, keyed by character names,
+//              maps character name to glyph data
+//
+//              CharStrings[charName] = glyphData
+//
+// TrueType fonts
+// --------------
+//
+// TrueType fonts contain:
+//
+// 'cmap' table: mapping from character code to glyph index; there may
+//               be multiple cmaps in a TrueType font
+//
+//               cmap[charCode] = glyphIdx
+//
+// 'post' table: mapping from glyph index to glyph name
+//
+//               post[glyphIdx] = glyphName
+//
+// Type 42 fonts
+// -------------
+//
+// Type 42 fonts contain:
+//
+// Encoding: array of glyph names, maps char codes to glyph names
+//
+//           Encoding[charCode] = charName
+//
+// CharStrings: dictionary of glyph indexes, keyed by character names,
+//              maps character name to glyph index
+//
+//              CharStrings[charName] = glyphIdx
+//
+
+struct TTFontTableHdr {
+  char tag[4];
+  Guint checksum;
+  Guint offset;
+  Guint length;
+};
+
+// TrueType tables required by the Type 42 spec.
+static char *t42ReqTables[9] = {
+  "head",
+  "hhea",
+  "loca",
+  "maxp",
+  "cvt ",
+  "prep",
+  "glyf",
+  "hmtx",
+  "fpgm"
+};
+
+// Glyph names in some arbitrary standard that Apple uses for their
+// TrueType fonts.
+static char *macGlyphNames[258] = {
+  ".notdef",
+  "null",
+  "CR",
+  "space",
+  "exclam",
+  "quotedbl",
+  "numbersign",
+  "dollar",
+  "percent",
+  "ampersand",
+  "quotesingle",
+  "parenleft",
+  "parenright",
+  "asterisk",
+  "plus",
+  "comma",
+  "hyphen",
+  "period",
+  "slash",
+  "zero",
+  "one",
+  "two",
+  "three",
+  "four",
+  "five",
+  "six",
+  "seven",
+  "eight",
+  "nine",
+  "colon",
+  "semicolon",
+  "less",
+  "equal",
+  "greater",
+  "question",
+  "at",
+  "A",
+  "B",
+  "C",
+  "D",
+  "E",
+  "F",
+  "G",
+  "H",
+  "I",
+  "J",
+  "K",
+  "L",
+  "M",
+  "N",
+  "O",
+  "P",
+  "Q",
+  "R",
+  "S",
+  "T",
+  "U",
+  "V",
+  "W",
+  "X",
+  "Y",
+  "Z",
+  "bracketleft",
+  "backslash",
+  "bracketright",
+  "asciicircum",
+  "underscore",
+  "grave",
+  "a",
+  "b",
+  "c",
+  "d",
+  "e",
+  "f",
+  "g",
+  "h",
+  "i",
+  "j",
+  "k",
+  "l",
+  "m",
+  "n",
+  "o",
+  "p",
+  "q",
+  "r",
+  "s",
+  "t",
+  "u",
+  "v",
+  "w",
+  "x",
+  "y",
+  "z",
+  "braceleft",
+  "bar",
+  "braceright",
+  "asciitilde",
+  "Adieresis",
+  "Aring",
+  "Ccedilla",
+  "Eacute",
+  "Ntilde",
+  "Odieresis",
+  "Udieresis",
+  "aacute",
+  "agrave",
+  "acircumflex",
+  "adieresis",
+  "atilde",
+  "aring",
+  "ccedilla",
+  "eacute",
+  "egrave",
+  "ecircumflex",
+  "edieresis",
+  "iacute",
+  "igrave",
+  "icircumflex",
+  "idieresis",
+  "ntilde",
+  "oacute",
+  "ograve",
+  "ocircumflex",
+  "odieresis",
+  "otilde",
+  "uacute",
+  "ugrave",
+  "ucircumflex",
+  "udieresis",
+  "dagger",
+  "degree",
+  "cent",
+  "sterling",
+  "section",
+  "bullet",
+  "paragraph",
+  "germandbls",
+  "registered",
+  "copyright",
+  "trademark",
+  "acute",
+  "dieresis",
+  "notequal",
+  "AE",
+  "Oslash",
+  "infinity",
+  "plusminus",
+  "lessequal",
+  "greaterequal",
+  "yen",
+  "mu1",
+  "partialdiff",
+  "summation",
+  "product",
+  "pi",
+  "integral",
+  "ordfeminine",
+  "ordmasculine",
+  "Ohm",
+  "ae",
+  "oslash",
+  "questiondown",
+  "exclamdown",
+  "logicalnot",
+  "radical",
+  "florin",
+  "approxequal",
+  "increment",
+  "guillemotleft",
+  "guillemotright",
+  "ellipsis",
+  "nbspace",
+  "Agrave",
+  "Atilde",
+  "Otilde",
+  "OE",
+  "oe",
+  "endash",
+  "emdash",
+  "quotedblleft",
+  "quotedblright",
+  "quoteleft",
+  "quoteright",
+  "divide",
+  "lozenge",
+  "ydieresis",
+  "Ydieresis",
+  "fraction",
+  "currency",
+  "guilsinglleft",
+  "guilsinglright",
+  "fi",
+  "fl",
+  "daggerdbl",
+  "periodcentered",
+  "quotesinglbase",
+  "quotedblbase",
+  "perthousand",
+  "Acircumflex",
+  "Ecircumflex",
+  "Aacute",
+  "Edieresis",
+  "Egrave",
+  "Iacute",
+  "Icircumflex",
+  "Idieresis",
+  "Igrave",
+  "Oacute",
+  "Ocircumflex",
+  "applelogo",
+  "Ograve",
+  "Uacute",
+  "Ucircumflex",
+  "Ugrave",
+  "dotlessi",
+  "circumflex",
+  "tilde",
+  "overscore",
+  "breve",
+  "dotaccent",
+  "ring",
+  "cedilla",
+  "hungarumlaut",
+  "ogonek",
+  "caron",
+  "Lslash",
+  "lslash",
+  "Scaron",
+  "scaron",
+  "Zcaron",
+  "zcaron",
+  "brokenbar",
+  "Eth",
+  "eth",
+  "Yacute",
+  "yacute",
+  "Thorn",
+  "thorn",
+  "minus",
+  "multiply",
+  "onesuperior",
+  "twosuperior",
+  "threesuperior",
+  "onehalf",
+  "onequarter",
+  "threequarters",
+  "franc",
+  "Gbreve",
+  "gbreve",
+  "Idot",
+  "Scedilla",
+  "scedilla",
+  "Cacute",
+  "cacute",
+  "Ccaron",
+  "ccaron",
+  "dmacron"
+};
+
+TrueTypeFontFile::TrueTypeFontFile(char *fileA, int lenA) {
+  int pos, i;
+
+  file = fileA;
+  len = lenA;
+
+  encoding = NULL;
+  freeEnc = gTrue;
+
+  // read table directory
+  nTables = getUShort(4);
+  tableHdrs = (TTFontTableHdr *)gmalloc(nTables * sizeof(TTFontTableHdr));
+  pos = 12;
+  for (i = 0; i < nTables; ++i) {
+    tableHdrs[i].tag[0] = getByte(pos+0);
+    tableHdrs[i].tag[1] = getByte(pos+1);
+    tableHdrs[i].tag[2] = getByte(pos+2);
+    tableHdrs[i].tag[3] = getByte(pos+3);
+    tableHdrs[i].checksum = getULong(pos+4);
+    tableHdrs[i].offset = getULong(pos+8);
+    tableHdrs[i].length = getULong(pos+12);
+    pos += 16;
+  }
+
+  // check for tables that are required by both the TrueType spec
+  // and the Type 42 spec
+  if (seekTable("head") < 0 ||
+      seekTable("hhea") < 0 ||
+      seekTable("loca") < 0 ||
+      seekTable("maxp") < 0 ||
+      seekTable("glyf") < 0 ||
+      seekTable("hmtx") < 0) {
+    error(-1, "TrueType font file is missing a required table");
+    return;
+  }
+
+  // read the 'head' table
+  pos = seekTable("head");
+  bbox[0] = getShort(pos + 36);
+  bbox[1] = getShort(pos + 38);
+  bbox[2] = getShort(pos + 40);
+  bbox[3] = getShort(pos + 42);
+  locaFmt = getShort(pos + 50);
+
+  // read the 'maxp' table
+  pos = seekTable("maxp");
+  nGlyphs = getUShort(pos + 4);
+}
+
+TrueTypeFontFile::~TrueTypeFontFile() {
+  if (encoding && freeEnc) {
+    delete encoding;
+  }
+  gfree(tableHdrs);
+}
+
+char *TrueTypeFontFile::getName() {
+  return NULL;
+}
+
+FontEncoding *TrueTypeFontFile::getEncoding(GBool taken) {
+  int cmap[256];
+  int nCmaps, cmapPlatform, cmapEncoding, cmapFmt, cmapLen, cmapOffset;
+  int segCnt, segStart, segEnd, segDelta, segOffset;
+  int pos, i, j, k;
+  Guint fmt;
+  GString *s;
+  int stringIdx, stringPos, n;
+
+  //----- construct the (char code) -> (glyph idx) mapping
+
+  // map everything to the missing glyph
+  for (i = 0; i < 256; ++i) {
+    cmap[i] = 0;
+  }
+
+  // look for the 'cmap' table
+  if ((pos = seekTable("cmap")) >= 0) {
+    nCmaps = getUShort(pos+2);
+
+    // if the font has a Windows-symbol cmap, use it;
+    // otherwise, use the first cmap in the table
+    for (i = 0; i < nCmaps; ++i) {
+      cmapPlatform = getUShort(pos + 4 + 8*i);
+      cmapEncoding = getUShort(pos + 4 + 8*i + 2);
+      if (cmapPlatform == 3 && cmapEncoding == 0) {
+	break;
+      }
+    }
+    if (i >= nCmaps) {
+      i = 0;
+      cmapPlatform = getUShort(pos + 4);
+      cmapEncoding = getUShort(pos + 4 + 2);
+    }
+    pos += getULong(pos + 4 + 8*i + 4);
+
+    // read the cmap
+    cmapFmt = getUShort(pos);
+    switch (cmapFmt) {
+    case 0: // byte encoding table (Apple standard)
+      cmapLen = getUShort(pos + 2);
+      for (i = 0; i < cmapLen && i < 256; ++i) {
+	cmap[i] = getByte(pos + 6 + i);
+      }
+      break;
+    case 4: // segment mapping to delta values (Microsoft standard)
+      if (cmapPlatform == 3 && cmapEncoding == 0) {
+	// Windows-symbol uses char codes 0xf000 - 0xf0ff
+	cmapOffset = 0xf000;
+      } else {
+	cmapOffset = 0;
+      }
+      segCnt = getUShort(pos + 6) / 2;
+      for (i = 0; i < segCnt; ++i) {
+	segEnd = getUShort(pos + 14 + 2*i);
+	segStart = getUShort(pos + 16 + 2*segCnt + 2*i);
+	segDelta = getUShort(pos + 16 + 4*segCnt + 2*i);
+	segOffset = getUShort(pos + 16 + 6*segCnt + 2*i);
+	if (segStart - cmapOffset <= 0xff &&
+	    segEnd - cmapOffset >= 0) {
+	  for (j = (segStart - cmapOffset >= 0) ? segStart : cmapOffset;
+	       j <= segEnd && j - cmapOffset <= 0xff;
+	       ++j) {
+	    if (segOffset == 0) {
+	      k = (j + segDelta) & 0xffff;
+	    } else {
+	      k = getUShort(pos + 16 + 6*segCnt + 2*i +
+			    segOffset + 2 * (j - segStart));
+	      if (k != 0) {
+		k = (k + segDelta) & 0xffff;
+	      }
+	    }
+	    cmap[j - cmapOffset] = k;
+	  }
+	}
+      }
+      break;
+    default:
+      error(-1, "Unimplemented cmap type (%d) in TrueType font file",
+	    cmapFmt);
+      break;
+    }
+  }
+
+  //----- construct the (glyph idx) -> (glyph name) mapping
+  //----- and compute the (char code) -> (glyph name) mapping
+
+  encoding = new FontEncoding();
+
+  if ((pos = seekTable("post")) >= 0) {
+    fmt = getULong(pos);
+
+    // Apple font
+    if (fmt == 0x00010000) {
+      for (i = 0; i < 256; ++i) {
+	j = (cmap[i] < 258) ? cmap[i] : 0;
+	encoding->addChar(i, copyString(macGlyphNames[j]));
+      }
+
+    // Microsoft font
+    } else if (fmt == 0x00020000) {
+      stringIdx = 0;
+      stringPos = pos + 34 + 2*nGlyphs;
+      for (i = 0; i < 256; ++i) {
+	if (cmap[i] < nGlyphs) {
+	  j = getUShort(pos + 34 + 2 * cmap[i]);
+	  if (j < 258) {
+	    encoding->addChar(i, copyString(macGlyphNames[j]));
+	  } else {
+	    j -= 258;
+	    if (j != stringIdx) {
+	      for (stringIdx = 0, stringPos = pos + 34 + 2*nGlyphs;
+		   stringIdx < j;
+		   ++stringIdx, stringPos += 1 + getByte(stringPos)) ;
+	    }
+	    n = getByte(stringPos);
+	    s = new GString(file + stringPos + 1, n);
+	    encoding->addChar(i, copyString(s->getCString()));
+	    delete s;
+	    ++stringIdx;
+	    stringPos += 1 + n;
+	  }
+	} else {
+	  encoding->addChar(i, copyString(macGlyphNames[0]));
+	}
+      }
+
+    // Apple subset
+    } else if (fmt == 0x000280000) {
+      for (i = 0; i < 256; ++i) {
+	if (cmap[i] < nGlyphs) {
+	  j = i + getChar(pos + 32 + cmap[i]);
+	} else {
+	  j = 0;
+	}
+	encoding->addChar(i, copyString(macGlyphNames[j]));
+      }
+
+    // Ugh, just assume the Apple glyph set
+    } else {
+      for (i = 0; i < 256; ++i) {
+	j = (cmap[i] < 258) ? cmap[i] : 0;
+	encoding->addChar(i, copyString(macGlyphNames[j]));
+      }
+    }
+
+  // no "post" table: assume the Apple glyph set
+  } else {
+    for (i = 0; i < 256; ++i) {
+      j = (cmap[i] < 258) ? cmap[i] : 0;
+      encoding->addChar(i, copyString(macGlyphNames[j]));
+    }
+  }
+
+  if (taken) {
+    freeEnc = gFalse;
+  }
+  return encoding;
+}
+
+void TrueTypeFontFile::convertToType42(char *name, FontEncoding *encodingA,
+				       FILE *out) {
+  // write the header
+  fprintf(out, "%%!PS-TrueTypeFont-%g\n", getFixed(0));
+
+  // begin the font dictionary
+  fprintf(out, "10 dict begin\n");
+  fprintf(out, "/FontName /%s def\n", name);
+  fprintf(out, "/FontType 42 def\n");
+  fprintf(out, "/FontMatrix [1 0 0 1 0 0] def\n");
+  fprintf(out, "/FontBBox [%d %d %d %d] def\n",
+	  bbox[0], bbox[1], bbox[2], bbox[3]);
+  fprintf(out, "/PaintType 0 def\n");
+
+  // write the guts of the dictionary
+  cvtEncoding(encodingA, out);
+  cvtCharStrings(encodingA, out);
+  cvtSfnts(out);
+
+  // end the dictionary and define the font
+  fprintf(out, "FontName currentdict end definefont pop\n");
+}
+
+int TrueTypeFontFile::getByte(int pos) {
+  return file[pos] & 0xff;
+}
+
+int TrueTypeFontFile::getChar(int pos) {
+  int x;
+
+  x = file[pos] & 0xff;
+  if (x & 0x80)
+    x |= 0xffffff00;
+  return x;
+}
+
+int TrueTypeFontFile::getUShort(int pos) {
+  int x;
+
+  x = file[pos] & 0xff;
+  x = (x << 8) + (file[pos+1] & 0xff);
+  return x;
+}
+
+int TrueTypeFontFile::getShort(int pos) {
+  int x;
+
+  x = file[pos] & 0xff;
+  x = (x << 8) + (file[pos+1] & 0xff);
+  if (x & 0x8000)
+    x |= 0xffff0000;
+  return x;
+}
+
+Guint TrueTypeFontFile::getULong(int pos) {
+  int x;
+
+  x = file[pos] & 0xff;
+  x = (x << 8) + (file[pos+1] & 0xff);
+  x = (x << 8) + (file[pos+2] & 0xff);
+  x = (x << 8) + (file[pos+3] & 0xff);
+  return x;
+}
+
+double TrueTypeFontFile::getFixed(int pos) {
+  int x, y;
+
+  x = getShort(pos);
+  y = getUShort(pos+2);
+  return (double)x + (double)y / 65536;
+}
+
+int TrueTypeFontFile::seekTable(char *tag) {
+  int i;
+
+  for (i = 0; i < nTables; ++i) {
+    if (!strncmp(tableHdrs[i].tag, tag, 4))
+      return tableHdrs[i].offset;
+  }
+  return -1;
+}
+
+void TrueTypeFontFile::cvtEncoding(FontEncoding *encodingA, FILE *out) {
+  char *name;
+  int i;
+
+  fprintf(out, "/Encoding 256 array\n");
+  for (i = 0; i < 256; ++i) {
+    if (!(name = encodingA->getCharName(i))) {
+      name = ".notdef";
+    }
+    fprintf(out, "dup %d /%s put\n", i, name);
+  }
+  fprintf(out, "readonly def\n");
+}
+
+void TrueTypeFontFile::cvtCharStrings(FontEncoding *encodingA, FILE *out) {
+  int cmap[256];
+  int nCmaps, cmapPlatform, cmapEncoding, cmapFmt, cmapLen, cmapOffset;
+  int segCnt, segStart, segEnd, segDelta, segOffset;
+  char *name;
+  int pos, i, j, k;
+
+  //----- read the cmap: construct the (char code) -> (glyph idx) mapping
+
+  // map everything to the missing glyph
+  for (i = 0; i < 256; ++i) {
+    cmap[i] = 0;
+  }
+
+  // look for the 'cmap' table
+  if ((pos = seekTable("cmap")) >= 0) {
+    nCmaps = getUShort(pos+2);
+
+    // if the font has a Windows-symbol cmap, use it;
+    // otherwise, use the first cmap in the table
+    for (i = 0; i < nCmaps; ++i) {
+      cmapPlatform = getUShort(pos + 4 + 8*i);
+      cmapEncoding = getUShort(pos + 4 + 8*i + 2);
+      if (cmapPlatform == 3 && cmapEncoding == 0) {
+	break;
+      }
+    }
+    if (i >= nCmaps) {
+      i = 0;
+      cmapPlatform = getUShort(pos + 4);
+      cmapEncoding = getUShort(pos + 4 + 2);
+    }
+    pos += getULong(pos + 4 + 8*i + 4);
+
+    // read the cmap
+    cmapFmt = getUShort(pos);
+    switch (cmapFmt) {
+    case 0: // byte encoding table (Apple standard)
+      cmapLen = getUShort(pos + 2);
+      for (i = 0; i < cmapLen && i < 256; ++i) {
+	cmap[i] = getByte(pos + 6 + i);
+      }
+      break;
+    case 4: // segment mapping to delta values (Microsoft standard)
+      if (cmapPlatform == 3 && cmapEncoding == 0) {
+	// Windows-symbol uses char codes 0xf000 - 0xf0ff
+	cmapOffset = 0xf000;
+      } else {
+	cmapOffset = 0;
+      }
+      segCnt = getUShort(pos + 6) / 2;
+      for (i = 0; i < segCnt; ++i) {
+	segEnd = getUShort(pos + 14 + 2*i);
+	segStart = getUShort(pos + 16 + 2*segCnt + 2*i);
+	segDelta = getUShort(pos + 16 + 4*segCnt + 2*i);
+	segOffset = getUShort(pos + 16 + 6*segCnt + 2*i);
+	if (segStart - cmapOffset <= 0xff &&
+	    segEnd - cmapOffset >= 0) {
+	  for (j = (segStart - cmapOffset >= 0) ? segStart : cmapOffset;
+	       j <= segEnd && j - cmapOffset <= 0xff;
+	       ++j) {
+	    if (segOffset == 0) {
+	      k = (j + segDelta) & 0xffff;
+	    } else {
+	      k = getUShort(pos + 16 + 6*segCnt + 2*i +
+			    segOffset + 2 * (j - segStart));
+	      if (k != 0) {
+		k = (k + segDelta) & 0xffff;
+	      }
+	    }
+	    cmap[j - cmapOffset] = k;
+	  }
+	}
+      }
+      break;
+    default:
+      error(-1, "Unimplemented cmap type (%d) in TrueType font file",
+	    cmapFmt);
+      break;
+    }
+  }
+
+  //----- map char code to glyph index
+
+  // 1. use encoding to map name to char code
+  // 2. use cmap to map char code to glyph index
+
+  fprintf(out, "/CharStrings 256 dict dup begin\n");
+  fprintf(out, "/.notdef 0 def\n");
+
+  // kludge: this loop goes backward because the WinAnsi and MacRoman
+  // encodings define certain chars multiple times (space, hyphen,
+  // etc.), and we want the lowest-numbered definition to "stick"
+  // (because the higher-numbered defn(s) may not have valid cmap
+  // entries)
+  i = encodingA->getSize();
+  if (i > 255) {
+    i = 255;
+  }
+  for (; i >= 0; --i) {
+    name = encodingA->getCharName(i);
+    if (name && strcmp(name, ".notdef")) {
+      fprintf(out, "/%s %d def\n", name, cmap[i]);
+    }
+  }
+
+  fprintf(out, "end readonly def\n");
+}
+
+void TrueTypeFontFile::cvtSfnts(FILE *out) {
+  char tableDir[12 + 9*16];
+  int *list;
+  int nTablesOut, pos, destPos, i, j, k1, k2;
+
+  fprintf(out, "/sfnts [\n");
+
+  // count tables
+  nTablesOut = 0;
+  for (i = 0; i < 9; ++i) {
+    for (j = 0; j < nTables; ++j) {
+      if (!strncmp(t42ReqTables[i], tableHdrs[j].tag, 4)) {
+	++nTablesOut;
+	break;
+      }
+    }
+  }
+
+  // header
+  tableDir[0] = 0x00;		// sfnt version
+  tableDir[1] = 0x01;
+  tableDir[2] = 0x00;
+  tableDir[3] = 0x00;
+  tableDir[4] = (nTablesOut >> 8) & 0xff;   // numTables
+  tableDir[5] = nTablesOut & 0xff;
+  tableDir[6] = 0;		// searchRange
+  tableDir[7] = (char)128;
+  tableDir[8] = 0;		// entrySelector
+  tableDir[9] = 3;
+  tableDir[10] = 0;		// rangeShift
+  tableDir[11] = 16;
+
+  // table directory
+  pos = 12;
+  destPos = 12 + 16 * nTablesOut;
+  for (i = 0; i < 9; ++i) {
+    for (j = 0; j < nTables; ++j) {
+      if (!strncmp(t42ReqTables[i], tableHdrs[j].tag, 4)) {
+	break;
+      }
+    }
+    if (j < nTables) {
+      memcpy(&tableDir[pos], t42ReqTables[i], 4);
+      tableDir[pos+4] = (tableHdrs[j].checksum >> 24) & 0xff;
+      tableDir[pos+5] = (tableHdrs[j].checksum >> 16) & 0xff;
+      tableDir[pos+6] = (tableHdrs[j].checksum >> 8) & 0xff;
+      tableDir[pos+7] = tableHdrs[j].checksum & 0xff;
+      tableDir[pos+8] = (destPos >> 24) & 0xff;
+      tableDir[pos+9] = (destPos >> 16) & 0xff;
+      tableDir[pos+10] = (destPos >> 8) & 0xff;
+      tableDir[pos+11] = destPos & 0xff;
+      tableDir[pos+12] = (tableHdrs[j].length >> 24) & 0xff;
+      tableDir[pos+13] = (tableHdrs[j].length >> 16) & 0xff;
+      tableDir[pos+14] = (tableHdrs[j].length >> 8) & 0xff;
+      tableDir[pos+15] = tableHdrs[j].length & 0xff;
+      pos += 16;
+      destPos += tableHdrs[j].length;
+      if (tableHdrs[j].length & 3) {
+	destPos += 4 - (tableHdrs[j].length & 3);
+      }
+    }
+  }
+
+  dumpString(tableDir, 12 + 16 * nTablesOut, out);
+
+  for (i = 0; i < 9; ++i) {
+    for (j = 0; j < nTables; ++j) {
+      if (!strncmp(t42ReqTables[i], tableHdrs[j].tag, 4)) {
+	break;
+      }
+    }
+    if (j < nTables) {
+      if (!strcmp(t42ReqTables[i], "glyf") && tableHdrs[j].length > 65532) {
+	// the 'glyf' table won't fit in a single string, and we're only
+	// allowed to break at glyph boundaries
+	list = (int *)gmalloc((nGlyphs + 1) * sizeof(int));
+	pos = seekTable("loca");
+	for (k1 = 0; k1 <= nGlyphs; ++k1) {
+	  if (locaFmt) {
+	    list[k1] = getULong(pos + 4*k1);
+	  } else {
+	    list[k1] = 2 * getUShort(pos + 2*k1);
+	  }
+	}
+	k1 = 0;
+	while (k1 < nGlyphs) {
+	  for (k2 = k1 + 1;
+	       k2 < nGlyphs && list[k2+1] - list[k1] <= 65532;
+	       ++k2) ;
+	  // ghostscript is unhappy if we break at anything other
+	  // than a multiple of four bytes
+	  while (((list[k2] - list[k1]) & 3) && k2 > k1 + 1) {
+	    --k2;
+	  }
+	  dumpString(file + tableHdrs[j].offset + list[k1],
+		     list[k2] - list[k1], out);
+	  k1 = k2;
+	}
+	gfree(list);
+      } else {
+	dumpString(file + tableHdrs[j].offset, tableHdrs[j].length, out);
+      }
+    }
+  }
+
+  fprintf(out, "] def\n");
+}
+
+void TrueTypeFontFile::dumpString(char *s, int n, FILE *out) {
+  int i, j;
+
+  fprintf(out, "<");
+  for (i = 0; i < n; i += 32) {
+    for (j = 0; j < 32 && i+j < n; ++j) {
+      fprintf(out, "%02X", s[i+j] & 0xff);
+    }
+    if (i+32 < n) {
+      fprintf(out, "\n");
+    }
+  }
+  if (n & 3) {
+    for (i = 0; i < 4 - (n & 3); ++i) {
+      fprintf(out, "00");
+    }
+  }
+  // append an extra mystery zero byte because the Type 42 spec says so
+  fprintf(out, "00>\n");
 }

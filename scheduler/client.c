@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.91.2.3 2001/05/14 18:01:22 mike Exp $"
+ * "$Id: client.c,v 1.91.2.4 2001/12/26 16:52:50 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -36,6 +36,7 @@
  *   check_if_modified()   - Decode an "If-Modified-Since" line.
  *   decode_auth()         - Decode an authorization string.
  *   get_file()            - Get a filename and state info.
+ *   install_conf_file()   - Install a configuration file.
  *   pipe_command()        - Pipe the output of a command to the remote client.
  */
 
@@ -58,10 +59,13 @@
  * Local functions...
  */
 
-static int	check_if_modified(client_t *con, struct stat *filestats);
-static void	decode_auth(client_t *con);
-static char	*get_file(client_t *con, struct stat *filestats);
-static int	pipe_command(client_t *con, int infile, int *outfile, char *command, char *options);
+static int		check_if_modified(client_t *con,
+			                  struct stat *filestats);
+static void		decode_auth(client_t *con);
+static char		*get_file(client_t *con, struct stat *filestats);
+static http_status_t	install_conf_file(client_t *con);
+static int		pipe_command(client_t *con, int infile, int *outfile,
+			             char *command, char *options);
 
 
 /*
@@ -160,7 +164,7 @@ AcceptClient(listener_t *lis)	/* I - Listener socket */
     * Do double lookups as needed...
     */
 
-    if ((host = gethostbyname(con->http.hostname)) != NULL)
+    if ((host = httpGetHostByName(con->http.hostname)) != NULL)
     {
      /*
       * See if the hostname maps to the same IP address...
@@ -393,7 +397,7 @@ EncryptClient(client_t *con)	/* I - Client to encrypt */
 #ifdef HAVE_LIBSSL
   SSL_CTX	*context;	/* Context for encryption */
   SSL		*conn;		/* Connection for encryption */
-  int		error;		/* Error code */
+  unsigned long	error;		/* Error code */
 
 
  /*
@@ -432,7 +436,7 @@ EncryptClient(client_t *con)	/* I - Client to encrypt */
 int				/* O - 1 on success, 0 on error */
 ReadClient(client_t *con)	/* I - Client to read from */
 {
-  char		line[8192],	/* Line from client... */
+  char		line[32768],	/* Line from client... */
 		operation[64],	/* Operation code from socket */
 		version[64];	/* HTTP version number string */
   int		major, minor;	/* HTTP version numbers */
@@ -519,7 +523,7 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	      if (major < 2)
 	      {
 	        con->http.version = (http_version_t)(major * 100 + minor);
-		if (con->http.version == HTTP_1_1)
+		if (con->http.version == HTTP_1_1 && KeepAlive)
 		  con->http.keep_alive = HTTP_KEEPALIVE_ON;
 		else
 		  con->http.keep_alive = HTTP_KEEPALIVE_OFF;
@@ -602,7 +606,8 @@ ReadClient(client_t *con)	/* I - Client to read from */
 
     decode_auth(con);
 
-    if (strncmp(con->http.fields[HTTP_FIELD_CONNECTION], "Keep-Alive", 10) == 0)
+    if (strncmp(con->http.fields[HTTP_FIELD_CONNECTION], "Keep-Alive", 10) == 0 &&
+        KeepAlive)
       con->http.keep_alive = HTTP_KEEPALIVE_ON;
 
     if (con->http.fields[HTTP_FIELD_HOST][0] == '\0' &&
@@ -624,7 +629,7 @@ ReadClient(client_t *con)	/* I - Client to read from */
       * Do OPTIONS command...
       */
 
-      if ((best = FindBest(con)) != NULL &&
+      if ((best = FindBest(con->uri, con->http.state)) != NULL &&
           best->type != AUTH_NONE)
       {
 	if (!SendHeader(con, HTTP_UNAUTHORIZED, NULL))
@@ -669,7 +674,7 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	return (0);
       }
 
-      httpPrintf(HTTP(con), "Allow: GET, HEAD, OPTIONS, POST\r\n");
+      httpPrintf(HTTP(con), "Allow: GET, HEAD, OPTIONS, POST, PUT\r\n");
       httpPrintf(HTTP(con), "Content-Length: 0\r\n");
       httpPrintf(HTTP(con), "\r\n");
     }
@@ -764,7 +769,8 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	      }
 	    }
 
-	    if (strncmp(con->uri, "/admin", 6) == 0 ||
+	    if ((strncmp(con->uri, "/admin", 6) == 0 &&
+	         strncmp(con->uri, "/admin/conf/", 12) != 0) ||
 		strncmp(con->uri, "/printers", 9) == 0 ||
 		strncmp(con->uri, "/classes", 8) == 0 ||
 		strncmp(con->uri, "/jobs", 5) == 0)
@@ -814,6 +820,23 @@ ReadClient(client_t *con)	/* I - Client to read from */
 
 	      if (con->http.version <= HTTP_1_0)
 		con->http.keep_alive = HTTP_KEEPALIVE_OFF;
+	    }
+            else if (strncmp(con->uri, "/admin/conf/", 12) == 0 &&
+	             (strchr(con->uri + 12, '/') != NULL ||
+		      strlen(con->uri) == 12))
+	    {
+	     /*
+	      * GET can only be done to configuration files under
+	      * /admin/conf...
+	      */
+
+	      if (!SendError(con, HTTP_FORBIDDEN))
+	      {
+	        CloseClient(con);
+		return (0);
+	      }
+
+	      break;
 	    }
 	    else
 	    {
@@ -887,7 +910,8 @@ ReadClient(client_t *con)	/* I - Client to read from */
 
 	    if (strcmp(con->http.fields[HTTP_FIELD_CONTENT_TYPE], "application/ipp") == 0)
               con->request = ippNew();
-	    else if (strncmp(con->uri, "/admin", 6) == 0 ||
+	    else if ((strncmp(con->uri, "/admin", 6) == 0 &&
+	              strncmp(con->uri, "/admin/conf/", 12) != 0) ||
 	             strncmp(con->uri, "/printers", 9) == 0 ||
 	             strncmp(con->uri, "/classes", 8) == 0 ||
 	             strncmp(con->uri, "/jobs", 5) == 0)
@@ -938,6 +962,76 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	    break;
 
 	case HTTP_PUT_RECV :
+	   /*
+	    * Validate the resource name...
+	    */
+
+            if (strncmp(con->uri, "/admin/conf/", 12) != 0 ||
+	        strchr(con->uri + 12, '/') != NULL ||
+		strlen(con->uri) == 12)
+	    {
+	     /*
+	      * PUT can only be done to configuration files under
+	      * /admin/conf...
+	      */
+
+	      if (!SendError(con, HTTP_FORBIDDEN))
+	      {
+	        CloseClient(con);
+		return (0);
+	      }
+
+	      break;
+	    }
+
+           /*
+	    * See if the PUT request includes a Content-Length field, and if
+	    * so check the length against any limits that are set...
+	    */
+
+            LogMessage(L_DEBUG2, "PUT %s", con->uri);
+	    LogMessage(L_DEBUG2, "CONTENT_TYPE = %s", con->http.fields[HTTP_FIELD_CONTENT_TYPE]);
+
+            if (con->http.fields[HTTP_FIELD_CONTENT_LENGTH][0] &&
+		atoi(con->http.fields[HTTP_FIELD_CONTENT_LENGTH]) > MaxRequestSize &&
+		MaxRequestSize > 0)
+	    {
+	     /*
+	      * Request too large...
+	      */
+
+              if (!SendError(con, HTTP_REQUEST_TOO_LARGE))
+	      {
+		CloseClient(con);
+		return (0);
+	      }
+
+	      break;
+            }
+
+           /*
+	    * Open a temporary file to hold the request...
+	    */
+
+            snprintf(con->filename, sizeof(con->filename), "%s/%08x",
+	             RequestRoot, request_id ++);
+	    con->file = open(con->filename, O_WRONLY | O_CREAT | O_TRUNC, 0640);
+	    fchmod(con->file, 0640);
+	    fchown(con->file, User, Group);
+
+            LogMessage(L_DEBUG2, "ReadClient() %d REQUEST %s=%d", con->http.fd,
+	               con->filename, con->file);
+
+	    if (con->file < 0)
+	    {
+	      if (!SendError(con, HTTP_REQUEST_TOO_LARGE))
+	      {
+		CloseClient(con);
+		return (0);
+	      }
+	    }
+	    break;
+
 	case HTTP_DELETE :
 	case HTTP_TRACE :
             SendError(con, HTTP_NOT_IMPLEMENTED);
@@ -969,7 +1063,8 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	      }
 	    }
 
-	    if (strncmp(con->uri, "/admin/", 7) == 0 ||
+	    if ((strncmp(con->uri, "/admin/", 7) == 0 &&
+	         strncmp(con->uri, "/admin/conf/", 12) != 0) ||
 		strncmp(con->uri, "/printers/", 10) == 0 ||
 		strncmp(con->uri, "/classes/", 9) == 0 ||
 		strncmp(con->uri, "/jobs/", 6) == 0)
@@ -991,6 +1086,23 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	      }
 
               LogRequest(con, HTTP_OK);
+	    }
+            else if (strncmp(con->uri, "/admin/conf/", 12) == 0 &&
+	             (strchr(con->uri + 12, '/') != NULL ||
+		      strlen(con->uri) == 12))
+	    {
+	     /*
+	      * HEAD can only be done to configuration files under
+	      * /admin/conf...
+	      */
+
+	      if (!SendError(con, HTTP_FORBIDDEN))
+	      {
+	        CloseClient(con);
+		return (0);
+	      }
+
+	      break;
 	    }
 	    else if ((filename = get_file(con, &filestats)) == NULL)
 	    {
@@ -1037,8 +1149,8 @@ ReadClient(client_t *con)	/* I - Client to read from */
 		return (0);
 	      }
 
-	      if (httpPrintf(HTTP(con), "Content-Length: %d\r\n",
-	                     filestats.st_size) < 0)
+	      if (httpPrintf(HTTP(con), "Content-Length: %lu\r\n",
+	                     (unsigned long)filestats.st_size) < 0)
 	      {
 		CloseClient(con);
 		return (0);
@@ -1069,6 +1181,90 @@ ReadClient(client_t *con)	/* I - Client to read from */
   switch (con->http.state)
   {
     case HTTP_PUT_RECV :
+        LogMessage(L_DEBUG2, "ReadClient() %d con->data_encoding = %s, con->data_remaining = %d, con->file = %d",
+		   con->http.fd,
+		   con->http.data_encoding == HTTP_ENCODE_CHUNKED ? "chunked" : "length",
+		   con->http.data_remaining, con->file);
+
+        if ((bytes = httpRead(HTTP(con), line, sizeof(line))) < 0)
+	{
+	  CloseClient(con);
+	  return (0);
+	}
+	else if (bytes > 0)
+	{
+	  con->bytes += bytes;
+
+          LogMessage(L_DEBUG2, "ReadClient() %d writing %d bytes to %d",
+	             con->http.fd, bytes, con->file);
+
+          if (write(con->file, line, bytes) < bytes)
+	  {
+            LogMessage(L_ERROR, "ReadClient: Unable to write %d bytes to %s: %s",
+	               bytes, con->filename, strerror(errno));
+
+	    close(con->file);
+	    con->file = 0;
+	    unlink(con->filename);
+	    con->filename[0] = '\0';
+
+            if (!SendError(con, HTTP_REQUEST_TOO_LARGE))
+	    {
+	      CloseClient(con);
+	      return (0);
+	    }
+	  }
+	}
+
+        if (con->http.state == HTTP_WAITING)
+	{
+	 /*
+	  * End of file, see how big it is...
+	  */
+
+	  fstat(con->file, &filestats);
+
+          LogMessage(L_DEBUG2, "ReadClient() %d Closing data file %d, size = %d.",
+                     con->http.fd, con->file, filestats.st_size);
+
+	  close(con->file);
+	  con->file = 0;
+
+          if (filestats.st_size > MaxRequestSize &&
+	      MaxRequestSize > 0)
+	  {
+	   /*
+	    * Request is too big; remove it and send an error...
+	    */
+
+            LogMessage(L_DEBUG2, "ReadClient() %d Removing temp file %s",
+	               con->http.fd, con->filename);
+	    unlink(con->filename);
+	    con->filename[0] = '\0';
+
+            if (!SendError(con, HTTP_REQUEST_TOO_LARGE))
+	    {
+	      CloseClient(con);
+	      return (0);
+	    }
+	  }
+
+         /*
+	  * Install the configuration file...
+	  */
+
+          status = install_conf_file(con);
+
+         /*
+	  * Return the status to the client...
+	  */
+
+          if (!SendError(con, status))
+	  {
+	    CloseClient(con);
+	    return (0);
+	  }
+	}
         break;
 
     case HTTP_POST_RECV :
@@ -1143,6 +1339,7 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	      close(con->file);
 	      con->file = 0;
 	      unlink(con->filename);
+	      con->filename[0] = '\0';
 
               if (!SendError(con, HTTP_REQUEST_TOO_LARGE))
 	      {
@@ -1180,6 +1377,7 @@ ReadClient(client_t *con)	/* I - Client to read from */
               LogMessage(L_DEBUG2, "ReadClient() %d Removing temp file %s",
 	                 con->http.fd, con->filename);
 	      unlink(con->filename);
+	      con->filename[0] = '\0';
 
 	      if (con->request)
 	      {
@@ -1305,7 +1503,7 @@ SendError(client_t      *con,	/* I - Connection */
   if (con->operation > HTTP_WAITING)
     LogRequest(con, code);
 
-  LogMessage(L_DEBUG2, "SendError() %d code=%d", con->http.fd, code);
+  LogMessage(L_DEBUG, "SendError() %d code=%d", con->http.fd, code);
 
  /*
   * To work around bugs in some proxies, don't use Keep-Alive for some
@@ -1396,7 +1594,8 @@ SendFile(client_t    *con,
 
   if (httpPrintf(HTTP(con), "Last-Modified: %s\r\n", httpGetDateString(filestats->st_mtime)) < 0)
     return (0);
-  if (httpPrintf(HTTP(con), "Content-Length: %d\r\n", filestats->st_size) < 0)
+  if (httpPrintf(HTTP(con), "Content-Length: %lu\r\n",
+                 (unsigned long)filestats->st_size) < 0)
     return (0);
   if (httpPrintf(HTTP(con), "\r\n") < 0)
     return (0);
@@ -1441,9 +1640,13 @@ SendHeader(client_t    *con,	/* I - Client to send to */
 
   if (code == HTTP_UNAUTHORIZED)
   {
-    loc = FindBest(con); /* This already succeeded in IsAuthorized */
+   /*
+    * This already succeeded in IsAuthorized...
+    */
 
-    if (loc->type == AUTH_BASIC)
+    loc = FindBest(con->uri, con->http.state);
+
+    if (loc->type != AUTH_DIGEST)
     {
       if (httpPrintf(HTTP(con), "WWW-Authenticate: Basic realm=\"CUPS\"\r\n") < 0)
 	return (0);
@@ -1609,6 +1812,7 @@ WriteClient(client_t *con)		/* I - Client connection */
       LogMessage(L_DEBUG2, "WriteClient() %d Removing temp file %s",
                  con->http.fd, con->filename);
       unlink(con->filename);
+      con->filename[0] = '\0';
     }
 
     if (con->request != NULL)
@@ -1797,6 +2001,8 @@ get_file(client_t    *con,	/* I - Client connection */
 
   if (strncmp(con->uri, "/ppd/", 5) == 0)
     snprintf(filename, sizeof(filename), "%s%s", ServerRoot, con->uri);
+  else if (strncmp(con->uri, "/admin/conf/", 12) == 0)
+    snprintf(filename, sizeof(filename), "%s%s", ServerRoot, con->uri + 11);
   else if (con->language != NULL)
     snprintf(filename, sizeof(filename), "%s/%s%s", DocumentRoot, con->language->language,
             con->uri);
@@ -1817,7 +2023,8 @@ get_file(client_t    *con,	/* I - Client connection */
     * Drop the language prefix and try the current directory...
     */
 
-    if (strncmp(con->uri, "/ppd/", 5) != 0)
+    if (strncmp(con->uri, "/ppd/", 5) != 0 &&
+        strncmp(con->uri, "/admin/conf/", 12) != 0)
     {
       snprintf(filename, sizeof(filename), "%s%s", DocumentRoot, con->uri);
 
@@ -1848,6 +2055,160 @@ get_file(client_t    *con,	/* I - Client connection */
     return (NULL);
   else
     return (filename);
+}
+
+
+/*
+ * 'install_conf_file()' - Install a configuration file.
+ */
+
+static http_status_t			/* O - Status */
+install_conf_file(client_t *con)	/* I - Connection */
+{
+  FILE		*in,			/* Input file */
+		*out;			/* Output file */
+  char		buffer[1024];		/* Copy buffer */
+  int		bytes;			/* Number of bytes */
+  char		conffile[1024],		/* Configuration filename */
+		newfile[1024],		/* New config filename */
+		oldfile[1024];		/* Old config filename */
+  struct stat	confinfo;		/* Config file info */
+
+
+ /*
+  * First construct the filenames...
+  */
+
+  snprintf(conffile, sizeof(conffile), "%s%s", ServerRoot, con->uri + 11);
+  snprintf(newfile, sizeof(newfile), "%s%s.N", ServerRoot, con->uri + 11);
+  snprintf(oldfile, sizeof(oldfile), "%s%s.O", ServerRoot, con->uri + 11);
+
+  LogMessage(L_INFO, "Installing config file \"%s\"...", conffile);
+
+ /*
+  * Get the owner, group, and permissions of the configuration file.
+  * If it doesn't exist, assign it to the User and Group in the
+  * cupsd.conf file with mode 0640 permissions.
+  */
+
+  if (stat(conffile, &confinfo))
+  {
+    confinfo.st_uid  = User;
+    confinfo.st_gid  = Group;
+    confinfo.st_mode = 0640;
+  }
+
+ /*
+  * Open the request file and new config file...
+  */
+
+  if ((in = fopen(con->filename, "rb")) == NULL)
+  {
+    LogMessage(L_ERROR, "Unable to open request file \"%s\" - %s",
+               con->filename, strerror(errno));
+    return (HTTP_SERVER_ERROR);
+  }
+
+  if ((out = fopen(newfile, "wb")) == NULL)
+  {
+    fclose(in);
+    LogMessage(L_ERROR, "Unable to open config file \"%s\" - %s",
+               newfile, strerror(errno));
+    return (HTTP_SERVER_ERROR);
+  }
+
+  fchmod(fileno(out), confinfo.st_mode);
+  fchown(fileno(out), confinfo.st_uid, confinfo.st_gid);
+
+ /*
+  * Copy from the request to the new config file...
+  */
+
+  while ((bytes = fread(buffer, 1, sizeof(buffer), in)) > 0)
+    if (fwrite(buffer, 1, bytes, out) < bytes)
+    {
+      LogMessage(L_ERROR, "Unable to copy to config file \"%s\" - %s",
+        	 newfile, strerror(errno));
+
+      fclose(in);
+      fclose(out);
+      unlink(newfile);
+
+      return (HTTP_SERVER_ERROR);
+    }
+
+ /*
+  * Close the files...
+  */
+
+  fclose(in);
+  if (fclose(out))
+  {
+    LogMessage(L_ERROR, "Error file closing config file \"%s\" - %s",
+               newfile, strerror(errno));
+
+    unlink(newfile);
+
+    return (HTTP_SERVER_ERROR);
+  }
+
+ /*
+  * Remove the request file...
+  */
+
+  unlink(con->filename);
+  con->filename[0] = '\0';
+
+ /*
+  * Unlink the old backup, rename the current config file to the backup
+  * filename, and rename the new config file to the config file name...
+  */
+
+  if (unlink(oldfile))
+    if (errno != ENOENT)
+    {
+      LogMessage(L_ERROR, "Unable to remove backup config file \"%s\" - %s",
+        	 oldfile, strerror(errno));
+
+      unlink(newfile);
+
+      return (HTTP_SERVER_ERROR);
+    }
+
+  if (rename(conffile, oldfile))
+    if (errno != ENOENT)
+    {
+      LogMessage(L_ERROR, "Unable to rename old config file \"%s\" - %s",
+        	 conffile, strerror(errno));
+
+      unlink(newfile);
+
+      return (HTTP_SERVER_ERROR);
+    }
+
+  if (rename(newfile, conffile))
+  {
+    LogMessage(L_ERROR, "Unable to rename new config file \"%s\" - %s",
+               newfile, strerror(errno));
+
+    rename(oldfile, conffile);
+    unlink(newfile);
+
+    return (HTTP_SERVER_ERROR);
+  }
+
+ /*
+  * If the cupsd.conf file was updated, set the NeedReload flag...
+  */
+
+  if (strcmp(con->uri, "/admin/conf/cupsd.conf") == 0)
+    NeedReload = TRUE;
+
+ /*
+  * Return that the file was created successfully...
+  */
+
+  return (HTTP_CREATED);
 }
 
 
@@ -2051,7 +2412,7 @@ pipe_command(client_t *con,	/* I - Client connection */
     if (getuid() == 0)
     {
      /*
-      * Running as root, so change to non-priviledged user...
+      * Running as root, so change to a non-priviledged user...
       */
 
       if (setgid(Group))
@@ -2074,11 +2435,13 @@ pipe_command(client_t *con,	/* I - Client connection */
     if (infile)
     {
       close(0);
-      dup(infile);
+      if (dup(infile) < 0)
+	exit(errno);
     }
 
     close(1);
-    dup(fds[1]);
+    if (dup(fds[1]) < 0)
+      exit(errno);
 
    /*
     * Close extra file descriptors...
@@ -2098,7 +2461,6 @@ pipe_command(client_t *con,	/* I - Client connection */
     */
 
     execve(command, argv, envp);
-    perror("execve failed");
     exit(errno);
     return (0);
   }
@@ -2123,7 +2485,7 @@ pipe_command(client_t *con,	/* I - Client connection */
 
     AddCert(pid, con->username);
 
-    LogMessage(L_DEBUG, "CGI %s started - PID = %d", argv[0], pid);
+    LogMessage(L_DEBUG, "CGI %s started - PID = %d", command, pid);
 
     *outfile = fds[0];
     close(fds[1]);
@@ -2134,5 +2496,5 @@ pipe_command(client_t *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.91.2.3 2001/05/14 18:01:22 mike Exp $".
+ * End of "$Id: client.c,v 1.91.2.4 2001/12/26 16:52:50 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.127.2.2 2001/05/13 18:38:35 mike Exp $"
+ * "$Id: ipp.c,v 1.127.2.3 2001/12/26 16:52:53 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -53,7 +53,7 @@
  *   get_printer_attrs()         - Get printer attributes.
  *   get_printers()              - Get a list of printers.
  *   hold_job()                  - Hold a print job.
- *   move_job()                  - Move a job.
+ *   move_job()                  - Move a job to a new destination.
  *   print_job()                 - Print a file to a printer or class.
  *   reject_jobs()               - Reject print jobs to a printer.
  *   release_job()               - Release a held print job.
@@ -94,7 +94,8 @@ static void	add_queued_job_count(client_t *con, printer_t *p);
 static void	cancel_all_jobs(client_t *con, ipp_attribute_t *uri);
 static void	cancel_job(client_t *con, ipp_attribute_t *uri);
 static int	check_quotas(client_t *con, printer_t *p);
-static void	copy_attribute(ipp_t *to, ipp_attribute_t *attr);
+static void	copy_attribute(ipp_t *to, ipp_attribute_t *attr,
+		               int quickcopy);
 static void	copy_attrs(ipp_t *to, ipp_t *from, ipp_attribute_t *req,
 		           ipp_tag_t group);
 static int	copy_banner(client_t *con, job_t *job, const char *name);
@@ -606,17 +607,22 @@ add_class(client_t        *con,		/* I - Client connection */
   else if (pclass->type & CUPS_PRINTER_IMPLICIT)
   {
    /*
-    * Rename the implicit class to "AnyClass"...
+    * Rename the implicit class to "AnyClass" or remove it...
     */
 
-    snprintf(pclass->name, sizeof(pclass->name), "Any%s", resource + 10);
-    SortPrinters();
+    if (ImplicitAnyClasses)
+    {
+      snprintf(pclass->name, sizeof(pclass->name), "Any%s", resource + 9);
+      SortPrinters();
+    }
+    else
+      DeletePrinter(pclass);
 
    /*
     * Add the class as a new local class...
     */
 
-    pclass = AddClass(resource + 10);
+    pclass = AddClass(resource + 9);
     modify = 0;
   }
   else if (pclass->type & CUPS_PRINTER_REMOTE)
@@ -626,7 +632,7 @@ add_class(client_t        *con,		/* I - Client connection */
     */
 
     DeletePrinterFilters(pclass);
-    snprintf(pclass->name, sizeof(pclass->name), "%s@%s", resource + 10,
+    snprintf(pclass->name, sizeof(pclass->name), "%s@%s", resource + 9,
              pclass->hostname);
     SetPrinterAttrs(pclass);
     SortPrinters();
@@ -635,7 +641,7 @@ add_class(client_t        *con,		/* I - Client connection */
     * Add the class as a new local class...
     */
 
-    pclass = AddClass(resource + 10);
+    pclass = AddClass(resource + 9);
     modify = 0;
   }
   else
@@ -655,12 +661,6 @@ add_class(client_t        *con,		/* I - Client connection */
   {
     strncpy(pclass->info, attr->values[0].string.text, sizeof(pclass->info) - 1);
     pclass->info[sizeof(pclass->info) - 1] = '\0';
-  }
-
-  if ((attr = ippFindAttribute(con->request, "printer-more-info", IPP_TAG_URI)) != NULL)
-  {
-    strncpy(pclass->more_info, attr->values[0].string.text, sizeof(pclass->more_info) - 1);
-    pclass->more_info[sizeof(pclass->more_info) - 1] = '\0';
   }
 
   if ((attr = ippFindAttribute(con->request, "printer-is-accepting-jobs", IPP_TAG_BOOLEAN)) != NULL)
@@ -695,7 +695,8 @@ add_class(client_t        *con,		/* I - Client connection */
             sizeof(pclass->state_message) - 1);
     pclass->state_message[sizeof(pclass->state_message) - 1] = '\0';
   }
-  if ((attr = ippFindAttribute(con->request, "job-sheets-default", IPP_TAG_ZERO)) != NULL)
+  if ((attr = ippFindAttribute(con->request, "job-sheets-default", IPP_TAG_ZERO)) != NULL &&
+      !Classification[0])
   {
     strncpy(pclass->job_sheets[0], attr->values[0].string.text,
             sizeof(pclass->job_sheets[0]) - 1);
@@ -704,24 +705,6 @@ add_class(client_t        *con,		/* I - Client connection */
               sizeof(pclass->job_sheets[1]) - 1);
     else
       strcpy(pclass->job_sheets[1], "none");
-
-   /*
-    * Enforce classification level if set...
-    */
-
-    if (Classification[0])
-    {
-      if (strcmp(pclass->job_sheets[0], Classification) != 0 &&
-          strcmp(pclass->job_sheets[1], Classification) != 0)
-      {
-       /*
-        * Force the leading banner to have the classification on it...
-	*/
-
-        strcpy(pclass->job_sheets[0], Classification);
-      }
-    }
-
   }
   if ((attr = ippFindAttribute(con->request, "requesting-user-name-allowed",
                                IPP_TAG_ZERO)) != NULL)
@@ -1037,11 +1020,16 @@ add_printer(client_t        *con,	/* I - Client connection */
   else if (printer->type & CUPS_PRINTER_IMPLICIT)
   {
    /*
-    * Rename the implicit printer to "AnyPrinter"...
+    * Rename the implicit printer to "AnyPrinter" or delete it...
     */
 
-    snprintf(printer->name, sizeof(printer->name), "Any%s", resource + 10);
-    SortPrinters();
+    if (ImplicitAnyClasses)
+    {
+      snprintf(printer->name, sizeof(printer->name), "Any%s", resource + 10);
+      SortPrinters();
+    }
+    else
+      DeletePrinter(printer);
 
    /*
     * Add the printer as a new local printer...
@@ -1088,14 +1076,47 @@ add_printer(client_t        *con,	/* I - Client connection */
     printer->info[sizeof(printer->info) - 1] = '\0';
   }
 
-  if ((attr = ippFindAttribute(con->request, "printer-more-info", IPP_TAG_URI)) != NULL)
-  {
-    strncpy(printer->more_info, attr->values[0].string.text, sizeof(printer->more_info) - 1);
-    printer->more_info[sizeof(printer->more_info) - 1] = '\0';
-  }
-
   if ((attr = ippFindAttribute(con->request, "device-uri", IPP_TAG_URI)) != NULL)
   {
+    ipp_attribute_t	*device;	/* Current device */
+    int			methodlen;	/* Length of method string */
+
+
+   /*
+    * Do we have a valid device URI?
+    */
+
+    httpSeparate(attr->values[0].string.text, method, username, host,
+                 &port, resource);
+    methodlen = strlen(method);
+
+    if (strcmp(method, "file") != 0)
+    {
+     /*
+      * See if the backend is listed as a device...
+      */
+
+      for (device = ippFindAttribute(Devices, "device-uri", IPP_TAG_URI);
+           device != NULL;
+	   device = ippFindNextAttribute(Devices, "device-uri", IPP_TAG_URI))
+        if (strncmp(method, device->values[0].string.text, methodlen) == 0 &&
+	    (device->values[0].string.text[methodlen] == ':' ||
+	     device->values[0].string.text[methodlen] == '\0'))
+	  break;
+
+      if (device == NULL)
+      {
+       /*
+        * Could not find device in list!
+	*/
+
+	LogMessage(L_ERROR, "add_printer: bad device-uri attribute \'%s\'!",
+        	   attr->values[0].string.text);
+	send_ipp_error(con, IPP_NOT_POSSIBLE);
+	return;
+      }
+    }
+
     LogMessage(L_INFO, "Setting %s device-uri to \"%s\" (was \"%s\".)",
                printer->name, attr->values[0].string.text, printer->device_uri);
 
@@ -1136,7 +1157,8 @@ add_printer(client_t        *con,	/* I - Client connection */
             sizeof(printer->state_message) - 1);
     printer->state_message[sizeof(printer->state_message) - 1] = '\0';
   }
-  if ((attr = ippFindAttribute(con->request, "job-sheets-default", IPP_TAG_ZERO)) != NULL)
+  if ((attr = ippFindAttribute(con->request, "job-sheets-default", IPP_TAG_ZERO)) != NULL &&
+      !Classification[0])
   {
     strncpy(printer->job_sheets[0], attr->values[0].string.text,
             sizeof(printer->job_sheets[0]) - 1);
@@ -1145,23 +1167,6 @@ add_printer(client_t        *con,	/* I - Client connection */
               sizeof(printer->job_sheets[1]) - 1);
     else
       strcpy(printer->job_sheets[1], "none");
-
-   /*
-    * Force classification if necessary...
-    */
-
-    if (Classification[0])
-    {
-      if (strcmp(printer->job_sheets[0], Classification) != 0 &&
-          strcmp(printer->job_sheets[1], Classification) != 0)
-      {
-       /*
-        * Force the leading banner to have the classification on it...
-	*/
-
-        strcpy(printer->job_sheets[0], Classification);
-      }
-    }
   }
   if ((attr = ippFindAttribute(con->request, "requesting-user-name-allowed",
                                IPP_TAG_ZERO)) != NULL)
@@ -1169,7 +1174,9 @@ add_printer(client_t        *con,	/* I - Client connection */
     FreePrinterUsers(printer);
 
     printer->deny_users = 0;
-    if (attr->value_tag == IPP_TAG_NAME)
+    if (attr->value_tag == IPP_TAG_NAME &&
+        (attr->num_values > 1 ||
+	 strcmp(attr->values[0].string.text, "all") != 0))
       for (i = 0; i < attr->num_values; i ++)
 	AddPrinterUser(printer, attr->values[i].string.text);
   }
@@ -1179,7 +1186,9 @@ add_printer(client_t        *con,	/* I - Client connection */
     FreePrinterUsers(printer);
 
     printer->deny_users = 1;
-    if (attr->value_tag == IPP_TAG_NAME)
+    if (attr->value_tag == IPP_TAG_NAME &&
+        (attr->num_values > 1 ||
+	 strcmp(attr->values[0].string.text, "none") != 0))
       for (i = 0; i < attr->num_values; i ++)
 	AddPrinterUser(printer, attr->values[i].string.text);
   }
@@ -1219,17 +1228,36 @@ add_printer(client_t        *con,	/* I - Client connection */
     srcfile[sizeof(srcfile) - 1] = '\0';
   }
   else if ((attr = ippFindAttribute(con->request, "ppd-name", IPP_TAG_NAME)) != NULL)
-    snprintf(srcfile, sizeof(srcfile), "%s/model/%s", DataDir,
-             attr->values[0].string.text);
+  {
+    if (strcmp(attr->values[0].string.text, "raw") == 0)
+      strcpy(srcfile, "raw");
+    else
+      snprintf(srcfile, sizeof(srcfile), "%s/model/%s", DataDir,
+               attr->values[0].string.text);
+  }
   else
     srcfile[0] = '\0';
 
   LogMessage(L_DEBUG, "add_printer: srcfile = \"%s\"", srcfile);
 
+  if (strcmp(srcfile, "raw") == 0)
+  {
+   /*
+    * Raw driver, remove any existing PPD or interface script files.
+    */
+
+    snprintf(dstfile, sizeof(dstfile), "%s/interfaces/%s", ServerRoot,
+             printer->name);
+    unlink(dstfile);
+
+    snprintf(dstfile, sizeof(dstfile), "%s/ppd/%s.ppd", ServerRoot,
+             printer->name);
+    unlink(dstfile);
+  }
 #ifdef HAVE_LIBZ
-  if (srcfile[0] && (fp = gzopen(srcfile, "rb")) != NULL)
+  else if (srcfile[0] && (fp = gzopen(srcfile, "rb")) != NULL)
 #else
-  if (srcfile[0] && (fp = fopen(srcfile, "rb")) != NULL)
+  else if (srcfile[0] && (fp = fopen(srcfile, "rb")) != NULL)
 #endif /* HAVE_LIBZ */
   {
    /*
@@ -1771,7 +1799,7 @@ check_quotas(client_t  *con,	/* I - Client connection */
   if (p->num_users)
   {
     for (i = 0; i < p->num_users; i ++)
-      if (strcmp(username, p->users[i]) == 0)
+      if (strcasecmp(username, p->users[i]) == 0)
 	break;
 
     if ((i < p->num_users) == p->deny_users)
@@ -1818,7 +1846,8 @@ check_quotas(client_t  *con,	/* I - Client connection */
 
 static void
 copy_attribute(ipp_t           *to,	/* O - Destination request/response */
-               ipp_attribute_t *attr)	/* I - Attribute to copy */
+               ipp_attribute_t *attr,	/* I - Attribute to copy */
+               int             quickcopy)/* I - Do a quick copy? */
 {
   int			i;		/* Looping var */
   ipp_attribute_t	*toattr;	/* Destination attribute */
@@ -1827,7 +1856,7 @@ copy_attribute(ipp_t           *to,	/* O - Destination request/response */
   LogMessage(L_DEBUG2, "copy_attribute(%p, %s)\n", to,
              attr->name ? attr->name : "(null)");
 
-  switch (attr->value_tag)
+  switch (attr->value_tag & ~IPP_TAG_COPY)
   {
     case IPP_TAG_ZERO :
         ippAddSeparator(to);
@@ -1860,12 +1889,19 @@ copy_attribute(ipp_t           *to,	/* O - Destination request/response */
     case IPP_TAG_LANGUAGE :
     case IPP_TAG_MIMETYPE :
         toattr = ippAddStrings(to, attr->group_tag,
-	                       (ipp_tag_t)(attr->value_tag | IPP_TAG_COPY),
-	                       attr->name, attr->num_values, NULL,
-			       NULL);
+	                       (ipp_tag_t)(attr->value_tag | quickcopy),
+	                       attr->name, attr->num_values, NULL, NULL);
 
-        for (i = 0; i < attr->num_values; i ++)
-	  toattr->values[i].string.text = attr->values[i].string.text;
+        if (quickcopy)
+	{
+          for (i = 0; i < attr->num_values; i ++)
+	    toattr->values[i].string.text = attr->values[i].string.text;
+        }
+	else
+	{
+          for (i = 0; i < attr->num_values; i ++)
+	    toattr->values[i].string.text = strdup(attr->values[i].string.text);
+	}
         break;
 
     case IPP_TAG_DATE :
@@ -1900,13 +1936,30 @@ copy_attribute(ipp_t           *to,	/* O - Destination request/response */
     case IPP_TAG_TEXTLANG :
     case IPP_TAG_NAMELANG :
         toattr = ippAddStrings(to, attr->group_tag,
-	                       (ipp_tag_t)(attr->value_tag | IPP_TAG_COPY),
+	                       (ipp_tag_t)(attr->value_tag | quickcopy),
 	                       attr->name, attr->num_values, NULL, NULL);
 
-        for (i = 0; i < attr->num_values; i ++)
+        if (quickcopy)
 	{
-          toattr->values[i].string.charset = attr->values[i].string.charset;
-	  toattr->values[i].string.text    = attr->values[i].string.text;
+          for (i = 0; i < attr->num_values; i ++)
+	  {
+            toattr->values[i].string.charset = attr->values[i].string.charset;
+	    toattr->values[i].string.text    = attr->values[i].string.text;
+          }
+        }
+	else
+	{
+          for (i = 0; i < attr->num_values; i ++)
+	  {
+	    if (!i)
+              toattr->values[i].string.charset =
+	          strdup(attr->values[i].string.charset);
+	    else
+              toattr->values[i].string.charset =
+	          toattr->values[0].string.charset;
+
+	    toattr->values[i].string.text = strdup(attr->values[i].string.text);
+          }
         }
         break;
 
@@ -1975,7 +2028,7 @@ copy_attrs(ipp_t           *to,		/* I - Destination request */
         continue;
     }
 
-    copy_attribute(to, fromattr);
+    copy_attribute(to, fromattr, IPP_TAG_COPY);
   }
 }
 
@@ -2198,7 +2251,8 @@ create_job(client_t        *con,	/* I - Client connection */
   if (attr == NULL)
     attr = ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_KEYWORD,
                         "job-hold-until", NULL, "no-hold");
-  if (attr != NULL && strcmp(attr->values[0].string.text, "no-hold") != 0)
+  if (attr != NULL && strcmp(attr->values[0].string.text, "no-hold") != 0 &&
+      !(printer->type & CUPS_PRINTER_REMOTE))
   {
    /*
     * Hold job until specified time...
@@ -2219,6 +2273,9 @@ create_job(client_t        *con,	/* I - Client connection */
 
     if ((attr = ippFindAttribute(job->attrs, "job-sheets", IPP_TAG_ZERO)) == NULL)
     {
+      LogMessage(L_DEBUG, "Adding default job-sheets values \"%s,%s\"...",
+                 printer->job_sheets[0], printer->job_sheets[1]);
+
       attr = ippAddStrings(job->attrs, IPP_TAG_JOB, IPP_TAG_NAME, "job-sheets",
                            2, NULL, NULL);
       attr->values[0].string.text = strdup(printer->job_sheets[0]);
@@ -2233,9 +2290,35 @@ create_job(client_t        *con,	/* I - Client connection */
 
     if (Classification[0])
     {
-      if (strcmp(attr->values[0].string.text, Classification) != 0 &&
-          (attr->num_values == 1 ||
-	   strcmp(attr->values[1].string.text, Classification) != 0))
+      if (ClassifyOverride)
+      {
+        if (strcmp(attr->values[0].string.text, "none") == 0 &&
+	    (attr->num_values == 1 ||
+	     strcmp(attr->values[1].string.text, "none") == 0))
+        {
+	 /*
+          * Force the leading banner to have the classification on it...
+	  */
+
+          free(attr->values[0].string.text);
+	  attr->values[0].string.text = strdup(Classification);
+	}
+	else if (attr->num_values == 2 &&
+	         strcmp(attr->values[0].string.text, attr->values[1].string.text) != 0 &&
+		 strcmp(attr->values[0].string.text, "none") != 0 &&
+		 strcmp(attr->values[1].string.text, "none") != 0)
+        {
+	 /*
+	  * Can't put two different security markings on the same document!
+	  */
+
+          free(attr->values[1].string.text);
+	  attr->values[1].string.text = strdup(attr->values[0].string.text);
+	}
+      }
+      else if (strcmp(attr->values[0].string.text, Classification) != 0 &&
+               (attr->num_values == 1 ||
+	       strcmp(attr->values[1].string.text, Classification) != 0))
       {
        /*
         * Force the leading banner to have the classification on it...
@@ -2254,6 +2337,8 @@ create_job(client_t        *con,	/* I - Client connection */
 
     UpdateQuota(printer, job->username, 0, kbytes);
   }
+  else if ((attr = ippFindAttribute(job->attrs, "job-sheets", IPP_TAG_ZERO)) != NULL)
+    job->sheets = attr;
 
  /*
   * Save and log the job...
@@ -2345,7 +2430,49 @@ copy_banner(client_t   *con,	/* I - Client connection */
   fchmod(fileno(out), 0640);
   fchown(fileno(out), User, Group);
 
-  if ((in = fopen(banner->filename, "r")) == NULL)
+  if (con->language)
+  {
+   /*
+    * Try the localized banner file under the subdirectory...
+    */
+
+    snprintf(filename, sizeof(filename), "%s/banners/%s/%s", DataDir,
+             con->language->language, name);
+
+    if (access(filename, 0) && con->language->language[2])
+    {
+     /*
+      * Wasn't able to find "ll_CC" locale file; try the non-national
+      * localization banner directory.
+      */
+
+      attrname[0] = con->language->language[0];
+      attrname[1] = con->language->language[1];
+      attrname[2] = '\0';
+
+      snprintf(filename, sizeof(filename), "%s/banners/%s/%s", DataDir,
+               attrname, name);
+    }
+
+    if (access(filename, 0))
+    {
+     /*
+      * Use the non-localized banner file.
+      */
+
+      snprintf(filename, sizeof(filename), "%s/banners/%s", DataDir, name);
+    }
+  }
+  else
+  {
+   /*
+    * Use the non-localized banner file.
+    */
+
+    snprintf(filename, sizeof(filename), "%s/banners/%s", DataDir, name);
+  }
+
+  if ((in = fopen(filename, "r")) == NULL)
   {
     fclose(out);
     unlink(filename);
@@ -2367,35 +2494,60 @@ copy_banner(client_t   *con,	/* I - Client connection */
       */
 
       for (s = attrname; (ch = getc(in)) != EOF;)
-        if (ch == '}' || isspace(ch))
+        if (!isalpha(ch) && ch != '-' && ch != '?')
           break;
 	else if (s < (attrname + sizeof(attrname) - 1))
           *s++ = ch;
+	else
+	  break;
 
-      if (isspace(ch) && s == attrname)
+      *s = '\0';
+
+      if (ch != '}')
       {
        /*
-        * Ignore { followed by whitespace...
+        * Ignore { followed by stuff that is not an attribute name...
 	*/
 
         putc('{', out);
+	fputs(attrname, out);
 	putc(ch, out);
 	continue;
       }
-
-      *s = '\0';
 
      /*
       * See if it is defined...
       */
 
-      if (strcmp(attrname, "printer-name") == 0)
+      if (attrname[0] == '?')
+        s = attrname + 1;
+      else
+        s = attrname;
+
+      if (strcmp(s, "printer-name") == 0)
       {
         fputs(job->dest, out);
 	continue;
       }
-      else if ((attr = ippFindAttribute(job->attrs, attrname, IPP_TAG_ZERO)) == NULL)
-        continue; /* Nope */
+      else if ((attr = ippFindAttribute(job->attrs, s, IPP_TAG_ZERO)) == NULL)
+      {
+       /*
+        * See if we have a leading question mark...
+	*/
+
+	if (attrname[0] != '?')
+	{
+	 /*
+          * Nope, write to file as-is; probably a PostScript procedure...
+	  */
+
+	  putc('{', out);
+	  fputs(attrname, out);
+	  putc('}', out);
+        }
+
+        continue;
+      }
 
      /*
       * Output value(s)...
@@ -2623,10 +2775,14 @@ delete_printer(client_t        *con,	/* I - Client connection */
     printer = FindPrinter(dest);
 
  /*
-  * Remove any old PPD or script files...
+  * Remove old jobs...
   */
 
   CancelJobs(dest);
+
+ /*
+  * Remove any old PPD or script files...
+  */
 
   snprintf(filename, sizeof(filename), "%s/interfaces/%s", ServerRoot, dest);
   unlink(filename);
@@ -3130,6 +3286,10 @@ get_printers(client_t *con,		/* I - Client connection */
   int			printer_type,	/* printer-type attribute */
 			printer_mask;	/* printer-type-mask attribute */
   char			*location;	/* Location string */
+  char			name[IPP_MAX_NAME],
+					/* Printer name */
+			*nameptr;	/* Pointer into name */
+  printer_t		*iclass;	/* Implicit class */
 
 
   LogMessage(L_DEBUG2, "get_printers(%d, %x)\n", con->http.fd, type);
@@ -3178,6 +3338,45 @@ get_printers(client_t *con,		/* I - Client connection */
         (printer->type & printer_mask) == printer_type &&
 	(location == NULL || strcasecmp(printer->location, location) == 0))
     {
+     /*
+      * If HideImplicitMembers is enabled, see if this printer or class
+      * is a member of an implicit class...
+      */
+
+      if (ImplicitClasses && HideImplicitMembers &&
+          (printer->type & CUPS_PRINTER_REMOTE))
+      {
+       /*
+        * Make a copy of the printer name...
+	*
+	* Note: name and printer->name are both IPP_MAX_NAME characters
+	*       in size, so strcpy() is safe...
+	*/
+
+        strcpy(name, printer->name);
+
+	if ((nameptr = strchr(name, '@')) != NULL)
+	{
+	 /*
+	  * Strip trailing @server...
+	  */
+
+	  *nameptr = '\0';
+
+         /*
+	  * Find the core printer, if any...
+	  */
+
+          if ((iclass = FindPrinter(name)) != NULL &&
+	      (iclass->type & CUPS_PRINTER_IMPLICIT))
+	    continue;
+	}
+      }
+
+     /*
+      * Add the group separator as needed...
+      */
+
       if (count > 0)
         ippAddSeparator(con->response);
 
@@ -3372,7 +3571,7 @@ hold_job(client_t        *con,	/* I - Client connection */
 
 
 /*
- * 'move_job()' - Set job attributes.
+ * 'move_job()' - Move a job to a new destination.
  */
 
 static void
@@ -3869,7 +4068,8 @@ print_job(client_t        *con,		/* I - Client connection */
     attr = ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_KEYWORD,
                         "job-hold-until", NULL, "no-hold");
 
-  if (attr != NULL && strcmp(attr->values[0].string.text, "no-hold") != 0)
+  if (attr != NULL && strcmp(attr->values[0].string.text, "no-hold") != 0 &&
+      !(printer->type & CUPS_PRINTER_REMOTE))
   {
    /*
     * Hold job until specified time...
@@ -3887,6 +4087,9 @@ print_job(client_t        *con,		/* I - Client connection */
 
     if ((attr = ippFindAttribute(job->attrs, "job-sheets", IPP_TAG_ZERO)) == NULL)
     {
+      LogMessage(L_DEBUG, "Adding default job-sheets values \"%s,%s\"...",
+                 printer->job_sheets[0], printer->job_sheets[1]);
+
       attr = ippAddStrings(job->attrs, IPP_TAG_JOB, IPP_TAG_NAME, "job-sheets",
                            2, NULL, NULL);
       attr->values[0].string.text = strdup(printer->job_sheets[0]);
@@ -3901,9 +4104,35 @@ print_job(client_t        *con,		/* I - Client connection */
 
     if (Classification[0])
     {
-      if (strcmp(attr->values[0].string.text, Classification) != 0 &&
-          (attr->num_values == 1 ||
-	   strcmp(attr->values[1].string.text, Classification) != 0))
+      if (ClassifyOverride)
+      {
+        if (strcmp(attr->values[0].string.text, "none") == 0 &&
+	    (attr->num_values == 1 ||
+	     strcmp(attr->values[1].string.text, "none") == 0))
+        {
+	 /*
+          * Force the leading banner to have the classification on it...
+	  */
+
+          free(attr->values[0].string.text);
+	  attr->values[0].string.text = strdup(Classification);
+	}
+	else if (attr->num_values == 2 &&
+	         strcmp(attr->values[0].string.text, attr->values[1].string.text) != 0 &&
+		 strcmp(attr->values[0].string.text, "none") != 0 &&
+		 strcmp(attr->values[1].string.text, "none") != 0)
+        {
+	 /*
+	  * Can't put two different security markings on the same document!
+	  */
+
+          free(attr->values[1].string.text);
+	  attr->values[1].string.text = strdup(attr->values[0].string.text);
+	}
+      }
+      else if (strcmp(attr->values[0].string.text, Classification) != 0 &&
+               (attr->num_values == 1 ||
+	       strcmp(attr->values[1].string.text, Classification) != 0))
       {
        /*
         * Force the leading banner to have the classification on it...
@@ -3922,6 +4151,8 @@ print_job(client_t        *con,		/* I - Client connection */
 
     UpdateQuota(printer, job->username, 0, kbytes);
   }
+  else if ((attr = ippFindAttribute(job->attrs, "job-sheets", IPP_TAG_ZERO)) != NULL)
+    job->sheets = attr;
    
  /*
   * Add the job file...
@@ -4981,7 +5212,7 @@ set_job_attrs(client_t        *con,	/* I - Client connection */
       * Then copy the attribute...
       */
 
-      copy_attribute(job->attrs, attr);
+      copy_attribute(job->attrs, attr, 0);
 
      /*
       * See if the job-name or job-hold-until is being changed.
@@ -5027,7 +5258,7 @@ set_job_attrs(client_t        *con,	/* I - Client connection */
       * Add new option by copying it...
       */
 
-      copy_attribute(job->attrs, attr);
+      copy_attribute(job->attrs, attr, 0);
     }
   }
 
@@ -5356,7 +5587,7 @@ validate_user(client_t   *con,		/* I - Client connection */
               char       *username,	/* O - Authenticated username */
 	      int        userlen)	/* I - Length of username */
 {
-  int			i;		/* Looping var */
+  int			i, j;		/* Looping vars */
   ipp_attribute_t	*attr;		/* requesting-user-name attribute */
   struct passwd		*user;		/* User info */
   struct group		*group;		/* System group info */
@@ -5389,7 +5620,7 @@ validate_user(client_t   *con,		/* I - Client connection */
   * Check the username against the owner...
   */
 
-  if (strcmp(username, owner) != 0 && strcmp(username, "root") != 0)
+  if (strcasecmp(username, owner) != 0 && strcasecmp(username, "root") != 0)
   {
    /*
     * Not the owner or root; check to see if the user is a member of the
@@ -5399,20 +5630,26 @@ validate_user(client_t   *con,		/* I - Client connection */
     user = getpwnam(username);
     endpwent();
 
-    group = getgrnam(SystemGroup);
-    endgrent();
-
-    if (group != NULL)
+    for (i = 0, j = 0, group = NULL; i < NumSystemGroups; i ++)
     {
-      for (i = 0; group->gr_mem[i]; i ++)
-        if (strcmp(username, group->gr_mem[i]) == 0)
+      group = getgrnam(SystemGroups[i]);
+      endgrent();
+
+      if (group != NULL)
+      {
+	for (j = 0; group->gr_mem[j]; j ++)
+          if (strcasecmp(username, group->gr_mem[j]) == 0)
+	    break;
+
+        if (group->gr_mem[j])
 	  break;
+      }
+      else
+	j = 0;
     }
-    else
-      i = 0;
 
     if (user == NULL || group == NULL ||
-        (group->gr_mem[i] == NULL && group->gr_gid != user->pw_gid))
+        (group->gr_mem[j] == NULL && group->gr_gid != user->pw_gid))
     {
      /*
       * Username not found, group not found, or user is not part of the
@@ -5428,5 +5665,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.127.2.2 2001/05/13 18:38:35 mike Exp $".
+ * End of "$Id: ipp.c,v 1.127.2.3 2001/12/26 16:52:53 mike Exp $".
  */

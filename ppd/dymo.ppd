@@ -1,6 +1,6 @@
 *PPD-Adobe: "4.3"
 *%
-*% "$Id: dymo.ppd,v 1.4 2001/07/18 18:18:30 mike Exp $"
+*% "$Id: dymo.ppd,v 1.4.2.1 2001/12/26 16:52:47 mike Exp $"
 *%
 *%   Sample DYMO label printer driver PPD file for the Common UNIX Printing
 *%   System (CUPS).
@@ -151,5 +151,5 @@
 *Font ZapfChancery-MediumItalic: Standard "(001.007S)" Standard ROM
 *Font ZapfDingbats: Special "(001.004S)" Standard ROM
 *%
-*% End of "$Id: dymo.ppd,v 1.4 2001/07/18 18:18:30 mike Exp $".
+*% End of "$Id: dymo.ppd,v 1.4.2.1 2001/12/26 16:52:47 mike Exp $".
 *%

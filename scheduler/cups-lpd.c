@@ -1,5 +1,5 @@
 /*
- * "$Id: cups-lpd.c,v 1.24.2.2 2001/05/13 18:38:34 mike Exp $"
+ * "$Id: cups-lpd.c,v 1.24.2.3 2001/12/26 16:52:51 mike Exp $"
  *
  *   Line Printer Daemon interface for the Common UNIX Printing System (CUPS).
  *
@@ -43,6 +43,8 @@
 #include <errno.h>
 #include <syslog.h>
 #include <ctype.h>
+#include <unistd.h>
+#include <fcntl.h>
 
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -228,28 +230,26 @@ main(int  argc,			/* I - Number of command-line arguments */
 
     case 0x02 : /* Receive a printer job */
         syslog(LOG_INFO, "Receive print job for %s", dest);
-	putchar(0);
+        /* recv_print_job() sends initial status byte */
 
         status = recv_print_job(dest, num_defaults, defaults);
 	break;
 
     case 0x03 : /* Send queue state (short) */
         syslog(LOG_INFO, "Send queue state (short) for %s %s", dest, list);
-	putchar(0);
+	/* send_state() sends initial status byte */
 
         status = send_state(dest, list, 0);
 	break;
 
     case 0x04 : /* Send queue state (long) */
         syslog(LOG_INFO, "Send queue state (long) for %s %s", dest, list);
-	putchar(0);
+	/* send_state() sends initial status byte */
 
         status = send_state(dest, list, 1);
 	break;
 
     case 0x05 : /* Remove jobs */
-	putchar(0);
-
        /*
         * Grab the agent and skip to the list of users and/or jobs.
 	*/
@@ -263,6 +263,8 @@ main(int  argc,			/* I - Number of command-line arguments */
         syslog(LOG_INFO, "Remove jobs %s on %s by %s", list, dest, agent);
 
         status = remove_jobs(dest, agent, list);
+
+	putchar(status);
 	break;
   }
 
@@ -282,7 +284,7 @@ print_file(const char    *name,		/* I - Printer or class name */
            const char    *file,		/* I - File to print */
            const char    *title,	/* I - Title of job */
            const char    *docname,	/* I - Name of job file */
-           const char    *user,		/* I - Title of job */
+           const char    *user,		/* I - Owner of job */
            int           num_options,	/* I - Number of options */
 	   cups_option_t *options)	/* I - Options */
 {
@@ -365,14 +367,20 @@ print_file(const char    *name,		/* I - Printer or class name */
   else
     jobid = attr->values[0].integer;
 
+  if (jobid)
+    syslog(LOG_INFO, "Print file - job ID = %d", jobid);
+  else if (response)
+    syslog(LOG_ERR, "Unable to print file - %s",
+           ippErrorString(response->request.status.status_code));
+  else
+    syslog(LOG_ERR, "Unable to print file - %s",
+           ippErrorString(cupsLastError()));
+
   if (response != NULL)
     ippDelete(response);
 
   httpClose(http);
   cupsLangFree(language);
-
-  if (jobid)
-    syslog(LOG_INFO, "Print file - job ID = %d", jobid);
 
   return (jobid);
 }
@@ -416,6 +424,9 @@ recv_print_job(const char    *dest,	/* I - Destination */
 
   status   = 0;
   num_data = 0;
+  fd       = -1;
+
+  control[0] = '\0';
 
   strncpy(queue, dest, sizeof(queue) - 1);
   queue[sizeof(queue) - 1] = '\0';
@@ -432,8 +443,13 @@ recv_print_job(const char    *dest,	/* I - Destination */
       syslog(LOG_ERR, "Unknown destination %s!", queue);
 
     cupsFreeDests(num_dests, dests);
+
+    putchar(1);
+
     return (1);
   }
+  else
+    putchar(0);
 
   while (smart_gets(line, sizeof(line), stdin) != NULL)
   {
@@ -465,16 +481,38 @@ recv_print_job(const char    *dest,	/* I - Destination */
 	    break;
 	  }
 
-          if ((fd = cupsTempFd(control, sizeof(control))) < 0)
+          if (control[0])
 	  {
-	    syslog(LOG_ERR, "Unable to open temporary control file - %s",
-        	   strerror(errno));
-	    putchar(1);
-	    status = 1;
-	    break;
-	  }
+	   /*
+	    * Append to the existing control file - the LPD spec is
+	    * not entirely clear, but at least the OS/2 LPD code sends
+	    * multiple control files per connection...
+	    */
 
-	  strcpy(filename, control);
+	    if ((fd = open(control, O_WRONLY)) < 0)
+	    {
+	      syslog(LOG_ERR, "Unable to append to temporary control file - %s",
+        	     strerror(errno));
+	      putchar(1);
+	      status = 1;
+	      break;
+	    }
+
+	    lseek(fd, 0, SEEK_END);
+          }
+	  else
+	  {
+	    if ((fd = cupsTempFd(control, sizeof(control))) < 0)
+	    {
+	      syslog(LOG_ERR, "Unable to open temporary control file - %s",
+        	     strerror(errno));
+	      putchar(1);
+	      status = 1;
+	      break;
+	    }
+
+	    strcpy(filename, control);
+	  }
 	  break;
       case 0x03 : /* Receive data file */
           if (strlen(name) < 2)
@@ -649,13 +687,14 @@ recv_print_job(const char    *dest,	/* I - Destination */
 	  case 't' : /* Print troff output file */
 	  case 'v' : /* Print raster file */
 	     /*
-	      * Verify that we have a username...
+	      * Check that we have a username...
 	      */
 
 	      if (!user[0])
 	      {
-	        status = 1;
-		break;
+		syslog(LOG_WARNING, "No username specified by client! "
+		                    "Using \"anonymous\"...");
+		strcpy(user, "anonymous");
 	      }
 
              /*
@@ -765,7 +804,10 @@ remove_jobs(const char *dest,		/* I - Destination */
 
   if ((http = httpConnectEncrypt(cupsServer(), ippPort(),
                                  cupsEncryption())) == NULL)
+  {
+    syslog(LOG_ERR, "Unable to connect to server: %s", strerror(errno));
     return (1);
+  }
 
   language = cupsLangDefault();
 
@@ -849,7 +891,7 @@ remove_jobs(const char *dest,		/* I - Destination */
 
 
 /*
- * 'send_short_state()' - Send the short queue state.
+ * 'send_state()' - Send the queue state.
  */
 
 int					/* O - Command status */
@@ -919,7 +961,11 @@ send_state(const char *dest,		/* I - Destination */
 
   if ((http = httpConnectEncrypt(cupsServer(), ippPort(),
                                  cupsEncryption())) == NULL)
+  {
+    syslog(LOG_ERR, "Unable to connect to server: %s", strerror(errno));
+    putchar(1);
     return (1);
+  }
 
  /*
   * Build an IPP_GET_PRINTER_ATTRIBUTES request, which requires the following
@@ -961,8 +1007,11 @@ send_state(const char *dest,		/* I - Destination */
       syslog(LOG_WARNING, "Unable to get printer list: %s\n",
              ippErrorString(response->request.status.status_code));
       ippDelete(response);
+      putchar(1);
       return (1);
     }
+    else
+      putchar(0);
 
     if ((attr = ippFindAttribute(response, "printer-state", IPP_TAG_ENUM)) != NULL)
       state = (ipp_pstate_t)attr->values[0].integer;
@@ -988,6 +1037,7 @@ send_state(const char *dest,		/* I - Destination */
   {
     syslog(LOG_WARNING, "Unable to get printer list: %s\n",
            ippErrorString(cupsLastError()));
+    putchar(1);
     return (1);
   }
 
@@ -1238,5 +1288,5 @@ smart_gets(char *s,	/* I - Pointer to line buffer */
 
 
 /*
- * End of "$Id: cups-lpd.c,v 1.24.2.2 2001/05/13 18:38:34 mike Exp $".
+ * End of "$Id: cups-lpd.c,v 1.24.2.3 2001/12/26 16:52:51 mike Exp $".
  */

@@ -1,5 +1,5 @@
 #
-# "$Id: mime.types,v 1.17.2.1 2001/05/13 18:38:02 mike Exp $"
+# "$Id: mime.types,v 1.17.2.2 2001/12/26 16:52:09 mike Exp $"
 #
 #   MIME types file for the Common UNIX Printing System (CUPS).
 #
@@ -131,6 +131,7 @@ text/plain			txt printable(0,1024)
 application/vnd.cups-form	string(0,"<CUPSFORM>")
 application/vnd.cups-postscript	string(0,<1B>%-12345X) + \
 				(contains(9,512,"LANGUAGE=POSTSCRIPT") \
+				 contains(9,512,"LANGUAGE = Postscript") \
 				 contains(9,512,"LANGUAGE = POSTSCRIPT"))
 application/vnd.cups-raster	string(0,"RaSt") string(0,"tSaR")
 application/vnd.cups-raw	(string(0,<1B>E) + !string(2,<1B>%0B)) \
@@ -151,5 +152,5 @@ application/vnd.cups-raw	(string(0,<1B>E) + !string(2,<1B>%0B)) \
 #application/octet-stream
 
 #
-# End of "$Id: mime.types,v 1.17.2.1 2001/05/13 18:38:02 mike Exp $".
+# End of "$Id: mime.types,v 1.17.2.2 2001/12/26 16:52:09 mike Exp $".
 #

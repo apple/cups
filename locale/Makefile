@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.8 2000/07/07 17:02:44 mike Exp $"
+# "$Id: Makefile,v 1.8.2.1 2001/12/26 16:52:40 mike Exp $"
 #
 #   Locale file makefile for the Common UNIX Printing System (CUPS).
 #
@@ -28,7 +28,7 @@ include ../Makedefs
 # Locales...
 #
 
-LOCALES	=	C de en es fr it
+LOCALES	=	C cs de en es fr it
 
 
 #
@@ -50,13 +50,9 @@ clean:
 #
 
 install:
-	-$(MKDIR) $(LOCALEDIR)
-	$(CHMOD) ugo+rx $(LOCALEDIR)
+	$(INSTALL_DIR) $(LOCALEDIR)
 	for dir in $(LOCALES) ; do \
-		if test ! -d $(LOCALEDIR)/$$dir ; then \
-			$(MKDIR) $(LOCALEDIR)/$$dir ; \
-			$(CHMOD) ugo+rx $(LOCALEDIR)/$$dir ; \
-		fi ; \
+		$(INSTALL_DIR) $(LOCALEDIR)/$$dir ; \
 		$(INSTALL_DATA) $$dir/cups_$$dir $(LOCALEDIR)/$$dir ; \
 	done
 
@@ -76,5 +72,5 @@ translate.o:	../cups/http.h
 
 
 #
-# End of "$Id: Makefile,v 1.8 2000/07/07 17:02:44 mike Exp $".
+# End of "$Id: Makefile,v 1.8.2.1 2001/12/26 16:52:40 mike Exp $".
 #

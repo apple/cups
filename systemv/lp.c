@@ -1,5 +1,5 @@
 /*
- * "$Id: lp.c,v 1.29.2.1 2001/05/13 18:38:40 mike Exp $"
+ * "$Id: lp.c,v 1.29.2.2 2001/12/26 16:52:56 mike Exp $"
  *
  *   "lp" command for the Common UNIX Printing System (CUPS).
  *
@@ -375,8 +375,9 @@ main(int  argc,		/* I - Number of command-line arguments */
 	    if (strcmp(val, "hold") == 0)
               num_options = cupsAddOption("job-hold-until", "indefinite",
 	                                  num_options, &options);
-	    if (strcmp(val, "resume") == 0)
-              num_options = cupsAddOption("job-hold-until", "none",
+	    else if (strcmp(val, "resume") == 0 ||
+	             strcmp(val, "release") == 0)
+              num_options = cupsAddOption("job-hold-until", "no-hold",
 	                                  num_options, &options);
 	    else if (strcmp(val, "immediate") == 0)
               num_options = cupsAddOption("job-priority", "100",
@@ -529,7 +530,7 @@ main(int  argc,		/* I - Number of command-line arguments */
       return (1);
     }
 
-    while ((i = fread(buffer, 1, sizeof(buffer), stdin)) > 0)
+    while ((i = read(0, buffer, sizeof(buffer))) > 0)
       write(temp, buffer, i);
 
     i = lseek(temp, 0, SEEK_CUR);
@@ -556,8 +557,7 @@ main(int  argc,		/* I - Number of command-line arguments */
     return (1);
   }
   else if (!silent)
-    fprintf(stderr, "request id is %s-%d (%d file(s))\n", printer, job_id,
-            num_files);
+    printf("request id is %s-%d (%d file(s))\n", printer, job_id, num_files);
 
   return (0);
 }
@@ -650,5 +650,5 @@ sighandler(int s)	/* I - Signal number */
 
 
 /*
- * End of "$Id: lp.c,v 1.29.2.1 2001/05/13 18:38:40 mike Exp $".
+ * End of "$Id: lp.c,v 1.29.2.2 2001/12/26 16:52:56 mike Exp $".
  */

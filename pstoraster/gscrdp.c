@@ -22,7 +22,7 @@
   GNU software to build or run it.
 */
 
-/*$Id: gscrdp.c,v 1.2 2000/10/13 01:04:41 mike Exp $ */
+/*$Id: gscrdp.c,v 1.2.2.1 2001/12/26 16:52:49 mike Exp $ */
 /* CIE color rendering dictionary creation */
 #include "math_.h"
 #include "memory_.h"
@@ -34,6 +34,7 @@
 #include "gscolor2.h"		/* for gs_set/currentcolorrendering */
 #include "gscrdp.h"
 #include "gxarith.h"
+#include "gsmalloc.h"
 
 /* Define the CRD type that we use here. */
 #define CRD_TYPE 101

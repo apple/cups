@@ -1,5 +1,5 @@
 /*
- * "$Id: admin.c,v 1.22.2.1 2001/05/13 18:38:01 mike Exp $"
+ * "$Id: admin.c,v 1.22.2.2 2001/12/26 16:52:08 mike Exp $"
  *
  *   Administration CGI for the Common UNIX Printing System (CUPS).
  *
@@ -549,7 +549,8 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
   else
     oldinfo = NULL;
 
-  if ((name = cgiGetVariable("PRINTER_NAME")) == NULL)
+  if ((name = cgiGetVariable("PRINTER_NAME")) == NULL ||
+      cgiGetVariable("PRINTER_LOCATION") == NULL)
   {
     if (modify)
     {
@@ -1594,5 +1595,5 @@ get_line(char *buf,	/* I - Line buffer */
 
 
 /*
- * End of "$Id: admin.c,v 1.22.2.1 2001/05/13 18:38:01 mike Exp $".
+ * End of "$Id: admin.c,v 1.22.2.2 2001/12/26 16:52:08 mike Exp $".
  */

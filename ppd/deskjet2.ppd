@@ -1,6 +1,6 @@
 *PPD-Adobe: "4.3"
 *%
-*% "$Id: deskjet2.ppd,v 1.1.2.1 2001/05/13 18:38:30 mike Exp $"
+*% "$Id: deskjet2.ppd,v 1.1.2.2 2001/12/26 16:52:47 mike Exp $"
 *%
 *%   Second sample HP DeskJet driver PPD file for the Common UNIX Printing
 *%   System (CUPS).
@@ -161,7 +161,7 @@
 *CloseUI: *ColorModel
 
 *OpenUI *Duplex/Double-Sided Printing: PickOne
-*OrderDependency: 20 AnySetup *Duplex
+*OrderDependency: 20 PageSetup *Duplex
 *DefaultDuplex: None
 *Duplex None/Off:	"<</Duplex false>>setpagedevice"
 *Duplex DuplexNoTumble/Long Edge (Standard):	"<</Duplex true/Tumble false>>setpagedevice"
@@ -213,5 +213,5 @@
 *Font ZapfChancery-MediumItalic: Standard "(001.007S)" Standard ROM
 *Font ZapfDingbats: Special "(001.004S)" Standard ROM
 *%
-*% End of "$Id: deskjet2.ppd,v 1.1.2.1 2001/05/13 18:38:30 mike Exp $".
+*% End of "$Id: deskjet2.ppd,v 1.1.2.2 2001/12/26 16:52:47 mike Exp $".
 *%

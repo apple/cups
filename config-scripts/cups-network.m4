@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-network.m4,v 1.1 2001/06/27 19:06:45 mike Exp $"
+dnl "$Id: cups-network.m4,v 1.1.2.1 2001/12/26 16:52:10 mike Exp $"
 dnl
 dnl   Networking stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -32,5 +32,5 @@ fi
 AC_SUBST(NETLIBS)
 
 dnl
-dnl End of "$Id: cups-network.m4,v 1.1 2001/06/27 19:06:45 mike Exp $".
+dnl End of "$Id: cups-network.m4,v 1.1.2.1 2001/12/26 16:52:10 mike Exp $".
 dnl

@@ -17,12 +17,12 @@ General Public License ("GPL") and GNU Library General Public License
 
 The GNU LGPL applies to the CUPS API library, located in the "cups"
 subdirectory of the CUPS source distribution and in the "/usr/include/cups"
-directory and "libcups.a", "libcups.sl", or "libcups.so" files in the binary
-distributions.
+directory and "libcups.a", "libcups_s.a", "libcups.sl", or "libcups.so"
+files in the binary distributions.
 
 The GNU GPL applies to the remainder of the CUPS distribution, including the
 "pstoraster" filter which is based upon GNU Ghostscript 5.50 and the
-"pdftops" filter which is based upon Xpdf 0.90.
+"pdftops" filter which is based upon Xpdf 0.93a.
 
 For those not familiar with the GNU GPL, the license basically allows you
 to:
@@ -75,7 +75,7 @@ contact:
      Fax: +1.415.492.9862
      EMail: info@arsoft.com
 
-The "pdftops" filter is based on the Xpdf 0.90 software. For binary
+The "pdftops" filter is based on the Xpdf 0.93a software. For binary
 distribution licensing of this software, please contact:
 
      Derek B. Noonburg

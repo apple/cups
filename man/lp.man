@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: lp.man,v 1.6 2001/03/09 14:26:54 mike Exp $"
+.\" "$Id: lp.man,v 1.6.2.1 2001/12/26 16:52:41 mike Exp $"
 .\"
 .\"   lp/cancel man page for the Common UNIX Printing System (CUPS).
 .\"
@@ -21,7 +21,7 @@
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
-.TH lp 1 "Common UNIX Printing System" "23 January 2001" "Easy Software Products"
+.TH lp 1 "Common UNIX Printing System" "25 September 2001" "Easy Software Products"
 .SH NAME
 lp \- print files
 .br
@@ -36,7 +36,7 @@ cancel \- cancel jobs
 .I num-copies
 [ \-o
 .I option
-] [ \-p/q
+] [ \-q
 .I priority
 ] [ \-s ] [ \-t
 .I title
@@ -57,7 +57,7 @@ cancel \- cancel jobs
 .I num-copies
 [ \-o
 .I option
-] [ \-p/q
+] [ \-q
 .I priority
 ] [ \-t
 .I title
@@ -114,10 +114,10 @@ Sets the number of copies to print from 1 to 100.
 .br
 Sets a job option.
 .TP 5
-\-p/q \fIpriority\fR
+\-q \fIpriority\fR
 .br
-Sets the job priority from 1 (lowest) to 100 (highest). The default priority
-is 50.
+Sets the job priority from 1 (lowest) to 100 (highest). The
+default priority is 50.
 .TP 5
 \-s
 .br
@@ -145,6 +145,10 @@ any printable character except SPACE and TAB. Also, printer and class names are
 \fBnot\fR case-sensitive. 
 .LP
 The "m" option is not functional in CUPS 1.1.
+.LP
+The "q" option accepts a different range of values than the
+Solaris lp command, matching the IPP job priority values (1-100)
+instead of the Solaris values (0-39).
 .SH SEE ALSO
 lpstat(1),
 CUPS Software Users Manual,
@@ -152,5 +156,5 @@ http://localhost:631/documentation.html
 .SH COPYRIGHT
 Copyright 1993-2001 by Easy Software Products, All Rights Reserved.
 .\"
-.\" End of "$Id: lp.man,v 1.6 2001/03/09 14:26:54 mike Exp $".
+.\" End of "$Id: lp.man,v 1.6.2.1 2001/12/26 16:52:41 mike Exp $".
 .\"

@@ -1633,6 +1633,18 @@ resolution is enabled.  The localhost address (127.0.0.1) is
 printing text files. Only the values 6 and 8 are currently supported.
 The default value is 6.
 
+<H3>natural-scaling (integer(1:1000))</H3>
+
+<P><I>(CUPS 1.1.9 and higher)</I>
+
+<P>The natural-scaling attribute specifies the scaling of image files with
+respect to the natural image size. A value of 100 specifies that the image
+file should exactly the natural size, while 50 is half the natural size
+and 200 is twice the natural size. The default value is 100.
+
+<P>The ppi option can be used to override the natural resolution of the
+image, which controls the natural size.
+
 <H3>page-bottom (integer(0:MAX))</H3>
 
 <P>The page-bottom attribute specifies the bottom margin in points (72 points

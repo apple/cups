@@ -2,7 +2,7 @@
 <HEAD>
 	<META NAME="Description" CONTENT="Common UNIX Printing System Software Users Manual">
 	<META NAME="COPYRIGHT" CONTENT="Copyright 1997-2001, All Rights Reserved">
-	<META NAME="DOCNUMBER" CONTENT="CUPS-SUM-1.1.7">
+	<META NAME="DOCNUMBER" CONTENT="CUPS-SUM-1.2.0">
 	<META NAME="Author" CONTENT="Easy Software Products">
 	<TITLE>CUPS Software Users Manual</TITLE>
 </HEAD>
@@ -11,7 +11,7 @@
 <H1 ALIGN="RIGHT">Preface</H1>
 
 <P>This software users manual describes how to use the Common UNIX Printing
-System<SUP>TM</SUP> ("CUPS<SUP>TM</SUP>") Version 1.1.7.
+System<SUP>TM</SUP> ("CUPS<SUP>TM</SUP>") Version 1.2.0.
 
 <EMBED SRC="system-overview.shtml">
 
@@ -592,26 +592,35 @@ image on the page:
 
 <H3>Scaling the Image</H3>
 
-<P>The <CODE>-o scaling=percent</CODE> and <CODE>-o ppi=value</CODE>
+<P>The <CODE>-o scaling=percent</CODE>, <CODE>-o
+ppi=value</CODE>, and <CODE>-o natural-scaling=percent</CODE>
 options change the size of a printed image:
 
 <UL><PRE>
 <B>lp -o scaling=<I>percent</I> filename ENTER</B>
 <B>lp -o ppi=<I>value</I> filename ENTER</B>
-<B>lpr -o ppi=<I>value</I> filename ENTER</B>
+<B>lpr -o natural-scaling=<I>percent</I> filename ENTER</B>
 </PRE></UL>
 
-<P>The <CODE>percent</CODE> value is a number from 1 to 800
+<P>The <CODE>scaling=percent</CODE> value is a number from 1 to 800
 specifying the size in relation to the page (<I>not</I> the image.) A
 scaling of 100 percent will fill the page as completely as the image
 aspect ratio allows. A scaling of 200 percent will print on up to 4
 pages.
 
-<P>The ppi <CODE>value</CODE> is a number from 1 to 1200 specifying the
+<P>The <CODE>ppi=value</CODE> value is a number from 1 to 1200 specifying the
 resolution of the image in pixels per inch. An image that is 3000x2400
 pixels will print 10x8 inches at 300 pixels per inch, for example. If
 the specified resolution makes the image larger than the page, multiple
 pages will be printed to satisfy the request.
+
+<P>The <CODE>natural-scaling=percent</CODE> value is a number
+from 1 to 800 specifying the size in relation to the natural
+image size. A scaling of 100 percent will print the image at its
+natural size, while a scaling of 50 percent will print the image
+at half its natural size. If the specified scaling makes the
+image larger than the page, multiple pages will be printed to
+satisfy the request.
 
 <H3>Adjusting the Hue (Tint) of an Image</H3>
 

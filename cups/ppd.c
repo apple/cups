@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c,v 1.51.2.2 2001/05/13 18:38:04 mike Exp $"
+ * "$Id: ppd.c,v 1.51.2.3 2001/12/26 16:52:13 mike Exp $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -284,12 +284,16 @@ ppd_get_group(ppd_file_t *ppd,	/* I - PPD file */
   ppd_group_t	*group;		/* Group */
 
 
+  DEBUG_printf(("ppd_get_group(%p, \"%s\")\n", ppd, name));
+
   for (i = ppd->num_groups, group = ppd->groups; i > 0; i --, group ++)
     if (strcmp(group->text, name) == 0)
       break;
 
   if (i == 0)
   {
+    DEBUG_printf(("Adding group %s...\n", name));
+
     if (ppd->num_groups == 0)
       group = malloc(sizeof(ppd_group_t));
     else
@@ -524,6 +528,21 @@ ppdOpen(FILE *fp)		/* I - File to read from */
 
     puts("");
 #endif /* DEBUG */
+
+    if (strcmp(keyword, "CloseUI") != 0 &&
+        strcmp(keyword, "JCLCloseUI") != 0 &&
+        strcmp(keyword, "CloseGroup") != 0 &&
+	strcmp(keyword, "CloseSubGroup") != 0 &&
+	strncmp(keyword, "Default", 7) != 0 &&
+	string == NULL)
+    {
+     /*
+      * Need a string value!
+      */
+
+      ppdClose(ppd);
+      return (NULL);
+    }
 
     if (strcmp(keyword, "LanguageLevel") == 0)
       ppd->language_level = atoi(string);
@@ -916,13 +935,13 @@ ppdOpen(FILE *fp)		/* I - File to read from */
       */
 
       if (name[0] == '*')
-        strcpy(name, name + 1);
+        strcpy(name, name + 1); /* Eliminate leading asterisk */
 
-      if (string == NULL)
-      {
-        ppdClose(ppd);
-	return (NULL);
-      }
+      for (i = strlen(name) - 1; i > 0 && isspace(name[i]); i --)
+        name[i] = '\0'; /* Eliminate trailing spaces */
+
+      DEBUG_printf(("OpenUI of %s in group %s...\n", name,
+                    group ? group->text : "(null)"));
 
       if (subgroup != NULL)
         option = ppd_get_option(subgroup, name);
@@ -951,6 +970,7 @@ ppdOpen(FILE *fp)		/* I - File to read from */
 	  return (NULL);
 	}
 
+        DEBUG_printf(("Adding to group %s...\n", group->text));
         option = ppd_get_option(group, name);
 	group  = NULL;
       }
@@ -1245,14 +1265,40 @@ ppdOpen(FILE *fp)		/* I - File to read from */
     }
     else if (strcmp(keyword, "PaperDimension") == 0)
     {
-      if ((size = ppdPageSize(ppd, name)) != NULL)
-        sscanf(string, "%f%f", &(size->width), &(size->length));
+      if ((size = ppdPageSize(ppd, name)) == NULL)
+	size = ppd_add_size(ppd, name);
+
+      if (size == NULL)
+      {
+       /*
+        * Unable to add or find size!
+	*/
+
+        ppdClose(ppd);
+	safe_free(string);
+	return (NULL);
+      }
+
+      sscanf(string, "%f%f", &(size->width), &(size->length));
     }
     else if (strcmp(keyword, "ImageableArea") == 0)
     {
-      if ((size = ppdPageSize(ppd, name)) != NULL)
-	sscanf(string, "%f%f%f%f", &(size->left), &(size->bottom),
-	       &(size->right), &(size->top));
+      if ((size = ppdPageSize(ppd, name)) == NULL)
+	size = ppd_add_size(ppd, name);
+
+      if (size == NULL)
+      {
+       /*
+        * Unable to add or find size!
+	*/
+
+        ppdClose(ppd);
+	safe_free(string);
+	return (NULL);
+      }
+
+      sscanf(string, "%f%f%f%f", &(size->left), &(size->bottom),
+	     &(size->right), &(size->top));
     }
     else if (option != NULL &&
              (mask & (PPD_KEYWORD | PPD_OPTION | PPD_STRING)) ==
@@ -1266,7 +1312,8 @@ ppdOpen(FILE *fp)		/* I - File to read from */
         * Add a page size...
 	*/
 
-	ppd_add_size(ppd, name);
+        if (ppdPageSize(ppd, name) == NULL)
+	  ppd_add_size(ppd, name);
       }
 
      /*
@@ -1584,6 +1631,7 @@ ppd_read(FILE *fp,		/* I - File to read from */
 	 char **string)		/* O - Code/string data */
 {
   int		ch,		/* Character from file */
+		colon,		/* Colon seen? */
 		endquote,	/* Waiting for an end quote */
 		mask;		/* Mask to be returned */
   char		*keyptr,	/* Keyword pointer */
@@ -1616,6 +1664,7 @@ ppd_read(FILE *fp,		/* I - File to read from */
 
     lineptr  = line;
     endquote = 0;
+    colon    = 0;
 
     while ((ch = getc(fp)) != EOF &&
            (lineptr - line) < (sizeof(line) - 1))
@@ -1656,7 +1705,10 @@ ppd_read(FILE *fp,		/* I - File to read from */
 
 	*lineptr++ = ch;
 
-	if (ch == '\"')
+	if (ch == ':')
+	  colon = 1;
+
+	if (ch == '\"' && colon)
         {
 	  endquote = !endquote;
 
@@ -1728,6 +1780,8 @@ ppd_read(FILE *fp,		/* I - File to read from */
 
     *lineptr = '\0';
 
+/*    DEBUG_printf(("LINE = \"%s\"\n", line));*/
+
     if (ch == EOF && lineptr == line)
       return (0);
 
@@ -1746,7 +1800,8 @@ ppd_read(FILE *fp,		/* I - File to read from */
     if (line[0] != '*')			/* All lines start with an asterisk */
       continue;
 
-    if (strncmp(line, "*%", 2) == 0 ||	/* Comment line */
+    if (strcmp(line, "*") == 0 ||	/* (Bad) comment line */
+        strncmp(line, "*%", 2) == 0 ||	/* Comment line */
         strncmp(line, "*?", 2) == 0 ||	/* Query line */
         strcmp(line, "*End") == 0)	/* End of multi-line string */
       continue;
@@ -1762,15 +1817,21 @@ ppd_read(FILE *fp,		/* I - File to read from */
       *keyptr++ = *lineptr++;
 
     *keyptr = '\0';
+
+    if (strcmp(keyword, "End") == 0)
+      continue;
+
     mask |= PPD_KEYWORD;
 
-    if (*lineptr == ' ' || *lineptr == '\t')
+/*    DEBUG_printf(("keyword = \"%s\", lineptr = \"%s\"\n", keyword, lineptr));*/
+
+    if (isspace(*lineptr))
     {
      /*
       * Get an option name...
       */
 
-      while (*lineptr == ' ' || *lineptr == '\t')
+      while (isspace(*lineptr))
         lineptr ++;
 
       optptr = option;
@@ -1781,6 +1842,8 @@ ppd_read(FILE *fp,		/* I - File to read from */
 
       *optptr = '\0';
       mask |= PPD_OPTION;
+
+/*      DEBUG_printf(("option = \"%s\", lineptr = \"%s\"\n", option, lineptr));*/
 
       if (*lineptr == '/')
       {
@@ -1801,6 +1864,8 @@ ppd_read(FILE *fp,		/* I - File to read from */
 
 	mask |= PPD_TEXT;
       }
+
+/*      DEBUG_printf(("text = \"%s\", lineptr = \"%s\"\n", text, lineptr));*/
     }
 
     if (*lineptr == ':')
@@ -1825,6 +1890,8 @@ ppd_read(FILE *fp,		/* I - File to read from */
       }
 
       *strptr = '\0';
+
+/*      DEBUG_printf(("string = \"%s\", lineptr = \"%s\"\n", *string, lineptr));*/
 
       mask |= PPD_STRING;
     }
@@ -1940,5 +2007,5 @@ ppd_fix(char *string)		/* IO - String to fix */
 
 
 /*
- * End of "$Id: ppd.c,v 1.51.2.2 2001/05/13 18:38:04 mike Exp $".
+ * End of "$Id: ppd.c,v 1.51.2.3 2001/12/26 16:52:13 mike Exp $".
  */

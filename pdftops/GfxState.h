@@ -15,16 +15,17 @@
 
 #include "gtypes.h"
 #include "Object.h"
+#include "Function.h"
 
 class Array;
-class Function;
 class GfxFont;
+struct PDFRectangle;
 
 //------------------------------------------------------------------------
 // GfxColor
 //------------------------------------------------------------------------
 
-#define gfxColorMaxComps 8
+#define gfxColorMaxComps funcMaxOutputs
 
 struct GfxColor {
   double c[gfxColorMaxComps];
@@ -201,14 +202,14 @@ public:
   double getGammaR() { return gammaR; }
   double getGammaG() { return gammaG; }
   double getGammaB() { return gammaB; }
-  double *getMatrix() { return m; }
+  double *getMatrix() { return mat; }
 
 private:
 
   double whiteX, whiteY, whiteZ;    // white point
   double blackX, blackY, blackZ;    // black point
   double gammaR, gammaG, gammaB;    // gamma values
-  double m[9];			    // ABC -> XYZ transform matrix
+  double mat[9];		// ABC -> XYZ transform matrix
 };
 
 //------------------------------------------------------------------------
@@ -283,8 +284,8 @@ private:
 class GfxICCBasedColorSpace: public GfxColorSpace {
 public:
 
-  GfxICCBasedColorSpace(int nComps, GfxColorSpace *alt,
-			Ref *iccProfileStream);
+  GfxICCBasedColorSpace(int nCompsA, GfxColorSpace *altA,
+			Ref *iccProfileStreamA);
   virtual ~GfxICCBasedColorSpace();
   virtual GfxColorSpace *copy();
   virtual GfxColorSpaceMode getMode() { return csICCBased; }
@@ -320,7 +321,7 @@ private:
 class GfxIndexedColorSpace: public GfxColorSpace {
 public:
 
-  GfxIndexedColorSpace(GfxColorSpace *base, int indexHigh);
+  GfxIndexedColorSpace(GfxColorSpace *baseA, int indexHighA);
   virtual ~GfxIndexedColorSpace();
   virtual GfxColorSpace *copy();
   virtual GfxColorSpaceMode getMode() { return csIndexed; }
@@ -356,8 +357,8 @@ private:
 class GfxSeparationColorSpace: public GfxColorSpace {
 public:
 
-  GfxSeparationColorSpace(GString *name, GfxColorSpace *alt,
-			  Function *func);
+  GfxSeparationColorSpace(GString *nameA, GfxColorSpace *altA,
+			  Function *funcA);
   virtual ~GfxSeparationColorSpace();
   virtual GfxColorSpace *copy();
   virtual GfxColorSpaceMode getMode() { return csSeparation; }
@@ -424,7 +425,7 @@ private:
 class GfxPatternColorSpace: public GfxColorSpace {
 public:
 
-  GfxPatternColorSpace(GfxColorSpace *under);
+  GfxPatternColorSpace(GfxColorSpace *underA);
   virtual ~GfxPatternColorSpace();
   virtual GfxColorSpace *copy();
   virtual GfxColorSpaceMode getMode() { return csPattern; }
@@ -454,7 +455,7 @@ private:
 class GfxPattern {
 public:
 
-  GfxPattern(int type);
+  GfxPattern(int typeA);
   virtual ~GfxPattern();
 
   static GfxPattern *parse(Object *obj);
@@ -504,94 +505,66 @@ private:
 };
 
 //------------------------------------------------------------------------
-// Function
+// GfxShading
 //------------------------------------------------------------------------
 
-#define funcMaxInputs  1
-#define funcMaxOutputs 8
-
-class Function {
+class GfxShading {
 public:
 
-  Function();
+  GfxShading();
+  virtual ~GfxShading();
 
-  virtual ~Function();
+  static GfxShading *parse(Object *obj);
 
-  // Construct a function.  Returns NULL if unsuccessful.
-  static Function *parse(Object *funcObj);
-
-  // Initialize the entries common to all function types.
-  GBool init(Dict *dict);
-
-  virtual Function *copy() = 0;
-
-  // Return size of input and output tuples.
-  int getInputSize() { return m; }
-  int getOutputSize() { return n; }
-
-  // Transform an input tuple into an output tuple.
-  virtual void transform(double *in, double *out) = 0;
-
-  virtual GBool isOk() = 0;
-
-protected:
-
-  int m, n;			// size of input and output tuples
-  double			// min and max values for function domain
-    domain[funcMaxInputs][2];
-  double			// min and max values for function range
-    range[funcMaxOutputs][2];
-  GBool hasRange;		// set if range is defined
-};
-
-//------------------------------------------------------------------------
-// SampledFunction
-//------------------------------------------------------------------------
-
-class SampledFunction: public Function {
-public:
-
-  SampledFunction(Object *funcObj, Dict *dict);
-  virtual ~SampledFunction();
-  virtual Function *copy() { return new SampledFunction(this); }
-  virtual void transform(double *in, double *out);
-  virtual GBool isOk() { return ok; }
+  int getType() { return type; }
+  GfxColorSpace *getColorSpace() { return colorSpace; }
+  GfxColor *getBackground() { return &background; }
+  GBool getHasBackground() { return hasBackground; }
+  void getBBox(double *xMinA, double *yMinA, double *xMaxA, double *yMaxA)
+    { *xMinA = xMin; *yMinA = yMin; *xMaxA = xMax; *yMaxA = yMax; }
+  GBool getHasBBox() { return hasBBox; }
 
 private:
 
-  SampledFunction(SampledFunction *func);
-
-  int				// number of samples for each domain element
-    sampleSize[funcMaxInputs];
-  double			// min and max values for domain encoder
-    encode[funcMaxInputs][2];
-  double			// min and max values for range decoder
-    decode[funcMaxOutputs][2];
-  double *samples;		// the samples
-  GBool ok;
+  int type;
+  GfxColorSpace *colorSpace;
+  GfxColor background;
+  GBool hasBackground;
+  double xMin, yMin, xMax, yMax;
+  GBool hasBBox;
 };
 
 //------------------------------------------------------------------------
-// ExponentialFunction
+// GfxAxialShading
 //------------------------------------------------------------------------
 
-class ExponentialFunction: public Function {
+class GfxAxialShading: public GfxShading {
 public:
 
-  ExponentialFunction(Object *funcObj, Dict *dict);
-  virtual ~ExponentialFunction();
-  virtual Function *copy() { return new ExponentialFunction(this); }
-  virtual void transform(double *in, double *out);
-  virtual GBool isOk() { return ok; }
+  GfxAxialShading(double x0A, double y0A,
+		  double x1A, double y1A,
+		  double t0A, double t1A,
+		  Function **funcsA, int nFuncsA,
+		  GBool extend0A, GBool extend1A);
+  virtual ~GfxAxialShading();
+
+  static GfxAxialShading *parse(Dict *dict);
+
+  void getCoords(double *x0A, double *y0A, double *x1A, double *y1A)
+    { *x0A = x0; *y0A = y0; *x1A = x1; *y1A = y1; }
+  double getDomain0() { return t0; }
+  double getDomain1() { return t1; }
+  void getColor(double t, GfxColor *color);
+  GBool getExtend0() { return extend0; }
+  GBool getExtend1() { return extend1; }
 
 private:
 
-  ExponentialFunction(ExponentialFunction *func);
-
-  double c0[funcMaxOutputs];
-  double c1[funcMaxOutputs];
-  double e;
-  GBool ok;
+  double x0, y0, x1, y1;
+  double t0, t1;
+  Function *funcs[gfxColorMaxComps];
+  int nFuncs;
+  GBool extend0, extend1;
 };
 
 //------------------------------------------------------------------------
@@ -602,7 +575,7 @@ class GfxImageColorMap {
 public:
 
   // Constructor.
-  GfxImageColorMap(int bits, Object *decode, GfxColorSpace *colorSpace);
+  GfxImageColorMap(int bitsA, Object *decode, GfxColorSpace *colorSpaceA);
 
   // Destructor.
   ~GfxImageColorMap();
@@ -750,10 +723,10 @@ class GfxState {
 public:
 
   // Construct a default GfxState, for a device with resolution <dpi>,
-  // page box (<x1>,<y1>)-(<x2>,<y2>), page rotation <rotate>, and
-  // coordinate system specified by <upsideDown>.
-  GfxState(double dpi, double px1a, double py1a,
-	   double px2a, double py2a, int rotate, GBool upsideDown);
+  // page box <pageBox>, page rotation <rotate>, and coordinate system
+  // specified by <upsideDown>.
+  GfxState(double dpi, PDFRectangle *pageBox, int rotate,
+	   GBool upsideDown);
 
   // Destructor.
   ~GfxState();
@@ -771,6 +744,10 @@ public:
   double getPageHeight() { return pageHeight; }
   GfxColor *getFillColor() { return &fillColor; }
   GfxColor *getStrokeColor() { return &strokeColor; }
+  void getFillGray(double *gray)
+    { fillColorSpace->getGray(&fillColor, gray); }
+  void getStrokeGray(double *gray)
+    { strokeColorSpace->getGray(&fillColor, gray); }
   void getFillRGB(GfxRGB *rgb)
     { fillColorSpace->getRGB(&fillColor, rgb); }
   void getStrokeRGB(GfxRGB *rgb)
@@ -804,6 +781,8 @@ public:
   GfxPath *getPath() { return path; }
   double getCurX() { return curX; }
   double getCurY() { return curY; }
+  void getClipBBox(double *xMin, double *yMin, double *xMax, double *yMax)
+    { *xMin = clipXMin; *yMin = clipYMin; *xMax = clipXMax; *yMax = clipYMax; }
   double getLineX() { return lineX; }
   double getLineY() { return lineY; }
 
@@ -848,9 +827,9 @@ public:
   void setFlatness(int flatness1) { flatness = flatness1; }
   void setLineJoin(int lineJoin1) { lineJoin = lineJoin1; }
   void setLineCap(int lineCap1) { lineCap = lineCap1; }
-  void setMiterLimit(double miterLimit1) { miterLimit = miterLimit1; }
-  void setFont(GfxFont *font1, double fontSize1)
-    { font = font1; fontSize = fontSize1; }
+  void setMiterLimit(double limit) { miterLimit = limit; }
+  void setFont(GfxFont *fontA, double fontSizeA)
+    { font = fontA; fontSize = fontSizeA; }
   void setTextMat(double a, double b, double c,
 		  double d, double e, double f)
     { textMat[0] = a; textMat[1] = b; textMat[2] = c;
@@ -861,12 +840,12 @@ public:
     { wordSpace = space; }
   void setHorizScaling(double scale)
     { horizScaling = 0.01 * scale; }
-  void setLeading(double leading1)
-    { leading = leading1; }
-  void setRise(double rise1)
-    { rise = rise1; }
-  void setRender(int render1)
-    { render = render1; }
+  void setLeading(double leadingA)
+    { leading = leadingA; }
+  void setRise(double riseA)
+    { rise = riseA; }
+  void setRender(int renderA)
+    { render = renderA; }
 
   // Add to path.
   void moveTo(double x, double y)
@@ -879,6 +858,9 @@ public:
   void closePath()
     { path->close(); curX = path->getLastX(); curY = path->getLastY(); }
   void clearPath();
+
+  // Update clip region.
+  void clip();
 
   // Text position.
   void textMoveTo(double tx, double ty)
@@ -928,6 +910,9 @@ private:
   GfxPath *path;		// array of path elements
   double curX, curY;		// current point (user coords)
   double lineX, lineY;		// start of current text line (text coords)
+
+  double clipXMin, clipYMin,	// bounding box for clip region
+         clipXMax, clipYMax;
 
   GfxState *saved;		// next GfxState on stack
 

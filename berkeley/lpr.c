@@ -1,5 +1,5 @@
 /*
- * "$Id: lpr.c,v 1.20.2.1 2001/05/13 18:38:00 mike Exp $"
+ * "$Id: lpr.c,v 1.20.2.2 2001/12/26 16:52:08 mike Exp $"
  *
  *   "lpr" command for the Common UNIX Printing System (CUPS).
  *
@@ -366,7 +366,7 @@ main(int  argc,		/* I - Number of command-line arguments */
       return (1);
     }
 
-    while ((i = fread(buffer, 1, sizeof(buffer), stdin)) > 0)
+    while ((i = read(0, buffer, sizeof(buffer))) > 0)
       write(temp, buffer, i);
 
     i = lseek(temp, 0, SEEK_CUR);
@@ -421,5 +421,5 @@ sighandler(int s)	/* I - Signal number */
 
 
 /*
- * End of "$Id: lpr.c,v 1.20.2.1 2001/05/13 18:38:00 mike Exp $".
+ * End of "$Id: lpr.c,v 1.20.2.2 2001/12/26 16:52:08 mike Exp $".
  */
