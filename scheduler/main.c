@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c,v 1.50 2000/11/06 16:18:12 mike Exp $"
+ * "$Id: main.c,v 1.51 2000/11/12 20:13:11 mike Exp $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -42,6 +42,10 @@
 #if defined(HAVE_MALLOC_H) && defined(HAVE_MALLINFO)
 #  include <malloc.h>
 #endif /* HAVE_MALLOC_H && HAVE_MALLINFO */
+
+#ifndef FD_SETSIZE
+#  define FD_SETSIZE	1024
+#endif /* !FD_SETSIZE */
 
 
 /*
@@ -186,7 +190,12 @@ main(int  argc,			/* I - Number of command-line arguments */
   */
 
   getrlimit(RLIMIT_NOFILE, &limit);
-  MaxFDs = limit.rlim_cur = limit.rlim_max;
+  if (limit.rlim_max > FD_SETSIZE)	/* Can't exceed size of FD set! */
+    MaxFDs = FD_SETSIZE;
+  else
+    MaxFDs = limit.rlim_max;
+
+  limit.rlim_cur = MaxFDs;
   setrlimit(RLIMIT_NOFILE, &limit);
 
  /*
@@ -658,5 +667,5 @@ usage(void)
 
 
 /*
- * End of "$Id: main.c,v 1.50 2000/11/06 16:18:12 mike Exp $".
+ * End of "$Id: main.c,v 1.51 2000/11/12 20:13:11 mike Exp $".
  */
