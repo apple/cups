@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# "$Id: cups-config.in,v 1.18 2002/12/20 19:39:47 mike Exp $"
+# "$Id: cups-config.in,v 1.19 2003/01/17 15:25:11 mike Exp $"
 # 
 #   CUPS configuration utility.
 #
@@ -39,7 +39,7 @@ cups_serverroot=@CUPS_SERVERROOT@
 
 # flags for C++ compiler:
 CFLAGS=""
-LDFLAGS=""
+LDFLAGS="@EXPORT_LDFLAGS@"
 LIBS="@EXPORT_SSLLIBS@ @NETLIBS@"
 IMGLIBS="@EXPORT_LIBTIFF@ @EXPORT_LIBJPEG@ @EXPORT_LIBPNG@ @EXPORT_LIBZ@"
 
@@ -130,5 +130,5 @@ while test $# -gt 0; do
 done
 
 #
-# End of "$Id: cups-config.in,v 1.18 2002/12/20 19:39:47 mike Exp $".
+# End of "$Id: cups-config.in,v 1.19 2003/01/17 15:25:11 mike Exp $".
 #
