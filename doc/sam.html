@@ -849,11 +849,12 @@ file:/directory/filename</CODE> while network devices use the more
  filtering is disabled when using an interface script, scripts generally
  should not be used unless there is no other driver for a printer.</DD>
 <DT>-m<I> model</I></DT>
-<DD>Specifies a standard printer driver which is usually a PPD file. A
- list of all available models can be displayed using the <CODE>lpinfo</CODE>
- command with the <CODE>-m</CODE> option. A list of printer drivers
- included with CUPS can be found in<A HREF="#PRINTER_DRIVERS"> Appendix
- C, &quot;Printer Drivers&quot;</A>.</DD>
+<DD>Specifies a standard printer driver which is usually a PPD file.
+ PPD's are usually stored under the<VAR> /usr/share/cups/model/</VAR>
+ directory structure. A list of all available models can be displayed
+ using the <CODE>lpinfo</CODE> command with the <CODE>-m</CODE> option.
+ A list of printer drivers included with CUPS can be found in<A HREF="#PRINTER_DRIVERS">
+ Appendix C, &quot;Printer Drivers&quot;</A>.</DD>
 <DT>-r<I> class</I></DT>
 <DD>Removes the named printer from printer class<VAR> class</VAR>. If
  the resulting class becomes empty then it is removed.</DD>
@@ -2364,7 +2365,7 @@ Satisfy</CODE></A> directives may all appear inside a location.
  get-jobs, etc.)</TD></TR>
 <TR><TD>/admin</TD><TD>The path for all administration operations
  (add-printer, delete-printer, start-printer, etc.)</TD></TR>
-<TR><TD>/admin/conf</TD><TD>The path for access to the ESP Print Pro
+<TR><TD>/admin/conf</TD><TD>The path for access to the CUPS
  configuration files (cupsd.conf, client.conf, etc.)</TD></TR>
 <TR><TD>/classes</TD><TD>The path for all classes</TD></TR>
 <TR><TD>/classes/name</TD><TD>The resource for class <CODE>name</CODE></TD>
@@ -4779,6 +4780,7 @@ copies of this license document, but changing it is not allowed.
  covered only if its contents constitute a work based on the Program
  (independent of having been made by running the Program). Whether that
  is true depends on what the Program does.</P>
+</LI>
 <LI>You may copy and distribute verbatim copies of the Program's source
  code as you receive it, in any medium, provided that you conspicuously
  and appropriately publish on each copy an appropriate copyright notice
@@ -4788,6 +4790,7 @@ copies of this license document, but changing it is not allowed.
  Program.
 <P>You may charge a fee for the physical act of transferring a copy, and
  you may at your option offer warranty protection in exchange for a fee.</P>
+</LI>
 <LI>You may modify your copy or copies of the Program or any portion of
  it, thus forming a work based on the Program, and copy and distribute
  such modifications or work under the terms of Section 1 above, provided
@@ -4827,6 +4830,7 @@ copies of this license document, but changing it is not allowed.
  Program with the Program (or with a work based on the Program) on a
  volume of a storage or distribution medium does not bring the other
  work under the scope of this License.</P>
+</LI>
 <LI>You may copy and distribute the Program (or a work based on it,
  under Section 2) in object code or executable form under the terms of
  Sections 1 and 2 above provided that you also do one of the following:
@@ -4861,6 +4865,7 @@ copies of this license document, but changing it is not allowed.
  to copy the source code from the same place counts as distribution of
  the source code, even though third parties are not compelled to copy
  the source along with the object code.</P>
+</LI>
 <LI>You may not copy, modify, sublicense, or distribute the Program
  except as expressly provided under this License. Any attempt otherwise
  to copy, modify, sublicense or distribute the Program is void, and will
@@ -4910,6 +4915,7 @@ copies of this license document, but changing it is not allowed.
  choice.</P>
 <P>This section is intended to make thoroughly clear what is believed to
  be a consequence of the rest of this License.</P>
+</LI>
 <LI>If the distribution and/or use of the Program is restricted in
  certain countries either by patents or by copyrighted interfaces, the
  original copyright holder who places the Program under this License may
@@ -4928,6 +4934,7 @@ copies of this license document, but changing it is not allowed.
  the Free Software Foundation. If the Program does not specify a version
  number of this License, you may choose any version ever published by
  the Free Software Foundation.</P>
+</LI>
 <LI>If you wish to incorporate parts of the Program into other free
  programs whose distribution conditions are different, write to the
  author to ask for permission. For software which is copyrighted by the
@@ -4935,12 +4942,6 @@ copies of this license document, but changing it is not allowed.
  sometimes make exceptions for this. Our decision will be guided by the
  two goals of preserving the free status of all derivatives of our free
  software and of promoting the sharing and reuse of software generally.</LI>
-</LI>
-</LI>
-</LI>
-</LI>
-</LI>
-</LI>
 </OL>
 <H4>NO WARRANTY</H4>
 <OL START="11">
@@ -5096,12 +5097,15 @@ of this license document, but changing it is not allowed.
 <OL TYPE="a">
 <LI>The modified work must itself be a software library.
 <P></P>
+</LI>
 <LI>You must cause the files modified to carry prominent notices stating
  that you changed the files and the date of any change.
 <P></P>
+</LI>
 <LI>You must cause the whole of the work to be licensed at no charge to
  all third parties under the terms of this License.
 <P></P>
+</LI>
 <LI>If a facility in the modified Library refers to a function or a
  table of data to be supplied by an application program that uses the
  facility, other than as an argument passed when the facility is
@@ -5115,9 +5119,6 @@ of this license document, but changing it is not allowed.
  function or table used by this function must be optional: if the
  application does not supply it, the square root function must still
  compute square roots.)</P>
-</LI>
-</LI>
-</LI>
 </LI>
 </OL>
 <P>These requirements apply to the modified work as a whole. If
@@ -5213,20 +5214,20 @@ of this license document, but changing it is not allowed.
  in the Library will not necessarily be able to recompile the
  application to use the modified definitions.)
 <P></P>
+</LI>
 <LI>Accompany the work with a written offer, valid for at least three
  years, to give the same user the materials specified in Subsection 6a,
  above, for a charge no more than the cost of performing this
  distribution.
 <P></P>
+</LI>
 <LI>If distribution of the work is made by offering access to copy from
  a designated place, offer equivalent access to copy the above specified
  materials from the same place.
 <P></P>
+</LI>
 <LI>Verify that the user has already received a copy of these materials
  or that you have already sent this user a copy.</LI>
-</LI>
-</LI>
-</LI>
 </OL>
 <P>For an executable, the required form of the &quot;work that uses the
  Library&quot; must include any data and utility programs needed for
@@ -5252,10 +5253,10 @@ of this license document, but changing it is not allowed.
  the Library, uncombined with any other library facilities. This must be
  distributed under the terms of the Sections above.
 <P></P>
+</LI>
 <LI>Give prominent notice with the combined library of the fact that
  part of it is a work based on the Library, and explaining where to find
  the accompanying uncombined form of the same work.</LI>
-</LI>
 </OL>
 <P><STRONG>8.</STRONG> You may not copy, modify, sublicense, link with,
  or distribute the Library except as expressly provided under this

@@ -509,10 +509,11 @@ to add or modify a printer:
 
 	<DT>-m <I>model</I>
 
-	<DD>Specifies a standard printer driver which is usually a PPD
-	file. A list of all available models can be displayed using the
-	<CODE>lpinfo</CODE> command with the <CODE>-m</CODE> option. A
-	list of printer drivers included with CUPS can be found in
+        <DD>Specifies a standard printer driver which is usually a PPD
+        file. PPD's are usually stored under the <VAR>/usr/share/cups/model/</VAR>
+        directory structure.  A list of all available models can be displayed 
+        using the <CODE>lpinfo</CODE> command with the <CODE>-m</CODE> option. 
+        A list of printer drivers included with CUPS can be found in
 	<A HREF="#PRINTER_DRIVERS">Appendix C, "Printer Drivers"</A>.
 
 	<DT>-r <I>class</I>
@@ -2338,7 +2339,7 @@ directives may all appear inside a location.
 <TR><TH>Location</TH><TH>Description</TH></TR>
 <TR><TD>/</TD><TD>The path for all get operations (get-printers, get-jobs, etc.)</TD></TR>
 <TR><TD>/admin</TD><TD>The path for all administration operations (add-printer, delete-printer, start-printer, etc.)</TD></TR>
-<TR><TD>/admin/conf</TD><TD>The path for access to the ESP Print Pro configuration files (cupsd.conf, client.conf, etc.)</TD></TR>
+<TR><TD>/admin/conf</TD><TD>The path for access to the CUPS configuration files (cupsd.conf, client.conf, etc.)</TD></TR>
 <TR><TD>/classes</TD><TD>The path for all classes</TD></TR>
 <TR><TD>/classes/name</TD><TD>The resource for class <CODE>name</CODE></TD></TR>
 <TR><TD>/jobs</TD><TD>The path for all jobs (hold-job, release-job, etc.)</TD></TR>
