@@ -48,15 +48,10 @@ Copyright 2001-2002, All Rights Reserved<BR>
 <UL>
 <LI><A HREF="#5_1">5.1 Template Files</A></LI>
 <UL>
-<LI><A HREF="#5_1_1">5.1.1 What Are Templates?</A></LI>
-<LI><A HREF="#5_1_2">5.1.2 How Do I Use a Template?</A></LI>
-<LI><A HREF="#5_1_3">5.1.3 void cgiCopyTemplateFile(FILE *out, const
- char *filename)</A></LI>
-<LI><A HREF="#5_1_4">5.1.4 Special Characters</A></LI>
-<LI><A HREF="#5_1_5">5.1.5 Variable Substititions</A></LI>
-<LI><A HREF="#5_1_6">5.1.6 Array Substitutions</A></LI>
-<LI><A HREF="#5_1_7">5.1.7 Tests</A></LI>
-<LI><A HREF="#5_1_8">5.1.8 Template Files</A></LI>
+<LI><A HREF="#5_1_1">5.1.1 Inserting Attributes and Values</A></LI>
+<LI><A HREF="#5_1_2">5.1.2 Array Substitutions</A></LI>
+<LI><A HREF="#5_1_3">5.1.3 Conditional Tests</A></LI>
+<LI><A HREF="#5_1_4">5.1.4 Template File List</A></LI>
 </UL>
 </UL>
 <B><A HREF="#6">A Glossary</A></B>
@@ -141,7 +136,77 @@ Adobe PostScript Language Reference, Third Edition.</A></LI>
 <P>CUPS uses character set files to define the mapping of local
  character sets to Unicode code points, as well as the fonts that should
  be used for different ranges of characters.</P>
+<P>CUPS includes files for common 8-bit encodings as well as UTF-8 for
+ Unicode text. The format of these files is described in the CUPS
+ Interface Design Description (IDD) document. Current character sets are
+ enumerated in the CUPS API, so in order to add a new character set you
+ must patch the CUPS source as well as provide a new charset file.</P>
+<P>CUPS 1.1 supports the following character sets:</P>
+<UL>
+<LI>iso-8859-1</LI>
+<LI>iso-8859-2</LI>
+<LI>iso-8859-3</LI>
+<LI>iso-8859-4</LI>
+<LI>iso-8859-5</LI>
+<LI>iso-8859-6</LI>
+<LI>iso-8859-7</LI>
+<LI>iso-8859-8</LI>
+<LI>iso-8859-9</LI>
+<LI>iso-8859-10</LI>
+<LI>iso-8859-13</LI>
+<LI>iso-8859-14</LI>
+<LI>iso-8859-15</LI>
+<LI>koi8-r</LI>
+<LI>koi8-u</LI>
+<LI>us-ascii</LI>
+<LI>utf-8</LI>
+<LI>windows-874</LI>
+<LI>windows-1250</LI>
+<LI>windows-1251</LI>
+<LI>windows-1252</LI>
+<LI>windows-1253</LI>
+<LI>windows-1254</LI>
+<LI>windows-1255</LI>
+<LI>windows-1256</LI>
+<LI>windows-1257</LI>
+<LI>windows-1258</LI>
+</UL>
 <H1><A NAME="4">4 Message Catalogs</A></H1>
+<P>CUPS message catalogs are text files that identify the default
+ character set for the locale and a list of localized message strings
+ for the CUPS software. The format of the message catalog files is
+ described in the CUPS IDD.</P>
+<P>Message catalogs are named<VAR> cups_ll</VAR>,<VAR> cups_ll_CC</VAR>,
+ or<VAR> cups_ll_CC.charset</VAR>, where &quot;ll&quot; is the standard 2-letter
+ abbreviation for the language, &quot;CC&quot; is the standard 2-letter
+ abbreviation for the country, and &quot;charset&quot; is the charset name which
+ may differ from the list above.</P>
+<P>Each message catalog file is stored in a subdirectory named<VAR> ll</VAR>
+,<VAR> ll_CC</VAR>, or<VAR> ll_CC.charset</VAR> to match the trailing
+ portion of the message catalog filename.</P>
+<P>When translating a new message catalog, copy the<VAR> cups_C</VAR>
+ message catalog file to a new subdirectory; to translate the message
+ catalog to Canadian French, you would type the following commands:</P>
+<UL>
+<PRE>
+<KBD>cd locale <I>ENTER</I></KBD>
+<KBD>mkdir fr_CA <I>ENTER</I></KBD>
+<KBD>cp C/cups_C fr_CA/cups_fr_CA <I>ENTER</I></KBD>
+</PRE>
+</UL>
+<P>Alternatively, you could copy the existing<VAR> cups_fr</VAR> message
+ catalog and then make any changes necessary.</P>
+<P>Once you have make your copy of the file, edit it using your favorite
+ text editor to translate the text to the desired language. Be sure to
+ preserve any numbers starting in the first column, as they indicate a
+ new message number - you'll see this for the HTTP status messages.</P>
+<P>Finally, add your locale to the list of locales in the makefile and
+ run the following command to install it:</P>
+<UL>
+<PRE>
+<KBD>make install <I>ENTER</I></KBD>
+</PRE>
+</UL>
 <H1><A NAME="5">5 Web Interfaces</A></H1>
 <P>The CUPS scheduler provides a web interface that can be used to do
  many common printing and administration tasks. The built-in web server
@@ -149,49 +214,33 @@ Adobe PostScript Language Reference, Third Edition.</A></LI>
  for each locale, e.g. &quot;fr&quot; for French, &quot;de&quot; for German, &quot;fr_ca&quot; for
  French in Canada, and so forth.</P>
 <H2><A NAME="5_1">5.1 Template Files</A></H2>
-<P>The CUPS CGI programs (<CODE>admin.cgi</CODE>, <CODE>classes.cgi</CODE>
-, <CODE>jobs.cgi</CODE>, and <CODE>printers.cgi</CODE>) are responsible
- for providing dynamic content for the web interface. To facilitate this
- process, a series of HTML template files are used that build the final
- output page. Template files are installed in the<VAR>
- /usr/share/cups/templates</VAR> directory by default.</P>
+<P>Template files are HTML files with special formatting characters in
+ them that allow substition of variables and arrays. The CUPS CGI
+ programs (<CODE>admin.cgi</CODE>, <CODE>classes.cgi</CODE>, <CODE>
+jobs.cgi</CODE>, and <CODE>printers.cgi</CODE>) use these template file
+ to provide dynamic content for the web interface. Template files are
+ installed in the<VAR> /usr/share/cups/templates</VAR> directory by
+ default.</P>
 <P>Translated versions of the template files should be installed in the
  appropriate subdirectories under<VAR> /usr/share/cups/templates</VAR>.
- Template files consist of HTML with variable substitutions for named
- inside curley braces &quot;{name}&quot;. See the next section for a complete
- description of the syntax. Variable names are generally the IPP
+ For example, Canadian French template files should be stored in the<VAR>
+ /usr/share/cups/templates/fr_CA</VAR> directory.</P>
+<H3><A NAME="5_1_1">5.1.1 Inserting Attributes and Values</A></H3>
+<P>Template files consist of HTML with variable substitutions for named
+ inside curley braces &quot;{name}&quot;. Variable names are generally the IPP
  attribute names with the hyphen (&quot;-&quot;) replaced by the underscore (&quot;_&quot;)
- character.</P>
-<H3><A NAME="5_1_1">5.1.1 What Are Templates?</A></H3>
-<P>Templates are HTML files with special formatting characters in them
- that allow substition of variables and arrays.</P>
-<BLOCKQUOTE><B> Note:</B> LIBCGI doesn't actually care if the template
- file is HTML or not. You can just as easily use a plain text file, XML
- file, or any other type of text file with the template code.</BLOCKQUOTE>
-<H3><A NAME="5_1_2">5.1.2 How Do I Use a Template?</A></H3>
-<P>LIBCGI provides a single template function called <CODE>
-cgiCopyTemplateFile()</CODE>.</P>
-<H3><A NAME="5_1_3">5.1.3 void cgiCopyTemplateFile(FILE *out, const char
- *filename)</A></H3>
-<P>The <CODE>cgiCopyTemplateFile()</CODE> function copies the template
- file (<CODE>filename</CODE>) to the output file (<CODE>out</CODE>.)</P>
-<P>The <CODE>out</CODE> argument is usually <CODE>stdout</CODE> for CGI
- programs, however you can write to any file or pipe with this function.</P>
-<P>If <CODE>cgiCopyTemplateFile()</CODE> is unable to open the specified
- file then no output is produced.</P>
-<H3><A NAME="5_1_4">5.1.4 Special Characters</A></H3>
-<P>LIBCGI uses the curley braces (&quot;{&quot; and &quot;}&quot;) to indicate
- substitutions, and the backslash (&quot;\&quot;) character for quoting. To insert
- any of these special characters as-is you need to use the HTML <CODE>
-&amp;name;</CODE> mechanism or prefix each special character with the
- backslash (&quot;\&quot;.)</P>
-<H3><A NAME="5_1_5">5.1.5 Variable Substititions</A></H3>
+ character. For example, the <TT>job-printer-uri</TT> attribute is
+ renamed to <TT>job_printer_uri</TT>.</P>
+<P>Curley braces (&quot;{&quot; and &quot;}&quot;) to indicate substitutions, and the
+ backslash (&quot;\&quot;) character for quoting. To insert any of these special
+ characters as-is you need to use the HTML <CODE>&amp;name;</CODE> mechanism
+ or prefix each special character with the backslash (&quot;\&quot;.)</P>
 <P>You substitute the value of a variable using <CODE>{NAME}</CODE> in
  your template file. If the variable is undefined then the <CODE>{NAME}</CODE>
  string is output as-is.</P>
 <P>To substitute an empty string if the variable is undefined, use <CODE>
 {?NAME}</CODE> instead.</P>
-<H3><A NAME="5_1_6">5.1.6 Array Substitutions</A></H3>
+<H3><A NAME="5_1_2">5.1.2 Array Substitutions</A></H3>
 <P>The number of array elements can be inserted using <CODE>{#NAME}</CODE>
 . If the array is undefined then 0 is output. The current array element
  (starting at 1) is inserted with <CODE>{#}</CODE>.</P>
@@ -199,37 +248,29 @@ cgiCopyTemplateFile()</CODE>.</P>
  section and <CODE>}</CODE> at the end. The information between the
  closing bracket (&quot;]&quot;) and closing brace (&quot;}&quot;) is repeated for as many
  elements as are in the named array. For example, the following template
- would display an invoice for each item defined in the <CODE>ITEM</CODE>
- array:</P>
+ will display a list of each job in the <CODE>job_id</CODE> array:</P>
 <UL>
 <PRE>
 &lt;TABLE&gt;
 &lt;TR&gt;
-	&lt;TH&gt;Quantity&lt;/TH&gt;
-	&lt;TH&gt;Item&lt;/TH&gt;
-	&lt;TH&gt;Price&lt;/TH&gt;
-	&lt;TH&gt;Amount&lt;/TH&gt;
+	&lt;TH&gt;Job ID&lt;/TH&gt;
+	&lt;TH&gt;Destination&lt;/TH&gt;
+	&lt;TH&gt;Title&lt;/TH&gt;
 &lt;/TR&gt;
 
-{[ITEM]
+{[job_id]
 &lt;TR&gt;
-	&lt;TD&gt;{?QUANTITY}&lt;/TD&gt;
-	&lt;TD&gt;{?ITEM}&lt;/TD&gt;
-	&lt;TD&gt;{?PRICE}&lt;/TD&gt;
-	&lt;TD&gt;{?AMOUNT}&lt;/TD&gt;
+	&lt;TD&gt;{?job_id}&lt;/TD&gt;
+	&lt;TD&gt;{?job_printer_name}&lt;/TD&gt;
+	&lt;TD&gt;{?job_name}&lt;/TD&gt;
 &lt;/TR&gt;
 }
-
-&lt;TR&gt;
-	&lt;TD COLSPAN=&quot;3&quot; ALIGN=&quot;RIGHT&quot;&gt;Total&lt;/TD&gt;
-	&lt;TD&gt;{?TOTAL}&lt;/TD&gt;
-&lt;/TR&gt;
 &lt;/TABLE&gt;
 </PRE>
 </UL>
 <P>Arrays can be nested, however all elements within the curley braces
  (&quot;{&quot; and &quot;}&quot;) are indexed using the innermost array.</P>
-<H3><A NAME="5_1_7">5.1.7 Tests</A></H3>
+<H3><A NAME="5_1_3">5.1.3 Conditional Tests</A></H3>
 <P>Templates can also test variables against specific values and
  conditionally include text in the template. The format is:</P>
 <UL>
@@ -262,7 +303,7 @@ cgiCopyTemplateFile()</CODE>.</P>
 </TABLE>
 </CENTER>
 </P>
-<H3><A NAME="5_1_8">5.1.8 Template Files</A></H3>
+<H3><A NAME="5_1_4">5.1.4 Template File List</A></H3>
 <P>The following template files are used by the web interface:</P>
 <DL>
 <DT>add-class.tmpl</DT>
@@ -301,62 +342,64 @@ cgiCopyTemplateFile()</CODE>.</P>
 <DD>This template shows one or more printer classes.</DD>
 <DT>class-modified.tmpl</DT>
 <DD>This template shows the &quot;class modified&quot; message.</DD>
-<DT>config-printer2.tmpl</DT>
-<DD></DD>
 <DT>config-printer.tmpl</DT>
-<DD></DD>
+<DD>This template starts the printer configuration form.</DD>
+<DT>config-printer2.tmpl</DT>
+<DD>This template ends the printer configuration form.</DD>
 <DT>error.tmpl</DT>
-<DD></DD>
+<DD>This template displays a generic error message.</DD>
 <DT>header.tmpl</DT>
-<DD></DD>
+<DD>This template is used as the standard header on all dynamic content.</DD>
 <DT>job-cancel.tmpl</DT>
-<DD></DD>
+<DD>This template shows &quot;job cancelled&quot;.</DD>
 <DT>job-hold.tmpl</DT>
-<DD></DD>
+<DD>This template shows &quot;job held&quot;.</DD>
 <DT>job-release.tmpl</DT>
-<DD></DD>
+<DD>This template shows &quot;job released&quot;.</DD>
 <DT>job-restart.tmpl</DT>
-<DD></DD>
+<DD>This template shows &quot;job restarted&quot;.</DD>
 <DT>jobs.tmpl</DT>
-<DD></DD>
+<DD>This template is used to list the print jobs on a server, class, or
+ printer.</DD>
 <DT>modify-class.tmpl</DT>
-<DD></DD>
+<DD>This template is used as the first form when modifying a class.</DD>
 <DT>modify-printer.tmpl</DT>
-<DD></DD>
+<DD>This template is used as the first form when modifying a printer.</DD>
 <DT>option-boolean.tmpl</DT>
-<DD></DD>
+<DD>This template is used to select a boolean PPD option.</DD>
 <DT>option-header.tmpl</DT>
-<DD></DD>
+<DD>This template is used to start a PPD option group.</DD>
 <DT>option-pickmany.tmpl</DT>
-<DD></DD>
+<DD>This template is used to select a multi-valued PPD option.</DD>
 <DT>option-pickone.tmpl</DT>
-<DD></DD>
+<DD>This template is used to select a single-valued PPD option.</DD>
 <DT>option-trailer.tmpl</DT>
-<DD></DD>
+<DD>This template is used to end a PPD option group.</DD>
 <DT>printer-accept.tmpl</DT>
-<DD></DD>
+<DD>This template shows &quot;printer now accepting jobs&quot;.</DD>
 <DT>printer-added.tmpl</DT>
-<DD></DD>
+<DD>This template shows &quot;printer added&quot;.</DD>
 <DT>printer-configured.tmpl</DT>
-<DD></DD>
+<DD>This template shows &quot;printer configured&quot;.</DD>
 <DT>printer-confirm.tmpl</DT>
-<DD></DD>
+<DD>This template asks the user to confirm the deletion of a printer.</DD>
 <DT>printer-deleted.tmpl</DT>
-<DD></DD>
+<DD>This template shows &quot;printer deleted&quot;.</DD>
 <DT>printer-modified.tmpl</DT>
-<DD></DD>
+<DD>This template shows &quot;printer modified&quot;.</DD>
 <DT>printer-reject.tmpl</DT>
-<DD></DD>
+<DD>This template shows &quot;printer now rejecting jobs&quot;.</DD>
 <DT>printer-start.tmpl</DT>
-<DD></DD>
+<DD>This template shows &quot;printer started&quot;.</DD>
 <DT>printers.tmpl</DT>
-<DD></DD>
+<DD>This template is used to list information on one or more printers.</DD>
 <DT>printer-stop.tmpl</DT>
-<DD></DD>
+<DD>This template shows &quot;printer stopped&quot;.</DD>
 <DT>test-page.tmpl</DT>
-<DD></DD>
+<DD>This template shows &quot;test page printed&quot;.</DD>
 <DT>trailer.tmpl</DT>
-<DD></DD>
+<DD>This template is used as the standard trailer on all dynamic
+ content.</DD>
 </DL>
 <H1 TYPE="A" VALUE="1"><A NAME="6">A Glossary</A></H1>
 <H2><A NAME="6_1">A.1 Terms</A></H2>
