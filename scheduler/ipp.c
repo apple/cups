@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.127.2.21 2002/08/21 02:06:23 mike Exp $"
+ * "$Id: ipp.c,v 1.127.2.22 2002/08/22 16:45:38 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -55,6 +55,7 @@
  *   hold_job()                  - Hold a print job.
  *   move_job()                  - Move a job to a new destination.
  *   print_job()                 - Print a file to a printer or class.
+ *   read_ps_job_ticket()        - Reads a job ticket embedded in a PS file.
  *   reject_jobs()               - Reject print jobs to a printer.
  *   release_job()               - Release a held print job.
  *   restart_job()               - Restart an old print job.
@@ -112,6 +113,7 @@ static void	get_printer_attrs(client_t *con, ipp_attribute_t *uri);
 static void	hold_job(client_t *con, ipp_attribute_t *uri);
 static void	move_job(client_t *con, ipp_attribute_t *uri);
 static void	print_job(client_t *con, ipp_attribute_t *uri);
+static void	read_ps_job_ticket(client_t *con);
 static void	reject_jobs(client_t *con, ipp_attribute_t *uri);
 static void	release_job(client_t *con, ipp_attribute_t *uri);
 static void	restart_job(client_t *con, ipp_attribute_t *uri);
@@ -3984,6 +3986,14 @@ print_job(client_t        *con,		/* I - Client connection */
 	     filetype->super, filetype->type);
 
  /*
+  * Read any embedded job ticket info from PS files...
+  */
+
+  if (strcasecmp(filetype->super, "application") == 0 &&
+      strcasecmp(filetype->super, "postscript") == 0)
+    read_ps_job_ticket(con);
+
+ /*
   * Is the destination valid?
   */
 
@@ -4380,6 +4390,178 @@ print_job(client_t        *con,		/* I - Client connection */
   add_job_state_reasons(con, job);
 
   con->response->request.status.status_code = IPP_OK;
+}
+
+
+/*
+ * 'read_ps_job_ticket()' - Reads a job ticket embedded in a PS file.
+ *
+ * This function only gets called when printing a single PostScript
+ * file using the Print-Job operation.  It doesn't work for Create-Job +
+ * Send-File, since the job attributes need to be set at job creation
+ * time for banners to work.  The embedded PS job ticket stuff is here
+ * only to allow the Windows printer driver for CUPS to pass in JCL
+ * options and IPP attributes which otherwise would be lost.
+ *
+ * The format of a PS job ticket is simple:
+ *
+ *     %cupsJobTicket: attr1=value1 attr2=value2 ... attrN=valueN
+ *
+ *     %cupsJobTicket: attr1=value1
+ *     %cupsJobTicket: attr2=value2
+ *     ...
+ *     %cupsJobTicket: attrN=valueN
+ *
+ * Job ticket lines must appear immediately after the first line that
+ * specifies PostScript format (%!PS-Adobe-3.0), and CUPS will stop
+ * looking for job ticket info when it finds a line that does not begin
+ * with "%cupsJobTicket:".
+ *
+ * The maximum length of a job ticket line, including the prefix, is
+ * 255 characters to conform with the Adobe DSC.  This function assumes
+ * that job ticket lines end with CR LF or LF; CR alone is not accepted.
+ *
+ * Read-only attributes are rejected with a notice to the error log in
+ * case a malicious user tries anything.  Since the job ticket is read
+ * prior to attribute validation in print_job(), job ticket attributes
+ * will go through the same validation as IPP attributes...
+ */
+
+static void
+read_ps_job_ticket(client_t *con)	/* I - Client connection */
+{
+  FILE			*fp;		/* File to read from */
+  char			line[256];	/* Line in file */
+  int			num_options;	/* Number of options */
+  cups_option_t		*options;	/* Options */
+  ipp_t			*ticket;	/* New attributes */
+  ipp_attribute_t	*attr,		/* Current attribute */
+			*attr2,		/* Job attribute */
+			*prev2;		/* Previous job attribute */
+
+
+ /*
+  * First open the print file...
+  */
+
+  if ((fp = fopen(con->filename, "r")) == NULL)
+  {
+    LogMessage(L_ERROR, "read_ps_job_ticket: Unable to open PostScript print file - %s",
+               strerror(errno));
+    return;
+  }
+
+ /*
+  * Skip the first line...
+  */
+
+  if (!fgets(line, sizeof(line), fp))
+  {
+    LogMessage(L_ERROR, "read_ps_job_ticket: Unable to read from PostScript print file - %s",
+               strerror(ferror(fp)));
+    fclose(fp);
+    return;
+  }
+
+  if (strncmp(line, "%!PS-Adobe-", 11) != 0)
+  {
+   /*
+    * Not a DSC-compliant file, so no job ticket info will be available...
+    */
+
+    fclose(fp);
+    return;
+  }
+
+ /*
+  * Read job ticket info from the file...
+  */
+
+  num_options = 0;
+  options     = NULL;
+
+  while (fgets(line, sizeof(line), fp) != NULL)
+  {
+   /*
+    * Stop at the first non-ticket line...
+    */
+
+    if (strncmp(line, "%cupsJobTicket:", 15) != 0)
+      break;
+
+   /*
+    * Add the options to the option array...
+    */
+
+    num_options = cupsParseOptions(line + 15, num_options, &options);
+  }
+
+ /*
+  * Done with the file; see if we have any options...
+  */
+
+  fclose(fp);
+
+  if (num_options == 0)
+    return;
+
+ /*
+  * OK, convert the options to an attribute list, and apply them to
+  * the request...
+  */
+
+  ticket = ippNew();
+  cupsEncodeOptions(ticket, num_options, options);
+
+ /*
+  * See what the user wants to change.
+  */
+
+  for (attr = ticket->attrs; attr != NULL; attr = attr->next)
+  {
+    if (attr->group_tag != IPP_TAG_JOB || !attr->name)
+      continue;
+
+    if (strcmp(attr->name, "job-originating-host-name") == 0 ||
+        strcmp(attr->name, "job-originating-user-name") == 0 ||
+	strcmp(attr->name, "job-media-sheets-completed") == 0 ||
+	strcmp(attr->name, "job-k-octets") == 0 ||
+	strcmp(attr->name, "job-id") == 0 ||
+	strncmp(attr->name, "job-state", 9) == 0 ||
+	strncmp(attr->name, "time-at-", 8) == 0)
+      continue; /* Read-only attrs */
+
+    if ((attr2 = ippFindAttribute(con->request, attr->name, IPP_TAG_ZERO)) != NULL)
+    {
+     /*
+      * Some other value; first free the old value...
+      */
+
+      for (prev2 = con->request->attrs; prev2 != NULL; prev2 = prev2->next)
+	if (prev2->next == attr2)
+	  break;
+
+      if (prev2)
+	prev2->next = attr2->next;
+      else
+	con->request->attrs = attr2->next;
+
+      _ipp_free_attr(attr2);
+    }
+
+   /*
+    * Add new option by copying it...
+    */
+
+    copy_attribute(con->request, attr, 0);
+  }
+
+ /*
+  * Then free the attribute list and option array...
+  */
+
+  ippDelete(ticket);
+  cupsFreeOptions(num_options, options);
 }
 
 
@@ -5842,5 +6024,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.127.2.21 2002/08/21 02:06:23 mike Exp $".
+ * End of "$Id: ipp.c,v 1.127.2.22 2002/08/22 16:45:38 mike Exp $".
  */
