@@ -1,5 +1,5 @@
 #
-# "$Id: mime.types,v 1.17.2.10 2003/04/07 18:03:47 mike Exp $"
+# "$Id: mime.types,v 1.17.2.11 2004/09/23 14:30:37 mike Exp $"
 #
 #   MIME types file for the Common UNIX Printing System (CUPS).
 #
@@ -76,6 +76,7 @@ application/postscript		ai eps ps string(0,%!) string(0,<04>%!) \
 				contains(0,128,<1B>%-12345X) + \
 				(contains(0,1024,"LANGUAGE=POSTSCRIPT") \
 				 contains(0,1024,"LANGUAGE = Postscript") \
+				 contains(0,1024,"LANGUAGE = PostScript") \
 				 contains(0,1024,"LANGUAGE = POSTSCRIPT"))
 application/vnd.hp-HPGL		hpgl string(0,<1B>&)\
 				string(0,<1B>E<1B>%0B) \
@@ -157,5 +158,5 @@ application/vnd.cups-raw	(string(0,<1B>E) + !string(2,<1B>%0B)) \
 #application/octet-stream
 
 #
-# End of "$Id: mime.types,v 1.17.2.10 2003/04/07 18:03:47 mike Exp $".
+# End of "$Id: mime.types,v 1.17.2.11 2004/09/23 14:30:37 mike Exp $".
 #
