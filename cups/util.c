@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c,v 1.62 2000/10/13 03:29:17 mike Exp $"
+ * "$Id: util.c,v 1.63 2000/10/20 17:19:44 mike Exp $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -673,6 +673,7 @@ cupsGetDefault(void)
 const char *				/* O - Filename for PPD file */
 cupsGetPPD(const char *name)		/* I - Printer name */
 {
+  int		i;			/* Looping var */
   ipp_t		*request,		/* IPP request */
 		*response;		/* IPP response */
   ipp_attribute_t *attr;		/* Current attribute */
@@ -694,6 +695,12 @@ cupsGetPPD(const char *name)		/* I - Printer name */
   http_status_t	status;			/* HTTP status from server */
   char		prompt[1024];		/* Prompt string */
   static char	filename[HTTP_MAX_URI];	/* Local filename */
+  static const char *requested_attrs[] =/* Requested attributes */
+		{
+		  "printer-uri-supported",
+		  "printer-type",
+		  "member-uris"
+		};
 
 
   if (name == NULL)
@@ -712,81 +719,110 @@ cupsGetPPD(const char *name)		/* I - Printer name */
     return (NULL);
   }
 
-  if (strchr(name, '@') == NULL)
+ /*
+  * Build an IPP_GET_PRINTER_ATTRIBUTES request, which requires the following
+  * attributes:
+  *
+  *    attributes-charset
+  *    attributes-natural-language
+  *    printer-uri
+  *    requested-attributes
+  */
+
+  request = ippNew();
+
+  request->request.op.operation_id = IPP_GET_PRINTER_ATTRIBUTES;
+  request->request.op.request_id   = 1;
+
+  language = cupsLangDefault();
+
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
+               "attributes-charset", NULL, cupsLangEncoding(language));
+
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
+               "attributes-natural-language", NULL, language->language);
+
+  snprintf(buffer, sizeof(buffer), "ipp://localhost/printers/%s", name);
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI,
+               "printer-uri", NULL, buffer);
+
+  ippAddStrings(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
+                "requested-attributes",
+		sizeof(requested_attrs) / sizeof(requested_attrs[0]),
+		NULL, requested_attrs);
+
+ /*
+  * Do the request and get back a response...
+  */
+
+  if ((response = cupsDoRequest(cups_server, request, "/")) != NULL)
   {
-   /*
-    * Build an IPP_GET_PRINTER_ATTRIBUTES request, which requires the following
-    * attributes:
-    *
-    *    attributes-charset
-    *    attributes-natural-language
-    *    printer-uri
-    */
+    last_error  = response->request.status.status_code;
+    printer[0]  = '\0';
+    hostname[0] = '\0';
 
-    request = ippNew();
-
-    request->request.op.operation_id = IPP_GET_PRINTER_ATTRIBUTES;
-    request->request.op.request_id   = 1;
-
-    language = cupsLangDefault();
-
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-        	 "attributes-charset", NULL, cupsLangEncoding(language));
-
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
-        	 "attributes-natural-language", NULL, language->language);
-
-    snprintf(buffer, sizeof(buffer), "ipp://localhost/printers/%s", name);
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI,
-                 "printer-uri", NULL, buffer);
-
-   /*
-    * Do the request and get back a response...
-    */
-
-    if ((response = cupsDoRequest(cups_server, request, "/")) != NULL)
+    if ((attr = ippFindAttribute(response, "member-uris", IPP_TAG_URI)) != NULL)
     {
-      last_error = response->request.status.status_code;
+     /*
+      * Get the first actual server and printer name in the class...
+      */
 
-      if ((attr = ippFindAttribute(response, "printer-uri-supported",
-                                   IPP_TAG_URI)) != NULL)
+      for (i = 0; i < attr->num_values; i ++)
       {
-       /*
-        * Get the actual server and printer names...
-	*/
-
-        httpSeparate(attr->values[0].string.text, method, username, hostname,
+	httpSeparate(attr->values[0].string.text, method, username, hostname,
 	             &port, resource);
-        strcpy(printer, strrchr(resource, '/') + 1);
+	if (strncmp(resource, "/printers/", 10) == 0)
+	{
+	 /*
+	  * Found a printer!
+	  */
 
-       /*
-        * Remap local hostname to localhost...
-	*/
-
-        gethostname(buffer, sizeof(buffer));
-
-	if (strcasecmp(buffer, hostname) == 0)
-	  strcpy(hostname, "localhost");
+	  strcpy(printer, resource + 10);
+	  break;
+	}
       }
+    }
+    else if ((attr = ippFindAttribute(response, "printer-uri-supported",
+                                      IPP_TAG_URI)) != NULL)
+    {
+     /*
+      * Get the actual server and printer names...
+      */
 
-      ippDelete(response);
+      httpSeparate(attr->values[0].string.text, method, username, hostname,
+	           &port, resource);
+      strcpy(printer, strrchr(resource, '/') + 1);
     }
 
-    cupsLangFree(language);
+    ippDelete(response);
 
    /*
-    * Reconnect to the correct server as needed...
+    * Remap local hostname to localhost...
     */
 
-    if (strcasecmp(cups_server->hostname, hostname) != 0)
-    {
-      httpClose(cups_server);
+    gethostname(buffer, sizeof(buffer));
 
-      if ((cups_server = httpConnect(hostname, ippPort())) == NULL)
-      {
-	last_error = IPP_SERVICE_UNAVAILABLE;
-	return (NULL);
-      }
+    if (strcasecmp(buffer, hostname) == 0)
+      strcpy(hostname, "localhost");
+  }
+
+  cupsLangFree(language);
+
+  if (!printer[0])
+    return (NULL);
+
+ /*
+  * Reconnect to the correct server as needed...
+  */
+
+  if (strcasecmp(cups_server->hostname, hostname) != 0)
+  {
+    httpClose(cups_server);
+
+    if ((cups_server = httpConnect(hostname, ippPort())) == NULL)
+    {
+      last_error = IPP_SERVICE_UNAVAILABLE;
+      return (NULL);
     }
   }
 
@@ -886,7 +922,6 @@ cupsGetPPD(const char *name)		/* I - Printer name */
   * OK, we need to copy the file; open the file and copy it...
   */
 
-  unlink(filename);
   if ((fp = fopen(filename, "w")) == NULL)
   {
    /*
@@ -1437,5 +1472,5 @@ cups_local_auth(http_t *http)	/* I - Connection */
 
 
 /*
- * End of "$Id: util.c,v 1.62 2000/10/13 03:29:17 mike Exp $".
+ * End of "$Id: util.c,v 1.63 2000/10/20 17:19:44 mike Exp $".
  */
