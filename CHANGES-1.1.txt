@@ -3,6 +3,11 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.20rc1
 
+	- The ppdOpen functions still supported the
+	  VariablePaperSize attribute, which was removed in v4.0
+	  of the PPD spec.  This caused problems with PPD files
+	  that relocated the PageSize option to a non-standard
+	  group (STR #158)
 	- The cups.list file referenced MAN1EXT, MAN3EXT, and
 	  MAN5EXT, but none of those were actually defined (STR
 	  #147)

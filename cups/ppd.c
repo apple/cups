@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c,v 1.51.2.53 2003/06/14 16:19:54 mike Exp $"
+ * "$Id: ppd.c,v 1.51.2.54 2003/07/06 20:02:41 mike Exp $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -678,6 +678,8 @@ ppdOpen(FILE *fp)			/* I - File to read from */
 	      !strcmp(ppd->attrs[j]->name + 7, keyword) &&
 	      ppd->attrs[j]->value)
 	  {
+	    DEBUG_printf(("Setting Default%s to %s via attribute...\n",
+	                  option->keyword, ppd->attrs[j]->value));
 	    strlcpy(option->defchoice, ppd->attrs[j]->value,
 	            sizeof(option->defchoice));
 	    break;
@@ -849,95 +851,6 @@ ppdOpen(FILE *fp)			/* I - File to read from */
       ppd->fonts[ppd->num_fonts] = strdup(name);
       ppd->num_fonts ++;
     }
-    else if (strcmp(keyword, "VariablePaperSize") == 0 &&
-             strcmp(string, "True") == 0 &&
-	     !ppd->variable_sizes)
-    {
-      ppd->variable_sizes = 1;
-
-     /*
-      * Add a "Custom" page size entry...
-      */
-
-      ppd_add_size(ppd, "Custom");
-
-     /*
-      * Add a "Custom" page size option...
-      */
-
-      if ((option = ppdFindOption(ppd, "PageSize")) == NULL)
-      {
-        ppd_group_t	*temp;
-
-
-	if ((temp = ppd_get_group(ppd, "General",
-                                  cupsLangString(language,
-                                                 CUPS_MSG_GENERAL))) == NULL)
-	{
-          ppdClose(ppd);
-
-	  ppd_free(string);
-
-          cupsLangFree(language);
-
-#ifdef LC_NUMERIC
-          setlocale(LC_NUMERIC, oldlocale);
-#else
-          setlocale(LC_ALL, oldlocale);
-#endif /* LC_NUMERIC */
-
-          ppd_status = PPD_ALLOC_ERROR;
-
-	  return (NULL);
-	}
-
-	if ((option = ppd_get_option(temp, "PageSize")) == NULL)
-	{
-          ppdClose(ppd);
-
-	  ppd_free(string);
-
-          cupsLangFree(language);
-
-#ifdef LC_NUMERIC
-          setlocale(LC_NUMERIC, oldlocale);
-#else
-          setlocale(LC_ALL, oldlocale);
-#endif /* LC_NUMERIC */
-
-          ppd_status = PPD_ALLOC_ERROR;
-
-	  return (NULL);
-	}
-      }
-
-      if ((choice = ppd_add_choice(option, "Custom")) == NULL)
-      {
-        ppdClose(ppd);
-
-	ppd_free(string);
-
-        cupsLangFree(language);
-
-#ifdef LC_NUMERIC
-        setlocale(LC_NUMERIC, oldlocale);
-#else
-        setlocale(LC_ALL, oldlocale);
-#endif /* LC_NUMERIC */
-
-        ppd_status = PPD_ALLOC_ERROR;
-
-	return (NULL);
-      }
-
-      strlcpy(choice->text, cupsLangString(language, CUPS_MSG_VARIABLE),
-              sizeof(choice->text));
-      option = NULL;
-    }
-    else if (strcmp(keyword, "MaxMediaWidth") == 0)
-      ppd->custom_max[0] = (float)atof(string);
-    else if (strcmp(keyword, "MaxMediaHeight") == 0)
-      ppd->custom_max[1] = (float)atof(string);
     else if (strcmp(keyword, "ParamCustomPageSize") == 0)
     {
       if (strcmp(name, "Width") == 0)
@@ -954,6 +867,8 @@ ppdOpen(FILE *fp)			/* I - File to read from */
     else if (strcmp(keyword, "CustomPageSize") == 0 &&
              strcmp(name, "True") == 0)
     {
+      DEBUG_puts("Processing CustomPageSize...");
+
       if (!ppd->variable_sizes)
       {
 	ppd->variable_sizes = 1;
@@ -972,6 +887,8 @@ ppdOpen(FILE *fp)			/* I - File to read from */
 	{
 	  ppd_group_t	*temp;
 
+
+          DEBUG_puts("PageSize option not found for CustomPageSize...");
 
 	  if ((temp = ppd_get_group(ppd, "General",
                                     cupsLangString(language,
@@ -1087,8 +1004,7 @@ ppdOpen(FILE *fp)			/* I - File to read from */
       }
 
       choice->code = string;
-      string = NULL;
-      option = NULL;
+      option       = NULL;
     }
     else if (strcmp(keyword, "LandscapeOrientation") == 0)
     {
@@ -1311,6 +1227,8 @@ ppdOpen(FILE *fp)			/* I - File to read from */
 	    !strcmp(ppd->attrs[j]->name + 7, name) &&
 	    ppd->attrs[j]->value)
 	{
+	  DEBUG_printf(("Setting Default%s to %s via attribute...\n",
+	                option->keyword, ppd->attrs[j]->value));
 	  strlcpy(option->defchoice, ppd->attrs[j]->value,
 	          sizeof(option->defchoice));
 	  break;
@@ -1459,6 +1377,8 @@ ppdOpen(FILE *fp)			/* I - File to read from */
 	    !strcmp(ppd->attrs[j]->name + 7, name) &&
 	    ppd->attrs[j]->value)
 	{
+	  DEBUG_printf(("Setting Default%s to %s via attribute...\n",
+	                option->keyword, ppd->attrs[j]->value));
 	  strlcpy(option->defchoice, ppd->attrs[j]->value,
 	          sizeof(option->defchoice));
 	  break;
@@ -1666,7 +1586,11 @@ ppdOpen(FILE *fp)			/* I - File to read from */
         * Set the default as part of the current option...
 	*/
 
+        DEBUG_printf(("Setting %s to %s...\n", keyword, string));
+
         strlcpy(option->defchoice, string, sizeof(option->defchoice));
+
+        DEBUG_printf(("%s is now %s...\n", keyword, option->defchoice));
       }
       else
       {
@@ -1678,7 +1602,10 @@ ppdOpen(FILE *fp)			/* I - File to read from */
 
 
         if ((toption = ppdFindOption(ppd, keyword + 7)) != NULL)
+	{
+	  DEBUG_printf(("Setting %s to %s...\n", keyword, string));
 	  strlcpy(toption->defchoice, string, sizeof(toption->defchoice));
+	}
       }
     }
     else if (strcmp(keyword, "UIConstraints") == 0 ||
@@ -2832,6 +2759,9 @@ ppd_get_option(ppd_group_t *group,	/* I - Group */
   ppd_option_t	*option;		/* Option */
 
 
+  DEBUG_printf(("ppd_get_option(group=%p(\"%s\"), name=\"%s\")\n",
+                group, group->name, name));
+
   for (i = group->num_options, option = group->options; i > 0; i --, option ++)
     if (strcmp(option->keyword, name) == 0)
       break;
@@ -3281,5 +3211,5 @@ ppd_read(FILE *fp,			/* I - File to read from */
 
 
 /*
- * End of "$Id: ppd.c,v 1.51.2.53 2003/06/14 16:19:54 mike Exp $".
+ * End of "$Id: ppd.c,v 1.51.2.54 2003/07/06 20:02:41 mike Exp $".
  */
