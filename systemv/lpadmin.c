@@ -1,5 +1,5 @@
 /*
- * "$Id: lpadmin.c,v 1.13 2000/02/22 20:09:30 mike Exp $"
+ * "$Id: lpadmin.c,v 1.14 2000/06/28 18:44:52 mike Exp $"
  *
  *   "lpadmin" command for the Common UNIX Printing System (CUPS).
  *
@@ -74,15 +74,19 @@ int
 main(int  argc,		/* I - Number of command-line arguments */
      char *argv[])	/* I - Command-line arguments */
 {
-  int	i;		/* Looping var */
-  http_t *http;		/* Connection to server */
-  char	*printer,	/* Destination printer */
-	*host,		/* Pointer to hostname */
-	filename[1024];	/* Model filename */
+  int		i;		/* Looping var */
+  http_t	 *http;		/* Connection to server */
+  char		*printer,	/* Destination printer */
+		*host,		/* Pointer to hostname */
+		filename[1024];	/* Model filename */
+  const char	*datadir;	/* CUPS_DATADIR env variable */
 
 
   http    = NULL;
   printer = NULL;
+
+  if ((datadir = getenv("CUPS_DATADIR")) == NULL)
+    datadir = CUPS_DATADIR;
 
   for (i = 1; i < argc; i ++)
     if (argv[i][0] == '-')
@@ -236,11 +240,13 @@ main(int  argc,		/* I - Number of command-line arguments */
 	    }
 
 	    if (argv[i][2])
-	      snprintf(filename, sizeof(filename), CUPS_DATADIR "/model/%s", argv[i] + 2);
+	      snprintf(filename, sizeof(filename), "%s/model/%s", datadir,
+	               argv[i] + 2);
 	    else
 	    {
 	      i ++;
-	      snprintf(filename, sizeof(filename), CUPS_DATADIR "/model/%s", argv[i]);
+	      snprintf(filename, sizeof(filename), "%s/model/%s", datadir,
+	               argv[i]);
 	    }
 
             set_printer_file(http, printer, filename);
@@ -1327,5 +1333,5 @@ set_printer_location(http_t *http,	/* I - Server connection */
 
 
 /*
- * End of "$Id: lpadmin.c,v 1.13 2000/02/22 20:09:30 mike Exp $".
+ * End of "$Id: lpadmin.c,v 1.14 2000/06/28 18:44:52 mike Exp $".
  */
