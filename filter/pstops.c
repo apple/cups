@@ -1,5 +1,5 @@
 /*
- * "$Id: pstops.c,v 1.27 1999/11/03 19:05:31 mike Exp $"
+ * "$Id: pstops.c,v 1.28 1999/11/03 19:29:29 mike Exp $"
  *
  *   PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -736,12 +736,12 @@ start_nup(int number)	/* I - Page number */
 	{
 	  x = 1 - x;
           w = pl;
-          l = w * pl / pw;
+          l = w * PageLength / PageWidth;
 
           if (l > (pw * 0.5))
           {
             l = pw * 0.5;
-            w = l * pw / pl;
+            w = l * PageWidth / PageLength;
           }
 
           tx = pw * 0.5 - l;
@@ -750,12 +750,12 @@ start_nup(int number)	/* I - Page number */
 	else
 	{
           l = pw;
-          w = l * pw / pl;
+          w = l * PageWidth / PageLength;
 
           if (w > (pl * 0.5))
           {
             w = pl * 0.5;
-            l = w * pl / pw;
+            l = w * PageLength / PageWidth;
           }
 
           tx = pl * 0.5 - w;
@@ -786,33 +786,41 @@ start_nup(int number)	/* I - Page number */
                "%.0f %.0f lineto\n"
                "0 %.0f lineto\n"
                "closepath clip newpath\n",
-               pw, pw, pl, pl);
+               PageWidth, PageWidth, PageLength, PageLength);
         break;
 
     case 4 :
         x = number & 1;
 	y = 1 - ((number & 2) != 0);
+
         w = pw * 0.5;
-        l = pl * 0.5;
+	l = w * PageLength / PageWidth;
+
+	if (l > (pl * 0.5))
+	{
+	  l = pl * 0.5;
+	  w = l * PageWidth / PageLength;
+	}
 
         if (Duplex && (number & 4))
 	  printf("%.0f %.0f translate\n", PageWidth - PageRight, PageBottom);
 	else
 	  printf("%.0f %.0f translate\n", PageLeft, PageBottom);
 
-	printf("%.0f %.0f translate 0.5 0.5 scale\n", x * w, y * l);
+	printf("%.0f %.0f translate %.3f %.3f scale\n", x * w, y * l,
+	       w / PageWidth, l / PageLength);
         printf("newpath\n"
                "0 0 moveto\n"
                "%.0f 0 lineto\n"
                "%.0f %.0f lineto\n"
                "0 %.0f lineto\n"
                "closepath clip newpath\n",
-               pw, pw, pl, pl);
+               PageWidth, PageWidth, PageLength, PageLength);
         break;
   }
 }
 
 
 /*
- * End of "$Id: pstops.c,v 1.27 1999/11/03 19:05:31 mike Exp $".
+ * End of "$Id: pstops.c,v 1.28 1999/11/03 19:29:29 mike Exp $".
  */
