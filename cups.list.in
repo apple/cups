@@ -1,5 +1,5 @@
 #
-# "$Id: cups.list.in,v 1.24 2002/05/21 19:59:40 mike Exp $"
+# "$Id: cups.list.in,v 1.25 2002/05/28 14:34:08 mike Exp $"
 #
 #   ESP Package Manager (EPM) file list for the Common UNIX Printing
 #   System (CUPS).
@@ -110,6 +110,7 @@ f 0555 root sys $SERVERBIN/backend/ipp backend/ipp
 l 0555 root sys $SERVERBIN/backend/http ipp
 f 0555 root sys $SERVERBIN/backend/lpd backend/lpd
 f 0555 root sys $SERVERBIN/backend/parallel backend/parallel
+f 0555 root sys $SERVERBIN/backend/scsi backend/scsi
 f 0555 root sys $SERVERBIN/backend/serial backend/serial
 f 0555 root sys $SERVERBIN/backend/socket backend/socket
 f 0555 root sys $SERVERBIN/backend/usb backend/usb
@@ -307,11 +308,12 @@ d 0555 root sys $AMANDIR/cat$MAN8DIR -
 d 0555 root sys $AMANDIR/man$MAN8DIR -
 d 0555 root sys $MANDIR -
 d 0555 root sys $MANDIR/cat1 -
-d 0555 root sys $PMANDIR/cat3 -
 d 0555 root sys $MANDIR/cat5 -
 d 0555 root sys $MANDIR/man1 -
-d 0555 root sys $PMANDIR/man3 -
 d 0555 root sys $MANDIR/man5 -
+d 0555 root sys $PMANDIR -
+d 0555 root sys $PMANDIR/cat3 -
+d 0555 root sys $PMANDIR/man3 -
 
 f 0444 root sys $MANDIR/cat1/backend.$CAT1EXT man/backend.$CAT1EXT
 f 0444 root sys $MANDIR/cat1/filter.$CAT1EXT man/filter.$CAT1EXT
@@ -382,11 +384,12 @@ d 0555 root sys $AMANDIR/fr/cat$MAN8DIR -
 d 0555 root sys $AMANDIR/fr/man$MAN8DIR -
 d 0555 root sys $MANDIR/fr -
 d 0555 root sys $MANDIR/fr/cat1 -
-d 0555 root sys $PMANDIR/fr/cat3 -
 d 0555 root sys $MANDIR/fr/cat5 -
 d 0555 root sys $MANDIR/fr/man1 -
-d 0555 root sys $PMANDIR/fr/man3 -
 d 0555 root sys $MANDIR/fr/man5 -
+d 0555 root sys $PMANDIR/fr -
+d 0555 root sys $PMANDIR/fr/cat3 -
+d 0555 root sys $PMANDIR/fr/man3 -
 
 f 0444 root sys $MANDIR/fr/cat1/backend.$CAT1EXT man/backend.$CAT1EXT
 f 0444 root sys $MANDIR/fr/cat1/filter.$CAT1EXT man/filter.$CAT1EXT
@@ -457,5 +460,5 @@ f 0444 root sys $AMANDIR/fr/man$MAN8DIR/lpmove.$MAN8EXT man/lpmove.man
 i 0555 root sys cups cups.sh
 
 #
-# End of "$Id: cups.list.in,v 1.24 2002/05/21 19:59:40 mike Exp $".
+# End of "$Id: cups.list.in,v 1.25 2002/05/28 14:34:08 mike Exp $".
 #
