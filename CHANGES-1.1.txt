@@ -3,6 +3,9 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.14
 
+	- The ippRead() function did not verify that the
+	  attribute name length was not larger than the read
+	  buffer of 8192 bytes.
 	- The IPP backend did not pass the requesting user name
 	  when checking on the print job status. This prevented
 	  it from waiting for the job to complete when

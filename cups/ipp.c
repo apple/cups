@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.55.2.8 2002/01/02 18:04:24 mike Exp $"
+ * "$Id: ipp.c,v 1.55.2.9 2002/02/10 00:11:00 mike Exp $"
  *
  *   Internet Printing Protocol support functions for the Common UNIX
  *   Printing System (CUPS).
@@ -1075,6 +1075,12 @@ ippReadIO(void       *src,	/* I - Data source */
 	  }
 
           n = (buffer[0] << 8) | buffer[1];
+
+          if (n > (sizeof(buffer) - 1))
+	  {
+	    DEBUG_printf(("ippReadIO: bad name length %d!\n", n));
+	    return (IPP_ERROR);
+	  }
 
           DEBUG_printf(("ippReadIO: name length = %d\n", n));
 
@@ -2203,5 +2209,5 @@ ipp_write_mem(ipp_mem_t   *m,		/* I - Memory buffer */
 
 
 /*
- * End of "$Id: ipp.c,v 1.55.2.8 2002/01/02 18:04:24 mike Exp $".
+ * End of "$Id: ipp.c,v 1.55.2.9 2002/02/10 00:11:00 mike Exp $".
  */
