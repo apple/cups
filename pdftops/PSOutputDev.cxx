@@ -1152,7 +1152,7 @@ void PSOutputDev::doImage(GfxImageColorMap *colorMap,
   }
 }
 
-void PSOutputDev::writePS(char *fmt, ...) {
+void PSOutputDev::writePS(const char *fmt, ...) {
   va_list args;
 
   va_start(args, fmt);

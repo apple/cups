@@ -134,7 +134,7 @@ private:
   void doImage(GfxImageColorMap *colorMap,
 	       GBool invert, GBool inlineImg,
 	       Stream *str, int width, int height, int len);
-  void writePS(char *fmt, ...);
+  void writePS(const char *fmt, ...);
   void writePSString(GString *s);
 
   GBool embedType1;		// embed Type 1 fonts?
