@@ -1,5 +1,5 @@
 /*
- * "$Id: http-addr.c,v 1.1.2.3 2002/01/02 18:04:24 mike Exp $"
+ * "$Id: http-addr.c,v 1.1.2.1 2002/03/22 15:47:24 mike Exp $"
  *
  *   HTTP address routines for the Common UNIX Printing System (CUPS).
  *
@@ -202,5 +202,5 @@ httpAddrString(const http_addr_t *addr,		/* I - Address to convert */
 
 
 /*
- * End of "$Id: http-addr.c,v 1.1.2.3 2002/01/02 18:04:24 mike Exp $".
+ * End of "$Id: http-addr.c,v 1.1.2.1 2002/03/22 15:47:24 mike Exp $".
  */

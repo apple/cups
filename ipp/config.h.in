@@ -1,7 +1,9 @@
 /*
- * "$Id: string.h,v 1.7.2.5 2002/03/22 15:47:22 mike Exp $"
+ * "$Id: config.h.in,v 1.1.2.1 2002/03/22 15:47:24 mike Exp $"
  *
- *   String redirection header for the Common UNIX Printing System (CUPS).
+ *   Configuration file for the Common UNIX Printing System (CUPS).
+ *
+ *   @configure_input@
  *
  *   Copyright 1997-2002 by Easy Software Products.
  *
@@ -17,24 +19,43 @@
  *       44141 Airport View Drive, Suite 204
  *       Hollywood, Maryland 20636-3111 USA
  *
- *       Voice: (301) 373-9603
+ *       Voice: (301) 373-9600
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
- *
- *   This file is subject to the Apple OS-Developed Software exception.
  */
 
-#ifndef _CUPS_STRING_H_
-#  define _CUPS_STRING_H_
-
 /*
- * Include real header file...
+ * Use <string.h>, <strings.h>, or both?
  */
 
-#  include <ipp/string.h>
+#undef HAVE_STRING_H
+#undef HAVE_STRINGS_H
 
-#endif /* !_CUPS_STRING_H_ */
 
 /*
- * End of "$Id: string.h,v 1.7.2.5 2002/03/22 15:47:22 mike Exp $".
+ * Do we have the strXXX() functions?
+ */
+
+#undef HAVE_STRDUP
+#undef HAVE_STRCASECMP
+#undef HAVE_STRNCASECMP
+
+
+/*
+ * Do we have the (v)snprintf() functions?
+ */
+
+#undef HAVE_SNPRINTF
+#undef HAVE_VSNPRINTF
+
+
+/*
+ * Do we have the OpenSSL library?
+ */
+
+#undef HAVE_LIBSSL
+
+
+/*
+ * End of "$Id: config.h.in,v 1.1.2.1 2002/03/22 15:47:24 mike Exp $".
  */

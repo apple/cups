@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.h,v 1.36.2.8 2002/03/01 19:55:12 mike Exp $"
+ * "$Id: ipp.h,v 1.1.2.1 2002/03/22 15:47:25 mike Exp $"
  *
  *   Internet Printing Protocol definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -25,8 +25,8 @@
  *   This file is subject to the Apple OS-Developed Software exception.
  */
 
-#ifndef _CUPS_IPP_H_
-#  define _CUPS_IPP_H_
+#ifndef _IPP_IPP_H_
+#  define _IPP_IPP_H_
 
 /*
  * Include necessary headers...
@@ -48,7 +48,7 @@ extern "C" {
  * IPP version string...
  */
 
-#  define IPP_VERSION		"\001\000"
+#  define IPP_VERSION		"\001\001"
 
 /*
  * IPP registered port number...  This is the default value - applications
@@ -330,7 +330,7 @@ typedef union			/**** Request Header ****/
     ipp_status_t status_code;	/* Status code */
     int		request_id;	/* Request ID */
   }		status;
-} ipp_request_t;
+} ipp_header_t;
 
 
 typedef union			/**** Attribute Value ****/
@@ -380,7 +380,7 @@ typedef struct ipp_attribute_s	/**** Attribute ****/
 typedef struct			/**** Request State ****/
 {
   ipp_state_t	state;		/* State of request */
-  ipp_request_t	request;	/* Request header */
+  ipp_header_t	header;		/* Request header */
   ipp_attribute_t *attrs,	/* Attributes */
 		*last,		/* Last attribute in list */
 		*current;	/* Current attribute (for read/write) */
@@ -423,6 +423,11 @@ extern ipp_state_t	ippWriteIO(void *dst, ipp_iocb_t cb, int blocking, ipp_t *par
 extern int		ippPort(void);
 extern void		ippSetPort(int p);
 
+
+/*
+ * "Private" functions used internally by CUPS...
+ */
+
 extern ipp_attribute_t	*_ipp_add_attr(ipp_t *, int);
 extern void		_ipp_free_attr(ipp_attribute_t *);
 
@@ -434,8 +439,8 @@ extern void		_ipp_free_attr(ipp_attribute_t *);
 #  ifdef __cplusplus
 }
 #  endif /* __cplusplus */
-#endif /* !_CUPS_IPP_H_ */
+#endif /* !_IPP_IPP_H_ */
 
 /*
- * End of "$Id: ipp.h,v 1.36.2.8 2002/03/01 19:55:12 mike Exp $".
+ * End of "$Id: ipp.h,v 1.1.2.1 2002/03/22 15:47:25 mike Exp $".
  */

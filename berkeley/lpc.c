@@ -1,5 +1,5 @@
 /*
- * "$Id: lpc.c,v 1.11.2.2 2002/01/02 18:04:19 mike Exp $"
+ * "$Id: lpc.c,v 1.11.2.3 2002/03/22 15:47:16 mike Exp $"
  *
  *   "lpc" command for the Common UNIX Printing System (CUPS).
  *
@@ -253,8 +253,8 @@ show_status(http_t *http,	/* I - HTTP connection to server */
 
   request = ippNew();
 
-  request->request.op.operation_id = CUPS_GET_PRINTERS;
-  request->request.op.request_id   = 1;
+  request->header.op.operation_id = CUPS_GET_PRINTERS;
+  request->header.op.request_id   = 1;
 
   language = cupsLangDefault();
 
@@ -409,8 +409,8 @@ show_status(http_t *http,	/* I - HTTP connection to server */
 
 	  request = ippNew();
 
-	  request->request.op.operation_id = IPP_GET_JOBS;
-	  request->request.op.request_id   = 1;
+	  request->header.op.operation_id = IPP_GET_JOBS;
+	  request->header.op.request_id   = 1;
 
 	  language = cupsLangDefault();
 
@@ -477,5 +477,5 @@ show_status(http_t *http,	/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpc.c,v 1.11.2.2 2002/01/02 18:04:19 mike Exp $".
+ * End of "$Id: lpc.c,v 1.11.2.3 2002/03/22 15:47:16 mike Exp $".
  */

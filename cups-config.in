@@ -1,6 +1,6 @@
 #! /bin/sh
 #
-# "$Id: cups-config.in,v 1.3.2.3 2002/03/14 02:58:20 mike Exp $"
+# "$Id: cups-config.in,v 1.3.2.4 2002/03/22 15:47:15 mike Exp $"
 # 
 #   CUPS configuration utility.
 #
@@ -97,15 +97,15 @@ while test $# -gt 0; do
 	--libs)
 	    if test $static = no; then
 	        if test $image = no; then
-	            echo -lcups $LIBS
+	            echo -lcups -lipp $LIBS
 		else
-	            echo -lcupsimage $IMGLIBS -lcups $LIBS
+	            echo -lcupsimage $IMGLIBS -lcups -lipp $LIBS
 		fi
 	    else
 	        if test $image = no; then
-	            echo $libdir/libcups.a $LIBS
+	            echo $libdir/libcups.a $libdir/libipp.a $LIBS
 		else
-	            echo $libdir/libcupsimage.a $IMGLIBS $libdir/libcups.a $LIBS
+	            echo $libdir/libcupsimage.a $IMGLIBS $libdir/libcups.a $libdir/libipp.a $LIBS
 		fi
 	    fi
 	    ;;
@@ -130,5 +130,5 @@ while test $# -gt 0; do
 done
 
 #
-# End of "$Id: cups-config.in,v 1.3.2.3 2002/03/14 02:58:20 mike Exp $".
+# End of "$Id: cups-config.in,v 1.3.2.4 2002/03/22 15:47:15 mike Exp $".
 #

@@ -1,7 +1,7 @@
 /*
- * "$Id: string.h,v 1.7.2.5 2002/03/22 15:47:22 mike Exp $"
+ * "$Id: debug.h,v 1.1.2.1 2002/03/22 15:47:24 mike Exp $"
  *
- *   String redirection header for the Common UNIX Printing System (CUPS).
+ *   Debugging macros for the Common UNIX Printing System (CUPS).
  *
  *   Copyright 1997-2002 by Easy Software Products.
  *
@@ -24,17 +24,36 @@
  *   This file is subject to the Apple OS-Developed Software exception.
  */
 
-#ifndef _CUPS_STRING_H_
-#  define _CUPS_STRING_H_
+#ifndef _IPP_DEBUG_H_
+#  define _IPP_DEBUG_H_
 
 /*
- * Include real header file...
+ * Include necessary headers...
  */
 
-#  include <ipp/string.h>
-
-#endif /* !_CUPS_STRING_H_ */
+#  include <stdio.h>
 
 /*
- * End of "$Id: string.h,v 1.7.2.5 2002/03/22 15:47:22 mike Exp $".
+ * The debug macros are used if you compile with DEBUG defined.
+ *
+ * Usage:
+ *
+ *   DEBUG_puts("string")
+ *   DEBUG_printf(("format string", arg, arg, ...));
+ *
+ * Note the extra parenthesis around the DEBUG_printf macro...
+ */
+
+#  ifdef DEBUG
+#    define DEBUG_puts(x) puts(x)
+#    define DEBUG_printf(x) printf x
+#  else
+#    define DEBUG_puts(x)
+#    define DEBUG_printf(x)
+#  endif /* DEBUG */
+
+#endif /* !_IPP_DEBUG_H_ */
+
+/*
+ * End of "$Id: debug.h,v 1.1.2.1 2002/03/22 15:47:24 mike Exp $".
  */

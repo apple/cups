@@ -1,5 +1,5 @@
 #
-# "$Id: Makedefs.in,v 1.36.2.6 2002/03/22 15:47:15 mike Exp $"
+# "$Id: Makedefs.in,v 1.1.2.1 2002/03/22 15:47:23 mike Exp $"
 #
 #   Common makefile definitions for the Common UNIX Printing System (CUPS).
 #
@@ -27,11 +27,8 @@
 #
 
 AR	=	@AR@
-AWK	=	@AWK@
 CC	=	@LIBTOOL@ @CC@
-CXX	=	@LIBTOOL@ @CXX@
 DSO	=	@DSO@
-HTMLDOC	=	@HTMLDOC@
 INSTALL	=	@INSTALL@
 LIBTOOL	=	@LIBTOOL@
 LN	=	/bin/ln -sf
@@ -39,7 +36,6 @@ MV	=	@MV@
 NROFF	=	@NROFF@
 RANLIB	=	@RANLIB@
 RM	=	@RM@ -f
-SED	=	@SED@
 SHELL	=	/bin/sh
 STRIP	=	@STRIP@
 
@@ -55,25 +51,10 @@ INSTALL_MAN	=	$(INSTALL) -m 644
 INSTALL_SCRIPT	=	$(INSTALL) -m 755
 
 #
-# Default user and group for the scheduler...
-#
-
-CUPS_USER	=	@CUPS_USER@
-CUPS_GROUP	=	@CUPS_GROUP@
-
-#
 # Libraries...
 #
 
-LIBCUPS	=	@LIBCUPS@
-LIBCUPSIMAGE =	@LIBCUPSIMAGE@
 LIBIPP	=	@LIBIPP@
-LIBJPEG	=	@LIBJPEG@
-LIBMALLOC =	@LIBMALLOC@
-LIBPNG	=	@LIBPNG@
-LIBSLP	=	@LIBSLP@
-LIBTIFF	=	@LIBTIFF@
-LIBZ	=	@LIBZ@
 
 #
 # Program options...
@@ -84,19 +65,14 @@ LIBZ	=	@LIBZ@
 #
 
 ARFLAGS	=	@ARFLAGS@
-CFLAGS	=	$(RC_CFLAGS) @CFLAGS@ -I.. $(OPTIONS)
-CXXFLAGS =	$(RC_CFLAGS) @CXXFLAGS@ -I.. $(OPTIONS)
+CFLAGS	=	$(RC_CFLAGS) @CFLAGS@ $(OPTIONS)
 DSOFLAGS =	@DSOFLAGS@
 DSOLIBS	=	@DSOLIBS@
-IMGLIBS	=	@IMGLIBS@ -lm
 LDFLAGS	=	@LDFLAGS@ $(OPTIM)
-LINKCUPS =	@LINKCUPS@
-LINKCUPSIMAGE =	@LINKCUPSIMAGE@
 LIBS	=	$(LINKCUPS) $(NETLIBS) @LIBS@
 NETLIBS	=	@NETLIBS@
 OPTIM	=	@OPTIM@
 OPTIONS	=
-PAMLIBS	=	@PAMLIBS@
 SSLLIBS	=	@SSLLIBS@
 
 #
@@ -179,5 +155,5 @@ MAN8DIR		=	@MAN8DIR@
 	$(MV) t.z $@
 
 #
-# End of "$Id: Makedefs.in,v 1.36.2.6 2002/03/22 15:47:15 mike Exp $"
+# End of "$Id: Makedefs.in,v 1.1.2.1 2002/03/22 15:47:23 mike Exp $"
 #

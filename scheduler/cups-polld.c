@@ -1,5 +1,5 @@
 /*
- * "$Id: cups-polld.c,v 1.5.2.5 2002/03/01 19:55:24 mike Exp $"
+ * "$Id: cups-polld.c,v 1.5.2.6 2002/03/22 15:47:27 mike Exp $"
  *
  *   Polling daemon for the Common UNIX Printing System (CUPS).
  *
@@ -200,8 +200,8 @@ poll_server(http_t      *http,		/* I - HTTP connection */
 
   request = ippNew();
 
-  request->request.op.operation_id = op;
-  request->request.op.request_id   = 1;
+  request->header.op.operation_id = op;
+  request->header.op.request_id   = 1;
 
   language = cupsLangDefault();
 
@@ -221,11 +221,11 @@ poll_server(http_t      *http,		/* I - HTTP connection */
 
   if ((response = cupsDoRequest(http, request, "/")) != NULL)
   {
-    if (response->request.status.status_code > IPP_OK_CONFLICT)
+    if (response->header.status.status_code > IPP_OK_CONFLICT)
     {
       fprintf(stderr, "cups-polld: get-%s failed: %s\n",
               op == CUPS_GET_PRINTERS ? "printers" : "classes",
-              ippErrorString(response->request.status.status_code));
+              ippErrorString(response->header.status.status_code));
       ippDelete(response);
       return (-1);
     }
@@ -377,5 +377,5 @@ poll_server(http_t      *http,		/* I - HTTP connection */
 
 
 /*
- * End of "$Id: cups-polld.c,v 1.5.2.5 2002/03/01 19:55:24 mike Exp $".
+ * End of "$Id: cups-polld.c,v 1.5.2.6 2002/03/22 15:47:27 mike Exp $".
  */

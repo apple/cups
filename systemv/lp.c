@@ -1,5 +1,5 @@
 /*
- * "$Id: lp.c,v 1.29.2.3 2002/01/02 18:05:07 mike Exp $"
+ * "$Id: lp.c,v 1.29.2.4 2002/03/22 15:47:31 mike Exp $"
  *
  *   "lp" command for the Common UNIX Printing System (CUPS).
  *
@@ -584,8 +584,8 @@ set_job_attrs(int           job_id,	/* I - Job ID */
   language = cupsLangDefault();
 
   request = ippNew();
-  request->request.op.operation_id = IPP_SET_JOB_ATTRIBUTES;
-  request->request.op.request_id   = 1;
+  request->header.op.operation_id = IPP_SET_JOB_ATTRIBUTES;
+  request->header.op.request_id   = 1;
 
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
                "attributes-charset", NULL, cupsLangEncoding(language));
@@ -605,10 +605,10 @@ set_job_attrs(int           job_id,	/* I - Job ID */
 
   if ((response = cupsDoRequest(http, request, "/jobs")) != NULL)
   {
-    if (response->request.status.status_code > IPP_OK_CONFLICT)
+    if (response->header.status.status_code > IPP_OK_CONFLICT)
     {
       fprintf(stderr, "lp: set-job-attributes failed: %s\n",
-              ippErrorString(response->request.status.status_code));
+              ippErrorString(response->header.status.status_code));
       ippDelete(response);
       return (1);
     }
@@ -650,5 +650,5 @@ sighandler(int s)	/* I - Signal number */
 
 
 /*
- * End of "$Id: lp.c,v 1.29.2.3 2002/01/02 18:05:07 mike Exp $".
+ * End of "$Id: lp.c,v 1.29.2.4 2002/03/22 15:47:31 mike Exp $".
  */

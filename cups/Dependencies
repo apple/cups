@@ -1,23 +1,21 @@
 # DO NOT DELETE
 
-dest.o: cups.h ipp.h http.h md5.h ppd.h language.h string.h ../config.h
-emit.o: ppd.h string.h ../config.h
-encode.o: cups.h ipp.h http.h md5.h ppd.h string.h ../config.h debug.h
-http.o: string.h ../config.h http.h md5.h ipp.h debug.h
-http-addr.o: http.h md5.h debug.h string.h ../config.h
-ipp.o: string.h ../config.h language.h ipp.h http.h md5.h debug.h
-language.o: string.h ../config.h language.h cups_C.h
-mark.o: ppd.h string.h ../config.h debug.h
-md5.o: md5.h string.h ../config.h
-md5passwd.o: http.h md5.h string.h ../config.h
-options.o: cups.h ipp.h http.h md5.h ppd.h string.h ../config.h debug.h
-page.o: ppd.h string.h ../config.h
-ppd.o: ppd.h string.h ../config.h language.h debug.h
-snprintf.o: string.h ../config.h
-string.o: string.h ../config.h
-tempfile.o: cups.h ipp.h http.h md5.h ppd.h string.h ../config.h debug.h
-usersys.o: cups.h ipp.h http.h md5.h ppd.h string.h ../config.h
-util.o: cups.h ipp.h http.h md5.h ppd.h language.h string.h ../config.h
-util.o: debug.h
-testhttp.o: http.h md5.h
-testppd.o: cups.h ipp.h http.h md5.h ppd.h string.h ../config.h
+dest.o: cups.h ipp.h ../ipp/ipp.h http.h ../ipp/http.h ../ipp/md5.h ppd.h
+dest.o: language.h string.h ../ipp/string.h ../config.h
+emit.o: ppd.h string.h ../ipp/string.h ../config.h
+encode.o: cups.h ipp.h ../ipp/ipp.h http.h ../ipp/http.h ../ipp/md5.h ppd.h
+encode.o: string.h ../ipp/string.h ../config.h debug.h
+language.o: string.h ../ipp/string.h ../config.h language.h cups_C.h
+mark.o: ppd.h string.h ../ipp/string.h ../config.h debug.h
+options.o: cups.h ipp.h ../ipp/ipp.h http.h ../ipp/http.h ../ipp/md5.h ppd.h
+options.o: string.h ../ipp/string.h ../config.h debug.h
+page.o: ppd.h string.h ../ipp/string.h ../config.h
+ppd.o: ppd.h string.h ../ipp/string.h ../config.h language.h debug.h
+tempfile.o: cups.h ipp.h ../ipp/ipp.h http.h ../ipp/http.h ../ipp/md5.h ppd.h
+tempfile.o: string.h ../ipp/string.h ../config.h debug.h
+usersys.o: cups.h ipp.h ../ipp/ipp.h http.h ../ipp/http.h ../ipp/md5.h ppd.h
+usersys.o: string.h ../ipp/string.h ../config.h
+util.o: cups.h ipp.h ../ipp/ipp.h http.h ../ipp/http.h ../ipp/md5.h ppd.h
+util.o: language.h string.h ../ipp/string.h ../config.h debug.h
+testppd.o: cups.h ipp.h ../ipp/ipp.h http.h ../ipp/http.h ../ipp/md5.h ppd.h
+testppd.o: string.h ../ipp/string.h ../config.h

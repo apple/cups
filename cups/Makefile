@@ -1,7 +1,7 @@
 #
-# "$Id: Makefile,v 1.53.2.7 2002/03/12 20:39:22 mike Exp $"
+# "$Id: Makefile,v 1.53.2.8 2002/03/22 15:47:19 mike Exp $"
 #
-#   Support library Makefile for the Common UNIX Printing System (CUPS).
+#   API library Makefile for the Common UNIX Printing System (CUPS).
 #
 #   Copyright 1997-2002 by Easy Software Products, all rights reserved.
 #
@@ -30,9 +30,8 @@ include ../Makedefs
 # Object files...
 #
 
-LIBOBJS	=	dest.o emit.o encode.o http.o http-addr.o ipp.o language.o \
-		mark.o md5.o md5passwd.o options.o page.o ppd.o snprintf.o \
-		string.o tempfile.o usersys.o util.o
+LIBOBJS	=	dest.o emit.o encode.o language.o mark.o options.o \
+		page.o ppd.o tempfile.o usersys.o util.o
 OBJS	=	$(LIBOBJS) testhttp.o testppd.o
 
 
@@ -40,7 +39,7 @@ OBJS	=	$(LIBOBJS) testhttp.o testppd.o
 # Header files to install...
 #
 
-HEADERS	=	cups.h http.h ipp.h language.h md5.h ppd.h
+HEADERS	=	cups.h language.h ppd.h
 
 
 #
@@ -108,7 +107,7 @@ installhdrs:
 
 libcups.so.3 libcups.sl.3:	$(LIBOBJS) ../Makedefs
 	echo Linking $@...
-	$(DSO) $(DSOFLAGS) -o $@ $(LIBOBJS) $(SSLLIBS)
+	$(DSO) $(DSOFLAGS) -o $@ $(LIBOBJS)
 	$(RM) `basename $@ .3`
 	$(LN) $@ `basename $@ .3`
 
@@ -123,7 +122,7 @@ libcups.3.dylib:	$(LIBOBJS) ../Makedefs
 		-install_name $(libdir)/libcups.dylib \
 		-current_version 3.0.0 \
 		-compatibility_version 3.0.0 \
-		$(LIBOBJS) $(SSLLIBS)
+		$(LIBOBJS)
 	$(RM) libcups.dylib
 	$(LN) $@ libcups.dylib
 
@@ -134,9 +133,7 @@ libcups.3.dylib:	$(LIBOBJS) ../Makedefs
 
 libcups_s.a:	$(LIBOBJS) ../Makedefs
 	echo Creating $@...
-	$(RM) libcups_s.exp
-	(echo _ipp_add_attr; echo _ipp_free_attr) >libcups_s.exp
-	$(DSO) $(DSOFLAGS) -Wl,-bexport:libcups_s.exp -o libcups_s.o $(LIBOBJS) $(SSLLIBS) -lm
+	$(DSO) $(DSOFLAGS) -o libcups_s.o $(LIBOBJS) -lm
 	$(RM) $@
 	$(AR) $(ARFLAGS) $@ libcups_s.o
 
@@ -148,7 +145,7 @@ libcups_s.a:	$(LIBOBJS) ../Makedefs
 libcups.la:    $(LIBOBJS) ../Makedefs
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ $(LIBOBJS:.o=.lo) -rpath $(LIBDIR) \
-		-version-info 3:0 $(SSLLIBS)
+		-version-info 3:0
 
 
 #
@@ -173,15 +170,6 @@ cups_C.h:	../locale/C/cups_C
 
 
 #
-# testhttp (dependency on static CUPS library is intentional)
-#
-
-testhttp:	testhttp.o libcups.a
-	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ testhttp.o libcups.a $(NETLIBS) $(SSLLIBS)
-
-
-#
 # testppd (dependency on static CUPS library is intentional)
 #
 
@@ -193,10 +181,10 @@ testppd:	testppd.o libcups.a
 #
 # Dependencies...
 #
-  
+
 include Dependencies
 
 
 #
-# End of "$Id: Makefile,v 1.53.2.7 2002/03/12 20:39:22 mike Exp $".
+# End of "$Id: Makefile,v 1.53.2.8 2002/03/22 15:47:19 mike Exp $".
 #

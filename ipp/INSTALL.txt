@@ -1,69 +1,46 @@
-INSTALL - CUPS v1.2.0 - 12/26/2001
-----------------------------------
+INSTALL - LIBIPP v1.2.0a - 03/22/2002
+-------------------------------------
 
-This file describes how to compile and install CUPS from source
-code. For more information on CUPS see the file called
-"README.txt".  A complete change log can be found in
-"CHANGES.txt".
+This file describes how to compile and install LIBIPP from
+source code. For more information on LIBIPP see the file called
+"README.txt".
 
 
 BEFORE YOU BEGIN
 
-You'll need ANSI-compliant C and C++ compilers, plus a make
-program and Bourne shell.  The GNU compiler tools work well -
-we've tested the current CUPS code against GCC 2.95.x with
-excellent results.
+You'll need an ANSI-compliant C compiler, plus a make program
+and Bourne shell.  The GNU compiler tools work well - we've
+tested the current LIBIPP code against GCC 2.95.x with excellent
+results.
 
 The makefiles used by the project should work with all versions
 of make.  We've tested them with GNU make as well as the make
 programs shipped by Compaq, HP, SGI, and Sun.  FreeBSD users
 should use GNU make (gmake).
 
-Besides these tools you'll want the following libraries:
+Besides these tools you'll want the following library to enable
+support for encryption:
 
-    - JPEG 6b or higher
-    - PNG 1.0.6 or higher
-    - TIFF 3.4 or higher
-    - ZLIB 1.1.3 or higher
+    - OpenSSL 0.9.6a or higher
 
-CUPS will compile and run without these, however you'll miss out on
-many of the features provided by CUPS.
+LIBIPP will compile and run without it, however you'll miss out
+on the encryption features provided by LIBIPP.
 
 
 CONFIGURATION
 
-CUPS uses GNU autoconf, so you should find the usual "configure"
-script in the main CUPS source directory.  To configure CUPS for
-your system, type:
+LIBIPP uses GNU autoconf, so you should find the usual
+"configure" script in the main CUPS source directory.  To
+configure LIBIPP for your system, type:
 
     ./configure ENTER
 
-The default installation will put the CUPS software in the
-"/etc", "/usr", and "/var" directories on your system, which
-will overwrite any existing printing commands on your system.
-Use the "--prefix" option to install the CUPS software in
-another location:
+The default installation will put the LIBIPP software in the
+"/usr/include" and "/usr/lib" directories on your system. Use
+the "--prefix" option to install the LIBIPP software in another
+location:
 
     ./configure --prefix=/some/directory ENTER
-
-If the PNG, JPEG, TIFF, and ZLIB libraries are not installed in
-a system default location (typically "/usr/include" and
-"/usr/lib") you'll need to set the CFLAGS, CXXFLAGS, DSOFLAGS,
-and LDFLAGS environment variables prior to running configure:
-
-    setenv CFLAGS "-I/some/directory" ENTER
-    setenv CXXFLAGS "-I/some/directory" ENTER
-    setenv DSOFLAGS "-L/some/directory" ENTER
-    setenv LDFLAGS "-L/some/directory" ENTER
-    ./configure ... ENTER
-
-or:
-
-    CFLAGS="-I/some/directory"; export CFLAGS ENTER
-    CXXFLAGS="-I/some/directory"; export CXXFLAGS ENTER
-    DSOFLAGS="-L/some/directory"; export DSOFLAGS ENTER
-    LDFLAGS="-L/some/directory"; export LDFLAGS ENTER
-    ./configure ... ENTER
 
 To enable support for encryption, you'll also want to add the
 "--enable-ssl" option:
@@ -81,9 +58,6 @@ location, specify the locations of these files using the
     ./configure --enable-ssl \
         --with-openssl-includes=/foo/bar/include \
         --with-openssl-libs=/foo/bar/lib
-
-See the file "ENCRYPTION.txt" for information on using the
-encryption support in CUPS.
 
 Once you have configured things, just type:
 
@@ -108,11 +82,11 @@ or for FreeBSD, NetBSD, or OpenBSD:
 
     gmake install ENTER
 
-You can also build binary packages that can be installed on other
-machines using the RPM spec file ("cups.spec") or EPM list file
-("cups.list").  The latter also supports building of binary RPMs,
-so it may be more convenient to use - we use EPM to build all of
-our binary distributions.
+You can also build binary packages that can be installed on
+other machines using the RPM spec file ("ipp.spec") or EPM list
+file ("ipp.list").  The latter also supports building of binary
+RPMs, so it may be more convenient to use - we use EPM to build
+all of our binary distributions.
 
 You can find the RPM software at:
 
@@ -120,7 +94,7 @@ You can find the RPM software at:
 
 The EPM software is at:
 
-    http://www.easysw.com/epm/
+    http://www.easysw.com/epm
 
 
 CREATING BINARY DISTRIBUTIONS WITH EPM

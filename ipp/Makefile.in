@@ -1,0 +1,182 @@
+#
+# "$Id: Makefile.in,v 1.1.2.1 2002/03/22 15:47:23 mike Exp $"
+#
+#   IPP library Makefile for the Common UNIX Printing System (CUPS).
+#
+#   Copyright 1997-2002 by Easy Software Products, all rights reserved.
+#
+#   These coded instructions, statements, and computer programs are the
+#   property of Easy Software Products and are protected by Federal
+#   copyright law.  Distribution and use rights are outlined in the file
+#   "LICENSE.txt" which should have been included with this file.  If this
+#   file is missing or damaged please contact Easy Software Products
+#   at:
+#
+#       Attn: CUPS Licensing Information
+#       Easy Software Products
+#       44141 Airport View Drive, Suite 204
+#       Hollywood, Maryland 20636-3111 USA
+#
+#       Voice: (301) 373-9603
+#       EMail: cups-info@cups.org
+#         WWW: http://www.cups.org
+#
+#   This file is subject to the Apple OS-Developed Software exception.
+#
+
+include @MAKEDEFS@
+
+#
+# Object files...
+#
+
+LIBOBJS	=	http.o http-addr.o ipp.o md5.o md5passwd.o snprintf.o \
+		string.o
+OBJS	=	$(LIBOBJS) testhttp.o
+
+
+#
+# Header files to install...
+#
+
+HEADERS	=	http.h ipp.h md5.h
+
+
+#
+# Targets in this directory...
+#
+
+TARGETS	=	$(LIBIPP) libipp.a
+
+
+#
+# Make all targets...
+#
+
+all:	$(TARGETS)
+
+
+#
+# Remove object and target files...
+#
+
+clean:
+	$(RM) $(OBJS) $(TARGETS) `basename $(LIBIPP) .3`
+
+
+#
+# Update dependencies (without system header dependencies...)
+#
+
+depend:
+	makedepend -Y -I.. -fDependencies $(OBJS:.o=.c) >/dev/null 2>&1
+
+
+#
+# Install object and target files...
+#
+
+install:	all	installhdrs
+	$(INSTALL_DIR) $(LIBDIR)
+	$(INSTALL_LIB) $(LIBIPP) $(LIBDIR)
+	if test $(LIBIPP) = "libipp.so.3" -o $(LIBIPP) = "libipp.sl.3"; then \
+		$(INSTALL_LIB) libipp.a $(LIBDIR); \
+		$(RM) $(LIBDIR)/`basename $(LIBIPP) .3`; \
+		$(LN) $(LIBIPP) $(LIBDIR)/`basename $(LIBIPP) .3`; \
+	fi
+	if test $(LIBIPP) = "libipp.3.dylib"; then \
+		$(STRIP) -x $(LIBDIR)/$(LIBIPP); \
+		$(INSTALL_LIB) libipp.a $(LIBDIR); \
+		$(RM) $(LIBDIR)/libipp.dylib; \
+		$(LN) $(LIBIPP) $(LIBDIR)/libipp.dylib; \
+	fi
+	if test $(LIBIPP) = "libipp_s.a"; then \
+		$(INSTALL_LIB) libipp.a $(LIBDIR); \
+	fi
+
+installhdrs:
+	$(INSTALL_DIR) $(INCLUDEDIR)/ipp
+	for file in $(HEADERS); do \
+		$(INSTALL_DATA) $$file $(INCLUDEDIR)/ipp; \
+	done
+
+
+#
+# libipp.so.3, libipp.sl.3
+#
+
+libipp.so.3 libipp.sl.3:	$(LIBOBJS) ../Makedefs
+	echo Linking $@...
+	$(DSO) $(DSOFLAGS) -o $@ $(LIBOBJS) $(SSLLIBS)
+	$(RM) `basename $@ .3`
+	$(LN) $@ `basename $@ .3`
+
+
+#
+# libipp.2.dylib
+#
+
+libipp.3.dylib:	$(LIBOBJS) ../Makedefs
+	echo Linking $@...
+	$(DSO) $(DSOFLAGS) -o $@ \
+		-install_name $(libdir)/libipp.dylib \
+		-current_version 3.0.0 \
+		-compatibility_version 3.0.0 \
+		$(LIBOBJS) $(SSLLIBS)
+	$(RM) libipp.dylib
+	$(LN) $@ libipp.dylib
+
+
+#
+# libipp_s.a
+#
+
+libipp_s.a:	$(LIBOBJS) ../Makedefs
+	echo Creating $@...
+	$(RM) libipp_s.exp
+	(echo _ipp_add_attr; echo _ipp_free_attr) >libipp_s.exp
+	$(DSO) $(DSOFLAGS) -Wl,-bexport:libipp_s.exp -o libipp_s.o $(LIBOBJS) $(SSLLIBS) -lm
+	$(RM) $@
+	$(AR) $(ARFLAGS) $@ libipp_s.o
+
+
+#
+# libipp.la
+#
+
+libipp.la:    $(LIBOBJS) ../Makedefs
+	echo Linking $@...
+	$(CC) $(LDFLAGS) -o $@ $(LIBOBJS:.o=.lo) -rpath $(LIBDIR) \
+		-version-info 3:0 $(SSLLIBS)
+
+
+#
+# libipp.a
+#
+
+libipp.a:	$(LIBOBJS)
+	echo Archiving $@...
+	$(RM) $@
+	$(AR) $(ARFLAGS) $@ $(LIBOBJS)
+	$(RANLIB) $@
+
+
+#
+# testhttp (dependency on static IPP library is intentional)
+#
+
+testhttp:	testhttp.o libipp.a
+	echo Linking $@...
+	$(CC) $(LDFLAGS) -o $@ testhttp.o libipp.a $(NETLIBS) $(SSLLIBS)
+
+
+#
+# Dependencies...
+#
+  
+include Dependencies
+
+
+#
+# End of "$Id: Makefile.in,v 1.1.2.1 2002/03/22 15:47:23 mike Exp $".
+#

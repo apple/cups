@@ -1,5 +1,5 @@
 /*
- * "$Id: lpadmin.c,v 1.22.2.5 2002/03/14 19:11:49 mike Exp $"
+ * "$Id: lpadmin.c,v 1.22.2.6 2002/03/22 15:47:31 mike Exp $"
  *
  *   "lpadmin" command for the Common UNIX Printing System (CUPS).
  *
@@ -746,8 +746,8 @@ add_printer_to_class(http_t *http,	/* I - Server connection */
 
   request = ippNew();
 
-  request->request.op.operation_id = IPP_GET_PRINTER_ATTRIBUTES;
-  request->request.op.request_id   = 1;
+  request->header.op.operation_id = IPP_GET_PRINTER_ATTRIBUTES;
+  request->header.op.request_id   = 1;
 
   language = cupsLangDefault();
 
@@ -778,8 +778,8 @@ add_printer_to_class(http_t *http,	/* I - Server connection */
 
   request = ippNew();
 
-  request->request.op.operation_id = CUPS_ADD_CLASS;
-  request->request.op.request_id   = 1;
+  request->header.op.operation_id = CUPS_ADD_CLASS;
+  request->header.op.request_id   = 1;
 
   language = cupsLangDefault();
 
@@ -842,9 +842,9 @@ add_printer_to_class(http_t *http,	/* I - Server connection */
             ippErrorString(cupsLastError()));
   else
   {
-    if (response->request.status.status_code > IPP_OK_CONFLICT)
+    if (response->header.status.status_code > IPP_OK_CONFLICT)
       fprintf(stderr, "lpadmin: add-class failed: %s\n",
-              ippErrorString(response->request.status.status_code));
+              ippErrorString(response->header.status.status_code));
 
     ippDelete(response);
   }
@@ -880,8 +880,8 @@ default_printer(http_t *http,		/* I - Server connection */
 
   request = ippNew();
 
-  request->request.op.operation_id = CUPS_SET_DEFAULT;
-  request->request.op.request_id   = 1;
+  request->header.op.operation_id = CUPS_SET_DEFAULT;
+  request->header.op.request_id   = 1;
 
   language = cupsLangDefault();
 
@@ -903,9 +903,9 @@ default_printer(http_t *http,		/* I - Server connection */
             ippErrorString(cupsLastError()));
   else
   {
-    if (response->request.status.status_code > IPP_OK_CONFLICT)
+    if (response->header.status.status_code > IPP_OK_CONFLICT)
       fprintf(stderr, "lpadmin: set-default failed: %s\n",
-              ippErrorString(response->request.status.status_code));
+              ippErrorString(response->header.status.status_code));
 
     ippDelete(response);
   }
@@ -941,8 +941,8 @@ delete_printer(http_t *http,		/* I - Server connection */
 
   request = ippNew();
 
-  request->request.op.operation_id = CUPS_DELETE_PRINTER;
-  request->request.op.request_id   = 1;
+  request->header.op.operation_id = CUPS_DELETE_PRINTER;
+  request->header.op.request_id   = 1;
 
   language = cupsLangDefault();
 
@@ -964,9 +964,9 @@ delete_printer(http_t *http,		/* I - Server connection */
             ippErrorString(cupsLastError()));
   else
   {
-    if (response->request.status.status_code > IPP_OK_CONFLICT)
+    if (response->header.status.status_code > IPP_OK_CONFLICT)
       fprintf(stderr, "lpadmin: delete-printer failed: %s\n",
-              ippErrorString(response->request.status.status_code));
+              ippErrorString(response->header.status.status_code));
 
     ippDelete(response);
   }
@@ -1007,8 +1007,8 @@ delete_printer_from_class(http_t *http,		/* I - Server connection */
 
   request = ippNew();
 
-  request->request.op.operation_id = IPP_GET_PRINTER_ATTRIBUTES;
-  request->request.op.request_id   = 1;
+  request->header.op.operation_id = IPP_GET_PRINTER_ATTRIBUTES;
+  request->header.op.request_id   = 1;
 
   language = cupsLangDefault();
 
@@ -1026,7 +1026,7 @@ delete_printer_from_class(http_t *http,		/* I - Server connection */
   */
 
   if ((response = cupsDoRequest(http, request, "/classes/")) == NULL ||
-      response->request.status.status_code == IPP_NOT_FOUND)
+      response->header.status.status_code == IPP_NOT_FOUND)
   {
     ippDelete(response);
     fprintf(stderr, "lpadmin: Class %s does not exist!\n", pclass);
@@ -1069,8 +1069,8 @@ delete_printer_from_class(http_t *http,		/* I - Server connection */
 
     request = ippNew();
 
-    request->request.op.operation_id = CUPS_DELETE_CLASS;
-    request->request.op.request_id   = 1;
+    request->header.op.operation_id = CUPS_DELETE_CLASS;
+    request->header.op.request_id   = 1;
 
     language = cupsLangDefault();
 
@@ -1097,8 +1097,8 @@ delete_printer_from_class(http_t *http,		/* I - Server connection */
 
     request = ippNew();
 
-    request->request.op.operation_id = CUPS_ADD_CLASS;
-    request->request.op.request_id   = 1;
+    request->header.op.operation_id = CUPS_ADD_CLASS;
+    request->header.op.request_id   = 1;
 
     language = cupsLangDefault();
 
@@ -1135,9 +1135,9 @@ delete_printer_from_class(http_t *http,		/* I - Server connection */
             ippErrorString(cupsLastError()));
   else
   {
-    if (response->request.status.status_code > IPP_OK_CONFLICT)
+    if (response->header.status.status_code > IPP_OK_CONFLICT)
       fprintf(stderr, "lpadmin: add/delete-class failed: %s\n",
-              ippErrorString(response->request.status.status_code));
+              ippErrorString(response->header.status.status_code));
 
     ippDelete(response);
   }
@@ -1175,8 +1175,8 @@ enable_printer(http_t *http,		/* I - Server connection */
 
   request = ippNew();
 
-  request->request.op.operation_id = CUPS_ADD_PRINTER;
-  request->request.op.request_id   = 1;
+  request->header.op.operation_id = CUPS_ADD_PRINTER;
+  request->header.op.request_id   = 1;
 
   language = cupsLangDefault();
 
@@ -1203,9 +1203,9 @@ enable_printer(http_t *http,		/* I - Server connection */
             ippErrorString(cupsLastError()));
   else
   {
-    if (response->request.status.status_code > IPP_OK_CONFLICT)
+    if (response->header.status.status_code > IPP_OK_CONFLICT)
       fprintf(stderr, "lpadmin: add-printer failed: %s\n",
-              ippErrorString(response->request.status.status_code));
+              ippErrorString(response->header.status.status_code));
 
     ippDelete(response);
   }
@@ -1291,8 +1291,8 @@ set_printer_device(http_t *http,	/* I - Server connection */
 
   request = ippNew();
 
-  request->request.op.operation_id = CUPS_ADD_PRINTER;
-  request->request.op.request_id   = 1;
+  request->header.op.operation_id = CUPS_ADD_PRINTER;
+  request->header.op.request_id   = 1;
 
   language = cupsLangDefault();
 
@@ -1332,9 +1332,9 @@ set_printer_device(http_t *http,	/* I - Server connection */
             ippErrorString(cupsLastError()));
   else
   {
-    if (response->request.status.status_code > IPP_OK_CONFLICT)
+    if (response->header.status.status_code > IPP_OK_CONFLICT)
       fprintf(stderr, "lpadmin: add-printer failed: %s\n",
-              ippErrorString(response->request.status.status_code));
+              ippErrorString(response->header.status.status_code));
 
     ippDelete(response);
   }
@@ -1413,8 +1413,8 @@ set_printer_file(http_t *http,		/* I - Server connection */
 
   request = ippNew();
 
-  request->request.op.operation_id = CUPS_ADD_PRINTER;
-  request->request.op.request_id   = 1;
+  request->header.op.operation_id = CUPS_ADD_PRINTER;
+  request->header.op.request_id   = 1;
 
   language = cupsLangDefault();
 
@@ -1436,9 +1436,9 @@ set_printer_file(http_t *http,		/* I - Server connection */
             ippErrorString(cupsLastError()));
   else
   {
-    if (response->request.status.status_code > IPP_OK_CONFLICT)
+    if (response->header.status.status_code > IPP_OK_CONFLICT)
       fprintf(stderr, "lpadmin: add-printer failed: %s\n",
-              ippErrorString(response->request.status.status_code));
+              ippErrorString(response->header.status.status_code));
 
     ippDelete(response);
   }
@@ -1485,8 +1485,8 @@ set_printer_info(http_t *http,		/* I - Server connection */
 
   request = ippNew();
 
-  request->request.op.operation_id = CUPS_ADD_PRINTER;
-  request->request.op.request_id   = 1;
+  request->header.op.operation_id = CUPS_ADD_PRINTER;
+  request->header.op.request_id   = 1;
 
   language = cupsLangDefault();
 
@@ -1515,9 +1515,9 @@ set_printer_info(http_t *http,		/* I - Server connection */
             ippErrorString(cupsLastError()));
   else
   {
-    if (response->request.status.status_code > IPP_OK_CONFLICT)
+    if (response->header.status.status_code > IPP_OK_CONFLICT)
       fprintf(stderr, "lpadmin: add-printer failed: %s\n",
-              ippErrorString(response->request.status.status_code));
+              ippErrorString(response->header.status.status_code));
 
     ippDelete(response);
   }
@@ -1555,8 +1555,8 @@ set_printer_location(http_t *http,	/* I - Server connection */
 
   request = ippNew();
 
-  request->request.op.operation_id = CUPS_ADD_PRINTER;
-  request->request.op.request_id   = 1;
+  request->header.op.operation_id = CUPS_ADD_PRINTER;
+  request->header.op.request_id   = 1;
 
   language = cupsLangDefault();
 
@@ -1585,9 +1585,9 @@ set_printer_location(http_t *http,	/* I - Server connection */
             ippErrorString(cupsLastError()));
   else
   {
-    if (response->request.status.status_code > IPP_OK_CONFLICT)
+    if (response->header.status.status_code > IPP_OK_CONFLICT)
       fprintf(stderr, "lpadmin: add-printer failed: %s\n",
-              ippErrorString(response->request.status.status_code));
+              ippErrorString(response->header.status.status_code));
 
     ippDelete(response);
   }
@@ -1623,8 +1623,8 @@ set_printer_model(http_t *http,		/* I - Server connection */
 
   request = ippNew();
 
-  request->request.op.operation_id = CUPS_ADD_PRINTER;
-  request->request.op.request_id   = 1;
+  request->header.op.operation_id = CUPS_ADD_PRINTER;
+  request->header.op.request_id   = 1;
 
   language = cupsLangDefault();
 
@@ -1649,9 +1649,9 @@ set_printer_model(http_t *http,		/* I - Server connection */
             ippErrorString(cupsLastError()));
   else
   {
-    if (response->request.status.status_code > IPP_OK_CONFLICT)
+    if (response->header.status.status_code > IPP_OK_CONFLICT)
       fprintf(stderr, "lpadmin: add-printer failed: %s\n",
-              ippErrorString(response->request.status.status_code));
+              ippErrorString(response->header.status.status_code));
 
     ippDelete(response);
   }
@@ -1700,8 +1700,8 @@ set_printer_options(http_t        *http,	/* I - Server connection */
 
   request = ippNew();
 
-  request->request.op.operation_id = CUPS_ADD_PRINTER;
-  request->request.op.request_id   = 1;
+  request->header.op.operation_id = CUPS_ADD_PRINTER;
+  request->header.op.request_id   = 1;
 
   language = cupsLangDefault();
 
@@ -1798,9 +1798,9 @@ set_printer_options(http_t        *http,	/* I - Server connection */
             ippErrorString(cupsLastError()));
   else
   {
-    if (response->request.status.status_code > IPP_OK_CONFLICT)
+    if (response->header.status.status_code > IPP_OK_CONFLICT)
       fprintf(stderr, "lpadmin: add-printer failed: %s\n",
-              ippErrorString(response->request.status.status_code));
+              ippErrorString(response->header.status.status_code));
 
     ippDelete(response);
   }
@@ -1839,5 +1839,5 @@ validate_name(const char *name)	/* I - Name to check */
 
 
 /*
- * End of "$Id: lpadmin.c,v 1.22.2.5 2002/03/14 19:11:49 mike Exp $".
+ * End of "$Id: lpadmin.c,v 1.22.2.6 2002/03/22 15:47:31 mike Exp $".
  */

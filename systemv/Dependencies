@@ -1,25 +1,30 @@
 # DO NOT DELETE
 
-accept.o: ../config.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
-accept.o: ../cups/md5.h ../cups/ppd.h ../cups/language.h
-cancel.o: ../config.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
-cancel.o: ../cups/md5.h ../cups/ppd.h ../cups/language.h
-cupsaddsmb.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
-cupsaddsmb.o: ../cups/ppd.h ../cups/string.h ../config.h
-lp.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h ../cups/ppd.h
-lp.o: ../cups/string.h ../config.h ../cups/language.h
-lpadmin.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
-lpadmin.o: ../cups/ppd.h ../cups/language.h ../cups/debug.h ../config.h
-lpinfo.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
-lpinfo.o: ../cups/ppd.h ../cups/language.h ../cups/debug.h ../cups/string.h
-lpinfo.o: ../config.h
-lpmove.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
-lpmove.o: ../cups/ppd.h ../cups/language.h ../cups/debug.h ../cups/string.h
-lpmove.o: ../config.h
-lpoptions.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
-lpoptions.o: ../cups/ppd.h ../cups/string.h ../config.h
-lppasswd.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
-lppasswd.o: ../cups/ppd.h ../cups/md5.h ../cups/string.h ../config.h
-lpstat.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
-lpstat.o: ../cups/ppd.h ../cups/language.h ../cups/debug.h ../cups/string.h
-lpstat.o: ../config.h
+accept.o: ../config.h ../cups/cups.h ../cups/ipp.h ../ipp/ipp.h ../ipp/http.h
+accept.o: ../ipp/md5.h ../cups/ppd.h ../cups/language.h
+cancel.o: ../config.h ../cups/cups.h ../cups/ipp.h ../ipp/ipp.h ../ipp/http.h
+cancel.o: ../ipp/md5.h ../cups/ppd.h ../cups/language.h
+cupsaddsmb.o: ../cups/cups.h ../cups/ipp.h ../ipp/ipp.h ../ipp/http.h
+cupsaddsmb.o: ../ipp/md5.h ../cups/ppd.h ../cups/string.h ../ipp/string.h
+cupsaddsmb.o: ../config.h
+lp.o: ../cups/cups.h ../cups/ipp.h ../ipp/ipp.h ../ipp/http.h ../ipp/md5.h
+lp.o: ../cups/ppd.h ../cups/string.h ../ipp/string.h ../config.h
+lp.o: ../cups/language.h
+lpadmin.o: ../cups/cups.h ../cups/ipp.h ../ipp/ipp.h ../ipp/http.h
+lpadmin.o: ../ipp/md5.h ../cups/ppd.h ../cups/language.h ../cups/debug.h
+lpadmin.o: ../config.h
+lpinfo.o: ../cups/cups.h ../cups/ipp.h ../ipp/ipp.h ../ipp/http.h
+lpinfo.o: ../ipp/md5.h ../cups/ppd.h ../cups/language.h ../cups/debug.h
+lpinfo.o: ../cups/string.h ../ipp/string.h ../config.h
+lpmove.o: ../cups/cups.h ../cups/ipp.h ../ipp/ipp.h ../ipp/http.h
+lpmove.o: ../ipp/md5.h ../cups/ppd.h ../cups/language.h ../cups/debug.h
+lpmove.o: ../cups/string.h ../ipp/string.h ../config.h
+lpoptions.o: ../cups/cups.h ../cups/ipp.h ../ipp/ipp.h ../ipp/http.h
+lpoptions.o: ../ipp/md5.h ../cups/ppd.h ../cups/string.h ../ipp/string.h
+lpoptions.o: ../config.h
+lppasswd.o: ../cups/cups.h ../cups/ipp.h ../ipp/ipp.h ../ipp/http.h
+lppasswd.o: ../ipp/md5.h ../cups/ppd.h ../cups/string.h ../ipp/string.h
+lppasswd.o: ../config.h
+lpstat.o: ../cups/cups.h ../cups/ipp.h ../ipp/ipp.h ../ipp/http.h
+lpstat.o: ../ipp/md5.h ../cups/ppd.h ../cups/language.h ../cups/debug.h
+lpstat.o: ../cups/string.h ../ipp/string.h ../config.h

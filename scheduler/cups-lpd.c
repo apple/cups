@@ -1,5 +1,5 @@
 /*
- * "$Id: cups-lpd.c,v 1.24.2.4 2002/01/02 18:05:00 mike Exp $"
+ * "$Id: cups-lpd.c,v 1.24.2.5 2002/03/22 15:47:27 mike Exp $"
  *
  *   Line Printer Daemon interface for the Common UNIX Printing System (CUPS).
  *
@@ -321,8 +321,8 @@ print_file(const char    *name,		/* I - Printer or class name */
     return (0);
   }
 
-  request->request.op.operation_id = IPP_PRINT_JOB;
-  request->request.op.request_id   = 1;
+  request->header.op.operation_id = IPP_PRINT_JOB;
+  request->header.op.request_id   = 1;
 
   snprintf(uri, sizeof(uri), "ipp://localhost/printers/%s", name);
 
@@ -360,7 +360,7 @@ print_file(const char    *name,		/* I - Printer or class name */
 
   if (response == NULL)
     jobid = 0;
-  else if (response->request.status.status_code > IPP_OK_CONFLICT)
+  else if (response->header.status.status_code > IPP_OK_CONFLICT)
     jobid = 0;
   else if ((attr = ippFindAttribute(response, "job-id", IPP_TAG_INTEGER)) == NULL)
     jobid = 0;
@@ -371,7 +371,7 @@ print_file(const char    *name,		/* I - Printer or class name */
     syslog(LOG_INFO, "Print file - job ID = %d", jobid);
   else if (response)
     syslog(LOG_ERR, "Unable to print file - %s",
-           ippErrorString(response->request.status.status_code));
+           ippErrorString(response->header.status.status_code));
   else
     syslog(LOG_ERR, "Unable to print file - %s",
            ippErrorString(cupsLastError()));
@@ -838,8 +838,8 @@ remove_jobs(const char *dest,		/* I - Destination */
 
     request = ippNew();
 
-    request->request.op.operation_id = IPP_CANCEL_JOB;
-    request->request.op.request_id   = 1;
+    request->header.op.operation_id = IPP_CANCEL_JOB;
+    request->header.op.request_id   = 1;
 
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
         	 "attributes-charset", NULL, cupsLangEncoding(language));
@@ -859,10 +859,10 @@ remove_jobs(const char *dest,		/* I - Destination */
 
     if ((response = cupsDoRequest(http, request, "/jobs")) != NULL)
     {
-      if (response->request.status.status_code > IPP_OK_CONFLICT)
+      if (response->header.status.status_code > IPP_OK_CONFLICT)
       {
 	syslog(LOG_WARNING, "Cancel of job ID %d failed: %s\n", id,
-               ippErrorString(response->request.status.status_code));
+               ippErrorString(response->header.status.status_code));
 	ippDelete(response);
 	cupsLangFree(language);
 	httpClose(http);
@@ -978,8 +978,8 @@ send_state(const char *dest,		/* I - Destination */
 
   request = ippNew();
 
-  request->request.op.operation_id = IPP_GET_PRINTER_ATTRIBUTES;
-  request->request.op.request_id   = 1;
+  request->header.op.operation_id = IPP_GET_PRINTER_ATTRIBUTES;
+  request->header.op.request_id   = 1;
 
   language = cupsLangDefault();
 
@@ -1002,10 +1002,10 @@ send_state(const char *dest,		/* I - Destination */
 
   if ((response = cupsDoRequest(http, request, "/")) != NULL)
   {
-    if (response->request.status.status_code > IPP_OK_CONFLICT)
+    if (response->header.status.status_code > IPP_OK_CONFLICT)
     {
       syslog(LOG_WARNING, "Unable to get printer list: %s\n",
-             ippErrorString(response->request.status.status_code));
+             ippErrorString(response->header.status.status_code));
       ippDelete(response);
       putchar(1);
       return (1);
@@ -1054,8 +1054,8 @@ send_state(const char *dest,		/* I - Destination */
 
   request = ippNew();
 
-  request->request.op.operation_id = id ? IPP_GET_JOB_ATTRIBUTES : IPP_GET_JOBS;
-  request->request.op.request_id   = 1;
+  request->header.op.operation_id = id ? IPP_GET_JOB_ATTRIBUTES : IPP_GET_JOBS;
+  request->header.op.request_id   = 1;
 
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
                "attributes-charset", NULL, cupsLangEncoding(language));
@@ -1089,10 +1089,10 @@ send_state(const char *dest,		/* I - Destination */
 
   if ((response = cupsDoRequest(http, request, "/")) != NULL)
   {
-    if (response->request.status.status_code > IPP_OK_CONFLICT)
+    if (response->header.status.status_code > IPP_OK_CONFLICT)
     {
       printf("get-jobs failed: %s\n",
-             ippErrorString(response->request.status.status_code));
+             ippErrorString(response->header.status.status_code));
       ippDelete(response);
       return (1);
     }
@@ -1288,5 +1288,5 @@ smart_gets(char *s,	/* I - Pointer to line buffer */
 
 
 /*
- * End of "$Id: cups-lpd.c,v 1.24.2.4 2002/01/02 18:05:00 mike Exp $".
+ * End of "$Id: cups-lpd.c,v 1.24.2.5 2002/03/22 15:47:27 mike Exp $".
  */

@@ -3,11 +3,12 @@
 pdftops.o: parseargs.h gtypes.h GString.h gmem.h Object.h Array.h Dict.h
 pdftops.o: Stream.h XRef.h Catalog.h Page.h PDFDoc.h Link.h PSOutputDev.h
 pdftops.o: config.h ../config.h OutputDev.h Params.h Error.h ../cups/cups.h
-pdftops.o: ../cups/ipp.h ../cups/http.h ../cups/md5.h ../cups/ppd.h
+pdftops.o: ../cups/ipp.h ../ipp/ipp.h ../ipp/http.h ../ipp/md5.h
+pdftops.o: ../cups/ppd.h
 Decrypt.o: gmem.h Decrypt.h gtypes.h GString.h
 GString.o: gtypes.h GString.h
 gfile.o: GString.h gfile.h config.h ../config.h gtypes.h ../cups/cups.h
-gfile.o: ../cups/ipp.h ../cups/http.h ../cups/md5.h ../cups/ppd.h
+gfile.o: ../cups/ipp.h ../ipp/ipp.h ../ipp/http.h ../ipp/md5.h ../cups/ppd.h
 gmempp.o: gmem.h
 Array.o: gmem.h Object.h gtypes.h GString.h Array.h Dict.h Stream.h
 Catalog.o: gmem.h Object.h gtypes.h GString.h Array.h Dict.h Stream.h XRef.h

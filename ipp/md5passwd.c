@@ -1,5 +1,5 @@
 /*
- * "$Id: md5passwd.c,v 1.5.2.3 2002/03/01 19:55:13 mike Exp $"
+ * "$Id: md5passwd.c,v 1.1.2.1 2002/03/22 15:47:26 mike Exp $"
  *
  *   MD5 password support for the Common UNIX Printing System (CUPS).
  *
@@ -146,5 +146,5 @@ httpMD5String(const md5_byte_t *sum,	/* I - MD5 sum data */
 
 
 /*
- * End of "$Id: md5passwd.c,v 1.5.2.3 2002/03/01 19:55:13 mike Exp $".
+ * End of "$Id: md5passwd.c,v 1.1.2.1 2002/03/22 15:47:26 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: snprintf.c,v 1.4.2.2 2002/03/01 19:55:14 mike Exp $"
+ * "$Id: snprintf.c,v 1.1.2.1 2002/03/22 15:47:26 mike Exp $"
  *
  *   snprintf functions for the Common UNIX Printing System (CUPS).
  *
@@ -25,8 +25,8 @@
  *
  * Contents:
  *
- *   vsnprintf() - Format a string into a fixed size buffer.
- *   snprintf()  - Format a string into a fixed size buffer.
+ *   ipp_vsnprintf() - Format a string into a fixed size buffer.
+ *   ipp_snprintf()  - Format a string into a fixed size buffer.
  */
 
 /*
@@ -40,28 +40,28 @@
 
 #ifndef HAVE_VSNPRINTF
 /*
- * 'vsnprintf()' - Format a string into a fixed size buffer.
+ * 'ipp_vsnprintf()' - Format a string into a fixed size buffer.
  */
 
-int				/* O - Number of bytes formatted */
-vsnprintf(char       *buffer,	/* O - Output buffer */
-          size_t     bufsize,	/* O - Size of output buffer */
-	  const char *format,	/* I - printf-style format string */
-	  va_list    ap)	/* I - Pointer to additional arguments */
+int					/* O - Number of bytes formatted */
+ipp_vsnprintf(char       *buffer,	/* O - Output buffer */
+              size_t     bufsize,	/* O - Size of output buffer */
+	      const char *format,	/* I - printf-style format string */
+	      va_list    ap)		/* I - Pointer to additional arguments */
 {
-  char		*bufptr,	/* Pointer to position in buffer */
-		*bufend,	/* Pointer to end of buffer */
-		sign,		/* Sign of format width */
-		size,		/* Size character (h, l, L) */
-		type;		/* Format type character */
-  const char	*bufformat;	/* Start of format */
-  int		width,		/* Width of field */
-		prec;		/* Number of characters of precision */
-  char		tformat[100],	/* Temporary format string for sprintf() */
-		temp[1024];	/* Buffer for formatted numbers */
-  int		*chars;		/* Pointer to integer for %p */
-  char		*s;		/* Pointer to string */
-  int		slen;		/* Length of string */
+  char		*bufptr,		/* Pointer to position in buffer */
+		*bufend,		/* Pointer to end of buffer */
+		sign,			/* Sign of format width */
+		size,			/* Size character (h, l, L) */
+		type;			/* Format type character */
+  const char	*bufformat;		/* Start of format */
+  int		width,			/* Width of field */
+		prec;			/* Number of characters of precision */
+  char		tformat[100],		/* Temporary format string for sprintf() */
+		temp[1024];		/* Buffer for formatted numbers */
+  int		*chars;			/* Pointer to integer for %p */
+  char		*s;			/* Pointer to string */
+  int		slen;			/* Length of string */
 
 
  /*
@@ -261,17 +261,17 @@ vsnprintf(char       *buffer,	/* O - Output buffer */
 
 #ifndef HAVE_SNPRINTF
 /*
- * 'snprintf()' - Format a string into a fixed size buffer.
+ * 'ipp_snprintf()' - Format a string into a fixed size buffer.
  */
 
-int				/* O - Number of bytes formatted */
-snprintf(char       *buffer,	/* O - Output buffer */
-         size_t     bufsize,	/* O - Size of output buffer */
-         const char *format,	/* I - printf-style format string */
-	 ...)			/* I - Additional arguments as needed */
+int					/* O - Number of bytes formatted */
+ipp_snprintf(char       *buffer,	/* O - Output buffer */
+             size_t     bufsize,	/* O - Size of output buffer */
+             const char *format,	/* I - printf-style format string */
+	     ...)			/* I - Additional arguments as needed */
 {
-  int		bytes;		/* Number of bytes formatted */
-  va_list 	ap;		/* Pointer to additional arguments */
+  int		bytes;			/* Number of bytes formatted */
+  va_list 	ap;			/* Pointer to additional arguments */
 
 
   va_start(ap, format);
@@ -284,6 +284,6 @@ snprintf(char       *buffer,	/* O - Output buffer */
 
 
 /*
- * End of "$Id: snprintf.c,v 1.4.2.2 2002/03/01 19:55:14 mike Exp $".
+ * End of "$Id: snprintf.c,v 1.1.2.1 2002/03/22 15:47:26 mike Exp $".
  */
 

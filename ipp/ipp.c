@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.55.2.12 2002/03/01 19:55:11 mike Exp $"
+ * "$Id: ipp.c,v 1.1.2.1 2002/03/22 15:47:25 mike Exp $"
  *
  *   Internet Printing Protocol support functions for the Common UNIX
  *   Printing System (CUPS).
@@ -74,7 +74,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "string.h"
-#include "language.h"
 
 #include "ipp.h"
 #include "debug.h"
@@ -910,8 +909,8 @@ ippNew(void)
     * Default to IPP 1.1...
     */
 
-    temp->request.any.version[0] = 1;
-    temp->request.any.version[1] = 1;
+    temp->header.any.version[0] = 1;
+    temp->header.any.version[1] = 1;
   }
 
   DEBUG_printf(("ippNew(): %p\n", temp));
@@ -1008,10 +1007,10 @@ ippReadIO(void       *src,	/* I - Data source */
         * Then copy the request header over...
 	*/
 
-        ipp->request.any.version[0]  = buffer[0];
-        ipp->request.any.version[1]  = buffer[1];
-        ipp->request.any.op_status   = (buffer[2] << 8) | buffer[3];
-        ipp->request.any.request_id  = (((((buffer[4] << 8) | buffer[5]) << 8) |
+        ipp->header.any.version[0]  = buffer[0];
+        ipp->header.any.version[1]  = buffer[1];
+        ipp->header.any.op_status   = (buffer[2] << 8) | buffer[3];
+        ipp->header.any.request_id  = (((((buffer[4] << 8) | buffer[5]) << 8) |
 	                               buffer[6]) << 8) | buffer[7];
 
         ipp->state   = IPP_ATTRIBUTE;
@@ -1019,8 +1018,8 @@ ippReadIO(void       *src,	/* I - Data source */
 	ipp->curtag  = IPP_TAG_ZERO;
 
         DEBUG_printf(("ippReadIO: version=%d.%d\n", buffer[0], buffer[1]));
-	DEBUG_printf(("ippReadIO: op_status=%04x\n", ipp->request.any.op_status));
-	DEBUG_printf(("ippReadIO: request_id=%d\n", ipp->request.any.request_id));
+	DEBUG_printf(("ippReadIO: op_status=%04x\n", ipp->header.any.op_status));
+	DEBUG_printf(("ippReadIO: request_id=%d\n", ipp->header.any.request_id));
 
        /*
         * If blocking is disabled, stop here...
@@ -1438,14 +1437,14 @@ ippWriteIO(void       *dst,	/* I - Destination */
 
         bufptr = buffer;
 
-	*bufptr++ = ipp->request.any.version[0];
-	*bufptr++ = ipp->request.any.version[1];
-	*bufptr++ = ipp->request.any.op_status >> 8;
-	*bufptr++ = ipp->request.any.op_status;
-	*bufptr++ = ipp->request.any.request_id >> 24;
-	*bufptr++ = ipp->request.any.request_id >> 16;
-	*bufptr++ = ipp->request.any.request_id >> 8;
-	*bufptr++ = ipp->request.any.request_id;
+	*bufptr++ = ipp->header.any.version[0];
+	*bufptr++ = ipp->header.any.version[1];
+	*bufptr++ = ipp->header.any.op_status >> 8;
+	*bufptr++ = ipp->header.any.op_status;
+	*bufptr++ = ipp->header.any.request_id >> 24;
+	*bufptr++ = ipp->header.any.request_id >> 16;
+	*bufptr++ = ipp->header.any.request_id >> 8;
+	*bufptr++ = ipp->header.any.request_id;
 
         if ((*cb)(dst, buffer, bufptr - buffer) < 0)
 	{
@@ -1458,8 +1457,8 @@ ippWriteIO(void       *dst,	/* I - Destination */
 	ipp->curtag  = IPP_TAG_ZERO;
 
         DEBUG_printf(("ippWrite: version=%d.%d\n", buffer[0], buffer[1]));
-	DEBUG_printf(("ippWrite: op_status=%04x\n", ipp->request.any.op_status));
-	DEBUG_printf(("ippWrite: request_id=%d\n", ipp->request.any.request_id));
+	DEBUG_printf(("ippWrite: op_status=%04x\n", ipp->header.any.op_status));
+	DEBUG_printf(("ippWrite: request_id=%d\n", ipp->header.any.request_id));
 
        /*
         * If blocking is disabled, stop here...
@@ -2217,5 +2216,5 @@ ipp_write_mem(ipp_mem_t   *m,		/* I - Memory buffer */
 
 
 /*
- * End of "$Id: ipp.c,v 1.55.2.12 2002/03/01 19:55:11 mike Exp $".
+ * End of "$Id: ipp.c,v 1.1.2.1 2002/03/22 15:47:25 mike Exp $".
  */
