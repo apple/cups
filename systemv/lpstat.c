@@ -1,5 +1,5 @@
 /*
- * "$Id: lpstat.c,v 1.5 1999/04/19 21:17:29 mike Exp $"
+ * "$Id: lpstat.c,v 1.6 1999/04/21 14:16:29 mike Exp $"
  *
  *   "lpstat" command for the Common UNIX Printing System (CUPS).
  *
@@ -23,7 +23,14 @@
  *
  * Contents:
  *
- * 'main()' - Parse options and show status information.
+ *   main()           - Parse options and show status information.
+ *   show_accepting() - Show acceptance status.
+ *   show_classes()   - Show printer classes.
+ *   show_default()   - Show default destination.
+ *   show_devices()   - Show printer devices.
+ *   show_jobs()      - Show active print jobs.
+ *   show_printers()  - Show printers.
+ *   show_scheduler() - Show scheduler status.
  */
 
 /*
@@ -36,6 +43,151 @@
 #include <cups/cups.h>
 #include <cups/language.h>
 #include <cups/debug.h>
+
+
+/*
+ * Local functions...
+ */
+
+static void	show_accepting(http_t *, char *);
+static void	show_classes(http_t *, char *);
+static void	show_default(http_t *);
+static void	show_devices(http_t *, char *);
+static void	show_jobs(http_t *, char *, char *);
+static void	show_printers(http_t *, char *);
+static void	show_scheduler(http_t *);
+
+
+/*
+ * 'main()' - Parse options and show status information.
+ */
+
+int
+main(int  argc,		/* I - Number of command-line arguments */
+     char *argv[])	/* I - Command-line arguments */
+{
+  int		i;	/* Looping var */
+  http_t	*http;	/* Connection to server */
+
+
+  http = httpConnect("localhost", ippPort());
+
+  for (i = 1; i < argc; i ++)
+    if (argv[i][0] == '-')
+      switch (argv[i][1])
+      {
+        case 'a' : /* Show acceptance status */
+	    if (argv[i][2] != '\0')
+	      show_accepting(http, argv[i] + 2);
+	    else if ((i + 1) < argc && argv[i + 1][0] != '-')
+	    {
+	      i ++;
+	      show_accepting(http, argv[i]);
+	    }
+	    else
+	      show_accepting(http, NULL);
+	    break;
+
+        case 'c' : /* Show classes and members */
+	    if (argv[i][2] != '\0')
+	      show_classes(http, argv[i] + 2);
+	    else if ((i + 1) < argc && argv[i + 1][0] != '-')
+	    {
+	      i ++;
+	      show_classes(http, argv[i]);
+	    }
+	    else
+	      show_classes(http, NULL);
+	    break;
+
+        case 'd' : /* Show default destination */
+	    show_default(http);
+	    break;
+
+        case 'o' : /* Show jobs by destination */
+	    if (argv[i][2] != '\0')
+	      show_jobs(http, argv[i] + 2, NULL);
+	    else if ((i + 1) < argc && argv[i + 1][0] != '-')
+	    {
+	      i ++;
+	      show_jobs(http, argv[i], NULL);
+	    }
+	    else
+	      show_jobs(http, NULL, NULL);
+	    break;
+
+        case 'p' : /* Show printers */
+	    if (argv[i][2] != '\0')
+	      show_printers(http, argv[i] + 2);
+	    else if ((i + 1) < argc && argv[i + 1][0] != '-')
+	    {
+	      i ++;
+	      show_printers(http, argv[i]);
+	    }
+	    else
+	      show_printers(http, NULL);
+	    break;
+
+        case 'r' : /* Show scheduler status */
+	    show_scheduler(http);
+	    break;
+
+        case 's' : /* Show summary */
+	    show_default(http);
+	    show_classes(http, NULL);
+	    show_devices(http, NULL);
+	    break;
+
+        case 't' : /* Show all info */
+	    show_scheduler(http);
+	    show_default(http);
+	    show_classes(http, NULL);
+	    show_devices(http, NULL);
+	    show_accepting(http, NULL);
+	    show_printers(http, NULL);
+	    show_jobs(http, NULL, NULL);
+	    break;
+
+        case 'u' : /* Show jobs by user */
+	    if (argv[i][2] != '\0')
+	      show_jobs(http, NULL, argv[i] + 2);
+	    else if ((i + 1) < argc && argv[i + 1][0] != '-')
+	    {
+	      i ++;
+	      show_jobs(http, NULL, argv[i]);
+	    }
+	    else
+	      show_jobs(http, NULL, NULL);
+	    break;
+
+        case 'v' : /* Show printer devices */
+	    if (argv[i][2] != '\0')
+	      show_devices(http, argv[i] + 2);
+	    else if ((i + 1) < argc && argv[i + 1][0] != '-')
+	    {
+	      i ++;
+	      show_devices(http, argv[i]);
+	    }
+	    else
+	      show_devices(http, NULL);
+	    break;
+
+
+	default :
+	    fprintf(stderr, "lpstat: Unknown option \'%c\'!\n", argv[i][1]);
+	    return (1);
+      }
+    else
+    {
+      fprintf(stderr, "lpstat: Unknown argument \'%s\'!\n", argv[i]);
+      return (1);
+    }
+
+  if (argc == 1)
+    show_jobs(http, NULL, cuserid(NULL));
+
+  return (0);
+}
 
 
 /*
@@ -945,137 +1097,5 @@ show_scheduler(http_t *http)	/* I - HTTP connection to server */
 
 
 /*
- * 'main()' - Parse options and show status information.
- */
-
-int
-main(int  argc,		/* I - Number of command-line arguments */
-     char *argv[])	/* I - Command-line arguments */
-{
-  int		i;	/* Looping var */
-  http_t	*http;	/* Connection to server */
-
-
-  http = httpConnect("localhost", ippPort());
-
-  for (i = 1; i < argc; i ++)
-    if (argv[i][0] == '-')
-      switch (argv[i][1])
-      {
-        case 'a' : /* Show acceptance status */
-	    if (argv[i][2] != '\0')
-	      show_accepting(http, argv[i] + 2);
-	    else if ((i + 1) < argc && argv[i + 1][0] != '-')
-	    {
-	      i ++;
-	      show_accepting(http, argv[i]);
-	    }
-	    else
-	      show_accepting(http, NULL);
-	    break;
-
-        case 'c' : /* Show classes and members */
-	    if (argv[i][2] != '\0')
-	      show_classes(http, argv[i] + 2);
-	    else if ((i + 1) < argc && argv[i + 1][0] != '-')
-	    {
-	      i ++;
-	      show_classes(http, argv[i]);
-	    }
-	    else
-	      show_classes(http, NULL);
-	    break;
-
-        case 'd' : /* Show default destination */
-	    show_default(http);
-	    break;
-
-        case 'o' : /* Show jobs by destination */
-	    if (argv[i][2] != '\0')
-	      show_jobs(http, argv[i] + 2, NULL);
-	    else if ((i + 1) < argc && argv[i + 1][0] != '-')
-	    {
-	      i ++;
-	      show_jobs(http, argv[i], NULL);
-	    }
-	    else
-	      show_jobs(http, NULL, NULL);
-	    break;
-
-        case 'p' : /* Show printers */
-	    if (argv[i][2] != '\0')
-	      show_printers(http, argv[i] + 2);
-	    else if ((i + 1) < argc && argv[i + 1][0] != '-')
-	    {
-	      i ++;
-	      show_printers(http, argv[i]);
-	    }
-	    else
-	      show_printers(http, NULL);
-	    break;
-
-        case 'r' : /* Show scheduler status */
-	    show_scheduler(http);
-	    break;
-
-        case 's' : /* Show summary */
-	    show_default(http);
-	    show_classes(http, NULL);
-	    show_devices(http, NULL);
-	    break;
-
-        case 't' : /* Show all info */
-	    show_scheduler(http);
-	    show_default(http);
-	    show_classes(http, NULL);
-	    show_devices(http, NULL);
-	    show_accepting(http, NULL);
-	    show_printers(http, NULL);
-	    show_jobs(http, NULL, NULL);
-	    break;
-
-        case 'u' : /* Show jobs by user */
-	    if (argv[i][2] != '\0')
-	      show_jobs(http, NULL, argv[i] + 2);
-	    else if ((i + 1) < argc && argv[i + 1][0] != '-')
-	    {
-	      i ++;
-	      show_jobs(http, NULL, argv[i]);
-	    }
-	    else
-	      show_jobs(http, NULL, NULL);
-	    break;
-
-        case 'v' : /* Show printer devices */
-	    if (argv[i][2] != '\0')
-	      show_devices(http, argv[i] + 2);
-	    else if ((i + 1) < argc && argv[i + 1][0] != '-')
-	    {
-	      i ++;
-	      show_devices(http, argv[i]);
-	    }
-	    else
-	      show_devices(http, NULL);
-	    break;
-
-
-	default :
-	    fprintf(stderr, "lpstat: Unknown option \'%c\'!\n", argv[i][1]);
-	    return (1);
-      }
-    else
-    {
-      fprintf(stderr, "lpstat: Unknown argument \'%s\'!\n", argv[i]);
-      return (1);
-    }
-
-  if (argc == 1)
-    show_jobs(http, NULL, cuserid(NULL));
-
-  return (0);
-}
-
-
-/*
- * End of "$Id: lpstat.c,v 1.5 1999/04/19 21:17:29 mike Exp $".
+ * End of "$Id: lpstat.c,v 1.6 1999/04/21 14:16:29 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: cancel.c,v 1.1 1999/03/03 21:18:58 mike Exp $"
+ * "$Id: cancel.c,v 1.2 1999/04/21 14:16:28 mike Exp $"
  *
  *   "cancel" command for the Common UNIX Printing System (CUPS).
  *
@@ -32,198 +32,146 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <ctype.h>
+
 #include <cups/cups.h>
+#include <cups/language.h>
 
 
 /*
  * 'main()' - Parse options and cancel jobs.
  */
 
-int
-main(int  argc,		/* I - Number of command-line arguments */
-     char *argv[])	/* I - Command-line arguments */
+int				/* O - Exit status */
+main(int  argc,			/* I - Number of command-line arguments */
+     char *argv[])		/* I - Command-line arguments */
 {
+  http_t	*http;		/* HTTP connection to server */
   int		i;		/* Looping var */
   int		job_id;		/* Job ID */
   char		*dest;		/* Destination printer */
-  char		*title;		/* Job title */
-  int		priority;	/* Job priority (1-100) */
-  int		num_copies;	/* Number of copies per file */
-  int		num_files;	/* Number of files printed */
-  int		num_options;	/* Number of options */
-  cups_option_t	*options;	/* Options */
-  int		silent;		/* Silent or verbose output? */
-  char		tempfile[1024];	/* Temporary file for printing from stdin */
-  char		buffer[8192];	/* Copy buffer */
-  FILE		*temp;		/* Temporary file pointer */
+  char		name[255];	/* Printer name */
+  char		uri[1024];	/* Printer or job URI */
+  ipp_t		*request;	/* IPP request */
+  ipp_t		*response;	/* IPP response */
+  ipp_op_t	op;		/* Operation */
+  cups_lang_t	*language;	/* Language */
 
 
-  silent      = 0;
-  dest        = cupsGetDefault();
-  num_options = 0;
-  options     = NULL;
-  num_files   = 0;
+ /*
+  * Setup to cancel individual print jobs...
+  */
+
+  op     = IPP_CANCEL_JOB;
+  job_id = 0;
+  dest   = NULL;
+
+ /*
+  * Open a connection to the server...
+  */
+
+  if ((http = httpConnect("localhost", ippPort())) == NULL)
+  {
+    fputs("cancel: Unable to contact server!\n", stderr);
+    return (1);
+  }
+
+ /*
+  * Process command-line arguments...
+  */
 
   for (i = 1; i < argc; i ++)
     if (argv[i][0] == '-')
       switch (argv[i][1])
       {
-        case 'c' : /* Copy to spool dir (always enabled) */
-	    break;
-
-        case 'd' : /* Destination printer or class */
-	    if (argv[i][2] != '\0')
-	      dest = argv[i] + 2;
-	    else
-	    {
-	      i ++;
-	      dest = argv[i];
-	    }
-	    break;
-
-	case 'm' : /* Send email when job is done */
-	case 'w' : /* Write to console or email */
-	    break;
-
-	case 'n' : /* Number of copies */
-	    if (argv[i][2] != '\0')
-	      num_copies = atoi(argv[i] + 2);
-	    else
-	    {
-	      i ++;
-	      num_copies = atoi(argv[i]);
-	    }
-
-	    if (num_copies < 1 || num_copies > 100)
-	    {
-	      fputs("lp: Number copies must be between 1 and 100.\n", stderr);
-	      return (1);
-	    }
-
-            sprintf(buffer, "%d", num_copies);
-            num_options = cupsAddOption("copies", buffer, num_options, &options);
-	    break;
-
-	case 'o' : /* Option */
-	    if (argv[i][2] != '\0')
-	      num_options = cupsParseOptions(argv[i] + 2, num_options, &options);
-	    else
-	    {
-	      i ++;
-	      num_options = cupsParseOptions(argv[i], num_options, &options);
-	    }
-	    break;
-
-	case 'q' : /* Queue priority */
-	    if (argv[i][2] != '\0')
-	      priority = atoi(argv[i] + 2);
-	    else
-	    {
-	      i ++;
-	      priority = atoi(argv[i]);
-	    }
-
-	    if (priority < 1 || priority > 100)
-	    {
-	      fputs("lp: Priority must be between 1 and 100.\n", stderr);
-	      return (1);
-	    }
-
-            sprintf(buffer, "%d", priority);
-            num_options = cupsAddOption("job-priority", buffer, num_options, &options);
-	    break;
-
-	case 's' : /* Silent */
-	    silent = 1;
-	    break;
-
-	case 't' : /* Title */
-	    if (argv[i][2] != '\0')
-	      title = argv[i] + 2;
-	    else
-	    {
-	      i ++;
-	      title = argv[i];
-	    }
-
-	    num_options = cupsAddOption("job-name", title, num_options, &options);
+        case 'a' : /* Cancel all jobs */
+	    op = IPP_PURGE_JOBS;
 	    break;
 
 	default :
-	    fprintf(stderr, "lp: Unknown option \'%c\'!\n", argv[i][1]);
+	    fprintf(stderr, "cancel: Unknown option \'%c\'!\n", argv[i][1]);
 	    return (1);
       }
-  else
-  {
-   /*
-    * Print a file...
-    */
-
-    if (dest == NULL)
+    else
     {
-      fputs("lp: error - no default destination available.\n", stderr);
-      return (1);
+     /*
+      * Cancel a job or printer...
+      */
+
+      if (isdigit(argv[i][0]))
+      {
+        dest   = NULL;
+	op     = IPP_CANCEL_JOB;
+        job_id = atoi(argv[i]);
+      }
+      else
+      {
+	dest   = name;
+        job_id = 0;
+	sscanf(argv[i], "%[^-]-%d", name, &job_id);
+	if (job_id)
+	  op = IPP_CANCEL_JOB;
+      }
+
+     /*
+      * Build an IPP request, which requires the following
+      * attributes:
+      *
+      *    attributes-charset
+      *    attributes-natural-language
+      *    printer-uri + job-id *or* job-uri
+      */
+
+      request = ippNew();
+
+      request->request.op.operation_id = op;
+      request->request.op.request_id   = 1;
+
+      language = cupsLangDefault();
+
+      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
+              	   "attributes-charset", NULL, cupsLangEncoding(language));
+
+      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
+                   "attributes-natural-language", NULL, language->language);
+
+      if (dest)
+      {
+        sprintf(uri, "http://localhost/printers/%s", dest);
+	ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI,
+	             "printer-uri", NULL, uri);
+	ippAddInteger(request, IPP_TAG_OPERATION, IPP_TAG_INTEGER, "job-id",
+	              job_id);
+      }
+      else
+      {
+        sprintf(uri, "http://localhost/jobs/%d", job_id);
+	ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "job-uri", NULL,
+	             uri);
+      }
+
+     /*
+      * Do the request and get back a response...
+      */
+
+      if (op == IPP_PURGE_JOBS)
+        response = cupsDoRequest(http, request, "/admin/");
+      else
+        response = cupsDoRequest(http, request, "/jobs/");
+
+      if (response != NULL)
+        ippDelete(response);
+      else
+      {
+        fputs("cancel: Unable to cancel job(s)!\n", stderr);
+	return (1);
+      }
     }
-
-    num_files ++;
-    job_id = cupsPrintFile(dest, argv[i], num_options, options);
-
-    if (job_id < 1)
-    {
-      fprintf(stderr, "lp: unable to print file \'%s\'.\n", argv[i]);
-      return (1);
-    }
-    else if (!silent)
-      fprintf(stderr, "request id is %s-%d (1 file(s))\n", dest, job_id);
-  }
-
- /*
-  * See if we printed anything; if not, print from stdin...
-  */
-
-  if (num_files == 0)
-  {
-    if (dest == NULL)
-    {
-      fputs("lp: error - no default destination available.\n", stderr);
-      return (1);
-    }
-
-    temp = fopen(tmpnam(tempfile), "w");
-
-    if (temp == NULL)
-    {
-      fputs("lp: unable to create temporary file.\n", stderr);
-      return (1);
-    }
-
-    while ((i = fread(buffer, 1, sizeof(buffer), stdin)) > 0)
-      fwrite(buffer, 1, i, temp);
-
-    i = ftell(temp);
-    fclose(temp);
-
-    if (i == 0)
-    {
-      fputs("lp: stdin is empty, so no job has been sent.\n", stderr);
-      return (1);
-    }
-
-    job_id = cupsPrintFile(dest, argv[i], num_options, options);
-
-    if (job_id < 1)
-    {
-      fprintf(stderr, "lp: unable to print file \'%s\'.\n", argv[i]);
-      return (1);
-    }
-    else if (!silent)
-      fprintf(stderr, "request id is %s-%d (1 file(s))\n", dest, job_id);
-  }
 
   return (0);
 }
 
 
 /*
- * End of "$Id: cancel.c,v 1.1 1999/03/03 21:18:58 mike Exp $".
+ * End of "$Id: cancel.c,v 1.2 1999/04/21 14:16:28 mike Exp $".
  */
