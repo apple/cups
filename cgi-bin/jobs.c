@@ -1,5 +1,5 @@
 /*
- * "$Id: jobs.c,v 1.1 1999/06/21 18:45:23 mike Exp $"
+ * "$Id: jobs.c,v 1.2 1999/06/23 14:08:35 mike Exp $"
  *
  *   Job status CGI for the Common UNIX Printing System (CUPS).
  *
@@ -25,6 +25,7 @@
  *
  *   main()          - Main entry for CGI.
  *   show_job_list() - Show a list of jobs...
+ *   show_job_info() - Show job information.
  */
 
 /*
@@ -60,6 +61,8 @@ main(int  argc,			/* I - Number of command-line arguments */
   char		*job;		/* Job name */
   http_t	*http;		/* Connection to the server */
 
+
+  setbuf(stdout, NULL);
 
  /*
   * Get the request language...
@@ -102,11 +105,11 @@ main(int  argc,			/* I - Number of command-line arguments */
          job == NULL ? "Jobs" : job, getenv("SERVER_NAME"));
   puts("<LINK REL=STYLESHEET TYPE=\"text/css\" HREF=\"/cups.css\">");
   puts("<MAP NAME=\"navbar\">");
-  puts("<AREA SHAPE=\"RECT\" COORDS=\"10,10,100,35\" HREF=\"/jobs\" ALT=\"Current Printer Status\">");
-  puts("<AREA SHAPE=\"RECT\" COORDS=\"115,10,205,35\" HREF=\"/classes\" ALT=\"Current Printer Classes Status\">");
-  puts("<AREA SHAPE=\"RECT\" COORDS=\"220,10,280,35\" HREF=\"/jobs\" ALT=\"Current Jobs Status\">");
-  puts("<AREA SHAPE=\"RECT\" COORDS=\"295,10,470,35\" HREF=\"/documentation.html\" ALT=\"Read CUPS Documentation On-Line\">");
-  puts("<AREA SHAPE=\"RECT\" COORDS=\"485,10,590,35\" HREF=\"http://www.cups.org\" ALT=\"Download the Current CUPS Software\">");
+  puts("<AREA SHAPE=\"RECT\" COORDS=\"10,10,85,30\" HREF=\"/printers\" ALT=\"Current Printer Status\">");
+  puts("<AREA SHAPE=\"RECT\" COORDS=\"95,10,175,30\" HREF=\"/classes\" ALT=\"Current Printer Classes Status\">");
+  puts("<AREA SHAPE=\"RECT\" COORDS=\"185,10,235,30\" HREF=\"/jobs\" ALT=\"Current Jobs Status\">");
+  puts("<AREA SHAPE=\"RECT\" COORDS=\"245,10,395,30\" HREF=\"/documentation.html\" ALT=\"Read CUPS Documentation On-Line\">");
+  puts("<AREA SHAPE=\"RECT\" COORDS=\"405,10,490,30\" HREF=\"http://www.cups.org\" ALT=\"Download the Current CUPS Software\">");
   puts("</MAP>");
   puts("</HEAD>");
   puts("<BODY>");
@@ -115,8 +118,6 @@ main(int  argc,			/* I - Number of command-line arguments */
   puts("<IMG SRC=\"/images/logo.gif\" WIDTH=\"71\" HEIGHT=\"40\" BORDER=0 ALT=\"Easy Software Products Home Page\"></A>");
   puts("<IMG SRC=\"/images/navbar.gif\" WIDTH=\"540\" HEIGHT=\"40\" USEMAP=\"#navbar\" BORDER=0>");
 
-  printf("<H1>%s on %s</H1>\n", job == NULL ? "Jobs" : job,
-         getenv("SERVER_NAME"));
   fflush(stdout);
 
  /*
@@ -179,12 +180,15 @@ show_job_list(http_t      *http,	/* I - HTTP connection */
   ipp_jstate_t	job_state;	/* job-state */
 
 
+  printf("<H1>Jobs on %s</H1>\n", getenv("SERVER_NAME"));
+
  /*
   * Build an IPP_GET_JOBS request, which requires the following
   * attributes:
   *
   *    attributes-charset
   *    attributes-natural-language
+  *    job-uri
   */
 
   request = ippNew();
@@ -192,11 +196,14 @@ show_job_list(http_t      *http,	/* I - HTTP connection */
   request->request.op.operation_id = IPP_GET_JOBS;
   request->request.op.request_id   = 1;
 
-  attr = ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-                      "attributes-charset", NULL, cupsLangEncoding(language));
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
+               "attributes-charset", NULL, cupsLangEncoding(language));
 
-  attr = ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
-                      "attributes-natural-language", NULL, language->language);
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
+               "attributes-natural-language", NULL, language->language);
+
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "job-uri",
+               NULL, "ipp://localhost/jobs/");
 
  /*
   * Do the request and get back a response...
@@ -211,13 +218,13 @@ show_job_list(http_t      *http,	/* I - HTTP connection */
     puts("<CENTER>");
     puts("<TABLE WIDTH=\"90%\" BORDER=\"1\">");
     puts("<TR>");
-    printf("<TD>%s</TD>\n", cupsLangString(language, CUPS_MSG_PRINT_JOBS));
-    printf("<TD>%s</TD>\n", cupsLangString(language, CUPS_MSG_JOB_STATE));
-    printf("<TD>%s</TD>\n", cupsLangString(language, CUPS_MSG_JOB_NAME));
-    printf("<TD>%s</TD>\n", cupsLangString(language, CUPS_MSG_USER_NAME));
-    printf("<TD>%s</TD>\n", cupsLangString(language, CUPS_MSG_PRIORITY));
-    printf("<TD>%s</TD>\n", cupsLangString(language, CUPS_MSG_COPIES));
-    printf("<TD>%s</TD>\n", cupsLangString(language, CUPS_MSG_FILE_SIZE));
+    printf("<TH>%s</TH>\n", cupsLangString(language, CUPS_MSG_PRINT_JOBS));
+    printf("<TH>%s</TH>\n", cupsLangString(language, CUPS_MSG_JOB_STATE));
+    printf("<TH>%s</TH>\n", cupsLangString(language, CUPS_MSG_JOB_NAME));
+    printf("<TH>%s</TH>\n", cupsLangString(language, CUPS_MSG_USER_NAME));
+    printf("<TH>%s</TH>\n", cupsLangString(language, CUPS_MSG_PRIORITY));
+    printf("<TH>%s</TH>\n", cupsLangString(language, CUPS_MSG_COPIES));
+    printf("<TH>%s</TH>\n", cupsLangString(language, CUPS_MSG_FILE_SIZE));
     puts("</TR>");
 
    /*
@@ -299,8 +306,8 @@ show_job_list(http_t      *http,	/* I - HTTP connection */
       if (job_id && job_uri != NULL && printer_uri != NULL)
       {
 	puts("<TR>");
-	printf("<TD><A HREF=\"http://%s:%d/jobs/%d\">%s-%d</A></TD>\n",
-	       getenv("SERVER_HOST"), ippPort(), job_id,
+	printf("<TD><A HREF=\"http://%s:%s/jobs/%d\">%s-%d</A></TD>\n",
+	       getenv("SERVER_NAME"), getenv("SERVER_PORT"), job_id,
 	       strrchr(printer_uri, '/') + 1, job_id);
 	printf("<TD>%s</TD>\n", job_state == IPP_JOB_PROCESSING ?
 	       cupsLangString(language, CUPS_MSG_PROCESSING) :
@@ -332,27 +339,27 @@ show_job_list(http_t      *http,	/* I - HTTP connection */
  */
 
 static void
-show_job_info(http_t      *http,
-              cups_lang_t *language,
-              char        *name)
+show_job_info(http_t      *http,	/* I - Server connection */
+              cups_lang_t *language,	/* I - Language */
+              char        *name)	/* I - Job "name" */
 {
-#if 0
+  int		i;		/* Looping var */
   ipp_t		*request,	/* IPP request */
 		*response;	/* IPP response */
   ipp_attribute_t *attr;	/* IPP attribute */
+  char		uri[HTTP_MAX_URI];/* Real URI */
   char		*job_uri,	/* job-uri */
 		*printer_uri,	/* job-printer-uri */
 		*job_name,	/* job-name */
 		*job_user;	/* job-originating-user-name */
   int		job_id,		/* job-id */
 		job_priority,	/* job-priority */
-		job_k_octets,	/* job-k-octets */
-		copies;		/* copies */
+		job_k_octets;	/* job-k-octets */
   ipp_jstate_t	job_state;	/* job-state */
 
 
  /*
-  * Build a IPP_GET_JOB_ATTRIBUTES request, which requires the following
+  * Build an IPP_GET_JOB_ATTRIBUTES request, which requires the following
   * attributes:
   *
   *    attributes-charset
@@ -362,7 +369,7 @@ show_job_info(http_t      *http,
 
   request = ippNew();
 
-  request->request.op.operation_id = IPP_GET_PRINTER_ATTRIBUTES;
+  request->request.op.operation_id = IPP_GET_JOB_ATTRIBUTES;
   request->request.op.request_id   = 1;
 
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
@@ -372,174 +379,199 @@ show_job_info(http_t      *http,
                "attributes-natural-language", NULL, language->language);
 
   sprintf(uri, "ipp://localhost/jobs/%s", name);
-
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "job-uri", NULL, uri);
 
  /*
   * Do the request and get back a response...
   */
 
-  if ((response = cupsDoRequest(http, request, uri + 15)) != NULL)
+  if ((response = cupsDoRequest(http, request, uri + 15)) == NULL)
   {
-   /*
-    * Grab the needed job attributes...
-    */
-
-    if ((attr = ippFindAttribute(response, "job-state", IPP_TAG_ENUM)) != NULL)
-      pstate = (ipp_pstate_t)attr->values[0].integer;
-    else
-      pstate = IPP_PRINTER_IDLE;
-
-    if ((attr = ippFindAttribute(response, "job-state-message", IPP_TAG_TEXT)) != NULL)
-      message = attr->values[0].string.text;
-    else
-      message = NULL;
-
-    if ((attr = ippFindAttribute(response, "job-is-accepting-jobs",
-                                 IPP_TAG_BOOLEAN)) != NULL)
-      accepting = attr->values[0].boolean;
-    else
-      accepting = 1;
-
-   /*
-    * Display the job entry...
-    */
-
-    puts("<TR>");
-
-    printf("<TD VALIGN=TOP><A HREF=\"/jobs/%s\">%s</A></TD>\n", name, name);
-
-    printf("<TD VALIGN=TOP><IMG SRC=\"/images/job-%s.gif\" ALIGN=\"LEFT\">\n",
-           pstate == IPP_PRINTER_IDLE ? "idle" :
-	       pstate == IPP_PRINTER_PROCESSING ? "processing" : "stopped");
-
-    printf("%s: %s, %s<BR>\n",
-           cupsLangString(language, CUPS_MSG_PRINTER_STATE),
-           cupsLangString(language, pstate == IPP_PRINTER_IDLE ? CUPS_MSG_IDLE :
-	                            pstate == IPP_PRINTER_PROCESSING ?
-				    CUPS_MSG_PROCESSING : CUPS_MSG_STOPPED),
-           cupsLangString(language, accepting ? CUPS_MSG_ACCEPTING_JOBS :
-	                            CUPS_MSG_NOT_ACCEPTING_JOBS));
-
-    if (message)
-      printf("<BR CLEAR=ALL><I>\"%s\"</I>\n", message);
-    else if (!accepting || pstate == IPP_PRINTER_STOPPED)
-      puts("<BR CLEAR=ALL><I>\"Reason Unknown\"</I>");
-
-    puts("</TD>");
-
-   /*
-    * Show a list of jobs as needed...
-    */
-
-    if (pstate != IPP_PRINTER_IDLE)
-    {
-     /*
-      * Build an IPP_GET_JOBS request, which requires the following
-      * attributes:
-      *
-      *    attributes-charset
-      *    attributes-natural-language
-      *    job-uri
-      */
-
-      request = ippNew();
-
-      request->request.op.operation_id = IPP_GET_JOBS;
-      request->request.op.request_id   = 1;
-
-      attr = ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-                	  "attributes-charset", NULL,
-			  cupsLangEncoding(language));
-
-      attr = ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
-                	  "attributes-natural-language", NULL,
-			  language->language);
-
-      attr = ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI,
-	                  "job-uri", NULL, uri);
-
-      jobs = cupsDoRequest(http, request, uri + 15);
-    }
-    else
-      jobs = NULL;
-
-    puts("<TD VALIGN=\"TOP\">");
-    jobcount = 0;
-
-    if (jobs != NULL)
-    {
-      char	*username;	/* Pointer to job-originating-user-name */
-      int	jobid,		/* job-id */
-		size;		/* job-k-octets */
-
-
-      for (attr = jobs->attrs; attr != NULL; attr = attr->next)
-      {
-       /*
-	* Skip leading attributes until we hit a job...
-	*/
-
-	while (attr != NULL && attr->group_tag != IPP_TAG_JOB)
-          attr = attr->next;
-
-	if (attr == NULL)
-          break;
-
-       /*
-	* Pull the needed attributes from this job...
-	*/
-
-	jobid    = 0;
-	size     = 0;
-	username = NULL;
-
-	while (attr != NULL && attr->group_tag == IPP_TAG_JOB)
-	{
-          if (strcmp(attr->name, "job-id") == 0 &&
-	      attr->value_tag == IPP_TAG_INTEGER)
-	    jobid = attr->values[0].integer;
-
-          if (strcmp(attr->name, "job-k-octets") == 0 &&
-	      attr->value_tag == IPP_TAG_INTEGER)
-	    size = attr->values[0].integer;
-
-          if (strcmp(attr->name, "job-originating-user-name") == 0 &&
-	      attr->value_tag == IPP_TAG_NAME)
-	    username = attr->values[0].string.text;
-
-          attr = attr->next;
-	}
-
-       /*
-        * Display the job if it matches the current job...
-	*/
-
-        if (username != NULL)
-	{
-	  jobcount ++;
-	  printf("<A HREF=\"/jobs/%d\">%s-%d %s %dk</A><BR>\n", jobid, name,
-	         jobid, username, size);
-	}
-
-	if (attr == NULL)
-          break;
-      }
-
-      ippDelete(jobs);
-    }
-      
-    if (jobcount == 0)
-      puts("None");
-    puts("</TD>");
-    puts("</TR>");
-
-    ippDelete(response);
+    puts("<P>Unable to communicate with CUPS server!");
+    return;
   }
-#endif /* 0 */
+
+  if (response->request.status.status_code == IPP_NOT_FOUND)
+  {
+    puts("<P>Job does not exist or has completed.");
+    ippDelete(response);
+    return;
+  }
+
+ /*
+  * Get the job status for this job...
+  */
+
+  if ((attr = ippFindAttribute(response, "job-uri", IPP_TAG_URI)) != NULL)
+    job_uri = attr->values[0].string.text;
+  else
+  {
+    puts("<P>Missing job-uri attribute!");
+    ippDelete(request);
+    return;
+  }
+
+  if ((attr = ippFindAttribute(response, "job-printer-uri", IPP_TAG_URI)) != NULL)
+    printer_uri = attr->values[0].string.text;
+  else
+  {
+    puts("<P>Missing job-printer-uri attribute!");
+    ippDelete(request);
+    return;
+  }
+
+  if ((attr = ippFindAttribute(response, "job-name", IPP_TAG_NAME)) != NULL)
+    job_name = attr->values[0].string.text;
+  else
+    job_name = "unknown";
+
+  if ((attr = ippFindAttribute(response, "job-originating-user-name",
+                               IPP_TAG_NAME)) != NULL)
+    job_user = attr->values[0].string.text;
+  else
+    job_user = "unknown";
+
+  if ((attr = ippFindAttribute(response, "job-id", IPP_TAG_INTEGER)) != NULL)
+    job_id = attr->values[0].integer;
+  else
+  {
+    puts("<P>Missing job-id attribute!");
+    ippDelete(request);
+    return;
+  }
+
+  if ((attr = ippFindAttribute(response, "job-priority", IPP_TAG_INTEGER)) != NULL)
+    job_priority = attr->values[0].integer;
+  else
+    job_priority = 50;
+
+  if ((attr = ippFindAttribute(response, "job-k-octets", IPP_TAG_INTEGER)) != NULL)
+    job_k_octets = attr->values[0].integer;
+  else
+    job_k_octets = 0;
+
+  if ((attr = ippFindAttribute(response, "job-state", IPP_TAG_ENUM)) != NULL)
+    job_state = (ipp_jstate_t)attr->values[0].integer;
+  else
+    job_state = IPP_JOB_PENDING;
+
+ /*
+  * Do a table for the job...
+  */
+
+  printf("<H1><A HREF=\"http://%s:%s/printers/%s\">%s-%d</A></H1>\n",
+	 getenv("SERVER_NAME"), getenv("SERVER_PORT"),
+	 strrchr(printer_uri, '/') + 1, strrchr(printer_uri, '/') + 1, job_id);
+
+  puts("<CENTER>");
+  puts("<TABLE WIDTH=\"90%\" BORDER=\"1\">");
+
+  puts("<TR>");
+  printf("<TH>%s</TH>\n", cupsLangString(language, CUPS_MSG_JOB_STATE));
+  printf("<TD>%s</TD>\n", job_state == IPP_JOB_PROCESSING ?
+	 cupsLangString(language, CUPS_MSG_PROCESSING) :
+	 cupsLangString(language, CUPS_MSG_PENDING));
+  puts("</TR>");
+
+  puts("<TR>");
+  printf("<TH>%s</TH>\n", cupsLangString(language, CUPS_MSG_JOB_NAME));
+  printf("<TD>%s</TD>\n", job_name);
+  puts("</TR>");
+
+  puts("<TR>");
+  printf("<TH>%s</TH>\n", cupsLangString(language, CUPS_MSG_USER_NAME));
+  printf("<TD>%s</TD>\n", job_user);
+  puts("</TR>");
+
+  puts("<TR>");
+  printf("<TH>%s</TH>\n", cupsLangString(language, CUPS_MSG_PRIORITY));
+  printf("<TD>%d</TD>\n", job_priority);
+  puts("</TR>");
+
+  puts("<TR>");
+  printf("<TH>%s</TH>\n", cupsLangString(language, CUPS_MSG_FILE_SIZE));
+  printf("<TD>%dk</TD>\n", job_k_octets);
+  puts("</TR>");
+
+  puts("<TR VALIGN=\"TOP\">");
+  printf("<TH>%s</TH>\n", cupsLangString(language, CUPS_MSG_OPTIONS));
+  puts("<TD>");
+
+  for (attr = response->attrs; attr != NULL; attr = attr->next)
+  {
+    if (attr->group_tag != IPP_TAG_JOB &&
+        attr->group_tag != IPP_TAG_EXTENSION)
+      continue;
+
+    if (strcmp(attr->name, "job-uri") == 0 ||
+        strcmp(attr->name, "job-printer-uri") == 0 ||
+        strcmp(attr->name, "job-name") == 0 ||
+        strcmp(attr->name, "job-originating-user-name") == 0 ||
+        strcmp(attr->name, "job-id") == 0 ||
+        strcmp(attr->name, "job-priority") == 0 ||
+        strcmp(attr->name, "job-k-octets") == 0 ||
+        strcmp(attr->name, "job-state") == 0)
+      continue;
+
+    if (attr->value_tag != IPP_TAG_BOOLEAN)
+      printf("%s=", attr->name);
+
+    for (i = 0; i < attr->num_values; i ++)
+    {
+      if (i)
+	putchar(',');
+
+      switch (attr->value_tag)
+      {
+	case IPP_TAG_INTEGER :
+	case IPP_TAG_ENUM :
+	    printf("%d", attr->values[i].integer);
+	    break;
+
+	case IPP_TAG_BOOLEAN :
+	    if (!attr->values[i].boolean)
+	      printf("no");
+
+	case IPP_TAG_NOVALUE :
+	    fputs(attr->name, stdout);
+	    break;
+
+	case IPP_TAG_RANGE :
+	    printf("%d-%d", attr->values[i].range.lower,
+		   attr->values[i].range.upper);
+	    break;
+
+	case IPP_TAG_RESOLUTION :
+	    printf("%dx%d%s", attr->values[i].resolution.xres,
+		   attr->values[i].resolution.yres,
+		   attr->values[i].resolution.units == IPP_RES_PER_INCH ?
+		       "dpi" : "dpc");
+	    break;
+
+        case IPP_TAG_STRING :
+	case IPP_TAG_TEXT :
+	case IPP_TAG_NAME :
+	case IPP_TAG_KEYWORD :
+	case IPP_TAG_CHARSET :
+	case IPP_TAG_LANGUAGE :
+	case IPP_TAG_MIMETYPE :
+	case IPP_TAG_URI :
+	    printf("\"%s\"", attr->values[i].string.text);
+	    break;
+      }
+    }
+
+    puts("<BR>");
+  }
+
+  puts("</TD>");
+  puts("</TR>");
+  puts("</TABLE></CENTER>");
+
+  ippDelete(response);
 }
 
 
 /*
- * End of "$Id: jobs.c,v 1.1 1999/06/21 18:45:23 mike Exp $".
+ * End of "$Id: jobs.c,v 1.2 1999/06/23 14:08:35 mike Exp $".
  */
