@@ -1,5 +1,5 @@
 /*
- * "$Id: raster.c,v 1.6 1999/04/06 16:24:46 mike Exp $"
+ * "$Id: raster.c,v 1.7 1999/04/06 19:34:28 mike Exp $"
  *
  *   Raster file routines for the Common UNIX Printing System (CUPS).
  *
@@ -45,6 +45,7 @@
 #include "raster.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <errno.h>
 
 #if defined(WIN32) || defined(__EMX__)
 #  include <io.h>
@@ -174,8 +175,14 @@ cupsRasterReadPixels(cups_raster_t *r,	/* I - Raster stream */
   while (remaining > 0)
   {
     bytes = read(r->fd, p, remaining);
+
     if (bytes <= 0)
-      return (0);
+    {
+      if (errno != EAGAIN && errno != EINTR)
+        return (0);
+      else
+        continue;
+    }
 
     remaining -= bytes;
     p += bytes;
@@ -223,8 +230,14 @@ cupsRasterWritePixels(cups_raster_t *r,	/* I - Raster stream */
   while (remaining > 0)
   {
     bytes = write(r->fd, p, remaining);
+
     if (bytes <= 0)
-      return (0);
+    {
+      if (errno != EAGAIN && errno != EINTR)
+        return (0);
+      else
+        continue;
+    }
 
     remaining -= bytes;
     p += bytes;
@@ -235,5 +248,5 @@ cupsRasterWritePixels(cups_raster_t *r,	/* I - Raster stream */
 
 
 /*
- * End of "$Id: raster.c,v 1.6 1999/04/06 16:24:46 mike Exp $".
+ * End of "$Id: raster.c,v 1.7 1999/04/06 19:34:28 mike Exp $".
  */
