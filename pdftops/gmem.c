@@ -3,9 +3,10 @@
  *
  * Memory routines with out-of-memory checking.
  *
- * Copyright 1996 Derek B. Noonburg
+ * Copyright 1996-2002 Glyph & Cog, LLC
  */
 
+#include <config.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stddef.h>
@@ -24,9 +25,9 @@ typedef struct _GMemHdr {
 #define gMemTrlSize (sizeof(long))
 
 #if gmemTrlSize==8
-#define gMemDeadVal 0xdeadbeefdeadbeef
+#define gMemDeadVal 0xdeadbeefdeadbeefUL
 #else
-#define gMemDeadVal 0xdeadbeef
+#define gMemDeadVal 0xdeadbeefUL
 #endif
 
 /* round data size so trailer will be aligned */
@@ -59,7 +60,7 @@ void *gmalloc(int size) {
   GMemHdr *hdr;
   void *data;
   int lst;
-  long *trl, *p;
+  unsigned long *trl, *p;
 
   if (size == 0)
     return NULL;
@@ -70,14 +71,14 @@ void *gmalloc(int size) {
   }
   hdr = (GMemHdr *)mem;
   data = (void *)(mem + gMemHdrSize);
-  trl = (long *)(mem + gMemHdrSize + size1);
+  trl = (unsigned long *)(mem + gMemHdrSize + size1);
   hdr->size = size;
   hdr->index = gMemIndex++;
   lst = ((int)hdr >> gMemListShift) & gMemListMask;
   hdr->next = gMemList[lst];
   gMemList[lst] = hdr;
   ++gMemAlloc;
-  for (p = (long *)data; p <= trl; ++p)
+  for (p = (unsigned long *)data; p <= trl; ++p)
     *p = gMemDeadVal;
   return data;
 #else
@@ -140,7 +141,7 @@ void gfree(void *p) {
   GMemHdr *hdr;
   GMemHdr *prevHdr, *q;
   int lst;
-  long *trl, *clr;
+  unsigned long *trl, *clr;
 
   if (p) {
     hdr = (GMemHdr *)((char *)p - gMemHdrSize);
@@ -156,12 +157,12 @@ void gfree(void *p) {
 	gMemList[lst] = hdr->next;
       --gMemAlloc;
       size = gMemDataSize(hdr->size);
-      trl = (long *)((char *)hdr + gMemHdrSize + size);
+      trl = (unsigned long *)((char *)hdr + gMemHdrSize + size);
       if (*trl != gMemDeadVal) {
 	fprintf(stderr, "Overwrite past end of block %d at address %p\n",
 		hdr->index, p);
       }
-      for (clr = (long *)hdr; clr <= trl; ++clr)
+      for (clr = (unsigned long *)hdr; clr <= trl; ++clr)
 	*clr = gMemDeadVal;
       free(hdr);
     } else {

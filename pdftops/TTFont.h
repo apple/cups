@@ -4,6 +4,8 @@
 //
 // An X wrapper for the FreeType TrueType font rasterizer.
 //
+// Copyright 2001-2002 Glyph & Cog, LLC
+//
 //========================================================================
 
 #ifndef TTFONT_H
@@ -22,6 +24,7 @@
 #include <freetype.h>
 #include <ftxpost.h>
 #endif
+#include "gtypes.h"
 #include "SFont.h"
 
 //------------------------------------------------------------------------
@@ -47,10 +50,25 @@ private:
 
 //------------------------------------------------------------------------
 
+enum TTFontIndexMode {
+  ttFontModeUnicode,
+  ttFontModeCharCode,
+  ttFontModeCharCodeOffset,
+  ttFontModeCodeMap,
+  ttFontModeCIDToGIDMap
+};
+
 class TTFontFile: public SFontFile {
 public:
 
-  TTFontFile(TTFontEngine *engineA, char *fontFileName);
+  // 8-bit font, TrueType or Type 1/1C
+  TTFontFile(TTFontEngine *engineA, char *fontFileName,
+	     char **fontEnc, GBool pdfFontHasEncoding);
+
+  // CID font, TrueType
+  TTFontFile(TTFontEngine *engineA, char *fontFileName,
+	     Gushort *cidToGIDA, int cidToGIDLenA);
+
   GBool isOk() { return ok; }
   virtual ~TTFontFile();
 
@@ -59,7 +77,11 @@ private:
   TTFontEngine *engine;
   TT_Face face;
   TT_CharMap charMap;
+  TTFontIndexMode mode;
   int charMapOffset;
+  Guchar *codeMap;
+  Gushort *cidToGID;
+  int cidToGIDLen;
   GBool ok;
 
   friend class TTFont;
@@ -79,11 +101,12 @@ public:
   GBool isOk() { return ok; }
   virtual ~TTFont();
   virtual GBool drawChar(Drawable d, int w, int h, GC gc,
-			 int x, int y, int r, int g, int b, Gushort c);
+			 int x, int y, int r, int g, int b,
+			 CharCode c, Unicode u);
 
 private:
 
-  GBool getGlyphPixmap(Gushort c);
+  GBool getGlyphPixmap(CharCode c, Unicode u);
 
   TTFontFile *fontFile;
   TT_Instance instance;

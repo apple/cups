@@ -2,7 +2,7 @@
 //
 // Function.cc
 //
-// Copyright 2001 Derek B. Noonburg
+// Copyright 2001-2002 Glyph & Cog, LLC
 //
 //========================================================================
 
@@ -10,6 +10,7 @@
 #pragma implementation
 #endif
 
+#include <config.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
@@ -60,6 +61,8 @@ Function *Function::parse(Object *funcObj) {
     func = new SampledFunction(funcObj, dict);
   } else if (funcType == 2) {
     func = new ExponentialFunction(funcObj, dict);
+  } else if (funcType == 3) {
+    func = new StitchingFunction(funcObj, dict);
   } else if (funcType == 4) {
     func = new PostScriptFunction(funcObj, dict);
   } else {
@@ -412,7 +415,6 @@ ExponentialFunction::ExponentialFunction(Object *funcObj, Dict *dict) {
   int i;
 
   ok = gFalse;
-  hasN = gFalse;
 
   //----- initialize the generic stuff
   if (!init(dict)) {
@@ -422,6 +424,7 @@ ExponentialFunction::ExponentialFunction(Object *funcObj, Dict *dict) {
     error(-1, "Exponential function with more than one input");
     goto err1;
   }
+  hasN = hasRange;
 
   //----- default values
   for (i = 0; i < funcMaxOutputs; ++i) {
@@ -433,6 +436,7 @@ ExponentialFunction::ExponentialFunction(Object *funcObj, Dict *dict) {
   if (dict->lookup("C0", &obj1)->isArray()) {
     if (!hasN) {
       n = obj1.arrayGetLength();
+      hasN = gTrue;
     } else if (obj1.arrayGetLength() != n) {
       error(-1, "Function's C0 array is wrong length");
       goto err2;
@@ -453,6 +457,7 @@ ExponentialFunction::ExponentialFunction(Object *funcObj, Dict *dict) {
   if (dict->lookup("C1", &obj1)->isArray()) {
     if (!hasN) {
       n = obj1.arrayGetLength();
+      hasN = gTrue;
     } else if (obj1.arrayGetLength() != n) {
       error(-1, "Function's C1 array is wrong length");
       goto err2;
@@ -476,6 +481,13 @@ ExponentialFunction::ExponentialFunction(Object *funcObj, Dict *dict) {
   }
   e = obj1.getNum();
   obj1.free();
+
+  // this isn't supposed to happen, but I've run into (broken) PDF
+  // files where it does
+  if (!hasN) {
+    error(-1, "Exponential function does not define number of output values");
+    n = 1;
+  }
 
   ok = gTrue;
   return;
@@ -517,6 +529,141 @@ void ExponentialFunction::transform(double *in, double *out) {
     }
   }
   return;
+}
+
+//------------------------------------------------------------------------
+// StitchingFunction
+//------------------------------------------------------------------------
+
+StitchingFunction::StitchingFunction(Object *funcObj, Dict *dict) {
+  Object obj1, obj2;
+  int i;
+
+  ok = gFalse;
+  funcs = NULL;
+  bounds = NULL;
+  encode = NULL;
+
+  //----- initialize the generic stuff
+  if (!init(dict)) {
+    goto err1;
+  }
+  if (m != 1) {
+    error(-1, "Stitching function with more than one input");
+    goto err1;
+  }
+
+  //----- Functions
+  if (!dict->lookup("Functions", &obj1)->isArray()) {
+    error(-1, "Missing 'Functions' entry in stitching function");
+    goto err1;
+  }
+  k = obj1.arrayGetLength();
+  funcs = (Function **)gmalloc(k * sizeof(Function *));
+  bounds = (double *)gmalloc((k + 1) * sizeof(double));
+  encode = (double *)gmalloc(2 * k * sizeof(double));
+  for (i = 0; i < k; ++i) {
+    funcs[i] = NULL;
+  }
+  for (i = 0; i < k; ++i) {
+    if (!(funcs[i] = Function::parse(obj1.arrayGet(i, &obj2)))) {
+      goto err2;
+    }
+    if (i > 0 && (funcs[i]->getInputSize() != 1 ||
+		  funcs[i]->getOutputSize() != funcs[0]->getOutputSize())) {
+      error(-1, "Incompatible subfunctions in stitching function");
+      goto err2;
+    }
+    obj2.free();
+  }
+  obj1.free();
+
+  //----- Bounds
+  if (!dict->lookup("Bounds", &obj1)->isArray() ||
+      obj1.arrayGetLength() != k - 1) {
+    error(-1, "Missing or invalid 'Bounds' entry in stitching function");
+    goto err1;
+  }
+  bounds[0] = domain[0][0];
+  for (i = 1; i < k; ++i) {
+    if (!obj1.arrayGet(i - 1, &obj2)->isNum()) {
+      error(-1, "Invalid type in 'Bounds' array in stitching function");
+      goto err2;
+    }
+    bounds[i] = obj2.getNum();
+    obj2.free();
+  }
+  bounds[k] = domain[0][1];
+  obj1.free();
+
+  //----- Encode
+  if (!dict->lookup("Encode", &obj1)->isArray() ||
+      obj1.arrayGetLength() != 2 * k) {
+    error(-1, "Missing or invalid 'Encode' entry in stitching function");
+    goto err1;
+  }
+  for (i = 0; i < 2 * k; ++i) {
+    if (!obj1.arrayGet(i, &obj2)->isNum()) {
+      error(-1, "Invalid type in 'Encode' array in stitching function");
+      goto err2;
+    }
+    encode[i] = obj2.getNum();
+    obj2.free();
+  }
+  obj1.free();
+
+  ok = gTrue;
+  return;
+
+ err2:
+  obj2.free();
+ err1:
+  obj1.free();
+}
+
+StitchingFunction::StitchingFunction(StitchingFunction *func) {
+  k = func->k;
+  funcs = (Function **)gmalloc(k * sizeof(Function *));
+  memcpy(funcs, func->funcs, k * sizeof(Function *));
+  bounds = (double *)gmalloc((k + 1) * sizeof(double));
+  memcpy(bounds, func->bounds, (k + 1) * sizeof(double));
+  encode = (double *)gmalloc(2 * k * sizeof(double));
+  memcpy(encode, func->encode, 2 * k * sizeof(double));
+  ok = gTrue;
+}
+
+StitchingFunction::~StitchingFunction() {
+  int i;
+
+  for (i = 0; i < k; ++i) {
+    if (funcs[i]) {
+      delete funcs[i];
+    }
+  }
+  gfree(funcs);
+  gfree(bounds);
+  gfree(encode);
+}
+
+void StitchingFunction::transform(double *in, double *out) {
+  double x;
+  int i;
+
+  if (in[0] < domain[0][0]) {
+    x = domain[0][0];
+  } else if (in[0] > domain[0][1]) {
+    x = domain[0][1];
+  } else {
+    x = in[0];
+  }
+  for (i = 0; i < k - 1; ++i) {
+    if (x < bounds[i+1]) {
+      break;
+    }
+  }
+  x = encode[2*i] + ((x - bounds[i]) / (bounds[i+1] - bounds[i])) *
+                    (encode[2*i+1] - encode[2*i]);
+  funcs[i]->transform(&x, out);
 }
 
 //------------------------------------------------------------------------

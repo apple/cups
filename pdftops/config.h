@@ -2,7 +2,7 @@
 //
 // config.h
 //
-// Copyright 1996 Derek B. Noonburg
+// Copyright 1996-2002 Glyph & Cog, LLC
 //
 //========================================================================
 
@@ -13,18 +13,23 @@
 #define HAVE_LIBCUPS
 
 //------------------------------------------------------------------------
-// general constants
+// version
 //------------------------------------------------------------------------
 
 // xpdf version
-#define xpdfVersion "0.93a"
+
+#define xpdfVersion "1.01"
 
 // supported PDF version
 #define supportedPDFVersionStr "1.4"
 #define supportedPDFVersionNum 1.4
 
 // copyright notice
-#define xpdfCopyright "Copyright 1996-2002 Derek B. Noonburg"
+#define xpdfCopyright "Copyright 1996-2002 Glyph & Cog, LLC"
+
+//------------------------------------------------------------------------
+// paper size
+//------------------------------------------------------------------------
 
 // default paper size (in points) for PostScript output
 #ifdef A4_PAPER
@@ -35,24 +40,37 @@
 #define defPaperHeight 792
 #endif
 
+//------------------------------------------------------------------------
+// config file (xpdfrc) path
+//------------------------------------------------------------------------
+
 // user config file name, relative to the user's home directory
-#if defined(VMS)
+#if defined(VMS) || (defined(WIN32) && !defined(__CYGWIN32__))
 #define xpdfUserConfigFile "xpdfrc"
 #else
 #define xpdfUserConfigFile ".xpdfrc"
 #endif
 
-#ifndef SYSTEM_XPDFRC
-#  define SYSTEM_XPDFRC	CUPS_SERVERROOT "/pdftops.conf"
-#endif // SYSTEM_XPDFRC
-
 // system config file name (set via the configure script)
-#define xpdfSysConfigFile SYSTEM_XPDFRC
+#ifdef SYSTEM_XPDFRC
+#define xpdfSysConfigFile CUPS_SERVERROOT "/pdftops.conf"
+#else
+// under Windows, we get the directory with the executable and then
+// append this file name
+#define xpdfSysConfigFile "xpdfrc"
+#endif
 
 // Support Unicode/etc.
-#define JAPANESE_SUPPORT 1
-#define CHINESE_GB_SUPPORT 1
-#define CHINESE_CNS_SUPPORT 1
+//
+// The IBM AIX GNUPro compilers seem not to like the Asian font
+// code, causing a "virtual memory exhausted" error.  Only support
+// Asian fonts on platforms that will compile it...
+
+#if !defined(_AIX) || __GNUC__ != 2 || __GNUC_MINOR__ != 9
+#  define JAPANESE_SUPPORT 1
+#  define CHINESE_GB_SUPPORT 1
+#  define CHINESE_CNS_SUPPORT 1
+#endif // !_AIX || !GCC 2.9
 
 //------------------------------------------------------------------------
 // X-related constants
@@ -61,17 +79,11 @@
 // default maximum size of color cube to allocate
 #define defaultRGBCube 5
 
-// number of X server fonts to cache
-#define serverFontCacheSize 16
+// number of fonts (combined t1lib, FreeType, X server) to cache
+#define xOutFontCacheSize 64
 
-// number of Type 1 (t1lib) fonts to cache
-#define t1FontCacheSize 32
-
-// number of TrueType (FreeType) fonts to cache
-#define ttFontCacheSize 32
-
-// number of FreeType (TrueType and Type 1) fonts to cache
-#define ftFontCacheSize 32
+// number of Type 3 fonts to cache
+#define xOutT3FontCacheSize 8
 
 //------------------------------------------------------------------------
 // popen

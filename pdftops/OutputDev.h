@@ -2,7 +2,7 @@
 //
 // OutputDev.h
 //
-// Copyright 1996 Derek B. Noonburg
+// Copyright 1996-2002 Glyph & Cog, LLC
 //
 //========================================================================
 
@@ -14,6 +14,7 @@
 #endif
 
 #include "gtypes.h"
+#include "CharTypes.h"
 
 class GString;
 class GfxState;
@@ -44,6 +45,13 @@ public:
 
   // Does this device use drawChar() or drawString()?
   virtual GBool useDrawChar() = 0;
+
+  // Does this device use beginType3Char/endType3Char?  Otherwise,
+  // text in Type 3 fonts will be drawn with drawChar/drawString.
+  virtual GBool interpretType3Chars() = 0;
+
+  // Does this device need non-text content?
+  virtual GBool needNonText() { return gTrue; }
 
   //----- initialization and control
 
@@ -111,11 +119,13 @@ public:
   virtual void beginString(GfxState *state, GString *s) {}
   virtual void endString(GfxState *state) {}
   virtual void drawChar(GfxState *state, double x, double y,
-			double dx, double dy, Guchar c) {}
-  virtual void drawChar16(GfxState *state, double x, double y,
-			  double dx, double dy, int c) {}
+			double dx, double dy,
+			double originX, double originY,
+			CharCode code, Unicode *u, int uLen) {}
   virtual void drawString(GfxState *state, GString *s) {}
-  virtual void drawString16(GfxState *state, GString *s) {}
+  virtual GBool beginType3Char(GfxState *state,
+			       CharCode code, Unicode *u, int uLen);
+  virtual void endType3Char(GfxState *state) {}
 
   //----- image drawing
   virtual void drawImageMask(GfxState *state, Object *ref, Stream *str,
@@ -130,6 +140,14 @@ public:
   virtual void opiBegin(GfxState *state, Dict *opiDict);
   virtual void opiEnd(GfxState *state, Dict *opiDict);
 #endif
+
+  //----- Type 3 font operators
+  virtual void type3D0(GfxState *state, double wx, double wy) {}
+  virtual void type3D1(GfxState *state, double wx, double wy,
+		       double llx, double lly, double urx, double ury) {}
+
+  //----- PostScript XObjects
+  virtual void psXObject(Stream *psStream, Stream *level1Stream) {}
 
 private:
 

@@ -2,7 +2,7 @@
 //
 // PDFDoc.h
 //
-// Copyright 1996 Derek B. Noonburg
+// Copyright 1996-2002 Glyph & Cog, LLC
 //
 //========================================================================
 
@@ -42,6 +42,9 @@ public:
   // Was PDF document successfully opened?
   GBool isOk() { return ok; }
 
+  // Get the error code (if isOk() returns false).
+  int getErrorCode() { return errCode; }
+
   // Get file name.
   GString *getFileName() { return fileName; }
 
@@ -64,6 +67,13 @@ public:
 
   // Get number of pages.
   int getNumPages() { return catalog->getNumPages(); }
+
+  // Return the contents of the metadata stream, or NULL if there is
+  // no metadata.
+  GString *readMetadata() { return catalog->readMetadata(); }
+
+  // Return the structure tree root object.
+  Object *getStructTreeRoot() { return catalog->getStructTreeRoot(); }
 
   // Display a page.
   void displayPage(OutputDev *out, int page, double zoom,
@@ -130,6 +140,7 @@ private:
   GBool printCommands;
 
   GBool ok;
+  int errCode;
 };
 
 #endif

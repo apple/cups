@@ -4,9 +4,11 @@
 //
 // Miscellaneous file and directory name manipulation.
 //
-// Copyright 1996 Derek B. Noonburg
+// Copyright 1996-2002 Glyph & Cog, LLC
 //
 //========================================================================
+
+#include <config.h>
 
 #ifdef WIN32
    extern "C" {
@@ -457,7 +459,26 @@ time_t getModTime(const char *fileName) {
 }
 
 GBool openTempFile(GString **name, FILE **f, const char *mode, const char *ext) {
-#if defined(VMS) || defined(__EMX__) || defined(WIN32) || defined(ACORN) || defined(MACOS)
+#if defined(WIN32)
+  //---------- Win32 ----------
+  char *s;
+  char buf[_MAX_PATH];
+  char *fp;
+
+  if (!(s = _tempnam(getenv("TEMP"), NULL))) {
+    return gFalse;
+  }
+  *name = new GString(s);
+  free(s);
+  if (ext) {
+    (*name)->append(ext);
+  }
+  if (!(*f = fopen((*name)->getCString(), mode))) {
+    delete (*name);
+    return gFalse;
+  }
+  return gTrue;
+#elif defined(VMS) || defined(__EMX__) || defined(ACORN) || defined(MACOS)
   //---------- non-Unix ----------
   char *s;
 
@@ -482,46 +503,25 @@ GBool openTempFile(GString **name, FILE **f, const char *mode, const char *ext) 
   char *s;
   int fd;
 
-  // MRS: Currently there is no standard function for creating a temporary
-  //      file with an extension; this is required when uncompressing
-  //      LZW data using the uncompress program on some UNIX, which is
-  //      looking for a ".Z" extension on the temporary filename.  Sooo,
-  //      when you print an *OLD* PDF file that uses LZW compression,
-  //      the tmpnam() function is usually the one that is called to
-  //      create the temporary file.  Under *BSD, the safer mkstemps()
-  //      function is used instead.
-  //
-  //      That said, all CUPS filters are run with TMPDIR pointing to
-  //      a private temporary directory, which by default is only
-  //      accessible to the 'lp' user.  Also, most files use Flate
-  //      compression now and will be able to use the (safer)
-  //      mkstemp() function for any temporary files...
-
   if (ext) {
-#  if HAVE_MKSTEMPS
+#if HAVE_MKSTEMPS
     if ((s = getenv("TMPDIR"))) {
       *name = new GString(s);
     } else {
       *name = new GString("/tmp");
     }
-    (*name)->append("/XXXXXX");
-    (*name)->append(ext);
+    (*name)->append("/XXXXXX")->append(ext);
     fd = mkstemps((*name)->getCString(), strlen(ext));
-# else // HAVE_MKSTEMPS
-  char *p;
+#else
     if (!(s = tmpnam(NULL))) {
       return gFalse;
     }
     *name = new GString(s);
-    s = (*name)->getCString();
-    if ((p = strrchr(s, '.'))) {
-      (*name)->del(p - s, (*name)->getLength() - (p - s));
-    }
     (*name)->append(ext);
     fd = open((*name)->getCString(), O_WRONLY | O_CREAT | O_EXCL, 0600);
-#  endif // HAVE_MKSTEMPS
+#endif
   } else {
-#  if HAVE_MKSTEMP
+#if HAVE_MKSTEMP
     if ((s = getenv("TMPDIR"))) {
       *name = new GString(s);
     } else {
@@ -543,6 +543,43 @@ GBool openTempFile(GString **name, FILE **f, const char *mode, const char *ext) 
   }
   return gTrue;
 #endif
+}
+
+GBool executeCommand(char *cmd) {
+#ifdef VMS
+  return system(cmd) ? gTrue : gFalse;
+#else
+  return system(cmd) ? gFalse : gTrue;
+#endif
+}
+
+char *getLine(char *buf, int size, FILE *f) {
+  int c, i;
+
+  i = 0;
+  while (i < size - 1) {
+    if ((c = fgetc(f)) == EOF) {
+      break;
+    }
+    buf[i++] = (char)c;
+    if (c == '\x0a') {
+      break;
+    }
+    if (c == '\x0d') {
+      c = fgetc(f);
+      if (c == '\x0a' && i < size - 1) {
+	buf[i++] = (char)c;
+      } else if (c != EOF) {
+	ungetc(c, f);
+      }
+      break;
+    }
+  }
+  buf[i] = '\0';
+  if (i == 0) {
+    return NULL;
+  }
+  return buf;
 }
 
 //------------------------------------------------------------------------

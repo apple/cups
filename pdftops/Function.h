@@ -2,7 +2,7 @@
 //
 // Function.h
 //
-// Copyright 2001 Derek B. Noonburg
+// Copyright 2001-2002 Glyph & Cog, LLC
 //
 //========================================================================
 
@@ -125,6 +125,30 @@ private:
   double c0[funcMaxOutputs];
   double c1[funcMaxOutputs];
   double e;
+  GBool ok;
+};
+
+//------------------------------------------------------------------------
+// StitchingFunction
+//------------------------------------------------------------------------
+
+class StitchingFunction: public Function {
+public:
+
+  StitchingFunction(Object *funcObj, Dict *dict);
+  virtual ~StitchingFunction();
+  virtual Function *copy() { return new StitchingFunction(this); }
+  virtual void transform(double *in, double *out);
+  virtual GBool isOk() { return ok; }
+
+private:
+
+  StitchingFunction(StitchingFunction *func);
+
+  int k;
+  Function **funcs;
+  double *bounds;
+  double *encode;
   GBool ok;
 };
 

@@ -2,7 +2,7 @@
 //
 // Link.cc
 //
-// Copyright 1996 Derek B. Noonburg
+// Copyright 1996-2002 Glyph & Cog, LLC
 //
 //========================================================================
 
@@ -10,6 +10,7 @@
 #pragma implementation
 #endif
 
+#include <config.h>
 #include <stddef.h>
 #include <string.h>
 #include "gmem.h"
@@ -28,31 +29,27 @@ static GString *getFileSpecName(Object *fileSpecObj);
 // LinkDest
 //------------------------------------------------------------------------
 
-LinkDest::LinkDest(Array *a, GBool pageIsRefA) {
+LinkDest::LinkDest(Array *a) {
   Object obj1, obj2;
 
   // initialize fields
-  pageIsRef = pageIsRefA;
   left = bottom = right = top = zoom = 0;
   ok = gFalse;
 
   // get page
-  if (pageIsRef) {
-    if (!a->getNF(0, &obj1)->isRef()) {
-      error(-1, "Bad annotation destination");
-      goto err2;
-    }
+  a->getNF(0, &obj1);
+  if (obj1.isInt()) {
+    pageNum = obj1.getInt() + 1;
+    pageIsRef = gFalse;
+  } else if (obj1.isRef()) {
     pageRef.num = obj1.getRefNum();
     pageRef.gen = obj1.getRefGen();
-    obj1.free();
+    pageIsRef = gTrue;
   } else {
-    if (!a->get(0, &obj1)->isInt()) {
-      error(-1, "Bad annotation destination");
-      goto err2;
-    }
-    pageNum = obj1.getInt() + 1;
-    obj1.free();
+    error(-1, "Bad annotation destination");
+    goto err2;
   }
+  obj1.free();
 
   // get destination type
   a->get(1, &obj1);
@@ -220,7 +217,7 @@ LinkGoTo::LinkGoTo(Object *destObj) {
 
   // destination dictionary
   } else if (destObj->isArray()) {
-    dest = new LinkDest(destObj->getArray(), gTrue);
+    dest = new LinkDest(destObj->getArray());
     if (!dest->isOk()) {
       delete dest;
       dest = NULL;
@@ -258,7 +255,7 @@ LinkGoToR::LinkGoToR(Object *fileSpecObj, Object *destObj) {
 
   // destination dictionary
   } else if (destObj->isArray()) {
-    dest = new LinkDest(destObj->getArray(), gFalse);
+    dest = new LinkDest(destObj->getArray());
     if (!dest->isOk()) {
       delete dest;
       dest = NULL;
@@ -445,7 +442,7 @@ Link::Link(Dict *dict, GString *baseURI) {
   }
 
   // get border
-  borderW = 0;
+  borderW = 1;
   if (!dict->lookup("Border", &obj1)->isNull()) {
     if (obj1.isArray() && obj1.arrayGetLength() >= 3) {
       if (obj1.arrayGet(2, &obj2)->isNum()) {
@@ -581,7 +578,7 @@ Links::~Links() {
 LinkAction *Links::find(double x, double y) {
   int i;
 
-  for (i = 0; i < numLinks; ++i) {
+  for (i = numLinks - 1; i >= 0; --i) {
     if (links[i]->inRect(x, y)) {
       return links[i]->getAction();
     }

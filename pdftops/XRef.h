@@ -2,7 +2,7 @@
 //
 // XRef.h
 //
-// Copyright 1996 Derek B. Noonburg
+// Copyright 1996-2002 Glyph & Cog, LLC
 //
 //========================================================================
 
@@ -24,7 +24,7 @@ class Stream;
 //------------------------------------------------------------------------
 
 struct XRefEntry {
-  int offset;
+  Guint offset;
   int gen;
   GBool used;
 };
@@ -40,6 +40,9 @@ public:
 
   // Is xref table valid?
   GBool isOk() { return ok; }
+
+  // Get the error code (if isOk() returns false).
+  int getErrorCode() { return errCode; }
 
   // Is the file encrypted?
 #ifndef NO_DECRYPTION
@@ -62,33 +65,35 @@ public:
 
   // Return the document's Info dictionary (if any).
   Object *getDocInfo(Object *obj);
+  Object *getDocInfoNF(Object *obj);
 
   // Return the number of objects in the xref table.
   int getNumObjects() { return size; }
 
   // Return the offset of the last xref table.
-  int getLastXRefPos() { return lastXRefPos; }
+  Guint getLastXRefPos() { return lastXRefPos; }
 
   // Return the catalog object reference.
   int getRootNum() { return rootNum; }
   int getRootGen() { return rootGen; }
 
   // Get end position for a stream in a damaged file.
-  // Returns -1 if unknown or file is not damaged.
-  int getStreamEnd(int streamStart);
+  // Returns false if unknown or file is not damaged.
+  GBool getStreamEnd(Guint streamStart, Guint *streamEnd);
 
 private:
 
   BaseStream *str;		// input stream
-  int start;			// offset in file (to allow for garbage
+  Guint start;			// offset in file (to allow for garbage
 				//   at beginning of file)
   XRefEntry *entries;		// xref entries
   int size;			// size of <entries> array
   int rootNum, rootGen;		// catalog dict
   GBool ok;			// true if xref table is valid
+  int errCode;			// error code (if <ok> is false)
   Object trailerDict;		// trailer dictionary
-  int lastXRefPos;		// offset of last xref table
-  int *streamEnds;		// 'endstream' positions - only used in
+  Guint lastXRefPos;		// offset of last xref table
+  Guint *streamEnds;		// 'endstream' positions - only used in
 				//   damaged files
   int streamEndsLen;		// number of valid entries in streamEnds
 #ifndef NO_DECRYPTION
@@ -101,10 +106,11 @@ private:
   GBool ownerPasswordOk;	// true if owner password is correct
 #endif
 
-  int readTrailer();
-  GBool readXRef(int *pos);
+  Guint readTrailer();
+  GBool readXRef(Guint *pos);
   GBool constructXRef();
   GBool checkEncrypted(GString *ownerPassword, GString *userPassword);
+  Guint strToUnsigned(char *s);
 };
 
 #endif

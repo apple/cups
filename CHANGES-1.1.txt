@@ -3,6 +3,7 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.16
 
+	- Upgraded the pdftops filter to Xpdf 1.01.
 	- The scheduler no longer passes the page-border and
 	  number-up-layout attributes to filters when printing
 	  banner pages.

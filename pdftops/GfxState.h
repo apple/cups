@@ -2,7 +2,7 @@
 //
 // GfxState.h
 //
-// Copyright 1996 Derek B. Noonburg
+// Copyright 1996-2002 Glyph & Cog, LLC
 //
 //========================================================================
 
@@ -583,10 +583,9 @@ public:
 
   static GfxRadialShading *parse(Dict *dict);
 
-  void getCoords(double *x0A, double *y0A, double *x1A, double *y1A)
-    { *x0A = x0; *y0A = y0; *x1A = x1; *y1A = y1; }
-  void getRadii(double *r0A, double *r1A)
-    { *r0A = r0; *r1A = r1; }
+  void getCoords(double *x0A, double *y0A, double *r0A,
+		 double *x1A, double *y1A, double *r1A)
+    { *x0A = x0; *y0A = y0; *r0A = r0; *x1A = x1; *y1A = y1; *r1A = r1; }
   double getDomain0() { return t0; }
   double getDomain1() { return t1; }
   void getColor(double t, GfxColor *color);
@@ -595,8 +594,7 @@ public:
 
 private:
 
-  double x0, y0, x1, y1;
-  double r0, r1;
+  double x0, y0, r0, x1, y1, r1;
   double t0, t1;
   Function *funcs[gfxColorMaxComps];
   int nFuncs;
@@ -737,7 +735,7 @@ public:
 	       double x3, double y3);
 
   // Close the last subpath.
-  void close() { subpaths[n-1]->close(); }
+  void close();
 
 private:
 
@@ -819,6 +817,7 @@ public:
   double getCurY() { return curY; }
   void getClipBBox(double *xMin, double *yMin, double *xMax, double *yMax)
     { *xMin = clipXMin; *yMin = clipYMin; *xMax = clipXMax; *yMax = clipYMax; }
+  void getUserClipBBox(double *xMin, double *yMin, double *xMax, double *yMax);
   double getLineX() { return lineX; }
   double getLineY() { return lineY; }
 
@@ -901,8 +900,8 @@ public:
   // Text position.
   void textMoveTo(double tx, double ty)
     { lineX = tx; lineY = ty; textTransform(tx, ty, &curX, &curY); }
-  void textShift(double tx);
   void textShift(double tx, double ty);
+  void shift(double dx, double dy);
 
   // Push/pop GfxState on/off stack.
   GfxState *save();

@@ -2,7 +2,7 @@
 //
 // Catalog.h
 //
-// Copyright 1996 Derek B. Noonburg
+// Copyright 1996-2002 Glyph & Cog, LLC
 //
 //========================================================================
 
@@ -48,6 +48,13 @@ public:
   // Return base URI, or NULL if none.
   GString *getBaseURI() { return baseURI; }
 
+  // Return the contents of the metadata stream, or NULL if there is
+  // no metadata.
+  GString *readMetadata();
+
+  // Return the structure tree root object.
+  Object *getStructTreeRoot() { return &structTreeRoot; }
+
   // Find a page, given its object ID.  Returns page number, or 0 if
   // not found.
   int findPage(int num, int gen);
@@ -66,6 +73,8 @@ private:
   Object dests;			// named destination dictionary
   Object nameTree;		// name tree
   GString *baseURI;		// base URI for URI-type links
+  Object metadata;		// metadata stream
+  Object structTreeRoot;	// structure tree root dictionary
   GBool ok;			// true if catalog is valid
 
   int readPageTree(Dict *pages, PageAttrs *attrs, int start,

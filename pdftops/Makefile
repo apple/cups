@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.6.2.4 2002/06/04 20:32:55 mike Exp $"
+# "$Id: Makefile,v 1.6.2.5 2002/09/18 17:03:20 mike Exp $"
 #
 #   pdftops filter Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -14,11 +14,50 @@ include ../Makedefs
 # Object files...
 #
 
-LIBOBJS	=	Decrypt.o GString.o gfile.o gmempp.o gmem.o parseargs.o \
-		Array.o Catalog.o Dict.o Error.o FontEncoding.o \
-		FontFile.o FormWidget.o Function.o Gfx.o GfxFont.o GfxState.o \
-		Lexer.o Link.o Object.o OutputDev.o Page.o Params.o \
-		Parser.o PDFDoc.o PSOutputDev.o Stream.o XRef.o
+LIBOBJS	=	Annot.o \
+		Array.o \
+		BuiltinFont.o \
+		BuiltinFontTables.o \
+		CMap.o \
+		Catalog.o \
+		CharCodeToUnicode.o \
+		Decrypt.o \
+		Dict.o \
+		Error.o \
+		FTFont.o \
+		FontEncoding.o \
+		FontEncodingTables.o \
+		FontFile.o \
+		Function.o \
+		GHash.o \
+		GList.o \
+		GString.o \
+		Gfx.o \
+		GfxFont.o \
+		GfxState.o \
+		GlobalParams.o \
+		Lexer.o \
+		Link.o \
+		NameToCharCode.o \
+		Object.o \
+		OutputDev.o \
+		PDFDoc.o \
+		PSOutputDev.o \
+		PSTokenizer.o \
+		Page.o \
+		Params.o \
+		Parser.o \
+		SFont.o \
+		Stream.o \
+		T1Font.o \
+		TTFont.o \
+		UnicodeMap.o \
+		XRef.o \
+		gfile.o \
+		gmem.o \
+		gmempp.o \
+		parseargs.o
+
 OBJS	=	pdftops.o $(LIBOBJS)
 
 #
@@ -78,10 +117,10 @@ libxpdf.a:	$(LIBOBJS)
 #
 # Dependencies...
 #
-  
+
 include Dependencies
 
 
 #
-# End of "$Id: Makefile,v 1.6.2.4 2002/06/04 20:32:55 mike Exp $".
+# End of "$Id: Makefile,v 1.6.2.5 2002/09/18 17:03:20 mike Exp $".
 #

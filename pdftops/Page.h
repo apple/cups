@@ -2,7 +2,7 @@
 //
 // Page.h
 //
-// Copyright 1996 Derek B. Noonburg
+// Copyright 1996-2002 Glyph & Cog, LLC
 //
 //========================================================================
 
@@ -51,6 +51,20 @@ public:
   PDFRectangle *getTrimBox() { return &trimBox; }
   PDFRectangle *getArtBox() { return &artBox; }
   int getRotate() { return rotate; }
+  GString *getLastModified()
+    { return lastModified.isString()
+	? lastModified.getString() : (GString *)NULL; }
+  Dict *getBoxColorInfo()
+    { return boxColorInfo.isDict() ? boxColorInfo.getDict() : (Dict *)NULL; }
+  Dict *getGroup()
+    { return group.isDict() ? group.getDict() : (Dict *)NULL; }
+  Stream *getMetadata()
+    { return metadata.isStream() ? metadata.getStream() : (Stream *)NULL; }
+  Dict *getPieceInfo()
+    { return pieceInfo.isDict() ? pieceInfo.getDict() : (Dict *)NULL; }
+  Dict *getSeparationInfo()
+    { return separationInfo.isDict()
+	? separationInfo.getDict() : (Dict *)NULL; }
   Dict *getResourceDict()
     { return resources.isDict() ? resources.getDict() : (Dict *)NULL; }
 
@@ -66,6 +80,12 @@ private:
   PDFRectangle trimBox;
   PDFRectangle artBox;
   int rotate;
+  Object lastModified;
+  Object boxColorInfo;
+  Object group;
+  Object metadata;
+  Object pieceInfo;
+  Object separationInfo;
   Object resources;
 };
 
@@ -97,6 +117,12 @@ public:
   PDFRectangle *getTrimBox() { return attrs->getTrimBox(); }
   PDFRectangle *getArtBox() { return attrs->getArtBox(); }
   int getRotate() { return attrs->getRotate(); }
+  GString *getLastModified() { return attrs->getLastModified(); }
+  Dict *getBoxColorInfo() { return attrs->getBoxColorInfo(); }
+  Dict *getGroup() { return attrs->getGroup(); }
+  Stream *getMetadata() { return attrs->getMetadata(); }
+  Dict *getPieceInfo() { return attrs->getPieceInfo(); }
+  Dict *getSeparationInfo() { return attrs->getSeparationInfo(); }
 
   // Get resource dictionary.
   Dict *getResourceDict() { return attrs->getResourceDict(); }

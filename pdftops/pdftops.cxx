@@ -9,7 +9,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stddef.h>
-#include <string.h>
+#include <cups/string.h>
 #include "parseargs.h"
 #include "GString.h"
 #include "gmem.h"
@@ -32,10 +32,11 @@ int main(int argc, char *argv[]) {
   PDFDoc	*doc;
   GString	*fileName;
   GString	*psFileName;
-  PSOutLevel	level;
+  PSLevel	level;
   PSOutputDev	*psOut;
   int		num_options;
   cups_option_t	*options;
+  const char	*val;
   ppd_file_t	*ppd;
   ppd_size_t	*size;
   FILE		*fp;
@@ -44,13 +45,11 @@ int main(int argc, char *argv[]) {
   char		buffer[8192];
   int		bytes;
   int		width, length;
+  int		duplex;
 
 
   // Make sure status messages are not buffered...
   setbuf(stderr, NULL);
-
-  // Send all error messages...
-  errQuiet = 0;
 
   // Make sure we have the right number of arguments for CUPS!
   if (argc < 6 || argc > 7) {
@@ -82,16 +81,17 @@ int main(int argc, char *argv[]) {
   width  = 595;
   length = 792;
   level  = psLevel2;
+  duplex = 0;
 
   // Get PPD and initialize options as needed...
+  num_options = cupsParseOptions(argv[5], 0, &options);
+
   if ((ppd = ppdOpenFile(getenv("PPD"))) != NULL)
   {
     fprintf(stderr, "DEBUG: pdftops - opened PPD file \"%s\"...\n", getenv("PPD"));
 
     ppdMarkDefaults(ppd);
-    num_options = cupsParseOptions(argv[5], 0, &options);
     cupsMarkOptions(ppd, num_options, options);
-    cupsFreeOptions(num_options, options);
 
     if ((size = ppdPageSize(ppd, NULL)) != NULL)
     {
@@ -100,22 +100,58 @@ int main(int argc, char *argv[]) {
     }
 
     level = ppd->language_level == 1 ? psLevel1 : psLevel2;
-
-    ppdClose(ppd);
   }
+
+  if ((val = cupsGetOption("sides", num_options, options)) != NULL &&
+      strncasecmp(val, "two-", 4) == 0)
+    duplex = 1;
+  else if ((val = cupsGetOption("Duplex", num_options, options)) != NULL &&
+           strncasecmp(val, "Duplex", 6) == 0)
+    duplex = 1;
+  else if ((val = cupsGetOption("JCLDuplex", num_options, options)) != NULL &&
+           strncasecmp(val, "Duplex", 6) == 0)
+    duplex = 1;
+  else if ((val = cupsGetOption("EFDuplex", num_options, options)) != NULL &&
+           strncasecmp(val, "Duplex", 6) == 0)
+    duplex = 1;
+  else if ((val = cupsGetOption("KD03Duplex", num_options, options)) != NULL &&
+           strncasecmp(val, "Duplex", 6) == 0)
+    duplex = 1;
+  else if (ppdIsMarked(ppd, "Duplex", "DuplexNoTumble") ||
+           ppdIsMarked(ppd, "Duplex", "DuplexTumble") ||
+	   ppdIsMarked(ppd, "JCLDuplex", "DuplexNoTumble") ||
+           ppdIsMarked(ppd, "JCLDuplex", "DuplexTumble") ||
+	   ppdIsMarked(ppd, "EFDuplex", "DuplexNoTumble") ||
+           ppdIsMarked(ppd, "EFDuplex", "DuplexTumble") ||
+	   ppdIsMarked(ppd, "KD03Duplex", "DuplexNoTumble") ||
+           ppdIsMarked(ppd, "KD03Duplex", "DuplexTumble"))
+    duplex = 1;
+
+  cupsFreeOptions(num_options, options);
+
+  if (ppd != NULL)
+    ppdClose(ppd);
 
   fprintf(stderr, "DEBUG: pdftops - level = %d, width = %d, length = %d\n",
           level, width, length);
-
-  // init error file
-  errorInit();
 
   // read config file
   if ((server_root = getenv("CUPS_SERVERROOT")) == NULL)
     server_root = CUPS_SERVERROOT;
 
-  sprintf(tempfile, "%s/pdftops.conf", server_root);
-  initParams("", tempfile);
+  snprintf(buffer, sizeof(buffer), "%s/pdftops.conf", server_root);
+
+  globalParams = new GlobalParams(buffer);
+
+  globalParams->setPSPaperWidth(width);
+  globalParams->setPSPaperHeight(length);
+  globalParams->setPSDuplex(duplex);
+  globalParams->setPSLevel(level);
+  globalParams->setPSASCIIHex(level == psLevel1);
+  globalParams->setPSEmbedType1(1);
+  globalParams->setPSEmbedTrueType(1);
+  globalParams->setPSEmbedCIDPostScript(1);
+  globalParams->setErrQuiet(0);
 
   // open PDF file
   doc = new PDFDoc(fileName, NULL, NULL, getenv("DEBUG") != NULL);
@@ -129,7 +165,7 @@ int main(int argc, char *argv[]) {
     // write PostScript file
     psOut = new PSOutputDev(psFileName->getCString(), doc->getXRef(),
                             doc->getCatalog(), 1, doc->getNumPages(),
-			    level, psModePS, 0, 1, 1, width, length);
+			    psModePS);
     if (psOut->isOk())
       doc->displayPages(psOut, 1, doc->getNumPages(), 72, 0, gFalse);
     delete psOut;
@@ -143,7 +179,7 @@ int main(int argc, char *argv[]) {
   }
 
   delete doc;
-  freeParams();
+  delete globalParams;
 
   // check for memory leaks
   Object::memCheck(stderr);

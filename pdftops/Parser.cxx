@@ -2,7 +2,7 @@
 //
 // Parser.cc
 //
-// Copyright 1996 Derek B. Noonburg
+// Copyright 1996-2002 Glyph & Cog, LLC
 //
 //========================================================================
 
@@ -10,6 +10,7 @@
 #pragma implementation
 #endif
 
+#include <config.h>
 #include <stddef.h>
 #include "Object.h"
 #include "Array.h"
@@ -154,7 +155,7 @@ Object *Parser::getObj(Object *obj) {
 Stream *Parser::makeStream(Object *dict) {
   Object obj;
   Stream *str;
-  int pos, endPos, length;
+  Guint pos, endPos, length;
 
   // get stream start position
   lexer->skipToNextLine();
@@ -163,7 +164,7 @@ Stream *Parser::makeStream(Object *dict) {
   // get length
   dict->dictLookup("Length", &obj);
   if (obj.isInt()) {
-    length = obj.getInt();
+    length = (Guint)obj.getInt();
     obj.free();
   } else {
     error(getPos(), "Bad 'Length' attribute in stream");
@@ -172,12 +173,13 @@ Stream *Parser::makeStream(Object *dict) {
   }
 
   // check for length in damaged file
-  if ((endPos = xref->getStreamEnd(pos)) >= 0) {
+  if (xref->getStreamEnd(pos, &endPos)) {
     length = endPos - pos;
   }
 
   // make base stream
-  str = lexer->getStream()->getBaseStream()->makeSubStream(pos, length, dict);
+  str = lexer->getStream()->getBaseStream()->makeSubStream(pos, gTrue,
+							   length, dict);
 
   // get filters
   str = str->addFilters(dict);

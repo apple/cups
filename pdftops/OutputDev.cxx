@@ -2,7 +2,7 @@
 //
 // OutputDev.cc
 //
-// Copyright 1996 Derek B. Noonburg
+// Copyright 1996-2002 Glyph & Cog, LLC
 //
 //========================================================================
 
@@ -10,6 +10,7 @@
 #pragma implementation
 #endif
 
+#include <config.h>
 #include <stddef.h>
 #include "Object.h"
 #include "Stream.h"
@@ -58,6 +59,11 @@ void OutputDev::updateAll(GfxState *state) {
   updateFont(state);
 }
 
+GBool OutputDev::beginType3Char(GfxState *state,
+				CharCode code, Unicode *u, int uLen) {
+  return gFalse;
+}
+
 void OutputDev::drawImageMask(GfxState *state, Object *ref, Stream *str,
 			      int width, int height, GBool invert,
 			      GBool inlineImg) {
@@ -68,6 +74,7 @@ void OutputDev::drawImageMask(GfxState *state, Object *ref, Stream *str,
     j = height * ((width + 7) / 8);
     for (i = 0; i < j; ++i)
       str->getChar();
+    str->close();
   }
 }
 
@@ -82,6 +89,7 @@ void OutputDev::drawImage(GfxState *state, Object *ref, Stream *str,
 		   colorMap->getBits() + 7) / 8);
     for (i = 0; i < j; ++i)
       str->getChar();
+    str->close();
   }
 }
 

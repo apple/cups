@@ -2,7 +2,7 @@
 //
 // Object.h
 //
-// Copyright 1996 Derek B. Noonburg
+// Copyright 1996-2002 Glyph & Cog, LLC
 //
 //========================================================================
 
@@ -176,8 +176,8 @@ public:
   int streamGetChar();
   int streamLookChar();
   char *streamGetLine(char *buf, int size);
-  int streamGetPos();
-  void streamSetPos(int pos);
+  Guint streamGetPos();
+  void streamSetPos(Guint pos, int dir = 0);
   Dict *streamGetDict();
 
   // Output.
@@ -287,11 +287,11 @@ inline int Object::streamLookChar()
 inline char *Object::streamGetLine(char *buf, int size)
   { return stream->getLine(buf, size); }
 
-inline int Object::streamGetPos()
+inline Guint Object::streamGetPos()
   { return stream->getPos(); }
 
-inline void Object::streamSetPos(int pos)
-  { stream->setPos(pos); }
+inline void Object::streamSetPos(Guint pos, int dir)
+  { stream->setPos(pos, dir); }
 
 inline Dict *Object::streamGetDict()
   { return stream->getDict(); }

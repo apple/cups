@@ -2,7 +2,7 @@
 //
 // XRef.cc
 //
-// Copyright 1996 Derek B. Noonburg
+// Copyright 1996-2002 Glyph & Cog, LLC
 //
 //========================================================================
 
@@ -10,6 +10,7 @@
 #pragma implementation
 #endif
 
+#include <config.h>
 #include <stdlib.h>
 #include <stddef.h>
 #include <string.h>
@@ -24,6 +25,7 @@
 #include "Decrypt.h"
 #endif
 #include "Error.h"
+#include "ErrorCodes.h"
 #include "XRef.h"
 
 //------------------------------------------------------------------------
@@ -48,10 +50,11 @@
 //------------------------------------------------------------------------
 
 XRef::XRef(BaseStream *strA, GString *ownerPassword, GString *userPassword) {
-  int pos;
+  Guint pos;
   int i;
 
   ok = gTrue;
+  errCode = errNone;
   size = 0;
   entries = NULL;
   streamEnds = NULL;
@@ -66,6 +69,7 @@ XRef::XRef(BaseStream *strA, GString *ownerPassword, GString *userPassword) {
   // try to reconstruct the xref table
   if (pos == 0) {
     if (!(ok = constructXRef())) {
+      errCode = errDamaged;
       return;
     }
 
@@ -73,7 +77,7 @@ XRef::XRef(BaseStream *strA, GString *ownerPassword, GString *userPassword) {
   } else {
     entries = (XRefEntry *)gmalloc(size * sizeof(XRefEntry));
     for (i = 0; i < size; ++i) {
-      entries[i].offset = -1;
+      entries[i].offset = 0xffffffff;
       entries[i].used = gFalse;
     }
     while (readXRef(&pos)) ;
@@ -85,6 +89,7 @@ XRef::XRef(BaseStream *strA, GString *ownerPassword, GString *userPassword) {
       size = 0;
       entries = NULL;
       if (!(ok = constructXRef())) {
+	errCode = errDamaged;
 	return;
       }
     }
@@ -100,6 +105,7 @@ XRef::XRef(BaseStream *strA, GString *ownerPassword, GString *userPassword) {
 #endif
   if (checkEncrypted(ownerPassword, userPassword)) {
     ok = gFalse;
+    errCode = errEncrypted;
     return;
   }
 }
@@ -114,17 +120,18 @@ XRef::~XRef() {
 
 // Read startxref position, xref table size, and root.  Returns
 // first xref position.
-int XRef::readTrailer() {
+Guint XRef::readTrailer() {
   Parser *parser;
   Object obj;
   char buf[xrefSearchSize+1];
-  int n, pos, pos1;
+  int n;
+  Guint pos, pos1;
   char *p;
   int c;
   int i;
 
   // read last xrefSearchSize bytes
-  str->setPos(-xrefSearchSize);
+  str->setPos(xrefSearchSize, -1);
   for (n = 0; n < xrefSearchSize; ++n) {
     if ((c = str->getChar()) == EOF)
       break;
@@ -140,7 +147,7 @@ int XRef::readTrailer() {
   if (i < 0)
     return 0;
   for (p = &buf[i+9]; isspace(*p); ++p) ;
-  pos = lastXRefPos = atoi(p);
+  pos = lastXRefPos = strToUnsigned(p);
 
   // find trailer dict by looking after first xref table
   // (NB: we can't just use the trailer dict at the end of the file --
@@ -175,8 +182,9 @@ int XRef::readTrailer() {
 
   // read trailer dict
   obj.initNull();
-  parser = new Parser(NULL, new Lexer(NULL, str->makeSubStream(start + pos1,
-							       -1, &obj)));
+  parser = new Parser(NULL,
+	     new Lexer(NULL,
+	       str->makeSubStream(start + pos1, gFalse, 0, &obj)));
   parser->getObj(&trailerDict);
   if (trailerDict.isDict()) {
     trailerDict.dictLookupNF("Size", &obj);
@@ -203,7 +211,7 @@ int XRef::readTrailer() {
 }
 
 // Read an xref table and the prev pointer from the trailer.
-GBool XRef::readXRef(int *pos) {
+GBool XRef::readXRef(Guint *pos) {
   Parser *parser;
   Object obj, obj2;
   char s[20];
@@ -260,7 +268,7 @@ GBool XRef::readXRef(int *pos) {
       newSize = size + 256;
       entries = (XRefEntry *)grealloc(entries, newSize * sizeof(XRefEntry));
       for (i = size; i < newSize; ++i) {
-	entries[i].offset = -1;
+	entries[i].offset = 0xffffffff;
 	entries[i].used = gFalse;
       }
       size = newSize;
@@ -272,9 +280,9 @@ GBool XRef::readXRef(int *pos) {
 	}
 	s[j] = (char)c;
       }
-      if (entries[i].offset < 0) {
+      if (entries[i].offset == 0xffffffff) {
 	s[10] = '\0';
-	entries[i].offset = atoi(s);
+	entries[i].offset = strToUnsigned(s);
 	s[16] = '\0';
 	entries[i].gen = atoi(&s[11]);
 	if (s[17] == 'n') {
@@ -292,7 +300,7 @@ GBool XRef::readXRef(int *pos) {
 	    !entries[1].used) {
 	  i = first = 0;
 	  entries[0] = entries[1];
-	  entries[1].offset = -1;
+	  entries[1].offset = 0xffffffff;
 	}
       }
     }
@@ -300,8 +308,9 @@ GBool XRef::readXRef(int *pos) {
 
   // read prev pointer from trailer dictionary
   obj.initNull();
-  parser = new Parser(NULL, new Lexer(NULL, str->makeSubStream(str->getPos(),
-							       -1, &obj)));
+  parser = new Parser(NULL,
+	     new Lexer(NULL,
+	       str->makeSubStream(str->getPos(), gFalse, 0, &obj)));
   parser->getObj(&obj);
   if (!obj.isCmd("trailer")) {
     goto err1;
@@ -313,7 +322,7 @@ GBool XRef::readXRef(int *pos) {
   }
   obj.getDict()->lookupNF("Prev", &obj2);
   if (obj2.isInt()) {
-    *pos = obj2.getInt();
+    *pos = (Guint)obj2.getInt();
     more = gTrue;
   } else {
     more = gFalse;
@@ -336,7 +345,7 @@ GBool XRef::constructXRef() {
   Parser *parser;
   Object obj;
   char buf[256];
-  int pos;
+  Guint pos;
   int num, gen;
   int newSize;
   int streamEndsSize;
@@ -359,8 +368,9 @@ GBool XRef::constructXRef() {
     // got trailer dictionary
     if (!strncmp(p, "trailer", 7)) {
       obj.initNull();
-      parser = new Parser(NULL, new Lexer(NULL,
-		      str->makeSubStream(start + pos + 7, -1, &obj)));
+      parser = new Parser(NULL,
+		 new Lexer(NULL,
+		   str->makeSubStream(start + pos + 7, gFalse, 0, &obj)));
       if (!trailerDict.isNone())
 	trailerDict.free();
       parser->getObj(&trailerDict);
@@ -402,7 +412,7 @@ GBool XRef::constructXRef() {
 		entries = (XRefEntry *)
 		            grealloc(entries, newSize * sizeof(XRefEntry));
 		for (i = size; i < newSize; ++i) {
-		  entries[i].offset = -1;
+		  entries[i].offset = 0xffffffff;
 		  entries[i].used = gFalse;
 		}
 		size = newSize;
@@ -420,7 +430,8 @@ GBool XRef::constructXRef() {
     } else if (!strncmp(p, "endstream", 9)) {
       if (streamEndsLen == streamEndsSize) {
 	streamEndsSize += 64;
-	streamEnds = (int *)grealloc(streamEnds, streamEndsSize * sizeof(int));
+	streamEnds = (Guint *)grealloc(streamEnds,
+				       streamEndsSize * sizeof(int));
       }
       streamEnds[streamEndsLen++] = pos;
     }
@@ -579,10 +590,11 @@ Object *XRef::fetch(int num, int gen, Object *obj) {
   }
 
   e = &entries[num];
-  if (e->gen == gen && e->offset >= 0) {
+  if (e->gen == gen && e->offset != 0xffffffff) {
     obj1.initNull();
-    parser = new Parser(this, new Lexer(this,
-	           str->makeSubStream(start + e->offset, -1, &obj1)));
+    parser = new Parser(this,
+	       new Lexer(this,
+		 str->makeSubStream(start + e->offset, gFalse, 0, &obj1)));
     parser->getObj(&obj1);
     parser->getObj(&obj2);
     parser->getObj(&obj3);
@@ -612,12 +624,17 @@ Object *XRef::getDocInfo(Object *obj) {
   return trailerDict.dictLookup("Info", obj);
 }
 
-int XRef::getStreamEnd(int streamStart) {
+// Added for the pdftex project.
+Object *XRef::getDocInfoNF(Object *obj) {
+  return trailerDict.dictLookupNF("Info", obj);
+}
+
+GBool XRef::getStreamEnd(Guint streamStart, Guint *streamEnd) {
   int a, b, m;
 
   if (streamEndsLen == 0 ||
       streamStart > streamEnds[streamEndsLen - 1]) {
-    return -1;
+    return gFalse;
   }
 
   a = -1;
@@ -631,5 +648,18 @@ int XRef::getStreamEnd(int streamStart) {
       a = m;
     }
   }
-  return streamEnds[b];
+  *streamEnd = streamEnds[b];
+  return gTrue;
+}
+
+Guint XRef::strToUnsigned(char *s) {
+  Guint x;
+  char *p;
+  int i;
+
+  x = 0;
+  for (p = s, i = 0; *p && isdigit(*p) && i < 10; ++p, ++i) {
+    x = 10 * x + (*p - '0');
+  }
+  return x;
 }

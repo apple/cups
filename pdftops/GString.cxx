@@ -4,7 +4,7 @@
 //
 // Simple variable-length string type.
 //
-// Copyright 1996 Derek B. Noonburg
+// Copyright 1996-2002 Glyph & Cog, LLC
 //
 //========================================================================
 
@@ -12,6 +12,7 @@
 #pragma implementation
 #endif
 
+#include <config.h>
 #include <stdlib.h>
 #include <stddef.h>
 #include <string.h>
