@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.3 2002/10/15 13:54:44 mike Exp $"
+# "$Id: Makefile,v 1.4 2002/12/12 21:44:44 mike Exp $"
 #
 #   Documentation makefile for the Common UNIX Printing System (CUPS).
 #
@@ -31,16 +31,17 @@ include ../../Makedefs
 .SUFFIXES:	.html .pdf .ps .shtml
 .shtml.html:
 	echo Formatting $@...
-	htmldoc --titleimage images/cups-large.gif --numbered -f $@ $<
+	$(HTMLDOC) --titleimage images/cups-large.gif --numbered -f $@ $<
 .shtml.pdf:
 	echo Formatting $@...
-	htmldoc --titleimage images/cups-large.gif --duplex --compression=9 \
+	$(HTMLDOC) --titleimage images/cups-large.gif --duplex --compression=9 \
 		--numbered --jpeg -f $@ $<
 .shtml.ps:
 	echo Formatting $@...
-	htmldoc --titleimage images/cups-large.gif --duplex --numbered \
+	$(HTMLDOC) --titleimage images/cups-large.gif --duplex --numbered \
 		--jpeg -f $@ $<
 
+HTMLDOC		=	htmldoc --strict --quiet --bodycolor white
 
 #
 # Document files...
@@ -131,43 +132,43 @@ install:
 
 overview.pdf:	overview.html
 	echo Formatting $@...
-	htmldoc --path ".;.." --duplex --compression=9 --jpeg --webpage -f overview.pdf overview.html
+	$(HTMLDOC) --path ".;.." --duplex --compression=9 --jpeg --webpage -f overview.pdf overview.html
 overview.ps:	overview.html
 	echo Formatting $@...
-	htmldoc --path ".;.." --duplex --jpeg --webpage -f overview.ps overview.html
+	$(HTMLDOC) --path ".;.." --duplex --jpeg --webpage -f overview.ps overview.html
 
 sam.html:	sam.shtml
 	echo Formatting $@...
-	htmldoc --toctitle "Table des matières" --path ".;.." --titleimage images/cups-large.gif -f $@ $<
+	$(HTMLDOC) --toctitle "Table des matières" --path ".;.." --titleimage images/cups-large.gif -f $@ $<
 sam.pdf:	sam.shtml
 	echo Formatting $@...
-	htmldoc --toctitle "Table des matières" --path ".;.." --titleimage images/cups-large.gif --duplex --compression=9 \
+	$(HTMLDOC) --toctitle "Table des matières" --path ".;.." --titleimage images/cups-large.gif --duplex --compression=9 \
 		--jpeg -f $@ $<
 sam.ps:		sam.shtml
 	echo Formatting $@...
-	htmldoc --toctitle "Table des matières" --path ".;.." --titleimage images/cups-large.gif --duplex --jpeg -f $@ $<
+	$(HTMLDOC) --toctitle "Table des matières" --path ".;.." --titleimage images/cups-large.gif --duplex --jpeg -f $@ $<
 
 spm.html:	spm.shtml
 	echo Formatting $@...
-	htmldoc --path ".;.." --titleimage images/cups-large.gif -f $@ $<
+	$(HTMLDOC) --path ".;.." --titleimage images/cups-large.gif -f $@ $<
 spm.pdf:	spm.shtml
 	echo Formatting $@...
-	htmldoc --path ".;.." --titleimage images/cups-large.gif --duplex --compression=9 \
+	$(HTMLDOC) --path ".;.." --titleimage images/cups-large.gif --duplex --compression=9 \
 		--jpeg -f $@ $<
 spm.ps:		spm.shtml
 	echo Formatting $@...
-	htmldoc --path ".;.." --titleimage images/cups-large.gif --duplex --jpeg -f $@ $<
+	$(HTMLDOC) --path ".;.." --titleimage images/cups-large.gif --duplex --jpeg -f $@ $<
 
 sum.html:	sum.shtml
 	echo Formatting $@...
-	htmldoc --toctitle "Table des matières" --path ".;.." --titleimage images/cups-large.gif -f $@ $<
+	$(HTMLDOC) --toctitle "Table des matières" --path ".;.." --titleimage images/cups-large.gif -f $@ $<
 sum.pdf:	sum.shtml
 	echo Formatting $@...
-	htmldoc --toctitle "Table des matières" --path ".;.." --titleimage images/cups-large.gif --duplex --compression=9 \
+	$(HTMLDOC) --toctitle "Table des matières" --path ".;.." --titleimage images/cups-large.gif --duplex --compression=9 \
 		--jpeg -f $@ $<
 sum.ps:		sum.shtml
 	echo Formatting $@...
-	htmldoc --toctitle "Table des matières" --path ".;.." --titleimage images/cups-large.gif --duplex --jpeg -f $@ $<
+	$(HTMLDOC) --toctitle "Table des matières" --path ".;.." --titleimage images/cups-large.gif --duplex --jpeg -f $@ $<
 
 $(DOCUMENTS:.shtml=.html): \
 		glossary.shtml printing-overview.shtml \

@@ -1,5 +1,5 @@
 /*
- * "$Id: serial.c,v 1.48 2002/10/15 16:40:11 mike Exp $"
+ * "$Id: serial.c,v 1.49 2002/12/12 21:44:42 mike Exp $"
  *
  *   Serial port backend for the Common UNIX Printing System (CUPS).
  *
@@ -560,7 +560,7 @@ list_devices(void)
 #  else
       printf("serial serial:%s?baud=115200 \"Unknown\" \"Serial Port #%d\"\n",
              device, i + 1);
-#  endif // _ARCH_PPC || powerpc || __powerpc
+#  endif /* _ARCH_PPC || powerpc || __powerpc */
     }
   }
 
@@ -987,5 +987,5 @@ list_devices(void)
 
 
 /*
- * End of "$Id: serial.c,v 1.48 2002/10/15 16:40:11 mike Exp $".
+ * End of "$Id: serial.c,v 1.49 2002/12/12 21:44:42 mike Exp $".
  */
