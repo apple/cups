@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: cupsaddsmb.man,v 1.2.2.6 2004/06/29 13:15:10 mike Exp $"
+.\" "$Id: cupsaddsmb.man,v 1.2.2.7 2004/08/19 21:02:55 mike Exp $"
 .\"
 .\"   cupsaddsmb man page for the Common UNIX Printing System (CUPS).
 .\"
@@ -15,13 +15,13 @@
 .\"       Attn: CUPS Licensing Information
 .\"       Easy Software Products
 .\"       44141 Airport View Drive, Suite 204
-.\"       Hollywood, Maryland 20636-3142 USA
+.\"       Hollywood, Maryland 20636 USA
 .\"
 .\"       Voice: (301) 373-9600
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
-.TH cupsaddsmb 8 "Common UNIX Printing System" "14 March 2002" "Easy Software Products"
+.TH cupsaddsmb 8 "Common UNIX Printing System" "19 August 2004" "Easy Software Products"
 .SH NAME
 cupsaddsmb \- export printers to samba for windows clients
 .SH SYNOPSIS
@@ -46,8 +46,8 @@ cupsaddsmb \- export printers to samba for windows clients
 \fIcupsaddsmb\fR exports printers to the SAMBA software (version
 2.2.0 or higher) for use with Windows clients. Depending on the
 SAMBA configuration, you may need to provide a password to
-export the printers. This program requires the Adobe PostScript
-printer driver files described below.
+export the printers. This program requires the Windows printer
+driver files described below.
 .LP
 The \fI-H\fR option specifies the SAMBA server which defaults
 to the CUPS server.
@@ -98,22 +98,80 @@ share, as follows:
 This configuration assumes a FHS-compliant installation of
 SAMBA; adjust the [printers] and [print$] share paths
 accordingly on your system as needed.
-.SH ADOBE POSTSCRIPT DRIVERS FOR WINDOWS
-\fIcupsaddsmb\fR uses the Adobe PostScript printer drivers for
-Windows, which are available for download from the Adobe web
-site (http://www.adobe.com). Once you have extracted the driver
-files, create a "drivers" directory in the CUPS data directory
-(usually /usr/share/cups) and copy the Adobe files using
-UPPERCASE filenames, as follows:
+
+.SH MICROSOFT POSTSCRIPT DRIVERS FOR WINDOWS
+The base driver for Windows 2000 and higher is the Microsoft
+PostScript driver, which is available on any system running
+Windows 2000 or higher in the
+%WINDOWS%\\SYSTEM32\\SPOOL\\DRIVERS\\W32X86\\3 folder.
+.LP
+The CUPS printer driver is preferred over the Microsoft driver
+since it supports the page-label, job-billing, and
+job-hold-until options fully on all printers. However, currently
+only Windows 2000 and higher is supported by the Microsoft
+driver, so you will also need to get the Adobe driver to support
+Windows 95, 98, and Me clients. The Adobe and Microsoft drivers
+for Windows 2000 are identical.
+.LP
+Once you have extracted the driver files, create a "drivers"
+directory in the CUPS data directory (usually /usr/share/cups)
+and copy the files exactly as named below:
 .nf
 
+    [Windows 2000 and higher]
+    ps5ui.dll
+    pscript.hlp
+    pscript.ntf
+    pscript5.dll
+.fi
+
+.SH CUPS POSTSCRIPT DRIVERS FOR WINDOWS
+\fIcupsaddsmb\fR can use the CUPS v6 PostScript printer driver
+for Windows, which is available for download from the CUPS web
+site.
+.LP
+The CUPS printer driver is preferred over the Adobe and
+Microsoft drivers since it supports the page-label, job-billing,
+and job-hold-until options fully on all printers. However,
+currently only Windows 2000 and higher is supported by the CUPS
+driver, so you will also need to get the Adobe driver to support
+Windows 95, 98, and Me clients.
+.LP
+Once you have extracted the driver files, create a "drivers"
+directory in the CUPS data directory (usually /usr/share/cups)
+and copy the files exactly as named below:
+.nf
+
+    [Windows 2000 and higher]
+    cupsui6.dll
+    cupsdrv6.dll
+    ps5ui.dll
+    pscript.hlp
+    pscript.ntf
+    pscript5.dll
+.fi
+
+.SH ADOBE POSTSCRIPT DRIVERS FOR WINDOWS
+\fIcupsaddsmb\fR can use the Adobe PostScript printer driver for
+Windows, which are available for download from the Adobe web
+site (http://www.adobe.com).
+.LP
+The CUPS printer driver is preferred over the Adobe drivers
+since they support the page-label, job-billing, and
+job-hold-until options fully on all printers. You can use the
+Adobe drivers for Windows 9x and the CUPS drivers for Windows
+2000 and higher. The Adobe and Microsoft drivers for Windows 2000
+are identical.
+.LP
+Once you have extracted the driver files, create a "drivers"
+directory in the CUPS data directory (usually /usr/share/cups)
+and copy the files exactly as named below:
+.nf
+
+    [Windows 95, 98, and Me]
     ADFONTS.MFM
     ADOBEPS4.DRV
     ADOBEPS4.HLP
-    ADOBEPS5.DLL
-    ADOBEPSU.DLL
-    ADOBEPSU.HLP
-    DEFPRTR2.PPD
     ICONLIB.DLL
     PSMON.DLL
 .fi
@@ -123,5 +181,5 @@ http://localhost:631/documentation.html
 .SH COPYRIGHT
 Copyright 1993-2004 by Easy Software Products, All Rights Reserved.
 .\"
-.\" End of "$Id: cupsaddsmb.man,v 1.2.2.6 2004/06/29 13:15:10 mike Exp $".
+.\" End of "$Id: cupsaddsmb.man,v 1.2.2.7 2004/08/19 21:02:55 mike Exp $".
 .\"

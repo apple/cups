@@ -3,6 +3,9 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.21rc2
 
+	- Updated the cupsaddsmb program to use the new Windows
+	  2000 PostScript drivers instead of the Windows NT
+	  printer drivers (STR #390)
 	- The gziptoany filter did not produce copies for raw
 	  print jobs (STR #808)
 	- The cupsLangGet() function now uses nl_langinfo(),
