@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.91.2.63 2003/07/20 01:36:50 mike Exp $"
+ * "$Id: client.c,v 1.91.2.64 2003/07/20 03:13:08 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -356,7 +356,6 @@ CloseAllClients(void)
 void
 CloseClient(client_t *con)	/* I - Client to close */
 {
-  int		status;		/* Exit status of pipe command */
 #if defined(HAVE_LIBSSL)
   SSL_CTX	*context;	/* Context for encryption */
   SSL		*conn;		/* Connection for encryption */
@@ -464,10 +463,7 @@ CloseClient(client_t *con)	/* I - Client to close */
     */
 
     if (con->pipe_pid)
-    {
       kill(con->pipe_pid, SIGKILL);
-      waitpid(con->pipe_pid, &status, WNOHANG);
-    }
 
     LogMessage(L_DEBUG2, "CloseClient() %d Closing data file %d.",
                con->http.fd, con->file);
@@ -3008,20 +3004,15 @@ pipe_command(client_t *con,		/* I - Client connection */
 
   snprintf(lang, sizeof(lang), "LANG=%s",
            con->language ? con->language->language : "C");
+  sprintf(ipp_port, "IPP_PORT=%d", LocalPort);
 #ifdef AF_INET6
   if (con->http.hostaddr.addr.sa_family == AF_INET6)
-  {
-    sprintf(ipp_port, "IPP_PORT=%d", ntohs(con->http.hostaddr.ipv6.sin6_port));
     sprintf(server_port, "SERVER_PORT=%d",
             ntohs(con->http.hostaddr.ipv6.sin6_port));
-  }
   else
 #endif /* AF_INET6 */
-  {
-    sprintf(ipp_port, "IPP_PORT=%d", ntohs(con->http.hostaddr.ipv4.sin_port));
     sprintf(server_port, "SERVER_PORT=%d",
             ntohs(con->http.hostaddr.ipv4.sin_port));
-  }
 
   if (strcmp(con->http.hostname, "localhost") == 0)
     strlcpy(server_name, "SERVER_NAME=localhost", sizeof(server_name));
@@ -3356,5 +3347,5 @@ CDSAWriteFunc(SSLConnectionRef connection,	/* I  - SSL/TLS connection */
 
 
 /*
- * End of "$Id: client.c,v 1.91.2.63 2003/07/20 01:36:50 mike Exp $".
+ * End of "$Id: client.c,v 1.91.2.64 2003/07/20 03:13:08 mike Exp $".
  */

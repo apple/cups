@@ -1,5 +1,5 @@
 /*
- * "$Id: http-addr.c,v 1.1.2.10 2003/01/24 20:45:11 mike Exp $"
+ * "$Id: http-addr.c,v 1.1.2.11 2003/07/20 03:13:07 mike Exp $"
  *
  *   HTTP address routines for the Common UNIX Printing System (CUPS).
  *
@@ -23,6 +23,7 @@
  *
  * Contents:
  *
+ *   httpAddrAny()       - Check for the "any" address.
  *   httpAddrEqual()     - Compare two addresses.
  *   httpAddrLoad()      - Load a host entry address into an HTTP address.
  *   httpAddrLocalhost() - Check for the local loopback address.
@@ -39,6 +40,27 @@
 #include "http.h"
 #include "debug.h"
 #include "string.h"
+
+
+/*
+ * 'httpAddrAny()' - Check for the "any" address.
+ */
+
+int					/* O - 1 if "any", 0 otherwise */
+httpAddrAny(const http_addr_t *addr)	/* I - Address to check */
+{
+#ifdef AF_INET6
+  if (addr->addr.sa_family == AF_INET6 &&
+      IN6_IS_ADDR_UNSPECIFIED(&(addr->ipv6.sin6_addr)))
+    return (1);
+#endif /* AF_INET6 */
+
+  if (addr->addr.sa_family == AF_INET &&
+      ntohl(addr->ipv4.sin_addr.s_addr) == 0x00000000)
+    return (1);
+
+  return (0);
+}
 
 
 /*
@@ -104,8 +126,9 @@ httpAddrLoad(const struct hostent *host,	/* I - Host entry */
  * 'httpAddrLocalhost()' - Check for the local loopback address.
  */
 
-int						/* O - 1 if local host, 1 otherwise */
-httpAddrLocalhost(const http_addr_t *addr)	/* I - Address to check */
+int					/* O - 1 if local host, 0 otherwise */
+httpAddrLocalhost(const http_addr_t *addr)
+					/* I - Address to check */
 {
 #ifdef AF_INET6
   if (addr->addr.sa_family == AF_INET6 &&
@@ -277,5 +300,5 @@ httpGetHostByName(const char *name)	/* I - Hostname or IP address */
 
 
 /*
- * End of "$Id: http-addr.c,v 1.1.2.10 2003/01/24 20:45:11 mike Exp $".
+ * End of "$Id: http-addr.c,v 1.1.2.11 2003/07/20 03:13:07 mike Exp $".
  */

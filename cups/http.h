@@ -1,5 +1,5 @@
 /*
- * "$Id: http.h,v 1.33.2.18 2003/05/09 18:35:38 mike Exp $"
+ * "$Id: http.h,v 1.33.2.19 2003/07/20 03:13:07 mike Exp $"
  *
  *   Hyper-Text Transport Protocol definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -388,6 +388,7 @@ extern void		httpSetCookie(http_t *http, const char *cookie);
 extern int		httpWait(http_t *http, int msec);
 
 /**** New in CUPS 1.2 ****/
+extern int		httpAddrAny(const http_addr_t *addr);
 extern int		httpAddrEqual(const http_addr_t *addr1,
 			              const http_addr_t *addr2);
 extern void		httpAddrLoad(const struct hostent *host, int port,
@@ -409,5 +410,5 @@ extern char		*httpAddrString(const http_addr_t *addr,
 #endif /* !_IPP_HTTP_H_ */
 
 /*
- * End of "$Id: http.h,v 1.33.2.18 2003/05/09 18:35:38 mike Exp $".
+ * End of "$Id: http.h,v 1.33.2.19 2003/07/20 03:13:07 mike Exp $".
  */

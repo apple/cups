@@ -1,5 +1,5 @@
 /*
- * "$Id: listen.c,v 1.9.2.10 2003/03/31 19:20:16 mike Exp $"
+ * "$Id: listen.c,v 1.9.2.11 2003/07/20 03:13:10 mike Exp $"
  *
  *   Server listening routines for the Common UNIX Printing System (CUPS)
  *   scheduler.
@@ -153,6 +153,26 @@ StartListening(void)
     LogMessage(L_DEBUG, "StartListening: address=%s port=%d", s,
 	       ntohs(lis->address.ipv4.sin_port));
 
+   /*
+    * Save the first port that is bound to the local loopback or
+    * "any" address...
+    */
+
+    if (httpAddrLocalhost(&(lis->address)) ||
+        httpAddrAny(&(lis->address)))
+    {
+#ifdef AF_INET6
+      if (lis->address.addr.sa_family == AF_INET6)
+	LocalPort = ntohs(lis->address.ipv6.sin6_port);
+      else
+#endif /* AF_INET6 */
+      LocalPort = ntohs(lis->address.ipv4.sin_port);
+    }
+
+   /*
+    * Create a socket for listening...
+    */
+
     if ((lis->fd = socket(lis->address.addr.sa_family, SOCK_STREAM, 0)) == -1)
     {
       LogMessage(L_ERROR, "StartListening: Unable to open listen socket - %s.",
@@ -235,5 +255,5 @@ StopListening(void)
 
 
 /*
- * End of "$Id: listen.c,v 1.9.2.10 2003/03/31 19:20:16 mike Exp $".
+ * End of "$Id: listen.c,v 1.9.2.11 2003/07/20 03:13:10 mike Exp $".
  */

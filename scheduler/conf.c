@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.77.2.40 2003/04/23 18:55:28 mike Exp $"
+ * "$Id: conf.c,v 1.77.2.41 2003/07/20 03:13:09 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -2026,7 +2026,7 @@ get_address(const char  *value,		/* I - Value string */
   * Decode the hostname and port number as needed...
   */
 
-  if (hostname[0] && strcmp(hostname, "*") != 0)
+  if (hostname[0] && strcmp(hostname, "*"))
   {
     if ((host = httpGetHostByName(hostname)) == NULL)
     {
@@ -2293,5 +2293,5 @@ CDSAGetServerCerts(void)
 
 
 /*
- * End of "$Id: conf.c,v 1.77.2.40 2003/04/23 18:55:28 mike Exp $".
+ * End of "$Id: conf.c,v 1.77.2.41 2003/07/20 03:13:09 mike Exp $".
  */

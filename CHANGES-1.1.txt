@@ -3,6 +3,10 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.20rc1
 
+	- The scheduler now passes the first port that is bound
+	  to the local loopback or "any" addresses to the CGI
+	  programs rather than the port that the browser
+	  connected to (STR #103)
 	- The cupstestppd program now checks for bad
 	  JobPatchFile attributes and incorrect versions of the
 	  Manufacturer attribute for HP printers (STR #155)
