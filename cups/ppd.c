@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c,v 1.112 2003/08/20 14:29:08 mike Exp $"
+ * "$Id: ppd.c,v 1.113 2003/08/20 15:54:18 mike Exp $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -126,7 +126,7 @@ static ppd_group_t	*ppd_get_group(ppd_file_t *ppd, const char *name,
 			               const char *text);
 static ppd_option_t	*ppd_get_option(ppd_group_t *group, const char *name);
 static int		ppd_read(FILE *fp, char *keyword, char *option,
-			         char *text, char **string);
+			         char *text, char **string, int ignoreblank);
 
 
 /*
@@ -443,7 +443,9 @@ ppdOpen(FILE *fp)			/* I - File to read from */
   * Grab the first line and make sure it reads '*PPD-Adobe: "major.minor"'...
   */
 
-  mask = ppd_read(fp, keyword, name, text, &string);
+  mask = ppd_read(fp, keyword, name, text, &string, 0);
+
+  DEBUG_printf(("mask=%x, keyword=\"%s\"...\n", mask, keyword));
 
   if (mask == 0 ||
       strcmp(keyword, "PPD-Adobe") != 0 ||
@@ -453,7 +455,7 @@ ppdOpen(FILE *fp)			/* I - File to read from */
     * Either this is not a PPD file, or it is not a 4.x PPD file.
     */
 
-    if (ppd_status != PPD_OK)
+    if (ppd_status == PPD_OK)
       ppd_status = PPD_MISSING_PPDADOBE4;
 
     ppd_free(string);
@@ -503,7 +505,7 @@ ppdOpen(FILE *fp)			/* I - File to read from */
   choice     = NULL;
   ui_keyword = 0;
 
-  while ((mask = ppd_read(fp, keyword, name, text, &string)) != 0)
+  while ((mask = ppd_read(fp, keyword, name, text, &string, 1)) != 0)
   {
 #ifdef DEBUG
     printf("mask = %x, keyword = \"%s\"", mask, keyword);
@@ -2183,7 +2185,8 @@ ppd_read(FILE *fp,			/* I - File to read from */
          char *keyword,			/* O - Keyword from line */
 	 char *option,			/* O - Option from line */
          char *text,			/* O - Human-readable text from line */
-	 char **string)			/* O - Code/string data */
+	 char **string,			/* O - Code/string data */
+         int  ignoreblank)		/* I - Ignore blank lines? */
 {
   int		ch,			/* Character from file */
 		col,			/* Column in line */
@@ -2249,8 +2252,8 @@ ppd_read(FILE *fp,			/* I - File to read from */
 	    ungetc(ch, fp);
 	}
 
-	if (lineptr == line)		/* Skip blank lines */
-          continue;
+	if (lineptr == line && ignoreblank)
+          continue;			/* Skip blank lines */
 
 	ch = '\n';
 
@@ -2420,7 +2423,7 @@ ppd_read(FILE *fp,			/* I - File to read from */
 
     *lineptr = '\0';
 
-/*    DEBUG_printf(("LINE = \"%s\"\n", line));*/
+    DEBUG_printf(("LINE = \"%s\"\n", line));
 
     if (ch == EOF && lineptr == line)
       return (0);
@@ -2437,9 +2440,10 @@ ppd_read(FILE *fp,			/* I - File to read from */
     text[0]    = '\0';
     *string    = NULL;
 
-    if (!line[0] ||			/* Blank line */
-        strncmp(line, "*%", 2) == 0 ||	/* Comment line */
-        strcmp(line, "*End") == 0)	/* End of multi-line string */
+    if ((!line[0] ||			/* Blank line */
+         strncmp(line, "*%", 2) == 0 ||	/* Comment line */
+         strcmp(line, "*End") == 0) &&	/* End of multi-line string */
+        ignoreblank)			/* Ignore these? */
     {
       startline = ppd_line + 1;
       continue;
@@ -2482,8 +2486,10 @@ ppd_read(FILE *fp,			/* I - File to read from */
         ppd_status = PPD_MISSING_ASTERISK;
         return (0);
       }
-      else
+      else if (ignoreblank)
         continue;
+      else
+        return (0);
     }
 
    /*
@@ -2637,5 +2643,5 @@ ppd_read(FILE *fp,			/* I - File to read from */
 
 
 /*
- * End of "$Id: ppd.c,v 1.112 2003/08/20 14:29:08 mike Exp $".
+ * End of "$Id: ppd.c,v 1.113 2003/08/20 15:54:18 mike Exp $".
  */
