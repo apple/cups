@@ -1,5 +1,5 @@
 /*
- * "$Id: imagetoraster.c,v 1.7 1998/11/16 15:47:04 mike Exp $"
+ * "$Id: imagetoraster.c,v 1.8 1999/02/01 17:26:58 mike Exp $"
  *
  *   Image file to STIFF conversion program for espPrint, a collection
  *   of printer drivers.
@@ -17,6 +17,9 @@
  * Revision History:
  *
  *   $Log: imagetoraster.c,v $
+ *   Revision 1.8  1999/02/01 17:26:58  mike
+ *   Updated to accept color profile option.
+ *
  *   Revision 1.7  1998/11/16 15:47:04  mike
  *   make_lut() didn't limit value to 1.0 (255)...
  *
@@ -505,6 +508,18 @@ main(int  argc,		/* I - Number of command-line arguments */
 	              break;
 	        };
 	      break;
+
+          case 'c' : /* Color profile */
+              i ++;
+              if (i < argc)
+                sscanf(argv[i], "%f,%f,%f,%f,%f,%f",
+                       profile + 0,
+                       profile + 1,
+                       profile + 2,
+                       profile + 3,
+                       profile + 4,
+                       profile + 5);
+              break;
 
           default :
               usage();
@@ -1146,5 +1161,5 @@ make_lut(ib_t  *lut,		/* I - Lookup table */
 
 
 /*
- * End of "$Id: imagetoraster.c,v 1.7 1998/11/16 15:47:04 mike Exp $".
+ * End of "$Id: imagetoraster.c,v 1.8 1999/02/01 17:26:58 mike Exp $".
  */

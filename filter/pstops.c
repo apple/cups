@@ -1,5 +1,5 @@
 /*
- * "$Id: pstops.c,v 1.6 1999/01/26 14:34:52 mike Exp $"
+ * "$Id: pstops.c,v 1.7 1999/02/01 17:27:15 mike Exp $"
  *
  *   PostScript filter for espPrint, a collection of printer drivers.
  *
@@ -17,7 +17,10 @@
  * Revision History:
  *
  *   $Log: pstops.c,v $
- *   Revision 1.6  1999/01/26 14:34:52  mike
+ *   Revision 1.7  1999/02/01 17:27:15  mike
+ *   Updated to accept color profile option.
+ *
+ *   Revision 1.6  1999/01/26  14:34:52  mike
  *   Updated to filter out BeginFeature/EndFeature commands.
  *
  *   Revision 1.5  1998/12/16  16:35:25  mike
@@ -762,7 +765,6 @@ main(int  argc,
                        ColorProfile + 4,
                        ColorProfile + 5);
               break;
-
         }
     else
     {
@@ -844,5 +846,5 @@ main(int  argc,
 
 
 /*
- * End of "$Id: pstops.c,v 1.6 1999/01/26 14:34:52 mike Exp $".
+ * End of "$Id: pstops.c,v 1.7 1999/02/01 17:27:15 mike Exp $".
  */

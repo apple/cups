@@ -1,5 +1,5 @@
 /*
- * "$Id: imagetops.c,v 1.6 1998/08/10 16:20:08 mike Exp $"
+ * "$Id: imagetops.c,v 1.7 1999/02/01 17:26:58 mike Exp $"
  *
  *   Image file to PostScript conversion program for espPrint, a collection
  *   of printer drivers.
@@ -17,7 +17,10 @@
  * Revision History:
  *
  *   $Log: imagetops.c,v $
- *   Revision 1.6  1998/08/10 16:20:08  mike
+ *   Revision 1.7  1999/02/01 17:26:58  mike
+ *   Updated to accept color profile option.
+ *
+ *   Revision 1.6  1998/08/10  16:20:08  mike
  *   Removed extra debug statements.
  *
  *   Revision 1.5  1998/08/10  15:51:04  mike
@@ -132,6 +135,7 @@ main(int  argc,		/* I - Number of command-line arguments */
 			xppi, yppi;	/* Pixels-per-inch */
   float			gammaval[4];
   int			brightness[4];
+  float			profile[6];
   int			x0, y0,		/* Corners of the page in image coords */
 			x1, y1;
   ib_t			*row;
@@ -167,6 +171,12 @@ main(int  argc,		/* I - Number of command-line arguments */
   brightness[1] = 100;
   brightness[2] = 100;
   brightness[3] = 100;
+  profile[0]    = 1.0;
+  profile[1]    = 1.0;
+  profile[2]    = 1.0;
+  profile[3]    = 1.0;
+  profile[4]    = 1.0;
+  profile[5]    = 1.0;
 
   for (i = 1; i < argc; i ++)
     if (argv[i][0] == '-')
@@ -179,6 +189,29 @@ main(int  argc,		/* I - Number of command-line arguments */
                 usage();
 
               printer = argv[i];
+
+	     /*
+	      * Open the POD database files and get the printer definition record.
+	      */
+
+	      if (PDLocalReadInfo(printer, &info, &mod_time) < 0)
+	      {
+		fprintf(stderr, "img2ps: Could not open required POD database files for printer \'%s\'.\n", 
+        		printer);
+		fprintf(stderr, "        Are you sure all required POD files are properly installed?\n");
+
+		PDPerror("img2ps");
+		exit(ERR_BAD_ARG);
+	      };
+
+	      status = info->active_status;
+	      size   = PDFindPageSize(info, PD_SIZE_CURRENT);
+
+             /*
+	      * Copy the color profile over...
+	      */
+
+              memcpy(profile, status->color_profile, sizeof(profile));
               break;
 
           case 'L' : /* Log file */
@@ -314,6 +347,18 @@ main(int  argc,		/* I - Number of command-line arguments */
 	        };
 	      break;
 
+          case 'c' : /* Color profile */
+              i ++;
+              if (i < argc)
+                sscanf(argv[i], "%f,%f,%f,%f,%f,%f",
+                       profile + 0,
+                       profile + 1,
+                       profile + 2,
+                       profile + 3,
+                       profile + 4,
+                       profile + 5);
+              break;
+
           default :
               usage();
               break;
@@ -338,23 +383,6 @@ main(int  argc,		/* I - Number of command-line arguments */
   if (printer == NULL ||
       infile == NULL)
     usage();
-
- /*
-  * Open the POD database files and get the printer definition record.
-  */
-  
-  if (PDLocalReadInfo(printer, &info, &mod_time) < 0)
-  {
-    fprintf(stderr, "img2ps: Could not open required POD database files for printer \'%s\'.\n", 
-            printer);
-    fprintf(stderr, "        Are you sure all required POD files are properly installed?\n");
-
-    PDPerror("img2ps");
-    exit(ERR_BAD_ARG);
-  };
-
-  status = info->active_status;
-  size   = PDFindPageSize(info, PD_SIZE_CURRENT);
 
  /*
   * Figure out what we need to generate...
@@ -555,7 +583,7 @@ main(int  argc,		/* I - Number of command-line arguments */
   fprintf(out, "%%Pages: %d\n", xpages * ypages);
   fputs("%%EndComments\n\n", out);
 
-  print_prolog(out, colorspace, gammaval, brightness, status->color_profile);
+  print_prolog(out, colorspace, gammaval, brightness, profile);
 
   row = malloc(img->xsize * abs(colorspace) + 3);
 
@@ -930,5 +958,5 @@ print_prolog(FILE  *out,
 
 
 /*
- * End of "$Id: imagetops.c,v 1.6 1998/08/10 16:20:08 mike Exp $".
+ * End of "$Id: imagetops.c,v 1.7 1999/02/01 17:26:58 mike Exp $".
  */
