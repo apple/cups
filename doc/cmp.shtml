@@ -31,6 +31,10 @@ supported with reduced functionality.
 Description (&quot;PPD&quot;)-based printing options to support real
 world applications under UNIX.
 
+<P>CUPS also includes a customized version of GNU GhostScript
+(currently based off GNU GhostScript 4.03) and an image file RIP that
+can be used to support non-PostScript printers.
+
 <H2>Document Overview</H2>
 
 This configuration management document is organized into the following
@@ -330,12 +334,12 @@ extension of ".h".
 The top of each source file shall contain a header giving the name of the
 file, the purpose or nature of the source file, the copyright and licensing
 notice, and the functions contained in the file.  The file name and revision
-information is provided by the CVS "$Id: cmp.shtml,v 1.2 1999/05/13 20:40:40 mike Exp $" tag:
+information is provided by the CVS "$Id: cmp.shtml,v 1.3 1999/05/21 20:54:04 mike Exp $" tag:
 
 <UL>
 <PRE>
 /*
- * "$Id: cmp.shtml,v 1.2 1999/05/13 20:40:40 mike Exp $"
+ * "$Id: cmp.shtml,v 1.3 1999/05/21 20:54:04 mike Exp $"
  *
  *   Description of file contents.
  *
@@ -368,14 +372,14 @@ information is provided by the CVS "$Id: cmp.shtml,v 1.2 1999/05/13 20:40:40 mik
 </UL>
 
 The bottom of each source file shall contain a trailer giving the name
-of the file using the CVS "$Id: cmp.shtml,v 1.2 1999/05/13 20:40:40 mike Exp $" tag. The primary purpose of this is to
+of the file using the CVS "$Id: cmp.shtml,v 1.3 1999/05/21 20:54:04 mike Exp $" tag. The primary purpose of this is to
 mark the end of a source file; if the trailer is missing it is possible
 that code has been lost near the end of the file:
 
 <UL>
 <PRE>
 /*
- * End of "$Id: cmp.shtml,v 1.2 1999/05/13 20:40:40 mike Exp $".
+ * End of "$Id: cmp.shtml,v 1.3 1999/05/21 20:54:04 mike Exp $".
  */
 </PRE>
 </UL>

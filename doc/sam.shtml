@@ -28,6 +28,10 @@ supported with reduced functionality.
 Description (&quot;PPD&quot;)-based printing options to support real
 world applications under UNIX.
 
+<P>CUPS also includes a customized version of GNU GhostScript
+(currently based off GNU GhostScript 4.03) and an image file RIP that
+can be used to support non-PostScript printers.
+
 <H2>Document Overview</H2>
 
 <P>This software administrators manual is organized into the following sections:</P>
@@ -37,6 +41,7 @@ world applications under UNIX.
 	<LI>2 - Building and Installing CUPS</LI>
 	<LI>3 - Printer Queue Management</LI>
 	<LI>4 - Printing System Management</LI>
+	<LI>5 - Printer Accounting</LI>
 </UL>
 
 <H1 ALIGN=RIGHT>1 - Printing System Overview</H1>
@@ -124,8 +129,12 @@ you can write your own printer drivers and incorporate them into CUPS.
 <H1 ALIGN=RIGHT>2 - Building and Installing CUPS</H1>
 
 <P>This chapter shows how to build and install the Common UNIX Printing System.
+If you are installing a binary distribution from the CUPS web site, proceed to
+the section titled, <A HREF="#binary">Installing a Binary Distribution</A>.
 
-<H2>Requirements</H2>
+<H2>Installing a Source Distribution</H2>
+
+<H3>Requirements</H3>
 
 <P>You'll need an ANSI C compiler to build CUPS on your system. As its name
 implies, CUPS is designed to run on the UNIX operating system, however
@@ -155,7 +164,7 @@ make changes you can get the HTMLDOC software from:
 <A HREF="http://www.easysw.com/htmldoc">http://www.easysw.com/htmldoc</A>
 </PRE></UL>
 
-<H2>Compiling CUPS</H2>
+<H3>Compiling CUPS</H3>
 
 <P>CUPS uses GNU autoconf to configure the makefiles and source code
 for your system. To configure CUPS for your system type:
@@ -193,7 +202,7 @@ system default location (typically <CODE>/usr/include</CODE> and
 
 <P>to build the software.
 
-<H2>Installing the Software</H2>
+<H3>Installing the Software</H3>
 
 <P>To install the software type:
 
@@ -201,7 +210,7 @@ system default location (typically <CODE>/usr/include</CODE> and
 % make install ENTER
 </PRE></UL>
 
-<H2>Running the Software</A></H2>
+<H3>Running the Software</A></H3>
 
 Once you have installed the software you can start the CUPS daemon by
 typing:
@@ -209,6 +218,32 @@ typing:
 <UL><PRE>
 % /usr/sbin/cupsd &amp; ENTER
 </PRE></UL>
+
+<H2><A NAME="binary">Installing a Binary Distribution</A></H2>
+
+<P>We are currently distributing CUPS binary distributions in TAR format
+with installation and removal scripts.
+
+<UL>
+	<B>WARNING:</B>
+	
+	<P>Installing CUPS will overwrite your existing printing
+	system. If you experience difficulties with the CUPS software
+	and need to go back to your old printing system, you will need
+	to remove the CUPS software with the provided script and
+	reinstall the printing system from your operating system CDs.
+</UL>
+
+<P>To install the CUPS software you will need to be logged in as root
+(doing an "su" is good enough). Once you are the root user, run the
+installation script with:
+
+<UL><PRE>
+./cups.install ENTER
+</PRE></UL>
+
+<P>After asking you a few yes/no questions the CUPS software will be
+installed and the scheduler will be started automatically.
 
 <H1 ALIGN=RIGHT>3 - Printer Queue Management</H1>
 
@@ -231,6 +266,8 @@ with the "-p" option:
 <UL><PRE>
 % /usr/lib/lpadmin -p<I>printer</I> -v<I>device</I> -P<I>ppd</I> ENTER
 </PRE></UL>
+
+<P>Spaces between the option letter and value are optional.
 
 <P>The <I>printer</I> name can be up to 127 letters, digits, hyphens,
 and underscores. Unlike other printing systems, the printer name in
@@ -284,6 +321,24 @@ CUPS:
 to use for this printer. Many options (such as media size, etc.) will not
 be available if you omit this part of the <CODE>lpadmin</CODE> command.
 
+<H3>Using Standard Printer Drivers</H2>
+
+<P>The <CODE>lpadmin</CODE> command allows you to use "standard" PPD files
+and interface scripts located in the <CODE>/usr/share/cups/model</CODE>
+directory with the "-m" option:
+
+<UL><PRE>
+% /usr/lib/lpadmin -p<I>printer</I> -v<I>device</I> -m<I>model</I> ENTER
+</PRE></UL>
+
+<P>The <I>model</I> argument specifies the name of the PPD file or interface
+script. For example, to add a printer using the sample HP DeskJet series
+driver connected to parallel port 1 under Linux you would use:
+
+<UL><PRE>
+% /usr/lib/lpadmin -pDeskJet -vparallel:/dev/par1 -mdeskjet.ppd ENTER
+</PRE></UL>
+
 <H2>Removing Printers</H2>
 
 <P>To remove a printer to CUPS you simply run the <CODE>lpadmin</CODE> command
@@ -326,60 +381,472 @@ command with the "-d" option:
 
 <H1 ALIGN=RIGHT>4 - Printing System Management</H1>
 
+<P>This chapter shows how you can configure the CUPS server.
+
 <H2>Network Configuration</H2>
 
-<H2>Printer Security</H2>
+<P>The default configuration of the CUPS server listens for connections from
+all network interfaces on port 631 (the standard IPP port). Administration
+functions are limited to local connections with the appropriate username and
+password.
 
-<H2>Printer Accounting</H2>
+<P>If you'd like to limit access to your system you'll need to edit the
+<CODE>/var/cups/conf/cupsd.conf</CODE> file.
 
-<H2>Adding File Types</H2>
+<H3>Port</H3>
 
-Before you run CUPS for the first time you'll need to edit the CUPS
-configuration files which are normally located in /var/cups/conf.
+<P>The <CODE>Port</CODE> directive specifies a port to listen on for
+all interfaces. Besides the standard IPP port (631) you can also setup
+your server to listen on the HTTP port (80) to use your CUPS server as
+a standard web server as well.
+
+<H3>Listen</H3>
+
+<P>The <CODE>Listen</CODE> directive specifies a listening address and port,
+extending the functionality of the <CODE>Port</CODE> directive. If you want
+to allow connections only from the local machine you can use:
+
+<UL><PRE>
+Listen 127.0.0.1:631
+</PRE></UL>
+
+<P>instead of the <CODE>Port</CODE> directive.
+
+<P>If you want to limit access to a specific network/subnet, make sure you
+specific only the network address and not your system's network address!
+
+<H3>BrowsePort</H3>
+
+<P>The <CODE>BrowsePort</CODE> directive controls which port is monitored for
+remote printers. By default it is set to the IPP port (631), however you can
+change it as needed.
 
 <UL>
 
-	The <CODE>cupsd.conf</CODE> file configures all of the
-	"global" server settings and access control. The default
-	settings are usually appropriate for most environments.
+	<B>NOTE:</B>
 
-	<P>The <CODE>printers.conf</CODE> file configures each printer
-	queue. You'll need to add a listing for each printer on your
-	system.
-
-	<P>The <CODE>classes.conf</CODE> file configures each printer
-	class. You'll need to add a listing for each printer class you
-	want.
-
-	<P>The <CODE>mime.types</CODE> file defines all of the
-	recognized file types. You don't normally have to edit this
-	file.
-
-	<P>The <CODE>mime.convs</CODE> file defines all of the file
-	conversion filters. You don't normally have to edit this file.
+	<P>You must set the <CODE>BrowsePort</CODE> to the same value
+	on all of the systems that you want to see.
 
 </UL>
 
-In addition to the files in the /var/cups/conf directory, you'll also need
-to copy PPD files for each printer to the /var/cups/ppd directory.  If you
-don't have a PPD file for your printer, the drivers will still work, just
-with reduced functionality.
+<H3>BrowseAddress</H3>
 
-<H2><A NAME="use">Using the Software</A></H2>
+<P>The <CODE>BrowseAddress</CODE> directive specifies a broadcast address to
+use when sending printer status updates over the network. The default
+browse address is <CODE>255.255.255.255</CODE> which will send printer
+information to all subnets.
 
-Once you have installed the software, you can use the normal lp or lpr
-commands to print jobs. If you installed the software under /usr then
-you shouldn't have to reconfigure any applications to recognize the new
-printing system.
+<UL>
 
-<P>One of the advantages of CUPS is that you don't always have to send
-PostScript or Text files to your printers. If you have a JPEG file, you
-can just type "lp filename.jpg" and CUPS will handle converting it for
-you!
+	<B>NOTE:</B>
 
-<P>You can monitor the status of jobs via the lpstat command or with your
-web browser by pointing it at "http://localhost:631".
+	<P>If you are using HP-UX 10.20 and a subnet that is not 24,
+	16, or 8 bits, printer browsing (and in fact all broadcast
+	reception) will not work. This problem appears to be fixed in
+	HP-UX 11.0.
 
+</UL>
+
+<H2>Printer Security</H2>
+
+<P>CUPS provides IP and domain-name based access control and Basic
+authentication for authentication.
+
+<H3>Location</H3>
+
+<P>The <CODE>Location</CODE> directive defines access control for a
+specific HTTP directory. The following pseudo directories are provided
+by the CUPS server:
+
+<UL>
+
+	<LI><CODE>/admin</CODE> - This is the URI that must be referenced to
+	do printer administation commands.
+
+	<LI><CODE>/classes</CODE> - This is the URI that must be referenced to
+	access printer classes.
+
+	<LI><CODE>/jobs</CODE> - This is the URI that must be referenced to
+	access jobs.
+
+	<LI><CODE>/printers</CODE> - This is the URI that must be referenced to
+	access printers.
+
+</UL>
+
+<P>All other directories are taken from the
+<CODE>/usr/share/cups/doc</CODE> directory.
+
+<P>The <CODE>Location</CODE> directive surrounds the other access control
+directives described below. The default server configuration uses:
+
+<UL><PRE>
+&lt;Location /admin&gt;
+AuthType Basic
+AuthClass System
+
+Order Deny,Allow
+Deny From All
+Allow From 127.0.0.1
+&lt;/Location&gt;
+</PRE></UL>
+
+<H3>Order</H3>
+
+<P>The <CODE>Order</CODE> directive defines the default access control.
+The following values are supported:
+
+<UL>
+
+	<LI><CODE>Order Allow,Deny</CODE> - Allow requests from all
+	systems <I>except</I> for those listed in a <CODE>Deny</CODE>
+	directive.
+
+	<LI><CODE>Order Deny,Allow</CODE> - Allow requests only from
+	those listed in an <CODE>Allow</CODE> directive.
+
+</UL>
+
+<P>The <CODE>Order</CODE> directive must appear inside a
+<CODE>Location</CODE> directive.
+
+<H3>Allow</H3>
+
+<P>The <CODE>Allow</CODE> directive specifies a hostname, IP address, or
+network that is allowed access to the server:
+
+<UL><PRE>
+Allow from All
+Allow from None
+Allow from *.domain.com
+Allow from .domain.com
+Allow from host.domain.com
+Allow from nnn.*
+Allow from nnn.nnn.*
+Allow from nnn.nnn.nnn.*
+Allow from nnn.nnn.nnn.nnn
+Allow from nnn.nnn.nnn.nnn/mm
+Allow from nnn.nnn.nnn.nnn/mmm.mmm.mmm.mmm
+</PRE></UL>
+
+<P><CODE>Allow</CODE> directives are cummulative, so multiple <CODE>Allow</CODE>
+directives can be used to allow access for multiple hosts or networks.
+
+<P>The <CODE>Allow</CODE> directive must appear inside a
+<CODE>Location</CODE> directive.
+
+<H3>Deny</H3>
+
+<P>The <CODE>Deny</CODE> directive specifies a hostname, IP address, or
+network that is allowed access to the server:
+
+<UL><PRE>
+Deny from All
+Deny from None
+Deny from *.domain.com
+Deny from .domain.com
+Deny from host.domain.com
+Deny from nnn.*
+Deny from nnn.nnn.*
+Deny from nnn.nnn.nnn.*
+Deny from nnn.nnn.nnn.nnn
+Deny from nnn.nnn.nnn.nnn/mm
+Deny from nnn.nnn.nnn.nnn/mmm.mmm.mmm.mmm
+</PRE></UL>
+
+<P><CODE>Deny</CODE> directives are cummulative, so multiple <CODE>Deny</CODE>
+directives can be used to allow access for multiple hosts or networks.
+
+<P>The <CODE>Deny</CODE> directive must appear inside a
+<CODE>Location</CODE> directive.
+
+<H3>AuthType</H3>
+
+<P>The <CODE>AuthType</CODE> directive defines the type of authentication to
+perform:
+
+<UL>
+
+	<LI><CODE>None</CODE> - No authentication should be performed
+	(default.)
+
+	<LI><CODE>Basic</CODE> - Basic authentication should be
+	performed using the UNIX password and group files.
+
+</UL>
+
+<P>The <CODE>AuthType</CODE> directive must appear inside a
+<CODE>Location</CODE> directive.
+
+<H3>AuthClass</H3>
+
+<P>The <CODE>AuthClass</CODE> directive defines what level of <CODE>Basic</CODE>
+access is required:
+
+<UL>
+
+	<LI><CODE>Anonymous</CODE> - No authentication should be performed
+	(default.)
+
+	<LI><CODE>User</CODE> - A valid username and password is required.
+
+	<LI><CODE>System</CODE> - A valid username and password is
+	required, and the username must belong to the "sys" group (this
+	can be changed using the <CODE>SystemGroup</CODE> directive,
+	below.
+
+	<LI><CODE>Group</CODE> - A valid username and password is
+	required, and the username must belong to the group named by
+	the <CODE>AuthGroupName</CODE> directive.
+
+</UL>
+
+<P>The <CODE>AuthClass</CODE> directive must appear inside a
+<CODE>Location</CODE> directive.
+
+<H3>AuthGroupName</H3>
+
+<P>The <CODE>AuthGroupName</CODE> directive sets the group to use for
+<CODE>Group</CODE> authentication.
+
+<P>The <CODE>AuthGroupName</CODE> directive must appear inside a
+<CODE>Location</CODE> directive.
+
+<H3>SystemGroup</H3>
+
+<P>The <CODE>SystemGroup</CODE> directive sets the administration group used
+when authenticating the <CODE>System</CODE> type. It defaults to the "sys"
+group.
+
+<H2>File Formats</H2>
+
+<P>CUPS provides a MIME-based file typing and filtering mechanism to
+convert files to a printable format for each printer. The
+<CODE>mime.types</CODE> and <CODE>mime.convs</CODE> files define the
+file type and filters that are available on the system.
+
+<H3>mime.types</H3>
+
+<P>The <CODE>mime.types</CODE> defines the known file types. Each line
+of the file starts with the MIME type and may be followed by one or
+more file type recognition rules. For example, the
+<CODE>text/html</CODE> file type is defined as:
+
+<UL><PRE>
+text/html html htm \
+          printable(0,1024) + (string(0,"&lt;HTML&gt;") string(0,"&lt;!DOCTYPE"))
+</PRE></UL>
+
+<P>The first two rules say that any file with an extension of ".html" or
+".htm" is a HTML file. The third rules says that any file whose first
+1024 characters are printable text and starts with the strings "&lt;HTML&gt;"
+or "&lt;!DOCTYPE" is a HTML file as well.
+
+<P>The first two rules deal solely with the name of the file being
+typed. This is useful when the original filename is known, however for
+print files the server doesn't always have a filename to work with. The
+third rule takes care of this possibility and automatically figures out
+the file type based upon the contents of the file instead.
+
+<P>The available tests are:
+
+<UL>
+
+	<LI><CODE>( expr )</CODE> - Parenthesis for expression grouping
+
+	<LI><CODE>+</CODE> - Logical AND
+
+	<LI><CODE>,</CODE> or whitespace - Logical OR
+
+	<LI><CODE>!</CODE> - Logical NOT
+
+	<LI><CODE>match("pattern")</CODE> - Pattern match on filename
+
+	<LI><CODE>extension</CODE> - Pattern match on "*.extension"
+
+	<LI><CODE>ascii(offset,length)</CODE> - True if bytes are valid
+	printable ASCII (CR, NL, TAB, BS, 32-126)
+
+	<LI><CODE>printable(offset,length)</CODE> - True if bytes are
+	printable 8-bit chars (CR, NL, TAB, BS, 32-126, 160-254)
+
+	<LI><CODE>string(offset,"string")</CODE> - True if bytes are
+	identical to string
+
+	<LI><CODE>char(offset,value)</CODE> - True if byte is identical
+
+	<LI><CODE>short(offset,value)</CODE> - True if 16-bit integer
+	is identical
+
+	<LI><CODE>int(offset,value)</CODE> - True if 32-bit integer is
+	identical
+
+	<LI><CODE>locale("string")</CODE> - True if current locale
+	matches string
+
+</UL>
+
+<H3>mime.convs</H3>
+
+<P>The <CODE>mime.convs</CODE> file defines all of the filter programs that
+are known to the system. Each line consists of:
+
+<UL><PRE>
+source destination cost program
+
+text/plain application/postscript 50 texttops
+application/vnd.cups-postscript application/vnd.cups-raster 50 pstoraster
+image/* application/vnd.cups-postscript 50 imagetops
+image/* application/vnd.cups-raster 50 imagetoraster
+</PRE></UL>
+
+<P>The <I>source</I> field is a MIME type, optionally using a wildcard for
+the super-type or sub-type (e.g. "text/plain", "image/*", "*/postscript").
+
+<P>The <I>destination</I> field is a MIME type defined in the
+<CODE>mime.types</CODE> file.
+
+<P>The <I>cost</I> field defines a relative cost for the filtering
+operation from 1 to 100. The cost is used to choose between two
+different sets of filters when converting a file. For example, to convert
+from <CODE>image/jpeg</CODE> to <CODE>application/vnd.cups-raster</CODE>,
+you could use the <CODE>imagetops</CODE> and <CODE>pstoraster</CODE>
+filters for a total cost of 100, or the <CODE>imagetoraster</CODE> filter
+for a total cost of 50.
+
+<P>The <I>program</I> field defines the filter program to run; the
+special program "-" can be used to make two file types equivalent. The
+program must accept the standard filter arguments and environment
+variables described in the CUPS Interface Design Document:
+
+<UL><PRE>
+program job user title options [filename]
+</PRE></UL>
+
+<P>If specified, the <I>filename</I> argument defines a file to read
+when filtering, otherwise the filter must read from the standard input.
+All filtered output must go to the standard output.
+
+<H1 ALIGN=RIGHT>5 - Printer Accounting</H1>
+
+This chapter describes the CUPS log files.
+
+<H2>Where to Find the Log Files</H2>
+
+<P>The log files are normally stored in the <CODE>/var/cups/logs</CODE>
+directory. You can change this by editing the
+<CODE>/var/cups/conf/cupsd.conf</CODE> configuration file.
+
+<H2>The access_log File</H2>
+
+<P>The <CODE>access_log</CODE> file lists each HTTP resource that is accessed
+by a web browser or CUPS/IPP client. Each line is in the so-called "Common
+Log Format" used by many web servers and web reporting tools:
+
+<UL><PRE>
+host group user date-time \"method resource version\" status bytes
+
+127.0.0.1 - - [20/May/1999:19:20:29 +0000] "POST /admin/ HTTP/1.1" 401 0
+127.0.0.1 - mike [20/May/1999:19:20:31 +0000] "POST /admin/ HTTP/1.1" 200 0
+</PRE></UL>
+
+<P>The <I>host</I> field will normally only be an IP address unless you
+have changed the <CODE>HostnameLookups</CODE> directive on in the
+<CODE>cupsd.conf</CODE> file.
+
+<P>The <I>group</I> field always contains "-".
+
+<P>The <I>user</I> field is the authenticated username of the requesting user.
+If no username and password is supplied for the request then this field
+contains "-".
+
+<P>The <I>date-time</I> field is the date and time of the request in Greenwich
+Mean Time (a.k.a. ZULU) and is in the format:
+
+<UL><PRE>
+[DD/MON/YYYY:HH:MM:SS +0000]
+</PRE></UL>
+
+<P>The <I>method</I> field is the HTTP method used ("GET", "PUT", "POST", etc.)
+
+<P>The <I>resource</I> field is the filename of the requested resource.
+
+<P>The <I>version</I> field is the HTTP specification version used by the
+client. For CUPS clients this will always be "HTTP/1.1".
+
+<P>The <I>status</I> field contains the HTTP result status of the
+request. Usually it is "200", but other HTTP status codes are possible.
+For example, 401 is the "unauthorized access" status in the example
+above.
+
+<P>The <I>bytes</I> field contains the number of bytes in the request.
+For POST requests the <I>bytes</I> field contains the number of bytes
+of non-IPP data that is received from the client.
+
+<H2>The error_log File</H2>
+
+<P>The <CODE>error_log</CODE> file lists messages from the scheduler (errors,
+warnings, etc.):
+
+<UL><PRE>
+level date-time message
+
+I [20/May/1999:19:18:28 +0000] Job 1 queued on 'DeskJet' by 'mike'.
+I [20/May/1999:19:21:02 +0000] Job 2 queued on 'DeskJet' by 'mike'.
+I [20/May/1999:19:22:24 +0000] Job 2 was cancelled by 'mike'.
+</PRE></UL>
+
+<P>The <I>level</I> field contains the type of message:
+
+<UL>
+
+	<LI><CODE>E</CODE> - An error occurred.
+
+	<LI><CODE>W</CODE> - The server was unable to perform some action.
+
+	<LI><CODE>I</CODE> - Informational message.
+
+	<LI><CODE>D</CODE> - Debugging message.
+
+</UL>
+
+<P>The <I>date-time</I> field contains the date and time of when the page
+started printing. The format of this field is identical to the <I>data-time</I>
+field in the <CODE>access_log</CODE> file.
+
+<P>The <I>message</I> fields contains a free-form textual message.
+
+<H2>The page_log File</H2>
+
+<P>The <CODE>page_log</CODE> file lists each page that is sent to a printer.
+Each line contains the following information:
+
+<UL><PRE>
+printer user job-id date-time page-number num-copies
+
+DeskJet root 2 [20/May/1999:19:21:05 +0000] 1 0
+</PRE></UL>
+
+<P>The <I>printer</I> field contains the name of the printer that
+printed the page. If you send a job to a printer class, this field will
+contain the name of the printer that was assigned the job.
+
+<P>The <I>user</I> field contains the name of the user (the IPP
+<CODE>requesting-user-name</CODE> attribute) that submitted this file for
+printing.
+
+<P>The <I>job-id</I> field contains the job number of the page being printed.
+Job numbers are reset to 1 whenever the CUPS server is started, so don't depend
+on this number being unique!
+
+<P>The <I>date-time</I> field contains the date and time of when the page
+started printing. The format of this field is identical to the <I>data-time</I>
+field in the <CODE>access_log</CODE> file.
+
+<P>The <I>page-number</I> and <I>num-pages</I> fields contain the page number
+and number of copies being printed of that page. For printer that can not
+produce copies on their own, the <I>num-pages</I> field will always be 1.
 
 </BODY>
 </HTML>

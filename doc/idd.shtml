@@ -31,6 +31,10 @@ supported with reduced functionality.
 Description (&quot;PPD&quot;)-based printing options to support real
 world applications under UNIX.
 
+<P>CUPS also includes a customized version of GNU GhostScript
+(currently based off GNU GhostScript 4.03) and an image file RIP that
+can be used to support non-PostScript printers.
+
 <H2>Document Overview</H2>
 
 <P>This interface design description document is organized into the following
@@ -171,6 +175,60 @@ directory.
 Adobe TechNote #5003: PostScript Printer Description File Format
 Specification Version 4.3</A>.
 
+<H3>CUPS Extensions to PPD Files</H3>
+
+<P>CUPS adds several new attributes that are described below.
+
+<H4>cupsFilter</H4>
+
+<P>This string attribute provides a conversion rule of the form:
+
+<UL><PRE>
+source/type cost program
+</PRE></UL>
+
+<P>The destination type is assumed to the printer's type. If a printer
+supports the source type directly the special filter program "-" may be used.
+
+<H4>cupsManualCopies</H4>
+
+<P>This boolean attribute notifies the RIP filters that the destination printer
+does not support copy generation in hardware. The default value is false.
+
+<H4>cupsModelNumber</H4>
+
+<P>This integer attribute specifies a printer-specific model number. This number
+can be used by a filter program to adjust the output for a specific model of
+printer.
+
+<H4>cupsProfile</H4>
+
+<P>This string attribute specifies a color profile of the form:
+
+<UL><PRE>
+resolution/type density m00 m01 m02 m10 m11 m12 m20 m21 m22
+</PRE></UL>
+
+<P>The <I>resolution</I> and <I>type</I> values may be "-" to act as a
+wildcard. Otherwise they must match one of the <CODE>Resolution</CODE> or
+<CODE>MediaType</CODE> attributes defined in the PPD file.
+
+<P>The <I>density</I> value defines a gamma and density adjustment function
+such that:
+
+<UL><PRE>
+f(x) = d * x<SUP>1/d</SUP>
+</PRE></UL>
+
+<P>The <I>m00</I> through <I>m22</I> values define a 3x3 transformation
+matrix for the CMY color values. The density function is applied <I>after</I>
+the CMY transformation.
+
+<H4>cupsVersion</H4>
+
+<P>This required attribute describes which version of the CUPS IDD was used
+for the PPD file extensions. Currently it must be the string "1.0".
+
 <H2>Scheduler Configuration Files</H2>
 
 <P>The scheduler reads three configuration files that define the available
@@ -211,7 +269,7 @@ followed by its value. The following directives are understood:
 </TR>
 <TR>
 	<TD>&lt;DefaultClass name&gt;<BR>
-	&lt;/DefaultClass&gt;</TD>
+	&lt;/Class&gt;</TD>
 	<TD></TD>
 </TR>
 <TR>
@@ -247,7 +305,8 @@ followed by its value. The following directives are understood:
 </TR>
 <TR>
 	<TD>AccessLog</TD>
-	<TD></TD>
+	<TD>Specifies the location of the access log file (default
+	"logs/access_log").</TD>
 </TR>
 <TR>
 	<TD>Allow</TD>
@@ -395,7 +454,7 @@ followed by its value. The following directives are understood:
 </TR>
 <TR>
 	<TD>&lt;DefaultPrinter name&gt;<BR>
-	&lt;/DefaultPrinter&gt;</TD>
+	&lt;/Printer&gt;</TD>
 	<TD></TD>
 </TR>
 <TR>
@@ -834,11 +893,9 @@ Protocol</A>.
 
 </UL>
 
-<H3>Extensions to IPP</H3>
-
 <P>CUPS defines the following extension operations to IPP.
 
-<H4>Get Default Destination (CUPS_GET_DEFAULT = 0x4001)</H4>
+<H3>Get Default Destination (CUPS_GET_DEFAULT = 0x4001)</H3>
 
 <P>The get default destination operation returns the printer attributes
 for the system default printer or class. The only required attributes
@@ -847,7 +904,7 @@ are <CODE>attributes-charset</CODE> and
 
 <P>Get default destination will only return <CODE>ipp-ok</CODE>.
 
-<H4>Get Printers (CUPS_GET_PRINTERS = 0x4002)</H4>
+<H3>Get Printers (CUPS_GET_PRINTERS = 0x4002)</H3>
 
 <P>The get printers operation returns the printer attributes for all
 printers known to the system. The only required attributes are
@@ -856,7 +913,7 @@ printers known to the system. The only required attributes are
 
 <P>Get printers will only return <CODE>ipp-ok</CODE>.
 
-<H4>Add Printer (CUPS_ADD_PRINTER = 0x4003)</H4>
+<H3>Add Printer (CUPS_ADD_PRINTER = 0x4003)</H3>
 
 <P>The add printer operation adds or replaces the specified printer. The
 <CODE>attributes-charset</CODE>,
@@ -875,7 +932,7 @@ PPD file is sent.
 <P>Add printer will return <CODE>ipp-ok</CODE>, <CODE>ipp-not-authorized</CODE>,
 <CODE>ipp-bad-request</CODE>, or <CODE>ipp-attributes</CODE>.
 
-<H4>Delete Printer (CUPS_DELETE_PRINTER = 0x4004)</H4>
+<H3>Delete Printer (CUPS_DELETE_PRINTER = 0x4004)</H3>
 
 <P>The delete printer operation removes the specified printer. The only
 required attributes are <CODE>attributes-charset</CODE>,
@@ -884,7 +941,7 @@ required attributes are <CODE>attributes-charset</CODE>,
 <P>Delete printer will return <CODE>ipp-ok</CODE>, <CODE>ipp-not-found</CODE>,
 or <CODE>ipp-not-authorized</CODE>.
 
-<H4>Get Classes (CUPS_GET_CLASSES = 0x4005)</H4>
+<H3>Get Classes (CUPS_GET_CLASSES = 0x4005)</H3>
 
 <P>The get classes operation returns the printer attributes for all
 classes known to the system. The only required attributes are
@@ -893,7 +950,7 @@ classes known to the system. The only required attributes are
 
 <P>Get classes will only return <CODE>ipp-ok</CODE>.
 
-<H4>Add Class (CUPS_ADD_CLASS = 0x4006)</H4>
+<H3>Add Class (CUPS_ADD_CLASS = 0x4006)</H3>
 
 <P>The add class operation adds or replaces the specified class. The
 <CODE>attributes-charset</CODE>,
@@ -908,7 +965,7 @@ a printer.
 <P>Add class will return <CODE>ipp-ok</CODE>, <CODE>ipp-not-authorized</CODE>,
 <CODE>ipp-bad-request</CODE>, or <CODE>ipp-attributes</CODE>.
 
-<H4>Delete Class (CUPS_DELETE_CLASS = 0x4007)</H4>
+<H3>Delete Class (CUPS_DELETE_CLASS = 0x4007)</H3>
 
 <P>The delete class operation removes the specified class. The only
 required attributes are <CODE>attributes-charset</CODE>,
@@ -917,7 +974,7 @@ required attributes are <CODE>attributes-charset</CODE>,
 <P>Delete class will return <CODE>ipp-ok</CODE>, <CODE>ipp-not-found</CODE>,
 or <CODE>ipp-not-authorized</CODE>.
 
-<H4>Accept Jobs (CUPS_ACCEPT_JOBS = 0x4008)</H4>
+<H3>Accept Jobs (CUPS_ACCEPT_JOBS = 0x4008)</H3>
 
 <P>The accept jobs operation allows jobs to be accepted by the
 specified destination. The only required attributes are
@@ -928,7 +985,7 @@ specified destination. The only required attributes are
 <P>Accept jobs will return <CODE>ipp-ok</CODE>, <CODE>ipp-not-found</CODE>,
 or <CODE>ipp-not-authorized</CODE>.
 
-<H4>Reject Jobs (CUPS_REJECT_JOBS = 0x4009)</H4>
+<H3>Reject Jobs (CUPS_REJECT_JOBS = 0x4009)</H3>
 
 <P>The reject jobs operation prevents jobs from being accepted by the
 specified destination. The only required attributes are
@@ -939,7 +996,7 @@ specified destination. The only required attributes are
 <P>Reject jobs will return <CODE>ipp-ok</CODE>, <CODE>ipp-not-found</CODE>,
 or <CODE>ipp-not-authorized</CODE>.
 
-<H4>Set Default Destination (CUPS_SET_DEFAULT = 0x400A)</H4>
+<H3>Set Default Destination (CUPS_SET_DEFAULT = 0x400A)</H3>
 
 <P>The set default destination operation returns the printer attributes
 for the system default printer or class. The only required attributes

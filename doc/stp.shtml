@@ -31,6 +31,10 @@ supported with reduced functionality.
 Description (&quot;PPD&quot;)-based printing options to support real
 world applications under UNIX.
 
+<P>CUPS also includes a customized version of GNU GhostScript
+(currently based off GNU GhostScript 4.03) and an image file RIP that
+can be used to support non-PostScript printers.
+
 <H2>Document Overview</H2>
 
 This software test plan is organized into the following sections:
