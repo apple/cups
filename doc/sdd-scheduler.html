@@ -1,136 +1,114 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
 <HTML>
 <HEAD>
-    <META NAME="Generator" CONTENT="Cosmo Create 1.0.3">
-    <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
     <META NAME="Description" CONTENT="Common UNIX Printing System Software Design Description">
     <META NAME="COPYRIGHT" CONTENT="Copyright 1997-1998, All Rights Reserved">
     <META NAME="DOCNUMBER" CONTENT="CUPS-SDD-SCHED-1.0">
     <META NAME="Author" CONTENT="Easy Software Products">
-    <TITLE>DRAFT - CUPS Print Scheduler Software Design Description - 
-    DRAFT</TITLE>
+    <TITLE>DRAFT - CUPS Print Scheduler Software Design Description - DRAFT</TITLE>
 </HEAD>
 <BODY>
-<H1>
-Scope</H1>
-<H2>
-Identification</H2>
-<P>
-This software design description document provides detailed information 
-on the architecture and coding of the Common UNIX Printing System 
-(&quot;CUPS&quot;) print scheduler, Version 1.0. </P>
-<H2>
-System Overview</H2>
-<P>
+
+<H1>Scope</H1>
+
+<H2>Identification</H2>
+
+This software design description document provides detailed
+information  on the architecture and coding of the Common UNIX Printing
+System (&quot;CUPS<SUP>TM</SUP>&quot;) print scheduler, Version 1.0.
+
+<H2>System Overview</H2>
+
 The Common UNIX Printing System provides a portable printing layer for 
-UNIX&#174; operating systems. It has been developed by Easy Software 
+UNIX&reg; operating systems. It has been developed by Easy Software 
 Products to promote a standard printing solution for all UNIX vendors 
-and users. CUPS provides the System V, Berkeley, and POSIX command-line 
-interfaces.</P>
-<P>
-CUPS supports the Internet Printing Protocol (IETF-IPP) as the basis 
-for sending and receiving remote print jobs. The Line Printer Daemon 
-(RFC1179) and Server Message Block (SMB) protocols are also supported, 
-but with reduced functionality.</P>
-<P>
-CUPS adds network printer browsing and PostScript Printer Description 
-(&quot;PPD&quot;)-based printing options to support real world 
-applications under UNIX. </P>
-<H2>
-Document Overview</H2>
-<P>
+and users. CUPS provides the System V, Berkeley, and POSIX
+command-line interfaces.
+
+<P>CUPS uses the Internet Printing Protocol (IETF-IPP) as the basis
+for managing print jobs and queues. The Line Printer Daemon  (LPD,
+RFC1179), Server Message Block (SMB), and AppSocket protocols are also
+supported with reduced functionality.
+
+<P>CUPS adds network printer browsing and PostScript Printer
+Description (&quot;PPD&quot;)-based printing options to support real
+world applications under UNIX.
+
+<H2>Document Overview</H2>
+
 This software design description document is organized into the 
-following sections: </P>
+following sections:
+
 <UL>
-    <LI>
-    1 - Scope 
-    <LI>
-    2 - References 
-    <LI>
-    3 - Preliminary Design 
-    <LI>
-    4 - Detailed Design 
-    <LI>
-    A - Glossary 
+	<LI>1 - Scope 
+	<LI>2 - References 
+	<LI>3 - Preliminary Design 
+	<LI>4 - Detailed Design 
+	<LI>A - Glossary 
 </UL>
-<H1>
-References</H1>
-<H2>
-CUPS Documentation</H2>
-<P>
-The following CUPS documentation is referenced by this document: </P>
+
+<H1>References</H1>
+
+<H2>CUPS Documentation</H2>
+
+The following CUPS documentation is referenced by this document:
+
 <UL>
-    <LI>
-    CUPS-CMP-1.0: CUPS Configuration Management Plan 
-    <LI>
-    CUPS-IDD-1.0: CUPS System Interface Design Description 
-    <LI>
-    CUPS-SAM-1.0.0: CUPS Software Administrators Manual 
-    <LI>
-    CUPS-SCHED-SDD-1.0: CUPS Print Scheduler Software Design Description 
-    <LI>
-    CUPS-POSIX-SDD-1.0: CUPS POSIX Interface Software Design Description 
-    <LI>
-    CUPS-BSD-SDD-1.0: CUPS Berkeley Interface Software Design Description 
-    <LI>
-    CUPS-SYSV-SDD-1.0: CUPS System V Interface Software Design Description 
-    <LI>
-    CUPS-GUI-SDD-1.0: CUPS Graphical User-Interface Software Design 
-    Description 
-    <LI>
-    CUPS-FILTER-SDD-1.0: CUPS Filter Software Design Description 
-    <LI>
-    CUPS-DRIVER-SDD-1.0: CUPS Driver Software Design Description 
-    <LI>
-    CUPS-SSR-1.0: CUPS Software Security Report 
-    <LI>
-    CUPS-STP-1.0: CUPS Software Test Plan 
-    <LI>
-    CUPS-SUM-1.0.0: CUPS Software Users Manual 
-    <LI>
-    CUPS-SVD-1.0.0: CUPS Software Version Description 
+	<LI>CUPS-BACKEND-SDD-1.0: CUPS Backend Software Design Description 
+	<LI>CUPS-BSD-SDD-1.0: CUPS Berkeley Interface Software Design Description 
+	<LI>CUPS-CMP-1.0: CUPS Configuration Management Plan 
+	<LI>CUPS-FILTER-SDD-1.0: CUPS Filter Software Design Description 
+	<LI>CUPS-GUI-SDD-1.0: CUPS Graphical User-Interface Software Design Description 
+	<LI>CUPS-IDD-1.0: CUPS System Interface Design Description 
+	<LI>CUPS-POSIX-SDD-1.0: CUPS POSIX Interface Software Design Description 
+	<LI>CUPS-SAM-1.0.0: CUPS Software Administrators Manual 
+	<LI>CUPS-SCHED-SDD-1.0: CUPS Print Scheduler Software Design Description 
+	<LI>CUPS-SPM-1.0: CUPS Software Programming Manual
+	<LI>CUPS-SSDD-1.0: CUPS System-Subsystem Design Description 
+	<LI>CUPS-SSR-1.0: CUPS Software Security Report 
+	<LI>CUPS-STP-1.0: CUPS Software Test Plan 
+	<LI>CUPS-SUM-1.0.0: CUPS Software Users Manual 
+	<LI>CUPS-SVD-1.0.0: CUPS Software Version Description 
+	<LI>CUPS-SYSV-SDD-1.0: CUPS System V Interface Software Design Description 
 </UL>
-<H2>
-Other Documents</H2>
-<P>
-The following non-CUPS documents are referenced by this document: </P>
+
+<H2>Other Documents</H2>
+
+The following non-CUPS documents are referenced by this document:
+
 <UL>
-    <LI>
-    IEEE 1387.4, System Administration: Printing (draft) 
-    <LI>
-    IETF-IPP, Internet Printing Protocol (draft) 
-    <LI>
-    RFC 1179, Line Printer Daemon Protocol 
+	<LI>IEEE 1387.4, System Administration: Printing (draft) 
+	<LI>IPP/1.0: Additional Optional Operations - Set 1
+	<LI>IPP/1.0: Encoding and Transport
+	<LI>IPP/1.0: Implementers Guide
+	<LI>IPP/1.0: Model and Semantics
+	<LI>RFC 1179, Line Printer Daemon Protocol 
 </UL>
-<H1>
-Preliminary Design</H1>
-<H2 VALUE="0">
-Sub-System Overview</H2>
-<P>
+
+<H1>Preliminary Design</H1>
+
+<H2 VALUE="0">Sub-System Overview</H2>
+
 The CUPS print scheduler is composed of four software sub-systems that 
 operate together to handle all printer management and queuing functions 
 of CUPS and maintain a database of available local and remote printers 
-and classes: </P>
+and classes:
+
 <UL>
-    <LI>
-    Command Processing 
-    <LI>
-    Job Processing 
-    <LI>
-    CUPS Interface 
-    <LI>
-    CUPS Directory Service 
+	<LI>Command Processing 
+	<LI>Job Processing 
+	<LI>CUPS Interface 
+	<LI>CUPS Directory Service 
 </UL>
-<H2>
-Command Processing</H2>
-<P>
+
+<H2>Command Processing</H2>
+
 The following commands are understood by the <I>command</I> <I>processing</I>
  sub-system. Each command sends a response back to the <I>CUPS 
 interface </I>sub-system indicating the success or failure of the 
 command, plus any additional data specific to the command. </P>
-<H3 TYPE="a">
-Add Printer</H3>
-<P>
+
+<H3 TYPE="a">Add Printer</H3>
+
 The <I>add printer</I> command adds the specified printer to the list 
 of available local printers. The printer name, universal resource 
 identifier (&quot;URI&quot;), interface script, PPD file, class(es), 
@@ -563,43 +541,48 @@ Image Filter</H2>
 PostScript Filter</H2>
 <H2>
 HPGL Filter</H2>
-<H1 TYPE="A" VALUE="1">
-Glossary</H1>
-<H2>
-Acronyms</H2>
+
+<H1 TYPE="A" VALUE="1">Glossary</H1>
+
+<H2>Acronyms</H2>
+
 <DL>
-    <DT>
-    ASCII 
-    <DD>
-    American Standard Code for Information Interchange 
-    <DT>
-    CUPS 
-    <DD>
-    Common UNIX Printing System 
-    <DT>
-    ESC/P 
-    <DD>
-    EPSON Standard Code for Printers 
-    <DT>
-    HPGL 
-    <DD>
-    Hewlett-Packard Graphics Language 
-    <DT>
-    ISO 
-    <DD>
-    International Standards Organization 
-    <DT>
-    LPD 
-    <DD>
-    Line Printer Daemon 
-    <DT>
-    PCL 
-    <DD>
-    Page Control Language 
-    <DT>
-    PPD 
-    <DD>
-    PostScript Printer Description 
+	<DT>ASCII
+	<DD>American Standard Code for Information Interchange
+
+	<DT>CUPS
+	<DD>Common UNIX Printing System
+
+	<DT>ESC/P
+	<DD>EPSON Standard Code for Printers
+
+	<DT>HP-GL
+	<DD>Hewlett-Packard Graphics Language
+
+	<DT>HP-PCL
+	<DD>Hewlett-Packard Printer Control Language
+
+	<DT>HP-PJL
+	<DD>Hewlett-Packard Printer Job Language
+
+	<DT>IPP
+	<DD>Internet Printing Protocol
+
+	<DT>ISO
+	<DD>International Standards Organization
+
+	<DT>LPD
+	<DD>Line Printer Daemon
+
+	<DT>MIME
+	<DD>Multimedia Internet Mail Exchange
+
+	<DT>PCL
+	<DD>Page Control Language
+
+	<DT>PPD
+	<DD>PostScript Printer Description
 </DL>
+
 </BODY>
 </HTML>

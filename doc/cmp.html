@@ -1,8 +1,7 @@
 <HTML>
 <HEAD>
-   <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
-   <META NAME="DOCNUMBER" CONTENT="CUPS-CMP-1.0B4">
-   <META NAME="COPYRIGHT" CONTENT="Copyright 1997-1998, All Rights Reserved">
+   <META NAME="DOCNUMBER" CONTENT="CUPS-CMP-1.0B5">
+   <META NAME="COPYRIGHT" CONTENT="Copyright 1997-1999, All Rights Reserved">
    <META NAME="Author" CONTENT="Easy Software Products">
    <TITLE>CUPS Configuration Management Plan</TITLE>
 </HEAD>
@@ -16,16 +15,7 @@ This configuration management plan document provides the guidelines for
 development and maintainance of the Common UNIX Printing System ("CUPS")
 Version 1.0 software.
 
-<H2>System Overview</H2>
-
-The Common UNIX Printing System provides a portable printing layer for
-UNIX&reg; operating systems. It has been developed by Easy Software Products
-to promote a standard printing solution for all UNIX vendors and users.
-
-<P>CUPS provides both the System V and Berkeley user interfaces and utilizes
-the Internet Printing Protocol (IETF-IPP) as the basis for the job scheduler.
-CUPS adds network printer browsing and PostScript Printer Description ("PPD")-based
-printing options to support real world applications under UNIX.
+<EMBED SRC="system.html">
 
 <H2>Document Overview</H2>
 
@@ -42,34 +32,7 @@ sections:
 	<LI>B - Coding Requirements</LI>
 </UL>
 
-<H1>References</H1>
-
-<H2>CUPS Documentation</H2>
-
-The following CUPS documentation is referenced by this document:
-
-<UL>
-	<LI>CUPS-CMP-1.0: CUPS Configuration Management Plan</LI>
-	<LI>CUPS-IDD-1.0: CUPS Interface Design Description</LI>
-	<LI>CUPS-SAM-1.0.0: CUPS Software Administrators Manual</LI>
-	<LI>CUPS-SDD-1.0: CUPS Software Design Description</LI>
-	<LI>CUPS-SSR-1.0: CUPS Software Security Report</LI>
-	<LI>CUPS-STP-1.0: CUPS Software Test Plan</LI>
-	<LI>CUPS-SUM-1.0.0: CUPS Software Users Manual</LI>
-	<LI>CUPS-SVD-1.0.0: CUPS Software Version Description</LI>
-</UL>
-
-<H2>Other Documents</H2>
-
-The following non-CUPS documents are referenced by this document:
-
-<UL>
-	<LI>IETF-IPP, Internet Printing Protocol (draft)</LI>
-
-	<LI>ANSI X3.159-1989, C Language Standard</LI>
-
-	<LI>CVS II: Parallelizing Software Development</LI>
-</UL>
+<EMBED SRC="references.html">
 
 <H1>File Management</H1>
 
@@ -226,42 +189,23 @@ When testing has been completed successfully a new distribution image is
 created from the current CVS code "snapshot". No production release shall
 contain software that has not passed the appropriate software tests.
 
-<H1 TYPE="A" VALUE="1">Glossary</H1>
-
-<H2>Acronyms</H2>
-
-<DL>
-	<DT>ANSI</DT>
-	<DD>American National Standards Institute</DD>
-
-	<DT>CUPS</DT>
-	<DD>Common UNIX Printing System</DD>
-
-	<DT>CVS</DT>
-	<DD>Concurrent Versioning System</DD>
-
-	<DT>RFC</DT>
-	<DD>Request For Comment</DD>
-
-	<DT>STR</DT>
-	<DD>Software Trouble Report</DD>
-</DL>
+<EMBED SRC="glossary.html">
 
 <H1>Coding Requirements</H1>
 
-These coding requirements provide detailed information on source file formatting
-and documentation content. These guidelines shall be applied to all C, C++,
-and Java source files provided with CUPS.
+These coding requirements provide detailed information on source file
+formatting and documentation content. These guidelines shall be applied
+to all C and C++ source files provided with CUPS.
 
 <H2>Source Files</H2>
 
 <H3>Naming</H3>
 
-All source files names shall be 16 characters or less in length to ensure
-compatibility with older UNIX filesystems. Source files containing functions
-shall have an extension of ".c" for ANSI C, ".cpp" for C++, or
-".j" for Java source files. All other "include" files shall have an extension
-of ".h".
+All source files names shall be 16 characters or less in length to
+ensure compatibility with older UNIX filesystems. Source files
+containing functions shall have an extension of ".c" for ANSI C and
+".cpp" for C++ source files. All other "include" files shall have an
+extension of ".h".
 
 <H3>Documentation</H3>
 
@@ -277,7 +221,7 @@ information is provided by the CVS "$Id$" tag:
  *
  *   Description of file contents.
  *
- *   Copyright 1997-1998 by Easy Software Products, all rights
+ *   Copyright 1997-1999 by Easy Software Products, all rights
  *   reserved.
  *
  *   These coded instructions, statements, and computer programs are
@@ -323,18 +267,20 @@ that code has been lost near the end of the file:
 <H3>Naming</H3>
 
 Functions with a global scope shall be capitalized ("DoThis", "DoThat",
-"DoSomethingElse", etc.) The only exception to this rule shall be the CUPS
-interface library functions which must begin with the prefix "cups" ("cupsDoThis",
-"cupsDoThat", etc.)
+"DoSomethingElse", etc.) The only exception to this rule shall be the
+CUPS interface library functions which may begin with a prefix word in
+lowercase ("cupsDoThis", "cupsDoThat", etc.)
 
 <P>Functions with a local scope shall be declared "static" and be lowercase
 with underscores between words ("do_this", "do_that", "do_something_else",
 etc.)
 
 <H3>Documentation</H3>
+
 Each function shall begin with a comment header describing what the function
 does, the possible input limits (if any), and the possible output values
 (if any), and any special information needed:
+
 <UL>
 <PRE>
 /*
@@ -368,13 +314,13 @@ does, the possible input limits (if any), and the possible output values
 <UL>
 <PRE>
 /*
- * 'class_c::do_this()' - Compute y = this(x).
+ * 'class::do_this()' - Compute y = this(x).
  *
  * Notes: none.
  */
 
-float                     /* O - Inverse power value, 0.0 &lt;= y &lt;= 1.0 */
-class_c::do_this(float x) /* I - Power value (0.0 &lt;= x &lt;= 1.0) */
+float                   /* O - Inverse power value, 0.0 &lt;= y &lt;= 1.0 */
+class::do_this(float x) /* I - Power value (0.0 &lt;= x &lt;= 1.0) */
 {
  ...
  return (y);
@@ -386,11 +332,12 @@ class_c::do_this(float x) /* I - Power value (0.0 &lt;= x &lt;= 1.0) */
 
 <H3>Naming</H3>
 
-Variables with a global scope shall be capitalized ("ThisVariable", "ThatVariable",
-"ThisStateVariable", etc.) The only exception to this rule shall be the
-CUPS interface library global variables which must begin with the prefix
-"cups" ("cupsThisVariable", "cupsThatVariable", etc.) Global variables
-shall be replaced by function arguments whenever possible.
+Variables with a global scope shall be capitalized ("ThisVariable",
+"ThatVariable", "ThisStateVariable", etc.) The only exception to this
+rule shall be the CUPS interface library global variables which must
+begin with the prefix "cups" ("cupsThisVariable", "cupsThatVariable",
+etc.) Global variables shall be replaced by function arguments whenever
+possible.
 
 <P>Variables with a local scope shall be lowercase with underscores between
 words ("this_variable", "that_variable", etc.) Any local variables shared
@@ -412,8 +359,7 @@ int that_variable;   /* The current state of that */
 
 All type names shall be lowercase with underscores between words and
 "_t" appended to the end of the name ("this_type_t", "that_type_t",
-etc.) Types defined for the CUPS interface library must begin with the
-prefix "cups_" ("cups_this_type_t", etc.)
+etc.)
 
 <H3>Documentation</H3>
 
@@ -434,11 +380,7 @@ typedef int cups_this_type_t;
 
 All structure names shall be lowercase with underscores between words and
 "_str" appended to the end of the name ("this_struct_str", "that_struct_str",
-etc.) Structures defined for the CUPS interface library must begin with the
-prefix "cups_" ("cups_this_struct_str", etc.)
-
-<P>Structure member names shall be lowercase with underscores between words
-("this_member", "that_member", etc.)
+etc.)
 
 <H3>Documentation</H3>
 
@@ -463,13 +405,8 @@ struct cups_this_struct_str
 
 <H3>Naming</H3>
 
-All class names shall be lowercase with underscores between words and
-"_c" appended to the end of the name ("this_class_c", "that_class_c",
-etc.) Classes defined for the CUPS interface library must begin with the
-prefix "cups_" ("cups_this_class_c", etc.)
-
-<P>Class member names shall be lowercase with underscores between words
-("this_member", "that_member", etc.)
+All class names shall be lowercase with underscores between words
+("this_class", "that_class", etc.)
 
 <H3>Documentation</H3>
 
@@ -482,7 +419,7 @@ policy above:
 /*
  * This class is for CUPS foobar options.
  */
-class cups_this_class_c
+class cups_this_class
 {
   int this_member;   /* Current state for this */
   int that_member;   /* Current state for that */
@@ -496,7 +433,7 @@ class cups_this_class_c
 
 All constant names shall be uppercase with underscored between words
 ("THIS_CONSTANT", "THAT_CONSTANT", etc.) Constants defined for the CUPS
-interface library must begin with the prefix "CUPS_"
+interface library must begin with an uppercase prefix
 ("CUPS_THIS_CONSTANT", "CUPS_THAT_CONSTANT", etc.)
 
 <P>Typed enumerations shall be used whenever possible to allow for type
