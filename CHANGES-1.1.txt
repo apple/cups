@@ -3,6 +3,11 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.19
 
+	- The scheduler used the stdio functions to read any job
+	  ticket information in a PostScript print job. Since
+	  some platforms limit the number of stdio files to 256,
+	  job ticket information was ignored when the server had
+	  a large number of clients connected to the system.
 	- Filters and backends may now report the total number
 	  of pages ("PAGE: total NNN") to the scheduler.
 	- The LPD backend now supports timeout and

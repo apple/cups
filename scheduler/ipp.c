@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.127.2.53 2003/03/20 15:42:43 mike Exp $"
+ * "$Id: ipp.c,v 1.127.2.54 2003/03/28 17:32:44 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -55,6 +55,7 @@
  *   hold_job()                  - Hold a print job.
  *   move_job()                  - Move a job to a new destination.
  *   print_job()                 - Print a file to a printer or class.
+ *   read_ps_line()              - Read a line from a PS file...
  *   read_ps_job_ticket()        - Reads a job ticket embedded in a PS file.
  *   reject_jobs()               - Reject print jobs to a printer.
  *   release_job()               - Release a held print job.
@@ -4611,6 +4612,97 @@ print_job(client_t        *con,		/* I - Client connection */
 
 
 /*
+ * PostScript line buffer structure for lines up to 255 chars...
+ */
+
+typedef struct
+{
+  char	buffer[256],			/* Line buffer (max 255 chars) */
+	*bufptr;			/* Pointer to next line */
+  int	bufused;			/* Number of bytes used */
+} cups_psline_t;
+
+
+/*
+ * 'read_ps_line()' - Read a line from a PS file...
+ */
+
+static char *				/* O  - Line or NULL on EOF/error */
+read_ps_line(int           fd,		/* I  - File descriptor to read from */
+             cups_psline_t *line)	/* IO - Line data */
+{
+  int	bytes;				/* Bytes read */
+  char	*cr, *lf;			/* Pointers into buffer */
+
+
+  if (line->bufused > 0 && line->bufptr > line->buffer)
+  {
+   /*
+    * Remove the last line that was read from the buffer...
+    */
+
+    bytes = line->bufptr - line->buffer;
+
+    strcpy(line->buffer, line->bufptr);
+
+    line->bufused -= bytes;
+
+    if (line->bufused < 0)
+      line->bufused = 0;
+  }
+
+ /*
+  * Read more data into the buffer...
+  */
+
+  bytes = sizeof(line->buffer) - line->bufused - 1;
+  if ((bytes = read(fd, line->buffer + line->bufused, bytes)) < 0)
+    return (NULL);
+
+ /*
+  * Nul-terminate the string buffer...
+  */
+
+  line->bufused += bytes;
+  line->buffer[line->bufused] = '\0';
+
+ /*
+  * Check for CR and/or LF.
+  */
+
+  cr = strchr(line->buffer, '\r');
+  lf = strchr(line->buffer, '\n');
+
+  if (!cr && !lf)
+    return (NULL);
+
+  if (cr && cr < lf)
+  {
+   /*
+    * CR and possibly LF terminate this line...
+    */
+
+    *cr++ = '\0';
+    if (*cr == '\n')
+      *cr++ = '\0';
+
+    line->bufptr = cr;
+  }
+  else
+  {
+   /*
+    * LF terminates this line...
+    */
+
+    *lf++ = '\0';
+    line->bufptr = lf;
+  }
+
+  return (line->buffer);
+}
+
+
+/*
  * 'read_ps_job_ticket()' - Reads a job ticket embedded in a PS file.
  *
  * This function only gets called when printing a single PostScript
@@ -4635,8 +4727,7 @@ print_job(client_t        *con,		/* I - Client connection */
  * with "%cupsJobTicket:".
  *
  * The maximum length of a job ticket line, including the prefix, is
- * 255 characters to conform with the Adobe DSC.  This function assumes
- * that job ticket lines end with CR LF or LF; CR alone is not accepted.
+ * 255 characters to conform with the Adobe DSC.
  *
  * Read-only attributes are rejected with a notice to the error log in
  * case a malicious user tries anything.  Since the job ticket is read
@@ -4647,8 +4738,8 @@ print_job(client_t        *con,		/* I - Client connection */
 static void
 read_ps_job_ticket(client_t *con)	/* I - Client connection */
 {
-  FILE			*fp;		/* File to read from */
-  char			line[256];	/* Line in file */
+  int			fd;		/* File to read from */
+  cups_psline_t		line;		/* Line data */
   int			num_options;	/* Number of options */
   cups_option_t		*options;	/* Options */
   ipp_t			*ticket;	/* New attributes */
@@ -4661,32 +4752,34 @@ read_ps_job_ticket(client_t *con)	/* I - Client connection */
   * First open the print file...
   */
 
-  if ((fp = fopen(con->filename, "r")) == NULL)
+  if ((fd = open(con->filename, O_RDONLY)) < 0)
   {
     LogMessage(L_ERROR, "read_ps_job_ticket: Unable to open PostScript print file - %s",
                strerror(errno));
     return;
   }
 
+  memset(&line, 0, sizeof(line));
+
  /*
   * Skip the first line...
   */
 
-  if (!fgets(line, sizeof(line), fp))
+  if (read_ps_line(fd, &line) == NULL)
   {
     LogMessage(L_ERROR, "read_ps_job_ticket: Unable to read from PostScript print file - %s",
-               strerror(ferror(fp)));
-    fclose(fp);
+               strerror(errno));
+    close(fd);
     return;
   }
 
-  if (strncmp(line, "%!PS-Adobe-", 11) != 0)
+  if (strncmp(line.buffer, "%!PS-Adobe-", 11) != 0)
   {
    /*
     * Not a DSC-compliant file, so no job ticket info will be available...
     */
 
-    fclose(fp);
+    close(fd);
     return;
   }
 
@@ -4697,27 +4790,27 @@ read_ps_job_ticket(client_t *con)	/* I - Client connection */
   num_options = 0;
   options     = NULL;
 
-  while (fgets(line, sizeof(line), fp) != NULL)
+  while (read_ps_line(fd, &line) != NULL)
   {
    /*
     * Stop at the first non-ticket line...
     */
 
-    if (strncmp(line, "%cupsJobTicket:", 15) != 0)
+    if (strncmp(line.buffer, "%cupsJobTicket:", 15) != 0)
       break;
 
    /*
     * Add the options to the option array...
     */
 
-    num_options = cupsParseOptions(line + 15, num_options, &options);
+    num_options = cupsParseOptions(line.buffer + 15, num_options, &options);
   }
 
  /*
   * Done with the file; see if we have any options...
   */
 
-  fclose(fp);
+  close(fd);
 
   if (num_options == 0)
     return;
@@ -6260,5 +6353,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.127.2.53 2003/03/20 15:42:43 mike Exp $".
+ * End of "$Id: ipp.c,v 1.127.2.54 2003/03/28 17:32:44 mike Exp $".
  */
