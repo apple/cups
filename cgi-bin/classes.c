@@ -1,5 +1,5 @@
 /*
- * "$Id: classes.c,v 1.18.2.8 2003/04/08 03:48:03 mike Exp $"
+ * "$Id: classes.c,v 1.18.2.9 2003/07/20 03:49:45 mike Exp $"
  *
  *   Class status CGI for the Common UNIX Printing System (CUPS).
  *
@@ -37,21 +37,25 @@
  * 'main()' - Main entry for CGI.
  */
 
-int				/* O - Exit status */
-main(int  argc,			/* I - Number of command-line arguments */
-     char *argv[])		/* I - Command-line arguments */
+int					/* O - Exit status */
+main(int  argc,				/* I - Number of command-line arguments */
+     char *argv[])			/* I - Command-line arguments */
 {
-  cups_lang_t	*language;	/* Language information */
-  char		*pclass;	/* Printer class name */
-  http_t	*http;		/* Connection to the server */
-  ipp_t		*request,	/* IPP request */
-		*response;	/* IPP response */
-  ipp_attribute_t *attr;	/* IPP attribute */
-  ipp_status_t	status;		/* Operation status... */
-  char		uri[HTTP_MAX_URI];
-				/* Printer URI */
-  const char	*which_jobs;	/* Which jobs to show */
-  const char	*op;		/* Operation to perform, if any */
+  cups_lang_t	*language;		/* Language information */
+  char		*pclass;		/* Printer class name */
+  http_t	*http;			/* Connection to the server */
+  ipp_t		*request,		/* IPP request */
+		*response;		/* IPP response */
+  ipp_attribute_t *attr;		/* IPP attribute */
+  ipp_status_t	status;			/* Operation status... */
+  char		uri[HTTP_MAX_URI];	/* Printer URI */
+  const char	*which_jobs;		/* Which jobs to show */
+  const char	*op;			/* Operation to perform, if any */
+  static const char	*def_attrs[] =	/* Attributes for default printer */
+		{
+		  "printer-name",
+		  "printer-uri-supported"
+		};
 
 
  /*
@@ -112,6 +116,10 @@ main(int  argc,			/* I - Number of command-line arguments */
 
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
         	 "attributes-natural-language", NULL, language->language);
+
+    ippAddStrings(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
+                  "requested-attributes",
+		  sizeof(def_attrs) / sizeof(def_attrs[0]), NULL, def_attrs);
 
     if ((response = cupsDoRequest(http, request, "/")) != NULL)
     {
@@ -202,8 +210,7 @@ main(int  argc,			/* I - Number of command-line arguments */
                    uri);
     }
 
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
-        	 "requested-attributes", NULL, "all");
+    ippGetAttributes(request, TEMPLATES, "classes.tmpl", getenv("LANG"));
 
    /*
     * Do the request and get back a response...
@@ -255,6 +262,8 @@ main(int  argc,			/* I - Number of command-line arguments */
       if ((which_jobs = cgiGetVariable("which_jobs")) != NULL)
 	ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD, "which-jobs",
                      NULL, which_jobs);
+
+      ippGetAttributes(request, TEMPLATES, "jobs.tmpl", getenv("LANG"));
 
      /*
       * Do the request and get back a response...
@@ -359,5 +368,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: classes.c,v 1.18.2.8 2003/04/08 03:48:03 mike Exp $".
+ * End of "$Id: classes.c,v 1.18.2.9 2003/07/20 03:49:45 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: jobs.c,v 1.15.2.10 2003/04/08 03:48:03 mike Exp $"
+ * "$Id: jobs.c,v 1.15.2.11 2003/07/20 03:49:46 mike Exp $"
  *
  *   Job status CGI for the Common UNIX Printing System (CUPS).
  *
@@ -45,16 +45,16 @@ static void	do_job_op(http_t *http, cups_lang_t *language, ipp_op_t op);
  * 'main()' - Main entry for CGI.
  */
 
-int				/* O - Exit status */
-main(int  argc,			/* I - Number of command-line arguments */
-     char *argv[])		/* I - Command-line arguments */
+int					/* O - Exit status */
+main(int  argc,				/* I - Number of command-line arguments */
+     char *argv[])			/* I - Command-line arguments */
 {
-  cups_lang_t	*language;	/* Language information */
-  http_t	*http;		/* Connection to the server */
-  const char	*which_jobs;	/* Which jobs to show */
-  ipp_t		*request,	/* IPP request */
-		*response;	/* IPP response */
-   const char	*op;		/* Operation name */
+  cups_lang_t	*language;		/* Language information */
+  http_t	*http;			/* Connection to the server */
+  const char	*which_jobs;		/* Which jobs to show */
+  ipp_t		*request,		/* IPP request */
+		*response;		/* IPP response */
+   const char	*op;			/* Operation name */
 
 
  /*
@@ -138,6 +138,8 @@ main(int  argc,			/* I - Number of command-line arguments */
     if ((which_jobs = cgiGetVariable("which_jobs")) != NULL)
       ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD, "which-jobs",
                    NULL, which_jobs);
+
+    ippGetAttributes(request, TEMPLATES, "jobs.tmpl", getenv("LANG"));
 
    /*
     * Do the request and get back a response...
@@ -255,5 +257,5 @@ do_job_op(http_t      *http,		/* I - HTTP connection */
 
 
 /*
- * End of "$Id: jobs.c,v 1.15.2.10 2003/04/08 03:48:03 mike Exp $".
+ * End of "$Id: jobs.c,v 1.15.2.11 2003/07/20 03:49:46 mike Exp $".
  */

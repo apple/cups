@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp-var.c,v 1.23.2.11 2003/06/14 16:53:47 mike Exp $"
+ * "$Id: ipp-var.c,v 1.23.2.12 2003/07/20 03:49:45 mike Exp $"
  *
  *   IPP variable routines for the Common UNIX Printing System (CUPS).
  *
@@ -23,6 +23,8 @@
  *
  * Contents:
  *
+ *   ippGetAttributes()    - Get the list of attributes that are needed
+ *                           by the template file.
  *   ippGetTemplateDir()   - Get the templates directory...
  *   ippSetServerVersion() - Set the server name and CUPS version...
  *   ippSetCGIVars()       - Set CGI variables from an IPP response.
@@ -33,6 +35,127 @@
  */
 
 #include "ipp-var.h"
+
+
+/*
+ * 'ippGetAttributes()' - Get the list of attributes that are needed
+ *                        by the template file.
+ */
+
+void
+ippGetAttributes(ipp_t      *request,	/* I - IPP request */
+                 const char *directory,	/* I - Directory */
+		 const char *tmpl,	/* I - Base filename */
+		 const char *lang)	/* I - Language */
+{
+  int	num_attrs;			/* Number of attributes */
+  char	*attrs[1000];			/* Attributes */
+  int	i;				/* Looping var */
+  char	filename[1024],			/* Filename */
+	locale[16];			/* Locale name */
+  FILE	*in;				/* Input file */
+  int	ch;				/* Character from file */
+  char	name[255],			/* Name of variable */
+	*nameptr;			/* Pointer into name */
+
+
+ /*
+  * Convert the language to a locale name...
+  */
+
+  if (lang != NULL)
+  {
+    for (i = 0; lang[i] && i < 15; i ++)
+      if (isalnum(lang[i]))
+        locale[i] = tolower(lang[i]);
+      else
+        locale[i] = '_';
+
+    locale[i] = '\0';
+  }
+  else
+    locale[0] = '\0';
+
+ /*
+  * See if we have a template file for this language...
+  */
+
+  snprintf(filename, sizeof(filename), "%s/%s/%s", directory, locale, tmpl);
+  if (access(filename, 0))
+  {
+    locale[2] = '\0';
+
+    snprintf(filename, sizeof(filename), "%s/%s/%s", directory, locale, tmpl);
+    if (access(filename, 0))
+      snprintf(filename, sizeof(filename), "%s/%s", directory, tmpl);
+  }
+
+ /*
+  * Open the template file...
+  */
+
+  if ((in = fopen(filename, "r")) == NULL)
+    return;
+
+ /*
+  * Loop through the file adding attribute names as needed...
+  */
+
+  num_attrs = 0;
+
+  while ((ch = getc(in)) != EOF)
+    if (ch == '\\')
+      getc(in);
+    else if (ch == '{' && num_attrs < (sizeof(attrs) / sizeof(attrs[0])))
+    {
+     /*
+      * Grab the name...
+      */
+
+      for (nameptr = name; (ch = getc(in)) != EOF;)
+        if (strchr("}]<>=! \t\n", ch))
+          break;
+        else if (nameptr > name && ch == '?')
+	  break;
+	else if (nameptr < (name + sizeof(name) - 1))
+	{
+	  if (ch == '_')
+	    *nameptr++ = '-';
+	  else
+            *nameptr++ = ch;
+	}
+
+      *nameptr = '\0';
+
+     /*
+      * Possibly add it to the list of attributes...
+      */
+
+      for (i = 0; i < num_attrs; i ++)
+        if (!strcmp(attrs[i], name))
+	  break;
+
+      if (i >= num_attrs)
+      {
+	attrs[num_attrs] = strdup(name);
+	num_attrs ++;
+      }
+    }
+
+ /*
+  * If we have attributes, add a requested-attributes attribute to the
+  * request...
+  */
+
+  if (num_attrs > 0)
+  {
+    ippAddStrings(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
+                  "requested-attributes", num_attrs, NULL, attrs);
+
+    for (i = 0; i < num_attrs; i ++)
+      free(attrs[i]);
+  }
+}
 
 
 /*
@@ -383,5 +506,5 @@ ippSetCGIVars(ipp_t      *response,	/* I - Response data to be copied... */
 
 
 /*
- * End of "$Id: ipp-var.c,v 1.23.2.11 2003/06/14 16:53:47 mike Exp $".
+ * End of "$Id: ipp-var.c,v 1.23.2.12 2003/07/20 03:49:45 mike Exp $".
  */
