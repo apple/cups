@@ -147,8 +147,22 @@ CHANGES IN CUPS V1.1.7
 	  by the GIMP.
 	- The HTTP Upgrade code (upgrade to TLS encryption)
 	  bypassed the authentication checks.
+	- The HTTP Upgrade code did not send a 426 status code
+	  to the client and end the current request. This caused
+	  a race condition between the client and server for the
+	  upgrade to TLS.
 	- Fixed a bug in the EOF and Trailer detection code in
 	  the pstops filter.
+	- The imagetoraster filter did not add the margins to
+	  the custom page size in the raster header.
+	- The imagetops filter did not adjust the custom page
+	  size to the size of the printed image.
+	- The imagetops filter did not include DSC comments
+	  which are required by some printers.
+	- The imagetops filter did not insert newlines in
+	  Base85 encoded output, causing files to contain
+	  lines longer than 255 characters (violation of the
+	  DSC).
 
 
 CHANGES IN CUPS V1.1.6-3
