@@ -1,5 +1,5 @@
 /*
- * "$Id: image-photocd.c,v 1.3 1999/03/24 18:01:43 mike Exp $"
+ * "$Id: image-photocd.c,v 1.4 1999/03/25 20:39:06 mike Exp $"
  *
  *   PhotoCD routines for the Common UNIX Printing System (CUPS).
  *
@@ -31,9 +31,12 @@
 
 #include "image.h"
 
-#ifdef HAVE_LIBPCD
-#  include <pcd.h>
 
+/*
+ * PhotoCD support is currently limited to the 768x512 base image, which
+ * is only YCC encoded.  Support for the higher resolution images will
+ * require a lot of extra code...
+ */
 
 int
 ImageReadPhotoCD(image_t *img,
@@ -43,112 +46,194 @@ ImageReadPhotoCD(image_t *img,
         	 int     saturation,
         	 int     hue)
 {
-  struct PCD_IMAGE	pcd;	/* PhotoCD image structure */
-  int		rot,		/* Image rotation */
-		res,		/* Image resolution */
-		left, top,	/* Left and top of image area */
-		width, height;	/* Width and height of image */
-  int		y;		/* Looping vars */
+  int		x, y;		/* Looping vars */
   int		bpp;		/* Bytes per pixel */
-  ib_t		*in,		/* Input pixels */
+  int		pass;		/* Pass number */
+  int		temp,		/* Adjusted luminance */
+		temp2,		/* Red, green, and blue values */
+		cb, cr;		/* Adjusted chroma values */
+  ib_t		*in,		/* Input (YCC) pixels */
+		*iy,		/* Luminance */
+		*icb,		/* Blue chroma */
+		*icr,		/* Red chroma */
+		*rgb,		/* RGB */
+		*rgbptr,	/* Pointer into RGB data */
 		*out;		/* Output pixels */
 
 
- /*
-  * Setup the PhotoCD file...
-  */
-
-  if (pcd_fdopen(&pcd, fileno(fp)))
-  {
-    fclose(fp);
-    return (-1);
-  }
+  (void)secondary;
 
  /*
-  * Get the image dimensions and load the output image...
+  * Seek to the start of the base image...
   */
 
-  rot    = pcd_get_rot(&pcd, 0);
-  res    = pcd_get_maxres(&pcd);
-  res    = res > 3 ? 3 : res;
-  left   = 0;
-  top    = 0;
-  width  = PCD_WIDTH(res, rot);
-  height = PCD_HEIGHT(res, rot);
+  fseek(fp, 0x30000, SEEK_SET);
 
-  if (primary == IMAGE_WHITE || primary == IMAGE_BLACK)
-    pcd_select(&pcd, res, 0, 1, 0, rot, &left, &top, &width, &height);
-  else
-    pcd_select(&pcd, res, 0, 0, 0, rot, &left, &top, &width, &height);
+ /*
+  * Allocate the initialize...
+  */
 
   img->colorspace = primary;
-  img->xsize      = width;
-  img->ysize      = height;
-  img->xppi       = (rot & 1) ? width / 4 : width / 6;
-  img->yppi       = img->xppi;
+  img->xsize      = 768;
+  img->ysize      = 512;
+  img->xppi       = 128;
+  img->yppi       = 128;
 
   ImageSetMaxTiles(img, 0);
 
   bpp = ImageGetDepth(img);
-  in  = malloc(img->xsize * (pcd.gray ? 1 : 3));
+  in  = malloc(768 * 3);
   out = malloc(img->xsize * bpp);
+
+  if (bpp > 1)
+    rgb = malloc(768 * 3);
 
  /*
   * Read the image file...
   */
 
-  for (y = 0; y < img->ysize; y ++)
+  for (y = 0; y < img->ysize; y += 2)
   {
-    if (pcd.gray)
-    {
-      pcd_get_image_line(&pcd, y, in, PCD_TYPE_GRAY, 0);
+   /*
+    * Grab the next two scanlines:
+    *
+    *     YYYYYYYYYYYYYYY...
+    *     YYYYYYYYYYYYYYY...
+    *     CbCbCb...CrCrCr...
+    */
 
-      if (primary == IMAGE_BLACK)
+    if (fread(in, 1, 768 * 3, fp) < (768 * 3))
+    {
+     /*
+      * Couldn't read a row of data - return an error!
+      */
+
+      free(in);
+      free(out);
+
+      return (-1);
+    }
+
+   /*
+    * Process the two scanlines...
+    */
+
+    for (pass = 0, iy = in; pass < 2; pass ++)
+    {
+      if (bpp == 1)
       {
-        ImageWhiteToBlack(in, out, img->xsize);
-        ImagePutRow(img, 0, y, img->xsize, out);
+       /*
+	* Just extract the luminance channel from the line and put it
+	* in the image...
+	*/
+
+        if (primary == IMAGE_BLACK)
+	{
+          ImageWhiteToBlack(iy, out, img->xsize);
+          ImagePutRow(img, 0, y + pass, img->xsize, out);
+	}
+	else
+          ImagePutRow(img, 0, y + pass, img->xsize, iy);
+
+        iy += 768;
       }
       else
-        ImagePutRow(img, 0, y, img->xsize, in);
-    }
-    else
-    {
-      pcd_get_image_line(&pcd, y, in, PCD_TYPE_RGB, 0);
-
-      if (saturation != 100 || hue != 0)
-	ImageRGBAdjust(in, img->xsize, saturation, hue);
-
-      if (primary == IMAGE_RGB)
-        ImagePutRow(img, 0, y, img->xsize, in);
-      else
       {
-	switch (img->colorspace)
+       /*
+        * Convert YCbCr to RGB...  While every pixel gets a luminance
+	* value, adjacent pixels share chroma information.
+	*/
+
+        for (x = 0, rgbptr = rgb, icb = in + 1536, icr = in + 1920;
+	     x < img->xsize;
+	     x ++, iy ++)
 	{
-	  case IMAGE_CMY :
-	      ImageRGBToCMY(in, out, img->xsize);
-	      break;
-	  case IMAGE_CMYK :
-	      ImageRGBToCMYK(in, out, img->xsize);
-	      break;
+	  if (!(x & 1))
+	  {
+	    cb = (float)(*icb - 156);
+	    cr = (float)(*icr - 137);
+	  }
+
+          temp = 1.407488 * (float)(*iy);
+
+          temp = 92241 * (*iy);
+
+	  temp2 = (temp + 86706 * cr) / 65536;
+	  if (temp2 < 0)
+	    *rgbptr++ = 0;
+	  else if (temp2 > 255)
+	    *rgbptr++ = 255;
+	  else
+	    *rgbptr++ = temp2;
+
+          temp2 = (temp - 25914 * cb - 44166 * cr) / 65536;
+	  if (temp2 < 0)
+	    *rgbptr++ = 0;
+	  else if (temp2 > 255)
+	    *rgbptr++ = 255;
+	  else
+	    *rgbptr++ = temp2;
+
+          temp2 = (temp + 133434 * cb) / 65536;
+	  if (temp2 < 0)
+	    *rgbptr++ = 0;
+	  else if (temp2 > 255)
+	    *rgbptr++ = 255;
+	  else
+	    *rgbptr++ = temp2;
+
+	  if (x & 1)
+	  {
+	    icb ++;
+	    icr ++;
+	  }
 	}
 
-        ImagePutRow(img, 0, y, img->xsize, out);
+       /*
+        * Adjust the hue and saturation if needed...
+	*/
+
+	if (saturation != 100 || hue != 0)
+	  ImageRGBAdjust(rgb, img->xsize, saturation, hue);
+
+       /*
+        * Then convert the RGB data to the appropriate colorspace and
+	* put it in the image...
+	*/
+
+        if (img->colorspace == IMAGE_RGB)
+          ImagePutRow(img, 0, y + pass, img->xsize, rgb);
+	else
+	{
+	  switch (img->colorspace)
+	  {
+	    case IMAGE_CMY :
+		ImageRGBToCMY(rgb, out, img->xsize);
+		break;
+	    case IMAGE_CMYK :
+		ImageRGBToCMYK(rgb, out, img->xsize);
+		break;
+	  }
+
+          ImagePutRow(img, 0, y + pass, img->xsize, out);
+	}
       }
     }
   }
 
+ /*
+  * Free memory and return...
+  */
+
   free(in);
   free(out);
-
-  pcd_close(&pcd);
+  if (bpp > 1)
+    free(rgb);
 
   return (0);
 }
 
 
-#endif /* HAVE_LIBPCD */
-
-
 /*
- * End of "$Id: image-photocd.c,v 1.3 1999/03/24 18:01:43 mike Exp $".
+ * End of "$Id: image-photocd.c,v 1.4 1999/03/25 20:39:06 mike Exp $".
  */

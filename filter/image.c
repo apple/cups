@@ -1,5 +1,5 @@
 /*
- * "$Id: image.c,v 1.6 1999/03/24 18:01:46 mike Exp $"
+ * "$Id: image.c,v 1.7 1999/03/25 20:39:07 mike Exp $"
  *
  *   Base image support for the Common UNIX Printing System (CUPS).
  *
@@ -51,7 +51,8 @@ ImageOpen(char *filename,
           int  hue)
 {
   FILE		*fp;		/* File pointer */
-  unsigned char	header[16];	/* First 16 bytes of file */
+  unsigned char	header[16],	/* First 16 bytes of file */
+		header2[16];	/* Bytes 2048-2064 (PhotoCD) */
   image_t	*img;		/* New image buffer */
   int		status;		/* Status of load... */
 
@@ -76,6 +77,9 @@ ImageOpen(char *filename,
     return (NULL);
   }
 
+  fseek(fp, 2048, SEEK_SET);
+  memset(header2, 0, sizeof(header2));
+  fread(header2, 1, sizeof(header2), fp);
   fseek(fp, 0, SEEK_SET);
 
  /*
@@ -108,6 +112,8 @@ ImageOpen(char *filename,
     status = ImageReadSunRaster(img, fp, primary, secondary, saturation, hue);
   else if (header[0] == 'P' && header[1] >= '1' && header[1] <= '6')
     status = ImageReadPNM(img, fp, primary, secondary, saturation, hue);
+  else if (memcmp(header2, "PCD_IPI", 7) == 0)
+    status = ImageReadPhotoCD(img, fp, primary, secondary, saturation, hue);
 #if defined(HAVE_LIBPNG) && defined(HAVE_LIBZ)
   else if (memcmp(header, "\211PNG", 4) == 0)
     status = ImageReadPNG(img, fp, primary, secondary, saturation, hue);
@@ -121,10 +127,6 @@ ImageOpen(char *filename,
            memcmp(header, "II", 2) == 0)
     status = ImageReadTIFF(img, fp, primary, secondary, saturation, hue);
 #endif /* HAVE_LIBTIFF */
-#ifdef HAVE_LIBPCD
-  else if (memcmp(header, "\377\377\377\377", 4) == 0)
-    status = ImageReadPhotoCD(img, fp, primary, secondary, saturation, hue);
-#endif /* HAVE_LIBPCD */
   else
   {
     fclose(fp);
@@ -665,5 +667,5 @@ flush_tile(image_t *img)
 
 
 /*
- * End of "$Id: image.c,v 1.6 1999/03/24 18:01:46 mike Exp $".
+ * End of "$Id: image.c,v 1.7 1999/03/25 20:39:07 mike Exp $".
  */
