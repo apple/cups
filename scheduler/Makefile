@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.15 1999/07/08 14:58:11 mike Exp $"
+# "$Id: Makefile,v 1.16 1999/09/27 18:21:21 mike Exp $"
 #
 #   Scheduler Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -25,7 +25,7 @@
 include ../Makedefs
 
 CUPSDOBJS =	auth.o classes.o client.o conf.o dirsvc.o main.o ipp.o \
-		listen.o job.o printers.o
+		listen.o job.o log.o printers.o
 OBJS	=	$(CUPSDOBJS) testspeed.o
 
 #
@@ -78,5 +78,5 @@ testspeed.o:	../cups/cups.h ../cups/http.h ../cups/ipp.h ../cups/language.h
 $(OBJS):	../config.h ../Makedefs
 
 #
-# End of "$Id: Makefile,v 1.15 1999/07/08 14:58:11 mike Exp $".
+# End of "$Id: Makefile,v 1.16 1999/09/27 18:21:21 mike Exp $".
 #
