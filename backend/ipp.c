@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.71 2003/01/29 15:35:53 mike Exp $"
+ * "$Id: ipp.c,v 1.72 2003/01/31 21:22:53 swdev Exp $"
  *
  *   IPP backend for the Common UNIX Printing System (CUPS).
  *
@@ -1020,6 +1020,8 @@ run_pictwps_filter(char **argv,			/* I - Command-line arguments */
   {
     fprintf(stderr, "ERROR: Unable to create temporary file - %s.\n",
             strerror(errno));
+    if (ppdfile)
+      unlink(ppdfile);
     return (-1);
   }
 
@@ -1029,6 +1031,11 @@ run_pictwps_filter(char **argv,			/* I - Command-line arguments */
   */
 
   stat(argv[6], &fileinfo);
+
+  if (ppdfile)
+    chown(ppdfile, fileinfo.st_uid, fileinfo.st_gid);
+
+  fchown(fd, fileinfo.st_uid, fileinfo.st_gid);
 
  /*
   * Finally, run the filter to convert the file...
@@ -1060,15 +1067,19 @@ run_pictwps_filter(char **argv,			/* I - Command-line arguments */
     perror("ERROR: Unable to exec pictwpstops");
     return (errno);
   }
-  else if (pid < 0)
+
+  close(fd);
+
+  if (pid < 0)
   {
    /*
     * Error!
     */
 
     perror("ERROR: Unable to fork pictwpstops");
-    close(fd);
     unlink(filename);
+    if (ppdfile)
+      unlink(ppdfile);
     return (-1);
   }
 
@@ -1081,8 +1092,13 @@ run_pictwps_filter(char **argv,			/* I - Command-line arguments */
     perror("ERROR: Unable to wait for pictwpstops");
     close(fd);
     unlink(filename);
+    if (ppdfile)
+      unlink(ppdfile);
     return (-1);
   }
+
+  if (ppdfile)
+    unlink(ppdfile);
 
   close(fd);
 
@@ -1109,5 +1125,5 @@ run_pictwps_filter(char **argv,			/* I - Command-line arguments */
 
 
 /*
- * End of "$Id: ipp.c,v 1.71 2003/01/29 15:35:53 mike Exp $".
+ * End of "$Id: ipp.c,v 1.72 2003/01/31 21:22:53 swdev Exp $".
  */
