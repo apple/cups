@@ -3,6 +3,9 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.16
 
+	- If the client.conf file defines an alternate server
+	  name, the "configure printer" action in the web
+	  interface might not work.
 	- The lpstat command now supports a "-W" option so that
 	  you can display completed jobs as well as
 	  not-completed (pending) jobs.
