@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.7 2000/03/30 05:19:21 mike Exp $"
+# "$Id: Makefile,v 1.8 2000/05/11 16:59:45 mike Exp $"
 #
 #   Datafile makefile for the Common UNIX Printing System (CUPS).
 #
@@ -28,16 +28,23 @@ include ../Makedefs
 # Data files...
 #
 
-CHARSETS =	cp874 \
-		cp1250 \
-		cp1251 \
-		cp1252 \
-		cp1253 \
-		cp1254 \
-		cp1255 \
-		cp1256 \
-		cp1257 \
-		cp1258 \
+BANNERS	=	classified \
+		confidential \
+		secret \
+		standard \
+		topsecret \
+		unclassified
+
+CHARSETS =	windows-874 \
+		windows-1250 \
+		windows-1251 \
+		windows-1252 \
+		windows-1253 \
+		windows-1254 \
+		windows-1255 \
+		windows-1256 \
+		windows-1257 \
+		windows-1258 \
 		iso-8859-1 \
 		iso-8859-2 \
 		iso-8859-3 \
@@ -75,12 +82,18 @@ clean:
 
 install:
 	-$(MKDIR) $(DATADIR)
-	-$(MKDIR) $(DATADIR)/data
-	$(INSTALL_DATA) $(DATAFILES) $(DATADIR)/data
+	-$(MKDIR) $(DATADIR)/banners
+	$(INSTALL_DATA) $(BANNERS) $(DATADIR)/banners
 	-$(MKDIR) $(DATADIR)/charsets
 	$(INSTALL_DATA) $(CHARSETS) $(DATADIR)/charsets
+	-$(MKDIR) $(DATADIR)/data
+	$(INSTALL_DATA) $(DATAFILES) $(DATADIR)/data
+	if test "$(PAMDIR)" != ""; then \
+		-$(MKDIR) $(PAMDIR); \
+		$(INSTALL_DATA) cups.pam $(PAMDIR)/cups; \
+	fi
 
 
 #
-# End of "$Id: Makefile,v 1.7 2000/03/30 05:19:21 mike Exp $".
+# End of "$Id: Makefile,v 1.8 2000/05/11 16:59:45 mike Exp $".
 #
