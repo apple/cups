@@ -1,5 +1,5 @@
 /*
- * "$Id: admin.c,v 1.22.2.14 2002/08/16 16:52:45 mike Exp $"
+ * "$Id: admin.c,v 1.22.2.15 2002/08/16 19:20:42 mike Exp $"
  *
  *   Administration CGI for the Common UNIX Printing System (CUPS).
  *
@@ -986,6 +986,21 @@ do_config_printer(http_t      *http,	/* I - HTTP connection */
     cgiCopyTemplateLang(stdout, TEMPLATES, "config-printer.tmpl",
                         getenv("LANG"));
 
+    if (ppdConflicts(ppd))
+    {
+      for (i = ppd->num_groups, k = 0, group = ppd->groups; i > 0; i --, group ++)
+	for (j = group->num_options, option = group->options; j > 0; j --, option ++)
+          if (option->conflicted)
+	  {
+	    cgiSetArray("ckeyword", k, option->keyword);
+	    cgiSetArray("ckeytext", k, option->text);
+	    k ++;
+	  }
+
+      cgiCopyTemplateLang(stdout, TEMPLATES, "option-conflict.tmpl",
+                          getenv("LANG"));
+    }
+
     for (i = ppd->num_groups, group = ppd->groups;
 	 i > 0;
 	 i --, group ++)
@@ -1009,7 +1024,6 @@ do_config_printer(http_t      *http,	/* I - HTTP connection */
         cgiSetVariable("KEYWORD", option->keyword);
         cgiSetVariable("KEYTEXT", option->text);
 	    
-
 	if (option->conflicted)
 	  cgiSetVariable("CONFLICTED", "1");
 	else
@@ -1515,5 +1529,5 @@ get_line(char *buf,	/* I - Line buffer */
 
 
 /*
- * End of "$Id: admin.c,v 1.22.2.14 2002/08/16 16:52:45 mike Exp $".
+ * End of "$Id: admin.c,v 1.22.2.15 2002/08/16 19:20:42 mike Exp $".
  */
