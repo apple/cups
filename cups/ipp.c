@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.55.2.33 2003/03/26 20:31:56 mike Exp $"
+ * "$Id: ipp.c,v 1.55.2.34 2003/04/08 03:48:05 mike Exp $"
  *
  *   Internet Printing Protocol support functions for the Common UNIX
  *   Printing System (CUPS).
@@ -824,10 +824,13 @@ ipp_state_t					/* O - Current state */
 ippRead(http_t *http,				/* I - HTTP connection */
         ipp_t  *ipp)				/* I - IPP data */
 {
-  DEBUG_printf(("ippRead(%p, %p)\n", http, ipp));
+  DEBUG_printf(("ippRead(http=%p, ipp=%p), data_remaining=%d\n", http, ipp,
+                http ? http->data_remaining : -1));
 
   if (http == NULL)
     return (IPP_ERROR);
+
+  DEBUG_printf(("http->state = %d\n", http->state));
 
   return (ippReadIO(http, (ipp_iocb_t)ipp_read_http,
                     http->blocking || http->used != 0, NULL, ipp));
@@ -1113,7 +1116,10 @@ ippReadIO(void       *src,			/* I - Data source */
 	    case IPP_TAG_INTEGER :
 	    case IPP_TAG_ENUM :
 	        if ((*cb)(src, buffer, 4) < 4)
+		{
+	          DEBUG_puts("ippReadIO: Unable to read integer value!");
 		  return (IPP_ERROR);
+		}
 
 		n = (((((buffer[0] << 8) | buffer[1]) << 8) | buffer[2]) << 8) |
 		    buffer[3];
@@ -1122,7 +1128,10 @@ ippReadIO(void       *src,			/* I - Data source */
 	        break;
 	    case IPP_TAG_BOOLEAN :
 	        if ((*cb)(src, buffer, 1) < 1)
+		{
+	          DEBUG_puts("ippReadIO: Unable to read boolean value!");
 		  return (IPP_ERROR);
+		}
 
                 value->boolean = buffer[0];
 	        break;
@@ -1138,18 +1147,27 @@ ippReadIO(void       *src,			/* I - Data source */
                 value->string.text = calloc(n + 1, 1);
 
 	        if ((*cb)(src, (ipp_uchar_t *)value->string.text, n) < n)
+		{
+	          DEBUG_puts("ippReadIO: Unable to read string value!");
 		  return (IPP_ERROR);
+		}
 
 		DEBUG_printf(("ippReadIO: value = \'%s\'\n",
 		              value->string.text));
 	        break;
 	    case IPP_TAG_DATE :
 	        if ((*cb)(src, value->date, 11) < 11)
+		{
+	          DEBUG_puts("ippReadIO: Unable to date integer value!");
 		  return (IPP_ERROR);
+		}
 	        break;
 	    case IPP_TAG_RESOLUTION :
 	        if ((*cb)(src, buffer, 9) < 9)
+		{
+	          DEBUG_puts("ippReadIO: Unable to read resolution value!");
 		  return (IPP_ERROR);
+		}
 
                 value->resolution.xres =
 		    (((((buffer[0] << 8) | buffer[1]) << 8) | buffer[2]) << 8) |
@@ -1162,7 +1180,10 @@ ippReadIO(void       *src,			/* I - Data source */
 	        break;
 	    case IPP_TAG_RANGE :
 	        if ((*cb)(src, buffer, 8) < 8)
+		{
+	          DEBUG_puts("ippReadIO: Unable to read range value!");
 		  return (IPP_ERROR);
+		}
 
                 value->range.lower =
 		    (((((buffer[0] << 8) | buffer[1]) << 8) | buffer[2]) << 8) |
@@ -1180,7 +1201,10 @@ ippReadIO(void       *src,			/* I - Data source */
 		}
 
 	        if ((*cb)(src, buffer, n) < n)
+		{
+	          DEBUG_puts("ippReadIO: Unable to read string w/language value!");
 		  return (IPP_ERROR);
+		}
 
                 bufptr = buffer;
 
@@ -1218,15 +1242,26 @@ ippReadIO(void       *src,			/* I - Data source */
                 value->collection = ippNew();
 
                 if (n > 0)
+		{
+	          DEBUG_puts("ippReadIO: begCollection tag with value length > 0!");
 		  return (IPP_ERROR);
+		}
 
 		if (ippReadIO(src, cb, 1, ipp, value->collection) == IPP_ERROR)
+		{
+	          DEBUG_puts("ippReadIO: Unable to read collection value!");
 		  return (IPP_ERROR);
+		}
                 break;
 
             case IPP_TAG_END_COLLECTION :
                 if (n > 0)
+		{
+	          DEBUG_puts("ippReadIO: endCollection tag with value length > 0!");
 		  return (IPP_ERROR);
+		}
+
+	        DEBUG_puts("ippReadIO: endCollection tag...");
 
 		return (ipp->state = IPP_DATA);
 
@@ -1239,7 +1274,12 @@ ippReadIO(void       *src,			/* I - Data source */
 		attr->name = calloc(n + 1, 1);
 
 	        if ((*cb)(src, (ipp_uchar_t *)attr->name, n) < n)
+		{
+	          DEBUG_puts("ippReadIO: Unable to read member name value!");
 		  return (IPP_ERROR);
+		}
+
+		DEBUG_printf(("ippReadIO: member name = \"%s\"\n", attr->name));
 		break;
 
             default : /* Other unsupported values */
@@ -1248,7 +1288,10 @@ ippReadIO(void       *src,			/* I - Data source */
 		{
 		  value->unknown.data = malloc(n);
 	          if ((*cb)(src, value->unknown.data, n) < n)
+		  {
+	            DEBUG_puts("ippReadIO: Unable to read unsupported value!");
 		    return (IPP_ERROR);
+		  }
 		}
 		else
 		  value->unknown.data = NULL;
@@ -2275,6 +2318,9 @@ ipp_length(ipp_t *ipp,				/* I - IPP request or collection */
     bytes += 2 * attr->num_values;	/* Name lengths */
     bytes += 2 * attr->num_values;	/* Value lengths */
 
+    if (collection)
+      bytes += 5;			/* Add membername overhead */
+
     switch (attr->value_tag & ~IPP_TAG_COPY)
     {
       case IPP_TAG_INTEGER :
@@ -2335,9 +2381,9 @@ ipp_length(ipp_t *ipp,				/* I - IPP request or collection */
 	       i < attr->num_values;
 	       i ++, value ++)
 	  {
-            bytes += 5;		/* Overhead of begCollection */
+/*            bytes += 5;*/		/* Overhead of begCollection */
             bytes += ipp_length(attr->values[i].collection, 1);
-            bytes += 5;		/* Overhead of endCollection */
+/*            bytes += 5;*/		/* Overhead of endCollection */
 	  }
 	  break;
 
@@ -2351,10 +2397,13 @@ ipp_length(ipp_t *ipp,				/* I - IPP request or collection */
   }
 
  /*
-  * Finally, add 1 byte for the "end of attributes" tag and return...
+  * Finally, add 1 byte for the "end of attributes" tag or 5 bytes
+  * for the "end of collection" tag and return...
   */
 
-  if (!collection)
+  if (collection)
+    bytes += 5;
+  else
     bytes ++;
 
   DEBUG_printf(("bytes = %d\n", bytes));
@@ -2377,13 +2426,21 @@ ipp_read_http(http_t      *http,		/* I - Client connection */
   char		len[32];			/* Length string */
   
 
+  DEBUG_printf(("ipp_read_http(http=%p, buffer=%p, length=%d)\n",
+                http, buffer, length));
+
  /*
   * Loop until all bytes are read...
   */
 
   for (tbytes = 0, bytes = 0; tbytes < length; tbytes += bytes, buffer += bytes)
   {
-    if (http->used > 0)
+    DEBUG_printf(("tbytes = %d, http->state = %d\n", tbytes, http->state));
+
+    if (http->state == HTTP_WAITING)
+      break;
+
+    if (http->used > 0 && http->data_encoding == HTTP_ENCODE_LENGTH)
     {
      /*
       * Do "fast read" from HTTP buffer directly...
@@ -2434,7 +2491,7 @@ ipp_read_http(http_t      *http,		/* I - Client connection */
         bytes = -1;
 	break;
       }
-      else if ((bytes = httpRead(http, (char *)buffer, length - tbytes)) <= 0)
+      else if ((bytes = httpRead(http, (char *)buffer, length - tbytes)) < 0)
         break;
     }
   }
@@ -2445,6 +2502,8 @@ ipp_read_http(http_t      *http,		/* I - Client connection */
 
   if (tbytes == 0 && bytes < 0)
     tbytes = -1;
+
+  DEBUG_printf(("returning %d bytes...\n", tbytes));
 
   return (tbytes);
 }
@@ -2477,5 +2536,5 @@ ipp_write_file(int         *fd,			/* I - File descriptor */
 
 
 /*
- * End of "$Id: ipp.c,v 1.55.2.33 2003/03/26 20:31:56 mike Exp $".
+ * End of "$Id: ipp.c,v 1.55.2.34 2003/04/08 03:48:05 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.21.2.8 2003/03/21 17:09:51 mike Exp $"
+ * "$Id: printers.c,v 1.21.2.9 2003/04/08 03:48:03 mike Exp $"
  *
  *   Printer status CGI for the Common UNIX Printing System (CUPS).
  *
@@ -54,6 +54,8 @@ main(int  argc,			/* I - Number of command-line arguments */
   const char	*op;		/* Operation to perform, if any */
  
 
+  setbuf(stdout, NULL);
+
  /*
   * Get any form variables...
   */
@@ -77,7 +79,8 @@ main(int  argc,			/* I - Number of command-line arguments */
   * Tell the client to expect HTML...
   */
 
-  printf("Content-Type: text/html;charset=%s\n\n", cupsLangEncoding(language));
+  printf("Content-Type: text/html;charset=%s\r\n\r\n",
+         cupsLangEncoding(language));
 
  /*
   * See if we need to show a list of printers or the status of a
@@ -211,9 +214,15 @@ main(int  argc,			/* I - Number of command-line arguments */
 
     if ((response = cupsDoRequest(http, request, "/")) != NULL)
     {
-      ippSetCGIVars(response, NULL, NULL, NULL);
+      ippSetCGIVars(response, NULL, NULL, NULL, 0);
       ippDelete(response);
     }
+    else if (printer)
+      fprintf(stderr, "ERROR: Get-Printer-Attributes request failed - %s (%x)\n",
+              ippErrorString(cupsLastError()), cupsLastError());
+    else
+      fprintf(stderr, "ERROR: CUPS-Get-Printers request failed - %s (%x)\n",
+              ippErrorString(cupsLastError()), cupsLastError());
 
    /*
     * Write the report...
@@ -262,11 +271,14 @@ main(int  argc,			/* I - Number of command-line arguments */
 
       if ((response = cupsDoRequest(http, request, "/")) != NULL)
       {
-	ippSetCGIVars(response, NULL, NULL, NULL);
+	ippSetCGIVars(response, NULL, NULL, NULL, 0);
 	ippDelete(response);
 
 	cgiCopyTemplateLang(stdout, TEMPLATES, "jobs.tmpl", getenv("LANG"));
       }
+      else
+	fprintf(stderr, "ERROR: Get-Jobs request failed - %s (%x)\n",
+        	ippErrorString(cupsLastError()), cupsLastError());
     }
   }
   else
@@ -323,7 +335,7 @@ main(int  argc,			/* I - Number of command-line arguments */
                                       CUPS_DATADIR "/data/testprint.ps")) != NULL)
     {
       status = response->request.status.status_code;
-      ippSetCGIVars(response, NULL, NULL, NULL);
+      ippSetCGIVars(response, NULL, NULL, NULL, 0);
 
       ippDelete(response);
     }
@@ -359,5 +371,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: printers.c,v 1.21.2.8 2003/03/21 17:09:51 mike Exp $".
+ * End of "$Id: printers.c,v 1.21.2.9 2003/04/08 03:48:03 mike Exp $".
  */

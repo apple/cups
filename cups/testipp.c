@@ -1,5 +1,5 @@
 /*
- * "$Id: testipp.c,v 1.1.2.2 2003/03/26 20:31:57 mike Exp $"
+ * "$Id: testipp.c,v 1.1.2.3 2003/04/08 03:48:06 mike Exp $"
  *
  *   IPP test program for the Common UNIX Printing System (CUPS).
  *
@@ -49,6 +49,27 @@ ipp_uchar_t	collection[] =			/* Collection buffer */
 		  0x01, 0x01,			/* IPP version */
 		  0x00, 0x02,			/* Print-Job operation */
 		  0x00, 0x00, 0x00, 0x01,	/* Request ID */
+		  IPP_TAG_OPERATION,
+		  IPP_TAG_CHARSET,
+		  0x00, 0x12,			/* Name length + name */
+		  'a','t','t','r','i','b','u','t','e','s','-',
+		  'c','h','a','r','s','e','t',
+		  0x00, 0x05,			/* Value length + value */
+		  'u','t','f','-','8',
+		  IPP_TAG_LANGUAGE,
+		  0x00, 0x1b,			/* Name length + name */
+		  'a','t','t','r','i','b','u','t','e','s','-',
+		  'n','a','t','u','r','a','l','-','l','a','n',
+		  'g','u','a','g','e',
+		  0x00, 0x02,			/* Value length + value */
+		  'e','n',
+		  IPP_TAG_URI,
+		  0x00, 0x0b,			/* Name length + name */
+		  'p','r','i','n','t','e','r','-','u','r','i',
+		  0x00, 0x1c,			/* Value length + value */
+		  'i','p','p',':','/','/','l','o','c','a','l',
+		  'h','o','s','t','/','p','r','i','n','t','e',
+		  'r','s','/','f','o','o',
 		  IPP_TAG_JOB,			/* job group tag */
 		  IPP_TAG_BEGIN_COLLECTION,	/* begCollection tag */
 		  0x00, 0x09,			/* Name length + name */
@@ -97,6 +118,13 @@ main(int  argc,			/* I - Number of command-line arguments */
   request->request.op.version[1]   = 0x01;
   request->request.op.operation_id = IPP_PRINT_JOB;
   request->request.op.request_id   = 1;
+
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
+               "attributes-charset", NULL, "utf-8");
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
+               "attributes-natural-language", NULL, "en");
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI,
+               "printer-uri", NULL, "ipp://localhost/printers/foo");
 
   col = ippNew();
   ippAddString(col, IPP_TAG_JOB, IPP_TAG_KEYWORD, "media-color", NULL, "blue");
@@ -218,5 +246,5 @@ write_cb(void        *data,
 
 
 /*
- * End of "$Id: testipp.c,v 1.1.2.2 2003/03/26 20:31:57 mike Exp $".
+ * End of "$Id: testipp.c,v 1.1.2.3 2003/04/08 03:48:06 mike Exp $".
  */

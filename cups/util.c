@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c,v 1.81.2.22 2003/01/24 20:45:15 mike Exp $"
+ * "$Id: util.c,v 1.81.2.23 2003/04/08 03:48:06 mike Exp $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -100,6 +100,7 @@ cupsCancelJob(const char *name,	/* I - Name of printer or class */
 
   if (!cups_connect(name, printer, hostname))
   {
+    DEBUG_puts("Unable to connect to server!");
     last_error = IPP_SERVICE_UNAVAILABLE;
     return (0);
   }
@@ -182,6 +183,10 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
   char		prompt[1024];		/* Prompt string */
 
 
+  DEBUG_printf(("cupsDoFileRequest(%p, %p, \'%s\', \'%s\')\n",
+                http, request, resource ? resource : "(null)",
+		filename ? filename : "(null)"));
+
   if (http == NULL || request == NULL || resource == NULL)
   {
     if (request != NULL)
@@ -190,9 +195,6 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
     last_error = IPP_INTERNAL_ERROR;
     return (NULL);
   }
-
-  DEBUG_printf(("cupsDoFileRequest(%p, %p, \'%s\', \'%s\')\n",
-                http, request, resource, filename ? filename : "(null)"));
 
  /*
   * See if we have a file to send...
@@ -432,6 +434,7 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
         * Delete the response...
 	*/
 
+        DEBUG_puts("IPP read error!");
 	ippDelete(response);
 	response = NULL;
 
@@ -467,7 +470,11 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
   else if (status == HTTP_UNAUTHORIZED)
     last_error = IPP_NOT_AUTHORIZED;
   else if (status != HTTP_OK)
+  {
+    DEBUG_printf(("HTTP error %d mapped to IPP_SERVICE_UNAVAILABLE!\n",
+                  status));
     last_error = IPP_SERVICE_UNAVAILABLE;
+  }
 
   return (response);
 }
@@ -526,6 +533,7 @@ cupsGetClasses(char ***classes)	/* O - Classes */
 
   if (!cups_connect("default", NULL, NULL))
   {
+    DEBUG_puts("Unable to connect to server!");
     last_error = IPP_SERVICE_UNAVAILABLE;
     return (0);
   }
@@ -640,6 +648,7 @@ cupsGetDefault(void)
 
   if (!cups_connect("default", NULL, NULL))
   {
+    DEBUG_puts("Unable to connect to server!");
     last_error = IPP_SERVICE_UNAVAILABLE;
     return (NULL);
   }
@@ -745,6 +754,7 @@ cupsGetJobs(cups_job_t **jobs,		/* O - Job data */
 
   if (!cups_connect("default", NULL, NULL))
   {
+    DEBUG_puts("Unable to connect to server!");
     last_error = IPP_SERVICE_UNAVAILABLE;
     return (0);
   }
@@ -995,6 +1005,7 @@ cupsGetPPD(const char *name)		/* I - Printer name */
 
   if (!cups_connect(name, printer, hostname))
   {
+    DEBUG_puts("Unable to connect to server!");
     last_error = IPP_SERVICE_UNAVAILABLE;
     return (NULL);
   }
@@ -1105,6 +1116,7 @@ cupsGetPPD(const char *name)		/* I - Printer name */
     if ((cups_server = httpConnectEncrypt(hostname, ippPort(),
                                           cupsEncryption())) == NULL)
     {
+      DEBUG_puts("Unable to connect to server!");
       last_error = IPP_SERVICE_UNAVAILABLE;
       return (NULL);
     }
@@ -1233,6 +1245,7 @@ cupsGetPPD(const char *name)		/* I - Printer name */
           last_error = IPP_NOT_FOUND;
 	  break;
       case HTTP_ERROR :
+          DEBUG_puts("Mapping HTTP error to IPP_SERVICE_UNAVAILABLE");
           last_error = IPP_SERVICE_UNAVAILABLE;
 	  break;
       case HTTP_UNAUTHORIZED :
@@ -1290,6 +1303,7 @@ cupsGetPrinters(char ***printers)	/* O - Printers */
 
   if (!cups_connect("default", NULL, NULL))
   {
+    DEBUG_puts("Unable to connect to server!");
     last_error = IPP_SERVICE_UNAVAILABLE;
     return (0);
   }
@@ -1438,6 +1452,7 @@ cupsPrintFiles(const char    *name,	/* I - Printer or class name */
   {
     DEBUG_printf(("cupsPrintFile: Unable to open connection - %s.\n",
                   strerror(errno)));
+    DEBUG_puts("Unable to connect to server!");
     last_error = IPP_SERVICE_UNAVAILABLE;
     return (0);
   }
@@ -1631,6 +1646,7 @@ cups_connect(const char *name,		/* I - Destination (printer[@host]) */
   if ((cups_server = httpConnectEncrypt(hostname, ippPort(),
                                         cupsEncryption())) == NULL)
   {
+    DEBUG_puts("Unable to connect to server!");
     last_error = IPP_SERVICE_UNAVAILABLE;
     return (NULL);
   }
@@ -1728,5 +1744,5 @@ cups_local_auth(http_t *http)	/* I - Connection */
 
 
 /*
- * End of "$Id: util.c,v 1.81.2.22 2003/01/24 20:45:15 mike Exp $".
+ * End of "$Id: util.c,v 1.81.2.23 2003/04/08 03:48:06 mike Exp $".
  */

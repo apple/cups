@@ -1,5 +1,5 @@
 {#printer_name=0?No printers:
-<P><B>Default Destination:</B> <A HREF="{default_uri}">{default_name}</A>
+<P><B>Default Destination:</B> {default_name?<A HREF="{default_uri}">{default_name}</A>:none}
 <P><TABLE CELLPADDING="0" CELLSPACING="0" BORDER="0" WIDTH="100%">
 {[printer_name]
 <TR>
@@ -21,6 +21,10 @@
 	Printer State: {printer_state=3?idle:{printer_state=4?processing:stopped}},
 	{printer_is_accepting_jobs=0?rejecting jobs:accepting jobs}.
 	{?printer_state_message=?:<BR><I>"{printer_state_message}"</I>}
+	{?printer_state_history2.printer_state_message=?:<BR><I>"{printer_state_history2.printer_state_message}"</I>}
+	{?printer_state_history3.printer_state_message=?:<BR><I>"{printer_state_history3.printer_state_message}"</I>}
+	{?printer_state_history4.printer_state_message=?:<BR><I>"{printer_state_history4.printer_state_message}"</I>}
+	{?printer_state_history5.printer_state_message=?:<BR><I>"{printer_state_history5.printer_state_message}"</I>}
 	{?device_uri=?:<BR>Device URI: {device_uri}}
 	<P>
 	<A HREF="{printer_uri_supported}?op=print-test-page">

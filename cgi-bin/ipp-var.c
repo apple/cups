@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp-var.c,v 1.23.2.9 2003/03/21 17:09:50 mike Exp $"
+ * "$Id: ipp-var.c,v 1.23.2.10 2003/04/08 03:48:03 mike Exp $"
  *
  *   IPP variable routines for the Common UNIX Printing System (CUPS).
  *
@@ -87,7 +87,8 @@ void
 ippSetCGIVars(ipp_t      *response,	/* I - Response data to be copied... */
               const char *filter_name,	/* I - Filter name */
 	      const char *filter_value,	/* I - Filter value */
-	      const char *prefix)	/* I - Prefix for name or NULL */
+	      const char *prefix,	/* I - Prefix for name or NULL */
+	      int        parent_el)	/* I - Parent element number */
 {
   int			element;	/* Element in CGI array */
   ipp_attribute_t	*attr,		/* Attribute in response... */
@@ -109,11 +110,15 @@ ippSetCGIVars(ipp_t      *response,	/* I - Response data to be copied... */
   struct tm		*date;		/* Date information */
 
 
+  DEBUG_printf(("<P>ippSetCGIVars(response=%p, filter_name=\"%s\", filter_value=\"%s\", prefix=\"%s\")\n",
+                response, filter_name, filter_value, prefix));
+  
  /*
   * Set common CGI template variables...
   */
 
-  ippSetServerVersion();
+  if (!prefix)
+    ippSetServerVersion();
 
  /*
   * Get the server name associated with the client interface as well as
@@ -134,11 +139,13 @@ ippSetCGIVars(ipp_t      *response,	/* I - Response data to be copied... */
   * Loop through the attributes and set them for the template...
   */
 
-  for (attr = response->attrs;
-       attr && attr->group_tag == IPP_TAG_OPERATION;
-       attr = attr->next);
+  attr = response->attrs;
 
-  for (element = 0; attr != NULL; attr = attr->next, element ++)
+  if (!prefix)
+    while (attr && attr->group_tag == IPP_TAG_OPERATION)
+     attr = attr->next;
+
+  for (element = parent_el; attr != NULL; attr = attr->next, element ++)
   {
    /*
     * Copy attributes to a separator...
@@ -309,13 +316,15 @@ ippSetCGIVars(ipp_t      *response,	/* I - Response data to be copied... */
 	  case IPP_TAG_KEYWORD :
 	  case IPP_TAG_CHARSET :
 	  case IPP_TAG_LANGUAGE :
+	  case IPP_TAG_MIMETYPE :
 	      strlcat(valptr, attr->values[i].string.text,
 	              sizeof(value) - (valptr - value));
 	      break;
 
           case IPP_TAG_BEGIN_COLLECTION :
+	      snprintf(value, sizeof(value), "%s%d", name, i + 1);
               ippSetCGIVars(attr->values[i].collection, filter_name,
-	                    filter_value, name);
+	                    filter_value, value, element);
               break;
 
           default :
@@ -328,17 +337,21 @@ ippSetCGIVars(ipp_t      *response,	/* I - Response data to be copied... */
       */
 
       if (attr->value_tag != IPP_TAG_BEGIN_COLLECTION)
+      {
         cgiSetArray(name, element, value);
 
-/*      fprintf(stderr, "DEBUG: %s[%d]=\"%s\"\n", name, element, value);*/
+        DEBUG_printf(("<P>%s[%d]=\"%s\"\n", name, element, value));
+      }
     }
 
     if (attr == NULL)
       break;
   }
+
+  DEBUG_puts("<P>Leaving ippSetCGIVars()...");
 }
 
 
 /*
- * End of "$Id: ipp-var.c,v 1.23.2.9 2003/03/21 17:09:50 mike Exp $".
+ * End of "$Id: ipp-var.c,v 1.23.2.10 2003/04/08 03:48:03 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.124.2.62 2003/04/03 03:33:40 mike Exp $"
+ * "$Id: job.c,v 1.124.2.63 2003/04/08 03:48:13 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -1149,56 +1149,53 @@ SetJobPriority(int id,		/* I - Job ID */
  */
 
 void
-StartJob(int       id,		/* I - Job ID */
-         printer_t *printer)	/* I - Printer to print job */
+StartJob(int       id,			/* I - Job ID */
+         printer_t *printer)		/* I - Printer to print job */
 {
-  job_t		*current;	/* Current job */
-  int		i;		/* Looping var */
-  int		slot;		/* Pipe slot */
-  int		num_filters;	/* Number of filters for job */
-  mime_filter_t	*filters;	/* Filters for job */
-  char		method[255],	/* Method for output */
-		*optptr;	/* Pointer to options */
-  ipp_attribute_t *attr;	/* Current attribute */
-  int		pid;		/* Process ID of new filter process */
-  int		banner_page;	/* 1 if banner page, 0 otherwise */
-  int		statusfds[2],	/* Pipes used between the filters and scheduler */
-		filterfds[2][2];/* Pipes used between the filters */
-  char		*argv[8],	/* Filter command-line arguments */
-		filename[1024],	/* Job filename */
-		command[1024],	/* Full path to filter/backend command */
-		jobid[255],	/* Job ID string */
-		title[IPP_MAX_NAME],
-				/* Job title string */
-		copies[255],	/* # copies string */
-		*envp[21],	/* Environment variables */
+  job_t		*current;		/* Current job */
+  int		i;			/* Looping var */
+  int		slot;			/* Pipe slot */
+  int		num_filters;		/* Number of filters for job */
+  mime_filter_t	*filters;		/* Filters for job */
+  char		method[255],		/* Method for output */
+		*optptr;		/* Pointer to options */
+  ipp_attribute_t *attr;		/* Current attribute */
+  int		pid;			/* Process ID of new filter process */
+  int		banner_page;		/* 1 if banner page, 0 otherwise */
+  int		statusfds[2],		/* Pipes used between the filters and scheduler */
+		filterfds[2][2];	/* Pipes used between the filters */
+  int		envc;			/* Number of environment variables */
+  char		*argv[8],		/* Filter command-line arguments */
+		filename[1024],		/* Job filename */
+		command[1024],		/* Full path to filter/backend command */
+		jobid[255],		/* Job ID string */
+		title[IPP_MAX_NAME],	/* Job title string */
+		copies[255],		/* # copies string */
+		*envp[100],		/* Environment variables */
 #ifdef __APPLE__
-		processPath[1050],
-				/* CFProcessPath environment variable */
+		processPath[1050],	/* CFProcessPath environment variable */
 #endif	/* __APPLE__ */
-		path[1024],	/* PATH environment variable */
-		language[255],	/* LANG environment variable */
-		charset[255],	/* CHARSET environment variable */
-		classification[1024],
-				/* CLASSIFICATION environment variable */
-		content_type[1024],
-				/* CONTENT_TYPE environment variable */
-		device_uri[1024],
-				/* DEVICE_URI environment variable */
-		ppd[1024],	/* PPD environment variable */
-		class_name[255],
-				/* CLASS environment variable */
-		printer_name[255],
-				/* PRINTER environment variable */
-		root[1024],	/* CUPS_SERVERROOT environment variable */
-		cache[255],	/* RIP_MAX_CACHE environment variable */
-		tmpdir[1024],	/* TMPDIR environment variable */
-		ldpath[1024],	/* LD_LIBRARY_PATH environment variable */
-		nlspath[1024],	/* NLSPATH environment variable */
-		datadir[1024],	/* CUPS_DATADIR environment variable */
-		fontpath[1050];	/* CUPS_FONTPATH environment variable */
-  static char	*options = NULL;/* Full list of options */
-  static int	optlength = 0;	/* Length of option buffer */
+		path[1024],		/* PATH environment variable */
+		language[255],		/* LANG environment variable */
+		charset[255],		/* CHARSET environment variable */
+		classification[1024],	/* CLASSIFICATION environment variable */
+		content_type[1024],	/* CONTENT_TYPE environment variable */
+		device_uri[1024],	/* DEVICE_URI environment variable */
+		ppd[1024],		/* PPD environment variable */
+		class_name[255],	/* CLASS environment variable */
+		printer_name[255],	/* PRINTER environment variable */
+		root[1024],		/* CUPS_SERVERROOT environment variable */
+		cache[255],		/* RIP_MAX_CACHE environment variable */
+		tmpdir[1024],		/* TMPDIR environment variable */
+		ld_library_path[1024],	/* LD_LIBRARY_PATH environment variable */
+		ld_preload[1024],	/* LD_PRELOAD environment variable */
+		dyld_library_path[1024],/* DYLD_LIBRARY_PATH environment variable */
+		shlib_path[1024],	/* SHLIB_PATH environment variable */
+		nlspath[1024],		/* NLSPATH environment variable */
+		datadir[1024],		/* CUPS_DATADIR environment variable */
+		fontpath[1050];		/* CUPS_FONTPATH environment variable */
+  static char	*options = NULL;	/* Full list of options */
+  static int	optlength = 0;		/* Length of option buffer */
 
 
   LogMessage(L_DEBUG, "StartJob(%d, %p)", id, printer);
@@ -1689,10 +1686,57 @@ StartJob(int       id,		/* I - Job ID */
   snprintf(datadir, sizeof(datadir), "CUPS_DATADIR=%s", DataDir);
   snprintf(fontpath, sizeof(fontpath), "CUPS_FONTPATH=%s", FontPath);
 
-  if (current->dtype & (CUPS_PRINTER_CLASS | CUPS_PRINTER_IMPLICIT))
-    snprintf(class_name, sizeof(class_name), "CLASS=%s", current->dest);
-  else
-    class_name[0] = '\0';
+  envc = 0;
+
+  envp[envc ++] = path;
+  envp[envc ++] = "SOFTWARE=CUPS/1.1";
+  envp[envc ++] = "USER=root";
+  envp[envc ++] = charset;
+  envp[envc ++] = language;
+  envp[envc ++] = TZ;
+  envp[envc ++] = ppd;
+  envp[envc ++] = root;
+  envp[envc ++] = cache;
+  envp[envc ++] = tmpdir;
+  envp[envc ++] = content_type;
+  envp[envc ++] = device_uri;
+  envp[envc ++] = printer_name;
+  envp[envc ++] = datadir;
+  envp[envc ++] = fontpath;
+
+  if (getenv("LD_LIBRARY_PATH") != NULL)
+  {
+    snprintf(ld_library_path, sizeof(ld_library_path), "LD_LIBRARY_PATH=%s",
+             getenv("LD_LIBRARY_PATH"));
+    envp[envc ++] = ld_library_path;
+  }
+
+  if (getenv("LD_PRELOAD") != NULL)
+  {
+    snprintf(ld_preload, sizeof(ld_preload), "LD_PRELOAD=%s",
+             getenv("LD_PRELOAD"));
+    envp[envc ++] = ld_preload;
+  }
+
+  if (getenv("DYLD_LIBRARY_PATH") != NULL)
+  {
+    snprintf(dyld_library_path, sizeof(dyld_library_path), "DYLD_LIBRARY_PATH=%s",
+             getenv("DYLD_LIBRARY_PATH"));
+    envp[envc ++] = dyld_library_path;
+  }
+
+  if (getenv("SHLIB_PATH") != NULL)
+  {
+    snprintf(shlib_path, sizeof(shlib_path), "SHLIB_PATH=%s",
+             getenv("SHLIB_PATH"));
+    envp[envc ++] = shlib_path;
+  }
+
+  if (getenv("NLSPATH") != NULL)
+  {
+    snprintf(nlspath, sizeof(nlspath), "NLSPATH=%s", getenv("NLSPATH"));
+    envp[envc ++] = nlspath;
+  }
 
   if (Classification && !banner_page)
   {
@@ -1707,60 +1751,24 @@ StartJob(int       id,		/* I - Job ID */
     else
       snprintf(classification, sizeof(classification), "CLASSIFICATION=%s",
                attr->values[0].string.text);
+
+    envp[envc ++] = classification;
   }
-  else
-    classification[0] = '\0';
 
-  if (getenv("LD_LIBRARY_PATH") != NULL)
-    snprintf(ldpath, sizeof(ldpath), "LD_LIBRARY_PATH=%s",
-             getenv("LD_LIBRARY_PATH"));
-  else if (getenv("DYLD_LIBRARY_PATH") != NULL)
-    snprintf(ldpath, sizeof(ldpath), "DYLD_LIBRARY_PATH=%s",
-             getenv("DYLD_LIBRARY_PATH"));
-  else if (getenv("SHLIB_PATH") != NULL)
-    snprintf(ldpath, sizeof(ldpath), "SHLIB_PATH=%s",
-             getenv("SHLIB_PATH"));
-  else
-    ldpath[0] = '\0';
+  if (current->dtype & (CUPS_PRINTER_CLASS | CUPS_PRINTER_IMPLICIT))
+  {
+    snprintf(class_name, sizeof(class_name), "CLASS=%s", current->dest);
+    envp[envc ++] = class_name;
+  }
 
-  if (getenv("NLSPATH") != NULL)
-    snprintf(nlspath, sizeof(nlspath), "NLSPATH=%s", getenv("NLSPATH"));
-  else
-    nlspath[0] = '\0';
-
-  envp[0]  = path;
-  envp[1]  = "SOFTWARE=CUPS/1.1";
-  envp[2]  = "USER=root";
-  envp[3]  = charset;
-  envp[4]  = language;
-  envp[5]  = TZ;
-  envp[6]  = ppd;
-  envp[7]  = root;
-  envp[8]  = cache;
-  envp[9]  = tmpdir;
-  envp[10] = content_type;
-  envp[11] = device_uri;
-  envp[12] = printer_name;
-  envp[13] = datadir;
-  envp[14] = fontpath;
-  envp[15] = ldpath;
-  envp[16] = nlspath;
-  envp[17] = classification;
-  envp[18] = class_name;
 #ifdef __APPLE__
-  envp[19] = processPath;
-  envp[20] = NULL;
-#else
-  envp[19] = NULL;
+  envp[envc ++] = processPath;
 #endif	/* __APPLE__ */
 
-  LogMessage(L_DEBUG, "StartJob: envp = \"%s\",\"%s\",\"%s\",\"%s\","
-                      "\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\","
-		      "\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"",
-	     envp[0], envp[1], envp[2], envp[3], envp[4],
-	     envp[5], envp[6], envp[7], envp[8], envp[9],
-	     envp[10], envp[11], envp[12], envp[13], envp[14],
-	     envp[15], envp[16], envp[17], envp[18]);
+  envp[envc ++] = NULL;
+
+  for (i = 0; i < envc; i ++)
+    LogMessage(L_DEBUG, "StartJob: envp[%d]=\"%s\"", i, envp[i]);
 
   current->current_file ++;
 
@@ -2721,5 +2729,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.124.2.62 2003/04/03 03:33:40 mike Exp $".
+ * End of "$Id: job.c,v 1.124.2.63 2003/04/08 03:48:13 mike Exp $".
  */
