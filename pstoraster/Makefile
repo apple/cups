@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.30 2001/01/22 15:03:54 mike Exp $"
+# "$Id: Makefile,v 1.31 2001/02/02 16:37:45 mike Exp $"
 #
 #   GNU Ghostscript makefile for the Common UNIX Printing System (CUPS).
 #
@@ -29,6 +29,16 @@
 #
 
 include ../Makedefs
+
+
+#
+# Updated rules for Ghostscript, which can't use the same level of
+# optimization on many platforms...
+#
+
+.c.o:
+	echo Compiling $<...
+	$(CC) $(GSOPTIM) $(CFLAGS) -c $<
 
 
 #
@@ -422,6 +432,7 @@ pstoraster:	pstoraster.o libgs.a ../Makedefs ../cups/$(LIBCUPS)
 		$(LINKCUPSIMAGE) $(IMGLIBS) $(DSOLIBS) $(LIBS) -lm
 pstoraster.o:	arch.h ../config.h ../Makedefs
 
+
 #
-# End of "$Id: Makefile,v 1.30 2001/01/22 15:03:54 mike Exp $".
+# End of "$Id: Makefile,v 1.31 2001/02/02 16:37:45 mike Exp $".
 #

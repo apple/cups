@@ -1,9 +1,9 @@
 #
-# "$Id: Makefile,v 1.28 2001/01/03 17:44:40 mike Exp $"
+# "$Id: Makefile,v 1.29 2001/02/02 16:37:43 mike Exp $"
 #
 #   Top-level Makefile for the Common UNIX Printing System (CUPS).
 #
-#   Copyright 1997-2000 by Easy Software Products, all rights reserved.
+#   Copyright 1997-2001 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
 #   property of Easy Software Products and are protected by Federal
@@ -83,12 +83,21 @@ install:
 		$(MKDIR) $(prefix)/$(INITDIR)/rc0.d; \
 		$(RM) $(prefix)/$(INITDIR)/rc0.d/K00cups; \
 		ln -s $(INITDDIR)/cups $(prefix)/$(INITDIR)/rc0.d/K00cups; \
+		$(MKDIR) $(prefix)/$(INITDIR)/rc2.d; \
+		$(RM) $(prefix)/$(INITDIR)/rc2.d/S99cups; \
+		ln -s $(INITDDIR)/cups $(prefix)/$(INITDIR)/rc2.d/S99cups; \
 		$(MKDIR) $(prefix)/$(INITDIR)/rc3.d; \
 		$(RM) $(prefix)/$(INITDIR)/rc3.d/S99cups; \
 		ln -s $(INITDDIR)/cups $(prefix)/$(INITDIR)/rc3.d/S99cups; \
 		$(MKDIR) $(prefix)/$(INITDIR)/rc5.d; \
 		$(RM) $(prefix)/$(INITDIR)/rc5.d/S99cups; \
 		ln -s $(INITDDIR)/cups $(prefix)/$(INITDIR)/rc5.d/S99cups; \
+	fi
+	if test "x$(INITDIR)" = "x" -a "x$(INITDDIR)" != "x"; then \
+		$(MKDIR) $(prefix)/$(INITDDIR); \
+		$(RM) $(prefix)/$(INITDDIR)/cups; \
+		$(INSTALL_SCRIPT) cups.sh $(prefix)/$(INITDDIR)/cups; \
+		$(CHMOD) ugo+rx $(prefix)/$(INITDDIR)/cups; \
 	fi
 
 #
@@ -123,5 +132,5 @@ tardist:
 	epm $(EPMFLAGS) -f tardist cups
 
 #
-# End of "$Id: Makefile,v 1.28 2001/01/03 17:44:40 mike Exp $".
+# End of "$Id: Makefile,v 1.29 2001/02/02 16:37:43 mike Exp $".
 #

@@ -1,5 +1,13 @@
-CHANGES.txt - 01/26/2001
+CHANGES.txt - 02/02/2001
 ------------------------
+
+CHANGES IN CUPS V1.1.6-2
+
+	- Added changes to support NetBSD startup scripts.
+	- Added separate compiler options for pstoraster
+	  (Ghostscript) to avoid compiler-induced errors
+	  from Ghostscript's twisted code.
+
 
 CHANGES IN CUPS V1.1.6-1
 

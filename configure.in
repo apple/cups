@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: configure.in,v 1.72 2001/01/26 15:01:59 mike Exp $"
+dnl "$Id: configure.in,v 1.73 2001/02/02 16:37:43 mike Exp $"
 dnl
 dnl   Configuration script for the Common UNIX Printing System (CUPS).
 dnl
@@ -39,12 +39,17 @@ dnl for them...
 
 OPTIM=""
 AC_SUBST(OPTIM)
+GSOPTIM=""
+AC_SUBST(GSOPTIM)
 PICFLAG=1
 CFLAGS="${CFLAGS:=}"
 CXXFLAGS="${CXXFLAGS:=}"
+DSOFLAGS="${DSOFLAGS:=}"
+AC_SUBST(DSOFLAGS)
 
 AC_ARG_ENABLE(debug, [  --enable-debug        turn on debugging [default=no]],[if eval "test x$enable_debug = xyes"; then
-	OPTIM="-g "
+	OPTIM="-g"
+	GSOPTIM="-g"
 fi])
 AC_ARG_ENABLE(shared, [  --enable-shared        turn on shared libraries [default=yes]])
 AC_ARG_ENABLE(ssl, [  --enable-ssl           turn on SSL/TLS support [default=no]])
@@ -64,34 +69,40 @@ if test "$enable_shared" != "no"; then
 		SunOS* | UNIX_S*)
 			LIBCUPS="libcups.so.2"
 			LIBCUPSIMAGE="libcupsimage.so.2"
-			DSO="\$(CC) -Wl,-h,\$@ -G \$(OPTIM) -o"
+			DSO="\$(CC)"
+			DSOFLAGS="-Wl,-h,\$@ -G \$(OPTIM)"
 			;;
 		HP-UX*)
 			LIBCUPS="libcups.sl.2"
 			LIBCUPSIMAGE="libcupsimage.sl.2"
-			DSO="ld -b -z +h \$@ -o"
+			DSO="ld"
+			DSOFLAGS="-b -z +h \$@"
 			;;
 		FreeBSD* | NetBSD* | OpenBSD*)
 			LIBCUPS="libcups.so.2"
 			LIBCUPSIMAGE="libcupsimage.so.2"
-			DSO="\$(CC) -Wl,-soname,\$@ -shared \$(OPTIM) -o"
+			DSO="\$(CC)"
+			DSOFLAGS="-Wl,-soname,\$@ -shared \$(OPTIM)"
 			;;
 		OSF1* | Linux*)
 			LIBCUPS="libcups.so.2"
 			LIBCUPSIMAGE="libcupsimage.so.2"
-			DSO="\$(CC) -Wl,-soname,\$@ -shared \$(OPTIM) -o"
+			DSO="\$(CC)"
+			DSOFLAGS="-Wl,-soname,\$@ -shared \$(OPTIM)"
 			;;
 		IRIX*)
 			LIBCUPS="libcups.so.2"
 			LIBCUPSIMAGE="libcupsimage.so.2"
-			DSO="\$(CC) -soname \$@ -shared \$(OPTIM) -o"
+			DSO="\$(CC)"
+			DSOFLAGS="-soname \$@ -shared \$(OPTIM)"
 			;;
 		*)
 			echo "Warning: shared libraries may not be supported.  Trying -shared"
 			echo "         option with compiler."
 			LIBCUPS="libcups.so.2"
 			LIBCUPSIMAGE="libcupsimage.so.2"
-			DSO="\$(CC) -Wl,-soname,\$@ -shared \$(OPTIM) -o"
+			DSO="\$(CC)"
+			DSOFLAGS="-Wl,-soname,\$@ -shared \$(OPTIM)"
 			;;
 	esac
 else
@@ -99,6 +110,7 @@ else
 	LIBCUPS="libcups.a"
 	LIBCUPSIMAGE="libcupsimage.a"
 	DSO=":"
+	DSOFLAGS=""
 fi
 
 if test "$LIBTOOL" != ""; then
@@ -107,6 +119,7 @@ if test "$LIBTOOL" != ""; then
 	LINKCUPS="../cups/\$(LIBCUPS)"
 	LINKCUPSIMAGE="../filter/\$(LIBCUPSIMAGE)"
 	DSO=":"
+	DSOFLAGS=""
 else
 	LINKCUPS="-L../cups -lcups"
 	LINKCUPSIMAGE="-L../filter -lcupsimage"
@@ -320,35 +333,45 @@ if test -n "$GCC"; then
 
 	if test -z "$OPTIM"; then
 	       	OPTIM="-O2"
+		GSOPTIM="-O1"
 	fi
 	if test $PICFLAG = 1; then
     		OPTIM="-fPIC $OPTIM"
+    		GSOPTIM="-fPIC $GSOPTIM"
 	fi
 	OPTIM="-Wall $OPTIM"
+	GSOPTIM="-Wall $GSOPTIM"
 else
 	case $uname in
         	IRIX*)
 			if test -z "$OPTIM"; then
         			OPTIM="-O2"
+        			GSOPTIM="-O1"
 			fi
 			if test $uversion -ge 62; then
 				OPTIM="$OPTIM -n32 -mips3"
+				GSOPTIM="$GSOPTIM -n32 -mips3"
 			fi
 			OPTIM="-fullwarn $OPTIM"
+			GSOPTIM="-fullwarn $GSOPTIM"
 			;;
 		HP-UX*)
 			if test -z "$OPTIM"; then
-				OPTIM="+O2 -g3"
+				OPTIM="+O2"
+				GSOPTIM="+O1"
 			fi
 			OPTIM="-Ae $OPTIM"
+			GSOPTIM="-Ae $GSOPTIM"
 			;;
 		SunOS*)
 			# Solaris
 			if test -z "$OPTIM"; then
 				OPTIM="-xO4"
+				GSOPTIM="-xO2"
 			fi
 			if test $PICFLAG = 1; then
 				OPTIM="-KPIC $OPTIM"
+				GSOPTIM="-KPIC $GSOPTIM"
 			fi
 			;;
 		*)
@@ -375,17 +398,21 @@ if test "$DSO" != ":"; then
 	# deciding where to find a DSO.  Add linker options to tell them
 	# where to find the DSO (usually in /usr/lib...  duh!)
 	case $uname in
-		HP-UX*)
-			LDFLAGS="$LDFLAGS -Wl,+b,$libdir,+fb"
-			;;
-		SunOS*)
-			# Solaris
-			LDFLAGS="$LDFLAGS -R$libdir"
-			;;
-		FreeBSD* | NetBSD* | OpenBSD*)
-			# *BSD
-			LDFLAGS="$LDFLAGS -Wl,-R$libdir"
-			;;
+                HP-UX*)
+			# HP-UX
+                	DSOFLAGS="+b $libdir +fb $DSOFLAGS"
+                	LDFLAGS="$LDFLAGS -Wl,+b,$libdir,+fb"
+                	;;
+                SunOS*)
+                	# Solaris
+                	DSOFLAGS="-R$libdir $DSOFLAGS"
+                	LDFLAGS="$LDFLAGS -R$libdir"
+                	;;
+                FreeBSD* | NetBSD* | OpenBSD*)
+                        # *BSD
+                	DSOFLAGS="-Wl,-R$libdir $DSOFLAGS"
+                        LDFLAGS="$LDFLAGS -Wl,-R$libdir"
+                        ;;
 	esac
 else
 	DSOLIBS=""
@@ -513,10 +540,16 @@ AC_SUBST(CAT8EXT)
 
 dnl Setup init.d locations...
 case "$uname" in
-	FreeBSD* | NetBSD* | OpenBSD*)
-		# *BSD
+	FreeBSD* | OpenBSD*)
+		# FreeBSD and OpenBSD
 		INITDIR=""
 		INITDDIR=""
+		;;
+
+	NetBSD*)
+		# NetBSD
+		INITDIR=""
+		INITDDIR="/etc/rc.d"
 		;;
 
 	Linux*)
@@ -621,5 +654,5 @@ AC_DEFINE_UNQUOTED(CUPS_FONTPATH, "$fontpath")
 AC_OUTPUT(Makedefs cups.sh)
 
 dnl
-dnl End of "$Id: configure.in,v 1.72 2001/01/26 15:01:59 mike Exp $".
+dnl End of "$Id: configure.in,v 1.73 2001/02/02 16:37:43 mike Exp $".
 dnl

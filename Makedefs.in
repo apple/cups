@@ -1,5 +1,5 @@
 #
-# "$Id: Makedefs.in,v 1.33 2001/01/22 15:03:15 mike Exp $"
+# "$Id: Makedefs.in,v 1.34 2001/02/02 16:37:43 mike Exp $"
 #
 #   Common makefile definitions for the Common UNIX Printing System (CUPS).
 #
@@ -70,15 +70,19 @@ LIBZ	=	@LIBZ@
 #
 # Program options...
 #
+# GSOPTIM defines the common compiler optimization/debugging options for
+#         pstoraster (Ghostscript).
 # OPTIM   defines the common compiler optimization/debugging options.
 # OPTIONS defines other compile-time options (currently only -dDEBUG for
 #         extra debug info)
 #
 
 ARFLAGS	=	crvs
-CFLAGS	=	@CFLAGS@ $(OPTIM) -I.. $(OPTIONS)
-CXXFLAGS =	@CXXFLAGS@ $(OPTIM) -I.. $(OPTIONS)
+CFLAGS	=	@CFLAGS@ -I.. $(OPTIONS)
+CXXFLAGS =	@CXXFLAGS@ -I.. $(OPTIONS)
+DSOFLAGS =	@DSOFLAGS@
 DSOLIBS	=	@DSOLIBS@
+GSOPTIM	=	@GSOPTIM@
 IMGLIBS	=	@IMGLIBS@ -lm
 LDFLAGS	=	@LDFLAGS@ $(OPTIM)
 LINKCUPS =	@LINKCUPS@
@@ -146,10 +150,10 @@ CAT8EXT		=	@CAT8EXT@
 .SUFFIXES:	.a .c .cxx .h .man .o .0 .1 .5 .8 .z
 .c.o:
 	echo Compiling $<...
-	$(CC) $(CFLAGS) -c $<
+	$(CC) $(OPTIM) $(CFLAGS) -c $<
 .cxx.o:
 	echo Compiling $<...
-	$(CXX) $(CXXFLAGS) -c $<
+	$(CXX) $(OPTIM) $(CXXFLAGS) -c $<
 .man.0 .man.1 .man.5 .man.8:
 	echo Formatting $<...
 	$(RM) $@
@@ -162,5 +166,5 @@ CAT8EXT		=	@CAT8EXT@
 	$(MV) t.z $@
 
 #
-# End of "$Id: Makedefs.in,v 1.33 2001/01/22 15:03:15 mike Exp $"
+# End of "$Id: Makedefs.in,v 1.34 2001/02/02 16:37:43 mike Exp $"
 #
