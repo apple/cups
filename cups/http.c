@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.45 1999/08/21 18:45:25 mike Exp $"
+ * "$Id: http.c,v 1.46 1999/08/27 16:31:58 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -685,6 +685,11 @@ httpRead(http_t *http,			/* I - HTTP data */
     * data, go idle...
     */
 
+    if (http->data_encoding == HTTP_ENCODE_CHUNKED &&
+	(http->state == HTTP_GET_SEND || http->state == HTTP_POST_RECV ||
+	 http->state == HTTP_POST_SEND || http->state == HTTP_PUT_RECV))
+      httpGets(len, sizeof(len), http);
+
     if (http->state == HTTP_POST_RECV)
       http->state ++;
     else
@@ -720,12 +725,20 @@ httpRead(http_t *http,			/* I - HTTP data */
   if (bytes > 0)
     http->data_remaining -= bytes;
 
-  if (http->data_remaining == 0 && http->data_encoding != HTTP_ENCODE_CHUNKED)
+  if (http->data_remaining == 0)
   {
-    if (http->state == HTTP_POST_RECV)
-      http->state ++;
-    else
-      http->state = HTTP_WAITING;
+    if (http->data_encoding == HTTP_ENCODE_CHUNKED &&
+	(http->state == HTTP_GET_SEND || http->state == HTTP_POST_RECV ||
+	 http->state == HTTP_POST_SEND || http->state == HTTP_PUT_RECV))
+      httpGets(len, sizeof(len), http);
+
+    if (http->data_encoding != HTTP_ENCODE_CHUNKED)
+    {
+      if (http->state == HTTP_POST_RECV)
+	http->state ++;
+      else
+	http->state = HTTP_WAITING;
+    }
   }
 
   return (bytes);
@@ -754,11 +767,8 @@ httpWrite(http_t     *http,		/* I - HTTP data */
   if (http->data_encoding == HTTP_ENCODE_CHUNKED &&
       (http->state == HTTP_GET_SEND || http->state == HTTP_POST_RECV ||
        http->state == HTTP_POST_SEND || http->state == HTTP_PUT_RECV))
-  {
-    sprintf(len, "%x\r\n", length);
-    if (send(http->fd, len, strlen(len), 0) < 3)
+    if (httpPrintf(http, "%x\r\n", length) < 0)
       return (-1);
-  }
 
   if (length == 0)
   {
@@ -793,6 +803,12 @@ httpWrite(http_t     *http,		/* I - HTTP data */
     if (http->data_encoding == HTTP_ENCODE_LENGTH)
       http->data_remaining -= bytes;
   }
+
+  if (http->data_encoding == HTTP_ENCODE_CHUNKED &&
+      (http->state == HTTP_GET_SEND || http->state == HTTP_POST_RECV ||
+       http->state == HTTP_POST_SEND || http->state == HTTP_PUT_RECV))
+    if (httpPrintf(http, "\r\n") < 0)
+      return (-1);
 
   if (http->data_remaining == 0 && http->data_encoding == HTTP_ENCODE_LENGTH)
   {
@@ -863,8 +879,7 @@ httpGets(char   *line,			/* I - Line to read into */
 	* Nope, can't get a line this time...
 	*/
 
-        if (errno != lasterror && errno != ECONNRESET &&
-	    errno != ECONNABORTED && errno != ENETRESET)
+        if (errno != lasterror)
 	{
 	  lasterror = errno;
 	  continue;
@@ -1442,5 +1457,5 @@ http_send(http_t       *http,	/* I - HTTP data */
 
 
 /*
- * End of "$Id: http.c,v 1.45 1999/08/21 18:45:25 mike Exp $".
+ * End of "$Id: http.c,v 1.46 1999/08/27 16:31:58 mike Exp $".
  */
