@@ -1,0 +1,299 @@
+#
+# "$Id: cups.list,v 1.1 1999/05/21 20:52:45 mike Exp $"
+#
+#   Installation list for the Common UNIX Printing System (CUPS).
+#
+#   Copyright 1997-1999 by Easy Software Products, all rights reserved.
+#
+#   These coded instructions, statements, and computer programs are the
+#   property of Easy Software Products and are protected by Federal
+#   copyright law.  Distribution and use rights are outlined in the file
+#   "LICENSE.txt" which should have been included with this file.  If this
+#   file is missing or damaged please contact Easy Software Products
+#   at:
+#
+#       Attn: CUPS Licensing Information
+#       Easy Software Products
+#       44145 Airport View Drive, Suite 204
+#       Hollywood, Maryland 20636-3111 USA
+#
+#       Voice: (301) 373-9603
+#       EMail: cups-info@cups.org
+#         WWW: http://www.cups.org
+#
+
+%product Common UNIX Printing System
+%copyright 1993-1999 by Easy Software Products, All Rights Reserved.
+%vendor Easy Software Products
+%license LICENSE.cups
+%readme README.cups
+%version 1.0b2
+
+%system all
+# Server files
+f 0555 root sys /var/cups/backend/lpd backend/lpd
+f 0555 root sys /var/cups/backend/parallel backend/parallel
+f 0555 root sys /var/cups/backend/serial backend/serial
+f 0555 root sys /var/cups/backend/socket backend/socket
+f 0500 root sys /usr/sbin/cupsd scheduler/cupsd
+f 0555 root sys /var/cups/cgi-bin/printers.cgi cgi-bin/printers.cgi
+f 0555 root sys /var/cups/filter/pstoraster pstoraster/pstoraster
+f 0555 root sys /var/cups/filter/imagetops filter/imagetops
+f 0555 root sys /var/cups/filter/pstops filter/pstops
+f 0555 root sys /var/cups/filter/texttops filter/texttops
+f 0555 root sys /var/cups/filter/rastertohp filter/rastertohp
+f 0555 root sys /var/cups/filter/hpgltops filter/hpgltops
+f 0555 root sys /var/cups/filter/imagetoraster filter/imagetoraster
+
+# User commands
+f 0555 root sys /usr/bin/lp systemv/lp
+f 0555 root sys /usr/bin/lpstat systemv/lpstat
+f 0555 root sys /usr/lib/lpadmin systemv/lpadmin
+f 0555 root sys /usr/lib/cancel systemv/cancel
+f 0555 root sys /usr/lib/accept systemv/accept
+l 0555 root sys /usr/lib/reject accept
+l 0555 root sys /usr/bin/disable /usr/lib/accept
+l 0555 root sys /usr/bin/enable /usr/lib/accept
+f 0555 root sys /usr/sbin/lpc berkeley/lpc
+f 0555 root sys /usr/bin/lpr berkeley/lpr
+f 0555 root sys /usr/bin/lprm berkeley/lprm
+
+# Directories
+d 0755 root sys /var/cups/interfaces
+d 0755 root sys /var/cups/logs
+d 0755 root sys /var/cups/ppd
+d 0755 root sys /var/cups/requests
+
+# Data files
+f 0444 root sys /usr/lib/locale/C/cups_C locale/C/cups_C
+f 0444 root sys /usr/lib/locale/de/cups_de locale/de/cups_de
+f 0444 root sys /usr/lib/locale/en/cups_en locale/en/cups_en
+f 0444 root sys /usr/lib/locale/es/cups_es locale/es/cups_es
+f 0444 root sys /usr/lib/locale/fr/cups_fr locale/fr/cups_fr
+f 0444 root sys /usr/lib/locale/it/cups_it locale/it/cups_it
+f 0444 root sys /usr/share/cups/data/8859-1 data/8859-1
+f 0444 root sys /usr/share/cups/data/8859-14 data/8859-14
+f 0444 root sys /usr/share/cups/data/8859-15 data/8859-15
+f 0444 root sys /usr/share/cups/data/8859-2 data/8859-2
+f 0444 root sys /usr/share/cups/data/8859-3 data/8859-3
+f 0444 root sys /usr/share/cups/data/8859-4 data/8859-4
+f 0444 root sys /usr/share/cups/data/8859-5 data/8859-5
+f 0444 root sys /usr/share/cups/data/8859-6 data/8859-6
+f 0444 root sys /usr/share/cups/data/8859-7 data/8859-7
+f 0444 root sys /usr/share/cups/data/8859-8 data/8859-8
+f 0444 root sys /usr/share/cups/data/8859-9 data/8859-9
+f 0444 root sys /usr/share/cups/data/HPGLprolog data/HPGLprolog
+f 0444 root sys /usr/share/cups/data/psglyphs data/psglyphs
+f 0444 root sys /usr/share/cups/fonts/AvantGarde-Book fonts/AvantGarde-Book
+f 0444 root sys /usr/share/cups/fonts/AvantGarde-BookOblique fonts/AvantGarde-BookOblique
+f 0444 root sys /usr/share/cups/fonts/AvantGarde-Demi fonts/AvantGarde-Demi
+f 0444 root sys /usr/share/cups/fonts/AvantGarde-DemiOblique fonts/AvantGarde-DemiOblique
+f 0444 root sys /usr/share/cups/fonts/Bookman-Demi fonts/Bookman-Demi
+f 0444 root sys /usr/share/cups/fonts/Bookman-DemiItalic fonts/Bookman-DemiItalic
+f 0444 root sys /usr/share/cups/fonts/Bookman-Light fonts/Bookman-Light
+f 0444 root sys /usr/share/cups/fonts/Bookman-LightItalic fonts/Bookman-LightItalic
+f 0444 root sys /usr/share/cups/fonts/Courier fonts/Courier
+f 0444 root sys /usr/share/cups/fonts/Courier-Bold fonts/Courier-Bold
+f 0444 root sys /usr/share/cups/fonts/Courier-BoldOblique fonts/Courier-BoldOblique
+f 0444 root sys /usr/share/cups/fonts/Courier-Oblique fonts/Courier-Oblique
+f 0444 root sys /usr/share/cups/fonts/Helvetica fonts/Helvetica
+f 0444 root sys /usr/share/cups/fonts/Helvetica-Bold fonts/Helvetica-Bold
+f 0444 root sys /usr/share/cups/fonts/Helvetica-BoldOblique fonts/Helvetica-BoldOblique
+f 0444 root sys /usr/share/cups/fonts/Helvetica-Narrow fonts/Helvetica-Narrow
+f 0444 root sys /usr/share/cups/fonts/Helvetica-Narrow-Bold fonts/Helvetica-Narrow-Bold
+f 0444 root sys /usr/share/cups/fonts/Helvetica-Narrow-BoldOblique fonts/Helvetica-Narrow-BoldOblique
+f 0444 root sys /usr/share/cups/fonts/Helvetica-Narrow-Oblique fonts/Helvetica-Narrow-Oblique
+f 0444 root sys /usr/share/cups/fonts/Helvetica-Oblique fonts/Helvetica-Oblique
+f 0444 root sys /usr/share/cups/fonts/NewCenturySchlbk-Bold fonts/NewCenturySchlbk-Bold
+f 0444 root sys /usr/share/cups/fonts/NewCenturySchlbk-BoldItalic fonts/NewCenturySchlbk-BoldItalic
+f 0444 root sys /usr/share/cups/fonts/NewCenturySchlbk-Italic fonts/NewCenturySchlbk-Italic
+f 0444 root sys /usr/share/cups/fonts/NewCenturySchlbk-Roman fonts/NewCenturySchlbk-Roman
+f 0444 root sys /usr/share/cups/fonts/Palatino-Bold fonts/Palatino-Bold
+f 0444 root sys /usr/share/cups/fonts/Palatino-BoldItalic fonts/Palatino-BoldItalic
+f 0444 root sys /usr/share/cups/fonts/Palatino-Italic fonts/Palatino-Italic
+f 0444 root sys /usr/share/cups/fonts/Palatino-Roman fonts/Palatino-Roman
+f 0444 root sys /usr/share/cups/fonts/Symbol fonts/Symbol
+f 0444 root sys /usr/share/cups/fonts/Times-Bold fonts/Times-Bold
+f 0444 root sys /usr/share/cups/fonts/Times-BoldItalic fonts/Times-BoldItalic
+f 0444 root sys /usr/share/cups/fonts/Times-Italic fonts/Times-Italic
+f 0444 root sys /usr/share/cups/fonts/Times-Roman fonts/Times-Roman
+f 0444 root sys /usr/share/cups/fonts/Utopia-Bold fonts/Utopia-Bold
+f 0444 root sys /usr/share/cups/fonts/Utopia-BoldItalic fonts/Utopia-BoldItalic
+f 0444 root sys /usr/share/cups/fonts/Utopia-Italic fonts/Utopia-Italic
+f 0444 root sys /usr/share/cups/fonts/Utopia-Regular fonts/Utopia-Regular
+f 0444 root sys /usr/share/cups/fonts/ZapfChancery-MediumItalic fonts/ZapfChancery-MediumItalic
+f 0444 root sys /usr/share/cups/fonts/ZapfDingbats fonts/ZapfDingbats
+f 0444 root sys /usr/share/cups/pstoraster/Fontmap pstoraster/Fontmap
+f 0444 root sys /usr/share/cups/pstoraster/gs_l2img.ps pstoraster/gs_l2img.ps
+f 0444 root sys /usr/share/cups/pstoraster/gs_pfile.ps pstoraster/gs_pfile.ps
+f 0444 root sys /usr/share/cups/pstoraster/pfbtogs.ps pstoraster/pfbtogs.ps
+f 0444 root sys /usr/share/cups/pstoraster/gs_wl1_e.ps pstoraster/gs_wl1_e.ps
+f 0444 root sys /usr/share/cups/pstoraster/gs_wl2_e.ps pstoraster/gs_wl2_e.ps
+f 0444 root sys /usr/share/cups/pstoraster/gs_wl5_e.ps pstoraster/gs_wl5_e.ps
+f 0444 root sys /usr/share/cups/pstoraster/gs_wan_e.ps pstoraster/gs_wan_e.ps
+f 0444 root sys /usr/share/cups/pstoraster/gs_pdf_e.ps pstoraster/gs_pdf_e.ps
+f 0444 root sys /usr/share/cups/pstoraster/gs_sym_e.ps pstoraster/gs_sym_e.ps
+f 0444 root sys /usr/share/cups/pstoraster/gs_std_e.ps pstoraster/gs_std_e.ps
+f 0444 root sys /usr/share/cups/pstoraster/gs_dbt_e.ps pstoraster/gs_dbt_e.ps
+f 0444 root sys /usr/share/cups/pstoraster/gs_mex_e.ps pstoraster/gs_mex_e.ps
+f 0444 root sys /usr/share/cups/pstoraster/gs_mro_e.ps pstoraster/gs_mro_e.ps
+f 0444 root sys /usr/share/cups/pstoraster/gs_iso_e.ps pstoraster/gs_iso_e.ps
+f 0444 root sys /usr/share/cups/pstoraster/gs_ksb_e.ps pstoraster/gs_ksb_e.ps
+f 0444 root sys /usr/share/cups/pstoraster/gs_ttf.ps pstoraster/gs_ttf.ps
+f 0444 root sys /usr/share/cups/pstoraster/gs_pdf.ps pstoraster/gs_pdf.ps
+f 0444 root sys /usr/share/cups/pstoraster/gs_ccfnt.ps pstoraster/gs_ccfnt.ps
+f 0444 root sys /usr/share/cups/pstoraster/pdf_sec.ps pstoraster/pdf_sec.ps
+f 0444 root sys /usr/share/cups/pstoraster/gs_res.ps pstoraster/gs_res.ps
+f 0444 root sys /usr/share/cups/pstoraster/pdf_base.ps pstoraster/pdf_base.ps
+f 0444 root sys /usr/share/cups/pstoraster/gs_btokn.ps pstoraster/gs_btokn.ps
+f 0444 root sys /usr/share/cups/pstoraster/gs_diskf.ps pstoraster/gs_diskf.ps
+f 0444 root sys /usr/share/cups/pstoraster/pdf_2ps.ps pstoraster/pdf_2ps.ps
+f 0444 root sys /usr/share/cups/pstoraster/gs_init.ps pstoraster/gs_init.ps
+f 0444 root sys /usr/share/cups/pstoraster/gs_kanji.ps pstoraster/gs_kanji.ps
+f 0444 root sys /usr/share/cups/pstoraster/pdf_draw.ps pstoraster/pdf_draw.ps
+f 0444 root sys /usr/share/cups/pstoraster/pdf_font.ps pstoraster/pdf_font.ps
+f 0444 root sys /usr/share/cups/pstoraster/gs_type1.ps pstoraster/gs_type1.ps
+f 0444 root sys /usr/share/cups/pstoraster/gs_fonts.ps pstoraster/gs_fonts.ps
+f 0444 root sys /usr/share/cups/pstoraster/gs_statd.ps pstoraster/gs_statd.ps
+f 0444 root sys /usr/share/cups/pstoraster/gs_lev2.ps pstoraster/gs_lev2.ps
+f 0444 root sys /usr/share/cups/pstoraster/gs_typ42.ps pstoraster/gs_typ42.ps
+f 0444 root sys /usr/share/cups/pstoraster/gs_pdfwr.ps pstoraster/gs_pdfwr.ps
+f 0444 root sys /usr/share/cups/pstoraster/gs_cidfn.ps pstoraster/gs_cidfn.ps
+f 0444 root sys /usr/share/cups/pstoraster/gs_cmdl.ps pstoraster/gs_cmdl.ps
+f 0444 root sys /usr/share/cups/pstoraster/gs_dps1.ps pstoraster/gs_dps1.ps
+f 0444 root sys /usr/share/cups/pstoraster/gs_setpd.ps pstoraster/gs_setpd.ps
+f 0444 root sys /usr/share/cups/pstoraster/gs_cmap.ps pstoraster/gs_cmap.ps
+f 0444 root sys /usr/share/cups/pstoraster/gs_fform.ps pstoraster/gs_fform.ps
+f 0444 root sys /usr/share/cups/pstoraster/pdf_main.ps pstoraster/pdf_main.ps
+f 0444 root sys /usr/share/cups/model/deskjet.ppd ppd/deskjet.ppd
+f 0444 root sys /usr/share/cups/model/laserjet.ppd ppd/laserjet.ppd
+
+# Config files
+c 0600 root sys /var/cups/conf/classes.conf conf/classes.conf
+c 0600 root sys /var/cups/conf/cupsd.conf conf/cupsd.conf
+c 0600 root sys /var/cups/conf/mime.convs conf/mime.convs
+c 0600 root sys /var/cups/conf/mime.types conf/mime.types
+c 0600 root sys /var/cups/conf/printers.conf conf/printers.conf
+
+# Documentation files
+f 0444 root sys /usr/share/cups/doc/cmp.html doc/cmp.html
+f 0444 root sys /usr/share/cups/doc/cmp.pdf doc/cmp.pdf
+f 0444 root sys /usr/share/cups/doc/cupsdoc.css doc/cupsdoc.css
+F 0444 root sys /usr/share/cups/doc/cups.css doc/cups.css
+F 0444 root sys /usr/share/cups/doc/documentation.html doc/documentation.html
+F 0444 root sys /usr/share/cups/doc/idd.html doc/idd.html
+F 0444 root sys /usr/share/cups/doc/idd.pdf doc/idd.pdf
+f 0444 root sys /usr/share/cups/doc/images/cups-bar.gif doc/images/cups-bar.gif
+f 0444 root sys /usr/share/cups/doc/images/cups-block-diagram.gif doc/images/cups-block-diagram.gif
+f 0444 root sys /usr/share/cups/doc/images/cups-large.gif doc/images/cups-large.gif
+f 0444 root sys /usr/share/cups/doc/images/cups-medium.gif doc/images/cups-medium.gif
+f 0444 root sys /usr/share/cups/doc/images/cups-small.gif doc/images/cups-small.gif
+f 0444 root sys /usr/share/cups/doc/images/logo.gif doc/images/logo.gif
+f 0444 root sys /usr/share/cups/doc/images/navbar.gif doc/images/navbar.gif
+f 0444 root sys /usr/share/cups/doc/images/printer-idle.gif doc/images/printer-idle.gif
+f 0444 root sys /usr/share/cups/doc/images/printer-processing.gif doc/images/printer-processing.gif
+f 0444 root sys /usr/share/cups/doc/images/printer-stopped.gif doc/images/printer-stopped.gif
+F 0444 root sys /usr/share/cups/doc/index.html doc/index.html
+f 0444 root sys /usr/share/cups/doc/overview.html doc/overview.html
+f 0444 root sys /usr/share/cups/doc/overview.pdf doc/overview.pdf
+F 0444 root sys /usr/share/cups/doc/sam.html doc/sam.html
+F 0444 root sys /usr/share/cups/doc/sam.pdf doc/sam.pdf
+f 0444 root sys /usr/share/cups/doc/sdd.html doc/sdd.html
+f 0444 root sys /usr/share/cups/doc/sdd.pdf doc/sdd.pdf
+f 0444 root sys /usr/share/cups/doc/ssr.html doc/ssr.html
+f 0444 root sys /usr/share/cups/doc/ssr.pdf doc/ssr.pdf
+f 0444 root sys /usr/share/cups/doc/stp.html doc/stp.html
+f 0444 root sys /usr/share/cups/doc/stp.pdf doc/stp.pdf
+F 0444 root sys /usr/share/cups/doc/sum.html doc/sum.html
+F 0444 root sys /usr/share/cups/doc/sum.pdf doc/sum.pdf
+f 0444 root sys /usr/share/cups/doc/svd.html doc/svd.html
+f 0444 root sys /usr/share/cups/doc/svd.pdf doc/svd.pdf
+
+# Man pages
+%system irix64
+f 0444 root sys /usr/share/catman/a_man/cat1/accept.z man/accept.z
+l 0444 root sys /usr/share/catman/a_man/cat1/reject.z accept.z
+f 0444 root sys /usr/share/catman/u_man/cat1/backend.z man/backend.z
+f 0444 root sys /usr/share/catman/u_man/cat5/classes.conf.z man/classes.conf.z
+f 0444 root sys /usr/share/catman/u_man/cat5/cupsd.conf.z man/cupsd.conf.z
+f 0444 root sys /usr/share/catman/a_man/cat1/cupsd.z man/cupsd.z
+f 0444 root sys /usr/share/catman/a_man/cat1/enable.z man/enable.z
+l 0444 root sys /usr/share/catman/a_man/cat1/disable.z enable.z
+f 0444 root sys /usr/share/catman/u_man/cat1/filter.z man/filter.z
+f 0444 root sys /usr/share/catman/a_man/cat1/lpadmin.z man/lpadmin.z
+f 0444 root sys /usr/share/catman/a_man/cat1/lpc.z man/lpc.z
+f 0444 root sys /usr/share/catman/u_man/cat1/lprm.z man/lprm.z
+f 0444 root sys /usr/share/catman/u_man/cat1/lpr.z man/lpr.z
+f 0444 root sys /usr/share/catman/u_man/cat1/lpstat.z man/lpstat.z
+f 0444 root sys /usr/share/catman/u_man/cat1/lp.z man/lp.z
+l 0444 root sys /usr/share/catman/u_man/cat1/cancel.z lp.z
+f 0444 root sys /usr/share/catman/u_man/cat5/mime.convs.z man/mime.convs.z
+f 0444 root sys /usr/share/catman/u_man/cat5/mime.types.z man/mime.types.z
+f 0444 root sys /usr/share/catman/u_man/cat5/printers.conf.z man/printers.conf.z
+%system hpux linux osf1 sunos
+f 0444 root sys /usr/man/man8/accept.8 man/accept.8
+l 0444 root sys /usr/man/man8/reject.8 accept.8
+f 0444 root sys /usr/man/man1/backend.1 man/backend.1
+f 0444 root sys /usr/man/man1/classes.conf.5 man/classes.conf.5
+f 0444 root sys /usr/man/man8/cupsd.8 man/cupsd.8
+f 0444 root sys /usr/man/man5/cupsd.conf.5 man/cupsd.conf.5
+f 0444 root sys /usr/man/man8/enable.8 man/enable.8
+l 0444 root sys /usr/man/man8/disable.8 enable.8
+f 0444 root sys /usr/man/man1/filter.1 man/filter.1
+f 0444 root sys /usr/man/man8/lpadmin.8 man/lpadmin.8
+f 0444 root sys /usr/man/man8/lpc.8 man/lpc.8
+f 0444 root sys /usr/man/man1/lprm.1 man/lprm.1
+f 0444 root sys /usr/man/man1/lpr.1 man/lpr.1
+f 0444 root sys /usr/man/man1/lpstat.1 man/lpstat.1
+f 0444 root sys /usr/man/man1/lp.1 man/lp.1
+l 0444 root sys /usr/man/man1/cancel.1 lp.1
+f 0444 root sys /usr/man/man5/mime.convs.5 man/mime.convs.5
+f 0444 root sys /usr/man/man5/mime.types.5 man/mime.types.5
+f 0444 root sys /usr/man/man5/printers.conf.5 man/printers.conf.5
+
+# Startup scripts
+%system hpux
+%install /sbin/init.d/lp start
+%remove /sbin/init.d/lp stop
+%patch /sbin/init.d/lp stop
+f 0555 root sys /sbin/init.d/lp packages/cups.sh
+l 0555 root sys /sbin/rc1.d/K280lp ../init.d/lp
+l 0555 root sys /sbin/rc2.d/S720lp ../init.d/lp
+%system irix64
+%install /etc/init.d/lp start
+%remove /etc/init.d/lp stop
+%patch /etc/init.d/lp stop
+f 0555 root sys /etc/init.d/lp packages/cups.sh
+l 0555 root sys /etc/rc0.d/K25lp ../init.d/lp
+l 0555 root sys /etc/rc2.d/S60lp ../init.d/lp
+%system linux
+%install /etc/rc.d/init.d/lpd start
+%remove /etc/rc.d/init.d/lpd stop
+%patch /etc/rc.d/init.d/lpd stop
+f 0555 root sys /etc/rc.d/init.d/lpd packages/cups.sh
+l 0555 root sys /etc/rc.d/rc2.d/S60lpd ../init.d/lpd
+l 0555 root sys /etc/rc.d/rc3.d/S60lpd ../init.d/lpd
+l 0555 root sys /etc/rc.d/rc4.d/S60lpd ../init.d/lpd
+l 0555 root sys /etc/rc.d/rc5.d/S60lpd ../init.d/lpd
+l 0555 root sys /etc/rc.d/rc0.d/K60lpd ../init.d/lpd
+l 0555 root sys /etc/rc.d/rc1.d/K60lpd ../init.d/lpd
+l 0555 root sys /etc/rc.d/rc6.d/K60lpd ../init.d/lpd
+%system osf1
+%install /sbin/init.d/lpd start
+%remove /sbin/init.d/lpd stop
+%patch /sbin/init.d/lpd stop
+f 0555 root sys /sbin/init.d/lpd packages/cups.sh
+l 0555 root sys /sbin/rc0.d/K05lpd ../init.d/lpd
+l 0555 root sys /sbin/rc2.d/K00lpd ../init.d/lpd
+l 0555 root sys /sbin/rc3.d/S65lpd ../init.d/lpd
+%system sunos
+%install /etc/init.d/lp start
+%remove /etc/init.d/lp stop
+%patch /etc/init.d/lp stop
+f 0555 root sys /etc/init.d/lp packages/cups.sh
+l 0555 root sys /etc/rc0.d/K20lp ../init.d/cups
+l 0555 root sys /etc/rc2.d/S80lp ../init.d/cups
+
+#
+# End of "$Id: cups.list,v 1.1 1999/05/21 20:52:45 mike Exp $".
+#
