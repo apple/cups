@@ -4,7 +4,7 @@
 <TITLE>CUPS Software Programmers Manual</TITLE>
 <META NAME="author" CONTENT="Easy Software Products">
 <META NAME="copyright" CONTENT="Copyright 1997-2003, All Rights Reserved">
-<META NAME="docnumber" CONTENT="CUPS-SPM-1.1.18">
+<META NAME="docnumber" CONTENT="CUPS-SPM-1.1.19">
 <META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-8859-1">
 <STYLE TYPE="text/css"><!--
 BODY { font-family: serif }
@@ -22,7 +22,7 @@ PRE { font-family: monospace }
 <BODY BGCOLOR="white">
 <CENTER><A HREF="#CONTENTS"><IMG SRC="images/cups-large.gif" BORDER="0" WIDTH="431" HEIGHT="511"><BR>
 <H1>CUPS Software Programmers Manual</H1></A><BR>
-CUPS-SPM-1.1.18<BR>
+CUPS-SPM-1.1.19<BR>
 Easy Software Products<BR>
 Copyright 1997-2003, All Rights Reserved<BR>
 </CENTER>
@@ -1175,7 +1175,7 @@ Copyright 1997-2003, All Rights Reserved<BR>
 <LI><A HREF="#10_111_5">Example</A></LI>
 <LI><A HREF="#10_111_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#ppdFindChoice">ppdFindChoice()</A></LI>
+<LI><A HREF="#ppdFindAttr">ppdFindAttr()</A></LI>
 <UL>
 <LI><A HREF="#10_112_1">Usage</A></LI>
 <LI><A HREF="#10_112_2">Arguments</A></LI>
@@ -1184,7 +1184,7 @@ Copyright 1997-2003, All Rights Reserved<BR>
 <LI><A HREF="#10_112_5">Example</A></LI>
 <LI><A HREF="#10_112_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#ppdFindMarkedChoice">ppdFindMarkedChoice()</A></LI>
+<LI><A HREF="#ppdFindChoice">ppdFindChoice()</A></LI>
 <UL>
 <LI><A HREF="#10_113_1">Usage</A></LI>
 <LI><A HREF="#10_113_2">Arguments</A></LI>
@@ -1193,7 +1193,7 @@ Copyright 1997-2003, All Rights Reserved<BR>
 <LI><A HREF="#10_113_5">Example</A></LI>
 <LI><A HREF="#10_113_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#ppdFindOption">ppdFindOption()</A></LI>
+<LI><A HREF="#ppdFindMarkedChoice">ppdFindMarkedChoice()</A></LI>
 <UL>
 <LI><A HREF="#10_114_1">Usage</A></LI>
 <LI><A HREF="#10_114_2">Arguments</A></LI>
@@ -1202,7 +1202,7 @@ Copyright 1997-2003, All Rights Reserved<BR>
 <LI><A HREF="#10_114_5">Example</A></LI>
 <LI><A HREF="#10_114_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#ppdIsMarked">ppdIsMarked()</A></LI>
+<LI><A HREF="#ppdFindNextAttr">ppdFindNextAttr()</A></LI>
 <UL>
 <LI><A HREF="#10_115_1">Usage</A></LI>
 <LI><A HREF="#10_115_2">Arguments</A></LI>
@@ -1211,15 +1211,16 @@ Copyright 1997-2003, All Rights Reserved<BR>
 <LI><A HREF="#10_115_5">Example</A></LI>
 <LI><A HREF="#10_115_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#ppdMarkDefaults">ppdMarkDefaults()</A></LI>
+<LI><A HREF="#ppdFindOption">ppdFindOption()</A></LI>
 <UL>
 <LI><A HREF="#10_116_1">Usage</A></LI>
 <LI><A HREF="#10_116_2">Arguments</A></LI>
-<LI><A HREF="#10_116_3">Description</A></LI>
-<LI><A HREF="#10_116_4">Example</A></LI>
-<LI><A HREF="#10_116_5">See Also</A></LI>
+<LI><A HREF="#10_116_3">Returns</A></LI>
+<LI><A HREF="#10_116_4">Description</A></LI>
+<LI><A HREF="#10_116_5">Example</A></LI>
+<LI><A HREF="#10_116_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#ppdMarkOption">ppdMarkOption()</A></LI>
+<LI><A HREF="#ppdIsMarked">ppdIsMarked()</A></LI>
 <UL>
 <LI><A HREF="#10_117_1">Usage</A></LI>
 <LI><A HREF="#10_117_2">Arguments</A></LI>
@@ -1228,16 +1229,15 @@ Copyright 1997-2003, All Rights Reserved<BR>
 <LI><A HREF="#10_117_5">Example</A></LI>
 <LI><A HREF="#10_117_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#ppdOpen">ppdOpen()</A></LI>
+<LI><A HREF="#ppdMarkDefaults">ppdMarkDefaults()</A></LI>
 <UL>
 <LI><A HREF="#10_118_1">Usage</A></LI>
 <LI><A HREF="#10_118_2">Arguments</A></LI>
-<LI><A HREF="#10_118_3">Returns</A></LI>
-<LI><A HREF="#10_118_4">Description</A></LI>
-<LI><A HREF="#10_118_5">Example</A></LI>
-<LI><A HREF="#10_118_6">See Also</A></LI>
+<LI><A HREF="#10_118_3">Description</A></LI>
+<LI><A HREF="#10_118_4">Example</A></LI>
+<LI><A HREF="#10_118_5">See Also</A></LI>
 </UL>
-<LI><A HREF="#ppdOpenFd">ppdOpenFd()</A></LI>
+<LI><A HREF="#ppdMarkOption">ppdMarkOption()</A></LI>
 <UL>
 <LI><A HREF="#10_119_1">Usage</A></LI>
 <LI><A HREF="#10_119_2">Arguments</A></LI>
@@ -1246,7 +1246,7 @@ Copyright 1997-2003, All Rights Reserved<BR>
 <LI><A HREF="#10_119_5">Example</A></LI>
 <LI><A HREF="#10_119_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#ppdOpenFile">ppdOpenFile()</A></LI>
+<LI><A HREF="#ppdOpen">ppdOpen()</A></LI>
 <UL>
 <LI><A HREF="#10_120_1">Usage</A></LI>
 <LI><A HREF="#10_120_2">Arguments</A></LI>
@@ -1255,7 +1255,7 @@ Copyright 1997-2003, All Rights Reserved<BR>
 <LI><A HREF="#10_120_5">Example</A></LI>
 <LI><A HREF="#10_120_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#ppdPageLength">ppdPageLength()</A></LI>
+<LI><A HREF="#ppdOpenFd">ppdOpenFd()</A></LI>
 <UL>
 <LI><A HREF="#10_121_1">Usage</A></LI>
 <LI><A HREF="#10_121_2">Arguments</A></LI>
@@ -1264,7 +1264,7 @@ Copyright 1997-2003, All Rights Reserved<BR>
 <LI><A HREF="#10_121_5">Example</A></LI>
 <LI><A HREF="#10_121_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#ppdPageSize">ppdPageSize()</A></LI>
+<LI><A HREF="#ppdOpenFile">ppdOpenFile()</A></LI>
 <UL>
 <LI><A HREF="#10_122_1">Usage</A></LI>
 <LI><A HREF="#10_122_2">Arguments</A></LI>
@@ -1273,7 +1273,7 @@ Copyright 1997-2003, All Rights Reserved<BR>
 <LI><A HREF="#10_122_5">Example</A></LI>
 <LI><A HREF="#10_122_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#ppdPageWidth">ppdPageWidth()</A></LI>
+<LI><A HREF="#ppdPageLength">ppdPageLength()</A></LI>
 <UL>
 <LI><A HREF="#10_123_1">Usage</A></LI>
 <LI><A HREF="#10_123_2">Arguments</A></LI>
@@ -1282,12 +1282,30 @@ Copyright 1997-2003, All Rights Reserved<BR>
 <LI><A HREF="#10_123_5">Example</A></LI>
 <LI><A HREF="#10_123_6">See Also</A></LI>
 </UL>
+<LI><A HREF="#ppdPageSize">ppdPageSize()</A></LI>
+<UL>
+<LI><A HREF="#10_124_1">Usage</A></LI>
+<LI><A HREF="#10_124_2">Arguments</A></LI>
+<LI><A HREF="#10_124_3">Returns</A></LI>
+<LI><A HREF="#10_124_4">Description</A></LI>
+<LI><A HREF="#10_124_5">Example</A></LI>
+<LI><A HREF="#10_124_6">See Also</A></LI>
+</UL>
+<LI><A HREF="#ppdPageWidth">ppdPageWidth()</A></LI>
+<UL>
+<LI><A HREF="#10_125_1">Usage</A></LI>
+<LI><A HREF="#10_125_2">Arguments</A></LI>
+<LI><A HREF="#10_125_3">Returns</A></LI>
+<LI><A HREF="#10_125_4">Description</A></LI>
+<LI><A HREF="#10_125_5">Example</A></LI>
+<LI><A HREF="#10_125_6">See Also</A></LI>
+</UL>
 </UL>
 <HR>
 <H1 ALIGN="RIGHT"><A NAME="1">Preface</A></H1>
 <P>This software programmers manual provides software programming
  information for the Common UNIX Printing System (&quot;CUPS&quot;) Version
- 1.1.18.</P>
+ 1.1.19.</P>
 <H2><A NAME="1_1">System Overview</A></H2>
 <P>CUPS provides a portable printing layer for UNIX&reg;-based operating
  systems. It has been developed by<A HREF="http://www.easysw.com"> Easy
@@ -1300,10 +1318,20 @@ Copyright 1997-2003, All Rights Reserved<BR>
  also supported with reduced functionality. CUPS adds network printer
  browsing and PostScript Printer Description (&quot;PPD&quot;) based printing
  options to support real-world printing under UNIX.</P>
-<P>CUPS also includes a customized version of GNU Ghostscript (currently
- based off GNU Ghostscript 5.50) and an image file RIP that are used to
- support non-PostScript printers. Sample drivers for HP and EPSON
- printers are included that use these filters.</P>
+<P>CUPS includes an image file RIP that supports printing of image files
+ to non-PostScript printers. A customized version of GNU Ghostscript
+ 7.05 for CUPS called ESP Ghostscript is available separately to support
+ printing of PostScript files within the CUPS driver framework. Sample
+ drivers for Dymo, EPSON, HP, and OKIDATA printers are included that use
+ these filters.</P>
+<P>Drivers for thousands of printers are provided with our ESP Print Pro
+ software, available at:</P>
+<PRE>
+    <A HREF="http://www.easysw.com/printpro/">http://www.easysw.com/printpro/</A>
+</PRE>
+<P>CUPS is licensed under the GNU General Public License and GNU Library
+ General Public License. Please contact Easy Software Products for
+ commercial support and &quot;binary distribution&quot; rights.</P>
 
 <!-- NEED 2in -->
 <H2><A NAME="1_2">Document Overview</A></H2>
@@ -8489,14 +8517,51 @@ ppdEmitFd(ppd, 1, PPD_ORDER_PAGE);
 <A HREF="#ppdEmit"> <CODE>ppdEmit()</CODE></A>
 <!-- NEW PAGE -->
 
-<H2><A NAME="ppdFindChoice">ppdFindChoice()</A></H2>
+<H2><A NAME="ppdFindAttr">ppdFindAttr()</A></H2>
 <H3><A NAME="10_112_1">Usage</A></H3>
+<PRE>
+ppd_attr_t *
+ppdFindAttr(ppd_file_t *ppd,
+            const char *keyword,
+	    const char *spec);
+</PRE>
+<H3><A NAME="10_112_2">Arguments</A></H3>
+<CENTER>
+<TABLE BORDER WIDTH="80%">
+<TR><TH>Argument</TH><TH>Description</TH></TR>
+<TR><TD>ppd</TD><TD>The PPD file</TD></TR>
+<TR><TD>keyword</TD><TD>The name of the attribute</TD></TR>
+<TR><TD>spec</TD><TD>The option keyword associated with the attribute or
+ NULL if you don't care.</TD></TR>
+</TABLE>
+</CENTER>
+<H3><A NAME="10_112_3">Returns</A></H3>
+<P>A pointer to the attribute data or NULL if the attribute does not
+ exist.</P>
+<H3><A NAME="10_112_4">Description</A></H3>
+<P>The <CODE>ppdFindAttr()</CODE> function returns a pointer to the
+ first occurrence of the attribute in the PPD file.</P>
+<H3><A NAME="10_112_5">Example</A></H3>
+<PRE>
+#include &lt;cups/ppd.h&gt;
+
+ppd_file_t *ppd;
+ppd_attr_t *attr;
+
+attr = ppdFindAttr(ppd, &quot;RequiresPageRegion&quot;, &quot;Upper&quot;);
+</PRE>
+<H3><A NAME="10_112_6">See Also</A></H3>
+<A HREF="#ppdFindNextAttr"> <CODE>ppdFindNextAttr()</CODE></A>
+<!-- NEW PAGE -->
+
+<H2><A NAME="ppdFindChoice">ppdFindChoice()</A></H2>
+<H3><A NAME="10_113_1">Usage</A></H3>
 <PRE>
 ppd_choice_t *
 ppdFindChoice(ppd_option_t *option,
               const char   *choice);
 </PRE>
-<H3><A NAME="10_112_2">Arguments</A></H3>
+<H3><A NAME="10_113_2">Arguments</A></H3>
 <CENTER>
 <TABLE BORDER WIDTH="80%">
 <TR><TH>Argument</TH><TH>Description</TH></TR>
@@ -8504,12 +8569,12 @@ ppdFindChoice(ppd_option_t *option,
 <TR><TD>choice</TD><TD>The name of the choice</TD></TR>
 </TABLE>
 </CENTER>
-<H3><A NAME="10_112_3">Returns</A></H3>
+<H3><A NAME="10_113_3">Returns</A></H3>
 <P>A pointer to the choice data or NULL if the choice does not exist.</P>
-<H3><A NAME="10_112_4">Description</A></H3>
+<H3><A NAME="10_113_4">Description</A></H3>
 <P>The <CODE>ppdFindChoice()</CODE> function returns a pointer to the
  choice data for the specified option.</P>
-<H3><A NAME="10_112_5">Example</A></H3>
+<H3><A NAME="10_113_5">Example</A></H3>
 <PRE>
 #include &lt;cups/ppd.h&gt;
 
@@ -8520,52 +8585,17 @@ ppd_choice_t *choice;
 option = ppdFindOption(ppd, &quot;PageSize&quot;);
 choice = ppdFindChoice(option, &quot;Letter&quot;);
 </PRE>
-<H3><A NAME="10_112_6">See Also</A></H3>
+<H3><A NAME="10_113_6">See Also</A></H3>
 <A HREF="#ppdFindMarkedChoice"> <CODE>ppdFindMarkedChoice()</CODE></A>,<A
 HREF="#ppdFindOption"> <CODE>ppdFindOption()</CODE></A>
 <!-- NEW PAGE -->
 
 <H2><A NAME="ppdFindMarkedChoice">ppdFindMarkedChoice()</A></H2>
-<H3><A NAME="10_113_1">Usage</A></H3>
+<H3><A NAME="10_114_1">Usage</A></H3>
 <PRE>
 ppd_choice_t *
 ppdFindMarkedChoice(ppd_file_t *ppd,
                     const char *keyword);
-</PRE>
-<H3><A NAME="10_113_2">Arguments</A></H3>
-<CENTER>
-<TABLE BORDER WIDTH="80%">
-<TR><TH>Argument</TH><TH>Description</TH></TR>
-<TR><TD>ppd</TD><TD>The PPD file</TD></TR>
-<TR><TD>keyword</TD><TD>The name of the option</TD></TR>
-</TABLE>
-</CENTER>
-<H3><A NAME="10_113_3">Returns</A></H3>
-<P>A pointer to the choice data or NULL if the choice does not exist or
- is not marked.</P>
-<H3><A NAME="10_113_4">Description</A></H3>
-<P>The <CODE>ppdFindMarkedChoice()</CODE> function returns a pointer to
- the marked choice data for the specified option.</P>
-<H3><A NAME="10_113_5">Example</A></H3>
-<PRE>
-#include &lt;cups/ppd.h&gt;
-
-ppd_file_t *ppd;
-ppd_choice_t *choice;
-
-choice = ppdFindMarkedChoice(ppd, &quot;PageSize&quot;);
-</PRE>
-<H3><A NAME="10_113_6">See Also</A></H3>
-<A HREF="#ppdFindChoice"> <CODE>ppdFindChoice()</CODE></A>,<A HREF="#ppdFindOption">
- <CODE>ppdFindOption()</CODE></A>
-<!-- NEW PAGE -->
-
-<H2><A NAME="ppdFindOption">ppdFindOption()</A></H2>
-<H3><A NAME="10_114_1">Usage</A></H3>
-<PRE>
-ppd_option_t *
-ppdFindOption(ppd_file_t *ppd,
-              const char *keyword);
 </PRE>
 <H3><A NAME="10_114_2">Arguments</A></H3>
 <CENTER>
@@ -8576,11 +8606,90 @@ ppdFindOption(ppd_file_t *ppd,
 </TABLE>
 </CENTER>
 <H3><A NAME="10_114_3">Returns</A></H3>
-<P>A pointer to the option data or NULL if the option does not exist.</P>
+<P>A pointer to the choice data or NULL if the choice does not exist or
+ is not marked.</P>
 <H3><A NAME="10_114_4">Description</A></H3>
+<P>The <CODE>ppdFindMarkedChoice()</CODE> function returns a pointer to
+ the marked choice data for the specified option.</P>
+<H3><A NAME="10_114_5">Example</A></H3>
+<PRE>
+#include &lt;cups/ppd.h&gt;
+
+ppd_file_t *ppd;
+ppd_choice_t *choice;
+
+choice = ppdFindMarkedChoice(ppd, &quot;PageSize&quot;);
+</PRE>
+<H3><A NAME="10_114_6">See Also</A></H3>
+<A HREF="#ppdFindChoice"> <CODE>ppdFindChoice()</CODE></A>,<A HREF="#ppdFindOption">
+ <CODE>ppdFindOption()</CODE></A>
+<!-- NEW PAGE -->
+
+<H2><A NAME="ppdFindNextAttr">ppdFindNextAttr()</A></H2>
+<H3><A NAME="10_115_1">Usage</A></H3>
+<PRE>
+ppd_attr_t *
+ppdFindNextAttr(ppd_file_t *ppd,
+        	const char *keyword,
+		const char *spec);
+</PRE>
+<H3><A NAME="10_115_2">Arguments</A></H3>
+<CENTER>
+<TABLE BORDER WIDTH="80%">
+<TR><TH>Argument</TH><TH>Description</TH></TR>
+<TR><TD>ppd</TD><TD>A pointer to the PPD file</TD></TR>
+<TR><TD>keyword</TD><TD>The name of the attribute</TD></TR>
+<TR><TD>spec</TD><TD>The option keyword associated with the attribute or
+ NULL if you don't care.</TD></TR>
+</TABLE>
+</CENTER>
+<H3><A NAME="10_115_3">Returns</A></H3>
+<P>A pointer to the attribute data or NULL if the attribute does not
+ exist.</P>
+<H3><A NAME="10_115_4">Description</A></H3>
+<P>The <CODE>ppdFindNextAttr()</CODE> function returns a pointer to the
+ next occurrence of the attribute in the PPD file.</P>
+<H3><A NAME="10_115_5">Example</A></H3>
+<PRE>
+#include &lt;cups/ppd.h&gt;
+
+ppd_file_t *ppd;
+ppd_attr_t *attr;
+
+for (attr = ppdFindAttr(ppd, &quot;cupsICCProfile&quot;, NULL);
+     attr != NULL;
+     attr = ppdFindNextAttr(ppd, &quot;cupsICCProfile&quot;, NULL))
+{
+  printf(&quot;*%s %s/%s: \&quot;%s\&quot;\n&quot;,
+         attr-&gt;name, attr-&gt;spec, attr-&gt;text,
+	 attr-&gt;value ? attr-&gt;value : &quot;(none)&quot;);
+}
+</PRE>
+<H3><A NAME="10_115_6">See Also</A></H3>
+<A HREF="#ppdFindAttr"> <CODE>ppdFindAttr()</CODE></A>
+<!-- NEW PAGE -->
+
+<H2><A NAME="ppdFindOption">ppdFindOption()</A></H2>
+<H3><A NAME="10_116_1">Usage</A></H3>
+<PRE>
+ppd_option_t *
+ppdFindOption(ppd_file_t *ppd,
+              const char *keyword);
+</PRE>
+<H3><A NAME="10_116_2">Arguments</A></H3>
+<CENTER>
+<TABLE BORDER WIDTH="80%">
+<TR><TH>Argument</TH><TH>Description</TH></TR>
+<TR><TD>ppd</TD><TD>The PPD file</TD></TR>
+<TR><TD>keyword</TD><TD>The name of the option</TD></TR>
+</TABLE>
+</CENTER>
+<H3><A NAME="10_116_3">Returns</A></H3>
+<P>A pointer to the option data or NULL if the option does not exist.</P>
+<H3><A NAME="10_116_4">Description</A></H3>
 <P>The <CODE>ppdFindOption()</CODE> function returns a pointer to the
  option data for the specified option.</P>
-<H3><A NAME="10_114_5">Example</A></H3>
+<H3><A NAME="10_116_5">Example</A></H3>
 <PRE>
 #include &lt;cups/ppd.h&gt;
 
@@ -8589,20 +8698,20 @@ ppd_option_t *option;
 
 option = ppdFindOption(ppd, &quot;PageSize&quot;);
 </PRE>
-<H3><A NAME="10_114_6">See Also</A></H3>
+<H3><A NAME="10_116_6">See Also</A></H3>
 <A HREF="#ppdFindChoice"> <CODE>ppdFindChoice()</CODE></A>,<A HREF="#ppdFindMarkedChoice">
  <CODE>ppdFindMarkedChoice()</CODE></A>
 <!-- NEW PAGE -->
 
 <H2><A NAME="ppdIsMarked">ppdIsMarked()</A></H2>
-<H3><A NAME="10_115_1">Usage</A></H3>
+<H3><A NAME="10_117_1">Usage</A></H3>
 <PRE>
 int
 ppdIsMarked(ppd_file_t *ppd,
             const char *keyword,
             const char *choice);
 </PRE>
-<H3><A NAME="10_115_2">Arguments</A></H3>
+<H3><A NAME="10_117_2">Arguments</A></H3>
 <CENTER>
 <TABLE BORDER WIDTH="80%">
 <TR><TH>Argument</TH><TH>Description</TH></TR>
@@ -8611,12 +8720,12 @@ ppdIsMarked(ppd_file_t *ppd,
 <TR><TD>choice</TD><TD>The name of the option choice</TD></TR>
 </TABLE>
 </CENTER>
-<H3><A NAME="10_115_3">Returns</A></H3>
+<H3><A NAME="10_117_3">Returns</A></H3>
 <P>1 if the choice is marked, 0 otherwise.</P>
-<H3><A NAME="10_115_4">Description</A></H3>
+<H3><A NAME="10_117_4">Description</A></H3>
 <P>The <CODE>ppdIsMarked()</CODE> function returns whether or not the
  specified option choice is marked.</P>
-<H3><A NAME="10_115_5">Example</A></H3>
+<H3><A NAME="10_117_5">Example</A></H3>
 <PRE>
 #include &lt;cups/ppd.h&gt;
 
@@ -8624,76 +8733,6 @@ ppd_file_t *ppd;
 
 printf(&quot;Letter size %s selected.\n&quot;,
        ppdIsMarked(ppd, &quot;PageSize&quot;, &quot;Letter&quot;) ? &quot;is&quot; : &quot;is not&quot;);
-</PRE>
-<H3><A NAME="10_115_6">See Also</A></H3>
-<A HREF="#cupsMarkOptions"> <CODE>cupsMarkOptions()</CODE></A>,<A HREF="#ppdConflicts">
- <CODE>ppdConflicts()</CODE></A>,<A HREF="#ppdIsMarked"> <CODE>
-ppdIsMarked()</CODE></A>,<A HREF="#ppdMarkDefaults"> <CODE>
-ppdMarkDefaults()</CODE></A>,<A HREF="#ppdMarkOption"> <CODE>
-ppdMarkOption()</CODE></A>
-<!-- NEW PAGE -->
-
-<H2><A NAME="ppdMarkDefaults">ppdMarkDefaults()</A></H2>
-<H3><A NAME="10_116_1">Usage</A></H3>
-<PRE>
-void
-ppdMarkDefaults(ppd_file_t *ppd);
-</PRE>
-<H3><A NAME="10_116_2">Arguments</A></H3>
-<CENTER>
-<TABLE BORDER WIDTH="80%">
-<TR><TH>Argument</TH><TH>Description</TH></TR>
-<TR><TD>ppd</TD><TD>The PPD file</TD></TR>
-</TABLE>
-</CENTER>
-<H3><A NAME="10_116_3">Description</A></H3>
-<P>The <CODE>ppdMarkDefaults()</CODE> function marks all of the default
- choices in the PPD file.</P>
-<H3><A NAME="10_116_4">Example</A></H3>
-<PRE>
-#include &lt;cups/ppd.h&gt;
-
-ppd_file_t *ppd;
-
-ppdMarkDefaults(ppd);
-</PRE>
-<H3><A NAME="10_116_5">See Also</A></H3>
-<A HREF="#cupsMarkOptions"> <CODE>cupsMarkOptions()</CODE></A>,<A HREF="#ppdConflicts">
- <CODE>ppdConflicts()</CODE></A>,<A HREF="#ppdIsMarked"> <CODE>
-ppdIsMarked()</CODE></A>,<A HREF="#ppdMarkDefaults"> <CODE>
-ppdMarkDefaults()</CODE></A>,<A HREF="#ppdMarkOption"> <CODE>
-ppdMarkOption()</CODE></A>
-<!-- NEW PAGE -->
-
-<H2><A NAME="ppdMarkOption">ppdMarkOption()</A></H2>
-<H3><A NAME="10_117_1">Usage</A></H3>
-<PRE>
-int
-ppdMarkOption(ppd_file_t *ppd,
-              const char *keyword,
-              const char *choice);
-</PRE>
-<H3><A NAME="10_117_2">Arguments</A></H3>
-<CENTER>
-<TABLE BORDER WIDTH="80%">
-<TR><TH>Argument</TH><TH>Description</TH></TR>
-<TR><TD>ppd</TD><TD>The PPD file</TD></TR>
-<TR><TD>keyword</TD><TD>The name of the option</TD></TR>
-<TR><TD>choice</TD><TD>The name of the choice</TD></TR>
-</TABLE>
-</CENTER>
-<H3><A NAME="10_117_3">Returns</A></H3>
-<P>The number of conflicts in the PPD file.</P>
-<H3><A NAME="10_117_4">Description</A></H3>
-<P>The <CODE>ppdMarkOption()</CODE> function marks the specified option
- choice.</P>
-<H3><A NAME="10_117_5">Example</A></H3>
-<PRE>
-#include &lt;cups/ppd.h&gt;
-
-ppd_file_t *ppd;
-
-ppdMarkOption(ppd, &quot;PageSize&quot;, &quot;Letter&quot;);
 </PRE>
 <H3><A NAME="10_117_6">See Also</A></H3>
 <A HREF="#cupsMarkOptions"> <CODE>cupsMarkOptions()</CODE></A>,<A HREF="#ppdConflicts">
@@ -8703,26 +8742,96 @@ ppdMarkDefaults()</CODE></A>,<A HREF="#ppdMarkOption"> <CODE>
 ppdMarkOption()</CODE></A>
 <!-- NEW PAGE -->
 
-<H2><A NAME="ppdOpen">ppdOpen()</A></H2>
+<H2><A NAME="ppdMarkDefaults">ppdMarkDefaults()</A></H2>
 <H3><A NAME="10_118_1">Usage</A></H3>
+<PRE>
+void
+ppdMarkDefaults(ppd_file_t *ppd);
+</PRE>
+<H3><A NAME="10_118_2">Arguments</A></H3>
+<CENTER>
+<TABLE BORDER WIDTH="80%">
+<TR><TH>Argument</TH><TH>Description</TH></TR>
+<TR><TD>ppd</TD><TD>The PPD file</TD></TR>
+</TABLE>
+</CENTER>
+<H3><A NAME="10_118_3">Description</A></H3>
+<P>The <CODE>ppdMarkDefaults()</CODE> function marks all of the default
+ choices in the PPD file.</P>
+<H3><A NAME="10_118_4">Example</A></H3>
+<PRE>
+#include &lt;cups/ppd.h&gt;
+
+ppd_file_t *ppd;
+
+ppdMarkDefaults(ppd);
+</PRE>
+<H3><A NAME="10_118_5">See Also</A></H3>
+<A HREF="#cupsMarkOptions"> <CODE>cupsMarkOptions()</CODE></A>,<A HREF="#ppdConflicts">
+ <CODE>ppdConflicts()</CODE></A>,<A HREF="#ppdIsMarked"> <CODE>
+ppdIsMarked()</CODE></A>,<A HREF="#ppdMarkDefaults"> <CODE>
+ppdMarkDefaults()</CODE></A>,<A HREF="#ppdMarkOption"> <CODE>
+ppdMarkOption()</CODE></A>
+<!-- NEW PAGE -->
+
+<H2><A NAME="ppdMarkOption">ppdMarkOption()</A></H2>
+<H3><A NAME="10_119_1">Usage</A></H3>
+<PRE>
+int
+ppdMarkOption(ppd_file_t *ppd,
+              const char *keyword,
+              const char *choice);
+</PRE>
+<H3><A NAME="10_119_2">Arguments</A></H3>
+<CENTER>
+<TABLE BORDER WIDTH="80%">
+<TR><TH>Argument</TH><TH>Description</TH></TR>
+<TR><TD>ppd</TD><TD>The PPD file</TD></TR>
+<TR><TD>keyword</TD><TD>The name of the option</TD></TR>
+<TR><TD>choice</TD><TD>The name of the choice</TD></TR>
+</TABLE>
+</CENTER>
+<H3><A NAME="10_119_3">Returns</A></H3>
+<P>The number of conflicts in the PPD file.</P>
+<H3><A NAME="10_119_4">Description</A></H3>
+<P>The <CODE>ppdMarkOption()</CODE> function marks the specified option
+ choice.</P>
+<H3><A NAME="10_119_5">Example</A></H3>
+<PRE>
+#include &lt;cups/ppd.h&gt;
+
+ppd_file_t *ppd;
+
+ppdMarkOption(ppd, &quot;PageSize&quot;, &quot;Letter&quot;);
+</PRE>
+<H3><A NAME="10_119_6">See Also</A></H3>
+<A HREF="#cupsMarkOptions"> <CODE>cupsMarkOptions()</CODE></A>,<A HREF="#ppdConflicts">
+ <CODE>ppdConflicts()</CODE></A>,<A HREF="#ppdIsMarked"> <CODE>
+ppdIsMarked()</CODE></A>,<A HREF="#ppdMarkDefaults"> <CODE>
+ppdMarkDefaults()</CODE></A>,<A HREF="#ppdMarkOption"> <CODE>
+ppdMarkOption()</CODE></A>
+<!-- NEW PAGE -->
+
+<H2><A NAME="ppdOpen">ppdOpen()</A></H2>
+<H3><A NAME="10_120_1">Usage</A></H3>
 <PRE>
 ppd_file_t *
 ppdOpen(FILE *file);
 </PRE>
-<H3><A NAME="10_118_2">Arguments</A></H3>
+<H3><A NAME="10_120_2">Arguments</A></H3>
 <CENTER>
 <TABLE BORDER WIDTH="80%">
 <TR><TH>Argument</TH><TH>Description</TH></TR>
 <TR><TD>file</TD><TD>The file to read from</TD></TR>
 </TABLE>
 </CENTER>
-<H3><A NAME="10_118_3">Returns</A></H3>
+<H3><A NAME="10_120_3">Returns</A></H3>
 <P>A pointer to a PPD file structure or NULL if the PPD file could not
  be read.</P>
-<H3><A NAME="10_118_4">Description</A></H3>
+<H3><A NAME="10_120_4">Description</A></H3>
 <P>The <CODE>ppdOpen()</CODE> function reads a PPD file from the
  specified file into memory.</P>
-<H3><A NAME="10_118_5">Example</A></H3>
+<H3><A NAME="10_120_5">Example</A></H3>
 <PRE>
 #include &lt;cups/ppd.h&gt;
 
@@ -8733,32 +8842,32 @@ file = fopen(&quot;filename.ppd&quot;, &quot;rb&quot;);
 ppd = ppdOpen(file);
 fclose(file);
 </PRE>
-<H3><A NAME="10_118_6">See Also</A></H3>
+<H3><A NAME="10_120_6">See Also</A></H3>
 <A HREF="#ppdClose"> <CODE>ppdClose()</CODE></A>,<A HREF="#ppdOpenFd"> <CODE>
 ppdOpenFd()</CODE></A>,<A HREF="#ppdOpenFile"> <CODE>ppdOpenFile()</CODE>
 </A>
 <!-- NEW PAGE -->
 
 <H2><A NAME="ppdOpenFd">ppdOpenFd()</A></H2>
-<H3><A NAME="10_119_1">Usage</A></H3>
+<H3><A NAME="10_121_1">Usage</A></H3>
 <PRE>
 ppd_file_t *
 ppdOpenFd(int fd);
 </PRE>
-<H3><A NAME="10_119_2">Arguments</A></H3>
+<H3><A NAME="10_121_2">Arguments</A></H3>
 <CENTER>
 <TABLE BORDER WIDTH="80%">
 <TR><TH>Argument</TH><TH>Description</TH></TR>
 <TR><TD>fd</TD><TD>The file descriptor to read from</TD></TR>
 </TABLE>
 </CENTER>
-<H3><A NAME="10_119_3">Returns</A></H3>
+<H3><A NAME="10_121_3">Returns</A></H3>
 <P>A pointer to a PPD file structure or NULL if the PPD file could not
  be read.</P>
-<H3><A NAME="10_119_4">Description</A></H3>
+<H3><A NAME="10_121_4">Description</A></H3>
 <P>The <CODE>ppdOpenFd()</CODE> function reads a PPD file from the
  specified file descriptor into memory.</P>
-<H3><A NAME="10_119_5">Example</A></H3>
+<H3><A NAME="10_121_5">Example</A></H3>
 <PRE>
 #include &lt;cups/ppd.h&gt;
 
@@ -8769,31 +8878,31 @@ fd = open(&quot;filename.ppd&quot;, O_RDONLY);
 ppd = ppdOpenFd(fd);
 close(fd);
 </PRE>
-<H3><A NAME="10_119_6">See Also</A></H3>
+<H3><A NAME="10_121_6">See Also</A></H3>
 <A HREF="#ppdClose"> <CODE>ppdClose()</CODE></A>,<A HREF="#ppdOpen"> <CODE>
 ppdOpen()</CODE></A>,<A HREF="#ppdOpenFile"> <CODE>ppdOpenFile()</CODE></A>
 <!-- NEW PAGE -->
 
 <H2><A NAME="ppdOpenFile">ppdOpenFile()</A></H2>
-<H3><A NAME="10_120_1">Usage</A></H3>
+<H3><A NAME="10_122_1">Usage</A></H3>
 <PRE>
 ppd_file_t *
 ppdOpenFile(const char *filename);
 </PRE>
-<H3><A NAME="10_120_2">Arguments</A></H3>
+<H3><A NAME="10_122_2">Arguments</A></H3>
 <CENTER>
 <TABLE BORDER WIDTH="80%">
 <TR><TH>Argument</TH><TH>Description</TH></TR>
 <TR><TD>filename</TD><TD>The name of the file to read from</TD></TR>
 </TABLE>
 </CENTER>
-<H3><A NAME="10_120_3">Returns</A></H3>
+<H3><A NAME="10_122_3">Returns</A></H3>
 <P>A pointer to a PPD file structure or NULL if the PPD file could not
  be read.</P>
-<H3><A NAME="10_120_4">Description</A></H3>
+<H3><A NAME="10_122_4">Description</A></H3>
 <P>The <CODE>ppdOpenFile()</CODE> function reads a PPD file from the
  named file into memory.</P>
-<H3><A NAME="10_120_5">Example</A></H3>
+<H3><A NAME="10_122_5">Example</A></H3>
 <PRE>
 #include &lt;cups/ppd.h&gt;
 
@@ -8801,19 +8910,19 @@ ppd_file_t *ppd;
 
 ppd = ppdOpenFile(&quot;filename.ppd&quot;);
 </PRE>
-<H3><A NAME="10_120_6">See Also</A></H3>
+<H3><A NAME="10_122_6">See Also</A></H3>
 <A HREF="#ppdClose"> <CODE>ppdClose()</CODE></A>,<A HREF="#ppdOpen"> <CODE>
 ppdOpen()</CODE></A>,<A HREF="#ppdOpenFd"> <CODE>ppdOpenFd()</CODE></A>
 <!-- NEW PAGE -->
 
 <H2><A NAME="ppdPageLength">ppdPageLength()</A></H2>
-<H3><A NAME="10_121_1">Usage</A></H3>
+<H3><A NAME="10_123_1">Usage</A></H3>
 <PRE>
 float
 ppdPageLength(ppd_file_t *ppd,
               const char *name);
 </PRE>
-<H3><A NAME="10_121_2">Arguments</A></H3>
+<H3><A NAME="10_123_2">Arguments</A></H3>
 <CENTER>
 <TABLE BORDER WIDTH="80%">
 <TR><TH>Argument</TH><TH>Description</TH></TR>
@@ -8821,13 +8930,13 @@ ppdPageLength(ppd_file_t *ppd,
 <TR><TD>name</TD><TD>The name of the page size</TD></TR>
 </TABLE>
 </CENTER>
-<H3><A NAME="10_121_3">Returns</A></H3>
+<H3><A NAME="10_123_3">Returns</A></H3>
 <P>The length of the specified page size in points or 0 if the page size
  does not exist.</P>
-<H3><A NAME="10_121_4">Description</A></H3>
+<H3><A NAME="10_123_4">Description</A></H3>
 <P>The <CODE>ppdPageLength()</CODE> function returns the page length of
  the specified page size.</P>
-<H3><A NAME="10_121_5">Example</A></H3>
+<H3><A NAME="10_123_5">Example</A></H3>
 <PRE>
 #include &lt;cups/ppd.h&gt;
 
@@ -8835,20 +8944,20 @@ ppd_file_t *ppd;
 
 printf(&quot;Length = %.0f\n&quot;, ppdPageLength(ppd, &quot;Letter&quot;));
 </PRE>
-<H3><A NAME="10_121_6">See Also</A></H3>
+<H3><A NAME="10_123_6">See Also</A></H3>
 <A HREF="#ppdPageLength"> <CODE>ppdPageLength()</CODE></A>,<A HREF="#ppdPageSize">
  <CODE>ppdPageSize()</CODE></A>,<A HREF="#ppdPageWidth"> <CODE>
 ppdPageWidth()</CODE></A>
 <!-- NEW PAGE -->
 
 <H2><A NAME="ppdPageSize">ppdPageSize()</A></H2>
-<H3><A NAME="10_122_1">Usage</A></H3>
+<H3><A NAME="10_124_1">Usage</A></H3>
 <PRE>
 ppd_size_t *
 ppdPageSize(ppd_file_t *ppd,
             const char *name);
 </PRE>
-<H3><A NAME="10_122_2">Arguments</A></H3>
+<H3><A NAME="10_124_2">Arguments</A></H3>
 <CENTER>
 <TABLE BORDER WIDTH="80%">
 <TR><TH>Argument</TH><TH>Description</TH></TR>
@@ -8856,13 +8965,13 @@ ppdPageSize(ppd_file_t *ppd,
 <TR><TD>name</TD><TD>The name of the page size</TD></TR>
 </TABLE>
 </CENTER>
-<H3><A NAME="10_122_3">Returns</A></H3>
+<H3><A NAME="10_124_3">Returns</A></H3>
 <P>A pointer to the page size record of the specified page size in
  points or NULL if the page size does not exist.</P>
-<H3><A NAME="10_122_4">Description</A></H3>
+<H3><A NAME="10_124_4">Description</A></H3>
 <P>The <CODE>ppdPageSize()</CODE> function returns the page size record
  for the specified page size.</P>
-<H3><A NAME="10_122_5">Example</A></H3>
+<H3><A NAME="10_124_5">Example</A></H3>
 <PRE>
 #include &lt;cups/ppd.h&gt;
 
@@ -8880,19 +8989,19 @@ if (size != NULL)
   printf(&quot;   Top = %.0f\n&quot;, size-&gt;top);
 }
 </PRE>
-<H3><A NAME="10_122_6">See Also</A></H3>
+<H3><A NAME="10_124_6">See Also</A></H3>
 <A HREF="#ppdPageLength"> <CODE>ppdPageLength()</CODE></A>,<A HREF="#ppdPageWidth">
  <CODE>ppdPageWidth()</CODE></A>
 <!-- NEW PAGE -->
 
 <H2><A NAME="ppdPageWidth">ppdPageWidth()</A></H2>
-<H3><A NAME="10_123_1">Usage</A></H3>
+<H3><A NAME="10_125_1">Usage</A></H3>
 <PRE>
 float
 ppdPageWidth(ppd_file_t *ppd,
              const char *name);
 </PRE>
-<H3><A NAME="10_123_2">Arguments</A></H3>
+<H3><A NAME="10_125_2">Arguments</A></H3>
 <CENTER>
 <TABLE BORDER WIDTH="80%">
 <TR><TH>Argument</TH><TH>Description</TH></TR>
@@ -8900,13 +9009,13 @@ ppdPageWidth(ppd_file_t *ppd,
 <TR><TD>name</TD><TD>The name of the page size</TD></TR>
 </TABLE>
 </CENTER>
-<H3><A NAME="10_123_3">Returns</A></H3>
+<H3><A NAME="10_125_3">Returns</A></H3>
 <P>The width of the specified page size in points or 0 if the page size
  does not exist.</P>
-<H3><A NAME="10_123_4">Description</A></H3>
+<H3><A NAME="10_125_4">Description</A></H3>
 <P>The <CODE>ppdPageWidth()</CODE> function returns the page width of
  the specified page size.</P>
-<H3><A NAME="10_123_5">Example</A></H3>
+<H3><A NAME="10_125_5">Example</A></H3>
 <PRE>
 #include &lt;cups/ppd.h&gt;
 
@@ -8914,7 +9023,7 @@ ppd_file_t *ppd;
 
 printf(&quot;Width = %.0f\n&quot;, ppdPageWidth(ppd, &quot;Letter&quot;));
 </PRE>
-<H3><A NAME="10_123_6">See Also</A></H3>
+<H3><A NAME="10_125_6">See Also</A></H3>
 <A HREF="#ppdPageLength"> <CODE>ppdPageLength()</CODE></A>,<A HREF="#ppdPageSize">
  <CODE>ppdPageSize()</CODE></A></BODY>
 </HTML>

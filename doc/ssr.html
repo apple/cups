@@ -72,10 +72,20 @@ Copyright 1997-2003, All Rights Reserved<BR>
  also supported with reduced functionality. CUPS adds network printer
  browsing and PostScript Printer Description (&quot;PPD&quot;) based printing
  options to support real-world printing under UNIX.</P>
-<P>CUPS also includes a customized version of GNU Ghostscript (currently
- based off GNU Ghostscript 5.50) and an image file RIP that are used to
- support non-PostScript printers. Sample drivers for HP and EPSON
- printers are included that use these filters.</P>
+<P>CUPS includes an image file RIP that supports printing of image files
+ to non-PostScript printers. A customized version of GNU Ghostscript
+ 7.05 for CUPS called ESP Ghostscript is available separately to support
+ printing of PostScript files within the CUPS driver framework. Sample
+ drivers for Dymo, EPSON, HP, and OKIDATA printers are included that use
+ these filters.</P>
+<P>Drivers for thousands of printers are provided with our ESP Print Pro
+ software, available at:</P>
+<PRE>
+    <A HREF="http://www.easysw.com/printpro/">http://www.easysw.com/printpro/</A>
+</PRE>
+<P>CUPS is licensed under the GNU General Public License and GNU Library
+ General Public License. Please contact Easy Software Products for
+ commercial support and &quot;binary distribution&quot; rights.</P>
 <H2><A NAME="1_3">1.3 Document Overview</A></H2>
 <P>This software security report is organized into the following
  sections:</P>
@@ -165,6 +175,7 @@ Adobe PostScript Language Reference, Third Edition.</A></LI>
 <P>Starting with CUPS 1.1.18, the <CODE>MaxClientsPerHost</CODE>
  provides limited protection against DoS attacks, however it is not
  effective against large-scale distributed attacks.</P>
+</LI>
 <LI>Repeatedly opening and closing connections to the server as fast as
  possible.
 <P>There is no easy way of protecting against this in the CUPS software.
@@ -172,16 +183,19 @@ Adobe PostScript Language Reference, Third Edition.</A></LI>
  possible to filter such an attack, however once the connection request
  has been received by the server it must at least accept the connection
  to find out who is connecting.</P>
+</LI>
 <LI>Flooding the network with broadcast packets on port 631.
 <P>It might be possible to disable browsing if this condition is
  detected by the CUPS software, however if there are large numbers of
  printers available on the network such an algorithm might think that an
  attack was occurring when instead a valid update was being received.</P>
+</LI>
 <LI>Sending partial IPP requests; specifically, sending part of an
  attribute value and then stopping transmission.
 <P>The current code is structured to read and write the IPP request data
  on-the-fly, so there is no easy way to protect against this for large
  attribute values.</P>
+</LI>
 <LI>Sending large/long print jobs to printers, preventing other users
  from printing.
 <P>There are limited facilities for protecting against large print jobs
@@ -190,10 +204,6 @@ Adobe PostScript Language Reference, Third Edition.</A></LI>
  hundreds or thousands of pages. In general, we recommend restricting
  printer access to known hosts or networks, and adding user-level access
  control as needed for expensive printers.</P>
-</LI>
-</LI>
-</LI>
-</LI>
 </LI>
 </OL>
 <H2><A NAME="4_2">4.2 Security Breaches</A></H2>

@@ -4,7 +4,7 @@
 <TITLE>CUPS Software Administrators Manual</TITLE>
 <META NAME="author" CONTENT="Easy Software Products">
 <META NAME="copyright" CONTENT="Copyright 1997-2003, All Rights Reserved">
-<META NAME="docnumber" CONTENT="CUPS-SAM-1.1.18">
+<META NAME="docnumber" CONTENT="CUPS-SAM-1.1.19">
 <META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-8859-1">
 <STYLE TYPE="text/css"><!--
 BODY { font-family: serif }
@@ -22,7 +22,7 @@ PRE { font-family: monospace }
 <BODY BGCOLOR="white">
 <CENTER><A HREF="#CONTENTS"><IMG SRC="images/cups-large.gif" BORDER="0" WIDTH="431" HEIGHT="511"><BR>
 <H1>CUPS Software Administrators Manual</H1></A><BR>
-CUPS-SAM-1.1.18<BR>
+CUPS-SAM-1.1.19<BR>
 Easy Software Products<BR>
 Copyright 1997-2003, All Rights Reserved<BR>
 </CENTER>
@@ -328,7 +328,7 @@ Copyright 1997-2003, All Rights Reserved<BR>
 <H1 ALIGN="RIGHT"><A NAME="1">Preface</A></H1>
 <P>This software administrators manual provides printer administration
  information for the Common UNIX Printing System<SUP>TM</SUP> (&quot;CUPS<SUP>
-TM</SUP>&quot;), version 1.1.18.</P>
+TM</SUP>&quot;), version 1.1.19.</P>
 <H2><A NAME="1_1">System Overview</A></H2>
 <P>CUPS provides a portable printing layer for UNIX&reg;-based operating
  systems. It has been developed by<A HREF="http://www.easysw.com"> Easy
@@ -341,10 +341,20 @@ TM</SUP>&quot;), version 1.1.18.</P>
  also supported with reduced functionality. CUPS adds network printer
  browsing and PostScript Printer Description (&quot;PPD&quot;) based printing
  options to support real-world printing under UNIX.</P>
-<P>CUPS also includes a customized version of GNU Ghostscript (currently
- based off GNU Ghostscript 5.50) and an image file RIP that are used to
- support non-PostScript printers. Sample drivers for HP and EPSON
- printers are included that use these filters.</P>
+<P>CUPS includes an image file RIP that supports printing of image files
+ to non-PostScript printers. A customized version of GNU Ghostscript
+ 7.05 for CUPS called ESP Ghostscript is available separately to support
+ printing of PostScript files within the CUPS driver framework. Sample
+ drivers for Dymo, EPSON, HP, and OKIDATA printers are included that use
+ these filters.</P>
+<P>Drivers for thousands of printers are provided with our ESP Print Pro
+ software, available at:</P>
+<PRE>
+    <A HREF="http://www.easysw.com/printpro/">http://www.easysw.com/printpro/</A>
+</PRE>
+<P>CUPS is licensed under the GNU General Public License and GNU Library
+ General Public License. Please contact Easy Software Products for
+ commercial support and &quot;binary distribution&quot; rights.</P>
 
 <!-- NEED 3in -->
 <H2><A NAME="1_2">Document Overview</A></H2>
@@ -972,6 +982,15 @@ lpoptions(1)</CODE> command.</P>
 </UL>
 <P>has the opposite effect. All users except peter, paul, and mary will
  be able to print to the named printer.</P>
+<P>You can control access by UNIX groups as well by placing an &quot;@&quot;
+ character before each group name. The command:</P>
+<UL>
+<PRE>
+<B>/usr/sbin/lpadmin -p <I>printer</I> -u allow:peter,paul,mary,@printgods <I>ENTER</I></B>
+</PRE>
+</UL>
+<P>allows the users peter, paul, and mary to print, as well as any user
+ in the printgods group to print.
 <CENTER>
 <TABLE BGCOLOR="#cccccc" BORDER="1" CELLPADDING="5" WIDTH="80%">
 <TR><TD><B>NOTE:</B>
@@ -985,6 +1004,7 @@ lpoptions(1)</CODE> command.</P>
 </TD></TR>
 </TABLE>
 </CENTER>
+</P>
 <H2><A NAME="4_4">Managing Printers from the Web</A></H2>
 <P>The Web interface is located at:</P>
 <UL>
@@ -2559,7 +2579,7 @@ MaxJobs 0
  to make room for the new one. If all of the known jobs are still
  pending or active then the new job will be rejected.</P>
 <P>Setting the maximum to 0 disables this functionality. The default
- setting is 0.
+ setting is 500.
 <!-- NEED 3in -->
 </P>
 <H3><A NAME="MaxJobsPerPrinter">MaxJobsPerPrinter</A></H3>
@@ -2691,7 +2711,8 @@ Port 80
 <H4>Description</H4>
 <P>The <CODE>Port</CODE> directive specifies a port to listen on.
  Multiple <CODE>Port</CODE> lines can be specified to listen on multiple
- ports. The default port is 631.
+ ports. The <CODE>Port</CODE> directive is equivalent to &quot;<CODE>Listen
+ *:nnn</CODE>&quot;. The default port is 631.
 <!-- NEED 3in -->
 </P>
 <H3><A NAME="PreserveJobHistory">PreserveJobHistory</A></H3>
