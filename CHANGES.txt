@@ -76,6 +76,9 @@ CHANGES IN CUPS V1.1.7
 	- The LPD backend now supports a new "order" option:
 	  "lpd://server/queue?order=control,data" (default) and
 	  "lpd://server/queue?order=data,control".
+	- The scheduler enforced a 30 second timeout on all
+	  clients regardless of the Timeout directive and if a
+	  CGI was currently running.
 
 
 CHANGES IN CUPS V1.1.6-3

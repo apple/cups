@@ -1,5 +1,5 @@
 #
-# "$Id: cups.spec,v 1.29 2001/02/21 17:01:15 mike Exp $"
+# "$Id: cups.spec,v 1.30 2001/03/06 18:37:49 mike Exp $"
 #
 #   RPM "spec" file for the Common UNIX Printing System (CUPS).
 #
@@ -36,7 +36,7 @@ Packager: Michael Sweet <mike@easysw.com>
 Vendor: Easy Software Products
 # use buildroot so as not to disturb the version already installed
 BuildRoot: /var/tmp/%{name}-root
-Conflicts: lpr
+Conflicts: lpr, LPRng
 
 %package devel
 Summary: Common Unix Printing System - development environment
@@ -94,15 +94,17 @@ if test -x /sbin/chkconfig; then
 	/sbin/chkconfig cups on
 fi
 
-if test -f /sbin/init.d/cups; then
-	/sbin/init.d/cups start
-fi
-if test -f /etc/rc.d/init.d/cups; then
-	/etc/rc.d/init.d/cups start
-fi
-if test -f /etc/init.d/cups; then
-	/etc/init.d/cups start
-fi
+# these lines automatically start cupsd after installation; commented out
+# by request...
+#if test -f /sbin/init.d/cups; then
+#	/sbin/init.d/cups start
+#fi
+#if test -f /etc/rc.d/init.d/cups; then
+#	/etc/rc.d/init.d/cups start
+#fi
+#if test -f /etc/init.d/cups; then
+#	/etc/init.d/cups start
+#fi
 
 %preun
 if test -f /sbin/init.d/cups; then
@@ -125,7 +127,7 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(-,root,root)
 %dir /etc/cups
-%config /etc/cups/*.conf
+%config(noreplace) /etc/cups/*.conf
 %dir /etc/cups/certs
 %dir /etc/cups/interfaces
 /etc/cups/mime.types
@@ -173,5 +175,5 @@ rm -rf $RPM_BUILD_ROOT
 /usr/lib/*.a
 
 #
-# End of "$Id: cups.spec,v 1.29 2001/02/21 17:01:15 mike Exp $".
+# End of "$Id: cups.spec,v 1.30 2001/03/06 18:37:49 mike Exp $".
 #
