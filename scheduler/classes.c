@@ -1,5 +1,5 @@
 /*
- * "$Id: classes.c,v 1.34.2.23 2004/06/29 13:15:10 mike Exp $"
+ * "$Id: classes.c,v 1.34.2.24 2004/06/29 18:54:17 mike Exp $"
  *
  *   Printer class routines for the Common UNIX Printing System (CUPS).
  *
@@ -65,14 +65,7 @@ AddClass(const char *name)	/* I - Name of class */
 
     c->type = CUPS_PRINTER_CLASS;
 
-#ifdef AF_INET6
-    if (Listeners[0].address.addr.sa_family == AF_INET6)
-      SetStringf(&c->uri, "ipp://%s:%d/classes/%s", ServerName,
-                 ntohs(Listeners[0].address.ipv6.sin6_port), name);
-    else
-#endif /* AF_INET6 */
-    SetStringf(&c->uri, "ipp://%s:%d/classes/%s", ServerName,
-               ntohs(Listeners[0].address.ipv4.sin_port), name);
+    SetStringf(&c->uri, "ipp://%s:%d/classes/%s", ServerName, LocalPort, name);
   }
 
   return (c);
@@ -707,5 +700,5 @@ UpdateImplicitClasses(void)
 
 
 /*
- * End of "$Id: classes.c,v 1.34.2.23 2004/06/29 13:15:10 mike Exp $".
+ * End of "$Id: classes.c,v 1.34.2.24 2004/06/29 18:54:17 mike Exp $".
  */

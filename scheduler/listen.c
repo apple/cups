@@ -1,5 +1,5 @@
 /*
- * "$Id: listen.c,v 1.9.2.16 2004/06/29 13:15:11 mike Exp $"
+ * "$Id: listen.c,v 1.9.2.17 2004/06/29 18:54:17 mike Exp $"
  *
  *   Server listening routines for the Common UNIX Printing System (CUPS)
  *   scheduler.
@@ -101,12 +101,14 @@ ResumeListening(void)
 void
 StartListening(void)
 {
-  int		i,		/* Looping var */
-		p,		/* Port number */
-		val;		/* Parameter value */
-  listener_t	*lis;		/* Current listening socket */
-  struct hostent *host;		/* Host entry for server address */
-  char		s[256];		/* String addresss */
+  int		status;			/* Bind result */
+  int		i,			/* Looping var */
+		p,			/* Port number */
+		val;			/* Parameter value */
+  listener_t	*lis;			/* Current listening socket */
+  struct hostent *host;			/* Host entry for server address */
+  char		s[256];			/* String addresss */
+  int		have_domain;		/* Have a domain socket */
 
 
   LogMessage(L_DEBUG, "StartListening: NumListeners=%d", NumListeners);
@@ -141,7 +143,8 @@ StartListening(void)
   * Setup socket listeners...
   */
 
-  for (i = NumListeners, lis = Listeners, LocalPort = 0; i > 0; i --, lis ++)
+  for (i = NumListeners, lis = Listeners, LocalPort = 0, have_domain = 0;
+       i > 0; i --, lis ++)
   {
     httpAddrString(&(lis->address), s, sizeof(s));
 
@@ -150,6 +153,14 @@ StartListening(void)
       p = ntohs(lis->address.ipv6.sin6_port);
     else
 #endif /* AF_INET6 */
+#ifdef AF_LOCAL
+    if (lis->address.addr.sa_family == AF_LOCAL)
+    {
+      have_domain = 1;
+      p           = 0;
+    }
+    else
+#endif /* AF_LOCAL */
     p = ntohs(lis->address.ipv4.sin_port);
 
     LogMessage(L_DEBUG, "StartListening: address=%s port=%d", s, p);
@@ -159,7 +170,7 @@ StartListening(void)
     * "any" address...
     */
 
-    if (!LocalPort &&
+    if (!LocalPort && p > 0 &&
         (httpAddrLocalhost(&(lis->address)) ||
          httpAddrAny(&(lis->address))))
     {
@@ -198,14 +209,48 @@ StartListening(void)
     */
 
 #ifdef AF_INET6
-    if (bind(lis->fd, (struct sockaddr *)&(lis->address),
-	     lis->address.addr.sa_family == AF_INET ?
-		 sizeof(lis->address.ipv4) :
-		 sizeof(lis->address.ipv6)) < 0)
-#else
-    if (bind(lis->fd, (struct sockaddr *)&(lis->address),
-             sizeof(lis->address.ipv4)) < 0)
-#endif
+    if (lis->address.addr.sa_family == AF_INET6)
+      status = bind(lis->fd, (struct sockaddr *)&(lis->address),
+	            sizeof(lis->address.ipv6));
+    else
+#endif /* AF_INET6 */
+#ifdef AF_LOCAL
+    if (lis->address.addr.sa_family == AF_LOCAL)
+    {
+      mode_t	mask;			/* Umask setting */
+
+
+     /*
+      * Remove any existing domain socket file...
+      */
+
+      unlink(lis->address.un.sun_path);
+
+     /*
+      * Save the curent umask and set it to 0...
+      */
+
+      mask = umask(0);
+
+     /*
+      * Bind the domain socket...
+      */
+
+      status = bind(lis->fd, (struct sockaddr *)&(lis->address),
+	            SUN_LEN(&(lis->address.un)));
+
+     /*
+      * Restore the umask...
+      */
+
+      umask(mask);
+    }
+    else
+#endif /* AF_LOCAL */
+    status = bind(lis->fd, (struct sockaddr *)&(lis->address),
+                  sizeof(lis->address.ipv4));
+
+    if (status < 0)
     {
       LogMessage(L_ERROR, "StartListening: Unable to bind socket for address %s:%d - %s.",
                  s, p, strerror(errno));
@@ -228,7 +273,7 @@ StartListening(void)
   * Make sure that we are listening on localhost!
   */
 
-  if (!LocalPort)
+  if (!LocalPort && !have_domain)
   {
     LogMessage(L_EMERG, "No Listen or Port lines were found to allow access via localhost!");
 
@@ -259,14 +304,25 @@ StopListening(void)
   PauseListening();
 
   for (i = NumListeners, lis = Listeners; i > 0; i --, lis ++)
+  {
 #ifdef WIN32
     closesocket(lis->fd);
 #else
     close(lis->fd);
 #endif /* WIN32 */
+
+#ifdef AF_LOCAL
+   /*
+    * Remove domain sockets...
+    */
+
+    if (lis->address.addr.sa_family == AF_LOCAL)
+      unlink(lis->address.un.sun_path);
+#endif /* AF_LOCAL */
+  }
 }
 
 
 /*
- * End of "$Id: listen.c,v 1.9.2.16 2004/06/29 13:15:11 mike Exp $".
+ * End of "$Id: listen.c,v 1.9.2.17 2004/06/29 18:54:17 mike Exp $".
  */

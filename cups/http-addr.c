@@ -1,5 +1,5 @@
 /*
- * "$Id: http-addr.c,v 1.1.2.15 2004/06/29 13:15:08 mike Exp $"
+ * "$Id: http-addr.c,v 1.1.2.16 2004/06/29 18:54:17 mike Exp $"
  *
  *   HTTP address routines for the Common UNIX Printing System (CUPS).
  *
@@ -136,6 +136,9 @@ httpAddrLocalhost(const http_addr_t *addr)
     return (1);
 #endif /* AF_INET6 */
 
+  if (addr->addr.sa_family == AF_LOCAL)
+    return (1);
+
   if (addr->addr.sa_family == AF_INET &&
       ntohl(addr->ipv4.sin_addr.s_addr) == 0x7f000001)
     return (1);
@@ -206,6 +209,11 @@ httpAddrString(const http_addr_t *addr,		/* I - Address to convert */
              ntohl(addr->ipv6.sin6_addr.s6_addr32[3]));
   else
 #endif /* AF_INET6 */
+#ifdef AF_LOCAL
+  if (addr->addr.sa_family == AF_LOCAL)
+    strlcpy(s, addr->un.sun_path, slen);
+  else
+#endif /* AF_LOCAL */
   if (addr->addr.sa_family == AF_INET)
   {
     unsigned temp;				/* Temporary address */
@@ -217,10 +225,7 @@ httpAddrString(const http_addr_t *addr,		/* I - Address to convert */
              (temp >> 16) & 255, (temp >> 8) & 255, temp & 255);
   }
   else
-  {
-    strncpy(s, "UNKNOWN", slen - 1);
-    s[slen - 1] = '\0';
-  }
+    strlcpy(s, "UNKNOWN", slen);
 
   return (s);
 }
@@ -303,5 +308,5 @@ httpGetHostByName(const char *name)	/* I - Hostname or IP address */
 
 
 /*
- * End of "$Id: http-addr.c,v 1.1.2.15 2004/06/29 13:15:08 mike Exp $".
+ * End of "$Id: http-addr.c,v 1.1.2.16 2004/06/29 18:54:17 mike Exp $".
  */

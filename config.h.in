@@ -1,5 +1,5 @@
 /*
- * "$Id: config.h.in,v 1.39.2.23 2004/06/29 13:15:07 mike Exp $"
+ * "$Id: config.h.in,v 1.39.2.24 2004/06/29 18:54:17 mike Exp $"
  *
  *   Configuration file for the Common UNIX Printing System (CUPS).
  *
@@ -54,6 +54,14 @@
  */
 
 #define CUPS_MAX_FDS		4096
+
+
+/*
+ * Do we have domain socket support?
+ */
+
+#undef HAVE_DOMAINSOCKETS
+#undef CUPS_DEFAULT_DOMAINSOCKET
 
 
 /*
@@ -286,5 +294,5 @@
 #endif /* !_CUPS_CONFIG_H_ */
 
 /*
- * End of "$Id: config.h.in,v 1.39.2.23 2004/06/29 13:15:07 mike Exp $".
+ * End of "$Id: config.h.in,v 1.39.2.24 2004/06/29 18:54:17 mike Exp $".
  */

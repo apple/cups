@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-network.m4,v 1.1.2.12 2004/06/29 03:46:29 mike Exp $"
+dnl "$Id: cups-network.m4,v 1.1.2.13 2004/06/29 18:54:17 mike Exp $"
 dnl
 dnl   Networking stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -54,6 +54,22 @@ AC_ARG_WITH(maxfiles, [  --with-maxfiles=N       set maximum number of file desc
 
 AC_DEFINE_UNQUOTED(CUPS_MAX_FDS, $maxfiles)
 
+CUPS_DEFAULT_DOMAINSOCKET=""
+
+dnl Domain socket support...
+AC_ARG_WITH(default_domainsocket, [  --with-domainsocket     set unix domain socket name],
+	default_domainsocket="$withval",
+	default_domainsocket="")
+
+if test "x$default_domainsocket" = x; then
+	CUPS_LISTEN_DOMAINSOCKET=""
+else
+	CUPS_LISTEN_DOMAINSOCKET="Listen $default_domainsocket"
+fi
+
+AC_DEFINE_UNQUOTED(CUPS_DEFAULT_DOMAINSOCKET, "$default_domainsocket")
+AC_SUBST(CUPS_LISTEN_DOMAINSOCKET)
+
 dnl
-dnl End of "$Id: cups-network.m4,v 1.1.2.12 2004/06/29 03:46:29 mike Exp $".
+dnl End of "$Id: cups-network.m4,v 1.1.2.13 2004/06/29 18:54:17 mike Exp $".
 dnl

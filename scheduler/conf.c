@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.77.2.54 2004/06/29 17:48:52 mike Exp $"
+ * "$Id: conf.c,v 1.77.2.55 2004/06/29 18:54:17 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -40,6 +40,10 @@
 #include <stdarg.h>
 #include <pwd.h>
 #include <grp.h>
+
+#ifdef HAVE_DOMAINSOCKETS
+#  include <sys/un.h>
+#endif /* HAVE_DOMAINSOCKETS */
 
 #ifdef HAVE_CDSASSL
 #  include <Security/SecureTransport.h>
@@ -244,6 +248,15 @@ ReadConfiguration(void)
 
   if (NumListeners > 0)
   {
+#ifdef HAVE_DOMAINSOCKETS
+  int i;			/* Looping var */
+  listener_t	*lis;		/* Current listening socket */
+
+  for (i = NumListeners, lis = Listeners; i > 0; i --, lis ++)
+    if (lis->address.sin_family == AF_LOCAL)
+      ClearString((char **)&lis->address.sin_addr);
+#endif /* HAVE_DOMAINSOCKETS */
+
     free(Listeners);
 
     NumListeners = 0;
@@ -2025,6 +2038,26 @@ get_address(const char  *value,		/* I - Value string */
     address->ipv4.sin_port        = htons(defport);
   }
 
+#ifdef AF_LOCAL
+ /*
+  * If the address starts with a "/", it is a domain socket...
+  */
+
+  if (*value == '/')
+  {
+    if (strlen(value) >= sizeof(address->un.sun_path))
+    {
+      LogMessage(L_ERROR, "Domain socket name \"%s\" too long!", value);
+      return (0);
+    }
+
+    address->un.sun_family = AF_LOCAL;
+    strcpy(address->un.sun_path, value);
+
+    return (1);
+  }
+#endif /* AF_LOCAL */
+
  /*
   * Try to grab a hostname and port number...
   */
@@ -2334,5 +2367,5 @@ CDSAGetServerCerts(void)
 
 
 /*
- * End of "$Id: conf.c,v 1.77.2.54 2004/06/29 17:48:52 mike Exp $".
+ * End of "$Id: conf.c,v 1.77.2.55 2004/06/29 18:54:17 mike Exp $".
  */

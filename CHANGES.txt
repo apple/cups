@@ -3,6 +3,7 @@ CHANGES.txt - 06/29/2004
 
 CHANGES IN CUPS V1.2.0b1
 
+	- Added domain socket support (STR #656)
 	- Added BrowseLocalOptions directive to allow the
 	  administrator to add printer URI options to the browse
 	  URI, e.g. "encryption=required" (STR #732)

@@ -1,5 +1,5 @@
 /*
- * "$Id: http.h,v 1.33.2.22 2004/06/29 13:15:08 mike Exp $"
+ * "$Id: http.h,v 1.33.2.23 2004/06/29 18:54:17 mike Exp $"
  *
  *   Hyper-Text Transport Protocol definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -49,6 +49,9 @@
 #    if !defined(__APPLE__) || !defined(TCP_NODELAY)
 #      include <netinet/tcp.h>
 #    endif /* !__APPLE__ || !TCP_NODELAY */
+#    ifdef AF_LOCAL
+#      include <sys/un.h>
+#    endif /* AF_LOCAL */
 #  endif /* WIN32 */
 
 #  include "md5.h"
@@ -283,6 +286,9 @@ typedef union
 #ifdef AF_INET6
   struct sockaddr_in6	ipv6;		/* IPv6 address */
 #endif /* AF_INET6 */
+#ifdef AF_LOCAL
+  struct sockaddr_un	un;		/* Domain socket file */
+#endif /* AF_LOCAL */
   char			pad[128];	/* Pad to ensure binary compatibility */
 } http_addr_t;
 
@@ -416,5 +422,5 @@ extern char		*httpAddrString(const http_addr_t *addr,
 #endif /* !_IPP_HTTP_H_ */
 
 /*
- * End of "$Id: http.h,v 1.33.2.22 2004/06/29 13:15:08 mike Exp $".
+ * End of "$Id: http.h,v 1.33.2.23 2004/06/29 18:54:17 mike Exp $".
  */

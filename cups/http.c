@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.82.2.52 2004/06/29 13:15:08 mike Exp $"
+ * "$Id: http.c,v 1.82.2.53 2004/06/29 18:54:17 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS).
  *
@@ -320,11 +320,11 @@ httpClose(http_t *http)		/* I - Connection to close */
  * 'httpConnect()' - Connect to a HTTP server.
  */
 
-http_t *			/* O - New HTTP connection */
-httpConnect(const char *host,	/* I - Host to connect to */
-            int        port)	/* I - Port number */
+http_t *				/* O - New HTTP connection */
+httpConnect(const char *host,		/* I - Host to connect to */
+            int        port)		/* I - Port number */
 {
-  http_encryption_t	encrypt;/* Type of encryption to use */
+  http_encryption_t	encrypt;	/* Type of encryption to use */
 
 
  /*
@@ -410,7 +410,7 @@ httpConnectEncrypt(const char *host,	/* I - Host to connect to */
   * Set the encryption status...
   */
 
-  if (port == 443)	/* Always use encryption for https */
+  if (port == 443)			/* Always use encryption for https */
     http->encryption = HTTP_ENCRYPT_ALWAYS;
   else
     http->encryption = encrypt;
@@ -482,10 +482,11 @@ httpEncryption(http_t            *http,	/* I - HTTP data */
  * 'httpReconnect()' - Reconnect to a HTTP server...
  */
 
-int				/* O - 0 on success, non-zero on failure */
-httpReconnect(http_t *http)	/* I - HTTP data */
+int					/* O - 0 on success, non-zero on failure */
+httpReconnect(http_t *http)		/* I - HTTP data */
 {
-  int		val;		/* Socket option value */
+  int		val;			/* Socket option value */
+  int		status;			/* Connect status */
 
 
   DEBUG_printf(("httpReconnect(http=%p)\n", http));
@@ -556,14 +557,21 @@ httpReconnect(http_t *http)	/* I - HTTP data */
   */
 
 #ifdef AF_INET6
-  if (connect(http->fd, (struct sockaddr *)&(http->hostaddr),
-	      http->hostaddr.addr.sa_family == AF_INET ?
-		  sizeof(http->hostaddr.ipv4) :
-		  sizeof(http->hostaddr.ipv6)) < 0)
-#else
-  if (connect(http->fd, (struct sockaddr *)&(http->hostaddr),
-              sizeof(http->hostaddr.ipv4)) < 0)
+  if (http->hostaddr.addr.sa_family == AF_INET6)
+    status = connect(http->fd, (struct sockaddr *)&(http->hostaddr),
+                     sizeof(http->hostaddr.ipv6));
+  else
 #endif /* AF_INET6 */
+#ifdef AF_LOCAL
+  if (http->hostaddr.addr.sa_family == AF_LOCAL)
+    status = connect(http->fd, (struct sockaddr *)&(http->hostaddr),
+                     SUN_LEN(&(http->hostaddr.un)));
+  else
+#endif /* AF_LOCAL */
+  status = connect(http->fd, (struct sockaddr *)&(http->hostaddr),
+                   sizeof(http->hostaddr.ipv4));
+
+  if (status < 0)
   {
 #ifdef WIN32
     http->error  = WSAGetLastError();
@@ -2470,5 +2478,5 @@ CDSAWriteFunc(SSLConnectionRef connection,	/* I  - SSL/TLS connection */
 
 
 /*
- * End of "$Id: http.c,v 1.82.2.52 2004/06/29 13:15:08 mike Exp $".
+ * End of "$Id: http.c,v 1.82.2.53 2004/06/29 18:54:17 mike Exp $".
  */
