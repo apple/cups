@@ -1,5 +1,5 @@
 /*
- * "$Id: lpstat.c,v 1.38 2001/05/06 00:11:27 mike Exp $"
+ * "$Id: lpstat.c,v 1.39 2001/05/06 20:09:20 mike Exp $"
  *
  *   "lpstat" command for the Common UNIX Printing System (CUPS).
  *
@@ -69,7 +69,6 @@ main(int  argc,			/* I - Number of command-line arguments */
 {
   int		i;		/* Looping var */
   http_t	*http;		/* Connection to server */
-  char		server[1024];	/* CUPS_SERVER environment variable */
   int		num_dests;	/* Number of user destinations */
   cups_dest_t	*dests;		/* User destinations */
   int		long_status;	/* Long status report? */
@@ -766,7 +765,7 @@ show_classes(http_t     *http,	/* I - HTTP connection to server */
       {
         httpSeparate(printer_uri, method, username, server, &port, resource);
 
-        if ((http2 = httpConnectEncrypt(server, port, encryption)) != NULL)
+        if ((http2 = httpConnectEncrypt(server, port, cupsEncryption())) != NULL)
 	{
 	 /*
 	  * Build an IPP_GET_PRINTER_ATTRIBUTES request, which requires the
@@ -1846,5 +1845,5 @@ show_scheduler(http_t *http)	/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpstat.c,v 1.38 2001/05/06 00:11:27 mike Exp $".
+ * End of "$Id: lpstat.c,v 1.39 2001/05/06 20:09:20 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: lpadmin.c,v 1.23 2001/05/06 00:11:27 mike Exp $"
+ * "$Id: lpadmin.c,v 1.24 2001/05/06 20:09:20 mike Exp $"
  *
  *   "lpadmin" command for the Common UNIX Printing System (CUPS).
  *
@@ -202,7 +202,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 		return (1);
               }
 	      else
-		http = httpConnectEncryption(argv[i], ippPort(), encryption);
+		http = httpConnectEncrypt(argv[i], ippPort(), encryption);
 	    }
 
 	    if (http == NULL)
@@ -1770,5 +1770,5 @@ validate_name(const char *name)	/* I - Name to check */
 
 
 /*
- * End of "$Id: lpadmin.c,v 1.23 2001/05/06 00:11:27 mike Exp $".
+ * End of "$Id: lpadmin.c,v 1.24 2001/05/06 20:09:20 mike Exp $".
  */
