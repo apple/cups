@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c,v 1.20 1999/06/03 19:06:51 mike Exp $"
+ * "$Id: ppd.c,v 1.21 1999/06/04 21:04:29 mike Exp $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -919,6 +919,7 @@ ppdOpen(FILE *fp)		/* I - File to read from */
       if (strchr(string, '/') != NULL)	/* Just show human readable text */
         strcpy(string, strchr(string, '/') + 1);
 
+      ppd_decode(string);
       group = ppd_get_group(ppd, string);
     }
     else if (strcmp(keyword, "CloseGroup") == 0)
@@ -1681,5 +1682,5 @@ ppd_decode(char *string)	/* I - String to decode */
 
 
 /*
- * End of "$Id: ppd.c,v 1.20 1999/06/03 19:06:51 mike Exp $".
+ * End of "$Id: ppd.c,v 1.21 1999/06/04 21:04:29 mike Exp $".
  */
