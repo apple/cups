@@ -1,5 +1,5 @@
 /*
- * "$Id: snprintf.c,v 1.4.2.7 2003/01/07 18:26:29 mike Exp $"
+ * "$Id: snprintf.c,v 1.4.2.8 2004/02/25 16:58:32 mike Exp $"
  *
  *   snprintf functions for the Common UNIX Printing System (CUPS).
  *
@@ -88,7 +88,7 @@ cups_vsnprintf(char       *buffer,	/* O - Output buffer */
         sign = 0;
 
       width = 0;
-      while (isdigit(*format))
+      while (isdigit(*format & 255))
         width = width * 10 + *format++ - '0';
 
       if (*format == '.')
@@ -96,7 +96,7 @@ cups_vsnprintf(char       *buffer,	/* O - Output buffer */
         format ++;
 	prec = 0;
 
-	while (isdigit(*format))
+	while (isdigit(*format & 255))
           prec = prec * 10 + *format++ - '0';
       }
       else
@@ -301,6 +301,6 @@ cups_snprintf(char       *buffer,	/* O - Output buffer */
 
 
 /*
- * End of "$Id: snprintf.c,v 1.4.2.7 2003/01/07 18:26:29 mike Exp $".
+ * End of "$Id: snprintf.c,v 1.4.2.8 2004/02/25 16:58:32 mike Exp $".
  */
 

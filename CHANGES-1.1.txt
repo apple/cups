@@ -3,6 +3,9 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.21rc1
 
+	- Some calls to the ctype functions did not account for
+	  platforms that use a signed char type by default (STR
+	  #518)
 	- The scheduler could use excess amounts of CPU if a CGI
 	  program was sending data faster than the client could
 	  take it (STR #595)

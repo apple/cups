@@ -1,5 +1,5 @@
 /*
- * "$Id: cancel.c,v 1.19.2.13 2003/04/28 19:33:42 mike Exp $"
+ * "$Id: cancel.c,v 1.19.2.14 2004/02/25 16:58:32 mike Exp $"
  *
  *   "cancel" command for the Common UNIX Printing System (CUPS).
  *
@@ -169,7 +169,7 @@ main(int  argc,			/* I - Number of command-line arguments */
         dest   = argv[i];
 	job_id = 0;
       }
-      else if ((job = strrchr(argv[i], '-')) != NULL && isdigit(job[1]))
+      else if ((job = strrchr(argv[i], '-')) != NULL && isdigit(job[1] & 255))
       {
        /*
         * Delete the specified job ID.
@@ -179,7 +179,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	op     = IPP_CANCEL_JOB;
         job_id = atoi(job + 1);
       }
-      else if (isdigit(argv[i][0]))
+      else if (isdigit(argv[i][0] & 255))
       {
        /*
         * Delete the specified job ID.
@@ -377,5 +377,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: cancel.c,v 1.19.2.13 2003/04/28 19:33:42 mike Exp $".
+ * End of "$Id: cancel.c,v 1.19.2.14 2004/02/25 16:58:32 mike Exp $".
  */

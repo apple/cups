@@ -1,5 +1,5 @@
 /*
- * "$Id: lpstat.c,v 1.37.2.17 2003/06/14 14:08:46 mike Exp $"
+ * "$Id: lpstat.c,v 1.37.2.18 2004/02/25 16:58:32 mike Exp $"
  *
  *   "lpstat" command for the Common UNIX Printing System (CUPS).
  *
@@ -585,7 +585,7 @@ check_dest(const char  *name,		/* I  - Name of printer/class(es) */
     * Skip leading whitespace and commas...
     */
 
-    while (isspace(*dptr) || *dptr == ',')
+    while (isspace(*dptr & 255) || *dptr == ',')
       dptr ++;
 
     if (*dptr == '\0')
@@ -595,7 +595,7 @@ check_dest(const char  *name,		/* I  - Name of printer/class(es) */
     * Extract a single destination name from the name string...
     */
 
-    for (pptr = printer; !isspace(*dptr) && *dptr != ',' && *dptr != '\0';)
+    for (pptr = printer; !isspace(*dptr & 255) && *dptr != ',' && *dptr != '\0';)
     {
       if ((pptr - printer) < (sizeof(printer) - 1))
         *pptr++ = *dptr++;
@@ -768,7 +768,7 @@ show_accepting(http_t      *http,	/* I - HTTP connection to server */
 	  * Skip leading whitespace and commas...
 	  */
 
-	  while (isspace(*dptr) || *dptr == ',')
+	  while (isspace(*dptr & 255) || *dptr == ',')
 	    dptr ++;
 
 	  if (*dptr == '\0')
@@ -779,10 +779,10 @@ show_accepting(http_t      *http,	/* I - HTTP connection to server */
 	  */
 
 	  for (ptr = printer;
-	       *ptr != '\0' && *dptr != '\0' && tolower(*ptr) == tolower(*dptr);
+	       *ptr != '\0' && *dptr != '\0' && tolower(*ptr & 255) == tolower(*dptr & 255);
 	       ptr ++, dptr ++);
 
-          if (*ptr == '\0' && (*dptr == '\0' || *dptr == ',' || isspace(*dptr)))
+          if (*ptr == '\0' && (*dptr == '\0' || *dptr == ',' || isspace(*dptr & 255)))
 	  {
 	    match = 1;
 	    break;
@@ -792,9 +792,9 @@ show_accepting(http_t      *http,	/* I - HTTP connection to server */
 	  * Skip trailing junk...
 	  */
 
-          while (!isspace(*dptr) && *dptr != ',' && *dptr != '\0')
+          while (!isspace(*dptr & 255) && *dptr != ',' && *dptr != '\0')
 	    dptr ++;
-	  while (isspace(*dptr) || *dptr == ',')
+	  while (isspace(*dptr & 255) || *dptr == ',')
 	    dptr ++;
 
 	  if (*dptr == '\0')
@@ -1047,7 +1047,7 @@ show_classes(http_t     *http,		/* I - HTTP connection to server */
 	  * Skip leading whitespace and commas...
 	  */
 
-	  while (isspace(*dptr) || *dptr == ',')
+	  while (isspace(*dptr & 255) || *dptr == ',')
 	    dptr ++;
 
 	  if (*dptr == '\0')
@@ -1058,10 +1058,10 @@ show_classes(http_t     *http,		/* I - HTTP connection to server */
 	  */
 
 	  for (ptr = printer;
-	       *ptr != '\0' && *dptr != '\0' && tolower(*ptr) == tolower(*dptr);
+	       *ptr != '\0' && *dptr != '\0' && tolower(*ptr & 255) == tolower(*dptr & 255);
 	       ptr ++, dptr ++);
 
-          if (*ptr == '\0' && (*dptr == '\0' || *dptr == ',' || isspace(*dptr)))
+          if (*ptr == '\0' && (*dptr == '\0' || *dptr == ',' || isspace(*dptr & 255)))
 	  {
 	    match = 1;
 	    break;
@@ -1071,9 +1071,9 @@ show_classes(http_t     *http,		/* I - HTTP connection to server */
 	  * Skip trailing junk...
 	  */
 
-          while (!isspace(*dptr) && *dptr != ',' && *dptr != '\0')
+          while (!isspace(*dptr & 255) && *dptr != ',' && *dptr != '\0')
 	    dptr ++;
-	  while (isspace(*dptr) || *dptr == ',')
+	  while (isspace(*dptr & 255) || *dptr == ',')
 	    dptr ++;
 
 	  if (*dptr == '\0')
@@ -1287,7 +1287,7 @@ show_devices(http_t      *http,		/* I - HTTP connection to server */
 	  * Skip leading whitespace and commas...
 	  */
 
-	  while (isspace(*dptr) || *dptr == ',')
+	  while (isspace(*dptr & 255) || *dptr == ',')
 	    dptr ++;
 
 	  if (*dptr == '\0')
@@ -1298,10 +1298,10 @@ show_devices(http_t      *http,		/* I - HTTP connection to server */
 	  */
 
 	  for (ptr = printer;
-	       *ptr != '\0' && *dptr != '\0' && tolower(*ptr) == tolower(*dptr);
+	       *ptr != '\0' && *dptr != '\0' && tolower(*ptr & 255) == tolower(*dptr & 255);
 	       ptr ++, dptr ++);
 
-          if (*ptr == '\0' && (*dptr == '\0' || *dptr == ',' || isspace(*dptr)))
+          if (*ptr == '\0' && (*dptr == '\0' || *dptr == ',' || isspace(*dptr & 255)))
 	  {
 	    match = 1;
 	    break;
@@ -1311,9 +1311,9 @@ show_devices(http_t      *http,		/* I - HTTP connection to server */
 	  * Skip trailing junk...
 	  */
 
-          while (!isspace(*dptr) && *dptr != ',' && *dptr != '\0')
+          while (!isspace(*dptr & 255) && *dptr != ',' && *dptr != '\0')
 	    dptr ++;
-	  while (isspace(*dptr) || *dptr == ',')
+	  while (isspace(*dptr & 255) || *dptr == ',')
 	    dptr ++;
 
 	  if (*dptr == '\0')
@@ -1577,7 +1577,7 @@ show_jobs(http_t     *http,		/* I - HTTP connection to server */
 	  * Skip leading whitespace and commas...
 	  */
 
-	  while (isspace(*dptr) || *dptr == ',')
+	  while (isspace(*dptr & 255) || *dptr == ',')
 	    dptr ++;
 
 	  if (*dptr == '\0')
@@ -1588,10 +1588,10 @@ show_jobs(http_t     *http,		/* I - HTTP connection to server */
 	  */
 
 	  for (ptr = dest;
-	       *ptr != '\0' && *dptr != '\0' && tolower(*ptr) == tolower(*dptr);
+	       *ptr != '\0' && *dptr != '\0' && tolower(*ptr & 255) == tolower(*dptr & 255);
 	       ptr ++, dptr ++);
 
-          if (*ptr == '\0' && (*dptr == '\0' || *dptr == ',' || isspace(*dptr)))
+          if (*ptr == '\0' && (*dptr == '\0' || *dptr == ',' || isspace(*dptr & 255)))
 	  {
 	    match = 1;
 	    break;
@@ -1601,9 +1601,9 @@ show_jobs(http_t     *http,		/* I - HTTP connection to server */
 	  * Skip trailing junk...
 	  */
 
-          while (!isspace(*dptr) && *dptr != ',' && *dptr != '\0')
+          while (!isspace(*dptr & 255) && *dptr != ',' && *dptr != '\0')
 	    dptr ++;
-	  while (isspace(*dptr) || *dptr == ',')
+	  while (isspace(*dptr & 255) || *dptr == ',')
 	    dptr ++;
 
 	  if (*dptr == '\0')
@@ -1619,7 +1619,7 @@ show_jobs(http_t     *http,		/* I - HTTP connection to server */
 	  * Skip leading whitespace and commas...
 	  */
 
-	  while (isspace(*dptr) || *dptr == ',')
+	  while (isspace(*dptr & 255) || *dptr == ',')
 	    dptr ++;
 
 	  if (*dptr == '\0')
@@ -1633,7 +1633,7 @@ show_jobs(http_t     *http,		/* I - HTTP connection to server */
 	       *ptr != '\0' && *dptr != '\0' && *ptr == *dptr;
 	       ptr ++, dptr ++);
 
-          if (*ptr == '\0' && (*dptr == '\0' || *dptr == ',' || isspace(*dptr)))
+          if (*ptr == '\0' && (*dptr == '\0' || *dptr == ',' || isspace(*dptr & 255)))
 	  {
 	    match = 1;
 	    break;
@@ -1643,9 +1643,9 @@ show_jobs(http_t     *http,		/* I - HTTP connection to server */
 	  * Skip trailing junk...
 	  */
 
-          while (!isspace(*dptr) && *dptr != ',' && *dptr != '\0')
+          while (!isspace(*dptr & 255) && *dptr != ',' && *dptr != '\0')
 	    dptr ++;
-	  while (isspace(*dptr) || *dptr == ',')
+	  while (isspace(*dptr & 255) || *dptr == ',')
 	    dptr ++;
 
 	  if (*dptr == '\0')
@@ -1901,7 +1901,7 @@ show_printers(http_t      *http,	/* I - HTTP connection to server */
 	  * Skip leading whitespace and commas...
 	  */
 
-	  while (isspace(*dptr) || *dptr == ',')
+	  while (isspace(*dptr & 255) || *dptr == ',')
 	    dptr ++;
 
 	  if (*dptr == '\0')
@@ -1912,10 +1912,10 @@ show_printers(http_t      *http,	/* I - HTTP connection to server */
 	  */
 
 	  for (ptr = printer;
-	       *ptr != '\0' && *dptr != '\0' && tolower(*ptr) == tolower(*dptr);
+	       *ptr != '\0' && *dptr != '\0' && tolower(*ptr & 255) == tolower(*dptr & 255);
 	       ptr ++, dptr ++);
 
-          if (*ptr == '\0' && (*dptr == '\0' || *dptr == ',' || isspace(*dptr)))
+          if (*ptr == '\0' && (*dptr == '\0' || *dptr == ',' || isspace(*dptr & 255)))
 	  {
 	    match = 1;
 	    break;
@@ -1925,9 +1925,9 @@ show_printers(http_t      *http,	/* I - HTTP connection to server */
 	  * Skip trailing junk...
 	  */
 
-          while (!isspace(*dptr) && *dptr != ',' && *dptr != '\0')
+          while (!isspace(*dptr & 255) && *dptr != ',' && *dptr != '\0')
 	    dptr ++;
-	  while (isspace(*dptr) || *dptr == ',')
+	  while (isspace(*dptr & 255) || *dptr == ',')
 	    dptr ++;
 
 	  if (*dptr == '\0')
@@ -2162,5 +2162,5 @@ show_scheduler(http_t *http)	/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpstat.c,v 1.37.2.17 2003/06/14 14:08:46 mike Exp $".
+ * End of "$Id: lpstat.c,v 1.37.2.18 2004/02/25 16:58:32 mike Exp $".
  */

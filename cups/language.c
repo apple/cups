@@ -1,5 +1,5 @@
 /*
- * "$Id: language.c,v 1.20.2.28 2003/11/19 18:25:50 mike Exp $"
+ * "$Id: language.c,v 1.20.2.29 2004/02/25 16:58:32 mike Exp $"
  *
  *   I18N/language support for the Common UNIX Printing System (CUPS).
  *
@@ -391,7 +391,7 @@ cupsLangGet(const char *language)	/* I - Language or locale */
       if (*language == '_' || *language == '-' || *language == '.')
 	break;
       else if (ptr < (langname + sizeof(langname) - 1))
-        *ptr++ = tolower(*language);
+        *ptr++ = tolower(*language & 255);
 
     *ptr = '\0';
 
@@ -405,7 +405,7 @@ cupsLangGet(const char *language)	/* I - Language or locale */
 	if (*language == '.')
 	  break;
 	else if (ptr < (country + sizeof(country) - 1))
-          *ptr++ = toupper(*language);
+          *ptr++ = toupper(*language & 255);
 
       *ptr = '\0';
     }
@@ -418,7 +418,7 @@ cupsLangGet(const char *language)	/* I - Language or locale */
 
       for (language ++, ptr = charset; *language; language ++)
 	if (ptr < (charset + sizeof(charset) - 1))
-          *ptr++ = toupper(*language);
+          *ptr++ = toupper(*language & 255);
 
       *ptr = '\0';
     }
@@ -643,7 +643,7 @@ cupsLangGet(const char *language)	/* I - Language or locale */
     * Grab the message number and text...
     */
 
-    if (isdigit(line[0]))
+    if (isdigit(line[0] & 255))
       msg = (cups_msg_t)atoi(line);
     else
       msg ++;
@@ -652,9 +652,9 @@ cupsLangGet(const char *language)	/* I - Language or locale */
       continue;
 
     text = line;
-    while (isdigit(*text))
+    while (isdigit(*text & 255))
       text ++;
-    while (isspace(*text))
+    while (isspace(*text & 255))
       text ++;
     
     lang->messages[msg] = strdup(text);
@@ -995,5 +995,5 @@ cups_cache_lookup(const char      *name,/* I - Name of locale */
 
 
 /*
- * End of "$Id: language.c,v 1.20.2.28 2003/11/19 18:25:50 mike Exp $".
+ * End of "$Id: language.c,v 1.20.2.29 2004/02/25 16:58:32 mike Exp $".
  */

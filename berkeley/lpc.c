@@ -1,5 +1,5 @@
 /*
- * "$Id: lpc.c,v 1.11.2.8 2004/02/03 04:08:18 mike Exp $"
+ * "$Id: lpc.c,v 1.11.2.9 2004/02/25 16:58:31 mike Exp $"
  *
  *   "lpc" command for the Common UNIX Printing System (CUPS).
  *
@@ -98,18 +98,18 @@ main(int  argc,		/* I - Number of command-line arguments */
       * Find any options in the string...
       */
 
-      while (isspace(line[0]))
+      while (isspace(line[0] & 255))
         cups_strcpy(line, line + 1);
 
       for (params = line; *params != '\0'; params ++)
-        if (isspace(*params))
+        if (isspace(*params & 255))
 	  break;
 
      /*
       * Remove whitespace between the command and parameters...
       */
 
-      while (isspace(*params))
+      while (isspace(*params & 255))
         *params++ = '\0';
 
      /*
@@ -351,7 +351,7 @@ show_status(http_t *http,	/* I - HTTP connection to server */
 	  * Skip leading whitespace and commas...
 	  */
 
-	  while (isspace(*dptr) || *dptr == ',')
+	  while (isspace(*dptr & 255) || *dptr == ',')
 	    dptr ++;
 
 	  if (*dptr == '\0')
@@ -365,7 +365,7 @@ show_status(http_t *http,	/* I - HTTP connection to server */
 	       *ptr != '\0' && *dptr != '\0' && *ptr == *dptr;
 	       ptr ++, dptr ++);
 
-          if (*ptr == '\0' && (*dptr == '\0' || *dptr == ',' || isspace(*dptr)))
+          if (*ptr == '\0' && (*dptr == '\0' || *dptr == ',' || isspace(*dptr & 255)))
 	  {
 	    match = 1;
 	    break;
@@ -375,9 +375,9 @@ show_status(http_t *http,	/* I - HTTP connection to server */
 	  * Skip trailing junk...
 	  */
 
-          while (!isspace(*dptr) && *dptr != '\0')
+          while (!isspace(*dptr & 255) && *dptr != '\0')
 	    dptr ++;
-	  while (isspace(*dptr) || *dptr == ',')
+	  while (isspace(*dptr & 255) || *dptr == ',')
 	    dptr ++;
 
 	  if (*dptr == '\0')
@@ -481,5 +481,5 @@ show_status(http_t *http,	/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpc.c,v 1.11.2.8 2004/02/03 04:08:18 mike Exp $".
+ * End of "$Id: lpc.c,v 1.11.2.9 2004/02/25 16:58:31 mike Exp $".
  */

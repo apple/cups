@@ -1,5 +1,5 @@
 /*
- * "$Id: http-support.c,v 1.1.2.5 2003/10/09 19:13:49 mike Exp $"
+ * "$Id: http-support.c,v 1.1.2.6 2004/02/25 16:58:32 mike Exp $"
  *
  *   HTTP support routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -123,7 +123,7 @@ httpSeparate(const char *uri,		/* I - Universal Resource Identifier */
       else
 	resource[0] = '\0';
 
-      if (isdigit(*uri))
+      if (isdigit(*uri & 255))
       {
        /*
 	* OK, we have "hostname:port[/resource]"...
@@ -177,7 +177,7 @@ httpSeparate(const char *uri,		/* I - Universal Resource Identifier */
     for (ptr = username; uri < atsign; uri ++)
       if (ptr < (username + HTTP_MAX_URI - 1))
       {
-        if (*uri == '%' && isxdigit(uri[1]) && isxdigit(uri[2]))
+        if (*uri == '%' && isxdigit(uri[1] & 255) && isxdigit(uri[2] & 255))
 	{
 	 /*
 	  * Grab a hex-encoded username and password...
@@ -241,7 +241,7 @@ httpSeparate(const char *uri,		/* I - Universal Resource Identifier */
 
     *port = 0;
     uri ++;
-    while (isdigit(*uri))
+    while (isdigit(*uri & 255))
     {
       *port = (*port * 10) + *uri - '0';
       uri ++;
@@ -341,5 +341,5 @@ cups_hstrerror(int error)		/* I - Error number */
 
 
 /*
- * End of "$Id: http-support.c,v 1.1.2.5 2003/10/09 19:13:49 mike Exp $".
+ * End of "$Id: http-support.c,v 1.1.2.6 2004/02/25 16:58:32 mike Exp $".
  */

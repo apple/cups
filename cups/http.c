@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.82.2.43 2004/02/05 20:54:44 mike Exp $"
+ * "$Id: http.c,v 1.82.2.44 2004/02/25 16:58:32 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS).
  *
@@ -637,7 +637,7 @@ httpGetSubField(http_t       *http,	/* I - HTTP data */
     * Skip leading whitespace...
     */
 
-    while (isspace(*fptr))
+    while (isspace(*fptr & 255))
       fptr ++;
 
     if (*fptr == ',')
@@ -651,7 +651,7 @@ httpGetSubField(http_t       *http,	/* I - HTTP data */
     */
 
     for (ptr = temp;
-         *fptr && *fptr != '=' && !isspace(*fptr) && ptr < (temp + sizeof(temp) - 1);
+         *fptr && *fptr != '=' && !isspace(*fptr & 255) && ptr < (temp + sizeof(temp) - 1);
          *ptr++ = *fptr++);
 
     *ptr = '\0';
@@ -662,7 +662,7 @@ httpGetSubField(http_t       *http,	/* I - HTTP data */
     * Skip trailing chars up to the '='...
     */
 
-    while (isspace(*fptr))
+    while (isspace(*fptr & 255))
       fptr ++;
 
     if (!*fptr)
@@ -677,7 +677,7 @@ httpGetSubField(http_t       *http,	/* I - HTTP data */
 
     fptr ++;
 
-    while (isspace(*fptr))
+    while (isspace(*fptr & 255))
       fptr ++;
 
     if (*fptr == '\"')
@@ -705,12 +705,12 @@ httpGetSubField(http_t       *http,	/* I - HTTP data */
       */
 
       for (ptr = value;
-           *fptr && !isspace(*fptr) && *fptr != ',' && ptr < (value + HTTP_MAX_VALUE - 1);
+           *fptr && !isspace(*fptr & 255) && *fptr != ',' && ptr < (value + HTTP_MAX_VALUE - 1);
 	   *ptr++ = *fptr++);
 
       *ptr = '\0';
 
-      while (*fptr && !isspace(*fptr) && *fptr != ',')
+      while (*fptr && !isspace(*fptr & 255) && *fptr != ',')
         fptr ++;
     }
 
@@ -1636,7 +1636,7 @@ httpUpdate(http_t *http)		/* I - HTTP data */
       */
 
       *value++ = '\0';
-      while (isspace(*value))
+      while (isspace(*value & 255))
         value ++;
 
      /*
@@ -2454,5 +2454,5 @@ CDSAWriteFunc(SSLConnectionRef connection,	/* I  - SSL/TLS connection */
 
 
 /*
- * End of "$Id: http.c,v 1.82.2.43 2004/02/05 20:54:44 mike Exp $".
+ * End of "$Id: http.c,v 1.82.2.44 2004/02/25 16:58:32 mike Exp $".
  */

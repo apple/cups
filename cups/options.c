@@ -1,5 +1,5 @@
 /*
- * "$Id: options.c,v 1.21.2.10 2003/07/20 12:51:41 mike Exp $"
+ * "$Id: options.c,v 1.21.2.11 2004/02/25 16:58:32 mike Exp $"
  *
  *   Option routines for the Common UNIX Printing System (CUPS).
  *
@@ -180,7 +180,7 @@ cupsParseOptions(const char    *arg,		/* I - Argument to parse */
   * Skip leading spaces...
   */
 
-  while (isspace(*ptr))
+  while (isspace(*ptr & 255))
     ptr ++;
 
  /*
@@ -194,7 +194,7 @@ cupsParseOptions(const char    *arg,		/* I - Argument to parse */
     */
 
     name = ptr;
-    while (!isspace(*ptr) && *ptr != '=' && *ptr != '\0')
+    while (!isspace(*ptr & 255) && *ptr != '=' && *ptr != '\0')
       ptr ++;
 
    /*
@@ -208,7 +208,7 @@ cupsParseOptions(const char    *arg,		/* I - Argument to parse */
     * Skip trailing spaces...
     */
 
-    while (isspace(*ptr))
+    while (isspace(*ptr & 255))
       *ptr++ = '\0';
 
     if (*ptr != '=')
@@ -310,7 +310,7 @@ cupsParseOptions(const char    *arg,		/* I - Argument to parse */
 
       value = ptr;
 
-      while (!isspace(*ptr) && *ptr != '\0')
+      while (!isspace(*ptr & 255) && *ptr != '\0')
       {
         if (*ptr == '\\')
 	  cups_strcpy(ptr, ptr + 1);
@@ -323,7 +323,7 @@ cupsParseOptions(const char    *arg,		/* I - Argument to parse */
     * Skip trailing whitespace...
     */
 
-    while (isspace(*ptr))
+    while (isspace(*ptr & 255))
       *ptr++ = '\0';
 
    /*
@@ -495,5 +495,5 @@ cupsMarkOptions(ppd_file_t    *ppd,		/* I - PPD file */
 
 
 /*
- * End of "$Id: options.c,v 1.21.2.10 2003/07/20 12:51:41 mike Exp $".
+ * End of "$Id: options.c,v 1.21.2.11 2004/02/25 16:58:32 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c,v 1.51.2.62 2004/02/03 04:08:18 mike Exp $"
+ * "$Id: ppd.c,v 1.51.2.63 2004/02/25 16:58:32 mike Exp $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -997,7 +997,7 @@ ppdOpen(FILE *fp)			/* I - File to read from */
       if (name[0] == '*')
         cups_strcpy(name, name + 1); /* Eliminate leading asterisk */
 
-      for (i = strlen(name) - 1; i > 0 && isspace(name[i]); i --)
+      for (i = strlen(name) - 1; i > 0 && isspace(name[i] & 255); i --)
         name[i] = '\0'; /* Eliminate trailing spaces */
 
       DEBUG_printf(("OpenUI of %s in group %s...\n", name,
@@ -2172,14 +2172,14 @@ ppd_decode(char *string)		/* I - String to decode */
   outptr = string;
 
   while (*inptr != '\0')
-    if (*inptr == '<' && isxdigit(inptr[1]))
+    if (*inptr == '<' && isxdigit(inptr[1] & 255))
     {
      /*
       * Convert hex to 8-bit values...
       */
 
       inptr ++;
-      while (isxdigit(*inptr))
+      while (isxdigit(*inptr & 255))
       {
 	if (isalpha(*inptr))
 	  *outptr = (tolower(*inptr) - 'a' + 10) << 4;
@@ -2187,6 +2187,9 @@ ppd_decode(char *string)		/* I - String to decode */
 	  *outptr = (*inptr - '0') << 4;
 
 	inptr ++;
+
+        if (!isxdigit(*inptr & 255))
+	  break;
 
 	if (isalpha(*inptr))
 	  *outptr |= tolower(*inptr) - 'a' + 10;
@@ -2851,7 +2854,7 @@ ppd_read(FILE *fp,			/* I - File to read from */
       */
 
       for (lineptr = line; *lineptr; lineptr ++)
-        if (!isspace(*lineptr))
+        if (!isspace(*lineptr & 255))
 	  break;
 
       if (*lineptr)
@@ -2871,7 +2874,7 @@ ppd_read(FILE *fp,			/* I - File to read from */
 
     keyptr = keyword;
 
-    while (*lineptr != '\0' && *lineptr != ':' && !isspace(*lineptr))
+    while (*lineptr != '\0' && *lineptr != ':' && !isspace(*lineptr & 255))
     {
       if (*lineptr <= ' ' || *lineptr > 126 || *lineptr == '/' ||
           (keyptr - keyword) >= (PPD_MAX_NAME - 1))
@@ -2892,18 +2895,18 @@ ppd_read(FILE *fp,			/* I - File to read from */
 
 /*    DEBUG_printf(("keyword = \"%s\", lineptr = \"%s\"\n", keyword, lineptr));*/
 
-    if (isspace(*lineptr))
+    if (isspace(*lineptr & 255))
     {
      /*
       * Get an option name...
       */
 
-      while (isspace(*lineptr))
+      while (isspace(*lineptr & 255))
         lineptr ++;
 
       optptr = option;
 
-      while (*lineptr != '\0' && !isspace(*lineptr) && *lineptr != ':' &&
+      while (*lineptr != '\0' && !isspace(*lineptr & 255) && *lineptr != ':' &&
              *lineptr != '/')
       {
 	if (*lineptr <= ' ' || *lineptr > 126 ||
@@ -2918,13 +2921,13 @@ ppd_read(FILE *fp,			/* I - File to read from */
 
       *optptr = '\0';
 
-      if (isspace(*lineptr) && ppd_conform == PPD_CONFORM_STRICT)
+      if (isspace(*lineptr & 255) && ppd_conform == PPD_CONFORM_STRICT)
       {
         ppd_status = PPD_ILLEGAL_WHITESPACE;
 	return (0);
       }
 
-      while (isspace(*lineptr))
+      while (isspace(*lineptr & 255))
 	lineptr ++;
 
       mask |= PPD_OPTION;
@@ -2968,13 +2971,13 @@ ppd_read(FILE *fp,			/* I - File to read from */
 /*      DEBUG_printf(("text = \"%s\", lineptr = \"%s\"\n", text, lineptr));*/
     }
 
-    if (isspace(*lineptr) && ppd_conform == PPD_CONFORM_STRICT)
+    if (isspace(*lineptr & 255) && ppd_conform == PPD_CONFORM_STRICT)
     {
       ppd_status = PPD_ILLEGAL_WHITESPACE;
       return (0);
     }
 
-    while (isspace(*lineptr))
+    while (isspace(*lineptr & 255))
       lineptr ++;
 
     if (*lineptr == ':')
@@ -2984,11 +2987,11 @@ ppd_read(FILE *fp,			/* I - File to read from */
       */
 
       lineptr ++;
-      while (isspace(*lineptr))
+      while (isspace(*lineptr & 255))
         lineptr ++;
 
       strptr = lineptr + strlen(lineptr) - 1;
-      while (strptr >= lineptr && isspace(*strptr))
+      while (strptr >= lineptr && isspace(*strptr & 255))
         *strptr-- = '\0';
 
       if (*strptr == '\"')
@@ -3022,5 +3025,5 @@ ppd_read(FILE *fp,			/* I - File to read from */
 
 
 /*
- * End of "$Id: ppd.c,v 1.51.2.62 2004/02/03 04:08:18 mike Exp $".
+ * End of "$Id: ppd.c,v 1.51.2.63 2004/02/25 16:58:32 mike Exp $".
  */

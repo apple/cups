@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.55.2.38 2003/11/07 19:45:05 mike Exp $"
+ * "$Id: ipp.c,v 1.55.2.39 2004/02/25 16:58:32 mike Exp $"
  *
  *   Internet Printing Protocol support functions for the Common UNIX
  *   Printing System (CUPS).
@@ -381,7 +381,7 @@ ippAddString(ipp_t      *ipp,			/* I - IPP request */
       if (*p == '_')
         *p = '-';
       else
-        *p = tolower(*p);
+        *p = tolower(*p & 255);
   }
 
   return (attr);
@@ -2553,5 +2553,5 @@ ipp_write_file(int         *fd,			/* I - File descriptor */
 
 
 /*
- * End of "$Id: ipp.c,v 1.55.2.38 2003/11/07 19:45:05 mike Exp $".
+ * End of "$Id: ipp.c,v 1.55.2.39 2004/02/25 16:58:32 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: dest.c,v 1.18.2.13 2003/10/30 15:45:29 mike Exp $"
+ * "$Id: dest.c,v 1.18.2.14 2004/02/25 16:58:32 mike Exp $"
  *
  *   User-defined destination (and option) support for the Common UNIX
  *   Printing System (CUPS).
@@ -547,9 +547,9 @@ cups_get_dests(const char  *filename,	/* I - File to read from */
     * See what type of line it is...
     */
 
-    if (strncasecmp(line, "dest", 4) == 0 && isspace(line[4]))
+    if (strncasecmp(line, "dest", 4) == 0 && isspace(line[4] & 255))
       lineptr = line + 4;
-    else if (strncasecmp(line, "default", 7) == 0 && isspace(line[7]))
+    else if (strncasecmp(line, "default", 7) == 0 && isspace(line[7] & 255))
       lineptr = line + 7;
     else
       continue;
@@ -558,7 +558,7 @@ cups_get_dests(const char  *filename,	/* I - File to read from */
     * Skip leading whitespace...
     */
 
-    while (isspace(*lineptr))
+    while (isspace(*lineptr & 255))
       lineptr ++;
 
     if (!*lineptr)
@@ -570,7 +570,7 @@ cups_get_dests(const char  *filename,	/* I - File to read from */
     * Search for an instance...
     */
 
-    while (!isspace(*lineptr) && *lineptr && *lineptr != '/')
+    while (!isspace(*lineptr & 255) && *lineptr && *lineptr != '/')
       lineptr ++;
 
     if (!*lineptr)
@@ -589,7 +589,7 @@ cups_get_dests(const char  *filename,	/* I - File to read from */
       * Search for an instance...
       */
 
-      while (!isspace(*lineptr) && *lineptr)
+      while (!isspace(*lineptr & 255) && *lineptr)
 	lineptr ++;
     }
     else
@@ -796,5 +796,5 @@ cups_get_sdests(ipp_op_t    op,		/* I - get-printers or get-classes */
 
 
 /*
- * End of "$Id: dest.c,v 1.18.2.13 2003/10/30 15:45:29 mike Exp $".
+ * End of "$Id: dest.c,v 1.18.2.14 2004/02/25 16:58:32 mike Exp $".
  */

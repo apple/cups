@@ -1,5 +1,5 @@
 /*
- * "$Id: lpq.c,v 1.17.2.11 2003/05/22 12:48:34 mike Exp $"
+ * "$Id: lpq.c,v 1.17.2.12 2004/02/25 16:58:32 mike Exp $"
  *
  *   "lpq" command for the Common UNIX Printing System (CUPS).
  *
@@ -173,7 +173,7 @@ main(int  argc,		/* I - Number of command-line arguments */
 	    break;
       }
     }
-    else if (isdigit(argv[i][0]))
+    else if (isdigit(argv[i][0] & 255))
       id = atoi(argv[i]);
     else
       user = argv[i];
@@ -569,5 +569,5 @@ usage(void)
 
 
 /*
- * End of "$Id: lpq.c,v 1.17.2.11 2003/05/22 12:48:34 mike Exp $".
+ * End of "$Id: lpq.c,v 1.17.2.12 2004/02/25 16:58:32 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: string.c,v 1.5.2.8 2003/07/20 12:51:42 mike Exp $"
+ * "$Id: string.c,v 1.5.2.9 2004/02/25 16:58:32 mike Exp $"
  *
  *   String functions for the Common UNIX Printing System (CUPS).
  *
@@ -88,9 +88,9 @@ cups_strcasecmp(const char *s,	/* I - First string */
 {
   while (*s != '\0' && *t != '\0')
   {
-    if (tolower(*s) < tolower(*t))
+    if (tolower(*s & 255) < tolower(*t & 255))
       return (-1);
-    else if (tolower(*s) > tolower(*t))
+    else if (tolower(*s & 255) > tolower(*t & 255))
       return (1);
 
     s ++;
@@ -118,9 +118,9 @@ cups_strncasecmp(const char *s,	/* I - First string */
 {
   while (*s != '\0' && *t != '\0' && n > 0)
   {
-    if (tolower(*s) < tolower(*t))
+    if (tolower(*s & 255) < tolower(*t & 255))
       return (-1);
-    else if (tolower(*s) > tolower(*t))
+    else if (tolower(*s & 255) > tolower(*t & 255))
       return (1);
 
     s ++;
@@ -222,5 +222,5 @@ cups_strlcpy(char       *dst,	/* O - Destination string */
 
 
 /*
- * End of "$Id: string.c,v 1.5.2.8 2003/07/20 12:51:42 mike Exp $".
+ * End of "$Id: string.c,v 1.5.2.9 2004/02/25 16:58:32 mike Exp $".
  */

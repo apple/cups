@@ -1,5 +1,5 @@
 /*
- * "$Id: http-addr.c,v 1.1.2.11 2003/07/20 03:13:07 mike Exp $"
+ * "$Id: http-addr.c,v 1.1.2.12 2004/02/25 16:58:32 mike Exp $"
  *
  *   HTTP address routines for the Common UNIX Printing System (CUPS).
  *
@@ -258,7 +258,7 @@ httpGetHostByName(const char *name)	/* I - Hostname or IP address */
   * htonl() macro to get the right byte order for the address.
   */
 
-  for (nameptr = name; isdigit(*nameptr) || *nameptr == '.'; nameptr ++);
+  for (nameptr = name; isdigit(*nameptr & 255) || *nameptr == '.'; nameptr ++);
 
   if (!*nameptr)
   {
@@ -300,5 +300,5 @@ httpGetHostByName(const char *name)	/* I - Hostname or IP address */
 
 
 /*
- * End of "$Id: http-addr.c,v 1.1.2.11 2003/07/20 03:13:07 mike Exp $".
+ * End of "$Id: http-addr.c,v 1.1.2.12 2004/02/25 16:58:32 mike Exp $".
  */
