@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.124.2.95 2004/09/09 15:10:29 mike Exp $"
+ * "$Id: job.c,v 1.124.2.96 2004/10/04 19:48:56 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -15,7 +15,7 @@
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
  *       44141 Airport View Drive, Suite 204
- *       Hollywood, Maryland 20636-3142 USA
+ *       Hollywood, Maryland 20636 USA
  *
  *       Voice: (301) 373-9600
  *       EMail: cups-info@cups.org
@@ -1502,7 +1502,8 @@ StartJob(int       id,			/* I - Job ID */
       LogMessage(L_ERROR, "Unable to add decompression filter - %s",
                  strerror(errno));
 
-      free(filters);
+      if (filters != NULL)
+        free(filters);
 
       current->current_file ++;
 
@@ -1531,7 +1532,7 @@ StartJob(int       id,			/* I - Job ID */
   if (current->current_file == 0)
   {
     set_time(current, "time-at-processing");
-    cupsdPipe(current->back_pipes);
+    cupsdOpenPipe(current->back_pipes);
   }
 
  /*
@@ -1951,7 +1952,7 @@ StartJob(int       id,			/* I - Job ID */
   * Now create processes for all of the filters...
   */
 
-  if (cupsdPipe(statusfds))
+  if (cupsdOpenPipe(statusfds))
   {
     LogMessage(L_ERROR, "Unable to create job status pipes - %s.",
 	       strerror(errno));
@@ -1963,6 +1964,7 @@ StartJob(int       id,			/* I - Job ID */
     if (filters != NULL)
       free(filters);
 
+    CancelJob(current->id, 0);
     return;
   }
 
@@ -1993,6 +1995,7 @@ StartJob(int       id,			/* I - Job ID */
     if (filters != NULL)
       free(filters);
 
+    cupsdClosePipe(statusfds);
     CancelJob(current->id, 0);
     return;
   }
@@ -2021,13 +2024,47 @@ StartJob(int       id,			/* I - Job ID */
 #endif	/* __APPLE__ */
 
     if (i < (num_filters - 1))
-      cupsdPipe(filterfds[slot]);
+    {
+      if (cupsdOpenPipe(filterfds[slot]))
+      {
+	LogMessage(L_ERROR, "Unable to create job filter pipes - %s.",
+		strerror(errno));
+	snprintf(printer->state_message, sizeof(printer->state_message),
+		"Unable to create filter pipes - %s.", strerror(errno));
+	AddPrinterHistory(printer);
+
+	if (filters != NULL)
+	  free(filters);
+
+	cupsdClosePipe(statusfds);
+	cupsdClosePipe(filterfds[!slot]);
+	CancelJob(current->id, 0);
+	return;
+      }
+    }
     else
     {
       if (current->current_file == 1)
       {
 	if (strncmp(printer->device_uri, "file:", 5) != 0)
-	  cupsdPipe(current->print_pipes);
+	{
+	  if (cupsdOpenPipe(current->print_pipes))
+	  {
+	    LogMessage(L_ERROR, "Unable to create job filter pipes - %s.",
+		    strerror(errno));
+	    snprintf(printer->state_message, sizeof(printer->state_message),
+		    "Unable to create filter pipes - %s.", strerror(errno));
+	    AddPrinterHistory(printer);
+
+	    if (filters != NULL)
+	      free(filters);
+
+	    cupsdClosePipe(statusfds);
+	    cupsdClosePipe(filterfds[!slot]);
+	    CancelJob(current->id, 0);
+	    return;
+	  }
+	}
 	else
 	{
 	  current->print_pipes[0] = -1;
@@ -2056,6 +2093,8 @@ StartJob(int       id,			/* I - Job ID */
 	    if (filters != NULL)
 	      free(filters);
 
+	    cupsdClosePipe(statusfds);
+	    cupsdClosePipe(filterfds[!slot]);
 	    CancelJob(current->id, 0);
 	    return;
 	  }
@@ -2083,10 +2122,7 @@ StartJob(int       id,			/* I - Job ID */
     LogMessage(L_DEBUG2, "StartJob: Closing filter pipes for slot %d [ %d %d ]...",
                !slot, filterfds[!slot][0], filterfds[!slot][1]);
 
-    if (filterfds[!slot][0] >= 0)
-      close(filterfds[!slot][0]);
-    if (filterfds[!slot][1] >= 0)
-      close(filterfds[!slot][1]);
+    cupsdClosePipe(filterfds[!slot]);
 
     if (pid == 0)
     {
@@ -2154,6 +2190,7 @@ StartJob(int       id,			/* I - Job ID */
 	if (filters != NULL)
 	  free(filters);
 
+	cupsdClosePipe(statusfds);
 	CancelJob(current->id, 0);
 	return;
       }
@@ -2180,22 +2217,12 @@ StartJob(int       id,			/* I - Job ID */
 	LogMessage(L_DEBUG2, "StartJob: Closing print pipes [ %d %d ]...",
         	   current->print_pipes[0], current->print_pipes[1]);
 
-        if (current->print_pipes[0] >= 0)
-	  close(current->print_pipes[0]);
-        if (current->print_pipes[1] >= 0)
-	  close(current->print_pipes[1]);
-
-	current->print_pipes[0] = -1;
-	current->print_pipes[1] = -1;
+        cupsdClosePipe(current->print_pipes);
 
 	LogMessage(L_DEBUG2, "StartJob: Closing back pipes [ %d %d ]...",
         	   current->back_pipes[0], current->back_pipes[1]);
 
-	close(current->back_pipes[0]);
-	close(current->back_pipes[1]);
-
-	current->back_pipes[0] = -1;
-	current->back_pipes[1] = -1;
+        cupsdClosePipe(current->back_pipes);
 
         CancelJob(current->id, 0);
 	return;
@@ -2212,22 +2239,12 @@ StartJob(int       id,			/* I - Job ID */
       LogMessage(L_DEBUG2, "StartJob: Closing print pipes [ %d %d ]...",
         	 current->print_pipes[0], current->print_pipes[1]);
 
-      if (current->print_pipes[0] >= 0)
-	close(current->print_pipes[0]);
-      if (current->print_pipes[1] >= 0)
-	close(current->print_pipes[1]);
-
-      current->print_pipes[0] = -1;
-      current->print_pipes[1] = -1;
+      cupsdClosePipe(current->print_pipes);
 
       LogMessage(L_DEBUG2, "StartJob: Closing back pipes [ %d %d ]...",
         	 current->back_pipes[0], current->back_pipes[1]);
 
-      close(current->back_pipes[0]);
-      close(current->back_pipes[1]);
-
-      current->back_pipes[0] = -1;
-      current->back_pipes[1] = -1;
+      cupsdClosePipe(current->back_pipes);
     }
   }
   else
@@ -2240,23 +2257,14 @@ StartJob(int       id,			/* I - Job ID */
       LogMessage(L_DEBUG2, "StartJob: Closing print pipes [ %d %d ]...",
         	 current->print_pipes[0], current->print_pipes[1]);
 
-      if (current->print_pipes[0] >= 0)
-	close(current->print_pipes[0]);
-      if (current->print_pipes[1] >= 0)
-	close(current->print_pipes[1]);
-
-      current->print_pipes[0] = -1;
-      current->print_pipes[1] = -1;
+      cupsdClosePipe(current->print_pipes);
     }
   }
 
   LogMessage(L_DEBUG2, "StartJob: Closing filter pipes for slot %d [ %d %d ]...",
              slot, filterfds[slot][0], filterfds[slot][1]);
 
-  if (filterfds[slot][0] >= 0)
-    close(filterfds[slot][0]);
-  if (filterfds[slot][1] >= 0)
-    close(filterfds[slot][1]);
+  cupsdClosePipe(filterfds[slot]);
 
   LogMessage(L_DEBUG2, "StartJob: Closing status output pipe %d...",
              statusfds[1]);
@@ -2347,22 +2355,12 @@ StopJob(int id,				/* I - Job ID */
 	LogMessage(L_DEBUG2, "StopJob: Closing print pipes [ %d %d ]...",
         	   current->print_pipes[0], current->print_pipes[1]);
 
-        if (current->print_pipes[0] >= 0)
-	  close(current->print_pipes[0]);
-        if (current->print_pipes[1] >= 0)
-          close(current->print_pipes[1]);
-
-	current->print_pipes[0] = -1;
-	current->print_pipes[1] = -1;
+	cupsdClosePipe(current->print_pipes);
 
 	LogMessage(L_DEBUG2, "StopJob: Closing back pipes [ %d %d ]...",
         	   current->back_pipes[0], current->back_pipes[1]);
 
-        close(current->back_pipes[0]);
-        close(current->back_pipes[1]);
-
-	current->back_pipes[0] = -1;
-	current->back_pipes[1] = -1;
+	cupsdClosePipe(current->back_pipes);
 
         if (current->status_buffer)
         {
@@ -2804,5 +2802,5 @@ set_hold_until(job_t *job, 		/* I - Job to update */
 
 
 /*
- * End of "$Id: job.c,v 1.124.2.95 2004/09/09 15:10:29 mike Exp $".
+ * End of "$Id: job.c,v 1.124.2.96 2004/10/04 19:48:56 mike Exp $".
  */

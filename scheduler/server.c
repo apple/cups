@@ -1,5 +1,5 @@
 /*
- * "$Id: server.c,v 1.2.2.17 2004/09/09 15:10:29 mike Exp $"
+ * "$Id: server.c,v 1.2.2.18 2004/10/04 19:48:56 mike Exp $"
  *
  *   Server start/stop routines for the Common UNIX Printing System (CUPS).
  *
@@ -15,7 +15,7 @@
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
  *       44141 Airport View Drive, Suite 204
- *       Hollywood, Maryland 20636-3142 USA
+ *       Hollywood, Maryland 20636 USA
  *
  *       Voice: (301) 373-9600
  *       EMail: cups-info@cups.org
@@ -93,7 +93,7 @@ StartServer(void)
   * Create a pipe for CGI processes...
   */
 
-  if (cupsdPipe(CGIPipes))
+  if (cupsdOpenPipe(CGIPipes))
     LogMessage(L_ERROR, "StartServer: Unable to create pipes for CGI status!");
   else
   {
@@ -185,5 +185,5 @@ StopServer(void)
 
 
 /*
- * End of "$Id: server.c,v 1.2.2.17 2004/09/09 15:10:29 mike Exp $".
+ * End of "$Id: server.c,v 1.2.2.18 2004/10/04 19:48:56 mike Exp $".
  */

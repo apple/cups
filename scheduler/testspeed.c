@@ -1,5 +1,5 @@
 /*
- * "$Id: testspeed.c,v 1.3.2.7 2004/07/06 00:35:31 mike Exp $"
+ * "$Id: testspeed.c,v 1.3.2.8 2004/10/04 19:48:56 mike Exp $"
  *
  *   Scheduler speed test for the Common UNIX Printing System (CUPS).
  *
@@ -15,7 +15,7 @@
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
  *       44141 Airport View Drive, Suite 204
- *       Hollywood, Maryland 20636-3142 USA
+ *       Hollywood, Maryland 20636 USA
  *
  *       Voice: (301) 373-9600
  *       EMail: cups-info@cups.org
@@ -295,5 +295,5 @@ usage(void)
 
 
 /*
- * End of "$Id: testspeed.c,v 1.3.2.7 2004/07/06 00:35:31 mike Exp $".
+ * End of "$Id: testspeed.c,v 1.3.2.8 2004/10/04 19:48:56 mike Exp $".
  */
