@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.55.2.35 2003/04/27 19:02:35 mike Exp $"
+ * "$Id: ipp.c,v 1.55.2.36 2003/05/09 16:06:43 mike Exp $"
  *
  *   Internet Printing Protocol support functions for the Common UNIX
  *   Printing System (CUPS).
@@ -2467,7 +2467,14 @@ ipp_read_http(http_t      *http,		/* I - Client connection */
       if (http->data_remaining == 0)
       {
 	if (http->data_encoding == HTTP_ENCODE_CHUNKED)
-	  httpGets(len, sizeof(len), http);
+	{
+	 /*
+	  * Get the trailing CR LF after the chunk...
+	  */
+
+	  if (!httpGets(len, sizeof(len), http))
+	    return (-1);
+	}
 
 	if (http->data_encoding != HTTP_ENCODE_CHUNKED)
 	{
@@ -2538,5 +2545,5 @@ ipp_write_file(int         *fd,			/* I - File descriptor */
 
 
 /*
- * End of "$Id: ipp.c,v 1.55.2.35 2003/04/27 19:02:35 mike Exp $".
+ * End of "$Id: ipp.c,v 1.55.2.36 2003/05/09 16:06:43 mike Exp $".
  */

@@ -3,6 +3,7 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.19rc5
 
+	- Added more checks for HTTP request timeouts.
 	- The scheduler dropped the first non-alpha character
 	  after an open brace when doing attribute substitutions
 	  in banner pages (STR #77)
