@@ -479,10 +479,21 @@ GBool openTempFile(GString **name, FILE **f, const char *mode, const char *ext) 
   return gTrue;
 #else
   //---------- Unix ----------
-  char *s, *p;
+  char *s;
   int fd;
 
   if (ext) {
+#  if HAVE_MKSTEMPS
+    if ((s = getenv("TMPDIR"))) {
+      *name = new GString(s);
+    } else {
+      *name = new GString("/tmp");
+    }
+    (*name)->append("/XXXXXX");
+    (*name)->append(ext);
+    fd = mkstemps((*name)->getCString(), strlen(ext));
+# else // HAVE_MKSTEMPS
+  char *p;
     if (!(s = tmpnam(NULL))) {
       return gFalse;
     }
@@ -493,6 +504,7 @@ GBool openTempFile(GString **name, FILE **f, const char *mode, const char *ext) 
     }
     (*name)->append(ext);
     fd = open((*name)->getCString(), O_WRONLY | O_CREAT | O_EXCL, 0600);
+#  endif // HAVE_MKSTEMPS
   } else {
 #  if HAVE_MKSTEMP
     if ((s = getenv("TMPDIR"))) {

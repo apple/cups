@@ -1,5 +1,5 @@
 /*
- * "$Id: config.h.in,v 1.46 2001/10/17 15:54:17 mike Exp $"
+ * "$Id: config.h.in,v 1.47 2001/10/29 21:52:18 mike Exp $"
  *
  *   Configuration file for the Common UNIX Printing System (CUPS).
  *
@@ -188,12 +188,13 @@
 
 
 /*
- * Do we have mkstemp()?
+ * Do we have mkstemp() and/or mkstemps()?
  */
 
 #undef HAVE_MKSTEMP
+#undef HAVE_MKSTEMPS
 
 
 /*
- * End of "$Id: config.h.in,v 1.46 2001/10/17 15:54:17 mike Exp $".
+ * End of "$Id: config.h.in,v 1.47 2001/10/29 21:52:18 mike Exp $".
  */

@@ -1,4 +1,4 @@
-CHANGES.txt - 10/28/2001
+CHANGES.txt - 10/29/2001
 ------------------------
 
 CHANGES IN CUPS V1.1.11
@@ -86,10 +86,13 @@ CHANGES IN CUPS V1.1.11
 	- The cups-lpd mini-daemon now returns a non-zero
 	  status if an invalid destination or job ID is
 	  provided.
-	- The scheduler did not honor the KeepAlive setting
-	  in cupsd.conf.
-	- Increased the size of the file read/write buffers
-	  to 32k.
+	- The scheduler did not honor the KeepAlive setting in
+	  cupsd.conf.
+	- Increased the size of the file read/write buffers to
+	  32k.
+	- *BSD static library creation fixes.
+	- Use mkstemps() instead of tmpnam() in pdftops whenever
+	  possible.
 
 
 CHANGES IN CUPS V1.1.10-1
