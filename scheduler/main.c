@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c,v 1.106 2003/08/01 15:20:27 mike Exp $"
+ * "$Id: main.c,v 1.107 2003/08/01 20:00:53 mike Exp $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -402,7 +402,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   if (RunAsUser)
   {
     setgid(Group);
-    setgroups(0, NULL);
+    setgroups(1, &Group);
     setuid(User);
   }
 
@@ -1103,5 +1103,5 @@ usage(void)
 
 
 /*
- * End of "$Id: main.c,v 1.106 2003/08/01 15:20:27 mike Exp $".
+ * End of "$Id: main.c,v 1.107 2003/08/01 20:00:53 mike Exp $".
  */

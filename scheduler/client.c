@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.168 2003/07/20 15:15:07 mike Exp $"
+ * "$Id: client.c,v 1.169 2003/08/01 20:00:52 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -3171,7 +3171,7 @@ pipe_command(client_t *con,		/* I - Client connection */
       if (setgid(Group))
         exit(errno);
 
-      if (setgroups(0, NULL))
+      if (setgroups(1, &Group))
         exit(errno);
 
       if (setuid(User))
@@ -3183,7 +3183,7 @@ pipe_command(client_t *con,		/* I - Client connection */
       * Reset group membership to just the main one we belong to.
       */
 
-      setgroups(0, NULL);
+      setgroups(1, &Group);
     }
 
    /*
@@ -3329,5 +3329,5 @@ CDSAWriteFunc(SSLConnectionRef connection,	/* I  - SSL/TLS connection */
 
 
 /*
- * End of "$Id: client.c,v 1.168 2003/07/20 15:15:07 mike Exp $".
+ * End of "$Id: client.c,v 1.169 2003/08/01 20:00:52 mike Exp $".
  */
