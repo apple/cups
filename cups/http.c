@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.81 2001/02/28 14:48:07 mike Exp $"
+ * "$Id: http.c,v 1.82 2001/03/06 14:57:00 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -790,7 +790,7 @@ httpGetSubField(http_t       *http,	/* I - HTTP data */
     * Skip leading whitespace...
     */
 
-    while (isspace(*fptr));
+    while (isspace(*fptr))
       fptr ++;
 
     if (*fptr == ',')
@@ -825,7 +825,7 @@ httpGetSubField(http_t       *http,	/* I - HTTP data */
 
     fptr ++;
 
-    while (isspace(*fptr));
+    while (isspace(*fptr))
       fptr ++;
 
     if (*fptr == '\"')
@@ -2038,5 +2038,5 @@ http_upgrade(http_t *http)	/* I - HTTP data */
 
 
 /*
- * End of "$Id: http.c,v 1.81 2001/02/28 14:48:07 mike Exp $".
+ * End of "$Id: http.c,v 1.82 2001/03/06 14:57:00 mike Exp $".
  */

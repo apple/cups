@@ -71,6 +71,8 @@ CHANGES IN CUPS V1.1.7
 	  which could block if insufficient entropy information
 	  had been collected by the kernel.  Now use
 	  /dev/urandom.
+	- Fixed a bug in the whitespace skipping code in
+	  httpGetSubField().
 
 
 CHANGES IN CUPS V1.1.6-3
