@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp-var.c,v 1.24 2002/01/02 17:58:36 mike Exp $"
+ * "$Id: ipp-var.c,v 1.25 2002/03/28 12:54:41 mike Exp $"
  *
  *   IPP variable routines for the Common UNIX Printing System (CUPS).
  *
@@ -239,7 +239,8 @@ ippSetCGIVars(ipp_t      *response,	/* I - Response data to be copied... */
 		  * Map localhost access to localhost and local port...
 		  */
 
-        	  if (strcasecmp(hostname, server) == 0 &&
+        	  if ((strcasecmp(hostname, server) == 0 ||
+		       strcasecmp(hostname, "localhost") == 0) &&
 	              (strcmp(getenv("REMOTE_HOST"), "127.0.0.1") == 0 ||
 		       strcmp(getenv("REMOTE_HOST"), "localhost") == 0 ||
 		       strcmp(getenv("REMOTE_HOST"), server) == 0))
@@ -295,5 +296,5 @@ ippSetCGIVars(ipp_t      *response,	/* I - Response data to be copied... */
 
 
 /*
- * End of "$Id: ipp-var.c,v 1.24 2002/01/02 17:58:36 mike Exp $".
+ * End of "$Id: ipp-var.c,v 1.25 2002/03/28 12:54:41 mike Exp $".
  */
