@@ -1,5 +1,5 @@
 /*
- * "$Id: filter.c,v 1.3.2.4 2002/08/23 20:59:44 mike Exp $"
+ * "$Id: filter.c,v 1.3.2.5 2002/12/16 03:04:40 mike Exp $"
  *
  *   File type conversion routines for the Common UNIX Printing System (CUPS).
  *
@@ -180,28 +180,34 @@ mimeFilter(mime_t      *mime,		/* I - MIME database */
     * Got a direct filter!
     */
 
-    if ((filters = (mime_filter_t *)malloc(sizeof(mime_filter_t))) == NULL)
+    if ((mintemp = (mime_filter_t *)malloc(sizeof(mime_filter_t))) == NULL)
       return (NULL);
 
-    memcpy(filters, temp, sizeof(mime_filter_t));
-    *num_filters = 1;
+    memcpy(mintemp, temp, sizeof(mime_filter_t));
+    num_mintemp = 1;
+    mincost     = mintemp->cost;
 
-    DEBUG_puts("    Returning 1 filter:");
+    DEBUG_puts("    Found direct filter:");
     DEBUG_printf(("    %s\n", filters->filter));
+  }
+  else
+  {
+   /*
+    * No direct filter...
+    */
 
-    return (filters);
+    mincost     = 9999999;
+    mintemp     = NULL;
+    num_mintemp = 0;
   }
 
  /*
   * OK, now look for filters from the source type to any other type...
   */
 
-  mincost     = 9999999;
-  mintemp     = NULL;
-  num_mintemp = 0;
-  mincurrent  = NULL;
-
-  for (i = mime->num_filters, current = mime->filters; i > 0; i --, current ++)
+  for (i = mime->num_filters, mincurrent  = NULL, current = mime->filters;
+       i > 0;
+       i --, current ++)
     if (current->src == src)
     {
      /*
@@ -219,7 +225,7 @@ mimeFilter(mime_t      *mime,		/* I - MIME database */
       */
 
       for (j = 0, cost = 0; j < num_temp; j ++)
-        cost += temp->cost;
+        cost += temp[j].cost;
 
       if (cost < mincost)
       {
@@ -316,5 +322,5 @@ lookup(mime_t      *mime,	/* I - MIME database */
 
 
 /*
- * End of "$Id: filter.c,v 1.3.2.4 2002/08/23 20:59:44 mike Exp $".
+ * End of "$Id: filter.c,v 1.3.2.5 2002/12/16 03:04:40 mike Exp $".
  */

@@ -3,6 +3,9 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.18
 
+	- The scheduler did not compute the cost of filters
+	  properly, nor did it choose a multi-filter solution
+	  with a lower cost than a single filter solution.
 	- Now install CUPS PPD file test utility (cupstestppd)
 	  to support basic conformance testing of PPD files.
 	- The scheduler now logs an error message when it sees a
