@@ -1,5 +1,5 @@
 /*
- * "$Id: imagetops.c,v 1.27 2000/07/21 15:57:44 mike Exp $"
+ * "$Id: imagetops.c,v 1.28 2000/08/01 16:06:00 mike Exp $"
  *
  *   Image file to PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -98,12 +98,50 @@ main(int  argc,		/* I - Number of command-line arguments */
   int		hue, sat;	/* Hue and saturation adjustment */
   int		realcopies;	/* Real copies being printed */
   float		left, top;	/* Left and top of image */
+  char		filename[1024];	/* Name of file to print */
 
 
-  if (argc != 7)
+ /*
+  * Check arguments...
+  */
+
+  if (argc < 6 || argc > 7)
   {
-    fputs("ERROR: imagetops job-id user title copies options file\n", stderr);
+    fputs("ERROR: imagetops job-id user title copies options [file]\n", stderr);
     return (1);
+  }
+
+  fprintf(stderr, "INFO: %s %s %s %s %s %s %s\n", argv[0], argv[1], argv[2],
+          argv[3], argv[4], argv[5], argv[6] ? argv[6] : "(null)");
+
+ /*
+  * Copy stdin as needed...
+  */
+
+  if (argc == 6)
+  {
+    FILE	*fp;		/* File to read from */
+    char	buffer[8192];	/* Buffer to read into */
+    int		bytes;		/* # of bytes to read */
+
+
+    if ((fp = fopen(cupsTempFile(filename, sizeof(filename)), "w")) == NULL)
+    {
+      perror("ERROR: Unable to copy image file");
+      return (1);
+    }
+
+    fprintf(stderr, "DEBUG: imagetops - copying to temp print file \"%s\"\n",
+            filename);
+
+    while ((bytes = fread(buffer, 1, sizeof(buffer), stdin)) > 0)
+      fwrite(buffer, 1, bytes, fp);
+    fclose(fp);
+  }
+  else
+  {
+    strncpy(filename, argv[6], sizeof(filename) - 1);
+    filename[sizeof(filename) - 1] = '\0';
   }
 
  /*
@@ -217,7 +255,12 @@ main(int  argc,		/* I - Number of command-line arguments */
 
   colorspace = ColorDevice ? IMAGE_RGB : IMAGE_WHITE;
 
-  if ((img = ImageOpen(argv[6], colorspace, IMAGE_WHITE, sat, hue, NULL)) == NULL)
+  img = ImageOpen(filename, colorspace, IMAGE_WHITE, sat, hue, NULL);
+
+  if (argc == 6)
+    unlink(filename);
+
+  if (img == NULL)
   {
     fputs("ERROR: Unable to open image file for printing!\n", stderr);
     ppdClose(ppd);
@@ -681,5 +724,5 @@ ps_ascii85(ib_t *data,		/* I - Data to print */
 
 
 /*
- * End of "$Id: imagetops.c,v 1.27 2000/07/21 15:57:44 mike Exp $".
+ * End of "$Id: imagetops.c,v 1.28 2000/08/01 16:06:00 mike Exp $".
  */

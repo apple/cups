@@ -1,5 +1,5 @@
 /*
- * "$Id: imagetoraster.c,v 1.48 2000/07/21 15:57:44 mike Exp $"
+ * "$Id: imagetoraster.c,v 1.49 2000/08/01 16:06:00 mike Exp $"
  *
  *   Image file to raster filter for the Common UNIX Printing System (CUPS).
  *
@@ -24,6 +24,8 @@
  * Contents:
  *
  *   main()          - Main entry...
+ *   exec_code()     - Execute PostScript setpagedevice commands as
+ *                     appropriate.
  *   format_CMY()    - Convert image data to CMY.
  *   format_CMYK()   - Convert image data to CMYK.
  *   format_K()      - Convert image data to black.
@@ -34,10 +36,6 @@
  *   format_YMC()    - Convert image data to YMC.
  *   format_YMCK()   - Convert image data to YMCK.
  *   make_lut()      - Make a lookup table given gamma and brightness values.
- */
-
-/*
- * Include necessary headers...
  */
 
 /*
@@ -123,7 +121,7 @@ int	Planes[] =	/* Number of planes for each colorspace */
  * Local functions...
  */
  
-static void	exec_choice(cups_page_header_t *header, ppd_choice_t *choice);
+static void	exec_code(cups_page_header_t *header, const char *code);
 static void	format_CMY(cups_page_header_t *header, unsigned char *row, int y, int z, int xsize, int ysize, int yerr0, int yerr1, ib_t *r0, ib_t *r1);
 static void	format_CMYK(cups_page_header_t *header, unsigned char *row, int y, int z, int xsize, int ysize, int yerr0, int yerr1, ib_t *r0, ib_t *r1);
 static void	format_K(cups_page_header_t *header, unsigned char *row, int y, int z, int xsize, int ysize, int yerr0, int yerr1, ib_t *r0, ib_t *r1);
@@ -166,7 +164,9 @@ main(int  argc,		/* I - Number of command-line arguments */
   int		x0, y0,		/* Corners of the page in image coords */
 		x1, y1;
   ppd_file_t	*ppd;		/* PPD file */
-  ppd_choice_t	*choice;	/* PPD option choice */
+  ppd_choice_t	*choice,	/* PPD option choice */
+		**choices;	/* List of marked choices */
+  int		count;		/* Number of marked choices */
   char		*resolution,	/* Output resolution */
 		*media_type;	/* Media type */
   ppd_profile_t	*profile;	/* Color profile */
@@ -198,16 +198,51 @@ main(int  argc,		/* I - Number of command-line arguments */
   ib_t		lut[256];	/* Gamma/brightness LUT */
   int		plane,		/* Current color plane */
 		num_planes;	/* Number of color planes */
+  char		filename[1024];	/* Name of file to print */
 
 
-  if (argc != 7)
+ /*
+  * Check arguments...
+  */
+
+  if (argc < 6 || argc > 7)
   {
-    fputs("ERROR: imagetoraster job-id user title copies options file\n", stderr);
+    fputs("ERROR: imagetoraster job-id user title copies options [file]\n", stderr);
     return (1);
   }
 
   fprintf(stderr, "INFO: %s %s %s %s %s %s %s\n", argv[0], argv[1], argv[2],
-          argv[3], argv[4], argv[5], argv[6]);
+          argv[3], argv[4], argv[5], argv[6] ? argv[6] : "(null)");
+
+ /*
+  * Copy stdin as needed...
+  */
+
+  if (argc == 6)
+  {
+    FILE	*fp;		/* File to read from */
+    char	buffer[8192];	/* Buffer to read into */
+    int		bytes;		/* # of bytes to read */
+
+
+    if ((fp = fopen(cupsTempFile(filename, sizeof(filename)), "w")) == NULL)
+    {
+      perror("ERROR: Unable to copy image file");
+      return (1);
+    }
+
+    fprintf(stderr, "DEBUG: imagetoraster - copying to temp print file \"%s\"\n",
+            filename);
+
+    while ((bytes = fread(buffer, 1, sizeof(buffer), stdin)) > 0)
+      fwrite(buffer, 1, bytes, fp);
+    fclose(fp);
+  }
+  else
+  {
+    strncpy(filename, argv[6], sizeof(filename) - 1);
+    filename[sizeof(filename) - 1] = '\0';
+  }
 
  /*
   * Process command-line options and write the prolog...
@@ -325,33 +360,36 @@ main(int  argc,		/* I - Number of command-line arguments */
   header.cupsColorOrder   = CUPS_ORDER_CHUNKED;
   header.cupsColorSpace   = CUPS_CSPACE_K;
 
-  if ((choice = ppdFindMarkedChoice(ppd, "ColorModel")) != NULL)
-    exec_choice(&header, choice);
+  if (ppd->patches)
+    exec_code(&header, ppd->patches);
 
-  if ((choice = ppdFindMarkedChoice(ppd, "CutMedia")) != NULL)
-    exec_choice(&header, choice);
+  if ((count = ppdCollect(ppd, PPD_ORDER_DOCUMENT, &choices)) > 0)
+    for (i = 0; i < count; i ++)
+      exec_code(&header, choices[i]->code);
 
-  if ((choice = ppdFindMarkedChoice(ppd, "ESPFinishing")) != NULL)
-    exec_choice(&header, choice);
+  if ((count = ppdCollect(ppd, PPD_ORDER_ANY, &choices)) > 0)
+    for (i = 0; i < count; i ++)
+      exec_code(&header, choices[i]->code);
 
-  if ((choice = ppdFindMarkedChoice(ppd, "InputSlot")) != NULL)
-    exec_choice(&header, choice);
+  if ((count = ppdCollect(ppd, PPD_ORDER_PROLOG, &choices)) > 0)
+    for (i = 0; i < count; i ++)
+      exec_code(&header, choices[i]->code);
+
+  if ((count = ppdCollect(ppd, PPD_ORDER_PAGE, &choices)) > 0)
+    for (i = 0; i < count; i ++)
+      exec_code(&header, choices[i]->code);
+
+ /*
+  * Get the media type and resolution that have been chosen...
+  */
 
   if ((choice = ppdFindMarkedChoice(ppd, "MediaType")) != NULL)
-  {
-    exec_choice(&header, choice);
-
     media_type = choice->choice;
-  }
   else
     media_type = "";
 
   if ((choice = ppdFindMarkedChoice(ppd, "Resolution")) != NULL)
-  {
-    exec_choice(&header, choice);
-
     resolution = choice->choice;
-  }
   else
     resolution = "";
 
@@ -517,7 +555,12 @@ main(int  argc,		/* I - Number of command-line arguments */
 
   fputs("INFO: Loading image file...\n", stderr);
 
-  if ((img = ImageOpen(argv[6], primary, secondary, sat, hue, lut)) == NULL)
+  img = ImageOpen(filename, primary, secondary, sat, hue, lut);
+
+  if (argc == 6)
+    unlink(filename);
+
+  if (img == NULL)
   {
     fputs("ERROR: Unable to open image file for printing!\n", stderr);
     ppdClose(ppd);
@@ -1163,20 +1206,19 @@ main(int  argc,		/* I - Number of command-line arguments */
 
 
 /*
- * 'exec_choice()' - Execute PostScript setpagedevice commands as appropriate.
+ * 'exec_code()' - Execute PostScript setpagedevice commands as appropriate.
  */
 
 static void
-exec_choice(cups_page_header_t *header,	/* I - Page header */
-            ppd_choice_t       *choice)	/* I - Option choice to execute */
+exec_code(cups_page_header_t *header,	/* I - Page header */
+          const char         *code)	/* I - Option choice to execute */
 {
-  char	*code,				/* Pointer into code string */
-	*ptr,				/* Pointer into name/value string */
+  char	*ptr,				/* Pointer into name/value string */
 	name[255],			/* Name of pagedevice entry */
 	value[1024];			/* Value of pagedevice entry */
 
 
-  for (code = choice->code; *code != '\0';)
+  for (; *code != '\0';)
   {
    /*
     * Search for the start of a dictionary name...
@@ -1234,7 +1276,7 @@ exec_choice(cups_page_header_t *header,	/* I - Page header */
 	{
 	  code ++;
 	  if (isdigit(*code))
-	    *ptr++ = (char)strtol(code, &code, 8);
+	    *ptr++ = (char)strtol(code, (char **)&code, 8);
           else
 	    *ptr++ = *code++;
 	}
@@ -4256,5 +4298,5 @@ make_lut(ib_t  *lut,		/* I - Lookup table */
 
 
 /*
- * End of "$Id: imagetoraster.c,v 1.48 2000/07/21 15:57:44 mike Exp $".
+ * End of "$Id: imagetoraster.c,v 1.49 2000/08/01 16:06:00 mike Exp $".
  */
