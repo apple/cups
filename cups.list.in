@@ -1,5 +1,5 @@
 #
-# "$Id: cups.list.in,v 1.13.2.13 2003/03/19 15:37:44 mike Exp $"
+# "$Id: cups.list.in,v 1.13.2.14 2003/03/30 21:49:14 mike Exp $"
 #
 #   ESP Package Manager (EPM) file list for the Common UNIX Printing
 #   System (CUPS).
@@ -132,15 +132,16 @@ d 0555 root sys $SERVERBIN/daemon -
 f 0555 root sys $SERVERBIN/daemon/cups-lpd scheduler/cups-lpd
 f 0555 root sys $SERVERBIN/daemon/cups-polld scheduler/cups-polld
 d 0555 root sys $SERVERBIN/filter -
-f 0555 root sys $SERVERBIN/filter/pdftops pdftops/pdftops
+f 0555 root sys $SERVERBIN/filter/gziptoany filter/gziptoany
+f 0555 root sys $SERVERBIN/filter/hpgltops filter/hpgltops
 f 0555 root sys $SERVERBIN/filter/imagetops filter/imagetops
+f 0555 root sys $SERVERBIN/filter/imagetoraster filter/imagetoraster
+f 0555 root sys $SERVERBIN/filter/pdftops pdftops/pdftops
 f 0555 root sys $SERVERBIN/filter/pstops filter/pstops
-f 0555 root sys $SERVERBIN/filter/texttops filter/texttops
 f 0555 root sys $SERVERBIN/filter/rastertodymo filter/rastertodymo
 f 0555 root sys $SERVERBIN/filter/rastertoepson filter/rastertoepson
 f 0555 root sys $SERVERBIN/filter/rastertohp filter/rastertohp
-f 0555 root sys $SERVERBIN/filter/hpgltops filter/hpgltops
-f 0555 root sys $SERVERBIN/filter/imagetoraster filter/imagetoraster
+f 0555 root sys $SERVERBIN/filter/texttops filter/texttops
 
 # Admin commands
 l 0555 root sys $BINDIR/disable $SBINDIR/accept
@@ -388,5 +389,5 @@ f 0444 root sys $AMANDIR/man$MAN8DIR/lpmove.$MAN8EXT man/lpmove.man
 i 0555 root sys cups cups.sh
 
 #
-# End of "$Id: cups.list.in,v 1.13.2.13 2003/03/19 15:37:44 mike Exp $".
+# End of "$Id: cups.list.in,v 1.13.2.14 2003/03/30 21:49:14 mike Exp $".
 #

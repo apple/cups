@@ -1,5 +1,5 @@
 /*
- * "$Id: file.h,v 1.1.2.2 2003/03/30 20:01:44 mike Exp $"
+ * "$Id: file.h,v 1.1.2.3 2003/03/30 21:49:17 mike Exp $"
  *
  *   File definitions for the Common UNIX Printing System (CUPS).
  *
@@ -49,6 +49,14 @@ extern "C" {
 
 
 /*
+ * CUPS file definitions...
+ */
+
+#  define CUPS_FILE_NONE	0	/* No compression */
+#  define CUPS_FILE_GZIP	1	/* GZIP compression */
+
+
+/*
  * CUPS file structure...
  */
 
@@ -75,7 +83,7 @@ typedef struct
  */
 
 extern int		cupsFileClose(cups_file_t *fp);
-#define			cupsFileCompressed(fp) (fp)->compressed
+#define			cupsFileCompression(fp) (fp)->compressed
 extern int		cupsFileFlush(cups_file_t *fp);
 extern int		cupsFileGetChar(cups_file_t *fp);
 extern char		*cupsFileGets(cups_file_t *fp, char *buf, int buflen);
@@ -96,5 +104,5 @@ extern int		cupsFileWrite(cups_file_t *fp, const char *buf, int bytes);
 #endif /* !_CUPS_FILE_H_ */
 
 /*
- * End of "$Id: file.h,v 1.1.2.2 2003/03/30 20:01:44 mike Exp $".
+ * End of "$Id: file.h,v 1.1.2.3 2003/03/30 21:49:17 mike Exp $".
  */

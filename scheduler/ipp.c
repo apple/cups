@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.127.2.55 2003/03/30 20:01:44 mike Exp $"
+ * "$Id: ipp.c,v 1.127.2.56 2003/03/30 21:49:17 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -88,7 +88,8 @@
 
 static void	accept_jobs(client_t *con, ipp_attribute_t *uri);
 static void	add_class(client_t *con, ipp_attribute_t *uri);
-static int	add_file(client_t *con, job_t *job, mime_type_t *filetype);
+static int	add_file(client_t *con, job_t *job, mime_type_t *filetype,
+		         int compression);
 static void	add_job_state_reasons(client_t *con, job_t *job);
 static void	add_printer(client_t *con, ipp_attribute_t *uri);
 static void	add_printer_state_reasons(client_t *con, printer_t *p);
@@ -847,26 +848,36 @@ add_class(client_t        *con,		/* I - Client connection */
 static int				/* O - 0 on success, -1 on error */
 add_file(client_t    *con,		/* I - Connection to client */
          job_t       *job,		/* I - Job to add to */
-         mime_type_t *filetype)		/* I - Type of file */
+         mime_type_t *filetype,		/* I - Type of file */
+	 int         compression)	/* I - Compression */
 {
   mime_type_t	**filetypes;		/* New filetypes array... */
+  int		*compressions;		/* New compressions array... */
 
 
-  LogMessage(L_DEBUG2, "add_file(%d, %d, %s/%s)\n", con->http.fd,
-             job->id, filetype->super, filetype->type);
+  LogMessage(L_DEBUG2, "add_file(con=%p[%d], job=%d, filetype=%s/%s, compression=%d)\n",
+             con, con->http.fd, job->id, filetype->super, filetype->type,
+	     compression);
 
  /*
   * Add the file to the job...
   */
 
   if (job->num_files == 0)
-    filetypes = (mime_type_t **)malloc(sizeof(mime_type_t *));
+  {
+    compressions = (int *)malloc(sizeof(int));
+    filetypes    = (mime_type_t **)malloc(sizeof(mime_type_t *));
+  }
   else
-    filetypes = (mime_type_t **)realloc(job->filetypes,
-                                       (job->num_files + 1) *
-				       sizeof(mime_type_t));
+  {
+    compressions = (int *)realloc(job->compressions,
+                                  (job->num_files + 1) * sizeof(int));
+    filetypes    = (mime_type_t **)realloc(job->filetypes,
+                                           (job->num_files + 1) *
+					   sizeof(mime_type_t *));
+  }
 
-  if (filetypes == NULL)
+  if (compressions == NULL || filetypes == NULL)
   {
     CancelJob(job->id, 1);
     LogMessage(L_ERROR, "add_file: unable to allocate memory for file types!");
@@ -874,8 +885,10 @@ add_file(client_t    *con,		/* I - Connection to client */
     return (-1);
   }
 
-  job->filetypes                 = filetypes;
-  job->filetypes[job->num_files] = filetype;
+  job->compressions                 = compressions;
+  job->compressions[job->num_files] = compression;
+  job->filetypes                    = filetypes;
+  job->filetypes[job->num_files]    = filetype;
 
   job->num_files ++;
 
@@ -2613,7 +2626,7 @@ copy_banner(client_t   *con,	/* I - Client connection */
   * Open the banner and job files...
   */
 
-  if (add_file(con, job, banner->filetype))
+  if (add_file(con, job, banner->filetype, 0))
     return (0);
 
   snprintf(filename, sizeof(filename), "%s/d%05d-%03d", RequestRoot, job->id,
@@ -4034,6 +4047,7 @@ print_job(client_t        *con,		/* I - Client connection */
   int			kbytes;		/* Size of file */
   int			i;		/* Looping var */
   int			lowerpagerange;	/* Page range bound */
+  int			compression;	/* Document compression */
 
 
   LogMessage(L_DEBUG2, "print_job(%d, %s)\n", con->http.fd,
@@ -4086,18 +4100,31 @@ print_job(client_t        *con,		/* I - Client connection */
 
  /*
   * OK, see if the client is sending the document compressed - CUPS
-  * doesn't support compression yet...
+  * only supports "none" and "gzip".
   */
 
-  if ((attr = ippFindAttribute(con->request, "compression", IPP_TAG_KEYWORD)) != NULL &&
-      strcmp(attr->values[0].string.text, "none") == 0)
+  compression = CUPS_FILE_NONE;
+
+  if ((attr = ippFindAttribute(con->request, "compression", IPP_TAG_KEYWORD)) != NULL)
   {
-    LogMessage(L_ERROR, "print_job: Unsupported compression attribute %s!",
-               attr->values[0].string.text);
-    send_ipp_error(con, IPP_ATTRIBUTES);
-    ippAddString(con->response, IPP_TAG_UNSUPPORTED_GROUP, IPP_TAG_KEYWORD,
-	         "compression", NULL, attr->values[0].string.text);
-    return;
+    if (strcmp(attr->values[0].string.text, "none")
+#ifdef HAVE_LIBZ
+        && strcmp(attr->values[0].string.text, "gzip")
+#endif /* HAVE_LIBZ */
+      )
+    {
+      LogMessage(L_ERROR, "print_job: Unsupported compression \"%s\"!",
+        	 attr->values[0].string.text);
+      send_ipp_error(con, IPP_ATTRIBUTES);
+      ippAddString(con->response, IPP_TAG_UNSUPPORTED_GROUP, IPP_TAG_KEYWORD,
+	           "compression", NULL, attr->values[0].string.text);
+      return;
+    }
+
+#ifdef HAVE_LIBZ
+    if (!strcmp(attr->values[0].string.text, "gzip"))
+      compression = CUPS_FILE_GZIP;
+#endif /* HAVE_LIBZ */
   }
 
  /*
@@ -4148,7 +4175,7 @@ print_job(client_t        *con,		/* I - Client connection */
 
     LogMessage(L_DEBUG, "print_job: auto-typing file...");
 
-    filetype = mimeFileType(MimeDatabase, con->filename);
+    filetype = mimeFileType(MimeDatabase, con->filename, &compression);
 
     if (filetype != NULL)
     {
@@ -4531,7 +4558,7 @@ print_job(client_t        *con,		/* I - Client connection */
   * Add the job file...
   */
 
-  if (add_file(con, job, filetype))
+  if (add_file(con, job, filetype, compression))
     return;
 
   snprintf(filename, sizeof(filename), "%s/d%05d-%03d", RequestRoot, job->id,
@@ -4595,97 +4622,6 @@ print_job(client_t        *con,		/* I - Client connection */
 
 
 /*
- * PostScript line buffer structure for lines up to 255 chars...
- */
-
-typedef struct
-{
-  char	buffer[256],			/* Line buffer (max 255 chars) */
-	*bufptr;			/* Pointer to next line */
-  int	bufused;			/* Number of bytes used */
-} cups_psline_t;
-
-
-/*
- * 'read_ps_line()' - Read a line from a PS file...
- */
-
-static char *				/* O  - Line or NULL on EOF/error */
-read_ps_line(int           fd,		/* I  - File descriptor to read from */
-             cups_psline_t *line)	/* IO - Line data */
-{
-  int	bytes;				/* Bytes read */
-  char	*cr, *lf;			/* Pointers into buffer */
-
-
-  if (line->bufused > 0 && line->bufptr > line->buffer)
-  {
-   /*
-    * Remove the last line that was read from the buffer...
-    */
-
-    bytes = line->bufptr - line->buffer;
-
-    strcpy(line->buffer, line->bufptr);
-
-    line->bufused -= bytes;
-
-    if (line->bufused < 0)
-      line->bufused = 0;
-  }
-
- /*
-  * Read more data into the buffer...
-  */
-
-  bytes = sizeof(line->buffer) - line->bufused - 1;
-  if ((bytes = read(fd, line->buffer + line->bufused, bytes)) < 0)
-    return (NULL);
-
- /*
-  * Nul-terminate the string buffer...
-  */
-
-  line->bufused += bytes;
-  line->buffer[line->bufused] = '\0';
-
- /*
-  * Check for CR and/or LF.
-  */
-
-  cr = strchr(line->buffer, '\r');
-  lf = strchr(line->buffer, '\n');
-
-  if (!cr && !lf)
-    return (NULL);
-
-  if (cr && cr < lf)
-  {
-   /*
-    * CR and possibly LF terminate this line...
-    */
-
-    *cr++ = '\0';
-    if (*cr == '\n')
-      *cr++ = '\0';
-
-    line->bufptr = cr;
-  }
-  else
-  {
-   /*
-    * LF terminates this line...
-    */
-
-    *lf++ = '\0';
-    line->bufptr = lf;
-  }
-
-  return (line->buffer);
-}
-
-
-/*
  * 'read_ps_job_ticket()' - Reads a job ticket embedded in a PS file.
  *
  * This function only gets called when printing a single PostScript
@@ -4721,8 +4657,8 @@ read_ps_line(int           fd,		/* I  - File descriptor to read from */
 static void
 read_ps_job_ticket(client_t *con)	/* I - Client connection */
 {
-  int			fd;		/* File to read from */
-  cups_psline_t		line;		/* Line data */
+  cups_file_t		*fp;		/* File to read from */
+  char			line[256];	/* Line data */
   int			num_options;	/* Number of options */
   cups_option_t		*options;	/* Options */
   ipp_t			*ticket;	/* New attributes */
@@ -4735,34 +4671,32 @@ read_ps_job_ticket(client_t *con)	/* I - Client connection */
   * First open the print file...
   */
 
-  if ((fd = open(con->filename, O_RDONLY)) < 0)
+  if ((fp = cupsFileOpen(con->filename, "rb")) == NULL)
   {
     LogMessage(L_ERROR, "read_ps_job_ticket: Unable to open PostScript print file - %s",
                strerror(errno));
     return;
   }
 
-  memset(&line, 0, sizeof(line));
-
  /*
   * Skip the first line...
   */
 
-  if (read_ps_line(fd, &line) == NULL)
+  if (cupsFileGets(fp, line, sizeof(line)) == NULL)
   {
     LogMessage(L_ERROR, "read_ps_job_ticket: Unable to read from PostScript print file - %s",
                strerror(errno));
-    close(fd);
+    cupsFileClose(fp);
     return;
   }
 
-  if (strncmp(line.buffer, "%!PS-Adobe-", 11) != 0)
+  if (strncmp(line, "%!PS-Adobe-", 11) != 0)
   {
    /*
     * Not a DSC-compliant file, so no job ticket info will be available...
     */
 
-    close(fd);
+    cupsFileClose(fp);
     return;
   }
 
@@ -4773,27 +4707,27 @@ read_ps_job_ticket(client_t *con)	/* I - Client connection */
   num_options = 0;
   options     = NULL;
 
-  while (read_ps_line(fd, &line) != NULL)
+  while (cupsFileGets(fp, line, sizeof(line)) != NULL)
   {
    /*
     * Stop at the first non-ticket line...
     */
 
-    if (strncmp(line.buffer, "%cupsJobTicket:", 15) != 0)
+    if (strncmp(line, "%cupsJobTicket:", 15) != 0)
       break;
 
    /*
     * Add the options to the option array...
     */
 
-    num_options = cupsParseOptions(line.buffer + 15, num_options, &options);
+    num_options = cupsParseOptions(line + 15, num_options, &options);
   }
 
  /*
   * Done with the file; see if we have any options...
   */
 
-  close(fd);
+  cupsFileClose(fp);
 
   if (num_options == 0)
     return;
@@ -5296,6 +5230,7 @@ send_document(client_t        *con,	/* I - Client connection */
   printer_t		*printer;	/* Current printer */
   struct stat		fileinfo;	/* File information */
   int			kbytes;		/* Size of file */
+  int			compression;	/* Type of compression */
 
 
   LogMessage(L_DEBUG2, "send_document(%d, %s)\n", con->http.fd,
@@ -5386,18 +5321,31 @@ send_document(client_t        *con,	/* I - Client connection */
 
  /*
   * OK, see if the client is sending the document compressed - CUPS
-  * doesn't support compression yet...
+  * only supports "none" and "gzip".
   */
 
-  if ((attr = ippFindAttribute(con->request, "compression", IPP_TAG_KEYWORD)) != NULL &&
-      strcmp(attr->values[0].string.text, "none") == 0)
+  compression = CUPS_FILE_NONE;
+
+  if ((attr = ippFindAttribute(con->request, "compression", IPP_TAG_KEYWORD)) != NULL)
   {
-    LogMessage(L_ERROR, "send_document: Unsupported compression attribute %s!",
-               attr->values[0].string.text);
-    send_ipp_error(con, IPP_ATTRIBUTES);
-    ippAddString(con->response, IPP_TAG_UNSUPPORTED_GROUP, IPP_TAG_KEYWORD,
-	         "compression", NULL, attr->values[0].string.text);
-    return;
+    if (strcmp(attr->values[0].string.text, "none")
+#ifdef HAVE_LIBZ
+        && strcmp(attr->values[0].string.text, "gzip")
+#endif /* HAVE_LIBZ */
+      )
+    {
+      LogMessage(L_ERROR, "print_job: Unsupported compression \"%s\"!",
+        	 attr->values[0].string.text);
+      send_ipp_error(con, IPP_ATTRIBUTES);
+      ippAddString(con->response, IPP_TAG_UNSUPPORTED_GROUP, IPP_TAG_KEYWORD,
+	           "compression", NULL, attr->values[0].string.text);
+      return;
+    }
+
+#ifdef HAVE_LIBZ
+    if (!strcmp(attr->values[0].string.text, "gzip"))
+      compression = CUPS_FILE_GZIP;
+#endif /* HAVE_LIBZ */
   }
 
  /*
@@ -5448,7 +5396,7 @@ send_document(client_t        *con,	/* I - Client connection */
 
     LogMessage(L_DEBUG, "send_document: auto-typing file...");
 
-    filetype = mimeFileType(MimeDatabase, con->filename);
+    filetype = mimeFileType(MimeDatabase, con->filename, &compression);
 
     if (filetype != NULL)
     {
@@ -5495,7 +5443,7 @@ send_document(client_t        *con,	/* I - Client connection */
   * Add the file to the job...
   */
 
-  if (add_file(con, job, filetype))
+  if (add_file(con, job, filetype, compression))
     return;
 
   if (job->dtype & CUPS_PRINTER_CLASS)
@@ -6336,5 +6284,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.127.2.55 2003/03/30 20:01:44 mike Exp $".
+ * End of "$Id: ipp.c,v 1.127.2.56 2003/03/30 21:49:17 mike Exp $".
  */

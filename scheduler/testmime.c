@@ -1,5 +1,5 @@
 /*
- * "$Id: testmime.c,v 1.4.2.3 2003/01/07 18:27:28 mike Exp $"
+ * "$Id: testmime.c,v 1.4.2.4 2003/03/30 21:49:23 mike Exp $"
  *
  *   MIME test program for the Common UNIX Printing System (CUPS).
  *
@@ -54,6 +54,7 @@ main(int  argc,				/* I - Number of command-line args */
   int		i;			/* Looping var */
   char		super[MIME_MAX_SUPER],	/* Super-type name */
 		type[MIME_MAX_TYPE];	/* Type name */
+  int		compression;		/* Compression of file */
   mime_t	*mime;			/* MIME database */
   mime_type_t	*src,			/* Source type */
 		*dst,			/* Destination type */
@@ -79,10 +80,11 @@ main(int  argc,				/* I - Number of command-line args */
       if (!mime)
 	mime = mimeLoad("../conf", "../filter");
 
-      src = mimeFileType(mime, argv[i]);
+      src = mimeFileType(mime, argv[i], &compression);
 
       if (src != NULL)
-	printf("%s: %s/%s\n", argv[i], src->super, src->type);
+	printf("%s: %s/%s%s\n", argv[i], src->super, src->type,
+	       compression ? " (gzipped)" : "");
       else
       {
 	printf("%s: unknown\n", argv[i]);
@@ -232,5 +234,5 @@ print_rules(mime_magic_t *rules)	/* I - Rules to print */
 
 
 /*
- * End of "$Id: testmime.c,v 1.4.2.3 2003/01/07 18:27:28 mike Exp $".
+ * End of "$Id: testmime.c,v 1.4.2.4 2003/03/30 21:49:23 mike Exp $".
  */

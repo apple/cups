@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.41.2.21 2003/01/07 18:26:50 mike Exp $"
+# "$Id: Makefile,v 1.41.2.22 2003/03/30 21:49:14 mike Exp $"
 #
 #   Filter makefile for the Common UNIX Printing System (CUPS).
 #
@@ -26,9 +26,9 @@
 
 include ../Makedefs
 
-TARGETS	=	hpgltops texttops pstops imagetops imagetoraster \
-		rastertodymo rastertoepson rastertohp rastertortl \
-		testraster
+FILTERS	=	gziptoany hpgltops texttops pstops imagetops imagetoraster \
+		rastertodymo rastertoepson rastertohp rastertortl
+TARGETS	=	$(FILTERS) testraster
 
 HPGLOBJS =	hpgl-attr.o hpgl-config.o hpgl-main.o hpgl-prolog.o \
 		hpgl-char.o hpgl-input.o hpgl-polygon.o hpgl-vector.o
@@ -73,7 +73,7 @@ depend:
 
 install:	all installhdrs
 	$(INSTALL_DIR) $(SERVERBIN)/filter
-	for file in $(TARGETS); do \
+	for file in $(FILTERS); do \
 		$(INSTALL_BIN) $$file $(SERVERBIN)/filter; \
 	done
 	$(INSTALL_DIR) $(LIBDIR)
@@ -105,6 +105,15 @@ installhdrs:
 formtops:	$(FORMOBJS) common.o ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ $(FORMOBJS) common.o $(LIBS) -lm
+
+
+#
+# gziptoany
+#
+
+gziptoany:	gziptoany.o
+	echo Linking $@...
+	$(CC) $(LDFLAGS) -o $@ gziptoany.o $(LIBZ)
 
 
 #
@@ -279,5 +288,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile,v 1.41.2.21 2003/01/07 18:26:50 mike Exp $".
+# End of "$Id: Makefile,v 1.41.2.22 2003/03/30 21:49:14 mike Exp $".
 #

@@ -1,5 +1,5 @@
 /*
- * "$Id: type.c,v 1.11.2.9 2003/03/28 22:29:49 mike Exp $"
+ * "$Id: type.c,v 1.11.2.10 2003/03/30 21:49:23 mike Exp $"
  *
  *   MIME typing routines for the Common UNIX Printing System (CUPS).
  *
@@ -536,7 +536,8 @@ mimeAddTypeRule(mime_type_t *mt,	/* I - Type to add to */
 
 mime_type_t *				/* O - Type of file */
 mimeFileType(mime_t     *mime,		/* I - MIME database */
-             const char *pathname)	/* I - Name of file to check */
+             const char *pathname,	/* I - Name of file to check */
+	     int        *compression)	/* O - Is the file compressed? */
 {
   int		i;			/* Looping var */
   cups_file_t	*fp;			/* File pointer */
@@ -578,6 +579,9 @@ mimeFileType(mime_t     *mime,		/* I - MIME database */
  /*
   * Finally, close the file and return a match (if any)...
   */
+
+  if (compression)
+    *compression = cupsFileCompression(fp);
 
   cupsFileClose(fp);
 
@@ -1092,5 +1096,5 @@ patmatch(const char *s,		/* I - String to match against */
 
 
 /*
- * End of "$Id: type.c,v 1.11.2.9 2003/03/28 22:29:49 mike Exp $".
+ * End of "$Id: type.c,v 1.11.2.10 2003/03/30 21:49:23 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.93.2.44 2003/03/30 20:01:48 mike Exp $"
+ * "$Id: printers.c,v 1.93.2.45 2003/03/30 21:49:22 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -843,7 +843,7 @@ SaveAllPrinters(void)
   */
 
   fchown(cupsFileNumber(fp), User, Group);
-  fchmod(cupsFileNumber(fp), 0600);
+  fchmod(cupsFileNumber(fp), ConfigFilePerm);
 
  /*
   * Write a small header to the file...
@@ -1036,6 +1036,15 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
 		  "koi8-r",
 		  "koi8-u",
 		};
+  const char	*compressions[] =
+		{
+#ifdef HAVE_LIBZ
+		  "none",
+		  "gzip"
+#else
+		  "none"
+#endif /* HAVE_LIBZ */
+		};
   int		num_finishings;
   ipp_finish_t	finishings[5];
   const char	*multiple_document_handling[] =
@@ -1087,8 +1096,10 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
     ippAddStrings(CommonData, IPP_TAG_PRINTER,
                   (ipp_tag_t)(IPP_TAG_MIMETYPE | IPP_TAG_COPY),
                   "document-format-supported", NumMimeTypes, NULL, MimeTypes);
-    ippAddString(CommonData, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
-        	 "compression-supported", NULL, "none");
+    ippAddStrings(CommonData, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
+        	  "compression-supported",
+		  sizeof(compressions) / sizeof(compressions[0]),
+		  NULL, compressions);
     ippAddInteger(CommonData, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
                   "job-priority-supported", 100);
     ippAddInteger(CommonData, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
@@ -2359,5 +2370,5 @@ write_irix_state(printer_t *p)		/* I - Printer to update */
 
 
 /*
- * End of "$Id: printers.c,v 1.93.2.44 2003/03/30 20:01:48 mike Exp $".
+ * End of "$Id: printers.c,v 1.93.2.45 2003/03/30 21:49:22 mike Exp $".
  */

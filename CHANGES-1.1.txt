@@ -3,6 +3,8 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.19
 
+	- The scheduler now supports print files that have been
+	  compressed using gzip.
 	- The scheduler used the stdio functions to read any job
 	  ticket information in a PostScript print job. Since
 	  some platforms limit the number of stdio files to 256,

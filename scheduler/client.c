@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.91.2.55 2003/03/30 20:01:42 mike Exp $"
+ * "$Id: client.c,v 1.91.2.56 2003/03/30 21:49:15 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -1307,7 +1307,7 @@ ReadClient(client_t *con)	/* I - Client to read from */
 		break;
 	      }
 
-	      type = mimeFileType(MimeDatabase, filename);
+	      type = mimeFileType(MimeDatabase, filename, NULL);
 
               if (IsCGI(con, filename, &filestats, type))
 	      {
@@ -1456,7 +1456,7 @@ ReadClient(client_t *con)	/* I - Client to read from */
 		break;
 	      }
 
-	      type = mimeFileType(MimeDatabase, filename);
+	      type = mimeFileType(MimeDatabase, filename, NULL);
 
               if (!IsCGI(con, filename, &filestats, type))
 	      {
@@ -1642,7 +1642,7 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	      * Serve a file...
 	      */
 
-	      type = mimeFileType(MimeDatabase, filename);
+	      type = mimeFileType(MimeDatabase, filename, NULL);
 	      if (type == NULL)
 		strcpy(line, "text/plain");
 	      else
@@ -2777,7 +2777,7 @@ install_conf_file(client_t *con)	/* I - Connection */
   {
     confinfo.st_uid  = User;
     confinfo.st_gid  = Group;
-    confinfo.st_mode = 0640;
+    confinfo.st_mode = ConfigFilePerm;
   }
 
  /*
@@ -3330,5 +3330,5 @@ CDSAWriteFunc(SSLConnectionRef connection,	/* I  - SSL/TLS connection */
 
 
 /*
- * End of "$Id: client.c,v 1.91.2.55 2003/03/30 20:01:42 mike Exp $".
+ * End of "$Id: client.c,v 1.91.2.56 2003/03/30 21:49:15 mike Exp $".
  */

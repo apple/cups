@@ -1,5 +1,5 @@
 /*
- * "$Id: banners.c,v 1.5.2.4 2003/01/07 18:27:15 mike Exp $"
+ * "$Id: banners.c,v 1.5.2.5 2003/03/30 21:49:15 mike Exp $"
  *
  *   Banner routines for the Common UNIX Printing System (CUPS).
  *
@@ -59,7 +59,7 @@ AddBanner(const char *name,	/* I - Name of banner */
   * See what the filetype is...
   */
 
-  if ((filetype = mimeFileType(MimeDatabase, filename)) == NULL)
+  if ((filetype = mimeFileType(MimeDatabase, filename, NULL)) == NULL)
   {
     LogMessage(L_WARN, "AddBanner: Banner \"%s\" is of an unknown file type - skipping!",
                name);
@@ -211,5 +211,5 @@ compare(const banner_t *b0,	/* I - First banner */
 
 
 /*
- * End of "$Id: banners.c,v 1.5.2.4 2003/01/07 18:27:15 mike Exp $".
+ * End of "$Id: banners.c,v 1.5.2.5 2003/03/30 21:49:15 mike Exp $".
  */
