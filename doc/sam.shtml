@@ -692,15 +692,11 @@ any printers of their own.
 <P>CUPS supports several methods of configuring client machines:
 
 <UL>
-
 	<LI><A HREF="#CLIENT_MANUAL">Manual configuration of print queues.</A>
-
 	<LI><A HREF="#CLIENT_SERVER">Specifying a single server for printing.</A>
-
 	<LI><A HREF="#CLIENT_AUTO">Automatic configuration of print queues.</A>
-
 	<LI><A HREF="#CLIENT_POLL">Specifying multiple servers for printing.</A>
-
+	<LI><A HREF="#CLIENT_RELAY">Relaying printers to other clients.</A>
 </UL>
 
 <H3><A NAME="CLIENT_MANUAL">Manual Configuration of Print Queues</A></H3>
@@ -715,7 +711,20 @@ each remote queue by hand using the <CODE>lpadmin</CODE> command:
 <P>The <CODE>printer</CODE> name is the name of the printer on the server
 machine. The <CODE>server</CODE> name is the hostname or IP address of the
 server machine. Repeat the <CODE>lpadmin</CODE> command for each remote
-printer you wish to use.
+printer you wish to use.</P>
+
+<CENTER>
+<TABLE BGCOLOR="#cccccc" BORDER="1" CELLPADDING="5" WIDTH="80%">
+	<TR>
+	<TD><B> NOTE:</B>
+	<P>Manual configuration of print queues is not recommended for large
+	numbers of client machines because of the administration nightmare it
+	creates. For busy networks, consider subnetting groups of clients and
+	polling and relaying printer information instead.</P>
+	</TD>
+	</TR>
+</TABLE>
+</CENTER>
 
 <H3><A NAME="CLIENT_SERVER">Specifying a Single Server for Printing</A></H3>
 
@@ -754,8 +763,27 @@ automatically. The printer and class lists are updated automatically as
 printers and servers are added or removed.
 
 <P>If you want to see printers on other subnets as well, use the
-<A HREF="#BrowsePoll"><CODE>BrowsePoll</CODE></A> directive as
-described next.
+<A HREF="#BrowsePoll"><CODE>BrowsePoll</CODE></A> 
+directive as described next.</P>
+
+<CENTER>
+<TABLE BGCOLOR="#cccccc" BORDER="1" CELLPADDING="5" WIDTH="80%">
+	<TR>
+	<TD><B> NOTE:</B>
+	<P>The<A HREF="#BrowseAddress"> <CODE>BrowseAddress</CODE></A> directive
+	enables broadcast traffic from your server. The default configuration
+	braodcasts printer information every 30 seconds. Although this printer
+	information does not use much bandwidth, typically about 80 bytes per
+	printer, it can add up with large numbers of servers and printers.</P>
+	<P>Use the <A HREF="#BrowseInterval"><CODE>BrowseInterval</CODE></A> 
+	and <A HREF="#BrowseTimeout"><CODE>BrowseTimeout</CODE></A> directives to tune
+	the amount of data that is added to your network load. In addition,
+	subnets can be used to minimize the amount of traffic that is carried
+	by the &quot;backbone&quot; of your large network.</P>
+	</TD>
+	</TR>
+</TABLE>
+</CENTER>
 
 <H3><A NAME="CLIENT_POLL">Specifying Multiple Servers for Printing</A></H3>
 
@@ -764,12 +792,51 @@ CUPS to poll those servers. Polling provides the benefits of automatic
 configuration without significant configuration on the clients, and multiple
 clients on the same subnet can share the same configuration information.
 
-<P>Polling is enabled by specifying one or more
-<A HREF="#BrowsePoll"><CODE>BrowsePoll</CODE></A> directives in the
-<VAR>/etc/cups/cupsd.conf</VAR> file. For information on making these
-changes, see <A HREF="#PRINTING_MANAGEMENT">Chapter 6, "Printing System
-Management"</A>.
+<P>Polling is enabled by specifying one or more 
+<A HREF="#BrowsePoll"><CODE>BrowsePoll</CODE></A> 
+directives in the <VAR>/etc/cups/cupsd.conf</VAR> file. 
+For information on making these changes, see 
+<A HREF="#PRINTING_MANAGEMENT">Chapter 6, "Printing System Management"</A>.
 
+<P>Multiple <A HREF="#BrowsePoll"><CODE>BrowsePoll</CODE></A> lines can
+be used to poll multiple CUPS servers. To limit the amount of
+polling you do from client machines, you can have only one of the
+clients do the polling and relay that information to the others on the
+same subnet (described next).</P>
+
+<H3><A NAME="CLIENT_RELAY">Relaying Printers to Other Clients</A></H3>
+
+<P>When you have clients and servers spread across multiple subnets, the
+polling method is inefficient. CUPS provides a 
+<A HREF="#BrowseRelay"><CODE>BrowseRelay</CODE></A> directive that enables a 
+single client to relay (broadcast) the polled printer information to the local subnet.</P>
+
+<H2>Load Balancing and Failsafe Operation</H2>
+
+<P>When using server polling or broadcasting, CUPS clients can
+automatically merge identical printers on multiple servers into a
+single<I> implicit class</I> queue. Clients assume that printers with
+the same name on multiple servers are in fact the same printer or type
+of printer being served by multiple machines.</P>
+
+<P>If you have two printers, LaserJet@ServerA and LaserJet@ServerB, a
+third implicit class called<I> LaserJet</I> will be created
+automatically on the client that refers to both printers. If the client
+also has a local printer with the name LaserJet then an implicit class
+named<I> AnyLaserJet</I> will be created instead.</P>
+
+<P>The client will alternate between servers and automatically stop
+sending jobs to a server if it goes down, providing a load-balancing
+effect and fail-safe operation with automatic switchover.</P>
+
+<CENTER><TABLE BGCOLOR="#cccccc" BORDER="1" CELLPADDING="5" WIDTH="80%">
+	<TR>
+	<TD><B> NOTE:</B>
+	<P>Note that implicit classes (<A HREF="#ImplicitClasses"><CODE>ImplicitClasses</CODE></A>) 
+	are enabled by default.</P>
+	</TD>
+	</TR>
+</TABLE></CENTER>
 
 <H1 ALIGN="RIGHT"><A NAME="PRINTING_MANAGEMENT">6 - Printing System Management</A></H1>
 
@@ -1183,7 +1250,7 @@ send browsing information to. Multiple <CODE>BrowseAddress</CODE>
 directives can be specified to send browsing information to different
 networks or systems.
 
-<P>No browse addresses are set by default.
+<P>No browse addresses are set by default.</P>
 
 <CENTER><TABLE WIDTH="80%" BORDER="1" CELLPADDING="5" BGCOLOR="#cccccc">
 <TR>
@@ -1338,7 +1405,7 @@ BrowsePort 9999
 <H4>Description</H4>
 
 <P>The <CODE>BrowsePort</CODE> directive specifies the UDP port number
-used for browse packets. The default port number is 631.
+used for browse packets. The default port number is 631.</P>
 
 <CENTER><TABLE WIDTH="80%" BORDER="1" CELLPADDING="5" BGCOLOR="#cccccc">
 <TR>
@@ -1369,7 +1436,7 @@ BrowseProtocols all
 <P>The <CODE>BrowseProtocols</CODE> directive specifies the protocols to
 use when collecting and distributing shared printers on the local network.
 The default protocol is <CODE>CUPS</CODE>, which is a broadcast-based
-protocol.
+protocol.</P>
 
 <CENTER><TABLE WIDTH="80%" BORDER="1" CELLPADDING="5" BGCOLOR="#cccccc">
 <TR>
@@ -1473,7 +1540,7 @@ Browsing Off
 <H4>Description</H4>
 
 <P>The <CODE>Browsing</CODE> directive controls whether or not network printer
-browsing is enabled. The default setting is <CODE>On</CODE>.
+browsing is enabled. The default setting is <CODE>On</CODE>.</P>
 
 <CENTER><TABLE WIDTH="80%" BORDER="1" CELLPADDING="5" BGCOLOR="#cccccc">
 <TR>
@@ -2111,7 +2178,7 @@ MaxClients 1024
 
 <P>The <CODE>MaxClients</CODE> directive controls the maximum number of
 simultaneous clients that will be allowed by the server. The default is
-100 clients.
+100 clients.</P>
 
 <CENTER><TABLE WIDTH="80%" BORDER="1" CELLPADDING="5" BGCOLOR="#cccccc">
 <TR>
@@ -2890,7 +2957,7 @@ root certificate is automatically regenerated every 5 minutes.
 
 <P>Basic authentication uses UNIX users and passwords to authenticate
 access to resources such as printers and classes, and to limit access
-to administrative functions.
+to administrative functions.</P>
 
 <CENTER><TABLE WIDTH="80%" BORDER="1" CELLPADDING="5" BGCOLOR="#cccccc">
 <TR>
@@ -2913,7 +2980,7 @@ using an account without a password, your access will be immediately
 blocked.
 
 <P>Once a valid username and password is authenticated by CUPS, any
-additional group membership requirements are checked.
+additional group membership requirements are checked.</P>
 
 <CENTER><TABLE WIDTH="80%" BORDER="1" CELLPADDING="5" BGCOLOR="#cccccc">
 <TR>
@@ -2939,7 +3006,7 @@ AuthType Basic
 <P>Digest authentication uses users and passwords defined in the
 <VAR>/etc/cups/passwd.md5</VAR> file to authenticate access to
 resources such as printers and classes, and to limit access to
-administrative functions.
+administrative functions.</P>
 
 <CENTER><TABLE WIDTH="80%" BORDER="1" CELLPADDING="5" BGCOLOR="#cccccc">
 <TR>
@@ -3003,7 +3070,7 @@ Password again: <B>(password) ENTER</B> [password is not echoed]
 </PRE></UL>
 
 <P>Once a valid username and password is authenticated by CUPS, any
-additional group membership requirements are checked.
+additional group membership requirements are checked.</P>
 
 <CENTER><TABLE WIDTH="80%" BORDER="1" CELLPADDING="5" BGCOLOR="#cccccc">
 <TR>
@@ -3057,7 +3124,7 @@ Password again: <B>(password) ENTER</B> [password is not echoed]
 <!-- NEW PAGE -->
 <H2><A NAME="PRINTER_ACCOUNTING">Printer Accounting</A></H2>
 
-<P>ESP Print Pro maintains a log of all accesses, errors, and
+<P>CUPS maintains a log of all accesses, errors, and
 pages that are printed. The log files are normally stored in the
 <VAR>/var/log/cups</VAR> directory. You can change this by
 editing the <VAR>/etc/cups/cupsd.conf</VAR> configuration file.
@@ -3801,7 +3868,7 @@ myprinter:ha=080069001234:ip=192.0.2.2:<VAR>t144=myprinter.boot</VAR>
 
 <P>The <VAR>myprinter.boot</VAR> file resides in the <VAR>/usr/local/boot</VAR>
 directory by default. If you do not need to provide a boot file you may leave
-the last part of the line blank.
+the last part of the line blank.</P>
 
 <!-- NEED 2in -->
 <CENTER><TABLE WIDTH="80%" BORDER="1" CELLPADDING="5" BGCOLOR="#cccccc">
@@ -4238,11 +4305,11 @@ the Common UNIX Printing System.
 </TR>
 <TR VALIGN="TOP">
 	<TD>/etc/cups/mime.convs</TD>
-	<TD>The list of standard file filters included with ESP Print Pro.</TD>
+	<TD>The list of standard file filters included with CUPS.</TD>
 </TR>
 <TR VALIGN="TOP">
 	<TD>/etc/cups/mime.types</TD>
-	<TD>The list of recognized file types for ESP Print Pro.</TD>
+	<TD>The list of recognized file types for CUPS.</TD>
 </TR>
 <TR VALIGN="TOP">
 	<TD>/etc/cups/ppd/</TD>
@@ -4489,7 +4556,7 @@ AuthClass System
 
 for the <VAR>/admin</VAR> location. Then restart the CUPS server as
 described in <A HREF="#PRINTING_MANAGEMENT">Chapter 6, "Printing System
-Management"</A>.
+Management"</A>.</P>
 
 <CENTER><TABLE WIDTH="80%" BORDER="1" CELLPADDING="5" BGCOLOR="#cccccc">
 <TR>
@@ -4517,7 +4584,7 @@ Allow from 127.0.0.1
 
 for the <VAR>/admin</VAR> location. Then restart the CUPS server as
 described in <A HREF="#PRINTING_MANAGEMENT">Chapter 6, "Printing System
-Management"</A>.
+Management"</A>.</P>
 
 <CENTER><TABLE WIDTH="80%" BORDER="1" CELLPADDING="5" BGCOLOR="#cccccc">
 <TR>

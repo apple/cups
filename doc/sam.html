@@ -97,7 +97,9 @@ Copyright 1997-2002, All Rights Reserved<BR>
 <LI><A HREF="#CLIENT_SERVER">Specifying a Single Server for Printing</A></LI>
 <LI><A HREF="#CLIENT_AUTO">Automatic Configuration of Print Queues</A></LI>
 <LI><A HREF="#CLIENT_POLL">Specifying Multiple Servers for Printing</A></LI>
+<LI><A HREF="#CLIENT_RELAY">Relaying Printers to Other Clients</A></LI>
 </UL>
+<LI><A HREF="#6_2">Load Balancing and Failsafe Operation</A></LI>
 </UL>
 <B><A HREF="#PRINTING_MANAGEMENT">6 - Printing System Management</A></B>
 <UL>
@@ -227,11 +229,9 @@ Copyright 1997-2002, All Rights Reserved<BR>
 <LI><A HREF="#9_1">Common UNIX Printing System License Agreement</A></LI>
 <UL>
 <LI><A HREF="#9_1_1">Introduction</A></LI>
-<LI><A HREF="#9_1_2">Apple Operating System Development License
- Exception</A></LI>
-<LI><A HREF="#9_1_3">Trademarks</A></LI>
-<LI><A HREF="#9_1_4">Binary Distribution Rights</A></LI>
-<LI><A HREF="#9_1_5">Support</A></LI>
+<LI><A HREF="#9_1_2">Trademarks</A></LI>
+<LI><A HREF="#9_1_3">Binary Distribution Rights</A></LI>
+<LI><A HREF="#9_1_4">Support</A></LI>
 </UL>
 <LI><A HREF="#9_2">GNU GENERAL PUBLIC LICENSE</A></LI>
 <LI><A HREF="#9_3">GNU LIBRARY GENERAL PUBLIC LICENSE</A></LI>
@@ -947,6 +947,7 @@ lpoptions(1)</CODE> command.</P>
 </LI>
 <LI><A HREF="#CLIENT_AUTO">Automatic configuration of print queues.</A></LI>
 <LI><A HREF="#CLIENT_POLL">Specifying multiple servers for printing.</A></LI>
+<LI><A HREF="#CLIENT_RELAY">Relaying printers to other clients.</A></LI>
 </UL>
 <H3><A NAME="CLIENT_MANUAL">Manual Configuration of Print Queues</A></H3>
 <P>The most tedious method of configuring client machines is to
@@ -961,6 +962,16 @@ lpoptions(1)</CODE> command.</P>
  server machine. The <CODE>server</CODE> name is the hostname or IP
  address of the server machine. Repeat the <CODE>lpadmin</CODE> command
  for each remote printer you wish to use.</P>
+<CENTER>
+<TABLE BGCOLOR="#cccccc" BORDER="1" CELLPADDING="5" WIDTH="80%">
+<TR><TD><B> NOTE:</B>
+<P>Manual configuration of print queues is not recommended for large
+ numbers of client machines because of the administration nightmare it
+ creates. For busy networks, consider subnetting groups of clients and
+ polling and relaying printer information instead.</P>
+</TD></TR>
+</TABLE>
+</CENTER>
 <H3><A NAME="CLIENT_SERVER">Specifying a Single Server for Printing</A></H3>
 <P>CUPS can be configured to run without a local spooler and send all
  jobs to a single server. However, if that server goes down then all
@@ -994,6 +1005,22 @@ ServerName <I>server</I>
  printers and servers are added or removed.</P>
 <P>If you want to see printers on other subnets as well, use the<A HREF="#BrowsePoll">
  <CODE>BrowsePoll</CODE></A> directive as described next.</P>
+<CENTER>
+<TABLE BGCOLOR="#cccccc" BORDER="1" CELLPADDING="5" WIDTH="80%">
+<TR><TD><B> NOTE:</B>
+<P>The<A HREF="#BrowseAddress"> <CODE>BrowseAddress</CODE></A> directive
+ enables broadcast traffic from your server. The default configuration
+ braodcasts printer information every 30 seconds. Although this printer
+ information does not use much bandwidth, typically about 80 bytes per
+ printer, it can add up with large numbers of servers and printers.</P>
+<P>Use the<A HREF="#BrowseInterval"> <CODE>BrowseInterval</CODE></A> and<A
+HREF="#BrowseTimeout"> <CODE>BrowseTimeout</CODE></A> directives to tune
+ the amount of data that is added to your network load. In addition,
+ subnets can be used to minimize the amount of traffic that is carried
+ by the &quot;backbone&quot; of your large network.</P>
+</TD></TR>
+</TABLE>
+</CENTER>
 <H3><A NAME="CLIENT_POLL">Specifying Multiple Servers for Printing</A></H3>
 <P>If you have CUPS servers on different subnets, then you should
  configure CUPS to poll those servers. Polling provides the benefits of
@@ -1004,6 +1031,38 @@ ServerName <I>server</I>
 BrowsePoll</CODE></A> directives in the<VAR> /etc/cups/cupsd.conf</VAR>
  file. For information on making these changes, see<A HREF="#PRINTING_MANAGEMENT">
  Chapter 6, &quot;Printing System Management&quot;</A>.</P>
+<P>Multiple<A HREF="#BrowsePoll"> <CODE>BrowsePoll</CODE></A> lines can
+ be used to poll multiple CUPS servers. To limit the amount of polling
+ you do from client machines, you can have only one of the clients do
+ the polling and relay that information to the others on the same subnet
+ (described next).</P>
+<H3><A NAME="CLIENT_RELAY">Relaying Printers to Other Clients</A></H3>
+<P>When you have clients and servers spread across multiple subnets, the
+ polling method is inefficient. CUPS provides a<A HREF="#BrowseRelay"> <CODE>
+BrowseRelay</CODE></A> directive that enables a single client to relay
+ (broadcast) the polled printer information to the local subnet.</P>
+<H2><A NAME="6_2">Load Balancing and Failsafe Operation</A></H2>
+<P>When using server polling or broadcasting, CUPS clients can
+ automatically merge identical printers on multiple servers into a
+ single<I> implicit class</I> queue. Clients assume that printers with
+ the same name on multiple servers are in fact the same printer or type
+ of printer being served by multiple machines.</P>
+<P>If you have two printers, LaserJet@ServerA and LaserJet@ServerB, a
+ third implicit class called<I> LaserJet</I> will be created
+ automatically on the client that refers to both printers. If the client
+ also has a local printer with the name LaserJet then an implicit class
+ named<I> AnyLaserJet</I> will be created instead.</P>
+<P>The client will alternate between servers and automatically stop
+ sending jobs to a server if it goes down, providing a load-balancing
+ effect and fail-safe operation with automatic switchover.</P>
+<CENTER>
+<TABLE BGCOLOR="#cccccc" BORDER="1" CELLPADDING="5" WIDTH="80%">
+<TR><TD><B> NOTE:</B>
+<P>Note that implicit classes (<A HREF="#ImplicitClasses"><CODE>
+ImplicitClasses</CODE></A>) are enabled by default.</P>
+</TD></TR>
+</TABLE>
+</CENTER>
 <H1 ALIGN="RIGHT"><A NAME="PRINTING_MANAGEMENT">6 - Printing System
  Management</A></H1>
 <P>This chapter shows how you can configure the CUPS server.</P>
@@ -1336,7 +1395,7 @@ BrowseAddress host.domain.com:631
  browsing information to. Multiple <CODE>BrowseAddress</CODE> directives
  can be specified to send browsing information to different networks or
  systems.</P>
-<P>No browse addresses are set by default.
+<P>No browse addresses are set by default.</P>
 <CENTER>
 <TABLE BGCOLOR="#cccccc" BORDER="1" CELLPADDING="5" WIDTH="80%">
 <TR><TD><B> NOTE:</B>
@@ -1348,7 +1407,6 @@ BrowseAddress host.domain.com:631
 </CENTER>
 
 <!-- NEED 4in -->
-</P>
 <H3><A NAME="BrowseAllow">BrowseAllow</A></H3>
 <HR>
 <H4>Examples</H4>
@@ -1468,7 +1526,7 @@ BrowsePort 9999
 </UL>
 <H4>Description</H4>
 <P>The <CODE>BrowsePort</CODE> directive specifies the UDP port number
- used for browse packets. The default port number is 631.
+ used for browse packets. The default port number is 631.</P>
 <CENTER>
 <TABLE BGCOLOR="#cccccc" BORDER="1" CELLPADDING="5" WIDTH="80%">
 <TR><TD><B> NOTE:</B>
@@ -1479,7 +1537,6 @@ BrowsePort 9999
 </CENTER>
 
 <!-- NEED 3in -->
-</P>
 <H3><A NAME="BrowseProtocols">BrowseProtocols</A></H3>
 <HR>
 <H4>Examples</H4>
@@ -1495,7 +1552,7 @@ BrowseProtocols all
 <P>The <CODE>BrowseProtocols</CODE> directive specifies the protocols to
  use when collecting and distributing shared printers on the local
  network. The default protocol is <CODE>CUPS</CODE>, which is a
- broadcast-based protocol.
+ broadcast-based protocol.</P>
 <CENTER>
 <TABLE BGCOLOR="#cccccc" BORDER="1" CELLPADDING="5" WIDTH="80%">
 <TR><TD><B> NOTE:</B>
@@ -1508,7 +1565,6 @@ BrowseProtocols all
 </CENTER>
 
 <!-- NEED 4in -->
-</P>
 <H3><A NAME="BrowseRelay">BrowseRelay</A></H3>
 <HR>
 <H4>Examples</H4>
@@ -1587,7 +1643,7 @@ Browsing Off
 </UL>
 <H4>Description</H4>
 <P>The <CODE>Browsing</CODE> directive controls whether or not network
- printer browsing is enabled. The default setting is <CODE>On</CODE>.
+ printer browsing is enabled. The default setting is <CODE>On</CODE>.</P>
 <CENTER>
 <TABLE BGCOLOR="#cccccc" BORDER="1" CELLPADDING="5" WIDTH="80%">
 <TR><TD><B> NOTE:</B>
@@ -1599,7 +1655,6 @@ Browsing Off
 </CENTER>
 
 <!-- NEED 3in -->
-</P>
 <H3><A NAME="Classification">Classification</A></H3>
 <HR>
 <H4>Examples</H4>
@@ -2123,7 +2178,7 @@ MaxClients 1024
 <H4>Description</H4>
 <P>The <CODE>MaxClients</CODE> directive controls the maximum number of
  simultaneous clients that will be allowed by the server. The default is
- 100 clients.
+ 100 clients.</P>
 <CENTER>
 <TABLE BGCOLOR="#cccccc" BORDER="1" CELLPADDING="5" WIDTH="80%">
 <TR><TD><B> NOTE:</B>
@@ -2136,7 +2191,6 @@ MaxClients 1024
 </CENTER>
 
 <!-- NEED 3in -->
-</P>
 <H3><A NAME="MaxJobs">MaxJobs</A></H3>
 <HR>
 <H4>Examples</H4>
@@ -2776,7 +2830,7 @@ Group</CODE></A> defined in the<VAR> cupsd.conf</VAR> file. When the CGI
 <H3><A NAME="7_5_2">Using Basic Authentication</A></H3>
 <P>Basic authentication uses UNIX users and passwords to authenticate
  access to resources such as printers and classes, and to limit access
- to administrative functions.
+ to administrative functions.</P>
 <CENTER>
 <TABLE BGCOLOR="#cccccc" BORDER="1" CELLPADDING="5" WIDTH="80%">
 <TR><TD><B> NOTE:</B>
@@ -2789,13 +2843,12 @@ Group</CODE></A> defined in the<VAR> cupsd.conf</VAR> file. When the CGI
 </TD></TR>
 </TABLE>
 </CENTER>
-</P>
 <P>The CUPS implementation of Basic authentication does not allow access
  through user accounts without a password. If you try to authenticate
  using an account without a password, your access will be immediately
  blocked.</P>
 <P>Once a valid username and password is authenticated by CUPS, any
- additional group membership requirements are checked.
+ additional group membership requirements are checked.</P>
 <CENTER>
 <TABLE BGCOLOR="#cccccc" BORDER="1" CELLPADDING="5" WIDTH="80%">
 <TR><TD><B> NOTE:</B>
@@ -2805,7 +2858,6 @@ Group</CODE></A> defined in the<VAR> cupsd.conf</VAR> file. When the CGI
 </CENTER>
 
 <!-- NEED 1in -->
-</P>
 <P>Use the <CODE>AuthType</CODE> directive to enable Basic
  authentication:</P>
 <UL>
@@ -2819,7 +2871,7 @@ AuthType Basic
 <P>Digest authentication uses users and passwords defined in the<VAR>
  /etc/cups/passwd.md5</VAR> file to authenticate access to resources
  such as printers and classes, and to limit access to administrative
- functions.
+ functions.</P>
 <CENTER>
 <TABLE BGCOLOR="#cccccc" BORDER="1" CELLPADDING="5" WIDTH="80%">
 <TR><TD><B> NOTE:</B>
@@ -2847,7 +2899,6 @@ AuthType Basic
 </CENTER>
 
 <!-- NEED 2in -->
-</P>
 <P>The <CODE>lppasswd(1)</CODE> command is used to add, change, or
  remove accounts from the<VAR> passwd.md5</VAR> file. To add a user to
  the default system group, type:</P>
@@ -2878,7 +2929,7 @@ Password again: <B>(password) ENTER</B> [password is not echoed]
 </PRE>
 </UL>
 <P>Once a valid username and password is authenticated by CUPS, any
- additional group membership requirements are checked.
+ additional group membership requirements are checked.</P>
 <CENTER>
 <TABLE BGCOLOR="#cccccc" BORDER="1" CELLPADDING="5" WIDTH="80%">
 <TR><TD><B> NOTE:</B>
@@ -2886,7 +2937,6 @@ Password again: <B>(password) ENTER</B> [password is not echoed]
 </TD></TR>
 </TABLE>
 </CENTER>
-</P>
 <P>Use the <CODE>AuthType</CODE> directive to enable Digest
  authentication:</P>
 <UL>
@@ -2928,10 +2978,10 @@ Password again: <B>(password) ENTER</B> [password is not echoed]
 
 <!-- NEW PAGE -->
 <H2><A NAME="PRINTER_ACCOUNTING">Printer Accounting</A></H2>
-<P>ESP Print Pro maintains a log of all accesses, errors, and pages that
- are printed. The log files are normally stored in the<VAR>
- /var/log/cups</VAR> directory. You can change this by editing the<VAR>
- /etc/cups/cupsd.conf</VAR> configuration file.</P>
+<P>CUPS maintains a log of all accesses, errors, and pages that are
+ printed. The log files are normally stored in the<VAR> /var/log/cups</VAR>
+ directory. You can change this by editing the<VAR> /etc/cups/cupsd.conf</VAR>
+ configuration file.</P>
 <H3><A NAME="7_6_1">The access_log File</A></H3>
 <P>The<VAR> access_log</VAR> file lists each HTTP resource that is
  accessed by a web browser or CUPS/IPP client. Each line is in the
@@ -3496,14 +3546,12 @@ smb://user:pass@server/sharename
 <H3><A NAME="9_1_1">Introduction</A></H3>
 <P>The Common UNIX Printing System<SUP>TM</SUP>, (&quot;CUPS<SUP>TM</SUP>&quot;),
  is provided under the GNU General Public License (&quot;GPL&quot;) and GNU
- Library General Public License (&quot;LGPL&quot;), Version 2, with exceptions for
- Apple operating systems. A copy of the exceptions and licenses follow
- this introduction.</P>
+ Library General Public License (&quot;LGPL&quot;), Version 2. A copy of these
+ licenses follow this introduction.</P>
 <P>The GNU LGPL applies to the CUPS API library, located in the &quot;cups&quot;
  subdirectory of the CUPS source distribution and in the
  &quot;/usr/include/cups&quot; directory and &quot;libcups.a&quot;, &quot;libcups_s.a&quot;,
- &quot;libcups.sl&quot;, &quot;libcups.so&quot;, or &quot;libcups.dylib&quot; files in the binary
- distributions.</P>
+ &quot;libcups.sl&quot;, or &quot;libcups.so&quot; files in the binary distributions.</P>
 <P>The GNU GPL applies to the remainder of the CUPS distribution,
  including the &quot;pstoraster&quot; filter which is based upon GNU Ghostscript
  5.50 and the &quot;pdftops&quot; filter which is based upon Xpdf 0.93a.</P>
@@ -3521,41 +3569,11 @@ smb://user:pass@server/sharename
  add features to CUPS and then sell a binary distribution without source
  code. You must provide source for any new drivers, changes, or
  additions to the software, and all code must be provided under the GPL
- or LGPL as appropriate. The only exceptions to this are the portions of
- the CUPS software covered by the Apple operating system license
- exceptions outlined later in this license agreement.</P>
+ or LGPL as appropriate.</P>
 <P>The GNU LGPL relaxes the &quot;link-to&quot; restriction, allowing you to
  develop applications that use the CUPS API library under other licenses
  and/or conditions as appropriate for your application.</P>
-<H3><A NAME="9_1_2">Apple Operating System Development License Exception</A>
-</H3>
-<P>In addition, as the copyright holder of CUPS, Easy Software Products
- grants the following special exception:<BLOCKQUOTE>Software that is
- developed by any person or entity for an Apple Operating System (&quot;Apple
- OS-Developed Software&quot;), including but not limited to Apple and third
- party printer drivers, filters, and backends for an Apple Operating
- System, that is linked to the CUPS imaging library or based on any
- sample filters or backends provided with CUPS shall not be considered
- to be a derivative work or collective work based on the CUPS program
- and is exempt from the mandatory source code release clauses of the GNU
- GPL. You may therefore distribute linked combinations of the CUPS
- imaging library with Apple OS-Developed Software without releasing the
- source code of the Apple OS-Developed Software. You may also use sample
- filters and backends provided with CUPS to develop Apple OS-Developed
- Software without releasing the source code of the Apple OS-Developed
- Software.</BLOCKQUOTE></P>
-<P>An Apple Operating System means any operating system software
- developed and/or marketed by Apple Computer, Inc., including but not
- limited to all existing releases and versions of Apple's Darwin, Mac OS
- X, and Mac OS X Server products and all follow-on releases and future
- versions thereof.</P>
-<P>This exception is only available for Apple OS-Developed Software and
- does not apply to software that is distributed for use on other
- operating systems.</P>
-<P>All CUPS software that falls under this license exception have the
- following text at the top of each source file:<BLOCKQUOTE>This file is
- subject to the Apple OS-Developed Software exception.</BLOCKQUOTE></P>
-<H3><A NAME="9_1_3">Trademarks</A></H3>
+<H3><A NAME="9_1_2">Trademarks</A></H3>
 <P>Easy Software Products has trademarked the Common UNIX Printing
  System, CUPS, and CUPS logo. These names and logos may be used freely
  in any direct port or binary distribution of CUPS. To use them in
@@ -3563,7 +3581,7 @@ smb://user:pass@server/sharename
  permission. Our intention is to protect the value of these trademarks
  and ensure that any derivative product meets the same high-quality
  standards as the original.</P>
-<H3><A NAME="9_1_4">Binary Distribution Rights</A></H3>
+<H3><A NAME="9_1_3">Binary Distribution Rights</A></H3>
 <P>Easy Software Products also sells rights to the CUPS source code
  under a binary distribution license for vendors that are unable to
  release source code for their drivers, additions, and modifications to
@@ -3587,7 +3605,7 @@ smb://user:pass@server/sharename
 <BR> Email:<A HREF="mailto:derekn@foolabs.com"> derekn@foolabs.com</A>
 <BR> WWW:<A HREF="http://www.foolabs.com/xpdf/">
  http://www.foolabs.com/xpdf/</A></BLOCKQUOTE></P>
-<H3><A NAME="9_1_5">Support</A></H3>
+<H3><A NAME="9_1_4">Support</A></H3>
 <P>Easy Software Products sells software support for CUPS as well as a
  commercial printing product based on CUPS called ESP Print Pro. You can
  find out more at our web site:</P>
@@ -4322,9 +4340,9 @@ myprinter:ha=080069001234:ip=192.0.2.2:<VAR>t144=myprinter.boot</VAR>
 </UL>
 <P>The<VAR> myprinter.boot</VAR> file resides in the<VAR>
  /usr/local/boot</VAR> directory by default. If you do not need to
- provide a boot file you may leave the last part of the line blank.
-<!-- NEED 2in -->
+ provide a boot file you may leave the last part of the line blank.</P>
 
+<!-- NEED 2in -->
 <CENTER>
 <TABLE BGCOLOR="#cccccc" BORDER="1" CELLPADDING="5" WIDTH="80%">
 <TR><TD><B> NOTE:</B>
@@ -4334,7 +4352,6 @@ myprinter:ha=080069001234:ip=192.0.2.2:<VAR>t144=myprinter.boot</VAR>
 </TD></TR>
 </TABLE>
 </CENTER>
-</P>
 <H2><A NAME="10_2">Verifying the Printer Connection</A></H2>
 <P>To test that the IP address has been successfully assigned and that
  the printer is properly connected to your LAN, type:</P>
@@ -4683,9 +4700,9 @@ ftp&gt; <B>quit ENTER</B>
 <TR VALIGN="TOP"><TD>/etc/cups/interfaces/</TD><TD>The location of
  System V interface scripts for printers.</TD></TR>
 <TR VALIGN="TOP"><TD>/etc/cups/mime.convs</TD><TD>The list of standard
- file filters included with ESP Print Pro.</TD></TR>
+ file filters included with CUPS.</TD></TR>
 <TR VALIGN="TOP"><TD>/etc/cups/mime.types</TD><TD>The list of recognized
- file types for ESP Print Pro.</TD></TR>
+ file types for CUPS.</TD></TR>
 <TR VALIGN="TOP"><TD>/etc/cups/ppd/</TD><TD>The location of PostScript
  Printer Description (&quot;PPD&quot;) files for printers.</TD></TR>
 <TR VALIGN="TOP"><TD>/etc/cups/printers.conf</TD><TD>The printer
