@@ -1,5 +1,5 @@
 #
-# "$Id: cups.list.in,v 1.9 2001/11/06 17:44:32 mike Exp $"
+# "$Id: cups.list.in,v 1.10 2001/11/09 20:45:49 mike Exp $"
 #
 #   ESP Package Manager (EPM) file list for the Common UNIX Printing
 #   System (CUPS).
@@ -241,7 +241,7 @@ d 0555 root sys $DATADIR/model -
 f 0444 root sys $DATADIR/model ppd/*.ppd
 
 d 0555 root sys $DATADIR/templates -
-f 0444 root sys $DATADIR/templates templates/*.tmpl
+c 0444 root sys $DATADIR/templates templates/*.tmpl
 
 # Config files
 d 0555 root sys $SERVERROOT -
@@ -249,8 +249,8 @@ d 0711 root sys $SERVERROOT/certs -
 d 0755 root sys $SERVERROOT/interfaces -
 d 0755 root sys $SERVERROOT/ppd -
 c 0644 root sys $SERVERROOT conf/*.conf
-f 0644 root sys $SERVERROOT/mime.convs conf/mime.convs
-f 0644 root sys $SERVERROOT/mime.types conf/mime.types
+c 0644 root sys $SERVERROOT/mime.convs conf/mime.convs
+c 0644 root sys $SERVERROOT/mime.types conf/mime.types
 
 %system linux
 d 0555 root sys $PAMDIR -
@@ -364,5 +364,5 @@ f 0444 root sys $AMANDIR/man$MAN8DIR/lpmove.$MAN8EXT man/lpmove.man
 i 0555 root sys cups cups.sh
 
 #
-# End of "$Id: cups.list.in,v 1.9 2001/11/06 17:44:32 mike Exp $".
+# End of "$Id: cups.list.in,v 1.10 2001/11/09 20:45:49 mike Exp $".
 #
