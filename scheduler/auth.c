@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.c,v 1.41.2.7 2002/03/27 19:10:15 mike Exp $"
+ * "$Id: auth.c,v 1.41.2.8 2002/03/27 20:00:06 mike Exp $"
  *
  *   Authorization routines for the Common UNIX Printing System (CUPS).
  *
@@ -202,7 +202,7 @@ AllowHost(location_t *loc,	/* I - Location to add to */
     */
 
     temp->type             = AUTH_INTERFACE;
-    temp->mask.name.name   = strdup("@");
+    temp->mask.name.name   = strdup("*");
     temp->mask.name.length = 1;
   }
   else if (strncasecmp(name, "@IF(", 4) == 0)
@@ -350,34 +350,35 @@ CheckAuth(unsigned   ip[4],	/* I - Client address */
 	    * Check the named interface...
 	    */
 
-            iface = NetIFFind(masks->mask.name.name);
-
-            if (iface->address.addr.sa_family == AF_INET)
+            if ((iface = NetIFFind(masks->mask.name.name)) != NULL)
 	    {
-	     /*
-	      * Check IPv4 address...
-	      */
+              if (iface->address.addr.sa_family == AF_INET)
+	      {
+	       /*
+		* Check IPv4 address...
+		*/
 
-              if ((netip4 & iface->mask.ipv4.sin_addr.s_addr) ==
-	          (iface->address.ipv4.sin_addr.s_addr &
-		   iface->mask.ipv4.sin_addr.s_addr))
-		return (1);
-            }
-	    else
-	    {
-	     /*
-	      * Check IPv6 address...
-	      */
+        	if ((netip4 & iface->mask.ipv4.sin_addr.s_addr) ==
+	            (iface->address.ipv4.sin_addr.s_addr &
+		     iface->mask.ipv4.sin_addr.s_addr))
+		  return (1);
+              }
+	      else
+	      {
+	       /*
+		* Check IPv6 address...
+		*/
 
-              for (i = 0; i < 4; i ++)
-		if ((netip6[i] & iface->mask.ipv6.sin6_addr.s6_addr32[i]) !=
-		    (iface->address.ipv6.sin6_addr.s6_addr32[i] &
-		     iface->mask.ipv6.sin6_addr.s6_addr32[i]))
-		  break;
+        	for (i = 0; i < 4; i ++)
+		  if ((netip6[i] & iface->mask.ipv6.sin6_addr.s6_addr32[i]) !=
+		      (iface->address.ipv6.sin6_addr.s6_addr32[i] &
+		       iface->mask.ipv6.sin6_addr.s6_addr32[i]))
+		    break;
 
-	      if (i == 4)
-		return (1);
-            }
+		if (i == 4)
+		  return (1);
+              }
+	    }
 	  }
 	  break;
 
@@ -632,7 +633,7 @@ DenyHost(location_t *loc,	/* I - Location to add to */
     */
 
     temp->type             = AUTH_INTERFACE;
-    temp->mask.name.name   = strdup("@");
+    temp->mask.name.name   = strdup("*");
     temp->mask.name.length = 1;
   }
   else if (strncasecmp(name, "@IF(", 4) == 0)
@@ -1722,5 +1723,5 @@ to64(char          *s,	/* O - Output string */
 
 
 /*
- * End of "$Id: auth.c,v 1.41.2.7 2002/03/27 19:10:15 mike Exp $".
+ * End of "$Id: auth.c,v 1.41.2.8 2002/03/27 20:00:06 mike Exp $".
  */
