@@ -1,5 +1,5 @@
 /*
- * "$Id: mime.c,v 1.3 1999/01/24 14:18:43 mike Exp $"
+ * "$Id: mime.c,v 1.4 1999/01/27 18:31:56 mike Exp $"
  *
  *   MIME database file routines for the Common UNIX Printing System (CUPS).
  *
@@ -33,6 +33,11 @@
  * Revision History:
  *
  *   $Log: mime.c,v $
+ *   Revision 1.4  1999/01/27 18:31:56  mike
+ *   Updated PPD routines to handle emulations and patch files.
+ *
+ *   Added DSC comments to emit output as appropriate.
+ *
  *   Revision 1.3  1999/01/24 14:18:43  mike
  *   Check-in prior to CVS use.
  *
@@ -48,6 +53,7 @@
  */
 
 #include "mime.h"
+#include <config.h>
 
 #ifdef HAVE_SYS_DIR_H
 #  include <sys/types.h>
@@ -481,5 +487,5 @@ delete_rules(mime_magic_t *rules)	/* I - Rules to free */
 
 
 /*
- * End of "$Id: mime.c,v 1.3 1999/01/24 14:18:43 mike Exp $".
+ * End of "$Id: mime.c,v 1.4 1999/01/27 18:31:56 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.h,v 1.3 1999/01/24 14:18:43 mike Exp $"
+ * "$Id: ppd.h,v 1.4 1999/01/27 18:31:57 mike Exp $"
  *
  *   PostScript Printer Description definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -84,8 +84,8 @@ typedef enum			/**** Colorspaces ****/
 
 typedef struct			/**** Option choices ****/
 {
-  short		marked;		/* 0 if not selected, 1 otherwise */
-  char		choice[41];	/* Computer-readable option name */
+  char		marked,		/* 0 if not selected, 1 otherwise */
+		choice[41];	/* Computer-readable option name */
   unsigned char	text[81],	/* Human-readable option name */
 		*code;		/* Code to send for this option */
   void		*option;	/* Pointer to parent option structure */
@@ -93,7 +93,8 @@ typedef struct			/**** Option choices ****/
 
 typedef struct			/**** Options ****/
 {
-  char		keyword[41],	/* Option keyword name ("PageSize", etc.) */
+  char		conflicted,	/* 0 if no conflicts exist, 1 otherwise */
+		keyword[41],	/* Option keyword name ("PageSize", etc.) */
 		defchoice[41];	/* Default option choice */
   unsigned char	text[81];	/* Human-readable text */
   ppd_ui_t	ui;		/* Type of UI option */
@@ -110,15 +111,15 @@ typedef struct ppd_group_str	/**** Groups ****/
   ppd_option_t	*options;	/* Options */
   int		num_subgroups;	/* Number of sub-groups */
   struct ppd_group_str	*subgroups;
-				/* Sub-groups */
+				/* Sub-groups (max depth = 1) */
 } ppd_group_t;
 
 typedef struct			/**** Constraints ****/
 {
-  char		keyword1[41],	/* First keyword */
-		option1[41],	/* First option/choice (blank for all) */
-		keyword2[41],	/* Second keyword */
-		option2[41];	/* Second option/choice (blank for all) */
+  char		option1[41],	/* First keyword */
+		choice1[41],	/* First option/choice (blank for all) */
+		option2[41],	/* Second keyword */
+		choice2[41];	/* Second option/choice (blank for all) */
 } ppd_const_t;
 
 typedef struct			/**** Page Sizes ****/
@@ -148,6 +149,7 @@ typedef struct			/**** File ****/
 		contone_only,	/* 1 = continuous tone only, 0 = not */
 		landscape;	/* -90 or 90 */
   ppd_cs_t	colorspace;	/* Default colorspace */
+  unsigned char	*patches;	/* Patch commands to be sent to printer */
   int		num_emulations;	/* Number of emulations supported */
   ppd_emul_t	*emulations;	/* Emulations and the code to invoke them */
   unsigned char	*jcl_begin,	/* Start JCL commands */
@@ -199,8 +201,6 @@ extern int		ppdMarkOption(ppd_file_t *ppd, char *keyword,
 extern ppd_file_t	*ppdOpen(FILE *fp);
 extern ppd_file_t	*ppdOpenFd(int fd);
 extern ppd_file_t	*ppdOpenFile(char *filename);
-extern ppd_file_t	*ppdOpenRead(char *(*readfunc)(char *,int,void*),
-			             void *data);
 extern float		ppdPageLength(ppd_file_t *ppd, char *name);
 extern ppd_size_t	*ppdPageSize(ppd_file_t *ppd, char *name);
 extern float		ppdPageWidth(ppd_file_t *ppd, char *name);
@@ -215,5 +215,5 @@ extern float		ppdPageWidth(ppd_file_t *ppd, char *name);
 #endif /* !_CUPS_PPD_H_ */
 
 /*
- * End of "$Id: ppd.h,v 1.3 1999/01/24 14:18:43 mike Exp $".
+ * End of "$Id: ppd.h,v 1.4 1999/01/27 18:31:57 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: testppd.c,v 1.3 1999/01/24 14:18:43 mike Exp $"
+ * "$Id: testppd.c,v 1.4 1999/01/27 18:31:57 mike Exp $"
  *
  *   PPD test program for the Common UNIX Printing System (CUPS).
  *
@@ -50,6 +50,9 @@ main(int  argc,			/* I - Number of command-line arguments */
   ppd_group_t	*group;		/* UI group */
   ppd_option_t	*option;	/* Standard UI option */
   ppd_choice_t	*choice;	/* Standard UI option choice */
+  static char	*uis[] = { "PPD_UI_BOOLEAN", "PPD_UI_PICKONE", "PPD_UI_PICKMANY" };
+  static char	*sections[] = { "PPD_ORDER_ANY", "PPD_ORDER_DOCUMENT", "PPD_ORDER_EXIT",
+                                "PPD_ORDER_JCL", "PPD_ORDER_PAGE", "PPD_ORDER_PROLOG" };
 
 
  /*
@@ -102,12 +105,13 @@ main(int  argc,			/* I - Number of command-line arguments */
     printf("    num_jcls = %d\n", ppd->num_jcls);
     for (j = 0, option = ppd->jcls; j < ppd->num_jcls; j ++, option ++)
     {
-      printf("        jcls[%d] = %s (%s)\n", j, option->keyword, option->text);
+      printf("        jcls[%d] = %s (%s) %s %s %.0f\n", j, option->keyword, option->text,
+             uis[option->ui], sections[option->section], option->order);
 
       for (k = option->num_choices, choice = option->choices;
 	   k > 0;
 	   k --, choice ++)
-	printf("            %s (%s)\n", choice->option, choice->text);
+	printf("            %s (%s)\n", choice->choice, choice->text);
     };
 
     printf("    lang_encoding = %s\n", ppd->lang_encoding);
@@ -119,11 +123,14 @@ main(int  argc,			/* I - Number of command-line arguments */
     printf("    product = %s\n", ppd->product);
     printf("    nickname = %s\n", ppd->nickname);
     printf("    shortnickname = %s\n", ppd->shortnickname);
+    printf("    patches = %d bytes\n",
+           ppd->patches == NULL ? 0 : strlen((char *)ppd->patches));
 
     printf("    num_options = %d\n", ppd->num_options);
     for (j = 0, option = ppd->options; j < ppd->num_options; j ++, option ++)
     {
-      printf("        option[%d] = %s (%s)\n", j, option->keyword, option->text);
+      printf("        option[%d] = %s (%s) %s %s %.0f\n", j, option->keyword,
+             option->text, uis[option->ui], sections[option->section], option->order);
 
       if (strcmp(option->keyword, "PageSize") == 0 ||
           strcmp(option->keyword, "PageRegion") == 0)
@@ -132,11 +139,11 @@ main(int  argc,			/* I - Number of command-line arguments */
 	     k > 0;
 	     k --, choice ++)
 	{
-	  size = ppdPageSize(ppd, choice->option);
+	  size = ppdPageSize(ppd, choice->choice);
 	  if (size == NULL)
-	    printf("            %s (%s) = ERROR\n", choice->option, choice->text);
+	    printf("            %s (%s) = ERROR\n", choice->choice, choice->text);
           else
-	    printf("            %s (%s) = %.2fx%.2fin\n", choice->option,
+	    printf("            %s (%s) = %.2fx%.2fin\n", choice->choice,
 	           choice->text, size->width / 72.0, size->length / 72.0);
         };
       }
@@ -145,7 +152,7 @@ main(int  argc,			/* I - Number of command-line arguments */
         for (k = option->num_choices, choice = option->choices;
 	     k > 0;
 	     k --, choice ++)
-	  printf("            %s (%s)\n", choice->option, choice->text);
+	  printf("            %s (%s)\n", choice->choice, choice->text);
       };
     };
 
@@ -156,12 +163,13 @@ main(int  argc,			/* I - Number of command-line arguments */
 
       for (k = 0, option = group->options; k < group->num_options; k ++, option ++)
       {
-	printf("            options[%d] = %s (%s)\n", k, option->keyword, option->text);
+	printf("            options[%d] = %s (%s) %s %s %.0f\n", k, option->keyword,
+	       option->text, uis[option->ui], sections[option->section], option->order);
 
 	for (m = option->num_choices, choice = option->choices;
 	     m > 0;
 	     m --, choice ++)
-	  printf("                %s (%s)\n", choice->option, choice->text);
+	  printf("                %s (%s)\n", choice->choice, choice->text);
       };
     };
 
@@ -173,5 +181,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: testppd.c,v 1.3 1999/01/24 14:18:43 mike Exp $".
+ * End of "$Id: testppd.c,v 1.4 1999/01/27 18:31:57 mike Exp $".
  */
