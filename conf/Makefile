@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.2 1999/05/14 17:02:54 mike Exp $"
+# "$Id: Makefile,v 1.3 1999/05/15 03:39:33 mike Exp $"
 #
 #   Configuration file makefile for the Common UNIX Printing System (CUPS).
 #
@@ -54,8 +54,8 @@ install:
 		else \
 			$(CP) $$file $(SERVERROOT)/conf ; \
 		fi ; \
-	end
+	done
 
 #
-# End of "$Id: Makefile,v 1.2 1999/05/14 17:02:54 mike Exp $".
+# End of "$Id: Makefile,v 1.3 1999/05/15 03:39:33 mike Exp $".
 #
