@@ -1,5 +1,5 @@
 /*
- * "$Id: http.h,v 1.33.2.3 2001/12/26 16:52:12 mike Exp $"
+ * "$Id: http.h,v 1.33.2.4 2001/12/30 22:06:51 mike Exp $"
  *
  *   Hyper-Text Transport Protocol definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -226,7 +226,9 @@ typedef enum
   HTTP_FIELD_CONTENT_RANGE,
   HTTP_FIELD_CONTENT_TYPE,
   HTTP_FIELD_CONTENT_VERSION,
+  HTTP_FIELD_COOKIE,
   HTTP_FIELD_DATE,
+  HTTP_FIELD_EXPECT,
   HTTP_FIELD_HOST,
   HTTP_FIELD_IF_MODIFIED_SINCE,
   HTTP_FIELD_IF_UNMODIFIED_SINCE,
@@ -237,6 +239,7 @@ typedef enum
   HTTP_FIELD_RANGE,
   HTTP_FIELD_REFERER,
   HTTP_FIELD_RETRY_AFTER,
+  HTTP_FIELD_SET_COOKIE,
   HTTP_FIELD_TRANSFER_ENCODING,
   HTTP_FIELD_UPGRADE,
   HTTP_FIELD_USER_AGENT,
@@ -365,5 +368,5 @@ extern char		*httpAddrString(const http_addr_t *addr,
 #endif /* !_CUPS_HTTP_H_ */
 
 /*
- * End of "$Id: http.h,v 1.33.2.3 2001/12/26 16:52:12 mike Exp $".
+ * End of "$Id: http.h,v 1.33.2.4 2001/12/30 22:06:51 mike Exp $".
  */

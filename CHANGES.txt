@@ -1,4 +1,4 @@
-CHANGES.txt - 12/29/2001
+CHANGES.txt - 12/30/2001
 ------------------------
 
 CHANGES IN CUPS V1.2.0a1
@@ -9,3 +9,5 @@ CHANGES IN CUPS V1.2.0a1
 	  distribution; these are now available as part of ESP
 	  Ghostscript, or by patching GNU Ghostscript using the
 	  patches in the pstoraster directory.
+	- Added Cookie, Expect, and Set-Cookie fields to HTTP
+	  request structure.

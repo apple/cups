@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.82.2.4 2001/12/26 17:22:18 mike Exp $"
+ * "$Id: http.c,v 1.82.2.5 2001/12/30 22:06:51 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS).
  *
@@ -130,7 +130,9 @@ static const char	*http_fields[] =
 			  "Content-Range",
 			  "Content-Type",
 			  "Content-Version",
+			  "Cookie",
 			  "Date",
+			  "Expect",
 			  "Host",
 			  "If-Modified-Since",
 			  "If-Unmodified-since",
@@ -141,6 +143,7 @@ static const char	*http_fields[] =
 			  "Range",
 			  "Referer",
 			  "Retry-After",
+			  "Set-Cookie",
 			  "Transfer-Encoding",
 			  "Upgrade",
 			  "User-Agent",
@@ -2191,5 +2194,5 @@ http_upgrade(http_t *http)	/* I - HTTP data */
 
 
 /*
- * End of "$Id: http.c,v 1.82.2.4 2001/12/26 17:22:18 mike Exp $".
+ * End of "$Id: http.c,v 1.82.2.5 2001/12/30 22:06:51 mike Exp $".
  */
