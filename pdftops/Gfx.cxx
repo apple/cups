@@ -1329,6 +1329,9 @@ void Gfx::opShFill(Object args[], int numArgs) {
   case 2:
     doAxialShFill((GfxAxialShading *)shading);
     break;
+  case 3:
+    doRadialShFill((GfxRadialShading *)shading);
+    break;
   }
 
   // restore graphics state
@@ -1614,6 +1617,58 @@ void Gfx::doAxialShFill(GfxAxialShading *shading) {
     vy0 = vy1;
     color0 = color1;
     i = next[i];
+  }
+}
+
+void Gfx::doRadialShFill(GfxRadialShading *shading) {
+  double xMin, yMin, xMax, yMax;
+  double x0, y0, x1, y1, r0, r1;
+  double xx, yy, rr, cr, dr, dt;
+  double cx, cy, th;
+  double t0, t1, tt;
+  GfxColor color;
+
+  // Find the centers and radii of the two circles...
+  shading->getCoords(&x0, &y0, &x1, &y1);
+  shading->getRadii(&r0, &r1);
+
+  if (r0 == 0.0f && r1 == 0.0f) return;
+
+  // get the function domain
+  t0 = shading->getDomain0();
+  t1 = shading->getDomain1();
+
+  // draw circles, stepping in small increments...
+  for (dr = (r1 - r0); dr > 0.1; dr *= 0.1);
+  if (dr < 0.001) dr = 1.0;
+
+  for (rr = r1; rr >= r0; rr -= dr) {
+    // get the current center/color
+    dt = (rr - r0) / (r1 - r0);
+
+    cr = rr * M_SQRT1_2;
+    xx = x0 + (x1 - x0) * dt;
+    yy = y0 + (y1 - y0) * dt;
+    tt = t0 + (t1 - t0) * dt;
+
+    shading->getColor(tt, &color);
+
+    // set the color
+    state->setFillColor(&color);
+    out->updateFillColor(state);
+
+    // stroke the circle
+    for (th = 0.0; th < 2 * M_PI; th += M_PI * 0.05) {
+      cx = xx + rr * cos(th);
+      cy = yy + rr * sin(th);
+
+      if (th == 0.0) state->moveTo(cx, cy);
+      else state->lineTo(cx, cy);
+    }
+
+    state->closePath();
+    out->fill(state);
+    state->clearPath();
   }
 }
 

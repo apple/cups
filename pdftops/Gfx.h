@@ -28,6 +28,7 @@ struct GfxFontEncoding16;
 class GfxPattern;
 class GfxShading;
 class GfxAxialShading;
+class GfxRadialShading;
 class GfxState;
 class Gfx;
 struct PDFRectangle;
@@ -180,6 +181,7 @@ private:
   void doPatternFill(GBool eoFill);
   void opShFill(Object args[], int numArgs);
   void doAxialShFill(GfxAxialShading *shading);
+  void doRadialShFill(GfxRadialShading *shading);
   void doEndPath();
 
   // path clipping operators
