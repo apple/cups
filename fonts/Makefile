@@ -65,7 +65,9 @@ clean:
 
 install:
 	$(INSTALL_DIR) $(DATADIR)/fonts
-	$(INSTALL_DATA) $(FONTS) $(DATADIR)/fonts
+	for file in $(FONTS); do \
+		$(INSTALL_DATA) $$file $(DATADIR)/fonts; \
+	done
 
 
 #

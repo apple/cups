@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.34 2001/06/27 21:53:11 mike Exp $"
+# "$Id: Makefile,v 1.35 2001/07/19 20:17:53 mike Exp $"
 #
 #   Documentation makefile for the Common UNIX Printing System (CUPS).
 #
@@ -119,13 +119,21 @@ clean:
 
 install:
 	$(INSTALL_DIR) $(DOCDIR)
-	$(INSTALL_MAN) $(WEBPAGES) $(DOCDIR)
-	$(INSTALL_MAN) overview.html overview.pdf $(DOCDIR)
-	$(INSTALL_MAN) $(DOCUMENTS:.shtml=.html) $(DOCDIR)
-	$(INSTALL_MAN) $(DOCUMENTS:.shtml=.pdf) $(DOCDIR)
+	for file in $(WEBPAGES); do \
+		$(INSTALL_MAN) $$file $(DOCDIR); \
+	done
+	$(INSTALL_MAN) overview.html $(DOCDIR)
+	$(INSTALL_MAN) overview.pdf $(DOCDIR)
+	for file in $(DOCUMENTS:.shtml=.html); do \
+		$(INSTALL_MAN) $$file $(DOCDIR); \
+	done
+	for file in $(DOCUMENTS:.shtml=.pdf); do \
+		$(INSTALL_MAN) $$file $(DOCDIR); \
+	done
 	$(INSTALL_DIR) $(DOCDIR)/images
-	$(INSTALL_MAN) $(WEBIMAGES) $(DOCDIR)/images
-	$(INSTALL_MAN) $(DOCIMAGES) $(DOCDIR)/images
+	for file in $(WEBIMAGES) $(DOCIMAGES); do \
+		$(INSTALL_MAN) $$file $(DOCDIR)/images; \
+	done
 
 
 #

@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.14 2001/06/27 21:53:10 mike Exp $"
+# "$Id: Makefile,v 1.15 2001/07/19 20:17:52 mike Exp $"
 #
 #   Datafile makefile for the Common UNIX Printing System (CUPS).
 #
@@ -82,11 +82,17 @@ clean:
 
 install:
 	$(INSTALL_DIR) $(DATADIR)/banners
-	$(INSTALL_DATA) $(BANNERS) $(DATADIR)/banners
+	for file in $(BANNERS); do \
+		$(INSTALL_DATA) $$file $(DATADIR)/banners; \
+	done
 	$(INSTALL_DIR) $(DATADIR)/charsets
-	$(INSTALL_DATA) $(CHARSETS) $(DATADIR)/charsets
+	for file in $(CHARSETS); do \
+		$(INSTALL_DATA) $$file $(DATADIR)/charsets; \
+	done
 	$(INSTALL_DIR) $(DATADIR)/data
-	$(INSTALL_DATA) $(DATAFILES) $(DATADIR)/data
+	for file in $(DATAFILES); do \
+		$(INSTALL_DATA) $$file $(DATADIR)/data; \
+	done
 	-if test x$(PAMDIR) != x; then \
 		$(INSTALL_DIR) $(PAMDIR); \
 		if test -f /lib/security/pam_unix.so; then \
@@ -98,5 +104,5 @@ install:
 
 
 #
-# End of "$Id: Makefile,v 1.14 2001/06/27 21:53:10 mike Exp $".
+# End of "$Id: Makefile,v 1.15 2001/07/19 20:17:52 mike Exp $".
 #

@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.38 2001/06/28 01:05:15 mike Exp $"
+# "$Id: Makefile,v 1.39 2001/07/19 20:17:57 mike Exp $"
 #
 #   Scheduler Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -55,7 +55,8 @@ install:
 	$(INSTALL_DIR) $(SBINDIR)
 	$(INSTALL_BIN) cupsd $(SBINDIR)
 	$(INSTALL_DIR) $(SERVERBIN)/daemon
-	$(INSTALL_BIN) cups-lpd cups-polld $(SERVERBIN)/daemon
+	$(INSTALL_BIN) cups-lpd $(SERVERBIN)/daemon
+	$(INSTALL_BIN) cups-polld $(SERVERBIN)/daemon
 	$(INSTALL_DIR) -m 711 -o $(CUPS_USER) -g $(CUPS_GROUP) $(SERVERROOT)/certs
 	$(INSTALL_DIR) $(SERVERROOT)/interfaces
 	$(INSTALL_DIR) $(SERVERROOT)/ppd
@@ -140,5 +141,5 @@ $(OBJS):	../config.h ../Makedefs
 
 
 #
-# End of "$Id: Makefile,v 1.38 2001/06/28 01:05:15 mike Exp $".
+# End of "$Id: Makefile,v 1.39 2001/07/19 20:17:57 mike Exp $".
 #

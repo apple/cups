@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.14 2001/06/27 21:53:07 mike Exp $"
+# "$Id: Makefile,v 1.15 2001/07/19 20:17:51 mike Exp $"
 #
 #   Berkeley commands makefile for the Common UNIX Printing System (CUPS).
 #
@@ -49,7 +49,9 @@ clean:
 
 install:
 	$(INSTALL_DIR) $(BINDIR)
-	$(INSTALL_BIN) lpq lpr lprm $(BINDIR)
+	$(INSTALL_BIN) lpq $(BINDIR)
+	$(INSTALL_BIN) lpr $(BINDIR)
+	$(INSTALL_BIN) lprm $(BINDIR)
 	$(INSTALL_DIR) $(SBINDIR)
 	$(INSTALL_BIN) lpc $(SBINDIR)
 
@@ -99,5 +101,5 @@ lprm.o:	../cups/cups.h ../Makedefs
 
 
 #
-# End of "$Id: Makefile,v 1.14 2001/06/27 21:53:07 mike Exp $".
+# End of "$Id: Makefile,v 1.15 2001/07/19 20:17:51 mike Exp $".
 #
