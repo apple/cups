@@ -44,6 +44,8 @@ CHANGES IN CUPS V1.1.10
 	- The IPP and AppSocket backends did not clear the
 	  "waiting for print job to complete" status message,
 	  which caused some confusion... :)
+	- The serial backend now opens the port in "no delay"
+	  mode to avoid DCD detection problems with some OS's.
 
 
 CHANGES IN CUPS V1.1.9-1

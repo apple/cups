@@ -1,5 +1,5 @@
 /*
- * "$Id: serial.c,v 1.34 2001/07/18 20:46:22 mike Exp $"
+ * "$Id: serial.c,v 1.35 2001/08/02 14:21:13 mike Exp $"
  *
  *   Serial port backend for the Common UNIX Printing System (CUPS).
  *
@@ -189,7 +189,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
   do
   {
-    if ((fd = open(resource, O_WRONLY | O_NOCTTY | O_EXCL)) == -1)
+    if ((fd = open(resource, O_WRONLY | O_NOCTTY | O_EXCL | O_NDELAY)) == -1)
     {
       if (errno == EBUSY)
       {
@@ -378,6 +378,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
     }
 
   tcsetattr(fd, TCSANOW, &opts);
+  fcntl(fd, F_SETFL, 0);
 
  /*
   * Now that we are "connected" to the port, ignore SIGTERM so that we
@@ -856,5 +857,5 @@ list_devices(void)
 
 
 /*
- * End of "$Id: serial.c,v 1.34 2001/07/18 20:46:22 mike Exp $".
+ * End of "$Id: serial.c,v 1.35 2001/08/02 14:21:13 mike Exp $".
  */
