@@ -41,7 +41,7 @@ RSC=rc.exe
 # PROP Intermediate_Dir "Release"
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /YX /FD /c
-# ADD CPP /nologo /MT /W3 /GX /O2 /Ob1 /I "..\zlib-1.1.3" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "WIN32_LEAN_AND_MEAN" /D "VC_EXTRA_LEAN" /D "WIN32_EXTRA_LEAN" /YX /FD /c
+# ADD CPP /nologo /MT /W3 /GX /O2 /Ob2 /I "..\zlib-1.1.3" /I "../visualc" /I "../zlib" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "WIN32_LEAN_AND_MEAN" /D "VC_EXTRA_LEAN" /D "WIN32_EXTRA_LEAN" /YX /FD /c
 # ADD BASE RSC /l 0x409
 # ADD RSC /l 0x409
 BSC32=bscmake.exe
@@ -64,7 +64,7 @@ LIB32=link.exe -lib
 # PROP Intermediate_Dir "Debug"
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /Z7 /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /YX /FD /c
-# ADD CPP /nologo /MTd /W3 /GX /Z7 /Od /I "..\zlib-1.1.3" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "WIN32_LEAN_AND_MEAN" /D "VC_EXTRA_LEAN" /D "WIN32_EXTRA_LEAN" /YX /FD /c
+# ADD CPP /nologo /MTd /GX /Zi /Od /I "..\zlib-1.1.3" /I "../visualc" /I "../zlib" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "WIN32_LEAN_AND_MEAN" /D "VC_EXTRA_LEAN" /D "WIN32_EXTRA_LEAN" /YX /FD /c
 # ADD BASE RSC /l 0x409
 # ADD RSC /l 0x409
 BSC32=bscmake.exe
@@ -82,67 +82,67 @@ LIB32=link.exe -lib
 # Name "libpng - Win32 Debug"
 # Begin Source File
 
-SOURCE=.\png.c
+SOURCE=..\png\png.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\pngerror.c
+SOURCE=..\png\pngerror.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\pngget.c
+SOURCE=..\png\pngget.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\pngmem.c
+SOURCE=..\png\pngmem.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\pngpread.c
+SOURCE=..\png\pngpread.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\pngread.c
+SOURCE=..\png\pngread.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\pngrio.c
+SOURCE=..\png\pngrio.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\pngrtran.c
+SOURCE=..\png\pngrtran.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\pngrutil.c
+SOURCE=..\png\pngrutil.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\pngset.c
+SOURCE=..\png\pngset.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\pngtest.c
+SOURCE=..\png\pngtest.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\pngtrans.c
+SOURCE=..\png\pngtrans.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\pngwio.c
+SOURCE=..\png\pngwio.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\pngwrite.c
+SOURCE=..\png\pngwrite.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\pngwtran.c
+SOURCE=..\png\pngwtran.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\pngwutil.c
+SOURCE=..\png\pngwutil.c
 # End Source File
 # End Target
 # End Project

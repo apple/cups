@@ -41,7 +41,7 @@ RSC=rc.exe
 # PROP Intermediate_Dir "Release"
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /YX /FD /c
-# ADD CPP /nologo /MT /W3 /GX /O2 /Ob1 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "WIN32_LEAN_AND_MEAN" /D "VC_EXTRA_LEAN" /D "WIN32_EXTRA_LEAN" /YX /FD /c
+# ADD CPP /nologo /MT /W3 /GX /O2 /Ob2 /I "../visualc" /I "../zlib" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "WIN32_LEAN_AND_MEAN" /D "VC_EXTRA_LEAN" /D "WIN32_EXTRA_LEAN" /YX /FD /c
 # ADD BASE RSC /l 0x409
 # ADD RSC /l 0x409
 BSC32=bscmake.exe
@@ -64,7 +64,7 @@ LIB32=link.exe -lib
 # PROP Intermediate_Dir "Debug"
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /Z7 /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /YX /FD /c
-# ADD CPP /nologo /MTd /W3 /GX /Z7 /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "WIN32_LEAN_AND_MEAN" /D "VC_EXTRA_LEAN" /D "WIN32_EXTRA_LEAN" /YX /FD /c
+# ADD CPP /nologo /MTd /GX /Zi /Od /I "../visualc" /I "../zlib" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "WIN32_LEAN_AND_MEAN" /D "VC_EXTRA_LEAN" /D "WIN32_EXTRA_LEAN" /YX /FD /c
 # ADD BASE RSC /l 0x409
 # ADD RSC /l 0x409
 BSC32=bscmake.exe
@@ -82,175 +82,175 @@ LIB32=link.exe -lib
 # Name "jpeg - Win32 Debug"
 # Begin Source File
 
-SOURCE=.\jcapimin.c
+SOURCE=..\jpeg\jcapimin.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\jcapistd.c
+SOURCE=..\jpeg\jcapistd.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\jccoefct.c
+SOURCE=..\jpeg\jccoefct.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\jccolor.c
+SOURCE=..\jpeg\jccolor.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\jcdctmgr.c
+SOURCE=..\jpeg\jcdctmgr.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\jchuff.c
+SOURCE=..\jpeg\jchuff.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\jcinit.c
+SOURCE=..\jpeg\jcinit.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\jcmainct.c
+SOURCE=..\jpeg\jcmainct.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\jcmarker.c
+SOURCE=..\jpeg\jcmarker.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\jcmaster.c
+SOURCE=..\jpeg\jcmaster.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\jcomapi.c
+SOURCE=..\jpeg\jcomapi.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\jcparam.c
+SOURCE=..\jpeg\jcparam.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\jcphuff.c
+SOURCE=..\jpeg\jcphuff.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\jcprepct.c
+SOURCE=..\jpeg\jcprepct.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\jcsample.c
+SOURCE=..\jpeg\jcsample.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\jctrans.c
+SOURCE=..\jpeg\jctrans.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\jdapimin.c
+SOURCE=..\jpeg\jdapimin.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\jdapistd.c
+SOURCE=..\jpeg\jdapistd.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\jdatadst.c
+SOURCE=..\jpeg\jdatadst.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\jdatasrc.c
+SOURCE=..\jpeg\jdatasrc.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\jdcoefct.c
+SOURCE=..\jpeg\jdcoefct.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\jdcolor.c
+SOURCE=..\jpeg\jdcolor.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\jddctmgr.c
+SOURCE=..\jpeg\jddctmgr.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\jdhuff.c
+SOURCE=..\jpeg\jdhuff.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\jdinput.c
+SOURCE=..\jpeg\jdinput.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\jdmainct.c
+SOURCE=..\jpeg\jdmainct.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\jdmarker.c
+SOURCE=..\jpeg\jdmarker.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\jdmaster.c
+SOURCE=..\jpeg\jdmaster.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\jdmerge.c
+SOURCE=..\jpeg\jdmerge.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\jdphuff.c
+SOURCE=..\jpeg\jdphuff.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\jdpostct.c
+SOURCE=..\jpeg\jdpostct.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\jdsample.c
+SOURCE=..\jpeg\jdsample.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\jdtrans.c
+SOURCE=..\jpeg\jdtrans.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\jerror.c
+SOURCE=..\jpeg\jerror.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\jfdctflt.c
+SOURCE=..\jpeg\jfdctflt.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\jfdctfst.c
+SOURCE=..\jpeg\jfdctfst.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\jfdctint.c
+SOURCE=..\jpeg\jfdctint.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\jidctflt.c
+SOURCE=..\jpeg\jidctflt.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\jidctfst.c
+SOURCE=..\jpeg\jidctfst.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\jidctint.c
+SOURCE=..\jpeg\jidctint.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\jidctred.c
+SOURCE=..\jpeg\jidctred.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\jmemmgr.c
+SOURCE=..\jpeg\jmemmgr.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\jmemnobs.c
+SOURCE=..\jpeg\jmemnobs.c
 
 !IF  "$(CFG)" == "jpeg - Win32 Release"
 
@@ -265,19 +265,19 @@ SOURCE=.\jmemnobs.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\jpegtran.c
+SOURCE=..\jpeg\jpegtran.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\jquant1.c
+SOURCE=..\jpeg\jquant1.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\jquant2.c
+SOURCE=..\jpeg\jquant2.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\jutils.c
+SOURCE=..\jpeg\jutils.c
 # End Source File
 # End Target
 # End Project

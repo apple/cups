@@ -41,7 +41,7 @@ RSC=rc.exe
 # PROP Intermediate_Dir "Release"
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /YX /FD /c
-# ADD CPP /nologo /MT /GX /O2 /Ob1 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "WIN32_LEAN_AND_MEAN" /D "VC_EXTRA_LEAN" /D "WIN32_EXTRA_LEAN" /YX /FD /c
+# ADD CPP /nologo /MT /GX /O2 /Ob2 /I "../visualc" /I "../zlib" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "WIN32_LEAN_AND_MEAN" /D "VC_EXTRA_LEAN" /D "WIN32_EXTRA_LEAN" /YX /FD /c
 # ADD BASE RSC /l 0x409
 # ADD RSC /l 0x409
 BSC32=bscmake.exe
@@ -64,7 +64,7 @@ LIB32=link.exe -lib
 # PROP Intermediate_Dir "Debug"
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /Z7 /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /YX /FD /c
-# ADD CPP /nologo /MTd /GX /Z7 /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "WIN32_LEAN_AND_MEAN" /D "VC_EXTRA_LEAN" /D "WIN32_EXTRA_LEAN" /YX /FD /c
+# ADD CPP /nologo /MTd /GX /Zi /Od /I "../visualc" /I "../zlib" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "WIN32_LEAN_AND_MEAN" /D "VC_EXTRA_LEAN" /D "WIN32_EXTRA_LEAN" /YX /FD /c
 # ADD BASE RSC /l 0x409
 # ADD RSC /l 0x409
 BSC32=bscmake.exe
@@ -82,59 +82,59 @@ LIB32=link.exe -lib
 # Name "zlib - Win32 Debug"
 # Begin Source File
 
-SOURCE=.\adler32.c
+SOURCE=..\zlib\adler32.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\compress.c
+SOURCE=..\zlib\compress.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\crc32.c
+SOURCE=..\zlib\crc32.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\deflate.c
+SOURCE=..\zlib\deflate.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\gzio.c
+SOURCE=..\zlib\gzio.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\infblock.c
+SOURCE=..\zlib\infblock.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\infcodes.c
+SOURCE=..\zlib\infcodes.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\inffast.c
+SOURCE=..\zlib\inffast.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\inflate.c
+SOURCE=..\zlib\inflate.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\inftrees.c
+SOURCE=..\zlib\inftrees.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\infutil.c
+SOURCE=..\zlib\infutil.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\trees.c
+SOURCE=..\zlib\trees.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\uncompr.c
+SOURCE=..\zlib\uncompr.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\zutil.c
+SOURCE=..\zlib\zutil.c
 # End Source File
 # End Target
 # End Project
