@@ -1,5 +1,5 @@
 #
-# "$Id: cups.spec,v 1.48 2002/05/21 19:59:41 mike Exp $"
+# "$Id: cups.spec,v 1.49 2002/06/06 12:32:22 mike Exp $"
 #
 #   RPM "spec" file for the Common UNIX Printing System (CUPS).
 #
@@ -27,10 +27,10 @@
 Summary: Common Unix Printing System
 Name: cups
 Version: 1.1.15
-Release: 0
+Release: 1
 Copyright: GPL
 Group: System Environment/Daemons
-Source: ftp://ftp.easysw.com/pub/cups/%{version}/cups-%{version}-source.tar.gz
+Source: ftp://ftp.easysw.com/pub/cups/%{version}/cups-%{version}-1-source.tar.gz
 Url: http://www.cups.org
 Packager: Anonymous <anonymous@foo.com>
 Vendor: Easy Software Products
@@ -203,5 +203,5 @@ rm -rf $RPM_BUILD_ROOT
 /usr/share/man/fr/man3/*
 
 #
-# End of "$Id: cups.spec,v 1.48 2002/05/21 19:59:41 mike Exp $".
+# End of "$Id: cups.spec,v 1.49 2002/06/06 12:32:22 mike Exp $".
 #
