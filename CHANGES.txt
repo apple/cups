@@ -1,5 +1,14 @@
-CHANGES.txt - 07/21/2000
+CHANGES.txt - 07/24/2000
 ------------------------
+
+CHANGES IN CUPS v1.1.2
+
+	- The cupsTempFile() function now uses a different
+	  algorithm for generating temp files and "reserves"
+	  them to avoid possible security exploitation.
+	- Now use /dev/random (if available) to seed the random
+	  number generator for certificates.
+
 
 CHANGES IN CUPS v1.1.1
 
