@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c,v 1.69 2000/12/20 21:16:36 mike Exp $"
+ * "$Id: util.c,v 1.70 2001/01/04 17:33:51 mike Exp $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -189,7 +189,7 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
     return (NULL);
   }
 
-  DEBUG_printf(("cupsDoFileRequest(%p, %08s, \'%s\', \'%s\')\n",
+  DEBUG_printf(("cupsDoFileRequest(%p, %08x, \'%s\', \'%s\')\n",
                 http, request, resource, filename ? filename : "(null)"));
 
  /*
@@ -1076,7 +1076,7 @@ cupsPrintFile(const char    *name,	/* I - Printer or class name */
 	      cups_option_t *options)	/* I - Options */
 {
   DEBUG_printf(("cupsPrintFile(\'%s\', \'%s\', %d, %p)\n",
-                printer, filename, num_options, options));
+                name, filename, num_options, options));
 
   return (cupsPrintFiles(name, 1, &filename, title, num_options, options));
 }
@@ -1107,7 +1107,7 @@ cupsPrintFiles(const char    *name,	/* I - Printer or class name */
 
 
   DEBUG_printf(("cupsPrintFiles(\'%s\', %d, %p, %d, %p)\n",
-                printer, num_files, files, num_options, options));
+                name, num_files, files, num_options, options));
 
   if (name == NULL || num_files < 1 || files == NULL)
     return (0);
@@ -1503,5 +1503,5 @@ cups_local_auth(http_t *http)	/* I - Connection */
 
 
 /*
- * End of "$Id: util.c,v 1.69 2000/12/20 21:16:36 mike Exp $".
+ * End of "$Id: util.c,v 1.70 2001/01/04 17:33:51 mike Exp $".
  */

@@ -22,11 +22,11 @@
   GNU software to build or run it.
 */
 
-/*$Id: gpsync.h,v 1.1 2000/03/13 19:00:47 mike Exp $ */
+/*$Id: gpsync.h,v 1.2 2001/01/04 17:33:52 mike Exp $ */
 /* Interface to platform-dependent synchronization primitives */
 
 #if !defined(gpsync_INCLUDED)
- #define gpsync_INCLUDED
+#define gpsync_INCLUDED
 
 /* Initial version 4/1/98 by John Desrosiers (soho@crl.com). */
 /* 8/9/98 L. Peter Deutsch (ghost@aladdin.com) Changed ...sizeof to
