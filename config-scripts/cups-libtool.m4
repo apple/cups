@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-libtool.m4,v 1.2.2.2 2002/01/02 18:50:23 mike Exp $"
+dnl "$Id: cups-libtool.m4,v 1.2.2.3 2002/06/04 21:15:57 mike Exp $"
 dnl
 dnl   Libtool stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -23,7 +23,7 @@ dnl         WWW: http://www.cups.org
 dnl
 
 AC_ARG_ENABLE(libtool_unsupported, [  --enable-libtool-unsupported=LIBTOOL_PATH
-                          turn on building with libtool (UNSUPPORTED!) [default=no]],
+                          turn on building with libtool (UNSUPPORTED!), default=no],
 	[if test x$enable_libtool_unsupported != xno; then
 		LIBTOOL="$enable_libtool_unsupported"
 		enable_shared=no
@@ -45,5 +45,5 @@ if test x$LIBTOOL != x; then
 fi
 
 dnl
-dnl End of "$Id: cups-libtool.m4,v 1.2.2.2 2002/01/02 18:50:23 mike Exp $".
+dnl End of "$Id: cups-libtool.m4,v 1.2.2.3 2002/06/04 21:15:57 mike Exp $".
 dnl

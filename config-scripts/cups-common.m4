@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-common.m4,v 1.12.2.8 2002/05/16 13:59:57 mike Exp $"
+dnl "$Id: cups-common.m4,v 1.12.2.9 2002/06/04 21:15:57 mike Exp $"
 dnl
 dnl   Common configuration stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -22,8 +22,8 @@ dnl       EMail: cups-info@cups.org
 dnl         WWW: http://www.cups.org
 dnl
 
-dnl We need at least autoconf 2.13...
-AC_PREREQ(2.13)
+dnl We need at least autoconf 2.50...
+AC_PREREQ(2.50)
 
 dnl Set the name of the config header file...
 AC_CONFIG_HEADER(config.h)
@@ -73,14 +73,19 @@ fi
 AC_SEARCH_LIBS(getspent, sec, gen)
 
 LIBMALLOC=""
-AC_CHECK_LIB(c,mallinfo,LIBS="$LIBS"; AC_DEFINE(HAVE_MALLINFO),LIBS="$LIBS")
-if test "$ac_cv_lib_c_mallinfo" = "no"; then
-	AC_CHECK_LIB(malloc,mallinfo,
-	             LIBS="$LIBS"
-		     LIBMALLOC="-lmalloc"
-		     AC_DEFINE(HAVE_MALLINFO),
-		     LIBS="$LIBS")
+AC_ARG_ENABLE(mallinfo, [  --enable-mallinfo       turn on malloc debug information, default=no])
+
+if test x$enable_mallinfo = xyes; then
+	AC_CHECK_LIB(c,mallinfo,LIBS="$LIBS"; AC_DEFINE(HAVE_MALLINFO),LIBS="$LIBS")
+	if test "$ac_cv_lib_c_mallinfo" = "no"; then
+		AC_CHECK_LIB(malloc,mallinfo,
+	        	     LIBS="$LIBS"
+			     LIBMALLOC="-lmalloc"
+			     AC_DEFINE(HAVE_MALLINFO),
+			     LIBS="$LIBS")
+	fi
 fi
+
 AC_SUBST(LIBMALLOC)
 
 dnl Checks for header files.
@@ -156,5 +161,5 @@ esac
 AC_SUBST(ARFLAGS)
 
 dnl
-dnl End of "$Id: cups-common.m4,v 1.12.2.8 2002/05/16 13:59:57 mike Exp $".
+dnl End of "$Id: cups-common.m4,v 1.12.2.9 2002/06/04 21:15:57 mike Exp $".
 dnl
