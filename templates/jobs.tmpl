@@ -26,18 +26,18 @@
 	<TD>
 	{job_state>5?
 	{job_k_octets>0?
-	<A HREF="/admin/?op=restart-job&job_id={job_id}">
+	<A HREF="/admin/?op=restart-job&job_id={job_id}&job_printer_uri={job_printer_uri}">
 	<IMG SRC="/images/restart-job.gif" ALT="Restart Job" BORDER="0"></A>
 	:}:}
 	{job_state>6?:
 	{job_state=4?
-	<A HREF="/admin/?op=release-job&job_id={job_id}">
+	<A HREF="/admin/?op=release-job&job_id={job_id}&job_printer_uri={job_printer_uri}">
 	<IMG SRC="/images/release-job.gif" ALT="Release Job" BORDER="0"></A>
 	:
-	<A HREF="/admin/?op=hold-job&job_id={job_id}">
+	<A HREF="/admin/?op=hold-job&job_id={job_id}&job_printer_uri={job_printer_uri}">
 	<IMG SRC="/images/hold-job.gif" ALT="Hold Job" BORDER="0"></A>
 	}
-	<A HREF="/admin/?op=cancel-job&job_id={job_id}">
+	<A HREF="/admin/?op=cancel-job&job_id={job_id}&job_printer_uri={job_printer_uri}">
 	<IMG SRC="/images/cancel-job.gif" ALT="Cancel Job" BORDER="0"></A>
 	}
 	&nbsp;</TD>
