@@ -1,5 +1,5 @@
 /*
- * "$Id: http.h,v 1.27 2000/05/20 15:47:45 mike Exp $"
+ * "$Id: http.h,v 1.28 2000/06/02 14:28:05 mike Exp $"
  *
  *   Hyper-Text Transport Protocol definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -260,6 +260,7 @@ typedef struct
   char			nonce[HTTP_MAX_VALUE];
 					/* Nonce value */
   int			nonce_count;	/* Nonce count */
+  void			*tls;		/* TLS state information */
 } http_t;
 
 
@@ -320,5 +321,5 @@ extern char		*httpMD5String(const md5_byte_t *, char [33]);
 #endif /* !_CUPS_HTTP_H_ */
 
 /*
- * End of "$Id: http.h,v 1.27 2000/05/20 15:47:45 mike Exp $".
+ * End of "$Id: http.h,v 1.28 2000/06/02 14:28:05 mike Exp $".
  */
