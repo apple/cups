@@ -3,6 +3,8 @@ CHANGES.txt - 11/19/2003
 
 CHANGES IN CUPS V1.1.20
 
+	- The pdftops filter no longer needs to create temporary
+	  files with tmpnam (STR #406)
 	- The HTTP code did not use a case-insensitive
 	  comparison when checking for the Basic authentication
 	  method (STR #407)

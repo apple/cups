@@ -443,6 +443,7 @@ time_t getModTime(const char *fileName) {
 #endif
 }
 
+#if 0 // MRS: This function is apparently no longer used...
 GBool openTempFile(GString **name, FILE **f, const char *mode, const char *ext) {
 #if defined(WIN32)
   //---------- Win32 ----------
@@ -527,6 +528,7 @@ GBool openTempFile(GString **name, FILE **f, const char *mode, const char *ext) 
   return gTrue;
 #endif
 }
+#endif // 0
 
 GBool executeCommand(const char *cmd) {
 #ifdef VMS
