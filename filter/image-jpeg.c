@@ -1,5 +1,5 @@
 /*
- * "$Id: image-jpeg.c,v 1.9 2000/01/04 13:45:45 mike Exp $"
+ * "$Id: image-jpeg.c,v 1.10 2000/04/24 20:47:49 mike Exp $"
  *
  *   JPEG image routines for the Common UNIX Printing System (CUPS).
  *
@@ -97,6 +97,10 @@ ImageReadJPEG(image_t    *img,		/* IO - Image */
     }
   }
 
+  fprintf(stderr, "DEBUG: JPEG image %dx%dx%d, %dx%d PPI\n",
+          img->xsize, img->colorspace, cinfo.output_components,
+	  img->xppi, img->yppi);
+
   ImageSetMaxTiles(img, 0);
 
   in = malloc(img->xsize * cinfo.output_components);
@@ -186,5 +190,5 @@ ImageReadJPEG(image_t    *img,		/* IO - Image */
 
 
 /*
- * End of "$Id: image-jpeg.c,v 1.9 2000/01/04 13:45:45 mike Exp $".
+ * End of "$Id: image-jpeg.c,v 1.10 2000/04/24 20:47:49 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: image.c,v 1.22 2000/03/21 04:03:27 mike Exp $"
+ * "$Id: image.c,v 1.23 2000/04/24 20:47:49 mike Exp $"
  *
  *   Base image support for the Common UNIX Printing System (CUPS).
  *
@@ -82,22 +82,34 @@ ImageOpen(char       *filename,	/* I - Filename of image */
   int		status;		/* Status of load... */
 
 
+  fprintf(stderr, "DEBUG: ImageOpen(\"%s\", %d, %d, %d, %d, %p)\n",
+          filename ? filename : "(null)", primary, secondary,
+	  saturation, hue, lut);
+
  /*
   * Range check...
   */
 
   if (filename == NULL)
+  {
+    fputs("ERROR: Image filename == NULL!\n", stderr);
     return (NULL);
+  }
 
  /*
   * Figure out the file type...
   */
 
   if ((fp = fopen(filename, "r")) == NULL)
+  {
+    perror("ERROR: Unable to open image file");
     return (NULL);
+  }
 
   if (fread(header, 1, sizeof(header), fp) == 0)
   {
+    perror("ERROR: Unable to read image file header");
+
     fclose(fp);
     return (NULL);
   }
@@ -115,6 +127,7 @@ ImageOpen(char       *filename,	/* I - Filename of image */
 
   if (img == NULL)
   {
+    perror("ERROR: Unable to allocate memory for image file");
     fclose(fp);
     return (NULL);
   }
@@ -144,7 +157,8 @@ ImageOpen(char       *filename,	/* I - Filename of image */
     status = ImageReadPNG(img, fp, primary, secondary, saturation, hue, lut);
 #endif /* HAVE_LIBPNG && HAVE_LIBZ */
 #ifdef HAVE_LIBJPEG
-  else if (memcmp(header + 6, "JFIF", 4) == 0)
+  else if (memcmp(header, "\377\330\377", 3) == 0 &&	/* Start-of-Image */
+	   header[3] >= 0xd0 && header[3] <= 0xd7)	/* Resource */
     status = ImageReadJPEG(img, fp, primary, secondary, saturation, hue, lut);
 #endif /* HAVE_LIBJPEG */
 #ifdef HAVE_LIBTIFF
@@ -154,6 +168,7 @@ ImageOpen(char       *filename,	/* I - Filename of image */
 #endif /* HAVE_LIBTIFF */
   else
   {
+    fputs("ERROR: Unknown image file format!\n", stderr);
     fclose(fp);
     status = -1;
   }
@@ -776,5 +791,5 @@ flush_tile(image_t *img)	/* I - Image */
 
 
 /*
- * End of "$Id: image.c,v 1.22 2000/03/21 04:03:27 mike Exp $".
+ * End of "$Id: image.c,v 1.23 2000/04/24 20:47:49 mike Exp $".
  */
