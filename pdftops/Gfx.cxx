@@ -2227,6 +2227,10 @@ void Gfx::opShowText(Object args[], int numArgs) {
     error(getPos(), "No font in show");
     return;
   }
+  if (fontChanged) {
+    out->updateFont(state);
+    fontChanged = gFalse;
+  }
   doShowText(args[0].getString());
 }
 
@@ -2236,6 +2240,10 @@ void Gfx::opMoveShowText(Object args[], int numArgs) {
   if (!state->getFont()) {
     error(getPos(), "No font in move/show");
     return;
+  }
+  if (fontChanged) {
+    out->updateFont(state);
+    fontChanged = gFalse;
   }
   tx = state->getLineX();
   ty = state->getLineY() - state->getLeading();
@@ -2250,6 +2258,10 @@ void Gfx::opMoveSetShowText(Object args[], int numArgs) {
   if (!state->getFont()) {
     error(getPos(), "No font in move/set/show");
     return;
+  }
+  if (fontChanged) {
+    out->updateFont(state);
+    fontChanged = gFalse;
   }
   state->setWordSpace(args[0].getNum());
   state->setCharSpace(args[1].getNum());
@@ -2271,6 +2283,10 @@ void Gfx::opShowSpaceText(Object args[], int numArgs) {
   if (!state->getFont()) {
     error(getPos(), "No font in show/space");
     return;
+  }
+  if (fontChanged) {
+    out->updateFont(state);
+    fontChanged = gFalse;
   }
   wMode = state->getFont()->getWMode();
   a = args[0].getArray();
@@ -2308,10 +2324,6 @@ void Gfx::doShowText(GString *s) {
   char *p;
   int len, n, uLen, nChars, nSpaces, i;
 
-  if (fontChanged) {
-    out->updateFont(state);
-    fontChanged = gFalse;
-  }
   font = state->getFont();
   wMode = font->getWMode();
 
