@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.30 2000/09/26 14:06:28 mike Exp $"
+ * "$Id: ipp.c,v 1.31 2000/10/02 13:44:20 mike Exp $"
  *
  *   IPP backend for the Common UNIX Printing System (CUPS).
  *
@@ -53,6 +53,7 @@ int			/* O - Exit status */
 main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
      char *argv[])	/* I - Command-line arguments */
 {
+  int		i;		/* Looping var */
   int		num_options;	/* Number of printer options */
   cups_option_t	*options;	/* Printer options */
   char		method[255],	/* Method in URI */
@@ -71,6 +72,8 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 		*response;	/* IPP response */
   ipp_attribute_t *job_id;	/* job-id attribute */
   ipp_attribute_t *copies_sup;	/* copies-supported attribute */
+  ipp_attribute_t *charset_sup;	/* charset-supported attribute */
+  const char	*charset;	/* Character set to use */
   cups_lang_t	*language;	/* Default language */
   struct stat	fileinfo;	/* File statistics */
   size_t	nbytes,		/* Number of bytes written */
@@ -200,9 +203,10 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   * don't support the copies attribute...
   */
 
-  language   = cupsLangDefault();
-  copies_sup = NULL;
-  version    = 1;
+  language    = cupsLangDefault();
+  charset_sup = NULL;
+  copies_sup  = NULL;
+  version     = 1;
 
   do
   {
@@ -325,7 +329,8 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 	    copies_sup = NULL; /* No */
         }
 
-	ippDelete(response);
+        charset_sup = ippFindAttribute(response, "charset-supported",
+	                               IPP_TAG_CHARSET);
       }
       else
       {
@@ -393,6 +398,46 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
     copies = atoi(argv[4]);
 
  /*
+  * Figure out the character set to use...
+  */
+
+  charset = language ? cupsLangEncoding(language) : "us-ascii";
+
+  if (charset_sup)
+  {
+   /*
+    * See if IPP server supports the requested character set...
+    */
+
+    for (i = 0; i < charset_sup->num_values; i ++)
+      if (strcasecmp(charset, charset_sup->values[i].string.text) == 0)
+        break;
+
+   /*
+    * If not, choose us-ascii or utf-8...
+    */
+
+    if (i >= charset_sup->num_values)
+    {
+     /*
+      * See if us-ascii is supported...
+      */
+
+      for (i = 0; i < charset_sup->num_values; i ++)
+        if (strcasecmp("us-ascii", charset_sup->values[i].string.text) == 0)
+          break;
+
+      if (i < charset_sup->num_values)
+        charset = "us-ascii";
+      else
+        charset = "utf-8";
+    }
+  }
+
+  if (response)
+    ippDelete(response);
+
+ /*
   * Then issue the print-job request...
   */
 
@@ -408,7 +453,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
     request->request.op.request_id   = 1;
 
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-        	 "attributes-charset", NULL, "utf-8");
+        	 "attributes-charset", NULL, charset);
 
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
         	 "attributes-natural-language", NULL,
@@ -610,5 +655,5 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
 
 /*
- * End of "$Id: ipp.c,v 1.30 2000/09/26 14:06:28 mike Exp $".
+ * End of "$Id: ipp.c,v 1.31 2000/10/02 13:44:20 mike Exp $".
  */
