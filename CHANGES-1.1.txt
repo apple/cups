@@ -3,6 +3,9 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.21rc2
 
+	- The scheduler did not correctly throttle the browse
+	  broadcasts, resulting in missing printers on client
+	  machines (STR #754)
 	- The scheduler did not pass the correct CUPS_ENCRYPTION
 	  setting to CGI programs which caused problems on
 	  systems which used non-standard encryption settings

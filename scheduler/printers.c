@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.93.2.56 2004/02/25 20:01:37 mike Exp $"
+ * "$Id: printers.c,v 1.93.2.57 2004/06/28 23:35:10 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -149,6 +149,12 @@ AddPrinter(const char *name)	/* I - Name of printer */
   */
 
   WritePrintcap();
+
+ /*
+  * Bump the printer count and return...
+  */
+
+  NumPrinters ++;
 
   return (p);
 }
@@ -525,14 +531,14 @@ DeleteAllPrinters(void)
  */
 
 void
-DeletePrinter(printer_t *p,	/* I - Printer to delete */
-	      int  update)	/* I - Update printers.conf? */
+DeletePrinter(printer_t *p,		/* I - Printer to delete */
+	      int       update)		/* I - Update printers.conf? */
 {
-  int		i;		/* Looping var */
-  printer_t	*current,	/* Current printer in list */
-		*prev;		/* Previous printer in list */
+  int		i;			/* Looping var */
+  printer_t	*current,		/* Current printer in list */
+		*prev;			/* Previous printer in list */
 #ifdef __sgi
-  char		filename[1024];	/* Interface script filename */
+  char		filename[1024];		/* Interface script filename */
 #endif /* __sgi */
 
 
@@ -546,7 +552,7 @@ DeletePrinter(printer_t *p,	/* I - Printer to delete */
     return;
 
  /*
-  * Remove the printer from the list...
+  * Find the printer in the list...
   */
 
   for (prev = NULL, current = Printers;
@@ -562,10 +568,23 @@ DeletePrinter(printer_t *p,	/* I - Printer to delete */
     return;
   }
 
+ /*
+  * If this printer is the next for browsing, point to the next one...
+  */
+
+  if (p == BrowseNext)
+    BrowseNext = p->next;
+
+ /*
+  * Remove the printer from the list...
+  */
+
   if (prev == NULL)
     Printers = p->next;
   else
     prev->next = p->next;
+
+  NumPrinters --;
 
  /*
   * Stop printing on this printer...
@@ -1798,6 +1817,11 @@ SetPrinterState(printer_t    *p,	/* I - Printer to change */
 
   if (old_state != s)
   {
+   /*
+    * Let the browse code know this needs to be updated...
+    */
+
+    BrowseNext     = p;
     p->state_time  = time(NULL);
     p->browse_time = 0;
 
@@ -2415,5 +2439,5 @@ write_irix_state(printer_t *p)		/* I - Printer to update */
 
 
 /*
- * End of "$Id: printers.c,v 1.93.2.56 2004/02/25 20:01:37 mike Exp $".
+ * End of "$Id: printers.c,v 1.93.2.57 2004/06/28 23:35:10 mike Exp $".
  */

@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# "$Id: run-stp-tests.sh,v 1.4.2.19 2004/05/27 18:18:11 mike Exp $"
+# "$Id: run-stp-tests.sh,v 1.4.2.20 2004/06/28 23:35:10 mike Exp $"
 #
 #   Perform the complete set of IPP compliance tests specified in the
 #   CUPS Software Test Plan.
@@ -116,7 +116,7 @@ read usevalgrind
 
 case "$usevalgrind" in
 	Y* | y*)
-		valgrind="valgrind --logfile=/tmp/$user/log/valgrind --error-limit=no --leak-check=yes --trace-children=yes"
+		valgrind="valgrind --tool=memcheck --logfile=/tmp/$user/log/valgrind --error-limit=no --leak-check=yes --trace-children=yes"
 		echo "Using Valgrind; log files can be found in /tmp/$user/log..."
 		;;
 
@@ -302,7 +302,8 @@ export HOME
 # Start the server; run as foreground daemon in the background...
 #
 
-echo "Starting scheduler..."
+echo "Starting scheduler:"
+echo "    $valgrind ../scheduler/cupsd -c /tmp/$user/cupsd.conf -f >/tmp/$user/log/debug_log &"
 
 $valgrind ../scheduler/cupsd -c /tmp/$user/cupsd.conf -f >/tmp/$user/log/debug_log &
 cupsd=$!
@@ -478,5 +479,5 @@ echo "    $pdffile"
 echo ""
 
 #
-# End of "$Id: run-stp-tests.sh,v 1.4.2.19 2004/05/27 18:18:11 mike Exp $"
+# End of "$Id: run-stp-tests.sh,v 1.4.2.20 2004/06/28 23:35:10 mike Exp $"
 #

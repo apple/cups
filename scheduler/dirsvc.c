@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.73.2.48 2004/05/27 18:04:39 mike Exp $"
+ * "$Id: dirsvc.c,v 1.73.2.49 2004/06/28 23:35:10 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -511,11 +511,11 @@ ProcessBrowseData(const char   *uri,	/* I - URI of printer/class */
 void
 SendBrowseList(void)
 {
-  int			count;	/* Number of dests to update */
-  printer_t		*p,	/* Current printer */
-			*np;	/* Next printer */
-  time_t		ut,	/* Minimum update time */
-			to;	/* Timeout time */
+  int			count;		/* Number of dests to update */
+  printer_t		*p,		/* Current printer */
+			*np;		/* Next printer */
+  time_t		ut,		/* Minimum update time */
+			to;		/* Timeout time */
 
 
   if (!Browsing || !BrowseProtocols)
@@ -534,20 +534,63 @@ SendBrowseList(void)
 
   if (BrowseInterval > 0)
   {
-    for (count = 0, p = Printers; p != NULL; p = p->next)
+    int	max_count;			/* Maximum number to update */
+
+
+   /*
+    * Throttle the number of printers we'll be updating this time
+    * around based on the number of queues that need updating and
+    * the maximum number of queues to update each second...
+    */
+
+    max_count = 2 * NumPrinters / BrowseInterval + 1;
+
+    for (count = 0, p = Printers; count < max_count && p != NULL; p = p->next)
       if (!(p->type & (CUPS_PRINTER_REMOTE | CUPS_PRINTER_IMPLICIT)) &&
           p->browse_time < ut)
         count ++;
 
    /*
-    * Throttle the number of printers we'll be updating this time
-    * around...
+    * Loop through all of the printers and send local updates as needed...
     */
 
-    count = 2 * count / BrowseInterval + 1;
+    for (p = BrowseNext; count > 0; p = p->next)
+    {
+     /*
+      * Check for wraparound...
+      */
+
+      if (!p)
+        p = Printers;
+
+      if (p->type & (CUPS_PRINTER_REMOTE | CUPS_PRINTER_IMPLICIT))
+        continue;
+      else if (p->browse_time < ut)
+      {
+       /*
+	* Need to send an update...
+	*/
+
+	count --;
+
+	p->browse_time = time(NULL);
+
+	if (BrowseProtocols & BROWSE_CUPS)
+          SendCUPSBrowse(p);
+
+#ifdef HAVE_LIBSLP
+	if (BrowseProtocols & BROWSE_SLP)
+          SendSLPBrowse(p);
+#endif /* HAVE_LIBSLP */
+      }
+    }
+
+   /*
+    * Save where we left off so that all printers get updated...
+    */
+
+    BrowseNext = p;
   }
-  else
-    count = 0;
 
  /*
   * Loop through all of the printers and send local updates as needed...
@@ -555,39 +598,24 @@ SendBrowseList(void)
 
   for (p = Printers; p != NULL; p = np)
   {
+   /*
+    * Save the next printer pointer...
+    */
+
     np = p->next;
+
+   /*
+    * If this is a remote queue, see if it needs to be timed out...
+    */
 
     if (p->type & CUPS_PRINTER_REMOTE)
     {
-     /*
-      * See if this printer needs to be timed out...
-      */
-
       if (p->browse_time < to)
       {
         LogMessage(L_INFO, "Remote destination \"%s\" has timed out; deleting it...",
 	           p->name);
         DeletePrinter(p, 1);
       }
-    }
-    else if (p->browse_time < ut && count > 0 &&
-             !(p->type & CUPS_PRINTER_IMPLICIT))
-    {
-     /*
-      * Need to send an update...
-      */
-
-      count --;
-
-      p->browse_time = time(NULL);
-
-      if (BrowseProtocols & BROWSE_CUPS)
-        SendCUPSBrowse(p);
-
-#ifdef HAVE_LIBSLP
-      if (BrowseProtocols & BROWSE_SLP)
-        SendSLPBrowse(p);
-#endif /* HAVE_LIBSLP */
     }
   }
 }
@@ -1972,5 +2000,5 @@ UpdateSLPBrowse(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.73.2.48 2004/05/27 18:04:39 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.73.2.49 2004/06/28 23:35:10 mike Exp $".
  */
