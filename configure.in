@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: configure.in,v 1.36 2000/03/21 04:03:22 mike Exp $"
+dnl "$Id: configure.in,v 1.37 2000/03/30 05:19:16 mike Exp $"
 dnl
 dnl   Configuration script for the Common UNIX Printing System (CUPS).
 dnl
@@ -46,6 +46,17 @@ AC_ARG_ENABLE(debug, [  --enable-debug        turn on debugging [default=no]],[i
 	OPTIM="-g "
 fi])
 AC_ARG_ENABLE(shared, [  --enable-shared        turn on shared libraries [default=yes]])
+AC_ARG_ENABLE(libtool_unsupported, [  --enable-libtool-unsupported=LIBTOOL_PATH
+                          turn on building with libtool (UNSUPPORTED!) [default=no]],[if eval "test x$enable_libtool != xno"; then
+	LIBTOOL="$enable_libtool"
+	enable_shared=no
+	echo "WARNING: libtool is not supported or endorsed by Easy Software Products."
+	echo "         WE DO NOT PROVIDE TECHNICAL SUPPORT FOR LIBTOOL PROBLEMS."
+	echo "         (even if you have a support contract)"
+else
+	LIBTOOL=""
+fi])
+
 if test "$enable_shared" != "no"; then
 	case "$uname" in
 		SunOS* | UNIX_S*)
@@ -86,6 +97,17 @@ else
 	LIBCUPS="libcups.a"
 	LIBCUPSIMAGE="libcupsimage.a"
 	DSO=":"
+fi
+
+if test "$LIBTOOL" != ""; then
+	LIBCUPS="libcups.la"
+	LIBCUPSIMAGE="libcupsimage.la"
+	LINKCUPS="../cups/\$(LIBCUPS)"
+	LINKCUPSIMAGE="../filter/\$(LIBCUPSIMAGE)"
+	DSO=":"
+else
+	LINKCUPS="-L../cups -lcups"
+	LINKCUPSIMAGE="-L../filter -lcupsimage"
 fi
 
 AC_ARG_ENABLE(pam, [  --enable-pam        turn on PAM support [default=yes]])
@@ -268,16 +290,20 @@ if test "$DSO" != ":"; then
 	DSOLIBS="\$(LIBJPEG) \$(LIBPNG) \$(LIBTIFF) \$(LIBZ)"
 	IMGLIBS=""
 
-	# The HP-UX and Solaris run-time linkers are EXTREMELY stupid when
-	# it comes to deciding where to find a DSO.  Add linker options to
-	# tell them where to find the DSO (usually in /usr/lib...  duh!)
+	# The *BSD, HP-UX, and Solaris run-time linkers need help when
+	# deciding where to find a DSO.  Add linker options to tell them
+	# where to find the DSO (usually in /usr/lib...  duh!)
 	case $uname in
 		HP-UX*)
 			LDFLAGS="$LDFLAGS -Wl,+b,$libdir,+fb"
 			;;
 		SunOS*)
 			# Solaris
-			LDFLAGS="-R$libdir"
+			LDFLAGS="$LDFLAGS -R$libdir"
+			;;
+		FreeBSD* | NetBSD* | OpenBSD*)
+			# *BSD
+			LDFLAGS="$LDFLAGS -Wl,-R$libdir"
 			;;
 	esac
 else
@@ -285,11 +311,26 @@ else
 	IMGLIBS="\$(LIBJPEG) \$(LIBPNG) \$(LIBTIFF) \$(LIBZ)"
 fi
 
+# Figure out how to install "cat" pages...
+case "$uname" in
+	FreeBSD* | NetBSD* | OpenBSD*)
+		# *BSD
+		INSTALL_CAT="install-bsdcat"
+		;;
+	*)
+		# All others
+		INSTALL_CAT="install-cat"
+		;;
+esac
+
 AC_SUBST(DSO)
 AC_SUBST(DSOLIBS)
 AC_SUBST(IMGLIBS)
 AC_SUBST(LIBCUPS)
 AC_SUBST(LIBCUPSIMAGE)
+AC_SUBST(LIBTOOL)
+AC_SUBST(LINKCUPS)
+AC_SUBST(LINKCUPSIMAGE)
 
 dnl Fix prefix as needed..
 if test "$prefix" = "NONE" ; then
@@ -320,8 +361,19 @@ else
 	AC_DEFINE_UNQUOTED(CUPS_REQUESTS, "$prefix/spool/cups")
 fi
 
-CUPS_SERVERBIN='${prefix}/lib/cups'
-AC_DEFINE_UNQUOTED(CUPS_SERVERBIN, "$prefix/lib/cups")
+dnl See what directory to put server executables...
+case "$uname" in
+	FreeBSD* | NetBSD* | OpenBSD*)
+		# *BSD
+		CUPS_SERVERBIN='${prefix}/libexec/cups'
+		AC_DEFINE_UNQUOTED(CUPS_SERVERBIN, "$prefix/libexec/cups")
+		;;
+	*)
+		# All others
+		CUPS_SERVERBIN='${prefix}/lib/cups'
+		AC_DEFINE_UNQUOTED(CUPS_SERVERBIN, "$prefix/lib/cups")
+		;;
+esac
 
 AC_SUBST(CUPS_SERVERROOT)
 AC_SUBST(CUPS_SERVERBIN)
@@ -330,12 +382,12 @@ AC_SUBST(CUPS_REQUESTS)
 
 dnl Set the CUPS_LOCALE directory...
 case "$uname" in
-	Linux)
+	Linux* | FreeBSD* | NetBSD* | OpenBSD*)
 		CUPS_LOCALEDIR='${prefix}/share/locale'
 		AC_DEFINE_UNQUOTED(CUPS_LOCALEDIR, "$prefix/share/locale")
 		;;
 
-	OSF1)
+	OSF1*)
 		CUPS_LOCALEDIR='${prefix}/lib/nls/msg'
 		AC_DEFINE_UNQUOTED(CUPS_LOCALEDIR, "$prefix/lib/nls/msg")
 		;;
@@ -362,5 +414,5 @@ AC_SUBST(CUPS_DOCDIR)
 AC_OUTPUT(Makedefs)
 
 dnl
-dnl End of "$Id: configure.in,v 1.36 2000/03/21 04:03:22 mike Exp $".
+dnl End of "$Id: configure.in,v 1.37 2000/03/30 05:19:16 mike Exp $".
 dnl

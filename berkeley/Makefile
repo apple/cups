@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.10 2000/03/09 19:47:21 mike Exp $"
+# "$Id: Makefile,v 1.11 2000/03/30 05:19:18 mike Exp $"
 #
 #   Berkeley commands makefile for the Common UNIX Printing System (CUPS).
 #
@@ -27,11 +27,13 @@ include ../Makedefs
 TARGETS	=	lpc lpq lpr lprm
 OBJS	=	lpc.o lpq.o lpr.o lprm.o
 
+
 #
 # Make all targets...
 #
 
 all:	$(TARGETS)
+
 
 #
 # Clean all object files...
@@ -40,15 +42,17 @@ all:	$(TARGETS)
 clean:
 	$(RM) $(OBJS) $(TARGETS)
 
+
 #
 # Install all targets...
 #
 
 install:
 	-$(MKDIR) $(BINDIR)
-	$(CP) lpq lpr lprm $(BINDIR)
+	$(INSTALL_BIN) lpq lpr lprm $(BINDIR)
 	-$(MKDIR) $(SBINDIR)
-	$(CP) lpc $(SBINDIR)
+	$(INSTALL_BIN) lpc $(SBINDIR)
+
 
 #
 # lpc
@@ -60,6 +64,7 @@ lpc:	lpc.o ../cups/$(LIBCUPS)
 
 lpc.o:	../cups/cups.h ../Makedefs
 
+
 #
 # lpq
 #
@@ -69,6 +74,7 @@ lpq:	lpq.o ../cups/$(LIBCUPS)
 	$(CC) $(LDFLAGS) -o lpq lpq.o $(LIBS)
 
 lpq.o:	../cups/cups.h ../Makedefs
+
 
 #
 # lpr
@@ -80,6 +86,7 @@ lpr:	lpr.o ../cups/$(LIBCUPS)
 
 lpr.o:	../cups/cups.h ../Makedefs
 
+
 #
 # lprm
 #
@@ -90,6 +97,7 @@ lprm:	lprm.o ../cups/$(LIBCUPS)
 
 lprm.o:	../cups/cups.h ../Makedefs
 
+
 #
-# End of "$Id: Makefile,v 1.10 2000/03/09 19:47:21 mike Exp $".
+# End of "$Id: Makefile,v 1.11 2000/03/30 05:19:18 mike Exp $".
 #

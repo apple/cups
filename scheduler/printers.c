@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.59 2000/03/21 04:03:35 mike Exp $"
+ * "$Id: printers.c,v 1.60 2000/03/30 05:19:29 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -88,6 +88,9 @@ AddPrinter(const char *name)	/* I - Name of printer */
   p->state     = IPP_PRINTER_STOPPED;
   p->accepting = 0;
   p->filetype  = mimeAddType(MimeDatabase, "printer", name);
+
+  strcpy(p->job_sheets[0], "none");
+  strcpy(p->job_sheets[1], "none");
 
  /*
   * Setup required filters and IPP attributes...
@@ -369,7 +372,8 @@ LoadAllPrinters(void)
   char		line[1024],		/* Line from file */
 		name[256],		/* Parameter name */
 		*nameptr,		/* Pointer into name */
-		*value;			/* Pointer to value */
+		*value,			/* Pointer to value */
+		*valueptr;		/* Pointer into value */
   printer_t	*p;			/* Current printer */
 
 
@@ -526,6 +530,32 @@ LoadAllPrinters(void)
       else
         p->accepting = 0;
     }
+    else if (strcmp(name, "JobSheets") == 0)
+    {
+     /*
+      * Set the initial job sheets...
+      */
+
+      for (valueptr = value; *valueptr && !isspace(*valueptr); valueptr ++);
+
+      if (*valueptr)
+        *valueptr++ = '\0';
+
+      strncpy(p->job_sheets[0], value, sizeof(p->job_sheets[0]) - 1);
+
+      while (isspace(*valueptr))
+        valueptr ++;
+
+      if (*valueptr)
+      {
+        for (value = valueptr; *valueptr && !isspace(*valueptr); valueptr ++);
+
+	if (*valueptr)
+          *valueptr++ = '\0';
+
+	strncpy(p->job_sheets[1], value, sizeof(p->job_sheets[1]) - 1);
+      }
+    }
     else
     {
      /*
@@ -622,6 +652,8 @@ SaveAllPrinters(void)
       fputs("Accepting Yes\n", fp);
     else
       fputs("Accepting No\n", fp);
+    fprintf(fp, "JobSheets %s %s\n", printer->job_sheets[0],
+            printer->job_sheets[1]);
 
     fputs("</Printer>\n", fp);
   }
@@ -861,21 +893,19 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
   if (NumBanners > 0)
   {
    /*
-    * Setup the banner-start-supported and banner-end-supported
-    * attributes...
+    * Setup the job-sheets-supported and job-sheets-default attributes...
     */
 
     attr = ippAddStrings(p->attrs, IPP_TAG_PRINTER, IPP_TAG_NAME,
-                	 "banner-start-supported", NumBanners + 1, NULL, NULL);
+                	 "job-sheets-supported", NumBanners + 1, NULL, NULL);
     attr->values[0].string.text = strdup("none");
     for (i = 0; i < NumBanners; i ++)
       attr->values[i + 1].string.text = strdup(Banners[i].name);
 
     attr = ippAddStrings(p->attrs, IPP_TAG_PRINTER, IPP_TAG_NAME,
-                	 "banner-end-supported", NumBanners + 1, NULL, NULL);
-    attr->values[0].string.text = strdup("none");
-    for (i = 0; i < NumBanners; i ++)
-      attr->values[i + 1].string.text = strdup(Banners[i].name);
+                	 "job-sheets-default", 2, NULL, NULL);
+    attr->values[0].string.text = strdup(p->job_sheets[0]);
+    attr->values[1].string.text = strdup(p->job_sheets[1]);
   }
 
   if (p->type & CUPS_PRINTER_REMOTE)
@@ -1349,5 +1379,5 @@ write_printcap(void)
 
 
 /*
- * End of "$Id: printers.c,v 1.59 2000/03/21 04:03:35 mike Exp $".
+ * End of "$Id: printers.c,v 1.60 2000/03/30 05:19:29 mike Exp $".
  */

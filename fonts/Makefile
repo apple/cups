@@ -65,7 +65,7 @@ clean:
 
 install:
 	-$(MKDIR) $(DATADIR)/fonts
-	$(CP) $(FONTS) $(DATADIR)/fonts
+	$(INSTALL_DATA) $(FONTS) $(DATADIR)/fonts
 
 
 #

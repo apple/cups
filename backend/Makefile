@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.19 2000/03/09 19:47:20 mike Exp $"
+# "$Id: Makefile,v 1.20 2000/03/30 05:19:17 mike Exp $"
 #
 #   Backend makefile for the Common UNIX Printing System (CUPS).
 #
@@ -50,7 +50,7 @@ clean:
 
 install:
 	-$(MKDIR) $(SERVERBIN)/backend
-	$(CP) $(BACKENDS) $(SERVERBIN)/backend
+	$(INSTALL_BIN) $(BACKENDS) $(SERVERBIN)/backend
 	$(RM) $(SERVERBIN)/backend/http
 	$(LN) ipp $(SERVERBIN)/backend/http
 
@@ -135,5 +135,5 @@ usb.o:	../cups/cups.h ../Makedefs
 
 
 #
-# End of "$Id: Makefile,v 1.19 2000/03/09 19:47:20 mike Exp $".
+# End of "$Id: Makefile,v 1.20 2000/03/30 05:19:17 mike Exp $".
 #

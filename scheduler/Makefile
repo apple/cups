@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.24 2000/03/21 04:03:32 mike Exp $"
+# "$Id: Makefile,v 1.25 2000/03/30 05:19:28 mike Exp $"
 #
 #   Scheduler Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -29,6 +29,7 @@ CUPSDOBJS =	auth.o banners.o cert.o classes.o client.o conf.o devices.o \
 MIMEOBJS =	filter.o mime.o type.o
 OBJS	=	$(CUPSDOBJS) $(MIMEOBJS) cups-polld.o testmime.o testspeed.o
 
+
 #
 # Make everything...
 #
@@ -50,10 +51,10 @@ clean:
 
 install:
 	-$(MKDIR) $(SBINDIR)
-	$(CP) cupsd $(SBINDIR)
+	$(INSTALL_BIN) cupsd $(SBINDIR)
 	$(CHMOD) g-rwx,o-rwx $(SBINDIR)/cupsd
 	-$(MKDIR) $(SERVERBIN)/daemon
-	$(CP) cups-polld $(SERVERBIN)/daemon
+	$(INSTALL_BIN) cups-polld $(SERVERBIN)/daemon
 	-$(MKDIR) $(SERVERROOT)/certs
 	-$(MKDIR) $(SERVERROOT)/interfaces
 	-$(MKDIR) $(SERVERROOT)/ppd
@@ -122,6 +123,7 @@ testspeed.o:	../cups/cups.h ../cups/http.h ../cups/ipp.h ../cups/language.h
 
 $(OBJS):	../config.h ../Makedefs
 
+
 #
-# End of "$Id: Makefile,v 1.24 2000/03/21 04:03:32 mike Exp $".
+# End of "$Id: Makefile,v 1.25 2000/03/30 05:19:28 mike Exp $".
 #

@@ -1,5 +1,5 @@
 /*
- * "$Id: template.c,v 1.14 2000/03/21 04:03:24 mike Exp $"
+ * "$Id: template.c,v 1.15 2000/03/30 05:19:19 mike Exp $"
  *
  *   CGI template function.
  *
@@ -23,6 +23,7 @@
  *
  *   cgiCopyTemplateFile() - Copy a template file and replace all the
  *                           '{variable}' strings with the variable value.
+ *   cgiCopyTemplateLang() - Copy a template file using a language...
  *   cgi_copy()            - Copy the template file, substituting as needed...
  *   cgi_puts()            - Put a string to the output file, quoting as
  *                           needed...
@@ -45,17 +46,85 @@ static void	cgi_puts(const char *s, FILE *out);
  */
 
 void
-cgiCopyTemplateFile(FILE       *out,		/* I - Output file */
-                    const char *template)	/* I - Template file to read */
+cgiCopyTemplateFile(FILE       *out,	/* I - Output file */
+                    const char *tmpl)	/* I - Template file to read */
 {
-  FILE	*in;					/* Input file */
+  FILE	*in;				/* Input file */
 
 
  /*
   * Open the template file...
   */
 
-  if ((in = fopen(template, "r")) == NULL)
+  if ((in = fopen(tmpl, "r")) == NULL)
+    return;
+
+ /*
+  * Parse the file to the end...
+  */
+
+  cgi_copy(out, in, 0, 0);
+
+ /*
+  * Close the template file and return...
+  */
+
+  fclose(in);
+}
+
+
+/*
+ * 'cgiCopyTemplateLang()' - Copy a template file using a language...
+ */
+
+void
+cgiCopyTemplateLang(FILE       *out,		/* I - Output file */
+                    const char *directory,	/* I - Directory */
+                    const char *tmpl,		/* I - Base filename */
+		    const char *lang)		/* I - Language */
+{
+  int	i;					/* Looping var */
+  char	filename[1024],				/* Filename */
+	locale[16];				/* Locale name */
+  FILE	*in;					/* Input file */
+
+
+ /*
+  * Convert the language to a locale name...
+  */
+
+  if (lang != NULL)
+  {
+    for (i = 0; lang[i] && i < 15; i ++)
+      if (isalnum(lang[i]))
+        locale[i] = tolower(lang[i]);
+      else
+        locale[i] = '_';
+
+    locale[i] = '\0';
+  }
+  else
+    locale[0] = '\0';
+
+ /*
+  * See if we have a template file for this language...
+  */
+
+  sprintf(filename, "%s/%s/%s", directory, locale, tmpl);
+  if (access(filename, 0))
+  {
+    locale[2] = '\0';
+
+    sprintf(filename, "%s/%s/%s", directory, locale, tmpl);
+    if (access(filename, 0))
+      sprintf(filename, "%s/%s", directory, tmpl);
+  }
+
+ /*
+  * Open the template file...
+  */
+
+  if ((in = fopen(filename, "r")) == NULL)
     return;
 
  /*
@@ -363,5 +432,5 @@ cgi_puts(const char *s,
 
 
 /*
- * End of "$Id: template.c,v 1.14 2000/03/21 04:03:24 mike Exp $".
+ * End of "$Id: template.c,v 1.15 2000/03/30 05:19:19 mike Exp $".
  */

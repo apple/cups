@@ -1,5 +1,5 @@
 /*
- * "$Id: classes.c,v 1.13 2000/02/08 20:38:44 mike Exp $"
+ * "$Id: classes.c,v 1.14 2000/03/30 05:19:19 mike Exp $"
  *
  *   Class status CGI for the Common UNIX Printing System (CUPS).
  *
@@ -148,8 +148,8 @@ main(int  argc,			/* I - Number of command-line arguments */
   * Write the report...
   */
 
-  cgiCopyTemplateFile(stdout, TEMPLATES "/header.tmpl");
-  cgiCopyTemplateFile(stdout, TEMPLATES "/classes.tmpl");
+  cgiCopyTemplateLang(stdout, TEMPLATES, "header.tmpl", getenv("LANG"));
+  cgiCopyTemplateLang(stdout, TEMPLATES, "classes.tmpl", getenv("LANG"));
 
  /*
   * Get jobs for the specified class if a class has been chosen...
@@ -195,11 +195,11 @@ main(int  argc,			/* I - Number of command-line arguments */
       ippSetCGIVars(response);
       ippDelete(response);
 
-      cgiCopyTemplateFile(stdout, TEMPLATES "/jobs.tmpl");
+      cgiCopyTemplateLang(stdout, TEMPLATES, "jobs.tmpl", getenv("LANG"));
     }
   }
 
-  cgiCopyTemplateFile(stdout, TEMPLATES "/trailer.tmpl");
+  cgiCopyTemplateLang(stdout, TEMPLATES, "trailer.tmpl", getenv("LANG"));
 
  /*
   * Close the HTTP server connection...
@@ -217,5 +217,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: classes.c,v 1.13 2000/02/08 20:38:44 mike Exp $".
+ * End of "$Id: classes.c,v 1.14 2000/03/30 05:19:19 mike Exp $".
  */

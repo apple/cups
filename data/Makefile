@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.6 2000/03/09 19:47:24 mike Exp $"
+# "$Id: Makefile,v 1.7 2000/03/30 05:19:21 mike Exp $"
 #
 #   Datafile makefile for the Common UNIX Printing System (CUPS).
 #
@@ -76,11 +76,11 @@ clean:
 install:
 	-$(MKDIR) $(DATADIR)
 	-$(MKDIR) $(DATADIR)/data
-	$(CP) $(DATAFILES) $(DATADIR)/data
+	$(INSTALL_DATA) $(DATAFILES) $(DATADIR)/data
 	-$(MKDIR) $(DATADIR)/charsets
-	$(CP) $(CHARSETS) $(DATADIR)/charsets
+	$(INSTALL_DATA) $(CHARSETS) $(DATADIR)/charsets
 
 
 #
-# End of "$Id: Makefile,v 1.6 2000/03/09 19:47:24 mike Exp $".
+# End of "$Id: Makefile,v 1.7 2000/03/30 05:19:21 mike Exp $".
 #

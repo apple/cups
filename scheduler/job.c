@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.58 2000/03/22 20:42:32 mike Exp $"
+ * "$Id: job.c,v 1.59 2000/03/30 05:19:29 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -453,7 +453,8 @@ LoadAllJobs(void)
 
       strncpy(job->dest, dest, sizeof(job->dest) - 1);
 
-      job->state = ippFindAttribute(job->attrs, "job-state", IPP_TAG_ENUM);
+      job->state      = ippFindAttribute(job->attrs, "job-state", IPP_TAG_ENUM);
+      job->job_sheets = ippFindAttribute(job->attrs, "job-sheets", IPP_TAG_NAME);
 
       attr = ippFindAttribute(job->attrs, "job-priority", IPP_TAG_INTEGER);
       job->priority = attr->values[0].integer;
@@ -826,7 +827,19 @@ StartJob(int       id,		/* I - Job ID */
   {
     if (strcmp(attr->name, "copies") == 0 &&
 	attr->value_tag == IPP_TAG_INTEGER)
-      sprintf(copies, "%d", attr->values[0].integer);
+    {
+     /*
+      * Don't use the # copies attribute if we are printing the job sheets...
+      */
+
+      if (current->job_sheets == NULL ||
+          ((strcasecmp(current->job_sheets->values[0].string.text, "none") == 0 ||
+	    current->current_file != 0) &&
+           (current->job_sheets->num_values == 1 ||
+	    strcasecmp(current->job_sheets->values[1].string.text, "none") == 0 ||
+	    current->current_file != (current->num_files - 1))))
+        sprintf(copies, "%d", attr->values[0].integer);
+    }
     else if (strcmp(attr->name, "job-name") == 0 &&
 	     (attr->value_tag == IPP_TAG_NAME ||
 	      attr->value_tag == IPP_TAG_NAMELANG))
@@ -1057,7 +1070,7 @@ StartJob(int       id,		/* I - Job ID */
 	                           O_WRONLY | O_EXCL);
       else
 	filterfds[i & 1][1] = open(printer->device_uri + 5,
-	                           O_WRONLY | O_CREAT | O_TRUNC, 0666);
+	                           O_WRONLY | O_CREAT, 0666);
     }
 
     DEBUG_printf(("filterfds[%d] = %d, %d\n", i & 1, filterfds[i & 1][0],
@@ -1210,7 +1223,7 @@ StopJob(int id)			/* I - Job ID */
 	current->current_file --;
 
         for (i = 0; current->procs[i]; i ++)
-	  if (current->procs[i] > 0)
+	  if (current->procs[i] > 0 && current->procs[i + 1])
 	  {
 	    kill(current->procs[i], SIGTERM);
 	    current->procs[i] = 0;
@@ -2295,5 +2308,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.58 2000/03/22 20:42:32 mike Exp $".
+ * End of "$Id: job.c,v 1.59 2000/03/30 05:19:29 mike Exp $".
  */

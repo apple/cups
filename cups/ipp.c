@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.35 2000/03/21 04:03:25 mike Exp $"
+ * "$Id: ipp.c,v 1.36 2000/03/30 05:19:20 mike Exp $"
  *
  *   Internet Printing Protocol support functions for the Common UNIX
  *   Printing System (CUPS).
@@ -45,7 +45,8 @@
  *   ippRead()           - Read data for an IPP request.
  *   ippTimeToDate()     - Convert from UNIX time to RFC 1903 format.
  *   ippWrite()          - Write data for an IPP request.
- *   _ipp_add_attr()          - Add a new attribute to the request.
+ *   _ipp_add_attr()     - Add a new attribute to the request.
+ *   _ipp_free_attr()    - Free an attribute.
  *   ipp_read()          - Semi-blocking read on a HTTP connection...
  */
 
@@ -524,7 +525,6 @@ ippDateToTime(const ipp_uchar_t *date)	/* I - RFC 1903 date info */
 void
 ippDelete(ipp_t *ipp)		/* I - IPP request */
 {
-  int			i;	/* Looping var */
   ipp_attribute_t	*attr,	/* Current attribute */
 			*next;	/* Next attribute */
 
@@ -534,41 +534,8 @@ ippDelete(ipp_t *ipp)		/* I - IPP request */
 
   for (attr = ipp->attrs; attr != NULL; attr = next)
   {
-    switch (attr->value_tag)
-    {
-      case IPP_TAG_TEXT :
-      case IPP_TAG_NAME :
-      case IPP_TAG_KEYWORD :
-      case IPP_TAG_STRING :
-      case IPP_TAG_URI :
-      case IPP_TAG_URISCHEME :
-      case IPP_TAG_CHARSET :
-      case IPP_TAG_LANGUAGE :
-      case IPP_TAG_MIMETYPE :
-          for (i = 0; i < attr->num_values; i ++)
-	    free(attr->values[i].string.text);
-	  break;
-
-      case IPP_TAG_TEXTLANG :
-      case IPP_TAG_NAMELANG :
-          for (i = 0; i < attr->num_values; i ++)
-	  {
-	    if (attr->values[i].string.charset)
-	      free(attr->values[i].string.charset);
-	    free(attr->values[i].string.text);
-	  }
-	  break;
-
-      default :
-          break; /* anti-compiler-warning-code */
-    }
-
     next = attr->next;
-
-    if (attr->name != NULL)
-      free(attr->name);
-
-    free(attr);
+    _ipp_free_attr(attr);
   }
 
   free(ipp);
@@ -677,7 +644,7 @@ ippFindAttribute(ipp_t      *ipp,	/* I - IPP request */
                   attr->name));
 
     if (attr->name != NULL && strcasecmp(attr->name, name) == 0 &&
-        (attr->value_tag == type ||
+        (attr->value_tag == type || type == IPP_TAG_ZERO ||
 	 (attr->value_tag == IPP_TAG_TEXTLANG && type == IPP_TAG_TEXT) ||
 	 (attr->value_tag == IPP_TAG_NAMELANG && type == IPP_TAG_NAME)))
       return (attr);
@@ -1637,6 +1604,52 @@ _ipp_add_attr(ipp_t *ipp,	/* I - IPP request */
 
 
 /*
+ * '_ipp_free_attr()' - Free an attribute.
+ */
+
+void
+_ipp_free_attr(ipp_attribute_t *attr)	/* I - Attribute to free */
+{
+  int	i;				/* Looping var */
+
+
+  switch (attr->value_tag)
+  {
+    case IPP_TAG_TEXT :
+    case IPP_TAG_NAME :
+    case IPP_TAG_KEYWORD :
+    case IPP_TAG_STRING :
+    case IPP_TAG_URI :
+    case IPP_TAG_URISCHEME :
+    case IPP_TAG_CHARSET :
+    case IPP_TAG_LANGUAGE :
+    case IPP_TAG_MIMETYPE :
+        for (i = 0; i < attr->num_values; i ++)
+	  free(attr->values[i].string.text);
+	break;
+
+    case IPP_TAG_TEXTLANG :
+    case IPP_TAG_NAMELANG :
+        for (i = 0; i < attr->num_values; i ++)
+	{
+	  if (attr->values[i].string.charset)
+	    free(attr->values[i].string.charset);
+	  free(attr->values[i].string.text);
+	}
+	break;
+
+    default :
+        break; /* anti-compiler-warning-code */
+  }
+
+  if (attr->name != NULL)
+    free(attr->name);
+
+  free(attr);
+}
+
+
+/*
  * 'ipp_read()' - Semi-blocking read on a HTTP connection...
  */
 
@@ -1666,5 +1679,5 @@ ipp_read(http_t        *http,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.35 2000/03/21 04:03:25 mike Exp $".
+ * End of "$Id: ipp.c,v 1.36 2000/03/30 05:19:20 mike Exp $".
  */

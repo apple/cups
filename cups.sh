@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# "$Id: cups.sh,v 1.9 2000/03/14 21:06:32 mike Exp $"
+# "$Id: cups.sh,v 1.10 2000/03/30 05:19:16 mike Exp $"
 #
 #   Startup/shutdown script for the Common UNIX Printing System (CUPS).
 #
@@ -64,11 +64,6 @@ case "`uname`" in
 		;;
 esac
 
-# Change to the root directory first, in case we are being run from a
-# CD-ROM installation script...
-
-cd /
-
 # Start or stop the CUPS server based upon the first argument to the script.
 case $1 in
 	start | restart | reload)
@@ -82,7 +77,7 @@ case $1 in
 			fi
 		else
 			if $IS_ON cups; then
-				/usr/sbin/cupsd >/dev/null 2>&1 &
+				/usr/sbin/cupsd
 				$ECHO "cups: scheduler started."
 			fi
 		fi
@@ -113,5 +108,5 @@ exit 0
 
 
 #
-# End of "$Id: cups.sh,v 1.9 2000/03/14 21:06:32 mike Exp $".
+# End of "$Id: cups.sh,v 1.10 2000/03/30 05:19:16 mike Exp $".
 #

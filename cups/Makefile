@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.33 2000/03/09 19:47:23 mike Exp $"
+# "$Id: Makefile,v 1.34 2000/03/30 05:19:20 mike Exp $"
 #
 #   Support library Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -32,11 +32,13 @@ LIBOBJS	=	dest.o emit.o http.o ipp.o language.o mark.o md5.o options.o \
 		page.o ppd.o snprintf.o string.o usersys.o util.o
 OBJS	=	$(LIBOBJS) testhttp.o testppd.o
 
+
 #
 # Header files to install...
 #
 
 HEADERS	=	cups.h http.h ipp.h language.h ppd.h
+
 
 #
 # Targets in this directory...
@@ -44,11 +46,13 @@ HEADERS	=	cups.h http.h ipp.h language.h ppd.h
 
 TARGETS	=	$(LIBCUPS) testhttp testppd
 
+
 #
 # Make all targets...
 #
 
 all:	$(TARGETS)
+
 
 #
 # Remove object and target files...
@@ -57,19 +61,21 @@ all:	$(TARGETS)
 clean:
 	$(RM) $(OBJS) $(TARGETS)
 
+
 #
 # Install object and target files...
 #
 
 install:	all
 	-$(MKDIR) $(INCLUDEDIR)/cups
-	$(CP) $(HEADERS) $(INCLUDEDIR)/cups
+	$(INSTALL_DATA) $(HEADERS) $(INCLUDEDIR)/cups
 	-$(MKDIR) $(LIBDIR)
-	$(CP) $(LIBCUPS) $(LIBDIR)
+	$(INSTALL_LIB) $(LIBCUPS) $(LIBDIR)
 	if test $(LIBCUPS) != "libcups.a"; then \
 		$(RM) `basename $(LIBCUPS) .2`; \
 		$(LN) $(LIBCUPS) `basename $(LIBCUPS) .2`; \
 	fi
+
 
 #
 # libcups.so.2, libcups.sl.1
@@ -81,6 +87,7 @@ libcups.so.2 libcups.sl.2:	$(LIBOBJS) ../Makedefs
 	$(RM) `basename $@ .2`
 	$(LN) $@ `basename $@ .2`
 
+
 #
 # libcups.a
 #
@@ -90,6 +97,7 @@ libcups.a:	$(LIBOBJS)
 	$(RM) $@
 	$(AR) $(ARFLAGS) $@ $(LIBOBJS)
 	$(RANLIB) $@
+
 
 #
 # cups_C.h - the default POSIX locale that is compiled in.
@@ -115,6 +123,7 @@ string.o:	string.h
 usersys.o:	cups.h
 util.o:		cups.h http.h ipp.h
 
+
 #
 # testhttp (dependency on static CUPS library is intentional)
 #
@@ -124,6 +133,7 @@ testhttp:	testhttp.o libcups.a
 	$(CC) $(LDFLAGS) -o $@ testhttp.o libcups.a $(NETLIBS)
 
 testhttp.o:	http.h
+
 
 #
 # testppd (dependency on static CUPS library is intentional)
@@ -137,6 +147,7 @@ testppd.o:	ppd.h
 
 $(OBJS):	../Makedefs ../config.h
 
+
 #
-# End of "$Id: Makefile,v 1.33 2000/03/09 19:47:23 mike Exp $".
+# End of "$Id: Makefile,v 1.34 2000/03/30 05:19:20 mike Exp $".
 #

@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.7 2000/02/29 14:47:29 mike Exp $"
+# "$Id: Makefile,v 1.8 2000/03/30 05:19:26 mike Exp $"
 #
 #   Man page makefile for the Common UNIX Printing System (CUPS).
 #
@@ -56,38 +56,63 @@ clean:
 # Install files...
 #
 
-install:
+install:	install-man $(INSTALL_CAT)
+
+install-man:
 	-$(MKDIR) $(MANDIR)/man1
 	for file in $(MAN1); do \
-		$(CP) $$file $(MANDIR)/man1/`basename $$file man`1; \
+		$(INSTALL_MAN) $$file $(MANDIR)/man1/`basename $$file man`1; \
 	done
 	$(RM) $(MANDIR)/man1/cancel.1
 	$(LN) lp.1 $(MANDIR)/man1/cancel.1
-	-$(MKDIR) $(MANDIR)/cat1
-	$(CP) $(CAT1) $(MANDIR)/cat1
-	$(RM) $(MANDIR)/cat1/cancel.1
-	$(LN) lp.1 $(MANDIR)/cat1/cancel.1
 	-$(MKDIR) $(MANDIR)/man5
 	for file in $(MAN5); do \
-		$(CP) $$file $(MANDIR)/man5/`basename $$file man`5; \
+		$(INSTALL_MAN) $$file $(MANDIR)/man5/`basename $$file man`5; \
 	done
-	-$(MKDIR) $(MANDIR)/cat5
-	$(CP) $(CAT5) $(MANDIR)/cat5
 	-$(MKDIR) $(MANDIR)/man8
 	for file in $(MAN8); do \
-		$(CP) $$file $(MANDIR)/man8/`basename $$file man`8; \
+		$(INSTALL_MAN) $$file $(MANDIR)/man8/`basename $$file man`8; \
 	done
 	$(RM) $(MANDIR)/man8/reject.8
 	$(LN) accept.8 $(MANDIR)/man8/reject.8
 	$(RM) $(MANDIR)/man8/disable.8
 	$(LN) enable.8 $(MANDIR)/man8/disable.8
+
+install-cat:
+	-$(MKDIR) $(MANDIR)/cat1
+	$(INSTALL_MAN) $(CAT1) $(MANDIR)/cat1
+	$(RM) $(MANDIR)/cat1/cancel.1
+	$(LN) lp.1 $(MANDIR)/cat1/cancel.1
+	-$(MKDIR) $(MANDIR)/cat5
+	$(INSTALL_MAN) $(CAT5) $(MANDIR)/cat5
 	-$(MKDIR) $(MANDIR)/cat8
-	$(CP) $(CAT8) $(MANDIR)/cat8
+	$(INSTALL_MAN) $(CAT8) $(MANDIR)/cat8
 	$(RM) $(MANDIR)/cat8/reject.8
 	$(LN) accept.8 $(MANDIR)/cat8/reject.8
 	$(RM) $(MANDIR)/cat8/disable.8
 	$(LN) enable.8 $(MANDIR)/cat8/disable.8
 
+install-bsdcat:
+	-$(MKDIR) $(MANDIR)/cat1
+	for file in $(CAT1); do \
+		$(INSTALL_MAN) $$file $(MANDIR)/cat1/`basename $$file 1`0; \
+	done
+	$(RM) $(MANDIR)/cat1/cancel.0
+	$(LN) lp.0 $(MANDIR)/cat1/cancel.0
+	-$(MKDIR) $(MANDIR)/cat5
+	for file in $(CAT5); do \
+		$(INSTALL_MAN) $$file $(MANDIR)/cat5/`basename $$file 5`0; \
+	done
+	-$(MKDIR) $(MANDIR)/cat8
+	for file in $(CAT8); do \
+		$(INSTALL_MAN) $$file $(MANDIR)/cat8/`basename $$file 8`0; \
+	done
+	$(RM) $(MANDIR)/cat8/reject.0
+	$(LN) accept.0 $(MANDIR)/cat8/reject.0
+	$(RM) $(MANDIR)/cat8/disable.0
+	$(LN) enable.0 $(MANDIR)/cat8/disable.0
+
+
 #
-# End of "$Id: Makefile,v 1.7 2000/02/29 14:47:29 mike Exp $".
+# End of "$Id: Makefile,v 1.8 2000/03/30 05:19:26 mike Exp $".
 #

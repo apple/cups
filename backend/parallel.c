@@ -1,5 +1,5 @@
 /*
- * "$Id: parallel.c,v 1.18 2000/03/09 19:47:20 mike Exp $"
+ * "$Id: parallel.c,v 1.19 2000/03/30 05:19:17 mike Exp $"
  *
  *   Parallel port backend for the Common UNIX Printing System (CUPS).
  *
@@ -34,6 +34,7 @@
 #include <cups/cups.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <errno.h>
 #include <cups/string.h>
 
 #if defined(WIN32) || defined(__EMX__)
@@ -150,11 +151,23 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   * Open the parallel port device...
   */
 
-  if ((fd = open(resource, O_WRONLY)) == -1)
+  do
   {
-    perror("ERROR: Unable to open parallel port device file");
-    return (1);
+    if ((fd = open(resource, O_WRONLY | O_EXCL)) == -1)
+    {
+      if (errno == EBUSY)
+      {
+        fputs("INFO: Parallel port busy; will retry in 30 seconds...\n", stderr);
+	sleep(30);
+      }
+      else
+      {
+	perror("ERROR: Unable to open parallel port device file");
+	return (1);
+      }
+    }
   }
+  while (fd < 0);
 
  /*
   * Set any options provided...
@@ -493,6 +506,7 @@ list_devices(void)
   }
 #elif defined(FreeBSD) || defined(OpenBSD) || defined(NetBSD)
   int	i;			/* Looping var */
+  int	fd;			/* File descriptor */
   char	device[255];		/* Device filename */
 
 
@@ -510,5 +524,5 @@ list_devices(void)
 
 
 /*
- * End of "$Id: parallel.c,v 1.18 2000/03/09 19:47:20 mike Exp $".
+ * End of "$Id: parallel.c,v 1.19 2000/03/30 05:19:17 mike Exp $".
  */

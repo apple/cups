@@ -1,5 +1,5 @@
 /*
- * "$Id: serial.c,v 1.14 2000/03/09 19:47:20 mike Exp $"
+ * "$Id: serial.c,v 1.15 2000/03/30 05:19:17 mike Exp $"
  *
  *   Serial port backend for the Common UNIX Printing System (CUPS).
  *
@@ -23,7 +23,8 @@
  *
  * Contents:
  *
- *   main() - Send a file to the printer or server.
+ *   main()         - Send a file to the printer or server.
+ *   list_devices() - List all serial devices.
  */
 
 /*
@@ -33,6 +34,7 @@
 #include <cups/cups.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <errno.h>
 #include <cups/string.h>
 
 #if defined(WIN32) || defined(__EMX__)
@@ -152,11 +154,23 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   * Open the serial port device...
   */
 
-  if ((fd = open(resource, O_WRONLY | O_NOCTTY)) == -1)
+  do
   {
-    perror("ERROR: Unable to open serial port device file");
-    return (1);
+    if ((fd = open(resource, O_WRONLY | O_NOCTTY | O_EXCL)) == -1)
+    {
+      if (errno == EBUSY)
+      {
+        fputs("INFO: Serial port busy; will retry in 30 seconds...\n", stderr);
+	sleep(30);
+      }
+      else
+      {
+	perror("ERROR: Unable to open serial port device file");
+	return (1);
+      }
+    }
   }
+  while (fd < 0);
 
  /*
   * Set any options provided...
@@ -350,7 +364,7 @@ list_devices(void)
   for (i = 0; i < 4; i ++)
   {
     sprintf(device, "/dev/ttyS%d", i);
-    if ((fd = open(device, O_WRONLY | O_NOCTTY)) >= 0)
+    if ((fd = open(device, O_WRONLY | O_NOCTTY | O_NDELAY)) >= 0)
     {
       close(fd);
       printf("serial serial:%s?baud=115200 \"Unknown\" \"Serial Port #%d\"\n",
@@ -578,7 +592,7 @@ list_devices(void)
   for (i = 0; i < 32; i ++)
   {
     sprintf(device, "/dev/ttyd%c", funky_hex[i]);
-    if ((fd = open(device, O_WRONLY | O_NOCTTY)) >= 0)
+    if ((fd = open(device, O_WRONLY | O_NOCTTY | O_NDELAY)) >= 0)
     {
       close(fd);
       printf("serial serial:%s?baud=115200 \"Unknown\" \"Standard Serial Port #%d\"\n",
@@ -594,7 +608,7 @@ list_devices(void)
     for (j = 0; j < 32; j ++)
     {
       sprintf(device, "/dev/ttyc%d%c", i, funky_hex[j]);
-      if ((fd = open(device, O_WRONLY | O_NOCTTY)) >= 0)
+      if ((fd = open(device, O_WRONLY | O_NOCTTY | O_NDELAY)) >= 0)
       {
 	close(fd);
 	printf("serial serial:%s?baud=115200 \"Unknown\" \"Cyclades #%d Serial Port #%d\"\n",
@@ -610,7 +624,7 @@ list_devices(void)
     for (j = 0; j < 32; j ++)
     {
       sprintf(device, "/dev/ttyD%d%c", i, funky_hex[j]);
-      if ((fd = open(device, O_WRONLY | O_NOCTTY)) >= 0)
+      if ((fd = open(device, O_WRONLY | O_NOCTTY | O_NDELAY)) >= 0)
       {
 	close(fd);
 	printf("serial serial:%s?baud=115200 \"Unknown\" \"Digiboard #%d Serial Port #%d\"\n",
@@ -625,7 +639,7 @@ list_devices(void)
   for (i = 0; i < 32; i ++)
   {
     sprintf(device, "/dev/ttyE%c", funky_hex[i]);
-    if ((fd = open(device, O_WRONLY | O_NOCTTY)) >= 0)
+    if ((fd = open(device, O_WRONLY | O_NOCTTY | O_NDELAY)) >= 0)
     {
       close(fd);
       printf("serial serial:%s?baud=115200 \"Unknown\" \"Stallion Serial Port #%d\"\n",
@@ -640,7 +654,7 @@ list_devices(void)
   for (i = 0; i < 128; i ++)
   {
     sprintf(device, "/dev/ttyA%d", i + 1);
-    if ((fd = open(device, O_WRONLY | O_NOCTTY)) >= 0)
+    if ((fd = open(device, O_WRONLY | O_NOCTTY | O_NDELAY)) >= 0)
     {
       close(fd);
       printf("serial serial:%s?baud=115200 \"Unknown\" \"SX Serial Port #%d\"\n",
@@ -652,5 +666,5 @@ list_devices(void)
 
 
 /*
- * End of "$Id: serial.c,v 1.14 2000/03/09 19:47:20 mike Exp $".
+ * End of "$Id: serial.c,v 1.15 2000/03/30 05:19:17 mike Exp $".
  */

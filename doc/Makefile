@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.19 2000/03/13 18:46:29 mike Exp $"
+# "$Id: Makefile,v 1.20 2000/03/30 05:19:21 mike Exp $"
 #
 #   Documentation makefile for the Common UNIX Printing System (CUPS).
 #
@@ -40,6 +40,7 @@ include ../Makedefs
 	echo Formatting $@...
 	htmldoc --titleimage images/cups-large.gif --duplex --numbered \
 		--jpeg -f $@ $<
+
 
 #
 # Document files...
@@ -84,12 +85,14 @@ WEBIMAGES	=	images/accept-jobs.gif \
 			images/stop-class.gif \
 			images/stop-printer.gif
 
+
 #
 #
 # Make all documents...
 #
 
 all:	$(DOCUMENTS:.shtml=.pdf) $(DOCUMENTS:.shtml=.html) overview.pdf
+
 
 #
 # Remove all generated files...
@@ -100,19 +103,21 @@ clean:
 	$(RM) $(DOCUMENTS:.shtml=.html)
 	$(RM) overview.pdf
 
+
 #
 # Install all documentation files...
 #
 
 install:
 	-$(MKDIR) $(DOCDIR)
-	$(CP) $(WEBPAGES) $(DOCDIR)
-	$(CP) overview.html overview.pdf $(DOCDIR)
-	$(CP) $(DOCUMENTS:.shtml=.html) $(DOCDIR)
-	$(CP) $(DOCUMENTS:.shtml=.pdf) $(DOCDIR)
+	$(INSTALL_MAN) $(WEBPAGES) $(DOCDIR)
+	$(INSTALL_MAN) overview.html overview.pdf $(DOCDIR)
+	$(INSTALL_MAN) $(DOCUMENTS:.shtml=.html) $(DOCDIR)
+	$(INSTALL_MAN) $(DOCUMENTS:.shtml=.pdf) $(DOCDIR)
 	-$(MKDIR) $(DOCDIR)/images
-	$(CP) $(WEBIMAGES) $(DOCDIR)/images
-	$(CP) $(DOCIMAGES) $(DOCDIR)/images
+	$(INSTALL_MAN) $(WEBIMAGES) $(DOCDIR)/images
+	$(INSTALL_MAN) $(DOCIMAGES) $(DOCDIR)/images
+
 
 #
 # The overview, admin manual, programmers manual, and users manual get

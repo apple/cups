@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.59 2000/03/21 04:03:34 mike Exp $"
+ * "$Id: ipp.c,v 1.60 2000/03/30 05:19:28 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -26,6 +26,7 @@
  *   ProcessIPPRequest()         - Process an incoming IPP request...
  *   accept_jobs()               - Accept print jobs to a printer.
  *   add_class()                 - Add a class to the system.
+ *   add_file()                  - Add a file to a job.
  *   add_job_state_reasons()     - Add the "job-state-reasons" attribute based
  *                                 upon the job and printer state...
  *   add_printer()               - Add a printer to the system.
@@ -48,6 +49,7 @@
  *   get_printer_attrs()         - Get printer attributes.
  *   get_printers()              - Get a list of printers.
  *   hold_job()                  - Hold a print job.
+ *   move_job()                  - Move a job.
  *   print_job()                 - Print a file to a printer or class.
  *   reject_jobs()               - Reject print jobs to a printer.
  *   release_job()               - Release a held print job.
@@ -79,6 +81,7 @@
 
 static void	accept_jobs(client_t *con, ipp_attribute_t *uri);
 static void	add_class(client_t *con, ipp_attribute_t *uri);
+static int	add_file(client_t *con, job_t *job, mime_type_t *filetype);
 static void	add_job_state_reasons(client_t *con, job_t *job);
 static void	add_printer(client_t *con, ipp_attribute_t *uri);
 static void	add_printer_state_reasons(client_t *con, printer_t *p);
@@ -98,6 +101,7 @@ static void	get_ppds(client_t *con);
 static void	get_printers(client_t *con, int type);
 static void	get_printer_attrs(client_t *con, ipp_attribute_t *uri);
 static void	hold_job(client_t *con, ipp_attribute_t *uri);
+static void	move_job(client_t *con, ipp_attribute_t *uri);
 static void	print_job(client_t *con, ipp_attribute_t *uri);
 static void	reject_jobs(client_t *con, ipp_attribute_t *uri);
 static void	release_job(client_t *con, ipp_attribute_t *uri);
@@ -357,6 +361,10 @@ ProcessIPPRequest(client_t *con)	/* I - Client connection */
               get_ppds(con);
               break;
 
+	  case CUPS_MOVE_JOB :
+              move_job(con, uri);
+              break;
+
 	  default :
               send_ipp_error(con, IPP_OPERATION_NOT_SUPPORTED);
 	}
@@ -589,6 +597,18 @@ add_class(client_t        *con,		/* I - Client connection */
             sizeof(pclass->state_message) - 1);
     pclass->state_message[sizeof(pclass->state_message) - 1] = '\0';
   }
+  if ((attr = ippFindAttribute(con->request, "job-sheets-default", IPP_TAG_NAME)) == NULL)
+    attr = ippFindAttribute(con->request, "job-sheets-default", IPP_TAG_KEYWORD);
+  if (attr != NULL)
+  {
+    strncpy(pclass->job_sheets[0], attr->values[0].string.text,
+            sizeof(pclass->job_sheets[0]) - 1);
+    if (attr->num_values > 1)
+      strncpy(pclass->job_sheets[1], attr->values[1].string.text,
+              sizeof(pclass->job_sheets[1]) - 1);
+    else
+      strcpy(pclass->job_sheets[1], "none");
+  }
 
   if ((attr = ippFindAttribute(con->request, "member-uris", IPP_TAG_URI)) != NULL)
   {
@@ -649,6 +669,46 @@ add_class(client_t        *con,		/* I - Client connection */
              con->username);
 
   con->response->request.status.status_code = IPP_OK;
+}
+
+
+/*
+ * 'add_file()' - Add a file to a job.
+ */
+
+static int
+add_file(client_t    *con,		/* I - Connection to client */
+         job_t       *job,		/* I - Job to add to */
+         mime_type_t *filetype)		/* I - Type of file */
+{
+  mime_type_t	**filetypes;		/* New filetypes array... */
+
+
+ /*
+  * Add the file to the job...
+  */
+
+  if (job->num_files == 0)
+    filetypes = (mime_type_t **)malloc(sizeof(mime_type_t *));
+  else
+    filetypes = (mime_type_t **)realloc(job->filetypes,
+                                       (job->num_files + 1) *
+				       sizeof(mime_type_t));
+
+  if (filetypes == NULL)
+  {
+    CancelJob(job->id);
+    LogMessage(L_ERROR, "add_file: unable to allocate memory for file types!");
+    send_ipp_error(con, IPP_INTERNAL_ERROR);
+    return (-1);
+  }
+
+  job->filetypes                 = filetypes;
+  job->filetypes[job->num_files] = filetype;
+
+  job->num_files ++;
+
+  return (0);
 }
 
 
@@ -863,6 +923,18 @@ add_printer(client_t        *con,	/* I - Client connection */
     strncpy(printer->state_message, attr->values[0].string.text,
             sizeof(printer->state_message) - 1);
     printer->state_message[sizeof(printer->state_message) - 1] = '\0';
+  }
+  if ((attr = ippFindAttribute(con->request, "job-sheets-default", IPP_TAG_NAME)) == NULL)
+    attr = ippFindAttribute(con->request, "job-sheets-default", IPP_TAG_KEYWORD);
+  if (attr != NULL)
+  {
+    strncpy(printer->job_sheets[0], attr->values[0].string.text,
+            sizeof(printer->job_sheets[0]) - 1);
+    if (attr->num_values > 1)
+      strncpy(printer->job_sheets[1], attr->values[1].string.text,
+              sizeof(printer->job_sheets[1]) - 1);
+    else
+      strcpy(printer->job_sheets[1], "none");
   }
 
  /*
@@ -1466,6 +1538,8 @@ create_job(client_t        *con,	/* I - Client connection */
 					/* Resource portion of URI */
   int			port;		/* Port portion of URI */
   printer_t		*printer;	/* Printer data */
+  char			filename[1024];	/* Banner filename */
+  banner_t		*banner;	/* Banner file */
 
 
   DEBUG_printf(("create_job(%08x, %08x)\n", con, uri));
@@ -1590,6 +1664,43 @@ create_job(client_t        *con,	/* I - Client connection */
                        "time-at-completed", 0);
   attr->value_tag = IPP_TAG_NOVALUE;
 
+  if (!(printer->type & CUPS_PRINTER_REMOTE))
+  {
+   /*
+    * Add job sheets options...
+    */
+
+    if ((attr = ippFindAttribute(job->attrs, "job-sheets", IPP_TAG_NAME)) == NULL)
+      if ((attr = ippFindAttribute(job->attrs, "job-sheets", IPP_TAG_KEYWORD)) != NULL)
+        attr->value_tag = IPP_TAG_NAME;
+
+    if (attr == NULL)
+    {
+      attr = ippAddStrings(job->attrs, IPP_TAG_JOB, IPP_TAG_NAME, "job->sheets",
+                           2, NULL, NULL);
+      attr->values[0].string.text = strdup(printer->job_sheets[0]);
+      attr->values[1].string.text = strdup(printer->job_sheets[1]);
+    }
+
+   /*
+    * See if we need to add the starting sheet...
+    */
+
+    if (strcasecmp(attr->values[0].string.text, "none") != 0 &&
+        (banner = FindBanner(attr->values[0].string.text)) != NULL)
+    {
+     /*
+      * Yes...
+      */
+
+      if (add_file(con, job, banner->filetype))
+        return;
+
+      sprintf(filename, "%s/d%05d-%03d", RequestRoot, job->id, job->num_files);
+      symlink(banner->filename, filename);
+    }
+  }
+   
   SaveJob(job->id);
 
   LogMessage(L_INFO, "Job %d created on \'%s\' by \'%s\'.", job->id,
@@ -1895,14 +2006,13 @@ get_jobs(client_t        *con,		/* I - Client connection */
     completed = 0;
 
  /*
-  * See if they want to limit the number of jobs reported; if not, limit
-  * the report to 1000 jobs to prevent swamping of the server...
+  * See if they want to limit the number of jobs reported...
   */
 
   if ((attr = ippFindAttribute(con->request, "limit", IPP_TAG_INTEGER)) != NULL)
     limit = attr->values[0].integer;
   else
-    limit = 1000;
+    limit = 1000000;
 
  /*
   * See if we only want to see jobs for a specific user...
@@ -2192,6 +2302,7 @@ get_printer_attrs(client_t        *con,	/* I - Client connection */
   int			port;		/* Port portion of URI */
   printer_t		*printer;	/* Printer/class */
   time_t		curtime;	/* Current time */
+  ipp_attribute_t	*attr;		/* Job-sheets attributes */
 
 
   DEBUG_printf(("get_printer_attrs(%08x, %08x)\n", con, uri));
@@ -2227,10 +2338,6 @@ get_printer_attrs(client_t        *con,	/* I - Client connection */
   * and document-format attributes that may be provided by the client.
   */
 
-  copy_attrs(con->response, printer->attrs,
-             ippFindAttribute(con->request, "requested-attributes",
-	                      IPP_TAG_KEYWORD), IPP_TAG_ZERO);
-
   ippAddInteger(con->response, IPP_TAG_PRINTER, IPP_TAG_ENUM, "printer-state",
                 printer->state);
 
@@ -2244,11 +2351,20 @@ get_printer_attrs(client_t        *con,	/* I - Client connection */
                 printer->accepting);
 
   ippAddInteger(con->response, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
-                "printer-up-time", curtime - StartTime);
+                "printer-up-time", curtime);
   ippAddDate(con->response, IPP_TAG_PRINTER, "printer-current-time",
              ippTimeToDate(curtime));
 
   add_queued_job_count(con, printer);
+
+  copy_attrs(con->response, printer->attrs,
+             ippFindAttribute(con->request, "requested-attributes",
+	                      IPP_TAG_KEYWORD), IPP_TAG_ZERO);
+
+  attr = ippAddStrings(con->response, IPP_TAG_JOB, IPP_TAG_NAME,
+                       "job-sheets-default", 2, NULL, NULL);
+  attr->values[0].string.text = strdup(printer->job_sheets[0]);
+  attr->values[1].string.text = strdup(printer->job_sheets[1]);
 
   con->response->request.status.status_code = IPP_OK;
 }
@@ -2267,19 +2383,40 @@ get_printers(client_t *con,		/* I - Client connection */
   int			count;		/* Number of printers that match */
   printer_t		*printer;	/* Current printer pointer */
   time_t		curtime;	/* Current time */
+  int			printer_type,	/* printer-type attribute */
+			printer_mask;	/* printer-type-mask attribute */
+  char			*location;	/* Location string */
 
 
   DEBUG_printf(("get_printers(%08x)\n", con));
 
  /*
-  * See if they want to limit the number of printers reported; if not, limit
-  * the report to 1000 printers to prevent swamping of the server...
+  * See if they want to limit the number of printers reported...
   */
 
   if ((attr = ippFindAttribute(con->request, "limit", IPP_TAG_INTEGER)) != NULL)
     limit = attr->values[0].integer;
   else
-    limit = 1000;
+    limit = 10000000;
+
+ /*
+  * Support filtering...
+  */
+
+  if ((attr = ippFindAttribute(con->request, "printer-type", IPP_TAG_ENUM)) != NULL)
+    printer_type = attr->values[0].integer;
+  else
+    printer_type = 0;
+
+  if ((attr = ippFindAttribute(con->request, "printer-type-mask", IPP_TAG_ENUM)) != NULL)
+    printer_mask = attr->values[0].integer;
+  else
+    printer_mask = 0;
+
+  if ((attr = ippFindAttribute(con->request, "location", IPP_TAG_TEXT)) != NULL)
+    location = attr->values[0].string.text;
+  else
+    location = NULL;
 
  /*
   * OK, build a list of printers for this printer...
@@ -2290,7 +2427,9 @@ get_printers(client_t *con,		/* I - Client connection */
   for (count = 0, printer = Printers;
        count < limit && printer != NULL;
        printer = printer->next)
-    if ((printer->type & CUPS_PRINTER_CLASS) == type)
+    if ((printer->type & CUPS_PRINTER_CLASS) == type &&
+        (printer->type & printer_mask) == printer_type &&
+	(location == NULL || strcasecmp(printer->location, location) == 0))
     {
      /*
       * Send the following attributes for each printer:
@@ -2314,7 +2453,7 @@ get_printers(client_t *con,		/* I - Client connection */
                     printer->accepting);
 
       ippAddInteger(con->response, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
-                    "printer-up-time", curtime - StartTime);
+                    "printer-up-time", curtime);
       ippAddDate(con->response, IPP_TAG_PRINTER, "printer-current-time",
         	 ippTimeToDate(curtime));
 
@@ -2323,6 +2462,11 @@ get_printers(client_t *con,		/* I - Client connection */
       copy_attrs(con->response, printer->attrs,
         	 ippFindAttribute(con->request, "requested-attributes",
 	                	  IPP_TAG_KEYWORD), IPP_TAG_ZERO);
+
+      attr = ippAddStrings(con->response, IPP_TAG_JOB, IPP_TAG_NAME,
+                           "job-sheets-default", 2, NULL, NULL);
+      attr->values[0].string.text = strdup(printer->job_sheets[0]);
+      attr->values[1].string.text = strdup(printer->job_sheets[1]);
 
       ippAddSeparator(con->response);
     }
@@ -2494,6 +2638,202 @@ hold_job(client_t        *con,	/* I - Client connection */
 
 
 /*
+ * 'move_job()' - Set job attributes.
+ */
+
+static void
+move_job(client_t        *con,		/* I - Client connection */
+	 ipp_attribute_t *uri)		/* I - Job URI */
+{
+  int			i;		/* Looping var */
+  ipp_attribute_t	*attr;		/* Current attribute */
+  int			jobid;		/* Job ID */
+  job_t			*job;		/* Current job */
+  const char		*dest;		/* Destination */
+  cups_ptype_t		dtype;		/* Destination type (printer or class) */
+  char			method[HTTP_MAX_URI],
+					/* Method portion of URI */
+			username[HTTP_MAX_URI],
+					/* Username portion of URI */
+			host[HTTP_MAX_URI],
+					/* Host portion of URI */
+			resource[HTTP_MAX_URI];
+					/* Resource portion of URI */
+  int			port;		/* Port portion of URI */
+  struct passwd		*user;		/* User info */
+  struct group		*group;		/* System group info */
+
+
+  DEBUG_printf(("move_job(%08x, %08x)\n", con, uri));
+
+ /*
+  * See if we have a job URI or a printer URI...
+  */
+
+  if (strcmp(uri->name, "printer-uri") == 0)
+  {
+   /*
+    * Got a printer URI; see if we also have a job-id attribute...
+    */
+
+    if ((attr = ippFindAttribute(con->request, "job-id", IPP_TAG_INTEGER)) == NULL)
+    {
+      LogMessage(L_ERROR, "move_job: got a printer-uri attribute but no job-id!");
+      send_ipp_error(con, IPP_BAD_REQUEST);
+      return;
+    }
+
+    jobid = attr->values[0].integer;
+  }
+  else
+  {
+   /*
+    * Got a job URI; parse it to get the job ID...
+    */
+
+    httpSeparate(uri->values[0].string.text, method, username, host, &port, resource);
+ 
+    if (strncmp(resource, "/jobs/", 6) != 0)
+    {
+     /*
+      * Not a valid URI!
+      */
+
+      LogMessage(L_ERROR, "move_job: bad job-uri attribute \'%s\'!\n",
+                 uri->values[0].string.text);
+      send_ipp_error(con, IPP_BAD_REQUEST);
+      return;
+    }
+
+    jobid = atoi(resource + 6);
+  }
+
+ /*
+  * See if the job exists...
+  */
+
+  if ((job = FindJob(jobid)) == NULL)
+  {
+   /*
+    * Nope - return a "not found" error...
+    */
+
+    LogMessage(L_ERROR, "move_job: job #%d doesn't exist!", jobid);
+    send_ipp_error(con, IPP_NOT_FOUND);
+    return;
+  }
+
+ /*
+  * See if the job has been completed...
+  */
+
+  if (job->state->values[0].integer > IPP_JOB_STOPPED)
+  {
+   /*
+    * Return a "not-possible" error...
+    */
+
+    LogMessage(L_ERROR, "move_job: job #%d is finished and cannot be altered!", jobid);
+    send_ipp_error(con, IPP_NOT_POSSIBLE);
+    return;
+  }
+
+ /*
+  * See if the job is owned by the requesting user...
+  */
+
+  if (con->username[0])
+    strcpy(username, con->username);
+  else if ((attr = ippFindAttribute(con->request, "requesting-user-name", IPP_TAG_NAME)) != NULL)
+  {
+    strncpy(username, attr->values[0].string.text, sizeof(username) - 1);
+    username[sizeof(username) - 1] = '\0';
+  }
+  else
+    strcpy(username, "anonymous");
+
+  if (strcmp(username, job->username) != 0 && strcmp(username, "root") != 0)
+  {
+   /*
+    * Not the owner or root; check to see if the user is a member of the
+    * system group...
+    */
+
+    user = getpwnam(username);
+    endpwent();
+
+    group = getgrnam(SystemGroup);
+    endgrent();
+
+    if (group != NULL)
+    {
+      for (i = 0; group->gr_mem[i]; i ++)
+        if (strcmp(username, group->gr_mem[i]) == 0)
+	  break;
+    }
+    else
+      i = 0;
+
+    if (user == NULL || group == NULL ||
+        (group->gr_mem[i] == NULL && group->gr_gid != user->pw_gid))
+    {
+     /*
+      * Username not found, group not found, or user is not part of the
+      * system group...
+      */
+
+      LogMessage(L_ERROR, "move_job: \"%s\" not authorized to delete job id %d owned by \"%s\"!",
+        	 username, jobid, job->username);
+      send_ipp_error(con, IPP_FORBIDDEN);
+      return;
+    }
+  }
+
+  if ((attr = ippFindAttribute(con->request, "job-printer-uri", IPP_TAG_URI)) == NULL)
+  {
+   /*
+    * Need job-printer-uri...
+    */
+
+    LogMessage(L_ERROR, "move_job: job-printer-uri attribute missing!");
+    send_ipp_error(con, IPP_BAD_REQUEST);
+    return;
+  }
+    
+ /*
+  * Move the job to a different printer or class...
+  */
+
+  httpSeparate(attr->values[0].string.text, method, username, host, &port,
+               resource);
+  if ((dest = ValidateDest(resource, &dtype)) == NULL)
+  {
+   /*
+    * Bad URI...
+    */
+
+    LogMessage(L_ERROR, "move_job: resource name \'%s\' no good!", resource);
+    send_ipp_error(con, IPP_NOT_FOUND);
+    return;
+  }
+
+  MoveJob(jobid, dest);
+
+ /*
+  * Start jobs if possible...
+  */
+
+  CheckJobs();
+
+ /*
+  * Return with "everything is OK" status...
+  */
+
+  con->response->request.status.status_code = IPP_OK;
+}
+
+
+/*
  * 'print_job()' - Print a file to a printer or class.
  */
 
@@ -2530,6 +2870,7 @@ print_job(client_t        *con,		/* I - Client connection */
 			mimetype[MIME_MAX_SUPER + MIME_MAX_TYPE + 2];
 					/* Textual name of mime type */
   printer_t		*printer;	/* Printer data */
+  banner_t		*banner;	/* Current banner */
 
 
   DEBUG_printf(("print_job(%08x, %08x)\n", con, uri));
@@ -2706,6 +3047,7 @@ print_job(client_t        *con,		/* I - Client connection */
     ippAddString(con->request, IPP_TAG_JOB, IPP_TAG_NAME, "job-name", NULL,
                  title = "Untitled");
 
+
   if ((job = AddJob(priority, printer->name)) == NULL)
   {
     LogMessage(L_ERROR, "print_job: unable to add job for destination \'%s\'!",
@@ -2718,19 +3060,96 @@ print_job(client_t        *con,		/* I - Client connection */
   job->attrs   = con->request;
   con->request = NULL;
 
-  if ((job->filetypes = (mime_type_t **)malloc(sizeof(mime_type_t *))) == NULL)
+  if (!(printer->type & CUPS_PRINTER_REMOTE))
   {
-    CancelJob(job->id);
-    LogMessage(L_ERROR, "print_job: unable to allocate memory for file types!");
-    send_ipp_error(con, IPP_INTERNAL_ERROR);
-    return;
+   /*
+    * Add job sheets options...
+    */
+
+    if ((attr = ippFindAttribute(job->attrs, "job-sheets", IPP_TAG_NAME)) == NULL)
+      if ((attr = ippFindAttribute(job->attrs, "job-sheets", IPP_TAG_KEYWORD)) != NULL)
+        attr->value_tag = IPP_TAG_NAME;
+
+    if (attr == NULL)
+    {
+      attr = ippAddStrings(job->attrs, IPP_TAG_JOB, IPP_TAG_NAME, "job-sheets",
+                           2, NULL, NULL);
+      attr->values[0].string.text = strdup(printer->job_sheets[0]);
+      attr->values[1].string.text = strdup(printer->job_sheets[1]);
+    }
+
+   /*
+    * See if we need to add the starting sheet...
+    */
+
+    if (strcasecmp(attr->values[0].string.text, "none") != 0 &&
+        (banner = FindBanner(attr->values[0].string.text)) != NULL)
+    {
+     /*
+      * Yes...
+      */
+
+      if (add_file(con, job, banner->filetype))
+        return;
+
+      sprintf(filename, "%s/d%05d-%03d", RequestRoot, job->id, job->num_files);
+      symlink(banner->filename, filename);
+    }
+  }
+   
+ /*
+  * See if we need to add the starting sheet...
+  */
+
+  if (strcasecmp(attr->values[0].string.text, "none") != 0 &&
+      (banner = FindBanner(attr->values[0].string.text)) != NULL)
+  {
+   /*
+    * Yes...
+    */
+
+    if (add_file(con, job, banner->filetype))
+      return;
+
+    sprintf(filename, "%s/d%05d-%03d", RequestRoot, job->id, job->num_files);
+    symlink(banner->filename, filename);
   }
 
-  job->filetypes[0] = filetype;
-  job->num_files    = 1;
+ /*
+  * Add the job file...
+  */
+
+  if (add_file(con, job, filetype))
+    return;
 
   sprintf(filename, "%s/d%05d-%03d", RequestRoot, job->id, job->num_files);
   rename(con->filename, filename);
+
+ /*
+  * See if we need to add the ending sheet...
+  */
+
+  if (!(printer->type & CUPS_PRINTER_REMOTE))
+  {
+    if (attr->num_values > 1 &&
+	strcasecmp(attr->values[1].string.text, "none") != 0 &&
+	(banner = FindBanner(attr->values[1].string.text)) != NULL)
+    {
+     /*
+      * Yes...
+      */
+
+      if (add_file(con, job, banner->filetype))
+	return;
+
+      sprintf(filename, "%s/d%05d-%03d", RequestRoot, job->id, job->num_files);
+      symlink(banner->filename, filename);
+    }
+  }
+
+ /*
+  * Copy the rest of the job info...
+  */
 
   strncpy(job->title, title, sizeof(job->title) - 1);
 
@@ -3299,8 +3718,7 @@ send_document(client_t        *con,	/* I - Client connection */
 			resource[HTTP_MAX_URI];
 					/* Resource portion of URI */
   int			port;		/* Port portion of URI */
-  mime_type_t		*filetype,	/* Type of file */
-			**filetypes;	/* File types array */
+  mime_type_t		*filetype;	/* Type of file */
   char			super[MIME_MAX_SUPER],
 					/* Supertype of file */
 			type[MIME_MAX_TYPE],
@@ -3310,6 +3728,8 @@ send_document(client_t        *con,	/* I - Client connection */
   struct passwd		*user;		/* User info */
   struct group		*group;		/* System group info */
   char			filename[1024];	/* Job filename */
+  printer_t		*printer;	/* Current printer */
+  banner_t		*banner;	/* Current banner */
 
 
   DEBUG_printf(("send_document(%08x, %08x)\n", con, uri));
@@ -3540,25 +3960,9 @@ send_document(client_t        *con,	/* I - Client connection */
   * Add the file to the job...
   */
 
-  if (job->num_files == 0)
-    filetypes = (mime_type_t **)malloc(sizeof(mime_type_t *));
-  else
-    filetypes = (mime_type_t **)realloc(job->filetypes,
-                                       (job->num_files + 1) *
-				       sizeof(mime_type_t));
-
-  if (filetypes == NULL)
-  {
-    CancelJob(job->id);
-    LogMessage(L_ERROR, "send_document: unable to allocate memory for file types!");
-    send_ipp_error(con, IPP_INTERNAL_ERROR);
+  if (add_file(con, job, filetype))
     return;
-  }
 
-  job->filetypes = filetypes;
-  job->filetypes[job->num_files] = filetype;
-
-  job->num_files ++;
   sprintf(filename, "%s/d%05d-%03d", RequestRoot, job->id, job->num_files);
   rename(con->filename, filename);
 
@@ -3574,6 +3978,32 @@ send_document(client_t        *con,	/* I - Client connection */
   if ((attr = ippFindAttribute(con->request, "last-document", IPP_TAG_BOOLEAN)) != NULL &&
       attr->values[0].boolean)
   {
+   /*
+    * See if we need to add the ending sheet...
+    */
+
+    if (job->dtype & CUPS_PRINTER_CLASS)
+      printer = FindClass(job->dest);
+    else
+      printer = FindPrinter(job->dest);
+
+    if (printer != NULL && !(printer->type & CUPS_PRINTER_REMOTE) &&
+        (attr = ippFindAttribute(job->attrs, "job-sheets", IPP_TAG_NAME)) != NULL &&
+        attr->num_values > 1 &&
+	strcasecmp(attr->values[1].string.text, "none") != 0 &&
+	(banner = FindBanner(attr->values[1].string.text)) != NULL)
+    {
+     /*
+      * Yes...
+      */
+
+      if (add_file(con, job, banner->filetype))
+	return;
+
+      sprintf(filename, "%s/d%05d-%03d", RequestRoot, job->id, job->num_files);
+      symlink(banner->filename, filename);
+    }
+
     job->state->values[0].integer = IPP_JOB_PENDING;
     CheckJobs();
   }
@@ -3699,11 +4129,12 @@ set_job_attrs(client_t        *con,		/* I - Client connection */
 	      ipp_attribute_t *uri)		/* I - Job URI */
 {
   int			i;		/* Looping var */
-  ipp_attribute_t	*attr;		/* Current attribute */
+  ipp_attribute_t	*attr,		/* Current attribute */
+			*prev,		/* Previous attribute */
+			*attr2,		/* Job attribute */
+			*prev2;		/* Previous job attribute */
   int			jobid;		/* Job ID */
   job_t			*job;		/* Current job */
-  const char		*dest;		/* Destination */
-  cups_ptype_t		dtype;		/* Destination type (printer or class) */
   char			method[HTTP_MAX_URI],
 					/* Method portion of URI */
 			username[HTTP_MAX_URI],
@@ -3835,7 +4266,7 @@ set_job_attrs(client_t        *con,		/* I - Client connection */
       * system group...
       */
 
-      LogMessage(L_ERROR, "cancel_job: \"%s\" not authorized to delete job id %d owned by \"%s\"!",
+      LogMessage(L_ERROR, "set_job_attrs: \"%s\" not authorized to delete job id %d owned by \"%s\"!",
         	 username, jobid, job->username);
       send_ipp_error(con, IPP_FORBIDDEN);
       return;
@@ -3844,54 +4275,102 @@ set_job_attrs(client_t        *con,		/* I - Client connection */
 
  /*
   * See what the user wants to change.
-  *
-  * NOTE: Unfortunately, the job-printer-uri attribute is specified as
-  *       READ ONLY in the Job and Printer Set Operations.  In order to
-  *       support a "move" operation from one printer to another, and
-  *       rather than defining YET ANOTHER extension operation, CUPS
-  *       allows the client to set this attribute in violation of the
-  *       spec.
-  *
-  *       If this bothers you, comment the job-printer-uri code out to
-  *       provide a completely compliant set-job-attributes operation.
-  *       [you will lose the ability to move jobs]
-  *
-  *       We did propose a change to the spec for this, but it was rejected
-  *       due to some special cases that might need to be supported (although
-  *       it is entirely possible to limit the valid values to the same
-  *       host, eliminating the problem...  sigh...)
   */
 
-  if ((attr = ippFindAttribute(con->request, "job-printer-uri", IPP_TAG_URI)) != NULL)
+  for (attr = con->request->attrs, prev = NULL;
+       attr != NULL;
+       prev = attr, attr = attr->next)
   {
-   /*
-    * Move the job to a different printer or class...
-    */
+    if (attr->group_tag != IPP_TAG_JOB || !attr->name)
+      continue;
 
-    httpSeparate(attr->values[0].string.text, method, username, host, &port,
-                 resource);
-    if ((dest = ValidateDest(resource, &dtype)) == NULL)
+    if (strcmp(attr->name, "job-priority") == 0 &&
+        attr->value_tag == IPP_TAG_INTEGER &&
+	job->state->values[0].integer != IPP_JOB_PROCESSING)
     {
      /*
-      * Bad URI...
+      * Change the job priority
       */
 
-      LogMessage(L_ERROR, "set_job_attrs: resource name \'%s\' no good!", resource);
-      send_ipp_error(con, IPP_NOT_FOUND);
-      return;
+      SetJobPriority(jobid, attr->values[0].integer);
     }
+    else if ((attr2 = ippFindAttribute(job->attrs, attr->name, attr->value_tag)) != NULL)
+    {
+     /*
+      * Some other value...
+      */
 
-    MoveJob(jobid, dest);
-  }
+      for (prev2 = job->attrs->attrs; prev2 != NULL; prev2 = prev2->next)
+	if (prev2->next == attr2)
+	  break;
 
-  if ((attr = ippFindAttribute(con->request, "job-priority", IPP_TAG_INTEGER)) != NULL &&
-      job->state->values[0].integer != IPP_JOB_PROCESSING)
-  {
-   /*
-    * Change the job priority
-    */
+      if (prev)
+        prev->next = attr->next;
+      else
+        con->request->attrs = attr->next;
 
-    SetJobPriority(jobid, attr->values[0].integer);
+      if (prev2)
+	prev2->next = attr;
+      else
+	job->attrs->attrs = attr;
+
+      attr->next = attr2->next;
+      attr       = prev;
+
+      _ipp_free_attr(attr2);
+            
+     /*
+      * See if the job-name is being changed.
+      */
+
+      if (strcmp(attr->name, "job-name") == 0)
+        strncpy(job->title, attr->values[0].string.text, sizeof(job->title) - 1);
+    }
+    else if (attr->value_tag == IPP_TAG_DELETEATTR)
+    {
+     /*
+      * Delete the attribute...
+      */
+
+      for (attr2 = job->attrs->attrs, prev2 = NULL;
+           attr2 != NULL;
+	   prev2 = attr2, attr2 = attr2->next)
+        if (attr2->name && strcmp(attr2->name, attr->name) == 0)
+	  break;
+
+      if (attr2)
+      {
+        if (prev2)
+	  prev2->next = attr2->next;
+	else
+	  job->attrs->attrs = attr2->next;
+
+        _ipp_free_attr(attr2);
+      }
+    }
+    else
+    {
+     /*
+      * Add new option by moving it from one request to another...
+      */
+
+      for (attr2 = job->attrs->attrs; attr2 != NULL; attr2 = attr2->next)
+        if (!attr2->next)
+	  break;
+
+      if (attr2)
+        attr2->next = attr;
+      else
+        job->attrs->attrs = attr;
+
+      if (prev)
+        prev->next = attr->next;
+      else
+        con->request->attrs = attr->next;
+
+      attr->next = NULL;
+      attr       = prev;
+    }
   }
 
  /*
@@ -4201,5 +4680,5 @@ validate_job(client_t        *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.59 2000/03/21 04:03:34 mike Exp $".
+ * End of "$Id: ipp.c,v 1.60 2000/03/30 05:19:28 mike Exp $".
  */

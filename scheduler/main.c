@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c,v 1.37 2000/03/09 19:47:33 mike Exp $"
+ * "$Id: main.c,v 1.38 2000/03/30 05:19:29 mike Exp $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -26,6 +26,7 @@
  *   main()            - Main entry for the CUPS scheduler.
  *   sigchld_handler() - Handle 'child' signals from old processes.
  *   sighup_handler()  - Handle 'hangup' signals to reconfigure the scheduler.
+ *   sigterm_handler() - Handle 'terminate' signals that stop the scheduler.
  *   usage()           - Show scheduler usage.
  */
 
@@ -36,6 +37,7 @@
 #define _MAIN_C_
 #include "cupsd.h"
 #include <sys/resource.h>
+#include <syslog.h>
 
 
 /*
@@ -44,6 +46,7 @@
 
 static void	sigchld_handler(int sig);
 static void	sighup_handler(int sig);
+static void	sigterm_handler(int sig);
 static void	usage(void);
 
 
@@ -57,6 +60,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 {
   int			i;		/* Looping var */
   char			*opt;		/* Option character */
+  int			fg;		/* Run in the foreground */
   fd_set		input,		/* Input set for select() */
 			output;		/* Output set for select() */
   client_t		*con;		/* Current client */
@@ -75,6 +79,8 @@ main(int  argc,			/* I - Number of command-line arguments */
   * Check for command-line arguments...
   */
 
+  fg = 0;
+
   for (i = 1; i < argc; i ++)
     if (argv[i][0] == '-')
       for (opt = argv[i] + 1; *opt != '\0'; opt ++)
@@ -85,8 +91,30 @@ main(int  argc,			/* I - Number of command-line arguments */
 	      if (i >= argc)
 	        usage();
 
-	      strncpy(ConfigurationFile, argv[i], sizeof(ConfigurationFile) - 1);
-	      ConfigurationFile[sizeof(ConfigurationFile) - 1] = '\0';
+              if (argv[i][0] == '/')
+	      {
+	       /*
+	        * Absolute directory...
+		*/
+
+		strncpy(ConfigurationFile, argv[i], sizeof(ConfigurationFile) - 1);
+		ConfigurationFile[sizeof(ConfigurationFile) - 1] = '\0';
+              }
+	      else
+	      {
+	       /*
+	        * Relative directory...
+		*/
+
+                getcwd(ConfigurationFile, sizeof(ConfigurationFile));
+		strncat(ConfigurationFile, "/", sizeof(ConfigurationFile) - 1);
+		strncat(ConfigurationFile, argv[i], sizeof(ConfigurationFile) - 1);
+		ConfigurationFile[sizeof(ConfigurationFile) - 1] = '\0';
+              }
+	      break;
+
+          case 'f' : /* Run in foreground... */
+	      fg = 1;
 	      break;
 
 	  default : /* Unknown option */
@@ -101,6 +129,42 @@ main(int  argc,			/* I - Number of command-line arguments */
     }
 
  /*
+  * If the user hasn't specified "-f", run in the background...
+  */
+
+  if (!fg)
+  {
+    if (fork() > 0)
+      return (0);
+
+   /*
+    * Make sure we aren't tying up any filesystems...
+    */
+
+    chdir("/");
+
+#ifndef DEBUG
+   /*
+    * Disable core dumps...
+    */
+
+    getrlimit(RLIMIT_CORE, &limit);
+    limit.rlim_cur = 0;
+    setrlimit(RLIMIT_CORE, &limit);
+
+   /*
+    * Disconnect from the controlling terminal...
+    */
+
+    close(0);
+    close(1);
+    close(2);
+
+    setsid();
+#endif /* DEBUG */
+  }
+
+ /*
   * Set the timezone info...
   */
 
@@ -108,22 +172,6 @@ main(int  argc,			/* I - Number of command-line arguments */
     sprintf(TZ, "TZ=%s", getenv("TZ"));
 
   tzset();
-
-#ifndef DEBUG
- /*
-  * Disable core dumps...
-  */
-
-  getrlimit(RLIMIT_CORE, &limit);
-  limit.rlim_cur = 0;
-  setrlimit(RLIMIT_CORE, &limit);
-
- /*
-  * Disconnect from the controlling terminal...
-  */
-
-  setsid();
-#endif /* DEBUG */
 
  /*
   * Set the maximum number of files...
@@ -141,6 +189,7 @@ main(int  argc,			/* I - Number of command-line arguments */
   sigset(SIGHUP, sighup_handler);
   sigset(SIGCHLD, sigchld_handler);
   sigset(SIGPIPE, SIG_IGN);
+  sigset(SIGTERM, sigterm_handler);
 #elif defined(HAVE_SIGACTION)
   memset(&action, 0, sizeof(action));
 
@@ -157,10 +206,16 @@ main(int  argc,			/* I - Number of command-line arguments */
   sigemptyset(&action.sa_mask);
   action.sa_handler = SIG_IGN;
   sigaction(SIGPIPE, &action, NULL);
+
+  sigemptyset(&action.sa_mask);
+  sigaddset(&action.sa_mask, SIGTERM);
+  action.sa_handler = sigterm_handler;
+  sigaction(SIGTERM, &action, NULL);
 #else
   signal(SIGHUP, sighup_handler);
   signal(SIGCLD, sigchld_handler);	/* No, SIGCLD isn't a typo... */
   signal(SIGPIPE, SIG_IGN);
+  signal(SIGTERM, sigterm_handler);
 #endif /* HAVE_SIGSET */
 
  /*
@@ -171,9 +226,9 @@ main(int  argc,			/* I - Number of command-line arguments */
 
   if (!ReadConfiguration())
   {
-    fprintf(stderr, "cupsd: Unable to read configuration file \'%s\' - exiting!\n",
-	    ConfigurationFile);
-    exit(1);
+    syslog(LOG_LPR, "Unable to read configuration file \'%s\' - exiting!",
+           ConfigurationFile);
+    return (1);
   }
 
   LoadAllJobs();
@@ -206,8 +261,8 @@ main(int  argc,			/* I - Number of command-line arguments */
       }
       else if (!ReadConfiguration())
       {
-        fprintf(stderr, "cupsd: Unable to read configuration file \'%s\' - exiting!\n",
-	        ConfigurationFile);
+        syslog(LOG_LPR, "Unable to read configuration file \'%s\' - exiting!",
+	       ConfigurationFile);
         break;
       }
     }
@@ -242,6 +297,7 @@ main(int  argc,			/* I - Number of command-line arguments */
       if (errno == EINTR)	/* Just interrupted by a signal */
         continue;
 
+#ifdef DEBUG
      /*
       * Display all sorts of logging info to help track down the problem.
       */
@@ -271,6 +327,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 
       for (job = Jobs; job != NULL; job = job->next)
         fprintf(stderr, "cupsd: Jobs[%d] = %d\n", job->id, job->pipe);
+#endif /* DEBUG */
 
       break;
     }
@@ -466,6 +523,67 @@ sighup_handler(int sig)	/* I - Signal number */
   (void)sig;
 
   NeedReload = TRUE;
+
+#ifdef HAVE_SIGSET
+  sigset(SIGHUP, sighup_handler);
+#elif !defined(HAVE_SIGACTION)
+  signal(SIGHUP, sighup_handler);
+#endif /* HAVE_SIGSET */
+}
+
+
+/*
+ * 'sigterm_handler()' - Handle 'terminate' signals that stop the scheduler.
+ */
+
+static void
+sigterm_handler(int sig)
+{
+ /*
+  * Log an error...
+  */
+
+  LogMessage(L_ERROR, "Scheduler shutting down due to SIGTERM.");
+
+ /*
+  * Close all network clients and stop all jobs...
+  */
+
+  CloseAllClients();
+  StopListening();
+  StopPolling();
+  StopBrowsing();
+
+  if (Clients != NULL)
+    free(Clients);
+
+  StopAllJobs();
+
+  if (AccessFile != NULL)
+    fclose(AccessFile);
+
+  if (ErrorFile != NULL)
+    fclose(ErrorFile);
+
+  if (PageFile != NULL)
+    fclose(PageFile);
+
+  DeleteAllLocations();
+
+  DeleteAllClasses();
+
+  if (Devices)
+    ippDelete(Devices);
+
+  if (PPDs)
+    ippDelete(PPDs);
+
+  DeleteAllPrinters();
+
+  if (MimeDatabase != NULL)
+    mimeDelete(MimeDatabase);
+
+  exit(1);
 }
 
 
@@ -476,11 +594,11 @@ sighup_handler(int sig)	/* I - Signal number */
 static void
 usage(void)
 {
-  fputs("Usage: cupsd [-c config-file]\n", stderr);
+  fputs("Usage: cupsd [-c config-file] [-f]\n", stderr);
   exit(1);
 }
 
 
 /*
- * End of "$Id: main.c,v 1.37 2000/03/09 19:47:33 mike Exp $".
+ * End of "$Id: main.c,v 1.38 2000/03/30 05:19:29 mike Exp $".
  */

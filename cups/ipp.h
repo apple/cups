@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.h,v 1.25 2000/03/11 18:30:12 mike Exp $"
+ * "$Id: ipp.h,v 1.26 2000/03/30 05:19:20 mike Exp $"
  *
  *   Internet Printing Protocol definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -80,6 +80,9 @@ typedef enum			/**** Format tags for attribute formats... ****/
   IPP_TAG_DEFAULT,
   IPP_TAG_UNKNOWN,
   IPP_TAG_NOVALUE,
+  IPP_TAG_NOTSETTABLE = 0x15,
+  IPP_TAG_DELETEATTR,
+  IPP_TAG_ANYVALUE,
   IPP_TAG_INTEGER = 0x21,
   IPP_TAG_BOOLEAN,
   IPP_TAG_ENUM,
@@ -198,7 +201,8 @@ typedef enum			/**** IPP operations... ****/
   CUPS_REJECT_JOBS,
   CUPS_SET_DEFAULT,
   CUPS_GET_DEVICES,
-  CUPS_GET_PPDS
+  CUPS_GET_PPDS,
+  CUPS_MOVE_JOB
 } ipp_op_t;
 
 typedef enum			/**** IPP status codes... ****/
@@ -342,6 +346,7 @@ extern ipp_state_t	ippWrite(http_t *http, ipp_t *ipp);
 extern int		ippPort(void);
 
 extern ipp_attribute_t	*_ipp_add_attr(ipp_t *, int);
+extern void		_ipp_free_attr(ipp_attribute_t *);
 
 
 /*
@@ -354,5 +359,5 @@ extern ipp_attribute_t	*_ipp_add_attr(ipp_t *, int);
 #endif /* !_CUPS_IPP_H_ */
 
 /*
- * End of "$Id: ipp.h,v 1.25 2000/03/11 18:30:12 mike Exp $".
+ * End of "$Id: ipp.h,v 1.26 2000/03/30 05:19:20 mike Exp $".
  */

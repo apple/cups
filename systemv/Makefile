@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.18 2000/03/09 19:47:34 mike Exp $"
+# "$Id: Makefile,v 1.19 2000/03/30 05:19:31 mike Exp $"
 #
 #   System V commands makefile for the Common UNIX Printing System (CUPS).
 #
@@ -50,8 +50,8 @@ clean:
 install:
 	-$(MKDIR) $(BINDIR)
 	-$(MKDIR) $(LIBDIR)
-	$(CP) accept lpadmin $(SBINDIR)
-	$(CP) cancel lp lpoptions lppasswd lpstat $(BINDIR)
+	$(INSTALL_PROGRAM) accept lpadmin $(SBINDIR)
+	$(INSTALL_PROGRAM) cancel lp lpoptions lppasswd lpstat $(BINDIR)
 	$(CHMOD) u+s $(BINDIR)/lppasswd
 	$(RM) $(SBINDIR)/reject
 	$(LN) accept $(SBINDIR)/reject
@@ -147,5 +147,5 @@ lpstat.o:	../cups/cups.h
 $(OBJS):	../Makedefs
 
 #
-# End of "$Id: Makefile,v 1.18 2000/03/09 19:47:34 mike Exp $".
+# End of "$Id: Makefile,v 1.19 2000/03/30 05:19:31 mike Exp $".
 #

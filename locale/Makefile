@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.4 2000/02/08 20:38:56 mike Exp $"
+# "$Id: Makefile,v 1.5 2000/03/30 05:19:25 mike Exp $"
 #
 #   Locale file makefile for the Common UNIX Printing System (CUPS).
 #
@@ -30,17 +30,20 @@ include ../Makedefs
 
 LOCALES	=	C de en es fr it
 
+
 #
 # Make everything...
 #
 
 all:	translate
 
+
 #
 # Clean all config and object files...
 #
 
 clean:
+
 
 #
 # Install files...
@@ -52,8 +55,9 @@ install:
 		if test ! -d $(LIBDIR)/locale/$$dir ; then \
 			$(MKDIR) $(LIBDIR)/locale/$$dir ; \
 		fi ; \
-		$(CP) $$dir/cups_$$dir $(LIBDIR)/locale/$$dir ; \
+		$(INSTALL_DATA) $$dir/cups_$$dir $(LIBDIR)/locale/$$dir ; \
 	done
+
 
 #
 # translate - a simple utility to use Bablefish to translate the POSIX message
@@ -68,6 +72,7 @@ translate:	translate.o ../cups/libcups.a
 
 translate.o:	../cups/http.h
 
+
 #
-# End of "$Id: Makefile,v 1.4 2000/02/08 20:38:56 mike Exp $".
+# End of "$Id: Makefile,v 1.5 2000/03/30 05:19:25 mike Exp $".
 #

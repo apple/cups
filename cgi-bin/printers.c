@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.16 2000/02/08 20:38:44 mike Exp $"
+ * "$Id: printers.c,v 1.17 2000/03/30 05:19:19 mike Exp $"
  *
  *   Printer status CGI for the Common UNIX Printing System (CUPS).
  *
@@ -148,8 +148,8 @@ main(int  argc,			/* I - Number of command-line arguments */
   * Write the report...
   */
 
-  cgiCopyTemplateFile(stdout, TEMPLATES "/header.tmpl");
-  cgiCopyTemplateFile(stdout, TEMPLATES "/printers.tmpl");
+  cgiCopyTemplateLang(stdout, TEMPLATES, "header.tmpl", getenv("LANG"));
+  cgiCopyTemplateLang(stdout, TEMPLATES, "printers.tmpl", getenv("LANG"));
 
  /*
   * Get jobs for the specified printer if a printer has been chosen...
@@ -195,11 +195,11 @@ main(int  argc,			/* I - Number of command-line arguments */
       ippSetCGIVars(response);
       ippDelete(response);
 
-      cgiCopyTemplateFile(stdout, TEMPLATES "/jobs.tmpl");
+      cgiCopyTemplateLang(stdout, TEMPLATES, "jobs.tmpl", getenv("LANG"));
     }
   }
 
-  cgiCopyTemplateFile(stdout, TEMPLATES "/trailer.tmpl");
+  cgiCopyTemplateLang(stdout, TEMPLATES, "trailer.tmpl", getenv("LANG"));
 
  /*
   * Close the HTTP server connection...
@@ -217,5 +217,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: printers.c,v 1.16 2000/02/08 20:38:44 mike Exp $".
+ * End of "$Id: printers.c,v 1.17 2000/03/30 05:19:19 mike Exp $".
  */

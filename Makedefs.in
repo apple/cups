@@ -1,5 +1,5 @@
 #
-# "$Id: Makedefs.in,v 1.20 2000/03/20 22:06:13 mike Exp $"
+# "$Id: Makedefs.in,v 1.21 2000/03/30 05:19:15 mike Exp $"
 #
 #   Common makefile definitions for the Common UNIX Printing System (CUPS).
 #
@@ -28,11 +28,12 @@
 
 AR	=	@AR@
 AWK	=	@AWK@
-CC	=	@CC@
+CC	=	@LIBTOOL@ @CC@
 CHMOD	=	@CHMOD@
 CP	=	@CP@
 DSO	=	@DSO@
 HTMLDOC	=	@HTMLDOC@
+LIBTOOL	=	@LIBTOOL@
 LN	=	/bin/ln -sf
 MKDIR	=	@MKDIR@ -p
 MV	=	@MV@
@@ -41,6 +42,17 @@ RANLIB	=	@RANLIB@
 RM	=	@RM@ -f
 SED	=	@SED@
 SHELL	=	/bin/sh
+
+#
+# Installation programs...
+#
+
+INSTALL_CAT	=	@INSTALL_CAT@
+INSTALL_DATA	=	$(CP)
+INSTALL_LIB	=	$(LIBTOOL) $(CP)
+INSTALL_MAN	=	$(CP)
+INSTALL_PROGRAM	=	$(LIBTOOL) $(CP)
+INSTALL_SCRIPT	=	$(CP)
 
 #
 # Libraries...
@@ -66,7 +78,9 @@ CFLAGS	=	@CFLAGS@ $(OPTIM) -I.. $(OPTIONS)
 DSOLIBS	=	@DSOLIBS@
 IMGLIBS	=	@IMGLIBS@ -lm
 LDFLAGS	=	@LDFLAGS@ $(OPTIM)
-LIBS	=	-L../cups -lcups $(NETLIBS) @LIBS@
+LINKCUPS =	@LINKCUPS@
+LINKCUPSIMAGE =	@LINKCUPSIMAGE@
+LIBS	=	$(LINKCUPS) $(NETLIBS) @LIBS@
 NETLIBS	=	@NETLIBS@
 OPTIM	=	@OPTIM@
 OPTIONS	=
@@ -129,5 +143,5 @@ SERVERROOT	= 	@CUPS_SERVERROOT@
 	$(NROFF) -man $< >$@
 
 #
-# End of "$Id: Makedefs.in,v 1.20 2000/03/20 22:06:13 mike Exp $"
+# End of "$Id: Makedefs.in,v 1.21 2000/03/30 05:19:15 mike Exp $"
 #

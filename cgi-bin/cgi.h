@@ -1,5 +1,5 @@
 /*
- * "$Id: cgi.h,v 1.9 2000/01/18 15:33:39 mike Exp $"
+ * "$Id: cgi.h,v 1.10 2000/03/30 05:19:19 mike Exp $"
  *
  *   CGI support library definitions.
  *
@@ -54,7 +54,9 @@ extern const char	*cgiGetVariable(const char *name);
 extern void		cgiSetArray(const char *name, int element,
 			            const char *value);
 extern void		cgiSetVariable(const char *name, const char *value);
-extern void		cgiCopyTemplateFile(FILE *out, const char *template);
+extern void		cgiCopyTemplateFile(FILE *out, const char *tmpl);
+extern void		cgiCopyTemplateLang(FILE *out, const char *directory,
+			                    const char *tmpl, const char *lang);
 
 extern void		cgiStartHTML(FILE *out, const char *author,
 			             const char *stylesheet,
@@ -77,5 +79,5 @@ extern void		cgiEMailClose(FILE *mail);
 #endif /* !_CGI_H_ */
 
 /*
- * End of "$Id: cgi.h,v 1.9 2000/01/18 15:33:39 mike Exp $".
+ * End of "$Id: cgi.h,v 1.10 2000/03/30 05:19:19 mike Exp $".
  */
