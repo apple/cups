@@ -3,6 +3,8 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.19rc1
 
+	- Added CUPS support files for Java, Perl, and PHP
+	  (located in the "scripting" subdirectory...)
 	- The scheduler now supports fast-reloads of the
 	  cupsd.conf file when it is updated via HTTP.
 	- The scheduler always changed the ownership of log
