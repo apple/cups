@@ -3,6 +3,10 @@ CHANGES.txt - 09/15/2003
 
 CHANGES IN CUPS V1.1.20
 
+	- The cupsDoRequest() and cupsDoFileRequest() functions
+	  did not map several HTTP status codes to their IPP
+	  counterparts. This made detecting certain conditions
+	  very difficult (STR #277)
 	- Config, spool, and status files are now owned by the
 	  scheduler user (usually root) with read permission for
 	  the filter group (STR #283)
