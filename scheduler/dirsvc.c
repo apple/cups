@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.73.2.26 2003/03/12 18:50:24 mike Exp $"
+ * "$Id: dirsvc.c,v 1.73.2.27 2003/03/12 18:52:21 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -1840,7 +1840,7 @@ UpdateSLPBrowse(void)
   * Reset the refresh time...
   */
 
-  BrowseSLPRefresh = time(NULL) + BrowseTimeout - BrowseInterval;
+  BrowseSLPRefresh = time(NULL) + BrowseInterval;
 
  /* 
   * Poll for remote printers using SLP...
@@ -1913,5 +1913,5 @@ UpdateSLPBrowse(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.73.2.26 2003/03/12 18:50:24 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.73.2.27 2003/03/12 18:52:21 mike Exp $".
  */
