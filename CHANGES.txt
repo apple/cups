@@ -1,7 +1,7 @@
-CHANGES.txt - 01/07/2003
+CHANGES.txt - 04/10/2003
 ------------------------
 
-CHANGES IN CUPS V1.2.0a1
+CHANGES IN CUPS V1.2.0b1
 
 	- New cupsLangPrintf() and cupsLangPuts() for localized
 	  interfaces.

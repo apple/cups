@@ -1,5 +1,5 @@
 /*
- * "$Id: admin.c,v 1.22.2.22 2003/04/08 03:48:02 mike Exp $"
+ * "$Id: admin.c,v 1.22.2.23 2003/04/10 21:02:07 mike Exp $"
  *
  *   Administration CGI for the Common UNIX Printing System (CUPS).
  *
@@ -916,6 +916,8 @@ do_config_printer(http_t      *http,	/* I - HTTP connection */
   ppd_file_t	*ppd;			/* PPD file */
   ppd_group_t	*group;			/* Option group */
   ppd_option_t	*option;		/* Option */
+  ppd_attr_t	*protocol;		/* cupsProtocol attribute */
+  ppd_attr_t	*protocols;		/* Protocols attribute */
 
 
  /*
@@ -1153,6 +1155,46 @@ do_config_printer(http_t      *http,	/* I - HTTP connection */
       ippDelete(response);
     }
 
+   /*
+    * Binary protocol support...
+    */
+
+    if ((protocols = ppdFindAttr(ppd, "Protocols", NULL)) != NULL &&
+        protocols->value && strstr(protocols->value, "BCP"))
+    {
+      protocol = ppdFindAttr(ppd, "cupsProtocol", NULL);
+
+      cgiSetVariable("GROUP", "PS Binary Protocol");
+      cgiCopyTemplateLang(stdout, TEMPLATES, "option-header.tmpl",
+                          getenv("LANG"));
+
+      cgiSetSize("CHOICES", 2);
+      cgiSetSize("TEXT", 2);
+      cgiSetArray("CHOICES", 0, "None");
+      cgiSetArray("TEXT", 0, "None");
+
+      if (strstr(protocols->value, "TBCP"))
+      {
+	cgiSetArray("CHOICES", 1, "TBCP");
+	cgiSetArray("TEXT", 1, "TBCP");
+      }
+      else
+      {
+	cgiSetArray("CHOICES", 1, "BCP");
+	cgiSetArray("TEXT", 1, "BCP");
+      }
+
+      cgiSetVariable("KEYWORD", "protocol");
+      cgiSetVariable("KEYTEXT", "PS Binary Protocol");
+      cgiSetVariable("DEFCHOICE", protocol ? protocol->value : "None");
+
+      cgiCopyTemplateLang(stdout, TEMPLATES, "option-pickone.tmpl",
+	                  getenv("LANG"));
+
+      cgiCopyTemplateLang(stdout, TEMPLATES, "option-trailer.tmpl",
+                          getenv("LANG"));
+    }
+
     cgiCopyTemplateLang(stdout, TEMPLATES, "config-printer2.tmpl",
                         getenv("LANG"));
   }
@@ -1176,7 +1218,9 @@ do_config_printer(http_t      *http,	/* I - HTTP connection */
 
     while (get_line(line, sizeof(line), in) != NULL)
     {
-      if (strncmp(line, "*Default", 8) != 0)
+      if (!strncmp(line, "*cupsProtocol:", 14) && cgiGetVariable("protocol"))
+        continue;
+      else if (strncmp(line, "*Default", 8))
         fprintf(out, "%s\n", line);
       else
       {
@@ -1203,6 +1247,9 @@ do_config_printer(http_t      *http,	/* I - HTTP connection */
 	  fprintf(out, "%s\n", line);
       }
     }
+
+    if ((var = cgiGetVariable("protocol")) != NULL)
+      fprintf(out, "*cupsProtocol: %s\n", cgiGetVariable("protocol"));
 
     fclose(in);
     fclose(out);
@@ -1547,5 +1594,5 @@ get_line(char *buf,	/* I - Line buffer */
 
 
 /*
- * End of "$Id: admin.c,v 1.22.2.22 2003/04/08 03:48:02 mike Exp $".
+ * End of "$Id: admin.c,v 1.22.2.23 2003/04/10 21:02:07 mike Exp $".
  */

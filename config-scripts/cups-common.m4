@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-common.m4,v 1.12.2.13 2003/04/10 16:12:47 mike Exp $"
+dnl "$Id: cups-common.m4,v 1.12.2.14 2003/04/10 21:02:08 mike Exp $"
 dnl
 dnl   Common configuration stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -28,7 +28,7 @@ AC_PREREQ(2.50)
 dnl Set the name of the config header file...
 AC_CONFIG_HEADER(config.h)
 
-CUPS_VERSION="1.2.0a1"
+CUPS_VERSION="1.2.0b1"
 AC_SUBST(CUPS_VERSION)
 AC_DEFINE_UNQUOTED(CUPS_SVERSION, "CUPS v$CUPS_VERSION")
 
@@ -198,5 +198,5 @@ AC_SUBST(DEFAULT_IPP_PORT)
 AC_DEFINE_UNQUOTED(CUPS_DEFAULT_IPP_PORT,$DEFAULT_IPP_PORT)
 
 dnl
-dnl End of "$Id: cups-common.m4,v 1.12.2.13 2003/04/10 16:12:47 mike Exp $".
+dnl End of "$Id: cups-common.m4,v 1.12.2.14 2003/04/10 21:02:08 mike Exp $".
 dnl
