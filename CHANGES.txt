@@ -1,8 +1,10 @@
-CHANGES.txt - 08/25/2002
+CHANGES.txt - 08/26/2002
 ------------------------
 
 CHANGES IN CUPS V1.1.16
 
+	- Updated the cupsaddsmb command to support the new CUPS
+	  driver for Windows NT/2k/XP.
 	- Filter status lines longer than 1023 characters could
 	  cause the scheduler to get into an infinite loop.
 	- The scheduler didn't reset the job state to pending
