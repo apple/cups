@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.94 2001/06/01 15:09:17 mike Exp $"
+ * "$Id: client.c,v 1.95 2001/06/05 15:36:41 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -415,6 +415,9 @@ EncryptClient(client_t *con)	/* I - Client to encrypt */
     SSL_free(conn);
     return (0);
   }
+
+  LogMessage(L_DEBUG, "EncryptClient() %d Connection now encrypted.",
+             con->http.fd);
 
   con->http.tls = conn;
   return (1);
@@ -2118,5 +2121,5 @@ pipe_command(client_t *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.94 2001/06/01 15:09:17 mike Exp $".
+ * End of "$Id: client.c,v 1.95 2001/06/05 15:36:41 mike Exp $".
  */
