@@ -1,5 +1,5 @@
 /*
- * "$Id: mime.c,v 1.10 1999/03/01 20:51:53 mike Exp $"
+ * "$Id: mime.c,v 1.11 1999/04/21 19:31:29 mike Exp $"
  *
  *   MIME database file routines for the Common UNIX Printing System (CUPS).
  *
@@ -33,6 +33,14 @@
  * Revision History:
  *
  *   $Log: mime.c,v $
+ *   Revision 1.11  1999/04/21 19:31:29  mike
+ *   Changed the directory header stuff to use the autoconf-recommended
+ *   sequence of #ifdef's.
+ *
+ *   Changed the language routines to look for the LOCALEDIR environment
+ *   variable, and if it is not defined to use the LOCALEDIR string defined
+ *   in config.h.
+ *
  *   Revision 1.10  1999/03/01 20:51:53  mike
  *   Code cleanup - removed extraneous semi-colons...
  *
@@ -97,14 +105,21 @@
 
 #if defined(WIN32) || defined(__EMX__)
 #  include <windows.h>
-#elif defined(HAVE_SYS_DIR_H)
-#  include <sys/types.h>
-#  include <sys/dir.h>
-typedef struct direct DIRENT;
-#else
+#elif HAVE_DIRENT_H
 #  include <dirent.h>
 typedef struct dirent DIRENT;
-#endif /* HAVE_SYS_DIR_H */
+#else
+#  if HAVE_SYS_NDIR_H
+#    include <sys/ndir.h>
+#  endif
+#  if HAVE_SYS_DIR_H
+#    include <sys/dir.h>
+#  endif
+#  if HAVE_NDIR_H
+#    include <ndir.h>
+#  endif
+typedef struct direct DIRENT;
+#endif
 
 
 /*
@@ -587,5 +602,5 @@ delete_rules(mime_magic_t *rules)	/* I - Rules to free */
 
 
 /*
- * End of "$Id: mime.c,v 1.10 1999/03/01 20:51:53 mike Exp $".
+ * End of "$Id: mime.c,v 1.11 1999/04/21 19:31:29 mike Exp $".
  */

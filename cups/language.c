@@ -1,5 +1,5 @@
 /*
- * "$Id: language.c,v 1.4 1999/04/21 14:12:19 mike Exp $"
+ * "$Id: language.c,v 1.5 1999/04/21 19:31:29 mike Exp $"
  *
  *   for the Common UNIX Printing System (CUPS).
  *
@@ -126,7 +126,8 @@ cupsLangGet(char *language)	/* I - Language or locale */
 {
   int		i;		/* Looping var */
   char		real[16],	/* Real language name */
-		filename[1024];	/* Filename for language locale file */
+		filename[1024],	/* Filename for language locale file */
+		*localedir;	/* Directory for locale files */
   FILE		*fp;		/* Language locale file pointer */
   char		line[1024];	/* Line from file */
   cups_msg_t	msg;		/* Message number */
@@ -184,7 +185,10 @@ cupsLangGet(char *language)	/* I - Language or locale */
   * will use the POSIX locale.
   */
 
-  sprintf(filename, LOCALEDIR "/%s/cups_%s", real, real);
+  if ((localedir = getenv("LOCALEDIR")) == NULL)
+    localedir = LOCALEDIR;
+
+  sprintf(filename, "%s/%s/cups_%s", localedir, real, real);
 
   if ((fp = fopen(filename, "r")) == NULL)
     if (strlen(real) > 2)
@@ -194,7 +198,7 @@ cupsLangGet(char *language)	/* I - Language or locale */
       */
 
       real[2] = '\0';
-      sprintf(filename, LOCALEDIR "/%s/cups_%s", real, real);
+      sprintf(filename, "%s/%s/cups_%s", localedir, real, real);
       fp = fopen(filename, "r");
     }
 
@@ -203,7 +207,10 @@ cupsLangGet(char *language)	/* I - Language or locale */
   */
 
   if (fp == NULL)
-    fp = fopen(LOCALEDIR "/C/cups_C", "r");
+  {
+    sprintf(filename, "%s/C/cups_C", localedir);
+    fp = fopen(filename, "r");
+  }
 
  /*
   * If we can't load anything, return NULL to signal an error!
@@ -344,5 +351,5 @@ cupsLangGet(char *language)	/* I - Language or locale */
 
 
 /*
- * End of "$Id: language.c,v 1.4 1999/04/21 14:12:19 mike Exp $".
+ * End of "$Id: language.c,v 1.5 1999/04/21 19:31:29 mike Exp $".
  */
