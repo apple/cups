@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.79 2003/01/14 21:46:46 mike Exp $"
+ * "$Id: ipp.c,v 1.80 2003/01/14 22:08:33 mike Exp $"
  *
  *   Internet Printing Protocol object functions for the Common UNIX
  *   Printing System (CUPS).
@@ -65,6 +65,7 @@
 #include "ipp.h"
 #include "debug.h"
 #include <ctype.h>
+#include <errno.h>
 
 
 /*
@@ -2071,7 +2072,16 @@ ipp_read(http_t        *http,	/* I - Client connection */
         bytes = -1;
 	break;
       }
-      else if ((bytes = httpRead(http, (char *)buffer, length - tbytes)) < 0)
+      else if (!FD_ISSET(http->fd, &input))
+      {
+       /*
+        * Signal no data...
+	*/
+
+        bytes = -1;
+	break;
+      }
+      else if ((bytes = httpRead(http, (char *)buffer, length - tbytes)) <= 0)
         break;
     }
   }
@@ -2081,12 +2091,12 @@ ipp_read(http_t        *http,	/* I - Client connection */
   */
 
   if (tbytes == 0 && bytes < 0)
-    return (-1);
-  else
-    return (tbytes);
+    tbytes = -1;
+
+  return (tbytes);
 }
 
 
 /*
- * End of "$Id: ipp.c,v 1.79 2003/01/14 21:46:46 mike Exp $".
+ * End of "$Id: ipp.c,v 1.80 2003/01/14 22:08:33 mike Exp $".
  */
