@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.156 2002/02/13 17:35:10 mike Exp $"
+ * "$Id: ipp.c,v 1.157 2002/04/29 17:25:26 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -2220,8 +2220,76 @@ create_job(client_t        *con,	/* I - Client connection */
     attr->name = strdup("job-originating-user-name");
   }
 
-  ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_NAME, 
-               "job-originating-host-name", NULL, con->http.hostname);
+  if ((attr = ippFindAttribute(job->attrs, "job-originating-host-name",
+                               IPP_TAG_ZERO)) != NULL)
+  {
+   /*
+    * Request contains a job-originating-host-name attribute; validate it...
+    */
+
+    if (attr->value_tag != IPP_TAG_NAME ||
+        attr->num_values != 1 ||
+        strcmp(con->http.hostname, "localhost") != 0)
+    {
+     /*
+      * Can't override the value if we aren't connected via localhost.
+      * Also, we can only have 1 value and it must be a name value.
+      */
+
+      int i;	/* Looping var */
+
+      switch (attr->value_tag)
+      {
+        case IPP_TAG_STRING :
+	case IPP_TAG_TEXTLANG :
+	case IPP_TAG_NAMELANG :
+	case IPP_TAG_TEXT :
+	case IPP_TAG_NAME :
+	case IPP_TAG_KEYWORD :
+	case IPP_TAG_URI :
+	case IPP_TAG_URISCHEME :
+	case IPP_TAG_CHARSET :
+	case IPP_TAG_LANGUAGE :
+	case IPP_TAG_MIMETYPE :
+	   /*
+	    * Free old strings...
+	    */
+
+	    for (i = 0; i < attr->num_values; i ++)
+	    {
+	      free(attr->values[i].string.text);
+	      attr->values[i].string.text = NULL;
+	      if (attr->values[i].string.charset)
+	      {
+		free(attr->values[i].string.charset);
+		attr->values[i].string.charset = NULL;
+	      }
+            }
+
+	default :
+            break;
+      }
+
+     /*
+      * Use the default connection hostname instead...
+      */
+
+      attr->value_tag             = IPP_TAG_NAME;
+      attr->num_values            = 1;
+      attr->values[0].string.text = strdup(con->http.hostname);
+    }
+  }
+  else
+  {
+   /*
+    * No job-originating-host-name attribute, so use the hostname from
+    * the connection...
+    */
+
+    ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_NAME, 
+        	 "job-originating-host-name", NULL, con->http.hostname);
+  }
+
   ippAddInteger(job->attrs, IPP_TAG_JOB, IPP_TAG_INTEGER, "time-at-creation",
                 time(NULL));
   attr = ippAddInteger(job->attrs, IPP_TAG_JOB, IPP_TAG_INTEGER,
@@ -4013,8 +4081,76 @@ print_job(client_t        *con,		/* I - Client connection */
   * Add remaining job attributes...
   */
 
-  ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_NAME, 
-               "job-originating-host-name", NULL, con->http.hostname);
+  if ((attr = ippFindAttribute(job->attrs, "job-originating-host-name",
+                               IPP_TAG_ZERO)) != NULL)
+  {
+   /*
+    * Request contains a job-originating-host-name attribute; validate it...
+    */
+
+    if (attr->value_tag != IPP_TAG_NAME ||
+        attr->num_values != 1 ||
+        strcmp(con->http.hostname, "localhost") != 0)
+    {
+     /*
+      * Can't override the value if we aren't connected via localhost.
+      * Also, we can only have 1 value and it must be a name value.
+      */
+
+      int i;	/* Looping var */
+
+      switch (attr->value_tag)
+      {
+        case IPP_TAG_STRING :
+	case IPP_TAG_TEXTLANG :
+	case IPP_TAG_NAMELANG :
+	case IPP_TAG_TEXT :
+	case IPP_TAG_NAME :
+	case IPP_TAG_KEYWORD :
+	case IPP_TAG_URI :
+	case IPP_TAG_URISCHEME :
+	case IPP_TAG_CHARSET :
+	case IPP_TAG_LANGUAGE :
+	case IPP_TAG_MIMETYPE :
+	   /*
+	    * Free old strings...
+	    */
+
+	    for (i = 0; i < attr->num_values; i ++)
+	    {
+	      free(attr->values[i].string.text);
+	      attr->values[i].string.text = NULL;
+	      if (attr->values[i].string.charset)
+	      {
+		free(attr->values[i].string.charset);
+		attr->values[i].string.charset = NULL;
+	      }
+            }
+
+	default :
+            break;
+      }
+
+     /*
+      * Use the default connection hostname instead...
+      */
+
+      attr->value_tag             = IPP_TAG_NAME;
+      attr->num_values            = 1;
+      attr->values[0].string.text = strdup(con->http.hostname);
+    }
+  }
+  else
+  {
+   /*
+    * No job-originating-host-name attribute, so use the hostname from
+    * the connection...
+    */
+
+    ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_NAME, 
+        	 "job-originating-host-name", NULL, con->http.hostname);
+  }
+
   ippAddInteger(job->attrs, IPP_TAG_JOB, IPP_TAG_INTEGER, "job-id", job->id);
   job->state = ippAddInteger(job->attrs, IPP_TAG_JOB, IPP_TAG_ENUM,
                              "job-state", IPP_JOB_PENDING);
@@ -5639,5 +5775,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.156 2002/02/13 17:35:10 mike Exp $".
+ * End of "$Id: ipp.c,v 1.157 2002/04/29 17:25:26 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: cups-lpd.c,v 1.31 2002/01/02 17:59:15 mike Exp $"
+ * "$Id: cups-lpd.c,v 1.32 2002/04/29 17:25:26 mike Exp $"
  *
  *   Line Printer Daemon interface for the Common UNIX Printing System (CUPS).
  *
@@ -106,7 +106,8 @@ main(int  argc,			/* I - Number of command-line arguments */
   int		hostlen;	/* Size of client address */
   unsigned	hostip;		/* (32-bit) IP address */
   struct sockaddr_in hostaddr;	/* Address of client */
-  struct hostent *hostname;	/* Name of client */
+  struct hostent *hostent;	/* Host entry of client */
+  char		hostname[256];	/* Hostname of client */
 
 
  /*
@@ -128,15 +129,29 @@ main(int  argc,			/* I - Number of command-line arguments */
   hostlen = sizeof(hostaddr);
 
   if (getpeername(0, (struct sockaddr *)&hostaddr, &hostlen))
+  {
     syslog(LOG_WARNING, "Unable to get client address - %s", strerror(errno));
+    strcpy(hostname, "unknown");
+  }
   else
   {
     hostip   = ntohl(hostaddr.sin_addr.s_addr);
-    hostname = gethostbyaddr((void *)&(hostaddr.sin_addr), hostlen, AF_INET);
+    hostent  = gethostbyaddr((void *)&(hostaddr.sin_addr), hostlen, AF_INET);
+
+    if (hostent)
+    {
+      strncpy(hostname, hostent->h_name, sizeof(hostname) - 1);
+      hostname[sizeof(hostname) - 1] = '\0';
+    }
+    else
+    {
+      snprintf(hostname, sizeof(hostname), "%d.%d.%d.%d",
+               (hostip >> 24) & 255, (hostip >> 16) & 255,
+	       (hostip >> 8) & 255, hostip & 255);
+    }
 
     syslog(LOG_INFO, "Connection from %s (%d.%d.%d.%d)",
-           hostname ? hostname->h_name : "unknown",
-           (hostip >> 24) & 255, (hostip >> 16) & 255,
+           hostname, (hostip >> 24) & 255, (hostip >> 16) & 255,
 	   (hostip >> 8) & 255, hostip & 255);
   }
 
@@ -146,6 +161,9 @@ main(int  argc,			/* I - Number of command-line arguments */
 
   num_defaults = 0;
   defaults     = NULL;
+
+  num_defaults = cupsAddOption("job-originating-host-name", hostname,
+                               num_defaults, &defaults);
 
   for (i = 1; i < argc; i ++)
     if (argv[i][0] == '-')
@@ -1283,5 +1301,5 @@ smart_gets(char *s,	/* I - Pointer to line buffer */
 
 
 /*
- * End of "$Id: cups-lpd.c,v 1.31 2002/01/02 17:59:15 mike Exp $".
+ * End of "$Id: cups-lpd.c,v 1.32 2002/04/29 17:25:26 mike Exp $".
  */
