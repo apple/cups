@@ -1,5 +1,5 @@
 #
-# "$Id: cups.list,v 1.9 1999/06/30 21:07:14 mike Exp $"
+# "$Id: cups.list,v 1.10 1999/07/07 18:20:53 mike Exp $"
 #
 #   ESP Package Manager (EPM) file list for the Common UNIX Printing
 #   System (CUPS).
@@ -32,6 +32,7 @@
 %license LICENSE.cups
 %readme README.cups
 %version 1.0b4
+%incompat printpro
 
 %system all
 # Server files
@@ -184,6 +185,22 @@ c 0600 root sys /var/cups/conf/mime.convs conf/mime.convs
 c 0600 root sys /var/cups/conf/mime.types conf/mime.types
 c 0600 root sys /var/cups/conf/printers.conf conf/printers.conf
 
+# Developer files
+f 0444 root sys /usr/include/cups/cups.h cups/cups.h
+f 0444 root sys /usr/include/cups/http.h cups/http.h
+f 0444 root sys /usr/include/cups/ipp.h cups/ipp.h
+f 0444 root sys /usr/include/cups/language.h cups/language.h
+f 0444 root sys /usr/include/cups/mime.h cups/mime.h
+f 0444 root sys /usr/include/cups/ppd.h cups/ppd.h
+f 0444 root sys /usr/include/cups/raster.h cups/raster.h
+
+# This should only be done for IRIX 6.x (-n32)
+%system irix irix64
+f 0444 root sys /usr/lib32/libcups.a cups/libcups.a
+%system hpux solaris sunos dunix linux
+f 0444 root sys /usr/lib/libcups.a cups/libcups.a
+%system all
+
 # Documentation files
 f 0444 root sys /usr/share/cups/doc/cmp.html doc/cmp.html
 f 0444 root sys /usr/share/cups/doc/cmp.pdf doc/cmp.pdf
@@ -305,5 +322,5 @@ l 0555 root sys /etc/rc0.d/K20lp ../init.d/lp
 l 0555 root sys /etc/rc2.d/S80lp ../init.d/lp
 
 #
-# End of "$Id: cups.list,v 1.9 1999/06/30 21:07:14 mike Exp $".
+# End of "$Id: cups.list,v 1.10 1999/07/07 18:20:53 mike Exp $".
 #
