@@ -1,5 +1,5 @@
 /*
- * "$Id: http-addr.c,v 1.1.2.12 2004/02/25 16:58:32 mike Exp $"
+ * "$Id: http-addr.c,v 1.1.2.13 2004/03/19 11:55:52 mike Exp $"
  *
  *   HTTP address routines for the Common UNIX Printing System (CUPS).
  *
@@ -269,7 +269,10 @@ httpGetHostByName(const char *name)	/* I - Hostname or IP address */
     */
 
     if (sscanf(name, "%u.%u.%u.%u", ip, ip + 1, ip + 2, ip + 3) != 4)
-      return (NULL); /* Must have 4 numbers */
+      return (NULL);			/* Must have 4 numbers */
+
+    if (ip[0] > 255 || ip[1] > 255 || ip[2] > 255 || ip[3] > 255)
+      return (NULL);			/* Invalid byte ranges! */
 
     packed_ip = htonl(((((((ip[0] << 8) | ip[1]) << 8) | ip[2]) << 8) | ip[3]));
 
@@ -300,5 +303,5 @@ httpGetHostByName(const char *name)	/* I - Hostname or IP address */
 
 
 /*
- * End of "$Id: http-addr.c,v 1.1.2.12 2004/02/25 16:58:32 mike Exp $".
+ * End of "$Id: http-addr.c,v 1.1.2.13 2004/03/19 11:55:52 mike Exp $".
  */

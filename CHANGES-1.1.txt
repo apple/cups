@@ -3,6 +3,8 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.21rc1
 
+	- The httpGetHostByName() function did not range check
+	  IP address values (STR #608)
 	- The httpUpdate() function could return HTTP_ERROR
 	  instead of the HTTP status if the server closed the
 	  connection before the client received the whole
