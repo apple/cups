@@ -32,6 +32,9 @@ public class GLPjobList implements ActionListener
           u = new URL("http://" + GLPvars.cupsServerName + ":631/printers/" +
                       cp.getPrinterName());
           cups = new Cups(u);
+          cups.setUser(GLPvars.cupsUser);
+          cups.setPasswd(GLPvars.cupsPasswd);
+
           jobs = cups.cupsGetJobs(GLPvars.showMyJobs, 
                                   GLPvars.showCompletedJobs );
         }

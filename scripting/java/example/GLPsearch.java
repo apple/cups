@@ -76,6 +76,9 @@ public class GLPsearch extends Thread
            {
              u    = new URL("http://" + host + ":631/printers");
              cups = new Cups(u);
+             cups.setUser(GLPvars.cupsUser);
+             cups.setPasswd(GLPvars.cupsPasswd);
+
              test = cups.cupsGetDefault();
              if ((test != null) && (test.length() > 0))
              {

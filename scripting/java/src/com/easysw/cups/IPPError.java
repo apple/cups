@@ -41,7 +41,7 @@ import java.io.*;
 public class IPPError
 {
   private int       error_number;
-  public  String    error_string;
+  private String    error_string;
 
 
   /**

@@ -78,9 +78,12 @@ public class GLPdetail implements ActionListener
         try
         {
             u    = new URL("http://" + GLPvars.getServerName() + 
-                           ":631/printers/" + GLPvars.selectedPrinterName );  
+                           ":631/printers/" + GLPvars.selectedPrinterName );
             cups = new Cups(u);
+            cups.setUser(GLPvars.cupsUser);
+            cups.setPasswd(GLPvars.cupsPasswd);
             printer = new CupsPrinter( cups, GLPvars.selectedPrinterName );
+
             detail = new GLPprinterDetail( printer );
             joblist = new GLPjobList(printer);
 
@@ -178,11 +181,15 @@ public class GLPdetail implements ActionListener
             u    = new URL("http://" + GLPvars.getServerName() + 
                            ":631/printers/" + GLPvars.selectedPrinterName );  
             cups = new Cups(u);
+            cups.setUser(GLPvars.cupsUser);
+            cups.setPasswd(GLPvars.cupsPasswd);
             printer = new CupsPrinter( cups, GLPvars.selectedPrinterName );
-            detail = new GLPprinterDetail( printer );
+
+            detail  = new GLPprinterDetail( printer );
             joblist = new GLPjobList(printer);
 
             detailPanel = detail.getPanel();
+
             jobPanel    = joblist.getPanel();
 
             mainLayout = new BoxLayout(mainPanel, BoxLayout.Y_AXIS);

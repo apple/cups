@@ -42,6 +42,24 @@ import java.net.*;
 public class Cups
 {
 
+    static final int REQ_STATE_CREATE_HTTP       = 0;
+    static final int REQ_STATE_WRITE_HTTP_HEADER = 1;
+    static final int REQ_STATE_WRITE_IPP_HEADER  = 2;
+    static final int REQ_STATE_WRITE_IPP_ATTRS   = 3;
+    static final int REQ_STATE_FINISH_IPP_ATTRS  = 4;
+    static final int REQ_STATE_READ_RESPONSE     = 5;
+    static final int REQ_STATE_DONE              = 6;
+    static final String[] req_state_names =
+                          { "Create HTTP", 
+                            "Write Http Header", 
+                            "Write IPP Header",
+                            "Write IPP Attrs", 
+                            "Finish IPP Attrs", 
+                            "Read Response",
+                            "Done" 
+                          };
+
+
     IPP		ipp;               //  IPP Request
     IPPHttp     http;              //  Connection to server
 
@@ -70,6 +88,9 @@ public class Cups
      */
     public Cups()
     {
+      http     = null;
+      ipp      = null;
+
       protocol = "http";
       address  = "localhost";
       port     = 631;
@@ -89,13 +110,15 @@ public class Cups
      */
     public Cups( URL p_url )
     {
+      http     = null;
+      ipp      = null;
+
       protocol = p_url.getProtocol() + "://";
       address  = p_url.getHost();
       port     = p_url.getPort();
       path     = p_url.getPath();
 
       site     = protocol + address;
-
       if (port > 0)
         site = site + ":" + port;
 
@@ -111,73 +134,6 @@ public class Cups
 
 
     /**
-     * Constructor using a destination only.
-     *
-     * @param	<code>p_dest</code>	A CUPS destination on the localhost.
-     */
-    public Cups( String p_dest )
-    {
-      protocol = "http";
-      address  = "localhost";
-      port     = 631;
-      path     = "/";
-      site     = "http://localhost:631/";
-      dest     = p_dest;
-      instance = "";
-      user     = "";
-      passwd   = "";
-      encrypt  = false;
-    }
-
-
-    /**
-     * Constructor using a <code>URL</code> and a destination.
-     *
-     * @param	<code>p_url</code>	A <code>URL</code> object.
-     * @param	<code>p_dest</code>	A CUPS destination on p_url server.
-     */
-    public Cups( URL p_url, String p_dest )
-    {
-      protocol = p_url.getProtocol();
-      address  = p_url.getHost();
-      port     = p_url.getPort();
-      path     = p_url.getPath();
-
-      site     = protocol + "://" + address;
-
-      if (port > 0)
-        site = site + ":" + port;
-
-      if (path.length() > 0)
-        site = site + path;
-
-      dest     = p_dest;
-      user     = "";
-      passwd   = "";
-      encrypt  = false;
-    }
-
-    /**
-     * Constructor using a destination and instance on the localhost.
-     *
-     * @param	<code>p_dest</code>	A CUPS destination on p_url server.
-     * @param	<code>p_instance</code>	An instance of p_dest.
-     */
-    public Cups( String p_dest, String p_instance )
-    {
-      protocol = "http";
-      address  = "localhost";
-      port     = 631;
-      path     = "/";
-      site     = "http://localhost:631/";
-      dest     = p_dest;
-      instance = p_instance;
-      user     = "";
-      passwd   = "";
-      encrypt  = false;
-    }
-
-    /**
      * Set the value of the <code>protocol</code> member.  Valid values
      * are ipp or http.
      *
@@ -186,7 +142,7 @@ public class Cups
     public void setProtocol( String p_protocol )
     {
       protocol = p_protocol;
-      site     = protocol + "://" + address + ":" + port + path + dest;
+      site     = protocol + "://" + address + ":" + port + path;
     }
 
     /**
@@ -198,7 +154,7 @@ public class Cups
     public void setServer( String p_server )
     {
       address = p_server;
-      site     = protocol + "://" + address + ":" + port + path + dest;
+      site     = protocol + "://" + address + ":" + port + path;
     }
 
 
@@ -210,7 +166,7 @@ public class Cups
     public void setPort( int p_port )
     {
       port = p_port;
-      site = protocol + "://" + address + ":" + port + path + dest;
+      site = protocol + "://" + address + ":" + port + path;
     }
 
 
@@ -233,6 +189,28 @@ public class Cups
     public void setPasswd( String p_passwd )
     {
       passwd = p_passwd;
+    }
+
+
+    /**
+     * Set the value of the <code>dest</code> member.  
+     *
+     * @param	<code>p_dest</code>		Destination.
+     */
+    public void setDest( String p_dest )
+    {
+      dest = p_dest;
+    }
+
+
+    /**
+     * Set the value of the <code>instance</code> member.  
+     *
+     * @param	<code>p_instance</code>		Instance.
+     */
+    public void setInstance( String p_instance)
+    {
+      instance = p_instance;
     }
 
 
@@ -267,21 +245,17 @@ public class Cups
     public void setPath( String p_path )
     {
       path = p_path;
-      site = protocol + "://" + address + ":" + port + path + dest;
+      site = protocol + "://" + address + ":" + port + path;
     }
 
 
-    /**
-     * Set the value of the <code>dest</code> member.  This is the
-     * name of the destination on the server.
-     *
-     * @param	<code>p_dest</code>		Destination name.
-     */
-    public void setDest( String p_dest )
+
+    public boolean doRequest(String from) throws IOException
     {
-      dest = p_dest;
-      site = protocol + "://" + address + ":" + port + path + dest;
+      // System.out.println("doRequest From: " + from );
+      return(doRequest());
     }
+
 
 
     /**
@@ -294,102 +268,196 @@ public class Cups
     public boolean doRequest() throws IOException
     {
       IPPAttribute attr;
+      int state  = REQ_STATE_CREATE_HTTP;
+      int errors = 0;
 
-      //
-      //  Connect if needed.
-      //
-      if (http == null)
+      while (true)
       {
-        String url_str = site + dest;
-        try
+        switch( state )
         {
-          if (user.length() > 0 && passwd.length() > 0)
-            http = new IPPHttp(url_str, user, passwd );
-          else
-            http = new IPPHttp(url_str);
+
+          case REQ_STATE_CREATE_HTTP:
+            String url_str = site + dest;
+
+            try
+            {
+              if (user.length() > 0 && passwd.length() > 0)
+                http = new IPPHttp(url_str, "", user, passwd );
+              else
+                http = new IPPHttp(url_str);
+              state++;
+            }
+            catch (IOException e)
+            {
+              throw(e);
+            }
+            break;
+
+
+
+          case REQ_STATE_WRITE_HTTP_HEADER:
+            //
+            //  Send the HTTP header.
+            //
+            switch( http.writeHeader( http.path, ipp.sizeInBytes() ))
+            {
+              case IPPHttp.HTTP_FORBIDDEN:
+              case IPPHttp.HTTP_NOT_FOUND:
+              case IPPHttp.HTTP_BAD_REQUEST:
+              case IPPHttp.HTTP_METHOD_NOT_ALLOWED:
+              case IPPHttp.HTTP_PAYMENT_REQUIRED:
+              case IPPHttp.HTTP_UPGRADE_REQUIRED:
+              case IPPHttp.HTTP_ERROR:
+              case IPPHttp.HTTP_UNAUTHORIZED:
+                     errors++;
+                     if (errors < 5)
+                     {
+                       http.reConnect();
+                     }
+                     else
+                       return(false);
+                     break;
+
+              default: state++;
+            }
+            break;
+
+
+
+          case REQ_STATE_WRITE_IPP_HEADER:
+            //
+            //  Send the request header.
+            //
+            byte[] header = new byte[8];
+            header[0] = (byte)1; 
+            header[1] = (byte)1; 
+            header[2] = (byte)((ipp.request.operation_id & 0xff00) >> 8);
+            header[3] = (byte)(ipp.request.operation_id & 0xff);
+            header[4] = (byte)((ipp.request.request_id & 0xff000000) >> 24);
+            header[5] = (byte)((ipp.request.request_id & 0xff0000) >> 16);
+            header[6] = (byte)((ipp.request.request_id & 0xff00) >> 8);
+            header[7] = (byte)(ipp.request.request_id & 0xff);
+            http.write( header );
+            if (http.checkForResponse() >= IPPHttp.HTTP_BAD_REQUEST)
+            {
+               errors++;
+               if (errors < 5)
+               {
+                 http.reConnect();
+                 state = REQ_STATE_WRITE_HTTP_HEADER;
+               }
+               else
+                 return(false);
+            }
+            else state++;
+            break;
+
+
+          case REQ_STATE_WRITE_IPP_ATTRS:
+            //
+            //  Send the attributes list.
+            //
+            byte[]  bytes;
+            int     sz;
+            int     last_group = -1;
+            boolean auth_error = false;
+            for (int i=0; i < ipp.attrs.size() && !auth_error; i++)
+            {
+              attr = (IPPAttribute)ipp.attrs.get(i);
+              sz    = attr.sizeInBytes(last_group);
+              bytes = attr.getBytes(sz,last_group);
+              last_group = attr.group_tag;
+              http.write(bytes);
+
+              //
+              //  Check for server response between each attribute.
+              //
+              if (http.checkForResponse() >= IPPHttp.HTTP_BAD_REQUEST)
+              {
+                 errors++;
+                 if (errors < 5)
+                 {
+                   http.reConnect();
+                   state = REQ_STATE_WRITE_HTTP_HEADER;
+                   auth_error = true;
+                 }
+                 else
+                   return(false);
+              }
+
+            }
+            if (!auth_error)
+              state++;
+            break;
+
+
+
+          case REQ_STATE_FINISH_IPP_ATTRS:
+            //
+            //  Send the end of attributes tag.
+            //
+            byte[] footer = new byte[1];
+            footer[0] = (byte)IPPDefs.TAG_END; 
+            http.write( footer );
+
+            //
+            //  Keep checking .....
+            //
+            if (http.checkForResponse() >= IPPHttp.HTTP_BAD_REQUEST)
+            {
+              errors++;
+              if (errors < 5)
+              {
+                   http.reConnect();
+                   state = REQ_STATE_WRITE_HTTP_HEADER;
+              }
+              else
+                return(false);
+            }
+            else state++;
+            break;
+
+
+
+          case REQ_STATE_READ_RESPONSE:
+            //
+            //   Now read back response
+            //
+            int read_length;
+            read_length = http.read_header();
+            switch( http.status )
+            {
+               case 200: break;
+               default:
+                  errors++;
+                  if (errors < 5)
+                  {
+                    http.reConnect();
+                    state = REQ_STATE_WRITE_HTTP_HEADER;
+                  }
+                  else 
+                  {
+                    return(false);
+                  }
+                  break;
+            }
+            if (read_length > 0)
+            {
+              http.read_buffer = http.read(read_length);
+              ipp = http.processResponse();
+            }
+            state++;
+            break;
+
+          case REQ_STATE_DONE:
+            //
+            //  success.
+            //
+            http.conn.close();
+            http = null;
+            return(true);
         }
-        catch (IOException e)
-        {
-          throw(e);
-        }        
       }
-
-      //
-      //  Send the HTTP header.
-      //
-      http.writeHeader( http.path, ipp.sizeInBytes() );
-      switch( http.status )
-      {
-        case IPPHttp.HTTP_FORBIDDEN:
-        case IPPHttp.HTTP_NOT_FOUND:
-        case IPPHttp.HTTP_BAD_REQUEST:
-        case IPPHttp.HTTP_UNAUTHORIZED:
-        case IPPHttp.HTTP_METHOD_NOT_ALLOWED:
-        case IPPHttp.HTTP_PAYMENT_REQUIRED:
-        case IPPHttp.HTTP_UPGRADE_REQUIRED:
-                     break;
-
-        case IPPHttp.HTTP_ERROR:
-                     break;
-
-        case IPPHttp.HTTP_OK:  
-                     break;
-      }
-
-      //
-      //  Send the request header.
-      //
-      byte[] header = new byte[8];
-      header[0] = (byte)1; 
-      header[1] = (byte)1; 
-      header[2] = (byte)((ipp.request.operation_id & 0xff00) >> 8);
-      header[3] = (byte)(ipp.request.operation_id & 0xff);
-      header[4] = (byte)((ipp.request.request_id & 0xff000000) >> 24);
-      header[5] = (byte)((ipp.request.request_id & 0xff0000) >> 16);
-      header[6] = (byte)((ipp.request.request_id & 0xff00) >> 8);
-      header[7] = (byte)(ipp.request.request_id & 0xff);
-      http.write( header );
-
-      //
-      //  Send the attributes list.
-      //
-      byte[] bytes;
-      int    sz;
-      int    last_group = -1;
-      for (int i=0; i < ipp.attrs.size(); i++)
-      {
-        attr = (IPPAttribute)ipp.attrs.get(i);
-        sz    = attr.sizeInBytes(last_group);
-        bytes = attr.getBytes(sz,last_group);
-        last_group = attr.group_tag;
-        http.write(bytes);
-      }
-
-      //
-      //  Send the end of attributes tag.
-      //
-      byte[] footer = new byte[1];
-      footer[0] = (byte)IPPDefs.TAG_END; 
-      http.write( footer );
-
-      //  ------------------------------------------
-      //
-      //   Now read back response
-      //
-
-      int read_length;
-
-      read_length = http.read_header();
-      if (read_length > 0)
-      {
-        http.read_buffer = http.read(read_length);
-        http.conn.close();
-        ipp = http.processResponse();
-
-        return( true );
-      }
-
-      return( false );
 
     }  // End of doRequest
 
@@ -431,7 +499,7 @@ public class Cups
         try
         {
           if (user.length() > 0 && passwd.length() > 0)
-            http = new IPPHttp(url_str, user, passwd );
+            http = new IPPHttp(url_str, "basic", user, passwd );
           else
             http = new IPPHttp(url_str);
         }
@@ -553,14 +621,8 @@ public class Cups
 	     };
 
 
-      //
-      //  Create a new IPP request if needed.
-      //
-      if (ipp == null)
-      {
-        ipp = new IPP();
-        ipp.request = new IPPRequest( 1, (short)IPPDefs.GET_JOBS );
-      }
+      ipp = new IPP();
+      ipp.request = new IPPRequest( 1, (short)IPPDefs.GET_JOBS );
 
       a = new IPPAttribute( IPPDefs.TAG_OPERATION, IPPDefs.TAG_CHARSET,
                             "attributes-charset" );
@@ -631,7 +693,7 @@ public class Cups
       //
       //  Do the request and process the response.
       //
-      if (doRequest())
+      if (doRequest("cupsGetJobs"))
       {
 
 
@@ -738,13 +800,7 @@ public class Cups
 
       IPPAttribute a;
 
-      //
-      //  Create a new IPP request if needed.
-      //
-      if (ipp == null)
-      {
-        ipp = new IPP();
-      }
+      ipp = new IPP();
 
       //
       //  Fill in the required attributes
@@ -763,7 +819,7 @@ public class Cups
       ipp.addAttribute(a);
             
 
-      if (doRequest())
+      if (doRequest("cupsGetPrinters"))
       {
         int num_printers = 0;
         for (int i=0; i < ipp.attrs.size(); i++)
@@ -821,14 +877,8 @@ public class Cups
 
       IPPAttribute a;
 
-      //
-      //  Create a new IPP request if needed.
-      //
-      if (ipp == null)
-      {
-        ipp = new IPP();
-      }
 
+      ipp = new IPP();
       //
       //  Fill in the required attributes
       //
@@ -846,7 +896,7 @@ public class Cups
       ipp.addAttribute(a);
             
 
-      if (doRequest())
+      if (doRequest("cupsGetDefault"))
       {
         if ((ipp == null) || (ipp.attrs == null))
           return(null);
@@ -891,34 +941,7 @@ public class Cups
 
       IPPAttribute a;
 
-      //
-      //  Create a new IPP request if needed.
-      //
-      if (ipp == null)
-      {
-        ipp = new IPP();
-      }
-
-      //
-      //  Connect if needed.
-      //
-      if (http == null)
-      {
-        String url_str = site + "/printers/" + printer_name;
-
-        try
-        {
-          if (user.length() > 0 && passwd.length() > 0)
-            http = new IPPHttp(url_str,user,passwd);
-          else
-            http = new IPPHttp(url_str);
-        }
-        catch (IOException e)
-        {
-          throw(e);
-        }        
-      }
-
+      ipp = new IPP();
 
       //
       //  Fill in the required attributes
@@ -941,10 +964,10 @@ public class Cups
       a.addString( "", site + "/printers/" + printer_name );  
       ipp.addAttribute(a);
 
-      if (doRequest())
+      if (doRequest("cupsGetPrinterAttributes"))
       {
         return(ipp.attrs);
-      }  // if doRequest ...
+      }  
 
       return(null);
 
@@ -990,14 +1013,8 @@ public class Cups
         return(null);
       }
 
-      //
-      //  Create a new IPP request if needed.
-      //
-      if (ipp == null)
-      {
-        ipp = new IPP();
-      }
 
+      ipp = new IPP();
       //
       //  Fill in the required attributes
       //
@@ -1082,13 +1099,7 @@ public class Cups
 
       IPPAttribute a;
 
-      //
-      //  Create a new IPP request if needed.
-      //
-      if (ipp == null)
-      {
-        ipp = new IPP();
-      }
+      ipp = new IPP();
 
       //
       //  Fill in the required attributes
@@ -1124,7 +1135,7 @@ public class Cups
       a.addString( "", p_user_name );  
       ipp.addAttribute(a);
 
-      if (doRequest())
+      if (doRequest("cupsCancelJob"))
       {
         for (int i=0; i < ipp.attrs.size(); i++)
         {
@@ -1148,13 +1159,7 @@ public class Cups
       IPPAttribute a;
       String       p_uri;
 
-      //
-      //  Create a new IPP request if needed.
-      //
-      if (ipp == null)
-      {
-        ipp = new IPP();
-      }
+      ipp = new IPP();
 
       //
       //  Fill in the required attributes
@@ -1180,10 +1185,10 @@ public class Cups
       ipp.addAttribute(a);
             
 
-      if (doRequest())
+      if (doRequest("cupsGetPrinterStatus"))
       {
         return(ipp.attrs);
-      }  // if doRequest ...
+      } 
       return(null);
   }
 

@@ -59,8 +59,8 @@ public class GLPprinters implements ActionListener
           cups = new Cups(u);
 
           // If authorization is required ....
-          // cups.setUser(GLPvars.cupsUser);
-          // cups.setPasswd(GLPvars.cupsPasswd);
+          cups.setUser(GLPvars.cupsUser);
+          cups.setPasswd(GLPvars.cupsPasswd);
 
           printer_names = cups.cupsGetPrinters();
           if (printer_names != null)
@@ -96,13 +96,14 @@ public class GLPprinters implements ActionListener
             cups = new Cups(u);
 
             // If authorization is required ....
-            // cups.setUser(GLPvars.cupsUser);
-            // cups.setPasswd(GLPvars.cupsPasswd);
+            cups.setUser(GLPvars.cupsUser);
+            cups.setPasswd(GLPvars.cupsPasswd);
 
             printers[i] = new CupsPrinter( cups, printer_names[i] );
           }
           catch (IOException e)
           {
+            // System.out.println("GLPprinters: IOException");
             // return(null);
           }
         }

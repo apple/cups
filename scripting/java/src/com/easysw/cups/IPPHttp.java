@@ -38,6 +38,7 @@ package com.easysw.cups;
 import java.io.*;
 import java.util.*;
 import java.net.*;
+import java.security.*;
 
 public class IPPHttp
 {
@@ -253,6 +254,16 @@ public class IPPHttp
   public String               user;           // User name
   public String               passwd;         // Password
 
+  public String               auth_type;      // none, basic, digest
+  public String               realm;          // For digest auth
+  public String               opaque;         // For digest auth
+  public String               nonce;          // For digest auth
+  public String               resource;       // For digest auth
+  public String               method;         // For digest auth
+
+  public String               http_request;  
+  public int                  http_content_length;
+
 
 
   /**
@@ -274,6 +285,12 @@ public class IPPHttp
     user        = "";
     passwd      = "";
 
+    auth_type   = "";
+    realm       = "";
+    nonce       = "";
+    resource    = "";
+    method      = "";
+
     try
     {
       //
@@ -289,7 +306,7 @@ public class IPPHttp
       //  Open the socket and set the options.
       //
       conn     = new Socket(hostname, port);
-      conn.setSoTimeout(200);
+      conn.setSoTimeout(100);
 
       //
       //  Create the input and output streams.
@@ -314,22 +331,30 @@ public class IPPHttp
    *  Constructor using <code>URL, user and pass</code>.
    *
    *  @param	request_url	<code>URL</code> of server to connect to.
+   *  @param	p_auth_type     <code>String</code> basic or digest.
    *  @param	p_user		<code>String</code> User name.
    *  @param	p_passwd	<code>String</code> password.
    *  @throw	IOException
    *  @throw	UnknownHostException
    */
-  public IPPHttp( String request_url, String p_user, String p_passwd )
+  public IPPHttp( String request_url, String p_auth_type,
+                  String p_user,      String p_passwd )
         throws IOException, UnknownHostException
   {
-
     encrypted   = false;
     status      = HTTP_OK;
     status_text = "";
     version     = "1.0";
     connected   = false;
+
     user        = p_user;
     passwd      = p_passwd;
+    auth_type   = p_auth_type;
+
+    realm       = "";
+    nonce       = "";
+    resource    = "";
+    method      = "";
 
     try
     {
@@ -346,7 +371,7 @@ public class IPPHttp
       //  Open the socket and set the options.
       //
       conn     = new Socket(hostname, port);
-      conn.setSoTimeout(200);
+      conn.setSoTimeout(100);
 
       //
       //  Create the input and output streams.
@@ -436,18 +461,25 @@ public class IPPHttp
    * @param	content_length	<code>int</code> - size of the total request.
    * @throw	IOException
    */
-  public void writeHeader(String request, int content_length )
+  public int writeHeader(String request, int content_length )
         throws IOException
   {
+
+    http_request        = request;
+    http_content_length = content_length;
+
     try
     {
       String s1 = "POST " + request + " HTTP/1.0\r\n";
-
       os.write(s1.getBytes(), 0, s1.length());
+
       s1 = "Content-type: application/ipp\r\n";
       os.write(s1.getBytes(), 0, s1.length());
 
-      if (user.length() > 0 && passwd.length() > 0)
+      //
+      //  Do basic style authorization if needed.
+      //
+      if (auth_type.compareTo("basic") == 0)
       {
         s1 = user + ":" + passwd;
         IPPBase64Encoder encoder = new IPPBase64Encoder();
@@ -455,20 +487,177 @@ public class IPPHttp
         s1 = "Authorization: Basic " + auth_string + "\r\n";
         os.write(s1.getBytes(), 0, s1.length());
       }
+      else if (auth_type.compareTo("digest") == 0)
+      {
+        try
+        {
+            IPPMD5 md5 = IPPMD5.getInstance();
+            String auth_string = md5.MD5Digest(user, passwd, realm,
+                                             "POST", path, nonce );
+            s1 = "Authorization: Digest " + "username=\"" + user + "\", " +
+                 "realm=\"" + realm + "\", " +
+                 "nonce=\"" + nonce + "\", " +
+                 "response=\"" + auth_string + "\"\r\n";
+
+            os.write(s1.getBytes(), 0, s1.length());
+        }
+        catch(NoSuchAlgorithmException e)
+        {
+            System.out.println("No such algorithm: MD5.");
+        }
+      }
 
       s1 = "Content-length: " + content_length + "\r\n\r\n";
       os.write(s1.getBytes(), 0, s1.length());
       os.flush();
+
     }
     catch(IOException ioexception)
     {
       error = HTTP_ERROR;
       throw ioexception;
     }
+
+
+    try
+    {
+      int          local_status = 0;
+
+      //
+      //  Check for any response.
+      //
+      if (is.available() > 0)
+      {
+        StringBuffer http_version = new StringBuffer(32);
+        StringBuffer http_status  = new StringBuffer(32);
+        StringBuffer http_text    = new StringBuffer(256);
+
+        String read_buffer;
+        status = 0;
+        is.mark(8192);
+        while (is.available() > 0)
+        {
+          read_buffer = read_line();
+
+          if (read_buffer.startsWith("HTTP/"))
+          {
+            int i,n;
+            String s2 = read_buffer.substring(5);
+
+
+            for (i=0;(i < s2.length() && s2.charAt(i) != ' '); i++)
+            {
+              http_version.append(s2.charAt(i));
+            }
+            while (i < s2.length() && s2.charAt(i) == ' ')
+              i++;
+            for (;(i < s2.length() && s2.charAt(i) != '\n' && 
+                 s2.charAt(i) != '\r' && s2.charAt(i) != ' '); i++)
+            {
+              http_status.append(s2.charAt(i));
+            }
+
+            while (i < s2.length() && s2.charAt(i) == ' ')
+              i++;
+            for (n=0;(n < 256 && i < s2.length() && s2.charAt(i) != '\n' && 
+                 s2.charAt(i) != '\r' && s2.charAt(i) != ' '); i++)
+            {
+              http_text.append(s2.charAt(i));
+            }
+            local_status      = Integer.parseInt(http_status.toString(), 10);
+          }
+        }
+        is.reset();
+      }
+
+      //
+      //  See if we need to reconnect and send authorization.
+      //
+      switch( local_status )
+      {
+        //
+        //  Not authorized.
+        //
+        case HTTP_UNAUTHORIZED: read_header();
+                  return( local_status );
+      }
+    }
+    catch(IOException ioexception)
+    {
+      error = HTTP_ERROR;
+      throw ioexception;
+    }
+    return(0);
   }
 
 
+  public int checkForResponse()
+  {
+    //
+    //  Check for any response.
+    //
+    try
+    {
+      if (is.available() > 0)
+      {
+        StringBuffer http_version = new StringBuffer(32);
+        StringBuffer http_status  = new StringBuffer(32);
+        StringBuffer http_text    = new StringBuffer(256);
+        int          local_status = 0;
+        String       read_buffer;
 
+        status = 0;
+        is.mark(8192);
+        while (is.available() > 0)
+        {
+          read_buffer = read_line();
+          if (read_buffer.startsWith("HTTP/"))
+          {
+            int i,n;
+            String s2 = read_buffer.substring(5);
+            for (i=0;(i < s2.length() && s2.charAt(i) != ' '); i++)
+            {
+              http_version.append(s2.charAt(i));
+            }
+            while (i < s2.length() && s2.charAt(i) == ' ')
+              i++;
+            for (;(i < s2.length() && s2.charAt(i) != '\n' && 
+                 s2.charAt(i) != '\r' && s2.charAt(i) != ' '); i++)
+            {
+              http_status.append(s2.charAt(i));
+            }
+
+            while (i < s2.length() && s2.charAt(i) == ' ')
+              i++;
+            for (n=0;(n < 256 && i < s2.length() && s2.charAt(i) != '\n' && 
+                 s2.charAt(i) != '\r' && s2.charAt(i) != ' '); i++)
+            {
+              http_text.append(s2.charAt(i));
+            }
+            local_status      = Integer.parseInt(http_status.toString(), 10);
+          }
+        }
+        is.reset();
+
+        //
+        //  See if we need to reconnect and send authorization.
+        //
+        switch( local_status )
+        {
+          //
+          //  Not authorized.
+          //
+          case HTTP_UNAUTHORIZED: read_header();
+                    return( local_status );
+        }
+      } 
+    }
+    catch (IOException e)
+    {
+      return(HTTP_ERROR);
+    }
+    return(0);
+  }
 
 
   /**
@@ -491,6 +680,13 @@ public class IPPHttp
       throw ioexception;
     }
   }
+
+
+
+
+
+
+
 
 
 
@@ -542,6 +738,17 @@ public class IPPHttp
           version     = http_version.toString();
           status      = Integer.parseInt(http_status.toString(), 10);
           status_text = http_text.toString();
+        }
+        else if (read_buffer.startsWith("WWW-Authenticate: Basic"))
+        {
+          String s2=read_buffer.substring("WWW-Authenticate: Basic".length());
+          auth_type = "basic";
+        }
+        else if (read_buffer.startsWith("WWW-Authenticate: Digest"))
+        {
+          String s2=read_buffer.substring("WWW-Authenticate: Digest".length());
+          auth_type = "digest";
+          parseAuthenticate(s2);
         }
         else if (read_buffer.startsWith("Content-Length:"))
         {
@@ -1004,6 +1211,109 @@ public class IPPHttp
     }
   }
   return (ipp);
+}
+
+
+
+//
+//  Parse a WWW-Authenticate: Digest request
+//
+public void parseAuthenticate( String p_auth )
+{
+  String        tmp;
+  StringBuffer	val;
+  int           i,n;
+
+  tmp = p_auth;
+  while (tmp.length() > 0)
+  {
+    i = 0;
+    while (tmp.length() > 0 && (tmp.charAt(i) == ' ' || tmp.charAt(i) == '"'))
+      tmp = tmp.substring(1); 
+    i = 0;
+
+    if (tmp.startsWith("realm="))
+    {
+      i = "realm=".length();
+      tmp = tmp.substring(i);
+      i = 0;
+      while ((i < tmp.length()) && 
+             (tmp.charAt(i) == ' ' || 
+              tmp.charAt(i) == '"' || 
+              tmp.charAt(i) == '='))
+      {
+        i++;
+      }
+      val = new StringBuffer(1024);
+      while (i < tmp.length() && tmp.charAt(i) != '"')
+        val.append(tmp.charAt(i++));
+      realm = val.toString();
+      tmp = tmp.substring(i);
+    }
+    else if (tmp.startsWith("nonce="))
+    {
+      i = "nonce=".length();
+      tmp = tmp.substring(i);
+      i = 0;
+      while ((i < tmp.length()) && 
+             (tmp.charAt(i) == ' ' || 
+              tmp.charAt(i) == '"' || 
+              tmp.charAt(i) == '='))
+      {
+        i++;
+      }
+      val = new StringBuffer(1024);
+      while (i < tmp.length() && tmp.charAt(i) != '"')
+        val.append(tmp.charAt(i++));
+      nonce = val.toString();
+      tmp = tmp.substring(i);
+    }
+    else if (tmp.startsWith("opaque="))
+    {
+      i = "opaque=".length();
+      tmp = tmp.substring(i);
+      i = 0;
+      while ((i < tmp.length()) && 
+             (tmp.charAt(i) == ' ' || 
+              tmp.charAt(i) == '"' || 
+              tmp.charAt(i) == '='))
+      {
+        i++;
+      }
+      val = new StringBuffer(1024);
+      while (i < tmp.length() && tmp.charAt(i) != '"')
+        val.append(tmp.charAt(i++));
+      opaque = val.toString();
+      tmp = tmp.substring(i);
+    }
+    else 
+    {
+      StringBuffer name = new StringBuffer(256);
+      while ((i < tmp.length()) && 
+             (tmp.charAt(i) != ' ' || 
+              tmp.charAt(i) != '"' || 
+              tmp.charAt(i) != '='))
+      {
+        name.append(tmp.charAt(i++));
+      }
+     
+      i = name.toString().length();
+      tmp = tmp.substring(i);
+      i = 0;
+      while ((i < tmp.length()) && 
+             (tmp.charAt(i) == ' ' || 
+              tmp.charAt(i) == '"' || 
+              tmp.charAt(i) == '='))
+      {
+        i++;
+      }
+      val = new StringBuffer(1024);
+      while (i < tmp.length() && tmp.charAt(i) != '"')
+        val.append(tmp.charAt(i++));
+      //junk = val.toString();
+      tmp = tmp.substring(i);
+    }
+  }
 }
 
 

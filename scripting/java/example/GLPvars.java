@@ -13,7 +13,7 @@ public class GLPvars
 
     // Current user name and password.
     public    static String       cupsUser       = "root";
-    public    static String       cupsPasswd	 = "";
+    public    static String       cupsPasswd	 = "Frak998";
 
     //  So we can access the tabs from other classes.
     public    static JTabbedPane  mainGLPPanel   = null;

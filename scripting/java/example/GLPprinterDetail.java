@@ -92,12 +92,22 @@ public class GLPprinterDetail
 
 	String imageName = "./images/printer-" + 
                            cp.getStateText() + ".gif";
-	URL iconURL = ClassLoader.getSystemResource(imageName);
-	ImageIcon icon = new ImageIcon(iconURL);
-        JButton printerButton = new JButton( "<html><center><b>" + 
-                                             cp.getPrinterName() + 
-                                             "</b></center></html>",
-                                            icon );
+        JButton printerButton;
+        try
+        {
+	  URL iconURL = ClassLoader.getSystemResource(imageName);
+	  ImageIcon icon = new ImageIcon(iconURL);
+          printerButton = new JButton( "<html><center><b>" + 
+                                       cp.getPrinterName() + 
+                                       "</b></center></html>",
+                                       icon );
+        }
+        catch (NullPointerException e)
+        {
+          printerButton = new JButton( "<html><center><b>" + 
+                                       cp.getPrinterName() + 
+                                       "</b></center></html>");
+        }
 	printerButton.setBorder(BorderFactory.createEmptyBorder(3,3,3,3));
         printerButton.setBackground(GLPcolors.backgroundColor);
         printerButton.setActionCommand( cp.getPrinterName() );

@@ -150,13 +150,39 @@ public class CupsPrinter
    */
   public CupsPrinter(Cups c, String name)
   {
-
     setDefaults();
-
     printer_name = name;
 
-    getStatus(c);
-    getAttributes(c);
+    //
+    //  The trys / reConnect is a hack until I can figure out why
+    //  I'm not getting a 401 error back on the first try.
+    //
+    int trys = 0;
+    while ((!getStatus(c)) && trys++ < 3)
+    {
+       try
+       {
+         c.http.reConnect();
+       }
+       catch (IOException e)
+       {
+         System.out.println("CupsPrinter.getStatus failure # " + trys );
+       }
+    }
+
+    trys = 0;
+    while ((!getAttributes(c)) && trys++ < 3)
+    {
+       try
+       {
+         c.http.reConnect();
+       }
+       catch (IOException e)
+       {
+         System.out.println("CupsPrinter.getStatus failure # " + trys );
+       }
+    }
+
   }
 
 
@@ -245,7 +271,7 @@ public class CupsPrinter
        {
          a = (IPPAttribute)attrs.get(i);
          updateAttribute(a);
-       }  // if doRequest ...
+       }  
        return(true);
      }
      catch (IOException e)
@@ -278,7 +304,7 @@ public class CupsPrinter
        {
          a = (IPPAttribute)attrs.get(i);
          updateAttribute(a);
-       }  // if doRequest ...
+       } 
        return(true);
      }
      catch (IOException e)

@@ -400,14 +400,17 @@ public class GLPoptions implements ActionListener
       
       attrs = buildPrintAttributes();
 
-for (int i=0; i < attrs.length; i++)
-  attrs[i].dump_values();
+      // for (int i=0; i < attrs.length; i++)
+      //   attrs[i].dump_values();
 
       try
       {
         u = new URL("http://" + GLPvars.getServerName() + 
                     ":631/printers/" + printer.getPrinterName() );
         cups = new Cups(u);
+        cups.setUser(GLPvars.cupsUser);
+        cups.setPasswd(GLPvars.cupsPasswd);
+
         job = cups.cupsPrintFile(filename,attrs);
         return(job);
       }
