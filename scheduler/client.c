@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.91.2.25 2002/10/16 22:13:01 mike Exp $"
+ * "$Id: client.c,v 1.91.2.26 2002/10/31 01:59:11 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -493,6 +493,8 @@ ReadClient(client_t *con)	/* I - Client to read from */
 
 
   status = HTTP_CONTINUE;
+
+  LogMessage(L_DEBUG2, "ReadClient() %d", con->http.fd);
 
   switch (con->http.state)
   {
@@ -1580,7 +1582,8 @@ SendError(client_t      *con,	/* I - Connection */
     return (0);
 #endif /* HAVE_LIBSSL */
 
-  if (con->http.version >= HTTP_1_1 && !con->http.keep_alive)
+  if ((con->http.version >= HTTP_1_1 && !con->http.keep_alive) ||
+      (code >= HTTP_BAD_REQUEST && code != HTTP_UPGRADE_REQUIRED))
   {
     if (httpPrintf(HTTP(con), "Connection: close\r\n") < 0)
       return (0);
@@ -2632,5 +2635,5 @@ pipe_command(client_t *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.91.2.25 2002/10/16 22:13:01 mike Exp $".
+ * End of "$Id: client.c,v 1.91.2.26 2002/10/31 01:59:11 mike Exp $".
  */
