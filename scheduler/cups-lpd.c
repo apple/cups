@@ -1,5 +1,5 @@
 /*
- * "$Id: cups-lpd.c,v 1.24.2.16 2004/02/25 20:01:37 mike Exp $"
+ * "$Id: cups-lpd.c,v 1.24.2.17 2004/02/25 21:20:27 mike Exp $"
  *
  *   Line Printer Daemon interface for the Common UNIX Printing System (CUPS).
  *
@@ -282,6 +282,103 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
+ * 'check_printer()' - Check that a printer exists and is accepting jobs.
+ */
+
+int					/* O - Job ID */
+check_printer(const char *name)		/* I - Printer or class name */
+{
+  http_t	*http;			/* Connection to server */
+  ipp_t		*request;		/* IPP request */
+  ipp_t		*response;		/* IPP response */
+  ipp_attribute_t *attr;		/* IPP job-id attribute */
+  char		uri[HTTP_MAX_URI];	/* Printer URI */
+  cups_lang_t	*language;		/* Language to use */
+  int		accepting;		/* printer-is-accepting-jobs value */
+
+
+ /*
+  * Setup a connection and request data...
+  */
+
+  if ((http = httpConnectEncrypt(cupsServer(), ippPort(),
+                                 cupsEncryption())) == NULL)
+  {
+    syslog(LOG_ERR, "Unable to connect to server %s: %s", cupsServer(),
+           strerror(errno));
+    return (0);
+  }
+
+ /*
+  * Build a standard CUPS URI for the printer and fill the standard IPP
+  * attributes...
+  */
+
+  if ((request = ippNew()) == NULL)
+  {
+    syslog(LOG_ERR, "Unable to create request: %s", strerror(errno));
+    httpClose(http);
+    return (0);
+  }
+
+  request->request.op.operation_id = IPP_GET_PRINTER_ATTRIBUTES;
+  request->request.op.request_id   = 1;
+
+  snprintf(uri, sizeof(uri), "ipp://localhost/printers/%s", name);
+
+  language = cupsLangDefault();
+
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
+               "attributes-charset", NULL, cupsLangEncoding(language));
+
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
+               "attributes-natural-language", NULL,
+               language != NULL ? language->language : "C");
+
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
+               NULL, uri);
+
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "requested-attributes",
+               NULL, "printer-is-accepting-jobs");
+
+ /*
+  * Do the request...
+  */
+
+  response = cupsDoRequest(http, request, "/");
+
+  if (response == NULL)
+  {
+    syslog(LOG_ERR, "Unable to check printer status - %s",
+           ippErrorString(cupsLastError()));
+    accepting = 0;
+  }
+  else if (response->request.status.status_code > IPP_OK_CONFLICT)
+  {
+    syslog(LOG_ERR, "Unable to check printer status - %s",
+           ippErrorString(response->request.status.status_code));
+    accepting = 0;
+  }
+  else if ((attr = ippFindAttribute(response, "printer-is-accepting-jobs",
+                                    IPP_TAG_BOOLEAN)) == NULL)
+  {
+    syslog(LOG_ERR, "No job-id attribute found in response from server!");
+    accepting = 0;
+  }
+  else
+    accepting = attr->values[0].boolean;
+
+  if (response != NULL)
+    ippDelete(response);
+
+  httpClose(http);
+  cupsLangFree(language);
+
+  return (accepting);
+}
+
+
+/*
  * 'print_file()' - Print a file to a printer or class.
  */
 
@@ -315,8 +412,6 @@ print_file(const char    *name,		/* I - Printer or class name */
     return (0);
   }
 
-  language = cupsLangDefault();
-
  /*
   * Build a standard CUPS URI for the printer and fill the standard IPP
   * attributes...
@@ -325,6 +420,7 @@ print_file(const char    *name,		/* I - Printer or class name */
   if ((request = ippNew()) == NULL)
   {
     syslog(LOG_ERR, "Unable to create request: %s", strerror(errno));
+    httpClose(http);
     return (0);
   }
 
@@ -332,6 +428,8 @@ print_file(const char    *name,		/* I - Printer or class name */
   request->request.op.request_id   = 1;
 
   snprintf(uri, sizeof(uri), "ipp://localhost/printers/%s", name);
+
+  language = cupsLangDefault();
 
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
                "attributes-charset", NULL, cupsLangEncoding(language));
@@ -366,22 +464,28 @@ print_file(const char    *name,		/* I - Printer or class name */
   response = cupsDoFileRequest(http, request, uri, file);
 
   if (response == NULL)
-    jobid = 0;
-  else if (response->request.status.status_code > IPP_OK_CONFLICT)
-    jobid = 0;
-  else if ((attr = ippFindAttribute(response, "job-id", IPP_TAG_INTEGER)) == NULL)
-    jobid = 0;
-  else
-    jobid = attr->values[0].integer;
-
-  if (jobid)
-    syslog(LOG_INFO, "Print file - job ID = %d", jobid);
-  else if (response)
-    syslog(LOG_ERR, "Unable to print file - %s",
-           ippErrorString(response->request.status.status_code));
-  else
+  {
     syslog(LOG_ERR, "Unable to print file - %s",
            ippErrorString(cupsLastError()));
+    jobid = 0;
+  }
+  else if (response->request.status.status_code > IPP_OK_CONFLICT)
+  {
+    syslog(LOG_ERR, "Unable to print file - %s",
+           ippErrorString(response->request.status.status_code));
+    jobid = 0;
+  }
+  else if ((attr = ippFindAttribute(response, "job-id", IPP_TAG_INTEGER)) == NULL)
+  {
+    syslog(LOG_ERR, "No job-id attribute found in response from server!");
+    jobid = 0;
+  }
+  else
+  {
+    jobid = attr->values[0].integer;
+
+    syslog(LOG_INFO, "Print file - job ID = %d", jobid);
+  }
 
   if (response != NULL)
     ippDelete(response);
@@ -464,6 +568,15 @@ recv_print_job(const char    *dest,	/* I - Destination */
 
       return (1);
     }
+  }
+
+  if (!check_printer(queue))
+  {
+    cupsFreeDests(num_dests, dests);
+
+    putchar(1);
+
+    return (1);
   }
 
   putchar(0);
@@ -1300,5 +1413,5 @@ smart_gets(char *s,	/* I - Pointer to line buffer */
 
 
 /*
- * End of "$Id: cups-lpd.c,v 1.24.2.16 2004/02/25 20:01:37 mike Exp $".
+ * End of "$Id: cups-lpd.c,v 1.24.2.17 2004/02/25 21:20:27 mike Exp $".
  */
