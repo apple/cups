@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-input.c,v 1.13 2002/12/17 18:59:25 swdev Exp $"
+ * "$Id: hpgl-input.c,v 1.14 2003/11/07 21:41:38 mike Exp $"
  *
  *   HP-GL/2 input processing for the Common UNIX Printing System (CUPS).
  *
@@ -103,11 +103,24 @@ ParseCommand(FILE    *fp,	/* I - File to read from */
             }
             break;
 
+        case '%' : /* PJL command? */
+            if (getc(fp) == '-')
+	    {
+	     /*
+	      * Yes, dump everything up to the "ENTER LANGUAGE" line...
+	      */
+
+              while (fgets(buf, sizeof(buf), fp) != NULL)
+	        if (strstr(buf, "ENTER") && strstr(buf, "LANGUAGE"))
+		  break;
+	      break;
+	    }
+
         default : /* HP RTL/PCL control */
             while ((i = getc(fp)) != EOF && !isupper(i));
             break;
       }
-  } while (ch == 0x1b);
+  } while (ch < ' ');
 
   name[0] = ch;
   name[1] = getc(fp);
@@ -230,5 +243,5 @@ FreeParameters(int     num_params,	/* I - Number of parameters */
 
 
 /*
- * End of "$Id: hpgl-input.c,v 1.13 2002/12/17 18:59:25 swdev Exp $".
+ * End of "$Id: hpgl-input.c,v 1.14 2003/11/07 21:41:38 mike Exp $".
  */
