@@ -3,6 +3,8 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.16
 
+	- Implicit classes did not inherit the location or
+	  description from member printers.
 	- The httpGetHostByName() function did not handle
 	  hostnames that started with a number.
 	- Updated the filters to use the %ESPRotation comment
