@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c,v 1.57.2.55 2004/02/25 16:22:01 mike Exp $"
+ * "$Id: main.c,v 1.57.2.56 2004/03/19 13:18:01 mike Exp $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -35,6 +35,7 @@
  *   sigchld_handler()    - Handle 'child' signals from old processes.
  *   sighup_handler()     - Handle 'hangup' signals to reconfigure the scheduler.
  *   sigterm_handler()    - Handle 'terminate' signals that stop the scheduler.
+ *   select_timeout()     - Calculate the select timeout value.
  *   usage()              - Show scheduler usage.
  */
 
@@ -62,6 +63,7 @@ static void	process_children(void);
 static void	sigchld_handler(int sig);
 static void	sighup_handler(int sig);
 static void	sigterm_handler(int sig);
+static long	select_timeout(int fds);
 static void	usage(void);
 
 
@@ -89,6 +91,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   int			i;		/* Looping var */
   char			*opt;		/* Option character */
   int			fg;		/* Run in the foreground */
+  int			fds;		/* Number of ready descriptors select returns */
   fd_set		*input,		/* Input set for select() */
 			*output;	/* Output set for select() */
   client_t		*con;		/* Current client */
@@ -421,12 +424,12 @@ main(int  argc,				/* I - Number of command-line arguments */
   * Loop forever...
   */
 
-  browse_time  = time(NULL);
-  senddoc_time = time(NULL);
-
 #ifdef HAVE_MALLINFO
   mallinfo_time = 0;
 #endif /* HAVE_MALLINFO */
+  browse_time   = time(NULL);
+  senddoc_time  = time(NULL);
+  fds           = 1;
 
   while (!stop_scheduler)
   {
@@ -504,27 +507,10 @@ main(int  argc,				/* I - Number of command-line arguments */
     memcpy(input, InputSet, SetSize);
     memcpy(output, OutputSet, SetSize);
 
-    for (i = NumClients, con = Clients; i > 0; i --, con ++)
-      if (con->http.used > 0)
-        break;
+    timeout.tv_sec  = select_timeout(fds);
+    timeout.tv_usec = 0;
 
-    if (i)
-    {
-      timeout.tv_sec  = 0;
-      timeout.tv_usec = 0;
-    }
-    else
-    {
-     /*
-      * If we have no pending data from a client, see when we really
-      * need to wake up...
-      */
-
-      timeout.tv_sec  = 1;
-      timeout.tv_usec = 0;
-    }
-
-    if ((i = select(MaxFDs, input, output, NULL, &timeout)) < 0)
+    if ((fds = select(MaxFDs, input, output, NULL, &timeout)) < 0)
     {
       char	s[16384],	/* String buffer */
 		*sptr;		/* Pointer into buffer */
@@ -1148,6 +1134,164 @@ sigterm_handler(int sig)		/* I - Signal */
 
 
 /*
+ * 'select_timeout()' - Calculate the select timeout value.
+ *
+ */
+
+static long				/* O - Number of seconds */
+select_timeout(int fds)			/* I - Number of ready descriptors select returned */
+{
+  int			i;		/* Looping var */
+  long			timeout;	/* Timeout for select */
+  time_t		now;		/* Current time */
+  client_t		*con;		/* Client information */
+  printer_t		*p;		/* Printer information */
+  job_t			*job;		/* Job information */
+  const char		*why;		/* Debugging aid */
+
+
+ /*
+  * Check to see if any of the clients have pending data to be
+  * processed; if so, the timeout should be 0...
+  */
+
+  for (i = NumClients, con = Clients; i > 0; i --, con ++)
+    if (con->http.used > 0)
+      return (0);
+
+ /*
+  * If select has been active in the last second (fds != 0) or we have
+  * many resources in use then don't bother trying to optimize the
+  * timeout, just make it 1 second.
+  */
+
+  if (fds || NumClients > 50)
+    return (1);
+
+ /*
+  * Otherwise, check all of the possible events that we need to wake for...
+  */
+
+  now     = time(NULL);
+  timeout = 2147483647;
+  why     = "do nothing";
+
+ /*
+  * Check the activity and close old clients...
+  */
+
+  for (i = NumClients, con = Clients; i > 0; i --, con ++)
+    if ((con->http.activity + Timeout) < timeout)
+    {
+      timeout = con->http.activity + Timeout;
+      why     = "timeout a client connection";
+    }
+
+ /*
+  * Update the browse list as needed...
+  */
+
+  if (Browsing && BrowseProtocols)
+  {
+#ifdef HAVE_LIBSLP
+    if ((BrowseProtocols & BROWSE_SLP) && (BrowseSLPRefresh < timeout))
+    {
+      timeout = BrowseSLPRefresh;
+      why     = "update SLP browsing";
+    }
+#endif /* HAVE_LIBSLP */
+
+    if (BrowseProtocols & BROWSE_CUPS)
+    {
+      for (p = Printers; p != NULL; p = p->next)
+      {
+	if (p->type & CUPS_PRINTER_REMOTE)
+	{
+	  if (p->browse_time + BrowseTimeout < timeout)
+	  {
+	    timeout = p->browse_time + BrowseTimeout;
+	    why     = "browse timeout a printer";
+	  }
+	}
+	else if (!(p->type & CUPS_PRINTER_IMPLICIT))
+	{
+	  if (BrowseInterval && p->browse_time + BrowseInterval < timeout)
+	  {
+	    timeout = p->browse_time + BrowseInterval;
+	    why     = "send browse update";
+	  }
+	}
+      }
+    }
+  }
+
+ /*
+  * Check for any active jobs...
+  */
+
+  if (timeout > (now + 10))
+  {
+    for (job = Jobs; job != NULL; job = job->next)
+      if (job->state->values[0].integer <= IPP_JOB_PROCESSING)
+      {
+	timeout = now + 10;
+	why     = "process active jobs";
+	break;
+      }
+  }
+
+#ifdef HAVE_MALLINFO
+ /*
+  * Log memory usage every minute...
+  */
+
+  if (LogLevel >= L_DEBUG && (mallinfo_time + 60) < timeout)
+  {
+    timeout = mallinfo_time + 60;
+    why     = "display memory usage";
+  }
+#endif /* HAVE_MALLINFO */
+
+ /*
+  * Update the root certificate when needed...
+  */
+
+  if (RootCertDuration && (RootCertTime + RootCertDuration) < timeout)
+  {
+    timeout = RootCertTime + RootCertDuration;
+    why     = "update root certificate";
+  }
+
+ /*
+  * Adjust the timeout as needed...
+  */
+
+  if (timeout != 2147483647)
+  {
+   /*
+    * Adjust from absolute to relative time.  If p->browse_time above
+    * was 0 then we can end up with a negative value here, so check.
+    * We add 1 second to the timeout since events occur after the
+    * timeout expires...
+    */
+
+    timeout = timeout - now + 1;
+
+    if (timeout < 1)
+      timeout = 1;
+  }
+
+ /*
+  * Log and return the timeout value...
+  */
+
+  LogMessage(L_DEBUG2, "select_timeout: %ld seconds to %s", timeout, why);
+
+  return (timeout);
+}
+
+
+/*
  * 'usage()' - Show scheduler usage.
  */
 
@@ -1160,5 +1304,5 @@ usage(void)
 
 
 /*
- * End of "$Id: main.c,v 1.57.2.55 2004/02/25 16:22:01 mike Exp $".
+ * End of "$Id: main.c,v 1.57.2.56 2004/03/19 13:18:01 mike Exp $".
  */

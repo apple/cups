@@ -3,6 +3,9 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.21rc1
 
+	- Added a timeout optimization to the scheduler's main
+	  loop to allow CUPS to sleep more of the time (STR
+	  #629)
 	- The USB backend now retries printing to devices of the
 	  form "usb://make/model" if any USB port shows up as
 	  "busy" (STR #617)
