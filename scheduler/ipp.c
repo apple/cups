@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.119 2001/02/23 01:15:15 mike Exp $"
+ * "$Id: ipp.c,v 1.120 2001/03/01 22:40:17 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -455,7 +455,8 @@ accept_jobs(client_t        *con,	/* I - Client connection */
   printer_t		*printer;	/* Printer data */
 
 
-  DEBUG_printf(("accept_jobs(%08x, %08x)\n", con, uri));
+  LogMessage(L_DEBUG2, "accept_jobs(%d, %s)\n", con->http.fd,
+             uri->values[0].string.text);
 
  /*
   * Was this operation called from the correct URI?
@@ -538,6 +539,9 @@ add_class(client_t        *con,		/* I - Client connection */
   ipp_attribute_t	*attr;		/* Printer attribute */
   int			modify;		/* Non-zero if we just modified */
 
+
+  LogMessage(L_DEBUG2, "add_class(%d, %s)\n", con->http.fd,
+             uri->values[0].string.text);
 
  /*
   * Was this operation called from the correct URI?
@@ -820,6 +824,9 @@ add_file(client_t    *con,		/* I - Connection to client */
   mime_type_t	**filetypes;		/* New filetypes array... */
 
 
+  LogMessage(L_DEBUG2, "add_file(%d, %d, %s/%s)\n", con->http.fd,
+             job->id, filetype->super, filetype->type);
+
  /*
   * Add the file to the job...
   */
@@ -859,6 +866,9 @@ add_job_state_reasons(client_t *con,	/* I - Client connection */
 {
   printer_t	*dest;			/* Destination printer */
 
+
+  LogMessage(L_DEBUG2, "add_job_state_reasons(%d, %d)\n", con->http.fd,
+             job->id);
 
   switch (job->state->values[0].integer)
   {
@@ -945,7 +955,7 @@ add_printer(client_t        *con,	/* I - Client connection */
   int			modify;		/* Non-zero if we are modifying */
 
 
-  LogMessage(L_DEBUG2, "add_printer() %d %s %s", con->http.fd, con->uri,\
+  LogMessage(L_DEBUG2, "add_printer(%d, %s)\n", con->http.fd,
              uri->values[0].string.text);
 
  /*
@@ -1314,6 +1324,9 @@ static void
 add_printer_state_reasons(client_t  *con,	/* I - Client connection */
                           printer_t *p)		/* I - Printer info */
 {
+  LogMessage(L_DEBUG2, "add_printer_state_reasons(%d, %s)\n", con->http.fd,
+             p->name);
+
   switch (p->state)
   {
     case IPP_PRINTER_STOPPED :
@@ -1342,6 +1355,9 @@ add_queued_job_count(client_t  *con,	/* I - Client connection */
   cups_ptype_t	dtype;			/* Destination type */
   int		count;			/* Number of jobs on destination */
 
+
+  LogMessage(L_DEBUG2, "add_queued_job_count(%d, %s)\n", con->http.fd,
+             p->name);
 
   dtype = p->type & CUPS_PRINTER_CLASS;
 
@@ -1376,7 +1392,8 @@ cancel_all_jobs(client_t        *con,	/* I - Client connection */
   int			port;		/* Port portion of URI */
 
 
-  DEBUG_printf(("cancel_all_jobs(%08x, %08x)\n", con, uri));
+  LogMessage(L_DEBUG2, "cancel_all_jobs(%d, %s)\n", con->http.fd,
+             uri->values[0].string.text);
 
  /*
   * Was this operation called from the correct URI?
@@ -1454,7 +1471,8 @@ cancel_job(client_t        *con,	/* I - Client connection */
   job_t			*job;		/* Job information */
 
 
-  DEBUG_printf(("cancel_job(%08x, %08x)\n", con, uri));
+  LogMessage(L_DEBUG2, "cancel_job(%d, %s)\n", con->http.fd,
+             uri->values[0].string.text);
 
  /*
   * Verify that the POST operation was done to a valid URI.
@@ -1582,6 +1600,8 @@ check_quotas(client_t  *con,	/* I - Client connection */
   quota_t	*q;		/* Quota data */
 
 
+  LogMessage(L_DEBUG2, "check_quotas(%d, %s)\n", con->http.fd, p->name);
+
  /*
   * Check input...
   */
@@ -1673,6 +1693,8 @@ copy_attribute(ipp_t           *to,	/* O - Destination request/response */
   int			i;		/* Looping var */
   ipp_attribute_t	*toattr;	/* Destination attribute */
 
+
+  LogMessage(L_DEBUG2, "copy_attribute(%p, %s)\n", to, attr->name);
 
   switch (attr->value_tag)
   {
@@ -1794,7 +1816,7 @@ copy_attrs(ipp_t           *to,		/* I - Destination request */
   ipp_attribute_t	*fromattr;	/* Source attribute */
 
 
-  DEBUG_printf(("copy_attrs(%08x, %08x)\n", to, from));
+  LogMessage(L_DEBUG2, "copy_attrs(%p, %p, %p, %x)\n", to, from, req, group);
 
   if (to == NULL || from == NULL)
     return;
@@ -1822,7 +1844,6 @@ copy_attrs(ipp_t           *to,		/* I - Destination request */
         continue;
     }
 
-    DEBUG_printf(("copy_attrs: copying attribute \'%s\'...\n", fromattr->name));
     copy_attribute(to, fromattr);
   }
 }
@@ -1859,7 +1880,8 @@ create_job(client_t        *con,	/* I - Client connection */
   int			kbytes;		/* Size of print file */
 
 
-  DEBUG_printf(("create_job(%08x, %08x)\n", con, uri));
+  LogMessage(L_DEBUG2, "create_job(%d, %s)\n", con->http.fd,
+             uri->values[0].string.text);
 
  /*
   * Verify that the POST operation was done to a valid URI.
@@ -2116,6 +2138,9 @@ copy_banner(client_t   *con,	/* I - Client connection */
   ipp_attribute_t *attr;	/* Attribute */
 
 
+  LogMessage(L_DEBUG2, "copy_banner(%d, %d, %s)\n", con->http.fd, job->id,
+             name);
+
  /*
   * Find the banner; return if not found or "none"...
   */
@@ -2312,6 +2337,8 @@ copy_file(const char *from,		/* I - Source file */
   char		buffer[8192];		/* Copy buffer */
 
 
+  LogMessage(L_DEBUG2, "copy_file(%s, %s)\n", from, to);
+
 #ifdef HAVE_LIBZ
   if ((src = gzopen(from, "rb")) == NULL)
     return (-1);
@@ -2379,6 +2406,9 @@ delete_printer(client_t        *con,	/* I - Client connection */
   printer_t		*printer;	/* Printer/class */
   char			filename[1024];	/* Script/PPD filename */
 
+
+  LogMessage(L_DEBUG2, "delete_printer(%d, %s)\n", con->http.fd,
+             uri->values[0].string.text);
 
  /*
   * Was this operation called from the correct URI?
@@ -2464,7 +2494,7 @@ delete_printer(client_t        *con,	/* I - Client connection */
 static void
 get_default(client_t *con)		/* I - Client connection */
 {
-  DEBUG_printf(("get_default(%08x)\n", con));
+  LogMessage(L_DEBUG2, "get_default(%d)\n", con->http.fd);
 
   if (DefaultPrinter != NULL)
   {
@@ -2486,6 +2516,8 @@ get_default(client_t *con)		/* I - Client connection */
 static void
 get_devices(client_t *con)		/* I - Client connection */
 {
+  LogMessage(L_DEBUG2, "get_devices(%d)\n", con->http.fd);
+
  /*
   * Copy the device attributes to the response using the requested-attributes
   * attribute that may be provided by the client.
@@ -2528,7 +2560,8 @@ get_jobs(client_t        *con,		/* I - Client connection */
 					/* Job URI... */
 
 
-  DEBUG_printf(("get_jobs(%08x, %08x)\n", con, uri));
+  LogMessage(L_DEBUG2, "get_jobs(%d, %s)\n", con->http.fd,
+             uri->values[0].string.text);
 
  /*
   * Is the destination valid?
@@ -2693,7 +2726,8 @@ get_job_attrs(client_t        *con,		/* I - Client connection */
 					/* Job URI... */
 
 
-  DEBUG_printf(("get_job_attrs(%08x, %08x)\n", con, uri));
+  LogMessage(L_DEBUG2, "get_job_attrs(%d, %s)\n", con->http.fd,
+             uri->values[0].string.text);
 
  /*
   * See if we have a job URI or a printer URI...
@@ -2797,6 +2831,8 @@ get_job_attrs(client_t        *con,		/* I - Client connection */
 static void
 get_ppds(client_t *con)			/* I - Client connection */
 {
+  LogMessage(L_DEBUG2, "get_ppds(%d)\n", con->http.fd);
+
  /*
   * Copy the PPD attributes to the response using the requested-attributes
   * attribute that may be provided by the client.
@@ -2833,8 +2869,7 @@ get_printer_attrs(client_t        *con,	/* I - Client connection */
   time_t		curtime;	/* Current time */
 
 
-  DEBUG_printf(("get_printer_attrs(%08x, %08x)\n", con, uri));
-  LogMessage(L_DEBUG, "get_printer_attrs(%08x, \"%s\")\n", con,
+  LogMessage(L_DEBUG2, "get_printer_attrs(%d, %s)\n", con->http.fd,
              uri->values[0].string.text);
 
  /*
@@ -2912,7 +2947,7 @@ get_printers(client_t *con,		/* I - Client connection */
   char			*location;	/* Location string */
 
 
-  DEBUG_printf(("get_printers(%08x)\n", con));
+  LogMessage(L_DEBUG2, "get_printers(%d, %s)\n", con->http.fd);
 
  /*
   * See if they want to limit the number of printers reported...
@@ -3021,7 +3056,8 @@ hold_job(client_t        *con,	/* I - Client connection */
   job_t			*job;		/* Job information */
 
 
-  DEBUG_printf(("hold_job(%08x, %08x)\n", con, uri));
+  LogMessage(L_DEBUG2, "hold_job(%d, %s)\n", con->http.fd,
+             uri->values[0].string.text);
 
  /*
   * Verify that the POST operation was done to a valid URI.
@@ -3174,7 +3210,8 @@ move_job(client_t        *con,		/* I - Client connection */
   int			port;		/* Port portion of URI */
 
 
-  DEBUG_printf(("move_job(%08x, %08x)\n", con, uri));
+  LogMessage(L_DEBUG2, "move_job(%d, %s)\n", con->http.fd,
+             uri->values[0].string.text);
 
  /*
   * See if we have a job URI or a printer URI...
@@ -3345,7 +3382,8 @@ print_job(client_t        *con,		/* I - Client connection */
   int			kbytes;		/* Size of file */
 
 
-  DEBUG_printf(("print_job(%08x, %08x)\n", con, uri));
+  LogMessage(L_DEBUG2, "print_job(%d, %s)\n", con->http.fd,
+             uri->values[0].string.text);
 
  /*
   * Verify that the POST operation was done to a valid URI.
@@ -3749,7 +3787,8 @@ reject_jobs(client_t        *con,	/* I - Client connection */
   ipp_attribute_t	*attr;		/* printer-state-message text */
 
 
-  DEBUG_printf(("reject_jobs(%08x, %08x)\n", con, uri));
+  LogMessage(L_DEBUG2, "reject_jobs(%d, %s)\n", con->http.fd,
+             uri->values[0].string.text);
 
  /*
   * Was this operation called from the correct URI?
@@ -3843,7 +3882,8 @@ release_job(client_t        *con,	/* I - Client connection */
   job_t			*job;		/* Job information */
 
 
-  DEBUG_printf(("release_job(%08x, %08x)\n", con, uri));
+  LogMessage(L_DEBUG2, "release_job(%d, %s)\n", con->http.fd,
+             uri->values[0].string.text);
 
  /*
   * Verify that the POST operation was done to a valid URI.
@@ -3991,7 +4031,8 @@ restart_job(client_t        *con,	/* I - Client connection */
   job_t			*job;		/* Job information */
 
 
-  DEBUG_printf(("restart_job(%08x, %08x)\n", con, uri));
+  LogMessage(L_DEBUG2, "restart_job(%d, %s)\n", con->http.fd,
+             uri->values[0].string.text);
 
  /*
   * Verify that the POST operation was done to a valid URI.
@@ -4154,7 +4195,8 @@ send_document(client_t        *con,	/* I - Client connection */
   int			kbytes;		/* Size of file */
 
 
-  DEBUG_printf(("send_document(%08x, %08x)\n", con, uri));
+  LogMessage(L_DEBUG2, "send_document(%d, %s)\n", con->http.fd,
+             uri->values[0].string.text);
 
  /*
   * Verify that the POST operation was done to a valid URI.
@@ -4453,9 +4495,9 @@ static void
 send_ipp_error(client_t     *con,	/* I - Client connection */
                ipp_status_t status)	/* I - IPP status code */
 {
-  DEBUG_printf(("send_ipp_error(%08x, %04x)\n", con, status));
+  LogMessage(L_DEBUG2, "send_ipp_error(%d, %x)\n", con->http.fd, status);
 
-  LogMessage(L_DEBUG, "Sending IPP error code %x.", status);
+  LogMessage(L_DEBUG, "Sending error: %s", ippErrorString(status));
 
   con->response->request.status.status_code = status;
 
@@ -4491,7 +4533,8 @@ set_default(client_t        *con,	/* I - Client connection */
   const char		*name;		/* Printer name */
 
 
-  DEBUG_printf(("set_default(%08x, %08x)\n", con, uri));
+  LogMessage(L_DEBUG2, "set_default(%d, %s)\n", con->http.fd,
+             uri->values[0].string.text);
 
  /*
   * Was this operation called from the correct URI?
@@ -4569,7 +4612,8 @@ set_job_attrs(client_t        *con,	/* I - Client connection */
   int			port;		/* Port portion of URI */
 
 
-  DEBUG_printf(("set_job_attrs(%08x, %08x)\n", con, uri));
+  LogMessage(L_DEBUG2, "set_job_attrs(%d, %s)\n", con->http.fd,
+             uri->values[0].string.text);
 
  /*
   * See if we have a job URI or a printer URI...
@@ -4796,7 +4840,8 @@ start_printer(client_t        *con,	/* I - Client connection */
   printer_t		*printer;	/* Printer data */
 
 
-  DEBUG_printf(("start_printer(%08x, %08x)\n", con, uri));
+  LogMessage(L_DEBUG2, "start_printer(%d, %s)\n", con->http.fd,
+             uri->values[0].string.text);
 
  /*
   * Was this operation called from the correct URI?
@@ -4885,7 +4930,8 @@ stop_printer(client_t        *con,	/* I - Client connection */
   ipp_attribute_t	*attr;		/* printer-state-message attribute */
 
 
-  DEBUG_printf(("stop_printer(%08x, %08x)\n", con, uri));
+  LogMessage(L_DEBUG2, "stop_printer(%d, %s)\n", con->http.fd,
+             uri->values[0].string.text);
 
  /*
   * Was this operation called from the correct URI?
@@ -4983,7 +5029,8 @@ validate_job(client_t        *con,	/* I - Client connection */
 					/* Subtype of file */
 
 
-  DEBUG_printf(("validate_job(%08x, %08x)\n", con, uri));
+  LogMessage(L_DEBUG2, "validate_job(%d, %s)\n", con->http.fd,
+             uri->values[0].string.text);
 
  /*
   * Verify that the POST operation was done to a valid URI.
@@ -5082,6 +5129,9 @@ validate_user(client_t   *con,		/* I - Client connection */
   struct group		*group;		/* System group info */
 
 
+  LogMessage(L_DEBUG2, "validate_user(%d, %s, %s, %d)\n", con->http.fd,
+             owner, username, userlen);
+
  /*
   * Validate input...
   */
@@ -5145,5 +5195,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.119 2001/02/23 01:15:15 mike Exp $".
+ * End of "$Id: ipp.c,v 1.120 2001/03/01 22:40:17 mike Exp $".
  */

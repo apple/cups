@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# "$Id: run-stp-tests.sh,v 1.1 2001/03/01 20:40:17 mike Exp $"
+# "$Id: run-stp-tests.sh,v 1.2 2001/03/01 22:40:18 mike Exp $"
 #
 #   Perform the complete set of IPP compliance tests specified in the
 #   CUPS Software Test Plan.
@@ -271,9 +271,9 @@ echo "</PRE>" >>$strfile
 # Format the reports and tell the user where to find them...
 #
 
-echo "Formatting reports...
+echo "Formatting reports..."
 
-cat str-trailer >>$strfile
+cat str-trailer.html >>$strfile
 
 htmlfile=`basename $strfile .shtml`.html
 pdffile=`basename $strfile .shtml`.pdf
@@ -301,5 +301,5 @@ echo "    $pdffile"
 echo ""
 
 #
-# End of "$Id: run-stp-tests.sh,v 1.1 2001/03/01 20:40:17 mike Exp $"
+# End of "$Id: run-stp-tests.sh,v 1.2 2001/03/01 22:40:18 mike Exp $"
 #
