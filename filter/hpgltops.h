@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgltops.h,v 1.12 1999/10/28 21:33:44 mike Exp $"
+ * "$Id: hpgltops.h,v 1.13 1999/11/01 16:53:42 mike Exp $"
  *
  *   HP-GL/2 to PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -67,6 +67,17 @@ typedef struct
 
 
 /*
+ * Pen information...
+ */
+
+typedef struct
+{
+  float	rgb[3];		/* Pen color */
+  float	width;		/* Pen width */
+} pen_t;
+
+
+/*
  * Globals...
  */
 
@@ -98,7 +109,9 @@ VAR font_t	StandardFont,			/* Standard font */
 		AlternateFont;			/* Alternate font */
 VAR float	PenPosition[2]	VALUE2(0.0f, 0.0f),
 						/* Current pen position */
-		PenScaling	VALUE(1.0f);	/* Pen width scaling factor */
+		PenScaling	VALUE(1.0f),	/* Pen width scaling factor */
+		PenWidth	VALUE(1.0f);	/* Default pen width */
+VAR pen_t	Pens[1024];			/* State of each pen */
 VAR int		PenMotion	VALUE(0), 	/* 0 = absolute, 1 = relative */
 		PenNumber	VALUE(1),	/* Current pen number */
 		PenCount	VALUE(8),	/* Number of pens */
@@ -210,10 +223,10 @@ extern void	UL_user_line_type(int num_params, param_t *params);
 extern void	WU_width_units(int num_params, param_t *params);
 
 /* hpgl-prolog.c */
-extern void	OutputProlog(char *title, char *user, int shading, float penwidth);
+extern void	OutputProlog(char *title, char *user, int shading);
 extern void	OutputTrailer(void);
 extern int	Outputf(const char *format, ...);
 
 /*
- * End of "$Id: hpgltops.h,v 1.12 1999/10/28 21:33:44 mike Exp $".
+ * End of "$Id: hpgltops.h,v 1.13 1999/11/01 16:53:42 mike Exp $".
  */

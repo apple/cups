@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-prolog.c,v 1.17 1999/10/28 21:33:44 mike Exp $"
+ * "$Id: hpgl-prolog.c,v 1.18 1999/11/01 16:53:42 mike Exp $"
  *
  *   HP-GL/2 prolog routines for for the Common UNIX Printing System (CUPS).
  *
@@ -44,8 +44,7 @@
 void
 OutputProlog(char  *title,	/* I - Job title */
              char  *user,	/* I - Username */
-             int   shading,	/* I - Type of shading */
-             float penwidth)	/* I - Default pen width */
+             int   shading)	/* I - Type of shading */
 {
   FILE		*prolog;	/* Prolog file */
   char		line[255];	/* Line from prolog file */
@@ -73,7 +72,7 @@ OutputProlog(char  *title,	/* I - Job title */
     puts("%%Orientation: Landscape");
   puts("%%EndComments");
   puts("%%BeginProlog");
-  printf("/DefaultPenWidth %.2f def\n", penwidth * 72.0 / 25.4);
+  printf("/DefaultPenWidth %.2f def\n", PenWidth * 72.0 / 25.4);
   puts("3.0 setmiterlimit");
   if (!shading)			/* Black only */
     puts("/setrgbcolor { pop pop pop } bind def");
@@ -144,7 +143,6 @@ Outputf(const char *format,	/* I - Printf-style string */
 
     printf("%%%%Page: %d %d\n", PageCount, PageCount);
 
-#if 0
     if (PPD != NULL && !FitPlot)
     {
      /*
@@ -262,9 +260,6 @@ Outputf(const char *format,	/* I - Printf-style string */
 	puts("%%EndSetup");
       }
     }
-#else
-    landscape = 0;
-#endif /* 0 */
 
     printf("/PenScaling %.3f def\n", PenScaling);
 
@@ -306,7 +301,15 @@ Outputf(const char *format,	/* I - Printf-style string */
     printf("%d setlinejoin\n", LineJoin);
 
     for (i = 0; i <= PenCount; i ++)
-      printf("/W%d { DefaultPenWidth PenScaling mul setlinewidth } bind def\n", i);
+    {
+      printf("/W%d { %.1f PenScaling mul setlinewidth } bind def\n", i,
+             Pens[i].width);
+
+      printf("/P%d { %.3f %.3f %.3f setrgbcolor } bind def\n",
+             i, Pens[i].rgb[0], Pens[i].rgb[1], Pens[i].rgb[2]);
+    }
+
+    puts("P1 W1");
 
     puts("gsave");
 
@@ -370,5 +373,5 @@ Outputf(const char *format,	/* I - Printf-style string */
 
 
 /*
- * End of "$Id: hpgl-prolog.c,v 1.17 1999/10/28 21:33:44 mike Exp $".
+ * End of "$Id: hpgl-prolog.c,v 1.18 1999/11/01 16:53:42 mike Exp $".
  */

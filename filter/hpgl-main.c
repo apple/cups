@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-main.c,v 1.17 1999/10/28 21:33:44 mike Exp $"
+ * "$Id: hpgl-main.c,v 1.18 1999/11/01 16:53:42 mike Exp $"
  *
  *   HP-GL/2 filter main entry for the Common UNIX Printing System (CUPS).
  *
@@ -136,7 +136,6 @@ main(int  argc,		/* I - Number of command-line arguments */
   cups_option_t	*options;	/* Print options */
   const char	*val;		/* Option value */
   int		shading;	/* -1 = black, 0 = grey, 1 = color */
-  float		penwidth;	/* Default pen width */
 
 
   if (argc < 6 || argc > 7)
@@ -178,7 +177,7 @@ main(int  argc,		/* I - Number of command-line arguments */
   PlotSize[1] = PageLength;
 
   shading  = 1;
-  penwidth = 1.0;
+  PenWidth = 1.0;
 
   if ((val = cupsGetOption("blackplot", num_options, options)) != NULL)
     shading = 0;
@@ -187,13 +186,13 @@ main(int  argc,		/* I - Number of command-line arguments */
     FitPlot = 1;
 
   if ((val = cupsGetOption("penwidth", num_options, options)) != NULL)
-    penwidth = (float)atof(val);
+    PenWidth = (float)atof(val);
 
  /*
   * Write the PostScript prolog and initialize the plotting "engine"...
   */
 
-  OutputProlog(argv[3], argv[2], shading, penwidth);
+  OutputProlog(argv[3], argv[2], shading);
 
   IP_input_absolute(0, NULL);
 
@@ -252,5 +251,5 @@ compare_names(const void *p1,	/* I - First name */
 
 
 /*
- * End of "$Id: hpgl-main.c,v 1.17 1999/10/28 21:33:44 mike Exp $".
+ * End of "$Id: hpgl-main.c,v 1.18 1999/11/01 16:53:42 mike Exp $".
  */

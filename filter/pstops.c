@@ -1,5 +1,5 @@
 /*
- * "$Id: pstops.c,v 1.25 1999/10/29 13:17:30 mike Exp $"
+ * "$Id: pstops.c,v 1.26 1999/11/01 16:53:43 mike Exp $"
  *
  *   PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -130,7 +130,7 @@ main(int  argc,			/* I - Number of command-line arguments */
   * Process command-line options and write the prolog...
   */
 
-  g = 2.2;
+  g = 1.0;
   b = 1.0;
 
   Copies = atoi(argv[4]);
@@ -800,5 +800,5 @@ start_nup(int number)	/* I - Page number */
 
 
 /*
- * End of "$Id: pstops.c,v 1.25 1999/10/29 13:17:30 mike Exp $".
+ * End of "$Id: pstops.c,v 1.26 1999/11/01 16:53:43 mike Exp $".
  */
