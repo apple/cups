@@ -1,7 +1,7 @@
-CHANGES.txt - 09/08/2004
+CHANGES.txt - 09/13/2004
 ------------------------
 
-CHANGES IN CUPS V1.1.21rc3
+CHANGES IN CUPS V1.1.21
 
 	- The scheduler did not separate Digest authentication
 	  parameters with commas (STR #882)

@@ -831,7 +831,7 @@ capability/type bits:
 </TR>
 <TR>
 	<TD>2</TD>
-	<TD>1 = can print B&W</TD>
+	<TD>1 = can print B&amp;W</TD>
 </TR>
 <TR>
 	<TD>3</TD>

@@ -3,7 +3,7 @@
 <HEAD>
 <TITLE>CUPS Interface Design Description</TITLE>
 <META NAME="author" CONTENT="Easy Software Products">
-<META NAME="copyright" CONTENT="Copyright 1997-2003, All Rights Reserved">
+<META NAME="copyright" CONTENT="Copyright 1997-2004, All Rights Reserved">
 <META NAME="docnumber" CONTENT="CUPS-IDD-1.1">
 <META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-8859-1">
 <STYLE TYPE="text/css"><!--
@@ -24,9 +24,9 @@ PRE { font-family: monospace }
 <H1>CUPS Interface Design Description</H1></A><BR>
 CUPS-IDD-1.1<BR>
 Easy Software Products<BR>
-Copyright 1997-2003, All Rights Reserved<BR>
+Copyright 1997-2004, All Rights Reserved<BR>
 </CENTER>
-<HR>
+<HR NOSHADE>
 <H1 ALIGN="CENTER"><A NAME="CONTENTS">Table of Contents</A></H1>
 <BR>
 <BR><B><A HREF="#1">1 Scope</A></B>
@@ -88,7 +88,7 @@ Copyright 1997-2003, All Rights Reserved<BR>
 <LI><A HREF="#6_1">A.1 Terms</A></LI>
 <LI><A HREF="#6_2">A.2 Acronyms</A></LI>
 </UL>
-<HR>
+<HR NOSHADE>
 <H1><A NAME="1">1 Scope</A></H1>
 <H2><A NAME="1_1">1.1 Identification</A></H2>
 <P>This interface design description document provides detailed file
@@ -96,7 +96,7 @@ Copyright 1997-2003, All Rights Reserved<BR>
  Printing System (&quot;CUPS&quot;) Version 1.1.</P>
 <H2><A NAME="1_2">1.2 System Overview</A></H2>
 <P>CUPS provides a portable printing layer for UNIX&reg;-based operating
- systems. It has been developed by<A HREF="http://www.easysw.com"> Easy
+ systems. It has been developed by <A HREF="http://www.easysw.com">Easy
  Software Products</A> to promote a standard printing solution for all
  UNIX vendors and users. CUPS provides the System V and Berkeley
  command-line interfaces.</P>
@@ -366,13 +366,19 @@ Default name/instance option=value option=value ... option=value
  capabilities of each printer and are used by CUPS to support
  printer-specific features and intelligent filtering.</P>
 <H3><A NAME="3_5_1">3.5.1 PPD Specification</A></H3>
-<P>The PPD file format is described in<A HREF="http://partners.adobe.com/asn/developer/PDFS/TN/5003.PPD_Spec_v4.3.pdf">
+<P>The PPD file format is described in <A HREF="http://partners.adobe.com/asn/developer/PDFS/TN/5003.PPD_Spec_v4.3.pdf">
  Adobe TechNote #5003: PostScript Printer Description File Format
  Specification Version 4.3</A>.</P>
 <H3><A NAME="3_5_2">3.5.2 CUPS Extensions to PPD Files</A></H3>
 <P>CUPS adds several new attributes that are described below.</P>
-<H4>3.5.2.1 cupsFilter</H4>
-<P>This string attribute provides a conversion rule of the form:</P>
+<H4>3.5.2.1 cupsFax</H4>
+<P>This optional boolean attributes specifies whether the printer should
+ be treated as a facsimile device, where failed jobs should be retried
+ according to the <TT>FaxRetryInterval</TT> and <TT>FaxRetryLimit</TT>
+ directives in the<VAR> cupsd.conf</VAR> file.</P>
+<H4>3.5.2.2 cupsFilter</H4>
+<P>This optional string attribute provides a conversion rule of the
+ form:</P>
 <UL>
 <PRE>
 source/type cost program
@@ -381,20 +387,20 @@ source/type cost program
 <P>The destination type is assumed to the printer's type. If a printer
  supports the source type directly the special filter program &quot;-&quot; may be
  specified.</P>
-<H4>3.5.2.2 cupsFlipDuplex</H4>
-<P>This boolean attribute notifies the RIP filters that the destination
- printer requires an upside-down image for the back page. The default
- value is false.</P>
-<H4>3.5.2.3 cupsManualCopies</H4>
-<P>This boolean attribute notifies the RIP filters that the destination
- printer does not support copy generation in hardware. The default value
- is false.</P>
-<H4>3.5.2.4 cupsModelNumber</H4>
-<P>This integer attribute specifies a printer-specific model number.
- This number can be used by a filter program to adjust the output for a
- specific model of printer.</P>
-<H4>3.5.2.5 cupsProfile</H4>
-<P>This string attribute specifies a color profile of the form:</P>
+<H4>3.5.2.3 cupsFlipDuplex</H4>
+<P>This optional boolean attribute notifies the RIP filters that the
+ destination printer requires an upside-down image for the back page.
+ The default value is false.</P>
+<H4>3.5.2.4 cupsManualCopies</H4>
+<P>This optional boolean attribute notifies the RIP filters that the
+ destination printer does not support copy generation in hardware. The
+ default value is false.</P>
+<H4>3.5.2.5 cupsModelNumber</H4>
+<P>This optional integer attribute specifies a printer-specific model
+ number. This number can be used by a filter program to adjust the
+ output for a specific model of printer.</P>
+<H4>3.5.2.6 cupsProfile</H4>
+<P>This optional string attribute specifies a color profile of the form:</P>
 <UL>
 <PRE>
 resolution/type density gamma m00 m01 m02 m10 m11 m12 m20 m21 m22
@@ -413,12 +419,12 @@ f(x) = density * x<SUP>gamma</SUP>
 <P>The<I> m00</I> through<I> m22</I> values define a 3x3 transformation
  matrix for the CMY color values. The density function is applied<I>
  after</I> the CMY transformation.</P>
-<H4>3.5.2.6 cupsProtocol</H4>
+<H4>3.5.2.7 cupsProtocol</H4>
 <P>This optional attribute describes which binary communication protocol
  to use when printing binary PostScript data. The strings &quot;None&quot;, &quot;BCP&quot;,
  and &quot;TBCP&quot; are recognized, corresponding to no encoding, BCP, and TBCP
  respectively.</P>
-<H4>3.5.2.7 cupsVersion</H4>
+<H4>3.5.2.8 cupsVersion</H4>
 <P>This required attribute describes which version of the CUPS IDD was
  used for the PPD file extensions. Currently it must be the string &quot;1.0&quot;
  or &quot;1.1&quot;.</P>
@@ -659,7 +665,7 @@ printer-info</CODE>, and <CODE>printer-make-and-model</CODE> attributes.</P>
 <TR><TD>1</TD><TD>0 = local
 <BR> 1 = remote
 <BR> (always 1)</TD></TR>
-<TR><TD>2</TD><TD>1 = can print B</TD></TR>
+<TR><TD>2</TD><TD>1 = can print B&amp;W</TD></TR>
 <TR><TD>3</TD><TD>1 = can print color</TD></TR>
 <TR><TD>4</TD><TD>1 = can duplex</TD></TR>
 <TR><TD>5</TD><TD>1 = can staple</TD></TR>
@@ -673,6 +679,10 @@ printer-info</CODE>, and <CODE>printer-make-and-model</CODE> attributes.</P>
 <TR><TD>13</TD><TD>1 = can print up to 18x24 inches</TD></TR>
 <TR><TD>14</TD><TD>1 = can print up to 36x48 inches</TD></TR>
 <TR><TD>15</TD><TD>1 = can print variable sizes</TD></TR>
+<TR><TD>16</TD><TD>1 = is an implicit class (bit 1 must be 0)</TD></TR>
+<TR><TD>17</TD><TD>1 = is the default printer on the network</TD></TR>
+<TR><TD>18</TD><TD>1 = is a fax device</TD></TR>
+<TR><TD>19</TD><TD>1 = printer is rejecting new jobs</TD></TR>
 </TABLE>
 </CENTER>
 </P>
@@ -862,7 +872,7 @@ printer-info</CODE>, and <CODE>printer-make-and-model</CODE> attributes.</P>
 </P>
 <H2><A NAME="4_4">4.4 CUPS PostScript File</A></H2>
 <P>CUPS PostScript files are device-dependent Adobe PostScript program
- files. The PostScript language is described in the<A HREF="http://partners.adobe.com/asn/developer/PDFS/TN/PLRM.pdf">
+ files. The PostScript language is described in the <A HREF="http://partners.adobe.com/asn/developer/PDFS/TN/PLRM.pdf">
  Adobe PostScript Language Reference Manual, Third Edition</A>.</P>
 <P>The MIME type for CUPS PostScript files is <CODE>
 application/vnd.cups-postscript</CODE>.</P>
@@ -1022,13 +1032,13 @@ application/vnd.cups-raster</CODE>.</P>
 <P>The Internet Printing Protocol and the CUPS extensions to it are
  described in the CUPS Implementation of IPP document.</P>
 <H2><A NAME="4_8">4.8 Line Printer Daemon Protocol</A></H2>
-<P>The Line Printer Daemon (LPD) protocol is described by<A HREF="http://www.ietf.org/rfc/rfc1179.txt">
- RFC 1179: Line Printer Daemon Protocol</A>.</P>
+<P>The Line Printer Daemon (LPD) protocol is described by <A HREF="http://www.ietf.org/rfc/rfc1179.txt">
+RFC 1179: Line Printer Daemon Protocol</A>.</P>
 <P>The URI method name for LPD is &quot;lpd&quot;.</P>
 <H2><A NAME="4_9">4.9 Server Message Block Protocol</A></H2>
 <P>The Server Message Block (SMB) and related Common Internet File
- System (CIFS) protocols are described at<A HREF="http://anu.samba.org/cifs">
- http://anu.samba.org/cifs</A>.</P>
+ System (CIFS) protocols are described at <A HREF="http://anu.samba.org/cifs">
+http://anu.samba.org/cifs</A>.</P>
 <P>The URI method name for SMB is &quot;smb&quot;. Support for this protocol is
  provided via the SAMBA <CODE>smbspool(1)</CODE> program provided with
  SAMBA 2.0.6 and higher.</P>

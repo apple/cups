@@ -1125,7 +1125,7 @@ const char    *val;
  */
 
 options     = NULL;
-num_options = cupsParseOptions(argv[5], 0, &options);
+num_options = cupsParseOptions(argv[5], 0, &amp;options);
 
 if ((val = cupsGetOption("blackplot", num_options, options)) != NULL)
   shading = 0;
@@ -3887,7 +3887,7 @@ char **classes;
 
 ...
 
-num_classes = cupsGetClasses(&classes);
+num_classes = cupsGetClasses(&amp;classes);
 
 ...
 
@@ -4514,7 +4514,7 @@ char **printers;
 
 ...
 
-num_printers = cupsGetPrinters(&printers);
+num_printers = cupsGetPrinters(&amp;printers);
 
 ...
 

@@ -3,8 +3,8 @@
 <HEAD>
 <TITLE>CUPS Software Programmers Manual</TITLE>
 <META NAME="author" CONTENT="Easy Software Products">
-<META NAME="copyright" CONTENT="Copyright 1997-2003, All Rights Reserved">
-<META NAME="docnumber" CONTENT="CUPS-SPM-1.1.20">
+<META NAME="copyright" CONTENT="Copyright 1997-2004, All Rights Reserved">
+<META NAME="docnumber" CONTENT="CUPS-SPM-1.1.21">
 <META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-8859-1">
 <STYLE TYPE="text/css"><!--
 BODY { font-family: serif }
@@ -22,11 +22,11 @@ PRE { font-family: monospace }
 <BODY BGCOLOR="white">
 <CENTER><A HREF="#CONTENTS"><IMG SRC="images/cups-large.gif" BORDER="0" WIDTH="431" HEIGHT="511"><BR>
 <H1>CUPS Software Programmers Manual</H1></A><BR>
-CUPS-SPM-1.1.20<BR>
+CUPS-SPM-1.1.21<BR>
 Easy Software Products<BR>
-Copyright 1997-2003, All Rights Reserved<BR>
+Copyright 1997-2004, All Rights Reserved<BR>
 </CENTER>
-<HR>
+<HR NOSHADE>
 <H1 ALIGN="CENTER"><A NAME="CONTENTS">Table of Contents</A></H1>
 <BR>
 <BR><B><A HREF="#1">Preface</A></B>
@@ -1368,11 +1368,11 @@ Copyright 1997-2003, All Rights Reserved<BR>
 <LI><A HREF="#10_131_6">See Also</A></LI>
 </UL>
 </UL>
-<HR>
+<HR NOSHADE>
 <H1 ALIGN="RIGHT"><A NAME="1">Preface</A></H1>
 <P>This software programmers manual provides software programming
  information for the Common UNIX Printing System (&quot;CUPS&quot;) Version
- 1.1.20.</P>
+ 1.1.21.</P>
 <H2><A NAME="1_1">System Overview</A></H2>
 <P>CUPS provides a portable printing layer for UNIX&reg;-based operating
  systems. It has been developed by <A HREF="http://www.easysw.com">Easy
@@ -1846,10 +1846,10 @@ cupsFreeOptions(num_options, options);
 <H3><A NAME="3_2_8">Getting Errors</A></H3>
 <P>If any of the CUPS API printing functions returns an error, the
  reason for that error can be found by calling <CODE>cupsLastError()</CODE>
- and <CODE>cupsErrorString()</CODE>. <CODE>cupsLastError()</CODE>
- returns the last IPP error code that was encountered. <CODE>
-cupsErrorString()</CODE> converts the error code to a localized message
- string suitable for presentation to the user:</P>
+ and <CODE>ippErrorString()</CODE>. <CODE>cupsLastError()</CODE> returns
+ the last IPP error code that was encountered. <CODE>ippErrorString()</CODE>
+ converts the error code to a localized message string suitable for
+ presentation to the user:</P>
 <UL>
 <PRE>
 #include &lt;cups/cups.h&gt;
@@ -1861,7 +1861,7 @@ int jobid;
 ...
 
 if (jobid == 0)
-  puts(cupsErrorString(cupsLastError()));
+  puts(ippErrorString(cupsLastError()));
 </PRE>
 </UL>
 <H3><A NAME="3_2_9">Passwords and Authentication</A></H3>
@@ -2375,7 +2375,7 @@ const char    *val;
  */
 
 options     = NULL;
-num_options = cupsParseOptions(argv[5], 0, 
+num_options = cupsParseOptions(argv[5], 0, &amp;options);
 
 if ((val = cupsGetOption(&quot;blackplot&quot;, num_options, options)) != NULL)
   shading = 0;
@@ -2720,7 +2720,7 @@ return (0);
  (IRIX), and in some cases by trying to open the ports to see if they
  actually exist.</P>
 <P>Once it finds a serial port it writes a single line for each port to
- the standard error file. Each line looks like this:</P>
+ the standard output file. Each line looks like this:</P>
 <UL>
 <PRE>
 serial serial:/dev/ttyS0?baud=115200 &quot;Unknown&quot; &quot;Serial Port 1&quot;
@@ -2810,9 +2810,9 @@ while (nbytes &gt; 0)
 <H1 ALIGN="RIGHT"><A NAME="LICENSE">A - Software License Agreement</A></H1>
 <H2 ALIGN="CENTER"><A NAME="7_1">Common UNIX Printing System License
  Agreement</A></H2>
-<P ALIGN="CENTER">Copyright 1997-2003 by Easy Software Products
+<P ALIGN="CENTER">Copyright 1997-2004 by Easy Software Products
 <BR> 44141 AIRPORT VIEW DR STE 204
-<BR> HOLLYWOOD, MARYLAND 20636-3111 USA
+<BR> HOLLYWOOD, MARYLAND 20636-3142 USA
 <BR>
 <BR> Voice: +1.301.373.9600
 <BR> Email: <A HREF="mailto:cups-info@cups.org">cups-info@cups.org</A>
@@ -2891,8 +2891,8 @@ while (nbytes &gt; 0)
  work.</P>
 <H3><A NAME="7_1_3">Trademarks</A></H3>
 <P>Easy Software Products has trademarked the Common UNIX Printing
- System, CUPS, and CUPS logo. These names and logos may be used freely
- in any direct port or binary distribution of CUPS. Please contract Easy
+ System, CUPS, and CUPS logo. You may use these names and logos in any
+ direct port or binary distribution of CUPS. Please contact Easy
  Software Products for written permission to use them in derivative
  products. Our intention is to protect the value of these trademarks and
  ensure that any derivative product meets the same high-quality
@@ -4377,7 +4377,6 @@ num_options = cupsAddOption(&quot;resolution&quot;, &quot;300dpi&quot;, num_opti
 cupsGetOption()</CODE></A>, <A HREF="#cupsParseOptions"><CODE>
 cupsParseOptions()</CODE></A>
 <!-- NEW PAGE -->
-
 <H2><A NAME="cupsCancelJob">cupsCancelJob()</A></H2>
 <H3><A NAME="10_3_1">Usage</A></H3>
 <PRE>
@@ -4487,7 +4486,6 @@ while (status == HTTP_UNAUTHORIZED);
 <CODE>cupsSetPasswordCB()</CODE></A>, <A HREF="#cupsSetUser"><CODE>
 cupsSetUser()</CODE></A>, <A HREF="#cupsUser"><CODE>cupsUser()</CODE></A>
 <!-- NEW PAGE -->
-
 </P>
 <H2><A NAME="cupsDoFileRequest">cupsDoFileRequest()</A></H2>
 <H3><A NAME="10_5_1">Usage</A></H3>
@@ -4843,7 +4841,7 @@ char **classes;
 
 ...
 
-num_classes = cupsGetClasses(
+num_classes = cupsGetClasses(&amp;classes);
 
 ...
 
@@ -5277,7 +5275,7 @@ char **printers;
 
 ...
 
-num_printers = cupsGetPrinters(
+num_printers = cupsGetPrinters(&amp;printers);
 
 ...
 
@@ -6216,7 +6214,6 @@ password = cupsGetPassword(&quot;Please enter a password:&quot;);
 <CODE>cupsSetServer()</CODE></A>, <A HREF="#cupsSetUser"><CODE>
 cupsSetUser()</CODE></A>, <A HREF="#cupsUser"><CODE>cupsUser()</CODE></A>
 <!-- NEW PAGE -->
-
 </P>
 <H2><A NAME="cupsSetServer">cupsSetServer()</A></H2>
 <H3><A NAME="10_46_1">Usage</A></H3>
@@ -6246,7 +6243,6 @@ cupsSetServer(&quot;foo.bar.com&quot;);
 <CODE>cupsSetPasswordCB()</CODE></A>, <A HREF="#cupsSetUser"><CODE>
 cupsSetUser()</CODE></A>, <A HREF="#cupsUser"><CODE>cupsUser()</CODE></A>
 <!-- NEW PAGE -->
-
 </P>
 <H2><A NAME="cupsSetUser">cupsSetUser()</A></H2>
 <H3><A NAME="10_47_1">Usage</A></H3>
@@ -6279,7 +6275,6 @@ cupsSetUser(&quot;root&quot;);
 <CODE>cupsSetPasswordCB()</CODE></A>, <A HREF="#cupsSetServer"><CODE>
 cupsSetServer()</CODE></A>, <A HREF="#cupsUser"><CODE>cupsUser()</CODE></A>
 <!-- NEW PAGE -->
-
 </P>
 <H2><A NAME="cupsTempFd">cupsTempFd()</A></H2>
 <H3><A NAME="10_48_1">Usage</A></H3>
@@ -6411,7 +6406,6 @@ httpBlocking(http, 0);
  <A HREF="#httpCheck"><CODE>httpCheck()</CODE></A>, <A HREF="#httpConnect">
 <CODE>httpConnect()</CODE></A>
 <!-- NEW PAGE -->
-
 <H2><A NAME="httpCheck">httpCheck()</A></H2>
 <H3><A NAME="10_52_1">Usage</A></H3>
 <PRE>
@@ -6446,7 +6440,6 @@ if (httpCheck(http))
 <CODE>httpConnect()</CODE></A>, <A HREF="#httpGets"><CODE>httpGets()</CODE>
 </A>, <A HREF="#httpRead"><CODE>httpRead()</CODE></A>
 <!-- NEW PAGE -->
-
 <H2><A NAME="httpClearFields">httpClearFields()</A></H2>
 <H3><A NAME="10_53_1">Usage</A></H3>
 <PRE>
@@ -6476,7 +6469,6 @@ httpClearFields(http);
 <CODE>httpGetField()</CODE></A>, <A HREF="#httpSetField"><CODE>
 httpSetField()</CODE></A>
 <!-- NEW PAGE -->
-
 <H2><A NAME="httpClose">httpClose()</A></H2>
 <H3><A NAME="10_54_1">Usage</A></H3>
 <PRE>
@@ -6504,7 +6496,6 @@ httpClose(http);
 <H3><A NAME="10_54_5">See Also</A></H3>
  <A HREF="#httpConnect"><CODE>httpConnect()</CODE></A>
 <!-- NEW PAGE -->
-
 <H2><A NAME="httpConnect">httpConnect()</A></H2>
 <H3><A NAME="10_55_1">Usage</A></H3>
 <PRE>
@@ -6542,7 +6533,6 @@ httpGet()</CODE></A>, <A HREF="#httpGets"><CODE>httpGets()</CODE></A>, <A
 HREF="#httpPost"><CODE>httpPost()</CODE></A>, <A HREF="#httpRead"><CODE>
 httpRead()</CODE></A>, <A HREF="#httpWrite"><CODE>httpWrite()</CODE></A>
 <!-- NEW PAGE -->
-
 <H2><A NAME="httpConnectEncrypt">httpConnectEncrypt()</A></H2>
 <H3><A NAME="10_56_1">Usage</A></H3>
 <PRE>
@@ -6582,7 +6572,6 @@ http = httpConnectEncrypt(cupsServer(), ippPort(), cupsEncryption());
 <CODE>httpPost()</CODE></A>, <A HREF="#httpRead"><CODE>httpRead()</CODE></A>
 , <A HREF="#httpWrite"><CODE>httpWrite()</CODE></A>
 <!-- NEW PAGE -->
-
 <H2><A NAME="httpDecode64">httpDecode64()</A></H2>
 <H3><A NAME="10_57_1">Usage</A></H3>
 <PRE>
@@ -6615,7 +6604,6 @@ httpDecode64(original_string, encoded_string);
 <H3><A NAME="10_57_6">See Also</A></H3>
  <A HREF="#httpEncode64"><CODE>httpEncode64()</CODE></A>
 <!-- NEW PAGE -->
-
 <H2><A NAME="httpDelete">httpDelete()</A></H2>
 <H3><A NAME="10_58_1">Usage</A></H3>
 <PRE>
@@ -6649,7 +6637,6 @@ httpDelete(http, &quot;/some/uri&quot;);
 <CODE>httpSetField()</CODE></A>, <A HREF="#httpUpdate"><CODE>
 httpUpdate()</CODE></A>
 <!-- NEW PAGE -->
-
 <H2><A NAME="httpEncode64">httpEncode64()</A></H2>
 <H3><A NAME="10_59_1">Usage</A></H3>
 <PRE>
@@ -6682,7 +6669,6 @@ httpEncode64(encoded_string, original_string);
 <H3><A NAME="10_59_6">See Also</A></H3>
  <A HREF="#httpDecode64"><CODE>httpDecode64()</CODE></A>
 <!-- NEW PAGE -->
-
 <H2><A NAME="httpEncryption">httpEncryption()</A></H2>
 <H3><A NAME="10_60_1">Usage</A></H3>
 <PRE>
@@ -6749,7 +6735,6 @@ if (httpError(http))
 <H3><A NAME="10_61_6">See Also</A></H3>
  <A HREF="#httpConnect"><CODE>httpConnect()</CODE></A>
 <!-- NEW PAGE -->
-
 <H2><A NAME="httpFlush">httpFlush()</A></H2>
 <H3><A NAME="10_62_1">Usage</A></H3>
 <PRE>
@@ -6777,7 +6762,6 @@ httpFlush(http);
 <H3><A NAME="10_62_5">See Also</A></H3>
  <A HREF="#httpConnect"><CODE>httpConnect()</CODE></A>,
 <!-- NEW PAGE -->
-
 <H2><A NAME="httpGet">httpGet()</A></H2>
 <H3><A NAME="10_63_1">Usage</A></H3>
 <PRE>
@@ -6811,7 +6795,6 @@ httpGet(http, &quot;/some/uri&quot;);
 <CODE>httpSetField()</CODE></A>, <A HREF="#httpUpdate"><CODE>
 httpUpdate()</CODE></A>
 <!-- NEW PAGE -->
-
 <H2><A NAME="httpGets">httpGets()</A></H2>
 <H3><A NAME="10_64_1">Usage</A></H3>
 <PRE>
@@ -6851,7 +6834,6 @@ if (httpGets(line, sizeof(line), http))
  <A HREF="#httpConnect"><CODE>httpConnect()</CODE></A>, <A HREF="#httpUpdate">
 <CODE>httpUpdate()</CODE></A>
 <!-- NEW PAGE -->
-
 <H2><A NAME="httpGetDateString">httpGetDateString()</A></H2>
 <H3><A NAME="10_65_1">Usage</A></H3>
 <PRE>
@@ -6880,7 +6862,6 @@ puts(httpGetDateString(time(NULL)));
 <H3><A NAME="10_65_6">See Also</A></H3>
  <A HREF="#httpGetDateTime"><CODE>httpGetDateTime()</CODE></A>
 <!-- NEW PAGE -->
-
 <H2><A NAME="httpGetDateTime">httpGetDateTime()</A></H2>
 <H3><A NAME="10_66_1">Usage</A></H3>
 <PRE>
@@ -6908,7 +6889,6 @@ printf(&quot;%d\n&quot;, httpGetDateTime(&quot;Fri, 30 June 2000 12:34:56 GMT&qu
 <H3><A NAME="10_66_6">See Also</A></H3>
  <A HREF="#httpGetDateString"><CODE>httpGetDateString()</CODE></A>
 <!-- NEW PAGE -->
-
 <H2><A NAME="httpGetField">httpGetField()</A></H2>
 <H3><A NAME="10_67_1">Usage</A></H3>
 <PRE>
@@ -6945,7 +6925,6 @@ puts(httpGetField(http, HTTP_FIELD_CONTENT_TYPE));
 <CODE>httpGetSubField()</CODE></A>, <A HREF="#httpSetField"><CODE>
 httpSetField()</CODE></A>
 <!-- NEW PAGE -->
-
 <H2><A NAME="httpGetHostByName">httpGetHostByName()</A></H2>
 <H3><A NAME="10_68_1">Usage</A></H3>
 <PRE>
@@ -7051,7 +7030,6 @@ puts(httpGetSubField(http, HTTP_FIELD_CONTENT_TYPE, &quot;charset&quot;, value))
 <CODE>httpGetField()</CODE></A>, <A HREF="#httpSetField"><CODE>
 httpSetField()</CODE></A>
 <!-- NEW PAGE -->
-
 <H2><A NAME="httpHead">httpHead()</A></H2>
 <H3><A NAME="10_71_1">Usage</A></H3>
 <PRE>
@@ -7085,7 +7063,6 @@ httpHead(http, &quot;/some/uri&quot;);
 <CODE>httpSetField()</CODE></A>, <A HREF="#httpUpdate"><CODE>
 httpUpdate()</CODE></A>
 <!-- NEW PAGE -->
-
 <H2><A NAME="httpInitialize">httpInitialize()</A></H2>
 <H3><A NAME="10_72_1">Usage</A></H3>
 <PRE>
@@ -7104,7 +7081,6 @@ httpInitialize();
 <H3><A NAME="10_72_4">See Also</A></H3>
  <A HREF="#httpConnect"><CODE>httpConnect()</CODE></A>
 <!-- NEW PAGE -->
-
 <H2><A NAME="httpMD5">httpMD5()</A></H2>
 <H3><A NAME="10_73_1">Usage</A></H3>
 <PRE>
@@ -7252,7 +7228,6 @@ httpOptions(http, &quot;/some/uri&quot;);
 <CODE>httpSetField()</CODE></A>, <A HREF="#httpUpdate"><CODE>
 httpUpdate()</CODE></A>
 <!-- NEW PAGE -->
-
 <H2><A NAME="httpPost">httpPost()</A></H2>
 <H3><A NAME="10_77_1">Usage</A></H3>
 <PRE>
@@ -7286,7 +7261,6 @@ httpPost(http, &quot;/some/uri&quot;);
 <CODE>httpSetField()</CODE></A>, <A HREF="#httpUpdate"><CODE>
 httpUpdate()</CODE></A>
 <!-- NEW PAGE -->
-
 <H2><A NAME="httpPrintf">httpPrintf()</A></H2>
 <H3><A NAME="10_78_1">Usage</A></H3>
 <PRE>
@@ -7320,7 +7294,6 @@ httpPrintf(http, &quot;GET / HTTP/1.1 \r\n&quot;);
 <H3><A NAME="10_78_6">See Also</A></H3>
  <A HREF="#httpConnect"><CODE>httpConnect()</CODE></A>
 <!-- NEW PAGE -->
-
 <H2><A NAME="httpPut">httpPut()</A></H2>
 <H3><A NAME="10_79_1">Usage</A></H3>
 <PRE>
@@ -7354,7 +7327,6 @@ httpDelete(http, &quot;/some/uri&quot;);
 <CODE>httpSetField()</CODE></A>, <A HREF="#httpUpdate"><CODE>
 httpUpdate()</CODE></A>
 <!-- NEW PAGE -->
-
 <H2><A NAME="httpRead">httpRead()</A></H2>
 <H3><A NAME="10_80_1">Usage</A></H3>
 <PRE>
@@ -7397,7 +7369,6 @@ while ((bytes = httpRead(http, buffer, sizeof(buffer) - 1)) &gt; 0)
  <A HREF="#httpConnect"><CODE>httpConnect()</CODE></A>, <A HREF="#httpWrite">
 <CODE>httpWrite()</CODE></A>
 <!-- NEW PAGE -->
-
 <H2><A NAME="httpReconnect">httpReconnect()</A></H2>
 <H3><A NAME="10_81_1">Usage</A></H3>
 <PRE>
@@ -7428,7 +7399,6 @@ httpReconnect(http);
 <H3><A NAME="10_81_6">See Also</A></H3>
  <A HREF="#httpConnect"><CODE>httpConnect()</CODE></A>
 <!-- NEW PAGE -->
-
 <H2><A NAME="httpSeparate">httpSeparate()</A></H2>
 <H3><A NAME="10_82_1">Usage</A></H3>
 <PRE>
@@ -7476,7 +7446,6 @@ httpSeparate(uri, method, username, host, &amp;port, resource);
 <H3><A NAME="10_82_5">See Also</A></H3>
  <A HREF="#httpConnect"><CODE>httpConnect()</CODE></A>
 <!-- NEW PAGE -->
-
 <H2><A NAME="httpSetField">httpSetField()</A></H2>
 <H3><A NAME="10_83_1">Usage</A></H3>
 <PRE>
@@ -7511,7 +7480,6 @@ while (httpUpdate(http) == HTTP_CONTINUE);
  <A HREF="#httpConnect"><CODE>httpConnect()</CODE></A>, <A HREF="#httpGetField">
 <CODE>httpGetField()</CODE></A>
 <!-- NEW PAGE -->
-
 <H2><A NAME="httpStatus">httpStatus()</A></H2>
 <H3><A NAME="10_84_1">Usage</A></H3>
 <PRE>
@@ -7575,7 +7543,6 @@ httpTrace(http, &quot;/some/uri&quot;);
 <CODE>httpSetField()</CODE></A>, <A HREF="#httpUpdate"><CODE>
 httpUpdate()</CODE></A>
 <!-- NEW PAGE -->
-
 <H2><A NAME="httpUpdate">httpUpdate()</A></H2>
 <H3><A NAME="10_86_1">Usage</A></H3>
 <PRE>
@@ -7619,7 +7586,6 @@ printf(&quot;Request status is %d\n&quot;, status);
 </A>, <A HREF="#httpPut"><CODE>httpPut()</CODE></A>, <A HREF="#httpTrace">
 <CODE>httpTrace()</CODE></A>
 <!-- NEW PAGE -->
-
 <H2><A NAME="httpWrite">httpWrite()</A></H2>
 <H3><A NAME="10_87_1">Usage</A></H3>
 <PRE>
@@ -7668,7 +7634,6 @@ while ((bytes = httpRead(http, buffer, sizeof(buffer) - 1)) &gt; 0)
  <A HREF="#httpConnect"><CODE>httpConnect()</CODE></A>, <A HREF="#httpRead">
 <CODE>httpRead()</CODE></A>
 <!-- NEW PAGE -->
-
 <H2><A NAME="ippAddBoolean">ippAddBoolean()</A></H2>
 <H3><A NAME="10_88_1">Usage</A></H3>
 <PRE>
@@ -7714,7 +7679,6 @@ ippAddSeparator()</CODE></A>, <A HREF="#ippAddString"><CODE>
 ippAddString()</CODE></A>, <A HREF="#ippAddStrings"><CODE>
 ippAddStrings()</CODE></A>
 <!-- NEW PAGE -->
-
 <H2><A NAME="ippAddBooleans">ippAddBooleans()</A></H2>
 <H3><A NAME="10_89_1">Usage</A></H3>
 <PRE>
@@ -7765,7 +7729,6 @@ ippAddSeparator()</CODE></A>, <A HREF="#ippAddString"><CODE>
 ippAddString()</CODE></A>, <A HREF="#ippAddStrings"><CODE>
 ippAddStrings()</CODE></A>
 <!-- NEW PAGE -->
-
 <H2><A NAME="ippAddDate">ippAddDate()</A></H2>
 <H3><A NAME="10_90_1">Usage</A></H3>
 <PRE>
@@ -7813,7 +7776,6 @@ ippAddString()</CODE></A>, <A HREF="#ippAddStrings"><CODE>
 ippAddStrings()</CODE></A>, <A HREF="#ippTimeToDate"><CODE>
 ippTimeToDate()</CODE></A>
 <!-- NEW PAGE -->
-
 <H2><A NAME="ippAddInteger">ippAddInteger()</A></H2>
 <H3><A NAME="10_91_1">Usage</A></H3>
 <PRE>
@@ -7862,7 +7824,6 @@ ippAddSeparator()</CODE></A>, <A HREF="#ippAddString"><CODE>
 ippAddString()</CODE></A>, <A HREF="#ippAddStrings"><CODE>
 ippAddStrings()</CODE></A>
 <!-- NEW PAGE -->
-
 <H2><A NAME="ippAddIntegers">ippAddIntegers()</A></H2>
 <H3><A NAME="10_92_1">Usage</A></H3>
 <PRE>
@@ -7916,7 +7877,6 @@ ippAddSeparator()</CODE></A>, <A HREF="#ippAddString"><CODE>
 ippAddString()</CODE></A>, <A HREF="#ippAddStrings"><CODE>
 ippAddStrings()</CODE></A>
 <!-- NEW PAGE -->
-
 <H2><A NAME="ippAddRange">ippAddRange()</A></H2>
 <H3><A NAME="10_93_1">Usage</A></H3>
 <PRE>
@@ -7964,7 +7924,6 @@ ippAddSeparator()</CODE></A>, <A HREF="#ippAddString"><CODE>
 ippAddString()</CODE></A>, <A HREF="#ippAddStrings"><CODE>
 ippAddStrings()</CODE></A>
 <!-- NEW PAGE -->
-
 <H2><A NAME="ippAddRanges">ippAddRanges()</A></H2>
 <H3><A NAME="10_94_1">Usage</A></H3>
 <PRE>
@@ -8018,7 +7977,6 @@ ippAddSeparator()</CODE></A>, <A HREF="#ippAddString"><CODE>
 ippAddString()</CODE></A>, <A HREF="#ippAddStrings"><CODE>
 ippAddStrings()</CODE></A>
 <!-- NEW PAGE -->
-
 <H2><A NAME="ippAddResolution">ippAddResolution()</A></H2>
 <H3><A NAME="10_95_1">Usage</A></H3>
 <PRE>
@@ -8069,7 +8027,6 @@ ippAddSeparator()</CODE></A>, <A HREF="#ippAddString"><CODE>
 ippAddString()</CODE></A>, <A HREF="#ippAddStrings"><CODE>
 ippAddStrings()</CODE></A>
 <!-- NEW PAGE -->
-
 <H2><A NAME="ippAddResolutions">ippAddResolutions()</A></H2>
 <H3><A NAME="10_96_1">Usage</A></H3>
 <PRE>
@@ -8127,7 +8084,6 @@ ippAddSeparator()</CODE></A>, <A HREF="#ippAddString"><CODE>
 ippAddString()</CODE></A>, <A HREF="#ippAddStrings"><CODE>
 ippAddStrings()</CODE></A>
 <!-- NEW PAGE -->
-
 <H2><A NAME="ippAddSeparator">ippAddSeparator()</A></H2>
 <H3><A NAME="10_97_1">Usage</A></H3>
 <PRE>
@@ -8167,7 +8123,6 @@ ippAddResolutions()</CODE></A>, <A HREF="#ippAddString"><CODE>
 ippAddString()</CODE></A>, <A HREF="#ippAddStrings"><CODE>
 ippAddStrings()</CODE></A>
 <!-- NEW PAGE -->
-
 <H2><A NAME="ippAddString">ippAddString()</A></H2>
 <H3><A NAME="10_98_1">Usage</A></H3>
 <PRE>
@@ -8221,7 +8176,6 @@ ippAddResolutions()</CODE></A>, <A HREF="#ippAddSeparator"><CODE>
 ippAddSeparator()</CODE></A>, <A HREF="#ippAddStrings"><CODE>
 ippAddStrings()</CODE></A>
 <!-- NEW PAGE -->
-
 <H2><A NAME="ippAddStrings">ippAddStrings()</A></H2>
 <H3><A NAME="10_99_1">Usage</A></H3>
 <PRE>
@@ -8280,7 +8234,6 @@ ippAddResolutions()</CODE></A>, <A HREF="#ippAddSeparator"><CODE>
 ippAddSeparator()</CODE></A>, <A HREF="#ippAddString"><CODE>
 ippAddString()</CODE></A>
 <!-- NEW PAGE -->
-
 <H2><A NAME="ippDateToTime">ippDateToTime()</A></H2>
 <H3><A NAME="10_100_1">Usage</A></H3>
 <PRE>
@@ -8310,7 +8263,6 @@ printf(&quot;UNIX time is %d\n&quot;, ippDateToTime(date));
 <H3><A NAME="10_100_6">See Also</A></H3>
  <A HREF="#ippTimeToDate"><CODE>ippTimeToDate()</CODE></A>
 <!-- NEW PAGE -->
-
 <H2><A NAME="ippDelete">ippDelete()</A></H2>
 <H3><A NAME="10_101_1">Usage</A></H3>
 <PRE>
@@ -8338,7 +8290,6 @@ ippDelete(ipp);
 <H3><A NAME="10_101_5">See Also</A></H3>
  <A HREF="#ippNew"><CODE>ippNew()</CODE></A>
 <!-- NEW PAGE -->
-
 <H2><A NAME="ippErrorString">ippErrorString()</A></H2>
 <H3><A NAME="10_102_1">Usage</A></H3>
 <PRE>
@@ -8413,7 +8364,6 @@ while (attr != NULL)
 </A>, <A HREF="#ippFindNextAttribute"><CODE>ippFindNextAttribute()</CODE>
 </A>, <A HREF="#ippNew"><CODE>ippNew()</CODE></A>
 <!-- NEW PAGE -->
-
 <H2><A NAME="ippFindNextAttribute">ippFindNextAttribute()</A></H2>
 <H3><A NAME="10_104_1">Usage</A></H3>
 <PRE>
@@ -8460,7 +8410,6 @@ while (attr != NULL)
 </A>, <A HREF="#ippFindNextAttribute"><CODE>ippFindNextAttribute()</CODE>
 </A>, <A HREF="#ippNew"><CODE>ippNew()</CODE></A>
 <!-- NEW PAGE -->
-
 <H2><A NAME="ippLength">ippLength()</A></H2>
 <H3><A NAME="10_105_1">Usage</A></H3>
 <PRE>
@@ -8487,7 +8436,6 @@ printf(&quot;The length of the response is %d bytes.\n&quot;, ippLength(response
  <A HREF="#ippDelete"><CODE>ippDelete()</CODE></A>, <A HREF="#ippNew"><CODE>
 ippNew()</CODE></A>
 <!-- NEW PAGE -->
-
 <H2><A NAME="ippNew">ippNew()</A></H2>
 <H3><A NAME="10_106_1">Usage</A></H3>
 <PRE>
@@ -8510,7 +8458,6 @@ ipp = ippNew();
 <H3><A NAME="10_106_5">See Also</A></H3>
  <A HREF="#ippDelete"><CODE>ippDelete()</CODE></A>
 <!-- NEW PAGE -->
-
 <H2><A NAME="ippPort">ippPort()</A></H2>
 <H3><A NAME="10_107_1">Usage</A></H3>
 <PRE>
@@ -8535,7 +8482,6 @@ http = httpConnect(cupsServer(), ippPort());
  <A HREF="#cupsServer"><CODE>cupsServer()</CODE></A>, <A HREF="#ippSetPort">
 <CODE>ippSetPort()</CODE></A>
 <!-- NEW PAGE -->
-
 <H2><A NAME="ippRead">ippRead()</A></H2>
 <H3><A NAME="10_108_1">Usage</A></H3>
 <PRE>
@@ -8581,7 +8527,6 @@ if (status == IPP_DATA)
 <H3><A NAME="10_108_6">See Also</A></H3>
  <A HREF="#ippWrite"><CODE>ippWrite()</CODE></A>
 <!-- NEW PAGE -->
-
 <H2><A NAME="ippSetPort">ippSetPort()</A></H2>
 <H3><A NAME="10_109_1">Usage</A></H3>
 <PRE>
@@ -8610,7 +8555,6 @@ ippSetPort(8631);
 <H3><A NAME="10_109_5">See Also</A></H3>
  <A HREF="#ippPort"><CODE>ippPort()</CODE></A>
 <!-- NEW PAGE -->
-
 <H2><A NAME="ippTimeToDate">ippTimeToDate()</A></H2>
 <H3><A NAME="10_110_1">Usage</A></H3>
 <PRE>
@@ -8640,7 +8584,6 @@ date = ippTimeToDate(time(NULL));
 <H3><A NAME="10_110_6">See Also</A></H3>
  <A HREF="#ippDateToTime"><CODE>ippDateToTime()</CODE></A>
 <!-- NEW PAGE -->
-
 <H2><A NAME="ippWrite">ippWrite()</A></H2>
 <H3><A NAME="10_111_1">Usage</A></H3>
 <PRE>
@@ -8687,7 +8630,6 @@ if (status == IPP_DATA)
 <H3><A NAME="10_111_6">See Also</A></H3>
  <A HREF="#ippRead"><CODE>ippRead()</CODE></A>
 <!-- NEW PAGE -->
-
 <H2><A NAME="ppdClose">ppdClose()</A></H2>
 <H3><A NAME="10_112_1">Usage</A></H3>
 <PRE>
@@ -8717,7 +8659,6 @@ ppdClose(ppd);
 ppdOpenFd()</CODE></A>, <A HREF="#ppdOpenFile"><CODE>ppdOpenFile()</CODE>
 </A>
 <!-- NEW PAGE -->
-
 <H2><A NAME="ppdCollect">ppdCollect()</A></H2>
 <H3><A NAME="10_113_1">Usage</A></H3>
 <PRE>
@@ -8759,7 +8700,6 @@ num_choices = ppdCollect(ppd, PPD_ORDER_JCL, &amp;choices);
 <P> <A HREF="#ppdEmit"><CODE>ppdEmit()</CODE></A>, <A HREF="#ppdEmitFd"><CODE>
 ppdEmitFd()</CODE></A>, <A HREF="#ppdEmitJCL"><CODE>ppdEmitJCL()</CODE></A>
 <!-- NEW PAGE -->
-
 </P>
 <H2><A NAME="ppdConflicts">ppdConflicts()</A></H2>
 <H3><A NAME="10_114_1">Usage</A></H3>
@@ -8793,7 +8733,6 @@ printf(&quot;%d conflicts\n&quot;, ppdConflicts(ppd));
 ppdMarkDefaults()</CODE></A>, <A HREF="#ppdMarkOption"><CODE>
 ppdMarkOption()</CODE></A>
 <!-- NEW PAGE -->
-
 <H2><A NAME="ppdEmit">ppdEmit()</A></H2>
 <H3><A NAME="10_115_1">Usage</A></H3>
 <PRE>
@@ -8827,7 +8766,6 @@ ppdEmit(ppd, stdout, PPD_ORDER_PAGE);
 <H3><A NAME="10_115_6">See Also</A></H3>
  <A HREF="#ppdEmitFd"><CODE>ppdEmitFd()</CODE></A>
 <!-- NEW PAGE -->
-
 <H2><A NAME="ppdEmitFd">ppdEmitFd()</A></H2>
 <H3><A NAME="10_116_1">Usage</A></H3>
 <PRE>
@@ -8862,7 +8800,6 @@ ppdEmitFd(ppd, 1, PPD_ORDER_PAGE);
  <A HREF="#ppdEmit"><CODE>ppdEmit()</CODE></A>, <A HREF="#ppdEmitJCL"><CODE>
 ppdEmitJCL()</CODE></A>
 <!-- NEW PAGE -->
-
 <H2><A NAME="ppdEmitJCL">ppdEmitJCL()</A></H2>
 <H3><A NAME="10_117_1">Usage</A></H3>
 <PRE>
@@ -8903,7 +8840,6 @@ ppdEmitJCL(ppd, stdout, job_id, user, title);
  <A HREF="#ppdEmit"><CODE>ppdEmit()</CODE></A>, <A HREF="#ppdEmitFd"><CODE>
 ppdEmitFd()</CODE></A>
 <!-- NEW PAGE -->
-
 <H2><A NAME="ppdFindAttr">ppdFindAttr()</A></H2>
 <H3><A NAME="10_118_1">Usage</A></H3>
 <PRE>
@@ -8940,7 +8876,6 @@ attr = ppdFindAttr(ppd, &quot;RequiresPageRegion&quot;, &quot;Upper&quot;);
 <H3><A NAME="10_118_6">See Also</A></H3>
  <A HREF="#ppdFindNextAttr"><CODE>ppdFindNextAttr()</CODE></A>
 <!-- NEW PAGE -->
-
 <H2><A NAME="ppdFindChoice">ppdFindChoice()</A></H2>
 <H3><A NAME="10_119_1">Usage</A></H3>
 <PRE>
@@ -8976,7 +8911,6 @@ choice = ppdFindChoice(option, &quot;Letter&quot;);
  <A HREF="#ppdFindMarkedChoice"><CODE>ppdFindMarkedChoice()</CODE></A>, <A
 HREF="#ppdFindOption"><CODE>ppdFindOption()</CODE></A>
 <!-- NEW PAGE -->
-
 <H2><A NAME="ppdFindMarkedChoice">ppdFindMarkedChoice()</A></H2>
 <H3><A NAME="10_120_1">Usage</A></H3>
 <PRE>
@@ -9011,7 +8945,6 @@ choice = ppdFindMarkedChoice(ppd, &quot;PageSize&quot;);
  <A HREF="#ppdFindChoice"><CODE>ppdFindChoice()</CODE></A>, <A HREF="#ppdFindOption">
 <CODE>ppdFindOption()</CODE></A>
 <!-- NEW PAGE -->
-
 <H2><A NAME="ppdFindNextAttr">ppdFindNextAttr()</A></H2>
 <H3><A NAME="10_121_1">Usage</A></H3>
 <PRE>
@@ -9055,7 +8988,6 @@ for (attr = ppdFindAttr(ppd, &quot;cupsICCProfile&quot;, NULL);
 <H3><A NAME="10_121_6">See Also</A></H3>
  <A HREF="#ppdFindAttr"><CODE>ppdFindAttr()</CODE></A>
 <!-- NEW PAGE -->
-
 <H2><A NAME="ppdFindOption">ppdFindOption()</A></H2>
 <H3><A NAME="10_122_1">Usage</A></H3>
 <PRE>
@@ -9089,7 +9021,6 @@ option = ppdFindOption(ppd, &quot;PageSize&quot;);
  <A HREF="#ppdFindChoice"><CODE>ppdFindChoice()</CODE></A>, <A HREF="#ppdFindMarkedChoice">
 <CODE>ppdFindMarkedChoice()</CODE></A>
 <!-- NEW PAGE -->
-
 <H2><A NAME="ppdIsMarked">ppdIsMarked()</A></H2>
 <H3><A NAME="10_123_1">Usage</A></H3>
 <PRE>
@@ -9128,7 +9059,6 @@ ppdIsMarked()</CODE></A>, <A HREF="#ppdMarkDefaults"><CODE>
 ppdMarkDefaults()</CODE></A>, <A HREF="#ppdMarkOption"><CODE>
 ppdMarkOption()</CODE></A>
 <!-- NEW PAGE -->
-
 <H2><A NAME="ppdMarkDefaults">ppdMarkDefaults()</A></H2>
 <H3><A NAME="10_124_1">Usage</A></H3>
 <PRE>
@@ -9160,7 +9090,6 @@ ppdIsMarked()</CODE></A>, <A HREF="#ppdMarkDefaults"><CODE>
 ppdMarkDefaults()</CODE></A>, <A HREF="#ppdMarkOption"><CODE>
 ppdMarkOption()</CODE></A>
 <!-- NEW PAGE -->
-
 <H2><A NAME="ppdMarkOption">ppdMarkOption()</A></H2>
 <H3><A NAME="10_125_1">Usage</A></H3>
 <PRE>
@@ -9198,7 +9127,6 @@ ppdIsMarked()</CODE></A>, <A HREF="#ppdMarkDefaults"><CODE>
 ppdMarkDefaults()</CODE></A>, <A HREF="#ppdMarkOption"><CODE>
 ppdMarkOption()</CODE></A>
 <!-- NEW PAGE -->
-
 <H2><A NAME="ppdOpen">ppdOpen()</A></H2>
 <H3><A NAME="10_126_1">Usage</A></H3>
 <PRE>
@@ -9234,7 +9162,6 @@ fclose(file);
 ppdOpenFd()</CODE></A>, <A HREF="#ppdOpenFile"><CODE>ppdOpenFile()</CODE>
 </A>
 <!-- NEW PAGE -->
-
 <H2><A NAME="ppdOpenFd">ppdOpenFd()</A></H2>
 <H3><A NAME="10_127_1">Usage</A></H3>
 <PRE>
@@ -9269,7 +9196,6 @@ close(fd);
  <A HREF="#ppdClose"><CODE>ppdClose()</CODE></A>, <A HREF="#ppdOpen"><CODE>
 ppdOpen()</CODE></A>, <A HREF="#ppdOpenFile"><CODE>ppdOpenFile()</CODE></A>
 <!-- NEW PAGE -->
-
 <H2><A NAME="ppdOpenFile">ppdOpenFile()</A></H2>
 <H3><A NAME="10_128_1">Usage</A></H3>
 <PRE>
@@ -9301,7 +9227,6 @@ ppd = ppdOpenFile(&quot;filename.ppd&quot;);
  <A HREF="#ppdClose"><CODE>ppdClose()</CODE></A>, <A HREF="#ppdOpen"><CODE>
 ppdOpen()</CODE></A>, <A HREF="#ppdOpenFd"><CODE>ppdOpenFd()</CODE></A>
 <!-- NEW PAGE -->
-
 <H2><A NAME="ppdPageLength">ppdPageLength()</A></H2>
 <H3><A NAME="10_129_1">Usage</A></H3>
 <PRE>
@@ -9336,7 +9261,6 @@ printf(&quot;Length = %.0f\n&quot;, ppdPageLength(ppd, &quot;Letter&quot;));
 <CODE>ppdPageSize()</CODE></A>, <A HREF="#ppdPageWidth"><CODE>
 ppdPageWidth()</CODE></A>
 <!-- NEW PAGE -->
-
 <H2><A NAME="ppdPageSize">ppdPageSize()</A></H2>
 <H3><A NAME="10_130_1">Usage</A></H3>
 <PRE>
@@ -9380,7 +9304,6 @@ if (size != NULL)
  <A HREF="#ppdPageLength"><CODE>ppdPageLength()</CODE></A>, <A HREF="#ppdPageWidth">
 <CODE>ppdPageWidth()</CODE></A>
 <!-- NEW PAGE -->
-
 <H2><A NAME="ppdPageWidth">ppdPageWidth()</A></H2>
 <H3><A NAME="10_131_1">Usage</A></H3>
 <PRE>
