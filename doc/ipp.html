@@ -153,17 +153,18 @@ name(MAX))</A></LI>
 <LI><A HREF="#5_2_11">5.2.11 job-originating-host-name (name(MAX))</A></LI>
 <LI><A HREF="#5_2_12">5.2.12 lpi (type2 enum)</A></LI>
 <LI><A HREF="#5_2_13">5.2.13 page-bottom (integer(0:MAX))</A></LI>
-<LI><A HREF="#5_2_14">5.2.14 page-left (integer(0:MAX))</A></LI>
-<LI><A HREF="#5_2_15">5.2.15 page-right (integer(0:MAX))</A></LI>
-<LI><A HREF="#5_2_16">5.2.16 page-set (type2 keyword)</A></LI>
-<LI><A HREF="#5_2_17">5.2.17 page-top (integer(0:MAX))</A></LI>
-<LI><A HREF="#5_2_18">5.2.18 penwidth (integer(0:MAX))</A></LI>
-<LI><A HREF="#5_2_19">5.2.19 position (type2 keyword)</A></LI>
-<LI><A HREF="#5_2_20">5.2.20 ppi (integer(1:MAX))</A></LI>
-<LI><A HREF="#5_2_21">5.2.21 prettyprint (boolean)</A></LI>
-<LI><A HREF="#5_2_22">5.2.22 saturation (integer(0:200))</A></LI>
-<LI><A HREF="#5_2_23">5.2.23 scaling (integer(1:1000))</A></LI>
-<LI><A HREF="#5_2_24">5.2.24 wrap (boolean)</A></LI>
+<LI><A HREF="#5_2_14">5.2.14 page-label (text(MAX))</A></LI>
+<LI><A HREF="#5_2_15">5.2.15 page-left (integer(0:MAX))</A></LI>
+<LI><A HREF="#5_2_16">5.2.16 page-right (integer(0:MAX))</A></LI>
+<LI><A HREF="#5_2_17">5.2.17 page-set (type2 keyword)</A></LI>
+<LI><A HREF="#5_2_18">5.2.18 page-top (integer(0:MAX))</A></LI>
+<LI><A HREF="#5_2_19">5.2.19 penwidth (integer(0:MAX))</A></LI>
+<LI><A HREF="#5_2_20">5.2.20 position (type2 keyword)</A></LI>
+<LI><A HREF="#5_2_21">5.2.21 ppi (integer(1:MAX))</A></LI>
+<LI><A HREF="#5_2_22">5.2.22 prettyprint (boolean)</A></LI>
+<LI><A HREF="#5_2_23">5.2.23 saturation (integer(0:200))</A></LI>
+<LI><A HREF="#5_2_24">5.2.24 scaling (integer(1:1000))</A></LI>
+<LI><A HREF="#5_2_25">5.2.25 wrap (boolean)</A></LI>
 </UL>
 <LI><A HREF="#5_3">5.3 PPD Attributes</A></LI>
 <UL>
@@ -1200,24 +1201,29 @@ The default value is 6. </P>
 <H3><A NAME="5_2_13">5.2.13 page-bottom (integer(0:MAX))</A></H3>
 <P>The page-bottom attribute specifies the bottom margin in points (72 
 points equals 1 inch). The default value is the device physical margin. </P>
-<H3><A NAME="5_2_14">5.2.14 page-left (integer(0:MAX))</A></H3>
+<H3><A NAME="5_2_14">5.2.14 page-label (text(MAX))</A></H3>
+<P><I>(CUPS 1.1.7 and higher)</I></P>
+<P>The page-label attribute provides a text value to place in the 
+header and footer on each page. If a classification level is set on the 
+server, then this classification is printed before the page label. </P>
+<H3><A NAME="5_2_15">5.2.15 page-left (integer(0:MAX))</A></H3>
 <P>The page-left attribute specifies the left margin in points (72 
 points equals 1 inch). The default value is the device physical margin. </P>
-<H3><A NAME="5_2_15">5.2.15 page-right (integer(0:MAX))</A></H3>
+<H3><A NAME="5_2_16">5.2.16 page-right (integer(0:MAX))</A></H3>
 <P>The page-right attribute specifies the right margin in points (72 
 points equals 1 inch). The default value is the device physical margin. </P>
-<H3><A NAME="5_2_16">5.2.16 page-set (type2 keyword)</A></H3>
+<H3><A NAME="5_2_17">5.2.17 page-set (type2 keyword)</A></H3>
 <P>The page-set attribute specifies which pages to print in a file. The 
 supported keywords are &quot;all&quot;, &quot;even&quot;, and &quot;odd&quot;. The default value is 
 &quot;all&quot;. </P>
-<H3><A NAME="5_2_17">5.2.17 page-top (integer(0:MAX))</A></H3>
+<H3><A NAME="5_2_18">5.2.18 page-top (integer(0:MAX))</A></H3>
 <P>The page-top attribute specifies the top margin in points (72 points 
 equals 1 inch). The default value is the device physical margin. </P>
-<H3><A NAME="5_2_18">5.2.18 penwidth (integer(0:MAX))</A></H3>
+<H3><A NAME="5_2_19">5.2.19 penwidth (integer(0:MAX))</A></H3>
 <P>The penwidth attribute specifies the default pen width in 
 micrometers when printing HP-GL/2 plot files. The default value is 1000 
 (1 millimeter). </P>
-<H3><A NAME="5_2_19">5.2.19 position (type2 keyword)</A></H3>
+<H3><A NAME="5_2_20">5.2.20 position (type2 keyword)</A></H3>
 <P>The position attribute specifies the location of image files on the 
 media. The following keyword values are recognized: </P>
 <UL>
@@ -1237,27 +1243,27 @@ page </LI>
 <LI><CODE>bottom-right</CODE> - Print the image at the bottom right 
  corner of the page </LI>
 </UL>
-<H3><A NAME="5_2_20">5.2.20 ppi (integer(1:MAX))</A></H3>
+<H3><A NAME="5_2_21">5.2.21 ppi (integer(1:MAX))</A></H3>
 <P>The ppi attribute specifies the resolution of an image file in 
 pixels per inch. The default value is the resolution included with the 
 file or 128 if no resolution information is available. </P>
-<H3><A NAME="5_2_21">5.2.21 prettyprint (boolean)</A></H3>
+<H3><A NAME="5_2_22">5.2.22 prettyprint (boolean)</A></H3>
 <P>The prettyprint attribute specifies whether text files should be 
 printed with a shaded header and keyword highlighting 
 (prettyprint=true) or without additional formatting 
 (prettyprint=false). The default value is false. </P>
-<H3><A NAME="5_2_22">5.2.22 saturation (integer(0:200))</A></H3>
+<H3><A NAME="5_2_23">5.2.23 saturation (integer(0:200))</A></H3>
 <P>The saturation attribute specifies the color saturation when 
 printing image files. A saturation of 100 is normal, while values of 50 
 and 200 will be half and twice as colorful, respectively. The default 
 value is 100. </P>
-<H3><A NAME="5_2_23">5.2.23 scaling (integer(1:1000))</A></H3>
+<H3><A NAME="5_2_24">5.2.24 scaling (integer(1:1000))</A></H3>
 <P>The scaling attribute specifies the scaling of image files with 
 respect to the selected media. A value of 100 specifies that the image 
 file should fit 100% of the page, or as much as possible given the 
 image dimensions. The default value is unspecified. </P>
 <P>The scaling attribute overrides the ppi attribute if specified. </P>
-<H3><A NAME="5_2_24">5.2.24 wrap (boolean)</A></H3>
+<H3><A NAME="5_2_25">5.2.25 wrap (boolean)</A></H3>
 <P>The wrap attribute specifies whether long lines should be wrapped 
 (wrap=true) or not (wrap=false) when printing text files. The default 
 value is true. </P>
