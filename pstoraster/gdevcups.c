@@ -1,5 +1,5 @@
 /*
- * "$Id: gdevcups.c,v 1.37 2000/11/18 17:29:30 mike Exp $"
+ * "$Id: gdevcups.c,v 1.38 2000/11/28 23:59:28 mike Exp $"
  *
  *   GNU Ghostscript raster output driver for the Common UNIX Printing
  *   System (CUPS).
@@ -295,10 +295,15 @@ cups_get_matrix(gx_device *pdev,	/* I - Device info */
   * Set the transform matrix...
   */
 
-#if 0
-  if (cups->header.Duplex && cups->ppd->flip_duplex && !(cups->page & 1))
+  fprintf(stderr, "DEBUG: cups->header.Duplex = %d\n", cups->header.Duplex);
+  fprintf(stderr, "DEBUG: cups->ppd = %p\n", cups->ppd);
+  fprintf(stderr, "DEBUG: cups->ppd->flip_duplex = %d\n", cups->ppd->flip_duplex);
+  fprintf(stderr, "DEBUG: cups->page = %d\n", cups->page);
+
+  if (cups->header.Duplex && cups->ppd && cups->ppd->flip_duplex &&
+      !(cups->page & 1))
   {
-    pmat->xx = (float)-cups->header.HWResolution[0] / 72.0;
+    pmat->xx = -(float)cups->header.HWResolution[0] / 72.0;
     pmat->xy = 0.0;
     pmat->yx = 0.0;
     pmat->yy = (float)cups->header.HWResolution[1] / 72.0;
@@ -307,7 +312,6 @@ cups_get_matrix(gx_device *pdev,	/* I - Device info */
     pmat->ty = -(float)cups->header.HWResolution[1] * pdev->HWMargins[1] / 72.0;
   }
   else
-#endif /* 0 */
   {
     pmat->xx = (float)cups->header.HWResolution[0] / 72.0;
     pmat->xy = 0.0;
@@ -318,15 +322,16 @@ cups_get_matrix(gx_device *pdev,	/* I - Device info */
                ((float)cups->header.PageSize[1] - pdev->HWMargins[3]) / 72.0;
   }
 
-#ifdef DEBUG
   fprintf(stderr, "DEBUG: width = %d, height = %d\n", cups->width,
           cups->height);
   fprintf(stderr, "DEBUG: PageSize = [ %d %d ], HWResolution = [ %d %d ]\n",
           cups->header.PageSize[0], cups->header.PageSize[1],
           cups->header.HWResolution[0], cups->header.HWResolution[1]);
+  fprintf(stderr, "DEBUG: HWMargins = [ %.3f %.3f %.3f %.3f ]\n",
+	  pdev->HWMargins[0], pdev->HWMargins[1], pdev->HWMargins[2],
+	  pdev->HWMargins[3]);
   fprintf(stderr, "DEBUG: matrix = [ %.3f %.3f %.3f %.3f %.3f %.3f ]\n",
           pmat->xx, pmat->xy, pmat->yx, pmat->yy, pmat->tx, pmat->ty);
-#endif /* DEBUG */
 }
 
 
@@ -2737,5 +2742,5 @@ cups_print_planar(gx_device_printer *pdev,	/* I - Printer device */
 
 
 /*
- * End of "$Id: gdevcups.c,v 1.37 2000/11/18 17:29:30 mike Exp $".
+ * End of "$Id: gdevcups.c,v 1.38 2000/11/28 23:59:28 mike Exp $".
  */
