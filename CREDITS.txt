@@ -1,4 +1,4 @@
-CREDITS.txt - 01/27/2000
+CREDITS.txt - 12/02/2002
 ------------------------
 
 Few projects are completed by one person, and CUPS is no exception.  We'd
@@ -12,11 +12,15 @@ like to thank the following individuals for their contributions:
     Guy Harris          - *BSD shared libraries and lots of other fixes.
     Wang Jian           - CUPS RPM corrections.
     Roderick Johnstone  - Beta tester of the millenium.
+    Till Kamppeter      - Bug fixes, beta testing, evangelism.
     Sergey V. Kovalyov  - ESP Print Pro and CUPS beta tester.
     Mark Lawrence       - Microsoft interoperability testing.
+    Jeff Licquia        - Bug fixes, beta testing, evangelism.
     Jason McMullan      - Original CUPS RPM distributions.
     Wes Morgan          - *BSD fixes.
     Ulrich Oldendorf    - German locale.
+    Giulio Orsero       - Bug fixes and testing.
+    Kurt Pfeifle        - Bug fixes, beta testing, evangelism.
     Petter Reinholdtsen - HP-UX compiler stuff.
     Stuart Stevens      - HP JetDirect IPP information.
     Kiko                - Bug fixes.
