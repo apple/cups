@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.125 2003/10/09 19:30:06 mike Exp $"
+ * "$Id: dirsvc.c,v 1.126 2003/10/22 14:41:33 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -781,6 +781,8 @@ StartBrowsing(void)
 
     FD_SET(BrowseSocket, InputSet);
   }
+  else
+    BrowseSocket = -1;
 
 #ifdef HAVE_LIBSLP
   if (BrowseProtocols & BROWSE_SLP)
@@ -1006,7 +1008,7 @@ StopBrowsing(void)
         	 BrowseSocket);
 
       FD_CLR(BrowseSocket, InputSet);
-      BrowseSocket = 0;
+      BrowseSocket = -1;
     }
   }
 
@@ -1904,5 +1906,5 @@ UpdateSLPBrowse(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.125 2003/10/09 19:30:06 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.126 2003/10/22 14:41:33 mike Exp $".
  */
