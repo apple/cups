@@ -639,6 +639,8 @@ void PSOutputDev::setupFont(GfxFont *font) {
       if (font->isItalic())
 	i += 1;
       psName = psSubstFonts[i].psName;
+      fprintf(stderr, "DEBUG: Substituting font %d (%s) for Type3 font...\n",
+              i, psName);
       if ((code = font->getCharCode("m")) >= 0) {
 	w1 = font->getWidth(code);
       } else {
