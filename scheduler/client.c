@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.172 2003/09/10 02:49:13 mike Exp $"
+ * "$Id: client.c,v 1.173 2003/09/15 19:40:45 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -1552,7 +1552,7 @@ ReadClient(client_t *con)		/* I - Client to read from */
             SetStringf(&con->filename, "%s/%08x", RequestRoot, request_id ++);
 	    con->file = open(con->filename, O_WRONLY | O_CREAT | O_TRUNC, 0640);
 	    fchmod(con->file, 0640);
-	    fchown(con->file, User, Group);
+	    fchown(con->file, getuid(), Group);
 
             LogMessage(L_DEBUG2, "ReadClient() %d REQUEST %s=%d", con->http.fd,
 	               con->filename, con->file);
@@ -1844,7 +1844,7 @@ ReadClient(client_t *con)		/* I - Client to read from */
           SetStringf(&con->filename, "%s/%08x", RequestRoot, request_id ++);
 	  con->file = open(con->filename, O_WRONLY | O_CREAT | O_TRUNC, 0640);
 	  fchmod(con->file, 0640);
-	  fchown(con->file, User, Group);
+	  fchown(con->file, getuid(), Group);
 
           LogMessage(L_DEBUG2, "ReadClient() %d REQUEST %s=%d", con->http.fd,
 	             con->filename, con->file);
@@ -3411,5 +3411,5 @@ CDSAWriteFunc(SSLConnectionRef connection,	/* I  - SSL/TLS connection */
 
 
 /*
- * End of "$Id: client.c,v 1.172 2003/09/10 02:49:13 mike Exp $".
+ * End of "$Id: client.c,v 1.173 2003/09/15 19:40:45 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.220 2003/09/10 19:29:20 mike Exp $"
+ * "$Id: job.c,v 1.221 2003/09/15 19:40:46 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -940,7 +940,7 @@ SaveJob(int id)			/* I - Job ID */
   }
 
   fchmod(fd, 0600);
-  fchown(fd, User, Group);
+  fchown(fd, getuid(), Group);
 
   ippWriteFile(fd, job->attrs);
 
@@ -2739,5 +2739,5 @@ set_hold_until(job_t *job, 		/* I - Job to update */
 
 
 /*
- * End of "$Id: job.c,v 1.220 2003/09/10 19:29:20 mike Exp $".
+ * End of "$Id: job.c,v 1.221 2003/09/15 19:40:46 mike Exp $".
  */
