@@ -27,7 +27,7 @@
 
 //------------------------------------------------------------------------
 
-static inline char *nextLine(char *line, char *end) {
+static inline const char *nextLine(const char *line, const char *end) {
   while (line < end && *line != '\n' && *line != '\r')
     ++line;
   while (line < end && *line == '\n' || *line == '\r')
@@ -51,15 +51,16 @@ FontFile::~FontFile() {
 // Type1FontFile
 //------------------------------------------------------------------------
 
-Type1FontFile::Type1FontFile(char *file, int len) {
-  char *line, *line1, *p, *p2;
+Type1FontFile::Type1FontFile(const char *file, int len) {
+  const char *line, *line1;
+  char *p, *p2;
   GBool haveEncoding;
   char buf[256];
   char c;
   int n, code, i, j;
 
   name = NULL;
-  encoding = (char **)gmalloc(256 * sizeof(char *));
+  encoding = (const char **)gmalloc(256 * sizeof(const char *));
   for (i = 0; i < 256; ++i) {
     encoding[i] = NULL;
   }
@@ -134,10 +135,10 @@ Type1FontFile::~Type1FontFile() {
   int i;
 
   if (name) {
-    gfree(name);
+    gfree((void *)name);
   }
   for (i = 0; i < 256; ++i) {
-    gfree(encoding[i]);
+    gfree((void *)encoding[i]);
   }
   gfree(encoding);
 }
@@ -186,7 +187,7 @@ struct Type1CPrivateDict {
   GBool nominalWidthXFP;
 };
 
-Type1CFontFile::Type1CFontFile(char *fileA, int lenA) {
+Type1CFontFile::Type1CFontFile(const char *fileA, int lenA) {
   Guchar *nameIdxPtr, *idxPtr0, *idxPtr1;
 
   file = fileA;
@@ -220,17 +221,17 @@ Type1CFontFile::~Type1CFontFile() {
   delete name;
   if (encoding) {
     for (i = 0; i < 256; ++i) {
-      gfree(encoding[i]);
+      gfree((void *)encoding[i]);
     }
     gfree(encoding);
   }
 }
 
-char *Type1CFontFile::getName() {
+const char *Type1CFontFile::getName() {
   return name->getCString();
 }
 
-char **Type1CFontFile::getEncoding() {
+const char **Type1CFontFile::getEncoding() {
   if (!encoding) {
     readNameAndEncoding();
   }
@@ -251,7 +252,7 @@ void Type1CFontFile::readNameAndEncoding() {
   int key;
   int i, j;
 
-  encoding = (char **)gmalloc(256 * sizeof(char *));
+  encoding = (const char **)gmalloc(256 * sizeof(const char *));
   for (i = 0; i < 256; ++i) {
     encoding[i] = NULL;
   }
@@ -552,7 +553,7 @@ void Type1CFontFile::convertToType1(FILE *outA) {
   }
 }
 
-void Type1CFontFile::convertToCIDType0(char *psName, FILE *outA) {
+void Type1CFontFile::convertToCIDType0(const char *psName, FILE *outA) {
   Type1CTopDict dict;
   Type1CPrivateDict *privateDicts;
   GString *charStrings;
@@ -816,7 +817,7 @@ void Type1CFontFile::convertToCIDType0(char *psName, FILE *outA) {
   gfree(fdSelect);
 }
 
-void Type1CFontFile::convertToType0(char *psName, FILE *outA) {
+void Type1CFontFile::convertToType0(const char *psName, FILE *outA) {
   Type1CTopDict dict;
   Type1CPrivateDict *privateDicts;
   Gushort *charset;
@@ -1321,7 +1322,7 @@ Gushort *Type1CFontFile::readCharset(int charset, int nGlyphs) {
   return glyphNames;
 }
 
-void Type1CFontFile::eexecWrite(char *s) {
+void Type1CFontFile::eexecWrite(const char *s) {
   Guchar *p;
   Guchar x;
 
@@ -1338,7 +1339,7 @@ void Type1CFontFile::eexecWrite(char *s) {
   }
 }
 
-void Type1CFontFile::eexecCvtGlyph(char *glyphName, Guchar *s, int n) {
+void Type1CFontFile::eexecCvtGlyph(const char *glyphName, Guchar *s, int n) {
   char eBuf[256];
 
   cvtGlyph(s, n);
@@ -2014,7 +2015,7 @@ void Type1CFontFile::eexecWriteCharstring(Guchar *s, int n) {
   }
 }
 
-void Type1CFontFile::getDeltaInt(char *buf, char *key, double *opA,
+void Type1CFontFile::getDeltaInt(char *buf, const char *key, double *opA,
 				 int n) {
   int x, i;
 
@@ -2029,7 +2030,7 @@ void Type1CFontFile::getDeltaInt(char *buf, char *key, double *opA,
   sprintf(buf, "] def\n");
 }
 
-void Type1CFontFile::getDeltaReal(char *buf, char *key, double *opA,
+void Type1CFontFile::getDeltaReal(char *buf, const char *key, double *opA,
 				  int n) {
   double x;
   int i;
@@ -2234,7 +2235,7 @@ struct TTFontTableHdr {
 };
 
 struct T42Table {
-  char *tag;			// 4-byte tag
+  const char *tag;		// 4-byte tag
   GBool required;		// required by the TrueType spec?
 };
 
@@ -2260,7 +2261,7 @@ static T42Table t42Tables[nT42Tables] = {
 
 // Glyph names in some arbitrary standard that Apple uses for their
 // TrueType fonts.
-static char *macGlyphNames[258] = {
+static const char *macGlyphNames[258] = {
   ".notdef",
   "null",
   "CR",
@@ -2528,7 +2529,7 @@ enum T42FontIndexMode {
   t42FontModeMacRoman
 };
 
-TrueTypeFontFile::TrueTypeFontFile(char *fileA, int lenA) {
+TrueTypeFontFile::TrueTypeFontFile(const char *fileA, int lenA) {
   int pos, i;
 
   file = fileA;
@@ -2581,18 +2582,18 @@ TrueTypeFontFile::~TrueTypeFontFile() {
 
   if (encoding) {
     for (i = 0; i < 256; ++i) {
-      gfree(encoding[i]);
+      gfree((void *)encoding[i]);
     }
     gfree(encoding);
   }
   gfree(tableHdrs);
 }
 
-char *TrueTypeFontFile::getName() {
+const char *TrueTypeFontFile::getName() {
   return NULL;
 }
 
-char **TrueTypeFontFile::getEncoding() {
+const char **TrueTypeFontFile::getEncoding() {
   int cmap[256];
   int nCmaps, cmapPlatform, cmapEncoding, cmapFmt;
   int cmapLen, cmapOffset, cmapFirst;
@@ -2691,7 +2692,7 @@ char **TrueTypeFontFile::getEncoding() {
   //----- construct the (glyph idx) -> (glyph name) mapping
   //----- and compute the (char code) -> (glyph name) mapping
 
-  encoding = (char **)gmalloc(256 * sizeof(char *));
+  encoding = (const char **)gmalloc(256 * sizeof(const char *));
   for (i = 0; i < 256; ++i) {
     encoding[i] = NULL;
   }
@@ -2764,7 +2765,7 @@ char **TrueTypeFontFile::getEncoding() {
   return encoding;
 }
 
-void TrueTypeFontFile::convertToType42(char *name, char **encodingA,
+void TrueTypeFontFile::convertToType42(const char *name, const char **encodingA,
 				       CharCodeToUnicode *toUnicode,
 				       GBool pdfFontHasEncoding, FILE *out) {
   // write the header
@@ -2788,7 +2789,7 @@ void TrueTypeFontFile::convertToType42(char *name, char **encodingA,
   fprintf(out, "FontName currentdict end definefont pop\n");
 }
 
-void TrueTypeFontFile::convertToCIDType2(char *name, Gushort *cidMap,
+void TrueTypeFontFile::convertToCIDType2(const char *name, Gushort *cidMap,
 					 int nCIDs, FILE *out) {
   Gushort cid;
   int i, j, k;
@@ -2876,7 +2877,7 @@ void TrueTypeFontFile::convertToCIDType2(char *name, Gushort *cidMap,
   fprintf(out, "CIDFontName currentdict end /CIDFont defineresource pop\n");
 }
 
-void TrueTypeFontFile::convertToType0(char *name, Gushort *cidMap,
+void TrueTypeFontFile::convertToType0(const char *name, Gushort *cidMap,
 				      int nCIDs, FILE *out) {
   GString *sfntsName;
   int n, i, j;
@@ -2994,7 +2995,7 @@ double TrueTypeFontFile::getFixed(int pos) {
   return (double)x + (double)y / 65536;
 }
 
-int TrueTypeFontFile::seekTable(char *tag) {
+int TrueTypeFontFile::seekTable(const char *tag) {
   int i;
 
   for (i = 0; i < nTables; ++i) {
@@ -3005,7 +3006,7 @@ int TrueTypeFontFile::seekTable(char *tag) {
   return -1;
 }
 
-int TrueTypeFontFile::seekTableIdx(char *tag) {
+int TrueTypeFontFile::seekTableIdx(const char *tag) {
   int i;
 
   for (i = 0; i < nTables; ++i) {
@@ -3016,8 +3017,8 @@ int TrueTypeFontFile::seekTableIdx(char *tag) {
   return -1;
 }
 
-void TrueTypeFontFile::cvtEncoding(char **encodingA, FILE *out) {
-  char *name;
+void TrueTypeFontFile::cvtEncoding(const char **encodingA, FILE *out) {
+  const char *name;
   int i;
 
   fprintf(out, "/Encoding 256 array\n");
@@ -3030,13 +3031,13 @@ void TrueTypeFontFile::cvtEncoding(char **encodingA, FILE *out) {
   fprintf(out, "readonly def\n");
 }
 
-void TrueTypeFontFile::cvtCharStrings(char **encodingA,
+void TrueTypeFontFile::cvtCharStrings(const char **encodingA,
 				      CharCodeToUnicode *toUnicode,
 				      GBool pdfFontHasEncoding, FILE *out) {
   int unicodeCmap, macRomanCmap, msSymbolCmap;
   int nCmaps, cmapPlatform, cmapEncoding, cmapFmt, cmapOffset;
   T42FontIndexMode mode;
-  char *name;
+  const char *name;
   Unicode u;
   int pos, i, j, k;
 
@@ -3399,7 +3400,7 @@ void TrueTypeFontFile::cvtSfnts(FILE *out, GString *name) {
   gfree(locaTable);
 }
 
-void TrueTypeFontFile::dumpString(char *s, int length, FILE *out) {
+void TrueTypeFontFile::dumpString(const char *s, int length, FILE *out) {
   int pad, i, j;
 
   fprintf(out, "<");
@@ -3423,7 +3424,7 @@ void TrueTypeFontFile::dumpString(char *s, int length, FILE *out) {
   fprintf(out, "00>\n");
 }
 
-Guint TrueTypeFontFile::computeTableChecksum(char *data, int length) {
+Guint TrueTypeFontFile::computeTableChecksum(const char *data, int length) {
   Guint checksum, word;
   int i;
 

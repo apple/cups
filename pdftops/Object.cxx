@@ -23,7 +23,7 @@
 // Object
 //------------------------------------------------------------------------
 
-char *objTypeNames[numObjTypes] = {
+const char *objTypeNames[numObjTypes] = {
   "boolean",
   "integer",
   "real",
@@ -104,7 +104,7 @@ void Object::free() {
     delete string;
     break;
   case objName:
-    gfree(name);
+    gfree((void *)name);
     break;
   case objArray:
     if (!array->decRef()) {
@@ -122,7 +122,7 @@ void Object::free() {
     }
     break;
   case objCmd:
-    gfree(cmd);
+    gfree((void *)cmd);
     break;
   default:
     break;
@@ -133,7 +133,7 @@ void Object::free() {
   type = objNone;
 }
 
-char *Object::getTypeName() {
+const char *Object::getTypeName() {
   return objTypeNames[type];
 }
 

@@ -836,7 +836,7 @@ void PSOutputDev::setupFont(GfxFont *font, Dict *parentResDict) {
   char *psName;
   char type3Name[64];
   UnicodeMap *uMap;
-  char *charName;
+  const char *charName;
   double xs, ys;
   int code;
   double w1, w2;

@@ -63,7 +63,7 @@ public:
   };
 
   DisplayFontParam(GString *nameA, DisplayFontParamKind kindA);
-  DisplayFontParam(char *nameA, char *xlfdA, char *encodingA);
+  DisplayFontParam(const char *nameA, const char *xlfdA, const char *encodingA);
   ~DisplayFontParam();
 };
 
@@ -119,15 +119,15 @@ public:
 
   // Initialize the global parameters by attempting to read a config
   // file.
-  GlobalParams(char *cfgFileName);
+  GlobalParams(const char *cfgFileName);
 
   ~GlobalParams();
 
   //----- accessors
 
-  CharCode getMacRomanCharCode(char *charName);
+  CharCode getMacRomanCharCode(const char *charName);
 
-  Unicode mapNameToUnicode(char *charName);
+  Unicode mapNameToUnicode(const char *charName);
   FILE *getCIDToUnicodeFile(GString *collection);
   UnicodeMap *getResidentUnicodeMap(GString *encodingName);
   FILE *getUnicodeMapFile(GString *encodingName);
@@ -150,7 +150,7 @@ public:
   GBool getPSASCIIHex() { return psASCIIHex; }
   GString *getTextEncodingName() { return textEncoding; }
   EndOfLineKind getTextEOL() { return textEOL; }
-  GString *findFontFile(GString *fontName, char *ext1, char *ext2);
+  GString *findFontFile(GString *fontName, const char *ext1, const char *ext2);
   GString *getInitialZoom() { return initialZoom; }
   FontRastControl getT1libControl() { return t1libControl; }
   FontRastControl getFreeTypeControl() { return freetypeControl; }
@@ -165,8 +165,8 @@ public:
 
   //----- functions to set parameters
 
-  void setPSFile(char *file);
-  GBool setPSPaperSize(char *size);
+  void setPSFile(const char *file);
+  GBool setPSPaperSize(const char *size);
   void setPSPaperWidth(int width);
   void setPSPaperHeight(int height);
   void setPSDuplex(GBool duplex);
@@ -177,11 +177,11 @@ public:
   void setPSEmbedCIDTrueType(GBool embed);
   void setPSOPI(GBool opi);
   void setPSASCIIHex(GBool hex);
-  void setTextEncoding(char *encodingName);
-  GBool setTextEOL(char *s);
-  void setInitialZoom(char *s);
-  GBool setT1libControl(char *s);
-  GBool setFreeTypeControl(char *s);
+  void setTextEncoding(const char *encodingName);
+  GBool setTextEOL(const char *s);
+  void setInitialZoom(const char *s);
+  GBool setT1libControl(const char *s);
+  GBool setFreeTypeControl(const char *s);
   void setErrQuiet(GBool errQuietA);
 
 private:
@@ -199,18 +199,18 @@ private:
   void parsePSPaperSize(GList *tokens, GString *fileName, int line);
   void parsePSLevel(GList *tokens, GString *fileName, int line);
   void parsePSFont(GList *tokens, GString *fileName, int line);
-  void parsePSFont16(char *cmdName, GList *fontList,
+  void parsePSFont16(const char *cmdName, GList *fontList,
 		     GList *tokens, GString *fileName, int line);
   void parseTextEncoding(GList *tokens, GString *fileName, int line);
   void parseTextEOL(GList *tokens, GString *fileName, int line);
   void parseFontDir(GList *tokens, GString *fileName, int line);
   void parseInitialZoom(GList *tokens, GString *fileName, int line);
-  void parseFontRastControl(char *cmdName, FontRastControl *val,
+  void parseFontRastControl(const char *cmdName, FontRastControl *val,
 			    GList *tokens, GString *fileName, int line);
   void parseURLCommand(GList *tokens, GString *fileName, int line);
-  void parseYesNo(char *cmdName, GBool *flag,
+  void parseYesNo(const char *cmdName, GBool *flag,
 		  GList *tokens, GString *fileName, int line);
-  GBool setFontRastControl(FontRastControl *val, char *s);
+  GBool setFontRastControl(FontRastControl *val, const char *s);
 
   //----- static tables
 
