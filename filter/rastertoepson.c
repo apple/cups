@@ -1,5 +1,5 @@
 /*
- * "$Id: rastertoepson.c,v 1.5 2000/06/07 17:03:41 mike Exp $"
+ * "$Id: rastertoepson.c,v 1.6 2000/10/19 18:42:50 mike Exp $"
  *
  *   EPSON ESC/P and ESC/P2 filter for the Common UNIX Printing System
  *   (CUPS).
@@ -103,11 +103,6 @@ void	OutputRows(const cups_page_header_t *header, int row);
 void
 Setup(void)
 {
- /*
-  * Send a reset sequence.
-  */
-
-  printf("\033@");
 }
 
 
@@ -126,6 +121,9 @@ StartPage(const ppd_file_t         *ppd,	/* I - PPD file */
  /*
   * Send a reset sequence.
   */
+
+  if (ppd->nickname && strstr(ppd->nickname, "OKIDATA") != NULL)
+    printf("\033{A");	/* Set EPSON emulation mode */
 
   printf("\033@");
 
@@ -694,7 +692,8 @@ OutputRows(const cups_page_header_t *header,	/* I - Page image header */
   unsigned	i, n;				/* Looping vars */
   int		dot_count,			/* Number of bytes to print */
                 dot_min;			/* Minimum number of bytes */
-  unsigned char *dot_ptr;			/* Pointer to print data */
+  unsigned char *dot_ptr,			/* Pointer to print data */
+		*ptr;				/* Current data */
 
 
   dot_min = DotBytes * DotColumns;
@@ -782,7 +781,45 @@ OutputRows(const cups_page_header_t *header,	/* I - Page image header */
     * Write the graphics data...
     */
 
-    pwrite(dot_ptr, dot_count);
+    if (header->HWResolution[0] == 120 ||
+        header->HWResolution[0] == 240)
+    {
+     /*
+      * Need to interleave the dots to avoid hosing the print head...
+      */
+
+      for (n = dot_count / 2, ptr = dot_ptr; n > 0; n --, ptr += 2)
+      {
+        putchar(*ptr);
+	putchar(0);
+      }
+
+     /*
+      * Move the head back and print the odd bytes...
+      */
+
+      putchar(0x1b);
+      putchar('$');
+      putchar(i & 255);
+      putchar(i >> 8);
+
+      if (header->HWResolution[0] == 120)
+      	printf("\033*\001");		/* Select bit image */
+      else
+      	printf("\033*\003");		/* Select bit image */
+
+      n = (unsigned)dot_count / DotBytes;
+      putchar(n & 255);
+      putchar(n / 256);
+
+      for (n = dot_count / 2, ptr = dot_ptr + 1; n > 0; n --, ptr += 2)
+      {
+	putchar(0);
+        putchar(*ptr);
+      }
+    }
+    else
+      pwrite(dot_ptr, dot_count);
   }
 
  /*
@@ -951,5 +988,5 @@ main(int  argc,		/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: rastertoepson.c,v 1.5 2000/06/07 17:03:41 mike Exp $".
+ * End of "$Id: rastertoepson.c,v 1.6 2000/10/19 18:42:50 mike Exp $".
  */
