@@ -30,18 +30,20 @@ include ../Makedefs
 
 FONTS	=	AvantGarde-Book AvantGarde-BookOblique AvantGarde-Demi \
 		AvantGarde-DemiOblique Bookman-Demi Bookman-DemiItalic \
-		Bookman-Light Bookman-LightItalic Courier Courier-Bold \
-		Courier-BoldOblique Courier-Oblique Helvetica \
-		Helvetica-Bold Helvetica-BoldOblique Helvetica-Narrow \
-		Helvetica-Narrow-Bold Helvetica-Narrow-BoldOblique \
-		Helvetica-Narrow-Oblique Helvetica-Oblique \
-		NewCenturySchlbk-Bold NewCenturySchlbk-BoldItalic \
-		NewCenturySchlbk-Italic NewCenturySchlbk-Roman \
-		Palatino-Bold Palatino-BoldItalic Palatino-Italic \
-		Palatino-Roman Symbol Times-Bold Times-BoldItalic \
-		Times-Italic Times-Roman Utopia-Bold Utopia-BoldItalic \
-		Utopia-Italic Utopia-Regular ZapfChancery-MediumItalic \
-		ZapfDingbats
+		Bookman-Light Bookman-LightItalic Charter-Bold \
+		Charter-BoldItalic Charter-Italic Charter-Roman Courier \
+		Courier-Bold Courier-BoldOblique Courier-Oblique \
+		Helvetica Helvetica-Bold Helvetica-BoldOblique \
+		Helvetica-Narrow Helvetica-Narrow-Bold \
+		Helvetica-Narrow-BoldOblique Helvetica-Narrow-Oblique \
+		Helvetica-Oblique NewCenturySchlbk-Bold \
+		NewCenturySchlbk-BoldItalic NewCenturySchlbk-Italic \
+		NewCenturySchlbk-Roman Palatino-Bold \
+		Palatino-BoldItalic Palatino-Italic Palatino-Roman \
+		Symbol Times-Bold Times-BoldItalic Times-Italic \
+		Times-Roman Utopia-Bold Utopia-BoldItalic Utopia-Italic \
+		Utopia-Regular ZapfChancery-MediumItalic ZapfDingbats
+
 
 #
 # Make everything...
@@ -49,11 +51,13 @@ FONTS	=	AvantGarde-Book AvantGarde-BookOblique AvantGarde-Demi \
 
 all:
 
+
 #
 # Clean all config and object files...
 #
 
 clean:
+
 
 #
 # Install files...
@@ -62,6 +66,7 @@ clean:
 install:
 	-$(MKDIR) $(DATADIR)/fonts
 	$(CP) $(FONTS) $(DATADIR)/fonts
+
 
 #
 # End of "$Id: Makefile,v 1.6 1999/05/10 17:42:00 mike Exp $".
