@@ -1,5 +1,5 @@
 /*
- * "$Id: admin.c,v 1.48 2004/02/26 16:36:02 mike Exp $"
+ * "$Id: admin.c,v 1.49 2004/06/29 13:18:35 mike Exp $"
  *
  *   Administration CGI for the Common UNIX Printing System (CUPS).
  *
@@ -265,7 +265,7 @@ do_am_class(http_t      *http,		/* I - HTTP connection */
   if (*ptr || ptr == name || strlen(name) > 127)
   {
     cgiSetVariable("ERROR", "The class name may only contain up to 127 printable "
-                            "characters.");
+                            "characters and may not contain spaces.");
     cgiCopyTemplateLang(stdout, TEMPLATES, "error.tmpl", getenv("LANG"));
     return;
   }
@@ -576,7 +576,7 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
   if (*ptr || ptr == name || strlen(name) > 127)
   {
     cgiSetVariable("ERROR", "The printer name may only contain up to 127 printable "
-                            "characters.");
+                            "characters and may not contain spaces.");
     cgiCopyTemplateLang(stdout, TEMPLATES, "error.tmpl", getenv("LANG"));
     return;
   }
@@ -1601,5 +1601,5 @@ get_line(char *buf,	/* I - Line buffer */
 
 
 /*
- * End of "$Id: admin.c,v 1.48 2004/02/26 16:36:02 mike Exp $".
+ * End of "$Id: admin.c,v 1.49 2004/06/29 13:18:35 mike Exp $".
  */
