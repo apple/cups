@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.c,v 1.1.2.3 2004/02/02 22:41:44 mike Exp $"
+ * "$Id: auth.c,v 1.1.2.4 2004/02/05 20:54:44 mike Exp $"
  *
  *   Authentication functions for the Common UNIX Printing System (CUPS).
  *
@@ -75,6 +75,9 @@ cupsDoAuthentication(http_t     *http,	/* I - HTTP connection to server */
 		encode[512];		/* Encoded username:password */
 
 
+  DEBUG_printf(("cupsDoAuthentication(http=%p, method=\"%s\", resource=\"%s\")\n",
+                http, method, resource));
+
  /*
   * Clear the current authentication string...
   */
@@ -86,7 +89,10 @@ cupsDoAuthentication(http_t     *http,	/* I - HTTP connection to server */
   */
 
   if (!cups_local_auth(http))
+  {
+    DEBUG_printf(("cupsDoAuthentication: authstring=\"%s\"\n", http->authstring));
     return (0);
+  }
 
  /*
   * Nope, see if we should retry the current digest password...
@@ -146,6 +152,8 @@ cupsDoAuthentication(http_t     *http,	/* I - HTTP connection to server */
 	     "uri=\"%s\", response=\"%s\"", cupsUser(), realm, nonce,
 	     resource, encode);
   }
+
+  DEBUG_printf(("cupsDoAuthentication: authstring=\"%s\"\n", http->authstring));
 
   return (0);
 }
@@ -235,5 +243,5 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: auth.c,v 1.1.2.3 2004/02/02 22:41:44 mike Exp $".
+ * End of "$Id: auth.c,v 1.1.2.4 2004/02/05 20:54:44 mike Exp $".
  */

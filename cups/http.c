@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.82.2.42 2004/02/04 19:18:06 mike Exp $"
+ * "$Id: http.c,v 1.82.2.43 2004/02/05 20:54:44 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS).
  *
@@ -1325,6 +1325,8 @@ httpGets(char   *line,			/* I - Line to read into */
 #endif /* HAVE_SSL */
         bytes = recv(http->fd, bufend, HTTP_MAX_BUFFER - http->used, 0);
 
+      DEBUG_printf(("httpGets: read %d bytes...\n", bytes));
+
       if (bytes < 0)
       {
        /*
@@ -1340,6 +1342,8 @@ httpGets(char   *line,			/* I - Line to read into */
 
         DEBUG_printf(("httpGets: recv() error %d!\n", WSAGetLastError()));
 #else
+        DEBUG_printf(("httpGets: recv() error %d!\n", errno));
+
         if (errno == EINTR)
 	  continue;
 	else if (errno != http->error)
@@ -1347,8 +1351,6 @@ httpGets(char   *line,			/* I - Line to read into */
 	  http->error = errno;
 	  continue;
 	}
-
-        DEBUG_printf(("httpGets: recv() error %d!\n", errno));
 #endif /* WIN32 */
 
         return (NULL);
@@ -1678,6 +1680,8 @@ httpUpdate(http_t *http)		/* I - HTTP data */
 
   if (http->error)
   {
+    DEBUG_printf(("httpUpdate: socket error %d - %s\n", http->error,
+                  strerror(http->error)));
     http->status = HTTP_ERROR;
     return (HTTP_ERROR);
   }
@@ -2186,6 +2190,8 @@ http_setup_ssl(http_t *http)		/* I - HTTP data */
 #  endif /* HAVE_LIBSSL */
 
 
+  DEBUG_printf(("http_setup_ssl(http=%p)\n", http));
+
 #  ifdef HAVE_LIBSSL
   context = SSL_CTX_new(SSLv23_client_method());
   conn    = SSL_new(context);
@@ -2193,6 +2199,13 @@ http_setup_ssl(http_t *http)		/* I - HTTP data */
   SSL_set_fd(conn, http->fd);
   if (SSL_connect(conn) != 1)
   {
+#    ifdef DEBUG
+    unsigned long	error;	/* Error code */
+
+    while ((error = ERR_get_error()) != 0)
+      printf("http_setup_ssl: %s\n", ERR_error_string(error, NULL));
+#    endif /* DEBUG */
+
     SSL_CTX_free(context);
     SSL_free(conn);
 
@@ -2441,5 +2454,5 @@ CDSAWriteFunc(SSLConnectionRef connection,	/* I  - SSL/TLS connection */
 
 
 /*
- * End of "$Id: http.c,v 1.82.2.42 2004/02/04 19:18:06 mike Exp $".
+ * End of "$Id: http.c,v 1.82.2.43 2004/02/05 20:54:44 mike Exp $".
  */

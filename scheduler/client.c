@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.91.2.74 2004/02/03 04:08:18 mike Exp $"
+ * "$Id: client.c,v 1.91.2.75 2004/02/05 20:54:44 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -355,6 +355,7 @@ CloseAllClients(void)
 void
 CloseClient(client_t *con)	/* I - Client to close */
 {
+  int		partial;	/* Do partial close for SSL? */
 #if defined(HAVE_LIBSSL)
   SSL_CTX	*context;	/* Context for encryption */
   SSL		*conn;		/* Connection for encryption */
@@ -369,14 +370,7 @@ CloseClient(client_t *con)	/* I - Client to close */
 
   LogMessage(L_DEBUG, "CloseClient() %d", con->http.fd);
 
-  if (con->http.input_set)
-    free(con->http.input_set);
-
-  httpClearCookie(HTTP(con));
-
-  ClearString(&con->filename);
-  ClearString(&con->command);
-  ClearString(&con->options);
+  partial = 0;
 
 #ifdef HAVE_SSL
  /*
@@ -385,6 +379,8 @@ CloseClient(client_t *con)	/* I - Client to close */
 
   if (con->http.tls)
   {
+    partial = 1;
+
 #  ifdef HAVE_LIBSSL
     conn    = (SSL *)(con->http.tls);
     context = SSL_get_SSL_CTX(conn);
@@ -438,76 +434,123 @@ CloseClient(client_t *con)	/* I - Client to close */
   * Close the socket and clear the file from the input set for select()...
   */
 
-  if (con->http.fd >= 0)
+  if (con->http.fd > 0)
   {
-    LogMessage(L_DEBUG2, "CloseClient: Removing fd %d from InputSet and OutputSet...",
-               con->http.fd);
-    close(con->http.fd);
-    FD_CLR(con->http.fd, InputSet);
-    FD_CLR(con->http.fd, OutputSet);
-    con->http.fd = 0;
+    if (partial)
+    {
+     /*
+      * Only do a partial close so that the encrypted client gets everything.
+      */
+
+      LogMessage(L_DEBUG2, "CloseClient: Removing fd %d from OutputSet...",
+        	 con->http.fd);
+      shutdown(con->http.fd, 0);
+      FD_CLR(con->http.fd, OutputSet);
+    }
+    else
+    {
+     /*
+      * Shut the socket down fully...
+      */
+
+      LogMessage(L_DEBUG2, "CloseClient: Removing fd %d from InputSet and OutputSet...",
+        	 con->http.fd);
+      close(con->http.fd);
+      FD_CLR(con->http.fd, InputSet);
+      FD_CLR(con->http.fd, OutputSet);
+      con->http.fd = 0;
+    }
   }
 
   if (con->pipe_pid != 0)
   {
-    LogMessage(L_DEBUG2, "CloseClient: Removing fd %d from InputSet...",
-               con->file);
-    FD_CLR(con->file, InputSet);
-  }
+   /*
+    * Stop any CGI process...
+    */
 
-  if (con->file)
+    LogMessage(L_DEBUG2, "CloseClient: %d Killing process ID %d...",
+               con->http.fd, con->pipe_pid);
+    kill(con->pipe_pid, SIGKILL);
+
+    LogMessage(L_DEBUG2, "CloseClient: %d Removing fd %d from InputSet...",
+               con->http.fd, con->file);
+    FD_CLR(con->file, InputSet);
+
+    LogMessage(L_DEBUG2, "CloseClient: %d Closing data file %d.",
+               con->http.fd, con->file);
+
+    close(con->file);
+    con->file = 0;
+  }
+  else if (con->file)
   {
    /*
     * Close the open data file...
     */
 
-    if (con->pipe_pid)
-      kill(con->pipe_pid, SIGKILL);
 
-    LogMessage(L_DEBUG2, "CloseClient() %d Closing data file %d.",
-               con->http.fd, con->file);
-    LogMessage(L_DEBUG2, "CloseClient() %d Removing fd %d from InputSet.",
+    LogMessage(L_DEBUG2, "CloseClient: %d Removing fd %d from InputSet.",
                con->http.fd, con->file);
 
     FD_CLR(con->file, InputSet);
+
+    LogMessage(L_DEBUG2, "CloseClient: %d Closing data file %d.",
+               con->http.fd, con->file);
+
     close(con->file);
     con->file = 0;
   }
 
-  if (con->request)
+  if (!partial)
   {
-    ippDelete(con->request);
-    con->request = NULL;
+   /*
+    * Free memory...
+    */
+
+    if (con->http.input_set)
+      free(con->http.input_set);
+
+    httpClearCookie(HTTP(con));
+
+    ClearString(&con->filename);
+    ClearString(&con->command);
+    ClearString(&con->options);
+
+    if (con->request)
+    {
+      ippDelete(con->request);
+      con->request = NULL;
+    }
+
+    if (con->response)
+    {
+      ippDelete(con->response);
+      con->response = NULL;
+    }
+
+    if (con->language)
+    {
+      cupsLangFree(con->language);
+      con->language = NULL;
+    }
+
+   /*
+    * Re-enable new client connections if we are going back under the
+    * limit...
+    */
+
+    if (NumClients == MaxClients)
+      ResumeListening();
+
+   /*
+    * Compact the list of clients as necessary...
+    */
+
+    NumClients --;
+
+    if (con < (Clients + NumClients))
+      memmove(con, con + 1, (Clients + NumClients - con) * sizeof(client_t));
   }
-
-  if (con->response)
-  {
-    ippDelete(con->response);
-    con->response = NULL;
-  }
-
-  if (con->language)
-  {
-    cupsLangFree(con->language);
-    con->language = NULL;
-  }
-
- /*
-  * Re-enable new client connections if we are going back under the
-  * limit...
-  */
-
-  if (NumClients == MaxClients)
-    ResumeListening();
-
- /*
-  * Compact the list of clients as necessary...
-  */
-
-  NumClients --;
-
-  if (con < (Clients + NumClients))
-    memmove(con, con + 1, (Clients + NumClients - con) * sizeof(client_t));
 }
 
 
@@ -3465,5 +3508,5 @@ CDSAWriteFunc(SSLConnectionRef connection,	/* I  - SSL/TLS connection */
 
 
 /*
- * End of "$Id: client.c,v 1.91.2.74 2004/02/03 04:08:18 mike Exp $".
+ * End of "$Id: client.c,v 1.91.2.75 2004/02/05 20:54:44 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: getputfile.c,v 1.1.2.3 2004/02/04 19:18:06 mike Exp $"
+ * "$Id: getputfile.c,v 1.1.2.4 2004/02/05 20:54:44 mike Exp $"
  *
  *   Get/put file functions for the Common UNIX Printing System (CUPS).
  *
@@ -125,17 +125,6 @@ cupsGetFd(http_t     *http,		/* I - HTTP connection to server */
 
       continue;
     }
-    else if (status == HTTP_ERROR)
-    {
-#ifdef WIN32
-      if (http->error != WSAENETDOWN && http->error != WSAENETUNREACH)
-#else
-      if (http->error != ENETDOWN && http->error != ENETUNREACH)
-#endif /* WIN32 */
-        continue;
-      else
-        break;
-    }
 #ifdef HAVE_LIBSSL
     else if (status == HTTP_UPGRADE_REQUIRED)
     {
@@ -153,8 +142,7 @@ cupsGetFd(http_t     *http,		/* I - HTTP connection to server */
     }
 #endif /* HAVE_LIBSSL */
   }
-  while (status == HTTP_UNAUTHORIZED || status == HTTP_UPGRADE_REQUIRED ||
-         status == HTTP_ERROR);
+  while (status == HTTP_UNAUTHORIZED || status == HTTP_UPGRADE_REQUIRED);
 
  /*
   * See if we actually got the file or an error...
@@ -278,6 +266,9 @@ cupsPutFd(http_t     *http,		/* I - HTTP connection to server */
 
   do
   {
+    DEBUG_printf(("cupsPutFd: starting attempt, authstring=\"%s\"...\n",
+                  http->authstring));
+
     httpClearFields(http);
     httpSetField(http, HTTP_FIELD_AUTHORIZATION, http->authstring);
     httpSetField(http, HTTP_FIELD_TRANSFER_ENCODING, "chunked");
@@ -320,6 +311,8 @@ cupsPutFd(http_t     *http,		/* I - HTTP connection to server */
       while ((status = httpUpdate(http)) == HTTP_CONTINUE);
     }
 
+    DEBUG_printf(("cupsPutFd: status=%d\n", status));
+
     if (status == HTTP_UNAUTHORIZED)
     {
      /*
@@ -339,17 +332,6 @@ cupsPutFd(http_t     *http,		/* I - HTTP connection to server */
 
       continue;
     }
-    else if (status == HTTP_ERROR)
-    {
-#ifdef WIN32
-      if (http->error != WSAENETDOWN && http->error != WSAENETUNREACH)
-#else
-      if (http->error != ENETDOWN && http->error != ENETUNREACH)
-#endif /* WIN32 */
-        continue;
-      else
-        break;
-    }
 #ifdef HAVE_LIBSSL
     else if (status == HTTP_UPGRADE_REQUIRED)
     {
@@ -367,8 +349,7 @@ cupsPutFd(http_t     *http,		/* I - HTTP connection to server */
     }
 #endif /* HAVE_LIBSSL */
   }
-  while (status == HTTP_UNAUTHORIZED || status == HTTP_UPGRADE_REQUIRED ||
-         status == HTTP_ERROR);
+  while (status == HTTP_UNAUTHORIZED || status == HTTP_UPGRADE_REQUIRED);
 
  /*
   * See if we actually put the file or an error...
@@ -434,5 +415,5 @@ cupsPutFile(http_t     *http,		/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: getputfile.c,v 1.1.2.3 2004/02/04 19:18:06 mike Exp $".
+ * End of "$Id: getputfile.c,v 1.1.2.4 2004/02/05 20:54:44 mike Exp $".
  */
