@@ -1,11 +1,11 @@
 /*
- * "$Id: config.h.in,v 1.38 2001/02/21 17:01:15 mike Exp $"
+ * "$Id: config.h.in,v 1.39 2001/03/02 21:38:27 andy Exp $"
  *
  *   Configuration file for the Common UNIX Printing System (CUPS).
  *
  *   @configure_input@
  *
- *   Copyright 1997-2000 by Easy Software Products.
+ *   Copyright 1997-2001 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -19,7 +19,7 @@
  *       44141 Airport View Drive, Suite 204
  *       Hollywood, Maryland 20636-3111 USA
  *
- *       Voice: (301) 373-9603
+ *       Voice: (301) 373-9600
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
  */
@@ -148,5 +148,5 @@
 #undef HAVE_SYS_IOCTL_H
 
 /*
- * End of "$Id: config.h.in,v 1.38 2001/02/21 17:01:15 mike Exp $".
+ * End of "$Id: config.h.in,v 1.39 2001/03/02 21:38:27 andy Exp $".
  */

@@ -266,7 +266,7 @@ For commercial licensing information, please contact:
     44141 Airport View Drive, Suite 204
     Hollywood, Maryland 20636-3111 USA
 
-    Voice: +1.301.373.9603
+    Voice: +1.301.373.9600
     Email: cups-info@cups.org
     WWW: http://www.cups.org
 

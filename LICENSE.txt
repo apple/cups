@@ -1,10 +1,10 @@
                 Common UNIX Printing System License Agreement
 
-                Copyright 1997-2000 by Easy Software Products
+                Copyright 1997-2001 by Easy Software Products
                         44141 AIRPORT VIEW DR STE 204
                      HOLLYWOOD, MARYLAND 20636-3111 USA
 
-                           Voice: +1.301.373.9603
+                           Voice: +1.301.373.9600
                           Email: cups-info@cups.org
                           WWW: http://www.cups.org
 
