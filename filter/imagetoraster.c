@@ -1,5 +1,5 @@
 /*
- * "$Id: imagetoraster.c,v 1.1 1998/02/19 20:18:34 mike Exp $"
+ * "$Id: imagetoraster.c,v 1.2 1998/02/24 21:06:28 mike Exp $"
  *
  *   Image file to STIFF conversion program for espPrint, a collection
  *   of printer drivers.
@@ -17,9 +17,12 @@
  * Revision History:
  *
  *   $Log: imagetoraster.c,v $
- *   Revision 1.1  1998/02/19 20:18:34  mike
- *   Initial revision
+ *   Revision 1.2  1998/02/24 21:06:28  mike
+ *   Updated to handle variable media sizes and adjust the output size
+ *   accordingly.
  *
+ *   Revision 1.1  1998/02/19  20:18:34  mike
+ *   Initial revision
  */
 
 /*
@@ -115,6 +118,7 @@ main(int  argc,		/* I - Number of command-line arguments */
   int			bits,		/* Bits-per-channel */
 			icolorspace,	/* Image colorspace */
                         scolorspace,	/* STIFF colorspace */
+                        variable,	/* Non-zero if page is variable size */
 			width,		/* Width (pixels) of each image */
 			height,		/* Height (pixels) of each image */
 			xdpi,		/* Horizontal resolution */
@@ -204,6 +208,7 @@ main(int  argc,		/* I - Number of command-line arguments */
   scolorspace   = ST_TYPE_K;
   width         = 850;
   height        = 1100;
+  variable      = 1;
   xdpi          = 100;
   ydpi          = 100;
   copies        = 1;
@@ -250,8 +255,9 @@ main(int  argc,		/* I - Number of command-line arguments */
 		exit(ERR_BAD_ARG);
 	      };
 
-	      status = info->active_status;
-	      size   = PDFindPageSize(info, PD_SIZE_CURRENT);
+	      status   = info->active_status;
+	      size     = PDFindPageSize(info, PD_SIZE_CURRENT);
+	      variable = (status->media_size == PD_SIZE_VARIABLE);
 
 	     /*
 	      * Figure out what we need to generate...
@@ -784,6 +790,20 @@ main(int  argc,		/* I - Number of command-line arguments */
   else
     header.samplesPerPixel = ImageGetDepth(img);
 
+  if (variable)
+  {
+    if (rotation == 0)
+    {
+      width  = xdpi * xinches / xpages;
+      height = ydpi * yinches / ypages;
+    }
+    else
+    {
+      width  = ydpi * xinches / xpages;
+      height = xdpi * yinches / ypages;
+    };
+  };
+
   bpp    = header.bitsPerSample * header.samplesPerPixel;
   bwidth = (width * bpp + 7) / 8;
   blank  = icolorspace < 0 ? 0 : 255;
@@ -815,8 +835,8 @@ main(int  argc,		/* I - Number of command-line arguments */
 	  y0 = img->ysize * xpage / xpages;
 	  y1 = img->ysize * (xpage + 1) / xpages - 1;
 
-	  xtemp = ydpi * yinches / xpages;
-	  ytemp = xdpi * xinches / ypages;
+	  xtemp = ydpi * xinches / xpages;
+	  ytemp = xdpi * yinches / ypages;
 	};
 
 	z = ImageZoomAlloc(img, x0, y0, x1, y1, xtemp, ytemp, rotation);
@@ -1088,5 +1108,5 @@ make_lut(ib_t  *lut,		/* I - Lookup table */
 
 
 /*
- * End of "$Id: imagetoraster.c,v 1.1 1998/02/19 20:18:34 mike Exp $".
+ * End of "$Id: imagetoraster.c,v 1.2 1998/02/24 21:06:28 mike Exp $".
  */
