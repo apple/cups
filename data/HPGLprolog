@@ -1,6 +1,6 @@
-%%BeginResource procset hpgltops 1.0 0
+%%BeginResource: procset hpgltops 1.0 0
 %
-% "$Id: HPGLprolog,v 1.2 1999/03/23 20:13:17 mike Exp $"
+% "$Id: HPGLprolog,v 1.3 1999/05/11 19:45:39 mike Exp $"
 %
 %   HP-GL/2 filter procset for the Common UNIX Printing System (CUPS).
 %
