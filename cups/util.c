@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c,v 1.15 1999/05/09 13:37:16 mike Exp $"
+ * "$Id: util.c,v 1.16 1999/05/13 20:40:28 mike Exp $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -171,10 +171,11 @@ cupsDoRequest(http_t *http,	/* I - HTTP connection to server */
   */
 
   if (httpPost(http, resource))
-  {
-    ippDelete(request);
-    return (NULL);
-  }
+    if (httpPost(http, resource))
+    {
+      ippDelete(request);
+      return (NULL);
+    }
 
  /*
   * Send the IPP data and wait for the response...
@@ -658,8 +659,16 @@ cupsPrintFile(char          *name,	/* I - Printer or class name */
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
                NULL, uri);
 
-  ippAddString(request, IPP_TAG_JOB, IPP_TAG_MIMETYPE, "document-format",
-               NULL, "application/octet-stream");
+ /*
+  * Handle raw print files...
+  */
+
+  if (cupsGetOption("raw", num_options, options))
+    ippAddString(request, IPP_TAG_JOB, IPP_TAG_MIMETYPE, "document-format",
+        	 NULL, "application/vnd.cups-raw");
+  else
+    ippAddString(request, IPP_TAG_JOB, IPP_TAG_MIMETYPE, "document-format",
+        	 NULL, "application/octet-stream");
 
 #if defined(WIN32) || defined(__EMX__)
   ippAddString(request, IPP_TAG_JOB, IPP_TAG_NAME, "requesting-user-name",
@@ -678,6 +687,13 @@ cupsPrintFile(char          *name,	/* I - Printer or class name */
 
   for (i = 0; i < num_options; i ++)
   {
+   /*
+    * Skip the "raw" option - handled above...
+    */
+
+    if (strcmp(options[i].name, "raw") == 0)
+      continue;
+
    /*
     * See what the option value is; for compatibility with older interface
     * scripts, we have to support single-argument options as well as
@@ -912,5 +928,5 @@ cups_connect(char *name,	/* I - Destination (printer[@host]) */
 
 
 /*
- * End of "$Id: util.c,v 1.15 1999/05/09 13:37:16 mike Exp $".
+ * End of "$Id: util.c,v 1.16 1999/05/13 20:40:28 mike Exp $".
  */
