@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.127.2.87 2004/06/30 18:24:17 mike Exp $"
+ * "$Id: ipp.c,v 1.127.2.88 2004/06/30 20:44:53 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -3294,14 +3294,8 @@ create_job(client_t        *con,	/* I - Client connection */
   * Fill in the response info...
   */
 
-#ifdef AF_INET6
-  if (con->http.hostaddr.addr.sa_family == AF_INET6)
-    snprintf(job_uri, sizeof(job_uri), "http://%s:%d/jobs/%d", ServerName,
-	     ntohs(con->http.hostaddr.ipv6.sin6_port), job->id);
-  else
-#endif /* AF_INET6 */
   snprintf(job_uri, sizeof(job_uri), "http://%s:%d/jobs/%d", ServerName,
-	   ntohs(con->http.hostaddr.ipv4.sin_port), job->id);
+	   LocalPort, job->id);
 
   ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_URI, "job-uri", NULL, job_uri);
 
@@ -3368,6 +3362,17 @@ delete_printer(client_t        *con,	/* I - Client connection */
 
     LogMessage(L_ERROR, "delete_printer: resource name \'%s\' no good!", resource);
     send_ipp_error(con, IPP_NOT_FOUND);
+    return;
+  }
+
+ /*
+  * Check policy...
+  */
+
+  if (!CheckPolicy(DefaultPolicyPtr, con, NULL))
+  {
+    LogMessage(L_ERROR, "delete_printer: not authorized!");
+    send_ipp_error(con, IPP_NOT_AUTHORIZED);
     return;
   }
 
@@ -3680,14 +3685,8 @@ get_jobs(client_t        *con,		/* I - Client connection */
     * Send the requested attributes for each job...
     */
 
-#ifdef AF_INET6
-    if (con->http.hostaddr.addr.sa_family == AF_INET6)
-      snprintf(job_uri, sizeof(job_uri), "http://%s:%d/jobs/%d", ServerName,
-	       ntohs(con->http.hostaddr.ipv6.sin6_port), job->id);
-    else
-#endif /* AF_INET6 */
     snprintf(job_uri, sizeof(job_uri), "http://%s:%d/jobs/%d", ServerName,
-	     ntohs(con->http.hostaddr.ipv4.sin_port), job->id);
+	     LocalPort, job->id);
 
     ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_URI,
                  "job-more-info", NULL, job_uri);
@@ -3803,19 +3802,22 @@ get_job_attrs(client_t        *con,		/* I - Client connection */
   }
 
  /*
+  * Check policy...
+  */
+
+  if (!CheckPolicy(DefaultPolicyPtr, con, NULL))
+  {
+    LogMessage(L_ERROR, "get_job_attrs: not authorized!");
+    send_ipp_error(con, IPP_NOT_AUTHORIZED);
+    return;
+  }
+
+ /*
   * Put out the standard attributes...
   */
 
-#ifdef AF_INET6
-  if (con->http.hostaddr.addr.sa_family == AF_INET6)
-    snprintf(job_uri, sizeof(job_uri), "http://%s:%d/jobs/%d",
-	     ServerName, ntohs(con->http.hostaddr.ipv6.sin6_port),
-	     job->id);
-  else
-#endif /* AF_INET6 */
   snprintf(job_uri, sizeof(job_uri), "http://%s:%d/jobs/%d",
-	   ServerName, ntohs(con->http.hostaddr.ipv4.sin_port),
-	   job->id);
+	   ServerName, LocalPort, job->id);
 
   ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_INTEGER, "job-id", job->id);
 
@@ -3855,6 +3857,17 @@ static void
 get_ppds(client_t *con)			/* I - Client connection */
 {
   LogMessage(L_DEBUG2, "get_ppds(%d)\n", con->http.fd);
+
+ /*
+  * Check policy...
+  */
+
+  if (!CheckPolicy(DefaultPolicyPtr, con, NULL))
+  {
+    LogMessage(L_ERROR, "get_ppds: not authorized!");
+    send_ipp_error(con, IPP_NOT_AUTHORIZED);
+    return;
+  }
 
  /*
   * Copy the PPD attributes to the response using the requested-attributes
@@ -3913,6 +3926,17 @@ get_printer_attrs(client_t        *con,	/* I - Client connection */
 
     LogMessage(L_ERROR, "get_printer_attrs: resource name \'%s\' no good!", resource);
     send_ipp_error(con, IPP_NOT_FOUND);
+    return;
+  }
+
+ /*
+  * Check policy...
+  */
+
+  if (!CheckPolicy(printer->op_policy_ptr, con, NULL))
+  {
+    LogMessage(L_ERROR, "get_printer_attrs: not authorized!");
+    send_ipp_error(con, IPP_NOT_AUTHORIZED);
     return;
   }
 
@@ -4004,6 +4028,17 @@ get_printers(client_t *con,		/* I - Client connection */
 
 
   LogMessage(L_DEBUG2, "get_printers(%d, %x)\n", con->http.fd, type);
+
+ /*
+  * Check policy...
+  */
+
+  if (!CheckPolicy(DefaultPolicyPtr, con, NULL))
+  {
+    LogMessage(L_ERROR, "get_printers: not authorized!");
+    send_ipp_error(con, IPP_NOT_AUTHORIZED);
+    return;
+  }
 
  /*
   * See if they want to limit the number of printers reported...
@@ -4431,7 +4466,7 @@ move_job(client_t        *con,		/* I - Client connection */
   }
     
  /*
-  * Move the job to a different printer or class...
+  * Get the new printer or class...
   */
 
   httpSeparate(attr->values[0].string.text, method, username, host, &port,
@@ -4446,6 +4481,21 @@ move_job(client_t        *con,		/* I - Client connection */
     send_ipp_error(con, IPP_NOT_FOUND);
     return;
   }
+
+ /*
+  * Check policy...
+  */
+
+  if (!CheckPolicy(printer->op_policy_ptr, con, NULL))
+  {
+    LogMessage(L_ERROR, "move_job: not authorized!");
+    send_ipp_error(con, IPP_NOT_AUTHORIZED);
+    return;
+  }
+
+ /*
+  * Move the job to a different printer or class...
+  */
 
   MoveJob(jobid, dest);
 
@@ -4599,8 +4649,6 @@ print_job(client_t        *con,		/* I - Client connection */
   int			jobid;		/* Job ID number */
   char			job_uri[HTTP_MAX_URI],
 					/* Job URI */
-			printer_uri[HTTP_MAX_URI],
-					/* Printer URI */
 			method[HTTP_MAX_URI],
 					/* Method portion of URI */
 			username[HTTP_MAX_URI],
@@ -4816,6 +4864,17 @@ print_job(client_t        *con,		/* I - Client connection */
 
     LogMessage(L_ERROR, "print_job: resource name \'%s\' no good!", resource);
     send_ipp_error(con, IPP_NOT_FOUND);
+    return;
+  }
+
+ /*
+  * Check policy...
+  */
+
+  if (!CheckPolicy(printer->op_policy_ptr, con, NULL))
+  {
+    LogMessage(L_ERROR, "print_job: not authorized!");
+    send_ipp_error(con, IPP_NOT_AUTHORIZED);
     return;
   }
 
@@ -5221,14 +5280,8 @@ print_job(client_t        *con,		/* I - Client connection */
   * Fill in the response info...
   */
 
-#ifdef AF_INET6
-  if (con->http.hostaddr.addr.sa_family == AF_INET6)
-    snprintf(job_uri, sizeof(job_uri), "http://%s:%d/jobs/%d", ServerName,
-	     ntohs(con->http.hostaddr.ipv6.sin6_port), jobid);
-  else
-#endif /* AF_INET6 */
   snprintf(job_uri, sizeof(job_uri), "http://%s:%d/jobs/%d", ServerName,
-	   ntohs(con->http.hostaddr.ipv4.sin_port), jobid);
+	   LocalPort, jobid);
 
   ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_URI, "job-uri", NULL, job_uri);
 
@@ -5474,6 +5527,17 @@ reject_jobs(client_t        *con,	/* I - Client connection */
 
     LogMessage(L_ERROR, "reject_jobs: resource name \'%s\' no good!", resource);
     send_ipp_error(con, IPP_NOT_FOUND);
+    return;
+  }
+
+ /*
+  * Check policy...
+  */
+
+  if (!CheckPolicy(printer->op_policy_ptr, con, NULL))
+  {
+    LogMessage(L_ERROR, "reject_jobs: not authorized!");
+    send_ipp_error(con, IPP_NOT_AUTHORIZED);
     return;
   }
 
@@ -6157,14 +6221,8 @@ send_document(client_t        *con,	/* I - Client connection */
   * Fill in the response info...
   */
 
-#ifdef AF_INET6
-  if (con->http.hostaddr.addr.sa_family == AF_INET6)
-    snprintf(job_uri, sizeof(job_uri), "http://%s:%d/jobs/%d", ServerName,
-	     ntohs(con->http.hostaddr.ipv6.sin6_port), jobid);
-  else
-#endif /* AF_INET6 */
   snprintf(job_uri, sizeof(job_uri), "http://%s:%d/jobs/%d", ServerName,
-	   ntohs(con->http.hostaddr.ipv4.sin_port), jobid);
+	   LocalPort, jobid);
 
   ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_URI, "job-uri", NULL,
                job_uri);
@@ -6255,6 +6313,17 @@ set_default(client_t        *con,	/* I - Client connection */
 
     LogMessage(L_ERROR, "set_default: resource name \'%s\' no good!", resource);
     send_ipp_error(con, IPP_NOT_FOUND);
+    return;
+  }
+
+ /*
+  * Check policy...
+  */
+
+  if (!CheckPolicy(DefaultPolicyPtr, con, NULL))
+  {
+    LogMessage(L_ERROR, "set_default: not authorized!");
+    send_ipp_error(con, IPP_NOT_AUTHORIZED);
     return;
   }
 
@@ -6673,6 +6742,17 @@ start_printer(client_t        *con,	/* I - Client connection */
   }
 
  /*
+  * Check policy...
+  */
+
+  if (!CheckPolicy(printer->op_policy_ptr, con, NULL))
+  {
+    LogMessage(L_ERROR, "start_printer: not authorized!");
+    send_ipp_error(con, IPP_NOT_AUTHORIZED);
+    return;
+  }
+
+ /*
   * Start the printer...
   */
 
@@ -6748,6 +6828,17 @@ stop_printer(client_t        *con,	/* I - Client connection */
 
     LogMessage(L_ERROR, "stop_printer: resource name \'%s\' no good!", resource);
     send_ipp_error(con, IPP_NOT_FOUND);
+    return;
+  }
+
+ /*
+  * Check policy...
+  */
+
+  if (!CheckPolicy(printer->op_policy_ptr, con, NULL))
+  {
+    LogMessage(L_ERROR, "stop_printer: not authorized!");
+    send_ipp_error(con, IPP_NOT_AUTHORIZED);
     return;
   }
 
@@ -6886,6 +6977,17 @@ validate_job(client_t        *con,	/* I - Client connection */
   }
 
  /*
+  * Check policy...
+  */
+
+  if (!CheckPolicy(printer->op_policy_ptr, con, NULL))
+  {
+    LogMessage(L_ERROR, "validate_job: not authorized!");
+    send_ipp_error(con, IPP_NOT_AUTHORIZED);
+    return;
+  }
+
+ /*
   * Everything was ok, so return OK status...
   */
 
@@ -6904,11 +7006,7 @@ validate_user(job_t      *job,		/* I - Job */
               char       *username,	/* O - Authenticated username */
 	      int        userlen)	/* I - Length of username */
 {
-  int			i, j;		/* Looping vars */
   ipp_attribute_t	*attr;		/* requesting-user-name attribute */
-  struct passwd		*user;		/* User info */
-  struct group		*group;		/* System group info */
-  char			junk[33];	/* MD5 password (not used) */
   printer_t		*printer;	/* Printer for job */
 
 
@@ -6950,5 +7048,5 @@ validate_user(job_t      *job,		/* I - Job */
 
 
 /*
- * End of "$Id: ipp.c,v 1.127.2.87 2004/06/30 18:24:17 mike Exp $".
+ * End of "$Id: ipp.c,v 1.127.2.88 2004/06/30 20:44:53 mike Exp $".
  */
