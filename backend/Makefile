@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.6 1999/06/21 18:59:05 mike Exp $"
+# "$Id: Makefile,v 1.7 1999/06/24 17:43:35 mike Exp $"
 #
 #   Backend makefile for the Common UNIX Printing System (CUPS).
 #
@@ -47,6 +47,7 @@ clean:
 install:
 	-$(MKDIR) $(SERVERROOT)/backend
 	$(CP) $(TARGETS) $(SERVERROOT)/backend
+	$(LN) ipp $(SERVERROOT)/backend/http
 	$(CHMOD) u+s $(SERVERROOT)/backend/lpd
 
 #
@@ -56,6 +57,7 @@ install:
 ipp:	ipp.o ../cups/libcups.a
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o ipp ipp.o $(LIBS)
+	$(LN) ipp http
 
 ipp.o:	../cups/cups.h ../Makedefs
 
@@ -113,5 +115,5 @@ socket:	socket.o ../cups/libcups.a
 socket.o:	../cups/cups.h ../Makedefs
 
 #
-# End of "$Id: Makefile,v 1.6 1999/06/21 18:59:05 mike Exp $".
+# End of "$Id: Makefile,v 1.7 1999/06/24 17:43:35 mike Exp $".
 #
