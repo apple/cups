@@ -3,6 +3,8 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.16
 
+	- The number-up option was incorrectly being used when
+	  printing banner pages.
 	- Added support for Greek and Slovak PPD files.
 	- CUPS now supports printer names containing any
 	  printable character, e.g. "123-abc", "foo-bar", etc.
