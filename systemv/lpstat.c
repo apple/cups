@@ -1,5 +1,5 @@
 /*
- * "$Id: lpstat.c,v 1.37.2.5 2002/03/22 15:47:33 mike Exp $"
+ * "$Id: lpstat.c,v 1.37.2.6 2002/05/09 03:08:05 mike Exp $"
  *
  *   "lpstat" command for the Common UNIX Printing System (CUPS).
  *
@@ -509,8 +509,8 @@ show_accepting(http_t      *http,	/* I - HTTP connection to server */
 
   request = ippNew();
 
-  request->header.op.operation_id = CUPS_GET_PRINTERS;
-  request->header.op.request_id   = 1;
+  request->request.op.operation_id = CUPS_GET_PRINTERS;
+  request->request.op.request_id   = 1;
 
   language = cupsLangDefault();
 
@@ -532,10 +532,10 @@ show_accepting(http_t      *http,	/* I - HTTP connection to server */
   {
     DEBUG_puts("show_accepting: request succeeded...");
 
-    if (response->header.status.status_code > IPP_OK_CONFLICT)
+    if (response->request.status.status_code > IPP_OK_CONFLICT)
     {
       fprintf(stderr, "lpstat: get-printers failed: %s\n",
-              ippErrorString(response->header.status.status_code));
+              ippErrorString(response->request.status.status_code));
       ippDelete(response);
       return;
     }
@@ -735,8 +735,8 @@ show_classes(http_t     *http,	/* I - HTTP connection to server */
 
   request = ippNew();
 
-  request->header.op.operation_id = CUPS_GET_CLASSES;
-  request->header.op.request_id   = 1;
+  request->request.op.operation_id = CUPS_GET_CLASSES;
+  request->request.op.request_id   = 1;
 
   language = cupsLangDefault();
 
@@ -758,10 +758,10 @@ show_classes(http_t     *http,	/* I - HTTP connection to server */
   {
     DEBUG_puts("show_classes: request succeeded...");
 
-    if (response->header.status.status_code > IPP_OK_CONFLICT)
+    if (response->request.status.status_code > IPP_OK_CONFLICT)
     {
       fprintf(stderr, "lpstat: get-classes failed: %s\n",
-              ippErrorString(response->header.status.status_code));
+              ippErrorString(response->request.status.status_code));
       ippDelete(response);
       return;
     }
@@ -832,8 +832,8 @@ show_classes(http_t     *http,	/* I - HTTP connection to server */
 
 	  request = ippNew();
 
-	  request->header.op.operation_id = IPP_GET_PRINTER_ATTRIBUTES;
-	  request->header.op.request_id   = 1;
+	  request->request.op.operation_id = IPP_GET_PRINTER_ATTRIBUTES;
+	  request->request.op.request_id   = 1;
 
 	  language = cupsLangDefault();
 
@@ -1028,8 +1028,8 @@ show_devices(http_t      *http,		/* I - HTTP connection to server */
 
   request = ippNew();
 
-  request->header.op.operation_id = CUPS_GET_PRINTERS;
-  request->header.op.request_id   = 1;
+  request->request.op.operation_id = CUPS_GET_PRINTERS;
+  request->request.op.request_id   = 1;
 
   language = cupsLangDefault();
 
@@ -1051,10 +1051,10 @@ show_devices(http_t      *http,		/* I - HTTP connection to server */
   {
     DEBUG_puts("show_devices: request succeeded...");
 
-    if (response->header.status.status_code > IPP_OK_CONFLICT)
+    if (response->request.status.status_code > IPP_OK_CONFLICT)
     {
       fprintf(stderr, "lpstat: get-printers failed: %s\n",
-              ippErrorString(response->header.status.status_code));
+              ippErrorString(response->request.status.status_code));
       ippDelete(response);
       return;
     }
@@ -1290,8 +1290,8 @@ show_jobs(http_t     *http,	/* I - HTTP connection to server */
 
   request = ippNew();
 
-  request->header.op.operation_id = IPP_GET_JOBS;
-  request->header.op.request_id   = 1;
+  request->request.op.operation_id = IPP_GET_JOBS;
+  request->request.op.request_id   = 1;
 
   language = cupsLangDefault();
 
@@ -1318,10 +1318,10 @@ show_jobs(http_t     *http,	/* I - HTTP connection to server */
     * Loop through the job list and display them...
     */
 
-    if (response->header.status.status_code > IPP_OK_CONFLICT)
+    if (response->request.status.status_code > IPP_OK_CONFLICT)
     {
       fprintf(stderr, "lpstat: get-jobs failed: %s\n",
-              ippErrorString(response->header.status.status_code));
+              ippErrorString(response->request.status.status_code));
       ippDelete(response);
       return;
     }
@@ -1597,8 +1597,8 @@ show_printers(http_t      *http,	/* I - HTTP connection to server */
 
   request = ippNew();
 
-  request->header.op.operation_id = CUPS_GET_PRINTERS;
-  request->header.op.request_id   = 1;
+  request->request.op.operation_id = CUPS_GET_PRINTERS;
+  request->request.op.request_id   = 1;
 
   language = cupsLangDefault();
 
@@ -1620,10 +1620,10 @@ show_printers(http_t      *http,	/* I - HTTP connection to server */
   {
     DEBUG_puts("show_printers: request succeeded...");
 
-    if (response->header.status.status_code > IPP_OK_CONFLICT)
+    if (response->request.status.status_code > IPP_OK_CONFLICT)
     {
       fprintf(stderr, "lpstat: get-printers failed: %s\n",
-              ippErrorString(response->header.status.status_code));
+              ippErrorString(response->request.status.status_code));
       ippDelete(response);
       return;
     }
@@ -1767,8 +1767,8 @@ show_printers(http_t      *http,	/* I - HTTP connection to server */
 
 	  request = ippNew();
 
-	  request->header.op.operation_id = IPP_GET_JOBS;
-	  request->header.op.request_id   = 1;
+	  request->request.op.operation_id = IPP_GET_JOBS;
+	  request->request.op.request_id   = 1;
 
 	  language = cupsLangDefault();
 
@@ -1920,5 +1920,5 @@ show_scheduler(http_t *http)	/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpstat.c,v 1.37.2.5 2002/03/22 15:47:33 mike Exp $".
+ * End of "$Id: lpstat.c,v 1.37.2.6 2002/05/09 03:08:05 mike Exp $".
  */

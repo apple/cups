@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.h,v 1.36.2.10 2002/05/09 02:22:08 mike Exp $"
+ * "$Id: ipp.h,v 1.36.2.11 2002/05/09 03:08:00 mike Exp $"
  *
  *   Internet Printing Protocol definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -380,7 +380,7 @@ typedef struct ipp_attribute_s	/**** Attribute ****/
 typedef struct			/**** Request State ****/
 {
   ipp_state_t	state;		/* State of request */
-  ipp_header_t	header;		/* Request header */
+  ipp_header_t	request;	/* Request header */
   ipp_attribute_t *attrs,	/* Attributes */
 		*last,		/* Last attribute in list */
 		*current;	/* Current attribute (for read/write) */
@@ -442,5 +442,5 @@ extern void		_ipp_free_attr(ipp_attribute_t *);
 #endif /* !_IPP_IPP_H_ */
 
 /*
- * End of "$Id: ipp.h,v 1.36.2.10 2002/05/09 02:22:08 mike Exp $".
+ * End of "$Id: ipp.h,v 1.36.2.11 2002/05/09 03:08:00 mike Exp $".
  */

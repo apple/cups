@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.21.2.4 2002/04/08 16:28:59 mike Exp $"
+ * "$Id: printers.c,v 1.21.2.5 2002/05/09 03:07:58 mike Exp $"
  *
  *   Printer status CGI for the Common UNIX Printing System (CUPS).
  *
@@ -104,8 +104,8 @@ main(int  argc,			/* I - Number of command-line arguments */
     */
 
     request = ippNew();
-    request->header.op.operation_id = CUPS_GET_DEFAULT;
-    request->header.op.request_id   = 1;
+    request->request.op.operation_id = CUPS_GET_DEFAULT;
+    request->request.op.request_id   = 1;
 
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
         	 "attributes-charset", NULL, cupsLangEncoding(language));
@@ -179,8 +179,8 @@ main(int  argc,			/* I - Number of command-line arguments */
       *    attributes-natural-language
       */
 
-      request->header.op.operation_id = CUPS_GET_PRINTERS;
-      request->header.op.request_id   = 1;
+      request->request.op.operation_id = CUPS_GET_PRINTERS;
+      request->request.op.request_id   = 1;
     }
     else
     {
@@ -193,8 +193,8 @@ main(int  argc,			/* I - Number of command-line arguments */
       *    printer-uri
       */
 
-      request->header.op.operation_id = IPP_GET_PRINTER_ATTRIBUTES;
-      request->header.op.request_id   = 1;
+      request->request.op.operation_id = IPP_GET_PRINTER_ATTRIBUTES;
+      request->request.op.request_id   = 1;
 
       snprintf(uri, sizeof(uri), "ipp://%s/printers/%s", getenv("SERVER_NAME"),
                printer);
@@ -241,8 +241,8 @@ main(int  argc,			/* I - Number of command-line arguments */
       ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
         	   "attributes-natural-language", NULL, language->language);
 
-      request->header.op.operation_id = IPP_GET_JOBS;
-      request->header.op.request_id   = 1;
+      request->request.op.operation_id = IPP_GET_JOBS;
+      request->request.op.request_id   = 1;
 
       snprintf(uri, sizeof(uri), "ipp://%s/printers/%s", getenv("SERVER_NAME"),
                printer);
@@ -287,8 +287,8 @@ main(int  argc,			/* I - Number of command-line arguments */
 
     request = ippNew();
 
-    request->header.op.operation_id = IPP_PRINT_JOB;
-    request->header.op.request_id   = 1;
+    request->request.op.operation_id = IPP_PRINT_JOB;
+    request->request.op.request_id   = 1;
 
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
         	 "attributes-charset", NULL, cupsLangEncoding(language));
@@ -319,7 +319,7 @@ main(int  argc,			/* I - Number of command-line arguments */
     if ((response = cupsDoFileRequest(http, request, uri + 15,
                                       CUPS_DATADIR "/data/testprint.ps")) != NULL)
     {
-      status = response->header.status.status_code;
+      status = response->request.status.status_code;
       ippSetCGIVars(response, NULL, NULL);
 
       ippDelete(response);
@@ -356,5 +356,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: printers.c,v 1.21.2.4 2002/04/08 16:28:59 mike Exp $".
+ * End of "$Id: printers.c,v 1.21.2.5 2002/05/09 03:07:58 mike Exp $".
  */

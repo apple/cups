@@ -1,5 +1,5 @@
 /*
- * "$Id: lpmove.c,v 1.5.2.3 2002/03/22 15:47:32 mike Exp $"
+ * "$Id: lpmove.c,v 1.5.2.4 2002/05/09 03:08:05 mike Exp $"
  *
  *   "lpmove" command for the Common UNIX Printing System (CUPS).
  *
@@ -184,8 +184,8 @@ move_job(http_t     *http,	/* I - HTTP connection to server */
 
   request = ippNew();
 
-  request->header.op.operation_id = CUPS_MOVE_JOB;
-  request->header.op.request_id   = 1;
+  request->request.op.operation_id = CUPS_MOVE_JOB;
+  request->request.op.request_id   = 1;
 
   language = cupsLangDefault();
 
@@ -211,10 +211,10 @@ move_job(http_t     *http,	/* I - HTTP connection to server */
 
   if ((response = cupsDoRequest(http, request, "/jobs")) != NULL)
   {
-    if (response->header.status.status_code > IPP_OK_CONFLICT)
+    if (response->request.status.status_code > IPP_OK_CONFLICT)
     {
       fprintf(stderr, "lpmove: move-job failed: %s\n",
-              ippErrorString(response->header.status.status_code));
+              ippErrorString(response->request.status.status_code));
       ippDelete(response);
       return;
     }
@@ -228,5 +228,5 @@ move_job(http_t     *http,	/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpmove.c,v 1.5.2.3 2002/03/22 15:47:32 mike Exp $".
+ * End of "$Id: lpmove.c,v 1.5.2.4 2002/05/09 03:08:05 mike Exp $".
  */

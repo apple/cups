@@ -1,5 +1,5 @@
 /*
- * "$Id: admin.c,v 1.22.2.5 2002/03/25 18:02:46 mike Exp $"
+ * "$Id: admin.c,v 1.22.2.6 2002/05/09 03:07:57 mike Exp $"
  *
  *   Administration CGI for the Common UNIX Printing System (CUPS).
  *
@@ -221,8 +221,8 @@ do_am_class(http_t      *http,		/* I - HTTP connection */
 
       request = ippNew();
 
-      request->header.op.operation_id = IPP_GET_PRINTER_ATTRIBUTES;
-      request->header.op.request_id   = 1;
+      request->request.op.operation_id = IPP_GET_PRINTER_ATTRIBUTES;
+      request->request.op.request_id   = 1;
 
       ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
         	   "attributes-charset", NULL, cupsLangEncoding(language));
@@ -292,8 +292,8 @@ do_am_class(http_t      *http,		/* I - HTTP connection */
 
     request = ippNew();
 
-    request->header.op.operation_id = CUPS_GET_PRINTERS;
-    request->header.op.request_id   = 1;
+    request->request.op.operation_id = CUPS_GET_PRINTERS;
+    request->request.op.request_id   = 1;
 
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
         	 "attributes-charset", NULL, cupsLangEncoding(language));
@@ -350,8 +350,8 @@ do_am_class(http_t      *http,		/* I - HTTP connection */
 
     request = ippNew();
 
-    request->header.op.operation_id = IPP_GET_PRINTER_ATTRIBUTES;
-    request->header.op.request_id   = 1;
+    request->request.op.operation_id = IPP_GET_PRINTER_ATTRIBUTES;
+    request->request.op.request_id   = 1;
 
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
         	 "attributes-charset", NULL, cupsLangEncoding(language));
@@ -415,8 +415,8 @@ do_am_class(http_t      *http,		/* I - HTTP connection */
 
     request = ippNew();
 
-    request->header.op.operation_id = CUPS_ADD_CLASS;
-    request->header.op.request_id   = 1;
+    request->request.op.operation_id = CUPS_ADD_CLASS;
+    request->request.op.request_id   = 1;
 
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
         	 "attributes-charset", NULL, cupsLangEncoding(language));
@@ -454,7 +454,7 @@ do_am_class(http_t      *http,		/* I - HTTP connection */
 
     if ((response = cupsDoRequest(http, request, "/admin/")) != NULL)
     {
-      status = response->header.status.status_code;
+      status = response->request.status.status_code;
       ippDelete(response);
     }
     else
@@ -526,8 +526,8 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
 
     request = ippNew();
 
-    request->header.op.operation_id = IPP_GET_PRINTER_ATTRIBUTES;
-    request->header.op.request_id   = 1;
+    request->request.op.operation_id = IPP_GET_PRINTER_ATTRIBUTES;
+    request->request.op.request_id   = 1;
 
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
         	 "attributes-charset", NULL, cupsLangEncoding(language));
@@ -606,8 +606,8 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
 
     request = ippNew();
 
-    request->header.op.operation_id = CUPS_GET_DEVICES;
-    request->header.op.request_id   = 1;
+    request->request.op.operation_id = CUPS_GET_DEVICES;
+    request->request.op.request_id   = 1;
 
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
         	 "attributes-charset", NULL, cupsLangEncoding(language));
@@ -743,8 +743,8 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
 
     request = ippNew();
 
-    request->header.op.operation_id = CUPS_GET_PPDS;
-    request->header.op.request_id   = 1;
+    request->request.op.operation_id = CUPS_GET_PPDS;
+    request->request.op.request_id   = 1;
 
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
         	 "attributes-charset", NULL, cupsLangEncoding(language));
@@ -829,8 +829,8 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
 
     request = ippNew();
 
-    request->header.op.operation_id = CUPS_ADD_PRINTER;
-    request->header.op.request_id   = 1;
+    request->request.op.operation_id = CUPS_ADD_PRINTER;
+    request->request.op.request_id   = 1;
 
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
         	 "attributes-charset", NULL, cupsLangEncoding(language));
@@ -883,7 +883,7 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
 
     if ((response = cupsDoRequest(http, request, "/admin/")) != NULL)
     {
-      status = response->header.status.status_code;
+      status = response->request.status.status_code;
       ippDelete(response);
     }
     else
@@ -1052,8 +1052,8 @@ do_config_printer(http_t      *http,	/* I - HTTP connection */
 
     request = ippNew();
 
-    request->header.op.operation_id = IPP_GET_PRINTER_ATTRIBUTES;
-    request->header.op.request_id   = 1;
+    request->request.op.operation_id = IPP_GET_PRINTER_ATTRIBUTES;
+    request->request.op.request_id   = 1;
 
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
         	 "attributes-charset", NULL, cupsLangEncoding(language));
@@ -1184,8 +1184,8 @@ do_config_printer(http_t      *http,	/* I - HTTP connection */
 
     request = ippNew();
 
-    request->header.op.operation_id = CUPS_ADD_PRINTER;
-    request->header.op.request_id   = 1;
+    request->request.op.operation_id = CUPS_ADD_PRINTER;
+    request->request.op.request_id   = 1;
 
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
         	 "attributes-charset", NULL, cupsLangEncoding(language));
@@ -1209,7 +1209,7 @@ do_config_printer(http_t      *http,	/* I - HTTP connection */
 
     if ((response = cupsDoFileRequest(http, request, "/admin/", tempfile)) != NULL)
     {
-      status = response->header.status.status_code;
+      status = response->request.status.status_code;
       ippDelete(response);
     }
     else
@@ -1271,8 +1271,8 @@ do_delete_class(http_t      *http,	/* I - HTTP connection */
 
   request = ippNew();
 
-  request->header.op.operation_id = CUPS_DELETE_CLASS;
-  request->header.op.request_id   = 1;
+  request->request.op.operation_id = CUPS_DELETE_CLASS;
+  request->request.op.request_id   = 1;
 
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
                "attributes-charset", NULL, cupsLangEncoding(language));
@@ -1289,7 +1289,7 @@ do_delete_class(http_t      *http,	/* I - HTTP connection */
 
   if ((response = cupsDoRequest(http, request, "/admin/")) != NULL)
   {
-    status = response->header.status.status_code;
+    status = response->request.status.status_code;
 
     ippDelete(response);
   }
@@ -1347,8 +1347,8 @@ do_delete_printer(http_t      *http,	/* I - HTTP connection */
 
   request = ippNew();
 
-  request->header.op.operation_id = CUPS_DELETE_PRINTER;
-  request->header.op.request_id   = 1;
+  request->request.op.operation_id = CUPS_DELETE_PRINTER;
+  request->request.op.request_id   = 1;
 
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
                "attributes-charset", NULL, cupsLangEncoding(language));
@@ -1365,7 +1365,7 @@ do_delete_printer(http_t      *http,	/* I - HTTP connection */
 
   if ((response = cupsDoRequest(http, request, "/admin/")) != NULL)
   {
-    status = response->header.status.status_code;
+    status = response->request.status.status_code;
 
     ippDelete(response);
   }
@@ -1422,8 +1422,8 @@ do_job_op(http_t      *http,		/* I - HTTP connection */
 
   request = ippNew();
 
-  request->header.op.operation_id = op;
-  request->header.op.request_id   = 1;
+  request->request.op.operation_id = op;
+  request->request.op.request_id   = 1;
 
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
                "attributes-charset", NULL, cupsLangEncoding(language));
@@ -1451,7 +1451,7 @@ do_job_op(http_t      *http,		/* I - HTTP connection */
 
   if ((response = cupsDoRequest(http, request, "/jobs")) != NULL)
   {
-    status = response->header.status.status_code;
+    status = response->request.status.status_code;
 
     ippDelete(response);
   }
@@ -1510,8 +1510,8 @@ do_printer_op(http_t      *http,	/* I - HTTP connection */
 
   request = ippNew();
 
-  request->header.op.operation_id = op;
-  request->header.op.request_id   = 1;
+  request->request.op.operation_id = op;
+  request->request.op.request_id   = 1;
 
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
                "attributes-charset", NULL, cupsLangEncoding(language));
@@ -1528,7 +1528,7 @@ do_printer_op(http_t      *http,	/* I - HTTP connection */
 
   if ((response = cupsDoRequest(http, request, "/admin/")) != NULL)
   {
-    status = response->header.status.status_code;
+    status = response->request.status.status_code;
 
     ippDelete(response);
   }
@@ -1600,5 +1600,5 @@ get_line(char *buf,	/* I - Line buffer */
 
 
 /*
- * End of "$Id: admin.c,v 1.22.2.5 2002/03/25 18:02:46 mike Exp $".
+ * End of "$Id: admin.c,v 1.22.2.6 2002/05/09 03:07:57 mike Exp $".
  */

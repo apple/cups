@@ -1,5 +1,5 @@
 /*
- * "$Id: lprm.c,v 1.15.2.3 2002/03/22 15:47:17 mike Exp $"
+ * "$Id: lprm.c,v 1.15.2.4 2002/05/09 03:07:57 mike Exp $"
  *
  *   "lprm" command for the Common UNIX Printing System (CUPS).
  *
@@ -165,8 +165,8 @@ main(int  argc,			/* I - Number of command-line arguments */
 
       request = ippNew();
 
-      request->header.op.operation_id = op;
-      request->header.op.request_id   = 1;
+      request->request.op.operation_id = op;
+      request->request.op.request_id   = 1;
 
       language = cupsLangDefault();
 
@@ -205,7 +205,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 
       if (response != NULL)
       {
-        switch (response->header.status.status_code)
+        switch (response->request.status.status_code)
 	{
 	  case IPP_NOT_FOUND :
               fputs("lprm: Job or printer not found!\n", stderr);
@@ -217,12 +217,12 @@ main(int  argc,			/* I - Number of command-line arguments */
               fprintf(stderr, "lprm: You don't own job ID %d!\n", job_id);
 	      break;
 	  default :
-              if (response->header.status.status_code > IPP_OK_CONFLICT)
+              if (response->request.status.status_code > IPP_OK_CONFLICT)
                 fputs("lprm: Unable to lprm job(s)!\n", stderr);
 	      break;
 	}
 
-        if (response->header.status.status_code > IPP_OK_CONFLICT)
+        if (response->request.status.status_code > IPP_OK_CONFLICT)
 	{
           ippDelete(response);
           cupsFreeDests(num_dests, dests);
@@ -263,5 +263,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: lprm.c,v 1.15.2.3 2002/03/22 15:47:17 mike Exp $".
+ * End of "$Id: lprm.c,v 1.15.2.4 2002/05/09 03:07:57 mike Exp $".
  */

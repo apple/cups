@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.127.2.12 2002/04/29 17:27:20 mike Exp $"
+ * "$Id: ipp.c,v 1.127.2.13 2002/05/09 03:08:02 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -143,7 +143,7 @@ ProcessIPPRequest(client_t *con)	/* I - Client connection */
 
   DEBUG_printf(("ProcessIPPRequest(%08x)\n", con));
   DEBUG_printf(("ProcessIPPRequest: operation_id = %04x\n",
-                con->request->header.op.operation_id));
+                con->request->request.op.operation_id));
 
  /*
   * First build an empty response message for this request...
@@ -151,23 +151,23 @@ ProcessIPPRequest(client_t *con)	/* I - Client connection */
 
   con->response = ippNew();
 
-  con->response->header.status.version[0] = con->request->header.op.version[0];
-  con->response->header.status.version[1] = con->request->header.op.version[1];
-  con->response->header.status.request_id = con->request->header.op.request_id;
+  con->response->request.status.version[0] = con->request->request.op.version[0];
+  con->response->request.status.version[1] = con->request->request.op.version[1];
+  con->response->request.status.request_id = con->request->request.op.request_id;
 
  /*
   * Then validate the request header and required attributes...
   */
   
-  if (con->request->header.any.version[0] != 1)
+  if (con->request->request.any.version[0] != 1)
   {
    /*
     * Return an error, since we only support IPP 1.x.
     */
 
     LogMessage(L_ERROR, "ProcessIPPRequest: bad request version (%d.%d)!",
-               con->request->header.any.version[0],
-	       con->request->header.any.version[1]);
+               con->request->request.any.version[0],
+	       con->request->request.any.version[1]);
 
     send_ipp_error(con, IPP_VERSION_NOT_SUPPORTED);
   }  
@@ -248,11 +248,11 @@ ProcessIPPRequest(client_t *con)	/* I - Client connection */
 
       if (charset == NULL || language == NULL ||
 	  (uri == NULL &&
-	   con->request->header.op.operation_id != CUPS_GET_DEFAULT &&
-	   con->request->header.op.operation_id != CUPS_GET_PRINTERS &&
-	   con->request->header.op.operation_id != CUPS_GET_CLASSES &&
-	   con->request->header.op.operation_id != CUPS_GET_DEVICES &&
-	   con->request->header.op.operation_id != CUPS_GET_PPDS))
+	   con->request->request.op.operation_id != CUPS_GET_DEFAULT &&
+	   con->request->request.op.operation_id != CUPS_GET_PRINTERS &&
+	   con->request->request.op.operation_id != CUPS_GET_CLASSES &&
+	   con->request->request.op.operation_id != CUPS_GET_DEVICES &&
+	   con->request->request.op.operation_id != CUPS_GET_PPDS))
       {
        /*
 	* Return an error, since attributes-charset,
@@ -301,7 +301,7 @@ ProcessIPPRequest(client_t *con)	/* I - Client connection */
         * Then try processing the operation...
 	*/
 
-	switch (con->request->header.op.operation_id)
+	switch (con->request->request.op.operation_id)
 	{
 	  case IPP_PRINT_JOB :
               print_job(con, uri);
@@ -517,7 +517,7 @@ accept_jobs(client_t        *con,	/* I - Client connection */
   * Everything was ok, so return OK status...
   */
 
-  con->response->header.status.status_code = IPP_OK;
+  con->response->request.status.status_code = IPP_OK;
 }
 
 
@@ -814,7 +814,7 @@ add_class(client_t        *con,		/* I - Client connection */
     LogMessage(L_INFO, "New class \'%s\' added by \'%s\'.", pclass->name,
                con->username);
 
-  con->response->header.status.status_code = IPP_OK;
+  con->response->request.status.status_code = IPP_OK;
 }
 
 
@@ -1379,7 +1379,7 @@ add_printer(client_t        *con,	/* I - Client connection */
     LogMessage(L_INFO, "New printer \'%s\' added by \'%s\'.", printer->name,
                con->username);
 
-  con->response->header.status.status_code = IPP_OK;
+  con->response->request.status.status_code = IPP_OK;
 }
 
 
@@ -1523,7 +1523,7 @@ cancel_all_jobs(client_t        *con,	/* I - Client connection */
                con->username);
   }
 
-  con->response->header.status.status_code = IPP_OK;
+  con->response->request.status.status_code = IPP_OK;
 }
 
 
@@ -1713,7 +1713,7 @@ cancel_job(client_t        *con,	/* I - Client connection */
 
   LogMessage(L_INFO, "Job %d was cancelled by \'%s\'.", jobid, username);
 
-  con->response->header.status.status_code = IPP_OK;
+  con->response->request.status.status_code = IPP_OK;
 }
 
 
@@ -2443,7 +2443,7 @@ create_job(client_t        *con,	/* I - Client connection */
   ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_ENUM, "job-state",
                 job->state->values[0].integer);
 
-  con->response->header.status.status_code = IPP_OK;
+  con->response->request.status.status_code = IPP_OK;
 }
 
 
@@ -2885,7 +2885,7 @@ delete_printer(client_t        *con,	/* I - Client connection */
   * Return with no errors...
   */
 
-  con->response->header.status.status_code = IPP_OK;
+  con->response->request.status.status_code = IPP_OK;
 }
 
 
@@ -2904,10 +2904,10 @@ get_default(client_t *con)		/* I - Client connection */
                ippFindAttribute(con->request, "requested-attributes",
 	                	IPP_TAG_KEYWORD), IPP_TAG_ZERO);
 
-    con->response->header.status.status_code = IPP_OK;
+    con->response->request.status.status_code = IPP_OK;
   }
   else
-    con->response->header.status.status_code = IPP_NOT_FOUND;
+    con->response->request.status.status_code = IPP_NOT_FOUND;
 }
 
 
@@ -2929,7 +2929,7 @@ get_devices(client_t *con)		/* I - Client connection */
              ippFindAttribute(con->request, "requested-attributes",
 	                      IPP_TAG_KEYWORD), IPP_TAG_ZERO);
 
-  con->response->header.status.status_code = IPP_OK;
+  con->response->request.status.status_code = IPP_OK;
 }
 
 
@@ -3116,9 +3116,9 @@ get_jobs(client_t        *con,		/* I - Client connection */
   }
 
   if (requested != NULL)
-    con->response->header.status.status_code = IPP_OK_SUBST;
+    con->response->request.status.status_code = IPP_OK_SUBST;
   else
-    con->response->header.status.status_code = IPP_OK;
+    con->response->request.status.status_code = IPP_OK;
 }
 
 
@@ -3246,9 +3246,9 @@ get_job_attrs(client_t        *con,		/* I - Client connection */
   add_job_state_reasons(con, job);
 
   if (requested != NULL)
-    con->response->header.status.status_code = IPP_OK_SUBST;
+    con->response->request.status.status_code = IPP_OK_SUBST;
   else
-    con->response->header.status.status_code = IPP_OK;
+    con->response->request.status.status_code = IPP_OK;
 }
 
 
@@ -3270,7 +3270,7 @@ get_ppds(client_t *con)			/* I - Client connection */
              ippFindAttribute(con->request, "requested-attributes",
 	                      IPP_TAG_KEYWORD), IPP_TAG_ZERO);
 
-  con->response->header.status.status_code = IPP_OK;
+  con->response->request.status.status_code = IPP_OK;
 }
 
 
@@ -3352,7 +3352,7 @@ get_printer_attrs(client_t        *con,	/* I - Client connection */
              ippFindAttribute(con->request, "requested-attributes",
 	                      IPP_TAG_KEYWORD), IPP_TAG_ZERO);
 
-  con->response->header.status.status_code = IPP_OK;
+  con->response->request.status.status_code = IPP_OK;
 }
 
 
@@ -3500,7 +3500,7 @@ get_printers(client_t *con,		/* I - Client connection */
       copy_attrs(con->response, printer->attrs, requested, IPP_TAG_ZERO);
     }
 
-  con->response->header.status.status_code = IPP_OK;
+  con->response->request.status.status_code = IPP_OK;
 }
 
 
@@ -3653,7 +3653,7 @@ hold_job(client_t        *con,	/* I - Client connection */
 
   LogMessage(L_INFO, "Job %d was held by \'%s\'.", jobid, username);
 
-  con->response->header.status.status_code = IPP_OK;
+  con->response->request.status.status_code = IPP_OK;
 }
 
 
@@ -3808,7 +3808,7 @@ move_job(client_t        *con,		/* I - Client connection */
   * Return with "everything is OK" status...
   */
 
-  con->response->header.status.status_code = IPP_OK;
+  con->response->request.status.status_code = IPP_OK;
 }
 
 
@@ -4375,7 +4375,7 @@ print_job(client_t        *con,		/* I - Client connection */
                 job->state->values[0].integer);
   add_job_state_reasons(con, job);
 
-  con->response->header.status.status_code = IPP_OK;
+  con->response->request.status.status_code = IPP_OK;
 }
 
 
@@ -4471,7 +4471,7 @@ reject_jobs(client_t        *con,	/* I - Client connection */
   * Everything was ok, so return OK status...
   */
 
-  con->response->header.status.status_code = IPP_OK;
+  con->response->request.status.status_code = IPP_OK;
 }
 
 
@@ -4620,7 +4620,7 @@ release_job(client_t        *con,	/* I - Client connection */
 
   LogMessage(L_INFO, "Job %d was released by \'%s\'.", jobid, username);
 
-  con->response->header.status.status_code = IPP_OK;
+  con->response->request.status.status_code = IPP_OK;
 }
 
 
@@ -4770,7 +4770,7 @@ restart_job(client_t        *con,	/* I - Client connection */
 
   LogMessage(L_INFO, "Job %d was restarted by \'%s\'.", jobid, username);
 
-  con->response->header.status.status_code = IPP_OK;
+  con->response->request.status.status_code = IPP_OK;
 }
 
 
@@ -5105,7 +5105,7 @@ send_document(client_t        *con,	/* I - Client connection */
                 job->state->values[0].integer);
   add_job_state_reasons(con, job);
 
-  con->response->header.status.status_code = IPP_OK;
+  con->response->request.status.status_code = IPP_OK;
 }
 
 
@@ -5121,7 +5121,7 @@ send_ipp_error(client_t     *con,	/* I - Client connection */
 
   LogMessage(L_DEBUG, "Sending error: %s", ippErrorString(status));
 
-  con->response->header.status.status_code = status;
+  con->response->request.status.status_code = status;
 
   if (ippFindAttribute(con->response, "attributes-charset", IPP_TAG_ZERO) == NULL)
     ippAddString(con->response, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
@@ -5206,7 +5206,7 @@ set_default(client_t        *con,	/* I - Client connection */
   * Everything was ok, so return OK status...
   */
 
-  con->response->header.status.status_code = IPP_OK;
+  con->response->request.status.status_code = IPP_OK;
 }
 
 
@@ -5436,7 +5436,7 @@ set_job_attrs(client_t        *con,	/* I - Client connection */
   * Return with "everything is OK" status...
   */
 
-  con->response->header.status.status_code = IPP_OK;
+  con->response->request.status.status_code = IPP_OK;
 }
 
 
@@ -5525,7 +5525,7 @@ start_printer(client_t        *con,	/* I - Client connection */
   * Everything was ok, so return OK status...
   */
 
-  con->response->header.status.status_code = IPP_OK;
+  con->response->request.status.status_code = IPP_OK;
 }
 
 
@@ -5621,7 +5621,7 @@ stop_printer(client_t        *con,	/* I - Client connection */
   * Everything was ok, so return OK status...
   */
 
-  con->response->header.status.status_code = IPP_OK;
+  con->response->request.status.status_code = IPP_OK;
 }
 
 
@@ -5731,7 +5731,7 @@ validate_job(client_t        *con,	/* I - Client connection */
   * Everything was ok, so return OK status...
   */
 
-  con->response->header.status.status_code = IPP_OK;
+  con->response->request.status.status_code = IPP_OK;
 }
 
 
@@ -5823,5 +5823,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.127.2.12 2002/04/29 17:27:20 mike Exp $".
+ * End of "$Id: ipp.c,v 1.127.2.13 2002/05/09 03:08:02 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: accept.c,v 1.11.2.4 2002/03/22 15:47:30 mike Exp $"
+ * "$Id: accept.c,v 1.11.2.5 2002/05/09 03:08:04 mike Exp $"
  *
  *   "accept", "disable", "enable", and "reject" commands for the Common
  *   UNIX Printing System (CUPS).
@@ -210,8 +210,8 @@ main(int  argc,			/* I - Number of command-line arguments */
 
       request = ippNew();
 
-      request->header.op.operation_id = op;
-      request->header.op.request_id   = 1;
+      request->request.op.operation_id = op;
+      request->request.op.request_id   = 1;
 
       language = cupsLangDefault();
 
@@ -235,7 +235,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 
       if ((response = cupsDoRequest(http, request, "/admin/")) != NULL)
       {
-        if (response->header.status.status_code > IPP_OK_CONFLICT)
+        if (response->request.status.status_code > IPP_OK_CONFLICT)
 	{
           fprintf(stderr, "%s: Operation failed: %s\n", command,
 	          ippErrorString(cupsLastError()));
@@ -268,8 +268,8 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 	request = ippNew();
 
-	request->header.op.operation_id = IPP_PURGE_JOBS;
-	request->header.op.request_id   = 1;
+	request->request.op.operation_id = IPP_PURGE_JOBS;
+	request->request.op.request_id   = 1;
 
 	language = cupsLangDefault();
 
@@ -285,7 +285,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 	if ((response = cupsDoRequest(http, request, "/admin/")) != NULL)
 	{
-          if (response->header.status.status_code > IPP_OK_CONFLICT)
+          if (response->request.status.status_code > IPP_OK_CONFLICT)
 	  {
             fprintf(stderr, "%s: Operation failed: %s\n", command,
 	            ippErrorString(cupsLastError()));
@@ -311,5 +311,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: accept.c,v 1.11.2.4 2002/03/22 15:47:30 mike Exp $".
+ * End of "$Id: accept.c,v 1.11.2.5 2002/05/09 03:08:04 mike Exp $".
  */

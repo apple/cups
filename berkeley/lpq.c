@@ -1,5 +1,5 @@
 /*
- * "$Id: lpq.c,v 1.17.2.4 2002/03/22 15:47:17 mike Exp $"
+ * "$Id: lpq.c,v 1.17.2.5 2002/05/09 03:07:57 mike Exp $"
  *
  *   "lpq" command for the Common UNIX Printing System (CUPS).
  *
@@ -249,8 +249,8 @@ show_jobs(http_t     *http,	/* I - HTTP connection to server */
 
   request = ippNew();
 
-  request->header.op.operation_id = id ? IPP_GET_JOB_ATTRIBUTES : IPP_GET_JOBS;
-  request->header.op.request_id   = 1;
+  request->request.op.operation_id = id ? IPP_GET_JOB_ATTRIBUTES : IPP_GET_JOBS;
+  request->request.op.request_id   = 1;
 
   language = cupsLangDefault();
 
@@ -293,10 +293,10 @@ show_jobs(http_t     *http,	/* I - HTTP connection to server */
 
   if ((response = cupsDoRequest(http, request, "/")) != NULL)
   {
-    if (response->header.status.status_code > IPP_OK_CONFLICT)
+    if (response->request.status.status_code > IPP_OK_CONFLICT)
     {
       fprintf(stderr, "lpq: get-jobs failed: %s\n",
-              ippErrorString(response->header.status.status_code));
+              ippErrorString(response->request.status.status_code));
       ippDelete(response);
       return (0);
     }
@@ -482,8 +482,8 @@ show_printer(http_t     *http,	/* I - HTTP connection to server */
 
   request = ippNew();
 
-  request->header.op.operation_id = IPP_GET_PRINTER_ATTRIBUTES;
-  request->header.op.request_id   = 1;
+  request->request.op.operation_id = IPP_GET_PRINTER_ATTRIBUTES;
+  request->request.op.request_id   = 1;
 
   language = cupsLangDefault();
 
@@ -503,10 +503,10 @@ show_printer(http_t     *http,	/* I - HTTP connection to server */
 
   if ((response = cupsDoRequest(http, request, "/")) != NULL)
   {
-    if (response->header.status.status_code > IPP_OK_CONFLICT)
+    if (response->request.status.status_code > IPP_OK_CONFLICT)
     {
       fprintf(stderr, "lpq: get-printer-attributes failed: %s\n",
-              ippErrorString(response->header.status.status_code));
+              ippErrorString(response->request.status.status_code));
       ippDelete(response);
       return;
     }
@@ -538,5 +538,5 @@ show_printer(http_t     *http,	/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpq.c,v 1.17.2.4 2002/03/22 15:47:17 mike Exp $".
+ * End of "$Id: lpq.c,v 1.17.2.5 2002/05/09 03:07:57 mike Exp $".
  */

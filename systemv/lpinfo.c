@@ -1,5 +1,5 @@
 /*
- * "$Id: lpinfo.c,v 1.3.2.3 2002/03/22 15:47:32 mike Exp $"
+ * "$Id: lpinfo.c,v 1.3.2.4 2002/05/09 03:08:05 mike Exp $"
  *
  *   "lpinfo" command for the Common UNIX Printing System (CUPS).
  *
@@ -189,8 +189,8 @@ show_devices(http_t *http,	/* I - HTTP connection to server */
 
   request = ippNew();
 
-  request->header.op.operation_id = CUPS_GET_DEVICES;
-  request->header.op.request_id   = 1;
+  request->request.op.operation_id = CUPS_GET_DEVICES;
+  request->request.op.request_id   = 1;
 
   language = cupsLangDefault();
 
@@ -213,10 +213,10 @@ show_devices(http_t *http,	/* I - HTTP connection to server */
     * Loop through the device list and display them...
     */
 
-    if (response->header.status.status_code > IPP_OK_CONFLICT)
+    if (response->request.status.status_code > IPP_OK_CONFLICT)
     {
       fprintf(stderr, "lpinfo: cups-get-devices failed: %s\n",
-              ippErrorString(response->header.status.status_code));
+              ippErrorString(response->request.status.status_code));
       ippDelete(response);
       return;
     }
@@ -333,8 +333,8 @@ show_models(http_t *http,	/* I - HTTP connection to server */
 
   request = ippNew();
 
-  request->header.op.operation_id = CUPS_GET_PPDS;
-  request->header.op.request_id   = 1;
+  request->request.op.operation_id = CUPS_GET_PPDS;
+  request->request.op.request_id   = 1;
 
   language = cupsLangDefault();
 
@@ -357,10 +357,10 @@ show_models(http_t *http,	/* I - HTTP connection to server */
     * Loop through the device list and display them...
     */
 
-    if (response->header.status.status_code > IPP_OK_CONFLICT)
+    if (response->request.status.status_code > IPP_OK_CONFLICT)
     {
       fprintf(stderr, "lpinfo: cups-get-ppds failed: %s\n",
-              ippErrorString(response->header.status.status_code));
+              ippErrorString(response->request.status.status_code));
       ippDelete(response);
       return;
     }
@@ -440,5 +440,5 @@ show_models(http_t *http,	/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpinfo.c,v 1.3.2.3 2002/03/22 15:47:32 mike Exp $".
+ * End of "$Id: lpinfo.c,v 1.3.2.4 2002/05/09 03:08:05 mike Exp $".
  */

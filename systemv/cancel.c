@@ -1,5 +1,5 @@
 /*
- * "$Id: cancel.c,v 1.19.2.3 2002/03/22 15:47:31 mike Exp $"
+ * "$Id: cancel.c,v 1.19.2.4 2002/05/09 03:08:04 mike Exp $"
  *
  *   "cancel" command for the Common UNIX Printing System (CUPS).
  *
@@ -221,8 +221,8 @@ main(int  argc,			/* I - Number of command-line arguments */
 
       request = ippNew();
 
-      request->header.op.operation_id = op;
-      request->header.op.request_id   = 1;
+      request->request.op.operation_id = op;
+      request->request.op.request_id   = 1;
 
       language = cupsLangDefault();
 
@@ -260,11 +260,11 @@ main(int  argc,			/* I - Number of command-line arguments */
         response = cupsDoRequest(http, request, "/jobs/");
 
       if (response == NULL ||
-          response->header.status.status_code > IPP_OK_CONFLICT)
+          response->request.status.status_code > IPP_OK_CONFLICT)
       {
 	fprintf(stderr, "cancel: %s failed: %s\n",
 	        op == IPP_PURGE_JOBS ? "purge-jobs" : "cancel-job",
-        	response ? ippErrorString(response->header.status.status_code) :
+        	response ? ippErrorString(response->request.status.status_code) :
 		           ippErrorString(cupsLastError()));
 
 	if (response)
@@ -281,5 +281,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: cancel.c,v 1.19.2.3 2002/03/22 15:47:31 mike Exp $".
+ * End of "$Id: cancel.c,v 1.19.2.4 2002/05/09 03:08:04 mike Exp $".
  */

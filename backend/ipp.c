@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.38.2.11 2002/04/24 19:54:42 mike Exp $"
+ * "$Id: ipp.c,v 1.38.2.12 2002/05/09 03:07:56 mike Exp $"
  *
  *   IPP backend for the Common UNIX Printing System (CUPS).
  *
@@ -250,9 +250,9 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
     */
 
     request = ippNew();
-    request->header.op.version[1]   = version;
-    request->header.op.operation_id = IPP_GET_PRINTER_ATTRIBUTES;
-    request->header.op.request_id   = 1;
+    request->request.op.version[1]   = version;
+    request->request.op.operation_id = IPP_GET_PRINTER_ATTRIBUTES;
+    request->request.op.request_id   = 1;
 
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
         	 "attributes-charset", NULL, "utf-8");
@@ -273,7 +273,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
     if ((supported = cupsDoRequest(http, request, resource)) == NULL)
       ipp_status = cupsLastError();
     else
-      ipp_status = supported->header.status.status_code;
+      ipp_status = supported->request.status.status_code;
 
     if (ipp_status > IPP_OK_CONFLICT)
     {
@@ -415,9 +415,9 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
     */
 
     request = ippNew();
-    request->header.op.version[1]   = version;
-    request->header.op.operation_id = IPP_PRINT_JOB;
-    request->header.op.request_id   = 1;
+    request->request.op.version[1]   = version;
+    request->request.op.operation_id = IPP_PRINT_JOB;
+    request->request.op.request_id   = 1;
 
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
         	 "attributes-charset", NULL, charset);
@@ -501,7 +501,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
     if ((response = cupsDoFileRequest(http, request, resource, filename)) == NULL)
       ipp_status = cupsLastError();
     else
-      ipp_status = response->header.status.status_code;
+      ipp_status = response->request.status.status_code;
 
     if (ipp_status > IPP_OK_CONFLICT)
     {
@@ -557,9 +557,9 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
       */
 
       request = ippNew();
-      request->header.op.version[1]   = version;
-      request->header.op.operation_id = IPP_GET_JOB_ATTRIBUTES;
-      request->header.op.request_id   = 1;
+      request->request.op.version[1]   = version;
+      request->request.op.operation_id = IPP_GET_JOB_ATTRIBUTES;
+      request->request.op.request_id   = 1;
 
       ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
         	   "attributes-charset", NULL, charset);
@@ -591,7 +591,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
       if ((response = cupsDoRequest(http, request, resource)) == NULL)
 	ipp_status = cupsLastError();
       else
-	ipp_status = response->header.status.status_code;
+	ipp_status = response->request.status.status_code;
 
       if (ipp_status == IPP_NOT_FOUND)
       {
@@ -640,9 +640,9 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
       */
 
       request = ippNew();
-      request->header.op.version[1]   = version;
-      request->header.op.operation_id = IPP_GET_PRINTER_ATTRIBUTES;
-      request->header.op.request_id   = 1;
+      request->request.op.version[1]   = version;
+      request->request.op.operation_id = IPP_GET_PRINTER_ATTRIBUTES;
+      request->request.op.request_id   = 1;
 
       ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
         	   "attributes-charset", NULL, charset);
@@ -820,5 +820,5 @@ report_printer_state(ipp_t *ipp)	/* I - IPP response */
 
 
 /*
- * End of "$Id: ipp.c,v 1.38.2.11 2002/04/24 19:54:42 mike Exp $".
+ * End of "$Id: ipp.c,v 1.38.2.12 2002/05/09 03:07:56 mike Exp $".
  */

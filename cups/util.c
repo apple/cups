@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c,v 1.81.2.10 2002/04/20 19:40:09 mike Exp $"
+ * "$Id: util.c,v 1.81.2.11 2002/05/09 03:08:00 mike Exp $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -117,8 +117,8 @@ cupsCancelJob(const char *name,	/* I - Name of printer or class */
 
   request = ippNew();
 
-  request->header.op.operation_id = IPP_CANCEL_JOB;
-  request->header.op.request_id   = 1;
+  request->request.op.operation_id = IPP_CANCEL_JOB;
+  request->request.op.request_id   = 1;
 
   language = cupsLangDefault();
 
@@ -149,7 +149,7 @@ cupsCancelJob(const char *name,	/* I - Name of printer or class */
   }
   else
   {
-    last_error = response->header.status.status_code;
+    last_error = response->request.status.status_code;
     ippDelete(response);
 
     return (1);
@@ -445,7 +445,7 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
   ippDelete(request);
 
   if (response)
-    last_error = response->header.status.status_code;
+    last_error = response->request.status.status_code;
   else if (status == HTTP_NOT_FOUND)
     last_error = IPP_NOT_FOUND;
   else if (status == HTTP_UNAUTHORIZED)
@@ -525,8 +525,8 @@ cupsGetClasses(char ***classes)	/* O - Classes */
 
   request = ippNew();
 
-  request->header.op.operation_id = CUPS_GET_CLASSES;
-  request->header.op.request_id   = 1;
+  request->request.op.operation_id = CUPS_GET_CLASSES;
+  request->request.op.request_id   = 1;
 
   language = cupsLangDefault();
 
@@ -548,7 +548,7 @@ cupsGetClasses(char ***classes)	/* O - Classes */
 
   if ((response = cupsDoRequest(cups_server, request, "/")) != NULL)
   {
-    last_error = response->header.status.status_code;
+    last_error = response->request.status.status_code;
 
     for (attr = response->attrs; attr != NULL; attr = attr->next)
       if (attr->name != NULL &&
@@ -638,8 +638,8 @@ cupsGetDefault(void)
 
   request = ippNew();
 
-  request->header.op.operation_id = CUPS_GET_DEFAULT;
-  request->header.op.request_id   = 1;
+  request->request.op.operation_id = CUPS_GET_DEFAULT;
+  request->request.op.request_id   = 1;
 
   language = cupsLangDefault();
 
@@ -655,7 +655,7 @@ cupsGetDefault(void)
 
   if ((response = cupsDoRequest(cups_server, request, "/")) != NULL)
   {
-    last_error = response->header.status.status_code;
+    last_error = response->request.status.status_code;
 
     if ((attr = ippFindAttribute(response, "printer-name", IPP_TAG_NAME)) != NULL)
     {
@@ -749,8 +749,8 @@ cupsGetJobs(cups_job_t **jobs,		/* O - Job data */
 
   request = ippNew();
 
-  request->header.op.operation_id = IPP_GET_JOBS;
-  request->header.op.request_id   = 1;
+  request->request.op.operation_id = IPP_GET_JOBS;
+  request->request.op.request_id   = 1;
 
   language = cupsLangDefault();
 
@@ -791,7 +791,7 @@ cupsGetJobs(cups_job_t **jobs,		/* O - Job data */
 
   if ((response = cupsDoRequest(cups_server, request, "/")) != NULL)
   {
-    last_error = response->header.status.status_code;
+    last_error = response->request.status.status_code;
 
     for (attr = response->attrs; attr != NULL; attr = attr->next)
     {
@@ -999,8 +999,8 @@ cupsGetPPD(const char *name)		/* I - Printer name */
 
   request = ippNew();
 
-  request->header.op.operation_id = IPP_GET_PRINTER_ATTRIBUTES;
-  request->header.op.request_id   = 1;
+  request->request.op.operation_id = IPP_GET_PRINTER_ATTRIBUTES;
+  request->request.op.request_id   = 1;
 
   language = cupsLangDefault();
 
@@ -1025,7 +1025,7 @@ cupsGetPPD(const char *name)		/* I - Printer name */
 
   if ((response = cupsDoRequest(cups_server, request, "/")) != NULL)
   {
-    last_error  = response->header.status.status_code;
+    last_error  = response->request.status.status_code;
     printer[0]  = '\0';
     hostname[0] = '\0';
 
@@ -1275,8 +1275,8 @@ cupsGetPrinters(char ***printers)	/* O - Printers */
 
   request = ippNew();
 
-  request->header.op.operation_id = CUPS_GET_PRINTERS;
-  request->header.op.request_id   = 1;
+  request->request.op.operation_id = CUPS_GET_PRINTERS;
+  request->request.op.request_id   = 1;
 
   language = cupsLangDefault();
 
@@ -1298,7 +1298,7 @@ cupsGetPrinters(char ***printers)	/* O - Printers */
 
   if ((response = cupsDoRequest(cups_server, request, "/")) != NULL)
   {
-    last_error = response->header.status.status_code;
+    last_error = response->request.status.status_code;
 
     for (attr = response->attrs; attr != NULL; attr = attr->next)
       if (attr->name != NULL &&
@@ -1422,9 +1422,9 @@ cupsPrintFiles(const char    *name,	/* I - Printer or class name */
   if ((request = ippNew()) == NULL)
     return (0);
 
-  request->header.op.operation_id = num_files == 1 ? IPP_PRINT_JOB :
+  request->request.op.operation_id = num_files == 1 ? IPP_PRINT_JOB :
                                                       IPP_CREATE_JOB;
-  request->header.op.request_id   = 1;
+  request->request.op.request_id   = 1;
 
   snprintf(uri, sizeof(uri), "ipp://%s:%d/printers/%s", hostname, ippPort(), printer);
 
@@ -1463,10 +1463,10 @@ cupsPrintFiles(const char    *name,	/* I - Printer or class name */
 
   if (response == NULL)
     jobid = 0;
-  else if (response->header.status.status_code > IPP_OK_CONFLICT)
+  else if (response->request.status.status_code > IPP_OK_CONFLICT)
   {
     DEBUG_printf(("IPP response code was 0x%x!\n",
-                  response->header.status.status_code));
+                  response->request.status.status_code));
     jobid = 0;
   }
   else if ((attr = ippFindAttribute(response, "job-id", IPP_TAG_INTEGER)) == NULL)
@@ -1495,8 +1495,8 @@ cupsPrintFiles(const char    *name,	/* I - Printer or class name */
       if ((request = ippNew()) == NULL)
 	return (0);
 
-      request->header.op.operation_id = IPP_SEND_DOCUMENT;
-      request->header.op.request_id   = 1;
+      request->request.op.operation_id = IPP_SEND_DOCUMENT;
+      request->request.op.request_id   = 1;
 
       snprintf(uri, sizeof(uri), "ipp://%s:%d/jobs/%d", hostname, ippPort(),
                jobid);
@@ -1685,5 +1685,5 @@ cups_local_auth(http_t *http)	/* I - Connection */
 
 
 /*
- * End of "$Id: util.c,v 1.81.2.10 2002/04/20 19:40:09 mike Exp $".
+ * End of "$Id: util.c,v 1.81.2.11 2002/05/09 03:08:00 mike Exp $".
  */
