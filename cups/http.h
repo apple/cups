@@ -1,5 +1,5 @@
 /*
- * "$Id: http.h,v 1.33.2.15 2003/02/11 18:23:28 mike Exp $"
+ * "$Id: http.h,v 1.33.2.16 2003/03/13 05:11:55 mike Exp $"
  *
  *   Hyper-Text Transport Protocol definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -318,11 +318,13 @@ typedef struct
   int			nonce_count;	/* Nonce count */
   void			*tls;		/* TLS state information */
   http_encryption_t	encryption;	/* Encryption requirements */
+  /* ADDED IN CUPS 1.1.19 */
   fd_set		*input_set;	/* select() set for httpWait() */
-  http_addr_t		hostaddr;	/* Host address and port */
   http_status_t		expect;		/* Expect: header */
   char			cookie[HTTP_MAX_VALUE * 2];
 					/* Cookie value(s) */
+  /* ADDED IN CUPS 1.2 */
+  http_addr_t		hostaddr;	/* Host address and port */
 } http_t;
 
 
@@ -402,5 +404,5 @@ extern char		*httpAddrString(const http_addr_t *addr,
 #endif /* !_IPP_HTTP_H_ */
 
 /*
- * End of "$Id: http.h,v 1.33.2.15 2003/02/11 18:23:28 mike Exp $".
+ * End of "$Id: http.h,v 1.33.2.16 2003/03/13 05:11:55 mike Exp $".
  */
