@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.15 1999/05/13 20:41:12 mike Exp $"
+ * "$Id: printers.c,v 1.16 1999/05/18 21:21:52 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -69,7 +69,13 @@ AddPrinter(char *name)		/* I - Name of printer */
 
   strcpy(p->name, name);
   p->state     = IPP_PRINTER_STOPPED;
-  p->accepting = 1;
+  p->accepting = 0;
+  p->filetype  = mimeAddType(MimeDatabase, "printer", name);
+
+ /*
+  * Setup required filters and IPP attributes...
+  */
+
   SetPrinterAttrs(p);
 
  /*
@@ -94,6 +100,55 @@ AddPrinter(char *name)		/* I - Name of printer */
   p->next = current;
 
   return (p);
+}
+
+
+/*
+ * 'AddPrinterFilter()' - Add a MIME filter for a printer.
+ */
+
+void
+AddPrinterFilter(printer_t *p,		/* I - Printer to add to */
+                 char      *filter)	/* I - Filter to add */
+{
+  int		i;			/* Looping var */
+  char		super[MIME_MAX_SUPER],	/* Super-type for filter */
+		type[MIME_MAX_TYPE],	/* Type for filter */
+		program[1024];		/* Program/filter name */
+  int		cost;			/* Cost of filter */
+  mime_type_t	**temptype;		/* MIME type looping var */
+
+
+ /*
+  * Range check input...
+  */
+
+  if (p == NULL || filter == NULL)
+    return;
+
+ /*
+  * Parse the filter string; it should be in the following format:
+  *
+  *     super/type cost program
+  */
+
+  if (sscanf(filter, "%[^/]/%s%d%s", super, type, &cost, program) != 4)
+  {
+    LogMessage(LOG_ERROR, "AddPrinterFilter: Invalid filter string \"%s\"!",
+               filter);
+    return;
+  }
+
+ /*
+  * Add the filter to the MIME database, supporting wildcards as needed...
+  */
+
+  for (temptype = MimeDatabase->types, i = MimeDatabase->num_types;
+       i > 0;
+       i --, temptype ++)
+    if ((super[0] == '*' || strcmp((*temptype)->super, super) == 0) &&
+        (type[0] == '*' || strcmp((*temptype)->type, type) == 0))
+      mimeAddFilter(MimeDatabase, *temptype, p->filetype, cost, program);
 }
 
 
@@ -168,6 +223,48 @@ DeletePrinter(printer_t *p)	/* I - Printer to delete */
 
 
 /*
+ * 'AddPrinterFilter()' - Add a MIME filter for a printer.
+ */
+
+void
+DeletePrinterFilters(printer_t *p)	/* I - Printer to remove from */
+{
+  int		i;			/* Looping var */
+  mime_filter_t	*filter;		/* MIME filter looping var */
+
+
+ /*
+  * Range check input...
+  */
+
+  if (p == NULL)
+    return;
+
+ /*
+  * Remove all filters from the MIME database that have a destination
+  * type == printer...
+  */
+
+  for (filter = MimeDatabase->filters, i = MimeDatabase->num_filters;
+       i > 0;
+       i --, filter ++)
+    if (filter->dst == p->filetype)
+    {
+     /*
+      * Delete the current filter...
+      */
+
+      MimeDatabase->num_filters --;
+
+      if (i > 1)
+        memcpy(filter, filter + 1, sizeof(mime_filter_t) * (i - 1));
+
+      filter --;
+    }
+}
+
+
+/*
  * 'FindPrinter()' - Find a printer in the list.
  */
 
@@ -209,12 +306,7 @@ LoadAllPrinters(void)
 		*nameptr,		/* Pointer into name */
 		*value,			/* Pointer to value */
 		*lineptr,		/* Pointer in line */
-		super[MIME_MAX_SUPER],	/* Super-type name */
-		type[MIME_MAX_TYPE],	/* Type name */
-		*temp,			/* Temporary pointer */
-		*filter;		/* Filter program */
-  mime_type_t	**temptype;		/* MIME type looping var */
-  int		cost;			/* Cost of filter */
+		*temp;			/* Temporary pointer */
   printer_t	*p;			/* Current printer */
 
 
@@ -291,17 +383,7 @@ LoadAllPrinters(void)
 
         line[len - 1] = '\0';
 
-        p           = AddPrinter(value);
-	p->filetype = mimeAddType(MimeDatabase, "printer", value);
-
-       /*
-        * Add a filter from application/vnd.cups-raw to printer/name to
-	* handle "raw" printing by users.
-	*/
-
-        mimeAddFilter(MimeDatabase,
-	              mimeType(MimeDatabase, "application", "vnd.cups-raw"),
-		      p->filetype, 0, "-");
+        p = AddPrinter(value);
 
        /*
         * Set the default printer as needed...
@@ -346,69 +428,6 @@ LoadAllPrinters(void)
       strncpy(p->location, value, sizeof(p->location) - 1);
     else if (strcmp(name, "DeviceURI") == 0)
       strncpy(p->device_uri, value, sizeof(p->device_uri) - 1);
-    else if (strcmp(name, "AddFilter") == 0)
-    {
-     /*
-      * Get the source super-type and type names from the beginning of
-      * the value.
-      */
-
-      lineptr = value;
-      temp    = super;
-
-      while (*lineptr != '/' && *lineptr != '\n' && *lineptr != '\0' &&
-             (temp - super + 1) < MIME_MAX_SUPER)
-	*temp++ = tolower(*lineptr++);
-
-      *temp = '\0';
-
-      if (*lineptr != '/')
-	continue;
-
-      lineptr ++;
-      temp = type;
-
-      while (*lineptr != ' ' && *lineptr != '\t' && *lineptr != '\n' &&
-             *lineptr != '\0' && (temp - type + 1) < MIME_MAX_TYPE)
-	*temp++ = tolower(*lineptr++);
-
-      *temp = '\0';
-
-     /*
-      * Then get the cost and filter program...
-      */
-
-      while (*lineptr == ' ' || *lineptr == '\t')
-	lineptr ++;
-
-      if (*lineptr < '0' || *lineptr > '9')
-	continue;
-
-      cost = atoi(lineptr);
-
-      while (*lineptr != ' ' && *lineptr != '\t' && *lineptr != '\0')
-	lineptr ++;
-      while (*lineptr == ' ' || *lineptr == '\t')
-	lineptr ++;
-
-      if (*lineptr == '\0' || *lineptr == '\n')
-	continue;
-
-      filter = lineptr;
-      if (filter[strlen(filter) - 1] == '\n')
-	filter[strlen(filter) - 1] = '\0';
-
-     /*
-      * Add the filter to the MIME database, supporting wildcards as needed...
-      */
-
-      for (temptype = MimeDatabase->types, i = 0;
-           i < MimeDatabase->num_types;
-	   i ++, temptype ++)
-	if ((super[0] == '*' || strcmp((*temptype)->super, super) == 0) &&
-            (type[0] == '*' || strcmp((*temptype)->type, type) == 0))
-	  mimeAddFilter(MimeDatabase, *temptype, p->filetype, cost, filter);
-    }
     else if (strcmp(name, "State") == 0)
     {
      /*
@@ -416,9 +435,24 @@ LoadAllPrinters(void)
       */
 
       if (strcasecmp(value, "idle") == 0)
-        p->state = IPP_PRINTER_IDLE;
+      {
+        p->state     = IPP_PRINTER_IDLE;
+        p->accepting = 1;
+      }
       else if (strcasecmp(value, "stopped") == 0)
-        p->state = IPP_PRINTER_STOPPED;
+      {
+        p->state     = IPP_PRINTER_STOPPED;
+        p->accepting = 0;
+      }
+    }
+    else
+    {
+     /*
+      * Something else we don't understand...
+      */
+
+      LogMessage(LOG_ERROR, "Unknown configuration directive %s on line %d of printers.conf.",
+	         name, linenum);
     }
   }
 
@@ -508,6 +542,14 @@ SetPrinterAttrs(printer_t *p)	/* I - Printer to setup */
   int		num_finishings;
   ipp_finish_t	finishings[5];
 
+
+ /*
+  * Clear out old filters and add a filter from application/vnd.cups-raw to
+  * printer/name to handle "raw" printing by users.
+  */
+
+  DeletePrinterFilters(p);
+  AddPrinterFilter(p, "application/vnd.cups-raw 0 -");
 
  /*
   * Create the required IPP attributes for a printer...
@@ -704,6 +746,16 @@ SetPrinterAttrs(printer_t *p)	/* I - Printer to setup */
 	else
           p->type += CUPS_PRINTER_SMALL;
 
+     /*
+      * Add any filters in the PPD file...
+      */
+
+      for (i = 0; i < ppd->num_filters; i ++)
+        AddPrinterFilter(p, ppd->filters[i]);
+
+      if (ppd->num_filters == 0)
+        AddPrinterFilter(p, "application/vnd.cups-postscript 0 -");
+
       ppdClose(ppd);
     }
 
@@ -713,7 +765,33 @@ SetPrinterAttrs(printer_t *p)	/* I - Printer to setup */
                   "finishings-default", IPP_FINISH_NONE);
   }
 
+ /*
+  * Add the CUPS-specific printer-type attribute...
+  */
+
   ippAddInteger(p->attrs, IPP_TAG_PRINTER, IPP_TAG_ENUM, "printer-type", p->type);
+
+ /*
+  * If we have an interface script, add a filter entry for it...
+  */
+
+  sprintf(filename, "%s/interfaces/%s", ServerRoot, p->name);
+  if (access(filename, X_OK) == 0)
+  {
+   /*
+    * Yes, we have a System V style interface script; use it!
+    */
+
+    sprintf(filename, "*/* 0 %s/interfaces/%s", ServerRoot, p->name);
+    AddPrinterFilter(p, filename);
+  }
+
+ /*
+  * Remote printers go directly to the remote destination...
+  */
+
+  if (p->type & CUPS_PRINTER_REMOTE)
+    AddPrinterFilter(p, "*/* 0 -");
 }
 
 
@@ -770,5 +848,5 @@ StopPrinter(printer_t *p)	/* I - Printer to stop */
 
 
 /*
- * End of "$Id: printers.c,v 1.15 1999/05/13 20:41:12 mike Exp $".
+ * End of "$Id: printers.c,v 1.16 1999/05/18 21:21:52 mike Exp $".
  */

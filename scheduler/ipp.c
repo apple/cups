@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.11 1999/05/13 20:41:11 mike Exp $"
+ * "$Id: ipp.c,v 1.12 1999/05/18 21:21:51 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -30,8 +30,7 @@
  *   cancel_all_jobs()   - Cancel all print jobs.
  *   cancel_job()        - Cancel a print job.
  *   copy_attrs()        - Copy attributes from one request to another.
- *   delete_class()      - Remove a class from the system.
- *   delete_printer()    - Remove a printer from the system.
+ *   delete_printer()    - Remove a printer or class from the system.
  *   get_default()       - Get the default destination.
  *   get_jobs()          - Get a list of jobs for the specified printer.
  *   get_job_attrs()     - Get job attributes.
@@ -58,13 +57,12 @@
  */
 
 static void	accept_jobs(client_t *con, ipp_attribute_t *uri);
-static void	add_class(client_t *con);
-static void	add_printer(client_t *con);
+static void	add_class(client_t *con, ipp_attribute_t *uri);
+static void	add_printer(client_t *con, ipp_attribute_t *uri);
 static void	cancel_all_jobs(client_t *con, ipp_attribute_t *uri);
 static void	cancel_job(client_t *con, ipp_attribute_t *uri);
 static void	copy_attrs(ipp_t *to, ipp_t *from, ipp_attribute_t *req);
-static void	delete_class(client_t *con);
-static void	delete_printer(client_t *con);
+static void	delete_printer(client_t *con, ipp_attribute_t *uri);
 static void	get_default(client_t *con);
 static void	get_jobs(client_t *con, ipp_attribute_t *uri);
 static void	get_job_attrs(client_t *con, ipp_attribute_t *uri);
@@ -253,23 +251,21 @@ ProcessIPPRequest(client_t *con)	/* I - Client connection */
               get_printers(con, CUPS_PRINTER_CLASS);
               break;
 
-#if 0
 	  case CUPS_ADD_PRINTER :
-              add_printer(con);
+              add_printer(con, uri);
               break;
 
 	  case CUPS_DELETE_PRINTER :
-              delete_printer(con);
+              delete_printer(con, uri);
               break;
 
 	  case CUPS_ADD_CLASS :
-              add_class(con);
+              add_class(con, uri);
               break;
 
 	  case CUPS_DELETE_CLASS :
-              delete_class(con);
+              delete_printer(con, uri);
               break;
-#endif /* 0 */
 
 	  case CUPS_ACCEPT_JOBS :
               accept_jobs(con, uri);
@@ -366,7 +362,8 @@ accept_jobs(client_t        *con,	/* I - Client connection */
  */
 
 static void
-add_class(client_t *con)		/* I - Client connection */
+add_class(client_t        *con,		/* I - Client connection */
+          ipp_attribute_t *uri)		/* I - URI of class */
 {
  /*
   * Was this operation called from the correct URI?
@@ -387,8 +384,27 @@ add_class(client_t *con)		/* I - Client connection */
  */
 
 static void
-add_printer(client_t *con)		/* I - Client connection */
+add_printer(client_t        *con,		/* I - Client connection */
+            ipp_attribute_t *uri)		/* I - URI of printer */
 {
+  char			*dest;		/* Destination */
+  cups_ptype_t		dtype;		/* Destination type (printer or class) */
+  char			method[HTTP_MAX_URI],
+					/* Method portion of URI */
+			username[HTTP_MAX_URI],
+					/* Username portion of URI */
+			host[HTTP_MAX_URI],
+					/* Host portion of URI */
+			resource[HTTP_MAX_URI];
+					/* Resource portion of URI */
+  int			port;		/* Port portion of URI */
+  printer_t		*printer;	/* Printer/class */
+  ipp_attribute_t	*attr;		/* Printer attribute */
+  FILE			*fp;		/* Script/PPD file */
+  char			line[1024];	/* Line from file... */
+  char			filename[1024];	/* Script/PPD file */
+
+
  /*
   * Was this operation called from the correct URI?
   */
@@ -399,7 +415,129 @@ add_printer(client_t *con)		/* I - Client connection */
     return;
   }
 
-  send_ipp_error(con, IPP_OPERATION_NOT_SUPPORTED);
+  DEBUG_printf(("delete_class(%08x)\n", con));
+
+ /*
+  * Do we have a valid URI?
+  */
+
+  httpSeparate(uri->values[0].string.text, method, username, host, &port, resource);
+
+  if (strncmp(resource, "/printers/", 10) != 0)
+  {
+   /*
+    * No, return an error...
+    */
+
+    send_ipp_error(con, IPP_BAD_REQUEST);
+    return;
+  }
+
+ /*
+  * See if the printer already exists; if not, create a new printer...
+  */
+
+  if ((printer = FindPrinter(resource + 10)) == NULL)
+    printer = AddPrinter(resource + 10);
+
+ /*
+  * Look for attributes and copy them over as needed...
+  */
+
+  if ((attr = ippFindAttribute(con->request, "printer-location", IPP_TAG_TEXT)) != NULL)
+    strcpy(printer->location, attr->values[0].string.text);
+  if ((attr = ippFindAttribute(con->request, "printer-info", IPP_TAG_TEXT)) != NULL)
+    strcpy(printer->info, attr->values[0].string.text);
+  if ((attr = ippFindAttribute(con->request, "printer-more-info", IPP_TAG_URI)) != NULL)
+    strcpy(printer->more_info, attr->values[0].string.text);
+  if ((attr = ippFindAttribute(con->request, "device-uri", IPP_TAG_URI)) != NULL)
+    strcpy(printer->device_uri, attr->values[0].string.text);
+
+ /*
+  * See if we have all required attributes...
+  */
+
+  if (printer->device_uri[0] == '\0')
+  {
+   /*
+    * Nope, return an error...
+    */
+
+    send_ipp_error(IPP_ATTRIBUTES);
+    return;
+  }
+
+ /*
+  * See if we have an interface script or PPD file attached to the request...
+  */
+
+  if (con->filename[0])
+  {
+   /*
+    * Yes; open the file and get the first line from it...
+    */
+
+    fp = fopen(con->filename, "r");
+    line[0] = '\0';
+    fgets(line, sizeof(line), fp);
+    fclose(fp);
+
+   /*
+    * Then see what kind of file it is...
+    */
+
+    sprintf(filename, "%s/interfaces/%s", ServerRoot, printer->name);
+
+    if (strncmp(line, "*PPD-Adobe", 10) == 0)
+    {
+     /*
+      * The new file is a PPD file, so remove any old interface script
+      * that might be lying around...
+      */
+
+      unlink(filename);
+    }
+    else
+    {
+     /*
+      * This must be an interface script, so move the file over to the
+      * interfaces directory and make it executable...
+      */
+
+      rename(con->filename, filename);
+      chmod(filename, 0755);
+    }
+
+    sprintf(filename, "%s/ppd/%s.ppd", ServerRoot, printer->name);
+
+    if (strncmp(line, "*PPD-Adobe", 10) == 0)
+    {
+     /*
+      * The new file is a PPD file, so move the file over to the
+      * ppd directory and make it readable by all...
+      */
+
+      rename(con->filename, filename);
+      chmod(filename, 0644);
+    }
+    else
+    {
+     /*
+      * This must be an interface script, so remove any old PPD file that
+      * may be lying around...
+      */
+
+      unlink(filename);
+    }
+  }
+
+ /*
+  * Update the printer attributes and return...
+  */
+
+  SetPrinterAttributes(printer);
+
+  con->response->request.status.status_code = IPP_OK;
 }
 
 
@@ -588,6 +726,9 @@ copy_attrs(ipp_t           *to,		/* I - Destination request */
   if (to == NULL || from == NULL)
     return;
 
+  if (req != NULL && strcmp(req->values[0].string.text, "all") == 0)
+    req = NULL;				/* "all" means no filter... */
+
   for (fromattr = from->attrs; fromattr != NULL; fromattr = fromattr->next)
   {
    /*
@@ -695,12 +836,28 @@ copy_attrs(ipp_t           *to,		/* I - Destination request */
 
 
 /*
- * 'delete_class()' - Remove a class from the system.
+ * 'delete_printer()' - Remove a printer or class from the system.
  */
 
 static void
-delete_class(client_t *con)		/* I - Client connection */
+delete_printer(client_t        *con,	/* I - Client connection */
+               ipp_attribute_t *uri)	/* I - URI of printer or class */
 {
+  char			*dest;		/* Destination */
+  cups_ptype_t		dtype;		/* Destination type (printer or class) */
+  char			method[HTTP_MAX_URI],
+					/* Method portion of URI */
+			username[HTTP_MAX_URI],
+					/* Username portion of URI */
+			host[HTTP_MAX_URI],
+					/* Host portion of URI */
+			resource[HTTP_MAX_URI];
+					/* Resource portion of URI */
+  int			port;		/* Port portion of URI */
+  printer_t		*printer;	/* Printer/class */
+  char			filename[1024];	/* Script/PPD filename */
+
+
  /*
   * Was this operation called from the correct URI?
   */
@@ -711,28 +868,52 @@ delete_class(client_t *con)		/* I - Client connection */
     return;
   }
 
-  send_ipp_error(con, IPP_OPERATION_NOT_SUPPORTED);
-}
+  DEBUG_printf(("delete_class(%08x)\n", con));
 
-
-/*
- * 'delete_printer()' - Remove a printer from the system.
- */
-
-static void
-delete_printer(client_t *con)		/* I - Client connection */
-{
  /*
-  * Was this operation called from the correct URI?
+  * Do we have a valid URI?
   */
 
-  if (strncmp(con->uri, "/admin/", 7) != 0)
+  httpSeparate(uri->values[0].string.text, method, username, host, &port, resource);
+
+  if ((dest = validate_dest(resource, &dtype)) == NULL)
   {
-    send_ipp_error(con, IPP_NOT_AUTHORIZED);
+   /*
+    * Bad URI...
+    */
+
+    DEBUG_printf(("get_printer_attrs: resource name \'%s\' no good!\n",
+	          resource));
+    send_ipp_error(con, IPP_NOT_FOUND);
     return;
   }
 
-  send_ipp_error(con, IPP_OPERATION_NOT_SUPPORTED);
+ /*
+  * Find the printer or class and delete it...
+  */
+
+  if (dtype == CUPS_PRINTER_CLASS)
+    printer = FindClass(dest);
+  else
+    printer = FindPrinter(dest);
+
+  DeletePrinter(printer);
+
+ /*
+  * Remove any old PPD or script files...
+  */
+
+  sprintf(filename, "%s/interfaces/%s", ServerRoot, dest);
+  unlink(filename);
+
+  sprintf(filename, "%s/ppd/%s.ppd", ServerRoot, dest);
+  unlink(filename);
+
+ /*
+  * Return with no errors...
+  */
+
+  con->response->request.status.status_code = IPP_OK;
 }
 
 
@@ -1798,5 +1979,5 @@ validate_job(client_t        *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.11 1999/05/13 20:41:11 mike Exp $".
+ * End of "$Id: ipp.c,v 1.12 1999/05/18 21:21:51 mike Exp $".
  */

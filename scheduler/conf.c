@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.18 1999/05/13 20:41:11 mike Exp $"
+ * "$Id: conf.c,v 1.19 1999/05/18 21:21:49 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -79,6 +79,7 @@ static var_t	variables[] =
   { "SystemGroup",	SystemGroup,		VAR_STRING,	sizeof(SystemGroup) },
   { "AccessLog",	AccessLog,		VAR_STRING,	sizeof(AccessLog) },
   { "ErrorLog",		ErrorLog,		VAR_STRING,	sizeof(ErrorLog) },
+  { "PageLog",		PageLog,		VAR_STRING,	sizeof(PageLog) },
   { "DefaultCharset",	DefaultCharset,		VAR_STRING,	sizeof(DefaultCharset) },
   { "DefaultLanguage",	DefaultLanguage,	VAR_STRING,	sizeof(DefaultLanguage) },
   { "RIPCache",		RIPCache,		VAR_STRING,	sizeof(RIPCache) },
@@ -95,6 +96,21 @@ static var_t	variables[] =
   { "MaxRequestSize",	&MaxRequestSize,	VAR_INTEGER,	0 }
 };
 #define NUM_VARS	(sizeof(variables) / sizeof(variables[0]))
+static char	*months[12] =	/* Months */
+		{
+		  "Jan",
+		  "Feb",
+		  "Mar",
+		  "Apr",
+		  "May",
+		  "Jun",
+		  "Jul",
+		  "Aug",
+		  "Sep",
+		  "Oct",
+		  "Nov",
+		  "Dec"
+		};
 
 
 /*
@@ -266,21 +282,6 @@ LogRequest(client_t      *con,	/* I - Request to log */
   char		filename[1024],	/* Name of access log file */
 		backname[1024];	/* Backup filename */
   struct tm	*date;		/* Date information */
-  static char	*months[12] =	/* Months */
-		{
-		  "Jan",
-		  "Feb",
-		  "Mar",
-		  "Apr",
-		  "May",
-		  "Jun",
-		  "Jul",
-		  "Aug",
-		  "Sep",
-		  "Oct",
-		  "Nov",
-		  "Dec"
-		};
   static char	*states[] =	/* HTTP client states... */
 		{
 		  "WAITING",
@@ -310,7 +311,9 @@ LogRequest(client_t      *con,	/* I - Request to log */
     * Nope, open the access log file...
     */
 
-    if (AccessLog[0] != '/')
+    if (AccessLog[0] == '\0')
+      return (1);
+    else if (AccessLog[0] != '/')
       sprintf(filename, "%s/%s", ServerRoot, AccessLog);
     else
       strcpy(filename, AccessLog);
@@ -379,21 +382,6 @@ LogMessage(int  level,		/* I - Log level */
   va_list	ap;		/* Argument pointer */
   time_t	dtime;		/* Time value */
   struct tm	*date;		/* Date information */
-  static char	*months[12] =	/* Months */
-		{
-		  "Jan",
-		  "Feb",
-		  "Mar",
-		  "Apr",
-		  "May",
-		  "Jun",
-		  "Jul",
-		  "Aug",
-		  "Sep",
-		  "Oct",
-		  "Nov",
-		  "Dec"
-		};
   static char	levels[] =	/* Log levels... */
 		{
 		  'N',
@@ -420,7 +408,9 @@ LogMessage(int  level,		/* I - Log level */
       * Nope, open error log...
       */
 
-      if (ErrorLog[0] != '/')
+      if (ErrorLog[0] == '\0')
+        return (1);
+      else if (ErrorLog[0] != '/')
         sprintf(filename, "%s/%s", ServerRoot, ErrorLog);
       else
         strcpy(filename, ErrorLog);
@@ -483,6 +473,87 @@ LogMessage(int  level,		/* I - Log level */
     fputs("\n", ErrorFile);
     fflush(ErrorFile);
   }
+
+  return (1);
+}
+
+
+/*
+ * 'LogMessage()' - Log a message to the error log file.
+ */
+
+int				/* O - 1 on success, 0 on error */
+LogPage(job_t *job,		/* I - Job being printed */
+        char  *page)		/* I - Page being printed */
+{
+  char		filename[1024],	/* Name of error log file */
+		backname[1024];	/* Backup filename */
+  time_t	dtime;		/* Time value */
+  struct tm	*date;		/* Date information */
+
+
+ /*
+  * See if the page log file is open...
+  */
+
+  if (PageFile == NULL)
+  {
+   /*
+    * Nope, open page log...
+    */
+
+    if (PageLog[0] == '\0')
+      return (1);
+    else if (PageLog[0] != '/')
+      sprintf(filename, "%s/%s", ServerRoot, PageLog);
+    else
+      strcpy(filename, PageLog);
+
+    if ((PageFile = fopen(filename, "a")) == NULL)
+      PageFile = stderr;
+  }
+
+ /*
+  * Do we need to rotate the log?
+  */
+
+  if (ftell(PageFile) > MaxLogSize && MaxLogSize > 0)
+  {
+   /*
+    * Rotate page_log file...
+    */
+
+    fclose(PageFile);
+
+    if (PageLog[0] != '/')
+      sprintf(filename, "%s/%s", ServerRoot, PageLog);
+    else
+      strcpy(filename, PageLog);
+
+    strcpy(backname, filename);
+    strcat(backname, ".O");
+
+    unlink(backname);
+    rename(filename, backname);
+
+    if ((PageFile = fopen(filename, "a")) == NULL)
+      PageFile = stderr;
+  }
+
+ /*
+  * Print a page log entry of the form:
+  *
+  *    printer job-id user [DD/MON/YYYY:HH:MM:SS +0000] page num-copies
+  */
+
+  dtime = time(NULL);
+  date  = gmtime(&dtime);
+
+  fprintf(PageFile, "%s %s %d [%02d/%s/%04d:%02d:%02d:%02d +0000] %s\n",
+          job->printer->name, job->username, job->id,
+	  date->tm_mday, months[date->tm_mon], 1900 + date->tm_year,
+	  date->tm_hour, date->tm_min, date->tm_sec, page);
+  fflush(PageFile);
 
   return (1);
 }
@@ -1062,5 +1133,5 @@ get_address(char               *value,		/* I - Value string */
 
 
 /*
- * End of "$Id: conf.c,v 1.18 1999/05/13 20:41:11 mike Exp $".
+ * End of "$Id: conf.c,v 1.19 1999/05/18 21:21:49 mike Exp $".
  */

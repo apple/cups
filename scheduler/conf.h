@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.h,v 1.9 1999/05/10 16:38:41 mike Exp $"
+ * "$Id: conf.h,v 1.10 1999/05/18 21:21:50 mike Exp $"
  *
  *   Configuration file definitions for the Common UNIX Printing System (CUPS)
  *   scheduler.
@@ -27,6 +27,7 @@
  * Log levels...
  */
 
+#define LOG_PAGE	-1	/* Used internally for page logging */
 #define LOG_NONE	0
 #define LOG_ERROR	1
 #define LOG_WARN	2
@@ -54,6 +55,8 @@ VAR char		ConfigurationFile[256]	VALUE(CUPS_SERVERROOT "/conf/cupsd.conf"),
 					/* Access log filename */
 			ErrorLog[1024]		VALUE("logs/error_log"),
 					/* Error log filename */
+			PageLog[1024]		VALUE("logs/page_log"),
+					/* Page log filename */
 			DefaultLanguage[32]	VALUE("C"),
 					/* Default language encoding */
 			DefaultCharset[32]	VALUE(DEFAULT_CHARSET),
@@ -81,9 +84,12 @@ VAR int			User			VALUE(DEFAULT_UID),
 					/* Are classes implicitly created? */
 VAR FILE		*AccessFile		VALUE(NULL),
 					/* Access log file */
-			*ErrorFile		VALUE(NULL);
+			*ErrorFile		VALUE(NULL),
 					/* Error log file */
+			*PageFile		VALUE(NULL);
+					/* Page log file */
 VAR mime_t		*MimeDatabase		VALUE(NULL);
+					/* MIME type database */
 
 
 /*
@@ -93,8 +99,9 @@ VAR mime_t		*MimeDatabase		VALUE(NULL);
 extern int	ReadConfiguration(void);
 extern int	LogRequest(client_t *con, http_status_t code);
 extern int	LogMessage(int level, char *message, ...);
+extern int	LogPage(job_t *job, char *page);
 
 
 /*
- * End of "$Id: conf.h,v 1.9 1999/05/10 16:38:41 mike Exp $".
+ * End of "$Id: conf.h,v 1.10 1999/05/18 21:21:50 mike Exp $".
  */

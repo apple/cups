@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.19 1999/05/11 19:48:39 mike Exp $"
+ * "$Id: job.c,v 1.20 1999/05/18 21:21:51 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -23,16 +23,17 @@
  *
  * Contents:
  *
- *   AddJob()     - Add a new job to the job queue...
- *   CancelJob()  - Cancel the specified print job.
- *   CancelJobs() - Cancel all jobs on the given printer or class.
- *   CheckJobs()  - Check the pending jobs and start any if the destination
- *                  is available.
- *   FindJob()    - Find the specified job.
- *   MoveJob()    - Move the specified job to a different destination.
- *   StartJob()   - Start a print job.
- *   StopJob()    - Stop a print job.
- *   UpdateJob()  - Read a status update from a job's filters.
+ *   AddJob()        - Add a new job to the job queue...
+ *   CancelJob()     - Cancel the specified print job.
+ *   CancelJobs()    - Cancel all jobs on the given printer or class.
+ *   CheckJobs()     - Check the pending jobs and start any if the destination
+ *                     is available.
+ *   FindJob()       - Find the specified job.
+ *   MoveJob()       - Move the specified job to a different destination.
+ *   StartJob()      - Start a print job.
+ *   StopJob()       - Stop a print job.
+ *   UpdateJob()     - Read a status update from a job's filters.
+ *   start_process() - Start a background process.
  */
 
 /*
@@ -326,8 +327,10 @@ StartJob(int       id,		/* I - Job ID */
       */
 
       num_filters = 0;
-      filters     = mimeFilter(MimeDatabase, current->filetype,
-                               printer->filetype, &num_filters);
+
+      if (!(printer->type & CUPS_PRINTER_REMOTE))
+        filters = mimeFilter(MimeDatabase, current->filetype,
+                             printer->filetype, &num_filters);
 
      /*
       * Building the options string is harder than it needs to be, but
@@ -714,22 +717,27 @@ UpdateJob(job_t *job)		/* I - Job to check */
       if (strncmp(buffer, "ERROR:", 6) == 0)
       {
         loglevel = LOG_ERROR;
-	message  = buffer + 7;
+	message  = buffer + 6;
       }
       else if (strncmp(buffer, "WARNING:", 8) == 0)
       {
         loglevel = LOG_WARN;
-	message  = buffer + 9;
+	message  = buffer + 8;
       }
       if (strncmp(buffer, "INFO:", 5) == 0)
       {
         loglevel = LOG_INFO;
-	message  = buffer + 6;
+	message  = buffer + 5;
       }
       else if (strncmp(buffer, "DEBUG:", 6) == 0)
       {
         loglevel = LOG_DEBUG;
-	message  = buffer + 7;
+	message  = buffer + 6;
+      }
+      else if (strncmp(buffer, "PAGE:", 5) == 0)
+      {
+        loglevel = LOG_PAGE;
+	message  = buffer + 5;
       }
       else
       {
@@ -738,14 +746,36 @@ UpdateJob(job_t *job)		/* I - Job to check */
       }
 
      /*
+      * Skip leading whitespace in the message...
+      */
+
+      while (isspace(*message))
+        message ++;
+
+     /*
       * Send it to the log file and printer state message as needed...
       */
 
-      LogMessage(loglevel, "%s", message);
+      if (loglevel == LOG_PAGE)
+      {
+       /*
+        * Page message; send the message to the page_log file...
+	*/
 
-      if (loglevel <= LOG_INFO)
-        strncpy(job->printer->state_message, message,
-                sizeof(job->printer->state_message) - 1);
+	LogPage(job, message);
+      }
+      else
+      {
+       /*
+        * Other status message; send it to the error_log file...
+	*/
+
+	LogMessage(loglevel, "%s", message);
+
+	if (loglevel <= LOG_INFO)
+          strncpy(job->printer->state_message, message,
+                  sizeof(job->printer->state_message) - 1);
+      }
 
      /*
       * Update the input buffer...
@@ -846,5 +876,5 @@ start_process(char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.19 1999/05/11 19:48:39 mike Exp $".
+ * End of "$Id: job.c,v 1.20 1999/05/18 21:21:51 mike Exp $".
  */

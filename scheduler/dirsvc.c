@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.16 1999/05/13 20:41:11 mike Exp $"
+ * "$Id: dirsvc.c,v 1.17 1999/05/18 21:21:51 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -197,33 +197,68 @@ UpdateBrowseList(void)
   * the Printers list, and add it if not...
   */
 
-  type += CUPS_PRINTER_REMOTE;
+  type |= CUPS_PRINTER_REMOTE;
 
   if ((ptr = strchr(host, '.')) != NULL)
     *ptr = '\0';
 
-  if (strncmp(resource, "/printers/", 10) == 0)
-    sprintf(name, "%s@%s", resource + 10, host);
-  else if (strncmp(resource, "/classes/", 9) == 0)
-    sprintf(name, "%s@%s", resource + 9, host);
-  else
-    return;
-
-  if ((p = FindPrinter(name)) == NULL)
+  if (type & CUPS_PRINTER_CLASS)
   {
    /*
-    * Printer doesn't exist; add it...
+    * Remote destination is a class...
     */
 
-    p = AddPrinter(name);
+    if (strncmp(resource, "/classes/", 9) == 0)
+      sprintf(name, "%s@%s", resource + 9, host);
+    else
+      return;
 
+    if ((p = FindClass(name)) == NULL)
+    {
+     /*
+      * Class doesn't exist; add it...
+      */
+
+      p = AddPrinter(name);
+
+     /*
+      * First the URI to point to the real server...
+      */
+
+      strcpy(p->uri, uri);
+      strcpy(p->device_uri, uri);
+      free(p->attrs->attrs->values[0].string.text);
+      p->attrs->attrs->values[0].string.text = strdup(uri);
+    }
+  }
+  else
+  {
    /*
-    * First the URI to point to the real server...
+    * Remote destination is a printer...
     */
 
-    strcpy(p->uri, uri);
-    free(p->attrs->attrs->values[0].string.text);
-    p->attrs->attrs->values[0].string.text = strdup(uri);
+    if (strncmp(resource, "/printers/", 10) == 0)
+      sprintf(name, "%s@%s", resource + 10, host);
+    else
+      return;
+
+    if ((p = FindPrinter(name)) == NULL)
+    {
+     /*
+      * Printer doesn't exist; add it...
+      */
+
+      p = AddPrinter(name);
+
+     /*
+      * First the URI to point to the real server...
+      */
+
+      strcpy(p->uri, uri);
+      strcpy(p->device_uri, uri);
+      free(p->attrs->attrs->values[0].string.text);
+      p->attrs->attrs->values[0].string.text = strdup(uri);
+    }
   }
 
  /*
@@ -304,5 +339,5 @@ SendBrowseList(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.16 1999/05/13 20:41:11 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.17 1999/05/18 21:21:51 mike Exp $".
  */
