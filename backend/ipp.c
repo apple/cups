@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.50 2001/07/20 17:04:09 mike Exp $"
+ * "$Id: ipp.c,v 1.51 2001/07/30 19:38:24 mike Exp $"
  *
  *   IPP backend for the Common UNIX Printing System (CUPS).
  *
@@ -626,6 +626,9 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   * Return the queue status...
   */
 
+  if (ipp_status <= IPP_OK_CONFLICT)
+    fputs("INFO: Ready to print.\n", stderr);
+
   return (ipp_status > IPP_OK_CONFLICT);
 }
 
@@ -644,5 +647,5 @@ password_cb(const char *prompt)	/* I - Prompt (not used) */
 
 
 /*
- * End of "$Id: ipp.c,v 1.50 2001/07/20 17:04:09 mike Exp $".
+ * End of "$Id: ipp.c,v 1.51 2001/07/30 19:38:24 mike Exp $".
  */

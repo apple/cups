@@ -41,6 +41,9 @@ CHANGES IN CUPS V1.1.10
 	  printers.
 	- The pdftops filter did not have the Japanese and
 	  Chinese text support compiled into it.
+	- The IPP and AppSocket backends did not clear the
+	  "waiting for print job to complete" status message,
+	  which caused some confusion... :)
 
 
 CHANGES IN CUPS V1.1.9-1
