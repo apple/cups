@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.135 2001/07/23 19:10:21 mike Exp $"
+ * "$Id: job.c,v 1.136 2001/09/25 13:42:45 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -279,8 +279,10 @@ CheckJobs(void)
 
         if (pclass->type & CUPS_PRINTER_REMOTE)
 	  printer = pclass;
-	else
+	else if (pclass->state != IPP_PRINTER_STOPPED)
 	  printer = FindAvailablePrinter(current->dest);
+	else
+	  printer = NULL;
       }
       else
         printer = FindPrinter(current->dest);
@@ -291,8 +293,12 @@ CheckJobs(void)
         * Handle implicit classes...
 	*/
 
-        pclass  = printer;
-        printer = FindAvailablePrinter(current->dest);
+        pclass = printer;
+
+	if (pclass->state != IPP_PRINTER_STOPPED)
+	  printer = FindAvailablePrinter(current->dest);
+	else
+	  printer = NULL;
       }
 
       if (printer == NULL && pclass == NULL)
@@ -2945,5 +2951,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.135 2001/07/23 19:10:21 mike Exp $".
+ * End of "$Id: job.c,v 1.136 2001/09/25 13:42:45 mike Exp $".
  */

@@ -30,6 +30,8 @@ CHANGES IN CUPS V1.1.11
 	  temporary directory did not exist; this would cause it
 	  to loop indefinitely instead of returning an error
 	  (-1).
+	- Stopping (disabling) a printer class did not stop jobs
+	  from printing to printers in that class.
 
 
 CHANGES IN CUPS V1.1.10-1
