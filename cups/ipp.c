@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.40 2000/06/13 13:54:49 mike Exp $"
+ * "$Id: ipp.c,v 1.41 2000/07/10 13:52:55 mike Exp $"
  *
  *   Internet Printing Protocol support functions for the Common UNIX
  *   Printing System (CUPS).
@@ -41,6 +41,7 @@
  *   ippErrorString()    - Return a textual message for the given error message.
  *   ippFindAttribute()  - Find a named attribute in a request...
  *   ippLength()         - Compute the length of an IPP request.
+ *   ippNew()            - Allocate a new IPP request.
  *   ippPort()           - Return the default IPP port number.
  *   ippRead()           - Read data for an IPP request.
  *   ippTimeToDate()     - Convert from UNIX time to RFC 1903 format.
@@ -270,11 +271,11 @@ ippAddString(ipp_t      *ipp,		/* I - IPP request */
     char *p;
 
 
-    for (p = attr->values[0].string.text; *p;)
+    for (p = attr->values[0].string.text; *p; p ++)
       if (*p == '_')
-        *p++ = '-';
+        *p = '-';
       else
-        *p++ = tolower(*p);
+        *p = tolower(*p);
   }
 
   return (attr);
@@ -1696,5 +1697,5 @@ ipp_read(http_t        *http,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.40 2000/06/13 13:54:49 mike Exp $".
+ * End of "$Id: ipp.c,v 1.41 2000/07/10 13:52:55 mike Exp $".
  */

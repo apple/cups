@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.27 2000/05/31 14:13:29 mike Exp $"
+ * "$Id: ipp.c,v 1.28 2000/07/10 13:52:54 mike Exp $"
  *
  *   IPP backend for the Common UNIX Printing System (CUPS).
  *
@@ -86,6 +86,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
   struct sigaction action;	/* Actions for POSIX signals */
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET */
+  int		version;	/* IPP version */
 
 
   if (argc == 1)
@@ -204,6 +205,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
   language   = cupsLangDefault();
   copies_sup = NULL;
+  version    = 1;
 
   do
   {
@@ -212,6 +214,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
     */
 
     request = ippNew();
+    request->request.op.version[1]   = version;
     request->request.op.operation_id = IPP_GET_PRINTER_ATTRIBUTES;
     request->request.op.request_id   = 1;
 
@@ -296,10 +299,20 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 	    fputs("INFO: Printer busy; will retry in 10 seconds...\n", stderr);
 	    sleep(10);
 	  }
+	  else if (ipp_status == IPP_BAD_REQUEST && version == 1)
+	  {
+	   /*
+	    * Switch to IPP/1.0...
+	    */
+
+	    fputs("INFO: Printer does not support IPP/1.1, trying IPP/1.0...\n", stderr);
+	    version = 0;
+	  }
 	  else
 	  {
 	    fprintf(stderr, "ERROR: Printer will not accept print file (%x)!\n",
 	            ipp_status);
+	    fprintf(stderr, "ERROR: %s\n", ippErrorString(ipp_status));
             status = HTTP_ERROR;
 	  }
 	}
@@ -330,7 +343,8 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 	}
 	else
 	{
-          fprintf(stderr, "ERROR: Validate request was not accepted (%d)!\n", status);
+          fprintf(stderr, "ERROR: Validate request was not accepted (%d)!\n",
+	          status);
 	  ipp_status = IPP_FORBIDDEN;
 	}
       }
@@ -349,6 +363,8 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
       return (1);
     }
+    else if (ipp_status > IPP_OK_CONFLICT)
+      httpReconnect(http);
   }
   while (ipp_status > IPP_OK_CONFLICT);
 
@@ -390,6 +406,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
     */
 
     request = ippNew();
+    request->request.op.version[1]   = version;
     request->request.op.operation_id = IPP_PRINT_JOB;
     request->request.op.request_id   = 1;
 
@@ -629,8 +646,11 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 	    sleep(10);
 	  }
 	  else
+	  {
             fprintf(stderr, "ERROR: Print file was not accepted (%04x)!\n",
 	            response->request.status.status_code);
+	    fprintf(stderr, "ERROR: %s\n", ippErrorString(ipp_status));
+	  }
 	}
 	else if ((job_id = ippFindAttribute(response, "job-id", IPP_TAG_INTEGER)) == NULL)
           fputs("INFO: Print file accepted - job ID unknown.\n", stderr);
@@ -697,5 +717,5 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
 
 /*
- * End of "$Id: ipp.c,v 1.27 2000/05/31 14:13:29 mike Exp $".
+ * End of "$Id: ipp.c,v 1.28 2000/07/10 13:52:54 mike Exp $".
  */
