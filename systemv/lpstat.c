@@ -1,5 +1,5 @@
 /*
- * "$Id: lpstat.c,v 1.6 1999/04/21 14:16:29 mike Exp $"
+ * "$Id: lpstat.c,v 1.7 1999/05/13 20:41:26 mike Exp $"
  *
  *   "lpstat" command for the Common UNIX Printing System (CUPS).
  *
@@ -376,12 +376,16 @@ static void
 show_classes(http_t *http,	/* I - HTTP connection to server */
              char   *dests)	/* I - Destinations */
 {
+  int		i;		/* Looping var */
   ipp_t		*request,	/* IPP Request */
 		*response;	/* IPP Response */
   ipp_attribute_t *attr;	/* Current attribute */
   cups_lang_t	*language;	/* Default language */
+  char		*printer;	/* Printer class name */
+  ipp_attribute_t *members;	/* Printer members */
   char		*dptr,		/* Pointer into destination list */
 		*ptr;		/* Pointer into printer name */
+  int		match;		/* Non-zero if this job matches */
 
 
   DEBUG_printf(("show_classes(%08x, %08x)\n", http, dests));
@@ -389,6 +393,149 @@ show_classes(http_t *http,	/* I - HTTP connection to server */
   if (http == NULL)
     return;
 
+ /*
+  * Build a CUPS_GET_CLASSES request, which requires the following
+  * attributes:
+  *
+  *    attributes-charset
+  *    attributes-natural-language
+  */
+
+  request = ippNew();
+
+  request->request.op.operation_id = CUPS_GET_CLASSES;
+  request->request.op.request_id   = 1;
+
+  language = cupsLangDefault();
+
+  attr = ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
+                      "attributes-charset", NULL, cupsLangEncoding(language));
+
+  attr = ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
+                      "attributes-natural-language", NULL, language->language);
+
+ /*
+  * Do the request and get back a response...
+  */
+
+  if ((response = cupsDoRequest(http, request, "/classes/")) != NULL)
+  {
+    DEBUG_puts("show_devices: request succeeded...");
+
+   /*
+    * Loop through the printers returned in the list and display
+    * their devices...
+    */
+
+    for (attr = response->attrs; attr != NULL; attr = attr->next)
+    {
+     /*
+      * Skip leading attributes until we hit a job...
+      */
+
+      while (attr != NULL && attr->group_tag != IPP_TAG_PRINTER)
+        attr = attr->next;
+
+      if (attr == NULL)
+        break;
+
+     /*
+      * Pull the needed attributes from this job...
+      */
+
+      printer = NULL;
+      members = NULL;
+
+      while (attr != NULL && attr->group_tag == IPP_TAG_PRINTER)
+      {
+        if (strcmp(attr->name, "printer-name") == 0 &&
+	    attr->value_tag == IPP_TAG_NAME)
+	  printer = attr->values[0].string.text;
+
+        if (strcmp(attr->name, "member-names") == 0 &&
+	    attr->value_tag == IPP_TAG_NAME)
+	  members = attr;
+
+        attr = attr->next;
+      }
+
+     /*
+      * See if we have everything needed...
+      */
+
+      if (printer == NULL || members == NULL)
+      {
+        if (attr == NULL)
+	  break;
+	else
+          continue;
+      }
+
+     /*
+      * See if this is a printer we're interested in...
+      */
+
+      match = dests == NULL;
+
+      if (dests != NULL)
+      {
+        for (dptr = dests; *dptr != '\0';)
+	{
+	 /*
+	  * Skip leading whitespace and commas...
+	  */
+
+	  while (isspace(*dptr) || *dptr == ',')
+	    dptr ++;
+
+	  if (*dptr == '\0')
+	    break;
+
+         /*
+	  * Compare names...
+	  */
+
+	  for (ptr = printer;
+	       *ptr != '\0' && *dptr != '\0' && *ptr == *dptr;
+	       ptr ++, dptr ++);
+
+          if (*ptr == '\0' && (*dptr == '\0' || *dptr == ',' || isspace(*dptr)))
+	  {
+	    match = 1;
+	    break;
+	  }
+
+         /*
+	  * Skip trailing junk...
+	  */
+
+          while (!isspace(*dptr) && *dptr != '\0')
+	    dptr ++;
+	  while (isspace(*dptr) || *dptr == ',')
+	    dptr ++;
+
+	  if (*dptr == '\0')
+	    break;
+        }
+      }
+
+     /*
+      * Display the printer entry if needed...
+      */
+
+      if (match)
+      {
+        printf("members of class %s:\n", printer);
+	for (i = 0; i < members->num_values; i ++)
+	  printf("\t%s\n", members->values[i].string.text);
+      }
+
+      if (attr == NULL)
+        break;
+    }
+
+    ippDelete(response);
+  }
 }
 
 
@@ -1097,5 +1244,5 @@ show_scheduler(http_t *http)	/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpstat.c,v 1.6 1999/04/21 14:16:29 mike Exp $".
+ * End of "$Id: lpstat.c,v 1.7 1999/05/13 20:41:26 mike Exp $".
  */
