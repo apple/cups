@@ -1,5 +1,5 @@
 /*
- * "$Id: lpadmin.c,v 1.4 1999/06/10 16:16:10 mike Exp $"
+ * "$Id: lpadmin.c,v 1.5 1999/06/19 13:14:39 mike Exp $"
  *
  *   "lpadmin" command for the Common UNIX Printing System (CUPS).
  *
@@ -28,6 +28,7 @@
  *   default_printer()           - Set the default printing destination.
  *   delete_printer()            - Delete a printer from the system...
  *   delete_printer_from_class() - Delete a printer from a class.
+ *   enable_printer()            - Enable a printer...
  *   set_printer_device()        - Set the device-uri attribute.
  *   set_printer_file()          - Set the interface script or PPD file.
  *   set_printer_info()          - Set the printer description string.
@@ -58,6 +59,7 @@ static void	add_printer_to_class(http_t *, char *, char *);
 static void	default_printer(http_t *, char *);
 static void	delete_printer(http_t *, char *);
 static void	delete_printer_from_class(http_t *, char *, char *);
+static void	enable_printer(http_t *, char *);
 static void	set_printer_device(http_t *, char *, char *);
 static void	set_printer_file(http_t *, char *, char *);
 static void	set_printer_info(http_t *, char *, char *);
@@ -155,6 +157,21 @@ main(int  argc,		/* I - Number of command-line arguments */
 	      set_printer_file(http, printer, argv[i]);
 	    }
 	    break;
+
+        case 'E' : /* Enable the printer */
+	    if (printer == NULL)
+	    {
+              if (argv[i][2])
+                printer = argv[i] + 2;
+              else
+              {
+                i ++;
+                printer = argv[i];
+              }
+	    }
+
+            enable_printer(http, printer);
+            break;
 
         case 'm' : /* Use the specified standard script/PPD file */
 	    if (printer == NULL)
@@ -361,6 +378,9 @@ add_printer_to_class(http_t *http,	/* I - Server connection */
   char		uri[HTTP_MAX_URI];	/* URI for printer/class */
 
 
+  DEBUG_printf(("add_printer_to_class(%08x, \"%s\", \"%s\")\n", http,
+                printer, pclass));
+
  /*
   * Build an IPP_GET_PRINTER_ATTRIBUTES request, which requires the following
   * attributes:
@@ -486,6 +506,8 @@ default_printer(http_t *http,		/* I - Server connection */
   char		uri[HTTP_MAX_URI];	/* URI for printer/class */
 
 
+  DEBUG_printf(("default_printer(%08x, \"%s\")\n", http, printer));
+
  /*
   * Build a CUPS_SET_DEFAULT request, which requires the following
   * attributes:
@@ -542,6 +564,8 @@ delete_printer(http_t *http,		/* I - Server connection */
   cups_lang_t	*language;		/* Default language */
   char		uri[HTTP_MAX_URI];	/* URI for printer/class */
 
+
+  DEBUG_printf(("delete_printer(%08x, \"%s\")\n", http, printer));
 
  /*
   * Build a CUPS_DELETE_PRINTER request, which requires the following
@@ -603,6 +627,9 @@ delete_printer_from_class(http_t *http,		/* I - Server connection */
   cups_lang_t	*language;		/* Default language */
   char		uri[HTTP_MAX_URI];	/* URI for printer/class */
 
+
+  DEBUG_printf(("delete_printer_from_class(%08x, \"%s\", \"%s\")\n", http,
+                printer, pclass));
 
  /*
   * Build an IPP_GET_PRINTER_ATTRIBUTES request, which requires the following
@@ -748,6 +775,72 @@ delete_printer_from_class(http_t *http,		/* I - Server connection */
 
 
 /*
+ * 'enable_printer()' - Enable a printer...
+ */
+
+static void
+enable_printer(http_t *http,		/* I - Server connection */
+               char   *printer)		/* I - Printer to enable */
+{
+  ipp_t		*request,		/* IPP Request */
+		*response;		/* IPP Response */
+  cups_lang_t	*language;		/* Default language */
+  char		uri[HTTP_MAX_URI];	/* URI for printer/class */
+
+
+  DEBUG_printf(("enable_printer(%08x, \"%s\")\n", http, printer));
+
+ /*
+  * Build a CUPS_ADD_PRINTER request, which requires the following
+  * attributes:
+  *
+  *    attributes-charset
+  *    attributes-natural-language
+  *    printer-uri
+  *    printer-state
+  *    printer-is-accepting-jobs
+  */
+
+  sprintf(uri, "ipp://localhost/printers/%s", printer);
+
+  request = ippNew();
+
+  request->request.op.operation_id = CUPS_ADD_PRINTER;
+  request->request.op.request_id   = 1;
+
+  language = cupsLangDefault();
+
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
+               "attributes-charset", NULL, cupsLangEncoding(language));
+
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
+               "attributes-natural-language", NULL, language->language);
+
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI,
+               "printer-uri", NULL, uri);
+
+  ippAddInteger(request, IPP_TAG_PRINTER, IPP_TAG_ENUM, "printer-state",
+                IPP_PRINTER_IDLE);
+
+  ippAddBoolean(request, IPP_TAG_PRINTER, "printer-is-accepting-jobs", 1);
+
+ /*
+  * Do the request and get back a response...
+  */
+
+  if ((response = cupsDoRequest(http, request, "/admin/")) == NULL)
+    fputs("lpadmin: Unable to delete printer!\n", stderr);
+  else
+  {
+    if (response->request.status.status_code == IPP_NOT_FOUND)
+      fprintf(stderr, "lpadmin: Destination %s does not exist!\n", printer);
+
+    ippDelete(response);
+  }
+}
+
+
+/*
  * 'set_printer_device()' - Set the device-uri attribute.
  */
 
@@ -761,6 +854,9 @@ set_printer_device(http_t *http,	/* I - Server connection */
   cups_lang_t	*language;		/* Default language */
   char		uri[HTTP_MAX_URI];	/* URI for printer/class */
 
+
+  DEBUG_printf(("set_printer_device(%08x, \"%s\", \"%s\")\n", http, printer,
+                device));
 
  /*
   * Build a CUPS_ADD_PRINTER request, which requires the following
@@ -838,6 +934,9 @@ set_printer_file(http_t *http,		/* I - Server connection */
   char		buffer[8192];		/* Copy buffer */
   int		bytes;			/* Bytes in buffer */
 
+
+  DEBUG_printf(("set_printer_file(%08x, \"%s\", \"%s\")\n", http, printer,
+                file));
 
  /*
   * See if the file is gzip'd; if so, unzip it to a temporary file and
@@ -936,6 +1035,9 @@ set_printer_info(http_t *http,		/* I - Server connection */
   char		uri[HTTP_MAX_URI];	/* URI for printer/class */
 
 
+  DEBUG_printf(("set_printer_info(%08x, \"%s\", \"%s\")\n", http, printer,
+                info));
+
  /*
   * Build a CUPS_ADD_PRINTER request, which requires the following
   * attributes:
@@ -996,6 +1098,9 @@ set_printer_location(http_t *http,	/* I - Server connection */
   char		uri[HTTP_MAX_URI];	/* URI for printer/class */
 
 
+  DEBUG_printf(("set_printer_location(%08x, \"%s\", \"%s\")\n", http, printer,
+                location));
+
  /*
   * Build a CUPS_ADD_PRINTER request, which requires the following
   * attributes:
@@ -1042,5 +1147,5 @@ set_printer_location(http_t *http,	/* I - Server connection */
 
 
 /*
- * End of "$Id: lpadmin.c,v 1.4 1999/06/10 16:16:10 mike Exp $".
+ * End of "$Id: lpadmin.c,v 1.5 1999/06/19 13:14:39 mike Exp $".
  */
