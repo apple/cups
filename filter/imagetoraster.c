@@ -1,5 +1,5 @@
 /*
- * "$Id: imagetoraster.c,v 1.12 1999/04/05 13:20:14 mike Exp $"
+ * "$Id: imagetoraster.c,v 1.13 1999/04/05 15:22:00 mike Exp $"
  *
  *   Image file to raster filter for the Common UNIX Printing System (CUPS).
  *
@@ -169,7 +169,8 @@ main(int  argc,		/* I - Number of command-line arguments */
   int		num_options;	/* Number of print options */
   cups_option_t	*options;	/* Print options */
   char		*val;		/* Option value */
-  int		slowcollate;	/* Collate copies the slow way */
+  int		slowcollate,	/* Collate copies the slow way */
+		slowcopies;	/* Make copies the "slow" way? */
   float		g;		/* Gamma correction value */
   float		b;		/* Brightness factor */
   float		zoom;		/* Zoom facter */
@@ -274,6 +275,9 @@ main(int  argc,		/* I - Number of command-line arguments */
       header.cupsColorOrder = CUPS_ORDER_CHUNKED;
       header.cupsColorSpace = CUPS_CSPACE_RGB;
     }
+
+    if (choice->num_data > 2)
+      header.cupsCompression = choice->data[2];
   }
   else
   {
@@ -290,6 +294,8 @@ main(int  argc,		/* I - Number of command-line arguments */
     media_type = choice->choice;
 
     strcpy(header.MediaType, media_type);
+    if (choice->num_data > 0)
+      header.cupsMediaType = choice->data[0];
   }
   else
     media_type = "";
@@ -546,8 +552,12 @@ main(int  argc,		/* I - Number of command-line arguments */
     Collate = 0;
 
   slowcollate = Collate && ppdFindOption(ppd, "Collate") == NULL;
+  if (ppd != NULL)
+    slowcopies = ppd->manual_copies;
+  else
+    slowcopies = 1;
 
-  if (Copies > 1 && !slowcollate)
+  if (Copies > 1 && !slowcollate && !slowcopies)
   {
     header.Collate   = (cups_bool_t)Collate;
     header.NumCopies = Copies;
@@ -3600,5 +3610,5 @@ make_lut(ib_t  *lut,		/* I - Lookup table */
 
 
 /*
- * End of "$Id: imagetoraster.c,v 1.12 1999/04/05 13:20:14 mike Exp $".
+ * End of "$Id: imagetoraster.c,v 1.13 1999/04/05 15:22:00 mike Exp $".
  */
