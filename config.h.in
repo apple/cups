@@ -1,5 +1,5 @@
 /*
- * "$Id: config.h.in,v 1.78 2004/07/02 04:44:19 mike Exp $"
+ * "$Id: config.h.in,v 1.79 2004/08/02 18:16:36 mike Exp $"
  *
  *   Configuration file for the Common UNIX Printing System (CUPS).
  *
@@ -271,6 +271,13 @@
 
 
 /*
+ * Do we have the AIX usersec.h header file?
+ */
+
+#undef HAVE_USERSEC_H
+
+
+/*
  * Various scripting languages...
  */
 
@@ -287,5 +294,5 @@
 #endif /* !_CUPS_CONFIG_H_ */
 
 /*
- * End of "$Id: config.h.in,v 1.78 2004/07/02 04:44:19 mike Exp $".
+ * End of "$Id: config.h.in,v 1.79 2004/08/02 18:16:36 mike Exp $".
  */
