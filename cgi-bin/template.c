@@ -1,5 +1,5 @@
 /*
- * "$Id: template.c,v 1.15 2000/03/30 05:19:19 mike Exp $"
+ * "$Id: template.c,v 1.16 2000/04/14 19:59:27 mike Exp $"
  *
  *   CGI template function.
  *
@@ -154,6 +154,7 @@ cgi_copy(FILE *out,		/* I - Output file */
   int		ch;		/* Character from file */
   char		op;		/* Operation */
   char		name[255],	/* Name of variable */
+		*nameptr,	/* Pointer into name */
 		innername[255],	/* Inner comparison name */
 		*innerptr,	/* Pointer into inner name */
 		*s;		/* String pointer */
@@ -197,6 +198,15 @@ cgi_copy(FILE *out,		/* I - Output file */
         * Insert value only if it exists...
 	*/
 
+	if ((nameptr = strrchr(name, '-')) != NULL && isdigit(nameptr[1]))
+	{
+	  *nameptr++ = '\0';
+
+	  if ((value = cgiGetArray(name + 1, atoi(nameptr) - 1)) != NULL)
+            strcpy(outval, value);
+	  else
+	    outval[0] = '\0';
+	}
         if ((value = cgiGetArray(name + 1, element)) != NULL)
 	  strcpy(outval, value);
 	else
@@ -250,7 +260,15 @@ cgi_copy(FILE *out,		/* I - Output file */
         * Insert variable or variable name (if element is NULL)...
 	*/
 
-	if ((value = cgiGetArray(name, element)) == NULL)
+	if ((nameptr = strrchr(name, '-')) != NULL && isdigit(nameptr[1]))
+	{
+	  *nameptr++ = '\0';
+	  if ((value = cgiGetArray(name, atoi(nameptr) - 1)) == NULL)
+            sprintf(outval, "{%s}", name);
+	  else
+            strcpy(outval, value);
+	}
+	else if ((value = cgiGetArray(name, element)) == NULL)
           sprintf(outval, "{%s}", name);
 	else
           strcpy(outval, value);
@@ -323,7 +341,7 @@ cgi_copy(FILE *out,		/* I - Output file */
 	             isdigit(innerptr[1]))
             {
 	      *innerptr++ = '\0';
-	      if ((innerval = cgiGetArray(innername, atoi(innerptr))) == NULL)
+	      if ((innerval = cgiGetArray(innername, atoi(innerptr) - 1)) == NULL)
 	        *s = '\0';
 	      else
 	        strcpy(s, innerval);
@@ -432,5 +450,5 @@ cgi_puts(const char *s,
 
 
 /*
- * End of "$Id: template.c,v 1.15 2000/03/30 05:19:19 mike Exp $".
+ * End of "$Id: template.c,v 1.16 2000/04/14 19:59:27 mike Exp $".
  */
