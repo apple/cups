@@ -3,6 +3,9 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.20rc1
 
+	- The pdftops filter incorrectly auto-rotated pages when
+	  the user already had specified the proper orientation
+	  (STR #207)
 	- Fixed AIX shared library support (STR #201)
 	- Added support for live testing with Valgrind (STR
 	  #193)

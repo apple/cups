@@ -1,10 +1,35 @@
-//========================================================================
 //
-// pdftops.cc
+// "$Id: pdftops.cxx,v 1.6.2.6 2003/07/25 20:26:21 mike Exp $"
 //
-// Copyright 1996 Derek B. Noonburg
+//   PDF to PostScript filter front-end for the Common UNIX Printing
+//   System (CUPS).
 //
-//========================================================================
+//   Copyright 1997-2003 by Easy Software Products.
+//
+//   These coded instructions, statements, and computer programs are the
+//   property of Easy Software Products and are protected by Federal
+//   copyright law.  Distribution and use rights are outlined in the file
+//   "LICENSE.txt" which should have been included with this file.  If this
+//   file is missing or damaged please contact Easy Software Products
+//   at:
+//
+//       Attn: CUPS Licensing Information
+//       Easy Software Products
+//       44141 Airport View Drive, Suite 204
+//       Hollywood, Maryland 20636-3111 USA
+//
+//       Voice: (301) 373-9600
+//       EMail: cups-info@cups.org
+//         WWW: http://www.cups.org
+//
+// Contents:
+//
+//   main() - Main entry for filter...
+//
+
+//
+// Include necessary headers...
+//
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -28,7 +53,15 @@
 
 #include <cups/cups.h>
 
-int main(int argc, char *argv[]) {
+
+//
+// 'main()' - Main entry for filter...
+//
+
+int					// O - Exit status
+main(int  argc,				// I - Number of command-line args
+     char *argv[])			// I - Command-line arguments
+{
   PDFDoc	*doc;
   GString	*fileName;
   GString	*psFileName;
@@ -46,6 +79,8 @@ int main(int argc, char *argv[]) {
   int		bytes;
   int		width, length;
   int		left, bottom, right, top;
+  int		orientation;
+  int		temp;
   int		duplex;
 
 
@@ -109,6 +144,84 @@ int main(int argc, char *argv[]) {
     }
 
     level = ppd->language_level == 1 ? psLevel1 : psLevel2;
+  }
+
+  // Track the orientation of the print job and update the page
+  // dimensions and margins as needed...
+  orientation = 0;
+
+  if ((val = cupsGetOption("landscape", num_options, options)) != NULL)
+  {
+    if (strcasecmp(val, "no") != 0 && strcasecmp(val, "off") != 0 &&
+        strcasecmp(val, "false") != 0)
+      orientation = 1;
+  }
+  else if ((val = cupsGetOption("orientation-requested", num_options, options)) != NULL)
+  {
+   /*
+    * Map IPP orientation values to 0 to 3:
+    *
+    *   3 = 0 degrees   = 0
+    *   4 = 90 degrees  = 1
+    *   5 = -90 degrees = 3
+    *   6 = 180 degrees = 2
+    */
+
+    orientation = atoi(val) - 3;
+    if (orientation >= 2)
+      orientation ^= 1;
+  }
+
+  switch (orientation & 3)
+  {
+    case 0 : /* Portait */
+        break;
+
+    case 1 : /* Landscape */
+	temp   = left;
+	left   = bottom;
+	bottom = temp;
+
+	temp   = right;
+	right  = top;
+	top    = temp;
+
+	temp   = width;
+	width  = length;
+	length = temp;
+	break;
+
+    case 2 : /* Reverse Portrait */
+	temp   = width - left;
+	left   = width - right;
+	right  = temp;
+
+	temp   = length - bottom;
+	bottom = length - top;
+	top    = temp;
+        break;
+
+    case 3 : /* Reverse Landscape */
+	temp   = width - left;
+	left   = width - right;
+	right  = temp;
+
+	temp   = length - bottom;
+	bottom = length - top;
+	top    = temp;
+
+	temp   = left;
+	left   = bottom;
+	bottom = temp;
+
+	temp   = right;
+	right  = top;
+	top    = temp;
+
+	temp   = width;
+	width  = length;
+	length = temp;
+	break;
   }
 
   if ((val = cupsGetOption("sides", num_options, options)) != NULL &&
@@ -202,3 +315,8 @@ int main(int argc, char *argv[]) {
 
   return 0;
 }
+
+
+//
+// End of "$Id: pdftops.cxx,v 1.6.2.6 2003/07/25 20:26:21 mike Exp $".
+//
