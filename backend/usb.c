@@ -1,5 +1,5 @@
 /*
- * "$Id: usb.c,v 1.18.2.15 2002/09/05 20:32:59 mike Exp $"
+ * "$Id: usb.c,v 1.18.2.16 2002/09/06 14:45:53 mike Exp $"
  *
  *   USB port backend for the Common UNIX Printing System (CUPS).
  *
@@ -66,7 +66,7 @@
 
 void	decode_device_id(int port, const char *device_id,
 	                 char *make_model, int mmsize,
-	                 char *serial_number, int snsize);
+			 char *uri, int urisize);
 void	list_devices(void);
 int	open_device(const char *uri);
 
@@ -310,15 +310,17 @@ decode_device_id(int        port,		/* I - Port number */
                  const char *device_id,		/* I - 1284 device ID string */
                  char       *make_model,	/* O - Make/model */
 		 int        mmsize,		/* I - Size of buffer */
-                 char       *serial_number,	/* O - Serial number */
-		 int        snsize)		/* I - Size of buffer */
+		 char       *uri,		/* O - Device URI */
+		 int        urisize)		/* I - Size of buffer */
 {
   char	*attr,					/* 1284 attribute */
   	*delim,					/* 1284 delimiter */
+	*uriptr,				/* Pointer into URI */
 	line[1024];				/* Line from devices file */
   FILE	*fp;					/* /proc/bus/usb/devices file */
   int	current;				/* Current printer port */
-  char	temp[1024];				/* Temp serial number */
+  char	serial_number[1024],			/* Serial number string */
+	temp[1024];				/* Temporary string */
 
 
  /*
@@ -359,7 +361,7 @@ decode_device_id(int        port,		/* I - Port number */
 
   if (attr)
   {
-    strlcpy(serial_number, attr, snsize);
+    strlcpy(serial_number, attr, sizeof(serial_number));
 
     if ((delim = strchr(serial_number, ';')) != NULL)
       *delim = '\0';
@@ -389,7 +391,7 @@ decode_device_id(int        port,		/* I - Port number */
 
 	if (current == port)
 	{
-	  strlcpy(serial_number, temp, snsize);
+	  strlcpy(serial_number, temp, sizeof(serial_number));
 	  break;
 	}
 
@@ -400,18 +402,43 @@ decode_device_id(int        port,		/* I - Port number */
     fclose(fp);
   }
 
-  if (!serial_number[0])
+ /*
+  * Generate the device URI from the make_model and serial number strings.
+  */
+
+  strlcpy(uri, "usb://", urisize);
+  for (uriptr = uri + 6, delim = make_model;
+       *delim && uriptr < (uri + urisize - 1);
+       delim ++)
+    if (*delim == ' ')
+    {
+      delim ++;
+      *uriptr++ = '/';
+      break;
+    }
+    else
+      *uriptr++ = *delim;
+
+  for (; *delim && uriptr < (uri + urisize - 3); delim ++)
+    if (*delim == ' ')
+    {
+      *uriptr++ = '%';
+      *uriptr++ = '2';
+      *uriptr++ = '0';
+    }
+    else
+      *uriptr++ = *delim;
+
+  *uriptr = '\0';
+
+  if (serial_number[0])
   {
    /*
-    * Make the serial number contain the make and model with underscores
-    * instead of spaces...  This means only 1 model per system, but is
-    * a last resort if the serial number cannot be found...
+    * Add the serial number to the URI...
     */
 
-    snprintf(serial_number, snsize, "%s_%d", make_model, port + 1);
-    for (delim = serial_number; *delim; delim ++)
-      if (*delim == ' ')
-        *delim = '_';
+    strlcat(uri, "?serial=", urisize);
+    strlcat(uri, serial_number, urisize);
   }
 }
 
@@ -430,8 +457,8 @@ list_devices(void)
   char	format[255],		/* Format for device filename */
 	device[255],		/* Device filename */
 	device_id[1024],	/* Device ID string */
-	make_model[1024],	/* Make and model */
-	serial_number[1024];	/* Serial number */
+	device_uri[1024],	/* Device URI string */
+	make_model[1024];	/* Make and model */
 
 
  /*
@@ -473,9 +500,9 @@ list_devices(void)
     if (device_id[0])
     {
       decode_device_id(i, device_id, make_model, sizeof(make_model),
-                       serial_number, sizeof(serial_number));
+		       device_uri, sizeof(device_uri));
 
-      printf("direct usb://%s \"%s\" \"USB Printer #%d\"\n", serial_number,
+      printf("direct %s \"%s\" \"USB Printer #%d\"\n", device_uri,
 	     make_model, i + 1);
     }
     else
@@ -543,7 +570,7 @@ open_device(const char *uri)		/* I - Device URI */
 		device[255],		/* Device filename */
 		device_id[1024],	/* Device ID string */
 		make_model[1024],	/* Make and model */
-		serial_number[1024];	/* Serial number */
+		device_uri[1024];	/* Device URI string */
 
 
    /*
@@ -587,9 +614,9 @@ open_device(const char *uri)		/* I - Device URI */
 	*/
 
 	decode_device_id(i, device_id, make_model, sizeof(make_model),
-                	 serial_number, sizeof(serial_number));
+                	 device_uri, sizeof(device_uri));
 
-        if (strcmp(uri + 6, serial_number) == 0)
+        if (strcmp(uri, device_uri) == 0)
 	  return (fd);	/* Yes, return this file descriptor... */
       }
 
@@ -618,5 +645,5 @@ open_device(const char *uri)		/* I - Device URI */
 
 
 /*
- * End of "$Id: usb.c,v 1.18.2.15 2002/09/05 20:32:59 mike Exp $".
+ * End of "$Id: usb.c,v 1.18.2.16 2002/09/06 14:45:53 mike Exp $".
  */
