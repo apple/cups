@@ -106,7 +106,10 @@ CHANGES IN CUPS V1.1.5
 	- Added new job-originating-host-name attribute for
 	  jobs.  The new attribute provides the hostname or
 	  IP address of the machine that submitted the job.
-
+	- The set-job-attributes code no longer allows read-only
+	  job attributes to be changed.
+	- Expanded the click area for the navigation bar in the
+	  web interface.
 
 CHANGES IN CUPS v1.1.4
 
