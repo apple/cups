@@ -3,6 +3,8 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.22
 
+	- Now allow 0-length reads in the CUPS file API (STR
+	  #985)
 	- cupsDoFileRequest() now sets cupsLastError() to
 	  IPP_ERROR on network errors (STR #953)
 	- The pdftops filter didn't scale small pages up to the

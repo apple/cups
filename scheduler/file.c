@@ -1,5 +1,5 @@
 /*
- * "$Id: file.c,v 1.1.2.10 2004/10/04 19:48:56 mike Exp $"
+ * "$Id: file.c,v 1.1.2.11 2004/10/28 16:12:54 mike Exp $"
  *
  *   File functions for the Common UNIX Printing System (CUPS).
  *
@@ -458,8 +458,11 @@ cupsFileRead(cups_file_t *fp,		/* I - CUPS file */
   * Range check input...
   */
 
-  if (!fp || !buf || bytes <= 0 || fp->mode != 'r')
+  if (!fp || !buf || bytes < 0 || fp->mode != 'r')
     return (-1);
+
+  if (bytes == 0)
+    return (0);
 
  /*
   * Loop until all bytes are read...
@@ -620,8 +623,11 @@ cupsFileWrite(cups_file_t *fp,		/* I - CUPS file */
   * Range check input...
   */
 
-  if (!fp || !buf || bytes <= 0 || fp->mode != 'w')
+  if (!fp || !buf || bytes < 0 || fp->mode != 'w')
     return (-1);
+
+  if (bytes == 0)
+    return (0);
 
  /*
   * Write the buffer...
@@ -987,5 +993,5 @@ cups_write(int        fd,		/* I - File descriptor */
 
 
 /*
- * End of "$Id: file.c,v 1.1.2.10 2004/10/04 19:48:56 mike Exp $".
+ * End of "$Id: file.c,v 1.1.2.11 2004/10/28 16:12:54 mike Exp $".
  */
