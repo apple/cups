@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.127.2.47 2003/03/10 21:05:28 mike Exp $"
+ * "$Id: ipp.c,v 1.127.2.48 2003/03/12 21:27:34 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -1480,14 +1480,16 @@ cancel_all_jobs(client_t        *con,	/* I - Client connection */
   cups_ptype_t		dtype;		/* Destination type */
   char			method[HTTP_MAX_URI],
 					/* Method portion of URI */
-			username[HTTP_MAX_URI],
+			userpass[HTTP_MAX_URI],
 					/* Username portion of URI */
 			host[HTTP_MAX_URI],
 					/* Host portion of URI */
 			resource[HTTP_MAX_URI];
 					/* Resource portion of URI */
   int			port;		/* Port portion of URI */
-  printer_t		*printer;	/* Current printer */
+  ipp_attribute_t	*attr;		/* Attribute in request */
+  const char		*username;	/* Username */
+  int			purge;		/* Purge? */
 
 
   LogMessage(L_DEBUG2, "cancel_all_jobs(%d, %s)\n", con->http.fd,
@@ -1518,10 +1520,39 @@ cancel_all_jobs(client_t        *con,	/* I - Client connection */
   }
 
  /*
+  * Get the username (if any) for the jobs we want to cancel (only if
+  * "my-jobs" is specified...
+  */
+
+  if ((attr = ippFindAttribute(con->request, "my-jobs", IPP_TAG_BOOLEAN)) != NULL &&
+      attr->values[0].boolean)
+  {
+    if ((attr = ippFindAttribute(con->request, "requesting-user-name", IPP_TAG_NAME)) != NULL)
+      username = attr->values[0].string.text;
+    else
+    {
+      LogMessage(L_ERROR, "cancel_all_jobs: missing requesting-user-name attribute!");
+      send_ipp_error(con, IPP_BAD_REQUEST);
+      return;
+    }
+  }
+  else
+    username = NULL;
+
+ /*
+  * Look for the "purge-jobs" attribute...
+  */
+
+  if ((attr = ippFindAttribute(con->request, "purge-jobs", IPP_TAG_BOOLEAN)) != NULL)
+    purge = attr->values[0].boolean;
+  else
+    purge = 1;
+
+ /*
   * And if the destination is valid...
   */
 
-  httpSeparate(uri->values[0].string.text, method, username, host, &port,
+  httpSeparate(uri->values[0].string.text, method, userpass, host, &port,
                resource);
 
   if ((dest = ValidateDest(host, resource, &dtype)) == NULL)
@@ -1541,12 +1572,10 @@ cancel_all_jobs(client_t        *con,	/* I - Client connection */
     * Cancel all jobs on all printers...
     */
 
-    for (printer = Printers; printer; printer = printer->next)
-    {
-      CancelJobs(printer->name);
-      LogMessage(L_INFO, "All jobs on \'%s\' were cancelled by \'%s\'.",
-                 printer->name, con->username);
-    }
+    CancelJobs(NULL, username, purge);
+
+    LogMessage(L_INFO, "All jobs were %s by \'%s\'.",
+               purge ? "purged" : "cancelled", con->username);
   }
   else
   {
@@ -1554,9 +1583,10 @@ cancel_all_jobs(client_t        *con,	/* I - Client connection */
     * Cancel all of the jobs on the named printer...
     */
 
-    CancelJobs(dest);
-    LogMessage(L_INFO, "All jobs on \'%s\' were cancelled by \'%s\'.", dest,
-               con->username);
+    CancelJobs(dest, username, purge);
+
+    LogMessage(L_INFO, "All jobs on \'%s\' were %s by \'%s\'.", dest,
+               purge ? "purged" : "cancelled", con->username);
   }
 
   con->response->request.status.status_code = IPP_OK;
@@ -2950,7 +2980,7 @@ delete_printer(client_t        *con,	/* I - Client connection */
   * Remove old jobs...
   */
 
-  CancelJobs(dest);
+  CancelJobs(dest, NULL, 1);
 
  /*
   * Remove any old PPD or script files...
@@ -6157,5 +6187,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.127.2.47 2003/03/10 21:05:28 mike Exp $".
+ * End of "$Id: ipp.c,v 1.127.2.48 2003/03/12 21:27:34 mike Exp $".
  */

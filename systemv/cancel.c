@@ -1,5 +1,5 @@
 /*
- * "$Id: cancel.c,v 1.19.2.11 2003/01/15 04:25:57 mike Exp $"
+ * "$Id: cancel.c,v 1.19.2.12 2003/03/12 21:27:39 mike Exp $"
  *
  *   "cancel" command for the Common UNIX Printing System (CUPS).
  *
@@ -51,7 +51,9 @@ main(int  argc,			/* I - Number of command-line arguments */
   int		num_dests;	/* Number of destinations */
   cups_dest_t	*dests;		/* Destinations */
   char		*dest,		/* Destination printer */
-		*job;		/* Job ID pointer */
+		*job,		/* Job ID pointer */
+		*user;		/* Cancel jobs for a user */
+  int		purge;		/* Purge or cancel jobs? */
   char		uri[1024];	/* Printer or job URI */
   ipp_t		*request;	/* IPP request */
   ipp_t		*response;	/* IPP response */
@@ -64,8 +66,10 @@ main(int  argc,			/* I - Number of command-line arguments */
   */
 
   op         = IPP_CANCEL_JOB;
+  purge      = 0;
   job_id     = 0;
   dest       = NULL;
+  user       = NULL;
   http       = NULL;
   num_dests  = 0;
   dests      = NULL;
@@ -91,7 +95,8 @@ main(int  argc,			/* I - Number of command-line arguments */
 	    break;
 
         case 'a' : /* Cancel all jobs */
-	    op = IPP_PURGE_JOBS;
+	    purge = 1;
+	    op    = IPP_PURGE_JOBS;
 	    break;
 
         case 'h' : /* Connect to host */
@@ -115,8 +120,10 @@ main(int  argc,			/* I - Number of command-line arguments */
 	    break;
 
         case 'u' : /* Username */
+	    op = IPP_PURGE_JOBS;
+
 	    if (argv[i][2] != '\0')
-	      cupsSetUser(argv[i] + 2);
+	      user = argv[i] + 2;
 	    else
 	    {
 	      i ++;
@@ -127,7 +134,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 		return (1);
               }
 	      else
-		cupsSetUser(argv[i]);
+		user = argv[i];
 	    }
 	    break;
 
@@ -251,8 +258,18 @@ main(int  argc,			/* I - Number of command-line arguments */
 	             uri);
       }
 
-      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
-                   "requesting-user-name", NULL, cupsUser());
+      if (user)
+      {
+	ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
+                     "requesting-user-name", NULL, user);
+	ippAddBoolean(request, IPP_TAG_OPERATION, "my-jobs", 1);
+      }
+      else
+	ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
+                     "requesting-user-name", NULL, cupsUser());
+
+      if (op == IPP_PURGE_JOBS)
+	ippAddBoolean(request, IPP_TAG_OPERATION, "purge-jobs", purge);
 
      /*
       * Do the request and get back a response...
@@ -285,5 +302,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: cancel.c,v 1.19.2.11 2003/01/15 04:25:57 mike Exp $".
+ * End of "$Id: cancel.c,v 1.19.2.12 2003/03/12 21:27:39 mike Exp $".
  */

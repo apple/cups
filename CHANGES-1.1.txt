@@ -3,6 +3,14 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.19
 
+	- The cancel command now correctly supports the "-u
+	  user" option to cancel all jobs for the named user.
+	- The Purge-Jobs operation now supports the my-jobs
+	  boolean attribute and a new purge-jobs boolean
+	  attribute to control whether job history data is
+	  purged from the scheduler; the default is false for
+	  my-jobs and true for purge-jobs to match the original
+	  implementation.
 	- The scheduler would not timeout printers when only
 	  using SLP browsing.
 	- If the scheduler was unable to execute a filter, it
