@@ -3,6 +3,13 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.20rc1
 
+	- The ppdOpen*() and cupsLangGet() functions did not
+	  make a copy of the old locale strings when using the
+	  POSIX locale when reading files, which apparently
+	  caused problems with some implementations of the
+	  standard C library. (STR #159)
+	- The pdftops filter did not work properly with some
+	  embedded Type1C fonts (STR #177)
 	- Updated the pdftops filter to be based upon Xpdf
 	  2.02pl1 (STR #191)
 	- The scheduler did not reset the group list when

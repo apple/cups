@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.91.2.62 2003/07/19 22:13:52 mike Exp $"
+ * "$Id: client.c,v 1.91.2.63 2003/07/20 01:36:50 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -1057,7 +1057,10 @@ ReadClient(client_t *con)	/* I - Client to read from */
 
   if (status == HTTP_OK)
   {
-    con->language = cupsLangGet(con->http.fields[HTTP_FIELD_ACCEPT_LANGUAGE]);
+    if (con->http.fields[HTTP_FIELD_ACCEPT_LANGUAGE][0])
+      con->language = cupsLangGet(con->http.fields[HTTP_FIELD_ACCEPT_LANGUAGE]);
+    else
+      con->language = cupsLangGet(DefaultLanguage);
 
     decode_auth(con);
 
@@ -3353,5 +3356,5 @@ CDSAWriteFunc(SSLConnectionRef connection,	/* I  - SSL/TLS connection */
 
 
 /*
- * End of "$Id: client.c,v 1.91.2.62 2003/07/19 22:13:52 mike Exp $".
+ * End of "$Id: client.c,v 1.91.2.63 2003/07/20 01:36:50 mike Exp $".
  */

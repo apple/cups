@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c,v 1.51.2.54 2003/07/06 20:02:41 mike Exp $"
+ * "$Id: ppd.c,v 1.51.2.55 2003/07/20 01:33:11 mike Exp $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -498,9 +498,9 @@ ppdOpen(FILE *fp)			/* I - File to read from */
   language = cupsLangDefault();
 
 #ifdef LC_NUMERIC
-  oldlocale = setlocale(LC_NUMERIC, "C");
+  oldlocale = _cupsSaveLocale(LC_NUMERIC, "C");
 #else
-  oldlocale = setlocale(LC_ALL, "C");
+  oldlocale = _cupsSaveLocale(LC_ALL, "C");
 #endif /* LC_NUMERIC */
 
  /*
@@ -545,19 +545,9 @@ ppdOpen(FILE *fp)			/* I - File to read from */
       * Need a string value!
       */
 
-      ppdClose(ppd);
-
-      cupsLangFree(language);
-
-#ifdef LC_NUMERIC
-      setlocale(LC_NUMERIC, oldlocale);
-#else
-      setlocale(LC_ALL, oldlocale);
-#endif /* LC_NUMERIC */
-
       ppd_status = PPD_MISSING_VALUE;
 
-      return (NULL);
+      goto error;
     }
 
    /*
@@ -614,21 +604,9 @@ ppdOpen(FILE *fp)			/* I - File to read from */
 
           if (group == NULL)
 	  {
-            ppdClose(ppd);
-
-	    ppd_free(string);
-
-            cupsLangFree(language);
-
-#ifdef LC_NUMERIC
-            setlocale(LC_NUMERIC, oldlocale);
-#else
-            setlocale(LC_ALL, oldlocale);
-#endif /* LC_NUMERIC */
-
             ppd_status = PPD_ALLOC_ERROR;
 
-	    return (NULL);
+	    goto error;
 	  }
 
           DEBUG_printf(("Adding to group %s...\n", group->text));
@@ -640,21 +618,9 @@ ppdOpen(FILE *fp)			/* I - File to read from */
 
 	if (option == NULL)
 	{
-          ppdClose(ppd);
-
-	  ppd_free(string);
-
-          cupsLangFree(language);
-
-#ifdef LC_NUMERIC
-          setlocale(LC_NUMERIC, oldlocale);
-#else
-          setlocale(LC_ALL, oldlocale);
-#endif /* LC_NUMERIC */
-
           ppd_status = PPD_ALLOC_ERROR;
 
-	  return (NULL);
+          goto error;
 	}
 
        /*
@@ -788,19 +754,9 @@ ppdOpen(FILE *fp)			/* I - File to read from */
       {
         ppd_free(filter);
 
-	ppdClose(ppd);
-
-        cupsLangFree(language);
-
-#ifdef LC_NUMERIC
-        setlocale(LC_NUMERIC, oldlocale);
-#else
-        setlocale(LC_ALL, oldlocale);
-#endif /* LC_NUMERIC */
-
         ppd_status = PPD_ALLOC_ERROR;
 
-	return (NULL);
+	goto error;
       }
 
       ppd->filters     = filter;
@@ -830,21 +786,9 @@ ppdOpen(FILE *fp)			/* I - File to read from */
 
       if (tempfonts == NULL)
       {
-        ppd_free(string);
-
-        ppdClose(ppd);
-
-        cupsLangFree(language);
-
-#ifdef LC_NUMERIC
-        setlocale(LC_NUMERIC, oldlocale);
-#else
-        setlocale(LC_ALL, oldlocale);
-#endif /* LC_NUMERIC */
-
         ppd_status = PPD_ALLOC_ERROR;
 
-	return (NULL);
+	goto error;
       }
       
       ppd->fonts                 = tempfonts;
@@ -896,42 +840,18 @@ ppdOpen(FILE *fp)			/* I - File to read from */
 	  {
 	    DEBUG_puts("Unable to get general group!");
 
-            ppdClose(ppd);
-
-	    ppd_free(string);
-
-            cupsLangFree(language);
-
-#ifdef LC_NUMERIC
-            setlocale(LC_NUMERIC, oldlocale);
-#else
-            setlocale(LC_ALL, oldlocale);
-#endif /* LC_NUMERIC */
-
             ppd_status = PPD_ALLOC_ERROR;
 
-	    return (NULL);
+	    goto error;
 	  }
 
 	  if ((option = ppd_get_option(temp, "PageSize")) == NULL)
 	  {
 	    DEBUG_puts("Unable to get PageSize option!");
 
-            ppdClose(ppd);
-
-	    ppd_free(string);
-
-            cupsLangFree(language);
-
-#ifdef LC_NUMERIC
-            setlocale(LC_NUMERIC, oldlocale);
-#else
-            setlocale(LC_ALL, oldlocale);
-#endif /* LC_NUMERIC */
-
             ppd_status = PPD_ALLOC_ERROR;
 
-	    return (NULL);
+	    goto error;
 	  }
         }
 
@@ -939,21 +859,9 @@ ppdOpen(FILE *fp)			/* I - File to read from */
 	{
 	  DEBUG_puts("Unable to add Custom choice!");
 
-          ppdClose(ppd);
-
-	  ppd_free(string);
-
-          cupsLangFree(language);
-
-#ifdef LC_NUMERIC
-          setlocale(LC_NUMERIC, oldlocale);
-#else
-          setlocale(LC_ALL, oldlocale);
-#endif /* LC_NUMERIC */
-
           ppd_status = PPD_ALLOC_ERROR;
 
-	  return (NULL);
+	  goto error;
 	}
 
 	strlcpy(choice->text, cupsLangString(language, CUPS_MSG_VARIABLE),
@@ -965,42 +873,18 @@ ppdOpen(FILE *fp)			/* I - File to read from */
       {
 	DEBUG_puts("Unable to find PageSize option!");
 
-        ppdClose(ppd);
-
-	ppd_free(string);
-
-        cupsLangFree(language);
-
-#ifdef LC_NUMERIC
-        setlocale(LC_NUMERIC, oldlocale);
-#else
-        setlocale(LC_ALL, oldlocale);
-#endif /* LC_NUMERIC */
-
         ppd_status = PPD_INTERNAL_ERROR;
 
-	return (NULL);
+	goto error;
       }
 
       if ((choice = ppdFindChoice(option, "Custom")) == NULL)
       {
 	DEBUG_puts("Unable to find Custom choice!");
 
-        ppdClose(ppd);
-
-	ppd_free(string);
-
-        cupsLangFree(language);
-
-#ifdef LC_NUMERIC
-        setlocale(LC_NUMERIC, oldlocale);
-#else
-        setlocale(LC_ALL, oldlocale);
-#endif /* LC_NUMERIC */
-
         ppd_status = PPD_INTERNAL_ERROR;
 
-	return (NULL);
+	goto error;
       }
 
       choice->code = string;
@@ -1072,21 +956,9 @@ ppdOpen(FILE *fp)			/* I - File to read from */
 	                             strlen(string) + 1);
         if (temp == NULL)
 	{
-          ppdClose(ppd);
-
-	  ppd_free(string);
-
-          cupsLangFree(language);
-
-#ifdef LC_NUMERIC
-          setlocale(LC_NUMERIC, oldlocale);
-#else
-          setlocale(LC_ALL, oldlocale);
-#endif /* LC_NUMERIC */
-
           ppd_status = PPD_ALLOC_ERROR;
 
-	  return (NULL);
+	  goto error;
 	}
 
         ppd->patches = temp;
@@ -1102,21 +974,9 @@ ppdOpen(FILE *fp)			/* I - File to read from */
 
       if (option)
       {
-        ppdClose(ppd);
-
-	ppd_free(string);
-
-        cupsLangFree(language);
-
-#ifdef LC_NUMERIC
-        setlocale(LC_NUMERIC, oldlocale);
-#else
-        setlocale(LC_ALL, oldlocale);
-#endif /* LC_NUMERIC */
-
         ppd_status = PPD_NESTED_OPEN_UI;
 
-	return (NULL);
+	goto error;
       }
 
      /*
@@ -1150,21 +1010,9 @@ ppdOpen(FILE *fp)			/* I - File to read from */
 
         if (group == NULL)
 	{
-          ppdClose(ppd);
-
-	  ppd_free(string);
-
-          cupsLangFree(language);
-
-#ifdef LC_NUMERIC
-          setlocale(LC_NUMERIC, oldlocale);
-#else
-          setlocale(LC_ALL, oldlocale);
-#endif /* LC_NUMERIC */
-
           ppd_status = PPD_ALLOC_ERROR;
 
-	  return (NULL);
+	  goto error;
 	}
 
         DEBUG_printf(("Adding to group %s...\n", group->text));
@@ -1176,21 +1024,9 @@ ppdOpen(FILE *fp)			/* I - File to read from */
 
       if (option == NULL)
       {
-        ppdClose(ppd);
-
-	ppd_free(string);
-
-        cupsLangFree(language);
-
-#ifdef LC_NUMERIC
-        setlocale(LC_NUMERIC, oldlocale);
-#else
-        setlocale(LC_ALL, oldlocale);
-#endif /* LC_NUMERIC */
-
         ppd_status = PPD_ALLOC_ERROR;
 
-	return (NULL);
+	goto error;
       }
 
      /*
@@ -1205,21 +1041,9 @@ ppdOpen(FILE *fp)			/* I - File to read from */
         option->ui = PPD_UI_PICKONE;
       else
       {
-        ppdClose(ppd);
-
-	ppd_free(string);
-
-        cupsLangFree(language);
-
-#ifdef LC_NUMERIC
-        setlocale(LC_NUMERIC, oldlocale);
-#else
-        setlocale(LC_ALL, oldlocale);
-#endif /* LC_NUMERIC */
-
         ppd_status = PPD_BAD_OPEN_UI;
 
-	return (NULL);
+	goto error;
       }
 
       for (j = 0; j < ppd->num_attrs; j ++)
@@ -1273,21 +1097,9 @@ ppdOpen(FILE *fp)			/* I - File to read from */
 
       if (option)
       {
-        ppdClose(ppd);
-
-	ppd_free(string);
-
-        cupsLangFree(language);
-
-#ifdef LC_NUMERIC
-        setlocale(LC_NUMERIC, oldlocale);
-#else
-        setlocale(LC_ALL, oldlocale);
-#endif /* LC_NUMERIC */
-
         ppd_status = PPD_NESTED_OPEN_UI;
 
-	return (NULL);
+	goto error;
       }
 
      /*
@@ -1298,21 +1110,9 @@ ppdOpen(FILE *fp)			/* I - File to read from */
 
       if (group == NULL)
       {
-        ppdClose(ppd);
-
-	ppd_free(string);
-
-        cupsLangFree(language);
-
-#ifdef LC_NUMERIC
-        setlocale(LC_NUMERIC, oldlocale);
-#else
-        setlocale(LC_ALL, oldlocale);
-#endif /* LC_NUMERIC */
-
         ppd_status = PPD_ALLOC_ERROR;
 
-	return (NULL);
+	goto error;
       }
 
      /*
@@ -1326,21 +1126,9 @@ ppdOpen(FILE *fp)			/* I - File to read from */
 
       if (option == NULL)
       {
-        ppdClose(ppd);
-
-	ppd_free(string);
-
-        cupsLangFree(language);
-
-#ifdef LC_NUMERIC
-        setlocale(LC_NUMERIC, oldlocale);
-#else
-        setlocale(LC_ALL, oldlocale);
-#endif /* LC_NUMERIC */
-
         ppd_status = PPD_ALLOC_ERROR;
 
-	return (NULL);
+	goto error;
       }
 
      /*
@@ -1355,21 +1143,9 @@ ppdOpen(FILE *fp)			/* I - File to read from */
         option->ui = PPD_UI_PICKONE;
       else
       {
-        ppdClose(ppd);
-
-	ppd_free(string);
-
-        cupsLangFree(language);
-
-#ifdef LC_NUMERIC
-        setlocale(LC_NUMERIC, oldlocale);
-#else
-        setlocale(LC_ALL, oldlocale);
-#endif /* LC_NUMERIC */
-
         ppd_status = PPD_BAD_OPEN_UI;
 
-	return (NULL);
+	goto error;
       }
 
       for (j = 0; j < ppd->num_attrs; j ++)
@@ -1408,40 +1184,16 @@ ppdOpen(FILE *fp)			/* I - File to read from */
 
       if (group != NULL)
       {
-        ppdClose(ppd);
-
-	ppd_free(string);
-
-        cupsLangFree(language);
-
-#ifdef LC_NUMERIC
-        setlocale(LC_NUMERIC, oldlocale);
-#else
-        setlocale(LC_ALL, oldlocale);
-#endif /* LC_NUMERIC */
-
         ppd_status = PPD_NESTED_OPEN_GROUP;
 
-	return (NULL);
+	goto error;
       }
 
       if (!string)
       {
-        ppdClose(ppd);
-
-	ppd_free(string);
-
-        cupsLangFree(language);
-
-#ifdef LC_NUMERIC
-        setlocale(LC_NUMERIC, oldlocale);
-#else
-        setlocale(LC_ALL, oldlocale);
-#endif /* LC_NUMERIC */
-
         ppd_status = PPD_BAD_OPEN_GROUP;
 
-	return (NULL);
+	goto error;
       }
 
      /*
@@ -1481,21 +1233,9 @@ ppdOpen(FILE *fp)			/* I - File to read from */
     {
       if (sscanf(string, "%f%40s%40s", &order, name, keyword) != 3)
       {
-        ppdClose(ppd);
-
-	ppd_free(string);
-
-        cupsLangFree(language);
-
-#ifdef LC_NUMERIC
-        setlocale(LC_NUMERIC, oldlocale);
-#else
-        setlocale(LC_ALL, oldlocale);
-#endif /* LC_NUMERIC */
-
         ppd_status = PPD_BAD_ORDER_DEPENDENCY;
 
-	return (NULL);
+	goto error;
       }
 
       if (keyword[0] == '*')
@@ -1619,21 +1359,9 @@ ppdOpen(FILE *fp)			/* I - File to read from */
 
       if (constraint == NULL)
       {
-        ppdClose(ppd);
-
-	ppd_free(string);
-
-        cupsLangFree(language);
-
-#ifdef LC_NUMERIC
-        setlocale(LC_NUMERIC, oldlocale);
-#else
-        setlocale(LC_ALL, oldlocale);
-#endif /* LC_NUMERIC */
-
         ppd_status = PPD_ALLOC_ERROR;
 
-	return (NULL);
+	goto error;
       }
 
       ppd->consts = constraint;
@@ -1646,10 +1374,8 @@ ppdOpen(FILE *fp)			/* I - File to read from */
       {
         case 0 : /* Error */
 	case 1 : /* Error */
-	    ppdClose(ppd);
-  	    ppd_free(string);
 	    ppd_status = PPD_BAD_UI_CONSTRAINTS;
-	    return (NULL);
+	    goto error;
 
 	case 2 : /* Two options... */
 	   /*
@@ -1716,21 +1442,9 @@ ppdOpen(FILE *fp)			/* I - File to read from */
         * Unable to add or find size!
 	*/
 
-        ppdClose(ppd);
-
-	ppd_free(string);
-
-        cupsLangFree(language);
-
-#ifdef LC_NUMERIC
-        setlocale(LC_NUMERIC, oldlocale);
-#else
-        setlocale(LC_ALL, oldlocale);
-#endif /* LC_NUMERIC */
-
         ppd_status = PPD_ALLOC_ERROR;
 
-	return (NULL);
+	goto error;
       }
 
       sscanf(string, "%f%f", &(size->width), &(size->length));
@@ -1749,21 +1463,9 @@ ppdOpen(FILE *fp)			/* I - File to read from */
         * Unable to add or find size!
 	*/
 
-        ppdClose(ppd);
-
-	ppd_free(string);
-
-        cupsLangFree(language);
-
-#ifdef LC_NUMERIC
-        setlocale(LC_NUMERIC, oldlocale);
-#else
-        setlocale(LC_ALL, oldlocale);
-#endif /* LC_NUMERIC */
-
         ppd_status = PPD_ALLOC_ERROR;
 
-	return (NULL);
+	goto error;
       }
 
       sscanf(string, "%f%f%f%f", &(size->left), &(size->bottom),
@@ -2046,9 +1748,9 @@ ppdOpen(FILE *fp)			/* I - File to read from */
   cupsLangFree(language);
 
 #ifdef LC_NUMERIC
-  setlocale(LC_NUMERIC, oldlocale);
+  _cupsRestoreLocale(LC_NUMERIC, oldlocale);
 #else
-  setlocale(LC_ALL, oldlocale);
+  _cupsRestoreLocale(LC_ALL, oldlocale);
 #endif /* LC_NUMERIC */
 
 #ifdef DEBUG
@@ -2164,6 +1866,26 @@ ppdOpen(FILE *fp)			/* I - File to read from */
   */
 
   return (ppd);
+
+ /*
+  * Common exit point for errors to save code size...
+  */
+
+  error:
+
+  ppd_free(string);
+
+  ppdClose(ppd);
+
+  cupsLangFree(language);
+
+#ifdef LC_NUMERIC
+  _cupsRestoreLocale(LC_NUMERIC, oldlocale);
+#else
+  _cupsRestoreLocale(LC_ALL, oldlocale);
+#endif /* LC_NUMERIC */
+
+  return (NULL);
 }
 
 
@@ -3211,5 +2933,5 @@ ppd_read(FILE *fp,			/* I - File to read from */
 
 
 /*
- * End of "$Id: ppd.c,v 1.51.2.54 2003/07/06 20:02:41 mike Exp $".
+ * End of "$Id: ppd.c,v 1.51.2.55 2003/07/20 01:33:11 mike Exp $".
  */
