@@ -92,6 +92,9 @@ CHANGES IN CUPS V1.1.7
 	  attribute when altering a job.
 	- The pstops filter did not handle PostScript files with
 	  lines longer than 8191 bytes.
+	- The scheduler now sets the HTTPS environment variable
+	  for CGI programs when a client connects using
+	  encryption.
 
 
 CHANGES IN CUPS V1.1.6-3

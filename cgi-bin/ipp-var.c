@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp-var.c,v 1.22 2001/02/20 17:32:59 mike Exp $"
+ * "$Id: ipp-var.c,v 1.23 2001/03/10 15:19:35 mike Exp $"
  *
  *   IPP variable routines for the Common UNIX Printing System (CUPS).
  *
@@ -97,13 +97,15 @@ ippSetCGIVars(ipp_t      *response,	/* I - Response data to be copied... */
 			resource[HTTP_MAX_URI],
 			uri[HTTP_MAX_URI];
   int			port;		/* URI data */
+  int			ishttps;	/* Using encryption? */
   const char		*server;	/* Name of server */
   struct tm		*date;		/* Date information */
 
 
   ippSetServerVersion();
 
-  server = getenv("SERVER_NAME");
+  server  = getenv("SERVER_NAME");
+  ishttps = getenv("HTTPS") != NULL;
 
   for (attr = response->attrs;
        attr && attr->group_tag == IPP_TAG_OPERATION;
@@ -234,25 +236,30 @@ ippSetCGIVars(ipp_t      *response,	/* I - Response data to be copied... */
 	            strcmp(method, "http") == 0)
         	{
         	 /*
-		  * Map localhost access to localhost...
+		  * Map localhost access to localhost and local port...
 		  */
 
         	  if (strcasecmp(hostname, server) == 0 &&
 	              (strcmp(getenv("REMOTE_HOST"), "127.0.0.1") == 0 ||
 		       strcmp(getenv("REMOTE_HOST"), "localhost") == 0 ||
 		       strcmp(getenv("REMOTE_HOST"), server) == 0))
+		  {
 		    strcpy(hostname, "localhost");
+		    port = atoi(getenv("SERVER_PORT"));
+		  }
 
         	 /*
 		  * Rewrite URI with HTTP address...
 		  */
 
 		  if (username[0])
-		    snprintf(uri, sizeof(uri), "http://%s@%s:%d%s", username,
-		             hostname, port, resource);
+		    snprintf(uri, sizeof(uri), "%s://%s@%s:%d%s",
+		             ishttps ? "https" : "http",
+		             username, hostname, port, resource);
         	  else
-		    snprintf(uri, sizeof(uri), "http://%s:%d%s", hostname, port,
-		             resource);
+		    snprintf(uri, sizeof(uri), "%s://%s:%d%s", 
+		             ishttps ? "https" : "http",
+			     hostname, port, resource);
 
 		  strncat(valptr, uri, sizeof(value) - (valptr - value) - 1);
         	  break;
@@ -288,5 +295,5 @@ ippSetCGIVars(ipp_t      *response,	/* I - Response data to be copied... */
 
 
 /*
- * End of "$Id: ipp-var.c,v 1.22 2001/02/20 17:32:59 mike Exp $".
+ * End of "$Id: ipp-var.c,v 1.23 2001/03/10 15:19:35 mike Exp $".
  */
