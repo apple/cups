@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.92 2003/06/14 17:06:28 mike Exp $"
+ * "$Id: ipp.c,v 1.93 2003/11/05 18:13:56 mike Exp $"
  *
  *   Internet Printing Protocol support functions for the Common UNIX
  *   Printing System (CUPS).
@@ -76,6 +76,10 @@
 #include "debug.h"
 #include <ctype.h>
 #include <errno.h>
+
+#ifdef WIN32
+#  include <io.h>
+#endif // WIN32
 
 
 /*
@@ -1718,7 +1722,7 @@ ippWriteIO(void       *dst,			/* I - Destination */
                   DEBUG_printf(("ippWrite: writing string = %d, \'%s\'\n", n,
 		                value->string.text));
 
-                  if ((sizeof(buffer) - (bufptr - buffer)) < (n + 2))
+                  if ((int)(sizeof(buffer) - (bufptr - buffer)) < (n + 2))
 		  {
                     if ((*cb)(dst, buffer, bufptr - buffer) < 0)
 	            {
@@ -1943,7 +1947,7 @@ ippWriteIO(void       *dst,			/* I - Destination */
                   if (n > (sizeof(buffer) - 2))
 		    return (IPP_ERROR);
 
-                  if ((sizeof(buffer) - (bufptr - buffer)) < (n + 2))
+                  if ((int)(sizeof(buffer) - (bufptr - buffer)) < (n + 2))
 		  {
                     if ((*cb)(dst, buffer, bufptr - buffer) < 0)
 	            {
@@ -2093,7 +2097,7 @@ ippWriteIO(void       *dst,			/* I - Destination */
                   if (n > (sizeof(buffer) - 2))
 		    return (IPP_ERROR);
 
-                  if ((sizeof(buffer) - (bufptr - buffer)) < (n + 2))
+                  if ((int)(sizeof(buffer) - (bufptr - buffer)) < (n + 2))
 		  {
                     if ((*cb)(dst, buffer, bufptr - buffer) < 0)
 	            {
@@ -2545,5 +2549,5 @@ ipp_write_file(int         *fd,			/* I - File descriptor */
 
 
 /*
- * End of "$Id: ipp.c,v 1.92 2003/06/14 17:06:28 mike Exp $".
+ * End of "$Id: ipp.c,v 1.93 2003/11/05 18:13:56 mike Exp $".
  */

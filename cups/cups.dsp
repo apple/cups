@@ -121,10 +121,6 @@ SOURCE=.\language.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\oemlicense\license.c
-# End Source File
-# Begin Source File
-
 SOURCE=.\mark.c
 # End Source File
 # Begin Source File

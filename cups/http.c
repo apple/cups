@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.125 2003/09/05 20:36:08 mike Exp $"
+ * "$Id: http.c,v 1.126 2003/11/05 18:13:56 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS).
  *
@@ -539,7 +539,11 @@ httpReconnect(http_t *http)	/* I - HTTP data */
   */
 
   val = 1;
+#ifdef WIN32
+  setsockopt(http->fd, IPPROTO_TCP, TCP_NODELAY, (char *)&val, sizeof(val)); 
+#else
   setsockopt(http->fd, IPPROTO_TCP, TCP_NODELAY, &val, sizeof(val)); 
+#endif // WIN32
 
  /*
   * Connect to the server...
@@ -2413,5 +2417,5 @@ CDSAWriteFunc(SSLConnectionRef connection,	/* I  - SSL/TLS connection */
 
 
 /*
- * End of "$Id: http.c,v 1.125 2003/09/05 20:36:08 mike Exp $".
+ * End of "$Id: http.c,v 1.126 2003/11/05 18:13:56 mike Exp $".
  */
