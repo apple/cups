@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.38.2.26 2003/04/10 14:13:48 mike Exp $"
+ * "$Id: ipp.c,v 1.38.2.27 2003/04/16 19:36:31 mike Exp $"
  *
  *   IPP backend for the Common UNIX Printing System (CUPS).
  *
@@ -129,7 +129,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 		hostname[1024],	/* Hostname */
 		username[255],	/* Username info */
 		resource[1024];	/* Resource info (printer name) */
-  const char	*filename;	/* File to print */
+  char		*filename;	/* File to print */
   int		port;		/* Port number (not used) */
   char		uri[HTTP_MAX_URI];/* Updated URI without user/pass */
   ipp_status_t	ipp_status;	/* Status of IPP request */
@@ -895,7 +895,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   * Remove the temporary file if necessary...
   */
 
-  if (tmpfilename[6])
+  if (tmpfilename[0])
     unlink(tmpfilename);
 
  /*
@@ -1214,5 +1214,5 @@ sigterm_handler(int sig)		/* I - Signal */
 
 
 /*
- * End of "$Id: ipp.c,v 1.38.2.26 2003/04/10 14:13:48 mike Exp $".
+ * End of "$Id: ipp.c,v 1.38.2.27 2003/04/16 19:36:31 mike Exp $".
  */

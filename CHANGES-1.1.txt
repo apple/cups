@@ -3,6 +3,12 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.19rc2
 
+	- Fixed typo and const mismatch in IPP backend.
+	- Updated the man pages for the new configuration
+	  directives.
+	- Updated the SAM for MacOS 10.2, the CUPS drivers for
+	  windows, the available LPD backend options, and the
+	  new configuration directives.
 	- The imagetops filter didn't position images properly
 	  on the page (STR #18)
 	- The configure script didn't add CPPFLAGS to the
