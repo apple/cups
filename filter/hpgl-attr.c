@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-attr.c,v 1.2 1996/10/14 16:50:14 mike Exp $"
+ * "$Id: hpgl-attr.c,v 1.3 1998/03/17 21:59:57 mike Exp $"
  *
  *   HPGL attribute processing for espPrint, a collection of printer drivers.
  *
@@ -16,7 +16,10 @@
  * Revision History:
  *
  *   $Log: hpgl-attr.c,v $
- *   Revision 1.2  1996/10/14 16:50:14  mike
+ *   Revision 1.3  1998/03/17 21:59:57  mike
+ *   Added CR (color range) support.
+ *
+ *   Revision 1.2  1996/10/14  16:50:14  mike
  *   Updated for 3.2 release.
  *   Added 'blackplot', grayscale, and default pen width options.
  *   Added encoded polyline support.
@@ -32,6 +35,30 @@
  */
 
 #include "hpgl2ps.h"
+
+
+void
+CR_color_range(int num_params, param_t *params)
+{
+  if (num_params == 0)
+  {
+    ColorRange[0][0] = 0.0;
+    ColorRange[0][1] = 255.0;
+    ColorRange[1][0] = 0.0;
+    ColorRange[1][1] = 255.0;
+    ColorRange[2][0] = 0.0;
+    ColorRange[2][1] = 255.0;
+  }
+  else if (num_params == 6)
+  {
+    ColorRange[0][0] = params[0].value.number;
+    ColorRange[0][1] = params[1].value.number - params[0].value.number;
+    ColorRange[1][0] = params[2].value.number;
+    ColorRange[1][1] = params[3].value.number - params[2].value.number;
+    ColorRange[2][0] = params[4].value.number;
+    ColorRange[2][1] = params[5].value.number - params[4].value.number;
+  };
+}
 
 
 void
@@ -115,8 +142,8 @@ NP_number_pens(int num_params, param_t *params)
 
   PC_pen_color(0, NULL);
 
-  for (i = 0; i < PenCount; i ++)
-    fprintf(OutputFile, "/W%d { 1.0 setlinewidth } bind def\n", i);
+  for (i = 0; i <= PenCount; i ++)
+    fprintf(OutputFile, "/W%d { DefaultPenWidth setlinewidth } bind def\n", i);
 }
 
 
@@ -138,7 +165,7 @@ PC_pen_color(int num_params, param_t *params)
 
   if (num_params == 0)
   {
-    for (i = 0; i < PenCount; i ++)
+    for (i = 0; i <= PenCount; i ++)
       if (i < 8)
 	fprintf(OutputFile, "/P%d { %.3f %.3f %.3f setrgbcolor } bind def\n",
         	i, standard_colors[i][0],
@@ -156,8 +183,10 @@ PC_pen_color(int num_params, param_t *params)
               standard_colors[i][1], standard_colors[i][2]);
     else
       fprintf(OutputFile, "/P%d { %.3f %.3f %.3f setrgbcolor } bind def\n",
-              i, params[1].value.number,
-              params[2].value.number, params[3].value.number);
+              i, 
+              (params[1].value.number - ColorRange[0][0]) / ColorRange[0][1],
+              (params[2].value.number - ColorRange[1][0]) / ColorRange[1][1],
+              (params[3].value.number - ColorRange[2][0]) / ColorRange[2][1]);
   };
 }
 
@@ -175,7 +204,7 @@ PW_pen_width(int num_params, param_t *params)
     */
 
     if (num_params == 0)
-      w = 0.35 / 25.0 * 72.0;
+      w = 0.35 / 25.4 * 72.0;
     else
       w = params[0].value.number / 25.4 * 72.0;
   }
@@ -219,7 +248,7 @@ SP_select_pen(int num_params, param_t *params)
 {
   if (num_params == 0)
     PenNumber = 1;
-  else
+  else if (params[0].value.number <= PenCount)
     PenNumber = params[0].value.number;
 
   fprintf(OutputFile, "P%d W%d\n", PenNumber, PenNumber);
@@ -243,5 +272,5 @@ WU_width_units(int num_params, param_t *params)
 
 
 /*
- * End of "$Id: hpgl-attr.c,v 1.2 1996/10/14 16:50:14 mike Exp $".
+ * End of "$Id: hpgl-attr.c,v 1.3 1998/03/17 21:59:57 mike Exp $".
  */
