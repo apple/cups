@@ -1,6 +1,6 @@
-/*#define DEBUG*/
+#define DEBUG
 /*
- * "$Id: gdevcups.c,v 1.43.2.6 2002/04/21 20:26:17 mike Exp $"
+ * "$Id: gdevcups.c,v 1.43.2.7 2002/04/22 19:49:19 mike Exp $"
  *
  *   GNU Ghostscript raster output driver for the Common UNIX Printing
  *   System (CUPS).
@@ -37,6 +37,7 @@
  *   cups_get_params()       - Get pagedevice parameters.
  *   cups_get_space_params() - Get space parameters from the RIP_CACHE env var.
  *   cups_map_color_rgb()    - Map a color index to an RGB color.
+ *   cups_map_cielab()       - Map CIE Lab transformation...
  *   cups_map_rgb_color()    - Map an RGB color to a color index.  We map the
  *                             RGB color to the output colorspace & bits (we
  *                             figure out the format when we output a page).
@@ -117,6 +118,8 @@ private int cups_print_pages(gx_device_printer *, FILE *, int);
 private int cups_put_params(gx_device *, gs_param_list *);
 private void cups_set_color_info(gx_device *);
 private dev_proc_sync_output(cups_sync_output);
+private prn_dev_proc_get_space_params(cups_get_space_params);
+
 
 /*
  * The device descriptors...
@@ -187,7 +190,7 @@ private gx_device_procs	cups_procs =
 gx_device_cups	gs_cups_device =
 {
   prn_device_body_copies(gx_device_cups, cups_procs, "cups", 85, 110, 100, 100,
-                         0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, cups_print_pages),
+                         0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 2, 0, cups_print_pages),
   0,				/* page */
   NULL,				/* stream */
   NULL,				/* ppd */
@@ -269,6 +272,7 @@ static unsigned char	rev_lower1[16] =
  * Local functions...
  */
 
+static double	cups_map_cielab(double, double);
 static void	cups_print_chunked(gx_device_printer *, unsigned char *,
 		                   unsigned char *, int);
 static void	cups_print_banded(gx_device_printer *, unsigned char *,
@@ -387,6 +391,7 @@ private int				/* O - Error status */
 cups_get_params(gx_device     *pdev,	/* I - Device info */
                 gs_param_list *plist)	/* I - Parameter list */
 {
+  int			i;		/* Looping var */
   int			code;		/* Return code */
   gs_param_string	s;		/* Temporary string value */
   bool			b;		/* Temporary boolean value */
@@ -864,6 +869,13 @@ cups_map_cmyk_color(gx_device      *pdev,	/* I - Device info */
     fprintf(stderr, "DEBUG: CMYK (%d,%d,%d,%d) -> CMYK %08x (%d,%d,%d,%d)\n",
 	    c, m, y, k, (unsigned)i, ic, im, iy, ik);
 
+ /*
+  * Make sure we don't get a CMYK color of 255, 255, 255, 255...
+  */
+
+  if (i == gx_no_color_index)
+    i --;
+
   return (i);
 }
     
@@ -1049,6 +1061,27 @@ cups_map_color_rgb(gx_device      *pdev,	/* I - Device info */
                     gx_max_color_value * c0 / divk;
         }
         break;
+
+#ifdef CUPS_RASTER_HAVE_COLORIMETRIC
+    case CUPS_CSPACE_CIEXYZ :
+    case CUPS_CSPACE_CIELab :
+    case CUPS_CSPACE_ICC1 :
+    case CUPS_CSPACE_ICC2 :
+    case CUPS_CSPACE_ICC3 :
+    case CUPS_CSPACE_ICC4 :
+    case CUPS_CSPACE_ICC5 :
+    case CUPS_CSPACE_ICC6 :
+    case CUPS_CSPACE_ICC7 :
+    case CUPS_CSPACE_ICC8 :
+    case CUPS_CSPACE_ICC9 :
+    case CUPS_CSPACE_ICCA :
+    case CUPS_CSPACE_ICCB :
+    case CUPS_CSPACE_ICCC :
+    case CUPS_CSPACE_ICCD :
+    case CUPS_CSPACE_ICCE :
+    case CUPS_CSPACE_ICCF :
+        break;
+#endif /* CUPS_RASTER_HAVE_COLORIMETRIC */
   }
 
 #ifdef DEBUG
@@ -1057,6 +1090,26 @@ cups_map_color_rgb(gx_device      *pdev,	/* I - Device info */
 #endif /* DEBUG */
 
   return (0);
+}
+
+
+/*
+ * 'cups_map_cielab()' - Map CIE Lab transformation...
+ */
+
+static double					/* O - Adjusted color value */
+cups_map_cielab(double x,			/* I - Raw color value */
+                double xn)			/* I - Whitepoint color value */
+{
+  double x_xn;					/* Fraction of whitepoint */
+
+
+  x_xn = x / xn;
+
+  if (x_xn > 0.008856)
+    return (cbrt(x_xn));
+  else
+    return (7.787 * x_xn + 16.0 / 116.0);
 }
 
 
@@ -1076,6 +1129,10 @@ cups_map_rgb_color(gx_device      *pdev,	/* I - Device info */
   gx_color_value	ic, im, iy, ik;		/* Integral CMYK values */
   gx_color_value	mk;			/* Maximum K value */
   int			tc, tm, ty;		/* Temporary color values */
+  float			rr, rg, rb,		/* Real RGB colors */
+			ciex, ciey, ciez,	/* CIE XYZ colors */
+			ciey_yn,		/* Normalized luminance */
+			ciel, ciea, cieb;	/* CIE Lab colors */
 
 
 #ifdef DEBUG
@@ -1392,6 +1449,137 @@ cups_map_rgb_color(gx_device      *pdev,	/* I - Device info */
               break;
         }
         break;
+
+#ifdef CUPS_RASTER_HAVE_COLORIMETRIC
+    case CUPS_CSPACE_CIEXYZ :
+    case CUPS_CSPACE_CIELab :
+    case CUPS_CSPACE_ICC1 :
+    case CUPS_CSPACE_ICC2 :
+    case CUPS_CSPACE_ICC3 :
+    case CUPS_CSPACE_ICC4 :
+    case CUPS_CSPACE_ICC5 :
+    case CUPS_CSPACE_ICC6 :
+    case CUPS_CSPACE_ICC7 :
+    case CUPS_CSPACE_ICC8 :
+    case CUPS_CSPACE_ICC9 :
+    case CUPS_CSPACE_ICCA :
+    case CUPS_CSPACE_ICCB :
+    case CUPS_CSPACE_ICCC :
+    case CUPS_CSPACE_ICCD :
+    case CUPS_CSPACE_ICCE :
+    case CUPS_CSPACE_ICCF :
+       /*
+        * Convert sRGB to linear RGB...
+	*/
+
+	rr = pow((double)r / (double)gx_max_color_value, 0.58823529412);
+	rg = pow((double)g / (double)gx_max_color_value, 0.58823529412);
+	rb = pow((double)b / (double)gx_max_color_value, 0.58823529412);
+
+       /*
+        * Convert to CIE XYZ...
+	*/
+
+#  define D65_X	(0.412453 + 0.357580 + 0.180423)
+#  define D65_Y	(0.212671 + 0.715160 + 0.072169)
+#  define D65_Z	(0.019334 + 0.119193 + 0.950227)
+
+	ciex = 0.412453 * rr + 0.357580 * rg + 0.180423 * rb; 
+	ciey = 0.212671 * rr + 0.715160 * rg + 0.072169 * rb;
+	ciez = 0.019334 * rr + 0.119193 * rg + 0.950227 * rb;
+
+        if (cups->header.cupsColorSpace != CUPS_CSPACE_CIELab)
+	{
+	 /*
+	  * Convert to an integer XYZ color value...
+	  */
+
+          if (ciex > 1.0)
+	    ic = 255;
+	  else if (ciex > 0.0)
+	    ic = (int)(ciex * 255.0 + 0.5);
+	  else
+	    ic = 0;
+
+          if (ciey > 1.0)
+	    im = 255;
+	  else if (ciey > 0.0)
+	    im = (int)(ciey * 255.0 + 0.5);
+	  else
+	    im = 0;
+
+          if (ciez > 1.0)
+	    iy = 255;
+	  else if (ciez > 0.0)
+	    iy = (int)(ciez * 255.0 + 0.5);
+	  else
+	    iy = 0;
+	}
+	else
+	{
+	 /*
+	  * Convert CIE XYZ to Lab...
+	  */
+
+	  ciey_yn = ciey / D65_Y;
+
+	  if (ciey_yn > 0.008856)
+	    ciel = 116 * cbrt(ciey_yn) - 16;
+	  else
+	    ciel = 903.3 * ciey_yn;
+
+          if (ciel < 0.0)
+	    ic = 0;
+	  else if (ciel < 255.0)
+	    ic = (int)(ciel + 0.5);
+	  else
+	    ic = 255;
+
+	  ciea = 500 * (cups_map_cielab(ciex, D65_X) -
+	                cups_map_cielab(ciey, D65_Y));
+	  cieb = 200 * (cups_map_cielab(ciey, D65_Y) -
+	                cups_map_cielab(ciez, D65_Z));
+
+          if (ciea < -127.0)
+	    im = 128;
+	  else if (ciea < 0.0)
+	    im = (int)(ciea + 256.5);
+	  else if (ciea > 127.0)
+	    im = 127;
+	  else
+	    im = (int)(ciea + 0.5);
+
+          if (cieb < -127.0)
+	    iy = 128;
+	  else if (cieb < 0.0)
+	    iy = (int)(cieb + 256.5);
+	  else if (cieb > 127.0)
+	    iy = 127;
+	  else
+	    iy = (int)(cieb + 0.5);
+	}
+
+       /*
+        * Put the final color value together...
+	*/
+
+        switch (cups->header.cupsBitsPerColor)
+        {
+          default :
+              i = (((ic << 1) | im) << 1) | iy;
+              break;
+          case 2 :
+              i = (((ic << 2) | im) << 2) | iy;
+              break;
+          case 4 :
+              i = (((ic << 4) | im) << 4) | iy;
+              break;
+          case 8 :
+              i = (((ic << 8) | im) << 8) | iy;
+              break;
+        }
+        break;
+#endif /* CUPS_RASTER_HAVE_COLORIMETRIC */
   }
 
 #ifdef DEBUG
@@ -1933,23 +2121,74 @@ cups_set_color_info(gx_device *pdev)	/* I - Device info */
         cups->color_info.depth          = 4 * cups->header.cupsBitsPerColor;
         cups->color_info.num_components = 4;
         break;
+
+#ifdef CUPS_RASTER_HAVE_COLORIMETRIC
+     case CUPS_CSPACE_CIEXYZ :
+     case CUPS_CSPACE_CIELab :
+     case CUPS_CSPACE_ICC1 :
+     case CUPS_CSPACE_ICC2 :
+     case CUPS_CSPACE_ICC3 :
+     case CUPS_CSPACE_ICC4 :
+     case CUPS_CSPACE_ICC5 :
+     case CUPS_CSPACE_ICC6 :
+     case CUPS_CSPACE_ICC7 :
+     case CUPS_CSPACE_ICC8 :
+     case CUPS_CSPACE_ICC9 :
+     case CUPS_CSPACE_ICCA :
+     case CUPS_CSPACE_ICCB :
+     case CUPS_CSPACE_ICCC :
+     case CUPS_CSPACE_ICCD :
+     case CUPS_CSPACE_ICCE :
+     case CUPS_CSPACE_ICCF :
+	/*
+	 * Colorimetric color spaces currently are implemented as 24-bit
+	 * mapping to XYZ or Lab, which are then converted as needed to
+	 * the final representation...
+	 *
+	 * This code enforces a minimum output depth of 8 bits per
+	 * component...
+	 */
+
+	 if (cups->header.cupsBitsPerColor < 8)
+           cups->header.cupsBitsPerColor = 8;
+
+	 if (cups->header.cupsColorOrder != CUPS_ORDER_CHUNKED)
+           cups->header.cupsBitsPerPixel = cups->header.cupsBitsPerColor;
+	 else
+	 {
+	   if (cups->header.cupsColorSpace < CUPS_CSPACE_ICC1)
+	     cups->header.cupsBitsPerPixel = 3 * cups->header.cupsBitsPerColor;
+	   else
+	     cups->header.cupsBitsPerPixel =
+	         (cups->header.cupsColorSpace - CUPS_CSPACE_ICC1 + 1) *
+		 cups->header.cupsBitsPerColor;
+         }
+
+	 cups->color_info.depth          = 24;
+	 cups->color_info.num_components = 3;
+	 break;
+#endif /* CUPS_RASTER_HAVE_COLORIMETRIC */
   }
+
+  if ((i = cups->header.cupsBitsPerColor) > 8)
+    i = 8;
 
   if (cups->color_info.num_components > 1)
   {
-    cups->color_info.max_gray      = (1 << cups->header.cupsBitsPerColor) - 1;
-    cups->color_info.max_color     = (1 << cups->header.cupsBitsPerColor) - 1;
-    cups->color_info.dither_grays  = (1 << cups->header.cupsBitsPerColor);
-    cups->color_info.dither_colors = (1 << cups->header.cupsBitsPerColor);
+    cups->color_info.max_gray      = (1 << i) - 1;
+    cups->color_info.max_color     = (1 << i) - 1;
+    cups->color_info.dither_grays  = (1 << i);
+    cups->color_info.dither_colors = (1 << i);
   }
   else
   {
-    cups->color_info.max_gray      = (1 << cups->header.cupsBitsPerColor) - 1;
+    cups->color_info.max_gray      = (1 << i) - 1;
     cups->color_info.max_color     = 0;
-    cups->color_info.dither_grays  = (1 << cups->header.cupsBitsPerColor);
+    cups->color_info.dither_grays  = (1 << i);
     cups->color_info.dither_colors = 0;
   }
 
+#if 0 /* MRS: This seems to not work with GNU Ghostscript 7.05 (blank page)... */
  /*
   * Enable/disable CMYK color support...
   */
@@ -1958,6 +2197,13 @@ cups_set_color_info(gx_device *pdev)	/* I - Device info */
     cups->procs.map_cmyk_color = cups_map_cmyk_color;
   else
     cups->procs.map_cmyk_color = NULL;
+#endif /* 0 */
+
+ /*
+  * Tell Ghostscript to forget any colors it has cached...
+  */
+
+  gx_device_decache_colors(pdev);
 
  /*
   * Compute the lookup tables...
@@ -1969,7 +2215,6 @@ cups_set_color_info(gx_device *pdev)	/* I - Device info */
   for (i = 0; i < cups->color_info.dither_grays; i ++)
     lut_color_rgb[i] = gx_max_color_value * i / cups->color_info.max_gray;
 
-#ifdef DEBUG
   fprintf(stderr, "DEBUG: num_components = %d, depth = %d\n",
           cups->color_info.num_components, cups->color_info.depth);
   fprintf(stderr, "DEBUG: cupsColorSpace = %d, cupsColorOrder = %d\n",
@@ -1980,7 +2225,6 @@ cups_set_color_info(gx_device *pdev)	/* I - Device info */
           cups->color_info.max_gray, cups->color_info.dither_grays);
   fprintf(stderr, "DEBUG: max_color = %d, dither_colors = %d\n",
           cups->color_info.max_color, cups->color_info.dither_colors);
-#endif /* DEBUG */
 
  /*
   * Set the color profile as needed...
@@ -2041,9 +2285,7 @@ cups_set_color_info(gx_device *pdev)	/* I - Device info */
 
     if (i < cups->ppd->num_profiles)
     {
-#ifdef DEBUG
-      fputs("DEBUG: Using color profile!\n", stderr);
-#endif /* DEBUG */
+      fputs("DEBUG: Using color profile in PPD file!\n", stderr);
 
       cupsHaveProfile = 1;
 
@@ -3186,5 +3428,5 @@ cups_print_planar(gx_device_printer *pdev,	/* I - Printer device */
 
 
 /*
- * End of "$Id: gdevcups.c,v 1.43.2.6 2002/04/21 20:26:17 mike Exp $".
+ * End of "$Id: gdevcups.c,v 1.43.2.7 2002/04/22 19:49:19 mike Exp $".
  */

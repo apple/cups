@@ -1,18 +1,74 @@
-? FOO
-? Makefile.bck
-? autom4te.cache
-? pstoraster
-? t.ps
-? t.ras
-? src/Makefile.in.bck
-? src/configure.ac.bck
+Index: lib/gs_setpd.ps
+===================================================================
+RCS file: /cvs/ghostscript/gs/lib/gs_setpd.ps,v
+retrieving revision 1.8.2.2
+diff -u -r1.8.2.2 gs_setpd.ps
+--- lib/gs_setpd.ps	22 Feb 2002 19:45:55 -0000	1.8.2.2
++++ lib/gs_setpd.ps	22 Apr 2002 18:17:52 -0000
+@@ -321,21 +321,42 @@
+     } bind
+ .dicttomark readonly def
+ 
+-% Define the keys used in input attribute matching.
+-/.inputattrkeys [
+-  /PageSize /MediaColor /MediaWeight /MediaType /InsertSheet
+-	% The following are documented in Adobe's supplement for v2017.
+-  /LeadingEdge /MediaClass
+-] readonly def
+-% Define other keys used in media selection.
+-/.inputselectionkeys [
+-  /MediaPosition /Orientation
+-] readonly def
++% M. Sweet, Easy Software Products:
++%
++% Define NOMEDIAATTRS to turn the default (but unimplementable) media
++% selection policies for setpagedevice.  This is used by CUPS to
++% support the standard Adobe media attributes.
++currentdict /NOMEDIAATTRS known {
++  % Define the keys used in input attribute matching.
++  /.inputattrkeys [
++    /PageSize /MediaColor /MediaWeight /MediaType /InsertSheet
++	  % The following are documented in Adobe's supplement for v2017.
++    /LeadingEdge /MediaClass
++  ] readonly def
++  % Define other keys used in media selection.
++  /.inputselectionkeys [
++    /MediaPosition /Orientation
++  ] readonly def
+ 
+-% Define the keys used in output attribute matching.
+-/.outputattrkeys [
+-  /OutputType
+-] readonly def
++  % Define the keys used in output attribute matching.
++  /.outputattrkeys [
++    /OutputType
++  ] readonly def
++} {
++  % Define only PageSize for input attribute matching.
++  /.inputattrkeys [
++    /PageSize
++  ] readonly def
++  % Define no other keys used in media selection.
++  /.inputselectionkeys [
++    /noInputSelectionsKeys
++  ] readonly def
++
++  % Define no keys used in output attribute matching.
++  /.outputattrkeys [
++    /noOutputAttrKeys
++  ] readonly def
++} ifelse
+ 
+ % Define all the parameters that should always be copied to the merged
+ % dictionary.
 Index: src/Makefile.in
 ===================================================================
 RCS file: /cvs/ghostscript/gs/src/Makefile.in,v
 retrieving revision 1.1.4.7
 diff -u -r1.1.4.7 Makefile.in
 --- src/Makefile.in	19 Apr 2002 22:23:09 -0000	1.1.4.7
-+++ src/Makefile.in	21 Apr 2002 16:10:02 -0000
++++ src/Makefile.in	22 Apr 2002 18:17:53 -0000
 @@ -70,7 +70,7 @@
  # Define the default directory/ies for the runtime
  # initialization and font files.  Separate multiple directories with a :.
@@ -99,8 +155,8 @@ RCS file: /cvs/ghostscript/gs/src/configure.ac,v
 retrieving revision 1.4.4.9
 diff -u -r1.4.4.9 configure.ac
 --- src/configure.ac	19 Apr 2002 22:23:09 -0000	1.4.4.9
-+++ src/configure.ac	21 Apr 2002 16:10:03 -0000
-@@ -167,6 +167,210 @@
++++ src/configure.ac	22 Apr 2002 18:17:53 -0000
+@@ -167,6 +167,213 @@
  AC_SUBST(LIBPNGDIR)
  AC_SUBST(PNGDEVS)
  
@@ -294,16 +350,19 @@ diff -u -r1.4.4.9 configure.ac
 +CUPSINCLUDE=""
 +CUPSCONFIG=":"
 +
-+if test x$enable_cups != xno; then
-+    AC_PATH_PROG(CUPSCONFIG,cups-config)
-+    if test "x$CUPSCONFIG" != x; then
-+	dnl Use values from CUPS config...
-+	LIBS="`$CUPSCONFIG --ldflags` `$CUPSCONFIG --image --libs` $LIBS"
-+	CFLAGS="`$CUPSCONFIG --cflags` $CFLAGS"
-+	CUPSINCLUDE="include pstoraster/cups.mak"
-+	CUPSDEV="\$(DD)cups.dev"
++if test -d pstoraster; then
++    if test x$enable_cups != xno; then
++	AC_PATH_PROG(CUPSCONFIG,cups-config)
++	if test "x$CUPSCONFIG" != x; then
++	    dnl Use values from CUPS config...
++	    LIBS="`$CUPSCONFIG --ldflags` `$CUPSCONFIG --image --libs` $LIBS"
++	    CFLAGS="`$CUPSCONFIG --cflags` $CFLAGS"
++	    CUPSINCLUDE="include pstoraster/cups.mak"
++	    CUPSDEV="\$(DD)cups.dev"
++	fi
 +    fi
 +fi
++
 +AC_SUBST(CUPSDEV)
 +AC_SUBST(CUPSCONFIG)
 +AC_SUBST(CUPSINCLUDE)
@@ -311,7 +370,7 @@ diff -u -r1.4.4.9 configure.ac
  dnl look for IJS implementation
  AC_ARG_WITH(ijs, AC_HELP_STRING([--with-ijs],[include IJS driver support]))
  dnl set safe defaults
-@@ -202,15 +406,51 @@
+@@ -202,15 +409,51 @@
  AC_SUBST(STPDEVS)
  
  dnl optional X11 for display devices
@@ -330,9 +389,11 @@ diff -u -r1.4.4.9 configure.ac
 +	if test "$uname" = "SunOS"; then
 +		XLDFLAGS="$XLDFLAGS -R$x_libraries"
 +	fi
-+else
+ else
+-	X11DEVS='$(DD)x11.dev $(DD)x11alpha.dev $(DD)x11cmyk.dev $(DD)x11gray2.dev $(DD)x11gray4.dev $(DD)x11mono.dev'
 +	XLDFLAGS=""
-+fi
+ fi
+-AC_SUBST(X11DEVS)
 +AC_SUBST(XLDFLAGS)
 +
 +if test "$x_includes" = "/usr/include"; then
@@ -346,7 +407,7 @@ diff -u -r1.4.4.9 configure.ac
 +fi
 +
 +SAVELIBS="$LIBS"
-+
+ 
 +AC_CHECK_LIB(X11,XOpenDisplay)
 +AC_CHECK_LIB(Xext,XdbeQueryExtension)
 +AC_CHECK_LIB(Xt,XtAppCreateShell)
@@ -356,20 +417,18 @@ diff -u -r1.4.4.9 configure.ac
 +if test "$ac_cv_lib_Xt_XtAppCreateShell" = yes; then
 +	X_DEVS="\$(DD)x11.dev \$(DD)x11alpha.dev \$(DD)x11cmyk.dev \$(DD)x11mono.dev \$(DD)x11_.dev \$(DD)x11alt_.dev \$(DD)x11cmyk2.dev \$(DD)x11cmyk4.dev \$(DD)x11cmyk8.dev \$(DD)x11rg16x.dev \$(DD)x11rg32x.dev"
 +	X_LIBS="-lXt -lXext -lX11"
- else
--	X11DEVS='$(DD)x11.dev $(DD)x11alpha.dev $(DD)x11cmyk.dev $(DD)x11gray2.dev $(DD)x11gray4.dev $(DD)x11mono.dev'
++else
 +	X_DEVS=""
 +	X_LIBS=""
- fi
--AC_SUBST(X11DEVS)
- 
++fi
++
 +AC_SUBST(X_CFLAGS)
 +AC_SUBST(X_LIBS)
 +AC_SUBST(X_DEVS)
  
  dnl --------------------------------------------------
  dnl Check for library functions
-@@ -233,4 +473,9 @@
+@@ -233,4 +476,9 @@
  dnl --------------------------------------------------
  
  AC_SUBST(GCFLAGS)
