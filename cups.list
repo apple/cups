@@ -1,5 +1,5 @@
 #
-# "$Id: cups.list,v 1.48 2000/02/22 20:45:12 mike Exp $"
+# "$Id: cups.list,v 1.49 2000/02/25 03:00:51 mike Exp $"
 #
 #   ESP Package Manager (EPM) file list for the Common UNIX Printing
 #   System (CUPS).
@@ -77,20 +77,20 @@ f 0555 root sys /usr/bin/lpstat systemv/lpstat
 
 # DSOs
 %system hpux
-f 0555 root sys /usr/lib/libcups.sl.1 cups/libcups.sl.1
-l 0555 root sys /usr/lib/libcups.sl libcups.sl.1
-f 0555 root sys /usr/lib/libcupsimage.sl.1 filter/libcupsimage.sl.1
-l 0555 root sys /usr/lib/libcupsimage.sl libcupsimage.sl.1
+f 0555 root sys /usr/lib/libcups.sl.2 cups/libcups.sl.2
+l 0555 root sys /usr/lib/libcups.sl libcups.sl.2
+f 0555 root sys /usr/lib/libcupsimage.sl.2 filter/libcupsimage.sl.2
+l 0555 root sys /usr/lib/libcupsimage.sl libcupsimage.sl.2
 %system irix-6.5
-f 0555 root sys /usr/lib32/libcups.so.1 cups/libcups.so.1
-l 0555 root sys /usr/lib32/libcups.so libcups.so.1
-f 0555 root sys /usr/lib32/libcupsimage.so.1 filter/libcupsimage.so.1
-l 0555 root sys /usr/lib32/libcupsimage.so libcupsimage.so.1
+f 0555 root sys /usr/lib32/libcups.so.2 cups/libcups.so.2
+l 0555 root sys /usr/lib32/libcups.so libcups.so.2
+f 0555 root sys /usr/lib32/libcupsimage.so.2 filter/libcupsimage.so.2
+l 0555 root sys /usr/lib32/libcupsimage.so libcupsimage.so.2
 %system !irix-6.5 !hpux
-f 0555 root sys /usr/lib/libcups.so.1 cups/libcups.so.1
-l 0555 root sys /usr/lib/libcups.so libcups.so.1
-f 0555 root sys /usr/lib/libcupsimage.so.1 filter/libcupsimage.so.1
-l 0555 root sys /usr/lib/libcupsimage.so libcupsimage.so.1
+f 0555 root sys /usr/lib/libcups.so.2 cups/libcups.so.2
+l 0555 root sys /usr/lib/libcups.so libcups.so.2
+f 0555 root sys /usr/lib/libcupsimage.so.2 filter/libcupsimage.so.2
+l 0555 root sys /usr/lib/libcupsimage.so libcupsimage.so.2
 %system all
 
 # Directories
@@ -397,5 +397,5 @@ f 0444 root sys /usr/man/man5/printers.conf.5 man/printers.conf.man
 i 0555 root sys cups cups.sh
 
 #
-# End of "$Id: cups.list,v 1.48 2000/02/22 20:45:12 mike Exp $".
+# End of "$Id: cups.list,v 1.49 2000/02/25 03:00:51 mike Exp $".
 #

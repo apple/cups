@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.53 2000/02/18 17:48:08 mike Exp $"
+ * "$Id: ipp.c,v 1.54 2000/02/25 03:00:54 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -3743,6 +3743,8 @@ start_printer(client_t        *con,	/* I - Client connection */
 
   printer->state_message[0] = '\0';
 
+  CheckJobs();
+
  /*
   * Everything was ok, so return OK status...
   */
@@ -3956,5 +3958,5 @@ validate_job(client_t        *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.53 2000/02/18 17:48:08 mike Exp $".
+ * End of "$Id: ipp.c,v 1.54 2000/02/25 03:00:54 mike Exp $".
  */
