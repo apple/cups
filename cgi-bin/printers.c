@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.4 1999/06/23 14:08:36 mike Exp $"
+ * "$Id: printers.c,v 1.5 1999/06/25 17:28:53 mike Exp $"
  *
  *   Printer status CGI for the Common UNIX Printing System (CUPS).
  *
@@ -328,8 +328,11 @@ show_printer_info(http_t      *http,
   else
     accepting = 1;
 
-  if ((attr = ippFindAttribute(response, "printer-uri", IPP_TAG_URI)) != NULL)
-    strcpy(uri, attr->values[0].string.text);
+  if ((attr = ippFindAttribute(response, "printer-uri-supported", IPP_TAG_URI)) != NULL)
+  {
+    strcpy(uri, "http:");
+    strcpy(uri + 5, strchr(attr->values[0].string.text, '/'));
+  }
 
  /*
   * Display the printer entry...
@@ -337,7 +340,7 @@ show_printer_info(http_t      *http,
 
   puts("<TR>");
 
-  printf("<TD VALIGN=TOP><A HREF=\"/printers/%s\">%s</A></TD>\n", name, name);
+  printf("<TD VALIGN=TOP><A HREF=\"%s\">%s</A></TD>\n", uri, name);
 
   printf("<TD VALIGN=TOP><IMG SRC=\"/images/printer-%s.gif\" ALIGN=\"LEFT\">\n",
          pstate == IPP_PRINTER_IDLE ? "idle" :
@@ -386,6 +389,7 @@ show_printer_info(http_t      *http,
                  "attributes-natural-language", NULL,
 		 language->language);
 
+    sprintf(uri, "ipp://localhost/printers/%s", name);
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI,
 	         "printer-uri", NULL, uri);
 
@@ -400,8 +404,8 @@ show_printer_info(http_t      *http,
   if (jobs != NULL)
   {
     char	*username;	/* Pointer to job-originating-user-name */
-    int	jobid,		/* job-id */
-	      size;		/* job-k-octets */
+    int		jobid,		/* job-id */
+		size;		/* job-k-octets */
 
 
     for (attr = jobs->attrs; attr != NULL; attr = attr->next)
@@ -469,5 +473,5 @@ show_printer_info(http_t      *http,
 
 
 /*
- * End of "$Id: printers.c,v 1.4 1999/06/23 14:08:36 mike Exp $".
+ * End of "$Id: printers.c,v 1.5 1999/06/25 17:28:53 mike Exp $".
  */

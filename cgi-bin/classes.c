@@ -1,5 +1,5 @@
 /*
- * "$Id: classes.c,v 1.2 1999/06/23 14:08:35 mike Exp $"
+ * "$Id: classes.c,v 1.3 1999/06/25 17:28:52 mike Exp $"
  *
  *   Class status CGI for the Common UNIX Printing System (CUPS).
  *
@@ -273,7 +273,7 @@ show_class_info(http_t      *http,
   *
   *    attributes-charset
   *    attributes-natural-language
-  *    class-uri
+  *    printer-uri
   */
 
   request = ippNew();
@@ -289,7 +289,7 @@ show_class_info(http_t      *http,
 
   sprintf(uri, "ipp://localhost/classes/%s", name);
 
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "class-uri", NULL, uri);
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri", NULL, uri);
 
  /*
   * Do the request and get back a response...
@@ -312,24 +312,27 @@ show_class_info(http_t      *http,
   * Grab the needed class attributes...
   */
 
-  if ((attr = ippFindAttribute(response, "class-state", IPP_TAG_ENUM)) != NULL)
+  if ((attr = ippFindAttribute(response, "printer-state", IPP_TAG_ENUM)) != NULL)
     pstate = (ipp_pstate_t)attr->values[0].integer;
   else
     pstate = IPP_PRINTER_IDLE;
 
-  if ((attr = ippFindAttribute(response, "class-state-message", IPP_TAG_TEXT)) != NULL)
+  if ((attr = ippFindAttribute(response, "printer-state-message", IPP_TAG_TEXT)) != NULL)
     message = attr->values[0].string.text;
   else
     message = NULL;
 
-  if ((attr = ippFindAttribute(response, "class-is-accepting-jobs",
+  if ((attr = ippFindAttribute(response, "printer-is-accepting-jobs",
                                IPP_TAG_BOOLEAN)) != NULL)
     accepting = attr->values[0].boolean;
   else
     accepting = 1;
 
-  if ((attr = ippFindAttribute(response, "printer-uri", IPP_TAG_URI)) != NULL)
-    strcpy(uri, attr->values[0].string.text);
+  if ((attr = ippFindAttribute(response, "printer-uri-supported", IPP_TAG_URI)) != NULL)
+  {
+    strcpy(uri, "http:");
+    strcpy(uri + 5, strchr(attr->values[0].string.text, '/'));
+  }
 
  /*
   * Display the class entry...
@@ -337,7 +340,7 @@ show_class_info(http_t      *http,
 
   puts("<TR>");
 
-  printf("<TD VALIGN=TOP><A HREF=\"/classes/%s\">%s</A></TD>\n", name, name);
+  printf("<TD VALIGN=TOP><A HREF=\"%s\">%s</A></TD>\n", uri, name);
 
   puts("<TD VALIGN=TOP><IMG SRC=\"/images/classes.gif\" ALIGN=\"LEFT\">");
 
@@ -368,7 +371,7 @@ show_class_info(http_t      *http,
     *
     *    attributes-charset
     *    attributes-natural-language
-    *    class-uri
+    *    printer-uri
     */
 
     request = ippNew();
@@ -384,8 +387,9 @@ show_class_info(http_t      *http,
                  "attributes-natural-language", NULL,
 		 language->language);
 
+    sprintf(uri, "ipp://localhost/printers/%s", name);
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI,
-	         "class-uri", NULL, uri);
+	         "printer-uri", NULL, uri);
 
     jobs = cupsDoRequest(http, request, uri + 15);
   }
@@ -398,8 +402,8 @@ show_class_info(http_t      *http,
   if (jobs != NULL)
   {
     char	*username;	/* Pointer to job-originating-user-name */
-    int	jobid,		/* job-id */
-	      size;		/* job-k-octets */
+    int		jobid,		/* job-id */
+		size;		/* job-k-octets */
 
 
     for (attr = jobs->attrs; attr != NULL; attr = attr->next)
@@ -467,5 +471,5 @@ show_class_info(http_t      *http,
 
 
 /*
- * End of "$Id: classes.c,v 1.2 1999/06/23 14:08:35 mike Exp $".
+ * End of "$Id: classes.c,v 1.3 1999/06/25 17:28:52 mike Exp $".
  */
