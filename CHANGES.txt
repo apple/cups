@@ -39,6 +39,8 @@ CHANGES IN CUPS V1.1.13
 	  regardless of whether a printer is connected or not. 
 	  This allows new USB printers to be connected without
 	  restarting cupsd.
+	- Added some more minor performance tweeks to the IPP
+	  protocol code to reduce copying and array indexing.
 
 
 CHANGES IN CUPS V1.1.12
