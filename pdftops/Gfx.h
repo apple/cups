@@ -9,7 +9,9 @@
 #ifndef GFX_H
 #define GFX_H
 
-#ifdef __GNUC__
+#include <config.h>
+
+#ifdef USE_GCC_PRAGMAS
 #pragma interface
 #endif
 
@@ -30,7 +32,7 @@ class GfxAxialShading;
 class GfxRadialShading;
 class GfxState;
 class Gfx;
-struct PDFRectangle;
+class PDFRectangle;
 
 //------------------------------------------------------------------------
 // Gfx
@@ -69,13 +71,13 @@ public:
   GfxResources(XRef *xref, Dict *resDict, GfxResources *nextA);
   ~GfxResources();
 
-  GfxFont *lookupFont(const char *name);
-  GBool lookupXObject(const char *name, Object *obj);
-  GBool lookupXObjectNF(const char *name, Object *obj);
-  void lookupColorSpace(const char *name, Object *obj);
-  GfxPattern *lookupPattern(const char *name);
-  GfxShading *lookupShading(const char *name);
-  GBool lookupGState(const char *name, Object *obj);
+  GfxFont *lookupFont(char *name);
+  GBool lookupXObject(char *name, Object *obj);
+  GBool lookupXObjectNF(char *name, Object *obj);
+  void lookupColorSpace(char *name, Object *obj);
+  GfxPattern *lookupPattern(char *name);
+  GfxShading *lookupShading(char *name);
+  GBool lookupGState(char *name, Object *obj);
 
   GfxResources *getNext() { return next; }
 
@@ -96,11 +98,14 @@ public:
   // Constructor for regular output.
   Gfx(XRef *xrefA, OutputDev *outA, int pageNum, Dict *resDict, double dpi,
       PDFRectangle *box, GBool crop, PDFRectangle *cropBox, int rotate,
-      GBool printCommandsA);
+      GBool (*abortCheckCbkA)(void *data) = NULL,
+      void *abortCheckCbkDataA = NULL);
 
   // Constructor for a sub-page object.
   Gfx(XRef *xrefA, OutputDev *outA, Dict *resDict,
-      PDFRectangle *box, GBool crop, PDFRectangle *cropBox);
+      PDFRectangle *box, GBool crop, PDFRectangle *cropBox,
+      GBool (*abortCheckCbkA)(void *data) = NULL,
+      void *abortCheckCbkDataA = NULL);
 
   ~Gfx();
 
@@ -133,11 +138,15 @@ private:
 
   Parser *parser;		// parser for page content stream(s)
 
+  GBool				// callback to check for an abort
+    (*abortCheckCbk)(void *data);
+  void *abortCheckCbkData;
+
   static Operator opTab[];	// table of operators
 
   void go(GBool topLevel);
   void execOp(Object *cmd, Object args[], int numArgs);
-  Operator *findOp(const char *name);
+  Operator *findOp(char *name);
   GBool checkArg(Object *arg, TchkType type);
   int getPos();
 

@@ -10,7 +10,7 @@
 #include <stdlib.h>
 #include "FontEncodingTables.h"
 
-const char *macRomanEncoding[256] = {
+char *macRomanEncoding[256] = {
   NULL,
   NULL,
   NULL,
@@ -269,7 +269,7 @@ const char *macRomanEncoding[256] = {
   "caron"
 };
 
-const char *macExpertEncoding[256] = {
+char *macExpertEncoding[256] = {
   NULL,
   NULL,
   NULL,
@@ -528,7 +528,7 @@ const char *macExpertEncoding[256] = {
   NULL
 };
 
-const char *winAnsiEncoding[256] = {
+char *winAnsiEncoding[256] = {
   NULL,
   NULL,
   NULL,
@@ -787,7 +787,7 @@ const char *winAnsiEncoding[256] = {
   "ydieresis"
 };
 
-const char *standardEncoding[256] = {
+char *standardEncoding[256] = {
   NULL,
   NULL,
   NULL,
@@ -1046,7 +1046,7 @@ const char *standardEncoding[256] = {
   NULL
 };
 
-const char *expertEncoding[256] = {
+char *expertEncoding[256] = {
   NULL,
   NULL,
   NULL,
@@ -1305,7 +1305,7 @@ const char *expertEncoding[256] = {
   "Ydieresissmall"
 };
 
-const char *symbolEncoding[256] = {
+char *symbolEncoding[256] = {
   NULL,
   NULL,
   NULL,
@@ -1564,7 +1564,7 @@ const char *symbolEncoding[256] = {
   NULL
 };
 
-const char *zapfDingbatsEncoding[256] = {
+char *zapfDingbatsEncoding[256] = {
   NULL,
   NULL,
   NULL,

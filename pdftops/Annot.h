@@ -9,7 +9,9 @@
 #ifndef ANNOT_H
 #define ANNOT_H
 
-#ifdef __GNUC__
+#include <config.h>
+
+#ifdef USE_GCC_PRAGMAS
 #pragma interface
 #endif
 

@@ -6,11 +6,12 @@
 //
 //========================================================================
 
-#ifdef __GNUC__
+#include <config.h>
+
+#ifdef USE_GCC_PRAGMAS
 #pragma implementation
 #endif
 
-#include <config.h>
 #include <stddef.h>
 #include "gmem.h"
 #include "Object.h"
@@ -26,7 +27,7 @@
 // Catalog
 //------------------------------------------------------------------------
 
-Catalog::Catalog(XRef *xrefA, GBool printCommands) {
+Catalog::Catalog(XRef *xrefA) {
   Object catDict, pagesDict;
   Object obj, obj2;
   int numPages0;
@@ -69,7 +70,7 @@ Catalog::Catalog(XRef *xrefA, GBool printCommands) {
     pageRefs[i].num = -1;
     pageRefs[i].gen = -1;
   }
-  numPages = readPageTree(pagesDict.getDict(), NULL, 0, printCommands);
+  numPages = readPageTree(pagesDict.getDict(), NULL, 0);
   if (numPages != numPages0) {
     error(-1, "Page count in top-level pages object is incorrect");
   }
@@ -99,6 +100,9 @@ Catalog::Catalog(XRef *xrefA, GBool printCommands) {
 
   // get the structure tree root
   catDict.dictLookup("StructTreeRoot", &structTreeRoot);
+
+  // get the outline dictionary
+  catDict.dictLookup("Outlines", &outline);
 
   catDict.free();
   return;
@@ -133,6 +137,7 @@ Catalog::~Catalog() {
   }
   metadata.free();
   structTreeRoot.free();
+  outline.free();
 }
 
 GString *Catalog::readMetadata() {
@@ -159,8 +164,7 @@ GString *Catalog::readMetadata() {
   return s;
 }
 
-int Catalog::readPageTree(Dict *pagesDict, PageAttrs *attrs, int start,
-			  GBool printCommands) {
+int Catalog::readPageTree(Dict *pagesDict, PageAttrs *attrs, int start) {
   Object kids;
   Object kid;
   Object kidRef;
@@ -179,7 +183,7 @@ int Catalog::readPageTree(Dict *pagesDict, PageAttrs *attrs, int start,
     kids.arrayGet(i, &kid);
     if (kid.isDict("Page")) {
       attrs2 = new PageAttrs(attrs1, kid.getDict());
-      page = new Page(xref, start+1, kid.getDict(), attrs2, printCommands);
+      page = new Page(xref, start+1, kid.getDict(), attrs2);
       if (!page->isOk()) {
 	++start;
 	goto err3;
@@ -205,7 +209,7 @@ int Catalog::readPageTree(Dict *pagesDict, PageAttrs *attrs, int start,
     // This should really be isDict("Pages"), but I've seen at least one
     // PDF file where the /Type entry is missing.
     } else if (kid.isDict()) {
-      if ((start = readPageTree(kid.getDict(), attrs1, start, printCommands))
+      if ((start = readPageTree(kid.getDict(), attrs1, start))
 	  < 0)
 	goto err2;
     } else {
@@ -276,6 +280,10 @@ LinkDest *Catalog::findDest(GString *name) {
     error(-1, "Bad named destination value");
   }
   obj1.free();
+  if (dest && !dest->isOk()) {
+    delete dest;
+    dest = NULL;
+  }
 
   return dest;
 }

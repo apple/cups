@@ -6,14 +6,16 @@
 //
 //========================================================================
 
-#ifdef __GNUC__
+#include <config.h>
+
+#ifdef USE_GCC_PRAGMAS
 #pragma implementation
 #endif
 
-#include <config.h>
 #include <math.h>
 #include <stdlib.h>
 #include <stddef.h>
+#include <stdarg.h>
 #include <string.h>
 #include <ctype.h>
 #include "gmem.h"
@@ -27,7 +29,7 @@
 
 //------------------------------------------------------------------------
 
-static inline const char *nextLine(const char *line, const char *end) {
+static inline char *nextLine(char *line, char *end) {
   while (line < end && *line != '\n' && *line != '\r')
     ++line;
   while (line < end && *line == '\n' || *line == '\r')
@@ -51,16 +53,15 @@ FontFile::~FontFile() {
 // Type1FontFile
 //------------------------------------------------------------------------
 
-Type1FontFile::Type1FontFile(const char *file, int len) {
-  const char *line, *line1;
-  char *p, *p2;
+Type1FontFile::Type1FontFile(char *file, int len) {
+  char *line, *line1, *p, *p2;
   GBool haveEncoding;
   char buf[256];
   char c;
   int n, code, i, j;
 
   name = NULL;
-  encoding = (const char **)gmalloc(256 * sizeof(const char *));
+  encoding = (char **)gmalloc(256 * sizeof(char *));
   for (i = 0; i < 256; ++i) {
     encoding[i] = NULL;
   }
@@ -135,10 +136,10 @@ Type1FontFile::~Type1FontFile() {
   int i;
 
   if (name) {
-    gfree((void *)name);
+    gfree(name);
   }
   for (i = 0; i < 256; ++i) {
-    gfree((void *)encoding[i]);
+    gfree(encoding[i]);
   }
   gfree(encoding);
 }
@@ -187,7 +188,7 @@ struct Type1CPrivateDict {
   GBool nominalWidthXFP;
 };
 
-Type1CFontFile::Type1CFontFile(const char *fileA, int lenA) {
+Type1CFontFile::Type1CFontFile(char *fileA, int lenA) {
   Guchar *nameIdxPtr, *idxPtr0, *idxPtr1;
 
   file = fileA;
@@ -221,17 +222,17 @@ Type1CFontFile::~Type1CFontFile() {
   delete name;
   if (encoding) {
     for (i = 0; i < 256; ++i) {
-      gfree((void *)encoding[i]);
+      gfree(encoding[i]);
     }
     gfree(encoding);
   }
 }
 
-const char *Type1CFontFile::getName() {
+char *Type1CFontFile::getName() {
   return name->getCString();
 }
 
-const char **Type1CFontFile::getEncoding() {
+char **Type1CFontFile::getEncoding() {
   if (!encoding) {
     readNameAndEncoding();
   }
@@ -252,7 +253,7 @@ void Type1CFontFile::readNameAndEncoding() {
   int key;
   int i, j;
 
-  encoding = (const char **)gmalloc(256 * sizeof(const char *));
+  encoding = (char **)gmalloc(256 * sizeof(char *));
   for (i = 0; i < 256; ++i) {
     encoding[i] = NULL;
   }
@@ -345,10 +346,11 @@ void Type1CFontFile::readNameAndEncoding() {
   }
 }
 
-void Type1CFontFile::convertToType1(FILE *outA) {
+void Type1CFontFile::convertToType1(FontFileOutputFunc outputFuncA,
+				    void *outputStreamA) {
   Type1CTopDict dict;
   Type1CPrivateDict privateDict;
-  char buf[256], eBuf[256];
+  char buf[512], eBuf[256];
   Guchar *idxPtr0, *idxPtr1, *subrsIdxPtr, *charStringsIdxPtr, *ptr;
   int nGlyphs, nCodes, nRanges, nLeft, nSups;
   Gushort *glyphNames;
@@ -356,7 +358,8 @@ void Type1CFontFile::convertToType1(FILE *outA) {
   int c, sid;
   int i, j, n;
 
-  out = outA;
+  outputFunc = outputFuncA;
+  outputStream = outputStreamA;
 
   // read top dict (first font only)
   readTopDict(&dict);
@@ -365,54 +368,81 @@ void Type1CFontFile::convertToType1(FILE *outA) {
   //~ ... global subrs are unimplemented
 
   // write header and font dictionary, up to encoding
-  fprintf(out, "%%!FontType1-1.0: %s", name->getCString());
+  (*outputFunc)(outputStream, "%!FontType1-1.0: ", 17);
+  (*outputFunc)(outputStream, name->getCString(), name->getLength());
   if (dict.version != 0) {
-    fprintf(out, "%s", getString(dict.version, buf));
+    getString(dict.version, buf);
+    (*outputFunc)(outputStream, buf, strlen(buf));
   }
-  fprintf(out, "\n");
-  fprintf(out, "11 dict begin\n");
-  fprintf(out, "/FontInfo 10 dict dup begin\n");
+  (*outputFunc)(outputStream, "\n", 1);
+  (*outputFunc)(outputStream, "11 dict begin\n", 14);
+  (*outputFunc)(outputStream, "/FontInfo 10 dict dup begin\n", 28);
   if (dict.version != 0) {
-    fprintf(out, "/version (%s) readonly def\n",
-	    getString(dict.version, buf));
+    (*outputFunc)(outputStream, "/version (", 10);
+    (*outputFunc)(outputStream, buf, strlen(buf));
+    (*outputFunc)(outputStream, ") readonly def\n", 15);
   }
   if (dict.notice != 0) {
-    fprintf(out, "/Notice (%s) readonly def\n",
-	    getString(dict.notice, buf));
+    getString(dict.notice, buf);
+    (*outputFunc)(outputStream, "/Notice (", 9);
+    (*outputFunc)(outputStream, buf, strlen(buf));
+    (*outputFunc)(outputStream, ") readonly def\n", 15);
   }
   if (dict.copyright != 0) {
-    fprintf(out, "/Copyright (%s) readonly def\n",
-	    getString(dict.copyright, buf));
+    getString(dict.copyright, buf);
+    (*outputFunc)(outputStream, "/Copyright (", 12);
+    (*outputFunc)(outputStream, buf, strlen(buf));
+    (*outputFunc)(outputStream, ") readonly def\n", 15);
   }
   if (dict.fullName != 0) {
-    fprintf(out, "/FullName (%s) readonly def\n",
-	    getString(dict.fullName, buf));
+    getString(dict.fullName, buf);
+    (*outputFunc)(outputStream, "/FullName (", 11);
+    (*outputFunc)(outputStream, buf, strlen(buf));
+    (*outputFunc)(outputStream, ") readonly def\n", 15);
   }
   if (dict.familyName != 0) {
-    fprintf(out, "/FamilyName (%s) readonly def\n",
-	    getString(dict.familyName, buf));
+    getString(dict.familyName, buf);
+    (*outputFunc)(outputStream, "/FamilyName (", 13);
+    (*outputFunc)(outputStream, buf, strlen(buf));
+    (*outputFunc)(outputStream, ") readonly def\n", 15);
   }
   if (dict.weight != 0) {
-    fprintf(out, "/Weight (%s) readonly def\n",
-	    getString(dict.weight, buf));
+    getString(dict.weight, buf);
+    (*outputFunc)(outputStream, "/Weight (", 9);
+    (*outputFunc)(outputStream, buf, strlen(buf));
+    (*outputFunc)(outputStream, ") readonly def\n", 15);
   }
-  fprintf(out, "/isFixedPitch %s def\n", dict.isFixedPitch ? "true" : "false");
-  fprintf(out, "/ItalicAngle %g def\n", dict.italicAngle);
-  fprintf(out, "/UnderlinePosition %g def\n", dict.underlinePosition);
-  fprintf(out, "/UnderlineThickness %g def\n", dict.underlineThickness);
-  fprintf(out, "end readonly def\n");
-  fprintf(out, "/FontName /%s def\n", name->getCString());
-  fprintf(out, "/PaintType %d def\n", dict.paintType);
-  fprintf(out, "/FontType 1 def\n");
-  fprintf(out, "/FontMatrix [%g %g %g %g %g %g] readonly def\n",
+  if (dict.isFixedPitch) {
+    (*outputFunc)(outputStream, "/isFixedPitch true def\n", 23);
+  } else {
+    (*outputFunc)(outputStream, "/isFixedPitch false def\n", 24);
+  }
+  sprintf(buf, "/ItalicAngle %g def\n", dict.italicAngle);
+  (*outputFunc)(outputStream, buf, strlen(buf));
+  sprintf(buf, "/UnderlinePosition %g def\n", dict.underlinePosition);
+  (*outputFunc)(outputStream, buf, strlen(buf));
+  sprintf(buf, "/UnderlineThickness %g def\n", dict.underlineThickness);
+  (*outputFunc)(outputStream, buf, strlen(buf));
+  (*outputFunc)(outputStream, "end readonly def\n", 17);
+  (*outputFunc)(outputStream, "/FontName /", 11);
+  (*outputFunc)(outputStream, name->getCString(), name->getLength());
+  (*outputFunc)(outputStream, " def\n", 5);
+  sprintf(buf, "/PaintType %d def\n", dict.paintType);
+  (*outputFunc)(outputStream, buf, strlen(buf));
+  (*outputFunc)(outputStream, "/FontType 1 def\n", 16);
+  sprintf(buf, "/FontMatrix [%g %g %g %g %g %g] readonly def\n",
 	  dict.fontMatrix[0], dict.fontMatrix[1], dict.fontMatrix[2],
 	  dict.fontMatrix[3], dict.fontMatrix[4], dict.fontMatrix[5]);
-  fprintf(out, "/FontBBox [%g %g %g %g] readonly def\n",
+  (*outputFunc)(outputStream, buf, strlen(buf));
+  sprintf(buf, "/FontBBox [%g %g %g %g] readonly def\n",
 	  dict.fontBBox[0], dict.fontBBox[1],
 	  dict.fontBBox[2], dict.fontBBox[3]);
-  fprintf(out, "/StrokeWidth %g def\n", dict.strokeWidth);
+  (*outputFunc)(outputStream, buf, strlen(buf));
+  sprintf(buf, "/StrokeWidth %g def\n", dict.strokeWidth);
+  (*outputFunc)(outputStream, buf, strlen(buf));
   if (dict.uniqueID != 0) {
-    fprintf(out, "/UniqueID %d def\n", dict.uniqueID);
+    sprintf(buf, "/UniqueID %d def\n", dict.uniqueID);
+    (*outputFunc)(outputStream, buf, strlen(buf));
   }
 
   // get number of glyphs from charstrings index
@@ -422,16 +452,18 @@ void Type1CFontFile::convertToType1(FILE *outA) {
   glyphNames = readCharset(dict.charset, nGlyphs);
 
   // read encoding (glyph -> code mapping), write Type 1 encoding
-  fprintf(out, "/Encoding ");
+  (*outputFunc)(outputStream, "/Encoding ", 10);
   if (dict.encoding == 0) {
-    fprintf(out, "StandardEncoding def\n");
+    (*outputFunc)(outputStream, "StandardEncoding def\n", 21);
   } else {
-    fprintf(out, "256 array\n");
-    fprintf(out, "0 1 255 {1 index exch /.notdef put} for\n");
+    (*outputFunc)(outputStream, "256 array\n", 10);
+    (*outputFunc)(outputStream,
+		  "0 1 255 {1 index exch /.notdef put} for\n", 40);
     if (dict.encoding == 1) {
       for (i = 0; i < 256; ++i) {
 	if (expertEncoding[i]) {
-	  fprintf(out, "dup %d /%s put\n", i, expertEncoding[i]);
+	  sprintf(buf, "dup %d /%s put\n", i, expertEncoding[i]);
+	  (*outputFunc)(outputStream, buf, strlen(buf));
 	}
       }
     } else {
@@ -444,8 +476,11 @@ void Type1CFontFile::convertToType1(FILE *outA) {
 	}
 	for (i = 1; i < nCodes; ++i) {
 	  c = *ptr++;
-	  fprintf(out, "dup %d /%s put\n",
-		  c, getString(glyphNames[i], buf));
+	  sprintf(buf, "dup %d /", c);
+	  (*outputFunc)(outputStream, buf, strlen(buf));
+	  getString(glyphNames[i], buf);
+	  (*outputFunc)(outputStream, buf, strlen(buf));
+	  (*outputFunc)(outputStream, " put\n", 5);
 	}
       } else if ((encFormat & 0x7f) == 1) {
 	nRanges = *ptr++;
@@ -454,8 +489,11 @@ void Type1CFontFile::convertToType1(FILE *outA) {
 	  c = *ptr++;
 	  nLeft = *ptr++;
 	  for (j = 0; j <= nLeft && nCodes < nGlyphs; ++j) {
-	    fprintf(out, "dup %d /%s put\n",
-		    c, getString(glyphNames[nCodes], buf));
+	    sprintf(buf, "dup %d /", c);
+	    (*outputFunc)(outputStream, buf, strlen(buf));
+	    getString(glyphNames[nCodes], buf);
+	    (*outputFunc)(outputStream, buf, strlen(buf));
+	    (*outputFunc)(outputStream, " put\n", 5);
 	    ++nCodes;
 	    ++c;
 	  }
@@ -467,16 +505,20 @@ void Type1CFontFile::convertToType1(FILE *outA) {
 	  c = *ptr++;
 	  sid = getWord(ptr, 2);
 	  ptr += 2;
-	  fprintf(out, "dup %d /%s put\n", c, getString(sid, buf));
+	  sprintf(buf, "dup %d /", c);
+	  (*outputFunc)(outputStream, buf, strlen(buf));
+	  getString(sid, buf);
+	  (*outputFunc)(outputStream, buf, strlen(buf));
+	  (*outputFunc)(outputStream, " put\n", 5);
 	}
       }
     }
-    fprintf(out, "readonly def\n");
+    (*outputFunc)(outputStream, "readonly def\n", 13);
   }
-  fprintf(out, "currentdict end\n");
+  (*outputFunc)(outputStream, "currentdict end\n", 16);
 
   // start the binary section
-  fprintf(out, "currentfile eexec\n");
+  (*outputFunc)(outputStream, "currentfile eexec\n", 18);
   r1 = 55665;
   line = 0;
 
@@ -539,12 +581,12 @@ void Type1CFontFile::convertToType1(FILE *outA) {
 
   // trailer
   if (line > 0) {
-    fputc('\n', out);
+    (*outputFunc)(outputStream, "\n", 1);
   }
   for (i = 0; i < 8; ++i) {
-    fprintf(out, "0000000000000000000000000000000000000000000000000000000000000000\n");
+    (*outputFunc)(outputStream, "0000000000000000000000000000000000000000000000000000000000000000\n", 65);
   }
-  fprintf(out, "cleartomark\n");
+  (*outputFunc)(outputStream, "cleartomark\n", 12);
 
   // clean up
   delete privateDict.dictData;
@@ -553,7 +595,9 @@ void Type1CFontFile::convertToType1(FILE *outA) {
   }
 }
 
-void Type1CFontFile::convertToCIDType0(const char *psName, FILE *outA) {
+void Type1CFontFile::convertToCIDType0(char *psName,
+				       FontFileOutputFunc outputFuncA,
+				       void *outputStreamA) {
   Type1CTopDict dict;
   Type1CPrivateDict *privateDicts;
   GString *charStrings;
@@ -562,7 +606,7 @@ void Type1CFontFile::convertToCIDType0(const char *psName, FILE *outA) {
   int *cidMap;
   Guchar *fdSelect;
   Guchar *charStringsIdxPtr, *fdArrayIdx, *idxPtr0, *idxPtr1, *ptr;
-  char buf[256];
+  char buf[512], buf2[16];
   int nGlyphs, nCIDs, gdBytes, nFDs;
   int fdSelectFmt, nRanges, gid0, gid1, fd, offset;
   int key;
@@ -570,9 +614,10 @@ void Type1CFontFile::convertToCIDType0(const char *psName, FILE *outA) {
   GBool isFP;
   int i, j, k, n;
 
-  out = outA;
+  outputFunc = outputFuncA;
+  outputStream = outputStreamA;
 
-  fprintf(out, "/CIDInit /ProcSet findresource begin\n");
+  (*outputFunc)(outputStream, "/CIDInit /ProcSet findresource begin\n", 37);
 
   // read top dict (first font only)
   readTopDict(&dict);
@@ -719,65 +764,84 @@ void Type1CFontFile::convertToCIDType0(const char *psName, FILE *outA) {
   }
 
   // begin the font dictionary
-  fprintf(out, "20 dict begin\n");
-  fprintf(out, "/CIDFontName /%s def\n", psName);
-  fprintf(out, "/CIDFontType 0 def\n");
-  fprintf(out, "/CIDSystemInfo 3 dict dup begin\n");
+  (*outputFunc)(outputStream, "20 dict begin\n", 14);
+  (*outputFunc)(outputStream, "/CIDFontName /", 14);
+  (*outputFunc)(outputStream, psName, strlen(psName));
+  (*outputFunc)(outputStream, " def\n", 5);
+  (*outputFunc)(outputStream, "/CIDFontType 0 def\n", 19);
+  (*outputFunc)(outputStream, "/CIDSystemInfo 3 dict dup begin\n", 32);
   if (dict.registry > 0 && dict.ordering > 0) {
-    fprintf(out, "  /Registry (%s) def\n", getString(dict.registry, buf));
-    fprintf(out, "  /Ordering (%s) def\n", getString(dict.ordering, buf));
+    getString(dict.registry, buf);
+    (*outputFunc)(outputStream, "  /Registry (", 13);
+    (*outputFunc)(outputStream, buf, strlen(buf));
+    (*outputFunc)(outputStream, ") def\n", 6);
+    getString(dict.ordering, buf);
+    (*outputFunc)(outputStream, "  /Ordering (", 13);
+    (*outputFunc)(outputStream, buf, strlen(buf));
+    (*outputFunc)(outputStream, ") def\n", 6);
   } else {
-    fprintf(out, "  /Registry (Adobe) def\n");
-    fprintf(out, "  /Ordering (Identity) def\n");
+    (*outputFunc)(outputStream, "  /Registry (Adobe) def\n", 24);
+    (*outputFunc)(outputStream, "  /Ordering (Identity) def\n", 27);
   }
-  fprintf(out, "  /Supplement %d def\n", dict.supplement);
-  fprintf(out, "end def\n");
-  fprintf(out, "/FontMatrix [%g %g %g %g %g %g] def\n",
+  sprintf(buf, "  /Supplement %d def\n", dict.supplement);
+  (*outputFunc)(outputStream, buf, strlen(buf));
+  (*outputFunc)(outputStream, "end def\n", 8);
+  sprintf(buf, "/FontMatrix [%g %g %g %g %g %g] def\n",
 	  dict.fontMatrix[0], dict.fontMatrix[1], dict.fontMatrix[2],
 	  dict.fontMatrix[3], dict.fontMatrix[4], dict.fontMatrix[5]);
-  fprintf(out, "/FontBBox [%g %g %g %g] def\n",
+  (*outputFunc)(outputStream, buf, strlen(buf));
+  sprintf(buf, "/FontBBox [%g %g %g %g] def\n",
 	  dict.fontBBox[0], dict.fontBBox[1],
 	  dict.fontBBox[2], dict.fontBBox[3]);
-  fprintf(out, "/FontInfo 1 dict dup begin\n");
-  fprintf(out, "  /FSType 8 def\n");
-  fprintf(out, "end def\n");
+  (*outputFunc)(outputStream, buf, strlen(buf));
+  (*outputFunc)(outputStream, "/FontInfo 1 dict dup begin\n", 27);
+  (*outputFunc)(outputStream, "  /FSType 8 def\n", 16);
+  (*outputFunc)(outputStream, "end def\n", 8);
 
   // CIDFont-specific entries
-  fprintf(out, "/CIDCount %d def\n", nCIDs);
-  fprintf(out, "/FDBytes 1 def\n");
-  fprintf(out, "/GDBytes %d def\n", gdBytes);
-  fprintf(out, "/CIDMapOffset 0 def\n");
+  sprintf(buf, "/CIDCount %d def\n", nCIDs);
+  (*outputFunc)(outputStream, buf, strlen(buf));
+  (*outputFunc)(outputStream, "/FDBytes 1 def\n", 15);
+  sprintf(buf, "/GDBytes %d def\n", gdBytes);
+  (*outputFunc)(outputStream, buf, strlen(buf));
+  (*outputFunc)(outputStream, "/CIDMapOffset 0 def\n", 20);
   if (dict.paintType != 0) {
-    fprintf(out, "/PaintType %d def\n", dict.paintType);
-    fprintf(out, "/StrokeWidth %g def\n", dict.strokeWidth);
+    sprintf(buf, "/PaintType %d def\n", dict.paintType);
+    (*outputFunc)(outputStream, buf, strlen(buf));
+    sprintf(buf, "/StrokeWidth %g def\n", dict.strokeWidth);
+    (*outputFunc)(outputStream, buf, strlen(buf));
   }
 
   // FDArray entry
-  fprintf(out, "/FDArray %d array\n", nFDs);
+  sprintf(buf, "/FDArray %d array\n", nFDs);
+  (*outputFunc)(outputStream, buf, strlen(buf));
   for (i = 0; i < nFDs; ++i) {
-    fprintf(out, "dup %d 10 dict begin\n", i);
-    fprintf(out, "/FontType 1 def\n");
-    fprintf(out, "/FontMatrix [1 0 0 1 0 0] def\n");
-    fprintf(out, "/PaintType %d def\n", dict.paintType);
-    fprintf(out, "/Private 32 dict begin\n");
-    fwrite(privateDicts[i].dictData->getCString(), 1,
-	   privateDicts[i].dictData->getLength(), out);
-    fprintf(out, "currentdict end def\n");
-    fprintf(out, "currentdict end put\n");
+    sprintf(buf, "dup %d 10 dict begin\n", i);
+    (*outputFunc)(outputStream, buf, strlen(buf));
+    (*outputFunc)(outputStream, "/FontType 1 def\n", 16);
+    (*outputFunc)(outputStream, "/FontMatrix [1 0 0 1 0 0] def\n", 30);
+    sprintf(buf, "/PaintType %d def\n", dict.paintType);
+    (*outputFunc)(outputStream, buf, strlen(buf));
+    (*outputFunc)(outputStream, "/Private 32 dict begin\n", 23);
+    (*outputFunc)(outputStream, privateDicts[i].dictData->getCString(),
+		  privateDicts[i].dictData->getLength());
+    (*outputFunc)(outputStream, "currentdict end def\n", 20);
+    (*outputFunc)(outputStream, "currentdict end put\n", 20);
   }
-  fprintf(out, "def\n");
+  (*outputFunc)(outputStream, "def\n", 4);
 
   //~ need to deal with subrs
   
   // start the binary section
   offset = (nCIDs + 1) * (1 + gdBytes);
-  fprintf(out, "(Hex) %d StartData\n",
+  sprintf(buf, "(Hex) %d StartData\n",
 	  offset + charStrings->getLength());
+  (*outputFunc)(outputStream, buf, strlen(buf));
 
   // write the charstring offset (CIDMap) table
   for (i = 0; i <= nCIDs; i += 6) {
     for (j = 0; j < 6 && i+j <= nCIDs; ++j) {
-      if (cidMap[i+j] >= 0) {
+      if (i+j < nCIDs && cidMap[i+j] >= 0) {
 	buf[0] = (char)fdSelect[cidMap[i+j]];
       } else {
 	buf[0] = (char)0;
@@ -788,22 +852,24 @@ void Type1CFontFile::convertToCIDType0(const char *psName, FILE *outA) {
 	n >>= 8;
       }
       for (k = 0; k <= gdBytes; ++k) {
-	fprintf(out, "%02x", buf[k] & 0xff);
+	sprintf(buf2, "%02x", buf[k] & 0xff);
+	(*outputFunc)(outputStream, buf2, 2);
       }
     }
-    fputc('\n', out);
+    (*outputFunc)(outputStream, "\n", 1);
   }
 
   // write the charstring data
   n = charStrings->getLength();
   for (i = 0; i < n; i += 32) {
     for (j = 0; j < 32 && i+j < n; ++j) {
-      fprintf(out, "%02x", charStrings->getChar(i+j) & 0xff);
+      sprintf(buf, "%02x", charStrings->getChar(i+j) & 0xff);
+      (*outputFunc)(outputStream, buf, strlen(buf));
     }
     if (i + 32 >= n) {
-      fputc('>', out);
+      (*outputFunc)(outputStream, ">", 1);
     }
-    fputc('\n', out);
+    (*outputFunc)(outputStream, "\n", 1);
   }
 
   for (i = 0; i < nFDs; ++i) {
@@ -817,14 +883,16 @@ void Type1CFontFile::convertToCIDType0(const char *psName, FILE *outA) {
   gfree(fdSelect);
 }
 
-void Type1CFontFile::convertToType0(const char *psName, FILE *outA) {
+void Type1CFontFile::convertToType0(char *psName,
+				    FontFileOutputFunc outputFuncA,
+				    void *outputStreamA) {
   Type1CTopDict dict;
   Type1CPrivateDict *privateDicts;
   Gushort *charset;
   int *cidMap;
   Guchar *fdSelect;
   Guchar *charStringsIdxPtr, *fdArrayIdx, *idxPtr0, *idxPtr1, *ptr;
-  char buf[256];
+  char buf[512];
   char eBuf[256];
   int nGlyphs, nCIDs, nFDs;
   int fdSelectFmt, nRanges, gid0, gid1, fd;
@@ -833,7 +901,8 @@ void Type1CFontFile::convertToType0(const char *psName, FILE *outA) {
   GBool isFP;
   int i, j, n;
 
-  out = outA;
+  outputFunc = outputFuncA;
+  outputStream = outputStreamA;
 
   // read top dict (first font only)
   readTopDict(&dict);
@@ -958,28 +1027,36 @@ void Type1CFontFile::convertToType0(const char *psName, FILE *outA) {
     }
 
     // font dictionary (unencrypted section)
-    fprintf(out, "16 dict begin\n");
-    fprintf(out, "/FontName /%s_%02x def\n", psName, i >> 8);
-    fprintf(out, "/FontType 1 def\n");
-    fprintf(out, "/FontMatrix [%g %g %g %g %g %g] def\n",
+    (*outputFunc)(outputStream, "16 dict begin\n", 14);
+    (*outputFunc)(outputStream, "/FontName /", 11);
+    (*outputFunc)(outputStream, psName, strlen(psName));
+    sprintf(buf, "_%02x def\n", i >> 8);
+    (*outputFunc)(outputStream, buf, strlen(buf));
+    (*outputFunc)(outputStream, "/FontType 1 def\n", 16);
+    sprintf(buf, "/FontMatrix [%g %g %g %g %g %g] def\n",
 	    dict.fontMatrix[0], dict.fontMatrix[1], dict.fontMatrix[2],
 	    dict.fontMatrix[3], dict.fontMatrix[4], dict.fontMatrix[5]);
-    fprintf(out, "/FontBBox [%g %g %g %g] def\n",
+    (*outputFunc)(outputStream, buf, strlen(buf));
+    sprintf(buf, "/FontBBox [%g %g %g %g] def\n",
 	    dict.fontBBox[0], dict.fontBBox[1],
 	    dict.fontBBox[2], dict.fontBBox[3]);
-    fprintf(out, "/PaintType %d def\n", dict.paintType);
+    (*outputFunc)(outputStream, buf, strlen(buf));
+    sprintf(buf, "/PaintType %d def\n", dict.paintType);
+    (*outputFunc)(outputStream, buf, strlen(buf));
     if (dict.paintType != 0) {
-      fprintf(out, "/StrokeWidth %g def\n", dict.strokeWidth);
+      sprintf(buf, "/StrokeWidth %g def\n", dict.strokeWidth);
+      (*outputFunc)(outputStream, buf, strlen(buf));
     }
-    fprintf(out, "/Encoding 256 array\n");
+    (*outputFunc)(outputStream, "/Encoding 256 array\n", 20);
     for (j = 0; j < 256 && i+j < nCIDs; ++j) {
-      fprintf(out, "dup %d /c%02x put\n", j, j);
+      sprintf(buf, "dup %d /c%02x put\n", j, j);
+      (*outputFunc)(outputStream, buf, strlen(buf));
     }
-    fprintf(out, "readonly def\n");
-    fprintf(out, "currentdict end\n");
+    (*outputFunc)(outputStream, "readonly def\n", 13);
+    (*outputFunc)(outputStream, "currentdict end\n", 16);
 
     // start the binary section
-    fprintf(out, "currentfile eexec\n");
+    (*outputFunc)(outputStream, "currentfile eexec\n", 18);
     r1 = 55665;
     line = 0;
 
@@ -1025,31 +1102,37 @@ void Type1CFontFile::convertToType0(const char *psName, FILE *outA) {
 
     // trailer
     if (line > 0) {
-      fputc('\n', out);
+      (*outputFunc)(outputStream, "\n", 1);
     }
     for (j = 0; j < 8; ++j) {
-      fprintf(out, "0000000000000000000000000000000000000000000000000000000000000000\n");
+      (*outputFunc)(outputStream, "0000000000000000000000000000000000000000000000000000000000000000\n", 65);
     }
-    fprintf(out, "cleartomark\n");
+    (*outputFunc)(outputStream, "cleartomark\n", 12);
   }
 
   // write the Type 0 parent font
-  fprintf(out, "16 dict begin\n");
-  fprintf(out, "/FontName /%s def\n", psName);
-  fprintf(out, "/FontType 0 def\n");
-  fprintf(out, "/FontMatrix [1 0 0 1 0 0] def\n");
-  fprintf(out, "/FMapType 2 def\n");
-  fprintf(out, "/Encoding [\n");
+  (*outputFunc)(outputStream, "16 dict begin\n", 14);
+  (*outputFunc)(outputStream, "/FontName /", 11);
+  (*outputFunc)(outputStream, psName, strlen(psName));
+  (*outputFunc)(outputStream, " def\n", 5);
+  (*outputFunc)(outputStream, "/FontType 0 def\n", 16);
+  (*outputFunc)(outputStream, "/FontMatrix [1 0 0 1 0 0] def\n", 30);
+  (*outputFunc)(outputStream, "/FMapType 2 def\n", 16);
+  (*outputFunc)(outputStream, "/Encoding [\n", 12);
   for (i = 0; i < nCIDs; i += 256) {
-    fprintf(out, "%d\n", i >> 8);
+    sprintf(buf, "%d\n", i >> 8);
+    (*outputFunc)(outputStream, buf, strlen(buf));
   }
-  fprintf(out, "] def\n");
-  fprintf(out, "/FDepVector [\n");
+  (*outputFunc)(outputStream, "] def\n", 6);
+  (*outputFunc)(outputStream, "/FDepVector [\n", 14);
   for (i = 0; i < nCIDs; i += 256) {
-    fprintf(out, "/%s_%02x findfont\n", psName, i >> 8);
+    (*outputFunc)(outputStream, "/", 1);
+    (*outputFunc)(outputStream, psName, strlen(psName));
+    sprintf(buf, "_%02x findfont\n", i >> 8);
+    (*outputFunc)(outputStream, buf, strlen(buf));
   }
-  fprintf(out, "] def\n");
-  fprintf(out, "FontName currentdict end definefont pop\n");
+  (*outputFunc)(outputStream, "] def\n", 6);
+  (*outputFunc)(outputStream, "FontName currentdict end definefont pop\n", 40);
 
   // clean up
   for (i = 0; i < nFDs; ++i) {
@@ -1322,24 +1405,24 @@ Gushort *Type1CFontFile::readCharset(int charset, int nGlyphs) {
   return glyphNames;
 }
 
-void Type1CFontFile::eexecWrite(const char *s) {
+void Type1CFontFile::eexecWrite(char *s) {
   Guchar *p;
   Guchar x;
 
   for (p = (Guchar *)s; *p; ++p) {
     x = *p ^ (r1 >> 8);
     r1 = (x + r1) * 52845 + 22719;
-    fputc(hexChars[x >> 4], out);
-    fputc(hexChars[x & 0x0f], out);
+    (*outputFunc)(outputStream, &hexChars[x >> 4], 1);
+    (*outputFunc)(outputStream, &hexChars[x & 0x0f], 1);
     line += 2;
     if (line == 64) {
-      fputc('\n', out);
+      (*outputFunc)(outputStream, "\n", 1);
       line = 0;
     }
   }
 }
 
-void Type1CFontFile::eexecCvtGlyph(const char *glyphName, Guchar *s, int n) {
+void Type1CFontFile::eexecCvtGlyph(char *glyphName, Guchar *s, int n) {
   char eBuf[256];
 
   cvtGlyph(s, n);
@@ -2005,17 +2088,17 @@ void Type1CFontFile::eexecWriteCharstring(Guchar *s, int n) {
   for (i = 0; i < n; ++i) {
     x = s[i] ^ (r1 >> 8);
     r1 = (x + r1) * 52845 + 22719;
-    fputc(hexChars[x >> 4], out);
-    fputc(hexChars[x & 0x0f], out);
+    (*outputFunc)(outputStream, &hexChars[x >> 4], 1);
+    (*outputFunc)(outputStream, &hexChars[x & 0x0f], 1);
     line += 2;
     if (line == 64) {
-      fputc('\n', out);
+      (*outputFunc)(outputStream, "\n", 1);
       line = 0;
     }
   }
 }
 
-void Type1CFontFile::getDeltaInt(char *buf, const char *key, double *opA,
+void Type1CFontFile::getDeltaInt(char *buf, char *key, double *opA,
 				 int n) {
   int x, i;
 
@@ -2030,7 +2113,7 @@ void Type1CFontFile::getDeltaInt(char *buf, const char *key, double *opA,
   sprintf(buf, "] def\n");
 }
 
-void Type1CFontFile::getDeltaReal(char *buf, const char *key, double *opA,
+void Type1CFontFile::getDeltaReal(char *buf, char *key, double *opA,
 				  int n) {
   double x;
   int i;
@@ -2235,7 +2318,7 @@ struct TTFontTableHdr {
 };
 
 struct T42Table {
-  const char *tag;		// 4-byte tag
+  char *tag;			// 4-byte tag
   GBool required;		// required by the TrueType spec?
 };
 
@@ -2261,7 +2344,7 @@ static T42Table t42Tables[nT42Tables] = {
 
 // Glyph names in some arbitrary standard that Apple uses for their
 // TrueType fonts.
-static const char *macGlyphNames[258] = {
+static char *macGlyphNames[258] = {
   ".notdef",
   "null",
   "CR",
@@ -2529,8 +2612,15 @@ enum T42FontIndexMode {
   t42FontModeMacRoman
 };
 
-TrueTypeFontFile::TrueTypeFontFile(const char *fileA, int lenA) {
-  int pos, i;
+struct TrueTypeLoca {
+  int idx;
+  int pos;
+  int length;
+};
+
+TrueTypeFontFile::TrueTypeFontFile(char *fileA, int lenA) {
+  int pos, i, idx, n, length;
+  Guint size, startPos, endPos;
 
   file = fileA;
   len = lenA;
@@ -2564,6 +2654,31 @@ TrueTypeFontFile::TrueTypeFontFile(const char *fileA, int lenA) {
     return;
   }
 
+  // some embedded TrueType fonts have an incorrect (too small) cmap
+  // table size
+  idx = seekTableIdx("cmap");
+  if (idx >= 0) {
+    pos = tableHdrs[idx].offset;
+    n = getUShort(pos + 2);
+    size = (Guint)(4 + 8 * n);
+    for (i = 0; i < n; ++i) {
+      startPos = getULong(pos + 4 + 8*i + 4);
+      length = getUShort(pos + startPos + 2);
+      endPos = startPos + length;
+      if (endPos > size) {
+	size = endPos;
+      }
+    }
+    if ((mungedCmapSize = size > tableHdrs[idx].length)) {
+#if 0 // don't bother printing this error message - it's too common
+      error(-1, "Bad cmap table size in TrueType font");
+#endif
+      tableHdrs[idx].length = size;
+    }
+  } else {
+    mungedCmapSize = gFalse;
+  }
+
   // read the 'head' table
   pos = seekTable("head");
   bbox[0] = getShort(pos + 36);
@@ -2582,18 +2697,18 @@ TrueTypeFontFile::~TrueTypeFontFile() {
 
   if (encoding) {
     for (i = 0; i < 256; ++i) {
-      gfree((void *)encoding[i]);
+      gfree(encoding[i]);
     }
     gfree(encoding);
   }
   gfree(tableHdrs);
 }
 
-const char *TrueTypeFontFile::getName() {
+char *TrueTypeFontFile::getName() {
   return NULL;
 }
 
-const char **TrueTypeFontFile::getEncoding() {
+char **TrueTypeFontFile::getEncoding() {
   int cmap[256];
   int nCmaps, cmapPlatform, cmapEncoding, cmapFmt;
   int cmapLen, cmapOffset, cmapFirst;
@@ -2692,7 +2807,7 @@ const char **TrueTypeFontFile::getEncoding() {
   //----- construct the (glyph idx) -> (glyph name) mapping
   //----- and compute the (char code) -> (glyph name) mapping
 
-  encoding = (const char **)gmalloc(256 * sizeof(const char *));
+  encoding = (char **)gmalloc(256 * sizeof(char *));
   for (i = 0; i < 256; ++i) {
     encoding[i] = NULL;
   }
@@ -2765,170 +2880,217 @@ const char **TrueTypeFontFile::getEncoding() {
   return encoding;
 }
 
-void TrueTypeFontFile::convertToType42(const char *name, const char **encodingA,
+void TrueTypeFontFile::convertToType42(char *name, char **encodingA,
 				       CharCodeToUnicode *toUnicode,
-				       GBool pdfFontHasEncoding, FILE *out) {
+				       GBool pdfFontHasEncoding,
+				       FontFileOutputFunc outputFunc,
+				       void *outputStream) {
+  char buf[512];
+
   // write the header
-  fprintf(out, "%%!PS-TrueTypeFont-%g\n", getFixed(0));
+  sprintf(buf, "%%!PS-TrueTypeFont-%g\n", getFixed(0));
+  (*outputFunc)(outputStream, buf, strlen(buf));
 
   // begin the font dictionary
-  fprintf(out, "10 dict begin\n");
-  fprintf(out, "/FontName /%s def\n", name);
-  fprintf(out, "/FontType 42 def\n");
-  fprintf(out, "/FontMatrix [1 0 0 1 0 0] def\n");
-  fprintf(out, "/FontBBox [%d %d %d %d] def\n",
+  (*outputFunc)(outputStream, "10 dict begin\n", 14);
+  (*outputFunc)(outputStream, "/FontName /", 11);
+  (*outputFunc)(outputStream, name, strlen(name));
+  (*outputFunc)(outputStream, " def\n", 5);
+  (*outputFunc)(outputStream, "/FontType 42 def\n", 17);
+  (*outputFunc)(outputStream, "/FontMatrix [1 0 0 1 0 0] def\n", 30);
+  sprintf(buf, "/FontBBox [%d %d %d %d] def\n",
 	  bbox[0], bbox[1], bbox[2], bbox[3]);
-  fprintf(out, "/PaintType 0 def\n");
+  (*outputFunc)(outputStream, buf, strlen(buf));
+  (*outputFunc)(outputStream, "/PaintType 0 def\n", 17);
 
   // write the guts of the dictionary
-  cvtEncoding(encodingA, out);
-  cvtCharStrings(encodingA, toUnicode, pdfFontHasEncoding, out);
-  cvtSfnts(out, NULL);
+  cvtEncoding(encodingA, pdfFontHasEncoding, outputFunc, outputStream);
+  cvtCharStrings(encodingA, toUnicode, pdfFontHasEncoding,
+		 outputFunc, outputStream);
+  cvtSfnts(outputFunc, outputStream, NULL);
 
   // end the dictionary and define the font
-  fprintf(out, "FontName currentdict end definefont pop\n");
+  (*outputFunc)(outputStream, "FontName currentdict end definefont pop\n", 40);
 }
 
-void TrueTypeFontFile::convertToCIDType2(const char *name, Gushort *cidMap,
-					 int nCIDs, FILE *out) {
+void TrueTypeFontFile::convertToCIDType2(char *name, Gushort *cidMap,
+					 int nCIDs,
+					 FontFileOutputFunc outputFunc,
+					 void *outputStream) {
+  char buf[512];
   Gushort cid;
   int i, j, k;
 
   // write the header
-  fprintf(out, "%%!PS-TrueTypeFont-%g\n", getFixed(0));
+  sprintf(buf, "%%!PS-TrueTypeFont-%g\n", getFixed(0));
+  (*outputFunc)(outputStream, buf, strlen(buf));
 
   // begin the font dictionary
-  fprintf(out, "20 dict begin\n");
-  fprintf(out, "/CIDFontName /%s def\n", name);
-  fprintf(out, "/CIDFontType 2 def\n");
-  fprintf(out, "/FontType 42 def\n");
-  fprintf(out, "/CIDSystemInfo 3 dict dup begin\n");
-  fprintf(out, "  /Registry (Adobe) def\n");
-  fprintf(out, "  /Ordering (Identity) def\n");
-  fprintf(out, "  /Supplement 0 def\n");
-  fprintf(out, "  end def\n");
-  fprintf(out, "/GDBytes 2 def\n");
+  (*outputFunc)(outputStream, "20 dict begin\n", 14);
+  (*outputFunc)(outputStream, "/CIDFontName /", 14);
+  (*outputFunc)(outputStream, name, strlen(name));
+  (*outputFunc)(outputStream, " def\n", 5);
+  (*outputFunc)(outputStream, "/CIDFontType 2 def\n", 19);
+  (*outputFunc)(outputStream, "/FontType 42 def\n", 17);
+  (*outputFunc)(outputStream, "/CIDSystemInfo 3 dict dup begin\n", 32);
+  (*outputFunc)(outputStream, "  /Registry (Adobe) def\n", 24);
+  (*outputFunc)(outputStream, "  /Ordering (Identity) def\n", 27);
+  (*outputFunc)(outputStream, "  /Supplement 0 def\n", 20);
+  (*outputFunc)(outputStream, "  end def\n", 10);
+  (*outputFunc)(outputStream, "/GDBytes 2 def\n", 15);
   if (cidMap) {
-    fprintf(out, "/CIDCount %d def\n", nCIDs);
+    sprintf(buf, "/CIDCount %d def\n", nCIDs);
+    (*outputFunc)(outputStream, buf, strlen(buf));
     if (nCIDs > 32767) {
-      fprintf(out, "/CIDMap [");
+      (*outputFunc)(outputStream, "/CIDMap [", 9);
       for (i = 0; i < nCIDs; i += 32768 - 16) {
-	fprintf(out, "<\n");
+	(*outputFunc)(outputStream, "<\n", 2);
 	for (j = 0; j < 32768 - 16 && i+j < nCIDs; j += 16) {
-	  fprintf(out, "  ");
+	  (*outputFunc)(outputStream, "  ", 2);
 	  for (k = 0; k < 16 && i+j+k < nCIDs; ++k) {
 	    cid = cidMap[i+j+k];
-	    fprintf(out, "%02x%02x", (cid >> 8) & 0xff, cid & 0xff);
+	    sprintf(buf, "%02x%02x", (cid >> 8) & 0xff, cid & 0xff);
+	    (*outputFunc)(outputStream, buf, strlen(buf));
 	  }
-	  fprintf(out, "\n");
+	  (*outputFunc)(outputStream, "\n", 1);
 	}
-	fprintf(out, "  >");
+	(*outputFunc)(outputStream, "  >", 3);
       }
-      fprintf(out, "\n");
-      fprintf(out, "] def\n");
+      (*outputFunc)(outputStream, "\n", 1);
+      (*outputFunc)(outputStream, "] def\n", 6);
     } else {
-      fprintf(out, "/CIDMap <\n");
+      (*outputFunc)(outputStream, "/CIDMap <\n", 10);
       for (i = 0; i < nCIDs; i += 16) {
-	fprintf(out, "  ");
+	(*outputFunc)(outputStream, "  ", 2);
 	for (j = 0; j < 16 && i+j < nCIDs; ++j) {
 	  cid = cidMap[i+j];
-	  fprintf(out, "%02x%02x", (cid >> 8) & 0xff, cid & 0xff);
+	  sprintf(buf, "%02x%02x", (cid >> 8) & 0xff, cid & 0xff);
+	  (*outputFunc)(outputStream, buf, strlen(buf));
 	}
-	fprintf(out, "\n");
+	(*outputFunc)(outputStream, "\n", 1);
       }
-      fprintf(out, "> def\n");
+      (*outputFunc)(outputStream, "> def\n", 6);
     }
   } else {
     // direct mapping - just fill the string(s) with s[i]=i
-    fprintf(out, "/CIDCount %d def\n", nGlyphs);
+    sprintf(buf, "/CIDCount %d def\n", nGlyphs);
+    (*outputFunc)(outputStream, buf, strlen(buf));
     if (nGlyphs > 32767) {
-      fprintf(out, "/CIDMap [\n");
+      (*outputFunc)(outputStream, "/CIDMap [\n", 10);
       for (i = 0; i < nGlyphs; i += 32767) {
 	j = nGlyphs - i < 32767 ? nGlyphs - i : 32767;
-	fprintf(out, "  %d string 0 1 %d {\n", 2 * j, j - 1);
-	fprintf(out, "    2 copy dup 2 mul exch %d add -8 bitshift put\n", i);
-	fprintf(out, "    1 index exch dup 2 mul 1 add exch %d add"
+	sprintf(buf, "  %d string 0 1 %d {\n", 2 * j, j - 1);
+	(*outputFunc)(outputStream, buf, strlen(buf));
+	sprintf(buf, "    2 copy dup 2 mul exch %d add -8 bitshift put\n", i);
+	(*outputFunc)(outputStream, buf, strlen(buf));
+	sprintf(buf, "    1 index exch dup 2 mul 1 add exch %d add"
 		" 255 and put\n", i);
-	fprintf(out, "  } for\n");
+	(*outputFunc)(outputStream, buf, strlen(buf));
+	(*outputFunc)(outputStream, "  } for\n", 8);
       }
-      fprintf(out, "] def\n");
+      (*outputFunc)(outputStream, "] def\n", 6);
     } else {
-      fprintf(out, "/CIDMap %d string\n", 2 * nGlyphs);
-      fprintf(out, "  0 1 %d {\n", nGlyphs - 1);
-      fprintf(out, "    2 copy dup 2 mul exch -8 bitshift put\n");
-      fprintf(out, "    1 index exch dup 2 mul 1 add exch 255 and put\n");
-      fprintf(out, "  } for\n");
-      fprintf(out, "def\n");
+      sprintf(buf, "/CIDMap %d string\n", 2 * nGlyphs);
+      (*outputFunc)(outputStream, buf, strlen(buf));
+      sprintf(buf, "  0 1 %d {\n", nGlyphs - 1);
+      (*outputFunc)(outputStream, buf, strlen(buf));
+      (*outputFunc)(outputStream,
+		    "    2 copy dup 2 mul exch -8 bitshift put\n", 42);
+      (*outputFunc)(outputStream,
+		    "    1 index exch dup 2 mul 1 add exch 255 and put\n", 50);
+      (*outputFunc)(outputStream, "  } for\n", 8);
+      (*outputFunc)(outputStream, "def\n", 4);
     }
   }
-  fprintf(out, "/FontMatrix [1 0 0 1 0 0] def\n");
-  fprintf(out, "/FontBBox [%d %d %d %d] def\n",
+  (*outputFunc)(outputStream, "/FontMatrix [1 0 0 1 0 0] def\n", 30);
+  sprintf(buf, "/FontBBox [%d %d %d %d] def\n",
 	  bbox[0], bbox[1], bbox[2], bbox[3]);
-  fprintf(out, "/PaintType 0 def\n");
-  fprintf(out, "/Encoding [] readonly def\n");
-  fprintf(out, "/CharStrings 1 dict dup begin\n");
-  fprintf(out, "  /.notdef 0 def\n");
-  fprintf(out, "  end readonly def\n");
+  (*outputFunc)(outputStream, buf, strlen(buf));
+  (*outputFunc)(outputStream, "/PaintType 0 def\n", 17);
+  (*outputFunc)(outputStream, "/Encoding [] readonly def\n", 26);
+  (*outputFunc)(outputStream, "/CharStrings 1 dict dup begin\n", 30);
+  (*outputFunc)(outputStream, "  /.notdef 0 def\n", 17);
+  (*outputFunc)(outputStream, "  end readonly def\n", 19);
 
   // write the guts of the dictionary
-  cvtSfnts(out, NULL);
+  cvtSfnts(outputFunc, outputStream, NULL);
 
   // end the dictionary and define the font
-  fprintf(out, "CIDFontName currentdict end /CIDFont defineresource pop\n");
+  (*outputFunc)(outputStream,
+		"CIDFontName currentdict end /CIDFont defineresource pop\n",
+		56);
 }
 
-void TrueTypeFontFile::convertToType0(const char *name, Gushort *cidMap,
-				      int nCIDs, FILE *out) {
+void TrueTypeFontFile::convertToType0(char *name, Gushort *cidMap,
+				      int nCIDs,
+				      FontFileOutputFunc outputFunc,
+				      void *outputStream) {
+  char buf[512];
   GString *sfntsName;
   int n, i, j;
 
   // write the Type 42 sfnts array
   sfntsName = (new GString(name))->append("_sfnts");
-  cvtSfnts(out, sfntsName);
+  cvtSfnts(outputFunc, outputStream, sfntsName);
   delete sfntsName;
 
   // write the descendant Type 42 fonts
   n = cidMap ? nCIDs : nGlyphs;
   for (i = 0; i < n; i += 256) {
-    fprintf(out, "10 dict begin\n");
-    fprintf(out, "/FontName /%s_%02x def\n", name, i >> 8);
-    fprintf(out, "/FontType 42 def\n");
-    fprintf(out, "/FontMatrix [1 0 0 1 0 0] def\n");
-    fprintf(out, "/FontBBox [%d %d %d %d] def\n",
+    (*outputFunc)(outputStream, "10 dict begin\n", 14);
+    (*outputFunc)(outputStream, "/FontName /", 11);
+    (*outputFunc)(outputStream, name, strlen(name));
+    sprintf(buf, "_%02x def\n", i >> 8);
+    (*outputFunc)(outputStream, buf, strlen(buf));
+    (*outputFunc)(outputStream, "/FontType 42 def\n", 17);
+    (*outputFunc)(outputStream, "/FontMatrix [1 0 0 1 0 0] def\n", 30);
+    sprintf(buf, "/FontBBox [%d %d %d %d] def\n",
 	    bbox[0], bbox[1], bbox[2], bbox[3]);
-    fprintf(out, "/PaintType 0 def\n");
-    fprintf(out, "/sfnts %s_sfnts def\n", name);
-    fprintf(out, "/Encoding 256 array\n");
+    (*outputFunc)(outputStream, buf, strlen(buf));
+    (*outputFunc)(outputStream, "/PaintType 0 def\n", 17);
+    (*outputFunc)(outputStream, "/sfnts ", 7);
+    (*outputFunc)(outputStream, name, strlen(name));
+    (*outputFunc)(outputStream, "_sfnts def\n", 11);
+    (*outputFunc)(outputStream, "/Encoding 256 array\n", 20);
     for (j = 0; j < 256 && i+j < n; ++j) {
-      fprintf(out, "dup %d /c%02x put\n", j, j);
+      sprintf(buf, "dup %d /c%02x put\n", j, j);
+      (*outputFunc)(outputStream, buf, strlen(buf));
     }
-    fprintf(out, "readonly def\n");
-    fprintf(out, "/CharStrings 257 dict dup begin\n");
-    fprintf(out, "/.notdef 0 def\n");
+    (*outputFunc)(outputStream, "readonly def\n", 13);
+    (*outputFunc)(outputStream, "/CharStrings 257 dict dup begin\n", 32);
+    (*outputFunc)(outputStream, "/.notdef 0 def\n", 15);
     for (j = 0; j < 256 && i+j < n; ++j) {
-      fprintf(out, "/c%02x %d def\n", j, cidMap ? cidMap[i+j] : i+j);
+      sprintf(buf, "/c%02x %d def\n", j, cidMap ? cidMap[i+j] : i+j);
+      (*outputFunc)(outputStream, buf, strlen(buf));
     }
-    fprintf(out, "end readonly def\n");
-    fprintf(out, "FontName currentdict end definefont pop\n");
+    (*outputFunc)(outputStream, "end readonly def\n", 17);
+    (*outputFunc)(outputStream,
+		  "FontName currentdict end definefont pop\n", 40);
   }
 
   // write the Type 0 parent font
-  fprintf(out, "16 dict begin\n");
-  fprintf(out, "/FontName /%s def\n", name);
-  fprintf(out, "/FontType 0 def\n");
-  fprintf(out, "/FontMatrix [1 0 0 1 0 0] def\n");
-  fprintf(out, "/FMapType 2 def\n");
-  fprintf(out, "/Encoding [\n");
+  (*outputFunc)(outputStream, "16 dict begin\n", 14);
+  (*outputFunc)(outputStream, "/FontName /", 11);
+  (*outputFunc)(outputStream, name, strlen(name));
+  (*outputFunc)(outputStream, " def\n", 5);
+  (*outputFunc)(outputStream, "/FontType 0 def\n", 16);
+  (*outputFunc)(outputStream, "/FontMatrix [1 0 0 1 0 0] def\n", 30);
+  (*outputFunc)(outputStream, "/FMapType 2 def\n", 16);
+  (*outputFunc)(outputStream, "/Encoding [\n", 12);
   for (i = 0; i < n; i += 256) {
-    fprintf(out, "%d\n", i >> 8);
+    sprintf(buf, "%d\n", i >> 8);
+    (*outputFunc)(outputStream, buf, strlen(buf));
   }
-  fprintf(out, "] def\n");
-  fprintf(out, "/FDepVector [\n");
+  (*outputFunc)(outputStream, "] def\n", 6);
+  (*outputFunc)(outputStream, "/FDepVector [\n", 14);
   for (i = 0; i < n; i += 256) {
-    fprintf(out, "/%s_%02x findfont\n", name, i >> 8);
+    (*outputFunc)(outputStream, "/", 1);
+    (*outputFunc)(outputStream, name, strlen(name));
+    sprintf(buf, "_%02x findfont\n", i >> 8);
+    (*outputFunc)(outputStream, buf, strlen(buf));
   }
-  fprintf(out, "] def\n");
-  fprintf(out, "FontName currentdict end definefont pop\n");
+  (*outputFunc)(outputStream, "] def\n", 6);
+  (*outputFunc)(outputStream, "FontName currentdict end definefont pop\n", 40);
 }
 
 int TrueTypeFontFile::getByte(int pos) {
@@ -2995,7 +3157,7 @@ double TrueTypeFontFile::getFixed(int pos) {
   return (double)x + (double)y / 65536;
 }
 
-int TrueTypeFontFile::seekTable(const char *tag) {
+int TrueTypeFontFile::seekTable(char *tag) {
   int i;
 
   for (i = 0; i < nTables; ++i) {
@@ -3006,7 +3168,7 @@ int TrueTypeFontFile::seekTable(const char *tag) {
   return -1;
 }
 
-int TrueTypeFontFile::seekTableIdx(const char *tag) {
+int TrueTypeFontFile::seekTableIdx(char *tag) {
   int i;
 
   for (i = 0; i < nTables; ++i) {
@@ -3017,33 +3179,49 @@ int TrueTypeFontFile::seekTableIdx(const char *tag) {
   return -1;
 }
 
-void TrueTypeFontFile::cvtEncoding(const char **encodingA, FILE *out) {
-  const char *name;
+void TrueTypeFontFile::cvtEncoding(char **encodingA, GBool pdfFontHasEncoding,
+				   FontFileOutputFunc outputFunc,
+				   void *outputStream) {
+  char *name;
+  char buf[64];
   int i;
 
-  fprintf(out, "/Encoding 256 array\n");
-  for (i = 0; i < 256; ++i) {
-    if (!(name = encodingA[i])) {
-      name = ".notdef";
+  (*outputFunc)(outputStream, "/Encoding 256 array\n", 20);
+  if (pdfFontHasEncoding) {
+    for (i = 0; i < 256; ++i) {
+      if (!(name = encodingA[i])) {
+	name = ".notdef";
+      }
+      sprintf(buf, "dup %d /", i);
+      (*outputFunc)(outputStream, buf, strlen(buf));
+      (*outputFunc)(outputStream, name, strlen(name));
+      (*outputFunc)(outputStream, " put\n", 5);
     }
-    fprintf(out, "dup %d /%s put\n", i, name);
+  } else {
+    for (i = 0; i < 256; ++i) {
+      sprintf(buf, "dup %d /c%02x put\n", i, i);
+      (*outputFunc)(outputStream, buf, strlen(buf));
+    }
   }
-  fprintf(out, "readonly def\n");
+  (*outputFunc)(outputStream, "readonly def\n", 13);
 }
 
-void TrueTypeFontFile::cvtCharStrings(const char **encodingA,
+void TrueTypeFontFile::cvtCharStrings(char **encodingA,
 				      CharCodeToUnicode *toUnicode,
-				      GBool pdfFontHasEncoding, FILE *out) {
+				      GBool pdfFontHasEncoding,
+				      FontFileOutputFunc outputFunc,
+				      void *outputStream) {
   int unicodeCmap, macRomanCmap, msSymbolCmap;
   int nCmaps, cmapPlatform, cmapEncoding, cmapFmt, cmapOffset;
   T42FontIndexMode mode;
-  const char *name;
+  char *name;
+  char buf[64], buf2[16];
   Unicode u;
   int pos, i, j, k;
 
   // always define '.notdef'
-  fprintf(out, "/CharStrings 256 dict dup begin\n");
-  fprintf(out, "/.notdef 0 def\n");
+  (*outputFunc)(outputStream, "/CharStrings 256 dict dup begin\n", 32);
+  (*outputFunc)(outputStream, "/.notdef 0 def\n", 15);
 
   // if there's no 'cmap' table, punt
   if ((pos = seekTable("cmap")) < 0) {
@@ -3114,7 +3292,12 @@ void TrueTypeFontFile::cvtCharStrings(const char **encodingA,
   // 2. use cmap to map char code to glyph index
   j = 0; // make gcc happy
   for (i = 0; i < 256; ++i) {
-    name = encodingA[i];
+    if (pdfFontHasEncoding) {
+      name = encodingA[i];
+    } else {
+      sprintf(buf2, "c%02x", i);
+      name = buf2;
+    }
     if (name && strcmp(name, ".notdef")) {
       switch (mode) {
       case t42FontModeUnicode:
@@ -3137,13 +3320,16 @@ void TrueTypeFontFile::cvtCharStrings(const char **encodingA,
       // test
       if ((k = getCmapEntry(cmapFmt, pos, j)) > 0 &&
 	  k < nGlyphs) {
-	fprintf(out, "/%s %d def\n", name, k);
+	(*outputFunc)(outputStream, "/", 1);
+	(*outputFunc)(outputStream, name, strlen(name));
+	sprintf(buf, " %d def\n", k);
+	(*outputFunc)(outputStream, buf, strlen(buf));
       }
     }
   }
 
  err:
-  fprintf(out, "end readonly def\n");
+  (*outputFunc)(outputStream, "end readonly def\n", 17);
 }
 
 int TrueTypeFontFile::getCmapEntry(int cmapFmt, int pos, int code) {
@@ -3208,11 +3394,20 @@ int TrueTypeFontFile::getCmapEntry(int cmapFmt, int pos, int code) {
   return 0;
 }
 
-void TrueTypeFontFile::cvtSfnts(FILE *out, GString *name) {
+static int cmpTrueTypeLocaIdx(const void *p1, const void *p2) {
+  return ((TrueTypeLoca *)p1)->idx - ((TrueTypeLoca *)p2)->idx;
+}
+
+static int cmpTrueTypeLocaPos(const void *p1, const void *p2) {
+  return ((TrueTypeLoca *)p1)->pos - ((TrueTypeLoca *)p2)->pos;
+}
+
+void TrueTypeFontFile::cvtSfnts(FontFileOutputFunc outputFunc,
+				void *outputStream, GString *name) {
   TTFontTableHdr newTableHdrs[nT42Tables];
   char tableDir[12 + nT42Tables*16];
   char headTable[54];
-  int *origLocaTable;
+  TrueTypeLoca *origLocaTable;
   char *locaTable;
   int nNewTables;
   Guint checksum;
@@ -3223,30 +3418,29 @@ void TrueTypeFontFile::cvtSfnts(FILE *out, GString *name) {
   memcpy(headTable, file + seekTable("head"), 54);
   headTable[8] = headTable[9] = headTable[10] = headTable[11] = (char)0;
 
-  // read the original 'loca' table and construct the new one
-  // (pad each glyph out to a multiple of 4 bytes)
-  origLocaTable = (int *)gmalloc((nGlyphs + 1) * sizeof(int));
+  // read the original 'loca' table and construct the new one,
+  // padding each glyph out to a multiple of 4 bytes, and also
+  // sorting the glyph data into glyph index order
+  origLocaTable = (TrueTypeLoca *)gmalloc((nGlyphs + 1) *
+					  sizeof(TrueTypeLoca));
   pos = seekTable("loca");
   for (i = 0; i <= nGlyphs; ++i) {
+    origLocaTable[i].idx = i;
     if (locaFmt) {
-      origLocaTable[i] = getULong(pos + 4*i);
+      origLocaTable[i].pos = getULong(pos + 4*i);
     } else {
-      origLocaTable[i] = 2 * getUShort(pos + 2*i);
+      origLocaTable[i].pos = 2 * getUShort(pos + 2*i);
     }
   }
+  qsort(origLocaTable, nGlyphs + 1, sizeof(TrueTypeLoca), &cmpTrueTypeLocaPos);
+  for (i = 0; i < nGlyphs; ++i) {
+    origLocaTable[i].length = origLocaTable[i+1].pos - origLocaTable[i].pos;
+  }
+  origLocaTable[nGlyphs].length = 0;
+  qsort(origLocaTable, nGlyphs + 1, sizeof(TrueTypeLoca), &cmpTrueTypeLocaIdx);
   locaTable = (char *)gmalloc((nGlyphs + 1) * (locaFmt ? 4 : 2));
-  if (locaFmt) {
-    locaTable[0] = locaTable[1] = locaTable[2] = locaTable[3] = 0;
-  } else {
-    locaTable[0] = locaTable[1] = 0;
-  }
   pos = 0;
-  for (i = 1; i <= nGlyphs; ++i) {
-    length = origLocaTable[i] - origLocaTable[i-1];
-    if (length & 3) {
-      length += 4 - (length & 3);
-    }
-    pos += length;
+  for (i = 0; i <= nGlyphs; ++i) {
     if (locaFmt) {
       locaTable[4*i  ] = (char)(pos >> 24);
       locaTable[4*i+1] = (char)(pos >> 16);
@@ -3256,6 +3450,11 @@ void TrueTypeFontFile::cvtSfnts(FILE *out, GString *name) {
       locaTable[2*i  ] = (char)(pos >> 9);
       locaTable[2*i+1] = (char)(pos >> 1);
     }
+    length = origLocaTable[i].length;
+    if (length & 3) {
+      length += 4 - (length & 3);
+    }
+    pos += length;
   }
 
   // count the number of tables
@@ -3285,10 +3484,10 @@ void TrueTypeFontFile::cvtSfnts(FILE *out, GString *name) {
       checksum = 0;
       glyfPos = seekTable("glyf");
       for (j = 0; j < nGlyphs; ++j) {
-	glyphLength = origLocaTable[j+1] - origLocaTable[j];
+	glyphLength = origLocaTable[j].length;
 	pad = (glyphLength & 3) ? 4 - (glyphLength & 3) : 0;
 	length += glyphLength + pad;
-	checksum += computeTableChecksum(file + glyfPos + origLocaTable[j],
+	checksum += computeTableChecksum(file + glyfPos + origLocaTable[j].pos,
 					 glyphLength);
       }
     } else {
@@ -3360,27 +3559,30 @@ void TrueTypeFontFile::cvtSfnts(FILE *out, GString *name) {
 
   // start the sfnts array
   if (name) {
-    fprintf(out, "/%s [\n", name->getCString());
+    (*outputFunc)(outputStream, "/", 1);
+    (*outputFunc)(outputStream, name->getCString(), name->getLength());
+    (*outputFunc)(outputStream, " [\n", 3);
   } else {
-    fprintf(out, "/sfnts [\n");
+    (*outputFunc)(outputStream, "/sfnts [\n", 9);
   }
 
   // write the table directory
-  dumpString(tableDir, 12 + nNewTables*16, out);
+  dumpString(tableDir, 12 + nNewTables*16, outputFunc, outputStream);
 
   // write the tables
   for (i = 0; i < nNewTables; ++i) {
     if (i == t42HeadTable) {
-      dumpString(headTable, 54, out);
+      dumpString(headTable, 54, outputFunc, outputStream);
     } else if (i == t42LocaTable) {
       length = (nGlyphs + 1) * (locaFmt ? 4 : 2);
-      dumpString(locaTable, length, out);
+      dumpString(locaTable, length, outputFunc, outputStream);
     } else if (i == t42GlyfTable) {
       glyfPos = seekTable("glyf");
       for (j = 0; j < nGlyphs; ++j) {
-	length = origLocaTable[j+1] - origLocaTable[j];
+	length = origLocaTable[j].length;
 	if (length > 0) {
-	  dumpString(file + glyfPos + origLocaTable[j], length, out);
+	  dumpString(file + glyfPos + origLocaTable[j].pos, length,
+		     outputFunc, outputStream);
 	}
       }
     } else {
@@ -3388,43 +3590,48 @@ void TrueTypeFontFile::cvtSfnts(FILE *out, GString *name) {
       // already reported during the construction of the table
       // headers
       if ((length = newTableHdrs[i].length) > 0) {
-	dumpString(file + seekTable(t42Tables[i].tag), length, out);
+	dumpString(file + seekTable(t42Tables[i].tag), length,
+		   outputFunc, outputStream);
       }
     }
   }
 
   // end the sfnts array
-  fprintf(out, "] def\n");
+  (*outputFunc)(outputStream, "] def\n", 6);
 
   gfree(origLocaTable);
   gfree(locaTable);
 }
 
-void TrueTypeFontFile::dumpString(const char *s, int length, FILE *out) {
+void TrueTypeFontFile::dumpString(char *s, int length,
+				  FontFileOutputFunc outputFunc,
+				  void *outputStream) {
+  char buf[64];
   int pad, i, j;
 
-  fprintf(out, "<");
+  (*outputFunc)(outputStream, "<", 1);
   for (i = 0; i < length; i += 32) {
     for (j = 0; j < 32 && i+j < length; ++j) {
-      fprintf(out, "%02X", s[i+j] & 0xff);
+      sprintf(buf, "%02X", s[i+j] & 0xff);
+      (*outputFunc)(outputStream, buf, strlen(buf));
     }
     if (i % (65536 - 32) == 65536 - 64) {
-      fprintf(out, ">\n<");
+      (*outputFunc)(outputStream, ">\n<", 3);
     } else if (i+32 < length) {
-      fprintf(out, "\n");
+      (*outputFunc)(outputStream, "\n", 1);
     }
   }
   if (length & 3) {
     pad = 4 - (length & 3);
     for (i = 0; i < pad; ++i) {
-      fprintf(out, "00");
+      (*outputFunc)(outputStream, "00", 2);
     }
   }
   // add an extra zero byte because the Adobe Type 42 spec says so
-  fprintf(out, "00>\n");
+  (*outputFunc)(outputStream, "00>\n", 4);
 }
 
-Guint TrueTypeFontFile::computeTableChecksum(const char *data, int length) {
+Guint TrueTypeFontFile::computeTableChecksum(char *data, int length) {
   Guint checksum, word;
   int i;
 
@@ -3495,7 +3702,7 @@ void TrueTypeFontFile::writeTTF(FILE *out) {
   haveName = seekTable("name") >= 0;
   havePost = seekTable("post") >= 0;
   nNewTables = (haveCmap ? 0 : 1) + (haveName ? 0 : 1) + (havePost ? 0 : 1);
-  if (!nNewTables) {
+  if (!nNewTables && !mungedCmapSize) {
     // none are missing - write the TTF file as is
     fwrite(file, 1, len, out);
     return;
@@ -3586,12 +3793,23 @@ void TrueTypeFontFile::writeTTF(FILE *out) {
       ++j;
       dirPost = gTrue;
     }
-    memcpy(&tableDir[12 + 16*j], file + 12 + 16*i, 16);
+    tableDir[12 + 16*j     ] = tableHdrs[i].tag[0];
+    tableDir[12 + 16*j +  1] = tableHdrs[i].tag[1];
+    tableDir[12 + 16*j +  2] = tableHdrs[i].tag[2];
+    tableDir[12 + 16*j +  3] = tableHdrs[i].tag[3];
+    tableDir[12 + 16*j +  4] = (char)((tableHdrs[i].checksum >> 24) & 0xff);
+    tableDir[12 + 16*j +  5] = (char)((tableHdrs[i].checksum >> 16) & 0xff);
+    tableDir[12 + 16*j +  6] = (char)((tableHdrs[i].checksum >>  8) & 0xff);
+    tableDir[12 + 16*j +  7] = (char)( tableHdrs[i].checksum        & 0xff);
     t = tableHdrs[i].offset + nNewTables * 16;
     tableDir[12 + 16*j +  8] = (char)((t >> 24) & 0xff);
     tableDir[12 + 16*j +  9] = (char)((t >> 16) & 0xff);
     tableDir[12 + 16*j + 10] = (char)((t >>  8) & 0xff);
     tableDir[12 + 16*j + 11] = (char)( t        & 0xff);
+    tableDir[12 + 16*j + 12] = (char)((tableHdrs[i].length >> 24) & 0xff);
+    tableDir[12 + 16*j + 13] = (char)((tableHdrs[i].length >> 16) & 0xff);
+    tableDir[12 + 16*j + 14] = (char)((tableHdrs[i].length >>  8) & 0xff);
+    tableDir[12 + 16*j + 15] = (char)( tableHdrs[i].length        & 0xff);
     ++j;
   }
   if (!dirCmap) {

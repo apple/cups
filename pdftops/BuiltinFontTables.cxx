@@ -1448,6 +1448,7 @@ static BuiltinFontWidth helveticaBoldWidthsTab[] = {
   { "ydieresis",                         556, NULL },
   { "Ccedilla",                          722, NULL },
   { "tilde",                             333, NULL },
+  { "dbldaggerumlaut",                   556, NULL },
   { "at",                                975, NULL },
   { "eacute",                            556, NULL },
   { "underscore",                        556, NULL },
@@ -3346,7 +3347,7 @@ void initBuiltinFontTables() {
   builtinFonts[2].widths = new BuiltinFontWidths(courierBoldObliqueWidthsTab, 260);
   builtinFonts[3].widths = new BuiltinFontWidths(courierObliqueWidthsTab, 260);
   builtinFonts[4].widths = new BuiltinFontWidths(helveticaWidthsTab, 228);
-  builtinFonts[5].widths = new BuiltinFontWidths(helveticaBoldWidthsTab, 228);
+  builtinFonts[5].widths = new BuiltinFontWidths(helveticaBoldWidthsTab, 229);
   builtinFonts[6].widths = new BuiltinFontWidths(helveticaBoldObliqueWidthsTab, 228);
   builtinFonts[7].widths = new BuiltinFontWidths(helveticaObliqueWidthsTab, 228);
   builtinFonts[8].widths = new BuiltinFontWidths(symbolWidthsTab, 189);

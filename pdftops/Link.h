@@ -9,7 +9,9 @@
 #ifndef LINK_H
 #define LINK_H
 
-#ifdef __GNUC__
+#include <config.h>
+
+#ifdef USE_GCC_PRAGMAS
 #pragma interface
 #endif
 
@@ -29,6 +31,7 @@ enum LinkActionKind {
   actionLaunch,			// launch app (or open document)
   actionURI,			// URI
   actionNamed,			// named action
+  actionMovie,			// movie action
   actionUnknown			// anything else
 };
 
@@ -43,6 +46,16 @@ public:
 
   // Check link action type.
   virtual LinkActionKind getKind() = 0;
+
+  // Parse a destination (old-style action) name, string, or array.
+  static LinkAction *parseDest(Object *obj);
+
+  // Parse an action dictionary.
+  static LinkAction *parseAction(Object *obj, GString *baseURI = NULL);
+
+  // Extract a file name from a file specification (string or
+  // dictionary).
+  static GString *getFileSpecName(Object *fileSpecObj);
 };
 
 //------------------------------------------------------------------------
@@ -240,6 +253,30 @@ private:
 };
 
 //------------------------------------------------------------------------
+// LinkMovie
+//------------------------------------------------------------------------
+
+class LinkMovie: public LinkAction {
+public:
+
+  LinkMovie(Object *annotObj, Object *titleObj);
+
+  virtual ~LinkMovie();
+
+  virtual GBool isOk() { return annotRef.num >= 0 || title != NULL; }
+
+  virtual LinkActionKind getKind() { return actionMovie; }
+  GBool hasAnnotRef() { return annotRef.num >= 0; }
+  Ref *getAnnotRef() { return &annotRef; }
+  GString *getTitle() { return title; }
+
+private:
+
+  Ref annotRef;
+  GString *title;
+};
+
+//------------------------------------------------------------------------
 // LinkUnknown
 //------------------------------------------------------------------------
 
@@ -247,7 +284,7 @@ class LinkUnknown: public LinkAction {
 public:
 
   // Build a LinkUnknown with the specified action type.
-  LinkUnknown(const char *actionA);
+  LinkUnknown(char *actionA);
 
   // Destructor.
   virtual ~LinkUnknown();

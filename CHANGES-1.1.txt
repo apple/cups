@@ -3,6 +3,8 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.18
 
+	- Upgraded pdftops filter to Xpdf 2.01 with fixes for
+	  TrueType fonts.
 	- Added a MaxClientsPerHost configuration directive to
 	  provide limited protection against Denial of Service
 	  attacks.

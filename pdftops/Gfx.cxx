@@ -6,16 +6,18 @@
 //
 //========================================================================
 
-#ifdef __GNUC__
+#include <config.h>
+
+#ifdef USE_GCC_PRAGMAS
 #pragma implementation
 #endif
 
-#include <config.h>
 #include <stdio.h>
 #include <stddef.h>
 #include <string.h>
 #include <math.h>
 #include "gmem.h"
+#include "GlobalParams.h"
 #include "CharTypes.h"
 #include "Object.h"
 #include "Array.h"
@@ -34,11 +36,6 @@
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
 #endif
-
-// Some systems don't define the constant for PI...
-#ifndef M_PI
-#  define M_PI		3.14159265358979323846
-#endif // !M_PI
 
 //------------------------------------------------------------------------
 // constants
@@ -271,7 +268,7 @@ GfxResources::~GfxResources() {
   gStateDict.free();
 }
 
-GfxFont *GfxResources::lookupFont(const char *name) {
+GfxFont *GfxResources::lookupFont(char *name) {
   GfxFont *font;
   GfxResources *resPtr;
 
@@ -285,7 +282,7 @@ GfxFont *GfxResources::lookupFont(const char *name) {
   return NULL;
 }
 
-GBool GfxResources::lookupXObject(const char *name, Object *obj) {
+GBool GfxResources::lookupXObject(char *name, Object *obj) {
   GfxResources *resPtr;
 
   for (resPtr = this; resPtr; resPtr = resPtr->next) {
@@ -299,7 +296,7 @@ GBool GfxResources::lookupXObject(const char *name, Object *obj) {
   return gFalse;
 }
 
-GBool GfxResources::lookupXObjectNF(const char *name, Object *obj) {
+GBool GfxResources::lookupXObjectNF(char *name, Object *obj) {
   GfxResources *resPtr;
 
   for (resPtr = this; resPtr; resPtr = resPtr->next) {
@@ -313,7 +310,7 @@ GBool GfxResources::lookupXObjectNF(const char *name, Object *obj) {
   return gFalse;
 }
 
-void GfxResources::lookupColorSpace(const char *name, Object *obj) {
+void GfxResources::lookupColorSpace(char *name, Object *obj) {
   GfxResources *resPtr;
 
   for (resPtr = this; resPtr; resPtr = resPtr->next) {
@@ -327,7 +324,7 @@ void GfxResources::lookupColorSpace(const char *name, Object *obj) {
   obj->initNull();
 }
 
-GfxPattern *GfxResources::lookupPattern(const char *name) {
+GfxPattern *GfxResources::lookupPattern(char *name) {
   GfxResources *resPtr;
   GfxPattern *pattern;
   Object obj;
@@ -346,7 +343,7 @@ GfxPattern *GfxResources::lookupPattern(const char *name) {
   return NULL;
 }
 
-GfxShading *GfxResources::lookupShading(const char *name) {
+GfxShading *GfxResources::lookupShading(char *name) {
   GfxResources *resPtr;
   GfxShading *shading;
   Object obj;
@@ -365,7 +362,7 @@ GfxShading *GfxResources::lookupShading(const char *name) {
   return NULL;
 }
 
-GBool GfxResources::lookupGState(const char *name, Object *obj) {
+GBool GfxResources::lookupGState(char *name, Object *obj) {
   GfxResources *resPtr;
 
   for (resPtr = this; resPtr; resPtr = resPtr->next) {
@@ -386,12 +383,13 @@ GBool GfxResources::lookupGState(const char *name, Object *obj) {
 
 Gfx::Gfx(XRef *xrefA, OutputDev *outA, int pageNum, Dict *resDict, double dpi,
 	 PDFRectangle *box, GBool crop, PDFRectangle *cropBox, int rotate,
-	 GBool printCommandsA) {
+	 GBool (*abortCheckCbkA)(void *data),
+	 void *abortCheckCbkDataA) {
   int i;
 
   xref = xrefA;
   subPage = gFalse;
-  printCommands = printCommandsA;
+  printCommands = globalParams->getPrintCommands();
 
   // start the resource stack
   res = new GfxResources(xref, resDict, NULL);
@@ -408,6 +406,8 @@ Gfx::Gfx(XRef *xrefA, OutputDev *outA, int pageNum, Dict *resDict, double dpi,
   for (i = 0; i < 6; ++i) {
     baseMatrix[i] = state->getCTM()[i];
   }
+  abortCheckCbk = abortCheckCbkA;
+  abortCheckCbkData = abortCheckCbkDataA;
 
   // set crop box
   if (crop) {
@@ -423,12 +423,14 @@ Gfx::Gfx(XRef *xrefA, OutputDev *outA, int pageNum, Dict *resDict, double dpi,
 }
 
 Gfx::Gfx(XRef *xrefA, OutputDev *outA, Dict *resDict,
-	 PDFRectangle *box, GBool crop, PDFRectangle *cropBox) {
+	 PDFRectangle *box, GBool crop, PDFRectangle *cropBox,
+	 GBool (*abortCheckCbkA)(void *data),
+	 void *abortCheckCbkDataA) {
   int i;
 
   xref = xrefA;
   subPage = gTrue;
-  printCommands = gFalse;
+  printCommands = globalParams->getPrintCommands();
 
   // start the resource stack
   res = new GfxResources(xref, resDict, NULL);
@@ -442,6 +444,8 @@ Gfx::Gfx(XRef *xrefA, OutputDev *outA, Dict *resDict,
   for (i = 0; i < 6; ++i) {
     baseMatrix[i] = state->getCTM()[i];
   }
+  abortCheckCbk = abortCheckCbkA;
+  abortCheckCbkData = abortCheckCbkDataA;
 
   // set crop box
   if (crop) {
@@ -499,11 +503,11 @@ void Gfx::display(Object *obj, GBool topLevel) {
 void Gfx::go(GBool topLevel) {
   Object obj;
   Object args[maxArgs];
-  int numArgs;
-  int i;
+  int numArgs, i;
+  int lastAbortCheck;
 
   // scan a sequence of objects
-  updateLevel = 0;
+  updateLevel = lastAbortCheck = 0;
   numArgs = 0;
   parser->getObj(&obj);
   while (!obj.isEOF()) {
@@ -529,6 +533,16 @@ void Gfx::go(GBool topLevel) {
       if (++updateLevel >= 20000) {
 	out->dump();
 	updateLevel = 0;
+      }
+
+      // check for an abort
+      if (abortCheckCbk) {
+	if (updateLevel - lastAbortCheck > 10) {
+	  if ((*abortCheckCbk)(abortCheckCbkData)) {
+	    break;
+	  }
+	  lastAbortCheck = updateLevel;
+	}
       }
 
     // got an argument - save it
@@ -576,11 +590,11 @@ void Gfx::go(GBool topLevel) {
 
 void Gfx::execOp(Object *cmd, Object args[], int numArgs) {
   Operator *op;
-  const char *name;
+  char *name;
   int i;
 
   // find operator
-  name = cmd->getName();
+  name = cmd->getCmd();
   if (!(op = findOp(name))) {
     if (ignoreUndef == 0)
       error(getPos(), "Unknown operator '%s'", name);
@@ -613,7 +627,7 @@ void Gfx::execOp(Object *cmd, Object args[], int numArgs) {
   (this->*op->func)(args, numArgs);
 }
 
-Operator *Gfx::findOp(const char *name) {
+Operator *Gfx::findOp(char *name) {
   int a, b, m, cmp;
 
   a = -1;
@@ -1811,7 +1825,7 @@ void Gfx::doRadialShFill(GfxRadialShading *shading) {
 }
 
 void Gfx::doEndPath() {
-  if (state->isPath() && clip != clipNone) {
+  if (state->isCurPt() && clip != clipNone) {
     state->clip();
     if (clip == clipNormal) {
       out->clip(state);
@@ -2024,7 +2038,7 @@ void Gfx::doShowText(GString *s) {
   double riseX, riseY;
   CharCode code;
   Unicode u[8];
-  double x, y, dx, dy, dx2, dy2, curX, curY, tdx, tdy;
+  double x, y, dx, dy, dx2, dy2, curX, curY, tdx, tdy, lineX, lineY;
   double originX, originY, tOriginX, tOriginY;
   double oldCTM[6], newCTM[6];
   double *mat;
@@ -2068,6 +2082,8 @@ void Gfx::doShowText(GString *s) {
     state->textTransformDelta(0, state->getRise(), &riseX, &riseY);
     curX = state->getCurX();
     curY = state->getCurY();
+    lineX = state->getLineX();
+    lineY = state->getLineY();
     oldParser = parser;
     p = s->getCString();
     len = s->getLength();
@@ -2106,10 +2122,11 @@ void Gfx::doShowText(GString *s) {
       state = state->restore();
       out->restoreState(state);
       // GfxState::restore() does *not* restore the current position,
-      // so we track it here with (curX, curY)
+      // so we deal with it here using (curX, curY) and (lineX, lineY)
       curX += tdx;
       curY += tdy;
       state->moveTo(curX, curY);
+      state->textSetPos(lineX, lineY);
       p += n;
       len -= n;
     }
@@ -2665,7 +2682,7 @@ void Gfx::opBeginImage(Object args[], int numArgs) {
 Stream *Gfx::buildImageStream() {
   Object dict;
   Object obj;
-  const char *key;
+  char *key;
   Stream *str;
 
   // build dictionary
@@ -2680,7 +2697,7 @@ Stream *Gfx::buildImageStream() {
       obj.free();
       parser->getObj(&obj);
       if (obj.isEOF() || obj.isError()) {
-	gfree((void *)key);
+	gfree(key);
 	break;
       }
       dict.dictAdd(key, &obj);

@@ -9,7 +9,9 @@
 #ifndef PSOUTPUTDEV_H
 #define PSOUTPUTDEV_H
 
-#ifdef __GNUC__
+#include <config.h>
+
+#ifdef USE_GCC_PRAGMAS
 #pragma interface
 #endif
 
@@ -39,14 +41,22 @@ enum PSOutMode {
 enum PSFileType {
   psFile,			// write to file
   psPipe,			// write to pipe
-  psStdout			// write to stdout
+  psStdout,			// write to stdout
+  psGeneric			// write to a generic stream
 };
+
+typedef void (*PSOutputFunc)(void *stream, char *data, int len);
 
 class PSOutputDev: public OutputDev {
 public:
 
   // Open a PostScript output file, and write the prolog.
   PSOutputDev(char *fileName, XRef *xrefA, Catalog *catalog,
+	      int firstPage, int lastPage, PSOutMode modeA);
+
+  // Open a PSOutputDev that will write to a generic stream.
+  PSOutputDev(PSOutputFunc outputFuncA, void *outputStreamA,
+	      XRef *xrefA, Catalog *catalog,
 	      int firstPage, int lastPage, PSOutMode modeA);
 
   // Destructor -- writes the trailer and closes the file.
@@ -137,8 +147,12 @@ public:
   //----- PostScript XObjects
   virtual void psXObject(Stream *psStream, Stream *level1Stream);
 
+
 private:
 
+  void init(PSOutputFunc outputFuncA, void *outputStreamA,
+	    PSFileType fileTypeA, XRef *xrefA, Catalog *catalog,
+	    int firstPage, int lastPage, PSOutMode modeA);
   void setupResources(Dict *resDict);
   void setupFonts(Dict *resDict);
   void setupFont(GfxFont *font, Dict *parentResDict);
@@ -172,9 +186,11 @@ private:
 		    double *x1, double *y1);
   GBool getFileSpec(Object *fileSpec, Object *fileName);
 #endif
-  void writePS(const char *fmt, ...);
-  void writePSString(GString *s);
   void writePSChar(char c);
+  void writePS(char *s);
+  void writePSFmt(const char *fmt, ...);
+  void writePSString(GString *s);
+  void writePSName(char *s);
   GString *filterPSName(GString *name);
 
   PSLevel level;		// PostScript level (1, 2, separation)
@@ -182,7 +198,8 @@ private:
   int paperWidth;		// width of paper, in pts
   int paperHeight;		// height of paper, in pts
 
-  FILE *f;			// PostScript file
+  PSOutputFunc outputFunc;
+  void *outputStream;
   PSFileType fileType;		// file / pipe / stdout
   int seqPage;			// current sequential page number
 
@@ -223,6 +240,7 @@ private:
 #endif
 
   GBool ok;			// set up ok?
+
 };
 
 #endif

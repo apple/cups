@@ -6,11 +6,12 @@
 //
 //========================================================================
 
-#ifdef __GNUC__
+#include <config.h>
+
+#ifdef USE_GCC_PRAGMAS
 #pragma implementation
 #endif
 
-#include <config.h>
 #include <stdlib.h>
 #include <stddef.h>
 #include <string.h>
@@ -454,6 +455,7 @@ GBool XRef::checkEncrypted(GString *ownerPassword, GString *userPassword) {
   ret = gFalse;
 
   permFlags = defPermFlags;
+  ownerPasswordOk = gFalse;
   trailerDict.dictLookup("Encrypt", &encrypt);
   if ((encrypted1 = encrypt.isDict())) {
     ret = gTrue;

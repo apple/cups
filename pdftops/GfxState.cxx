@@ -6,11 +6,12 @@
 //
 //========================================================================
 
-#ifdef __GNUC__
+#include <config.h>
+
+#ifdef USE_GCC_PRAGMAS
 #pragma implementation
 #endif
 
-#include <config.h>
 #include <stddef.h>
 #include <math.h>
 #include <string.h> // for memcpy()
@@ -26,6 +27,24 @@
 static inline double clip01(double x) {
   return (x < 0) ? 0 : ((x > 1) ? 1 : x);
 }
+
+//------------------------------------------------------------------------
+
+static char *gfxColorSpaceModeNames[] = {
+  "DeviceGray",
+  "CalGray",
+  "DeviceRGB",
+  "CalRGB",
+  "DeviceCMYK",
+  "Lab",
+  "ICCBased",
+  "Indexed",
+  "Separation",
+  "DeviceN",
+  "Pattern"
+};
+
+#define nGfxColorSpaceModes ((sizeof(gfxColorSpaceModeNames) / sizeof(char *)))
 
 //------------------------------------------------------------------------
 // GfxColorSpace
@@ -96,6 +115,14 @@ void GfxColorSpace::getDefaultRanges(double *decodeLow, double *decodeRange,
     decodeLow[i] = 0;
     decodeRange[i] = 1;
   }
+}
+
+int GfxColorSpace::getNumColorSpaceModes() {
+  return nGfxColorSpaceModes;
+}
+
+char *GfxColorSpace::getColorSpaceModeName(int idx) {
+  return gfxColorSpaceModeNames[idx];
 }
 
 //------------------------------------------------------------------------
@@ -833,43 +860,37 @@ GfxColorSpace *GfxIndexedColorSpace::parse(Array *arr) {
   return NULL;
 }
 
-void GfxIndexedColorSpace::getGray(GfxColor *color, double *gray) {
+GfxColor *GfxIndexedColorSpace::mapColorToBase(GfxColor *color,
+					       GfxColor *baseColor) {
   Guchar *p;
-  GfxColor color2;
+  double low[gfxColorMaxComps], range[gfxColorMaxComps];
   int n, i;
 
   n = base->getNComps();
+  base->getDefaultRanges(low, range, indexHigh);
   p = &lookup[(int)(color->c[0] + 0.5) * n];
   for (i = 0; i < n; ++i) {
-    color2.c[i] = p[i] / 255.0;
+    baseColor->c[i] = low[i] + (p[i] / 255.0) * range[i];
   }
-  base->getGray(&color2, gray);
+  return baseColor;
+}
+
+void GfxIndexedColorSpace::getGray(GfxColor *color, double *gray) {
+  GfxColor color2;
+
+  base->getGray(mapColorToBase(color, &color2), gray);
 }
 
 void GfxIndexedColorSpace::getRGB(GfxColor *color, GfxRGB *rgb) {
-  Guchar *p;
   GfxColor color2;
-  int n, i;
 
-  n = base->getNComps();
-  p = &lookup[(int)(color->c[0] + 0.5) * n];
-  for (i = 0; i < n; ++i) {
-    color2.c[i] = p[i] / 255.0;
-  }
-  base->getRGB(&color2, rgb);
+  base->getRGB(mapColorToBase(color, &color2), rgb);
 }
 
 void GfxIndexedColorSpace::getCMYK(GfxColor *color, GfxCMYK *cmyk) {
-  Guchar *p;
   GfxColor color2;
-  int n, i;
 
-  n = base->getNComps();
-  p = &lookup[(int)(color->c[0] + 0.5) * n];
-  for (i = 0; i < n; ++i) {
-    color2.c[i] = p[i] / 255.0;
-  }
-  base->getCMYK(&color2, cmyk);
+  base->getCMYK(mapColorToBase(color, &color2), cmyk);
 }
 
 void GfxIndexedColorSpace::getDefaultRanges(double *decodeLow,
@@ -1480,17 +1501,17 @@ void GfxAxialShading::getColor(double t, GfxColor *color) {
 //------------------------------------------------------------------------
 
 GfxRadialShading::GfxRadialShading(double x0A, double y0A, double r0A,
-				 double x1A, double y1A, double r1A,
-				 double t0A, double t1A,
-				 Function **funcsA, int nFuncsA,
-				 GBool extend0A, GBool extend1A) {
+				   double x1A, double y1A, double r1A,
+				   double t0A, double t1A,
+				   Function **funcsA, int nFuncsA,
+				   GBool extend0A, GBool extend1A) {
   int i;
 
   x0 = x0A;
   y0 = y0A;
+  r0 = r0A;
   x1 = x1A;
   y1 = y1A;
-  r0 = r0A;
   r1 = r1A;
   t0 = t0A;
   t1 = t1A;
@@ -1511,8 +1532,7 @@ GfxRadialShading::~GfxRadialShading() {
 }
 
 GfxRadialShading *GfxRadialShading::parse(Dict *dict) {
-  double x0A, y0A, x1A, y1A;
-  double r0A, r1A;
+  double x0A, y0A, r0A, x1A, y1A, r1A;
   double t0A, t1A;
   Function *funcsA[gfxColorMaxComps];
   int nFuncsA;
@@ -1520,7 +1540,7 @@ GfxRadialShading *GfxRadialShading::parse(Dict *dict) {
   Object obj1, obj2;
   int i;
 
-  x0A = y0A = x1A = y1A = r0A = r1A = 0;
+  x0A = y0A = r0A = x1A = y1A = r1A = 0;
   if (dict->lookup("Coords", &obj1)->isArray() &&
       obj1.arrayGetLength() == 6) {
     x0A = obj1.arrayGet(0, &obj2)->getNum();
@@ -1572,11 +1592,6 @@ GfxRadialShading *GfxRadialShading::parse(Dict *dict) {
     }
   }
   obj1.free();
-  for (i = 0; i < nFuncsA; ++i) {
-    if (!funcsA[i]->isOk()) {
-      goto err2;
-    }
-  }
 
   extend0A = extend1A = gFalse;
   if (dict->lookup("Extend", &obj1)->isArray() &&
@@ -1589,12 +1604,8 @@ GfxRadialShading *GfxRadialShading::parse(Dict *dict) {
   obj1.free();
 
   return new GfxRadialShading(x0A, y0A, r0A, x1A, y1A, r1A, t0A, t1A,
-			     funcsA, nFuncsA, extend0A, extend1A);
+			      funcsA, nFuncsA, extend0A, extend1A);
 
- err2:
-  for (i = 0; i < nFuncsA; ++i) {
-    delete funcsA[i];
-  }
  err1:
   return NULL;
 }
@@ -1676,10 +1687,11 @@ GfxImageColorMap::GfxImageColorMap(int bitsA, Object *decode,
     nComps2 = colorSpace2->getNComps();
     lookup = (double *)gmalloc((indexHigh + 1) * nComps2 * sizeof(double));
     lookup2 = indexedCS->getLookup();
+    colorSpace2->getDefaultRanges(x, y, indexHigh);
     for (i = 0; i <= indexHigh; ++i) {
-      j = (int)(decodeLow[0] +(i * decodeRange[0]) / maxPixel + 0.5);
+      j = (int)(decodeLow[0] + (i * decodeRange[0]) / maxPixel + 0.5);
       for (k = 0; k < nComps2; ++k) {
-	lookup[i*nComps2 + k] = lookup2[i*nComps2 + k] / 255.0;
+	lookup[j*nComps2 + k] = x[k] + (lookup2[i*nComps2 + k] / 255.0) * y[k];
       }
     }
   } else if (colorSpace->getMode() == csSeparation) {
@@ -1772,6 +1784,15 @@ void GfxImageColorMap::getCMYK(Guchar *x, GfxCMYK *cmyk) {
       color.c[i] = lookup[x[i] * nComps + i];
     }
     colorSpace->getCMYK(&color, cmyk);
+  }
+}
+
+void GfxImageColorMap::getColor(Guchar *x, GfxColor *color) {
+  int maxPixel, i;
+
+  maxPixel = (1 << bits) - 1;
+  for (i = 0; i < nComps; ++i) {
+    color->c[i] = decodeLow[i] + (x[i] * decodeRange[i]) / maxPixel;
   }
 }
 

@@ -152,9 +152,10 @@ int main(int argc, char *argv[]) {
   globalParams->setPSEmbedTrueType(1);
   globalParams->setPSEmbedCIDPostScript(1);
   globalParams->setErrQuiet(0);
+  globalParams->setPrintCommands(0);
 
   // open PDF file
-  doc = new PDFDoc(fileName, NULL, NULL, getenv("DEBUG") != NULL);
+  doc = new PDFDoc(fileName, NULL, NULL);
 
   // check for print permission
   if (doc->isOk() && doc->okToPrint())

@@ -6,11 +6,12 @@
 //
 //========================================================================
 
-#ifdef __GNUC__
+#include <config.h>
+
+#ifdef USE_GCC_PRAGMAS
 #pragma implementation
 #endif
 
-#include <config.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -30,8 +31,8 @@
 //------------------------------------------------------------------------
 
 struct StdFontMapEntry {
-  const char *altName;
-  const char *properName;
+  char *altName;
+  char *properName;
 };
 
 static StdFontMapEntry stdFontMap[] = {
@@ -65,6 +66,9 @@ static StdFontMapEntry stdFontMap[] = {
   { "Helvetica,Italic",             "Helvetica-Oblique" },
   { "Helvetica-BoldItalic",         "Helvetica-BoldOblique" },
   { "Helvetica-Italic",             "Helvetica-Oblique" },
+  { "Symbol,Bold",                  "Symbol" },
+  { "Symbol,BoldItalic",            "Symbol" },
+  { "Symbol,Italic",                "Symbol" },
   { "TimesNewRoman",                "Times-Roman" },
   { "TimesNewRoman,Bold",           "Times-Bold" },
   { "TimesNewRoman,BoldItalic",     "Times-BoldItalic" },
@@ -86,7 +90,7 @@ static StdFontMapEntry stdFontMap[] = {
 // GfxFont
 //------------------------------------------------------------------------
 
-GfxFont *GfxFont::makeFont(XRef *xref, const char *tagA, Ref idA, Dict *fontDict) {
+GfxFont *GfxFont::makeFont(XRef *xref, char *tagA, Ref idA, Dict *fontDict) {
   GString *nameA;
   GfxFont *font;
   Object obj1;
@@ -122,7 +126,7 @@ GfxFont *GfxFont::makeFont(XRef *xref, const char *tagA, Ref idA, Dict *fontDict
   return font;
 }
 
-GfxFont::GfxFont(const char *tagA, Ref idA, GString *nameA) {
+GfxFont::GfxFont(char *tagA, Ref idA, GString *nameA) {
   ok = gFalse;
   tag = new GString(tagA);
   id = idA;
@@ -255,6 +259,10 @@ void GfxFont::readFontDescriptor(XRef *xref, Dict *fontDict) {
       if (t != 0) {
 	descent = t;
       }
+      // some broken font descriptors specify a positive descent
+      if (descent > 0) {
+	descent = -descent;
+      }
     }
     obj2.free();
 
@@ -365,18 +373,18 @@ char *GfxFont::readEmbFontFile(XRef *xref, int *len) {
 // Gfx8BitFont
 //------------------------------------------------------------------------
 
-Gfx8BitFont::Gfx8BitFont(XRef *xref, const char *tagA, Ref idA, GString *nameA,
+Gfx8BitFont::Gfx8BitFont(XRef *xref, char *tagA, Ref idA, GString *nameA,
 			 GfxFontType typeA, Dict *fontDict):
   GfxFont(tagA, idA, nameA)
 {
   BuiltinFont *builtinFont;
-  const char **baseEnc;
+  char **baseEnc;
   GBool baseEncFromFontFile;
   char *buf;
   int len;
   FontFile *fontFile;
   int code, code2;
-  const char *charName;
+  char *charName;
   GBool missing, hex;
   Unicode toUnicode[256];
   double mul;
@@ -564,8 +572,9 @@ Gfx8BitFont::Gfx8BitFont(XRef *xref, const char *tagA, Ref idA, GString *nameA,
   if (!baseEnc) {
     if (builtinFont) {
       baseEnc = builtinFont->defaultBaseEnc;
+      hasEncoding = gTrue;
     } else if (type == fontTrueType) {
-      baseEnc = macRomanEncoding;
+      baseEnc = winAnsiEncoding;
     } else {
       baseEnc = standardEncoding;
     }
@@ -592,7 +601,7 @@ Gfx8BitFont::Gfx8BitFont(XRef *xref, const char *tagA, Ref idA, GString *nameA,
 	} else if (obj3.isName()) {
 	  if (code < 256) {
 	    if (encFree[code]) {
-	      gfree((void *)enc[code]);
+	      gfree(enc[code]);
 	    }
 	    enc[code] = copyString(obj3.getName());
 	    encFree[code] = gTrue;
@@ -768,7 +777,7 @@ Gfx8BitFont::~Gfx8BitFont() {
 
   for (i = 0; i < 256; ++i) {
     if (encFree[i] && enc[i]) {
-      gfree((void *)enc[i]);
+      gfree(enc[i]);
     }
   }
   ctu->decRefCnt();
@@ -780,7 +789,7 @@ Gfx8BitFont::~Gfx8BitFont() {
   }
 }
 
-int Gfx8BitFont::getNextChar(const char *s, int len, CharCode *code,
+int Gfx8BitFont::getNextChar(char *s, int len, CharCode *code,
 			     Unicode *u, int uSize, int *uLen,
 			     double *dx, double *dy, double *ox, double *oy) {
   CharCode c;
@@ -828,7 +837,7 @@ static int cmpWidthExcepV(const void *w1, const void *w2) {
          ((GfxFontCIDWidthExcepV *)w2)->first;
 }
 
-GfxCIDFont::GfxCIDFont(XRef *xref, const char *tagA, Ref idA, GString *nameA,
+GfxCIDFont::GfxCIDFont(XRef *xref, char *tagA, Ref idA, GString *nameA,
 		       Dict *fontDict):
   GfxFont(tagA, idA, nameA)
 {
@@ -947,7 +956,7 @@ GfxCIDFont::GfxCIDFont(XRef *xref, const char *tagA, Ref idA, GString *nameA,
 
   // CIDToGIDMap (for embedded TrueType fonts)
   if (type == fontCIDType2) {
-    fontDict->lookup("CIDToGIDMap", &obj1);
+    desFontDict->lookup("CIDToGIDMap", &obj1);
     if (obj1.isStream()) {
       cidToGIDLen = 0;
       i = 64;
@@ -1144,7 +1153,7 @@ GfxCIDFont::~GfxCIDFont() {
   }
 }
 
-int GfxCIDFont::getNextChar(const char *s, int len, CharCode *code,
+int GfxCIDFont::getNextChar(char *s, int len, CharCode *code,
 			    Unicode *u, int uSize, int *uLen,
 			    double *dx, double *dy, double *ox, double *oy) {
   CID cid;
@@ -1240,21 +1249,31 @@ GString *GfxCIDFont::getCollection() {
 GfxFontDict::GfxFontDict(XRef *xref, Dict *fontDict) {
   int i;
   Object obj1, obj2;
+  Ref r;
 
   numFonts = fontDict->getLength();
   fonts = (GfxFont **)gmalloc(numFonts * sizeof(GfxFont *));
   for (i = 0; i < numFonts; ++i) {
     fontDict->getValNF(i, &obj1);
     obj1.fetch(xref, &obj2);
-    if (obj1.isRef() && obj2.isDict()) {
+    if (obj2.isDict()) {
+      if (obj1.isRef()) {
+	r = obj1.getRef();
+      } else {
+	// no indirect reference for this font, so invent a unique one
+	// (legal generation numbers are five digits, so any 6-digit
+	// number would be safe)
+	r.num = i;
+	r.gen = 999999;
+      }
       fonts[i] = GfxFont::makeFont(xref, fontDict->getKey(i),
-				   obj1.getRef(), obj2.getDict());
+				   r, obj2.getDict());
       if (fonts[i] && !fonts[i]->isOk()) {
 	delete fonts[i];
 	fonts[i] = NULL;
       }
     } else {
-      error(-1, "font resource is not a dictionary reference");
+      error(-1, "font resource is not a dictionary");
       fonts[i] = NULL;
     }
     obj1.free();
@@ -1273,7 +1292,7 @@ GfxFontDict::~GfxFontDict() {
   gfree(fonts);
 }
 
-GfxFont *GfxFontDict::lookup(const char *tag) {
+GfxFont *GfxFontDict::lookup(char *tag) {
   int i;
 
   for (i = 0; i < numFonts; ++i) {

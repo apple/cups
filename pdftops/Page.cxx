@@ -6,12 +6,14 @@
 //
 //========================================================================
 
-#ifdef __GNUC__
+#include <config.h>
+
+#ifdef USE_GCC_PRAGMAS
 #pragma implementation
 #endif
 
-#include <config.h>
 #include <stddef.h>
+#include "GlobalParams.h"
 #include "Object.h"
 #include "Array.h"
 #include "Dict.h"
@@ -170,13 +172,10 @@ GBool PageAttrs::readBox(Dict *dict, char *key, PDFRectangle *box) {
 // Page
 //------------------------------------------------------------------------
 
-Page::Page(XRef *xrefA, int numA, Dict *pageDict, PageAttrs *attrsA,
-	   GBool printCommandsA) {
-
+Page::Page(XRef *xrefA, int numA, Dict *pageDict, PageAttrs *attrsA) {
   ok = gTrue;
   xref = xrefA;
   num = numA;
-  printCommands = printCommandsA;
 
   // get attributes
   attrs = attrsA;
@@ -216,27 +215,27 @@ Page::~Page() {
 }
 
 void Page::display(OutputDev *out, double dpi, int rotate,
-		   Links *links, Catalog *catalog) {
+		   Links *links, Catalog *catalog,
+		   GBool (*abortCheckCbk)(void *data),
+		   void *abortCheckCbkData) {
+  displaySlice(out, dpi, rotate, -1, -1, -1, -1, links, catalog,
+	       abortCheckCbk, abortCheckCbkData);
+}
+
+void Page::displaySlice(OutputDev *out, double dpi, int rotate,
+			int sliceX, int sliceY, int sliceW, int sliceH,
+			Links *links, Catalog *catalog,
+			GBool (*abortCheckCbk)(void *data),
+			void *abortCheckCbkData) {
 #ifndef PDF_PARSER_ONLY
-  PDFRectangle *box, *cropBox;
+  PDFRectangle *mediaBox, *cropBox;
+  PDFRectangle box;
   Gfx *gfx;
   Object obj;
   Link *link;
-  int i;
   Annots *annotList;
-
-  box = getBox();
-  cropBox = getCropBox();
-
-  if (printCommands) {
-    printf("***** MediaBox = ll:%g,%g ur:%g,%g\n",
-	   box->x1, box->y1, box->x2, box->y2);
-    if (isCropped()) {
-      printf("***** CropBox = ll:%g,%g ur:%g,%g\n",
-	     cropBox->x1, cropBox->y1, cropBox->x2, cropBox->y2);
-    }
-    printf("***** Rotate = %d\n", attrs->getRotate());
-  }
+  double k;
+  int i;
 
   rotate += getRotate();
   if (rotate >= 360) {
@@ -244,8 +243,69 @@ void Page::display(OutputDev *out, double dpi, int rotate,
   } else if (rotate < 0) {
     rotate += 360;
   }
+
+  mediaBox = getBox();
+  if (sliceW >= 0 && sliceH >= 0) {
+    k = 72.0 / dpi;
+    if (rotate == 90) {
+      if (out->upsideDown()) {
+	box.x1 = mediaBox->x1 + k * sliceY;
+	box.x2 = mediaBox->x1 + k * (sliceY + sliceH);
+      } else {
+	box.x1 = mediaBox->x2 - k * (sliceY + sliceH);
+	box.x2 = mediaBox->x2 - k * sliceY;
+      }
+      box.y1 = mediaBox->y1 + k * sliceX;
+      box.y2 = mediaBox->y1 + k * (sliceX + sliceW);
+    } else if (rotate == 180) {
+      box.x1 = mediaBox->x2 - k * (sliceX + sliceW);
+      box.x2 = mediaBox->x2 - k * sliceX;
+      if (out->upsideDown()) {
+	box.y1 = mediaBox->y1 + k * sliceY;
+	box.y2 = mediaBox->y1 + k * (sliceY + sliceH);
+      } else {
+	box.y1 = mediaBox->y2 - k * (sliceY + sliceH);
+	box.y2 = mediaBox->y2 - k * sliceY;
+      }
+    } else if (rotate == 270) {
+      if (out->upsideDown()) {
+	box.x1 = mediaBox->x2 - k * (sliceY + sliceH);
+	box.x2 = mediaBox->x2 - k * sliceY;
+      } else {
+	box.x1 = mediaBox->x1 + k * sliceY;
+	box.x2 = mediaBox->x1 + k * (sliceY + sliceH);
+      }
+      box.y1 = mediaBox->y2 - k * (sliceX + sliceW);
+      box.y2 = mediaBox->y2 - k * sliceX;
+    } else {
+      box.x1 = mediaBox->x1 + k * sliceX;
+      box.x2 = mediaBox->x1 + k * (sliceX + sliceW);
+      if (out->upsideDown()) {
+	box.y1 = mediaBox->y2 - k * (sliceY + sliceH);
+	box.y2 = mediaBox->y2 - k * sliceY;
+      } else {
+	box.y1 = mediaBox->y1 + k * sliceY;
+	box.y2 = mediaBox->y1 + k * (sliceY + sliceH);
+      }
+    }
+  } else {
+    box = *mediaBox;
+  }
+  cropBox = getCropBox();
+
+  if (globalParams->getPrintCommands()) {
+    printf("***** MediaBox = ll:%g,%g ur:%g,%g\n",
+	   box.x1, box.y1, box.x2, box.y2);
+    if (isCropped()) {
+      printf("***** CropBox = ll:%g,%g ur:%g,%g\n",
+	     cropBox->x1, cropBox->y1, cropBox->x2, cropBox->y2);
+    }
+    printf("***** Rotate = %d\n", attrs->getRotate());
+  }
+
   gfx = new Gfx(xref, out, num, attrs->getResourceDict(),
-		dpi, box, isCropped(), cropBox, rotate, printCommands);
+		dpi, &box, isCropped(), cropBox, rotate,
+		abortCheckCbk, abortCheckCbkData);
   contents.fetch(xref, &obj);
   if (!obj.isNull()) {
     gfx->display(&obj);
@@ -266,7 +326,7 @@ void Page::display(OutputDev *out, double dpi, int rotate,
   annotList = new Annots(xref, annots.fetch(xref, &obj));
   obj.free();
   if (annotList->getNumAnnots() > 0) {
-    if (printCommands) {
+    if (globalParams->getPrintCommands()) {
       printf("***** Annotations\n");
     }
     for (i = 0; i < annotList->getNumAnnots(); ++i) {

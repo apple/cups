@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.6.2.6 2002/10/09 23:25:21 mike Exp $"
+# "$Id: Makefile,v 1.6.2.7 2002/12/13 20:21:52 mike Exp $"
 #
 #   pdftops filter Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -14,13 +14,14 @@ include ../Makedefs
 # Object files...
 #
 
-LIBOBJS	=	Annot.o \
+LIBOBJS	=	\
+		Annot.o \
 		Array.o \
 		BuiltinFont.o \
 		BuiltinFontTables.o \
-		CMap.o \
 		Catalog.o \
 		CharCodeToUnicode.o \
+		CMap.o \
 		Decrypt.o \
 		Dict.o \
 		Error.o \
@@ -28,31 +29,35 @@ LIBOBJS	=	Annot.o \
 		FontEncodingTables.o \
 		FontFile.o \
 		Function.o \
-		GHash.o \
-		GList.o \
-		GString.o \
+		gfile.o \
 		Gfx.o \
 		GfxFont.o \
 		GfxState.o \
+		GHash.o \
+		GList.o \
 		GlobalParams.o \
+		gmem.o \
+		gmempp.o \
+		GString.o \
+		JBIG2Stream.o \
 		Lexer.o \
 		Link.o \
 		NameToCharCode.o \
 		Object.o \
+		Outline.o \
 		OutputDev.o \
-		PDFDoc.o \
-		PSOutputDev.o \
-		PSTokenizer.o \
 		Page.o \
 		Params.o \
+		parseargs.o \
 		Parser.o \
+		PDFDoc.o \
+		PDFDocEncoding.o \
+		PSOutputDev.o \
+		PSTokenizer.o \
 		Stream.o \
 		UnicodeMap.o \
-		XRef.o \
-		gfile.o \
-		gmem.o \
-		gmempp.o \
-		parseargs.o
+		XRef.o
+
 
 OBJS	=	pdftops.o $(LIBOBJS)
 
@@ -118,5 +123,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile,v 1.6.2.6 2002/10/09 23:25:21 mike Exp $".
+# End of "$Id: Makefile,v 1.6.2.7 2002/12/13 20:21:52 mike Exp $".
 #

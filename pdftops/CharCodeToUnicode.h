@@ -11,7 +11,9 @@
 #ifndef CHARCODETOUNICODE_H
 #define CHARCODETOUNICODE_H
 
-#ifdef __GNUC__
+#include <config.h>
+
+#ifdef USE_GCC_PRAGMAS
 #pragma interface
 #endif
 

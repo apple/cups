@@ -9,7 +9,9 @@
 #ifndef XREF_H
 #define XREF_H
 
-#ifdef __GNUC__
+#include <config.h>
+
+#ifdef USE_GCC_PRAGMAS
 #pragma interface
 #endif
 
@@ -80,6 +82,11 @@ public:
   // Get end position for a stream in a damaged file.
   // Returns false if unknown or file is not damaged.
   GBool getStreamEnd(Guint streamStart, Guint *streamEnd);
+
+  // Direct access.
+  int getSize() { return size; }
+  XRefEntry *getEntry(int i) { return &entries[i]; }
+  Object *getTrailerDict() { return &trailerDict; }
 
 private:
 

@@ -6,11 +6,12 @@
 //
 //========================================================================
 
-#ifdef __GNUC__
+#include <config.h>
+
+#ifdef USE_GCC_PRAGMAS
 #pragma implementation
 #endif
 
-#include <config.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
@@ -1095,13 +1096,13 @@ GBool PostScriptFunction::parseCode(Stream *str, int *codePtr) {
 	if (!parseCode(str, codePtr)) {
 	  return gFalse;
 	}
+	delete tok;
+	if (!(tok = getToken(str))) {
+	  error(-1, "Unexpected end of PostScript function stream");
+	  return gFalse;
+	}
       } else {
 	elsePtr = -1;
-      }
-      delete tok;
-      if (!(tok = getToken(str))) {
-	error(-1, "Unexpected end of PostScript function stream");
-	return gFalse;
       }
       if (!tok->cmp("if")) {
 	if (elsePtr >= 0) {
