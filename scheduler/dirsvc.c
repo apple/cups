@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.5 1999/04/22 20:32:31 mike Exp $"
+ * "$Id: dirsvc.c,v 1.6 1999/04/22 20:42:19 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -235,7 +235,8 @@ SendBrowseList(void)
   int			i;	/* Looping var */
   printer_t		*p,	/* Current printer */
 			*np;	/* Next printer */
-  time_t		t;	/* Minimum update time */
+  time_t		ut,	/* Minimum update time */
+			to;	/* Timeout time */
   int			bytes;	/* Length of packet */
   char			packet[1540];
 				/* Browse data packet */
@@ -245,7 +246,8 @@ SendBrowseList(void)
   * Compute the update time...
   */
 
-  t = time(NULL) - BrowseTimeout;
+  ut = time(NULL) - BrowseInterval;
+  to = time(NULL) - BrowseTimeout;
 
  /*
   * Loop through all of the printers and send local updates as needed...
@@ -261,10 +263,10 @@ SendBrowseList(void)
       * See if this printer needs to be timed out...
       */
 
-      if (p->browse_time < (t - 2))
+      if (p->browse_time < to)
         DeletePrinter(p);
     }
-    else if (p->browse_time < t)
+    else if (p->browse_time < ut)
     {
      /*
       * Need to send an update...
@@ -288,5 +290,5 @@ SendBrowseList(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.5 1999/04/22 20:32:31 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.6 1999/04/22 20:42:19 mike Exp $".
  */

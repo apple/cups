@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.12 1999/04/22 15:02:46 mike Exp $"
+ * "$Id: job.c,v 1.13 1999/04/22 20:42:20 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -317,7 +317,7 @@ StartJob(int       id,		/* I - Job ID */
       current->state   = IPP_JOB_PROCESSING;
       current->printer = printer;
       printer->job     = current;
-      printer->state   = IPP_PRINTER_PROCESSING;
+      SetPrinterState(printer, IPP_PRINTER_PROCESSING);
 
      /*
       * Figure out what filters are required to convert from
@@ -659,8 +659,8 @@ StopJob(int id)
       {
         DEBUG_puts("StopJob: job state is \'processing\'.");
 
+	SetPrinterState(current->printer, IPP_PRINTER_IDLE);
 	current->state          = IPP_JOB_STOPPED;
-	current->printer->state = IPP_PRINTER_IDLE;
         current->printer->job   = NULL;
         current->printer        = NULL;
 
@@ -841,5 +841,5 @@ start_process(char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.12 1999/04/22 15:02:46 mike Exp $".
+ * End of "$Id: job.c,v 1.13 1999/04/22 20:42:20 mike Exp $".
  */
