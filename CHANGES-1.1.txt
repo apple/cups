@@ -3,6 +3,9 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.15
 
+	- The cupsGetJobs() function wouldn't report completed
+	  jobs that did not have a document-format attribute
+	  value.
 	- The cupsEncodeOptions() function now maintains a table
 	  of known boolean and numeric options, and encodes all
 	  other options as strings.
