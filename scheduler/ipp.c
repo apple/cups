@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.23 1999/07/21 19:39:09 mike Exp $"
+ * "$Id: ipp.c,v 1.24 1999/07/27 12:49:08 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -1782,13 +1782,16 @@ print_job(client_t        *con,		/* I - Client connection */
     DEBUG_puts("print_job: auto-typing request using magic rules.");
     filetype = mimeFileType(MimeDatabase, con->filename);
 
-   /*
-    * Replace the document-format attribute value with the auto-typed one.
-    */
+    if (filetype != NULL)
+    {
+     /*
+      * Replace the document-format attribute value with the auto-typed one.
+      */
 
-    free(format->values[0].string.text);
-    sprintf(mimetype, "%s/%s", filetype->super, filetype->type);
-    format->values[0].string.text = strdup(mimetype);
+      free(format->values[0].string.text);
+      sprintf(mimetype, "%s/%s", filetype->super, filetype->type);
+      format->values[0].string.text = strdup(mimetype);
+    }
   }
   else
     filetype = mimeType(MimeDatabase, super, type);
@@ -2414,5 +2417,5 @@ validate_job(client_t        *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.23 1999/07/21 19:39:09 mike Exp $".
+ * End of "$Id: ipp.c,v 1.24 1999/07/27 12:49:08 mike Exp $".
  */
