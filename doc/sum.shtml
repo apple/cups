@@ -2,7 +2,7 @@
 <HEAD>
 	<META NAME="Description" CONTENT="Common UNIX Printing System Software Users Manual">
 	<META NAME="COPYRIGHT" CONTENT="Copyright 1997-2003, All Rights Reserved">
-	<META NAME="DOCNUMBER" CONTENT="CUPS-SUM-1.1.20">
+	<META NAME="DOCNUMBER" CONTENT="CUPS-SUM-1.1.21">
 	<META NAME="Author" CONTENT="Easy Software Products">
 	<TITLE>CUPS Software Users Manual</TITLE>
 </HEAD>
@@ -11,7 +11,7 @@
 <H1 ALIGN="RIGHT">Preface</H1>
 
 <P>This software users manual describes how to use the Common UNIX Printing
-System<SUP>TM</SUP> ("CUPS<SUP>TM</SUP>") Version 1.1.20.
+System<SUP>TM</SUP> ("CUPS<SUP>TM</SUP>") Version 1.1.21.
 
 <EMBED SRC="system-overview.shtml">
 
@@ -192,8 +192,8 @@ for a particular file you are printing.
 printer options using the <CODE>-o</CODE> option:
 
 <UL><PRE>
-<B>lp -o landscape -o scaling=75 -o media=A4 filename.jpg
-<B>lpr -o landscape -o scaling=75 -o media=A4 filename.jpg
+<B>lp -o landscape -o scaling=75 -o media=A4 filename.jpg ENTER</B>
+<B>lpr -o landscape -o scaling=75 -o media=A4 filename.jpg ENTER</B>
 </PRE></UL>
 
 <P>The available printer options vary depending on the printer. The standard

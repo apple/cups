@@ -1,7 +1,7 @@
 <HTML>
 <HEAD>
 	<META NAME="COPYRIGHT" CONTENT="Copyright 1997-2003, All Rights Reserved">
-	<META NAME="DOCNUMBER" CONTENT="CUPS-SPM-1.1.20">
+	<META NAME="DOCNUMBER" CONTENT="CUPS-SPM-1.1.21">
 	<META NAME="Author" CONTENT="Easy Software Products">
 	<TITLE>CUPS Software Programmers Manual</TITLE>
 </HEAD>
@@ -11,7 +11,7 @@
 
 <P>This software programmers manual provides software
 programming information for the Common UNIX Printing System
-("CUPS") Version 1.1.20.
+("CUPS") Version 1.1.21.
 
 <EMBED SRC="system-overview.shtml">
 
@@ -433,8 +433,8 @@ cupsFreeOptions(num_options, options);
 
 <P>If any of the CUPS API printing functions returns an error, the reason for
 that error can be found by calling <CODE>cupsLastError()</CODE> and
-<CODE>cupsErrorString()</CODE>. <CODE>cupsLastError()</CODE> returns the
-last IPP error code that was encountered. <CODE>cupsErrorString()</CODE>
+<CODE>ippErrorString()</CODE>. <CODE>cupsLastError()</CODE> returns the
+last IPP error code that was encountered. <CODE>ippErrorString()</CODE>
 converts the error code to a localized message string suitable for
 presentation to the user:
 
@@ -448,7 +448,7 @@ int jobid;
 ...
 
 if (jobid == 0)
-  puts(cupsErrorString(cupsLastError()));
+  puts(ippErrorString(cupsLastError()));
 </PRE></UL>
 
 <H3>Passwords and Authentication</H3>
