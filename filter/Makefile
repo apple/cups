@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.14 1999/06/21 15:27:43 mike Exp $"
+# "$Id: Makefile,v 1.15 1999/06/21 19:00:53 mike Exp $"
 #
 #   Filter makefile for the Common UNIX Printing System (CUPS).
 #
@@ -61,6 +61,7 @@ install:
 #
 
 hpgltops:	$(HPGLOBJS) common.o ../Makedefs ../cups/libcups.a
+	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ $(HPGLOBJS) common.o $(LIBS) -lm
 $(HPGLOBJS):	hpgltops.h
 
@@ -69,6 +70,7 @@ $(HPGLOBJS):	hpgltops.h
 #
 
 image.a:	$(IMAGEOBJS) ../Makedefs ../cups/libcups.a
+	echo Archiving $@...
 	$(RM) $@
 	$(AR) $(ARFLAGS) $@ $(IMAGEOBJS)
 	$(RANLIB) $@
@@ -79,6 +81,7 @@ $(IMAGEOBJS):	image.h
 #
 
 imagetops:	imagetops.o common.o image.a ../Makedefs ../cups/libcups.a
+	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ imagetops.o common.o image.a $(IMGLIBS)
 imagetops:	common.h image.h
 
@@ -87,6 +90,7 @@ imagetops:	common.h image.h
 #
 
 imagetoraster:	imagetoraster.o common.o image.a ../Makedefs ../cups/libcups.a
+	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ imagetoraster.o common.o image.a $(IMGLIBS)
 imagetoraster:	common.h image.h
 
@@ -95,6 +99,7 @@ imagetoraster:	common.h image.h
 #
 
 pstops:	pstops.o common.o ../Makedefs ../cups/libcups.a
+	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ pstops.o common.o $(LIBS)
 pstops.o:	common.h
 
@@ -103,6 +108,7 @@ pstops.o:	common.h
 #
 
 rastertohp:	rastertohp.o ../Makedefs ../cups/libcups.a
+	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ rastertohp.o $(LIBS)
 rastertohp.o:	../cups/raster.h
 
@@ -111,6 +117,7 @@ rastertohp.o:	../cups/raster.h
 #
 
 texttops:	texttops.o textcommon.o common.o ../Makedefs ../cups/libcups.a
+	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ texttops.o textcommon.o common.o $(LIBS)
 texttops.o:	common.h textcommon.h
 
@@ -119,5 +126,5 @@ textcommon.o:	textcommon.h common.h
 $(OBJS):	../Makedefs ../cups/cups.h ../cups/ppd.h ../cups/language.h
 
 #
-# End of "$Id: Makefile,v 1.14 1999/06/21 15:27:43 mike Exp $".
+# End of "$Id: Makefile,v 1.15 1999/06/21 19:00:53 mike Exp $".
 #

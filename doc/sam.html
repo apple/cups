@@ -44,10 +44,13 @@ Copyright 1997-1999, All Rights Reserved<BR>
 <LI><A HREF=#4_2>Adding and Modifying Printers</A></LI>
 <UL>
 <LI><A HREF=#4_2_1>Using Standard Printer Drivers</A></LI>
+<LI><A HREF=#4_2_2>Enabling New Printer Queues</A></LI>
 </UL>
 <LI><A HREF=#4_3>Removing Printers</A></LI>
 <LI><A HREF=#4_4>Printer Classes</A></LI>
 <LI><A HREF=#4_5>Setting the Default Printer</A></LI>
+<LI><A HREF=#4_6>Starting and Stopping Printers</A></LI>
+<LI><A HREF=#4_7>Accepting and Rejecting Print Jobs</A></LI>
 </UL>
 <B><A HREF=#5>4 - Printing System Management</A></B>
 <UL>
@@ -312,6 +315,7 @@ installation of CUPS: </P>
 <DT>file:/dev/filename </DT>
 <DT>/dev/filename </DT>
 <DD>Sends all output to the specified file. </DD>
+<DT>http://hostname[:port]/resource </DT>
 <DT>ipp://hostname[:port]/resource </DT>
 <DD>Sends all output to the specified IPP printer or server.  The <I>
 port</I> parameters defaults to 631. </DD>
@@ -357,6 +361,20 @@ would use: </P>
 % /usr/lib/lpadmin -pDeskJet -vparallel:/dev/par1 -mdeskjet.ppd ENTER
 </PRE>
 </UL>
+<H3><A NAME=4_2_2>Enabling New Printer Queues</A></H3>
+<P>Before you can print to your new printer queue you need to enable it 
+with the following two commands: </P>
+<UL>
+<PRE>
+% /usr/bin/enable <I>printer</I> ENTER
+% /usr/lib/accept <I>printer</I> ENTER
+</PRE>
+</UL>
+<P>The <CODE>enable</CODE> command tells the scheduler to start the 
+named printer. Otherwise any jobs you submitted would sit in the queue 
+without being printed! </P>
+<P>The <CODE>accept</CODE> command tells the scheduler to start 
+accepting print jobs for that printer. </P>
 <H2><A NAME=4_3>Removing Printers</A></H2>
 <P>To remove a printer to CUPS you simply run the <CODE>lpadmin</CODE>
  command with the &quot;-x&quot; option: </P>
@@ -392,6 +410,33 @@ remove a class just use the &quot;-x&quot; option: </P>
 </PRE>
 </UL>
 <P>The <I>destination</I> argument is the name of the printer or class. </P>
+<H2><A NAME=4_6>Starting and Stopping Printers</A></H2>
+<P>The <CODE>enable</CODE> and <CODE>disable</CODE> commands start and 
+stop printer queues, respectively: </P>
+<UL>
+<PRE>
+% /usr/bin/enable <I>printer</I> ENTER
+% /usr/bin/disable <I>printer</I> ENTER
+</PRE>
+</UL>
+<P>Printers that are disabled may still accept jobs for printing, but 
+won't actually print any files until they are restarted. This is useful 
+if the printer malfunctions and you need time to correct the problem. 
+Any queues jobs are printed after the printer is enabled (started). </P>
+<H2><A NAME=4_7>Accepting and Rejecting Print Jobs</A></H2>
+<P>The <CODE>accept</CODE> and <CODE>reject</CODE> commands accept and 
+reject print jobs for the named printer, respectively: </P>
+<UL>
+<PRE>
+% /usr/lib/accept <I>printer</I> ENTER
+% /usr/lib/reject <I>printer</I> ENTER
+</PRE>
+</UL>
+<P>As noted above, a printer can be stopped but accepting new print 
+jobs. A printer can also be rejecting new print jobs while it finishes 
+those that have been queued. This is useful for when you must perform 
+maintenance on the printer and will not have it available to users for 
+a long period of time. </P>
 <H1 ALIGN=RIGHT><A NAME=5>4 - Printing System Management</A></H1>
 <P>This chapter shows how you can configure the CUPS server. </P>
 <H2><A NAME=5_1>Network Configuration</A></H2>

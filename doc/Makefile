@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.10 1999/06/21 18:46:25 mike Exp $"
+# "$Id: Makefile,v 1.11 1999/06/21 19:00:51 mike Exp $"
 #
 #   Documentation makefile for the Common UNIX Printing System (CUPS).
 #
@@ -30,10 +30,10 @@ include ../Makedefs
 
 .SUFFIXES:	.html .pdf .shtml
 .shtml.html:
-	echo Formatting $<...
+	echo Formatting $@...
 	htmldoc --title images/cups-large.gif --numbered -f $@ $<
 .shtml.pdf:
-	echo Formatting $<...
+	echo Formatting $@...
 	htmldoc --title images/cups-large.gif --duplex --compression=9 \
 		--numbered --jpeg -f $@ $<
 
@@ -85,22 +85,22 @@ install:
 #
 
 overview.pdf:	overview.html
-	echo Formatting $<...
+	echo Formatting $@...
 	htmldoc --duplex --compression=9 --jpeg --webpage -f $@ $<
 
 sam.html:	sam.shtml
-	echo Formatting $<...
+	echo Formatting $@...
 	htmldoc --title images/cups-large.gif -f $@ $<
 sam.pdf:	sam.shtml
-	echo Formatting $<...
+	echo Formatting $@...
 	htmldoc --title images/cups-large.gif --duplex --compression=9 \
 		--jpeg -f $@ $<
 
 sum.html:	sum.shtml
-	echo Formatting $<...
+	echo Formatting $@...
 	htmldoc --title images/cups-large.gif -f $@ $<
 sum.pdf:	sum.shtml
-	echo Formatting $<...
+	echo Formatting $@...
 	htmldoc --title images/cups-large.gif --duplex --compression=9 \
 		--jpeg -f $@ $<
 
