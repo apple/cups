@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-vector.c,v 1.3 1998/03/10 16:52:25 mike Exp $"
+ * "$Id: hpgl-vector.c,v 1.4 1998/09/10 20:00:01 mike Exp $"
  *
  *   HPGL vector processing routines for espPrint, a collection of printer
  *   drivers.
@@ -17,7 +17,10 @@
  * Revision History:
  *
  *   $Log: hpgl-vector.c,v $
- *   Revision 1.3  1998/03/10 16:52:25  mike
+ *   Revision 1.4  1998/09/10 20:00:01  mike
+ *   Wasn't drawing arcs properly.
+ *
+ *   Revision 1.3  1998/03/10  16:52:25  mike
  *   Fixed debug printf...
  *
  *   Revision 1.2  1996/10/14  16:50:14  mike
@@ -58,57 +61,58 @@ AA_arc_absolute(int num_params, param_t *params)
   dx = PenPosition[0] - x;
   dy = PenPosition[1] - y;
 
-  start  = 180.0 * atan2(dx, dy) / M_PI;
+  start = 180.0 * atan2(dy, dx) / M_PI;
+  if (start < 0.0)
+    start += 360.0;
+
   end    = start + params[2].value.number;
   radius = hypot(dx, dy);
 
+#ifdef DEBUG
+  fprintf(OutputFile, "%%AA %.3f, %.3f, %.3f, %.1f\n",
+          params[0].value.number, params[1].value.number,
+	  params[2].value.number, num_params > 3 ? params[3].value.number : 5.0);
+  fprintf(OutputFile, "%% %.3f %.3f %.3f %.1f %.1f arc\n",
+          x, y, radius, start, end);
+#endif /* DEBUG */
+
   if (PenDown)
   {
-    if (num_params > 3)
+    if (num_params > 3 && params[3].value.number > 0.0)
       dt = fabs(params[3].value.number);
     else
       dt = 5.0;
 
     if (!PolygonMode)
       fputs("MP\n", OutputFile);
+
     fprintf(OutputFile, "%.3f %.3f MO\n", PenPosition[0], PenPosition[1]);
 
     if (start < end)
       for (theta = start + dt; theta < end; theta += dt)
       {
-        PenPosition[0] = x +
-                         radius * cos(M_PI * theta / 180.0) * Transform[0][0] +
-                         radius * sin(M_PI * theta / 180.0) * Transform[0][1];
-        PenPosition[1] = y +
-        		 radius * cos(M_PI * theta / 180.0) * Transform[1][0] +
-        		 radius * sin(M_PI * theta / 180.0) * Transform[1][1];
+	PenPosition[0] = x + radius * cos(M_PI * theta / 180.0);
+	PenPosition[1] = y + radius * sin(M_PI * theta / 180.0);
 
 	fprintf(OutputFile, "%.3f %.3f LI\n", PenPosition[0], PenPosition[1]);
       }
     else
       for (theta = start - dt; theta > end; theta -= dt)
       {
-        PenPosition[0] = x +
-                         radius * cos(M_PI * theta / 180.0) * Transform[0][0] +
-                         radius * sin(M_PI * theta / 180.0) * Transform[0][1];
-        PenPosition[1] = y +
-        		 radius * cos(M_PI * theta / 180.0) * Transform[1][0] +
-        		 radius * sin(M_PI * theta / 180.0) * Transform[1][1];
+	PenPosition[0] = x + radius * cos(M_PI * theta / 180.0);
+	PenPosition[1] = y + radius * sin(M_PI * theta / 180.0);
 
 	fprintf(OutputFile, "%.3f %.3f LI\n", PenPosition[0], PenPosition[1]);
       };
   };
 
-  PenPosition[0] = x +
-                   radius * cos(M_PI * end / 180.0) * Transform[0][0] +
-                   radius * sin(M_PI * end / 180.0) * Transform[0][1];
-  PenPosition[1] = y +
-        	   radius * cos(M_PI * end / 180.0) * Transform[1][0] +
-        	   radius * sin(M_PI * end / 180.0) * Transform[1][1];
+  PenPosition[0] = x + radius * cos(M_PI * end / 180.0);
+  PenPosition[1] = y + radius * sin(M_PI * end / 180.0);
 
   if (PenDown)
   {
     fprintf(OutputFile, "%.3f %.3f LI\n", PenPosition[0], PenPosition[1]);
+
     if (!PolygonMode)
       fputs("ST\n", OutputFile);
 
@@ -137,57 +141,58 @@ AR_arc_relative(int num_params, param_t *params)
   dx = PenPosition[0] - x;
   dy = PenPosition[1] - y;
 
-  start  = 180.0 * atan2(dx, dy) / M_PI;
+  start = 180.0 * atan2(dy, dx) / M_PI;
+  if (start < 0.0)
+    start += 360.0;
+
   end    = start + params[2].value.number;
   radius = hypot(dx, dy);
 
+#ifdef DEBUG
+  fprintf(OutputFile, "%%AA %.3f, %.3f, %.3f, %.1f\n",
+          params[0].value.number, params[1].value.number,
+	  params[2].value.number, num_params > 3 ? params[3].value.number : 5.0);
+  fprintf(OutputFile, "%% %.3f %.3f %.3f %.1f %.1f arc\n",
+          x, y, radius, start, end);
+#endif /* DEBUG */
+
   if (PenDown)
   {
-    if (num_params > 3)
+    if (num_params > 3 && params[3].value.number > 0.0)
       dt = fabs(params[3].value.number);
     else
       dt = 5.0;
 
     if (!PolygonMode)
       fputs("MP\n", OutputFile);
+
     fprintf(OutputFile, "%.3f %.3f MO\n", PenPosition[0], PenPosition[1]);
 
     if (start < end)
       for (theta = start + dt; theta < end; theta += dt)
       {
-        PenPosition[0] = x +
-                         radius * cos(M_PI * theta / 180.0) * Transform[0][0] +
-                         radius * sin(M_PI * theta / 180.0) * Transform[0][1];
-        PenPosition[1] = y +
-        		 radius * cos(M_PI * theta / 180.0) * Transform[1][0] +
-        		 radius * sin(M_PI * theta / 180.0) * Transform[1][1];
+	PenPosition[0] = x + radius * cos(M_PI * theta / 180.0);
+	PenPosition[1] = y + radius * sin(M_PI * theta / 180.0);
 
 	fprintf(OutputFile, "%.3f %.3f LI\n", PenPosition[0], PenPosition[1]);
       }
     else
       for (theta = start - dt; theta > end; theta -= dt)
       {
-        PenPosition[0] = x +
-                         radius * cos(M_PI * theta / 180.0) * Transform[0][0] +
-                         radius * sin(M_PI * theta / 180.0) * Transform[0][1];
-        PenPosition[1] = y +
-        		 radius * cos(M_PI * theta / 180.0) * Transform[1][0] +
-        		 radius * sin(M_PI * theta / 180.0) * Transform[1][1];
+	PenPosition[0] = x + radius * cos(M_PI * theta / 180.0);
+	PenPosition[1] = y + radius * sin(M_PI * theta / 180.0);
 
 	fprintf(OutputFile, "%.3f %.3f LI\n", PenPosition[0], PenPosition[1]);
       };
   };
 
-  PenPosition[0] = x +
-                   radius * cos(M_PI * end / 180.0) * Transform[0][0] +
-                   radius * sin(M_PI * end / 180.0) * Transform[0][1];
-  PenPosition[1] = y +
-        	   radius * cos(M_PI * end / 180.0) * Transform[1][0] +
-        	   radius * sin(M_PI * end / 180.0) * Transform[1][1];
+  PenPosition[0] = x + radius * cos(M_PI * end / 180.0);
+  PenPosition[1] = y + radius * sin(M_PI * end / 180.0);
 
   if (PenDown)
   {
     fprintf(OutputFile, "%.3f %.3f LI\n", PenPosition[0], PenPosition[1]);
+
     if (!PolygonMode)
       fputs("ST\n", OutputFile);
 
@@ -202,12 +207,39 @@ AT_arc_absolute3(int num_params, param_t *params)
   if (num_params < 4)
     return;
 
+  if (PenDown)
+  {
+    if (!PolygonMode)
+      fputs("MP\n", OutputFile);
+
+    fprintf(OutputFile, "%.3f %.3f MO\n", PenPosition[0], PenPosition[1]);
+
+    PenPosition[0] = Transform[0][0] * params[0].value.number +
+                     Transform[0][1] * params[1].value.number +
+                     Transform[0][2];
+    PenPosition[1] = Transform[1][0] * params[0].value.number +
+                     Transform[1][1] * params[1].value.number +
+                     Transform[1][2];
+
+    fprintf(OutputFile, "%.3f %.3f LI\n", PenPosition[0], PenPosition[1]);
+  };
+
   PenPosition[0] = Transform[0][0] * params[2].value.number +
                    Transform[0][1] * params[3].value.number +
                    Transform[0][2];
   PenPosition[1] = Transform[1][0] * params[2].value.number +
                    Transform[1][1] * params[3].value.number +
                    Transform[1][2];
+
+  if (PenDown)
+  {
+    fprintf(OutputFile, "%.3f %.3f LI\n", PenPosition[0], PenPosition[1]);
+
+    if (!PolygonMode)
+      fputs("ST\n", OutputFile);
+
+    PageDirty = 1;
+  };
 }
 
 
@@ -219,6 +251,9 @@ CI_circle(int num_params, param_t *params)
 
 
   if (num_params < 1)
+    return;
+
+  if (!PenDown)
     return;
 
   radius = params[0].value.number;
@@ -293,10 +328,13 @@ plot_points(int num_params, param_t *params)
     PenPosition[1] = y;
   };
 
-  if (PenDown && !PolygonMode)
-    fputs("ST\n", OutputFile);
+  if (PenDown)
+  {
+    if (!PolygonMode)
+      fputs("ST\n", OutputFile);
 
     PageDirty = 1;
+  };
 }
 
 
@@ -595,16 +633,42 @@ RT_arc_relative3(int num_params, param_t *params)
   if (num_params < 4)
     return;
 
+  if (PenDown)
+  {
+    if (!PolygonMode)
+      fputs("MP\n", OutputFile);
+
+    fprintf(OutputFile, "%.3f %.3f MO\n", PenPosition[0], PenPosition[1]);
+
+    PenPosition[0] = Transform[0][0] * params[0].value.number +
+                     Transform[0][1] * params[1].value.number +
+                     PenPosition[0];
+    PenPosition[1] = Transform[1][0] * params[0].value.number +
+                     Transform[1][1] * params[1].value.number +
+                     PenPosition[1];
+
+    fprintf(OutputFile, "%.3f %.3f LI\n", PenPosition[0], PenPosition[1]);
+  };
+
   PenPosition[0] = Transform[0][0] * params[2].value.number +
                    Transform[0][1] * params[3].value.number +
                    PenPosition[0];
   PenPosition[1] = Transform[1][0] * params[2].value.number +
                    Transform[1][1] * params[3].value.number +
                    PenPosition[1];
+
+  if (PenDown)
+  {
+    fprintf(OutputFile, "%.3f %.3f LI\n", PenPosition[0], PenPosition[1]);
+
+    if (!PolygonMode)
+      fputs("ST\n", OutputFile);
+
+    PageDirty = 1;
+  };
 }
 
 
 /*
- * End of "$Id: hpgl-vector.c,v 1.3 1998/03/10 16:52:25 mike Exp $".
+ * End of "$Id: hpgl-vector.c,v 1.4 1998/09/10 20:00:01 mike Exp $".
  */
-
