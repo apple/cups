@@ -87,7 +87,7 @@ if test -n "$GCC"; then
 	fi
 
 	if test "x$with_optim" = x; then
-		OPTIM="-Wall $OPTIM"
+		OPTIM="-Wall -Wno-format-y2k $OPTIM"
 	fi
 else
 	case $uname in
