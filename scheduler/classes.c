@@ -159,9 +159,11 @@ DeletePrinterFromClass(printer_t *c,	/* I - Class to delete from */
 
     c->num_printers --;
     if (i < c->num_printers)
-      memcpy(c->printers + i, c->printers + i + 1,
-             (c->num_printers - i) * sizeof(printer_t *));
+      memmove(c->printers + i, c->printers + i + 1,
+              (c->num_printers - i) * sizeof(printer_t *));
   }
+  else
+    return;
 
  /*
   * Recompute the printer type mask as needed...
@@ -220,7 +222,14 @@ DeletePrinterFromClasses(printer_t *p)	/* I - Printer to delete */
 
     if ((c->type & (CUPS_PRINTER_CLASS | CUPS_PRINTER_IMPLICIT)) &&
         c->num_printers == 0)
+    {
+     /*
+      * Set class type to 0 to prevent recursion...
+      */
+
+      c->type = 0;
       DeletePrinter(c, 1);
+    }
   }
 }
 
