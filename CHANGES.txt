@@ -1,8 +1,11 @@
-CHANGES.txt - 04/18/2005
+CHANGES.txt - 04/27/2005
 ------------------------
 
 CHANGES IN CUPS V1.2.0b1
 
+	- The scheduler could block trying to read the job status
+	  if there was input pending and the job was cancelled in
+	  the same input cycle (STR #1157)
 	- The scheduler could crash when deleting a class due to
 	  infinite recursion.
 	- Updated the Zebra ZPL label printer driver to use the

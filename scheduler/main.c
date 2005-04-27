@@ -586,12 +586,76 @@ main(int  argc,				/* I - Number of command-line arguments */
       break;
     }
 
+   /*
+    * Check for status info from job filters...
+    */
+
+    for (job = Jobs; job != NULL; job = next)
+    {
+      next = job->next;
+
+      if (job->status_buffer && FD_ISSET(job->status_buffer->fd, input))
+      {
+       /*
+        * Clear the input bit to avoid updating the next job
+	* using the same status pipe file descriptor...
+	*/
+
+        FD_CLR(job->status_buffer->fd, input);
+
+       /*
+        * Read any status messages from the filters...
+	*/
+
+        UpdateJob(job);
+      }
+    }
+
+   /*
+    * Update CGI messages as needed...
+    */
+
+    if (CGIPipes[0] >= 0 && FD_ISSET(CGIPipes[0], input))
+      UpdateCGI();
+
+   /*
+    * Update the browse list as needed...
+    */
+
+    if (Browsing && BrowseProtocols)
+    {
+      if (BrowseSocket >= 0 && FD_ISSET(BrowseSocket, input))
+        UpdateCUPSBrowse();
+
+      if (PollPipe >= 0 && FD_ISSET(PollPipe, input))
+        UpdatePolling();
+
+#ifdef HAVE_LIBSLP
+      if ((BrowseProtocols & BROWSE_SLP) && BrowseSLPRefresh <= time(NULL))
+        UpdateSLPBrowse();
+#endif /* HAVE_LIBSLP */
+
+      if (time(NULL) > browse_time)
+      {
+        SendBrowseList();
+	browse_time = time(NULL);
+      }
+    }
+
+   /*
+    * Check for new connections on the "listen" sockets...
+    */
+
     for (i = NumListeners, lis = Listeners; i > 0; i --, lis ++)
       if (FD_ISSET(lis->fd, input))
       {
         FD_CLR(lis->fd, input);
         AcceptClient(lis);
       }
+
+   /*
+    * Check for new data on the client sockets...
+    */
 
     for (i = NumClients, con = Clients; i > 0; i --, con ++)
     {
@@ -657,62 +721,6 @@ main(int  argc,				/* I - Number of command-line arguments */
         CloseClient(con);
         con --;
         continue;
-      }
-    }
-
-   /*
-    * Check for status info from job filters...
-    */
-
-    for (job = Jobs; job != NULL; job = next)
-    {
-      next = job->next;
-
-      if (job->status_buffer && FD_ISSET(job->status_buffer->fd, input))
-      {
-       /*
-        * Clear the input bit to avoid updating the next job
-	* using the same status pipe file descriptor...
-	*/
-
-        FD_CLR(job->status_buffer->fd, input);
-
-       /*
-        * Read any status messages from the filters...
-	*/
-
-        UpdateJob(job);
-      }
-    }
-
-   /*
-    * Update CGI messages as needed...
-    */
-
-    if (CGIPipes[0] >= 0 && FD_ISSET(CGIPipes[0], input))
-      UpdateCGI();
-
-   /*
-    * Update the browse list as needed...
-    */
-
-    if (Browsing && BrowseProtocols)
-    {
-      if (BrowseSocket >= 0 && FD_ISSET(BrowseSocket, input))
-        UpdateCUPSBrowse();
-
-      if (PollPipe >= 0 && FD_ISSET(PollPipe, input))
-        UpdatePolling();
-
-#ifdef HAVE_LIBSLP
-      if ((BrowseProtocols & BROWSE_SLP) && BrowseSLPRefresh <= time(NULL))
-        UpdateSLPBrowse();
-#endif /* HAVE_LIBSLP */
-
-      if (time(NULL) > browse_time)
-      {
-        SendBrowseList();
-	browse_time = time(NULL);
       }
     }
 
