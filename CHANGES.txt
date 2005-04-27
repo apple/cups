@@ -3,6 +3,8 @@ CHANGES.txt - 04/27/2005
 
 CHANGES IN CUPS V1.2.0b1
 
+	- The scheduler didn't detect a closed connection in the
+	  middle of an IPP request (STR #1153)
 	- The scheduler could block trying to read the job status
 	  if there was input pending and the job was cancelled in
 	  the same input cycle (STR #1157)

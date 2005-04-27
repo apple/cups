@@ -1797,7 +1797,15 @@ ReadClient(client_t *con)		/* I - Client to read from */
 	    return (CloseClient(con));
 	  }
 	  else if (ipp_state != IPP_DATA)
+	  {
+            if (con->http.state == HTTP_POST_SEND)
+	    {
+	      SendError(con, HTTP_BAD_REQUEST);
+	      return (CloseClient(con));
+	    }
+
 	    break;
+          }
 	  else
 	    con->bytes += ippLength(con->request);
 	}
