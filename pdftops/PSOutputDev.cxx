@@ -1744,7 +1744,7 @@ void PSOutputDev::setupEmbeddedType1Font(Ref *id, GString *psName) {
     }
     // if Length2 is incorrect (too small), font data gets chopped, so
     // we take a few extra characters from the trailer just in case
-    length2 += length3 >= 8 ? 8 : length3;
+//    length2 += length3 >= 8 ? 8 : length3;
     while (i < length2) {
       if ((c = strObj.streamGetChar()) == EOF) {
 	break;
