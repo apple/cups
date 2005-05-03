@@ -669,6 +669,9 @@ main(int  argc,				/* I - Number of command-line arguments */
 
         if (!ReadClient(con))
 	{
+	  if (con->pipe_pid)
+	    FD_CLR(con->file, input);
+
 	  con --;
 	  continue;
 	}
