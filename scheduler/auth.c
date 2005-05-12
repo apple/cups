@@ -1540,9 +1540,9 @@ add_deny(location_t *loc)	/* I - Location to add to */
  *                  as needed.
  */
 
-static char *			/* O - Encrypted password */
-cups_crypt(const char *pw,	/* I - Password string */
-           const char *salt)	/* I - Salt (key) string */
+static char *				/* O - Encrypted password */
+cups_crypt(const char *pw,		/* I - Password string */
+           const char *salt)		/* I - Salt (key) string */
 {
   if (strncmp(salt, "$1$", 3) == 0)
   {
@@ -1552,15 +1552,15 @@ cups_crypt(const char *pw,	/* I - Password string */
     * old shadow-19990827/lib/md5crypt.c source code... :(
     */
 
-    int		i;		/* Looping var */
-    unsigned long n;		/* Output number */
-    int		pwlen;		/* Length of password string */
-    const char	*salt_end;	/* End of "salt" data for MD5 */
-    char	*ptr;		/* Pointer into result string */
-    md5_state_t state;		/* Primary MD5 state info */
-    md5_state_t state2;		/* Secondary MD5 state info */
-    md5_byte_t	digest[16];	/* MD5 digest result */
-    static char	result[120];	/* Final password string */
+    int			i;		/* Looping var */
+    unsigned long	n;		/* Output number */
+    int			pwlen;		/* Length of password string */
+    const char		*salt_end;	/* End of "salt" data for MD5 */
+    char		*ptr;		/* Pointer into result string */
+    _cups_md5_state_t	state;		/* Primary MD5 state info */
+    _cups_md5_state_t	state2;		/* Secondary MD5 state info */
+    unsigned char	digest[16];	/* MD5 digest result */
+    static char		result[120];	/* Final password string */
 
 
    /*
@@ -1578,45 +1578,45 @@ cups_crypt(const char *pw,	/* I - Password string */
 
     pwlen = strlen(pw);
 
-    md5_init(&state);
-    md5_append(&state, (md5_byte_t *)pw, pwlen);
-    md5_append(&state, (md5_byte_t *)salt, salt_end - salt);
+    _cups_md5_init(&state);
+    _cups_md5_append(&state, (_cups_md5_byte_t *)pw, pwlen);
+    _cups_md5_append(&state, (_cups_md5_byte_t *)salt, salt_end - salt);
 
-    md5_init(&state2);
-    md5_append(&state2, (md5_byte_t *)pw, pwlen);
-    md5_append(&state2, (md5_byte_t *)salt + 3, salt_end - salt - 3);
-    md5_append(&state2, (md5_byte_t *)pw, pwlen);
-    md5_finish(&state2, digest);
+    _cups_md5_init(&state2);
+    _cups_md5_append(&state2, (_cups_md5_byte_t *)pw, pwlen);
+    _cups_md5_append(&state2, (_cups_md5_byte_t *)salt + 3, salt_end - salt - 3);
+    _cups_md5_append(&state2, (_cups_md5_byte_t *)pw, pwlen);
+    _cups_md5_finish(&state2, digest);
 
     for (i = pwlen; i > 0; i -= 16)
-      md5_append(&state, digest, i > 16 ? 16 : i);
+      _cups_md5_append(&state, digest, i > 16 ? 16 : i);
 
     for (i = pwlen; i > 0; i >>= 1)
-      md5_append(&state, (md5_byte_t *)((i & 1) ? "" : pw), 1);
+      _cups_md5_append(&state, (_cups_md5_byte_t *)((i & 1) ? "" : pw), 1);
 
-    md5_finish(&state, digest);
+    _cups_md5_finish(&state, digest);
 
     for (i = 0; i < 1000; i ++)
     {
-      md5_init(&state);
+      _cups_md5_init(&state);
 
       if (i & 1)
-        md5_append(&state, (md5_byte_t *)pw, pwlen);
+        _cups_md5_append(&state, (_cups_md5_byte_t *)pw, pwlen);
       else
-        md5_append(&state, digest, 16);
+        _cups_md5_append(&state, digest, 16);
 
       if (i % 3)
-        md5_append(&state, (md5_byte_t *)salt + 3, salt_end - salt - 3);
+        _cups_md5_append(&state, (_cups_md5_byte_t *)salt + 3, salt_end - salt - 3);
 
       if (i % 7)
-        md5_append(&state, (md5_byte_t *)pw, pwlen);
+        _cups_md5_append(&state, (_cups_md5_byte_t *)pw, pwlen);
 
       if (i & 1)
-        md5_append(&state, digest, 16);
+        _cups_md5_append(&state, digest, 16);
       else
-        md5_append(&state, (md5_byte_t *)pw, pwlen);
+        _cups_md5_append(&state, (_cups_md5_byte_t *)pw, pwlen);
 
-      md5_finish(&state, digest);
+      _cups_md5_finish(&state, digest);
     }
 
    /*
