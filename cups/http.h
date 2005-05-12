@@ -318,7 +318,7 @@ typedef struct
   char			buffer[HTTP_MAX_BUFFER];
 					/* Buffer for messages */
   int			auth_type;	/* Authentication in use */
-  md5_state_t		md5_state;	/* MD5 state */
+  _cups_md5_state_t	md5_state;	/* MD5 state */
   char			nonce[HTTP_MAX_VALUE];
 					/* Nonce value */
   int			nonce_count;	/* Nonce count */
@@ -391,7 +391,7 @@ extern char		*httpMD5(const char *, const char *, const char *,
 			         char [33]);
 extern char		*httpMD5Final(const char *, const char *, const char *,
 			              char [33]);
-extern char		*httpMD5String(const md5_byte_t *, char [33]);
+extern char		*httpMD5String(const unsigned char *, char [33]);
 
 /**** New in CUPS 1.1.19 ****/
 extern void		httpClearCookie(http_t *http);

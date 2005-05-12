@@ -43,15 +43,15 @@
  * 'httpMD5()' - Compute the MD5 sum of the username:group:password.
  */
 
-char *				/* O - MD5 sum */
-httpMD5(const char *username,	/* I - User name */
-        const char *realm,	/* I - Realm name */
-        const char *passwd,	/* I - Password string */
-	char       md5[33])	/* O - MD5 string */
+char *					/* O - MD5 sum */
+httpMD5(const char *username,		/* I - User name */
+        const char *realm,		/* I - Realm name */
+        const char *passwd,		/* I - Password string */
+	char       md5[33])		/* O - MD5 string */
 {
-  md5_state_t	state;		/* MD5 state info */
-  md5_byte_t	sum[16];	/* Sum data */
-  char		line[256];	/* Line to sum */
+  _cups_md5_state_t	state;		/* MD5 state info */
+  unsigned char		sum[16];	/* Sum data */
+  char			line[256];	/* Line to sum */
 
 
  /*
@@ -59,9 +59,9 @@ httpMD5(const char *username,	/* I - User name */
   */
 
   snprintf(line, sizeof(line), "%s:%s:%s", username, realm, passwd);
-  md5_init(&state);
-  md5_append(&state, (md5_byte_t *)line, strlen(line));
-  md5_finish(&state, sum);
+  _cups_md5_init(&state);
+  _cups_md5_append(&state, (unsigned char *)line, strlen(line));
+  _cups_md5_finish(&state, sum);
 
  /*
   * Return the sum...
@@ -83,10 +83,10 @@ httpMD5Final(const char *nonce,		/* I - Server nonce value */
 	     const char *resource,	/* I - Resource path */
              char       md5[33])	/* IO - MD5 sum */
 {
-  md5_state_t	state;			/* MD5 state info */
-  md5_byte_t	sum[16];		/* Sum data */
-  char		line[1024];		/* Line of data */
-  char		a2[33];			/* Hash of method and resource */
+  _cups_md5_state_t	state;		/* MD5 state info */
+  unsigned char		sum[16];	/* Sum data */
+  char			line[1024];	/* Line of data */
+  char			a2[33];		/* Hash of method and resource */
 
 
  /*
@@ -94,9 +94,9 @@ httpMD5Final(const char *nonce,		/* I - Server nonce value */
   */
 
   snprintf(line, sizeof(line), "%s:%s", method, resource);
-  md5_init(&state);
-  md5_append(&state, (md5_byte_t *)line, strlen(line));
-  md5_finish(&state, sum);
+  _cups_md5_init(&state);
+  _cups_md5_append(&state, (unsigned char *)line, strlen(line));
+  _cups_md5_finish(&state, sum);
   httpMD5String(sum, a2);
 
  /*
@@ -107,9 +107,9 @@ httpMD5Final(const char *nonce,		/* I - Server nonce value */
 
   snprintf(line, sizeof(line), "%s:%s:%s", md5, nonce, a2);
 
-  md5_init(&state);
-  md5_append(&state, (md5_byte_t *)line, strlen(line));
-  md5_finish(&state, sum);
+  _cups_md5_init(&state);
+  _cups_md5_append(&state, (unsigned char *)line, strlen(line));
+  _cups_md5_finish(&state, sum);
 
   return (httpMD5String(sum, md5));
 }
@@ -120,8 +120,9 @@ httpMD5Final(const char *nonce,		/* I - Server nonce value */
  */
 
 char *					/* O - MD5 sum in hex */
-httpMD5String(const md5_byte_t *sum,	/* I - MD5 sum data */
-              char             md5[33])	/* O - MD5 sum in hex */
+httpMD5String(const unsigned char *sum,	/* I - MD5 sum data */
+              char                md5[33])
+					/* O - MD5 sum in hex */
 {
   int		i;			/* Looping var */
   char		*md5ptr;		/* Pointer into MD5 string */

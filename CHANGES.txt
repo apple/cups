@@ -1,8 +1,11 @@
-CHANGES.txt - 04/29/2005
+CHANGES.txt - 05/12/2005
 ------------------------
 
 CHANGES IN CUPS V1.2.0b1
 
+	- The md5.h header and md5_* functions are now officially
+	  private and have been renamed to avoid conflicts with
+	  other implementations with the same name.
 	- The pdftops filter incorrectly embedded some Type1
 	  fonts (STR #1093)
 	- The scheduler didn't detect a closed connection in the

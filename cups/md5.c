@@ -1,4 +1,9 @@
 /*
+  Copyright 2005 by Easy Software Products
+
+  This source file implements private APIs and should not be used in
+  CUPS-based applications.
+
   Copyright (C) 1999 Aladdin Enterprises.  All rights reserved.
 
   This software is provided 'as-is', without any express or implied
@@ -41,62 +46,6 @@
 #include "md5.h"
 #include "string.h"
 
-#ifdef TEST
-/*
- * Compile with -DTEST to create a self-contained executable test program.
- * The test program should print out the same values as given in section
- * A.5 of RFC 1321, reproduced below.
- */
-main()
-{
-    static const char *const test[7] = {
-	"", /*d41d8cd98f00b204e9800998ecf8427e*/
-	"a", /*0cc175b9c0f1b6a831c399e269772661*/
-	"abc", /*900150983cd24fb0d6963f7d28e17f72*/
-	"message digest", /*f96b697d7cb7938d525a2f31aaf161d0*/
-	"abcdefghijklmnopqrstuvwxyz", /*c3fcd3d76192e4007dfb496cca67e13b*/
-	"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789",
-				/*d174ab98d277d9f5a5611c2c9f419d9f*/
-	"12345678901234567890123456789012345678901234567890123456789012345678901234567890" /*57edf4a22be3c955ac49da2e2107b67a*/
-    };
-    int i;
-
-    for (i = 0; i < 7; ++i) {
-	md5_state_t state;
-	md5_byte_t digest[16];
-	int di;
-
-	md5_init(&state);
-	md5_append(&state, (const md5_byte_t *)test[i], strlen(test[i]));
-	md5_finish(&state, digest);
-	printf("MD5 (\"%s\") = ", test[i]);
-	for (di = 0; di < 16; ++di)
-	    printf("%02x", digest[di]);
-	printf("\n");
-    }
-    return 0;
-}
-#endif /* TEST */
-
-
-/*
- * For reference, here is the program that computed the T values.
- */
-#if 0
-#include <math.h>
-main()
-{
-    int i;
-    for (i = 1; i <= 64; ++i) {
-	unsigned long v = (unsigned long)(4294967296.0 * fabs(sin((double)i)));
-	printf("#define T%d 0x%08lx\n", i, v);
-    }
-    return 0;
-}
-#endif
-/*
- * End of T computation program.
- */
 #define T1 0xd76aa478
 #define T2 0xe8c7b756
 #define T3 0x242070db
@@ -163,12 +112,12 @@ main()
 #define T64 0xeb86d391
 
 static void
-md5_process(md5_state_t *pms, const md5_byte_t *data /*[64]*/)
+_cups_md5_process(_cups_md5_state_t *pms, const unsigned char *data /*[64]*/)
 {
-    md5_word_t
+    unsigned int
 	a = pms->abcd[0], b = pms->abcd[1],
 	c = pms->abcd[2], d = pms->abcd[3];
-    md5_word_t t;
+    unsigned int t;
 
 #ifndef ARCH_IS_BIG_ENDIAN
 # define ARCH_IS_BIG_ENDIAN 1	/* slower, default implementation */
@@ -179,8 +128,8 @@ md5_process(md5_state_t *pms, const md5_byte_t *data /*[64]*/)
      * On big-endian machines, we must arrange the bytes in the right
      * order.  (This also works on machines of unknown byte order.)
      */
-    md5_word_t X[16];
-    const md5_byte_t *xp = data;
+    unsigned int X[16];
+    const unsigned char *xp = data;
     int i;
 
     for (i = 0; i < 16; ++i, xp += 4)
@@ -192,12 +141,12 @@ md5_process(md5_state_t *pms, const md5_byte_t *data /*[64]*/)
      * On little-endian machines, we can process properly aligned data
      * without copying it.
      */
-    md5_word_t xbuf[16];
-    const md5_word_t *X;
+    unsigned int xbuf[16];
+    const unsigned int *X;
 
-    if (!((data - (const md5_byte_t *)0) & 3)) {
+    if (!((data - (const unsigned char *)0) & 3)) {
 	/* data are properly aligned */
-	X = (const md5_word_t *)data;
+	X = (const unsigned int *)data;
     } else {
 	/* not aligned */
 	memcpy(xbuf, data, 64);
@@ -321,7 +270,7 @@ md5_process(md5_state_t *pms, const md5_byte_t *data /*[64]*/)
 }
 
 void
-md5_init(md5_state_t *pms)
+_cups_md5_init(_cups_md5_state_t *pms)
 {
     pms->count[0] = pms->count[1] = 0;
     pms->abcd[0] = 0x67452301;
@@ -331,12 +280,12 @@ md5_init(md5_state_t *pms)
 }
 
 void
-md5_append(md5_state_t *pms, const md5_byte_t *data, int nbytes)
+_cups_md5_append(_cups_md5_state_t *pms, const unsigned char *data, int nbytes)
 {
-    const md5_byte_t *p = data;
+    const unsigned char *p = data;
     int left = nbytes;
     int offset = (pms->count[0] >> 3) & 63;
-    md5_word_t nbits = (md5_word_t)(nbytes << 3);
+    unsigned int nbits = (unsigned int)(nbytes << 3);
 
     if (nbytes <= 0)
 	return;
@@ -356,12 +305,12 @@ md5_append(md5_state_t *pms, const md5_byte_t *data, int nbytes)
 	    return;
 	p += copy;
 	left -= copy;
-	md5_process(pms, pms->buf);
+	_cups_md5_process(pms, pms->buf);
     }
 
     /* Process full blocks. */
     for (; left >= 64; p += 64, left -= 64)
-	md5_process(pms, p);
+	_cups_md5_process(pms, p);
 
     /* Process a final partial block. */
     if (left)
@@ -369,24 +318,24 @@ md5_append(md5_state_t *pms, const md5_byte_t *data, int nbytes)
 }
 
 void
-md5_finish(md5_state_t *pms, md5_byte_t digest[16])
+_cups_md5_finish(_cups_md5_state_t *pms, unsigned char digest[16])
 {
-    static const md5_byte_t pad[64] = {
+    static const unsigned char pad[64] = {
 	0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
     };
-    md5_byte_t data[8];
+    unsigned char data[8];
     int i;
 
     /* Save the length before padding. */
     for (i = 0; i < 8; ++i)
-	data[i] = (md5_byte_t)(pms->count[i >> 2] >> ((i & 3) << 3));
+	data[i] = (unsigned char)(pms->count[i >> 2] >> ((i & 3) << 3));
     /* Pad to 56 bytes mod 64. */
-    md5_append(pms, pad, ((55 - (pms->count[0] >> 3)) & 63) + 1);
+    _cups_md5_append(pms, pad, ((55 - (pms->count[0] >> 3)) & 63) + 1);
     /* Append the length. */
-    md5_append(pms, data, 8);
+    _cups_md5_append(pms, data, 8);
     for (i = 0; i < 16; ++i)
-	digest[i] = (md5_byte_t)(pms->abcd[i >> 2] >> ((i & 3) << 3));
+	digest[i] = (unsigned char)(pms->abcd[i >> 2] >> ((i & 3) << 3));
 }
