@@ -1579,20 +1579,20 @@ cups_crypt(const char *pw,		/* I - Password string */
     pwlen = strlen(pw);
 
     _cups_md5_init(&state);
-    _cups_md5_append(&state, (_cups_md5_byte_t *)pw, pwlen);
-    _cups_md5_append(&state, (_cups_md5_byte_t *)salt, salt_end - salt);
+    _cups_md5_append(&state, (unsigned char *)pw, pwlen);
+    _cups_md5_append(&state, (unsigned char *)salt, salt_end - salt);
 
     _cups_md5_init(&state2);
-    _cups_md5_append(&state2, (_cups_md5_byte_t *)pw, pwlen);
-    _cups_md5_append(&state2, (_cups_md5_byte_t *)salt + 3, salt_end - salt - 3);
-    _cups_md5_append(&state2, (_cups_md5_byte_t *)pw, pwlen);
+    _cups_md5_append(&state2, (unsigned char *)pw, pwlen);
+    _cups_md5_append(&state2, (unsigned char *)salt + 3, salt_end - salt - 3);
+    _cups_md5_append(&state2, (unsigned char *)pw, pwlen);
     _cups_md5_finish(&state2, digest);
 
     for (i = pwlen; i > 0; i -= 16)
       _cups_md5_append(&state, digest, i > 16 ? 16 : i);
 
     for (i = pwlen; i > 0; i >>= 1)
-      _cups_md5_append(&state, (_cups_md5_byte_t *)((i & 1) ? "" : pw), 1);
+      _cups_md5_append(&state, (unsigned char *)((i & 1) ? "" : pw), 1);
 
     _cups_md5_finish(&state, digest);
 
@@ -1601,20 +1601,20 @@ cups_crypt(const char *pw,		/* I - Password string */
       _cups_md5_init(&state);
 
       if (i & 1)
-        _cups_md5_append(&state, (_cups_md5_byte_t *)pw, pwlen);
+        _cups_md5_append(&state, (unsigned char *)pw, pwlen);
       else
         _cups_md5_append(&state, digest, 16);
 
       if (i % 3)
-        _cups_md5_append(&state, (_cups_md5_byte_t *)salt + 3, salt_end - salt - 3);
+        _cups_md5_append(&state, (unsigned char *)salt + 3, salt_end - salt - 3);
 
       if (i % 7)
-        _cups_md5_append(&state, (_cups_md5_byte_t *)pw, pwlen);
+        _cups_md5_append(&state, (unsigned char *)pw, pwlen);
 
       if (i & 1)
         _cups_md5_append(&state, digest, 16);
       else
-        _cups_md5_append(&state, (_cups_md5_byte_t *)pw, pwlen);
+        _cups_md5_append(&state, (unsigned char *)pw, pwlen);
 
       _cups_md5_finish(&state, digest);
     }
