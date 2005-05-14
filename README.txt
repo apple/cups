@@ -1,4 +1,4 @@
-README - CUPS v1.2.0b1 - 02/17/2005
+README - CUPS v1.2.0b1 - 05/14/2005
 -----------------------------------
 
 *****************************************************************
@@ -14,9 +14,15 @@ README - CUPS v1.2.0b1 - 02/17/2005
 Looking for compile instructions?  Read the file "INSTALL.txt"
 instead...
 
-**** IF YOU HAVE A NON-POSTSCRIPT PRINTER, YOU WILL ALSO  ****
-**** NEED TO INSTALL ESP GHOSTSCRIPT OR A PATCHED VERSION ****
-**** OF THE STANDARD GHOSTSCRIPT RELEASES.                ****
+*****************************************************************
+*****************************************************************
+****                                                         ****
+**** IF YOU HAVE A NON-POSTSCRIPT PRINTER, YOU WILL ALSO     ****
+**** NEED TO INSTALL ESP GHOSTSCRIPT OR A PATCHED VERSION    ****
+**** OF A STANDARD GHOSTSCRIPT RELEASE.                      ****
+****                                                         ****
+*****************************************************************
+*****************************************************************
 
 
 INTRODUCTION
@@ -37,7 +43,7 @@ support real-world printing under UNIX.
 
 CUPS includes an image file RIP that supports printing of image
 files to non-PostScript printers.  A customized version of GNU
-Ghostscript 7.05 for CUPS called ESP Ghostscript is available
+Ghostscript for CUPS called ESP Ghostscript is available
 separately to support printing of PostScript files within the
 CUPS driver framework.  Sample drivers for Dymo, EPSON, HP, and
 OKIDATA printers are included that use these filters.
@@ -129,30 +135,26 @@ Please read the documentation before asking questions.
 
 GETTING SUPPORT AND OTHER RESOURCES
 
-If you have problems, READ THE DOCUMENTATION FIRST!
+If you have problems, READ THE DOCUMENTATION FIRST!  We also
+provide many discussion forums which are available at:
 
-You can subscribe to the CUPS mailing list by sending a message
-containing "subscribe cups" to majordomo@cups.org.  This list is
-provided to discuss problems, questions, and improvements to the
-CUPS software.  New releases of CUPS are announced to this list
-as well.
+    http://www.cups.org/newsgroups.php
 
-Commercial support (with a guaranteed response time) is
-available from Easy Software Products.  For more information
-see:
+Commercial support (with a guaranteed response time) is available
+from Easy Software Products.  For more information see:
 
-    http://www.easysw.com/cups
+    http://www.easysw.com/cups/
 
-See the CUPS web site at "http://www.cups.org" for other site
+See the CUPS web site at "http://www.cups.org/" for other site
 links.
 
 
 SETTING UP PRINTER QUEUES USING YOUR WEB BROWSER
 
-CUPS 1.1 includes a new web-based administration tool that
-allows you to manage printers, classes, and jobs on your
-server.  To access the printer administration tools open the
-following URL in your browser:
+CUPS 1.2 includes a web-based administration tool that allows you
+to manage printers, classes, and jobs on your server.  To access
+the printer administration tools open the following URL in your
+browser:
 
     http://localhost:631/admin
 
@@ -219,7 +221,7 @@ generally do not exercise the full potential of the printers or
 CUPS.  For commercial printer drivers check out our ESP Print
 Pro software at:
 
-    http://www.easysw.com/printpro
+    http://www.easysw.com/printpro/
 
 
 PRINTING FILES
