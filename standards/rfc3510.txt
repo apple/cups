@@ -1,0 +1,899 @@
+
+
+
+
+
+
+Network Working Group                                         R. Herriot
+Request for Comments: 3510                                   I. McDonald
+Updates: 2910                                            High North Inc.
+Category: Standards Track                                     April 2003
+
+
+                    Internet Printing Protocol/1.1:
+                             IPP URL Scheme
+
+Status of this Memo
+
+   This document specifies an Internet standards track protocol for the
+   Internet community, and requests discussion and suggestions for
+   improvements.  Please refer to the current edition of the "Internet
+   Official Protocol Standards" (STD 1) for the standardization state
+   and status of this protocol.  Distribution of this memo is unlimited.
+
+Copyright Notice
+
+   Copyright (C) The Internet Society (2003).  All Rights Reserved.
+
+Abstract
+
+   This memo defines the "ipp" URL (Uniform Resource Locator) scheme.
+   This memo updates IPP/1.1: Encoding and Transport (RFC 2910), by
+   expanding and clarifying Section 5, "IPP URL Scheme", of RFC 2910.
+   An "ipp" URL is used to specify the network location of a print
+   service that supports the IPP Protocol (RFC 2910), or of a network
+   resource (for example, a print job) managed by such a print service.
+
+Table of Contents
+
+   1.  Introduction ...............................................  2
+   2.  Terminology ................................................  3
+       2.1.  Conformance Terminology ..............................  3
+       2.2.  Model Terminology ....................................  3
+   3.  IPP Model for Printers and Jobs ............................  3
+   4.  IPP URL Scheme .............................................  4
+       4.1.  IPP URL Scheme Applicability .........................  4
+       4.2.  IPP URL Scheme Associated Port .......................  4
+       4.3.  IPP URL Scheme Associated MIME Type ..................  5
+       4.4.  IPP URL Scheme Character Encoding ....................  5
+       4.5.  IPP URL Scheme Syntax ................................  5
+       4.6.  IPP URL Examples .....................................  6
+             4.6.1.  IPP Printer URL Examples .....................  6
+             4.6.2.  IPP Job URL Examples .........................  6
+       4.7.  IPP URL Comparisons ..................................  7
+
+
+
+
+Herriot & McDonald          Standards Track                     [Page 1]
+
+RFC 3510                     IPP URL Scheme                   April 2003
+
+
+   5.  Conformance Requirements ...................................  8
+       5.1.  IPP Client Conformance Requirements ..................  8
+       5.2.  IPP Printer Conformance Requirements .................  8
+   6.  IANA Considerations ........................................  9
+   7.  Internationalization Considerations ........................  9
+   8.  Security Considerations ....................................  9
+   9.  Intellectual Property Rights ............................... 10
+   10. Normative References ....................................... 11
+   11. Informative References ..................................... 11
+   12. Acknowledgments ............................................ 12
+   Appendix A - Registration of "ipp" URL Scheme .................. 13
+   Authors' Addresses ............................................. 15
+   Full Copyright Statement ....................................... 16
+
+1.  Introduction
+
+   This memo conforms to all of the requirements in Registration
+   Procedures for URL Scheme Names [RFC2717].  This memo also follows
+   all of the recommendations in Guidelines for new URL Schemes
+   [RFC2718].
+
+   See section 1, "Introduction", of [RFC2911] and section 1,
+   "Introduction", of [RFC3196] for overview information about IPP.  See
+   section 10, "Description of the Base IPP Documents", of [RFC3196] for
+   a full description of the IPP document set.
+
+   This memo updates IPP/1.1: Encoding and Transport (RFC 2910), by
+   expanding and clarifying Section 5, "IPP URL Scheme", of RFC 2910,
+   but does not define any new parameters or other new extensions to the
+   syntax of IPP URLs.
+
+   The IPP URL scheme defined in this document is based on the ABNF for
+   the HTTP URL scheme defined in HTTP [RFC2616], which in turn is
+   derived from the URI Generic Syntax [RFC2396] and further updated for
+   IPv6 by [RFC2732].  An IPP URL is transformed into an HTTP URL
+   according to the rules specified in section 5 of IPP Protocol
+   [RFC2910].
+
+   This document defines IPP URL scheme applicability, associated port
+   (631), associated MIME type ("application/ipp"), character encoding,
+   and syntax.
+
+   This document is laid out as follows:
+
+   -  Section 2 defines the terminology used throughout the document.
+
+   -  Section 3 supplies references to the IPP Printer and IPP Job
+      object model defined in IPP Model [RFC2911].
+
+
+
+Herriot & McDonald          Standards Track                     [Page 2]
+
+RFC 3510                     IPP URL Scheme                   April 2003
+
+
+   -  Section 4 specifies the IPP URL scheme.
+
+   -  Section 5 specifies the conformance requirements for IPP Clients
+      and IPP Printers that claim conformance to this document.
+
+   -  Sections 6, 7, and 8 specify IANA, internationalization, and
+      security considerations.
+
+   -  Sections 9, 10, 11, 12, and 13 specify normative references,
+      informative references, acknowledgements, authors' addresses, and
+      full IETF copyright statement.
+
+   -  Section 14 (Appendix A) is a completed registration template for
+      the IPP URL Scheme (see section 6.0 of [RFC2717]).
+
+2.  Terminology
+
+      This specification document uses the terminology defined in this
+      section.
+
+2.1.  Conformance Terminology
+
+      The uppercase terms "MUST", "MUST NOT", "REQUIRED", "SHALL",
+      "SHALL NOT" "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and
+      "OPTIONAL" in this document are to be interpreted as described in
+      [RFC2119].  These terms are used to specify conformance
+      requirements for all implementations (both print clients and print
+      services) of this specification.
+
+2.2.  Model Terminology
+
+      See section 12.2, "Model Terminology", in IPP Model [RFC2911].
+
+3.  IPP Model for Printers and Jobs
+
+      See section 2, "IPP Objects", section 2.1, "Printer Object", and
+      section 2.2, "Job Object", in [RFC2911] for a full description of
+      the IPP object model and terminology.
+
+      In this document, "IPP Client" means the software (on some
+      hardware platform) that submits, monitors, and/or manages print
+      jobs via the IPP Protocol [RFC2910] to a print spooler, print
+      gateway, or physical printing device.
+
+
+
+
+
+
+
+
+Herriot & McDonald          Standards Track                     [Page 3]
+
+RFC 3510                     IPP URL Scheme                   April 2003
+
+
+      In this document, "IPP Printer object" means the software (on some
+      hardware platform) that receives print jobs and/or printer/job
+      operations via the IPP Protocol [RFC2910] from an "IPP Client".
+
+      In this document, "IPP Printer" is a synonym for "IPP Printer
+      object".
+
+      In this document, "IPP Job object" means the set of attributes and
+      documents for one print job instantiated on an "IPP Printer".
+
+      In this document, "IPP Job" is a synonym for "IPP Job object".
+
+      In this document, "IPP URL" means a URL with the "ipp" scheme.
+
+      Note:  In this document, "IPP URL" is a synonym for "ipp-URL" (in
+      section 4, "IPP URL Scheme", of this document) and "ipp-URL" (in
+      section 5, "IPP URL Scheme", of [RFC2910]).
+
+4.  IPP URL Scheme
+
+4.1.  IPP URL Scheme Applicability
+
+      The "ipp" URL scheme MUST only be used to specify absolute URLs
+      (relative IPP URLs are not allowed) for IPP print services and
+      their associated network resources.  The "ipp" URL scheme MUST
+      only be used to specify the use of the abstract protocol defined
+      in IPP Model [RFC2911] over an HTTP [RFC2616] transport, as
+      defined in IPP Protocol [RFC2910].  Any other transport binding
+      for the abstract protocol defined in IPP Model [RFC2911] would
+      require a different URL scheme.
+
+      The "ipp" URL scheme allows an IPP client to choose an appropriate
+      IPP print service (for example, from a directory).  The IPP client
+      can establish an HTTP connection to the specified IPP print
+      service.  The IPP client can send IPP protocol requests (for
+      example, a "Print-Job" request) and receive IPP protocol responses
+      over that HTTP connection.
+
+4.2.  IPP URL Scheme Associated Port
+
+      All IPP URLs which do NOT explicitly specify a port MUST be
+      resolved to IANA-assigned well-known port 631, as registered in
+      [IANA-PORTREG].
+
+      See:  IANA Port Numbers Registry [IANA-PORTREG].
+      See:  IPP Protocol [RFC2910].
+
+
+
+
+
+Herriot & McDonald          Standards Track                     [Page 4]
+
+RFC 3510                     IPP URL Scheme                   April 2003
+
+
+4.3.  IPP URL Scheme Associated MIME Type
+
+      All IPP URLs MUST be used to specify network print services which
+      support the "application/ipp" MIME media type as registered in
+      [IANA-MIMEREG] for IPP protocol requests and responses.
+
+      See:  IANA MIME Media Types Registry [IANA-MIMEREG].
+      See:  IPP Protocol [RFC2910].
+
+4.4.  IPP URL Scheme Character Encoding
+
+      IPP URLs MUST use [RFC2396] encoding, as do their equivalent HTTP
+      URLs.  Characters other than those in the "reserved" and "unsafe"
+      sets [RFC2396] are equivalent to their ""%" HEX HEX" encoding.
+
+4.5.  IPP URL Scheme Syntax
+
+      The abstract protocol defined in IPP Model [RFC2911] places a
+      limit of 1023 octets (NOT characters) on the length of a URI (see
+      section 4.1.5, "uri", in [RFC2911]).
+
+      Note:  IPP Printers ought to be cautious about depending on URI
+      lengths above 255 bytes, because some older client implementations
+      might not properly support these lengths.
+
+   IPP URLs MUST be represented in absolute form.  Absolute URLs MUST
+   always begin with a scheme name followed by a colon.  For definitive
+   information on URL syntax and semantics, see "Uniform Resource
+   Identifiers (URI): Generic Syntax and Semantics" [RFC2396].  This
+   specification adopts the definitions of "host", "port", "abs_path",
+   and "query" from [RFC2396], as updated for IPv6 by [RFC2732].
+
+   The IPP URL scheme syntax in ABNF is as follows:
+
+   ipp-URL = "ipp:" "//" host [ ":" port ] [ abs_path [ "?" query ]]
+
+   If the port is empty or not given, port 631 is assumed.  The
+   semantics are that the identified resource (see section 5.1.2 of
+   [RFC2616]) is located at the IPP print service listening for HTTP
+   connections on that port of that host, and the Request-URI for the
+   identified resource is 'abs_path'.
+
+   If the 'abs_path' is not present in the URL, it MUST be given as "/"
+   when used as a Request-URI for a resource (see section 5.1.2 of
+   [RFC2616]).
+
+
+
+
+
+
+Herriot & McDonald          Standards Track                     [Page 5]
+
+RFC 3510                     IPP URL Scheme                   April 2003
+
+
+4.6.  IPP URL Examples
+
+   Note:  Literal IPv4 or IPv6 addresses SHOULD NOT be used in IPP URLs.
+
+4.6.1.  IPP Printer URL Examples
+
+   The following are examples of well-formed IPP URLs for IPP Printers
+   (for example, to be used as protocol elements in 'printer-uri'
+   operation attributes of 'Print-Job' request messages):
+
+      ipp://example.com
+      ipp://example.com/printer
+      ipp://example.com/printer/tiger
+      ipp://example.com/printer/fox
+      ipp://example.com/printer/tiger/bob
+      ipp://example.com/printer/tiger/ira
+
+   Each of the above URLs are well-formed URLs for IPP Printers and each
+   would reference a logically different IPP Printer, even though some
+   of those IPP Printers might share the same host system.  The 'bob' or
+   'ira' last path components might represent two different physical
+   printer devices, while 'tiger' might represent some grouping of IPP
+   Printers (for example, a load-balancing spooler).  Or the 'bob' and
+   'ira' last path components might represent separate human recipients
+   on the same physical printer device (for example, a physical printer
+   supporting two job queues).  In either case, both 'bob' and 'ira'
+   would behave as different and independent IPP Printers.
+
+   The following are examples of well-formed IPP URLs for IPP Printers
+   with (optional) ports and paths:
+
+      ipp://example.com
+      ipp://example.com/~smith/printer
+      ipp://example.com:631/~smith/printer
+
+   The first and second IPP URLs above MUST be resolved to port 631
+   (IANA assigned well-known port for IPP).  The second and third IPP
+   URLs above are equivalent (see section 4.7 below).
+
+4.6.2.  IPP Job URL Examples
+
+   The following are examples of well-formed IPP URLs for IPP Jobs (for
+   example, to be used as protocol elements in 'job-uri' attributes of
+   'Print-Job' response messages):
+
+      ipp://example.com/printer/123
+      ipp://example.com/printer/tiger/job123
+
+
+
+
+Herriot & McDonald          Standards Track                     [Page 6]
+
+RFC 3510                     IPP URL Scheme                   April 2003
+
+
+   IPP Job URLs are valid and meaningful only until Job completion and
+   possibly an implementation defined optional period of persistence
+   after Job completion (see IPP Model [RFC2911]).
+
+   Ambiguously, section 4.3.1 'job-uri' of IPP Model [RFC2911] states
+   that:
+
+      "the precise format of a Job URI is implementation dependent."
+
+   Thus, the relationship between the value of the "printer-uri"
+   operation attribute used in a 'Print-Job' request and the value of
+   the "job-uri" attribute returned in the corresponding 'Print-Job'
+   response is implementation dependent.  Also, section 4.3.3 'job-
+   printer-uri' of IPP Model [RFC2911] states that the 'job-printer-uri'
+   attribute of a Job object:
+
+      "permits a client to identify the Printer object that created this
+      Job object when only the Job object's URI is available to the
+      client."
+
+   However, the above statement is false, because the transform from an
+   IPP Job URL to the corresponding IPP Printer URL is unspecified in
+   either IPP Model [RFC2911] or IPP Protocol [RFC2910].
+
+   IPP Printers that conform to this specification SHOULD only generate
+   IPP Job URLs (for example, in the "job-uri" attribute in a 'Print-
+   Job' response) by appending exactly one path component to the
+   corresponding IPP Printer URL (for interoperability).
+
+4.7.  IPP URL Comparisons
+
+   When comparing two IPP URLs to decide if they match or not, an IPP
+   Client MUST use the same rules as those defined for HTTP URI
+   comparisons in [RFC2616], with the sole following exception:
+
+   -  A port that is empty or not given MUST be treated as equivalent to
+      the well-known port for that IPP URL (port 631);
+
+      See:  Section 3.2.3, "URI Comparison", in [RFC2616].
+
+
+
+
+
+
+
+
+
+
+
+
+Herriot & McDonald          Standards Track                     [Page 7]
+
+RFC 3510                     IPP URL Scheme                   April 2003
+
+
+5.  Conformance Requirements
+
+5.1.  IPP Client Conformance Requirements
+
+      IPP Clients that conform to this specification:
+
+   a) MUST only send IPP protocol connections to the port specified in
+      each given IPP URL (if present) or otherwise to IANA assigned
+      well-known port 631;
+
+   b) MUST only send IPP URLs used as protocol elements in outgoing IPP
+      protocol request messages (for example, in the "printer-uri"
+      operation attribute in a 'Print-Job' request) that conform to the
+      ABNF specified in section 4.5, "IPP URL Scheme Syntax, of this
+      document;
+
+   c) MUST only convert IPP URLs to their corresponding HTTP URL forms
+      according to the rules in section 5, "IPP URL Scheme", in
+      [RFC2910].
+
+5.2.  IPP Printer Conformance Requirements
+
+   IPP Printers that conform to this specification:
+
+   a) MUST listen for incoming IPP protocol connections on IANA-assigned
+      well-known port 631, unless explicitly configured by system
+      administrators or site policies;
+
+   b) SHOULD NOT listen for incoming IPP protocol connections on any
+      other port, unless explicitly configured by system administrators
+      or site policies;
+
+   c) SHOULD only accept IPP URLs used as protocol elements in incoming
+      IPP protocol request messages (for example, in the "printer-uri"
+      operation attribute in a 'Print-Job' request) that conform to the
+      ABNF specified in section 4.5, "IPP URL Scheme Syntax", of this
+      document;
+
+   d) SHOULD only send IPP URLs used as protocol elements in outgoing
+      IPP protocol response messages (for example, in the "job-uri"
+      attribute in a 'Print-Job' response) that conform to the ABNF
+      specified in section 4.5, "IPP URL Scheme Syntax", of this
+      document;
+
+   e) SHOULD only generate IPP Job URLs (for example, in the "job-uri"
+      attribute in a 'Print-Job' response) by appending exactly one path
+      component to the corresponding IPP Printer URL (for
+      interoperability);
+
+
+
+Herriot & McDonald          Standards Track                     [Page 8]
+
+RFC 3510                     IPP URL Scheme                   April 2003
+
+
+   f) SHOULD NOT use literal IPv6 or IPv4 addresses in configured or
+      locally generated IPP URLs.
+
+6.  IANA Considerations
+
+   This IPP URL Scheme specification does not introduce any additional
+   IANA considerations, beyond those described in [RFC2910] and
+   [RFC2911].
+
+   See:  Section 6, "IANA Considerations" in [RFC2910]
+   See:  Section 6, "IANA Considerations" in [RFC2911].
+
+7.  Internationalization Considerations
+
+   This IPP URL Scheme specification does not introduce any additional
+   internationalization considerations, beyond those described in
+   [RFC2910] and [RFC2911].
+
+   See:  Section 7, "Internationalization Considerations", in [RFC2910].
+   See:  Section 7, "Internationalization Considerations", in [RFC2911].
+
+8.  Security Considerations
+
+   This IPP URL Scheme specification does not introduce any additional
+   security considerations, beyond those described in [RFC2910] and
+   [RFC2911], except the following:
+
+   a) An IPP URL might be faked to point to a rogue IPP print service,
+      thus collecting confidential document contents from IPP clients.
+      Server authentication mechanisms and security mechanisms specified
+      in the IPP Protocol [RFC2910] are sufficient to address this
+      threat.
+
+   b) An IPP URL might be used to access an IPP print service by an
+      unauthorized IPP client.  Client authentication mechanisms and
+      security mechanisms specified in the IPP Protocol [RFC2910] are
+      sufficient to address this threat.
+
+   c) An IPP URL might be used to access an IPP print service at a print
+      protocol application layer gateway (for example, an IPP to LPD
+      gateway [RFC2569]) causing silent compromise of IPP security
+      mechanisms.  There is no practical defense against this threat by
+      a client system.  System administrators should avoid such
+      compromising configurations.
+
+   d) An IPP URL does not have parameters to specify the required client
+      authentication mechanism (for example, 'certificate' as defined in
+      section 4.4.2, "uri-authentication-supported", of IPP Model
+
+
+
+Herriot & McDonald          Standards Track                     [Page 9]
+
+RFC 3510                     IPP URL Scheme                   April 2003
+
+
+      [RFC2911]) and required security mechanism (for example, 'tls' as
+      defined in section 4.4.3, "uri-security-supported", of IPP Model
+      [RFC2911]).  Service discovery or directory protocols might be
+      used to discover the required client authentication and security
+      mechanisms associated with given IPP URLs.
+
+   Historical Note:  During the development of this document,
+   consideration was given to the addition of standard IPP URL
+   parameters for the client authentication and security mechanisms.
+   However, based on a strong IETF IPP Working Group consensus, no
+   parameters were added to the "ipp" URL scheme as originally defined
+   in IPP Protocol [RFC2910] in September 2000, for reasons of backwards
+   compatibility with the many currently shipping implementations of
+   IPP/1.1.
+
+   See:  Section 8, "Security Considerations", in [RFC2910].
+   See:  Section 8, "Security Considerations", in [RFC2911].
+
+9.  Intellectual Property Rights
+
+   The IETF takes no position regarding the validity or scope of any
+   intellectual property or other rights that might be claimed to
+   pertain to the implementation or use of the technology described in
+   this document or the extent to which any license under such rights
+   might or might not be available; neither does it represent that it
+   has made any effort to identify any such rights.  Information on the
+   IETF's procedures with respect to rights in standards-track and
+   standards-related documentation can be found in BCP-11.  Copies of
+   claims of rights made available for publication and any assurances of
+   licenses to be made available, or the result of an attempt made to
+   obtain a general license or permission for the use of such
+   proprietary rights by implementors or users of this specification can
+   be obtained from the IETF Secretariat.
+
+   The IETF invites any interested party to bring to its attention any
+   copyrights, patents or patent applications, or other proprietary
+   rights which may cover technology that may be required to practice
+   this standard.  Please address the information to the IETF Executive
+   Director.
+
+
+
+
+
+
+
+
+
+
+
+
+Herriot & McDonald          Standards Track                    [Page 10]
+
+RFC 3510                     IPP URL Scheme                   April 2003
+
+
+10.  Normative References
+
+   [RFC2234]      Crocker, D. and  P. Overell, "Augmented BNF for Syntax
+                  Specifications: ABNF", RFC 2234, November 1997.
+
+   [RFC2396]      Berners-Lee, T., Fielding, R. and L. Masinter,
+                  "Uniform Resource Identifiers (URI): Generic Syntax",
+                  RFC 2396, August 1998.
+
+   [RFC2616]      Fielding, R., Gettys, J., Mogul, J., Frystyk, H.,
+                  Masinter, L., Leach, P. and T. Berners-Lee, "Hypertext
+                  Transfer Protocol -- HTTP/1.1", RFC 2616, June 1999.
+
+   [RFC2732]      Hinden, R., Carpenter, B. and L. Masinter, "Format for
+                  Literal IPv6 Addresses in URL's", RFC 2732, December
+                  1999.
+
+   [RFC2910]      Herriot, R., Butler, S., Moore, P., Turner, R. and J.
+                  Wenn, "IPP/1.1 Encoding and Transport [IPP Protocol]",
+                  RFC 2910, September 2000.
+
+   [RFC2911]      Hastings, T., Herriot, R., deBry, R., Isaacson, S. and
+                  P. Powell, "IPP/1.1 Model and Semantics [IPP Model]",
+                  RFC 2911, September 2000.
+
+   [US-ASCII]     Coded Character Set -- 7-bit American Standard Code
+                  for Information Interchange, ANSI X3.4-1986.
+
+11.  Informative References
+
+   [IANA-MIMEREG] IANA MIME Media Types Registry.
+                  ftp://ftp.iana.org/in-notes/iana/assignments/media-
+                  types/...
+
+   [IANA-PORTREG] IANA Port Numbers Registry. ftp://ftp.iana.org/in-
+                  notes/iana/assignments/port-numbers
+
+   [RFC2569]      Herriot, R., Hastings, T., Jacobs, N. and J. Martin,
+                  "Mapping between LPD and IPP Protocols", RFC 2569,
+                  April 1999.
+
+   [RFC2717]      Petke, R. and I. King, "Registration Procedures for
+                  URL Scheme Names", RFC 2717, November 1999.
+
+   [RFC2718]      Masinter, L., Alvestrand, H., Zigmond, D. and R.
+                  Petke, "Guidelines for new URL Schemes", RFC 2718,
+                  November 1999.
+
+
+
+
+Herriot & McDonald          Standards Track                    [Page 11]
+
+RFC 3510                     IPP URL Scheme                   April 2003
+
+
+   [RFC3196]      Hastings, T., Manros, C., Zehler, P., Kugler, C. and
+                  H. Holst, "Internet Printing Protocol/1.1:
+                  Implementor's Guide", RFC 3196, November 2001.
+
+12.  Acknowledgments
+
+   This document is a product of the Internet Printing Protocol Working
+   Group of the Internet Engineering Task Force (IETF).
+
+   Thanks to Pat Fleming (IBM), Tom Hastings (Xerox), Harry Lewis (IBM),
+   Hugo Parra (Novell), Don Wright (Lexmark), and all the members of the
+   IETF IPP WG.
+
+   Section 5, "IPP URL Scheme", in IPP Protocol [RFC2910] was the
+   primary input to this IPP URL Scheme specification.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Herriot & McDonald          Standards Track                    [Page 12]
+
+RFC 3510                     IPP URL Scheme                   April 2003
+
+
+Appendix A - Registration of "ipp" URL Scheme
+
+   Note:  The following registration obsoletes section 5, "IPP URL
+   Scheme", of IPP Protocol [RFC2911].
+
+   URL Scheme Name:  ipp
+
+   URL Scheme Syntax:
+
+      ipp-URL = "ipp:" "//" host [ ":" port ] [ abs_path [ "?" query ]]
+
+   Character Encoding Considerations:
+
+      IPP URLs MUST use [RFC2396] encoding, as do their equivalent HTTP
+      URLs.  Characters other than those in the "reserved" and "unsafe"
+      sets [RFC2396] are equivalent to their ""%" HEX HEX" encoding.
+
+   Intended Usage:
+
+      The intended usage of the "ipp" URL scheme is COMMON.
+
+      An "ipp" URL is used to specify the network location of a print
+      service that supports the IPP Protocol [RFC2910], or of a network
+      resource (for example, a print job) managed by such a print
+      service.  An IPP client can choose to establish an HTTP connection
+      to the specified print service for transmission of IPP protocol
+      requests (for example, IPP print job submission requests).
+
+   Applications or Protocols which use this URL scheme:
+
+      See:  Section 5, "IPP URL Scheme", in IPP Protocol [RFC2910].
+
+   Interoperability Considerations:
+
+      See:  Section 9, "Interoperability with IPP/1.0 Implementations",
+      in IPP Protocol [RFC2910].
+
+   Security Considerations:
+
+      See:  Section 8, "Security Considerations", in IPP Protocol
+      [RFC2910].
+
+   Relevant Publications:
+
+   [RFC2910] Herriot, R., Butler, S., Moore, P., Turner, R. and J. Wenn,
+             "IPP/1.1 Encoding and Transport [IPP Protocol]", RFC 2910,
+             September 2000.
+
+
+
+
+Herriot & McDonald          Standards Track                    [Page 13]
+
+RFC 3510                     IPP URL Scheme                   April 2003
+
+
+   [RFC2616] Fielding, R., Gettys, J., Mogul, J., Frystyk, H., Masinter,
+             L., Leach, P. and T. Berners-Lee, "Hypertext Transfer
+             Protocol -- HTTP/1.1", RFC 2616, June 1999.
+
+   [RFC3510] Herriot, R. and I. McDonald, "IPP/1.1: IPP URL Scheme", RFC
+             3510, April 2003.
+
+   Person & email address to contact for further information:
+
+   Robert Herriot
+   Consultant
+   706 Colorado Ave
+   Palo Alto, CA  94303
+
+   Phone: +1 650-327-4466
+   EMail: bob@herriot.com
+
+   Ira McDonald
+   High North Inc
+   221 Ridge Ave
+   Grand Marais, MI  49839
+
+   Phone: +1 906-494-2434
+   EMail: imcdonald@sharplabs.com
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Herriot & McDonald          Standards Track                    [Page 14]
+
+RFC 3510                     IPP URL Scheme                   April 2003
+
+
+Authors' Addresses
+
+   Robert Herriot
+   Consultant
+   706 Colorado Ave
+   Palo Alto, CA  94303
+
+   Phone: +1 650-327-4466
+   EMail: bob@herriot.com
+
+
+   Ira McDonald
+   High North Inc
+   221 Ridge Ave
+   Grand Marais, MI  49839
+
+   Phone: +1 906-494-2434
+   EMail: imcdonald@sharplabs.com
+
+   Usage questions and comments on this IPP URL Scheme should be sent
+   directly to the editors at their above addresses (and to the IPP
+   mailing list, if you are a subscriber - see below).
+
+   IPP Web Page:      http://www.pwg.org/ipp/
+   IPP Mailing List:  ipp@pwg.org
+
+   To subscribe to the IPP mailing list, send the following email:
+
+   1) send it to majordomo@pwg.org
+
+   2) leave the subject line blank
+
+   3) put the following two lines in the message body:  subscribe ipp
+
+   Implementers of this specification are encouraged to join the IPP
+   Mailing List in order to participate in any discussions of
+   clarification issues and comments.  In order to reduce spam the
+   mailing list rejects mail from non-subscribers, so you must subscribe
+   to the mailing list in order to send a question or comment to the IPP
+   mailing list.
+
+
+
+
+
+
+
+
+
+
+
+Herriot & McDonald          Standards Track                    [Page 15]
+
+RFC 3510                     IPP URL Scheme                   April 2003
+
+
+Full Copyright Statement
+
+   Copyright (C) The Internet Society (2003).  All Rights Reserved.
+
+   This document and translations of it may be copied and furnished to
+   others, and derivative works that comment on or otherwise explain it
+   or assist in its implementation may be prepared, copied, published
+   and distributed, in whole or in part, without restriction of any
+   kind, provided that the above copyright notice and this paragraph are
+   included on all such copies and derivative works.  However, this
+   document itself may not be modified in any way, such as by removing
+   the copyright notice or references to the Internet Society or other
+   Internet organizations, except as needed for the purpose of
+   developing Internet standards in which case the procedures for
+   copyrights defined in the Internet Standards process must be
+   followed, or as required to translate it into languages other than
+   English.
+
+   The limited permissions granted above are perpetual and will not be
+   revoked by the Internet Society or its successors or assigns.
+
+   This document and the information contained herein is provided on an
+   "AS IS" basis and THE INTERNET SOCIETY AND THE INTERNET ENGINEERING
+   TASK FORCE DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING
+   BUT NOT LIMITED TO ANY WARRANTY THAT THE USE OF THE INFORMATION
+   HEREIN WILL NOT INFRINGE ANY RIGHTS OR ANY IMPLIED WARRANTIES OF
+   MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+
+Acknowledgement
+
+   Funding for the RFC Editor function is currently provided by the
+   Internet Society.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Herriot & McDonald          Standards Track                    [Page 16]
+
