@@ -134,6 +134,7 @@ extern const char *cups_hstrerror(int);
 #include "banners.h"
 #include "dirsvc.h"
 #include "network.h"
+#include "subscriptions.h"
 
 
 /*

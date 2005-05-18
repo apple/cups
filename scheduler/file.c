@@ -31,6 +31,7 @@
  *   cupsFileClose()   - Close a CUPS file.
  *   cupsFileFlush()   - Flush pending output.
  *   cupsFileGetChar() - Get a single character from a file.
+ *   cupsFileGetConf() - Get a line from a configuration file...
  *   cupsFileGets()    - Get a CR and/or LF-terminated line.
  *   cupsFileOpen()    - Open a CUPS file.
  *   cupsFilePrintf()  - Write a formatted string.
@@ -68,9 +69,9 @@
  * Local functions...
  */
 
-static int	cups_fill(cups_file_t *fp);
-static int	cups_read(int fd, char *buf, int bytes);
-static int	cups_write(int fd, const char *buf, int bytes);
+static ssize_t	cups_fill(cups_file_t *fp);
+static ssize_t	cups_read(int fd, char *buf, size_t bytes);
+static ssize_t	cups_write(int fd, const char *buf, size_t bytes);
 
 
 /*
@@ -125,7 +126,7 @@ cupsFileClose(cups_file_t *fp)		/* I - CUPS file */
 int					/* O - 0 on success, -1 on error */
 cupsFileFlush(cups_file_t *fp)		/* I - CUPS file */
 {
-  int	bytes;				/* Bytes to write */
+  size_t	bytes;			/* Bytes to write */
 
 
  /*
@@ -180,13 +181,114 @@ cupsFileGetChar(cups_file_t *fp)	/* I - CUPS file */
 
 
 /*
+ * 'cupsFileGetConf()' - Get a line from a configuration file...
+ */
+
+char *					/* O - Line read of NULL on eof/error */
+cupsFileGetConf(cups_file_t *fp,	/* I - CUPS file */
+                char        *buf,	/* O - String buffer */
+		size_t      buflen,	/* I - Size of string buffer */
+                char        **value)	/* O - Pointer to value */
+{
+  char	*ptr;				/* Pointer into line */
+
+
+ /*
+  * Range check input...
+  */
+
+  if (!fp || fp->mode != 'r' || !buf || buflen < 2 || !value)
+  {
+    if (value)
+      *value = NULL;
+
+    return (NULL);
+  }
+
+ /*
+  * Read the next non-comment line...
+  */
+
+  *value = NULL;
+  
+  while (cupsFileGets(fp, buf, buflen))
+  {
+   /*
+    * Strip any comments...
+    */
+
+    if ((ptr = strchr(buf, '#')) != NULL)
+    {
+      while (ptr > buf)
+      {
+	if (!isspace(ptr[-1] & 255))
+	  break;
+
+        ptr --;
+      }
+
+      *ptr = '\0';
+    }
+
+   /*
+    * See if there is anything left...
+    */
+
+    if (buf[0])
+    {
+     /*
+      * Yes, grab any value and return...
+      */
+
+      for (ptr = buf; *ptr; ptr ++)
+        if (isspace(*ptr & 255))
+	  break;
+
+      if (*ptr)
+      {
+       /*
+        * Have a value, skip any other spaces...
+	*/
+
+        while (isspace(*ptr & 255))
+	  *ptr++ = '\0';
+
+        if (*ptr)
+	  *value = ptr;
+
+       /*
+        * Strip trailing whitespace and > for lines that begin with <...
+	*/
+
+        ptr += strlen(ptr) - 1;
+
+        if (buf[0] == '<' && *ptr == '>')
+	  *ptr-- = '\0';
+
+        while (ptr > *value && isspace(*ptr & 255))
+	  *ptr-- = '\0';
+      }
+
+     /*
+      * Return the line...
+      */
+
+      return (buf);
+    }
+  }
+
+  return (NULL);
+}
+
+
+/*
  * 'cupsFileGets()' - Get a CR and/or LF-terminated line.
  */
 
 char *					/* O - Line read or NULL on eof/error */
 cupsFileGets(cups_file_t *fp,		/* I - CUPS file */
              char        *buf,		/* O - String buffer */
-	     int         buflen)	/* I - Size of string buffer */
+	     size_t      buflen)	/* I - Size of string buffer */
 {
   int		ch;			/* Character from file */
   char		*ptr,			/* Current position in line buffer */
@@ -283,7 +385,7 @@ cupsFileOpen(const char *filename,	/* I - Name of file */
   switch (*mode)
   {
     case 'a' :
-        o = O_RDWR | O_CREAT;
+        o = O_RDWR | O_CREAT | O_APPEND;
 	fp->mode = 'w';
         break;
 
@@ -301,7 +403,7 @@ cupsFileOpen(const char *filename,	/* I - Name of file */
         return (NULL);
   }
 
-  if ((fp->fd = open(filename, o, 0644)) < 0)
+  if ((fp->fd = open(filename, o, 0666)) < 0)
   {
    /*
     * Can't open file!
@@ -342,7 +444,7 @@ cupsFilePrintf(cups_file_t *fp,		/* I - CUPS file */
 	       ...)			/* I - Additional args as necessary */
 {
   va_list	ap;			/* Argument list */
-  int		bytes;			/* Formatted size */
+  size_t	bytes;			/* Formatted size */
   char		buf[2048];		/* Formatted text */
 
 
@@ -408,7 +510,7 @@ int					/* O - Number of bytes written or -1 */
 cupsFilePuts(cups_file_t *fp,		/* I - CUPS file */
              const char  *s)		/* I - String to write */
 {
-  int	bytes;				/* Bytes to write */
+  size_t	bytes;			/* Bytes to write */
 
 
  /*
@@ -445,13 +547,13 @@ cupsFilePuts(cups_file_t *fp,		/* I - CUPS file */
  * 'cupsFileRead()' - Read from a file.
  */
 
-int					/* O - Number of bytes read or -1 */
+ssize_t					/* O - Number of bytes read or -1 */
 cupsFileRead(cups_file_t *fp,		/* I - CUPS file */
              char        *buf,		/* O - Buffer */
-	     int         bytes)		/* I - Number of bytes to read */
+	     size_t      bytes)		/* I - Number of bytes to read */
 {
-  int	total,				/* Total bytes read */
-	count;				/* Bytes read */
+  size_t	total,			/* Total bytes read */
+		count;			/* Bytes read */
 
 
  /*
@@ -508,11 +610,11 @@ cupsFileRead(cups_file_t *fp,		/* I - CUPS file */
  * 'cupsFileSeek()' - Seek in a file.
  */
 
-int					/* O - New file position or -1 */
+off_t					/* O - New file position or -1 */
 cupsFileSeek(cups_file_t *fp,		/* I - CUPS file */
-             int         pos)		/* I - Position in file */
+             off_t       pos)		/* I - Position in file */
 {
-  int	bytes;				/* Number bytes in buffer */
+  size_t	bytes;			/* Number bytes in buffer */
 
 
  /*
@@ -527,7 +629,8 @@ cupsFileSeek(cups_file_t *fp,		/* I - CUPS file */
   * see if we are outside of it...
   */
 
-  bytes = fp->end - fp->buf;
+  bytes   = fp->end - fp->buf;
+  fp->eof = 0;
 
   if (pos < fp->pos)
   {
@@ -544,7 +647,6 @@ cupsFileSeek(cups_file_t *fp,		/* I - CUPS file */
       fp->pos = 0;
       fp->ptr = NULL;
       fp->end = NULL;
-      fp->eof = 0;
 
       while ((bytes = cups_fill(fp)) > 0)
         if (pos >= fp->pos && pos < (fp->pos + bytes))
@@ -556,13 +658,9 @@ cupsFileSeek(cups_file_t *fp,		/* I - CUPS file */
     else
 #endif /* HAVE_LIBZ */
     {
-      lseek(fp->fd, pos, SEEK_SET);
-      fp->pos = pos;
+      fp->pos = lseek(fp->fd, pos, SEEK_SET);
       fp->ptr = NULL;
       fp->end = NULL;
-#ifdef HAVE_LIBZ
-      fp->eof = 0;
-#endif /* HAVE_LIBZ */
     }
   }
   else if (pos >= (fp->pos + bytes))
@@ -584,13 +682,9 @@ cupsFileSeek(cups_file_t *fp,		/* I - CUPS file */
     else
 #endif /* HAVE_LIBZ */
     {
-      lseek(fp->fd, pos, SEEK_SET);
-      fp->pos = pos;
+      fp->pos = lseek(fp->fd, pos, SEEK_SET);
       fp->ptr = NULL;
       fp->end = NULL;
-#ifdef HAVE_LIBZ
-      fp->eof = 0;
-#endif /* HAVE_LIBZ */
     }
   }
   else
@@ -601,12 +695,9 @@ cupsFileSeek(cups_file_t *fp,		/* I - CUPS file */
     */
 
     fp->ptr = fp->buf + pos - fp->pos;
-#ifdef HAVE_LIBZ
-    fp->eof = 0;
-#endif /* HAVE_LIBZ */
   }
 
-  return (pos);
+  return (fp->pos);
 }
 
 
@@ -614,10 +705,10 @@ cupsFileSeek(cups_file_t *fp,		/* I - CUPS file */
  * 'cupsFileWrite()' - Write to a file.
  */
 
-int					/* O - Number of bytes written */
+ssize_t					/* O - Number of bytes written */
 cupsFileWrite(cups_file_t *fp,		/* I - CUPS file */
               const char  *buf,		/* I - Buffer */
-	      int         bytes)	/* I - Number of bytes to write */
+	      size_t      bytes)	/* I - Number of bytes to write */
 {
  /*
   * Range check input...
@@ -654,10 +745,10 @@ cupsFileWrite(cups_file_t *fp,		/* I - CUPS file */
  * 'cups_fill()' - Fill the input buffer...
  */
 
-static int				/* O - Number of bytes or -1 */
+static ssize_t				/* O - Number of bytes or -1 */
 cups_fill(cups_file_t *fp)		/* I - CUPS file */
 {
-  int			bytes;		/* Number of bytes read */
+  size_t		bytes;		/* Number of bytes read */
 #ifdef HAVE_LIBZ
   const unsigned char	*ptr,		/* Pointer into buffer */
 			*end;		/* End of buffer */
@@ -890,6 +981,7 @@ cups_fill(cups_file_t *fp)		/* I - CUPS file */
     * Can't read from file!
     */
 
+    fp->eof = 1;
     fp->ptr = fp->buf;
     fp->end = fp->buf;
 
@@ -900,6 +992,7 @@ cups_fill(cups_file_t *fp)		/* I - CUPS file */
   * Return the bytes we read...
   */
 
+  fp->eof = 0;
   fp->ptr = fp->buf;
   fp->end = fp->buf + bytes;
 
@@ -911,12 +1004,12 @@ cups_fill(cups_file_t *fp)		/* I - CUPS file */
  * 'cups_read()' - Read from a file descriptor.
  */
 
-int					/* O - Number of bytes read or -1 */
-cups_read(int  fd,			/* I - File descriptor */
-          char *buf,			/* I - Buffer */
-	  int  bytes)			/* I - Number bytes */
+ssize_t					/* O - Number of bytes read or -1 */
+cups_read(int    fd,			/* I - File descriptor */
+          char   *buf,			/* I - Buffer */
+	  size_t bytes)			/* I - Number bytes */
 {
-  int	total;				/* Total bytes read */
+  size_t	total;			/* Total bytes read */
 
 
  /*
@@ -947,13 +1040,13 @@ cups_read(int  fd,			/* I - File descriptor */
  * 'cups_write()' - Write to a file descriptor.
  */
 
-int					/* O - Number of bytes written or -1 */
+ssize_t					/* O - Number of bytes written or -1 */
 cups_write(int        fd,		/* I - File descriptor */
            const char *buf,		/* I - Buffer */
-	   int        bytes)		/* I - Number bytes */
+	   size_t     bytes)		/* I - Number bytes */
 {
-  int	total,				/* Total bytes written */
-	count;				/* Count this time */
+  size_t	total,			/* Total bytes written */
+		count;			/* Count this time */
 
 
  /*

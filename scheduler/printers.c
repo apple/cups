@@ -94,7 +94,7 @@ AddPrinter(const char *name)	/* I - Name of printer */
 
   if ((p = calloc(1, sizeof(printer_t))) == NULL)
   {
-    LogMessage(L_ERROR, "Unable to allocate memory for printer - %s",
+    LogMessage(L_CRIT, "Unable to allocate memory for printer - %s",
                strerror(errno));
     return (NULL);
   }

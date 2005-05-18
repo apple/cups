@@ -60,7 +60,7 @@ extern "C" {
  * CUPS file structure...
  */
 
-typedef struct
+typedef struct cups_file_s
 {
   int		fd;			/* File descriptor */
   char		mode,			/* Mode ('r' or 'w') */
@@ -68,11 +68,11 @@ typedef struct
 		buf[2048],		/* Buffer */
 		*ptr,			/* Pointer into buffer */
 		*end;			/* End of buffer data */
-  int		pos;			/* File position for start of buffer */
+  off_t		pos;			/* File position for start of buffer */
+  int		eof;			/* End of file? */
 
 #  ifdef HAVE_LIBZ
   z_stream	stream;			/* Decompression stream */
-  int		eof;			/* End of file? */
   unsigned char	cbuf[1024];		/* Decompression buffer */
 #  endif /* HAVE_LIBZ */
 } cups_file_t;
@@ -84,18 +84,22 @@ typedef struct
 
 extern int		cupsFileClose(cups_file_t *fp);
 #define			cupsFileCompression(fp) (fp)->compressed
+#define			cupsFileEOF(fp) (fp)->eof
 extern int		cupsFileFlush(cups_file_t *fp);
 extern int		cupsFileGetChar(cups_file_t *fp);
-extern char		*cupsFileGets(cups_file_t *fp, char *buf, int buflen);
+extern char		*cupsFileGetConf(cups_file_t *fp, char *buf, size_t buflen,
+			                 char **value);
+extern char		*cupsFileGets(cups_file_t *fp, char *buf, size_t buflen);
 #define			cupsFileNumber(fp) (fp)->fd
 extern cups_file_t	*cupsFileOpen(const char *filename, const char *mode);
 extern int		cupsFilePrintf(cups_file_t *fp, const char *format, ...);
 extern int		cupsFilePutChar(cups_file_t *fp, int c);
 extern int		cupsFilePuts(cups_file_t *fp, const char *s);
-extern int		cupsFileRead(cups_file_t *fp, char *buf, int bytes);
-extern int		cupsFileSeek(cups_file_t *fp, int pos);
+extern ssize_t		cupsFileRead(cups_file_t *fp, char *buf, size_t bytes);
+#define			cupsFileRewind(fp) cupsFileSeek(fp, 0L)
+extern off_t		cupsFileSeek(cups_file_t *fp, off_t pos);
 #define			cupsFileTell(fp) (fp)->pos
-extern int		cupsFileWrite(cups_file_t *fp, const char *buf, int bytes);
+extern ssize_t		cupsFileWrite(cups_file_t *fp, const char *buf, size_t bytes);
 
 
 #  ifdef _cplusplus
