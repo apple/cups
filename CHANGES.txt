@@ -1,8 +1,10 @@
-CHANGES.txt - 05/12/2005
+CHANGES.txt - 05/19/2005
 ------------------------
 
 CHANGES IN CUPS V1.2.0b1
 
+	- The cupsFile API now uses the O_APPEND option when
+	  opening files in append mode (STR #990)
 	- The md5.h header and md5_* functions are now officially
 	  private and have been renamed to avoid conflicts with
 	  other implementations with the same name.
