@@ -88,7 +88,7 @@ extern int		cupsFileClose(cups_file_t *fp);
 extern int		cupsFileFlush(cups_file_t *fp);
 extern int		cupsFileGetChar(cups_file_t *fp);
 extern char		*cupsFileGetConf(cups_file_t *fp, char *buf, size_t buflen,
-			                 char **value);
+			                 char **value, int *linenum);
 extern char		*cupsFileGets(cups_file_t *fp, char *buf, size_t buflen);
 #define			cupsFileNumber(fp) (fp)->fd
 extern cups_file_t	*cupsFileOpen(const char *filename, const char *mode);

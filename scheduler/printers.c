@@ -822,10 +822,8 @@ LoadAllPrinters(void)
 {
   cups_file_t	*fp;			/* printers.conf file */
   int		linenum;		/* Current line number */
-  int		len;			/* Length of line */
   char		line[1024],		/* Line from file */
 		name[256],		/* Parameter name */
-		*nameptr,		/* Pointer into name */
 		*value,			/* Pointer to value */
 		*valueptr;		/* Pointer into value */
   printer_t	*p;			/* Current printer */
@@ -850,46 +848,8 @@ LoadAllPrinters(void)
   linenum = 0;
   p       = NULL;
 
-  while (cupsFileGets(fp, line, sizeof(line)) != NULL)
+  while (cupsFileGetConf(fp, line, sizeof(line), &value, &linenum))
   {
-    linenum ++;
-
-   /*
-    * Skip comment lines...
-    */
-
-    if (line[0] == '#')
-      continue;
-
-   /*
-    * Strip trailing whitespace, if any...
-    */
-
-    len = strlen(line);
-
-    while (len > 0 && isspace(line[len - 1] & 255))
-    {
-      len --;
-      line[len] = '\0';
-    }
-
-   /*
-    * Extract the name from the beginning of the line...
-    */
-
-    for (value = line; isspace(*value & 255); value ++);
-
-    for (nameptr = name; *value != '\0' && !isspace(*value & 255) &&
-                             nameptr < (name + sizeof(name) - 1);)
-      *nameptr++ = *value++;
-    *nameptr = '\0';
-
-    while (isspace(*value & 255))
-      value ++;
-
-    if (name[0] == '\0')
-      continue;
-
    /*
     * Decode the directive...
     */
@@ -901,13 +861,11 @@ LoadAllPrinters(void)
       * <Printer name> or <DefaultPrinter name>
       */
 
-      if (line[len - 1] == '>' && p == NULL)
+      if (p == NULL && value)
       {
        /*
         * Add the printer and a base file type...
 	*/
-
-        line[len - 1] = '\0';
 
         LogMessage(L_DEBUG, "LoadAllPrinters: Loading printer %s...", value);
 

@@ -184,11 +184,12 @@ cupsFileGetChar(cups_file_t *fp)	/* I - CUPS file */
  * 'cupsFileGetConf()' - Get a line from a configuration file...
  */
 
-char *					/* O - Line read of NULL on eof/error */
-cupsFileGetConf(cups_file_t *fp,	/* I - CUPS file */
-                char        *buf,	/* O - String buffer */
-		size_t      buflen,	/* I - Size of string buffer */
-                char        **value)	/* O - Pointer to value */
+char *					/* O  - Line read of NULL on eof/error */
+cupsFileGetConf(cups_file_t *fp,	/* I  - CUPS file */
+                char        *buf,	/* O  - String buffer */
+		size_t      buflen,	/* I  - Size of string buffer */
+                char        **value,	/* O  - Pointer to value */
+		int         *linenum)	/* IO - Current line number */
 {
   char	*ptr;				/* Pointer into line */
 
@@ -213,6 +214,8 @@ cupsFileGetConf(cups_file_t *fp,	/* I - CUPS file */
   
   while (cupsFileGets(fp, buf, buflen))
   {
+    (*linenum) ++;
+
    /*
     * Strip any comments...
     */
@@ -264,6 +267,15 @@ cupsFileGetConf(cups_file_t *fp,	/* I - CUPS file */
 
         if (buf[0] == '<' && *ptr == '>')
 	  *ptr-- = '\0';
+	else if (buf[0] == '<' && *ptr != '>')
+        {
+	 /*
+	  * Syntax error...
+	  */
+
+	  *value = NULL;
+	  return (buf);
+	}
 
         while (ptr > *value && isspace(*ptr & 255))
 	  *ptr-- = '\0';

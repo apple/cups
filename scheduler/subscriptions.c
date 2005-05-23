@@ -683,6 +683,42 @@ cupsdFindSubscription(int id)		/* I - Subscription ID */
 void
 cupsdLoadAllSubscriptions(void)
 {
+  cups_file_t		*fp;		/* subscriptions.conf file */
+  int			linenum;	/* Current line number */
+  int			len;		/* Length of line */
+  char			line[1024],	/* Line from file */
+			name[256],	/* Parameter name */
+			*nameptr,	/* Pointer into name */
+			*value,		/* Pointer to value */
+			*valueptr;	/* Pointer into value */
+  cupsd_subscription_t	*sub;		/* Current subscription */
+  int			hex;		/* Non-zero if reading hex data */
+
+
+ /*
+  * Open the subscriptions.conf file...
+  */
+
+  snprintf(line, sizeof(line), "%s/subscriptions.conf", ServerRoot);
+  if ((fp = cupsFileOpen(line, "r")) == NULL)
+  {
+    LogMessage(L_ERROR, "LoadAllSubscriptions: Unable to open %s - %s", line,
+               strerror(errno));
+    return;
+  }
+
+ /*
+  * Read all of the lines from the file...
+  */
+
+  linenum = 0;
+  sub     = NULL;
+
+  while (cupsFileGetConf(fp, line, sizeof(line), &value, &linenum))
+  {
+  }
+
+  cupsFileClose(fp);
 }
 
 
@@ -693,7 +729,7 @@ cupsdLoadAllSubscriptions(void)
 void
 cupsdSaveAllSubscriptions(void)
 {
-  int			i;		/* Looping var */
+  int			i, j;		/* Looping vars */
   cups_file_t		*fp;		/* subscriptions.conf file */
   char			temp[1024];	/* Temporary string */
   char			backup[1024];	/* subscriptions.conf.O file */
@@ -702,6 +738,7 @@ cupsdSaveAllSubscriptions(void)
   struct tm		*curdate;	/* Current date */
   unsigned		mask;		/* Current event mask */
   const char		*name;		/* Current event name */
+  int			hex;		/* Non-zero if we are writing hex data */
 
 
  /*
@@ -785,6 +822,42 @@ cupsdSaveAllSubscriptions(void)
       cupsFilePrintf(fp, "JobId %d\n", sub->job->id);
     if (sub->dest)
       cupsFilePrintf(fp, "PrinterName %s\n", sub->dest->name);
+
+    if (sub->user_data_len > 0)
+    {
+      cupsFilePuts(fp, "UserData ");
+
+      for (j = 0, hex = 0; j < sub->user_data_len; j ++)
+      {
+        if (sub->user_data[j] < ' ' ||
+	    sub->user_data[j] > 0x7f ||
+	    sub->user_data[j] == '<')
+	{
+	  if (!hex)
+	  {
+	    cupsFilePrintf(fp, "<%02X", sub->user_data[j]);
+	    hex = 1;
+	  }
+	  else
+	    cupsFilePrintf(fp, "%02X", sub->user_data[j]);
+	}
+	else
+	{
+	  if (hex)
+	  {
+	    cupsFilePrintf(fp, ">%c", sub->user_data[j]);
+	    hex = 0;
+	  }
+	  else
+	    cupsFilePutChar(fp, sub->user_data[j]);
+	}
+      }
+
+      if (hex)
+        cupsFilePuts(fp, ">\n");
+      else
+        cupsFilePutChar(fp, '\n');
+    }
 
     cupsFilePrintf(fp, "LeaseTime %d\n", sub->lease);
     cupsFilePrintf(fp, "Interval %d\n", sub->interval);

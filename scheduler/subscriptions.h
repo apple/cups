@@ -90,7 +90,7 @@ typedef struct cupsd_subscription_s	/**** Subscription structure ****/
   int		id;			/* subscription-id */
   unsigned	mask;			/* Event mask */
   char		*recipient;		/* notify-recipient-uri, if applicable */
-  char		user_data[64];		/* notify-user-data */
+  unsigned char	user_data[64];		/* notify-user-data */
   int		user_data_len;		/* Length of notify-user-data */
   int		lease;			/* notify-lease-time */
   int		interval;		/* notify-interval */

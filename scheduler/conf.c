@@ -927,46 +927,8 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 
   linenum = 0;
 
-  while (cupsFileGets(fp, line, sizeof(line)) != NULL)
+  while (cupsFileGetConf(fp, line, sizeof(line), &value, &linenum))
   {
-    linenum ++;
-
-   /*
-    * Skip comment lines...
-    */
-
-    if (line[0] == '#')
-      continue;
-
-   /*
-    * Strip trailing whitespace, if any...
-    */
-
-    len = strlen(line);
-
-    while (len > 0 && isspace(line[len - 1]))
-    {
-      len --;
-      line[len] = '\0';
-    }
-
-   /*
-    * Extract the name from the beginning of the line...
-    */
-
-    for (value = line; isspace(*value); value ++);
-
-    for (nameptr = name; *value != '\0' && !isspace(*value) &&
-                             nameptr < (name + sizeof(name) - 1);)
-      *nameptr++ = *value++;
-    *nameptr = '\0';
-
-    while (isspace(*value))
-      value ++;
-
-    if (name[0] == '\0')
-      continue;
-
    /*
     * Decode the directive...
     */
@@ -997,10 +959,8 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
       * <Location path>
       */
 
-      if (line[len - 1] == '>')
+      if (value)
       {
-        line[len - 1] = '\0';
-
 	linenum = read_location(fp, value, linenum);
 	if (linenum == 0)
 	  return (0);
@@ -1018,10 +978,8 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
       * <Policy name>
       */
 
-      if (line[len - 1] == '>')
+      if (value)
       {
-        line[len - 1] = '\0';
-
 	linenum = read_policy(fp, value, linenum);
 	if (linenum == 0)
 	  return (0);
@@ -1814,10 +1772,8 @@ read_location(cups_file_t *fp,		/* I - Configuration file */
   int		i;			/* Looping var */
   location_t	*loc,			/* New location */
 		*parent;		/* Parent location */
-  int		len;			/* Length of line */
   char		line[HTTP_MAX_BUFFER],	/* Line buffer */
 		name[256],		/* Configuration directive */
-		*nameptr,		/* Pointer into name */
 		*value,			/* Value for directive */
 		*valptr;		/* Pointer into value */
   unsigned	ip[4],			/* IP address components */
@@ -1830,46 +1786,8 @@ read_location(cups_file_t *fp,		/* I - Configuration file */
   parent->limit = AUTH_LIMIT_ALL;
   loc           = parent;
 
-  while (cupsFileGets(fp, line, sizeof(line)) != NULL)
+  while (cupsFileGetConf(fp, line, sizeof(line), &value, &linenum))
   {
-    linenum ++;
-
-   /*
-    * Skip comment lines...
-    */
-
-    if (line[0] == '#')
-      continue;
-
-   /*
-    * Strip trailing whitespace, if any...
-    */
-
-    len = strlen(line);
-
-    while (len > 0 && isspace(line[len - 1] & 255))
-    {
-      len --;
-      line[len] = '\0';
-    }
-
-   /*
-    * Extract the name from the beginning of the line...
-    */
-
-    for (value = line; isspace(*value & 255); value ++);
-
-    for (nameptr = name; *value != '\0' && !isspace(*value & 255) &&
-                             nameptr < (name + sizeof(name) - 1);)
-      *nameptr++ = *value++;
-    *nameptr = '\0';
-
-    while (isspace(*value & 255))
-      value ++;
-
-    if (name[0] == '\0')
-      continue;
-
    /*
     * Decode the directive...
     */
@@ -1879,15 +1797,19 @@ read_location(cups_file_t *fp,		/* I - Configuration file */
     else if (strcasecmp(name, "<Limit") == 0 ||
              strcasecmp(name, "<LimitExcept") == 0)
     {
+      if (!value)
+      {
+        LogMessage(L_ERROR, "Syntax error on line %d.", linenum);
+        return (0);
+      }
+      
       if ((loc = CopyLocation(&parent)) == NULL)
         return (0);
 
       loc->limit = 0;
       while (*value)
       {
-        for (valptr = value;
-	     !isspace(*valptr & 255) && *valptr != '>' && *valptr;
-	     valptr ++);
+        for (valptr = value; !isspace(*valptr & 255) && *valptr; valptr ++);
 
 	if (*valptr)
 	  *valptr++ = '\0';
@@ -1910,7 +1832,7 @@ read_location(cups_file_t *fp,		/* I - Configuration file */
 	  LogMessage(L_WARN, "Unknown request type %s on line %d!", value,
 	             linenum);
 
-        for (value = valptr; isspace(*value & 255) || *value == '>'; value ++);
+        for (value = valptr; isspace(*value & 255); value ++);
       }
 
       if (strcasecmp(name, "<LimitExcept") == 0)
@@ -2131,9 +2053,7 @@ read_location(cups_file_t *fp,		/* I - Configuration file */
       *     Require user names
       */
 
-      for (valptr = value;
-	   !isspace(*valptr & 255) && *valptr != '>' && *valptr;
-	   valptr ++);
+      for (valptr = value; !isspace(*valptr & 255) && *valptr; valptr ++);
 
       if (*valptr)
 	*valptr++ = '\0';
@@ -2222,10 +2142,8 @@ read_policy(cups_file_t *fp,		/* I - Configuration file */
   policyop_t	*op;			/* Policy operation */
   int		num_ops;		/* Number of IPP operations */
   ipp_op_t	ops[100];		/* Operations */
-  int		len;			/* Length of line */
   char		line[HTTP_MAX_BUFFER],	/* Line buffer */
 		name[256],		/* Configuration directive */
-		*nameptr,		/* Pointer into name */
 		*value,			/* Value for directive */
 		*valptr;		/* Pointer into value */
 
@@ -2244,46 +2162,8 @@ read_policy(cups_file_t *fp,		/* I - Configuration file */
   op      = NULL;
   num_ops = 0;
 
-  while (cupsFileGets(fp, line, sizeof(line)) != NULL)
+  while (cupsFileGetConf(fp, line, sizeof(line), &value, &linenum))
   {
-    linenum ++;
-
-   /*
-    * Skip comment lines...
-    */
-
-    if (line[0] == '#')
-      continue;
-
-   /*
-    * Strip trailing whitespace, if any...
-    */
-
-    len = strlen(line);
-
-    while (len > 0 && isspace(line[len - 1] & 255))
-    {
-      len --;
-      line[len] = '\0';
-    }
-
-   /*
-    * Extract the name from the beginning of the line...
-    */
-
-    for (value = line; isspace(*value & 255); value ++);
-
-    for (nameptr = name; *value != '\0' && !isspace(*value & 255) &&
-                             nameptr < (name + sizeof(name) - 1);)
-      *nameptr++ = *value++;
-    *nameptr = '\0';
-
-    while (isspace(*value & 255))
-      value ++;
-
-    if (name[0] == '\0')
-      continue;
-
    /*
     * Decode the directive...
     */
@@ -2298,6 +2178,12 @@ read_policy(cups_file_t *fp,		/* I - Configuration file */
     }
     else if (!strcasecmp(name, "<Limit") && !op)
     {
+      if (!value)
+      {
+        LogMessage(L_ERROR, "Syntax error on line %d.", linenum);
+        return (0);
+      }
+      
      /*
       * Scan for IPP operation names...
       */
@@ -2306,9 +2192,7 @@ read_policy(cups_file_t *fp,		/* I - Configuration file */
 
       while (*value)
       {
-        for (valptr = value;
-	     !isspace(*valptr & 255) && *valptr != '>' && *valptr;
-	     valptr ++);
+        for (valptr = value; !isspace(*valptr & 255) && *valptr; valptr ++);
 
 	if (*valptr)
 	  *valptr++ = '\0';
@@ -2325,7 +2209,7 @@ read_policy(cups_file_t *fp,		/* I - Configuration file */
 	  LogMessage(L_ERROR, "Too many operations listed on line %d!",
 	             linenum);
 
-        for (value = valptr; isspace(*value & 255) || *value == '>'; value ++);
+        for (value = valptr; isspace(*value & 255); value ++);
       }
 
      /*
