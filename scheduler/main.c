@@ -703,13 +703,17 @@ main(int  argc,				/* I - Number of command-line arguments */
 	}
       }
 
-      if (FD_ISSET(con->http.fd, output) &&
-          (!con->pipe_pid || con->file_ready))
-        if (!WriteClient(con))
-	{
-	  con --;
-	  continue;
-	}
+      if (FD_ISSET(con->http.fd, output))
+      {
+        FD_CLR(con->http.fd, output);
+
+	if (!con->pipe_pid || con->file_ready)
+          if (!WriteClient(con))
+	  {
+	    con --;
+	    continue;
+	  }
+      }
 
      /*
       * Check the activity and close old clients...
