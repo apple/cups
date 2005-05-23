@@ -553,7 +553,7 @@ httpReconnect(http_t *http)		/* I - HTTP data */
   setsockopt(http->fd, IPPROTO_TCP, TCP_NODELAY, (char *)&val, sizeof(val)); 
 #else
   setsockopt(http->fd, IPPROTO_TCP, TCP_NODELAY, &val, sizeof(val)); 
-#endif // WIN32
+#endif /* WIN32 */
 
  /*
   * Connect to the server...

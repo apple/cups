@@ -79,7 +79,7 @@
 
 #ifdef WIN32
 #  include <io.h>
-#endif // WIN32
+#endif /* WIN32 */
 
 
 /*
