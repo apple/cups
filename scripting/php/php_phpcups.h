@@ -1,38 +1,42 @@
 /*
-   +----------------------------------------------------------------------+
-   | PHP version 4.0                                                      |
-   +----------------------------------------------------------------------+
-   | Copyright (c) 1997, 1998, 1999, 2000, 2001 The PHP Group             |
-   +----------------------------------------------------------------------+
-   | This source file is subject to version 2.02 of the PHP license,      |
-   | that is bundled with this package in the file LICENSE, and is        |
-   | available at through the world-wide-web at                           |
-   | http://www.php.net/license/2_02.txt.                                 |
-   | If you did not receive a copy of the PHP license and are unable to   |
-   | obtain it through the world-wide-web, please send a note to          |
-   | license@php.net so we can mail you a copy immediately.               |
-   +----------------------------------------------------------------------+
-   | Authors:                                                             |
-   |                                                                      |
-   +----------------------------------------------------------------------+
+ * "$Id$"
+ *
+ *   PHP module include file for the Common UNIX Printing System (CUPS).
+ *
+ *   Copyright 1997-2003 by Easy Software Products.
+ *
+ *   These coded instructions, statements, and computer programs are the
+ *   property of Easy Software Products and are protected by Federal
+ *   copyright law.  Distribution and use rights are outlined in the file
+ *   "LICENSE.txt" which should have been included with this file.  If this
+ *   file is missing or damaged please contact Easy Software Products
+ *   at:
+ *
+ *       Attn: CUPS Licensing Information
+ *       Easy Software Products
+ *       44141 Airport View Drive, Suite 204
+ *       Hollywood, Maryland 20636-3111 USA
+ *
+ *       Voice: (301) 373-9603
+ *       EMail: cups-info@cups.org
+ *         WWW: http://www.cups.org
  */
 
-
 #ifndef PHP_PHPCUPS_H
-#define PHP_PHPCUPS_H
+#  define PHP_PHPCUPS_H
 
 extern zend_module_entry phpcups_module_entry;
-#define phpext_phpcups_ptr &phpcups_module_entry
+#  define phpext_phpcups_ptr &phpcups_module_entry
 
-#ifdef PHP_WIN32
-#define PHP_PHPCUPS_API __declspec(dllexport)
-#else
-#define PHP_PHPCUPS_API
-#endif
+#  ifdef PHP_WIN32
+#    define PHP_PHPCUPS_API __declspec(dllexport)
+#  else
+#    define PHP_PHPCUPS_API
+#  endif
 
-#ifdef ZTS
-#include "TSRM.h"
-#endif
+#  ifdef ZTS
+#    include "TSRM.h"
+#  endif
 
 PHP_MINIT_FUNCTION(phpcups);
 PHP_MSHUTDOWN_FUNCTION(phpcups);
@@ -69,14 +73,15 @@ ZEND_END_MODULE_GLOBALS(phpcups)
    examples in any other php module directory.
 */
 
-#ifdef ZTS
-#define PHPCUPS_G(v) TSRMG(phpcups_globals_id, zend_phpcups_globals *, v)
-#else
-#define PHPCUPS_G(v) (phpcups_globals.v)
-#endif
+#  ifdef ZTS
+#    define PHPCUPS_G(v) TSRMG(phpcups_globals_id, zend_phpcups_globals *, v)
+#  else
+#    define PHPCUPS_G(v) (phpcups_globals.v)
+#  endif
 
-#endif	/* PHP_PHPCUPS_H */
+#endif	/* !PHP_PHPCUPS_H */
 
 
 /*
+ * End of "$Id$".
  */
