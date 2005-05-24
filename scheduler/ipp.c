@@ -103,7 +103,6 @@ typedef struct
 } ppd_default_t;
 
 
-
 /*
  * Local functions...
  */
@@ -207,11 +206,22 @@ ProcessIPPRequest(client_t *con)	/* I - Client connection */
                con->request->request.any.version[0],
 	       con->request->request.any.version[1]);
 
+    cupsdAddEvent(CUPSD_EVENT_SERVER_AUDIT, NULL, NULL,
+                  "%04X %s Bad request version (%d.%d)",
+		  IPP_VERSION_NOT_SUPPORTED, con->http.hostname,
+                  con->request->request.any.version[0],
+	          con->request->request.any.version[1]);
+
     send_ipp_error(con, IPP_VERSION_NOT_SUPPORTED);
   }  
   else if (con->request->attrs == NULL)
   {
     LogMessage(L_ERROR, "ProcessIPPRequest: no attributes in request!");
+
+    cupsdAddEvent(CUPSD_EVENT_SERVER_AUDIT, NULL, NULL,
+                  "%04X %s No attributes in request",
+		  IPP_BAD_REQUEST, con->http.hostname);
+
     send_ipp_error(con, IPP_BAD_REQUEST);
   }
   else
@@ -231,6 +241,11 @@ ProcessIPPRequest(client_t *con)	/* I - Client connection */
 	*/
 
 	LogMessage(L_ERROR, "ProcessIPPRequest: attribute groups are out of order!");
+
+	cupsdAddEvent(CUPSD_EVENT_SERVER_AUDIT, NULL, NULL,
+                      "%04X %s Attribute groups are out of order",
+		      IPP_BAD_REQUEST, con->http.hostname);
+
 	send_ipp_error(con, IPP_BAD_REQUEST);
 	break;
       }
@@ -248,7 +263,7 @@ ProcessIPPRequest(client_t *con)	/* I - Client connection */
       */
 
       attr = con->request->attrs;
-      if (attr != NULL && strcmp(attr->name, "attributes-charset") == 0 &&
+      if (attr && !strcmp(attr->name, "attributes-charset") &&
 	  attr->value_tag == IPP_TAG_CHARSET)
 	charset = attr;
       else
@@ -256,7 +271,8 @@ ProcessIPPRequest(client_t *con)	/* I - Client connection */
 
       if (attr)
         attr = attr->next;
-      if (attr != NULL && strcmp(attr->name, "attributes-natural-language") == 0 &&
+
+      if (attr && !strcmp(attr->name, "attributes-natural-language") &&
 	  attr->value_tag == IPP_TAG_LANGUAGE)
 	language = attr;
       else
@@ -298,14 +314,32 @@ ProcessIPPRequest(client_t *con)	/* I - Client connection */
 	* for all operations.
 	*/
 
-        if (charset == NULL)
+        if (!charset)
+	{
 	  LogMessage(L_ERROR, "ProcessIPPRequest: missing attributes-charset attribute!");
 
-        if (language == NULL)
+	  cupsdAddEvent(CUPSD_EVENT_SERVER_AUDIT, NULL, NULL,
+                	"%04X %s Missing attributes-charset attribute",
+			IPP_BAD_REQUEST, con->http.hostname);
+        }
+
+        if (!language)
+	{
 	  LogMessage(L_ERROR, "ProcessIPPRequest: missing attributes-natural-language attribute!");
 
-        if (uri == NULL)
+	  cupsdAddEvent(CUPSD_EVENT_SERVER_AUDIT, NULL, NULL,
+                	"%04X %s Missing attributes-natural-language attribute",
+			IPP_BAD_REQUEST, con->http.hostname);
+        }
+
+        if (!uri)
+	{
 	  LogMessage(L_ERROR, "ProcessIPPRequest: missing printer-uri or job-uri attribute!");
+
+	  cupsdAddEvent(CUPSD_EVENT_SERVER_AUDIT, NULL, NULL,
+                	"%04X %s Missing printer-uri or job-uri attribute",
+			IPP_BAD_REQUEST, con->http.hostname);
+        }
 
 	LogMessage(L_DEBUG, "Request attributes follow...");
 
@@ -500,14 +534,22 @@ ProcessIPPRequest(client_t *con)	/* I - Client connection */
 	      break;
 
 	  default :
+	      cupsdAddEvent(CUPSD_EVENT_SERVER_AUDIT, NULL, NULL,
+                	    "%04X %s Operation %04X (%s) not supported",
+			    IPP_OPERATION_NOT_SUPPORTED, con->http.hostname,
+			    con->request->request.op.operation_id,
+			    ippOpString(con->request->request.op.operation_id));
+
               send_ipp_error(con, IPP_OPERATION_NOT_SUPPORTED);
+	      break;
 	}
       }
     }
   }
 
-  LogMessage(L_DEBUG, "ProcessIPPRequest: %d status_code=%x",
-             con->http.fd, con->response->request.status.status_code);
+  LogMessage(L_DEBUG, "ProcessIPPRequest: %d status_code=%x (%s)",
+             con->http.fd, con->response->request.status.status_code,
+	     ippErrorString(con->response->request.status.status_code));
 
   if (SendHeader(con, HTTP_OK, "application/ipp"))
   {

@@ -904,7 +904,6 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 {
   int		i;			/* Looping var */
   int		linenum;		/* Current line number */
-  int		len;			/* Length of line */
   char		line[HTTP_MAX_BUFFER],	/* Line from file */
 		name[256],		/* Parameter name */
 		*nameptr,		/* Pointer into name */

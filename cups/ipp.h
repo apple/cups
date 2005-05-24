@@ -444,6 +444,10 @@ extern ipp_state_t	ippReadIO(void *src, ipp_iocb_t cb, int blocking, ipp_t *pare
 extern ipp_state_t	ippWriteFile(int fd, ipp_t *ipp);
 extern ipp_state_t	ippWriteIO(void *dst, ipp_iocb_t cb, int blocking, ipp_t *parent, ipp_t *ipp);
 
+/**** New in CUPS 1.2 ****/
+extern ipp_status_t	ippErrorValue(const char *name);
+extern const char	*ippOpString(ipp_op_t op);
+extern ipp_op_t		ippOpValue(const char *name);
 
 /*
  * "Private" functions used internally by CUPS...

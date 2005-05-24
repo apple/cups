@@ -25,8 +25,6 @@
  *
  *   main()          - Parse options and do tests.
  *   do_tests()      - Do tests as specified in the test file.
- *   get_operation() - Get an IPP opcode from an operation name...
- *   get_status()    - Get an IPP status from a status name...
  *   get_tag()       - Get an IPP value or group tag from a name...
  *   get_token()     - Get a token from a file.
  *   print_attr()    - Print an attribute on the screen.
@@ -56,8 +54,8 @@
  */
 
 int		do_tests(const char *, const char *);
-ipp_op_t	get_operation(const char *);
-ipp_status_t	get_status(const char *);
+ipp_op_t	ippOpValue(const char *);
+ipp_status_t	ippErrorValue(const char *);
 ipp_tag_t	get_tag(const char *);
 char		*get_token(FILE *, char *, int);
 void		print_attr(ipp_attribute_t *);
@@ -242,7 +240,7 @@ do_tests(const char *uri,		/* I - URI to connect on */
 	*/
 
 	get_token(fp, token, sizeof(token));
-	op = get_operation(token);
+	op = ippOpValue(token);
       }
       else if (strcasecmp(token, "GROUP") == 0)
       {
@@ -372,7 +370,7 @@ do_tests(const char *uri,		/* I - URI to connect on */
 	*/
 
 	get_token(fp, token, sizeof(token));
-	statuses[num_statuses] = get_status(token);
+	statuses[num_statuses] = ippErrorValue(token);
 	num_statuses ++;
       }
       else if (strcasecmp(token, "EXPECT") == 0)
@@ -489,139 +487,6 @@ do_tests(const char *uri,		/* I - URI to connect on */
   httpClose(http);
 
   return (pass);
-}
-
-
-/*
- * 'get_operation()' - Get an IPP opcode from an operation name...
- */
-
-ipp_op_t
-get_operation(const char *name)
-{
-  int		i;
-  static char	*ipp_ops[] =
-		{
-		  "",
-		  "",
-		  "print-job",
-		  "print-uri",
-		  "validate-job",
-		  "create-job",
-		  "send-document",
-		  "send-uri",
-		  "cancel-job",
-		  "get-job-attributes",
-		  "get-jobs",
-		  "get-printer-attributes",
-		  "hold-job",
-		  "release-job",
-		  "restart-job",
-		  "",
-		  "pause-printer",
-		  "resume-printer",
-		  "purge-jobs",
-		  "set-printer-attributes",
-		  "set-job-attributes",
-		  "get-printer-supported-values"
-		},
-		*cups_ops[] =
-		{
-		  "cups-get-default",
-		  "cups-get-printers",
-		  "cups-add-printer",
-		  "cups-delete-printer",
-		  "cups-get-classes",
-		  "cups-add-class",
-		  "cups-delete-class",
-		  "cups-accept-jobs",
-		  "cups-reject-jobs",
-		  "cups-set-default",
-		  "cups-get-devices",
-		  "cups-get-ppds",
-		  "cups-move-job"
-		};
-
-
-  for (i = 0; i < (sizeof(ipp_ops) / sizeof(ipp_ops[0])); i ++)
-    if (strcasecmp(name, ipp_ops[i]) == 0)
-      return ((ipp_op_t)i);
-
-  if (strcasecmp(name, "windows-ext") == 0)
-    return (IPP_PRIVATE);
-
-  for (i = 0; i < (sizeof(cups_ops) / sizeof(cups_ops[0])); i ++)
-    if (strcasecmp(name, cups_ops[i]) == 0)
-      return ((ipp_op_t)(i + 0x4001));
-
-  return ((ipp_op_t)0);
-}
-
-
-/*
- * 'get_status()' - Get an IPP status from a status name...
- */
-
-ipp_status_t
-get_status(const char *name)
-{
-  int		i;
-  static const char *status_oks[] =	/* "OK" status codes */
-		{
-		  "successful-ok",
-		  "successful-ok-ignored-or-substituted-attributes",
-		  "successful-ok-conflicting-attributes"
-		},
-		*status_400s[] =	/* Client errors */
-		{
-		  "client-error-bad-request",
-		  "client-error-forbidden",
-		  "client-error-not-authenticated",
-		  "client-error-not-authorized",
-		  "client-error-not-possible",
-		  "client-error-timeout",
-		  "client-error-not-found",
-		  "client-error-gone",
-		  "client-error-request-entity-too-large",
-		  "client-error-request-value-too-long",
-		  "client-error-document-format-not-supported",
-		  "client-error-attributes-or-values-not-supported",
-		  "client-error-uri-scheme-not-supported",
-		  "client-error-charset-not-supported",
-		  "client-error-conflicting-attributes",
-		  "client-error-compression-not-supported",
-		  "client-error-compression-error",
-		  "client-error-document-format-error",
-		  "client-error-document-access-error"
-		},
-		*status_500s[] =	/* Server errors */
-		{
-		  "server-error-internal-error",
-		  "server-error-operation-not-supported",
-		  "server-error-service-unavailable",
-		  "server-error-version-not-supported",
-		  "server-error-device-error",
-		  "server-error-temporary-error",
-		  "server-error-not-accepting-jobs",
-		  "server-error-busy",
-		  "server-error-job-canceled",
-		  "server-error-multiple-document-jobs-not-supported"
-		};
-
-
-  for (i = 0; i < (sizeof(status_oks) / sizeof(status_oks[0])); i ++)
-    if (strcasecmp(name, status_oks[i]) == 0)
-      return ((ipp_status_t)i);
-
-  for (i = 0; i < (sizeof(status_400s) / sizeof(status_400s[0])); i ++)
-    if (strcasecmp(name, status_400s[i]) == 0)
-      return ((ipp_status_t)(i + 0x400));
-
-  for (i = 0; i < (sizeof(status_500s) / sizeof(status_500s[0])); i ++)
-    if (strcasecmp(name, status_500s[i]) == 0)
-      return ((ipp_status_t)(i + 0x500));
-
-  return ((ipp_status_t)-1);
 }
 
 
