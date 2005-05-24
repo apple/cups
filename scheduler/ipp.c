@@ -35,6 +35,7 @@
  *   add_queued_job_count()      - Add the "queued-job-count" attribute for
  *   cancel_all_jobs()           - Cancel all print jobs.
  *   cancel_job()                - Cancel a print job.
+ *   cancel_subscription()       - Cancel a subscription.
  *   check_quotas()              - Check quotas for a printer and user.
  *   copy_attribute()            - Copy a single attribute.
  *   copy_attrs()                - Copy attributes from one request to another.
@@ -44,16 +45,20 @@
  *   copy_model()                - Copy a PPD model file, substituting default
  *                                 values as needed...
  *   create_job()                - Print a file to a printer or class.
+ *   create_subscription()       - Create a notification subscription.
  *   delete_printer()            - Remove a printer or class from the system.
  *   get_default()               - Get the default destination.
  *   get_devices()               - Get the list of available devices on the
  *                                 local system.
  *   get_jobs()                  - Get a list of jobs for the specified printer.
  *   get_job_attrs()             - Get job attributes.
+ *   get_notifications()         - Get events for a subscription.
  *   get_ppds()                  - Get the list of PPD files on the local
  *                                 system.
  *   get_printer_attrs()         - Get printer attributes.
  *   get_printers()              - Get a list of printers.
+ *   get_subscription_attrs()    - Get subscription attributes.
+ *   get_subscriptions()         - Get subscriptions.
  *   hold_job()                  - Hold a print job.
  *   move_job()                  - Move a job to a new destination.
  *   ppd_add_default()           - Add a PPD default choice.
@@ -113,6 +118,7 @@ static void	add_printer_state_reasons(client_t *con, printer_t *p);
 static void	add_queued_job_count(client_t *con, printer_t *p);
 static void	cancel_all_jobs(client_t *con, ipp_attribute_t *uri);
 static void	cancel_job(client_t *con, ipp_attribute_t *uri);
+static void	cancel_subscription(client_t *con, int id);
 static int	check_quotas(client_t *con, printer_t *p);
 static ipp_attribute_t	*copy_attribute(ipp_t *to, ipp_attribute_t *attr,
 		                        int quickcopy);
@@ -122,14 +128,18 @@ static int	copy_banner(client_t *con, job_t *job, const char *name);
 static int	copy_file(const char *from, const char *to);
 static int	copy_model(const char *from, const char *to);
 static void	create_job(client_t *con, ipp_attribute_t *uri);
+static void	create_subscription(client_t *con, ipp_attribute_t *uri);
 static void	delete_printer(client_t *con, ipp_attribute_t *uri);
 static void	get_default(client_t *con);
 static void	get_devices(client_t *con);
 static void	get_jobs(client_t *con, ipp_attribute_t *uri);
 static void	get_job_attrs(client_t *con, ipp_attribute_t *uri);
+static void	get_notifications(client_t *con, int id);
 static void	get_ppds(client_t *con);
 static void	get_printers(client_t *con, int type);
 static void	get_printer_attrs(client_t *con, ipp_attribute_t *uri);
+static void	get_subscription_attrs(client_t *con, int sub_id);
+static void	get_subscriptions(client_t *con, ipp_attribute_t *uri);
 static void	hold_job(client_t *con, ipp_attribute_t *uri);
 static void	move_job(client_t *con, ipp_attribute_t *uri);
 static int	ppd_add_default(const char *option, const char *choice,
@@ -140,6 +150,7 @@ static void	print_job(client_t *con, ipp_attribute_t *uri);
 static void	read_ps_job_ticket(client_t *con);
 static void	reject_jobs(client_t *con, ipp_attribute_t *uri);
 static void	release_job(client_t *con, ipp_attribute_t *uri);
+static void	renew_subscription(client_t *con, int sub_id);
 static void	restart_job(client_t *con, ipp_attribute_t *uri);
 static void	send_document(client_t *con, ipp_attribute_t *uri);
 static void	send_ipp_error(client_t *con, ipp_status_t status);
@@ -166,6 +177,7 @@ ProcessIPPRequest(client_t *con)	/* I - Client connection */
   ipp_attribute_t	*language;	/* Language attribute */
   ipp_attribute_t	*uri;		/* Printer URI attribute */
   ipp_attribute_t	*username;	/* requesting-user-name attr */
+  int			sub_id;		/* Subscription ID */
 
 
   LogMessage(L_DEBUG2, "ProcessIPPRequest(%p[%d]): operation_id = %04x",
@@ -313,7 +325,8 @@ ProcessIPPRequest(client_t *con)	/* I - Client connection */
 	* not "root" from a remote host...
 	*/
 
-        if ((username = ippFindAttribute(con->request, "requesting-user-name", IPP_TAG_NAME)) != NULL)
+        if ((username = ippFindAttribute(con->request, "requesting-user-name",
+	                                 IPP_TAG_NAME)) != NULL)
 	{
 	 /*
 	  * Check for root user...
@@ -330,6 +343,12 @@ ProcessIPPRequest(client_t *con)	/* I - Client connection */
 	    SetString(&(username->values[0].string.text), RemoteRoot);
 	  }
 	}
+
+        if ((attr = ippFindAttribute(con->request, "notify-subscription-id",
+	                             IPP_TAG_INTEGER)) != NULL)
+	  sub_id = attr->values[0].integer;
+	else
+	  sub_id = 0;
 
        /*
         * Then try processing the operation...
@@ -455,6 +474,31 @@ ProcessIPPRequest(client_t *con)	/* I - Client connection */
               move_job(con, uri);
               break;
 
+          case IPP_CREATE_PRINTER_SUBSCRIPTION :
+	  case IPP_CREATE_JOB_SUBSCRIPTION :
+	      create_subscription(con, uri);
+	      break;
+
+          case IPP_GET_SUBSCRIPTION_ATTRIBUTES :
+	      get_subscription_attrs(con, sub_id);
+	      break;
+
+	  case IPP_GET_SUBSCRIPTIONS :
+	      get_subscriptions(con, uri);
+	      break;
+
+	  case IPP_RENEW_SUBSCRIPTION :
+	      renew_subscription(con, sub_id);
+	      break;
+
+	  case IPP_CANCEL_SUBSCRIPTION :
+	      cancel_subscription(con, sub_id);
+	      break;
+
+          case IPP_GET_NOTIFICATIONS :
+	      get_notifications(con, sub_id);
+	      break;
+
 	  default :
               send_ipp_error(con, IPP_OPERATION_NOT_SUPPORTED);
 	}
@@ -512,18 +556,14 @@ static void
 accept_jobs(client_t        *con,	/* I - Client connection */
             ipp_attribute_t *uri)	/* I - Printer or class URI */
 {
-  cups_ptype_t		dtype;		/* Destination type (printer or class) */
-  char			method[HTTP_MAX_URI],
-					/* Method portion of URI */
-			username[HTTP_MAX_URI],
-					/* Username portion of URI */
-			host[HTTP_MAX_URI],
-					/* Host portion of URI */
-			resource[HTTP_MAX_URI];
-					/* Resource portion of URI */
-  int			port;		/* Port portion of URI */
-  const char		*name;		/* Printer name */
-  printer_t		*printer;	/* Printer data */
+  cups_ptype_t	dtype;			/* Destination type (printer or class) */
+  char		method[HTTP_MAX_URI],	/* Method portion of URI */
+		username[HTTP_MAX_URI],	/* Username portion of URI */
+		host[HTTP_MAX_URI],	/* Host portion of URI */
+		resource[HTTP_MAX_URI];	/* Resource portion of URI */
+  int		port;			/* Port portion of URI */
+  const char	*name;			/* Printer name */
+  printer_t	*printer;		/* Printer data */
 
 
   LogMessage(L_DEBUG2, "accept_jobs(%p[%d], %s)\n", con, con->http.fd,
@@ -602,22 +642,18 @@ static void
 add_class(client_t        *con,		/* I - Client connection */
           ipp_attribute_t *uri)		/* I - URI of class */
 {
-  int			i;		/* Looping var */
-  char			method[HTTP_MAX_URI],
-					/* Method portion of URI */
-			username[HTTP_MAX_URI],
-					/* Username portion of URI */
-			host[HTTP_MAX_URI],
-					/* Host portion of URI */
-			resource[HTTP_MAX_URI];
-					/* Resource portion of URI */
-  int			port;		/* Port portion of URI */
-  printer_t		*pclass,	/* Class */
-			*member;	/* Member printer/class */
-  cups_ptype_t		dtype;		/* Destination type */
-  const char		*dest;		/* Printer or class name */
-  ipp_attribute_t	*attr;		/* Printer attribute */
-  int			modify;		/* Non-zero if we just modified */
+  int		i;			/* Looping var */
+  char		method[HTTP_MAX_URI],	/* Method portion of URI */
+		username[HTTP_MAX_URI],	/* Username portion of URI */
+		host[HTTP_MAX_URI],	/* Host portion of URI */
+		resource[HTTP_MAX_URI];	/* Resource portion of URI */
+  int		port;			/* Port portion of URI */
+  printer_t	*pclass,		/* Class */
+		*member;		/* Member printer/class */
+  cups_ptype_t	dtype;			/* Destination type */
+  const char	*dest;			/* Printer or class name */
+  ipp_attribute_t *attr;		/* Printer attribute */
+  int		modify;			/* Non-zero if we just modified */
 
 
   LogMessage(L_DEBUG2, "add_class(%p[%d], %s)\n", con, con->http.fd,
@@ -1066,23 +1102,19 @@ static void
 add_printer(client_t        *con,	/* I - Client connection */
             ipp_attribute_t *uri)	/* I - URI of printer */
 {
-  int			i;		/* Looping var */
-  char			method[HTTP_MAX_URI],
-					/* Method portion of URI */
-			username[HTTP_MAX_URI],
-					/* Username portion of URI */
-			host[HTTP_MAX_URI],
-					/* Host portion of URI */
-			resource[HTTP_MAX_URI];
-					/* Resource portion of URI */
-  int			port;		/* Port portion of URI */
-  printer_t		*printer;	/* Printer/class */
-  ipp_attribute_t	*attr;		/* Printer attribute */
-  cups_file_t		*fp;		/* Script/PPD file */
-  char			line[1024];	/* Line from file... */
-  char			srcfile[1024],	/* Source Script/PPD file */
-			dstfile[1024];	/* Destination Script/PPD file */
-  int			modify;		/* Non-zero if we are modifying */
+  int		i;			/* Looping var */
+  char		method[HTTP_MAX_URI],	/* Method portion of URI */
+		username[HTTP_MAX_URI],	/* Username portion of URI */
+		host[HTTP_MAX_URI],	/* Host portion of URI */
+		resource[HTTP_MAX_URI];	/* Resource portion of URI */
+  int		port;			/* Port portion of URI */
+  printer_t	*printer;		/* Printer/class */
+  ipp_attribute_t *attr;		/* Printer attribute */
+  cups_file_t	*fp;			/* Script/PPD file */
+  char		line[1024];		/* Line from file... */
+  char		srcfile[1024],		/* Source Script/PPD file */
+		dstfile[1024];		/* Destination Script/PPD file */
+  int		modify;			/* Non-zero if we are modifying */
 
 
   LogMessage(L_DEBUG2, "add_printer(%p[%d], %s)\n", con, con->http.fd,
@@ -1598,8 +1630,9 @@ add_printer(client_t        *con,	/* I - Client connection */
  */
 
 static void
-add_printer_state_reasons(client_t  *con,	/* I - Client connection */
-                          printer_t *p)		/* I - Printer info */
+add_printer_state_reasons(
+    client_t  *con,			/* I - Client connection */
+    printer_t *p)			/* I - Printer info */
 {
   LogMessage(L_DEBUG2, "add_printer_state_reasons(%p[%d], %p[%s])\n",
              con, con->http.fd, p, p->name);
@@ -1645,21 +1678,17 @@ static void
 cancel_all_jobs(client_t        *con,	/* I - Client connection */
 	        ipp_attribute_t *uri)	/* I - Job or Printer URI */
 {
-  const char		*dest;		/* Destination */
-  cups_ptype_t		dtype;		/* Destination type */
-  char			method[HTTP_MAX_URI],
-					/* Method portion of URI */
-			userpass[HTTP_MAX_URI],
-					/* Username portion of URI */
-			host[HTTP_MAX_URI],
-					/* Host portion of URI */
-			resource[HTTP_MAX_URI];
-					/* Resource portion of URI */
-  int			port;		/* Port portion of URI */
-  ipp_attribute_t	*attr;		/* Attribute in request */
-  const char		*username;	/* Username */
-  int			purge;		/* Purge? */
-  printer_t		*printer;	/* Printer */
+  const char	*dest;			/* Destination */
+  cups_ptype_t	dtype;			/* Destination type */
+  char		method[HTTP_MAX_URI],	/* Method portion of URI */
+		userpass[HTTP_MAX_URI],	/* Username portion of URI */
+		host[HTTP_MAX_URI],	/* Host portion of URI */
+		resource[HTTP_MAX_URI];	/* Resource portion of URI */
+  int		port;			/* Port portion of URI */
+  ipp_attribute_t *attr;		/* Attribute in request */
+  const char	*username;		/* Username */
+  int		purge;			/* Purge? */
+  printer_t	*printer;		/* Printer */
 
 
   LogMessage(L_DEBUG2, "cancel_all_jobs(%p[%d], %s)\n", con, con->http.fd,
@@ -1804,21 +1833,17 @@ static void
 cancel_job(client_t        *con,	/* I - Client connection */
 	   ipp_attribute_t *uri)	/* I - Job or Printer URI */
 {
-  ipp_attribute_t	*attr;		/* Current attribute */
-  int			jobid;		/* Job ID */
-  char			method[HTTP_MAX_URI],
-					/* Method portion of URI */
-			username[HTTP_MAX_URI],
-					/* Username portion of URI */
-			host[HTTP_MAX_URI],
-					/* Host portion of URI */
-			resource[HTTP_MAX_URI];
-					/* Resource portion of URI */
-  int			port;		/* Port portion of URI */
-  job_t			*job;		/* Job information */
-  const char		*dest;		/* Destination */
-  cups_ptype_t		dtype;		/* Destination type (printer or class) */
-  printer_t		*printer;	/* Printer data */
+  ipp_attribute_t *attr;		/* Current attribute */
+  int		jobid;			/* Job ID */
+  char		method[HTTP_MAX_URI],	/* Method portion of URI */
+		username[HTTP_MAX_URI],	/* Username portion of URI */
+		host[HTTP_MAX_URI],	/* Host portion of URI */
+		resource[HTTP_MAX_URI];	/* Resource portion of URI */
+  int		port;			/* Port portion of URI */
+  job_t		*job;			/* Job information */
+  const char	*dest;			/* Destination */
+  cups_ptype_t	dtype;			/* Destination type (printer or class) */
+  printer_t	*printer;		/* Printer data */
 
 
   LogMessage(L_DEBUG2, "cancel_job(%p[%d], %s)\n", con, con->http.fd,
@@ -1982,19 +2007,30 @@ cancel_job(client_t        *con,	/* I - Client connection */
 
 
 /*
+ * 'cancel_subscription()' - Cancel a subscription.
+ */
+
+static void
+cancel_subscription(client_t *con,	/* I - Client connection */
+                    int      sub_id)	/* I - Subscription ID */
+{
+}
+
+
+/*
  * 'check_quotas()' - Check quotas for a printer and user.
  */
 
-static int			/* O - 1 if OK, 0 if not */
-check_quotas(client_t  *con,	/* I - Client connection */
-             printer_t *p)	/* I - Printer or class */
+static int				/* O - 1 if OK, 0 if not */
+check_quotas(client_t  *con,		/* I - Client connection */
+             printer_t *p)		/* I - Printer or class */
 {
-  int		i, j;		/* Looping vars */
-  ipp_attribute_t *attr;	/* Current attribute */
-  char		username[33];	/* Username */
-  quota_t	*q;		/* Quota data */
-  struct passwd	*pw;		/* User password data */
-  struct group	*grp;		/* Group data */
+  int		i, j;			/* Looping vars */
+  ipp_attribute_t *attr;		/* Current attribute */
+  char		username[33];		/* Username */
+  quota_t	*q;			/* Quota data */
+  struct passwd	*pw;			/* User password data */
+  struct group	*grp;			/* Group data */
 
 
   LogMessage(L_DEBUG2, "check_quotas(%p[%d], %p[%s])\n",
@@ -2144,9 +2180,10 @@ check_quotas(client_t  *con,	/* I - Client connection */
  */
 
 static ipp_attribute_t *		/* O - New attribute */
-copy_attribute(ipp_t           *to,	/* O - Destination request/response */
-               ipp_attribute_t *attr,	/* I - Attribute to copy */
-               int             quickcopy)/* I - Do a quick copy? */
+copy_attribute(
+    ipp_t           *to,		/* O - Destination request/response */
+    ipp_attribute_t *attr,		/* I - Attribute to copy */
+    int             quickcopy)		/* I - Do a quick copy? */
 {
   int			i;		/* Looping var */
   ipp_attribute_t	*toattr;	/* Destination attribute */
@@ -2353,21 +2390,21 @@ copy_attrs(ipp_t           *to,		/* I - Destination request */
  *                   specified job.
  */
 
-static int			/* O - Size of banner file in kbytes */
-copy_banner(client_t   *con,	/* I - Client connection */
-            job_t      *job,	/* I - Job information */
-            const char *name)	/* I - Name of banner */
+static int				/* O - Size of banner file in kbytes */
+copy_banner(client_t   *con,		/* I - Client connection */
+            job_t      *job,		/* I - Job information */
+            const char *name)		/* I - Name of banner */
 {
-  int		i;		/* Looping var */
-  int		kbytes;		/* Size of banner file in kbytes */
-  char		filename[1024];	/* Job filename */
-  banner_t	*banner;	/* Pointer to banner */
-  cups_file_t	*in;		/* Input file */
-  cups_file_t	*out;		/* Output file */
-  int		ch;		/* Character from file */
-  char		attrname[255],	/* Name of attribute */
-		*s;		/* Pointer into name */
-  ipp_attribute_t *attr;	/* Attribute */
+  int		i;			/* Looping var */
+  int		kbytes;			/* Size of banner file in kbytes */
+  char		filename[1024];		/* Job filename */
+  banner_t	*banner;		/* Pointer to banner */
+  cups_file_t	*in;			/* Input file */
+  cups_file_t	*out;			/* Output file */
+  int		ch;			/* Character from file */
+  char		attrname[255],		/* Name of attribute */
+		*s;			/* Pointer into name */
+  ipp_attribute_t *attr;		/* Attribute */
 
 
   LogMessage(L_DEBUG2, "copy_banner(%p[%d], %p[%d], %s)",
@@ -2873,27 +2910,22 @@ static void
 create_job(client_t        *con,	/* I - Client connection */
 	   ipp_attribute_t *uri)	/* I - Printer URI */
 {
-  ipp_attribute_t	*attr;		/* Current attribute */
-  const char		*dest;		/* Destination */
-  cups_ptype_t		dtype;		/* Destination type (printer or class) */
-  int			priority;	/* Job priority */
-  char			*title;		/* Job name/title */
-  job_t			*job;		/* Current job */
-  char			job_uri[HTTP_MAX_URI],
-					/* Job URI */
-			method[HTTP_MAX_URI],
-					/* Method portion of URI */
-			username[HTTP_MAX_URI],
-					/* Username portion of URI */
-			host[HTTP_MAX_URI],
-					/* Host portion of URI */
-			resource[HTTP_MAX_URI];
-					/* Resource portion of URI */
-  int			port;		/* Port portion of URI */
-  printer_t		*printer;	/* Printer data */
-  int			kbytes;		/* Size of print file */
-  int			i;		/* Looping var */
-  int			lowerpagerange;	/* Page range bound */
+  ipp_attribute_t *attr;		/* Current attribute */
+  const char	*dest;			/* Destination */
+  cups_ptype_t	dtype;			/* Destination type (printer or class) */
+  int		priority;		/* Job priority */
+  char		*title;			/* Job name/title */
+  job_t		*job;			/* Current job */
+  char		job_uri[HTTP_MAX_URI],	/* Job URI */
+		method[HTTP_MAX_URI],	/* Method portion of URI */
+		username[HTTP_MAX_URI],	/* Username portion of URI */
+		host[HTTP_MAX_URI],	/* Host portion of URI */
+		resource[HTTP_MAX_URI];	/* Resource portion of URI */
+  int		port;			/* Port portion of URI */
+  printer_t	*printer;		/* Printer data */
+  int		kbytes;			/* Size of print file */
+  int		i;			/* Looping var */
+  int		lowerpagerange;		/* Page range bound */
 
 
   LogMessage(L_DEBUG2, "create_job(%p[%d], %s)\n", con, con->http.fd,
@@ -3340,6 +3372,18 @@ create_job(client_t        *con,	/* I - Client connection */
 
 
 /*
+ * 'create_subscription()' - Create a notification subscription.
+ */
+
+static void
+create_subscription(
+    client_t        *con,		/* I - Client connection */
+    ipp_attribute_t *uri)		/* I - Printer URI */
+{
+}
+
+
+/*
  * 'delete_printer()' - Remove a printer or class from the system.
  */
 
@@ -3347,19 +3391,15 @@ static void
 delete_printer(client_t        *con,	/* I - Client connection */
                ipp_attribute_t *uri)	/* I - URI of printer or class */
 {
-  const char		*dest;		/* Destination */
-  cups_ptype_t		dtype;		/* Destination type (printer or class) */
-  char			method[HTTP_MAX_URI],
-					/* Method portion of URI */
-			username[HTTP_MAX_URI],
-					/* Username portion of URI */
-			host[HTTP_MAX_URI],
-					/* Host portion of URI */
-			resource[HTTP_MAX_URI];
-					/* Resource portion of URI */
-  int			port;		/* Port portion of URI */
-  printer_t		*printer;	/* Printer/class */
-  char			filename[1024];	/* Script/PPD filename */
+  const char	*dest;			/* Destination */
+  cups_ptype_t	dtype;			/* Destination type (printer or class) */
+  char		method[HTTP_MAX_URI],	/* Method portion of URI */
+		username[HTTP_MAX_URI],	/* Username portion of URI */
+		host[HTTP_MAX_URI],	/* Host portion of URI */
+		resource[HTTP_MAX_URI];	/* Resource portion of URI */
+  int		port;			/* Port portion of URI */
+  printer_t	*printer;		/* Printer/class */
+  char		filename[1024];		/* Script/PPD filename */
 
 
   LogMessage(L_DEBUG2, "delete_printer(%p[%d], %s)\n", con, con->http.fd,
@@ -3553,27 +3593,22 @@ static void
 get_jobs(client_t        *con,		/* I - Client connection */
 	 ipp_attribute_t *uri)		/* I - Printer URI */
 {
-  ipp_attribute_t	*attr,		/* Current attribute */
-			*requested;	/* Requested attributes */
-  const char		*dest;		/* Destination */
-  cups_ptype_t		dtype;		/* Destination type (printer or class) */
-  cups_ptype_t		dmask;		/* Destination type mask */
-  char			method[HTTP_MAX_URI],
-					/* Method portion of URI */
-			username[HTTP_MAX_URI],
-					/* Username portion of URI */
-			host[HTTP_MAX_URI],
-					/* Host portion of URI */
-			resource[HTTP_MAX_URI];
-					/* Resource portion of URI */
-  int			port;		/* Port portion of URI */
-  int			completed;	/* Completed jobs? */
-  int			limit;		/* Maximum number of jobs to return */
-  int			count;		/* Number of jobs that match */
-  job_t			*job;		/* Current job pointer */
-  char			job_uri[HTTP_MAX_URI];
-					/* Job URI... */
-  printer_t		*printer;	/* Printer */
+  ipp_attribute_t *attr,		/* Current attribute */
+		*requested;		/* Requested attributes */
+  const char	*dest;			/* Destination */
+  cups_ptype_t	dtype;			/* Destination type (printer or class) */
+  cups_ptype_t	dmask;			/* Destination type mask */
+  char		method[HTTP_MAX_URI],	/* Method portion of URI */
+		username[HTTP_MAX_URI],	/* Username portion of URI */
+		host[HTTP_MAX_URI],	/* Host portion of URI */
+		resource[HTTP_MAX_URI];	/* Resource portion of URI */
+  int		port;			/* Port portion of URI */
+  int		completed;		/* Completed jobs? */
+  int		limit;			/* Maximum number of jobs to return */
+  int		count;			/* Number of jobs that match */
+  job_t		*job;			/* Current job pointer */
+  char		job_uri[HTTP_MAX_URI];	/* Job URI... */
+  printer_t	*printer;		/* Printer */
 
 
   LogMessage(L_DEBUG2, "get_jobs(%p[%d], %s)\n", con, con->http.fd,
@@ -3750,24 +3785,19 @@ get_jobs(client_t        *con,		/* I - Client connection */
  */
 
 static void
-get_job_attrs(client_t        *con,		/* I - Client connection */
-	      ipp_attribute_t *uri)		/* I - Job URI */
+get_job_attrs(client_t        *con,	/* I - Client connection */
+	      ipp_attribute_t *uri)	/* I - Job URI */
 {
-  ipp_attribute_t	*attr,		/* Current attribute */
-			*requested;	/* Requested attributes */
-  int			jobid;		/* Job ID */
-  job_t			*job;		/* Current job */
-  char			method[HTTP_MAX_URI],
-					/* Method portion of URI */
-			username[HTTP_MAX_URI],
-					/* Username portion of URI */
-			host[HTTP_MAX_URI],
-					/* Host portion of URI */
-			resource[HTTP_MAX_URI];
-					/* Resource portion of URI */
-  int			port;		/* Port portion of URI */
-  char			job_uri[HTTP_MAX_URI];
-					/* Job URI... */
+  ipp_attribute_t *attr,		/* Current attribute */
+		*requested;		/* Requested attributes */
+  int		jobid;			/* Job ID */
+  job_t		*job;			/* Current job */
+  char		method[HTTP_MAX_URI],	/* Method portion of URI */
+		username[HTTP_MAX_URI],	/* Username portion of URI */
+		host[HTTP_MAX_URI],	/* Host portion of URI */
+		resource[HTTP_MAX_URI];	/* Resource portion of URI */
+  int		port;			/* Port portion of URI */
+  char		job_uri[HTTP_MAX_URI];	/* Job URI... */
 
 
   LogMessage(L_DEBUG2, "get_job_attrs(%p[%d], %s)\n", con, con->http.fd,
@@ -3875,6 +3905,17 @@ get_job_attrs(client_t        *con,		/* I - Client connection */
     con->response->request.status.status_code = IPP_OK_SUBST;
   else
     con->response->request.status.status_code = IPP_OK;
+}
+
+
+/*
+ * 'get_notifications()' - Get events for a subscription.
+ */
+
+static void
+get_notifications(client_t *con,	/* I - Client connection */
+                  int      id)		/* I - Subscription ID */
+{
 }
 
 
@@ -4043,22 +4084,21 @@ static void
 get_printers(client_t *con,		/* I - Client connection */
              int      type)		/* I - 0 or CUPS_PRINTER_CLASS */
 {
-  int			i;		/* Looping var */
-  ipp_attribute_t	*requested,	/* requested-attributes */
-			*history,	/* History collection */
-			*attr;		/* Current attribute */
-  int			need_history;	/* Need to send history collection? */
-  int			limit;		/* Maximum number of printers to return */
-  int			count;		/* Number of printers that match */
-  printer_t		*printer;	/* Current printer pointer */
-  time_t		curtime;	/* Current time */
-  int			printer_type,	/* printer-type attribute */
-			printer_mask;	/* printer-type-mask attribute */
-  char			*location;	/* Location string */
-  char			name[IPP_MAX_NAME],
-					/* Printer name */
-			*nameptr;	/* Pointer into name */
-  printer_t		*iclass;	/* Implicit class */
+  int		i;			/* Looping var */
+  ipp_attribute_t *requested,		/* requested-attributes */
+		*history,		/* History collection */
+		*attr;			/* Current attribute */
+  int		need_history;		/* Need to send history collection? */
+  int		limit;			/* Maximum number of printers to return */
+  int		count;			/* Number of printers that match */
+  printer_t	*printer;		/* Current printer pointer */
+  time_t	curtime;		/* Current time */
+  int		printer_type,		/* printer-type attribute */
+		printer_mask;		/* printer-type-mask attribute */
+  char		*location;		/* Location string */
+  char		name[IPP_MAX_NAME],	/* Printer name */
+		*nameptr;		/* Pointer into name */
+  printer_t	*iclass;		/* Implicit class */
 
 
   LogMessage(L_DEBUG2, "get_printers(%p[%d], %x)\n", con, con->http.fd, type);
@@ -4229,26 +4269,44 @@ get_printers(client_t *con,		/* I - Client connection */
 
 
 /*
+ * 'get_subscription_attrs()' - Get subscription attributes.
+ */
+
+static void
+get_subscription_attrs(client_t *con,	/* I - Client connection */
+                       int      sub_id)	/* I - Subscription ID */
+{
+}
+
+
+/*
+ * 'get_subscriptions()' - Get subscriptions.
+ */
+
+static void
+get_subscriptions(client_t *con,	/* I - Client connection */
+                  ipp_attribute_t *uri)	/* I - Printer URI */
+{
+}
+
+
+/*
  * 'hold_job()' - Hold a print job.
  */
 
 static void
-hold_job(client_t        *con,	/* I - Client connection */
-         ipp_attribute_t *uri)	/* I - Job or Printer URI */
+hold_job(client_t        *con,		/* I - Client connection */
+         ipp_attribute_t *uri)		/* I - Job or Printer URI */
 {
-  ipp_attribute_t	*attr,		/* Current job-hold-until */
-			*newattr;	/* New job-hold-until */
-  int			jobid;		/* Job ID */
-  char			method[HTTP_MAX_URI],
-					/* Method portion of URI */
-			username[HTTP_MAX_URI],
-					/* Username portion of URI */
-			host[HTTP_MAX_URI],
-					/* Host portion of URI */
-			resource[HTTP_MAX_URI];
-					/* Resource portion of URI */
-  int			port;		/* Port portion of URI */
-  job_t			*job;		/* Job information */
+  ipp_attribute_t *attr,		/* Current job-hold-until */
+		*newattr;		/* New job-hold-until */
+  int		jobid;			/* Job ID */
+  char		method[HTTP_MAX_URI],	/* Method portion of URI */
+		username[HTTP_MAX_URI],	/* Username portion of URI */
+		host[HTTP_MAX_URI],	/* Host portion of URI */
+		resource[HTTP_MAX_URI];	/* Resource portion of URI */
+  int		port;			/* Port portion of URI */
+  job_t		*job;			/* Job information */
 
 
   LogMessage(L_DEBUG2, "hold_job(%p[%d], %s)\n", con, con->http.fd,
@@ -4389,21 +4447,17 @@ static void
 move_job(client_t        *con,		/* I - Client connection */
 	 ipp_attribute_t *uri)		/* I - Job URI */
 {
-  ipp_attribute_t	*attr;		/* Current attribute */
-  int			jobid;		/* Job ID */
-  job_t			*job;		/* Current job */
-  const char		*dest;		/* Destination */
-  cups_ptype_t		dtype;		/* Destination type (printer or class) */
-  char			method[HTTP_MAX_URI],
-					/* Method portion of URI */
-			username[HTTP_MAX_URI],
-					/* Username portion of URI */
-			host[HTTP_MAX_URI],
-					/* Host portion of URI */
-			resource[HTTP_MAX_URI];
-					/* Resource portion of URI */
-  int			port;		/* Port portion of URI */
-  printer_t		*printer;	/* Printer */
+  ipp_attribute_t *attr;		/* Current attribute */
+  int		jobid;			/* Job ID */
+  job_t		*job;			/* Current job */
+  const char	*dest;			/* Destination */
+  cups_ptype_t	dtype;			/* Destination type (printer or class) */
+  char		method[HTTP_MAX_URI],	/* Method portion of URI */
+		username[HTTP_MAX_URI],	/* Username portion of URI */
+		host[HTTP_MAX_URI],	/* Host portion of URI */
+		resource[HTTP_MAX_URI];	/* Resource portion of URI */
+  int		port;			/* Port portion of URI */
+  printer_t	*printer;		/* Printer */
 
 
   LogMessage(L_DEBUG2, "move_job(%p[%d], %s)\n", con, con->http.fd,
@@ -4557,12 +4611,11 @@ move_job(client_t        *con,		/* I - Client connection */
  */
 
 static int				/* O  - Number of defaults */
-ppd_add_default(const char    *option,	/* I  - Option name */
-                const char    *choice,	/* I  - Choice name */
-                int           num_defaults,
-					/* I  - Number of defaults */
-		ppd_default_t **defaults)
-					/* IO - Defaults */
+ppd_add_default(
+    const char    *option,		/* I  - Option name */
+    const char    *choice,		/* I  - Choice name */
+    int           num_defaults,		/* I  - Number of defaults */
+    ppd_default_t **defaults)		/* IO - Defaults */
 {
   int		i;			/* Looping var */
   ppd_default_t	*temp;			/* Temporary defaults array */
@@ -4678,39 +4731,32 @@ static void
 print_job(client_t        *con,		/* I - Client connection */
 	  ipp_attribute_t *uri)		/* I - Printer URI */
 {
-  ipp_attribute_t	*attr;		/* Current attribute */
-  ipp_attribute_t	*format;	/* Document-format attribute */
-  const char		*dest;		/* Destination */
-  cups_ptype_t		dtype;		/* Destination type (printer or class) */
-  int			priority;	/* Job priority */
-  char			*title;		/* Job name/title */
-  job_t			*job;		/* Current job */
-  int			jobid;		/* Job ID number */
-  char			job_uri[HTTP_MAX_URI],
-					/* Job URI */
-			method[HTTP_MAX_URI],
-					/* Method portion of URI */
-			username[HTTP_MAX_URI],
-					/* Username portion of URI */
-			host[HTTP_MAX_URI],
-					/* Host portion of URI */
-			resource[HTTP_MAX_URI],
-					/* Resource portion of URI */
-			filename[1024];	/* Job filename */
-  int			port;		/* Port portion of URI */
-  mime_type_t		*filetype;	/* Type of file */
-  char			super[MIME_MAX_SUPER],
-					/* Supertype of file */
-			type[MIME_MAX_TYPE],
-					/* Subtype of file */
-			mimetype[MIME_MAX_SUPER + MIME_MAX_TYPE + 2];
+  ipp_attribute_t *attr;		/* Current attribute */
+  ipp_attribute_t *format;		/* Document-format attribute */
+  const char	*dest;			/* Destination */
+  cups_ptype_t	dtype;			/* Destination type (printer or class) */
+  int		priority;		/* Job priority */
+  char		*title;			/* Job name/title */
+  job_t		*job;			/* Current job */
+  int		jobid;			/* Job ID number */
+  char		job_uri[HTTP_MAX_URI],	/* Job URI */
+		method[HTTP_MAX_URI],	/* Method portion of URI */
+		username[HTTP_MAX_URI],	/* Username portion of URI */
+		host[HTTP_MAX_URI],	/* Host portion of URI */
+		resource[HTTP_MAX_URI],	/* Resource portion of URI */
+		filename[1024];		/* Job filename */
+  int		port;			/* Port portion of URI */
+  mime_type_t	*filetype;		/* Type of file */
+  char		super[MIME_MAX_SUPER],	/* Supertype of file */
+		type[MIME_MAX_TYPE],	/* Subtype of file */
+		mimetype[MIME_MAX_SUPER + MIME_MAX_TYPE + 2];
 					/* Textual name of mime type */
-  printer_t		*printer;	/* Printer data */
-  struct stat		fileinfo;	/* File information */
-  int			kbytes;		/* Size of file */
-  int			i;		/* Looping var */
-  int			lowerpagerange;	/* Page range bound */
-  int			compression;	/* Document compression */
+  printer_t	*printer;		/* Printer data */
+  struct stat	fileinfo;		/* File information */
+  int		kbytes;			/* Size of file */
+  int		i;			/* Looping var */
+  int		lowerpagerange;		/* Page range bound */
+  int		compression;		/* Document compression */
 
 
   LogMessage(L_DEBUG2, "print_job(%p[%d], %s)\n", con, con->http.fd,
@@ -5522,19 +5568,15 @@ static void
 reject_jobs(client_t        *con,	/* I - Client connection */
             ipp_attribute_t *uri)	/* I - Printer or class URI */
 {
-  cups_ptype_t		dtype;		/* Destination type (printer or class) */
-  char			method[HTTP_MAX_URI],
-					/* Method portion of URI */
-			username[HTTP_MAX_URI],
-					/* Username portion of URI */
-			host[HTTP_MAX_URI],
-					/* Host portion of URI */
-			resource[HTTP_MAX_URI];
-					/* Resource portion of URI */
-  int			port;		/* Port portion of URI */
-  const char		*name;		/* Printer name */
-  printer_t		*printer;	/* Printer data */
-  ipp_attribute_t	*attr;		/* printer-state-message text */
+  cups_ptype_t	dtype;			/* Destination type (printer or class) */
+  char		method[HTTP_MAX_URI],	/* Method portion of URI */
+		username[HTTP_MAX_URI],	/* Username portion of URI */
+		host[HTTP_MAX_URI],	/* Host portion of URI */
+		resource[HTTP_MAX_URI];	/* Resource portion of URI */
+  int		port;			/* Port portion of URI */
+  const char	*name;			/* Printer name */
+  printer_t	*printer;		/* Printer data */
+  ipp_attribute_t *attr;		/* printer-state-message text */
 
 
   LogMessage(L_DEBUG2, "reject_jobs(%p[%d], %s)\n", con, con->http.fd,
@@ -5626,18 +5668,14 @@ static void
 release_job(client_t        *con,	/* I - Client connection */
             ipp_attribute_t *uri)	/* I - Job or Printer URI */
 {
-  ipp_attribute_t	*attr;		/* Current attribute */
-  int			jobid;		/* Job ID */
-  char			method[HTTP_MAX_URI],
-					/* Method portion of URI */
-			username[HTTP_MAX_URI],
-					/* Username portion of URI */
-			host[HTTP_MAX_URI],
-					/* Host portion of URI */
-			resource[HTTP_MAX_URI];
-					/* Resource portion of URI */
-  int			port;		/* Port portion of URI */
-  job_t			*job;		/* Job information */
+  ipp_attribute_t *attr;		/* Current attribute */
+  int		jobid;			/* Job ID */
+  char		method[HTTP_MAX_URI],	/* Method portion of URI */
+		username[HTTP_MAX_URI],	/* Username portion of URI */
+		host[HTTP_MAX_URI],	/* Host portion of URI */
+		resource[HTTP_MAX_URI];	/* Resource portion of URI */
+  int		port;			/* Port portion of URI */
+  job_t		*job;			/* Job information */
 
 
   LogMessage(L_DEBUG2, "release_job(%p[%d], %s)\n", con, con->http.fd,
@@ -5768,25 +5806,32 @@ release_job(client_t        *con,	/* I - Client connection */
 
 
 /*
+ * 'renew_subscription()' - Renew an existing subscription...
+ */
+
+static void
+renew_subscription(client_t *con,	/* I - Client connection */
+                   int      sub_id)	/* I - Subscription ID */
+{
+}
+
+
+/*
  * 'restart_job()' - Restart an old print job.
  */
 
 static void
 restart_job(client_t        *con,	/* I - Client connection */
-         ipp_attribute_t *uri)	/* I - Job or Printer URI */
+            ipp_attribute_t *uri)	/* I - Job or Printer URI */
 {
-  ipp_attribute_t	*attr;		/* Current attribute */
-  int			jobid;		/* Job ID */
-  char			method[HTTP_MAX_URI],
-					/* Method portion of URI */
-			username[HTTP_MAX_URI],
-					/* Username portion of URI */
-			host[HTTP_MAX_URI],
-					/* Host portion of URI */
-			resource[HTTP_MAX_URI];
-					/* Resource portion of URI */
-  int			port;		/* Port portion of URI */
-  job_t			*job;		/* Job information */
+  ipp_attribute_t *attr;		/* Current attribute */
+  int		jobid;			/* Job ID */
+  char		method[HTTP_MAX_URI],	/* Method portion of URI */
+		username[HTTP_MAX_URI],	/* Username portion of URI */
+		host[HTTP_MAX_URI],	/* Host portion of URI */
+		resource[HTTP_MAX_URI];	/* Resource portion of URI */
+  int		port;			/* Port portion of URI */
+  job_t		*job;			/* Job information */
 
 
   LogMessage(L_DEBUG2, "restart_job(%p[%d], %s)\n", con, con->http.fd,

@@ -355,6 +355,13 @@ CreateCommonData(void)
 		  IPP_RESUME_PRINTER,
 		  IPP_PURGE_JOBS,
 		  IPP_SET_JOB_ATTRIBUTES,
+		  IPP_CREATE_PRINTER_SUBSCRIPTION,
+		  IPP_CREATE_JOB_SUBSCRIPTION,
+		  IPP_GET_SUBSCRIPTION_ATTRIBUTES,
+		  IPP_GET_SUBSCRIPTIONS,
+		  IPP_RENEW_SUBSCRIPTION,
+		  IPP_CANCEL_SUBSCRIPTION,
+		  IPP_GET_NOTIFICATIONS,
 		  IPP_ENABLE_PRINTER,
 		  IPP_DISABLE_PRINTER,
 		  CUPS_GET_DEFAULT,
@@ -373,32 +380,7 @@ CreateCommonData(void)
   static const char * const charsets[] =/* charset-supported values */
 		{
 		  "us-ascii",
-		  "iso-8859-1",
-		  "iso-8859-2",
-		  "iso-8859-3",
-		  "iso-8859-4",
-		  "iso-8859-5",
-		  "iso-8859-6",
-		  "iso-8859-7",
-		  "iso-8859-8",
-		  "iso-8859-9",
-		  "iso-8859-10",
-		  "iso-8859-13",
-		  "iso-8859-14",
-		  "iso-8859-15",
-		  "utf-8",
-		  "windows-874",
-		  "windows-1250",
-		  "windows-1251",
-		  "windows-1252",
-		  "windows-1253",
-		  "windows-1254",
-		  "windows-1255",
-		  "windows-1256",
-		  "windows-1257",
-		  "windows-1258",
-		  "koi8-r",
-		  "koi8-u",
+		  "utf-8"
 		};
   static const char * const compressions[] =
 		{			/* document-compression-supported values */
@@ -902,28 +884,61 @@ LoadAllPrinters(void)
         return;
       }
     }
-    else if (p == NULL)
+    else if (!p)
     {
       LogMessage(L_ERROR, "Syntax error on line %d of printers.conf.",
 	         linenum);
       return;
     }
     else if (!strcasecmp(name, "Info"))
-      SetString(&p->info, value);
+    {
+      if (value)
+	SetString(&p->info, value);
+      else
+      {
+	LogMessage(L_ERROR, "Syntax error on line %d of printers.conf.",
+	           linenum);
+	return;
+      }
+    }
     else if (!strcasecmp(name, "Location"))
-      SetString(&p->location, value);
+    {
+      if (value)
+	SetString(&p->location, value);
+      else
+      {
+	LogMessage(L_ERROR, "Syntax error on line %d of printers.conf.",
+	           linenum);
+	return;
+      }
+    }
     else if (!strcasecmp(name, "DeviceURI"))
-      SetString(&p->device_uri, value);
+    {
+      if (value)
+	SetString(&p->device_uri, value);
+      else
+      {
+	LogMessage(L_ERROR, "Syntax error on line %d of printers.conf.",
+	           linenum);
+	return;
+      }
+    }
     else if (!strcasecmp(name, "State"))
     {
      /*
       * Set the initial queue state...
       */
 
-      if (!strcasecmp(value, "idle"))
+      if (value && !strcasecmp(value, "idle"))
         p->state = IPP_PRINTER_IDLE;
-      else if (!strcasecmp(value, "stopped"))
+      else if (value && !strcasecmp(value, "stopped"))
         p->state = IPP_PRINTER_STOPPED;
+      else
+      {
+	LogMessage(L_ERROR, "Syntax error on line %d of printers.conf.",
+	           linenum);
+	return;
+      }
     }
     else if (!strcasecmp(name, "StateMessage"))
     {
@@ -931,10 +946,14 @@ LoadAllPrinters(void)
       * Set the initial queue state message...
       */
 
-      while (isspace(*value & 255))
-        value ++;
-
-      strlcpy(p->state_message, value, sizeof(p->state_message));
+      if (value)
+	strlcpy(p->state_message, value, sizeof(p->state_message));
+      else
+      {
+	LogMessage(L_ERROR, "Syntax error on line %d of printers.conf.",
+	           linenum);
+	return;
+      }
     }
     else if (!strcasecmp(name, "Accepting"))
     {
@@ -942,12 +961,22 @@ LoadAllPrinters(void)
       * Set the initial accepting state...
       */
 
-      if (!strcasecmp(value, "yes") ||
-          !strcasecmp(value, "on") ||
-          !strcasecmp(value, "true"))
+      if (value &&
+          (!strcasecmp(value, "yes") ||
+           !strcasecmp(value, "on") ||
+           !strcasecmp(value, "true")))
         p->accepting = 1;
-      else
+      else if (value &&
+               (!strcasecmp(value, "no") ||
+        	!strcasecmp(value, "off") ||
+        	!strcasecmp(value, "false")))
         p->accepting = 0;
+      else
+      {
+	LogMessage(L_ERROR, "Syntax error on line %d of printers.conf.",
+	           linenum);
+	return;
+      }
     }
     else if (!strcasecmp(name, "JobSheets"))
     {
@@ -955,46 +984,118 @@ LoadAllPrinters(void)
       * Set the initial job sheets...
       */
 
-      for (valueptr = value; *valueptr && !isspace(*valueptr & 255); valueptr ++);
-
-      if (*valueptr)
-        *valueptr++ = '\0';
-
-      SetString(&p->job_sheets[0], value);
-
-      while (isspace(*valueptr & 255))
-        valueptr ++;
-
-      if (*valueptr)
+      if (value)
       {
-        for (value = valueptr; *valueptr && !isspace(*valueptr & 255); valueptr ++);
+	for (valueptr = value; *valueptr && !isspace(*valueptr & 255); valueptr ++);
 
 	if (*valueptr)
           *valueptr++ = '\0';
 
-	SetString(&p->job_sheets[1], value);
+	SetString(&p->job_sheets[0], value);
+
+	while (isspace(*valueptr & 255))
+          valueptr ++;
+
+	if (*valueptr)
+	{
+          for (value = valueptr; *valueptr && !isspace(*valueptr & 255); valueptr ++);
+
+	  if (*valueptr)
+            *valueptr++ = '\0';
+
+	  SetString(&p->job_sheets[1], value);
+	}
+      }
+      else
+      {
+	LogMessage(L_ERROR, "Syntax error on line %d of printers.conf.",
+	           linenum);
+	return;
       }
     }
     else if (!strcasecmp(name, "AllowUser"))
     {
-      p->deny_users = 0;
-      AddPrinterUser(p, value);
+      if (value)
+      {
+        p->deny_users = 0;
+        AddPrinterUser(p, value);
+      }
+      else
+      {
+	LogMessage(L_ERROR, "Syntax error on line %d of printers.conf.",
+	           linenum);
+	return;
+      }
     }
     else if (!strcasecmp(name, "DenyUser"))
     {
-      p->deny_users = 1;
-      AddPrinterUser(p, value);
+      if (value)
+      {
+        p->deny_users = 1;
+        AddPrinterUser(p, value);
+      }
+      else
+      {
+	LogMessage(L_ERROR, "Syntax error on line %d of printers.conf.",
+	           linenum);
+	return;
+      }
     }
     else if (!strcasecmp(name, "QuotaPeriod"))
-      p->quota_period = atoi(value);
+    {
+      if (value)
+        p->quota_period = atoi(value);
+      else
+      {
+	LogMessage(L_ERROR, "Syntax error on line %d of printers.conf.",
+	           linenum);
+	return;
+      }
+    }
     else if (!strcasecmp(name, "PageLimit"))
-      p->page_limit = atoi(value);
+    {
+      if (value)
+        p->page_limit = atoi(value);
+      else
+      {
+	LogMessage(L_ERROR, "Syntax error on line %d of printers.conf.",
+	           linenum);
+	return;
+      }
+    }
     else if (!strcasecmp(name, "KLimit"))
-      p->k_limit = atoi(value);
+    {
+      if (value)
+        p->k_limit = atoi(value);
+      else
+      {
+	LogMessage(L_ERROR, "Syntax error on line %d of printers.conf.",
+	           linenum);
+	return;
+      }
+    }
     else if (!strcasecmp(name, "OpPolicy"))
-      SetString(&p->op_policy, value);
+    {
+      if (value)
+        SetString(&p->op_policy, value);
+      else
+      {
+	LogMessage(L_ERROR, "Syntax error on line %d of printers.conf.",
+	           linenum);
+	return;
+      }
+    }
     else if (!strcasecmp(name, "ErrorPolicy"))
-      SetString(&p->error_policy, value);
+    {
+      if (value)
+        SetString(&p->error_policy, value);
+      else
+      {
+	LogMessage(L_ERROR, "Syntax error on line %d of printers.conf.",
+	           linenum);
+	return;
+      }
+    }
     else
     {
      /*

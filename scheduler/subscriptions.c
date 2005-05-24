@@ -683,16 +683,16 @@ cupsdFindSubscription(int id)		/* I - Subscription ID */
 void
 cupsdLoadAllSubscriptions(void)
 {
+  int			i;		/* Looping var */
   cups_file_t		*fp;		/* subscriptions.conf file */
   int			linenum;	/* Current line number */
-  int			len;		/* Length of line */
   char			line[1024],	/* Line from file */
 			name[256],	/* Parameter name */
-			*nameptr,	/* Pointer into name */
 			*value,		/* Pointer to value */
 			*valueptr;	/* Pointer into value */
   cupsd_subscription_t	*sub;		/* Current subscription */
   int			hex;		/* Non-zero if reading hex data */
+  int			delete_sub;	/* Delete subscription? */
 
 
  /*
@@ -711,11 +711,278 @@ cupsdLoadAllSubscriptions(void)
   * Read all of the lines from the file...
   */
 
-  linenum = 0;
-  sub     = NULL;
+  linenum    = 0;
+  sub        = NULL;
+  delete_sub = 0;
 
   while (cupsFileGetConf(fp, line, sizeof(line), &value, &linenum))
   {
+    if (!strcasecmp(name, "<Subscription"))
+    {
+     /*
+      * <Subscription #>
+      */
+
+      if (!sub && value && isdigit(value[0] & 255))
+      {
+        sub     = cupsdAddSubscription(CUPSD_EVENT_NONE, NULL, NULL, NULL);
+	sub->id = atoi(value);
+      }
+      else
+      {
+        LogMessage(L_ERROR, "Syntax error on line %d of subscriptions.conf.",
+	           linenum);
+        return;
+      }
+    }
+    else if (!strcasecmp(name, "</Subscription>"))
+    {
+      if (!sub)
+      {
+        LogMessage(L_ERROR, "Syntax error on line %d of subscriptions.conf.",
+	           linenum);
+        return;
+      }
+
+      if (delete_sub)
+        cupsdDeleteSubscription(sub, 0);
+
+      sub        = NULL;
+      delete_sub = 0;
+    }
+    else if (!sub)
+    {
+      LogMessage(L_ERROR, "Syntax error on line %d of subscriptions.conf.",
+	         linenum);
+      return;
+    }
+    else if (!strcasecmp(name, "Events"))
+    {
+     /*
+      * Events name
+      * Events name name name ...
+      */
+
+      if (!value)
+      {
+	LogMessage(L_ERROR, "Syntax error on line %d of subscriptions.conf.",
+	           linenum);
+	return;
+      }
+
+      while (*value)
+      {
+       /*
+        * Separate event names...
+	*/
+
+        for (valueptr = value; !isspace(*valueptr) && *valueptr; valueptr ++);
+
+	while (isspace(*valueptr & 255))
+	  *valueptr++ = '\0';
+
+       /*
+        * See if the name exists...
+	*/
+
+        if ((sub->mask |= cupsdEventValue(value)) == CUPSD_EVENT_NONE)
+	{
+	  LogMessage(L_ERROR, "Unknown event name \'%s\' on line %d of subscriptions.conf.",
+	             value, linenum);
+	  return;
+	}
+
+	value = valueptr;
+      }
+    }
+    else if (!strcasecmp(name, "Recipient"))
+    {
+     /*
+      * Recipient uri
+      */
+
+      if (value)
+	SetString(&sub->recipient, value);
+      else
+      {
+	LogMessage(L_ERROR, "Syntax error on line %d of subscriptions.conf.",
+	           linenum);
+	return;
+      }
+    }
+    else if (!strcasecmp(name, "JobId"))
+    {
+     /*
+      * JobId #
+      */
+
+      if (value && isdigit(*value & 255))
+      {
+        if ((sub->job = FindJob(atoi(value))) == NULL)
+	{
+	  LogMessage(L_ERROR, "Job %s not found on line %d of subscriptions.conf.",
+	             value, linenum);
+	  delete_sub = 1;
+	}
+      }
+      else
+      {
+	LogMessage(L_ERROR, "Syntax error on line %d of subscriptions.conf.",
+	           linenum);
+	return;
+      }
+    }
+    else if (!strcasecmp(name, "PrinterName"))
+    {
+     /*
+      * PrinterName name
+      */
+
+      if (value)
+      {
+        if ((sub->dest = FindDest(value)) == NULL)
+	{
+	  LogMessage(L_ERROR, "Printer \'%s\' not found on line %d of subscriptions.conf.",
+	             value, linenum);
+	  delete_sub = 1;
+	}
+      }
+      else
+      {
+	LogMessage(L_ERROR, "Syntax error on line %d of subscriptions.conf.",
+	           linenum);
+	return;
+      }
+    }
+    else if (!strcasecmp(name, "UserData"))
+    {
+     /*
+      * UserData encoded-string
+      */
+
+      if (value)
+      {
+        for (i = 0, valueptr = value, hex = 0; i < 63 && *valueptr; i ++)
+	{
+	  if (*valueptr == '<' && !hex)
+	  {
+	    hex = 1;
+	    valueptr ++;
+	  }
+
+	  if (hex)
+	  {
+	    if (isxdigit(valueptr[0]) && isxdigit(valueptr[1]))
+	    {
+	      if (isdigit(valueptr[0]))
+	        sub->user_data[i] = (valueptr[0] - '0') << 4;
+	      else
+	        sub->user_data[i] = (tolower(valueptr[0]) - 'a' + 10) << 4;
+
+	      if (isdigit(valueptr[1]))
+	        sub->user_data[i] |= valueptr[1] - '0';
+	      else
+	        sub->user_data[i] |= tolower(valueptr[1]) - 'a' + 10;
+
+              valueptr += 2;
+
+	      if (*valueptr == '>')
+	      {
+	        hex = 0;
+		valueptr ++;
+	      }
+	    }
+	    else
+	      break;
+	  }
+	  else
+	    sub->user_data[i] = *valueptr++;
+	}
+
+	if (*valueptr)
+	{
+	  LogMessage(L_ERROR, "Bad UserData \'%s\' on line %d of subscriptions.conf.",
+	             value, linenum);
+	}
+	else
+	  sub->user_data_len = i;
+      }
+      else
+      {
+	LogMessage(L_ERROR, "Syntax error on line %d of subscriptions.conf.",
+	           linenum);
+	return;
+      }
+    }
+    else if (!strcasecmp(name, "LeaseTime"))
+    {
+     /*
+      * LeaseTime #
+      */
+
+      if (value && isdigit(*value & 255))
+        sub->lease = atoi(value);
+      else
+      {
+	LogMessage(L_ERROR, "Syntax error on line %d of subscriptions.conf.",
+	           linenum);
+	return;
+      }
+    }
+    else if (!strcasecmp(name, "Interval"))
+    {
+     /*
+      * Interval #
+      */
+
+      if (value && isdigit(*value & 255))
+        sub->interval = atoi(value);
+      else
+      {
+	LogMessage(L_ERROR, "Syntax error on line %d of subscriptions.conf.",
+	           linenum);
+	return;
+      }
+    }
+    else if (!strcasecmp(name, "ExpirationTime"))
+    {
+     /*
+      * ExpirationTime #
+      */
+
+      if (value && isdigit(*value & 255))
+        sub->expire = atoi(value);
+      else
+      {
+	LogMessage(L_ERROR, "Syntax error on line %d of subscriptions.conf.",
+	           linenum);
+	return;
+      }
+    }
+    else if (!strcasecmp(name, "NextEventId"))
+    {
+     /*
+      * NextEventId #
+      */
+
+      if (value && isdigit(*value & 255))
+        sub->next_event_id = sub->first_event_id = atoi(value);
+      else
+      {
+	LogMessage(L_ERROR, "Syntax error on line %d of subscriptions.conf.",
+	           linenum);
+	return;
+      }
+    }
+    else
+    {
+     /*
+      * Something else we don't understand...
+      */
+
+      LogMessage(L_ERROR, "Unknown configuration directive %s on line %d of subscriptions.conf.",
+	         name, linenum);
+    }
   }
 
   cupsFileClose(fp);

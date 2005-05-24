@@ -409,20 +409,43 @@ LoadAllClasses(void)
         return;
       }
     }
-    else if (p == NULL)
+    else if (!p)
     {
       LogMessage(L_ERROR, "Syntax error on line %d of classes.conf.",
 	         linenum);
       return;
     }
-    
     else if (!strcasecmp(name, "Info"))
-      SetString(&p->info, value);
+    {
+      if (value)
+        SetString(&p->info, value);
+      else
+      {
+	LogMessage(L_ERROR, "Syntax error on line %d of classes.conf.",
+	           linenum);
+	return;
+      }
+    }
     else if (!strcasecmp(name, "Location"))
-      SetString(&p->location, value);
+    {
+      if (value)
+        SetString(&p->location, value);
+      else
+      {
+	LogMessage(L_ERROR, "Syntax error on line %d of classes.conf.",
+	           linenum);
+	return;
+      }
+    }
     else if (!strcasecmp(name, "Printer"))
     {
-      if ((temp = FindPrinter(value)) == NULL)
+      if (!value)
+      {
+	LogMessage(L_ERROR, "Syntax error on line %d of classes.conf.",
+	           linenum);
+	return;
+      }
+      else if ((temp = FindPrinter(value)) == NULL)
       {
 	LogMessage(L_WARN, "Unknown printer %s on line %d of classes.conf.",
 	           value, linenum);
@@ -460,6 +483,12 @@ LoadAllClasses(void)
         p->state = IPP_PRINTER_IDLE;
       else if (!strcasecmp(value, "stopped"))
         p->state = IPP_PRINTER_STOPPED;
+      else
+      {
+	LogMessage(L_ERROR, "Syntax error on line %d of classes.conf.",
+	           linenum);
+	return;
+      }
     }
     else if (!strcasecmp(name, "StateMessage"))
     {
@@ -467,10 +496,14 @@ LoadAllClasses(void)
       * Set the initial queue state message...
       */
 
-      while (isspace(*value & 255))
-        value ++;
-
-      strlcpy(p->state_message, value, sizeof(p->state_message));
+      if (value)
+	strlcpy(p->state_message, value, sizeof(p->state_message));
+      else
+      {
+	LogMessage(L_ERROR, "Syntax error on line %d of classes.conf.",
+	           linenum);
+	return;
+      }
     }
     else if (!strcasecmp(name, "Accepting"))
     {
@@ -478,12 +511,22 @@ LoadAllClasses(void)
       * Set the initial accepting state...
       */
 
-      if (!strcasecmp(value, "yes") ||
-          !strcasecmp(value, "on") ||
-          !strcasecmp(value, "true"))
+      if (value &&
+          (!strcasecmp(value, "yes") ||
+           !strcasecmp(value, "on") ||
+           !strcasecmp(value, "true")))
         p->accepting = 1;
-      else
+      else if (value &&
+               (!strcasecmp(value, "no") ||
+        	!strcasecmp(value, "off") ||
+        	!strcasecmp(value, "false")))
         p->accepting = 0;
+      else
+      {
+	LogMessage(L_ERROR, "Syntax error on line %d of classes.conf.",
+	           linenum);
+	return;
+      }
     }
     else if (!strcasecmp(name, "JobSheets"))
     {
@@ -491,46 +534,118 @@ LoadAllClasses(void)
       * Set the initial job sheets...
       */
 
-      for (valueptr = value; *valueptr && !isspace(*valueptr & 255); valueptr ++);
-
-      if (*valueptr)
-        *valueptr++ = '\0';
-
-      SetString(&p->job_sheets[0], value);
-
-      while (isspace(*valueptr & 255))
-        valueptr ++;
-
-      if (*valueptr)
+      if (value)
       {
-        for (value = valueptr; *valueptr && !isspace(*valueptr & 255); valueptr ++);
+	for (valueptr = value; *valueptr && !isspace(*valueptr & 255); valueptr ++);
 
 	if (*valueptr)
           *valueptr++ = '\0';
 
-	SetString(&p->job_sheets[1], value);
+	SetString(&p->job_sheets[0], value);
+
+	while (isspace(*valueptr & 255))
+          valueptr ++;
+
+	if (*valueptr)
+	{
+          for (value = valueptr; *valueptr && !isspace(*valueptr & 255); valueptr ++);
+
+	  if (*valueptr)
+            *valueptr++ = '\0';
+
+	  SetString(&p->job_sheets[1], value);
+	}
+      }
+      else
+      {
+	LogMessage(L_ERROR, "Syntax error on line %d of classes.conf.",
+	           linenum);
+	return;
       }
     }
     else if (!strcasecmp(name, "AllowUser"))
     {
-      p->deny_users = 0;
-      AddPrinterUser(p, value);
+      if (value)
+      {
+        p->deny_users = 0;
+        AddPrinterUser(p, value);
+      }
+      else
+      {
+	LogMessage(L_ERROR, "Syntax error on line %d of classes.conf.",
+	           linenum);
+	return;
+      }
     }
     else if (!strcasecmp(name, "DenyUser"))
     {
-      p->deny_users = 1;
-      AddPrinterUser(p, value);
+      if (value)
+      {
+        p->deny_users = 1;
+        AddPrinterUser(p, value);
+      }
+      else
+      {
+	LogMessage(L_ERROR, "Syntax error on line %d of classes.conf.",
+	           linenum);
+	return;
+      }
     }
     else if (!strcasecmp(name, "QuotaPeriod"))
-      p->quota_period = atoi(value);
+    {
+      if (value)
+        p->quota_period = atoi(value);
+      else
+      {
+	LogMessage(L_ERROR, "Syntax error on line %d of classes.conf.",
+	           linenum);
+	return;
+      }
+    }
     else if (!strcasecmp(name, "PageLimit"))
-      p->page_limit = atoi(value);
+    {
+      if (value)
+        p->page_limit = atoi(value);
+      else
+      {
+	LogMessage(L_ERROR, "Syntax error on line %d of classes.conf.",
+	           linenum);
+	return;
+      }
+    }
     else if (!strcasecmp(name, "KLimit"))
-      p->k_limit = atoi(value);
+    {
+      if (value)
+        p->k_limit = atoi(value);
+      else
+      {
+	LogMessage(L_ERROR, "Syntax error on line %d of classes.conf.",
+	           linenum);
+	return;
+      }
+    }
     else if (!strcasecmp(name, "OpPolicy"))
-      SetString(&p->op_policy, value);
+    {
+      if (value)
+        SetString(&p->op_policy, value);
+      else
+      {
+	LogMessage(L_ERROR, "Syntax error on line %d of classes.conf.",
+	           linenum);
+	return;
+      }
+    }
     else if (!strcasecmp(name, "ErrorPolicy"))
-      SetString(&p->error_policy, value);
+    {
+      if (value)
+        SetString(&p->error_policy, value);
+      else
+      {
+	LogMessage(L_ERROR, "Syntax error on line %d of classes.conf.",
+	           linenum);
+	return;
+      }
+    }
     else
     {
      /*
