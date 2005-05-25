@@ -1021,7 +1021,11 @@ httpRead(http_t *http,			/* I - HTTP data */
       return (0);
 
     DEBUG_printf(("httpRead: reading %d bytes from socket...\n", length));
-    bytes = recv(http->fd, buffer, length, 0);
+
+    while ((bytes = recv(http->fd, buffer, length, 0)) < 0)
+      if (errno != EINTR)
+        break;
+
     DEBUG_printf(("httpRead: read %d bytes from socket...\n", bytes));
   }
 
