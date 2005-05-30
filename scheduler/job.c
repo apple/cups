@@ -480,6 +480,10 @@ FinishJob(job_t *job)			/* I - Job */
       StartJob(job->id, job->printer);
     else
     {
+      cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, job->printer, job,
+                    "Job aborted due to filter errors; please consult the "
+		    "error_log file for details.");
+
       job_history = JobHistory && !(job->dtype & CUPS_PRINTER_REMOTE);
 
       CancelJob(job->id, 0);
@@ -506,6 +510,9 @@ FinishJob(job_t *job)			/* I - Job */
     }
     else
     {
+      cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, job->printer, job,
+                    "Job completed successfully.");
+
       job_history = JobHistory && !(job->dtype & CUPS_PRINTER_REMOTE);
 
       CancelJob(job->id, 0);

@@ -29,6 +29,7 @@
  *   add_file()                  - Add a file to a job.
  *   add_job_state_reasons()     - Add the "job-state-reasons" attribute based
  *                                 upon the job and printer state...
+ *   add_job_subscriptions()     - Add any subcriptions for a job.
  *   add_printer()               - Add a printer to the system.
  *   add_printer_state_reasons() - Add the "printer-state-reasons" attribute
  *                                 based upon the printer state...
@@ -112,6 +113,7 @@ static void	add_class(client_t *con, ipp_attribute_t *uri);
 static int	add_file(client_t *con, job_t *job, mime_type_t *filetype,
 		         int compression);
 static void	add_job_state_reasons(client_t *con, job_t *job);
+static void	add_job_subscriptions(client_t *con, job_t *job);
 static void	add_printer(client_t *con, ipp_attribute_t *uri);
 static void	add_printer_state_reasons(client_t *con, printer_t *p);
 static void	add_queued_job_count(client_t *con, printer_t *p);
@@ -1137,6 +1139,150 @@ add_job_state_reasons(client_t *con,	/* I - Client connection */
 
 
 /*
+ * 'add_job_subscriptions()' - Add any subcriptions for a job.
+ */
+
+static void
+add_job_subscriptions(client_t *con,	/* I - Client connection */
+                      job_t    *job)	/* I - Newly created job */
+{
+  int			i;		/* Looping var */
+  ipp_t			*temp;		/* Temporary request data... */
+  ipp_attribute_t	*prev,		/* Previous attribute */
+			*attr;		/* Current attribute */
+  cupsd_subscription_t	*sub;		/* Subscription object */
+  const char		*recipient,	/* notify-recipient-uri */
+			*pullmethod;	/* notify-pull-method */
+  ipp_attribute_t	*user_data;	/* notify-user-data */
+  int			interval;	/* notify-time-interval */
+  unsigned		mask;		/* notify-events */
+
+
+ /*
+  * Find the first subscription group attribute; return if we have
+  * none...
+  */
+
+  for (attr = con->request->attrs, prev = NULL; attr; prev = attr, attr = attr->next)
+    if (attr->group_tag == IPP_TAG_SUBSCRIPTION)
+      break;
+
+  if (!attr)
+    return;
+
+ /*
+  * Create a new temporary request record to hold the subscription
+  * attributes...
+  */
+
+  temp          = ippNew();
+  temp->attrs   = attr;
+  temp->last    = con->request->last;
+  temp->current = con->request->current;
+
+ /*
+  * Remove all of the subscription attributes from the end of the job
+  * request...
+  */
+
+  if (prev)
+    prev->next = NULL;
+  else
+    con->request->attrs = NULL;
+
+  con->request->last    = prev;
+  con->request->current = prev;
+
+ /*
+  * Now process the subscription attributes in the request...
+  */
+
+  while (attr)
+  {
+    recipient = NULL;
+    pullmethod = NULL;
+    user_data  = NULL;
+    interval   = 0;
+    mask       = CUPSD_EVENT_NONE;
+
+    while (attr && attr->group_tag != IPP_TAG_ZERO)
+    {
+      if (!strcmp(attr->name, "notify-recipient") &&
+          attr->value_tag == IPP_TAG_URI)
+        recipient = attr->values[0].string.text;
+      else if (!strcmp(attr->name, "notify-pull-method") &&
+               attr->value_tag == IPP_TAG_KEYWORD)
+        pullmethod = attr->values[0].string.text;
+      else if (!strcmp(attr->name, "notify-charset") &&
+               attr->value_tag == IPP_TAG_CHARSET &&
+	       strcmp(attr->values[0].string.text, "utf-8"))
+      {
+        send_ipp_error(con, IPP_CHARSET);
+	return;
+      }
+      else if (!strcmp(attr->name, "notify-natural-language") &&
+               attr->value_tag == IPP_TAG_LANGUAGE &&
+	       strcmp(attr->values[0].string.text, DefaultLanguage))
+      {
+        send_ipp_error(con, IPP_CHARSET);
+	return;
+      }
+      else if (!strcmp(attr->name, "notify-user-data") &&
+               attr->value_tag == IPP_TAG_STRING)
+      {
+        if (attr->num_values > 1 || attr->values[0].unknown.length > 63)
+	{
+          send_ipp_error(con, IPP_REQUEST_VALUE);
+	  return;
+	}
+
+        user_data = attr;
+      }
+      else if (!strcmp(attr->name, "notify-events") &&
+               attr->value_tag == IPP_TAG_KEYWORD)
+      {
+        for (i = 0; i < attr->num_values; i ++)
+	  mask |= cupsdEventValue(attr->values[i].string.text);
+      }
+      else if (!strcmp(attr->name, "notify-lease-time"))
+      {
+        send_ipp_error(con, IPP_BAD_REQUEST);
+	return;
+      }
+      else if (!strcmp(attr->name, "notify-time-interval") &&
+               attr->value_tag == IPP_TAG_INTEGER)
+        interval = attr->values[0].integer;
+
+      attr = attr->next;
+    }
+
+    if (!recipient && !pullmethod)
+      break;
+
+    sub = cupsdAddSubscription(mask, FindDest(job->dest), job, recipient);
+
+    SetString(&sub->owner, job->username);
+
+    if (user_data)
+    {
+      sub->user_data_len = user_data->values[0].unknown.length;
+      memcpy(sub->user_data, user_data->values[0].unknown.data,
+             sub->user_data_len);
+    }
+
+    if (attr)
+      attr = attr->next;
+  }
+
+ /*
+  * Free memory used by subscription attributes...
+  */
+
+  ippDelete(temp);
+}
+
+
+/*
  * 'add_printer()' - Add a printer to the system.
  */
 
@@ -2038,6 +2184,9 @@ cancel_job(client_t        *con,	/* I - Client connection */
  /*
   * Cancel the job and return...
   */
+
+  cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, job->printer, job,
+                "Job cancelled by \'%s\'.", username);
 
   CancelJob(jobid, 0);
   CheckJobs();
@@ -3079,13 +3228,6 @@ create_job(client_t        *con,	/* I - Client connection */
   }
 
  /*
-  * Set all but the first two attributes to the job attributes group...
-  */
-
-  for (attr = con->request->attrs->next->next; attr; attr = attr->next)
-    attr->group_tag = IPP_TAG_JOB;
-
- /*
   * Create the job and set things up...
   */
 
@@ -3385,6 +3527,19 @@ create_job(client_t        *con,	/* I - Client connection */
   }
   else if ((attr = ippFindAttribute(job->attrs, "job-sheets", IPP_TAG_ZERO)) != NULL)
     job->sheets = attr;
+
+ /*
+  * Add any job subscriptions...
+  */
+
+  add_job_subscriptions(con, job);
+
+ /*
+  * Set all but the first two attributes to the job attributes group...
+  */
+
+  for (attr = con->request->attrs->next->next; attr; attr = attr->next)
+    attr->group_tag = IPP_TAG_JOB;
 
  /*
   * Save and log the job...
@@ -5039,13 +5194,6 @@ print_job(client_t        *con,		/* I - Client connection */
   }
 
  /*
-  * Set all but the first two attributes to the job attributes group...
-  */
-
-  for (attr = con->request->attrs->next->next; attr; attr = attr->next)
-    attr->group_tag = IPP_TAG_JOB;
-
- /*
   * Create the job and set things up...
   */
 
@@ -5381,6 +5529,19 @@ print_job(client_t        *con,		/* I - Client connection */
 
     UpdateQuota(printer, job->username, 0, kbytes);
   }
+
+ /*
+  * Add any job subscriptions...
+  */
+
+  add_job_subscriptions(con, job);
+
+ /*
+  * Set all but the first two attributes to the job attributes group...
+  */
+
+  for (attr = con->request->attrs->next->next; attr; attr = attr->next)
+    attr->group_tag = IPP_TAG_JOB;
 
  /*
   * Log and save the job...

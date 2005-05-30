@@ -89,6 +89,7 @@ typedef struct cupsd_subscription_s	/**** Subscription structure ****/
 {
   int		id;			/* subscription-id */
   unsigned	mask;			/* Event mask */
+  char		*owner;			/* notify-subscriber-user-name */
   char		*recipient;		/* notify-recipient-uri, if applicable */
   unsigned char	user_data[64];		/* notify-user-data */
   int		user_data_len;		/* Length of notify-user-data */
@@ -122,6 +123,9 @@ VAR int		MaxSubscriptions VALUE(100),
 					/* Per-user subscription limit */
 		NextSubscriptionId VALUE(1),
 					/* Next subscription ID */
+		DefaultLeaseTime VALUE(86400),
+					/* Default notify-lease-time */
+		MaxLeaseTime VALUE(0),	/* Maximum notify-lease-time */
 		NumSubscriptions VALUE(0);
 					/* Number of active subscriptions */
 VAR cupsd_subscription_t **Subscriptions VALUE(NULL);
@@ -162,6 +166,7 @@ extern void	cupsdLoadAllSubscriptions(void);
 extern void	cupsdSaveAllSubscriptions(void);
 extern void	cupsdSendNotification(cupsd_subscription_t *sub,
 		                      cupsd_event_t *event);
+extern void	cupsdUpdateNotiferStatus(void);
 
 
 /*

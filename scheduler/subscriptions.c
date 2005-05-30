@@ -33,6 +33,8 @@
  *   cupsdLoadAllSubscriptions()   - Load all subscriptions from the .conf file.
  *   cupsdSaveAllSubscriptions()   - Save all subscriptions to the .conf file.
  *   cupsdSendNotification()       - Send a notification for the specified event.
+ *   cupsdUpdateNotifierStatus()   - Read messages from notifiers.
+ *   cupsd_delete_event()          - Delete a single event...
  */
 
 /*
@@ -418,8 +420,8 @@ cupsdDeleteSubscription(
   * Free memory...
   */
 
-  if (sub->recipient)
-    free(sub->recipient);
+  ClearString(&(sub->owner));
+  ClearString(&(sub->recipient));
 
   if (sub->events)
     free(sub->events);
@@ -795,6 +797,21 @@ cupsdLoadAllSubscriptions(void)
 	value = valueptr;
       }
     }
+    else if (!strcasecmp(name, "Owner"))
+    {
+     /*
+      * Owner
+      */
+
+      if (value)
+	SetString(&sub->owner, value);
+      else
+      {
+	LogMessage(L_ERROR, "Syntax error on line %d of subscriptions.conf.",
+	           linenum);
+	return;
+      }
+    }
     else if (!strcasecmp(name, "Recipient"))
     {
      /*
@@ -1083,6 +1100,8 @@ cupsdSaveAllSubscriptions(void)
       cupsFilePuts(fp, "\n");
     }
 
+    if (sub->owner)
+      cupsFilePrintf(fp, "Owner %s\n", sub->owner);
     if (sub->recipient)
       cupsFilePrintf(fp, "Recipient %s\n", sub->recipient);
     if (sub->job)
@@ -1171,6 +1190,16 @@ cupsdSendNotification(
   */
 
   sub->next_event_id ++;
+}
+
+
+/*
+ * 'cupsdUpdateNotifierStatus()' - Read messages from notifiers.
+ */
+
+void
+cupsdUpdateNotiferStatus(void)
+{
 }
 
 
