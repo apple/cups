@@ -3,7 +3,7 @@
 #
 #   PHP Makefile for the Common UNIX Printing System (CUPS).
 #
-#   Copyright 1997-2003 by Easy Software Products, all rights reserved.
+#   Copyright 1997-2005 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
 #   property of Easy Software Products and are protected by Federal
@@ -31,7 +31,7 @@ include ../../Makedefs
 
 PHPDIR	=	`php-config --extension-dir`
 OPTIONS	=	`php-config --includes` -I../.. -DCOMPILE_DL_PHPCUPS
-
+PHPLIBS	=	`php-config --ldflags` `php-config --libs`
 
 #
 # Object files...
@@ -86,7 +86,13 @@ install:	all
 
 phpcups.so:	$(OBJS) ../../Makedefs
 	echo Linking $@...
-	$(DSO) $(DSOFLAGS) -o $@ $(OBJS) -L../../cups -lcups
+	if test `uname` = Darwin; then \
+		DSOFLAGS="-bundle -flat_namespace -undefined suppress"; \
+	else \
+		DSOFLAGS="-rdynamic"; \
+	fi; \
+	echo $(DSO) $$DSOFLAGS -o $@ $(OBJS) -L../../cups -lcups $(PHPLIBS); \
+	$(DSO) $$DSOFLAGS -o $@ $(OBJS) -L../../cups -lcups $(PHPLIBS)
 
 
 #

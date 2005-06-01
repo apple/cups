@@ -54,12 +54,12 @@
  * Include necessary headers...
  */
 
-#include "config.h"
-#include "cups.h"
-#include "ipp.h"
-#include "language.h"
-#include "string.h"
-#include "debug.h"
+#include <config.h>
+#include <cups/cups.h>
+#include <cups/ipp.h>
+#include <cups/language.h>
+#include <cups/string.h>
+#include <cups/debug.h>
 #include <stdlib.h>
 #include <ctype.h>
 #include <errno.h>
