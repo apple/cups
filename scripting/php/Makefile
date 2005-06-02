@@ -89,7 +89,7 @@ phpcups.so:	$(OBJS) ../../Makedefs
 	if test `uname` = Darwin; then \
 		DSOFLAGS="-bundle -flat_namespace -undefined suppress"; \
 	else \
-		DSOFLAGS="-rdynamic"; \
+		DSOFLAGS="$(DSOFLAGS)"; \
 	fi; \
 	echo $(DSO) $$DSOFLAGS -o $@ $(OBJS) -L../../cups -lcups $(PHPLIBS); \
 	$(DSO) $$DSOFLAGS -o $@ $(OBJS) -L../../cups -lcups $(PHPLIBS)
