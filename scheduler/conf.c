@@ -810,8 +810,10 @@ ReadConfiguration(void)
 
     snprintf(temp, sizeof(temp), "%s/filter", ServerBin);
 
-    MimeDatabase = mimeNew();
-    mimeMerge(MimeDatabase, ServerRoot, temp);
+    MimeDatabase = mimeLoad(ServerRoot, temp);
+
+    LogMessage(L_INFO, "Loaded MIME database from \'%s\': %d types, %d filters...",
+               ServerRoot, MimeDatabase->num_types, MimeDatabase->num_filters);
 
    /*
     * Create a list of MIME types for the document-format-supported
@@ -905,8 +907,9 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
   int		i;			/* Looping var */
   int		linenum;		/* Current line number */
   char		line[HTTP_MAX_BUFFER],	/* Line from file */
-		name[256],		/* Parameter name */
-		*nameptr,		/* Pointer into name */
+		temp[HTTP_MAX_BUFFER],	/* Temporary buffer for value */
+		temp2[HTTP_MAX_BUFFER],	/* Temporary buffer 2 for value */
+		*ptr,			/* Pointer into line/temp */
 		*value;			/* Pointer to value */
   int		valuelen;		/* Length of value */
   var_t		*var;			/* Current variable */
@@ -932,7 +935,7 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
     * Decode the directive...
     */
 
-    if (strcasecmp(name, "Include") == 0)
+    if (!strcasecmp(line, "Include"))
     {
      /*
       * Include filename
@@ -952,7 +955,7 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 	cupsFileClose(incfile);
       }
     }
-    else if (strcasecmp(name, "<Location") == 0)
+    else if (!strcasecmp(line, "<Location"))
     {
      /*
       * <Location path>
@@ -971,7 +974,7 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
         return (0);
       }
     }
-    else if (!strcasecmp(name, "<Policy"))
+    else if (!strcasecmp(line, "<Policy"))
     {
      /*
       * <Policy name>
@@ -990,158 +993,156 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
         return (0);
       }
     }
-    else if (strcasecmp(name, "Port") == 0 ||
-             strcasecmp(name, "Listen") == 0)
+    else if (!strcasecmp(line, "Port") || !strcasecmp(line, "Listen"))
     {
      /*
       * Add a listening address to the list...
       */
 
-      listener_t	*temp;		/* New listeners array */
+      listener_t	*lis;		/* New listeners array */
 
 
       if (NumListeners == 0)
-        temp = malloc(sizeof(listener_t));
+        lis = malloc(sizeof(listener_t));
       else
-        temp = realloc(Listeners, (NumListeners + 1) * sizeof(listener_t));
+        lis = realloc(Listeners, (NumListeners + 1) * sizeof(listener_t));
 
-      if (!temp)
+      if (!lis)
       {
         LogMessage(L_ERROR, "Unable to allocate %s at line %d - %s.",
-	           name, linenum, strerror(errno));
+	           line, linenum, strerror(errno));
         continue;
       }
 
-      Listeners = temp;
-      temp      += NumListeners;
+      Listeners = lis;
+      lis      += NumListeners;
 
-      memset(temp, 0, sizeof(listener_t));
+      memset(lis, 0, sizeof(listener_t));
 
-      if (get_address(value, INADDR_ANY, IPP_PORT, AF_INET, &(temp->address)))
+      if (get_address(value, INADDR_ANY, IPP_PORT, AF_INET, &(lis->address)))
       {
-        httpAddrString(&(temp->address), line, sizeof(line));
+        httpAddrString(&(lis->address), temp, sizeof(temp));
 
 #ifdef AF_INET6
-        if (temp->address.addr.sa_family == AF_INET6)
-          LogMessage(L_INFO, "Listening to %s:%d (IPv6)", line,
-                     ntohs(temp->address.ipv6.sin6_port));
+        if (lis->address.addr.sa_family == AF_INET6)
+          LogMessage(L_INFO, "Listening to %s:%d (IPv6)", temp,
+                     ntohs(lis->address.ipv6.sin6_port));
 	else
 #endif /* AF_INET6 */
-        LogMessage(L_INFO, "Listening to %s:%d", line,
-                   ntohs(temp->address.ipv4.sin_port));
+        LogMessage(L_INFO, "Listening to %s:%d", temp,
+                   ntohs(lis->address.ipv4.sin_port));
 	NumListeners ++;
       }
       else
-        LogMessage(L_ERROR, "Bad %s address %s at line %d.", name,
+        LogMessage(L_ERROR, "Bad %s address %s at line %d.", line,
 	           value, linenum);
     }
 #ifdef HAVE_SSL
-    else if (strcasecmp(name, "SSLPort") == 0 ||
-             strcasecmp(name, "SSLListen") == 0)
+    else if (!strcasecmp(line, "SSLPort") || !strcasecmp(line, "SSLListen"))
     {
      /*
       * Add a listening address to the list...
       */
 
-      listener_t	*temp;		/* New listeners array */
+      listener_t	*lis;		/* New listeners array */
 
 
       if (NumListeners == 0)
-        temp = malloc(sizeof(listener_t));
+        lis = malloc(sizeof(listener_t));
       else
-        temp = realloc(Listeners, (NumListeners + 1) * sizeof(listener_t));
+        lis = realloc(Listeners, (NumListeners + 1) * sizeof(listener_t));
 
-      if (!temp)
+      if (!lis)
       {
         LogMessage(L_ERROR, "Unable to allocate %s at line %d - %s.",
-	           name, linenum, strerror(errno));
+	           line, linenum, strerror(errno));
         continue;
       }
 
-      Listeners = temp;
-      temp      += NumListeners;
+      Listeners = lis;
+      lis      += NumListeners;
 
-      if (get_address(value, INADDR_ANY, IPP_PORT, AF_INET, &(temp->address)))
+      if (get_address(value, INADDR_ANY, IPP_PORT, AF_INET, &(lis->address)))
       {
-        httpAddrString(&(temp->address), line, sizeof(line));
+        httpAddrString(&(lis->address), temp, sizeof(temp));
 
 #ifdef AF_INET6
-        if (temp->address.addr.sa_family == AF_INET6)
-          LogMessage(L_INFO, "Listening to %s:%d (IPv6)", line,
-                     ntohs(temp->address.ipv6.sin6_port));
+        if (lis->address.addr.sa_family == AF_INET6)
+          LogMessage(L_INFO, "Listening to %s:%d (IPv6)", temp,
+                     ntohs(lis->address.ipv6.sin6_port));
 	else
 #endif /* AF_INET6 */
-        LogMessage(L_INFO, "Listening to %s:%d", line,
-                   ntohs(temp->address.ipv4.sin_port));
-        temp->encryption = HTTP_ENCRYPT_ALWAYS;
+        LogMessage(L_INFO, "Listening to %s:%d", temp,
+                   ntohs(lis->address.ipv4.sin_port));
+        lis->encryption = HTTP_ENCRYPT_ALWAYS;
 	NumListeners ++;
       }
       else
-        LogMessage(L_ERROR, "Bad %s address %s at line %d.", name,
+        LogMessage(L_ERROR, "Bad %s address %s at line %d.", line,
 	           value, linenum);
     }
 #endif /* HAVE_SSL */
-    else if (strcasecmp(name, "BrowseAddress") == 0)
+    else if (!strcasecmp(line, "BrowseAddress"))
     {
      /*
       * Add a browse address to the list...
       */
 
-      dirsvc_addr_t	*temp;		/* New browse address array */
+      dirsvc_addr_t	*dira;		/* New browse address array */
 
 
       if (NumBrowsers == 0)
-        temp = malloc(sizeof(dirsvc_addr_t));
+        dira = malloc(sizeof(dirsvc_addr_t));
       else
-        temp = realloc(Browsers, (NumBrowsers + 1) * sizeof(dirsvc_addr_t));
+        dira = realloc(Browsers, (NumBrowsers + 1) * sizeof(dirsvc_addr_t));
 
-      if (!temp)
+      if (!dira)
       {
         LogMessage(L_ERROR, "Unable to allocate BrowseAddress at line %d - %s.",
 	           linenum, strerror(errno));
         continue;
       }
 
-      Browsers = temp;
-      temp     += NumBrowsers;
+      Browsers = dira;
+      dira     += NumBrowsers;
 
-      memset(temp, 0, sizeof(dirsvc_addr_t));
+      memset(dira, 0, sizeof(dirsvc_addr_t));
 
-      if (strcasecmp(value, "@LOCAL") == 0)
+      if (!strcasecmp(value, "@LOCAL"))
       {
        /*
 	* Send browse data to all local interfaces...
 	*/
 
-	strcpy(temp->iface, "*");
+	strcpy(dira->iface, "*");
 	NumBrowsers ++;
       }
-      else if (strncasecmp(value, "@IF(", 4) == 0)
+      else if (!strncasecmp(value, "@IF(", 4))
       {
        /*
 	* Send browse data to the named interface...
 	*/
 
-	strlcpy(temp->iface, value + 4, sizeof(Browsers[0].iface));
+	strlcpy(dira->iface, value + 4, sizeof(Browsers[0].iface));
 
-        nameptr = temp->iface + strlen(temp->iface) - 1;
-        if (*nameptr == ')')
-	  *nameptr = '\0';
+        ptr = dira->iface + strlen(dira->iface) - 1;
+        if (*ptr == ')')
+	  *ptr = '\0';
 
 	NumBrowsers ++;
       }
-      else if (get_address(value, INADDR_NONE, BrowsePort, AF_INET, &(temp->to)))
+      else if (get_address(value, INADDR_NONE, BrowsePort, AF_INET, &(dira->to)))
       {
-        httpAddrString(&(temp->to), line, sizeof(line));
+        httpAddrString(&(dira->to), temp, sizeof(temp));
 
 #ifdef AF_INET6
-        if (temp->to.addr.sa_family == AF_INET6)
-          LogMessage(L_INFO, "Sending browsing info to %s:%d (IPv6)", line,
-                     ntohs(temp->to.ipv6.sin6_port));
+        if (dira->to.addr.sa_family == AF_INET6)
+          LogMessage(L_INFO, "Sending browsing info to %s:%d (IPv6)", temp,
+                     ntohs(dira->to.ipv6.sin6_port));
 	else
 #endif /* AF_INET6 */
-        LogMessage(L_INFO, "Sending browsing info to %s:%d", line,
-                   ntohs(temp->to.ipv4.sin_port));
+        LogMessage(L_INFO, "Sending browsing info to %s:%d", temp,
+                   ntohs(dira->to.ipv4.sin_port));
 
 	NumBrowsers ++;
       }
@@ -1149,7 +1150,7 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
         LogMessage(L_ERROR, "Bad BrowseAddress %s at line %d.", value,
 	           linenum);
     }
-    else if (strcasecmp(name, "BrowseOrder") == 0)
+    else if (!strcasecmp(line, "BrowseOrder"))
     {
      /*
       * "BrowseOrder Deny,Allow" or "BrowseOrder Allow,Deny"...
@@ -1160,15 +1161,15 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 
       if (location == NULL)
         LogMessage(L_ERROR, "Unable to initialize browse access control list!");
-      else if (strncasecmp(value, "deny", 4) == 0)
+      else if (!strncasecmp(value, "deny", 4))
         location->order_type = AUTH_ALLOW;
-      else if (strncasecmp(value, "allow", 5) == 0)
+      else if (!strncasecmp(value, "allow", 5))
         location->order_type = AUTH_DENY;
       else
         LogMessage(L_ERROR, "Unknown BrowseOrder value %s on line %d.",
 	           value, linenum);
     }
-    else if (strcasecmp(name, "BrowseProtocols") == 0)
+    else if (!strcasecmp(line, "BrowseProtocols"))
     {
      /*
       * "BrowseProtocol name [... name]"
@@ -1188,13 +1189,13 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 	  valuelen ++;
 	}
 
-        if (strcasecmp(value, "cups") == 0)
+        if (!strcasecmp(value, "cups"))
 	  BrowseProtocols |= BROWSE_CUPS;
-        else if (strcasecmp(value, "slp") == 0)
+        else if (!strcasecmp(value, "slp"))
 	  BrowseProtocols |= BROWSE_SLP;
-        else if (strcasecmp(value, "ldap") == 0)
+        else if (!strcasecmp(value, "ldap"))
 	  BrowseProtocols |= BROWSE_LDAP;
-        else if (strcasecmp(value, "all") == 0)
+        else if (!strcasecmp(value, "all"))
 	  BrowseProtocols |= BROWSE_ALL;
 	else
 	{
@@ -1208,8 +1209,8 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 	    break;
       }
     }
-    else if (strcasecmp(name, "BrowseAllow") == 0 ||
-             strcasecmp(name, "BrowseDeny") == 0)
+    else if (!strcasecmp(line, "BrowseAllow") ||
+             !strcasecmp(line, "BrowseDeny"))
     {
      /*
       * BrowseAllow [From] host/ip...
@@ -1223,7 +1224,7 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
         LogMessage(L_ERROR, "Unable to initialize browse access control list!");
       else
       {
-	if (strncasecmp(value, "from ", 5) == 0)
+	if (!strncasecmp(value, "from ", 5))
 	{
 	 /*
           * Strip leading "from"...
@@ -1251,24 +1252,24 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 	*    nnn.nnn.nnn.nnn/mmm.mmm.mmm.mmm
 	*/
 
-	if (strcasecmp(value, "all") == 0)
+	if (!strcasecmp(value, "all"))
 	{
 	 /*
           * All hosts...
 	  */
 
-          if (strcasecmp(name, "BrowseAllow") == 0)
+          if (!strcasecmp(line, "BrowseAllow"))
 	    AllowIP(location, zeros, zeros);
 	  else
 	    DenyIP(location, zeros, zeros);
 	}
-	else if (strcasecmp(value, "none") == 0)
+	else if (!strcasecmp(value, "none"))
 	{
 	 /*
           * No hosts...
 	  */
 
-          if (strcasecmp(name, "BrowseAllow") == 0)
+          if (!strcasecmp(line, "BrowseAllow"))
 	    AllowIP(location, ones, zeros);
 	  else
 	    DenyIP(location, ones, zeros);
@@ -1282,7 +1283,7 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 	  if (value[0] == '*')
 	    value ++;
 
-          if (strcasecmp(name, "BrowseAllow") == 0)
+          if (!strcasecmp(line, "BrowseAllow"))
 	    AllowHost(location, value);
 	  else
 	    DenyHost(location, value);
@@ -1300,14 +1301,14 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 	    break;
 	  }
 
-          if (strcasecmp(name, "BrowseAllow") == 0)
+          if (!strcasecmp(line, "BrowseAllow"))
 	    AllowIP(location, ip, mask);
 	  else
 	    DenyIP(location, ip, mask);
 	}
       }
     }
-    else if (strcasecmp(name, "BrowseRelay") == 0)
+    else if (!strcasecmp(line, "BrowseRelay"))
     {
      /*
       * BrowseRelay [from] source [to] destination
@@ -1330,7 +1331,7 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 
       memset(relay, 0, sizeof(dirsvc_relay_t));
 
-      if (strncasecmp(value, "from ", 5) == 0)
+      if (!strncasecmp(value, "from ", 5))
       {
        /*
         * Strip leading "from"...
@@ -1365,13 +1366,13 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 	if (value[0] == '*')
 	  value ++;
 
-        strlcpy(name, value, sizeof(name));
-	if ((nameptr = strchr(name, ' ')) != NULL)
-	  *nameptr = '\0';
+        strlcpy(temp, value, sizeof(temp));
+	if ((ptr = strchr(temp, ' ')) != NULL)
+	  *ptr = '\0';
 
         relay->from.type             = AUTH_NAME;
-	relay->from.mask.name.name   = strdup(name);
-	relay->from.mask.name.length = strlen(name);
+	relay->from.mask.name.name   = strdup(temp);
+	relay->from.mask.name.length = strlen(temp);
       }
       else
       {
@@ -1404,7 +1405,7 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
       while (isspace(*value))
         value ++;
 
-      if (strncasecmp(value, "to ", 3) == 0)
+      if (!strncasecmp(value, "to ", 3))
       {
        /*
         * Strip leading "to"...
@@ -1422,10 +1423,10 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 
       if (get_address(value, INADDR_BROADCAST, BrowsePort, AF_INET, &(relay->to)))
       {
-        httpAddrString(&(relay->to), line, sizeof(line));
+        httpAddrString(&(relay->to), temp, sizeof(temp));
 
         if (relay->from.type == AUTH_IP)
-	  snprintf(name, sizeof(name), "%u.%u.%u.%u/%u.%u.%u.%u",
+	  snprintf(temp2, sizeof(temp2), "%u.%u.%u.%u/%u.%u.%u.%u",
 		   relay->from.mask.ip.address[0],
 		   relay->from.mask.ip.address[1],
 		   relay->from.mask.ip.address[2],
@@ -1435,18 +1436,15 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 		   relay->from.mask.ip.netmask[2],
 		   relay->from.mask.ip.netmask[3]);
 	else
-	{
-	  strncpy(name, relay->from.mask.name.name, sizeof(name) - 1);
-	  name[sizeof(name) - 1] = '\0';
-	}
+	  strlcpy(temp2, relay->from.mask.name.name, sizeof(temp2));
 
 #ifdef AF_INET6
         if (relay->to.addr.sa_family == AF_INET6)
-          LogMessage(L_INFO, "Relaying from %s to %s:%d", name, line,
+          LogMessage(L_INFO, "Relaying from %s to %s:%d", temp, temp2,
                      ntohs(relay->to.ipv6.sin6_port));
 	else
 #endif /* AF_INET6 */
-        LogMessage(L_INFO, "Relaying from %s to %s:%d", name, line,
+        LogMessage(L_INFO, "Relaying from %s to %s:%d", temp, temp2,
                    ntohs(relay->to.ipv4.sin_port));
 
 	NumRelays ++;
@@ -1459,7 +1457,7 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
         LogMessage(L_ERROR, "Bad relay address %s at line %d.", value, linenum);
       }
     }
-    else if (strcasecmp(name, "BrowsePoll") == 0)
+    else if (!strcasecmp(line, "BrowsePoll"))
     {
      /*
       * BrowsePoll address[:port]
@@ -1503,7 +1501,7 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
       else
         LogMessage(L_ERROR, "Bad poll address %s at line %d.", value, linenum);
     }
-    else if (strcasecmp(name, "User") == 0)
+    else if (!strcasecmp(line, "User"))
     {
      /*
       * User ID to run as...
@@ -1521,11 +1519,10 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 	if (p != NULL)
 	  User = p->pw_uid;
 	else
-	  LogMessage(L_WARN, "Unknown username \"%s\"",
-	             value);
+	  LogMessage(L_WARN, "Unknown username \"%s\"", value);
       }
     }
-    else if (strcasecmp(name, "Group") == 0)
+    else if (!strcasecmp(line, "Group"))
     {
      /*
       * Group ID to run as...
@@ -1543,11 +1540,10 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 	if (g != NULL)
 	  Group = g->gr_gid;
 	else
-	  LogMessage(L_WARN, "Unknown groupname \"%s\"",
-	             value);
+	  LogMessage(L_WARN, "Unknown groupname \"%s\"", value);
       }
     }
-    else if (strcasecmp(name, "SystemGroup") == 0)
+    else if (!strcasecmp(line, "SystemGroup"))
     {
      /*
       * System (admin) group(s)...
@@ -1596,66 +1592,66 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
       if (i)
         NumSystemGroups = i;
     }
-    else if (strcasecmp(name, "HostNameLookups") == 0)
+    else if (!strcasecmp(line, "HostNameLookups"))
     {
      /*
       * Do hostname lookups?
       */
 
-      if (strcasecmp(value, "off") == 0)
+      if (!strcasecmp(value, "off"))
         HostNameLookups = 0;
-      else if (strcasecmp(value, "on") == 0)
+      else if (!strcasecmp(value, "on"))
         HostNameLookups = 1;
-      else if (strcasecmp(value, "double") == 0)
+      else if (!strcasecmp(value, "double"))
         HostNameLookups = 2;
       else
 	LogMessage(L_WARN, "Unknown HostNameLookups %s on line %d.",
 	           value, linenum);
     }
-    else if (strcasecmp(name, "LogLevel") == 0)
+    else if (!strcasecmp(line, "LogLevel"))
     {
      /*
       * Amount of logging to do...
       */
 
-      if (strcasecmp(value, "debug2") == 0)
+      if (!strcasecmp(value, "debug2"))
         LogLevel = L_DEBUG2;
-      else if (strcasecmp(value, "debug") == 0)
+      else if (!strcasecmp(value, "debug"))
         LogLevel = L_DEBUG;
-      else if (strcasecmp(value, "info") == 0)
+      else if (!strcasecmp(value, "info"))
         LogLevel = L_INFO;
-      else if (strcasecmp(value, "notice") == 0)
+      else if (!strcasecmp(value, "notice"))
         LogLevel = L_NOTICE;
-      else if (strcasecmp(value, "warn") == 0)
+      else if (!strcasecmp(value, "warn"))
         LogLevel = L_WARN;
-      else if (strcasecmp(value, "error") == 0)
+      else if (!strcasecmp(value, "error"))
         LogLevel = L_ERROR;
-      else if (strcasecmp(value, "crit") == 0)
+      else if (!strcasecmp(value, "crit"))
         LogLevel = L_CRIT;
-      else if (strcasecmp(value, "alert") == 0)
+      else if (!strcasecmp(value, "alert"))
         LogLevel = L_ALERT;
-      else if (strcasecmp(value, "emerg") == 0)
+      else if (!strcasecmp(value, "emerg"))
         LogLevel = L_EMERG;
-      else if (strcasecmp(value, "none") == 0)
+      else if (!strcasecmp(value, "none"))
         LogLevel = L_NONE;
       else
         LogMessage(L_WARN, "Unknown LogLevel %s on line %d.", value, linenum);
     }
-    else if (strcasecmp(name, "PrintcapFormat") == 0)
+    else if (!strcasecmp(line, "PrintcapFormat"))
     {
      /*
       * Format of printcap file?
       */
 
-      if (strcasecmp(value, "bsd") == 0)
+      if (!strcasecmp(value, "bsd"))
         PrintcapFormat = PRINTCAP_BSD;
-      else if (strcasecmp(value, "solaris") == 0)
+      else if (!strcasecmp(value, "solaris"))
         PrintcapFormat = PRINTCAP_SOLARIS;
       else
 	LogMessage(L_WARN, "Unknown PrintcapFormat %s on line %d.",
 	           value, linenum);
     }
-    else if (!strcasecmp(name, "ServerTokens"))
+    else if (!strcasecmp(line, "ServerTokens"))
     {
      /*
       * Set the string used for the Server header...
@@ -1690,7 +1686,7 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
       */
 
       for (i = NUM_VARS, var = variables; i > 0; i --, var ++)
-        if (strcasecmp(name, var->name) == 0)
+        if (!strcasecmp(line, var->name))
 	  break;
 
       if (i == 0)
@@ -1699,7 +1695,7 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
         * Unknown directive!  Output an error message and continue...
 	*/
 
-        LogMessage(L_ERROR, "Unknown directive %s on line %d.", name,
+        LogMessage(L_ERROR, "Unknown directive %s on line %d.", line,
 	           linenum);
         continue;
       }
@@ -1731,17 +1727,17 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 	    break;
 
 	case VAR_BOOLEAN :
-	    if (strcasecmp(value, "true") == 0 ||
-	        strcasecmp(value, "on") == 0 ||
-		strcasecmp(value, "enabled") == 0 ||
-		strcasecmp(value, "yes") == 0 ||
+	    if (!strcasecmp(value, "true") ||
+	        !strcasecmp(value, "on") ||
+		!strcasecmp(value, "enabled") ||
+		!strcasecmp(value, "yes") ||
 		atoi(value) != 0)
               *((int *)var->ptr) = TRUE;
-	    else if (strcasecmp(value, "false") == 0 ||
-	             strcasecmp(value, "off") == 0 ||
-		     strcasecmp(value, "disabled") == 0 ||
-		     strcasecmp(value, "no") == 0 ||
-		     strcasecmp(value, "0") == 0)
+	    else if (!strcasecmp(value, "false") ||
+	             !strcasecmp(value, "off") ||
+		     !strcasecmp(value, "disabled") ||
+		     !strcasecmp(value, "no") ||
+		     !strcasecmp(value, "0"))
               *((int *)var->ptr) = FALSE;
 	    else
               LogMessage(L_ERROR, "Unknown boolean value %s on line %d.",
@@ -1772,7 +1768,6 @@ read_location(cups_file_t *fp,		/* I - Configuration file */
   location_t	*loc,			/* New location */
 		*parent;		/* Parent location */
   char		line[HTTP_MAX_BUFFER],	/* Line buffer */
-		name[256],		/* Configuration directive */
 		*value,			/* Value for directive */
 		*valptr;		/* Pointer into value */
   unsigned	ip[4],			/* IP address components */
@@ -1791,10 +1786,10 @@ read_location(cups_file_t *fp,		/* I - Configuration file */
     * Decode the directive...
     */
 
-    if (strcasecmp(name, "</Location>") == 0)
+    if (!strcasecmp(line, "</Location>"))
       return (linenum);
-    else if (strcasecmp(name, "<Limit") == 0 ||
-             strcasecmp(name, "<LimitExcept") == 0)
+    else if (!strcasecmp(line, "<Limit") ||
+             !strcasecmp(line, "<LimitExcept"))
     {
       if (!value)
       {
@@ -1813,19 +1808,19 @@ read_location(cups_file_t *fp,		/* I - Configuration file */
 	if (*valptr)
 	  *valptr++ = '\0';
 
-        if (strcmp(value, "ALL") == 0)
+        if (!strcmp(value, "ALL"))
 	  loc->limit = AUTH_LIMIT_ALL;
-	else if (strcmp(value, "GET") == 0)
+	else if (!strcmp(value, "GET"))
 	  loc->limit |= AUTH_LIMIT_GET;
-	else if (strcmp(value, "HEAD") == 0)
+	else if (!strcmp(value, "HEAD"))
 	  loc->limit |= AUTH_LIMIT_HEAD;
-	else if (strcmp(value, "OPTIONS") == 0)
+	else if (!strcmp(value, "OPTIONS"))
 	  loc->limit |= AUTH_LIMIT_OPTIONS;
-	else if (strcmp(value, "POST") == 0)
+	else if (!strcmp(value, "POST"))
 	  loc->limit |= AUTH_LIMIT_POST;
-	else if (strcmp(value, "PUT") == 0)
+	else if (!strcmp(value, "PUT"))
 	  loc->limit |= AUTH_LIMIT_PUT;
-	else if (strcmp(value, "TRACE") == 0)
+	else if (!strcmp(value, "TRACE"))
 	  loc->limit |= AUTH_LIMIT_TRACE;
 	else
 	  LogMessage(L_WARN, "Unknown request type %s on line %d!", value,
@@ -1834,59 +1829,58 @@ read_location(cups_file_t *fp,		/* I - Configuration file */
         for (value = valptr; isspace(*value & 255); value ++);
       }
 
-      if (strcasecmp(name, "<LimitExcept") == 0)
+      if (!strcasecmp(line, "<LimitExcept"))
         loc->limit = AUTH_LIMIT_ALL ^ loc->limit;
 
       parent->limit &= ~loc->limit;
     }
-    else if (strcasecmp(name, "</Limit>") == 0)
+    else if (!strcasecmp(line, "</Limit>"))
       loc = parent;
-    else if (strcasecmp(name, "Encryption") == 0)
+    else if (!strcasecmp(line, "Encryption"))
     {
      /*
       * "Encryption xxx" - set required encryption level...
       */
 
-      if (strcasecmp(value, "never") == 0)
+      if (!strcasecmp(value, "never"))
         loc->encryption = HTTP_ENCRYPT_NEVER;
-      else if (strcasecmp(value, "always") == 0)
+      else if (!strcasecmp(value, "always"))
       {
         LogMessage(L_ERROR, "Encryption value \"%s\" on line %d is invalid in this context. "
 	                    "Using \"required\" instead.", value, linenum);
 
         loc->encryption = HTTP_ENCRYPT_REQUIRED;
       }
-      else if (strcasecmp(value, "required") == 0)
+      else if (!strcasecmp(value, "required"))
         loc->encryption = HTTP_ENCRYPT_REQUIRED;
-      else if (strcasecmp(value, "ifrequested") == 0)
+      else if (!strcasecmp(value, "ifrequested"))
         loc->encryption = HTTP_ENCRYPT_IF_REQUESTED;
       else
         LogMessage(L_ERROR, "Unknown Encryption value %s on line %d.",
 	           value, linenum);
     }
-    else if (strcasecmp(name, "Order") == 0)
+    else if (!strcasecmp(line, "Order"))
     {
      /*
       * "Order Deny,Allow" or "Order Allow,Deny"...
       */
 
-      if (strncasecmp(value, "deny", 4) == 0)
+      if (!strncasecmp(value, "deny", 4))
         loc->order_type = AUTH_ALLOW;
-      else if (strncasecmp(value, "allow", 5) == 0)
+      else if (!strncasecmp(value, "allow", 5))
         loc->order_type = AUTH_DENY;
       else
         LogMessage(L_ERROR, "Unknown Order value %s on line %d.",
 	           value, linenum);
     }
-    else if (strcasecmp(name, "Allow") == 0 ||
-             strcasecmp(name, "Deny") == 0)
+    else if (!strcasecmp(line, "Allow") || !strcasecmp(line, "Deny"))
     {
      /*
       * Allow [From] host/ip...
       * Deny [From] host/ip...
       */
 
-      if (strncasecmp(value, "from", 4) == 0)
+      if (!strncasecmp(value, "from", 4))
       {
        /*
         * Strip leading "from"...
@@ -1914,24 +1908,24 @@ read_location(cups_file_t *fp,		/* I - Configuration file */
       *    nnn.nnn.nnn.nnn/mmm.mmm.mmm.mmm
       */
 
-      if (strcasecmp(value, "all") == 0)
+      if (!strcasecmp(value, "all"))
       {
        /*
         * All hosts...
 	*/
 
-        if (strcasecmp(name, "Allow") == 0)
+        if (!strcasecmp(line, "Allow"))
 	  AllowIP(loc, zeros, zeros);
 	else
 	  DenyIP(loc, zeros, zeros);
       }
-      else  if (strcasecmp(value, "none") == 0)
+      else if (!strcasecmp(value, "none"))
       {
        /*
         * No hosts...
 	*/
 
-        if (strcasecmp(name, "Allow") == 0)
+        if (!strcasecmp(line, "Allow"))
 	  AllowIP(loc, ones, zeros);
 	else
 	  DenyIP(loc, ones, zeros);
@@ -1945,7 +1939,7 @@ read_location(cups_file_t *fp,		/* I - Configuration file */
 	if (value[0] == '*')
 	  value ++;
 
-        if (strcasecmp(name, "Allow") == 0)
+        if (!strcasecmp(line, "Allow"))
 	  AllowHost(loc, value);
 	else
 	  DenyHost(loc, value);
@@ -1963,38 +1957,38 @@ read_location(cups_file_t *fp,		/* I - Configuration file */
 	  break;
 	}
 
-        if (strcasecmp(name, "Allow") == 0)
+        if (!strcasecmp(line, "Allow"))
 	  AllowIP(loc, ip, mask);
 	else
 	  DenyIP(loc, ip, mask);
       }
     }
-    else if (strcasecmp(name, "AuthType") == 0)
+    else if (!strcasecmp(line, "AuthType"))
     {
      /*
       * AuthType {none,basic,digest,basicdigest}
       */
 
-      if (strcasecmp(value, "none") == 0)
+      if (!strcasecmp(value, "none"))
       {
 	loc->type  = AUTH_NONE;
 	loc->level = AUTH_ANON;
       }
-      else if (strcasecmp(value, "basic") == 0)
+      else if (!strcasecmp(value, "basic"))
       {
 	loc->type = AUTH_BASIC;
 
         if (loc->level == AUTH_ANON)
 	  loc->level = AUTH_USER;
       }
-      else if (strcasecmp(value, "digest") == 0)
+      else if (!strcasecmp(value, "digest"))
       {
 	loc->type = AUTH_DIGEST;
 
         if (loc->level == AUTH_ANON)
 	  loc->level = AUTH_USER;
       }
-      else if (strcasecmp(value, "basicdigest") == 0)
+      else if (!strcasecmp(value, "basicdigest"))
       {
 	loc->type = AUTH_BASICDIGEST;
 
@@ -2005,22 +1999,22 @@ read_location(cups_file_t *fp,		/* I - Configuration file */
         LogMessage(L_WARN, "Unknown authorization type %s on line %d.",
 	           value, linenum);
     }
-    else if (strcasecmp(name, "AuthClass") == 0)
+    else if (!strcasecmp(line, "AuthClass"))
     {
      /*
       * AuthClass anonymous, user, system, group
       */
 
-      if (strcasecmp(value, "anonymous") == 0)
+      if (!strcasecmp(value, "anonymous"))
       {
         loc->type  = AUTH_NONE;
         loc->level = AUTH_ANON;
       }
-      else if (strcasecmp(value, "user") == 0)
+      else if (!strcasecmp(value, "user"))
         loc->level = AUTH_USER;
-      else if (strcasecmp(value, "group") == 0)
+      else if (!strcasecmp(value, "group"))
         loc->level = AUTH_GROUP;
-      else if (strcasecmp(value, "system") == 0)
+      else if (!strcasecmp(value, "system"))
       {
         loc->level = AUTH_GROUP;
 
@@ -2028,7 +2022,7 @@ read_location(cups_file_t *fp,		/* I - Configuration file */
         * Use the default system group if none is defined so far...
 	*/
 
-        if (NumSystemGroups == 0)
+        if (NumSystemGroups)
 	  NumSystemGroups = 1;
 
 	for (i = 0; i < NumSystemGroups; i ++)
@@ -2038,9 +2032,9 @@ read_location(cups_file_t *fp,		/* I - Configuration file */
         LogMessage(L_WARN, "Unknown authorization class %s on line %d.",
 	           value, linenum);
     }
-    else if (strcasecmp(name, "AuthGroupName") == 0)
+    else if (!strcasecmp(line, "AuthGroupName"))
       AddName(loc, value);
-    else if (strcasecmp(name, "Require") == 0)
+    else if (!strcasecmp(line, "Require"))
     {
      /*
       * Apache synonym for AuthClass and AuthGroupName...
@@ -2057,10 +2051,10 @@ read_location(cups_file_t *fp,		/* I - Configuration file */
       if (*valptr)
 	*valptr++ = '\0';
 
-      if (strcasecmp(value, "valid-user") == 0 ||
-          strcasecmp(value, "user") == 0)
+      if (!strcasecmp(value, "valid-user") ||
+          !strcasecmp(value, "user"))
         loc->level = AUTH_USER;
-      else if (strcasecmp(value, "group") == 0)
+      else if (!strcasecmp(value, "group"))
         loc->level = AUTH_GROUP;
       else
       {
@@ -2105,11 +2099,11 @@ read_location(cups_file_t *fp,		/* I - Configuration file */
         for (value = valptr; isspace(*value & 255); value ++);
       }
     }
-    else if (strcasecmp(name, "Satisfy") == 0)
+    else if (!strcasecmp(line, "Satisfy"))
     {
-      if (strcasecmp(value, "all") == 0)
+      if (!strcasecmp(value, "all"))
         loc->satisfy = AUTH_SATISFY_ALL;
-      else if (strcasecmp(value, "any") == 0)
+      else if (!strcasecmp(value, "any"))
         loc->satisfy = AUTH_SATISFY_ANY;
       else
         LogMessage(L_WARN, "Unknown Satisfy value %s on line %d.", value,
@@ -2117,7 +2111,7 @@ read_location(cups_file_t *fp,		/* I - Configuration file */
     }
     else
       LogMessage(L_ERROR, "Unknown Location directive %s on line %d.",
-	         name, linenum);
+	         line, linenum);
   }
 
   LogMessage(L_ERROR, "Unexpected end-of-file at line %d while reading location!",
@@ -2142,7 +2136,6 @@ read_policy(cups_file_t *fp,		/* I - Configuration file */
   int		num_ops;		/* Number of IPP operations */
   ipp_op_t	ops[100];		/* Operations */
   char		line[HTTP_MAX_BUFFER],	/* Line buffer */
-		name[256],		/* Configuration directive */
 		*value,			/* Value for directive */
 		*valptr;		/* Pointer into value */
 
@@ -2167,7 +2160,7 @@ read_policy(cups_file_t *fp,		/* I - Configuration file */
     * Decode the directive...
     */
 
-    if (!strcasecmp(name, "</Policy>"))
+    if (!strcasecmp(line, "</Policy>"))
     {
       if (op)
         LogMessage(L_WARN, "Missing </Limit> before </Policy> on line %d!",
@@ -2175,7 +2168,7 @@ read_policy(cups_file_t *fp,		/* I - Configuration file */
 
       return (linenum);
     }
-    else if (!strcasecmp(name, "<Limit") && !op)
+    else if (!strcasecmp(line, "<Limit") && !op)
     {
       if (!value)
       {
@@ -2227,7 +2220,7 @@ read_policy(cups_file_t *fp,		/* I - Configuration file */
 
       op = AddPolicyOp(pol, NULL, ops[0]);
     }
-    else if (!strcasecmp(name, "</Limit>") && op)
+    else if (!strcasecmp(line, "</Limit>") && op)
     {
      /*
       * Finish the current operation limit...
@@ -2245,7 +2238,7 @@ read_policy(cups_file_t *fp,		/* I - Configuration file */
 
       op = NULL;
     }
-    else if (!strcasecmp(name, "Authenticate") && op)
+    else if (!strcasecmp(line, "Authenticate") && op)
     {
      /*
       * Authenticate boolean
@@ -2263,7 +2256,7 @@ read_policy(cups_file_t *fp,		/* I - Configuration file */
         LogMessage(L_ERROR, "Invalid Authenticate value \"%s\" on line %d!\n",
 	           value, linenum);
     }
-    else if (!strcasecmp(name, "Order") && op)
+    else if (!strcasecmp(line, "Order") && op)
     {
      /*
       * "Order Deny,Allow" or "Order Allow,Deny"...
@@ -2277,11 +2270,11 @@ read_policy(cups_file_t *fp,		/* I - Configuration file */
         LogMessage(L_ERROR, "Unknown Order value %s on line %d.",
 	           value, linenum);
     }
-    else if ((!strcasecmp(name, "Allow") || !strcasecmp(name, "Deny")) && op)
+    else if ((!strcasecmp(line, "Allow") || !strcasecmp(line, "Deny")) && op)
     {
      /*
-      * Allow name, @group, @OWNER
-      * Deny name, @group, @OWNER
+      * Allow line, @group, @OWNER
+      * Deny line, @group, @OWNER
       */
 
       for (value = valptr; *value;)
@@ -2311,7 +2304,7 @@ read_policy(cups_file_t *fp,		/* I - Configuration file */
 	if (*valptr)
 	  *valptr++ = '\0';
 
-        if (!strcasecmp(name, "Allow"))
+        if (!strcasecmp(line, "Allow"))
           AddPolicyOpName(op, POLICY_ALLOW, value);
 	else
           AddPolicyOpName(op, POLICY_DENY, value);
@@ -2321,10 +2314,10 @@ read_policy(cups_file_t *fp,		/* I - Configuration file */
     }
     else if (op)
       LogMessage(L_ERROR, "Unknown Policy Limit directive %s on line %d.",
-	         name, linenum);
+	         line, linenum);
     else
       LogMessage(L_ERROR, "Unknown Policy directive %s on line %d.",
-	         name, linenum);
+	         line, linenum);
   }
 
   LogMessage(L_ERROR, "Unexpected end-of-file at line %d while reading policy \"%s\"!",

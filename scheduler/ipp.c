@@ -1000,11 +1000,21 @@ add_class(client_t        *con,		/* I - Client connection */
   WritePrintcap();
 
   if (modify)
+  {
+    cupsdAddEvent(CUPSD_EVENT_PRINTER_MODIFIED, pclass, NULL,
+                  "Class \'%s\' modified by \'%s\'.", pclass->name,
+        	  con->username);
+
     LogMessage(L_INFO, "Class \'%s\' modified by \'%s\'.", pclass->name,
                con->username);
+  }
   else
   {
     AddPrinterHistory(pclass);
+
+    cupsdAddEvent(CUPSD_EVENT_PRINTER_ADDED, pclass, NULL,
+                  "New class \'%s\' added by \'%s\'.", pclass->name,
+        	  con->username);
 
     LogMessage(L_INFO, "New class \'%s\' added by \'%s\'.", pclass->name,
                con->username);
@@ -1163,7 +1173,7 @@ add_job_subscriptions(client_t *con,	/* I - Client connection */
   * none...
   */
 
-  for (attr = con->request->attrs, prev = NULL; attr; prev = attr, attr = attr->next)
+  for (attr = job->attrs->attrs, prev = NULL; attr; prev = attr, attr = attr->next)
     if (attr->group_tag == IPP_TAG_SUBSCRIPTION)
       break;
 
@@ -1177,8 +1187,8 @@ add_job_subscriptions(client_t *con,	/* I - Client connection */
 
   temp          = ippNew();
   temp->attrs   = attr;
-  temp->last    = con->request->last;
-  temp->current = con->request->current;
+  temp->last    = job->attrs->last;
+  temp->current = job->attrs->current;
 
  /*
   * Remove all of the subscription attributes from the end of the job
@@ -1188,10 +1198,10 @@ add_job_subscriptions(client_t *con,	/* I - Client connection */
   if (prev)
     prev->next = NULL;
   else
-    con->request->attrs = NULL;
+    job->attrs->attrs = NULL;
 
-  con->request->last    = prev;
-  con->request->current = prev;
+  job->attrs->last    = prev;
+  job->attrs->current = prev;
 
  /*
   * Now process the subscription attributes in the request...
@@ -1798,11 +1808,21 @@ add_printer(client_t        *con,	/* I - Client connection */
   WritePrintcap();
 
   if (modify)
+  {
+    cupsdAddEvent(CUPSD_EVENT_PRINTER_MODIFIED, printer, NULL,
+                  "Printer \'%s\' modified by \'%s\'.", printer->name,
+        	  con->username);
+
     LogMessage(L_INFO, "Printer \'%s\' modified by \'%s\'.", printer->name,
                con->username);
+  }
   else
   {
     AddPrinterHistory(printer);
+
+    cupsdAddEvent(CUPSD_EVENT_PRINTER_ADDED, printer, NULL,
+                  "New printer \'%s\' added by \'%s\'.", printer->name,
+        	  con->username);
 
     LogMessage(L_INFO, "New printer \'%s\' added by \'%s\'.", printer->name,
                con->username);
@@ -3538,7 +3558,7 @@ create_job(client_t        *con,	/* I - Client connection */
   * Set all but the first two attributes to the job attributes group...
   */
 
-  for (attr = con->request->attrs->next->next; attr; attr = attr->next)
+  for (attr = job->attrs->attrs->next->next; attr; attr = attr->next)
     attr->group_tag = IPP_TAG_JOB;
 
  /*
@@ -3648,6 +3668,17 @@ delete_printer(client_t        *con,	/* I - Client connection */
 
   CancelJobs(dest, NULL, 1);
 
+ /*
+  * Remove old subscriptions and send a "deleted printer" event...
+  */
+
+  cupsdAddEvent(CUPSD_EVENT_PRINTER_DELETED, printer, NULL,
+                "%s \'%s\' deleted by \'%s\'.",
+		(dtype & CUPS_PRINTER_CLASS) ? "Class" : "Printer",
+		dest, con->username);
+
+  cupsdExpireSubscriptions(printer, NULL);
+ 
  /*
   * Remove any old PPD or script files...
   */
@@ -5540,7 +5571,7 @@ print_job(client_t        *con,		/* I - Client connection */
   * Set all but the first two attributes to the job attributes group...
   */
 
-  for (attr = con->request->attrs->next->next; attr; attr = attr->next)
+  for (attr = job->attrs->attrs->next->next; attr; attr = attr->next)
     attr->group_tag = IPP_TAG_JOB;
 
  /*

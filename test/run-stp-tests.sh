@@ -202,7 +202,7 @@ MaxLogSize 0
 AccessLog /tmp/$user/log/access_log
 ErrorLog /tmp/$user/log/error_log
 PageLog /tmp/$user/log/page_log
-LogLevel debug2
+LogLevel debug
 PreserveJobHistory Yes
 <Location />
 Order deny,allow
@@ -281,7 +281,7 @@ fi
 
 export LD_LIBRARY_PATH
 
-LD_PRELOAD="$root/cups/libcups.so:$root/filter/libcupsimage.so"
+LD_PRELOAD="$root/cups/libcups.so.2:$root/filter/libcupsimage.so.2"
 export LD_PRELOAD
 
 if test "x$DYLD_LIBRARY_PATH" = x; then

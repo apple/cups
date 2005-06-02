@@ -253,6 +253,9 @@ ProcessBrowseData(const char   *uri,	/* I - URI of printer/class */
 
       LogMessage(L_INFO, "Added remote class \"%s\"...", name);
 
+      cupsdAddEvent(CUPSD_EVENT_PRINTER_ADDED, pclass, NULL,
+                    "Class \'%s\' added by directory services.", name);
+
      /*
       * Force the URI to point to the real server...
       */
@@ -324,6 +327,9 @@ ProcessBrowseData(const char   *uri,	/* I - URI of printer/class */
       */
 
       p = AddPrinter(name);
+
+      cupsdAddEvent(CUPSD_EVENT_PRINTER_ADDED, pclass, NULL,
+                    "Printer \'%s\' added by directory services.", name);
 
       LogMessage(L_INFO, "Added remote printer \"%s\"...", name);
 
@@ -403,6 +409,12 @@ ProcessBrowseData(const char   *uri,	/* I - URI of printer/class */
 
   if (type & CUPS_PRINTER_DELETE)
   {
+    cupsdAddEvent(CUPSD_EVENT_PRINTER_DELETED, p, NULL,
+                  "%s \'%s\' deleted by directory services.",
+		  (type & CUPS_PRINTER_CLASS) ? "Class" : "Printer", p->name);
+
+    cupsdExpireSubscriptions(p, NULL);
+ 
     DeletePrinter(p, 1);
     UpdateImplicitClasses();
   }
@@ -704,8 +716,14 @@ SendBrowseList(void)
     {
       if (p->browse_time < to)
       {
+	cupsdAddEvent(CUPSD_EVENT_PRINTER_DELETED, p, NULL,
+                      "%s \'%s\' deleted by directory services (timeout).",
+		      (p->type & CUPS_PRINTER_CLASS) ? "Class" : "Printer",
+		      p->name);
+
         LogMessage(L_INFO, "Remote destination \"%s\" has timed out; deleting it...",
 	           p->name);
+
         DeletePrinter(p, 1);
       }
     }

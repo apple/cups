@@ -548,6 +548,9 @@ mimeFileType(mime_t     *mime,		/* I - MIME database */
   const char	*filename;		/* Base filename of file */
 
 
+  DEBUG_printf(("mimeFileType(mime=%p, pathname=\"%s\", compression=%p)\n",
+                mime, pathname ? pathname : "(nil)", compression));
+
  /*
   * Range check input parameters...
   */
@@ -679,7 +682,28 @@ checkrules(const char   *filename,	/* I - Filename */
 		*bufptr;		/* Current buffer position */
   int		bufoffset,		/* Offset in file for buffer */
 		buflength;		/* Length of data in buffer */
+#ifdef DEBUG
+  const char	* const debug_tests[] =	/* Test names... */
+		{
+		  "NOP",		/* No operation */
+		  "AND",		/* Logical AND of all children */
+		  "OR",			/* Logical OR of all children */
+		  "MATCH",		/* Filename match */
+		  "ASCII",		/* ASCII characters in range */
+		  "PRINTABLE",		/* Printable characters (32-255) in range */
+		  "STRING",		/* String matches */
+		  "CHAR",		/* Character/byte matches */
+		  "SHORT",		/* Short/16-bit word matches */
+		  "INT",		/* Integer/32-bit word matches */
+		  "LOCALE"		/* Current locale matches string */
+		  "CONTAINS"		/* File contains a string */
+		  "ISTRING"		/* Case-insensitive string matches */
+		};
+#endif /* DEBUG */
 
+
+  DEBUG_printf(("checkrules(filename=\"%s\", fp=%p, rules=%p)\n", filename,
+                fp, rules));
 
   if (rules == NULL)
     return (0);
@@ -790,6 +814,9 @@ checkrules(const char   *filename,	/* I - Filename */
 	  break;
 
       case MIME_MAGIC_STRING :
+          DEBUG_printf(("    string(%d, \"%s\")\n", rules->offset,
+	                rules->value.stringv));
+
          /*
 	  * Load the buffer if necessary...
 	  */
@@ -804,6 +831,10 @@ checkrules(const char   *filename,	/* I - Filename */
             cupsFileSeek(fp, rules->offset);
 	    buflength = cupsFileRead(fp, (char *)buffer, sizeof(buffer));
 	    bufoffset = rules->offset;
+
+            DEBUG_printf(("        loaded %d byte buffer at %d, starts with \"%c%c%c%c\"...\n",
+	                  buflength, bufoffset, buffer[0], buffer[1],
+			  buffer[2], buffer[3]));
 	  }
 
          /*
@@ -816,6 +847,7 @@ checkrules(const char   *filename,	/* I - Filename */
 	  else
             result = (memcmp(buffer + rules->offset - bufoffset,
 	                     rules->value.stringv, rules->length) == 0);
+          DEBUG_printf(("    result=%d\n", result));
 	  break;
 
       case MIME_MAGIC_ISTRING :
@@ -1006,7 +1038,8 @@ checkrules(const char   *filename,	/* I - Filename */
     * the the rule set is false...
     */
 
-    DEBUG_printf(("result of test %p is %d\n", rules, result));
+    DEBUG_printf(("    result of test %p (MIME_MAGIC_%s) is %d\n", rules,
+                  debug_tests[rules->op], result));
 
     if ((result && logic == MIME_MAGIC_OR) ||
         (!result && logic == MIME_MAGIC_AND))

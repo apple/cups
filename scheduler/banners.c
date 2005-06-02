@@ -61,8 +61,8 @@ AddBanner(const char *name,	/* I - Name of banner */
 
   if ((filetype = mimeFileType(MimeDatabase, filename, NULL)) == NULL)
   {
-    LogMessage(L_WARN, "AddBanner: Banner \"%s\" is of an unknown file type - skipping!",
-               name);
+    LogMessage(L_WARN, "AddBanner: Banner \"%s\" (\"%s\") is of an unknown file type - skipping!",
+               name, filename);
     return;
   }
 

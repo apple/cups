@@ -163,6 +163,8 @@ CancelJob(int id,			/* I - Job to cancel */
 
       set_time(current, "time-at-completed");
 
+      cupsdExpireSubscriptions(NULL, current);
+
      /*
       * Remove the print file for good if we aren't preserving jobs or
       * files...
@@ -255,6 +257,9 @@ CancelJobs(const char *dest,		/* I - Destination to cancel */
 
       next = current->next;
 
+      cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, current->printer, current,
+                    purge ? "Job purged." : "Job cancelled.");
+
       CancelJob(current->id, purge);
 
       current = next;
@@ -344,6 +349,10 @@ CheckJobs(void)
 
         LogMessage(L_WARN, "Printer/class %s has gone away; cancelling job %d!",
 	           current->dest, current->id);
+
+	cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, current->printer, current,
+                      "Job cancelled because the destination printer/class has gone away.");
+
         CancelJob(current->id, 1);
       }
       else if (printer != NULL)
@@ -456,6 +465,11 @@ FinishJob(job_t *job)			/* I - Job */
 
 	LogMessage(L_ERROR, "Canceling fax job %d since it could not be sent after %d tries.",
 	           job->id, FaxRetryLimit);
+
+	cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, job->printer, job,
+                      "Job cancelled since it could not be sent after %d tries.",
+		      FaxRetryLimit);
+
 	CancelJob(job->id, 0);
       }
       else
@@ -1382,6 +1396,10 @@ StartJob(int       id,			/* I - Job ID */
   if (current->num_files == 0)
   {
     LogMessage(L_ERROR, "Job ID %d has no files!  Cancelling it!", id);
+
+    cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, current->printer, current,
+                  "Job cancelled because it has no files.");
+
     CancelJob(id, 0);
     return;
   }
@@ -1426,7 +1444,12 @@ StartJob(int       id,			/* I - Job ID */
       current->current_file ++;
 
       if (current->current_file == current->num_files)
+      {
+	cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, current->printer, current,
+                      "Job cancelled because it has no files that can be printed.");
+
         CancelJob(current->id, 0);
+      }
 
       return;
     }
@@ -1516,7 +1539,12 @@ StartJob(int       id,			/* I - Job ID */
       current->current_file ++;
 
       if (current->current_file == current->num_files)
+      {
+	cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, current->printer, current,
+                      "Job cancelled because the print file could not be decompressed.");
+
         CancelJob(current->id, 0);
+      }
 
       return;
     }
@@ -1604,7 +1632,10 @@ StartJob(int       id,			/* I - Job ID */
         free(filters);
 
       FilterLevel -= current->cost;
-      
+
+      cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, current->printer, current,
+                    "Job cancelled because the server ran out of memory.");
+
       CancelJob(id, 0);
       return;
     }
@@ -1977,6 +2008,9 @@ StartJob(int       id,			/* I - Job ID */
     if (filters != NULL)
       free(filters);
 
+    cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, current->printer, current,
+                  "Job cancelled because the server could not create the job status pipes.");
+
     CancelJob(current->id, 0);
     return;
   }
@@ -2051,6 +2085,10 @@ StartJob(int       id,			/* I - Job ID */
 
 	cupsdClosePipe(statusfds);
 	cupsdClosePipe(filterfds[!slot]);
+
+	cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, current->printer, current,
+                      "Job cancelled because the server could not create the filter pipes.");
+
 	CancelJob(current->id, 0);
 	return;
       }
@@ -2063,10 +2101,10 @@ StartJob(int       id,			/* I - Job ID */
 	{
 	  if (cupsdOpenPipe(current->print_pipes))
 	  {
-	    LogMessage(L_ERROR, "Unable to create job filter pipes - %s.",
-		    strerror(errno));
+	    LogMessage(L_ERROR, "Unable to create job backend pipes - %s.",
+		       strerror(errno));
 	    snprintf(printer->state_message, sizeof(printer->state_message),
-		    "Unable to create filter pipes - %s.", strerror(errno));
+		    "Unable to create backend pipes - %s.", strerror(errno));
 	    AddPrinterHistory(printer);
 
 	    if (filters != NULL)
@@ -2074,6 +2112,10 @@ StartJob(int       id,			/* I - Job ID */
 
 	    cupsdClosePipe(statusfds);
 	    cupsdClosePipe(filterfds[!slot]);
+
+	    cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, current->printer, current,
+                	  "Job cancelled because the server could not create the backend pipes.");
+
 	    CancelJob(current->id, 0);
 	    return;
 	  }
@@ -2108,6 +2150,10 @@ StartJob(int       id,			/* I - Job ID */
 
 	    cupsdClosePipe(statusfds);
 	    cupsdClosePipe(filterfds[!slot]);
+
+	    cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, current->printer, current,
+                	  "Job cancelled because the server could not open the output file.");
+
 	    CancelJob(current->id, 0);
 	    return;
 	  }
@@ -2151,6 +2197,9 @@ StartJob(int       id,			/* I - Job ID */
 	free(filters);
 
       AddPrinterHistory(printer);
+
+      cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, current->printer, current,
+                    "Job cancelled because the server could not execute a filter.");
 
       CancelJob(current->id, 0);
       return;
@@ -2204,6 +2253,10 @@ StartJob(int       id,			/* I - Job ID */
 	  free(filters);
 
 	cupsdClosePipe(statusfds);
+
+	cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, current->printer, current,
+                      "Job cancelled because the server could not open a file.");
+
 	CancelJob(current->id, 0);
 	return;
       }
@@ -2236,6 +2289,9 @@ StartJob(int       id,			/* I - Job ID */
         	   current->back_pipes[0], current->back_pipes[1]);
 
         cupsdClosePipe(current->back_pipes);
+
+	cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, current->printer, current,
+                      "Job cancelled because the server could not execute the backend.");
 
         CancelJob(current->id, 0);
 	return;
@@ -2448,6 +2504,9 @@ UpdateJob(job_t *job)			/* I - Job to check */
       }
 
       LogPage(job, message);
+
+      cupsdAddEvent(CUPSD_EVENT_JOB_PROGRESS, job->printer, job,
+                    "Printed %d page(s).", job->sheets->values[0].integer);
     }
     else if (loglevel == L_STATE)
       SetPrinterReasons(job->printer, message);

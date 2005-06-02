@@ -2192,7 +2192,7 @@ WritePrintcap(void)
   * See if we have a printcap file; if not, don't bother writing it.
   */
 
-  if (!Printcap[0])
+  if (!Printcap || !*Printcap)
     return;
 
  /*

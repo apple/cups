@@ -54,6 +54,7 @@
 #include <stdarg.h>
 #include <cups/string.h>
 #include <errno.h>
+#include <cups/debug.h>
 
 #ifdef WIN32
 #  include <io.h>
@@ -83,6 +84,8 @@ cupsFileClose(cups_file_t *fp)		/* I - CUPS file */
 {
   int	fd;				/* File descriptor */
 
+
+  DEBUG_printf(("cupsFileClose(fp=%p)\n", fp));
 
  /*
   * Range check...
@@ -129,12 +132,17 @@ cupsFileFlush(cups_file_t *fp)		/* I - CUPS file */
   size_t	bytes;			/* Bytes to write */
 
 
+  DEBUG_printf(("cupsFileFlush(fp=%p)\n", fp));
+
  /*
   * Range check input...
   */
 
   if (!fp || fp->mode != 'w')
+  {
+    DEBUG_puts("    Attempt to flush a read-only file...");
     return (-1);
+  }
 
   bytes = fp->ptr - fp->buf;
 
@@ -568,6 +576,9 @@ cupsFileRead(cups_file_t *fp,		/* I - CUPS file */
 		count;			/* Bytes read */
 
 
+  DEBUG_printf(("cupsFileRead(fp=%p, buf=%p, bytes=%ld)\n", fp, buf,
+                (long)bytes));
+
  /*
   * Range check input...
   */
@@ -588,6 +599,8 @@ cupsFileRead(cups_file_t *fp,		/* I - CUPS file */
     if (fp->ptr >= fp->end)
       if (cups_fill(fp) <= 0)
       {
+        DEBUG_printf(("    cups_fill() returned -1, total=%d\n", total));
+
         if (total > 0)
           return (total);
 	else
@@ -614,6 +627,8 @@ cupsFileRead(cups_file_t *fp,		/* I - CUPS file */
   * Return the total number of bytes read...
   */
 
+  DEBUG_printf(("    total=%d\n", total));
+
   return (total);
 }
 
@@ -628,6 +643,9 @@ cupsFileSeek(cups_file_t *fp,		/* I - CUPS file */
 {
   size_t	bytes;			/* Number bytes in buffer */
 
+
+  DEBUG_printf(("cupsFileSeek(fp=%p, pos=%ld)\n", fp, (long)pos));
+  DEBUG_printf(("    fp->pos=%ld\n", (long)fp->pos));
 
  /*
   * Range check input...
@@ -671,6 +689,7 @@ cupsFileSeek(cups_file_t *fp,		/* I - CUPS file */
 #endif /* HAVE_LIBZ */
     {
       fp->pos = lseek(fp->fd, pos, SEEK_SET);
+      DEBUG_printf(("    lseek() returned %ld...\n", (long)fp->pos));
       fp->ptr = NULL;
       fp->end = NULL;
     }
@@ -695,6 +714,7 @@ cupsFileSeek(cups_file_t *fp,		/* I - CUPS file */
 #endif /* HAVE_LIBZ */
     {
       fp->pos = lseek(fp->fd, pos, SEEK_SET);
+      DEBUG_printf(("    lseek() returned %ld...\n", (long)fp->pos));
       fp->ptr = NULL;
       fp->end = NULL;
     }
@@ -707,6 +727,7 @@ cupsFileSeek(cups_file_t *fp,		/* I - CUPS file */
     */
 
     fp->ptr = fp->buf + pos - fp->pos;
+    DEBUG_puts(("    seek inside buffer..."));
   }
 
   return (fp->pos);
@@ -767,11 +788,15 @@ cups_fill(cups_file_t *fp)		/* I - CUPS file */
 #endif /* HAVE_LIBZ */
 
 
+  DEBUG_printf(("cups_fill(fp=%p)\n", fp));
+  DEBUG_printf(("    fp->ptr=%p, fp->end=%p, fp->buf=%p, fp->pos=%ld\n",
+                fp->ptr, fp->end, fp->buf, (long)fp->pos));
+
  /*
   * Update the "pos" element as needed...
   */
 
-  if (fp->ptr)
+  if (fp->ptr && fp->end)
     fp->pos += fp->end - fp->buf;
 
 #ifdef HAVE_LIBZ
