@@ -62,12 +62,11 @@ if test -n "$GCC"; then
 			;;
 		*)
         		# This is gcc 3.x, and it knows of libsupc++, so we need it
+			CXX="$CC"
         		CXXLIBS="-lsupc++"
         		AC_MSG_RESULT(yes)
 			;;
 	esac
-
-	CXX="$CC"
 
 	if test -z "$OPTIM"; then
 		if test "x$with_optim" = x; then

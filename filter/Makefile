@@ -146,7 +146,7 @@ libcupsimage.2.dylib:	$(IMAGEOBJS)
 		-install_name $(libdir)/libcupsimage.dylib \
 		-current_version 2.2.0 \
 		-compatibility_version 2.0.0 \
-		$(IMAGEOBJS) $(DSOLIBS) -L../cups $(LINKCUPS) -lm -lcc_dynamic
+		$(IMAGEOBJS) $(DSOLIBS) -L../cups $(LINKCUPS) -lm
 	$(RM) libcupsimage.dylib
 	$(LN) $@ libcupsimage.dylib
 
