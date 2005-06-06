@@ -473,7 +473,7 @@ CloseClient(client_t *con)	/* I - Client to close */
 
     LogMessage(L_DEBUG2, "CloseClient: %d Killing process ID %d...",
                con->http.fd, con->pipe_pid);
-    kill(con->pipe_pid, SIGKILL);
+    cupsdEndProcess(con->pipe_pid, 1);
   }
 
   if (con->file >= 0)
@@ -2356,7 +2356,7 @@ WriteClient(client_t *con)		/* I - Client connection */
       }
 
       if (con->pipe_pid)
-	kill(con->pipe_pid, SIGTERM);
+	cupsdEndProcess(con->pipe_pid, 0);
 
       LogMessage(L_DEBUG2, "WriteClient: %d Closing data file %d.",
                  con->http.fd, con->file);
@@ -3237,7 +3237,6 @@ pipe_command(client_t *con,		/* I - Client connection */
     return (0);
   }
 
-#if 1
  /*
   * Then execute the command...
   */
@@ -3268,129 +3267,6 @@ pipe_command(client_t *con,		/* I - Client connection */
     *outfile = fds[0];
     close(fds[1]);
   }
-#else
- /*
-  * Block signals before forking...
-  */
-
-  HoldSignals();
-
- /*
-  * Then execute the command...
-  */
-
-  if ((pid = fork()) == 0)
-  {
-   /*
-    * Child comes here...  Close stdin if necessary and dup the pipe to stdout.
-    */
-
-    if (!RunUser)
-    {
-     /*
-      * Running as root, so change to a non-priviledged user...
-      */
-
-      if (setgid(Group))
-        exit(errno);
-
-      if (setgroups(1, &Group))
-        exit(errno);
-
-      if (setuid(User))
-        exit(errno);
-    }
-    else
-    {
-     /*
-      * Reset group membership to just the main one we belong to.
-      */
-
-      setgroups(1, &Group);
-    }
-
-   /*
-    * Update stdin/stdout/stderr...
-    */
-
-    if (infile)
-    {
-      close(0);
-      if (dup(infile) < 0)
-	exit(errno);
-    }
-
-    close(1);
-    if (dup(fds[1]) < 0)
-      exit(errno);
-
-    close(2);
-    dup(CGIPipes[1]);
-
-   /*
-    * Change umask to restrict permissions on created files...
-    */
-
-    umask(077);
-
-   /*
-    * Unblock signals before doing the exec...
-    */
-
-#ifdef HAVE_SIGSET
-    sigset(SIGTERM, SIG_DFL);
-    sigset(SIGCHLD, SIG_DFL);
-#elif defined(HAVE_SIGACTION)
-    memset(&action, 0, sizeof(action));
-
-    sigemptyset(&action.sa_mask);
-    action.sa_handler = SIG_DFL;
-
-    sigaction(SIGTERM, &action, NULL);
-    sigaction(SIGCHLD, &action, NULL);
-#else
-    signal(SIGTERM, SIG_DFL);
-    signal(SIGCHLD, SIG_DFL);
-#endif /* HAVE_SIGSET */
-
-    ReleaseSignals();
-
-   /*
-    * Execute the pipe program; if an error occurs, exit with status 1...
-    */
-
-    execve(command, argv, envp);
-    exit(errno);
-    return (0);
-  }
-  else if (pid < 0)
-  {
-   /*
-    * Error - can't fork!
-    */
-
-    LogMessage(L_ERROR, "Unable to fork for CGI %s - %s", argv[0],
-               strerror(errno));
-
-    cupsdClosePipe(fds);
-    pid = 0;
-  }
-  else
-  {
-   /*
-    * Fork successful - return the PID...
-    */
-
-    AddCert(pid, con->username);
-
-    LogMessage(L_DEBUG, "CGI %s started - PID = %d", command, pid);
-
-    *outfile = fds[0];
-    close(fds[1]);
-  }
-
-  ReleaseSignals();
-#endif // 1
 
   ClearString(&query_string);
 

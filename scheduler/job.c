@@ -2406,13 +2406,13 @@ StopJob(int id,				/* I - Job ID */
         for (i = 0; current->filters[i]; i ++)
 	  if (current->filters[i] > 0)
 	  {
-	    kill(current->filters[i], force ? SIGKILL : SIGTERM);
+	    cupsdEndProcess(current->filters[i], force);
 	    current->filters[i] = 0;
 	  }
 
 	if (current->backend > 0)
 	{
-	  kill(current->backend, force ? SIGKILL : SIGTERM);
+	  cupsdEndProcess(current->backend, force);
 	  current->backend = 0;
 	}
 

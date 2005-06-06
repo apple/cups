@@ -1035,15 +1035,16 @@ StartBrowsing(void)
 void
 StartPolling(void)
 {
-  int		i;		/* Looping var */
-  dirsvc_poll_t	*poll;		/* Current polling server */
-  int		pid;		/* New process ID */
-  char		sport[10];	/* Server port */
-  char		bport[10];	/* Browser port */
-  char		interval[10];	/* Poll interval */
-  int		statusfds[2];	/* Status pipe */
+  int		i;			/* Looping var */
+  dirsvc_poll_t	*poll;			/* Current polling server */
+  char		polld[1024];		/* Poll daemon path */
+  char		sport[10];		/* Server port */
+  char		bport[10];		/* Browser port */
+  char		interval[10];		/* Poll interval */
+  int		statusfds[2];		/* Status pipe */
+  char		*argv[6];		/* Arguments */
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
-  struct sigaction action;	/* POSIX signal handler */
+  struct sigaction action;		/* POSIX signal handler */
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET */
 
 
@@ -1058,8 +1059,10 @@ StartPolling(void)
   }
 
  /*
-  * Setup string arguments for port and interval options.
+  * Setup string arguments for polld, port and interval options.
   */
+
+  snprintf(polld, sizeof(polld), "%s/daemon/cups-polld", ServerBin);
 
   sprintf(bport, "%d", BrowsePort);
 
@@ -1067,6 +1070,12 @@ StartPolling(void)
     sprintf(interval, "%d", BrowseInterval);
   else
     strcpy(interval, "30");
+
+  argv[0] = "cups-polld";
+  argv[2] = sport;
+  argv[3] = interval;
+  argv[4] = bport;
+  argv[5] = NULL;
 
  /*
   * Create a pipe that receives the status messages from each
@@ -1091,87 +1100,10 @@ StartPolling(void)
   {
     sprintf(sport, "%d", poll->port);
 
-   /*
-    * Block signals before forking...
-    */
+    argv[1] = poll->hostname;
 
-    HoldSignals();
-
-    if ((pid = fork()) == 0)
-    {
-     /*
-      * Child...
-      */
-
-      if (getuid() == 0)
-      {
-       /*
-	* Running as root, so change to non-priviledged user...
-	*/
-
-	if (setgid(Group))
-          exit(errno);
-
-	if (setgroups(1, &Group))
-          exit(errno);
-
-	if (setuid(User))
-          exit(errno);
-      }
-      else
-      {
-       /*
-	* Reset group membership to just the main one we belong to.
-	*/
-
-	setgroups(1, &Group);
-      }
-
-     /*
-      * Redirect stdin and stdout to /dev/null, and stderr to the
-      * status pipe.  Close all other files.
-      */
-
-      close(0);
-      open("/dev/null", O_RDONLY);
-
-      close(1);
-      open("/dev/null", O_WRONLY);
-
-      close(2);
-      dup(statusfds[1]);
-
-     /*
-      * Unblock signals before doing the exec...
-      */
-
-#ifdef HAVE_SIGSET
-      sigset(SIGTERM, SIG_DFL);
-      sigset(SIGCHLD, SIG_DFL);
-#elif defined(HAVE_SIGACTION)
-      memset(&action, 0, sizeof(action));
-
-      sigemptyset(&action.sa_mask);
-      action.sa_handler = SIG_DFL;
-
-      sigaction(SIGTERM, &action, NULL);
-      sigaction(SIGCHLD, &action, NULL);
-#else
-      signal(SIGTERM, SIG_DFL);
-      signal(SIGCHLD, SIG_DFL);
-#endif /* HAVE_SIGSET */
-
-      ReleaseSignals();
-
-     /*
-      * Execute the polling daemon...
-      */
-
-      execl(CUPS_SERVERBIN "/daemon/cups-polld", "cups-polld", poll->hostname,
-            sport, interval, bport, NULL);
-      exit(errno);
-    }
-    else if (pid < 0)
+    if (cupsdStartProcess(polld, argv, NULL, -1, -1, statusfds[1], -1,
+                          0, &(poll->pid)) < 0)
     {
       LogMessage(L_ERROR, "StartPolling: Unable to fork polling daemon - %s",
                  strerror(errno));
@@ -1179,13 +1111,8 @@ StartPolling(void)
       break;
     }
     else
-    {
-      poll->pid = pid;
       LogMessage(L_DEBUG, "StartPolling: Started polling daemon for %s:%d, pid = %d",
-                 poll->hostname, poll->port, pid);
-    }
-
-    ReleaseSignals();
+                 poll->hostname, poll->port, poll->pid);
   }
 
   close(statusfds[1]);
@@ -1270,7 +1197,7 @@ StopPolling(void)
 
   for (i = 0, poll = Polled; i < NumPolled; i ++, poll ++)
     if (poll->pid)
-      kill(poll->pid, SIGTERM);
+      cupsdEndProcess(poll->pid, 0);
 }
 
 

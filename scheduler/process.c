@@ -175,7 +175,10 @@ cupsdStartProcess(
     * return the error code...
     */
 
-    execve(command, argv, envp);
+    if (envp)
+      execve(command, argv, envp);
+    else
+      execv(command, argv);
 
     perror(command);
 

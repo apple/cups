@@ -481,7 +481,7 @@ ReadConfiguration(void)
     * Commit suicide...
     */
 
-    kill(getpid(), SIGTERM);
+    cupsdEndProcess(getpid(), 0);
   }
 
  /*
