@@ -35,7 +35,8 @@ LIBOBJS	=	attr.o auth.o dest.o emit.o encode.o extended.o getputfile.o \
 		langprintf.o language.o mark.o md5.o md5passwd.o normalize.o \
 		options.o page.o ppd.o snprintf.o string.o tempfile.o \
 		transcode.o usersys.o util.o
-OBJS	=	$(LIBOBJS) testhttp.o testi18n.o testipp.o testlang.o
+OBJS	=	$(LIBOBJS) testhttp.o testi18n.o testipp.o testlang.o \
+		php_cups_wrap.o
 
 
 #
@@ -165,6 +166,27 @@ libcups.a:	$(LIBOBJS)
 	$(RM) $@
 	$(AR) $(ARFLAGS) $@ $(LIBOBJS)
 	$(RANLIB) $@
+
+
+#
+# CUPS language bindings for various scripting languages...
+#
+
+phpcups.so:	$(LIBCUPS) php_cups_wrap.o
+	echo Linking $@...
+	if test `uname` = Darwin; then \
+		DSOFLAGS="-bundle -flat_namespace -undefined suppress"; \
+	else \
+		DSOFLAGS="$(DSOFLAGS)"; \
+	fi; \
+	$(DSO) $$DSOFLAGS -o $@ php_cups_wrap.o $(LIBS) `php-config --ldflags --libs`
+
+php_cups_wrap.o:	php_cups_wrap.c
+	echo Compiling $<...
+	$(CC) $(CFLAGS) `php-config --includes` -c $<
+php_cups_wrap.c:	cups.h
+	echo Creating $< using SWIG...
+	swig -php -o $@ -module cups cups.h
 
 
 #

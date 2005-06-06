@@ -3237,6 +3237,38 @@ pipe_command(client_t *con,		/* I - Client connection */
     return (0);
   }
 
+#if 1
+ /*
+  * Then execute the command...
+  */
+
+  if (cupsdStartProcess(command, argv, envp, infile, fds[1], CGIPipes[1],
+			-1, 0, &pid) < 0)
+  {
+   /*
+    * Error - can't fork!
+    */
+
+    LogMessage(L_ERROR, "Unable to fork for CGI %s - %s", argv[0],
+               strerror(errno));
+
+    cupsdClosePipe(fds);
+    pid = 0;
+  }
+  else
+  {
+   /*
+    * Fork successful - return the PID...
+    */
+
+    AddCert(pid, con->username);
+
+    LogMessage(L_DEBUG, "CGI %s started - PID = %d", command, pid);
+
+    *outfile = fds[0];
+    close(fds[1]);
+  }
+#else
  /*
   * Block signals before forking...
   */
@@ -3358,6 +3390,7 @@ pipe_command(client_t *con,		/* I - Client connection */
   }
 
   ReleaseSignals();
+#endif // 1
 
   ClearString(&query_string);
 

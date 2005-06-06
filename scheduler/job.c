@@ -51,7 +51,6 @@
  *   UpdateJob()          - Read a status update from a job's filters.
  *   ipp_length()         - Compute the size of the buffer needed to hold 
  *		            the textual IPP attributes.
- *   start_process()      - Start a background process.
  *   set_hold_until()     - Set the hold time and update job-hold-until attribute.
  */
 
@@ -82,10 +81,6 @@ static mime_filter_t	gziptoany_filter =
 
 static int		ipp_length(ipp_t *ipp);
 static void		set_time(job_t *job, const char *name);
-static int		start_process(const char *command, char *argv[],
-			              char *envp[], int infd, int outfd,
-				      int errfd, int backfd, int root,
-				      int *pid);
 static void		set_hold_until(job_t *job, time_t holdtime);
 
 
@@ -2174,9 +2169,9 @@ StartJob(int       id,			/* I - Job ID */
     LogMessage(L_DEBUG, "StartJob: filterfds[%d] = [ %d %d ]",
                slot, filterfds[slot][0], filterfds[slot][1]);
 
-    pid = start_process(command, argv, envp, filterfds[!slot][0],
-                        filterfds[slot][1], statusfds[1],
-			current->back_pipes[0], 0, current->filters + i);
+    pid = cupsdStartProcess(command, argv, envp, filterfds[!slot][0],
+                            filterfds[slot][1], statusfds[1],
+		            current->back_pipes[0], 0, current->filters + i);
 
     LogMessage(L_DEBUG2, "StartJob: Closing filter pipes for slot %d [ %d %d ]...",
                !slot, filterfds[!slot][0], filterfds[!slot][1]);
@@ -2268,10 +2263,10 @@ StartJob(int       id,			/* I - Job ID */
       LogMessage(L_DEBUG, "StartJob: filterfds[%d] = [ %d %d ]",
         	 slot, filterfds[slot][0], filterfds[slot][1]);
 
-      pid = start_process(command, argv, envp, filterfds[!slot][0],
-			  filterfds[slot][1], statusfds[1],
-			  current->back_pipes[1], 1,
-			  &(current->backend));
+      pid = cupsdStartProcess(command, argv, envp, filterfds[!slot][0],
+			      filterfds[slot][1], statusfds[1],
+			      current->back_pipes[1], 1,
+			      &(current->backend));
 
       if (pid == 0)
       {
@@ -2677,151 +2672,6 @@ set_time(job_t      *job,	/* I - Job to update */
     attr->value_tag         = IPP_TAG_INTEGER;
     attr->values[0].integer = time(NULL);
   }
-}
-
-
-/*
- * 'start_process()' - Start a background process.
- */
-
-static int				/* O - Process ID or 0 */
-start_process(const char *command,	/* I - Full path to command */
-              char       *argv[],	/* I - Command-line arguments */
-	      char       *envp[],	/* I - Environment */
-              int        infd,		/* I - Standard input file descriptor */
-	      int        outfd,		/* I - Standard output file descriptor */
-	      int        errfd,		/* I - Standard error file descriptor */
-	      int        backfd,	/* I - Backchannel file descriptor */
-	      int        root,		/* I - Run as root? */
-	      int        *pid)          /* O - Process ID */
-{
-#if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
-  struct sigaction	action;		/* POSIX signal handler */
-#endif /* HAVE_SIGACTION && !HAVE_SIGSET */
-
-
-  LogMessage(L_DEBUG, "start_process(\"%s\", %p, %p, %d, %d, %d)",
-             command, argv, envp, infd, outfd, errfd);
-
- /*
-  * Block signals before forking...
-  */
-
-  HoldSignals();
-
-  if ((*pid = fork()) == 0)
-  {
-   /*
-    * Child process goes here...
-    *
-    * Update stdin/stdout/stderr as needed...
-    */
-
-    close(0);
-    dup(infd);
-    close(1);
-    dup(outfd);
-    if (errfd > 2)
-    {
-      close(2);
-      dup(errfd);
-    }
-    if (backfd > 3)
-    {
-      close(3);
-      dup(backfd);
-      fcntl(3, F_SETFL, O_NDELAY);
-    }
-
-   /*
-    * Change the priority of the process based on the FilterNice setting.
-    * (this is not done for backends...)
-    */
-
-    if (!root)
-      nice(FilterNice);
-
-   /*
-    * Change user to something "safe"...
-    */
-
-    if (!root && !RunUser)
-    {
-     /*
-      * Running as root, so change to non-priviledged user...
-      */
-
-      if (setgid(Group))
-        exit(errno);
-
-      if (setgroups(1, &Group))
-        exit(errno);
-
-      if (setuid(User))
-        exit(errno);
-    }
-    else
-    {
-     /*
-      * Reset group membership to just the main one we belong to.
-      */
-
-      setgroups(1, &Group);
-    }
-
-   /*
-    * Change umask to restrict permissions on created files...
-    */
-
-    umask(077);
-
-   /*
-    * Unblock signals before doing the exec...
-    */
-
-#ifdef HAVE_SIGSET
-    sigset(SIGTERM, SIG_DFL);
-    sigset(SIGCHLD, SIG_DFL);
-#elif defined(HAVE_SIGACTION)
-    memset(&action, 0, sizeof(action));
-
-    sigemptyset(&action.sa_mask);
-    action.sa_handler = SIG_DFL;
-
-    sigaction(SIGTERM, &action, NULL);
-    sigaction(SIGCHLD, &action, NULL);
-#else
-    signal(SIGTERM, SIG_DFL);
-    signal(SIGCHLD, SIG_DFL);
-#endif /* HAVE_SIGSET */
-
-    ReleaseSignals();
-
-   /*
-    * Execute the command; if for some reason this doesn't work,
-    * return the error code...
-    */
-
-    execve(command, argv, envp);
-
-    perror(command);
-
-    exit(errno);
-  }
-  else if (*pid < 0)
-  {
-   /*
-    * Error - couldn't fork a new process!
-    */
-
-    LogMessage(L_ERROR, "Unable to fork %s - %s.", command, strerror(errno));
-
-    *pid = 0;
-  }
-
-  ReleaseSignals();
-
-  return (*pid);
 }
 
 

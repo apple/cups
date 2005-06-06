@@ -212,6 +212,11 @@ extern void	StopServer(void);
 extern void	cupsdClosePipe(int *fds);
 extern int	cupsdOpenPipe(int *fds);
 
+extern int	cupsdStartProcess(const char *command, char *argv[],
+				  char *envp[], int infd, int outfd,
+				  int errfd, int backfd, int root, int *pid);
+extern int	cupsdEndProcess(int pid, int force);
+
 
 /*
  * End of "$Id$".
