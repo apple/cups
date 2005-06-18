@@ -143,6 +143,7 @@ and copy the files exactly as named below:
 .nf
 
     [Windows 2000 and higher]
+    cups6.ini
     cupsui6.dll
     cupsdrv6.dll
     ps5ui.dll

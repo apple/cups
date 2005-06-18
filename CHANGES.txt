@@ -1,8 +1,10 @@
-CHANGES.txt - 05/25/2005
+CHANGES.txt - 06/17/2005
 ------------------------
 
 CHANGES IN CUPS V1.2.0b1
 
+	- Updated the cupsaddsmb utility to correctly export the
+	  CUPS driver for Windows.
 	- Fixed a signal-handling bug in httpRead() which
 	  ultimately caused the server to print multiple copies
 	  when it was busy (STR #1184)

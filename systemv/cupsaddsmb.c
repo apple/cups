@@ -633,9 +633,10 @@ export_dest(const char *dest)		/* I - Destination to export */
       */
 
       snprintf(subcmd, sizeof(subcmd),
+               "put %s/drivers/cups6.ini W32X86/cups6.ini;"
                "put %s/drivers/cupsdrv6.dll W32X86/cupsdrv6.dll;"
 	       "put %s/drivers/cupsui6.dll W32X86/cupsui6.dll",
-	       datadir, datadir);
+	       datadir, datadir, datadir);
 
       if ((status = do_samba_command(command, subcmd)) != 0)
       {
@@ -652,8 +653,9 @@ export_dest(const char *dest)		/* I - Destination to export */
       snprintf(subcmd, sizeof(subcmd),
                "adddriver \"Windows NT x86\" \"%s:"
 	       "pscript5.dll:%s.ppd:ps5ui.dll:pscript.hlp:NULL:RAW:"
-	       "cupsdrv6.dll,cupsui6.dll,pscript.ntf\"",
-	       dest, dest);
+	       "pscript5.dll,%s.ppd,ps5ui.dll,pscript.hlp,pscript.ntf,"
+	       "cups6.ini,cupsdrv6.dll,cupsui6.dll\"",
+	       dest, dest, dest);
     }
     else
     {
@@ -665,8 +667,8 @@ export_dest(const char *dest)		/* I - Destination to export */
       snprintf(subcmd, sizeof(subcmd),
                "adddriver \"Windows NT x86\" \"%s:"
 	       "pscript5.dll:%s.ppd:ps5ui.dll:pscript.hlp:NULL:RAW:"
-	       "pscript.ntf\"",
-	       dest, dest);
+	       "pscript5.dll,%s.ppd,ps5ui.dll,pscript.hlp,pscript.ntf\"",
+	       dest, dest, dest);
     }
 
     snprintf(command, sizeof(command), "rpcclient %s", SAMBAServer);
