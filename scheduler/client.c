@@ -919,7 +919,8 @@ ReadClient(client_t *con)		/* I - Client to read from */
 
     con->auto_ssl = 0;
 
-    if (recv(con->http.fd, buf, 1, MSG_PEEK) == 1 && !strchr("DGHOPT", buf[0]))
+    if (recv(con->http.fd, buf, 1, MSG_PEEK) == 1 &&
+        (!buf[0] || !strchr("DGHOPT", buf[0])))
     {
      /*
       * Encrypt this connection...
