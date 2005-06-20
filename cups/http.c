@@ -2310,7 +2310,10 @@ http_setup_ssl(http_t *http)		/* I - HTTP data */
 
 #  ifdef HAVE_LIBSSL
   context = SSL_CTX_new(SSLv23_client_method());
-  conn    = SSL_new(context);
+
+  SSL_CTX_set_options(context, SSL_OP_NO_SSLv2); /* Only use SSLv3 or TLS */
+
+  conn = SSL_new(context);
 
   SSL_set_fd(conn, http->fd);
   if (SSL_connect(conn) != 1)
