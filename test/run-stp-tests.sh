@@ -91,6 +91,46 @@ case "$testtype" in
 esac
 
 #
+# See if we want to do SSL testing...
+#
+
+echo ""
+echo "Now you can choose whether to create a SSL/TLS encryption key and"
+echo "certificate for testing; these tests currently require the OpenSSL"
+echo "tools:"
+echo ""
+echo "0 - Do not do SSL/TLS encryption tests"
+echo "1 - Create a SSL/TLS certificate and key, but do not require encryption"
+echo "2 - Create a SSL/TLS certificate and key and require encryption"
+echo ""
+
+read ssltype
+
+case "$ssltype" in
+	1 | 2)
+		if test -f server.key; then
+			echo "Using existing SSL/TLS certificate and key..."
+		else
+			echo "Generating SSL/TLS certificate and key..."
+			openssl req -new -x509 -keyout server.key -out server.crt -days 3650 -nodes >/dev/null <<EOF
+ZZ
+Testland
+Testville
+Test Company
+
+`hostname`
+test@domain.com
+EOF
+		fi
+		;;
+
+	*)
+		echo "Not using SSL/TLS ($ssltype)..."
+		ssltype=0
+		;;
+esac
+
+#
 # Information for the server/tests...
 #
 
@@ -181,9 +221,20 @@ ln -s $root/fonts /tmp/$user/share
 ln -s $root/ppd/*.ppd /tmp/$user/share/model
 ln -s $root/templates /tmp/$user/share
 
+if test $ssltype != 0; then
+	mkdir $root/ssl
+	cp server.* $root/ssl
+fi
+
 #
 # Then create the necessary config files...
 #
+
+if test $ssltype = 2; then
+	$encryption="Encryption Required"
+else
+	$encryption=""
+fi
 
 cat >/tmp/$user/cupsd.conf <<EOF
 Browsing Off
@@ -208,12 +259,14 @@ PreserveJobHistory Yes
 Order deny,allow
 Deny from all
 Allow from 127.0.0.1
+$encryption
 </Location>
 <Location /admin>
 Order deny,allow
 Deny from all
 Allow from 127.0.0.1
 Require valid-user
+$encryption
 </Location>
 <Policy default>
 <Limit All>

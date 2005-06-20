@@ -46,6 +46,9 @@ typedef struct
   int		got_fields,		/* Non-zero if all fields seen */
 		field_col;		/* Column within line */
   cups_lang_t	*language;		/* Language to use */
+#ifdef HAVE_SSL
+  int		auto_ssl;		/* Automatic test for SSL/TLS */
+#endif /* HAVE_SSL */
 } client_t;
 
 #define HTTP(con) &((con)->http)

@@ -3,6 +3,8 @@ CHANGES.txt - 06/20/2005
 
 CHANGES IN CUPS V1.2.0b1
 
+	- The scheduler now automatically detects SSL/TLS clients
+	  without using the SSLPort/SSLListen directives.
 	- The CUPS API and scheduler no longer support SSLv2-
 	  encrypted connections.
 	- Updated the cupsaddsmb utility to correctly export the

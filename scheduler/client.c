@@ -335,6 +335,8 @@ AcceptClient(listener_t *lis)	/* I - Listener socket */
 
     EncryptClient(con);
   }
+  else
+    con->auto_ssl = 1;
 #endif /* HAVE_SSL */
 }
 
@@ -907,6 +909,30 @@ ReadClient(client_t *con)		/* I - Client to read from */
     LogMessage(L_DEBUG2, "ReadClient: http error seen...");
     return (CloseClient(con));
   }
+
+#ifdef HAVE_SSL
+  if (con->auto_ssl)
+  {
+   /*
+    * Automatically check for a SSL/TLS handshake...
+    */
+
+    con->auto_ssl = 0;
+
+    if (recv(con->http.fd, buf, 1, MSG_PEEK) == 1 && !strchr("DGHOPT", buf[0]))
+    {
+     /*
+      * Encrypt this connection...
+      */
+
+      LogMessage(L_DEBUG2, "ReadClient: Saw first byte %02X, auto-negotiating SSL/TLS session...",
+                 buf[0] & 255);
+
+      EncryptClient(con);
+      return (1);
+    }
+  }
+#endif /* HAVE_SSL */
 
   switch (con->http.state)
   {
