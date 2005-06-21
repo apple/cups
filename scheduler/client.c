@@ -51,7 +51,6 @@
 
 #include <cups/http-private.h>
 #include "cupsd.h"
-#include <grp.h>
 
 
 /*
@@ -2927,9 +2926,6 @@ pipe_command(client_t *con,		/* I - Client connection */
 		tmpdir[1024],		/* TMPDIR environment variable */
 		vg_args[1024],		/* VG_ARGS environment variable */
 		ld_assume_kernel[1024];	/* LD_ASSUME_KERNEL environment variable */
-#if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
-  struct sigaction action;		/* POSIX signal handler */
-#endif /* HAVE_SIGACTION && !HAVE_SIGSET */
   static const char * const locale_encodings[] =
 		{			/* Locale charset names */
 		  "ASCII",	"ISO8859-1",	"ISO8859-2",	"ISO8859-3",

@@ -1043,9 +1043,6 @@ StartPolling(void)
   char		interval[10];		/* Poll interval */
   int		statusfds[2];		/* Status pipe */
   char		*argv[6];		/* Arguments */
-#if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
-  struct sigaction action;		/* POSIX signal handler */
-#endif /* HAVE_SIGACTION && !HAVE_SIGSET */
 
 
  /*

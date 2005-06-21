@@ -32,6 +32,7 @@
  */
 
 #include "cupsd.h"
+#include <grp.h>
 
 
 /*

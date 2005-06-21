@@ -805,7 +805,6 @@ LoadAllPrinters(void)
   cups_file_t	*fp;			/* printers.conf file */
   int		linenum;		/* Current line number */
   char		line[1024],		/* Line from file */
-		name[256],		/* Parameter name */
 		*value,			/* Pointer to value */
 		*valueptr;		/* Pointer into value */
   printer_t	*p;			/* Current printer */
@@ -836,8 +835,8 @@ LoadAllPrinters(void)
     * Decode the directive...
     */
 
-    if (!strcasecmp(name, "<Printer") ||
-        !strcasecmp(name, "<DefaultPrinter"))
+    if (!strcasecmp(line, "<Printer") ||
+        !strcasecmp(line, "<DefaultPrinter"))
     {
      /*
       * <Printer name> or <DefaultPrinter name>
@@ -859,7 +858,7 @@ LoadAllPrinters(void)
         * Set the default printer as needed...
 	*/
 
-        if (!strcasecmp(name, "<DefaultPrinter"))
+        if (!strcasecmp(line, "<DefaultPrinter"))
 	  DefaultPrinter = p;
       }
       else
@@ -869,7 +868,7 @@ LoadAllPrinters(void)
         return;
       }
     }
-    else if (!strcasecmp(name, "</Printer>"))
+    else if (!strcasecmp(line, "</Printer>"))
     {
       if (p != NULL)
       {
@@ -890,29 +889,17 @@ LoadAllPrinters(void)
 	         linenum);
       return;
     }
-    else if (!strcasecmp(name, "Info"))
+    else if (!strcasecmp(line, "Info"))
     {
       if (value)
 	SetString(&p->info, value);
-      else
-      {
-	LogMessage(L_ERROR, "Syntax error on line %d of printers.conf.",
-	           linenum);
-	return;
-      }
     }
-    else if (!strcasecmp(name, "Location"))
+    else if (!strcasecmp(line, "Location"))
     {
       if (value)
 	SetString(&p->location, value);
-      else
-      {
-	LogMessage(L_ERROR, "Syntax error on line %d of printers.conf.",
-	           linenum);
-	return;
-      }
     }
-    else if (!strcasecmp(name, "DeviceURI"))
+    else if (!strcasecmp(line, "DeviceURI"))
     {
       if (value)
 	SetString(&p->device_uri, value);
@@ -923,7 +910,7 @@ LoadAllPrinters(void)
 	return;
       }
     }
-    else if (!strcasecmp(name, "State"))
+    else if (!strcasecmp(line, "State"))
     {
      /*
       * Set the initial queue state...
@@ -940,7 +927,7 @@ LoadAllPrinters(void)
 	return;
       }
     }
-    else if (!strcasecmp(name, "StateMessage"))
+    else if (!strcasecmp(line, "StateMessage"))
     {
      /*
       * Set the initial queue state message...
@@ -948,14 +935,8 @@ LoadAllPrinters(void)
 
       if (value)
 	strlcpy(p->state_message, value, sizeof(p->state_message));
-      else
-      {
-	LogMessage(L_ERROR, "Syntax error on line %d of printers.conf.",
-	           linenum);
-	return;
-      }
     }
-    else if (!strcasecmp(name, "Accepting"))
+    else if (!strcasecmp(line, "Accepting"))
     {
      /*
       * Set the initial accepting state...
@@ -978,7 +959,7 @@ LoadAllPrinters(void)
 	return;
       }
     }
-    else if (!strcasecmp(name, "JobSheets"))
+    else if (!strcasecmp(line, "JobSheets"))
     {
      /*
       * Set the initial job sheets...
@@ -1013,7 +994,7 @@ LoadAllPrinters(void)
 	return;
       }
     }
-    else if (!strcasecmp(name, "AllowUser"))
+    else if (!strcasecmp(line, "AllowUser"))
     {
       if (value)
       {
@@ -1027,7 +1008,7 @@ LoadAllPrinters(void)
 	return;
       }
     }
-    else if (!strcasecmp(name, "DenyUser"))
+    else if (!strcasecmp(line, "DenyUser"))
     {
       if (value)
       {
@@ -1041,7 +1022,7 @@ LoadAllPrinters(void)
 	return;
       }
     }
-    else if (!strcasecmp(name, "QuotaPeriod"))
+    else if (!strcasecmp(line, "QuotaPeriod"))
     {
       if (value)
         p->quota_period = atoi(value);
@@ -1052,7 +1033,7 @@ LoadAllPrinters(void)
 	return;
       }
     }
-    else if (!strcasecmp(name, "PageLimit"))
+    else if (!strcasecmp(line, "PageLimit"))
     {
       if (value)
         p->page_limit = atoi(value);
@@ -1063,7 +1044,7 @@ LoadAllPrinters(void)
 	return;
       }
     }
-    else if (!strcasecmp(name, "KLimit"))
+    else if (!strcasecmp(line, "KLimit"))
     {
       if (value)
         p->k_limit = atoi(value);
@@ -1074,7 +1055,7 @@ LoadAllPrinters(void)
 	return;
       }
     }
-    else if (!strcasecmp(name, "OpPolicy"))
+    else if (!strcasecmp(line, "OpPolicy"))
     {
       if (value)
         SetString(&p->op_policy, value);
@@ -1085,7 +1066,7 @@ LoadAllPrinters(void)
 	return;
       }
     }
-    else if (!strcasecmp(name, "ErrorPolicy"))
+    else if (!strcasecmp(line, "ErrorPolicy"))
     {
       if (value)
         SetString(&p->error_policy, value);
@@ -1103,7 +1084,7 @@ LoadAllPrinters(void)
       */
 
       LogMessage(L_ERROR, "Unknown configuration directive %s on line %d of printers.conf.",
-	         name, linenum);
+	         line, linenum);
     }
   }
 
@@ -1224,8 +1205,10 @@ SaveAllPrinters(void)
       cupsFilePrintf(fp, "%sUser %s\n", printer->deny_users ? "Deny" : "Allow",
               printer->users[i]);
 
-    cupsFilePrintf(fp, "OpPolicy %s\n", printer->op_policy);
-    cupsFilePrintf(fp, "ErrorPolicy %s\n", printer->error_policy);
+    if (printer->op_policy)
+      cupsFilePrintf(fp, "OpPolicy %s\n", printer->op_policy);
+    if (printer->error_policy)
+      cupsFilePrintf(fp, "ErrorPolicy %s\n", printer->error_policy);
 
     cupsFilePuts(fp, "</Printer>\n");
 

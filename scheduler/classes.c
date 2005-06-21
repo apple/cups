@@ -213,23 +213,15 @@ DeletePrinterFromClasses(printer_t *p)	/* I - Printer to delete */
   }
 
  /*
-  * Then clean out any empty classes...
+  * Then clean out any empty implicit classes...
   */
 
   for (c = Printers; c != NULL; c = next)
   {
     next = c->next;
 
-    if ((c->type & (CUPS_PRINTER_CLASS | CUPS_PRINTER_IMPLICIT)) &&
-        c->num_printers == 0)
-    {
-     /*
-      * Set class type to 0 to prevent recursion...
-      */
-
-      c->type = 0;
-      DeletePrinter(c, 1);
-    }
+    if ((c->type & CUPS_PRINTER_IMPLICIT) && c->num_printers == 0)
+      DeletePrinter(c, 0);
   }
 }
 
@@ -338,7 +330,6 @@ LoadAllClasses(void)
   cups_file_t	*fp;			/* classes.conf file */
   int		linenum;		/* Current line number */
   char		line[1024],		/* Line from file */
-		name[256],		/* Parameter name */
 		*value,			/* Pointer to value */
 		*valueptr;		/* Pointer into value */
   printer_t	*p,			/* Current printer class */
@@ -370,8 +361,8 @@ LoadAllClasses(void)
     * Decode the directive...
     */
 
-    if (!strcasecmp(name, "<Class") ||
-        !strcasecmp(name, "<DefaultClass"))
+    if (!strcasecmp(line, "<Class") ||
+        !strcasecmp(line, "<DefaultClass"))
     {
      /*
       * <Class name> or <DefaultClass name>
@@ -385,7 +376,7 @@ LoadAllClasses(void)
 	p->accepting = 1;
 	p->state     = IPP_PRINTER_IDLE;
 
-        if (!strcasecmp(name, "<DefaultClass"))
+        if (!strcasecmp(line, "<DefaultClass"))
 	  DefaultPrinter = p;
       }
       else
@@ -395,7 +386,7 @@ LoadAllClasses(void)
         return;
       }
     }
-    else if (!strcasecmp(name, "</Class>"))
+    else if (!strcasecmp(line, "</Class>"))
     {
       if (p != NULL)
       {
@@ -415,29 +406,17 @@ LoadAllClasses(void)
 	         linenum);
       return;
     }
-    else if (!strcasecmp(name, "Info"))
+    else if (!strcasecmp(line, "Info"))
     {
       if (value)
         SetString(&p->info, value);
-      else
-      {
-	LogMessage(L_ERROR, "Syntax error on line %d of classes.conf.",
-	           linenum);
-	return;
-      }
     }
-    else if (!strcasecmp(name, "Location"))
+    else if (!strcasecmp(line, "Location"))
     {
       if (value)
         SetString(&p->location, value);
-      else
-      {
-	LogMessage(L_ERROR, "Syntax error on line %d of classes.conf.",
-	           linenum);
-	return;
-      }
     }
-    else if (!strcasecmp(name, "Printer"))
+    else if (!strcasecmp(line, "Printer"))
     {
       if (!value)
       {
@@ -473,7 +452,7 @@ LoadAllClasses(void)
       if (temp)
         AddPrinterToClass(p, temp);
     }
-    else if (!strcasecmp(name, "State"))
+    else if (!strcasecmp(line, "State"))
     {
      /*
       * Set the initial queue state...
@@ -490,7 +469,7 @@ LoadAllClasses(void)
 	return;
       }
     }
-    else if (!strcasecmp(name, "StateMessage"))
+    else if (!strcasecmp(line, "StateMessage"))
     {
      /*
       * Set the initial queue state message...
@@ -498,14 +477,8 @@ LoadAllClasses(void)
 
       if (value)
 	strlcpy(p->state_message, value, sizeof(p->state_message));
-      else
-      {
-	LogMessage(L_ERROR, "Syntax error on line %d of classes.conf.",
-	           linenum);
-	return;
-      }
     }
-    else if (!strcasecmp(name, "Accepting"))
+    else if (!strcasecmp(line, "Accepting"))
     {
      /*
       * Set the initial accepting state...
@@ -528,7 +501,7 @@ LoadAllClasses(void)
 	return;
       }
     }
-    else if (!strcasecmp(name, "JobSheets"))
+    else if (!strcasecmp(line, "JobSheets"))
     {
      /*
       * Set the initial job sheets...
@@ -563,7 +536,7 @@ LoadAllClasses(void)
 	return;
       }
     }
-    else if (!strcasecmp(name, "AllowUser"))
+    else if (!strcasecmp(line, "AllowUser"))
     {
       if (value)
       {
@@ -577,7 +550,7 @@ LoadAllClasses(void)
 	return;
       }
     }
-    else if (!strcasecmp(name, "DenyUser"))
+    else if (!strcasecmp(line, "DenyUser"))
     {
       if (value)
       {
@@ -591,7 +564,7 @@ LoadAllClasses(void)
 	return;
       }
     }
-    else if (!strcasecmp(name, "QuotaPeriod"))
+    else if (!strcasecmp(line, "QuotaPeriod"))
     {
       if (value)
         p->quota_period = atoi(value);
@@ -602,7 +575,7 @@ LoadAllClasses(void)
 	return;
       }
     }
-    else if (!strcasecmp(name, "PageLimit"))
+    else if (!strcasecmp(line, "PageLimit"))
     {
       if (value)
         p->page_limit = atoi(value);
@@ -613,7 +586,7 @@ LoadAllClasses(void)
 	return;
       }
     }
-    else if (!strcasecmp(name, "KLimit"))
+    else if (!strcasecmp(line, "KLimit"))
     {
       if (value)
         p->k_limit = atoi(value);
@@ -624,7 +597,7 @@ LoadAllClasses(void)
 	return;
       }
     }
-    else if (!strcasecmp(name, "OpPolicy"))
+    else if (!strcasecmp(line, "OpPolicy"))
     {
       if (value)
         SetString(&p->op_policy, value);
@@ -635,7 +608,7 @@ LoadAllClasses(void)
 	return;
       }
     }
-    else if (!strcasecmp(name, "ErrorPolicy"))
+    else if (!strcasecmp(line, "ErrorPolicy"))
     {
       if (value)
         SetString(&p->error_policy, value);
@@ -653,7 +626,7 @@ LoadAllClasses(void)
       */
 
       LogMessage(L_ERROR, "Unknown configuration directive %s on line %d of classes.conf.",
-	         name, linenum);
+	         line, linenum);
     }
   }
 
@@ -773,8 +746,10 @@ SaveAllClasses(void)
       cupsFilePrintf(fp, "%sUser %s\n", pclass->deny_users ? "Deny" : "Allow",
         	     pclass->users[i]);
 
-    cupsFilePrintf(fp, "OpPolicy %s\n", pclass->op_policy);
-    cupsFilePrintf(fp, "ErrorPolicy %s\n", pclass->error_policy);
+    if (pclass->op_policy)
+      cupsFilePrintf(fp, "OpPolicy %s\n", pclass->op_policy);
+    if (pclass->error_policy)
+      cupsFilePrintf(fp, "ErrorPolicy %s\n", pclass->error_policy);
 
     cupsFilePuts(fp, "</Class>\n");
   }
