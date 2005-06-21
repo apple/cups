@@ -63,7 +63,7 @@ main(void)
     return (1);
   }
 
-  if ((r = cupsRasterOpen(fp, CUPS_RASTER_WRITE)) == NULL)
+  if ((r = cupsRasterOpen(fileno(fp), CUPS_RASTER_WRITE)) == NULL)
   {
     perror("Unable to create raster output stream");
     fclose(fp);
@@ -133,7 +133,7 @@ main(void)
     return (1);
   }
 
-  if ((r = cupsRasterOpen(fp, CUPS_RASTER_READ)) == NULL)
+  if ((r = cupsRasterOpen(fileno(fp), CUPS_RASTER_READ)) == NULL)
   {
     perror("Unable to create raster input stream");
     fclose(fp);
