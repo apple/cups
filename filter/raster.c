@@ -600,7 +600,7 @@ cups_raster_read_header(cups_raster_t *r)	/* I - Raster stream */
     for (len = 74, s = (union swap_s *)&(r->header.AdvanceDistance);
 	 len > 0;
 	 len --, s ++)
-      s->v = (((((s->b[0] << 8) | s->b[1]) << 8) | s->b[2]) << 8) | s->b[3];
+      s->v = (((((s->b[3] << 8) | s->b[2]) << 8) | s->b[1]) << 8) | s->b[0];
 
  /*
   * Update the header and row count...
