@@ -3126,7 +3126,8 @@ pipe_command(client_t *con,		/* I - Client connection */
   envp[envc ++] = server_port;
   envp[envc ++] = remote_addr;
   envp[envc ++] = remote_host;
-  envp[envc ++] = remote_user;
+  if (con->username[0])
+    envp[envc ++] = remote_user;
   envp[envc ++] = lang;
   envp[envc ++] = TZ;
   envp[envc ++] = tmpdir;
