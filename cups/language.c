@@ -42,9 +42,10 @@
  * Include necessary headers...
  */
 
-#include <stdio.h>
+#include "string.h"
+#include "language.h"
+#include "debug.h"
 #include <stdlib.h>
-#include <ctype.h>
 #ifdef HAVE_LANGINFO_H
 #  include <langinfo.h>
 #endif /* HAVE_LANGINFO_H */
@@ -53,9 +54,6 @@
 #else
 #  include <unistd.h>
 #endif /* WIN32 */
-#include "string.h"
-#include "language.h"
-#include "debug.h"
 
 
 /*
