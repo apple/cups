@@ -1,8 +1,11 @@
-CHANGES.txt - 06/20/2005
+CHANGES.txt - 06/21/2005
 ------------------------
 
 CHANGES IN CUPS V1.2.0b1
 
+	- "lpstat -l -p" incorrectly showed all users as allowed,
+	  even if the queue was restricted to certain users (STR
+	  #801)
 	- The scheduler now automatically detects SSL/TLS clients
 	  without using the SSLPort/SSLListen directives.
 	- The CUPS API and scheduler no longer support SSLv2-

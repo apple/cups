@@ -1675,6 +1675,8 @@ show_printers(http_t      *http,	/* I - HTTP connection to server */
 		*location,		/* Location of printer */
 		*make_model,		/* Make and model of printer */
 		*uri;			/* URI of printer */
+  ipp_attribute_t *allowed,		/* requesting-user-name-allowed */
+		*denied;		/* requestint-user-name-denied */
   ipp_pstate_t	pstate;			/* Printer state */
   cups_ptype_t	ptype;			/* Printer type */
   int		jobid;			/* Job ID of current job */
@@ -1694,7 +1696,9 @@ show_printers(http_t      *http,	/* I - HTTP connection to server */
 		  "printer-info",
                   "printer-location",
 		  "printer-make-and-model",
-		  "printer-uri-supported"
+		  "printer-uri-supported",
+		  "requesting-user-name-allowed",
+		  "requesting-user-name-denied"
 		};
   static const char *jattrs[] =		/* Attributes we need for jobs... */
 		{
@@ -1786,6 +1790,8 @@ show_printers(http_t      *http,	/* I - HTTP connection to server */
       reasons     = NULL;
       uri         = NULL;
       jobid       = 0;
+      allowed     = NULL;
+      denied      = NULL;
 
       while (attr != NULL && attr->group_tag == IPP_TAG_PRINTER)
       {
@@ -1816,6 +1822,12 @@ show_printers(http_t      *http,	/* I - HTTP connection to server */
         else if (strcmp(attr->name, "printer-state-reasons") == 0 &&
 	         attr->value_tag == IPP_TAG_KEYWORD)
 	  reasons = attr;
+        else if (strcmp(attr->name, "requesting-user-name-allowed") == 0 &&
+	         attr->value_tag == IPP_TAG_NAME)
+	  allowed = attr;
+        else if (strcmp(attr->name, "requesting-user-name-denied") == 0 &&
+	         attr->value_tag == IPP_TAG_NAME)
+	  denied = attr;
 
         attr = attr->next;
       }
@@ -1996,8 +2008,23 @@ show_printers(http_t      *http,	/* I - HTTP connection to server */
 
 	  puts("\tOn fault: no alert");
 	  puts("\tAfter fault: continue");
-	  puts("\tUsers allowed:");
-	  puts("\t\t(all)");
+          if (allowed)
+	  {
+	    puts("\tUsers allowed:");
+	    for (i = 0; i < allowed->num_values; i ++)
+	      printf("\t\t%s\n", allowed->values[i].string.text);
+	  }
+	  else if (denied)
+	  {
+	    puts("\tUsers denied:");
+	    for (i = 0; i < denied->num_values; i ++)
+	      printf("\t\t%s\n", denied->values[i].string.text);
+	  }
+	  else
+	  {
+	    puts("\tUsers allowed:");
+	    puts("\t\t(all)");
+	  }
 	  puts("\tForms allowed:");
 	  puts("\t\t(none)");
 	  puts("\tBanner required");
