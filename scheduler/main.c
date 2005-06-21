@@ -1115,12 +1115,12 @@ process_children(void)
 
     if (status)
     {
-      if (WIFSTOPPED(status))
-	LogMessage(L_ERROR, "PID %d crashed on signal %d!", pid,
-	           WSTOPSIG(status));
-      else
+      if (WIFEXITED(status))
 	LogMessage(L_ERROR, "PID %d stopped with status %d!", pid,
 	           WEXITSTATUS(status));
+      else
+	LogMessage(L_ERROR, "PID %d crashed on signal %d!", pid,
+	           WTERMSIG(status));
 
       if (LogLevel < L_DEBUG)
         LogMessage(L_INFO, "Hint: Try setting the LogLevel to \"debug\" to find out more.");
