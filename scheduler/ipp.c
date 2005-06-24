@@ -3444,6 +3444,9 @@ create_job(client_t        *con,	/* I - Client connection */
 
     if (Classification)
     {
+      LogMessage(L_INFO, "Classification=\"%s\", ClassifyOverride=%d",
+                 Classification ? Classification : "(null)", ClassifyOverride);
+
       if (ClassifyOverride)
       {
         if (strcmp(attr->values[0].string.text, "none") == 0 &&
@@ -3494,7 +3497,7 @@ create_job(client_t        *con,	/* I - Client connection */
 		       job->username);
           else
             LogMessage(L_NOTICE, "[Job %d] CLASSIFICATION OVERRIDDEN "
-	                         "job-sheets=\"%s,%s\", "
+	                         "job-sheets=\"%s,%s\",fffff "
 			         "job-originating-user-name=\"%s\"",
 	               job->id, attr->values[0].string.text,
 		       attr->values[1].string.text,
@@ -3509,11 +3512,22 @@ create_job(client_t        *con,	/* I - Client connection */
         * Force the banner to have the classification on it...
 	*/
 
-        if (attr->num_values == 1 || strcmp(attr->values[0].string.text, "none"))
-          SetString(&attr->values[0].string.text, Classification);
+        if (attr->num_values > 1 &&
+	    !strcmp(attr->values[0].string.text, attr->values[1].string.text))
+	{
+          SetString(&(attr->values[0].string.text), Classification);
+          SetString(&(attr->values[1].string.text), Classification);
+	}
+        else
+	{
+          if (attr->num_values == 1 ||
+	      strcmp(attr->values[0].string.text, "none"))
+            SetString(&(attr->values[0].string.text), Classification);
 
-        if (attr->num_values > 1 && strcmp(attr->values[1].string.text, "none"))
-          SetString(&attr->values[1].string.text, Classification);
+          if (attr->num_values > 1 &&
+	      strcmp(attr->values[1].string.text, "none"))
+            SetString(&(attr->values[1].string.text), Classification);
+        }
 
         if (attr->num_values > 1)
 	  LogMessage(L_NOTICE, "[Job %d] CLASSIFICATION FORCED "
@@ -5429,6 +5443,9 @@ print_job(client_t        *con,		/* I - Client connection */
 
     if (Classification)
     {
+      LogMessage(L_INFO, "Classification=\"%s\", ClassifyOverride=%d",
+                 Classification ? Classification : "(null)", ClassifyOverride);
+
       if (ClassifyOverride)
       {
         if (strcmp(attr->values[0].string.text, "none") == 0 &&
@@ -5494,8 +5511,22 @@ print_job(client_t        *con,		/* I - Client connection */
         * Force the banner to have the classification on it...
 	*/
 
-        if (attr->num_values == 1 || strcmp(attr->values[0].string.text, "none"))
-          SetString(&attr->values[0].string.text, Classification);
+        if (attr->num_values > 1 &&
+	    !strcmp(attr->values[0].string.text, attr->values[1].string.text))
+	{
+          SetString(&(attr->values[0].string.text), Classification);
+          SetString(&(attr->values[1].string.text), Classification);
+	}
+        else
+	{
+          if (attr->num_values == 1 ||
+	      strcmp(attr->values[0].string.text, "none"))
+            SetString(&(attr->values[0].string.text), Classification);
+
+          if (attr->num_values > 1 &&
+	      strcmp(attr->values[1].string.text, "none"))
+            SetString(&(attr->values[1].string.text), Classification);
+        }
 
         if (attr->num_values > 1)
 	  LogMessage(L_NOTICE, "[Job %d] CLASSIFICATION FORCED "
