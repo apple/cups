@@ -1,8 +1,13 @@
-CHANGES.txt - 06/24/2005
+CHANGES.txt - 06/26/2005
 ------------------------
 
 CHANGES IN CUPS V1.2.0b1
 
+	- Backends now use "&" to separate options in device
+	  URIs; "+" is still recognized but is deprecated (STR
+	  #842)
+	- The USB backend no longer supports the usb:/dev/foo
+	  format on systems that support device ID queries.
 	- Forced classification markings did not work when the
 	  job-sheets parameters were "none,none".
 	- "lpstat -l -p" incorrectly showed all users as allowed,

@@ -97,33 +97,33 @@ void	list_devices(void);
  *    printer-uri job-id user title copies options [file]
  */
 
-int			/* O - Exit status */
-main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
-     char *argv[])	/* I - Command-line arguments */
+int					/* O - Exit status */
+main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
+     char *argv[])			/* I - Command-line arguments */
 {
-  char		method[255],	/* Method in URI */
-		hostname[1024],	/* Hostname */
-		username[255],	/* Username info (not used) */
-		resource[1024],	/* Resource info (device and options) */
-		*options,	/* Pointer to options */
-		name[255],	/* Name of option */
-		value[255],	/* Value of option */
-		*ptr;		/* Pointer into name or value */
-  int		port;		/* Port number (not used) */
-  int		fp;		/* Print file */
-  int		copies;		/* Number of copies to print */
-  int		fd;		/* Parallel device */
-  int		wbytes;		/* Number of bytes written */
-  size_t	nbytes,		/* Number of bytes read */
-		tbytes;		/* Total number of bytes written */
-  int		dtrdsr;		/* Do dtr/dsr flow control? */
-  int		bufsize;	/* Size of output buffer for writes */
-  char		buffer[8192],	/* Output buffer */
-		*bufptr;	/* Pointer into buffer */
-  struct termios opts;		/* Serial port options */
-  struct termios origopts;	/* Original port options */
+  char		method[255],		/* Method in URI */
+		hostname[1024],		/* Hostname */
+		username[255],		/* Username info (not used) */
+		resource[1024],		/* Resource info (device and options) */
+		*options,		/* Pointer to options */
+		name[255],		/* Name of option */
+		value[255],		/* Value of option */
+		*ptr;			/* Pointer into name or value */
+  int		port;			/* Port number (not used) */
+  int		fp;			/* Print file */
+  int		copies;			/* Number of copies to print */
+  int		fd;			/* Parallel device */
+  int		wbytes;			/* Number of bytes written */
+  size_t	nbytes,			/* Number of bytes read */
+		tbytes;			/* Total number of bytes written */
+  int		dtrdsr;			/* Do dtr/dsr flow control? */
+  int		bufsize;		/* Size of output buffer for writes */
+  char		buffer[8192],		/* Output buffer */
+		*bufptr;		/* Pointer into buffer */
+  struct termios opts;			/* Serial port options */
+  struct termios origopts;		/* Original port options */
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
-  struct sigaction action;	/* Actions for POSIX signals */
+  struct sigaction action;		/* Actions for POSIX signals */
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET */
 
 
@@ -263,7 +263,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
         options ++;
 
-	for (ptr = value; *options && *options != '+';)
+	for (ptr = value; *options && *options != '+' && *optptr != '&';)
           if (ptr < (value + sizeof(value) - 1))
             *ptr++ = *options++;
 	*ptr = '\0';

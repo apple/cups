@@ -88,53 +88,51 @@ static void	sigterm_handler(int sig);
  *    printer-uri job-id user title copies options [file]
  */
 
-int			/* O - Exit status */
-main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
-     char *argv[])	/* I - Command-line arguments */
+int					/* O - Exit status */
+main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
+     char *argv[])			/* I - Command-line arguments */
 {
-  int		i;		/* Looping var */
-  int		num_options;	/* Number of printer options */
-  cups_option_t	*options;	/* Printer options */
-  char		method[255],	/* Method in URI */
-		hostname[1024],	/* Hostname */
-		username[255],	/* Username info */
-		resource[1024],	/* Resource info (printer name) */
-		*optptr,	/* Pointer to URI options */
-		name[255],	/* Name of option */
-		value[255],	/* Value of option */
-		*ptr;		/* Pointer into name or value */
-  char		*filename;	/* File to print */
-  int		port;		/* Port number (not used) */
-  char		uri[HTTP_MAX_URI];/* Updated URI without user/pass */
-  ipp_status_t	ipp_status;	/* Status of IPP request */
-  http_t	*http;		/* HTTP connection */
-  ipp_t		*request,	/* IPP request */
-		*response,	/* IPP response */
-		*supported;	/* get-printer-attributes response */
-  int		waitjob,	/* Wait for job complete? */
-		waitprinter;	/* Wait for printer ready? */
-  ipp_attribute_t *job_id_attr;	/* job-id attribute */
-  int		job_id;		/* job-id value */
-  ipp_attribute_t *job_sheets;	/* job-media-sheets-completed attribute */
-  ipp_attribute_t *job_state;	/* job-state attribute */
-  ipp_attribute_t *copies_sup;	/* copies-supported attribute */
-  ipp_attribute_t *charset_sup;	/* charset-supported attribute */
-  ipp_attribute_t *format_sup;	/* document-format-supported attribute */
-  ipp_attribute_t *printer_state;
-  				/* printer-state attribute */
-  ipp_attribute_t *printer_accepting;
-  				/* printer-is-accepting-jobs attribute */
-  const char	*charset;	/* Character set to use */
-  cups_lang_t	*language;	/* Default language */
-  int		copies;		/* Number of copies remaining */
-  const char	*content_type;	/* CONTENT_TYPE environment variable */
+  int		i;			/* Looping var */
+  int		num_options;		/* Number of printer options */
+  cups_option_t	*options;		/* Printer options */
+  char		method[255],		/* Method in URI */
+		hostname[1024],		/* Hostname */
+		username[255],		/* Username info */
+		resource[1024],		/* Resource info (printer name) */
+		*optptr,		/* Pointer to URI options */
+		name[255],		/* Name of option */
+		value[255],		/* Value of option */
+		*ptr;			/* Pointer into name or value */
+  char		*filename;		/* File to print */
+  int		port;			/* Port number (not used) */
+  char		uri[HTTP_MAX_URI];	/* Updated URI without user/pass */
+  ipp_status_t	ipp_status;		/* Status of IPP request */
+  http_t	*http;			/* HTTP connection */
+  ipp_t		*request,		/* IPP request */
+		*response,		/* IPP response */
+		*supported;		/* get-printer-attributes response */
+  int		waitjob,		/* Wait for job complete? */
+		waitprinter;		/* Wait for printer ready? */
+  ipp_attribute_t *job_id_attr;		/* job-id attribute */
+  int		job_id;			/* job-id value */
+  ipp_attribute_t *job_sheets;		/* job-media-sheets-completed attribute */
+  ipp_attribute_t *job_state;		/* job-state attribute */
+  ipp_attribute_t *copies_sup;		/* copies-supported attribute */
+  ipp_attribute_t *charset_sup;		/* charset-supported attribute */
+  ipp_attribute_t *format_sup;		/* document-format-supported attribute */
+  ipp_attribute_t *printer_state;	/* printer-state attribute */
+  ipp_attribute_t *printer_accepting;	/* printer-is-accepting-jobs attribute */
+  const char	*charset;		/* Character set to use */
+  cups_lang_t	*language;		/* Default language */
+  int		copies;			/* Number of copies remaining */
+  const char	*content_type;		/* CONTENT_TYPE environment variable */
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
-  struct sigaction action;	/* Actions for POSIX signals */
+  struct sigaction action;		/* Actions for POSIX signals */
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET */
-  int		version;	/* IPP version */
-  int		reasons;	/* Number of printer-state-reasons shown */
+  int		version;		/* IPP version */
+  int		reasons;		/* Number of printer-state-reasons shown */
   static const char * const pattrs[] =
-		{		/* Printer attributes we want */
+		{			/* Printer attributes we want */
 		  "copies-supported",
 		  "charset-supported",
 		  "document-format-supported",
@@ -143,7 +141,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 		  "printer-state-reasons",
 		};
   static const char * const jattrs[] =
-		{		/* Job attributes we want */
+		{			/* Job attributes we want */
 		  "job-media-sheets-completed",
 		  "job-state"
 		};
@@ -309,7 +307,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
         optptr ++;
 
-	for (ptr = value; *optptr && *optptr != '+';)
+	for (ptr = value; *optptr && *optptr != '+' && *optptr != '&';)
           if (ptr < (value + sizeof(value) - 1))
             *ptr++ = *optptr++;
 	*ptr = '\0';

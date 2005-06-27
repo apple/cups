@@ -929,7 +929,7 @@ static void parseOptions(const char *options, char *serial)
 	/*
 	* Get the name...
 	*/
-	for (ptr = optionName; *options && *options != '=' && *options != '+'; )
+	for (ptr = optionName; *options && *options != '=' && *options != '+' && *options != '&'; )
 	    *ptr++ = *options++;
 
 	*ptr = '\0';
@@ -943,15 +943,15 @@ static void parseOptions(const char *options, char *serial)
 	    
 	    options ++;
 	    
-	    for (ptr = value; *options && *options != '+';)
+	    for (ptr = value; *options && *options != '+' && *options != '&';)
 		*ptr++ = *options++;
 
 	    *ptr = '\0';
 	    
-	    if (*options == '+')
+	    if (*options == '+' || *options == '&')
 		options ++;
 	}
-	else if (*options == '+')
+	else if (*options == '+' || *options == '&')
 	{
 	    options ++;
 	}

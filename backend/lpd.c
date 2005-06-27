@@ -288,7 +288,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 
         options ++;
 
-	for (ptr = value; *options && *options != '+';)
+	for (ptr = value; *options && *options != '+' && *optptr != '&';)
           if (ptr < (value + sizeof(value) - 1))
             *ptr++ = *options++;
 	*ptr = '\0';

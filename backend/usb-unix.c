@@ -480,20 +480,16 @@ list_devices(void)
       printf("direct %s \"%s\" \"USB Printer #%d\"\n", device_uri,
 	     make_model, i + 1);
     }
-    else
-      printf("direct usb:%s \"Unknown\" \"USB Printer #%d\"\n", device, i + 1);
   }
 #elif defined(__sgi)
-#elif defined(__sun)
+#elif defined(__sun) && defined(ECPPIOC_GETDEVID)
   int	i;			/* Looping var */
   int	fd;			/* File descriptor */
   char	device[255],		/* Device filename */
 	device_id[1024],	/* Device ID string */
 	device_uri[1024],	/* Device URI string */
 	make_model[1024];	/* Make and model */
-#  ifdef ECPPIOC_GETDEVID
   struct ecpp_device_id did;	/* Device ID buffer */
-#  endif /* ECPPIOC_GETDEVID */
 
 
  /*
@@ -504,10 +500,6 @@ list_devices(void)
   {
     sprintf(device, "/dev/usb/printer%d", i);
 
-#  ifndef ECPPIOC_GETDEVID
-    if (!access(device, 0))
-      printf("direct usb:%s \"Unknown\" \"USB Printer #%d\"\n", device, i + 1);
-#  else
     if ((fd = open(device, O_RDWR | O_EXCL)) >= 0)
     {
       did.mode = ECPP_CENTRONICS;
@@ -538,9 +530,6 @@ list_devices(void)
       printf("direct %s \"%s\" \"USB Printer #%d\"\n", device_uri,
 	     make_model, i + 1);
     }
-    else
-      printf("direct usb:%s \"Unknown\" \"USB Printer #%d\"\n", device, i + 1);
-#  endif /* !ECPPIOC_GETDEVID */
   }
 #elif defined(__hpux)
 #elif defined(__osf)
@@ -577,8 +566,8 @@ open_device(const char *uri)		/* I - Device URI */
   */
 
   if (strncmp(uri, "usb:/dev/", 9) == 0)
-    return (open(uri + 4, O_RDWR | O_EXCL));
 #ifdef __linux
+    return (-1); /* Do not allow direct devices anymore */
   else if (strncmp(uri, "usb://", 6) == 0)
   {
    /*
@@ -694,6 +683,7 @@ open_device(const char *uri)		/* I - Device URI */
     return (-1);
   }
 #elif defined(__sun) && defined(ECPPIOC_GETDEVID)
+    return (-1); /* Do not allow direct devices anymore */
   else if (strncmp(uri, "usb://", 6) == 0)
   {
    /*
@@ -794,6 +784,7 @@ open_device(const char *uri)		/* I - Device URI */
     return (-1);
   }
 #endif /* __linux */
+    return (open(uri + 4, O_RDWR | O_EXCL));
   else
   {
     errno = ENODEV;
