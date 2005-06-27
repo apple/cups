@@ -64,6 +64,8 @@ VAR char		*ConfigurationFile	VALUE(NULL),
 					/* Root directory for scheduler */
 			*ServerBin		VALUE(NULL),
 					/* Root directory for binaries */
+			*StateDir		VALUE(NULL),
+					/* Root directory for state data */
 			*RequestRoot		VALUE(NULL),
 					/* Directory for request files */
 			*DocumentRoot		VALUE(NULL);

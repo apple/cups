@@ -151,6 +151,7 @@ static var_t	variables[] =
 #endif /* HAVE_SSL */
   { "ServerName",		&ServerName,		VAR_STRING },
   { "ServerRoot",		&ServerRoot,		VAR_STRING },
+  { "StateDir",			&StateDir,		VAR_STRING },
   { "TempDir",			&TempDir,		VAR_STRING },
   { "Timeout",			&Timeout,		VAR_INTEGER }
 };
@@ -287,6 +288,7 @@ ReadConfiguration(void)
   SetString(&FontPath, CUPS_FONTPATH);
   SetString(&RemoteRoot, "remroot");
   SetString(&ServerHeader, "CUPS/1.1");
+  SetString(&StateDir, CUPS_STATEDIR);
 
   strlcpy(temp, ConfigurationFile, sizeof(temp));
   if ((slash = strrchr(temp, '/')) != NULL)
@@ -520,16 +522,19 @@ ReadConfiguration(void)
 #endif /* HAVE_SSL */
 
  /*
-  * Make sure that ServerRoot and the config files are owned and
+  * Make sure that directories and config files are owned and
   * writable by the user and group in the cupsd.conf file...
   */
 
-  chown(ServerRoot, RunUser, Group);
-  chmod(ServerRoot, 0775);
+  chown(StateDir, RunUser, Group);
+  chmod(StateDir, 0775);
 
-  snprintf(temp, sizeof(temp), "%s/certs", ServerRoot);
+  snprintf(temp, sizeof(temp), "%s/certs", StateDir);
   chown(temp, RunUser, Group);
   chmod(temp, 0711);
+
+  chown(ServerRoot, RunUser, Group);
+  chmod(ServerRoot, 0775);
 
   snprintf(temp, sizeof(temp), "%s/ppd", ServerRoot);
   chown(temp, RunUser, Group);

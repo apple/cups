@@ -783,8 +783,9 @@ open_device(const char *uri)		/* I - Device URI */
 
     return (-1);
   }
-#endif /* __linux */
+#else
     return (open(uri + 4, O_RDWR | O_EXCL));
+#endif /* __linux */
   else
   {
     errno = ENODEV;

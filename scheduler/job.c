@@ -1361,6 +1361,7 @@ StartJob(int       id,			/* I - Job ID */
 		class_name[255],	/* CLASS environment variable */
 		printer_name[255],	/* PRINTER environment variable */
 		root[1024],		/* CUPS_SERVERROOT environment variable */
+		cups_statedir[1024],	/* CUPS_STATEDIR environment variable */
 		cache[255],		/* RIP_MAX_CACHE environment variable */
 		tmpdir[1024],		/* TMPDIR environment variable */
 		ld_library_path[1024],	/* LD_LIBRARY_PATH environment variable */
@@ -1876,6 +1877,7 @@ StartJob(int       id,			/* I - Job ID */
   snprintf(printer_name, sizeof(printer_name), "PRINTER=%s", printer->name);
   snprintf(cache, sizeof(cache), "RIP_MAX_CACHE=%s", RIPCache);
   snprintf(root, sizeof(root), "CUPS_SERVERROOT=%s", ServerRoot);
+  snprintf(cups_statedir, sizeof(cups_statedir), "CUPS_STATEDIR=%s", StateDir);
   snprintf(tmpdir, sizeof(tmpdir), "TMPDIR=%s", TempDir);
   snprintf(datadir, sizeof(datadir), "CUPS_DATADIR=%s", DataDir);
   snprintf(fontpath, sizeof(fontpath), "CUPS_FONTPATH=%s", FontPath);
@@ -1892,6 +1894,7 @@ StartJob(int       id,			/* I - Job ID */
     envp[envc ++] = TZ;
   envp[envc ++] = ppd;
   envp[envc ++] = root;
+  envp[envc ++] = cups_statedir;
   envp[envc ++] = cache;
   envp[envc ++] = tmpdir;
   envp[envc ++] = content_type;

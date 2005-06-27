@@ -180,7 +180,7 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
   FILE		*fp;			/* Certificate file */
   char		filename[1024],		/* Certificate filename */
 		certificate[33];	/* Certificate string */
-  const char	*root;			/* Server root directory */
+  const char	*state;			/* Server state directory */
 
 
   DEBUG_printf(("cups_local_auth(http=%p) hostaddr=%08x, hostname=\"%s\"\n",
@@ -202,17 +202,17 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
   * try the root certificate...
   */
 
-  if ((root = getenv("CUPS_SERVERROOT")) == NULL)
-    root = CUPS_SERVERROOT;
+  if ((state = getenv("CUPS_STATEDIR")) == NULL)
+    state = CUPS_STATEDIR;
 
   pid = getpid();
-  snprintf(filename, sizeof(filename), "%s/certs/%d", root, pid);
+  snprintf(filename, sizeof(filename), "%s/certs/%d", state, pid);
   if ((fp = fopen(filename, "r")) == NULL && pid > 0)
   {
     DEBUG_printf(("cups_local_auth: Unable to open file %s: %s\n",
                   filename, strerror(errno)));
 
-    snprintf(filename, sizeof(filename), "%s/certs/0", root);
+    snprintf(filename, sizeof(filename), "%s/certs/0", state);
     fp = fopen(filename, "r");
   }
 

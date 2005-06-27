@@ -2907,6 +2907,7 @@ pipe_command(client_t *con,		/* I - Client connection */
 		content_type[1024],	/* CONTENT_TYPE environment variable */
 		cups_datadir[1024],	/* CUPS_DATADIR environment variable */
 		cups_serverroot[1024],	/* CUPS_SERVERROOT environment variable */
+		cups_statedir[1024],	/* CUPS_STATEDIR environment variable */
 		http_cookie[1024],	/* HTTP_COOKIE environment variable */
 		http_user_agent[1024],	/* HTTP_USER_AGENT environment variable */
 		ipp_port[1024],		/* IPP_PORT environment variable */
@@ -3107,6 +3108,7 @@ pipe_command(client_t *con,		/* I - Client connection */
   snprintf(tmpdir, sizeof(tmpdir), "TMPDIR=%s", TempDir);
   snprintf(cups_datadir, sizeof(cups_datadir), "CUPS_DATADIR=%s", DataDir);
   snprintf(cups_serverroot, sizeof(cups_serverroot), "CUPS_SERVERROOT=%s", ServerRoot);
+  snprintf(cups_statedir, sizeof(cups_statedir), "CUPS_STATEDIR=%s", StateDir);
 
   envc = 0;
 
@@ -3133,6 +3135,7 @@ pipe_command(client_t *con,		/* I - Client connection */
   envp[envc ++] = tmpdir;
   envp[envc ++] = cups_datadir;
   envp[envc ++] = cups_serverroot;
+  envp[envc ++] = cups_statedir;
 
   if (getenv("VG_ARGS") != NULL)
   {

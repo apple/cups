@@ -160,9 +160,11 @@ AC_SUBST(INITDDIR)
 
 dnl Setup default locations...
 CUPS_SERVERROOT="$sysconfdir/cups"
+CUPS_STATEDIR="$localstatedir/run/cups"
 CUPS_REQUESTS="$localstatedir/spool/cups"
 
 AC_DEFINE_UNQUOTED(CUPS_SERVERROOT, "$sysconfdir/cups")
+AC_DEFINE_UNQUOTED(CUPS_STATEDIR, "$localstatedir/run/cups")
 AC_DEFINE_UNQUOTED(CUPS_REQUESTS, "$localstatedir/spool/cups")
 
 if test x$logdir = x; then
@@ -192,6 +194,7 @@ esac
 AC_SUBST(INSTALL_SYSV)
 AC_SUBST(CUPS_SERVERROOT)
 AC_SUBST(CUPS_SERVERBIN)
+AC_SUBST(CUPS_STATEDIR)
 AC_SUBST(CUPS_LOGDIR)
 AC_SUBST(CUPS_REQUESTS)
 

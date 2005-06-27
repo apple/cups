@@ -81,7 +81,7 @@ AddCert(int        pid,			/* I - Process ID */
   * (or root and SystemGroup for PID == 0)...
   */
 
-  snprintf(filename, sizeof(filename), "%s/certs/%d", ServerRoot, pid);
+  snprintf(filename, sizeof(filename), "%s/certs/%d", StateDir, pid);
   unlink(filename);
 
   if ((fd = open(filename, O_WRONLY | O_CREAT | O_EXCL, 0400)) < 0)
@@ -169,7 +169,7 @@ DeleteCert(int pid)			/* I - Process ID */
       * Delete the file and return...
       */
 
-      snprintf(filename, sizeof(filename), "%s/certs/%d", ServerRoot, pid);
+      snprintf(filename, sizeof(filename), "%s/certs/%d", StateDir, pid);
       if (unlink(filename))
 	LogMessage(L_ERROR, "DeleteCert: Unable to remove %s!\n", filename);
 
@@ -200,7 +200,7 @@ DeleteAllCerts(void)
     * Delete the file...
     */
 
-    snprintf(filename, sizeof(filename), "%s/certs/%d", ServerRoot, cert->pid);
+    snprintf(filename, sizeof(filename), "%s/certs/%d", StateDir, cert->pid);
     if (unlink(filename))
       LogMessage(L_ERROR, "DeleteAllCerts: Unable to remove %s!\n", filename);
 

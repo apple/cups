@@ -3,6 +3,9 @@ CHANGES.txt - 06/26/2005
 
 CHANGES IN CUPS V1.2.0b1
 
+	- Local authentication certificates are now stored in
+	  /var/run/cups/certs by default instead of
+	  /etc/cups/certs (STR #1211)
 	- Backends now use "&" to separate options in device
 	  URIs; "+" is still recognized but is deprecated (STR
 	  #842)

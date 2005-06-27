@@ -243,6 +243,7 @@ Printcap
 Listen 127.0.0.1:$port
 User $user
 ServerRoot /tmp/$user
+StateDir /tmp/$user
 ServerBin /tmp/$user/bin
 DataDir /tmp/$user/share
 FontPath /tmp/$user/share/fonts
