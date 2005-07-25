@@ -26,7 +26,7 @@
 #  define _CUPS_MIME_H_
 
 #  include <cups/ipp.h>
-#  include "file.h"
+#  include <cups/file.h>
 
 
 /*

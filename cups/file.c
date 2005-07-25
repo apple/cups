@@ -28,21 +28,27 @@
  *
  * Contents:
  *
- *   cupsFileClose()   - Close a CUPS file.
- *   cupsFileFlush()   - Flush pending output.
- *   cupsFileGetChar() - Get a single character from a file.
- *   cupsFileGetConf() - Get a line from a configuration file...
- *   cupsFileGets()    - Get a CR and/or LF-terminated line.
- *   cupsFileOpen()    - Open a CUPS file.
- *   cupsFilePrintf()  - Write a formatted string.
- *   cupsFilePutChar() - Write a character.
- *   cupsFilePuts()    - Write a string.
- *   cupsFileRead()    - Read from a file.
- *   cupsFileSeek()    - Seek in a file.
- *   cupsFileWrite()   - Write to a file.
- *   cups_fill()       - Fill the input buffer...
- *   cups_read()       - Read from a file descriptor.
- *   cups_write()      - Write to a file descriptor.
+ *   cupsFileClose()       - Close a CUPS file.
+ *   cupsFileCompression() - Return whether a file is compressed.
+ *   cupsFileEOF()         - Return the end-of-file status.
+ *   cupsFileFlush()       - Flush pending output.
+ *   cupsFileGetChar()     - Get a single character from a file.
+ *   cupsFileGetConf()     - Get a line from a configuration file...
+ *   cupsFileGets()        - Get a CR and/or LF-terminated line.
+ *   cupsFileNumber()      - Return the file descriptor associated with a CUPS file.
+ *   cupsFileOpen()        - Open a CUPS file.
+ *   cupsFileOpenFd()      - Open a CUPS file using a file descriptor.
+ *   cupsFilePrintf()      - Write a formatted string.
+ *   cupsFilePutChar()     - Write a character.
+ *   cupsFilePuts()        - Write a string.
+ *   cupsFileRead()        - Read from a file.
+ *   cupsFileRewind()      - Rewind a file.
+ *   cupsFileSeek()        - Seek in a file.
+ *   cupsFileTell()        - Return the current file position.
+ *   cupsFileWrite()       - Write to a file.
+ *   cups_fill()           - Fill the input buffer...
+ *   cups_read()           - Read from a file descriptor.
+ *   cups_write()          - Write to a file descriptor.
  */
 
 /*
@@ -55,15 +61,20 @@
 #include <cups/string.h>
 #include <errno.h>
 #include <cups/debug.h>
+#include <sys/types.h>
 
 #ifdef WIN32
 #  include <io.h>
+#  include <winsock2.h>
 #else
 #  include <unistd.h>
 #  include <fcntl.h>
+#  include <sys/socket.h>
+#  define closesocket(f) close(f)
 #endif /* WIN32 */
 
-#include "file.h"
+#include "file-private.h"
+#include "http-private.h"
 
 
 /*
@@ -71,8 +82,8 @@
  */
 
 static ssize_t	cups_fill(cups_file_t *fp);
-static ssize_t	cups_read(int fd, char *buf, size_t bytes);
-static ssize_t	cups_write(int fd, const char *buf, size_t bytes);
+static ssize_t	cups_read(cups_file_t *fp, char *buf, size_t bytes);
+static ssize_t	cups_write(cups_file_t *fp, const char *buf, size_t bytes);
 
 
 /*
@@ -83,6 +94,7 @@ int					/* O - 0 on success, -1 on error */
 cupsFileClose(cups_file_t *fp)		/* I - CUPS file */
 {
   int	fd;				/* File descriptor */
+  char	mode;				/* Open mode */
 
 
   DEBUG_printf(("cupsFileClose(fp=%p)\n", fp));
@@ -110,7 +122,8 @@ cupsFileClose(cups_file_t *fp)		/* I - CUPS file */
   * Save the file descriptor we used and free memory...
   */
 
-  fd = fp->fd;
+  fd   = fp->fd;
+  mode = fp->mode;
 
   free(fp);
 
@@ -118,7 +131,32 @@ cupsFileClose(cups_file_t *fp)		/* I - CUPS file */
   * Close the file, returning the close status...
   */
 
-  return (close(fd));
+  if (mode == 's')
+    return (closesocket(fd));
+  else
+    return (close(fd));
+}
+
+
+/*
+ * 'cupsFileCompression()' - Return whether a file is compressed.
+ */
+
+int					/* O - CUPS_FILE_NONE or CUPS_FILE_GZIP */
+cupsFileCompression(cups_file_t *fp)	/* I - CUPS file */
+{
+  return (fp->compressed);
+}
+
+
+/*
+ * 'cupsFileEOF()' - Return the end-of-file status.
+ */
+
+int					/* O - 1 on EOF, 0 otherwise */
+cupsFileEOF(cups_file_t *fp)		/* I - CUPS file */
+{
+  return (fp->eof);
 }
 
 
@@ -148,7 +186,7 @@ cupsFileFlush(cups_file_t *fp)		/* I - CUPS file */
 
   if (bytes > 0)
   {
-    if (cups_write(fp->fd, fp->buf, bytes) < bytes)
+    if (cups_write(fp, fp->buf, bytes) < bytes)
       return (-1);
 
     fp->ptr = fp->buf;
@@ -169,7 +207,7 @@ cupsFileGetChar(cups_file_t *fp)	/* I - CUPS file */
   * Range check input...
   */
 
-  if (!fp || fp->mode != 'r')
+  if (!fp || (fp->mode != 'r' && fp->mode != 's'))
     return (-1);
 
  /*
@@ -206,7 +244,8 @@ cupsFileGetConf(cups_file_t *fp,	/* I  - CUPS file */
   * Range check input...
   */
 
-  if (!fp || fp->mode != 'r' || !buf || buflen < 2 || !value)
+  if (!fp || (fp->mode != 'r' && fp->mode != 's') ||
+      !buf || buflen < 2 || !value)
   {
     if (value)
       *value = NULL;
@@ -319,7 +358,7 @@ cupsFileGets(cups_file_t *fp,		/* I - CUPS file */
   * Range check input...
   */
 
-  if (!fp || fp->mode != 'r' || !buf || buflen < 2)
+  if (!fp || (fp->mode != 'r' && fp->mode != 's') || !buf || buflen < 2)
     return (NULL);
 
  /*
@@ -373,6 +412,17 @@ cupsFileGets(cups_file_t *fp,		/* I - CUPS file */
 
 
 /*
+ * 'cupsFileNumber()' - Return the file descriptor associated with a CUPS file.
+ */
+
+int					/* O - File descriptor */
+cupsFileNumber(cups_file_t *fp)		/* I - CUPS file */
+{
+  return (fp->fd);
+}
+
+
+/*
  * 'cupsFileOpen()' - Open a CUPS file.
  */
 
@@ -381,14 +431,158 @@ cupsFileOpen(const char *filename,	/* I - Name of file */
              const char *mode)		/* I - Open mode */
 {
   cups_file_t	*fp;			/* New CUPS file */
-  int		o;			/* Open mode bits */
+  int		fd;			/* File descriptor */
+  char		hostname[1024],		/* Hostname */
+		portname[64];		/* Port "name" (number or service) */
+  int		port;			/* Port number */
+  struct servent *service;		/* Service */
+  int		i;			/* Looping var */
+  int		val;			/* Socket value */
+  struct hostent *hostaddr;		/* Host address data */
+  http_addr_t	sockaddr;		/* Socket address */
 
 
  /*
   * Range check input...
   */
 
-  if (!filename || !mode || (*mode != 'r' && *mode != 'w' && *mode != 'a'))
+  if (!filename || !mode ||
+      (*mode != 'r' && *mode != 'w' && *mode != 'a' && *mode != 's'))
+    return (NULL);
+
+ /*
+  * Open the file...
+  */
+
+  switch (*mode)
+  {
+    case 'a' : /* Append file */
+        fd = open(filename, O_RDWR | O_CREAT | O_APPEND, 0666);
+        break;
+
+    case 'r' : /* Read file */
+	fd = open(filename, O_RDONLY, 0);
+	break;
+
+    case 'w' : /* Write file */
+        fd = open(filename, O_WRONLY | O_TRUNC | O_CREAT, 0666);
+        break;
+
+    case 's' : /* Read/write socket */
+        if (sscanf(filename, "%1023[^:]:%63s", hostname, portname) != 2)
+	  return (NULL);
+
+        if ((hostaddr = httpGetHostByName(hostname)) == NULL)
+          return (NULL);
+
+        if (isdigit(portname[0] & 255))
+	  port = atoi(portname);
+	else if ((service = getservbyname(portname, NULL)) != NULL)
+	  port = ntohs(service->s_port);
+	else
+	  return (NULL);
+
+	for (i = 0; hostaddr->h_addr_list[i]; i ++)
+	{
+	 /*
+	  * Load the address...
+	  */
+
+	  httpAddrLoad(hostaddr, port, i, &sockaddr);
+
+	 /*
+	  * Create a socket...
+	  */
+
+	  if ((fd = socket(sockaddr.addr.sa_family, SOCK_STREAM, 0)) < 0)
+	    continue;
+
+	  val = 1;
+	  setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &val, sizeof(val));
+
+#ifdef SO_REUSEPORT
+	  val = 1;
+	  setsockopt(fd, SOL_SOCKET, SO_REUSEPORT, &val, sizeof(val));
+#endif /* SO_REUSEPORT */
+
+	 /*
+	  * Using TCP_NODELAY improves responsiveness, especially on systems
+	  * with a slow loopback interface...  Since we write large buffers
+	  * when sending print files and requests, there shouldn't be any
+	  * performance penalty for this...
+	  */
+
+	  val = 1;
+	  setsockopt(fd, IPPROTO_TCP, TCP_NODELAY, &val, sizeof(val)); 
+
+	 /*
+	  * Connect to the server...
+	  */
+
+#ifdef AF_INET6
+	  if (sockaddr.addr.sa_family == AF_INET6)
+	  {
+	    if (connect(fd, (struct sockaddr *)&sockaddr,
+			sizeof(sockaddr.ipv6)) < 0)
+	    {
+	      fd = -1;
+	      continue;
+	    }
+	  }
+	  else
+#endif /* AF_INET6 */
+	  if (connect(fd, (struct sockaddr *)&sockaddr,
+		      sizeof(sockaddr.ipv4)) < 0)
+	  {
+	    fd = -1;
+	    continue;
+	  }
+	}
+	break;
+
+    default : /* Remove bogus compiler warning... */
+        return (NULL);
+  }
+
+  if (fd < 0)
+    return (NULL);
+
+ /*
+  * Create the CUPS file structure...
+  */
+
+  if ((fp = cupsFileOpenFd(fd, mode)) == NULL)
+  {
+    if (*mode == 's')
+      closesocket(fd);
+    else
+      close(fd);
+  }
+
+ /*
+  * Return it...
+  */
+
+  return (fp);
+}
+
+/*
+ * 'cupsFileOpenFd()' - Open a CUPS file using a file descriptor.
+ */
+
+cups_file_t *				/* O - CUPS file or NULL */
+cupsFileOpenFd(int        fd,		/* I - File descriptor */
+	       const char *mode)	/* I - Open mode */
+{
+  cups_file_t	*fp;			/* New CUPS file */
+
+
+ /*
+  * Range check input...
+  */
+
+  if (fd < 0 || !mode ||
+      (*mode != 'r' && *mode != 'w' && *mode != 'a' && *mode != 's'))
     return (NULL);
 
  /*
@@ -404,34 +598,24 @@ cupsFileOpen(const char *filename,	/* I - Name of file */
 
   switch (*mode)
   {
+    case 'w' :
     case 'a' :
-        o = O_RDWR | O_CREAT | O_APPEND;
 	fp->mode = 'w';
         break;
 
     case 'r' :
-	o        = O_RDONLY;
 	fp->mode = 'r';
 	break;
 
-    case 'w' :
-        o = O_WRONLY | O_TRUNC | O_CREAT;
-	fp->mode = 'w';
-        break;
+    case 's' :
+        fp->mode = 's';
+	break;
 
     default : /* Remove bogus compiler warning... */
         return (NULL);
   }
 
-  if ((fp->fd = open(filename, o, 0666)) < 0)
-  {
-   /*
-    * Can't open file!
-    */
-
-    free(fp);
-    return (NULL);
-  }
+  fp->fd = fd;
 
  /*
   * Don't pass this file to child processes...
@@ -444,7 +628,7 @@ cupsFileOpen(const char *filename,	/* I - Name of file */
   else
     fp->pos = 0;
 
-  if (*mode != 'r')
+  if (*mode != 'r' && *mode != 's')
   {
     fp->ptr = fp->buf;
     fp->end = fp->buf + sizeof(fp->buf);
@@ -468,12 +652,15 @@ cupsFilePrintf(cups_file_t *fp,		/* I - CUPS file */
   char		buf[2048];		/* Formatted text */
 
 
-  if (!fp || !format || fp->mode != 'w')
+  if (!fp || !format || (fp->mode != 'w' && fp->mode != 's'))
     return (-1);
 
   va_start(ap, format);
   bytes = vsnprintf(buf, sizeof(buf), format, ap);
   va_end(ap);
+
+  if (fp->mode == 's')
+    return (cups_write(fp, buf, bytes));
 
   if ((fp->ptr + bytes) > fp->end)
     if (cupsFileFlush(fp))
@@ -482,7 +669,7 @@ cupsFilePrintf(cups_file_t *fp,		/* I - CUPS file */
   fp->pos += bytes;
 
   if (bytes > sizeof(fp->buf))
-    return (cups_write(fp->fd, buf, bytes));
+    return (cups_write(fp, buf, bytes));
   else
   {
     memcpy(fp->ptr, buf, bytes);
@@ -504,18 +691,36 @@ cupsFilePutChar(cups_file_t *fp,	/* I - CUPS file */
   * Range check input...
   */
 
-  if (!fp || fp->mode != 'w')
+  if (!fp || (fp->mode != 'w' && fp->mode != 's'))
     return (-1);
 
- /*
-  * Buffer it up...
-  */
+  if (fp->mode == 's')
+  {
+   /*
+    * Send character immediately over socket...
+    */
 
-  if (fp->ptr >= fp->end)
-    if (cupsFileFlush(fp))
+    char ch;				/* Output character */
+
+
+    ch = c;
+
+    if (send(fp->fd, &ch, 1, 0) < 1)
       return (-1);
+  }
+  else
+  {
+   /*
+    * Buffer it up...
+    */
 
-  *(fp->ptr) ++ = c;
+    if (fp->ptr >= fp->end)
+      if (cupsFileFlush(fp))
+	return (-1);
+
+    *(fp->ptr) ++ = c;
+  }
+
   fp->pos ++;
 
   return (0);
@@ -537,7 +742,7 @@ cupsFilePuts(cups_file_t *fp,		/* I - CUPS file */
   * Range check input...
   */
 
-  if (!fp || !s || fp->mode != 'w')
+  if (!fp || !s || (fp->mode != 'w' && fp->mode != 's'))
     return (-1);
 
  /*
@@ -546,6 +751,16 @@ cupsFilePuts(cups_file_t *fp,		/* I - CUPS file */
 
   bytes = strlen(s);
 
+  if (fp->mode == 's')
+  {
+    if (cups_write(fp, s, bytes) < 0)
+      return (-1);
+
+    fp->pos += bytes;
+
+    return (bytes);
+  }
+
   if ((fp->ptr + bytes) > fp->end)
     if (cupsFileFlush(fp))
       return (-1);
@@ -553,7 +768,7 @@ cupsFilePuts(cups_file_t *fp,		/* I - CUPS file */
   fp->pos += bytes;
 
   if (bytes > sizeof(fp->buf))
-    return (cups_write(fp->fd, s, bytes));
+    return (cups_write(fp, s, bytes));
   else
   {
     memcpy(fp->ptr, s, bytes);
@@ -583,7 +798,7 @@ cupsFileRead(cups_file_t *fp,		/* I - CUPS file */
   * Range check input...
   */
 
-  if (!fp || !buf || bytes < 0 || fp->mode != 'r')
+  if (!fp || !buf || bytes < 0 || (fp->mode != 'r' && fp->mode != 's'))
     return (-1);
 
   if (bytes == 0)
@@ -630,6 +845,17 @@ cupsFileRead(cups_file_t *fp,		/* I - CUPS file */
   DEBUG_printf(("    total=%d\n", total));
 
   return (total);
+}
+
+
+/*
+ * 'cupsFileRewind()' - Rewind a file.
+ */
+
+off_t					/* O - New file position or -1 */
+cupsFileRewind(cups_file_t *fp)		/* I - CUPS file */
+{
+  return (cupsFileSeek(fp, 0L));
 }
 
 
@@ -735,6 +961,17 @@ cupsFileSeek(cups_file_t *fp,		/* I - CUPS file */
 
 
 /*
+ * 'cupsFileTell()' - Return the current file position.
+ */
+
+off_t					/* O - File position */
+cupsFileTell(cups_file_t *fp)		/* I - CUPS file */
+{
+  return (fp->pos);
+}
+
+
+/*
  * 'cupsFileWrite()' - Write to a file.
  */
 
@@ -747,7 +984,7 @@ cupsFileWrite(cups_file_t *fp,		/* I - CUPS file */
   * Range check input...
   */
 
-  if (!fp || !buf || bytes < 0 || fp->mode != 'w')
+  if (!fp || !buf || bytes < 0 || (fp->mode != 'w' && fp->mode != 's'))
     return (-1);
 
   if (bytes == 0)
@@ -757,6 +994,16 @@ cupsFileWrite(cups_file_t *fp,		/* I - CUPS file */
   * Write the buffer...
   */
 
+  if (fp->mode == 's')
+  {
+    if (cups_write(fp, buf, bytes) < 0)
+      return (-1);
+
+    fp->pos += bytes;
+
+    return (bytes);
+  }
+
   if ((fp->ptr + bytes) > fp->end)
     if (cupsFileFlush(fp))
       return (-1);
@@ -764,7 +1011,7 @@ cupsFileWrite(cups_file_t *fp,		/* I - CUPS file */
   fp->pos += bytes;
 
   if (bytes > sizeof(fp->buf))
-    return (cups_write(fp->fd, buf, bytes));
+    return (cups_write(fp, buf, bytes));
   else
   {
     memcpy(fp->ptr, buf, bytes);
@@ -819,7 +1066,7 @@ cups_fill(cups_file_t *fp)		/* I - CUPS file */
     * file...
     */
 
-    if ((bytes = cups_read(fp->fd, (char *)fp->cbuf, sizeof(fp->cbuf))) < 0)
+    if ((bytes = cups_read(fp, (char *)fp->cbuf, sizeof(fp->cbuf))) < 0)
     {
      /*
       * Can't read from file!
@@ -971,7 +1218,7 @@ cups_fill(cups_file_t *fp)		/* I - CUPS file */
 
     if (fp->stream.avail_in == 0)
     {
-      if ((bytes = cups_read(fp->fd, (char *)fp->cbuf, sizeof(fp->cbuf))) <= 0)
+      if ((bytes = cups_read(fp, (char *)fp->cbuf, sizeof(fp->cbuf))) <= 0)
         return (-1);
 
       fp->stream.next_in  = fp->cbuf;
@@ -1012,7 +1259,7 @@ cups_fill(cups_file_t *fp)		/* I - CUPS file */
   * Read a buffer's full of data...
   */
 
-  if ((bytes = cups_read(fp->fd, fp->buf, sizeof(fp->buf))) <= 0)
+  if ((bytes = cups_read(fp, fp->buf, sizeof(fp->buf))) <= 0)
   {
    /*
     * Can't read from file!
@@ -1042,9 +1289,9 @@ cups_fill(cups_file_t *fp)		/* I - CUPS file */
  */
 
 ssize_t					/* O - Number of bytes read or -1 */
-cups_read(int    fd,			/* I - File descriptor */
-          char   *buf,			/* I - Buffer */
-	  size_t bytes)			/* I - Number bytes */
+cups_read(cups_file_t *fp,		/* I - CUPS file */
+          char        *buf,		/* I - Buffer */
+	  size_t      bytes)		/* I - Number bytes */
 {
   size_t	total;			/* Total bytes read */
 
@@ -1053,8 +1300,16 @@ cups_read(int    fd,			/* I - File descriptor */
   * Loop until we read at least 0 bytes...
   */
 
-  while ((total = read(fd, buf, bytes)) < 0)
+  for (;;)
   {
+    if (fp->mode == 's')
+      total = recv(fp->fd, buf, bytes, 0);
+    else
+      total = read(fp->fd, buf, bytes);
+
+    if (total < 0)
+      break;
+
    /*
     * Reads can be interrupted by signals and unavailable resources...
     */
@@ -1078,9 +1333,9 @@ cups_read(int    fd,			/* I - File descriptor */
  */
 
 ssize_t					/* O - Number of bytes written or -1 */
-cups_write(int        fd,		/* I - File descriptor */
-           const char *buf,		/* I - Buffer */
-	   size_t     bytes)		/* I - Number bytes */
+cups_write(cups_file_t *fp,		/* I - CUPS file */
+           const char  *buf,		/* I - Buffer */
+	   size_t      bytes)		/* I - Number bytes */
 {
   size_t	total,			/* Total bytes written */
 		count;			/* Count this time */
@@ -1093,7 +1348,12 @@ cups_write(int        fd,		/* I - File descriptor */
   total = 0;
   while (bytes > 0)
   {
-    if ((count = write(fd, buf, bytes)) < 0)
+    if (fp->mode == 's')
+      count = send(fp->fd, buf, bytes, 0);
+    else
+      count = write(fp->fd, buf, bytes);
+
+    if (count < 0)
     {
      /*
       * Writes can be interrupted by signals and unavailable resources...

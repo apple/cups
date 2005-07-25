@@ -30,11 +30,11 @@ include ../Makedefs
 # Object files...
 #
 
-LIBOBJS	=	attr.o auth.o dest.o emit.o encode.o extended.o getputfile.o \
-		http.o http-addr.o http-support.o ipp.o ipp-support.o \
-		langprintf.o language.o mark.o md5.o md5passwd.o normalize.o \
-		options.o page.o ppd.o snprintf.o string.o tempfile.o \
-		transcode.o usersys.o util.o
+LIBOBJS	=	attr.o auth.o dest.o emit.o encode.o extended.o \
+		file.o getputfile.o http.o http-addr.o http-support.o \
+		ipp.o ipp-support.o langprintf.o language.o mark.o \
+		md5.o md5passwd.o normalize.o options.o page.o ppd.o \
+		snprintf.o string.o tempfile.o transcode.o usersys.o util.o
 OBJS	=	$(LIBOBJS) testhttp.o testi18n.o testipp.o testlang.o \
 		php_cups_wrap.o
 
@@ -112,7 +112,7 @@ installhdrs:
 
 libcups.so.2 libcups.sl.2:	$(LIBOBJS)
 	echo Linking $@...
-	$(DSO) $(DSOFLAGS) -o $@ $(LIBOBJS) $(SSLLIBS) $(COMMONLIBS)
+	$(DSO) $(DSOFLAGS) -o $@ $(LIBOBJS) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
 	$(RM) `basename $@ .2`
 	$(LN) $@ `basename $@ .2`
 
@@ -127,7 +127,7 @@ libcups.2.dylib:	$(LIBOBJS)
 		-install_name $(libdir)/libcups.dylib \
 		-current_version 2.7.0 \
 		-compatibility_version 2.0.0 \
-		$(LIBOBJS) $(SSLLIBS) $(COMMONLIBS)
+		$(LIBOBJS) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
 	$(RM) libcups.dylib
 	$(LN) $@ libcups.dylib
 
@@ -142,7 +142,7 @@ libcups_s.a:	$(LIBOBJS)
 	(echo _ipp_add_attr; echo _ipp_free_attr; \
 	 echo _cups_md5_init; echo _cups_md5_append; \
 	 echo _cups_md5_finish) >libcups_s.exp
-	$(DSO) $(DSOFLAGS) -Wl,-bexport:libcups_s.exp -o libcups_s.o $(LIBOBJS) $(SSLLIBS) $(COMMONLIBS) -lm
+	$(DSO) $(DSOFLAGS) -Wl,-bexport:libcups_s.exp -o libcups_s.o $(LIBOBJS) $(SSLLIBS) $(COMMONLIBS) $(LIBZ) -lm
 	$(RM) $@
 	$(AR) $(ARFLAGS) $@ libcups_s.o
 
@@ -154,7 +154,7 @@ libcups_s.a:	$(LIBOBJS)
 libcups.la:    $(LIBOBJS)
 	echo Linking $@...
 	$(CC) $(DSOFLAGS) -o $@ $(LIBOBJS:.o=.lo) -rpath $(LIBDIR) \
-		-version-info 2:7 $(SSLLIBS) $(COMMONLIBS)
+		-version-info 2:7 $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
 
 
 #

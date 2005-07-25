@@ -1051,7 +1051,8 @@ StartPolling(void)
 
   if (NumPolled == 0)
   {
-    PollPipe = -1;
+    PollPipe         = -1;
+    PollStatusBuffer = NULL;
     return;
   }
 
@@ -1083,11 +1084,13 @@ StartPolling(void)
   {
     LogMessage(L_ERROR, "Unable to create polling status pipes - %s.",
 	       strerror(errno));
-    PollPipe = -1;
+    PollPipe         = -1;
+    PollStatusBuffer = NULL;
     return;
   }
 
-  PollPipe = statusfds[0];
+  PollPipe         = statusfds[0];
+  PollStatusBuffer = cupsdStatBufNew(PollPipe, "[Poll]");
 
  /*
   * Run each polling daemon, redirecting stderr to the polling pipe...
@@ -1183,13 +1186,15 @@ StopPolling(void)
 
   if (PollPipe >= 0)
   {
+    cupsdStatBufDelete(PollStatusBuffer);
     close(PollPipe);
 
     LogMessage(L_DEBUG2, "StopPolling: removing fd %d from InputSet.",
                PollPipe);
     FD_CLR(PollPipe, InputSet);
 
-    PollPipe = -1;
+    PollPipe         = -1;
+    PollStatusBuffer = NULL;
   }
 
   for (i = 0, poll = Polled; i < NumPolled; i ++, poll ++)
@@ -1477,61 +1482,17 @@ UpdateCUPSBrowse(void)
 void
 UpdatePolling(void)
 {
-  int		bytes;		/* Number of bytes read */
-  char		*lineptr;	/* Pointer to end of line in buffer */
-  static int	bufused = 0;	/* Number of bytes used in buffer */
-  static char	buffer[1024];	/* Status buffer */
+  char		*ptr,			/* Pointer to end of line in buffer */
+		message[1024];		/* Pointer to message text */
+  int		loglevel;		/* Log level for message */
 
 
-  if ((bytes = read(PollPipe, buffer + bufused,
-                    sizeof(buffer) - bufused - 1)) > 0)
-  {
-    bufused += bytes;
-    buffer[bufused] = '\0';
-    lineptr = strchr(buffer, '\n');
-  }
-  else if (bytes < 0 && errno == EINTR)
-    return;
-  else
-  {
-    lineptr    = buffer + bufused;
-    lineptr[1] = 0;
-  }
+  while ((ptr = cupsdStatBufUpdate(PollStatusBuffer, &loglevel,
+                                   message, sizeof(message))) != NULL)
+    if (!strchr(PollStatusBuffer->buffer, '\n'))
+      break;
 
-  if (bytes == 0 && bufused == 0)
-    lineptr = NULL;
-
-  while (lineptr != NULL)
-  {
-   /*
-    * Terminate each line and process it...
-    */
-
-    *lineptr++ = '\0';
-
-    if (!strncmp(buffer, "ERROR: ", 7))
-      LogMessage(L_ERROR, "%s", buffer + 7);
-    else if (!strncmp(buffer, "DEBUG: ", 7))
-      LogMessage(L_DEBUG, "%s", buffer + 7);
-    else if (!strncmp(buffer, "DEBUG2: ", 8))
-      LogMessage(L_DEBUG2, "%s", buffer + 8);
-    else
-      LogMessage(L_DEBUG, "%s", buffer);
-
-   /*
-    * Copy over the buffer data we've used up...
-    */
-
-    cups_strcpy(buffer, lineptr);
-    bufused -= lineptr - buffer;
-
-    if (bufused < 0)
-      bufused = 0;
-
-    lineptr = strchr(buffer, '\n');
-  }
-
-  if (bytes <= 0)
+  if (ptr == NULL)
   {
    /*
     * All polling processes have died; stop polling...

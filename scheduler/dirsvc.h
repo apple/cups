@@ -118,6 +118,8 @@ VAR dirsvc_poll_t	*Polled		VALUE(NULL);
 					/* Polled servers */
 VAR int			PollPipe	VALUE(0);
 					/* Status pipe for pollers */
+VAR cupsd_statbuf_t	*PollStatusBuffer VALUE(NULL);
+					/* Status buffer for pollers */
 
 #ifdef HAVE_LIBSLP
 VAR SLPHandle		BrowseSLPHandle	VALUE(NULL);

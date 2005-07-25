@@ -33,6 +33,7 @@
  *   cupsdLoadAllSubscriptions()   - Load all subscriptions from the .conf file.
  *   cupsdSaveAllSubscriptions()   - Save all subscriptions to the .conf file.
  *   cupsdSendNotification()       - Send a notification for the specified event.
+ *   cupsdStopAllNotifiers()       - Stop all notifier processes.
  *   cupsdUpdateNotifierStatus()   - Read messages from notifiers.
  *   cupsd_delete_event()          - Delete a single event...
  */
@@ -1194,12 +1195,85 @@ cupsdSendNotification(
 
 
 /*
+ * 'cupsdStopAllNotifiers()' - Stop all notifier processes.
+ */
+
+void
+cupsdStopAllNotifiers(void)
+{
+  int			i;		/* Looping var */
+  cupsd_subscription_t	*sub;		/* Current subscription */
+
+
+ /*
+  * See if we have started any notifiers...
+  */
+
+  if (!NotifierStatusBuffer)
+    return;
+
+ /*
+  * Yes, kill and processes that are left...
+  */
+
+  for (i = 0; i < NumSubscriptions; i ++)
+  {
+    sub = Subscriptions[i];
+
+    if (sub->pid)
+    {
+      cupsdEndProcess(sub->pid, 0);
+
+      close(sub->pipe);
+      sub->pipe = -1;
+    }
+  }
+
+ /*
+  * Close the status pipes...
+  */
+
+  LogMessage(L_DEBUG2, "cupsdStopAllNotifiers: Removing fd %d from InputSet...",
+	     NotifierPipes[0]);
+  FD_CLR(NotifierPipes[0], InputSet);
+
+  cupsdStatBufDelete(NotifierStatusBuffer);
+
+  close(NotifierPipes[0]);
+  close(NotifierPipes[1]);
+
+  NotifierPipes[0] = -1;
+  NotifierPipes[1] = -1;
+  NotifierStatusBuffer = NULL;
+}
+
+
+/*
  * 'cupsdUpdateNotifierStatus()' - Read messages from notifiers.
  */
 
 void
 cupsdUpdateNotiferStatus(void)
 {
+  char		*ptr,			/* Pointer to end of line in buffer */
+		message[1024];		/* Pointer to message text */
+  int		loglevel;		/* Log level for message */
+
+
+  while ((ptr = cupsdStatBufUpdate(NotifierStatusBuffer, &loglevel,
+                                   message, sizeof(message))) != NULL)
+    if (!strchr(NotifierStatusBuffer->buffer, '\n'))
+      break;
+
+  if (ptr == NULL)
+  {
+   /*
+    * Fatal error on pipe - should never happen!
+    */
+
+    LogMessage(L_CRIT, "cupsdUpdateNotifierStatus: error reading from notifier error pipe - %s",
+               strerror(errno));
+  }
 }
 
 
