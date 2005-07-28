@@ -10,70 +10,92 @@
 %%Title: Test Page
 %%EndComments
 %%BeginProlog
-%%BeginResource procset testprint 1.1 0
+%%BeginResource procset testprint 1.2 0
 %
 %   PostScript test page for the Common UNIX Printing System ("CUPS").
 %
 %   Copyright 1993-2005 Easy Software Products
 %
-%   These coded instructions, statements, and computer programs contain
-%   unpublished proprietary information of Easy Software Products, and
-%   are protected by Federal copyright law. They may not be disclosed
-%   to third parties or copied or duplicated in any form, in whole or
-%   in part, without the prior written consent of Easy Software Products.
+%   These coded instructions, statements, and computer programs are the
+%   property of Easy Software Products and are protected by Federal
+%   copyright law.  Distribution and use rights are outlined in the file
+%   "LICENSE.txt" which should have been included with this file.  If this
+%   file is missing or damaged please contact Easy Software Products
+%   at:
 %
-/OCTANT {			% Draw a color wheel OCTANT...
-				% (name) radius r g b OCTANT -
+%       Attn: CUPS Licensing Information
+%       Easy Software Products
+%       44141 Airport View Drive, Suite 204
+%       Hollywood, Maryland 20636 USA
+%
+%       Voice: (301) 373-9600
+%       EMail: cups-info@cups.org
+%         WWW: http://www.cups.org
+%
+/SEXTANT {			% Draw a color wheel sextant...
+				% (name) white radius r g b SEXTANT -
   % Loop through 100 shades...
   0 0.010101 0.98 {
     % Set the color...
-    3 index 1 eq		% R == 1?
-    3 index 1 eq		% G == 1?
-    3 index 1 eq		% B == 1?
-    and and {
-      0 index 4 index mul 	% R * val
-      1 index 4 index mul 	% G * val
-      2 index 4 index mul 	% B * val
+    dup 0.75 le {		% Get "white" value
+      % Start from black
+      dup 0.75 div		% val2 = val / 0.75
+
+      0 index 5 index mul 	% R = R * val2
+      1 index 5 index mul 	% G = G * val2
+      2 index 5 index mul 	% B = B * val2
+
+      4 -1 roll pop		% Discard val2
     } {
-      0 index 4 index mul 	% R * val
-      1 index neg 1 add	add	% + (1 - val)
-      1 index 4 index mul 	% G * val
-      2 index neg 1 add	add	% + (1 - val)
-      2 index 4 index mul 	% B * val
-      3 index neg 1 add	add	% + (1 - val)
+      % Fade to white
+      dup neg 1 add 4 mul	% val2 = (1 - val) * 4
+
+      0 index 5 index mul 	% R = R * val2
+      1 index neg 1 add add	% + (1 - val2)
+      1 index 5 index mul 	% G = G * val2
+      2 index neg 1 add add	% + (1 - val2)
+      2 index 5 index mul 	% B = B * val2
+      3 index neg 1 add add	% + (1 - val2)
+
+      4 -1 roll pop		% Discard val2
     } ifelse
-    setrgbcolor
+    setrgbcolor			% Set the color...
 
-    % Draw a polygon...
-    dup 5 index mul dup 0	% x1, y1
-    moveto
-    0.707106781 mul dup lineto	% x2, y2
+    % Draw the polygon...
+    newpath			% Start a new path...
+    dup 5 index mul		% r1 = radius * val
+    0 0 3 -1 roll 0 60 arc	% Draw the inner arc
 
-    0.010101 add 4 index mul dup % x3
-    0.707106781 mul dup lineto	% x3, y3
-    0 lineto			% x4, y4
-    closepath
-    fill
+    dup 0.010101 add 5 index mul% r2 = (radius + 0.010101) * val
+    0 0 3 -1 roll 60 0 arcn	% Draw the outer arc
+
+    closepath			% Close the path
+    fill			% Fill it...
+
+    pop				% Pop value...
   } for
 
   % Draw a line around the polygons...
-  pop pop pop dup
-  0 setgray
-  0 0 moveto
-  dup 0 lineto
-  0.707106781 mul dup lineto
-  closepath
-  stroke
+  pop pop pop dup		% Pop R, G, B, start
+  0 setgray			% Black
+  newpath
+  0 0 moveto			% Center
+  0 0 3 -1 roll 0 60 arc	% Arc around octant
+  closepath			% Back to center
+  stroke			% Stroke it...
 
   % Draw the label...
-  0 exch dup -9 div exch	% text offset = 0, -radius/9
-  dup 0.923879532 mul		% x = radius * cos(22.5)
-  exch 0.382683432 mul		% y = radius * cos(22.5)
-  moveto			% position label
+  dup				% Save radius
+  dup 30 cos mul		% X = radius * cos(30)
+  exch 30 sin mul		% Y = radius * sin(30)
+  moveto			% Position label
+
   gsave
-    22.5 rotate			% rotate label
-    rmoveto			% offset label
-    show			% show label
+    30 rotate			% Rotate label
+    dup 0.05 mul		% Offset to the right
+    exch -0.05 mul		% and down...
+    rmoveto			% Offset label
+    show			% Show label
   grestore
 } bind def
 /CENTER {			% Draw centered text
@@ -235,10 +257,11 @@ gsave
   pageBottom 72 mul
   translate
 
-  % Draw the color wheel...
+  % Set text font and color...
   mediumFont setfont			% Font
   0 setgray				% Color
 
+  % Draw the color wheel...
   gsave
     % Position the wheel on the left side...
     pageWidth 18 mul			% x = pageWidth * 1/4 * 72
@@ -249,14 +272,14 @@ gsave
     wheelSize
 
     % Draw the colors...
-    dup (C) exch 0 1 1 OCTANT 45 rotate
-    dup (M) exch 1 0 1 OCTANT 45 rotate
-    dup (Y) exch 1 1 0 OCTANT 45 rotate
-    dup (K) exch 0 0 0 OCTANT 45 rotate
-    dup (R) exch 1 0 0 OCTANT 45 rotate
-    dup (G) exch 0 1 0 OCTANT 45 rotate
-    dup (B) exch 0 0 1 OCTANT 45 rotate
-    (W) exch 1 1 1 OCTANT 45 rotate
+    dup (C) 3 -1 roll 0 1 1 SEXTANT 60 rotate
+    dup (M) 3 -1 roll 1 0 1 SEXTANT 60 rotate
+    dup (Y) 3 -1 roll 1 1 0 SEXTANT 60 rotate
+    dup (R) 3 -1 roll 1 0 0 SEXTANT 60 rotate
+    dup (G) 3 -1 roll 0 1 0 SEXTANT 60 rotate
+    dup (B) 3 -1 roll 0 0 1 SEXTANT 60 rotate
+
+    pop
   grestore
 
   % Label the color wheel...
@@ -264,6 +287,65 @@ gsave
   pageHeight 44 mul			% y = pageHeight * 19/32 * 72
   moveto				% Position the text
   (Color Wheel) CENTER			% Show the text centered
+
+  % Draw the gray ramp...
+  gsave
+    % Position the gray ramp in the center...
+    pageWidth 36 mul			% x = pageWidth * 1/2 * 72
+    pageHeight 54 mul			% y = pageHeight * 3/4 * 72
+    wheelSize sub			% - wheelSize
+    translate
+
+    % Loop through 100 shades...
+    0 0.010101 0.98 {
+      % Set the color...
+      dup setgray			% Set the grayscale...
+
+      % Draw the polygon...
+      newpath				% Start a new path...
+
+      wheelSize -0.2 mul		% X = -wheelSize / 5
+      1 index 2 mul wheelSize mul	% Y = val * 2 * wheelSize
+      moveto				% Move there...
+
+      wheelSize 0.4 mul 0 rlineto	% Right side...
+
+      wheelSize 0.2 mul			% X = wheelSize / 5
+      1 index 0.010101 add 2 mul wheelSize mul
+      					% Y = (val + 0.010101) * 2 * wheelSize
+      lineto				% Move there...
+
+      wheelSize -0.4 mul 0 rlineto	% Left side...
+
+      closepath				% Close the path
+      fill				% Fill it...
+
+      pop				% Pop value...
+    } for
+
+    0 setgray				% Black
+
+    newpath				% Start a new path
+    wheelSize -0.2 mul 0 moveto		% Bottom left
+    wheelSize 0.4 mul 0 rlineto		% Bottom right
+    0 wheelSize 2 mul rlineto		% Upper right
+    wheelSize -0.4 mul 0 rlineto	% Upper left
+    closepath				% Close the path
+    stroke				% Stroke it...
+
+    0 wheelSize -0.2 mul moveto		% Center bottom for label
+    (K) CENTER				% Center K at bottom
+
+    0 wheelSize 2.05 mul moveto		% Center top for label
+    (W) CENTER				% Center W at top
+  grestore
+
+  % Label the gray ramp...
+  pageWidth 36 mul			% x = pageWidth * 1/2 * 72
+  pageHeight 44 mul			% y = pageHeight * 19/32 * 72
+  moveto				% Position the text
+  (Gray Ramp) CENTER			% Show the text centered
+
 
   % Draw radial lines...
   gsave
@@ -472,7 +554,7 @@ gsave
   pageWidth 36 mul			% Center of page
   pageHeight 10 mul			% Bottom of page
   2 copy moveto				% Position text
-  (Printed Using CUPS v1.1.x) CENTER	% Show text centered
+  (Printed Using CUPS v1.2.x) CENTER	% Show text centered
 
   pageHeight 2 mul sub			% Move down...
   2 copy moveto				% Position text
