@@ -26,10 +26,10 @@ classes.o: auth.h policy.h printers.h classes.h job.h conf.h banners.h
 classes.o: dirsvc.h network.h subscriptions.h
 client.o: ../cups/http-private.h ../config.h ../cups/http.h ../cups/md5.h
 client.o: cupsd.h ../cups/string.h ../cups/cups.h ../cups/ipp.h ../cups/ppd.h
-client.o: mime.h ../cups/ipp.h ../cups/file.h ../cups/http.h ../cups/language.h
-client.o: ../cups/debug.h statbuf.h cert.h client.h auth.h policy.h
-client.o: printers.h classes.h job.h conf.h banners.h dirsvc.h network.h
-client.o: subscriptions.h
+client.o: mime.h ../cups/ipp.h ../cups/file.h ../cups/http.h
+client.o: ../cups/language.h ../cups/debug.h statbuf.h cert.h client.h auth.h
+client.o: policy.h printers.h classes.h job.h conf.h banners.h dirsvc.h
+client.o: network.h subscriptions.h
 conf.o: cupsd.h ../cups/http-private.h ../config.h ../cups/http.h
 conf.o: ../cups/md5.h ../cups/string.h ../cups/cups.h ../cups/ipp.h
 conf.o: ../cups/ppd.h mime.h ../cups/ipp.h ../cups/file.h ../cups/http.h
@@ -102,6 +102,12 @@ printers.o: ../cups/ppd.h mime.h ../cups/ipp.h ../cups/file.h ../cups/http.h
 printers.o: ../cups/language.h ../cups/debug.h statbuf.h cert.h client.h
 printers.o: auth.h policy.h printers.h classes.h job.h conf.h banners.h
 printers.o: dirsvc.h network.h subscriptions.h
+process.o: cupsd.h ../cups/http-private.h ../config.h ../cups/http.h
+process.o: ../cups/md5.h ../cups/string.h ../cups/cups.h ../cups/ipp.h
+process.o: ../cups/ppd.h mime.h ../cups/ipp.h ../cups/file.h ../cups/http.h
+process.o: ../cups/language.h ../cups/debug.h statbuf.h cert.h client.h
+process.o: auth.h policy.h printers.h classes.h job.h conf.h banners.h
+process.o: dirsvc.h network.h subscriptions.h
 quotas.o: cupsd.h ../cups/http-private.h ../config.h ../cups/http.h
 quotas.o: ../cups/md5.h ../cups/string.h ../cups/cups.h ../cups/ipp.h
 quotas.o: ../cups/ppd.h mime.h ../cups/ipp.h ../cups/file.h ../cups/http.h
@@ -110,10 +116,10 @@ quotas.o: policy.h printers.h classes.h job.h conf.h banners.h dirsvc.h
 quotas.o: network.h subscriptions.h
 server.o: ../cups/http-private.h ../config.h ../cups/http.h ../cups/md5.h
 server.o: cupsd.h ../cups/string.h ../cups/cups.h ../cups/ipp.h ../cups/ppd.h
-server.o: mime.h ../cups/ipp.h ../cups/file.h ../cups/http.h ../cups/language.h
-server.o: ../cups/debug.h statbuf.h cert.h client.h auth.h policy.h
-server.o: printers.h classes.h job.h conf.h banners.h dirsvc.h network.h
-server.o: subscriptions.h
+server.o: mime.h ../cups/ipp.h ../cups/file.h ../cups/http.h
+server.o: ../cups/language.h ../cups/debug.h statbuf.h cert.h client.h auth.h
+server.o: policy.h printers.h classes.h job.h conf.h banners.h dirsvc.h
+server.o: network.h subscriptions.h
 statbuf.o: cupsd.h ../cups/http-private.h ../config.h ../cups/http.h
 statbuf.o: ../cups/md5.h ../cups/string.h ../cups/cups.h ../cups/ipp.h
 statbuf.o: ../cups/ppd.h mime.h ../cups/ipp.h ../cups/file.h ../cups/http.h
@@ -122,10 +128,10 @@ statbuf.o: auth.h policy.h printers.h classes.h job.h conf.h banners.h
 statbuf.o: dirsvc.h network.h subscriptions.h
 subscriptions.o: cupsd.h ../cups/http-private.h ../config.h ../cups/http.h
 subscriptions.o: ../cups/md5.h ../cups/string.h ../cups/cups.h ../cups/ipp.h
-subscriptions.o: ../cups/ppd.h mime.h ../cups/ipp.h ../cups/file.h ../cups/http.h
-subscriptions.o: ../cups/language.h ../cups/debug.h statbuf.h cert.h client.h
-subscriptions.o: auth.h policy.h printers.h classes.h job.h conf.h banners.h
-subscriptions.o: dirsvc.h network.h subscriptions.h
+subscriptions.o: ../cups/ppd.h mime.h ../cups/ipp.h ../cups/file.h
+subscriptions.o: ../cups/http.h ../cups/language.h ../cups/debug.h statbuf.h
+subscriptions.o: cert.h client.h auth.h policy.h printers.h classes.h job.h
+subscriptions.o: conf.h banners.h dirsvc.h network.h subscriptions.h
 filter.o: ../cups/debug.h ../cups/string.h ../config.h mime.h ../cups/ipp.h
 filter.o: ../cups/file.h
 mime.o: ../cups/string.h ../config.h mime.h ../cups/ipp.h ../cups/file.h

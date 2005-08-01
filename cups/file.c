@@ -1028,7 +1028,7 @@ cupsFileWrite(cups_file_t *fp,		/* I - CUPS file */
 static ssize_t				/* O - Number of bytes or -1 */
 cups_fill(cups_file_t *fp)		/* I - CUPS file */
 {
-  size_t		bytes;		/* Number of bytes read */
+  ssize_t		bytes;		/* Number of bytes read */
 #ifdef HAVE_LIBZ
   const unsigned char	*ptr,		/* Pointer into buffer */
 			*end;		/* End of buffer */
@@ -1293,7 +1293,7 @@ cups_read(cups_file_t *fp,		/* I - CUPS file */
           char        *buf,		/* I - Buffer */
 	  size_t      bytes)		/* I - Number bytes */
 {
-  size_t	total;			/* Total bytes read */
+  ssize_t	total;			/* Total bytes read */
 
 
  /*
@@ -1307,7 +1307,7 @@ cups_read(cups_file_t *fp,		/* I - CUPS file */
     else
       total = read(fp->fd, buf, bytes);
 
-    if (total < 0)
+    if (total >= 0)
       break;
 
    /*

@@ -231,9 +231,9 @@ fi
 #
 
 if test $ssltype = 2; then
-	$encryption="Encryption Required"
+	encryption="Encryption Required"
 else
-	$encryption=""
+	encryption=""
 fi
 
 cat >/tmp/$user/cupsd.conf <<EOF
@@ -355,6 +355,7 @@ fi
 export SHLIB_PATH
 
 CUPS_SERVERROOT=/tmp/$user; export CUPS_SERVERROOT
+CUPS_STATEDIR=/tmp/$user; export CUPS_STATEDIR
 CUPS_DATADIR=/tmp/$user/share; export CUPS_DATADIR
 
 #

@@ -50,11 +50,11 @@ struct cups_file_s
   int		fd;			/* File descriptor */
   char		mode,			/* Mode ('r' or 'w') */
 		compressed,		/* Compression used? */
+		eof,			/* End of file? */
 		buf[2048],		/* Buffer */
 		*ptr,			/* Pointer into buffer */
 		*end;			/* End of buffer data */
   off_t		pos;			/* File position for start of buffer */
-  int		eof;			/* End of file? */
 
 #  ifdef HAVE_LIBZ
   z_stream	stream;			/* Decompression stream */
