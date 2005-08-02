@@ -84,6 +84,17 @@ static const ipp_option_t ipp_options[] =
 			  { "sides",			IPP_TAG_KEYWORD },
 			  { "wrap",			IPP_TAG_BOOLEAN }
 			};
+static const ipp_option_t notify_options[] =
+			{
+			  { "notify-charset",		IPP_TAG_CHARSET },
+			  { "notify-keywords",		IPP_TAG_KEYWORD },
+			  { "notify-lease-time",	IPP_TAG_INTEGER },
+			  { "notify-natural-language",	IPP_TAG_LANGUAGE },
+			  { "notify-pull-method",	IPP_TAG_KEYWORD },
+			  { "notify-recipient",		IPP_TAG_URI },
+			  { "notify-time-interval",	IPP_TAG_INTEGER },
+			  { "notify-user-data",		IPP_TAG_STRING }
+			};
 
 
 /*
@@ -124,17 +135,19 @@ cupsEncodeOptions(ipp_t         *ipp,		/* I - Request to add to */
         	 NULL, "application/octet-stream");
 
  /*
-  * Then add all other options...
+  * Then add job options...
   */
 
   for (i = 0; i < num_options; i ++)
   {
    /*
-    * Skip document format options - handled above...
+    * Skip document format options that are handled above and notification
+    * options which are handled below...
     */
 
-    if (strcasecmp(options[i].name, "raw") == 0 ||
-        strcasecmp(options[i].name, "document-format") == 0 ||
+    if (!strcasecmp(options[i].name, "raw") ||
+        !strcasecmp(options[i].name, "document-format") ||
+        !strncasecmp(options[i].name, "notify-", 7) ||
 	!options[i].name[0])
       continue;
 
@@ -374,10 +387,144 @@ cupsEncodeOptions(ipp_t         *ipp,		/* I - Request to add to */
 	      return;
 	    }
 
-	    DEBUG_printf(("cupsEncodeOptions: Added string value \'%s\'...\n",
+	    DEBUG_printf(("cupsEncodeOptions: Added string value \"%s\"...\n",
 	                  val));
             break;
       }
+    }
+  }
+
+ /*
+  * Finally, add notification options...
+  */
+
+  for (i = 0; i < num_options; i ++)
+  {
+   /*
+    * Only add notification options here...
+    */
+
+    if (strncasecmp(options[i].name, "notify-", 7))
+      continue;
+
+   /*
+    * Allocate memory for the attribute...
+    */
+
+    if ((attr = _ipp_add_attr(ipp, 1)) == NULL)
+    {
+     /*
+      * Ran out of memory!
+      */
+
+      DEBUG_puts("cupsEncodeOptions: Ran out of memory for attributes!");
+      return;
+    }
+
+   /*
+    * Now figure out what type of value we have...
+    */
+
+    attr->group_tag = IPP_TAG_SUBSCRIPTION;
+
+    if (strcasecmp(options[i].value, "true") == 0 ||
+        strcasecmp(options[i].value, "false") == 0)
+      attr->value_tag = IPP_TAG_BOOLEAN;
+    else
+      attr->value_tag = IPP_TAG_NAME;
+
+    for (j = 0; j < (int)(sizeof(notify_options) / sizeof(notify_options[0])); j ++)
+      if (!strcasecmp(options[i].name, notify_options[j].name))
+      {
+        attr->value_tag = notify_options[j].value_tag;
+	break;
+      }
+
+   /*
+    * Copy the name over...
+    */
+
+    if ((attr->name = strdup(options[i].name)) == NULL)
+    {
+     /*
+      * Ran out of memory!
+      */
+
+      DEBUG_puts("cupsEncodeOptions: Ran out of memory for name!");
+      return;
+    }
+
+   /*
+    * Copy the option value(s) over as needed by the type...
+    */
+
+    val = options[i].value;
+
+    switch (attr->value_tag)
+    {
+      case IPP_TAG_INTEGER :
+      case IPP_TAG_ENUM :
+	 /*
+	  * Integer/enumeration value...
+	  */
+
+          attr->values[0].integer = strtol(val, &s, 0);
+
+          DEBUG_printf(("cupsEncodeOptions: Adding integer option value %d...\n",
+	                attr->values[0].integer));
+          break;
+
+      case IPP_TAG_BOOLEAN :
+	  if (!strcasecmp(val, "true") ||
+	      !strcasecmp(val, "on") ||
+	      !strcasecmp(val, "yes"))
+	  {
+	   /*
+	    * Boolean value - true...
+	    */
+
+	    attr->values[0].boolean = 1;
+
+            DEBUG_puts("cupsEncodeOptions: Added boolean true value...");
+	  }
+	  else
+	  {
+	   /*
+	    * Boolean value - false...
+	    */
+
+	    attr->values[0].boolean = 0;
+
+            DEBUG_puts("cupsEncodeOptions: Added boolean false value...");
+	  }
+          break;
+
+      case IPP_TAG_STRING :
+         /*
+	  * octet-string
+	  */
+
+          attr->values[0].unknown.length = strlen(val);
+	  attr->values[0].unknown.data   = strdup(val);
+
+          DEBUG_printf(("cupsEncodeOptions: Added octet-string value \"%s\"...\n",
+	                attr->values[0].unknown.data));
+          break;
+
+      default :
+          if ((attr->values[0].string.text = strdup(val)) == NULL)
+	  {
+	   /*
+	    * Ran out of memory!
+	    */
+
+	    DEBUG_puts("cupsEncodeOptions: Ran out of memory for string!");
+	    return;
+	  }
+
+	  DEBUG_printf(("cupsEncodeOptions: Added string value \"%s\"...\n",
+	                val));
+          break;
     }
   }
 }

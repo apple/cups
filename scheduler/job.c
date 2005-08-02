@@ -405,6 +405,8 @@ FinishJob(job_t *job)			/* I - Job */
   LogMessage(L_DEBUG, "FinishJob: job %d, file %d is complete.",
              job->id, job->current_file - 1);
 
+  LogMessage(L_DEBUG2, "FinishJob: job->status is %d", job->status);
+
   if (job->status_buffer && job->current_file >= job->num_files)
   {
    /*

@@ -139,6 +139,10 @@ cupsdAddEvent(
 	temp->job   = job;
 	temp->dest  = dest;
 
+       /*
+        * Add common event notification attributes...
+	*/
+
         ippAddInteger(temp->attrs, IPP_TAG_EVENT_NOTIFICATION, IPP_TAG_INTEGER,
 	              "notify-subscription-id", sub->id);
 
@@ -157,6 +161,10 @@ cupsdAddEvent(
 
         if (dest)
 	{
+	 /*
+	  * Add printer attributes...
+	  */
+
 	  ippAddString(temp->attrs, IPP_TAG_EVENT_NOTIFICATION, IPP_TAG_URI,
 	               "notify-printer-uri", NULL, dest->uri);
 
@@ -182,6 +190,10 @@ cupsdAddEvent(
 
         if (job)
 	{
+	 /*
+	  * Add job attributes...
+	  */
+
 	  ippAddInteger(temp->attrs, IPP_TAG_EVENT_NOTIFICATION, IPP_TAG_INTEGER,
 	                "job-id", job->id);
 	  ippAddInteger(temp->attrs, IPP_TAG_EVENT_NOTIFICATION, IPP_TAG_ENUM,
@@ -284,7 +296,7 @@ cupsdAddEvent(
   if (temp)
     cupsdSaveAllSubscriptions();
   else
-    LogMessage(L_DEBUG2, "Discarding unused %s event...",
+    LogMessage(L_DEBUG, "Discarding unused %s event...",
                cupsdEventName(event));
 }
 

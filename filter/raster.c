@@ -169,7 +169,7 @@ cupsRasterReadHeader(cups_raster_t      *r,	/* I - Raster stream */
   * Copy the header to the user-supplied buffer...
   */
 
-  memcpy(h, &(r->header), sizeof(cups_page_header2_t));
+  memcpy(h, &(r->header), sizeof(cups_page_header_t));
 
   return (1);
 }
