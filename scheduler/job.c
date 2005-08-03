@@ -253,7 +253,7 @@ CancelJobs(const char *dest,		/* I - Destination to cancel */
       next = current->next;
 
       cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, current->printer, current,
-                    purge ? "Job purged." : "Job cancelled.");
+                    purge ? "Job purged." : "Job canceled.");
 
       CancelJob(current->id, purge);
 

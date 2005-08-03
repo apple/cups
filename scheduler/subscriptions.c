@@ -315,6 +315,10 @@ cupsdAddSubscription(
   cupsd_subscription_t	*temp;		/* New subscription object */
 
 
+  LogMessage(L_DEBUG, "cupsdAddSubscription(mask=%x(%s), dest=%p(%s), job=%p(%d), uri=\"%s\")",
+             mask, cupsdEventName(mask), dest, dest ? dest->name : "",
+	     job, job ? job->id : 0, uri);
+
   if (!Subscriptions)
   {
    /*
@@ -1181,6 +1185,22 @@ cupsdSendNotification(
 {
   LogMessage(L_DEBUG, "cupsdSendNotification(sub=%p(%d), event=%p(%s))\n",
              sub, sub->id, event, cupsdEventName(event->event));
+
+ /*
+  * Allocate the events array as needed...
+  */
+
+  if (!sub->events)
+  {
+    sub->events = calloc(MaxEvents, sizeof(cupsd_event_t *));
+
+    if (!sub->events)
+    {
+      LogMessage(L_CRIT, "Unable to allocate memory for subscription #%d!",
+                 sub->id);
+      return;
+    }
+  }
 
  /*
   * Add the event to the subscription.  Since the events array is

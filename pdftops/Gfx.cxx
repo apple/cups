@@ -3097,17 +3097,36 @@ void Gfx::doForm(Object *str) {
 void Gfx::doAnnot(Object *str, double xMin, double yMin,
 		  double xMax, double yMax) {
   Dict *dict, *resDict;
-  Object matrixObj, bboxObj, resObj;
+  Object matrixObj, bboxObj, resObj, flagsObj;
   Object obj1;
   double m[6], bbox[6], ictm[6];
   double *ctm;
   double formX0, formY0, formX1, formY1;
   double annotX0, annotY0, annotX1, annotY1;
   double det, x, y, sx, sy;
-  int i;
+  int i, flags;
 
   // get stream dict
   dict = str->streamGetDict();
+
+  // get annotation flags and only print annotations that are hidden or
+  // don't have the print bit set.
+  dict->lookup("F", &flagsObj);
+  if (flagsObj.isInt()) {
+    flags = flagsObj.getInt();
+  } else {
+    // Print anything that doesn't have any flags set...
+    flags = 4;
+  }
+  flagsObj.free();
+
+  fprintf(stderr, "DEBUG: pdftops: doAnnot found annotation with flags = %x\n",
+          flags);
+
+  if ((flags & 2) == 2 || (flags & 4) == 0) {
+    // Don't print hidden or no-print annotations...
+    return;
+  }
 
   // get the form bounding box
   dict->lookup("BBox", &bboxObj);

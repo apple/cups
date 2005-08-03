@@ -200,6 +200,11 @@ extern int		cupsPrintFiles2(http_t *http, const char *printer,
 extern int		cupsSetDests2(http_t *http, int num_dests,
 			              cups_dest_t *dests);
 
+/**** New in CUPS 1.2 ****/
+extern void		cupsEncodeOptions2(ipp_t *ipp, int num_options,
+					   cups_option_t *options,
+					   ipp_tag_t group_tag);
+
 
 #  ifdef __cplusplus
 }

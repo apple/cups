@@ -1157,8 +1157,8 @@ add_job_subscriptions(client_t *con,	/* I - Client connection */
                       job_t    *job)	/* I - Newly created job */
 {
   int			i;		/* Looping var */
-  ipp_t			*temp;		/* Temporary request data... */
   ipp_attribute_t	*prev,		/* Previous attribute */
+			*next,		/* Next attribute */
 			*attr;		/* Current attribute */
   cupsd_subscription_t	*sub;		/* Subscription object */
   const char		*recipient,	/* notify-recipient-uri */
@@ -1181,30 +1181,7 @@ add_job_subscriptions(client_t *con,	/* I - Client connection */
     return;
 
  /*
-  * Create a new temporary request record to hold the subscription
-  * attributes...
-  */
-
-  temp          = ippNew();
-  temp->attrs   = attr;
-  temp->last    = job->attrs->last;
-  temp->current = job->attrs->current;
-
- /*
-  * Remove all of the subscription attributes from the end of the job
-  * request...
-  */
-
-  if (prev)
-    prev->next = NULL;
-  else
-    job->attrs->attrs = NULL;
-
-  job->attrs->last    = prev;
-  job->attrs->current = prev;
-
- /*
-  * Now process the subscription attributes in the request...
+  * Process the subscription attributes in the request...
   */
 
   while (attr)
@@ -1269,7 +1246,12 @@ add_job_subscriptions(client_t *con,	/* I - Client connection */
     if (!recipient && !pullmethod)
       break;
 
+    if (mask == CUPSD_EVENT_NONE)
+      mask = CUPSD_EVENT_JOB_COMPLETED;
+
     sub = cupsdAddSubscription(mask, FindDest(job->dest), job, recipient);
+
+    sub->interval = interval;
 
     SetString(&sub->owner, job->username);
 
@@ -1285,10 +1267,33 @@ add_job_subscriptions(client_t *con,	/* I - Client connection */
   }
 
  /*
-  * Free memory used by subscription attributes...
+  * Remove all of the subscription attributes from the job request...
   */
 
-  ippDelete(temp);
+  for (attr = job->attrs->attrs, prev = NULL; attr; attr = next)
+  {
+    next = attr->next;
+
+    if (attr->group_tag == IPP_TAG_SUBSCRIPTION ||
+        attr->group_tag == IPP_TAG_ZERO)
+    {
+     /*
+      * Free and remove this attribute...
+      */
+
+      _ipp_free_attr(attr);
+
+      if (prev)
+        prev->next = next;
+      else
+        job->attrs->attrs = next;
+    }
+    else
+      prev = attr;
+  }
+
+  job->attrs->last    = prev;
+  job->attrs->current = prev;
 }
 
 
@@ -3584,6 +3589,8 @@ create_job(client_t        *con,	/* I - Client connection */
   LogMessage(L_INFO, "Job %d created on \'%s\' by \'%s\'.", job->id,
              job->dest, job->username);
 
+  cupsdAddEvent(CUPSD_EVENT_JOB_CREATED, printer, job, "Job created.");
+
  /*
   * Fill in the response info...
   */
@@ -5614,6 +5621,8 @@ print_job(client_t        *con,		/* I - Client connection */
   LogMessage(L_DEBUG, "Job %d hold_until = %d", job->id, (int)job->hold_until);
 
   SaveJob(job->id);
+
+  cupsdAddEvent(CUPSD_EVENT_JOB_CREATED, printer, job, "Job created.");
 
  /*
   * Start the job if possible...  Since CheckJobs() can cancel a job if it

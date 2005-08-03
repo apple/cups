@@ -85,6 +85,8 @@ Annot::~Annot() {
 void Annot::draw(Gfx *gfx) {
   Object obj;
 
+  fprintf(stderr, "DEBUG: Annot::draw(gfx=%p)\n", gfx);
+
   if (appearance.fetch(xref, &obj)->isStream()) {
     gfx->doAnnot(&obj, xMin, yMin, xMax, yMax);
   }

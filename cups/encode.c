@@ -25,7 +25,9 @@
  *
  * Contents:
  *
- *   cupsEncodeOptions() - Encode printer options into IPP attributes.
+ *   cupsEncodeOptions()  - Encode printer options into IPP attributes.
+ *   cupsEncodeOptions2() - Encode printer options into IPP attributes for
+ *                          a group.
  */
 
 /*
@@ -47,54 +49,55 @@ typedef struct
 {
   const char	*name;
   ipp_tag_t	value_tag;
+  ipp_tag_t	group_tag;
 } ipp_option_t;
 
 static const ipp_option_t ipp_options[] =
-			{
-			  { "blackplot",		IPP_TAG_BOOLEAN },
-			  { "brightness",		IPP_TAG_INTEGER },
-			  { "columns",			IPP_TAG_INTEGER },
-			  { "copies",			IPP_TAG_INTEGER },
-			  { "finishings",		IPP_TAG_ENUM },
-			  { "fitplot",			IPP_TAG_BOOLEAN },
-			  { "gamma",			IPP_TAG_INTEGER },
-			  { "hue",			IPP_TAG_INTEGER },
-			  { "job-k-limit",		IPP_TAG_INTEGER },
-			  { "job-page-limit",		IPP_TAG_INTEGER },
-			  { "job-priority",		IPP_TAG_INTEGER },
-			  { "job-quota-period",		IPP_TAG_INTEGER },
-			  { "landscape",		IPP_TAG_BOOLEAN },
-			  { "media",			IPP_TAG_KEYWORD },
-			  { "mirror",			IPP_TAG_BOOLEAN },
-			  { "natural-scaling",		IPP_TAG_INTEGER },
-			  { "number-up",		IPP_TAG_INTEGER },
-			  { "orientation-requested",	IPP_TAG_ENUM },
-			  { "page-bottom",		IPP_TAG_INTEGER },
-			  { "page-left",		IPP_TAG_INTEGER },
-			  { "page-ranges",		IPP_TAG_RANGE },
-			  { "page-right",		IPP_TAG_INTEGER },
-			  { "page-top",			IPP_TAG_INTEGER },
-			  { "penwidth",			IPP_TAG_INTEGER },
-			  { "ppi",			IPP_TAG_INTEGER },
-			  { "prettyprint",		IPP_TAG_BOOLEAN },
-			  { "printer-resolution",	IPP_TAG_RESOLUTION },
-			  { "print-quality",		IPP_TAG_ENUM },
-			  { "saturation",		IPP_TAG_INTEGER },
-			  { "scaling",			IPP_TAG_INTEGER },
-			  { "sides",			IPP_TAG_KEYWORD },
-			  { "wrap",			IPP_TAG_BOOLEAN }
-			};
-static const ipp_option_t notify_options[] =
-			{
-			  { "notify-charset",		IPP_TAG_CHARSET },
-			  { "notify-keywords",		IPP_TAG_KEYWORD },
-			  { "notify-lease-time",	IPP_TAG_INTEGER },
-			  { "notify-natural-language",	IPP_TAG_LANGUAGE },
-			  { "notify-pull-method",	IPP_TAG_KEYWORD },
-			  { "notify-recipient",		IPP_TAG_URI },
-			  { "notify-time-interval",	IPP_TAG_INTEGER },
-			  { "notify-user-data",		IPP_TAG_STRING }
-			};
+{
+  { "blackplot",		IPP_TAG_BOOLEAN,	IPP_TAG_JOB },
+  { "brightness",		IPP_TAG_INTEGER,	IPP_TAG_JOB },
+  { "columns",			IPP_TAG_INTEGER,	IPP_TAG_JOB },
+  { "copies",			IPP_TAG_INTEGER,	IPP_TAG_JOB },
+  { "document-format",		IPP_TAG_MIMETYPE,	IPP_TAG_OPERATION },
+  { "finishings",		IPP_TAG_ENUM,		IPP_TAG_JOB },
+  { "fitplot",			IPP_TAG_BOOLEAN,	IPP_TAG_JOB },
+  { "gamma",			IPP_TAG_INTEGER,	IPP_TAG_JOB },
+  { "hue",			IPP_TAG_INTEGER,	IPP_TAG_JOB },
+  { "job-k-limit",		IPP_TAG_INTEGER,	IPP_TAG_JOB },
+  { "job-page-limit",		IPP_TAG_INTEGER,	IPP_TAG_JOB },
+  { "job-priority",		IPP_TAG_INTEGER,	IPP_TAG_JOB },
+  { "job-quota-period",		IPP_TAG_INTEGER,	IPP_TAG_JOB },
+  { "landscape",		IPP_TAG_BOOLEAN,	IPP_TAG_JOB },
+  { "media",			IPP_TAG_KEYWORD,	IPP_TAG_JOB },
+  { "mirror",			IPP_TAG_BOOLEAN,	IPP_TAG_JOB },
+  { "natural-scaling",		IPP_TAG_INTEGER,	IPP_TAG_JOB },
+  { "notify-charset",		IPP_TAG_CHARSET,	IPP_TAG_SUBSCRIPTION },
+  { "notify-events",		IPP_TAG_KEYWORD,	IPP_TAG_SUBSCRIPTION },
+  { "notify-lease-time",	IPP_TAG_INTEGER,	IPP_TAG_SUBSCRIPTION },
+  { "notify-natural-language",	IPP_TAG_LANGUAGE,	IPP_TAG_SUBSCRIPTION },
+  { "notify-pull-method",	IPP_TAG_KEYWORD,	IPP_TAG_SUBSCRIPTION },
+  { "notify-recipient",		IPP_TAG_URI,		IPP_TAG_SUBSCRIPTION },
+  { "notify-time-interval",	IPP_TAG_INTEGER,	IPP_TAG_SUBSCRIPTION },
+  { "notify-user-data",		IPP_TAG_STRING,		IPP_TAG_SUBSCRIPTION },
+  { "number-up",		IPP_TAG_INTEGER,	IPP_TAG_JOB },
+  { "orientation-requested",	IPP_TAG_ENUM,		IPP_TAG_JOB },
+  { "page-bottom",		IPP_TAG_INTEGER,	IPP_TAG_JOB },
+  { "page-left",		IPP_TAG_INTEGER,	IPP_TAG_JOB },
+  { "page-ranges",		IPP_TAG_RANGE,		IPP_TAG_JOB },
+  { "page-right",		IPP_TAG_INTEGER,	IPP_TAG_JOB },
+  { "page-top",			IPP_TAG_INTEGER,	IPP_TAG_JOB },
+  { "penwidth",			IPP_TAG_INTEGER,	IPP_TAG_JOB },
+  { "ppi",			IPP_TAG_INTEGER,	IPP_TAG_JOB },
+  { "prettyprint",		IPP_TAG_BOOLEAN,	IPP_TAG_JOB },
+  { "printer-resolution",	IPP_TAG_RESOLUTION,	IPP_TAG_JOB },
+  { "printer-uri",		IPP_TAG_URI,		IPP_TAG_OPERATION },
+  { "print-quality",		IPP_TAG_ENUM,		IPP_TAG_JOB },
+  { "raw",			IPP_TAG_MIMETYPE,	IPP_TAG_OPERATION },
+  { "saturation",		IPP_TAG_INTEGER,	IPP_TAG_JOB },
+  { "scaling",			IPP_TAG_INTEGER,	IPP_TAG_JOB },
+  { "sides",			IPP_TAG_KEYWORD,	IPP_TAG_JOB },
+  { "wrap",			IPP_TAG_BOOLEAN,	IPP_TAG_JOB }
+};
 
 
 /*
@@ -106,50 +109,107 @@ cupsEncodeOptions(ipp_t         *ipp,		/* I - Request to add to */
         	  int           num_options,	/* I - Number of options */
 		  cups_option_t *options)	/* I - Options */
 {
-  int		i, j;				/* Looping vars */
-  int		count;				/* Number of values */
-  char		*s,				/* Pointer into option value */
-		*val,				/* Pointer to option value */
-		*copy,				/* Copy of option value */
-		*sep;				/* Option separator */
-  ipp_attribute_t *attr;			/* IPP job-id attribute */
-
-
   DEBUG_printf(("cupsEncodeOptions(%p, %d, %p)\n", ipp, num_options, options));
+
+ /*
+  * Add the options in the proper groups & order...
+  */
+
+  cupsEncodeOptions2(ipp, num_options, options, IPP_TAG_OPERATION);
+  cupsEncodeOptions2(ipp, num_options, options, IPP_TAG_JOB);
+  cupsEncodeOptions2(ipp, num_options, options, IPP_TAG_SUBSCRIPTION);
+}
+
+
+/*
+ * 'cupsEncodeOptions2()' - Encode printer options into IPP attributes for a group.
+ */
+
+void
+cupsEncodeOptions2(
+    ipp_t         *ipp,			/* I - Request to add to */
+    int           num_options,		/* I - Number of options */
+    cups_option_t *options,		/* I - Options */
+    ipp_tag_t     group_tag)		/* I - Group to encode */
+{
+  int		i, j;			/* Looping vars */
+  int		count;			/* Number of values */
+  char		*s,			/* Pointer into option value */
+		*val,			/* Pointer to option value */
+		*copy,			/* Copy of option value */
+		*sep;			/* Option separator */
+  ipp_attribute_t *attr;		/* IPP attribute */
+  ipp_tag_t	value_tag;		/* IPP value tag */
+
+
+  DEBUG_printf(("cupsEncodeOptions2(ipp=%p, num_options=%d, options=%p, group_tag=%x)\n",
+                ipp, num_options, options, group_tag));
+
+ /*
+  * Range check input...
+  */
 
   if (ipp == NULL || num_options < 1 || options == NULL)
     return;
 
  /*
-  * Handle the document format stuff first...
+  * Do special handling for the document-format/raw options...
   */
 
-  if ((val = (char *)cupsGetOption("document-format", num_options, options)) != NULL)
-    ippAddString(ipp, IPP_TAG_OPERATION, IPP_TAG_MIMETYPE, "document-format",
-        	 NULL, val);
-  else if (cupsGetOption("raw", num_options, options))
-    ippAddString(ipp, IPP_TAG_OPERATION, IPP_TAG_MIMETYPE, "document-format",
-        	 NULL, "application/vnd.cups-raw");
-  else
-    ippAddString(ipp, IPP_TAG_OPERATION, IPP_TAG_MIMETYPE, "document-format",
-        	 NULL, "application/octet-stream");
+  if (group_tag == IPP_TAG_OPERATION)
+  {
+   /*
+    * Handle the document format stuff first...
+    */
+
+    if ((val = (char *)cupsGetOption("document-format", num_options, options)) != NULL)
+      ippAddString(ipp, IPP_TAG_OPERATION, IPP_TAG_MIMETYPE, "document-format",
+        	   NULL, val);
+    else if (cupsGetOption("raw", num_options, options))
+      ippAddString(ipp, IPP_TAG_OPERATION, IPP_TAG_MIMETYPE, "document-format",
+        	   NULL, "application/vnd.cups-raw");
+    else
+      ippAddString(ipp, IPP_TAG_OPERATION, IPP_TAG_MIMETYPE, "document-format",
+        	   NULL, "application/octet-stream");
+  }
 
  /*
-  * Then add job options...
+  * Then loop through the options...
   */
 
   for (i = 0; i < num_options; i ++)
   {
    /*
-    * Skip document format options that are handled above and notification
-    * options which are handled below...
+    * Skip document format options that are handled above...
     */
 
     if (!strcasecmp(options[i].name, "raw") ||
         !strcasecmp(options[i].name, "document-format") ||
-        !strncasecmp(options[i].name, "notify-", 7) ||
 	!options[i].name[0])
       continue;
+
+   /*
+    * Figure out the proper value and group tags for this option...
+    */
+
+    for (j = 0; j < (int)(sizeof(ipp_options) / sizeof(ipp_options[0])); j ++)
+      if (!strcasecmp(options[i].name, ipp_options[j].name))
+        break;
+
+    if (j < (int)(sizeof(ipp_options) / sizeof(ipp_options[0])))
+    {
+      if (ipp_options[j].group_tag != group_tag)
+        continue;
+
+      value_tag = ipp_options[j].value_tag;
+    }
+    else if (group_tag != IPP_TAG_JOB)
+      continue;
+    else if (!strcasecmp(options[i].value, "true") ||
+             !strcasecmp(options[i].value, "false"))
+      value_tag = IPP_TAG_BOOLEAN;
+    else
+      value_tag = IPP_TAG_NAME;
 
    /*
     * Count the number of values...
@@ -191,7 +251,7 @@ cupsEncodeOptions(ipp_t         *ipp,		/* I - Request to add to */
         sep ++;
     }
 
-    DEBUG_printf(("cupsEncodeOptions: option = \'%s\', count = %d\n",
+    DEBUG_printf(("cupsEncodeOptions2: option = \'%s\', count = %d\n",
                   options[i].name, count));
 
    /*
@@ -204,7 +264,7 @@ cupsEncodeOptions(ipp_t         *ipp,		/* I - Request to add to */
       * Ran out of memory!
       */
 
-      DEBUG_puts("cupsEncodeOptions: Ran out of memory for attributes!");
+      DEBUG_puts("cupsEncodeOptions2: Ran out of memory for attributes!");
       return;
     }
 
@@ -212,20 +272,8 @@ cupsEncodeOptions(ipp_t         *ipp,		/* I - Request to add to */
     * Now figure out what type of value we have...
     */
 
-    attr->group_tag = IPP_TAG_JOB;
-
-    if (strcasecmp(options[i].value, "true") == 0 ||
-        strcasecmp(options[i].value, "false") == 0)
-      attr->value_tag = IPP_TAG_BOOLEAN;
-    else
-      attr->value_tag = IPP_TAG_NAME;
-
-    for (j = 0; j < (int)(sizeof(ipp_options) / sizeof(ipp_options[0])); j ++)
-      if (strcasecmp(options[i].name, ipp_options[j].name) == 0)
-      {
-        attr->value_tag = ipp_options[j].value_tag;
-	break;
-      }
+    attr->group_tag = group_tag;
+    attr->value_tag = value_tag;
 
    /*
     * Copy the name over...
@@ -237,7 +285,7 @@ cupsEncodeOptions(ipp_t         *ipp,		/* I - Request to add to */
       * Ran out of memory!
       */
 
-      DEBUG_puts("cupsEncodeOptions: Ran out of memory for name!");
+      DEBUG_puts("cupsEncodeOptions2: Ran out of memory for name!");
       return;
     }
 
@@ -253,7 +301,7 @@ cupsEncodeOptions(ipp_t         *ipp,		/* I - Request to add to */
 	* Ran out of memory!
 	*/
 
-	DEBUG_puts("cupsEncodeOptions: Ran out of memory for value copy!");
+	DEBUG_puts("cupsEncodeOptions2: Ran out of memory for value copy!");
 	return;
       }
 
@@ -298,7 +346,7 @@ cupsEncodeOptions(ipp_t         *ipp,		/* I - Request to add to */
 
             attr->values[j].integer = strtol(val, &s, 0);
 
-            DEBUG_printf(("cupsEncodeOptions: Adding integer option value %d...\n",
+            DEBUG_printf(("cupsEncodeOptions2: Added integer option value %d...\n",
 	                  attr->values[j].integer));
             break;
 
@@ -313,7 +361,7 @@ cupsEncodeOptions(ipp_t         *ipp,		/* I - Request to add to */
 
 	      attr->values[j].boolean = 1;
 
-              DEBUG_puts("cupsEncodeOptions: Added boolean true value...");
+              DEBUG_puts("cupsEncodeOptions2: Added boolean true value...");
 	    }
 	    else
 	    {
@@ -323,7 +371,7 @@ cupsEncodeOptions(ipp_t         *ipp,		/* I - Request to add to */
 
 	      attr->values[j].boolean = 0;
 
-              DEBUG_puts("cupsEncodeOptions: Added boolean false value...");
+              DEBUG_puts("cupsEncodeOptions2: Added boolean false value...");
 	    }
             break;
 
@@ -350,7 +398,7 @@ cupsEncodeOptions(ipp_t         *ipp,		/* I - Request to add to */
 	    else
 	      attr->values[j].range.upper = attr->values[j].range.lower;
 
-	    DEBUG_printf(("cupsEncodeOptions: Added range option value %d-%d...\n",
+	    DEBUG_printf(("cupsEncodeOptions2: Added range option value %d-%d...\n",
                 	  attr->values[j].range.lower,
 			  attr->values[j].range.upper));
             break;
@@ -372,8 +420,20 @@ cupsEncodeOptions(ipp_t         *ipp,		/* I - Request to add to */
             else
               attr->values[j].resolution.units = IPP_RES_PER_INCH;
 
-	    DEBUG_printf(("cupsEncodeOptions: Adding resolution option value %s...\n",
+	    DEBUG_printf(("cupsEncodeOptions2: Added resolution option value %s...\n",
                 	  val));
+            break;
+
+	case IPP_TAG_STRING :
+           /*
+	    * octet-string
+	    */
+
+            attr->values[j].unknown.length = strlen(val);
+	    attr->values[j].unknown.data   = strdup(val);
+
+            DEBUG_printf(("cupsEncodeOptions2: Added octet-string value \"%s\"...\n",
+	                  attr->values[j].unknown.data));
             break;
 
 	default :
@@ -383,148 +443,14 @@ cupsEncodeOptions(ipp_t         *ipp,		/* I - Request to add to */
 	      * Ran out of memory!
 	      */
 
-	      DEBUG_puts("cupsEncodeOptions: Ran out of memory for string!");
+	      DEBUG_puts("cupsEncodeOptions2: Ran out of memory for string!");
 	      return;
 	    }
 
-	    DEBUG_printf(("cupsEncodeOptions: Added string value \"%s\"...\n",
+	    DEBUG_printf(("cupsEncodeOptions2: Added string value \"%s\"...\n",
 	                  val));
             break;
       }
-    }
-  }
-
- /*
-  * Finally, add notification options...
-  */
-
-  for (i = 0; i < num_options; i ++)
-  {
-   /*
-    * Only add notification options here...
-    */
-
-    if (strncasecmp(options[i].name, "notify-", 7))
-      continue;
-
-   /*
-    * Allocate memory for the attribute...
-    */
-
-    if ((attr = _ipp_add_attr(ipp, 1)) == NULL)
-    {
-     /*
-      * Ran out of memory!
-      */
-
-      DEBUG_puts("cupsEncodeOptions: Ran out of memory for attributes!");
-      return;
-    }
-
-   /*
-    * Now figure out what type of value we have...
-    */
-
-    attr->group_tag = IPP_TAG_SUBSCRIPTION;
-
-    if (strcasecmp(options[i].value, "true") == 0 ||
-        strcasecmp(options[i].value, "false") == 0)
-      attr->value_tag = IPP_TAG_BOOLEAN;
-    else
-      attr->value_tag = IPP_TAG_NAME;
-
-    for (j = 0; j < (int)(sizeof(notify_options) / sizeof(notify_options[0])); j ++)
-      if (!strcasecmp(options[i].name, notify_options[j].name))
-      {
-        attr->value_tag = notify_options[j].value_tag;
-	break;
-      }
-
-   /*
-    * Copy the name over...
-    */
-
-    if ((attr->name = strdup(options[i].name)) == NULL)
-    {
-     /*
-      * Ran out of memory!
-      */
-
-      DEBUG_puts("cupsEncodeOptions: Ran out of memory for name!");
-      return;
-    }
-
-   /*
-    * Copy the option value(s) over as needed by the type...
-    */
-
-    val = options[i].value;
-
-    switch (attr->value_tag)
-    {
-      case IPP_TAG_INTEGER :
-      case IPP_TAG_ENUM :
-	 /*
-	  * Integer/enumeration value...
-	  */
-
-          attr->values[0].integer = strtol(val, &s, 0);
-
-          DEBUG_printf(("cupsEncodeOptions: Adding integer option value %d...\n",
-	                attr->values[0].integer));
-          break;
-
-      case IPP_TAG_BOOLEAN :
-	  if (!strcasecmp(val, "true") ||
-	      !strcasecmp(val, "on") ||
-	      !strcasecmp(val, "yes"))
-	  {
-	   /*
-	    * Boolean value - true...
-	    */
-
-	    attr->values[0].boolean = 1;
-
-            DEBUG_puts("cupsEncodeOptions: Added boolean true value...");
-	  }
-	  else
-	  {
-	   /*
-	    * Boolean value - false...
-	    */
-
-	    attr->values[0].boolean = 0;
-
-            DEBUG_puts("cupsEncodeOptions: Added boolean false value...");
-	  }
-          break;
-
-      case IPP_TAG_STRING :
-         /*
-	  * octet-string
-	  */
-
-          attr->values[0].unknown.length = strlen(val);
-	  attr->values[0].unknown.data   = strdup(val);
-
-          DEBUG_printf(("cupsEncodeOptions: Added octet-string value \"%s\"...\n",
-	                attr->values[0].unknown.data));
-          break;
-
-      default :
-          if ((attr->values[0].string.text = strdup(val)) == NULL)
-	  {
-	   /*
-	    * Ran out of memory!
-	    */
-
-	    DEBUG_puts("cupsEncodeOptions: Ran out of memory for string!");
-	    return;
-	  }
-
-	  DEBUG_printf(("cupsEncodeOptions: Added string value \"%s\"...\n",
-	                val));
-          break;
     }
   }
 }
