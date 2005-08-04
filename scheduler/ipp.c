@@ -76,6 +76,7 @@
  *   set_job_attrs()             - Set job attributes.
  *   start_printer()             - Start a printer.
  *   stop_printer()              - Stop a printer.
+ *   user_allowed()              - See if a user is allowed to print to a queue.
  *   validate_job()              - Validate printer options and destination.
  *   validate_name()             - Make sure the printer name only contains
  *                                 valid chars.
@@ -161,6 +162,7 @@ static void	set_default(client_t *con, ipp_attribute_t *uri);
 static void	set_job_attrs(client_t *con, ipp_attribute_t *uri);
 static void	start_printer(client_t *con, ipp_attribute_t *uri);
 static void	stop_printer(client_t *con, ipp_attribute_t *uri);
+static int	user_allowed(printer_t *p, const char *username);
 static void	validate_job(client_t *con, ipp_attribute_t *uri);
 static int	validate_name(const char *name);
 static int	validate_user(job_t *job, client_t *con,
@@ -4379,6 +4381,7 @@ get_printers(client_t *con,		/* I - Client connection */
   char		name[IPP_MAX_NAME],	/* Printer name */
 		*nameptr;		/* Pointer into name */
   printer_t	*iclass;		/* Implicit class */
+  const char	*username;		/* Current user */
 
 
   LogMessage(L_DEBUG2, "get_printers(%p[%d], %x)\n", con, con->http.fd, type);
@@ -4421,6 +4424,13 @@ get_printers(client_t *con,		/* I - Client connection */
     location = attr->values[0].string.text;
   else
     location = NULL;
+
+  if (con->username[0])
+    username = con->username;
+  else if ((attr = ippFindAttribute(con->request, "requesting-user-name", IPP_TAG_NAME)) != NULL)
+    username = attr->values[0].string.text;
+  else
+    username = NULL;
 
   requested = ippFindAttribute(con->request, "requested-attributes",
 	                       IPP_TAG_KEYWORD);
@@ -4483,6 +4493,14 @@ get_printers(client_t *con,		/* I - Client connection */
 	    continue;
 	}
       }
+
+     /*
+      * If a username is specified, see if it is allowed or denied
+      * access...
+      */
+
+      if (printer->num_users && username && !user_allowed(printer, username))
+        continue;
 
      /*
       * Add the group separator as needed...
@@ -7259,6 +7277,68 @@ stop_printer(client_t        *con,	/* I - Client connection */
   */
 
   con->response->request.status.status_code = IPP_OK;
+}
+
+
+/*
+ * 'user_allowed()' - See if a user is allowed to print to a queue.
+ */
+
+static int				/* O - 0 if not allowed, 1 if allowed */
+user_allowed(printer_t  *p,		/* I - Printer or class */
+             const char *username)	/* I - Username */
+{
+  int		i, j;			/* Looping vars */
+  struct passwd	*pw;			/* User password data */
+  struct group	*grp;			/* Group data */
+
+
+  if (p->num_users == 0)
+    return (1);
+
+  if (!strcmp(username, "root"))
+    return (1);
+
+  pw = getpwnam(username);
+  endpwent();
+
+  for (i = 0; i < p->num_users; i ++)
+  {
+    if (p->users[i][0] == '@')
+    {
+     /*
+      * Check group membership...
+      */
+
+      grp = getgrnam(p->users[i] + 1);
+      endgrent();
+
+      if (grp)
+      {
+       /*
+	* Check primary group...
+	*/
+
+	if (pw && grp->gr_gid == pw->pw_gid)
+	  break;
+
+       /*
+	* Check usernames in group...
+	*/
+
+        for (j = 0; grp->gr_mem[j]; j ++)
+	  if (!strcasecmp(username, grp->gr_mem[j]))
+	    break;
+
+        if (grp->gr_mem[j])
+	  break;
+      }
+    }
+    else if (!strcasecmp(username, p->users[i]))
+      break;
+  }
+
+  return ((i < p->num_users) != p->deny_users);
 }
 
 
