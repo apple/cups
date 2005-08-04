@@ -58,10 +58,11 @@ extern "C" {
 #define ATTR_BLUE	0x80
 
 #define PRETTY_OFF	0
-#define PRETTY_CODE	1
-#define PRETTY_SHELL	2
-#define PRETTY_PERL	3
-#define PRETTY_HTML	4
+#define PRETTY_PLAIN	1
+#define PRETTY_CODE	2
+#define PRETTY_SHELL	3
+#define PRETTY_PERL	4
+#define PRETTY_HTML	5
 
 
 /*

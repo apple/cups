@@ -47,6 +47,7 @@ application/pdf		application/postscript	33	pdftops
 application/postscript	application/vnd.cups-postscript	66	pstops
 application/vnd.hp-HPGL	application/postscript	66	hpgltops
 application/x-cshell	application/postscript	33	texttops
+application/x-csource	application/postscript	33	texttops
 application/x-perl	application/postscript	33	texttops
 application/x-shell	application/postscript	33	texttops
 text/plain		application/postscript	33	texttops

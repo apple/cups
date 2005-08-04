@@ -568,15 +568,21 @@ TextMain(const char *name,	/* I - Name of filter */
 
     if ((val = getenv("CONTENT_TYPE")) == NULL)
     {
-      PrettyPrint = PRETTY_CODE;
-      NumKeywords = sizeof(code_keywords) / sizeof(code_keywords[0]);
-      Keywords    = code_keywords;
+      PrettyPrint = PRETTY_PLAIN;
+      NumKeywords = 0;
+      Keywords    = NULL;
     }
     else if (strcasecmp(val, "application/x-cshell") == 0)
     {
       PrettyPrint = PRETTY_SHELL;
       NumKeywords = sizeof(csh_keywords) / sizeof(csh_keywords[0]);
       Keywords    = csh_keywords;
+    }
+    else if (strcasecmp(val, "application/x-csource") == 0)
+    {
+      PrettyPrint = PRETTY_CODE;
+      NumKeywords = sizeof(code_keywords) / sizeof(code_keywords[0]);
+      Keywords    = code_keywords;
     }
     else if (strcasecmp(val, "application/x-perl") == 0)
     {
@@ -592,9 +598,9 @@ TextMain(const char *name,	/* I - Name of filter */
     }
     else
     {
-      PrettyPrint = PRETTY_CODE;
-      NumKeywords = sizeof(code_keywords) / sizeof(code_keywords[0]);
-      Keywords    = code_keywords;
+      PrettyPrint = PRETTY_PLAIN;
+      NumKeywords = 0;
+      Keywords    = NULL;
     }
   }
 
@@ -668,9 +674,6 @@ TextMain(const char *name,	/* I - Name of filter */
 	  {
 	    *keyptr = '\0';
 	    keyptr  = keyword;
-
-            fprintf(stderr, "DEBUG: TAB - column=%d, keycol=%d, attr=%x\n",
-	            column, keycol, attr);
 
 	    if (bsearch(&keyptr, Keywords, NumKeywords, sizeof(char *),
 	                compare_keywords))
@@ -879,7 +882,7 @@ TextMain(const char *name,	/* I - Name of filter */
           if (ch < ' ')
             break;		/* Ignore other control chars */
 
-          if (PrettyPrint)
+          if (PrettyPrint > PRETTY_PLAIN)
 	  {
 	   /*
 	    * Do highlighting of C/C++ keywords, preprocessor commands,

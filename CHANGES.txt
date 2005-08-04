@@ -3,6 +3,10 @@ CHANGES.txt - 08/04/2005
 
 CHANGES IN CUPS V1.2.0b1
 
+	- Added a new application/x-csource MIME type, and
+	  support for it to the texttops filter so that you can
+	  pretty print plain text files without the C/C++
+	  keywords being highlighted.
 	- The pdftops filter did not compile with GCC 4.0 (STR
 	  #1226)
 	- The texttops filter did not highlight preprocessor

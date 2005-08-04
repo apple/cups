@@ -120,8 +120,6 @@ image/x-bitmap			bmp string(0,BM) && !printable(2,14)
 # Text files...
 #
 
-text/html			html htm printable(0,1024) +\
-				(istring(0,"<HTML>") istring(0,"<!DOCTYPE"))
 application/x-cshell		csh printable(0,1024) + string(0,#!) +\
 				(contains(2,80,/csh) contains(2,80,/tcsh))
 application/x-perl		pl printable(0,1024) + string(0,#!) +\
@@ -129,6 +127,13 @@ application/x-perl		pl printable(0,1024) + string(0,#!) +\
 application/x-shell		sh printable(0,1024) + string(0,#!) +\
 				(contains(2,80,/bash) contains(2,80,/ksh)\
 				 contains(2,80,/sh) contains(2,80,/zsh))
+application/x-csource		c cxx cpp cc C h hpp \
+				printable(0,1024) + \
+				(string(0,/*) string(0,//)
+				 string(0,#include) contains(0,1024,<0a>#include) \
+				 string(0,#define) contains(0,1024,<0a>#define))
+text/html			html htm printable(0,1024) +\
+				(istring(0,"<HTML>") istring(0,"<!DOCTYPE"))
 text/plain			txt printable(0,1024)
 
 ########################################################################
