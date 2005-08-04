@@ -74,7 +74,8 @@ FILES	=	add-class.tmpl \
 		printer-start.tmpl \
 		printer-stop.tmpl \
 		test-page.tmpl \
-		trailer.tmpl
+		trailer.tmpl \
+		users.tmpl
 
 
 #

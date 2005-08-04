@@ -3,6 +3,9 @@ CHANGES.txt - 08/04/2005
 
 CHANGES IN CUPS V1.2.0b1
 
+	- Added a "set allowed users" interface to the web
+	  interface so that you can set the list of allowed or
+	  denied users/groups for a printer or class.
 	- Disallow the "#" character in printer names, since it
 	  has special meaning in the shell, config files, and in
 	  URIs (STR #917)

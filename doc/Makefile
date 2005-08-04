@@ -84,6 +84,7 @@ WEBIMAGES	=	images/accept-jobs.gif \
 			images/release-job.gif \
 			images/restart-job.gif \
 			images/right.gif \
+			images/set-allowed-users.gif \
 			images/set-as-default.gif \
 			images/show-active.gif \
 			images/show-completed.gif \

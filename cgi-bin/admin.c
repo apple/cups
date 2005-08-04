@@ -23,14 +23,15 @@
  *
  * Contents:
  *
- *   main()              - Main entry for CGI.
- *   do_am_class()       - Add or modify a class.
- *   do_am_printer()     - Add or modify a printer.
- *   do_config_printer() - Configure the default options for a printer.
- *   do_delete_class()   - Delete a class...
- *   do_delete_printer() - Delete a printer...
- *   do_printer_op()     - Do a printer operation.
- *   get_line()          - Get a line that is terminated by a LF, CR, or CR LF.
+ *   main()                 - Main entry for CGI.
+ *   do_am_class()          - Add or modify a class.
+ *   do_am_printer()        - Add or modify a printer.
+ *   do_config_printer()    - Configure the default options for a printer.
+ *   do_delete_class()      - Delete a class...
+ *   do_delete_printer()    - Delete a printer...
+ *   do_printer_op()        - Do a printer operation.
+ *   do_set_allowed_users() - Set the allowed/denied users for a queue.
+ *   get_line()             - Get a line that is terminated by a LF, CR, or CR LF.
  */
 
 /*
@@ -52,6 +53,7 @@ static void	do_config_printer(http_t *http, cups_lang_t *language);
 static void	do_delete_class(http_t *http, cups_lang_t *language);
 static void	do_delete_printer(http_t *http, cups_lang_t *language);
 static void	do_printer_op(http_t *http, cups_lang_t *language, ipp_op_t op);
+static void	do_set_allowed_users(http_t *http, cups_lang_t *language);
 static char	*get_line(char *buf, int length, FILE *fp);
 
 
@@ -59,13 +61,13 @@ static char	*get_line(char *buf, int length, FILE *fp);
  * 'main()' - Main entry for CGI.
  */
 
-int				/* O - Exit status */
-main(int  argc,			/* I - Number of command-line arguments */
-     char *argv[])		/* I - Command-line arguments */
+int					/* O - Exit status */
+main(int  argc,				/* I - Number of command-line arguments */
+     char *argv[])			/* I - Command-line arguments */
 {
-  cups_lang_t	*language;	/* Language information */
-  http_t	*http;		/* Connection to the server */
-  const char	*op;		/* Operation name */
+  cups_lang_t	*language;		/* Language information */
+  http_t	*http;			/* Connection to the server */
+  const char	*op;			/* Operation name */
 
 
  /*
@@ -119,6 +121,8 @@ main(int  argc,			/* I - Number of command-line arguments */
       do_printer_op(http, language, CUPS_REJECT_JOBS);
     else if (strcmp(op, "purge-jobs") == 0)
       do_printer_op(http, language, IPP_PURGE_JOBS);
+    else if (strcmp(op, "set-allowed-users") == 0)
+      do_set_allowed_users(http, language);
     else if (strcmp(op, "set-as-default") == 0)
       do_printer_op(http, language, CUPS_SET_DEFAULT);
     else if (strcmp(op, "add-class") == 0)
@@ -1555,16 +1559,268 @@ do_printer_op(http_t      *http,	/* I - HTTP connection */
 
 
 /*
+ * 'do_set_allowed_users()' - Set the allowed/denied users for a queue.
+ */
+
+static void
+do_set_allowed_users(
+    http_t      *http,			/* I - HTTP connection */
+    cups_lang_t *language)		/* I - Language */
+{
+  int		i;			/* Looping var */
+  ipp_t		*request,		/* IPP request */
+		*response;		/* IPP response */
+  char		uri[HTTP_MAX_URI];	/* Printer URI */
+  const char	*printer,		/* Printer name (purge-jobs) */
+		*users,			/* List of users or groups */
+		*type;			/* Allow/deny type */
+  int		num_users;		/* Number of users */
+  char		*ptr,			/* Pointer into users string */
+		*end,			/* Pointer to end of users string */
+		quote;			/* Quote character */
+  ipp_attribute_t *attr;		/* Attribute */
+  ipp_status_t	status;			/* Operation status... */
+  static const char * const attrs[] =	/* Requested attributes */
+		{
+		  "requesting-user-name-allowed",
+		  "requesting-user-name-denied"
+		};
+
+
+  if ((printer = cgiGetVariable("PRINTER_NAME")) != NULL)
+    snprintf(uri, sizeof(uri), "ipp://localhost/printers/%s", printer);
+  else
+  {
+    cgiSetVariable("ERROR", ippErrorString(IPP_NOT_FOUND));
+    cgiCopyTemplateLang(stdout, TEMPLATES, "error.tmpl", getenv("LANG"));
+    return;
+  }
+
+  users = cgiGetVariable("users");
+  type  = cgiGetVariable("type");
+
+  if (!users || !type ||
+      (strcmp(type, "requesting-user-name-allowed") &&
+       strcmp(type, "requesting-user-name-denied")))
+  {
+   /*
+    * Build a Get-Printer-Attributes request, which requires the following
+    * attributes:
+    *
+    *    attributes-charset
+    *    attributes-natural-language
+    *    printer-uri
+    *    requested-attributes
+    */
+
+    request = ippNew();
+
+    request->request.op.operation_id = IPP_GET_PRINTER_ATTRIBUTES;
+    request->request.op.request_id   = 1;
+
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
+        	 "attributes-charset", NULL, cupsLangEncoding(language));
+
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
+        	 "attributes-natural-language", NULL, language->language);
+
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
+        	 NULL, uri);
+
+    ippAddStrings(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
+                  "requested-attributes",
+		  (int)(sizeof(attrs) / sizeof(attrs[0])), NULL, attrs);
+
+   /*
+    * Do the request and get back a response...
+    */
+
+    if ((response = cupsDoRequest(http, request, "/admin/")) != NULL)
+    {
+      status = response->request.status.status_code;
+
+      ippSetCGIVars(response, NULL, NULL, NULL, 0);
+
+      ippDelete(response);
+    }
+    else
+      status = cupsLastError();
+
+    if (status > IPP_OK_CONFLICT)
+    {
+      cgiSetVariable("ERROR", ippErrorString(status));
+      cgiCopyTemplateLang(stdout, TEMPLATES, "error.tmpl", getenv("LANG"));
+    }
+    else
+      cgiCopyTemplateLang(stdout, TEMPLATES, "users.tmpl", getenv("LANG"));
+  }
+  else
+  {
+   /*
+    * Save the changes...
+    */
+
+    for (num_users = 0, ptr = (char *)users; *ptr; num_users ++)
+    {
+     /*
+      * Skip whitespace and commas...
+      */
+
+      while (*ptr == ',' || isspace(*ptr & 255))
+	ptr ++;
+
+      if (*ptr == '\'' || *ptr == '\"')
+      {
+       /*
+	* Scan quoted name...
+	*/
+
+	quote = *ptr++;
+
+	for (end = ptr; *end; end ++)
+	  if (*end == quote)
+	    break;
+      }
+      else
+      {
+       /*
+	* Scan space or comma-delimited name...
+	*/
+
+        for (end = ptr; *end; end ++)
+	  if (isspace(*end & 255) || *end == ',')
+	    break;
+      }
+
+     /*
+      * Advance to the next name...
+      */
+
+      ptr = end;
+    }
+
+   /*
+    * Build a CUPS-Add-Printer request, which requires the following
+    * attributes:
+    *
+    *    attributes-charset
+    *    attributes-natural-language
+    *    printer-uri
+    *    requesting-user-name-{allowed,denied}
+    */
+
+    request = ippNew();
+
+    request->request.op.operation_id = CUPS_ADD_PRINTER;
+    request->request.op.request_id   = 1;
+
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
+        	 "attributes-charset", NULL, cupsLangEncoding(language));
+
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
+        	 "attributes-natural-language", NULL, language->language);
+
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
+        	 NULL, uri);
+
+    if (num_users == 0)
+      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
+                   "requesting-user-name-allowed", NULL, "all");
+    else
+    {
+      attr = ippAddStrings(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
+                           type, num_users, NULL, NULL);
+
+      for (i = 0, ptr = (char *)users; *ptr; i ++)
+      {
+       /*
+        * Skip whitespace and commas...
+	*/
+
+        while (*ptr == ',' || isspace(*ptr & 255))
+	  ptr ++;
+
+        if (*ptr == '\'' || *ptr == '\"')
+	{
+	 /*
+	  * Scan quoted name...
+	  */
+
+	  quote = *ptr++;
+
+	  for (end = ptr; *end; end ++)
+	    if (*end == quote)
+	      break;
+	}
+	else
+	{
+	 /*
+	  * Scan space or comma-delimited name...
+	  */
+
+          for (end = ptr; *end; end ++)
+	    if (isspace(*end & 255) || *end == ',')
+	      break;
+        }
+
+       /*
+        * Terminate the name...
+	*/
+
+        if (*end)
+          *end++ = '\0';
+
+       /*
+        * Add the name...
+	*/
+
+        attr->values[i].string.text = strdup(ptr);
+
+       /*
+        * Advance to the next name...
+	*/
+
+        ptr = end;
+      }
+    }
+
+   /*
+    * Do the request and get back a response...
+    */
+
+    if ((response = cupsDoRequest(http, request, "/admin/")) != NULL)
+    {
+      status = response->request.status.status_code;
+
+      ippSetCGIVars(response, NULL, NULL, NULL, 0);
+
+      ippDelete(response);
+    }
+    else
+      status = cupsLastError();
+
+    if (status > IPP_OK_CONFLICT)
+    {
+      cgiSetVariable("ERROR", ippErrorString(status));
+      cgiCopyTemplateLang(stdout, TEMPLATES, "error.tmpl", getenv("LANG"));
+    }
+    else
+      cgiCopyTemplateLang(stdout, TEMPLATES, "printer-modified.tmpl", getenv("LANG"));
+  }
+}
+
+
+/*
  * 'get_line()' - Get a line that is terminated by a LF, CR, or CR LF.
  */
 
-static char *		/* O - Pointer to buf or NULL on EOF */
-get_line(char *buf,	/* I - Line buffer */
-         int  length,	/* I - Length of buffer */
-	 FILE *fp)	/* I - File to read from */
+static char *				/* O - Pointer to buf or NULL on EOF */
+get_line(char *buf,			/* I - Line buffer */
+         int  length,			/* I - Length of buffer */
+	 FILE *fp)			/* I - File to read from */
 {
-  char	*bufptr;	/* Pointer into buffer */
-  int	ch;		/* Character from file */
+  char	*bufptr;			/* Pointer into buffer */
+  int	ch;				/* Character from file */
 
 
   length --;
