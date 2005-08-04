@@ -163,6 +163,10 @@ main(int  argc,				/* I - Number of command-line arguments */
 
       request->request.op.operation_id = CUPS_GET_CLASSES;
       request->request.op.request_id   = 1;
+
+      if (getenv("REMOTE_USER") != NULL)
+	ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "requesting-user-name",
+                     NULL, getenv("REMOTE_USER"));
     }
     else
     {
@@ -236,6 +240,18 @@ main(int  argc,				/* I - Number of command-line arguments */
       if ((which_jobs = cgiGetVariable("which_jobs")) != NULL)
 	ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD, "which-jobs",
                      NULL, which_jobs);
+
+      if (getenv("REMOTE_USER") != NULL)
+      {
+	ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "requesting-user-name",
+                     NULL, getenv("REMOTE_USER"));
+
+	if (strcmp(getenv("REMOTE_USER"), "root"))
+	  ippAddBoolean(request, IPP_TAG_OPERATION, "my-jobs", 1);
+      }
+      else
+	ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "requesting-user-name",
+                     NULL, "unknown");
 
       ippGetAttributes(request, TEMPLATES, "jobs.tmpl", getenv("LANG"));
 

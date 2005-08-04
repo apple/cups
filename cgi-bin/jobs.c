@@ -225,8 +225,13 @@ do_job_op(http_t      *http,		/* I - HTTP connection */
                NULL, uri);
 
   if (getenv("REMOTE_USER") != NULL)
+  {
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "requesting-user-name",
                  NULL, getenv("REMOTE_USER"));
+
+    if (strcmp(getenv("REMOTE_USER"), "root"))
+      ippAddBoolean(request, IPP_TAG_OPERATION, "my-jobs", 1);
+  }
   else
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "requesting-user-name",
                  NULL, "unknown");
