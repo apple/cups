@@ -3,6 +3,8 @@ CHANGES.txt - 08/04/2005
 
 CHANGES IN CUPS V1.2.0b1
 
+	- The pstops filter did not handle Adobe-specific
+	  comments in Windows NT driver output (STR #1085)
 	- "lpstat -l -p" incorrectly reported the printer
 	  interface (STR #936)
 	- The web interface now operates exclusively with the

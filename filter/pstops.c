@@ -508,12 +508,14 @@ main(int  argc,			/* I - Number of command-line arguments */
       }
 
       if (!strncmp(line, "%%BeginDocument:", 16) ||
-          !strncmp(line, "%%BeginDocument ", 16))	/* Adobe Acrobat BUG */
+          !strncmp(line, "%%BeginDocument ", 16) ||	/* Adobe Acrobat BUG */
+	  !strncmp(line, "%ADO_BeginApplication", 21))
       {
 	fputs(line, stdout);
         level ++;
       }
-      else if (!strncmp(line, "%%EndDocument", 13) && level > 0)
+      else if ((!strncmp(line, "%%EndDocument", 13) ||
+		!strncmp(line, "%ADO_EndApplication", 19)) && level > 0)
       {
 	fputs(line, stdout);
         level --;
