@@ -517,6 +517,7 @@ recv_print_job(const char    *dest,	/* I - Destination */
 		command,		/* Command from line */
 		*count,			/* Number of bytes */
 		*name;			/* Name of file */
+  const char	*job_sheets;		/* Job sheets */
   int		num_data;		/* Number of data files */
   char		control[1024],		/* Control filename */
 		data[32][256],		/* Data files */
@@ -763,7 +764,7 @@ recv_print_job(const char    *dest,	/* I - Destination */
       title[0]   = '\0';
       user[0]    = '\0';
       docname[0] = '\0';
-      banner     = cupsGetOption("job-sheets", num_defaults, defaults) != NULL;
+      banner     = 0;
 
       while (smart_gets(line, sizeof(line), fp) != NULL)
       {
@@ -837,22 +838,35 @@ recv_print_job(const char    *dest,	/* I - Destination */
               num_options = 0;
 	      options     = NULL;
 
-	      for (i = 0; i < num_defaults; i ++)
-	        num_options = cupsAddOption(defaults[i].name,
-		                            defaults[i].value,
-		                            num_options, &options);
 	      for (i = 0; i < destptr->num_options; i ++)
 	        num_options = cupsAddOption(destptr->options[i].name,
 		                            destptr->options[i].value,
 		                            num_options, &options);
+	      for (i = 0; i < num_defaults; i ++)
+	        num_options = cupsAddOption(defaults[i].name,
+		                            defaults[i].value,
+		                            num_options, &options);
+
+             /*
+	      * If a banner was requested and it's not overridden by a
+	      * command line option and the destination's default is none
+	      * then add the standard banner...
+	      */
+
+              if (banner &&
+	          cupsGetOption("job-sheets", num_defaults, defaults) == NULL &&
+                  ((job_sheets = cupsGetOption("job-sheets",
+		                               destptr->num_options,
+					       destptr->options)) == NULL ||
+                   !strcmp(job_sheets, "none,none")))
+	      {
+	        num_options = cupsAddOption("job-sheets", "standard",
+		                            num_options, &options);
+	      }
 
              /*
 	      * Add additional options as needed...
 	      */
-
-              if (!banner)
-	        num_options = cupsAddOption("job-sheets", "none",
-		                            num_options, &options);
 
 	      if (line[0] == 'l')
 	        num_options = cupsAddOption("raw", "", num_options, &options);

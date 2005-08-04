@@ -3,6 +3,9 @@ CHANGES.txt - 08/04/2005
 
 CHANGES IN CUPS V1.2.0b1
 
+	- cups-lpd now honors remote banner requests with the
+	  "standard" banner whenever a printer does not have one
+	  defined (STR #1220)
 	- The scheduler's denial-of-service checks did not work
 	  properly with IPv6 addresses (STR #1134)
 	- The lp and lpr commands did not error out properly when
