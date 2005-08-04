@@ -585,7 +585,14 @@ main(int  argc,		/* I - Number of command-line arguments */
     }
 
     while ((i = read(0, buffer, sizeof(buffer))) > 0)
-      write(temp, buffer, i);
+      if (write(temp, buffer, i) < 0)
+      {
+	fprintf(stderr, "lp: error - unable to write to temporary file \"%s\" - %s\n",
+        	tempfile, strerror(errno));
+        close(temp);
+        unlink(tempfile);
+	return (1);
+      }
 
     i = lseek(temp, 0, SEEK_CUR);
     close(temp);
@@ -593,6 +600,7 @@ main(int  argc,		/* I - Number of command-line arguments */
     if (i == 0)
     {
       fputs("lp: stdin is empty, so no job has been sent.\n", stderr);
+      unlink(tempfile);
       return (1);
     }
 
