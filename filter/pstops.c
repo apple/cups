@@ -1060,19 +1060,7 @@ main(int  argc,			/* I - Number of command-line arguments */
   * End the job with the appropriate JCL command or CTRL-D otherwise.
   */
 
-  if (ppd != NULL)
-  {
-    if (ppd->jcl_end)
-      fputs(ppd->jcl_end, stdout);
-    else
-    {
-      if (ppd->num_filters == 0)
-        putchar(0x04);
-
-      if (Protocol == PROT_TBCP)
-        fputs("\033%-12345X", stdout);
-    }
-  }
+  ppdEmitJCLEnd(ppd, stdout);
 
  /*
   * Close files and remove the temporary file if needed...

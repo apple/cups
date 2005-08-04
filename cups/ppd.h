@@ -398,6 +398,7 @@ extern ppd_status_t	ppdLastError(int *line);
 extern void		ppdSetConformance(ppd_conform_t c);
 
 /**** New in CUPS 1.2 ****/
+extern int		ppdEmitJCLEnd(ppd_file_t *ppd, FILE *fp);
 extern ppd_ext_option_t	*ppdFindExtOption(ppd_file_t *ppd, const char *keyword);
 extern ppd_ext_param_t	*ppdFindExtParam(ppd_ext_option_t *opt, const char *param);
 extern int		ppdMarkCurve(ppd_file_t *ppd, const char *keyword,

@@ -32,6 +32,7 @@
  *   ppdEmit()          - Emit code for marked options to a file.
  *   ppdEmitFd()        - Emit code for marked options to a file.
  *   ppdEmitJCL()       - Emit code for JCL options to a file.
+ *   ppdEmitJCLEnd()    - Emit JCLEnd code to a file.
  *   ppd_handle_media() - Handle media selection...
  *   ppd_sort()         - Sort options by ordering numbers...
  */
@@ -575,7 +576,7 @@ ppdEmitJCL(ppd_file_t *ppd,		/* I - PPD file record */
   * See if the printer supports HP PJL...
   */
 
-  if (strncmp(ppd->jcl_begin, "\033%-12345X@", 10) == 0)
+  if (!strncmp(ppd->jcl_begin, "\033%-12345X@", 10))
   {
    /*
     * This printer uses HP PJL commands for output; filter the output
@@ -588,7 +589,7 @@ ppdEmitJCL(ppd_file_t *ppd,		/* I - PPD file record */
 
     fputs("\033%-12345X@PJL\n", fp);
     for (ptr = ppd->jcl_begin + 9; *ptr;)
-      if (strncmp(ptr, "@PJL JOB", 8) == 0)
+      if (!strncmp(ptr, "@PJL JOB", 8))
       {
        /*
         * Skip job command...
@@ -637,17 +638,74 @@ ppdEmitJCL(ppd_file_t *ppd,		/* I - PPD file record */
         *ptr = '\'';
 
    /*
-    * Send PJL JOB command before we enter PostScript mode...
+    * Send PJL JOB and PJL RDYMSG commands before we enter PostScript mode...
     */
 
     fprintf(fp, "@PJL JOB NAME = \"%s\" DISPLAY = \"%d %s %s\"\n", temp,
             job_id, user, temp);
+    fprintf(fp, "@PJL RDYMSG DISPLAY = \"%d %s %s\"\n", job_id, user, temp);
   }
   else
     fputs(ppd->jcl_begin, fp);
 
   ppdEmit(ppd, fp, PPD_ORDER_JCL);
   fputs(ppd->jcl_ps, fp);
+
+  return (0);
+}
+
+
+/*
+ * 'ppdEmitJCLEnd()' - Emit JCLEnd code to a file.
+ */
+
+int					/* O - 0 on success, -1 on failure */
+ppdEmitJCLEnd(ppd_file_t *ppd,		/* I - PPD file record */
+              FILE       *fp)		/* I - File to write to */
+{
+  ppd_attr_t	*attr;			/* PPD attributes */
+
+
+ /*
+  * Range check the input...
+  */
+
+  if (ppd == NULL)
+    return (0);
+
+  if (ppd->jcl_end == NULL)
+  {
+    if (ppd->num_filters == 0)
+      fputc(0x04, fp);
+
+    if ((attr = ppdFindAttr(ppd, "cupsProtocol", NULL)) != NULL &&
+        attr->value != NULL && !strcasecmp(attr->value, "TBCP"))
+      fputs("\033%-12345X", stdout);
+
+    return (0);
+  }
+
+ /*
+  * See if the printer supports HP PJL...
+  */
+
+  if (!strncmp(ppd->jcl_end, "\033%-12345X@", 10))
+  {
+   /*
+    * This printer uses HP PJL commands for output; filter the output
+    * so that we only have a single "@PJL JOB" command in the header...
+    *
+    * To avoid bugs in the PJL implementation of certain vendors' products
+    * (Xerox in particular), we add a dummy "@PJL" command at the beginning
+    * of the PJL commands to initialize PJL processing.
+    */
+
+    fputs("\033%-12345X@PJL\n", fp);
+    fputs("@PJL RDYMSG DISPLAY = \"READY\"\n", fp);
+    fputs(ppd->jcl_end + 9, fp);
+  }
+  else
+    fputs(ppd->jcl_end, fp);
 
   return (0);
 }

@@ -1,8 +1,11 @@
-CHANGES.txt - 06/26/2005
+CHANGES.txt - 08/03/2005
 ------------------------
 
 CHANGES IN CUPS V1.2.0b1
 
+	- HP PJL output now uses both JOB DISPLAY and RDYMSG
+	  commands to show the current job on the printer's
+	  display (STR #1218)
 	- Local authentication certificates are now stored in
 	  /var/run/cups/certs by default instead of
 	  /etc/cups/certs (STR #1211)
