@@ -139,8 +139,7 @@ AcceptClient(listener_t *lis)	/* I - Listener socket */
   */
 
   for (i = 0, count = 0; i < NumClients; i ++)
-    if (memcmp(&(Clients[i].http.hostaddr), &(con->http.hostaddr),
-	       sizeof(con->http.hostaddr)) == 0)
+    if (httpAddrEqual(&(Clients[i].http.hostaddr), &(con->http.hostaddr)))
     {
       count ++;
       if (count >= MaxClientsPerHost)

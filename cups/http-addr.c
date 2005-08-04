@@ -74,6 +74,11 @@ httpAddrEqual(const http_addr_t *addr1,		/* I - First address */
   if (addr1->addr.sa_family != addr2->addr.sa_family)
     return (0);
 
+#ifdef AF_LOCAL
+  if (addr1->addr.sa_family == AF_LOCAL)
+    return (!strcmp(addr1->un.sun_path, addr2->un.sun_path));
+#endif /* AF_LOCAL */
+
 #ifdef AF_INET6
   if (addr1->addr.sa_family == AF_INET6)
     return (memcmp(&(addr1->ipv6.sin6_addr), &(addr2->ipv6.sin6_addr), 16) == 0);
