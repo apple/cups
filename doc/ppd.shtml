@@ -216,7 +216,7 @@ attributes define the mapping from selector to main keyword:</p>
     *cupsICCQualifier3: Resolution
 </pre>
 
-<h1>I18N Support</h1>
+<h1><a name'I18N'>I18N Support</a></h1>
 
 <p>CUPS 1.2 and higher adds support for PPD files containing multiple
 languages by following the following rules:</p>
@@ -232,19 +232,25 @@ languages by following the following rules:</p>
 	allows.</li>
 
 	<li>Translations are specified using a locale prefix of
-	the form "ll_CC." where "ll" is the 2-letter ISO
+	the form "ll" or "ll_CC." where "ll" is the 2-letter ISO
 	language code and "CC" is the 2-letter ISO country
 	code</li>
 
 	<li>Translation strings are encoded using UTF-8.</li>
 
-	<li>Main keywords are translated using the following
-	form: <tt>*ll_CC.Translation MainKeyword/translation
-	text: ""</tt></li>
+	<li>Main keywords are translated using any of the
+	following forms:
+	<p><tt>*ll.Translation MainKeyword/translation
+	text: ""</tt><br />
+	<tt>*ll_CC.Translation MainKeyword/translation
+	text: ""</tt></p></li>
 
-	<li>Option keywords are translated using the following
-	form: <tt>*ll_CC.MainKeyword OptionKeyword/translation
-	text: ""</tt></li>
+	<li>Option keywords are translated using any of the
+	following forms:
+	<p><tt>*ll.MainKeyword OptionKeyword/translation
+	text: ""</tt><br />
+	<tt>*ll_CC.MainKeyword OptionKeyword/translation
+	text: ""</tt></p></li>
 
 </ol>
 
