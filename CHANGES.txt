@@ -1,8 +1,10 @@
-CHANGES.txt - 08/03/2005
+CHANGES.txt - 08/04/2005
 ------------------------
 
 CHANGES IN CUPS V1.2.0b1
 
+	- The texttops filter did not highlight preprocessor
+	  directives followed by a tab properly.
 	- HP PJL output now uses both JOB DISPLAY and RDYMSG
 	  commands to show the current job on the printer's
 	  display (STR #1218)

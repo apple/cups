@@ -669,6 +669,9 @@ TextMain(const char *name,	/* I - Name of filter */
 	    *keyptr = '\0';
 	    keyptr  = keyword;
 
+            fprintf(stderr, "DEBUG: TAB - column=%d, keycol=%d, attr=%x\n",
+	            column, keycol, attr);
+
 	    if (bsearch(&keyptr, Keywords, NumKeywords, sizeof(char *),
 	                compare_keywords))
             {
@@ -707,6 +710,8 @@ TextMain(const char *name,	/* I - Name of filter */
           }
 
 	  keycol = column;
+
+          attr &= ~ATTR_BOLD;
           break;
 
       case 0x0d :		/* CR */
@@ -881,7 +886,7 @@ TextMain(const char *name,	/* I - Name of filter */
 	    * and comments...
 	    */
 
-	    if ((ch == ' ' || ch == '\t') && (attr & ATTR_BOLD))
+	    if (ch == ' ' && (attr & ATTR_BOLD))
 	    {
 	     /*
 	      * Stop bolding preprocessor command...
@@ -934,7 +939,7 @@ TextMain(const char *name,	/* I - Name of filter */
 	      */
 
 	      cstring = -1;
-              attr    |= ATTR_BLUE;
+              attr    = ATTR_BLUE;
 	    }
             else if (ch == '*' && lastch == '/' && !cstring &&
 	             PrettyPrint != PRETTY_SHELL)
@@ -944,7 +949,7 @@ TextMain(const char *name,	/* I - Name of filter */
 	      */
 
 	      ccomment = 1;
-	      attr     |= ATTR_ITALIC | ATTR_GREEN;
+	      attr     = ATTR_ITALIC | ATTR_GREEN;
 	    }
 	    else if (ch == '/' && lastch == '/' && !cstring &&
 	             PrettyPrint == PRETTY_CODE)
@@ -953,7 +958,7 @@ TextMain(const char *name,	/* I - Name of filter */
 	      * Start a C++-style comment...
 	      */
 
-	      attr |= ATTR_ITALIC | ATTR_GREEN;
+	      attr = ATTR_ITALIC | ATTR_GREEN;
 	    }
 	    else if (ch == '#' && !cstring && PrettyPrint != PRETTY_CODE)
 	    {
@@ -961,7 +966,7 @@ TextMain(const char *name,	/* I - Name of filter */
 	      * Start a shell-style comment...
 	      */
 
-	      attr |= ATTR_ITALIC | ATTR_GREEN;
+	      attr = ATTR_ITALIC | ATTR_GREEN;
 	    }
 	    else if (ch == '#' && column == 0 && !ccomment && !cstring &&
 	             PrettyPrint == PRETTY_CODE)
@@ -970,7 +975,7 @@ TextMain(const char *name,	/* I - Name of filter */
 	      * Start a preprocessor command...
 	      */
 
-	      attr |= ATTR_BOLD | ATTR_RED;
+	      attr = ATTR_BOLD | ATTR_RED;
 	    }
           }
 
