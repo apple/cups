@@ -1008,7 +1008,7 @@ Gushort *Gfx8BitFont::getCodeToGIDMap(FoFiTrueType *ff) {
   // try the TrueType 'post' table to handle any unmapped characters
   for (i = 0; i < 256; ++i) {
     if (!map[i] && (charName = enc[i])) {
-      map[i] = (Gushort)(int)ff->mapNameToGID(charName);
+      map[i] = (Gushort)(long)ff->mapNameToGID(charName);
     }
   }
 

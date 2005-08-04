@@ -3,6 +3,8 @@ CHANGES.txt - 08/04/2005
 
 CHANGES IN CUPS V1.2.0b1
 
+	- The pdftops filter did not compile with GCC 4.0 (STR
+	  #1226)
 	- The texttops filter did not highlight preprocessor
 	  directives followed by a tab properly.
 	- HP PJL output now uses both JOB DISPLAY and RDYMSG
