@@ -77,10 +77,14 @@ main(int  argc,				/* I - Number of command-line arguments */
   language = cupsLangDefault();
 
  /*
-  * Send a standard header...
+  * Tell the client to expect UTF-8 encoded HTML...
   */
 
-  printf("Content-Type: text/html;charset=%s\n\n", cupsLangEncoding(language));
+  puts("Content-Type: text/html;charset=utf-8\n");
+
+ /*
+  * Send a standard header...
+  */
 
   cgiSetVariable("TITLE", "Admin");
   ippSetServerVersion();

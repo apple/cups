@@ -76,10 +76,14 @@ main(int  argc,				/* I - Number of command-line arguments */
   http = httpConnectEncrypt("localhost", ippPort(), cupsEncryption());
 
  /*
-  * Tell the client to expect HTML...
+  * Tell the client to expect UTF-8 encoded HTML...
   */
 
-  printf("Content-Type: text/html;charset=%s\n\n", cupsLangEncoding(language));
+  puts("Content-Type: text/html;charset=utf-8\n");
+
+ /*
+  * Send a standard header...
+  */
 
   cgiSetVariable("TITLE", "Jobs");
 
