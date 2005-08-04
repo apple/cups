@@ -3,6 +3,9 @@ CHANGES.txt - 08/04/2005
 
 CHANGES IN CUPS V1.2.0b1
 
+	- Disallow the "#" character in printer names, since it
+	  has special meaning in the shell, config files, and in
+	  URIs (STR #917)
 	- Added a new application/x-csource MIME type, and
 	  support for it to the texttops filter so that you can
 	  pretty print plain text files without the C/C++

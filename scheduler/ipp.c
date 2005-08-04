@@ -77,6 +77,8 @@
  *   start_printer()             - Start a printer.
  *   stop_printer()              - Stop a printer.
  *   validate_job()              - Validate printer options and destination.
+ *   validate_name()             - Make sure the printer name only contains
+ *                                 valid chars.
  *   validate_user()             - Validate the user for the request.
  */
 
@@ -160,6 +162,7 @@ static void	set_job_attrs(client_t *con, ipp_attribute_t *uri);
 static void	start_printer(client_t *con, ipp_attribute_t *uri);
 static void	stop_printer(client_t *con, ipp_attribute_t *uri);
 static void	validate_job(client_t *con, ipp_attribute_t *uri);
+static int	validate_name(const char *name);
 static int	validate_user(job_t *job, client_t *con,
 		              const char *owner, char *username,
 		              int userlen);
@@ -722,6 +725,20 @@ add_class(client_t        *con,		/* I - Client connection */
   httpSeparate(uri->values[0].string.text, method, username, host, &port, resource);
 
   if (strncmp(resource, "/classes/", 9) != 0 || strlen(resource) == 9)
+  {
+   /*
+    * No, return an error...
+    */
+
+    send_ipp_error(con, IPP_BAD_REQUEST);
+    return;
+  }
+
+ /*
+  * Do we have a valid printer name?
+  */
+
+  if (!validate_name(resource + 9))
   {
    /*
     * No, return an error...
@@ -1349,6 +1366,20 @@ add_printer(client_t        *con,	/* I - Client connection */
 
     LogMessage(L_ERROR, "add_printer: bad printer URI \"%s\"!",
                uri->values[0].string.text);
+    send_ipp_error(con, IPP_BAD_REQUEST);
+    return;
+  }
+
+ /*
+  * Do we have a valid printer name?
+  */
+
+  if (!validate_name(resource + 10))
+  {
+   /*
+    * No, return an error...
+    */
+
     send_ipp_error(con, IPP_BAD_REQUEST);
     return;
   }
@@ -7351,6 +7382,32 @@ validate_job(client_t        *con,	/* I - Client connection */
   */
 
   con->response->request.status.status_code = IPP_OK;
+}
+
+
+/*
+ * 'validate_name()' - Make sure the printer name only contains valid chars.
+ */
+
+static int			/* O - 0 if name is no good, 1 if name is good */
+validate_name(const char *name)	/* I - Name to check */
+{
+  const char	*ptr;		/* Pointer into name */
+
+
+ /*
+  * Scan the whole name...
+  */
+
+  for (ptr = name; *ptr; ptr ++)
+    if ((*ptr >= 0 && *ptr <= ' ') || *ptr == 127 || *ptr == '/' || *ptr == '#')
+      return (0);
+
+ /*
+  * All the characters are good; validate the length, too...
+  */
+
+  return ((ptr - name) < 128);
 }
 
 

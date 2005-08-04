@@ -259,13 +259,14 @@ do_am_class(http_t      *http,		/* I - HTTP connection */
 
   name = cgiGetVariable("PRINTER_NAME");
   for (ptr = name; *ptr; ptr ++)
-    if ((*ptr >= 0 && *ptr <= ' ') || *ptr == 127 || *ptr == '/')
+    if ((*ptr >= 0 && *ptr <= ' ') || *ptr == 127 || *ptr == '/' || *ptr == '#')
       break;
 
   if (*ptr || ptr == name || strlen(name) > 127)
   {
     cgiSetVariable("ERROR", "The class name may only contain up to 127 printable "
-                            "characters and may not contain spaces.");
+                            "characters and may not contain spaces, slashes (/), "
+			    "or the pound sign (#).");
     cgiCopyTemplateLang(stdout, TEMPLATES, "error.tmpl", getenv("LANG"));
     return;
   }
@@ -570,13 +571,14 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
   }
 
   for (ptr = name; *ptr; ptr ++)
-    if ((*ptr >= 0 && *ptr <= ' ') || *ptr == 127 || *ptr == '/')
+    if ((*ptr >= 0 && *ptr <= ' ') || *ptr == 127 || *ptr == '/' || *ptr == '#')
       break;
 
   if (*ptr || ptr == name || strlen(name) > 127)
   {
     cgiSetVariable("ERROR", "The printer name may only contain up to 127 printable "
-                            "characters and may not contain spaces.");
+                            "characters and may not contain spaces, slashes (/), "
+			    "or the pound sign (#).");
     cgiCopyTemplateLang(stdout, TEMPLATES, "error.tmpl", getenv("LANG"));
     return;
   }
