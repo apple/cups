@@ -348,17 +348,44 @@ cupsParseOptions(const char    *arg,		/* I - Argument to parse */
  * 'cupsMarkOptions()' - Mark command-line options in a PPD file.
  */
 
-int						/* O - 1 if conflicting */
-cupsMarkOptions(ppd_file_t    *ppd,		/* I - PPD file */
-                int           num_options,	/* I - Number of options */
-                cups_option_t *options)		/* I - Options */
+int					/* O - 1 if conflicting */
+cupsMarkOptions(
+    ppd_file_t    *ppd,			/* I - PPD file */
+    int           num_options,		/* I - Number of options */
+    cups_option_t *options)		/* I - Options */
 {
-  int		i;				/* Looping var */
-  int		conflict;			/* Option conflicts */
-  char		*val,				/* Pointer into value */
-		*ptr,				/* Pointer into string */
-		s[255];				/* Temporary string */
-  cups_option_t	*optptr;			/* Current option */
+  int		i, j, k;		/* Looping vars */
+  int		conflict;		/* Option conflicts */
+  char		*val,			/* Pointer into value */
+		*ptr,			/* Pointer into string */
+		s[255];			/* Temporary string */
+  cups_option_t	*optptr;		/* Current option */
+  ppd_option_t	*option;		/* PPD option */
+  static const char * const duplex_options[] =
+		{			/* Duplex option names */
+		  "Duplex",		/* Adobe */
+		  "EFDuplex",		/* EFI */
+		  "EFDuplexing",	/* EFI */
+		  "KD03Duplex",		/* Kodak */
+		  "JCLDuplex"		/* Samsung */
+		};
+  static const char * const duplex_one[] =
+		{			/* one-sided names */
+		  "None",
+		  "False"
+		};
+  static const char * const duplex_two_long[] =
+		{			/* two-sided-long-edge names */
+		  "DuplexNoTumble",	/* Adobe */
+		  "LongEdge",		/* EFI */
+		  "Top"			/* EFI */
+		};
+  static const char * const duplex_two_short[] =
+		{			/* two-sided-long-edge names */
+		  "DuplexTumble",	/* Adobe */
+		  "ShortEdge",		/* EFI */
+		  "Bottom"		/* EFI */
+		};
 
 
  /*
@@ -423,10 +450,11 @@ cupsMarkOptions(ppd_file_t    *ppd,		/* I - PPD file */
     }
     else if (strcasecmp(optptr->name, "sides") == 0)
     {
-      if (cupsGetOption("Duplex", num_options, options) != NULL ||
-          cupsGetOption("JCLDuplex", num_options, options) != NULL ||
-          cupsGetOption("EFDuplex", num_options, options) != NULL ||
-          cupsGetOption("KD03Duplex", num_options, options) != NULL)
+      for (j = 0; j < (int)(sizeof(duplex_options) / sizeof(duplex_options[0])); j ++)
+        if (cupsGetOption(duplex_options[j], num_options, options) != NULL)
+	  break;
+
+      if (j < (int)(sizeof(duplex_options) / sizeof(duplex_options[0])))
       {
        /*
         * Don't override the PPD option with the IPP attribute...
@@ -434,38 +462,72 @@ cupsMarkOptions(ppd_file_t    *ppd,		/* I - PPD file */
 
         continue;
       }
-      else if (strcasecmp(optptr->value, "one-sided") == 0)
+
+      if (strcasecmp(optptr->value, "one-sided") == 0)
       {
-        if (ppdMarkOption(ppd, "Duplex", "None"))
-	  conflict = 1;
-        if (ppdMarkOption(ppd, "JCLDuplex", "None"))	/* Samsung */
-	  conflict = 1;
-        if (ppdMarkOption(ppd, "EFDuplex", "None"))	/* EFI */
-	  conflict = 1;
-        if (ppdMarkOption(ppd, "KD03Duplex", "None"))	/* Kodak */
-	  conflict = 1;
+       /*
+        * Mark the appropriate duplex option for one-sided output...
+	*/
+
+        for (j = 0; j < (int)(sizeof(duplex_options) / sizeof(duplex_options[0])); j ++)
+	  if ((option = ppdFindOption(ppd, duplex_options[j])) != NULL)
+	    break;
+
+	if (j < (int)(sizeof(duplex_options) / sizeof(duplex_options[0])))
+	{
+          for (k = 0; k < (int)(sizeof(duplex_one) / sizeof(duplex_one[0])); k ++)
+            if (ppdFindChoice(option, duplex_one[k]))
+	    {
+	      if (ppdMarkOption(ppd, duplex_options[j], duplex_one[k]))
+		conflict = 1;
+
+	      break;
+            }
+        }
       }
       else if (strcasecmp(optptr->value, "two-sided-long-edge") == 0)
       {
-        if (ppdMarkOption(ppd, "Duplex", "DuplexNoTumble"))
-	  conflict = 1;
-        if (ppdMarkOption(ppd, "JCLDuplex", "DuplexNoTumble"))	/* Samsung */
-	  conflict = 1;
-        if (ppdMarkOption(ppd, "EFDuplex", "DuplexNoTumble"))	/* EFI */
-	  conflict = 1;
-        if (ppdMarkOption(ppd, "KD03Duplex", "DuplexNoTumble"))	/* Kodak */
-	  conflict = 1;
+       /*
+        * Mark the appropriate duplex option for two-sided-long-edge output...
+	*/
+
+        for (j = 0; j < (int)(sizeof(duplex_options) / sizeof(duplex_options[0])); j ++)
+	  if ((option = ppdFindOption(ppd, duplex_options[j])) != NULL)
+	    break;
+
+	if (j < (int)(sizeof(duplex_options) / sizeof(duplex_options[0])))
+	{
+          for (k = 0; k < (int)(sizeof(duplex_two_long) / sizeof(duplex_two_long[0])); k ++)
+            if (ppdFindChoice(option, duplex_two_long[k]))
+	    {
+	      if (ppdMarkOption(ppd, duplex_options[j], duplex_two_long[k]))
+		conflict = 1;
+
+	      break;
+            }
+        }
       }
       else if (strcasecmp(optptr->value, "two-sided-short-edge") == 0)
       {
-        if (ppdMarkOption(ppd, "Duplex", "DuplexTumble"))
-	  conflict = 1;
-        if (ppdMarkOption(ppd, "JCLDuplex", "DuplexTumble"))	/* Samsung */
-	  conflict = 1;
-        if (ppdMarkOption(ppd, "EFDuplex", "DuplexTumble"))	/* EFI */
-	  conflict = 1;
-        if (ppdMarkOption(ppd, "KD03Duplex", "DuplexTumble"))	/* Kodak */
-	  conflict = 1;
+       /*
+        * Mark the appropriate duplex option for two-sided-short-edge output...
+	*/
+
+        for (j = 0; j < (int)(sizeof(duplex_options) / sizeof(duplex_options[0])); j ++)
+	  if ((option = ppdFindOption(ppd, duplex_options[j])) != NULL)
+	    break;
+
+	if (j < (int)(sizeof(duplex_options) / sizeof(duplex_options[0])))
+	{
+          for (k = 0; k < (int)(sizeof(duplex_two_short) / sizeof(duplex_two_short[0])); k ++)
+            if (ppdFindChoice(option, duplex_two_short[k]))
+	    {
+	      if (ppdMarkOption(ppd, duplex_options[j], duplex_two_short[k]))
+		conflict = 1;
+
+	      break;
+            }
+        }
       }
     }
     else if (strcasecmp(optptr->name, "resolution") == 0 ||

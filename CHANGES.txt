@@ -3,6 +3,8 @@ CHANGES.txt - 08/04/2005
 
 CHANGES IN CUPS V1.2.0b1
 
+	- cupsMarkOptions() now handles more non-standard
+	  duplexing options and choices (STR #915)
 	- cups-lpd now honors remote banner requests with the
 	  "standard" banner whenever a printer does not have one
 	  defined (STR #1220)
