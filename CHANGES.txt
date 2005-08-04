@@ -3,6 +3,8 @@ CHANGES.txt - 08/04/2005
 
 CHANGES IN CUPS V1.2.0b1
 
+	- "lpstat -l -p" incorrectly reported the printer
+	  interface (STR #936)
 	- The web interface now operates exclusively with the
 	  UTF-8 encoding, and sends the appropriate character set
 	  and header information to the web browser (STR #919,

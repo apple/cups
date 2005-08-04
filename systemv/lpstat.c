@@ -1998,7 +1998,7 @@ show_printers(http_t      *http,	/* I - HTTP connection to server */
 	  if (!(ptype & CUPS_PRINTER_REMOTE))
 	  {
 	    if (make_model && strstr(make_model, "System V Printer"))
-	      printf("\tInterface: %s/ppd/%s.ppd\n", root, printer);
+	      printf("\tInterface: %s/interfaces/%s\n", root, printer);
 	    else if (make_model && !strstr(make_model, "Raw Printer"))
 	      printf("\tInterface: %s/ppd/%s.ppd\n", root, printer);
           }
