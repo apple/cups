@@ -253,7 +253,7 @@ ProcessBrowseData(const char   *uri,	/* I - URI of printer/class */
 
       LogMessage(L_INFO, "Added remote class \"%s\"...", name);
 
-      cupsdAddEvent(CUPSD_EVENT_PRINTER_ADDED, pclass, NULL,
+      cupsdAddEvent(CUPSD_EVENT_PRINTER_ADDED, p, NULL,
                     "Class \'%s\' added by directory services.", name);
 
      /*
@@ -328,7 +328,7 @@ ProcessBrowseData(const char   *uri,	/* I - URI of printer/class */
 
       p = AddPrinter(name);
 
-      cupsdAddEvent(CUPSD_EVENT_PRINTER_ADDED, pclass, NULL,
+      cupsdAddEvent(CUPSD_EVENT_PRINTER_ADDED, p, NULL,
                     "Printer \'%s\' added by directory services.", name);
 
       LogMessage(L_INFO, "Added remote printer \"%s\"...", name);
