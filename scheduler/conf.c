@@ -2282,7 +2282,7 @@ read_policy(cups_file_t *fp,		/* I - Configuration file */
       * Deny line, @group, @OWNER
       */
 
-      for (value = valptr; *value;)
+      while (*value)
       {
         while (isspace(*value & 255))
 	  value ++;
