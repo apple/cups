@@ -29,6 +29,7 @@
  *   do_config_printer()    - Configure the default options for a printer.
  *   do_delete_class()      - Delete a class...
  *   do_delete_printer()    - Delete a printer...
+ *   do_menu()              - Show the main menu...
  *   do_printer_op()        - Do a printer operation.
  *   do_set_allowed_users() - Set the allowed/denied users for a queue.
  *   get_line()             - Get a line that is terminated by a LF, CR, or CR LF.
@@ -39,6 +40,7 @@
  */
 
 #include "ipp-var.h"
+#include <cups/file.h>
 #include <ctype.h>
 #include <errno.h>
 
@@ -52,6 +54,7 @@ static void	do_am_printer(http_t *http, cups_lang_t *language, int modify);
 static void	do_config_printer(http_t *http, cups_lang_t *language);
 static void	do_delete_class(http_t *http, cups_lang_t *language);
 static void	do_delete_printer(http_t *http, cups_lang_t *language);
+static void	do_menu(http_t *http, cups_lang_t *language);
 static void	do_printer_op(http_t *http, cups_lang_t *language, ipp_op_t op);
 static void	do_set_allowed_users(http_t *http, cups_lang_t *language);
 static char	*get_line(char *buf, int length, FILE *fp);
@@ -75,6 +78,12 @@ main(int  argc,				/* I - Number of command-line arguments */
   */
 
   language = cupsLangDefault();
+
+ /*
+  * Connect to the HTTP server...
+  */
+
+  http = httpConnectEncrypt("localhost", ippPort(), cupsEncryption());
 
  /*
   * Tell the client to expect UTF-8 encoded HTML...
@@ -101,47 +110,41 @@ main(int  argc,				/* I - Number of command-line arguments */
     * Nope, send the administration menu...
     */
 
-    cgiCopyTemplateLang(stdout, TEMPLATES, "admin.tmpl", getenv("LANG"));
+    do_menu(http, language);
   }
   else if ((op = cgiGetVariable("OP")) != NULL)
   {
    /*
-    * Connect to the HTTP server...
-    */
-
-    http = httpConnectEncrypt("localhost", ippPort(), cupsEncryption());
-
-   /*
     * Do the operation...
     */
 
-    if (strcmp(op, "start-printer") == 0)
+    if (!strcmp(op, "start-printer"))
       do_printer_op(http, language, IPP_RESUME_PRINTER);
-    else if (strcmp(op, "stop-printer") == 0)
+    else if (!strcmp(op, "stop-printer"))
       do_printer_op(http, language, IPP_PAUSE_PRINTER);
-    else if (strcmp(op, "accept-jobs") == 0)
+    else if (!strcmp(op, "accept-jobs"))
       do_printer_op(http, language, CUPS_ACCEPT_JOBS);
-    else if (strcmp(op, "reject-jobs") == 0)
+    else if (!strcmp(op, "reject-jobs"))
       do_printer_op(http, language, CUPS_REJECT_JOBS);
-    else if (strcmp(op, "purge-jobs") == 0)
+    else if (!strcmp(op, "purge-jobs"))
       do_printer_op(http, language, IPP_PURGE_JOBS);
-    else if (strcmp(op, "set-allowed-users") == 0)
+    else if (!strcmp(op, "set-allowed-users"))
       do_set_allowed_users(http, language);
-    else if (strcmp(op, "set-as-default") == 0)
+    else if (!strcmp(op, "set-as-default"))
       do_printer_op(http, language, CUPS_SET_DEFAULT);
-    else if (strcmp(op, "add-class") == 0)
+    else if (!strcmp(op, "add-class"))
       do_am_class(http, language, 0);
-    else if (strcmp(op, "add-printer") == 0)
+    else if (!strcmp(op, "add-printer"))
       do_am_printer(http, language, 0);
-    else if (strcmp(op, "modify-class") == 0)
+    else if (!strcmp(op, "modify-class"))
       do_am_class(http, language, 1);
-    else if (strcmp(op, "modify-printer") == 0)
+    else if (!strcmp(op, "modify-printer"))
       do_am_printer(http, language, 1);
-    else if (strcmp(op, "delete-class") == 0)
+    else if (!strcmp(op, "delete-class"))
       do_delete_class(http, language);
-    else if (strcmp(op, "delete-printer") == 0)
+    else if (!strcmp(op, "delete-printer"))
       do_delete_printer(http, language);
-    else if (strcmp(op, "config-printer") == 0)
+    else if (!strcmp(op, "config-printer"))
       do_config_printer(http, language);
     else
     {
@@ -1478,6 +1481,158 @@ do_delete_printer(http_t      *http,	/* I - HTTP connection */
   }
   else
     cgiCopyTemplateLang(stdout, TEMPLATES, "printer-deleted.tmpl", getenv("LANG"));
+}
+
+
+/*
+ * 'do_menu()' - Show the main menu...
+ */
+
+static void
+do_menu(http_t      *http,		/* I - HTTP connection */
+        cups_lang_t *language)		/* I - Client's language */
+{
+  cups_file_t	*cupsd;			/* cupsd.conf file */
+  char		line[1024],		/* Line from cupsd.conf file */
+		*value;			/* Value on line */
+  const char	*server_root;		/* Location of config files */
+
+
+ /*
+  * Locate the cupsd.conf file...
+  */
+
+  if ((server_root = getenv("CUPS_SERVERROOT")) == NULL)
+    server_root = CUPS_SERVERROOT;
+
+  snprintf(line, sizeof(line), "%s/cupsd.conf", server_root);
+
+  printf("<!-- \"%s\" -->\n", line);
+
+ /*
+  * Open the cupsd.conf file...
+  */
+
+  if ((cupsd = cupsFileOpen(line, "r")) == NULL)
+  {
+   /*
+    * Unable to open - log an error...
+    */
+
+    perror(line);
+  }
+  else
+  {
+   /*
+    * Read the file, keeping track of what settings are enabled...
+    */
+
+    int		remote_access = 0,	/* Remote access allowed? */
+		remote_admin = 0,	/* Remote administration allowed? */
+		browsing = 1,		/* Browsing enabled? */
+		browse_address = 0,	/* Browse address set? */
+		cancel_policy = 0;	/* Cancel-job policy set? */
+    int		linenum = 0,		/* Line number in file */
+		in_policy = 0,		/* In a policy section? */
+		in_cancel_job = 0;	/* In a cancel-job section? */
+
+
+    while (cupsFileGetConf(cupsd, line, sizeof(line), &value, &linenum))
+    {
+      if (!strcasecmp(line, "Port"))
+      {
+        remote_access = 1;
+      }
+      else if (!strcasecmp(line, "Listen"))
+      {
+        char	*port;			/* Pointer to port number, if any */
+
+
+	if ((port = strrchr(value, ':')) != NULL)
+	  *port = '\0';
+
+        if (strcasecmp(value, "localhost") && strcmp(value, "127.0.0.1"))
+	  remote_access = 1;
+      }
+      else if (!strcasecmp(line, "Browsing"))
+      {
+        if (!strcasecmp(value, "yes") || !strcasecmp(value, "on") ||
+	    !strcasecmp(value, "true"))
+	  browsing = 1;
+        else
+	  browsing = 0;
+      }
+      else if (!strcasecmp(line, "BrowseAddress"))
+      {
+        browse_address = 1;
+      }
+      else if (!strcasecmp(line, "Policy"))
+      {
+        in_policy = 1;
+      }
+      else if (!strcasecmp(line, "/Policy"))
+      {
+        in_policy = 0;
+      }
+      else if (!strcasecmp(line, "Limit") && in_policy)
+      {
+       /*
+        * See if the policy limit is for the Cancel-Job operation...
+	*/
+
+        char	*valptr;		/* Pointer into value */
+
+
+        while (*value)
+	{
+	  for (valptr = value; !isspace(*valptr & 255) && *valptr; valptr ++);
+
+	  if (*valptr)
+	    *valptr++ = '\0';
+
+          if (!strcasecmp(value, "cancel-job"))
+	  {
+	    in_cancel_job = 1;
+	    break;
+	  }
+
+          for (value = valptr; isspace(*value & 255); value ++);
+        }
+      }
+      else if (!strcasecmp(line, "/Limit"))
+      {
+        in_cancel_job = 0;
+      }
+      else if (!strcasecmp(line, "Allow") && in_cancel_job)
+      {
+       /*
+        * See if we are allowing all users to cancel jobs...
+	*/
+
+        if (!strcasecmp(value, "@ALL"))
+	  cancel_policy = 1;
+      }
+    }
+
+    cupsFileClose(cupsd);
+
+    if (browsing)
+      cgiSetVariable("REMOTE_PRINTERS", "CHECKED");
+
+    if (remote_access && browsing && browse_address)
+      cgiSetVariable("SHARE_PRINTERS", "CHECKED");
+
+    if (remote_access && remote_admin)
+      cgiSetVariable("REMOTE_ADMIN", "CHECKED");
+
+    if (cancel_policy)
+      cgiSetVariable("USER_CANCEL_ANY", "CHECKED");
+
+    printf("<!-- browsing=%d, browse_address=%d, cancel_policy=%d, remote_access=%d, remote_admin=%d -->\n",
+           browsing, browse_address, cancel_policy, remote_access, remote_admin);
+  }
+
+  cgiCopyTemplateLang(stdout, TEMPLATES, "admin.tmpl", getenv("LANG"));
 }
 
 

@@ -523,6 +523,8 @@ check_op(policyop_t *po,		/* I - Policy operation */
       if (owner && !strcasecmp(name, owner))
         return (1);
     }
+    else if (!strcasecmp(pn->name, "@ALL"))
+      return (1);
     else if (pn->name[0] == '@')
     {
       if (check_group(name, pn->name + 1))

@@ -46,10 +46,36 @@
 <TR>
 	<TD></TD>
 	<TD><A HREF="/admin/?op=add-printer">
-	<IMG SRC="/images/add-printer.gif" ALT="Add a New Printer" BORDER="0"></A>
+	<IMG SRC="/images/add-printer.gif" ALT="Add Printer" BORDER="0"></A>
 	<A HREF="/printers/">
-	<IMG SRC="/images/manage-printers.gif" ALT="Manage Available Printers" BORDER="0"></A>
-	</TD>
+	<IMG SRC="/images/manage-printers.gif" ALT="Manage Printers" BORDER="0"></A>
+	{#device_uri=0?:{[device_uri]
+	<p>{device_make_and_model} ({device_info})
+	<A HREF="/admin/?op=add-printer&amp;{device_options}">
+	<IMG SRC="/images/add-printer.gif" ALT="Add Printer" BORDER="0"></A></P>
+	}}</TD>
+</TR>
+<TR>
+	<TD>&nbsp;</TD>
+</TR>
+<TR>
+	<TH BGCOLOR="#999966"><IMG SRC="/images/left.gif" ALT=""></TH>
+	<TH BGCOLOR="#999966">Server Settings</TH>
+	<TH WIDTH="16"><IMG SRC="/images/right.gif" ALT=""></TH>
+</TR>
+<TR>
+	<TD HEIGHT="4"></TD>
+</TR>
+<TR>
+	<TD></TD>
+	<TD><FORM METHOD="POST" ACTION="/admin">
+	<INPUT TYPE="HIDDEN" NAME="OP" VALUE="config-server">
+	<INPUT TYPE="CHECKBOX" NAME="REMOTE_PRINTERS" {?remote_printers}> Show printers shared by other systems<br />
+	<INPUT TYPE="CHECKBOX" NAME="SHARE_PRINTERS" {?share_printers}> Share printers connected to this system<br />
+	<INPUT TYPE="CHECKBOX" NAME="REMOTE_ADMIN" {?remote_admin}> Allow remote administration<br />
+	<INPUT TYPE="CHECKBOX" NAME="USER_CANCEL_ANY" {?user_cancel_any}> Allow users to cancel any job (not just their own)<br />
+	<INPUT TYPE="IMAGE" SRC="/images/change-settings.gif" ALT="Change Settings" BORDER="0">
+	</FORM></TD>
 </TR>
 <TR>
 	<TD>&nbsp;</TD>
