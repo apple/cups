@@ -6,6 +6,11 @@
 #   file.
 #
 
+# Log general information in error_log - change "info" to "debug" for
+# troubleshooting...
+LogLevel info
+
+
 # Only listen for connections from the local machine.
 Listen 127.0.0.1:@DEFAULT_IPP_PORT@
 @CUPS_LISTEN_DOMAINSOCKET@

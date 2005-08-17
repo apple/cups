@@ -49,18 +49,19 @@
 	<IMG SRC="/images/add-printer.gif" ALT="Add Printer" BORDER="0"></A>
 	<A HREF="/printers/">
 	<IMG SRC="/images/manage-printers.gif" ALT="Manage Printers" BORDER="0"></A>
-	{#device_uri=0?:{[device_uri]
-	<p>{device_make_and_model} ({device_info})
-	<A HREF="/admin/?op=add-printer&amp;{device_options}">
-	<IMG SRC="/images/add-printer.gif" ALT="Add Printer" BORDER="0"></A></P>
-	}}</TD>
+	{#device_uri=0?:<P><B>New Printers Found:</B></P><UL>{[device_uri]
+	<LI>{device_make_and_model} ({device_info})
+	<A HREF="/admin/?op=add-printer&amp;{device_options}"><IMG
+	SRC="/images/add-printer.gif" ALT="Add Printer" BORDER="0"
+	ALIGN="MIDDLE"></A></LI>
+	}</UL>}</TD>
 </TR>
 <TR>
 	<TD>&nbsp;</TD>
 </TR>
 <TR>
 	<TH BGCOLOR="#999966"><IMG SRC="/images/left.gif" ALT=""></TH>
-	<TH BGCOLOR="#999966">Server Settings</TH>
+	<TH BGCOLOR="#999966">Server</TH>
 	<TH WIDTH="16"><IMG SRC="/images/right.gif" ALT=""></TH>
 </TR>
 <TR>
@@ -68,13 +69,14 @@
 </TR>
 <TR>
 	<TD></TD>
-	<TD><FORM METHOD="POST" ACTION="/admin">
-	<INPUT TYPE="HIDDEN" NAME="OP" VALUE="config-server">
-	<INPUT TYPE="CHECKBOX" NAME="REMOTE_PRINTERS" {?remote_printers}> Show printers shared by other systems<br />
-	<INPUT TYPE="CHECKBOX" NAME="SHARE_PRINTERS" {?share_printers}> Share printers connected to this system<br />
-	<INPUT TYPE="CHECKBOX" NAME="REMOTE_ADMIN" {?remote_admin}> Allow remote administration<br />
-	<INPUT TYPE="CHECKBOX" NAME="USER_CANCEL_ANY" {?user_cancel_any}> Allow users to cancel any job (not just their own)<br />
-	<INPUT TYPE="IMAGE" SRC="/images/change-settings.gif" ALT="Change Settings" BORDER="0">
+	<TD><FORM METHOD="POST" ACTION="/admin"><P><B>Basic Server Settings:</B><P>
+	<P><INPUT TYPE="HIDDEN" NAME="OP" VALUE="config-server">
+	<INPUT TYPE="CHECKBOX" NAME="REMOTE_PRINTERS" {?remote_printers}> Show printers shared by other systems<BR>
+	<INPUT TYPE="CHECKBOX" NAME="SHARE_PRINTERS" {?share_printers}> Share printers connected to this system<BR>
+	<INPUT TYPE="CHECKBOX" NAME="REMOTE_ADMIN" {?remote_admin}> Allow remote administration<BR>
+	<INPUT TYPE="CHECKBOX" NAME="USER_CANCEL_ANY" {?user_cancel_any}> Allow users to cancel any job (not just their own)<BR>
+	<INPUT TYPE="CHECKBOX" NAME="DEBUG_LOGGING" {?debug_logging}> Save debugging information for troubleshooting</P>
+	<P><INPUT TYPE="IMAGE" SRC="/images/change-settings.gif" ALT="Change Settings" BORDER="0"></P>
 	</FORM></TD>
 </TR>
 <TR>

@@ -49,7 +49,7 @@ extern void	ippGetAttributes(ipp_t *request, const char *directory,
 extern char	*ippGetTemplateDir(void);
 extern char	*ippRewriteURL(const char *, char *, int, const char *);
 extern void	ippSetServerVersion(void);
-extern void	ippSetCGIVars(ipp_t *, const char *, const char *,
+extern int	ippSetCGIVars(ipp_t *, const char *, const char *,
 		              const char *, int);
 
 

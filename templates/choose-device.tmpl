@@ -18,7 +18,7 @@
 	<TD ALIGN="RIGHT">Device:&nbsp;</TD>
 	<TD>
 	<SELECT NAME="DEVICE_URI">
-	{[device_uri]<OPTION VALUE="{device_uri}" {?current_device_uri={device_uri}?SELECTED:}>
+	{[device_uri]<OPTION VALUE="{device_uri}{?device_make_and_model!Unknown?;{device_make_and_model}:}" {?current_device_uri={device_uri}?SELECTED:}>
 	{device_info} {?device_make_and_model!Unknown?({device_make_and_model}):}
 	}</SELECT>
 	</TD>

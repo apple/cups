@@ -339,7 +339,7 @@ ippSetServerVersion(void)
  * 'ippSetCGIVars()' - Set CGI variables from an IPP response.
  */
 
-void
+int					/* O - Maximum number of elements */
 ippSetCGIVars(ipp_t      *response,	/* I - Response data to be copied... */
               const char *filter_name,	/* I - Filter name */
 	      const char *filter_value,	/* I - Filter value */
@@ -397,7 +397,7 @@ ippSetCGIVars(ipp_t      *response,	/* I - Response data to be copied... */
 	  break;
 
       if (!filter)
-        return;
+        return (element + 1);
 
       if (filter->group_tag == IPP_TAG_ZERO)
       {
@@ -567,6 +567,8 @@ ippSetCGIVars(ipp_t      *response,	/* I - Response data to be copied... */
   }
 
   DEBUG_puts("<P>Leaving ippSetCGIVars()...");
+
+  return (element + 1);
 }
 
 

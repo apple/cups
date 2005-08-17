@@ -23,16 +23,20 @@
  *
  * Contents:
  *
- *   main()                 - Main entry for CGI.
- *   do_am_class()          - Add or modify a class.
- *   do_am_printer()        - Add or modify a printer.
- *   do_config_printer()    - Configure the default options for a printer.
- *   do_delete_class()      - Delete a class...
- *   do_delete_printer()    - Delete a printer...
- *   do_menu()              - Show the main menu...
- *   do_printer_op()        - Do a printer operation.
- *   do_set_allowed_users() - Set the allowed/denied users for a queue.
- *   get_line()             - Get a line that is terminated by a LF, CR, or CR LF.
+ *   main()                    - Main entry for CGI.
+ *   compare_printer_devices() - Compare two printer devices.
+ *   do_am_class()             - Add or modify a class.
+ *   do_am_printer()           - Add or modify a printer.
+ *   do_config_printer()       - Configure the default options for a printer.
+ *   do_config_server()        - Configure server settings.
+ *   do_delete_class()         - Delete a class...
+ *   do_delete_printer()       - Delete a printer...
+ *   do_menu()                 - Show the main menu...
+ *   do_printer_op()           - Do a printer operation.
+ *   do_set_allowed_users()    - Set the allowed/denied users for a queue.
+ *   form_encode()             - Encode a string as a form variable...
+ *   get_line()                - Get a line that is terminated by a LF, CR, or CR LF.
+ *   match_string()            - Return the number of matching characters.
  */
 
 /*
@@ -52,12 +56,15 @@
 static void	do_am_class(http_t *http, cups_lang_t *language, int modify);
 static void	do_am_printer(http_t *http, cups_lang_t *language, int modify);
 static void	do_config_printer(http_t *http, cups_lang_t *language);
+static void	do_config_server(http_t *http, cups_lang_t *language);
 static void	do_delete_class(http_t *http, cups_lang_t *language);
 static void	do_delete_printer(http_t *http, cups_lang_t *language);
 static void	do_menu(http_t *http, cups_lang_t *language);
 static void	do_printer_op(http_t *http, cups_lang_t *language, ipp_op_t op);
 static void	do_set_allowed_users(http_t *http, cups_lang_t *language);
+static void	form_encode(char *dst, const char *src, size_t dstsize);
 static char	*get_line(char *buf, int length, FILE *fp);
+static int	match_string(const char *a, const char *b);
 
 
 /*
@@ -146,6 +153,8 @@ main(int  argc,				/* I - Number of command-line arguments */
       do_delete_printer(http, language);
     else if (!strcmp(op, "config-printer"))
       do_config_printer(http, language);
+    else if (!strcmp(op, "config-server"))
+      do_config_server(http, language);
     else
     {
      /*
@@ -187,6 +196,18 @@ main(int  argc,				/* I - Number of command-line arguments */
   */
 
   return (0);
+}
+
+
+/*
+ * 'compare_printer_devices()' - Compare two printer devices.
+ */
+
+static int				/* O - Result of comparison */
+compare_printer_devices(const void *a,	/* I - First device */
+                        const void *b)	/* I - Second device */
+{
+  return (strcmp(*((char **)a), *((char **)b)));
 }
 
 
@@ -498,7 +519,6 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
 		*uriptr;		/* Pointer into URI */
   int		maxrate;		/* Maximum baud rate */
   char		baudrate[255];		/* Baud rate string */
-  char		make[255];		/* Make string */
   const char	*name,			/* Pointer to class name */
 		*ptr;			/* Pointer to CGI variable */
   static int	baudrates[] =		/* Baud rates */
@@ -695,11 +715,11 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
       * Get the PPD file...
       */
 
-      int		fd;			/* PPD file */
-      char		filename[1024];		/* PPD filename */
-      ppd_file_t	*ppd;			/* PPD information */
-      char		buffer[1024];		/* Buffer */
-      int		bytes;			/* Number of bytes */
+      int		fd;		/* PPD file */
+      char		filename[1024];	/* PPD filename */
+      ppd_file_t	*ppd;		/* PPD information */
+      char		buffer[1024];	/* Buffer */
+      int		bytes;		/* Number of bytes */
 
 
       snprintf(uri, sizeof(uri), "/printers/%s.ppd", name);
@@ -731,6 +751,39 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
       else
         httpFlush(http);
     }
+    else if ((uriptr = strrchr(cgiGetVariable("DEVICE_URI"), ';')) != NULL)
+    {
+     /*
+      * Extract make and make/model from device URI string...
+      */
+
+      char	make[1024],		/* Make string */
+		*makeptr;		/* Pointer into make */
+
+
+      *uriptr++ = '\0';
+
+      strlcpy(make, uriptr, sizeof(make));
+
+      if ((makeptr = strchr(make, ' ')) != NULL)
+        *makeptr = '\0';
+      else if ((makeptr = strchr(make, '-')) != NULL)
+        *makeptr = '\0';
+      else if (!strncasecmp(make, "laserjet", 8) ||
+               !strncasecmp(make, "deskjet", 7) ||
+               !strncasecmp(make, "designjet", 9))
+        strcpy(make, "HP");
+      else if (!strncasecmp(make, "phaser", 6))
+        strcpy(make, "Xerox");
+      else if (!strncasecmp(make, "stylus", 6))
+        strcpy(make, "Epson");
+      else
+        strcpy(make, "Generic");
+
+      cgiSetVariable("CURRENT_MAKE", make);
+      cgiSetVariable("PPD_MAKE", make);
+      cgiSetVariable("CURRENT_MAKE_AND_MODEL", uriptr);
+    }
 
    /*
     * Build a CUPS_GET_PPDS request, which requires the following
@@ -761,7 +814,22 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
 
     if ((response = cupsDoRequest(http, request, "/")) != NULL)
     {
-      if ((var = cgiGetVariable("PPD_MAKE")) == NULL)
+     /*
+      * Got the list of PPDs, see if the user has selected a make...
+      */
+
+      if ((var = cgiGetVariable("PPD_MAKE")) != NULL)
+      {
+       /*
+        * Yes, copy those attributes, but check if the make doesn't
+	* exist...
+	*/
+
+        if (ippSetCGIVars(response, "ppd-make", var, NULL, 0) <= 0)
+	  var = NULL;
+      }
+
+      if (var == NULL)
       {
        /*
 	* Let the user choose a make...
@@ -789,13 +857,51 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
 	* Let the user choose a model...
 	*/
 
-        strlcpy(make, var, sizeof(make));
+        const char	*make_model;	/* Current make/model string */
 
-        ippSetCGIVars(response, "ppd-make", make, NULL, 0);
+
+        if ((make_model = cgiGetVariable("CURRENT_MAKE_AND_MODEL")) != NULL)
+	{
+	 /*
+	  * Scan for "close" matches...
+	  */
+
+          int		match,		/* Current match */
+			best_match,	/* Best match so far */
+			count;		/* Number of drivers */
+	  const char	*best,		/* Best matching string */
+			*current;	/* Current string */
+
+
+          count = cgiGetSize("PPD_MAKE_AND_MODEL");
+
+	  for (i = 0, best_match = 0, best = NULL; i < count; i ++)
+	  {
+	    current = cgiGetArray("PPD_MAKE_AND_MODEL", i);
+	    match   = match_string(make_model, current);
+
+	    if (match > best_match)
+	    {
+	      best_match = match;
+	      best       = current;
+	    }
+	  }
+
+          if (best_match > strlen(var))
+	  {
+	   /*
+	    * Found a match longer than the make...
+	    */
+
+            cgiSetVariable("CURRENT_MAKE_AND_MODEL", best);
+	  }
+	}
+
 	cgiCopyTemplateLang(stdout, TEMPLATES, "choose-model.tmpl",
 	                    getenv("LANG"));
       }
 
+      
       ippDelete(response);
     }
     else
@@ -1333,6 +1439,253 @@ do_config_printer(http_t      *http,	/* I - HTTP connection */
 
 
 /*
+ * 'do_config_server()' - Configure server settings.
+ */
+
+static void
+do_config_server(http_t      *http,	/* I - HTTP connection */
+                 cups_lang_t *language)	/* I - Client's language */
+{
+  cups_file_t	*cupsd;			/* cupsd.conf file */
+  char		tempfile[1024];		/* Temporary new cupsd.conf */
+  int		tempfd;			/* Temporary file descriptor */
+  cups_file_t	*temp;			/* Temporary file */
+  char		line[1024],		/* Line from cupsd.conf file */
+		*value;			/* Value on line */
+  const char	*server_root;		/* Location of config files */
+  const char	*val;			/* CGI form variable value */
+  int		linenum,		/* Line number in file */
+		in_policy,		/* In a policy section? */
+		in_cancel_job,		/* In a cancel-job section? */
+		in_admin_location;	/* In the /admin location? */
+  int		remote_printers,	/* Show remote printers */
+		share_printers,		/* Share local printers */
+		remote_admin,		/* Remote administration allowed? */
+		user_cancel_any,	/* Cancel-job policy set? */
+		debug_logging;		/* LogLevel debug set? */
+  int		wrote_port_listen,	/* Wrote the port/listen lines? */
+		wrote_browsing,		/* Wrote the browsing lines? */
+		wrote_browse_address,	/* Wrote the BrowseAddress lines? */
+		wrote_policy,		/* Wrote the policy? */
+		wrote_admin_location;	/* Wrote the /admin location? */
+
+
+ /*
+  * Get form variables...
+  */
+
+  remote_printers = cgiGetVariable("REMOTE_PRINTERS") != NULL;
+  share_printers  = cgiGetVariable("SHARE_PRINTERS") != NULL;
+  remote_admin    = cgiGetVariable("REMOTE_ADMIN") != NULL;
+  user_cancel_any = cgiGetVariable("USER_CANCEL_ANY") != NULL;
+  debug_logging   = cgiGetVariable("DEBUG_LOGGING") != NULL;
+
+ /*
+  * Locate the cupsd.conf file...
+  */
+
+  if ((server_root = getenv("CUPS_SERVERROOT")) == NULL)
+    server_root = CUPS_SERVERROOT;
+
+  snprintf(line, sizeof(line), "%s/cupsd.conf", server_root);
+
+  printf("<!-- \"%s\" -->\n", line);
+
+ /*
+  * Open the cupsd.conf file...
+  */
+
+  if ((cupsd = cupsFileOpen(line, "r")) == NULL)
+  {
+   /*
+    * Unable to open - log an error...
+    */
+
+    perror(line);
+    return;
+  }
+
+ /*
+  * Create a temporary file for the new cupsd.conf file...
+  */
+
+  if ((tempfd = cupsTempFd(tempfile, sizeof(tempfile))) < 0)
+  {
+    perror(tempfile);
+    cupsFileClose(cupsd);
+    return;
+  }
+
+  if ((temp = cupsFileOpenFd(tempfd, "w")) == NULL)
+  {
+    perror(tempfile);
+    close(tempfd);
+    unlink(tempfile);
+    cupsFileClose(cupsd);
+    return;
+  }
+
+  printf("<!-- tempfile=\"%s\" -->\n", tempfile);
+
+ /*
+  * Copy the old file to the new, making changes along the way...
+  */
+
+  in_admin_location    = 0;
+  in_cancel_job        = 0;
+  in_policy            = 0;
+  linenum              = 0;
+  wrote_admin_location = 0;
+  wrote_browsing       = 0;
+  wrote_browse_address = 0;
+  wrote_policy         = 0;
+  wrote_port_listen    = 0;
+
+  while (cupsFileGetConf(cupsd, line, sizeof(line), &value, &linenum))
+  {
+    if (!strcasecmp(line, "Port") || !strcasecmp(line, "Listen"))
+    {
+      if (!wrote_port_listen)
+      {
+        wrote_port_listen = 1;
+
+	if (share_printers || remote_admin)
+	{
+	  cupsFilePuts(temp, "# Allow remote access\n");
+	  cupsFilePrintf(temp, "Port %d\n", ippPort());
+	}
+	else
+	{
+	  cupsFilePuts(temp, "# Only listen for connections from the local machine.\n");
+	  cupsFilePrintf(temp, "Listen localhost:%d\n", ippPort());
+	}
+      }
+    }
+    else if (!strcasecmp(line, "Browsing") ||
+             !strcasecmp(line, "BrowseAddress") ||
+             !strcasecmp(line, "BrowseAllow") ||
+             !strcasecmp(line, "BrowseDeny") ||
+             !strcasecmp(line, "BrowseOrder"))
+    {
+      if (!wrote_browsing)
+      {
+        wrote_browsing = 1;
+
+        if (remote_printers || share_printers)
+	{
+	  if (remote_printers && share_printers)
+	    cupsFilePuts(temp, "# Enable printer sharing and shared printers.\n");
+	  else if (remote_printers)
+	    cupsFilePuts(temp, "# Show shared printers on the local network.\n");
+	  else
+	    cupsFilePuts(temp, "# Share local printers on the local network.\n");
+
+	  cupsFilePuts(temp, "Browsing On\n");
+	  cupsFilePuts(temp, "BrowseOrder allow,deny\n");
+
+	  if (remote_printers)
+	    cupsFilePuts(temp, "BrowseAllow @LOCAL\n");
+	  
+	  if (share_printers)
+	    cupsFilePuts(temp, "BrowseAddress @LOCAL\n");
+        }
+	else
+	{
+	  cupsFilePuts(temp, "# Disable printer sharing and shared printers.\n");
+	  cupsFilePuts(temp, "Browsing Off\n");
+	}
+      }
+    }
+    else if (!strcasecmp(line, "LogLevel"))
+    {
+      if (debug_logging)
+      {
+        cupsFilePuts(temp, "# Show troubleshooting information in error_log.\n");
+	cupsFilePuts(temp, "LogLevel debug\n");
+      }
+      else
+      {
+        cupsFilePuts(temp, "# Show general information in error_log.\n");
+	cupsFilePuts(temp, "LogLevel info\n");
+      }
+    }
+    else if (line[0] == '<' && value)
+      cupsFilePrintf(temp, "%s %s>\n", line, value);
+    else if (value)
+      cupsFilePrintf(temp, "%s %s\n", line, value);
+    else
+      cupsFilePrintf(temp, "%s\n", line);
+#if 0
+    else if (!strcasecmp(line, "Policy") && !strcasecmp(value, "default"))
+    {
+      in_policy = 1;
+    }
+    else if (!strcasecmp(line, "</Policy>"))
+    {
+      in_policy = 0;
+    }
+    else if (!strcasecmp(line, "<Limit") && in_policy)
+    {
+     /*
+      * See if the policy limit is for the Cancel-Job operation...
+      */
+
+      char	*valptr;		/* Pointer into value */
+
+
+      while (*value)
+      {
+	for (valptr = value; !isspace(*valptr & 255) && *valptr; valptr ++);
+
+	if (*valptr)
+	  *valptr++ = '\0';
+
+        if (!strcasecmp(value, "cancel-job"))
+	{
+	  in_cancel_job = 1;
+	  break;
+	}
+
+        for (value = valptr; isspace(*value & 255); value ++);
+      }
+    }
+    else if (!strcasecmp(line, "</Limit>"))
+    {
+      in_cancel_job = 0;
+    }
+    else if (!strcasecmp(line, "Order") && in_cancel_job)
+    {
+     /*
+      * See if we are allowing all users to cancel jobs...
+      */
+
+      if (!strcasecmp(value, "deny,allow"))
+	cancel_policy = 1;
+    }
+    else if (!strcasecmp(line, "<Location") && !strcasecmp(value, "/admin"))
+    {
+      in_admin_location = 1;
+    }
+    else if (!strcasecmp(line, "</Location>"))
+    {
+      in_admin_location = 0;
+    }
+    else if (!strcasecmp(line, "Allow") && in_admin_location &&
+             strcasecmp(value, "localhost") && strcasecmp(value, "127.0.0.1"))
+    {
+      remote_admin = 1;
+    }
+#endif /* 0 */
+  }
+
+  cupsFileClose(cupsd);
+  cupsFileClose(temp);
+
+  puts("<p>Boo!</p>");
+}
+
+
+/*
  * 'do_delete_class()' - Delete a class...
  */
 
@@ -1496,6 +1849,9 @@ do_menu(http_t      *http,		/* I - HTTP connection */
   char		line[1024],		/* Line from cupsd.conf file */
 		*value;			/* Value on line */
   const char	*server_root;		/* Location of config files */
+  ipp_t		*request,		/* IPP request */
+		*response;		/* IPP response */
+  ipp_attribute_t *attr;		/* IPP attribute */
 
 
  /*
@@ -1531,10 +1887,12 @@ do_menu(http_t      *http,		/* I - HTTP connection */
 		remote_admin = 0,	/* Remote administration allowed? */
 		browsing = 1,		/* Browsing enabled? */
 		browse_address = 0,	/* Browse address set? */
-		cancel_policy = 0;	/* Cancel-job policy set? */
+		cancel_policy = 0,	/* Cancel-job policy set? */
+		debug_logging = 0;	/* LogLevel debug set? */
     int		linenum = 0,		/* Line number in file */
 		in_policy = 0,		/* In a policy section? */
-		in_cancel_job = 0;	/* In a cancel-job section? */
+		in_cancel_job = 0,	/* In a cancel-job section? */
+		in_admin_location = 0;	/* In the /admin location? */
 
 
     while (cupsFileGetConf(cupsd, line, sizeof(line), &value, &linenum))
@@ -1556,25 +1914,26 @@ do_menu(http_t      *http,		/* I - HTTP connection */
       }
       else if (!strcasecmp(line, "Browsing"))
       {
-        if (!strcasecmp(value, "yes") || !strcasecmp(value, "on") ||
-	    !strcasecmp(value, "true"))
-	  browsing = 1;
-        else
-	  browsing = 0;
+        browsing = !strcasecmp(value, "yes") || !strcasecmp(value, "on") ||
+	           !strcasecmp(value, "true");
       }
       else if (!strcasecmp(line, "BrowseAddress"))
       {
         browse_address = 1;
       }
-      else if (!strcasecmp(line, "Policy"))
+      else if (!strcasecmp(line, "LogLevel"))
+      {
+        debug_logging = !strncasecmp(value, "debug", 5);
+      }
+      else if (!strcasecmp(line, "Policy") && !strcasecmp(value, "default"))
       {
         in_policy = 1;
       }
-      else if (!strcasecmp(line, "/Policy"))
+      else if (!strcasecmp(line, "</Policy>"))
       {
         in_policy = 0;
       }
-      else if (!strcasecmp(line, "Limit") && in_policy)
+      else if (!strcasecmp(line, "<Limit") && in_policy)
       {
        /*
         * See if the policy limit is for the Cancel-Job operation...
@@ -1599,18 +1958,31 @@ do_menu(http_t      *http,		/* I - HTTP connection */
           for (value = valptr; isspace(*value & 255); value ++);
         }
       }
-      else if (!strcasecmp(line, "/Limit"))
+      else if (!strcasecmp(line, "</Limit>"))
       {
         in_cancel_job = 0;
       }
-      else if (!strcasecmp(line, "Allow") && in_cancel_job)
+      else if (!strcasecmp(line, "Order") && in_cancel_job)
       {
        /*
         * See if we are allowing all users to cancel jobs...
 	*/
 
-        if (!strcasecmp(value, "@ALL"))
+        if (!strcasecmp(value, "deny,allow"))
 	  cancel_policy = 1;
+      }
+      else if (!strcasecmp(line, "<Location") && !strcasecmp(value, "/admin"))
+      {
+        in_admin_location = 1;
+      }
+      else if (!strcasecmp(line, "</Location>"))
+      {
+        in_admin_location = 0;
+      }
+      else if (!strcasecmp(line, "Allow") && in_admin_location &&
+               strcasecmp(value, "localhost") && strcasecmp(value, "127.0.0.1"))
+      {
+        remote_admin = 1;
       }
     }
 
@@ -1628,9 +2000,232 @@ do_menu(http_t      *http,		/* I - HTTP connection */
     if (cancel_policy)
       cgiSetVariable("USER_CANCEL_ANY", "CHECKED");
 
-    printf("<!-- browsing=%d, browse_address=%d, cancel_policy=%d, remote_access=%d, remote_admin=%d -->\n",
-           browsing, browse_address, cancel_policy, remote_access, remote_admin);
+    if (debug_logging)
+      cgiSetVariable("DEBUG_LOGGING", "CHECKED");
+
+    printf("<!-- browsing=%d, browse_address=%d, cancel_policy=%d, debug_logging=%d, remote_access=%d, remote_admin=%d -->\n",
+           browsing, browse_address, cancel_policy, debug_logging, remote_access, remote_admin);
   }
+
+ /*
+  * Get the list of printers and their devices...
+  */
+
+  request = ippNew();
+  request->request.op.operation_id = CUPS_GET_PRINTERS;
+  request->request.op.request_id   = 1;
+
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
+               "attributes-charset", NULL, cupsLangEncoding(language));
+
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
+               "attributes-natural-language", NULL, language->language);
+
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
+               "requested-attributes", NULL, "device-uri");
+
+  ippAddInteger(request, IPP_TAG_OPERATION, IPP_TAG_ENUM, "printer-type",
+                CUPS_PRINTER_LOCAL);
+  ippAddInteger(request, IPP_TAG_OPERATION, IPP_TAG_ENUM, "printer-type-mask",
+                CUPS_PRINTER_LOCAL);
+
+  if ((response = cupsDoRequest(http, request, "/")) != NULL)
+  {
+   /*
+    * Got the printer list, now load the devices...
+    */
+
+    int		i;			/* Looping var */
+    int		num_printer_devices;	/* Number of devices for local printers */
+    char	**printer_devices;	/* Printer devices for local printers */
+
+
+   /*
+    * Count the number of printers we have...
+    */
+
+    for (num_printer_devices = 0,
+             attr = ippFindAttribute(response, "device-uri", IPP_TAG_URI);
+         attr;
+	 num_printer_devices ++,
+	     attr = ippFindNextAttribute(response, "device-uri", IPP_TAG_URI));
+
+    if (num_printer_devices > 0)
+    {
+     /*
+      * Allocate an array and copy the device strings...
+      */
+
+      printer_devices = calloc(num_printer_devices, sizeof(char *));
+
+      for (i = 0, attr = ippFindAttribute(response, "device-uri", IPP_TAG_URI);
+           attr;
+	   i ++,  attr = ippFindNextAttribute(response, "device-uri", IPP_TAG_URI))
+      {
+	printer_devices[i] = strdup(attr->values[0].string.text);
+      }
+
+     /*
+      * Sort the printer devices as needed...
+      */
+
+      if (num_printer_devices > 1)
+        qsort(printer_devices, num_printer_devices, sizeof(char *),
+	      compare_printer_devices);
+    }
+
+   /*
+    * Free the printer list and get the device list...
+    */
+
+    ippDelete(response);
+
+    request = ippNew();
+    request->request.op.operation_id = CUPS_GET_DEVICES;
+    request->request.op.request_id   = 1;
+
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
+        	 "attributes-charset", NULL, cupsLangEncoding(language));
+
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
+        	 "attributes-natural-language", NULL, language->language);
+
+    if ((response = cupsDoRequest(http, request, "/")) != NULL)
+    {
+     /*
+      * Got the device list, let's parse it...
+      */
+
+      const char *device_uri,		/* device-uri attribute value */
+		*device_make_and_model,	/* device-make-and-model value */
+		*device_info;		/* device-info value */
+
+
+      for (i = 0, attr = response->attrs; attr; attr = attr->next)
+      {
+       /*
+        * Skip leading attributes until we hit a device...
+	*/
+
+	while (attr && attr->group_tag != IPP_TAG_PRINTER)
+          attr = attr->next;
+
+	if (!attr)
+          break;
+
+       /*
+	* Pull the needed attributes from this device...
+	*/
+
+	device_info           = NULL;
+	device_make_and_model = NULL;
+	device_uri            = NULL;
+
+	while (attr && attr->group_tag == IPP_TAG_PRINTER)
+	{
+          if (strcmp(attr->name, "device-info") == 0 &&
+	      attr->value_tag == IPP_TAG_TEXT)
+	    device_info = attr->values[0].string.text;
+
+          if (strcmp(attr->name, "device-make-and-model") == 0 &&
+	      attr->value_tag == IPP_TAG_TEXT)
+	    device_make_and_model = attr->values[0].string.text;
+
+          if (strcmp(attr->name, "device-uri") == 0 &&
+	      attr->value_tag == IPP_TAG_URI)
+	    device_uri = attr->values[0].string.text;
+
+          attr = attr->next;
+	}
+
+       /*
+	* See if we have everything needed...
+	*/
+
+	if (device_info && device_make_and_model && device_uri &&
+	    strcasecmp(device_make_and_model, "unknown") &&
+	    strchr(device_uri, ':'))
+	{
+	 /*
+	  * Yes, now see if there is already a printer for this
+	  * device...
+	  */
+
+          if (!bsearch(&device_uri, printer_devices, num_printer_devices,
+	               sizeof(char *), compare_printer_devices))
+          {
+	   /*
+	    * Not found, so it must be a new printer...
+	    */
+
+            char	options[1024],	/* Form variables for this device */
+			*options_ptr;	/* Pointer into string */
+	    const char	*ptr;		/* Pointer into device string */
+
+
+           /*
+	    * Format the printer name variable for this device...
+	    *
+	    * TODO: check for existing names, add number/address...
+	    */
+
+	    strcpy(options, "PRINTER_NAME=");
+	    options_ptr = options + strlen(options);
+
+	    for (ptr = device_make_and_model;
+	         options_ptr < (options + sizeof(options) - 1) && *ptr;
+		 ptr ++)
+	      if (isalnum(*ptr & 255) || *ptr == '_' || *ptr == '-')
+	        *options_ptr++ = *ptr;
+	      else if (*ptr == ' ')
+	        *options_ptr++ = '_';
+ 
+           /*
+	    * Then copy the device URI...
+	    */
+
+            strlcpy(options_ptr, "&PRINTER_LOCATION=&PRINTER_INFO=&DEVICE_URI=",
+	            sizeof(options) - (options_ptr - options));
+	    options_ptr += strlen(options_ptr);
+
+            form_encode(options_ptr, device_uri,
+	                sizeof(options) - (options_ptr - options));
+	    options_ptr += strlen(options_ptr);
+
+            if (options_ptr < (options + sizeof(options) - 1))
+	    {
+	      *options_ptr++ = ';';
+	      form_encode(options_ptr, device_make_and_model,
+	                  sizeof(options) - (options_ptr - options));
+	    }
+
+           /*
+	    * Finally, set the form variables for this printer...
+	    */
+
+	    cgiSetArray("device_info", i, device_info);
+	    cgiSetArray("device_make_and_model", i, device_make_and_model);
+	    cgiSetArray("device_options", i, options);
+            cgiSetArray("device_uri", i, device_uri);
+	    i ++;
+	  }
+	}
+
+        if (!attr)
+	  break;
+      }
+
+     /*
+      * Free the device list...
+      */
+
+      ippDelete(response);
+    }
+  }
+
+ /*
+  * Finally, show the main menu template...
+  */
 
   cgiCopyTemplateLang(stdout, TEMPLATES, "admin.tmpl", getenv("LANG"));
 }
@@ -1970,6 +2565,77 @@ do_set_allowed_users(
 
 
 /*
+ * 'form_encode()' - Encode a string as a form variable...
+ */
+
+static void
+form_encode(char       *dst,		/* I - Destination string */
+            const char *src,		/* I - Source string */
+	    size_t     dstsize)		/* I - Size of destination string */
+{
+  char			*dstend;	/* End of destination */
+  static const char	*hex =		/* Hexadecimal characters */
+			"0123456789ABCDEF";
+
+
+ /*
+  * Mark the end of the string...
+  */
+
+  dstend = dst + dstsize - 1;
+
+ /*
+  * Loop through the source string and copy...
+  */
+
+  while (*src && dst < dstend)
+  {
+    switch (*src)
+    { 
+      case ' ' :
+         /*
+	  * Encode spaces with a "+"...
+	  */
+
+          *dst++ = '+';
+	  src ++;
+	  break;
+
+      case '&' :
+      case '%' :
+      case '+' :
+         /*
+	  * Encode special characters with %XX escape...
+	  */
+
+          if (dst < (dstend - 2))
+	  {
+	    *dst++ = '%';
+	    *dst++ = hex[(*src & 255) >> 4];
+	    *dst++ = hex[*src & 15];
+	    src ++;
+	  }
+          break;
+
+      default :
+         /*
+	  * Copy other characters literally...
+	  */
+
+          *dst++ = *src++;
+	  break;
+    }
+  }
+
+ /*
+  * Nul-terminate the destination string...
+  */
+
+  *dst = '\0';
+}
+
+
+/*
  * 'get_line()' - Get a line that is terminated by a LF, CR, or CR LF.
  */
 
@@ -2017,6 +2683,55 @@ get_line(char *buf,			/* I - Line buffer */
 }
 
 
+/*
+ * 'match_string()' - Return the number of matching characters.
+ */
+
+static int				/* O - Number of matching characters */
+match_string(const char *a,		/* I - First string */
+             const char *b)		/* I - Second string */
+{
+  int	count;				/* Number of matching characters */
+
+
+ /*
+  * Loop through both strings until we hit the end of either or we find
+  * a non-matching character.  For the purposes of comparison, we ignore
+  * whitespace and do a case-insensitive comparison so that we have a
+  * better chance of finding a match...
+  */
+
+  for (count = 0; *a && *b; a++, b++, count ++)
+  {
+   /*
+    * Skip leading whitespace characters...
+    */
+
+    while (isspace(*a & 255))
+      a ++;
+
+    while (isspace(*b & 255))
+      b ++;
+
+   /*
+    * Break out if we run out of characters...
+    */
+
+    if (!*a || !*b)
+      break;
+
+   /*
+    * Do a case-insensitive comparison of the next two chars...
+    */
+
+    if (tolower(*a & 255) != tolower(*b & 255))
+      break;
+  }
+
+  return (count);
+}
+
+    
 /*
  * End of "$Id$".
  */

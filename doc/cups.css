@@ -1,4 +1,53 @@
-H1 { font-family: sans-serif }
-H2 { font-family: sans-serif }
-TH { text-align: left }
+BODY {
+  background: #cccc99;
+  color: #000000;
+  font-family: sans-serif;
+}
 
+H1, H2, H3, H4, H5, H6, P {
+  font-family: sans-serif;
+}
+
+TD, TH {
+  font-family: sans-serif;
+  text-align: left
+}
+
+KBD {
+  color: #006600;
+  font-family: monospace;
+  font-weight: bold;
+}
+
+PRE {
+  color: #7f0000;
+  font-family: monospace;
+}
+
+PRE.command {
+  margin-left: 3em;
+}
+
+A:link, A:visited {
+  text-decoration: none;
+  font-weight: bold;
+  color: #993300;
+}
+
+A:link:hover, A:visited:hover, A:active {
+  text-decoration: underline;
+  font-weight: bold;
+  color: #bb5500;
+}
+
+INPUT[TYPE="TEXT"], TEXTAREA {
+  font-family: monospace;
+}
+
+LI {
+  margin-bottom: 1em;
+}
+
+SUB, SUP {
+  font-size: 50%;
+}

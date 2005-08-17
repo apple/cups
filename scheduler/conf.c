@@ -682,7 +682,7 @@ ReadConfiguration(void)
       {
         snprintf(groupname, sizeof(groupname), "@%s", SystemGroups[i]);
 	AddPolicyOpName(po, POLICY_ALLOW, groupname);
-	LogMessage(L_INFO, "Allow %s", groupname);
+	LogMessage(L_INFO, "Allow @%s", groupname);
       }
 
       AddPolicyOp(p, po, IPP_SEND_URI);
@@ -725,7 +725,7 @@ ReadConfiguration(void)
       {
         snprintf(groupname, sizeof(groupname), "@%s", SystemGroups[i]);
 	AddPolicyOpName(po, POLICY_ALLOW, groupname);
-	LogMessage(L_INFO, "Allow %s", groupname);
+	LogMessage(L_INFO, "Allow @%s", groupname);
       }
 
       AddPolicyOp(p, po, IPP_RESUME_PRINTER);
