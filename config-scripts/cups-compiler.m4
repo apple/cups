@@ -39,35 +39,6 @@ CXXLIBS=""
 AC_SUBST(CXXLIBS)
 
 if test -n "$GCC"; then
-	# Starting with GCC 3.0, you must link C++ programs against either
-	# libstdc++ (shared by default), or libsupc++ (always static).  If
-	# you care about binary portability between Linux distributions,
-	# you need to either 1) build your own GCC with static C++ libraries
-	# or 2) link using gcc and libsupc++.  We choose the latter since
-	# CUPS doesn't (currently) use any of the stdc++ library.
-	#
-	# Also, GCC 3.0.x still has problems compiling some code.  You may
-	# or may not have success with it.  USE 3.0.x WITH EXTREME CAUTION!
-	#
-	# Previous versions of GCC do not have the reliance on the stdc++
-	# or g++ libraries, so the extra supc++ library is not needed.
-
-	AC_MSG_CHECKING(if libsupc++ is required)
-
- 	SUPC="`$CXX -print-file-name=libsupc++.a 2>/dev/null`"
-	case "$SUPC" in
-    		libsupc++.a*)
-			# Library not found, so this is and older GCC...
-			AC_MSG_RESULT(no)
-			;;
-		*)
-        		# This is gcc 3.x, and it knows of libsupc++, so we need it
-			CXX="$CC"
-        		CXXLIBS="-lsupc++"
-        		AC_MSG_RESULT(yes)
-			;;
-	esac
-
 	if test -z "$OPTIM"; then
 		if test "x$with_optim" = x; then
 			if test $uname = HP-UX; then
@@ -86,7 +57,10 @@ if test -n "$GCC"; then
 	fi
 
 	if test "x$with_optim" = x; then
-		OPTIM="-Wall -Wno-format-y2k $OPTIM"
+		# Add useful warning options for tracking down problems...
+		OPTIM="-Wall -Wunused -Wno-format-y2k $OPTIM"
+		# Additional warning options for alpha testing...
+		OPTIM="-Wshadow -Wconversion $OPTIM"
 	fi
 else
 	case $uname in
