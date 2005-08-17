@@ -83,7 +83,7 @@ ImageReadPNG(image_t    *img,		/* IO - Image */
   png_read_info(pp, info);
 
   fprintf(stderr, "DEBUG: PNG image: %dx%dx%d, color_type=%x (%s%s%s)\n",
-          info->width, info->height, info->bit_depth, info->color_type,
+          (int)info->width, (int)info->height, info->bit_depth, info->color_type,
 	  (info->color_type & PNG_COLOR_MASK_COLOR) ? "RGB" : "GRAYSCALE",
 	  (info->color_type & PNG_COLOR_MASK_ALPHA) ? "+ALPHA" : "",
 	  (info->color_type & PNG_COLOR_MASK_PALETTE) ? "+PALETTE" : "");
