@@ -986,7 +986,7 @@ main(int  argc,		/* I - Number of command-line arguments */
 
   switch (Orientation)
   {
-    case 0 :
+    default :
 	switch (XPosition)
 	{
 	  case -1 :
