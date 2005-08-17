@@ -482,7 +482,7 @@ cupsFileOpen(const char *filename,	/* I - Name of file */
 	else
 	  return (NULL);
 
-	for (i = 0; hostaddr->h_addr_list[i]; i ++)
+	for (i = 0, fd = -1; hostaddr->h_addr_list[i]; i ++)
 	{
 	 /*
 	  * Load the address...
