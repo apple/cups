@@ -72,8 +72,8 @@ private:
   XRef *xref;			// the xref table for this PDF file
   Page **pages;			// array of pages
   Ref *pageRefs;		// object ID for each page
-  int numPages;			// number of pages
-  int pagesSize;		// size of pages array
+  unsigned int numPages;	// number of pages
+  unsigned int pagesSize;	// size of pages array
   Object dests;			// named destination dictionary
   Object nameTree;		// name tree
   GString *baseURI;		// base URI for URI-type links
@@ -82,7 +82,7 @@ private:
   Object outline;		// outline dictionary
   GBool ok;			// true if catalog is valid
 
-  int readPageTree(Dict *pages, PageAttrs *attrs, int start);
+  int readPageTree(Dict *pages, PageAttrs *attrs, unsigned int start);
   Object *findDestInTree(Object *tree, GString *name, Object *obj);
 };
 

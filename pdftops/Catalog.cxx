@@ -30,8 +30,8 @@
 Catalog::Catalog(XRef *xrefA) {
   Object catDict, pagesDict;
   Object obj, obj2;
-  int numPages0;
-  int i;
+  unsigned int numPages0;
+  unsigned int i;
 
   ok = gTrue;
   xref = xrefA;
@@ -129,7 +129,7 @@ Catalog::Catalog(XRef *xrefA) {
 }
 
 Catalog::~Catalog() {
-  int i;
+  unsigned int i;
 
   if (pages) {
     for (i = 0; i < pagesSize; ++i) {
@@ -174,13 +174,14 @@ GString *Catalog::readMetadata() {
   return s;
 }
 
-int Catalog::readPageTree(Dict *pagesDict, PageAttrs *attrs, int start) {
+int Catalog::readPageTree(Dict *pagesDict, PageAttrs *attrs, unsigned int start) {
   Object kids;
   Object kid;
   Object kidRef;
   PageAttrs *attrs1, *attrs2;
   Page *page;
-  int i, j;
+  int i;
+  unsigned int j;
 
   attrs1 = new PageAttrs(attrs, pagesDict);
   pagesDict->lookup("Kids", &kids);
@@ -249,7 +250,7 @@ int Catalog::readPageTree(Dict *pagesDict, PageAttrs *attrs, int start) {
 }
 
 int Catalog::findPage(int num, int gen) {
-  int i;
+  unsigned int i;
 
   for (i = 0; i < numPages; ++i) {
     if (pageRefs[i].num == num && pageRefs[i].gen == gen)
