@@ -26,7 +26,7 @@ include ../Makedefs
 
 CGIS	=	admin.cgi classes.cgi jobs.cgi printers.cgi
 TARGETS	=	libcgi.a $(CGIS)
-LIBOBJS	=	html.o ipp-var.o template.o var.o
+LIBOBJS	=	ipp-var.o template.o var.o
 OBJS	=	$(LIBOBJS) admin.o classes.o jobs.o printers.o
 
 

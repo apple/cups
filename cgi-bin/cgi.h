@@ -43,6 +43,7 @@
  */
 
 extern int		cgiInitialize(void);
+extern int		cgiIsPOST(void);
 extern void		cgiAbort(const char *title, const char *stylesheet,
 			         const char *format, ...);
 extern int		cgiCheckVariables(const char *names);
@@ -56,20 +57,6 @@ extern void		cgiSetVariable(const char *name, const char *value);
 extern void		cgiCopyTemplateFile(FILE *out, const char *tmpl);
 extern void		cgiCopyTemplateLang(FILE *out, const char *directory,
 			                    const char *tmpl, const char *lang);
-
-extern void		cgiStartHTML(FILE *out, const char *author,
-			             const char *stylesheet,
-			             const char *keywords,
-			             const char *description,
-				     const char *title, ...);
-extern void		cgiEndHTML(FILE *out);
-
-extern FILE		*cgiEMailOpen(const char *from, const char *to,
-			              const char *cc, const char *subject,
-				      int multipart);
-extern void		cgiEMailPart(FILE *mail, const char *type,
-			             const char *charset, const char *encoding);
-extern void		cgiEMailClose(FILE *mail);
 
 extern char		*cgiGetCookie(const char *name, char *buf, int buflen);
 extern void		cgiSetCookie(const char *name, const char *value,

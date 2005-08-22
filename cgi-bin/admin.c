@@ -36,6 +36,8 @@
  *   do_set_allowed_users()    - Set the allowed/denied users for a queue.
  *   form_encode()             - Encode a string as a form variable...
  *   get_line()                - Get a line that is terminated by a LF, CR, or CR LF.
+ *   html_end()                - End a HTML page.
+ *   html_start()              - Start a HTML page.
  *   match_string()            - Return the number of matching characters.
  */
 
@@ -45,6 +47,7 @@
 
 #include "ipp-var.h"
 #include <cups/file.h>
+#include <sys/stat.h>
 #include <ctype.h>
 #include <errno.h>
 
@@ -64,6 +67,8 @@ static void	do_printer_op(http_t *http, cups_lang_t *language, ipp_op_t op);
 static void	do_set_allowed_users(http_t *http, cups_lang_t *language);
 static void	form_encode(char *dst, const char *src, size_t dstsize);
 static char	*get_line(char *buf, int length, FILE *fp);
+static void	html_start(void);
+static void	html_end(void);
 static int	match_string(const char *a, const char *b);
 
 
@@ -93,21 +98,6 @@ main(int  argc,				/* I - Number of command-line arguments */
   http = httpConnectEncrypt("localhost", ippPort(), cupsEncryption());
 
  /*
-  * Tell the client to expect UTF-8 encoded HTML...
-  */
-
-  puts("Content-Type: text/html;charset=utf-8\n");
-
- /*
-  * Send a standard header...
-  */
-
-  cgiSetVariable("TITLE", "Admin");
-  ippSetServerVersion();
-
-  cgiCopyTemplateLang(stdout, TEMPLATES, "header.tmpl", getenv("LANG"));
-
- /*
   * See if we have form data...
   */
 
@@ -125,7 +115,9 @@ main(int  argc,				/* I - Number of command-line arguments */
     * Do the operation...
     */
 
-    if (!strcmp(op, "start-printer"))
+    if (!strcmp(op, "redirect"))
+      puts("Location: /admin\n");
+    else if (!strcmp(op, "start-printer"))
       do_printer_op(http, language, IPP_RESUME_PRINTER);
     else if (!strcmp(op, "stop-printer"))
       do_printer_op(http, language, IPP_PAUSE_PRINTER);
@@ -161,7 +153,9 @@ main(int  argc,				/* I - Number of command-line arguments */
       * Bad operation code...  Display an error...
       */
 
+      html_start();
       cgiCopyTemplateLang(stdout, TEMPLATES, "admin-op.tmpl", getenv("LANG"));
+      html_end();
     }
 
    /*
@@ -176,14 +170,10 @@ main(int  argc,				/* I - Number of command-line arguments */
     * Form data but no operation code...  Display an error...
     */
 
+    html_start();
     cgiCopyTemplateLang(stdout, TEMPLATES, "admin-op.tmpl", getenv("LANG"));
+    html_end();
   }
-
- /*
-  * Send the standard trailer...
-  */
-
-  cgiCopyTemplateLang(stdout, TEMPLATES, "trailer.tmpl", getenv("LANG"));
 
  /*
   * Free the request language...
@@ -234,6 +224,8 @@ do_am_class(http_t      *http,		/* I - HTTP connection */
 
   if (cgiGetVariable("PRINTER_LOCATION") == NULL)
   {
+    html_start();
+
     if (modify)
     {
      /*
@@ -286,6 +278,8 @@ do_am_class(http_t      *http,		/* I - HTTP connection */
       cgiCopyTemplateLang(stdout, TEMPLATES, "add-class.tmpl", getenv("LANG"));
     }
 
+    html_end();
+
     return;
   }
 
@@ -299,7 +293,9 @@ do_am_class(http_t      *http,		/* I - HTTP connection */
     cgiSetVariable("ERROR", "The class name may only contain up to 127 printable "
                             "characters and may not contain spaces, slashes (/), "
 			    "or the pound sign (#).");
+    html_start();
     cgiCopyTemplateLang(stdout, TEMPLATES, "error.tmpl", getenv("LANG"));
+    html_end();
     return;
   }
 
@@ -419,7 +415,9 @@ do_am_class(http_t      *http,		/* I - HTTP connection */
     * Let the user choose...
     */
 
+    html_start();
     cgiCopyTemplateLang(stdout, TEMPLATES, "choose-members.tmpl", getenv("LANG"));
+    html_end();
   }
   else
   {
@@ -484,6 +482,8 @@ do_am_class(http_t      *http,		/* I - HTTP connection */
     else
       status = cupsLastError();
 
+    html_start();
+
     if (status > IPP_OK_CONFLICT)
     {
       cgiSetVariable("ERROR", ippErrorString(status));
@@ -493,6 +493,8 @@ do_am_class(http_t      *http,		/* I - HTTP connection */
       cgiCopyTemplateLang(stdout, TEMPLATES, "class-modified.tmpl", getenv("LANG"));
     else
       cgiCopyTemplateLang(stdout, TEMPLATES, "class-added.tmpl", getenv("LANG"));
+
+    html_end();
   }
 }
 
@@ -575,6 +577,8 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
   if ((name = cgiGetVariable("PRINTER_NAME")) == NULL ||
       cgiGetVariable("PRINTER_LOCATION") == NULL)
   {
+    html_start();
+
     if (modify)
     {
      /*
@@ -595,6 +599,8 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
       cgiCopyTemplateLang(stdout, TEMPLATES, "add-printer.tmpl", getenv("LANG"));
     }
 
+    html_end();
+
     if (oldinfo)
       ippDelete(oldinfo);
 
@@ -610,7 +616,9 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
     cgiSetVariable("ERROR", "The printer name may only contain up to 127 printable "
                             "characters and may not contain spaces, slashes (/), "
 			    "or the pound sign (#).");
+    html_start();
     cgiCopyTemplateLang(stdout, TEMPLATES, "error.tmpl", getenv("LANG"));
+    html_end();
     return;
   }
 
@@ -663,7 +671,9 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
       cgiSetVariable("CURRENT_DEVICE_URI", uri);
     }
 
+    html_start();
     cgiCopyTemplateLang(stdout, TEMPLATES, "choose-device.tmpl", getenv("LANG"));
+    html_end();
   }
   else if (strchr(var, '/') == NULL)
   {
@@ -682,7 +692,9 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
     * User needs to set the full URI...
     */
 
+    html_start();
     cgiCopyTemplateLang(stdout, TEMPLATES, "choose-uri.tmpl", getenv("LANG"));
+    html_end();
   }
   else if (strncmp(var, "serial:", 7) == 0 && cgiGetVariable("BAUDRATE") == NULL)
   {
@@ -705,7 +717,9 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
 	cgiSetArray("BAUDRATES", i, baudrate);
       }
 
+    html_start();
     cgiCopyTemplateLang(stdout, TEMPLATES, "choose-serial.tmpl", getenv("LANG"));
+    html_end();
   }
   else if ((var = cgiGetVariable("PPD_NAME")) == NULL)
   {
@@ -848,8 +862,10 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
 	      last = attr;
 	    }
 
+        html_start();
 	cgiCopyTemplateLang(stdout, TEMPLATES, "choose-make.tmpl",
 	                    getenv("LANG"));
+        html_end();
       }
       else
       {
@@ -897,8 +913,10 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
 	  }
 	}
 
+        html_start();
 	cgiCopyTemplateLang(stdout, TEMPLATES, "choose-model.tmpl",
 	                    getenv("LANG"));
+        html_end();
       }
 
       
@@ -912,7 +930,9 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
       snprintf(message, sizeof(message), "Unable to get list of printer drivers: %s",
                ippErrorString(cupsLastError()));
       cgiSetVariable("ERROR", message);
+      html_start();
       cgiCopyTemplateLang(stdout, TEMPLATES, "error.tmpl", getenv("LANG"));
+      html_end();
     }
   }
   else
@@ -993,6 +1013,8 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
     else
       status = cupsLastError();
 
+    html_start();
+
     if (status > IPP_OK_CONFLICT)
     {
       cgiSetVariable("ERROR", ippErrorString(status));
@@ -1002,6 +1024,8 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
       cgiCopyTemplateLang(stdout, TEMPLATES, "printer-modified.tmpl", getenv("LANG"));
     else
       cgiCopyTemplateLang(stdout, TEMPLATES, "printer-added.tmpl", getenv("LANG"));
+
+    html_end();
   }
 
   if (oldinfo)
@@ -1049,7 +1073,9 @@ do_config_printer(http_t      *http,	/* I - HTTP connection */
   else
   {
     cgiSetVariable("ERROR", ippErrorString(IPP_NOT_FOUND));
+    html_start();
     cgiCopyTemplateLang(stdout, TEMPLATES, "error.tmpl", getenv("LANG"));
+    html_end();
     return;
   }
 
@@ -1068,7 +1094,9 @@ do_config_printer(http_t      *http,	/* I - HTTP connection */
       */
 
       cgiSetVariable("ERROR", ippErrorString(IPP_NOT_POSSIBLE));
+      html_start();
       cgiCopyTemplateLang(stdout, TEMPLATES, "error.tmpl", getenv("LANG"));
+      html_end();
     }
     else
     {
@@ -1077,7 +1105,9 @@ do_config_printer(http_t      *http,	/* I - HTTP connection */
       */
 
       cgiSetVariable("ERROR", ippErrorString(cupsLastError()));
+      html_start();
       cgiCopyTemplateLang(stdout, TEMPLATES, "error.tmpl", getenv("LANG"));
+      html_end();
     }
     return;
   }
@@ -1085,7 +1115,9 @@ do_config_printer(http_t      *http,	/* I - HTTP connection */
   if ((ppd = ppdOpenFile(filename)) == NULL)
   {
     cgiSetVariable("ERROR", ippErrorString(IPP_DEVICE_ERROR));
+    html_start();
     cgiCopyTemplateLang(stdout, TEMPLATES, "error.tmpl", getenv("LANG"));
+    html_end();
     return;
   }
 
@@ -1128,6 +1160,7 @@ do_config_printer(http_t      *http,	/* I - HTTP connection */
     * Show the options to the user...
     */
 
+    html_start();
     cgiCopyTemplateLang(stdout, TEMPLATES, "config-printer.tmpl",
                         getenv("LANG"));
 
@@ -1321,6 +1354,7 @@ do_config_printer(http_t      *http,	/* I - HTTP connection */
 
     cgiCopyTemplateLang(stdout, TEMPLATES, "config-printer2.tmpl",
                         getenv("LANG"));
+    html_end();
   }
   else
   {
@@ -1335,7 +1369,9 @@ do_config_printer(http_t      *http,	/* I - HTTP connection */
     if (outfd < 0 || in == NULL || out == NULL)
     {
       cgiSetVariable("ERROR", strerror(errno));
+      html_start();
       cgiCopyTemplateLang(stdout, TEMPLATES, "error.tmpl", getenv("LANG"));
+      html_end();
       unlink(filename);
       return;
     }
@@ -1423,6 +1459,8 @@ do_config_printer(http_t      *http,	/* I - HTTP connection */
     else
       status = cupsLastError();
 
+    html_start();
+
     if (status > IPP_OK_CONFLICT)
     {
       cgiSetVariable("ERROR", ippErrorString(status));
@@ -1430,6 +1468,8 @@ do_config_printer(http_t      *http,	/* I - HTTP connection */
     }
     else
       cgiCopyTemplateLang(stdout, TEMPLATES, "printer-configured.tmpl", getenv("LANG"));
+
+    html_end();
 
     unlink(tempfile);
   }
@@ -1446,157 +1486,376 @@ static void
 do_config_server(http_t      *http,	/* I - HTTP connection */
                  cups_lang_t *language)	/* I - Client's language */
 {
-  cups_file_t	*cupsd;			/* cupsd.conf file */
-  char		tempfile[1024];		/* Temporary new cupsd.conf */
-  int		tempfd;			/* Temporary file descriptor */
-  cups_file_t	*temp;			/* Temporary file */
-  char		line[1024],		/* Line from cupsd.conf file */
+  if (cgiIsPOST() && !cgiGetVariable("CUPSD.CONF"))
+  {
+   /*
+    * Save basic setting changes...
+    */
+
+    http_status_t status;		/* PUT status */
+    cups_file_t	*cupsd;			/* cupsd.conf file */
+    char	tempfile[1024];		/* Temporary new cupsd.conf */
+    int		tempfd;			/* Temporary file descriptor */
+    cups_file_t	*temp;			/* Temporary file */
+    char	line[1024],		/* Line from cupsd.conf file */
 		*value;			/* Value on line */
-  const char	*server_root;		/* Location of config files */
-  const char	*val;			/* CGI form variable value */
-  int		linenum,		/* Line number in file */
+    const char	*server_root;		/* Location of config files */
+    int		linenum,		/* Line number in file */
 		in_policy,		/* In a policy section? */
 		in_cancel_job,		/* In a cancel-job section? */
-		in_admin_location;	/* In the /admin location? */
-  int		remote_printers,	/* Show remote printers */
+		in_admin_location,	/* In the /admin location? */
+		in_root_location;	/* In the / location? */
+    int		remote_printers,	/* Show remote printers */
 		share_printers,		/* Share local printers */
 		remote_admin,		/* Remote administration allowed? */
 		user_cancel_any,	/* Cancel-job policy set? */
 		debug_logging;		/* LogLevel debug set? */
-  int		wrote_port_listen,	/* Wrote the port/listen lines? */
+    int		wrote_port_listen,	/* Wrote the port/listen lines? */
 		wrote_browsing,		/* Wrote the browsing lines? */
-		wrote_browse_address,	/* Wrote the BrowseAddress lines? */
 		wrote_policy,		/* Wrote the policy? */
-		wrote_admin_location;	/* Wrote the /admin location? */
+		wrote_loglevel,		/* Wrote the LogLevel line? */
+		wrote_admin_location,	/* Wrote the /admin location? */
+		wrote_root_location;	/* Wrote the / location? */
 
 
- /*
-  * Get form variables...
-  */
-
-  remote_printers = cgiGetVariable("REMOTE_PRINTERS") != NULL;
-  share_printers  = cgiGetVariable("SHARE_PRINTERS") != NULL;
-  remote_admin    = cgiGetVariable("REMOTE_ADMIN") != NULL;
-  user_cancel_any = cgiGetVariable("USER_CANCEL_ANY") != NULL;
-  debug_logging   = cgiGetVariable("DEBUG_LOGGING") != NULL;
-
- /*
-  * Locate the cupsd.conf file...
-  */
-
-  if ((server_root = getenv("CUPS_SERVERROOT")) == NULL)
-    server_root = CUPS_SERVERROOT;
-
-  snprintf(line, sizeof(line), "%s/cupsd.conf", server_root);
-
-  printf("<!-- \"%s\" -->\n", line);
-
- /*
-  * Open the cupsd.conf file...
-  */
-
-  if ((cupsd = cupsFileOpen(line, "r")) == NULL)
-  {
    /*
-    * Unable to open - log an error...
+    * Get form variables...
     */
 
-    perror(line);
-    return;
-  }
+    remote_printers = cgiGetVariable("REMOTE_PRINTERS") != NULL;
+    share_printers  = cgiGetVariable("SHARE_PRINTERS") != NULL;
+    remote_admin    = cgiGetVariable("REMOTE_ADMIN") != NULL;
+    user_cancel_any = cgiGetVariable("USER_CANCEL_ANY") != NULL;
+    debug_logging   = cgiGetVariable("DEBUG_LOGGING") != NULL;
 
- /*
-  * Create a temporary file for the new cupsd.conf file...
-  */
+   /*
+    * Locate the cupsd.conf file...
+    */
 
-  if ((tempfd = cupsTempFd(tempfile, sizeof(tempfile))) < 0)
-  {
-    perror(tempfile);
-    cupsFileClose(cupsd);
-    return;
-  }
+    if ((server_root = getenv("CUPS_SERVERROOT")) == NULL)
+      server_root = CUPS_SERVERROOT;
 
-  if ((temp = cupsFileOpenFd(tempfd, "w")) == NULL)
-  {
-    perror(tempfile);
-    close(tempfd);
-    unlink(tempfile);
-    cupsFileClose(cupsd);
-    return;
-  }
+    snprintf(line, sizeof(line), "%s/cupsd.conf", server_root);
 
-  printf("<!-- tempfile=\"%s\" -->\n", tempfile);
+   /*
+    * Open the cupsd.conf file...
+    */
 
- /*
-  * Copy the old file to the new, making changes along the way...
-  */
-
-  in_admin_location    = 0;
-  in_cancel_job        = 0;
-  in_policy            = 0;
-  linenum              = 0;
-  wrote_admin_location = 0;
-  wrote_browsing       = 0;
-  wrote_browse_address = 0;
-  wrote_policy         = 0;
-  wrote_port_listen    = 0;
-
-  while (cupsFileGetConf(cupsd, line, sizeof(line), &value, &linenum))
-  {
-    if (!strcasecmp(line, "Port") || !strcasecmp(line, "Listen"))
+    if ((cupsd = cupsFileOpen(line, "r")) == NULL)
     {
-      if (!wrote_port_listen)
-      {
-        wrote_port_listen = 1;
+     /*
+      * Unable to open - log an error...
+      */
 
-	if (share_printers || remote_admin)
-	{
-	  cupsFilePuts(temp, "# Allow remote access\n");
-	  cupsFilePrintf(temp, "Port %d\n", ippPort());
-	}
-	else
-	{
-	  cupsFilePuts(temp, "# Only listen for connections from the local machine.\n");
-	  cupsFilePrintf(temp, "Listen localhost:%d\n", ippPort());
-	}
-      }
+      html_start();
+      cgiSetVariable("ERROR", strerror(errno));
+      cgiCopyTemplateLang(stdout, TEMPLATES, "error.tmpl", getenv("LANG"));
+      html_end();
+      
+      perror(line);
+      return;
     }
-    else if (!strcasecmp(line, "Browsing") ||
-             !strcasecmp(line, "BrowseAddress") ||
-             !strcasecmp(line, "BrowseAllow") ||
-             !strcasecmp(line, "BrowseDeny") ||
-             !strcasecmp(line, "BrowseOrder"))
-    {
-      if (!wrote_browsing)
-      {
-        wrote_browsing = 1;
 
-        if (remote_printers || share_printers)
+   /*
+    * Create a temporary file for the new cupsd.conf file...
+    */
+
+    if ((tempfd = cupsTempFd(tempfile, sizeof(tempfile))) < 0)
+    {
+      html_start();
+      cgiSetVariable("ERROR", strerror(errno));
+      cgiCopyTemplateLang(stdout, TEMPLATES, "error.tmpl", getenv("LANG"));
+      html_end();
+      
+      perror(tempfile);
+      cupsFileClose(cupsd);
+      return;
+    }
+
+    if ((temp = cupsFileOpenFd(tempfd, "w")) == NULL)
+    {
+      html_start();
+      cgiSetVariable("ERROR", strerror(errno));
+      cgiCopyTemplateLang(stdout, TEMPLATES, "error.tmpl", getenv("LANG"));
+      html_end();
+      
+      perror(tempfile);
+      close(tempfd);
+      unlink(tempfile);
+      cupsFileClose(cupsd);
+      return;
+    }
+
+   /*
+    * Copy the old file to the new, making changes along the way...
+    */
+
+    in_admin_location    = 0;
+    in_cancel_job        = 0;
+    in_policy            = 0;
+    in_root_location     = 0;
+    linenum              = 0;
+    wrote_admin_location = 0;
+    wrote_browsing       = 0;
+    wrote_loglevel       = 0;
+    wrote_policy         = 0;
+    wrote_port_listen    = 0;
+    wrote_root_location  = 0;
+
+    while (cupsFileGetConf(cupsd, line, sizeof(line), &value, &linenum))
+    {
+      if (!strcasecmp(line, "Port") || !strcasecmp(line, "Listen"))
+      {
+	if (!wrote_port_listen)
 	{
-	  if (remote_printers && share_printers)
-	    cupsFilePuts(temp, "# Enable printer sharing and shared printers.\n");
-	  else if (remote_printers)
-	    cupsFilePuts(temp, "# Show shared printers on the local network.\n");
+          wrote_port_listen = 1;
+
+	  if (share_printers || remote_admin)
+	  {
+	    cupsFilePuts(temp, "# Allow remote access\n");
+	    cupsFilePrintf(temp, "Port %d\n", ippPort());
+	  }
 	  else
-	    cupsFilePuts(temp, "# Share local printers on the local network.\n");
-
-	  cupsFilePuts(temp, "Browsing On\n");
-	  cupsFilePuts(temp, "BrowseOrder allow,deny\n");
-
-	  if (remote_printers)
-	    cupsFilePuts(temp, "BrowseAllow @LOCAL\n");
-	  
-	  if (share_printers)
-	    cupsFilePuts(temp, "BrowseAddress @LOCAL\n");
-        }
-	else
-	{
-	  cupsFilePuts(temp, "# Disable printer sharing and shared printers.\n");
-	  cupsFilePuts(temp, "Browsing Off\n");
+	  {
+	    cupsFilePuts(temp, "# Only listen for connections from the local machine.\n");
+	    cupsFilePrintf(temp, "Listen localhost:%d\n", ippPort());
+	  }
 	}
       }
+      else if (!strcasecmp(line, "Browsing") ||
+               !strcasecmp(line, "BrowseAddress") ||
+               !strcasecmp(line, "BrowseAllow") ||
+               !strcasecmp(line, "BrowseDeny") ||
+               !strcasecmp(line, "BrowseOrder"))
+      {
+	if (!wrote_browsing)
+	{
+          wrote_browsing = 1;
+
+          if (remote_printers || share_printers)
+	  {
+	    if (remote_printers && share_printers)
+	      cupsFilePuts(temp, "# Enable printer sharing and shared printers.\n");
+	    else if (remote_printers)
+	      cupsFilePuts(temp, "# Show shared printers on the local network.\n");
+	    else
+	      cupsFilePuts(temp, "# Share local printers on the local network.\n");
+
+	    cupsFilePuts(temp, "Browsing On\n");
+	    cupsFilePuts(temp, "BrowseOrder allow,deny\n");
+
+	    if (remote_printers)
+	      cupsFilePuts(temp, "BrowseAllow @LOCAL\n");
+
+	    if (share_printers)
+	      cupsFilePuts(temp, "BrowseAddress @LOCAL\n");
+          }
+	  else
+	  {
+	    cupsFilePuts(temp, "# Disable printer sharing and shared printers.\n");
+	    cupsFilePuts(temp, "Browsing Off\n");
+	  }
+	}
+      }
+      else if (!strcasecmp(line, "LogLevel"))
+      {
+        wrote_loglevel = 1;
+
+	if (debug_logging)
+	{
+          cupsFilePuts(temp, "# Show troubleshooting information in error_log.\n");
+	  cupsFilePuts(temp, "LogLevel debug\n");
+	}
+	else
+	{
+          cupsFilePuts(temp, "# Show general information in error_log.\n");
+	  cupsFilePuts(temp, "LogLevel info\n");
+	}
+      }
+      else if (!strcasecmp(line, "<Policy") && !strcasecmp(value, "default"))
+      {
+	in_policy = 1;
+
+	cupsFilePrintf(temp, "%s %s>\n", line, value);
+      }
+      else if (!strcasecmp(line, "</Policy>"))
+      {
+        if (!wrote_policy)
+	{
+	  wrote_policy = 1;
+
+          if (!user_cancel_any)
+	    cupsFilePuts(temp, "<Limit Cancel-Job>\n"
+	                       "Order allow,deny\n"
+	                       "Allow @SYSTEM\n"
+			       "Allow @OWNER\n"
+			       "</Limit>\n");
+        }
+
+	in_policy = 0;
+
+	cupsFilePuts(temp, "</Policy>\n");
+      }
+      else if (!strcasecmp(line, "<Location"))
+      {
+        if (!strcmp(value, "/admin"))
+	  in_admin_location = 1;
+	else if (!strcmp(value, "/"))
+	  in_root_location = 1;
+
+	cupsFilePrintf(temp, "%s %s>\n", line, value);
+      }
+      else if (!strcasecmp(line, "</Location>"))
+      {
+        if (in_admin_location)
+	{
+	  wrote_admin_location = 1;
+
+	  if (remote_admin)
+            cupsFilePuts(temp, "# Allow remote administration.\n");
+	  else
+            cupsFilePuts(temp, "# Only allow local administration.\n");
+
+          cupsFilePuts(temp, "Order allow,deny\n");
+
+	  if (remote_admin)
+	    cupsFilePuts(temp, "Allow @LOCAL\n");
+	  else
+	    cupsFilePuts(temp, "Allow localhost\n");
+	}
+	else if (in_root_location)
+	{
+	  wrote_root_location = 1;
+
+	  if (remote_admin && share_printers)
+            cupsFilePuts(temp, "# Allow shared printing and remote administration.\n");
+	  else if (remote_admin)
+            cupsFilePuts(temp, "# Allow remote administration.\n");
+	  else if (share_printers)
+            cupsFilePuts(temp, "# Allow shared printing.\n");
+	  else
+            cupsFilePuts(temp, "# Only allow local access.\n");
+
+          cupsFilePuts(temp, "Order allow,deny\n");
+
+	  if (remote_admin || share_printers)
+	    cupsFilePuts(temp, "Allow @LOCAL\n");
+	  else
+	    cupsFilePuts(temp, "Allow localhost\n");
+	}
+
+	in_admin_location = 0;
+        in_root_location  = 0;
+
+	cupsFilePuts(temp, "</Location>\n");
+      }
+      else if (!strcasecmp(line, "<Limit") && in_policy)
+      {
+       /*
+	* See if the policy limit is for the Cancel-Job operation...
+	*/
+
+	char	*valptr;		/* Pointer into value */
+
+
+        if (!strcasecmp(value, "cancel-job"))
+	{
+	 /*
+	  * Don't write anything for this limit section...
+	  */
+
+	  in_cancel_job = 2;
+	}
+	else
+	{
+	  cupsFilePuts(temp, line);
+
+	  while (*value)
+	  {
+	    for (valptr = value; !isspace(*valptr & 255) && *valptr; valptr ++);
+
+	    if (*valptr)
+	      *valptr++ = '\0';
+
+            if (!strcasecmp(value, "cancel-job"))
+	    {
+	     /*
+	      * Write everything except for this definition...
+	      */
+
+	      in_cancel_job = 1;
+	    }
+	    else
+	      cupsFilePrintf(temp, " %s", value);
+
+            for (value = valptr; isspace(*value & 255); value ++);
+	  }
+
+	  cupsFilePuts(temp, ">\n");
+        }
+      }
+      else if (!strcasecmp(line, "</Limit>") && in_cancel_job)
+      {
+        if (in_cancel_job == 1)
+          cupsFilePuts(temp, "</Limit>\n");
+
+        wrote_policy = 1;
+
+        if (!user_cancel_any)
+	  cupsFilePuts(temp, "<Limit Cancel-Job>\n"
+	                     "Order allow,deny\n"
+	                     "Allow @SYSTEM\n"
+			     "Allow @OWNER\n"
+			     "</Limit>\n");
+
+	in_cancel_job = 0;
+      }
+      else if ((in_admin_location || in_root_location) &&
+               (!strcasecmp(line, "Allow") || !strcasecmp(line, "Deny") ||
+	        !strcasecmp(line, "Order")))
+	continue;
+      else if (in_cancel_job == 2)
+        continue;
+      else if (line[0] == '<' && value)
+	cupsFilePrintf(temp, "%s %s>\n", line, value);
+      else if (value)
+	cupsFilePrintf(temp, "%s %s\n", line, value);
+      else
+	cupsFilePrintf(temp, "%s\n", line);
     }
-    else if (!strcasecmp(line, "LogLevel"))
+
+   /*
+    * Write any missing info...
+    */
+
+    if (!wrote_browsing)
+    {
+      if (remote_printers || share_printers)
+      {
+	if (remote_printers && share_printers)
+	  cupsFilePuts(temp, "# Enable printer sharing and shared printers.\n");
+	else if (remote_printers)
+	  cupsFilePuts(temp, "# Show shared printers on the local network.\n");
+	else
+	  cupsFilePuts(temp, "# Share local printers on the local network.\n");
+
+	cupsFilePuts(temp, "Browsing On\n");
+	cupsFilePuts(temp, "BrowseOrder allow,deny\n");
+
+	if (remote_printers)
+	  cupsFilePuts(temp, "BrowseAllow @LOCAL\n");
+
+	if (share_printers)
+	  cupsFilePuts(temp, "BrowseAddress @LOCAL\n");
+      }
+      else
+      {
+	cupsFilePuts(temp, "# Disable printer sharing and shared printers.\n");
+	cupsFilePuts(temp, "Browsing Off\n");
+      }
+    }
+
+    if (!wrote_loglevel)
     {
       if (debug_logging)
       {
@@ -1609,79 +1868,309 @@ do_config_server(http_t      *http,	/* I - HTTP connection */
 	cupsFilePuts(temp, "LogLevel info\n");
       }
     }
-    else if (line[0] == '<' && value)
-      cupsFilePrintf(temp, "%s %s>\n", line, value);
-    else if (value)
-      cupsFilePrintf(temp, "%s %s\n", line, value);
-    else
-      cupsFilePrintf(temp, "%s\n", line);
-#if 0
-    else if (!strcasecmp(line, "Policy") && !strcasecmp(value, "default"))
-    {
-      in_policy = 1;
-    }
-    else if (!strcasecmp(line, "</Policy>"))
-    {
-      in_policy = 0;
-    }
-    else if (!strcasecmp(line, "<Limit") && in_policy)
-    {
-     /*
-      * See if the policy limit is for the Cancel-Job operation...
-      */
 
-      char	*valptr;		/* Pointer into value */
-
-
-      while (*value)
+    if (!wrote_port_listen)
+    {
+      if (share_printers || remote_admin)
       {
-	for (valptr = value; !isspace(*valptr & 255) && *valptr; valptr ++);
-
-	if (*valptr)
-	  *valptr++ = '\0';
-
-        if (!strcasecmp(value, "cancel-job"))
-	{
-	  in_cancel_job = 1;
-	  break;
-	}
-
-        for (value = valptr; isspace(*value & 255); value ++);
+	cupsFilePuts(temp, "# Allow remote access\n");
+	cupsFilePrintf(temp, "Port %d\n", ippPort());
+      }
+      else
+      {
+	cupsFilePuts(temp, "# Only listen for connections from the local machine.\n");
+	cupsFilePrintf(temp, "Listen localhost:%d\n", ippPort());
       }
     }
-    else if (!strcasecmp(line, "</Limit>"))
+
+    if (!wrote_root_location)
     {
-      in_cancel_job = 0;
+      if (remote_admin && share_printers)
+        cupsFilePuts(temp, "# Allow shared printing and remote administration.\n");
+      else if (remote_admin)
+        cupsFilePuts(temp, "# Allow remote administration.\n");
+      else if (share_printers)
+        cupsFilePuts(temp, "# Allow shared printing.\n");
+      else
+        cupsFilePuts(temp, "# Only allow local access.\n");
+
+      cupsFilePuts(temp, "<Location />\n"
+                         "Order allow,deny\n");
+
+      if (remote_admin || share_printers)
+	cupsFilePuts(temp, "Allow @LOCAL\n");
+      else
+	cupsFilePuts(temp, "Allow localhost\n");
+
+      cupsFilePuts(temp, "</Location>\n");
     }
-    else if (!strcasecmp(line, "Order") && in_cancel_job)
+
+    if (!wrote_admin_location)
+    {
+      if (remote_admin)
+        cupsFilePuts(temp, "# Allow remote administration.\n");
+      else
+        cupsFilePuts(temp, "# Only allow local administration.\n");
+
+      cupsFilePuts(temp, "<Location /admin>\n"
+                         "AuthType Basic\n"
+                         "AuthClass System\n"
+                         "Order allow,deny\n");
+
+      if (remote_admin)
+	cupsFilePuts(temp, "Allow @LOCAL\n");
+      else
+	cupsFilePuts(temp, "Allow localhost\n");
+
+      cupsFilePuts(temp, "</Location>\n");
+    }
+
+    if (!wrote_policy)
+    {
+      cupsFilePuts(temp, "<Policy default>\n"
+                         "<Limit Send-Document Send-URI Hold-Job Release-Job "
+			 "Restart-Job Purge-Jobs Set-Job-Attributes "
+			 "Create-Job-Subscription Renew-Subscription "
+			 "Cancel-Subscription Get-Notifications Reprocess-Job "
+			 "Cancel-Current-Job Suspend-Current-Job Resume-Job "
+			 "CUPS-Move-Job>\n"
+                         "Order allow,deny\n"
+                         "Allow @OWNER\n"
+                         "Allow @SYSTEM\n"
+                         "</Limit>\n"
+                         "<Limit Pause-Printer Resume-Printer "
+                         "Set-Printer-Attributes Enable-Printer "
+			 "Disable-Printer Pause-Printer-After-Current-Job "
+			 "Hold-New-Jobs Release-Held-New-Jobs Deactivate-Printer "
+			 "Activate-Printer Restart-Printer Shutdown-Printer "
+			 "Startup-Printer Promote-Job Schedule-Job-After "
+			 "CUPS-Add-Printer CUPS-Delete-Printer "
+			 "CUPS-Add-Class CUPS-Delete-Class "
+			 "CUPS-Accept-Jobs CUPS-Reject-Jobs "
+			 "CUPS-Set-Default CUPS-Add-Device CUPS-Delete-Device>\n"
+                         "Order allow,deny\n"
+                         "Authenticate yes\n"
+                         "Allow @SYSTEM\n"
+                         "</Limit>\n");
+
+      if (!user_cancel_any)
+	cupsFilePuts(temp, "<Limit Cancel-Job>\n"
+	                   "Order allow,deny\n"
+	                   "Allow @SYSTEM\n"
+			   "Allow @OWNER\n"
+			   "</Limit>\n");
+
+      cupsFilePuts(temp, "<Limit All>\n"
+                         "Order deny,allow\n"
+                         "</Limit>\n"
+			 "</Policy>\n");
+    }
+
+    cupsFileClose(cupsd);
+    cupsFileClose(temp);
+
+   /*
+    * Upload the configuration file to the server...
+    */
+
+    status = cupsPutFile(http, "/admin/conf/cupsd.conf", tempfile);
+
+    if (status != HTTP_CREATED)
+    {
+      cgiSetVariable("ERROR", cupsLangString(language, status));
+      html_start();
+      cgiCopyTemplateLang(stdout, TEMPLATES, "error.tmpl", getenv("LANG"));
+    }
+    else
+    {
+      cgiSetVariable("refresh_page", "10;/admin?OP=redirect");
+
+      html_start();
+      cgiCopyTemplateLang(stdout, TEMPLATES, "restart.tmpl", getenv("LANG"));
+    }
+
+    html_end();
+
+    unlink(tempfile);
+  }
+  else if (cgiIsPOST())
+  {
+   /*
+    * Save hand-edited config file...
+    */
+
+    http_status_t status;		/* PUT status */
+    char	tempfile[1024];		/* Temporary new cupsd.conf */
+    int		tempfd;			/* Temporary file descriptor */
+    cups_file_t	*temp;			/* Temporary file */
+    const char	*start,			/* Start of line */
+		*end;			/* End of line */
+
+
+   /*
+    * Create a temporary file for the new cupsd.conf file...
+    */
+
+    if ((tempfd = cupsTempFd(tempfile, sizeof(tempfile))) < 0)
+    {
+      html_start();
+      cgiSetVariable("ERROR", strerror(errno));
+      cgiCopyTemplateLang(stdout, TEMPLATES, "error.tmpl", getenv("LANG"));
+      html_end();
+      
+      perror(tempfile);
+      return;
+    }
+
+    if ((temp = cupsFileOpenFd(tempfd, "w")) == NULL)
+    {
+      html_start();
+      cgiSetVariable("ERROR", strerror(errno));
+      cgiCopyTemplateLang(stdout, TEMPLATES, "error.tmpl", getenv("LANG"));
+      html_end();
+      
+      perror(tempfile);
+      close(tempfd);
+      unlink(tempfile);
+      return;
+    }
+
+   /*
+    * Copy the cupsd.conf text from the form variable...
+    */
+
+    start = cgiGetVariable("CUPSD.CONF");
+    while (start)
+    {
+      if ((end = strstr(start, "\r\n")) == NULL)
+        if ((end = strstr(start, "\n")) == NULL)
+	  end = start + strlen(start);
+
+      cupsFileWrite(temp, start, end - start);
+      cupsFilePutChar(temp, '\n');
+
+      if (*end == '\r')
+        start = end + 2;
+      else if (*end == '\n')
+        start = end + 1;
+      else
+        start = NULL;
+    }
+
+    cupsFileClose(temp);
+
+   /*
+    * Upload the configuration file to the server...
+    */
+
+    status = cupsPutFile(http, "/admin/conf/cupsd.conf", tempfile);
+
+    if (status != HTTP_CREATED)
+    {
+      cgiSetVariable("ERROR", cupsLangString(language, status));
+      html_start();
+      cgiCopyTemplateLang(stdout, TEMPLATES, "error.tmpl", getenv("LANG"));
+    }
+    else
+    {
+      cgiSetVariable("refresh_page", "10;/admin?OP=redirect");
+
+      html_start();
+      cgiCopyTemplateLang(stdout, TEMPLATES, "restart.tmpl", getenv("LANG"));
+    }
+
+    html_end();
+
+    unlink(tempfile);
+  }
+  else
+  {
+    struct stat	info;			/* cupsd.conf information */
+    cups_file_t	*cupsd;			/* cupsd.conf file */
+    char	*buffer;		/* Buffer for entire file */
+    char	filename[1024];		/* Filename */
+    const char	*server_root;		/* Location of config files */
+
+
+   /*
+    * Locate the cupsd.conf file...
+    */
+
+    if ((server_root = getenv("CUPS_SERVERROOT")) == NULL)
+      server_root = CUPS_SERVERROOT;
+
+    snprintf(filename, sizeof(filename), "%s/cupsd.conf", server_root);
+
+   /*
+    * Figure out the size...
+    */
+
+    if (stat(filename, &info))
+    {
+      html_start();
+      cgiSetVariable("ERROR", strerror(errno));
+      cgiCopyTemplateLang(stdout, TEMPLATES, "error.tmpl", getenv("LANG"));
+      html_end();
+
+      perror(filename);
+      return;
+    }
+
+    if (info.st_size > (1024 * 1024))
+    {
+      html_start();
+      cgiSetVariable("ERROR", "Unable to edit cupsd.conf files larger than 1MB!");
+      cgiCopyTemplateLang(stdout, TEMPLATES, "error.tmpl", getenv("LANG"));
+      html_end();
+
+      fprintf(stderr, "ERROR: \"%s\" too large (%ld) to edit!\n", filename,
+              (long)info.st_size);
+      return;
+    }
+
+   /*
+    * Open the cupsd.conf file...
+    */
+
+    if ((cupsd = cupsFileOpen(filename, "r")) == NULL)
     {
      /*
-      * See if we are allowing all users to cancel jobs...
+      * Unable to open - log an error...
       */
 
-      if (!strcasecmp(value, "deny,allow"))
-	cancel_policy = 1;
+      html_start();
+      cgiSetVariable("ERROR", strerror(errno));
+      cgiCopyTemplateLang(stdout, TEMPLATES, "error.tmpl", getenv("LANG"));
+      html_end();
+
+      perror(filename);
+      return;
     }
-    else if (!strcasecmp(line, "<Location") && !strcasecmp(value, "/admin"))
-    {
-      in_admin_location = 1;
-    }
-    else if (!strcasecmp(line, "</Location>"))
-    {
-      in_admin_location = 0;
-    }
-    else if (!strcasecmp(line, "Allow") && in_admin_location &&
-             strcasecmp(value, "localhost") && strcasecmp(value, "127.0.0.1"))
-    {
-      remote_admin = 1;
-    }
-#endif /* 0 */
+
+   /*
+    * Allocate memory and load the file into a string buffer...
+    */
+
+    buffer = calloc(1, info.st_size + 1);
+
+    cupsFileRead(cupsd, buffer, info.st_size);
+    cupsFileClose(cupsd);
+
+    cgiSetVariable("CUPSD.CONF", buffer);
+    free(buffer);
+
+   /*
+    * Show the current config file...
+    */
+
+    html_start();
+
+    printf("<!-- \"%s\" -->\n", filename);
+
+    cgiCopyTemplateLang(stdout, TEMPLATES, "edit-config.tmpl", getenv("LANG"));
+
+    html_end();
   }
-
-  cupsFileClose(cupsd);
-  cupsFileClose(temp);
-
-  puts("<p>Boo!</p>");
 }
 
 
@@ -1702,7 +2191,9 @@ do_delete_class(http_t      *http,	/* I - HTTP connection */
 
   if (cgiGetVariable("CONFIRM") == NULL)
   {
+    html_start();
     cgiCopyTemplateLang(stdout, TEMPLATES, "class-confirm.tmpl", getenv("LANG"));
+    html_end();
     return;
   }
 
@@ -1711,7 +2202,9 @@ do_delete_class(http_t      *http,	/* I - HTTP connection */
   else
   {
     cgiSetVariable("ERROR", ippErrorString(IPP_NOT_FOUND));
+    html_start();
     cgiCopyTemplateLang(stdout, TEMPLATES, "error.tmpl", getenv("LANG"));
+    html_end();
     return;
   }
 
@@ -1751,6 +2244,8 @@ do_delete_class(http_t      *http,	/* I - HTTP connection */
   else
     status = cupsLastError();
 
+  html_start();
+
   if (status > IPP_OK_CONFLICT)
   {
     cgiSetVariable("ERROR", ippErrorString(status));
@@ -1758,6 +2253,8 @@ do_delete_class(http_t      *http,	/* I - HTTP connection */
   }
   else
     cgiCopyTemplateLang(stdout, TEMPLATES, "class-deleted.tmpl", getenv("LANG"));
+
+  html_end();
 }
 
 
@@ -1778,7 +2275,9 @@ do_delete_printer(http_t      *http,	/* I - HTTP connection */
 
   if (cgiGetVariable("CONFIRM") == NULL)
   {
+    html_start();
     cgiCopyTemplateLang(stdout, TEMPLATES, "printer-confirm.tmpl", getenv("LANG"));
+    html_end();
     return;
   }
 
@@ -1787,7 +2286,9 @@ do_delete_printer(http_t      *http,	/* I - HTTP connection */
   else
   {
     cgiSetVariable("ERROR", ippErrorString(IPP_NOT_FOUND));
+    html_start();
     cgiCopyTemplateLang(stdout, TEMPLATES, "error.tmpl", getenv("LANG"));
+    html_end();
     return;
   }
 
@@ -1827,6 +2328,8 @@ do_delete_printer(http_t      *http,	/* I - HTTP connection */
   else
     status = cupsLastError();
 
+  html_start();
+
   if (status > IPP_OK_CONFLICT)
   {
     cgiSetVariable("ERROR", ippErrorString(status));
@@ -1834,6 +2337,8 @@ do_delete_printer(http_t      *http,	/* I - HTTP connection */
   }
   else
     cgiCopyTemplateLang(stdout, TEMPLATES, "printer-deleted.tmpl", getenv("LANG"));
+
+  html_end();
 }
 
 
@@ -1863,6 +2368,8 @@ do_menu(http_t      *http,		/* I - HTTP connection */
 
   snprintf(line, sizeof(line), "%s/cupsd.conf", server_root);
 
+  html_start();
+
   printf("<!-- \"%s\" -->\n", line);
 
  /*
@@ -1874,6 +2381,11 @@ do_menu(http_t      *http,		/* I - HTTP connection */
    /*
     * Unable to open - log an error...
     */
+
+    html_start();
+    cgiSetVariable("ERROR", strerror(errno));
+    cgiCopyTemplateLang(stdout, TEMPLATES, "error.tmpl", getenv("LANG"));
+    html_end();
 
     perror(line);
   }
@@ -1925,7 +2437,7 @@ do_menu(http_t      *http,		/* I - HTTP connection */
       {
         debug_logging = !strncasecmp(value, "debug", 5);
       }
-      else if (!strcasecmp(line, "Policy") && !strcasecmp(value, "default"))
+      else if (!strcasecmp(line, "<Policy") && !strcasecmp(value, "default"))
       {
         in_policy = 1;
       }
@@ -2228,6 +2740,8 @@ do_menu(http_t      *http,		/* I - HTTP connection */
   */
 
   cgiCopyTemplateLang(stdout, TEMPLATES, "admin.tmpl", getenv("LANG"));
+
+  html_end();
 }
 
 
@@ -2252,7 +2766,9 @@ do_printer_op(http_t      *http,	/* I - HTTP connection */
   else
   {
     cgiSetVariable("ERROR", ippErrorString(IPP_NOT_FOUND));
+    html_start();
     cgiCopyTemplateLang(stdout, TEMPLATES, "error.tmpl", getenv("LANG"));
+    html_end();
     return;
   }
 
@@ -2292,6 +2808,8 @@ do_printer_op(http_t      *http,	/* I - HTTP connection */
   else
     status = cupsLastError();
 
+  html_start();
+
   if (status > IPP_OK_CONFLICT)
   {
     cgiSetVariable("ERROR", ippErrorString(status));
@@ -2309,6 +2827,8 @@ do_printer_op(http_t      *http,	/* I - HTTP connection */
     cgiCopyTemplateLang(stdout, TEMPLATES, "printer-purge.tmpl", getenv("LANG"));
   else if (op == CUPS_SET_DEFAULT)
     cgiCopyTemplateLang(stdout, TEMPLATES, "printer-default.tmpl", getenv("LANG"));
+
+  html_end();
 }
 
 
@@ -2346,7 +2866,9 @@ do_set_allowed_users(
   else
   {
     cgiSetVariable("ERROR", ippErrorString(IPP_NOT_FOUND));
+    html_start();
     cgiCopyTemplateLang(stdout, TEMPLATES, "error.tmpl", getenv("LANG"));
+    html_end();
     return;
   }
 
@@ -2400,6 +2922,8 @@ do_set_allowed_users(
     else
       status = cupsLastError();
 
+    html_start();
+
     if (status > IPP_OK_CONFLICT)
     {
       cgiSetVariable("ERROR", ippErrorString(status));
@@ -2407,6 +2931,8 @@ do_set_allowed_users(
     }
     else
       cgiCopyTemplateLang(stdout, TEMPLATES, "users.tmpl", getenv("LANG"));
+
+    html_end();
   }
   else
   {
@@ -2553,6 +3079,8 @@ do_set_allowed_users(
     else
       status = cupsLastError();
 
+    html_start();
+
     if (status > IPP_OK_CONFLICT)
     {
       cgiSetVariable("ERROR", ippErrorString(status));
@@ -2560,6 +3088,8 @@ do_set_allowed_users(
     }
     else
       cgiCopyTemplateLang(stdout, TEMPLATES, "printer-modified.tmpl", getenv("LANG"));
+
+    html_end();
   }
 }
 
@@ -2680,6 +3210,45 @@ get_line(char *buf,			/* I - Line buffer */
     return (NULL);
   else
     return (buf);
+}
+
+
+/*
+ * 'html_end()' - End a HTML page.
+ */
+
+static void
+html_end(void)
+{
+ /*
+  * Send the standard trailer...
+  */
+
+  cgiCopyTemplateLang(stdout, TEMPLATES, "trailer.tmpl", getenv("LANG"));
+}
+
+
+/*
+ * 'html_start()' - Start a HTML page.
+ */
+
+static void
+html_start(void)
+{
+ /*
+  * Tell the client to expect UTF-8 encoded HTML...
+  */
+
+  puts("Content-Type: text/html;charset=utf-8\n");
+
+ /*
+  * Send a standard header...
+  */
+
+  cgiSetVariable("TITLE", "Admin");
+  ippSetServerVersion();
+
+  cgiCopyTemplateLang(stdout, TEMPLATES, "header.tmpl", getenv("LANG"));
 }
 
 

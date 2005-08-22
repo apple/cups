@@ -1300,17 +1300,18 @@ ReadClient(client_t *con)		/* I - Client to read from */
 	      }
 	    }
 
-	    if ((strncmp(con->uri, "/admin", 6) == 0 &&
-	         strncmp(con->uri, "/admin/conf/", 12) != 0) ||
-		strncmp(con->uri, "/printers", 9) == 0 ||
-		strncmp(con->uri, "/classes", 8) == 0 ||
-		strncmp(con->uri, "/jobs", 5) == 0)
+	    if ((!strncmp(con->uri, "/admin", 6) &&
+	         strncmp(con->uri, "/admin/conf/", 12) &&
+	         strncmp(con->uri, "/admin/log/", 11)) ||
+		!strncmp(con->uri, "/printers", 9) ||
+		!strncmp(con->uri, "/classes", 8) ||
+		!strncmp(con->uri, "/jobs", 5))
 	    {
 	     /*
 	      * Send CGI output...
 	      */
 
-              if (strncmp(con->uri, "/admin", 6) == 0)
+              if (!strncmp(con->uri, "/admin", 6))
 	      {
 		SetStringf(&con->command, "%s/cgi-bin/admin.cgi", ServerBin);
 
@@ -1319,12 +1320,12 @@ ReadClient(client_t *con)		/* I - Client to read from */
 		else
 		  SetString(&con->options, "admin");
 	      }
-              else if (strncmp(con->uri, "/printers", 9) == 0)
+              else if (!strncmp(con->uri, "/printers", 9))
 	      {
 		SetStringf(&con->command, "%s/cgi-bin/printers.cgi", ServerBin);
 		SetString(&con->options, con->uri + 9);
 	      }
-	      else if (strncmp(con->uri, "/classes", 8) == 0)
+	      else if (!strncmp(con->uri, "/classes", 8))
 	      {
 		SetStringf(&con->command, "%s/cgi-bin/classes.cgi", ServerBin);
 		SetString(&con->options, con->uri + 8);
@@ -1349,9 +1350,12 @@ ReadClient(client_t *con)		/* I - Client to read from */
 	      if (con->http.version <= HTTP_1_0)
 		con->http.keep_alive = HTTP_KEEPALIVE_OFF;
 	    }
-            else if (strncmp(con->uri, "/admin/conf/", 12) == 0 &&
-	             (strchr(con->uri + 12, '/') != NULL ||
-		      strlen(con->uri) == 12))
+            else if ((!strncmp(con->uri, "/admin/conf/", 12) &&
+	              (strchr(con->uri + 12, '/') ||
+		       strlen(con->uri) == 12)) ||
+		     (!strncmp(con->uri, "/admin/log/", 11) &&
+	              (strchr(con->uri + 11, '/') ||
+		       strlen(con->uri) == 11)))
 	    {
 	     /*
 	      * GET can only be done to configuration files under
@@ -2006,20 +2010,10 @@ SendCommand(client_t      *con,
   FD_SET(con->file, InputSet);
   FD_SET(con->http.fd, OutputSet);
 
-  if (!SendHeader(con, HTTP_OK, NULL))
-    return (0);
-
-  if (con->http.version == HTTP_1_1)
-  {
-    con->http.data_encoding = HTTP_ENCODE_CHUNKED;
-
-    if (httpPrintf(HTTP(con), "Transfer-Encoding: chunked\r\n") < 0)
-      return (0);
-  }
-
-  con->file_ready = 0;
-  con->got_fields = 0;
-  con->field_col  = 0;
+  con->sent_header = 0;
+  con->file_ready  = 0;
+  con->got_fields  = 0;
+  con->field_col   = 0;
 
   return (1);
 }
@@ -2090,7 +2084,7 @@ SendError(client_t      *con,	/* I - Connection */
 	     con->language ? con->language->messages[code] :
 	 	            httpStatus(code));
 
-    if (httpPrintf(HTTP(con), "Content-Type: text/html\r\n") < 0)
+    if (httpPrintf(HTTP(con), "Content-Type: text/html; charset=utf-8\r\n") < 0)
       return (0);
     if (httpPrintf(HTTP(con), "Content-Length: %d\r\n",
                    (int)strlen(message)) < 0)
@@ -2201,20 +2195,24 @@ SendHeader(client_t    *con,	/* I - Client to send to */
 	return (0);
     }
   }
+
   if (con->language != NULL)
   {
     if (httpPrintf(HTTP(con), "Content-Language: %s\r\n",
                    con->language->language) < 0)
       return (0);
-
-    if (type != NULL)
-      if (httpPrintf(HTTP(con), "Content-Type: %s; charset=%s\r\n", type,
-                     cupsLangEncoding(con->language)) < 0)
-        return (0);
   }
-  else if (type != NULL)
-    if (httpPrintf(HTTP(con), "Content-Type: %s\r\n", type) < 0)
+
+  if (type != NULL)
+  {
+    if (!strcmp(type, "text/html"))
+    {
+      if (httpPrintf(HTTP(con), "Content-Type: text/html; charset=utf-8\r\n") < 0)
+        return (0);
+    }
+    else if (httpPrintf(HTTP(con), "Content-Type: %s\r\n", type) < 0)
       return (0);
+  }
 
   return (1);
 }
@@ -2302,7 +2300,33 @@ WriteClient(client_t *con)		/* I - Client connection */
 	    bufptr[-1] = '\0';
 	  *bufptr++ = '\0';
 
-	  httpPrintf(HTTP(con), "%s\r\n", buf);
+          if (!con->sent_header)
+	  {
+	   /*
+	    * Handle redirection and CGI status codes...
+	    */
+
+            if (!strncasecmp(buf, "Location:", 9))
+  	      SendHeader(con, HTTP_SEE_OTHER, NULL);
+	    else if (!strncasecmp(buf, "Status:", 7))
+  	      SendHeader(con, atoi(buf + 7), NULL);
+	    else
+  	      SendHeader(con, HTTP_OK, NULL);
+
+	    if (con->http.version == HTTP_1_1)
+	    {
+	      con->http.data_encoding = HTTP_ENCODE_CHUNKED;
+
+	      if (httpPrintf(HTTP(con), "Transfer-Encoding: chunked\r\n") < 0)
+		return (0);
+	    }
+
+	    con->sent_header = 1;
+	  }
+
+	  if (strncasecmp(buf, "Status:", 7))
+	    httpPrintf(HTTP(con), "%s\r\n", buf);
+
 	  LogMessage(L_DEBUG2, "WriteClient: %d %s", con->http.fd, buf);
 
          /*
@@ -2588,10 +2612,21 @@ get_file(client_t    *con,		/* I  - Client connection */
   * Need to add DocumentRoot global...
   */
 
-  if (strncmp(con->uri, "/ppd/", 5) == 0)
+  if (!strncmp(con->uri, "/ppd/", 5))
     snprintf(filename, len, "%s%s", ServerRoot, con->uri);
-  else if (strncmp(con->uri, "/admin/conf/", 12) == 0)
+  else if (!strncmp(con->uri, "/admin/conf/", 12))
     snprintf(filename, len, "%s%s", ServerRoot, con->uri + 11);
+  else if (!strncmp(con->uri, "/admin/log/", 11))
+  {
+    if (!strcmp(con->uri + 11, "access_log") && AccessLog[0] == '/')
+      strlcpy(filename, AccessLog, len);
+    else if (!strcmp(con->uri + 11, "error_log") && ErrorLog[0] == '/')
+      strlcpy(filename, ErrorLog, len);
+    else if (!strcmp(con->uri + 11, "page_log") && PageLog[0] == '/')
+      strlcpy(filename, PageLog, len);
+    else
+      return (NULL);
+  }
   else if (con->language != NULL)
     snprintf(filename, len, "%s/%s%s", DocumentRoot, con->language->language,
             con->uri);

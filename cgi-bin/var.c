@@ -22,6 +22,7 @@
  * Contents:
  *
  *   cgiInitialize()         - Initialize the CGI variable "database"...
+ *   cgiIsPOST()             - Determine whether this page was POSTed.
  *   cgiCheckVariables()     - Check for the presence of "required" variables.
  *   cgiGetArray()           - Get an element from a form array...
  *   cgiGetSize()            - Get the size of a form array value.
@@ -155,6 +156,23 @@ cgiCheckVariables(const char *names)	/* I - Variables to look for */
   }
 
   return (1);
+}
+
+
+/*
+ * 'cgiIsPOST()' - Determine whether this page was POSTed.
+ */
+
+int					/* O - 1 if POST, 0 if GET */
+cgiIsPOST(void)
+{
+  const char	*method;		/* REQUEST_METHOD environment variable */
+
+
+  if ((method = getenv("REQUEST_METHOD")) == NULL)
+    return (0);
+  else
+    return (!strcmp(method, "POST"));
 }
 
 

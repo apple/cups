@@ -43,7 +43,8 @@ typedef struct
   int		file;			/* Input/output file */
   int		file_ready;		/* Input ready on file/pipe? */
   int		pipe_pid;		/* Pipe process ID (or 0 if not a pipe) */
-  int		got_fields,		/* Non-zero if all fields seen */
+  int		sent_header,		/* Non-zero if sent HTTP header */
+		got_fields,		/* Non-zero if all fields seen */
 		field_col;		/* Column within line */
   cups_lang_t	*language;		/* Language to use */
 #ifdef HAVE_SSL
