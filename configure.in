@@ -44,7 +44,7 @@ AC_SUBST(MAKEDEFS)
 
 sinclude(config-scripts/cups-scripting.m4)
 
-AC_OUTPUT(Makedefs cups.list cups.sh cups-config conf/cupsd.conf conf/pam.std)
+AC_OUTPUT(Makedefs cups.list cups.sh cups-config conf/cupsd.conf conf/pam.std doc/index.html doc/documentation.html)
 
 chmod +x cups-config
 
