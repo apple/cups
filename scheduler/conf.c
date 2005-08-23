@@ -786,12 +786,6 @@ ReadConfiguration(void)
 
     DefaultPrinter = NULL;
 
-    if (Devices)
-    {
-      ippDelete(Devices);
-      Devices = NULL;
-    }
-
     if (PPDs)
     {
       ippDelete(PPDs);
@@ -861,9 +855,6 @@ ReadConfiguration(void)
    /*
     * Load devices and PPDs...
     */
-
-    snprintf(temp, sizeof(temp), "%s/backend", ServerBin);
-    LoadDevices(temp);
 
     snprintf(temp, sizeof(temp), "%s/model", DataDir);
     LoadPPDs(temp);

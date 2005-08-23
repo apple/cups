@@ -554,45 +554,61 @@ ProcessIPPRequest(client_t *con)	/* I - Client connection */
     }
   }
 
-  LogMessage(L_DEBUG, "ProcessIPPRequest: %d status_code=%x (%s)",
-             con->http.fd, con->response->request.status.status_code,
-	     ippErrorString(con->response->request.status.status_code));
-
-  if (SendHeader(con, HTTP_OK, "application/ipp"))
+  if (con->response)
   {
-    if (con->http.version == HTTP_1_1)
-    {
-      con->http.data_encoding = HTTP_ENCODE_CHUNKED;
+   /*
+    * Sending data from the scheduler...
+    */
 
-      httpPrintf(HTTP(con), "Transfer-Encoding: chunked\r\n\r\n");
+    LogMessage(L_DEBUG, "ProcessIPPRequest: %d status_code=%x (%s)",
+               con->http.fd, con->response->request.status.status_code,
+	       ippErrorString(con->response->request.status.status_code));
+
+    if (SendHeader(con, HTTP_OK, "application/ipp"))
+    {
+      if (con->http.version == HTTP_1_1)
+      {
+	con->http.data_encoding = HTTP_ENCODE_CHUNKED;
+
+	httpPrintf(HTTP(con), "Transfer-Encoding: chunked\r\n\r\n");
+      }
+      else
+      {
+	con->http.data_encoding  = HTTP_ENCODE_LENGTH;
+	con->http.data_remaining = ippLength(con->response);
+
+	httpPrintf(HTTP(con), "Content-Length: %d\r\n\r\n",
+        	   con->http.data_remaining);
+      }
+
+      LogMessage(L_DEBUG2, "ProcessIPPRequest: Adding fd %d to OutputSet...",
+        	 con->http.fd);
+
+      FD_SET(con->http.fd, OutputSet);
+
+     /*
+      * Tell the caller the response header was sent successfully...
+      */
+
+      return (1);
     }
     else
     {
-      con->http.data_encoding  = HTTP_ENCODE_LENGTH;
-      con->http.data_remaining = ippLength(con->response);
+     /*
+      * Tell the caller the response header could not be sent...
+      */
 
-      httpPrintf(HTTP(con), "Content-Length: %d\r\n\r\n",
-        	 con->http.data_remaining);
+      return (0);
     }
-
-    LogMessage(L_DEBUG2, "ProcessIPPRequest: Adding fd %d to OutputSet...",
-               con->http.fd);
-
-    FD_SET(con->http.fd, OutputSet);
-
-   /*
-    * Tell the caller the response header was sent successfully...
-    */
-
-    return (1);
   }
   else
   {
    /*
-    * Tell the caller the response header could not be sent...
+    * Sending data from a subprocess like cups-deviced; tell the caller
+    * everything is A-OK so far...
     */
 
-    return (0);
+    return (1);
   }
 }
 
@@ -1517,6 +1533,7 @@ add_printer(client_t        *con,	/* I - Client connection */
       * See if the backend is listed as a device...
       */
 
+#if 0 /* ADD THIS BACK IN SOMEHOW */
       for (device = ippFindAttribute(Devices, "device-uri", IPP_TAG_URI);
            device != NULL;
 	   device = ippFindNextAttribute(Devices, "device-uri", IPP_TAG_URI))
@@ -1536,6 +1553,7 @@ add_printer(client_t        *con,	/* I - Client connection */
 	send_ipp_error(con, IPP_NOT_POSSIBLE);
 	return;
       }
+#endif /* 0 */
     }
 
     LogMessage(L_INFO, "Setting %s device-uri to \"%s\" (was \"%s\".)",
@@ -3352,8 +3370,6 @@ create_job(client_t        *con,	/* I - Client connection */
       * Also, we can only have 1 value and it must be a name value.
       */
 
-      int i;	/* Looping var */
-
       switch (attr->value_tag)
       {
         case IPP_TAG_STRING :
@@ -3841,6 +3857,11 @@ get_default(client_t *con)		/* I - Client connection */
 static void
 get_devices(client_t *con)		/* I - Client connection */
 {
+  ipp_attribute_t	*limit;		/* Limit attribute */
+  char			command[1024],	/* cups-deviced command */
+			options[1024];	/* Options to pass to command */
+
+
   LogMessage(L_DEBUG2, "get_devices(%p[%d])\n", con, con->http.fd);
 
  /*
@@ -3855,15 +3876,34 @@ get_devices(client_t *con)		/* I - Client connection */
   }
 
  /*
-  * Copy the device attributes to the response using the requested-attributes
-  * attribute that may be provided by the client.
+  * Run cups-deviced command with the given options...
   */
 
-  copy_attrs(con->response, Devices,
-             ippFindAttribute(con->request, "requested-attributes",
-	                      IPP_TAG_KEYWORD), IPP_TAG_ZERO, IPP_TAG_COPY);
+  limit = ippFindAttribute(con->request, "limit", IPP_TAG_INTEGER);
 
-  con->response->request.status.status_code = IPP_OK;
+  snprintf(command, sizeof(command), "%s/daemon/cups-deviced", ServerBin);
+  snprintf(options, sizeof(options), "cups-deviced %d+%d",
+           con->request->request.op.request_id,
+           limit ? limit->values[0].integer : 0);
+
+  if (SendCommand(con, command, options))
+  {
+   /*
+    * Command started successfully, don't send an IPP response here...
+    */
+
+    ippDelete(con->response);
+    con->response = NULL;
+  }
+  else
+  {
+   /*
+    * Command failed, return "internal error" so the user knows something
+    * went wrong...
+    */
+
+    send_ipp_error(con, IPP_INTERNAL_ERROR);
+  }
 }
 
 
@@ -5368,8 +5408,6 @@ print_job(client_t        *con,		/* I - Client connection */
       * Can't override the value if we aren't connected via localhost.
       * Also, we can only have 1 value and it must be a name value.
       */
-
-      int i;	/* Looping var */
 
       switch (attr->value_tag)
       {

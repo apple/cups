@@ -2691,12 +2691,25 @@ do_menu(http_t      *http,		/* I - HTTP connection */
 	        *options_ptr++ = *ptr;
 	      else if (*ptr == ' ')
 	        *options_ptr++ = '_';
- 
+
+           /*
+	    * Then add the make and model in the printer info, so
+	    * that MacOS clients see something reasonable...
+	    */
+
+            strlcpy(options_ptr, "&PRINTER_LOCATION=&PRINTER_INFO=",
+	            sizeof(options) - (options_ptr - options));
+	    options_ptr += strlen(options_ptr);
+
+            form_encode(options_ptr, device_make_and_model,
+	                sizeof(options) - (options_ptr - options));
+	    options_ptr += strlen(options_ptr);
+
            /*
 	    * Then copy the device URI...
 	    */
 
-            strlcpy(options_ptr, "&PRINTER_LOCATION=&PRINTER_INFO=&DEVICE_URI=",
+	    strlcpy(options_ptr, "&DEVICE_URI=",
 	            sizeof(options) - (options_ptr - options));
 	    options_ptr += strlen(options_ptr);
 

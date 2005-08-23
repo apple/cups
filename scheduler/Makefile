@@ -24,14 +24,20 @@
 
 include ../Makedefs
 
-CUPSDOBJS =	auth.o banners.o cert.o classes.o client.o conf.o devices.o \
+CUPSDOBJS =	auth.o banners.o cert.o classes.o client.o conf.o \
 		dirsvc.o main.o ipp.o listen.o job.o log.o network.o \
 		policy.o ppds.o printers.o process.o quotas.o server.o \
 		statbuf.o subscriptions.o
 MIMEOBJS =	filter.o mime.o type.o
-OBJS	=	$(CUPSDOBJS) $(MIMEOBJS) cups-lpd.o cups-polld.o testmime.o \
+OBJS	=	$(CUPSDOBJS) $(MIMEOBJS) \
+		cups-deviced.o util.o \
+		cups-lpd.o \
+		cups-polld.o \
+		testmime.o \
 		testspeed.o
-TARGETS	=	cupsd cups-lpd cups-polld libmime.a testmime testspeed
+TARGETS	=	cupsd cups-deviced cups-lpd cups-polld libmime.a \
+		testmime testspeed
+
 
 #
 # Make everything...
@@ -65,6 +71,7 @@ install:	all
 	$(INSTALL_DIR) $(SBINDIR)
 	$(INSTALL_BIN) cupsd $(SBINDIR)
 	$(INSTALL_DIR) $(SERVERBIN)/daemon
+	$(INSTALL_BIN) cups-deviced $(SERVERBIN)/daemon
 	$(INSTALL_BIN) cups-lpd $(SERVERBIN)/daemon
 	$(INSTALL_BIN) cups-polld $(SERVERBIN)/daemon
 	$(INSTALL_DIR) -m 711 -o $(CUPS_USER) -g $(CUPS_GROUP) $(SERVERROOT)/certs
@@ -84,6 +91,15 @@ cupsd:	$(CUPSDOBJS) libmime.a ../cups/$(LIBCUPS)
 	$(CC) $(LDFLAGS) -o cupsd $(CUPSDOBJS) libmime.a \
 		$(LIBZ) $(SSLLIBS) $(LIBSLP) $(PAMLIBS) $(LIBS) \
 		$(LIBPAPER) $(LIBMALLOC)
+
+
+#
+# Make the device daemon, "cups-deviced".
+#
+
+cups-deviced:	cups-deviced.o util.o ../cups/$(LIBCUPS)
+	echo Linking $@...
+	$(CC) $(LDFLAGS) -o cups-deviced cups-deviced.o util.o $(LIBS)
 
 
 #

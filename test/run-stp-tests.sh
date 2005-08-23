@@ -200,6 +200,7 @@ ln -s $root/backend/serial /tmp/$user/bin/backend
 ln -s $root/backend/socket /tmp/$user/bin/backend
 ln -s $root/backend/usb /tmp/$user/bin/backend
 ln -s $root/cgi-bin /tmp/$user/bin
+ln -s $root/scheduler /tmp/$user/bin/daemon
 ln -s $root/filter/hpgltops /tmp/$user/bin/filter
 ln -s $root/filter/imagetops /tmp/$user/bin/filter
 ln -s $root/filter/imagetoraster /tmp/$user/bin/filter

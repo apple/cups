@@ -188,9 +188,7 @@ VAR int			NeedReload	VALUE(RELOAD_ALL),
 VAR char		*TZ		VALUE(NULL);
 					/* Timezone configuration */
 
-VAR ipp_t		*Devices	VALUE(NULL),
-					/* Available devices */
-			*PPDs		VALUE(NULL);
+VAR ipp_t		*PPDs		VALUE(NULL);
 					/* Available PPDs */
 
 
@@ -202,7 +200,6 @@ extern void	CatchChildSignals(void);
 extern void	ClearString(char **s);
 extern void	HoldSignals(void);
 extern void	IgnoreChildSignals(void);
-extern void	LoadDevices(const char *d);
 extern void	LoadPPDs(const char *d);
 extern void	ReleaseSignals(void);
 extern void	SetString(char **s, const char *v);
