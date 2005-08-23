@@ -1,8 +1,19 @@
-CHANGES.txt - 08/04/2005
+CHANGES.txt - 08/23/2005
 ------------------------
 
 CHANGES IN CUPS V1.2.0b1
 
+	- Devices are now tracked dynamically, with each query
+	  doing a new device scan.  This eliminates a previous
+	  startup delay caused by slow backends and allows new
+	  printers to be seen without restarting the server,
+	  however it limits the amount of device URI checking
+	  that can be done (basically now the scheduler only
+	  requires a URI with a method that is a listed backend)
+	- Added new printer auto-detection, server configuration,
+	  and log file viewing to the administration web page.
+	- Added new "set allowed users" web interface to set the
+	  list of allowed users for a printer or class.
 	- The scheduler, command-line, and web interfaces now
 	  limit the list of printers and classes to those
 	  accessible by a user.

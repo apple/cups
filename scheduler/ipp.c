@@ -1509,7 +1509,7 @@ add_printer(client_t        *con,	/* I - Client connection */
                  &port, resource);
     methodlen = strlen(method);
 
-    if (strcmp(method, "file") == 0)
+    if (!strcmp(method, "file"))
     {
      /*
       * See if the administrator has enabled file devices...
@@ -1530,19 +1530,11 @@ add_printer(client_t        *con,	/* I - Client connection */
     else
     {
      /*
-      * See if the backend is listed as a device...
+      * See if the backend exists and is executable...
       */
 
-#if 0 /* ADD THIS BACK IN SOMEHOW */
-      for (device = ippFindAttribute(Devices, "device-uri", IPP_TAG_URI);
-           device != NULL;
-	   device = ippFindNextAttribute(Devices, "device-uri", IPP_TAG_URI))
-        if (strncmp(method, device->values[0].string.text, methodlen) == 0 &&
-	    (device->values[0].string.text[methodlen] == ':' ||
-	     device->values[0].string.text[methodlen] == '\0'))
-	  break;
-
-      if (device == NULL)
+      snprintf(srcfile, sizeof(srcfile), "%s/backend/%s", ServerBin, method);
+      if (access(srcfile, X_OK))
       {
        /*
         * Could not find device in list!
@@ -1553,7 +1545,6 @@ add_printer(client_t        *con,	/* I - Client connection */
 	send_ipp_error(con, IPP_NOT_POSSIBLE);
 	return;
       }
-#endif /* 0 */
     }
 
     LogMessage(L_INFO, "Setting %s device-uri to \"%s\" (was \"%s\".)",
