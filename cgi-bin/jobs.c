@@ -64,6 +64,12 @@ main(int  argc,				/* I - Number of command-line arguments */
   cgiInitialize();
 
  /*
+  * Set the web interface section...
+  */
+
+  cgiSetVariable("SECTION", "jobs");
+
+ /*
   * Get the request language...
   */
 

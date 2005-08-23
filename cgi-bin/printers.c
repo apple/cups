@@ -72,6 +72,12 @@ main(int  argc,				/* I - Number of command-line arguments */
   language = cupsLangDefault();
 
  /*
+  * Set the web interface section...
+  */
+
+  cgiSetVariable("SECTION", "printers");
+
+ /*
   * Connect to the HTTP server...
   */
 

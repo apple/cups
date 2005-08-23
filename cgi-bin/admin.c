@@ -98,6 +98,12 @@ main(int  argc,				/* I - Number of command-line arguments */
   http = httpConnectEncrypt("localhost", ippPort(), cupsEncryption());
 
  /*
+  * Set the web interface section...
+  */
+
+  cgiSetVariable("SECTION", "admin");
+
+ /*
   * See if we have form data...
   */
 

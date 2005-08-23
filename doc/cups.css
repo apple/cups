@@ -40,6 +40,19 @@ A:link:hover, A:visited:hover, A:active {
   color: #bb5500;
 }
 
+A.sel, TR.sel {
+  background-color: #e8e8b8;
+}
+
+TR.sel TD {
+  padding: 4;
+}
+
+A.unsel {
+  background-color: #999966;
+  color: #e8e8b8;
+}
+
 INPUT[TYPE="TEXT"], TEXTAREA {
   font-family: monospace;
 }
@@ -50,4 +63,12 @@ LI {
 
 SUB, SUP {
   font-size: 50%;
+}
+
+TR.header, TR.header TH, TH.header {
+  background-color: #bbbb88;
+}
+
+TR.page, TD.page {
+  background-color: #d4d4a4;
 }

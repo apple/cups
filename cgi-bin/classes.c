@@ -66,6 +66,12 @@ main(int  argc,				/* I - Number of command-line arguments */
   op = cgiGetVariable("OP");
 
  /*
+  * Set the web interface section...
+  */
+
+  cgiSetVariable("SECTION", "classes");
+
+ /*
   * Get the request language...
   */
 
