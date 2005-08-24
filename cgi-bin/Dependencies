@@ -1,5 +1,8 @@
 # DO NOT DELETE
 
+html.o: ipp-var.h ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
+html.o: ../cups/ppd.h ../cups/file.h ../cups/debug.h ../cups/language.h
+html.o: ../cups/string.h ../config.h cgi.h
 ipp-var.o: ipp-var.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
 ipp-var.o: ../cups/md5.h ../cups/ppd.h ../cups/file.h ../cups/debug.h
 ipp-var.o: ../cups/language.h ../cups/string.h ../config.h cgi.h

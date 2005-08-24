@@ -70,39 +70,58 @@ static var_t	*form_vars = NULL;	/* Form variables */
  * Local functions...
  */
 
-static void	cgi_add_variable(const char *name, int element,
-		                 const char *value);
-static int	cgi_compare_variables(const var_t *v1, const var_t *v2);
-static var_t	*cgi_find_variable(const char *name);
-static int	cgi_initialize_get(void);
-static int	cgi_initialize_post(void);
-static int	cgi_initialize_string(const char *data);
-static void	cgi_sort_variables(void);
+static void		cgi_add_variable(const char *name, int element,
+			                 const char *value);
+static int		cgi_compare_variables(const var_t *v1, const var_t *v2);
+static var_t		*cgi_find_variable(const char *name);
+static int		cgi_initialize_get(void);
+static int		cgi_initialize_post(void);
+static int		cgi_initialize_string(const char *data);
+static const char	*cgi_passwd(const char *prompt);
+static void		cgi_sort_variables(void);
 
 
 /*
  * 'cgiInitialize()' - Initialize the CGI variable "database"...
  */
 
-int			/* O - Non-zero if there was form data */
+int					/* O - Non-zero if there was form data */
 cgiInitialize(void)
 {
-  char	*method;	/* Form posting method */
+  const char	*method;		/* Form posting method */
  
 
+ /*
+  * Setup a password callback for authentication...
+  */
+
+  cupsSetPasswordCB(cgi_passwd);
+
 #ifdef DEBUG
+ /*
+  * Disable output buffering to find bugs...
+  */
+
   setbuf(stdout, NULL);
   puts("Content-type: text/plain\n");
 #endif /* DEBUG */
 
+ /*
+  * Get the request method (GET or POST)...
+  */
+
   method = getenv("REQUEST_METHOD");
 
-  if (method == NULL)
+  if (!method)
     return (0);
 
-  if (strcasecmp(method, "GET") == 0)
+ /*
+  * Grab form data from the corresponding location...
+  */
+
+  if (!strcasecmp(method, "GET"))
     return (cgi_initialize_get());
-  else if (strcasecmp(method, "POST") == 0)
+  else if (!strcasecmp(method, "POST"))
     return (cgi_initialize_post());
   else
     return (0);
@@ -653,6 +672,34 @@ cgi_initialize_string(const char *data)	/* I - Form data string */
   }
 
   return (1);
+}
+
+
+/*
+ * 'cgi_passwd()' - Catch authentication requests and notify the server.
+ *
+ * This function sends a Status header and exits, forcing authentication
+ * for this request.
+ */
+
+static const char *			/* O - NULL (no return) */
+cgi_passwd(const char *prompt)		/* I - Prompt (not used) */
+{
+  (void)prompt;
+
+ /*
+  * Send a 401 (unauthorized) status to the server, so it can notify
+  * the client that authentication is required.
+  */
+
+  puts("Status: 401\n");
+  exit(0);
+
+ /*
+  * This code is never executed, but is present to satisfy the compiler.
+  */
+
+  return (NULL);
 }
 
 

@@ -63,6 +63,10 @@ extern void		cgiSetCookie(const char *name, const char *value,
 			             const char *path, const char *domain,
 				     time_t expires, int secure);
 
+extern void		cgiEndHTML(void);
+extern char		*cgiFormEncode(char *dst, const char *src, size_t dstsize);
+extern void		cgiStartHTML(const char *title);
+
 #  define cgiGetUser()	getenv("REMOTE_USER")
 #  define cgiGetHost()	(getenv("REMOTE_HOST") == NULL ? getenv("REMOTE_ADDR") : getenv("REMOTE_HOST"))
 
