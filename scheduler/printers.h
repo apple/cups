@@ -51,6 +51,7 @@ typedef struct printer_str
 		*op_policy,		/* Operation policy name */
 		*error_policy;		/* Error policy */
   policy_t	*op_policy_ptr;		/* Pointer to operation policy */
+  int		shared;			/* Shared? */
   int		accepting;		/* Accepting jobs? */
   ipp_pstate_t	state;			/* Printer state */
   char		state_message[1024];	/* Printer state message */

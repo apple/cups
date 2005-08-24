@@ -584,7 +584,7 @@ SendBrowseDelete(printer_t *p)		/* I - Printer to delete */
   * Only announce if browsing is enabled...
   */
 
-  if (!Browsing)
+  if (!Browsing || !p->shared)
     return;
 
  /*
@@ -649,7 +649,7 @@ SendBrowseList(void)
 
     for (count = 0, p = Printers; count < max_count && p != NULL; p = p->next)
       if (!(p->type & (CUPS_PRINTER_REMOTE | CUPS_PRINTER_IMPLICIT)) &&
-          p->browse_time < ut)
+          p->shared && p->browse_time < ut)
         count ++;
 
    /*
@@ -667,7 +667,8 @@ SendBrowseList(void)
 
       if (!p)
         break;
-      else if (p->type & (CUPS_PRINTER_REMOTE | CUPS_PRINTER_IMPLICIT))
+      else if ((p->type & (CUPS_PRINTER_REMOTE | CUPS_PRINTER_IMPLICIT)) ||
+               !p->shared)
         continue;
       else if (p->browse_time < ut)
       {

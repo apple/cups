@@ -145,11 +145,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     remain = interval;
 
     if ((seconds = poll_server(http, language, CUPS_GET_PRINTERS, sock, port,
-                               interval / 2, prefix)) > 0)
-      remain -= seconds;
-
-    if ((seconds = poll_server(http, language, CUPS_GET_CLASSES, sock, port,
-                               interval / 2, prefix)) > 0)
+                               interval, prefix)) > 0)
       remain -= seconds;
 
    /*
@@ -231,6 +227,13 @@ poll_server(http_t      *http,		/* I - HTTP connection */
   ippAddStrings(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
                "requested-attributes", sizeof(attrs) / sizeof(attrs[0]),
 	       NULL, attrs);
+
+  ippAddInteger(request, IPP_TAG_OPERATION, IPP_TAG_ENUM,
+                "printer-type", CUPS_PRINTER_SHARED);
+  ippAddInteger(request, IPP_TAG_OPERATION, IPP_TAG_ENUM,
+                "printer-type-mask",
+		CUPS_PRINTER_REMOTE | CUPS_PRINTER_IMPLICIT |
+		CUPS_PRINTER_SHARED);
 
  /*
   * Do the request and get back a response...
@@ -338,48 +341,41 @@ poll_server(http_t      *http,		/* I - HTTP connection */
       }
 
      /*
-      * See if this is a local printer or class...
+      * Send the printer information...
       */
 
-      if (!(type & (CUPS_PRINTER_REMOTE | CUPS_PRINTER_IMPLICIT)))
+      type |= CUPS_PRINTER_REMOTE;
+
+      if (!accepting)
+	type |= CUPS_PRINTER_REJECTING;
+
+      snprintf(packet, sizeof(packet), "%x %x %s \"%s\" \"%s\" \"%s\"\n",
+               type, state, uri, location, info, make_model);
+
+      fprintf(stderr, "DEBUG2: %s Sending %s", prefix, packet);
+
+      if (sendto(sock, packet, strlen(packet), 0,
+	         (struct sockaddr *)&addr, sizeof(addr)) <= 0)
+      {
+	ippDelete(response);
+	perror("cups-polld");
+	return (-1);
+      }
+
+     /*
+      * Throttle the local broadcasts as needed so that we don't
+      * overwhelm the local server...
+      */
+
+      count ++;
+      if (count >= max_count)
       {
        /*
-	* Send the printer information...
+	* Sleep for a second...
 	*/
 
-        type |= CUPS_PRINTER_REMOTE;
-
-	if (!accepting)
-	  type |= CUPS_PRINTER_REJECTING;
-
-	snprintf(packet, sizeof(packet), "%x %x %s \"%s\" \"%s\" \"%s\"\n",
-        	 type, state, uri, location, info, make_model);
-
-        fprintf(stderr, "DEBUG2: %s Sending %s", prefix, packet);
-
-	if (sendto(sock, packet, strlen(packet), 0,
-	           (struct sockaddr *)&addr, sizeof(addr)) <= 0)
-	{
-	  ippDelete(response);
-	  perror("cups-polld");
-	  return (-1);
-	}
-
-       /*
-        * Throttle the local broadcasts as needed so that we don't
-	* overwhelm the local server...
-	*/
-
-        count ++;
-	if (count >= max_count)
-	{
-	 /*
-	  * Sleep for a second...
-	  */
-
-	  count = 0;
-	  sleep(1);
-	}
+	count = 0;
+	sleep(1);
       }
 
       if (attr == NULL)

@@ -108,6 +108,7 @@ AddPrinter(const char *name)	/* I - Name of printer */
 
   p->state     = IPP_PRINTER_STOPPED;
   p->accepting = 0;
+  p->shared    = 1;
   p->filetype  = mimeAddType(MimeDatabase, "printer", name);
 
   SetString(&p->job_sheets[0], "none");
@@ -959,6 +960,29 @@ LoadAllPrinters(void)
 	return;
       }
     }
+    else if (!strcasecmp(line, "Shared"))
+    {
+     /*
+      * Set the initial shared state...
+      */
+
+      if (value &&
+          (!strcasecmp(value, "yes") ||
+           !strcasecmp(value, "on") ||
+           !strcasecmp(value, "true")))
+        p->shared = 1;
+      else if (value &&
+               (!strcasecmp(value, "no") ||
+        	!strcasecmp(value, "off") ||
+        	!strcasecmp(value, "false")))
+        p->shared = 0;
+      else
+      {
+	LogMessage(L_ERROR, "Syntax error on line %d of printers.conf.",
+	           linenum);
+	return;
+      }
+    }
     else if (!strcasecmp(line, "JobSheets"))
     {
      /*
@@ -1193,6 +1217,11 @@ SaveAllPrinters(void)
       cupsFilePuts(fp, "Accepting Yes\n");
     else
       cupsFilePuts(fp, "Accepting No\n");
+
+    if (printer->shared)
+      cupsFilePuts(fp, "Shared Yes\n");
+    else
+      cupsFilePuts(fp, "Shared No\n");
 
     cupsFilePrintf(fp, "JobSheets %s %s\n", printer->job_sheets[0],
             printer->job_sheets[1]);
@@ -1736,6 +1765,11 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
  /*
   * Add the CUPS-specific printer-type attribute...
   */
+
+  if (p->shared)
+    p->type |= CUPS_PRINTER_SHARED;
+  else
+    p->type &= ~CUPS_PRINTER_SHARED;
 
   ippAddInteger(p->attrs, IPP_TAG_PRINTER, IPP_TAG_ENUM, "printer-type",
                 printer_type);

@@ -399,7 +399,7 @@ void
 FinishJob(job_t *job)			/* I - Job */
 {
   int		job_history;		/* Did CancelJob() keep the job? */
-  cups_ptype_t	ptype;			/* Printer type (color, small, etc.) */
+  printer_t	*printer;		/* Current printer */
 
 
   LogMessage(L_DEBUG, "FinishJob: job %d, file %d is complete.",
@@ -432,7 +432,7 @@ FinishJob(job_t *job)			/* I - Job */
     * Backend had errors; stop it...
     */
 
-    ptype = job->printer->type;
+    printer = job->printer;
 
     StopJob(job->id, 0);
     job->state->values[0].integer = IPP_JOB_PENDING;
@@ -440,12 +440,13 @@ FinishJob(job_t *job)			/* I - Job */
 
    /*
     * If the job was queued to a class, try requeuing it...  For
-    * faxes, hold the current job for 5 minutes.
+    * faxes and retry-job queues, hold the current job for 5 minutes.
     */
 
     if (job->dtype & (CUPS_PRINTER_CLASS | CUPS_PRINTER_IMPLICIT))
       CheckJobs();
-    else if (ptype & CUPS_PRINTER_FAX)
+    else if ((printer->type & CUPS_PRINTER_FAX) ||
+             !strcmp(printer->error_policy, "retry-job"))
     {
      /*
       * See how many times we've tried to send the job; if more than
@@ -460,7 +461,7 @@ FinishJob(job_t *job)			/* I - Job */
 	* Too many tries...
 	*/
 
-	LogMessage(L_ERROR, "Canceling fax job %d since it could not be sent after %d tries.",
+	LogMessage(L_ERROR, "Canceling job %d since it could not be sent after %d tries.",
 	           job->id, FaxRetryLimit);
 
 	cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, job->printer, job,
@@ -480,6 +481,8 @@ FinishJob(job_t *job)			/* I - Job */
 
       CheckJobs();
     }
+    else if (!strcmp(printer->error_policy, "abort-job"))
+      CheckJobs();
   }
   else if (job->status > 0)
   {
@@ -2398,7 +2401,8 @@ StopJob(int id,				/* I - Job ID */
 
         if (current->status < 0 &&
 	    !(current->dtype & (CUPS_PRINTER_CLASS | CUPS_PRINTER_IMPLICIT)) &&
-	    !(current->printer->type & CUPS_PRINTER_FAX))
+	    !(current->printer->type & CUPS_PRINTER_FAX) &&
+	    !strcmp(current->printer->error_policy, "stop-printer"))
 	  SetPrinterState(current->printer, IPP_PRINTER_STOPPED, 1);
 	else if (current->printer->state != IPP_PRINTER_STOPPED)
 	  SetPrinterState(current->printer, IPP_PRINTER_IDLE, 0);

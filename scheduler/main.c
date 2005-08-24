@@ -424,6 +424,12 @@ main(int  argc,				/* I - Number of command-line arguments */
   }
 
  /*
+  * Catch signals...
+  */
+
+  CatchChildSignals();
+
+ /*
   * Start any pending print jobs...
   */
 
@@ -460,9 +466,6 @@ main(int  argc,				/* I - Number of command-line arguments */
 
     if (NeedReload)
     {
-      job_t	*job;			/* Current job */
-
-
      /*
       * Close any idle clients...
       */
@@ -1086,6 +1089,8 @@ process_children(void)
   int		i;		/* Looping var */
 
 
+  LogMessage(L_DEBUG2, "process_children()");
+
  /*
   * Reset the dead_children flag...
   */
@@ -1104,7 +1109,7 @@ process_children(void)
   if ((pid = wait(&status)) > 0)
 #endif /* HAVE_WAITPID */
   {
-    DEBUG_printf(("process_children: pid = %d, status = %d\n", pid, status));
+    LogMessage(L_DEBUG2, "process_children: pid = %d, status = %d\n", pid, status);
 
    /*
     * Ignore SIGTERM errors - that comes when a job is cancelled...

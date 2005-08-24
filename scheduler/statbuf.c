@@ -215,57 +215,57 @@ cupsdStatBufUpdate(cupsd_statbuf_t *sb,	/* I - Status buffer */
   * Figure out the logging level...
   */
 
-  if (strncmp(sb->buffer, "EMERG:", 6) == 0)
+  if (!strncmp(sb->buffer, "EMERG:", 6))
   {
     *loglevel = L_EMERG;
     message   = sb->buffer + 6;
   }
-  else if (strncmp(sb->buffer, "ALERT:", 6) == 0)
+  else if (!strncmp(sb->buffer, "ALERT:", 6))
   {
     *loglevel = L_ALERT;
     message   = sb->buffer + 6;
   }
-  else if (strncmp(sb->buffer, "CRIT:", 5) == 0)
+  else if (!strncmp(sb->buffer, "CRIT:", 5))
   {
     *loglevel = L_CRIT;
     message   = sb->buffer + 5;
   }
-  else if (strncmp(sb->buffer, "ERROR:", 6) == 0)
+  else if (!strncmp(sb->buffer, "ERROR:", 6))
   {
     *loglevel = L_ERROR;
     message   = sb->buffer + 6;
   }
-  else if (strncmp(sb->buffer, "WARNING:", 8) == 0)
+  else if (!strncmp(sb->buffer, "WARNING:", 8))
   {
     *loglevel = L_WARN;
     message   = sb->buffer + 8;
   }
-  else if (strncmp(sb->buffer, "NOTICE:", 6) == 0)
+  else if (!strncmp(sb->buffer, "NOTICE:", 7))
   {
     *loglevel = L_NOTICE;
-    message   = sb->buffer + 6;
+    message   = sb->buffer + 7;
   }
-  else if (strncmp(sb->buffer, "INFO:", 5) == 0)
+  else if (!strncmp(sb->buffer, "INFO:", 5))
   {
     *loglevel = L_INFO;
     message   = sb->buffer + 5;
   }
-  else if (strncmp(sb->buffer, "DEBUG:", 6) == 0)
+  else if (!strncmp(sb->buffer, "DEBUG:", 6))
   {
     *loglevel = L_DEBUG;
     message   = sb->buffer + 6;
   }
-  else if (strncmp(sb->buffer, "DEBUG2:", 7) == 0)
+  else if (!strncmp(sb->buffer, "DEBUG2:", 7))
   {
     *loglevel = L_DEBUG2;
     message   = sb->buffer + 7;
   }
-  else if (strncmp(sb->buffer, "PAGE:", 5) == 0)
+  else if (!strncmp(sb->buffer, "PAGE:", 5))
   {
     *loglevel = L_PAGE;
     message   = sb->buffer + 5;
   }
-  else if (strncmp(sb->buffer, "STATE:", 6) == 0)
+  else if (!strncmp(sb->buffer, "STATE:", 6))
   {
     *loglevel = L_STATE;
     message   = sb->buffer + 6;

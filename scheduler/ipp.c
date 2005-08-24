@@ -865,6 +865,15 @@ add_class(client_t        *con,		/* I - Client connection */
     pclass->accepting = attr->values[0].boolean;
     AddPrinterHistory(pclass);
   }
+
+  if ((attr = ippFindAttribute(con->request, "printer-is-shared", IPP_TAG_BOOLEAN)) != NULL)
+  {
+    LogMessage(L_INFO, "Setting %s printer-is-shared to %d (was %d.)",
+               pclass->name, attr->values[0].boolean, pclass->shared);
+
+    pclass->shared = attr->values[0].boolean;
+  }
+
   if ((attr = ippFindAttribute(con->request, "printer-state", IPP_TAG_ENUM)) != NULL)
   {
     if (attr->values[0].integer != IPP_PRINTER_IDLE &&
@@ -1563,6 +1572,15 @@ add_printer(client_t        *con,	/* I - Client connection */
     printer->accepting = attr->values[0].boolean;
     AddPrinterHistory(printer);
   }
+
+  if ((attr = ippFindAttribute(con->request, "printer-is-shared", IPP_TAG_BOOLEAN)) != NULL)
+  {
+    LogMessage(L_INFO, "Setting %s printer-is-shared to %d (was %d.)",
+               printer->name, attr->values[0].boolean, printer->shared);
+
+    printer->shared = attr->values[0].boolean;
+  }
+
   if ((attr = ippFindAttribute(con->request, "printer-state", IPP_TAG_ENUM)) != NULL)
   {
     if (attr->values[0].integer != IPP_PRINTER_IDLE &&
@@ -3220,6 +3238,19 @@ create_job(client_t        *con,	/* I - Client connection */
   }
 
  /*
+  * Check remote printing to non-shared printer...
+  */
+
+  if (!printer->shared &&
+      strcasecmp(con->http.hostname, "localhost") &&
+      strcasecmp(con->http.hostname, ServerName))
+  {
+    LogMessage(L_ERROR, "print_job: printer not shared!");
+    send_ipp_error(con, IPP_NOT_AUTHORIZED);
+    return;
+  }
+
+ /*
   * Check policy...
   */
 
@@ -4340,6 +4371,8 @@ get_printer_attrs(client_t        *con,	/* I - Client connection */
 
   ippAddBoolean(con->response, IPP_TAG_PRINTER, "printer-is-accepting-jobs",
                 printer->accepting);
+  ippAddBoolean(con->response, IPP_TAG_PRINTER, "printer-is-shared",
+                printer->shared);
 
   ippAddInteger(con->response, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
                 "printer-up-time", curtime);
@@ -4488,10 +4521,10 @@ get_printers(client_t *con,		/* I - Client connection */
   for (count = 0, printer = Printers;
        count < limit && printer != NULL;
        printer = printer->next)
-    if ((printer->type & CUPS_PRINTER_CLASS) == type &&
+    if ((!type || (printer->type & CUPS_PRINTER_CLASS) == type) &&
         (printer->type & printer_mask) == printer_type &&
 	(location == NULL || printer->location == NULL ||
-	 strcasecmp(printer->location, location) == 0))
+	 !strcasecmp(printer->location, location)))
     {
      /*
       * If HideImplicitMembers is enabled, see if this printer or class
@@ -4548,6 +4581,9 @@ get_printers(client_t *con,		/* I - Client connection */
       *    printer-state
       *    printer-state-message
       *    printer-is-accepting-jobs
+      *    printer-is-shared
+      *    printer-up-time
+      *    printer-state-time
       *    + all printer attributes
       */
 
@@ -4561,6 +4597,8 @@ get_printers(client_t *con,		/* I - Client connection */
 
       ippAddBoolean(con->response, IPP_TAG_PRINTER, "printer-is-accepting-jobs",
                     printer->accepting);
+      ippAddBoolean(con->response, IPP_TAG_PRINTER, "printer-is-shared",
+                    printer->shared);
 
       ippAddInteger(con->response, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
                     "printer-up-time", curtime);
@@ -5278,6 +5316,19 @@ print_job(client_t        *con,		/* I - Client connection */
 
     LogMessage(L_ERROR, "print_job: resource name \'%s\' no good!", resource);
     send_ipp_error(con, IPP_NOT_FOUND);
+    return;
+  }
+
+ /*
+  * Check remote printing to non-shared printer...
+  */
+
+  if (!printer->shared &&
+      strcasecmp(con->http.hostname, "localhost") &&
+      strcasecmp(con->http.hostname, ServerName))
+  {
+    LogMessage(L_ERROR, "print_job: printer not shared!");
+    send_ipp_error(con, IPP_NOT_AUTHORIZED);
     return;
   }
 
