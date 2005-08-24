@@ -2,7 +2,7 @@
 <HTML>
 <HEAD>
 	<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=utf-8">
-	<TITLE>Documentation - Common UNIX Printing System @CUPS_VERSION@</TITLE>
+	<TITLE>Documentation - CUPS v@CUPS_VERSION@</TITLE>
 	<LINK REL=STYLESHEET TYPE="text/css" HREF="/cups.css">
 </HEAD>
 <BODY>
@@ -22,36 +22,31 @@ ALT="">&nbsp;&nbsp;Home&nbsp;&nbsp;<IMG
 SRC="/images/tab-right.gif" WIDTH="4" HEIGHT="4" ALIGN="TOP"
 BORDER="0" ALT=""></A>
 
-&nbsp;
-<A CLASS="unsel" HREF="/admin/"><IMG SRC="/images/tab-left.gif" WIDTH="4"
+&nbsp;<A CLASS="unsel" HREF="/admin/"><IMG SRC="/images/tab-left.gif" WIDTH="4"
 HEIGHT="4" ALIGN="TOP" BORDER="0"
 ALT="">&nbsp;&nbsp;Administation&nbsp;&nbsp;<IMG
 SRC="/images/tab-right.gif" WIDTH="4" HEIGHT="4" ALIGN="TOP"
 BORDER="0" ALT=""></A>
 
-&nbsp;
-<A CLASS="unsel" HREF="/classes/"><IMG SRC="/images/tab-left.gif" WIDTH="4"
+&nbsp;<A CLASS="unsel" HREF="/classes/"><IMG SRC="/images/tab-left.gif" WIDTH="4"
 HEIGHT="4" ALIGN="TOP" BORDER="0"
 ALT="">&nbsp;&nbsp;Classes&nbsp;&nbsp;<IMG
 SRC="/images/tab-right.gif" WIDTH="4" HEIGHT="4" ALIGN="TOP"
 BORDER="0" ALT=""></A>
 
-&nbsp;
-<A CLASS="sel" HREF="/documentation.html"><IMG SRC="/images/tab-left.gif" WIDTH="4"
+&nbsp;<A CLASS="sel" HREF="/documentation.html"><IMG SRC="/images/tab-left.gif" WIDTH="4"
 HEIGHT="4" ALIGN="TOP" BORDER="0"
 ALT="">&nbsp;&nbsp;Documentation/Help&nbsp;&nbsp;<IMG
 SRC="/images/tab-right.gif" WIDTH="4" HEIGHT="4" ALIGN="TOP"
 BORDER="0" ALT=""></A>
 
-&nbsp;
-<A CLASS="unsel" HREF="/jobs/"><IMG SRC="/images/tab-left.gif" WIDTH="4"
+&nbsp;<A CLASS="unsel" HREF="/jobs/"><IMG SRC="/images/tab-left.gif" WIDTH="4"
 HEIGHT="4" ALIGN="TOP" BORDER="0"
 ALT="">&nbsp;&nbsp;Jobs&nbsp;&nbsp;<IMG
 SRC="/images/tab-right.gif" WIDTH="4" HEIGHT="4" ALIGN="TOP"
 BORDER="0" ALT=""></A>
 
-&nbsp;
-<A CLASS="unsel" HREF="/printers/"><IMG SRC="/images/tab-left.gif" WIDTH="4"
+&nbsp;<A CLASS="unsel" HREF="/printers/"><IMG SRC="/images/tab-left.gif" WIDTH="4"
 HEIGHT="4" ALIGN="TOP" BORDER="0"
 ALT="">&nbsp;&nbsp;Printers&nbsp;&nbsp;<IMG
 SRC="/images/tab-right.gif" WIDTH="4" HEIGHT="4" ALIGN="TOP"
