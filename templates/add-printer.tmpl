@@ -1,33 +1,46 @@
 <FORM METHOD="POST" ACTION="/admin">
 <INPUT TYPE="HIDDEN" NAME="OP" VALUE="{op}">
-<TABLE CELLPADDING="0" CELLSPACING="0" BORDER="0" WIDTH="100%">
-<TR BGCOLOR="#999966">
-	<TH WIDTH="16"><IMG SRC="/images/left.gif" ALT=""></TH>
-	<TH COLSPAN="2">Add New Printer</TH>
-	<TH BGCOLOR="#cccc99" WIDTH="16"><IMG SRC="/images/right.gif" ALT=""></TH>
+
+<P><TABLE CELLPADDING="0" CELLSPACING="0" BORDER="0" WIDTH="100%">
+<TR CLASS="header">
+<TH ALIGN="LEFT" VALIGN="TOP"><IMG SRC="/images/hdr-top-left.gif"
+WIDTH="16" HEIGHT="16" ALT=""></TH>
+<TH COLSPAN="2">Add New Printer</TH>
+<TH ALIGN="RIGHT" VALIGN="TOP"><IMG
+SRC="/images/hdr-top-right.gif" WIDTH="16" HEIGHT="16"
+ALT=""></TH>
 </TR>
-<TR>
-	<TD HEIGHT="4"></TD>
+<TR CLASS="data">
+<TD></TD>
+<TH ALIGN="RIGHT">Name:</TH>
+<TD><INPUT TYPE="TEXT" NAME="PRINTER_NAME" SIZE="40" MAXLENGTH="127"></TD>
+<TD></TD>
 </TR>
-<TR>
-	<TD></TD>
-	<TD ALIGN="RIGHT">Name:</TD>
-	<TD><INPUT TYPE="TEXT" NAME="PRINTER_NAME" SIZE="40" MAXLENGTH="127"></TD>
+<TR CLASS="data">
+<TD></TD>
+<TH ALIGN="RIGHT">Location:</TH>
+<TD><INPUT TYPE="TEXT" NAME="PRINTER_LOCATION" SIZE="40" MAXLENGTH="127"></TD>
+<TD></TD>
 </TR>
-<TR>
-	<TD></TD>
-	<TD ALIGN="RIGHT">Location:</TD>
-	<TD><INPUT TYPE="TEXT" NAME="PRINTER_LOCATION" SIZE="40" MAXLENGTH="127"></TD>
+<TR CLASS="data">
+<TD></TD>
+<TH ALIGN="RIGHT">Description:</TH>
+<TD><INPUT TYPE="TEXT" NAME="PRINTER_INFO" SIZE="40" MAXLENGTH="127"></TD>
+<TD></TD>
 </TR>
-<TR>
-	<TD></TD>
-	<TD ALIGN="RIGHT">Description:</TD>
-	<TD><INPUT TYPE="TEXT" NAME="PRINTER_INFO" SIZE="40" MAXLENGTH="127"></TD>
+<TR CLASS="data">
+<TD></TD>
+<TD></TD>
+<TD><INPUT TYPE="IMAGE" SRC="/images/continue.gif" ALT="Continue" BORDER="0"></TD>
+<TD></TD>
 </TR>
-<TR>
-	<TD></TD>
-	<TD></TD>
-	<TD><INPUT TYPE="IMAGE" SRC="/images/continue.gif" ALT="Continue" BORDER="0"></TD>
+<TR CLASS="header">
+<TH ALIGN="LEFT" VALIGN="BOTTOM"><IMG SRC="/images/hdr-bottom-left.gif"
+WIDTH="16" HEIGHT="16" ALT=""></TH>
+<TH COLSPAN="2"></TH>
+<TH ALIGN="RIGHT" VALIGN="BOTTOM"><IMG
+SRC="/images/hdr-bottom-right.gif" WIDTH="16" HEIGHT="16"
+ALT=""></TH>
 </TR>
-</TABLE>
+</TABLE></P>
 </FORM>

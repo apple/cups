@@ -1,20 +1,19 @@
 # DO NOT DELETE
 
-html.o: cgi.h ../cups/string.h ../config.h
 ipp-var.o: ipp-var.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
-ipp-var.o: ../cups/md5.h ../cups/ppd.h ../cups/debug.h ../cups/language.h
-ipp-var.o: ../cups/string.h ../config.h cgi.h
+ipp-var.o: ../cups/md5.h ../cups/ppd.h ../cups/file.h ../cups/debug.h
+ipp-var.o: ../cups/language.h ../cups/string.h ../config.h cgi.h
 template.o: cgi.h ../cups/string.h ../config.h
 var.o: cgi.h ../cups/string.h ../config.h
 admin.o: ipp-var.h ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
-admin.o: ../cups/ppd.h ../cups/debug.h ../cups/language.h ../cups/string.h
-admin.o: ../config.h cgi.h
+admin.o: ../cups/ppd.h ../cups/file.h ../cups/debug.h ../cups/language.h
+admin.o: ../cups/string.h ../config.h cgi.h ../cups/file.h
 classes.o: ipp-var.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
-classes.o: ../cups/md5.h ../cups/ppd.h ../cups/debug.h ../cups/language.h
-classes.o: ../cups/string.h ../config.h cgi.h
+classes.o: ../cups/md5.h ../cups/ppd.h ../cups/file.h ../cups/debug.h
+classes.o: ../cups/language.h ../cups/string.h ../config.h cgi.h
 jobs.o: ipp-var.h ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
-jobs.o: ../cups/ppd.h ../cups/debug.h ../cups/language.h ../cups/string.h
-jobs.o: ../config.h cgi.h
+jobs.o: ../cups/ppd.h ../cups/file.h ../cups/debug.h ../cups/language.h
+jobs.o: ../cups/string.h ../config.h cgi.h
 printers.o: ipp-var.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
-printers.o: ../cups/md5.h ../cups/ppd.h ../cups/debug.h ../cups/language.h
-printers.o: ../cups/string.h ../config.h cgi.h
+printers.o: ../cups/md5.h ../cups/ppd.h ../cups/file.h ../cups/debug.h
+printers.o: ../cups/language.h ../cups/string.h ../config.h cgi.h

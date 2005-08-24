@@ -1,63 +1,80 @@
+<P><A HREF="/admin/?op=add-printer"><IMG
+SRC="/images/add-printer.gif" ALT="Add Printer"
+BORDER="0"></A></P>
+
 {#printer_name=0?No printers:
-<P><B>Default Destination:</B> {default_name?<A HREF="{default_uri}">{default_name}</A>:none}
-<P><TABLE CELLPADDING="0" CELLSPACING="0" BORDER="0" WIDTH="100%">
+<P><B>Default Destination:</B> {default_name?<A HREF="{default_uri}">{default_name}</A>:none}</P>
 {[printer_name]
-<TR>
-	<TH BGCOLOR="#999966"><IMG SRC="/images/left.gif" ALT=""></TH>
-	<TH BGCOLOR="#999966"><A HREF="{printer_uri_supported}">{printer_name}</A></TH>
-	<TH BGCOLOR="#999966">{printer_make_and_model}</TH>
-	<TH><IMG SRC="/images/right.gif" ALT=""></TH>
+<P><TABLE CELLPADDING="0" CELLSPACING="0" BORDER="0" WIDTH="100%">
+<TR CLASS="header">
+<TH ALIGN="LEFT" VALIGN="TOP"><IMG SRC="/images/hdr-top-left.gif"
+WIDTH="16" HEIGHT="16" ALT=""></TH>
+<TH><A HREF="{printer_uri_supported}">{printer_name}</A>{default_name={printer_name}? (Default Printer):}</TH>
+<TH ALIGN="RIGHT" VALIGN="TOP"><IMG
+SRC="/images/hdr-top-right.gif" WIDTH="16" HEIGHT="16"
+ALT=""></TH>
 </TR>
+<TR CLASS="data">
+<TD></TD>
+<TD WIDTH="100%">
+
+<TABLE WIDTH="100%" BORDER="0" CELLSPACING="0" CELLPADDING="0">
 <TR>
-	<TD HEIGHT="4"></TD>
-</TR>
-<TR>
-	<TD></TD>
-	<TD VALIGN="TOP"><A HREF="{printer_uri_supported}">
-	<IMG SRC="../images/printer-{printer_state=3?idle:{printer_state=4?processing:stopped}}.gif" BORDER="0" ALT=""></A>
-	</TD>
-	<TD VALIGN="TOP">Description: {printer_info}<BR>
-	Location: {printer_location}<BR>
-	Printer State: {printer_state=3?idle:{printer_state=4?processing:stopped}},
-	{printer_is_accepting_jobs=0?rejecting jobs:accepting jobs}.
-	{?printer_state_message=?:<BR><I>"{printer_state_message}"</I>}
-	{?printer_state_history2.printer_state_message=?:<BR><I>"{printer_state_history2.printer_state_message}"</I>}
-	{?printer_state_history3.printer_state_message=?:<BR><I>"{printer_state_history3.printer_state_message}"</I>}
-	{?printer_state_history4.printer_state_message=?:<BR><I>"{printer_state_history4.printer_state_message}"</I>}
-	{?printer_state_history5.printer_state_message=?:<BR><I>"{printer_state_history5.printer_state_message}"</I>}
-	{?device_uri=?:<BR>Device URI: {device_uri}}
-	<P>
-	<A HREF="{printer_uri_supported}?op=print-test-page">
-	<IMG SRC="/images/print-test-page.gif" ALT="Print Test Page" BORDER="0"></A>
-	{printer_state=5?
-	<A HREF="{admin_uri}?op=start-printer&printer_name={printer_name}">
-	<IMG SRC="/images/start-printer.gif" ALT="Start Printer" BORDER="0"></A>
-	:
-	<A HREF="{admin_uri}?op=stop-printer&printer_name={printer_name}">
-	<IMG SRC="/images/stop-printer.gif" ALT="Stop Printer" BORDER="0"></A>
-	}
-	{printer_is_accepting_jobs=0?
-	<A HREF="{admin_uri}?op=accept-jobs&printer_name={printer_name}">
-	<IMG SRC="/images/accept-jobs.gif" ALT="Accept Jobs" BORDER="0"></A>
-	:
-	<A HREF="{admin_uri}?op=reject-jobs&printer_name={printer_name}">
-	<IMG SRC="/images/reject-jobs.gif" ALT="Reject Jobs" BORDER="0"></A>
-	}
-	<A HREF="{admin_uri}?op=modify-printer&printer_name={printer_name}">
-	<IMG SRC="/images/modify-printer.gif" ALT="Modify Printer" BORDER="0"></A>
-	<A HREF="{admin_uri}?op=config-printer&printer_name={printer_name}">
-	<IMG SRC="/images/config-printer.gif" ALT="Configure Printer" BORDER="0"></A>
-	<A HREF="{admin_uri}?op=delete-printer&printer_name={printer_name}">
-	<IMG SRC="/images/delete-printer.gif" ALT="Delete Printer" BORDER="0"></A>
-	<A HREF="{admin_uri}?op=set-as-default&printer_name={printer_name}">
-	<IMG SRC="/images/set-as-default.gif" ALT="Set As Default" BORDER="0"></A>
-	</TD>
-</TR>
-<TR>
-	<TD>&nbsp;</TD>
-</TR>
+<TD VALIGN="TOP"><A HREF="{printer_uri_supported}">
+<IMG SRC="../images/printer-{printer_state=3?idle:{printer_state=4?processing:stopped}}.gif" BORDER="0" ALT=""></A>
+</TD>
+<TD VALIGN="TOP">Description: {printer_info}<BR>
+Location: {printer_location}<BR>
+Printer State: {printer_state=3?idle:{printer_state=4?processing:stopped}},
+{printer_is_accepting_jobs=0?rejecting jobs:accepting jobs}.
+{?printer_state_message=?:<BR><I>"{printer_state_message}"</I>}
+{?printer_state_history2.printer_state_message=?:<BR><I>"{printer_state_history2.printer_state_message}"</I>}
+{?printer_state_history3.printer_state_message=?:<BR><I>"{printer_state_history3.printer_state_message}"</I>}
+{?printer_state_history4.printer_state_message=?:<BR><I>"{printer_state_history4.printer_state_message}"</I>}
+{?printer_state_history5.printer_state_message=?:<BR><I>"{printer_state_history5.printer_state_message}"</I>}
+{?device_uri=?:<BR>Device URI: {device_uri}}
+<P>
+<A HREF="{printer_uri_supported}?op=print-test-page">
+<IMG SRC="/images/print-test-page.gif" ALT="Print Test Page" BORDER="0"></A>
+{printer_state=5?
+<A HREF="{admin_uri}?op=start-printer&printer_name={printer_name}">
+<IMG SRC="/images/start-printer.gif" ALT="Start Printer" BORDER="0"></A>
+:
+<A HREF="{admin_uri}?op=stop-printer&printer_name={printer_name}">
+<IMG SRC="/images/stop-printer.gif" ALT="Stop Printer" BORDER="0"></A>
 }
+{printer_is_accepting_jobs=0?
+<A HREF="{admin_uri}?op=accept-jobs&printer_name={printer_name}">
+<IMG SRC="/images/accept-jobs.gif" ALT="Accept Jobs" BORDER="0"></A>
+:
+<A HREF="{admin_uri}?op=reject-jobs&printer_name={printer_name}">
+<IMG SRC="/images/reject-jobs.gif" ALT="Reject Jobs" BORDER="0"></A>
+}
+<A HREF="{admin_uri}?op=modify-printer&printer_name={printer_name}">
+<IMG SRC="/images/modify-printer.gif" ALT="Modify Printer" BORDER="0"></A>
+<A HREF="{admin_uri}?op=config-printer&printer_name={printer_name}">
+<IMG SRC="/images/config-printer.gif" ALT="Configure Printer" BORDER="0"></A>
+<A HREF="{admin_uri}?op=delete-printer&printer_name={printer_name}">
+<IMG SRC="/images/delete-printer.gif" ALT="Delete Printer" BORDER="0"></A>
+<A HREF="{admin_uri}?op=set-as-default&printer_name={printer_name}">
+<IMG SRC="/images/set-as-default.gif" ALT="Set As Default" BORDER="0"></A>
+<A HREF="{admin_uri}?op=set-allowed-users&printer_name={printer_name}">
+<IMG SRC="/images/set-allowed-users.gif" ALT="Set Allowed Users" BORDER="0"></A>
+</TD>
+</TR>
 </TABLE>
-}
-<P><A HREF="/admin/?op=add-printer">
-<IMG SRC="/images/add-printer.gif" ALT="Add Printer" BORDER="0"></A>
+
+</TD>
+<TD></TD>
+</TR>
+<TR CLASS="header">
+<TH ALIGN="LEFT" VALIGN="BOTTOM"><IMG SRC="/images/hdr-bottom-left.gif"
+WIDTH="16" HEIGHT="16" ALT=""></TH>
+<TH></TH>
+<TH ALIGN="RIGHT" VALIGN="BOTTOM"><IMG
+SRC="/images/hdr-bottom-right.gif" WIDTH="16" HEIGHT="16"
+ALT=""></TH>
+</TR>
+</TABLE></P>
+
+}}

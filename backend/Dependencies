@@ -1,17 +1,20 @@
 # DO NOT DELETE
 
 betest.o: ../cups/string.h ../config.h
-ipp.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
-ipp.o: ../cups/ppd.h ../cups/language.h ../cups/string.h ../config.h
+ipp.o: ../cups/http-private.h ../config.h ../cups/http.h ../cups/md5.h
+ipp.o: ../cups/cups.h ../cups/ipp.h ../cups/ppd.h ../cups/file.h
+ipp.o: ../cups/language.h ../cups/string.h
 lpd.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
-lpd.o: ../cups/ppd.h ../cups/string.h ../config.h
+lpd.o: ../cups/ppd.h ../cups/file.h ../cups/http-private.h ../config.h
+lpd.o: ../cups/string.h
 parallel.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
-parallel.o: ../cups/ppd.h ../cups/string.h ../config.h
+parallel.o: ../cups/ppd.h ../cups/file.h ../cups/string.h ../config.h
 scsi.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
-scsi.o: ../cups/ppd.h ../cups/string.h ../config.h
+scsi.o: ../cups/ppd.h ../cups/file.h ../cups/string.h ../config.h
 serial.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
-serial.o: ../cups/ppd.h ../cups/string.h ../config.h
+serial.o: ../cups/ppd.h ../cups/file.h ../cups/string.h ../config.h
 socket.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
-socket.o: ../cups/ppd.h ../cups/string.h ../config.h
+socket.o: ../cups/ppd.h ../cups/file.h ../cups/http-private.h ../config.h
+socket.o: ../cups/string.h
 usb.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
-usb.o: ../cups/ppd.h ../cups/string.h ../config.h
+usb.o: ../cups/ppd.h ../cups/file.h ../cups/string.h ../config.h

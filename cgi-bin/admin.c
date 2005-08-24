@@ -35,7 +35,6 @@
  *   do_printer_op()           - Do a printer operation.
  *   do_set_allowed_users()    - Set the allowed/denied users for a queue.
  *   form_encode()             - Encode a string as a form variable...
- *   get_line()                - Get a line that is terminated by a LF, CR, or CR LF.
  *   html_end()                - End a HTML page.
  *   html_start()              - Start a HTML page.
  *   match_string()            - Return the number of matching characters.
@@ -63,11 +62,11 @@ static void	do_config_server(http_t *http, cups_lang_t *language);
 static void	do_delete_class(http_t *http, cups_lang_t *language);
 static void	do_delete_printer(http_t *http, cups_lang_t *language);
 static void	do_menu(http_t *http, cups_lang_t *language);
-static void	do_printer_op(http_t *http, cups_lang_t *language, ipp_op_t op);
+static void	do_printer_op(http_t *http, cups_lang_t *language,
+		              ipp_op_t op, const char *title);
 static void	do_set_allowed_users(http_t *http, cups_lang_t *language);
 static void	form_encode(char *dst, const char *src, size_t dstsize);
-static char	*get_line(char *buf, int length, FILE *fp);
-static void	html_start(void);
+static void	html_start(const char *title);
 static void	html_end(void);
 static int	match_string(const char *a, const char *b);
 
@@ -122,21 +121,33 @@ main(int  argc,				/* I - Number of command-line arguments */
     */
 
     if (!strcmp(op, "redirect"))
-      puts("Location: /admin\n");
+    {
+      const char *url;			/* Redirection URL... */
+
+
+      if ((url = cgiGetVariable("URL")) != NULL)
+        printf("Location: %s\n\n", url);
+      else
+        puts("Location: /admin\n");
+    }
     else if (!strcmp(op, "start-printer"))
-      do_printer_op(http, language, IPP_RESUME_PRINTER);
+      do_printer_op(http, language, IPP_RESUME_PRINTER, "Start Printer");
     else if (!strcmp(op, "stop-printer"))
-      do_printer_op(http, language, IPP_PAUSE_PRINTER);
+      do_printer_op(http, language, IPP_PAUSE_PRINTER, "Stop Printer");
+    else if (!strcmp(op, "start-class"))
+      do_printer_op(http, language, IPP_RESUME_PRINTER, "Start Class");
+    else if (!strcmp(op, "stop-class"))
+      do_printer_op(http, language, IPP_PAUSE_PRINTER, "Stop Class");
     else if (!strcmp(op, "accept-jobs"))
-      do_printer_op(http, language, CUPS_ACCEPT_JOBS);
+      do_printer_op(http, language, CUPS_ACCEPT_JOBS, "Accept Jobs");
     else if (!strcmp(op, "reject-jobs"))
-      do_printer_op(http, language, CUPS_REJECT_JOBS);
+      do_printer_op(http, language, CUPS_REJECT_JOBS, "Reject Jobs");
     else if (!strcmp(op, "purge-jobs"))
-      do_printer_op(http, language, IPP_PURGE_JOBS);
+      do_printer_op(http, language, IPP_PURGE_JOBS, "Purge Jobs");
     else if (!strcmp(op, "set-allowed-users"))
       do_set_allowed_users(http, language);
     else if (!strcmp(op, "set-as-default"))
-      do_printer_op(http, language, CUPS_SET_DEFAULT);
+      do_printer_op(http, language, CUPS_SET_DEFAULT, "Set As Default");
     else if (!strcmp(op, "add-class"))
       do_am_class(http, language, 0);
     else if (!strcmp(op, "add-printer"))
@@ -159,7 +170,7 @@ main(int  argc,				/* I - Number of command-line arguments */
       * Bad operation code...  Display an error...
       */
 
-      html_start();
+      html_start("Error");
       cgiCopyTemplateLang(stdout, TEMPLATES, "admin-op.tmpl", getenv("LANG"));
       html_end();
     }
@@ -176,7 +187,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     * Form data but no operation code...  Display an error...
     */
 
-    html_start();
+    html_start("Error");
     cgiCopyTemplateLang(stdout, TEMPLATES, "admin-op.tmpl", getenv("LANG"));
     html_end();
   }
@@ -226,12 +237,13 @@ do_am_class(http_t      *http,		/* I - HTTP connection */
   char		uri[HTTP_MAX_URI];	/* Device or printer URI */
   const char	*name,			/* Pointer to class name */
 		*ptr;			/* Pointer to CGI variable */
+  const char	*title;			/* Title of page */
 
+
+  title = modify ? "Modify Class" : "Add Class";
 
   if (cgiGetVariable("PRINTER_LOCATION") == NULL)
   {
-    html_start();
-
     if (modify)
     {
      /*
@@ -273,6 +285,7 @@ do_am_class(http_t      *http,		/* I - HTTP connection */
       * Update the location and description of an existing printer...
       */
 
+      html_start(title);
       cgiCopyTemplateLang(stdout, TEMPLATES, "modify-class.tmpl", getenv("LANG"));
     }
     else
@@ -281,6 +294,7 @@ do_am_class(http_t      *http,		/* I - HTTP connection */
       * Get the name, location, and description for a new printer...
       */
 
+      html_start(title);
       cgiCopyTemplateLang(stdout, TEMPLATES, "add-class.tmpl", getenv("LANG"));
     }
 
@@ -299,7 +313,7 @@ do_am_class(http_t      *http,		/* I - HTTP connection */
     cgiSetVariable("ERROR", "The class name may only contain up to 127 printable "
                             "characters and may not contain spaces, slashes (/), "
 			    "or the pound sign (#).");
-    html_start();
+    html_start(title);
     cgiCopyTemplateLang(stdout, TEMPLATES, "error.tmpl", getenv("LANG"));
     html_end();
     return;
@@ -421,7 +435,7 @@ do_am_class(http_t      *http,		/* I - HTTP connection */
     * Let the user choose...
     */
 
-    html_start();
+    html_start(title);
     cgiCopyTemplateLang(stdout, TEMPLATES, "choose-members.tmpl", getenv("LANG"));
     html_end();
   }
@@ -488,17 +502,32 @@ do_am_class(http_t      *http,		/* I - HTTP connection */
     else
       status = cupsLastError();
 
-    html_start();
-
     if (status > IPP_OK_CONFLICT)
     {
+      html_start(title);
       cgiSetVariable("ERROR", ippErrorString(status));
       cgiCopyTemplateLang(stdout, TEMPLATES, "error.tmpl", getenv("LANG"));
     }
-    else if (modify)
-      cgiCopyTemplateLang(stdout, TEMPLATES, "class-modified.tmpl", getenv("LANG"));
     else
-      cgiCopyTemplateLang(stdout, TEMPLATES, "class-added.tmpl", getenv("LANG"));
+    {
+     /*
+      * Redirect successful updates back to the class page...
+      */
+
+      char	refresh[1024];		/* Refresh URL */
+
+      form_encode(uri, name, sizeof(uri));
+      snprintf(refresh, sizeof(refresh), "2;/admin?OP=redirect&URL=/classes/%s",
+               uri);
+      cgiSetVariable("refresh_page", refresh);
+
+      html_start(title);
+
+      if (modify)
+        cgiCopyTemplateLang(stdout, TEMPLATES, "class-modified.tmpl", getenv("LANG"));
+      else
+        cgiCopyTemplateLang(stdout, TEMPLATES, "class-added.tmpl", getenv("LANG"));
+    }
 
     html_end();
   }
@@ -529,6 +558,7 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
   char		baudrate[255];		/* Baud rate string */
   const char	*name,			/* Pointer to class name */
 		*ptr;			/* Pointer to CGI variable */
+  const char	*title;			/* Title of page */
   static int	baudrates[] =		/* Baud rates */
 		{
 		  1200,
@@ -543,6 +573,8 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
 		  460800
 		};
 
+
+  title = modify ? "Modify Printer" : "Add Printer";
 
   if (modify)
   {
@@ -583,7 +615,7 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
   if ((name = cgiGetVariable("PRINTER_NAME")) == NULL ||
       cgiGetVariable("PRINTER_LOCATION") == NULL)
   {
-    html_start();
+    html_start(title);
 
     if (modify)
     {
@@ -622,7 +654,7 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
     cgiSetVariable("ERROR", "The printer name may only contain up to 127 printable "
                             "characters and may not contain spaces, slashes (/), "
 			    "or the pound sign (#).");
-    html_start();
+    html_start(title);
     cgiCopyTemplateLang(stdout, TEMPLATES, "error.tmpl", getenv("LANG"));
     html_end();
     return;
@@ -677,7 +709,7 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
       cgiSetVariable("CURRENT_DEVICE_URI", uri);
     }
 
-    html_start();
+    html_start(title);
     cgiCopyTemplateLang(stdout, TEMPLATES, "choose-device.tmpl", getenv("LANG"));
     html_end();
   }
@@ -698,7 +730,7 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
     * User needs to set the full URI...
     */
 
-    html_start();
+    html_start(title);
     cgiCopyTemplateLang(stdout, TEMPLATES, "choose-uri.tmpl", getenv("LANG"));
     html_end();
   }
@@ -723,7 +755,7 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
 	cgiSetArray("BAUDRATES", i, baudrate);
       }
 
-    html_start();
+    html_start(title);
     cgiCopyTemplateLang(stdout, TEMPLATES, "choose-serial.tmpl", getenv("LANG"));
     html_end();
   }
@@ -868,7 +900,7 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
 	      last = attr;
 	    }
 
-        html_start();
+        html_start(title);
 	cgiCopyTemplateLang(stdout, TEMPLATES, "choose-make.tmpl",
 	                    getenv("LANG"));
         html_end();
@@ -919,7 +951,7 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
 	  }
 	}
 
-        html_start();
+        html_start(title);
 	cgiCopyTemplateLang(stdout, TEMPLATES, "choose-model.tmpl",
 	                    getenv("LANG"));
         html_end();
@@ -936,7 +968,7 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
       snprintf(message, sizeof(message), "Unable to get list of printer drivers: %s",
                ippErrorString(cupsLastError()));
       cgiSetVariable("ERROR", message);
-      html_start();
+      html_start(title);
       cgiCopyTemplateLang(stdout, TEMPLATES, "error.tmpl", getenv("LANG"));
       html_end();
     }
@@ -1019,17 +1051,32 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
     else
       status = cupsLastError();
 
-    html_start();
-
     if (status > IPP_OK_CONFLICT)
     {
+      html_start(title);
       cgiSetVariable("ERROR", ippErrorString(status));
       cgiCopyTemplateLang(stdout, TEMPLATES, "error.tmpl", getenv("LANG"));
     }
-    else if (modify)
-      cgiCopyTemplateLang(stdout, TEMPLATES, "printer-modified.tmpl", getenv("LANG"));
     else
-      cgiCopyTemplateLang(stdout, TEMPLATES, "printer-added.tmpl", getenv("LANG"));
+    {
+     /*
+      * Redirect successful updates back to the printer page...
+      */
+
+      char	refresh[1024];		/* Refresh URL */
+
+      form_encode(uri, name, sizeof(uri));
+      snprintf(refresh, sizeof(refresh), "2;/admin?OP=redirect&URL=/printers/%s",
+               uri);
+      cgiSetVariable("refresh_page", refresh);
+
+      html_start(title);
+
+      if (modify)
+        cgiCopyTemplateLang(stdout, TEMPLATES, "printer-modified.tmpl", getenv("LANG"));
+      else
+        cgiCopyTemplateLang(stdout, TEMPLATES, "printer-added.tmpl", getenv("LANG"));
+    }
 
     html_end();
   }
@@ -1047,7 +1094,7 @@ static void
 do_config_printer(http_t      *http,	/* I - HTTP connection */
                   cups_lang_t *language)/* I - Client's language */
 {
-  int		i, j, k;		/* Looping vars */
+  int		i, j, k, m;		/* Looping vars */
   int		have_options;		/* Have options? */
   ipp_t		*request,		/* IPP request */
 		*response;		/* IPP response */
@@ -1058,9 +1105,8 @@ do_config_printer(http_t      *http,	/* I - HTTP connection */
   ipp_status_t	status;			/* Operation status... */
   const char	*filename;		/* PPD filename */
   char		tempfile[1024];		/* Temporary filename */
-  FILE		*in,			/* Input file */
+  cups_file_t	*in,			/* Input file */
 		*out;			/* Output file */
-  int		outfd;			/* Output file descriptor */
   char		line[1024];		/* Line from PPD file */
   char		keyword[1024],		/* Keyword from Default line */
 		*keyptr;		/* Pointer into keyword... */
@@ -1079,7 +1125,7 @@ do_config_printer(http_t      *http,	/* I - HTTP connection */
   else
   {
     cgiSetVariable("ERROR", ippErrorString(IPP_NOT_FOUND));
-    html_start();
+    html_start("Set Printer Options");
     cgiCopyTemplateLang(stdout, TEMPLATES, "error.tmpl", getenv("LANG"));
     html_end();
     return;
@@ -1100,7 +1146,7 @@ do_config_printer(http_t      *http,	/* I - HTTP connection */
       */
 
       cgiSetVariable("ERROR", ippErrorString(IPP_NOT_POSSIBLE));
-      html_start();
+      html_start("Set Printer Options");
       cgiCopyTemplateLang(stdout, TEMPLATES, "error.tmpl", getenv("LANG"));
       html_end();
     }
@@ -1111,7 +1157,7 @@ do_config_printer(http_t      *http,	/* I - HTTP connection */
       */
 
       cgiSetVariable("ERROR", ippErrorString(cupsLastError()));
-      html_start();
+      html_start("Set Printer Options");
       cgiCopyTemplateLang(stdout, TEMPLATES, "error.tmpl", getenv("LANG"));
       html_end();
     }
@@ -1121,7 +1167,7 @@ do_config_printer(http_t      *http,	/* I - HTTP connection */
   if ((ppd = ppdOpenFile(filename)) == NULL)
   {
     cgiSetVariable("ERROR", ippErrorString(IPP_DEVICE_ERROR));
-    html_start();
+    html_start("Set Printer Options");
     cgiCopyTemplateLang(stdout, TEMPLATES, "error.tmpl", getenv("LANG"));
     html_end();
     return;
@@ -1166,7 +1212,7 @@ do_config_printer(http_t      *http,	/* I - HTTP connection */
     * Show the options to the user...
     */
 
-    html_start();
+    html_start("Set Printer Options");
     cgiCopyTemplateLang(stdout, TEMPLATES, "config-printer.tmpl",
                         getenv("LANG"));
 
@@ -1202,7 +1248,7 @@ do_config_printer(http_t      *http,	/* I - HTTP connection */
            j > 0;
 	   j --, option ++)
       {
-        if (strcmp(option->keyword, "PageRegion") == 0)
+        if (!strcmp(option->keyword, "PageRegion"))
 	  continue;
 
         cgiSetVariable("KEYWORD", option->keyword);
@@ -1213,12 +1259,21 @@ do_config_printer(http_t      *http,	/* I - HTTP connection */
 	else
 	  cgiSetVariable("CONFLICTED", "0");
 
-	cgiSetSize("CHOICES", option->num_choices);
-	cgiSetSize("TEXT", option->num_choices);
-	for (k = 0; k < option->num_choices; k ++)
+	cgiSetSize("CHOICES", 0);
+	cgiSetSize("TEXT", 0);
+	for (k = 0, m = 0; k < option->num_choices; k ++)
 	{
-	  cgiSetArray("CHOICES", k, option->choices[k].choice);
-	  cgiSetArray("TEXT", k, option->choices[k].text);
+	 /*
+	  * Hide custom option values...
+	  */
+
+	  if (!strcmp(option->choices[k].choice, "Custom"))
+	    continue;
+
+	  cgiSetArray("CHOICES", m, option->choices[k].choice);
+	  cgiSetArray("TEXT", m, option->choices[k].text);
+
+          m ++;
 
           if (option->choices[k].marked)
 	    cgiSetVariable("DEFCHOICE", option->choices[k].choice);
@@ -1265,8 +1320,7 @@ do_config_printer(http_t      *http,	/* I - HTTP connection */
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
         	 "attributes-natural-language", NULL, language->language);
 
-    snprintf(uri, sizeof(uri), "ipp://localhost/printers/%s",
-             cgiGetVariable("PRINTER_NAME"));
+    snprintf(uri, sizeof(uri), "ipp://localhost/printers/%s", printer);
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
                  NULL, uri);
 
@@ -1368,26 +1422,35 @@ do_config_printer(http_t      *http,	/* I - HTTP connection */
     * Set default options...
     */
 
-    outfd = cupsTempFd(tempfile, sizeof(tempfile));
-    in    = fopen(filename, "rb");
-    out   = fdopen(outfd, "wb");
+    out = cupsTempFile2(tempfile, sizeof(tempfile));
+    in  = cupsFileOpen(filename, "r");
 
-    if (outfd < 0 || in == NULL || out == NULL)
+    if (!in || !out)
     {
       cgiSetVariable("ERROR", strerror(errno));
-      html_start();
+      html_start("Set Printer Options");
       cgiCopyTemplateLang(stdout, TEMPLATES, "error.tmpl", getenv("LANG"));
       html_end();
+
+      if (in)
+        cupsFileClose(in);
+
+      if (out)
+      {
+        cupsFileClose(out);
+	unlink(tempfile);
+      }
+
       unlink(filename);
       return;
     }
 
-    while (get_line(line, sizeof(line), in) != NULL)
+    while (cupsFileGets(in, line, sizeof(line)))
     {
       if (!strncmp(line, "*cupsProtocol:", 14) && cgiGetVariable("protocol"))
         continue;
       else if (strncmp(line, "*Default", 8))
-        fprintf(out, "%s\n", line);
+        cupsFilePrintf(out, "%s\n", line);
       else
       {
        /*
@@ -1402,24 +1465,23 @@ do_config_printer(http_t      *http,	/* I - HTTP connection */
 
         *keyptr = '\0';
 
-        if (strcmp(keyword, "PageRegion") == 0)
+        if (!strcmp(keyword, "PageRegion"))
 	  var = cgiGetVariable("PageSize");
 	else
 	  var = cgiGetVariable(keyword);
 
         if (var != NULL)
-	  fprintf(out, "*Default%s: %s\n", keyword, var);
+	  cupsFilePrintf(out, "*Default%s: %s\n", keyword, var);
 	else
-	  fprintf(out, "%s\n", line);
+	  cupsFilePrintf(out, "%s\n", line);
       }
     }
 
     if ((var = cgiGetVariable("protocol")) != NULL)
-      fprintf(out, "*cupsProtocol: %s\n", cgiGetVariable("protocol"));
+      cupsFilePrintf(out, "*cupsProtocol: %s\n", cgiGetVariable("protocol"));
 
-    fclose(in);
-    fclose(out);
-    close(outfd);
+    cupsFileClose(in);
+    cupsFileClose(out);
 
    /*
     * Build a CUPS_ADD_PRINTER request, which requires the following
@@ -1465,15 +1527,29 @@ do_config_printer(http_t      *http,	/* I - HTTP connection */
     else
       status = cupsLastError();
 
-    html_start();
-
     if (status > IPP_OK_CONFLICT)
     {
+      html_start("Set Printer Options");
       cgiSetVariable("ERROR", ippErrorString(status));
       cgiCopyTemplateLang(stdout, TEMPLATES, "error.tmpl", getenv("LANG"));
     }
     else
+    {
+     /*
+      * Redirect successful updates back to the printer page...
+      */
+
+      char	refresh[1024];		/* Refresh URL */
+
+      form_encode(uri, printer, sizeof(uri));
+      snprintf(refresh, sizeof(refresh), "2;/admin?OP=redirect&URL=/printers/%s",
+               uri);
+      cgiSetVariable("refresh_page", refresh);
+
+      html_start("Set Printer Options");
+
       cgiCopyTemplateLang(stdout, TEMPLATES, "printer-configured.tmpl", getenv("LANG"));
+    }
 
     html_end();
 
@@ -1492,7 +1568,7 @@ static void
 do_config_server(http_t      *http,	/* I - HTTP connection */
                  cups_lang_t *language)	/* I - Client's language */
 {
-  if (cgiIsPOST() && !cgiGetVariable("CUPSD.CONF"))
+  if (cgiIsPOST() && !cgiGetVariable("CUPSDCONF"))
   {
    /*
     * Save basic setting changes...
@@ -1553,7 +1629,7 @@ do_config_server(http_t      *http,	/* I - HTTP connection */
       * Unable to open - log an error...
       */
 
-      html_start();
+      html_start("Change Settings");
       cgiSetVariable("ERROR", strerror(errno));
       cgiCopyTemplateLang(stdout, TEMPLATES, "error.tmpl", getenv("LANG"));
       html_end();
@@ -1568,7 +1644,7 @@ do_config_server(http_t      *http,	/* I - HTTP connection */
 
     if ((tempfd = cupsTempFd(tempfile, sizeof(tempfile))) < 0)
     {
-      html_start();
+      html_start("Change Settings");
       cgiSetVariable("ERROR", strerror(errno));
       cgiCopyTemplateLang(stdout, TEMPLATES, "error.tmpl", getenv("LANG"));
       html_end();
@@ -1580,7 +1656,7 @@ do_config_server(http_t      *http,	/* I - HTTP connection */
 
     if ((temp = cupsFileOpenFd(tempfd, "w")) == NULL)
     {
-      html_start();
+      html_start("Change Settings");
       cgiSetVariable("ERROR", strerror(errno));
       cgiCopyTemplateLang(stdout, TEMPLATES, "error.tmpl", getenv("LANG"));
       html_end();
@@ -1984,14 +2060,14 @@ do_config_server(http_t      *http,	/* I - HTTP connection */
     if (status != HTTP_CREATED)
     {
       cgiSetVariable("ERROR", cupsLangString(language, status));
-      html_start();
+      html_start("Change Settings");
       cgiCopyTemplateLang(stdout, TEMPLATES, "error.tmpl", getenv("LANG"));
     }
     else
     {
       cgiSetVariable("refresh_page", "10;/admin?OP=redirect");
 
-      html_start();
+      html_start("Change Settings");
       cgiCopyTemplateLang(stdout, TEMPLATES, "restart.tmpl", getenv("LANG"));
     }
 
@@ -2019,7 +2095,7 @@ do_config_server(http_t      *http,	/* I - HTTP connection */
 
     if ((tempfd = cupsTempFd(tempfile, sizeof(tempfile))) < 0)
     {
-      html_start();
+      html_start("Edit Configuration File");
       cgiSetVariable("ERROR", strerror(errno));
       cgiCopyTemplateLang(stdout, TEMPLATES, "error.tmpl", getenv("LANG"));
       html_end();
@@ -2030,7 +2106,7 @@ do_config_server(http_t      *http,	/* I - HTTP connection */
 
     if ((temp = cupsFileOpenFd(tempfd, "w")) == NULL)
     {
-      html_start();
+      html_start("Edit Configuration File");
       cgiSetVariable("ERROR", strerror(errno));
       cgiCopyTemplateLang(stdout, TEMPLATES, "error.tmpl", getenv("LANG"));
       html_end();
@@ -2045,7 +2121,7 @@ do_config_server(http_t      *http,	/* I - HTTP connection */
     * Copy the cupsd.conf text from the form variable...
     */
 
-    start = cgiGetVariable("CUPSD.CONF");
+    start = cgiGetVariable("CUPSDCONF");
     while (start)
     {
       if ((end = strstr(start, "\r\n")) == NULL)
@@ -2074,14 +2150,14 @@ do_config_server(http_t      *http,	/* I - HTTP connection */
     if (status != HTTP_CREATED)
     {
       cgiSetVariable("ERROR", cupsLangString(language, status));
-      html_start();
+      html_start("Edit Configuration File");
       cgiCopyTemplateLang(stdout, TEMPLATES, "error.tmpl", getenv("LANG"));
     }
     else
     {
       cgiSetVariable("refresh_page", "10;/admin?OP=redirect");
 
-      html_start();
+      html_start("Edit Configuration File");
       cgiCopyTemplateLang(stdout, TEMPLATES, "restart.tmpl", getenv("LANG"));
     }
 
@@ -2113,7 +2189,7 @@ do_config_server(http_t      *http,	/* I - HTTP connection */
 
     if (stat(filename, &info))
     {
-      html_start();
+      html_start("Edit Configuration File");
       cgiSetVariable("ERROR", strerror(errno));
       cgiCopyTemplateLang(stdout, TEMPLATES, "error.tmpl", getenv("LANG"));
       html_end();
@@ -2124,7 +2200,7 @@ do_config_server(http_t      *http,	/* I - HTTP connection */
 
     if (info.st_size > (1024 * 1024))
     {
-      html_start();
+      html_start("Edit Configuration File");
       cgiSetVariable("ERROR", "Unable to edit cupsd.conf files larger than 1MB!");
       cgiCopyTemplateLang(stdout, TEMPLATES, "error.tmpl", getenv("LANG"));
       html_end();
@@ -2144,7 +2220,7 @@ do_config_server(http_t      *http,	/* I - HTTP connection */
       * Unable to open - log an error...
       */
 
-      html_start();
+      html_start("Edit Configuration File");
       cgiSetVariable("ERROR", strerror(errno));
       cgiCopyTemplateLang(stdout, TEMPLATES, "error.tmpl", getenv("LANG"));
       html_end();
@@ -2162,14 +2238,14 @@ do_config_server(http_t      *http,	/* I - HTTP connection */
     cupsFileRead(cupsd, buffer, info.st_size);
     cupsFileClose(cupsd);
 
-    cgiSetVariable("CUPSD.CONF", buffer);
+    cgiSetVariable("CUPSDCONF", buffer);
     free(buffer);
 
    /*
     * Show the current config file...
     */
 
-    html_start();
+    html_start("Edit Configuration File");
 
     printf("<!-- \"%s\" -->\n", filename);
 
@@ -2197,7 +2273,7 @@ do_delete_class(http_t      *http,	/* I - HTTP connection */
 
   if (cgiGetVariable("CONFIRM") == NULL)
   {
-    html_start();
+    html_start("Delete Class");
     cgiCopyTemplateLang(stdout, TEMPLATES, "class-confirm.tmpl", getenv("LANG"));
     html_end();
     return;
@@ -2208,7 +2284,7 @@ do_delete_class(http_t      *http,	/* I - HTTP connection */
   else
   {
     cgiSetVariable("ERROR", ippErrorString(IPP_NOT_FOUND));
-    html_start();
+    html_start("Delete Class");
     cgiCopyTemplateLang(stdout, TEMPLATES, "error.tmpl", getenv("LANG"));
     html_end();
     return;
@@ -2250,7 +2326,7 @@ do_delete_class(http_t      *http,	/* I - HTTP connection */
   else
     status = cupsLastError();
 
-  html_start();
+  html_start("Delete Class");
 
   if (status > IPP_OK_CONFLICT)
   {
@@ -2281,7 +2357,7 @@ do_delete_printer(http_t      *http,	/* I - HTTP connection */
 
   if (cgiGetVariable("CONFIRM") == NULL)
   {
-    html_start();
+    html_start("Delete Printer");
     cgiCopyTemplateLang(stdout, TEMPLATES, "printer-confirm.tmpl", getenv("LANG"));
     html_end();
     return;
@@ -2292,7 +2368,7 @@ do_delete_printer(http_t      *http,	/* I - HTTP connection */
   else
   {
     cgiSetVariable("ERROR", ippErrorString(IPP_NOT_FOUND));
-    html_start();
+    html_start("Delete Printer");
     cgiCopyTemplateLang(stdout, TEMPLATES, "error.tmpl", getenv("LANG"));
     html_end();
     return;
@@ -2334,7 +2410,7 @@ do_delete_printer(http_t      *http,	/* I - HTTP connection */
   else
     status = cupsLastError();
 
-  html_start();
+  html_start("Delete Printer");
 
   if (status > IPP_OK_CONFLICT)
   {
@@ -2374,7 +2450,7 @@ do_menu(http_t      *http,		/* I - HTTP connection */
 
   snprintf(line, sizeof(line), "%s/cupsd.conf", server_root);
 
-  html_start();
+  html_start(NULL);
 
   printf("<!-- \"%s\" -->\n", line);
 
@@ -2388,7 +2464,7 @@ do_menu(http_t      *http,		/* I - HTTP connection */
     * Unable to open - log an error...
     */
 
-    html_start();
+    html_start(NULL);
     cgiSetVariable("ERROR", strerror(errno));
     cgiCopyTemplateLang(stdout, TEMPLATES, "error.tmpl", getenv("LANG"));
     html_end();
@@ -2771,7 +2847,8 @@ do_menu(http_t      *http,		/* I - HTTP connection */
 static void
 do_printer_op(http_t      *http,	/* I - HTTP connection */
               cups_lang_t *language,	/* I - Client's language */
-	      ipp_op_t    op)		/* I - Operation to perform */
+	      ipp_op_t    op,		/* I - Operation to perform */
+	      const char  *title)	/* I - Title of page */
 {
   ipp_t		*request,		/* IPP request */
 		*response;		/* IPP response */
@@ -2785,7 +2862,7 @@ do_printer_op(http_t      *http,	/* I - HTTP connection */
   else
   {
     cgiSetVariable("ERROR", ippErrorString(IPP_NOT_FOUND));
-    html_start();
+    html_start(title);
     cgiCopyTemplateLang(stdout, TEMPLATES, "error.tmpl", getenv("LANG"));
     html_end();
     return;
@@ -2827,25 +2904,40 @@ do_printer_op(http_t      *http,	/* I - HTTP connection */
   else
     status = cupsLastError();
 
-  html_start();
-
   if (status > IPP_OK_CONFLICT)
   {
+    html_start(title);
     cgiSetVariable("ERROR", ippErrorString(status));
     cgiCopyTemplateLang(stdout, TEMPLATES, "error.tmpl", getenv("LANG"));
   }
-  else if (op == IPP_PAUSE_PRINTER)
-    cgiCopyTemplateLang(stdout, TEMPLATES, "printer-stop.tmpl", getenv("LANG"));
-  else if (op == IPP_RESUME_PRINTER)
-    cgiCopyTemplateLang(stdout, TEMPLATES, "printer-start.tmpl", getenv("LANG"));
-  else if (op == CUPS_ACCEPT_JOBS)
-    cgiCopyTemplateLang(stdout, TEMPLATES, "printer-accept.tmpl", getenv("LANG"));
-  else if (op == CUPS_REJECT_JOBS)
-    cgiCopyTemplateLang(stdout, TEMPLATES, "printer-reject.tmpl", getenv("LANG"));
-  else if (op == IPP_PURGE_JOBS)
-    cgiCopyTemplateLang(stdout, TEMPLATES, "printer-purge.tmpl", getenv("LANG"));
-  else if (op == CUPS_SET_DEFAULT)
-    cgiCopyTemplateLang(stdout, TEMPLATES, "printer-default.tmpl", getenv("LANG"));
+  else
+  {
+   /*
+    * Redirect successful updates back to the printer page...
+    */
+
+    char	refresh[1024];		/* Refresh URL */
+
+    form_encode(uri, printer, sizeof(uri));
+    snprintf(refresh, sizeof(refresh), "2;/admin?OP=redirect&URL=/printers/%s",
+             uri);
+    cgiSetVariable("refresh_page", refresh);
+
+    html_start(title);
+
+    if (op == IPP_PAUSE_PRINTER)
+      cgiCopyTemplateLang(stdout, TEMPLATES, "printer-stop.tmpl", getenv("LANG"));
+    else if (op == IPP_RESUME_PRINTER)
+      cgiCopyTemplateLang(stdout, TEMPLATES, "printer-start.tmpl", getenv("LANG"));
+    else if (op == CUPS_ACCEPT_JOBS)
+      cgiCopyTemplateLang(stdout, TEMPLATES, "printer-accept.tmpl", getenv("LANG"));
+    else if (op == CUPS_REJECT_JOBS)
+      cgiCopyTemplateLang(stdout, TEMPLATES, "printer-reject.tmpl", getenv("LANG"));
+    else if (op == IPP_PURGE_JOBS)
+      cgiCopyTemplateLang(stdout, TEMPLATES, "printer-purge.tmpl", getenv("LANG"));
+    else if (op == CUPS_SET_DEFAULT)
+      cgiCopyTemplateLang(stdout, TEMPLATES, "printer-default.tmpl", getenv("LANG"));
+  }
 
   html_end();
 }
@@ -2885,7 +2977,7 @@ do_set_allowed_users(
   else
   {
     cgiSetVariable("ERROR", ippErrorString(IPP_NOT_FOUND));
-    html_start();
+    html_start("Set Allowed Users");
     cgiCopyTemplateLang(stdout, TEMPLATES, "error.tmpl", getenv("LANG"));
     html_end();
     return;
@@ -2941,7 +3033,7 @@ do_set_allowed_users(
     else
       status = cupsLastError();
 
-    html_start();
+    html_start("Set Allowed Users");
 
     if (status > IPP_OK_CONFLICT)
     {
@@ -3098,15 +3190,29 @@ do_set_allowed_users(
     else
       status = cupsLastError();
 
-    html_start();
-
     if (status > IPP_OK_CONFLICT)
     {
+      html_start("Set Allowed Users");
       cgiSetVariable("ERROR", ippErrorString(status));
       cgiCopyTemplateLang(stdout, TEMPLATES, "error.tmpl", getenv("LANG"));
     }
     else
+    {
+     /*
+      * Redirect successful updates back to the printer page...
+      */
+
+      char	refresh[1024];		/* Refresh URL */
+
+      form_encode(uri, printer, sizeof(uri));
+      snprintf(refresh, sizeof(refresh), "2;/admin?OP=redirect&URL=/printers/%s",
+               uri);
+      cgiSetVariable("refresh_page", refresh);
+
+      html_start("Set Allowed Users");
+
       cgiCopyTemplateLang(stdout, TEMPLATES, "printer-modified.tmpl", getenv("LANG"));
+    }
 
     html_end();
   }
@@ -3185,54 +3291,6 @@ form_encode(char       *dst,		/* I - Destination string */
 
 
 /*
- * 'get_line()' - Get a line that is terminated by a LF, CR, or CR LF.
- */
-
-static char *				/* O - Pointer to buf or NULL on EOF */
-get_line(char *buf,			/* I - Line buffer */
-         int  length,			/* I - Length of buffer */
-	 FILE *fp)			/* I - File to read from */
-{
-  char	*bufptr;			/* Pointer into buffer */
-  int	ch;				/* Character from file */
-
-
-  length --;
-  bufptr = buf;
-
-  while ((ch = getc(fp)) != EOF)
-  {
-    if (ch == '\n')
-      break;
-    else if (ch == '\r')
-    {
-     /*
-      * Look for LF...
-      */
-
-      ch = getc(fp);
-      if (ch != '\n' && ch != EOF)
-        ungetc(ch, fp);
-
-      break;
-    }
-
-    *bufptr++ = ch;
-    length --;
-    if (length == 0)
-      break;
-  }
-
-  *bufptr = '\0';
-
-  if (ch == EOF)
-    return (NULL);
-  else
-    return (buf);
-}
-
-
-/*
  * 'html_end()' - End a HTML page.
  */
 
@@ -3252,7 +3310,7 @@ html_end(void)
  */
 
 static void
-html_start(void)
+html_start(const char *title)		/* I - Title of page */
 {
  /*
   * Tell the client to expect UTF-8 encoded HTML...
@@ -3264,7 +3322,7 @@ html_start(void)
   * Send a standard header...
   */
 
-  cgiSetVariable("TITLE", "Admin");
+  cgiSetVariable("TITLE", title ? title : "Administration");
   ippSetServerVersion();
 
   cgiCopyTemplateLang(stdout, TEMPLATES, "header.tmpl", getenv("LANG"));

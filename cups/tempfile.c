@@ -25,8 +25,9 @@
  *
  * Contents:
  *
- *   cupsTempFd()   - Create a temporary file.
- *   cupsTempFile() - Generate a temporary filename.
+ *   cupsTempFd()    - Create a temporary file.
+ *   cupsTempFile()  - Generate a temporary filename.
+ *   cupsTempFile2() - Create a temporary CUPS file.
  */
 
 /*
@@ -213,6 +214,31 @@ cupsTempFile(char *filename,		/* I - Pointer to buffer */
   */
 
   return (filename);
+}
+
+
+/*
+ * 'cupsTempFile2()' - Create a temporary CUPS file.
+ */
+
+cups_file_t *				/* O - CUPS file or NULL on error */
+cupsTempFile2(char *filename,		/* I - Pointer to buffer */
+              int  len)			/* I - Size of buffer */
+{
+  cups_file_t	*file;			/* CUPS file */
+  int		fd;			/* File descriptor */
+
+
+  if ((fd = cupsTempFd(filename, len)) < 0)
+    return (NULL);
+  else if ((file = cupsFileOpenFd(fd, "w")) == NULL)
+  {
+    close(fd);
+    unlink(filename);
+    return (NULL);
+  }
+  else
+    return (file);
 }
 
 

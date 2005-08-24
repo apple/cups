@@ -4,53 +4,67 @@
 <INPUT TYPE="HIDDEN" NAME="PRINTER_LOCATION" VALUE="{?printer_location}">
 <INPUT TYPE="HIDDEN" NAME="PRINTER_INFO" VALUE="{?printer_info}">
 <INPUT TYPE="HIDDEN" NAME="DEVICE_URI" VALUE="{device_uri}">
-<TABLE CELLPADDING="0" CELLSPACING="0" BORDER="0" WIDTH="100%">
-<TR BGCOLOR="#999966">
-	<TH WIDTH="16"><IMG SRC="/images/left.gif" ALT=""></TH>
-	<TH COLSPAN="2">Serial Port Settings for {printer_name}</TH>
-	<TH BGCOLOR="#cccc99" WIDTH="16"><IMG SRC="/images/right.gif" ALT=""></TH>
+
+<P><TABLE CELLPADDING="0" CELLSPACING="0" BORDER="0" WIDTH="100%">
+<TR CLASS="header">
+<TH ALIGN="LEFT" VALIGN="TOP"><IMG SRC="/images/hdr-top-left.gif"
+WIDTH="16" HEIGHT="16" ALT=""></TH>
+<TH COLSPAN="2">Serial Port Settings for {printer_name}</TH>
+<TH ALIGN="RIGHT" VALIGN="TOP"><IMG
+SRC="/images/hdr-top-right.gif" WIDTH="16" HEIGHT="16"
+ALT=""></TH>
 </TR>
-<TR>
-	<TD HEIGHT="4"></TD>
+<TR CLASS="data">
+<TD></TD>
+<TH ALIGN="RIGHT">Baud Rate:</TH>
+<TD><SELECT NAME="BAUDRATE">
+{[baudrates]<OPTION {?baudrate={baudrates}?SELECTED:}>{baudrates}}
+</SELECT></TD>
+<TD></TD>
 </TR>
-<TR>
-	<TD></TD>
-	<TD ALIGN="RIGHT">Baud Rate:&nbsp;</TD>
-	<TD><SELECT NAME="BAUDRATE">
-	{[baudrates]<OPTION {?baudrate={baudrates}?SELECTED:}>{baudrates}}
-	</SELECT></TD>
+<TR CLASS="data">
+<TD></TD>
+<TH ALIGN="RIGHT">Parity:</TH>
+<TD><SELECT NAME="PARITY">
+<OPTION VALUE="none" {?parity=none?SELECTED:}>None
+<OPTION VALUE="even" {?parity=even?SELECTED:}>Even
+<OPTION VALUE="odd" {?parity=odd?SELECTED:}>Odd
+</SELECT></TD>
+<TD></TD>
 </TR>
-<TR>
-	<TD></TD>
-	<TD ALIGN="RIGHT">Parity:&nbsp;</TD>
-	<TD><SELECT NAME="PARITY">
-	<OPTION VALUE="none" {?parity=none?SELECTED:}>None
-	<OPTION VALUE="even" {?parity=even?SELECTED:}>Even
-	<OPTION VALUE="odd" {?parity=odd?SELECTED:}>Odd
-	</SELECT></TD>
+<TR CLASS="data">
+<TD></TD>
+<TH ALIGN="RIGHT">Data Bits:</TH>
+<TD><SELECT NAME="BITS">
+<OPTION {?bits=8?SELECTED:}>8
+<OPTION {?bits=7?SELECTED:}>7
+</SELECT></TD>
+<TD></TD>
 </TR>
-<TR>
-	<TD></TD>
-	<TD ALIGN="RIGHT">Data Bits:&nbsp;</TD>
-	<TD><SELECT NAME="BITS">
-	<OPTION {?bits=8?SELECTED:}>8
-	<OPTION {?bits=7?SELECTED:}>7
-	</SELECT></TD>
+<TR CLASS="data">
+<TD></TD>
+<TH ALIGN="RIGHT">Flow Control:</TH>
+<TD><SELECT NAME="FLOW">
+<OPTION VALUE="none" {?flow=none?SELECTED:}>None
+<OPTION VALUE="soft" {?flow=soft?SELECTED:}>XON/XOFF (Software)
+<OPTION VALUE="hard" {?flow=hard?SELECTED:}>RTS/CTS (Hardware)
+<OPTION VALUE="dtrdsr" {?flow=dtrdsr?SELECTED:}>DTR/DSR (Hardware)
+</SELECT></TD>
+<TD></TD>
 </TR>
-<TR>
-	<TD></TD>
-	<TD ALIGN="RIGHT">Flow Control:&nbsp;</TD>
-	<TD><SELECT NAME="FLOW">
-	<OPTION VALUE="none" {?flow=none?SELECTED:}>None
-	<OPTION VALUE="soft" {?flow=soft?SELECTED:}>XON/XOFF (Software)
-	<OPTION VALUE="hard" {?flow=hard?SELECTED:}>RTS/CTS (Hardware)
-	<OPTION VALUE="dtrdsr" {?flow=dtrdsr?SELECTED:}>DTR/DSR (Hardware)
-	</SELECT></TD>
+<TR CLASS="data">
+<TD></TD>
+<TD></TD>
+<TD><INPUT TYPE="IMAGE" SRC="/images/continue.gif" ALT="Continue" BORDER="0"></TD>
+<TD></TD>
 </TR>
-<TR>
-	<TD></TD>
-	<TD></TD>
-	<TD><INPUT TYPE="IMAGE" SRC="/images/continue.gif" ALT="Continue" BORDER="0"></TD>
+<TR CLASS="header">
+<TH ALIGN="LEFT" VALIGN="BOTTOM"><IMG SRC="/images/hdr-bottom-left.gif"
+WIDTH="16" HEIGHT="16" ALT=""></TH>
+<TH COLSPAN="2"></TH>
+<TH ALIGN="RIGHT" VALIGN="BOTTOM"><IMG
+SRC="/images/hdr-bottom-right.gif" WIDTH="16" HEIGHT="16"
+ALT=""></TH>
 </TR>
-</TABLE>
+</TABLE></P>
 </FORM>

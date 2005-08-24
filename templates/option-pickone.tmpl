@@ -1,7 +1,8 @@
-<TR>
-	<TD></TD>
-	<TD ALIGN="RIGHT">{conflicted=1?<FONT COLOR="#ff0000"><B>:}<A NAME="{keyword}">{keytext}</A>:{conflicted=1?<BR>(conflicting)</B></FONT>:}</TD>
-	<TD><SELECT NAME="{keyword}">
-	{[choices]<OPTION {choices={defchoice}?SELECTED:} VALUE="{choices}">{text}}
-	</SELECT></TD>
+<TR CLASS="data">
+<TD></TD>
+<TH ALIGN="RIGHT"{conflicted=1? CLASS="conflict":}><A NAME="{keyword}">{keytext}</A>:</TH>
+<TD><SELECT NAME="{keyword}">
+{[choices]<OPTION {choices={defchoice}?SELECTED:} VALUE="{choices}">{text}}
+</SELECT></TD>
+<TD></TD>
 </TR>

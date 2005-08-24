@@ -4,13 +4,8 @@ BODY {
   font-family: sans-serif;
 }
 
-H1, H2, H3, H4, H5, H6, P {
+H1, H2, H3, H4, H5, H6, P, TD, TH {
   font-family: sans-serif;
-}
-
-TD, TH {
-  font-family: sans-serif;
-  text-align: left
 }
 
 KBD {
@@ -69,6 +64,16 @@ TR.header, TR.header TH, TH.header {
   background-color: #bbbb88;
 }
 
-TR.page, TD.page {
+TR.page, TD.page, TR.page TD {
   background-color: #d4d4a4;
+  padding: 5;
+}
+
+TR.data, TD.data, TR.data TD {
+  background-color: #eeeebb;
+  padding: 5;
+}
+
+.conflict {
+  color: red;
 }

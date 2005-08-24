@@ -1,54 +1,66 @@
-<P>{#job_id=0?No {?which_jobs=completed?Completed:Active} Jobs:
-<TABLE CELLPADDING="0" CELLSPACING="0" BORDER="0" WIDTH="100%">
-<TR BGCOLOR="#999966">
-	<TH WIDTH="16"><IMG SRC="/images/left.gif" ALT=""></TH>
-	<TH>ID&nbsp;</TH>
-	<TH>Name&nbsp;</TH>
-	<TH>User&nbsp;</TH>
-	<TH>Size&nbsp;</TH>
-	<TH>State&nbsp;</TH>
-	<TH>Control&nbsp;</TH>
-	<TH BGCOLOR="#cccc99" WIDTH="16"><IMG SRC="/images/right.gif" ALT=""></TH>
+<P>{?which_jobs=?<A
+HREF="{?printer_name=?/jobs:{printer_uri_supported}}?which_jobs=completed"><IMG
+SRC="/images/show-completed.gif" BORDER="0" ALT="Show Completed
+Jobs">:<A
+HREF="{?printer_name=?/jobs:{printer_uri_supported}}"><IMG
+SRC="/images/show-active.gif" BORDER="0" ALT="Show Active
+Jobs">}</A></P>
+
+{#job_id=0?No {?which_jobs=completed?Completed:Active} Jobs:
+<P><TABLE CELLPADDING="0" CELLSPACING="0" BORDER="0" WIDTH="100%">
+<TR CLASS="header">
+<TH ALIGN="LEFT" VALIGN="TOP"><IMG SRC="/images/hdr-top-left.gif"
+WIDTH="16" HEIGHT="16" ALT=""></TH>
+<TH>ID&nbsp;</TH>
+<TH>Name&nbsp;</TH>
+<TH>User&nbsp;</TH>
+<TH>Size&nbsp;</TH>
+<TH>State&nbsp;</TH>
+<TH>Control&nbsp;</TH>
+<TH ALIGN="RIGHT" VALIGN="TOP"><IMG
+SRC="/images/hdr-top-right.gif" WIDTH="16" HEIGHT="16"
+ALT=""></TH>
 </TR>
-<TR>
-	<TD HEIGHT="4"></TD>
-</TR>
+
 {[job_id]
-<TR VALIGN="TOP">
-	<TD HEIGHT="28"></TD>
-	<TD><A HREF="{job_printer_uri}">{job_printer_name}</A>-{job_id}&nbsp;</TD>
-	<TD>{?job_name=?Unknown:{job_name}}&nbsp;</TD>
-	<TD>{job_originating_user_name}&nbsp;</TD>
-	<TD>{job_k_octets}k&nbsp;</TD>
-	<TD>{job_state=3?pending since<BR>{time_at_creation}:{job_state=4?held since<BR>{time_at_creation}:
-	{job_state=5?processing since<BR>{time_at_processing}:{job_state=6?stopped at<BR>{time_at_completed}:
-	{job_state=7?cancelled at<BR>{time_at_completed}:{job_state=8?aborted:completed at<BR>{time_at_completed}}}}}}}&nbsp;</TD>
-	<TD>
-	{job_state>5?
-	{job_k_octets>0?
-	<A HREF="/jobs/?op=restart-job&job_id={job_id}&job_printer_uri={job_printer_uri}">
-	<IMG SRC="/images/restart-job.gif" ALT="Restart Job" BORDER="0"></A>
-	:}:}
-	{job_state>6?:
-	{job_state=4?
-	<A HREF="/jobs/?op=release-job&job_id={job_id}&job_printer_uri={job_printer_uri}">
-	<IMG SRC="/images/release-job.gif" ALT="Release Job" BORDER="0"></A>
-	:
-	<A HREF="/jobs/?op=hold-job&job_id={job_id}&job_printer_uri={job_printer_uri}">
-	<IMG SRC="/images/hold-job.gif" ALT="Hold Job" BORDER="0"></A>
-	}
-	<A HREF="/jobs/?op=cancel-job&job_id={job_id}&job_printer_uri={job_printer_uri}">
-	<IMG SRC="/images/cancel-job.gif" ALT="Cancel Job" BORDER="0"></A>
-	}
-	&nbsp;</TD>
+<TR CLASS="data" VALIGN="TOP">
+<TD></TD>
+<TD><A HREF="{job_printer_uri}">{job_printer_name}</A>-{job_id}&nbsp;</TD>
+<TD>{?job_name=?Unknown:{job_name}}&nbsp;</TD>
+<TD>{job_originating_user_name}&nbsp;</TD>
+<TD>{job_k_octets}k&nbsp;</TD>
+<TD>{job_state=3?pending since<BR>{time_at_creation}:{job_state=4?held since<BR>{time_at_creation}:
+{job_state=5?processing since<BR>{time_at_processing}:{job_state=6?stopped at<BR>{time_at_completed}:
+{job_state=7?cancelled at<BR>{time_at_completed}:{job_state=8?aborted:completed at<BR>{time_at_completed}}}}}}}&nbsp;</TD>
+<TD>
+{job_state>5?
+{job_k_octets>0?
+<A HREF="/jobs/?op=restart-job&job_id={job_id}&job_printer_uri={job_printer_uri}">
+<IMG SRC="/images/restart-job.gif" ALT="Restart Job" BORDER="0"></A>
+:}:}
+{job_state>6?:
+{job_state=4?
+<A HREF="/jobs/?op=release-job&job_id={job_id}&job_printer_uri={job_printer_uri}">
+<IMG SRC="/images/release-job.gif" ALT="Release Job" BORDER="0"></A>
+:
+<A HREF="/jobs/?op=hold-job&job_id={job_id}&job_printer_uri={job_printer_uri}">
+<IMG SRC="/images/hold-job.gif" ALT="Hold Job" BORDER="0"></A>
+}
+<A HREF="/jobs/?op=cancel-job&job_id={job_id}&job_printer_uri={job_printer_uri}">
+<IMG SRC="/images/cancel-job.gif" ALT="Cancel Job" BORDER="0"></A>
+}
+&nbsp;</TD>
+</TD>
+<TD></TD>
 </TR>
 }
-</TABLE>
-}
-<P>{?which_jobs=?
-<A HREF="{?printer_name=?/jobs:/printers/{printer_name}}?which_jobs=completed">
-<IMG SRC="/images/show-completed.gif" BORDER="0" ALT="Show Completed Jobs"></A>
-:
-<A HREF="{?printer_name=?/jobs:/printers/{printer_name}}">
-<IMG SRC="/images/show-active.gif" BORDER="0" ALT="Show Active Jobs"></A>
+<TR CLASS="header">
+<TH ALIGN="LEFT" VALIGN="BOTTOM"><IMG SRC="/images/hdr-bottom-left.gif"
+WIDTH="16" HEIGHT="16" ALT=""></TH>
+<TH COLSPAN="6"></TH>
+<TH ALIGN="RIGHT" VALIGN="BOTTOM"><IMG
+SRC="/images/hdr-bottom-right.gif" WIDTH="16" HEIGHT="16"
+ALT=""></TH>
+</TR>
+</TABLE></P>
 }

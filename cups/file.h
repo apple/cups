@@ -27,8 +27,16 @@
  *         WWW: http://www.cups.org
  */
 
-#ifndef _CUPS_FILE_H
+#ifndef _CUPS_FILE_H_
 #  define _CUPS_FILE_H_
+
+
+/*
+ * Include necessary headers...
+ */
+
+#  include <sys/types.h>
+
 
 /*
  * C++ magic...

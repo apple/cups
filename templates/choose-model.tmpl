@@ -8,28 +8,39 @@
 <INPUT TYPE="HIDDEN" NAME="BITS" VALUE="{?bits}">
 <INPUT TYPE="HIDDEN" NAME="PARITY" VALUE="{?parity}">
 <INPUT TYPE="HIDDEN" NAME="FLOW" VALUE="{?flow}">
-<TABLE CELLPADDING="0" CELLSPACING="0" BORDER="0" WIDTH="100%">
-<TR BGCOLOR="#999966">
-	<TH WIDTH="16"><IMG SRC="/images/left.gif" ALT=""></TH>
-	<TH COLSPAN="2">Model/Driver for {printer_name}</TH>
-	<TH BGCOLOR="#cccc99" WIDTH="16"><IMG SRC="/images/right.gif" ALT=""></TH>
+
+<P><TABLE CELLPADDING="0" CELLSPACING="0" BORDER="0" WIDTH="100%">
+<TR CLASS="header">
+<TH ALIGN="LEFT" VALIGN="TOP"><IMG SRC="/images/hdr-top-left.gif"
+WIDTH="16" HEIGHT="16" ALT=""></TH>
+<TH COLSPAN="2">Model/Driver for {printer_name}</TH>
+<TH ALIGN="RIGHT" VALIGN="TOP"><IMG
+SRC="/images/hdr-top-right.gif" WIDTH="16" HEIGHT="16"
+ALT=""></TH>
 </TR>
-<TR>
-	<TD HEIGHT="4"></TD>
+<TR CLASS="data">
+<TD></TD>
+<TH ALIGN="RIGHT">Model:&nbsp;</TH>
+<TD>
+<SELECT NAME="PPD_NAME" SIZE="10">
+{[ppd_name]<OPTION VALUE="{ppd_name}" {?current_make_and_model={ppd_make_and_model}?SELECTED:}>{ppd_make_and_model} ({ppd_natural_language})
+}</SELECT>
+</TD>
+<TD></TD>
 </TR>
-<TR>
-	<TD></TD>
-	<TD ALIGN="RIGHT">Model:&nbsp;</TD>
-	<TD>
-	<SELECT NAME="PPD_NAME" SIZE="10">
-	{[ppd_name]<OPTION VALUE="{ppd_name}" {?current_make_and_model={ppd_make_and_model}?SELECTED:}>{ppd_make_and_model} ({ppd_natural_language})
-	}</SELECT>
-	</TD>
+<TR CLASS="data">
+<TD></TD>
+<TD></TD>
+<TD><INPUT TYPE="IMAGE" SRC="/images/continue.gif" ALT="Continue" BORDER="0"></TD>
+<TD></TD>
 </TR>
-<TR>
-	<TD></TD>
-	<TD></TD>
-	<TD><INPUT TYPE="IMAGE" SRC="/images/continue.gif" ALT="Continue" BORDER="0"></TD>
+<TR CLASS="header">
+<TH ALIGN="LEFT" VALIGN="BOTTOM"><IMG SRC="/images/hdr-bottom-left.gif"
+WIDTH="16" HEIGHT="16" ALT=""></TH>
+<TH COLSPAN="2"></TH>
+<TH ALIGN="RIGHT" VALIGN="BOTTOM"><IMG
+SRC="/images/hdr-bottom-right.gif" WIDTH="16" HEIGHT="16"
+ALT=""></TH>
 </TR>
-</TABLE>
+</TABLE></P>
 </FORM>

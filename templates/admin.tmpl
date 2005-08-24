@@ -1,95 +1,164 @@
-<TABLE CELLPADDING="0" CELLSPACING="0" BORDER="0" WIDTH="100%">
-<TR>
-	<TH BGCOLOR="#999966"><IMG SRC="/images/left.gif" ALT=""></TH>
-	<TH BGCOLOR="#999966">Classes</TH>
-	<TH WIDTH="16"><IMG SRC="/images/right.gif" ALT=""></TH>
-</TR>
-<TR>
-	<TD HEIGHT="4"></TD>
-</TR>
-<TR>
-	<TD></TD>
-	<TD><A HREF="/admin/?op=add-class"><IMG SRC="/images/add-class.gif"
-	ALT="Add Class" BORDER="0"></A>
-	<A HREF="/classes/"><IMG SRC="/images/manage-classes.gif"
-	ALT="Manage Classes" BORDER="0"></A>
-	</TD>
-</TR>
-<TR>
-	<TD>&nbsp;</TD>
-</TR>
-<TR>
-	<TH BGCOLOR="#999966"><IMG SRC="/images/left.gif" ALT=""></TH>
-	<TH BGCOLOR="#999966">Jobs</TH>
-	<TH WIDTH="16"><IMG SRC="/images/right.gif" ALT=""></TH>
-</TR>
-<TR>
-	<TD HEIGHT="4"></TD>
-</TR>
-<TR>
-	<TD></TD>
-	<TD><A HREF="/jobs/"><IMG SRC="/images/manage-jobs.gif"
-	ALT="Manage Jobs" BORDER="0"></A>
-	</TD>
-</TR>
-<TR>
-	<TD>&nbsp;</TD>
-</TR>
-<TR>
-	<TH BGCOLOR="#999966"><IMG SRC="/images/left.gif" ALT=""></TH>
-	<TH BGCOLOR="#999966">Printers</TH>
-	<TH WIDTH="16"><IMG SRC="/images/right.gif" ALT=""></TH>
-</TR>
-<TR>
-	<TD HEIGHT="4"></TD>
-</TR>
-<TR>
-	<TD></TD>
-	<TD><A HREF="/admin/?op=add-printer"><IMG
-	SRC="/images/add-printer.gif" ALT="Add Printer" BORDER="0"></A>
-	<A HREF="/printers/"><IMG
-	SRC="/images/manage-printers.gif" ALT="Manage Printers" BORDER="0"></A>
-	{#device_uri=0?:<P><B>New Printers Found:</B></P><UL>{[device_uri]
-	<LI>{device_make_and_model} ({device_info})
-	<A HREF="/admin/?op=add-printer&amp;{device_options}"><IMG
-	SRC="/images/add-this-printer.gif" ALT="Add This Printer" BORDER="0"
-	ALIGN="MIDDLE"></A></LI>
-	}</UL>}</TD>
-</TR>
-<TR>
-	<TD>&nbsp;</TD>
-</TR>
-<TR>
-	<TH BGCOLOR="#999966"><IMG SRC="/images/left.gif" ALT=""></TH>
-	<TH BGCOLOR="#999966">Server</TH>
-	<TH WIDTH="16"><IMG SRC="/images/right.gif" ALT=""></TH>
-</TR>
-<TR>
-	<TD HEIGHT="4"></TD>
-</TR>
-<TR>
-	<TD></TD>
-	<TD><A HREF="/admin/?op=config-server"><IMG
-	SRC="/images/edit-configuration-file.gif" ALT="Edit Configuration File"
-	BORDER="0"></A>
-	<A HREF="/admin/log/access_log" TARGET="_new"><IMG
-	SRC="/images/view-access-log.gif" ALT="View Access Log" BORDER="0"></A>
-	<A HREF="/admin/log/error_log" TARGET="_new"><IMG
-	SRC="/images/view-error-log.gif" ALT="View Error Log" BORDER="0"></A>
-	<A HREF="/admin/log/page_log" TARGET="_new"><IMG
-	SRC="/images/view-page-log.gif" ALT="View Page Log" BORDER="0"></A>
+<P><TABLE CELLPADDING="0" CELLSPACING="0" BORDER="0" WIDTH="100%">
+<TR><TD VALIGN="TOP">
 
-	<FORM METHOD="POST" ACTION="/admin"><P><B>Basic Server Settings:</B><P>
-	<P><INPUT TYPE="HIDDEN" NAME="OP" VALUE="config-server">
-	<INPUT TYPE="CHECKBOX" NAME="REMOTE_PRINTERS" {?remote_printers}> Show printers shared by other systems<BR>
-	<INPUT TYPE="CHECKBOX" NAME="SHARE_PRINTERS" {?share_printers}> Share printers connected to this system<BR>
-	<INPUT TYPE="CHECKBOX" NAME="REMOTE_ADMIN" {?remote_admin}> Allow remote administration<BR>
-	<INPUT TYPE="CHECKBOX" NAME="USER_CANCEL_ANY" {?user_cancel_any}> Allow users to cancel any job (not just their own)<BR>
-	<INPUT TYPE="CHECKBOX" NAME="DEBUG_LOGGING" {?debug_logging}> Save debugging information for troubleshooting</P>
-	<P><INPUT TYPE="IMAGE" SRC="/images/change-settings.gif" ALT="Change Settings" BORDER="0"></P>
-	</FORM></TD>
+<!-- CLASSES -->
+<P><TABLE CELLPADDING="0" CELLSPACING="0" BORDER="0" WIDTH="100%">
+<TR CLASS="header">
+<TH ALIGN="LEFT" VALIGN="TOP"><IMG SRC="/images/hdr-top-left.gif"
+WIDTH="16" HEIGHT="16" ALT=""></TH>
+<TH>Classes</TH>
+<TH ALIGN="RIGHT" VALIGN="TOP"><IMG
+SRC="/images/hdr-top-right.gif" WIDTH="16" HEIGHT="16"
+ALT=""></TH>
 </TR>
-<TR>
-	<TD>&nbsp;</TD>
+<TR CLASS="data">
+<TD></TD>
+<TD WIDTH="100%">
+
+<A HREF="/admin/?op=add-class"><IMG SRC="/images/add-class.gif"
+ALT="Add Class" BORDER="0"></A>
+
+<A HREF="/classes/"><IMG SRC="/images/manage-classes.gif"
+ALT="Manage Classes" BORDER="0"></A>
+
+</TD>
+<TD></TD>
 </TR>
-</TABLE>
+<TR CLASS="header">
+<TH ALIGN="LEFT" VALIGN="BOTTOM"><IMG SRC="/images/hdr-bottom-left.gif"
+WIDTH="16" HEIGHT="16" ALT=""></TH>
+<TH></TH>
+<TH ALIGN="RIGHT" VALIGN="BOTTOM"><IMG
+SRC="/images/hdr-bottom-right.gif" WIDTH="16" HEIGHT="16"
+ALT=""></TH>
+</TR>
+</TABLE></P>
+
+
+<!-- JOBS -->
+<P><TABLE CELLPADDING="0" CELLSPACING="0" BORDER="0" WIDTH="100%">
+<TR CLASS="header">
+<TH ALIGN="LEFT" VALIGN="TOP"><IMG SRC="/images/hdr-top-left.gif"
+WIDTH="16" HEIGHT="16" ALT=""></TH>
+<TH>Jobs</TH>
+<TH ALIGN="RIGHT" VALIGN="TOP"><IMG
+SRC="/images/hdr-top-right.gif" WIDTH="16" HEIGHT="16"
+ALT=""></TH>
+</TR>
+<TR CLASS="data">
+<TD></TD>
+<TD WIDTH="100%">
+
+<A HREF="/jobs/"><IMG SRC="/images/manage-jobs.gif" ALT="Manage
+Jobs" BORDER="0"></A>
+
+</TD>
+<TD></TD>
+</TR>
+<TR CLASS="header">
+<TH ALIGN="LEFT" VALIGN="BOTTOM"><IMG SRC="/images/hdr-bottom-left.gif"
+WIDTH="16" HEIGHT="16" ALT=""></TH>
+<TH></TH>
+<TH ALIGN="RIGHT" VALIGN="BOTTOM"><IMG
+SRC="/images/hdr-bottom-right.gif" WIDTH="16" HEIGHT="16"
+ALT=""></TH>
+</TR>
+</TABLE></P>
+
+
+<!-- PRINTERS -->
+<P><TABLE CELLPADDING="0" CELLSPACING="0" BORDER="0" WIDTH="100%">
+<TR CLASS="header">
+<TH ALIGN="LEFT" VALIGN="TOP"><IMG SRC="/images/hdr-top-left.gif"
+WIDTH="16" HEIGHT="16" ALT=""></TH>
+<TH>Printers</TH>
+<TH ALIGN="RIGHT" VALIGN="TOP"><IMG
+SRC="/images/hdr-top-right.gif" WIDTH="16" HEIGHT="16"
+ALT=""></TH>
+</TR>
+<TR CLASS="data">
+<TD></TD>
+<TD WIDTH="100%">
+
+<A HREF="/admin/?op=add-printer"><IMG
+SRC="/images/add-printer.gif" ALT="Add Printer" BORDER="0"></A>
+
+<A HREF="/printers/"><IMG SRC="/images/manage-printers.gif"
+ALT="Manage Printers" BORDER="0"></A>
+
+{#device_uri=0?:<P><B>New Printers Found:</B></P><UL>{[device_uri]
+<LI>{device_make_and_model} ({device_info})
+<A HREF="/admin/?op=add-printer&amp;{device_options}"><IMG
+SRC="/images/add-this-printer.gif" ALT="Add This Printer" BORDER="0"
+ALIGN="MIDDLE"></A></LI>
+}</UL>}
+</TD>
+<TD></TD>
+</TR>
+<TR CLASS="header">
+<TH ALIGN="LEFT" VALIGN="BOTTOM"><IMG SRC="/images/hdr-bottom-left.gif"
+WIDTH="16" HEIGHT="16" ALT=""></TH>
+<TH></TH>
+<TH ALIGN="RIGHT" VALIGN="BOTTOM"><IMG
+SRC="/images/hdr-bottom-right.gif" WIDTH="16" HEIGHT="16"
+ALT=""></TH>
+</TR>
+</TABLE></P>
+
+</TD><TD>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD><TD VALIGN="TOP">
+
+<!-- SERVER -->
+<P><TABLE CELLPADDING="0" CELLSPACING="0" BORDER="0" WIDTH="100%">
+<TR CLASS="header">
+<TH ALIGN="LEFT" VALIGN="TOP"><IMG SRC="/images/hdr-top-left.gif"
+WIDTH="16" HEIGHT="16" ALT=""></TH>
+<TH>Server</TH>
+<TH ALIGN="RIGHT" VALIGN="TOP"><IMG
+SRC="/images/hdr-top-right.gif" WIDTH="16" HEIGHT="16"
+ALT=""></TH>
+</TR>
+<TR CLASS="data">
+<TD></TD>
+<TD WIDTH="100%">
+
+<A HREF="/admin/?op=config-server"><IMG
+SRC="/images/edit-configuration-file.gif" ALT="Edit Configuration
+File" BORDER="0"></A>
+
+<A HREF="/admin/log/access_log" TARGET="_new"><IMG
+SRC="/images/view-access-log.gif" ALT="View Access Log"
+BORDER="0"></A>
+
+<A HREF="/admin/log/error_log" TARGET="_new"><IMG
+SRC="/images/view-error-log.gif" ALT="View Error Log"
+BORDER="0"></A>
+
+<A HREF="/admin/log/page_log" TARGET="_new"><IMG
+SRC="/images/view-page-log.gif" ALT="View Page Log"
+BORDER="0"></A>
+
+<FORM METHOD="POST" ACTION="/admin"><P><B>Basic Server Settings:</B><P>
+<P><INPUT TYPE="HIDDEN" NAME="OP" VALUE="config-server">
+<INPUT TYPE="CHECKBOX" NAME="REMOTE_PRINTERS" {?remote_printers}> Show printers shared by other systems<BR>
+<INPUT TYPE="CHECKBOX" NAME="SHARE_PRINTERS" {?share_printers}> Share printers connected to this system<BR>
+<INPUT TYPE="CHECKBOX" NAME="REMOTE_ADMIN" {?remote_admin}> Allow remote administration<BR>
+<INPUT TYPE="CHECKBOX" NAME="USER_CANCEL_ANY" {?user_cancel_any}> Allow users to cancel any job (not just their own)<BR>
+<INPUT TYPE="CHECKBOX" NAME="DEBUG_LOGGING" {?debug_logging}> Save debugging information for troubleshooting</P>
+<P><INPUT TYPE="IMAGE" SRC="/images/change-settings.gif" ALT="Change Settings" BORDER="0"></P>
+</FORM>
+
+</TD>
+<TD></TD>
+</TR>
+<TR CLASS="header">
+<TH ALIGN="LEFT" VALIGN="BOTTOM"><IMG SRC="/images/hdr-bottom-left.gif"
+WIDTH="16" HEIGHT="16" ALT=""></TH>
+<TH></TH>
+<TH ALIGN="RIGHT" VALIGN="BOTTOM"><IMG
+SRC="/images/hdr-bottom-right.gif" WIDTH="16" HEIGHT="16"
+ALT=""></TH>
+</TR>
+</TABLE></P>
+
+</TD></TR>
+</TABLE></P>

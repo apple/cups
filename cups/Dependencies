@@ -1,16 +1,17 @@
 # DO NOT DELETE
 
-attr.o: ppd.h debug.h string.h ../config.h
-auth.o: cups.h ipp.h http.h string.h ../config.h md5.h ppd.h language.h
-auth.o: debug.h
-dest.o: cups.h ipp.h http.h string.h ../config.h md5.h ppd.h language.h
-emit.o: ppd.h string.h ../config.h
-encode.o: cups.h ipp.h http.h string.h ../config.h md5.h ppd.h debug.h
-extended.o: ppd.h string.h ../config.h debug.h
+attr.o: ppd.h file.h debug.h string.h ../config.h
+auth.o: cups.h ipp.h http.h string.h ../config.h md5.h ppd.h file.h
+auth.o: language.h debug.h
+dest.o: cups.h ipp.h http.h string.h ../config.h md5.h ppd.h file.h
+dest.o: language.h
+emit.o: ppd.h file.h string.h ../config.h
+encode.o: cups.h ipp.h http.h string.h ../config.h md5.h ppd.h file.h debug.h
+extended.o: ppd.h file.h string.h ../config.h debug.h
 file.o: ../cups/string.h ../config.h string.h ../cups/debug.h file-private.h
 file.o: file.h http-private.h http.h md5.h
-getputfile.o: cups.h ipp.h http.h string.h ../config.h md5.h ppd.h language.h
-getputfile.o: debug.h
+getputfile.o: cups.h ipp.h http.h string.h ../config.h md5.h ppd.h file.h
+getputfile.o: language.h debug.h
 http.o: http-private.h ../config.h http.h string.h md5.h debug.h
 http-addr.o: http.h string.h ../config.h md5.h debug.h
 http-support.o: string.h ../config.h http.h md5.h ipp.h
@@ -18,21 +19,23 @@ ipp.o: string.h ../config.h ipp.h http.h md5.h debug.h
 ipp-support.o: string.h ../config.h language.h ipp.h http.h md5.h debug.h
 langprintf.o: string.h ../config.h language.h transcode.h
 language.o: string.h ../config.h language.h debug.h cups_C.h
-mark.o: ppd.h string.h ../config.h debug.h
+mark.o: ppd.h file.h string.h ../config.h debug.h
 md5.o: md5.h string.h ../config.h
 md5passwd.o: http.h string.h ../config.h md5.h
 normalize.o: string.h ../config.h language.h transcode.h normalize.h
-options.o: cups.h ipp.h http.h string.h ../config.h md5.h ppd.h debug.h
-page.o: ppd.h string.h ../config.h
-ppd.o: ppd.h string.h ../config.h language.h debug.h
+options.o: cups.h ipp.h http.h string.h ../config.h md5.h ppd.h file.h
+options.o: debug.h
+page.o: ppd.h file.h string.h ../config.h
+ppd.o: ppd.h file.h string.h ../config.h language.h debug.h
 snprintf.o: string.h ../config.h
 string.o: string.h ../config.h
-tempfile.o: cups.h ipp.h http.h string.h ../config.h md5.h ppd.h debug.h
+tempfile.o: cups.h ipp.h http.h string.h ../config.h md5.h ppd.h file.h
+tempfile.o: debug.h
 transcode.o: string.h ../config.h language.h transcode.h
-usersys.o: cups.h ipp.h http.h string.h ../config.h md5.h ppd.h
+usersys.o: cups.h ipp.h http.h string.h ../config.h md5.h ppd.h file.h
 usersys.o: http-private.h
-util.o: cups.h ipp.h http.h string.h ../config.h md5.h ppd.h language.h
-util.o: debug.h
+util.o: cups.h ipp.h http.h string.h ../config.h md5.h ppd.h file.h
+util.o: language.h debug.h
 testhttp.o: http.h string.h ../config.h md5.h
 testi18n.o: language.h string.h ../config.h transcode.h normalize.h
 testipp.o: ../cups/string.h ../config.h string.h ipp.h http.h md5.h

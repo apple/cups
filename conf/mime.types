@@ -136,6 +136,7 @@ application/x-csource		c cxx cpp cc C h hpp \
 text/html			html htm printable(0,1024) +\
 				(istring(0,"<HTML>") istring(0,"<!DOCTYPE"))
 text/plain			txt printable(0,1024)
+text/css			css
 
 ########################################################################
 #

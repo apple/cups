@@ -1,12 +1,13 @@
 # DO NOT DELETE
 
 lpc.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
-lpc.o: ../cups/ppd.h ../cups/language.h ../cups/debug.h ../cups/string.h
-lpc.o: ../config.h
+lpc.o: ../cups/ppd.h ../cups/file.h ../cups/language.h ../cups/debug.h
+lpc.o: ../cups/string.h ../config.h
 lpq.o: ../cups/string.h ../config.h ../cups/cups.h ../cups/ipp.h
-lpq.o: ../cups/http.h ../cups/md5.h ../cups/ppd.h ../cups/language.h
-lpq.o: ../cups/debug.h
+lpq.o: ../cups/http.h ../cups/md5.h ../cups/ppd.h ../cups/file.h
+lpq.o: ../cups/language.h ../cups/debug.h
 lpr.o: ../cups/string.h ../config.h ../cups/cups.h ../cups/ipp.h
-lpr.o: ../cups/http.h ../cups/md5.h ../cups/ppd.h
+lpr.o: ../cups/http.h ../cups/md5.h ../cups/ppd.h ../cups/file.h
 lprm.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
-lprm.o: ../cups/ppd.h ../cups/language.h ../cups/string.h ../config.h
+lprm.o: ../cups/ppd.h ../cups/file.h ../cups/language.h ../cups/string.h
+lprm.o: ../config.h
