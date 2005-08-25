@@ -35,6 +35,7 @@
  *   cupsFileGetChar()     - Get a single character from a file.
  *   cupsFileGetConf()     - Get a line from a configuration file...
  *   cupsFileGets()        - Get a CR and/or LF-terminated line.
+ *   cupsFileLock()        - Temporarily lock access to a file.
  *   cupsFileNumber()      - Return the file descriptor associated with a CUPS file.
  *   cupsFileOpen()        - Open a CUPS file.
  *   cupsFileOpenFd()      - Open a CUPS file using a file descriptor.
@@ -45,6 +46,7 @@
  *   cupsFileRewind()      - Rewind a file.
  *   cupsFileSeek()        - Seek in a file.
  *   cupsFileTell()        - Return the current file position.
+ *   cupsFileUnlock()      - Unlock access to a file.
  *   cupsFileWrite()       - Write to a file.
  *   cups_fill()           - Fill the input buffer...
  *   cups_read()           - Read from a file descriptor.
@@ -408,6 +410,29 @@ cupsFileGets(cups_file_t *fp,		/* I - CUPS file */
   *ptr = '\0';
 
   return (buf);
+}
+
+
+/*
+ * 'cupsFileLock()' - Temporarily lock access to a file.
+ */
+
+int					/* O - 0 on success, -1 on error */
+cupsFileLock(cups_file_t *fp,		/* I - File to lock */
+             int         block)		/* I - 1 to wait for the lock, 0 to fail right away */
+{
+ /*
+  * Range check...
+  */
+
+  if (!fp || fp->mode == 's')
+    return (-1);
+
+ /*
+  * Try the lock...
+  */
+
+  return (lockf(fp->fd, block ? F_LOCK : F_TLOCK, 0));
 }
 
 
@@ -968,6 +993,28 @@ off_t					/* O - File position */
 cupsFileTell(cups_file_t *fp)		/* I - CUPS file */
 {
   return (fp->pos);
+}
+
+
+/*
+ * 'cupsFileUnlock()' - Unlock access to a file.
+ */
+
+int					/* O - 0 on success, -1 on error */
+cupsFileUnlock(cups_file_t *fp)		/* I - File to lock */
+{
+ /*
+  * Range check...
+  */
+
+  if (!fp || fp->mode == 's')
+    return (-1);
+
+ /*
+  * Unlock...
+  */
+
+  return (lockf(fp->fd, F_ULOCK, 0));
 }
 
 

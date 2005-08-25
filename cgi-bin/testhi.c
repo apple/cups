@@ -1,7 +1,7 @@
 /*
  * "$Id$"
  *
- *   Mini-daemon utility definitions for the Common UNIX Printing System (CUPS).
+ *   Help index test program for the Common UNIX Printing System (CUPS).
  *
  *   Copyright 1997-2005 by Easy Software Products.
  *
@@ -20,39 +20,33 @@
  *       Voice: (301) 373-9600
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
+ *
+ * Contents:
+ *
  */
-
-#ifndef _CUPSD_UTIL_H_
-#  define _CUPSD_UTIL_H_
 
 /*
  * Include necessary headers...
  */
 
-#  include <cups/cups.h>
-#  include <cups/file.h>
-#  include <cups/string.h>
-#  include <stdlib.h>
-#  include <errno.h>
-#  include <signal.h>
-#  include <dirent.h>
+#include "help-index.h"
 
 
 /*
- * Prototypes...
+ * 'main()' - Test the help index code.
  */
 
-extern int	cupsdCompareNames(const char *s, const char *t);
-extern void	cupsdSendIPPGroup(ipp_tag_t group_tag);
-extern void	cupsdSendIPPHeader(ipp_status_t status_code, int request_id);
-extern void	cupsdSendIPPInteger(ipp_tag_t value_tag, const char *name,
-		                    int value);
-extern void	cupsdSendIPPString(ipp_tag_t value_tag, const char *name,
-		                   const char *value);
-extern void	cupsdSendIPPTrailer(void);
+int					/* O - Exit status */
+main(int  argc,				/* I - Number of command-line arguments */
+     char *argv[])			/* I - Command-line arguments */
+{
+ /*
+  * Return with no errors...
+  */
 
+  return (0);
+}
 
-#endif /* !_CUPSD_UTIL_H_ */
 
 /*
  * End of "$Id$".

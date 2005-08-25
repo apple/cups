@@ -1,0 +1,80 @@
+<HTML>
+<HEAD>
+	<TITLE>subscriptions.conf Reference</TITLE>
+</HEAD>
+<BODY>
+
+<P>The CUPS scheduler (cupsd) uses the <VAR>/etc/cups/subscriptions.conf</VAR> file 
+to store the list of active subscriptions.  This file contains only locally defined
+classes, but not remote or implicit classes that are created automatically.  
+Each directive is listed on a line by itself followed by its value. 
+Comments are introduced using the number sign ("#") character at the beginning of a line.
+
+<P>Since the classes configuration file consists of plain text, you can
+use your favorite text editor to make changes to it.
+
+<P>The <VAR>subscription.conf</VAR> file contains many directives that
+determine how the subscriptions behave:</P>
+
+<P ALIGN="CENTER">
+<TABLE CELLPADDING="0" CELLSPACING="0" BORDER="0">
+<TR>
+<TD VALIGN="TOP">
+
+	<LI><A HREF="#ClassAccepting"><CODE>Accepting</CODE></A>
+	<LI><A HREF="#ClassAllowUser"><CODE>AllowUser</CODE></A>
+	<LI><A HREF="#Class"><CODE>Class</CODE></A>
+	<LI><A HREF="#DefaultClass"><CODE>DefaultClass</CODE></A>
+	<LI><A HREF="#ClassDenyUser"><CODE>DenyUser</CODE></A>
+
+</TD>
+<TD VALIGN="TOP">
+&nbsp;&nbsp;&nbsp;
+</TD>
+<TD VALIGN="TOP">
+
+	<LI><A HREF="#ClassInfo"><CODE>Info</CODE></A>
+	<LI><A HREF="#ClassJobSheets"><CODE>JobSheets</CODE></A>
+	<LI><A HREF="#ClassKLimit"><CODE>KLimit</CODE></A>
+	<LI><A HREF="#ClassLocation"><CODE>Location</CODE></A>
+	<LI><A HREF="#ClassPageLimit"><CODE>PageLimit</CODE></A>
+
+</TD>
+<TD VALIGN="TOP">
+&nbsp;&nbsp;&nbsp;
+</TD>
+<TD VALIGN="TOP">
+
+	<LI><A HREF="#ClassPrinter"><CODE>Printer</CODE></A>
+	<LI><A HREF="#ClassQuotaPeriod"><CODE>QuotaPeriod</CODE></A>
+	<LI><A HREF="#ClassState"><CODE>State</CODE></A>
+	<LI><A HREF="#ClassStateMessage"><CODE>StateMessage</CODE></A>
+
+</TD>
+</TR>
+</TABLE>
+</P>
+
+<!-- HALF PAGE -->
+<H3><A NAME="ClassAccepting">Accepting</A></H3>
+<HR>
+
+<H4>Examples</H4>
+
+<UL><PRE>
+Accepting yes
+
+Accepting no
+</PRE></UL>
+
+<H4>Description</H4>
+
+<P>The <CODE>Accepting</CODE> directive defines the initial Boolean
+value for the <VAR>printer-is-accepting-job</VAR> attribute which can
+be set by the <CODE>accept</CODE> and <CODE>reject</CODE> commands. 
+
+<P>This directive must appear inside a <A HREF="#Class"><CODE>Class</CODE></A> 
+or <A HREF="#DefaultClass"><CODE>DefaultClass</CODE></A> directive.  
+
+</BODY>
+</HTML>

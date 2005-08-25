@@ -30,6 +30,7 @@
 #include <cups/http-private.h>
 #include <cups/string.h>
 #include <stdlib.h>
+#include <dirent.h>
 #include <limits.h>
 #include <errno.h>
 #include <time.h>
@@ -135,29 +136,6 @@ extern const char *cups_hstrerror(int);
 #include "dirsvc.h"
 #include "network.h"
 #include "subscriptions.h"
-
-
-/*
- * Directory handling functions...
- */
-
-#if HAVE_DIRENT_H
-#  include <dirent.h>
-typedef struct dirent DIRENT;
-#  define NAMLEN(dirent) strlen((dirent)->d_name)
-#else
-#  if HAVE_SYS_NDIR_H
-#    include <sys/ndir.h>
-#  endif
-#  if HAVE_SYS_DIR_H
-#    include <sys/dir.h>
-#  endif
-#  if HAVE_NDIR_H
-#    include <ndir.h>
-#  endif
-typedef struct direct DIRENT;
-#  define NAMLEN(dirent) (dirent)->d_namlen
-#endif
 
 
 /*

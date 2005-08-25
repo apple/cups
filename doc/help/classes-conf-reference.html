@@ -1,0 +1,378 @@
+<HTML>
+<HEAD>
+	<TITLE>classes.conf Reference</TITLE>
+</HEAD>
+<BODY>
+
+<P>The <VAR>/etc/cups/classes.conf</VAR> file contains many directives that
+determine how the classes behaves:</P>
+
+<P ALIGN="CENTER">
+<TABLE CELLPADDING="0" CELLSPACING="0" BORDER="0">
+<TR>
+<TD VALIGN="TOP">
+
+	<LI><A HREF="#ClassAccepting"><CODE>Accepting</CODE></A>
+	<LI><A HREF="#ClassAllowUser"><CODE>AllowUser</CODE></A>
+	<LI><A HREF="#Class"><CODE>Class</CODE></A>
+	<LI><A HREF="#DefaultClass"><CODE>DefaultClass</CODE></A>
+	<LI><A HREF="#ClassDenyUser"><CODE>DenyUser</CODE></A>
+
+</TD>
+<TD VALIGN="TOP">
+&nbsp;&nbsp;&nbsp;
+</TD>
+<TD VALIGN="TOP">
+
+	<LI><A HREF="#ClassInfo"><CODE>Info</CODE></A>
+	<LI><A HREF="#ClassJobSheets"><CODE>JobSheets</CODE></A>
+	<LI><A HREF="#ClassKLimit"><CODE>KLimit</CODE></A>
+	<LI><A HREF="#ClassLocation"><CODE>Location</CODE></A>
+	<LI><A HREF="#ClassPageLimit"><CODE>PageLimit</CODE></A>
+
+</TD>
+<TD VALIGN="TOP">
+&nbsp;&nbsp;&nbsp;
+</TD>
+<TD VALIGN="TOP">
+
+	<LI><A HREF="#ClassPrinter"><CODE>Printer</CODE></A>
+	<LI><A HREF="#ClassQuotaPeriod"><CODE>QuotaPeriod</CODE></A>
+	<LI><A HREF="#ClassState"><CODE>State</CODE></A>
+	<LI><A HREF="#ClassStateMessage"><CODE>StateMessage</CODE></A>
+
+</TD>
+</TR>
+</TABLE>
+</P>
+
+<!-- HALF PAGE -->
+<H3><A NAME="ClassAccepting">Accepting</A></H3>
+<HR>
+
+<H4>Examples</H4>
+
+<UL><PRE>
+Accepting yes
+
+Accepting no
+</PRE></UL>
+
+<H4>Description</H4>
+
+<P>The <CODE>Accepting</CODE> directive defines the initial Boolean
+value for the <VAR>printer-is-accepting-job</VAR> attribute which can
+be set by the <CODE>accept</CODE> and <CODE>reject</CODE> commands. 
+
+<P>This directive must appear inside a <A HREF="#Class"><CODE>Class</CODE></A> 
+or <A HREF="#DefaultClass"><CODE>DefaultClass</CODE></A> directive.  
+
+<!-- HALF PAGE -->
+<H3><A NAME="ClassAllowUser">AllowUser</A></H3>
+<HR>
+
+<H4>Examples</H4>
+
+<UL><PRE>
+AllowUser foo_user
+AllowUser bar_user
+</PRE></UL>
+
+<H4>Description</H4>
+
+<P>The <CODE>AllowUser</CODE> directive adds a username to the 
+<VAR>requesting-user-name-allowed</VAR> attribute which can be set
+by the <CODE>lpadmin -u</CODE> command.
+
+<P>This directive must appear inside a <A HREF="#Class"><CODE>Class</CODE></A> 
+or <A HREF="#DefaultClass"><CODE>DefaultClass</CODE></A> directive.  
+
+
+<!-- HALF PAGE -->
+<H3><A NAME="Class">Class</A></H3>
+<HR>
+
+<H4>Examples</H4>
+
+<UL><PRE>
+&lt;Class name/&gt;
+...
+&lt;/Class&gt;
+</PRE></UL>
+
+<H4>Description</H4>
+
+<P>The <CODE>Class</CODE> directive begins a class definition.
+It can be added by the <CODE>lpadmin -c</CODE> command.</P>
+
+<!-- HALF PAGE -->
+<H3><A NAME="DefaultClass">DefaultClass</A></H3>
+<HR>
+
+<H4>Examples</H4>
+
+<UL><PRE>
+&lt;DefaultClass name/&gt;
+...
+&lt;/DefaultClass&gt;
+</PRE></UL>
+
+<H4>Description</H4>
+
+<P>The <CODE>DefaultClass</CODE> directive begins a class definition 
+for the default server destination.  
+It can be added by the <CODE>lpadmin -c</CODE> command or if already defined, 
+set as default by the <CODE>lpoptions -d</CODE> command.</P>
+
+<!-- HALF PAGE -->
+<H3><A NAME="ClassDenyUser">DenyUser</A></H3>
+<HR>
+
+<H4>Examples</H4>
+
+<UL><PRE>
+DenyUser foo_user
+DenyUser bar_user
+</PRE></UL>
+
+<H4>Description</H4>
+
+<P>The <CODE>DenyUser</CODE> directive adds a username to the 
+<VAR>requesting-user-name-allowed</VAR> attribute which can be set
+by the <CODE>lpadmin -u</CODE> command.</P>
+
+<P>This directive must appear inside a <A HREF="#Class"><CODE>Class</CODE></A> 
+or <A HREF="#DefaultClass"><CODE>DefaultClass</CODE></A> directive.  
+
+<!-- HALF PAGE -->
+<H3><A NAME="ClassInfo">Info</A></H3>
+<HR>
+
+<H4>Examples</H4>
+
+<UL><PRE>
+Info My Printer
+</PRE></UL>
+
+<H4>Description</H4>
+
+<P>The <CODE>Info</CODE> directive defines the string for the 
+<VAR>printer-info</VAR> attribute which can be set by the 
+<CODE>lpadmin -D</CODE> command.</P>
+
+<P>This directive must appear inside a <A HREF="#Class"><CODE>Class</CODE></A> 
+or <A HREF="#DefaultClass"><CODE>DefaultClass</CODE></A> directive.  
+
+<!-- NEW PAGE -->
+<H3><A NAME="ClassJobSheets">JobSheets</A></H3>
+<HR>
+
+<H4>Examples</H4>
+
+<UL><PRE>
+JobSheets none,standard
+</PRE></UL>
+
+<H4>Description</H4>
+
+<P>The <CODE>JobSheets</CODE> directive specifies the default banner pages 
+to print before and after a print job.
+In the above example, only a <VAR>standard</VAR> banner will print after each job.</P>
+
+<P>The <CODE>lpoptions -o job-sheets=</CODE> command can be used to set banners. 
+For example, the following command would produce the same results of a 
+<VAR>standard</VAR> banner at the end of each print job for the default class.</P>
+
+<UL><B>
+lpoptions -o job-sheets=none,standard
+</B></UL>
+
+<P>If only one banner file is specified, it will be printed before the 
+files in the job. If a second banner file is specified, it is printed 
+after the files in the job.</P>
+
+<P>The available banner pages depend on the local system configuration;
+ CUPS includes the following banner files:</P>
+
+<UL>
+<LI><CODE>none</CODE> - Do not produce a banner page.</LI>
+<LI><CODE>classified</CODE> - A banner page with a &quot;classified&quot; label at the top and bottom.</LI>
+<LI><CODE>confidential</CODE> - A banner page with a &quot;confidential&quot; label at the top and bottom.</LI>
+<LI><CODE>secret</CODE> - A banner page with a &quot;secret&quot; label at the top and bottom.</LI>
+<LI><CODE>standard</CODE> - A banner page with no label at the top and bottom.</LI>
+<LI><CODE>topsecret</CODE> - A banner page with a &quot;top secret&quot; label at the top and bottom.</LI>
+<LI><CODE>unclassified</CODE> - A banner page with an &quot;unclassified&quot; label at the top and bottom.</LI>
+</UL>
+
+<P>This directive must appear inside a <A HREF="#Class"><CODE>Class</CODE></A> 
+or <A HREF="#DefaultClass"><CODE>DefaultClass</CODE></A> directive.  
+
+<!-- HALF PAGE -->
+<H3><A NAME="ClassKLimit">KLimit</A></H3>
+<HR>
+
+<H4>Examples</H4>
+
+<UL><PRE>
+KLimit 1234
+</PRE></UL>
+
+<H4>Description</H4>
+
+<P>The <CODE>KLimit</CODE> directive defines the value of the 
+<VAR>job-k-limit</VAR> attribute which can be set by the 
+<CODE>lpadmin -o job-k-limit=</CODE> command.
+
+<P>This directive must appear inside a <A HREF="#Class"><CODE>Class</CODE></A> 
+or <A HREF="#DefaultClass"><CODE>DefaultClass</CODE></A> directive.  
+
+<!-- HALF PAGE -->
+<H3><A NAME="ClassLocation">Location</A></H3>
+<HR>
+
+<H4>Examples</H4>
+
+<UL><PRE>
+Location Building 3321
+</PRE></UL>
+
+<H4>Description</H4>
+
+<P>The <CODE>Location</CODE> directive defines the string for the 
+<VAR>printer-location</VAR> attribute which can be set by the 
+<CODE>lpadmin -L</CODE> command.</P>
+
+<CENTER><TABLE WIDTH="80%" BORDER="1" CELLPADDING="5" BGCOLOR="#cccccc">
+<TR>
+	<TD>
+	<B>Note:</B>
+
+	<P>Do not confuse this <CODE>Location</CODE> directive with the 
+	one for cupsd.conf.  They are completely different.
+	</TD>
+</TR>
+</TABLE></CENTER>
+
+<P>This directive must appear inside a <A HREF="#Class"><CODE>Class</CODE></A> 
+or <A HREF="#DefaultClass"><CODE>DefaultClass</CODE></A> directive.  
+
+<!-- HALF PAGE -->
+<H3><A NAME="ClassPageLimit">PageLimit</A></H3>
+<HR>
+
+<H4>Examples</H4>
+
+<UL><PRE>
+PageLimit 1234
+</PRE></UL>
+
+<H4>Description</H4>
+
+<P>The <CODE>PageLimit</CODE> directive defines the value of the 
+<VAR>job-page-limit</VAR> attribute which can be set
+by the <CODE>lpadmin -o job-page-limit=</CODE> command.</P>
+
+<P>This directive must appear inside a <A HREF="#Class"><CODE>Class</CODE></A> 
+or <A HREF="#DefaultClass"><CODE>DefaultClass</CODE></A> directive.  
+
+<!-- HALF PAGE -->
+<H3><A NAME="ClassPrinter">Printer</A></H3>
+<HR>
+
+<H4>Examples</H4>
+
+<UL><PRE>
+Printer foo
+Printer bar
+Printer foo@bar
+</PRE></UL>
+
+<H4>Description</H4>
+
+<P>The <CODE>Printer</CODE> directive adds a printer to the class.
+It can be added by the <CODE>lpadmin -c</CODE> command.</P>
+
+<CENTER><TABLE WIDTH="80%" BORDER="1" CELLPADDING="5" BGCOLOR="#cccccc">
+<TR>
+	<TD>
+	<B>Note:</B>
+
+	<P>Do not confuse this <CODE>Printer</CODE> directive with the 
+	one for printers.conf.  They are completely different.
+	</TD>
+</TR>
+</TABLE></CENTER>
+
+<P>This directive must appear inside a <A HREF="#Class"><CODE>Class</CODE></A> 
+or <A HREF="#DefaultClass"><CODE>DefaultClass</CODE></A> directive.</P>
+
+<!-- HALF PAGE -->
+<H3><A NAME="ClassQuotaPeriod">QuotaPeriod</A></H3>
+<HR>
+
+<H4>Examples</H4>
+
+<UL><PRE>
+QuotaPeriod 604800
+</PRE></UL>
+
+<H4>Description</H4>
+
+<P>The <CODE>QuotaPeriod</CODE> directive defines the value of the 
+<VAR>job-quota-period</VAR> attribute which can be set
+by the <CODE>lpadmin -o job-quota-period=</CODE> command.</P>
+
+<P>This directive must appear inside a <A HREF="#Class"><CODE>Class</CODE></A> 
+or <A HREF="#DefaultClass"><CODE>DefaultClass</CODE></A> directive.  
+
+<!-- HALF PAGE -->
+<H3><A NAME="ClassState">State</A></H3>
+<HR>
+
+<H4>Examples</H4>
+
+<UL><PRE>
+State stopped
+</PRE></UL>
+
+<H4>Description</H4>
+
+<P>The <CODE>State</CODE> directive defines the initial value of the 
+<VAR>printer-state</VAR> attribute.  The strings <VAR>idle</VAR> and 
+<VAR>stopped</VAR> correspond to the IPP enumeration values.</P>
+
+<P>This directive must appear inside a <A HREF="#Class"><CODE>Class</CODE></A> 
+or <A HREF="#DefaultClass"><CODE>DefaultClass</CODE></A> directive.  
+
+<!-- HALF PAGE -->
+<H3><A NAME="ClassStateMessage">StateMessage</A></H3>
+<HR>
+
+<H4>Examples</H4>
+
+<UL><PRE>
+StateMessage Ready to print.
+</PRE></UL>
+
+<H4>Description</H4>
+
+<P>The <CODE>StateMessage</CODE> directive defines the initial string for the 
+<VAR>printer-state-message</VAR> attribute.  
+The following are some example messages:</P>
+
+<UL>
+<LI>Connected to <VAR>host_name</VAR>...
+<LI>Connecting to <VAR>class_queue</VAR> on port <VAR>port_number</VAR>...
+<LI>Network host <VAR>host_name</VAR> is busy; will retry in 30 seconds...
+<LI>Printer busy; will retry in 10 seconds...
+<LI>Printer is busy; retrying print job...
+<LI>Print file accepted - job ID <VAR>id_number</VAR>.
+<LI>Ready to print.
+<LI>Waiting for job to complete
+</UL>
+
+<P>This directive must appear inside a <A HREF="#Class"><CODE>Class</CODE></A> 
+or <A HREF="#DefaultClass"><CODE>DefaultClass</CODE></A> directive.</P>
+
+</BODY>
+</HTML>

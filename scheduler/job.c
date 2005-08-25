@@ -675,7 +675,7 @@ void
 LoadAllJobs(void)
 {
   DIR		*dir;			/* Directory */
-  DIRENT	*dent;			/* Directory entry */
+  struct dirent	*dent;			/* Directory entry */
   char		filename[1024];		/* Full filename of job file */
   int		fd;			/* File descriptor */
   job_t		*job,			/* New job */

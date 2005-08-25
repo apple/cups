@@ -2958,6 +2958,7 @@ pipe_command(client_t *con,		/* I - Client connection */
   char		content_length[1024],	/* CONTENT_LENGTH environment variable */
 		content_type[1024],	/* CONTENT_TYPE environment variable */
 		cups_datadir[1024],	/* CUPS_DATADIR environment variable */
+		cups_docroot[1024],	/* CUPS_DOCROOT environment variable */
 		cups_serverbin[1024],	/* CUPS_SERVERBIN environment variable */
 		cups_serverroot[1024],	/* CUPS_SERVERROOT environment variable */
 		cups_statedir[1024],	/* CUPS_STATEDIR environment variable */
@@ -3160,6 +3161,7 @@ pipe_command(client_t *con,		/* I - Client connection */
   snprintf(remote_user, sizeof(remote_user), "REMOTE_USER=%s", con->username);
   snprintf(tmpdir, sizeof(tmpdir), "TMPDIR=%s", TempDir);
   snprintf(cups_datadir, sizeof(cups_datadir), "CUPS_DATADIR=%s", DataDir);
+  snprintf(cups_docroot, sizeof(cups_docroot), "CUPS_DOCROOT=%s", DocumentRoot);
   snprintf(cups_serverbin, sizeof(cups_serverbin), "CUPS_SERVERBIN=%s", ServerBin);
   snprintf(cups_serverroot, sizeof(cups_serverroot), "CUPS_SERVERROOT=%s", ServerRoot);
   snprintf(cups_statedir, sizeof(cups_statedir), "CUPS_STATEDIR=%s", StateDir);
@@ -3188,6 +3190,7 @@ pipe_command(client_t *con,		/* I - Client connection */
   envp[envc ++] = TZ;
   envp[envc ++] = tmpdir;
   envp[envc ++] = cups_datadir;
+  envp[envc ++] = cups_docroot;
   envp[envc ++] = cups_serverbin;
   envp[envc ++] = cups_serverroot;
   envp[envc ++] = cups_statedir;

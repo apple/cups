@@ -409,7 +409,7 @@ load_ppds(const char *d,		/* I - Actual directory */
   int		i;			/* Looping var */
   cups_file_t	*fp;			/* Pointer to file */
   DIR		*dir;			/* Directory pointer */
-  DIRENT	*dent;			/* Directory entry */
+  struct dirent	*dent;			/* Directory entry */
   struct stat	fileinfo;		/* File information */
   char		filename[1024],		/* Name of PPD or directory */
 		line[256],		/* Line from backend */

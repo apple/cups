@@ -1,0 +1,39 @@
+<HTML>
+<HEAD>
+	<TITLE>error_log Reference</TITLE>
+</HEAD>
+<BODY>
+
+<P>The <VAR>error_log</VAR> file lists messages from the scheduler (errors,
+warnings, etc.):
+
+<UL><PRE>
+level date-time message
+
+I [20/May/1999:19:18:28 +0000] Job 1 queued on 'DeskJet' by 'mike'.
+I [20/May/1999:19:21:02 +0000] Job 2 queued on 'DeskJet' by 'mike'.
+I [20/May/1999:19:22:24 +0000] Job 2 was cancelled by 'mike'.
+</PRE></UL>
+
+<P>The <I>level</I> field contains the type of message:
+
+<UL>
+
+	<LI><CODE>E</CODE> - An error occurred.
+
+	<LI><CODE>W</CODE> - The server was unable to perform some action.
+
+	<LI><CODE>I</CODE> - Informational message.
+
+	<LI><CODE>D</CODE> - Debugging message.
+
+</UL>
+
+<P>The <I>date-time</I> field contains the date and time of when the page
+started printing. The format of this field is identical to the <I>data-time</I>
+field in the <VAR>access_log</VAR> file.
+
+<P>The <I>message</I> fields contains a free-form textual message.
+
+</BODY>
+</HTML>

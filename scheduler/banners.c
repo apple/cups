@@ -120,7 +120,7 @@ void
 LoadBanners(const char *d)	/* I - Directory to search */
 {
   DIR		*dir;		/* Directory pointer */
-  DIRENT	*dent;		/* Directory entry */
+  struct dirent	*dent;		/* Directory entry */
   char		filename[1024],	/* Name of banner */
 		*ext;		/* Pointer to extension */
   struct stat	fileinfo;	/* File information */

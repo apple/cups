@@ -74,6 +74,7 @@ extern int		cupsFileGetChar(cups_file_t *fp);
 extern char		*cupsFileGetConf(cups_file_t *fp, char *buf, size_t buflen,
 			                 char **value, int *linenum);
 extern char		*cupsFileGets(cups_file_t *fp, char *buf, size_t buflen);
+extern int		cupsFileLock(cups_file_t *fp, int block);
 extern int		cupsFileNumber(cups_file_t *fp);
 extern cups_file_t	*cupsFileOpen(const char *filename, const char *mode);
 extern cups_file_t	*cupsFileOpenFd(int fd, const char *mode);
@@ -84,6 +85,7 @@ extern ssize_t		cupsFileRead(cups_file_t *fp, char *buf, size_t bytes);
 extern off_t		cupsFileRewind(cups_file_t *fp);
 extern off_t		cupsFileSeek(cups_file_t *fp, off_t pos);
 extern off_t		cupsFileTell(cups_file_t *fp);
+extern int		cupsFileUnlock(cups_file_t *fp);
 extern ssize_t		cupsFileWrite(cups_file_t *fp, const char *buf, size_t bytes);
 
 

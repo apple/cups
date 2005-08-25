@@ -25,9 +25,10 @@
 include ../Makedefs
 
 CGIS	=	admin.cgi classes.cgi help.cgi jobs.cgi printers.cgi
-TARGETS	=	libcgi.a $(CGIS)
+TARGETS	=	libcgi.a $(CGIS) testhi
 LIBOBJS	=	html.o ipp-var.o template.o var.o
-OBJS	=	$(LIBOBJS) admin.o classes.o help.o jobs.o printers.o
+OBJS	=	$(LIBOBJS) admin.o classes.o help.o help-index.o \
+		jobs.o printers.o testhi.o
 
 
 #
@@ -97,9 +98,18 @@ classes.cgi:	classes.o ../Makedefs ../cups/$(LIBCUPS) libcgi.a
 # help.cgi
 #
 
-help.cgi:	help.o ../Makedefs ../cups/$(LIBCUPS) libcgi.a
+help.cgi:	help.o help-index.o ../Makedefs libcgi.a
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ help.o libcgi.a $(LIBS)
+	$(CC) $(LDFLAGS) -o $@ help.o help-index.o libcgi.a $(LIBS)
+
+
+#
+# testhi
+#
+
+testhi:	testhi.o help-index.o ../Makedefs
+	echo Linking $@...
+	$(CC) $(LDFLAGS) -o $@ testhi.o help-index.o $(LIBS)
 
 
 #

@@ -44,23 +44,9 @@
 
 #ifdef WIN32
 #  include <windows.h>
-#elif HAVE_DIRENT_H
-#  include <dirent.h>
-typedef struct dirent DIRENT;
-#  define NAMLEN(dirent) strlen((dirent)->d_name)
 #else
-#  if HAVE_SYS_NDIR_H
-#    include <sys/ndir.h>
-#  endif
-#  if HAVE_SYS_DIR_H
-#    include <sys/dir.h>
-#  endif
-#  if HAVE_NDIR_H
-#    include <ndir.h>
-#  endif
-typedef struct direct DIRENT;
-#  define NAMLEN(dirent) (dirent)->d_namlen
-#endif
+#  include <dirent.h>
+#endif /* WIN32 */
 
 
 /*
@@ -205,7 +191,7 @@ mimeMerge(mime_t     *mime,	/* I - MIME database to add to */
   return (mime);
 #else
   DIR		*dir;		/* Directory */
-  DIRENT	*dent;		/* Directory entry */
+  struct dirent	*dent;		/* Directory entry */
   char		filename[1024];	/* Full filename of types/converts file */
 
 

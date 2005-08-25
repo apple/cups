@@ -86,7 +86,7 @@ main(int  argc,				/* I - Number of command-line args */
   int		compat;			/* Compatibility device? */
   FILE		*fp;			/* Pipe to device backend */
   DIR		*dir;			/* Directory pointer */
-  DIRENT	*dent;			/* Directory entry */
+  struct dirent	*dent;			/* Directory entry */
   char		filename[1024],		/* Name of backend */
 		line[2048],		/* Line from backend */
 		dclass[64],		/* Device class */

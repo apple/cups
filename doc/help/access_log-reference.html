@@ -1,0 +1,52 @@
+<HTML>
+<HEAD>
+	<TITLE>access_log Reference</TITLE>
+</HEAD>
+<BODY>
+
+<P>The <VAR>access_log</VAR> file lists each HTTP resource that is accessed
+by a web browser or ESP Print Pro/IPP client. Each line is in the so-called "Common
+Log Format" used by many web servers and web reporting tools:
+
+<UL><PRE>
+host group user date-time \"method resource version\" status bytes
+
+127.0.0.1 - - [20/May/1999:19:20:29 +0000] "POST /admin/ HTTP/1.1" 401 0
+127.0.0.1 - mike [20/May/1999:19:20:31 +0000] "POST /admin/ HTTP/1.1" 200 0
+</PRE></UL>
+
+<P>The <I>host</I> field will normally only be an IP address unless you
+have enabled the <A HREF="#HostNameLookups"><CODE>HostNameLookups</CODE></A>
+directive in the <VAR>cupsd.conf</VAR> file.
+
+<P>The <I>group</I> field always contains "-" in ESP Print Pro.
+
+<P>The <I>user</I> field is the authenticated username of the requesting user.
+If no username and password is supplied for the request then this field
+contains "-".
+
+<P>The <I>date-time</I> field is the date and time of the request in Greenwich
+Mean Time (a.k.a. ZULU) and is in the format:
+
+<UL><PRE>
+[DD/MON/YYYY:HH:MM:SS +0000]
+</PRE></UL>
+
+<P>The <I>method</I> field is the HTTP method used ("GET", "PUT", "POST", etc.)
+
+<P>The <I>resource</I> field is the filename of the requested resource.
+
+<P>The <I>version</I> field is the HTTP specification version used by the
+client. For ESP Print Pro clients this will always be "HTTP/1.1".
+
+<P>The <I>status</I> field contains the HTTP result status of the
+request. Usually it is "200", but other HTTP status codes are possible.
+For example, 401 is the "unauthorized access" status in the example
+above.
+
+<P>The <I>bytes</I> field contains the number of bytes in the request.
+For POST requests the <I>bytes</I> field contains the number of bytes
+of non-IPP data that is received from the client.
+
+</BODY>
+</HTML>
