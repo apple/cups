@@ -170,6 +170,11 @@ main(int  argc,				/* I - Number of command-line arguments */
       request->request.op.operation_id = CUPS_GET_PRINTERS;
       request->request.op.request_id   = 1;
 
+      ippAddInteger(request, IPP_TAG_OPERATION, IPP_TAG_ENUM,
+                    "printer-type", 0);
+      ippAddInteger(request, IPP_TAG_OPERATION, IPP_TAG_ENUM,
+                    "printer-type-mask", CUPS_PRINTER_CLASS);
+
       if (getenv("REMOTE_USER") != NULL)
 	ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "requesting-user-name",
                      NULL, getenv("REMOTE_USER"));
