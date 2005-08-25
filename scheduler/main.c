@@ -409,7 +409,18 @@ main(int  argc,				/* I - Number of command-line arguments */
   */
 
   if (!fg)
-    kill(getppid(), SIGUSR1);
+  {
+   /*
+    * Send a signal to the parent process, but only if the parent is
+    * not PID 1 (init).  This avoids accidentally shutting down the
+    * system on OpenBSD if you CTRL-C the server before it is up...
+    */
+
+    i = getppid();	/* Save parent PID to avoid race condition */
+
+    if (i != 1)
+      kill(i, SIGUSR1);
+  }
 
  /*
   * If the administrator has configured the server to run as an unpriviledged

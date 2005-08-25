@@ -1,8 +1,14 @@
-CHANGES.txt - 08/23/2005
+CHANGES.txt - 08/25/2005
 ------------------------
 
 CHANGES IN CUPS V1.2.0b1
 
+	- Fixed a bug in the scheduler's startup signalling code
+	  which caused cupsd to send the SIGUSR1 signal to the
+	  init process instead of the original parent process
+	  (STR #1258)
+	- Added new on-line help CGI to web interface to provide
+	  searchable help.
 	- Devices are now tracked dynamically, with each query
 	  doing a new device scan.  This eliminates a previous
 	  startup delay caused by slow backends and allows new
