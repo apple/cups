@@ -14,6 +14,9 @@ admin.o: ../cups/string.h ../config.h cgi.h ../cups/file.h
 classes.o: ipp-var.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
 classes.o: ../cups/md5.h ../cups/ppd.h ../cups/file.h ../cups/debug.h
 classes.o: ../cups/language.h ../cups/string.h ../config.h cgi.h
+help.o: ipp-var.h ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
+help.o: ../cups/ppd.h ../cups/file.h ../cups/debug.h ../cups/language.h
+help.o: ../cups/string.h ../config.h cgi.h
 jobs.o: ipp-var.h ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
 jobs.o: ../cups/ppd.h ../cups/file.h ../cups/debug.h ../cups/language.h
 jobs.o: ../cups/string.h ../config.h cgi.h

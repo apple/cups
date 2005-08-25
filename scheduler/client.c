@@ -1305,6 +1305,7 @@ ReadClient(client_t *con)		/* I - Client to read from */
 	         strncmp(con->uri, "/admin/log/", 11)) ||
 		!strncmp(con->uri, "/printers", 9) ||
 		!strncmp(con->uri, "/classes", 8) ||
+		!strncmp(con->uri, "/help", 5) ||
 		!strncmp(con->uri, "/jobs", 5))
 	    {
 	     /*
@@ -1330,9 +1331,14 @@ ReadClient(client_t *con)		/* I - Client to read from */
 		SetStringf(&con->command, "%s/cgi-bin/classes.cgi", ServerBin);
 		SetString(&con->options, con->uri + 8);
 	      }
-	      else
+	      else if (!strncmp(con->uri, "/jobs", 5))
 	      {
 		SetStringf(&con->command, "%s/cgi-bin/jobs.cgi", ServerBin);
+                SetString(&con->options, con->uri + 5);
+	      }
+	      else
+	      {
+		SetStringf(&con->command, "%s/cgi-bin/help.cgi", ServerBin);
                 SetString(&con->options, con->uri + 5);
 	      }
 
@@ -1463,17 +1469,19 @@ ReadClient(client_t *con)		/* I - Client to read from */
 
 	    if (strcmp(con->http.fields[HTTP_FIELD_CONTENT_TYPE], "application/ipp") == 0)
               con->request = ippNew();
-	    else if ((strncmp(con->uri, "/admin", 6) == 0 &&
-	              strncmp(con->uri, "/admin/conf/", 12) != 0) ||
-	             strncmp(con->uri, "/printers", 9) == 0 ||
-	             strncmp(con->uri, "/classes", 8) == 0 ||
-	             strncmp(con->uri, "/jobs", 5) == 0)
+	    else if ((!strncmp(con->uri, "/admin", 6) == 0 &&
+	              strncmp(con->uri, "/admin/conf/", 12) &&
+	              strncmp(con->uri, "/admin/log/", 11)) ||
+	             !strncmp(con->uri, "/printers", 9) ||
+	             !strncmp(con->uri, "/classes", 8) ||
+	             !strncmp(con->uri, "/help", 5) ||
+	             !strncmp(con->uri, "/jobs", 5))
 	    {
 	     /*
 	      * CGI request...
 	      */
 
-              if (strncmp(con->uri, "/admin", 6) == 0)
+              if (!strncmp(con->uri, "/admin", 6))
 	      {
 		SetStringf(&con->command, "%s/cgi-bin/admin.cgi", ServerBin);
 
@@ -1482,19 +1490,24 @@ ReadClient(client_t *con)		/* I - Client to read from */
 		else
 		  SetString(&con->options, "admin");
 	      }
-              else if (strncmp(con->uri, "/printers", 9) == 0)
+              else if (!strncmp(con->uri, "/printers", 9))
 	      {
 		SetStringf(&con->command, "%s/cgi-bin/printers.cgi", ServerBin);
 		SetString(&con->options, con->uri + 9);
 	      }
-	      else if (strncmp(con->uri, "/classes", 8) == 0)
+	      else if (!strncmp(con->uri, "/classes", 8))
 	      {
 		SetStringf(&con->command, "%s/cgi-bin/classes.cgi", ServerBin);
 		SetString(&con->options, con->uri + 8);
 	      }
-	      else
+	      else if (!strncmp(con->uri, "/jobs", 5))
 	      {
 		SetStringf(&con->command, "%s/cgi-bin/jobs.cgi", ServerBin);
+		SetString(&con->options, con->uri + 5);
+	      }
+	      else
+	      {
+		SetStringf(&con->command, "%s/cgi-bin/help.cgi", ServerBin);
 		SetString(&con->options, con->uri + 5);
 	      }
 
@@ -1541,8 +1554,8 @@ ReadClient(client_t *con)		/* I - Client to read from */
 	    * Validate the resource name...
 	    */
 
-            if (strncmp(con->uri, "/admin/conf/", 12) != 0 ||
-	        strchr(con->uri + 12, '/') != NULL ||
+            if (strncmp(con->uri, "/admin/conf/", 12) ||
+	        strchr(con->uri + 12, '/') ||
 		strlen(con->uri) == 12)
 	    {
 	     /*
@@ -1616,8 +1629,8 @@ ReadClient(client_t *con)		/* I - Client to read from */
 	    return (CloseClient(con));
 
 	case HTTP_HEAD :
-            if (strncmp(con->uri, "/printers/", 10) == 0 &&
-		strcmp(con->uri + strlen(con->uri) - 4, ".ppd") == 0)
+            if (!strncmp(con->uri, "/printers/", 10) &&
+		!strcmp(con->uri + strlen(con->uri) - 4, ".ppd"))
 	    {
 	     /*
 	      * Send PPD file - get the real printer name since printer
@@ -1637,11 +1650,13 @@ ReadClient(client_t *con)		/* I - Client to read from */
 	      }
 	    }
 
-	    if ((strncmp(con->uri, "/admin/", 7) == 0 &&
-	         strncmp(con->uri, "/admin/conf/", 12) != 0) ||
-		strncmp(con->uri, "/printers/", 10) == 0 ||
-		strncmp(con->uri, "/classes/", 9) == 0 ||
-		strncmp(con->uri, "/jobs/", 6) == 0)
+	    if ((!strncmp(con->uri, "/admin", 6) &&
+	         strncmp(con->uri, "/admin/conf/", 12) &&
+	         strncmp(con->uri, "/admin/log/", 11)) ||
+		!strncmp(con->uri, "/printers", 9) ||
+		!strncmp(con->uri, "/classes", 8) ||
+		!strncmp(con->uri, "/help", 5) ||
+		!strncmp(con->uri, "/jobs", 5))
 	    {
 	     /*
 	      * CGI output...
@@ -1655,9 +1670,12 @@ ReadClient(client_t *con)		/* I - Client to read from */
 
               LogRequest(con, HTTP_OK);
 	    }
-            else if (strncmp(con->uri, "/admin/conf/", 12) == 0 &&
-	             (strchr(con->uri + 12, '/') != NULL ||
-		      strlen(con->uri) == 12))
+            else if ((!strncmp(con->uri, "/admin/conf/", 12) &&
+	              (strchr(con->uri + 12, '/') ||
+		       strlen(con->uri) == 12)) ||
+		     (!strncmp(con->uri, "/admin/log/", 11) &&
+	              (strchr(con->uri + 11, '/') ||
+		       strlen(con->uri) == 11)))
 	    {
 	     /*
 	      * HEAD can only be done to configuration files under

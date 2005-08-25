@@ -34,7 +34,7 @@ ALT="">&nbsp;&nbsp;Classes&nbsp;&nbsp;<IMG
 SRC="/images/tab-right.gif" WIDTH="4" HEIGHT="4" ALIGN="TOP"
 BORDER="0" ALT=""></A>
 
-&nbsp;<A CLASS="unsel" HREF="/documentation.html"><IMG SRC="/images/tab-left.gif" WIDTH="4"
+&nbsp;<A CLASS="unsel" HREF="/help/"><IMG SRC="/images/tab-left.gif" WIDTH="4"
 HEIGHT="4" ALIGN="TOP" BORDER="0"
 ALT="">&nbsp;&nbsp;Documentation/Help&nbsp;&nbsp;<IMG
 SRC="/images/tab-right.gif" WIDTH="4" HEIGHT="4" ALIGN="TOP"
@@ -85,7 +85,7 @@ ALT=""></TH>
 <TD WIDTH="100%">
 
 <P>
-<A HREF="/documentation.html"><IMG SRC="/images/help.gif" BORDER="0" ALIGN="MIDDLE" ALT="Help"></A>
+<A HREF="/help/"><IMG SRC="/images/help.gif" BORDER="0" ALIGN="MIDDLE" ALT="Help"></A>
 <A HREF="/admin/OP=add-class"><IMG SRC="/images/add-class.gif" BORDER="0" ALIGN="MIDDLE" ALT="Add Class"></A>
 <A HREF="/admin/OP=add-printer"><IMG SRC="/images/add-printer.gif" BORDER="0" ALIGN="MIDDLE" ALT="Add Printer"></A>
 <A HREF="/classes"><IMG SRC="/images/manage-classes.gif" BORDER="0" ALIGN="MIDDLE" ALT="Manage Classes"></A>
