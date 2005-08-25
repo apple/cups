@@ -10,7 +10,7 @@
 <TR CLASS="HEADER">
 <TD VALIGN="TOP" WIDTH="15" ROWSPAN="2"><IMG SRC="/images/top-left.gif" WIDTH="15" HEIGHT="80" ALT=""></TD>
 <TD VALIGN="TOP" WIDTH="55" ROWSPAN="2"><IMG SRC="/images/top-middle.gif" WIDTH="55" HEIGHT="80" ALT=""></TD>
-<TD WIDTH="100%" HEIGHT="60"><H1>Common UNIX Printing System</H1></TD>
+<TD WIDTH="100%" HEIGHT="60"><H1>Common UNIX Printing System v@CUPS_VERSION@</H1></TD>
 <TD ALIGN="RIGHT" VALIGN="TOP" WIDTH="15" ROWSPAN="2"><IMG
 SRC="/images/top-right.gif" WIDTH="15" HEIGHT="15" ALT=""></TD>
 </TR>
@@ -59,14 +59,56 @@ BORDER="0" ALT=""></A>
 <TR CLASS="page">
 <TD WIDTH="15">&nbsp;</TD>
 <TD COLSPAN="2" WIDTH="100%" VALIGN="TOP">
-<BR>
 
-<H1><A HREF="admin">Do Administration Tasks</A></H1>
-<H1><A HREF="classes">Manage Printer Classes</A></H1>
-<H1><A HREF="documentation.html">On-Line Help</A></H1>
-<H1><A HREF="jobs">Manage Jobs</A></H1>
-<H1><A HREF="printers">Manage Printers</A></H1>
-<H1><A HREF="http://www.cups.org">Download the Current CUPS Software</A></H1>
+<P><A HREF="http://www.easysw.com/"><IMG
+SRC="/images/esp-logo.gif" ALIGN="RIGHT" WIDTH="110" HEIGHT="68"
+BORDER="0" ALT="Easy Software Products"></A>CUPS (<A
+HREF="http://www.cups.org/">www.cups.org</A>) provides a portable
+printing layer for UNIX<SUP>&reg;</SUP>-based operating systems.
+It is developed and maintained by <A
+HREF="http://www.easysw.com/">Easy Software Products</A> to
+promote a standard printing solution and is the standard printing
+system on MacOS<SUP>&reg;</SUP> X and most Linux<SUP>&reg;</SUP>
+distributions.</P>
+
+<P><TABLE CELLPADDING="0" CELLSPACING="0" BORDER="0" WIDTH="100%">
+<TR CLASS="header">
+<TH ALIGN="LEFT" VALIGN="TOP"><IMG SRC="/images/hdr-top-left.gif"
+WIDTH="16" HEIGHT="16" ALT=""></TH>
+<TH>Common Tasks</TH>
+<TH ALIGN="RIGHT" VALIGN="TOP"><IMG
+SRC="/images/hdr-top-right.gif" WIDTH="16" HEIGHT="16"
+ALT=""></TH>
+</TR>
+<TR CLASS="data">
+<TD></TD>
+<TD WIDTH="100%">
+
+<P>
+<A HREF="/documentation.html"><IMG SRC="/images/help.gif" BORDER="0" ALIGN="MIDDLE" ALT="Help"></A>
+<A HREF="/admin/OP=add-class"><IMG SRC="/images/add-class.gif" BORDER="0" ALIGN="MIDDLE" ALT="Add Class"></A>
+<A HREF="/admin/OP=add-printer"><IMG SRC="/images/add-printer.gif" BORDER="0" ALIGN="MIDDLE" ALT="Add Printer"></A>
+<A HREF="/classes"><IMG SRC="/images/manage-classes.gif" BORDER="0" ALIGN="MIDDLE" ALT="Manage Classes"></A>
+<A HREF="/jobs"><IMG SRC="/images/manage-jobs.gif" BORDER="0" ALIGN="MIDDLE" ALT="Manage Jobs"></A>
+<A HREF="/printers"><IMG SRC="/images/manage-printers.gif" BORDER="0" ALIGN="MIDDLE" ALT="Manage Printers"></A>
+<A HREF="/admin"><IMG SRC="/images/manage-server.gif" BORDER="0" ALIGN="MIDDLE" ALT="Manage Server"></A>
+</P>
+
+<P><I>If asked for a username and password, login with your
+username and password or the "root" username and password.</I></P>
+
+</TD>
+<TD></TD>
+</TR>
+<TR CLASS="header">
+<TH ALIGN="LEFT" VALIGN="BOTTOM"><IMG SRC="/images/hdr-bottom-left.gif"
+WIDTH="16" HEIGHT="16" ALT=""></TH>
+<TH></TH>
+<TH ALIGN="RIGHT" VALIGN="BOTTOM"><IMG
+SRC="/images/hdr-bottom-right.gif" WIDTH="16" HEIGHT="16"
+ALT=""></TH>
+</TR>
+</TABLE></P>
 
 </TD>
 <TD WIDTH="15">&nbsp;</TD>
