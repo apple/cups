@@ -41,18 +41,21 @@ FILES	=	add-class.tmpl \
 		class-added.tmpl \
 		class-confirm.tmpl \
 		class-deleted.tmpl \
-		class-modified.tmpl \
 		classes.tmpl \
-		config-printer.tmpl \
+		class-modified.tmpl \
 		config-printer2.tmpl \
+		config-printer.tmpl \
+		edit-config.tmpl \
 		error.tmpl \
 		header.tmpl \
-		jobs.tmpl \
+		help-header.tmpl \
+		help-trailer.tmpl \
 		job-cancel.tmpl \
 		job-hold.tmpl \
 		job-op.tmpl \
 		job-release.tmpl \
 		job-restart.tmpl \
+		jobs.tmpl \
 		modify-class.tmpl \
 		modify-printer.tmpl \
 		option-boolean.tmpl \
@@ -61,7 +64,6 @@ FILES	=	add-class.tmpl \
 		option-pickmany.tmpl \
 		option-pickone.tmpl \
 		option-trailer.tmpl \
-		printers.tmpl \
 		printer-accept.tmpl \
 		printer-added.tmpl \
 		printer-configured.tmpl \
@@ -72,7 +74,9 @@ FILES	=	add-class.tmpl \
 		printer-purge.tmpl \
 		printer-reject.tmpl \
 		printer-start.tmpl \
+		printers.tmpl \
 		printer-stop.tmpl \
+		restart.tmpl \
 		test-page.tmpl \
 		trailer.tmpl \
 		users.tmpl

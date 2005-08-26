@@ -25,65 +25,50 @@
 include ../Makedefs
 
 #
-# HTMLDOC generation rules...
-#
-
-.SUFFIXES:	.html .pdf .ps .shtml
-.shtml.html:
-	echo Formatting $@...
-	$(HTMLDOC) --titleimage images/cups-large.gif --numbered -f $@ $<
-.shtml.pdf:
-	echo Formatting $@...
-	$(HTMLDOC) --titleimage images/cups-large.gif --duplex --compression=9 \
-		--numbered --jpeg -f $@ $<
-.shtml.ps:
-	echo Formatting $@...
-	$(HTMLDOC) --titleimage images/cups-large.gif --duplex --numbered \
-		--jpeg -f $@ $<
-
-HTMLDOC		=	htmldoc --strict --quiet --bodycolor white
-
-
-#
 # Document files...
 #
 
-DOCUMENTS	=	cmp.shtml idd.shtml ipp.shtml ppd.shtml sam.shtml \
-			sdd.shtml spm.shtml sps.shtml ssr.shtml stp.shtml \
-			sum.shtml svd.shtml translation.shtml
-DOCIMAGES	=	images/cups-block-diagram.gif images/cups-large.gif \
-			images/cups-medium.gif images/cups-small.gif
-WEBPAGES	=	cups.css cupsdoc.css index.html documentation.html \
-			robots.txt
+WEBPAGES	=	cups.css cupsdoc.css index.html robots.txt
 WEBIMAGES	=	images/accept-jobs.gif \
 			images/add-class.gif \
 			images/add-printer.gif \
+			images/add-this-printer.gif \
+			images/bottom-left.gif \
+			images/bottom-right.gif \
+			images/cancel.gif \
 			images/cancel-job.gif \
 			images/cancel-jobs.gif \
-			images/cancel.gif \
+			images/change-settings.gif \
 			images/classes.gif \
 			images/config-printer.gif \
 			images/continue.gif \
 			images/delete-class.gif \
 			images/delete-printer.gif \
 			images/draft.gif \
+			images/edit-configuration-file.gif \
+			images/esp-logo.gif \
+			images/hdr-bottom-left.gif \
+			images/hdr-bottom-right.gif \
+			images/hdr-top-left.gif \
+			images/hdr-top-right.gif \
+			images/help.gif \
 			images/hold-job.gif \
-			images/left.gif \
 			images/logo.gif \
 			images/manage-classes.gif \
 			images/manage-jobs.gif \
 			images/manage-printers.gif \
+			images/manage-server.gif \
 			images/modify-class.gif \
 			images/modify-printer.gif \
-			images/navbar.gif \
-			images/print-test-page.gif \
 			images/printer-idle.gif \
 			images/printer-processing.gif \
 			images/printer-stopped.gif \
+			images/print-test-page.gif \
 			images/reject-jobs.gif \
 			images/release-job.gif \
 			images/restart-job.gif \
-			images/right.gif \
+			images/save-changes.gif \
+			images/search.gif \
 			images/set-allowed-users.gif \
 			images/set-as-default.gif \
 			images/show-active.gif \
@@ -91,21 +76,31 @@ WEBIMAGES	=	images/accept-jobs.gif \
 			images/start-class.gif \
 			images/start-printer.gif \
 			images/stop-class.gif \
-			images/stop-printer.gif
+			images/stop-printer.gif \
+			images/tab-left.gif \
+			images/tab-right.gif \
+			images/top-left.gif \
+			images/top-middle.gif \
+			images/top-right.gif \
+			images/use-default-config.gif \
+			images/view-access-log.gif \
+			images/view-error-log.gif \
+			images/view-page-log.gif
+HELPFILES	=	help/access_log-reference.html \
+			help/classes-conf-reference.html \
+			help/client-conf-reference.html \
+			help/cupsd-conf-reference.html \
+			help/error_log-reference.html \
+			help/page_log-reference.html \
+			help/printers-conf-reference.html \
+			help/subscriptions-conf-reference.html
 
 
 #
 # Make all documents...
 #
 
-all:	$(DOCUMENTS:.shtml=.pdf) $(DOCUMENTS:.shtml=.html) overview.pdf
-
-
-#
-# Make PS files...
-#
-
-ps:	$(DOCUMENTS:.shtml=.ps) overview.ps
+all:
 
 
 #
@@ -113,9 +108,6 @@ ps:	$(DOCUMENTS:.shtml=.ps) overview.ps
 #
 
 clean:
-	$(RM) $(DOCUMENTS:.shtml=.pdf)
-	$(RM) $(DOCUMENTS:.shtml=.html)
-	$(RM) overview.pdf
 
 
 #
@@ -127,113 +119,14 @@ install:
 	for file in $(WEBPAGES); do \
 		$(INSTALL_MAN) $$file $(DOCDIR); \
 	done
-	$(INSTALL_MAN) overview.html $(DOCDIR)
-	$(INSTALL_MAN) overview.pdf $(DOCDIR)
-	for file in $(DOCUMENTS:.shtml=.html); do \
-		$(INSTALL_MAN) $$file $(DOCDIR); \
-	done
-	for file in $(DOCUMENTS:.shtml=.pdf); do \
-		$(INSTALL_MAN) $$file $(DOCDIR); \
+	$(INSTALL_DIR) $(DOCDIR)/help
+	for file in $(HELPFILES); do \
+		$(INSTALL_MAN) $$file $(DOCDIR)/help; \
 	done
 	$(INSTALL_DIR) $(DOCDIR)/images
-	for file in $(WEBIMAGES) $(DOCIMAGES); do \
+	for file in $(WEBIMAGES); do \
 		$(INSTALL_MAN) $$file $(DOCDIR)/images; \
 	done
-
-
-#
-# The overview, admin manual, programmers manual, and users manual get
-# special attention...
-#
-
-overview.pdf:	overview.html
-	echo Formatting $@...
-	$(HTMLDOC) --duplex --compression=9 --jpeg --webpage -f overview.pdf overview.html
-overview.ps:	overview.html
-	echo Formatting $@...
-	$(HTMLDOC) --duplex --jpeg --webpage -f overview.ps overview.html
-
-sam.html:	sam.shtml
-	echo Formatting $@...
-	$(HTMLDOC) --titleimage images/cups-large.gif -f $@ $<
-sam.pdf:	sam.shtml
-	echo Formatting $@...
-	$(HTMLDOC) --titleimage images/cups-large.gif --duplex --compression=9 \
-		--jpeg -f $@ $<
-sam.ps:		sam.shtml
-	echo Formatting $@...
-	$(HTMLDOC) --titleimage images/cups-large.gif --duplex --jpeg -f $@ $<
-
-spm.html:	spm.shtml
-	echo Formatting $@...
-	$(HTMLDOC) --titleimage images/cups-large.gif -f $@ $<
-spm.pdf:	spm.shtml
-	echo Formatting $@...
-	$(HTMLDOC) --titleimage images/cups-large.gif --duplex --compression=9 \
-		--jpeg -f $@ $<
-spm.ps:		spm.shtml
-	echo Formatting $@...
-	$(HTMLDOC) --titleimage images/cups-large.gif --duplex --jpeg -f $@ $<
-
-sum.html:	sum.shtml
-	echo Formatting $@...
-	$(HTMLDOC) --titleimage images/cups-large.gif -f $@ $<
-sum.pdf:	sum.shtml
-	echo Formatting $@...
-	$(HTMLDOC) --titleimage images/cups-large.gif --duplex --compression=9 \
-		--jpeg -f $@ $<
-sum.ps:		sum.shtml
-	echo Formatting $@...
-	$(HTMLDOC) --titleimage images/cups-large.gif --duplex --jpeg -f $@ $<
-
-sam-7x8.pdf:	sam.shtml
-	echo Formatting $@...
-	$(HTMLDOC) --titleimage images/cups-large.gif --duplex --compression=9 \
-		--pagelayout tworight --pagemode document \
-		--jpeg --size 7x8.5in --left 0.5in --right 0.25in \
-		--top 0.25in --bottom 0.25in --fontsize 10 --headfootsize 10 -f $@ sam.shtml
-sam-7x8.ps:		sam.shtml
-	echo Formatting $@...
-	$(HTMLDOC) --titleimage images/cups-large.gif --duplex --jpeg \
-		--size 7x8.5in --left 0.5in --right 0.25in \
-		--top 0.25in --bottom 0.25in --fontsize 10 --headfootsize 10 -f $@ sam.shtml
-spm-7x8.pdf:	spm.shtml
-	echo Formatting $@...
-	$(HTMLDOC) --titleimage images/cups-large.gif --duplex --compression=9 \
-		--pagelayout tworight --pagemode document \
-		--jpeg --size 7x8.5in --left 0.5in --right 0.25in \
-		--top 0.25in --bottom 0.25in --fontsize 10 --headfootsize 10 -f $@ spm.shtml
-spm-7x8.ps:		spm.shtml
-	echo Formatting $@...
-	$(HTMLDOC) --titleimage images/cups-large.gif --duplex --jpeg \
-		--size 7x8.5in --left 0.5in --right 0.25in \
-		--top 0.25in --bottom 0.25in --fontsize 10 --headfootsize 10 -f $@ spm.shtml
-sum-7x8.pdf:	sum.shtml
-	echo Formatting $@...
-	$(HTMLDOC) --titleimage images/cups-large.gif --duplex --compression=9 \
-		--pagelayout tworight --pagemode document \
-		--jpeg --size 7x8.5in --left 0.5in --right 0.25in \
-		--top 0.25in --bottom 0.25in --fontsize 10 --headfootsize 10 -f $@ sum.shtml
-sum-7x8.ps:		sum.shtml
-	echo Formatting $@...
-	$(HTMLDOC) --titleimage images/cups-large.gif --duplex --jpeg \
-		--size 7x8.5in --left 0.5in --right 0.25in \
-		--top 0.25in --bottom 0.25in --fontsize 10 --headfootsize 10 -f $@ sum.shtml
-
-$(DOCUMENTS:.shtml=.html): \
-		glossary.shtml printing-overview.shtml \
-		references.shtml system-overview.shtml \
-		../LICENSE.html
-
-$(DOCUMENTS:.shtml=.pdf): \
-		glossary.shtml printing-overview.shtml \
-		references.shtml system-overview.shtml \
-		../LICENSE.html
-
-$(DOCUMENTS:.shtml=.ps): \
-		glossary.shtml printing-overview.shtml \
-		references.shtml system-overview.shtml \
-		../LICENSE.html
 
 
 #
