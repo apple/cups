@@ -74,6 +74,10 @@ TR.data, TD.data, TR.data TD {
   padding: 5;
 }
 
+HR {
+  border: solid thin;
+}
+
 .conflict {
   color: red;
 }
