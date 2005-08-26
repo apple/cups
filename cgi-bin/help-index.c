@@ -1,4 +1,3 @@
-#define DEBUG
 /*
  * "$Id$"
  *
@@ -33,12 +32,14 @@
 #include "help-index.h"
 #include <cups/debug.h>
 #include <dirent.h>
+#include <regex.h>
 
 
 /*
  * Local functions...
  */
 
+static regex_t		*help_compile_search(const char *query);
 static void		help_create_sorted(help_index_t *hi);
 static void		help_delete_node(help_node_t *n);
 static help_node_t	**help_find_node(help_index_t *hi,
@@ -320,13 +321,47 @@ helpSaveIndex(help_index_t *hi,		/* I - Index */
 
 help_index_t *				/* O - Search index */
 helpSearchIndex(help_index_t *hi,	/* I - Index */
-                const char   *query)	/* I - Query string */
+                const char   *query,	/* I - Query string */
+		const char   *filename)	/* I - Limit search to this file */
 {
+  int		i, j;			/* Looping vars */
   help_index_t	*search;		/* Search index */
+  help_node_t	**n;			/* Current node */
+  regex_t	*re;			/* Regular expression */
+  int		num_matches;		/* Number of matches */
+  regmatch_t	matches[100];		/* Matches */
 
 
-  DEBUG_printf(("helpSearchIndex(hi=%p, query=\"%s\")\n",
-                hi, query ? query : "(nil)"));
+  DEBUG_printf(("helpSearchIndex(hi=%p, query=\"%s\", filename=\"%s\")\n",
+                hi, query ? query : "(nil)",
+		filename ? filename : "(nil)"));
+
+ /*
+  * Range check...
+  */
+
+  if (!hi || !query)
+    return (NULL);
+
+  for (i = 0, n = hi->nodes; i < hi->num_nodes; i ++, n ++)
+    n[0]->score = 0;
+
+  if (filename)
+  {
+    n = help_find_node(hi, filename, NULL);
+    if (!n)
+      return (NULL);
+  }
+  else
+    n = hi->nodes;
+
+ /*
+  * Convert the query into a regular expression...
+  */
+
+  re = help_compile_search(query);
+  if (!re)
+    return (NULL);
 
  /*
   * Allocate a search index...
@@ -334,9 +369,44 @@ helpSearchIndex(help_index_t *hi,	/* I - Index */
 
   search = calloc(1, sizeof(help_index_t));
   if (!search)
+  {
+    regfree(re);
     return (NULL);
+  }
 
   search->search = 1;
+
+ /*
+  * Check each node in the index, adding matching nodes to the
+  * search index...
+  */
+
+  for (i = n - hi->nodes; i < hi->num_nodes; i ++, n ++)
+    if (!regexec(re, n[0]->text, sizeof(matches) / sizeof(matches[0]),
+                 matches, 0))
+    {
+     /*
+      * Found a match, add the node to the search index...
+      */
+
+      help_insert_node(search, *n);
+
+     /*
+      * Figure out the number of matches in the string...
+      */
+
+      for (j = 0; j < (int)(sizeof(matches) / sizeof(matches[0])); j ++)
+        if (matches[j].rm_so < 0)
+	  break;
+
+      n[0]->score = j;
+    }
+
+ /*
+  * Free the regular expression...
+  */
+
+  regfree(re);
 
  /*
   * Sort the results...
@@ -349,6 +419,233 @@ helpSearchIndex(help_index_t *hi,	/* I - Index */
   */
 
   return (search);
+}
+
+
+/*
+ * 'help_compile_search()' - Convert a search string into a regular expression.
+ */
+
+static regex_t *			/* O - New regular expression */
+help_compile_search(const char *query)	/* I - Query string */
+{
+  regex_t	*re;			/* Regular expression */
+  char		*s,			/* Regular expression string */
+		*sptr;			/* Pointer into RE string */
+  int		slen;			/* Allocated size of RE string */
+  const char	*qptr,			/* Pointer into query string */
+		*qend;			/* End of current word */
+  const char	*prefix;		/* Prefix to add to next word */
+  int		quoted;			/* Word is quoted */
+  int		wlen;			/* Word length */
+
+
+  DEBUG_printf(("help_compile_search(query=\"%s\")\n", query ? query : "(nil)"));
+
+ /*
+  * Allocate a regular expression storage structure...
+  */
+
+  re = (regex_t *)calloc(1, sizeof(regex_t));
+
+ /*
+  * Allocate a buffer to hold the regular expression string, starting
+  * at 1024 bytes or 3 times the length of the query string, whichever
+  * is greater.  We'll expand the string as needed...
+  */
+
+  slen = strlen(query) * 3;
+  if (slen < 1024)
+    slen = 1024;
+
+  s = (char *)malloc(slen);
+
+ /*
+  * Copy the query string to the regular expression, handling basic
+  * AND and OR logic...
+  */
+
+  prefix = ".*";
+  qptr   = query;
+  sptr   = s;
+
+  while (*qptr)
+  {
+   /*
+    * Skip leading whitespace...
+    */
+
+    while (isspace(*qptr & 255))
+      qptr ++;
+
+    if (!*qptr)
+      break;
+
+   /*
+    * Find the end of the current word...
+    */
+
+    if (*qptr == '\"' || *qptr == '\'')
+    {
+     /*
+      * Scan quoted string...
+      */
+
+      quoted = *qptr ++;
+      for (qend = qptr; *qend && *qend != quoted; qend ++);
+
+      if (!*qend)
+      {
+       /*
+        * No closing quote, error out!
+	*/
+
+	free(s);
+	free(re);
+
+	return (NULL);
+      }
+    }
+    else
+    {
+     /*
+      * Scan whitespace-delimited string...
+      */
+
+      quoted = 0;
+      for (qend = qptr + 1; *qend && !isspace(*qend); qend ++);
+    }
+
+    wlen = qend - qptr;
+
+   /*
+    * Look for logic words: AND, OR
+    */
+
+    if (wlen == 3 && !strncasecmp(qptr, "AND", 3))
+    {
+     /*
+      * Logical AND with the following text...
+      */
+
+      if (sptr > s)
+        prefix = ".*";
+
+      qptr = qend;
+    }
+    else if (wlen == 2 && !strncasecmp(qptr, "OR", 2))
+    {
+     /*
+      * Logical OR with the following text...
+      */
+
+      if (sptr > s)
+        prefix = ".*|.*";
+
+      qptr = qend;
+    }
+    else
+    {
+     /*
+      * Add a search word, making sure we have enough room for the
+      * string + RE overhead...
+      */
+
+      wlen = (sptr - s) + 2 * wlen + strlen(prefix) + 4;
+
+      if (wlen > slen)
+      {
+       /*
+        * Expand the RE string buffer...
+	*/
+
+        char *temp;			/* Temporary string pointer */
+
+
+	slen = wlen + 128;
+        temp = (char *)realloc(s, slen);
+	if (!temp)
+	{
+	  free(s);
+	  free(re);
+
+	  return (NULL);
+	}
+
+        sptr = temp + (sptr - s);
+	s    = temp;
+      }
+
+     /*
+      * Add the prefix string...
+      */
+
+      strcpy(sptr, prefix);
+      sptr += strlen(sptr);
+
+     /*
+      * Then quote the remaining word characters as needed for the
+      * RE...
+      */
+
+      while (qptr < qend)
+      {
+       /*
+        * Quote: ^ . [ $ ( ) | * + ? { \
+	*/
+
+        if (strchr("^.[$()|*+?{\\", *qptr))
+	  *sptr++ = '\\';
+
+	*sptr++ = *qptr++;
+      }
+
+      prefix = ".*|.*";
+    }
+
+   /*
+    * Advance to the next string...
+    */
+
+    if (quoted)
+      qptr ++;
+  }
+
+  if (sptr > s)
+    strcpy(sptr, ".*");
+  else
+  {
+   /*
+    * No query data, return NULL...
+    */
+
+    free(s);
+    free(re);
+
+    return (NULL);
+  }
+
+ /*
+  * Compile the regular expression...
+  */
+
+  DEBUG_printf(("    s=\"%s\"\n", s));
+
+  if (regcomp(re, s, REG_ICASE))
+  {
+    free(re);
+    free(s);
+
+    return (NULL);
+  }
+
+ /*
+  * Free the RE string and return the new regular expression we compiled...
+  */
+
+  free(s);
+
+  return (re);
 }
 
 
@@ -514,7 +811,10 @@ help_insert_node(help_index_t *hi,	/* I - Index */
   * Otherwise, do a binary insertion...
   */
 
-  for (left = 0, right = hi->num_nodes - 1; (right - left) > 1;)
+  left    = 0;
+  right   = hi->num_nodes - 1;
+
+  do
   {
     current = (left + right) / 2;
     diff    = help_sort_by_name(&n, hi->nodes + current);
@@ -526,6 +826,7 @@ help_insert_node(help_index_t *hi,	/* I - Index */
     else
       left = current;
   }
+  while ((right - left) > 1);
 
   if (diff > 0)
     current ++;
@@ -756,8 +1057,10 @@ help_load_file(
       while ((ptr = strchr(text, '<')) == NULL)
       {
 	ptr = text + strlen(text);
-	if (ptr >= (line + sizeof(line) - 1))
+	if (ptr >= (line + sizeof(line) - 2))
 	  break;
+
+        *ptr++ = ' ';
 
         if (!cupsFileGets(fp, ptr, sizeof(line) - (ptr - line) - 1))
 	  break;
@@ -825,6 +1128,8 @@ help_load_file(
 
     offset = cupsFileTell(fp);
   }
+
+  cupsFileClose(fp);
 
   if (node)
     node->length = offset - node->offset;

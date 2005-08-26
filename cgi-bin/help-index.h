@@ -70,7 +70,8 @@ extern help_node_t	*helpFindNode(help_index_t *hi, const char *filename,
 			              const char *anchor);
 extern help_index_t	*helpLoadIndex(const char *hifile, const char *directory);
 extern int		helpSaveIndex(help_index_t *hi, const char *hifile);
-extern help_index_t	*helpSearchIndex(help_index_t *hi, const char *query);
+extern help_index_t	*helpSearchIndex(help_index_t *hi, const char *query,
+			                 const char *filename);
 
 
 #endif /* !_CUPS_HELP_INDEX_H_ */

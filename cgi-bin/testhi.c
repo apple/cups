@@ -60,6 +60,23 @@ main(int  argc,				/* I - Number of command-line arguments */
   list_nodes("nodes", hi->num_nodes, hi->nodes);
   list_nodes("sorted", hi->num_nodes, hi->sorted);
 
+ /*
+  * Do any searches...
+  */
+
+  if (argc > 1)
+  {
+    search = helpSearchIndex(hi, argv[1], argv[2]);
+
+    if (search)
+    {
+      list_nodes(argv[1], search->num_nodes, search->sorted);
+      helpDeleteIndex(search);
+    }
+    else
+      printf("%s (0 nodes)\n", argv[1]);
+  }
+
   helpDeleteIndex(hi);
 
  /*
