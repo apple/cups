@@ -122,13 +122,13 @@ if test x$rcdir = x; then
 				INITDIR="/sbin/init.d"
 				INITDDIR=".."
 			else
-				if test -d /etc/rc.d; then
-					# RedHat
-					INITDIR="/etc/rc.d"
-					INITDDIR="../init.d"
-				else
+				if test -d /etc/init.d; then
 					# Others
 					INITDIR="/etc"
+					INITDDIR="../init.d"
+				else
+					# RedHat
+					INITDIR="/etc/rc.d"
 					INITDDIR="../init.d"
 				fi
 			fi

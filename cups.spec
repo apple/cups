@@ -156,8 +156,6 @@ rm -rf $RPM_BUILD_ROOT
 
 /usr/bin/cancel
 /usr/bin/cupstestppd
-/usr/bin/disable
-/usr/bin/enable
 /usr/bin/lp*
 %dir /usr/lib/cups
 /usr/lib/cups/*
@@ -200,37 +198,6 @@ rm -rf $RPM_BUILD_ROOT
 %dir /usr/share/man/man8
 /usr/share/man/man8/*
 
-%dir /usr/share/man/fr/cat1
-/usr/share/man/fr/cat1/backend.1
-/usr/share/man/fr/cat1/cupstestppd.1
-/usr/share/man/fr/cat1/filter.1
-/usr/share/man/fr/cat1/lp.1
-/usr/share/man/fr/cat1/lpoptions.1
-/usr/share/man/fr/cat1/lppasswd.1
-/usr/share/man/fr/cat1/lpq.1
-/usr/share/man/fr/cat1/lpr.1
-/usr/share/man/fr/cat1/lprm.1
-/usr/share/man/fr/cat1/lpstat.1
-%dir /usr/share/man/fr/cat5
-/usr/share/man/fr/cat5/*
-%dir /usr/share/man/fr/cat8
-/usr/share/man/fr/cat8/*
-%dir /usr/share/man/fr/man1
-/usr/share/man/fr/man1/backend.1
-/usr/share/man/fr/man1/cupstestppd.1
-/usr/share/man/fr/man1/filter.1
-/usr/share/man/fr/man1/lp.1
-/usr/share/man/fr/man1/lpoptions.1
-/usr/share/man/fr/man1/lppasswd.1
-/usr/share/man/fr/man1/lpq.1
-/usr/share/man/fr/man1/lpr.1
-/usr/share/man/fr/man1/lprm.1
-/usr/share/man/fr/man1/lpstat.1
-%dir /usr/share/man/fr/man5
-/usr/share/man/fr/man5/*
-%dir /usr/share/man/fr/man8
-/usr/share/man/fr/man8/*
-
 %attr(0700,lp,root) %dir /var/spool/cups
 %attr(1700,lp,root) %dir /var/spool/cups/tmp
 
@@ -239,11 +206,6 @@ rm -rf $RPM_BUILD_ROOT
 /usr/share/man/cat1/cups-config.1
 %dir /usr/share/man/man1
 /usr/share/man/man1/cups-config.1.gz
-
-%dir /usr/share/man/es/cat1
-/usr/share/man/es/cat1/cups-config.1
-%dir /usr/share/man/es/man1
-/usr/share/man/es/man1/cups-config.1.gz
 
 /usr/bin/cups-config
 %dir /usr/include/cups
