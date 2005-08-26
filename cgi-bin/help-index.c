@@ -658,7 +658,7 @@ help_compile_search(const char *query)	/* I - Query string */
 
   DEBUG_printf(("    s=\"%s\"\n", s));
 
-  if (regcomp(re, s, REG_ICASE))
+  if (regcomp(re, s, REG_EXTENDED | REG_ICASE))
   {
     free(re);
     free(s);
