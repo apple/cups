@@ -29,9 +29,11 @@
  * Include necessary headers...
  */
 
+#  include <stdio.h>
+#  include <stdlib.h>
+#  include <sys/stat.h>
 #  include <cups/cups.h>
 #  include <cups/string.h>
-#  include <sys/stat.h>
 
 
 /*
@@ -70,6 +72,8 @@ extern help_index_t	*helpLoadIndex(const char *hifile, const char *directory);
 extern int		helpSaveIndex(help_index_t *hi, const char *hifile);
 extern help_index_t	*helpSearchIndex(help_index_t *hi, const char *query);
 
+
+#endif /* !_CUPS_HELP_INDEX_H_ */
 
 /*
  * End of "$Id$".

@@ -220,8 +220,8 @@ mimeMerge(mime_t     *mime,	/* I - MIME database to add to */
 
   while ((dent = readdir(dir)) != NULL)
   {
-    if (NAMLEN(dent) > 6 &&
-        strcmp(dent->d_name + NAMLEN(dent) - 6, ".types") == 0)
+    if (strlen(dent->d_name) > 6 &&
+        strcmp(dent->d_name + strlen(dent->d_name) - 6, ".types") == 0)
     {
      /*
       * Load a mime.types file...
@@ -240,8 +240,8 @@ mimeMerge(mime_t     *mime,	/* I - MIME database to add to */
 
   while ((dent = readdir(dir)) != NULL)
   {
-    if (NAMLEN(dent) > 6 &&
-        strcmp(dent->d_name + NAMLEN(dent) - 6, ".convs") == 0)
+    if (strlen(dent->d_name) > 6 &&
+        strcmp(dent->d_name + strlen(dent->d_name) - 6, ".convs") == 0)
     {
      /*
       * Load a mime.convs file...

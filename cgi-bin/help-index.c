@@ -1,3 +1,4 @@
+#define DEBUG
 /*
  * "$Id$"
  *
@@ -30,6 +31,7 @@
  */
 
 #include "help-index.h"
+#include <cups/debug.h>
 #include <dirent.h>
 
 
@@ -42,6 +44,7 @@ static void		help_delete_node(help_node_t *n);
 static help_node_t	**help_find_node(help_index_t *hi,
 			                 const char *filename,
 			                 const char *anchor);
+static void		help_insert_node(help_index_t *hi, help_node_t *n);
 static int		help_load_directory(help_index_t *hi,
 			                    const char *directory,
 					    const char *relative);
@@ -49,12 +52,11 @@ static int		help_load_file(help_index_t *hi,
 			               const char *filename,
 				       const char *relative,
 				       time_t     mtime);
-static help_node_t	*help_new_node(help_index_t *hi, const char *filename,
-			               const char *anchor, const char *text,
-				       time_t mtime, off_t offset,
-				       size_t length);
-static int		help_sort_nodes_by_name(const void *n1, const void *n2);
-static int		help_sort_nodes_by_score(const void *n1, const void *n2);
+static help_node_t	*help_new_node(const char *filename, const char *anchor,
+			               const char *text, time_t mtime,
+				       off_t offset, size_t length);
+static int		help_sort_by_name(const void *p1, const void *p2);
+static int		help_sort_by_score(const void *p1, const void *p2);
 
 
 /*
@@ -66,6 +68,8 @@ helpDeleteIndex(help_index_t *hi)
 {
   int	i;				/* Looping var */
 
+
+  DEBUG_printf(("helpDeleteIndex(hi=%p)\n", hi));
 
   if (!hi)
     return;
@@ -96,6 +100,9 @@ helpFindNode(help_index_t *hi,		/* I - Index */
 {
   help_node_t	**match;		/* Match */
 
+
+  DEBUG_printf(("helpFindNode(hi=%p, filename=\"%s\", anchor=\"%s\")\n",
+                hi, filename ? filename : "(nil)", anchor ? anchor : "(nil)"));
 
   if (!hi || !filename)
     return (NULL);
@@ -129,6 +136,9 @@ helpLoadIndex(const char *hifile,	/* I - Index filename */
   int		i;			/* Looping var */
   help_node_t	*node;			/* Current node */
 
+
+  DEBUG_printf(("helpLoadIndex(hifile=\"%s\", directory=\"%s\")\n",
+                hifile, directory));
 
  /*
   * Create a new, empty index.
@@ -174,12 +184,11 @@ helpLoadIndex(const char *hifile,	/* I - Index filename */
 
       text = ptr;
 
-      if ((node = help_new_node(hi,
-                                strdup(filename),
-				anchor ? strdup(anchor) : anchor,
-				strdup(text),
+      if ((node = help_new_node(filename, anchor, text,
 				mtime, offset, length)) == NULL)
         break;
+
+      help_insert_node(hi, node);
 
       node->score = -1;
     }
@@ -258,6 +267,8 @@ helpSaveIndex(help_index_t *hi,		/* I - Index */
   help_node_t	*node;			/* Current node */
 
 
+  DEBUG_printf(("helpSaveIndex(hi=%p, hifile=\"%s\")\n", hi, hifile));
+
  /*
   * Try creating a new index file...
   */
@@ -307,9 +318,37 @@ helpSaveIndex(help_index_t *hi,		/* I - Index */
  * 'helpSearchIndex()' - Search an index.
  */
 
-help_index_t *
-helpSearchIndex(help_index_t *hi, const char *query)
+help_index_t *				/* O - Search index */
+helpSearchIndex(help_index_t *hi,	/* I - Index */
+                const char   *query)	/* I - Query string */
 {
+  help_index_t	*search;		/* Search index */
+
+
+  DEBUG_printf(("helpSearchIndex(hi=%p, query=\"%s\")\n",
+                hi, query ? query : "(nil)"));
+
+ /*
+  * Allocate a search index...
+  */
+
+  search = calloc(1, sizeof(help_index_t));
+  if (!search)
+    return (NULL);
+
+  search->search = 1;
+
+ /*
+  * Sort the results...
+  */
+
+  help_create_sorted(search);
+
+ /*
+  * Return the results...
+  */
+
+  return (search);
 }
 
 
@@ -320,6 +359,8 @@ helpSearchIndex(help_index_t *hi, const char *query)
 static void
 help_create_sorted(help_index_t *hi)	/* I - Index */
 {
+  DEBUG_printf(("help_create_sorted(hi=%p)\n", hi));
+
  /*
   * Free any existing sorted array...
   */
@@ -346,8 +387,9 @@ help_create_sorted(help_index_t *hi)	/* I - Index */
   * Sort the new array by score and text.
   */
 
-  qsort(hi->sorted, hi->num_nodes, sizeof(help_node_t *),
-        help_sort_by_score);
+  if (hi->num_nodes > 1)
+    qsort(hi->sorted, hi->num_nodes, sizeof(help_node_t *),
+          help_sort_by_score);
 }
 
 
@@ -358,6 +400,8 @@ help_create_sorted(help_index_t *hi)	/* I - Index */
 static void
 help_delete_node(help_node_t *n)	/* I - Node */
 {
+  DEBUG_printf(("help_delete_node(n=%p)\n", n));
+
   if (!n)
     return;
 
@@ -387,12 +431,109 @@ help_find_node(help_index_t *hi,	/* I - Index */
 		*ptr;			/* Pointer to key */
 
 
-  key.filename = filename;
-  key.anchor   = anchor;
+  DEBUG_printf(("help_find_node(hi=%p, filename=\"%s\", anchor=\"%s\")\n",
+                hi, filename ? filename : "(nil)", anchor ? anchor : "(nil)"));
+
+  key.filename = (char *)filename;
+  key.anchor   = (char *)anchor;
   ptr          = &key;
 
   return ((help_node_t **)bsearch(&ptr, hi->nodes, hi->num_nodes,
                                   sizeof(help_node_t *), help_sort_by_name));
+}
+
+
+/*
+ * 'help_insert_node()' - Insert a node in an index.
+ */
+
+static void
+help_insert_node(help_index_t *hi,	/* I - Index */
+                 help_node_t  *n)	/* I - Node */
+{
+  int		current,		/* Current node */
+		left,			/* Left side */
+		right,			/* Right side */
+		diff;			/* Difference between nodes */
+  help_node_t	**temp;			/* Temporary node pointer */
+
+
+  DEBUG_printf(("help_insert_node(hi=%p, n=%p)\n", hi, n));
+
+ /*
+  * Allocate memory as needed...
+  */
+
+  if (hi->num_nodes >= hi->alloc_nodes)
+  {
+   /*
+    * Expand the array in 128 node increments...
+    */
+
+    hi->alloc_nodes += 128;
+    if (hi->alloc_nodes == 128)
+      temp = (help_node_t **)malloc(hi->alloc_nodes * sizeof(help_node_t *));
+    else
+      temp = (help_node_t **)realloc(hi->nodes,
+                                     hi->alloc_nodes * sizeof(help_node_t *));
+
+    if (!temp)
+      return;
+
+    hi->nodes = temp;
+  }
+
+ /*
+  * Find the insertion point...
+  */
+
+  if (hi->num_nodes == 0 ||
+      help_sort_by_name(&n, hi->nodes + hi->num_nodes - 1) > 0)
+  {
+   /*
+    * Last node...
+    */
+
+    hi->nodes[hi->num_nodes] = n;
+    hi->num_nodes ++;
+    return;
+  }
+  else if (help_sort_by_name(&n, hi->nodes) < 0)
+  {
+   /*
+    * First node...
+    */
+
+    memmove(hi->nodes + 1, hi->nodes, hi->num_nodes * sizeof(help_node_t *));
+    hi->nodes[0] = n;
+    hi->num_nodes ++;
+    return;
+  }
+
+ /*
+  * Otherwise, do a binary insertion...
+  */
+
+  for (left = 0, right = hi->num_nodes - 1; (right - left) > 1;)
+  {
+    current = (left + right) / 2;
+    diff    = help_sort_by_name(&n, hi->nodes + current);
+
+    if (!diff)
+      break;
+    else if (diff < 0)
+      right = current;
+    else
+      left = current;
+  }
+
+  if (diff > 0)
+    current ++;
+
+  memmove(hi->nodes + current + 1, hi->nodes + current,
+          (hi->num_nodes - current) * sizeof(help_node_t *));
+  hi->nodes[current] = n;
+  hi->num_nodes ++;
 }
 
 
@@ -416,6 +557,9 @@ help_load_directory(
   int		update;			/* Updated? */
   help_node_t	**node;			/* Current node */
 
+
+  DEBUG_printf(("help_load_directory(hi=%p, directory=\"%s\", relative=\"%s\")\n",
+                hi, directory ? directory : "(nil)", relative ? relative : "(nil)"));
 
  /*
   * Open the directory and scan it...
@@ -479,11 +623,11 @@ help_load_directory(
 
           continue;
 	}
-
-        update = 1;
-
-	help_load_file(hi, filename, relname, fileinfo.st_mtime);
       }
+
+      update = 1;
+
+      help_load_file(hi, filename, relname, fileinfo.st_mtime);
     }
     else if (S_ISDIR(fileinfo.st_mode))
     {
@@ -523,6 +667,10 @@ help_load_file(
   char		quote;			/* Quote character */
 
 
+  DEBUG_printf(("help_load_file(hi=%p, filename=\"%s\", relative=\"%s\", mtime=%ld)\n",
+                hi, filename ? filename : "(nil)",
+		relative ? relative : "(nil)", mtime));
+
   if ((fp = cupsFileOpen(filename, "r")) == NULL)
     return (-1);
 
@@ -535,7 +683,7 @@ help_load_file(
     * Look for a <TITLE> or <A NAME prefix...
     */
 
-    for (ptr = line; (ptr = strchr(ptr, '<')) != NULL);)
+    for (ptr = line; (ptr = strchr(ptr, '<')) != NULL;)
     {
       ptr ++;
 
@@ -545,7 +693,8 @@ help_load_file(
         * Found the title...
 	*/
 
-	break;
+	anchor = NULL;
+	ptr += 6;
       }
       else if (!strncasecmp(ptr, "A NAME=", 7))
       {
@@ -575,7 +724,9 @@ help_load_file(
 	  */
 
           anchor = ptr + 1;
+
 	  for (ptr = anchor; *ptr && *ptr != '>' && !isspace(*ptr & 255); ptr ++);
+
 	  if (*ptr)
 	    *ptr++ = '\0';
 	  else
@@ -592,9 +743,80 @@ help_load_file(
         if (*ptr != '>')
 	  break;
 
-        text = ptr + 1;
-	break;
+        ptr ++;
       }
+      else
+        continue;
+
+     /*
+      * Now collect text for the link...
+      */
+
+      text = ptr;
+      while ((ptr = strchr(text, '<')) == NULL)
+      {
+	ptr = text + strlen(text);
+	if (ptr >= (line + sizeof(line) - 1))
+	  break;
+
+        if (!cupsFileGets(fp, ptr, sizeof(line) - (ptr - line) - 1))
+	  break;
+      }
+
+      *ptr = '\0';
+
+      if (node)
+	node->length = offset - node->offset;
+
+      if ((node = helpFindNode(hi, filename, anchor)) != NULL)
+      {
+       /*
+	* Node already in the index, so replace the text and other
+	* data...
+	*/
+
+	if (node->text)
+	  free(node->text);
+
+	node->text   = strdup(text);
+	node->mtime  = mtime;
+	node->offset = offset;
+	node->score  = 0;
+      }
+      else
+      {
+       /*
+	* New node...
+	*/
+
+        node = help_new_node(filename, anchor, text, mtime, offset, 0);
+	help_insert_node(hi, node);
+      }
+
+     /*
+      * Go through the text value and replace tabs and newlines with
+      * whitespace and eliminate extra whitespace...
+      */
+
+      for (ptr = node->text, text = node->text; *ptr;)
+	if (isspace(*ptr & 255))
+	{
+	  while (isspace(*ptr & 255))
+	    *ptr ++;
+
+	  *text++ = ' ';
+        }
+	else if (text != ptr)
+	  *text++ = *ptr++;
+	else
+	{
+	  text ++;
+	  ptr ++;
+	}
+
+      *text = '\0';
+
+      break;
     }
 
    /*
@@ -616,13 +838,32 @@ help_load_file(
  */
 
 static help_node_t *			/* O - Node pointer or NULL on error */
-help_new_node(help_index_t *hi,		/* I - Index */
-              const char   *filename,	/* I - Filename */
+help_new_node(const char   *filename,	/* I - Filename */
               const char   *anchor,	/* I - Anchor */
 	      const char   *text,	/* I - Text */
+	      time_t       mtime,	/* I - Modification time */
               off_t        offset,	/* I - Offset in file */
 	      size_t       length)	/* I - Length in bytes */
 {
+  help_node_t	*n;			/* Node */
+
+
+  DEBUG_printf(("help_new_node(filename=\"%s\", anchor=\"%s\", text=\"%s\", mtime=%ld, offset=%ld, length=%ld)\n",
+                filename ? filename : "(nil)", anchor ? anchor : "(nil)",
+		text ? text : "(nil)", mtime, offset, length));
+
+  n = (help_node_t *)calloc(1, sizeof(help_node_t));
+  if (!n)
+    return (NULL);
+
+  n->filename = strdup(filename);
+  n->anchor   = anchor ? strdup(anchor) : NULL;
+  n->text     = strdup(text);
+  n->mtime    = mtime;
+  n->offset   = offset;
+  n->length   = length;
+
+  return (n);
 }
 
 
@@ -630,10 +871,31 @@ help_new_node(help_index_t *hi,		/* I - Index */
  * 'help_sort_nodes_by_name()' - Sort nodes by filename and anchor.
  */
 
-static int
-help_sort_nodes_by_name(const void *n1,
-                        const void *n2)
+static int				/* O - Difference */
+help_sort_by_name(const void *p1,	/* I - First node */
+                  const void *p2)	/* I - Second node */
 {
+  help_node_t	**n1,			/* First node */
+		**n2;			/* Second node */
+  int		diff;			/* Difference */
+
+
+  DEBUG_printf(("help_sort_by_name(p1=%p, p2=%p)\n", p1, p2));
+
+  n1 = (help_node_t **)p1;
+  n2 = (help_node_t **)p2;
+
+  if ((diff = strcmp(n1[0]->filename, n2[0]->filename)) != 0)
+    return (diff);
+
+  if (!n1[0]->anchor && !n2[0]->anchor)
+    return (0);
+  else if (!n1[0]->anchor)
+    return (-1);
+  else if (!n2[0]->anchor)
+    return (1);
+  else
+    return (strcmp(n1[0]->anchor, n2[0]->anchor));
 }
 
 
@@ -641,10 +903,23 @@ help_sort_nodes_by_name(const void *n1,
  * 'help_sort_nodes_by_score()' - Sort nodes by score and text.
  */
 
-static int
-help_sort_nodes_by_score(const void *n1,
-                         const void *n2)
+static int				/* O - Difference */
+help_sort_by_score(const void *p1,	/* I - First node */
+                   const void *p2)	/* I - Second node */
 {
+  help_node_t	**n1,			/* First node */
+		**n2;			/* Second node */
+
+
+  DEBUG_printf(("help_sort_by_score(p1=%p, p2=%p)\n", p1, p2));
+
+  n1 = (help_node_t **)p1;
+  n2 = (help_node_t **)p2;
+
+  if (n1[0]->score != n2[0]->score)
+    return (n1[0]->score - n2[0]->score);
+  else
+    return (strcasecmp(n1[0]->text, n2[0]->text));
 }
 
 

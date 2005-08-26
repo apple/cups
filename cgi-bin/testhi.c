@@ -33,6 +33,13 @@
 
 
 /*
+ * Local functions...
+ */
+
+static void	list_nodes(const char *title, int num_nodes, help_node_t **nodes);
+
+
+/*
  * 'main()' - Test the help index code.
  */
 
@@ -40,11 +47,48 @@ int					/* O - Exit status */
 main(int  argc,				/* I - Number of command-line arguments */
      char *argv[])			/* I - Command-line arguments */
 {
+  help_index_t	*hi,			/* Help index */
+		*search;		/* Search index */
+
+
+ /*
+  * Load the help index...
+  */
+
+  hi = helpLoadIndex("testhi.index", ".");
+
+  list_nodes("nodes", hi->num_nodes, hi->nodes);
+  list_nodes("sorted", hi->num_nodes, hi->sorted);
+
+  helpDeleteIndex(hi);
+
  /*
   * Return with no errors...
   */
 
   return (0);
+}
+
+
+/*
+ * 'list_nodes()' - List nodes in an array...
+ */
+
+static void
+list_nodes(const char  *title,		/* I - Title string */
+           int         num_nodes,	/* I - Number of nodes */
+	   help_node_t **nodes)		/* I - Nodes */
+{
+  int	i;				/* Looping var */
+
+
+  printf("%s (%d nodes):\n", title, num_nodes);
+  for (i = 0; i < num_nodes; i ++)
+    if (nodes[i]->anchor)
+      printf("    %d: %s#%s \"%s\"\n", i, nodes[i]->filename, nodes[i]->anchor,
+             nodes[i]->text);
+    else
+      printf("    %d: %s \"%s\"\n", i, nodes[i]->filename, nodes[i]->text);
 }
 
 

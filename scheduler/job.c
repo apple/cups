@@ -715,7 +715,7 @@ LoadAllJobs(void)
   */
 
   while ((dent = readdir(dir)) != NULL)
-    if (NAMLEN(dent) >= 6 && dent->d_name[0] == 'c')
+    if (strlen(dent->d_name) >= 6 && dent->d_name[0] == 'c')
     {
      /*
       * Allocate memory for the job...
@@ -919,7 +919,7 @@ LoadAllJobs(void)
   rewinddir(dir);
 
   while ((dent = readdir(dir)) != NULL)
-    if (NAMLEN(dent) > 7 && dent->d_name[0] == 'd' && strchr(dent->d_name, '-'))
+    if (strlen(dent->d_name) > 7 && dent->d_name[0] == 'd' && strchr(dent->d_name, '-'))
     {
      /*
       * Find the job...
