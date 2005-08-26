@@ -30,6 +30,7 @@
  */
 
 #include "ipp-var.h"
+#include "help-index.h"
 
 
 /*
@@ -40,6 +41,18 @@ int					/* O - Exit status */
 main(int  argc,				/* I - Number of command-line arguments */
      char *argv[])			/* I - Command-line arguments */
 {
+  help_index_t	*hi,			/* Help index */
+		*si;			/* Search index */
+  help_node_t	**n;			/* Current help node */
+  int		i, j;			/* Looping vars */
+  const char	*query;			/* Search query */
+  const char	*server_root;		/* CUPS_SERVERROOT environment variable */
+  const char	*docroot;		/* CUPS_DOCROOT environment variable */
+  const char	*helpfile;		/* Current help file */
+  char		filename[1024],		/* Filename */
+		directory[1024];	/* Directory */
+  cups_file_t	*fp;			/* Help file */
+  char		line[1024];		/* Line from file */
 
 
  /*
@@ -55,16 +68,258 @@ main(int  argc,				/* I - Number of command-line arguments */
   cgiSetVariable("SECTION", "help");
 
  /*
-  * Send a standard header...
+  * Load the help index...
   */
 
-  cgiStartHTML("Help");
+  if ((server_root = getenv("CUPS_SERVERROOT")) == NULL)
+    server_root = CUPS_SERVERROOT;
+
+  snprintf(filename, sizeof(filename), "%s/help.index", server_root);
+
+  if ((docroot = getenv("CUPS_DOCROOT")) == NULL)
+    docroot = CUPS_DOCROOT;
+
+  snprintf(directory, sizeof(directory), "%s/help", docroot);
+
+  fprintf(stderr, "DEBUG: helpLoadIndex(filename=\"%s\", directory=\"%s\")\n",
+          filename, directory);
+
+  hi = helpLoadIndex(filename, directory);
+  if (!hi)
+  {
+    perror(filename);
+
+    cgiStartHTML("Help");
+    cgiSetVariable("ERROR", "Unable to load help index!");
+    cgiCopyTemplateLang(stdout, TEMPLATES, "error.tmpl", getenv("LANG"));
+    cgiEndHTML();
+
+    return (1);
+  }
+
+  fprintf(stderr, "hi->num_nodes=%d\n", hi->num_nodes);
+
+ /*
+  * See if we are viewing a file...
+  */
+
+  for (i = 0; i < argc; i ++)
+    fprintf(stderr, "argv[%d]=\"%s\"\n", i, argv[i]);
+
+  if (strstr(argv[0], "help.cgi"))
+    helpfile = NULL;
+  else
+    helpfile = argv[0];
+
+  if (helpfile)
+  {
+   /*
+    * Verify that the help file exists and is part of the index...
+    */
+
+    snprintf(filename, sizeof(filename), "%s/help/%s", docroot, helpfile);
+
+    fprintf(stderr, "DEBUG: helpfile=\"%s\", filename=\"%s\"\n",
+            helpfile, filename);
+
+    if (access(filename, R_OK))
+    {
+      perror(filename);
+
+      cgiStartHTML("Help");
+      cgiSetVariable("ERROR", "Unable to access help file!");
+      cgiCopyTemplateLang(stdout, TEMPLATES, "error.tmpl", getenv("LANG"));
+      cgiEndHTML();
+
+      return (1);
+    }
+
+    if ((n = helpFindNode(hi, helpfile, NULL)) == NULL)
+    {
+      cgiStartHTML("Help");
+      cgiSetVariable("ERROR", "Help file not in index!");
+      cgiCopyTemplateLang(stdout, TEMPLATES, "error.tmpl", getenv("LANG"));
+      cgiEndHTML();
+
+      return (1);
+    }
+
+   /*
+    * Set the page title and save the help file...
+    */
+
+    cgiSetVariable("HELPFILE", helpfile);
+    cgiSetVariable("HELPTITLE", n[0]->text);
+
+   /*
+    * Send a standard page header...
+    */
+
+    cgiStartHTML(n[0]->text);
+  }
+  else
+  {
+   /*
+    * Send a standard page header...
+    */
+
+    cgiStartHTML("Help");
+  }
+
+ /*
+  * Do a search as needed...
+  */
+
+  query = cgiGetVariable("QUERY");
+  si    = helpSearchIndex(hi, query, helpfile);
+
+  if (si)
+  {
+    help_node_t	**nn;			/* Parent node */
+
+
+    fprintf(stderr, "si=%p, si->num_nodes=%d, si->sorted=%p\n", si,
+            si->num_nodes, si->sorted);
+
+    for (i = 0, n = si->sorted; i < si->num_nodes; i ++, n ++)
+    {
+      if (helpfile && n[0]->anchor)
+        snprintf(line, sizeof(line), "#%s", n[0]->anchor);
+      else if (n[0]->anchor)
+        snprintf(line, sizeof(line), "/help/%s?QUERY=%s#%s", n[0]->filename,
+	         query ? query : "", n[0]->anchor);
+      else
+        snprintf(line, sizeof(line), "/help/%s?QUERY=%s", n[0]->filename,
+	         query ? query : "");
+
+      cgiSetArray("QTEXT", i, n[0]->text);
+      cgiSetArray("QLINK", i, line);
+
+      if (!helpfile && n[0]->anchor)
+      {
+        nn = helpFindNode(hi, n[0]->filename, NULL);
+
+        snprintf(line, sizeof(line), "/help/%s?QUERY=%s", nn[0]->filename,
+	         query ? query : "");
+
+        cgiSetArray("QPTEXT", i, nn[0]->text);
+	cgiSetArray("QPLINK", i, line);
+      }
+      else
+      {
+        cgiSetArray("QPTEXT", i, "");
+	cgiSetArray("QPLINK", i, "");
+      }
+
+      fprintf(stderr, "DEBUG: [%d] = \"%s\" @ \"%s\"\n", i, n[0]->text, line);
+    }
+
+    helpDeleteIndex(si);
+  }
+
+ /*
+  * OK, now list the bookmarks within the index...
+  */
+
+  for (i = hi->num_nodes, j = 0, n = hi->sorted; i > 0; i --, n ++)
+  {
+    if (n[0]->anchor)
+      continue;
+
+   /*
+    * Add a link for this node...
+    */
+
+    snprintf(line, sizeof(line), "/help/%s?QUERY=%s", n[0]->filename,
+             query ? query : "");
+    cgiSetArray("BMLINK", j, line);
+    cgiSetArray("BMTEXT", j, n[0]->text);
+    cgiSetArray("BMINDENT", j, "0");
+
+    j ++;
+
+    if (helpfile && !strcmp(helpfile, n[0]->filename))
+    {
+      int		ii;		/* Looping var */
+      help_node_t	**nn;		/* Pointer to sub-node */
+
+
+      for (ii = hi->num_nodes, nn = hi->sorted; ii > 0; ii --, nn ++)
+        if (nn[0]->anchor && !strcmp(helpfile, nn[0]->filename))
+	{
+	 /*
+	  * Add a link for this node...
+	  */
+
+	  snprintf(line, sizeof(line), "#%s", nn[0]->anchor);
+	  cgiSetArray("BMLINK", j, line);
+	  cgiSetArray("BMTEXT", j, nn[0]->text);
+	  cgiSetArray("BMINDENT", j, "1");
+
+	  j ++;
+	}
+    }
+  }
+
+ /*
+  * Show the search and bookmark content...
+  */
+
+  cgiCopyTemplateLang(stdout, TEMPLATES, "help-header.tmpl", getenv("LANG"));
+
+ /*
+  * If we are viewing a file, copy it in now...
+  */
+
+  if (helpfile)
+  {
+    if ((fp = cupsFileOpen(filename, "r")) != NULL)
+    {
+      int	inbody;			/* Are we inside the body? */
+
+
+      inbody = 0;
+
+      while (cupsFileGets(fp, line, sizeof(line)))
+      {
+        if (inbody)
+	{
+	  if (!strncmp(line, "</BODY>", 7))
+	    break;
+
+	  printf("%s\n", line);
+        }
+	else if (!strncmp(line, "<BODY", 5))
+	  inbody = 1;
+      }
+
+      cupsFileClose(fp);
+    }
+    else
+    {
+      perror(filename);
+      cgiSetVariable("ERROR", "Unable to open help file.");
+      cgiCopyTemplateLang(stdout, TEMPLATES, "error.tmpl", getenv("LANG"));
+    }
+  }
+
+ /*
+  * Finish off the  content...
+  */
+
+  cgiCopyTemplateLang(stdout, TEMPLATES, "help-trailer.tmpl", getenv("LANG"));
 
  /*
   * Send a standard trailer...
   */
 
   cgiEndHTML();
+
+ /*
+  * Delete the index...
+  */
+
+  helpDeleteIndex(hi);
 
  /*
   * Return with no errors...

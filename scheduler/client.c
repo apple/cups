@@ -1469,7 +1469,7 @@ ReadClient(client_t *con)		/* I - Client to read from */
 
 	    if (strcmp(con->http.fields[HTTP_FIELD_CONTENT_TYPE], "application/ipp") == 0)
               con->request = ippNew();
-	    else if ((!strncmp(con->uri, "/admin", 6) == 0 &&
+	    else if ((!strncmp(con->uri, "/admin", 6) &&
 	              strncmp(con->uri, "/admin/conf/", 12) &&
 	              strncmp(con->uri, "/admin/log/", 11)) ||
 	             !strncmp(con->uri, "/printers", 9) ||
@@ -2665,8 +2665,9 @@ get_file(client_t    *con,		/* I  - Client connection */
     * Drop the language prefix and try the current directory...
     */
 
-    if (strncmp(con->uri, "/ppd/", 5) != 0 &&
-        strncmp(con->uri, "/admin/conf/", 12) != 0)
+    if (strncmp(con->uri, "/ppd/", 5) &&
+        strncmp(con->uri, "/admin/conf/", 12) &&
+        strncmp(con->uri, "/admin/log/", 11))
     {
       snprintf(filename, len, "%s%s", DocumentRoot, con->uri);
 
@@ -2884,7 +2885,7 @@ install_conf_file(client_t *con)	/* I - Connection */
   * If the cupsd.conf file was updated, set the NeedReload flag...
   */
 
-  if (strcmp(con->uri, "/admin/conf/cupsd.conf") == 0)
+  if (!strcmp(con->uri, "/admin/conf/cupsd.conf"))
     NeedReload = RELOAD_CUPSD;
   else
     NeedReload = RELOAD_ALL;

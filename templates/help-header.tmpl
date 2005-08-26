@@ -1,0 +1,52 @@
+<FORM ACTION="/help/{?HELPFILE}" METHOD="GET">
+
+<P ALIGN="CENTER"><B>Search in {HELPTITLE?"<I>{HELPTITLE}</I>":All
+Documents}:</B> <INPUT TYPE="TEXT" NAME="QUERY"
+VALUE="{?QUERY}" SIZE="60"> <INPUT TYPE="IMAGE"
+SRC="/images/search.gif" BORDER="0" ALIGN="MIDDLE"
+ALT="Search"></P>
+
+</FORM>
+
+<P><TABLE CELLPADDING="0" CELLSPACING="0" BORDER="0" WIDTH="100%">
+<TR><TD VALIGN="TOP">
+
+<!-- Bookmarks -->
+<P><TABLE CELLPADDING="0" CELLSPACING="0" BORDER="0" WIDTH="100%" HEIGHT="100%">
+<TR CLASS="header">
+<TH ALIGN="LEFT" VALIGN="TOP"><IMG SRC="/images/hdr-top-left.gif"
+WIDTH="16" HEIGHT="16" ALT=""></TH>
+<TH>On-Line Help Documents</TH>
+<TH ALIGN="RIGHT" VALIGN="TOP"><IMG
+SRC="/images/hdr-top-right.gif" WIDTH="16" HEIGHT="16"
+ALT=""></TH>
+</TR>
+<TR CLASS="data" HEIGHT="100%">
+<TD></TD>
+<TD WIDTH="100%" HEIGHT="100%" NOWRAP>
+
+<A HREF="/help{QUERY??QUERY={QUERY}:}">All Documents</A><HR NOSHADE>
+{[BMTEXT]{BMINDENT=1?&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<I>:}<A HREF="{BMLINK}">{BMTEXT}</A>{BMINDENT=1?</I>:}<BR>}
+
+</TD>
+<TD></TD>
+</TR>
+<TR CLASS="header">
+<TH ALIGN="LEFT" VALIGN="BOTTOM"><IMG SRC="/images/hdr-bottom-left.gif"
+WIDTH="16" HEIGHT="16" ALT=""></TH>
+<TH></TH>
+<TH ALIGN="RIGHT" VALIGN="BOTTOM"><IMG
+SRC="/images/hdr-bottom-right.gif" WIDTH="16" HEIGHT="16"
+ALT=""></TH>
+</TR>
+</TABLE></P>
+
+</TD><TD>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD><TD VALIGN="TOP" WIDTH="100%">
+
+{QUERY?<P>Search Results in {HELPFILE?"<I>{HELPTITLE}</I>":All Documents}\:</P>
+{QTEXT?<UL>
+{[QTEXT]<LI><A HREF="{QLINK}">{QTEXT}</A>{QPTEXT? (in <I><A HREF="{QPLINK}">{QPTEXT}</A></I>):}</LI>}
+{QTEXT?</UL>:}
+:<BLOCKQUOTE>No matches found.</BLOCKQUOTE>}
+{HELPTITLE?<HR NOSHADE>:}:}
+{HELPTITLE?<H1>{HELPTITLE}</H1>:}

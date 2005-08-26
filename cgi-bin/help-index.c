@@ -23,6 +23,20 @@
  *
  * Contents:
  *
+ *   helpDeleteIndex()          - Delete an index, freeing all memory used.
+ *   helpFindNode()             - Find a node in an index.
+ *   helpLoadIndex()            - Load a help index from disk.
+ *   helpSaveIndex()            - Save a help index to disk.
+ *   helpSearchIndex()          - Search an index.
+ *   help_compile_search()      - Convert a search string into a regular expression.
+ *   help_create_sorted()       - Create the sorted node array.
+ *   help_delete_node()         - Free all memory used by a node.
+ *   help_insert_node()         - Insert a node in an index.
+ *   help_load_directory()      - Load a directory of files into an index.
+ *   help_load_file()           - Load a HTML files into an index.
+ *   help_new_node()            - Create a new node and add it to an index.
+ *   help_sort_nodes_by_name()  - Sort nodes by filename and anchor.
+ *   help_sort_nodes_by_score() - Sort nodes by score and text.
  */
 
 /*
@@ -42,9 +56,6 @@
 static regex_t		*help_compile_search(const char *query);
 static void		help_create_sorted(help_index_t *hi);
 static void		help_delete_node(help_node_t *n);
-static help_node_t	**help_find_node(help_index_t *hi,
-			                 const char *filename,
-			                 const char *anchor);
 static void		help_insert_node(help_index_t *hi, help_node_t *n);
 static int		help_load_directory(help_index_t *hi,
 			                    const char *directory,
@@ -94,24 +105,39 @@ helpDeleteIndex(help_index_t *hi)
  * 'helpFindNode()' - Find a node in an index.
  */
 
-help_node_t *				/* O - Node pointer or NULL */
+help_node_t **				/* O - Node pointer or NULL */
 helpFindNode(help_index_t *hi,		/* I - Index */
              const char   *filename,	/* I - Filename */
              const char   *anchor)	/* I - Anchor */
 {
-  help_node_t	**match;		/* Match */
+  help_node_t	key,			/* Search key */
+		*ptr;			/* Pointer to key */
 
 
   DEBUG_printf(("helpFindNode(hi=%p, filename=\"%s\", anchor=\"%s\")\n",
                 hi, filename ? filename : "(nil)", anchor ? anchor : "(nil)"));
 
+ /*
+  * Range check input...
+  */
+
   if (!hi || !filename)
     return (NULL);
 
-  if ((match = help_find_node(hi, filename, anchor)) != NULL)
-    return (*match);
+ /*
+  * Initialize the search key...
+  */
 
-  return (NULL);
+  key.filename = (char *)filename;
+  key.anchor   = (char *)anchor;
+  ptr          = &key;
+
+ /*
+  * Return any match...
+  */
+
+  return ((help_node_t **)bsearch(&ptr, hi->nodes, hi->num_nodes,
+                                  sizeof(help_node_t *), help_sort_by_name));
 }
 
 
@@ -328,8 +354,7 @@ helpSearchIndex(help_index_t *hi,	/* I - Index */
   help_index_t	*search;		/* Search index */
   help_node_t	**n;			/* Current node */
   regex_t	*re;			/* Regular expression */
-  int		num_matches;		/* Number of matches */
-  regmatch_t	matches[100];		/* Matches */
+  regmatch_t	matches[100];		/* RE matches */
 
 
   DEBUG_printf(("helpSearchIndex(hi=%p, query=\"%s\", filename=\"%s\")\n",
@@ -348,7 +373,7 @@ helpSearchIndex(help_index_t *hi,	/* I - Index */
 
   if (filename)
   {
-    n = help_find_node(hi, filename, NULL);
+    n = helpFindNode(hi, filename, NULL);
     if (!n)
       return (NULL);
   }
@@ -382,8 +407,10 @@ helpSearchIndex(help_index_t *hi,	/* I - Index */
   */
 
   for (i = n - hi->nodes; i < hi->num_nodes; i ++, n ++)
-    if (!regexec(re, n[0]->text, sizeof(matches) / sizeof(matches[0]),
-                 matches, 0))
+    if (filename && strcmp(n[0]->filename, filename))
+      continue;
+    else if (!regexec(re, n[0]->text, sizeof(matches) / sizeof(matches[0]),
+                      matches, 0))
     {
      /*
       * Found a match, add the node to the search index...
@@ -716,31 +743,6 @@ help_delete_node(help_node_t *n)	/* I - Node */
 
 
 /*
- * 'help_find_node()' - Find a node in an index.
- */
-
-help_node_t **				/* O - Node array pointer or NULL */
-help_find_node(help_index_t *hi,	/* I - Index */
-               const char   *filename,	/* I - Filename */
-               const char   *anchor)	/* I - Anchor */
-{
-  help_node_t	key,			/* Search key */
-		*ptr;			/* Pointer to key */
-
-
-  DEBUG_printf(("help_find_node(hi=%p, filename=\"%s\", anchor=\"%s\")\n",
-                hi, filename ? filename : "(nil)", anchor ? anchor : "(nil)"));
-
-  key.filename = (char *)filename;
-  key.anchor   = (char *)anchor;
-  ptr          = &key;
-
-  return ((help_node_t **)bsearch(&ptr, hi->nodes, hi->num_nodes,
-                                  sizeof(help_node_t *), help_sort_by_name));
-}
-
-
-/*
  * 'help_insert_node()' - Insert a node in an index.
  */
 
@@ -902,7 +904,7 @@ help_load_directory(
       * HTML file, see if we have already indexed the file...
       */
 
-      if ((node = help_find_node(hi, relname, NULL)) != NULL)
+      if ((node = helpFindNode(hi, relname, NULL)) != NULL)
       {
        /*
         * File already indexed - check dates to confirm that the
@@ -959,7 +961,8 @@ help_load_file(
     time_t       mtime)			/* I - Modification time */
 {
   cups_file_t	*fp;			/* HTML file */
-  help_node_t	*node;			/* Current node */
+  help_node_t	*node,			/* Current node */
+		**n;			/* Node pointer */
   char		line[1024],		/* Line from file */
 		*ptr,			/* Pointer into line */
 		*anchor,		/* Anchor name */
@@ -1071,12 +1074,20 @@ help_load_file(
       if (node)
 	node->length = offset - node->offset;
 
-      if ((node = helpFindNode(hi, filename, anchor)) != NULL)
+      if (!*text)
+      {
+        node = NULL;
+        break;
+      }
+
+      if ((n = helpFindNode(hi, relative, anchor)) != NULL)
       {
        /*
 	* Node already in the index, so replace the text and other
 	* data...
 	*/
+
+        node = n[0];
 
 	if (node->text)
 	  free(node->text);
@@ -1092,7 +1103,7 @@ help_load_file(
 	* New node...
 	*/
 
-        node = help_new_node(filename, anchor, text, mtime, offset, 0);
+        node = help_new_node(relative, anchor, text, mtime, offset, 0);
 	help_insert_node(hi, node);
       }
 
