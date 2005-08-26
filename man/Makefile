@@ -110,10 +110,10 @@ install:	all
 	$(LN) accept.$(CAT8EXT) $(AMANDIR)/cat$(MAN8EXT)/reject.$(CAT8EXT)
 	$(RM) $(AMANDIR)/cat$(MAN8EXT)/disable.$(CAT8EXT)
 	$(LN) enable.$(CAT8EXT) $(AMANDIR)/cat$(MAN8EXT)/disable.$(CAT8EXT)
-	for dir in $(LANGDIRS); do \
-		echo "Installing all in man/$$dir..."; \
-		(cd $$dir; $(MAKE) $(MFLAGS) install); \
-	done
+#	for dir in $(LANGDIRS); do \
+#		echo "Installing all in man/$$dir..."; \
+#		(cd $$dir; $(MAKE) $(MFLAGS) install); \
+#	done
 
 
 #
