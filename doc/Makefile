@@ -64,6 +64,7 @@ WEBIMAGES	=	images/accept-jobs.gif \
 			images/printer-processing.gif \
 			images/printer-stopped.gif \
 			images/print-test-page.gif \
+			images/publish-printer.gif \
 			images/reject-jobs.gif \
 			images/release-job.gif \
 			images/restart-job.gif \
@@ -82,6 +83,7 @@ WEBIMAGES	=	images/accept-jobs.gif \
 			images/top-left.gif \
 			images/top-middle.gif \
 			images/top-right.gif \
+			images/unpublish-printer.gif \
 			images/use-default-config.gif \
 			images/view-access-log.gif \
 			images/view-error-log.gif \

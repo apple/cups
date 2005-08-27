@@ -34,6 +34,7 @@
  *   do_menu()                 - Show the main menu...
  *   do_printer_op()           - Do a printer operation.
  *   do_set_allowed_users()    - Set the allowed/denied users for a queue.
+ *   do_set_sharing()          - Set printer-is-shared value...
  *   match_string()            - Return the number of matching characters.
  */
 
@@ -62,6 +63,7 @@ static void	do_menu(http_t *http, cups_lang_t *language);
 static void	do_printer_op(http_t *http, cups_lang_t *language,
 		              ipp_op_t op, const char *title);
 static void	do_set_allowed_users(http_t *http, cups_lang_t *language);
+static void	do_set_sharing(http_t *http, cups_lang_t *language);
 static int	match_string(const char *a, const char *b);
 
 
@@ -142,6 +144,8 @@ main(int  argc,				/* I - Number of command-line arguments */
       do_set_allowed_users(http, language);
     else if (!strcmp(op, "set-as-default"))
       do_printer_op(http, language, CUPS_SET_DEFAULT, "Set As Default");
+    else if (!strcmp(op, "set-sharing"))
+      do_set_sharing(http, language);
     else if (!strcmp(op, "add-class"))
       do_am_class(http, language, 0);
     else if (!strcmp(op, "add-printer"))
@@ -3210,6 +3214,111 @@ do_set_allowed_users(
 
     cgiEndHTML();
   }
+}
+
+
+/*
+ * 'do_set_sharing()' - Set printer-is-shared value...
+ */
+
+static void
+do_set_sharing(http_t      *http,	/* I - HTTP connection */
+               cups_lang_t *language)	/* I - Language */
+{
+  ipp_t		*request,		/* IPP request */
+		*response;		/* IPP response */
+  char		uri[HTTP_MAX_URI];	/* Printer URI */
+  const char	*printer,		/* Printer name */
+		*shared;		/* Sharing value */
+  ipp_status_t	status;			/* Operation status... */
+
+
+  if ((printer = cgiGetVariable("PRINTER_NAME")) != NULL)
+    snprintf(uri, sizeof(uri), "ipp://localhost/printers/%s", printer);
+  else
+  {
+    cgiSetVariable("ERROR", ippErrorString(IPP_NOT_FOUND));
+    cgiStartHTML("Set Publishing");
+    cgiCopyTemplateLang(stdout, TEMPLATES, "error.tmpl", getenv("LANG"));
+    cgiEndHTML();
+    return;
+  }
+
+  if ((shared = cgiGetVariable("SHARED")) == NULL)
+  {
+    cgiSetVariable("ERROR", "Missing SHARED parameter");
+    cgiStartHTML("Set Publishing");
+    cgiCopyTemplateLang(stdout, TEMPLATES, "error.tmpl", getenv("LANG"));
+    cgiEndHTML();
+    return;
+  }
+
+ /*
+  * Build a CUPS-Add-Printer request, which requires the following
+  * attributes:
+  *
+  *    attributes-charset
+  *    attributes-natural-language
+  *    printer-uri
+  *    printer-is-shared
+  */
+
+  request = ippNew();
+
+  request->request.op.operation_id = CUPS_ADD_PRINTER;
+  request->request.op.request_id   = 1;
+
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
+               "attributes-charset", NULL, cupsLangEncoding(language));
+
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
+               "attributes-natural-language", NULL, language->language);
+
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
+               NULL, uri);
+
+  ippAddBoolean(request, IPP_TAG_OPERATION, "printer-is-shared", atoi(shared));
+
+ /*
+  * Do the request and get back a response...
+  */
+
+  if ((response = cupsDoRequest(http, request, "/admin/")) != NULL)
+  {
+    status = response->request.status.status_code;
+
+    ippSetCGIVars(response, NULL, NULL, NULL, 0);
+
+    ippDelete(response);
+  }
+  else
+    status = cupsLastError();
+
+  if (status > IPP_OK_CONFLICT)
+  {
+    cgiStartHTML("Set Publishing");
+    cgiSetVariable("ERROR", ippErrorString(status));
+    cgiCopyTemplateLang(stdout, TEMPLATES, "error.tmpl", getenv("LANG"));
+  }
+  else
+  {
+   /*
+    * Redirect successful updates back to the printer page...
+    */
+
+    char	refresh[1024];		/* Refresh URL */
+
+    cgiFormEncode(uri, printer, sizeof(uri));
+    snprintf(refresh, sizeof(refresh), "2;/admin?OP=redirect&URL=/printers/%s",
+             uri);
+    cgiSetVariable("refresh_page", refresh);
+
+    cgiStartHTML("Set Publishing");
+
+    cgiCopyTemplateLang(stdout, TEMPLATES, "printer-modified.tmpl", getenv("LANG"));
+  }
+
+  cgiEndHTML();
 }
 
 

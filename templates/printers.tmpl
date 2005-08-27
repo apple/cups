@@ -26,7 +26,7 @@ ALT=""></TH>
 <TD VALIGN="TOP">Description: {printer_info}<BR>
 Location: {printer_location}<BR>
 Printer State: {printer_state=3?idle:{printer_state=4?processing:stopped}},
-{printer_is_accepting_jobs=0?rejecting jobs:accepting jobs}.
+{printer_is_accepting_jobs=0?rejecting jobs:accepting jobs}, {printer_is_shared=0?not:} published.
 {?printer_state_message=?:<BR><I>"{printer_state_message}"</I>}
 {?printer_state_history2.printer_state_message=?:<BR><I>"{printer_state_history2.printer_state_message}"</I>}
 {?printer_state_history3.printer_state_message=?:<BR><I>"{printer_state_history3.printer_state_message}"</I>}
@@ -37,28 +37,35 @@ Printer State: {printer_state=3?idle:{printer_state=4?processing:stopped}},
 <A HREF="{printer_uri_supported}?op=print-test-page">
 <IMG SRC="/images/print-test-page.gif" ALT="Print Test Page" BORDER="0"></A>
 {printer_state=5?
-<A HREF="{admin_uri}?op=start-printer&printer_name={printer_name}">
+<A HREF="{admin_uri}?op=start-printer&amp;printer_name={printer_name}">
 <IMG SRC="/images/start-printer.gif" ALT="Start Printer" BORDER="0"></A>
 :
-<A HREF="{admin_uri}?op=stop-printer&printer_name={printer_name}">
+<A HREF="{admin_uri}?op=stop-printer&amp;printer_name={printer_name}">
 <IMG SRC="/images/stop-printer.gif" ALT="Stop Printer" BORDER="0"></A>
 }
 {printer_is_accepting_jobs=0?
-<A HREF="{admin_uri}?op=accept-jobs&printer_name={printer_name}">
+<A HREF="{admin_uri}?op=accept-jobs&amp;printer_name={printer_name}">
 <IMG SRC="/images/accept-jobs.gif" ALT="Accept Jobs" BORDER="0"></A>
 :
-<A HREF="{admin_uri}?op=reject-jobs&printer_name={printer_name}">
+<A HREF="{admin_uri}?op=reject-jobs&amp;printer_name={printer_name}">
 <IMG SRC="/images/reject-jobs.gif" ALT="Reject Jobs" BORDER="0"></A>
 }
-<A HREF="{admin_uri}?op=modify-printer&printer_name={printer_name}">
+{printer_is_shared=0?
+<A HREF="{admin_uri}?op=set-sharing&amp;printer_name={printer_name}&amp;shared=1">
+<IMG SRC="/images/publish-printer.gif" ALT="Publish Printer" BORDER="0"></A>
+:
+<A HREF="{admin_uri}?op=set-sharing&amp;printer_name={printer_name}&amp;shared=0">
+<IMG SRC="/images/unpublish-printer.gif" ALT="Unpublish Printer" BORDER="0"></A>
+}
+<A HREF="{admin_uri}?op=modify-printer&amp;printer_name={printer_name}">
 <IMG SRC="/images/modify-printer.gif" ALT="Modify Printer" BORDER="0"></A>
-<A HREF="{admin_uri}?op=config-printer&printer_name={printer_name}">
+<A HREF="{admin_uri}?op=config-printer&amp;printer_name={printer_name}">
 <IMG SRC="/images/config-printer.gif" ALT="Set Printer Options" BORDER="0"></A>
-<A HREF="{admin_uri}?op=delete-printer&printer_name={printer_name}">
+<A HREF="{admin_uri}?op=delete-printer&amp;printer_name={printer_name}">
 <IMG SRC="/images/delete-printer.gif" ALT="Delete Printer" BORDER="0"></A>
-<A HREF="{admin_uri}?op=set-as-default&printer_name={printer_name}">
+<A HREF="{admin_uri}?op=set-as-default&amp;printer_name={printer_name}">
 <IMG SRC="/images/set-as-default.gif" ALT="Set As Default" BORDER="0"></A>
-<A HREF="{admin_uri}?op=set-allowed-users&printer_name={printer_name}">
+<A HREF="{admin_uri}?op=set-allowed-users&amp;printer_name={printer_name}">
 <IMG SRC="/images/set-allowed-users.gif" ALT="Set Allowed Users" BORDER="0"></A>
 </TD>
 </TR>

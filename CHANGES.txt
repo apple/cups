@@ -1,8 +1,9 @@
-CHANGES.txt - 08/25/2005
+CHANGES.txt - 08/27/2005
 ------------------------
 
 CHANGES IN CUPS V1.2.0b1
 
+	- Printers can now be published individually for sharing.
 	- Fixed a bug in the scheduler's startup signalling code
 	  which caused cupsd to send the SIGUSR1 signal to the
 	  init process instead of the original parent process

@@ -25,31 +25,38 @@ ALT=""></TH>
 <TD VALIGN=TOP>Description: {printer_info}<BR>
 Location: {printer_location}<BR>
 Class State: {printer_state=3?idle:{printer_state=4?processing:stopped}},
-{printer_is_accepting_jobs=0?rejecting jobs:accepting jobs}.
+{printer_is_accepting_jobs=0?rejecting jobs:accepting jobs}, {printer_is_shared=0?not:} published.
 {?printer_state_message=?:<BR><I>"{printer_state_message}"</I>}
 {?member_names=?:<BR>Members: {member_names}}
 <P>
 <A HREF="{printer_uri_supported}?op=print-test-page">
 <IMG SRC="/images/print-test-page.gif" ALT="Print Test Page" BORDER="0"></A>
 {printer_state=5?
-<A HREF="{admin_uri}?op=start-class&printer_name={printer_name}">
+<A HREF="{admin_uri}?op=start-class&amp;printer_name={printer_name}">
 <IMG SRC="/images/start-class.gif" ALT="Start Class" BORDER="0"></A>
 :
-<A HREF="{admin_uri}?op=stop-class&printer_name={printer_name}">
+<A HREF="{admin_uri}?op=stop-class&amp;printer_name={printer_name}">
 <IMG SRC="/images/stop-class.gif" ALT="Stop Class" BORDER="0"></A>
 }
 {printer_is_accepting_jobs=0?
-<A HREF="{admin_uri}?op=accept-jobs&printer_name={printer_name}">
+<A HREF="{admin_uri}?op=accept-jobs&amp;printer_name={printer_name}">
 <IMG SRC="/images/accept-jobs.gif" ALT="Accept Jobs" BORDER="0"></A>
 :
-<A HREF="{admin_uri}?op=reject-jobs&printer_name={printer_name}">
+<A HREF="{admin_uri}?op=reject-jobs&amp;printer_name={printer_name}">
 <IMG SRC="/images/reject-jobs.gif" ALT="Reject Jobs" BORDER="0"></A>
 }
-<A HREF="{admin_uri}?op=modify-class&printer_name={printer_name}">
+{printer_is_shared=0?
+<A HREF="{admin_uri}?op=set-sharing&amp;printer_name={printer_name}&amp;shared=1">
+<IMG SRC="/images/publish-printer.gif" ALT="Publish Printer" BORDER="0"></A>
+:
+<A HREF="{admin_uri}?op=set-sharing&amp;printer_name={printer_name}&amp;shared=0">
+<IMG SRC="/images/unpublish-printer.gif" ALT="Unpublish Printer" BORDER="0"></A>
+}
+<A HREF="{admin_uri}?op=modify-class&amp;printer_name={printer_name}">
 <IMG SRC="/images/modify-class.gif" ALT="Modify Class" BORDER="0"></A>
-<A HREF="{admin_uri}?op=delete-class&printer_name={printer_name}">
+<A HREF="{admin_uri}?op=delete-class&amp;printer_name={printer_name}">
 <IMG SRC="/images/delete-class.gif" ALT="Delete Class" BORDER="0"></A>
-<A HREF="{admin_uri}?op=set-as-default&printer_name={printer_name}">
+<A HREF="{admin_uri}?op=set-as-default&amp;printer_name={printer_name}">
 <IMG SRC="/images/set-as-default.gif" ALT="Set As Default" BORDER="0"></A>
 </TD>
 </TR>
