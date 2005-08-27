@@ -458,13 +458,15 @@ help_compile_search(const char *query)	/* I - Query string */
 {
   regex_t	*re;			/* Regular expression */
   char		*s,			/* Regular expression string */
-		*sptr;			/* Pointer into RE string */
+		*sptr,			/* Pointer into RE string */
+		*sword;			/* Pointer to start of word */
   int		slen;			/* Allocated size of RE string */
   const char	*qptr,			/* Pointer into query string */
 		*qend;			/* End of current word */
   const char	*prefix;		/* Prefix to add to next word */
   int		quoted;			/* Word is quoted */
   int		wlen;			/* Word length */
+  char		*lword;			/* Last word in query */
 
 
   DEBUG_printf(("help_compile_search(query=\"%s\")\n", query ? query : "(nil)"));
@@ -495,6 +497,7 @@ help_compile_search(const char *query)	/* I - Query string */
   prefix = ".*";
   qptr   = query;
   sptr   = s;
+  lword  = NULL;
 
   while (*qptr)
   {
@@ -529,6 +532,9 @@ help_compile_search(const char *query)	/* I - Query string */
 
 	free(s);
 	free(re);
+
+	if (lword)
+          free(lword);
 
 	return (NULL);
       }
@@ -578,7 +584,7 @@ help_compile_search(const char *query)	/* I - Query string */
       * string + RE overhead...
       */
 
-      wlen = (sptr - s) + 2 * wlen + strlen(prefix) + 4;
+      wlen = (sptr - s) + 4 * wlen + 2 * strlen(prefix) + 4;
 
       if (wlen > slen)
       {
@@ -595,6 +601,9 @@ help_compile_search(const char *query)	/* I - Query string */
 	{
 	  free(s);
 	  free(re);
+
+	  if (lword)
+            free(lword);
 
 	  return (NULL);
 	}
@@ -615,6 +624,8 @@ help_compile_search(const char *query)	/* I - Query string */
       * RE...
       */
 
+      sword = sptr;
+
       while (qptr < qend)
       {
        /*
@@ -627,6 +638,40 @@ help_compile_search(const char *query)	/* I - Query string */
 	*sptr++ = *qptr++;
       }
 
+     /*
+      * For "word1 AND word2", add reciprocal "word2 AND word1"...
+      */
+
+      if (!strcmp(prefix, ".*") && lword)
+      {
+        char *lword2;			/* New "last word" */
+
+
+        lword2 = strdup(sword);
+
+        strcpy(sptr, ".*|.*");
+	sptr += 5;
+
+	strcpy(sptr, lword2);
+	sptr += strlen(sptr);
+
+        strcpy(sptr, ".*");
+	sptr += 2;
+
+	strcpy(sptr, lword);
+	sptr += strlen(sptr);
+
+        free(lword);
+	lword = lword2;
+      }
+      else
+      {
+	if (lword)
+          free(lword);
+
+	lword = strdup(sword);
+      }
+
       prefix = ".*|.*";
     }
 
@@ -637,6 +682,9 @@ help_compile_search(const char *query)	/* I - Query string */
     if (quoted)
       qptr ++;
   }
+
+  if (lword)
+    free(lword);
 
   if (sptr > s)
     strcpy(sptr, ".*");
