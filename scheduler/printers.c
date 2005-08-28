@@ -675,6 +675,7 @@ DeletePrinter(printer_t *p,		/* I - Printer to delete */
   ClearString(&p->job_sheets[0]);
   ClearString(&p->job_sheets[1]);
   ClearString(&p->device_uri);
+  ClearString(&p->port_monitor);
   ClearString(&p->op_policy);
   ClearString(&p->error_policy);
 
@@ -904,6 +905,19 @@ LoadAllPrinters(void)
     {
       if (value)
 	SetString(&p->device_uri, value);
+      else
+      {
+	LogMessage(L_ERROR, "Syntax error on line %d of printers.conf.",
+	           linenum);
+	return;
+      }
+    }
+    else if (!strcasecmp(line, "PortMonitor"))
+    {
+      if (value && strcmp(value, "none"))
+	SetString(&p->port_monitor, value);
+      else if (value)
+        ClearString(&p->port_monitor);
       else
       {
 	LogMessage(L_ERROR, "Syntax error on line %d of printers.conf.",
@@ -1204,6 +1218,9 @@ SaveAllPrinters(void)
 
     if (printer->device_uri)
       cupsFilePrintf(fp, "DeviceURI %s\n", printer->device_uri);
+
+    if (printer->port_monitor)
+      cupsFilePrintf(fp, "PortMonitor %s\n", printer->port_monitor);
 
     if (printer->state == IPP_PRINTER_STOPPED)
     {
@@ -1661,6 +1678,48 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
 
 	if (ppd->num_filters == 0)
           AddPrinterFilter(p, "application/vnd.cups-postscript 0 -");
+
+       /*
+	* Show current and available port monitors for this printer...
+	*/
+
+	ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD, "port-monitor",
+                     NULL, p->port_monitor ? p->port_monitor : "none");
+
+
+        for (i = 1, ppdattr = ppdFindAttr(ppd, "cupsPortMonitor", NULL);
+	     attr;
+	     i ++, ppdattr = ppdFindNextAttr(ppd, "cupsPortMonitor", NULL));
+
+        if (ppd->protocols)
+	{
+	  if (strstr(ppd->protocols, "TBCP"))
+	    i ++;
+	  else if (strstr(ppd->protocols, "BCP"))
+	    i ++;
+	}
+
+        attr = ippAddStrings(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
+	                     "port-monitor-supported", i, NULL, NULL);
+
+        attr->values[0].string.text = strdup("none");
+
+        for (i = 1, ppdattr = ppdFindAttr(ppd, "cupsPortMonitor", NULL);
+	     attr;
+	     i ++, ppdattr = ppdFindNextAttr(ppd, "cupsPortMonitor", NULL));
+	  attr->values[i].string.text = strdup(ppdattr->value);
+
+        if (ppd->protocols)
+	{
+	  if (strstr(ppd->protocols, "TBCP"))
+	    attr->values[i].string.text = strdup("tbcp");
+	  else if (strstr(ppd->protocols, "BCP"))
+	    attr->values[i].string.text = strdup("bcp");
+	}
+
+       /*
+        * Close the PPD and set the type...
+	*/
 
 	ppdClose(ppd);
 

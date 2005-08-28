@@ -62,6 +62,7 @@ typedef struct printer_str
   cups_ptype_t	type;			/* Printer type (color, small, etc.) */
   time_t	browse_time;		/* Last time update was sent/received */
   char		*device_uri;		/* Device URI */
+  char		*port_monitor;		/* Port monitor */
   int		raw;			/* Raw queue? */
   mime_type_t	*filetype;		/* Pseudo-filetype for printer */
   void		*job;			/* Current job in queue */

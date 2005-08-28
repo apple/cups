@@ -1564,6 +1564,36 @@ add_printer(client_t        *con,	/* I - Client connection */
     SetString(&printer->device_uri, attr->values[0].string.text);
   }
 
+  if ((attr = ippFindAttribute(con->request, "port-monitor", IPP_TAG_KEYWORD)) != NULL)
+  {
+    ipp_attribute_t	*supported;	/* port-monitor-supported attribute */
+
+
+    supported = ippFindAttribute(printer->attrs, "port-monitor-supported",
+                                 IPP_TAG_KEYWORD);
+    for (i = 0; i < supported->num_values; i ++)
+      if (!strcmp(supported->values[i].string.text,
+                  attr->values[0].string.text))
+        break;
+
+    if (i >= supported->num_values)
+    {
+      LogMessage(L_ERROR, "add_printer: bad port-monitor attribute \'%s\'!",
+        	 attr->values[0].string.text);
+      send_ipp_error(con, IPP_NOT_POSSIBLE);
+      return;
+    }
+
+    LogMessage(L_INFO, "Setting %s port-monitor to \"%s\" (was \"%s\".)",
+               printer->name, attr->values[0].string.text,
+	       printer->port_monitor);
+
+    if (strcmp(attr->values[0].string.text, "none"))
+      SetString(&printer->port_monitor, attr->values[0].string.text);
+    else
+      ClearString(&printer->port_monitor);
+  }
+
   if ((attr = ippFindAttribute(con->request, "printer-is-accepting-jobs", IPP_TAG_BOOLEAN)) != NULL)
   {
     LogMessage(L_INFO, "Setting %s printer-is-accepting-jobs to %d (was %d.)",

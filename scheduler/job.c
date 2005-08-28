@@ -1365,8 +1365,11 @@ StartJob(int       id,			/* I - Job ID */
 		ppd[1024],		/* PPD environment variable */
 		class_name[255],	/* CLASS environment variable */
 		printer_name[255],	/* PRINTER environment variable */
-		root[1024],		/* CUPS_SERVERROOT environment variable */
+		cups_datadir[1024],	/* CUPS_DATADIR environment variable */
+		cups_docroot[1024],	/* CUPS_DOCROOT environment variable */
+		cups_fontpath[1024],	/* CUPS_FONTPATH environment variable */
 		cups_serverbin[1024],	/* CUPS_SERVERBIN environment variable */
+		cups_serverroot[1024],	/* CUPS_SERVERROOT environment variable */
 		cups_statedir[1024],	/* CUPS_STATEDIR environment variable */
 		cache[255],		/* RIP_MAX_CACHE environment variable */
 		tmpdir[1024],		/* TMPDIR environment variable */
@@ -1375,8 +1378,6 @@ StartJob(int       id,			/* I - Job ID */
 		dyld_library_path[1024],/* DYLD_LIBRARY_PATH environment variable */
 		shlib_path[1024],	/* SHLIB_PATH environment variable */
 		nlspath[1024],		/* NLSPATH environment variable */
-		datadir[1024],		/* CUPS_DATADIR environment variable */
-		fontpath[1050],		/* CUPS_FONTPATH environment variable */
 		vg_args[1024],		/* VG_ARGS environment variable */
 		ld_assume_kernel[1024];	/* LD_ASSUME_KERNEL environment variable */
   static char	*options = NULL;	/* Full list of options */
@@ -1554,6 +1555,52 @@ StartJob(int       id,			/* I - Job ID */
     filters = temp_filters;
     memmove(filters + 1, filters, num_filters * sizeof(mime_filter_t));
     *filters = gziptoany_filter;
+    num_filters ++;
+  }
+
+ /*
+  * Add port monitor, if any...
+  */
+
+  if (printer->port_monitor)
+  {
+   /*
+    * Add port monitor to the end of the list...
+    */
+
+    mime_filter_t	*temp_filters;
+
+    if (num_filters == 0)
+      temp_filters = malloc(sizeof(mime_filter_t));
+    else
+      temp_filters = realloc(filters,
+                             sizeof(mime_filter_t) * (num_filters + 1));
+
+    if (temp_filters == NULL)
+    {
+      LogMessage(L_ERROR, "Unable to add port monitor - %s",
+                 strerror(errno));
+
+      if (filters != NULL)
+        free(filters);
+
+      current->current_file ++;
+
+      if (current->current_file == current->num_files)
+      {
+	cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, current->printer, current,
+                      "Job cancelled because the port monitor could not be added.");
+
+        CancelJob(current->id, 0);
+      }
+
+      return;
+    }
+
+    filters = temp_filters;
+    memset(filters + num_filters, 0, sizeof(mime_filter_t));
+    snprintf(filters[num_filters].filter, sizeof(filters[num_filters].filter),
+             "%s/monitor/%s", ServerBin, printer->port_monitor);
     num_filters ++;
   }
 
@@ -1882,12 +1929,13 @@ StartJob(int       id,			/* I - Job ID */
   snprintf(ppd, sizeof(ppd), "PPD=%s/ppd/%s.ppd", ServerRoot, printer->name);
   snprintf(printer_name, sizeof(printer_name), "PRINTER=%s", printer->name);
   snprintf(cache, sizeof(cache), "RIP_MAX_CACHE=%s", RIPCache);
-  snprintf(root, sizeof(root), "CUPS_SERVERROOT=%s", ServerRoot);
+  snprintf(cups_datadir, sizeof(cups_datadir), "CUPS_DATADIR=%s", DataDir);
+  snprintf(cups_docroot, sizeof(cups_docroot), "CUPS_DOCROOT=%s", DocumentRoot);
+  snprintf(cups_fontpath, sizeof(cups_fontpath), "CUPS_FONTPATH=%s", FontPath);
   snprintf(cups_serverbin, sizeof(cups_serverbin), "CUPS_SERVERBIN=%s", ServerBin);
+  snprintf(cups_serverroot, sizeof(cups_serverroot), "CUPS_SERVERROOT=%s", ServerRoot);
   snprintf(cups_statedir, sizeof(cups_statedir), "CUPS_STATEDIR=%s", StateDir);
   snprintf(tmpdir, sizeof(tmpdir), "TMPDIR=%s", TempDir);
-  snprintf(datadir, sizeof(datadir), "CUPS_DATADIR=%s", DataDir);
-  snprintf(fontpath, sizeof(fontpath), "CUPS_FONTPATH=%s", FontPath);
   sprintf(ipp_port, "IPP_PORT=%d", LocalPort);
 
   envc = 0;
@@ -1900,16 +1948,17 @@ StartJob(int       id,			/* I - Job ID */
   if (TZ && TZ[0])
     envp[envc ++] = TZ;
   envp[envc ++] = ppd;
+  envp[envc ++] = cups_datadir;
+  envp[envc ++] = cups_docroot;
+  envp[envc ++] = cups_fontpath;
   envp[envc ++] = cups_serverbin;
-  envp[envc ++] = root;
+  envp[envc ++] = cups_serverroot;
   envp[envc ++] = cups_statedir;
   envp[envc ++] = cache;
   envp[envc ++] = tmpdir;
   envp[envc ++] = content_type;
   envp[envc ++] = device_uri;
   envp[envc ++] = printer_name;
-  envp[envc ++] = datadir;
-  envp[envc ++] = fontpath;
   envp[envc ++] = "CUPS_SERVER=localhost";
   envp[envc ++] = ipp_port;
 

@@ -54,19 +54,19 @@ extern "C" {
 
 typedef enum
 {
-  MIME_MAGIC_NOP,	/* No operation */
-  MIME_MAGIC_AND,	/* Logical AND of all children */
-  MIME_MAGIC_OR,	/* Logical OR of all children */
-  MIME_MAGIC_MATCH,	/* Filename match */
-  MIME_MAGIC_ASCII,	/* ASCII characters in range */
-  MIME_MAGIC_PRINTABLE,	/* Printable characters (32-255) in range */
-  MIME_MAGIC_STRING,	/* String matches */
-  MIME_MAGIC_CHAR,	/* Character/byte matches */
-  MIME_MAGIC_SHORT,	/* Short/16-bit word matches */
-  MIME_MAGIC_INT,	/* Integer/32-bit word matches */
-  MIME_MAGIC_LOCALE,	/* Current locale matches string */
-  MIME_MAGIC_CONTAINS,	/* File contains a string */
-  MIME_MAGIC_ISTRING	/* Case-insensitive string matches */
+  MIME_MAGIC_NOP,			/* No operation */
+  MIME_MAGIC_AND,			/* Logical AND of all children */
+  MIME_MAGIC_OR,			/* Logical OR of all children */
+  MIME_MAGIC_MATCH,			/* Filename match */
+  MIME_MAGIC_ASCII,			/* ASCII characters in range */
+  MIME_MAGIC_PRINTABLE,			/* Printable characters (32-255) in range */
+  MIME_MAGIC_STRING,			/* String matches */
+  MIME_MAGIC_CHAR,			/* Character/byte matches */
+  MIME_MAGIC_SHORT,			/* Short/16-bit word matches */
+  MIME_MAGIC_INT,			/* Integer/32-bit word matches */
+  MIME_MAGIC_LOCALE,			/* Current locale matches string */
+  MIME_MAGIC_CONTAINS,			/* File contains a string */
+  MIME_MAGIC_ISTRING			/* Case-insensitive string matches */
 } mime_op_t;
 
 typedef struct mime_magic_str		/**** MIME Magic Data ****/
