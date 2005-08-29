@@ -60,7 +60,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
-#include <cups/string.h>
+#include "string.h"
 #include <errno.h>
 #include <cups/debug.h>
 #include <sys/types.h>
@@ -75,8 +75,35 @@
 #  define closesocket(f) close(f)
 #endif /* WIN32 */
 
-#include "file-private.h"
+#include "file.h"
+#ifdef HAVE_LIBZ
+#  include <zlib.h>
+#endif /* HAVE_LIBZ */
 #include "http-private.h"
+
+
+/*
+ * CUPS file structure...
+ *
+ * @private
+ */
+
+struct cups_file_s
+{
+  int		fd;			/* File descriptor */
+  char		mode,			/* Mode ('r' or 'w') */
+		compressed,		/* Compression used? */
+		eof,			/* End of file? */
+		buf[2048],		/* Buffer */
+		*ptr,			/* Pointer into buffer */
+		*end;			/* End of buffer data */
+  off_t		pos;			/* File position for start of buffer */
+
+#  ifdef HAVE_LIBZ
+  z_stream	stream;			/* Decompression stream */
+  unsigned char	cbuf[1024];		/* Decompression buffer */
+#  endif /* HAVE_LIBZ */
+};
 
 
 /*
