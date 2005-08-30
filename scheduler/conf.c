@@ -589,7 +589,7 @@ ReadConfiguration(void)
   chmod(RequestRoot, 0710);
 
   if (!strncmp(TempDir, RequestRoot, strlen(RequestRoot)) ||
-      access(TempDir))
+      access(TempDir, 0))
   {
    /*
     * Only update ownership and permissions if the CUPS temp directory

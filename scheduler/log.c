@@ -421,7 +421,7 @@ check_log_file(cups_file_t **lf,	/* IO - Log file */
   * Format the filename as needed...
   */
 
-  if (!*lf == NULL || (cupsFileTell(*lf) > MaxLogSize && MaxLogSize > 0))
+  if (!*lf || (cupsFileTell(*lf) > MaxLogSize && MaxLogSize > 0))
   {
    /*
     * Handle format strings...

@@ -23,13 +23,6 @@
  *
  * Contents:
  *
- *   LoadPPDs()      - Load PPD files from the specified directory...
- *   buf_read()      - Read a buffer of data into memory...
- *   check_ppds()    - Check to see if we need to regenerate the PPD file
- *                     list...
- *   compare_names() - Compare PPD filenames for sorting.
- *   compare_ppds()  - Compare PPD file make and model names for sorting.
- *   load_ppds()     - Load PPD files recursively.
  */
 
 /*
@@ -44,7 +37,7 @@
  * PPD information structures...
  */
 
-typedef struct
+typedef struct				/**** PPD record ****/
 {
   time_t	mtime;			/* Modification time */
   size_t	size;			/* Size in bytes */
@@ -55,39 +48,37 @@ typedef struct
 		make_and_model[256];	/* Make and model */
 } ppd_rec_t;
 
-typedef struct
+typedef struct				/**** In-memory record ****/
 {
   int		found;			/* 1 if PPD is found */
-  ppd_rec_t	record;			/* ppds.dat record */
+  ppd_rec_t	record;			/* PPDs.dat record */
 } ppd_info_t;
 
 
 /*
- * Local globals...
+ * Globals...
  */
 
-static int		num_ppds,	/* Number of PPD files */
-			sorted_ppds,	/* Number of sorted PPD files */
-			alloc_ppds;	/* Number of allocated entries */
-static ppd_info_t	*ppds;		/* PPD file info */
-static int		changed_ppd;	/* Did we change the PPD database? */
+int		NumPPDs,		/* Number of PPD files */
+		SortedPPDs,		/* Number of sorted PPD files */
+		AllocPPDs;		/* Number of allocated entries */
+ppd_info_t	*PPDs;			/* PPD file info */
+int		ChangedPPD;		/* Did we change the PPD database? */
 
 
 /*
  * Local functions...
  */
 
-static ppd_info_t	*add_ppd(const char *name, const char *natural_language,
-			         const char *make, const char *make_and_model,
-				 time_t mtime, size_t size);
-static int		cat_ppd(const char *name);
-static int		compare_names(const ppd_info_t *p0,
-			              const ppd_info_t *p1);
-static int		compare_ppds(const ppd_info_t *p0,
-			             const ppd_info_t *p1);
-static int		list_ppds(int request_id, int limit,
-			          const char *optarg);
-static void		load_ppds(const char *d, const char *p);
+ppd_info_t	*add_ppd(const char *name, const char *natural_language,
+		         const char *make, const char *make_and_model,
+			 time_t mtime, size_t size);
+int		cat_ppd(const char *name);
+int		compare_names(const ppd_info_t *p0, const ppd_info_t *p1);
+int		compare_ppds(const ppd_info_t *p0, const ppd_info_t *p1);
+int		list_ppds(int request_id, int limit, const char *optarg);
+int		load_drivers(void);
+int		load_ppds(const char *d, const char *p);
 
 
 /*
@@ -130,7 +121,7 @@ main(int  argc,				/* I - Number of command-line args */
  * 'add_ppd()' - Add a PPD file.
  */
 
-static ppd_info_t *			/* O - PPD */
+ppd_info_t *				/* O - PPD */
 add_ppd(const char *name,		/* I - PPD name */
         const char *natural_language,	/* I - Language(s) */
         const char *make,		/* I - Manufacturer */
@@ -138,6 +129,61 @@ add_ppd(const char *name,		/* I - PPD name */
         time_t     mtime,		/* I - Modification time */
 	size_t     size)		/* I - File size */
 {
+  ppd_info_t	*ppd;			/* PPD */
+
+
+ /*
+  * Add a new PPD file...
+  */
+
+  if (NumPPDs >= AllocPPDs)
+  {
+   /*
+    * Allocate (more) memory for the PPD files...
+    */
+
+    AllocPPDs += 128;
+
+    if (!PPDs)
+      ppd = malloc(sizeof(ppd_info_t) * AllocPPDs);
+    else
+      ppd = realloc(PPDs, sizeof(ppd_info_t) * AllocPPDs);
+
+    if (ppd == NULL)
+    {
+      fprintf(stderr, "ERROR: cups-driverd: Ran out of memory for %d PPD files!\n",
+	      AllocPPDs);
+      return (NULL);
+    }
+
+    PPDs = ppd;
+  }
+
+  ppd = PPDs + NumPPDs;
+  NumPPDs ++;
+
+ /*
+  * Zero-out the PPD data and copy the values over...
+  */
+
+  memset(ppd, 0, sizeof(ppd_info_t));
+
+  ppd->found        = 1;
+  ppd->record.mtime = mtime;
+  ppd->record.size  = size;
+
+  strlcpy(ppd->record.name, name, sizeof(ppd->record.name));
+  strlcpy(ppd->record.make, make, sizeof(ppd->record.make));
+  strlcpy(ppd->record.make_and_model, make_and_model,
+          sizeof(ppd->record.make_and_model));
+  strlcpy(ppd->record.natural_language, natural_language,
+          sizeof(ppd->record.natural_language));
+
+ /*
+  * Return the new PPD pointer...
+  */
+
+  return (ppd);
 }
 
 
@@ -145,7 +191,7 @@ add_ppd(const char *name,		/* I - PPD name */
  * 'cat_ppd()' - Copy a PPD file to stdout.
  */
 
-static int				/* O - Exit code */
+int					/* O - Exit code */
 cat_ppd(const char *name)		/* I - PPD name */
 {
   return (0);
@@ -156,7 +202,7 @@ cat_ppd(const char *name)		/* I - PPD name */
  * 'compare_names()' - Compare PPD filenames for sorting.
  */
 
-static int				/* O - Result of comparison */
+int					/* O - Result of comparison */
 compare_names(const ppd_info_t *p0,	/* I - First PPD file */
               const ppd_info_t *p1)	/* I - Second PPD file */
 {
@@ -168,7 +214,7 @@ compare_names(const ppd_info_t *p0,	/* I - First PPD file */
  * 'compare_ppds()' - Compare PPD file make and model names for sorting.
  */
 
-static int				/* O - Result of comparison */
+int					/* O - Result of comparison */
 compare_ppds(const ppd_info_t *p0,	/* I - First PPD file */
              const ppd_info_t *p1)	/* I - Second PPD file */
 {
@@ -193,16 +239,14 @@ compare_ppds(const ppd_info_t *p0,	/* I - First PPD file */
  * 'list_ppds()' - List PPD files.
  */
 
-static int				/* O - Exit code */
+int					/* O - Exit code */
 list_ppds(int        request_id,	/* I - Request ID */
           int        limit,		/* I - Limit */
 	  const char *optarg)		/* I - Option argument */
 {
   const char	*server_bin;		/* CUPS_SERVERBIN environment variable */
-  char		backends[1024];		/* Location of backends */
-  int		count;			/* Number of devices from backend */
-  int		compat;			/* Compatibility device? */
-  FILE		*fp;			/* Pipe to device backend */
+  char		driver[1024];		/* Location of driver programs */
+  FILE		*fp;			/* Pipe to driver program */
   cups_dir_t	*dir;			/* Directory pointer */
   cups_dentry_t *dent;			/* Directory entry */
   char		filename[1024],		/* Name of backend */
@@ -224,40 +268,40 @@ list_ppds(int        request_id,	/* I - Request ID */
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET */
   int		i;			/* Looping var */
   ppd_info_t	*ppd;			/* Current PPD file */
-  cups_file_t	*fp;			/* ppds.dat file */
-  struct stat	fileinfo;		/* ppds.dat information */
-  char		filename[1024];		/* ppds.dat filename */
+  cups_file_t	*fp;			/* PPDs.dat file */
+  struct stat	fileinfo;		/* PPDs.dat information */
+  char		filename[1024];		/* PPDs.dat filename */
 
 
  /*
   * See if we a PPD database file...
   */
 
-  num_ppds    = 0;
-  alloc_ppds  = 0;
-  ppds        = (ppd_info_t *)0;
-  changed_ppd = 0;
+  NumPPDs    = 0;
+  AllocPPDs  = 0;
+  PPDs        = (ppd_info_t *)0;
+  ChangedPPD = 0;
 
-  snprintf(filename, sizeof(filename), "%s/ppds.dat", ServerRoot);
+  snprintf(filename, sizeof(filename), "%s/PPDs.dat", ServerRoot);
   if (!stat(filename, &fileinfo) &&
-      (num_ppds = fileinfo.st_size / sizeof(ppd_rec_t)) > 0)
+      (NumPPDs = fileinfo.st_size / sizeof(ppd_rec_t)) > 0)
   {
    /*
-    * We have a ppds.dat file, so read it!
+    * We have a PPDs.dat file, so read it!
     */
 
-    alloc_ppds = num_ppds;
+    AllocPPDs = NumPPDs;
 
-    if ((ppds = malloc(sizeof(ppd_info_t) * num_ppds)) == NULL)
+    if ((PPDs = malloc(sizeof(ppd_info_t) * NumPPDs)) == NULL)
     {
-      LogMessage(L_ERROR, "LoadPPDs: Unable to allocate memory for %d PPD files!",
-                 num_ppds);
-      num_ppds   = 0;
-      alloc_ppds = 0;
+      fprintf(stderr, "ERROR: LoadPPDs: Unable to allocate memory for %d PPD files!",
+                 NumPPDs);
+      NumPPDs   = 0;
+      AllocPPDs = 0;
     }
     else if ((fp = cupsFileOpen(filename, "rb")) != NULL)
     {
-      for (i = num_ppds, ppd = ppds; i > 0; i --, ppd ++)
+      for (i = NumPPDs, ppd = PPDs; i > 0; i --, ppd ++)
       {
         cupsFileRead(fp, (char *)&(ppd->record), sizeof(ppd_rec_t));
 	ppd->found = 0;
@@ -266,23 +310,23 @@ list_ppds(int        request_id,	/* I - Request ID */
       cupsFileClose(fp);
 
       LogMessage(L_INFO, "LoadPPDs: Read \"%s\", %d PPDs...", filename,
-                 num_ppds);
+                 NumPPDs);
 
      /*
       * Sort the PPDs by name...
       */
 
-      if (num_ppds > 1)
+      if (NumPPDs > 1)
       {
-	qsort(ppds, num_ppds, sizeof(ppd_info_t),
+	qsort(PPDs, NumPPDs, sizeof(ppd_info_t),
               (int (*)(const void *, const void *))compare_names);
       }
     }
     else
     {
-      LogMessage(L_ERROR, "LoadPPDs: Unable to read \"%s\" - %s", filename,
+      fprintf(stderr, "ERROR: LoadPPDs: Unable to read \"%s\" - %s", filename,
                  strerror(errno));
-      num_ppds = 0;
+      NumPPDs = 0;
     }
   }
 
@@ -290,7 +334,7 @@ list_ppds(int        request_id,	/* I - Request ID */
   * Load all PPDs in the specified directory and below...
   */
 
-  sorted_ppds = num_ppds;
+  SortedPPDs = NumPPDs;
 
   load_ppds(d, "");
 
@@ -298,7 +342,7 @@ list_ppds(int        request_id,	/* I - Request ID */
   * Cull PPD files that are no longer present...
   */
 
-  for (i = num_ppds, ppd = ppds; i > 0; i --, ppd ++)
+  for (i = NumPPDs, ppd = PPDs; i > 0; i --, ppd ++)
     if (!ppd->found)
     {
      /*
@@ -308,7 +352,7 @@ list_ppds(int        request_id,	/* I - Request ID */
       if (i > 1)
         memmove(ppd, ppd + 1, (i - 1) * sizeof(ppd_info_t));
 
-      num_ppds --;
+      NumPPDs --;
       ppd --;
     }
 
@@ -316,28 +360,28 @@ list_ppds(int        request_id,	/* I - Request ID */
   * Sort the PPDs by make and model...
   */
 
-  if (num_ppds > 1)
-    qsort(ppds, num_ppds, sizeof(ppd_info_t),
-          (int (*)(const void *, const void *))compare_ppds);
+  if (NumPPDs > 1)
+    qsort(PPDs, NumPPDs, sizeof(ppd_info_t),
+          (int (*)(const void *, const void *))compare_PPDs);
 
  /*
-  * Write the new ppds.dat file...
+  * Write the new PPDs.dat file...
   */
 
-  if (changed_ppd)
+  if (ChangedPPD)
   {
     if ((fp = cupsFileOpen(filename, "wb")) != NULL)
     {
-      for (i = num_ppds, ppd = ppds; i > 0; i --, ppd ++)
+      for (i = NumPPDs, ppd = PPDs; i > 0; i --, ppd ++)
 	cupsFileWrite(fp, (char *)&(ppd->record), sizeof(ppd_rec_t));
 
       cupsFileClose(fp);
 
       LogMessage(L_INFO, "LoadPPDs: Wrote \"%s\", %d PPDs...", filename,
-        	 num_ppds);
+        	 NumPPDs);
     }
     else
-      LogMessage(L_ERROR, "LoadPPDs: Unable to write \"%s\" - %s", filename,
+      fprintf(stderr, "ERROR: LoadPPDs: Unable to write \"%s\" - %s", filename,
         	 strerror(errno));
   }
   else
@@ -366,28 +410,28 @@ list_ppds(int        request_id,	/* I - Request ID */
   * Then the PPD files...
   */
 
-  for (i = num_ppds, ppd = ppds; i > 0; i --, ppd ++)
+  for (i = NumPPDs, ppd = PPDs; i > 0; i --, ppd ++)
   {
     ippAddSeparator(PPDs);
 
     ippAddString(PPDs, IPP_TAG_PRINTER, IPP_TAG_NAME,
-                 "ppd-name", NULL, ppd->record.ppd_name);
+                 "ppd-name", NULL, ppd->record.name);
     ippAddString(PPDs, IPP_TAG_PRINTER, IPP_TAG_TEXT,
-                 "ppd-make", NULL, ppd->record.ppd_make);
+                 "ppd-make", NULL, ppd->record.make);
     ippAddString(PPDs, IPP_TAG_PRINTER, IPP_TAG_TEXT,
-                 "ppd-make-and-model", NULL, ppd->record.ppd_make_and_model);
+                 "ppd-make-and-model", NULL, ppd->record.make_and_model);
     ippAddString(PPDs, IPP_TAG_PRINTER, IPP_TAG_LANGUAGE,
-                 "ppd-natural-language", NULL, ppd->record.ppd_natural_language);
+                 "ppd-natural-language", NULL, ppd->record.natural_language);
   }
 
  /*
   * Free the memory used...
   */
 
-  if (alloc_ppds)
+  if (AllocPPDs)
   {
-    free(ppds);
-    alloc_ppds = 0;
+    free(PPDs);
+    AllocPPDs = 0;
   }
 
 
@@ -619,15 +663,14 @@ list_ppds(int        request_id,	/* I - Request ID */
  * 'load_ppds()' - Load PPD files recursively.
  */
 
-static void
+int					/* O - 1 on success, 0 on failure */
 load_ppds(const char *d,		/* I - Actual directory */
           const char *p)		/* I - Virtual path in name */
 {
   int		i;			/* Looping var */
   cups_file_t	*fp;			/* Pointer to file */
-  DIR		*dir;			/* Directory pointer */
-  struct dirent	*dent;			/* Directory entry */
-  struct stat	fileinfo;		/* File information */
+  cups_dir_t	*dir;			/* Directory pointer */
+  cups_dentry_t	*dent;			/* Directory entry */
   char		filename[1024],		/* Name of PPD or directory */
 		line[256],		/* Line from backend */
 		*ptr,			/* Pointer into name */
@@ -668,43 +711,38 @@ load_ppds(const char *d,		/* I - Actual directory */
   };
 
 
-  if ((dir = opendir(d)) == NULL)
+  if ((dir = cupsDirOpen(d)) == NULL)
   {
-    LogMessage(L_ERROR, "LoadPPDs: Unable to open PPD directory \"%s\": %s",
-               d, strerror(errno));
-    return;
+    fprintf(stderr, "ERROR: cups-driverd: Unable to open PPD directory \"%s\": %s\n",
+            d, strerror(errno));
+    return (0);
   }
 
-  while ((dent = readdir(dir)) != NULL)
+  while ((dent = cupsDirRead(dir)) != NULL)
   {
-   /*
-    * Skip "." and ".."...
-    */
-
-    if (dent->d_name[0] == '.')
-      continue;
-
    /*
     * See if this is a file...
     */
 
-    snprintf(filename, sizeof(filename), "%s/%s", d, dent->d_name);
+    snprintf(filename, sizeof(filename), "%s/%s", d, dent->filename);
 
     if (p[0])
-      snprintf(name, sizeof(name), "%s/%s", p, dent->d_name);
+      snprintf(name, sizeof(name), "%s/%s", p, dent->filename);
     else
-      strlcpy(name, dent->d_name, sizeof(name));
+      strlcpy(name, dent->filename, sizeof(name));
 
-    if (stat(filename, &fileinfo))
-      continue;
-
-    if (S_ISDIR(fileinfo.st_mode))
+    if (S_ISDIR(dent->fileinfo.st_mode))
     {
      /*
       * Do subdirectory...
       */
 
-      load_ppds(filename, name);
+      if (!load_ppds(filename, name))
+      {
+        cupsDirClose(dir);
+        return (1);
+      }
+
       continue;
     }
 
@@ -712,16 +750,16 @@ load_ppds(const char *d,		/* I - Actual directory */
     * See if this file has been scanned before...
     */
 
-    if (sorted_ppds > 0)
+    if (SortedPPDs > 0)
     {
-      strcpy(key.record.ppd_name, name);
+      strcpy(key.record.name, name);
 
-      ppd = bsearch(&key, ppds, sorted_ppds, sizeof(ppd_info_t),
+      ppd = bsearch(&key, PPDs, SortedPPDs, sizeof(ppd_info_t),
                     (int (*)(const void *, const void *))compare_names);
 
       if (ppd &&
-          ppd->record.ppd_size == fileinfo.st_size &&
-	  ppd->record.ppd_mtime == fileinfo.st_mtime)
+          ppd->record.size == fileinfo.st_size &&
+	  ppd->record.mtime == fileinfo.st_mtime)
       {
         ppd->found = 1;
         continue;
@@ -744,7 +782,7 @@ load_ppds(const char *d,		/* I - Actual directory */
     line[0] = '\0';
     cupsFileGets(fp, line, sizeof(line));
 
-    if (strncmp(line, "*PPD-Adobe:", 11) != 0)
+    if (strncmp(line, "*PPD-Adobe:", 11))
     {
      /*
       * Nope, close the file and continue...
@@ -766,15 +804,15 @@ load_ppds(const char *d,		/* I - Actual directory */
 
     while (cupsFileGets(fp, line, sizeof(line)) != NULL)
     {
-      if (strncmp(line, "*Manufacturer:", 14) == 0)
+      if (!strncmp(line, "*Manufacturer:", 14))
 	sscanf(line, "%*[^\"]\"%255[^\"]", manufacturer);
-      else if (strncmp(line, "*ModelName:", 11) == 0)
+      else if (!strncmp(line, "*ModelName:", 11))
 	sscanf(line, "%*[^\"]\"%127[^\"]", model_name);
-      else if (strncmp(line, "*LanguageVersion:", 17) == 0)
+      else if (!strncmp(line, "*LanguageVersion:", 17))
 	sscanf(line, "%*[^:]:%63s", language);
-      else if (strncmp(line, "*NickName:", 10) == 0)
+      else if (!strncmp(line, "*NickName:", 10))
 	sscanf(line, "%*[^\"]\"%255[^\"]", nick_name);
-      else if (strncmp(line, "*OpenUI", 7) == 0)
+      else if (!strncmp(line, "*OpenUI", 7))
       {
        /*
         * Stop early if we have a NickName or ModelName attributes
@@ -822,7 +860,7 @@ load_ppds(const char *d,		/* I - Actual directory */
     while (isspace(manufacturer[0] & 255))
       cups_strcpy(manufacturer, manufacturer + 1);
 
-    if (!manufacturer[0] || strcmp(manufacturer, "ESP") == 0)
+    if (!manufacturer[0] || !strcmp(manufacturer, "ESP"))
     {
      /*
       * Nope, copy the first part of the make and model then...
@@ -841,10 +879,10 @@ load_ppds(const char *d,		/* I - Actual directory */
 
       if (*ptr && ptr > manufacturer)
 	*ptr = '\0';
-      else if (strncasecmp(manufacturer, "agfa", 4) == 0)
+      else if (!strncasecmp(manufacturer, "agfa", 4))
 	strcpy(manufacturer, "AGFA");
-      else if (strncasecmp(manufacturer, "herk", 4) == 0 ||
-               strncasecmp(manufacturer, "linotype", 8) == 0)
+      else if (!strncasecmp(manufacturer, "herk", 4) ||
+               !strncasecmp(manufacturer, "linotype", 8))
 	strcpy(manufacturer, "LHAG");
       else
 	strcpy(manufacturer, "Other");
@@ -853,26 +891,26 @@ load_ppds(const char *d,		/* I - Actual directory */
       * Hack for various vendors...
       */
 
-      if (strcasecmp(manufacturer, "XPrint") == 0)
+      if (!strcasecmp(manufacturer, "XPrint"))
 	strcpy(manufacturer, "Xerox");
-      else if (strcasecmp(manufacturer, "Eastman") == 0)
+      else if (!strcasecmp(manufacturer, "Eastman"))
 	strcpy(manufacturer, "Kodak");
-      else if (strcasecmp(manufacturer, "laserwriter") == 0)
+      else if (!strcasecmp(manufacturer, "laserwriter"))
 	strcpy(manufacturer, "Apple");
-      else if (strcasecmp(manufacturer, "colorpoint") == 0)
+      else if (!strcasecmp(manufacturer, "colorpoint"))
 	strcpy(manufacturer, "Seiko");
-      else if (strcasecmp(manufacturer, "fiery") == 0)
+      else if (!strcasecmp(manufacturer, "fiery"))
 	strcpy(manufacturer, "EFI");
-      else if (strcasecmp(manufacturer, "ps") == 0 ||
-               strcasecmp(manufacturer, "colorpass") == 0)
+      else if (!strcasecmp(manufacturer, "ps") ||
+               !strcasecmp(manufacturer, "colorpass"))
 	strcpy(manufacturer, "Canon");
-      else if (strncasecmp(manufacturer, "primera", 7) == 0)
+      else if (!strncasecmp(manufacturer, "primera", 7))
 	strcpy(manufacturer, "Fargo");
-      else if (strcasecmp(manufacturer, "designjet") == 0)
+      else if (!strcasecmp(manufacturer, "designjet"))
 	strcpy(manufacturer, "HP");
     }
-    else if (strncasecmp(manufacturer, "LHAG", 4) == 0 ||
-             strncasecmp(manufacturer, "linotype", 8) == 0)
+    else if (!strncasecmp(manufacturer, "LHAG", 4) ||
+             !strncasecmp(manufacturer, "linotype", 8))
       strcpy(manufacturer, "LHAG");
 
    /*
@@ -903,7 +941,7 @@ load_ppds(const char *d,		/* I - Actual directory */
     }
 
     for (i = 0; i < (int)(sizeof(languages) / sizeof(languages[0])); i ++)
-      if (strcasecmp(languages[i].version, language) == 0)
+      if (!strcasecmp(languages[i].version, language))
         break;
 
     if (i < (int)(sizeof(languages) / sizeof(languages[0])))
@@ -933,66 +971,60 @@ load_ppds(const char *d,		/* I - Actual directory */
     if (new_ppd)
     {
      /*
-      * Allocate memory for the new PPD file...
+      * Add new PPD file...
       */
 
-      LogMessage(L_DEBUG, "LoadPPDs: Adding ppd \"%s\"...", name);
+      fprintf(stderr, "DEBUG: cups-driverd: Adding ppd \"%s\"...\n", name);
 
-      if (num_ppds >= alloc_ppds)
+      if (!add_ppd(name, manufacturer, make_model, language,
+                   dent->fileinfo.st_mtime, dent->fileinfo.st_size))
       {
-       /*
-	* Allocate (more) memory for the PPD files...
-	*/
-
-	if (alloc_ppds == 0)
-          ppd = malloc(sizeof(ppd_info_t) * 32);
-	else
-          ppd = realloc(ppds, sizeof(ppd_info_t) * (alloc_ppds + 32));
-
-	if (ppd == NULL)
-	{
-          LogMessage(L_ERROR, "load_ppds: Ran out of memory for %d PPD files!",
-	             alloc_ppds + 32);
-          closedir(dir);
-	  return;
-	}
-
-	ppds = ppd;
-	alloc_ppds += 32;
+        cupsDirClose(dir);
+      	return (0);
       }
-
-      ppd = ppds + num_ppds;
-      num_ppds ++;
     }
     else
-      LogMessage(L_DEBUG, "LoadPPDs: Updating ppd \"%s\"...", name);
+    {
+     /*
+      * Update existing record...
+      */
 
-   /*
-    * Zero the PPD record and copy the info over...
-    */
+      fprintf(stderr, "DEBUG: cups-driverd: Updating ppd \"%s\"...\n", name);
 
-    memset(ppd, 0, sizeof(ppd_info_t));
+      memset(ppd, 0, sizeof(ppd_info_t));
 
-    ppd->found            = 1;
-    ppd->record.ppd_mtime = fileinfo.st_mtime;
-    ppd->record.ppd_size  = fileinfo.st_size;
+      ppd->found        = 1;
+      ppd->record.mtime = dent->fileinfo.st_mtime;
+      ppd->record.size  = dent->fileinfo.st_size;
 
-    strlcpy(ppd->record.ppd_name, name,
-            sizeof(ppd->record.ppd_name));
-    strlcpy(ppd->record.ppd_make, manufacturer,
-            sizeof(ppd->record.ppd_make));
-    strlcpy(ppd->record.ppd_make_and_model, make_model,
-            sizeof(ppd->record.ppd_make_and_model));
-    strlcpy(ppd->record.ppd_natural_language, language,
-            sizeof(ppd->record.ppd_natural_language));
+      strlcpy(ppd->record.name, name, sizeof(ppd->record.name));
+      strlcpy(ppd->record.make, manufacturer, sizeof(ppd->record.make));
+      strlcpy(ppd->record.make_and_model, make_model,
+              sizeof(ppd->record.make_and_model));
+      strlcpy(ppd->record.natural_language, language,
+              sizeof(ppd->record.natural_language));
+    }
 
-    changed_ppd = 1;
+    ChangedPPD = 1;
   }
 
-  closedir(dir);
+  cupsDirClose(dir);
+
+  return (1);
 }
 
 
 /*
- * End of "$Id: ppds.c 4598 2005-08-25 21:36:26Z mike $".
+ * 'load_drivers()' - Load driver-generated PPD files.
+ */
+
+int					/* O - 1 on success, 0 on failure */
+load_drivers(void)
+{
+  return (1);
+}
+
+
+/*
+ * End of "$Id$".
  */
