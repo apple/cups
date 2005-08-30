@@ -198,6 +198,9 @@ rm -rf $RPM_BUILD_ROOT
 %dir /usr/share/man/man8
 /usr/share/man/man8/*
 
+%dir /var/cache/cups
+%dir /var/cache/cups/ppd
+%dir /var/run/cups
 %attr(0700,lp,root) %dir /var/spool/cups
 %attr(1700,lp,root) %dir /var/spool/cups/tmp
 

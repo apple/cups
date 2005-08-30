@@ -75,12 +75,17 @@ install:	all
 	$(INSTALL_BIN) cups-driverd $(SERVERBIN)/daemon
 	$(INSTALL_BIN) cups-lpd $(SERVERBIN)/daemon
 	$(INSTALL_BIN) cups-polld $(SERVERBIN)/daemon
-	$(INSTALL_DIR) -m 711 -o $(CUPS_USER) -g $(CUPS_GROUP) $(SERVERROOT)/certs
+	$(INSTALL_DIR) $(SERVERBIN)/driver
+	$(INSTALL_DIR) $(SERVERROOT)
 	$(INSTALL_DIR) $(SERVERROOT)/interfaces
 	$(INSTALL_DIR) $(SERVERROOT)/ppd
+	$(INSTALL_DIR) $(STATEDIR)
+	-$(INSTALL_DIR) -m 711 -o $(CUPS_USER) -g $(CUPS_GROUP) $(STATEDIR)/certs
 	$(INSTALL_DIR) $(LOGDIR)
 	$(INSTALL_DIR) -m 710 $(REQUESTS)
 	$(INSTALL_DIR) -m 1770 $(REQUESTS)/tmp
+	$(INSTALL_DIR) $(CACHEDIR)
+	$(INSTALL_DIR) $(CACHEDIR)/ppd
 
 
 #

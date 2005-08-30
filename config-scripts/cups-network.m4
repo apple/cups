@@ -57,17 +57,25 @@ AC_DEFINE_UNQUOTED(CUPS_MAX_FDS, $maxfiles)
 CUPS_DEFAULT_DOMAINSOCKET=""
 
 dnl Domain socket support...
+AC_ARG_ENABLE(domainsocket, [  --enable-domainsocket   turn on domain socket support, default=yes])
 AC_ARG_WITH(domainsocket, [  --with-domainsocket     set unix domain socket name],
 	default_domainsocket="$withval",
 	default_domainsocket="")
 
-if test "x$default_domainsocket" = x; then
-	CUPS_LISTEN_DOMAINSOCKET=""
+if test x$enable_domainsocket != xno; then
+	if test "x$default_domainsocket" = x; then
+		CUPS_DEFAULT_DOMAINSOCKET="$CUPS_STATEDIR/cups.sock"
+	else
+		CUPS_DEFAULT_DOMAINSOCKET="$default_domainsocket"
+	fi
+
+	CUPS_LISTEN_DOMAINSOCKET="Listen $CUPS_DEFAULT_DOMAINSOCKET"
 else
-	CUPS_LISTEN_DOMAINSOCKET="Listen $default_domainsocket"
+	CUPS_DEFAULT_DOMAINSOCKET=""
+	CUPS_LISTEN_DOMAINSOCKET=""
 fi
 
-AC_DEFINE_UNQUOTED(CUPS_DEFAULT_DOMAINSOCKET, "$default_domainsocket")
+AC_DEFINE_UNQUOTED(CUPS_DEFAULT_DOMAINSOCKET, "$CUPS_DEFAULT_DOMAINSOCKET")
 AC_SUBST(CUPS_LISTEN_DOMAINSOCKET)
 
 dnl

@@ -23,9 +23,9 @@ dnl         WWW: http://www.cups.org
 dnl
 
 AC_ARG_ENABLE(ssl, [  --enable-ssl            turn on SSL/TLS support, default=yes])
-AC_ARG_ENABLE(openssl, [  --enable-openssl        use OpenSSL for SSL/TLS support, default=yes])
-AC_ARG_ENABLE(gnutls, [  --enable-gnutls         use GNU TLS for SSL/TLS support, default=yes])
-AC_ARG_ENABLE(cdsassl, [  --enable-cdsassl        use CDSA for SSL/TLS support, default=yes])
+AC_ARG_ENABLE(cdsassl, [  --enable-cdsassl        use CDSA for SSL/TLS support, default=first])
+AC_ARG_ENABLE(gnutls, [  --enable-gnutls         use GNU TLS for SSL/TLS support, default=second])
+AC_ARG_ENABLE(openssl, [  --enable-openssl        use OpenSSL for SSL/TLS support, default=third])
 AC_ARG_WITH(openssl-libs, [  --with-openssl-libs     set directory for OpenSSL library],
     LDFLAGS="-L$withval $LDFLAGS"
     DSOFLAGS="-L$withval $DSOFLAGS",)
@@ -38,8 +38,34 @@ SSLFLAGS=""
 SSLLIBS=""
 
 if test x$enable_ssl != xno; then
-    dnl Check for the OpenSSL library first, which has precedence over
-    dnl CDSA and GNUTLS...
+    dnl Look for CDSA...
+    if test "x${SSLLIBS}" = "x" -a "x${enable_cdsassl}" != "xno"; then
+	if test $uname = Darwin; then
+	    AC_CHECK_HEADER(Security/SecureTransport.h,
+		[SSLLIBS="-framework CoreFoundation -framework Security"
+		 AC_DEFINE(HAVE_SSL)
+		 AC_DEFINE(HAVE_CDSASSL)])
+	fi
+    fi
+
+    dnl Then look for GNU TLS...
+    if test "x${SSLLIBS}" = "x" -a "x${enable_gnutls}" != "xno"; then
+	AC_CHECK_HEADER(gnutls/gnutls.h,
+	    dnl Save the current libraries so the crypto stuff isn't always
+	    dnl included...
+	    SAVELIBS="$LIBS"
+
+	    TEST_GNUTLS_LIBS=`libgnutls-config --libs`
+	    AC_CHECK_LIB(gnutls, gnutls_init,
+		[SSLLIBS=$TEST_GNUTLS_LIBS
+		 AC_DEFINE(HAVE_SSL)
+		 AC_DEFINE(HAVE_GNUTLS)],,
+		$TEST_GNUTLS_LIBS)
+
+	    LIBS="$SAVELIBS")
+    fi
+
+    dnl Check for the OpenSSL library last...
     if test "x${SSLLIBS}" = "x" -a "x${enable_openssl}" != "xno"; then
 	AC_CHECK_HEADER(openssl/ssl.h,
 	    dnl Save the current libraries so the crypto stuff isn't always
@@ -68,33 +94,6 @@ if test x$enable_ssl != xno; then
 		    break
 		fi
 	    done
-
-	    LIBS="$SAVELIBS")
-    fi
-
-    dnl If OpenSSL wasn't found, look for CDSA...
-    if test "x${SSLLIBS}" = "x" -a "x${enable_cdsassl}" != "xno"; then
-	if test $uname = Darwin; then
-	    AC_CHECK_HEADER(Security/SecureTransport.h,
-		[SSLLIBS="-framework CoreFoundation -framework Security"
-		 AC_DEFINE(HAVE_SSL)
-		 AC_DEFINE(HAVE_CDSASSL)])
-	fi
-    fi
-
-    dnl Then look for GNU TLS...
-    if test "x${SSLLIBS}" = "x" -a "x${enable_gnutls}" != "xno"; then
-	AC_CHECK_HEADER(gnutls/gnutls.h,
-	    dnl Save the current libraries so the crypto stuff isn't always
-	    dnl included...
-	    SAVELIBS="$LIBS"
-
-	    TEST_GNUTLS_LIBS=`libgnutls-config --libs`
-	    AC_CHECK_LIB(gnutls, gnutls_init,
-		[SSLLIBS=$TEST_GNUTLS_LIBS
-		 AC_DEFINE(HAVE_SSL)
-		 AC_DEFINE(HAVE_GNUTLS)],,
-		$TEST_GNUTLS_LIBS)
 
 	    LIBS="$SAVELIBS")
     fi
