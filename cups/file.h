@@ -78,6 +78,7 @@ extern int		cupsFileLock(cups_file_t *fp, int block);
 extern int		cupsFileNumber(cups_file_t *fp);
 extern cups_file_t	*cupsFileOpen(const char *filename, const char *mode);
 extern cups_file_t	*cupsFileOpenFd(int fd, const char *mode);
+extern int		cupsFilePeekChar(cups_file_t *fp);
 extern int		cupsFilePrintf(cups_file_t *fp, const char *format, ...);
 extern int		cupsFilePutChar(cups_file_t *fp, int c);
 extern int		cupsFilePuts(cups_file_t *fp, const char *s);

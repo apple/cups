@@ -402,7 +402,7 @@ LogRequest(client_t      *con,	/* I - Request to log */
  */
 
 static int				/* O  - 1 if log file open */
-check_log_file(cups_file_t **log,	/* IO - Log file */
+check_log_file(cups_file_t **lf,	/* IO - Log file */
 	       const char  *logname)	/* I  - Log filename */
 {
   char	backname[1024],			/* Backup log filename */
@@ -414,15 +414,14 @@ check_log_file(cups_file_t **log,	/* IO - Log file */
   * See if we have a log file to check or we are handling a signal...
   */
 
-  if (log == NULL || logname == NULL || !logname[0] || SignalCount)
+  if (!lf || !logname || !logname[0] || SignalCount)
     return (1);
 
  /*
   * Format the filename as needed...
   */
 
-  if (*log == NULL ||
-      (cupsFileTell(*log) > MaxLogSize && MaxLogSize > 0))
+  if (!*lf == NULL || (cupsFileTell(*lf) > MaxLogSize && MaxLogSize > 0))
   {
    /*
     * Handle format strings...
@@ -476,19 +475,23 @@ check_log_file(cups_file_t **log,	/* IO - Log file */
   * See if the log file is open...
   */
 
-  if (*log == NULL)
+  if (!*lf)
   {
    /*
     * Nope, open the log file...
     */
 
-    if ((*log = cupsFileOpen(filename, "a")) == NULL)
+    if ((*lf = cupsFileOpen(filename, "a")) == NULL)
       return (0);
 
     if (strncmp(filename, "/dev/", 5))
     {
-      fchown(cupsFileNumber(*log), RunUser, Group);
-      fchmod(cupsFileNumber(*log), LogFilePerm);
+     /*
+      * Change ownership and permissions of non-device logs...
+      */
+
+      fchown(cupsFileNumber(*lf), RunUser, Group);
+      fchmod(cupsFileNumber(*lf), LogFilePerm);
     }
   }
 
@@ -496,13 +499,13 @@ check_log_file(cups_file_t **log,	/* IO - Log file */
   * Do we need to rotate the log?
   */
 
-  if (cupsFileTell(*log) > MaxLogSize && MaxLogSize > 0)
+  if (cupsFileTell(*lf) > MaxLogSize && MaxLogSize > 0)
   {
    /*
     * Rotate log file...
     */
 
-    cupsFileClose(*log);
+    cupsFileClose(*lf);
 
     strcpy(backname, filename);
     strlcat(backname, ".O", sizeof(backname));
@@ -510,13 +513,17 @@ check_log_file(cups_file_t **log,	/* IO - Log file */
     unlink(backname);
     rename(filename, backname);
 
-    if ((*log = cupsFileOpen(filename, "a")) == NULL)
+    if ((*lf = cupsFileOpen(filename, "a")) == NULL)
       return (0);
 
     if (strncmp(filename, "/dev/", 5))
     {
-      fchown(cupsFileNumber(*log), RunUser, Group);
-      fchmod(cupsFileNumber(*log), LogFilePerm);
+     /*
+      * Change ownership and permissions of non-device logs...
+      */
+
+      fchown(cupsFileNumber(*lf), RunUser, Group);
+      fchmod(cupsFileNumber(*lf), LogFilePerm);
     }
   }
 

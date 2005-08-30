@@ -39,6 +39,7 @@
  *   cupsFileNumber()      - Return the file descriptor associated with a CUPS file.
  *   cupsFileOpen()        - Open a CUPS file.
  *   cupsFileOpenFd()      - Open a CUPS file using a file descriptor.
+ *   cupsFilePeekChar()    - Peek at the next character from a file.
  *   cupsFilePrintf()      - Write a formatted string.
  *   cupsFilePutChar()     - Write a character.
  *   cupsFilePuts()        - Write a string.
@@ -687,6 +688,36 @@ cupsFileOpenFd(int        fd,		/* I - File descriptor */
   }
 
   return (fp);
+}
+
+
+/*
+ * 'cupsFilePeekChar()' - Peek at the next character from a file.
+ */
+
+int					/* O - Character or -1 on EOF */
+cupsFilePeekChar(cups_file_t *fp)	/* I - CUPS file */
+{
+ /*
+  * Range check input...
+  */
+
+  if (!fp || (fp->mode != 'r' && fp->mode != 's'))
+    return (-1);
+
+ /*
+  * If the input buffer is empty, try to read more data...
+  */
+
+  if (fp->ptr >= fp->end)
+    if (cups_fill(fp) < 0)
+      return (-1);
+
+ /*
+  * Return the next character in the buffer...
+  */
+
+  return (*(fp->ptr) & 255);
 }
 
 

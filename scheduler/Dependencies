@@ -11,7 +11,7 @@ banners.o: ../cups/md5.h ../cups/string.h ../cups/cups.h ../cups/ipp.h
 banners.o: ../cups/ppd.h ../cups/file.h mime.h ../cups/ipp.h ../cups/file.h
 banners.o: ../cups/http.h ../cups/language.h ../cups/debug.h statbuf.h cert.h
 banners.o: client.h auth.h policy.h printers.h classes.h job.h conf.h
-banners.o: banners.h dirsvc.h network.h subscriptions.h
+banners.o: banners.h dirsvc.h network.h subscriptions.h ../cups/dir.h
 cert.o: cupsd.h ../cups/http-private.h ../config.h ../cups/http.h
 cert.o: ../cups/md5.h ../cups/string.h ../cups/cups.h ../cups/ipp.h
 cert.o: ../cups/ppd.h ../cups/file.h mime.h ../cups/ipp.h ../cups/file.h
@@ -65,7 +65,7 @@ job.o: ../cups/md5.h ../cups/string.h ../cups/cups.h ../cups/ipp.h
 job.o: ../cups/ppd.h ../cups/file.h mime.h ../cups/ipp.h ../cups/file.h
 job.o: ../cups/http.h ../cups/language.h ../cups/debug.h statbuf.h cert.h
 job.o: client.h auth.h policy.h printers.h classes.h job.h conf.h banners.h
-job.o: dirsvc.h network.h subscriptions.h
+job.o: dirsvc.h network.h subscriptions.h ../cups/dir.h
 log.o: cupsd.h ../cups/http-private.h ../config.h ../cups/http.h
 log.o: ../cups/md5.h ../cups/string.h ../cups/cups.h ../cups/ipp.h
 log.o: ../cups/ppd.h ../cups/file.h mime.h ../cups/ipp.h ../cups/file.h
@@ -134,7 +134,7 @@ type.o: ../cups/string.h ../config.h mime.h ../cups/ipp.h ../cups/file.h
 type.o: ../cups/debug.h
 cups-deviced.o: util.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
 cups-deviced.o: ../cups/md5.h ../cups/ppd.h ../cups/file.h ../cups/file.h
-cups-deviced.o: ../cups/string.h ../config.h
+cups-deviced.o: ../cups/string.h ../config.h ../cups/dir.h
 util.o: util.h ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
 util.o: ../cups/ppd.h ../cups/file.h ../cups/file.h ../cups/string.h
 util.o: ../config.h

@@ -53,7 +53,7 @@ struct cups_dir_s
 {
   char			directory[1024];/* Directory filename */
   HANDLE		dir;		/* Directory handle */
-  cups_dir_entry_t	entry;		/* Directory entry */
+  cups_dentry_t	entry;		/* Directory entry */
 };
 
 
@@ -152,7 +152,7 @@ cupsDirOpen(const char *directory)	/* I - Directory name */
  * 'cupsDirRead()' - Read the next directory entry.
  */
 
-cups_dir_entry_t *			/* O - Directory entry */
+cups_dentry_t *			/* O - Directory entry */
 cupsDirRead(cups_dir_t *dp)		/* I - Directory */
 {
   WIN32_FIND_DATA	entry;		/* Directory entry data */
@@ -207,7 +207,7 @@ cupsDirRead(cups_dir_t *dp)		/* I - Directory */
 
 
 /*
- * 'cupsDir()' - .
+ * 'cupsDirRewind()' - Rewind to the start of the directory.
  */
 
 void
@@ -241,6 +241,7 @@ cupsDirRewind(cups_dir_t *dp)		/* I - Directory */
 #  include <sys/types.h>
 #  include <dirent.h>
 
+
 /*
  * Directory data structure...
  *
@@ -249,9 +250,9 @@ cupsDirRewind(cups_dir_t *dp)		/* I - Directory */
 
 struct cups_dir_s
 {
-  char			directory[1024];/* Directory filename */
-  DIR			*dir;		/* Directory file */
-  cups_dir_entry_t	entry;		/* Directory entry */
+  char		directory[1024];	/* Directory filename */
+  DIR		*dir;			/* Directory file */
+  cups_dentry_t	entry;			/* Directory entry */
 };
 
 
@@ -332,7 +333,7 @@ cupsDirOpen(const char *directory)	/* I - Directory name */
  * 'cupsDirRead()' - Read the next directory entry.
  */
 
-cups_dir_entry_t *			/* O - Directory entry */
+cups_dentry_t *				/* O - Directory entry */
 cupsDirRead(cups_dir_t *dp)		/* I - Directory */
 {
   char		buffer[sizeof(struct dirent) + PATH_MAX];
@@ -378,7 +379,7 @@ cupsDirRead(cups_dir_t *dp)		/* I - Directory */
 
 
 /*
- * 'cupsDirRewind()' - Rewind the directory to the beginning.
+ * 'cupsDirRewind()' - Rewind to the start of the directory.
  */
 
 void

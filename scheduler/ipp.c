@@ -1506,17 +1506,12 @@ add_printer(client_t        *con,	/* I - Client connection */
 
   if ((attr = ippFindAttribute(con->request, "device-uri", IPP_TAG_URI)) != NULL)
   {
-    ipp_attribute_t	*device;	/* Current device */
-    int			methodlen;	/* Length of method string */
-
-
    /*
     * Do we have a valid device URI?
     */
 
     httpSeparate(attr->values[0].string.text, method, username, host,
                  &port, resource);
-    methodlen = strlen(method);
 
     if (!strcmp(method, "file"))
     {
@@ -3909,9 +3904,14 @@ get_default(client_t *con)		/* I - Client connection */
 static void
 get_devices(client_t *con)		/* I - Client connection */
 {
-  ipp_attribute_t	*limit;		/* Limit attribute */
+  int			i;		/* Looping var */
+  ipp_attribute_t	*limit,		/* Limit attribute */
+			*requested;	/* requested-attributes attribute */
   char			command[1024],	/* cups-deviced command */
-			options[1024];	/* Options to pass to command */
+			options[1024],	/* Options to pass to command */
+			attrs[1024],	/* String for requested attributes */
+			*aptr;		/* Pointer into string */
+  int			alen;		/* Length of attribute value */
 
 
   LogMessage(L_DEBUG2, "get_devices(%p[%d])\n", con, con->http.fd);
@@ -3932,11 +3932,52 @@ get_devices(client_t *con)		/* I - Client connection */
   */
 
   limit = ippFindAttribute(con->request, "limit", IPP_TAG_INTEGER);
+  requested = ippFindAttribute(con->request, "requested-attributes",
+                               IPP_TAG_KEYWORD);
+
+  if (requested)
+  {
+    for (i = 0, aptr = attrs; i < requested->num_values; i ++)
+    {
+     /*
+      * Check that we have enough room...
+      */
+
+      alen = strlen(requested->values[i].string.text);
+      if (alen > (sizeof(attrs) - (aptr - attrs) - 2))
+        break;
+
+     /*
+      * Put commas between values...
+      */
+
+      if (i)
+        *aptr++ = ',';
+
+     /*
+      * Add the value to the end of the string...
+      */
+
+      strcpy(aptr, requested->values[i].string.text);
+      aptr += alen;
+    }
+
+   /*
+    * If we have more attribute names than will fit, default to "all"...
+    */
+
+    if (i < requested->num_values)
+      strcpy(attrs, "all");
+  }
+  else
+    strcpy(attrs, "all");
 
   snprintf(command, sizeof(command), "%s/daemon/cups-deviced", ServerBin);
-  snprintf(options, sizeof(options), "cups-deviced %d+%d",
+  snprintf(options, sizeof(options),
+           "cups-deviced %d+%d+requested-attributes=%s",
            con->request->request.op.request_id,
-           limit ? limit->values[0].integer : 0);
+           limit ? limit->values[0].integer : 0,
+	   attrs);
 
   if (SendCommand(con, command, options))
   {
@@ -4300,6 +4341,17 @@ get_notifications(client_t *con,	/* I - Client connection */
 static void
 get_ppds(client_t *con)			/* I - Client connection */
 {
+  int			i;		/* Looping var */
+  ipp_attribute_t	*limit,		/* Limit attribute */
+			*make,		/* ppd-make attribute */
+			*requested;	/* requested-attributes attribute */
+  char			command[1024],	/* cups-deviced command */
+			options[1024],	/* Options to pass to command */
+			attrs[1024],	/* String for requested attributes */
+			*aptr;		/* Pointer into string */
+  int			alen;		/* Length of attribute value */
+
+
   LogMessage(L_DEBUG2, "get_ppds(%p[%d])\n", con, con->http.fd);
 
  /*
@@ -4314,15 +4366,78 @@ get_ppds(client_t *con)			/* I - Client connection */
   }
 
  /*
-  * Copy the PPD attributes to the response using the requested-attributes
-  * attribute that may be provided by the client.
+  * Run cups-driverd command with the given options...
   */
 
-  copy_attrs(con->response, PPDs,
-             ippFindAttribute(con->request, "requested-attributes",
-	                      IPP_TAG_KEYWORD), IPP_TAG_ZERO, IPP_TAG_COPY);
+  limit     = ippFindAttribute(con->request, "limit", IPP_TAG_INTEGER);
+  make      = ippFindAttribute(con->request, "ppd-make", IPP_TAG_KEYWORD);
+  requested = ippFindAttribute(con->request, "requested-attributes",
+                               IPP_TAG_KEYWORD);
 
-  con->response->request.status.status_code = IPP_OK;
+  if (requested)
+  {
+    for (i = 0, aptr = attrs; i < requested->num_values; i ++)
+    {
+     /*
+      * Check that we have enough room...
+      */
+
+      alen = strlen(requested->values[i].string.text);
+      if (alen > (sizeof(attrs) - (aptr - attrs) - 2))
+        break;
+
+     /*
+      * Put commas between values...
+      */
+
+      if (i)
+        *aptr++ = ',';
+
+     /*
+      * Add the value to the end of the string...
+      */
+
+      strcpy(aptr, requested->values[i].string.text);
+      aptr += alen;
+    }
+
+   /*
+    * If we have more attribute names than will fit, default to "all"...
+    */
+
+    if (i < requested->num_values)
+      strcpy(attrs, "all");
+  }
+  else
+    strcpy(attrs, "all");
+
+  snprintf(command, sizeof(command), "%s/daemon/cups-driverd", ServerBin);
+  snprintf(options, sizeof(options),
+           "cups-driverd %d+%d+requested-attributes=%s%s%s",
+           con->request->request.op.request_id,
+           limit ? limit->values[0].integer : 0,
+	   attrs,
+	   make ? " ppd-make=" : "",
+	   make ? make->values[0].string.text : "all");
+
+  if (SendCommand(con, command, options))
+  {
+   /*
+    * Command started successfully, don't send an IPP response here...
+    */
+
+    ippDelete(con->response);
+    con->response = NULL;
+  }
+  else
+  {
+   /*
+    * Command failed, return "internal error" so the user knows something
+    * went wrong...
+    */
+
+    send_ipp_error(con, IPP_INTERNAL_ERROR);
+  }
 }
 
 

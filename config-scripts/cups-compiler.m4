@@ -58,9 +58,9 @@ if test -n "$GCC"; then
 
 	if test "x$with_optim" = x; then
 		# Add useful warning options for tracking down problems...
-		OPTIM="-Wall -Wunused -Wno-format-y2k $OPTIM"
+		OPTIM="-Wall -Wno-format-y2k $OPTIM"
 		# Additional warning options for alpha testing...
-		OPTIM="-Wshadow -Wconversion $OPTIM"
+		OPTIM="-Wshadow -Wunused $OPTIM"
 	fi
 else
 	case $uname in

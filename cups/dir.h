@@ -50,11 +50,11 @@ extern "C" {
 
 typedef struct cups_dir_s cups_dir_t;	/**** Directory type ****/
 
-typedef struct cups_dir_entry_s		/**** Directory entry type ****/
+typedef struct cups_dentry_s		/**** Directory entry type ****/
 {
   char		filename[260];		/* File name */
   struct stat	fileinfo;		/* File information */
-} cups_dir_entry_t;
+} cups_dentry_t;
 
 
 /*
@@ -63,7 +63,7 @@ typedef struct cups_dir_entry_s		/**** Directory entry type ****/
 
 extern void		cupsDirClose(cups_dir_t *dp);
 extern cups_dir_t	*cupsDirOpen(const char *directory);
-extern cups_dir_entry_t	*cupsDirRead(cups_dir_t *dp);
+extern cups_dentry_t	*cupsDirRead(cups_dir_t *dp);
 extern void		cupsDirRewind(cups_dir_t *dp);
 
 

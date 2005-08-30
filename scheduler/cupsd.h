@@ -30,7 +30,6 @@
 #include <cups/http-private.h>
 #include <cups/string.h>
 #include <stdlib.h>
-#include <dirent.h>
 #include <limits.h>
 #include <errno.h>
 #include <time.h>
@@ -165,9 +164,6 @@ VAR int			NeedReload	VALUE(RELOAD_ALL),
 
 VAR char		*TZ		VALUE(NULL);
 					/* Timezone configuration */
-
-VAR ipp_t		*PPDs		VALUE(NULL);
-					/* Available PPDs */
 
 
 /*

@@ -530,17 +530,29 @@ ReadConfiguration(void)
   chmod(StateDir, 0775);
 
   snprintf(temp, sizeof(temp), "%s/certs", StateDir);
+  if (access(temp, 0))
+    mkdir(temp, 0711);
   chown(temp, RunUser, Group);
   chmod(temp, 0711);
+
+  snprintf(temp, sizeof(temp), "%s/ppd", StateDir);
+  if (access(temp, 0))
+    mkdir(temp, 0755);
+  chown(temp, RunUser, Group);
+  chmod(temp, 0755);
 
   chown(ServerRoot, RunUser, Group);
   chmod(ServerRoot, 0775);
 
   snprintf(temp, sizeof(temp), "%s/ppd", ServerRoot);
+  if (access(temp, 0))
+    mkdir(temp, 0755);
   chown(temp, RunUser, Group);
   chmod(temp, 0755);
 
   snprintf(temp, sizeof(temp), "%s/ssl", ServerRoot);
+  if (access(temp, 0))
+    mkdir(temp, 0700);
   chown(temp, RunUser, Group);
   chmod(temp, 0700);
 
@@ -576,12 +588,16 @@ ReadConfiguration(void)
   chown(RequestRoot, RunUser, Group);
   chmod(RequestRoot, 0710);
 
-  if (strncmp(TempDir, RequestRoot, strlen(RequestRoot)) == 0)
+  if (!strncmp(TempDir, RequestRoot, strlen(RequestRoot)) ||
+      access(TempDir))
   {
    /*
     * Only update ownership and permissions if the CUPS temp directory
-    * is under the spool directory...
+    * is under the spool directory or does not exist...
     */
+
+    if (access(TempDir, 0))
+      mkdir(TempDir, 01770);
 
     chown(TempDir, RunUser, Group);
     chmod(TempDir, 01770);
@@ -786,12 +802,6 @@ ReadConfiguration(void)
 
     DefaultPrinter = NULL;
 
-    if (PPDs)
-    {
-      ippDelete(PPDs);
-      PPDs = NULL;
-    }
-
     if (MimeDatabase != NULL)
       mimeDelete(MimeDatabase);
 
@@ -851,13 +861,6 @@ ReadConfiguration(void)
     LoadAllClasses();
 
     CreateCommonData();
-
-   /*
-    * Load devices and PPDs...
-    */
-
-    snprintf(temp, sizeof(temp), "%s/model", DataDir);
-    LoadPPDs(temp);
 
    /*
     * Load queued jobs...

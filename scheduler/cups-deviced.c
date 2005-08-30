@@ -30,6 +30,7 @@
  */
 
 #include "util.h"
+#include <cups/dir.h>
 
 
 /*
@@ -73,7 +74,7 @@ static void		sigalrm_handler(int sig);
  *
  * Usage:
  *
- *    cups-deviced request_id limit
+ *    cups-deviced request_id limit options
  */
 
 int					/* O - Exit code */
@@ -85,14 +86,21 @@ main(int  argc,				/* I - Number of command-line args */
   int		count;			/* Number of devices from backend */
   int		compat;			/* Compatibility device? */
   FILE		*fp;			/* Pipe to device backend */
-  DIR		*dir;			/* Directory pointer */
-  struct dirent	*dent;			/* Directory entry */
+  cups_dir_t	*dir;			/* Directory pointer */
+  cups_dentry_t *dent;			/* Directory entry */
   char		filename[1024],		/* Name of backend */
 		line[2048],		/* Line from backend */
 		dclass[64],		/* Device class */
 		uri[1024],		/* Device URI */
 		info[128],		/* Device info */
 		make_model[256];	/* Make and model */
+  int		num_options;		/* Number of options */
+  cups_option_t	*options;		/* Options */
+  const char	*requested;		/* requested-attributes option */
+  int		send_class,		/* Send device-class attribute? */
+		send_info,		/* Send device-info attribute? */
+		send_make_and_model,	/* Send device-make-and-model attribute? */
+		send_uri;		/* Send device-uri attribute? */
   dev_info_t	*dev;			/* Current device */
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
   struct sigaction action;		/* Actions for POSIX signals */
@@ -103,10 +111,28 @@ main(int  argc,				/* I - Number of command-line args */
   * Check the command-line...
   */
 
-  if (argc != 3)
+  if (argc != 4)
   {
-    fputs("Usage: cups-deviced request_id limit\n", stderr);
+    fputs("Usage: cups-deviced request_id limit options\n", stderr);
     return (1);
+  }
+
+  num_options = cupsParseOptions(argv[3], 0, &options);
+  requested   = cupsGetOption("requested-attributes", num_options, options);
+
+  if (!requested || strstr(requested, "all"))
+  {
+    send_class          = 1;
+    send_info           = 1;
+    send_make_and_model = 1;
+    send_uri            = 1;
+  }
+  else
+  {
+    send_class          = strstr(requested, "device-class") != NULL;
+    send_info           = strstr(requested, "device-info") != NULL;
+    send_make_and_model = strstr(requested, "device-make-and-model") != NULL;
+    send_uri            = strstr(requested, "device-uri") != NULL;
   }
 
  /*
@@ -118,7 +144,7 @@ main(int  argc,				/* I - Number of command-line args */
 
   snprintf(backends, sizeof(backends), "%s/backend", server_bin);
 
-  if ((dir = opendir(backends)) == NULL)
+  if ((dir = cupsDirOpen(backends)) == NULL)
   {
     fprintf(stderr, "ERROR: [cups-deviced] Unable to open backend directory \"%s\": %s",
             backends, strerror(errno));
@@ -137,20 +163,13 @@ main(int  argc,				/* I - Number of command-line args */
   * Loop through all of the device backends...
   */
 
-  while ((dent = readdir(dir)) != NULL)
+  while ((dent = cupsDirRead(dir)) != NULL)
   {
-   /*
-    * Skip "." and ".."...
-    */
-
-    if (dent->d_name[0] == '.')
-      continue;
-
    /*
     * Run the backend with no arguments and collect the output...
     */
 
-    snprintf(filename, sizeof(filename), "%s/%s", backends, dent->d_name);
+    snprintf(filename, sizeof(filename), "%s/%s", backends, dent->filename);
     if ((fp = popen(filename, "r")) != NULL)
     {
      /*
@@ -173,7 +192,7 @@ main(int  argc,				/* I - Number of command-line args */
 
       alarm_tripped = 0;
       count         = 0;
-      compat        = !strcmp(dent->d_name, "smb");
+      compat        = !strcmp(dent->filename, "smb");
 
       alarm(30);
 
@@ -204,7 +223,7 @@ main(int  argc,				/* I - Number of command-line args */
 	    line[strlen(line) - 1] = '\0';
 
 	  fprintf(stderr, "ERROR: [cups-deviced] Bad line from \"%s\": %s\n",
-	          dent->d_name, line);
+	          dent->filename, line);
           compat = 1;
 	  break;
         }
@@ -217,7 +236,7 @@ main(int  argc,				/* I - Number of command-line args */
           dev = add_dev(dclass, make_model, info, uri);
 	  if (!dev)
 	  {
-            closedir(dir);
+            cupsDirClose(dir);
 	    return (1);
 	  }
 
@@ -234,7 +253,7 @@ main(int  argc,				/* I - Number of command-line args */
 
       if (alarm_tripped)
         fprintf(stderr, "WARNING: [cups-deviced] Backend \"%s\" did not respond within 30 seconds!\n",
-	        dent->d_name);
+	        dent->filename);
 
       pclose(fp);
 
@@ -246,25 +265,25 @@ main(int  argc,				/* I - Number of command-line args */
       if (count == 0 && compat)
       {
 	snprintf(line, sizeof(line), "Unknown Network Device (%s)",
-	         dent->d_name);
+	         dent->filename);
 
-        dev = add_dev("network", line, "Unknown", dent->d_name);
+        dev = add_dev("network", line, "Unknown", dent->filename);
 	if (!dev)
 	{
-          closedir(dir);
+          cupsDirClose(dir);
 	  return (1);
 	}
 
         fprintf(stderr, "DEBUG: [cups-deviced] Compatibility device \"%s\"...\n",
-	        dent->d_name);
+	        dent->filename);
       }
     }
     else
       fprintf(stderr, "WARNING: [cups-deviced] Unable to execute \"%s\" backend: %s\n",
-              dent->d_name, strerror(errno));
+              dent->filename, strerror(errno));
   }
 
-  closedir(dir);
+  cupsDirClose(dir);
 
  /*
   * Sort the available devices...
@@ -298,11 +317,15 @@ main(int  argc,				/* I - Number of command-line args */
     */
 
     cupsdSendIPPGroup(IPP_TAG_PRINTER);
-    cupsdSendIPPString(IPP_TAG_KEYWORD, "device-class", dev->device_class);
-    cupsdSendIPPString(IPP_TAG_TEXT, "device-info", dev->device_info);
-    cupsdSendIPPString(IPP_TAG_TEXT, "device-make-and-model",
-                       dev->device_make_and_model);
-    cupsdSendIPPString(IPP_TAG_URI, "device-uri", dev->device_uri);
+    if (send_class)
+      cupsdSendIPPString(IPP_TAG_KEYWORD, "device-class", dev->device_class);
+    if (send_info)
+      cupsdSendIPPString(IPP_TAG_TEXT, "device-info", dev->device_info);
+    if (send_make_and_model)
+      cupsdSendIPPString(IPP_TAG_TEXT, "device-make-and-model",
+                	 dev->device_make_and_model);
+    if (send_uri)
+      cupsdSendIPPString(IPP_TAG_URI, "device-uri", dev->device_uri);
   }
 
   cupsdSendIPPTrailer();

@@ -60,6 +60,7 @@
 
 #include "cupsd.h"
 #include <grp.h>
+#include <cups/dir.h>
 
 
 /*
@@ -674,8 +675,8 @@ HoldJob(int id)				/* I - Job ID */
 void
 LoadAllJobs(void)
 {
-  DIR		*dir;			/* Directory */
-  struct dirent	*dent;			/* Directory entry */
+  cups_dir_t	*dir;			/* Directory */
+  cups_dentry_t	*dent;			/* Directory entry */
   char		filename[1024];		/* Full filename of job file */
   int		fd;			/* File descriptor */
   job_t		*job,			/* New job */
@@ -703,7 +704,7 @@ LoadAllJobs(void)
 
   NumJobs = 0;
 
-  if ((dir = opendir(RequestRoot)) == NULL)
+  if ((dir = cupsDirOpen(RequestRoot)) == NULL)
   {
     LogMessage(L_ERROR, "LoadAllJobs: Unable to open spool directory %s: %s",
                RequestRoot, strerror(errno));
@@ -714,8 +715,8 @@ LoadAllJobs(void)
   * Read all the c##### files...
   */
 
-  while ((dent = readdir(dir)) != NULL)
-    if (strlen(dent->d_name) >= 6 && dent->d_name[0] == 'c')
+  while ((dent = cupsDirRead(dir)) != NULL)
+    if (strlen(dent->filename) >= 6 && dent->filename[0] == 'c')
     {
      /*
       * Allocate memory for the job...
@@ -724,7 +725,7 @@ LoadAllJobs(void)
       if ((job = calloc(sizeof(job_t), 1)) == NULL)
       {
         LogMessage(L_ERROR, "LoadAllJobs: Ran out of memory for jobs!");
-	closedir(dir);
+	cupsDirClose(dir);
 	return;
       }
 
@@ -732,7 +733,7 @@ LoadAllJobs(void)
       {
         free(job);
         LogMessage(L_ERROR, "LoadAllJobs: Ran out of memory for job attributes!");
-	closedir(dir);
+	cupsDirClose(dir);
 	return;
       }
 
@@ -740,7 +741,7 @@ LoadAllJobs(void)
       * Assign the job ID...
       */
 
-      job->id             = atoi(dent->d_name + 1);
+      job->id             = atoi(dent->filename + 1);
       job->back_pipes[0]  = -1;
       job->back_pipes[1]  = -1;
       job->print_pipes[0] = -1;
@@ -756,7 +757,7 @@ LoadAllJobs(void)
       * Load the job control file...
       */
 
-      snprintf(filename, sizeof(filename), "%s/%s", RequestRoot, dent->d_name);
+      snprintf(filename, sizeof(filename), "%s/%s", RequestRoot, dent->filename);
       if ((fd = open(filename, O_RDONLY)) < 0)
       {
         LogMessage(L_ERROR, "LoadAllJobs: Unable to open job control file \"%s\" - %s!",
@@ -916,22 +917,23 @@ LoadAllJobs(void)
   * Read all the d##### files...
   */
 
-  rewinddir(dir);
+  cupsDirRewind(dir);
 
-  while ((dent = readdir(dir)) != NULL)
-    if (strlen(dent->d_name) > 7 && dent->d_name[0] == 'd' && strchr(dent->d_name, '-'))
+  while ((dent = cupsDirRead(dir)) != NULL)
+    if (strlen(dent->filename) > 7 && dent->filename[0] == 'd' &&
+        strchr(dent->filename, '-'))
     {
      /*
       * Find the job...
       */
 
-      jobid  = atoi(dent->d_name + 1);
-      fileid = atoi(strchr(dent->d_name, '-') + 1);
+      jobid  = atoi(dent->filename + 1);
+      fileid = atoi(strchr(dent->filename, '-') + 1);
 
       LogMessage(L_DEBUG, "LoadAllJobs: Auto-typing document file %s...",
-                 dent->d_name);
+                 dent->filename);
 
-      snprintf(filename, sizeof(filename), "%s/%s", RequestRoot, dent->d_name);
+      snprintf(filename, sizeof(filename), "%s/%s", RequestRoot, dent->filename);
 
       if ((job = FindJob(jobid)) == NULL)
       {
@@ -975,7 +977,7 @@ LoadAllJobs(void)
 	                                      "vnd.cups-raw");
     }
 
-  closedir(dir);
+  cupsDirClose(dir);
 
  /*
   * Clean out old jobs as needed...

@@ -34,6 +34,7 @@
  */
 
 #include "cupsd.h"
+#include <cups/dir.h>
 
 
 /*
@@ -117,13 +118,12 @@ FindBanner(const char *name)	/* I - Name of banner */
  */
 
 void
-LoadBanners(const char *d)	/* I - Directory to search */
+LoadBanners(const char *d)		/* I - Directory to search */
 {
-  DIR		*dir;		/* Directory pointer */
-  struct dirent	*dent;		/* Directory entry */
-  char		filename[1024],	/* Name of banner */
-		*ext;		/* Pointer to extension */
-  struct stat	fileinfo;	/* File information */
+  cups_dir_t	*dir;			/* Directory pointer */
+  cups_dentry_t	*dent;			/* Directory entry */
+  char		filename[1024],		/* Name of banner */
+		*ext;			/* Pointer to extension */
 
 
  /*
@@ -140,7 +140,7 @@ LoadBanners(const char *d)	/* I - Directory to search */
   * Try opening the banner directory...
   */
 
-  if ((dir = opendir(d)) == NULL)
+  if ((dir = cupsDirOpen(d)) == NULL)
   {
     LogMessage(L_ERROR, "LoadBanners: Unable to open banner directory \"%s\": %s",
                d, strerror(errno));
@@ -151,46 +151,39 @@ LoadBanners(const char *d)	/* I - Directory to search */
   * Read entries, skipping directories and backup files.
   */
 
-  while ((dent = readdir(dir)) != NULL)
+  while ((dent = cupsDirRead(dir)) != NULL)
   {
    /*
     * Check the file to make sure it isn't a directory or a backup
     * file of some sort...
     */
 
-    snprintf(filename, sizeof(filename), "%s/%s", d, dent->d_name);
+    snprintf(filename, sizeof(filename), "%s/%s", d, dent->filename);
 
-    if (stat(filename, &fileinfo))
-    {
-      LogMessage(L_WARN, "LoadBanners: Unable to stat \"%s\" banner: %s",
-                 dent->d_name, strerror(errno));
-      continue;
-    }
-
-    if (S_ISDIR(fileinfo.st_mode))
+    if (S_ISDIR(dent->fileinfo.st_mode))
       continue;
 
-    if (dent->d_name[0] == '~')
+    if (dent->filename[0] == '~')
       continue;
 
-    if ((ext = strrchr(dent->d_name, '.')) != NULL)
-      if (strcmp(ext, ".bck") == 0 ||
-          strcmp(ext, ".bak") == 0 ||
-	  strcmp(ext, ".sav") == 0)
+    if ((ext = strrchr(dent->filename, '.')) != NULL)
+      if (!strcmp(ext, ".bck") ||
+          !strcmp(ext, ".bak") ||
+	  !strcmp(ext, ".sav"))
 	continue;
 
    /*
     * Must be a valid file; add it!
     */
 
-    AddBanner(dent->d_name, filename);
+    AddBanner(dent->filename, filename);
   }
 
  /*
   * Close the directory and sort as needed...
   */
 
-  closedir(dir);
+  cupsDirClose(dir);
 
   if (NumBanners > 1)
     qsort(Banners, NumBanners, sizeof(banner_t),

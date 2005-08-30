@@ -124,14 +124,16 @@ static void		ppd_fix(char *string);
 #endif /* !__APPLE__ */
 static void		ppd_free_group(ppd_group_t *group);
 static void		ppd_free_option(ppd_option_t *option);
+#if 0
 static ppd_ext_option_t	*ppd_get_extoption(ppd_file_t *ppd, const char *name);
 static ppd_ext_param_t	*ppd_get_extparam(ppd_ext_option_t *opt,
 			                  const char *param,
 					  const char *text);
+#endif /* 0 */
 static ppd_group_t	*ppd_get_group(ppd_file_t *ppd, const char *name,
 			               const char *text);
 static ppd_option_t	*ppd_get_option(ppd_group_t *group, const char *name);
-static int		ppd_read(FILE *fp, char *keyword, char *option,
+static int		ppd_read(cups_file_t *fp, char *keyword, char *option,
 			         char *text, char **string, int ignoreblank);
 
 
@@ -162,14 +164,17 @@ _ppd_attr_compare(ppd_attr_t **a,	/* I - First attribute */
 void
 ppdClose(ppd_file_t *ppd)		/* I - PPD file record */
 {
-  int			i, j;		/* Looping var */
+  int			i;		/* Looping var */
   ppd_emul_t		*emul;		/* Current emulation */
   ppd_group_t		*group;		/* Current group */
   char			**font;		/* Current font */
   char			**filter;	/* Current filter */
   ppd_attr_t		**attr;		/* Current attribute */
+#if 0
+  int			j;		/* Looping var */
   ppd_ext_option_t	**opt;		/* Current extended option */
   ppd_ext_param_t	**param;	/* Current extended parameter */
+#endif /* 0 */
 
 
  /*
@@ -285,6 +290,7 @@ ppdClose(ppd_file_t *ppd)		/* I - PPD file record */
     ppd_free(ppd->attrs);
   }
 
+#if 0
   if (ppd->num_extended)
   {
     for (i = ppd->num_extended, opt = ppd->extended; i > 0; i --, opt ++)
@@ -299,6 +305,7 @@ ppdClose(ppd_file_t *ppd)		/* I - PPD file record */
 
     ppd_free(ppd->extended);
   }
+#endif /* 0 */
 
  /*
   * Free the whole record...
@@ -368,6 +375,40 @@ ppdLastError(int *line)			/* O - Line number */
 ppd_file_t *				/* O - PPD file record */
 ppdOpen(FILE *fp)			/* I - File to read from */
 {
+  ppd_file_t	*ppd;			/* PPD file record */
+  cups_file_t	*cf;			/* CUPS file */
+
+
+ /*
+  * Reopen the stdio file as a CUPS file...
+  */
+
+  if ((cf = cupsFileOpenFd(fileno(fp), "r")) == NULL)
+    return (NULL);
+
+ /*
+  * Load the PPD file using the newer API...
+  */
+
+  ppd = ppdOpen2(cf);
+
+ /*
+  * Close the CUPS file and return the PPD...
+  */
+
+  cupsFileClose(cf);
+
+  return (ppd);
+}
+
+
+/*
+ * 'ppdOpen2()' - Read a PPD file into memory.
+ */
+
+ppd_file_t *				/* O - PPD file record */
+ppdOpen2(cups_file_t *fp)		/* I - File to read from */
+{
   char			*oldlocale;	/* Old locale settings */
   int			i, j, k, m;	/* Looping vars */
   int			count;		/* Temporary count */
@@ -375,7 +416,6 @@ ppdOpen(FILE *fp)			/* I - File to read from */
   ppd_group_t		*group,		/* Current group */
 			*subgroup;	/* Current sub-group */
   ppd_option_t		*option;	/* Current option */
-  ppd_ext_option_t	*extopt;	/* Current extended option */
   ppd_choice_t		*choice;	/* Current choice */
   ppd_const_t		*constraint;	/* Current constraint */
   ppd_size_t		*size;		/* Current page size */
@@ -841,21 +881,21 @@ ppdOpen(FILE *fp)			/* I - File to read from */
 
         if ((option = ppdFindOption(ppd, "PageSize")) == NULL)
 	{
-	  ppd_group_t	*temp;
+	  ppd_group_t	*gtemp;
 
 
           DEBUG_puts("PageSize option not found for CustomPageSize...");
 
-	  if ((temp = ppd_get_group(ppd, "General",
-                                    cupsLangString(language,
-                                                   CUPS_MSG_GENERAL))) == NULL)
+	  if ((gtemp = ppd_get_group(ppd, "General",
+                                     cupsLangString(language,
+                                                    CUPS_MSG_GENERAL))) == NULL)
 	  {
 	    DEBUG_puts("Unable to get general group!");
 
 	    goto error;
 	  }
 
-	  if ((option = ppd_get_option(temp, "PageSize")) == NULL)
+	  if ((option = ppd_get_option(gtemp, "PageSize")) == NULL)
 	  {
 	    DEBUG_puts("Unable to get PageSize option!");
 
@@ -1264,23 +1304,23 @@ ppdOpen(FILE *fp)			/* I - File to read from */
 
       if (option == NULL)
       {
-        ppd_group_t	*temp;
+        ppd_group_t	*gtemp;
 
 
        /*
         * Only valid for Non-UI options...
 	*/
 
-        for (i = ppd->num_groups, temp = ppd->groups; i > 0; i --, temp ++)
-          if (temp->text[0] == '\0')
+        for (i = ppd->num_groups, gtemp = ppd->groups; i > 0; i --, gtemp ++)
+          if (gtemp->text[0] == '\0')
 	    break;
 
         if (i > 0)
-          for (i = 0; i < temp->num_options; i ++)
-	    if (strcmp(keyword, temp->options[i].keyword) == 0)
+          for (i = 0; i < gtemp->num_options; i ++)
+	    if (strcmp(keyword, gtemp->options[i].keyword) == 0)
 	    {
-	      temp->options[i].section = section;
-	      temp->options[i].order   = order;
+	      gtemp->options[i].section = section;
+	      gtemp->options[i].order   = order;
 	      break;
 	    }
       }
@@ -1857,12 +1897,14 @@ ppdOpen(FILE *fp)			/* I - File to read from */
     }
   }
 
+#if 0
  /*
   * Set the option pointers for all extended options...
   */
 
   for (i = 0; i < ppd->num_extended; i ++)
     ppd->extended[i]->option = ppdFindOption(ppd, ppd->extended[i]->keyword);
+#endif /* 0 */
 
  /*
   * Sort the attributes...
@@ -2327,6 +2369,7 @@ ppd_free_option(ppd_option_t *option)	/* I - Option to free */
 }
 
 
+#if 0
 /*
  * 'ppd_get_extoption()' - Get an extended option record.
  */
@@ -2451,6 +2494,7 @@ ppd_get_extparam(ppd_ext_option_t *opt,	/* I - PPD file */
 
   return (extparam);
 }
+#endif /* 0 */
 
 
 /*
@@ -2557,12 +2601,12 @@ ppd_get_option(ppd_group_t *group,	/* I - Group */
  */
 
 static int				/* O - Bitmask of fields read */
-ppd_read(FILE *fp,			/* I - File to read from */
-         char *keyword,			/* O - Keyword from line */
-	 char *option,			/* O - Option from line */
-         char *text,			/* O - Human-readable text from line */
-	 char **string,			/* O - Code/string data */
-         int  ignoreblank)		/* I - Ignore blank lines? */
+ppd_read(cups_file_t *fp,		/* I - File to read from */
+         char        *keyword,		/* O - Keyword from line */
+	 char        *option,		/* O - Option from line */
+         char        *text,		/* O - Human-readable text from line */
+	 char        **string,		/* O - Code/string data */
+         int         ignoreblank)	/* I - Ignore blank lines? */
 {
   int		ch,			/* Character from file */
 		col,			/* Column in line */
@@ -2583,8 +2627,7 @@ ppd_read(FILE *fp,			/* I - File to read from */
   * Range check everything...
   */
 
-  if (fp == NULL || keyword == NULL || option == NULL || text == NULL ||
-      string == NULL)
+  if (!fp || !keyword || !option || !text || !string)
     return (0);
 
  /*
@@ -2605,7 +2648,7 @@ ppd_read(FILE *fp,			/* I - File to read from */
     endquote = 0;
     colon    = 0;
 
-    while ((ch = getc(fp)) != EOF &&
+    while ((ch = cupsFileGetChar(fp)) != EOF &&
            (lineptr - line) < (sizeof(line) - 1))
     {
       if (ch == '\r' || ch == '\n')
@@ -2623,10 +2666,10 @@ ppd_read(FILE *fp,			/* I - File to read from */
           * Check for a trailing line feed...
 	  */
 
-	  if ((ch = getc(fp)) == EOF)
+	  if ((ch = cupsFilePeekChar(fp)) == EOF)
 	    break;
-	  if (ch != 0x0a)
-	    ungetc(ch, fp);
+	  if (ch == 0x0a)
+	    cupsFileGetChar(fp);
 	}
 
 	if (lineptr == line && ignoreblank)
@@ -2685,7 +2728,7 @@ ppd_read(FILE *fp,			/* I - File to read from */
       * Didn't finish this quoted string...
       */
 
-      while ((ch = getc(fp)) != EOF)
+      while ((ch = cupsFileGetChar(fp)) != EOF)
         if (ch == '\"')
 	  break;
 	else if (ch == '\r' || ch == '\n')
@@ -2699,10 +2742,10 @@ ppd_read(FILE *fp,			/* I - File to read from */
             * Check for a trailing line feed...
 	    */
 
-	    if ((ch = getc(fp)) == EOF)
+	    if ((ch = cupsFilePeekChar(fp)) == EOF)
 	      break;
-	    if (ch != 0x0a)
-	      ungetc(ch, fp);
+	    if (ch == 0x0a)
+	      cupsFileGetChar(fp);
 	  }
 
 	  ch = '\n';
@@ -2742,7 +2785,7 @@ ppd_read(FILE *fp,			/* I - File to read from */
       * Didn't finish this line...
       */
 
-      while ((ch = getc(fp)) != EOF)
+      while ((ch = cupsFileGetChar(fp)) != EOF)
 	if (ch == '\r' || ch == '\n')
 	{
 	 /*
@@ -2758,10 +2801,10 @@ ppd_read(FILE *fp,			/* I - File to read from */
             * Check for a trailing line feed...
 	    */
 
-	    if ((ch = getc(fp)) == EOF)
+	    if ((ch = cupsFilePeekChar(fp)) == EOF)
 	      break;
-	    if (ch != 0x0a)
-	      ungetc(ch, fp);
+	    if (ch == 0x0a)
+	      cupsFileGetChar(fp);
 	  }
 
 	  break;

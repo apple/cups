@@ -233,7 +233,8 @@ typedef struct ppd_profile_str	/**** sRGB Color Profiles ****/
   float		matrix[3][3];	/* Transform matrix */
 } ppd_profile_t;
 
-/**** New in CUPS 1.1.19 ****/
+/**** New in CUPS 1.2 ****/
+#  if 0
 typedef enum ppd_ext_ui_e	/**** Extended UI Types ****/
 {
   PPD_UI_CUPS_TEXT,		/* Specify a string */
@@ -298,6 +299,7 @@ typedef struct ppd_ext_option_str
   int		num_params;	/* Number of parameters */
   ppd_ext_param_t **params;	/* Parameters */
 } ppd_ext_option_t;
+#  endif /* 0 */
 
 typedef struct ppd_file_str	/**** Files ****/
 {
@@ -353,8 +355,10 @@ typedef struct ppd_file_str	/**** Files ****/
   ppd_attr_t	**attrs;	/* Attributes */
 
   /**** New in CUPS 1.2 ****/
+#  if 0
   int		num_extended;	/* Number of extended options */
   ppd_ext_option_t **extended;	/* Extended options */
+#  endif /* 0 */
 } ppd_file_t;
 
 
@@ -400,31 +404,7 @@ extern void		ppdSetConformance(ppd_conform_t c);
 
 /**** New in CUPS 1.2 ****/
 extern int		ppdEmitJCLEnd(ppd_file_t *ppd, FILE *fp);
-extern ppd_ext_option_t	*ppdFindExtOption(ppd_file_t *ppd, const char *keyword);
-extern ppd_ext_param_t	*ppdFindExtParam(ppd_ext_option_t *opt, const char *param);
-extern int		ppdMarkCurve(ppd_file_t *ppd, const char *keyword,
-			             const char *param, float low, float high,
-				     float gvalue);
-extern int		ppdMarkGamma(ppd_file_t *ppd, const char *keyword,
-			             const char *param, float gvalue);
-extern int		ppdMarkInteger(ppd_file_t *ppd, const char *keyword,
-			               const char *param, int value);
-extern int		ppdMarkIntegerArray(ppd_file_t *ppd, const char *keyword,
-			                    const char *param, int num_values,
-					    const int *values);
-extern int		ppdMarkReal(ppd_file_t *ppd, const char *keyword,
-			            const char *param, float value);
-extern int		ppdMarkRealArray(ppd_file_t *ppd, const char *keyword,
-			                 const char *param, int num_values,
-					 const float *values);
-extern int		ppdMarkText(ppd_file_t *ppd, const char *keyword,
-			            const char *param, const char *value);
-extern int		ppdMarkXYArray(ppd_file_t *ppd, const char *keyword,
-			               const char *param, int num_values,
-				       const float *values);
-extern int		ppdSave(ppd_file_t *ppd, FILE *fp);
-extern int		ppdSaveFd(ppd_file_t *ppd, int fd);
-extern int		ppdSaveFile(ppd_file_t *ppd, const char *filename);
+extern ppd_file_t	*ppdOpen2(cups_file_t *fp);
 
 
 /*
