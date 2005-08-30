@@ -42,6 +42,7 @@
 #include <pwd.h>
 #include <grp.h>
 #include <sys/utsname.h>
+#include <cups/dir.h>
 
 #ifdef HAVE_DOMAINSOCKETS
 #  include <sys/un.h>
@@ -592,7 +593,7 @@ ReadConfiguration(void)
       access(TempDir, 0))
   {
    /*
-    * Only update ownership and permissions if the CUPS temp directory
+    * Update ownership and permissions if the CUPS temp directory
     * is under the spool directory or does not exist...
     */
 
@@ -603,6 +604,40 @@ ReadConfiguration(void)
     chmod(TempDir, 01770);
   }
 
+  if (!strncmp(TempDir, RequestRoot, strlen(RequestRoot)))
+  {
+   /*
+    * Clean out the temporary directory...
+    */
+
+    cups_dir_t		*dir;		/* Temporary directory */
+    cups_dentry_t	*dent;		/* Directory entry */
+    char		tempfile[1024];	/* Temporary filename */
+
+
+    if ((dir = cupsDirOpen(TempDir)) != NULL)
+    {
+      LogMessage(L_INFO, "Cleaning out old temporary files in \"%s\"...",
+                 TempDir);
+
+      while ((dent = cupsDirRead(dir)) != NULL)
+      {
+        snprintf(tempfile, sizeof(tempfile), "%s/%s", TempDir, dent->filename);
+
+	if (unlink(tempfile))
+	  LogMessage(L_ERROR, "Unable to remove temporary file \"%s\" - %s",
+	             tempfile, strerror(errno));
+        else
+	  LogMessage(L_DEBUG, "Removed temporary file \"%s\"...", tempfile);
+      }
+
+      cupsDirClose(dir);
+    }
+    else
+      LogMessage(L_ERROR, "Unable to open temporary directory \"%s\" - %s",
+                 TempDir, strerror(errno));
+  }
+
  /*
   * Check the MaxClients setting, and then allocate memory for it...
   */
@@ -610,8 +645,8 @@ ReadConfiguration(void)
   if (MaxClients > (MaxFDs / 3) || MaxClients <= 0)
   {
     if (MaxClients > 0)
-      LogMessage(L_INFO, "MaxClients limited to 1/3 of the file descriptor limit (%d)...",
-                 MaxFDs);
+      LogMessage(L_INFO, "MaxClients limited to 1/3 (%d) of the file descriptor limit (%d)...",
+                 MaxFDs / 3, MaxFDs);
 
     MaxClients = MaxFDs / 3;
   }

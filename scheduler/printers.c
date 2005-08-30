@@ -1688,7 +1688,7 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
 
 
         for (i = 1, ppdattr = ppdFindAttr(ppd, "cupsPortMonitor", NULL);
-	     attr;
+	     ppdattr;
 	     i ++, ppdattr = ppdFindNextAttr(ppd, "cupsPortMonitor", NULL));
 
         if (ppd->protocols)
@@ -1705,8 +1705,8 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
         attr->values[0].string.text = strdup("none");
 
         for (i = 1, ppdattr = ppdFindAttr(ppd, "cupsPortMonitor", NULL);
-	     attr;
-	     i ++, ppdattr = ppdFindNextAttr(ppd, "cupsPortMonitor", NULL));
+	     ppdattr;
+	     i ++, ppdattr = ppdFindNextAttr(ppd, "cupsPortMonitor", NULL))
 	  attr->values[i].string.text = strdup(ppdattr->value);
 
         if (ppd->protocols)

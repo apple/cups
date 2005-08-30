@@ -3,6 +3,10 @@
  *
  *   PPD/driver support for the Common UNIX Printing System (CUPS).
  *
+ *   This program handles listing and installing both static PPD files
+ *   in CUPS_DATADIR/model and dynamically generated PPD files using
+ *   the driver helper programs in CUPS_SERVERBIN/driver.
+ *
  *   Copyright 1997-2005 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -76,7 +80,7 @@ ppd_info_t	*add_ppd(const char *name, const char *natural_language,
 int		cat_ppd(const char *name);
 int		compare_names(const ppd_info_t *p0, const ppd_info_t *p1);
 int		compare_ppds(const ppd_info_t *p0, const ppd_info_t *p1);
-int		list_ppds(int request_id, int limit, const char *optarg);
+int		list_ppds(int request_id, int limit, const char *opt);
 int		load_drivers(void);
 int		load_ppds(const char *d, const char *p);
 
@@ -110,8 +114,8 @@ main(int  argc,				/* I - Number of command-line args */
   * Install or list PPDs...
   */
 
-  if (!strcmp(argv[1], "install"))
-    return (install_ppd(argv[2]));
+  if (!strcmp(argv[1], "cat"))
+    return (cat_ppd(argv[2]));
   else
     return (list_ppds(atoi(argv[2]), atoi(argv[3]), argv[4]));
 }
@@ -151,7 +155,7 @@ add_ppd(const char *name,		/* I - PPD name */
 
     if (ppd == NULL)
     {
-      fprintf(stderr, "ERROR: cups-driverd: Ran out of memory for %d PPD files!\n",
+      fprintf(stderr, "ERROR: [cups-driverd] Ran out of memory for %d PPD files!\n",
 	      AllocPPDs);
       return (NULL);
     }
@@ -173,11 +177,11 @@ add_ppd(const char *name,		/* I - PPD name */
   ppd->record.size  = size;
 
   strlcpy(ppd->record.name, name, sizeof(ppd->record.name));
+  strlcpy(ppd->record.natural_language, natural_language,
+          sizeof(ppd->record.natural_language));
   strlcpy(ppd->record.make, make, sizeof(ppd->record.make));
   strlcpy(ppd->record.make_and_model, make_and_model,
           sizeof(ppd->record.make_and_model));
-  strlcpy(ppd->record.natural_language, natural_language,
-          sizeof(ppd->record.natural_language));
 
  /*
   * Return the new PPD pointer...
@@ -242,35 +246,25 @@ compare_ppds(const ppd_info_t *p0,	/* I - First PPD file */
 int					/* O - Exit code */
 list_ppds(int        request_id,	/* I - Request ID */
           int        limit,		/* I - Limit */
-	  const char *optarg)		/* I - Option argument */
+	  const char *opt)		/* I - Option argument */
 {
-  const char	*server_bin;		/* CUPS_SERVERBIN environment variable */
-  char		driver[1024];		/* Location of driver programs */
-  FILE		*fp;			/* Pipe to driver program */
-  cups_dir_t	*dir;			/* Directory pointer */
-  cups_dentry_t *dent;			/* Directory entry */
-  char		filename[1024],		/* Name of backend */
-		line[2048],		/* Line from backend */
-		dclass[64],		/* Device class */
-		uri[1024],		/* Device URI */
-		info[128],		/* Device info */
-		make_model[256];	/* Make and model */
+  int		i;			/* Looping var */
+  int		count;			/* Number of PPDs to send */
+  ppd_info_t	*ppd;			/* Current PPD file */
+  cups_file_t	*fp;			/* ppds.dat file */
+  struct stat	fileinfo;		/* ppds.dat information */
+  char		filename[1024],		/* ppds.dat filename */
+		model[1024];		/* Model directory */
+  const char	*cups_cachedir;		/* CUPS_CACHEDIR environment variable */
+  const char	*cups_datadir;		/* CUPS_DATADIR environment variable */
   int		num_options;		/* Number of options */
   cups_option_t	*options;		/* Options */
-  const char	*requested;		/* requested-attributes option */
+  const char	*requested,		/* requested-attributes option */
+		*make;			/* ppd-make option */
   int		send_natural_language,	/* Send ppd-natural-language attribute? */
 		send_make,		/* Send ppd-make attribute? */
 		send_make_and_model,	/* Send ppd-make-and-model attribute? */
 		send_name;		/* Send ppd-name attribute? */
-  dev_info_t	*dev;			/* Current device */
-#if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
-  struct sigaction action;		/* Actions for POSIX signals */
-#endif /* HAVE_SIGACTION && !HAVE_SIGSET */
-  int		i;			/* Looping var */
-  ppd_info_t	*ppd;			/* Current PPD file */
-  cups_file_t	*fp;			/* PPDs.dat file */
-  struct stat	fileinfo;		/* PPDs.dat information */
-  char		filename[1024];		/* PPDs.dat filename */
 
 
  /*
@@ -279,27 +273,31 @@ list_ppds(int        request_id,	/* I - Request ID */
 
   NumPPDs    = 0;
   AllocPPDs  = 0;
-  PPDs        = (ppd_info_t *)0;
+  PPDs       = (ppd_info_t *)NULL;
   ChangedPPD = 0;
 
-  snprintf(filename, sizeof(filename), "%s/PPDs.dat", ServerRoot);
+  if ((cups_cachedir = getenv("CUPS_CACHEDIR")) == NULL)
+    cups_cachedir = CUPS_CACHEDIR;
+
+  snprintf(filename, sizeof(filename), "%s/ppds.dat", cups_cachedir);
   if (!stat(filename, &fileinfo) &&
+      (fileinfo.st_size % sizeof(ppd_rec_t)) == 0 &&
       (NumPPDs = fileinfo.st_size / sizeof(ppd_rec_t)) > 0)
   {
    /*
-    * We have a PPDs.dat file, so read it!
+    * We have a ppds.dat file, so read it!
     */
 
     AllocPPDs = NumPPDs;
 
     if ((PPDs = malloc(sizeof(ppd_info_t) * NumPPDs)) == NULL)
     {
-      fprintf(stderr, "ERROR: LoadPPDs: Unable to allocate memory for %d PPD files!",
-                 NumPPDs);
+      fprintf(stderr, "ERROR: [cups-driverd] Unable to allocate memory for %d PPD files!\n",
+              NumPPDs);
       NumPPDs   = 0;
       AllocPPDs = 0;
     }
-    else if ((fp = cupsFileOpen(filename, "rb")) != NULL)
+    else if ((fp = cupsFileOpen(filename, "r")) != NULL)
     {
       for (i = NumPPDs, ppd = PPDs; i > 0; i --, ppd ++)
       {
@@ -309,23 +307,13 @@ list_ppds(int        request_id,	/* I - Request ID */
 
       cupsFileClose(fp);
 
-      LogMessage(L_INFO, "LoadPPDs: Read \"%s\", %d PPDs...", filename,
-                 NumPPDs);
-
-     /*
-      * Sort the PPDs by name...
-      */
-
-      if (NumPPDs > 1)
-      {
-	qsort(PPDs, NumPPDs, sizeof(ppd_info_t),
-              (int (*)(const void *, const void *))compare_names);
-      }
+      fprintf(stderr, "INFO: [cups-driverd] Read \"%s\", %d PPDs...\n",
+              filename, NumPPDs);
     }
     else
     {
-      fprintf(stderr, "ERROR: LoadPPDs: Unable to read \"%s\" - %s", filename,
-                 strerror(errno));
+      fprintf(stderr, "ERROR: [cups-driverd] Unable to read \"%s\" - %s\n", filename,
+              strerror(errno));
       NumPPDs = 0;
     }
   }
@@ -336,7 +324,11 @@ list_ppds(int        request_id,	/* I - Request ID */
 
   SortedPPDs = NumPPDs;
 
-  load_ppds(d, "");
+  if ((cups_datadir = getenv("CUPS_DATADIR")) == NULL)
+    cups_datadir = CUPS_DATADIR;
+
+  snprintf(model, sizeof(model), "%s/model", cups_datadir);
+  load_ppds(model, "");
 
  /*
   * Cull PPD files that are no longer present...
@@ -357,303 +349,138 @@ list_ppds(int        request_id,	/* I - Request ID */
     }
 
  /*
-  * Sort the PPDs by make and model...
+  * Sort the PPDs by name...
   */
 
   if (NumPPDs > 1)
     qsort(PPDs, NumPPDs, sizeof(ppd_info_t),
-          (int (*)(const void *, const void *))compare_PPDs);
+          (int (*)(const void *, const void *))compare_names);
 
  /*
-  * Write the new PPDs.dat file...
+  * Write the new ppds.dat file...
   */
 
   if (ChangedPPD)
   {
-    if ((fp = cupsFileOpen(filename, "wb")) != NULL)
+    if ((fp = cupsFileOpen(filename, "w")) != NULL)
     {
       for (i = NumPPDs, ppd = PPDs; i > 0; i --, ppd ++)
 	cupsFileWrite(fp, (char *)&(ppd->record), sizeof(ppd_rec_t));
 
       cupsFileClose(fp);
 
-      LogMessage(L_INFO, "LoadPPDs: Wrote \"%s\", %d PPDs...", filename,
-        	 NumPPDs);
+      fprintf(stderr, "INFO: [cups-driverd] Wrote \"%s\", %d PPDs...\n",
+              filename, NumPPDs);
     }
     else
-      fprintf(stderr, "ERROR: LoadPPDs: Unable to write \"%s\" - %s", filename,
-        	 strerror(errno));
+      fprintf(stderr, "ERROR: [cups-driverd] Unable to write \"%s\" - %s",
+              filename, strerror(errno));
   }
   else
-    LogMessage(L_INFO, "LoadPPDs: No new or changed PPDs...");
+    fputs("INFO: [cups-driverd] No new or changed PPDs...\n", stderr);
 
  /*
-  * Create the list of PPDs...
+  * Scan for dynamic PPD files...
   */
 
-  PPDs = ippNew();
+  load_drivers();
 
  /*
-  * First the raw driver...
+  * Add the raw driver...
   */
 
-  ippAddString(PPDs, IPP_TAG_PRINTER, IPP_TAG_NAME,
-               "ppd-name", NULL, "raw");
-  ippAddString(PPDs, IPP_TAG_PRINTER, IPP_TAG_TEXT,
-               "ppd-make", NULL, "Raw");
-  ippAddString(PPDs, IPP_TAG_PRINTER, IPP_TAG_TEXT,
-               "ppd-make-and-model", NULL, "Raw Queue");
-  ippAddString(PPDs, IPP_TAG_PRINTER, IPP_TAG_LANGUAGE,
-               "ppd-natural-language", NULL, "en");
+  add_ppd("raw", "en", "Raw", "Raw Queue", 0, 0);
 
  /*
-  * Then the PPD files...
+  * Sort the PPDs by make and model...
   */
 
-  for (i = NumPPDs, ppd = PPDs; i > 0; i --, ppd ++)
-  {
-    ippAddSeparator(PPDs);
-
-    ippAddString(PPDs, IPP_TAG_PRINTER, IPP_TAG_NAME,
-                 "ppd-name", NULL, ppd->record.name);
-    ippAddString(PPDs, IPP_TAG_PRINTER, IPP_TAG_TEXT,
-                 "ppd-make", NULL, ppd->record.make);
-    ippAddString(PPDs, IPP_TAG_PRINTER, IPP_TAG_TEXT,
-                 "ppd-make-and-model", NULL, ppd->record.make_and_model);
-    ippAddString(PPDs, IPP_TAG_PRINTER, IPP_TAG_LANGUAGE,
-                 "ppd-natural-language", NULL, ppd->record.natural_language);
-  }
+  if (NumPPDs > 1)
+    qsort(PPDs, NumPPDs, sizeof(ppd_info_t),
+          (int (*)(const void *, const void *))compare_ppds);
 
  /*
-  * Free the memory used...
+  * Send IPP attributes...
   */
 
-  if (AllocPPDs)
-  {
-    free(PPDs);
-    AllocPPDs = 0;
-  }
-
-
-  num_options = cupsParseOptions(argv[3], 0, &options);
+  num_options = cupsParseOptions(opt, 0, &options);
   requested   = cupsGetOption("requested-attributes", num_options, options);
+  make        = cupsGetOption("ppd-make", num_options, options);
 
   if (!requested || strstr(requested, "all"))
   {
-    send_class          = 1;
-    send_info           = 1;
-    send_make_and_model = 1;
-    send_uri            = 1;
+    send_name             = 1;
+    send_make             = 1;
+    send_make_and_model   = 1;
+    send_natural_language = 1;
   }
   else
   {
-    send_class          = strstr(requested, "device-class") != NULL;
-    send_info           = strstr(requested, "device-info") != NULL;
-    send_make_and_model = strstr(requested, "device-make-and-model") != NULL;
-    send_uri            = strstr(requested, "device-uri") != NULL;
+    send_name             = strstr(requested, "ppd-name") != NULL;
+    send_make             = strstr(requested, "ppd-make,") != NULL ||
+                            strstr(requested, ",ppd-make") != NULL ||
+                            !strcmp(requested, "ppd-make");
+    send_make_and_model   = strstr(requested, "ppd-make-and-model") != NULL;
+    send_natural_language = strstr(requested, "ppd-natural-language") != NULL;
   }
-
- /*
-  * Try opening the backend directory...
-  */
-
-  if ((server_bin = getenv("CUPS_SERVERBIN")) == NULL)
-    server_bin = CUPS_SERVERBIN;
-
-  snprintf(backends, sizeof(backends), "%s/backend", server_bin);
-
-  if ((dir = cupsDirOpen(backends)) == NULL)
-  {
-    fprintf(stderr, "ERROR: [cups-deviced] Unable to open backend directory \"%s\": %s",
-            backends, strerror(errno));
-    return (1);
-  }
-
- /*
-  * Setup the devices array...
-  */
-
-  alloc_devs = 0;
-  num_devs   = 0;
-  devs       = (dev_info_t *)0;
-
- /*
-  * Loop through all of the device backends...
-  */
-
-  while ((dent = cupsDirRead(dir)) != NULL)
-  {
-   /*
-    * Run the backend with no arguments and collect the output...
-    */
-
-    snprintf(filename, sizeof(filename), "%s/%s", backends, dent->filename);
-    if ((fp = popen(filename, "r")) != NULL)
-    {
-     /*
-      * Set an alarm for the first read from the backend; this avoids
-      * problems when a backend is hung getting device information.
-      */
-
-#ifdef HAVE_SIGSET /* Use System V signals over POSIX to avoid bugs */
-      sigset(SIGALRM, sigalrm_handler);
-#elif defined(HAVE_SIGACTION)
-      memset(&action, 0, sizeof(action));
-
-      sigemptyset(&action.sa_mask);
-      sigaddset(&action.sa_mask, SIGALRM);
-      action.sa_handler = sigalrm_handler;
-      sigaction(SIGALRM, &action, NULL);
-#else
-      signal(SIGALRM, sigalrm_handler);
-#endif /* HAVE_SIGSET */
-
-      alarm_tripped = 0;
-      count         = 0;
-      compat        = !strcmp(dent->filename, "smb");
-
-      alarm(30);
-
-      while (fgets(line, sizeof(line), fp) != NULL)
-      {
-       /*
-        * Reset the alarm clock...
-	*/
-
-        alarm(30);
-
-       /*
-        * Each line is of the form:
-	*
-	*   class URI "make model" "name"
-	*/
-
-        if (!strncasecmp(line, "Usage", 5))
-	  compat = 1;
-        else if (sscanf(line, "%63s%1023s%*[ \t]\"%255[^\"]\"%*[ \t]\"%127[^\"]",
-	                dclass, uri, make_model, info) != 4)
-        {
-	 /*
-	  * Bad format; strip trailing newline and write an error message.
-	  */
-
-          if (line[strlen(line) - 1] == '\n')
-	    line[strlen(line) - 1] = '\0';
-
-	  fprintf(stderr, "ERROR: [cups-deviced] Bad line from \"%s\": %s\n",
-	          dent->filename, line);
-          compat = 1;
-	  break;
-        }
-	else
-	{
-	 /*
-	  * Add the device to the array of available devices...
-	  */
-
-          dev = add_dev(dclass, make_model, info, uri);
-	  if (!dev)
-	  {
-            cupsDirClose(dir);
-	    return (1);
-	  }
-
-          fprintf(stderr, "DEBUG: [cups-deviced] Added device \"%s\"...\n", uri);
-	  count ++;
-	}
-      }
-
-     /*
-      * Turn the alarm clock off and close the pipe to the command...
-      */
-
-      alarm(0);
-
-      if (alarm_tripped)
-        fprintf(stderr, "WARNING: [cups-deviced] Backend \"%s\" did not respond within 30 seconds!\n",
-	        dent->filename);
-
-      pclose(fp);
-
-     /*
-      * Hack for backends that don't support the CUPS 1.1 calling convention:
-      * add a network device with the method == backend name.
-      */
-
-      if (count == 0 && compat)
-      {
-	snprintf(line, sizeof(line), "Unknown Network Device (%s)",
-	         dent->filename);
-
-        dev = add_dev("network", line, "Unknown", dent->filename);
-	if (!dev)
-	{
-          cupsDirClose(dir);
-	  return (1);
-	}
-
-        fprintf(stderr, "DEBUG: [cups-deviced] Compatibility device \"%s\"...\n",
-	        dent->filename);
-      }
-    }
-    else
-      fprintf(stderr, "WARNING: [cups-deviced] Unable to execute \"%s\" backend: %s\n",
-              dent->filename, strerror(errno));
-  }
-
-  cupsDirClose(dir);
-
- /*
-  * Sort the available devices...
-  */
-
-  if (num_devs > 1)
-    qsort(devs, num_devs, sizeof(dev_info_t),
-          (int (*)(const void *, const void *))compare_devs);
-
- /*
-  * Output the list of devices...
-  */
 
   puts("Content-Type: application/ipp\n");
 
-  cupsdSendIPPHeader(IPP_OK, atoi(argv[1]));
+  cupsdSendIPPHeader(IPP_OK, request_id);
   cupsdSendIPPGroup(IPP_TAG_OPERATION);
   cupsdSendIPPString(IPP_TAG_CHARSET, "attributes-charset", "utf-8");
   cupsdSendIPPString(IPP_TAG_LANGUAGE, "attributes-natural-language", "en-US");
 
-  if ((count = atoi(argv[2])) <= 0)
-    count = num_devs;
+  if (limit <= 0 || limit > NumPPDs)
+    count = NumPPDs;
+  else
+    count = limit;
 
-  if (count > num_devs)
-    count = num_devs;
+  for (i = NumPPDs, ppd = PPDs; count > 0 && i > 0; i --, ppd ++)
+    if (!make || !strcasecmp(ppd->record.make, make))
+    {
+     /*
+      * Send this PPD...
+      */
 
-  for (dev = devs; count > 0; count --, dev ++)
-  {
-   /*
-    * Add strings to attributes...
-    */
+      count --;
 
-    cupsdSendIPPGroup(IPP_TAG_PRINTER);
-    if (send_class)
-      cupsdSendIPPString(IPP_TAG_KEYWORD, "device-class", dev->device_class);
-    if (send_info)
-      cupsdSendIPPString(IPP_TAG_TEXT, "device-info", dev->device_info);
-    if (send_make_and_model)
-      cupsdSendIPPString(IPP_TAG_TEXT, "device-make-and-model",
-                	 dev->device_make_and_model);
-    if (send_uri)
-      cupsdSendIPPString(IPP_TAG_URI, "device-uri", dev->device_uri);
-  }
+      cupsdSendIPPGroup(IPP_TAG_PRINTER);
+
+      if (send_name)
+        cupsdSendIPPString(IPP_TAG_NAME, "ppd-name", ppd->record.name);
+
+      if (send_natural_language)
+        cupsdSendIPPString(IPP_TAG_LANGUAGE, "ppd-natural-language",
+	                   ppd->record.natural_language);
+
+      if (send_make)
+        cupsdSendIPPString(IPP_TAG_TEXT, "ppd-make", ppd->record.make);
+
+      if (send_make_and_model)
+        cupsdSendIPPString(IPP_TAG_TEXT, "ppd-make-and-model",
+	                   ppd->record.make_and_model);
+
+     /*
+      * If we have only requested the ppd-make attribute, then skip
+      * the remaining PPDs with this make...
+      */
+
+      if (requested && !strcmp(requested, "ppd-make"))
+      {
+        const char	*this_make;	/* This ppd-make */
+
+
+        for (this_make = ppd->record.make, i --, ppd ++; i > 0; i --, ppd ++)
+	  if (strcasecmp(this_make, ppd->record.make))
+	    break;
+
+        i ++;
+	ppd --;
+      }
+    }
 
   cupsdSendIPPTrailer();
-
- /*
-  * Free the devices array and return...
-  */
-
-  if (alloc_devs)
-    free(devs);
 
   return (0);
 }
@@ -713,7 +540,7 @@ load_ppds(const char *d,		/* I - Actual directory */
 
   if ((dir = cupsDirOpen(d)) == NULL)
   {
-    fprintf(stderr, "ERROR: cups-driverd: Unable to open PPD directory \"%s\": %s\n",
+    fprintf(stderr, "ERROR: [cups-driverd] Unable to open PPD directory \"%s\": %s\n",
             d, strerror(errno));
     return (0);
   }
@@ -758,8 +585,8 @@ load_ppds(const char *d,		/* I - Actual directory */
                     (int (*)(const void *, const void *))compare_names);
 
       if (ppd &&
-          ppd->record.size == fileinfo.st_size &&
-	  ppd->record.mtime == fileinfo.st_mtime)
+          ppd->record.size == dent->fileinfo.st_size &&
+	  ppd->record.mtime == dent->fileinfo.st_mtime)
       {
         ppd->found = 1;
         continue;
@@ -772,7 +599,7 @@ load_ppds(const char *d,		/* I - Actual directory */
     * No, file is new/changed, so re-scan it...
     */
 
-    if ((fp = cupsFileOpen(filename, "rb")) == NULL)
+    if ((fp = cupsFileOpen(filename, "r")) == NULL)
       continue;
 
    /*
@@ -974,9 +801,9 @@ load_ppds(const char *d,		/* I - Actual directory */
       * Add new PPD file...
       */
 
-      fprintf(stderr, "DEBUG: cups-driverd: Adding ppd \"%s\"...\n", name);
+      fprintf(stderr, "DEBUG: [cups-driverd] Adding ppd \"%s\"...\n", name);
 
-      if (!add_ppd(name, manufacturer, make_model, language,
+      if (!add_ppd(name, language, manufacturer, make_model,
                    dent->fileinfo.st_mtime, dent->fileinfo.st_size))
       {
         cupsDirClose(dir);
@@ -989,7 +816,7 @@ load_ppds(const char *d,		/* I - Actual directory */
       * Update existing record...
       */
 
-      fprintf(stderr, "DEBUG: cups-driverd: Updating ppd \"%s\"...\n", name);
+      fprintf(stderr, "DEBUG: [cups-driverd] Updating ppd \"%s\"...\n", name);
 
       memset(ppd, 0, sizeof(ppd_info_t));
 
@@ -1021,6 +848,103 @@ load_ppds(const char *d,		/* I - Actual directory */
 int					/* O - 1 on success, 0 on failure */
 load_drivers(void)
 {
+  const char	*server_bin;		/* CUPS_SERVERBIN environment variable */
+  char		drivers[1024];		/* Location of driver programs */
+  FILE		*fp;			/* Pipe to driver program */
+  cups_dir_t	*dir;			/* Directory pointer */
+  cups_dentry_t *dent;			/* Directory entry */
+  char		filename[1024],		/* Name of driver */
+		line[2048],		/* Line from driver */
+		name[512],		/* ppd-name */
+		natural_language[128],	/* ppd-natural-language */
+		make[128],		/* ppd-make */
+		make_and_model[256];	/* ppd-make-and-model */
+
+
+ /*
+  * Try opening the driver directory...
+  */
+
+  if ((server_bin = getenv("CUPS_SERVERBIN")) == NULL)
+    server_bin = CUPS_SERVERBIN;
+
+  snprintf(drivers, sizeof(drivers), "%s/driver", server_bin);
+
+  if ((dir = cupsDirOpen(drivers)) == NULL)
+  {
+    fprintf(stderr, "ERROR: [cups-driverd] Unable to open driver directory \"%s\": %s",
+            drivers, strerror(errno));
+    return (0);
+  }
+
+ /*
+  * Loop through all of the device drivers...
+  */
+
+  while ((dent = cupsDirRead(dir)) != NULL)
+  {
+   /*
+    * Only look at executable files...
+    */
+
+    if (!(dent->fileinfo.st_mode & 0111) || !S_ISREG(dent->fileinfo.st_mode))
+      continue;
+
+   /*
+    * Run the driver with no arguments and collect the output...
+    */
+
+    snprintf(filename, sizeof(filename), "%s/%s", drivers, dent->filename);
+    if ((fp = popen(filename, "r")) != NULL)
+    {
+      while (fgets(line, sizeof(line), fp) != NULL)
+      {
+       /*
+        * Each line is of the form:
+	*
+	*   \"ppd-name\" ppd-natural-language "ppd-make" "ppd-make-and-model"
+	*/
+
+        if (sscanf(line, "\"%511[^\"]\"%127s%*[ \t]\"%127[^\"]\"%*[ \t]\"%256[^\"]\"",
+	           name, natural_language, make, make_and_model) != 4)
+        {
+	 /*
+	  * Bad format; strip trailing newline and write an error message.
+	  */
+
+          if (line[strlen(line) - 1] == '\n')
+	    line[strlen(line) - 1] = '\0';
+
+	  fprintf(stderr, "ERROR: [cups-driverd] Bad line from \"%s\": %s\n",
+	          dent->filename, line);
+	  break;
+        }
+	else
+	{
+	 /*
+	  * Add the device to the array of available devices...
+	  */
+
+          if (!add_ppd(name, natural_language, make, make_and_model, 0, 0))
+	  {
+            cupsDirClose(dir);
+	    return (0);
+	  }
+
+          fprintf(stderr, "DEBUG: [cups-driverd] Added dynamic PPD \"%s\"...\n",
+	          name);
+	}
+      }
+
+      pclose(fp);
+    }
+    else
+      fprintf(stderr, "WARNING: [cups-driverd] Unable to execute \"%s\": %s\n",
+              filename, strerror(errno));
+  }
+
+  cupsDirClose(dir);
+
   return (1);
 }
 

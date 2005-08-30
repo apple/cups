@@ -251,9 +251,8 @@ cupsRasterReadPixels(cups_raster_t *r,	/* I - Raster stream */
         * Read using a modified TIFF "packbits" compression...
 	*/
 
-        unsigned char	*temp;
-	int		count;
-	unsigned char	byte;
+        unsigned char	*temp;		/* Pointer into buffer */
+	int		count;		/* Repetition count */
 
 
         if (cups_read(r->fd, &byte, 1) < 1)

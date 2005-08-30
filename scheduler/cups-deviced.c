@@ -23,6 +23,10 @@
  *
  * Contents:
  *
+ *   main()            - Scan for devices and return an IPP response.
+ *   add_dev()         - Add a new device to the list.
+ *   compare_devs()    - Compare device names for sorting.
+ *   sigalrm_handler() - Handle alarm signals for backends that get hung
  */
 
 /*

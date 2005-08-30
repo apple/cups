@@ -33,7 +33,9 @@
 
 #include "dir.h"
 #include "string.h"
+#include "debug.h"
 #include <stdlib.h>
+#include <errno.h>
 
 
 /*
@@ -263,6 +265,8 @@ struct cups_dir_s
 void
 cupsDirClose(cups_dir_t *dp)		/* I - Directory */
 {
+  DEBUG_printf(("cupsDirClose(dp=%p)\n", dp));
+
  /*
   * Range check input...
   */
@@ -288,6 +292,8 @@ cupsDirOpen(const char *directory)	/* I - Directory name */
 {
   cups_dir_t	*dp;			/* Directory */
 
+
+  DEBUG_printf(("cupsDirOpen(directory=\"%s\")\n", directory));
 
  /*
   * Range check input...
@@ -342,6 +348,8 @@ cupsDirRead(cups_dir_t *dp)		/* I - Directory */
   char		filename[1024];		/* Full filename */
 
 
+  DEBUG_printf(("cupsDirRead(dp=%p)\n", dp));
+
  /*
   * Range check input...
   */
@@ -355,8 +363,19 @@ cupsDirRead(cups_dir_t *dp)		/* I - Directory */
 
   do
   {
-    if (!readdir_r(dp->dir, (struct dirent *)buffer, &entry))
+    if (readdir_r(dp->dir, (struct dirent *)buffer, &entry))
+    {
+      DEBUG_printf(("    readdir_r() failed - %s\n", strerror(errno)));
       return (NULL);
+    }
+
+    if (!entry)
+    {
+      DEBUG_puts("    readdir_r() returned a NULL pointer!");
+      return (NULL);
+    }
+
+    DEBUG_printf(("    readdir_r() returned \"%s\"...\n", entry->d_name));
   }
   while (!strcmp(entry->d_name, ".") || !strcmp(entry->d_name, ".."));
 
@@ -368,7 +387,11 @@ cupsDirRead(cups_dir_t *dp)		/* I - Directory */
 
   snprintf(filename, sizeof(filename), "%s/%s", dp->directory, entry->d_name);
   if (stat(filename, &(dp->entry.fileinfo)))
+  {
+    DEBUG_printf(("    stat() failed for \"%s\" - %s...\n", filename,
+                  strerror(errno)));
     return (NULL);
+  }
 
  /*
   * Return the entry...
@@ -385,6 +408,8 @@ cupsDirRead(cups_dir_t *dp)		/* I - Directory */
 void
 cupsDirRewind(cups_dir_t *dp)		/* I - Directory */
 {
+  DEBUG_printf(("cupsDirRewind(dp=%p)\n", dp));
+
  /*
   * Range check input...
   */

@@ -105,7 +105,7 @@ cupsTempFd(char *filename,		/* I - Pointer to buffer */
     if (getuid() == 0)
       tmpdir = CUPS_REQUESTS "/tmp";
     else
-      tmpdir = "/var/tmp";
+      tmpdir = "/tmp";
   }
 #endif /* WIN32 */
 

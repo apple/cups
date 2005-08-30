@@ -40,6 +40,7 @@
 
 /*#define DEBUG*/
 #include "cgi.h"
+#include <cups/cups.h>
 #include <errno.h>
 #include <syslog.h>
 

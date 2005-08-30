@@ -4418,7 +4418,7 @@ get_ppds(client_t *con)			/* I - Client connection */
            limit ? limit->values[0].integer : 0,
 	   attrs,
 	   make ? " ppd-make=" : "",
-	   make ? make->values[0].string.text : "all");
+	   make ? make->values[0].string.text : "");
 
   if (SendCommand(con, command, options))
   {

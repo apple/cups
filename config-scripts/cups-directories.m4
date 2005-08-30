@@ -24,11 +24,6 @@ dnl
 
 AC_PREFIX_DEFAULT(/)
 
-AC_ARG_WITH(fontpath, [  --with-fontpath         set font path for pstoraster],fontpath="$withval",fontpath="")
-AC_ARG_WITH(docdir, [  --with-docdir           set path for documentation],docdir="$withval",docdir="")
-AC_ARG_WITH(logdir, [  --with-logdir           set path for log files],logdir="$withval",logdir="")
-AC_ARG_WITH(rcdir, [  --with-rcdir            set path for rc scripts],rcdir="$withval",rcdir="")
-
 dnl Fix "prefix" variable if it hasn't been specified...
 if test "$prefix" = "NONE"; then
 	prefix="/"
@@ -82,19 +77,16 @@ fi
 
 dnl Fix "libdir" variable for IRIX 6.x...
 if test "$libdir" = "\${exec_prefix}/lib"; then
-	libdir="$exec_prefix/lib"
-fi
-
-if test "$uname" = "IRIX" -a $uversion -ge 62; then
-	libdir="$exec_prefix/lib32"
-fi
-
-dnl Fix "fontpath" variable...
-if test "x$fontpath" = "x"; then
-	fontpath="$datadir/cups/fonts"
+	if test "$uname" = "IRIX" -a $uversion -ge 62; then
+		libdir="$exec_prefix/lib32"
+	else
+		libdir="$exec_prefix/lib"
+	fi
 fi
 
 dnl Setup init.d locations...
+AC_ARG_WITH(rcdir, [  --with-rcdir            set path for rc scripts],rcdir="$withval",rcdir="")
+
 if test x$rcdir = x; then
 	case "$uname" in
 		FreeBSD* | OpenBSD*)
@@ -159,72 +151,25 @@ AC_SUBST(INITDIR)
 AC_SUBST(INITDDIR)
 
 dnl Setup default locations...
-CUPS_SERVERROOT="$sysconfdir/cups"
-CUPS_STATEDIR="$localstatedir/run/cups"
-CUPS_REQUESTS="$localstatedir/spool/cups"
+# Cache data...
+AC_ARG_WITH(cachedir, [  --with-cachedir         set path for cache files],cachedir="$withval",cachedir="")
 
-AC_DEFINE_UNQUOTED(CUPS_SERVERROOT, "$sysconfdir/cups")
-AC_DEFINE_UNQUOTED(CUPS_STATEDIR, "$localstatedir/run/cups")
-AC_DEFINE_UNQUOTED(CUPS_REQUESTS, "$localstatedir/spool/cups")
-
-if test x$logdir = x; then
-	CUPS_LOGDIR="$localstatedir/log/cups"
-	AC_DEFINE_UNQUOTED(CUPS_LOGDIR, "$localstatedir/log/cups")
+if test x$cachedir = x; then
+	CUPS_CACHEDIR="$localstatedir/cache/cups"
 else
-	CUPS_LOGDIR="$logdir"
-	AC_DEFINE_UNQUOTED(CUPS_LOGDIR, "$logdir")
+	CUPS_CACHEDIR="$cachedir"
 fi
+AC_DEFINE_UNQUOTED(CUPS_CACHEDIR, "$CUPS_CACHEDIR")
+AC_SUBST(CUPS_CACHEDIR)
 
-dnl See what directory to put server executables...
-case "$uname" in
-	*BSD* | Darwin*)
-		# *BSD and Darwin (MacOS X)
-		INSTALL_SYSV=""
-		CUPS_SERVERBIN="$exec_prefix/libexec/cups"
-		AC_DEFINE_UNQUOTED(CUPS_SERVERBIN, "$exec_prefix/libexec/cups")
-		;;
-	*)
-		# All others
-		INSTALL_SYSV="install-sysv"
-		CUPS_SERVERBIN="$libdir/cups"
-		AC_DEFINE_UNQUOTED(CUPS_SERVERBIN, "$libdir/cups")
-		;;
-esac
-
-AC_SUBST(INSTALL_SYSV)
-AC_SUBST(CUPS_SERVERROOT)
-AC_SUBST(CUPS_SERVERBIN)
-AC_SUBST(CUPS_STATEDIR)
-AC_SUBST(CUPS_LOGDIR)
-AC_SUBST(CUPS_REQUESTS)
-
-dnl Set the CUPS_LOCALE directory...
-case "$uname" in
-	Linux | GNU | *BSD* | Darwin*)
-		CUPS_LOCALEDIR="$datadir/locale"
-		AC_DEFINE_UNQUOTED(CUPS_LOCALEDIR, "$datadir/locale")
-		;;
-
-	OSF1* | AIX*)
-		CUPS_LOCALEDIR="$exec_prefix/lib/nls/msg"
-		AC_DEFINE_UNQUOTED(CUPS_LOCALEDIR, "$exec_prefix/lib/nls/msg")
-		;;
-
-	*)
-		# This is the standard System V location...
-		CUPS_LOCALEDIR="$exec_prefix/lib/locale"
-		AC_DEFINE_UNQUOTED(CUPS_LOCALEDIR, "$exec_prefix/lib/locale")
-		;;
-esac
-
-AC_SUBST(CUPS_LOCALEDIR)
-
-dnl Set the CUPS_DATADIR directory...
+# Data files
 CUPS_DATADIR="$datadir/cups"
 AC_DEFINE_UNQUOTED(CUPS_DATADIR, "$datadir/cups")
 AC_SUBST(CUPS_DATADIR)
 
-dnl Set the CUPS_DOCROOT directory...
+# Documentation files
+AC_ARG_WITH(docdir, [  --with-docdir           set path for documentation],docdir="$withval",docdir="")
+
 if test x$docdir = x; then
 	CUPS_DOCROOT="$datadir/doc/cups"
 	docdir="$datadir/doc/cups"
@@ -235,10 +180,81 @@ fi
 AC_DEFINE_UNQUOTED(CUPS_DOCROOT, "$docdir")
 AC_SUBST(CUPS_DOCROOT)
 
-dnl Set the CUPS_FONTPATH directory...
-CUPS_FONTPATH="$fontpath"
+# Fonts
+AC_ARG_WITH(fontpath, [  --with-fontpath         set font path for pstoraster],fontpath="$withval",fontpath="")
+
+if test "x$fontpath" = "x"; then
+	CUPS_FONTPATH="$datadir/cups/fonts"
+else
+	CUPS_FONTPATH="$fontpath"
+fi
+
 AC_SUBST(CUPS_FONTPATH)
 AC_DEFINE_UNQUOTED(CUPS_FONTPATH, "$fontpath")
+
+# Locale data
+case "$uname" in
+	Linux | GNU | *BSD* | Darwin*)
+		CUPS_LOCALEDIR="$datadir/locale"
+		;;
+
+	OSF1* | AIX*)
+		CUPS_LOCALEDIR="$exec_prefix/lib/nls/msg"
+		;;
+
+	*)
+		# This is the standard System V location...
+		CUPS_LOCALEDIR="$exec_prefix/lib/locale"
+		;;
+esac
+
+AC_DEFINE_UNQUOTED(CUPS_LOCALEDIR, "$CUPS_LOCALDIR")
+AC_SUBST(CUPS_LOCALEDIR)
+
+# Log files...
+AC_ARG_WITH(logdir, [  --with-logdir           set path for log files],logdir="$withval",logdir="")
+
+if test x$logdir = x; then
+	CUPS_LOGDIR="$localstatedir/log/cups"
+	AC_DEFINE_UNQUOTED(CUPS_LOGDIR, "$localstatedir/log/cups")
+else
+	CUPS_LOGDIR="$logdir"
+fi
+AC_DEFINE_UNQUOTED(CUPS_LOGDIR, "$CUPS_LOGDIR")
+AC_SUBST(CUPS_LOGDIR)
+
+# Longer-term spool data
+CUPS_REQUESTS="$localstatedir/spool/cups"
+AC_DEFINE_UNQUOTED(CUPS_REQUESTS, "$localstatedir/spool/cups")
+AC_SUBST(CUPS_REQUESTS)
+
+# Server executables...
+case "$uname" in
+	*BSD* | Darwin*)
+		# *BSD and Darwin (MacOS X)
+		INSTALL_SYSV=""
+		CUPS_SERVERBIN="$exec_prefix/libexec/cups"
+		;;
+	*)
+		# All others
+		INSTALL_SYSV="install-sysv"
+		CUPS_SERVERBIN="$libdir/cups"
+		;;
+esac
+
+AC_DEFINE_UNQUOTED(CUPS_SERVERBIN, "$CUPS_SERVERBIN")
+AC_SUBST(CUPS_SERVERBIN)
+AC_SUBST(INSTALL_SYSV)
+
+# Configuration files
+CUPS_SERVERROOT="$sysconfdir/cups"
+AC_DEFINE_UNQUOTED(CUPS_SERVERROOT, "$sysconfdir/cups")
+AC_SUBST(CUPS_SERVERROOT)
+
+# Transient run-time state
+CUPS_STATEDIR="$localstatedir/run/cups"
+AC_DEFINE_UNQUOTED(CUPS_STATEDIR, "$localstatedir/run/cups")
+AC_SUBST(CUPS_STATEDIR)
 
 dnl
 dnl End of "$Id$".
