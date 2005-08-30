@@ -124,7 +124,6 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root)
 %dir /etc/cups
 %config(noreplace) /etc/cups/*.conf
-%dir /etc/cups/certs
 %dir /etc/cups/interfaces
 /etc/cups/mime.types
 /etc/cups/mime.convs
@@ -201,6 +200,7 @@ rm -rf $RPM_BUILD_ROOT
 %dir /var/cache/cups
 %dir /var/cache/cups/ppd
 %dir /var/run/cups
+%attr(0711,lp,root) %dir /var/run/cups/certs
 %attr(0700,lp,root) %dir /var/spool/cups
 %attr(1700,lp,root) %dir /var/spool/cups/tmp
 
