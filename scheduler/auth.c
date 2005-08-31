@@ -960,11 +960,17 @@ IsAuthorized(client_t *con)	/* I - Connection */
 
  /*
   * Find a matching location; if there is no match then access is
-  * not authorized...
+  * allowed from localhost and denied from other addresses...
   */
 
   if ((best = FindBest(con->uri, con->http.state)) == NULL)
-    return (HTTP_FORBIDDEN);
+  {
+    if (!strcmp(con->http.hostname, "localhost") ||
+        !strcmp(con->http.hostname, ServerName))
+      return (HTTP_OK);
+    else
+      return (HTTP_FORBIDDEN);
+  }
 
  /*
   * Check host/ip-based accesses...

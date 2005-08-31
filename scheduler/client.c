@@ -1194,7 +1194,7 @@ ReadClient(client_t *con)		/* I - Client to read from */
 	  return (CloseClient(con));
       }
 
-      if (strcasecmp(con->http.fields[HTTP_FIELD_CONNECTION], "Upgrade") == 0 &&
+      if (!strcasecmp(con->http.fields[HTTP_FIELD_CONNECTION], "Upgrade") &&
 	  con->http.tls == NULL)
       {
 #ifdef HAVE_SSL
@@ -1240,7 +1240,7 @@ ReadClient(client_t *con)		/* I - Client to read from */
     }
     else
     {
-      if (strcasecmp(con->http.fields[HTTP_FIELD_CONNECTION], "Upgrade") == 0 &&
+      if (!strcasecmp(con->http.fields[HTTP_FIELD_CONNECTION], "Upgrade") &&
 	  con->http.tls == NULL)
       {
 #ifdef HAVE_SSL
