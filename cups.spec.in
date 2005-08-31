@@ -37,7 +37,7 @@ Packager: Anonymous <anonymous@foo.com>
 Vendor: Easy Software Products
 
 # Use buildroot so as not to disturb the version already installed
-BuildRoot: ${_tmppath}/%{name}-root
+BuildRoot: /tmp/%{name}-root
 
 # Dependencies...
 Requires: %{name}-libs = %{epoch}:%{version}
