@@ -26,9 +26,10 @@
 
 Summary: Common Unix Printing System
 Name: cups
-Version: 1.2.0b1
+Version: 1.2svn
 Release: 0
-Copyright: GPL
+Epoch: 1
+License: GPL
 Group: System Environment/Daemons
 Source: ftp://ftp.easysw.com/pub/cups/%{version}/cups-%{version}-source.tar.gz
 Url: http://www.cups.org
@@ -36,21 +37,27 @@ Packager: Anonymous <anonymous@foo.com>
 Vendor: Easy Software Products
 
 # Use buildroot so as not to disturb the version already installed
-BuildRoot: /var/tmp/%{name}-root
+BuildRoot: ${_tmppath}/%{name}-root
 
 # Dependencies...
-Conflicts: lpr, LPRng
-Provides: libcups.so.2
-Provides: libcupsimage.so.2
+Requires: %{name}-libs = %{epoch}:%{version}
+Obsoletes: lpd, lpr, LPRng
+Provides: lpd, lpr, LPRng
 
 %package devel
 Summary: Common Unix Printing System - development environment
 Group: Development/Libraries
+Requires: %{name}-libs = %{epoch}:%{version}
 
 %package libs
 Summary: Common Unix Printing System - shared libraries
 Group: System Environment/Libraries
 Provides: libcups1
+
+%package lpd
+Summary: Common Unix Printing System - LPD support
+Group: System Environment/Daemons
+Requires: %{name} = %{epoch}:%{version} xinetd
 
 %description
 The Common UNIX Printing System provides a portable printing layer for 
@@ -66,6 +73,10 @@ additional printer drivers and other CUPS services.
 %description libs
 The Common UNIX Printing System provides a portable printing layer for 
 UNIX® operating systems. This package contains the CUPS shared libraries.
+
+%description lpd
+The Common UNIX Printing System provides a portable printing layer for 
+UNIX® operating systems. This package provides LPD client support.
 
 %prep
 %setup
@@ -157,7 +168,18 @@ rm -rf $RPM_BUILD_ROOT
 /usr/bin/cupstestppd
 /usr/bin/lp*
 %dir /usr/lib/cups
-/usr/lib/cups/*
+%dir /usr/lib/cups/backend
+/usr/lib/cups/backend/*
+%dir /usr/lib/cups/cgi-bin
+/usr/lib/cups/cgi-bin/*
+%dir /usr/lib/cups/daemon
+/usr/lib/cups/daemon/cups-deviced
+/usr/lib/cups/daemon/cups-driverd
+/usr/lib/cups/daemon/cups-polld
+%dir /usr/lib/cups/driver
+%dir /usr/lib/cups/filter
+/usr/lib/cups/filter/*
+
 /usr/sbin/*
 %dir /usr/share/cups
 /usr/share/cups/*
@@ -205,6 +227,7 @@ rm -rf $RPM_BUILD_ROOT
 %attr(1700,lp,root) %dir /var/spool/cups/tmp
 
 %files devel
+%defattr(-,root,root)
 %dir /usr/share/man/cat1
 /usr/share/man/cat1/cups-config.1
 %dir /usr/share/man/man1
@@ -214,9 +237,18 @@ rm -rf $RPM_BUILD_ROOT
 %dir /usr/include/cups
 /usr/include/cups/*
 /usr/lib/*.a
+/usr/lib/*.so
 
 %files libs
-/usr/lib/*.so*
+%defattr(-,root,root)
+/usr/lib/*.so.*
+
+%files lpd
+%defattr(-,root,root)
+%dir /usr/lib/cups
+%dir /usr/lib/cups/daemon
+/usr/lib/cups/daemon/cups-lpd
+#/etc/xinetd.d/cups-lpd
 
 #
 # End of "$Id$".
