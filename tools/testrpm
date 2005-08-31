@@ -1,0 +1,33 @@
+#!/bin/sh
+#
+# Test script for making RPMs...
+#
+
+echo Updating...
+svn up
+rev=`svnversion .`
+version="1.2svn"
+
+echo Exporting $version...
+rm -rf /tmp/cups-$version
+svn export . /tmp/cups-$version
+
+echo Configuring...
+cd /tmp/cups-$version/config-scripts
+
+sed -e '1,$s/^CUPS_VERSION=.*/CUPS_VERSION='$version'/' <cups-common.m4 >cups-common.m4.new
+mv cups-common.m4.new cups-common.m4
+cd ..
+sed -e '1,$s/@CUPS_VERSION@/'$version'/' -e '1,$s/^Release:.*/Release: '$rev'/' -e '1,$s/-source/-r'$rev'-source/' <cups.spec.in >cups.spec
+autoconf -f
+rm -rf autom4te*.cache
+rm -rf standards
+rm -rf tools
+cd ..
+
+echo Archiving...
+tar czf cups-$version-r$rev-source.tar.gz cups-$version
+tar cjf cups-$version-r$rev-source.tar.bz2 cups-$version
+
+echo Building rpm...
+rpmbuild -ta cups-$version-r$rev-source.tar.gz
