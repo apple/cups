@@ -2195,13 +2195,9 @@ SendHeader(client_t    *con,	/* I - Client to send to */
 
   if (code == HTTP_UNAUTHORIZED)
   {
-   /*
-    * This already succeeded in IsAuthorized...
-    */
-
     loc = FindBest(con->uri, con->http.state);
 
-    if (loc->type != AUTH_DIGEST)
+    if (!loc || loc->type != AUTH_DIGEST)
     {
       if (httpPrintf(HTTP(con), "WWW-Authenticate: Basic realm=\"CUPS\"\r\n") < 0)
 	return (0);
@@ -2317,6 +2313,8 @@ WriteClient(client_t *con)		/* I - Client connection */
 	  if (bufptr > buf && bufptr[-1] == '\r')
 	    bufptr[-1] = '\0';
 	  *bufptr++ = '\0';
+
+          LogMessage(L_DEBUG2, "Script header: %s", buf);
 
           if (!con->sent_header)
 	  {

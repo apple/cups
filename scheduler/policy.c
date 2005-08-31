@@ -396,7 +396,7 @@ check_group(const char *username,	/* I - Authenticated username */
   * Validate input...
   */
 
-  if (username == NULL || groupname == NULL)
+  if (!username || !groupname)
     return (0);
 
  /*
@@ -416,7 +416,7 @@ check_group(const char *username,	/* I - Authenticated username */
     */
 
     for (i = 0; group->gr_mem[i]; i ++)
-      if (strcasecmp(username, group->gr_mem[i]) == 0)
+      if (!strcasecmp(username, group->gr_mem[i]))
 	return (1);
   }
 
@@ -425,7 +425,7 @@ check_group(const char *username,	/* I - Authenticated username */
   * against the user's group ID...
   */
 
-  if (user != NULL && group != NULL && group->gr_gid == user->pw_gid)
+  if (user && group && group->gr_gid == user->pw_gid)
     return (1);
 
  /*

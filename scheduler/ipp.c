@@ -6882,6 +6882,21 @@ send_ipp_error(client_t     *con,	/* I - Client connection */
 
   LogMessage(L_DEBUG, "Sending error: %s", ippErrorString(status));
 
+  if (status == IPP_NOT_AUTHORIZED && !con->username[0])
+  {
+   /*
+    * Send HTTP_UNAUTHORIZED response instead of IPP response, so that
+    * the client will properly authenticate the request...
+    */
+
+    SendError(con, HTTP_UNAUTHORIZED);
+
+    ippDelete(con->response);
+    con->response = NULL;
+
+    return;
+  }
+
   con->response->request.status.status_code = status;
 
   if (ippFindAttribute(con->response, "attributes-charset", IPP_TAG_ZERO) == NULL)

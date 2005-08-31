@@ -688,6 +688,8 @@ cgi_passwd(const char *prompt)		/* I - Prompt (not used) */
 {
   (void)prompt;
 
+  fprintf(stderr, "DEBUG: cgi_passwd(prompt=\"%s\") called!\n", prompt);
+
  /*
   * Send a 401 (unauthorized) status to the server, so it can notify
   * the client that authentication is required.
