@@ -1367,6 +1367,7 @@ StartJob(int       id,			/* I - Job ID */
 		ppd[1024],		/* PPD environment variable */
 		class_name[255],	/* CLASS environment variable */
 		printer_name[255],	/* PRINTER environment variable */
+		cups_cachedir[1024],	/* CUPS_CACHEDIR environment variable */
 		cups_datadir[1024],	/* CUPS_DATADIR environment variable */
 		cups_docroot[1024],	/* CUPS_DOCROOT environment variable */
 		cups_fontpath[1024],	/* CUPS_FONTPATH environment variable */
@@ -1931,6 +1932,7 @@ StartJob(int       id,			/* I - Job ID */
   snprintf(ppd, sizeof(ppd), "PPD=%s/ppd/%s.ppd", ServerRoot, printer->name);
   snprintf(printer_name, sizeof(printer_name), "PRINTER=%s", printer->name);
   snprintf(cache, sizeof(cache), "RIP_MAX_CACHE=%s", RIPCache);
+  snprintf(cups_cachedir, sizeof(cups_cachedir), "CUPS_CACHEDIR=%s", CacheDir);
   snprintf(cups_datadir, sizeof(cups_datadir), "CUPS_DATADIR=%s", DataDir);
   snprintf(cups_docroot, sizeof(cups_docroot), "CUPS_DOCROOT=%s", DocumentRoot);
   snprintf(cups_fontpath, sizeof(cups_fontpath), "CUPS_FONTPATH=%s", FontPath);
@@ -1950,6 +1952,7 @@ StartJob(int       id,			/* I - Job ID */
   if (TZ && TZ[0])
     envp[envc ++] = TZ;
   envp[envc ++] = ppd;
+  envp[envc ++] = cups_cachedir;
   envp[envc ++] = cups_datadir;
   envp[envc ++] = cups_docroot;
   envp[envc ++] = cups_fontpath;

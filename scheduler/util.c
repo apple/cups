@@ -177,14 +177,12 @@ cupsdSendIPPHeader(
 {
  /*
   * Send IPP/1.1 response header: version number (2 bytes), status code
-  * (4 bytes), and request ID (4 bytes)...
+  * (2 bytes), and request ID (4 bytes)...
   */
 
   putchar(1);
   putchar(1);
 
-  putchar(status_code >> 24);
-  putchar(status_code >> 16);
   putchar(status_code >> 8);
   putchar(status_code);
 

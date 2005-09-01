@@ -246,6 +246,7 @@ User $user
 ServerRoot /tmp/$user
 StateDir /tmp/$user
 ServerBin /tmp/$user/bin
+CacheDir /tmp/$user/share
 DataDir /tmp/$user/share
 FontPath /tmp/$user/share/fonts
 DocumentRoot $root/doc

@@ -24,6 +24,13 @@
  */
 
 /*
+ * Include necessary headers...
+ */
+
+#include <pwd.h>
+
+
+/*
  * HTTP authorization types and levels...
  */
 
@@ -123,6 +130,9 @@ extern void		AllowIP(location_t *loc, unsigned address[4],
 			        unsigned netmask[4]);
 extern int		CheckAuth(unsigned ip[4], char *name, int namelen,
 				  int num_masks, authmask_t *masks);
+extern int		cupsdCheckGroup(const char *username,
+			                struct passwd *user,
+			                const char *groupname);
 extern location_t	*CopyLocation(location_t **loc);
 extern void		DeleteAllLocations(void);
 extern void		DenyHost(location_t *loc, char *name);

@@ -357,9 +357,9 @@ ippSetCGIVars(ipp_t      *response,	/* I - Response data to be copied... */
   struct tm		*date;		/* Date information */
 
 
-  DEBUG_printf(("<P>ippSetCGIVars(response=%p, filter_name=\"%s\", filter_value=\"%s\", prefix=\"%s\")\n",
-                response, filter_name, filter_value, prefix));
-  
+  fprintf(stderr, "DEBUG2: ippSetCGIVars(response=%p, filter_name=\"%s\", filter_value=\"%s\", prefix=\"%s\", parent_el=%d)\n",
+          response, filter_name, filter_value, prefix, parent_el);
+
  /*
   * Set common CGI template variables...
   */
@@ -375,7 +375,7 @@ ippSetCGIVars(ipp_t      *response,	/* I - Response data to be copied... */
 
   if (!prefix)
     while (attr && attr->group_tag == IPP_TAG_OPERATION)
-     attr = attr->next;
+      attr = attr->next;
 
   for (element = parent_el; attr != NULL; attr = attr->next, element ++)
   {
@@ -388,12 +388,12 @@ ippSetCGIVars(ipp_t      *response,	/* I - Response data to be copied... */
       for (filter = attr;
            filter != NULL && filter->group_tag != IPP_TAG_ZERO;
            filter = filter->next)
-        if (filter->name && strcmp(filter->name, filter_name) == 0 &&
+        if (filter->name && !strcmp(filter->name, filter_name) &&
 	    (filter->value_tag == IPP_TAG_STRING ||
 	     (filter->value_tag >= IPP_TAG_TEXTLANG &&
 	      filter->value_tag <= IPP_TAG_MIMETYPE)) &&
 	    filter->values[0].string.text != NULL &&
-	    strcasecmp(filter->values[0].string.text, filter_value) == 0)
+	    !strcasecmp(filter->values[0].string.text, filter_value))
 	  break;
 
       if (!filter)
@@ -558,7 +558,7 @@ ippSetCGIVars(ipp_t      *response,	/* I - Response data to be copied... */
       {
         cgiSetArray(name, element, value);
 
-        DEBUG_printf(("<P>%s[%d]=\"%s\"\n", name, element, value));
+        fprintf(stderr, "DEBUG2: %s[%d]=\"%s\"\n", name, element, value);
       }
     }
 
@@ -566,7 +566,7 @@ ippSetCGIVars(ipp_t      *response,	/* I - Response data to be copied... */
       break;
   }
 
-  DEBUG_puts("<P>Leaving ippSetCGIVars()...");
+  fprintf(stderr, "DEBUG2: Returing %d from ippSetCGIVars()...\n", element + 1);
 
   return (element + 1);
 }

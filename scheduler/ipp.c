@@ -88,8 +88,6 @@
  */
 
 #include "cupsd.h"
-#include <pwd.h>
-#include <grp.h>
 
 #ifdef HAVE_LIBPAPER
 #  include <paper.h>
@@ -2326,12 +2324,11 @@ static int				/* O - 1 if OK, 0 if not */
 check_quotas(client_t  *con,		/* I - Client connection */
              printer_t *p)		/* I - Printer or class */
 {
-  int		i, j;			/* Looping vars */
+  int		i;			/* Looping var */
   ipp_attribute_t *attr;		/* Current attribute */
   char		username[33];		/* Username */
   quota_t	*q;			/* Quota data */
   struct passwd	*pw;			/* User password data */
-  struct group	*grp;			/* Group data */
 
 
   LogMessage(L_DEBUG2, "check_quotas(%p[%d], %p[%s])\n",
@@ -2411,29 +2408,8 @@ check_quotas(client_t  *con,		/* I - Client connection */
         * Check group membership...
 	*/
 
-        grp = getgrnam(p->users[i] + 1);
-	endgrent();
-
-        if (grp)
-	{
-	 /*
-	  * Check primary group...
-	  */
-
-	  if (pw && grp->gr_gid == pw->pw_gid)
-	    break;
-
-         /*
-	  * Check usernames in group...
-	  */
-
-          for (j = 0; grp->gr_mem[j]; j ++)
-	    if (!strcasecmp(username, grp->gr_mem[j]))
-	      break;
-
-          if (grp->gr_mem[j])
-	    break;
-	}
+        if (cupsdCheckGroup(username, pw, p->users[i] + 1))
+	  break;
       }
       else if (!strcasecmp(username, p->users[i]))
 	break;
@@ -4370,7 +4346,7 @@ get_ppds(client_t *con)			/* I - Client connection */
   */
 
   limit     = ippFindAttribute(con->request, "limit", IPP_TAG_INTEGER);
-  make      = ippFindAttribute(con->request, "ppd-make", IPP_TAG_KEYWORD);
+  make      = ippFindAttribute(con->request, "ppd-make", IPP_TAG_TEXT);
   requested = ippFindAttribute(con->request, "requested-attributes",
                                IPP_TAG_KEYWORD);
 
@@ -4413,11 +4389,11 @@ get_ppds(client_t *con)			/* I - Client connection */
 
   snprintf(command, sizeof(command), "%s/daemon/cups-driverd", ServerBin);
   snprintf(options, sizeof(options),
-           "cups-driverd %d+%d+requested-attributes=%s%s%s",
+           "cups-driverd list+%d+%d+requested-attributes=%s%s%s",
            con->request->request.op.request_id,
            limit ? limit->values[0].integer : 0,
 	   attrs,
-	   make ? " ppd-make=" : "",
+	   make ? "%20ppd-make=" : "",
 	   make ? make->values[0].string.text : "");
 
   if (SendCommand(con, command, options, 0))
@@ -7528,9 +7504,8 @@ static int				/* O - 0 if not allowed, 1 if allowed */
 user_allowed(printer_t  *p,		/* I - Printer or class */
              const char *username)	/* I - Username */
 {
-  int		i, j;			/* Looping vars */
+  int		i;			/* Looping var */
   struct passwd	*pw;			/* User password data */
-  struct group	*grp;			/* Group data */
 
 
   if (p->num_users == 0)
@@ -7550,29 +7525,8 @@ user_allowed(printer_t  *p,		/* I - Printer or class */
       * Check group membership...
       */
 
-      grp = getgrnam(p->users[i] + 1);
-      endgrent();
-
-      if (grp)
-      {
-       /*
-	* Check primary group...
-	*/
-
-	if (pw && grp->gr_gid == pw->pw_gid)
-	  break;
-
-       /*
-	* Check usernames in group...
-	*/
-
-        for (j = 0; grp->gr_mem[j]; j ++)
-	  if (!strcasecmp(username, grp->gr_mem[j]))
-	    break;
-
-        if (grp->gr_mem[j])
-	  break;
-      }
+      if (cupsdCheckGroup(username, pw, p->users[i] + 1))
+        break;
     }
     else if (!strcasecmp(username, p->users[i]))
       break;

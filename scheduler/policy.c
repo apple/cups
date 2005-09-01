@@ -30,7 +30,6 @@
  */
 
 #include "cupsd.h"
-#include <pwd.h>
 #include <grp.h>
 #ifdef HAVE_USERSEC_H
 #  include <usersec.h>
@@ -41,7 +40,6 @@
  * Local functions...
  */
 
-static int	check_group(const char *name, const char *group);
 static int	check_op(policyop_t *po, int allow_deny, const char *name,
 		         const char *owner);
 
@@ -377,129 +375,6 @@ FindPolicyOp(policy_t *p,		/* I - Policy */
 
 
 /*
- * 'validate_user()' - Validate the user for the request.
- */
-
-static int				/* O - 1 if permitted, 0 otherwise */
-check_group(const char *username,	/* I - Authenticated username */
-            const char *groupname)	/* I - Group name */
-{
-  int			i;		/* Looping var */
-  struct passwd		*user;		/* User info */
-  struct group		*group;		/* System group info */
-  char			junk[33];	/* MD5 password (not used) */
-
-
-  LogMessage(L_DEBUG2, "check_group(%s, %s)\n", username, groupname);
-
- /*
-  * Validate input...
-  */
-
-  if (!username || !groupname)
-    return (0);
-
- /*
-  * Check to see if the user is a member of the named group...
-  */
-
-  user = getpwnam(username);
-  endpwent();
-
-  group = getgrnam(groupname);
-  endgrent();
-
-  if (group != NULL)
-  {
-   /*
-    * Group exists, check it...
-    */
-
-    for (i = 0; group->gr_mem[i]; i ++)
-      if (!strcasecmp(username, group->gr_mem[i]))
-	return (1);
-  }
-
- /*
-  * Group doesn't exist or user not in group list, check the group ID
-  * against the user's group ID...
-  */
-
-  if (user && group && group->gr_gid == user->pw_gid)
-    return (1);
-
- /*
-  * Username not found, group not found, or user is not part of the
-  * system group...  Check for a user and group in the MD5 password
-  * file...
-  */
-
-  if (GetMD5Passwd(username, groupname, junk) != NULL)
-    return (1);
-
- /*
-  * If we get this far, then the user isn't part of the named group...
-  */
-
-  return (0);
-
-
-#if 0 //// OLD OLD OLD OLD OLD
-  if (strcasecmp(username, owner) != 0 && strcasecmp(username, "root") != 0)
-  {
-   /*
-    * Not the owner or root; check to see if the user is a member of the
-    * system group...
-    */
-
-    user = getpwnam(username);
-    endpwent();
-
-    for (i = 0, j = 0, group = NULL; i < NumSystemGroups; i ++)
-    {
-      group = getgrnam(SystemGroups[i]);
-      endgrent();
-
-      if (group != NULL)
-      {
-	for (j = 0; group->gr_mem[j]; j ++)
-          if (strcasecmp(username, group->gr_mem[j]) == 0)
-	    break;
-
-        if (group->gr_mem[j])
-	  break;
-      }
-      else
-	j = 0;
-    }
-
-    if (user == NULL || group == NULL ||
-        (group->gr_mem[j] == NULL && group->gr_gid != user->pw_gid))
-    {
-     /*
-      * Username not found, group not found, or user is not part of the
-      * system group...  Check for a user and group in the MD5 password
-      * file...
-      */
-
-      for (i = 0; i < NumSystemGroups; i ++)
-        if (GetMD5Passwd(username, SystemGroups[i], junk) != NULL)
-	  return (1);
-
-     /*
-      * Nope, not an MD5 user, either.  Return 0 indicating no-go...
-      */
-
-      return (0);
-    }
-  }
-
-  return (1);
-#endif //// 0
-}
-
-
-/*
  * 'check_op()' - Check the current operation.
  */
 
@@ -509,9 +384,13 @@ check_op(policyop_t *po,		/* I - Policy operation */
          const char *name,		/* I - User name */
 	 const char *owner)		/* I - Owner name */
 {
-  int		i;			/* Looping vars */
+  int		i, j;			/* Looping vars */
   policyname_t	*pn;			/* Current policy name */
+  struct passwd	*pw;			/* User's password entry */
 
+
+  pw = getpwnam(name);
+  endpwent();
 
   for (i = po->num_names, pn = po->names; i > 0; i --, pn ++)
   {
@@ -523,9 +402,15 @@ check_op(policyop_t *po,		/* I - Policy operation */
       if (owner && !strcasecmp(name, owner))
         return (1);
     }
+    else if (!strcasecmp(pn->name, "@SYSTEM"))
+    {
+      for (j = 0; j < NumSystemGroups; j ++)
+        if (cupsdCheckGroup(name, pw, SystemGroups[j]))
+          return (1);
+    }
     else if (pn->name[0] == '@')
     {
-      if (check_group(name, pn->name + 1))
+      if (cupsdCheckGroup(name, pw, pn->name + 1))
         return (1);
     }
     else if (!strcasecmp(name, pn->name))

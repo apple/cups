@@ -80,6 +80,8 @@ VAR char		*SystemGroups[MAX_SYSTEM_GROUPS],
 					/* Error log filename */
 			*PageLog		VALUE(NULL),
 					/* Page log filename */
+			*CacheDir		VALUE(NULL),
+					/* Cache file directory */
 			*DataDir		VALUE(NULL),
 					/* Data file directory */
 			*DefaultLanguage	VALUE(NULL),

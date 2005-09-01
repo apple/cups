@@ -98,26 +98,19 @@ main(int  argc,				/* I - Number of command-line args */
      char *argv[])			/* I - Command-line arguments */
 {
  /*
-  * Check the command-line...
+  * Install or list PPDs...
   */
 
-  if (argc < 3 ||
-      (!strcmp(argv[1], "cat") && argc != 3) ||
-      (!strcmp(argv[1], "list") && argc != 5))
+  if (!strcmp(argv[1], "cat") && argc == 3)
+    return (cat_ppd(argv[2]));
+  else if (!strcmp(argv[1], "list") && argc == 5)
+    return (list_ppds(atoi(argv[2]), atoi(argv[3]), argv[4]));
+  else
   {
     fputs("Usage: cups-driverd cat ppd-name\n", stderr);
     fputs("Usage: cups-driverd list request_id limit options\n", stderr);
     return (1);
   }
-
- /*
-  * Install or list PPDs...
-  */
-
-  if (!strcmp(argv[1], "cat"))
-    return (cat_ppd(argv[2]));
-  else
-    return (list_ppds(atoi(argv[2]), atoi(argv[3]), argv[4]));
 }
 
 
@@ -267,6 +260,9 @@ list_ppds(int        request_id,	/* I - Request ID */
 		send_name;		/* Send ppd-name attribute? */
 
 
+  fprintf(stderr, "DEBUG2: [cups-driverd] list_ppds(request_id=%d, limit=%d, opt=\"%s\"\n",
+          request_id, limit, opt);
+
  /*
   * See if we a PPD database file...
   */
@@ -373,7 +369,7 @@ list_ppds(int        request_id,	/* I - Request ID */
               filename, NumPPDs);
     }
     else
-      fprintf(stderr, "ERROR: [cups-driverd] Unable to write \"%s\" - %s",
+      fprintf(stderr, "ERROR: [cups-driverd] Unable to write \"%s\" - %s\n",
               filename, strerror(errno));
   }
   else
@@ -406,6 +402,9 @@ list_ppds(int        request_id,	/* I - Request ID */
   num_options = cupsParseOptions(opt, 0, &options);
   requested   = cupsGetOption("requested-attributes", num_options, options);
   make        = cupsGetOption("ppd-make", num_options, options);
+
+  fprintf(stderr, "DEBUG: [cups-driverd] requested=\"%s\"\n",
+          requested ? requested : "(nil)");
 
   if (!requested || strstr(requested, "all"))
   {
@@ -442,6 +441,9 @@ list_ppds(int        request_id,	/* I - Request ID */
      /*
       * Send this PPD...
       */
+
+      fprintf(stderr, "DEBUG: [cups-driverd] Sending %s (%s)...\n",
+              ppd->record.name, ppd->record.make_and_model);
 
       count --;
 

@@ -30,6 +30,7 @@
  *   AllowIP()            - Add an IP address or network that is allowed to
  *                          access the location.
  *   CheckAuth()          - Check authorization masks.
+ *   cupsdCheckGroup()    - Check for a user's group membership.
  *   CopyLocation()       - Make a copy of a location...
  *   DeleteAllLocations() - Free all memory used for location authorization.
  *   DenyHost()           - Add a host name that is not allowed to access the
@@ -54,7 +55,6 @@
  */
 
 #include "cupsd.h"
-#include <pwd.h>
 #include <grp.h>
 #ifdef HAVE_SHADOW_H
 #  include <shadow.h>
@@ -430,6 +430,74 @@ CheckAuth(unsigned   ip[4],	/* I - Client address */
 
 
 /*
+ * 'cupsdCheckGroup()' - Check for a user's group membership.
+ */
+
+int					/* O - 1 if user is a member, 0 otherwise */
+cupsdCheckGroup(
+    const char    *username,		/* I - User name */
+    struct passwd *user,		/* I - System user info */
+    const char    *groupname)		/* I - Group name */
+{
+  int			i;		/* Looping var */
+  struct group		*group;		/* System group info */
+  char			junk[33];	/* MD5 password (not used) */
+
+
+  LogMessage(L_DEBUG2, "cupsdCheckGroup(username=\"%s\", user=%p, groupname=\"%s\")\n",
+             username, user, groupname);
+
+ /*
+  * Validate input...
+  */
+
+  if (!username || !groupname)
+    return (0);
+
+ /*
+  * Check to see if the user is a member of the named group...
+  */
+
+  group = getgrnam(groupname);
+  endgrent();
+
+  if (group != NULL)
+  {
+   /*
+    * Group exists, check it...
+    */
+
+    for (i = 0; group->gr_mem[i]; i ++)
+      if (!strcasecmp(username, group->gr_mem[i]))
+	return (1);
+  }
+
+ /*
+  * Group doesn't exist or user not in group list, check the group ID
+  * against the user's group ID...
+  */
+
+  if (user && group && group->gr_gid == user->pw_gid)
+    return (1);
+
+ /*
+  * Username not found, group not found, or user is not part of the
+  * system group...  Check for a user and group in the MD5 password
+  * file...
+  */
+
+  if (GetMD5Passwd(username, groupname, junk) != NULL)
+    return (1);
+
+ /*
+  * If we get this far, then the user isn't part of the named group...
+  */
+
+  return (0);
+}
+
+
+/*
  * 'CopyLocation()' - Make a copy of a location...
  */
 
@@ -465,7 +533,7 @@ CopyLocation(location_t **loc)	/* IO - Original location */
   * Copy the information from the original location to the new one.
   */
 
-  temp->limit = (*loc)->limit;
+  temp->limit      = (*loc)->limit;
   temp->order_type = (*loc)->order_type;
   temp->type       = (*loc)->type;
   temp->level      = (*loc)->level;
@@ -918,7 +986,6 @@ IsAuthorized(client_t *con)	/* I - Connection */
   location_t	*best;		/* Best match for location so far */
   int		hostlen;	/* Length of hostname */
   struct passwd	*pw;		/* User password data */
-  struct group	*grp;		/* Group data */
   char		nonce[HTTP_MAX_VALUE],
 				/* Nonce value from client */
 		md5[33],	/* MD5 password */
@@ -1296,8 +1363,19 @@ IsAuthorized(client_t *con)	/* I - Connection */
 	    LogMessage(L_DEBUG2, "IsAuthorized: num_names = %d", best->num_names);
 
             for (i = 0; i < best->num_names; i ++)
-	      if (GetMD5Passwd(con->username, best->names[i], md5))
+	    {
+	      if (!strcasecmp(best->names[i], "@SYSTEM"))
+	      {
+	        for (j = 0; j < NumSystemGroups; j ++)
+		  if (GetMD5Passwd(con->username, SystemGroups[j], md5))
+		    break;
+
+                if (j < NumSystemGroups)
+		  break;
+	      }
+	      else if (GetMD5Passwd(con->username, best->names[i], md5))
 		break;
+            }
 
             if (i >= best->num_names)
 	      md5[0] = '\0';
@@ -1332,8 +1410,19 @@ IsAuthorized(client_t *con)	/* I - Connection */
 	    LogMessage(L_DEBUG2, "IsAuthorized: num_names = %d", best->num_names);
 
             for (i = 0; i < best->num_names; i ++)
-	      if (GetMD5Passwd(con->username, best->names[i], md5))
+	    {
+	      if (!strcasecmp(best->names[i], "@SYSTEM"))
+	      {
+	        for (j = 0; j < NumSystemGroups; j ++)
+		  if (GetMD5Passwd(con->username, SystemGroups[j], md5))
+		    break;
+
+                if (j < NumSystemGroups)
+		  break;
+	      }
+	      else if (GetMD5Passwd(con->username, best->names[i], md5))
 		break;
+            }
 
             if (i >= best->num_names)
 	      md5[0] = '\0';
@@ -1395,7 +1484,7 @@ IsAuthorized(client_t *con)	/* I - Connection */
     */
 
     for (i = 0; i < best->num_names; i ++)
-      if (!strcmp(con->username, best->names[i]))
+      if (!strcasecmp(con->username, best->names[i]))
         return (HTTP_OK);
 
     return (HTTP_UNAUTHORIZED);
@@ -1418,26 +1507,14 @@ IsAuthorized(client_t *con)	/* I - Connection */
       LogMessage(L_DEBUG2, "IsAuthorized: Checking group \"%s\" membership...",
                  best->names[i]);
 
-      grp = getgrnam(best->names[i]);
-      endgrent();
-
-      if (grp == NULL)			/* No group by that name??? */
+      if (!strcasecmp(best->names[i], "@SYSTEM"))
       {
-	LogMessage(L_WARN, "IsAuthorized: Group \"%s\" does not exist!",
-        	   best->names[i]);
-	return (HTTP_FORBIDDEN);
+        for (j = 0; j < NumSystemGroups; j ++)
+	  if (cupsdCheckGroup(con->username, pw, SystemGroups[j]))
+	    return (HTTP_OK);
       }
-
-      for (j = 0; grp->gr_mem[j] != NULL; j ++)
-	if (!strcmp(con->username, grp->gr_mem[j]))
-	  return (HTTP_OK);
-
-     /*
-      * Check to see if the default group ID matches for the user...
-      */
-
-      if (pw != NULL && grp->gr_gid == pw->pw_gid)
-	return (HTTP_OK);
+      else if (cupsdCheckGroup(con->username, pw, best->names[i]))
+        return (HTTP_OK);
     }
 
    /*

@@ -39,7 +39,6 @@
 
 #include "cupsd.h"
 #include <stdarg.h>
-#include <pwd.h>
 #include <grp.h>
 #include <sys/utsname.h>
 #include <cups/dir.h>
@@ -98,6 +97,7 @@ static var_t	variables[] =
   { "BrowseShortNames",		&BrowseShortNames,	VAR_BOOLEAN },
   { "BrowseTimeout",		&BrowseTimeout,		VAR_INTEGER },
   { "Browsing",			&Browsing,		VAR_BOOLEAN },
+  { "CacheDir",			&CacheDir,		VAR_STRING },
   { "Classification",		&Classification,	VAR_STRING },
   { "ClassifyOverride",		&ClassifyOverride,	VAR_BOOLEAN },
   { "ConfigFilePerm",		&ConfigFilePerm,	VAR_INTEGER },
@@ -279,8 +279,9 @@ ReadConfiguration(void)
   SetStringf(&ServerAdmin, "root@%s", temp);
   SetString(&ServerBin, CUPS_SERVERBIN);
   SetString(&RequestRoot, CUPS_REQUESTS);
-  SetString(&DocumentRoot, CUPS_DOCROOT);
+  SetString(&CacheDir, CUPS_CACHEDIR);
   SetString(&DataDir, CUPS_DATADIR);
+  SetString(&DocumentRoot, CUPS_DOCROOT);
   SetString(&AccessLog, CUPS_LOGDIR "/access_log");
   SetString(&ErrorLog, CUPS_LOGDIR "/error_log");
   SetString(&PageLog, CUPS_LOGDIR "/page_log");
@@ -507,6 +508,12 @@ ReadConfiguration(void)
   if (ServerBin[0] != '/')
     SetStringf(&ServerBin, "%s/%s", ServerRoot, ServerBin);
 
+  if (StateDir[0] != '/')
+    SetStringf(&StateDir, "%s/%s", ServerRoot, StateDir);
+
+  if (CacheDir[0] != '/')
+    SetStringf(&CacheDir, "%s/%s", ServerRoot, CacheDir);
+
 #ifdef HAVE_SSL
   if (ServerCertificate[0] != '/')
     SetStringf(&ServerCertificate, "%s/%s", ServerRoot, ServerCertificate);
@@ -528,6 +535,15 @@ ReadConfiguration(void)
   * writable by the user and group in the cupsd.conf file...
   */
 
+  chown(CacheDir, RunUser, Group);
+  chmod(CacheDir, 0775);
+
+  snprintf(temp, sizeof(temp), "%s/ppd", CacheDir);
+  if (access(temp, 0))
+    mkdir(temp, 0755);
+  chown(temp, RunUser, Group);
+  chmod(temp, 0755);
+
   chown(StateDir, RunUser, Group);
   chmod(StateDir, 0775);
 
@@ -536,12 +552,6 @@ ReadConfiguration(void)
     mkdir(temp, 0711);
   chown(temp, RunUser, Group);
   chmod(temp, 0711);
-
-  snprintf(temp, sizeof(temp), "%s/ppd", StateDir);
-  if (access(temp, 0))
-    mkdir(temp, 0755);
-  chown(temp, RunUser, Group);
-  chmod(temp, 0755);
 
   chown(ServerRoot, RunUser, Group);
   chmod(ServerRoot, 0775);
@@ -701,7 +711,6 @@ ReadConfiguration(void)
   {
     policy_t	*p;			/* New policy */
     policyop_t	*po;			/* New policy operation */
-    char	groupname[255];		/* Group name */
 
 
     if (DefaultPolicy)
@@ -729,13 +738,10 @@ ReadConfiguration(void)
       po->order_type = POLICY_DENY;
 
       AddPolicyOpName(po, POLICY_ALLOW, "@OWNER");
+      LogMessage(L_INFO, "Allow @OWNER");
 
-      for (i = 0; i < NumSystemGroups; i ++)
-      {
-        snprintf(groupname, sizeof(groupname), "@%s", SystemGroups[i]);
-	AddPolicyOpName(po, POLICY_ALLOW, groupname);
-	LogMessage(L_INFO, "Allow @%s", groupname);
-      }
+      AddPolicyOpName(po, POLICY_ALLOW, "@SYSTEM");
+      LogMessage(L_INFO, "Allow @SYSTEM");
 
       AddPolicyOp(p, po, IPP_SEND_URI);
       AddPolicyOp(p, po, IPP_CANCEL_JOB);
@@ -773,12 +779,8 @@ ReadConfiguration(void)
       po->order_type   = POLICY_DENY;
       po->authenticate = 1;
 
-      for (i = 0; i < NumSystemGroups; i ++)
-      {
-        snprintf(groupname, sizeof(groupname), "@%s", SystemGroups[i]);
-	AddPolicyOpName(po, POLICY_ALLOW, groupname);
-	LogMessage(L_INFO, "Allow @%s", groupname);
-      }
+      AddPolicyOpName(po, POLICY_ALLOW, "@SYSTEM");
+      LogMessage(L_INFO, "Allow @SYSTEM");
 
       AddPolicyOp(p, po, IPP_RESUME_PRINTER);
       AddPolicyOp(p, po, IPP_SET_PRINTER_ATTRIBUTES);
@@ -1817,7 +1819,6 @@ read_location(cups_file_t *fp,		/* I - Configuration file */
               char        *location,	/* I - Location name/path */
 	      int         linenum)	/* I - Current line number */
 {
-  int		i;			/* Looping var */
   location_t	*loc,			/* New location */
 		*parent;		/* Parent location */
   char		line[HTTP_MAX_BUFFER],	/* Line buffer */
@@ -2071,15 +2072,7 @@ read_location(cups_file_t *fp,		/* I - Configuration file */
       {
         loc->level = AUTH_GROUP;
 
-       /*
-        * Use the default system group if none is defined so far...
-	*/
-
-        if (NumSystemGroups)
-	  NumSystemGroups = 1;
-
-	for (i = 0; i < NumSystemGroups; i ++)
-	  AddName(loc, SystemGroups[i]);
+        AddName(loc, "@SYSTEM");
       }
       else
         LogMessage(L_WARN, "Unknown authorization class %s on line %d.",

@@ -858,6 +858,14 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
                  NULL, "ipp://localhost/printers/");
 
+
+    if ((var = cgiGetVariable("PPD_MAKE")) != NULL)
+      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_TEXT,
+                   "ppd-make", NULL, var);
+    else
+      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
+                   "requested-attributes", NULL, "ppd-make");
+
    /*
     * Do the request and get back a response...
     */
@@ -868,16 +876,7 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
       * Got the list of PPDs, see if the user has selected a make...
       */
 
-      if ((var = cgiGetVariable("PPD_MAKE")) != NULL)
-      {
-       /*
-        * Yes, copy those attributes, but check if the make doesn't
-	* exist...
-	*/
-
-        if (ippSetCGIVars(response, "ppd-make", var, NULL, 0) <= 0)
-	  var = NULL;
-      }
+      ippSetCGIVars(response, NULL, NULL, NULL, 0);
 
       if (var == NULL)
       {
