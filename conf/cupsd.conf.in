@@ -11,14 +11,27 @@
 LogLevel info
 
 
+# Administrator user group...
+SystemGroup @CUPS_GROUP@
+
+
 # Only listen for connections from the local machine.
 Listen 127.0.0.1:@DEFAULT_IPP_PORT@
 @CUPS_LISTEN_DOMAINSOCKET@
+
 
 # Show shared printers on the local network.
 Browsing On
 BrowseOrder allow,deny
 BrowseAllow @LOCAL
+
+# Restrict access to configuration files...
+<Location /admin/conf>
+AuthType Basic
+AuthClass SystemGroup
+Order allow,deny
+Allow localhost
+</Location>
 
 #
 # End of "$Id$".

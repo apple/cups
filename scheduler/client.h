@@ -108,7 +108,8 @@ extern void	PauseListening(void);
 extern int	ProcessIPPRequest(client_t *con);
 extern int	ReadClient(client_t *con);
 extern void	ResumeListening(void);
-extern int	SendCommand(client_t *con, char *command, char *options);
+extern int	SendCommand(client_t *con, char *command, char *options,
+		            int root);
 extern int	SendError(client_t *con, http_status_t code);
 extern int	SendFile(client_t *con, http_status_t code, char *filename,
 		         char *type, struct stat *filestats);

@@ -417,6 +417,7 @@ ReadConfiguration(void)
   MaxCopies           = 100;
 
   ClearString(&DefaultPolicy);
+  DefaultAuthType = AUTH_BASIC;
 
  /*
   * Read the configuration file...
@@ -1026,6 +1027,24 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 	           linenum);
         return (0);
       }
+    }
+    else if (!strcasecmp(line, "DefaultAuthType"))
+    {
+     /*
+      * DefaultAuthType {none,basic,digest,basicdigest}
+      */
+
+      if (!strcasecmp(value, "none"))
+	DefaultAuthType = AUTH_NONE;
+      else if (!strcasecmp(value, "basic"))
+        DefaultAuthType = AUTH_BASIC;
+      else if (!strcasecmp(value, "digest"))
+        DefaultAuthType = AUTH_DIGEST;
+      else if (!strcasecmp(value, "basicdigest"))
+        DefaultAuthType = AUTH_BASICDIGEST;
+      else
+        LogMessage(L_WARN, "Unknown authorization type %s on line %d.",
+	           value, linenum);
     }
     else if (!strcasecmp(line, "Port") || !strcasecmp(line, "Listen"))
     {
@@ -2065,6 +2084,14 @@ read_location(cups_file_t *fp,		/* I - Configuration file */
       else
         LogMessage(L_WARN, "Unknown authorization class %s on line %d.",
 	           value, linenum);
+
+     /*
+      * Make sure that authentication is set to DefaultAuthType
+      * as needed...
+      */
+
+      if (loc->type == AUTH_NONE && strcasecmp(value, "anonymous"))
+        loc->type = DefaultAuthType;
     }
     else if (!strcasecmp(line, "AuthGroupName"))
       AddName(loc, value);
@@ -2132,6 +2159,14 @@ read_location(cups_file_t *fp,		/* I - Configuration file */
 
         for (value = valptr; isspace(*value & 255); value ++);
       }
+
+     /*
+      * Make sure that authentication is set to DefaultAuthType
+      * as needed...
+      */
+
+      if (loc->type == AUTH_NONE)
+        loc->type = DefaultAuthType;
     }
     else if (!strcasecmp(line, "Satisfy"))
     {

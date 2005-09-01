@@ -105,6 +105,7 @@ typedef struct
  * Globals...
  */
 
+VAR int			DefaultAuthType	VALUE(AUTH_BASIC);
 VAR int			NumLocations	VALUE(0);
 					/* Number of authorization locations */
 VAR location_t		*Locations	VALUE(NULL);

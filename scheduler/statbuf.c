@@ -293,7 +293,10 @@ cupsdStatBufUpdate(cupsd_statbuf_t *sb,	/* I - Status buffer */
     * General status message; send it to the error_log file...
     */
 
-    LogMessage(*loglevel, "%s %s", sb->prefix, message);
+    if (message[0] == '[')
+      LogMessage(*loglevel, "%s", message);
+    else
+      LogMessage(*loglevel, "%s %s", sb->prefix, message);
   }
 
  /*

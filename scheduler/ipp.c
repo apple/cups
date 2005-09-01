@@ -3979,7 +3979,7 @@ get_devices(client_t *con)		/* I - Client connection */
            limit ? limit->values[0].integer : 0,
 	   attrs);
 
-  if (SendCommand(con, command, options))
+  if (SendCommand(con, command, options, 1))
   {
    /*
     * Command started successfully, don't send an IPP response here...
@@ -4420,7 +4420,7 @@ get_ppds(client_t *con)			/* I - Client connection */
 	   make ? " ppd-make=" : "",
 	   make ? make->values[0].string.text : "");
 
-  if (SendCommand(con, command, options))
+  if (SendCommand(con, command, options, 0))
   {
    /*
     * Command started successfully, don't send an IPP response here...
@@ -6882,7 +6882,7 @@ send_ipp_error(client_t     *con,	/* I - Client connection */
 
   LogMessage(L_DEBUG, "Sending error: %s", ippErrorString(status));
 
-  if (status == IPP_NOT_AUTHORIZED && !con->username[0])
+  if (status == IPP_NOT_AUTHORIZED)
   {
    /*
     * Send HTTP_UNAUTHORIZED response instead of IPP response, so that

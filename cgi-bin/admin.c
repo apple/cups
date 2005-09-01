@@ -1584,6 +1584,7 @@ do_config_server(http_t      *http,	/* I - HTTP connection */
 		in_policy,		/* In a policy section? */
 		in_cancel_job,		/* In a cancel-job section? */
 		in_admin_location,	/* In the /admin location? */
+		in_conf_location,	/* In the /admin/conf location? */
 		in_root_location;	/* In the / location? */
     int		remote_printers,	/* Show remote printers */
 		share_printers,		/* Share local printers */
@@ -1595,6 +1596,7 @@ do_config_server(http_t      *http,	/* I - HTTP connection */
 		wrote_policy,		/* Wrote the policy? */
 		wrote_loglevel,		/* Wrote the LogLevel line? */
 		wrote_admin_location,	/* Wrote the /admin location? */
+		wrote_conf_location,	/* Wrote the /admin/conf location? */
 		wrote_root_location;	/* Wrote the / location? */
 
 
@@ -1677,6 +1679,7 @@ do_config_server(http_t      *http,	/* I - HTTP connection */
     linenum              = 0;
     wrote_admin_location = 0;
     wrote_browsing       = 0;
+    wrote_conf_location  = 0;
     wrote_loglevel       = 0;
     wrote_policy         = 0;
     wrote_port_listen    = 0;
@@ -1780,6 +1783,8 @@ do_config_server(http_t      *http,	/* I - HTTP connection */
       {
         if (!strcmp(value, "/admin"))
 	  in_admin_location = 1;
+        if (!strcmp(value, "/admin/conf"))
+	  in_conf_location = 1;
 	else if (!strcmp(value, "/"))
 	  in_root_location = 1;
 
@@ -1790,6 +1795,22 @@ do_config_server(http_t      *http,	/* I - HTTP connection */
         if (in_admin_location)
 	{
 	  wrote_admin_location = 1;
+
+	  if (remote_admin)
+            cupsFilePuts(temp, "# Allow remote administration.\n");
+	  else
+            cupsFilePuts(temp, "# Only allow local administration.\n");
+
+          cupsFilePuts(temp, "Order allow,deny\n");
+
+	  if (remote_admin)
+	    cupsFilePuts(temp, "Allow @LOCAL\n");
+	  else
+	    cupsFilePuts(temp, "Allow localhost\n");
+	}
+        else if (in_conf_location)
+	{
+	  wrote_conf_location = 1;
 
 	  if (remote_admin)
             cupsFilePuts(temp, "# Allow remote administration.\n");
@@ -1825,6 +1846,7 @@ do_config_server(http_t      *http,	/* I - HTTP connection */
 	}
 
 	in_admin_location = 0;
+	in_conf_location  = 0;
         in_root_location  = 0;
 
 	cupsFilePuts(temp, "</Location>\n");
@@ -1890,7 +1912,7 @@ do_config_server(http_t      *http,	/* I - HTTP connection */
 
 	in_cancel_job = 0;
       }
-      else if ((in_admin_location || in_root_location) &&
+      else if ((in_admin_location || in_conf_location || in_root_location) &&
                (!strcasecmp(line, "Allow") || !strcasecmp(line, "Deny") ||
 	        !strcasecmp(line, "Order")))
 	continue;
@@ -1993,6 +2015,26 @@ do_config_server(http_t      *http,	/* I - HTTP connection */
         cupsFilePuts(temp, "# Only allow local administration.\n");
 
       cupsFilePuts(temp, "<Location /admin>\n"
+                         "AuthType Basic\n"
+                         "AuthClass System\n"
+                         "Order allow,deny\n");
+
+      if (remote_admin)
+	cupsFilePuts(temp, "Allow @LOCAL\n");
+      else
+	cupsFilePuts(temp, "Allow localhost\n");
+
+      cupsFilePuts(temp, "</Location>\n");
+    }
+
+    if (!wrote_conf_location)
+    {
+      if (remote_admin)
+        cupsFilePuts(temp, "# Allow remote administration.\n");
+      else
+        cupsFilePuts(temp, "# Only allow local administration.\n");
+
+      cupsFilePuts(temp, "<Location /admin/conf>\n"
                          "AuthType Basic\n"
                          "AuthClass System\n"
                          "Order allow,deny\n");

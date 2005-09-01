@@ -35,7 +35,7 @@ conf.o: ../cups/md5.h ../cups/string.h ../cups/cups.h ../cups/ipp.h
 conf.o: ../cups/ppd.h ../cups/file.h mime.h ../cups/ipp.h ../cups/file.h
 conf.o: ../cups/http.h ../cups/language.h ../cups/debug.h statbuf.h cert.h
 conf.o: client.h auth.h policy.h printers.h classes.h job.h conf.h banners.h
-conf.o: dirsvc.h network.h subscriptions.h
+conf.o: dirsvc.h network.h subscriptions.h ../cups/dir.h
 dirsvc.o: cupsd.h ../cups/http-private.h ../config.h ../cups/http.h
 dirsvc.o: ../cups/md5.h ../cups/string.h ../cups/cups.h ../cups/ipp.h
 dirsvc.o: ../cups/ppd.h ../cups/file.h mime.h ../cups/ipp.h ../cups/file.h
@@ -84,12 +84,6 @@ policy.o: ../cups/ppd.h ../cups/file.h mime.h ../cups/ipp.h ../cups/file.h
 policy.o: ../cups/http.h ../cups/language.h ../cups/debug.h statbuf.h cert.h
 policy.o: client.h auth.h policy.h printers.h classes.h job.h conf.h
 policy.o: banners.h dirsvc.h network.h subscriptions.h
-ppds.o: cupsd.h ../cups/http-private.h ../config.h ../cups/http.h
-ppds.o: ../cups/md5.h ../cups/string.h ../cups/cups.h ../cups/ipp.h
-ppds.o: ../cups/ppd.h ../cups/file.h mime.h ../cups/ipp.h ../cups/file.h
-ppds.o: ../cups/http.h ../cups/language.h ../cups/debug.h statbuf.h cert.h
-ppds.o: client.h auth.h policy.h printers.h classes.h job.h conf.h banners.h
-ppds.o: dirsvc.h network.h subscriptions.h
 printers.o: cupsd.h ../cups/http-private.h ../config.h ../cups/http.h
 printers.o: ../cups/md5.h ../cups/string.h ../cups/cups.h ../cups/ipp.h
 printers.o: ../cups/ppd.h ../cups/file.h mime.h ../cups/ipp.h ../cups/file.h
@@ -135,6 +129,9 @@ type.o: ../cups/debug.h
 cups-deviced.o: util.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
 cups-deviced.o: ../cups/md5.h ../cups/ppd.h ../cups/file.h ../cups/file.h
 cups-deviced.o: ../cups/string.h ../config.h ../cups/dir.h
+cups-driverd.o: util.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
+cups-driverd.o: ../cups/md5.h ../cups/ppd.h ../cups/file.h ../cups/file.h
+cups-driverd.o: ../cups/string.h ../config.h ../cups/dir.h
 util.o: util.h ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
 util.o: ../cups/ppd.h ../cups/file.h ../cups/file.h ../cups/string.h
 util.o: ../config.h

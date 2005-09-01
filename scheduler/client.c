@@ -65,7 +65,7 @@ static char		*get_file(client_t *con, struct stat *filestats,
 static http_status_t	install_conf_file(client_t *con);
 static int		is_path_absolute(const char *path);
 static int		pipe_command(client_t *con, int infile, int *outfile,
-			             char *command, char *options);
+			             char *command, char *options, int root);
 
 #ifdef HAVE_CDSASSL
 static OSStatus		CDSAReadFunc(SSLConnectionRef connection, void *data,
@@ -1345,7 +1345,7 @@ ReadClient(client_t *con)		/* I - Client to read from */
               if (con->options[0] == '/')
 	        cups_strcpy(con->options, con->options + 1);
 
-              if (!SendCommand(con, con->command, con->options))
+              if (!SendCommand(con, con->command, con->options, 0))
 	      {
 		if (!SendError(con, HTTP_NOT_FOUND))
 		  return (CloseClient(con));
@@ -1397,7 +1397,7 @@ ReadClient(client_t *con)		/* I - Client to read from */
 		* IsCGI()...
 		*/
 
-        	if (!SendCommand(con, con->command, con->options))
+        	if (!SendCommand(con, con->command, con->options, 0))
 		{
 		  if (!SendError(con, HTTP_NOT_FOUND))
 		    return (CloseClient(con));
@@ -1955,7 +1955,7 @@ ReadClient(client_t *con)		/* I - Client to read from */
 
 	    if (con->command)
 	    {
-	      if (!SendCommand(con, con->command, con->options))
+	      if (!SendCommand(con, con->command, con->options, 0))
 	      {
 		if (!SendError(con, HTTP_NOT_FOUND))
 		  return (CloseClient(con));
@@ -1988,7 +1988,8 @@ ReadClient(client_t *con)		/* I - Client to read from */
 int					/* O - 1 on success, 0 on failure */
 SendCommand(client_t      *con,		/* I - Client connection */
 	    char          *command,	/* I - Command to run */
-	    char          *options)	/* I - Command-line options */
+	    char          *options,	/* I - Command-line options */
+	    int           root)		/* I - Run as root? */
 {
   int	fd;				/* Standard input file descriptor */
 
@@ -2008,7 +2009,7 @@ SendCommand(client_t      *con,		/* I - Client connection */
 
   fcntl(fd, F_SETFD, fcntl(fd, F_GETFD) | FD_CLOEXEC);
 
-  con->pipe_pid = pipe_command(con, fd, &(con->file), command, options);
+  con->pipe_pid = pipe_command(con, fd, &(con->file), command, options, root);
 
   close(fd);
 
@@ -2197,7 +2198,7 @@ SendHeader(client_t    *con,	/* I - Client to send to */
   {
     loc = FindBest(con->uri, con->http.state);
 
-    if (!loc || loc->type != AUTH_DIGEST)
+    if ((!loc && DefaultAuthType != AUTH_DIGEST) || loc->type != AUTH_DIGEST)
     {
       if (httpPrintf(HTTP(con), "WWW-Authenticate: Basic realm=\"CUPS\"\r\n") < 0)
 	return (0);
@@ -2942,7 +2943,8 @@ pipe_command(client_t *con,		/* I - Client connection */
              int      infile,		/* I - Standard input for command */
              int      *outfile,		/* O - Standard output for command */
 	     char     *command,		/* I - Command to run */
-	     char     *options)		/* I - Options for command */
+	     char     *options,		/* I - Options for command */
+	     int      root)		/* I - Run as root? */
 {
   int		i;			/* Looping var */
   int		pid;			/* Process ID */
@@ -3327,7 +3329,7 @@ pipe_command(client_t *con,		/* I - Client connection */
   */
 
   if (cupsdStartProcess(command, argv, envp, infile, fds[1], CGIPipes[1],
-			-1, 0, &pid) < 0)
+			-1, root, &pid) < 0)
   {
    /*
     * Error - can't fork!

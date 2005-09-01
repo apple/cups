@@ -7,14 +7,28 @@ function reset_config()
 "LogLevel info\\n" +
 "\\n" +
 "\\n" +
+"# Administrator user group...\\n" +
+"SystemGroup @CUPS_GROUP@\\n" +
+"\\n" +
+"\\n" +
 "# Only listen for connections from the local machine.\\n" +
 "Listen 127.0.0.1:@DEFAULT_IPP_PORT@\\n" +
 "@CUPS_LISTEN_DOMAINSOCKET@\\n" +
 "\\n" +
+"\\n" +
 "# Show shared printers on the local network.\\n" +
 "Browsing On\\n" +
 "BrowseOrder allow,deny\\n" +
-"BrowseAllow @LOCAL\\n";
+"BrowseAllow @LOCAL\\n" +
+"\\n" +
+"\\n" +
+"# Restrict access to configuration files...\\n" +
+"<Location /admin/conf>\\n" +
+"AuthType Basic\\n" +
+"AuthClass SystemGroup\\n" +
+"Order allow,deny\\n" +
+"Allow localhost\\n" +
+"</Location>\\n";
 }
 </SCRIPT>
 

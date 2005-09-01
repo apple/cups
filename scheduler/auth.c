@@ -1374,7 +1374,7 @@ IsAuthorized(client_t *con)	/* I - Connection */
   * access... (root always matches)
   */
 
-  if (strcmp(con->username, "root") == 0)
+  if (!strcmp(con->username, "root"))
     return (HTTP_OK);
 
   if (best->level == AUTH_USER)
@@ -1395,7 +1395,7 @@ IsAuthorized(client_t *con)	/* I - Connection */
     */
 
     for (i = 0; i < best->num_names; i ++)
-      if (strcmp(con->username, best->names[i]) == 0)
+      if (!strcmp(con->username, best->names[i]))
         return (HTTP_OK);
 
     return (HTTP_UNAUTHORIZED);
@@ -1413,22 +1413,23 @@ IsAuthorized(client_t *con)	/* I - Connection */
     * Check to see if this user is in any of the named groups...
     */
 
-    LogMessage(L_DEBUG2, "IsAuthorized: Checking group membership...");
-
     for (i = 0; i < best->num_names; i ++)
     {
+      LogMessage(L_DEBUG2, "IsAuthorized: Checking group \"%s\" membership...",
+                 best->names[i]);
+
       grp = getgrnam(best->names[i]);
       endgrent();
 
       if (grp == NULL)			/* No group by that name??? */
       {
-	LogMessage(L_WARN, "IsAuthorized: group name \"%s\" does not exist!",
+	LogMessage(L_WARN, "IsAuthorized: Group \"%s\" does not exist!",
         	   best->names[i]);
 	return (HTTP_FORBIDDEN);
       }
 
       for (j = 0; grp->gr_mem[j] != NULL; j ++)
-	if (strcmp(con->username, grp->gr_mem[j]) == 0)
+	if (!strcmp(con->username, grp->gr_mem[j]))
 	  return (HTTP_OK);
 
      /*
@@ -1443,7 +1444,7 @@ IsAuthorized(client_t *con)	/* I - Connection */
     * The user isn't part of the specified group, so deny access...
     */
 
-    LogMessage(L_DEBUG2, "IsAuthorized: user not in group!");
+    LogMessage(L_DEBUG2, "IsAuthorized: user not in group(s)!");
 
     return (HTTP_UNAUTHORIZED);
   }

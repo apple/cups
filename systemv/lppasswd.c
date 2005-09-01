@@ -120,22 +120,17 @@ main(int  argc,			/* I - Number of command-line arguments */
  /*
   * Find the server directory...
   *
-  * Don't use CUPS_SERVERROOT unless we're run by the
-  * super user.
+  * We use the CUPS_SERVERROOT environment variable when we are running
+  * as root or when lppasswd is not setuid...
   */
 
-  if (!getuid() && (root = getenv("CUPS_SERVERROOT")) != NULL)
-  {
-    snprintf(passwdmd5, sizeof(passwdmd5), "%s/passwd.md5", root);
-    snprintf(passwdold, sizeof(passwdold), "%s/passwd.old", root);
-    snprintf(passwdnew, sizeof(passwdnew), "%s/passwd.new", root);
-  }
-  else
-  {
-    strcpy(passwdmd5, CUPS_SERVERROOT "/passwd.md5");
-    strcpy(passwdold, CUPS_SERVERROOT "/passwd.old");
-    strcpy(passwdnew, CUPS_SERVERROOT "/passwd.new");
-  }
+  if ((getuid() == geteuid() || !getuid()) &&
+      (root = getenv("CUPS_SERVERROOT")) == NULL)
+    root = CUPS_SERVERROOT;
+
+  snprintf(passwdmd5, sizeof(passwdmd5), "%s/passwd.md5", root);
+  snprintf(passwdold, sizeof(passwdold), "%s/passwd.old", root);
+  snprintf(passwdnew, sizeof(passwdnew), "%s/passwd.new", root);
 
  /*
   * Find the default system group: "sys", "system", or "root"...
@@ -194,7 +189,7 @@ main(int  argc,			/* I - Number of command-line arguments */
   * as root...
   */
 
-  if (getuid() && (op != CHANGE || username))
+  if (getuid() && getuid() != geteuid() && (op != CHANGE || username))
   {
     fputs("lppasswd: Only root can add or delete passwords!\n", stderr);
     return (1);
