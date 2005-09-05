@@ -169,7 +169,7 @@ static unsigned		zeros[4] =
 			};
 
 #ifdef HAVE_CDSASSL
-static CFArrayRef CDSAGetServerCerts();
+CFArrayRef CDSAGetServerCerts();
 #endif /* HAVE_CDSASSL */
 
 
@@ -2779,7 +2779,7 @@ get_operation(const char *name)		/* I - Operating name */
  *     certtool c c v k=CUPS
  */
 
-static CFArrayRef
+CFArrayRef
 CDSAGetServerCerts(void)
 {
   OSStatus		err;		/* Error info */

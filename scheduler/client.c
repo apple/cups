@@ -368,7 +368,9 @@ CloseClient(client_t *con)	/* I - Client to close */
   int            error;		/* Error code */
   gnutls_certificate_server_credentials *credentials;
 				/* TLS credentials */
-#endif /* HAVE_GNUTLS */
+#else
+  int		status;		/* Error status */
+#endif /* HAVE_LIBSSL */
 
 
   LogMessage(L_DEBUG, "CloseClient: %d", con->http.fd);

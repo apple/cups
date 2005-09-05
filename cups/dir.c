@@ -242,6 +242,9 @@ cupsDirRewind(cups_dir_t *dp)		/* I - Directory */
 
 #  include <sys/types.h>
 #  include <dirent.h>
+#  ifndef PATH_MAX
+#    define PATH_MAX 1024
+#  endif /* PATH_MAX */
 
 
 /*
