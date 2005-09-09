@@ -288,7 +288,8 @@ InitCerts(void)
   * Create a root certificate and return...
   */
 
-  AddCert(0, "root");
+  if (!RunUser)
+    AddCert(0, "root");
 }
 
 

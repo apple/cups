@@ -3352,7 +3352,8 @@ pipe_command(client_t *con,		/* I - Client connection */
     * Fork successful - return the PID...
     */
 
-    AddCert(pid, con->username);
+    if (con->username[0])
+      AddCert(pid, con->username);
 
     LogMessage(L_DEBUG, "CGI %s started - PID = %d", command, pid);
 

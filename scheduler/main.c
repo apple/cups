@@ -777,7 +777,8 @@ main(int  argc,				/* I - Number of command-line arguments */
     * Update the root certificate once every 5 minutes...
     */
 
-    if ((time(NULL) - RootCertTime) >= RootCertDuration && RootCertDuration)
+    if ((time(NULL) - RootCertTime) >= RootCertDuration && RootCertDuration &&
+        !RunUser)
     {
      /*
       * Update the root certificate...
@@ -1398,7 +1399,8 @@ select_timeout(int fds)			/* I - Number of ready descriptors select returned */
   * Update the root certificate when needed...
   */
 
-  if (RootCertDuration && (RootCertTime + RootCertDuration) < timeout)
+  if (!RunUser && RootCertDuration &&
+      (RootCertTime + RootCertDuration) < timeout)
   {
     timeout = RootCertTime + RootCertDuration;
     why     = "update root certificate";
