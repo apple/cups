@@ -124,8 +124,8 @@ extern const char *cups_hstrerror(int);
 
 #include "statbuf.h"
 #include "cert.h"
-#include "client.h"
 #include "auth.h"
+#include "client.h"
 #include "policy.h"
 #include "printers.h"
 #include "classes.h"

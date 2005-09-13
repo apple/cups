@@ -23,31 +23,32 @@
  *
  * Contents:
  *
- *   AddLocation()        - Add a location for authorization.
- *   AddName()            - Add a name to a location...
- *   AllowHost()          - Add a host name that is allowed to access the
- *                          location.
- *   AllowIP()            - Add an IP address or network that is allowed to
- *                          access the location.
- *   CheckAuth()          - Check authorization masks.
- *   cupsdCheckGroup()    - Check for a user's group membership.
- *   CopyLocation()       - Make a copy of a location...
- *   DeleteAllLocations() - Free all memory used for location authorization.
- *   DenyHost()           - Add a host name that is not allowed to access the
- *                          location.
- *   DenyIP()             - Add an IP address or network that is not allowed
- *                          to access the location.
- *   FindBest()           - Find the location entry that best matches the
- *                          resource.
- *   FindLocation()       - Find the named location.
- *   GetMD5Passwd()       - Get an MD5 password.
- *   IsAuthorized()       - Check to see if the user is authorized...
- *   add_allow()          - Add an allow mask to the location.
- *   add_deny()           - Add a deny mask to the location.
- *   cups_crypt()         - Encrypt the password using the DES or MD5
- *                          algorithms, as needed.
- *   pam_func()           - PAM conversation function.
- *   to64()               - Base64-encode an integer value...
+ *   AddLocation()         - Add a location for authorization.
+ *   AddName()             - Add a name to a location...
+ *   AllowHost()           - Add a host name that is allowed to access the
+ *                           location.
+ *   AllowIP()             - Add an IP address or network that is allowed to
+ *                           access the location.
+ *   CheckAuth()           - Check authorization masks.
+ *   cupsdCheckGroup()     - Check for a user's group membership.
+ *   CopyLocation()        - Make a copy of a location...
+ *   DeleteAllLocations()  - Free all memory used for location authorization.
+ *   cupsdDeleteLocation() - Free all memory used by a location.
+ *   DenyHost()            - Add a host name that is not allowed to access the
+ *                           location.
+ *   DenyIP()              - Add an IP address or network that is not allowed
+ *                           to access the location.
+ *   FindBest()            - Find the location entry that best matches the
+ *                           resource.
+ *   FindLocation()        - Find the named location.
+ *   GetMD5Passwd()        - Get an MD5 password.
+ *   IsAuthorized()        - Check to see if the user is authorized...
+ *   add_allow()           - Add an allow mask to the location.
+ *   add_deny()            - Add a deny mask to the location.
+ *   cups_crypt()          - Encrypt the password using the DES or MD5
+ *                           algorithms, as needed.
+ *   pam_func()            - PAM conversation function.
+ *   to64()                - Base64-encode an integer value...
  */
 
 /*
@@ -648,9 +649,8 @@ CopyLocation(location_t **loc)	/* IO - Original location */
 void
 DeleteAllLocations(void)
 {
-  int		i, j;		/* Looping vars */
-  location_t	*loc;		/* Current location */
-  authmask_t	*mask;		/* Current mask */
+  int		i;			/* Looping var */
+  location_t	*loc;			/* Current location */
 
 
  /*
@@ -658,27 +658,7 @@ DeleteAllLocations(void)
   */
 
   for (i = NumLocations, loc = Locations; i > 0; i --, loc ++)
-  {
-    for (j = loc->num_names - 1; j >= 0; j --)
-      free(loc->names[j]);
-
-    if (loc->num_names > 0)
-      free(loc->names);
-
-    for (j = loc->num_allow, mask = loc->allow; j > 0; j --, mask ++)
-      if (mask->type == AUTH_NAME || mask->type == AUTH_INTERFACE)
-        free(mask->mask.name.name);
-
-    if (loc->num_allow > 0)
-      free(loc->allow);
-
-    for (j = loc->num_deny, mask = loc->deny; j > 0; j --, mask ++)
-      if (mask->type == AUTH_NAME || mask->type == AUTH_INTERFACE)
-        free(mask->mask.name.name);
-
-    if (loc->num_deny > 0)
-      free(loc->deny);
-  }
+    cupsdDeleteLocation(loc);
 
  /*
   * Then free the location array...
@@ -689,6 +669,39 @@ DeleteAllLocations(void)
 
   Locations    = NULL;
   NumLocations = 0;
+}
+
+
+/*
+ * 'cupsdDeleteLocation()' - Free all memory used by a location.
+ */
+
+void
+cupsdDeleteLocation(location_t *loc)	/* I - Location to delete */
+{
+  int		i;			/* Looping var */
+  authmask_t	*mask;			/* Current mask */
+
+
+  for (i = loc->num_names - 1; i >= 0; i --)
+    free(loc->names[i]);
+
+  if (loc->num_names > 0)
+    free(loc->names);
+
+  for (i = loc->num_allow, mask = loc->allow; i > 0; i --, mask ++)
+    if (mask->type == AUTH_NAME || mask->type == AUTH_INTERFACE)
+      free(mask->mask.name.name);
+
+  if (loc->num_allow > 0)
+    free(loc->allow);
+
+  for (i = loc->num_deny, mask = loc->deny; i > 0; i --, mask ++)
+    if (mask->type == AUTH_NAME || mask->type == AUTH_INTERFACE)
+      free(mask->mask.name.name);
+
+  if (loc->num_deny > 0)
+    free(loc->deny);
 }
 
 
@@ -974,34 +987,34 @@ GetMD5Passwd(const char *username,	/* I - Username */
 
 
 /*
- * 'IsAuthorized()' - Check to see if the user is authorized...
+ * 'cupsdIsAuthorized()' - Check to see if the user is authorized...
  */
 
-http_status_t			/* O - HTTP_OK if authorized or error code */
-IsAuthorized(client_t *con)	/* I - Connection */
+http_status_t				/* O - HTTP_OK if authorized or error code */
+cupsdIsAuthorized(client_t   *con,	/* I - Connection */
+                  const char *owner)	/* I - Owner of object */
 {
-  int		i, j,		/* Looping vars */
-		auth;		/* Authorization status */
-  unsigned	address[4];	/* Authorization address */
-  location_t	*best;		/* Best match for location so far */
-  int		hostlen;	/* Length of hostname */
-  struct passwd	*pw;		/* User password data */
-  char		nonce[HTTP_MAX_VALUE],
-				/* Nonce value from client */
-		md5[33],	/* MD5 password */
-		basicmd5[33];	/* MD5 of Basic password */
+  int		i, j,			/* Looping vars */
+		auth;			/* Authorization status */
+  unsigned	address[4];		/* Authorization address */
+  location_t	*best;			/* Best match for location so far */
+  int		hostlen;		/* Length of hostname */
+  struct passwd	*pw;			/* User password data */
+  char		nonce[HTTP_MAX_VALUE],	/* Nonce value from client */
+		md5[33],		/* MD5 password */
+		basicmd5[33];		/* MD5 of Basic password */
 #if HAVE_LIBPAM
-  pam_handle_t	*pamh;		/* PAM authentication handle */
-  int		pamerr;		/* PAM error code */
-  struct pam_conv pamdata;	/* PAM conversation data */
+  pam_handle_t	*pamh;			/* PAM authentication handle */
+  int		pamerr;			/* PAM error code */
+  struct pam_conv pamdata;		/* PAM conversation data */
 #elif defined(HAVE_USERSEC_H)
-  char		*authmsg;	/* Authentication message */
-  char		*loginmsg;	/* Login message */
-  int		reenter;	/* ??? */
+  char		*authmsg;		/* Authentication message */
+  char		*loginmsg;		/* Login message */
+  int		reenter;		/* ??? */
 #else
-  char		*pass;		/* Encrypted password */
+  char		*pass;			/* Encrypted password */
 #  ifdef HAVE_SHADOW_H
-  struct spwd	*spw;		/* Shadow password data */
+  struct spwd	*spw;			/* Shadow password data */
 #  endif /* HAVE_SHADOW_H */
 #endif /* HAVE_LIBPAM */
   static const char * const states[] =	/* HTTP client states... */
@@ -1026,11 +1039,11 @@ IsAuthorized(client_t *con)	/* I - Connection */
   LogMessage(L_DEBUG2, "IsAuthorized: con->uri = \"%s\"", con->uri);
 
  /*
-  * Find a matching location; if there is no match then access is
-  * allowed from localhost and denied from other addresses...
+  * If there is no "best" authentication rule for this request, then
+  * access is allowed from localhost and denied from other addresses...
   */
 
-  if ((best = FindBest(con->uri, con->http.state)) == NULL)
+  if (con->best == NULL)
   {
     if (!strcmp(con->http.hostname, "localhost") ||
         !strcmp(con->http.hostname, ServerName))
@@ -1038,6 +1051,8 @@ IsAuthorized(client_t *con)	/* I - Connection */
     else
       return (HTTP_FORBIDDEN);
   }
+
+  best = con->best;
 
  /*
   * Check host/ip-based accesses...
@@ -1077,10 +1092,10 @@ IsAuthorized(client_t *con)	/* I - Connection */
 
   hostlen = strlen(con->http.hostname);
 
-  if (strcasecmp(con->http.hostname, "localhost") == 0)
+  if (!strcasecmp(con->http.hostname, "localhost"))
   {
    /*
-    * Access from localhost (127.0.0.1 or 0.0.0.1) is always allowed...
+    * Access from localhost (127.0.0.1 or :::1) is always allowed...
     */
 
     auth = AUTH_ALLOW;
@@ -1484,7 +1499,16 @@ IsAuthorized(client_t *con)	/* I - Connection */
     */
 
     for (i = 0; i < best->num_names; i ++)
-      if (!strcasecmp(con->username, best->names[i]))
+      if (!strcasecmp(best->names[i], "@OWNER") && owner &&
+          !strcasecmp(con->username, owner))
+	return (HTTP_OK)
+      else if (!strcasecmp(best->names[i], "@SYSTEM"))
+      {
+      }
+      else if (best->names[i][0] == '@')
+      {
+      }
+      else if (!strcasecmp(con->username, best->names[i]))
         return (HTTP_OK);
 
     return (HTTP_UNAUTHORIZED);

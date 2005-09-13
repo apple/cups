@@ -665,7 +665,7 @@ accept_jobs(client_t        *con,	/* I - Client connection */
   * Check policy...
   */
 
-  if (!CheckPolicy(printer->op_policy_ptr, con, NULL))
+  if (!cupsdCheckPolicy(printer->op_policy_ptr, con, NULL))
   {
     LogMessage(L_ERROR, "accept_jobs: not authorized!");
     send_ipp_error(con, IPP_NOT_AUTHORIZED);
@@ -768,7 +768,7 @@ add_class(client_t        *con,		/* I - Client connection */
   * Check policy...
   */
 
-  if (!CheckPolicy(DefaultPolicyPtr, con, NULL))
+  if (!cupsdCheckPolicy(DefaultPolicyPtr, con, NULL))
   {
     LogMessage(L_ERROR, "add_class: not authorized!");
     send_ipp_error(con, IPP_NOT_AUTHORIZED);
@@ -953,10 +953,10 @@ add_class(client_t        *con,		/* I - Client connection */
   }
   if ((attr = ippFindAttribute(con->request, "printer-op-policy", IPP_TAG_TEXT)) != NULL)
   {
-    policy_t *p;			/* Policy */
+    cupsd_policy_t *p;			/* Policy */
 
 
-    if ((p = FindPolicy(attr->values[0].string.text)) != NULL)
+    if ((p = cupsdFindPolicy(attr->values[0].string.text)) != NULL)
     {
       LogMessage(L_DEBUG, "add_class: Setting printer-op-policy to \"%s\"...",
                  attr->values[0].string.text);
@@ -1413,7 +1413,7 @@ add_printer(client_t        *con,	/* I - Client connection */
   * Check policy...
   */
 
-  if (!CheckPolicy(DefaultPolicyPtr, con, NULL))
+  if (!cupsdCheckPolicy(DefaultPolicyPtr, con, NULL))
   {
     LogMessage(L_ERROR, "add_printer: not authorized!");
     send_ipp_error(con, IPP_NOT_AUTHORIZED);
@@ -1685,10 +1685,10 @@ add_printer(client_t        *con,	/* I - Client connection */
   }
   if ((attr = ippFindAttribute(con->request, "printer-op-policy", IPP_TAG_TEXT)) != NULL)
   {
-    policy_t *p;			/* Policy */
+    cupsd_policy_t *p;			/* Policy */
 
 
-    if ((p = FindPolicy(attr->values[0].string.text)) != NULL)
+    if ((p = cupsdFindPolicy(attr->values[0].string.text)) != NULL)
     {
       LogMessage(L_DEBUG, "add_printer: Setting printer-op-policy to \"%s\"...",
                  attr->values[0].string.text);
@@ -2078,7 +2078,7 @@ cancel_all_jobs(client_t        *con,	/* I - Client connection */
     * Check policy...
     */
 
-    if (!CheckPolicy(DefaultPolicyPtr, con, NULL))
+    if (!cupsdCheckPolicy(DefaultPolicyPtr, con, NULL))
     {
       LogMessage(L_ERROR, "cancel_all_jobs: not authorized!");
       send_ipp_error(con, IPP_NOT_AUTHORIZED);
@@ -2100,7 +2100,7 @@ cancel_all_jobs(client_t        *con,	/* I - Client connection */
     * Check policy...
     */
 
-    if (!CheckPolicy(printer->op_policy_ptr, con, NULL))
+    if (!cupsdCheckPolicy(printer->op_policy_ptr, con, NULL))
     {
       LogMessage(L_ERROR, "cancel_all_jobs: not authorized!");
       send_ipp_error(con, IPP_NOT_AUTHORIZED);
@@ -3255,7 +3255,7 @@ create_job(client_t        *con,	/* I - Client connection */
   * Check policy...
   */
 
-  if (!CheckPolicy(printer->op_policy_ptr, con, NULL))
+  if (!cupsdCheckPolicy(printer->op_policy_ptr, con, NULL))
   {
     LogMessage(L_ERROR, "create_job: not authorized!");
     send_ipp_error(con, IPP_NOT_AUTHORIZED);
@@ -3748,7 +3748,7 @@ delete_printer(client_t        *con,	/* I - Client connection */
   * Check policy...
   */
 
-  if (!CheckPolicy(DefaultPolicyPtr, con, NULL))
+  if (!cupsdCheckPolicy(DefaultPolicyPtr, con, NULL))
   {
     LogMessage(L_ERROR, "delete_printer: not authorized!");
     send_ipp_error(con, IPP_NOT_AUTHORIZED);
@@ -3826,7 +3826,7 @@ get_default(client_t *con)		/* I - Client connection */
   * Check policy...
   */
 
-  if (!CheckPolicy(DefaultPolicyPtr, con, NULL))
+  if (!cupsdCheckPolicy(DefaultPolicyPtr, con, NULL))
   {
     LogMessage(L_ERROR, "get_default: not authorized!");
     send_ipp_error(con, IPP_NOT_AUTHORIZED);
@@ -3896,7 +3896,7 @@ get_devices(client_t *con)		/* I - Client connection */
   * Check policy...
   */
 
-  if (!CheckPolicy(DefaultPolicyPtr, con, NULL))
+  if (!cupsdCheckPolicy(DefaultPolicyPtr, con, NULL))
   {
     LogMessage(L_ERROR, "get_devices: not authorized!");
     send_ipp_error(con, IPP_NOT_AUTHORIZED);
@@ -4052,14 +4052,14 @@ get_jobs(client_t        *con,		/* I - Client connection */
 
   if (printer)
   {
-    if (!CheckPolicy(printer->op_policy_ptr, con, NULL))
+    if (!cupsdCheckPolicy(printer->op_policy_ptr, con, NULL))
     {
       LogMessage(L_ERROR, "get_jobs: not authorized!");
       send_ipp_error(con, IPP_NOT_AUTHORIZED);
       return;
     }
   }
-  else if (!CheckPolicy(DefaultPolicyPtr, con, NULL))
+  else if (!cupsdCheckPolicy(DefaultPolicyPtr, con, NULL))
   {
     LogMessage(L_ERROR, "get_jobs: not authorized!");
     send_ipp_error(con, IPP_NOT_AUTHORIZED);
@@ -4255,7 +4255,7 @@ get_job_attrs(client_t        *con,	/* I - Client connection */
   * Check policy...
   */
 
-  if (!CheckPolicy(DefaultPolicyPtr, con, NULL))
+  if (!cupsdCheckPolicy(DefaultPolicyPtr, con, NULL))
   {
     LogMessage(L_ERROR, "get_job_attrs: not authorized!");
     send_ipp_error(con, IPP_NOT_AUTHORIZED);
@@ -4334,7 +4334,7 @@ get_ppds(client_t *con)			/* I - Client connection */
   * Check policy...
   */
 
-  if (!CheckPolicy(DefaultPolicyPtr, con, NULL))
+  if (!cupsdCheckPolicy(DefaultPolicyPtr, con, NULL))
   {
     LogMessage(L_ERROR, "get_ppds: not authorized!");
     send_ipp_error(con, IPP_NOT_AUTHORIZED);
@@ -4468,7 +4468,7 @@ get_printer_attrs(client_t        *con,	/* I - Client connection */
   * Check policy...
   */
 
-  if (!CheckPolicy(printer->op_policy_ptr, con, NULL))
+  if (!cupsdCheckPolicy(printer->op_policy_ptr, con, NULL))
   {
     LogMessage(L_ERROR, "get_printer_attrs: not authorized!");
     send_ipp_error(con, IPP_NOT_AUTHORIZED);
@@ -4575,7 +4575,7 @@ get_printers(client_t *con,		/* I - Client connection */
   * Check policy...
   */
 
-  if (!CheckPolicy(DefaultPolicyPtr, con, NULL))
+  if (!cupsdCheckPolicy(DefaultPolicyPtr, con, NULL))
   {
     LogMessage(L_ERROR, "get_printers: not authorized!");
     send_ipp_error(con, IPP_NOT_AUTHORIZED);
@@ -5067,7 +5067,7 @@ move_job(client_t        *con,		/* I - Client connection */
   * Check policy...
   */
 
-  if (!CheckPolicy(printer->op_policy_ptr, con, NULL))
+  if (!cupsdCheckPolicy(printer->op_policy_ptr, con, NULL))
   {
     LogMessage(L_ERROR, "move_job: not authorized!");
     send_ipp_error(con, IPP_NOT_AUTHORIZED);
@@ -5457,7 +5457,7 @@ print_job(client_t        *con,		/* I - Client connection */
   * Check policy...
   */
 
-  if (!CheckPolicy(printer->op_policy_ptr, con, NULL))
+  if (!cupsdCheckPolicy(printer->op_policy_ptr, con, NULL))
   {
     LogMessage(L_ERROR, "print_job: not authorized!");
     send_ipp_error(con, IPP_NOT_AUTHORIZED);
@@ -6139,7 +6139,7 @@ reject_jobs(client_t        *con,	/* I - Client connection */
   * Check policy...
   */
 
-  if (!CheckPolicy(printer->op_policy_ptr, con, NULL))
+  if (!cupsdCheckPolicy(printer->op_policy_ptr, con, NULL))
   {
     LogMessage(L_ERROR, "reject_jobs: not authorized!");
     send_ipp_error(con, IPP_NOT_AUTHORIZED);
@@ -6944,7 +6944,7 @@ set_default(client_t        *con,	/* I - Client connection */
   * Check policy...
   */
 
-  if (!CheckPolicy(DefaultPolicyPtr, con, NULL))
+  if (!cupsdCheckPolicy(DefaultPolicyPtr, con, NULL))
   {
     LogMessage(L_ERROR, "set_default: not authorized!");
     send_ipp_error(con, IPP_NOT_AUTHORIZED);
@@ -7369,7 +7369,7 @@ start_printer(client_t        *con,	/* I - Client connection */
   * Check policy...
   */
 
-  if (!CheckPolicy(printer->op_policy_ptr, con, NULL))
+  if (!cupsdCheckPolicy(printer->op_policy_ptr, con, NULL))
   {
     LogMessage(L_ERROR, "start_printer: not authorized!");
     send_ipp_error(con, IPP_NOT_AUTHORIZED);
@@ -7459,7 +7459,7 @@ stop_printer(client_t        *con,	/* I - Client connection */
   * Check policy...
   */
 
-  if (!CheckPolicy(printer->op_policy_ptr, con, NULL))
+  if (!cupsdCheckPolicy(printer->op_policy_ptr, con, NULL))
   {
     LogMessage(L_ERROR, "stop_printer: not authorized!");
     send_ipp_error(con, IPP_NOT_AUTHORIZED);
@@ -7644,7 +7644,7 @@ validate_job(client_t        *con,	/* I - Client connection */
   * Check policy...
   */
 
-  if (!CheckPolicy(printer->op_policy_ptr, con, NULL))
+  if (!cupsdCheckPolicy(printer->op_policy_ptr, con, NULL))
   {
     LogMessage(L_ERROR, "validate_job: not authorized!");
     send_ipp_error(con, IPP_NOT_AUTHORIZED);
@@ -7732,9 +7732,9 @@ validate_user(job_t      *job,		/* I - Job */
     printer = FindPrinter(job->dest);
 
   if (printer)
-    return (CheckPolicy(printer->op_policy_ptr, con, owner));
+    return (cupsdCheckPolicy(printer->op_policy_ptr, con, owner));
   else
-    return (CheckPolicy(DefaultPolicyPtr, con, owner));
+    return (cupsdCheckPolicy(DefaultPolicyPtr, con, owner));
 }
 
 

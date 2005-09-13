@@ -26,11 +26,12 @@
  * HTTP client structure...
  */
 
-typedef struct
+struct client_s
 {
   http_t	http;			/* HTTP client connection */
   ipp_t		*request,		/* IPP request information */
 		*response;		/* IPP response information */
+  location_t	*best;			/* Best match for AAA */
   time_t	start;			/* Request start time */
   http_state_t	operation;		/* Request operation */
   int		bytes;			/* Bytes transferred for this request */
@@ -50,7 +51,7 @@ typedef struct
 #ifdef HAVE_SSL
   int		auto_ssl;		/* Automatic test for SSL/TLS */
 #endif /* HAVE_SSL */
-} client_t;
+};
 
 #define HTTP(con) &((con)->http)
 

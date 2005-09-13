@@ -368,7 +368,7 @@ CloseClient(client_t *con)	/* I - Client to close */
   int            error;		/* Error code */
   gnutls_certificate_server_credentials *credentials;
 				/* TLS credentials */
-#else
+#elif defined(HAVE_CDSASSL)
   int		status;		/* Error status */
 #endif /* HAVE_LIBSSL */
 
@@ -895,7 +895,6 @@ ReadClient(client_t *con)		/* I - Client to read from */
   struct stat	filestats;		/* File information */
   mime_type_t	*type;			/* MIME type of file */
   printer_t	*p;			/* Printer */
-  location_t	*best;			/* Best match for authentication */
   static unsigned request_id = 0;	/* Request ID for temp files */
 
 
@@ -1189,8 +1188,8 @@ ReadClient(client_t *con)		/* I - Client to read from */
       * Do OPTIONS command...
       */
 
-      if ((best = FindBest(con->uri, con->http.state)) != NULL &&
-          best->type != AUTH_NONE)
+      if ((con->best = FindBest(con->uri, con->http.state)) != NULL &&
+          con->best->type != AUTH_NONE)
       {
 	if (!SendHeader(con, HTTP_UNAUTHORIZED, NULL))
 	  return (CloseClient(con));
@@ -1265,7 +1264,9 @@ ReadClient(client_t *con)		/* I - Client to read from */
 #endif /* HAVE_SSL */
       }
 
-      if ((status = IsAuthorized(con)) != HTTP_OK)
+      con->best = FindBest(con->uri, con->http.state);
+
+      if ((status = cupsdIsAuthorized(con, NULL)) != HTTP_OK)
       {
         LogMessage(L_DEBUG2, "ReadClient: Unauthorized request for %s...\n",
 	           con->uri);
@@ -2198,9 +2199,9 @@ SendHeader(client_t    *con,	/* I - Client to send to */
 
   if (code == HTTP_UNAUTHORIZED)
   {
-    loc = FindBest(con->uri, con->http.state);
+    loc = con->best;
 
-    if ((!loc && DefaultAuthType != AUTH_DIGEST) || loc->type != AUTH_DIGEST)
+    if (!loc || loc->type != AUTH_DIGEST)
     {
       if (httpPrintf(HTTP(con), "WWW-Authenticate: Basic realm=\"CUPS\"\r\n") < 0)
 	return (0);

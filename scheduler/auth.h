@@ -61,6 +61,12 @@
 #define AUTH_LIMIT_PUT		32	/* Limit PUT requests */
 #define AUTH_LIMIT_TRACE	64	/* Limit TRACE requests */
 #define AUTH_LIMIT_ALL		127	/* Limit all requests */
+#define AUTH_LIMIT_IPP		128	/* Limit IPP requests */
+
+#define IPP_ANY_OPERATION	(ipp_op_t)0
+					/* Any IPP operation */
+#define IPP_BAD_OPERATION	(ipp_op_t)-1
+					/* No IPP operation */
 
 
 /*
@@ -92,6 +98,7 @@ typedef struct
 typedef struct
 {
   char		location[HTTP_MAX_URI];	/* Location of resource */
+  ipp_op_t	op;			/* IPP operation */
   int		limit,			/* Limit for these types of requests */
 		length,			/* Length of location string */
 		order_type,		/* Allow or Deny */
@@ -107,12 +114,13 @@ typedef struct
   http_encryption_t encryption;		/* To encrypt or not to encrypt... */
 } location_t;
 
+typedef struct client_s client_t;
+
 
 /*
  * Globals...
  */
 
-VAR int			DefaultAuthType	VALUE(AUTH_BASIC);
 VAR int			NumLocations	VALUE(0);
 					/* Number of authorization locations */
 VAR location_t		*Locations	VALUE(NULL);
@@ -135,6 +143,7 @@ extern int		cupsdCheckGroup(const char *username,
 			                const char *groupname);
 extern location_t	*CopyLocation(location_t **loc);
 extern void		DeleteAllLocations(void);
+extern void		cupsdDeleteLocation(location_t *loc);
 extern void		DenyHost(location_t *loc, char *name);
 extern void		DenyIP(location_t *loc, unsigned address[4],
 			       unsigned netmask[4]);
@@ -142,7 +151,7 @@ extern location_t	*FindBest(const char *path, http_state_t state);
 extern location_t	*FindLocation(const char *location);
 extern char		*GetMD5Passwd(const char *username, const char *group,
 			              char passwd[33]);
-extern http_status_t	IsAuthorized(client_t *con);
+extern http_status_t	cupsdIsAuthorized(client_t *con, const char *owner);
 
 
 /*

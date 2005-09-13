@@ -50,7 +50,7 @@ typedef struct printer_str
 		*info,			/* Description */
 		*op_policy,		/* Operation policy name */
 		*error_policy;		/* Error policy */
-  policy_t	*op_policy_ptr;		/* Pointer to operation policy */
+  cupsd_policy_t *op_policy_ptr;	/* Pointer to operation policy */
   int		shared;			/* Shared? */
   int		accepting;		/* Accepting jobs? */
   ipp_pstate_t	state;			/* Printer state */
@@ -98,7 +98,7 @@ VAR printer_t		*DefaultPrinter	VALUE(NULL);
 					/* Default printer */
 VAR char		*DefaultPolicy	VALUE(NULL);
 					/* Default policy name */
-VAR policy_t		*DefaultPolicyPtr
+VAR cupsd_policy_t	*DefaultPolicyPtr
 					VALUE(NULL);
 					/* Pointer to default policy */
 

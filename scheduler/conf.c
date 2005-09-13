@@ -24,11 +24,13 @@
  * Contents:
  *
  *   ReadConfiguration()  - Read the cupsd.conf file.
+ *   get_address()        - Get an address + port number from a line.
+ *   get_addr_and_mask()  - Get an IP address and netmask.
+ *   parse_aaa()          - Parse authentication, authorization, and
+ *                          access control lines.
  *   read_configuration() - Read a configuration file.
  *   read_location()      - Read a <Location path> definition.
  *   read_policy()        - Read a <Policy name> definition.
- *   get_address()        - Get an address + port number from a line.
- *   get_addr_and_mask()  - Get an IP address and netmask.
  *   CDSAGetServerCerts() - Convert a keychain name into the CFArrayRef
  *                          required by SSLSetCertificate.
  */
@@ -177,14 +179,14 @@ CFArrayRef CDSAGetServerCerts();
  * Local functions...
  */
 
-static int	read_configuration(cups_file_t *fp);
-static int	read_location(cups_file_t *fp, char *name, int linenum);
-static int	read_policy(cups_file_t *fp, char *name, int linenum);
 static int	get_address(const char *value, unsigned defaddress, int defport,
 		            int deffamily, http_addr_t *address);
 static int	get_addr_and_mask(const char *value, unsigned *ip,
 		                  unsigned *mask);
-static ipp_op_t	get_operation(const char *name);
+static int	parse_aaa(location_t *loc, char *line, char *value, int linenum);
+static int	read_configuration(cups_file_t *fp);
+static int	read_location(cups_file_t *fp, char *name, int linenum);
+static int	read_policy(cups_file_t *fp, char *name, int linenum);
 
 
 /*
@@ -418,7 +420,6 @@ ReadConfiguration(void)
   MaxCopies           = 100;
 
   ClearString(&DefaultPolicy);
-  DefaultAuthType = AUTH_BASIC;
 
  /*
   * Read the configuration file...
@@ -703,26 +704,26 @@ ReadConfiguration(void)
   */
 
   if (DefaultPolicy)
-    DefaultPolicyPtr = FindPolicy(DefaultPolicy);
+    DefaultPolicyPtr = cupsdFindPolicy(DefaultPolicy);
   else
     DefaultPolicyPtr = NULL;
 
   if (!DefaultPolicyPtr)
   {
-    policy_t	*p;			/* New policy */
-    policyop_t	*po;			/* New policy operation */
+    cupsd_policy_t	*p;		/* New policy */
+    location_t		*po;		/* New policy operation */
 
 
     if (DefaultPolicy)
       LogMessage(L_ERROR, "Default policy \"%s\" not found!", DefaultPolicy);
 
-    if ((DefaultPolicyPtr = FindPolicy("default")) != NULL)
+    if ((DefaultPolicyPtr = cupsdFindPolicy("default")) != NULL)
       LogMessage(L_INFO, "Using policy \"default\" as the default!");
     else
     {
       LogMessage(L_INFO, "Creating CUPS default administrative policy:");
 
-      DefaultPolicyPtr = p = AddPolicy("default");
+      DefaultPolicyPtr = p = cupsdAddPolicy("default");
 
       LogMessage(L_INFO, "<Policy default>");
       LogMessage(L_INFO, "<Limit Send-Document Send-URI Cancel-Job Hold-Job "
@@ -732,33 +733,31 @@ ReadConfiguration(void)
 			 "Get-Notifications Reprocess-Job Cancel-Current-Job "
 			 "Suspend-Current-Job Resume-Job CUPS-Move-Job>");
       LogMessage(L_INFO, "Order Allow,Deny");
-      LogMessage(L_INFO, "Allow @OWNER");
 
-      po = AddPolicyOp(p, NULL, IPP_SEND_DOCUMENT);
-      po->order_type = POLICY_DENY;
+      po = cupsdAddPolicyOp(p, NULL, IPP_SEND_DOCUMENT);
+      po->order_type = AUTH_DENY;
+      po->level      = AUTH_USER;
 
-      AddPolicyOpName(po, POLICY_ALLOW, "@OWNER");
-      LogMessage(L_INFO, "Allow @OWNER");
+      AddName(po, "@OWNER");
+      AddName(po, "@SYSTEM");
+      LogMessage(L_INFO, "Require user @OWNER @SYSTEM");
 
-      AddPolicyOpName(po, POLICY_ALLOW, "@SYSTEM");
-      LogMessage(L_INFO, "Allow @SYSTEM");
-
-      AddPolicyOp(p, po, IPP_SEND_URI);
-      AddPolicyOp(p, po, IPP_CANCEL_JOB);
-      AddPolicyOp(p, po, IPP_HOLD_JOB);
-      AddPolicyOp(p, po, IPP_RELEASE_JOB);
-      AddPolicyOp(p, po, IPP_RESTART_JOB);
-      AddPolicyOp(p, po, IPP_PURGE_JOBS);
-      AddPolicyOp(p, po, IPP_SET_JOB_ATTRIBUTES);
-      AddPolicyOp(p, po, IPP_CREATE_JOB_SUBSCRIPTION);
-      AddPolicyOp(p, po, IPP_RENEW_SUBSCRIPTION);
-      AddPolicyOp(p, po, IPP_CANCEL_SUBSCRIPTION);
-      AddPolicyOp(p, po, IPP_GET_NOTIFICATIONS);
-      AddPolicyOp(p, po, IPP_REPROCESS_JOB);
-      AddPolicyOp(p, po, IPP_CANCEL_CURRENT_JOB);
-      AddPolicyOp(p, po, IPP_SUSPEND_CURRENT_JOB);
-      AddPolicyOp(p, po, IPP_RESUME_JOB);
-      AddPolicyOp(p, po, CUPS_MOVE_JOB);
+      cupsdAddPolicyOp(p, po, IPP_SEND_URI);
+      cupsdAddPolicyOp(p, po, IPP_CANCEL_JOB);
+      cupsdAddPolicyOp(p, po, IPP_HOLD_JOB);
+      cupsdAddPolicyOp(p, po, IPP_RELEASE_JOB);
+      cupsdAddPolicyOp(p, po, IPP_RESTART_JOB);
+      cupsdAddPolicyOp(p, po, IPP_PURGE_JOBS);
+      cupsdAddPolicyOp(p, po, IPP_SET_JOB_ATTRIBUTES);
+      cupsdAddPolicyOp(p, po, IPP_CREATE_JOB_SUBSCRIPTION);
+      cupsdAddPolicyOp(p, po, IPP_RENEW_SUBSCRIPTION);
+      cupsdAddPolicyOp(p, po, IPP_CANCEL_SUBSCRIPTION);
+      cupsdAddPolicyOp(p, po, IPP_GET_NOTIFICATIONS);
+      cupsdAddPolicyOp(p, po, IPP_REPROCESS_JOB);
+      cupsdAddPolicyOp(p, po, IPP_CANCEL_CURRENT_JOB);
+      cupsdAddPolicyOp(p, po, IPP_SUSPEND_CURRENT_JOB);
+      cupsdAddPolicyOp(p, po, IPP_RESUME_JOB);
+      cupsdAddPolicyOp(p, po, CUPS_MOVE_JOB);
 
       LogMessage(L_INFO, "</Limit>");
 
@@ -773,46 +772,47 @@ ReadConfiguration(void)
 			 "CUPS-Accept-Jobs CUPS-Reject-Jobs "
 			 "CUPS-Set-Default CUPS-Add-Device CUPS-Delete-Device>");
       LogMessage(L_INFO, "Order Allow,Deny");
-      LogMessage(L_INFO, "Authenticate yes");
+      LogMessage(L_INFO, "AuthType Basic");
 
-      po = AddPolicyOp(p, NULL, IPP_PAUSE_PRINTER);
-      po->order_type   = POLICY_DENY;
-      po->authenticate = 1;
+      po = cupsdAddPolicyOp(p, NULL, IPP_PAUSE_PRINTER);
+      po->order_type = AUTH_DENY;
+      po->type       = AUTH_BASIC;
+      po->level      = AUTH_USER;
 
-      AddPolicyOpName(po, POLICY_ALLOW, "@SYSTEM");
-      LogMessage(L_INFO, "Allow @SYSTEM");
+      AddName(po, "@SYSTEM");
+      LogMessage(L_INFO, "Require user @SYSTEM");
 
-      AddPolicyOp(p, po, IPP_RESUME_PRINTER);
-      AddPolicyOp(p, po, IPP_SET_PRINTER_ATTRIBUTES);
-      AddPolicyOp(p, po, IPP_ENABLE_PRINTER);
-      AddPolicyOp(p, po, IPP_DISABLE_PRINTER);
-      AddPolicyOp(p, po, IPP_PAUSE_PRINTER_AFTER_CURRENT_JOB);
-      AddPolicyOp(p, po, IPP_HOLD_NEW_JOBS);
-      AddPolicyOp(p, po, IPP_RELEASE_HELD_NEW_JOBS);
-      AddPolicyOp(p, po, IPP_DEACTIVATE_PRINTER);
-      AddPolicyOp(p, po, IPP_ACTIVATE_PRINTER);
-      AddPolicyOp(p, po, IPP_RESTART_PRINTER);
-      AddPolicyOp(p, po, IPP_SHUTDOWN_PRINTER);
-      AddPolicyOp(p, po, IPP_STARTUP_PRINTER);
-      AddPolicyOp(p, po, IPP_PROMOTE_JOB);
-      AddPolicyOp(p, po, IPP_SCHEDULE_JOB_AFTER);
-      AddPolicyOp(p, po, CUPS_ADD_PRINTER);
-      AddPolicyOp(p, po, CUPS_DELETE_PRINTER);
-      AddPolicyOp(p, po, CUPS_ADD_CLASS);
-      AddPolicyOp(p, po, CUPS_DELETE_CLASS);
-      AddPolicyOp(p, po, CUPS_ACCEPT_JOBS);
-      AddPolicyOp(p, po, CUPS_REJECT_JOBS);
-      AddPolicyOp(p, po, CUPS_SET_DEFAULT);
-      AddPolicyOp(p, po, CUPS_ADD_DEVICE);
-      AddPolicyOp(p, po, CUPS_DELETE_DEVICE);
+      cupsdAddPolicyOp(p, po, IPP_RESUME_PRINTER);
+      cupsdAddPolicyOp(p, po, IPP_SET_PRINTER_ATTRIBUTES);
+      cupsdAddPolicyOp(p, po, IPP_ENABLE_PRINTER);
+      cupsdAddPolicyOp(p, po, IPP_DISABLE_PRINTER);
+      cupsdAddPolicyOp(p, po, IPP_PAUSE_PRINTER_AFTER_CURRENT_JOB);
+      cupsdAddPolicyOp(p, po, IPP_HOLD_NEW_JOBS);
+      cupsdAddPolicyOp(p, po, IPP_RELEASE_HELD_NEW_JOBS);
+      cupsdAddPolicyOp(p, po, IPP_DEACTIVATE_PRINTER);
+      cupsdAddPolicyOp(p, po, IPP_ACTIVATE_PRINTER);
+      cupsdAddPolicyOp(p, po, IPP_RESTART_PRINTER);
+      cupsdAddPolicyOp(p, po, IPP_SHUTDOWN_PRINTER);
+      cupsdAddPolicyOp(p, po, IPP_STARTUP_PRINTER);
+      cupsdAddPolicyOp(p, po, IPP_PROMOTE_JOB);
+      cupsdAddPolicyOp(p, po, IPP_SCHEDULE_JOB_AFTER);
+      cupsdAddPolicyOp(p, po, CUPS_ADD_PRINTER);
+      cupsdAddPolicyOp(p, po, CUPS_DELETE_PRINTER);
+      cupsdAddPolicyOp(p, po, CUPS_ADD_CLASS);
+      cupsdAddPolicyOp(p, po, CUPS_DELETE_CLASS);
+      cupsdAddPolicyOp(p, po, CUPS_ACCEPT_JOBS);
+      cupsdAddPolicyOp(p, po, CUPS_REJECT_JOBS);
+      cupsdAddPolicyOp(p, po, CUPS_SET_DEFAULT);
+      cupsdAddPolicyOp(p, po, CUPS_ADD_DEVICE);
+      cupsdAddPolicyOp(p, po, CUPS_DELETE_DEVICE);
 
       LogMessage(L_INFO, "</Limit>");
 
       LogMessage(L_INFO, "<Limit All>");
-      LogMessage(L_INFO, "Order Deny,Allow");
+      LogMessage(L_INFO, "Order Allow,Deny");
 
-      po = AddPolicyOp(p, NULL, IPP_ANY_OPERATION);
-      po->order_type = POLICY_ALLOW;
+      po = cupsdAddPolicyOp(p, NULL, IPP_ANY_OPERATION);
+      po->order_type = AUTH_DENY;
 
       LogMessage(L_INFO, "</Limit>");
       LogMessage(L_INFO, "</Policy>");
@@ -935,6 +935,588 @@ ReadConfiguration(void)
 
 
 /*
+ * 'get_address()' - Get an address + port number from a line.
+ */
+
+static int				/* O - 1 if address good, 0 if bad */
+get_address(const char  *value,		/* I - Value string */
+            unsigned    defaddress,	/* I - Default address */
+	    int         defport,	/* I - Default port */
+	    int         deffamily,	/* I - Default family */
+            http_addr_t *address)	/* O - Socket address */
+{
+  char			hostname[256],	/* Hostname or IP */
+			portname[256];	/* Port number or name */
+  struct hostent	*host;		/* Host address */
+  struct servent	*port;		/* Port number */  
+
+
+ /*
+  * Initialize the socket address to the defaults...
+  */
+
+  memset(address, 0, sizeof(http_addr_t));
+
+#ifdef AF_INET6
+  if (deffamily == AF_INET6)
+  {
+    address->ipv6.sin6_family            = AF_INET6;
+    address->ipv6.sin6_addr.s6_addr32[0] = htonl(defaddress);
+    address->ipv6.sin6_addr.s6_addr32[1] = htonl(defaddress);
+    address->ipv6.sin6_addr.s6_addr32[2] = htonl(defaddress);
+    address->ipv6.sin6_addr.s6_addr32[3] = htonl(defaddress);
+    address->ipv6.sin6_port              = htons(defport);
+  }
+  else
+#endif /* AF_INET6 */
+  {
+    address->ipv4.sin_family      = AF_INET;
+    address->ipv4.sin_addr.s_addr = htonl(defaddress);
+    address->ipv4.sin_port        = htons(defport);
+  }
+
+#ifdef AF_LOCAL
+ /*
+  * If the address starts with a "/", it is a domain socket...
+  */
+
+  if (*value == '/')
+  {
+    if (strlen(value) >= sizeof(address->un.sun_path))
+    {
+      LogMessage(L_ERROR, "Domain socket name \"%s\" too long!", value);
+      return (0);
+    }
+
+    address->un.sun_family = AF_LOCAL;
+    strcpy(address->un.sun_path, value);
+
+    return (1);
+  }
+#endif /* AF_LOCAL */
+
+ /*
+  * Try to grab a hostname and port number...
+  */
+
+  switch (sscanf(value, "%255[^:]:%255s", hostname, portname))
+  {
+    case 1 :
+        if (strchr(hostname, '.') == NULL && defaddress == INADDR_ANY)
+	{
+	 /*
+	  * Hostname is a port number...
+	  */
+
+	  strlcpy(portname, hostname, sizeof(portname));
+	  hostname[0] = '\0';
+	}
+        else
+          portname[0] = '\0';
+        break;
+
+    case 2 :
+        break;
+
+    default :
+	LogMessage(L_ERROR, "Unable to decode address \"%s\"!", value);
+        return (0);
+  }
+
+ /*
+  * Decode the hostname and port number as needed...
+  */
+
+  if (hostname[0] && strcmp(hostname, "*"))
+  {
+    if ((host = httpGetHostByName(hostname)) == NULL)
+    {
+      LogMessage(L_ERROR, "httpGetHostByName(\"%s\") failed - %s!", hostname,
+                 hstrerror(h_errno));
+      return (0);
+    }
+
+    httpAddrLoad(host, defport, 0, address);
+  }
+
+  if (portname[0] != '\0')
+  {
+    if (isdigit(portname[0] & 255))
+    {
+#ifdef AF_INET6
+      if (address->addr.sa_family == AF_INET6)
+        address->ipv6.sin6_port = htons(atoi(portname));
+      else
+#endif /* AF_INET6 */
+      address->ipv4.sin_port = htons(atoi(portname));
+    }
+    else
+    {
+      if ((port = getservbyname(portname, NULL)) == NULL)
+      {
+        LogMessage(L_ERROR, "getservbyname(\"%s\") failed - %s!", portname,
+                   strerror(errno));
+        return (0);
+      }
+      else
+      {
+#ifdef AF_INET6
+	if (address->addr.sa_family == AF_INET6)
+          address->ipv6.sin6_port = htons(port->s_port);
+	else
+#endif /* AF_INET6 */
+	address->ipv4.sin_port = htons(port->s_port);
+      }
+    }
+  }
+
+  return (1);
+}
+
+
+/*
+ * 'get_addr_and_mask()' - Get an IP address and netmask.
+ */
+
+static int				/* O - 1 on success, 0 on failure */
+get_addr_and_mask(const char *value,	/* I - String from config file */
+                  unsigned   *ip,	/* O - Address value */
+		  unsigned   *mask)	/* O - Mask value */
+{
+  int		i,			/* Looping var */
+		family,			/* Address family */
+		ipcount;		/* Count of fields in address */
+  static unsigned netmasks[4][4] =	/* Standard netmasks... */
+  {
+    { 0xffffffff, 0x00000000, 0x00000000, 0x00000000 },
+    { 0xffffffff, 0xffffffff, 0x00000000, 0x00000000 },
+    { 0xffffffff, 0xffffffff, 0xffffffff, 0x00000000 },
+    { 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff }
+  };
+
+
+ /*
+  * Get the address...
+  */
+
+  memset(ip, 0, sizeof(unsigned) * 4);
+  family  = AF_INET;
+  ipcount = sscanf(value, "%u.%u.%u.%u", ip + 0, ip + 1, ip + 2, ip + 3);
+
+#ifdef AF_INET6
+ /*
+  * See if we have any values > 255; if so, this is an IPv6 address only.
+  */
+
+  for (i = 0; i < ipcount; i ++)
+    if (ip[0] > 255)
+    {
+      family = AF_INET6;
+      break;
+    }
+#endif /* AF_INET6 */
+
+  if ((value = strchr(value, '/')) != NULL)
+  {
+   /*
+    * Get the netmask value(s)...
+    */
+
+    value ++;
+    memset(mask, 0, sizeof(unsigned) * 4);
+    switch (sscanf(value, "%u.%u.%u.%u", mask + 0, mask + 1,
+	           mask + 2, mask + 3))
+    {
+      case 1 :
+#ifdef AF_INET6
+          if (mask[0] >= 32)
+	    family = AF_INET6;
+
+          if (family == AF_INET6)
+	  {
+  	    i = 128 - mask[0];
+
+	    if (i <= 96)
+	      mask[0] = 0xffffffff;
+	    else
+	      mask[0] = (0xffffffff << (128 - mask[0])) & 0xffffffff;
+
+	    if (i <= 64)
+	      mask[1] = 0xffffffff;
+	    else if (i >= 96)
+	      mask[1] = 0;
+	    else
+	      mask[1] = (0xffffffff << (96 - mask[0])) & 0xffffffff;
+
+	    if (i <= 32)
+	      mask[1] = 0xffffffff;
+	    else if (i >= 64)
+	      mask[1] = 0;
+	    else
+	      mask[1] = (0xffffffff << (64 - mask[0])) & 0xffffffff;
+
+	    if (i >= 32)
+	      mask[1] = 0;
+	    else
+	      mask[1] = (0xffffffff << (32 - mask[0])) & 0xffffffff;
+          }
+	  else
+#endif /* AF_INET6 */
+	  {
+  	    i = 32 - mask[0];
+
+	    if (i <= 24)
+	      mask[0] = 0xffffffff;
+	    else
+	      mask[0] = (0xffffffff << (32 - mask[0])) & 0xffffffff;
+
+	    if (i <= 16)
+	      mask[1] = 0xffffffff;
+	    else if (i >= 24)
+	      mask[1] = 0;
+	    else
+	      mask[1] = (0xffffffff << (24 - mask[0])) & 0xffffffff;
+
+	    if (i <= 8)
+	      mask[1] = 0xffffffff;
+	    else if (i >= 16)
+	      mask[1] = 0;
+	    else
+	      mask[1] = (0xffffffff << (16 - mask[0])) & 0xffffffff;
+
+	    if (i >= 8)
+	      mask[1] = 0;
+	    else
+	      mask[1] = (0xffffffff << (8 - mask[0])) & 0xffffffff;
+          }
+
+      case 4 :
+	  break;
+
+      default :
+          return (0);
+    }
+  }
+  else
+    memcpy(mask, netmasks[ipcount - 1], sizeof(unsigned) * 4);
+
+ /*
+  * Check for a valid netmask; no fallback like in CUPS 1.1.x!
+  */
+
+  if ((ip[0] & ~mask[0]) != 0 ||
+      (ip[1] & ~mask[1]) != 0 ||
+      (ip[2] & ~mask[2]) != 0 ||
+      (ip[3] & ~mask[3]) != 0)
+    return (0);
+
+  return (1);
+}
+
+
+/*
+ * 'parse_aaa()' - Parse authentication, authorization, and access control lines.
+ */
+
+static int				/* O - 1 on success, 0 on failure */
+parse_aaa(location_t *loc,		/* I - Location */
+          char       *line,		/* I - Line from file */
+	  char       *value,		/* I - Start of value data */
+	  int        linenum)		/* I - Current line number */
+{
+  char		*valptr;		/* Pointer into value */
+  unsigned	ip[4],			/* IP address components */
+ 		mask[4];		/* IP netmask components */
+
+
+  if (!strcasecmp(line, "Encryption"))
+  {
+   /*
+    * "Encryption xxx" - set required encryption level...
+    */
+
+    if (!strcasecmp(value, "never"))
+      loc->encryption = HTTP_ENCRYPT_NEVER;
+    else if (!strcasecmp(value, "always"))
+    {
+      LogMessage(L_ERROR, "Encryption value \"%s\" on line %d is invalid in this context. "
+	                  "Using \"required\" instead.", value, linenum);
+
+      loc->encryption = HTTP_ENCRYPT_REQUIRED;
+    }
+    else if (!strcasecmp(value, "required"))
+      loc->encryption = HTTP_ENCRYPT_REQUIRED;
+    else if (!strcasecmp(value, "ifrequested"))
+      loc->encryption = HTTP_ENCRYPT_IF_REQUESTED;
+    else
+    {
+      LogMessage(L_ERROR, "Unknown Encryption value %s on line %d.",
+	         value, linenum);
+      return (0);
+    }
+  }
+  else if (!strcasecmp(line, "Order"))
+  {
+   /*
+    * "Order Deny,Allow" or "Order Allow,Deny"...
+    */
+
+    if (!strncasecmp(value, "deny", 4))
+      loc->order_type = AUTH_ALLOW;
+    else if (!strncasecmp(value, "allow", 5))
+      loc->order_type = AUTH_DENY;
+    else
+    {
+      LogMessage(L_ERROR, "Unknown Order value %s on line %d.",
+	         value, linenum);
+      return (0);
+    }
+  }
+  else if (!strcasecmp(line, "Allow") || !strcasecmp(line, "Deny"))
+  {
+   /*
+    * Allow [From] host/ip...
+    * Deny [From] host/ip...
+    */
+
+    if (!strncasecmp(value, "from", 4))
+    {
+     /*
+      * Strip leading "from"...
+      */
+
+      value += 4;
+
+      while (isspace(*value & 255))
+	value ++;
+    }
+
+   /*
+    * Figure out what form the allow/deny address takes:
+    *
+    *    All
+    *    None
+    *    *.domain.com
+    *    .domain.com
+    *    host.domain.com
+    *    nnn.*
+    *    nnn.nnn.*
+    *    nnn.nnn.nnn.*
+    *    nnn.nnn.nnn.nnn
+    *    nnn.nnn.nnn.nnn/mm
+    *    nnn.nnn.nnn.nnn/mmm.mmm.mmm.mmm
+    */
+
+    if (!strcasecmp(value, "all"))
+    {
+     /*
+      * All hosts...
+      */
+
+      if (!strcasecmp(line, "Allow"))
+	AllowIP(loc, zeros, zeros);
+      else
+	DenyIP(loc, zeros, zeros);
+    }
+    else if (!strcasecmp(value, "none"))
+    {
+     /*
+      * No hosts...
+      */
+
+      if (!strcasecmp(line, "Allow"))
+	AllowIP(loc, ones, zeros);
+      else
+	DenyIP(loc, ones, zeros);
+    }
+    else if (value[0] == '*' || value[0] == '.' || !isdigit(value[0] & 255))
+    {
+     /*
+      * Host or domain name...
+      */
+
+      if (value[0] == '*')
+	value ++;
+
+      if (!strcasecmp(line, "Allow"))
+	AllowHost(loc, value);
+      else
+	DenyHost(loc, value);
+    }
+    else
+    {
+     /*
+      * One of many IP address forms...
+      */
+
+      if (!get_addr_and_mask(value, ip, mask))
+      {
+        LogMessage(L_ERROR, "Bad netmask value %s on line %d.",
+	           value, linenum);
+        return (0);
+      }
+
+      if (!strcasecmp(line, "Allow"))
+	AllowIP(loc, ip, mask);
+      else
+	DenyIP(loc, ip, mask);
+    }
+  }
+  else if (!strcasecmp(line, "AuthType"))
+  {
+   /*
+    * AuthType {none,basic,digest,basicdigest}
+    */
+
+    if (!strcasecmp(value, "none"))
+    {
+      loc->type  = AUTH_NONE;
+      loc->level = AUTH_ANON;
+    }
+    else if (!strcasecmp(value, "basic"))
+    {
+      loc->type = AUTH_BASIC;
+
+      if (loc->level == AUTH_ANON)
+	loc->level = AUTH_USER;
+    }
+    else if (!strcasecmp(value, "digest"))
+    {
+      loc->type = AUTH_DIGEST;
+
+      if (loc->level == AUTH_ANON)
+	loc->level = AUTH_USER;
+    }
+    else if (!strcasecmp(value, "basicdigest"))
+    {
+      loc->type = AUTH_BASICDIGEST;
+
+      if (loc->level == AUTH_ANON)
+	loc->level = AUTH_USER;
+    }
+    else
+    {
+      LogMessage(L_WARN, "Unknown authorization type %s on line %d.",
+	         value, linenum);
+      return (0);
+    }
+  }
+  else if (!strcasecmp(line, "AuthClass"))
+  {
+   /*
+    * AuthClass anonymous, user, system, group
+    */
+
+    if (!strcasecmp(value, "anonymous"))
+    {
+      loc->type  = AUTH_NONE;
+      loc->level = AUTH_ANON;
+    }
+    else if (!strcasecmp(value, "user"))
+      loc->level = AUTH_USER;
+    else if (!strcasecmp(value, "group"))
+      loc->level = AUTH_GROUP;
+    else if (!strcasecmp(value, "system"))
+    {
+      loc->level = AUTH_GROUP;
+
+      AddName(loc, "@SYSTEM");
+    }
+    else
+    {
+      LogMessage(L_WARN, "Unknown authorization class %s on line %d.",
+	         value, linenum);
+      return (0);
+    }
+  }
+  else if (!strcasecmp(line, "AuthGroupName"))
+    AddName(loc, value);
+  else if (!strcasecmp(line, "Require"))
+  {
+   /*
+    * Apache synonym for AuthClass and AuthGroupName...
+    *
+    * Get initial word:
+    *
+    *     Require valid-user
+    *     Require group names
+    *     Require user names
+    */
+
+    for (valptr = value; !isspace(*valptr & 255) && *valptr; valptr ++);
+
+    if (*valptr)
+      *valptr++ = '\0';
+
+    if (!strcasecmp(value, "valid-user") ||
+        !strcasecmp(value, "user"))
+      loc->level = AUTH_USER;
+    else if (!strcasecmp(value, "group"))
+      loc->level = AUTH_GROUP;
+    else
+    {
+      LogMessage(L_WARN, "Unknown Require type %s on line %d.",
+	         value, linenum);
+      return (0);
+    }
+
+   /*
+    * Get the list of names from the line...
+    */
+
+    for (value = valptr; *value;)
+    {
+      while (isspace(*value & 255))
+	value ++;
+
+      if (*value == '\"' || *value == '\'')
+      {
+       /*
+	* Grab quoted name...
+	*/
+
+        for (valptr = value + 1; *valptr != *value && *valptr; valptr ++);
+
+	value ++;
+      }
+      else
+      {
+       /*
+	* Grab literal name.
+	*/
+
+        for (valptr = value; !isspace(*valptr & 255) && *valptr; valptr ++);
+      }
+
+      if (*valptr)
+	*valptr++ = '\0';
+
+      AddName(loc, value);
+
+      for (value = valptr; isspace(*value & 255); value ++);
+    }
+  }
+  else if (!strcasecmp(line, "Satisfy"))
+  {
+    if (!strcasecmp(value, "all"))
+      loc->satisfy = AUTH_SATISFY_ALL;
+    else if (!strcasecmp(value, "any"))
+      loc->satisfy = AUTH_SATISFY_ANY;
+    else
+    {
+      LogMessage(L_WARN, "Unknown Satisfy value %s on line %d.", value,
+	         linenum);
+      return (0);
+    }
+  }
+  else
+    return (0);
+
+  return (1);
+}
+
+
+/*
  * 'read_configuration()' - Read a configuration file.
  */
 
@@ -1029,24 +1611,6 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 	           linenum);
         return (0);
       }
-    }
-    else if (!strcasecmp(line, "DefaultAuthType"))
-    {
-     /*
-      * DefaultAuthType {none,basic,digest,basicdigest}
-      */
-
-      if (!strcasecmp(value, "none"))
-	DefaultAuthType = AUTH_NONE;
-      else if (!strcasecmp(value, "basic"))
-        DefaultAuthType = AUTH_BASIC;
-      else if (!strcasecmp(value, "digest"))
-        DefaultAuthType = AUTH_DIGEST;
-      else if (!strcasecmp(value, "basicdigest"))
-        DefaultAuthType = AUTH_BASICDIGEST;
-      else
-        LogMessage(L_WARN, "Unknown authorization type %s on line %d.",
-	           value, linenum);
     }
     else if (!strcasecmp(line, "Port") || !strcasecmp(line, "Listen"))
     {
@@ -1824,8 +2388,6 @@ read_location(cups_file_t *fp,		/* I - Configuration file */
   char		line[HTTP_MAX_BUFFER],	/* Line buffer */
 		*value,			/* Value for directive */
 		*valptr;		/* Pointer into value */
-  unsigned	ip[4],			/* IP address components */
- 		mask[4];		/* IP netmask components */
 
 
   if ((parent = AddLocation(location)) == NULL)
@@ -1890,290 +2452,12 @@ read_location(cups_file_t *fp,		/* I - Configuration file */
     }
     else if (!strcasecmp(line, "</Limit>"))
       loc = parent;
-    else if (!strcasecmp(line, "Encryption"))
+    else if (!parse_aaa(loc, line, value, linenum))
     {
-     /*
-      * "Encryption xxx" - set required encryption level...
-      */
-
-      if (!strcasecmp(value, "never"))
-        loc->encryption = HTTP_ENCRYPT_NEVER;
-      else if (!strcasecmp(value, "always"))
-      {
-        LogMessage(L_ERROR, "Encryption value \"%s\" on line %d is invalid in this context. "
-	                    "Using \"required\" instead.", value, linenum);
-
-        loc->encryption = HTTP_ENCRYPT_REQUIRED;
-      }
-      else if (!strcasecmp(value, "required"))
-        loc->encryption = HTTP_ENCRYPT_REQUIRED;
-      else if (!strcasecmp(value, "ifrequested"))
-        loc->encryption = HTTP_ENCRYPT_IF_REQUESTED;
-      else
-        LogMessage(L_ERROR, "Unknown Encryption value %s on line %d.",
-	           value, linenum);
-    }
-    else if (!strcasecmp(line, "Order"))
-    {
-     /*
-      * "Order Deny,Allow" or "Order Allow,Deny"...
-      */
-
-      if (!strncasecmp(value, "deny", 4))
-        loc->order_type = AUTH_ALLOW;
-      else if (!strncasecmp(value, "allow", 5))
-        loc->order_type = AUTH_DENY;
-      else
-        LogMessage(L_ERROR, "Unknown Order value %s on line %d.",
-	           value, linenum);
-    }
-    else if (!strcasecmp(line, "Allow") || !strcasecmp(line, "Deny"))
-    {
-     /*
-      * Allow [From] host/ip...
-      * Deny [From] host/ip...
-      */
-
-      if (!strncasecmp(value, "from", 4))
-      {
-       /*
-        * Strip leading "from"...
-	*/
-
-	value += 4;
-
-	while (isspace(*value & 255))
-	  value ++;
-      }
-
-     /*
-      * Figure out what form the allow/deny address takes:
-      *
-      *    All
-      *    None
-      *    *.domain.com
-      *    .domain.com
-      *    host.domain.com
-      *    nnn.*
-      *    nnn.nnn.*
-      *    nnn.nnn.nnn.*
-      *    nnn.nnn.nnn.nnn
-      *    nnn.nnn.nnn.nnn/mm
-      *    nnn.nnn.nnn.nnn/mmm.mmm.mmm.mmm
-      */
-
-      if (!strcasecmp(value, "all"))
-      {
-       /*
-        * All hosts...
-	*/
-
-        if (!strcasecmp(line, "Allow"))
-	  AllowIP(loc, zeros, zeros);
-	else
-	  DenyIP(loc, zeros, zeros);
-      }
-      else if (!strcasecmp(value, "none"))
-      {
-       /*
-        * No hosts...
-	*/
-
-        if (!strcasecmp(line, "Allow"))
-	  AllowIP(loc, ones, zeros);
-	else
-	  DenyIP(loc, ones, zeros);
-      }
-      else if (value[0] == '*' || value[0] == '.' || !isdigit(value[0] & 255))
-      {
-       /*
-        * Host or domain name...
-	*/
-
-	if (value[0] == '*')
-	  value ++;
-
-        if (!strcasecmp(line, "Allow"))
-	  AllowHost(loc, value);
-	else
-	  DenyHost(loc, value);
-      }
-      else
-      {
-       /*
-        * One of many IP address forms...
-	*/
-
-        if (!get_addr_and_mask(value, ip, mask))
-	{
-          LogMessage(L_ERROR, "Bad netmask value %s on line %d.",
-	             value, linenum);
-	  break;
-	}
-
-        if (!strcasecmp(line, "Allow"))
-	  AllowIP(loc, ip, mask);
-	else
-	  DenyIP(loc, ip, mask);
-      }
-    }
-    else if (!strcasecmp(line, "AuthType"))
-    {
-     /*
-      * AuthType {none,basic,digest,basicdigest}
-      */
-
-      if (!strcasecmp(value, "none"))
-      {
-	loc->type  = AUTH_NONE;
-	loc->level = AUTH_ANON;
-      }
-      else if (!strcasecmp(value, "basic"))
-      {
-	loc->type = AUTH_BASIC;
-
-        if (loc->level == AUTH_ANON)
-	  loc->level = AUTH_USER;
-      }
-      else if (!strcasecmp(value, "digest"))
-      {
-	loc->type = AUTH_DIGEST;
-
-        if (loc->level == AUTH_ANON)
-	  loc->level = AUTH_USER;
-      }
-      else if (!strcasecmp(value, "basicdigest"))
-      {
-	loc->type = AUTH_BASICDIGEST;
-
-        if (loc->level == AUTH_ANON)
-	  loc->level = AUTH_USER;
-      }
-      else
-        LogMessage(L_WARN, "Unknown authorization type %s on line %d.",
-	           value, linenum);
-    }
-    else if (!strcasecmp(line, "AuthClass"))
-    {
-     /*
-      * AuthClass anonymous, user, system, group
-      */
-
-      if (!strcasecmp(value, "anonymous"))
-      {
-        loc->type  = AUTH_NONE;
-        loc->level = AUTH_ANON;
-      }
-      else if (!strcasecmp(value, "user"))
-        loc->level = AUTH_USER;
-      else if (!strcasecmp(value, "group"))
-        loc->level = AUTH_GROUP;
-      else if (!strcasecmp(value, "system"))
-      {
-        loc->level = AUTH_GROUP;
-
-        AddName(loc, "@SYSTEM");
-      }
-      else
-        LogMessage(L_WARN, "Unknown authorization class %s on line %d.",
-	           value, linenum);
-
-     /*
-      * Make sure that authentication is set to DefaultAuthType
-      * as needed...
-      */
-
-      if (loc->type == AUTH_NONE && strcasecmp(value, "anonymous"))
-        loc->type = DefaultAuthType;
-    }
-    else if (!strcasecmp(line, "AuthGroupName"))
-      AddName(loc, value);
-    else if (!strcasecmp(line, "Require"))
-    {
-     /*
-      * Apache synonym for AuthClass and AuthGroupName...
-      *
-      * Get initial word:
-      *
-      *     Require valid-user
-      *     Require group names
-      *     Require user names
-      */
-
-      for (valptr = value; !isspace(*valptr & 255) && *valptr; valptr ++);
-
-      if (*valptr)
-	*valptr++ = '\0';
-
-      if (!strcasecmp(value, "valid-user") ||
-          !strcasecmp(value, "user"))
-        loc->level = AUTH_USER;
-      else if (!strcasecmp(value, "group"))
-        loc->level = AUTH_GROUP;
-      else
-      {
-        LogMessage(L_WARN, "Unknown Require type %s on line %d.",
-	           value, linenum);
-	continue;
-      }
-
-     /*
-      * Get the list of names from the line...
-      */
-
-      for (value = valptr; *value;)
-      {
-        while (isspace(*value & 255))
-	  value ++;
-
-        if (*value == '\"' || *value == '\'')
-	{
-	 /*
-	  * Grab quoted name...
-	  */
-
-          for (valptr = value + 1; *valptr != *value && *valptr; valptr ++);
-
-	  value ++;
-	}
-	else
-	{
-	 /*
-	  * Grab literal name.
-	  */
-
-          for (valptr = value; !isspace(*valptr & 255) && *valptr; valptr ++);
-        }
-
-	if (*valptr)
-	  *valptr++ = '\0';
-
-        AddName(loc, value);
-
-        for (value = valptr; isspace(*value & 255); value ++);
-      }
-
-     /*
-      * Make sure that authentication is set to DefaultAuthType
-      * as needed...
-      */
-
-      if (loc->type == AUTH_NONE)
-        loc->type = DefaultAuthType;
-    }
-    else if (!strcasecmp(line, "Satisfy"))
-    {
-      if (!strcasecmp(value, "all"))
-        loc->satisfy = AUTH_SATISFY_ALL;
-      else if (!strcasecmp(value, "any"))
-        loc->satisfy = AUTH_SATISFY_ANY;
-      else
-        LogMessage(L_WARN, "Unknown Satisfy value %s on line %d.", value,
-	           linenum);
-    }
-    else
       LogMessage(L_ERROR, "Unknown Location directive %s on line %d.",
 	         line, linenum);
+      return (0);
+    }
   }
 
   LogMessage(L_ERROR, "Unexpected end-of-file at line %d while reading location!",
@@ -2192,21 +2476,22 @@ read_policy(cups_file_t *fp,		/* I - Configuration file */
             char        *policy,	/* I - Location name/path */
 	    int         linenum)	/* I - Current line number */
 {
-  int		i;			/* Looping var */
-  policy_t	*pol;			/* Policy */
-  policyop_t	*op;			/* Policy operation */
-  int		num_ops;		/* Number of IPP operations */
-  ipp_op_t	ops[100];		/* Operations */
-  char		line[HTTP_MAX_BUFFER],	/* Line buffer */
-		*value,			/* Value for directive */
-		*valptr;		/* Pointer into value */
+  int			i;		/* Looping var */
+  cupsd_policy_t	*pol;		/* Policy */
+  location_t		*op;		/* Policy operation */
+  int			num_ops;	/* Number of IPP operations */
+  ipp_op_t		ops[100];	/* Operations */
+  char			line[HTTP_MAX_BUFFER],
+					/* Line buffer */
+			*value,		/* Value for directive */
+			*valptr;	/* Pointer into value */
 
 
  /*
   * Create the policy...
   */
 
-  if ((pol = AddPolicy(policy)) == NULL)
+  if ((pol = cupsdAddPolicy(policy)) == NULL)
     return (0);
 
  /*
@@ -2253,7 +2538,7 @@ read_policy(cups_file_t *fp,		/* I - Configuration file */
 
         if (num_ops < (int)(sizeof(ops) / sizeof(ops[0])))
 	{
-	  if ((ops[num_ops] = get_operation(value)) == IPP_BAD_OPERATION)
+	  if ((ops[num_ops] = ippOpValue(value)) == IPP_BAD_OPERATION)
 	    LogMessage(L_ERROR, "Bad IPP operation name \"%s\" on line %d!",
 	               value, linenum);
           else
@@ -2280,7 +2565,7 @@ read_policy(cups_file_t *fp,		/* I - Configuration file */
       * Add a new policy for the first operation...
       */
 
-      op = AddPolicyOp(pol, NULL, ops[0]);
+      op = cupsdAddPolicyOp(pol, NULL, ops[0]);
     }
     else if (!strcasecmp(line, "</Limit>") && op)
     {
@@ -2295,470 +2580,34 @@ read_policy(cups_file_t *fp,		/* I - Configuration file */
 	*/
 
         for (i = 1; i < num_ops; i ++)
-	  AddPolicyOp(pol, op, ops[i]);
+	  cupsdAddPolicyOp(pol, op, ops[i]);
       }
 
       op = NULL;
     }
-    else if (!strcasecmp(line, "Authenticate") && op)
+    else if (!op)
     {
-     /*
-      * Authenticate boolean
-      */
-
-      if (!strcasecmp(value, "on") ||
-          !strcasecmp(value, "yes") ||
-          !strcasecmp(value, "true"))
-	op->authenticate = 1;
-      else if (!strcasecmp(value, "off") ||
-               !strcasecmp(value, "no") ||
-               !strcasecmp(value, "false"))
-	op->authenticate = 0;
+      LogMessage(L_ERROR, "Missing <Limit ops> directive before %s on line %d.",
+                 line, linenum);
+      return (0);
+    }
+    else if (!parse_aaa(op, line, value, linenum))
+    {
+      if (op)
+	LogMessage(L_ERROR, "Unknown Policy Limit directive %s on line %d.",
+	           line, linenum);
       else
-        LogMessage(L_ERROR, "Invalid Authenticate value \"%s\" on line %d!\n",
-	           value, linenum);
+	LogMessage(L_ERROR, "Unknown Policy directive %s on line %d.",
+	           line, linenum);
+
+      return (0);
     }
-    else if (!strcasecmp(line, "Order") && op)
-    {
-     /*
-      * "Order Deny,Allow" or "Order Allow,Deny"...
-      */
-
-      if (!strncasecmp(value, "deny", 4))
-        op->order_type = POLICY_ALLOW;
-      else if (!strncasecmp(value, "allow", 5))
-        op->order_type = POLICY_DENY;
-      else
-        LogMessage(L_ERROR, "Unknown Order value %s on line %d.",
-	           value, linenum);
-    }
-    else if ((!strcasecmp(line, "Allow") || !strcasecmp(line, "Deny")) && op)
-    {
-     /*
-      * Allow line, @group, @OWNER
-      * Deny line, @group, @OWNER
-      */
-
-      while (*value)
-      {
-        while (isspace(*value & 255))
-	  value ++;
-
-        if (*value == '\"' || *value == '\'')
-	{
-	 /*
-	  * Grab quoted name...
-	  */
-
-          for (valptr = value + 1; *valptr != *value && *valptr; valptr ++);
-
-	  value ++;
-	}
-	else
-	{
-	 /*
-	  * Grab literal name.
-	  */
-
-          for (valptr = value; !isspace(*valptr & 255) && *valptr; valptr ++);
-        }
-
-	if (*valptr)
-	  *valptr++ = '\0';
-
-        if (!strcasecmp(line, "Allow"))
-          AddPolicyOpName(op, POLICY_ALLOW, value);
-	else
-          AddPolicyOpName(op, POLICY_DENY, value);
-
-        for (value = valptr; isspace(*value & 255); value ++);
-      }
-    }
-    else if (op)
-      LogMessage(L_ERROR, "Unknown Policy Limit directive %s on line %d.",
-	         line, linenum);
-    else
-      LogMessage(L_ERROR, "Unknown Policy directive %s on line %d.",
-	         line, linenum);
   }
 
   LogMessage(L_ERROR, "Unexpected end-of-file at line %d while reading policy \"%s\"!",
              linenum, policy);
 
   return (0);
-}
-
-
-/*
- * 'get_address()' - Get an address + port number from a line.
- */
-
-static int				/* O - 1 if address good, 0 if bad */
-get_address(const char  *value,		/* I - Value string */
-            unsigned    defaddress,	/* I - Default address */
-	    int         defport,	/* I - Default port */
-	    int         deffamily,	/* I - Default family */
-            http_addr_t *address)	/* O - Socket address */
-{
-  char			hostname[256],	/* Hostname or IP */
-			portname[256];	/* Port number or name */
-  struct hostent	*host;		/* Host address */
-  struct servent	*port;		/* Port number */  
-
-
- /*
-  * Initialize the socket address to the defaults...
-  */
-
-  memset(address, 0, sizeof(http_addr_t));
-
-#ifdef AF_INET6
-  if (deffamily == AF_INET6)
-  {
-    address->ipv6.sin6_family            = AF_INET6;
-    address->ipv6.sin6_addr.s6_addr32[0] = htonl(defaddress);
-    address->ipv6.sin6_addr.s6_addr32[1] = htonl(defaddress);
-    address->ipv6.sin6_addr.s6_addr32[2] = htonl(defaddress);
-    address->ipv6.sin6_addr.s6_addr32[3] = htonl(defaddress);
-    address->ipv6.sin6_port              = htons(defport);
-  }
-  else
-#endif /* AF_INET6 */
-  {
-    address->ipv4.sin_family      = AF_INET;
-    address->ipv4.sin_addr.s_addr = htonl(defaddress);
-    address->ipv4.sin_port        = htons(defport);
-  }
-
-#ifdef AF_LOCAL
- /*
-  * If the address starts with a "/", it is a domain socket...
-  */
-
-  if (*value == '/')
-  {
-    if (strlen(value) >= sizeof(address->un.sun_path))
-    {
-      LogMessage(L_ERROR, "Domain socket name \"%s\" too long!", value);
-      return (0);
-    }
-
-    address->un.sun_family = AF_LOCAL;
-    strcpy(address->un.sun_path, value);
-
-    return (1);
-  }
-#endif /* AF_LOCAL */
-
- /*
-  * Try to grab a hostname and port number...
-  */
-
-  switch (sscanf(value, "%255[^:]:%255s", hostname, portname))
-  {
-    case 1 :
-        if (strchr(hostname, '.') == NULL && defaddress == INADDR_ANY)
-	{
-	 /*
-	  * Hostname is a port number...
-	  */
-
-	  strlcpy(portname, hostname, sizeof(portname));
-	  hostname[0] = '\0';
-	}
-        else
-          portname[0] = '\0';
-        break;
-
-    case 2 :
-        break;
-
-    default :
-	LogMessage(L_ERROR, "Unable to decode address \"%s\"!", value);
-        return (0);
-  }
-
- /*
-  * Decode the hostname and port number as needed...
-  */
-
-  if (hostname[0] && strcmp(hostname, "*"))
-  {
-    if ((host = httpGetHostByName(hostname)) == NULL)
-    {
-      LogMessage(L_ERROR, "httpGetHostByName(\"%s\") failed - %s!", hostname,
-                 hstrerror(h_errno));
-      return (0);
-    }
-
-    httpAddrLoad(host, defport, 0, address);
-  }
-
-  if (portname[0] != '\0')
-  {
-    if (isdigit(portname[0] & 255))
-    {
-#ifdef AF_INET6
-      if (address->addr.sa_family == AF_INET6)
-        address->ipv6.sin6_port = htons(atoi(portname));
-      else
-#endif /* AF_INET6 */
-      address->ipv4.sin_port = htons(atoi(portname));
-    }
-    else
-    {
-      if ((port = getservbyname(portname, NULL)) == NULL)
-      {
-        LogMessage(L_ERROR, "getservbyname(\"%s\") failed - %s!", portname,
-                   strerror(errno));
-        return (0);
-      }
-      else
-      {
-#ifdef AF_INET6
-	if (address->addr.sa_family == AF_INET6)
-          address->ipv6.sin6_port = htons(port->s_port);
-	else
-#endif /* AF_INET6 */
-	address->ipv4.sin_port = htons(port->s_port);
-      }
-    }
-  }
-
-  return (1);
-}
-
-
-/*
- * 'get_addr_and_mask()' - Get an IP address and netmask.
- */
-
-static int				/* O - 1 on success, 0 on failure */
-get_addr_and_mask(const char *value,	/* I - String from config file */
-                  unsigned   *ip,	/* O - Address value */
-		  unsigned   *mask)	/* O - Mask value */
-{
-  int		i,			/* Looping var */
-		family,			/* Address family */
-		ipcount;		/* Count of fields in address */
-  static unsigned netmasks[4][4] =	/* Standard netmasks... */
-  {
-    { 0xffffffff, 0x00000000, 0x00000000, 0x00000000 },
-    { 0xffffffff, 0xffffffff, 0x00000000, 0x00000000 },
-    { 0xffffffff, 0xffffffff, 0xffffffff, 0x00000000 },
-    { 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff }
-  };
-
-
- /*
-  * Get the address...
-  */
-
-  memset(ip, 0, sizeof(unsigned) * 4);
-  family  = AF_INET;
-  ipcount = sscanf(value, "%u.%u.%u.%u", ip + 0, ip + 1, ip + 2, ip + 3);
-
-#ifdef AF_INET6
- /*
-  * See if we have any values > 255; if so, this is an IPv6 address only.
-  */
-
-  for (i = 0; i < ipcount; i ++)
-    if (ip[0] > 255)
-    {
-      family = AF_INET6;
-      break;
-    }
-#endif /* AF_INET6 */
-
-  if ((value = strchr(value, '/')) != NULL)
-  {
-   /*
-    * Get the netmask value(s)...
-    */
-
-    value ++;
-    memset(mask, 0, sizeof(unsigned) * 4);
-    switch (sscanf(value, "%u.%u.%u.%u", mask + 0, mask + 1,
-	           mask + 2, mask + 3))
-    {
-      case 1 :
-#ifdef AF_INET6
-          if (mask[0] >= 32)
-	    family = AF_INET6;
-
-          if (family == AF_INET6)
-	  {
-  	    i = 128 - mask[0];
-
-	    if (i <= 96)
-	      mask[0] = 0xffffffff;
-	    else
-	      mask[0] = (0xffffffff << (128 - mask[0])) & 0xffffffff;
-
-	    if (i <= 64)
-	      mask[1] = 0xffffffff;
-	    else if (i >= 96)
-	      mask[1] = 0;
-	    else
-	      mask[1] = (0xffffffff << (96 - mask[0])) & 0xffffffff;
-
-	    if (i <= 32)
-	      mask[1] = 0xffffffff;
-	    else if (i >= 64)
-	      mask[1] = 0;
-	    else
-	      mask[1] = (0xffffffff << (64 - mask[0])) & 0xffffffff;
-
-	    if (i >= 32)
-	      mask[1] = 0;
-	    else
-	      mask[1] = (0xffffffff << (32 - mask[0])) & 0xffffffff;
-          }
-	  else
-#endif /* AF_INET6 */
-	  {
-  	    i = 32 - mask[0];
-
-	    if (i <= 24)
-	      mask[0] = 0xffffffff;
-	    else
-	      mask[0] = (0xffffffff << (32 - mask[0])) & 0xffffffff;
-
-	    if (i <= 16)
-	      mask[1] = 0xffffffff;
-	    else if (i >= 24)
-	      mask[1] = 0;
-	    else
-	      mask[1] = (0xffffffff << (24 - mask[0])) & 0xffffffff;
-
-	    if (i <= 8)
-	      mask[1] = 0xffffffff;
-	    else if (i >= 16)
-	      mask[1] = 0;
-	    else
-	      mask[1] = (0xffffffff << (16 - mask[0])) & 0xffffffff;
-
-	    if (i >= 8)
-	      mask[1] = 0;
-	    else
-	      mask[1] = (0xffffffff << (8 - mask[0])) & 0xffffffff;
-          }
-
-      case 4 :
-	  break;
-
-      default :
-          return (0);
-    }
-  }
-  else
-    memcpy(mask, netmasks[ipcount - 1], sizeof(unsigned) * 4);
-
- /*
-  * Check for a valid netmask; no fallback like in CUPS 1.1.x!
-  */
-
-  if ((ip[0] & ~mask[0]) != 0 ||
-      (ip[1] & ~mask[1]) != 0 ||
-      (ip[2] & ~mask[2]) != 0 ||
-      (ip[3] & ~mask[3]) != 0)
-    return (0);
-
-  return (1);
-}
-
-
-/*
- * 'get_operation()' - Get an IPP opcode from an operation name...
- */
-
-static ipp_op_t				/* O - Operation code or -1 on error */
-get_operation(const char *name)		/* I - Operating name */
-{
-  int		i;			/* Looping var */
-  static const char * const ipp_ops[] =	/* List of standard operations */
-		{
-		  /* 0x0000 */ "all",
-		  /* 0x0001 */ "",
-		  /* 0x0002 */ "print-job",
-		  /* 0x0003 */ "print-uri",
-		  /* 0x0004 */ "validate-job",
-		  /* 0x0005 */ "create-job",
-		  /* 0x0006 */ "send-document",
-		  /* 0x0007 */ "send-uri",
-		  /* 0x0008 */ "cancel-job",
-		  /* 0x0009 */ "get-job-attributes",
-		  /* 0x000a */ "get-jobs",
-		  /* 0x000b */ "get-printer-attributes",
-		  /* 0x000c */ "hold-job",
-		  /* 0x000d */ "release-job",
-		  /* 0x000e */ "restart-job",
-		  /* 0x000f */ "",
-		  /* 0x0010 */ "pause-printer",
-		  /* 0x0011 */ "resume-printer",
-		  /* 0x0012 */ "purge-jobs",
-		  /* 0x0013 */ "set-printer-attributes",
-		  /* 0x0014 */ "set-job-attributes",
-		  /* 0x0015 */ "get-printer-supported-values",
-		  /* 0x0016 */ "create-printer-subscription",
-		  /* 0x0017 */ "create-job-subscription",
-		  /* 0x0018 */ "get-subscription-attributes",
-		  /* 0x0019 */ "get-subscriptions",
-		  /* 0x001a */ "renew-subscription",
-		  /* 0x001b */ "cancel-subscription",
-		  /* 0x001c */ "get-notifications",
-		  /* 0x001d */ "send-notifications",
-		  /* 0x001e */ "",
-		  /* 0x001f */ "",
-		  /* 0x0020 */ "",
-		  /* 0x0021 */ "get-print-support-files",
-		  /* 0x0022 */ "enable-printer",
-		  /* 0x0023 */ "disable-printer",
-		  /* 0x0024 */ "pause-printer-after-current-job",
-		  /* 0x0025 */ "hold-new-jobs",
-		  /* 0x0026 */ "release-held-new-jobs",
-		  /* 0x0027 */ "deactivate-printer",
-		  /* 0x0028 */ "activate-printer",
-		  /* 0x0029 */ "restart-printer",
-		  /* 0x002a */ "shutdown-printer",
-		  /* 0x002b */ "startup-printer",
-		  /* 0x002c */ "reprocess-job",
-		  /* 0x002d */ "cancel-current-job",
-		  /* 0x002e */ "suspend-current-job",
-		  /* 0x002f */ "resume-job",
-		  /* 0x0030 */ "promote-job",
-		  /* 0x0031 */ "schedule-job-after"
-		},
-		*cups_ops[] =		/* List of CUPS operations */
-		{
-		  /* 0x4001 */ "cups-get-default",
-		  /* 0x4002 */ "cups-get-printers",
-		  /* 0x4003 */ "cups-add-printer",
-		  /* 0x4004 */ "cups-delete-printer",
-		  /* 0x4005 */ "cups-get-classes",
-		  /* 0x4006 */ "cups-add-class",
-		  /* 0x4007 */ "cups-delete-class",
-		  /* 0x4008 */ "cups-accept-jobs",
-		  /* 0x4009 */ "cups-reject-jobs",
-		  /* 0x400a */ "cups-set-default",
-		  /* 0x400b */ "cups-get-devices",
-		  /* 0x400c */ "cups-get-ppds",
-		  /* 0x400d */ "cups-move-job",
-		  /* 0x400e */ "cups-add-device",
-		  /* 0x400f */ "cups-delete-device"
-		};
-
-
-  for (i = 0; i < (int)(sizeof(ipp_ops) / sizeof(ipp_ops[0])); i ++)
-    if (!strcasecmp(name, ipp_ops[i]))
-      return ((ipp_op_t)i);
-
-  for (i = 0; i < (int)(sizeof(cups_ops) / sizeof(cups_ops[0])); i ++)
-    if (!strcasecmp(name, cups_ops[i]))
-      return ((ipp_op_t)(i + 0x4001));
-
-  return ((ipp_op_t)-1);
 }
 
 

@@ -23,6 +23,14 @@
  *
  * Contents:
  *
+ *   cupsdAddPolicy()         - Add a policy to the system.
+ *   cupsdAddPolicyOp()       - Add an operation to a policy.
+ *   cupsdCheckPolicy()       - Check the IPP operation and username against
+ *                              a policy.
+ *   cupsdDeleteAllPolicies() - Delete all policies in memory.
+ *   cupsdFindPolicy()        - Find a named policy.
+ *   cupsdFindPolicyOp()      - Find a policy operation.
+ *   check_op()               - Check the current operation.
  */
 
 /*
@@ -40,7 +48,7 @@
  * Local functions...
  */
 
-static int	check_op(policyop_t *po, int allow_deny, const char *name,
+static int	check_op(location_t *po, int allow_deny, const char *name,
 		         const char *owner);
 
 
@@ -48,20 +56,20 @@ static int	check_op(policyop_t *po, int allow_deny, const char *name,
  * 'AddPolicy()' - Add a policy to the system.
  */
 
-policy_t *				/* O - Policy */
-AddPolicy(const char *policy)		/* I - Name of policy */
+cupsd_policy_t *			/* O - Policy */
+cupsdAddPolicy(const char *policy)	/* I - Name of policy */
 {
-  policy_t	*temp,			/* Pointer to policy */
-		**tempa;		/* Pointer to policy array */
+  cupsd_policy_t	*temp,		/* Pointer to policy */
+			**tempa;	/* Pointer to policy array */
 
 
   if (policy == NULL)
     return (NULL);
 
   if (NumPolicies == 0)
-    tempa = malloc(sizeof(policy_t *));
+    tempa = malloc(sizeof(cupsd_policy_t *));
   else
-    tempa = realloc(Policies, sizeof(policy_t *) * (NumPolicies + 1));
+    tempa = realloc(Policies, sizeof(cupsd_policy_t *) * (NumPolicies + 1));
 
   if (tempa == NULL)
     return (NULL);
@@ -69,7 +77,7 @@ AddPolicy(const char *policy)		/* I - Name of policy */
   Policies = tempa;
   tempa    += NumPolicies;
 
-  if ((temp = calloc(1, sizeof(policy_t))) != NULL)
+  if ((temp = calloc(1, sizeof(cupsd_policy_t))) != NULL)
   {
     temp->name = strdup(policy);
     *tempa     = temp;
@@ -82,39 +90,41 @@ AddPolicy(const char *policy)		/* I - Name of policy */
 
 
 /*
- * 'AddPolicyOp()' - Add an operation to a policy.
+ * 'cupsdAddPolicyOp()' - Add an operation to a policy.
  */
 
-policyop_t *				/* O - New policy operation */
-AddPolicyOp(policy_t   *p,		/* I - Policy */
-            policyop_t *po,		/* I - Policy operation to copy */
-            ipp_op_t   op)		/* I - IPP operation code */
+location_t *				/* O - New policy operation */
+cupsdAddPolicyOp(cupsd_policy_t *p,	/* I - Policy */
+                 location_t     *po,	/* I - Policy operation to copy */
+                 ipp_op_t       op)	/* I - IPP operation code */
 {
   int		i;			/* Looping var */
-  policyop_t	*temp,			/* New policy operation */
+  location_t	*temp,			/* New policy operation */
 		**tempa;		/* New policy operation array */
+  char		name[1024];		/* Interface name */
 
 
   if (p == NULL)
     return (NULL);
 
   if (p->num_ops == 0)
-    tempa = malloc(sizeof(policyop_t *));
+    tempa = malloc(sizeof(location_t *));
   else
-    tempa = realloc(p->ops, sizeof(policyop_t *) * (p->num_ops + 1));
+    tempa = realloc(p->ops, sizeof(location_t *) * (p->num_ops + 1));
 
   if (tempa == NULL)
     return (NULL);
 
   p->ops = tempa;
 
-  if ((temp = calloc(1, sizeof(policyop_t))) != NULL)
+  if ((temp = calloc(1, sizeof(location_t))) != NULL)
   {
     p->ops            = tempa;
     tempa[p->num_ops] = temp;
     p->num_ops ++;
 
-    temp->op = op;
+    temp->op    = op;
+    temp->limit = AUTH_LIMIT_IPP;
 
     if (po)
     {
@@ -122,10 +132,52 @@ AddPolicyOp(policy_t   *p,		/* I - Policy */
       * Copy the specified policy to the new one...
       */
 
-      temp->order_type   = po->order_type;
-      temp->authenticate = po->authenticate;
+      temp->order_type = po->order_type;
+      temp->type       = po->order_type;
+      temp->level      = po->level;
+      temp->satisfy    = po->satisfy;
+      temp->encryption = po->encryption;
+
       for (i = 0; i < po->num_names; i ++)
-        AddPolicyOpName(temp, po->names[i].allow_deny, po->names[i].name);
+        AddName(temp, po->names[i]);
+
+      for (i = 0; i < po->num_allow; i ++)
+        switch (po->allow[i].type)
+	{
+	  case AUTH_IP :
+	      AllowIP(temp, po->allow[i].mask.ip.address,
+	              po->allow[i].mask.ip.netmask);
+	      break;
+
+          case AUTH_INTERFACE :
+	      snprintf(name, sizeof(name), "@IF(%s)",
+	               po->allow[i].mask.name.name);
+              AllowHost(temp, name);
+	      break;
+
+          default :
+              AllowHost(temp, po->allow[i].mask.name.name);
+	      break;
+        }
+
+      for (i = 0; i < po->num_deny; i ++)
+        switch (po->deny[i].type)
+	{
+	  case AUTH_IP :
+	      DenyIP(temp, po->deny[i].mask.ip.address,
+	              po->deny[i].mask.ip.netmask);
+	      break;
+
+          case AUTH_INTERFACE :
+	      snprintf(name, sizeof(name), "@IF(%s)",
+	               po->deny[i].mask.name.name);
+              DenyHost(temp, name);
+	      break;
+
+          default :
+              DenyHost(temp, po->deny[i].mask.name.name);
+	      break;
+        }
     }
   }
 
@@ -134,52 +186,20 @@ AddPolicyOp(policy_t   *p,		/* I - Policy */
 
 
 /*
- * 'AddPolicyOpName()' - Add a name to a policy operation.
- */
-
-void
-AddPolicyOpName(policyop_t *po,		/* I - Policy operation */
-                int        allow_deny,	/* I - POLICY_ALLOW or POLICY_DENY */
-                const char *name)	/* I - Name to add */
-{
-  policyname_t	*temp;			/* New name array */
-
-
-  if (po == NULL || name == NULL)
-    return;
-
-  if (po->num_names == 0)
-    temp = malloc(sizeof(policyname_t));
-  else
-    temp = realloc(po->names, sizeof(policyname_t) * (po->num_names + 1));
-
-  if (temp != NULL)
-  {
-    po->names = temp;
-    temp      += po->num_names;
-    po->num_names ++;
-
-    temp->allow_deny = allow_deny;
-    temp->name       = strdup(name);
-  }
-}
-
-
-/*
- * 'CheckPolicy()' - Check the IPP operation and username against a policy.
+ * 'cupsdCheckPolicy()' - Check the IPP operation and username against a policy.
  */
 
 int					/* I - 1 if OK, 0 otherwise */
-CheckPolicy(policy_t   *p,		/* I - Policy */
-            client_t   *con,		/* I - Client connection */
-	    const char *owner)		/* I - Owner of object */
+cupsdCheckPolicy(cupsd_policy_t *p,	/* I - Policy */
+                 client_t       *con,	/* I - Client connection */
+	         const char     *owner)	/* I - Owner of object */
 {
   ipp_op_t	op;			/* IPP operation */
   const char	*name;			/* Username */
   int		authenticated;		/* Authenticated? */
   ipp_attribute_t *attr;		/* IPP attribute */
   int		status;			/* Status */
-  policyop_t	*po;			/* Current policy operation */
+  location_t	*po;			/* Current policy operation */
 
 
  /*
@@ -223,7 +243,7 @@ CheckPolicy(policy_t   *p,		/* I - Policy */
   * Find a match for the operation...
   */
 
-  if ((po = FindPolicyOp(p, op)) == NULL)
+  if ((po = cupsdFindPolicyOp(p, op)) == NULL)
   {
     LogMessage(L_DEBUG2, "CheckPolicy: No matching operation, returning 0!");
     return (0);
@@ -233,7 +253,7 @@ CheckPolicy(policy_t   *p,		/* I - Policy */
   * Check the policy against the current user, etc.
   */
 
-  if (po->authenticate && !authenticated)
+  if (po->type && !authenticated)
   {
     LogMessage(L_DEBUG2, "CheckPolicy: Operation requires authentication, returning 0!");
     return (0);
@@ -268,16 +288,15 @@ CheckPolicy(policy_t   *p,		/* I - Policy */
 
 
 /*
- * 'DeleteAllPolicies()' - Delete all policies in memory.
+ * 'cupsdDeleteAllPolicies()' - Delete all policies in memory.
  */
 
 void
-DeleteAllPolicies(void)
+cupsdDeleteAllPolicies(void)
 {
-  int		i, j, k;		/* Looping vars */
-  policy_t	**p;			/* Current policy */
-  policyop_t	**po;			/* Current policy operation */
-  policyname_t	*pn;			/* Current policy name */
+  int			i, j;		/* Looping vars */
+  cupsd_policy_t	**p;		/* Current policy */
+  location_t		**po;		/* Current policy op */
 
 
   if (NumPolicies == 0)
@@ -287,12 +306,7 @@ DeleteAllPolicies(void)
   {
     for (j = (*p)->num_ops, po = (*p)->ops; j > 0; j --, po ++)
     {
-      for (k = (*po)->num_names, pn = (*po)->names; k > 0; k --, pn ++)
-        free(pn->name);
-
-      if ((*po)->num_names > 0)
-        free((*po)->names);
-
+      cupsdDeleteLocation(*po);
       free(*po);
     }
 
@@ -310,14 +324,14 @@ DeleteAllPolicies(void)
 
 
 /*
- * 'FindPolicy()' - Find a named policy.
+ * 'cupsdFindPolicy()' - Find a named policy.
  */
 
-policy_t *				/* O - Policy */
-FindPolicy(const char *policy)		/* I - Name of policy */
+cupsd_policy_t *			/* O - Policy */
+cupsdFindPolicy(const char *policy)	/* I - Name of policy */
 {
   int		i;			/* Looping var */
-  policy_t	**p;			/* Current policy */
+  cupsd_policy_t	**p;		/* Current policy */
 
 
  /*
@@ -332,7 +346,7 @@ FindPolicy(const char *policy)		/* I - Name of policy */
   */
 
   for (i = NumPolicies, p = Policies; i > 0; i --, p ++)
-    if (strcasecmp(policy, (*p)->name) == 0)
+    if (!strcasecmp(policy, (*p)->name))
       return (*p);
 
   return (NULL);
@@ -340,15 +354,15 @@ FindPolicy(const char *policy)		/* I - Name of policy */
 
 
 /*
- * 'FindPolicyOp()' - Find a policy operation.
+ * 'cupsdFindPolicyOp()' - Find a policy operation.
  */
 
-policyop_t *				/* O - Policy operation */
-FindPolicyOp(policy_t *p,		/* I - Policy */
-             ipp_op_t op)		/* I - IPP operation */
+location_t *				/* O - Policy operation */
+cupsdFindPolicyOp(cupsd_policy_t *p,	/* I - Policy */
+                  ipp_op_t       op)	/* I - IPP operation */
 {
   int		i;			/* Looping var */
-  policyop_t	**po;			/* Current policy operation */
+  location_t	**po;			/* Current policy operation */
 
 
  /*
@@ -374,12 +388,13 @@ FindPolicyOp(policy_t *p,		/* I - Policy */
 }
 
 
+#if 0
 /*
  * 'check_op()' - Check the current operation.
  */
 
 static int				/* O - 1 if match, 0 if not */
-check_op(policyop_t *po,		/* I - Policy operation */
+check_op(location_t *po,		/* I - Policy operation */
          int        allow_deny,		/* I - POLICY_ALLOW or POLICY_DENY */
          const char *name,		/* I - User name */
 	 const char *owner)		/* I - Owner name */
@@ -419,7 +434,7 @@ check_op(policyop_t *po,		/* I - Policy operation */
 
   return (0);
 }
-
+#endif /* 0 */
 
 /*
  * End of "$Id$".

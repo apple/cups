@@ -23,47 +23,17 @@
  *         WWW: http://www.cups.org
  */
 
-/*
- * "Any" operation code...
- */
-
-#define IPP_ANY_OPERATION	(ipp_op_t)0
-#define IPP_BAD_OPERATION	(ipp_op_t)-1
-
 
 /*
- * Access levels...
+ * Policy structure...
  */
-
-#define POLICY_ALLOW		0	/* Allow access */
-#define POLICY_DENY		1	/* Deny access */
-
-
-/*
- * IPP operation policy structures...
- */
-
-typedef struct
-{
-  int		allow_deny;		/* POLICY_ALLOW or POLICY_DENY */
-  char		*name;			/* Name to allow or deny */
-} policyname_t;
-
-typedef struct
-{
-  ipp_op_t	op;			/* Operation */
-  int		order_type,		/* Default allow/deny */
-		authenticate,		/* Authentication required? */
-		num_names;		/* Number of names */
-  policyname_t	*names;			/* Names */
-} policyop_t;
 
 typedef struct
 {
   char		*name;			/* Policy name */
   int		num_ops;		/* Number of operations */
-  policyop_t	**ops;			/* Operations */
-} policy_t;
+  location_t	**ops;			/* Operations */
+} cupsd_policy_t;
 
 
 /*
@@ -72,7 +42,7 @@ typedef struct
 
 VAR int			NumPolicies	VALUE(0);
 					/* Number of policies */
-VAR policy_t		**Policies	VALUE(NULL);
+VAR cupsd_policy_t	**Policies	VALUE(NULL);
 					/* Policies */
 
 
@@ -80,15 +50,14 @@ VAR policy_t		**Policies	VALUE(NULL);
  * Prototypes...
  */
 
-extern policy_t		*AddPolicy(const char *policy);
-extern policyop_t	*AddPolicyOp(policy_t *p, policyop_t *po, ipp_op_t op);
-extern void		AddPolicyOpName(policyop_t *po, int allow_deny,
-			                const char *name);
-extern int		CheckPolicy(policy_t *p, client_t *con,
-				    const char *owner);
-extern void		DeleteAllPolicies(void);
-extern policy_t		*FindPolicy(const char *policy);
-extern policyop_t	*FindPolicyOp(policy_t *p, ipp_op_t op);
+extern cupsd_policy_t	*cupsdAddPolicy(const char *policy);
+extern location_t	*cupsdAddPolicyOp(cupsd_policy_t *p, location_t *po,
+			                  ipp_op_t op);
+extern int		cupsdCheckPolicy(cupsd_policy_t *p, client_t *con,
+				         const char *owner);
+extern void		cupsdDeleteAllPolicies(void);
+extern cupsd_policy_t	*cupsdFindPolicy(const char *policy);
+extern location_t	*cupsdFindPolicyOp(cupsd_policy_t *p, ipp_op_t op);
 
 
 /*
