@@ -258,22 +258,12 @@ ErrorLog /tmp/$user/log/error_log
 PageLog /tmp/$user/log/page_log
 LogLevel debug
 PreserveJobHistory Yes
-<Location />
-Order deny,allow
-Deny from all
-Allow from 127.0.0.1
-$encryption
-</Location>
-<Location /admin>
-Order deny,allow
-Deny from all
-Allow from 127.0.0.1
-Require valid-user
-$encryption
-</Location>
 <Policy default>
 <Limit All>
 Order Deny,Allow
+Deny from all
+Allow from 127.0.0.1
+$encryption
 </Limit>
 </Policy>
 EOF
