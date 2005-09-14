@@ -2538,7 +2538,9 @@ read_policy(cups_file_t *fp,		/* I - Configuration file */
 
         if (num_ops < (int)(sizeof(ops) / sizeof(ops[0])))
 	{
-	  if ((ops[num_ops] = ippOpValue(value)) == IPP_BAD_OPERATION)
+	  if (!strcasecmp(value, "All"))
+	    ops[num_ops] = IPP_ANY_OPERATION;
+	  else if ((ops[num_ops] = ippOpValue(value)) == IPP_BAD_OPERATION)
 	    LogMessage(L_ERROR, "Bad IPP operation name \"%s\" on line %d!",
 	               value, linenum);
           else
