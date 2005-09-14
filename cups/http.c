@@ -52,6 +52,7 @@
  *   httpGets()           - Get a line of text from a HTTP connection.
  *   httpPrintf()         - Print a formatted string to a HTTP connection.
  *   httpGetDateString()  - Get a formatted date/time string from a time value.
+ *   httpGetDateString2() - Get a formatted date/time string from a time value.
  *   httpGetDateTime()    - Get a time value from a formatted date/time string.
  *   httpUpdate()         - Update the current HTTP state for incoming data.
  *   httpDecode64()       - Base64-decode a string.
@@ -1501,22 +1502,39 @@ httpPrintf(http_t     *http,		/* I - HTTP data */
 
 /*
  * 'httpGetDateString()' - Get a formatted date/time string from a time value.
+ *
+ * This function is not thread-safe and is therefore deprecated.
  */
 
 const char *				/* O - Date/time string */
 httpGetDateString(time_t t)		/* I - UNIX time */
 {
-  struct tm	*tdate;			/* UNIX date/time data */
   static char	datetime[256];		/* Date/time string */
 
 
+  return (httpGetDateString2(t, datetime, sizeof(datetime)));
+}
+
+
+/*
+ * 'httpGetDateString2()' - Get a formatted date/time string from a time value.
+ */
+
+const char *				/* O - Date/time string */
+httpGetDateString2(time_t t,		/* I - UNIX time */
+                   char   *s,		/* I - String buffer */
+		   int    slen)		/* I - Size of string buffer */
+{
+  struct tm	*tdate;			/* UNIX date/time data */
+
+
   tdate = gmtime(&t);
-  snprintf(datetime, sizeof(datetime), "%s, %02d %s %d %02d:%02d:%02d GMT",
+  snprintf(s, slen, "%s, %02d %s %d %02d:%02d:%02d GMT",
            http_days[tdate->tm_wday], tdate->tm_mday,
 	   http_months[tdate->tm_mon], tdate->tm_year + 1900,
 	   tdate->tm_hour, tdate->tm_min, tdate->tm_sec);
 
-  return (datetime);
+  return (s);
 }
 
 
