@@ -42,7 +42,7 @@
  *                           resource.
  *   FindLocation()        - Find the named location.
  *   GetMD5Passwd()        - Get an MD5 password.
- *   IsAuthorized()        - Check to see if the user is authorized...
+ *   cupsdIsAuthorized()   - Check to see if the user is authorized...
  *   add_allow()           - Add an allow mask to the location.
  *   add_deny()            - Add a deny mask to the location.
  *   cups_crypt()          - Encrypt the password using the DES or MD5
@@ -1036,7 +1036,7 @@ cupsdIsAuthorized(client_t   *con,	/* I - Connection */
 		};
 
 
-  LogMessage(L_DEBUG2, "cupsdIsAuthorized: con->uri = \"%s\"", con->uri);
+  LogMessage(L_DEBUG2, "cupsdIsAuthorized: con->uri=\"%s\"", con->uri);
 
  /*
   * If there is no "best" authentication rule for this request, then
@@ -1053,6 +1053,13 @@ cupsdIsAuthorized(client_t   *con,	/* I - Connection */
   }
 
   best = con->best;
+
+  LogMessage(L_DEBUG2, "cupsdIsAuthorized: level=%d, type=%d, satisfy=%d, num_names=%d",
+             best->level, best->type, best->satisfy, best->num_names);
+
+  if (best->limit == AUTH_LIMIT_IPP)
+    LogMessage(L_DEBUG2, "cupsdIsAuthorized: op=%x(%s)", best->op,
+               ippOpString(best->op));
 
  /*
   * Check host/ip-based accesses...
@@ -1146,8 +1153,7 @@ cupsdIsAuthorized(client_t   *con,	/* I - Connection */
     }
   }
 
-  LogMessage(L_DEBUG2, "cupsdIsAuthorized: auth = %d, satisfy=%d...",
-             auth, best->satisfy);
+  LogMessage(L_DEBUG2, "cupsdIsAuthorized: auth=%d...", auth);
 
   if (auth == AUTH_DENY && best->satisfy == AUTH_SATISFY_ALL)
     return (HTTP_FORBIDDEN);
@@ -1168,7 +1174,12 @@ cupsdIsAuthorized(client_t   *con,	/* I - Connection */
   * Now see what access level is required...
   */
 
-  if (best->level == AUTH_ANON)		/* Anonymous access - allow it */
+  if (best->level == AUTH_ANON ||	/* Anonymous access - allow it */
+      (best->type == AUTH_NONE && best->num_names == 0))
+    return (HTTP_OK);
+
+  if (best->type == AUTH_NONE &&
+      ippFindAttribute(con->request, "requesting-user-name", IPP_TAG_NAME))
     return (HTTP_OK);
 
   LogMessage(L_DEBUG2, "cupsdIsAuthorized: username = \"%s\" password = %d chars",

@@ -91,6 +91,9 @@ cupsdAddPolicyOp(cupsd_policy_t *p,	/* I - Policy */
   char		name[1024];		/* Interface name */
 
 
+  LogMessage(L_DEBUG2, "cupsdAddPolicyOp(p=%p, po=%p, op=%x(%s))",
+             p, po, op, ippOpString(op));
+
   if (p == NULL)
     return (NULL);
 
@@ -120,7 +123,7 @@ cupsdAddPolicyOp(cupsd_policy_t *p,	/* I - Policy */
       */
 
       temp->order_type = po->order_type;
-      temp->type       = po->order_type;
+      temp->type       = po->type;
       temp->level      = po->level;
       temp->satisfy    = po->satisfy;
       temp->encryption = po->encryption;
@@ -181,10 +184,6 @@ cupsdCheckPolicy(cupsd_policy_t *p,	/* I - Policy */
                  client_t       *con,	/* I - Client connection */
 	         const char     *owner)	/* I - Owner of object */
 {
-  ipp_op_t	op;			/* IPP operation */
-  const char	*name;			/* Username */
-  ipp_attribute_t *attr;		/* IPP attribute */
-  int		status;			/* Status */
   location_t	*po;			/* Current policy operation */
 
 
@@ -200,52 +199,22 @@ cupsdCheckPolicy(cupsd_policy_t *p,	/* I - Policy */
   }
 
  /*
-  * Collect info from the request...
-  */
-
-  op = con->request->request.op.operation_id;
-
-  if (con->username[0])
-    name = con->username;
-  else if ((attr = ippFindAttribute(con->request, "requesting-user-name",
-                                    IPP_TAG_NAME)) != NULL)
-    name = attr->values[0].string.text;
-  else
-    name = "anonymous";
-
-  LogMessage(L_DEBUG2, "cupsdCheckPolicy: op=%04x, name=\"%s\" (%sauthenticated), owner=\"%s\"",
-             op, name, con->username[0] ? "" : "not ", owner ? owner : "");
-
- /*
   * Find a match for the operation...
   */
 
-  if ((po = cupsdFindPolicyOp(p, op)) == NULL)
+  if ((po = cupsdFindPolicyOp(p, con->request->request.op.operation_id)) == NULL)
   {
     LogMessage(L_DEBUG2, "cupsdCheckPolicy: No matching operation, returning 0!");
     return (0);
   }
 
- /*
-  * Check the policy against the current user, etc.
-  */
-
-  if (po->type && !con->username[0])
-  {
-    LogMessage(L_DEBUG2, "cupsdCheckPolicy: Operation requires authentication, returning 0!");
-    return (0);
-  }
-
   con->best = po;
-  status    = cupsdIsAuthorized(con, owner) == HTTP_OK;
 
  /*
   * Return the status of the check...
   */
 
-  LogMessage(L_DEBUG2, "cupsdCheckPolicy: Returning %d...", status);
-
-  return (status);
+  return (cupsdIsAuthorized(con, owner) == HTTP_OK);
 }
 
 

@@ -311,6 +311,15 @@ cupsFileGetConf(cups_file_t *fp,	/* I  - CUPS file */
     }
 
    /*
+    * Strip leading whitespace...
+    */
+
+    for (ptr = buf; isspace(*ptr & 255); ptr ++);
+
+    if (ptr > buf)
+      cups_strcpy(buf, ptr);
+
+   /*
     * See if there is anything left...
     */
 
