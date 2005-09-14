@@ -1036,7 +1036,7 @@ cupsdIsAuthorized(client_t   *con,	/* I - Connection */
 		};
 
 
-  LogMessage(L_DEBUG2, "IsAuthorized: con->uri = \"%s\"", con->uri);
+  LogMessage(L_DEBUG2, "cupsdIsAuthorized: con->uri = \"%s\"", con->uri);
 
  /*
   * If there is no "best" authentication rule for this request, then
@@ -1146,7 +1146,7 @@ cupsdIsAuthorized(client_t   *con,	/* I - Connection */
     }
   }
 
-  LogMessage(L_DEBUG2, "IsAuthorized: auth = %d, satisfy=%d...",
+  LogMessage(L_DEBUG2, "cupsdIsAuthorized: auth = %d, satisfy=%d...",
              auth, best->satisfy);
 
   if (auth == AUTH_DENY && best->satisfy == AUTH_SATISFY_ALL)
@@ -1159,7 +1159,7 @@ cupsdIsAuthorized(client_t   *con,	/* I - Connection */
 
   if (best->encryption >= HTTP_ENCRYPT_REQUIRED && !con->http.tls)
   {
-    LogMessage(L_DEBUG2, "IsAuthorized: Need upgrade to TLS...");
+    LogMessage(L_DEBUG2, "cupsdIsAuthorized: Need upgrade to TLS...");
     return (HTTP_UPGRADE_REQUIRED);
   }
 #endif /* HAVE_SSL */
@@ -1171,9 +1171,9 @@ cupsdIsAuthorized(client_t   *con,	/* I - Connection */
   if (best->level == AUTH_ANON)		/* Anonymous access - allow it */
     return (HTTP_OK);
 
-  LogMessage(L_DEBUG2, "IsAuthorized: username = \"%s\" password = %d chars",
+  LogMessage(L_DEBUG2, "cupsdIsAuthorized: username = \"%s\" password = %d chars",
 	     con->username, (int)strlen(con->password));
-  DEBUG_printf(("IsAuthorized: username = \"%s\", password = \"%s\"\n",
+  DEBUG_printf(("cupsdIsAuthorized: username = \"%s\", password = \"%s\"\n",
 		con->username, con->password));
 
   if (con->username[0] == '\0')
@@ -1188,14 +1188,14 @@ cupsdIsAuthorized(client_t   *con,	/* I - Connection */
   * Check the user's password...
   */
 
-  LogMessage(L_DEBUG2, "IsAuthorized: Checking \"%s\", address = %x:%x:%x:%x, hostname = \"%s\"",
+  LogMessage(L_DEBUG2, "cupsdIsAuthorized: Checking \"%s\", address = %x:%x:%x:%x, hostname = \"%s\"",
 	     con->username, address[0], address[1], address[2],
 	     address[3], con->http.hostname);
 
   pw = NULL;
 
-  if (strcasecmp(con->http.hostname, "localhost") != 0 ||
-      strncmp(con->http.fields[HTTP_FIELD_AUTHORIZATION], "Local", 5) != 0)
+  if (strcasecmp(con->http.hostname, "localhost") ||
+      strncmp(con->http.fields[HTTP_FIELD_AUTHORIZATION], "Local", 5))
   {
    /*
     * Not doing local certificate-based authentication; check the password...
@@ -1236,12 +1236,12 @@ cupsdIsAuthorized(client_t   *con,	/* I - Connection */
 	  auth_client = con;
 #  endif /* __hpux */
 
-	  DEBUG_printf(("IsAuthorized: Setting appdata_ptr = %p\n", con));
+	  DEBUG_printf(("cupsdIsAuthorized: Setting appdata_ptr = %p\n", con));
 
 	  pamerr = pam_start("cups", con->username, &pamdata, &pamh);
 	  if (pamerr != PAM_SUCCESS)
 	  {
-	    LogMessage(L_ERROR, "IsAuthorized: pam_start() returned %d (%s)!\n",
+	    LogMessage(L_ERROR, "cupsdIsAuthorized: pam_start() returned %d (%s)!\n",
         	       pamerr, pam_strerror(pamh, pamerr));
 	    pam_end(pamh, 0);
 	    return (HTTP_UNAUTHORIZED);
@@ -1250,7 +1250,7 @@ cupsdIsAuthorized(client_t   *con,	/* I - Connection */
 	  pamerr = pam_authenticate(pamh, PAM_SILENT);
 	  if (pamerr != PAM_SUCCESS)
 	  {
-	    LogMessage(L_ERROR, "IsAuthorized: pam_authenticate() returned %d (%s)!\n",
+	    LogMessage(L_ERROR, "cupsdIsAuthorized: pam_authenticate() returned %d (%s)!\n",
         	       pamerr, pam_strerror(pamh, pamerr));
 	    pam_end(pamh, 0);
 	    return (HTTP_UNAUTHORIZED);
@@ -1259,7 +1259,7 @@ cupsdIsAuthorized(client_t   *con,	/* I - Connection */
 	  pamerr = pam_acct_mgmt(pamh, PAM_SILENT);
 	  if (pamerr != PAM_SUCCESS)
 	  {
-	    LogMessage(L_ERROR, "IsAuthorized: pam_acct_mgmt() returned %d (%s)!\n",
+	    LogMessage(L_ERROR, "cupsdIsAuthorized: pam_acct_mgmt() returned %d (%s)!\n",
         	       pamerr, pam_strerror(pamh, pamerr));
 	    pam_end(pamh, 0);
 	    return (HTTP_UNAUTHORIZED);
@@ -1271,13 +1271,13 @@ cupsdIsAuthorized(client_t   *con,	/* I - Connection */
 	  * Use AIX authentication interface...
 	  */
 
-	  LogMessage(L_DEBUG, "IsAuthorized: AIX authenticate of username \"%s\"",
+	  LogMessage(L_DEBUG, "cupsdIsAuthorized: AIX authenticate of username \"%s\"",
                      con->username);
 
 	  reenter = 1;
 	  if (authenticate(con->username, con->password, &reenter, &authmsg) != 0)
 	  {
-	    LogMessage(L_DEBUG, "IsAuthorized: Unable to authenticate username \"%s\": %s",
+	    LogMessage(L_DEBUG, "cupsdIsAuthorized: Unable to authenticate username \"%s\": %s",
 	               con->username, strerror(errno));
 	    return (HTTP_UNAUTHORIZED);
 	  }
@@ -1288,7 +1288,7 @@ cupsdIsAuthorized(client_t   *con,	/* I - Connection */
 
 	  if (pw == NULL)			/* No such user... */
 	  {
-	    LogMessage(L_WARN, "IsAuthorized: Unknown username \"%s\"; access denied.",
+	    LogMessage(L_WARN, "cupsdIsAuthorized: Unknown username \"%s\"; access denied.",
         	       con->username);
 	    return (HTTP_UNAUTHORIZED);
 	  }
@@ -1299,7 +1299,7 @@ cupsdIsAuthorized(client_t   *con,	/* I - Connection */
 
 	  if (spw == NULL && strcmp(pw->pw_passwd, "x") == 0)
 	  {					/* Don't allow blank passwords! */
-	    LogMessage(L_WARN, "IsAuthorized: Username \"%s\" has no shadow password; access denied.",
+	    LogMessage(L_WARN, "cupsdIsAuthorized: Username \"%s\" has no shadow password; access denied.",
         	       con->username);
 	    return (HTTP_UNAUTHORIZED);	/* No such user or bad shadow file */
 	  }
@@ -1316,7 +1316,7 @@ cupsdIsAuthorized(client_t   *con,	/* I - Connection */
 	  if (pw->pw_passwd[0] == '\0')
 #  endif /* HAVE_SHADOW_H */
 	  {					/* Don't allow blank passwords! */
-	    LogMessage(L_WARN, "IsAuthorized: Username \"%s\" has no password; access denied.",
+	    LogMessage(L_WARN, "cupsdIsAuthorized: Username \"%s\" has no password; access denied.",
         	       con->username);
 	    return (HTTP_UNAUTHORIZED);
 	  }
@@ -1327,7 +1327,7 @@ cupsdIsAuthorized(client_t   *con,	/* I - Connection */
 
 	  pass = cups_crypt(con->password, pw->pw_passwd);
 
-	  LogMessage(L_DEBUG2, "IsAuthorized: pw_passwd = %s, crypt = %s",
+	  LogMessage(L_DEBUG2, "cupsdIsAuthorized: pw_passwd = %s, crypt = %s",
 		     pw->pw_passwd, pass);
 
 	  if (pass == NULL || strcmp(pw->pw_passwd, pass) != 0)
@@ -1337,7 +1337,7 @@ cupsdIsAuthorized(client_t   *con,	/* I - Connection */
 	    {
 	      pass = cups_crypt(con->password, spw->sp_pwdp);
 
-	      LogMessage(L_DEBUG2, "IsAuthorized: sp_pwdp = %s, crypt = %s",
+	      LogMessage(L_DEBUG2, "cupsdIsAuthorized: sp_pwdp = %s, crypt = %s",
 			 spw->sp_pwdp, pass);
 
 	      if (pass == NULL || strcmp(spw->sp_pwdp, pass) != 0)
@@ -1358,24 +1358,24 @@ cupsdIsAuthorized(client_t   *con,	/* I - Connection */
 	  if (!httpGetSubField(&(con->http), HTTP_FIELD_AUTHORIZATION, "nonce",
                                nonce))
 	  {
-            LogMessage(L_ERROR, "IsAuthorized: No nonce value for Digest authentication!");
+            LogMessage(L_ERROR, "cupsdIsAuthorized: No nonce value for Digest authentication!");
             return (HTTP_UNAUTHORIZED);
 	  }
 
 	  if (strcmp(con->http.hostname, nonce) != 0)
 	  {
-            LogMessage(L_ERROR, "IsAuthorized: Nonce value error!");
-            LogMessage(L_ERROR, "IsAuthorized: Expected \"%s\",",
+            LogMessage(L_ERROR, "cupsdIsAuthorized: Nonce value error!");
+            LogMessage(L_ERROR, "cupsdIsAuthorized: Expected \"%s\",",
 	               con->http.hostname);
-            LogMessage(L_ERROR, "IsAuthorized: Got \"%s\"!", nonce);
+            LogMessage(L_ERROR, "cupsdIsAuthorized: Got \"%s\"!", nonce);
             return (HTTP_UNAUTHORIZED);
 	  }
 
-	  LogMessage(L_DEBUG2, "IsAuthorized: nonce = \"%s\"", nonce);
+	  LogMessage(L_DEBUG2, "cupsdIsAuthorized: nonce = \"%s\"", nonce);
 
 	  if (best->num_names && best->level == AUTH_GROUP)
 	  {
-	    LogMessage(L_DEBUG2, "IsAuthorized: num_names = %d", best->num_names);
+	    LogMessage(L_DEBUG2, "cupsdIsAuthorized: num_names = %d", best->num_names);
 
             for (i = 0; i < best->num_names; i ++)
 	    {
@@ -1400,7 +1400,7 @@ cupsdIsAuthorized(client_t   *con,	/* I - Connection */
 
 	  if (!md5[0])
 	  {
-            LogMessage(L_DEBUG2, "IsAuthorized: No matching user:group for \"%s\" in passwd.md5!",
+            LogMessage(L_DEBUG2, "cupsdIsAuthorized: No matching user:group for \"%s\" in passwd.md5!",
 	               con->username);
             return (HTTP_UNAUTHORIZED);
 	  }
@@ -1409,7 +1409,7 @@ cupsdIsAuthorized(client_t   *con,	/* I - Connection */
 
 	  if (strcmp(md5, con->password) != 0)
 	  {
-            LogMessage(L_DEBUG2, "IsAuthorized: MD5s \"%s\" and \"%s\" don't match!",
+            LogMessage(L_DEBUG2, "cupsdIsAuthorized: MD5s \"%s\" and \"%s\" don't match!",
 	               md5, con->password);
             return (HTTP_UNAUTHORIZED);
 	  }
@@ -1422,7 +1422,7 @@ cupsdIsAuthorized(client_t   *con,	/* I - Connection */
 
 	  if (best->num_names && best->level == AUTH_GROUP)
 	  {
-	    LogMessage(L_DEBUG2, "IsAuthorized: num_names = %d", best->num_names);
+	    LogMessage(L_DEBUG2, "cupsdIsAuthorized: num_names = %d", best->num_names);
 
             for (i = 0; i < best->num_names; i ++)
 	    {
@@ -1447,7 +1447,7 @@ cupsdIsAuthorized(client_t   *con,	/* I - Connection */
 
 	  if (!md5[0])
 	  {
-            LogMessage(L_DEBUG2, "IsAuthorized: No matching user:group for \"%s\" in passwd.md5!",
+            LogMessage(L_DEBUG2, "cupsdIsAuthorized: No matching user:group for \"%s\" in passwd.md5!",
 	               con->username);
             return (HTTP_UNAUTHORIZED);
 	  }
@@ -1456,7 +1456,7 @@ cupsdIsAuthorized(client_t   *con,	/* I - Connection */
 
 	  if (strcmp(md5, basicmd5) != 0)
 	  {
-            LogMessage(L_DEBUG2, "IsAuthorized: MD5s \"%s\" and \"%s\" don't match!",
+            LogMessage(L_DEBUG2, "cupsdIsAuthorized: MD5s \"%s\" and \"%s\" don't match!",
 	               md5, basicmd5);
             return (HTTP_UNAUTHORIZED);
 	  }
@@ -1488,7 +1488,7 @@ cupsdIsAuthorized(client_t   *con,	/* I - Connection */
     * any valid user is OK...
     */
 
-    LogMessage(L_DEBUG2, "IsAuthorized: Checking user membership...");
+    LogMessage(L_DEBUG2, "cupsdIsAuthorized: Checking user membership...");
 
     if (best->num_names == 0)
       return (HTTP_OK);
@@ -1499,17 +1499,24 @@ cupsdIsAuthorized(client_t   *con,	/* I - Connection */
     */
 
     for (i = 0; i < best->num_names; i ++)
+    {
       if (!strcasecmp(best->names[i], "@OWNER") && owner &&
           !strcasecmp(con->username, owner))
-	return (HTTP_OK)
+	return (HTTP_OK);
       else if (!strcasecmp(best->names[i], "@SYSTEM"))
       {
+        for (j = 0; j < NumSystemGroups; j ++)
+	  if (cupsdCheckGroup(con->username, pw, SystemGroups[j]))
+	    return (HTTP_OK);
       }
       else if (best->names[i][0] == '@')
       {
+        if (cupsdCheckGroup(con->username, pw, best->names[i] + 1))
+          return (HTTP_OK);
       }
       else if (!strcasecmp(con->username, best->names[i]))
         return (HTTP_OK);
+    }
 
     return (HTTP_UNAUTHORIZED);
   }
@@ -1518,7 +1525,7 @@ cupsdIsAuthorized(client_t   *con,	/* I - Connection */
   * Check to see if this user is in any of the named groups...
   */
 
-  LogMessage(L_DEBUG2, "IsAuthorized: Checking group membership...");
+  LogMessage(L_DEBUG2, "cupsdIsAuthorized: Checking group membership...");
 
   if (best->type == AUTH_BASIC)
   {
@@ -1528,7 +1535,7 @@ cupsdIsAuthorized(client_t   *con,	/* I - Connection */
 
     for (i = 0; i < best->num_names; i ++)
     {
-      LogMessage(L_DEBUG2, "IsAuthorized: Checking group \"%s\" membership...",
+      LogMessage(L_DEBUG2, "cupsdIsAuthorized: Checking group \"%s\" membership...",
                  best->names[i]);
 
       if (!strcasecmp(best->names[i], "@SYSTEM"))
@@ -1545,7 +1552,7 @@ cupsdIsAuthorized(client_t   *con,	/* I - Connection */
     * The user isn't part of the specified group, so deny access...
     */
 
-    LogMessage(L_DEBUG2, "IsAuthorized: user not in group(s)!");
+    LogMessage(L_DEBUG2, "cupsdIsAuthorized: User not in group(s)!");
 
     return (HTTP_UNAUTHORIZED);
   }

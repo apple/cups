@@ -30,7 +30,6 @@
  *   cupsdDeleteAllPolicies() - Delete all policies in memory.
  *   cupsdFindPolicy()        - Find a named policy.
  *   cupsdFindPolicyOp()      - Find a policy operation.
- *   check_op()               - Check the current operation.
  */
 
 /*
@@ -38,18 +37,6 @@
  */
 
 #include "cupsd.h"
-#include <grp.h>
-#ifdef HAVE_USERSEC_H
-#  include <usersec.h>
-#endif /* HAVE_USERSEC_H */
-
-
-/*
- * Local functions...
- */
-
-static int	check_op(location_t *po, int allow_deny, const char *name,
-		         const char *owner);
 
 
 /*
@@ -196,7 +183,6 @@ cupsdCheckPolicy(cupsd_policy_t *p,	/* I - Policy */
 {
   ipp_op_t	op;			/* IPP operation */
   const char	*name;			/* Username */
-  int		authenticated;		/* Authenticated? */
   ipp_attribute_t *attr;		/* IPP attribute */
   int		status;			/* Status */
   location_t	*po;			/* Current policy operation */
@@ -208,7 +194,7 @@ cupsdCheckPolicy(cupsd_policy_t *p,	/* I - Policy */
 
   if (!p || !con)
   {
-    LogMessage(L_CRIT, "CheckPolicy: p=%p, con=%p!", p, con);
+    LogMessage(L_CRIT, "cupsdCheckPolicy: p=%p, con=%p!", p, con);
 
     return (0);
   }
@@ -220,24 +206,15 @@ cupsdCheckPolicy(cupsd_policy_t *p,	/* I - Policy */
   op = con->request->request.op.operation_id;
 
   if (con->username[0])
-  {
-    name          = con->username;
-    authenticated = 1;
-  }
+    name = con->username;
   else if ((attr = ippFindAttribute(con->request, "requesting-user-name",
                                     IPP_TAG_NAME)) != NULL)
-  {
-    name          = attr->values[0].string.text;
-    authenticated = 0;
-  }
+    name = attr->values[0].string.text;
   else
-  {
-    name          = "anonymous";
-    authenticated = 0;
-  }
+    name = "anonymous";
 
-  LogMessage(L_DEBUG2, "CheckPolicy: op=%04x, name=\"%s\", authenticated=%d, owner=\"%s\"",
-             op, name, authenticated, owner ? owner : "");
+  LogMessage(L_DEBUG2, "cupsdCheckPolicy: op=%04x, name=\"%s\" (%sauthenticated), owner=\"%s\"",
+             op, name, con->username[0] ? "" : "not ", owner ? owner : "");
 
  /*
   * Find a match for the operation...
@@ -245,7 +222,7 @@ cupsdCheckPolicy(cupsd_policy_t *p,	/* I - Policy */
 
   if ((po = cupsdFindPolicyOp(p, op)) == NULL)
   {
-    LogMessage(L_DEBUG2, "CheckPolicy: No matching operation, returning 0!");
+    LogMessage(L_DEBUG2, "cupsdCheckPolicy: No matching operation, returning 0!");
     return (0);
   }
 
@@ -253,37 +230,22 @@ cupsdCheckPolicy(cupsd_policy_t *p,	/* I - Policy */
   * Check the policy against the current user, etc.
   */
 
-  if (po->type && !authenticated)
+  if (po->type && !con->username[0])
   {
-    LogMessage(L_DEBUG2, "CheckPolicy: Operation requires authentication, returning 0!");
+    LogMessage(L_DEBUG2, "cupsdCheckPolicy: Operation requires authentication, returning 0!");
     return (0);
   }
 
-  switch (status = po->order_type)
-  {
-    default :
-    case POLICY_ALLOW :
-        if (check_op(po, POLICY_DENY, name, owner))
-	  status = POLICY_DENY;
-        if (check_op(po, POLICY_ALLOW, name, owner))
-	  status = POLICY_ALLOW;
-	break;
-
-    case POLICY_DENY :
-        if (check_op(po, POLICY_ALLOW, name, owner))
-	  status = POLICY_ALLOW;
-        if (check_op(po, POLICY_DENY, name, owner))
-	  status = POLICY_DENY;
-	break;
-  }
+  con->best = po;
+  status    = cupsdIsAuthorized(con, owner) == HTTP_OK;
 
  /*
   * Return the status of the check...
   */
 
-  LogMessage(L_DEBUG2, "CheckPolicy: Returning %d...", !status);
+  LogMessage(L_DEBUG2, "cupsdCheckPolicy: Returning %d...", status);
 
-  return (!status);
+  return (status);
 }
 
 
@@ -330,7 +292,7 @@ cupsdDeleteAllPolicies(void)
 cupsd_policy_t *			/* O - Policy */
 cupsdFindPolicy(const char *policy)	/* I - Name of policy */
 {
-  int		i;			/* Looping var */
+  int			i;		/* Looping var */
   cupsd_policy_t	**p;		/* Current policy */
 
 
@@ -387,54 +349,6 @@ cupsdFindPolicyOp(cupsd_policy_t *p,	/* I - Policy */
   return (NULL);
 }
 
-
-#if 0
-/*
- * 'check_op()' - Check the current operation.
- */
-
-static int				/* O - 1 if match, 0 if not */
-check_op(location_t *po,		/* I - Policy operation */
-         int        allow_deny,		/* I - POLICY_ALLOW or POLICY_DENY */
-         const char *name,		/* I - User name */
-	 const char *owner)		/* I - Owner name */
-{
-  int		i, j;			/* Looping vars */
-  policyname_t	*pn;			/* Current policy name */
-  struct passwd	*pw;			/* User's password entry */
-
-
-  pw = getpwnam(name);
-  endpwent();
-
-  for (i = po->num_names, pn = po->names; i > 0; i --, pn ++)
-  {
-    if (pn->allow_deny != allow_deny)
-      continue;
-
-    if (!strcasecmp(pn->name, "@OWNER"))
-    {
-      if (owner && !strcasecmp(name, owner))
-        return (1);
-    }
-    else if (!strcasecmp(pn->name, "@SYSTEM"))
-    {
-      for (j = 0; j < NumSystemGroups; j ++)
-        if (cupsdCheckGroup(name, pw, SystemGroups[j]))
-          return (1);
-    }
-    else if (pn->name[0] == '@')
-    {
-      if (cupsdCheckGroup(name, pw, pn->name + 1))
-        return (1);
-    }
-    else if (!strcasecmp(name, pn->name))
-      return (1);
-  }
-
-  return (0);
-}
-#endif /* 0 */
 
 /*
  * End of "$Id$".

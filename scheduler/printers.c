@@ -503,7 +503,7 @@ CreateCommonData(void)
   */
 
   for (p = Printers; p; p = p->next)
-    if ((p->op_policy_ptr = FindPolicy(p->op_policy)) == NULL)
+    if ((p->op_policy_ptr = cupsdFindPolicy(p->op_policy)) == NULL)
       p->op_policy_ptr = DefaultPolicyPtr;
 }
 
