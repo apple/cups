@@ -156,6 +156,8 @@ AddName(location_t *loc,	/* I - Location to add to */
   char	**temp;			/* Pointer to names array */
 
 
+  LogMessage(L_DEBUG2, "AddName(loc=%p, name=\"%s\")", loc, name);
+
   if (loc->num_names == 0)
     temp = malloc(sizeof(char *));
   else
@@ -193,6 +195,9 @@ AllowHost(location_t *loc,	/* I - Location to add to */
   char		ifname[32],	/* Interface name */
 		*ifptr;		/* Pointer to end of name */
 
+
+  LogMessage(L_DEBUG2, "AllowHost(loc=%p(%s), name=\"%s\")", loc,
+             loc->location, name);
 
   if ((temp = add_allow(loc)) == NULL)
     return;
@@ -237,8 +242,6 @@ AllowHost(location_t *loc,	/* I - Location to add to */
     temp->mask.name.name   = strdup(name);
     temp->mask.name.length = strlen(name);
   }
-
-  LogMessage(L_DEBUG, "AllowHost: %s allow %s", loc->location, name);
 }
 
 
@@ -255,17 +258,17 @@ AllowIP(location_t *loc,	/* I - Location to add to */
   authmask_t	*temp;		/* New host/domain mask */
 
 
+  LogMessage(L_DEBUG2, "AllowIP(loc=%p(%s), address=%x:%x:%x:%x, netmask=%x:%x:%x:%x)",
+	     loc, loc->location, address[0], address[1], address[2],
+	     address[3], netmask[0], netmask[1], netmask[2],
+	     netmask[3]);
+
   if ((temp = add_allow(loc)) == NULL)
     return;
 
   temp->type = AUTH_IP;
-  memcpy(temp->mask.ip.address, address, sizeof(address));
-  memcpy(temp->mask.ip.netmask, netmask, sizeof(netmask));
-
-  LogMessage(L_DEBUG, "AllowIP: %s allow %x:%x:%x:%x/%x:%x:%x:%x",
-	     loc->location, address[0], address[1], address[2],
-	     address[3], netmask[0], netmask[1], netmask[2],
-	     netmask[3]);
+  memcpy(temp->mask.ip.address, address, sizeof(temp->mask.ip.address));
+  memcpy(temp->mask.ip.netmask, netmask, sizeof(temp->mask.ip.netmask));
 }
 
 
@@ -718,6 +721,9 @@ DenyHost(location_t *loc,	/* I - Location to add to */
 		*ifptr;		/* Pointer to end of name */
 
 
+  LogMessage(L_DEBUG2, "DenyHost(loc=%p(%s), name=\"%s\")", loc,
+             loc->location, name);
+
   if ((temp = add_deny(loc)) == NULL)
     return;
 
@@ -761,8 +767,6 @@ DenyHost(location_t *loc,	/* I - Location to add to */
     temp->mask.name.name   = strdup(name);
     temp->mask.name.length = strlen(name);
   }
-
-  LogMessage(L_DEBUG, "DenyHost: %s deny %s", loc->location, name);
 }
 
 
@@ -779,17 +783,17 @@ DenyIP(location_t *loc,		/* I - Location to add to */
   authmask_t	*temp;		/* New host/domain mask */
 
 
+  LogMessage(L_DEBUG, "DenyIP(loc=%p(%s), address=%x:%x:%x:%x, netmask=%x:%x:%x:%x)",
+	     loc, loc->location, address[0], address[1], address[2],
+	     address[3], netmask[0], netmask[1], netmask[2],
+	     netmask[3]);
+
   if ((temp = add_deny(loc)) == NULL)
     return;
 
   temp->type = AUTH_IP;
-  memcpy(temp->mask.ip.address, address, sizeof(address));
-  memcpy(temp->mask.ip.netmask, netmask, sizeof(netmask));
-
-  LogMessage(L_DEBUG, "DenyIP: %s deny %x:%x:%x:%x/%x:%x:%x:%x",
-	     loc->location, address[0], address[1], address[2],
-	     address[3], netmask[0], netmask[1], netmask[2],
-	     netmask[3]);
+  memcpy(temp->mask.ip.address, address, sizeof(temp->mask.ip.address));
+  memcpy(temp->mask.ip.netmask, netmask, sizeof(temp->mask.ip.netmask));
 }
 
 
@@ -1034,16 +1038,31 @@ cupsdIsAuthorized(client_t   *con,	/* I - Connection */
 		  "CLOSE",
 		  "STATUS"
 		};
+  static const char * const levels[] =	/* Auth levels */
+		{
+		  "ANON",
+		  "USER",
+		  "GROUP"
+		};
+  static const char * const types[] =	/* Auth types */
+		{
+		  "NONE",
+		  "BASIC",
+		  "DIGEST",
+		  "BASICDIGEST"
+		};
 
 
-  LogMessage(L_DEBUG2, "cupsdIsAuthorized: con->uri=\"%s\"", con->uri);
+  LogMessage(L_DEBUG2, "cupsdIsAuthorized: con->uri=\"%s\", con->best=%p(%s)",
+             con->uri, con->best, con->best ? con->best->location : "");
 
  /*
   * If there is no "best" authentication rule for this request, then
-  * access is allowed from localhost and denied from other addresses...
+  * access is allowed from the local system and denied from other
+  * addresses...
   */
 
-  if (con->best == NULL)
+  if (!con->best)
   {
     if (!strcmp(con->http.hostname, "localhost") ||
         !strcmp(con->http.hostname, ServerName))
@@ -1054,8 +1073,9 @@ cupsdIsAuthorized(client_t   *con,	/* I - Connection */
 
   best = con->best;
 
-  LogMessage(L_DEBUG2, "cupsdIsAuthorized: level=%d, type=%d, satisfy=%d, num_names=%d",
-             best->level, best->type, best->satisfy, best->num_names);
+  LogMessage(L_DEBUG2, "cupsdIsAuthorized: level=AUTH_%s, type=AUTH_%s, satisfy=AUTH_SATISFY_%s, num_names=%d",
+             levels[best->level], types[best->type],
+	     best->satisfy ? "ANY" : "ALL", best->num_names);
 
   if (best->limit == AUTH_LIMIT_IPP)
     LogMessage(L_DEBUG2, "cupsdIsAuthorized: op=%x(%s)", best->op,
@@ -1107,14 +1127,6 @@ cupsdIsAuthorized(client_t   *con,	/* I - Connection */
 
     auth = AUTH_ALLOW;
   }
-  else if (best->num_allow == 0 && best->num_deny == 0)
-  {
-   /*
-    * No allow/deny lines - allow access...
-    */
-
-    auth = AUTH_ALLOW;
-  }
   else
   {
    /*
@@ -1153,7 +1165,8 @@ cupsdIsAuthorized(client_t   *con,	/* I - Connection */
     }
   }
 
-  LogMessage(L_DEBUG2, "cupsdIsAuthorized: auth=%d...", auth);
+  LogMessage(L_DEBUG2, "cupsdIsAuthorized: auth=AUTH_%s...",
+             auth ? "DENY" : "ALLOW");
 
   if (auth == AUTH_DENY && best->satisfy == AUTH_SATISFY_ALL)
     return (HTTP_FORBIDDEN);
@@ -1178,16 +1191,30 @@ cupsdIsAuthorized(client_t   *con,	/* I - Connection */
       (best->type == AUTH_NONE && best->num_names == 0))
     return (HTTP_OK);
 
-  if (best->type == AUTH_NONE &&
-      ippFindAttribute(con->request, "requesting-user-name", IPP_TAG_NAME))
-    return (HTTP_OK);
+  if (best->type == AUTH_NONE && best->limit == AUTH_LIMIT_IPP)
+  {
+   /*
+    * Check for unauthenticated username...
+    */
 
-  LogMessage(L_DEBUG2, "cupsdIsAuthorized: username = \"%s\" password = %d chars",
+    ipp_attribute_t	*attr;		/* requesting-user-name attribute */
+
+
+    attr = ippFindAttribute(con->request, "requesting-user-name", IPP_TAG_NAME);
+    if (attr)
+    {
+      LogMessage(L_DEBUG2, "cupsdIsAuthorized: requesting-user-name=\"%s\"",
+                 attr->values[0].string.text);
+      return (HTTP_OK);
+    }
+  }
+
+  LogMessage(L_DEBUG2, "cupsdIsAuthorized: username=\"%s\" password=%d chars",
 	     con->username, (int)strlen(con->password));
-  DEBUG_printf(("cupsdIsAuthorized: username = \"%s\", password = \"%s\"\n",
+  DEBUG_printf(("cupsdIsAuthorized: username=\"%s\", password=\"%s\"\n",
 		con->username, con->password));
 
-  if (con->username[0] == '\0')
+  if (!con->username[0])
   {
     if (best->satisfy == AUTH_SATISFY_ALL || auth == AUTH_DENY)
       return (HTTP_UNAUTHORIZED);	/* Non-anonymous needs user/pass */
@@ -1219,7 +1246,7 @@ cupsdIsAuthorized(client_t   *con,	/* I - Connection */
     * See what kind of authentication we are doing...
     */
 
-    switch (best->type)
+    switch (best->type != AUTH_NONE ? best->type : DefaultAuthType)
     {
       case AUTH_BASIC :
 	 /*

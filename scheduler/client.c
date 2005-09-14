@@ -2175,9 +2175,6 @@ SendHeader(client_t    *con,	/* I - Client to send to */
            http_status_t code,	/* I - HTTP status code */
 	   char        *type)	/* I - MIME type of document */
 {
-  location_t	*loc;		/* Authentication location */
-
-
   if (httpPrintf(HTTP(con), "HTTP/%d.%d %d %s\r\n", con->http.version / 100,
                  con->http.version % 100, code, httpStatus(code)) < 0)
     return (0);
@@ -2199,9 +2196,15 @@ SendHeader(client_t    *con,	/* I - Client to send to */
 
   if (code == HTTP_UNAUTHORIZED)
   {
-    loc = con->best;
+    int	auth_type;			/* Authentication type */
 
-    if (!loc || loc->type != AUTH_DIGEST)
+
+    if (!con->best || con->best->type == AUTH_NONE)
+      auth_type = DefaultAuthType;
+    else
+      auth_type = con->best->type;
+      
+    if (auth_type != AUTH_DIGEST)
     {
       if (httpPrintf(HTTP(con), "WWW-Authenticate: Basic realm=\"CUPS\"\r\n") < 0)
 	return (0);

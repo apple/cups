@@ -125,6 +125,8 @@ VAR int			NumLocations	VALUE(0);
 					/* Number of authorization locations */
 VAR location_t		*Locations	VALUE(NULL);
 					/* Authorization locations */
+VAR int			DefaultAuthType	VALUE(AUTH_BASIC);
+					/* Default AuthType, if not specified */
 
 
 /*

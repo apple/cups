@@ -161,9 +161,7 @@ static char	* const ipp_std_ops[] =
 		  "CUPS-Set-Default",
 		  "CUPS-Get-Devices",
 		  "CUPS-Get-PPDs",
-		  "CUPS-Move-Job",
-		  "CUPS-Add-Device",
-		  "CUPS-Delete-Device"
+		  "CUPS-Move-Job"
 		};
 
 
@@ -247,7 +245,7 @@ ippOpString(ipp_op_t op)		/* I - Operation ID */
     return (ipp_std_ops[op]);
   else if (op == IPP_PRIVATE)
     return ("windows-ext");
-  else if (op >= CUPS_GET_DEFAULT && op <= CUPS_DELETE_DEVICE)
+  else if (op >= CUPS_GET_DEFAULT && op <= CUPS_MOVE_JOB)
     return (ipp_cups_ops[op - CUPS_GET_DEFAULT]);
 
  /*
@@ -281,7 +279,7 @@ ippOpValue(const char *name)		/* I - Textual name */
     if (!strcasecmp(name, ipp_cups_ops[i]))
       return ((ipp_op_t)(i + 0x4001));
 
-  return ((ipp_op_t)0);
+  return ((ipp_op_t)-1);
 }
 
 

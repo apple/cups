@@ -296,6 +296,9 @@ cupsdFindPolicyOp(cupsd_policy_t *p,	/* I - Policy */
   location_t	**po;			/* Current policy operation */
 
 
+  LogMessage(L_DEBUG2, "cupsdFindPolicyOp(p=%p, op=%x(%s))\n",
+             p, op, ippOpString(op));
+
  /*
   * Range check...
   */
@@ -309,11 +312,19 @@ cupsdFindPolicyOp(cupsd_policy_t *p,	/* I - Policy */
 
   for (i = p->num_ops, po = p->ops; i > 0; i --, po ++)
     if ((*po)->op == op)
+    {
+      LogMessage(L_DEBUG2, "cupsdFindPolicyOp: Found exact match...");
       return (*po);
+    }
 
   for (i = p->num_ops, po = p->ops; i > 0; i --, po ++)
     if ((*po)->op == IPP_ANY_OPERATION)
+    {
+      LogMessage(L_DEBUG2, "cupsdFindPolicyOp: Found wildcard match...");
       return (*po);
+    }
+
+  LogMessage(L_DEBUG2, "cupsdFindPolicyOp: No match found!");
 
   return (NULL);
 }

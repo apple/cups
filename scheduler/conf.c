@@ -374,8 +374,7 @@ ReadConfiguration(void)
   */
 
   ConfigFilePerm      = 0640;
-  LogFilePerm         = 0644;
-
+  DefaultAuthType     = AUTH_BASIC;
   FaxRetryLimit       = 5;
   FaxRetryInterval    = 300;
   FileDevice          = FALSE;
@@ -389,6 +388,7 @@ ReadConfiguration(void)
   KeepAlive           = TRUE;
   KeepAliveTimeout    = DEFAULT_KEEPALIVE;
   ListenBackLog       = SOMAXCONN;
+  LogFilePerm         = 0644;
   LogLevel            = L_ERROR;
   MaxClients          = 100;
   MaxClientsPerHost   = 0;
@@ -764,13 +764,12 @@ ReadConfiguration(void)
       LogMessage(L_INFO, "<Limit Pause-Printer Resume-Printer "
                          "Set-Printer-Attributes Enable-Printer "
 			 "Disable-Printer Pause-Printer-After-Current-Job "
-			 "Hold-New-Jobs Release-Held-New-Jobs Deactivate-Printer "
-			 "Activate-Printer Restart-Printer Shutdown-Printer "
-			 "Startup-Printer Promote-Job Schedule-Job-After "
-			 "CUPS-Add-Printer CUPS-Delete-Printer "
-			 "CUPS-Add-Class CUPS-Delete-Class "
-			 "CUPS-Accept-Jobs CUPS-Reject-Jobs "
-			 "CUPS-Set-Default CUPS-Add-Device CUPS-Delete-Device>");
+			 "Hold-New-Jobs Release-Held-New-Jobs "
+			 "Deactivate-Printer Activate-Printer Restart-Printer "
+			 "Shutdown-Printer Startup-Printer Promote-Job "
+			 "Schedule-Job-After CUPS-Add-Printer "
+			 "CUPS-Delete-Printer CUPS-Add-Class CUPS-Delete-Class "
+			 "CUPS-Accept-Jobs CUPS-Reject-Jobs CUPS-Set-Default>");
       LogMessage(L_INFO, "Order Allow,Deny");
       LogMessage(L_INFO, "AuthType Basic");
 
@@ -803,8 +802,6 @@ ReadConfiguration(void)
       cupsdAddPolicyOp(p, po, CUPS_ACCEPT_JOBS);
       cupsdAddPolicyOp(p, po, CUPS_REJECT_JOBS);
       cupsdAddPolicyOp(p, po, CUPS_SET_DEFAULT);
-      cupsdAddPolicyOp(p, po, CUPS_ADD_DEVICE);
-      cupsdAddPolicyOp(p, po, CUPS_DELETE_DEVICE);
 
       LogMessage(L_INFO, "</Limit>");
 
@@ -2119,6 +2116,25 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
       }
       else
         LogMessage(L_ERROR, "Bad poll address %s at line %d.", value, linenum);
+    }
+    else if (!strcasecmp(line, "DefaultAuthType"))
+    {
+     /*
+      * DefaultAuthType {basic,digest,basicdigest}
+      */
+
+      if (!strcasecmp(value, "basic"))
+	DefaultAuthType = AUTH_BASIC;
+      else if (!strcasecmp(value, "digest"))
+	DefaultAuthType = AUTH_DIGEST;
+      else if (!strcasecmp(value, "basicdigest"))
+	DefaultAuthType = AUTH_BASICDIGEST;
+      else
+      {
+	LogMessage(L_WARN, "Unknown default authorization type %s on line %d.",
+	           value, linenum);
+	return (0);
+      }
     }
     else if (!strcasecmp(line, "User"))
     {
