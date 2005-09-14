@@ -162,7 +162,7 @@ static const char * const http_fields[] =
 			  "User-Agent",
 			  "WWW-Authenticate"
 			};
-static const char * const days[7] =
+static const char * const http_days[7] =
 			{
 			  "Sun",
 			  "Mon",
@@ -172,7 +172,7 @@ static const char * const days[7] =
 			  "Fri",
 			  "Sat"
 			};
-static const char * const months[12] =
+static const char * const http_months[12] =
 			{
 			  "Jan",
 			  "Feb",
@@ -1506,14 +1506,15 @@ httpPrintf(http_t     *http,		/* I - HTTP data */
 const char *				/* O - Date/time string */
 httpGetDateString(time_t t)		/* I - UNIX time */
 {
-  struct tm	*tdate;
-  static char	datetime[256];
+  struct tm	*tdate;			/* UNIX date/time data */
+  static char	datetime[256];		/* Date/time string */
 
 
   tdate = gmtime(&t);
   snprintf(datetime, sizeof(datetime), "%s, %02d %s %d %02d:%02d:%02d GMT",
-           days[tdate->tm_wday], tdate->tm_mday, months[tdate->tm_mon],
-	   tdate->tm_year + 1900, tdate->tm_hour, tdate->tm_min, tdate->tm_sec);
+           http_days[tdate->tm_wday], tdate->tm_mday,
+	   http_months[tdate->tm_mon], tdate->tm_year + 1900,
+	   tdate->tm_hour, tdate->tm_min, tdate->tm_sec);
 
   return (datetime);
 }
@@ -1527,31 +1528,62 @@ time_t					/* O - UNIX time */
 httpGetDateTime(const char *s)		/* I - Date/time string */
 {
   int		i;			/* Looping var */
-  struct tm	tdate;			/* Time/date structure */
   char		mon[16];		/* Abbreviated month name */
   int		day, year;		/* Day of month and year */
   int		hour, min, sec;		/* Time */
+  int		days;			/* Number of days since 1970 */
+  static const int normal_days[] =	/* Days to a month, normal years */
+		{ 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365 };
+  static const int leap_days[] =	/* Days to a month, leap years */
+		{ 0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335, 366 };
 
+
+  DEBUG_printf(("httpGetDateTime(s=\"%s\")\n", s));
+
+ /*
+  * Extract the date and time from the formatted string...
+  */
 
   if (sscanf(s, "%*s%d%15s%d%d:%d:%d", &day, mon, &year, &hour, &min, &sec) < 6)
     return (0);
 
+  DEBUG_printf(("    day=%d, mon=\"%s\", year=%d, hour=%d, min=%d, sec=%d\n",
+                day, mon, year, hour, min, sec));
+
+ /*
+  * Convert the month name to a number from 0 to 11.
+  */
+
   for (i = 0; i < 12; i ++)
-    if (strcasecmp(mon, months[i]) == 0)
+    if (!strcasecmp(mon, http_months[i]))
       break;
 
   if (i >= 12)
     return (0);
 
-  tdate.tm_mon   = i;
-  tdate.tm_mday  = day;
-  tdate.tm_year  = year - 1900;
-  tdate.tm_hour  = hour;
-  tdate.tm_min   = min;
-  tdate.tm_sec   = sec;
-  tdate.tm_isdst = 0;
+  DEBUG_printf(("    i=%d\n", i));
 
-  return (mktime(&tdate));
+ /*
+  * Now convert the date and time to a UNIX time value in seconds since
+  * 1970.  We can't use mktime() since the timezone may not be UTC but
+  * the date/time string *is* UTC.
+  */
+
+  if ((year & 3) == 0 && ((year % 100) != 0 || (year % 400) == 0))
+    days = leap_days[i] + day - 1;
+  else
+    days = normal_days[i] + day - 1;
+
+  DEBUG_printf(("    days=%d\n", days));
+
+  days += (year - 1970) * 365 +		/* 365 days per year (normally) */
+          ((year - 1) / 4 - 492) -	/* + leap days */
+	  ((year - 1) / 100 - 19) +	/* - 100 year days */
+          ((year - 1) / 400 - 4);	/* + 400 year days */
+
+  DEBUG_printf(("    days=%d\n", days));
+
+  return (days * 86400 + hour * 3600 + min * 60 + sec);
 }
 
 

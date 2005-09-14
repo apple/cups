@@ -61,6 +61,22 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 
+  start = time(NULL);
+  strcpy(buffer, httpGetDateString(start));
+  current = httpGetDateTime(buffer);
+
+  printf("httpGetDateString(%d) returned \"%s\"\n", (int)start, buffer);
+  printf("httpGetDateTime(\"%s\") returned %d\n", buffer, (int)current);
+  printf("httpGetDateString(%d) returned \"%s\"\n", (int)current,
+         httpGetDateString(current));
+
+  i = (int)(current - start);
+  if (i < 0)
+    i = -i;
+
+  printf("Difference is %d seconds, %02d:%02d:%02d...\n", i, i / 3600,
+         (i / 60) % 60, i % 60);
+
   http = NULL;
   out = stdout;
 
