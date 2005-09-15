@@ -106,7 +106,7 @@ print_device(const char *uri,		/* I - Device URI */
         fputs("INFO: USB port busy; will retry in 30 seconds...\n", stderr);
 	sleep(30);
       }
-      else if (errno == ENXIO || errno == EIO || errno == ENOENT)
+      else if (errno == ENXIO || errno == EIO || errno == ENOENT || errno == ENODEV)
       {
         fputs("INFO: Printer not connected; will retry in 30 seconds...\n", stderr);
 	sleep(30);
