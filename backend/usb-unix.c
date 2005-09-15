@@ -101,6 +101,27 @@ print_device(const char *uri,		/* I - Device URI */
   {
     if ((fd = open_device(uri)) == -1)
     {
+      if (getenv("CLASS") != NULL)
+      {
+       /*
+        * If the CLASS environment variable is set, the job was submitted
+	* to a class and not to a specific queue.  In this case, we want
+	* to abort immediately so that the job can be requeued on the next
+	* available printer in the class.
+	*/
+
+        fputs("INFO: Unable to open USB device, queuing on next printer in class...\n",
+	      stderr);
+
+       /*
+        * Sleep 5 seconds to keep the job from requeuing too rapidly...
+	*/
+
+	sleep(5);
+
+        return (1);
+      }
+
       if (errno == EBUSY)
       {
         fputs("INFO: USB port busy; will retry in 30 seconds...\n", stderr);

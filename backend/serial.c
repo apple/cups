@@ -215,6 +215,27 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   {
     if ((fd = open(resource, O_WRONLY | O_NOCTTY | O_EXCL | O_NDELAY)) == -1)
     {
+      if (getenv("CLASS") != NULL)
+      {
+       /*
+        * If the CLASS environment variable is set, the job was submitted
+	* to a class and not to a specific queue.  In this case, we want
+	* to abort immediately so that the job can be requeued on the next
+	* available printer in the class.
+	*/
+
+        fputs("INFO: Unable to open serial port, queuing on next printer in class...\n",
+	      stderr);
+
+       /*
+        * Sleep 5 seconds to keep the job from requeuing too rapidly...
+	*/
+
+	sleep(5);
+
+        return (1);
+      }
+
       if (errno == EBUSY)
       {
         fputs("INFO: Serial port busy; will retry in 30 seconds...\n", stderr);
