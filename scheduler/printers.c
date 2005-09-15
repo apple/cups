@@ -1316,12 +1316,10 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
     CreateCommonData();
 
  /*
-  * Clear out old filters and add a filter from application/vnd.cups-raw to
-  * printer/name to handle "raw" printing by users.
+  * Clear out old filters, if any...
   */
 
   DeletePrinterFilters(p);
-  AddPrinterFilter(p, "application/vnd.cups-raw 0 -");
 
  /*
   * Figure out the authentication that is required for the printer.
@@ -1417,7 +1415,6 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
 
     ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_TEXT,
                  "printer-make-and-model", NULL, p->make_model);
-
     p->raw = 1;
   }
   else
@@ -1431,6 +1428,8 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
 
     if (p->type & (CUPS_PRINTER_CLASS | CUPS_PRINTER_IMPLICIT))
     {
+      p->raw = 1;
+
      /*
       * Add class-specific attributes...
       */
@@ -1666,6 +1665,13 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
             p->type |= CUPS_PRINTER_SMALL;
 
        /*
+	* Add a filter from application/vnd.cups-raw to printer/name to
+	* handle "raw" printing by users.
+	*/
+
+        AddPrinterFilter(p, "application/vnd.cups-raw 0 -");
+
+       /*
 	* Add any filters in the PPD file...
 	*/
 
@@ -1677,7 +1683,13 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
 	}
 
 	if (ppd->num_filters == 0)
+	{
+	 /*
+	  * If there are no filters, add a PostScript printing filter.
+	  */
+
           AddPrinterFilter(p, "application/vnd.cups-postscript 0 -");
+        }
 
        /*
 	* Show current and available port monitors for this printer...
@@ -1725,7 +1737,7 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
 
         printer_type = p->type;
       }
-      else if (access(filename, 0) == 0)
+      else if (!access(filename, 0))
       {
         int		pline;			/* PPD line number */
 	ppd_status_t	pstatus;		/* PPD load status */
@@ -1743,6 +1755,17 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
 
         LogMessage(L_INFO, "Hint: Run \"cupstestppd %s\" and fix any errors.",
 	           filename);
+
+       /*
+	* Add a filter from application/vnd.cups-raw to printer/name to
+	* handle "raw" printing by users.
+	*/
+
+        AddPrinterFilter(p, "application/vnd.cups-raw 0 -");
+
+       /*
+        * Add a PostScript filter, since this is still possibly PS printer.
+	*/
 
 	AddPrinterFilter(p, "application/vnd.cups-postscript 0 -");
       }

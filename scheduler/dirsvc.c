@@ -98,21 +98,18 @@ ProcessBrowseData(const char   *uri,	/* I - URI of printer/class */
   * Determine if the URI contains any illegal characters in it...
   */
 
-  if (strncmp(uri, "ipp://", 6) != 0 ||
-      !host[0] ||
-      (strncmp(resource, "/printers/", 10) != 0 &&
-       strncmp(resource, "/classes/", 9) != 0))
+  if (strncmp(uri, "ipp://", 6) || !host[0] ||
+      (strncmp(resource, "/printers/", 10) &&
+       strncmp(resource, "/classes/", 9)))
   {
     LogMessage(L_ERROR, "ProcessBrowseData: Bad printer URI in browse data: %s",
                uri);
     return;
   }
 
-  if (strchr(resource, '?') != NULL ||
-      (strncmp(resource, "/printers/", 10) == 0 &&
-       strchr(resource + 10, '/') != NULL) ||
-      (strncmp(resource, "/classes/", 9) == 0 &&
-       strchr(resource + 9, '/') != NULL))
+  if (strchr(resource, '?') ||
+      (!strncmp(resource, "/printers/", 10) && strchr(resource + 10, '/')) ||
+      (!strncmp(resource, "/classes/", 9) && strchr(resource + 9, '/')))
   {
     LogMessage(L_ERROR, "ProcessBrowseData: Bad resource in browse data: %s",
                resource);
@@ -182,7 +179,7 @@ ProcessBrowseData(const char   *uri,	/* I - URI of printer/class */
 
     while (hptr != NULL)
     {
-      if (strcasecmp(hptr, sptr) == 0)
+      if (!strcasecmp(hptr, sptr))
       {
         *hptr = '\0';
 	break;
@@ -198,7 +195,7 @@ ProcessBrowseData(const char   *uri,	/* I - URI of printer/class */
     * Remote destination is a class...
     */
 
-    if (strncmp(resource, "/classes/", 9) == 0)
+    if (!strncmp(resource, "/classes/", 9))
       snprintf(name, sizeof(name), "%s@%s", resource + 9, host);
     else
       return;
@@ -207,7 +204,7 @@ ProcessBrowseData(const char   *uri,	/* I - URI of printer/class */
     {
       if ((p = FindClass(resource + 9)) != NULL)
       {
-        if (p->hostname && strcasecmp(p->hostname, host) != 0)
+        if (p->hostname && strcasecmp(p->hostname, host))
 	{
 	 /*
 	  * Nope, this isn't the same host; if the hostname isn't the local host,
@@ -217,15 +214,30 @@ ProcessBrowseData(const char   *uri,	/* I - URI of printer/class */
 
 	  if (p->type & CUPS_PRINTER_REMOTE)
 	  {
+	    LogMessage(L_INFO, "Renamed remote class \"%s\" to \"%s@%s\"...",
+	               p->name, p->name, p->hostname);
+	    cupsdAddEvent(CUPSD_EVENT_PRINTER_DELETED, p, NULL,
+                	  "Class \'%s\' deleted by directory services.",
+			  p->name);
+
             SetStringf(&p->name, "%s@%s", p->name, p->hostname);
 	    SetPrinterAttrs(p);
 	    SortPrinters();
+
+	    cupsdAddEvent(CUPSD_EVENT_PRINTER_ADDED, p, NULL,
+                	  "Class \'%s\' added by directory services.",
+			  p->name);
 	  }
 
           p = NULL;
 	}
 	else if (!p->hostname)
 	{
+	 /*
+	  * Hostname not set, so this must be a cached remote printer
+	  * that was created for a pending print job...
+	  */
+
           SetString(&p->hostname, host);
 	  SetString(&p->uri, uri);
 	  SetString(&p->device_uri, uri);
@@ -233,17 +245,28 @@ ProcessBrowseData(const char   *uri,	/* I - URI of printer/class */
         }
       }
       else
+      {
+       /*
+        * Use the short name for this shared class.
+	*/
+
         strlcpy(name, resource + 9, sizeof(name));
+      }
     }
-    else if (p != NULL && !p->hostname)
+    else if (p && !p->hostname)
     {
+     /*
+      * Hostname not set, so this must be a cached remote printer
+      * that was created for a pending print job...
+      */
+
       SetString(&p->hostname, host);
       SetString(&p->uri, uri);
       SetString(&p->device_uri, uri);
       update = 1;
     }
 
-    if (p == NULL)
+    if (!p)
     {
      /*
       * Class doesn't exist; add it...
@@ -284,7 +307,7 @@ ProcessBrowseData(const char   *uri,	/* I - URI of printer/class */
     {
       if ((p = FindPrinter(resource + 10)) != NULL)
       {
-        if (p->hostname && strcasecmp(p->hostname, host) != 0)
+        if (p->hostname && strcasecmp(p->hostname, host))
 	{
 	 /*
 	  * Nope, this isn't the same host; if the hostname isn't the local host,
@@ -294,15 +317,30 @@ ProcessBrowseData(const char   *uri,	/* I - URI of printer/class */
 
 	  if (p->type & CUPS_PRINTER_REMOTE)
 	  {
+	    LogMessage(L_INFO, "Renamed remote printer \"%s\" to \"%s@%s\"...",
+	               p->name, p->name, p->hostname);
+	    cupsdAddEvent(CUPSD_EVENT_PRINTER_DELETED, p, NULL,
+                	  "Printer \'%s\' deleted by directory services.",
+			  p->name);
+
 	    SetStringf(&p->name, "%s@%s", p->name, p->hostname);
 	    SetPrinterAttrs(p);
 	    SortPrinters();
+
+	    cupsdAddEvent(CUPSD_EVENT_PRINTER_ADDED, p, NULL,
+                	  "Printer \'%s\' added by directory services.",
+			  p->name);
 	  }
 
           p = NULL;
 	}
 	else if (!p->hostname)
 	{
+	 /*
+	  * Hostname not set, so this must be a cached remote printer
+	  * that was created for a pending print job...
+	  */
+
           SetString(&p->hostname, host);
 	  SetString(&p->uri, uri);
 	  SetString(&p->device_uri, uri);
@@ -310,17 +348,28 @@ ProcessBrowseData(const char   *uri,	/* I - URI of printer/class */
         }
       }
       else
+      {
+       /*
+        * Use the short name for this shared printer.
+	*/
+
         strlcpy(name, resource + 10, sizeof(name));
+      }
     }
-    else if (p != NULL && !p->hostname)
+    else if (p && !p->hostname)
     {
+     /*
+      * Hostname not set, so this must be a cached remote printer
+      * that was created for a pending print job...
+      */
+
       SetString(&p->hostname, host);
       SetString(&p->uri, uri);
       SetString(&p->device_uri, uri);
       update = 1;
     }
 
-    if (p == NULL)
+    if (!p)
     {
      /*
       * Printer doesn't exist; add it...
@@ -446,7 +495,8 @@ ProcessBrowseData(const char   *uri,	/* I - URI of printer/class */
     * Loop through all available printers and create classes as needed...
     */
 
-    for (p = Printers, len = 0, offset = 0, first = NULL;
+    for (p = Printers, len = 0, offset = 0, update = 0, pclass = NULL,
+             first = NULL;
          p != NULL;
 	 p = next)
     {
@@ -480,7 +530,16 @@ ProcessBrowseData(const char   *uri,	/* I - URI of printer/class */
 	* we have a class, and if this printer is a member...
 	*/
 
-        if ((pclass = FindDest(name)) == NULL)
+        if (pclass && strcasecmp(pclass->name, name))
+	{
+	  if (update)
+	    SetPrinterAttrs(pclass);
+
+	  update = 0;
+	  pclass = NULL;
+	}
+
+        if (!pclass && (pclass = FindDest(name)) == NULL)
 	{
 	 /*
 	  * Need to add the class...
@@ -494,7 +553,7 @@ ProcessBrowseData(const char   *uri,	/* I - URI of printer/class */
           SetString(&pclass->location, p->location);
           SetString(&pclass->info, p->info);
 
-          SetPrinterAttrs(pclass);
+          update = 1;
 
           LogMessage(L_INFO, "Added implicit class \"%s\"...", name);
 	}
@@ -516,7 +575,10 @@ ProcessBrowseData(const char   *uri,	/* I - URI of printer/class */
 	    break;
 
         if (i >= pclass->num_printers)
+	{
 	  AddPrinterToClass(pclass, p);
+	  update = 1;
+	}
       }
       else
       {
@@ -534,8 +596,8 @@ ProcessBrowseData(const char   *uri,	/* I - URI of printer/class */
 	name[len] = '\0';
 	offset    = 0;
 
-	if ((pclass = FindDest(name)) != NULL &&
-	    !(pclass->type & CUPS_PRINTER_IMPLICIT))
+	if ((first = FindDest(name)) != NULL &&
+	    !(first->type & CUPS_PRINTER_IMPLICIT))
 	{
 	 /*
 	  * Can't use same name as a local printer; add "Any" to the
@@ -569,6 +631,13 @@ ProcessBrowseData(const char   *uri,	/* I - URI of printer/class */
 	first = p;
       }
     }
+
+   /*
+    * Update the last printer class as needed...
+    */
+
+    if (pclass && update)
+      SetPrinterAttrs(pclass);
   }
 }
 

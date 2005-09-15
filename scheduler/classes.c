@@ -118,12 +118,6 @@ AddPrinterToClass(printer_t *c,	/* I - Class to add to */
   c->num_printers ++;
 
   *temp = p;
-
- /*
-  * Update the IPP attributes...
-  */
-
-  SetPrinterAttrs(c);
 }
 
 
