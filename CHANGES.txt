@@ -3,6 +3,9 @@ CHANGES.txt - 09/15/2005
 
 CHANGES IN CUPS V1.2.0b1
 
+	- The lpstat program could display garbage date and time
+	  values for locales whose date format exceeded 31
+	  characters (STR #1263)
 	- The cupstestppd program would segfault when testing
 	  certain broken PPD files (STR #1268)
 	- Dramatically reduced the overhead of implicit classes.

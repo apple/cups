@@ -1369,7 +1369,7 @@ show_jobs(http_t     *http,		/* I - HTTP connection to server */
 		*ptr;			/* Pointer into printer name */
   int		match;			/* Non-zero if this job matches */
   char		temp[255],		/* Temporary buffer */
-		date[32];		/* Date buffer */
+		date[255];		/* Date buffer */
   static const char *jattrs[] =		/* Attributes we need for jobs... */
 		{
 		  "job-id",
@@ -1613,14 +1613,16 @@ show_jobs(http_t     *http,		/* I - HTTP connection to server */
 	  * Show the consolidated output format for the SGI tools...
 	  */
 
-	  strftime(date, sizeof(date), "%b %d %H:%M", jobdate);
+	  if (!strftime(date, sizeof(date), "%b %d %H:%M", jobdate))
+	    strcpy(date, "Unknown");
 
 	  printf("%s;%s;%d;%s;%s\n", temp, username ? username : "unknown",
 	         size, title ? title : "unknown", date);
 	}
 	else
 	{
-	  strftime(date, sizeof(date), CUPS_STRFTIME_FORMAT, jobdate);
+	  if (!strftime(date, sizeof(date), CUPS_STRFTIME_FORMAT, jobdate))
+	    strcpy(date, "Unknown");
 
           if (ranking)
 	    printf("%3d %-21s %-13s %8d %s\n", rank, temp,
