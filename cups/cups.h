@@ -84,7 +84,7 @@ enum cups_ptype_e			/* Not a typedef'd enum so we can OR */
   CUPS_PRINTER_FAX = 0x40000,		/* Fax queue */
   CUPS_PRINTER_REJECTING = 0x80000,	/* Printer is rejecting jobs */
   CUPS_PRINTER_DELETE = 0x100000,	/* Delete printer */
-  CUPS_PRINTER_SHARED = 0x200000,	/* Printer is shared */
+  CUPS_PRINTER_NOT_SHARED = 0x200000,	/* Printer is not shared */
   CUPS_PRINTER_OPTIONS = 0x26fffc	/* ~(CLASS | REMOTE | IMPLICIT) */
 };
 

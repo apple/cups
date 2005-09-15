@@ -1300,9 +1300,9 @@ UpdateCUPSBrowse(void)
   * Do ACL stuff...
   */
 
-  if (BrowseACL && (BrowseACL->num_allow || BrowseACL->num_deny))
+  if (BrowseACL)
   {
-    if (httpAddrLocalhost(&srcaddr) || strcasecmp(srcname, "localhost") == 0)
+    if (httpAddrLocalhost(&srcaddr) || !strcasecmp(srcname, "localhost"))
     {
      /*
       * Access from localhost (127.0.0.1) is always allowed...
@@ -1443,13 +1443,13 @@ UpdateCUPSBrowse(void)
   * Check for packets from the local server...
   */
 
-  if (strcasecmp(host, ServerName) == 0)
+  if (!strcasecmp(host, ServerName) && port == LocalPort)
     return;
 
   NetIFUpdate();
 
   for (iface = NetIFList; iface != NULL; iface = iface->next)
-    if (strcasecmp(host, iface->hostname) == 0)
+    if (!strcasecmp(host, iface->hostname) && port == LocalPort)
       return;
 
  /*

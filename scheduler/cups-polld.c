@@ -229,11 +229,11 @@ poll_server(http_t      *http,		/* I - HTTP connection */
 	       NULL, attrs);
 
   ippAddInteger(request, IPP_TAG_OPERATION, IPP_TAG_ENUM,
-                "printer-type", CUPS_PRINTER_SHARED);
+                "printer-type", 0);
   ippAddInteger(request, IPP_TAG_OPERATION, IPP_TAG_ENUM,
                 "printer-type-mask",
 		CUPS_PRINTER_REMOTE | CUPS_PRINTER_IMPLICIT |
-		CUPS_PRINTER_SHARED);
+		CUPS_PRINTER_NOT_SHARED);
 
  /*
   * Do the request and get back a response...

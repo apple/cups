@@ -1825,10 +1825,10 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
   * Add the CUPS-specific printer-type attribute...
   */
 
-  if (p->shared)
-    p->type |= CUPS_PRINTER_SHARED;
+  if (!p->shared)
+    p->type |= CUPS_PRINTER_NOT_SHARED;
   else
-    p->type &= ~CUPS_PRINTER_SHARED;
+    p->type &= ~CUPS_PRINTER_NOT_SHARED;
 
   ippAddInteger(p->attrs, IPP_TAG_PRINTER, IPP_TAG_ENUM, "printer-type",
                 printer_type);
