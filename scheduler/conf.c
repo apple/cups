@@ -1083,6 +1083,8 @@ get_addr_and_mask(const char *value,	/* I - String from config file */
   int		i,			/* Looping var */
 		family,			/* Address family */
 		ipcount;		/* Count of fields in address */
+  const char	*maskval,		/* Pointer to start of mask value */
+		*ptr;			/* Pointer into value */
   static unsigned netmasks[4][4] =	/* Standard netmasks... */
   {
     { 0xffffffff, 0x00000000, 0x00000000, 0x00000000 },
@@ -1097,105 +1099,177 @@ get_addr_and_mask(const char *value,	/* I - String from config file */
   */
 
   memset(ip, 0, sizeof(unsigned) * 4);
-  family  = AF_INET;
-  ipcount = sscanf(value, "%u.%u.%u.%u", ip + 0, ip + 1, ip + 2, ip + 3);
+
+  if ((maskval = strchr(value, '/')) != NULL)
+    maskval ++;
+  else
+    maskval = value + strlen(value);
 
 #ifdef AF_INET6
  /*
-  * See if we have any values > 255; if so, this is an IPv6 address only.
+  * Check for an IPv6 address...
   */
 
-  for (i = 0; i < ipcount; i ++)
-    if (ip[0] > 255)
-    {
-      family = AF_INET6;
-      break;
-    }
-#endif /* AF_INET6 */
+  if ((ptr = strchr(value, ':')) != NULL && ptr < maskval)
+  {
+   /*
+    * Parse hexadecimal IPv6 address...
+    */
 
-  if ((value = strchr(value, '/')) != NULL)
+    family  = AF_INET6;
+
+    for (i = 0, ptr = value; *ptr && i < 4; i ++)
+    {
+      if (*ptr == ':')
+        ip[i] = 0;
+      else
+        ip[i] = strtoul(ptr, (char **)&ptr, 16);
+
+      if (*ptr == ':')
+        ptr ++;
+    }
+
+    ipcount = i;
+
+    if (*ptr && *ptr != '/')
+      return (0);
+  }
+  else
+#endif /* AF_INET6 */
+  {
+   /*
+    * Parse dotted-decimal IPv4 address...
+    */
+
+    family  = AF_INET;
+    ipcount = sscanf(value, "%u.%u.%u.%u", ip + 0, ip + 1, ip + 2, ip + 3);
+  }
+
+  if (*maskval)
   {
    /*
     * Get the netmask value(s)...
     */
 
-    value ++;
     memset(mask, 0, sizeof(unsigned) * 4);
-    switch (sscanf(value, "%u.%u.%u.%u", mask + 0, mask + 1,
-	           mask + 2, mask + 3))
-    {
-      case 1 :
+
 #ifdef AF_INET6
-          if (mask[0] >= 32)
-	    family = AF_INET6;
+    if (strchr(maskval, ':'))
+    {
+     /*
+      * Get hexadecimal mask value...
+      */
 
-          if (family == AF_INET6)
-	  {
-  	    i = 128 - mask[0];
+      for (i = 0, ptr = maskval; *ptr && i < 4; i ++)
+      {
+	if (*ptr == ':')
+          mask[i] = 0;
+	else
+          mask[i] = strtoul(ptr, (char **)&ptr, 16);
 
-	    if (i <= 96)
-	      mask[0] = 0xffffffff;
-	    else
-	      mask[0] = (0xffffffff << (128 - mask[0])) & 0xffffffff;
+	if (*ptr == ':')
+          ptr ++;
+      }
 
-	    if (i <= 64)
-	      mask[1] = 0xffffffff;
-	    else if (i >= 96)
-	      mask[1] = 0;
-	    else
-	      mask[1] = (0xffffffff << (96 - mask[0])) & 0xffffffff;
+      while (i < 4)
+      {
+	mask[i] = 0;
+	i ++;
+      }
 
-	    if (i <= 32)
-	      mask[1] = 0xffffffff;
-	    else if (i >= 64)
-	      mask[1] = 0;
-	    else
-	      mask[1] = (0xffffffff << (64 - mask[0])) & 0xffffffff;
-
-	    if (i >= 32)
-	      mask[1] = 0;
-	    else
-	      mask[1] = (0xffffffff << (32 - mask[0])) & 0xffffffff;
-          }
-	  else
+      if (*ptr && *ptr != '/')
+	return (0);
+    }
+    else
 #endif /* AF_INET6 */
-	  {
-  	    i = 32 - mask[0];
+    if (strchr(maskval, '.'))
+    {
+     /*
+      * Get dotted-decimal mask...
+      */
 
-	    if (i <= 24)
-	      mask[0] = 0xffffffff;
-	    else
-	      mask[0] = (0xffffffff << (32 - mask[0])) & 0xffffffff;
+      if (sscanf(maskval, "%u.%u.%u.%u", mask + 0, mask + 1, mask + 2, mask + 3) != 4)
+        return (0);
+    }
+    else
+    {
+     /*
+      * Get address/bits format...
+      */
 
-	    if (i <= 16)
-	      mask[1] = 0xffffffff;
-	    else if (i >= 24)
-	      mask[1] = 0;
-	    else
-	      mask[1] = (0xffffffff << (24 - mask[0])) & 0xffffffff;
+      i = atoi(maskval);
 
-	    if (i <= 8)
-	      mask[1] = 0xffffffff;
-	    else if (i >= 16)
-	      mask[1] = 0;
-	    else
-	      mask[1] = (0xffffffff << (16 - mask[0])) & 0xffffffff;
+#ifdef AF_INET6
+      if (family == AF_INET6)
+      {
+        i = 128 - i;
 
-	    if (i >= 8)
-	      mask[1] = 0;
-	    else
-	      mask[1] = (0xffffffff << (8 - mask[0])) & 0xffffffff;
-          }
+	if (i <= 96)
+	  mask[0] = 0xffffffff;
+	else
+	  mask[0] = (0xffffffff << (i - 96)) & 0xffffffff;
 
-      case 4 :
-	  break;
+	if (i <= 64)
+	  mask[1] = 0xffffffff;
+	else if (i >= 96)
+	  mask[1] = 0;
+	else
+	  mask[1] = (0xffffffff << (i - 64)) & 0xffffffff;
 
-      default :
-          return (0);
+	if (i <= 32)
+	  mask[2] = 0xffffffff;
+	else if (i >= 64)
+	  mask[2] = 0;
+	else
+	  mask[2] = (0xffffffff << (i - 32)) & 0xffffffff;
+
+	if (i == 0)
+	  mask[3] = 0xffffffff;
+	else if (i >= 32)
+	  mask[3] = 0;
+	else
+	  mask[3] = (0xffffffff << i) & 0xffffffff;
+      }
+      else
+#endif /* AF_INET6 */
+      {
+        i = 32 - i;
+
+	if (i <= 24)
+	  mask[0] = 0xffffffff;
+	else
+	  mask[0] = 0xffffff00 | ((0xff << (i - 24)) & 0xff);
+
+	if (i <= 16)
+	  mask[1] = 0xffffffff;
+	else if (i >= 24)
+	  mask[1] = 0xffffff00;
+	else
+	  mask[1] = 0xffffff00 | ((0xff << (i - 16)) & 0xff);
+
+	if (i <= 8)
+	  mask[2] = 0xffffffff;
+	else if (i >= 16)
+	  mask[2] = 0xffffff00;
+	else
+	  mask[2] = 0xffffff00 | ((0xff << (i - 8)) & 0xff);
+
+	if (i == 0)
+	  mask[3] = 0xffffffff;
+	else if (i >= 8)
+	  mask[3] = 0xffffff00;
+	else
+	  mask[3] = 0xffffff00 | ((0xff << i) & 0xff);
+      }
     }
   }
   else
     memcpy(mask, netmasks[ipcount - 1], sizeof(unsigned) * 4);
+
+  LogMessage(L_DEBUG2, "get_addr_and_mask(value=\"%s\", "
+                       "ip=[%08x:%08x:%08x:%08x], mask=[%08x:%08x:%08x:%08x]",
+             value, ip[0], ip[1], ip[2], ip[3], mask[0], mask[1], mask[2],
+	     mask[3]);
 
  /*
   * Check for a valid netmask; no fallback like in CUPS 1.1.x!
