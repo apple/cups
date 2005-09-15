@@ -80,6 +80,8 @@ main(int  argc,			/* I - Number of command-line arguments */
   int		ppdversion;	/* PPD spec version in PPD file */
   ppd_status_t	error;		/* Status of ppdOpen*() */
   int		line;		/* Line number for error */
+  int		xdpi,		/* X resolution */
+		ydpi;		/* Y resolution */
   ppd_file_t	*ppd;		/* PPD file record */
   ppd_attr_t	*attr;		/* PPD attribute */
   ppd_size_t	*size;		/* Size record */
@@ -825,6 +827,49 @@ main(int  argc,			/* I - Number of command-line arguments */
       }
 
      /*
+      * Check for valid Resolution, JCLResolution, or SetResolution values...
+      */
+
+      if ((option = ppdFindOption(ppd, "Resolution")) == NULL)
+	if ((option = ppdFindOption(ppd, "JCLResolution")) == NULL)
+          option = ppdFindOption(ppd, "SetResolution");
+
+      if (option != NULL)
+      {
+        for (j = option->num_choices, choice = option->choices; j > 0; j --, choice ++)
+        {
+	 /*
+	  * Verify that all resolution options are of the form NNNdpi
+	  * or NNNxNNNdpi...
+	  */
+
+          xdpi = strtol(choice->choice, (char **)&ptr, 10);
+	  if (ptr > choice->choice && xdpi > 0)
+	  {
+	    if (*ptr == 'x')
+	      ydpi = strtol(ptr + 1, (char **)&ptr, 10);
+	    else
+	      ydpi = xdpi;
+	  }
+
+	  if (xdpi <= 0 || ydpi <= 0 || strcmp(ptr, "dpi"))
+	  {
+	    if (verbose >= 0)
+	    {
+	      if (!errors && !verbose)
+		puts(" FAIL");
+
+	      printf("      **FAIL**  Bad %s choice %s!\n",
+	             option->keyword, choice->choice);
+	      puts("                REF: Page 84, section 5.9");
+            }
+
+	    errors ++;
+	  }
+	}
+      }
+
+     /*
       * Check for a duplex option, and for standard values...
       */
 
@@ -881,8 +926,9 @@ main(int  argc,			/* I - Number of command-line arguments */
 	    strcmp(option->keyword, "Duplex") &&
 	    strcmp(option->keyword, "JCLDuplex"))
 	{
-	  printf("        WARN    Duplex option keyword %s should be named Duplex!\n",
+	  printf("        WARN    Duplex option keyword %s should be named Duplex or JCLDuplex!\n",
 	         option->keyword);
+          puts("                REF: Page 122, section 5.17");
 	}
 
         ppdMarkDefaults(ppd);
