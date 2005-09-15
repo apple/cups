@@ -3,6 +3,10 @@ CHANGES.txt - 09/15/2005
 
 CHANGES IN CUPS V1.2.0b1
 
+	- The configure script now supports "--disable-library"
+	  to disable particular image file format support
+	  libraries, even if they are available on the build
+	  system (STR #1248)
 	- The IPP backend did not always report on the total
 	  number of pages that were printed (STR #1251)
 	- The lpstat program could display garbage date and time

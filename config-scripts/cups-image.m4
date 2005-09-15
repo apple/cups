@@ -27,6 +27,10 @@ dnl included with every program...
 SAVELIBS="$LIBS"
 
 dnl Check for image libraries...
+AC_ARG_ENABLE(jpeg, [  --enable-jpeg           turn on JPEG support, default=yes])
+AC_ARG_ENABLE(png, [  --enable-png            turn on PNG support, default=yes])
+AC_ARG_ENABLE(tiff, [  --enable-tiff           turn on TIFF support, default=yes])
+
 LIBJPEG=""
 LIBPNG=""
 LIBTIFF=""
@@ -37,11 +41,15 @@ AC_SUBST(LIBPNG)
 AC_SUBST(LIBTIFF)
 AC_SUBST(LIBZ)
 
-AC_CHECK_HEADER(jpeglib.h,
-    AC_CHECK_LIB(jpeg, jpeg_destroy_decompress,
-	AC_DEFINE(HAVE_LIBJPEG)
-	LIBJPEG="-ljpeg"
-	LIBS="$LIBS -ljpeg"))
+if test x$enable_jpeg != xno; then
+    AC_CHECK_HEADER(jpeglib.h,
+	AC_CHECK_LIB(jpeg, jpeg_destroy_decompress,
+	    AC_DEFINE(HAVE_LIBJPEG)
+	    LIBJPEG="-ljpeg"
+	    LIBS="$LIBS -ljpeg"))
+else
+    AC_MSG_NOTICE([JPEG support disabled with --disable-jpeg.])
+fi
 
 AC_CHECK_HEADER(zlib.h,
     AC_CHECK_LIB(z, gzgets,
@@ -52,15 +60,23 @@ AC_CHECK_HEADER(zlib.h,
 dnl PNG library uses math library functions...
 AC_CHECK_LIB(m, pow)
 
-AC_CHECK_HEADER(png.h,
-    AC_CHECK_LIB(png, png_set_tRNS_to_alpha,
-	AC_DEFINE(HAVE_LIBPNG)
-	LIBPNG="-lpng -lm"))
+if test x$enable_png != xno; then
+    AC_CHECK_HEADER(png.h,
+	AC_CHECK_LIB(png, png_set_tRNS_to_alpha,
+	    AC_DEFINE(HAVE_LIBPNG)
+	    LIBPNG="-lpng -lm"))
+else
+    AC_MSG_NOTICE([PNG support disabled with --disable-png.])
+fi
 
-AC_CHECK_HEADER(tiff.h,
-    AC_CHECK_LIB(tiff, TIFFReadScanline,
+if test x$enable_tiff != xno; then
+    AC_CHECK_HEADER(tiff.h,
+	AC_CHECK_LIB(tiff, TIFFReadScanline,
 	AC_DEFINE(HAVE_LIBTIFF)
 	LIBTIFF="-ltiff"))
+else
+    AC_MSG_NOTICE([TIFF support disabled with --disable-tiff.])
+fi
 
 dnl Restore original LIBS settings...
 LIBS="$SAVELIBS"

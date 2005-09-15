@@ -121,7 +121,7 @@ static char	* const ipp_std_ops[] =
 		  "Create-Printer-Subscription",
 		  "Create-Job-Subscription",
 		  "Get-Subscription-Attributes",
-		  "Get-Subscriptions", "Renew-Subscriptions",
+		  "Get-Subscriptions", "Renew-Subscription",
 		  "Cancel-Subscription", "Get-Notifications",
 		  "Send-Notifications", "", "",
 
