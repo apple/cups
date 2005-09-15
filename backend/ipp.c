@@ -835,9 +835,11 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
       fprintf(stderr, "PAGE: 1 %d\n", copies_sup ? atoi(argv[4]) : 1);
       copies --;
     }
-    else if (ipp_status != IPP_SERVICE_UNAVAILABLE &&
-	     ipp_status != IPP_PRINTER_BUSY)
+    else if (ipp_status == IPP_SERVICE_UNAVAILABLE ||
+	     ipp_status == IPP_PRINTER_BUSY)
       break;
+    else
+      copies --;
 
    /*
     * Wait for the job to complete...
@@ -920,10 +922,6 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 
       if (response != NULL)
       {
-	if ((job_sheets = ippFindAttribute(response, "job-media-sheets-completed",
-	                                   IPP_TAG_INTEGER)) != NULL)
-	  fprintf(stderr, "PAGE: total %d\n", job_sheets->values[0].integer);
-
 	if ((job_state = ippFindAttribute(response, "job-state",
 	                                  IPP_TAG_ENUM)) != NULL)
 	{
@@ -934,6 +932,10 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
           if (job_state->values[0].integer > IPP_JOB_PROCESSING ||
 	      job_state->values[0].integer == IPP_JOB_HELD)
 	  {
+	    if ((job_sheets = ippFindAttribute(response, "job-media-sheets-completed",
+	                                   IPP_TAG_INTEGER)) != NULL)
+	      fprintf(stderr, "PAGE: total %d\n", job_sheets->values[0].integer);
+
 	    ippDelete(response);
 	    break;
 	  }

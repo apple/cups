@@ -3,6 +3,8 @@ CHANGES.txt - 09/15/2005
 
 CHANGES IN CUPS V1.2.0b1
 
+	- The IPP backend did not always report on the total
+	  number of pages that were printed (STR #1251)
 	- The lpstat program could display garbage date and time
 	  values for locales whose date format exceeded 31
 	  characters (STR #1263)
