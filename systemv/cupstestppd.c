@@ -340,7 +340,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	  puts("        PASS    DefaultImageableArea");
       }
 
-      if (ppdFindAttr(ppd, "DefaultPaperDimension", NULL) == NULL)
+      if ((attr = ppdFindAttr(ppd, "DefaultPaperDimension", NULL)) == NULL)
       {
 	if (verbose >= 0)
 	{
