@@ -369,5 +369,43 @@ httpGetHostByName(const char *name)	/* I - Hostname or IP address */
 
 
 /*
+ * 'httpGetHostname()' - Get the FQDN for the local system.
+ *
+ * This function uses both gethostname() and gethostbyname() to
+ * get the local hostname with domain.
+ */
+
+const char *				/* O - FQDN for this system */
+httpGetHostname(char *s,		/* I - String buffer for name */
+                int  slen)		/* I - Size of buffer */
+{
+  struct hostent	*host;		/* Host entry to get FQDN */
+
+
+ /*
+  * Get the hostname...
+  */
+
+  gethostname(s, slen);
+
+  if (!strchr(s, '.'))
+  {
+   /*
+    * The hostname is not a FQDN, so look it up...
+    */
+
+    if ((host = gethostbyname(s)) != NULL)
+      strlcpy(s, host->h_name, slen);
+  }
+
+ /*
+  * Return the hostname with as much domain info as we have...
+  */
+
+  return (s);
+}
+
+
+/*
  * End of "$Id$".
  */

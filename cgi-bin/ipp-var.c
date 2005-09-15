@@ -231,7 +231,8 @@ ippRewriteURL(const char *uri,		/* I - Current URI */
     */
 
     server = getenv("SERVER_NAME");
-    gethostname(servername, sizeof(servername));
+
+    httpGetHostname(servername, sizeof(servername));
 
    /*
     * Then flag whether we are using SSL on this connection...

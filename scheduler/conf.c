@@ -276,8 +276,7 @@ ReadConfiguration(void)
   * String options...
   */
 
-  gethostname(temp, sizeof(temp));
-  SetString(&ServerName, temp);
+  SetString(&ServerName, httpGetHostname(temp, sizeof(temp)));
   SetStringf(&ServerAdmin, "root@%s", temp);
   SetString(&ServerBin, CUPS_SERVERBIN);
   SetString(&RequestRoot, CUPS_REQUESTS);

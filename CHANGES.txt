@@ -3,6 +3,10 @@ CHANGES.txt - 09/15/2005
 
 CHANGES IN CUPS V1.2.0b1
 
+	- Added new httpGetHostname() function to CUPS API, and
+	  use it instead of gethostname() so that the web
+	  interface will work correctly on systems whose hostname
+	  is not the FQDN (STR #1266)
 	- The scheduler now stops printers if the backend for the
 	  queue is missing on startup (STR #1265)
 	- The configure script now supports "--disable-library"

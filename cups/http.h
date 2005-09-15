@@ -421,6 +421,7 @@ extern char		*httpAddrLookup(const http_addr_t *addr,
 extern char		*httpAddrString(const http_addr_t *addr,
 			                char *s, int slen);
 extern const char	*httpGetDateString2(time_t t, char *s, int slen);
+extern const char	*httpGetHostname(char *s, int slen);
 
 
 /*
