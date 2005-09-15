@@ -3,6 +3,9 @@ CHANGES.txt - 09/15/2005
 
 CHANGES IN CUPS V1.2.0b1
 
+	- The scheduler now verifies that a printer supports
+	  Letter or A4 media sizes before setting them as the
+	  initial default (STR #1250)
 	- The cupstestppd program now flags bad Resolution
 	  options (STR #1269)
 	- The USB backend now retries printing when the printer

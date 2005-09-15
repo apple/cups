@@ -2994,7 +2994,8 @@ copy_model(const char *from,		/* I - Source file */
 {
   cups_file_t	*src,			/* Source file */
 		*dst;			/* Destination file */
-  char		buffer[2048];		/* Copy buffer */
+  char		buffer[2048],		/* Copy buffer */
+		*ptr;			/* Pointer into buffer */
   int		i;			/* Looping var */
   char		option[PPD_MAX_NAME],	/* Option name */
 		choice[PPD_MAX_NAME];	/* Choice name */
@@ -3002,6 +3003,8 @@ copy_model(const char *from,		/* I - Source file */
   ppd_default_t	*defaults;		/* Default options */
   char		cups_protocol[PPD_MAX_LINE];
 					/* cupsProtocol attribute */
+  int		have_letter,		/* Have Letter size */
+		have_a4;		/* Have A4 size */
 #ifdef HAVE_LIBPAPER
   char		*paper_result;		/* Paper size name from libpaper */
   char		system_paper[64];	/* Paper size name buffer */
@@ -3009,6 +3012,43 @@ copy_model(const char *from,		/* I - Source file */
 
 
   LogMessage(L_DEBUG2, "copy_model(\"%s\", \"%s\")\n", from, to);
+
+ /*
+  * Read the source file and see what page sizes are supported...
+  */
+
+  have_letter = 0;
+  have_a4     = 0;
+
+  if ((src = cupsFileOpen(from, "rb")) == NULL)
+    return (-1);
+
+  while (cupsFileGets(src, buffer, sizeof(buffer)) != NULL)
+    if (!strncmp(buffer, "*PageSize ", 10))
+    {
+     /*
+      * Strip UI text and command data from the end of the line...
+      */
+
+      if ((ptr = strchr(buffer + 10, '/')) != NULL)
+        *ptr = '\0';
+      if ((ptr = strchr(buffer + 10, ':')) != NULL)
+        *ptr = '\0';
+
+      for (ptr = buffer + 10; isspace(*ptr); ptr ++);
+
+     /*
+      * Look for Letter and A4 page sizes...
+      */
+
+      if (!strcmp(ptr, "Letter"))
+	have_letter = 1;
+
+      if (!strcmp(ptr, "A4"))
+	have_a4 = 1;
+    }
+
+  cupsFileRewind(src);
 
  /*
   * Open the destination (if possible) and set the default options...
@@ -3051,14 +3091,18 @@ copy_model(const char *from,		/* I - Source file */
     strlcpy(system_paper, paper_result, sizeof(system_paper));
     system_paper[0] = toupper(system_paper[0] & 255);
 
-    num_defaults = ppd_add_default("PageSize", system_paper, 
-				   num_defaults, &defaults);
-    num_defaults = ppd_add_default("PageRegion", system_paper, 
-				   num_defaults, &defaults);
-    num_defaults = ppd_add_default("PaperDimension", system_paper, 
-				   num_defaults, &defaults);
-    num_defaults = ppd_add_default("ImageableArea", system_paper, 
-				   num_defaults, &defaults);
+    if ((!strcmp(system_paper, "Letter") && have_letter) ||
+        (!strcmp(system_paper, "A4") && have_a4))
+    {
+      num_defaults = ppd_add_default("PageSize", system_paper, 
+				     num_defaults, &defaults);
+      num_defaults = ppd_add_default("PageRegion", system_paper, 
+				     num_defaults, &defaults);
+      num_defaults = ppd_add_default("PaperDimension", system_paper, 
+				     num_defaults, &defaults);
+      num_defaults = ppd_add_default("ImageableArea", system_paper, 
+				     num_defaults, &defaults);
+    }
   }
 #endif /* HAVE_LIBPAPER */
   else
@@ -3084,16 +3128,19 @@ copy_model(const char *from,		/* I - Source file */
       * These are the only locales that will default to "letter" size...
       */
 
-      num_defaults = ppd_add_default("PageSize", "Letter", num_defaults,
-                                     &defaults);
-      num_defaults = ppd_add_default("PageRegion", "Letter", num_defaults,
-                                     &defaults);
-      num_defaults = ppd_add_default("PaperDimension", "Letter", num_defaults,
-                                     &defaults);
-      num_defaults = ppd_add_default("ImageableArea", "Letter", num_defaults,
-                                     &defaults);
+      if (have_letter)
+      {
+	num_defaults = ppd_add_default("PageSize", "Letter", num_defaults,
+                                       &defaults);
+	num_defaults = ppd_add_default("PageRegion", "Letter", num_defaults,
+                                       &defaults);
+	num_defaults = ppd_add_default("PaperDimension", "Letter", num_defaults,
+                                       &defaults);
+	num_defaults = ppd_add_default("ImageableArea", "Letter", num_defaults,
+                                       &defaults);
+      }
     }
-    else
+    else if (have_a4)
     {
      /*
       * The rest default to "a4" size...
@@ -3111,16 +3158,8 @@ copy_model(const char *from,		/* I - Source file */
   }
 
  /*
-  * Open the source and destination file for a copy...
+  * Open the destination file for a copy...
   */
-
-  if ((src = cupsFileOpen(from, "rb")) == NULL)
-  {
-    if (num_defaults > 0)
-      free(defaults);
-
-    return (-1);
-  }
 
   if ((dst = cupsFileOpen(to, "wb")) == NULL)
   {
