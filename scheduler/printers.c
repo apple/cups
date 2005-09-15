@@ -874,8 +874,38 @@ LoadAllPrinters(void)
     {
       if (p != NULL)
       {
+       /*
+        * Close out the current printer...
+	*/
+
         SetPrinterAttrs(p);
 	AddPrinterHistory(p);
+
+        if (p->device_uri && strncmp(p->device_uri, "file:", 5) &&
+	    p->state != IPP_PRINTER_STOPPED)
+	{
+	 /*
+          * See if the backend exists...
+	  */
+
+	  snprintf(line, sizeof(line), "%s/backends/%s", ServerBin,
+	           p->device_uri);
+
+          if ((valueptr = strchr(line + strlen(ServerBin), ':')) != NULL)
+	    *valueptr = '\0';		/* Chop everything but URI scheme */
+
+          if (access(line, 0))
+	  {
+	   /*
+	    * Backend does not exist, stop printer...
+	    */
+
+	    p->state = IPP_PRINTER_STOPPED;
+	    snprintf(p->state_message, sizeof(p->state_message),
+	             "Backend %s does not exist!", line);
+	  }
+        }
+
         p = NULL;
       }
       else
