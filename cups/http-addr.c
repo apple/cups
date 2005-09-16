@@ -461,16 +461,19 @@ httpGetHostByName(const char *name)	/* I - Hostname or IP address */
     host_ip.h_name      = h_name;
     host_ip.h_aliases   = NULL;
     host_ip.h_addrtype  = current->ai_family;
-    host_ip.h_length    = current->ai_addrlen;
     host_ip.h_addr_list = packed_ptr;
+
+    if (current->ai_family == AF_INET6)
+      host_ip.h_length = 16;
+    else
+      host_ip.h_length = 4;
 
    /*
     * Convert the address info to a hostent structure...
     */
 
     for (i = 0, current = results; i < 100 && current; current = current->ai_next)
-      if (current->ai_family == host_ip.h_addrtype &&
-          current->ai_addrlen == host_ip.h_length)
+      if (current->ai_family == host_ip.h_addrtype)
       {
        /*
         * Copy this address...
