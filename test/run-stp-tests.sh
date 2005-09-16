@@ -163,8 +163,8 @@ read usevalgrind
 
 case "$usevalgrind" in
 	Y* | y*)
-		valgrind="valgrind --tool=memcheck --logfile=/tmp/$user/log/valgrind --error-limit=no --leak-check=yes --trace-children=yes"
-		echo "Using Valgrind; log files can be found in /tmp/$user/log..."
+		valgrind="valgrind --tool=memcheck --logfile=/tmp/cups-$user/log/valgrind --error-limit=no --leak-check=yes --trace-children=yes"
+		echo "Using Valgrind; log files can be found in /tmp/cups-$user/log..."
 		;;
 
 	*)
@@ -176,51 +176,51 @@ esac
 # Start by creating temporary directories for the tests...
 #
 
-rm -rf /tmp/$user
-mkdir /tmp/$user
-mkdir /tmp/$user/bin
-mkdir /tmp/$user/bin/backend
-mkdir /tmp/$user/bin/filter
-mkdir /tmp/$user/certs
-mkdir /tmp/$user/share
-mkdir /tmp/$user/share/banners
-mkdir /tmp/$user/share/model
-mkdir /tmp/$user/interfaces
-mkdir /tmp/$user/log
-mkdir /tmp/$user/ppd
-mkdir /tmp/$user/spool
-mkdir /tmp/$user/spool/temp
-mkdir /tmp/$user/ssl
+rm -rf /tmp/cups-$user
+mkdir /tmp/cups-$user
+mkdir /tmp/cups-$user/bin
+mkdir /tmp/cups-$user/bin/backend
+mkdir /tmp/cups-$user/bin/filter
+mkdir /tmp/cups-$user/certs
+mkdir /tmp/cups-$user/share
+mkdir /tmp/cups-$user/share/banners
+mkdir /tmp/cups-$user/share/model
+mkdir /tmp/cups-$user/interfaces
+mkdir /tmp/cups-$user/log
+mkdir /tmp/cups-$user/ppd
+mkdir /tmp/cups-$user/spool
+mkdir /tmp/cups-$user/spool/temp
+mkdir /tmp/cups-$user/ssl
 
-ln -s $root/backend/http /tmp/$user/bin/backend
-ln -s $root/backend/ipp /tmp/$user/bin/backend
-ln -s $root/backend/lpd /tmp/$user/bin/backend
-ln -s $root/backend/parallel /tmp/$user/bin/backend
-ln -s $root/backend/serial /tmp/$user/bin/backend
-ln -s $root/backend/socket /tmp/$user/bin/backend
-ln -s $root/backend/usb /tmp/$user/bin/backend
-ln -s $root/cgi-bin /tmp/$user/bin
-ln -s $root/scheduler /tmp/$user/bin/daemon
-ln -s $root/filter/hpgltops /tmp/$user/bin/filter
-ln -s $root/filter/imagetops /tmp/$user/bin/filter
-ln -s $root/filter/imagetoraster /tmp/$user/bin/filter
-ln -s $root/filter/pstops /tmp/$user/bin/filter
-ln -s $root/filter/rastertoepson /tmp/$user/bin/filter
-ln -s $root/filter/rastertohp /tmp/$user/bin/filter
-ln -s $root/filter/texttops /tmp/$user/bin/filter
-ln -s $root/pdftops/pdftops /tmp/$user/bin/filter
+ln -s $root/backend/http /tmp/cups-$user/bin/backend
+ln -s $root/backend/ipp /tmp/cups-$user/bin/backend
+ln -s $root/backend/lpd /tmp/cups-$user/bin/backend
+ln -s $root/backend/parallel /tmp/cups-$user/bin/backend
+ln -s $root/backend/serial /tmp/cups-$user/bin/backend
+ln -s $root/backend/socket /tmp/cups-$user/bin/backend
+ln -s $root/backend/usb /tmp/cups-$user/bin/backend
+ln -s $root/cgi-bin /tmp/cups-$user/bin
+ln -s $root/scheduler /tmp/cups-$user/bin/daemon
+ln -s $root/filter/hpgltops /tmp/cups-$user/bin/filter
+ln -s $root/filter/imagetops /tmp/cups-$user/bin/filter
+ln -s $root/filter/imagetoraster /tmp/cups-$user/bin/filter
+ln -s $root/filter/pstops /tmp/cups-$user/bin/filter
+ln -s $root/filter/rastertoepson /tmp/cups-$user/bin/filter
+ln -s $root/filter/rastertohp /tmp/cups-$user/bin/filter
+ln -s $root/filter/texttops /tmp/cups-$user/bin/filter
+ln -s $root/pdftops/pdftops /tmp/cups-$user/bin/filter
 
-ln -s $root/data/classified /tmp/$user/share/banners
-ln -s $root/data/confidential /tmp/$user/share/banners
-ln -s $root/data/secret /tmp/$user/share/banners
-ln -s $root/data/standard /tmp/$user/share/banners
-ln -s $root/data/topsecret /tmp/$user/share/banners
-ln -s $root/data/unclassified /tmp/$user/share/banners
-ln -s $root/data /tmp/$user/share/charsets
-ln -s $root/data /tmp/$user/share
-ln -s $root/fonts /tmp/$user/share
-ln -s $root/ppd/*.ppd /tmp/$user/share/model
-ln -s $root/templates /tmp/$user/share
+ln -s $root/data/classified /tmp/cups-$user/share/banners
+ln -s $root/data/confidential /tmp/cups-$user/share/banners
+ln -s $root/data/secret /tmp/cups-$user/share/banners
+ln -s $root/data/standard /tmp/cups-$user/share/banners
+ln -s $root/data/topsecret /tmp/cups-$user/share/banners
+ln -s $root/data/unclassified /tmp/cups-$user/share/banners
+ln -s $root/data /tmp/cups-$user/share/charsets
+ln -s $root/data /tmp/cups-$user/share
+ln -s $root/fonts /tmp/cups-$user/share
+ln -s $root/ppd/*.ppd /tmp/cups-$user/share/model
+ln -s $root/templates /tmp/cups-$user/share
 
 if test $ssltype != 0; then
 	mkdir $root/ssl
@@ -237,25 +237,25 @@ else
 	encryption=""
 fi
 
-cat >/tmp/$user/cupsd.conf <<EOF
+cat >/tmp/cups-$user/cupsd.conf <<EOF
 Browsing Off
 FileDevice yes
 Printcap
 Listen 127.0.0.1:$port
 User $user
-ServerRoot /tmp/$user
-StateDir /tmp/$user
-ServerBin /tmp/$user/bin
-CacheDir /tmp/$user/share
-DataDir /tmp/$user/share
-FontPath /tmp/$user/share/fonts
+ServerRoot /tmp/cups-$user
+StateDir /tmp/cups-$user
+ServerBin /tmp/cups-$user/bin
+CacheDir /tmp/cups-$user/share
+DataDir /tmp/cups-$user/share
+FontPath /tmp/cups-$user/share/fonts
 DocumentRoot $root/doc
-RequestRoot /tmp/$user/spool
-TempDir /tmp/$user/spool/temp
+RequestRoot /tmp/cups-$user/spool
+TempDir /tmp/cups-$user/spool/temp
 MaxLogSize 0
-AccessLog /tmp/$user/log/access_log
-ErrorLog /tmp/$user/log/error_log
-PageLog /tmp/$user/log/page_log
+AccessLog /tmp/cups-$user/log/access_log
+ErrorLog /tmp/cups-$user/log/error_log
+PageLog /tmp/cups-$user/log/page_log
 LogLevel debug
 PreserveJobHistory Yes
 <Policy default>
@@ -268,8 +268,8 @@ $encryption
 </Policy>
 EOF
 
-touch /tmp/$user/classes.conf
-touch /tmp/$user/printers.conf
+touch /tmp/cups-$user/classes.conf
+touch /tmp/cups-$user/printers.conf
 
 #
 # Setup lots of test queues - 500 with PPD files, 500 without...
@@ -277,7 +277,7 @@ touch /tmp/$user/printers.conf
 
 i=1
 while test $i -le $nprinters1; do
-	cat >>/tmp/$user/printers.conf <<EOF
+	cat >>/tmp/cups-$user/printers.conf <<EOF
 <Printer test-$i>
 Accepting Yes
 DeviceURI file:/dev/null
@@ -289,13 +289,13 @@ StateMessage Printer $1 is idle.
 </Printer>
 EOF
 
-	cp testps.ppd /tmp/$user/ppd/test-$i.ppd
+	cp testps.ppd /tmp/cups-$user/ppd/test-$i.ppd
 
 	i=`expr $i + 1`
 done
 
 while test $i -le $nprinters2; do
-	cat >>/tmp/$user/printers.conf <<EOF
+	cat >>/tmp/cups-$user/printers.conf <<EOF
 <Printer test-$i>
 Accepting Yes
 DeviceURI file:/dev/null
@@ -310,10 +310,10 @@ EOF
 	i=`expr $i + 1`
 done
 
-cp /tmp/$user/printers.conf /tmp/$user/printers.conf.orig
+cp /tmp/cups-$user/printers.conf /tmp/cups-$user/printers.conf.orig
 
-cp $root/conf/mime.types /tmp/$user/mime.types
-cp $root/conf/mime.convs /tmp/$user/mime.convs
+cp $root/conf/mime.types /tmp/cups-$user/mime.types
+cp $root/conf/mime.convs /tmp/cups-$user/mime.convs
 
 #
 # Setup the paths...
@@ -346,15 +346,15 @@ fi
 
 export SHLIB_PATH
 
-CUPS_SERVERROOT=/tmp/$user; export CUPS_SERVERROOT
-CUPS_STATEDIR=/tmp/$user; export CUPS_STATEDIR
-CUPS_DATADIR=/tmp/$user/share; export CUPS_DATADIR
+CUPS_SERVERROOT=/tmp/cups-$user; export CUPS_SERVERROOT
+CUPS_STATEDIR=/tmp/cups-$user; export CUPS_STATEDIR
+CUPS_DATADIR=/tmp/cups-$user/share; export CUPS_DATADIR
 
 #
 # Set a new home directory to avoid getting user options mixed in...
 #
 
-HOME=/tmp/$user
+HOME=/tmp/cups-$user
 export HOME
 
 #
@@ -362,15 +362,15 @@ export HOME
 #
 
 echo "Starting scheduler:"
-echo "    $valgrind ../scheduler/cupsd -c /tmp/$user/cupsd.conf -f >/tmp/$user/log/debug_log &"
+echo "    $valgrind ../scheduler/cupsd -c /tmp/cups-$user/cupsd.conf -f >/tmp/cups-$user/log/debug_log &"
 echo ""
 
-$valgrind ../scheduler/cupsd -c /tmp/$user/cupsd.conf -f >/tmp/$user/log/debug_log &
+$valgrind ../scheduler/cupsd -c /tmp/cups-$user/cupsd.conf -f >/tmp/cups-$user/log/debug_log &
 cupsd=$!
 
 #if test -x /usr/bin/strace; then
 #	# Trace system calls in cupsd if we have strace...
-#	/usr/bin/strace -tt -o /tmp/$user/log/cupsd.trace -p $cupsd &
+#	/usr/bin/strace -tt -o /tmp/cups-$user/log/cupsd.trace -p $cupsd &
 #fi
 
 if test "x$testtype" = x0; then
@@ -491,23 +491,23 @@ echo "<H1>Log Files</H1>" >>$strfile
 
 echo "<H2>access_log</H2>" >>$strfile
 echo "<PRE>" >>$strfile
-cat /tmp/$user/log/access_log >>$strfile
+cat /tmp/cups-$user/log/access_log >>$strfile
 echo "</PRE>" >>$strfile
 
 echo "<H2>error_log</H2>" >>$strfile
 echo "<PRE>" >>$strfile
-cat /tmp/$user/log/error_log >>$strfile
+cat /tmp/cups-$user/log/error_log >>$strfile
 echo "</PRE>" >>$strfile
 
 echo "<H2>page_log</H2>" >>$strfile
 echo "<PRE>" >>$strfile
-cat /tmp/$user/log/page_log >>$strfile
+cat /tmp/cups-$user/log/page_log >>$strfile
 echo "</PRE>" >>$strfile
 
-if test -f /tmp/$user/log/cupsd.trace; then
+if test -f /tmp/cups-$user/log/cupsd.trace; then
 	echo "<H2>cupsd.trace</H2>" >>$strfile
 	echo "<PRE>" >>$strfile
-	cat /tmp/$user/log/cupsd.trace >>$strfile
+	cat /tmp/cups-$user/log/cupsd.trace >>$strfile
 	echo "</PRE>" >>$strfile
 fi
 
@@ -536,7 +536,7 @@ else
 fi
 
 if test "x$valgrind" != x; then
-	echo "Valgrind log files can be found in /tmp/$user/log."
+	echo "Valgrind log files can be found in /tmp/cups-$user/log."
 fi
 
 echo ""
