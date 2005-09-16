@@ -3,6 +3,8 @@ CHANGES.txt - 09/15/2005
 
 CHANGES IN CUPS V1.2.0b1
 
+	- ippReadIO() did not read collections properly (STR
+	  #1249)
 	- The "make test" script now creates the test files in
 	  "/tmp/cups-$USER" instead of "/tmp/$USER" (STR #981)
 	- All backends now abort on error when printing a job to

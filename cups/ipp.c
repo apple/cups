@@ -1010,6 +1010,10 @@ ippReadIO(void       *src,			/* I - Data source */
 
 	    if (attr->value_tag == IPP_TAG_ZERO)
 	    {
+	     /*
+	      * Setting the value of a collection member...
+	      */
+
 	      attr->value_tag = tag;
 	    }
 	    else if (attr->value_tag == IPP_TAG_STRING ||
@@ -1045,22 +1049,25 @@ ippReadIO(void       *src,			/* I - Data source */
 	      */
 
               if ((temp = realloc(attr, sizeof(ipp_attribute_t) +
-	                                (attr->num_values + IPP_MAX_VALUES - 1) *
+	                                (attr->num_values + IPP_MAX_VALUES) *
 					sizeof(ipp_value_t))) == NULL)
 	        return (IPP_ERROR);
 
-             /*
-	      * Reset pointers in the list...
-	      */
+              if (temp != attr)
+	      {
+               /*
+		* Reset pointers in the list...
+		*/
 
-	      for (ptr = ipp->attrs; ptr && ptr->next != attr; ptr = ptr->next);
+		for (ptr = ipp->attrs; ptr && ptr->next != attr; ptr = ptr->next);
 
-              if (ptr)
-	        ptr->next = temp;
-	      else
-	        ipp->attrs = temp;
+        	if (ptr)
+	          ptr->next = temp;
+		else
+	          ipp->attrs = temp;
 
-              attr = ipp->current = ipp->last = temp;
+        	attr = ipp->current = ipp->last = temp;
+	      }
 	    }
 	  }
 	  else if (tag == IPP_TAG_MEMBERNAME)
@@ -1271,8 +1278,8 @@ ippReadIO(void       *src,			/* I - Data source */
 
             case IPP_TAG_MEMBERNAME :
 	       /*
-	        * The value the name of the member in the collection, which
-		* we need to carry over...
+	        * The value is the name of the member in the collection,
+		* which we need to carry over...
 		*/
 
 		attr->name = calloc(n + 1, 1);
@@ -1282,6 +1289,14 @@ ippReadIO(void       *src,			/* I - Data source */
 	          DEBUG_puts("ippReadIO: Unable to read member name value!");
 		  return (IPP_ERROR);
 		}
+
+               /*
+	        * Since collection members are encoded differently than
+		* regular attributes, make sure we don't start with an
+		* empty value...
+		*/
+
+                attr->num_values --;
 
 		DEBUG_printf(("ippReadIO: member name = \"%s\"\n", attr->name));
 		break;
