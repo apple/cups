@@ -85,13 +85,6 @@ static char	tmpfilename[1024] = "";	/* Temporary spool file name */
 
 
 /*
- * It appears that rresvport_af() is never declared on most systems...
- */
-
-extern int	rresvport_af(int *port, sa_family_t family);
-
-
-/*
  * Local functions...
  */
 
@@ -103,6 +96,9 @@ static int	lpd_queue(const char *hostname, int port, const char *printer,
 			  int manual_copies, int timeout);
 static void	lpd_timeout(int sig);
 static int	lpd_write(int lpd_fd, char *buffer, int length);
+#ifndef HAVE_RRESVPORT_AF
+extern int	rresvport_af(int *port, int family);
+#endif /* !HAVE_RRESVPORT_AF */
 static void	sigterm_handler(int sig);
 
 
@@ -969,8 +965,8 @@ lpd_write(int  lpd_fd,			/* I - LPD socket */
  */
 
 int					/* O  - Socket or -1 on error */
-rresvport_af(int         *port,		/* IO - Port number to bind to */
-             sa_family_t family)	/* I  - Address family */
+rresvport_af(int *port,			/* IO - Port number to bind to */
+             int family)		/* I  - Address family */
 {
   http_addr_t	addr;			/* Socket address */
   int		fd;			/* Socket file descriptor */
@@ -1000,11 +996,11 @@ rresvport_af(int         *port,		/* IO - Port number to bind to */
     * Set the port number...
     */
 
-#ifdef AF_INET6
+#  ifdef AF_INET6
     if (family == AF_INET6
       addr.ipv6.sin6_port = htons(*port);
     else
-#endif /* AF_INET6 */
+#  endif /* AF_INET6 */
     addr.ipv4.sin_port = htons(*port);
 
    /*

@@ -2181,7 +2181,7 @@ http_wait(http_t *http,			/* I - HTTP data */
     size_t bytes;			/* Bytes that are available */
 
     if (!SSLGetBufferedReadSize((SSLContextRef)http->tls, &bytes) && bytes > 0)
-      return;
+      return (1);
 #  endif /* HAVE_LIBSSL */
   }
 #endif /* HAVE_SSL */
