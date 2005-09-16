@@ -74,6 +74,7 @@ int				/* O - Exit status */
 main(int  argc,			/* I - Number of command-line arguments (6 or 7) */
      char *argv[])		/* I - Command-line arguments */
 {
+  int		i;		/* Looping var */
   char		method[255],	/* Method in URI */
 		hostname[1024],	/* Hostname */
 		username[255],	/* Username info (not used) */
@@ -84,7 +85,7 @@ main(int  argc,			/* I - Number of command-line arguments (6 or 7) */
   int		delay;		/* Delay for retries... */
   int		fd;		/* AppSocket */
   int		error;		/* Error code (if any) */
-  struct sockaddr_in addr;	/* Socket address */
+  http_addr_t	addr;		/* Socket address */
   struct hostent *hostaddr;	/* Host address */
   int		wbytes;		/* Number of bytes written */
   int		nbytes;		/* Number of bytes read */
@@ -182,11 +183,6 @@ main(int  argc,			/* I - Number of command-line arguments (6 or 7) */
   fprintf(stderr, "INFO: Attempting to connect to host %s on port %d\n",
           hostname, port);
 
-  memset(&addr, 0, sizeof(addr));
-  memcpy(&(addr.sin_addr), hostaddr->h_addr, hostaddr->h_length);
-  addr.sin_family = hostaddr->h_addrtype;
-  addr.sin_port   = htons(port);
-
   wbytes = 0;
 
   while (copies > 0)
@@ -199,7 +195,15 @@ main(int  argc,			/* I - Number of command-line arguments (6 or 7) */
 	return (1);
       }
 
-      if (connect(fd, (struct sockaddr *)&addr, sizeof(addr)) < 0)
+      for (i = 0; hostaddr->h_addr_list[i]; i ++)
+      {
+        httpAddrLoad(hostaddr, port, i, &addr);
+
+        if (!connect(fd, (struct sockaddr *)&addr, sizeof(addr)))
+	  break;
+      }
+
+      if (!hostaddr->h_addr_list[i])
       {
 	error = errno;
 	close(fd);

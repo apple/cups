@@ -168,16 +168,6 @@ AcceptClient(listener_t *lis)	/* I - Listener socket */
   * Get the hostname or format the IP address as needed...
   */
 
-  if (HostNameLookups)
-    hostname = httpAddrLookup(&(con->http.hostaddr), con->http.hostname,
-                              sizeof(con->http.hostname));
-  else
-  {
-    hostname = NULL;
-    httpAddrString(&(con->http.hostaddr), con->http.hostname,
-                   sizeof(con->http.hostname));
-  }
-
   if (httpAddrLocalhost(&(con->http.hostaddr)))
   {
    /*
@@ -193,6 +183,15 @@ AcceptClient(listener_t *lis)	/* I - Listener socket */
     */
 
     strlcpy(con->http.hostname, ServerName, sizeof(con->http.hostname));
+  }
+  else if (HostNameLookups)
+    hostname = httpAddrLookup(&(con->http.hostaddr), con->http.hostname,
+                              sizeof(con->http.hostname));
+  else
+  {
+    hostname = NULL;
+    httpAddrString(&(con->http.hostaddr), con->http.hostname,
+                   sizeof(con->http.hostname));
   }
 
   if (hostname == NULL && HostNameLookups == 2)

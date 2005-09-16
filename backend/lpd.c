@@ -30,7 +30,7 @@
  *   lpd_queue()       - Queue a file using the Line Printer Daemon protocol.
  *   lpd_timeout()     - Handle timeout alarms...
  *   lpd_write()       - Write a buffer of data to an LPD server.
- *   rresvport()       - A simple implementation of rresvport().
+ *   rresvport_af()    - A simple implementation of rresvport_af().
  *   sigterm_handler() - Handle 'terminate' signals that stop the backend.
  */
 
@@ -85,10 +85,10 @@ static char	tmpfilename[1024] = "";	/* Temporary spool file name */
 
 
 /*
- * It appears that rresvport() is never declared on most systems...
+ * It appears that rresvport_af() is never declared on most systems...
  */
 
-extern int	rresvport(int *port);
+extern int	rresvport_af(int *port, sa_family_t family);
 
 
 /*
@@ -531,6 +531,7 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
 	  int        manual_copies,	/* I - Do copies by hand... */
 	  int        timeout)		/* I - Timeout... */
 {
+  int			i;		/* Looping var */
   FILE			*fp;		/* Job file */
   char			localhost[255];	/* Local host name */
   int			error;		/* Error number */
@@ -540,7 +541,7 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
   char			control[10240],	/* LPD control 'file' */
 			*cptr;		/* Pointer into control file string */
   char			status;		/* Status byte from command */
-  struct sockaddr_in	addr;		/* Socket address */
+  http_addr_t		addr;		/* Socket address */
   struct hostent	*hostaddr;	/* Host address */
   int			copy;		/* Copies written */
   size_t		nbytes,		/* Number of bytes written */
@@ -587,11 +588,6 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
     fprintf(stderr, "INFO: Attempting to connect to host %s for printer %s\n",
             hostname, printer);
 
-    memset(&addr, 0, sizeof(addr));
-    memcpy(&(addr.sin_addr), hostaddr->h_addr, hostaddr->h_length);
-    addr.sin_family = hostaddr->h_addrtype;
-    addr.sin_port   = htons(port);
-
     for (lport = reserve == RESERVE_RFC1179 ? 732 : 1024;;)
     {
      /*
@@ -630,7 +626,7 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
 	* priviledged lport between 721 and 731...
 	*/
 
-	if ((fd = rresvport(&lport)) < 0)
+	if ((fd = rresvport_af(&lport, hostaddr->h_addrtype)) < 0)
 	{
 	  perror("ERROR: Unable to reserve port");
 	  sleep(1);
@@ -639,7 +635,19 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
 	}
       }
 
-      if (connect(fd, (struct sockaddr *)&addr, sizeof(addr)) < 0)
+     /*
+      * Connect to the printer or server...
+      */
+
+      for (i = 0; hostaddr->h_addr_list[i]; i ++)
+      {
+        httpAddrLoad(hostaddr, port, i, &addr);
+
+	if (!connect(fd, (struct sockaddr *)&addr, sizeof(addr)))
+	  break;
+      }
+
+      if (!hostaddr->h_addr_list[i])
       {
 	error = errno;
 	close(fd);
@@ -955,23 +963,24 @@ lpd_write(int  lpd_fd,			/* I - LPD socket */
 }
 
 
-#ifndef HAVE_RRESVPORT
+#ifndef HAVE_RRESVPORT_AF
 /*
- * 'rresvport()' - A simple implementation of rresvport().
+ * 'rresvport_af()' - A simple implementation of rresvport_af().
  */
 
 int					/* O  - Socket or -1 on error */
-rresvport(int *port)			/* IO - Port number to bind to */
+rresvport_af(int         *port,		/* IO - Port number to bind to */
+             sa_family_t family)	/* I  - Address family */
 {
-  struct sockaddr_in	addr;		/* Socket address */
-  int			fd;		/* Socket file descriptor */
+  http_addr_t	addr;			/* Socket address */
+  int		fd;			/* Socket file descriptor */
 
 
  /*
   * Try to create an IPv4 socket...
   */
 
-  if ((fd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
+  if ((fd = socket(family, SOCK_STREAM, 0)) < 0)
     return (-1);
 
  /*
@@ -979,24 +988,24 @@ rresvport(int *port)			/* IO - Port number to bind to */
   */
 
   memset(&addr, 0, sizeof(addr));
-
-  addr.sin_family      = AF_INET;
-  addr.sin_addr.s_addr = INADDR_ANY;
+  addr.addr.sa_family = family;
 
  /*
-  * Try to bind the socket to a reserved port; unlike the standard
-  * BSD rresvport(), we limit the port number to 721 through 732
-  * (instead of 512 to 1023) since RFC 1179 defines the local port
-  * number between 721 and 732...
+  * Try to bind the socket to a reserved port...
   */
 
-  while (*port > 720)
+  while (*port > 511)
   {
    /*
     * Set the port number...
     */
 
-    addr.sin_port = htons(*port);
+#ifdef AF_INET6
+    if (family == AF_INET6
+      addr.ipv6.sin6_port = htons(*port);
+    else
+#endif /* AF_INET6 */
+    addr.ipv4.sin_port = htons(*port);
 
    /*
     * Try binding the port to the socket; return if all is OK...
@@ -1040,7 +1049,7 @@ rresvport(int *port)			/* IO - Port number to bind to */
 
   return (-1);
 }
-#endif /* !HAVE_RRESVPORT */
+#endif /* !HAVE_RRESVPORT_AF */
 
 
 /*

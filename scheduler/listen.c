@@ -210,8 +210,34 @@ StartListening(void)
 
 #ifdef AF_INET6
     if (lis->address.addr.sa_family == AF_INET6)
+    {
       status = bind(lis->fd, (struct sockaddr *)&(lis->address),
 	            sizeof(lis->address.ipv6));
+
+      if (status < 0 &&
+          (httpAddrLocalhost(&(lis->address)) ||
+           httpAddrAny(&(lis->address))))
+      {
+       /*
+        * Try binding to an IPv4 address instead...
+	*/
+
+        LogMessage(L_NOTICE, "StartListening: Unable to bind to IPv6 address, trying IPv4...");
+
+        p = ntohs(lis->address.ipv6.sin6_port);
+
+        if (httpAddrAny(&(lis->address)))
+	  lis->address.ipv4.sin_addr.s_addr = htonl(0x00000000);
+        else
+	  lis->address.ipv4.sin_addr.s_addr = htonl(0x7f000001);
+
+        lis->address.ipv4.sin_port  = htons(p);
+	lis->address.addr.sa_family = AF_INET;
+
+	status = bind(lis->fd, (struct sockaddr *)&(lis->address),
+	              sizeof(lis->address.ipv4));
+      }
+    }
     else
 #endif /* AF_INET6 */
 #ifdef AF_LOCAL

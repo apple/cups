@@ -350,7 +350,7 @@ extern int		httpCheck(http_t *http);
 extern void		httpClose(http_t *http);
 extern http_t		*httpConnect(const char *host, int port);
 extern http_t		*httpConnectEncrypt(const char *host, int port,
-			                    http_encryption_t encrypt);
+			                    http_encryption_t encryption);
 extern int		httpDelete(http_t *http, const char *uri);
 extern int		httpEncryption(http_t *http, http_encryption_t e);
 #  define		httpError(http) ((http)->error)

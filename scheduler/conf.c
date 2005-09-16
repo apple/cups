@@ -942,10 +942,21 @@ get_address(const char  *value,		/* I - Value string */
             http_addr_t *address)	/* O - Socket address */
 {
   char			hostname[256],	/* Hostname or IP */
-			portname[256];	/* Port number or name */
+			portname[256],	/* Port number or name */
+			*ptr;		/* Pointer into hostname string */
   struct hostent	*host;		/* Host address */
   struct servent	*port;		/* Port number */  
 
+
+ /*
+  * Check for an empty value...
+  */
+
+  if (!*value)
+  {
+    LogMessage(L_ERROR, "Bad (empty) address!");
+    return (0);
+  }
 
  /*
   * Initialize the socket address to the defaults...
@@ -986,37 +997,42 @@ get_address(const char  *value,		/* I - Value string */
 
     address->un.sun_family = AF_LOCAL;
     strcpy(address->un.sun_path, value);
-
-    return (1);
   }
+  else
 #endif /* AF_LOCAL */
 
  /*
   * Try to grab a hostname and port number...
   */
 
-  switch (sscanf(value, "%255[^:]:%255s", hostname, portname))
+  strlcpy(hostname, value, sizeof(hostname));
+
+  if ((ptr = strrchr(hostname, ':')) != NULL)
   {
-    case 1 :
-        if (strchr(hostname, '.') == NULL && defaddress == INADDR_ANY)
-	{
-	 /*
-	  * Hostname is a port number...
-	  */
+   /*
+    * Copy hostname and port separately...
+    */
 
-	  strlcpy(portname, hostname, sizeof(portname));
-	  hostname[0] = '\0';
-	}
-        else
-          portname[0] = '\0';
-        break;
+    *ptr++ = '\0';
 
-    case 2 :
-        break;
+    strlcpy(portname, ptr, sizeof(portname));
+  }
+  else if (isdigit(value[0] & 255))
+  {
+   /*
+    * Port number...
+    */
 
-    default :
-	LogMessage(L_ERROR, "Unable to decode address \"%s\"!", value);
-        return (0);
+    hostname[0] = '\0';
+    strlcpy(portname, value, sizeof(portname));
+  }
+  else
+  {
+   /*
+    * Hostname by itself...
+    */
+
+    portname[0] = '\0';
   }
 
  /*
@@ -1109,7 +1125,7 @@ get_addr_and_mask(const char *value,	/* I - String from config file */
   * Check for an IPv6 address...
   */
 
-  if ((ptr = strchr(value, ':')) != NULL && ptr < maskval)
+  if (*value == '[')
   {
    /*
     * Parse hexadecimal IPv6 address...
@@ -1117,14 +1133,16 @@ get_addr_and_mask(const char *value,	/* I - String from config file */
 
     family  = AF_INET6;
 
-    for (i = 0, ptr = value; *ptr && i < 4; i ++)
+    for (i = 0, ptr = value + 1; *ptr && i < 4; i ++)
     {
-      if (*ptr == ':')
+      if (*ptr == ']')
+        break;
+      else if (*ptr == ':')
         ip[i] = 0;
       else
         ip[i] = strtoul(ptr, (char **)&ptr, 16);
 
-      if (*ptr == ':')
+      if (*ptr == ':' || *ptr == ']')
         ptr ++;
     }
 
@@ -1142,6 +1160,9 @@ get_addr_and_mask(const char *value,	/* I - String from config file */
 
     family  = AF_INET;
     ipcount = sscanf(value, "%u.%u.%u.%u", ip + 0, ip + 1, ip + 2, ip + 3);
+
+    ip[3] |= ((((ip[0] << 8) | ip[1]) << 8) | ip[2]) << 8;
+    ip[0] = ip[1] = ip[2] = 0;
   }
 
   if (*maskval)
@@ -1153,30 +1174,26 @@ get_addr_and_mask(const char *value,	/* I - String from config file */
     memset(mask, 0, sizeof(unsigned) * 4);
 
 #ifdef AF_INET6
-    if (strchr(maskval, ':'))
+    if (maskval[1] == '[')
     {
      /*
       * Get hexadecimal mask value...
       */
 
-      for (i = 0, ptr = maskval; *ptr && i < 4; i ++)
+      for (i = 0, ptr = maskval + 1; *ptr && i < 4; i ++)
       {
-	if (*ptr == ':')
+	if (*ptr == ']')
+	  break;
+	else if (*ptr == ':')
           mask[i] = 0;
 	else
           mask[i] = strtoul(ptr, (char **)&ptr, 16);
 
-	if (*ptr == ':')
+	if (*ptr == ':' || *ptr == ']')
           ptr ++;
       }
 
-      while (i < 4)
-      {
-	mask[i] = 0;
-	i ++;
-      }
-
-      if (*ptr && *ptr != '/')
+      if (*ptr)
 	return (0);
     }
     else
@@ -1189,6 +1206,9 @@ get_addr_and_mask(const char *value,	/* I - String from config file */
 
       if (sscanf(maskval, "%u.%u.%u.%u", mask + 0, mask + 1, mask + 2, mask + 3) != 4)
         return (0);
+
+      mask[3] |= ((((mask[0] << 8) | mask[1]) << 8) | mask[2]) << 8;
+      mask[0] = mask[1] = mask[2] = 0;
     }
     else
     {
@@ -1234,31 +1254,14 @@ get_addr_and_mask(const char *value,	/* I - String from config file */
       {
         i = 32 - i;
 
-	if (i <= 24)
-	  mask[0] = 0xffffffff;
-	else
-	  mask[0] = 0xffffff00 | ((0xff << (i - 24)) & 0xff);
+        mask[0] = 0xffffffff;
+        mask[1] = 0xffffffff;
+        mask[2] = 0xffffffff;
 
-	if (i <= 16)
-	  mask[1] = 0xffffffff;
-	else if (i >= 24)
-	  mask[1] = 0xffffff00;
+	if (i > 0)
+          mask[3] = (0xffffffff << i) & 0xffffffff;
 	else
-	  mask[1] = 0xffffff00 | ((0xff << (i - 16)) & 0xff);
-
-	if (i <= 8)
-	  mask[2] = 0xffffffff;
-	else if (i >= 16)
-	  mask[2] = 0xffffff00;
-	else
-	  mask[2] = 0xffffff00 | ((0xff << (i - 8)) & 0xff);
-
-	if (i == 0)
 	  mask[3] = 0xffffffff;
-	else if (i >= 8)
-	  mask[3] = 0xffffff00;
-	else
-	  mask[3] = 0xffffff00 | ((0xff << i) & 0xff);
       }
     }
   }
@@ -1692,9 +1695,9 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 
 
       if (NumListeners == 0)
-        lis = malloc(sizeof(listener_t));
+        lis = malloc(2 * sizeof(listener_t));
       else
-        lis = realloc(Listeners, (NumListeners + 1) * sizeof(listener_t));
+        lis = realloc(Listeners, (NumListeners + 2) * sizeof(listener_t));
 
       if (!lis)
       {
@@ -1708,18 +1711,47 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 
       memset(lis, 0, sizeof(listener_t));
 
+#ifdef AF_INET6
+      if (get_address(value, INADDR_ANY, IPP_PORT, AF_INET6, &(lis->address)))
+#else
       if (get_address(value, INADDR_ANY, IPP_PORT, AF_INET, &(lis->address)))
+#endif /* AF_INET6 */
       {
         httpAddrString(&(lis->address), temp, sizeof(temp));
 
 #ifdef AF_INET6
         if (lis->address.addr.sa_family == AF_INET6)
+	{
           LogMessage(L_INFO, "Listening to %s:%d (IPv6)", temp,
                      ntohs(lis->address.ipv6.sin6_port));
+
+#  if ALSO_BIND_IPV4
+          if (value[0] == '*')
+	  {
+	   /*
+	    * Also listen on IPv4 address...
+	    */
+
+	    lis ++;
+	    NumListeners ++;
+
+            memset(lis, 0, sizeof(listener_t));
+            get_address(value, INADDR_ANY, IPP_PORT, AF_INET,
+	                &(lis->address));
+
+            httpAddrString(&(lis->address), temp, sizeof(temp));
+            LogMessage(L_INFO, "Listening to %s:%d (IPv4)", temp,
+                       ntohs(lis->address.ipv4.sin_port));
+          }
+#  endif /* ALSO_BIND_IPV4 */
+        }
 	else
 #endif /* AF_INET6 */
-        LogMessage(L_INFO, "Listening to %s:%d", temp,
-                   ntohs(lis->address.ipv4.sin_port));
+        {
+	  LogMessage(L_INFO, "Listening to %s:%d", temp,
+                     ntohs(lis->address.ipv4.sin_port));
+	}
+
 	NumListeners ++;
       }
       else

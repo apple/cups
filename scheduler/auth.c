@@ -285,9 +285,10 @@ CheckAuth(unsigned   ip[4],	/* I - Client address */
 {
   int		i;		/* Looping var */
   cups_netif_t	*iface;		/* Network interface */
-  unsigned	netip4,		/* IPv4 network address */
-		netip6[4];	/* IPv6 network address */
-
+  unsigned	netip4;		/* IPv4 network address */
+#ifdef AF_INET6
+  unsigned	netip6[4];	/* IPv6 network address */
+#endif /* AF_INET6 */
 
   while (num_masks > 0)
   {
@@ -298,14 +299,16 @@ CheckAuth(unsigned   ip[4],	/* I - Client address */
 	  * Check for a match with a network interface...
 	  */
 
-          netip4    = htonl((((((ip[0] << 8) | ip[1]) << 8) |
-	                      ip[2]) << 8) | ip[3]);
+          netip4 = htonl(ip[3]);
+
+#ifdef AF_INET6
           netip6[0] = htonl(ip[0]);
           netip6[1] = htonl(ip[1]);
           netip6[2] = htonl(ip[2]);
           netip6[3] = htonl(ip[3]);
+#endif /* AF_INET6 */
 
-          if (strcmp(masks->mask.name.name, "*") == 0)
+          if (!strcmp(masks->mask.name.name, "*"))
 	  {
 	   /*
 	    * Check against all local interfaces...
@@ -1088,6 +1091,10 @@ cupsdIsAuthorized(client_t   *con,	/* I - Connection */
 #ifdef AF_INET6
   if (con->http.hostaddr.addr.sa_family == AF_INET6)
   {
+   /*
+    * Copy IPv6 address...
+    */
+
     address[0] = ntohl(con->http.hostaddr.ipv6.sin6_addr.s6_addr32[0]);
     address[1] = ntohl(con->http.hostaddr.ipv6.sin6_addr.s6_addr32[1]);
     address[2] = ntohl(con->http.hostaddr.ipv6.sin6_addr.s6_addr32[2]);
@@ -1097,22 +1104,14 @@ cupsdIsAuthorized(client_t   *con,	/* I - Connection */
 #endif /* AF_INET6 */
   if (con->http.hostaddr.addr.sa_family == AF_INET)
   {
-    unsigned temp;		/* Temporary address variable */
-
-
    /*
-    * Convert 32-bit IPv4 address to 128 bits...
+    * Copy IPv4 address...
     */
 
-    temp = ntohl(con->http.hostaddr.ipv4.sin_addr.s_addr);
-
-    address[3] = temp & 255;
-    temp       >>= 8;
-    address[2] = temp & 255;
-    temp       >>= 8;
-    address[1] = temp & 255;
-    temp       >>= 8;
-    address[0] = temp & 255;
+    address[0] = 0;
+    address[1] = 0;
+    address[2] = 0;
+    address[3] = ntohl(con->http.hostaddr.ipv4.sin_addr.s_addr);
   }
   else
     memset(address, 0, sizeof(address));

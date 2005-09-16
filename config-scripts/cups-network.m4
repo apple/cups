@@ -29,7 +29,7 @@ if test "$uname" != "IRIX"; then
 	AC_CHECK_LIB(nsl,gethostbyaddr,NETLIBS="$NETLIBS -lnsl")
 fi
 
-AC_CHECK_FUNCS(rresvport getifaddrs hstrerror)
+AC_CHECK_FUNCS(getaddrinfo getifaddrs hstrerror rresvport_af)
 
 AC_CHECK_MEMBER(struct sockaddr.sa_len,,,[#include <sys/socket.h>])
 AC_CHECK_HEADER(sys/sockio.h,AC_DEFINE(HAVE_SYS_SOCKIO_H))

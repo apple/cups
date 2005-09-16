@@ -29,21 +29,9 @@
 #  include <sys/types.h>
 #  ifdef VMS
 #    include "vms_dirent.h"
-#  elif HAVE_DIRENT_H
+#  else
 #    include <dirent.h>
 #    define NAMLEN(d) strlen((d)->d_name)
-#  else
-#    define dirent direct
-#    define NAMLEN(d) (d)->d_namlen
-#    if HAVE_SYS_NDIR_H
-#      include <sys/ndir.h>
-#    endif
-#    if HAVE_SYS_DIR_H
-#      include <sys/dir.h>
-#    endif
-#    if HAVE_NDIR_H
-#      include <ndir.h>
-#    endif
 #  endif
 #endif
 #include "gtypes.h"

@@ -63,13 +63,13 @@ static const char	*http_copy_decode(char *dst, const char *src,
 
 void
 httpSeparate(const char *uri,		/* I - Universal Resource Identifier */
-             char       *method,	/* O - Method [32] (http, https, etc.) */
+             char       *scheme,	/* O - Scheme [32] (http, https, etc.) */
 	     char       *username,	/* O - Username [1024] */
 	     char       *host,		/* O - Hostname [1024] */
 	     int        *port,		/* O - Port number to use */
              char       *resource)	/* O - Resource/filename [1024] */
 {
-  httpSeparate2(uri, method, 32, username, HTTP_MAX_URI, host, HTTP_MAX_URI,
+  httpSeparate2(uri, scheme, 32, username, HTTP_MAX_URI, host, HTTP_MAX_URI,
                 port, resource, HTTP_MAX_URI);
 }
 
@@ -81,8 +81,8 @@ httpSeparate(const char *uri,		/* I - Universal Resource Identifier */
 
 void
 httpSeparate2(const char *uri,		/* I - Universal Resource Identifier */
-              char       *method,	/* O - Method (http, https, etc.) */
-	      int        methodlen,	/* I - Size of method buffer */
+              char       *scheme,	/* O - Scheme (http, https, etc.) */
+	      int        schemelen,	/* I - Size of scheme buffer */
 	      char       *username,	/* O - Username */
 	      int        usernamelen,	/* I - Size of username buffer */
 	      char       *host,		/* O - Hostname */
@@ -100,26 +100,26 @@ httpSeparate2(const char *uri,		/* I - Universal Resource Identifier */
   * Range check input...
   */
 
-  if (uri == NULL || method == NULL || username == NULL || host == NULL ||
+  if (uri == NULL || scheme == NULL || username == NULL || host == NULL ||
       port == NULL || resource == NULL)
     return;
 
  /*
-  * Grab the method portion of the URI...
+  * Grab the scheme portion of the URI...
   */
 
-  if (strncmp(uri, "//", 2) == 0)
+  if (!strncmp(uri, "//", 2))
   {
    /*
     * Workaround for HP IPP client bug...
     */
 
-    strlcpy(method, "ipp", methodlen);
+    strlcpy(scheme, "ipp", schemelen);
   }
   else
   {
    /*
-    * Standard URI with method...
+    * Standard URI with scheme...
     */
 
     uri = http_copy_decode(host, uri, hostlen, ":");
@@ -128,11 +128,11 @@ httpSeparate2(const char *uri,		/* I - Universal Resource Identifier */
       uri ++;
 
    /*
-    * If the method contains a period or slash, then it's probably
+    * If the scheme contains a period or slash, then it's probably
     * hostname/filename...
     */
 
-    if (strchr(host, '.') != NULL || strchr(host, '/') != NULL || *uri == '\0')
+    if (strchr(host, '.') || strchr(host, '/') || !*uri)
     {
       if ((ptr = strchr(host, '/')) != NULL)
       {
@@ -151,26 +151,36 @@ httpSeparate2(const char *uri,		/* I - Universal Resource Identifier */
 	*port = strtol(uri, (char **)&uri, 10);
 
 	if (*uri == '/')
-          strlcpy(resource, uri, resourcelen);
+	  http_copy_decode(resource, uri, resourcelen, "");
       }
       else
 	*port = 631;
 
-      strlcpy(method, "http", methodlen);
+      strlcpy(scheme, "http", schemelen);
       username[0] = '\0';
       return;
     }
     else
-      strlcpy(method, host, methodlen);
+    {
+     /*
+      * Copy scheme over...
+      */
+
+      strlcpy(scheme, host, schemelen);
+    }
   }
 
  /*
-  * If the method starts with less than 2 slashes then it is a local resource...
+  * If the scheme starts with less than 2 slashes then it is a local resource...
   */
 
-  if (strncmp(uri, "//", 2) != 0)
+  if (strncmp(uri, "//", 2))
   {
-    strlcpy(resource, uri, resourcelen);
+   /*
+    * File-based URI...
+    */
+
+    http_copy_decode(resource, uri, resourcelen, "");
 
     username[0] = '\0';
     host[0]     = '\0';
@@ -190,31 +200,59 @@ httpSeparate2(const char *uri,		/* I - Universal Resource Identifier */
   if ((atsign = strchr(uri, '@')) != NULL && atsign < slash)
   {
    /*
-    * Got a username:password combo...
+    * Get a username:password combo...
     */
 
     uri = http_copy_decode(username, uri, usernamelen, "@") + 1;
   }
   else
+  {
+   /*
+    * No username:password combo...
+    */
+
     username[0] = '\0';
+  }
 
  /*
   * Grab the hostname...
   */
 
-  uri = http_copy_decode(host, uri, hostlen, ":/");
+  if (uri[0] == '[')
+  {
+   /*
+    * Get IPv6 address...
+    */
+
+    uri = http_copy_decode(host, uri, hostlen, "]");
+
+    if (*uri == ']')
+      uri ++;
+  }
+  else
+  {
+   /*
+    * Get IPv4 address or hostname...
+    */
+
+    uri = http_copy_decode(host, uri, hostlen, ":/");
+  }
 
   if (*uri != ':')
   {
-    if (strcasecmp(method, "http") == 0)
+   /*
+    * Use a standard port number for the given scheme.
+    */
+
+    if (!strcmp(scheme, "http"))
       *port = 80;
-    else if (strcasecmp(method, "https") == 0)
+    else if (!strcmp(scheme, "https"))
       *port = 443;
-    else if (strcasecmp(method, "ipp") == 0)
+    else if (!strcmp(scheme, "ipp"))
       *port = 631;
-    else if (strcasecmp(method, "lpd") == 0)
+    else if (!strcasecmp(scheme, "lpd"))
       *port = 515;
-    else if (strcasecmp(method, "socket") == 0)	/* Not registered yet... */
+    else if (!strcmp(scheme, "socket"))	/* Not yet registered... */
       *port = 9100;
     else
       *port = 0;
@@ -228,10 +266,10 @@ httpSeparate2(const char *uri,		/* I - Universal Resource Identifier */
     *port = strtol(uri + 1, (char **)&uri, 10);
   }
 
-  if (*uri == '\0')
+  if (!*uri)
   {
    /*
-    * Hostname but no port or path...
+    * No resource path...
     */
 
     resource[0] = '/';

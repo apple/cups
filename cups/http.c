@@ -327,7 +327,7 @@ http_t *				/* O - New HTTP connection */
 httpConnect(const char *host,		/* I - Host to connect to */
             int        port)		/* I - Port number */
 {
-  http_encryption_t	encrypt;	/* Type of encryption to use */
+  http_encryption_t	encryption;	/* Type of encryption to use */
 
 
  /*
@@ -335,11 +335,11 @@ httpConnect(const char *host,		/* I - Host to connect to */
   */
 
   if (port == 443)
-    encrypt = HTTP_ENCRYPT_ALWAYS;
+    encryption = HTTP_ENCRYPT_ALWAYS;
   else
-    encrypt = HTTP_ENCRYPT_IF_REQUESTED;
+    encryption = HTTP_ENCRYPT_IF_REQUESTED;
 
-  return (httpConnectEncrypt(host, port, encrypt));
+  return (httpConnectEncrypt(host, port, encryption));
 }
 
 
@@ -348,10 +348,10 @@ httpConnect(const char *host,		/* I - Host to connect to */
  */
 
 http_t *				/* O - New HTTP connection */
-httpConnectEncrypt(const char *host,	/* I - Host to connect to */
-                   int        port,	/* I - Port number */
-		   http_encryption_t encrypt)
-					/* I - Type of encryption to use */
+httpConnectEncrypt(
+    const char        *host,		/* I - Host to connect to */
+    int               port,		/* I - Port number */
+    http_encryption_t encryption)	/* I - Type of encryption to use */
 {
   int			i;		/* Looping var */
   http_t		*http;		/* New HTTP connection */
@@ -417,7 +417,7 @@ httpConnectEncrypt(const char *host,	/* I - Host to connect to */
   if (port == 443)			/* Always use encryption for https */
     http->encryption = HTTP_ENCRYPT_ALWAYS;
   else
-    http->encryption = encrypt;
+    http->encryption = encryption;
 
  /*
   * Loop through the addresses we have until one of them connects...

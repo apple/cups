@@ -101,16 +101,6 @@
 
 
 /*
- * Which directory functions and headers do we use?
- */
-
-#undef HAVE_DIRENT_H
-#undef HAVE_SYS_DIR_H
-#undef HAVE_SYS_NDIR_H
-#undef HAVE_NDIR_H
-
-
-/*
  * Do we have PAM stuff?
  */
 
@@ -255,10 +245,17 @@
 
 
 /*
- * Do we have rresvport()?
+ * Do we have rresvport_af()?
  */
 
-#undef HAVE_RRESVPORT
+#undef HAVE_RRESVPORT_AF
+
+
+/*
+ * Do we have getaddrinfo()?
+ */
+
+#undef HAVE_GETADDRINFO
 
 
 /*
