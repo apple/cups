@@ -338,6 +338,15 @@ show_status(http_t *http,	/* I - HTTP connection to server */
       }
 
      /*
+      * A single 'all' printer name is special, meaning all printers.
+      */
+
+      if (dests != NULL && compare_strings(dests, "all", 3) == 0)
+      {
+        dests = NULL;
+      }
+
+     /*
       * See if this is a printer we're interested in...
       */
 

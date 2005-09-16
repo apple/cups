@@ -1,8 +1,10 @@
-CHANGES.txt - 09/15/2005
+CHANGES.txt - 09/16/2005
 ------------------------
 
 CHANGES IN CUPS V1.2.0b1
 
+	- The "lpc" command now supports the "status all" command
+	  (STR #1004)
 	- ippReadIO() did not read collections properly (STR
 	  #1249)
 	- The "make test" script now creates the test files in
