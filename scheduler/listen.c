@@ -237,6 +237,23 @@ StartListening(void)
 	status = bind(lis->fd, (struct sockaddr *)&(lis->address),
 	              sizeof(lis->address.ipv4));
       }
+#ifdef IPV6_V6ONLY
+      else if (httpAddrLocalhost(&(lis->address)) ||
+               httpAddrAny(&(lis->address)))
+      {
+       /*
+        * Make sure that wildcard and loopback addresses accept
+	* connections from both IPv6 and IPv4 clients.
+	*/
+
+        val = 0;
+#  ifdef __sun
+        setsockopt(lis->fd, IPPROTO_IPV6, IPV6_V6ONLY, (char *)&val, sizeof(val));
+#  else
+        setsockopt(lis->fd, IPPROTO_IPV6, IPV6_V6ONLY, &val, sizeof(val));
+#  endif /* __sun */
+      }
+#endif /* IPV6_V6ONLY */
     }
     else
 #endif /* AF_INET6 */
