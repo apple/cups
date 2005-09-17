@@ -3,12 +3,12 @@
 attr.o: ppd.h file.h debug.h string.h ../config.h
 auth.o: cups.h ipp.h http.h string.h ../config.h md5.h ppd.h file.h
 auth.o: language.h debug.h
+backchannel.o: cups.h ipp.h http.h string.h ../config.h md5.h ppd.h file.h
 dest.o: cups.h ipp.h http.h string.h ../config.h md5.h ppd.h file.h
 dest.o: language.h
-dir.o: dir.h string.h ../config.h
+dir.o: dir.h string.h ../config.h debug.h
 emit.o: ppd.h file.h string.h ../config.h
 encode.o: cups.h ipp.h http.h string.h ../config.h md5.h ppd.h file.h debug.h
-extended.o: ppd.h file.h string.h ../config.h debug.h
 file.o: string.h ../config.h ../cups/debug.h file.h http-private.h http.h
 file.o: md5.h
 getputfile.o: cups.h ipp.h http.h string.h ../config.h md5.h ppd.h file.h

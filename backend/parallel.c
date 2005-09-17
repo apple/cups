@@ -46,6 +46,7 @@
 #  include <unistd.h>
 #  include <fcntl.h>
 #  include <termios.h>
+#  include <sys/socket.h>
 #endif /* WIN32 */
 
 #ifdef __sgi
@@ -75,27 +76,31 @@ void	list_devices(void);
  *    printer-uri job-id user title copies options [file]
  */
 
-int			/* O - Exit status */
-main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
-     char *argv[])	/* I - Command-line arguments */
+int					/* O - Exit status */
+main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
+     char *argv[])			/* I - Command-line arguments */
 {
-  char		method[255],	/* Method in URI */
-		hostname[1024],	/* Hostname */
-		username[255],	/* Username info (not used) */
-		resource[1024],	/* Resource info (device and options) */
-		*options;	/* Pointer to options */
-  int		port;		/* Port number (not used) */
-  int		fp;		/* Print file */
-  int		copies;		/* Number of copies to print */
-  int		fd;		/* Parallel device */
-  int		wbytes;		/* Number of bytes written */
-  size_t	nbytes,		/* Number of bytes read */
-		tbytes;		/* Total number of bytes written */
-  char		buffer[8192],	/* Output buffer */
-		*bufptr;	/* Pointer into buffer */
-  struct termios opts;		/* Parallel port options */
+  char		method[255],		/* Method in URI */
+		hostname[1024],		/* Hostname */
+		username[255],		/* Username info (not used) */
+		resource[1024],		/* Resource info (device and options) */
+		*options;		/* Pointer to options */
+  int		port;			/* Port number (not used) */
+  int		fp;			/* Print file */
+  int		copies;			/* Number of copies to print */
+  int		fd;			/* Parallel device */
+  int		rbytes;			/* Number of bytes read */
+  int		wbytes;			/* Number of bytes written */
+  size_t	nbytes,			/* Number of bytes read */
+		tbytes;			/* Total number of bytes written */
+  char		buffer[8192],		/* Output buffer */
+		*bufptr;		/* Pointer into buffer */
+  struct termios opts;			/* Parallel port options */
+  fd_set	input,			/* Input set for select() */
+		output;			/* Output set for select() */
+  int		paperout;		/* Paper out? */
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
-  struct sigaction action;	/* Actions for POSIX signals */
+  struct sigaction action;		/* Actions for POSIX signals */
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET */
 
 
@@ -266,7 +271,8 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   * Finally, send the print file...
   */
 
-  wbytes = 0;
+  wbytes   = 0;
+  paperout = 0;
 
   while (copies > 0)
   {
@@ -290,18 +296,77 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
       while (nbytes > 0)
       {
-	if ((wbytes = write(fd, bufptr, nbytes)) < 0)
-	  if (errno == ENOTTY)
-	    wbytes = write(fd, bufptr, nbytes);
+       /*
+        * See if we are ready to read or write...
+	*/
 
-	if (wbytes < 0)
+        do
 	{
-	  perror("ERROR: Unable to send print file to printer");
-	  break;
+          FD_ZERO(&input);
+	  FD_SET(fd, &input);
+	  FD_ZERO(&output);
+	  FD_SET(fd, &output);
+        }
+	while (select(fd + 1, &input, &output, NULL, NULL) < 0);
+
+        if (FD_ISSET(fd, &input))
+	{
+	 /*
+	  * Read backchannel data...
+	  */
+
+	  if ((rbytes = read(fd, resource, sizeof(resource))) > 0)
+	  {
+	    fprintf(stderr, "DEBUG: Received %d bytes of back-channel data!\n",
+	            rbytes);
+            cupsBackchannelWrite(resource, rbytes, 1.0);
+          }
 	}
 
-	nbytes -= wbytes;
-	bufptr += wbytes;
+        if (FD_ISSET(fd, &output))
+	{
+	 /*
+	  * Write print data...
+	  */
+
+	  if ((wbytes = write(fd, bufptr, nbytes)) < 0)
+	    if (errno == ENOTTY)
+	      wbytes = write(fd, bufptr, nbytes);
+
+	  if (wbytes < 0)
+	  {
+	   /*
+	    * Check for retryable errors...
+	    */
+
+            if (errno == ENOSPC)
+	    {
+	      paperout = 1;
+	      fputs("ERROR: Out of paper!\n", stderr);
+	      fputs("STATUS: +media-tray-empty-error\n", stderr);
+	    }
+	    else if (errno != EAGAIN && errno != EINTR)
+	    {
+	      perror("ERROR: Unable to send print file to printer");
+	      break;
+	    }
+	  }
+	  else
+	  {
+	   /*
+	    * Update count and pointer...
+	    */
+
+            if (paperout)
+	    {
+	      fputs("STATUS: -media-tray-empty-error\n", stderr);
+	      paperout = 0;
+	    }
+
+	    nbytes -= wbytes;
+	    bufptr += wbytes;
+	  }
+	}
       }
 
       if (wbytes < 0)

@@ -1106,55 +1106,55 @@ report_printer_state(ipp_t *ipp)	/* I - IPP response */
     prefix  = ",";
     message = NULL;
 
-    if (strncmp(reason, "media-needed", 12) == 0)
+    if (!strncmp(reason, "media-needed", 12))
       message = "Media tray needs to be filled.";
-    else if (strncmp(reason, "media-jam", 9) == 0)
+    else if (!strncmp(reason, "media-jam", 9))
       message = "Media jam!";
-    else if (strncmp(reason, "moving-to-paused", 16) == 0 ||
-             strncmp(reason, "paused", 6) == 0 ||
-	     strncmp(reason, "shutdown", 8) == 0)
+    else if (!strncmp(reason, "moving-to-paused", 16) ||
+             !strncmp(reason, "paused", 6) ||
+	     !strncmp(reason, "shutdown", 8))
       message = "Printer off-line.";
-    else if (strncmp(reason, "toner-low", 9) == 0)
+    else if (!strncmp(reason, "toner-low", 9))
       message = "Toner low.";
-    else if (strncmp(reason, "toner-empty", 11) == 0)
+    else if (!strncmp(reason, "toner-empty", 11))
       message = "Out of toner!";
-    else if (strncmp(reason, "cover-open", 10) == 0)
+    else if (!strncmp(reason, "cover-open", 10))
       message = "Cover open.";
-    else if (strncmp(reason, "interlock-open", 14) == 0)
+    else if (!strncmp(reason, "interlock-open", 14))
       message = "Interlock open.";
-    else if (strncmp(reason, "door-open", 9) == 0)
+    else if (!strncmp(reason, "door-open", 9))
       message = "Door open.";
-    else if (strncmp(reason, "input-tray-missing", 18) == 0)
+    else if (!strncmp(reason, "input-tray-missing", 18))
       message = "Media tray missing!";
-    else if (strncmp(reason, "media-low", 9) == 0)
+    else if (!strncmp(reason, "media-low", 9))
       message = "Media tray almost empty.";
-    else if (strncmp(reason, "media-empty", 11) == 0)
+    else if (!strncmp(reason, "media-empty", 11))
       message = "Media tray empty!";
-    else if (strncmp(reason, "output-tray-missing", 19) == 0)
+    else if (!strncmp(reason, "output-tray-missing", 19))
       message = "Output tray missing!";
-    else if (strncmp(reason, "output-area-almost-full", 23) == 0)
+    else if (!strncmp(reason, "output-area-almost-full", 23))
       message = "Output bin almost full.";
-    else if (strncmp(reason, "output-area-full", 16) == 0)
+    else if (!strncmp(reason, "output-area-full", 16))
       message = "Output bin full!";
-    else if (strncmp(reason, "marker-supply-low", 17) == 0)
+    else if (!strncmp(reason, "marker-supply-low", 17))
       message = "Ink/toner almost empty.";
-    else if (strncmp(reason, "marker-supply-empty", 19) == 0)
+    else if (!strncmp(reason, "marker-supply-empty", 19))
       message = "Ink/toner empty!";
-    else if (strncmp(reason, "marker-waste-almost-full", 24) == 0)
+    else if (!strncmp(reason, "marker-waste-almost-full", 24))
       message = "Ink/toner waste bin almost full.";
-    else if (strncmp(reason, "marker-waste-full", 17) == 0)
+    else if (!strncmp(reason, "marker-waste-full", 17))
       message = "Ink/toner waste bin full!";
-    else if (strncmp(reason, "fuser-over-temp", 15) == 0)
+    else if (!strncmp(reason, "fuser-over-temp", 15))
       message = "Fuser temperature high!";
-    else if (strncmp(reason, "fuser-under-temp", 16) == 0)
+    else if (!strncmp(reason, "fuser-under-temp", 16))
       message = "Fuser temperature low!";
-    else if (strncmp(reason, "opc-near-eol", 12) == 0)
+    else if (!strncmp(reason, "opc-near-eol", 12))
       message = "OPC almost at end-of-life.";
-    else if (strncmp(reason, "opc-life-over", 13) == 0)
+    else if (!strncmp(reason, "opc-life-over", 13))
       message = "OPC at end-of-life!";
-    else if (strncmp(reason, "developer-low", 13) == 0)
+    else if (!strncmp(reason, "developer-low", 13))
       message = "Developer almost empty.";
-    else if (strncmp(reason, "developer-empty", 15) == 0)
+    else if (!strncmp(reason, "developer-empty", 15))
       message = "Developer empty!";
     else if (strstr(reason, "error") != NULL)
     {

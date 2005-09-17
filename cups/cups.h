@@ -202,6 +202,9 @@ extern int		cupsSetDests2(http_t *http, int num_dests,
 			              cups_dest_t *dests);
 
 /**** New in CUPS 1.2 ****/
+extern int		cupsBackchannelRead(char *buffer, int bytes, double timeout);
+extern int		cupsBackchannelWrite(const char *buffer, int bytes,
+			                     double timeout);
 extern void		cupsEncodeOptions2(ipp_t *ipp, int num_options,
 					   cups_option_t *options,
 					   ipp_tag_t group_tag);

@@ -56,13 +56,6 @@
 
 
 /*
- * Local functions...
- */
-
-void	print_backchannel(const unsigned char *buffer, int nbytes);
-
-
-/*
  * 'main()' - Send a file to the printer or server.
  *
  * Usage:
@@ -70,32 +63,34 @@ void	print_backchannel(const unsigned char *buffer, int nbytes);
  *    printer-uri job-id user title copies options [file]
  */
 
-int				/* O - Exit status */
-main(int  argc,			/* I - Number of command-line arguments (6 or 7) */
-     char *argv[])		/* I - Command-line arguments */
+int					/* O - Exit status */
+main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
+     char *argv[])			/* I - Command-line arguments */
 {
-  int		i;		/* Looping var */
-  char		method[255],	/* Method in URI */
-		hostname[1024],	/* Hostname */
-		username[255],	/* Username info (not used) */
-		resource[1024];	/* Resource info (not used) */
-  int		fp;		/* Print file */
-  int		copies;		/* Number of copies to print */
-  int		port;		/* Port number */
-  int		delay;		/* Delay for retries... */
-  int		fd;		/* AppSocket */
-  int		error;		/* Error code (if any) */
-  http_addr_t	addr;		/* Socket address */
-  struct hostent *hostaddr;	/* Host address */
-  int		wbytes;		/* Number of bytes written */
-  int		nbytes;		/* Number of bytes read */
-  size_t	tbytes;		/* Total number of bytes written */
-  char		buffer[8192],	/* Output buffer */
-		*bufptr;	/* Pointer into buffer */
-  struct timeval timeout;	/* Timeout for select() */
-  fd_set	input;		/* Input set for select() */
+  int		i;			/* Looping var */
+  char		method[255],		/* Method in URI */
+		hostname[1024],		/* Hostname */
+		username[255],		/* Username info (not used) */
+		resource[1024];		/* Resource info (not used) */
+  int		fp;			/* Print file */
+  int		copies;			/* Number of copies to print */
+  int		port;			/* Port number */
+  int		delay;			/* Delay for retries... */
+  int		fd;			/* AppSocket */
+  int		error;			/* Error code (if any) */
+  http_addr_t	addr;			/* Socket address */
+  struct hostent *hostaddr;		/* Host address */
+  int		rbytes;			/* Number of bytes read */
+  int		wbytes;			/* Number of bytes written */
+  int		nbytes;			/* Number of bytes read */
+  size_t	tbytes;			/* Total number of bytes written */
+  char		buffer[8192],		/* Output buffer */
+		*bufptr;		/* Pointer into buffer */
+  struct timeval timeout;		/* Timeout for select() */
+  fd_set	input,			/* Input set for select() */
+		output;			/* Output set for select() */
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
-  struct sigaction action;	/* Actions for POSIX signals */
+  struct sigaction action;		/* Actions for POSIX signals */
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET */
 
 
@@ -298,42 +293,67 @@ main(int  argc,			/* I - Number of command-line arguments (6 or 7) */
 
       while (nbytes > 0)
       {
-	if ((wbytes = send(fd, bufptr, nbytes, 0)) < 0)
+       /*
+        * See if we are ready to read or write...
+	*/
+
+        do
 	{
-	  perror("ERROR: Unable to send print file to printer");
-	  break;
+          FD_ZERO(&input);
+	  FD_SET(fd, &input);
+	  FD_ZERO(&output);
+	  FD_SET(fd, &output);
+        }
+	while (select(fd + 1, &input, &output, NULL, NULL) < 0);
+
+        if (FD_ISSET(fd, &input))
+	{
+	 /*
+	  * Read backchannel data...
+	  */
+
+	  if ((rbytes = recv(fd, resource, sizeof(resource), 0)) > 0)
+	  {
+	    fprintf(stderr, "DEBUG: Received %d bytes of back-channel data!\n",
+	            rbytes);
+            cupsBackchannelWrite(resource, rbytes, 1.0);
+          }
 	}
 
-	nbytes -= wbytes;
-	bufptr += wbytes;
+        if (FD_ISSET(fd, &output))
+	{
+	 /*
+	  * Write print data...
+	  */
+
+	  if ((wbytes = send(fd, bufptr, nbytes, 0)) < 0)
+	  {
+	   /*
+	    * Check for retryable errors...
+	    */
+
+	    if (errno != EAGAIN && errno != EINTR)
+	    {
+	      perror("ERROR: Unable to send print file to printer");
+	      break;
+	    }
+	  }
+	  else
+	  {
+	   /*
+	    * Update count and pointer...
+	    */
+
+	    nbytes -= wbytes;
+	    bufptr += wbytes;
+	  }
+        }
       }
 
       if (wbytes < 0)
         break;
 
-     /*
-      * Check for possible data coming back from the printer...
-      */
-
-      timeout.tv_sec  = 0;
-      timeout.tv_usec = 0;
-
-      FD_ZERO(&input);
-      FD_SET(fd, &input);
-      if (select(fd + 1, &input, NULL, NULL, &timeout) > 0)
-      {
-       /*
-	* Grab the data coming back and spit it out to stderr...
-	*/
-
-	if ((nbytes = recv(fd, buffer, sizeof(buffer), 0)) > 0)
-	{
-	  fprintf(stderr, "INFO: Received %d bytes of back-channel data!\n",
-	          nbytes);
-          print_backchannel((unsigned char *)buffer, nbytes);
-        }
-      }
-      else if (argc > 6)
+      if (argc > 6)
 	fprintf(stderr, "INFO: Sending print file, %lu bytes...\n",
 	        (unsigned long)tbytes);
     }
@@ -369,11 +389,11 @@ main(int  argc,			/* I - Number of command-line arguments (6 or 7) */
 	* Grab the data coming back and spit it out to stderr...
 	*/
 
-	if ((nbytes = recv(fd, buffer, sizeof(buffer), 0)) > 0)
+	if ((rbytes = recv(fd, resource, sizeof(resource), 0)) > 0)
 	{
-	  fprintf(stderr, "INFO: Received %d bytes of back-channel data!\n",
-	          nbytes);
-          print_backchannel((unsigned char *)buffer, nbytes);
+	  fprintf(stderr, "DEBUG: Received %d bytes of back-channel data!\n",
+	          rbytes);
+          cupsBackchannelWrite(resource, rbytes, 1.0);
         }
 	else
 	  break;
@@ -397,44 +417,6 @@ main(int  argc,			/* I - Number of command-line arguments (6 or 7) */
     close(fp);
 
   return (wbytes < 0);
-}
-
-
-/*
- * 'print_backchannel()' - Print the contents of a back-channel buffer.
- */
-
-void
-print_backchannel(const unsigned char *buffer,	/* I - Data buffer */
-                  int                 nbytes)	/* I - Number of bytes */
-{
-  char	line[255],				/* Formatted line */
-	*lineptr;				/* Pointer into line */
-
-
-  for (lineptr = line; nbytes > 0; buffer ++, nbytes --)
-  {
-    if (*buffer < 0x20 || *buffer >= 0x7f)
-    {
-      snprintf(lineptr, sizeof(line) - (lineptr - line), "<%02X>", *buffer);
-      lineptr += strlen(lineptr);
-    }
-    else
-      *lineptr++ = *buffer;
-
-    if ((lineptr - line) > 72)
-    {
-      *lineptr = '\0';
-      fprintf(stderr, "DEBUG: DATA: %s\n", line);
-      lineptr = line;
-    }
-  }
-
-  if (lineptr > line)
-  {
-    *lineptr = '\0';
-    fprintf(stderr, "DEBUG: DATA: %s\n", line);
-  }
 }
 
 

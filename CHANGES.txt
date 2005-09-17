@@ -3,6 +3,13 @@ CHANGES.txt - 09/16/2005
 
 CHANGES IN CUPS V1.2.0b1
 
+	- Added new cupsBackchannelRead() and
+	  cupsBackchannelWrite() functions, as well as
+	  backchannel support to the parallel, serial, socket,
+	  and USB backends (STR #1252)
+	- The parallel and USB backends now treat a "no space
+	  available" error as an out-of-paper condition (STR
+	  #1225)
 	- The "lpc" command now supports the "status all" command
 	  (STR #1004)
 	- ippReadIO() did not read collections properly (STR

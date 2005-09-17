@@ -30,7 +30,7 @@ include ../Makedefs
 # Object files...
 #
 
-LIBOBJS	=	attr.o auth.o dest.o dir.o emit.o encode.o \
+LIBOBJS	=	attr.o auth.o backchannel.o dest.o dir.o emit.o encode.o \
 		file.o getputfile.o http.o http-addr.o http-support.o \
 		ipp.o ipp-support.o langprintf.o language.o mark.o \
 		md5.o md5passwd.o normalize.o options.o page.o ppd.o \

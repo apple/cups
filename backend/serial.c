@@ -50,6 +50,7 @@
 #  include <unistd.h>
 #  include <fcntl.h>
 #  include <termios.h>
+#  include <sys/select.h>
 #  ifdef HAVE_SYS_IOCTL_H
 #    include <sys/ioctl.h>
 #  endif /* HAVE_SYS_IOCTL_H */
@@ -113,6 +114,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   int		fp;			/* Print file */
   int		copies;			/* Number of copies to print */
   int		fd;			/* Parallel device */
+  int		rbytes;			/* Number of bytes read */
   int		wbytes;			/* Number of bytes written */
   size_t	nbytes,			/* Number of bytes read */
 		tbytes;			/* Total number of bytes written */
@@ -122,6 +124,8 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 		*bufptr;		/* Pointer into buffer */
   struct termios opts;			/* Serial port options */
   struct termios origopts;		/* Original port options */
+  fd_set	input,			/* Input set for select() */
+		output;			/* Output set for select() */
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
   struct sigaction action;		/* Actions for POSIX signals */
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET */
@@ -519,18 +523,65 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 
       while (nbytes > 0)
       {
-	if ((wbytes = write(fd, bufptr, nbytes)) < 0)
-	  if (errno == ENOTTY)
-	    wbytes = write(fd, bufptr, nbytes);
+       /*
+        * See if we are ready to read or write...
+	*/
 
-	if (wbytes < 0)
+        do
 	{
-	  perror("ERROR: Unable to send print file to printer");
-	  break;
+          FD_ZERO(&input);
+	  FD_SET(fd, &input);
+	  FD_ZERO(&output);
+	  FD_SET(fd, &output);
+        }
+	while (select(fd + 1, &input, &output, NULL, NULL) < 0);
+
+        if (FD_ISSET(fd, &input))
+	{
+	 /*
+	  * Read backchannel data...
+	  */
+
+	  if ((rbytes = read(fd, resource, sizeof(resource))) > 0)
+	  {
+	    fprintf(stderr, "DEBUG: Received %d bytes of back-channel data!\n",
+	            rbytes);
+            cupsBackchannelWrite(resource, rbytes, 1.0);
+          }
 	}
 
-	nbytes -= wbytes;
-	bufptr += wbytes;
+        if (FD_ISSET(fd, &output))
+	{
+	 /*
+	  * Write print data...
+	  */
+
+	  if ((wbytes = write(fd, bufptr, nbytes)) < 0)
+	    if (errno == ENOTTY)
+	      wbytes = write(fd, bufptr, nbytes);
+
+	  if (wbytes < 0)
+	  {
+	   /*
+	    * Check for retryable errors...
+	    */
+
+	    if (errno != EAGAIN && errno != EINTR)
+	    {
+	      perror("ERROR: Unable to send print file to printer");
+	      break;
+	    }
+	  }
+	  else
+	  {
+	   /*
+	    * Update count and pointer...
+	    */
+
+	    nbytes -= wbytes;
+	    bufptr += wbytes;
+	  }
+	}
       }
 
       if (wbytes < 0)
