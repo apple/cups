@@ -3,6 +3,8 @@ CHANGES.txt - 09/17/2005
 
 CHANGES IN CUPS V1.2.0b1
 
+	- Added a new RGBW colorspace to the CUPS raster format
+	  (STR #1071)
 	- The pdftops filter now sets the page size based on the
 	  media box when not scaling the output (STR #912)
 	- The pdftops filter now supports masked images (STR

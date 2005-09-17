@@ -80,104 +80,105 @@ extern "C" {
  * Types...
  */
 
-typedef enum
+typedef enum cups_mode_e		/**** Raster modes ****/
 {
-  CUPS_RASTER_READ,			/* Open stream for reading */
-  CUPS_RASTER_WRITE			/* Open stream for writing */
+  CUPS_RASTER_READ = 0,			/* Open stream for reading */
+  CUPS_RASTER_WRITE = 1			/* Open stream for writing */
 } cups_mode_t;
 
-typedef enum
+typedef enum cups_bool_e		/**** Boolean type ****/
 {
-  CUPS_FALSE,				/* Logical false */
-  CUPS_TRUE				/* Logical true */
+  CUPS_FALSE = 0,			/* Logical false */
+  CUPS_TRUE = 1				/* Logical true */
 } cups_bool_t;
 
-typedef enum
+typedef enum cups_jog_e			/**** Jog attribute values ****/
 {
-  CUPS_JOG_NONE,			/* Never move pages */
-  CUPS_JOG_FILE,			/* Move pages after this file */
-  CUPS_JOG_JOB,				/* Move pages after this job */
-  CUPS_JOG_SET				/* Move pages after this set */
+  CUPS_JOG_NONE = 0,			/* Never move pages */
+  CUPS_JOG_FILE = 1,			/* Move pages after this file */
+  CUPS_JOG_JOB = 2,			/* Move pages after this job */
+  CUPS_JOG_SET = 3			/* Move pages after this set */
 } cups_jog_t;
 
-typedef enum
+typedef enum cups_orient_e		/**** Orientation attribute values ****/
 {
-  CUPS_ORIENT_0,			/* Don't rotate the page */
-  CUPS_ORIENT_90,			/* Rotate the page counter-clockwise */
-  CUPS_ORIENT_180,			/* Turn the page upside down */
-  CUPS_ORIENT_270			/* Rotate the page clockwise */
+  CUPS_ORIENT_0 = 0,			/* Don't rotate the page */
+  CUPS_ORIENT_90 = 1,			/* Rotate the page counter-clockwise */
+  CUPS_ORIENT_180 = 2,			/* Turn the page upside down */
+  CUPS_ORIENT_270 = 3			/* Rotate the page clockwise */
 } cups_orient_t;
 
-typedef enum
+typedef enum cups_cut_e			/**** CutMedia attribute values ****/
 {
-  CUPS_CUT_NONE,			/* Never cut the roll */
-  CUPS_CUT_FILE,			/* Cut the roll after this file */
-  CUPS_CUT_JOB,				/* Cut the roll after this job */
-  CUPS_CUT_SET,				/* Cut the roll after this set */
-  CUPS_CUT_PAGE				/* Cut the roll after this page */
+  CUPS_CUT_NONE = 0,			/* Never cut the roll */
+  CUPS_CUT_FILE = 1,			/* Cut the roll after this file */
+  CUPS_CUT_JOB = 2,			/* Cut the roll after this job */
+  CUPS_CUT_SET = 3,			/* Cut the roll after this set */
+  CUPS_CUT_PAGE = 4			/* Cut the roll after this page */
 } cups_cut_t;
 
-typedef enum
+typedef enum cups_adv_e			/**** AdvanceMedia attribute values ****/
 {
-  CUPS_ADVANCE_NONE,			/* Never advance the roll */
-  CUPS_ADVANCE_FILE,			/* Advance the roll after this file */
-  CUPS_ADVANCE_JOB,			/* Advance the roll after this job */
-  CUPS_ADVANCE_SET,			/* Advance the roll after this set */
-  CUPS_ADVANCE_PAGE			/* Advance the roll after this page */
+  CUPS_ADVANCE_NONE = 0,		/* Never advance the roll */
+  CUPS_ADVANCE_FILE = 1,		/* Advance the roll after this file */
+  CUPS_ADVANCE_JOB = 2,			/* Advance the roll after this job */
+  CUPS_ADVANCE_SET = 3,			/* Advance the roll after this set */
+  CUPS_ADVANCE_PAGE = 4			/* Advance the roll after this page */
 } cups_adv_t;
 
-typedef enum
+typedef enum cups_edge_e		/**** LeadingEdge attribute values ****/
 {
-  CUPS_EDGE_TOP,			/* Leading edge is the top of the page */
-  CUPS_EDGE_RIGHT,			/* Leading edge is the right of the page */
-  CUPS_EDGE_BOTTOM,			/* Leading edge is the bottom of the page */
-  CUPS_EDGE_LEFT			/* Leading edge is the left of the page */
+  CUPS_EDGE_TOP = 0,			/* Leading edge is the top of the page */
+  CUPS_EDGE_RIGHT = 1,			/* Leading edge is the right of the page */
+  CUPS_EDGE_BOTTOM = 2,			/* Leading edge is the bottom of the page */
+  CUPS_EDGE_LEFT = 3			/* Leading edge is the left of the page */
 } cups_edge_t;
 
-typedef enum
+typedef enum cups_order_e		/**** cupsColorOrder attribute values ****/
 {
-  CUPS_ORDER_CHUNKED,			/* CMYK CMYK CMYK ... */
-  CUPS_ORDER_BANDED,			/* CCC MMM YYY KKK ... */
-  CUPS_ORDER_PLANAR			/* CCC ... MMM ... YYY ... KKK ... */
+  CUPS_ORDER_CHUNKED = 0,		/* CMYK CMYK CMYK ... */
+  CUPS_ORDER_BANDED = 1,		/* CCC MMM YYY KKK ... */
+  CUPS_ORDER_PLANAR = 2			/* CCC ... MMM ... YYY ... KKK ... */
 } cups_order_t;
 
-typedef enum
+typedef enum cups_cspace_e		/**** cupsColorSpace attribute values ****/
 {
-  CUPS_CSPACE_W,			/* Luminance */
-  CUPS_CSPACE_RGB,			/* Red, green, blue */
-  CUPS_CSPACE_RGBA,			/* Red, green, blue, alpha */
-  CUPS_CSPACE_K,			/* Black */
-  CUPS_CSPACE_CMY,			/* Cyan, magenta, yellow */
-  CUPS_CSPACE_YMC,			/* Yellow, magenta, cyan */
-  CUPS_CSPACE_CMYK,			/* Cyan, magenta, yellow, black */
-  CUPS_CSPACE_YMCK,			/* Yellow, magenta, cyan, black */
-  CUPS_CSPACE_KCMY,			/* Black, cyan, magenta, yellow */
-  CUPS_CSPACE_KCMYcm,			/* Black, cyan, magenta, yellow, *
+  CUPS_CSPACE_W = 0,			/* Luminance */
+  CUPS_CSPACE_RGB = 1,			/* Red, green, blue */
+  CUPS_CSPACE_RGBA = 2,			/* Red, green, blue, alpha */
+  CUPS_CSPACE_K = 3,			/* Black */
+  CUPS_CSPACE_CMY = 4,			/* Cyan, magenta, yellow */
+  CUPS_CSPACE_YMC = 5,			/* Yellow, magenta, cyan */
+  CUPS_CSPACE_CMYK = 6,			/* Cyan, magenta, yellow, black */
+  CUPS_CSPACE_YMCK = 7,			/* Yellow, magenta, cyan, black */
+  CUPS_CSPACE_KCMY = 8,			/* Black, cyan, magenta, yellow */
+  CUPS_CSPACE_KCMYcm = 9,		/* Black, cyan, magenta, yellow, *
 					 * light-cyan, light-magenta     */
-  CUPS_CSPACE_GMCK,			/* Gold, magenta, yellow, black */
-  CUPS_CSPACE_GMCS,			/* Gold, magenta, yellow, silver */
-  CUPS_CSPACE_WHITE,			/* White ink (as black) */
-  CUPS_CSPACE_GOLD,			/* Gold foil */
-  CUPS_CSPACE_SILVER,			/* Silver foil */
+  CUPS_CSPACE_GMCK = 10,		/* Gold, magenta, yellow, black */
+  CUPS_CSPACE_GMCS = 11,		/* Gold, magenta, yellow, silver */
+  CUPS_CSPACE_WHITE = 12,		/* White ink (as black) */
+  CUPS_CSPACE_GOLD = 13,		/* Gold foil */
+  CUPS_CSPACE_SILVER = 14,		/* Silver foil */
 
-  CUPS_CSPACE_CIEXYZ,			/* CIE XYZ */
-  CUPS_CSPACE_CIELab,			/* CIE Lab */
+  CUPS_CSPACE_CIEXYZ = 15,		/* CIE XYZ */
+  CUPS_CSPACE_CIELab = 16,		/* CIE Lab */
+  CUPS_CSPACE_RGBW = 17,		/* Red, green, blue, white */
 
   CUPS_CSPACE_ICC1 = 32,		/* ICC-based, 1 color */
-  CUPS_CSPACE_ICC2,			/* ICC-based, 2 colors */
-  CUPS_CSPACE_ICC3,			/* ICC-based, 3 colors */
-  CUPS_CSPACE_ICC4,			/* ICC-based, 4 colors */
-  CUPS_CSPACE_ICC5,			/* ICC-based, 5 colors */
-  CUPS_CSPACE_ICC6,			/* ICC-based, 6 colors */
-  CUPS_CSPACE_ICC7,			/* ICC-based, 7 colors */
-  CUPS_CSPACE_ICC8,			/* ICC-based, 8 colors */
-  CUPS_CSPACE_ICC9,			/* ICC-based, 9 colors */
-  CUPS_CSPACE_ICCA,			/* ICC-based, 10 colors */
-  CUPS_CSPACE_ICCB,			/* ICC-based, 11 colors */
-  CUPS_CSPACE_ICCC,			/* ICC-based, 12 colors */
-  CUPS_CSPACE_ICCD,			/* ICC-based, 13 colors */
-  CUPS_CSPACE_ICCE,			/* ICC-based, 14 colors */
-  CUPS_CSPACE_ICCF			/* ICC-based, 15 colors */
+  CUPS_CSPACE_ICC2 = 33,		/* ICC-based, 2 colors */
+  CUPS_CSPACE_ICC3 = 34,		/* ICC-based, 3 colors */
+  CUPS_CSPACE_ICC4 = 35,		/* ICC-based, 4 colors */
+  CUPS_CSPACE_ICC5 = 36,		/* ICC-based, 5 colors */
+  CUPS_CSPACE_ICC6 = 37,		/* ICC-based, 6 colors */
+  CUPS_CSPACE_ICC7 = 38,		/* ICC-based, 7 colors */
+  CUPS_CSPACE_ICC8 = 39,		/* ICC-based, 8 colors */
+  CUPS_CSPACE_ICC9 = 40,		/* ICC-based, 9 colors */
+  CUPS_CSPACE_ICCA = 41,		/* ICC-based, 10 colors */
+  CUPS_CSPACE_ICCB = 42,		/* ICC-based, 11 colors */
+  CUPS_CSPACE_ICCC = 43,		/* ICC-based, 12 colors */
+  CUPS_CSPACE_ICCD = 44,		/* ICC-based, 13 colors */
+  CUPS_CSPACE_ICCE = 45,		/* ICC-based, 14 colors */
+  CUPS_CSPACE_ICCF = 46			/* ICC-based, 15 colors */
 } cups_cspace_t;
 
 
@@ -190,7 +191,7 @@ typedef enum
  * (from CUPS 1.2 and higher) page header, for binary compatibility.
  */
 
-typedef struct				/**** Version 1 Page Header ****/
+typedef struct cups_page_header_s	/**** Version 1 Page Header ****/
 {
   /**** Standard Page Device Dictionary String Values ****/
   char		MediaClass[64];		/* MediaClass string */
@@ -238,8 +239,7 @@ typedef struct				/**** Version 1 Page Header ****/
   unsigned	cupsRowStep;		/* Spacing between lines */
 } cups_page_header_t;
 
-
-typedef struct				/**** Version 2 Page Header ****/
+typedef struct cups_page_header2_s	/**** Version 2 Page Header ****/
 {
   /**** Standard Page Device Dictionary String Values ****/
   char		MediaClass[64];		/* MediaClass string */
@@ -295,13 +295,7 @@ typedef struct				/**** Version 2 Page Header ****/
   char		cupsRenderingIntent[64];/* Color rendering intent */
 } cups_page_header2_t;
 
-
-/*
- * The raster structure maintains information about a raster data
- * stream...
- */
-
-typedef struct
+typedef struct cups_raster_s		/**** Raster stream data ****/
 {
   unsigned		sync;		/* Sync word from start of stream */
   int			fd;		/* File descriptor */

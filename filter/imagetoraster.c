@@ -33,7 +33,7 @@
  *   format_K()      - Convert image data to black.
  *   format_KCMY()   - Convert image data to KCMY.
  *   format_KCMYcm() - Convert image data to KCMYcm.
- *   format_RGBA()   - Convert image data to RGBA.
+ *   format_RGBA()   - Convert image data to RGBA/RGBW.
  *   format_W()      - Convert image data to luminance.
  *   format_YMC()    - Convert image data to YMC.
  *   format_YMCK()   - Convert image data to YMCK.
@@ -135,7 +135,7 @@ int	Planes[] =	/* Number of planes for each colorspace */
 	  1,		/* CUPS_CSPACE_SILVER */
 	  3,		/* CUPS_CSPACE_CIEXYZ */
 	  3,		/* CUPS_CSPACE_CIELab */
-	  0,		/* ... reserved ... */
+	  4,		/* CUPS_CSPACE_RGBW */
 	  0,		/* ... reserved ... */
 	  0,		/* ... reserved ... */
 	  0,		/* ... reserved ... */
@@ -536,6 +536,7 @@ main(int  argc,		/* I - Number of command-line arguments */
     default :
     case CUPS_CSPACE_RGB :
     case CUPS_CSPACE_RGBA :
+    case CUPS_CSPACE_RGBW :
         primary   = IMAGE_RGB;
 	secondary = IMAGE_RGB;
 
@@ -1339,6 +1340,7 @@ main(int  argc,		/* I - Number of command-line arguments */
 		             yerr0, yerr1, r0, r1);
 		  break;
 	      case CUPS_CSPACE_RGBA :
+	      case CUPS_CSPACE_RGBW :
 	          format_RGBA(&header, row, y, plane, z->xsize, z->ysize,
 		              yerr0, yerr1, r0, r1);
 		  break;
@@ -3239,7 +3241,7 @@ format_KCMYcm(cups_page_header2_t *header,/* I - Page header */
 
 
 /*
- * 'format_RGBA()' - Convert image data to RGBA.
+ * 'format_RGBA()' - Convert image data to RGBA/RGBW.
  */
 
 static void
