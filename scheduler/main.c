@@ -263,11 +263,16 @@ main(int  argc,				/* I - Number of command-line arguments */
     * Disconnect from the controlling terminal...
     */
 
-    close(0);
-    close(1);
-    close(2);
-
     setsid();
+
+   /*
+    * Close all open files...
+    */
+
+    getrlimit(RLIMIT_NOFILE, &limit);
+
+    for (i = 0; i < limit.rlim_cur; i ++)
+      close(i);
 #endif /* DEBUG */
   }
 
