@@ -3,6 +3,12 @@ CHANGES.txt - 09/17/2005
 
 CHANGES IN CUPS V1.2.0b1
 
+	- The pdftops filter now sets the page size based on the
+	  media box when not scaling the output (STR #912)
+	- The pdftops filter now supports masked images (STR
+	  #281)
+	- The pdftops filter produced large output when rendering
+	  PDF files containing lot of repeated images (STR #327)
 	- The pdftops filter now minimizes print processing of
 	  PDF files when using the page-ranges option (STR #273)
 	- Updated pdftops filter to Xpdf 3.01.

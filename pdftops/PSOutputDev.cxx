@@ -2434,7 +2434,10 @@ GBool PSOutputDev::startPage(int pageNum, GfxState *state) {
       }
     } else {
       xScale = yScale = 1;
+      paperWidth = width;
+      paperHeight = height;
     }
+
     // deal with odd bounding boxes or clipping
     if (clipLLX0 < clipURX0 && clipLLY0 < clipURY0) {
       tx -= xScale * clipLLX0;
