@@ -25,16 +25,17 @@
  *
  * Contents:
  *
- *   main()        - Main entry...
- *   check_range() - Check to see if the current page is selected for
- *   copy_bytes()  - Copy bytes from the input file to stdout...
- *   do_prolog()   - Send the necessary document prolog commands...
- *   do_setup()    - Send the necessary document setup commands...
- *   end_nup()     - End processing for N-up printing...
- *   psbcp()       - Enable the binary communications protocol on the printer.
- *   psgets()      - Get a line from a file.
- *   pswrite()     - Write data from a file.
- *   start_nup()   - Start processing for N-up printing...
+ *   main()            - Main entry...
+ *   check_range()     - Check to see if the current page is selected for
+ *   copy_bytes()      - Copy bytes from the input file to stdout...
+ *   do_prolog()       - Send the necessary document prolog commands...
+ *   do_setup()        - Send the necessary document setup commands...
+ *   end_nup()         - End processing for N-up printing...
+ *   include_feature() - Include a printer option/feature command.
+ *   psbcp()           - Enable the binary communications protocol on the printer.
+ *   psgets()          - Get a line from a file.
+ *   pswrite()         - Write data from a file.
+ *   start_nup()       - Start processing for N-up printing...
  */
 
 /*
@@ -106,6 +107,7 @@ static void	do_prolog(ppd_file_t *ppd);
 static void 	do_setup(ppd_file_t *ppd, int copies,  int collate,
 		         int slowcollate, float g, float b);
 static void	end_nup(int number);
+static void	include_feature(ppd_file_t *ppd, const char *line, FILE *out);
 #define		is_first_page(p)	(NUp == 1 || (((p)+1) % NUp) == 1)
 #define		is_last_page(p)		(NUp > 1 && (((p)+1) % NUp) == 0)
 #define 	is_not_last_page(p)	(NUp > 1 && ((p) % NUp) != 0)
@@ -573,6 +575,8 @@ main(int  argc,			/* I - Number of command-line arguments */
       }
       else if (!strncmp(line, "%%Page:", 7) && level == 0)
         break;
+      else if (!strncmp(line, "%%IncludeFeature:", 17) && level == 0 && NUp == 1)
+        include_feature(ppd, line, stdout);
       else if (!strncmp(line, "%%BeginBinary:", 14) ||
                (!strncmp(line, "%%BeginData:", 12) &&
 	        !strstr(line, "ASCII") && !strstr(line, "Hex")))
@@ -797,6 +801,13 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 	  tbytes -= nbytes;
 	}
+      }
+      else if (!strncmp(line, "%%IncludeFeature:", 17) && level == 0 && NUp == 1)
+      {
+	include_feature(ppd, line, stdout);
+
+        if (slowcollate || sloworder)
+	  include_feature(ppd, line, temp);
       }
       else if (!strncmp(line, "%%Trailer", 9) && level == 0)
       {
@@ -1326,11 +1337,79 @@ end_nup(int number)	/* I - Page number */
 
 
 /*
+ * 'include_feature()' - Include a printer option/feature command.
+ */
+
+static void
+include_feature(ppd_file_t *ppd,	/* I - PPD file */
+                const char *line,	/* I - DSC line */
+		FILE       *out)	/* I - Output file */
+{
+  char		name[255],		/* Option name */
+		value[255];		/* Option value */
+  ppd_option_t	*option;		/* Option in file */
+  ppd_choice_t	*choice;		/* Choice */
+
+
+ /*
+  * Get the "%%IncludeFeature: *Keyword OptionKeyword" values...
+  */
+
+  if (sscanf(line + 17, "%254s%254s", name, value) != 2)
+  {
+    fprintf(stderr, "ERROR: Bad line: \"%s\"!\n", line);
+    return;
+  }
+
+ /*
+  * Find the option and choice...
+  */
+
+  if ((option = ppdFindOption(ppd, name + 1)) == NULL)
+  {
+    fprintf(stderr, "WARNING: Unknown option \"%s\"!\n", name + 1);
+    return;
+  }
+
+  if (option->section == PPD_ORDER_EXIT ||
+      option->section == PPD_ORDER_JCL)
+  {
+    fprintf(stderr, "WARNING: Option \"%s\" cannot be included via IncludeFeature!\n",
+            name + 1);
+    return;
+  }
+
+  if ((choice = ppdFindChoice(option, value)) == NULL)
+  {
+    fprintf(stderr, "WARNING: Unknown choice \"%s\" for option \"%s\"!\n",
+            value, name + 1);
+    return;
+  }
+
+ /*
+  * Emit the option...
+  */
+
+  fputs("[{\n", out);
+  fprintf(out, "%%%%BeginFeature: %s %s\n", name, value);
+  if (choice->code && choice->code[0])
+  {
+    fputs(choice->code, out);
+
+    if (choice->code[strlen(choice->code) - 1] != '\n')
+      putc('\n', out);
+  }
+  fputs("%%EndFeature\n", out);
+  fputs("} stopped cleartomark\n", out);
+}
+
+
+/*
  * 'psbcp()' - Enable the binary communications protocol on the printer.
  */
 
 static void
-psbcp(ppd_file_t *ppd)		/* I - PPD file */
+psbcp(ppd_file_t *ppd)			/* I - PPD file */
 {
   if (ppd->jcl_begin)
     fputs(ppd->jcl_begin, stdout);

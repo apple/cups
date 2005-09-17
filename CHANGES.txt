@@ -3,6 +3,8 @@ CHANGES.txt - 09/17/2005
 
 CHANGES IN CUPS V1.2.0b1
 
+	- The pstops filter now supports the IncludeFeature DSC
+	  comment (STR #1212)
 	- The pstops filter now disables the setpagedevice
 	  procedure when doing N-up printing (STR #1161)
 	- The serial backend now supports "stop=1", "stop=2",
