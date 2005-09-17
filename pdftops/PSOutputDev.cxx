@@ -13,6 +13,8 @@
 #endif
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <ctype.h>
 #include <stddef.h>
 #include <stdarg.h>
 #include <signal.h>
@@ -65,7 +67,6 @@ static char *prolog[] = {
   "  } for",
   "~123sn",
   "/pdfSetup {",
-#if 0 /* NOT FOR CUPS */
   "  3 1 roll 2 array astore",
   "  /setpagedevice where {",
   "    pop 3 dict begin",
@@ -77,9 +78,6 @@ static char *prolog[] = {
   "  } {",
   "    pop pop",
   "  } ifelse",
-#else
-  "  pop pop pop",
-#endif /* 0 */
   "} def",
   "~1sn",
   "/pdfOpNames [",
@@ -892,7 +890,7 @@ static void outputToFile(void *stream, char *data, int len) {
 PSOutputDev::PSOutputDev(char *fileName, XRef *xrefA, Catalog *catalog,
 			 int firstPage, int lastPage, PSOutMode modeA,
 			 int imgLLXA, int imgLLYA, int imgURXA, int imgURYA,
-			 GBool manualCtrlA) {
+			 GBool manualCtrlA, const char *pageRangesA) {
   FILE *f;
   PSFileType fileTypeA;
 
@@ -942,14 +940,14 @@ PSOutputDev::PSOutputDev(char *fileName, XRef *xrefA, Catalog *catalog,
 
   init(outputToFile, f, fileTypeA,
        xrefA, catalog, firstPage, lastPage, modeA,
-       imgLLXA, imgLLYA, imgURXA, imgURYA, manualCtrlA);
+       imgLLXA, imgLLYA, imgURXA, imgURYA, manualCtrlA, pageRangesA);
 }
 
 PSOutputDev::PSOutputDev(PSOutputFunc outputFuncA, void *outputStreamA,
 			 XRef *xrefA, Catalog *catalog,
 			 int firstPage, int lastPage, PSOutMode modeA,
 			 int imgLLXA, int imgLLYA, int imgURXA, int imgURYA,
-			 GBool manualCtrlA) {
+			 GBool manualCtrlA, const char *pageRangesA) {
   underlayCbk = NULL;
   underlayCbkData = NULL;
   overlayCbk = NULL;
@@ -967,14 +965,14 @@ PSOutputDev::PSOutputDev(PSOutputFunc outputFuncA, void *outputStreamA,
 
   init(outputFuncA, outputStreamA, psGeneric,
        xrefA, catalog, firstPage, lastPage, modeA,
-       imgLLXA, imgLLYA, imgURXA, imgURYA, manualCtrlA);
+       imgLLXA, imgLLYA, imgURXA, imgURYA, manualCtrlA, pageRangesA);
 }
 
 void PSOutputDev::init(PSOutputFunc outputFuncA, void *outputStreamA,
 		       PSFileType fileTypeA, XRef *xrefA, Catalog *catalog,
 		       int firstPage, int lastPage, PSOutMode modeA,
 		       int imgLLXA, int imgLLYA, int imgURXA, int imgURYA,
-		       GBool manualCtrlA) {
+		       GBool manualCtrlA, const char *pageRangesA) {
   Page *page;
   PDFRectangle *box;
 
@@ -992,6 +990,7 @@ void PSOutputDev::init(PSOutputFunc outputFuncA, void *outputStreamA,
   imgLLY = imgLLYA;
   imgURX = imgURXA;
   imgURY = imgURYA;
+  pageRanges = pageRangesA;
   if (imgLLX == 0 && imgURX == 0 && imgLLY == 0 && imgURY == 0) {
     globalParams->getPSImageableArea(&imgLLX, &imgLLY, &imgURX, &imgURY);
   }
@@ -2341,7 +2340,7 @@ void PSOutputDev::setupImage(Ref id, Stream *str) {
   delete str;
 }
 
-void PSOutputDev::startPage(int pageNum, GfxState *state) {
+GBool PSOutputDev::startPage(int pageNum, GfxState *state) {
   int x1, y1, x2, y2, width, height;
   int imgWidth, imgHeight, imgWidth2, imgHeight2;
   GBool landscape;
@@ -2506,6 +2505,11 @@ void PSOutputDev::startPage(int pageNum, GfxState *state) {
     rotate = 0;
     break;
   }
+
+  if (!checkRange(pageNum))
+    return (gFalse);
+  else
+    return (gTrue);
 }
 
 void PSOutputDev::endPage() {
@@ -2513,7 +2517,6 @@ void PSOutputDev::endPage() {
     restoreState(NULL);
     (*overlayCbk)(this, overlayCbkData);
   }
-
 
   if (mode == psModeForm) {
     writePS("pdfEndPage\n");
@@ -4840,4 +4843,50 @@ GString *PSOutputDev::filterPSName(GString *name) {
     }
   }
   return name2;
+}
+
+GBool					/* O - gTrue if selected, gFalse otherwise */
+PSOutputDev::checkRange(int page)	/* I - Page number */
+{
+  const char	*range;			/* Pointer into range string */
+  int		lower, upper;		/* Lower and upper page numbers */
+
+
+  if (pageRanges == NULL)
+    return (gTrue);				/* No range, print all pages... */
+
+  for (range = pageRanges; *range != '\0';)
+  {
+    if (*range == '-')
+    {
+      lower = 1;
+      range ++;
+      upper = strtol(range, (char **)&range, 10);
+    }
+    else
+    {
+      lower = strtol(range, (char **)&range, 10);
+
+      if (*range == '-')
+      {
+        range ++;
+	if (!isdigit(*range & 255))
+	  upper = 65535;
+	else
+	  upper = strtol(range, (char **)&range, 10);
+      }
+      else
+        upper = lower;
+    }
+
+    if (page >= lower && page <= upper)
+      return (gTrue);
+
+    if (*range == ',')
+      range ++;
+    else
+      break;
+  }
+
+  return (gFalse);
 }

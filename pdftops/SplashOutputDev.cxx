@@ -636,7 +636,7 @@ void SplashOutputDev::startDoc(XRef *xrefA) {
   nT3Fonts = 0;
 }
 
-void SplashOutputDev::startPage(int pageNum, GfxState *state) {
+GBool SplashOutputDev::startPage(int pageNum, GfxState *state) {
   int w, h;
   SplashColor color;
 
@@ -691,6 +691,8 @@ void SplashOutputDev::startPage(int pageNum, GfxState *state) {
   splash->setMiterLimit(10);
   splash->setFlatness(1);
   splash->clear(paperColor);
+
+  return (gTrue);
 }
 
 void SplashOutputDev::endPage() {

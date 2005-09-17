@@ -1,8 +1,11 @@
-CHANGES.txt - 09/16/2005
+CHANGES.txt - 09/17/2005
 ------------------------
 
 CHANGES IN CUPS V1.2.0b1
 
+	- The pdftops filter now minimizes print processing of
+	  PDF files when using the page-ranges option (STR #273)
+	- Updated pdftops filter to Xpdf 3.01.
 	- Added new cupsBackchannelRead() and
 	  cupsBackchannelWrite() functions, as well as
 	  backchannel support to the parallel, serial, socket,
@@ -147,7 +150,6 @@ CHANGES IN CUPS V1.2.0b1
 	  (STR #1046)
 	- Moved enable and disable commands to sbindir to be
 	  consistent.
-	- Updated pdftops filter to Xpdf 3.00.03.
 	- Added new cupsRasterInterpretPPD() function for RIP
 	  filters to setup the raster page header from
 	  PostScript commands in a PPD file.

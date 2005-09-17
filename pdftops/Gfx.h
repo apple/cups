@@ -156,6 +156,7 @@ private:
   GBool				// callback to check for an abort
     (*abortCheckCbk)(void *data);
   void *abortCheckCbkData;
+  GBool renderThisPage;		// Render this page?
 
   static Operator opTab[];	// table of operators
 

@@ -439,7 +439,10 @@ Gfx::Gfx(XRef *xrefA, OutputDev *outA, int pageNum, Dict *resDict,
   fontChanged = gFalse;
   clip = clipNone;
   ignoreUndef = 0;
-  out->startPage(pageNum, state);
+  renderThisPage = out->startPage(pageNum, state);
+  if (!renderThisPage)
+    return;
+
   out->setDefaultCTM(state->getCTM());
   out->updateAll(state);
   for (i = 0; i < 6; ++i) {
@@ -471,6 +474,7 @@ Gfx::Gfx(XRef *xrefA, OutputDev *outA, Dict *resDict,
   xref = xrefA;
   subPage = gTrue;
   printCommands = globalParams->getPrintCommands();
+  renderThisPage = gTrue;
 
   // start the resource stack
   res = new GfxResources(xref, resDict, NULL);
@@ -519,6 +523,9 @@ Gfx::~Gfx() {
 void Gfx::display(Object *obj, GBool topLevel) {
   Object obj2;
   int i;
+
+  if (!renderThisPage)
+    return;
 
   if (obj->isArray()) {
     for (i = 0; i < obj->arrayGetLength(); ++i) {

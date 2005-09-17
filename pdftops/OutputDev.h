@@ -74,7 +74,7 @@ public:
   virtual void setDefaultCTM(double *ctm);
 
   // Start a page.
-  virtual void startPage(int pageNum, GfxState *state) {}
+  virtual GBool startPage(int pageNum, GfxState *state) { return (gTrue); }
 
   // End a page.
   virtual void endPage() {}

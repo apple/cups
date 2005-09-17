@@ -2,11 +2,11 @@
 
 pdftops.o: ../cups/string.h ../config.h parseargs.h gtypes.h GString.h gmem.h
 pdftops.o: Object.h Array.h Dict.h Stream.h XRef.h Catalog.h Page.h PDFDoc.h
-pdftops.o: Link.h PSOutputDev.h GlobalParams.h CharTypes.h OutputDev.h
-pdftops.o: Error.h ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
+pdftops.o: PSOutputDev.h GlobalParams.h CharTypes.h OutputDev.h Error.h
+pdftops.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
 pdftops.o: ../cups/ppd.h ../cups/file.h
 Annot.o: ../config.h gmem.h Object.h gtypes.h GString.h Array.h Dict.h
-Annot.o: Stream.h Gfx.h Annot.h
+Annot.o: Stream.h Catalog.h Gfx.h Lexer.h Annot.h
 Array.o: ../config.h gmem.h Object.h gtypes.h GString.h Array.h Dict.h
 Array.o: Stream.h
 BuiltinFont.o: ../config.h gmem.h FontEncodingTables.h BuiltinFont.h gtypes.h
@@ -50,8 +50,8 @@ GList.o: ../config.h gmem.h GList.h gtypes.h
 GlobalParams.o: ../config.h gmem.h GString.h GList.h gtypes.h GHash.h gfile.h
 GlobalParams.o: Error.h NameToCharCode.h CharTypes.h CharCodeToUnicode.h
 GlobalParams.o: UnicodeMap.h CMap.h BuiltinFontTables.h BuiltinFont.h
-GlobalParams.o: FontEncodingTables.h XpdfPluginAPI.h GlobalParams.h
-GlobalParams.o: NameToUnicodeTable.h UnicodeMapTables.h UTF8.h
+GlobalParams.o: FontEncodingTables.h GlobalParams.h NameToUnicodeTable.h
+GlobalParams.o: UnicodeMapTables.h UTF8.h
 gmempp.o: ../config.h gmem.h
 GString.o: ../config.h gtypes.h GString.h
 JArithmeticDecoder.o: ../config.h Object.h gtypes.h gmem.h GString.h Array.h
@@ -74,7 +74,7 @@ OutputDev.o: ../config.h Object.h gtypes.h gmem.h GString.h Array.h Dict.h
 OutputDev.o: Stream.h GfxState.h Function.h OutputDev.h CharTypes.h
 Page.o: ../config.h GlobalParams.h gtypes.h CharTypes.h Object.h gmem.h
 Page.o: GString.h Array.h Dict.h Stream.h XRef.h Link.h OutputDev.h Gfx.h
-Page.o: Annot.h Error.h Page.h
+Page.o: GfxState.h Function.h Annot.h Error.h Page.h
 Parser.o: ../config.h Object.h gtypes.h gmem.h GString.h Array.h Dict.h
 Parser.o: Stream.h Parser.h Lexer.h XRef.h Error.h Decrypt.h
 PDFDoc.o: ../config.h GString.h GlobalParams.h gtypes.h CharTypes.h Page.h
@@ -89,9 +89,8 @@ PSOutputDev.o: FoFiType1C.h FoFiBase.h FoFiTrueType.h Catalog.h Page.h
 PSOutputDev.o: Annot.h PSOutputDev.h OutputDev.h
 PSTokenizer.o: ../config.h PSTokenizer.h gtypes.h
 SecurityHandler.o: ../config.h GString.h PDFDoc.h XRef.h gtypes.h Object.h
-SecurityHandler.o: gmem.h Array.h Dict.h Stream.h Link.h Catalog.h Page.h
-SecurityHandler.o: Decrypt.h Error.h GlobalParams.h CharTypes.h
-SecurityHandler.o: XpdfPluginAPI.h SecurityHandler.h
+SecurityHandler.o: gmem.h Array.h Dict.h Stream.h Catalog.h Page.h Decrypt.h
+SecurityHandler.o: Error.h GlobalParams.h CharTypes.h SecurityHandler.h
 SplashBitmap.o: ../config.h gmem.h SplashErrorCodes.h SplashBitmap.h
 SplashBitmap.o: SplashTypes.h gtypes.h
 SplashClip.o: ../config.h gmem.h SplashErrorCodes.h SplashMath.h
@@ -99,8 +98,8 @@ SplashClip.o: SplashTypes.h gtypes.h SplashPath.h SplashXPath.h
 SplashClip.o: SplashXPathScanner.h SplashClip.h
 Splash.o: ../config.h gmem.h SplashErrorCodes.h SplashMath.h SplashTypes.h
 Splash.o: gtypes.h SplashBitmap.h SplashState.h SplashPath.h SplashXPath.h
-Splash.o: SplashXPathScanner.h SplashPattern.h SplashScreen.h SplashClip.h
-Splash.o: SplashFont.h SplashGlyphBitmap.h Splash.h
+Splash.o: SplashXPathScanner.h SplashPattern.h SplashScreen.h SplashFont.h
+Splash.o: SplashGlyphBitmap.h Splash.h SplashClip.h
 SplashFont.o: ../config.h gmem.h SplashMath.h SplashTypes.h gtypes.h
 SplashFont.o: SplashGlyphBitmap.h SplashFontFile.h SplashFont.h
 SplashFontEngine.o: ../config.h gmem.h GString.h SplashT1FontEngine.h
@@ -115,13 +114,13 @@ SplashFTFontEngine.o: ../config.h
 SplashFTFontFile.o: ../config.h
 SplashOutputDev.o: ../config.h gfile.h gtypes.h GlobalParams.h CharTypes.h
 SplashOutputDev.o: Error.h Object.h gmem.h GString.h Array.h Dict.h Stream.h
-SplashOutputDev.o: GfxState.h Function.h GfxFont.h Link.h CharCodeToUnicode.h
-SplashOutputDev.o: FontEncodingTables.h FoFiTrueType.h FoFiBase.h
-SplashOutputDev.o: SplashBitmap.h SplashTypes.h SplashGlyphBitmap.h
-SplashOutputDev.o: SplashPattern.h SplashScreen.h SplashPath.h SplashState.h
-SplashOutputDev.o: SplashErrorCodes.h SplashFontEngine.h SplashFont.h
-SplashOutputDev.o: SplashFontFile.h SplashFontFileID.h Splash.h
-SplashOutputDev.o: SplashOutputDev.h OutputDev.h
+SplashOutputDev.o: GfxFont.h Link.h CharCodeToUnicode.h FontEncodingTables.h
+SplashOutputDev.o: FoFiTrueType.h FoFiBase.h SplashBitmap.h SplashTypes.h
+SplashOutputDev.o: SplashGlyphBitmap.h SplashPattern.h SplashScreen.h
+SplashOutputDev.o: SplashPath.h SplashState.h SplashErrorCodes.h
+SplashOutputDev.o: SplashFontEngine.h SplashFont.h SplashFontFile.h
+SplashOutputDev.o: SplashFontFileID.h Splash.h SplashClip.h SplashOutputDev.h
+SplashOutputDev.o: OutputDev.h GfxState.h Function.h
 SplashPath.o: ../config.h gmem.h SplashErrorCodes.h SplashPath.h
 SplashPath.o: SplashTypes.h gtypes.h
 SplashPattern.o: ../config.h SplashMath.h SplashTypes.h gtypes.h
@@ -138,8 +137,8 @@ SplashXPath.o: SplashPath.h SplashXPath.h
 SplashXPathScanner.o: ../config.h gmem.h SplashMath.h SplashTypes.h gtypes.h
 SplashXPathScanner.o: SplashXPath.h SplashXPathScanner.h
 Stream.o: ../config.h gmem.h gfile.h gtypes.h Error.h Object.h GString.h
-Stream.o: Array.h Dict.h Stream.h Decrypt.h JBIG2Stream.h JPXStream.h
-Stream.o: Stream-CCITT.h
+Stream.o: Array.h Dict.h Stream.h Lexer.h Decrypt.h GfxState.h Function.h
+Stream.o: JBIG2Stream.h JPXStream.h Stream-CCITT.h
 UnicodeMap.o: ../config.h gmem.h gfile.h gtypes.h GString.h GList.h Error.h
 UnicodeMap.o: GlobalParams.h CharTypes.h UnicodeMap.h
 UnicodeTypeTable.o: CharTypes.h UnicodeTypeTable.h gtypes.h

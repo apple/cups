@@ -57,7 +57,8 @@ public:
 	      int firstPage, int lastPage, PSOutMode modeA,
 	      int imgLLXA = 0, int imgLLYA = 0,
 	      int imgURXA = 0, int imgURYA = 0,
-	      GBool manualCtrlA = gFalse);
+	      GBool manualCtrlA = gFalse,
+	      const char *pageRangesA = (const char *)0);
 
   // Open a PSOutputDev that will write to a generic stream.
   PSOutputDev(PSOutputFunc outputFuncA, void *outputStreamA,
@@ -65,7 +66,8 @@ public:
 	      int firstPage, int lastPage, PSOutMode modeA,
 	      int imgLLXA = 0, int imgLLYA = 0,
 	      int imgURXA = 0, int imgURYA = 0,
-	      GBool manualCtrlA = gFalse);
+	      GBool manualCtrlA = gFalse,
+	      const char *pageRangesA = (const char *)0);
 
   // Destructor -- writes the trailer and closes the file.
   virtual ~PSOutputDev();
@@ -119,7 +121,7 @@ public:
   //----- initialization and control
 
   // Start a page.
-  virtual void startPage(int pageNum, GfxState *state);
+  virtual GBool startPage(int pageNum, GfxState *state);
 
   // End a page.
   virtual void endPage();
@@ -226,7 +228,7 @@ private:
 	    PSFileType fileTypeA, XRef *xrefA, Catalog *catalog,
 	    int firstPage, int lastPage, PSOutMode modeA,
 	    int imgLLXA, int imgLLYA, int imgURXA, int imgURYA,
-	    GBool manualCtrlA);
+	    GBool manualCtrlA, const char *pageRangesA);
   void setupResources(Dict *resDict);
   void setupFonts(Dict *resDict);
   void setupFont(GfxFont *font, Dict *parentResDict);
@@ -271,6 +273,7 @@ private:
   void writePSString(GString *s);
   void writePSName(char *s);
   GString *filterPSName(GString *name);
+  GBool checkRange(int page);
 
   PSLevel level;		// PostScript level (1, 2, separation)
   PSOutMode mode;		// PostScript mode (PS, EPS, form)
@@ -343,7 +346,7 @@ private:
 #endif
 
   GBool ok;			// set up ok?
-
+  const char *pageRanges;	// page ranges to render
 
   friend class WinPDFPrinter;
 };

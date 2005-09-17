@@ -265,8 +265,6 @@ main(int  argc,				// I - Number of command-line args
            ppdIsMarked(ppd, "KD03Duplex", "DuplexTumble"))
     duplex = 1;
 
-  cupsFreeOptions(num_options, options);
-
   if (ppd != NULL)
     ppdClose(ppd);
 
@@ -310,7 +308,8 @@ main(int  argc,				// I - Number of command-line args
     // write PostScript file
     psOut = new PSOutputDev(psFileName->getCString(), doc->getXRef(),
                             doc->getCatalog(), 1, doc->getNumPages(),
-			    psModePS);
+			    psModePS, 0, 0, 0, 0, gFalse,
+			    cupsGetOption("page-ranges", num_options, options));
     if (psOut->isOk())
       doc->displayPages(psOut, 1, doc->getNumPages(), 72.0, 72.0, 0,
                         gTrue, gFalse, gFalse);
@@ -323,6 +322,8 @@ main(int  argc,				// I - Number of command-line args
   {
     error(-1, "Unable to print this document.");
   }
+
+  cupsFreeOptions(num_options, options);
 
   delete doc;
   delete globalParams;
