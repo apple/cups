@@ -2,7 +2,7 @@
 //
 // JBIG2Stream.h
 //
-// Copyright 2002-2004 Glyph & Cog, LLC
+// Copyright 2002-2003 Glyph & Cog, LLC
 //
 //========================================================================
 
@@ -45,8 +45,8 @@ public:
 private:
 
   void readSegments();
-  void readSymbolDictSeg(Guint segNum, Guint length,
-			 Guint *refSegs, Guint nRefSegs);
+  GBool readSymbolDictSeg(Guint segNum, Guint length,
+			  Guint *refSegs, Guint nRefSegs);
   void readTextRegionSeg(Guint segNum, GBool imm,
 			 GBool lossless, Guint length,
 			 Guint *refSegs, Guint nRefSegs);

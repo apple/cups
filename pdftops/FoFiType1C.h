@@ -2,7 +2,7 @@
 //
 // FoFiType1C.h
 //
-// Copyright 1999-2004 Glyph & Cog, LLC
+// Copyright 1999-2003 Glyph & Cog, LLC
 //
 //========================================================================
 
@@ -51,6 +51,9 @@ struct Type1CTopDict {
   int paintType;
   int charstringType;
   double fontMatrix[6];
+  GBool hasFontMatrix;		// CID fonts are allowed to put their
+				//   FontMatrix in the FD instead of the
+				//   top dict
   int uniqueID;
   double fontBBox[4];
   double strokeWidth;
@@ -73,6 +76,8 @@ struct Type1CTopDict {
 #define type1CMaxStemSnap   12
 
 struct Type1CPrivateDict {
+  double fontMatrix[6];
+  GBool hasFontMatrix;
   int blueValues[type1CMaxBlueValues];
   int nBlueValues;
   int otherBlues[type1CMaxOtherBlues];
@@ -221,6 +226,7 @@ private:
   int nOps;			// number of operands
   int nHints;			// number of hints for the current glyph
   GBool firstOp;		// true if we haven't hit the first op yet
+  GBool openPath;		// true if there is an unclosed path
 };
 
 #endif

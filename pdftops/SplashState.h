@@ -70,6 +70,9 @@ private:
   SplashPattern *strokePattern;
   SplashPattern *fillPattern;
   SplashScreen *screen;
+  SplashBlendFunc blendFunc;
+  SplashCoord strokeAlpha;
+  SplashCoord fillAlpha;
   SplashCoord lineWidth;
   int lineCap;
   int lineJoin;

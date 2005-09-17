@@ -2,7 +2,7 @@
 //
 // GfxState.cc
 //
-// Copyright 1996-2004 Glyph & Cog, LLC
+// Copyright 1996-2003 Glyph & Cog, LLC
 //
 //========================================================================
 
@@ -14,7 +14,7 @@
 
 #include <stddef.h>
 #include <math.h>
-#include <string.h> // for memcpy()
+#include <string.h>
 #include "gmem.h"
 #include "Error.h"
 #include "Object.h"
@@ -24,12 +24,46 @@
 
 //------------------------------------------------------------------------
 
+static inline GfxColorComp clip01(GfxColorComp x) {
+  return (x < 0) ? 0 : (x > gfxColorComp1) ? gfxColorComp1 : x;
+}
+
 static inline double clip01(double x) {
-  return (x < 0) ? 0 : ((x > 1) ? 1 : x);
+  return (x < 0) ? 0 : (x > 1) ? 1 : x;
 }
 
 //------------------------------------------------------------------------
 
+static struct {
+  char *name;
+  GfxBlendMode mode;
+} gfxBlendModeNames[] = {
+  { "Normal",     gfxBlendNormal },
+  { "Compatible", gfxBlendNormal },
+  { "Multiply",   gfxBlendMultiply },
+  { "Screen",     gfxBlendScreen },
+  { "Overlay",    gfxBlendOverlay },
+  { "Darken",     gfxBlendDarken },
+  { "Lighten",    gfxBlendLighten },
+  { "ColorDodge", gfxBlendColorDodge },
+  { "ColorBurn",  gfxBlendColorBurn },
+  { "HardLight",  gfxBlendHardLight },
+  { "SoftLight",  gfxBlendSoftLight },
+  { "Difference", gfxBlendDifference },
+  { "Exclusion",  gfxBlendExclusion },
+  { "Hue",        gfxBlendHue },
+  { "Saturation", gfxBlendSaturation },
+  { "Color",      gfxBlendColor },
+  { "Luminosity", gfxBlendLuminosity }
+};
+
+#define nGfxBlendModeNames \
+          ((int)((sizeof(gfxBlendModeNames) / sizeof(char *))))
+
+//------------------------------------------------------------------------
+
+// NB: This must match the GfxColorSpaceMode enum defined in
+// GfxState.h
 static char *gfxColorSpaceModeNames[] = {
   "DeviceGray",
   "CalGray",
@@ -139,7 +173,7 @@ GfxColorSpace *GfxDeviceGrayColorSpace::copy() {
   return new GfxDeviceGrayColorSpace();
 }
 
-void GfxDeviceGrayColorSpace::getGray(GfxColor *color, double *gray) {
+void GfxDeviceGrayColorSpace::getGray(GfxColor *color, GfxGray *gray) {
   *gray = clip01(color->c[0]);
 }
 
@@ -149,7 +183,7 @@ void GfxDeviceGrayColorSpace::getRGB(GfxColor *color, GfxRGB *rgb) {
 
 void GfxDeviceGrayColorSpace::getCMYK(GfxColor *color, GfxCMYK *cmyk) {
   cmyk->c = cmyk->m = cmyk->y = 0;
-  cmyk->k = clip01(1 - color->c[0]);
+  cmyk->k = clip01(gfxColorComp1 - color->c[0]);
 }
 
 //------------------------------------------------------------------------
@@ -224,7 +258,7 @@ GfxColorSpace *GfxCalGrayColorSpace::parse(Array *arr) {
   return cs;
 }
 
-void GfxCalGrayColorSpace::getGray(GfxColor *color, double *gray) {
+void GfxCalGrayColorSpace::getGray(GfxColor *color, GfxGray *gray) {
   *gray = clip01(color->c[0]);
 }
 
@@ -234,7 +268,7 @@ void GfxCalGrayColorSpace::getRGB(GfxColor *color, GfxRGB *rgb) {
 
 void GfxCalGrayColorSpace::getCMYK(GfxColor *color, GfxCMYK *cmyk) {
   cmyk->c = cmyk->m = cmyk->y = 0;
-  cmyk->k = clip01(1 - color->c[0]);
+  cmyk->k = clip01(gfxColorComp1 - color->c[0]);
 }
 
 //------------------------------------------------------------------------
@@ -251,10 +285,10 @@ GfxColorSpace *GfxDeviceRGBColorSpace::copy() {
   return new GfxDeviceRGBColorSpace();
 }
 
-void GfxDeviceRGBColorSpace::getGray(GfxColor *color, double *gray) {
-  *gray = clip01(0.299 * color->c[0] +
-		 0.587 * color->c[1] +
-		 0.114 * color->c[2]);
+void GfxDeviceRGBColorSpace::getGray(GfxColor *color, GfxGray *gray) {
+  *gray = clip01((GfxColorComp)(0.3  * color->c[0] +
+				0.59 * color->c[1] +
+				0.11 * color->c[2] + 0.5));
 }
 
 void GfxDeviceRGBColorSpace::getRGB(GfxColor *color, GfxRGB *rgb) {
@@ -264,11 +298,11 @@ void GfxDeviceRGBColorSpace::getRGB(GfxColor *color, GfxRGB *rgb) {
 }
 
 void GfxDeviceRGBColorSpace::getCMYK(GfxColor *color, GfxCMYK *cmyk) {
-  double c, m, y, k;
+  GfxColorComp c, m, y, k;
 
-  c = clip01(1 - color->c[0]);
-  m = clip01(1 - color->c[1]);
-  y = clip01(1 - color->c[2]);
+  c = clip01(gfxColorComp1 - color->c[0]);
+  m = clip01(gfxColorComp1 - color->c[1]);
+  y = clip01(gfxColorComp1 - color->c[2]);
   k = c;
   if (m < k) {
     k = m;
@@ -382,10 +416,10 @@ GfxColorSpace *GfxCalRGBColorSpace::parse(Array *arr) {
   return cs;
 }
 
-void GfxCalRGBColorSpace::getGray(GfxColor *color, double *gray) {
-  *gray = clip01(0.299 * color->c[0] +
-		 0.587 * color->c[1] +
-		 0.114 * color->c[2]);
+void GfxCalRGBColorSpace::getGray(GfxColor *color, GfxGray *gray) {
+  *gray = clip01((GfxColorComp)(0.299 * color->c[0] +
+				0.587 * color->c[1] +
+				0.114 * color->c[2] + 0.5));
 }
 
 void GfxCalRGBColorSpace::getRGB(GfxColor *color, GfxRGB *rgb) {
@@ -395,11 +429,11 @@ void GfxCalRGBColorSpace::getRGB(GfxColor *color, GfxRGB *rgb) {
 }
 
 void GfxCalRGBColorSpace::getCMYK(GfxColor *color, GfxCMYK *cmyk) {
-  double c, m, y, k;
+  GfxColorComp c, m, y, k;
 
-  c = clip01(1 - color->c[0]);
-  m = clip01(1 - color->c[1]);
-  y = clip01(1 - color->c[2]);
+  c = clip01(gfxColorComp1 - color->c[0]);
+  m = clip01(gfxColorComp1 - color->c[1]);
+  y = clip01(gfxColorComp1 - color->c[2]);
   k = c;
   if (m < k) {
     k = m;
@@ -427,30 +461,73 @@ GfxColorSpace *GfxDeviceCMYKColorSpace::copy() {
   return new GfxDeviceCMYKColorSpace();
 }
 
-void GfxDeviceCMYKColorSpace::getGray(GfxColor *color, double *gray) {
-  *gray = clip01(1 - color->c[3]
-		 - 0.299 * color->c[0]
-		 - 0.587 * color->c[1]
-		 - 0.114 * color->c[2]);
+void GfxDeviceCMYKColorSpace::getGray(GfxColor *color, GfxGray *gray) {
+  *gray = clip01((GfxColorComp)(gfxColorComp1 - color->c[3]
+				- 0.3  * color->c[0]
+				- 0.59 * color->c[1]
+				- 0.11 * color->c[2] + 0.5));
 }
 
 void GfxDeviceCMYKColorSpace::getRGB(GfxColor *color, GfxRGB *rgb) {
-  double c, m, y, aw, ac, am, ay, ar, ag, ab;
+  double c, m, y, k, c1, m1, y1, k1, r, g, b, x;
 
-  c = clip01(color->c[0] + color->c[3]);
-  m = clip01(color->c[1] + color->c[3]);
-  y = clip01(color->c[2] + color->c[3]);
-  aw = (1-c) * (1-m) * (1-y);
-  ac = c * (1-m) * (1-y);
-  am = (1-c) * m * (1-y);
-  ay = (1-c) * (1-m) * y;
-  ar = (1-c) * m * y;
-  ag = c * (1-m) * y;
-  ab = c * m * (1-y);
-  rgb->r = clip01(aw + 0.9137*am + 0.9961*ay + 0.9882*ar);
-  rgb->g = clip01(aw + 0.6196*ac + ay + 0.5176*ag);
-  rgb->b = clip01(aw + 0.7804*ac + 0.5412*am + 0.0667*ar + 0.2118*ag +
-		  0.4863*ab);
+  c = colToDbl(color->c[0]);
+  m = colToDbl(color->c[1]);
+  y = colToDbl(color->c[2]);
+  k = colToDbl(color->c[3]);
+  c1 = 1 - c;
+  m1 = 1 - m;
+  y1 = 1 - y;
+  k1 = 1 - k;
+  // this is a matrix multiplication, unrolled for performance
+  //                        C M Y K
+  x = c1 * m1 * y1 * k1; // 0 0 0 0
+  r = g = b = x;
+  x = c1 * m1 * y1 * k;  // 0 0 0 1
+  r += 0.1373 * x;
+  g += 0.1216 * x;
+  b += 0.1255 * x;
+  x = c1 * m1 * y  * k1; // 0 0 1 0
+  r += x;
+  g += 0.9490 * x;
+  x = c1 * m1 * y  * k;  // 0 0 1 1
+  r += 0.1098 * x;
+  g += 0.1020 * x;
+  x = c1 * m  * y1 * k1; // 0 1 0 0
+  r += 0.9255 * x;
+  b += 0.5490 * x;
+  x = c1 * m  * y1 * k;  // 0 1 0 1
+  r += 0.1412 * x;
+  x = c1 * m  * y  * k1; // 0 1 1 0
+  r += 0.9294 * x;
+  g += 0.1098 * x;
+  b += 0.1412 * x;
+  x = c1 * m  * y  * k;  // 0 1 1 1
+  r += 0.1333 * x;
+  x = c  * m1 * y1 * k1; // 1 0 0 0
+  g += 0.6784 * x;
+  b += 0.9373 * x;
+  x = c  * m1 * y1 * k;  // 1 0 0 1
+  g += 0.0588 * x;
+  b += 0.1412 * x;
+  x = c  * m1 * y  * k1; // 1 0 1 0
+  g += 0.6510 * x;
+  b += 0.3137 * x;
+  x = c  * m1 * y  * k;  // 1 0 1 1
+  g += 0.0745 * x;
+  x = c  * m  * y1 * k1; // 1 1 0 0
+  r += 0.1804 * x;
+  g += 0.1922 * x;
+  b += 0.5725 * x;
+  x = c  * m  * y1 * k;  // 1 1 0 1
+  b += 0.0078 * x;
+  x = c  * m  * y  * k1; // 1 1 1 0
+  r += 0.2118 * x;
+  g += 0.2119 * x;
+  b += 0.2235 * x;
+  rgb->r = clip01(dblToCol(r));
+  rgb->g = clip01(dblToCol(g));
+  rgb->b = clip01(dblToCol(b));
 }
 
 void GfxDeviceCMYKColorSpace::getCMYK(GfxColor *color, GfxCMYK *cmyk) {
@@ -570,13 +647,13 @@ GfxColorSpace *GfxLabColorSpace::parse(Array *arr) {
   return cs;
 }
 
-void GfxLabColorSpace::getGray(GfxColor *color, double *gray) {
+void GfxLabColorSpace::getGray(GfxColor *color, GfxGray *gray) {
   GfxRGB rgb;
 
   getRGB(color, &rgb);
-  *gray = clip01(0.299 * rgb.r +
-		 0.587 * rgb.g +
-		 0.114 * rgb.b);
+  *gray = clip01((GfxColorComp)(0.299 * rgb.r +
+				0.587 * rgb.g +
+				0.114 * rgb.b + 0.5));
 }
 
 void GfxLabColorSpace::getRGB(GfxColor *color, GfxRGB *rgb) {
@@ -585,8 +662,8 @@ void GfxLabColorSpace::getRGB(GfxColor *color, GfxRGB *rgb) {
   double r, g, b;
 
   // convert L*a*b* to CIE 1931 XYZ color space
-  t1 = (color->c[0] + 16) / 116;
-  t2 = t1 + color->c[1] / 500;
+  t1 = (colToDbl(color->c[0]) + 16) / 116;
+  t2 = t1 + colToDbl(color->c[1]) / 500;
   if (t2 >= (6.0 / 29.0)) {
     X = t2 * t2 * t2;
   } else {
@@ -599,7 +676,7 @@ void GfxLabColorSpace::getRGB(GfxColor *color, GfxRGB *rgb) {
     Y = (108.0 / 841.0) * (t1 - (4.0 / 29.0));
   }
   Y *= whiteY;
-  t2 = t1 - color->c[2] / 200;
+  t2 = t1 - colToDbl(color->c[2]) / 200;
   if (t2 >= (6.0 / 29.0)) {
     Z = t2 * t2 * t2;
   } else {
@@ -611,19 +688,19 @@ void GfxLabColorSpace::getRGB(GfxColor *color, GfxRGB *rgb) {
   r = xyzrgb[0][0] * X + xyzrgb[0][1] * Y + xyzrgb[0][2] * Z;
   g = xyzrgb[1][0] * X + xyzrgb[1][1] * Y + xyzrgb[1][2] * Z;
   b = xyzrgb[2][0] * X + xyzrgb[2][1] * Y + xyzrgb[2][2] * Z;
-  rgb->r = pow(clip01(r * kr), 0.5);
-  rgb->g = pow(clip01(g * kg), 0.5);
-  rgb->b = pow(clip01(b * kb), 0.5);
+  rgb->r = dblToCol(pow(clip01(r * kr), 0.5));
+  rgb->g = dblToCol(pow(clip01(g * kg), 0.5));
+  rgb->b = dblToCol(pow(clip01(b * kb), 0.5));
 }
 
 void GfxLabColorSpace::getCMYK(GfxColor *color, GfxCMYK *cmyk) {
   GfxRGB rgb;
-  double c, m, y, k;
+  GfxColorComp c, m, y, k;
 
   getRGB(color, &rgb);
-  c = clip01(1 - rgb.r);
-  m = clip01(1 - rgb.g);
-  y = clip01(1 - rgb.b);
+  c = clip01(gfxColorComp1 - rgb.r);
+  m = clip01(gfxColorComp1 - rgb.g);
+  y = clip01(gfxColorComp1 - rgb.b);
   k = c;
   if (m < k) {
     k = m;
@@ -750,7 +827,7 @@ GfxColorSpace *GfxICCBasedColorSpace::parse(Array *arr) {
   return cs;
 }
 
-void GfxICCBasedColorSpace::getGray(GfxColor *color, double *gray) {
+void GfxICCBasedColorSpace::getGray(GfxColor *color, GfxGray *gray) {
   alt->getGray(color, gray);
 }
 
@@ -787,8 +864,8 @@ GfxIndexedColorSpace::GfxIndexedColorSpace(GfxColorSpace *baseA,
 					   int indexHighA) {
   base = baseA;
   indexHigh = indexHighA;
-  lookup = (Guchar *)gmalloc((indexHigh + 1) * base->getNComps() *
-			     sizeof(Guchar));
+  lookup = (Guchar *)gmallocn((indexHigh + 1) * base->getNComps(),
+			      sizeof(Guchar));
 }
 
 GfxIndexedColorSpace::~GfxIndexedColorSpace() {
@@ -889,14 +966,14 @@ GfxColor *GfxIndexedColorSpace::mapColorToBase(GfxColor *color,
 
   n = base->getNComps();
   base->getDefaultRanges(low, range, indexHigh);
-  p = &lookup[(int)(color->c[0] + 0.5) * n];
+  p = &lookup[(int)(colToDbl(color->c[0]) + 0.5) * n];
   for (i = 0; i < n; ++i) {
-    baseColor->c[i] = low[i] + (p[i] / 255.0) * range[i];
+    baseColor->c[i] = dblToCol(low[i] + (p[i] / 255.0) * range[i]);
   }
   return baseColor;
 }
 
-void GfxIndexedColorSpace::getGray(GfxColor *color, double *gray) {
+void GfxIndexedColorSpace::getGray(GfxColor *color, GfxGray *gray) {
   GfxColor color2;
 
   base->getGray(mapColorToBase(color, &color2), gray);
@@ -985,24 +1062,45 @@ GfxColorSpace *GfxSeparationColorSpace::parse(Array *arr) {
   return NULL;
 }
 
-void GfxSeparationColorSpace::getGray(GfxColor *color, double *gray) {
+void GfxSeparationColorSpace::getGray(GfxColor *color, GfxGray *gray) {
+  double x;
+  double c[gfxColorMaxComps];
   GfxColor color2;
+  int i;
 
-  func->transform(color->c, color2.c);
+  x = colToDbl(color->c[0]);
+  func->transform(&x, c);
+  for (i = 0; i < alt->getNComps(); ++i) {
+    color2.c[i] = dblToCol(c[i]);
+  }
   alt->getGray(&color2, gray);
 }
 
 void GfxSeparationColorSpace::getRGB(GfxColor *color, GfxRGB *rgb) {
+  double x;
+  double c[gfxColorMaxComps];
   GfxColor color2;
+  int i;
 
-  func->transform(color->c, color2.c);
+  x = colToDbl(color->c[0]);
+  func->transform(&x, c);
+  for (i = 0; i < alt->getNComps(); ++i) {
+    color2.c[i] = dblToCol(c[i]);
+  }
   alt->getRGB(&color2, rgb);
 }
 
 void GfxSeparationColorSpace::getCMYK(GfxColor *color, GfxCMYK *cmyk) {
+  double x;
+  double c[gfxColorMaxComps];
   GfxColor color2;
+  int i;
 
-  func->transform(color->c, color2.c);
+  x = colToDbl(color->c[0]);
+  func->transform(&x, c);
+  for (i = 0; i < alt->getNComps(); ++i) {
+    color2.c[i] = dblToCol(c[i]);
+  }
   alt->getCMYK(&color2, cmyk);
 }
 
@@ -1102,24 +1200,48 @@ GfxColorSpace *GfxDeviceNColorSpace::parse(Array *arr) {
   return NULL;
 }
 
-void GfxDeviceNColorSpace::getGray(GfxColor *color, double *gray) {
+void GfxDeviceNColorSpace::getGray(GfxColor *color, GfxGray *gray) {
+  double x[gfxColorMaxComps], c[gfxColorMaxComps];
   GfxColor color2;
+  int i;
 
-  func->transform(color->c, color2.c);
+  for (i = 0; i < nComps; ++i) {
+    x[i] = colToDbl(color->c[i]);
+  }
+  func->transform(x, c);
+  for (i = 0; i < alt->getNComps(); ++i) {
+    color2.c[i] = dblToCol(c[i]);
+  }
   alt->getGray(&color2, gray);
 }
 
 void GfxDeviceNColorSpace::getRGB(GfxColor *color, GfxRGB *rgb) {
+  double x[gfxColorMaxComps], c[gfxColorMaxComps];
   GfxColor color2;
+  int i;
 
-  func->transform(color->c, color2.c);
+  for (i = 0; i < nComps; ++i) {
+    x[i] = colToDbl(color->c[i]);
+  }
+  func->transform(x, c);
+  for (i = 0; i < alt->getNComps(); ++i) {
+    color2.c[i] = dblToCol(c[i]);
+  }
   alt->getRGB(&color2, rgb);
 }
 
 void GfxDeviceNColorSpace::getCMYK(GfxColor *color, GfxCMYK *cmyk) {
+  double x[gfxColorMaxComps], c[gfxColorMaxComps];
   GfxColor color2;
+  int i;
 
-  func->transform(color->c, color2.c);
+  for (i = 0; i < nComps; ++i) {
+    x[i] = colToDbl(color->c[i]);
+  }
+  func->transform(x, c);
+  for (i = 0; i < alt->getNComps(); ++i) {
+    color2.c[i] = dblToCol(c[i]);
+  }
   alt->getCMYK(&color2, cmyk);
 }
 
@@ -1165,7 +1287,7 @@ GfxColorSpace *GfxPatternColorSpace::parse(Array *arr) {
   return cs;
 }
 
-void GfxPatternColorSpace::getGray(GfxColor *color, double *gray) {
+void GfxPatternColorSpace::getGray(GfxColor *color, GfxGray *gray) {
   *gray = 0;
 }
 
@@ -1513,7 +1635,7 @@ GBool GfxShading::init(Dict *dict) {
     if (obj1.arrayGetLength() == colorSpace->getNComps()) {
       hasBackground = gTrue;
       for (i = 0; i < colorSpace->getNComps(); ++i) {
-	background.c[i] = obj1.arrayGet(i, &obj2)->getNum();
+	background.c[i] = dblToCol(obj1.arrayGet(i, &obj2)->getNum());
 	obj2.free();
       }
     } else {
@@ -1681,13 +1803,21 @@ GfxShading *GfxFunctionShading::copy() {
 }
 
 void GfxFunctionShading::getColor(double x, double y, GfxColor *color) {
-  double in[2];
+  double in[2], out[gfxColorMaxComps];
   int i;
 
+  // NB: there can be one function with n outputs or n functions with
+  // one output each (where n = number of color components)
+  for (i = 0; i < gfxColorMaxComps; ++i) {
+    out[i] = 0;
+  }
   in[0] = x;
   in[1] = y;
   for (i = 0; i < nFuncs; ++i) {
-    funcs[i]->transform(in, &color->c[i]);
+    funcs[i]->transform(in, &out[i]);
+  }
+  for (i = 0; i < gfxColorMaxComps; ++i) {
+    color->c[i] = dblToCol(out[i]);
   }
 }
 
@@ -1835,12 +1965,19 @@ GfxShading *GfxAxialShading::copy() {
 }
 
 void GfxAxialShading::getColor(double t, GfxColor *color) {
+  double out[gfxColorMaxComps];
   int i;
 
   // NB: there can be one function with n outputs or n functions with
   // one output each (where n = number of color components)
+  for (i = 0; i < gfxColorMaxComps; ++i) {
+    out[i] = 0;
+  }
   for (i = 0; i < nFuncs; ++i) {
-    funcs[i]->transform(&t, &color->c[i]);
+    funcs[i]->transform(&t, &out[i]);
+  }
+  for (i = 0; i < gfxColorMaxComps; ++i) {
+    color->c[i] = dblToCol(out[i]);
   }
 }
 
@@ -1996,12 +2133,19 @@ GfxShading *GfxRadialShading::copy() {
 }
 
 void GfxRadialShading::getColor(double t, GfxColor *color) {
+  double out[gfxColorMaxComps];
   int i;
 
   // NB: there can be one function with n outputs or n functions with
   // one output each (where n = number of color components)
+  for (i = 0; i < gfxColorMaxComps; ++i) {
+    out[i] = 0;
+  }
   for (i = 0; i < nFuncs; ++i) {
-    funcs[i]->transform(&t, &color->c[i]);
+    funcs[i]->transform(&t, &out[i]);
+  }
+  for (i = 0; i < gfxColorMaxComps; ++i) {
+    color->c[i] = dblToCol(out[i]);
   }
 }
 
@@ -2102,10 +2246,10 @@ GfxGouraudTriangleShading::GfxGouraudTriangleShading(
   int i;
 
   nVertices = shading->nVertices;
-  vertices = (GfxGouraudVertex *)gmalloc(nVertices * sizeof(GfxGouraudVertex));
+  vertices = (GfxGouraudVertex *)gmallocn(nVertices, sizeof(GfxGouraudVertex));
   memcpy(vertices, shading->vertices, nVertices * sizeof(GfxGouraudVertex));
   nTriangles = shading->nTriangles;
-  triangles = (int (*)[3])gmalloc(nTriangles * 3 * sizeof(int));
+  triangles = (int (*)[3])gmallocn(nTriangles * 3, sizeof(int));
   memcpy(triangles, shading->triangles, nTriangles * 3 * sizeof(int));
   nFuncs = shading->nFuncs;
   for (i = 0; i < nFuncs; ++i) {
@@ -2181,18 +2325,18 @@ GfxGouraudTriangleShading *GfxGouraudTriangleShading::parse(int typeA,
     obj2.free();
     xMax = obj1.arrayGet(1, &obj2)->getNum();
     obj2.free();
-    xMul = (xMax - xMin) * pow(2.0, -coordBits);
+    xMul = (xMax - xMin) / (pow(2.0, coordBits) - 1);
     yMin = obj1.arrayGet(2, &obj2)->getNum();
     obj2.free();
     yMax = obj1.arrayGet(3, &obj2)->getNum();
     obj2.free();
-    yMul = (yMax - yMin) * pow(2.0, -coordBits);
+    yMul = (yMax - yMin) / (pow(2.0, coordBits) - 1);
     for (i = 0; 5 + 2*i < obj1.arrayGetLength() && i < gfxColorMaxComps; ++i) {
       cMin[i] = obj1.arrayGet(4 + 2*i, &obj2)->getNum();
       obj2.free();
       cMax[i] = obj1.arrayGet(5 + 2*i, &obj2)->getNum();
       obj2.free();
-      cMul[i] = (cMax[i] - cMin[i]) / (double)(1 << compBits);
+      cMul[i] = (cMax[i] - cMin[i]) / (double)((1 << compBits) - 1);
     }
     nComps = i;
   } else {
@@ -2257,12 +2401,13 @@ GfxGouraudTriangleShading *GfxGouraudTriangleShading::parse(int typeA,
     if (nVerticesA == vertSize) {
       vertSize = (vertSize == 0) ? 16 : 2 * vertSize;
       verticesA = (GfxGouraudVertex *)
-	              grealloc(verticesA, vertSize * sizeof(GfxGouraudVertex));
+	              greallocn(verticesA, vertSize, sizeof(GfxGouraudVertex));
     }
     verticesA[nVerticesA].x = xMin + xMul * (double)x;
     verticesA[nVerticesA].y = yMin + yMul * (double)y;
     for (i = 0; i < nComps; ++i) {
-      verticesA[nVerticesA].color.c[i] = cMin[i] + cMul[i] * (double)c[i];
+      verticesA[nVerticesA].color.c[i] =
+	  dblToCol(cMin[i] + cMul[i] * (double)c[i]);
     }
     ++nVerticesA;
     bitBuf->flushBits();
@@ -2273,7 +2418,7 @@ GfxGouraudTriangleShading *GfxGouraudTriangleShading::parse(int typeA,
 	if (nTrianglesA == triSize) {
 	  triSize = (triSize == 0) ? 16 : 2 * triSize;
 	  trianglesA = (int (*)[3])
-	                   grealloc(trianglesA, triSize * 3 * sizeof(int));
+	                   greallocn(trianglesA, triSize * 3, sizeof(int));
 	}
 	if (state == 2) {
 	  trianglesA[nTrianglesA][0] = nVerticesA - 3;
@@ -2299,7 +2444,7 @@ GfxGouraudTriangleShading *GfxGouraudTriangleShading::parse(int typeA,
   if (typeA == 5) {
     nRows = nVerticesA / vertsPerRow;
     nTrianglesA = (nRows - 1) * 2 * (vertsPerRow - 1);
-    trianglesA = (int (*)[3])gmalloc(nTrianglesA * 3 * sizeof(int));
+    trianglesA = (int (*)[3])gmallocn(nTrianglesA * 3, sizeof(int));
     k = 0;
     for (i = 0; i < nRows - 1; ++i) {
       for (j = 0; j < vertsPerRow - 1; ++j) {
@@ -2339,14 +2484,20 @@ void GfxGouraudTriangleShading::getTriangle(
 				    double *x0, double *y0, GfxColor *color0,
 				    double *x1, double *y1, GfxColor *color1,
 				    double *x2, double *y2, GfxColor *color2) {
+  double in;
+  double out[gfxColorMaxComps];
   int v, j;
 
   v = triangles[i][0];
   *x0 = vertices[v].x;
   *y0 = vertices[v].y;
   if (nFuncs > 0) {
+    in = colToDbl(vertices[v].color.c[0]);
     for (j = 0; j < nFuncs; ++j) {
-      funcs[j]->transform(&vertices[v].color.c[0], &color0->c[j]);
+      funcs[j]->transform(&in, &out[j]);
+    }
+    for (j = 0; j < gfxColorMaxComps; ++j) {
+      color0->c[j] = dblToCol(out[j]);
     }
   } else {
     *color0 = vertices[v].color;
@@ -2355,8 +2506,12 @@ void GfxGouraudTriangleShading::getTriangle(
   *x1 = vertices[v].x;
   *y1 = vertices[v].y;
   if (nFuncs > 0) {
+    in = colToDbl(vertices[v].color.c[0]);
     for (j = 0; j < nFuncs; ++j) {
-      funcs[j]->transform(&vertices[v].color.c[0], &color1->c[j]);
+      funcs[j]->transform(&in, &out[j]);
+    }
+    for (j = 0; j < gfxColorMaxComps; ++j) {
+      color1->c[j] = dblToCol(out[j]);
     }
   } else {
     *color1 = vertices[v].color;
@@ -2365,8 +2520,12 @@ void GfxGouraudTriangleShading::getTriangle(
   *x2 = vertices[v].x;
   *y2 = vertices[v].y;
   if (nFuncs > 0) {
+    in = colToDbl(vertices[v].color.c[0]);
     for (j = 0; j < nFuncs; ++j) {
-      funcs[j]->transform(&vertices[v].color.c[0], &color2->c[j]);
+      funcs[j]->transform(&in, &out[j]);
+    }
+    for (j = 0; j < gfxColorMaxComps; ++j) {
+      color2->c[j] = dblToCol(out[j]);
     }
   } else {
     *color2 = vertices[v].color;
@@ -2398,7 +2557,7 @@ GfxPatchMeshShading::GfxPatchMeshShading(GfxPatchMeshShading *shading):
   int i;
 
   nPatches = shading->nPatches;
-  patches = (GfxPatch *)gmalloc(nPatches * sizeof(GfxPatch));
+  patches = (GfxPatch *)gmallocn(nPatches, sizeof(GfxPatch));
   memcpy(patches, shading->patches, nPatches * sizeof(GfxPatch));
   nFuncs = shading->nFuncs;
   for (i = 0; i < nFuncs; ++i) {
@@ -2430,7 +2589,7 @@ GfxPatchMeshShading *GfxPatchMeshShading::parse(int typeA, Dict *dict,
   Guint flag;
   double x[16], y[16];
   Guint xi, yi;
-  double c[4][gfxColorMaxComps];
+  GfxColorComp c[4][gfxColorMaxComps];
   Guint ci[4];
   GfxShadingBitBuf *bitBuf;
   Object obj1, obj2;
@@ -2463,18 +2622,18 @@ GfxPatchMeshShading *GfxPatchMeshShading::parse(int typeA, Dict *dict,
     obj2.free();
     xMax = obj1.arrayGet(1, &obj2)->getNum();
     obj2.free();
-    xMul = (xMax - xMin) * pow(2.0, -coordBits);
+    xMul = (xMax - xMin) / (pow(2.0, coordBits) - 1);
     yMin = obj1.arrayGet(2, &obj2)->getNum();
     obj2.free();
     yMax = obj1.arrayGet(3, &obj2)->getNum();
     obj2.free();
-    yMul = (yMax - yMin) * pow(2.0, -coordBits);
+    yMul = (yMax - yMin) / (pow(2.0, coordBits) - 1);
     for (i = 0; 5 + 2*i < obj1.arrayGetLength() && i < gfxColorMaxComps; ++i) {
       cMin[i] = obj1.arrayGet(4 + 2*i, &obj2)->getNum();
       obj2.free();
       cMax[i] = obj1.arrayGet(5 + 2*i, &obj2)->getNum();
       obj2.free();
-      cMul[i] = (cMax[i] - cMin[i]) / (double)(1 << compBits);
+      cMul[i] = (cMax[i] - cMin[i]) / (double)((1 << compBits) - 1);
     }
     nComps = i;
   } else {
@@ -2552,7 +2711,7 @@ GfxPatchMeshShading *GfxPatchMeshShading::parse(int typeA, Dict *dict,
 	if (!bitBuf->getBits(compBits, &ci[j])) {
 	  break;
 	}
-	c[i][j] = cMin[j] + cMul[j] * (double)ci[j];
+	c[i][j] = dblToCol(cMin[j] + cMul[j] * (double)ci[j]);
       }
       if (j < nComps) {
 	break;
@@ -2563,8 +2722,8 @@ GfxPatchMeshShading *GfxPatchMeshShading::parse(int typeA, Dict *dict,
     }
     if (nPatchesA == patchesSize) {
       patchesSize = (patchesSize == 0) ? 16 : 2 * patchesSize;
-      patchesA = (GfxPatch *)grealloc(patchesA,
-				      patchesSize * sizeof(GfxPatch));
+      patchesA = (GfxPatch *)greallocn(patchesA,
+				       patchesSize, sizeof(GfxPatch));
     }
     p = &patchesA[nPatchesA];
     if (typeA == 6) {
@@ -2988,6 +3147,9 @@ GfxImageColorMap::GfxImageColorMap(int bitsA, Object *decode,
   // Optimization: for Indexed and Separation color spaces (which have
   // only one component), we store color values in the lookup table
   // rather than component values.
+  for (k = 0; k < gfxColorMaxComps; ++k) {
+    lookup[k] = NULL;
+  }
   colorSpace2 = NULL;
   nComps2 = 0;
   if (colorSpace->getMode() == csIndexed) {
@@ -2998,39 +3160,43 @@ GfxImageColorMap::GfxImageColorMap(int bitsA, Object *decode,
     colorSpace2 = indexedCS->getBase();
     indexHigh = indexedCS->getIndexHigh();
     nComps2 = colorSpace2->getNComps();
-    lookup = (double *)gmalloc((maxPixel + 1) * nComps2 * sizeof(double));
     lookup2 = indexedCS->getLookup();
     colorSpace2->getDefaultRanges(x, y, indexHigh);
-    for (i = 0; i <= maxPixel; ++i) {
-      j = (int)(decodeLow[0] + (i * decodeRange[0]) / maxPixel + 0.5);
-      if (j < 0) {
-	j = 0;
-      } else if (j > indexHigh) {
-	j = indexHigh;
-      }
-      for (k = 0; k < nComps2; ++k) {
-	lookup[i*nComps2 + k] = x[k] + (lookup2[j*nComps2 + k] / 255.0) * y[k];
+    for (k = 0; k < nComps2; ++k) {
+      lookup[k] = (GfxColorComp *)gmallocn(maxPixel + 1,
+					   sizeof(GfxColorComp));
+      for (i = 0; i <= maxPixel; ++i) {
+	j = (int)(decodeLow[0] + (i * decodeRange[0]) / maxPixel + 0.5);
+	if (j < 0) {
+	  j = 0;
+	} else if (j > indexHigh) {
+	  j = indexHigh;
+	}
+	lookup[k][i] =
+	    dblToCol(x[k] + (lookup2[j*nComps2 + k] / 255.0) * y[k]);
       }
     }
   } else if (colorSpace->getMode() == csSeparation) {
     sepCS = (GfxSeparationColorSpace *)colorSpace;
     colorSpace2 = sepCS->getAlt();
     nComps2 = colorSpace2->getNComps();
-    lookup = (double *)gmalloc((maxPixel + 1) * nComps2 * sizeof(double));
     sepFunc = sepCS->getFunc();
-    for (i = 0; i <= maxPixel; ++i) {
-      x[0] = decodeLow[0] + (i * decodeRange[0]) / maxPixel;
-      sepFunc->transform(x, y);
-      for (k = 0; k < nComps2; ++k) {
-	lookup[i*nComps2 + k] = y[k];
+    for (k = 0; k < nComps2; ++k) {
+      lookup[k] = (GfxColorComp *)gmallocn(maxPixel + 1,
+					   sizeof(GfxColorComp));
+      for (i = 0; i <= maxPixel; ++i) {
+	x[0] = decodeLow[0] + (i * decodeRange[0]) / maxPixel;
+	sepFunc->transform(x, y);
+	lookup[k][i] = dblToCol(y[k]);
       }
     }
   } else {
-    lookup = (double *)gmalloc((maxPixel + 1) * nComps * sizeof(double));
-    for (i = 0; i <= maxPixel; ++i) {
-      for (k = 0; k < nComps; ++k) {
-	lookup[i*nComps + k] = decodeLow[k] +
-	                         (i * decodeRange[k]) / maxPixel;
+    for (k = 0; k < nComps; ++k) {
+      lookup[k] = (GfxColorComp *)gmallocn(maxPixel + 1,
+					   sizeof(GfxColorComp));
+      for (i = 0; i <= maxPixel; ++i) {
+	lookup[k][i] = dblToCol(decodeLow[k] +
+				(i * decodeRange[k]) / maxPixel);
       }
     }
   }
@@ -3044,26 +3210,35 @@ GfxImageColorMap::GfxImageColorMap(int bitsA, Object *decode,
 }
 
 GfxImageColorMap::GfxImageColorMap(GfxImageColorMap *colorMap) {
-  int n, i;
+  int n, i, k;
 
   colorSpace = colorMap->colorSpace->copy();
   bits = colorMap->bits;
   nComps = colorMap->nComps;
   nComps2 = colorMap->nComps2;
   colorSpace2 = NULL;
-  lookup = NULL;
+  for (k = 0; k < gfxColorMaxComps; ++k) {
+    lookup[k] = NULL;
+  }
   n = 1 << bits;
   if (colorSpace->getMode() == csIndexed) {
     colorSpace2 = ((GfxIndexedColorSpace *)colorSpace)->getBase();
-    n = n * nComps2 * sizeof(double);
+    for (k = 0; k < nComps2; ++k) {
+      lookup[k] = (GfxColorComp *)gmallocn(n, sizeof(GfxColorComp));
+      memcpy(lookup[k], colorMap->lookup[k], n * sizeof(GfxColorComp));
+    }
   } else if (colorSpace->getMode() == csSeparation) {
     colorSpace2 = ((GfxSeparationColorSpace *)colorSpace)->getAlt();
-    n = n * nComps2 * sizeof(double);
+    for (k = 0; k < nComps2; ++k) {
+      lookup[k] = (GfxColorComp *)gmallocn(n, sizeof(GfxColorComp));
+      memcpy(lookup[k], colorMap->lookup[k], n * sizeof(GfxColorComp));
+    }
   } else {
-    n = n * nComps * sizeof(double);
+    for (k = 0; k < nComps; ++k) {
+      lookup[k] = (GfxColorComp *)gmallocn(n, sizeof(GfxColorComp));
+      memcpy(lookup[k], colorMap->lookup[k], n * sizeof(GfxColorComp));
+    }
   }
-  lookup = (double *)gmalloc(n);
-  memcpy(lookup, colorMap->lookup, n);
   for (i = 0; i < nComps; ++i) {
     decodeLow[i] = colorMap->decodeLow[i];
     decodeRange[i] = colorMap->decodeRange[i];
@@ -3072,24 +3247,26 @@ GfxImageColorMap::GfxImageColorMap(GfxImageColorMap *colorMap) {
 }
 
 GfxImageColorMap::~GfxImageColorMap() {
+  int i;
+
   delete colorSpace;
-  gfree(lookup);
+  for (i = 0; i < gfxColorMaxComps; ++i) {
+    gfree(lookup[i]);
+  }
 }
 
-void GfxImageColorMap::getGray(Guchar *x, double *gray) {
+void GfxImageColorMap::getGray(Guchar *x, GfxGray *gray) {
   GfxColor color;
-  double *p;
   int i;
 
   if (colorSpace2) {
-    p = &lookup[x[0] * nComps2];
     for (i = 0; i < nComps2; ++i) {
-      color.c[i] = *p++;
+      color.c[i] = lookup[i][x[0]];
     }
     colorSpace2->getGray(&color, gray);
   } else {
     for (i = 0; i < nComps; ++i) {
-      color.c[i] = lookup[x[i] * nComps + i];
+      color.c[i] = lookup[i][x[i]];
     }
     colorSpace->getGray(&color, gray);
   }
@@ -3097,18 +3274,16 @@ void GfxImageColorMap::getGray(Guchar *x, double *gray) {
 
 void GfxImageColorMap::getRGB(Guchar *x, GfxRGB *rgb) {
   GfxColor color;
-  double *p;
   int i;
 
   if (colorSpace2) {
-    p = &lookup[x[0] * nComps2];
     for (i = 0; i < nComps2; ++i) {
-      color.c[i] = *p++;
+      color.c[i] = lookup[i][x[0]];
     }
     colorSpace2->getRGB(&color, rgb);
   } else {
     for (i = 0; i < nComps; ++i) {
-      color.c[i] = lookup[x[i] * nComps + i];
+      color.c[i] = lookup[i][x[i]];
     }
     colorSpace->getRGB(&color, rgb);
   }
@@ -3116,18 +3291,16 @@ void GfxImageColorMap::getRGB(Guchar *x, GfxRGB *rgb) {
 
 void GfxImageColorMap::getCMYK(Guchar *x, GfxCMYK *cmyk) {
   GfxColor color;
-  double *p;
   int i;
 
   if (colorSpace2) {
-    p = &lookup[x[0] * nComps2];
     for (i = 0; i < nComps2; ++i) {
-      color.c[i] = *p++;
+      color.c[i] = lookup[i][x[0]];
     }
     colorSpace2->getCMYK(&color, cmyk);
   } else {
     for (i = 0; i < nComps; ++i) {
-      color.c[i] = lookup[x[i] * nComps + i];
+      color.c[i] = lookup[i][x[i]];
     }
     colorSpace->getCMYK(&color, cmyk);
   }
@@ -3138,7 +3311,7 @@ void GfxImageColorMap::getColor(Guchar *x, GfxColor *color) {
 
   maxPixel = (1 << bits) - 1;
   for (i = 0; i < nComps; ++i) {
-    color->c[i] = decodeLow[i] + (x[i] * decodeRange[i]) / maxPixel;
+    color->c[i] = dblToCol(decodeLow[i] + (x[i] * decodeRange[i]) / maxPixel);
   }
 }
 
@@ -3148,9 +3321,9 @@ void GfxImageColorMap::getColor(Guchar *x, GfxColor *color) {
 
 GfxSubpath::GfxSubpath(double x1, double y1) {
   size = 16;
-  x = (double *)gmalloc(size * sizeof(double));
-  y = (double *)gmalloc(size * sizeof(double));
-  curve = (GBool *)gmalloc(size * sizeof(GBool));
+  x = (double *)gmallocn(size, sizeof(double));
+  y = (double *)gmallocn(size, sizeof(double));
+  curve = (GBool *)gmallocn(size, sizeof(GBool));
   n = 1;
   x[0] = x1;
   y[0] = y1;
@@ -3168,9 +3341,9 @@ GfxSubpath::~GfxSubpath() {
 GfxSubpath::GfxSubpath(GfxSubpath *subpath) {
   size = subpath->size;
   n = subpath->n;
-  x = (double *)gmalloc(size * sizeof(double));
-  y = (double *)gmalloc(size * sizeof(double));
-  curve = (GBool *)gmalloc(size * sizeof(GBool));
+  x = (double *)gmallocn(size, sizeof(double));
+  y = (double *)gmallocn(size, sizeof(double));
+  curve = (GBool *)gmallocn(size, sizeof(GBool));
   memcpy(x, subpath->x, n * sizeof(double));
   memcpy(y, subpath->y, n * sizeof(double));
   memcpy(curve, subpath->curve, n * sizeof(GBool));
@@ -3180,9 +3353,9 @@ GfxSubpath::GfxSubpath(GfxSubpath *subpath) {
 void GfxSubpath::lineTo(double x1, double y1) {
   if (n >= size) {
     size += 16;
-    x = (double *)grealloc(x, size * sizeof(double));
-    y = (double *)grealloc(y, size * sizeof(double));
-    curve = (GBool *)grealloc(curve, size * sizeof(GBool));
+    x = (double *)greallocn(x, size, sizeof(double));
+    y = (double *)greallocn(y, size, sizeof(double));
+    curve = (GBool *)greallocn(curve, size, sizeof(GBool));
   }
   x[n] = x1;
   y[n] = y1;
@@ -3194,9 +3367,9 @@ void GfxSubpath::curveTo(double x1, double y1, double x2, double y2,
 			 double x3, double y3) {
   if (n+3 > size) {
     size += 16;
-    x = (double *)grealloc(x, size * sizeof(double));
-    y = (double *)grealloc(y, size * sizeof(double));
-    curve = (GBool *)grealloc(curve, size * sizeof(GBool));
+    x = (double *)greallocn(x, size, sizeof(double));
+    y = (double *)greallocn(y, size, sizeof(double));
+    curve = (GBool *)greallocn(curve, size, sizeof(GBool));
   }
   x[n] = x1;
   y[n] = y1;
@@ -3230,7 +3403,7 @@ GfxPath::GfxPath() {
   size = 16;
   n = 0;
   firstX = firstY = 0;
-  subpaths = (GfxSubpath **)gmalloc(size * sizeof(GfxSubpath *));
+  subpaths = (GfxSubpath **)gmallocn(size, sizeof(GfxSubpath *));
 }
 
 GfxPath::~GfxPath() {
@@ -3251,7 +3424,7 @@ GfxPath::GfxPath(GBool justMoved1, double firstX1, double firstY1,
   firstY = firstY1;
   size = size1;
   n = n1;
-  subpaths = (GfxSubpath **)gmalloc(size * sizeof(GfxSubpath *));
+  subpaths = (GfxSubpath **)gmallocn(size, sizeof(GfxSubpath *));
   for (i = 0; i < n; ++i)
     subpaths[i] = subpaths1[i]->copy();
 }
@@ -3267,7 +3440,7 @@ void GfxPath::lineTo(double x, double y) {
     if (n >= size) {
       size += 16;
       subpaths = (GfxSubpath **)
-	           grealloc(subpaths, size * sizeof(GfxSubpath *));
+	           greallocn(subpaths, size, sizeof(GfxSubpath *));
     }
     subpaths[n] = new GfxSubpath(firstX, firstY);
     ++n;
@@ -3282,7 +3455,7 @@ void GfxPath::curveTo(double x1, double y1, double x2, double y2,
     if (n >= size) {
       size += 16;
       subpaths = (GfxSubpath **)
-	           grealloc(subpaths, size * sizeof(GfxSubpath *));
+	           greallocn(subpaths, size, sizeof(GfxSubpath *));
     }
     subpaths[n] = new GfxSubpath(firstX, firstY);
     ++n;
@@ -3298,7 +3471,7 @@ void GfxPath::close() {
     if (n >= size) {
       size += 16;
       subpaths = (GfxSubpath **)
-	           grealloc(subpaths, size * sizeof(GfxSubpath *));
+	           greallocn(subpaths, size, sizeof(GfxSubpath *));
     }
     subpaths[n] = new GfxSubpath(firstX, firstY);
     ++n;
@@ -3313,7 +3486,7 @@ void GfxPath::append(GfxPath *path) {
   if (n + path->n > size) {
     size = n + path->n;
     subpaths = (GfxSubpath **)
-                 grealloc(subpaths, size * sizeof(GfxSubpath *));
+                 greallocn(subpaths, size, sizeof(GfxSubpath *));
   }
   for (i = 0; i < path->n; ++i) {
     subpaths[n++] = path->subpaths[i]->copy();
@@ -3334,9 +3507,10 @@ void GfxPath::offset(double dx, double dy) {
 //------------------------------------------------------------------------
 
 GfxState::GfxState(double hDPI, double vDPI, PDFRectangle *pageBox,
-		   int rotate, GBool upsideDown) {
+		   int rotateA, GBool upsideDown) {
   double kx, ky;
 
+  rotate = rotateA;
   px1 = pageBox->x1;
   py1 = pageBox->y1;
   px2 = pageBox->x2;
@@ -3387,8 +3561,11 @@ GfxState::GfxState(double hDPI, double vDPI, PDFRectangle *pageBox,
   strokeColor.c[0] = 0;
   fillPattern = NULL;
   strokePattern = NULL;
+  blendMode = gfxBlendNormal;
   fillOpacity = 1;
   strokeOpacity = 1;
+  fillOverprint = gFalse;
+  strokeOverprint = gFalse;
 
   lineWidth = 1;
   lineDash = NULL;
@@ -3462,7 +3639,7 @@ GfxState::GfxState(GfxState *state) {
     strokePattern = state->strokePattern->copy();
   }
   if (lineDashLength > 0) {
-    lineDash = (double *)gmalloc(lineDashLength * sizeof(double));
+    lineDash = (double *)gmallocn(lineDashLength, sizeof(double));
     memcpy(lineDash, state->lineDash, lineDashLength * sizeof(double));
   }
   saved = NULL;
@@ -3731,4 +3908,39 @@ GfxState *GfxState::restore() {
   }
 
   return oldState;
+}
+
+GBool GfxState::parseBlendMode(Object *obj, GfxBlendMode *mode) {
+  Object obj2;
+  int i, j;
+
+  if (obj->isName()) {
+    for (i = 0; i < nGfxBlendModeNames; ++i) {
+      if (!strcmp(obj->getName(), gfxBlendModeNames[i].name)) {
+	*mode = gfxBlendModeNames[i].mode;
+	return gTrue;
+      }
+    }
+    return gFalse;
+  } else if (obj->isArray()) {
+    for (i = 0; i < obj->arrayGetLength(); ++i) {
+      obj->arrayGet(i, &obj2);
+      if (!obj2.isName()) {
+	obj2.free();
+	return gFalse;
+      }
+      for (j = 0; j < nGfxBlendModeNames; ++j) {
+	if (!strcmp(obj2.getName(), gfxBlendModeNames[j].name)) {
+	  obj2.free();
+	  *mode = gfxBlendModeNames[j].mode;
+	  return gTrue;
+	}
+      }
+      obj2.free();
+    }
+    *mode = gfxBlendNormal;
+    return gTrue;
+  } else {
+    return gFalse;
+  }
 }

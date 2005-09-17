@@ -19,9 +19,8 @@
 #include "SplashTypes.h"
 #include "config.h"
 #include "OutputDev.h"
+#include "GfxState.h"
 
-class GfxState;
-class GfxPath;
 class Gfx8BitFont;
 class SplashBitmap;
 class Splash;
@@ -32,7 +31,6 @@ class SplashFont;
 class T3FontCache;
 struct T3FontCacheTag;
 struct T3GlyphStack;
-struct GfxRGB;
 
 //------------------------------------------------------------------------
 
@@ -48,7 +46,9 @@ public:
 
   // Constructor.
   SplashOutputDev(SplashColorMode colorModeA, int bitmapRowPadA,
-		  GBool reverseVideoA, SplashColor paperColorA);
+		  GBool reverseVideoA, SplashColorPtr paperColorA,
+		  GBool bitmapTopDownA = gTrue,
+		  GBool allowAntialiasA = gTrue);
 
   // Destructor.
   virtual ~SplashOutputDev();
@@ -93,6 +93,9 @@ public:
   virtual void updateLineWidth(GfxState *state);
   virtual void updateFillColor(GfxState *state);
   virtual void updateStrokeColor(GfxState *state);
+  virtual void updateBlendMode(GfxState *state);
+  virtual void updateFillOpacity(GfxState *state);
+  virtual void updateStrokeOpacity(GfxState *state);
 
   //----- update text state
   virtual void updateFont(GfxState *state);
@@ -110,7 +113,7 @@ public:
   virtual void drawChar(GfxState *state, double x, double y,
 			double dx, double dy,
 			double originX, double originY,
-			CharCode code, Unicode *u, int uLen);
+			CharCode code, int nBytes, Unicode *u, int uLen);
   virtual GBool beginType3Char(GfxState *state, double x, double y,
 			       double dx, double dy,
 			       CharCode code, Unicode *u, int uLen);
@@ -124,6 +127,17 @@ public:
   virtual void drawImage(GfxState *state, Object *ref, Stream *str,
 			 int width, int height, GfxImageColorMap *colorMap,
 			 int *maskColors, GBool inlineImg);
+  virtual void drawMaskedImage(GfxState *state, Object *ref, Stream *str,
+			       int width, int height,
+			       GfxImageColorMap *colorMap,
+			       Stream *maskStr, int maskWidth, int maskHeight,
+			       GBool maskInvert);
+  virtual void drawSoftMaskedImage(GfxState *state, Object *ref, Stream *str,
+				   int width, int height,
+				   GfxImageColorMap *colorMap,
+				   Stream *maskStr,
+				   int maskWidth, int maskHeight,
+				   GfxImageColorMap *maskColorMap);
 
   //----- Type 3 font operators
   virtual void type3D0(GfxState *state, double wx, double wy);
@@ -135,20 +149,28 @@ public:
   // Called to indicate that a new PDF document has been loaded.
   void startDoc(XRef *xrefA);
  
+  void setPaperColor(SplashColorPtr paperColorA);
+
   GBool isReverseVideo() { return reverseVideo; }
+  void setReverseVideo(GBool reverseVideoA) { reverseVideo = reverseVideoA; }
 
   // Get the bitmap and its size.
   SplashBitmap *getBitmap() { return bitmap; }
   int getBitmapWidth();
   int getBitmapHeight();
 
+  // Returns the last rasterized bitmap, transferring ownership to the
+  // caller.
+  SplashBitmap *takeBitmap();
+
   // Get the Splash object.
   Splash *getSplash() { return splash; }
 
-  // XOR a rectangular region in the bitmap with <pattern>.  <pattern>
-  // is passed to Splash::setFillPattern, so it should not be used
-  // after calling this function.
-  void xorRectangle(int x0, int y0, int x1, int y1, SplashPattern *pattern);
+  // Get the modified region.
+  void getModRegion(int *xMin, int *yMin, int *xMax, int *yMax);
+
+  // Clear the modified region.
+  void clearModRegion();
 
   // Set the Splash fill color.
   void setFillColor(int r, int g, int b);
@@ -156,21 +178,28 @@ public:
   // Get a font object for a Base-14 font, using the Latin-1 encoding.
   SplashFont *getFont(GString *name, double *mat);
 
-  void setUnderlayCbk(void (*cbk)(void *data), void *data)
-    { underlayCbk = cbk; underlayCbkData = data; }
+  SplashFont *getCurrentFont() { return font; }
 
 private:
 
-  SplashPattern *getColor(double gray, GfxRGB *rgb);
+#if SPLASH_CMYK
+  SplashPattern *getColor(GfxGray gray, GfxRGB *rgb, GfxCMYK *cmyk);
+#else
+  SplashPattern *getColor(GfxGray gray, GfxRGB *rgb);
+#endif
   SplashPath *convertPath(GfxState *state, GfxPath *path);
   void drawType3Glyph(T3FontCache *t3Font,
 		      T3FontCacheTag *tag, Guchar *data,
 		      double x, double y);
-  static GBool imageMaskSrc(void *data, SplashMono1 *pixel);
-  static GBool imageSrc(void *data, SplashColor *pixel, Guchar *alpha);
+  static GBool imageMaskSrc(void *data, SplashColorPtr line);
+  static GBool imageSrc(void *data, SplashColorPtr line);
+  static GBool alphaImageSrc(void *data, SplashColorPtr line);
+  static GBool maskedImageSrc(void *data, SplashColorPtr line);
 
   SplashColorMode colorMode;
   int bitmapRowPad;
+  GBool bitmapTopDown;
+  GBool allowAntialias;
   GBool reverseVideo;		// reverse video mode
   SplashColor paperColor;	// paper color
 
@@ -188,9 +217,6 @@ private:
   SplashFont *font;		// current font
   GBool needFontUpdate;		// set when the font needs to be updated
   SplashPath *textClipPath;	// clipping path built with text object
-
-  void (*underlayCbk)(void *data);
-  void *underlayCbkData;
 };
 
 #endif

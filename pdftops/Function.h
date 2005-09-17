@@ -2,7 +2,7 @@
 //
 // Function.h
 //
-// Copyright 2001-2004 Glyph & Cog, LLC
+// Copyright 2001-2003 Glyph & Cog, LLC
 //
 //========================================================================
 
@@ -126,7 +126,11 @@ private:
     encode[funcMaxInputs][2];
   double			// min and max values for range decoder
     decode[funcMaxOutputs][2];
+  double			// input multipliers
+    inputMul[funcMaxInputs];
+  int idxMul[funcMaxInputs];	// sample array index multipliers
   double *samples;		// the samples
+  int nSamples;			// size of the samples array
   GBool ok;
 };
 

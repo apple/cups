@@ -61,10 +61,10 @@ SplashClip::SplashClip(SplashClip *clip) {
   yMax = clip->yMax;
   length = clip->length;
   size = clip->size;
-  paths = (SplashXPath **)gmalloc(size * sizeof(SplashXPath *));
-  flags = (Guchar *)gmalloc(size * sizeof(Guchar));
+  paths = (SplashXPath **)gmallocn(size, sizeof(SplashXPath *));
+  flags = (Guchar *)gmallocn(size, sizeof(Guchar));
   scanners = (SplashXPathScanner **)
-                 gmalloc(size * sizeof(SplashXPathScanner *));
+                 gmallocn(size, sizeof(SplashXPathScanner *));
   for (i = 0; i < length; ++i) {
     paths[i] = clip->paths[i]->copy();
     flags[i] = clip->flags[i];
@@ -92,10 +92,10 @@ void SplashClip::grow(int nPaths) {
     while (size < length + nPaths) {
       size *= 2;
     }
-    paths = (SplashXPath **)grealloc(paths, size * sizeof(SplashXPath *));
-    flags = (Guchar *)grealloc(flags, size * sizeof(Guchar));
+    paths = (SplashXPath **)greallocn(paths, size, sizeof(SplashXPath *));
+    flags = (Guchar *)greallocn(flags, size, sizeof(Guchar));
     scanners = (SplashXPathScanner **)
-                   grealloc(scanners, size * sizeof(SplashXPathScanner *));
+                   greallocn(scanners, size, sizeof(SplashXPathScanner *));
   }
 }
 

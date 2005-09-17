@@ -2,7 +2,7 @@
 //
 // UnicodeMap.cc
 //
-// Copyright 2001-2004 Glyph & Cog, LLC
+// Copyright 2001-2003 Glyph & Cog, LLC
 //
 //========================================================================
 
@@ -53,7 +53,7 @@ UnicodeMap *UnicodeMap::parse(GString *encodingNameA) {
   map = new UnicodeMap(encodingNameA->copy());
 
   size = 8;
-  map->ranges = (UnicodeMapRange *)gmalloc(size * sizeof(UnicodeMapRange));
+  map->ranges = (UnicodeMapRange *)gmallocn(size, sizeof(UnicodeMapRange));
   eMapsSize = 0;
 
   line = 1;
@@ -69,7 +69,7 @@ UnicodeMap *UnicodeMap::parse(GString *encodingNameA) {
 	if (map->len == size) {
 	  size *= 2;
 	  map->ranges = (UnicodeMapRange *)
-	    grealloc(map->ranges, size * sizeof(UnicodeMapRange));
+	    greallocn(map->ranges, size, sizeof(UnicodeMapRange));
 	}
 	range = &map->ranges[map->len];
 	sscanf(tok1, "%x", &range->start);
@@ -81,7 +81,7 @@ UnicodeMap *UnicodeMap::parse(GString *encodingNameA) {
 	if (map->eMapsLen == eMapsSize) {
 	  eMapsSize += 16;
 	  map->eMaps = (UnicodeMapExt *)
-	    grealloc(map->eMaps, eMapsSize * sizeof(UnicodeMapExt));
+	    greallocn(map->eMaps, eMapsSize, sizeof(UnicodeMapExt));
 	}
 	eMap = &map->eMaps[map->eMapsLen];
 	sscanf(tok1, "%x", &eMap->u);

@@ -2,7 +2,7 @@
 //
 // NameToCharCode.cc
 //
-// Copyright 2001-2004 Glyph & Cog, LLC
+// Copyright 2001-2003 Glyph & Cog, LLC
 //
 //========================================================================
 
@@ -30,7 +30,7 @@ NameToCharCode::NameToCharCode() {
 
   size = 31;
   len = 0;
-  tab = (NameToCharCodeEntry *)gmalloc(size * sizeof(NameToCharCodeEntry));
+  tab = (NameToCharCodeEntry *)gmallocn(size, sizeof(NameToCharCodeEntry));
   for (i = 0; i < size; ++i) {
     tab[i].name = NULL;
   }
@@ -56,7 +56,7 @@ void NameToCharCode::add(char *name, CharCode c) {
     oldSize = size;
     oldTab = tab;
     size = 2*size + 1;
-    tab = (NameToCharCodeEntry *)gmalloc(size * sizeof(NameToCharCodeEntry));
+    tab = (NameToCharCodeEntry *)gmallocn(size, sizeof(NameToCharCodeEntry));
     for (h = 0; h < size; ++h) {
       tab[h].name = NULL;
     }

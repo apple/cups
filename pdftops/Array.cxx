@@ -2,7 +2,7 @@
 //
 // Array.cc
 //
-// Copyright 1996-2004 Glyph & Cog, LLC
+// Copyright 1996-2003 Glyph & Cog, LLC
 //
 //========================================================================
 
@@ -44,7 +44,7 @@ void Array::add(Object *elem) {
     } else {
       size *= 2;
     }
-    elems = (Object *)grealloc(elems, size * sizeof(Object));
+    elems = (Object *)greallocn(elems, size, sizeof(Object));
   }
   elems[length] = *elem;
   ++length;

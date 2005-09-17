@@ -2,7 +2,7 @@
 //
 // FoFiType1.cc
 //
-// Copyright 1999-2004 Glyph & Cog, LLC
+// Copyright 1999-2003 Glyph & Cog, LLC
 //
 //========================================================================
 
@@ -159,7 +159,7 @@ void FoFiType1::parse() {
       encoding = fofiType1StandardEncoding;
     } else if (!encoding &&
 	       !strncmp(line, "/Encoding 256 array", 19)) {
-      encoding = (char **)gmalloc(256 * sizeof(char *));
+      encoding = (char **)gmallocn(256, sizeof(char *));
       for (j = 0; j < 256; ++j) {
 	encoding[j] = NULL;
       }
@@ -195,7 +195,6 @@ void FoFiType1::parse() {
 	    break;
 	  }
 	}
-	line = line1;
       }
       //~ check for getinterval/putinterval junk
 

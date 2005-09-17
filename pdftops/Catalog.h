@@ -2,7 +2,7 @@
 //
 // Catalog.h
 //
-// Copyright 1996-2004 Glyph & Cog, LLC
+// Copyright 1996-2003 Glyph & Cog, LLC
 //
 //========================================================================
 
@@ -67,22 +67,25 @@ public:
 
   Object *getOutline() { return &outline; }
 
+  Object *getAcroForm() { return &acroForm; }
+
 private:
 
   XRef *xref;			// the xref table for this PDF file
   Page **pages;			// array of pages
   Ref *pageRefs;		// object ID for each page
-  unsigned int numPages;	// number of pages
-  unsigned int pagesSize;	// size of pages array
+  int numPages;			// number of pages
+  int pagesSize;		// size of pages array
   Object dests;			// named destination dictionary
   Object nameTree;		// name tree
   GString *baseURI;		// base URI for URI-type links
   Object metadata;		// metadata stream
   Object structTreeRoot;	// structure tree root dictionary
   Object outline;		// outline dictionary
+  Object acroForm;		// AcroForm dictionary
   GBool ok;			// true if catalog is valid
 
-  int readPageTree(Dict *pages, PageAttrs *attrs, unsigned int start);
+  int readPageTree(Dict *pages, PageAttrs *attrs, int start);
   Object *findDestInTree(Object *tree, GString *name, Object *obj);
 };
 

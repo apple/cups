@@ -2,7 +2,7 @@
 //
 // OutputDev.cc
 //
-// Copyright 1996-2004 Glyph & Cog, LLC
+// Copyright 1996-2003 Glyph & Cog, LLC
 //
 //========================================================================
 
@@ -59,6 +59,11 @@ void OutputDev::updateAll(GfxState *state) {
   updateFillColor(state);
   updateStrokeColorSpace(state);
   updateStrokeColor(state);
+  updateBlendMode(state);
+  updateFillOpacity(state);
+  updateStrokeOpacity(state);
+  updateFillOverprint(state);
+  updateStrokeOverprint(state);
   updateFont(state);
 }
 
@@ -103,6 +108,15 @@ void OutputDev::drawMaskedImage(GfxState *state, Object *ref, Stream *str,
 				Stream *maskStr,
 				int maskWidth, int maskHeight,
 				GBool maskInvert) {
+  drawImage(state, ref, str, width, height, colorMap, NULL, gFalse);
+}
+
+void OutputDev::drawSoftMaskedImage(GfxState *state, Object *ref, Stream *str,
+				    int width, int height,
+				    GfxImageColorMap *colorMap,
+				    Stream *maskStr,
+				    int maskWidth, int maskHeight,
+				    GfxImageColorMap *maskColorMap) {
   drawImage(state, ref, str, width, height, colorMap, NULL, gFalse);
 }
 

@@ -2,7 +2,7 @@
 //
 // OutputDev.h
 //
-// Copyright 1996-2004 Glyph & Cog, LLC
+// Copyright 1996-2003 Glyph & Cog, LLC
 //
 //========================================================================
 
@@ -88,6 +88,9 @@ public:
   virtual void cvtDevToUser(double dx, double dy, double *ux, double *uy);
   virtual void cvtUserToDev(double ux, double uy, int *dx, int *dy);
 
+  double *getDefCTM() { return defCTM; }
+  double *getDefICTM() { return defICTM; }
+
   //----- link borders
   virtual void drawLink(Link *link, Catalog *catalog) {}
 
@@ -109,8 +112,11 @@ public:
   virtual void updateStrokeColorSpace(GfxState *state) {}
   virtual void updateFillColor(GfxState *state) {}
   virtual void updateStrokeColor(GfxState *state) {}
+  virtual void updateBlendMode(GfxState *state) {}
   virtual void updateFillOpacity(GfxState *state) {}
   virtual void updateStrokeOpacity(GfxState *state) {}
+  virtual void updateFillOverprint(GfxState *state) {}
+  virtual void updateStrokeOverprint(GfxState *state) {}
 
   //----- update text state
   virtual void updateFont(GfxState *state) {}
@@ -142,12 +148,14 @@ public:
   virtual void eoClip(GfxState *state) {}
 
   //----- text drawing
+  virtual void beginStringOp(GfxState *state) {}
+  virtual void endStringOp(GfxState *state) {}
   virtual void beginString(GfxState *state, GString *s) {}
   virtual void endString(GfxState *state) {}
   virtual void drawChar(GfxState *state, double x, double y,
 			double dx, double dy,
 			double originX, double originY,
-			CharCode code, Unicode *u, int uLen) {}
+			CharCode code, int nBytes, Unicode *u, int uLen) {}
   virtual void drawString(GfxState *state, GString *s) {}
   virtual GBool beginType3Char(GfxState *state, double x, double y,
 			       double dx, double dy,
@@ -167,6 +175,12 @@ public:
 			       GfxImageColorMap *colorMap,
 			       Stream *maskStr, int maskWidth, int maskHeight,
 			       GBool maskInvert);
+  virtual void drawSoftMaskedImage(GfxState *state, Object *ref, Stream *str,
+				   int width, int height,
+				   GfxImageColorMap *colorMap,
+				   Stream *maskStr,
+				   int maskWidth, int maskHeight,
+				   GfxImageColorMap *maskColorMap);
 
 #if OPI_SUPPORT
   //----- OPI functions

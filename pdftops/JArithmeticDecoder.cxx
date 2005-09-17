@@ -22,7 +22,7 @@
 
 JArithmeticDecoderStats::JArithmeticDecoderStats(int contextSizeA) {
   contextSize = contextSizeA;
-  cxTab = (Guchar *)gmalloc(contextSize * sizeof(Guchar));
+  cxTab = (Guchar *)gmallocn(contextSize, sizeof(Guchar));
   reset();
 }
 
@@ -89,22 +89,22 @@ int JArithmeticDecoder::switchTab[47] = {
 
 JArithmeticDecoder::JArithmeticDecoder() {
   str = NULL;
+  dataLen = 0;
+  limitStream = gFalse;
 }
 
 inline Guint JArithmeticDecoder::readByte() {
-  if (dataLen == 0) {
-    return 0xff;
-  }
-  if (dataLen > 0) {
+  if (limitStream) {
     --dataLen;
+    if (dataLen < 0) {
+      return 0xff;
+    }
   }
   return (Guint)str->getChar() & 0xff;
 }
 
 JArithmeticDecoder::~JArithmeticDecoder() {
-  while (dataLen > 0) {
-    readByte();
-  }
+  cleanup();
 }
 
 void JArithmeticDecoder::start() {
@@ -117,6 +117,28 @@ void JArithmeticDecoder::start() {
   c <<= 7;
   ct -= 7;
   a = 0x80000000;
+}
+
+void JArithmeticDecoder::restart(int dataLenA) {
+  int oldDataLen;
+
+  oldDataLen = dataLen;
+  dataLen = dataLenA;
+  if (oldDataLen == -1) {
+    buf1 = readByte();
+  } else if (oldDataLen <= -2) {
+    buf0 = readByte();
+    buf1 = readByte();
+  }
+}
+
+void JArithmeticDecoder::cleanup() {
+  if (limitStream) {
+    while (dataLen > 0) {
+      buf0 = buf1;
+      buf1 = readByte();
+    }
+  }
 }
 
 int JArithmeticDecoder::decodeBit(Guint context,

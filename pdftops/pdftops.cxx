@@ -313,7 +313,7 @@ main(int  argc,				// I - Number of command-line args
 			    psModePS);
     if (psOut->isOk())
       doc->displayPages(psOut, 1, doc->getNumPages(), 72.0, 72.0, 0,
-                        gTrue, gFalse);
+                        gTrue, gFalse, gFalse);
     delete psOut;
 
     // clean up

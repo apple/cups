@@ -96,12 +96,12 @@ SplashXPath::SplashXPath(SplashPath *path, SplashCoord flatness,
 	if (quad0 == quad1) {
 	  switch (quad0) {
 	  case 0:
-	  case 1: n = path->pts[i].x < path->pts[i+1].x ? 0 : 4; break;
+	  case 1: n = path->pts[i-1].x < path->pts[i+1].x ? 0 : 4; break;
 	  case 2:
-	  case 3: n = path->pts[i].x > path->pts[i+1].x ? 0 : 4; break;
+	  case 3: n = path->pts[i-1].x > path->pts[i+1].x ? 0 : 4; break;
 	  }
 	} else {
-	  n = (4 + quad1 - quad0) & 3;
+	  n = (quad1 - quad0) & 3;
 	}
 	x0 = path->pts[i-1].x;
 	y0 = path->pts[i-1].y;
@@ -169,7 +169,7 @@ SplashXPath::SplashXPath(SplashPath *path, SplashCoord flatness,
 SplashXPath::SplashXPath(SplashXPath *xPath) {
   length = xPath->length;
   size = xPath->size;
-  segs = (SplashXPathSeg *)gmalloc(size * sizeof(SplashXPathSeg));
+  segs = (SplashXPathSeg *)gmallocn(size, sizeof(SplashXPathSeg));
   memcpy(segs, xPath->segs, length * sizeof(SplashXPathSeg));
 }
 
@@ -186,7 +186,7 @@ void SplashXPath::grow(int nSegs) {
     while (size < length + nSegs) {
       size *= 2;
     }
-    segs = (SplashXPathSeg *)grealloc(segs, size * sizeof(SplashXPathSeg));
+    segs = (SplashXPathSeg *)greallocn(segs, size, sizeof(SplashXPathSeg));
   }
 }
 
@@ -306,8 +306,8 @@ void SplashXPath::addArc(SplashCoord x0, SplashCoord y0,
 
     // compute the arc midpoint
     t = (xx0 - xc) * (xx1 - xc) - (yy0 - yc) * (yy1 - yc);
-    xm = splashSqrt(0.5 * (r2 + t));
-    ym = splashSqrt(0.5 * (r2 - t));
+    xm = splashSqrt((SplashCoord)0.5 * (r2 + t));
+    ym = splashSqrt((SplashCoord)0.5 * (r2 - t));
     switch (quad) {
     case 0: xm = xc - xm;  ym = yc - ym;  break;
     case 1: xm = xc + xm;  ym = yc - ym;  break;
@@ -317,8 +317,8 @@ void SplashXPath::addArc(SplashCoord x0, SplashCoord y0,
 
     // compute distance from midpoint of straight segment to midpoint
     // of arc
-    dx = 0.5 * (xx0 + xx1) - xm;
-    dy = 0.5 * (yy0 + yy1) - ym;
+    dx = (SplashCoord)0.5 * (xx0 + xx1) - xm;
+    dy = (SplashCoord)0.5 * (yy0 + yy1) - ym;
 
     // if the arc is flat enough, or no more subdivisions are allowed,
     // add the straight line segment
@@ -373,7 +373,7 @@ void SplashXPath::addSegment(SplashCoord x0, SplashCoord y0,
     segs[length].flags |= splashXPathVert;
   } else {
     segs[length].dxdy = (x1 - x0) / (y1 - y0);
-    segs[length].dydx = 1 / segs[length].dxdy;
+    segs[length].dydx = (SplashCoord)1 / segs[length].dxdy;
   }
   if (y0 > y1) {
     segs[length].flags |= splashXPathFlip;

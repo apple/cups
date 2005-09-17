@@ -2,7 +2,7 @@
 //
 // Lexer.h
 //
-// Copyright 1996-2004 Glyph & Cog, LLC
+// Copyright 1996-2003 Glyph & Cog, LLC
 //
 //========================================================================
 
@@ -61,6 +61,9 @@ public:
   // Set position in file.
   void setPos(Guint pos, int dir = 0)
     { if (!curStr.isNone()) curStr.streamSetPos(pos, dir); }
+
+  // Returns true if <c> is a whitespace character.
+  static GBool isSpace(int c);
 
 private:
 

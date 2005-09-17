@@ -73,6 +73,15 @@ public:
   // Similar to testRect, but tests a horizontal span.
   SplashClipResult testSpan(int spanXMin, int spanXMax, int spanY);
 
+  // Get the rectangle part of the clip region.
+  int getXMin() { return xMin; }
+  int getXMax() { return xMax; }
+  int getYMin() { return yMin; }
+  int getYMax() { return yMax; }
+
+  // Get the number of arbitrary paths used by the clip region.
+  int getNumPaths() { return length; }
+
 private:
 
   SplashClip(SplashClip *clip);

@@ -2,7 +2,7 @@
 //
 // FoFiEncodings.cc
 //
-// Copyright 1999-2004 Glyph & Cog, LLC
+// Copyright 1999-2003 Glyph & Cog, LLC
 //
 //========================================================================
 

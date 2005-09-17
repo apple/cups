@@ -10,6 +10,7 @@
 #pragma implementation
 #endif
 
+#include <string.h>
 #include "gmem.h"
 #include "SplashMath.h"
 #include "SplashScreen.h"
@@ -33,7 +34,7 @@ SplashScreen::SplashScreen(int sizeA) {
   size = size2 << 1;
 
   // initialize the threshold matrix
-  mat = (SplashCoord *)gmalloc(size * size * sizeof(SplashCoord));
+  mat = (SplashCoord *)gmallocn(size * size, sizeof(SplashCoord));
   for (y = 0; y < size; ++y) {
     for (x = 0; x < size; ++x) {
       mat[y * size + x] = -1;
@@ -41,7 +42,7 @@ SplashScreen::SplashScreen(int sizeA) {
   }
 
   // build the distance matrix
-  dist = (SplashCoord *)gmalloc(size * size2 * sizeof(SplashCoord));
+  dist = (SplashCoord *)gmallocn(size * size2, sizeof(SplashCoord));
   for (y = 0; y < size2; ++y) {
     for (x = 0; x < size2; ++x) {
       if (x + y < size2 - 1) {
@@ -83,7 +84,7 @@ SplashScreen::SplashScreen(int sizeA) {
 	}
       }
     }
-    u = 1.0 - (SplashCoord)i / (SplashCoord)(size * size2 + 1);
+    u = (SplashCoord)1 - (SplashCoord)i / (SplashCoord)(size * size2 + 1);
     val = splashPow(u, 1.33);
     if (val < minVal) {
       minVal = val;
@@ -102,6 +103,17 @@ SplashScreen::SplashScreen(int sizeA) {
   gfree(dist);
 }
 
+SplashScreen::SplashScreen(SplashScreen *screen) {
+  int n;
+
+  size = screen->size;
+  n = size * size * sizeof(SplashCoord);
+  mat = (SplashCoord *)gmalloc(n);
+  memcpy(mat, screen->mat, n);
+  minVal = screen->minVal;
+  maxVal = screen->maxVal;
+}
+
 SplashScreen::~SplashScreen() {
   gfree(mat);
 }
@@ -115,8 +127,12 @@ int SplashScreen::test(int x, int y, SplashCoord value) {
   if (value >= maxVal) {
     return 1;
   }
-  xx = x % size;
-  yy = y % size;
+  if ((xx = x % size) < 0) {
+    xx = -xx;
+  }
+  if ((yy = y % size) < 0) {
+    yy = -yy;
+  }
   return value < mat[yy * size + xx] ? 0 : 1;
 }
 

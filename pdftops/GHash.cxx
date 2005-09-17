@@ -2,7 +2,7 @@
 //
 // GHash.cc
 //
-// Copyright 2001-2004 Glyph & Cog, LLC
+// Copyright 2001-2003 Glyph & Cog, LLC
 //
 //========================================================================
 
@@ -39,7 +39,7 @@ GHash::GHash(GBool deleteKeysA) {
 
   deleteKeys = deleteKeysA;
   size = 7;
-  tab = (GHashBucket **)gmalloc(size * sizeof(GHashBucket *));
+  tab = (GHashBucket **)gmallocn(size, sizeof(GHashBucket *));
   for (h = 0; h < size; ++h) {
     tab[h] = NULL;
   }
@@ -99,6 +99,30 @@ void GHash::add(GString *key, int val) {
   p->next = tab[h];
   tab[h] = p;
   ++len;
+}
+
+void GHash::replace(GString *key, void *val) {
+  GHashBucket *p;
+  int h;
+
+  if ((p = find(key, &h))) {
+    p->val.p = val;
+    delete key;
+  } else {
+    add(key, val);
+  }
+}
+
+void GHash::replace(GString *key, int val) {
+  GHashBucket *p;
+  int h;
+
+  if ((p = find(key, &h))) {
+    p->val.i = val;
+    delete key;
+  } else {
+    add(key, val);
+  }
 }
 
 void *GHash::lookup(GString *key) {
@@ -292,7 +316,7 @@ void GHash::expand() {
   oldSize = size;
   oldTab = tab;
   size = 2*size + 1;
-  tab = (GHashBucket **)gmalloc(size * sizeof(GHashBucket *));
+  tab = (GHashBucket **)gmallocn(size, sizeof(GHashBucket *));
   for (h = 0; h < size; ++h) {
     tab[h] = NULL;
   }

@@ -4,7 +4,7 @@
 //
 // Simple variable-length string type.
 //
-// Copyright 1996-2004 Glyph & Cog, LLC
+// Copyright 1996-2003 Glyph & Cog, LLC
 //
 //========================================================================
 
@@ -35,7 +35,12 @@ inline void GString::resize(int length1) {
     s = new char[size(length1)];
   } else if (size(length1) != size(length)) {
     s1 = new char[size(length1)];
-    memcpy(s1, s, length + 1);
+    if (length1 < length) {
+      memcpy(s1, s, length1);
+      s1[length1] = '\0';
+    } else {
+      memcpy(s1, s, length + 1);
+    }
     delete[] s;
     s = s1;
   }
@@ -233,4 +238,82 @@ GString *GString::lowerCase() {
       s[i] = tolower(s[i]);
   }
   return this;
+}
+
+int GString::cmp(GString *str) {
+  int n1, n2, i, x;
+  char *p1, *p2;
+
+  n1 = length;
+  n2 = str->length;
+  for (i = 0, p1 = s, p2 = str->s; i < n1 && i < n2; ++i, ++p1, ++p2) {
+    x = *p1 - *p2;
+    if (x != 0) {
+      return x;
+    }
+  }
+  return n1 - n2;
+}
+
+int GString::cmpN(GString *str, int n) {
+  int n1, n2, i, x;
+  char *p1, *p2;
+
+  n1 = length;
+  n2 = str->length;
+  for (i = 0, p1 = s, p2 = str->s;
+       i < n1 && i < n2 && i < n;
+       ++i, ++p1, ++p2) {
+    x = *p1 - *p2;
+    if (x != 0) {
+      return x;
+    }
+  }
+  if (i == n) {
+    return 0;
+  }
+  return n1 - n2;
+}
+
+int GString::cmp(const char *sA) {
+  int n1, i, x;
+  const char *p1, *p2;
+
+  n1 = length;
+  for (i = 0, p1 = s, p2 = sA; i < n1 && *p2; ++i, ++p1, ++p2) {
+    x = *p1 - *p2;
+    if (x != 0) {
+      return x;
+    }
+  }
+  if (i < n1) {
+    return 1;
+  }
+  if (*p2) {
+    return -1;
+  }
+  return 0;
+}
+
+int GString::cmpN(const char *sA, int n) {
+  int n1, i, x;
+  const char *p1, *p2;
+
+  n1 = length;
+  for (i = 0, p1 = s, p2 = sA; i < n1 && *p2 && i < n; ++i, ++p1, ++p2) {
+    x = *p1 - *p2;
+    if (x != 0) {
+      return x;
+    }
+  }
+  if (i == n) {
+    return 0;
+  }
+  if (i < n1) {
+    return 1;
+  }
+  if (*p2) {
+    return -1;
+  }
+  return 0;
 }

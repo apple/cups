@@ -34,7 +34,7 @@ SplashFontFile *SplashFTFontFile::loadType1Font(SplashFTFontEngine *engineA,
   if (FT_New_Face(engineA->lib, fileNameA, 0, &faceA)) {
     return NULL;
   }
-  codeToGIDA = (Gushort *)gmalloc(256 * sizeof(int));
+  codeToGIDA = (Gushort *)gmallocn(256, sizeof(int));
   for (i = 0; i < 256; ++i) {
     codeToGIDA[i] = 0;
     if ((name = encA[i])) {

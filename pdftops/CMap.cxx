@@ -2,7 +2,7 @@
 //
 // CMap.cc
 //
-// Copyright 2001-2004 Glyph & Cog, LLC
+// Copyright 2001-2003 Glyph & Cog, LLC
 //
 //========================================================================
 
@@ -49,7 +49,7 @@ CMap *CMap::parse(CMapCache *cache, GString *collectionA,
   PSTokenizer *pst;
   char tok1[256], tok2[256], tok3[256];
   int n1, n2, n3;
-  Guint start, end;
+  Guint start, end, code;
 
   if (!(f = globalParams->findCMapFile(collectionA, cMapNameA))) {
 
@@ -99,6 +99,30 @@ CMap *CMap::parse(CMapCache *cache, GString *collectionA,
 	}
       }
       pst->getToken(tok1, sizeof(tok1), &n1);
+    } else if (!strcmp(tok2, "begincidchar")) {
+      while (pst->getToken(tok1, sizeof(tok1), &n1)) {
+	if (!strcmp(tok1, "endcidchar")) {
+	  break;
+	}
+	if (!pst->getToken(tok2, sizeof(tok2), &n2) ||
+	    !strcmp(tok2, "endcidchar")) {
+	  error(-1, "Illegal entry in cidchar block in CMap");
+	  break;
+	}
+	if (!(tok1[0] == '<' && tok1[n1 - 1] == '>' &&
+	      n1 >= 4 && (n1 & 1) == 0)) {
+	  error(-1, "Illegal entry in cidchar block in CMap");
+	  continue;
+	}
+	tok1[n1 - 1] = '\0';
+	if (sscanf(tok1 + 1, "%x", &code) != 1) {
+	  error(-1, "Illegal entry in cidchar block in CMap");
+	  continue;
+	}
+	n1 = (n1 - 2) / 2;
+	cmap->addCIDs(code, code, n1, (CID)atoi(tok2));
+      }
+      pst->getToken(tok1, sizeof(tok1), &n1);
     } else if (!strcmp(tok2, "begincidrange")) {
       while (pst->getToken(tok1, sizeof(tok1), &n1)) {
 	if (!strcmp(tok1, "endcidrange")) {
@@ -138,7 +162,7 @@ CMap::CMap(GString *collectionA, GString *cMapNameA) {
   collection = collectionA;
   cMapName = cMapNameA;
   wMode = 0;
-  vector = (CMapVectorEntry *)gmalloc(256 * sizeof(CMapVectorEntry));
+  vector = (CMapVectorEntry *)gmallocn(256, sizeof(CMapVectorEntry));
   for (i = 0; i < 256; ++i) {
     vector[i].isVector = gFalse;
     vector[i].cid = 0;
@@ -182,7 +206,7 @@ void CMap::copyVector(CMapVectorEntry *dest, CMapVectorEntry *src) {
       if (!dest[i].isVector) {
 	dest[i].isVector = gTrue;
 	dest[i].vector =
-	  (CMapVectorEntry *)gmalloc(256 * sizeof(CMapVectorEntry));
+	  (CMapVectorEntry *)gmallocn(256, sizeof(CMapVectorEntry));
 	for (j = 0; j < 256; ++j) {
 	  dest[i].vector[j].isVector = gFalse;
 	  dest[i].vector[j].cid = 0;
@@ -213,7 +237,7 @@ void CMap::addCodeSpace(CMapVectorEntry *vec, Guint start, Guint end,
       if (!vec[i].isVector) {
 	vec[i].isVector = gTrue;
 	vec[i].vector =
-	  (CMapVectorEntry *)gmalloc(256 * sizeof(CMapVectorEntry));
+	  (CMapVectorEntry *)gmallocn(256, sizeof(CMapVectorEntry));
 	for (j = 0; j < 256; ++j) {
 	  vec[i].vector[j].isVector = gFalse;
 	  vec[i].vector[j].cid = 0;
@@ -234,7 +258,7 @@ void CMap::addCIDs(Guint start, Guint end, Guint nBytes, CID firstCID) {
   for (i = nBytes - 1; i >= 1; --i) {
     byte = (start >> (8 * i)) & 0xff;
     if (!vec[byte].isVector) {
-      error(-1, "Invalid CID (%*x - %*x) in CMap",
+      error(-1, "Invalid CID (%0*x - %0*x) in CMap",
 	    2*nBytes, start, 2*nBytes, end);
       return;
     }
@@ -243,7 +267,7 @@ void CMap::addCIDs(Guint start, Guint end, Guint nBytes, CID firstCID) {
   cid = firstCID;
   for (byte = (int)(start & 0xff); byte <= (int)(end & 0xff); ++byte) {
     if (vec[byte].isVector) {
-      error(-1, "Invalid CID (%*x - %*x) in CMap",
+      error(-1, "Invalid CID (%0*x - %0*x) in CMap",
 	    2*nBytes, start, 2*nBytes, end);
     } else {
       vec[byte].cid = cid;

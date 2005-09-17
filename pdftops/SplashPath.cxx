@@ -40,8 +40,8 @@ SplashPath::SplashPath() {
 SplashPath::SplashPath(SplashPath *path) {
   length = path->length;
   size = path->size;
-  pts = (SplashPathPoint *)gmalloc(size * sizeof(SplashPathPoint));
-  flags = (Guchar *)gmalloc(size * sizeof(Guchar));
+  pts = (SplashPathPoint *)gmallocn(size, sizeof(SplashPathPoint));
+  flags = (Guchar *)gmallocn(size, sizeof(Guchar));
   memcpy(pts, path->pts, length * sizeof(SplashPathPoint));
   memcpy(flags, path->flags, length * sizeof(Guchar));
   curSubpath = path->curSubpath;
@@ -61,8 +61,8 @@ void SplashPath::grow(int nPts) {
     while (size < length + nPts) {
       size *= 2;
     }
-    pts = (SplashPathPoint *)grealloc(pts, size * sizeof(SplashPathPoint));
-    flags = (Guchar *)grealloc(flags, size * sizeof(Guchar));
+    pts = (SplashPathPoint *)greallocn(pts, size, sizeof(SplashPathPoint));
+    flags = (Guchar *)greallocn(flags, size, sizeof(Guchar));
   }
 }
 
@@ -148,7 +148,8 @@ SplashError SplashPath::close() {
   if (noCurrentPoint()) {
     return splashErrNoCurPt;
   }
-  if (pts[length - 1].x != pts[curSubpath].x ||
+  if (curSubpath == length - 1 ||
+      pts[length - 1].x != pts[curSubpath].x ||
       pts[length - 1].y != pts[curSubpath].y) {
     lineTo(pts[curSubpath].x, pts[curSubpath].y);
   }

@@ -2,7 +2,7 @@
 //
 // CMap.h
 //
-// Copyright 2001-2004 Glyph & Cog, LLC
+// Copyright 2001-2003 Glyph & Cog, LLC
 //
 //========================================================================
 
@@ -73,7 +73,7 @@ private:
   CMapVectorEntry *vector;	// vector for first byte (NULL for
 				//   identity CMap)
   int refCnt;
-#ifdef MULTITHREADED
+#if MULTITHREADED
   GMutex mutex;
 #endif
 };

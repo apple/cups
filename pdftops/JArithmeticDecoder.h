@@ -53,12 +53,29 @@ public:
 
   JArithmeticDecoder();
   ~JArithmeticDecoder();
+
   void setStream(Stream *strA)
-    { str = strA; dataLen = -1; }
+    { str = strA; dataLen = 0; limitStream = gFalse; }
   void setStream(Stream *strA, int dataLenA)
-    { str = strA; dataLen = dataLenA; }
+    { str = strA; dataLen = dataLenA; limitStream = gTrue; }
+
+  // Start decoding on a new stream.  This fills the byte buffers and
+  // runs INITDEC.
   void start();
+
+  // Restart decoding on an interrupted stream.  This refills the
+  // buffers if needed, but does not run INITDEC.  (This is used in
+  // JPEG 2000 streams when codeblock data is split across multiple
+  // packets/layers.)
+  void restart(int dataLenA);
+
+  // Read any leftover data in the stream.
+  void cleanup();
+
+  // Decode one bit.
   int decodeBit(Guint context, JArithmeticDecoderStats *stats);
+
+  // Decode eight bits.
   int decodeByte(Guint context, JArithmeticDecoderStats *stats);
 
   // Returns false for OOB, otherwise sets *<x> and returns true.
@@ -86,6 +103,7 @@ private:
 
   Stream *str;
   int dataLen;
+  GBool limitStream;
 };
 
 #endif

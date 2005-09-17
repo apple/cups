@@ -112,14 +112,21 @@ SplashFTFont::SplashFTFont(SplashFTFontFile *fontFileA, SplashCoord *matA):
   }
   if (yMax == yMin) {
     yMin = 0;
-    yMax = (int)(1.2 * size);
+    yMax = (int)((SplashCoord)1.2 * size);
   }
 
   // compute the transform matrix
+#if USE_FIXEDPOINT
+  matrix.xx = (FT_Fixed)((mat[0] / size).getRaw());
+  matrix.yx = (FT_Fixed)((mat[1] / size).getRaw());
+  matrix.xy = (FT_Fixed)((mat[2] / size).getRaw());
+  matrix.yy = (FT_Fixed)((mat[3] / size).getRaw());
+#else
   matrix.xx = (FT_Fixed)((mat[0] / size) * 65536);
   matrix.yx = (FT_Fixed)((mat[1] / size) * 65536);
   matrix.xy = (FT_Fixed)((mat[2] / size) * 65536);
   matrix.yy = (FT_Fixed)((mat[3] / size) * 65536);
+#endif
 }
 
 SplashFTFont::~SplashFTFont() {
@@ -143,7 +150,7 @@ GBool SplashFTFont::makeGlyph(int c, int xFrac, int yFrac,
   ff = (SplashFTFontFile *)fontFile;
 
   ff->face->size = sizeObj;
-  offset.x = (FT_Pos)(xFrac * splashFontFractionMul * 64);
+  offset.x = (FT_Pos)(int)((SplashCoord)xFrac * splashFontFractionMul * 64);
   offset.y = 0;
   FT_Set_Transform(ff->face, &matrix, &offset);
   slot = ff->face->glyph;
@@ -197,6 +204,11 @@ GBool SplashFTFont::makeGlyph(int c, int xFrac, int yFrac,
   return gTrue;
 }
 
+struct SplashFTFontPath {
+  SplashPath *path;
+  GBool needClose;
+};
+
 SplashPath *SplashFTFont::getGlyphPath(int c) {
   static FT_Outline_Funcs outlineFuncs = {
     &glyphPathMoveTo,
@@ -206,7 +218,7 @@ SplashPath *SplashFTFont::getGlyphPath(int c) {
     0, 0
   };
   SplashFTFontFile *ff;
-  SplashPath *path;
+  SplashFTFontPath path;
   FT_GlyphSlot slot;
   FT_UInt gid;
   FT_Glyph glyph;
@@ -220,32 +232,47 @@ SplashPath *SplashFTFont::getGlyphPath(int c) {
   } else {
     gid = (FT_UInt)c;
   }
-  if (FT_Load_Glyph(ff->face, gid, FT_LOAD_DEFAULT)) {
+  if (FT_Load_Glyph(ff->face, gid, FT_LOAD_NO_BITMAP)) {
     return NULL;
   }
   if (FT_Get_Glyph(slot, &glyph)) {
     return NULL;
   }
-  path = new SplashPath();
+  path.path = new SplashPath();
+  path.needClose = gFalse;
   FT_Outline_Decompose(&((FT_OutlineGlyph)glyph)->outline,
-		       &outlineFuncs, path);
-  return path;
+		       &outlineFuncs, &path);
+  if (path.needClose) {
+    path.path->close();
+  }
+  FT_Done_Glyph(glyph);
+  return path.path;
 }
 
 static int glyphPathMoveTo(FT_Vector *pt, void *path) {
-  ((SplashPath *)path)->moveTo(pt->x / 64.0, -pt->y / 64.0);
+  SplashFTFontPath *p = (SplashFTFontPath *)path;
+
+  if (p->needClose) {
+    p->path->close();
+    p->needClose = gFalse;
+  }
+  p->path->moveTo(pt->x / 64.0, -pt->y / 64.0);
   return 0;
 }
 
 static int glyphPathLineTo(FT_Vector *pt, void *path) {
-  ((SplashPath *)path)->lineTo(pt->x / 64.0, -pt->y / 64.0);
+  SplashFTFontPath *p = (SplashFTFontPath *)path;
+
+  p->path->lineTo(pt->x / 64.0, -pt->y / 64.0);
+  p->needClose = gTrue;
   return 0;
 }
 
 static int glyphPathConicTo(FT_Vector *ctrl, FT_Vector *pt, void *path) {
+  SplashFTFontPath *p = (SplashFTFontPath *)path;
   SplashCoord x0, y0, x1, y1, x2, y2, x3, y3, xc, yc;
 
-  if (!((SplashPath *)path)->getCurPt(&x0, &y0)) {
+  if (!p->path->getCurPt(&x0, &y0)) {
     return 0;
   }
   xc = ctrl->x / 64.0;
@@ -269,20 +296,24 @@ static int glyphPathConicTo(FT_Vector *ctrl, FT_Vector *pt, void *path) {
   //     p1 = (1/3) * (p0 + 2pc)
   //     p2 = (1/3) * (2pc + p3)
 
-  x1 = (1.0 / 3.0) * (x0 + 2 * xc);
-  y1 = (1.0 / 3.0) * (y0 + 2 * yc);
-  x2 = (1.0 / 3.0) * (2 * xc + x3);
-  y2 = (1.0 / 3.0) * (2 * yc + y3);
+  x1 = (SplashCoord)(1.0 / 3.0) * (x0 + (SplashCoord)2 * xc);
+  y1 = (SplashCoord)(1.0 / 3.0) * (y0 + (SplashCoord)2 * yc);
+  x2 = (SplashCoord)(1.0 / 3.0) * ((SplashCoord)2 * xc + x3);
+  y2 = (SplashCoord)(1.0 / 3.0) * ((SplashCoord)2 * yc + y3);
 
-  ((SplashPath *)path)->curveTo(x1, y1, x2, y2, x3, y3);
+  p->path->curveTo(x1, y1, x2, y2, x3, y3);
+  p->needClose = gTrue;
   return 0;
 }
 
 static int glyphPathCubicTo(FT_Vector *ctrl1, FT_Vector *ctrl2,
 			    FT_Vector *pt, void *path) {
-  ((SplashPath *)path)->curveTo(ctrl1->x / 64.0, -ctrl1->y / 64.0,
-				ctrl2->x / 64.0, -ctrl2->y / 64.0,
-				pt->x / 64.0, -pt->y / 64.0);
+  SplashFTFontPath *p = (SplashFTFontPath *)path;
+
+  p->path->curveTo(ctrl1->x / 64.0, -ctrl1->y / 64.0,
+		   ctrl2->x / 64.0, -ctrl2->y / 64.0,
+		   pt->x / 64.0, -pt->y / 64.0);
+  p->needClose = gTrue;
   return 0;
 }
 

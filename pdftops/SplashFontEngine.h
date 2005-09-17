@@ -18,6 +18,7 @@
 class SplashT1FontEngine;
 class SplashFTFontEngine;
 class SplashDTFontEngine;
+class SplashDT4FontEngine;
 class SplashFontFile;
 class SplashFontFileID;
 class SplashFont;

@@ -27,7 +27,8 @@ class SplashPath;
 // decimal points.
 #define splashFontFractionBits 2
 #define splashFontFraction     (1 << splashFontFractionBits)
-#define splashFontFractionMul  (1 / (SplashCoord)splashFontFraction)
+#define splashFontFractionMul \
+                       ((SplashCoord)1 / (SplashCoord)splashFontFraction)
 
 //------------------------------------------------------------------------
 // SplashFont
@@ -70,6 +71,13 @@ public:
 
   // Return the path for a glyph.
   virtual SplashPath *getGlyphPath(int c) = 0;
+
+  // Return the font transform matrix.
+  SplashCoord *getMatrix() { return mat; }
+
+  // Return the glyph bounding box.
+  void getBBox(int *xMinA, int *yMinA, int *xMaxA, int *yMaxA)
+    { *xMinA = xMin; *yMinA = yMin; *xMaxA = xMax; *yMaxA = yMax; }
 
 protected:
 

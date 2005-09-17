@@ -22,10 +22,20 @@
 #include "SplashXPathScanner.h"
 #include "SplashPattern.h"
 #include "SplashScreen.h"
-#include "SplashClip.h"
 #include "SplashFont.h"
 #include "SplashGlyphBitmap.h"
 #include "Splash.h"
+
+//------------------------------------------------------------------------
+
+static void blendNormal(SplashColorPtr src, SplashColorPtr dest,
+			SplashColorPtr blend, SplashColorMode cm) {
+  int i;
+
+  for (i = 0; i < splashColorModeNComps[cm]; ++i) {
+    blend[i] = src[i];
+  }
+}
 
 //------------------------------------------------------------------------
 // Splash
@@ -34,6 +44,8 @@
 Splash::Splash(SplashBitmap *bitmapA) {
   bitmap = bitmapA;
   state = new SplashState(bitmap->width, bitmap->height);
+  softMask = NULL;
+  clearModRegion();
   debugMode = gFalse;
 }
 
@@ -42,12 +54,14 @@ Splash::~Splash() {
     restoreState();
   }
   delete state;
+  if (softMask) {
+    delete softMask;
+  }
 }
 
 //------------------------------------------------------------------------
 // state read
 //------------------------------------------------------------------------
-
 
 SplashPattern *Splash::getStrokePattern() {
   return state->strokePattern;
@@ -59,6 +73,18 @@ SplashPattern *Splash::getFillPattern() {
 
 SplashScreen *Splash::getScreen() {
   return state->screen;
+}
+
+SplashBlendFunc Splash::getBlendFunc() {
+  return state->blendFunc;
+}
+
+SplashCoord Splash::getStrokeAlpha() {
+  return state->strokeAlpha;
+}
+
+SplashCoord Splash::getFillAlpha() {
+  return state->fillAlpha;
 }
 
 SplashCoord Splash::getLineWidth() {
@@ -111,6 +137,18 @@ void Splash::setFillPattern(SplashPattern *fillPattern) {
 
 void Splash::setScreen(SplashScreen *screen) {
   state->setScreen(screen);
+}
+
+void Splash::setBlendFunc(SplashBlendFunc func) {
+  state->blendFunc = func;
+}
+
+void Splash::setStrokeAlpha(SplashCoord alpha) {
+  state->strokeAlpha = alpha;
+}
+
+void Splash::setFillAlpha(SplashCoord alpha) {
+  state->fillAlpha = alpha;
 }
 
 void Splash::setLineWidth(SplashCoord lineWidth) {
@@ -181,55 +219,172 @@ SplashError Splash::restoreState() {
 }
 
 //------------------------------------------------------------------------
+// soft mask
+//------------------------------------------------------------------------
+
+void Splash::setSoftMask(SplashBitmap *softMaskA) {
+  if (softMask) {
+    delete softMask;
+  }
+  softMask = softMaskA;
+}
+
+//------------------------------------------------------------------------
+// modified region
+//------------------------------------------------------------------------
+
+void Splash::clearModRegion() {
+  modXMin = bitmap->getWidth();
+  modYMin = bitmap->getHeight();
+  modXMax = -1;
+  modYMax = -1;
+}
+
+inline void Splash::updateModX(int x) {
+  if (x < modXMin) {
+    modXMin = x;
+  }
+  if (x > modXMax) {
+    modXMax = x;
+  }
+}
+
+inline void Splash::updateModY(int y) {
+  if (y < modYMin) {
+    modYMin = y;
+  }
+  if (y > modYMax) {
+    modYMax = y;
+  }
+}
+
+//------------------------------------------------------------------------
 // drawing operations
 //------------------------------------------------------------------------
 
-void Splash::clear(SplashColor color) {
-  SplashMono1P *mono1;
-  SplashMono8 *mono8;
-  SplashRGB8 *rgb8Row, *rgb8;
-  SplashBGR8P *bgr8Row, *bgr8;
-  SplashMono1 data;
-  int n, i, x, y;
+void Splash::clear(SplashColorPtr color) {
+  SplashColorPtr row, p;
+  Guchar mono;
+  int x, y;
 
   switch (bitmap->mode) {
   case splashModeMono1:
-    n = bitmap->rowSize * bitmap->height;
-    data = color.mono1 ? 0xff : 0x00;
-    for (i = 0, mono1 = bitmap->data.mono1; i < n; ++i, ++mono1) {
-      *mono1 = data;
+    mono = color[0] ? 0xff : 0x00;
+    if (bitmap->rowSize < 0) {
+      memset(bitmap->data + bitmap->rowSize * (bitmap->height - 1),
+	     mono, -bitmap->rowSize * bitmap->height);
+    } else {
+      memset(bitmap->data, mono, bitmap->rowSize * bitmap->height);
     }
     break;
   case splashModeMono8:
-    n = bitmap->rowSize * bitmap->height;
-    for (i = 0, mono8 = bitmap->data.mono8; i < n; ++i, ++mono8) {
-      *mono8 = color.mono8;
+    if (bitmap->rowSize < 0) {
+      memset(bitmap->data + bitmap->rowSize * (bitmap->height - 1),
+	     color[0], -bitmap->rowSize * bitmap->height);
+    } else {
+      memset(bitmap->data, color[0], bitmap->rowSize * bitmap->height);
+    }
+    break;
+  case splashModeAMono8:
+    if (color[0] == color[1]) {
+      if (bitmap->rowSize < 0) {
+	memset(bitmap->data + bitmap->rowSize * (bitmap->height - 1),
+	       color[0], -bitmap->rowSize * bitmap->height);
+      } else {
+	memset(bitmap->data, color[0], bitmap->rowSize * bitmap->height);
+      }
+    } else {
+      row = bitmap->data;
+      for (y = 0; y < bitmap->height; ++y) {
+	p = row;
+	for (x = 0; x < bitmap->width; ++x) {
+	  *p++ = color[0];
+	  *p++ = color[1];
+	}
+	row += bitmap->rowSize;
+      }
     }
     break;
   case splashModeRGB8:
-    rgb8Row = bitmap->data.rgb8;
-    for (y = 0; y < bitmap->height; ++y) {
-      rgb8 = rgb8Row;
-      for (x = 0; x < bitmap->width; ++x) {
-	*rgb8++ = color.rgb8;
+  case splashModeBGR8:
+    if (color[0] == color[1] && color[1] == color[2]) {
+      if (bitmap->rowSize < 0) {
+	memset(bitmap->data + bitmap->rowSize * (bitmap->height - 1),
+	       color[0], -bitmap->rowSize * bitmap->height);
+      } else {
+	memset(bitmap->data, color[0], bitmap->rowSize * bitmap->height);
       }
-      rgb8Row += bitmap->rowSize >> 2;
+    } else {
+      row = bitmap->data;
+      for (y = 0; y < bitmap->height; ++y) {
+	p = row;
+	for (x = 0; x < bitmap->width; ++x) {
+	  *p++ = color[0];
+	  *p++ = color[1];
+	  *p++ = color[2];
+	}
+	row += bitmap->rowSize;
+      }
     }
     break;
-  case splashModeBGR8Packed:
-    bgr8Row = bitmap->data.bgr8;
-    for (y = 0; y < bitmap->height; ++y) {
-      bgr8 = bgr8Row;
-      for (x = 0; x < bitmap->width; ++x) {
-	bgr8[2] = splashBGR8R(color.bgr8);
-	bgr8[1] = splashBGR8G(color.bgr8);
-	bgr8[0] = splashBGR8B(color.bgr8);
-	bgr8 += 3;
+  case splashModeARGB8:
+  case splashModeBGRA8:
+#if SPLASH_CMYK
+  case splashModeCMYK8:
+#endif
+    if (color[0] == color[1] && color[1] == color[2] && color[2] == color[3]) {
+      if (bitmap->rowSize < 0) {
+	memset(bitmap->data + bitmap->rowSize * (bitmap->height - 1),
+	       color[0], -bitmap->rowSize * bitmap->height);
+      } else {
+	memset(bitmap->data, color[0], bitmap->rowSize * bitmap->height);
       }
-      bgr8Row += bitmap->rowSize;
+    } else {
+      row = bitmap->data;
+      for (y = 0; y < bitmap->height; ++y) {
+	p = row;
+	for (x = 0; x < bitmap->width; ++x) {
+	  *p++ = color[0];
+	  *p++ = color[1];
+	  *p++ = color[2];
+	  *p++ = color[3];
+	}
+	row += bitmap->rowSize;
+      }
     }
     break;
+#if SPLASH_CMYK
+  case splashModeACMYK8:
+    if (color[0] == color[1] && color[1] == color[2] &&
+	color[2] == color[3] && color[3] == color[4]) {
+      if (bitmap->rowSize < 0) {
+	memset(bitmap->data + bitmap->rowSize * (bitmap->height - 1),
+	       color[0], -bitmap->rowSize * bitmap->height);
+      } else {
+	memset(bitmap->data, color[0], bitmap->rowSize * bitmap->height);
+      }
+    } else {
+      row = bitmap->data;
+      for (y = 0; y < bitmap->height; ++y) {
+	p = row;
+	for (x = 0; x < bitmap->width; ++x) {
+	  *p++ = color[0];
+	  *p++ = color[1];
+	  *p++ = color[2];
+	  *p++ = color[3];
+	  *p++ = color[4];
+	}
+	row += bitmap->rowSize;
+      }
+    }
+    break;
+#endif
   }
+
+  updateModX(0);
+  updateModY(0);
+  updateModX(bitmap->width - 1);
+  updateModY(bitmap->height - 1);
 }
 
 SplashError Splash::stroke(SplashPath *path) {
@@ -237,13 +392,18 @@ SplashError Splash::stroke(SplashPath *path) {
 
   if (debugMode) {
     printf("stroke [dash:%d] [width:%.2f]:\n",
-	   state->lineDashLength, state->lineWidth);
+	   state->lineDashLength, (double)state->lineWidth);
     dumpPath(path);
   }
+  opClipRes = splashClipAllOutside;
   if (path->length == 0) {
     return splashErrEmptyPath;
   }
   xPath = new SplashXPath(path, state->flatness, gFalse);
+  if (xPath->length == 0) {
+    delete xPath;
+    return splashErrEmptyPath;
+  }
   if (state->lineDashLength > 0) {
     xPath2 = makeDashedPath(xPath);
     delete xPath;
@@ -263,6 +423,7 @@ void Splash::strokeNarrow(SplashXPath *xPath) {
   int x0, x1, x2, x3, y0, y1, x, y, t;
   SplashCoord dx, dy, dxdy;
   SplashClipResult clipRes;
+  int nClipRes[3];
   int i;
 
   for (i = 0, seg = xPath->segs; i < xPath->length; ++i, ++seg) {
@@ -279,7 +440,7 @@ void Splash::strokeNarrow(SplashXPath *xPath) {
       }
       if ((clipRes = state->clip->testSpan(x0, x1, y0))
 	  != splashClipAllOutside) {
-	drawSpan(x0, x1, y0, state->strokePattern,
+	drawSpan(x0, x1, y0, state->strokePattern, state->strokeAlpha,
 		 clipRes == splashClipAllInside);
       }
 
@@ -299,24 +460,32 @@ void Splash::strokeNarrow(SplashXPath *xPath) {
 	  != splashClipAllOutside) {
 	if (dx > 0) {
 	  x2 = x0;
-	  for (y = y0; y < y1; ++y) {
-	    x3 = splashFloor(seg->x0 + (y + 1 - seg->y0) * dxdy);
+	  x3 = splashFloor(seg->x0 + ((SplashCoord)y0 + 1 - seg->y0) * dxdy);
+	  drawSpan(x2, (x2 <= x3 - 1) ? x3 - 1 : x2, y0, state->strokePattern,
+		   state->strokeAlpha, clipRes == splashClipAllInside);
+	  x2 = x3;
+	  for (y = y0 + 1; y <= y1 - 1; ++y) {
+	    x3 = splashFloor(seg->x0 + ((SplashCoord)y + 1 - seg->y0) * dxdy);
 	    drawSpan(x2, x3 - 1, y, state->strokePattern,
-		     clipRes == splashClipAllInside);
+		     state->strokeAlpha, clipRes == splashClipAllInside);
 	    x2 = x3;
 	  }
-	  drawSpan(x2, x1, y, state->strokePattern,
-		   clipRes == splashClipAllInside);
+	  drawSpan(x2, x2 <= x1 ? x1 : x2, y1, state->strokePattern,
+		   state->strokeAlpha, clipRes == splashClipAllInside);
 	} else {
 	  x2 = x0;
-	  for (y = y0; y < y1; ++y) {
-	    x3 = splashFloor(seg->x0 + (y + 1 - seg->y0) * dxdy);
+	  x3 = splashFloor(seg->x0 + ((SplashCoord)y0 + 1 - seg->y0) * dxdy);
+	  drawSpan((x3 + 1 <= x2) ? x3 + 1 : x2, x2, y0, state->strokePattern,
+		   state->strokeAlpha, clipRes == splashClipAllInside);
+	  x2 = x3;
+	  for (y = y0 + 1; y <= y1 - 1; ++y) {
+	    x3 = splashFloor(seg->x0 + ((SplashCoord)y + 1 - seg->y0) * dxdy);
 	    drawSpan(x3 + 1, x2, y, state->strokePattern,
-		     clipRes == splashClipAllInside);
+		     state->strokeAlpha, clipRes == splashClipAllInside);
 	    x2 = x3;
 	  }
-	  drawSpan(x1, x2, y, state->strokePattern,
-		   clipRes == splashClipAllInside);
+	  drawSpan(x1, (x1 <= x2) ? x2 : x1, y1, state->strokePattern,
+		   state->strokeAlpha, clipRes == splashClipAllInside);
 	}
       }
 
@@ -324,18 +493,32 @@ void Splash::strokeNarrow(SplashXPath *xPath) {
     } else {
       dxdy = seg->dxdy;
       if (y0 > y1) {
+	t = x0; x0 = x1; x1 = t;
 	t = y0; y0 = y1; y1 = t;
       }
       if ((clipRes = state->clip->testRect(x0 <= x1 ? x0 : x1, y0,
 					   x0 <= x1 ? x1 : x0, y1))
 	  != splashClipAllOutside) {
-	for (y = y0; y <= y1; ++y) {
-	  x = splashFloor(seg->x0 + (y - seg->y0) * dxdy);
-	  drawPixel(x, y, state->strokePattern,
+	drawPixel(x0, y0, state->strokePattern, state->strokeAlpha,
+		  clipRes == splashClipAllInside);
+	for (y = y0 + 1; y <= y1 - 1; ++y) {
+	  x = splashFloor(seg->x0 + ((SplashCoord)y - seg->y0) * dxdy);
+	  drawPixel(x, y, state->strokePattern, state->strokeAlpha,
 		    clipRes == splashClipAllInside);
 	}
+	drawPixel(x1, y1, state->strokePattern, state->strokeAlpha,
+		  clipRes == splashClipAllInside);
       }
     }
+    ++nClipRes[clipRes];
+  }
+  if (nClipRes[splashClipPartial] ||
+      (nClipRes[splashClipAllInside] && nClipRes[splashClipAllOutside])) {
+    opClipRes = splashClipPartial;
+  } else if (nClipRes[splashClipAllInside]) {
+    opClipRes = splashClipAllInside;
+  } else {
+    opClipRes = splashClipAllOutside;
   }
 }
 
@@ -363,12 +546,12 @@ void Splash::strokeWide(SplashXPath *xPath) {
 	    dxPrev = 0;
 	    dyPrev = 1;
 	  } else {
-	    d = 1 / d;
+	    d = (SplashCoord)1 / d;
 	    dxPrev = d * (seg2->x1 - seg2->x0);
 	    dyPrev = d * (seg2->y1 - seg2->y0);
 	  }
-	  wdxPrev = 0.5 * state->lineWidth * dxPrev;
-	  wdyPrev = 0.5 * state->lineWidth * dyPrev;
+	  wdxPrev = (SplashCoord)0.5 * state->lineWidth * dxPrev;
+	  wdyPrev = (SplashCoord)0.5 * state->lineWidth * dyPrev;
 	  break;
 	}
       }
@@ -387,12 +570,12 @@ void Splash::strokeWide(SplashXPath *xPath) {
       dx = 0;
       dy = 1;
     } else {
-      d = 1 / d;
+      d = (SplashCoord)1 / d;
       dx = d * (seg->x1 - seg->x0);
       dy = d * (seg->y1 - seg->y0);
     }
-    wdx = 0.5 * state->lineWidth * dx;
-    wdy = 0.5 * state->lineWidth * dy;
+    wdx = (SplashCoord)0.5 * state->lineWidth * dx;
+    wdy = (SplashCoord)0.5 * state->lineWidth * dy;
 
     // initialize the path (which will be filled)
     widePath = new SplashPath();
@@ -443,7 +626,7 @@ void Splash::strokeWide(SplashXPath *xPath) {
     widePath->lineTo(seg->x0 - wdy, seg->y0 + wdx);
 
     // fill the segment
-    fillWithPattern(widePath, gTrue, state->strokePattern);
+    fillWithPattern(widePath, gTrue, state->strokePattern, state->strokeAlpha);
     delete widePath;
 
     // draw the line join
@@ -452,10 +635,10 @@ void Splash::strokeWide(SplashXPath *xPath) {
       switch (state->lineJoin) {
       case splashLineJoinMiter:
 	dotprod = -(dx * dxPrev + dy * dyPrev);
-	if (fabs(fabs(dotprod) - 1) > 0.01) {
+	if (splashAbs(splashAbs(dotprod) - 1) > 0.01) {
 	  widePath = new SplashPath();
 	  widePath->moveTo(seg->x0, seg->y0);
-	  miter = 2 / (1 - dotprod);
+	  miter = (SplashCoord)2 / ((SplashCoord)1 - dotprod);
 	  if (splashSqrt(miter) <= state->miterLimit) {
 	    miter = splashSqrt(miter - 1);
 	    if (dy * dxPrev > dx * dyPrev) {
@@ -498,7 +681,8 @@ void Splash::strokeWide(SplashXPath *xPath) {
 	break;
       }
       if (widePath) {
-	fillWithPattern(widePath, gTrue, state->strokePattern);
+	fillWithPattern(widePath, gTrue, state->strokePattern,
+			state->strokeAlpha);
 	delete widePath;
       }
     }
@@ -524,7 +708,7 @@ SplashXPath *Splash::makeDashedPath(SplashXPath *xPath) {
   }
   lineDashStartPhase = state->lineDashPhase;
   i = splashFloor(lineDashStartPhase / lineDashTotal);
-  lineDashStartPhase -= i * lineDashTotal;
+  lineDashStartPhase -= (SplashCoord)i * lineDashTotal;
   lineDashStartOn = gTrue;
   lineDashStartIdx = 0;
   while (lineDashStartPhase >= state->lineDash[lineDashStartIdx]) {
@@ -622,11 +806,12 @@ SplashError Splash::fill(SplashPath *path, GBool eo) {
     printf("fill [eo:%d]:\n", eo);
     dumpPath(path);
   }
-  return fillWithPattern(path, eo, state->fillPattern);
+  return fillWithPattern(path, eo, state->fillPattern, state->fillAlpha);
 }
 
 SplashError Splash::fillWithPattern(SplashPath *path, GBool eo,
-				    SplashPattern *pattern) {
+				    SplashPattern *pattern,
+				    SplashCoord alpha) {
   SplashXPath *xPath;
   SplashXPathScanner *scanner;
   int xMinI, yMinI, xMaxI, yMaxI, x0, x1, y;
@@ -646,18 +831,34 @@ SplashError Splash::fillWithPattern(SplashPath *path, GBool eo,
   if ((clipRes = state->clip->testRect(xMinI, yMinI, xMaxI, yMaxI))
       != splashClipAllOutside) {
 
+    // limit the y range
+    if (yMinI < state->clip->getYMin()) {
+      yMinI = state->clip->getYMin();
+    }
+    if (yMaxI > state->clip->getYMax()) {
+      yMaxI = state->clip->getYMax();
+    }
+
     // draw the spans
     for (y = yMinI; y <= yMaxI; ++y) {
       while (scanner->getNextSpan(y, &x0, &x1)) {
 	if (clipRes == splashClipAllInside) {
-	  drawSpan(x0, x1, y, pattern, gTrue);
+	  drawSpan(x0, x1, y, pattern, alpha, gTrue);
 	} else {
+	  // limit the x range
+	  if (x0 < state->clip->getXMin()) {
+	    x0 = state->clip->getXMin();
+	  }
+	  if (x1 > state->clip->getXMax()) {
+	    x1 = state->clip->getXMax();
+	  }
 	  clipRes2 = state->clip->testSpan(x0, x1, y);
-	  drawSpan(x0, x1, y, pattern, clipRes2 == splashClipAllInside);
+	  drawSpan(x0, x1, y, pattern, alpha, clipRes2 == splashClipAllInside);
 	}
       }
     }
   }
+  opClipRes = clipRes;
 
   delete scanner;
   delete xPath;
@@ -684,12 +885,27 @@ SplashError Splash::xorFill(SplashPath *path, GBool eo) {
   if ((clipRes = state->clip->testRect(xMinI, yMinI, xMaxI, yMaxI))
       != splashClipAllOutside) {
 
+    // limit the y range
+    if (yMinI < state->clip->getYMin()) {
+      yMinI = state->clip->getYMin();
+    }
+    if (yMaxI > state->clip->getYMax()) {
+      yMaxI = state->clip->getYMax();
+    }
+
     // draw the spans
     for (y = yMinI; y <= yMaxI; ++y) {
       while (scanner->getNextSpan(y, &x0, &x1)) {
 	if (clipRes == splashClipAllInside) {
 	  xorSpan(x0, x1, y, state->fillPattern, gTrue);
 	} else {
+	  // limit the x range
+	  if (x0 < state->clip->getXMin()) {
+	    x0 = state->clip->getXMin();
+	  }
+	  if (x1 > state->clip->getXMax()) {
+	    x1 = state->clip->getXMax();
+	  }
 	  clipRes2 = state->clip->testSpan(x0, x1, y);
 	  xorSpan(x0, x1, y, state->fillPattern,
 		  clipRes2 == splashClipAllInside);
@@ -697,325 +913,1048 @@ SplashError Splash::xorFill(SplashPath *path, GBool eo) {
       }
     }
   }
+  opClipRes = clipRes;
 
   delete scanner;
   delete xPath;
   return splashOk;
 }
 
-void Splash::drawPixel(int x, int y, SplashColor *color, GBool noClip) {
-  SplashMono1P *mono1;
-  SplashBGR8P *bgr8;
+void Splash::drawPixel(int x, int y, SplashColorPtr color,
+		       SplashCoord alpha, GBool noClip) {
+  SplashBlendFunc blendFunc;
+  SplashColorPtr p;
+  SplashColor dest, blend;
+  int alpha2, ialpha2;
+  Guchar t;
 
   if (noClip || state->clip->test(x, y)) {
-    switch (bitmap->mode) {
-    case splashModeMono1:
-      mono1 = &bitmap->data.mono8[y * bitmap->rowSize + (x >> 3)];
-      if (color->mono1) {
-	*mono1 |= 0x80 >> (x & 7);
+    if (alpha != 1 || softMask || state->blendFunc) {
+      blendFunc = state->blendFunc ? state->blendFunc : &blendNormal;
+      if (softMask) {
+	alpha2 = (int)(alpha * softMask->data[y * softMask->rowSize + x]);
       } else {
-	*mono1 &= ~(0x80 >> (x & 7));
+	alpha2 = (int)(alpha * 255);
       }
-      break;
-    case splashModeMono8:
-      bitmap->data.mono8[y * bitmap->rowSize + x] = color->mono8;
-      break;
-    case splashModeRGB8:
-      bitmap->data.rgb8[y * (bitmap->rowSize >> 2) + x] = color->rgb8;
-      break;
-    case splashModeBGR8Packed:
-      bgr8 = &bitmap->data.bgr8[y * bitmap->rowSize + 3 * x];
-      bgr8[2] = splashBGR8R(color->bgr8);
-      bgr8[1] = splashBGR8G(color->bgr8);
-      bgr8[0] = splashBGR8B(color->bgr8);
-      break;
+      ialpha2 = 255 - alpha2;
+      switch (bitmap->mode) {
+      case splashModeMono1:
+	p = &bitmap->data[y * bitmap->rowSize + (x >> 3)];
+	dest[0] = (*p >> (7 - (x & 7))) & 1;
+	(*blendFunc)(color, dest, blend, bitmap->mode);
+	t = (alpha2 * blend[0] + ialpha2 * dest[0]) >> 8;
+	if (t) {
+	  *p |= 0x80 >> (x & 7);
+	} else {
+	  *p &= ~(0x80 >> (x & 7));
+	}
+	break;
+      case splashModeMono8:
+	p = &bitmap->data[y * bitmap->rowSize + x];
+	(*blendFunc)(color, p, blend, bitmap->mode);
+	// note: floor(x / 255) = x >> 8 (for 16-bit x)
+	p[0] = (alpha2 * blend[0] + ialpha2 * p[0]) >> 8;
+	break;
+      case splashModeAMono8:
+	p = &bitmap->data[y * bitmap->rowSize + 2 * x];
+	(*blendFunc)(color, p, blend, bitmap->mode);
+	p[0] = (alpha2 * blend[0] + ialpha2 * p[0]) >> 8;
+	p[1] = (alpha2 * blend[1] + ialpha2 * p[1]) >> 8;
+	break;
+      case splashModeRGB8:
+      case splashModeBGR8:
+	p = &bitmap->data[y * bitmap->rowSize + 3 * x];
+	(*blendFunc)(color, p, blend, bitmap->mode);
+	p[0] = (alpha2 * blend[0] + ialpha2 * p[0]) >> 8;
+	p[1] = (alpha2 * blend[1] + ialpha2 * p[1]) >> 8;
+	p[2] = (alpha2 * blend[2] + ialpha2 * p[2]) >> 8;
+	break;
+      case splashModeARGB8:
+      case splashModeBGRA8:
+#if SPLASH_CMYK
+      case splashModeCMYK8:
+#endif
+	p = &bitmap->data[y * bitmap->rowSize + 4 * x];
+	(*blendFunc)(color, p, blend, bitmap->mode);
+	p[0] = (alpha2 * blend[0] + ialpha2 * p[0]) >> 8;
+	p[1] = (alpha2 * blend[1] + ialpha2 * p[1]) >> 8;
+	p[2] = (alpha2 * blend[2] + ialpha2 * p[2]) >> 8;
+	p[3] = (alpha2 * blend[3] + ialpha2 * p[3]) >> 8;
+	break;
+#if SPLASH_CMYK
+      case splashModeACMYK8:
+	p = &bitmap->data[y * bitmap->rowSize + 5 * x];
+	(*blendFunc)(color, p, blend, bitmap->mode);
+	p[0] = (alpha2 * blend[0] + ialpha2 * p[0]) >> 8;
+	p[1] = (alpha2 * blend[1] + ialpha2 * p[1]) >> 8;
+	p[2] = (alpha2 * blend[2] + ialpha2 * p[2]) >> 8;
+	p[3] = (alpha2 * blend[3] + ialpha2 * p[3]) >> 8;
+	p[4] = (alpha2 * blend[4] + ialpha2 * p[4]) >> 8;
+	break;
+#endif
+      }
+    } else {
+      switch (bitmap->mode) {
+      case splashModeMono1:
+	p = &bitmap->data[y * bitmap->rowSize + (x >> 3)];
+	if (color[0]) {
+	  *p |= 0x80 >> (x & 7);
+	} else {
+	  *p &= ~(0x80 >> (x & 7));
+	}
+	break;
+      case splashModeMono8:
+	p = &bitmap->data[y * bitmap->rowSize + x];
+	p[0] = color[0];
+	break;
+      case splashModeAMono8:
+	p = &bitmap->data[y * bitmap->rowSize + 2 * x];
+	p[0] = color[0];
+	p[1] = color[1];
+	break;
+      case splashModeRGB8:
+      case splashModeBGR8:
+	p = &bitmap->data[y * bitmap->rowSize + 3 * x];
+	p[0] = color[0];
+	p[1] = color[1];
+	p[2] = color[2];
+	break;
+      case splashModeARGB8:
+      case splashModeBGRA8:
+#if SPLASH_CMYK
+      case splashModeCMYK8:
+#endif
+	p = &bitmap->data[y * bitmap->rowSize + 4 * x];
+	p[0] = color[0];
+	p[1] = color[1];
+	p[2] = color[2];
+	p[3] = color[3];
+	break;
+#if SPLASH_CMYK
+      case splashModeACMYK8:
+	p = &bitmap->data[y * bitmap->rowSize + 5 * x];
+	p[0] = color[0];
+	p[1] = color[1];
+	p[2] = color[2];
+	p[3] = color[3];
+	p[4] = color[4];
+	break;
+#endif
+      }
     }
+    updateModX(x);
+    updateModY(y);
   }
 }
 
-void Splash::drawPixel(int x, int y, SplashPattern *pattern, GBool noClip) {
+void Splash::drawPixel(int x, int y, SplashPattern *pattern,
+		       SplashCoord alpha, GBool noClip) {
+  SplashBlendFunc blendFunc;
   SplashColor color;
-  SplashMono1P *mono1;
-  SplashBGR8P *bgr8;
+  SplashColorPtr p;
+  SplashColor dest, blend;
+  int alpha2, ialpha2;
+  Guchar t;
 
   if (noClip || state->clip->test(x, y)) {
-    color = pattern->getColor(x, y);
-    switch (bitmap->mode) {
-    case splashModeMono1:
-      mono1 = &bitmap->data.mono8[y * bitmap->rowSize + (x >> 3)];
-      if (color.mono1) {
-	*mono1 |= 0x80 >> (x & 7);
+    if (alpha != 1 || softMask || state->blendFunc) {
+      blendFunc = state->blendFunc ? state->blendFunc : &blendNormal;
+      pattern->getColor(x, y, color);
+      if (softMask) {
+	alpha2 = (int)(alpha * softMask->data[y * softMask->rowSize + x]);
       } else {
-	*mono1 &= ~(0x80 >> (x & 7));
+	alpha2 = (int)(alpha * 255);
       }
-      break;
-    case splashModeMono8:
-      bitmap->data.mono8[y * bitmap->rowSize + x] = color.mono8;
-      break;
-    case splashModeRGB8:
-      bitmap->data.rgb8[y * (bitmap->rowSize >> 2) + x] = color.rgb8;
-      break;
-    case splashModeBGR8Packed:
-      bgr8 = &bitmap->data.bgr8[y * bitmap->rowSize + 3 * x];
-      bgr8[2] = splashBGR8R(color.bgr8);
-      bgr8[1] = splashBGR8G(color.bgr8);
-      bgr8[0] = splashBGR8B(color.bgr8);
-      break;
+      ialpha2 = 255 - alpha2;
+      switch (bitmap->mode) {
+      case splashModeMono1:
+	p = &bitmap->data[y * bitmap->rowSize + (x >> 3)];
+	dest[0] = (*p >> (7 - (x & 7))) & 1;
+	(*blendFunc)(color, dest, blend, bitmap->mode);
+	t = (alpha2 * blend[0] + ialpha2 * dest[0]) >> 8;
+	if (t) {
+	  *p |= 0x80 >> (x & 7);
+	} else {
+	  *p &= ~(0x80 >> (x & 7));
+	}
+	break;
+      case splashModeMono8:
+	p = &bitmap->data[y * bitmap->rowSize + x];
+	(*blendFunc)(color, p, blend, bitmap->mode);
+	// note: floor(x / 255) = x >> 8 (for 16-bit x)
+	p[0] = (alpha2 * blend[0] + ialpha2 * p[0]) >> 8;
+	break;
+      case splashModeAMono8:
+	p = &bitmap->data[y * bitmap->rowSize + 2 * x];
+	(*blendFunc)(color, p, blend, bitmap->mode);
+	p[0] = (alpha2 * blend[0] + ialpha2 * p[0]) >> 8;
+	p[1] = (alpha2 * blend[1] + ialpha2 * p[1]) >> 8;
+	break;
+      case splashModeRGB8:
+      case splashModeBGR8:
+	p = &bitmap->data[y * bitmap->rowSize + 3 * x];
+	(*blendFunc)(color, p, blend, bitmap->mode);
+	p[0] = (alpha2 * blend[0] + ialpha2 * p[0]) >> 8;
+	p[1] = (alpha2 * blend[1] + ialpha2 * p[1]) >> 8;
+	p[2] = (alpha2 * blend[2] + ialpha2 * p[2]) >> 8;
+	break;
+      case splashModeARGB8:
+      case splashModeBGRA8:
+#if SPLASH_CMYK
+      case splashModeCMYK8:
+#endif
+	p = &bitmap->data[y * bitmap->rowSize + 4 * x];
+	(*blendFunc)(color, p, blend, bitmap->mode);
+	p[0] = (alpha2 * blend[0] + ialpha2 * p[0]) >> 8;
+	p[1] = (alpha2 * blend[1] + ialpha2 * p[1]) >> 8;
+	p[2] = (alpha2 * blend[2] + ialpha2 * p[2]) >> 8;
+	p[3] = (alpha2 * blend[3] + ialpha2 * p[3]) >> 8;
+	break;
+#if SPLASH_CMYK
+      case splashModeACMYK8:
+	p = &bitmap->data[y * bitmap->rowSize + 5 * x];
+	(*blendFunc)(color, p, blend, bitmap->mode);
+	p[0] = (alpha2 * blend[0] + ialpha2 * p[0]) >> 8;
+	p[1] = (alpha2 * blend[1] + ialpha2 * p[1]) >> 8;
+	p[2] = (alpha2 * blend[2] + ialpha2 * p[2]) >> 8;
+	p[3] = (alpha2 * blend[3] + ialpha2 * p[3]) >> 8;
+	p[4] = (alpha2 * blend[4] + ialpha2 * p[4]) >> 8;
+	break;
+#endif
+      }
+    } else {
+      pattern->getColor(x, y, color);
+      switch (bitmap->mode) {
+      case splashModeMono1:
+	p = &bitmap->data[y * bitmap->rowSize + (x >> 3)];
+	if (color[0]) {
+	  *p |= 0x80 >> (x & 7);
+	} else {
+	  *p &= ~(0x80 >> (x & 7));
+	}
+	break;
+      case splashModeMono8:
+	p = &bitmap->data[y * bitmap->rowSize + x];
+	p[0] = color[0];
+	break;
+      case splashModeAMono8:
+	p = &bitmap->data[y * bitmap->rowSize + 2 * x];
+	p[0] = color[0];
+	p[1] = color[1];
+	break;
+      case splashModeRGB8:
+      case splashModeBGR8:
+	p = &bitmap->data[y * bitmap->rowSize + 3 * x];
+	p[0] = color[0];
+	p[1] = color[1];
+	p[2] = color[2];
+	break;
+      case splashModeARGB8:
+      case splashModeBGRA8:
+#if SPLASH_CMYK
+      case splashModeCMYK8:
+#endif
+	p = &bitmap->data[y * bitmap->rowSize + 4 * x];
+	p[0] = color[0];
+	p[1] = color[1];
+	p[2] = color[2];
+	p[3] = color[3];
+	break;
+#if SPLASH_CMYK
+      case splashModeACMYK8:
+	p = &bitmap->data[y * bitmap->rowSize + 5 * x];
+	p[0] = color[0];
+	p[1] = color[1];
+	p[2] = color[2];
+	p[3] = color[3];
+	p[4] = color[4];
+	break;
+#endif
+      }
     }
+    updateModX(x);
+    updateModY(y);
   }
 }
 
 void Splash::drawSpan(int x0, int x1, int y, SplashPattern *pattern,
-		      GBool noClip) {
+		      SplashCoord alpha, GBool noClip) {
+  SplashBlendFunc blendFunc;
   SplashColor color;
-  SplashMono1P *mono1;
-  SplashMono8 *mono8;
-  SplashRGB8 *rgb8;
-  SplashBGR8P *bgr8;
-  SplashMono1 mask1;
+  SplashColorPtr p;
+  SplashColor dest, blend;
+  Guchar mask, t;
+  int alpha2, ialpha2;
   int i, j, n;
 
   n = x1 - x0 + 1;
 
-  switch (bitmap->mode) {
-  case splashModeMono1:
-    mono1 = &bitmap->data.mono8[y * bitmap->rowSize + (x0 >> 3)];
-    i = 0;
-    if (pattern->isStatic()) {
-      color = pattern->getColor(0, 0);
-      if ((j = x0 & 7)) {
-	mask1 = 0x80 >> j;
-	for (; j < 8 && i < n; ++i, ++j) {
-	  if (noClip || state->clip->test(x0 + i, y)) {
-	    if (color.mono1) {
-	      *mono1 |= mask1;
-	    } else {
-	      *mono1 &= ~mask1;
-	    }
-	  }
-	  mask1 >>= 1;
-	}
-	++mono1;
-      }
-      while (i < n) {
-	mask1 = 0x80;
-	for (j = 0; j < 8 && i < n; ++i, ++j) {
-	  if (noClip || state->clip->test(x0 + i, y)) {
-	    if (color.mono1) {
-	      *mono1 |= mask1;
-	    } else {
-	      *mono1 &= ~mask1;
-	    }
-	  }
-	  mask1 >>= 1;
-	}
-	++mono1;
-      }
-    } else {
-      if ((j = x0 & 7)) {
-	mask1 = 0x80 >> j;
-	for (; j < 8 && i < n; ++i, ++j) {
-	  if (noClip || state->clip->test(x0 + i, y)) {
-	    color = pattern->getColor(x0 + i, y);
-	    if (color.mono1) {
-	      *mono1 |= mask1;
-	    } else {
-	      *mono1 &= ~mask1;
-	    }
-	  }
-	  mask1 >>= 1;
-	}
-	++mono1;
-      }
-      while (i < n) {
-	mask1 = 0x80;
-	for (j = 0; j < 8 && i < n; ++i, ++j) {
-	  if (noClip || state->clip->test(x0 + i, y)) {
-	    color = pattern->getColor(x0 + i, y);
-	    if (color.mono1) {
-	      *mono1 |= mask1;
-	    } else {
-	      *mono1 &= ~mask1;
-	    }
-	  }
-	  mask1 >>= 1;
-	}
-	++mono1;
-      }
-    }
-    break;
+  if (noClip) {
+    updateModX(x0);
+    updateModX(x1);
+    updateModY(y);
+  }
 
-  case splashModeMono8:
-    mono8 = &bitmap->data.mono8[y * bitmap->rowSize + x0];
-    if (pattern->isStatic()) {
-      color = pattern->getColor(0, 0);
-      for (i = 0; i < n; ++i) {
-	if (noClip || state->clip->test(x0 + i, y)) {
-	  *mono8 = color.mono8;
-	}
-	++mono8;
-      }
+  if (alpha != 1 || softMask || state->blendFunc) {
+    blendFunc = state->blendFunc ? state->blendFunc : &blendNormal;
+    if (softMask) {
+      alpha2 = ialpha2 = 0; // make gcc happy
     } else {
-      for (i = 0; i < n; ++i) {
-	if (noClip || state->clip->test(x0 + i, y)) {
-	  color = pattern->getColor(x0 + i, y);
-	  *mono8 = color.mono8;
-	}
-	++mono8;
-      }
+      alpha2 = (int)(alpha * 255);
+      ialpha2 = 255 - alpha2;
     }
-    break;
+    switch (bitmap->mode) {
+    case splashModeMono1:
+      p = &bitmap->data[y * bitmap->rowSize + (x0 >> 3)];
+      i = 0;
+      if (pattern->isStatic()) {
+	pattern->getColor(0, 0, color);
+	if ((j = x0 & 7)) {
+	  mask = 0x80 >> j;
+	  for (; j < 8 && i < n; ++i, ++j) {
+	    if (noClip || state->clip->test(x0 + i, y)) {
+	      if (softMask) {
+		alpha2 = (int)(alpha *
+			       softMask->data[y * softMask->rowSize + x0 + i]);
+		ialpha2 = 255 - alpha2;
+	      }
+	      dest[0] = (*p >> (7 - j)) & 1;
+	      (*blendFunc)(color, dest, blend, bitmap->mode);
+	      t = (alpha2 * blend[0] + ialpha2 * dest[0]) >> 8;
+	      if (t) {
+		*p |= mask;
+	      } else {
+		*p &= ~mask;
+	      }
+	      if (!noClip) {
+		updateModX(x0 + i);
+		updateModY(y);
+	      }
+	    }
+	    mask >>= 1;
+	  }
+	  ++p;
+	}
+	while (i < n) {
+	  mask = 0x80;
+	  for (j = 0; j < 8 && i < n; ++i, ++j) {
+	    if (noClip || state->clip->test(x0 + i, y)) {
+	      if (softMask) {
+		alpha2 = (int)(alpha *
+			       softMask->data[y * softMask->rowSize + x0 + i]);
+		ialpha2 = 255 - alpha2;
+	      }
+	      dest[0] = (*p >> (7 - j)) & 1;
+	      (*blendFunc)(color, dest, blend, bitmap->mode);
+	      t = (alpha2 * blend[0] + ialpha2 * dest[0]) >> 8;
+	      if (t) {
+		*p |= mask;
+	      } else {
+		*p &= ~mask;
+	      }
+	      if (!noClip) {
+		updateModX(x0 + i);
+		updateModY(y);
+	      }
+	    }
+	    mask >>= 1;
+	  }
+	  ++p;
+	}
+      } else {
+	if ((j = x0 & 7)) {
+	  mask = 0x80 >> j;
+	  for (; j < 8 && i < n; ++i, ++j) {
+	    if (noClip || state->clip->test(x0 + i, y)) {
+	      pattern->getColor(x0 + i, y, color);
+	      if (softMask) {
+		alpha2 = (int)(alpha *
+			       softMask->data[y * softMask->rowSize + x0 + i]);
+		ialpha2 = 255 - alpha2;
+	      }
+	      dest[0] = (*p >> (7 - j)) & 1;
+	      (*blendFunc)(color, dest, blend, bitmap->mode);
+	      t = (alpha2 * blend[0] + ialpha2 * dest[0]) >> 8;
+	      if (t) {
+		*p |= mask;
+	      } else {
+		*p &= ~mask;
+	      }
+	      if (!noClip) {
+		updateModX(x0 + i);
+		updateModY(y);
+	      }
+	    }
+	    mask >>= 1;
+	  }
+	  ++p;
+	}
+	while (i < n) {
+	  mask = 0x80;
+	  for (j = 0; j < 8 && i < n; ++i, ++j) {
+	    if (noClip || state->clip->test(x0 + i, y)) {
+	      pattern->getColor(x0 + i, y, color);
+	      if (softMask) {
+		alpha2 = (int)(alpha *
+			       softMask->data[y * softMask->rowSize + x0 + i]);
+		ialpha2 = 255 - alpha2;
+	      }
+	      dest[0] = (*p >> (7 - j)) & 1;
+	      (*blendFunc)(color, dest, blend, bitmap->mode);
+	      t = (alpha2 * blend[0] + ialpha2 * dest[0]) >> 8;
+	      if (t) {
+		*p |= mask;
+	      } else {
+		*p &= ~mask;
+	      }
+	      if (!noClip) {
+		updateModX(x0 + i);
+		updateModY(y);
+	      }
+	    }
+	    mask >>= 1;
+	  }
+	  ++p;
+	}
+      }
+      break;
 
-  case splashModeRGB8:
-    rgb8 = &bitmap->data.rgb8[y * (bitmap->rowSize >> 2) + x0];
-    if (pattern->isStatic()) {
-      color = pattern->getColor(0, 0);
-      for (i = 0; i < n; ++i) {
-	if (noClip || state->clip->test(x0 + i, y)) {
-	  *rgb8 = color.rgb8;
+    case splashModeMono8:
+      p = &bitmap->data[y * bitmap->rowSize + x0];
+      if (pattern->isStatic()) {
+	pattern->getColor(0, 0, color);
+	for (i = 0; i < n; ++i) {
+	  if (noClip || state->clip->test(x0 + i, y)) {
+	    if (softMask) {
+	      alpha2 = (int)(alpha *
+			     softMask->data[y * softMask->rowSize + x0 + i]);
+	      ialpha2 = 255 - alpha2;
+	    }
+	    (*blendFunc)(color, p, blend, bitmap->mode);
+	    *p = (alpha2 * blend[0] + ialpha2 * *p) >> 8;
+	    if (!noClip) {
+	      updateModX(x0 + i);
+	      updateModY(y);
+	    }
+	  }
+	  ++p;
 	}
-	++rgb8;
-      }
-    } else {
-      for (i = 0; i < n; ++i) {
-	if (noClip || state->clip->test(x0 + i, y)) {
-	  color = pattern->getColor(x0 + i, y);
-	  *rgb8 = color.rgb8;
+      } else {
+	for (i = 0; i < n; ++i) {
+	  if (noClip || state->clip->test(x0 + i, y)) {
+	    pattern->getColor(x0 + i, y, color);
+	    if (softMask) {
+	      alpha2 = (int)(alpha *
+			     softMask->data[y * softMask->rowSize + x0 + i]);
+	      ialpha2 = 255 - alpha2;
+	    }
+	    (*blendFunc)(color, p, blend, bitmap->mode);
+	    *p = (alpha2 * blend[0] + ialpha2 * *p) >> 8;
+	    if (!noClip) {
+	      updateModX(x0 + i);
+	      updateModY(y);
+	    }
+	  }
+	  ++p;
 	}
-	++rgb8;
       }
-    }
-    break;
+      break;
 
-  case splashModeBGR8Packed:
-    bgr8 = &bitmap->data.bgr8[y * bitmap->rowSize + 3 * x0];
-    if (pattern->isStatic()) {
-      color = pattern->getColor(0, 0);
-      for (i = 0; i < n; ++i) {
-	if (noClip || state->clip->test(x0 + i, y)) {
-	  bgr8[2] = splashBGR8R(color.bgr8);
-	  bgr8[1] = splashBGR8G(color.bgr8);
-	  bgr8[0] = splashBGR8B(color.bgr8);
+    case splashModeAMono8:
+      p = &bitmap->data[y * bitmap->rowSize + 2 * x0];
+      if (pattern->isStatic()) {
+	pattern->getColor(0, 0, color);
+	for (i = 0; i < n; ++i) {
+	  if (noClip || state->clip->test(x0 + i, y)) {
+	    if (softMask) {
+	      alpha2 = (int)(alpha *
+			     softMask->data[y * softMask->rowSize + x0 + i]);
+	      ialpha2 = 255 - alpha2;
+	    }
+	    (*blendFunc)(color, p, blend, bitmap->mode);
+	    p[0] = (alpha2 * blend[0] + ialpha2 * p[0]) >> 8;
+	    p[1] = (alpha2 * blend[1] + ialpha2 * p[1]) >> 8;
+	    if (!noClip) {
+	      updateModX(x0 + i);
+	      updateModY(y);
+	    }
+	  }
+	  p += 2;
 	}
-	bgr8 += 3;
-      }
-    } else {
-      for (i = 0; i < n; ++i) {
-	if (noClip || state->clip->test(x0 + i, y)) {
-	  color = pattern->getColor(x0 + i, y);
-	  bgr8[2] = splashBGR8R(color.bgr8);
-	  bgr8[1] = splashBGR8G(color.bgr8);
-	  bgr8[0] = splashBGR8B(color.bgr8);
+      } else {
+	for (i = 0; i < n; ++i) {
+	  if (noClip || state->clip->test(x0 + i, y)) {
+	    pattern->getColor(x0 + i, y, color);
+	    if (softMask) {
+	      alpha2 = (int)(alpha *
+			     softMask->data[y * softMask->rowSize + x0 + i]);
+	      ialpha2 = 255 - alpha2;
+	    }
+	    (*blendFunc)(color, p, blend, bitmap->mode);
+	    p[0] = (alpha2 * blend[0] + ialpha2 * p[0]) >> 8;
+	    p[1] = (alpha2 * blend[1] + ialpha2 * p[1]) >> 8;
+	    if (!noClip) {
+	      updateModX(x0 + i);
+	      updateModY(y);
+	    }
+	  }
+	  p += 2;
 	}
-	bgr8 += 3;
       }
+      break;
+
+    case splashModeRGB8:
+    case splashModeBGR8:
+      p = &bitmap->data[y * bitmap->rowSize + 3 * x0];
+      if (pattern->isStatic()) {
+	pattern->getColor(0, 0, color);
+	for (i = 0; i < n; ++i) {
+	  if (noClip || state->clip->test(x0 + i, y)) {
+	    if (softMask) {
+	      alpha2 = (int)(alpha *
+			     softMask->data[y * softMask->rowSize + x0 + i]);
+	      ialpha2 = 255 - alpha2;
+	    }
+	    (*blendFunc)(color, p, blend, bitmap->mode);
+	    p[0] = (alpha2 * blend[0] + ialpha2 * p[0]) >> 8;
+	    p[1] = (alpha2 * blend[1] + ialpha2 * p[1]) >> 8;
+	    p[2] = (alpha2 * blend[2] + ialpha2 * p[2]) >> 8;
+	    if (!noClip) {
+	      updateModX(x0 + i);
+	      updateModY(y);
+	    }
+	  }
+	  p += 3;
+	}
+      } else {
+	for (i = 0; i < n; ++i) {
+	  if (noClip || state->clip->test(x0 + i, y)) {
+	    pattern->getColor(x0 + i, y, color);
+	    if (softMask) {
+	      alpha2 = (int)(alpha *
+			     softMask->data[y * softMask->rowSize + x0 + i]);
+	      ialpha2 = 255 - alpha2;
+	    }
+	    (*blendFunc)(color, p, blend, bitmap->mode);
+	    p[0] = (alpha2 * blend[0] + ialpha2 * p[0]) >> 8;
+	    p[1] = (alpha2 * blend[1] + ialpha2 * p[1]) >> 8;
+	    p[2] = (alpha2 * blend[2] + ialpha2 * p[2]) >> 8;
+	    if (!noClip) {
+	      updateModX(x0 + i);
+	      updateModY(y);
+	    }
+	  }
+	  p += 3;
+	}
+      }
+      break;
+
+    case splashModeARGB8:
+    case splashModeBGRA8:
+#if SPLASH_CMYK
+    case splashModeCMYK8:
+#endif
+      p = &bitmap->data[y * bitmap->rowSize + 4 * x0];
+      if (pattern->isStatic()) {
+	pattern->getColor(0, 0, color);
+	for (i = 0; i < n; ++i) {
+	  if (noClip || state->clip->test(x0 + i, y)) {
+	    if (softMask) {
+	      alpha2 = (int)(alpha *
+			     softMask->data[y * softMask->rowSize + x0 + i]);
+	      ialpha2 = 255 - alpha2;
+	    }
+	    (*blendFunc)(color, p, blend, bitmap->mode);
+	    p[0] = (alpha2 * blend[0] + ialpha2 * p[0]) >> 8;
+	    p[1] = (alpha2 * blend[1] + ialpha2 * p[1]) >> 8;
+	    p[2] = (alpha2 * blend[2] + ialpha2 * p[2]) >> 8;
+	    p[3] = (alpha2 * blend[3] + ialpha2 * p[3]) >> 8;
+	    if (!noClip) {
+	      updateModX(x0 + i);
+	      updateModY(y);
+	    }
+	  }
+	  p += 4;
+	}
+      } else {
+	for (i = 0; i < n; ++i) {
+	  if (noClip || state->clip->test(x0 + i, y)) {
+	    pattern->getColor(x0 + i, y, color);
+	    if (softMask) {
+	      alpha2 = (int)(alpha *
+			     softMask->data[y * softMask->rowSize + x0 + i]);
+	      ialpha2 = 255 - alpha2;
+	    }
+	    (*blendFunc)(color, p, blend, bitmap->mode);
+	    p[0] = (alpha2 * blend[0] + ialpha2 * p[0]) >> 8;
+	    p[1] = (alpha2 * blend[1] + ialpha2 * p[1]) >> 8;
+	    p[2] = (alpha2 * blend[2] + ialpha2 * p[2]) >> 8;
+	    p[3] = (alpha2 * blend[3] + ialpha2 * p[3]) >> 8;
+	    if (!noClip) {
+	      updateModX(x0 + i);
+	      updateModY(y);
+	    }
+	  }
+	  p += 4;
+	}
+      }
+      break;
+#if SPLASH_CMYK
+    case splashModeACMYK8:
+      p = &bitmap->data[y * bitmap->rowSize + 5 * x0];
+      if (pattern->isStatic()) {
+	pattern->getColor(0, 0, color);
+	for (i = 0; i < n; ++i) {
+	  if (noClip || state->clip->test(x0 + i, y)) {
+	    if (softMask) {
+	      alpha2 = (int)(alpha *
+			     softMask->data[y * softMask->rowSize + x0 + i]);
+	      ialpha2 = 255 - alpha2;
+	    }
+	    (*blendFunc)(color, p, blend, bitmap->mode);
+	    p[0] = (alpha2 * blend[0] + ialpha2 * p[0]) >> 8;
+	    p[1] = (alpha2 * blend[1] + ialpha2 * p[1]) >> 8;
+	    p[2] = (alpha2 * blend[2] + ialpha2 * p[2]) >> 8;
+	    p[3] = (alpha2 * blend[3] + ialpha2 * p[3]) >> 8;
+	    p[4] = (alpha2 * blend[4] + ialpha2 * p[4]) >> 8;
+	    if (!noClip) {
+	      updateModX(x0 + i);
+	      updateModY(y);
+	    }
+	  }
+	  p += 4;
+	}
+      } else {
+	for (i = 0; i < n; ++i) {
+	  if (noClip || state->clip->test(x0 + i, y)) {
+	    pattern->getColor(x0 + i, y, color);
+	    if (softMask) {
+	      alpha2 = (int)(alpha *
+			     softMask->data[y * softMask->rowSize + x0 + i]);
+	      ialpha2 = 255 - alpha2;
+	    }
+	    (*blendFunc)(color, p, blend, bitmap->mode);
+	    p[0] = (alpha2 * blend[0] + ialpha2 * p[0]) >> 8;
+	    p[1] = (alpha2 * blend[1] + ialpha2 * p[1]) >> 8;
+	    p[2] = (alpha2 * blend[2] + ialpha2 * p[2]) >> 8;
+	    p[3] = (alpha2 * blend[3] + ialpha2 * p[3]) >> 8;
+	    p[4] = (alpha2 * blend[4] + ialpha2 * p[4]) >> 8;
+	    if (!noClip) {
+	      updateModX(x0 + i);
+	      updateModY(y);
+	    }
+	  }
+	  p += 4;
+	}
+      }
+      break;
+#endif
     }
-    break;
+
+  } else {
+    switch (bitmap->mode) {
+    case splashModeMono1:
+      p = &bitmap->data[y * bitmap->rowSize + (x0 >> 3)];
+      i = 0;
+      if (pattern->isStatic()) {
+	pattern->getColor(0, 0, color);
+	if ((j = x0 & 7)) {
+	  mask = 0x80 >> j;
+	  for (; j < 8 && i < n; ++i, ++j) {
+	    if (noClip || state->clip->test(x0 + i, y)) {
+	      if (color[0]) {
+		*p |= mask;
+	      } else {
+		*p &= ~mask;
+	      }
+	      if (!noClip) {
+		updateModX(x0 + i);
+		updateModY(y);
+	      }
+	    }
+	    mask >>= 1;
+	  }
+	  ++p;
+	}
+	while (i < n) {
+	  mask = 0x80;
+	  for (j = 0; j < 8 && i < n; ++i, ++j) {
+	    if (noClip || state->clip->test(x0 + i, y)) {
+	      if (color[0]) {
+		*p |= mask;
+	      } else {
+		*p &= ~mask;
+	      }
+	      if (!noClip) {
+		updateModX(x0 + i);
+		updateModY(y);
+	      }
+	    }
+	    mask >>= 1;
+	  }
+	  ++p;
+	}
+      } else {
+	if ((j = x0 & 7)) {
+	  mask = 0x80 >> j;
+	  for (; j < 8 && i < n; ++i, ++j) {
+	    if (noClip || state->clip->test(x0 + i, y)) {
+	      pattern->getColor(x0 + i, y, color);
+	      if (color[0]) {
+		*p |= mask;
+	      } else {
+		*p &= ~mask;
+	      }
+	      if (!noClip) {
+		updateModX(x0 + i);
+		updateModY(y);
+	      }
+	    }
+	    mask >>= 1;
+	  }
+	  ++p;
+	}
+	while (i < n) {
+	  mask = 0x80;
+	  for (j = 0; j < 8 && i < n; ++i, ++j) {
+	    if (noClip || state->clip->test(x0 + i, y)) {
+	      pattern->getColor(x0 + i, y, color);
+	      if (color[0]) {
+		*p |= mask;
+	      } else {
+		*p &= ~mask;
+	      }
+	      if (!noClip) {
+		updateModX(x0 + i);
+		updateModY(y);
+	      }
+	    }
+	    mask >>= 1;
+	  }
+	  ++p;
+	}
+      }
+      break;
+
+    case splashModeMono8:
+      p = &bitmap->data[y * bitmap->rowSize + x0];
+      if (pattern->isStatic()) {
+	pattern->getColor(0, 0, color);
+	for (i = 0; i < n; ++i) {
+	  if (noClip || state->clip->test(x0 + i, y)) {
+	    *p = color[0];
+	    if (!noClip) {
+	      updateModX(x0 + i);
+	      updateModY(y);
+	    }
+	  }
+	  ++p;
+	}
+      } else {
+	for (i = 0; i < n; ++i) {
+	  if (noClip || state->clip->test(x0 + i, y)) {
+	    pattern->getColor(x0 + i, y, color);
+	    *p = color[0];
+	    if (!noClip) {
+	      updateModX(x0 + i);
+	      updateModY(y);
+	    }
+	  }
+	  ++p;
+	}
+      }
+      break;
+
+    case splashModeAMono8:
+      p = &bitmap->data[y * bitmap->rowSize + 2 * x0];
+      if (pattern->isStatic()) {
+	pattern->getColor(0, 0, color);
+	for (i = 0; i < n; ++i) {
+	  if (noClip || state->clip->test(x0 + i, y)) {
+	    p[0] = color[0];
+	    p[1] = color[1];
+	    if (!noClip) {
+	      updateModX(x0 + i);
+	      updateModY(y);
+	    }
+	  }
+	  p += 2;
+	}
+      } else {
+	for (i = 0; i < n; ++i) {
+	  if (noClip || state->clip->test(x0 + i, y)) {
+	    pattern->getColor(x0 + i, y, color);
+	    p[0] = color[0];
+	    p[1] = color[1];
+	    if (!noClip) {
+	      updateModX(x0 + i);
+	      updateModY(y);
+	    }
+	  }
+	  p += 2;
+	}
+      }
+      break;
+
+    case splashModeRGB8:
+    case splashModeBGR8:
+      p = &bitmap->data[y * bitmap->rowSize + 3 * x0];
+      if (pattern->isStatic()) {
+	pattern->getColor(0, 0, color);
+	for (i = 0; i < n; ++i) {
+	  if (noClip || state->clip->test(x0 + i, y)) {
+	    p[0] = color[0];
+	    p[1] = color[1];
+	    p[2] = color[2];
+	    if (!noClip) {
+	      updateModX(x0 + i);
+	      updateModY(y);
+	    }
+	  }
+	  p += 3;
+	}
+      } else {
+	for (i = 0; i < n; ++i) {
+	  if (noClip || state->clip->test(x0 + i, y)) {
+	    pattern->getColor(x0 + i, y, color);
+	    p[0] = color[0];
+	    p[1] = color[1];
+	    p[2] = color[2];
+	    if (!noClip) {
+	      updateModX(x0 + i);
+	      updateModY(y);
+	    }
+	  }
+	  p += 3;
+	}
+      }
+      break;
+
+    case splashModeARGB8:
+    case splashModeBGRA8:
+#if SPLASH_CMYK
+    case splashModeCMYK8:
+#endif
+      p = &bitmap->data[y * bitmap->rowSize + 4 * x0];
+      if (pattern->isStatic()) {
+	pattern->getColor(0, 0, color);
+	for (i = 0; i < n; ++i) {
+	  if (noClip || state->clip->test(x0 + i, y)) {
+	    p[0] = color[0];
+	    p[1] = color[1];
+	    p[2] = color[2];
+	    p[3] = color[3];
+	    if (!noClip) {
+	      updateModX(x0 + i);
+	      updateModY(y);
+	    }
+	  }
+	  p += 4;
+	}
+      } else {
+	for (i = 0; i < n; ++i) {
+	  if (noClip || state->clip->test(x0 + i, y)) {
+	    pattern->getColor(x0 + i, y, color);
+	    p[0] = color[0];
+	    p[1] = color[1];
+	    p[2] = color[2];
+	    p[3] = color[3];
+	    if (!noClip) {
+	      updateModX(x0 + i);
+	      updateModY(y);
+	    }
+	  }
+	  p += 4;
+	}
+      }
+      break;
+#if SPLASH_CMYK
+    case splashModeACMYK8:
+      p = &bitmap->data[y * bitmap->rowSize + 5 * x0];
+      if (pattern->isStatic()) {
+	pattern->getColor(0, 0, color);
+	for (i = 0; i < n; ++i) {
+	  if (noClip || state->clip->test(x0 + i, y)) {
+	    p[0] = color[0];
+	    p[1] = color[1];
+	    p[2] = color[2];
+	    p[3] = color[3];
+	    p[4] = color[4];
+	    if (!noClip) {
+	      updateModX(x0 + i);
+	      updateModY(y);
+	    }
+	  }
+	  p += 4;
+	}
+      } else {
+	for (i = 0; i < n; ++i) {
+	  if (noClip || state->clip->test(x0 + i, y)) {
+	    pattern->getColor(x0 + i, y, color);
+	    p[0] = color[0];
+	    p[1] = color[1];
+	    p[2] = color[2];
+	    p[3] = color[3];
+	    p[4] = color[4];
+	    if (!noClip) {
+	      updateModX(x0 + i);
+	      updateModY(y);
+	    }
+	  }
+	  p += 4;
+	}
+      }
+      break;
+#endif
+    }
   }
 }
 
 void Splash::xorSpan(int x0, int x1, int y, SplashPattern *pattern,
 		     GBool noClip) {
   SplashColor color;
-  SplashMono1P *mono1;
-  SplashMono8 *mono8;
-  SplashRGB8 *rgb8;
-  SplashBGR8P *bgr8;
-  SplashMono1 mask1;
+  SplashColorPtr p;
+  Guchar mask;
   int i, j, n;
 
   n = x1 - x0 + 1;
 
+  if (noClip) {
+    updateModX(x0);
+    updateModX(x1);
+    updateModY(y);
+  }
+
   switch (bitmap->mode) {
   case splashModeMono1:
-    mono1 = &bitmap->data.mono8[y * bitmap->rowSize + (x0 >> 3)];
+    p = &bitmap->data[y * bitmap->rowSize + (x0 >> 3)];
     i = 0;
     if ((j = x0 & 7)) {
-      mask1 = 0x80 >> j;
-      for (j = x0 & 7; j < 8 && i < n; ++i, ++j) {
+      mask = 0x80 >> j;
+      for (; j < 8 && i < n; ++i, ++j) {
 	if (noClip || state->clip->test(x0 + i, y)) {
-	  color = pattern->getColor(x0 + i, y);
-	  if (color.mono1) {
-	    *mono1 ^= mask1;
+	  pattern->getColor(x0 + i, y, color);
+	  if (color[0]) {
+	    *p ^= mask;
+	  }
+	  if (!noClip) {
+	    updateModX(x0 + i);
+	    updateModY(y);
 	  }
 	}
-	mask1 >>= 1;
+	mask >>= 1;
       }
-      ++mono1;
+      ++p;
     }
     while (i < n) {
-      mask1 = 0x80;
+      mask = 0x80;
       for (j = 0; j < 8 && i < n; ++i, ++j) {
 	if (noClip || state->clip->test(x0 + i, y)) {
-	  color = pattern->getColor(x0 + i, y);
-	  if (color.mono1) {
-	    *mono1 ^= mask1;
+	  pattern->getColor(x0 + i, y, color);
+	  if (color[0]) {
+	    *p ^= mask;
+	  }
+	  if (!noClip) {
+	    updateModX(x0 + i);
+	    updateModY(y);
 	  }
 	}
-	mask1 >>= 1;
+	mask >>= 1;
       }
-      ++mono1;
+      ++p;
     }
     break;
 
   case splashModeMono8:
-    mono8 = &bitmap->data.mono8[y * bitmap->rowSize + x0];
+    p = &bitmap->data[y * bitmap->rowSize + x0];
     for (i = 0; i < n; ++i) {
       if (noClip || state->clip->test(x0 + i, y)) {
-	color = pattern->getColor(x0 + i, y);
-	*mono8 ^= color.mono8;
+	pattern->getColor(x0 + i, y, color);
+	*p ^= color[0];
+	if (!noClip) {
+	  updateModX(x0 + i);
+	  updateModY(y);
+	}
       }
-      ++mono8;
+      ++p;
+    }
+    break;
+
+  case splashModeAMono8:
+    p = &bitmap->data[y * bitmap->rowSize + 2 * x0];
+    for (i = 0; i < n; ++i) {
+      if (noClip || state->clip->test(x0 + i, y)) {
+	pattern->getColor(x0 + i, y, color);
+	p[0] ^= color[0];
+	p[1] ^= color[1];
+	if (!noClip) {
+	  updateModX(x0 + i);
+	  updateModY(y);
+	}
+      }
+      p += 2;
     }
     break;
 
   case splashModeRGB8:
-    rgb8 = &bitmap->data.rgb8[y * (bitmap->rowSize >> 2) + x0];
+  case splashModeBGR8:
+    p = &bitmap->data[y * bitmap->rowSize + 3 * x0];
     for (i = 0; i < n; ++i) {
       if (noClip || state->clip->test(x0 + i, y)) {
-	color = pattern->getColor(x0 + i, y);
-	*rgb8 ^= color.rgb8;
+	pattern->getColor(x0 + i, y, color);
+	p[0] ^= color[0];
+	p[1] ^= color[1];
+	p[2] ^= color[2];
+	if (!noClip) {
+	  updateModX(x0 + i);
+	  updateModY(y);
+	}
       }
-      ++rgb8;
+      p += 3;
     }
     break;
 
-  case splashModeBGR8Packed:
-    bgr8 = &bitmap->data.bgr8[y * bitmap->rowSize + 3 * x0];
+  case splashModeARGB8:
+  case splashModeBGRA8:
+#if SPLASH_CMYK
+  case splashModeCMYK8:
+#endif
+    p = &bitmap->data[y * bitmap->rowSize + 4 * x0];
     for (i = 0; i < n; ++i) {
       if (noClip || state->clip->test(x0 + i, y)) {
-	color = pattern->getColor(x0 + i, y);
-	bgr8[2] ^= splashBGR8R(color.bgr8);
-	bgr8[1] ^= splashBGR8G(color.bgr8);
-	bgr8[0] ^= splashBGR8B(color.bgr8);
+	pattern->getColor(x0 + i, y, color);
+	p[0] ^= color[0];
+	p[1] ^= color[1];
+	p[2] ^= color[2];
+	p[3] ^= color[3];
+	if (!noClip) {
+	  updateModX(x0 + i);
+	  updateModY(y);
+	}
       }
-      bgr8 += 3;
+      p += 4;
     }
     break;
-  }
-}
-
-void Splash::getPixel(int x, int y, SplashColor *pixel) {
-  SplashBGR8P *bgr8;
-
-  if (y < 0 || y >= bitmap->height || x < 0 || x >= bitmap->width) {
-    return;
-  }
-  switch (bitmap->mode) {
-  case splashModeMono1:
-    pixel->mono1 = (bitmap->data.mono1[y * bitmap->rowSize + (x >> 3)]
-		    >> (7 - (x & 7))) & 1;
+#if SPLASH_CMYK
+  case splashModeACMYK8:
+    p = &bitmap->data[y * bitmap->rowSize + 5 * x0];
+    for (i = 0; i < n; ++i) {
+      if (noClip || state->clip->test(x0 + i, y)) {
+	pattern->getColor(x0 + i, y, color);
+	p[0] ^= color[0];
+	p[1] ^= color[1];
+	p[2] ^= color[2];
+	p[3] ^= color[3];
+	p[4] ^= color[4];
+	if (!noClip) {
+	  updateModX(x0 + i);
+	  updateModY(y);
+	}
+      }
+      p += 4;
+    }
     break;
-  case splashModeMono8:
-    pixel->mono8 = bitmap->data.mono8[y * bitmap->rowSize + x];
-    break;
-  case splashModeRGB8:
-    pixel->rgb8 = bitmap->data.rgb8[y * (bitmap->rowSize >> 2) + x];
-    break;
-  case splashModeBGR8Packed:
-    bgr8 = &bitmap->data.bgr8[y * bitmap->rowSize + 3 * x];
-    pixel->bgr8 = splashMakeBGR8(bgr8[2], bgr8[1], bgr8[0]);
-    break;
+#endif
   }
 }
 
@@ -1027,7 +1966,7 @@ SplashError Splash::fillChar(SplashCoord x, SplashCoord y,
 
   if (debugMode) {
     printf("fillChar: x=%.2f y=%.2f c=%3d=0x%02x='%c'\n",
-	   x, y, c, c, c);
+	   (double)x, (double)y, c, c, c);
   }
   x0 = splashFloor(x);
   xFrac = splashFloor((x - x0) * splashFontFraction);
@@ -1045,17 +1984,14 @@ SplashError Splash::fillChar(SplashCoord x, SplashCoord y,
 
 SplashError Splash::fillGlyph(SplashCoord x, SplashCoord y,
 			      SplashGlyphBitmap *glyph) {
-  int alpha, ialpha;
+  SplashBlendFunc blendFunc;
+  int alpha0, alpha, ialpha;
   Guchar *p;
-  SplashColor fg;
-  SplashMono1P *mono1Ptr;
-  SplashMono8 *mono8Ptr;
-  SplashRGB8 *rgb8Ptr;
-  SplashBGR8P *bgr8Ptr;
-  SplashMono8 bgMono8;
-  int bgR, bgG, bgB;
+  SplashColor fg, dest, blend;
+  SplashColorPtr pix;
   SplashClipResult clipRes;
   GBool noClip;
+  Guchar t;
   int x0, y0, x1, y1, xx, xx1, yy;
 
   x0 = splashFloor(x);
@@ -1068,101 +2004,319 @@ SplashError Splash::fillGlyph(SplashCoord x, SplashCoord y,
       != splashClipAllOutside) {
     noClip = clipRes == splashClipAllInside;
 
+    if (noClip) {
+      updateModX(x0 - glyph->x);
+      updateModX(x0 - glyph->x + glyph->w - 1);
+      updateModY(y0 - glyph->y);
+      updateModY(y0 - glyph->y + glyph->h - 1);
+    }
+
     //~ optimize this
-    if (glyph->aa) {
-      p = glyph->data;
-      for (yy = 0, y1 = y0 - glyph->y; yy < glyph->h; ++yy, ++y1) {
-	for (xx = 0, x1 = x0 - glyph->x; xx < glyph->w; ++xx, ++x1) {
-	  alpha = *p++;
-	  if (alpha > 0) {
-	    if (noClip || state->clip->test(x1, y1)) {
-	      ialpha = 255 - alpha;
-	      fg = state->fillPattern->getColor(x1, y1);
-	      switch (bitmap->mode) {
-	      case splashModeMono1:
-		if (alpha >= 0x80) {
-		  mono1Ptr = &bitmap->data.mono1[y1 * bitmap->rowSize +
-						 (x1 >> 3)];
-		  if (fg.mono1) {
-		    *mono1Ptr |= 0x80 >> (x1 & 7);
+    if (state->fillAlpha != 1 || softMask || state->blendFunc) {
+      blendFunc = state->blendFunc ? state->blendFunc : &blendNormal;
+      if (glyph->aa) {
+	p = glyph->data;
+	for (yy = 0, y1 = y0 - glyph->y; yy < glyph->h; ++yy, ++y1) {
+	  for (xx = 0, x1 = x0 - glyph->x; xx < glyph->w; ++xx, ++x1) {
+	    alpha = *p++;
+	    if (softMask) {
+	      alpha = (int)(alpha * state->fillAlpha *
+			    softMask->data[y1 * softMask->rowSize + x1]);
+	    } else {
+	      alpha = (int)(alpha * state->fillAlpha);
+	    }
+	    if (alpha > 0) {
+	      if (noClip || state->clip->test(x1, y1)) {
+		ialpha = 255 - alpha;
+		state->fillPattern->getColor(x1, y1, fg);
+		switch (bitmap->mode) {
+		case splashModeMono1:
+		  pix = &bitmap->data[y1 * bitmap->rowSize + (x1 >> 3)];
+		  dest[0] = (*pix >> (7 - (x1 & 7))) & 1;
+		  (*blendFunc)(fg, dest, blend, bitmap->mode);
+		  t = (alpha * blend[0] + ialpha * dest[0]) >> 8;
+		  if (t) {
+		    *pix |= 0x80 >> (x1 & 7);
 		  } else {
-		    *mono1Ptr &= ~(0x80 >> (x1 & 7));
+		    *pix &= ~(0x80 >> (x1 & 7));
+		  }
+		  break;
+		case splashModeMono8:
+		  pix = &bitmap->data[y1 * bitmap->rowSize + x1];
+		  (*blendFunc)(fg, pix, blend, bitmap->mode);
+		  // note: floor(x / 255) = x >> 8 (for 16-bit x)
+		  pix[0] = (alpha * blend[0] + ialpha * pix[0]) >> 8;
+		  break;
+		case splashModeAMono8:
+		  pix = &bitmap->data[y1 * bitmap->rowSize + 2 * x1];
+		  (*blendFunc)(fg, pix, blend, bitmap->mode);
+		  pix[0] = (alpha * blend[0] + ialpha * pix[0]) >> 8;
+		  pix[1] = (alpha * blend[1] + ialpha * pix[1]) >> 8;
+		  break;
+		case splashModeRGB8:
+		case splashModeBGR8:
+		  pix = &bitmap->data[y1 * bitmap->rowSize + 3 * x1];
+		  (*blendFunc)(fg, pix, blend, bitmap->mode);
+		  pix[0] = (alpha * blend[0] + ialpha * pix[0]) >> 8;
+		  pix[1] = (alpha * blend[1] + ialpha * pix[1]) >> 8;
+		  pix[2] = (alpha * blend[2] + ialpha * pix[2]) >> 8;
+		  break;
+		case splashModeARGB8:
+		case splashModeBGRA8:
+#if SPLASH_CMYK
+		case splashModeCMYK8:
+#endif
+		  pix = &bitmap->data[y1 * bitmap->rowSize + 4 * x1];
+		  (*blendFunc)(fg, pix, blend, bitmap->mode);
+		  pix[0] = (alpha * blend[0] + ialpha * pix[0]) >> 8;
+		  pix[1] = (alpha * blend[1] + ialpha * pix[1]) >> 8;
+		  pix[2] = (alpha * blend[2] + ialpha * pix[2]) >> 8;
+		  pix[3] = (alpha * blend[3] + ialpha * pix[3]) >> 8;
+		  break;
+#if SPLASH_CMYK
+		case splashModeACMYK8:
+		  pix = &bitmap->data[y1 * bitmap->rowSize + 5 * x1];
+		  (*blendFunc)(fg, pix, blend, bitmap->mode);
+		  pix[0] = (alpha * blend[0] + ialpha * pix[0]) >> 8;
+		  pix[1] = (alpha * blend[1] + ialpha * pix[1]) >> 8;
+		  pix[2] = (alpha * blend[2] + ialpha * pix[2]) >> 8;
+		  pix[3] = (alpha * blend[3] + ialpha * pix[3]) >> 8;
+		  pix[4] = (alpha * blend[4] + ialpha * pix[4]) >> 8;
+		  break;
+#endif
+		}
+		if (!noClip) {
+		  updateModX(x1);
+		  updateModY(y1);
+		}
+	      }
+	    }
+	  }
+	}
+
+      } else {
+	p = glyph->data;
+	for (yy = 0, y1 = y0 - glyph->y; yy < glyph->h; ++yy, ++y1) {
+	  for (xx = 0, x1 = x0 - glyph->x; xx < glyph->w; xx += 8) {
+	    alpha0 = *p++;
+	    for (xx1 = 0; xx1 < 8 && xx + xx1 < glyph->w; ++xx1, ++x1) {
+	      if (alpha0 & 0x80) {
+		if (noClip || state->clip->test(x1, y1)) {
+		  if (softMask) {
+		    alpha = (int)(state->fillAlpha *
+				  softMask->data[y1 * softMask->rowSize + x1]);
+		  } else {
+		    alpha = (int)(state->fillAlpha * 255);
+		  }
+		  ialpha = 255 - alpha;
+		  state->fillPattern->getColor(x1, y1, fg);
+		  switch (bitmap->mode) {
+		  case splashModeMono1:
+		    pix = &bitmap->data[y1 * bitmap->rowSize + (x1 >> 3)];
+		    dest[0] = (*pix >> (7 - (x1 & 7))) & 1;
+		    (*blendFunc)(fg, dest, blend, bitmap->mode);
+		    t = (alpha * blend[0] + ialpha * dest[0]) >> 8;
+		    if (t) {
+		      *pix |= 0x80 >> (x1 & 7);
+		    } else {
+		      *pix &= ~(0x80 >> (x1 & 7));
+		    }
+		    break;
+		  case splashModeMono8:
+		    pix = &bitmap->data[y1 * bitmap->rowSize + x1];
+		    (*blendFunc)(fg, pix, blend, bitmap->mode);
+		    // note: floor(x / 255) = x >> 8 (for 16-bit x)
+		    pix[0] = (alpha * blend[0] + ialpha * pix[0]) >> 8;
+		    break;
+		  case splashModeAMono8:
+		    pix = &bitmap->data[y1 * bitmap->rowSize + 2 * x1];
+		    (*blendFunc)(fg, pix, blend, bitmap->mode);
+		    pix[0] = (alpha * blend[0] + ialpha * pix[0]) >> 8;
+		    pix[1] = (alpha * blend[1] + ialpha * pix[1]) >> 8;
+		    break;
+		  case splashModeRGB8:
+		  case splashModeBGR8:
+		    pix = &bitmap->data[y1 * bitmap->rowSize + 3 * x1];
+		    (*blendFunc)(fg, pix, blend, bitmap->mode);
+		    pix[0] = (alpha * blend[0] + ialpha * pix[0]) >> 8;
+		    pix[1] = (alpha * blend[1] + ialpha * pix[1]) >> 8;
+		    pix[2] = (alpha * blend[2] + ialpha * pix[2]) >> 8;
+		    break;
+		  case splashModeARGB8:
+		  case splashModeBGRA8:
+#if SPLASH_CMYK
+		  case splashModeCMYK8:
+#endif
+		    pix = &bitmap->data[y1 * bitmap->rowSize + 4 * x1];
+		    (*blendFunc)(fg, pix, blend, bitmap->mode);
+		    pix[0] = (alpha * blend[0] + ialpha * pix[0]) >> 8;
+		    pix[1] = (alpha * blend[1] + ialpha * pix[1]) >> 8;
+		    pix[2] = (alpha * blend[2] + ialpha * pix[2]) >> 8;
+		    pix[3] = (alpha * blend[3] + ialpha * pix[3]) >> 8;
+		    break;
+#if SPLASH_CMYK
+		  case splashModeACMYK8:
+		    pix = &bitmap->data[y1 * bitmap->rowSize + 5 * x1];
+		    (*blendFunc)(fg, pix, blend, bitmap->mode);
+		    pix[0] = (alpha * blend[0] + ialpha * pix[0]) >> 8;
+		    pix[1] = (alpha * blend[1] + ialpha * pix[1]) >> 8;
+		    pix[2] = (alpha * blend[2] + ialpha * pix[2]) >> 8;
+		    pix[3] = (alpha * blend[3] + ialpha * pix[3]) >> 8;
+		    pix[4] = (alpha * blend[4] + ialpha * pix[4]) >> 8;
+		    break;
+#endif
+		  }
+		  if (!noClip) {
+		    updateModX(x1);
+		    updateModY(y1);
 		  }
 		}
-		break;
-	      case splashModeMono8:
-		mono8Ptr = &bitmap->data.mono8[y1 * bitmap->rowSize + x1];
-		bgMono8 = *mono8Ptr;
-		// note: floor(x / 255) = x >> 8 (for 16-bit x)
-		*mono8Ptr = (alpha * fg.mono8 + ialpha * bgMono8) >> 8;
-		break;
-	      case splashModeRGB8:
-		rgb8Ptr = &bitmap->data.rgb8[y1 * (bitmap->rowSize >> 2) + x1];
-		bgR = splashRGB8R(*rgb8Ptr);
-		bgG = splashRGB8G(*rgb8Ptr);
-		bgB = splashRGB8B(*rgb8Ptr);
-		*rgb8Ptr = splashMakeRGB8((alpha * splashRGB8R(fg.rgb8) +
-					   ialpha * bgR) >> 8,
-					  (alpha * splashRGB8G(fg.rgb8) +
-					   ialpha * bgG) >> 8,
-					  (alpha * splashRGB8B(fg.rgb8) +
-					   ialpha * bgB) >> 8);
-		break;
-	      case splashModeBGR8Packed:
-		bgr8Ptr = &bitmap->data.bgr8[y1 * bitmap->rowSize + 3 * x1];
-		bgr8Ptr[2] =
-		    (alpha * splashBGR8R(fg.bgr8) + ialpha * bgr8Ptr[2]) >> 8;
-		bgr8Ptr[1] =
-		    (alpha * splashBGR8G(fg.bgr8) + ialpha * bgr8Ptr[1]) >> 8;
-		bgr8Ptr[0] =
-		    (alpha * splashBGR8B(fg.bgr8) + ialpha * bgr8Ptr[0]) >> 8;
-		break;
 	      }
+	      alpha0 <<= 1;
 	    }
 	  }
 	}
       }
 
     } else {
-      p = glyph->data;
-      for (yy = 0, y1 = y0 - glyph->y; yy < glyph->h; ++yy, ++y1) {
-	for (xx = 0, x1 = x0 - glyph->x; xx < glyph->w; xx += 8) {
-	  alpha = *p++;
-	  for (xx1 = 0; xx1 < 8 && xx + xx1 < glyph->w; ++xx1, ++x1) {
-	    if (alpha & 0x80) {
+      if (glyph->aa) {
+	p = glyph->data;
+	for (yy = 0, y1 = y0 - glyph->y; yy < glyph->h; ++yy, ++y1) {
+	  for (xx = 0, x1 = x0 - glyph->x; xx < glyph->w; ++xx, ++x1) {
+	    alpha = *p++;
+	    if (alpha > 0) {
 	      if (noClip || state->clip->test(x1, y1)) {
-		fg = state->fillPattern->getColor(x1, y1);
+		ialpha = 255 - alpha;
+		state->fillPattern->getColor(x1, y1, fg);
 		switch (bitmap->mode) {
 		case splashModeMono1:
-		  mono1Ptr = &bitmap->data.mono1[y1 * bitmap->rowSize +
-						 (x1 >> 3)];
-		  if (fg.mono1) {
-		    *mono1Ptr |= 0x80 >> (x1 & 7);
-		  } else {
-		    *mono1Ptr &= ~(0x80 >> (x1 & 7));
+		  if (alpha >= 0x80) {
+		    pix = &bitmap->data[y1 * bitmap->rowSize + (x1 >> 3)];
+		    if (fg[0]) {
+		      *pix |= 0x80 >> (x1 & 7);
+		    } else {
+		      *pix &= ~(0x80 >> (x1 & 7));
+		    }
 		  }
 		  break;
 		case splashModeMono8:
-		  bitmap->data.mono8[y1 * bitmap->width + x1] = fg.mono8;
+		  pix = &bitmap->data[y1 * bitmap->rowSize + x1];
+		  // note: floor(x / 255) = x >> 8 (for 16-bit x)
+		  pix[0] = (alpha * fg[0] + ialpha * pix[0]) >> 8;
+		  break;
+		case splashModeAMono8:
+		  pix = &bitmap->data[y1 * bitmap->rowSize + 2 * x1];
+		  pix[0] = (alpha * fg[0] + ialpha * pix[0]) >> 8;
+		  pix[1] = (alpha * fg[1] + ialpha * pix[1]) >> 8;
 		  break;
 		case splashModeRGB8:
-		  bitmap->data.rgb8[y1 * bitmap->width + x1] = fg.rgb8;
+		case splashModeBGR8:
+		  pix = &bitmap->data[y1 * bitmap->rowSize + 3 * x1];
+		  pix[0] = (alpha * fg[0] + ialpha * pix[0]) >> 8;
+		  pix[1] = (alpha * fg[1] + ialpha * pix[1]) >> 8;
+		  pix[2] = (alpha * fg[2] + ialpha * pix[2]) >> 8;
 		  break;
-		case splashModeBGR8Packed:
-		  bgr8Ptr = &bitmap->data.bgr8[y1 * bitmap->rowSize + 3 * x1];
-		  bgr8Ptr[2] = splashBGR8R(fg.bgr8);
-		  bgr8Ptr[1] = splashBGR8G(fg.bgr8);
-		  bgr8Ptr[0] = splashBGR8B(fg.bgr8);
+		case splashModeARGB8:
+		case splashModeBGRA8:
+#if SPLASH_CMYK
+		case splashModeCMYK8:
+#endif
+		  pix = &bitmap->data[y1 * bitmap->rowSize + 4 * x1];
+		  pix[0] = (alpha * fg[0] + ialpha * pix[0]) >> 8;
+		  pix[1] = (alpha * fg[1] + ialpha * pix[1]) >> 8;
+		  pix[2] = (alpha * fg[2] + ialpha * pix[2]) >> 8;
+		  pix[3] = (alpha * fg[3] + ialpha * pix[3]) >> 8;
 		  break;
+#if SPLASH_CMYK
+		case splashModeACMYK8:
+		  pix = &bitmap->data[y1 * bitmap->rowSize + 5 * x1];
+		  pix[0] = (alpha * fg[0] + ialpha * pix[0]) >> 8;
+		  pix[1] = (alpha * fg[1] + ialpha * pix[1]) >> 8;
+		  pix[2] = (alpha * fg[2] + ialpha * pix[2]) >> 8;
+		  pix[3] = (alpha * fg[3] + ialpha * pix[3]) >> 8;
+		  pix[4] = (alpha * fg[4] + ialpha * pix[4]) >> 8;
+		  break;
+#endif
+		}
+		if (!noClip) {
+		  updateModX(x1);
+		  updateModY(y1);
 		}
 	      }
 	    }
-	    alpha <<= 1;
+	  }
+	}
+
+      } else {
+	p = glyph->data;
+	for (yy = 0, y1 = y0 - glyph->y; yy < glyph->h; ++yy, ++y1) {
+	  for (xx = 0, x1 = x0 - glyph->x; xx < glyph->w; xx += 8) {
+	    alpha0 = *p++;
+	    for (xx1 = 0; xx1 < 8 && xx + xx1 < glyph->w; ++xx1, ++x1) {
+	      if (alpha0 & 0x80) {
+		if (noClip || state->clip->test(x1, y1)) {
+		  state->fillPattern->getColor(x1, y1, fg);
+		  switch (bitmap->mode) {
+		  case splashModeMono1:
+		    pix = &bitmap->data[y1 * bitmap->rowSize + (x1 >> 3)];
+		    if (fg[0]) {
+		      *pix |= 0x80 >> (x1 & 7);
+		    } else {
+		      *pix &= ~(0x80 >> (x1 & 7));
+		    }
+		    break;
+		  case splashModeMono8:
+		    pix = &bitmap->data[y1 * bitmap->rowSize + x1];
+		    pix[0] = fg[0];
+		    break;
+		  case splashModeAMono8:
+		    pix = &bitmap->data[y1 * bitmap->rowSize + 2 * x1];
+		    pix[0] = fg[0];
+		    pix[1] = fg[1];
+		    break;
+		  case splashModeRGB8:
+		  case splashModeBGR8:
+		    pix = &bitmap->data[y1 * bitmap->rowSize + 3 * x1];
+		    pix[0] = fg[0];
+		    pix[1] = fg[1];
+		    pix[2] = fg[2];
+		    break;
+		  case splashModeARGB8:
+		  case splashModeBGRA8:
+#if SPLASH_CMYK
+		  case splashModeCMYK8:
+#endif
+		    pix = &bitmap->data[y1 * bitmap->rowSize + 4 * x1];
+		    pix[0] = fg[0];
+		    pix[1] = fg[1];
+		    pix[2] = fg[2];
+		    pix[3] = fg[3];
+		    break;
+#if SPLASH_CMYK
+		  case splashModeACMYK8:
+		    pix = &bitmap->data[y1 * bitmap->rowSize + 5 * x1];
+		    pix[0] = fg[0];
+		    pix[1] = fg[1];
+		    pix[2] = fg[2];
+		    pix[3] = fg[3];
+		    pix[4] = fg[4];
+		    break;
+#endif
+		  }
+		  if (!noClip) {
+		    updateModX(x1);
+		    updateModY(y1);
+		  }
+		}
+	      }
+	      alpha0 <<= 1;
+	    }
 	  }
 	}
       }
     }
   }
+  opClipRes = clipRes;
 
   return splashOk;
 }
@@ -1170,8 +2324,8 @@ SplashError Splash::fillGlyph(SplashCoord x, SplashCoord y,
 SplashError Splash::fillImageMask(SplashImageMaskSource src, void *srcData,
 				  int w, int h, SplashCoord *mat) {
   GBool rot;
-  SplashCoord xScale, yScale, xShear, yShear;
-  int tx, ty, scaledWidth, scaledHeight, xSign, ySign;
+  SplashCoord xScale, yScale, xShear, yShear, yShear1;
+  int tx, tx2, ty, ty2, scaledWidth, scaledHeight, xSign, ySign;
   int ulx, uly, llx, lly, urx, ury, lrx, lry;
   int ulx1, uly1, llx1, lly1, urx1, ury1, lrx1, lry1;
   int xMin, xMax, yMin, yMax;
@@ -1179,17 +2333,17 @@ SplashError Splash::fillImageMask(SplashImageMaskSource src, void *srcData,
   int yp, yq, yt, yStep, lastYStep;
   int xp, xq, xt, xStep, xSrc;
   int k1, spanXMin, spanXMax, spanY;
-  SplashMono1 *pixBuf;
-  SplashMono1 *p;
+  SplashColorPtr pixBuf, p;
   int pixAcc;
   SplashCoord alpha;
-  SplashColor fg, bg, pix;
-  int x, y, x1, y1, x2, y2;
+  int x, y, x1, x2, y2;
+  SplashCoord y1;
   int n, m, i, j;
 
   if (debugMode) {
     printf("fillImageMask: w=%d h=%d mat=[%.2f %.2f %.2f %.2f %.2f %.2f]\n",
-	   w, h, mat[0], mat[1], mat[2], mat[3], mat[4], mat[5]);
+	   w, h, (double)mat[0], (double)mat[1], (double)mat[2],
+	   (double)mat[3], (double)mat[4], (double)mat[5]);
   }
 
   // check for singular matrix
@@ -1210,23 +2364,52 @@ SplashError Splash::fillImageMask(SplashImageMaskSource src, void *srcData,
     xShear = mat[2] / yScale;
     yShear = mat[1] / mat[0];
   }
-  tx = splashRound(mat[4]);
-  ty = splashRound(mat[5]);
-  scaledWidth = abs(splashRound(mat[4] + xScale) - tx) + 1;
-  scaledHeight = abs(splashRound(mat[5] + yScale) - ty) + 1;
+  // the +/-0.01 in these computations is to avoid floating point
+  // precision problems which can lead to gaps between image stripes
+  // (it can cause image stripes to overlap, but that's a much less
+  // visible problem)
+  if (xScale >= 0) {
+    tx = splashRound(mat[4] - 0.01);
+    tx2 = splashRound(mat[4] + xScale + 0.01) - 1;
+  } else {
+    tx = splashRound(mat[4] + 0.01) - 1;
+    tx2 = splashRound(mat[4] + xScale - 0.01);
+  }
+  scaledWidth = abs(tx2 - tx) + 1;
+  if (scaledWidth == 0) {
+    // technically, this should draw nothing, but it generally seems
+    // better to draw a one-pixel-wide stripe rather than throwing it
+    // away
+    scaledWidth = 1;
+  }
+  if (yScale >= 0) {
+    ty = splashRound(mat[5] - 0.01);
+    ty2 = splashRound(mat[5] + yScale + 0.01) - 1;
+  } else {
+    ty = splashRound(mat[5] + 0.01) - 1;
+    ty2 = splashRound(mat[5] + yScale - 0.01);
+  }
+  scaledHeight = abs(ty2 - ty) + 1;
+  if (scaledHeight == 0) {
+    // technically, this should draw nothing, but it generally seems
+    // better to draw a one-pixel-wide stripe rather than throwing it
+    // away
+    scaledHeight = 1;
+  }
   xSign = (xScale < 0) ? -1 : 1;
   ySign = (yScale < 0) ? -1 : 1;
+  yShear1 = (SplashCoord)xSign * yShear;
 
   // clipping
   ulx1 = 0;
   uly1 = 0;
   urx1 = xSign * (scaledWidth - 1);
-  ury1 = splashRound(yShear * urx1);
+  ury1 = (int)(yShear * urx1);
   llx1 = splashRound(xShear * ySign * (scaledHeight - 1));
-  lly1 = ySign * (scaledHeight - 1) + splashRound(yShear * llx1);
+  lly1 = ySign * (scaledHeight - 1) + (int)(yShear * llx1);
   lrx1 = xSign * (scaledWidth - 1) +
            splashRound(xShear * ySign * (scaledHeight - 1));
-  lry1 = ySign * (scaledHeight - 1) + splashRound(yShear * lrx1);
+  lry1 = ySign * (scaledHeight - 1) + (int)(yShear * lrx1);
   if (rot) {
     ulx = tx + uly1;    uly = ty - ulx1;
     urx = tx + ury1;    ury = ty - urx1;
@@ -1255,6 +2438,7 @@ SplashError Splash::fillImageMask(SplashImageMaskSource src, void *srcData,
 		     : (ury > lly) ? (ury > lry) ? ury : lry
                                    : (lly > lry) ? lly : lry;
   clipRes = state->clip->testRect(xMin, yMin, xMax, yMax);
+  opClipRes = clipRes;
 
   // compute Bresenham parameters for x and y scaling
   yp = h / scaledHeight;
@@ -1263,7 +2447,7 @@ SplashError Splash::fillImageMask(SplashImageMaskSource src, void *srcData,
   xq = w % scaledWidth;
 
   // allocate pixel buffer
-  pixBuf = (SplashMono1 *)gmalloc((yp + 1) * w * sizeof(SplashMono1));
+  pixBuf = (SplashColorPtr)gmalloc((yp + 1) * w);
 
   // init y scale Bresenham
   yt = 0;
@@ -1284,9 +2468,8 @@ SplashError Splash::fillImageMask(SplashImageMaskSource src, void *srcData,
     if (n > 0) {
       p = pixBuf;
       for (i = 0; i < n; ++i) {
-	for (j = 0; j < w; ++j) {
-	  (*src)(srcData, p++);
-	}
+	(*src)(srcData, p);
+	p += w;
       }
     }
     lastYStep = yStep;
@@ -1297,8 +2480,8 @@ SplashError Splash::fillImageMask(SplashImageMaskSource src, void *srcData,
     // clipping test
     if (clipRes != splashClipAllInside &&
 	!rot &&
-	splashRound(yShear * k1) ==
-	  splashRound(yShear * (xSign * (scaledWidth - 1) + k1))) {
+	(int)(yShear * k1) ==
+	  (int)(yShear * (xSign * (scaledWidth - 1) + k1))) {
       if (xSign > 0) {
 	spanXMin = tx + k1;
 	spanXMax = spanXMin + (scaledWidth - 1);
@@ -1306,7 +2489,7 @@ SplashError Splash::fillImageMask(SplashImageMaskSource src, void *srcData,
 	spanXMax = tx + k1;
 	spanXMin = spanXMax - (scaledWidth - 1);
       }
-      spanY = ty + ySign * y + splashRound(xShear * ySign * y);
+      spanY = ty + ySign * y + (int)(yShear * k1);
       clipRes2 = state->clip->testSpan(spanXMin, spanXMax, spanY);
       if (clipRes2 == splashClipAllOutside) {
 	continue;
@@ -1319,6 +2502,21 @@ SplashError Splash::fillImageMask(SplashImageMaskSource src, void *srcData,
     xt = 0;
     xSrc = 0;
 
+    // x shear
+    x1 = k1;
+
+    // y shear
+    y1 = (SplashCoord)ySign * y + yShear * x1;
+    // this is a kludge: if yShear1 is negative, then (int)y1 would
+    // change immediately after the first pixel, which is not what we
+    // want
+    if (yShear1 < 0) {
+      y1 += 0.999;
+    }
+
+    // loop-invariant constants
+    n = yStep > 0 ? yStep : 1;
+
     for (x = 0; x < scaledWidth; ++x) {
 
       // x scale Bresenham
@@ -1329,24 +2527,17 @@ SplashError Splash::fillImageMask(SplashImageMaskSource src, void *srcData,
 	++xStep;
       }
 
-      // x shear
-      x1 = xSign * x + k1;
-
-      // y shear
-      y1 = ySign * y + splashRound(yShear * x1);
-
       // rotation
       if (rot) {
-	x2 = y1;
+	x2 = (int)y1;
 	y2 = -x1;
       } else {
 	x2 = x1;
-	y2 = y1;
+	y2 = (int)y1;
       }
 
       // compute the alpha value for (x,y) after the x and y scaling
       // operations
-      n = yStep > 0 ? yStep : 1;
       m = xStep > 0 ? xStep : 1;
       p = pixBuf + xSrc;
       pixAcc = 0;
@@ -1359,45 +2550,25 @@ SplashError Splash::fillImageMask(SplashImageMaskSource src, void *srcData,
 
       // blend fill color with background
       if (pixAcc != 0) {
-	fg = state->fillPattern->getColor(tx + x2, ty + y2);
 	if (pixAcc == n * m) {
-	  pix = fg;
+	  drawPixel(tx + x2, ty + y2, state->fillPattern, state->fillAlpha,
+		    clipRes2 == splashClipAllInside);
 	} else {
-	  getPixel(tx + x2, ty + y2, &bg);
 	  alpha = (SplashCoord)pixAcc / (SplashCoord)(n * m);
-	  switch (bitmap->mode) {
-	  case splashModeMono1:
-	    pix.mono1 = splashRound(alpha * fg.mono1 +
-				    (1 - alpha) * bg.mono1);
-	    break;
-	  case splashModeMono8:
-	    pix.mono8 = splashRound(alpha * fg.mono8 +
-				    (1 - alpha) * bg.mono8);
-	    break;
-	  case splashModeRGB8:
-	    pix.rgb8 = splashMakeRGB8(
-			   splashRound(alpha * splashRGB8R(fg.rgb8) +
-				       (1 - alpha) * splashRGB8R(bg.rgb8)),
-			   splashRound(alpha * splashRGB8G(fg.rgb8) +
-				       (1 - alpha) * splashRGB8G(bg.rgb8)),
-			   splashRound(alpha * splashRGB8B(fg.rgb8) +
-				       (1 - alpha) * splashRGB8B(bg.rgb8)));
-	  case splashModeBGR8Packed:
-	    pix.bgr8 = splashMakeBGR8(
-			   splashRound(alpha * splashBGR8R(fg.bgr8) +
-				       (1 - alpha) * splashBGR8R(bg.bgr8)),
-			   splashRound(alpha * splashBGR8G(fg.bgr8) +
-				       (1 - alpha) * splashBGR8G(bg.bgr8)),
-			   splashRound(alpha * splashBGR8B(fg.bgr8) +
-				       (1 - alpha) * splashBGR8B(bg.bgr8)));
-	    break;
-	  }
+	  drawPixel(tx + x2, ty + y2, state->fillPattern,
+		    state->fillAlpha * alpha,
+		    clipRes2 == splashClipAllInside);
 	}
-	drawPixel(tx + x2, ty + y2, &pix, clipRes2 == splashClipAllInside);
       }
 
       // x scale Bresenham
       xSrc += xStep;
+
+      // x shear
+      x1 += xSign;
+
+      // y shear
+      y1 += yShear1;
     }
   }
 
@@ -1410,9 +2581,9 @@ SplashError Splash::fillImageMask(SplashImageMaskSource src, void *srcData,
 SplashError Splash::drawImage(SplashImageSource src, void *srcData,
 			      SplashColorMode srcMode,
 			      int w, int h, SplashCoord *mat) {
-  GBool ok, rot, halftone;
-  SplashCoord xScale, yScale, xShear, yShear;
-  int tx, ty, scaledWidth, scaledHeight, xSign, ySign;
+  GBool ok, rot, halftone, srcAlpha;
+  SplashCoord xScale, yScale, xShear, yShear, yShear1;
+  int tx, tx2, ty, ty2, scaledWidth, scaledHeight, xSign, ySign;
   int ulx, uly, llx, lly, urx, ury, lrx, lry;
   int ulx1, uly1, llx1, lly1, urx1, ury1, lrx1, lry1;
   int xMin, xMax, yMin, yMax;
@@ -1420,40 +2591,78 @@ SplashError Splash::drawImage(SplashImageSource src, void *srcData,
   int yp, yq, yt, yStep, lastYStep;
   int xp, xq, xt, xStep, xSrc;
   int k1, spanXMin, spanXMax, spanY;
-  SplashColor *pixBuf, *p;
-  Guchar *alphaBuf, *q;
+  SplashColorPtr pixBuf, p;
   SplashColor pix;
-  SplashCoord pixAcc[splashMaxColorComps];
+#if SPLASH_CMYK
+  int pixAcc0, pixAcc1, pixAcc2, pixAcc3;
+#else
+  int pixAcc0, pixAcc1, pixAcc2;
+#endif
   int alphaAcc;
   SplashCoord pixMul, alphaMul, alpha;
-  int x, y, x1, y1, x2, y2;
-  int n, m, i, j;
+  int x, y, x1, x2, y2;
+  SplashCoord y1;
+  int nComps, n, m, i, j;
 
   if (debugMode) {
     printf("drawImage: srcMode=%d w=%d h=%d mat=[%.2f %.2f %.2f %.2f %.2f %.2f]\n",
-	   srcMode, w, h, mat[0], mat[1], mat[2], mat[3], mat[4], mat[5]);
+	   srcMode, w, h, (double)mat[0], (double)mat[1], (double)mat[2],
+	   (double)mat[3], (double)mat[4], (double)mat[5]);
   }
 
   // check color modes
   ok = gFalse; // make gcc happy
+  nComps = 0; // make gcc happy
+  halftone = gFalse;
+  srcAlpha = gFalse;
   switch (bitmap->mode) {
   case splashModeMono1:
-    ok = srcMode == splashModeMono1 || srcMode == splashModeMono8;
+    ok = srcMode == splashModeMono1 || srcMode == splashModeMono8 ||
+         srcMode == splashModeAMono8;
+    halftone = srcMode == splashModeMono8 || srcMode == splashModeAMono8;
+    srcAlpha = srcMode == splashModeAMono8;
+    nComps = srcAlpha ? 2 : 1;
     break;
   case splashModeMono8:
-    ok = srcMode == splashModeMono8;
+    ok = srcMode == splashModeMono8 || srcMode == splashModeAMono8;
+    srcAlpha = srcMode == splashModeAMono8;
+    nComps = srcAlpha ? 2 : 1;
+    break;
+  case splashModeAMono8:
+    //~ not implemented yet
+    ok = gFalse;
+    nComps = 2;
     break;
   case splashModeRGB8:
-    ok = srcMode == splashModeRGB8;
+    ok = srcMode == splashModeRGB8 || srcMode == splashModeARGB8;
+    srcAlpha = srcMode == splashModeARGB8;
+    nComps = srcAlpha ? 4 : 3;
     break;
-  case splashModeBGR8Packed:
-    ok = srcMode == splashModeBGR8Packed;
+  case splashModeBGR8:
+    ok = srcMode == splashModeBGR8 || srcMode == splashModeBGRA8;
+    srcAlpha = srcMode == splashModeBGRA8;
+    nComps = srcAlpha ? 4 : 3;
+    break;
+#if SPLASH_CMYK
+  case splashModeCMYK8:
+    ok = srcMode == splashModeCMYK8 || srcMode == splashModeACMYK8;
+    srcAlpha = srcMode == splashModeACMYK8;
+    nComps = srcAlpha ? 5 : 4;
+    break;
+#endif
+  case splashModeARGB8:
+  case splashModeBGRA8:
+#if SPLASH_CMYK
+  case splashModeACMYK8:
+#endif
+    //~ not implemented yet
+    ok = gFalse;
+    nComps = 4;
     break;
   }
   if (!ok) {
     return splashErrModeMismatch;
   }
-  halftone = bitmap->mode == splashModeMono1 && srcMode == splashModeMono8;
 
   // check for singular matrix
   if (splashAbs(mat[0] * mat[3] - mat[1] * mat[2]) < 0.000001) {
@@ -1473,23 +2682,52 @@ SplashError Splash::drawImage(SplashImageSource src, void *srcData,
     xShear = mat[2] / yScale;
     yShear = mat[1] / mat[0];
   }
-  tx = splashRound(mat[4]);
-  ty = splashRound(mat[5]);
-  scaledWidth = abs(splashRound(mat[4] + xScale) - tx) + 1;
-  scaledHeight = abs(splashRound(mat[5] + yScale) - ty) + 1;
+  // the +/-0.01 in these computations is to avoid floating point
+  // precision problems which can lead to gaps between image stripes
+  // (it can cause image stripes to overlap, but that's a much less
+  // visible problem)
+  if (xScale >= 0) {
+    tx = splashRound(mat[4] - 0.01);
+    tx2 = splashRound(mat[4] + xScale + 0.01) - 1;
+  } else {
+    tx = splashRound(mat[4] + 0.01) - 1;
+    tx2 = splashRound(mat[4] + xScale - 0.01);
+  }
+  scaledWidth = abs(tx2 - tx) + 1;
+  if (scaledWidth == 0) {
+    // technically, this should draw nothing, but it generally seems
+    // better to draw a one-pixel-wide stripe rather than throwing it
+    // away
+    scaledWidth = 1;
+  }
+  if (yScale >= 0) {
+    ty = splashRound(mat[5] - 0.01);
+    ty2 = splashRound(mat[5] + yScale + 0.01) - 1;
+  } else {
+    ty = splashRound(mat[5] + 0.01) - 1;
+    ty2 = splashRound(mat[5] + yScale - 0.01);
+  }
+  scaledHeight = abs(ty2 - ty) + 1;
+  if (scaledHeight == 0) {
+    // technically, this should draw nothing, but it generally seems
+    // better to draw a one-pixel-wide stripe rather than throwing it
+    // away
+    scaledHeight = 1;
+  }
   xSign = (xScale < 0) ? -1 : 1;
   ySign = (yScale < 0) ? -1 : 1;
+  yShear1 = (SplashCoord)xSign * yShear;
 
   // clipping
   ulx1 = 0;
   uly1 = 0;
   urx1 = xSign * (scaledWidth - 1);
-  ury1 = splashRound(yShear * urx1);
+  ury1 = (int)(yShear * urx1);
   llx1 = splashRound(xShear * ySign * (scaledHeight - 1));
-  lly1 = ySign * (scaledHeight - 1) + splashRound(yShear * llx1);
+  lly1 = ySign * (scaledHeight - 1) + (int)(yShear * llx1);
   lrx1 = xSign * (scaledWidth - 1) +
            splashRound(xShear * ySign * (scaledHeight - 1));
-  lry1 = ySign * (scaledHeight - 1) + splashRound(yShear * lrx1);
+  lry1 = ySign * (scaledHeight - 1) + (int)(yShear * lrx1);
   if (rot) {
     ulx = tx + uly1;    uly = ty - ulx1;
     urx = tx + ury1;    ury = ty - urx1;
@@ -1517,8 +2755,9 @@ SplashError Splash::drawImage(SplashImageSource src, void *srcData,
                                    : (lly > lry) ? lly : lry
 		     : (ury > lly) ? (ury > lry) ? ury : lry
                                    : (lly > lry) ? lly : lry;
-  if ((clipRes = state->clip->testRect(xMin, yMin, xMax, yMax))
-      == splashClipAllOutside) {
+  clipRes = state->clip->testRect(xMin, yMin, xMax, yMax);
+  opClipRes = clipRes;
+  if (clipRes == splashClipAllOutside) {
     return splashOk;
   }
 
@@ -1529,174 +2768,393 @@ SplashError Splash::drawImage(SplashImageSource src, void *srcData,
   xq = w % scaledWidth;
 
   // allocate pixel buffer
-  pixBuf = (SplashColor *)gmalloc((yp + 1) * w * sizeof(SplashColor));
-  alphaBuf = (Guchar *)gmalloc((yp + 1) * w * sizeof(Guchar));
+  pixBuf = (SplashColorPtr)gmalloc((yp + 1) * w * nComps);
 
-  // init y scale Bresenham
-  yt = 0;
-  lastYStep = 1;
+  pixAcc0 = pixAcc1 = pixAcc2 = 0; // make gcc happy
+#if SPLASH_CMYK
+  pixAcc3 = 0; // make gcc happy
+#endif
 
-  for (y = 0; y < scaledHeight; ++y) {
+  if (srcAlpha) {
 
-    // y scale Bresenham
-    yStep = yp;
-    yt += yq;
-    if (yt >= scaledHeight) {
-      yt -= scaledHeight;
-      ++yStep;
-    }
+    // init y scale Bresenham
+    yt = 0;
+    lastYStep = 1;
 
-    // read row(s) from image
-    n = (yp > 0) ? yStep : lastYStep;
-    if (n > 0) {
-      p = pixBuf;
-      q = alphaBuf;
-      for (i = 0; i < n; ++i) {
-	for (j = 0; j < w; ++j) {
-	  (*src)(srcData, p++, q++);
+    for (y = 0; y < scaledHeight; ++y) {
+
+      // y scale Bresenham
+      yStep = yp;
+      yt += yq;
+      if (yt >= scaledHeight) {
+	yt -= scaledHeight;
+	++yStep;
+      }
+
+      // read row(s) from image
+      n = (yp > 0) ? yStep : lastYStep;
+      if (n > 0) {
+	p = pixBuf;
+	for (i = 0; i < n; ++i) {
+	  (*src)(srcData, p);
+	  p += w * nComps;
 	}
       }
-    }
-    lastYStep = yStep;
+      lastYStep = yStep;
 
-    // loop-invariant constants
-    k1 = splashRound(xShear * ySign * y);
+      // loop-invariant constants
+      k1 = splashRound(xShear * ySign * y);
 
-    // clipping test
-    if (clipRes != splashClipAllInside &&
-	!rot &&
-	splashRound(yShear * k1) ==
-	  splashRound(yShear * (xSign * (scaledWidth - 1) + k1))) {
-      if (xSign > 0) {
-	spanXMin = tx + k1;
-	spanXMax = spanXMin + (scaledWidth - 1);
+      // clipping test
+      if (clipRes != splashClipAllInside &&
+	  !rot &&
+	  (int)(yShear * k1) ==
+	    (int)(yShear * (xSign * (scaledWidth - 1) + k1))) {
+	if (xSign > 0) {
+	  spanXMin = tx + k1;
+	  spanXMax = spanXMin + (scaledWidth - 1);
+	} else {
+	  spanXMax = tx + k1;
+	  spanXMin = spanXMax - (scaledWidth - 1);
+	}
+	spanY = ty + ySign * y + (int)(yShear * k1);
+	clipRes2 = state->clip->testSpan(spanXMin, spanXMax, spanY);
+	if (clipRes2 == splashClipAllOutside) {
+	  continue;
+	}
       } else {
-	spanXMax = tx + k1;
-	spanXMin = spanXMax - (scaledWidth - 1);
+	clipRes2 = clipRes;
       }
-      spanY = ty + ySign * y + splashRound(xShear * ySign * y);
-      clipRes2 = state->clip->testSpan(spanXMin, spanXMax, spanY);
-      if (clipRes2 == splashClipAllOutside) {
-	continue;
-      }
-    } else {
-      clipRes2 = clipRes;
-    }
 
-    // init x scale Bresenham
-    xt = 0;
-    xSrc = 0;
-
-    for (x = 0; x < scaledWidth; ++x) {
-
-      // x scale Bresenham
-      xStep = xp;
-      xt += xq;
-      if (xt >= scaledWidth) {
-	xt -= scaledWidth;
-	++xStep;
-      }
+      // init x scale Bresenham
+      xt = 0;
+      xSrc = 0;
 
       // x shear
-      x1 = xSign * x + k1;
+      x1 = k1;
 
       // y shear
-      y1 = ySign * y + splashRound(yShear * x1);
-
-      // rotation
-      if (rot) {
-	x2 = y1;
-	y2 = -x1;
-      } else {
-	x2 = x1;
-	y2 = y1;
+      y1 = (SplashCoord)ySign * y + yShear * x1;
+      // this is a kludge: if yShear1 is negative, then (int)y1 would
+      // change immediately after the first pixel, which is not what
+      // we want
+      if (yShear1 < 0) {
+	y1 += 0.999;
       }
 
-      // compute the filtered pixel at (x,y) after the x and y scaling
-      // operations
+      // loop-invariant constants
       n = yStep > 0 ? yStep : 1;
-      m = xStep > 0 ? xStep : 1;
-      p = pixBuf + xSrc;
-      q = alphaBuf + xSrc;
-      for (i = 0; i < splashMaxColorComps; ++i) {
-	pixAcc[i] = 0;
-      }
-      alphaAcc = 0;
-      for (i = 0; i < n; ++i) {
-	for (j = 0; j < m; ++j) {
-	  switch (srcMode) {
-	  case splashModeMono1:
-	    pixAcc[0] += p->mono1;
-	    break;
-	  case splashModeMono8:
-	    pixAcc[0] += p->mono8;
-	    break;
-	  case splashModeRGB8:
-	    pixAcc[0] += splashRGB8R(p->rgb8);
-	    pixAcc[1] += splashRGB8G(p->rgb8);
-	    pixAcc[2] += splashRGB8B(p->rgb8);
-	    break;
-	  case splashModeBGR8Packed:
-	    pixAcc[0] += splashBGR8R(p->bgr8);
-	    pixAcc[1] += splashBGR8G(p->bgr8);
-	    pixAcc[2] += splashBGR8B(p->bgr8);
-	    break;
-	  }
-	  ++p;
-	  alphaAcc += *q++;
-	}
-	p += w - m;
-	q += w - m;
-      }
-      alphaMul = 1 / (SplashCoord)(n * m);
-      if (halftone) {
-	pixMul = (SplashCoord)alphaMul / 256.0;
-      } else {
-	pixMul = alphaMul;
-      }
-      alpha = (SplashCoord)alphaAcc * alphaMul;
 
-      //~ this should blend if 0 < alpha < 1
-      if (alpha > 0.75) {
+      for (x = 0; x < scaledWidth; ++x) {
+
+	// x scale Bresenham
+	xStep = xp;
+	xt += xq;
+	if (xt >= scaledWidth) {
+	  xt -= scaledWidth;
+	  ++xStep;
+	}
+
+	// rotation
+	if (rot) {
+	  x2 = (int)y1;
+	  y2 = -x1;
+	} else {
+	  x2 = x1;
+	  y2 = (int)y1;
+	}
+
+	// compute the filtered pixel at (x,y) after the x and y scaling
+	// operations
+	m = xStep > 0 ? xStep : 1;
+	alphaAcc = 0;
+	switch (srcMode) {
+	case splashModeAMono8:
+	  p = pixBuf + xSrc * 2;
+	  pixAcc0 = 0;
+	  for (i = 0; i < n; ++i) {
+	    for (j = 0; j < m; ++j) {
+	      alphaAcc += *p++;
+	      pixAcc0 += *p++;
+	    }
+	    p += 2 * (w - m);
+	  }
+	  break;
+	case splashModeARGB8:
+	  p = pixBuf + xSrc * 4;
+	  pixAcc0 = pixAcc1 = pixAcc2 = 0;
+	  for (i = 0; i < n; ++i) {
+	    for (j = 0; j < m; ++j) {
+	      alphaAcc += *p++;
+	      pixAcc0 += *p++;
+	      pixAcc1 += *p++;
+	      pixAcc2 += *p++;
+	    }
+	    p += 4 * (w - m);
+	  }
+	  break;
+	case splashModeBGRA8:
+	  p = pixBuf + xSrc * 4;
+	  pixAcc0 = pixAcc1 = pixAcc2 = 0;
+	  for (i = 0; i < n; ++i) {
+	    for (j = 0; j < m; ++j) {
+	      pixAcc0 += *p++;
+	      pixAcc1 += *p++;
+	      pixAcc2 += *p++;
+	      alphaAcc += *p++;
+	    }
+	    p += 4 * (w - m);
+	  }
+	  break;
+#if SPLASH_CMYK
+	case splashModeACMYK8:
+	  p = pixBuf + xSrc * 5;
+	  pixAcc0 = pixAcc1 = pixAcc2 = pixAcc3 = 0;
+	  for (i = 0; i < n; ++i) {
+	    for (j = 0; j < m; ++j) {
+	      alphaAcc += *p++;
+	      pixAcc0 += *p++;
+	      pixAcc1 += *p++;
+	      pixAcc2 += *p++;
+	      pixAcc3 += *p++;
+	    }
+	    p += 5 * (w - m);
+	  }
+	  break;
+#endif
+	default: // make gcc happy
+	  break;
+	}
+	pixMul = (SplashCoord)1 / (SplashCoord)(n * m);
+	alphaMul = pixMul * (1.0 / 256.0);
+	alpha = (SplashCoord)alphaAcc * alphaMul;
+
+	if (alpha > 0) {
+	  // mono8 -> mono1 conversion, with halftoning
+	  if (halftone) {
+	    pix[0] = state->screen->test(tx + x2, ty + y2,
+			    (SplashCoord)pixAcc0 * pixMul * (1.0 / 256.0));
+
+	  // no conversion, no halftoning
+	  } else {
+	    switch (bitmap->mode) {
+#if SPLASH_CMYK
+	    case splashModeCMYK8:
+	      pix[3] = (int)((SplashCoord)pixAcc3 * pixMul);
+	      // fall through
+#endif
+	    case splashModeRGB8:
+	    case splashModeBGR8:
+	      pix[2] = (int)((SplashCoord)pixAcc2 * pixMul);
+	      pix[1] = (int)((SplashCoord)pixAcc1 * pixMul);
+	      // fall through
+	    case splashModeMono1:
+	    case splashModeMono8:
+	      pix[0] = (int)((SplashCoord)pixAcc0 * pixMul);
+	      break;
+	    default: // make gcc happy
+	      break;
+	    }
+	  }
+
+	  // set pixel
+	  drawPixel(tx + x2, ty + y2, pix, alpha * state->fillAlpha,
+		    clipRes2 == splashClipAllInside);
+	}
+
+	// x scale Bresenham
+	xSrc += xStep;
+
+	// x shear
+	x1 += xSign;
+
+	// y shear
+	y1 += yShear1;
+      }
+    }
+
+  } else {
+
+    // init y scale Bresenham
+    yt = 0;
+    lastYStep = 1;
+
+    for (y = 0; y < scaledHeight; ++y) {
+
+      // y scale Bresenham
+      yStep = yp;
+      yt += yq;
+      if (yt >= scaledHeight) {
+	yt -= scaledHeight;
+	++yStep;
+      }
+
+      // read row(s) from image
+      n = (yp > 0) ? yStep : lastYStep;
+      if (n > 0) {
+	p = pixBuf;
+	for (i = 0; i < n; ++i) {
+	  (*src)(srcData, p);
+	  p += w * nComps;
+	}
+      }
+      lastYStep = yStep;
+
+      // loop-invariant constants
+      k1 = splashRound(xShear * ySign * y);
+
+      // clipping test
+      if (clipRes != splashClipAllInside &&
+	  !rot &&
+	  (int)(yShear * k1) ==
+	    (int)(yShear * (xSign * (scaledWidth - 1) + k1))) {
+	if (xSign > 0) {
+	  spanXMin = tx + k1;
+	  spanXMax = spanXMin + (scaledWidth - 1);
+	} else {
+	  spanXMax = tx + k1;
+	  spanXMin = spanXMax - (scaledWidth - 1);
+	}
+	spanY = ty + ySign * y + (int)(yShear * k1);
+	clipRes2 = state->clip->testSpan(spanXMin, spanXMax, spanY);
+	if (clipRes2 == splashClipAllOutside) {
+	  continue;
+	}
+      } else {
+	clipRes2 = clipRes;
+      }
+
+      // init x scale Bresenham
+      xt = 0;
+      xSrc = 0;
+
+      // x shear
+      x1 = k1;
+
+      // y shear
+      y1 = (SplashCoord)ySign * y + yShear * x1;
+      // this is a kludge: if yShear1 is negative, then (int)y1 would
+      // change immediately after the first pixel, which is not what
+      // we want
+      if (yShear1 < 0) {
+	y1 += 0.999;
+      }
+
+      // loop-invariant constants
+      n = yStep > 0 ? yStep : 1;
+
+      for (x = 0; x < scaledWidth; ++x) {
+
+	// x scale Bresenham
+	xStep = xp;
+	xt += xq;
+	if (xt >= scaledWidth) {
+	  xt -= scaledWidth;
+	  ++xStep;
+	}
+
+	// rotation
+	if (rot) {
+	  x2 = (int)y1;
+	  y2 = -x1;
+	} else {
+	  x2 = x1;
+	  y2 = (int)y1;
+	}
+
+	// compute the filtered pixel at (x,y) after the x and y scaling
+	// operations
+	m = xStep > 0 ? xStep : 1;
+	switch (srcMode) {
+	case splashModeMono1:
+	case splashModeMono8:
+	  p = pixBuf + xSrc;
+	  pixAcc0 = 0;
+	  for (i = 0; i < n; ++i) {
+	    for (j = 0; j < m; ++j) {
+	      pixAcc0 += *p++;
+	    }
+	    p += w - m;
+	  }
+	  break;
+	case splashModeRGB8:
+	case splashModeBGR8:
+	  p = pixBuf + xSrc * 3;
+	  pixAcc0 = pixAcc1 = pixAcc2 = 0;
+	  for (i = 0; i < n; ++i) {
+	    for (j = 0; j < m; ++j) {
+	      pixAcc0 += *p++;
+	      pixAcc1 += *p++;
+	      pixAcc2 += *p++;
+	    }
+	    p += 3 * (w - m);
+	  }
+	  break;
+#if SPLASH_CMYK
+	case splashModeCMYK8:
+	  p = pixBuf + xSrc * 4;
+	  pixAcc0 = pixAcc1 = pixAcc2 = pixAcc3 = 0;
+	  for (i = 0; i < n; ++i) {
+	    for (j = 0; j < m; ++j) {
+	      pixAcc0 += *p++;
+	      pixAcc1 += *p++;
+	      pixAcc2 += *p++;
+	      pixAcc3 += *p++;
+	    }
+	    p += 4 * (w - m);
+	  }
+	  break;
+#endif
+	default: // make gcc happy
+	  break;
+	}
+	pixMul = (SplashCoord)1 / (SplashCoord)(n * m);
 
 	// mono8 -> mono1 conversion, with halftoning
 	if (halftone) {
-	  pix.mono1 = state->screen->test(tx + x2, ty + y2,
-					  pixAcc[0] * pixMul);
+	  pix[0] = state->screen->test(tx + x2, ty + y2,
+			  (SplashCoord)pixAcc0 * pixMul * (1.0 / 256.0));
 
 	// no conversion, no halftoning
 	} else {
 	  switch (bitmap->mode) {
-	  case splashModeMono1:
-	    pix.mono1 = splashRound(pixAcc[0] * pixMul);
-	    break;
-	  case splashModeMono8:
-	    pix.mono8 = splashRound(pixAcc[0] * pixMul);
-	    break;
+#if SPLASH_CMYK
+	  case splashModeCMYK8:
+	    pix[3] = (int)((SplashCoord)pixAcc3 * pixMul);
+	    // fall through
+#endif
 	  case splashModeRGB8:
-	    pix.rgb8 = splashMakeRGB8(splashRound(pixAcc[0] * pixMul),
-				      splashRound(pixAcc[1] * pixMul),
-				      splashRound(pixAcc[2] * pixMul));
+	  case splashModeBGR8:
+	    pix[2] = (int)((SplashCoord)pixAcc2 * pixMul);
+	    pix[1] = (int)((SplashCoord)pixAcc1 * pixMul);
+	    // fall through
+	  case splashModeMono1:
+	  case splashModeMono8:
+	    pix[0] = (int)((SplashCoord)pixAcc0 * pixMul);
 	    break;
-	  case splashModeBGR8Packed:
-	    pix.bgr8 = splashMakeBGR8(splashRound(pixAcc[0] * pixMul),
-				      splashRound(pixAcc[1] * pixMul),
-				      splashRound(pixAcc[2] * pixMul));
+	  default: // make gcc happy
 	    break;
 	  }
 	}
 
 	// set pixel
-	drawPixel(tx + x2, ty + y2, &pix, clipRes2 == splashClipAllInside);
-      }
+	drawPixel(tx + x2, ty + y2, pix, state->fillAlpha,
+		  clipRes2 == splashClipAllInside);
 
-      // x scale Bresenham
-      xSrc += xStep;
+	// x scale Bresenham
+	xSrc += xStep;
+
+	// x shear
+	x1 += xSign;
+
+	// y shear
+	y1 += yShear1;
+      }
     }
+
   }
 
   gfree(pixBuf);
-  gfree(alphaBuf);
 
   return splashOk;
 }
@@ -1706,7 +3164,7 @@ void Splash::dumpPath(SplashPath *path) {
 
   for (i = 0; i < path->length; ++i) {
     printf("  %3d: x=%8.2f y=%8.2f%s%s%s%s%s\n",
-	   i, path->pts[i].x, path->pts[i].y,
+	   i, (double)path->pts[i].x, (double)path->pts[i].y,
 	   (path->flags[i] & splashPathFirst) ? " first" : "",
 	   (path->flags[i] & splashPathLast) ? " last" : "",
 	   (path->flags[i] & splashPathClosed) ? " closed" : "",
@@ -1720,8 +3178,8 @@ void Splash::dumpXPath(SplashXPath *path) {
 
   for (i = 0; i < path->length; ++i) {
     printf("  %4d: x0=%8.2f y0=%8.2f x1=%8.2f y1=%8.2f %s%s%s%s%s%s%s\n",
-	   i, path->segs[i].x0, path->segs[i].y0,
-	   path->segs[i].x1, path->segs[i].y1,
+	   i, (double)path->segs[i].x0, (double)path->segs[i].y0,
+	   (double)path->segs[i].x1, (double)path->segs[i].y1,
 	   (path->segs[i].flags	& splashXPathFirst) ? "F" : " ",
 	   (path->segs[i].flags	& splashXPathLast) ? "L" : " ",
 	   (path->segs[i].flags	& splashXPathEnd0) ? "0" : " ",

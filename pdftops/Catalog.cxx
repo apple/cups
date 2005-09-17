@@ -2,7 +2,7 @@
 //
 // Catalog.cc
 //
-// Copyright 1996-2004 Glyph & Cog, LLC
+// Copyright 1996-2003 Glyph & Cog, LLC
 //
 //========================================================================
 
@@ -30,8 +30,8 @@
 Catalog::Catalog(XRef *xrefA) {
   Object catDict, pagesDict;
   Object obj, obj2;
-  unsigned int numPages0;
-  unsigned int i;
+  int numPages0;
+  int i;
 
   ok = gTrue;
   xref = xrefA;
@@ -64,17 +64,8 @@ Catalog::Catalog(XRef *xrefA) {
   }
   pagesSize = numPages0 = (int)obj.getNum();
   obj.free();
-  // The gcc doesnt optimize this away, so this check is ok,
-  // even if it looks like a pagesSize != pagesSize check
-  if (pagesSize*sizeof(Page *)/sizeof(Page *) != pagesSize ||
-      pagesSize*sizeof(Ref)/sizeof(Ref) != pagesSize) {
-    error(-1, "Invalid 'pagesSize'");
-    ok = gFalse;
-    return;
-  }
-
-  pages = (Page **)gmalloc(pagesSize * sizeof(Page *));
-  pageRefs = (Ref *)gmalloc(pagesSize * sizeof(Ref));
+  pages = (Page **)gmallocn(pagesSize, sizeof(Page *));
+  pageRefs = (Ref *)gmallocn(pagesSize, sizeof(Ref));
   for (i = 0; i < pagesSize; ++i) {
     pages[i] = NULL;
     pageRefs[i].num = -1;
@@ -114,6 +105,9 @@ Catalog::Catalog(XRef *xrefA) {
   // get the outline dictionary
   catDict.dictLookup("Outlines", &outline);
 
+  // get the AcroForm dictionary
+  catDict.dictLookup("AcroForm", &acroForm);
+
   catDict.free();
   return;
 
@@ -129,7 +123,7 @@ Catalog::Catalog(XRef *xrefA) {
 }
 
 Catalog::~Catalog() {
-  unsigned int i;
+  int i;
 
   if (pages) {
     for (i = 0; i < pagesSize; ++i) {
@@ -148,6 +142,7 @@ Catalog::~Catalog() {
   metadata.free();
   structTreeRoot.free();
   outline.free();
+  acroForm.free();
 }
 
 GString *Catalog::readMetadata() {
@@ -174,14 +169,13 @@ GString *Catalog::readMetadata() {
   return s;
 }
 
-int Catalog::readPageTree(Dict *pagesDict, PageAttrs *attrs, unsigned int start) {
+int Catalog::readPageTree(Dict *pagesDict, PageAttrs *attrs, int start) {
   Object kids;
   Object kid;
   Object kidRef;
   PageAttrs *attrs1, *attrs2;
   Page *page;
-  int i;
-  unsigned int j;
+  int i, j;
 
   attrs1 = new PageAttrs(attrs, pagesDict);
   pagesDict->lookup("Kids", &kids);
@@ -201,12 +195,8 @@ int Catalog::readPageTree(Dict *pagesDict, PageAttrs *attrs, unsigned int start)
       }
       if (start >= pagesSize) {
 	pagesSize += 32;
-        if (pagesSize*sizeof(Page *)/sizeof(Page *) != pagesSize) {
-          error(-1, "Invalid 'pagesSize' parameter.");
-          goto err3;
-        }
-	pages = (Page **)grealloc(pages, pagesSize * sizeof(Page *));
-	pageRefs = (Ref *)grealloc(pageRefs, pagesSize * sizeof(Ref));
+	pages = (Page **)greallocn(pages, pagesSize, sizeof(Page *));
+	pageRefs = (Ref *)greallocn(pageRefs, pagesSize, sizeof(Ref));
 	for (j = pagesSize - 32; j < pagesSize; ++j) {
 	  pages[j] = NULL;
 	  pageRefs[j].num = -1;
@@ -230,7 +220,6 @@ int Catalog::readPageTree(Dict *pagesDict, PageAttrs *attrs, unsigned int start)
     } else {
       error(-1, "Kid object (page %d) is wrong type (%s)",
 	    start+1, kid.getTypeName());
-      goto err2;
     }
     kid.free();
   }
@@ -250,7 +239,7 @@ int Catalog::readPageTree(Dict *pagesDict, PageAttrs *attrs, unsigned int start)
 }
 
 int Catalog::findPage(int num, int gen) {
-  unsigned int i;
+  int i;
 
   for (i = 0; i < numPages; ++i) {
     if (pageRefs[i].num == num && pageRefs[i].gen == gen)

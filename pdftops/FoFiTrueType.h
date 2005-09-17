@@ -2,7 +2,7 @@
 //
 // FoFiTrueType.h
 //
-// Copyright 1999-2004 Glyph & Cog, LLC
+// Copyright 1999-2003 Glyph & Cog, LLC
 //
 //========================================================================
 
@@ -84,6 +84,7 @@ public:
   // font).  The <cidMap> array maps CIDs to GIDs; it has <nCIDs>
   // entries.
   void convertToCIDType2(char *psName, Gushort *cidMap, int nCIDs,
+			 GBool needVerticalMetrics,
 			 FoFiOutputFunc outputFunc, void *outputStream);
 
   // Convert to a Type 0 (but non-CID) composite font, suitable for
@@ -92,12 +93,16 @@ public:
   // table in the font).  The <cidMap> array maps CIDs to GIDs; it has
   // <nCIDs> entries.
   void convertToType0(char *psName, Gushort *cidMap, int nCIDs,
+		      GBool needVerticalMetrics,
 		      FoFiOutputFunc outputFunc, void *outputStream);
 
   // Write a clean TTF file, filling in missing tables and correcting
-  // various other errors.  If the font is complete and correct, it
-  // will be written unmodified.
-  void writeTTF(FoFiOutputFunc outputFunc, void *outputStream);
+  // various other errors.  If <name> is non-NULL, the font is renamed
+  // to <name>.  If <codeToGID> is non-NULL, the font is re-encoded,
+  // using a Windows Unicode cmap.  If <name> is NULL and the font is
+  // complete and correct, it will be written unmodified.
+  void writeTTF(FoFiOutputFunc outputFunc, void *outputStream,
+		char *name = NULL, Gushort *codeToGID = NULL);
 
 private:
 
@@ -110,7 +115,8 @@ private:
 		      FoFiOutputFunc outputFunc,
 		      void *outputStream);
   void cvtSfnts(FoFiOutputFunc outputFunc,
-		void *outputStream, GString *name);
+		void *outputStream, GString *name,
+		GBool needVerticalMetrics);
   void dumpString(Guchar *s, int length,
 		  FoFiOutputFunc outputFunc,
 		  void *outputStream);

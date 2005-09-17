@@ -2,7 +2,7 @@
 //
 // Stream.h
 //
-// Copyright 1996-2004 Glyph & Cog, LLC
+// Copyright 1996-2003 Glyph & Cog, LLC
 //
 //========================================================================
 
@@ -36,6 +36,13 @@ enum StreamKind {
   strJBIG2,
   strJPX,
   strWeird			// internal-use stream types
+};
+
+enum StreamColorSpaceMode {
+  streamCSNone,
+  streamCSDeviceGray,
+  streamCSDeviceRGB,
+  streamCSDeviceCMYK
 };
 
 //------------------------------------------------------------------------
@@ -100,14 +107,13 @@ public:
   // Is this an encoding filter?
   virtual GBool isEncoder() { return gFalse; }
 
+  // Get image parameters which are defined by the stream contents.
+  virtual void getImageParams(int *bitsPerComponent,
+			      StreamColorSpaceMode *csMode) {}
+
   // Add filters to this stream according to the parameters in <dict>.
   // Returns the new stream.
   Stream *addFilters(Object *dict);
-
-  // Tell this stream to ignore any length limitation -- this only
-  // applies to BaseStream subclasses, and is used as a hack to work
-  // around broken PDF files with incorrect stream lengths.
-  virtual void ignoreLength() {}
 
 private:
 
@@ -167,7 +173,6 @@ public:
   virtual void setPos(Guint pos, int dir = 0);
   virtual BaseStream *getBaseStream() { return str->getBaseStream(); }
   virtual Dict *getDict() { return str->getDict(); }
-  virtual void ignoreLength() { str->ignoreLength(); }
 
 protected:
 
@@ -269,7 +274,6 @@ public:
     { return (bufPtr >= bufEnd && !fillBuf()) ? EOF : (*bufPtr & 0xff); }
   virtual int getPos() { return bufPos + (bufPtr - buf); }
   virtual void setPos(Guint pos, int dir = 0);
-  virtual void ignoreLength() { limited = gFalse; }
   virtual Guint getStart() { return start; }
   virtual void moveStart(int delta);
 
@@ -692,6 +696,10 @@ private:
     lengthDecode[flateMaxLitCodes-257];
   static FlateDecode		// distance decoding info
     distDecode[flateMaxDistCodes];
+  static FlateHuffmanTab	// fixed literal code table
+    fixedLitCodeTab;
+  static FlateHuffmanTab	// fixed distance code table
+    fixedDistCodeTab;
 
   void readSome();
   GBool startBlock();

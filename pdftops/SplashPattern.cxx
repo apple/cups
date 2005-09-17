@@ -28,25 +28,25 @@ SplashPattern::~SplashPattern() {
 // SplashSolidColor
 //------------------------------------------------------------------------
 
-SplashSolidColor::SplashSolidColor(SplashColor colorA) {
-  color = colorA;
+SplashSolidColor::SplashSolidColor(SplashColorPtr colorA) {
+  splashColorCopy(color, colorA);
 }
 
 SplashSolidColor::~SplashSolidColor() {
 }
 
-SplashColor SplashSolidColor::getColor(int x, int y) {
-  return color;
+void SplashSolidColor::getColor(int x, int y, SplashColorPtr c) {
+  splashColorCopy(c, color);
 }
 
 //------------------------------------------------------------------------
 // SplashHalftone
 //------------------------------------------------------------------------
 
-SplashHalftone::SplashHalftone(SplashColor color0A, SplashColor color1A,
+SplashHalftone::SplashHalftone(SplashColorPtr color0A, SplashColorPtr color1A,
 			       SplashScreen *screenA, SplashCoord valueA) {
-  color0 = color0A;
-  color1 = color1A;
+  splashColorCopy(color0, color0A);
+  splashColorCopy(color1, color1A);
   screen = screenA;
   value = valueA;
 }
@@ -59,8 +59,8 @@ SplashHalftone::~SplashHalftone() {
   delete screen;
 }
 
-SplashColor SplashHalftone::getColor(int x, int y) {
-  return screen->test(x, y, value) ? color1 : color0;
+void SplashHalftone::getColor(int x, int y, SplashColorPtr c) {
+  splashColorCopy(c, screen->test(x, y, value) ? color1 : color0);
 }
 
 GBool SplashHalftone::isStatic() {

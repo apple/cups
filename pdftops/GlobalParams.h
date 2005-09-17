@@ -2,7 +2,7 @@
 //
 // GlobalParams.h
 //
-// Copyright 2001-2004 Glyph & Cog, LLC
+// Copyright 2001-2003 Glyph & Cog, LLC
 //
 //========================================================================
 
@@ -48,6 +48,14 @@ enum DisplayFontParamKind {
   displayFontTT
 };
 
+struct DisplayFontParamT1 {
+  GString *fileName;
+};
+
+struct DisplayFontParamTT {
+  GString *fileName;
+};
+
 class DisplayFontParam {
 public:
 
@@ -56,12 +64,8 @@ public:
 				//   generic CID fonts
   DisplayFontParamKind kind;
   union {
-    struct {
-      GString *fileName;
-    } t1;
-    struct {
-      GString *fileName;
-    } tt;
+    DisplayFontParamT1 t1;
+    DisplayFontParamTT tt;
   };
 
   DisplayFontParam(GString *nameA, DisplayFontParamKind kindA);
@@ -155,6 +159,7 @@ public:
   GBool getTextKeepTinyChars();
   GString *findFontFile(GString *fontName, char **exts);
   GString *getInitialZoom();
+  GBool getContinuousView();
   GBool getEnableT1lib();
   GBool getEnableFreeType();
   GBool getAntialias();
@@ -195,6 +200,7 @@ public:
   void setTextPageBreaks(GBool pageBreaks);
   void setTextKeepTinyChars(GBool keep);
   void setInitialZoom(char *s);
+  void setContinuousView(GBool cont);
   GBool setEnableT1lib(char *s);
   GBool setEnableFreeType(char *s);
   GBool setAntialias(char *s);
@@ -299,6 +305,7 @@ private:
   GBool textKeepTinyChars;	// keep all characters in text output
   GList *fontDirs;		// list of font dirs [GString]
   GString *initialZoom;		// initial zoom level
+  GBool continuousView;		// continuous view mode
   GBool enableT1lib;		// t1lib enable flag
   GBool enableFreeType;		// FreeType enable flag
   GBool antialias;		// anti-aliasing enable flag

@@ -2,7 +2,7 @@
 //
 // Page.h
 //
-// Copyright 1996-2004 Glyph & Cog, LLC
+// Copyright 1996-2003 Glyph & Cog, LLC
 //
 //========================================================================
 
@@ -51,7 +51,6 @@ public:
   ~PageAttrs();
 
   // Accessors.
-  PDFRectangle *getBox() { return limitToCropBox ? &cropBox : &mediaBox; }
   PDFRectangle *getMediaBox() { return &mediaBox; }
   PDFRectangle *getCropBox() { return &cropBox; }
   GBool isCropped() { return haveCropBox; }
@@ -83,7 +82,6 @@ private:
   PDFRectangle mediaBox;
   PDFRectangle cropBox;
   GBool haveCropBox;
-  GBool limitToCropBox;
   PDFRectangle bleedBox;
   PDFRectangle trimBox;
   PDFRectangle artBox;
@@ -114,12 +112,17 @@ public:
   GBool isOk() { return ok; }
 
   // Get page parameters.
-  PDFRectangle *getBox() { return attrs->getBox(); }
   PDFRectangle *getMediaBox() { return attrs->getMediaBox(); }
   PDFRectangle *getCropBox() { return attrs->getCropBox(); }
   GBool isCropped() { return attrs->isCropped(); }
-  double getWidth() { return attrs->getBox()->x2 - attrs->getBox()->x1; }
-  double getHeight() { return attrs->getBox()->y2 - attrs->getBox()->y1; }
+  double getMediaWidth() 
+    { return attrs->getMediaBox()->x2 - attrs->getMediaBox()->x1; }
+  double getMediaHeight()
+    { return attrs->getMediaBox()->y2 - attrs->getMediaBox()->y1; }
+  double getCropWidth() 
+    { return attrs->getCropBox()->x2 - attrs->getCropBox()->x1; }
+  double getCropHeight()
+    { return attrs->getCropBox()->y2 - attrs->getCropBox()->y1; }
   PDFRectangle *getBleedBox() { return attrs->getBleedBox(); }
   PDFRectangle *getTrimBox() { return attrs->getTrimBox(); }
   PDFRectangle *getArtBox() { return attrs->getArtBox(); }
@@ -142,18 +145,22 @@ public:
 
   // Display a page.
   void display(OutputDev *out, double hDPI, double vDPI,
-	       int rotate, GBool crop,
+	       int rotate, GBool useMediaBox, GBool crop,
 	       Links *links, Catalog *catalog,
 	       GBool (*abortCheckCbk)(void *data) = NULL,
 	       void *abortCheckCbkData = NULL);
 
   // Display part of a page.
   void displaySlice(OutputDev *out, double hDPI, double vDPI,
-		    int rotate, GBool crop,
+		    int rotate, GBool useMediaBox, GBool crop,
 		    int sliceX, int sliceY, int sliceW, int sliceH,
 		    Links *links, Catalog *catalog,
 		    GBool (*abortCheckCbk)(void *data) = NULL,
 		    void *abortCheckCbkData = NULL);
+
+  // Get the page's default CTM.
+  void getDefaultCTM(double *ctm, double hDPI, double vDPI,
+		     int rotate, GBool upsideDown);
 
 private:
 

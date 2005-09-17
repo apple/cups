@@ -2,7 +2,7 @@
 //
 // Outline.cc
 //
-// Copyright 2002-2004 Glyph & Cog, LLC
+// Copyright 2002-2003 Glyph & Cog, LLC
 //
 //========================================================================
 
@@ -58,14 +58,14 @@ OutlineItem::OutlineItem(Dict *dict, XRef *xrefA) {
     if ((s->getChar(0) & 0xff) == 0xfe &&
 	(s->getChar(1) & 0xff) == 0xff) {
       titleLen = (s->getLength() - 2) / 2;
-      title = (Unicode *)gmalloc(titleLen * sizeof(Unicode));
+      title = (Unicode *)gmallocn(titleLen, sizeof(Unicode));
       for (i = 0; i < titleLen; ++i) {
 	title[i] = ((s->getChar(2 + 2*i) & 0xff) << 8) |
 	           (s->getChar(3 + 2*i) & 0xff);
       }
     } else {
       titleLen = s->getLength();
-      title = (Unicode *)gmalloc(titleLen * sizeof(Unicode));
+      title = (Unicode *)gmallocn(titleLen, sizeof(Unicode));
       for (i = 0; i < titleLen; ++i) {
 	title[i] = pdfDocEncoding[s->getChar(i) & 0xff];
       }

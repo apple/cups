@@ -2,7 +2,7 @@
 //
 // XRef.cc
 //
-// Copyright 1996-2004 Glyph & Cog, LLC
+// Copyright 1996-2003 Glyph & Cog, LLC
 //
 //========================================================================
 
@@ -105,14 +105,9 @@ ObjectStream::ObjectStream(XRef *xref, int objStrNumA) {
     goto err1;
   }
 
-  if (nObjects*sizeof(int)/sizeof(int) != nObjects) {
-    error(-1, "Invalid 'nObjects'");
-    goto err1;
-  }
- 
   objs = new Object[nObjects];
-  objNums = (int *)gmalloc(nObjects * sizeof(int));
-  offsets = (int *)gmalloc(nObjects * sizeof(int));
+  objNums = (int *)gmallocn(nObjects, sizeof(int));
+  offsets = (int *)gmallocn(nObjects, sizeof(int));
 
   // parse the header: object numbers and offsets
   objStr.streamReset();
@@ -382,12 +377,7 @@ GBool XRef::readXRefTable(Parser *parser, Guint *pos) {
       if (newSize < 0) {
 	goto err1;
       }
-      if (newSize*sizeof(XRefEntry)/sizeof(XRefEntry) != newSize) {
-        error(-1, "Invalid 'obj' parameters'");
-        goto err1;
-      }
- 
-      entries = (XRefEntry *)grealloc(entries, newSize * sizeof(XRefEntry));
+      entries = (XRefEntry *)greallocn(entries, newSize, sizeof(XRefEntry));
       for (i = size; i < newSize; ++i) {
 	entries[i].offset = 0xffffffff;
 	entries[i].type = xrefEntryFree;
@@ -460,6 +450,7 @@ GBool XRef::readXRefTable(Parser *parser, Guint *pos) {
     pos2 = (Guint)obj2.getInt();
     readXRef(&pos2);
     if (!ok) {
+      obj2.free();
       goto err1;
     }
   }
@@ -492,11 +483,7 @@ GBool XRef::readXRefStream(Stream *xrefStr, Guint *pos) {
     goto err1;
   }
   if (newSize > size) {
-    if (newSize * sizeof(XRefEntry)/sizeof(XRefEntry) != newSize) {
-      error(-1, "Invalid 'size' parameter.");
-      return gFalse;
-    }
-    entries = (XRefEntry *)grealloc(entries, newSize * sizeof(XRefEntry));
+    entries = (XRefEntry *)greallocn(entries, newSize, sizeof(XRefEntry));
     for (i = size; i < newSize; ++i) {
       entries[i].offset = 0xffffffff;
       entries[i].type = xrefEntryFree;
@@ -586,11 +573,7 @@ GBool XRef::readXRefStreamSection(Stream *xrefStr, int *w, int first, int n) {
     if (newSize < 0) {
       return gFalse;
     }
-    if (newSize*sizeof(XRefEntry)/sizeof(XRefEntry) != newSize) {
-      error(-1, "Invalid 'size' inside xref table.");
-      return gFalse;
-    }
-    entries = (XRefEntry *)grealloc(entries, newSize * sizeof(XRefEntry));
+    entries = (XRefEntry *)greallocn(entries, newSize, sizeof(XRefEntry));
     for (i = size; i < newSize; ++i) {
       entries[i].offset = 0xffffffff;
       entries[i].type = xrefEntryFree;
@@ -680,7 +663,7 @@ GBool XRef::constructXRef() {
       obj.initNull();
       parser = new Parser(NULL,
 		 new Lexer(NULL,
-		   str->makeSubStream(start + pos + 7, gFalse, 0, &obj)));
+		   str->makeSubStream(pos + 7, gFalse, 0, &obj)));
       parser->getObj(&newTrailerDict);
       if (newTrailerDict.isDict()) {
 	newTrailerDict.dictLookupNF("Root", &obj);
@@ -725,12 +708,8 @@ GBool XRef::constructXRef() {
 		    error(-1, "Bad object number");
 		    return gFalse;
 		  }
-                  if (newSize*sizeof(XRefEntry)/sizeof(XRefEntry) != newSize) {
-                    error(-1, "Invalid 'obj' parameters.");
-                    return gFalse;
-                  }
 		  entries = (XRefEntry *)
-		      grealloc(entries, newSize * sizeof(XRefEntry));
+		      greallocn(entries, newSize, sizeof(XRefEntry));
 		  for (i = size; i < newSize; ++i) {
 		    entries[i].offset = 0xffffffff;
 		    entries[i].type = xrefEntryFree;
@@ -752,12 +731,8 @@ GBool XRef::constructXRef() {
     } else if (!strncmp(p, "endstream", 9)) {
       if (streamEndsLen == streamEndsSize) {
 	streamEndsSize += 64;
-        if (streamEndsSize*sizeof(int)/sizeof(int) != streamEndsSize) {
-          error(-1, "Invalid 'endstream' parameter.");
-          return gFalse;
-        }
-	streamEnds = (Guint *)grealloc(streamEnds,
-				       streamEndsSize * sizeof(int));
+	streamEnds = (Guint *)greallocn(streamEnds,
+					streamEndsSize, sizeof(int));
       }
       streamEnds[streamEndsLen++] = pos;
     }
@@ -776,6 +751,7 @@ void XRef::setEncryption(int permFlagsA, GBool ownerPasswordOkA,
 
   encrypted = gTrue;
   permFlags = permFlagsA;
+  ownerPasswordOk = ownerPasswordOkA;
   if (keyLengthA <= 16) {
     keyLength = keyLengthA;
   } else {
@@ -830,6 +806,10 @@ Object *XRef::fetch(int num, int gen, Object *obj) {
     if (!obj1.isInt() || obj1.getInt() != num ||
 	!obj2.isInt() || obj2.getInt() != gen ||
 	!obj3.isCmd("obj")) {
+      obj1.free();
+      obj2.free();
+      obj3.free();
+      delete parser;
       goto err;
     }
     parser->getObj(obj, encrypted ? fileKey : (Guchar *)NULL, keyLength,

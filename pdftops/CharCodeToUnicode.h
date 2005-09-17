@@ -4,7 +4,7 @@
 //
 // Mapping from character codes to Unicode.
 //
-// Copyright 2001-2004 Glyph & Cog, LLC
+// Copyright 2001-2003 Glyph & Cog, LLC
 //
 //========================================================================
 
@@ -87,7 +87,7 @@ private:
   CharCodeToUnicodeString *sMap;
   int sMapLen, sMapSize;
   int refCnt;
-#ifdef MULTITHREADED
+#if MULTITHREADED
   GMutex mutex;
 #endif
 };

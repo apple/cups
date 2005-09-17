@@ -70,9 +70,9 @@ void SplashFont::initCache() {
   } else {
     cacheSets = 1;
   }
-  cache = (Guchar *)gmalloc(cacheSets * cacheAssoc * glyphSize);
-  cacheTags = (SplashFontCacheTag *)gmalloc(cacheSets * cacheAssoc *
-					      sizeof(SplashFontCacheTag));
+  cache = (Guchar *)gmallocn(cacheSets* cacheAssoc, glyphSize);
+  cacheTags = (SplashFontCacheTag *)gmallocn(cacheSets * cacheAssoc,
+					     sizeof(SplashFontCacheTag));
   for (i = 0; i < cacheSets * cacheAssoc; ++i) {
     cacheTags[i].mru = i & (cacheAssoc - 1);
   }
@@ -94,6 +94,12 @@ GBool SplashFont::getGlyph(int c, int xFrac, int yFrac,
   int size;
   Guchar *p;
   int i, j, k;
+
+  // no fractional coordinates for large glyphs or non-anti-aliased
+  // glyphs
+  if (!aa || glyphH > 50) {
+    xFrac = yFrac = 0;
+  }
 
   // check the cache
   i = (c & (cacheSets - 1)) * cacheAssoc;

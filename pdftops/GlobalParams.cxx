@@ -2,7 +2,7 @@
 //
 // GlobalParams.cc
 //
-// Copyright 2001-2004 Glyph & Cog, LLC
+// Copyright 2001-2003 Glyph & Cog, LLC
 //
 //========================================================================
 
@@ -20,6 +20,9 @@
 #    include <dlfcn.h>
 #  endif
 #endif
+#ifdef WIN32
+#  include <shlobj.h>
+#endif
 #if HAVE_PAPER_H
 #include <paper.h>
 #endif
@@ -35,7 +38,9 @@
 #include "CMap.h"
 #include "BuiltinFontTables.h"
 #include "FontEncodingTables.h"
-#include "XpdfPluginAPI.h"
+#ifdef ENABLE_PLUGINS
+#  include "XpdfPluginAPI.h"
+#endif
 #include "GlobalParams.h"
 
 #if MULTITHREADED
@@ -58,8 +63,10 @@
 #include "UnicodeMapTables.h"
 #include "UTF8.h"
 
-#ifdef WIN32
+#ifdef ENABLE_PLUGINS
+#  ifdef WIN32
 extern XpdfPluginVecTable xpdfPluginVecTable;
+#  endif
 #endif
 
 //------------------------------------------------------------------------
@@ -71,31 +78,42 @@ extern XpdfPluginVecTable xpdfPluginVecTable;
 
 static struct {
   char *name;
-  char *fileName;
+  char *t1FileName;
+  char *ttFileName;
 } displayFontTab[] = {
-  {"Courier",               "n022003l.pfb"},
-  {"Courier-Bold",          "n022004l.pfb"},
-  {"Courier-BoldOblique",   "n022024l.pfb"},
-  {"Courier-Oblique",       "n022023l.pfb"},
-  {"Helvetica",             "n019003l.pfb"},
-  {"Helvetica-Bold",        "n019004l.pfb"},
-  {"Helvetica-BoldOblique", "n019024l.pfb"},
-  {"Helvetica-Oblique",     "n019023l.pfb"},
-  {"Symbol",                "s050000l.pfb"},
-  {"Times-Bold",            "n021004l.pfb"},
-  {"Times-BoldItalic",      "n021024l.pfb"},
-  {"Times-Italic",          "n021023l.pfb"},
-  {"Times-Roman",           "n021003l.pfb"},
-  {"ZapfDingbats",          "d050000l.pfb"},
+  {"Courier",               "n022003l.pfb", "cour.ttf"},
+  {"Courier-Bold",          "n022004l.pfb", "courbd.ttf"},
+  {"Courier-BoldOblique",   "n022024l.pfb", "courbi.ttf"},
+  {"Courier-Oblique",       "n022023l.pfb", "couri.ttf"},
+  {"Helvetica",             "n019003l.pfb", "arial.ttf"},
+  {"Helvetica-Bold",        "n019004l.pfb", "arialbd.ttf"},
+  {"Helvetica-BoldOblique", "n019024l.pfb", "arialbi.ttf"},
+  {"Helvetica-Oblique",     "n019023l.pfb", "ariali.ttf"},
+  {"Symbol",                "s050000l.pfb", NULL},
+  {"Times-Bold",            "n021004l.pfb", "timesbd.ttf"},
+  {"Times-BoldItalic",      "n021024l.pfb", "timesbi.ttf"},
+  {"Times-Italic",          "n021023l.pfb", "timesi.ttf"},
+  {"Times-Roman",           "n021003l.pfb", "times.ttf"},
+  {"ZapfDingbats",          "d050000l.pfb", NULL},
   {NULL}
 };
 
+#ifdef WIN32
+static char *displayFontDirs[] = {
+  "c:/windows/fonts",
+  "c:/winnt/fonts",
+  NULL
+};
+#else
 static char *displayFontDirs[] = {
   "/usr/share/ghostscript/fonts",
   "/usr/local/share/ghostscript/fonts",
   "/usr/share/fonts/default/Type1",
+  "/usr/share/fonts/default/ghostscript",
+  "/usr/share/fonts/type1/gsfonts",
   NULL
 };
+#endif
 
 //------------------------------------------------------------------------
 
@@ -389,6 +407,7 @@ GlobalParams::GlobalParams(char *cfgFileName) {
   textKeepTinyChars = gFalse;
   fontDirs = new GList();
   initialZoom = new GString("125");
+  continuousView = gFalse;
   enableT1lib = gTrue;
   enableFreeType = gTrue;
   antialias = gTrue;
@@ -600,6 +619,8 @@ void GlobalParams::parseFile(GString *fileName, FILE *f) {
 	parseFontDir(tokens, fileName, line);
       } else if (!cmd->cmp("initialZoom")) {
 	parseInitialZoom(tokens, fileName, line);
+      } else if (!cmd->cmp("continuousView")) {
+	parseYesNo("continuousView", &continuousView, tokens, fileName, line);
       } else if (!cmd->cmp("enableT1lib")) {
 	parseYesNo("enableT1lib", &enableT1lib, tokens, fileName, line);
       } else if (!cmd->cmp("enableFreeType")) {
@@ -1067,10 +1088,35 @@ void GlobalParams::setBaseDir(char *dir) {
 void GlobalParams::setupBaseFonts(char *dir) {
   GString *fontName;
   GString *fileName;
+#ifdef WIN32
+  HMODULE shell32Lib;
+  BOOL (__stdcall *SHGetSpecialFolderPathFunc)(HWND hwndOwner,
+					       LPTSTR lpszPath,
+					       int nFolder,
+					       BOOL fCreate);
+  char winFontDir[MAX_PATH];
+#endif
   FILE *f;
+  DisplayFontParamKind kind;
   DisplayFontParam *dfp;
   int i, j;
 
+#ifdef WIN32
+  // SHGetSpecialFolderPath isn't available in older versions of
+  // shell32.dll (Win95 and WinNT4), so do a dynamic load
+  winFontDir[0] = '\0';
+  if ((shell32Lib = LoadLibrary("shell32.dll"))) {
+    if ((SHGetSpecialFolderPathFunc = 
+	 (BOOL (__stdcall *)(HWND hwndOwner, LPTSTR lpszPath,
+			     int nFolder, BOOL fCreate))
+	 GetProcAddress(shell32Lib, "SHGetSpecialFolderPath"))) {
+      if (!(*SHGetSpecialFolderPathFunc)(NULL, winFontDir,
+					 CSIDL_FONTS, FALSE)) {
+	winFontDir[0] = '\0';
+      }
+    }
+  }
+#endif
   for (i = 0; displayFontTab[i].name; ++i) {
     fontName = new GString(displayFontTab[i].name);
     if (getDisplayFont(fontName)) {
@@ -1078,8 +1124,10 @@ void GlobalParams::setupBaseFonts(char *dir) {
       continue;
     }
     fileName = NULL;
+    kind = displayFontT1; // make gcc happy
     if (dir) {
-      fileName = appendToPath(new GString(dir), displayFontTab[i].fileName);
+      fileName = appendToPath(new GString(dir), displayFontTab[i].t1FileName);
+      kind = displayFontT1;
       if ((f = fopen(fileName->getCString(), "rb"))) {
 	fclose(f);
       } else {
@@ -1087,10 +1135,39 @@ void GlobalParams::setupBaseFonts(char *dir) {
 	fileName = NULL;
       }
     }
-#ifndef WIN32
+#ifdef WIN32
+    if (!fileName && winFontDir[0] && displayFontTab[i].ttFileName) {
+      fileName = appendToPath(new GString(winFontDir),
+			      displayFontTab[i].ttFileName);
+      kind = displayFontTT;
+      if ((f = fopen(fileName->getCString(), "rb"))) {
+	fclose(f);
+      } else {
+	delete fileName;
+	fileName = NULL;
+      }
+    }
+    // SHGetSpecialFolderPath(CSIDL_FONTS) doesn't work on Win 2k Server
+    // or Win2003 Server, or with older versions of shell32.dll, so check
+    // the "standard" directories
+    if (displayFontTab[i].ttFileName) {
+      for (j = 0; !fileName && displayFontDirs[j]; ++j) {
+	fileName = appendToPath(new GString(displayFontDirs[j]),
+				displayFontTab[i].ttFileName);
+	kind = displayFontTT;
+	if ((f = fopen(fileName->getCString(), "rb"))) {
+	  fclose(f);
+	} else {
+	  delete fileName;
+	  fileName = NULL;
+	}
+      }
+    }
+#else
     for (j = 0; !fileName && displayFontDirs[j]; ++j) {
       fileName = appendToPath(new GString(displayFontDirs[j]),
-			      displayFontTab[i].fileName);
+			      displayFontTab[i].t1FileName);
+      kind = displayFontT1;
       if ((f = fopen(fileName->getCString(), "rb"))) {
 	fclose(f);
       } else {
@@ -1104,7 +1181,7 @@ void GlobalParams::setupBaseFonts(char *dir) {
       delete fontName;
       continue;
     }
-    dfp = new DisplayFontParam(fontName, displayFontT1);
+    dfp = new DisplayFontParam(fontName, kind);
     dfp->t1.fileName = fileName;
     globalParams->addDisplayFont(dfp);
   }
@@ -1480,6 +1557,15 @@ GString *GlobalParams::getInitialZoom() {
   return s;
 }
 
+GBool GlobalParams::getContinuousView() {
+  GBool f;
+
+  lockGlobalParams;
+  f = continuousView;
+  unlockGlobalParams;
+  return f;
+}
+
 GBool GlobalParams::getEnableT1lib() {
   GBool f;
 
@@ -1796,6 +1882,12 @@ void GlobalParams::setInitialZoom(char *s) {
   unlockGlobalParams;
 }
 
+void GlobalParams::setContinuousView(GBool cont) {
+  lockGlobalParams;
+  continuousView = cont;
+  unlockGlobalParams;
+}
+
 GBool GlobalParams::setEnableT1lib(char *s) {
   GBool ok;
 
@@ -1858,7 +1950,7 @@ XpdfSecurityHandler *GlobalParams::getSecurityHandler(char *name) {
   lockGlobalParams;
   for (i = 0; i < securityHandlers->getLength(); ++i) {
     hdlr = (XpdfSecurityHandler *)securityHandlers->get(i);
-    if (!strcmp(hdlr->name, name)) {
+    if (!stricmp(hdlr->name, name)) {
       unlockGlobalParams;
       return hdlr;
     }

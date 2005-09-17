@@ -121,6 +121,7 @@ SplashFontFile *SplashFontEngine::loadType1Font(SplashFontFileID *idA,
   }
 #endif
 
+#ifndef WIN32
   // delete the (temporary) font file -- with Unix hard link
   // semantics, this will remove the last link; otherwise it will
   // return an error, leaving the file to be deleted later (if
@@ -128,6 +129,7 @@ SplashFontFile *SplashFontEngine::loadType1Font(SplashFontFileID *idA,
   if (deleteFile) {
     unlink(fontFile ? fontFile->fileName->getCString() : fileName);
   }
+#endif
 
   return fontFile;
 }
@@ -150,6 +152,7 @@ SplashFontFile *SplashFontEngine::loadType1CFont(SplashFontFileID *idA,
   }
 #endif
 
+#ifndef WIN32
   // delete the (temporary) font file -- with Unix hard link
   // semantics, this will remove the last link; otherwise it will
   // return an error, leaving the file to be deleted later (if
@@ -157,6 +160,7 @@ SplashFontFile *SplashFontEngine::loadType1CFont(SplashFontFileID *idA,
   if (deleteFile) {
     unlink(fontFile ? fontFile->fileName->getCString() : fileName);
   }
+#endif
 
   return fontFile;
 }
@@ -173,6 +177,7 @@ SplashFontFile *SplashFontEngine::loadCIDFont(SplashFontFileID *idA,
   }
 #endif
 
+#ifndef WIN32
   // delete the (temporary) font file -- with Unix hard link
   // semantics, this will remove the last link; otherwise it will
   // return an error, leaving the file to be deleted later (if
@@ -180,6 +185,7 @@ SplashFontFile *SplashFontEngine::loadCIDFont(SplashFontFileID *idA,
   if (deleteFile) {
     unlink(fontFile ? fontFile->fileName->getCString() : fileName);
   }
+#endif
 
   return fontFile;
 }
@@ -203,6 +209,7 @@ SplashFontFile *SplashFontEngine::loadTrueTypeFont(SplashFontFileID *idA,
     gfree(codeToGID);
   }
 
+#ifndef WIN32
   // delete the (temporary) font file -- with Unix hard link
   // semantics, this will remove the last link; otherwise it will
   // return an error, leaving the file to be deleted later (if
@@ -210,6 +217,7 @@ SplashFontFile *SplashFontEngine::loadTrueTypeFont(SplashFontFileID *idA,
   if (deleteFile) {
     unlink(fontFile ? fontFile->fileName->getCString() : fileName);
   }
+#endif
 
   return fontFile;
 }

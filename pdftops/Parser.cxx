@@ -2,7 +2,7 @@
 //
 // Parser.cc
 //
-// Copyright 1996-2004 Glyph & Cog, LLC
+// Copyright 1996-2003 Glyph & Cog, LLC
 //
 //========================================================================
 
@@ -137,6 +137,7 @@ Object *Parser::getObj(Object *obj,
 
 Stream *Parser::makeStream(Object *dict) {
   Object obj;
+  BaseStream *baseStr;
   Stream *str;
   Guint pos, endPos, length;
 
@@ -165,13 +166,7 @@ Stream *Parser::makeStream(Object *dict) {
   if (!lexer->getStream()) {
     return NULL;
   }
-
-  // make base stream
-  str = lexer->getStream()->getBaseStream()->makeSubStream(pos, gTrue,
-							   length, dict);
-
-  // get filters
-  str = str->addFilters(dict);
+  baseStr = lexer->getStream()->getBaseStream();
 
   // skip over stream data
   lexer->setPos(pos + length);
@@ -183,8 +178,16 @@ Stream *Parser::makeStream(Object *dict) {
     shift();
   } else {
     error(getPos(), "Missing 'endstream'");
-    str->ignoreLength();
+    // kludge for broken PDF files: just add 5k to the length, and
+    // hope its enough
+    length += 5000;
   }
+
+  // make base stream
+  str = baseStr->makeSubStream(pos, gTrue, length, dict);
+
+  // get filters
+  str = str->addFilters(dict);
 
   return str;
 }

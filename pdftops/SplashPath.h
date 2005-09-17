@@ -84,6 +84,11 @@ public:
   // Add (<dx>, <dy>) to every point on this path.
   void offset(SplashCoord dx, SplashCoord dy);
 
+  // Get the points on the path.
+  int getLength() { return length; }
+  void getPoint(int i, double *x, double *y, Guchar *f)
+    { *x = pts[i].x; *y = pts[i].y; *f = flags[i]; }
+
   // Get the current point.
   GBool getCurPt(SplashCoord *x, SplashCoord *y);
 

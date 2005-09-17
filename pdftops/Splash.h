@@ -14,29 +14,28 @@
 #endif
 
 #include "SplashTypes.h"
+#include "SplashClip.h"
 
 class SplashBitmap;
-class SplashGlyphBitmap;
+struct SplashGlyphBitmap;
 class SplashState;
 class SplashPattern;
 class SplashScreen;
 class SplashPath;
 class SplashXPath;
-class SplashClip;
 class SplashFont;
 
 //------------------------------------------------------------------------
 
-// Retrieves the next pixel in an image mask.  Normally, fills in
-// *<pixel> and returns true.  If the image stream is exhausted,
-// returns false.
-typedef GBool (*SplashImageMaskSource)(void *data, SplashMono1 *pixel);
+// Retrieves the next line of pixels in an image mask.  Normally,
+// fills in *<line> and returns true.  If the image stream is
+// exhausted, returns false.
+typedef GBool (*SplashImageMaskSource)(void *data, SplashColorPtr pixel);
 
-// Retrieves the next pixel in an image.  Normally, fills in *<pixel>
-// (pixel color) and *<alpha> (1 for opaque, 0 for transparent), and
-// returns true.  If the image stream is exhausted, returns false.
-typedef GBool (*SplashImageSource)(void *data, SplashColor *pixel,
-				   Guchar *alpha);
+// Retrieves the next line of pixels in an image.  Normally, fills in
+// *<line> and returns true.  If the image stream is exhausted,
+// returns false.
+typedef GBool (*SplashImageSource)(void *data, SplashColorPtr line);
 
 //------------------------------------------------------------------------
 // Splash
@@ -55,6 +54,9 @@ public:
   SplashPattern *getStrokePattern();
   SplashPattern *getFillPattern();
   SplashScreen *getScreen();
+  SplashBlendFunc getBlendFunc();
+  SplashCoord getStrokeAlpha();
+  SplashCoord getFillAlpha();
   SplashCoord getLineWidth();
   int getLineCap();
   int getLineJoin();
@@ -70,6 +72,9 @@ public:
   void setStrokePattern(SplashPattern *strokeColor);
   void setFillPattern(SplashPattern *fillColor);
   void setScreen(SplashScreen *screen);
+  void setBlendFunc(SplashBlendFunc func);
+  void setStrokeAlpha(SplashCoord alpha);
+  void setFillAlpha(SplashCoord alpha);
   void setLineWidth(SplashCoord lineWidth);
   void setLineCap(int lineCap);
   void setLineJoin(int lineJoin);
@@ -89,10 +94,14 @@ public:
   void saveState();
   SplashError restoreState();
 
+  //----- soft mask
+
+  void setSoftMask(SplashBitmap *softMaskA);
+
   //----- drawing operations
 
   // Fill the bitmap with <color>.  This is not subject to clipping.
-  void clear(SplashColor color);
+  void clear(SplashColorPtr color);
 
   // Stroke a path using the current stroke pattern.
   SplashError stroke(SplashPath *path);
@@ -111,10 +120,10 @@ public:
   SplashError fillGlyph(SplashCoord x, SplashCoord y,
 			SplashGlyphBitmap *glyph);
 
-  // Draws an image mask using the fill color.  This will read <w>*<h>
-  // pixels from <src>, in raster order, starting with the top line.
-  // "1" pixels will be drawn with the current fill color; "0" pixels
-  // are transparent.  The matrix:
+  // Draws an image mask using the fill color.  This will read <h>
+  // lines of <w> pixels from <src>, starting with the top line.  "1"
+  // pixels will be drawn with the current fill color; "0" pixels are
+  // transparent.  The matrix:
   //    [ mat[0] mat[1] 0 ]
   //    [ mat[2] mat[3] 0 ]
   //    [ mat[4] mat[5] 1 ]
@@ -127,50 +136,68 @@ public:
   SplashError fillImageMask(SplashImageMaskSource src, void *srcData,
 			    int w, int h, SplashCoord *mat);
 
-  // Draw an image.  This will read <w>*<h> pixels from <src>, in
-  // raster order, starting with the top line.  These pixels are
-  // assumed to be in the source mode, <srcMode>.  The following
-  // combinations of source and target modes are supported:
+  // Draw an image.  This will read <h> lines of <w> pixels from
+  // <src>, starting with the top line.  These pixels are assumed to
+  // be in the source mode, <srcMode>.  The following combinations of
+  // source and target modes are supported:
   //    source       target
   //    ------       ------
   //    Mono1        Mono1
   //    Mono8        Mono1   -- with dithering
   //    Mono8        Mono8
   //    RGB8         RGB8
-  //    BGR8packed   BGR8Packed
+  //    BGR8         BGR8
+  //    ARGB8        RGB8    -- with source alpha (masking)
+  //    BGRA8        BGR8    -- with source alpha (masking)
   // The matrix behaves as for fillImageMask.
   SplashError drawImage(SplashImageSource src, void *srcData,
 			SplashColorMode srcMode,
 			int w, int h, SplashCoord *mat);
-
-  //~ drawMaskedImage
 
   //----- misc
 
   // Return the associated bitmap.
   SplashBitmap *getBitmap() { return bitmap; }
 
+  // Get a bounding box which includes all modifications since the
+  // last call to clearModRegion.
+  void getModRegion(int *xMin, int *yMin, int *xMax, int *yMax)
+    { *xMin = modXMin; *yMin = modYMin; *xMax = modXMax; *yMax = modYMax; }
+
+  // Clear the modified region bounding box.
+  void clearModRegion();
+
+  // Get clipping status for the last drawing operation subject to
+  // clipping.
+  SplashClipResult getClipRes() { return opClipRes; }
+
   // Toggle debug mode on or off.
   void setDebugMode(GBool debugModeA) { debugMode = debugModeA; }
 
 private:
 
+  void updateModX(int x);
+  void updateModY(int y);
   void strokeNarrow(SplashXPath *xPath);
   void strokeWide(SplashXPath *xPath);
   SplashXPath *makeDashedPath(SplashXPath *xPath);
   SplashError fillWithPattern(SplashPath *path, GBool eo,
-			      SplashPattern *pattern);
-  void drawPixel(int x, int y, SplashColor *color, GBool noClip);
-  void drawPixel(int x, int y, SplashPattern *pattern, GBool noClip);
-  void drawSpan(int x0, int x1, int y, SplashPattern *pattern, GBool noClip);
+			      SplashPattern *pattern, SplashCoord alpha);
+  void drawPixel(int x, int y, SplashColorPtr color,
+		 SplashCoord alpha, GBool noClip);
+  void drawPixel(int x, int y, SplashPattern *pattern,
+		 SplashCoord alpha, GBool noClip);
+  void drawSpan(int x0, int x1, int y, SplashPattern *pattern,
+		SplashCoord alpha, GBool noClip);
   void xorSpan(int x0, int x1, int y, SplashPattern *pattern, GBool noClip);
-  void putPixel(int x, int y, SplashColor *pixel);
-  void getPixel(int x, int y, SplashColor *pixel);
   void dumpPath(SplashPath *path);
   void dumpXPath(SplashXPath *path);
 
   SplashBitmap *bitmap;
   SplashState *state;
+  SplashBitmap *softMask;
+  int modXMin, modYMin, modXMax, modYMax;
+  SplashClipResult opClipRes;
   GBool debugMode;
 };
 

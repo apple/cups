@@ -23,9 +23,10 @@ class SplashScreen {
 public:
 
   SplashScreen(int sizeA);
+  SplashScreen(SplashScreen *screen);
   ~SplashScreen();
 
-  SplashScreen *copy() { return new SplashScreen(size); }
+  SplashScreen *copy() { return new SplashScreen(this); }
 
   // Return the computed pixel value (0=black, 1=white) for the gray
   // level <value> at (<x>, <y>).

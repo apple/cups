@@ -159,10 +159,10 @@ SplashT1Font::SplashT1Font(SplashT1FontFile *fontFileA, SplashCoord *matA):
   }
 
   // transform the font
-  matrix.cxx = mat[0] / size;
-  matrix.cxy = mat[1] / size;
-  matrix.cyx = mat[2] / size;
-  matrix.cyy = mat[3] / size;
+  matrix.cxx = (double)mat[0] / size;
+  matrix.cxy = (double)mat[1] / size;
+  matrix.cyx = (double)mat[2] / size;
+  matrix.cyy = (double)mat[3] / size;
   T1_TransformFont(t1libID, &matrix);
 }
 
@@ -215,14 +215,22 @@ SplashPath *SplashT1Font::getGlyphPath(int c) {
   T1_PATHSEGMENT *seg;
   T1_BEZIERSEGMENT *bez;
   SplashCoord x, y, x1, y1;
+  GBool needClose;
 
   path = new SplashPath();
-  outline = T1_GetCharOutline(t1libID, c, size, NULL);
+  if (!(outline = T1_GetCharOutline(t1libID, c, size, NULL))) {
+    return path;
+  }
   x = 0;
   y = 0;
+  needClose = gFalse;
   for (seg = outline; seg; seg = seg->link) {
     switch (seg->type) {
     case T1_PATHTYPE_MOVE:
+      if (needClose) {
+	path->close();
+	needClose = gFalse;
+      }
       x += seg->dest.x / 65536.0;
       y += seg->dest.y / 65536.0;
       path->moveTo(x, y);
@@ -231,6 +239,7 @@ SplashPath *SplashT1Font::getGlyphPath(int c) {
       x += seg->dest.x / 65536.0;
       y += seg->dest.y / 65536.0;
       path->lineTo(x, y);
+      needClose = gTrue;
       break;
     case T1_PATHTYPE_BEZIER:
       bez = (T1_BEZIERSEGMENT *)seg;
@@ -241,8 +250,12 @@ SplashPath *SplashT1Font::getGlyphPath(int c) {
 		    x1, y1);
       x = x1;
       y = y1;
+      needClose = gTrue;
       break;
     }
+  }
+  if (needClose) {
+    path->close();
   }
   T1_FreeOutline(outline);
   return path;

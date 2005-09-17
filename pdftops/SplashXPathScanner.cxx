@@ -87,11 +87,10 @@ SplashXPathScanner::SplashXPathScanner(SplashXPath *xPathA, GBool eoA) {
     yMax = splashFloor(yMaxFP);
   }
 
-  interY = 0;
+  interY = yMin - 1;
   xPathIdx = 0;
   inter = NULL;
   interLen = interSize = 0;
-  computeIntersections(yMin);
 }
 
 SplashXPathScanner::~SplashXPathScanner() {
@@ -227,8 +226,8 @@ void SplashXPathScanner::computeIntersections(int y) {
       } else {
 	interSize *= 2;
       }
-      inter = (SplashIntersect *)grealloc(inter,
-					  interSize * sizeof(SplashIntersect));
+      inter = (SplashIntersect *)greallocn(inter, interSize,
+					   sizeof(SplashIntersect));
     }
 
     if (seg->flags & splashXPathHoriz) {
@@ -239,14 +238,14 @@ void SplashXPathScanner::computeIntersections(int y) {
     } else {
       if (ySegMin <= y) {
 	// intersection with top edge
-	xx0 = seg->x0 + (y - seg->y0) * seg->dxdy;
+	xx0 = seg->x0 + ((SplashCoord)y - seg->y0) * seg->dxdy;
       } else {
 	// x coord of segment endpoint with min y coord
 	xx0 = (seg->flags & splashXPathFlip) ? seg->x1 : seg->x0;
       }
       if (ySegMax >= y + 1) {
 	// intersection with bottom edge
-	xx1 = seg->x0 + (y + 1 - seg->y0) * seg->dxdy;
+	xx1 = seg->x0 + ((SplashCoord)y + 1 - seg->y0) * seg->dxdy;
       } else {
 	// x coord of segment endpoint with max y coord
 	xx1 = (seg->flags & splashXPathFlip) ? seg->x0 : seg->x1;
@@ -259,7 +258,9 @@ void SplashXPathScanner::computeIntersections(int y) {
       inter[interLen].x0 = splashFloor(xx1);
       inter[interLen].x1 = splashFloor(xx0);
     }
-    if (ySegMin <= y && y < ySegMax && !(seg->flags & splashXPathHoriz)) {
+    if (ySegMin <= y &&
+	(SplashCoord)y < ySegMax &&
+	!(seg->flags & splashXPathHoriz)) {
       inter[interLen].count = eo ? 1
 	                         : (seg->flags & splashXPathFlip) ? 1 : -1;
     } else {

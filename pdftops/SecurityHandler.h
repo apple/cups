@@ -109,12 +109,14 @@ private:
   int fileKeyLength;
   int encVersion;
   int encRevision;
+  GBool encryptMetadata;
 
   GString *ownerKey, *userKey;
   GString *fileID;
   GBool ok;
 };
 
+#ifdef ENABLE_PLUGINS
 //------------------------------------------------------------------------
 // ExternalSecurityHandler
 //------------------------------------------------------------------------
@@ -148,5 +150,6 @@ private:
   int encVersion;
   GBool ok;
 };
+#endif // ENABLE_PLUGINS
 
 #endif

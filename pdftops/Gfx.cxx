@@ -2,7 +2,7 @@
 //
 // Gfx.cc
 //
-// Copyright 1996-2004 Glyph & Cog, LLC
+// Copyright 1996-2003 Glyph & Cog, LLC
 //
 //========================================================================
 
@@ -12,6 +12,7 @@
 #pragma implementation
 #endif
 
+#include <stdlib.h>
 #include <stdio.h>
 #include <stddef.h>
 #include <string.h>
@@ -45,33 +46,33 @@
 #define functionMaxDepth 6
 
 // Max delta allowed in any color component for a function shading fill.
-#define functionColorDelta (1 / 256.0)
+#define functionColorDelta (dblToCol(1 / 256.0))
 
 // Max number of splits along the t axis for an axial shading fill.
 #define axialMaxSplits 256
 
 // Max delta allowed in any color component for an axial shading fill.
-#define axialColorDelta (1 / 256.0)
+#define axialColorDelta (dblToCol(1 / 256.0))
 
 // Max number of splits along the t axis for a radial shading fill.
 #define radialMaxSplits 256
 
 // Max delta allowed in any color component for a radial shading fill.
-#define radialColorDelta (1 / 256.0)
+#define radialColorDelta (dblToCol(1 / 256.0))
 
 // Max recursive depth for a Gouraud triangle shading fill.
 #define gouraudMaxDepth 4
 
 // Max delta allowed in any color component for a Gouraud triangle
 // shading fill.
-#define gouraudColorDelta (1 / 256.0)
+#define gouraudColorDelta (dblToCol(1 / 256.0))
 
 // Max recursive depth for a patch mesh shading fill.
-#define patchMaxDepth 4
+#define patchMaxDepth 6
 
 // Max delta allowed in any color component for a patch mesh shading
 // fill.
-#define patchColorDelta (1 / 256.0)
+#define patchColorDelta (dblToCol(1 / 256.0))
 
 //------------------------------------------------------------------------
 // Operator table
@@ -419,7 +420,7 @@ GBool GfxResources::lookupGState(char *name, Object *obj) {
 //------------------------------------------------------------------------
 
 Gfx::Gfx(XRef *xrefA, OutputDev *outA, int pageNum, Dict *resDict,
-	 double hDPI, double vDPI, PDFRectangle *box, GBool crop,
+	 double hDPI, double vDPI, PDFRectangle *box,
 	 PDFRectangle *cropBox, int rotate,
 	 GBool (*abortCheckCbkA)(void *data),
 	 void *abortCheckCbkDataA) {
@@ -449,7 +450,7 @@ Gfx::Gfx(XRef *xrefA, OutputDev *outA, int pageNum, Dict *resDict,
   abortCheckCbkData = abortCheckCbkDataA;
 
   // set crop box
-  if (crop) {
+  if (cropBox) {
     state->moveTo(cropBox->x1, cropBox->y1);
     state->lineTo(cropBox->x2, cropBox->y1);
     state->lineTo(cropBox->x2, cropBox->y2);
@@ -462,7 +463,7 @@ Gfx::Gfx(XRef *xrefA, OutputDev *outA, int pageNum, Dict *resDict,
 }
 
 Gfx::Gfx(XRef *xrefA, OutputDev *outA, Dict *resDict,
-	 PDFRectangle *box, GBool crop, PDFRectangle *cropBox,
+	 PDFRectangle *box, PDFRectangle *cropBox,
 	 GBool (*abortCheckCbkA)(void *data),
 	 void *abortCheckCbkDataA) {
   int i;
@@ -488,7 +489,7 @@ Gfx::Gfx(XRef *xrefA, OutputDev *outA, Dict *resDict,
   abortCheckCbkData = abortCheckCbkDataA;
 
   // set crop box
-  if (crop) {
+  if (cropBox) {
     state->moveTo(cropBox->x1, cropBox->y1);
     state->lineTo(cropBox->x2, cropBox->y1);
     state->lineTo(cropBox->x2, cropBox->y2);
@@ -748,7 +749,7 @@ void Gfx::opSetDash(Object args[], int numArgs) {
   if (length == 0) {
     dash = NULL;
   } else {
-    dash = (double *)gmalloc(length * sizeof(double));
+    dash = (double *)gmallocn(length, sizeof(double));
     for (i = 0; i < length; ++i) {
       dash[i] = a->get(i, &obj)->getNum();
       obj.free();
@@ -785,6 +786,8 @@ void Gfx::opSetLineWidth(Object args[], int numArgs) {
 
 void Gfx::opSetExtGState(Object args[], int numArgs) {
   Object obj1, obj2;
+  GfxBlendMode mode;
+  GBool haveFillOP;
 
   if (!res->lookupGState(args[0].getName(), &obj1)) {
     return;
@@ -794,6 +797,17 @@ void Gfx::opSetExtGState(Object args[], int numArgs) {
     obj1.free();
     return;
   }
+
+  // transparency support: blend mode, fill/stroke opacity
+  if (!obj1.dictLookup("BM", &obj2)->isNull()) {
+    if (state->parseBlendMode(&obj2, &mode)) {
+      state->setBlendMode(mode);
+      out->updateBlendMode(state);
+    } else {
+      error(getPos(), "Invalid blend mode in ExtGState");
+    }
+  }
+  obj2.free();
   if (obj1.dictLookup("ca", &obj2)->isNum()) {
     state->setFillOpacity(obj2.getNum());
     out->updateFillOpacity(state);
@@ -804,6 +818,23 @@ void Gfx::opSetExtGState(Object args[], int numArgs) {
     out->updateStrokeOpacity(state);
   }
   obj2.free();
+
+  // fill/stroke overprint
+  if ((haveFillOP = (obj1.dictLookup("op", &obj2)->isBool()))) {
+    state->setFillOverprint(obj2.getBool());
+    out->updateFillOverprint(state);
+  }
+  obj2.free();
+  if (obj1.dictLookup("OP", &obj2)->isBool()) {
+    state->setStrokeOverprint(obj2.getBool());
+    out->updateStrokeOverprint(state);
+    if (!haveFillOP) {
+      state->setFillOverprint(obj2.getBool());
+      out->updateFillOverprint(state);
+    }
+  }
+  obj2.free();
+
   obj1.free();
 }
 
@@ -820,7 +851,7 @@ void Gfx::opSetFillGray(Object args[], int numArgs) {
   state->setFillPattern(NULL);
   state->setFillColorSpace(new GfxDeviceGrayColorSpace());
   out->updateFillColorSpace(state);
-  color.c[0] = args[0].getNum();
+  color.c[0] = dblToCol(args[0].getNum());
   state->setFillColor(&color);
   out->updateFillColor(state);
 }
@@ -831,7 +862,7 @@ void Gfx::opSetStrokeGray(Object args[], int numArgs) {
   state->setStrokePattern(NULL);
   state->setStrokeColorSpace(new GfxDeviceGrayColorSpace());
   out->updateStrokeColorSpace(state);
-  color.c[0] = args[0].getNum();
+  color.c[0] = dblToCol(args[0].getNum());
   state->setStrokeColor(&color);
   out->updateStrokeColor(state);
 }
@@ -844,7 +875,7 @@ void Gfx::opSetFillCMYKColor(Object args[], int numArgs) {
   state->setFillColorSpace(new GfxDeviceCMYKColorSpace());
   out->updateFillColorSpace(state);
   for (i = 0; i < 4; ++i) {
-    color.c[i] = args[i].getNum();
+    color.c[i] = dblToCol(args[i].getNum());
   }
   state->setFillColor(&color);
   out->updateFillColor(state);
@@ -858,7 +889,7 @@ void Gfx::opSetStrokeCMYKColor(Object args[], int numArgs) {
   state->setStrokeColorSpace(new GfxDeviceCMYKColorSpace());
   out->updateStrokeColorSpace(state);
   for (i = 0; i < 4; ++i) {
-    color.c[i] = args[i].getNum();
+    color.c[i] = dblToCol(args[i].getNum());
   }
   state->setStrokeColor(&color);
   out->updateStrokeColor(state);
@@ -872,7 +903,7 @@ void Gfx::opSetFillRGBColor(Object args[], int numArgs) {
   state->setFillColorSpace(new GfxDeviceRGBColorSpace());
   out->updateFillColorSpace(state);
   for (i = 0; i < 3; ++i) {
-    color.c[i] = args[i].getNum();
+    color.c[i] = dblToCol(args[i].getNum());
   }
   state->setFillColor(&color);
   out->updateFillColor(state);
@@ -886,7 +917,7 @@ void Gfx::opSetStrokeRGBColor(Object args[], int numArgs) {
   state->setStrokeColorSpace(new GfxDeviceRGBColorSpace());
   out->updateStrokeColorSpace(state);
   for (i = 0; i < 3; ++i) {
-    color.c[i] = args[i].getNum();
+    color.c[i] = dblToCol(args[i].getNum());
   }
   state->setStrokeColor(&color);
   out->updateStrokeColor(state);
@@ -952,7 +983,7 @@ void Gfx::opSetFillColor(Object args[], int numArgs) {
 
   state->setFillPattern(NULL);
   for (i = 0; i < numArgs; ++i) {
-    color.c[i] = args[i].getNum();
+    color.c[i] = dblToCol(args[i].getNum());
   }
   state->setFillColor(&color);
   out->updateFillColor(state);
@@ -964,7 +995,7 @@ void Gfx::opSetStrokeColor(Object args[], int numArgs) {
 
   state->setStrokePattern(NULL);
   for (i = 0; i < numArgs; ++i) {
-    color.c[i] = args[i].getNum();
+    color.c[i] = dblToCol(args[i].getNum());
   }
   state->setStrokeColor(&color);
   out->updateStrokeColor(state);
@@ -979,7 +1010,7 @@ void Gfx::opSetFillColorN(Object args[], int numArgs) {
     if (numArgs > 1) {
       for (i = 0; i < numArgs && i < 4; ++i) {
 	if (args[i].isNum()) {
-	  color.c[i] = args[i].getNum();
+	  color.c[i] = dblToCol(args[i].getNum());
 	}
       }
       state->setFillColor(&color);
@@ -994,7 +1025,7 @@ void Gfx::opSetFillColorN(Object args[], int numArgs) {
     state->setFillPattern(NULL);
     for (i = 0; i < numArgs && i < 4; ++i) {
       if (args[i].isNum()) {
-	color.c[i] = args[i].getNum();
+	color.c[i] = dblToCol(args[i].getNum());
       }
     }
     state->setFillColor(&color);
@@ -1011,7 +1042,7 @@ void Gfx::opSetStrokeColorN(Object args[], int numArgs) {
     if (numArgs > 1) {
       for (i = 0; i < numArgs && i < 4; ++i) {
 	if (args[i].isNum()) {
-	  color.c[i] = args[i].getNum();
+	  color.c[i] = dblToCol(args[i].getNum());
 	}
       }
       state->setStrokeColor(&color);
@@ -1026,7 +1057,7 @@ void Gfx::opSetStrokeColorN(Object args[], int numArgs) {
     state->setStrokePattern(NULL);
     for (i = 0; i < numArgs && i < 4; ++i) {
       if (args[i].isNum()) {
-	color.c[i] = args[i].getNum();
+	color.c[i] = dblToCol(args[i].getNum());
       }
     }
     state->setStrokeColor(&color);
@@ -1360,8 +1391,13 @@ void Gfx::doTilingPatternFill(GfxTilingPattern *tPat, GBool eoFill) {
   }
   state->clearPath();
 
-  // transform clip region bbox to pattern space
+  // get the clip region, check for empty
   state->getClipBBox(&cxMin, &cyMin, &cxMax, &cyMax);
+  if (cxMin > cxMax || cyMin > cyMax) {
+    goto err;
+  }
+
+  // transform clip region bbox to pattern space
   xMin = xMax = cxMin * imb[0] + cyMin * imb[2] + imb[4];
   yMin = yMax = cxMin * imb[1] + cyMin * imb[3] + imb[5];
   x1 = cxMin * imb[0] + cyMax * imb[2] + imb[4];
@@ -1434,6 +1470,7 @@ void Gfx::doTilingPatternFill(GfxTilingPattern *tPat, GBool eoFill) {
   }
 
   // restore graphics state
+ err:
   restoreState();
   state->setPath(savedPath);
 }
@@ -1462,7 +1499,7 @@ void Gfx::doShadingPatternFill(GfxShadingPattern *sPat, GBool eoFill) {
     state->closePath();
     state->clip();
     out->clip(state);
-    state->clearPath();
+    state->setPath(savedPath->copy());
   }
 
   // clip to current path
@@ -1471,6 +1508,17 @@ void Gfx::doShadingPatternFill(GfxShadingPattern *sPat, GBool eoFill) {
     out->eoClip(state);
   } else {
     out->clip(state);
+  }
+
+  // set the color space
+  state->setFillColorSpace(shading->getColorSpace()->copy());
+  out->updateFillColorSpace(state);
+
+  // background color fill
+  if (shading->getHasBackground()) {
+    state->setFillColor(shading->getBackground());
+    out->updateFillColor(state);
+    out->fill(state);
   }
   state->clearPath();
 
@@ -1504,12 +1552,6 @@ void Gfx::doShadingPatternFill(GfxShadingPattern *sPat, GBool eoFill) {
   // set the new matrix
   state->concatCTM(m[0], m[1], m[2], m[3], m[4], m[5]);
   out->updateCTM(state, m[0], m[1], m[2], m[3], m[4], m[5]);
-
-  // set the color space
-  state->setFillColorSpace(shading->getColorSpace()->copy());
-  out->updateFillColorSpace(state);
-
-  //~ should do background color fill here (?)
 
   // do shading type-specific operations
   switch (shading->getType()) {
@@ -1628,7 +1670,7 @@ void Gfx::doFunctionShFill1(GfxFunctionShading *shading,
   // compare the four corner colors
   for (i = 0; i < 4; ++i) {
     for (j = 0; j < nComps; ++j) {
-      if (fabs(colors[i].c[j] - colors[(i+1)&3].c[j]) > functionColorDelta) {
+      if (abs(colors[i].c[j] - colors[(i+1)&3].c[j]) > functionColorDelta) {
 	break;
       }
     }
@@ -1723,6 +1765,7 @@ void Gfx::doAxialShFill(GfxAxialShading *shading) {
   double xMin, yMin, xMax, yMax;
   double x0, y0, x1, y1;
   double dx, dy, mul;
+  GBool dxZero, dyZero;
   double tMin, tMax, t, tx, ty;
   double s[4], sMin, sMax, tmp;
   double ux0, uy0, ux1, uy1, vx0, vy0, vx1, vy1;
@@ -1747,6 +1790,8 @@ void Gfx::doAxialShFill(GfxAxialShading *shading) {
     shading->getCoords(&x0, &y0, &x1, &y1);
     dx = x1 - x0;
     dy = y1 - y0;
+    dxZero = fabs(dx) < 0.001;
+    dyZero = fabs(dy) < 0.001;
     mul = 1 / (dx * dx + dy * dy);
     tMin = tMax = ((xMin - x0) * dx + (yMin - y0) * dy) * mul;
     t = ((xMin - x0) * dx + (yMax - y0) * dy) * mul;
@@ -1831,13 +1876,13 @@ void Gfx::doAxialShFill(GfxAxialShading *shading) {
     // bounding box
     tx = x0 + tMin * dx;
     ty = y0 + tMin * dy;
-    if (dx == 0 && dy == 0) {
+    if (dxZero && dyZero) {
       sMin = sMax = 0;
-    } if (dx == 0) {
+    } if (dxZero) {
       sMin = (xMin - tx) / -dy;
       sMax = (xMax - tx) / -dy;
       if (sMin > sMax) { tmp = sMin; sMin = sMax; sMax = tmp; }
-    } else if (dy == 0) {
+    } else if (dyZero) {
       sMin = (yMin - ty) / dx;
       sMax = (yMax - ty) / dx;
       if (sMin > sMax) { tmp = sMin; sMin = sMax; sMax = tmp; }
@@ -1879,7 +1924,7 @@ void Gfx::doAxialShFill(GfxAxialShading *shading) {
 	}
 	shading->getColor(tt, &color1);
 	for (k = 0; k < nComps; ++k) {
-	  if (fabs(color1.c[k] - color0.c[k]) > axialColorDelta) {
+	  if (abs(color1.c[k] - color0.c[k]) > axialColorDelta) {
 	    break;
 	  }
 	}
@@ -1895,7 +1940,7 @@ void Gfx::doAxialShFill(GfxAxialShading *shading) {
 
       // use the average of the colors of the two sides of the region
       for (k = 0; k < nComps; ++k) {
-	color0.c[k] = 0.5 * (color0.c[k] + color1.c[k]);
+	color0.c[k] = (color0.c[k] + color1.c[k]) / 2;
       }
 
       // compute the coordinates of the point on the t axis; then
@@ -1903,13 +1948,13 @@ void Gfx::doAxialShFill(GfxAxialShading *shading) {
       // bounding box
       tx = x0 + ta[j] * dx;
       ty = y0 + ta[j] * dy;
-      if (dx == 0 && dy == 0) {
+      if (dxZero && dyZero) {
 	sMin = sMax = 0;
-      } if (dx == 0) {
+      } if (dxZero) {
 	sMin = (xMin - tx) / -dy;
 	sMax = (xMax - tx) / -dy;
 	if (sMin > sMax) { tmp = sMin; sMin = sMax; sMax = tmp; }
-      } else if (dy == 0) {
+      } else if (dyZero) {
 	sMin = (yMin - ty) / dx;
 	sMax = (yMax - ty) / dx;
 	if (sMin > sMax) { tmp = sMin; sMin = sMax; sMax = tmp; }
@@ -1968,7 +2013,7 @@ void Gfx::doRadialShFill(GfxRadialShading *shading) {
   double ta, tb, sa, sb;
   int ia, ib, k, n;
   double *ctm;
-  double angle, t;
+  double angle, t, d0, d1;
 
   if (out->useShadedFills()) {
 
@@ -1991,13 +2036,14 @@ void Gfx::doRadialShFill(GfxRadialShading *shading) {
 	sMin = -r0 / (r1 - r0);
       } else {
 	// extend the larger end
-	//~ this computes the diagonal of the bounding box -- we should
-	//~ really compute the intersection of the moving/expanding
-	//~ circles with each of the four corners and look for the max
-	//~ radius
 	state->getUserClipBBox(&xMin, &yMin, &xMax, &yMax);
-	sMin = (sqrt((xMax - xMin) * (xMax - xMin) +
-		     (yMax - yMin) * (yMax - yMin)) - r0) / (r1 - r0);
+	d0 = (x0 - xMin) * (x0 - xMin);
+	d1 = (x0 - xMax) * (x0 - xMax);
+	sMin = d0 > d1 ? d0 : d1;
+	d0 = (y0 - yMin) * (y0 - yMin);
+	d1 = (y0 - yMax) * (y0 - yMax);
+	sMin += d0 > d1 ? d0 : d1;
+	sMin = (sqrt(sMin) - r0) / (r1 - r0);
 	if (sMin > 0) {
 	  sMin = 0;
 	} else if (sMin < -20) {
@@ -2013,10 +2059,15 @@ void Gfx::doRadialShFill(GfxRadialShading *shading) {
       } else if (r1 > r0) {
 	// extend the larger end
 	state->getUserClipBBox(&xMin, &yMin, &xMax, &yMax);
-	sMax = (sqrt((xMax - xMin) * (xMax - xMin) +
-		     (yMax - yMin) * (yMax - yMin)) - r0) / (r1 - r0);
+	d0 = (x1 - xMin) * (x1 - xMin);
+	d1 = (x1 - xMax) * (x1 - xMax);
+	sMax = d0 > d1 ? d0 : d1;
+	d0 = (y1 - yMin) * (y1 - yMin);
+	d1 = (y1 - yMax) * (y1 - yMax);
+	sMax += d0 > d1 ? d0 : d1;
+	sMax = (sqrt(sMax) - r0) / (r1 - r0);
 	if (sMax < 1) {
-	  sMin = 1;
+	  sMax = 1;
 	} else if (sMax > 20) {
 	  // sanity check
 	  sMax = 20;
@@ -2101,7 +2152,7 @@ void Gfx::doRadialShFill(GfxRadialShading *shading) {
       }
       while (ib - ia > 1) {
 	for (k = 0; k < nComps; ++k) {
-	  if (fabs(colorB.c[k] - colorA.c[k]) > radialColorDelta) {
+	  if (abs(colorB.c[k] - colorA.c[k]) > radialColorDelta) {
 	    break;
 	  }
 	}
@@ -2127,7 +2178,7 @@ void Gfx::doRadialShFill(GfxRadialShading *shading) {
 
       // use the average of the colors at the two circles
       for (k = 0; k < nComps; ++k) {
-	colorA.c[k] = 0.5 * (colorA.c[k] + colorB.c[k]);
+	colorA.c[k] = (colorA.c[k] + colorB.c[k]) / 2;
       }
       state->setFillColor(&colorA);
       out->updateFillColor(state);
@@ -2187,8 +2238,8 @@ void Gfx::gouraudFillTriangle(double x0, double y0, GfxColor *color0,
   int i;
 
   for (i = 0; i < nComps; ++i) {
-    if (fabs(color0->c[i] - color1->c[i]) > gouraudColorDelta ||
-	fabs(color1->c[i] - color2->c[i]) > gouraudColorDelta) {
+    if (abs(color0->c[i] - color1->c[i]) > gouraudColorDelta ||
+	abs(color1->c[i] - color2->c[i]) > gouraudColorDelta) {
       break;
     }
   }
@@ -2211,9 +2262,9 @@ void Gfx::gouraudFillTriangle(double x0, double y0, GfxColor *color0,
     //~ if the shading has a Function, this should interpolate on the
     //~ function parameter, not on the color components
     for (i = 0; i < nComps; ++i) {
-      color01.c[i] = 0.5 * (color0->c[i] + color1->c[i]);
-      color12.c[i] = 0.5 * (color1->c[i] + color2->c[i]);
-      color20.c[i] = 0.5 * (color2->c[i] + color0->c[i]);
+      color01.c[i] = (color0->c[i] + color1->c[i]) / 2;
+      color12.c[i] = (color1->c[i] + color2->c[i]) / 2;
+      color20.c[i] = (color2->c[i] + color0->c[i]) / 2;
     }
     gouraudFillTriangle(x0, y0, color0, x01, y01, &color01,
 			x20, y20, &color20, nComps, depth + 1);
@@ -2227,26 +2278,37 @@ void Gfx::gouraudFillTriangle(double x0, double y0, GfxColor *color0,
 }
 
 void Gfx::doPatchMeshShFill(GfxPatchMeshShading *shading) {
-  int i;
+  int start, i;
 
+  if (shading->getNPatches() > 128) {
+    start = 3;
+  } else if (shading->getNPatches() > 64) {
+    start = 2;
+  } else if (shading->getNPatches() > 16) {
+    start = 1;
+  } else {
+    start = 0;
+  }
   for (i = 0; i < shading->getNPatches(); ++i) {
-    fillPatch(shading->getPatch(i), shading->getColorSpace()->getNComps(), 0);
+    fillPatch(shading->getPatch(i), shading->getColorSpace()->getNComps(),
+	      start);
   }
 }
 
 void Gfx::fillPatch(GfxPatch *patch, int nComps, int depth) {
   GfxPatch patch00, patch01, patch10, patch11;
   double xx[4][8], yy[4][8];
+  double xxm, yym;
   int i;
 
   for (i = 0; i < nComps; ++i) {
-    if (fabs(patch->color[0][0].c[i] - patch->color[0][1].c[i])
+    if (abs(patch->color[0][0].c[i] - patch->color[0][1].c[i])
 	  > patchColorDelta ||
-	fabs(patch->color[0][1].c[i] - patch->color[1][1].c[i])
+	abs(patch->color[0][1].c[i] - patch->color[1][1].c[i])
 	  > patchColorDelta ||
-	fabs(patch->color[1][1].c[i] - patch->color[1][0].c[i])
+	abs(patch->color[1][1].c[i] - patch->color[1][0].c[i])
 	  > patchColorDelta ||
-	fabs(patch->color[1][0].c[i] - patch->color[0][0].c[i])
+	abs(patch->color[1][0].c[i] - patch->color[0][0].c[i])
 	  > patchColorDelta) {
       break;
     }
@@ -2276,16 +2338,16 @@ void Gfx::fillPatch(GfxPatch *patch, int nComps, int depth) {
       yy[i][0] = patch->y[i][0];
       xx[i][1] = 0.5 * (patch->x[i][0] + patch->x[i][1]);
       yy[i][1] = 0.5 * (patch->y[i][0] + patch->y[i][1]);
-      xx[i][2] = 0.25 * (patch->x[i][0] + 2 * patch->x[i][1] + patch->x[i][2]);
-      yy[i][2] = 0.25 * (patch->y[i][0] + 2 * patch->y[i][1] + patch->y[i][2]);
-      xx[i][3] = 0.5 * (patch->x[i][1] + patch->x[i][2]);
-      yy[i][3] = 0.5 * (patch->y[i][1] + patch->y[i][2]);
-      xx[i][4] = xx[i][3];
-      yy[i][4] = yy[i][3];
-      xx[i][5] = 0.25 * (patch->x[i][1] + 2 * patch->x[i][2] + patch->x[i][3]);
-      yy[i][5] = 0.25 * (patch->y[i][1] + 2 * patch->y[i][2] + patch->y[i][3]);
+      xxm = 0.5 * (patch->x[i][1] + patch->x[i][2]);
+      yym = 0.5 * (patch->y[i][1] + patch->y[i][2]);
       xx[i][6] = 0.5 * (patch->x[i][2] + patch->x[i][3]);
       yy[i][6] = 0.5 * (patch->y[i][2] + patch->y[i][3]);
+      xx[i][2] = 0.5 * (xx[i][1] + xxm);
+      yy[i][2] = 0.5 * (yy[i][1] + yym);
+      xx[i][5] = 0.5 * (xxm + xx[i][6]);
+      yy[i][5] = 0.5 * (yym + yy[i][6]);
+      xx[i][3] = xx[i][4] = 0.5 * (xx[i][2] + xx[i][5]);
+      yy[i][3] = yy[i][4] = 0.5 * (yy[i][2] + yy[i][5]);
       xx[i][7] = patch->x[i][3];
       yy[i][7] = patch->y[i][3];
     }
@@ -2294,16 +2356,18 @@ void Gfx::fillPatch(GfxPatch *patch, int nComps, int depth) {
       patch00.y[0][i] = yy[0][i];
       patch00.x[1][i] = 0.5 * (xx[0][i] + xx[1][i]);
       patch00.y[1][i] = 0.5 * (yy[0][i] + yy[1][i]);
-      patch00.x[2][i] = 0.25 * (xx[0][i] + 2 * xx[1][i] + xx[2][i]);
-      patch00.y[2][i] = 0.25 * (yy[0][i] + 2 * yy[1][i] + yy[2][i]);
-      patch00.x[3][i] = 0.5 * (xx[1][i] + xx[2][i]);
-      patch00.y[3][i] = 0.5 * (yy[1][i] + yy[2][i]);
-      patch10.x[0][i] = patch00.x[3][i];
-      patch10.y[0][i] = patch00.y[3][i];
-      patch10.x[1][i] = 0.25 * (xx[1][i] + 2 * xx[2][i] + xx[3][i]);
-      patch10.y[1][i] = 0.25 * (yy[1][i] + 2 * yy[2][i] + yy[3][i]);
+      xxm = 0.5 * (xx[1][i] + xx[2][i]);
+      yym = 0.5 * (yy[1][i] + yy[2][i]);
       patch10.x[2][i] = 0.5 * (xx[2][i] + xx[3][i]);
       patch10.y[2][i] = 0.5 * (yy[2][i] + yy[3][i]);
+      patch00.x[2][i] = 0.5 * (patch00.x[1][i] + xxm);
+      patch00.y[2][i] = 0.5 * (patch00.y[1][i] + yym);
+      patch10.x[1][i] = 0.5 * (xxm + patch10.x[2][i]);
+      patch10.y[1][i] = 0.5 * (yym + patch10.y[2][i]);
+      patch00.x[3][i] = 0.5 * (patch00.x[2][i] + patch10.x[1][i]);
+      patch00.y[3][i] = 0.5 * (patch00.y[2][i] + patch10.y[1][i]);
+      patch10.x[0][i] = patch00.x[3][i];
+      patch10.y[0][i] = patch00.y[3][i];
       patch10.x[3][i] = xx[3][i];
       patch10.y[3][i] = yy[3][i];
     }
@@ -2312,16 +2376,18 @@ void Gfx::fillPatch(GfxPatch *patch, int nComps, int depth) {
       patch01.y[0][i-4] = yy[0][i];
       patch01.x[1][i-4] = 0.5 * (xx[0][i] + xx[1][i]);
       patch01.y[1][i-4] = 0.5 * (yy[0][i] + yy[1][i]);
-      patch01.x[2][i-4] = 0.25 * (xx[0][i] + 2 * xx[1][i] + xx[2][i]);
-      patch01.y[2][i-4] = 0.25 * (yy[0][i] + 2 * yy[1][i] + yy[2][i]);
-      patch01.x[3][i-4] = 0.5 * (xx[1][i] + xx[2][i]);
-      patch01.y[3][i-4] = 0.5 * (yy[1][i] + yy[2][i]);
-      patch11.x[0][i-4] = patch01.x[3][i-4];
-      patch11.y[0][i-4] = patch01.y[3][i-4];
-      patch11.x[1][i-4] = 0.25 * (xx[1][i] + 2 * xx[2][i] + xx[3][i]);
-      patch11.y[1][i-4] = 0.25 * (yy[1][i] + 2 * yy[2][i] + yy[3][i]);
+      xxm = 0.5 * (xx[1][i] + xx[2][i]);
+      yym = 0.5 * (yy[1][i] + yy[2][i]);
       patch11.x[2][i-4] = 0.5 * (xx[2][i] + xx[3][i]);
       patch11.y[2][i-4] = 0.5 * (yy[2][i] + yy[3][i]);
+      patch01.x[2][i-4] = 0.5 * (patch01.x[1][i-4] + xxm);
+      patch01.y[2][i-4] = 0.5 * (patch01.y[1][i-4] + yym);
+      patch11.x[1][i-4] = 0.5 * (xxm + patch11.x[2][i-4]);
+      patch11.y[1][i-4] = 0.5 * (yym + patch11.y[2][i-4]);
+      patch01.x[3][i-4] = 0.5 * (patch01.x[2][i-4] + patch11.x[1][i-4]);
+      patch01.y[3][i-4] = 0.5 * (patch01.y[2][i-4] + patch11.y[1][i-4]);
+      patch11.x[0][i-4] = patch01.x[3][i-4];
+      patch11.y[0][i-4] = patch01.y[3][i-4];
       patch11.x[3][i-4] = xx[3][i];
       patch11.y[3][i-4] = yy[3][i];
     }
@@ -2329,23 +2395,23 @@ void Gfx::fillPatch(GfxPatch *patch, int nComps, int depth) {
     //~ function parameter, not on the color components
     for (i = 0; i < nComps; ++i) {
       patch00.color[0][0].c[i] = patch->color[0][0].c[i];
-      patch00.color[0][1].c[i] = 0.5 * (patch->color[0][0].c[i] +
-					patch->color[0][1].c[i]);
+      patch00.color[0][1].c[i] = (patch->color[0][0].c[i] +
+				  patch->color[0][1].c[i]) / 2;
       patch01.color[0][0].c[i] = patch00.color[0][1].c[i];
       patch01.color[0][1].c[i] = patch->color[0][1].c[i];
-      patch01.color[1][1].c[i] = 0.5 * (patch->color[0][1].c[i] +
-					patch->color[1][1].c[i]);
+      patch01.color[1][1].c[i] = (patch->color[0][1].c[i] +
+				  patch->color[1][1].c[i]) / 2;
       patch11.color[0][1].c[i] = patch01.color[1][1].c[i];
       patch11.color[1][1].c[i] = patch->color[1][1].c[i];
-      patch11.color[1][0].c[i] = 0.5 * (patch->color[1][1].c[i] +
-					patch->color[1][0].c[i]);
+      patch11.color[1][0].c[i] = (patch->color[1][1].c[i] +
+				  patch->color[1][0].c[i]) / 2;
       patch10.color[1][1].c[i] = patch11.color[1][0].c[i];
       patch10.color[1][0].c[i] = patch->color[1][0].c[i];
-      patch10.color[0][0].c[i] = 0.5 * (patch->color[1][0].c[i] +
-					patch->color[0][0].c[i]);
+      patch10.color[0][0].c[i] = (patch->color[1][0].c[i] +
+				  patch->color[0][0].c[i]) / 2;
       patch00.color[1][0].c[i] = patch10.color[0][0].c[i];
-      patch00.color[1][1].c[i] = 0.5 * (patch00.color[1][0].c[i] +
-					patch01.color[1][1].c[i]);
+      patch00.color[1][1].c[i] = (patch00.color[1][0].c[i] +
+				  patch01.color[1][1].c[i]) / 2;
       patch01.color[1][0].c[i] = patch00.color[1][1].c[i];
       patch11.color[0][0].c[i] = patch00.color[1][1].c[i];
       patch10.color[0][1].c[i] = patch00.color[1][1].c[i];
@@ -2505,7 +2571,9 @@ void Gfx::opShowText(Object args[], int numArgs) {
     out->updateFont(state);
     fontChanged = gFalse;
   }
+  out->beginStringOp(state);
   doShowText(args[0].getString());
+  out->endStringOp(state);
 }
 
 void Gfx::opMoveShowText(Object args[], int numArgs) {
@@ -2523,7 +2591,9 @@ void Gfx::opMoveShowText(Object args[], int numArgs) {
   ty = state->getLineY() - state->getLeading();
   state->textMoveTo(tx, ty);
   out->updateTextPos(state);
+  out->beginStringOp(state);
   doShowText(args[0].getString());
+  out->endStringOp(state);
 }
 
 void Gfx::opMoveSetShowText(Object args[], int numArgs) {
@@ -2545,7 +2615,9 @@ void Gfx::opMoveSetShowText(Object args[], int numArgs) {
   out->updateWordSpace(state);
   out->updateCharSpace(state);
   out->updateTextPos(state);
+  out->beginStringOp(state);
   doShowText(args[2].getString());
+  out->endStringOp(state);
 }
 
 void Gfx::opShowSpaceText(Object args[], int numArgs) {
@@ -2562,15 +2634,20 @@ void Gfx::opShowSpaceText(Object args[], int numArgs) {
     out->updateFont(state);
     fontChanged = gFalse;
   }
+  out->beginStringOp(state);
   wMode = state->getFont()->getWMode();
   a = args[0].getArray();
   for (i = 0; i < a->getLength(); ++i) {
     a->get(i, &obj);
     if (obj.isNum()) {
+      // this uses the absolute value of the font size to match
+      // Acrobat's behavior
       if (wMode) {
-	state->textShift(0, -obj.getNum() * 0.001 * state->getFontSize());
+	state->textShift(0, -obj.getNum() * 0.001 *
+			    fabs(state->getFontSize()));
       } else {
-	state->textShift(-obj.getNum() * 0.001 * state->getFontSize(), 0);
+	state->textShift(-obj.getNum() * 0.001 *
+			 fabs(state->getFontSize()), 0);
       }
       out->updateTextShift(state, obj.getNum());
     } else if (obj.isString()) {
@@ -2580,6 +2657,7 @@ void Gfx::opShowSpaceText(Object args[], int numArgs) {
     }
     obj.free();
   }
+  out->endStringOp(state);
 }
 
 void Gfx::doShowText(GString *s) {
@@ -2706,7 +2784,7 @@ void Gfx::doShowText(GString *s) {
       originY *= state->getFontSize();
       state->textTransformDelta(originX, originY, &tOriginX, &tOriginY);
       out->drawChar(state, state->getCurX() + riseX, state->getCurY() + riseY,
-		    tdx, tdy, tOriginX, tOriginY, code, u, uLen);
+		    tdx, tdy, tOriginX, tOriginY, code, n, u, uLen);
       state->shift(tdx, tdy);
       p += n;
       len -= n;
@@ -2780,9 +2858,11 @@ void Gfx::opXObject(Object args[], int numArgs) {
 #endif
   obj1.streamGetDict()->lookup("Subtype", &obj2);
   if (obj2.isName("Image")) {
-    res->lookupXObjectNF(args[0].getName(), &refObj);
-    doImage(&refObj, obj1.getStream(), gFalse);
-    refObj.free();
+    if (out->needNonText()) {
+      res->lookupXObjectNF(args[0].getName(), &refObj);
+      doImage(&refObj, obj1.getStream(), gFalse);
+      refObj.free();
+    }
   } else if (obj2.isName("Form")) {
     doForm(&obj1);
   } else if (obj2.isName("PS")) {
@@ -2807,19 +2887,25 @@ void Gfx::opXObject(Object args[], int numArgs) {
 void Gfx::doImage(Object *ref, Stream *str, GBool inlineImg) {
   Dict *dict, *maskDict;
   int width, height;
-  int bits;
+  int bits, maskBits;
+  StreamColorSpaceMode csMode;
   GBool mask;
   GBool invert;
-  GfxColorSpace *colorSpace;
-  GfxImageColorMap *colorMap;
-  Object maskObj;
-  GBool haveColorKeyMask, haveExplicitMask;
+  GfxColorSpace *colorSpace, *maskColorSpace;
+  GfxImageColorMap *colorMap, *maskColorMap;
+  Object maskObj, smaskObj;
+  GBool haveColorKeyMask, haveExplicitMask, haveSoftMask;
   int maskColors[2*gfxColorMaxComps];
   int maskWidth, maskHeight;
   GBool maskInvert;
   Stream *maskStr;
   Object obj1, obj2;
   int i;
+
+  // get info from the stream
+  bits = 0;
+  csMode = streamCSNone;
+  str->getImageParams(&bits, &csMode);
 
   // get stream dict
   dict = str->getDict();
@@ -2858,19 +2944,21 @@ void Gfx::doImage(Object *ref, Stream *str, GBool inlineImg) {
   obj1.free();
 
   // bit depth
-  dict->lookup("BitsPerComponent", &obj1);
-  if (obj1.isNull()) {
+  if (bits == 0) {
+    dict->lookup("BitsPerComponent", &obj1);
+    if (obj1.isNull()) {
+      obj1.free();
+      dict->lookup("BPC", &obj1);
+    }
+    if (obj1.isInt()) {
+      bits = obj1.getInt();
+    } else if (mask) {
+      bits = 1;
+    } else {
+      goto err2;
+    }
     obj1.free();
-    dict->lookup("BPC", &obj1);
   }
-  if (obj1.isInt()) {
-    bits = obj1.getInt();
-  } else if (mask) {
-    bits = 1;
-  } else {
-    goto err2;
-  }
-  obj1.free();
 
   // display a mask
   if (mask) {
@@ -2914,7 +3002,17 @@ void Gfx::doImage(Object *ref, Stream *str, GBool inlineImg) {
 	obj2.free();
       }
     }
-    colorSpace = GfxColorSpace::parse(&obj1);
+    if (!obj1.isNull()) {
+      colorSpace = GfxColorSpace::parse(&obj1);
+    } else if (csMode == streamCSDeviceGray) {
+      colorSpace = new GfxDeviceGrayColorSpace();
+    } else if (csMode == streamCSDeviceRGB) {
+      colorSpace = new GfxDeviceRGBColorSpace();
+    } else if (csMode == streamCSDeviceCMYK) {
+      colorSpace = new GfxDeviceCMYKColorSpace();
+    } else {
+      colorSpace = NULL;
+    }
     obj1.free();
     if (!colorSpace) {
       goto err1;
@@ -2932,15 +3030,86 @@ void Gfx::doImage(Object *ref, Stream *str, GBool inlineImg) {
     }
 
     // get the mask
-    haveColorKeyMask = haveExplicitMask = gFalse;
+    haveColorKeyMask = haveExplicitMask = haveSoftMask = gFalse;
     maskStr = NULL; // make gcc happy
     maskWidth = maskHeight = 0; // make gcc happy
-    maskInvert = gFalse; // make gcc hapyp
+    maskInvert = gFalse; // make gcc happy
+    maskColorMap = NULL; // make gcc happy
     dict->lookup("Mask", &maskObj);
-    if (maskObj.isArray()) {
+    dict->lookup("SMask", &smaskObj);
+    if (smaskObj.isStream()) {
+      // soft mask
+      if (inlineImg) {
+	goto err1;
+      }
+      maskStr = smaskObj.getStream();
+      maskDict = smaskObj.streamGetDict();
+      maskDict->lookup("Width", &obj1);
+      if (obj1.isNull()) {
+	obj1.free();
+	maskDict->lookup("W", &obj1);
+      }
+      if (!obj1.isInt()) {
+	goto err2;
+      }
+      maskWidth = obj1.getInt();
+      obj1.free();
+      maskDict->lookup("Height", &obj1);
+      if (obj1.isNull()) {
+	obj1.free();
+	maskDict->lookup("H", &obj1);
+      }
+      if (!obj1.isInt()) {
+	goto err2;
+      }
+      maskHeight = obj1.getInt();
+      obj1.free();
+      maskDict->lookup("BitsPerComponent", &obj1);
+      if (obj1.isNull()) {
+	obj1.free();
+	maskDict->lookup("BPC", &obj1);
+      }
+      if (!obj1.isInt()) {
+	goto err2;
+      }
+      maskBits = obj1.getInt();
+      obj1.free();
+      maskDict->lookup("ColorSpace", &obj1);
+      if (obj1.isNull()) {
+	obj1.free();
+	maskDict->lookup("CS", &obj1);
+      }
+      if (obj1.isName()) {
+	res->lookupColorSpace(obj1.getName(), &obj2);
+	if (!obj2.isNull()) {
+	  obj1.free();
+	  obj1 = obj2;
+	} else {
+	  obj2.free();
+	}
+      }
+      maskColorSpace = GfxColorSpace::parse(&obj1);
+      obj1.free();
+      if (!maskColorSpace || maskColorSpace->getMode() != csDeviceGray) {
+	goto err1;
+      }
+      maskDict->lookup("Decode", &obj1);
+      if (obj1.isNull()) {
+	obj1.free();
+	maskDict->lookup("D", &obj1);
+      }
+      maskColorMap = new GfxImageColorMap(maskBits, &obj1, maskColorSpace);
+      obj1.free();
+      if (!maskColorMap->isOk()) {
+	delete maskColorMap;
+	goto err1;
+      }
+      //~ handle the Matte entry
+      haveSoftMask = gTrue;
+    } else if (maskObj.isArray()) {
       // color key mask
       for (i = 0;
-           i < maskObj.arrayGetLength() && i < 2*gfxColorMaxComps;
+	   i < maskObj.arrayGetLength() && i < 2*gfxColorMaxComps;
 	   ++i) {
 	maskObj.arrayGet(i, &obj1);
 	maskColors[i] = obj1.getInt();
@@ -3003,7 +3172,11 @@ void Gfx::doImage(Object *ref, Stream *str, GBool inlineImg) {
     }
 
     // draw it
-    if (haveExplicitMask) {
+    if (haveSoftMask) {
+      out->drawSoftMaskedImage(state, ref, str, width, height, colorMap,
+			       maskStr, maskWidth, maskHeight, maskColorMap);
+      delete maskColorMap;
+    } else if (haveExplicitMask) {
       out->drawMaskedImage(state, ref, str, width, height, colorMap,
 			   maskStr, maskWidth, maskHeight, maskInvert);
     } else {
@@ -3013,6 +3186,7 @@ void Gfx::doImage(Object *ref, Stream *str, GBool inlineImg) {
     delete colorMap;
 
     maskObj.free();
+    smaskObj.free();
   }
 
   if ((i = width * height) > 1000) {

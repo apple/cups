@@ -2,7 +2,7 @@
 //
 // CharCodeToUnicode.cc
 //
-// Copyright 2001-2004 Glyph & Cog, LLC
+// Copyright 2001-2003 Glyph & Cog, LLC
 //
 //========================================================================
 
@@ -70,13 +70,13 @@ CharCodeToUnicode *CharCodeToUnicode::parseCIDToUnicode(GString *fileName,
   }
 
   size = 32768;
-  mapA = (Unicode *)gmalloc(size * sizeof(Unicode));
+  mapA = (Unicode *)gmallocn(size, sizeof(Unicode));
   mapLenA = 0;
 
   while (getLine(buf, sizeof(buf), f)) {
     if (mapLenA == size) {
       size *= 2;
-      mapA = (Unicode *)grealloc(mapA, size * sizeof(Unicode));
+      mapA = (Unicode *)greallocn(mapA, size, sizeof(Unicode));
     }
     if (sscanf(buf, "%x", &u) == 1) {
       mapA[mapLenA] = u;
@@ -115,7 +115,7 @@ CharCodeToUnicode *CharCodeToUnicode::parseUnicodeToUnicode(
   }
 
   size = 4096;
-  mapA = (Unicode *)gmalloc(size * sizeof(Unicode));
+  mapA = (Unicode *)gmallocn(size, sizeof(Unicode));
   memset(mapA, 0, size * sizeof(Unicode));
   len = 0;
   sMapA = NULL;
@@ -152,7 +152,7 @@ CharCodeToUnicode *CharCodeToUnicode::parseUnicodeToUnicode(
       while (u0 >= size) {
 	size *= 2;
       }
-      mapA = (Unicode *)grealloc(mapA, size * sizeof(Unicode));
+      mapA = (Unicode *)greallocn(mapA, size, sizeof(Unicode));
       memset(mapA + oldSize, 0, (size - oldSize) * sizeof(Unicode));
     }
     if (n == 1) {
@@ -162,7 +162,7 @@ CharCodeToUnicode *CharCodeToUnicode::parseUnicodeToUnicode(
       if (sMapLenA == sMapSizeA) {
 	sMapSizeA += 16;
 	sMapA = (CharCodeToUnicodeString *)
-	          grealloc(sMapA, sMapSizeA * sizeof(CharCodeToUnicodeString));
+	          greallocn(sMapA, sMapSizeA, sizeof(CharCodeToUnicodeString));
       }
       sMapA[sMapLenA].c = u0;
       for (i = 0; i < n; ++i) {
@@ -251,7 +251,7 @@ void CharCodeToUnicode::parseCMap1(int (*getCharFunc)(void *), void *data,
 	  error(-1, "Illegal entry in bfchar block in ToUnicode CMap");
 	  continue;
 	}
-	addMapping(code1, tok2 + 1, n2 - 1, 0);
+	addMapping(code1, tok2 + 1, n2 - 2, 0);
       }
       pst->getToken(tok1, sizeof(tok1), &n1);
     } else if (!strcmp(tok2, "beginbfrange")) {
@@ -320,7 +320,7 @@ void CharCodeToUnicode::addMapping(CharCode code, char *uStr, int n,
   if (code >= mapLen) {
     oldLen = mapLen;
     mapLen = (code + 256) & ~255;
-    map = (Unicode *)grealloc(map, mapLen * sizeof(Unicode));
+    map = (Unicode *)greallocn(map, mapLen, sizeof(Unicode));
     for (i = oldLen; i < mapLen; ++i) {
       map[i] = 0;
     }
@@ -335,7 +335,7 @@ void CharCodeToUnicode::addMapping(CharCode code, char *uStr, int n,
     if (sMapLen >= sMapSize) {
       sMapSize = sMapSize + 16;
       sMap = (CharCodeToUnicodeString *)
-	       grealloc(sMap, sMapSize * sizeof(CharCodeToUnicodeString));
+	       greallocn(sMap, sMapSize, sizeof(CharCodeToUnicodeString));
     }
     map[code] = 0;
     sMap[sMapLen].c = code;
@@ -357,7 +357,7 @@ CharCodeToUnicode::CharCodeToUnicode(GString *tagA) {
 
   tag = tagA;
   mapLen = 256;
-  map = (Unicode *)gmalloc(mapLen * sizeof(Unicode));
+  map = (Unicode *)gmallocn(mapLen, sizeof(Unicode));
   for (i = 0; i < mapLen; ++i) {
     map[i] = 0;
   }
@@ -376,7 +376,7 @@ CharCodeToUnicode::CharCodeToUnicode(GString *tagA, Unicode *mapA,
   tag = tagA;
   mapLen = mapLenA;
   if (copyMap) {
-    map = (Unicode *)gmalloc(mapLen * sizeof(Unicode));
+    map = (Unicode *)gmallocn(mapLen, sizeof(Unicode));
     memcpy(map, mapA, mapLen * sizeof(Unicode));
   } else {
     map = mapA;
@@ -433,23 +433,30 @@ GBool CharCodeToUnicode::match(GString *tagA) {
 }
 
 void CharCodeToUnicode::setMapping(CharCode c, Unicode *u, int len) {
-  int i;
+  int i, j;
 
   if (len == 1) {
     map[c] = u[0];
   } else {
+    for (i = 0; i < sMapLen; ++i) {
+      if (sMap[i].c == c) {
+	break;
+      }
+    }
+    if (i == sMapLen) {
+      if (sMapLen == sMapSize) {
+	sMapSize += 8;
+	sMap = (CharCodeToUnicodeString *)
+	         greallocn(sMap, sMapSize, sizeof(CharCodeToUnicodeString));
+      }
+      ++sMapLen;
+    }
     map[c] = 0;
-    if (sMapLen == sMapSize) {
-      sMapSize += 8;
-      sMap = (CharCodeToUnicodeString *)
-	       grealloc(sMap, sMapSize * sizeof(CharCodeToUnicodeString));
+    sMap[i].c = c;
+    sMap[i].len = len;
+    for (j = 0; j < len && j < maxUnicodeString; ++j) {
+      sMap[i].u[j] = u[j];
     }
-    sMap[sMapLen].c = c;
-    sMap[sMapLen].len = len;
-    for (i = 0; i < len && i < maxUnicodeString; ++i) {
-      sMap[sMapLen].u[i] = u[i];
-    }
-    ++sMapLen;
   }
 }
 
@@ -480,7 +487,7 @@ CharCodeToUnicodeCache::CharCodeToUnicodeCache(int sizeA) {
   int i;
 
   size = sizeA;
-  cache = (CharCodeToUnicode **)gmalloc(size * sizeof(CharCodeToUnicode *));
+  cache = (CharCodeToUnicode **)gmallocn(size, sizeof(CharCodeToUnicode *));
   for (i = 0; i < size; ++i) {
     cache[i] = NULL;
   }

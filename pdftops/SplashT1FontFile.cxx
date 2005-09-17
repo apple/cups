@@ -48,8 +48,8 @@ SplashFontFile *SplashT1FontFile::loadType1Font(SplashT1FontEngine *engineA,
       encStrSize += strlen(encA[i]) + 1;
     }
   }
-  encTmp = (char **)gmalloc(257 * sizeof(char *));
-  encStrTmp = (char *)gmalloc(encStrSize * sizeof(char));
+  encTmp = (char **)gmallocn(257, sizeof(char *));
+  encStrTmp = (char *)gmallocn(encStrSize, sizeof(char));
   encPtr = encStrTmp;
   for (i = 0; i < 256; ++i) {
     if (encA[i]) {

@@ -2,7 +2,7 @@
 //
 // PSOutputDev.h
 //
-// Copyright 1996-2004 Glyph & Cog, LLC
+// Copyright 1996-2003 Glyph & Cog, LLC
 //
 //========================================================================
 
@@ -101,16 +101,14 @@ public:
 
   // Write the document-level header.
   void writeHeader(int firstPage, int lastPage,
-		   PDFRectangle *mediaBox, PDFRectangle *cropBox);
+		   PDFRectangle *mediaBox, PDFRectangle *cropBox,
+		   int pageRotate);
 
   // Write the Xpdf procset.
   void writeXpdfProcset();
 
   // Write the document-level setup.
   void writeDocSetup(Catalog *catalog, int firstPage, int lastPage);
-
-  // Write the setup for the current page.
-  void writePageSetup();
 
   // Write the trailer for the current page.
   void writePageTrailer();
@@ -143,6 +141,8 @@ public:
   virtual void updateStrokeColorSpace(GfxState *state);
   virtual void updateFillColor(GfxState *state);
   virtual void updateStrokeColor(GfxState *state);
+  virtual void updateFillOverprint(GfxState *state);
+  virtual void updateStrokeOverprint(GfxState *state);
 
   //----- update text state
   virtual void updateFont(GfxState *state);
@@ -236,7 +236,8 @@ private:
   void setupEmbeddedTrueTypeFont(GfxFont *font, Ref *id, GString *psName);
   void setupExternalTrueTypeFont(GfxFont *font, GString *psName);
   void setupEmbeddedCIDType0Font(GfxFont *font, Ref *id, GString *psName);
-  void setupEmbeddedCIDTrueTypeFont(GfxFont *font, Ref *id, GString *psName);
+  void setupEmbeddedCIDTrueTypeFont(GfxFont *font, Ref *id, GString *psName,
+				    GBool needVerticalMetrics);
   void setupType3Font(GfxFont *font, GString *psName, Dict *parentResDict);
   void setupImages(Dict *resDict);
   void setupImage(Ref id, Stream *str);
@@ -318,6 +319,8 @@ private:
   double tx, ty;		// global translation for current page
   double xScale, yScale;	// global scaling for current page
   int rotate;			// rotation angle for current page
+  double epsX1, epsY1,		// EPS bounding box (unrotated)
+         epsX2, epsY2;
 
   GString *embFontList;		// resource comments for embedded fonts
 

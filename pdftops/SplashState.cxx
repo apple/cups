@@ -21,6 +21,11 @@
 // SplashState
 //------------------------------------------------------------------------
 
+// number of components in each color mode
+int splashColorModeNComps[] = {
+  1, 1, 2, 3, 3, 4, 4
+};
+
 SplashState::SplashState(int width, int height) {
   SplashColor color;
 
@@ -28,6 +33,9 @@ SplashState::SplashState(int width, int height) {
   strokePattern = new SplashSolidColor(color);
   fillPattern = new SplashSolidColor(color);
   screen = new SplashScreen(10);
+  blendFunc = NULL;
+  strokeAlpha = 1;
+  fillAlpha = 1;
   lineWidth = 0;
   lineCap = splashLineCapButt;
   lineJoin = splashLineJoinMiter;
@@ -44,6 +52,9 @@ SplashState::SplashState(SplashState *state) {
   strokePattern = state->strokePattern->copy();
   fillPattern = state->fillPattern->copy();
   screen = state->screen->copy();
+  blendFunc = state->blendFunc;
+  strokeAlpha = state->strokeAlpha;
+  fillAlpha = state->fillAlpha;
   lineWidth = state->lineWidth;
   lineCap = state->lineCap;
   lineJoin = state->lineJoin;
@@ -51,7 +62,7 @@ SplashState::SplashState(SplashState *state) {
   flatness = state->flatness;
   if (state->lineDash) {
     lineDashLength = state->lineDashLength;
-    lineDash = (SplashCoord *)gmalloc(lineDashLength * sizeof(SplashCoord));
+    lineDash = (SplashCoord *)gmallocn(lineDashLength, sizeof(SplashCoord));
     memcpy(lineDash, state->lineDash, lineDashLength * sizeof(SplashCoord));
   } else {
     lineDash = NULL;
@@ -90,7 +101,7 @@ void SplashState::setLineDash(SplashCoord *lineDashA, int lineDashLengthA,
   gfree(lineDash);
   lineDashLength = lineDashLengthA;
   if (lineDashLength > 0) {
-    lineDash = (SplashCoord *)gmalloc(lineDashLength * sizeof(SplashCoord));
+    lineDash = (SplashCoord *)gmallocn(lineDashLength, sizeof(SplashCoord));
     memcpy(lineDash, lineDashA, lineDashLength * sizeof(SplashCoord));
   } else {
     lineDash = NULL;
