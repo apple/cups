@@ -1234,6 +1234,13 @@ do_setup(ppd_file_t *ppd,		/* I - PPD file */
   }
 
  /*
+  * If we are doing N-up printing, disable setpagedevice...
+  */
+
+  if (NUp > 1)
+    puts("userdict/setpagedevice{pop}bind put");
+
+ /*
   * Changes to the transfer function must be made AFTER any
   * setpagedevice code...
   */
