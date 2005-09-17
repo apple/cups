@@ -3,6 +3,8 @@ CHANGES.txt - 09/17/2005
 
 CHANGES IN CUPS V1.2.0b1
 
+	- "make install" no longer overwrites an existing PAM
+	  configuration file (STR #1064)
 	- The scheduler now closes all files on startup when run
 	  in daemon mode (STR #1009)
 	- Added a new RGBW colorspace to the CUPS raster format

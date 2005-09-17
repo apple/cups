@@ -67,7 +67,11 @@ install:
 	done
 	-if test x$(PAMDIR) != x$(BUILDROOT); then \
 		$(INSTALL_DIR) $(PAMDIR); \
-		$(INSTALL_DATA) $(PAMFILE) $(PAMDIR)/cups; \
+		if test -r $(PAMDIR)/cups/$(PAMFILE) ; then \
+			$(INSTALL_DATA) $(PAMFILE) $(PAMDIR)/cups.N ; \
+		else \
+			$(INSTALL_DATA) $(PAMFILE) $(PAMDIR)/cups ; \
+		fi ; \
 	fi
 
 
