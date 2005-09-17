@@ -457,9 +457,9 @@ ReadConfiguration(void)
   */
 
 #ifdef HAVE_VSYSLOG
-  if (strcmp(AccessLog, "syslog") == 0 ||
-      strcmp(ErrorLog, "syslog") == 0 ||
-      strcmp(PageLog, "syslog") == 0)
+  if (!strcmp(AccessLog, "syslog") ||
+      !strcmp(ErrorLog, "syslog") ||
+      !strcmp(PageLog, "syslog"))
     openlog("cupsd", LOG_PID | LOG_NOWAIT | LOG_NDELAY, LOG_LPR);
 #endif /* HAVE_VSYSLOG */
 
