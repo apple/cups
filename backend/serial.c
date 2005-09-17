@@ -303,7 +303,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
       * Process the option...
       */
 
-      if (strcasecmp(name, "baud") == 0)
+      if (!strcasecmp(name, "baud"))
       {
        /*
         * Set the baud rate...
@@ -365,7 +365,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 	}
 #endif /* B19200 == 19200 */
       }
-      else if (strcasecmp(name, "bits") == 0)
+      else if (!strcasecmp(name, "bits"))
       {
        /*
         * Set number of data bits...
@@ -386,53 +386,88 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 	      break;
 	}
       }
-      else if (strcasecmp(name, "parity") == 0)
+      else if (!strcasecmp(name, "parity"))
       {
        /*
 	* Set parity checking...
 	*/
 
-	if (strcasecmp(value, "even") == 0)
+	if (!strcasecmp(value, "even"))
 	{
 	  opts.c_cflag |= PARENB;
           opts.c_cflag &= ~PARODD;
 	}
-	else if (strcasecmp(value, "odd") == 0)
+	else if (!strcasecmp(value, "odd"))
 	{
 	  opts.c_cflag |= PARENB;
           opts.c_cflag |= PARODD;
 	}
-	else if (strcasecmp(value, "none") == 0)
+	else if (!strcasecmp(value, "none"))
 	  opts.c_cflag &= ~PARENB;
+	else if (!strcasecmp(value, "space"))
+	{
+	 /*
+	  * Note: we only support space parity with 7 bits per character...
+	  */
+
+	  opts.c_cflag &= ~CSIZE;
+          opts.c_cflag |= CS8;
+	  opts.c_cflag &= ~PARENB;
+        }
+	else if (!strcasecmp(value, "mark"))
+	{
+	 /*
+	  * Note: we only support mark parity with 7 bits per character
+	  * and 1 stop bit...
+	  */
+
+	  opts.c_cflag &= ~CSIZE;
+          opts.c_cflag |= CS7;
+	  opts.c_cflag &= ~PARENB;
+          opts.c_cflag |= CSTOPB;
+        }
       }
-      else if (strcasecmp(name, "flow") == 0)
+      else if (!strcasecmp(name, "flow"))
       {
        /*
 	* Set flow control...
 	*/
 
-	if (strcasecmp(value, "none") == 0)
+	if (!strcasecmp(value, "none"))
 	{
 	  opts.c_iflag &= ~(IXON | IXOFF);
           opts.c_cflag &= ~CRTSCTS;
 	}
-	else if (strcasecmp(value, "soft") == 0)
+	else if (!strcasecmp(value, "soft"))
 	{
 	  opts.c_iflag |= IXON | IXOFF;
           opts.c_cflag &= ~CRTSCTS;
 	}
-	else if (strcasecmp(value, "hard") == 0 ||
-	         strcasecmp(value, "rtscts") == 0)
+	else if (!strcasecmp(value, "hard") ||
+	         !strcasecmp(value, "rtscts"))
         {
 	  opts.c_iflag &= ~(IXON | IXOFF);
           opts.c_cflag |= CRTSCTS;
 	}
-	else if (strcasecmp(value, "dtrdsr") == 0)
+	else if (!strcasecmp(value, "dtrdsr"))
 	{
 	  opts.c_iflag &= ~(IXON | IXOFF);
           opts.c_cflag &= ~CRTSCTS;
 
 	  dtrdsr = 1;
+	}
+      }
+      else if (!strcasecmp(name, "stop"))
+      {
+        switch (atoi(value))
+	{
+	  case 1 :
+	      opts.c_cflag &= ~CSTOPB;
+	      break;
+
+	  case 2 :
+	      opts.c_cflag |= CSTOPB;
+	      break;
 	}
       }
     }

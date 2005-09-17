@@ -3,6 +3,8 @@ CHANGES.txt - 09/17/2005
 
 CHANGES IN CUPS V1.2.0b1
 
+	- The serial backend now supports "stop=1", "stop=2",
+	  "parity=space", and "parity=mark" options (STR #1155)
 	- "make install" no longer overwrites an existing PAM
 	  configuration file (STR #1064)
 	- The scheduler now closes all files on startup when run
