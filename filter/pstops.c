@@ -802,12 +802,33 @@ main(int  argc,			/* I - Number of command-line arguments */
 	  tbytes -= nbytes;
 	}
       }
-      else if (!strncmp(line, "%%IncludeFeature:", 17) && level == 0 && NUp == 1)
+      else if (!strncmp(line, "%%IncludeFeature:", 17))
       {
-	include_feature(ppd, line, stdout);
+       /*
+        * Embed printer commands as needed...
+	*/
 
-        if (slowcollate || sloworder)
-	  include_feature(ppd, line, temp);
+        if (level == 0 && NUp == 1)
+	{
+	  include_feature(ppd, line, stdout);
+
+          if (slowcollate || sloworder)
+	    include_feature(ppd, line, temp);
+	}
+      }
+      else if (!strncmp(line, "%%BeginFeature:", 15) && NUp > 1)
+      {
+       /*
+        * Strip page options for N-up > 1...
+	*/
+
+        do
+	{
+	  len = sizeof(line);
+	  if (psgets(line, &len, fp) == NULL)
+	    break;
+        }
+	while (strncmp(line, "%%EndFeature", 12));
       }
       else if (!strncmp(line, "%%Trailer", 9) && level == 0)
       {
