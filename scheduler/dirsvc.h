@@ -82,8 +82,12 @@ typedef struct
 
 VAR int			Browsing	VALUE(TRUE),
 					/* Whether or not browsing is enabled */
-			BrowseProtocols	VALUE(BROWSE_ALL),
-					/* Protocols to support */
+			BrowseLocalProtocols
+					VALUE(BROWSE_ALL),
+					/* Protocols to support for local printers */
+			BrowseRemoteProtocols
+					VALUE(BROWSE_ALL),
+					/* Protocols to support for remote printers */
 			BrowseShortNames VALUE(TRUE),
 					/* Short names for remote printers? */
 			BrowseSocket	VALUE(-1),

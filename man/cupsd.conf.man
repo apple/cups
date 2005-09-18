@@ -21,7 +21,7 @@
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
-.TH cupsd.conf 5 "Common UNIX Printing System" "18 August 2004" "Easy Software Products"
+.TH cupsd.conf 5 "Common UNIX Printing System" "17 September 2005" "Easy Software Products"
 .SH NAME
 cupsd.conf \- server configuration file for cups
 .SH DESCRIPTION
@@ -93,6 +93,14 @@ BrowseProtocols
 .br
 Specifies the protocols to use for printer browsing.
 .TP 5
+BrowseLocalProtocols
+.br
+Specifies the protocols to use for local printer browsing.
+.TP 5
+BrowseRemoteProtocols
+.br
+Specifies the protocols to use for remote printer browsing.
+.TP 5
 BrowseRelay
 .br
 Specifies that printer information packets should be relayed from one host or
@@ -131,6 +139,10 @@ DataDir
 .br
 Specified the directory where data files can be found.
 .TP 5
+DefaultAuthType
+.br
+Specifies the default type of authentication to use.
+.TP 5
 DefaultCharset
 .br
 Specifies the default character set to use for text.
@@ -138,6 +150,10 @@ Specifies the default character set to use for text.
 DefaultLanguage
 .br
 Specifies the default language to use for text and web content.
+.TP 5
+DefaultPolicy
+.br
+Specifies the default access policy to use.
 .TP 5
 Deny
 .br
@@ -218,6 +234,10 @@ KeepAliveTimeout
 .br
 Specifies the connection timeout for HTTP Keep-Alive.
 .TP 5
+<Limit operations> ... </Limit>
+.br
+Specifies the IPP operations that are being limited inside a policy.
+.TP 5
 <Limit methods> ... </Limit>
 .TP 5
 <LimitExcept methods> ... </LimitExcept>
@@ -285,6 +305,10 @@ Specifies the order of HTTP access control (allow,deny or deny,allow)
 PageLog
 .br
 Specifies the page log filename.
+.TP 5
+<Policy name> ... </Policy>
+.br
+Specifies access control for the named policy.
 .TP 5
 Port
 .br

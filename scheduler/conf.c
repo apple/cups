@@ -399,12 +399,13 @@ ReadConfiguration(void)
   RunAsUser           = FALSE;
   Timeout             = DEFAULT_TIMEOUT;
 
-  BrowseInterval      = DEFAULT_INTERVAL;
-  BrowsePort          = ippPort();
-  BrowseProtocols     = BROWSE_CUPS;
-  BrowseShortNames    = TRUE;
-  BrowseTimeout       = DEFAULT_TIMEOUT;
-  Browsing            = TRUE;
+  BrowseInterval        = DEFAULT_INTERVAL;
+  BrowsePort            = ippPort();
+  BrowseLocalProtocols  = BROWSE_CUPS;
+  BrowseRemoteProtocols = BROWSE_CUPS;
+  BrowseShortNames      = TRUE;
+  BrowseTimeout         = DEFAULT_TIMEOUT;
+  Browsing              = TRUE;
 
   ClearString(&BrowseLocalOptions);
   ClearString(&BrowseRemoteOptions);
@@ -1890,13 +1891,18 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
         LogMessage(L_ERROR, "Unknown BrowseOrder value %s on line %d.",
 	           value, linenum);
     }
-    else if (!strcasecmp(line, "BrowseProtocols"))
+    else if (!strcasecmp(line, "BrowseProtocols") ||
+             !strcasecmp(line, "BrowseLocalProtocols") ||
+             !strcasecmp(line, "BrowseRemoteProtocols"))
     {
      /*
       * "BrowseProtocol name [... name]"
       */
 
-      BrowseProtocols = 0;
+      if (strcasecmp(line, "BrowseLocalProtocols"))
+        BrowseRemoteProtocols = 0;
+      if (strcasecmp(line, "BrowseRemoteProtocols"))
+        BrowseLocalProtocols = 0;
 
       for (; *value;)
       {
@@ -1911,13 +1917,33 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 	}
 
         if (!strcasecmp(value, "cups"))
-	  BrowseProtocols |= BROWSE_CUPS;
+	{
+	  if (strcasecmp(line, "BrowseLocalProtocols"))
+	    BrowseRemoteProtocols |= BROWSE_CUPS;
+	  if (strcasecmp(line, "BrowseRemoteProtocols"))
+	    BrowseLocalProtocols |= BROWSE_CUPS;
+	}
         else if (!strcasecmp(value, "slp"))
-	  BrowseProtocols |= BROWSE_SLP;
+	{
+	  if (strcasecmp(line, "BrowseLocalProtocols"))
+	    BrowseRemoteProtocols |= BROWSE_SLP;
+	  if (strcasecmp(line, "BrowseRemoteProtocols"))
+	    BrowseLocalProtocols |= BROWSE_SLP;
+	}
         else if (!strcasecmp(value, "ldap"))
-	  BrowseProtocols |= BROWSE_LDAP;
+	{
+	  if (strcasecmp(line, "BrowseLocalProtocols"))
+	    BrowseRemoteProtocols |= BROWSE_LDAP;
+	  if (strcasecmp(line, "BrowseRemoteProtocols"))
+	    BrowseLocalProtocols |= BROWSE_LDAP;
+	}
         else if (!strcasecmp(value, "all"))
-	  BrowseProtocols |= BROWSE_ALL;
+	{
+	  if (strcasecmp(line, "BrowseLocalProtocols"))
+	    BrowseRemoteProtocols |= BROWSE_ALL;
+	  if (strcasecmp(line, "BrowseRemoteProtocols"))
+	    BrowseLocalProtocols |= BROWSE_ALL;
+	}
 	else
 	{
 	  LogMessage(L_ERROR, "Unknown browse protocol \"%s\" on line %d.",

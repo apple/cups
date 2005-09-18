@@ -641,7 +641,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     * Update the browse list as needed...
     */
 
-    if (Browsing && BrowseProtocols)
+    if (Browsing && (BrowseLocalProtocols | BrowseRemoteProtocols))
     {
       if (BrowseSocket >= 0 && FD_ISSET(BrowseSocket, input))
         UpdateCUPSBrowse();
@@ -650,7 +650,8 @@ main(int  argc,				/* I - Number of command-line arguments */
         UpdatePolling();
 
 #ifdef HAVE_LIBSLP
-      if ((BrowseProtocols & BROWSE_SLP) && BrowseSLPRefresh <= time(NULL))
+      if (((BrowseLocalProtocols | BrowseRemoteProtocols) & BROWSE_SLP) &&
+          BrowseSLPRefresh <= time(NULL))
         UpdateSLPBrowse();
 #endif /* HAVE_LIBSLP */
 
@@ -1339,17 +1340,17 @@ select_timeout(int fds)			/* I - Number of ready descriptors select returned */
   * Update the browse list as needed...
   */
 
-  if (Browsing && BrowseProtocols)
+  if (Browsing && BrowseLocalProtocols)
   {
 #ifdef HAVE_LIBSLP
-    if ((BrowseProtocols & BROWSE_SLP) && (BrowseSLPRefresh < timeout))
+    if ((BrowseLocalProtocols & BROWSE_SLP) && (BrowseSLPRefresh < timeout))
     {
       timeout = BrowseSLPRefresh;
       why     = "update SLP browsing";
     }
 #endif /* HAVE_LIBSLP */
 
-    if (BrowseProtocols & BROWSE_CUPS)
+    if (BrowseLocalProtocols & BROWSE_CUPS)
     {
       for (p = Printers; p != NULL; p = p->next)
       {

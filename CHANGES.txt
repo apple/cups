@@ -3,6 +3,10 @@ CHANGES.txt - 09/17/2005
 
 CHANGES IN CUPS V1.2.0b1
 
+	- Added new BrowseLocalProtocols and
+	  BrowseRemoteProtocols directives to cupsd.conf,
+	  allowing for different browse protocols for local and
+	  remote printers (STR #877)
 	- PPD files can now contain strings up to 256k in length
 	  (STR #1215)
 	- The pstops filter now supports the IncludeFeature DSC

@@ -666,10 +666,10 @@ SendBrowseDelete(printer_t *p)		/* I - Printer to delete */
   * Announce the deletion...
   */
 
-  if (BrowseProtocols & BROWSE_CUPS)
+  if (BrowseLocalProtocols & BROWSE_CUPS)
     SendCUPSBrowse(p);
 #ifdef HAVE_LIBSLP
-  if (BrowseProtocols & BROWSE_SLP)
+  if (BrowseLocalProtocols & BROWSE_SLP)
     SLPDeregPrinter(p);
 #endif /* HAVE_LIBSLP */
 }
@@ -689,7 +689,7 @@ SendBrowseList(void)
 			to;		/* Timeout time */
 
 
-  if (!Browsing || !BrowseProtocols)
+  if (!Browsing || !BrowseLocalProtocols)
     return;
 
  /*
@@ -749,11 +749,11 @@ SendBrowseList(void)
 
 	p->browse_time = time(NULL);
 
-	if (BrowseProtocols & BROWSE_CUPS)
+	if (BrowseLocalProtocols & BROWSE_CUPS)
           SendCUPSBrowse(p);
 
 #ifdef HAVE_LIBSLP
-	if (BrowseProtocols & BROWSE_SLP)
+	if (BrowseLocalProtocols & BROWSE_SLP)
           SendSLPBrowse(p);
 #endif /* HAVE_LIBSLP */
       }
@@ -998,10 +998,10 @@ StartBrowsing(void)
   struct sockaddr_in	addr;	/* Broadcast address */
 
 
-  if (!Browsing || !BrowseProtocols)
+  if (!Browsing || !(BrowseLocalProtocols | BrowseRemoteProtocols))
     return;
 
-  if (BrowseProtocols & BROWSE_CUPS)
+  if ((BrowseLocalProtocols | BrowseRemoteProtocols) & BROWSE_CUPS)
   {
    /*
     * Create the broadcast socket...
@@ -1011,7 +1011,8 @@ StartBrowsing(void)
     {
       LogMessage(L_ERROR, "StartBrowsing: Unable to create broadcast socket - %s.",
         	 strerror(errno));
-      BrowseProtocols &= ~BROWSE_CUPS;
+      BrowseLocalProtocols &= ~BROWSE_CUPS;
+      BrowseRemoteProtocols &= ~BROWSE_CUPS;
       return;
     }
 
@@ -1031,8 +1032,9 @@ StartBrowsing(void)
       close(BrowseSocket);
 #endif /* WIN32 */
 
-      BrowseSocket    = -1;
-      BrowseProtocols &= ~BROWSE_CUPS;
+      BrowseSocket = -1;
+      BrowseLocalProtocols &= ~BROWSE_CUPS;
+      BrowseRemoteProtocols &= ~BROWSE_CUPS;
       return;
     }
 
@@ -1056,8 +1058,9 @@ StartBrowsing(void)
       close(BrowseSocket);
 #endif /* WIN32 */
 
-      BrowseSocket    = -1;
-      BrowseProtocols &= ~BROWSE_CUPS;
+      BrowseSocket = -1;
+      BrowseLocalProtocols &= ~BROWSE_CUPS;
+      BrowseRemoteProtocols &= ~BROWSE_CUPS;
       return;
     }
 
@@ -1080,7 +1083,7 @@ StartBrowsing(void)
     BrowseSocket = -1;
 
 #ifdef HAVE_LIBSLP
-  if (BrowseProtocols & BROWSE_SLP)
+  if ((BrowseLocalProtocols | BrowseRemoteProtocols) & BROWSE_SLP)
   {
    /* 
     * Open SLP handle...
@@ -1089,7 +1092,8 @@ StartBrowsing(void)
     if (SLPOpen("en", SLP_FALSE, &BrowseSLPHandle) != SLP_OK)
     {
       LogMessage(L_ERROR, "Unable to open an SLP handle; disabling SLP browsing!");
-      BrowseProtocols &= ~BROWSE_SLP;
+      BrowseLocalProtocols &= ~BROWSE_SLP;
+      BrowseRemoteProtocols &= ~BROWSE_SLP;
     }
 
     BrowseSLPRefresh = 0;
@@ -1205,10 +1209,10 @@ StartPolling(void)
 void
 StopBrowsing(void)
 {
-  if (!Browsing || !BrowseProtocols)
+  if (!Browsing || !(BrowseLocalProtocols | BrowseRemoteProtocols))
     return;
 
-  if (BrowseProtocols & BROWSE_CUPS)
+  if ((BrowseLocalProtocols | BrowseRemoteProtocols) & BROWSE_CUPS)
   {
    /*
     * Close the socket and remove it from the input selection set.
@@ -1231,7 +1235,7 @@ StopBrowsing(void)
   }
 
 #ifdef HAVE_LIBSLP
-  if (BrowseProtocols & BROWSE_SLP)
+  if ((BrowseLocalProtocols | BrowseRemoteProtocols) & BROWSE_SLP)
   {
    /* 
     * Close SLP handle...
