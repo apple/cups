@@ -95,7 +95,7 @@ extern "C" {
 
 #  define HTTP_MAX_URI		1024	/* Max length of URI string */
 #  define HTTP_MAX_HOST		256	/* Max length of hostname string */
-#  define HTTP_MAX_BUFFER	2048	/* Max length of data buffer */
+#  define HTTP_MAX_BUFFER	1024	/* Max length of data buffer */
 #  define HTTP_MAX_VALUE	256	/* Max header field value length */
 
 
@@ -316,7 +316,9 @@ typedef struct
   int			data_remaining;	/* Number of bytes left */
   int			used;		/* Number of bytes used in buffer */
   char			buffer[HTTP_MAX_BUFFER];
-					/* Buffer for messages */
+					/* Buffer for incoming data */
+  char			wbuffer[HTTP_MAX_BUFFER];
+					/* Buffer for outgoing data */
   int			auth_type;	/* Authentication in use */
   _cups_md5_state_t	md5_state;	/* MD5 state */
   char			nonce[HTTP_MAX_VALUE];
@@ -336,8 +338,11 @@ typedef struct
   int			digest_tries;	/* Number of tries for digest auth */
   /**** New in CUPS 1.2 ****/
   http_addr_t		hostaddr;	/* Host address and port */
+  int			wused;		/* Write buffer bytes used */
 } http_t;
 
+/**** New in CUPS 1.1.20+ ****/
+extern int		httpWriteFlush(http_t *http);
 
 /*
  * Prototypes...
@@ -422,6 +427,7 @@ extern char		*httpAddrString(const http_addr_t *addr,
 			                char *s, int slen);
 extern const char	*httpGetDateString2(time_t t, char *s, int slen);
 extern const char	*httpGetHostname(char *s, int slen);
+extern void		httpFlushWrite(http_t *http);
 
 
 /*

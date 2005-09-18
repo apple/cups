@@ -1,8 +1,12 @@
-CHANGES.txt - 09/17/2005
+CHANGES.txt - 09/18/2005
 ------------------------
 
 CHANGES IN CUPS V1.2.0b1
 
+	- Added write buffering to the HTTP code to improve
+	  performance (STR #547)
+	- The scheduler now uses the attributes-natural-language
+	  attribute to localize banner pages (STR #386)
 	- The scheduler now returns the address that was used to
 	  connect to it (STR #1076)
 	- Fixed a problem with N-up printing and OpenOffice (STR

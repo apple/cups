@@ -2716,40 +2716,40 @@ copy_banner(client_t   *con,		/* I - Client connection */
   fchmod(cupsFileNumber(out), 0640);
   fchown(cupsFileNumber(out), RunUser, Group);
 
-  if (con->language)
+ /*
+  * Try the localized banner file under the subdirectory...
+  */
+
+  strlcpy(attrname, con->request->attrs->next->values[0].string.text,
+          sizeof(attrname));
+  if (strlen(attrname) > 2 && attrname[2] == '-')
   {
    /*
-    * Try the localized banner file under the subdirectory...
+    * Convert ll-cc to ll_CC...
     */
 
-    snprintf(filename, sizeof(filename), "%s/banners/%s/%s", DataDir,
-             con->language->language, name);
-
-    if (access(filename, 0) && con->language->language[2])
-    {
-     /*
-      * Wasn't able to find "ll_CC" locale file; try the non-national
-      * localization banner directory.
-      */
-
-      attrname[0] = con->language->language[0];
-      attrname[1] = con->language->language[1];
-      attrname[2] = '\0';
-
-      snprintf(filename, sizeof(filename), "%s/banners/%s/%s", DataDir,
-               attrname, name);
-    }
-
-    if (access(filename, 0))
-    {
-     /*
-      * Use the non-localized banner file.
-      */
-
-      snprintf(filename, sizeof(filename), "%s/banners/%s", DataDir, name);
-    }
+    attrname[2] = '_';
+    attrname[3] = toupper(attrname[3] & 255);
+    attrname[4] = toupper(attrname[4] & 255);
   }
-  else
+
+  snprintf(filename, sizeof(filename), "%s/banners/%s/%s", DataDir,
+           attrname, name);
+
+  if (access(filename, 0) && strlen(attrname) > 2)
+  {
+   /*
+    * Wasn't able to find "ll_CC" locale file; try the non-national
+    * localization banner directory.
+    */
+
+    attrname[2] = '\0';
+
+    snprintf(filename, sizeof(filename), "%s/banners/%s/%s", DataDir,
+             attrname, name);
+  }
+
+  if (access(filename, 0))
   {
    /*
     * Use the non-localized banner file.

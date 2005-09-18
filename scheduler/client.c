@@ -410,6 +410,13 @@ CloseClient(client_t *con)	/* I - Client to close */
 
   LogMessage(L_DEBUG, "CloseClient: %d", con->http.fd);
 
+ /*
+  * Flush pending writes before closing...
+  */
+
+ if (con->http.wused)
+   httpFlushWrite(HTTP(con));
+
   partial = 0;
 
 #ifdef HAVE_SSL
@@ -2446,6 +2453,9 @@ WriteClient(client_t *con)		/* I - Client connection */
 	return (0);
       }
     }
+
+    if (con->http.wused)
+      httpFlushWrite(HTTP(con));
 
     con->http.state = HTTP_WAITING;
 

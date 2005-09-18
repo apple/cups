@@ -45,6 +45,7 @@
  *   httpPut()            - Send a PUT request to the server.
  *   httpTrace()          - Send an TRACE request to the server.
  *   httpFlush()          - Flush data from a HTTP connection.
+ *   httpFlushWrite()     - Flush data in write buffer.
  *   httpRead()           - Read data from a HTTP connection.
  *   httpSetCookie()      - Set the cookie value(s)...
  *   httpWait()           - Wait for data available on a connection.
@@ -871,6 +872,65 @@ httpFlush(http_t *http)			/* I - HTTP data */
 
 
 /*
+ * 'httpFlushWrite()' - Flush data in write buffer.
+ */
+
+void
+httpFlushWrite(http_t *http)		/* I - HTTP data */
+{
+  const char	*buffer;		/* Buffer for data */
+  int		tbytes;			/* Total bytes sent */
+  int		bytes;			/* Bytes sent */
+
+
+  DEBUG_printf(("httpFlushWrite(http=%p)\n", http));
+
+  if (!http->wused)
+    return;
+
+  buffer = http->wbuffer;
+  tbytes = 0;
+
+  while (http->wused > 0)
+  {
+#ifdef HAVE_SSL
+    if (http->tls)
+      bytes = http_write_ssl(http, buffer, http->wused);
+    else
+#endif /* HAVE_SSL */
+    bytes = send(http->fd, buffer, http->wused, 0);
+
+    if (bytes < 0)
+    {
+#ifdef WIN32
+      if (WSAGetLastError() != http->error)
+      {
+        http->error = WSAGetLastError();
+	continue;
+      }
+#else
+      if (errno == EINTR)
+        continue;
+      else if (errno != http->error)
+      {
+        http->error = errno;
+	continue;
+      }
+#endif /* WIN32 */
+
+      DEBUG_puts("httpWrite: error writing data...\n");
+
+      return;
+    }
+
+    buffer += bytes;
+    tbytes += bytes;
+    http->wused -= bytes;
+  }
+}
+
+
+/*
  * 'httpRead()' - Read data from a HTTP connection.
  */
 
@@ -1196,6 +1256,21 @@ httpWrite(http_t     *http,		/* I - HTTP data */
 
   while (length > 0)
   {
+   /*
+    * Buffer small writes for better performance...
+    */
+    if (length <= sizeof(http->wbuffer) - http->wused)
+    {
+      DEBUG_printf(("httpWrite adding %d bytes to existing %d buffer\n", length, http->wused));
+      memcpy(&http->wbuffer[http->wused], buffer, length);
+      http->wused += length;
+      bytes = length;
+    }
+    else
+    {
+      if (http->wused)
+        httpFlushWrite(http);
+
 #ifdef HAVE_SSL
     if (http->tls)
       bytes = http_write_ssl(http, buffer, length);
@@ -1225,7 +1300,7 @@ httpWrite(http_t     *http,		/* I - HTTP data */
 
       return (-1);
     }
-
+    }
     buffer += bytes;
     tbytes += bytes;
     length -= bytes;
@@ -1463,6 +1538,28 @@ httpPrintf(http_t     *http,		/* I - HTTP data */
 
   DEBUG_printf(("httpPrintf: %s", buf));
 
+ /*
+  * Buffer small writes for better performance...
+  */
+
+  if ((bytes + http->wused) <= sizeof(http->wbuffer))
+  {
+    memcpy(http->wbuffer + http->wused, buf, bytes);
+    http->wused += bytes;
+    return (bytes);
+  }
+
+ /* 
+  * Flush any pending data...
+  */
+
+  if (http->wused)
+    httpFlushWrite(http);
+
+ /*
+  * Write current data...
+  */
+
   for (tbytes = 0, bufptr = buf; tbytes < bytes; tbytes += nbytes, bufptr += nbytes)
   {
 #ifdef HAVE_SSL
@@ -1620,6 +1717,13 @@ httpUpdate(http_t *http)		/* I - HTTP data */
 
 
   DEBUG_printf(("httpUpdate(http=%p), state=%d\n", http, http->state));
+
+ /*
+  * Flush pending data, if any...
+  */
+
+  if (http->wused)
+    httpFlushWrite(http);
 
  /*
   * If we haven't issued any commands, then there is nothing to "update"...
