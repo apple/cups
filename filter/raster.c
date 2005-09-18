@@ -650,6 +650,7 @@ cups_raster_update(cups_raster_t *r)	/* I - Raster stream */
 	  break;
 
       case CUPS_CSPACE_RGBA :
+      case CUPS_CSPACE_RGBW :
       case CUPS_CSPACE_CMYK :
       case CUPS_CSPACE_YMCK :
       case CUPS_CSPACE_KCMY :

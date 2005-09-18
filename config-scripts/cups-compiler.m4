@@ -56,6 +56,17 @@ if test -n "$GCC"; then
     		OPTIM="-fPIC $OPTIM"
 	fi
 
+	AC_MSG_CHECKING(if GCC supports -fpie)
+
+	OLDCFLAGS="$CFLAGS"
+	CFLAGS="$CFLAGS -fpie"
+	AC_TRY_COMPILE(,,
+		OPTIM="$OPTIM -fpie"
+		LDFLAGS="$LDFLAGS -pie"
+		AC_MSG_RESULT(yes),
+		CFLAGS="$OLDCFLAGS"
+		AC_MSG_RESULT(no))
+
 	if test "x$with_optim" = x; then
 		# Add useful warning options for tracking down problems...
 		OPTIM="-Wall -Wno-format-y2k $OPTIM"
