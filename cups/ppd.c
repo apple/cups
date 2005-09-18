@@ -2620,8 +2620,8 @@ ppd_read(cups_file_t *fp,		/* I - File to read from */
 		*textptr,		/* Text pointer */
 		*strptr,		/* Pointer into string */
 		*lineptr,		/* Current position in line buffer */
-		line[65536];		/* Line buffer (64k) */
-
+		*line;			/* Line buffer */
+  int		linesize;		/* Current size of line buffer */
 
  /*
   * Range check everything...
@@ -2637,6 +2637,11 @@ ppd_read(cups_file_t *fp,		/* I - File to read from */
   *string   = NULL;
   col       = 0;
   startline = ppd_line + 1;
+  linesize  = 1024;
+  line      = malloc(linesize);
+
+  if (!line)
+    return (0);
 
   do
   {
@@ -2648,9 +2653,47 @@ ppd_read(cups_file_t *fp,		/* I - File to read from */
     endquote = 0;
     colon    = 0;
 
-    while ((ch = cupsFileGetChar(fp)) != EOF &&
-           (lineptr - line) < (sizeof(line) - 1))
+    while ((ch = cupsFileGetChar(fp)) != EOF)
     {
+      if (lineptr >= (line + linesize - 1))
+      {
+       /*
+        * Expand the line buffer...
+	*/
+
+        char *temp;			/* Temporary line pointer */
+
+
+        linesize += 1024;
+	if (linesize > 262144)
+	{
+	 /*
+	  * Don't allow lines longer than 256k!
+	  */
+
+          ppd_line   = startline;
+          ppd_status = PPD_LINE_TOO_LONG;
+
+	  free(line);
+
+	  return (0);
+	}
+
+        temp = realloc(line, linesize);
+	if (!temp)
+	{
+          ppd_line   = startline;
+          ppd_status = PPD_LINE_TOO_LONG;
+
+	  free(line);
+
+	  return (0);
+	}
+
+        lineptr = temp + (lineptr - line);
+	line    = temp;
+      }
+
       if (ch == '\r' || ch == '\n')
       {
        /*
@@ -2691,6 +2734,8 @@ ppd_read(cups_file_t *fp,		/* I - File to read from */
         ppd_line   = startline;
         ppd_status = PPD_ILLEGAL_CHARACTER;
 
+        free(line);
+
         return (0);
       }
       else if (ch != 0x1a)
@@ -2710,6 +2755,8 @@ ppd_read(cups_file_t *fp,		/* I - File to read from */
 
           ppd_line   = startline;
           ppd_status = PPD_LINE_TOO_LONG;
+
+          free(line);
 
           return (0);
 	}
@@ -2759,6 +2806,8 @@ ppd_read(cups_file_t *fp,		/* I - File to read from */
           ppd_line   = startline;
           ppd_status = PPD_ILLEGAL_CHARACTER;
 
+          free(line);
+
           return (0);
 	}
 	else if (ch != 0x1a)
@@ -2773,6 +2822,8 @@ ppd_read(cups_file_t *fp,		/* I - File to read from */
 
             ppd_line   = startline;
             ppd_status = PPD_LINE_TOO_LONG;
+
+            free(line);
 
             return (0);
 	  }
@@ -2818,6 +2869,8 @@ ppd_read(cups_file_t *fp,		/* I - File to read from */
           ppd_line   = startline;
           ppd_status = PPD_ILLEGAL_CHARACTER;
 
+          free(line);
+
           return (0);
 	}
 	else if (ch != 0x1a)
@@ -2833,6 +2886,8 @@ ppd_read(cups_file_t *fp,		/* I - File to read from */
             ppd_line   = startline;
             ppd_status = PPD_LINE_TOO_LONG;
 
+            free(line);
+
             return (0);
 	  }
 	}
@@ -2846,7 +2901,10 @@ ppd_read(cups_file_t *fp,		/* I - File to read from */
     DEBUG_printf(("LINE = \"%s\"\n", line));
 
     if (ch == EOF && lineptr == line)
+    {
+      free(line);
       return (0);
+    }
 
    /*
     * Now parse it...
@@ -2881,6 +2939,7 @@ ppd_read(cups_file_t *fp,		/* I - File to read from */
         ppd_line   = startline;
         ppd_status = PPD_ILLEGAL_MAIN_KEYWORD;
 
+        free(line);
         return (0);
       }
     }
@@ -2890,6 +2949,7 @@ ppd_read(cups_file_t *fp,		/* I - File to read from */
       if (ppd_conform == PPD_CONFORM_STRICT)
       {
         ppd_status = PPD_MISSING_ASTERISK;
+        free(line);
         return (0);
       }
 
@@ -2904,12 +2964,16 @@ ppd_read(cups_file_t *fp,		/* I - File to read from */
       if (*lineptr)
       {
         ppd_status = PPD_MISSING_ASTERISK;
+        free(line);
         return (0);
       }
       else if (ignoreblank)
         continue;
       else
+      {
+        free(line);
         return (0);
+      }
     }
 
    /*
@@ -2924,6 +2988,7 @@ ppd_read(cups_file_t *fp,		/* I - File to read from */
           (keyptr - keyword) >= (PPD_MAX_NAME - 1))
       {
         ppd_status = PPD_ILLEGAL_MAIN_KEYWORD;
+        free(line);
 	return (0);
       }
 
@@ -2957,6 +3022,7 @@ ppd_read(cups_file_t *fp,		/* I - File to read from */
 	    (optptr - option) >= (PPD_MAX_NAME - 1))
         {
           ppd_status = PPD_ILLEGAL_OPTION_KEYWORD;
+          free(line);
 	  return (0);
 	}
 
@@ -2968,6 +3034,7 @@ ppd_read(cups_file_t *fp,		/* I - File to read from */
       if (isspace(*lineptr & 255) && ppd_conform == PPD_CONFORM_STRICT)
       {
         ppd_status = PPD_ILLEGAL_WHITESPACE;
+        free(line);
 	return (0);
       }
 
@@ -2994,6 +3061,7 @@ ppd_read(cups_file_t *fp,		/* I - File to read from */
 	      (textptr - text) >= (PPD_MAX_LINE - 1))
 	  {
 	    ppd_status = PPD_ILLEGAL_TRANSLATION;
+            free(line);
 	    return (0);
 	  }
 
@@ -3006,6 +3074,7 @@ ppd_read(cups_file_t *fp,		/* I - File to read from */
 	if (textlen > PPD_MAX_TEXT && ppd_conform == PPD_CONFORM_STRICT)
 	{
 	  ppd_status = PPD_ILLEGAL_TRANSLATION;
+          free(line);
 	  return (0);
 	}
 	    
@@ -3018,6 +3087,7 @@ ppd_read(cups_file_t *fp,		/* I - File to read from */
     if (isspace(*lineptr & 255) && ppd_conform == PPD_CONFORM_STRICT)
     {
       ppd_status = PPD_ILLEGAL_WHITESPACE;
+      free(line);
       return (0);
     }
 
@@ -3063,6 +3133,8 @@ ppd_read(cups_file_t *fp,		/* I - File to read from */
     }
   }
   while (mask == 0);
+
+  free(line);
 
   return (mask);
 }

@@ -3,6 +3,8 @@ CHANGES.txt - 09/17/2005
 
 CHANGES IN CUPS V1.2.0b1
 
+	- PPD files can now contain strings up to 256k in length
+	  (STR #1215)
 	- The pstops filter now supports the IncludeFeature DSC
 	  comment (STR #1212)
 	- The pstops filter now disables the setpagedevice
