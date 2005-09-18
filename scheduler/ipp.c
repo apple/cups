@@ -3857,6 +3857,9 @@ get_default(client_t *con)		/* I - Client connection */
   ipp_attribute_t	*requested,	/* requested-attributes */
 			*history;	/* History collection */
   int			need_history;	/* Need to send history collection? */
+  char			printer_uri[HTTP_MAX_URI];
+					/* Printer URI */
+  time_t		curtime;	/* Current time */
 
 
   LogMessage(L_DEBUG2, "get_default(%p[%d])\n", con, con->http.fd);
@@ -3874,6 +3877,49 @@ get_default(client_t *con)		/* I - Client connection */
 
   if (DefaultPrinter != NULL)
   {
+   /*
+    * Copy the printer attributes to the response using requested-attributes
+    * and document-format attributes that may be provided by the client.
+    */
+
+    if (!ippFindAttribute(DefaultPrinter->attrs, "printer-uri-supported",
+                          IPP_TAG_URI))
+    {
+      snprintf(printer_uri, sizeof(printer_uri), "ipp://%s:%d/printers/%s",
+               con->servername, con->serverport, DefaultPrinter->name);
+      ippAddString(con->response, IPP_TAG_PRINTER, IPP_TAG_URI,
+        	   "printer-uri-supported", NULL, printer_uri);
+      LogMessage(L_DEBUG2, "printer-uri-supported=\"%s\"", printer_uri);
+    }
+
+    ippAddInteger(con->response, IPP_TAG_PRINTER, IPP_TAG_ENUM, "printer-state",
+                  DefaultPrinter->state);
+
+    add_printer_state_reasons(con, DefaultPrinter);
+
+    ippAddString(con->response, IPP_TAG_PRINTER, IPP_TAG_TEXT,
+        	 "printer-state-message", NULL, DefaultPrinter->state_message);
+
+    ippAddBoolean(con->response, IPP_TAG_PRINTER, "printer-is-accepting-jobs",
+                  DefaultPrinter->accepting);
+    ippAddBoolean(con->response, IPP_TAG_PRINTER, "printer-is-shared",
+                  DefaultPrinter->shared);
+
+    curtime = time(NULL);
+    ippAddInteger(con->response, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
+                  "printer-up-time", curtime);
+    ippAddInteger(con->response, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
+                  "printer-state-time", DefaultPrinter->state_time);
+    ippAddDate(con->response, IPP_TAG_PRINTER, "printer-current-time",
+               ippTimeToDate(curtime));
+
+    ippAddString(con->response, IPP_TAG_PRINTER, IPP_TAG_NAME,
+        	 "printer-error-policy", NULL, DefaultPrinter->op_policy);
+    ippAddString(con->response, IPP_TAG_PRINTER, IPP_TAG_NAME,
+        	 "printer-op-policy", NULL, DefaultPrinter->op_policy);
+
+    add_queued_job_count(con, DefaultPrinter);
+
     requested = ippFindAttribute(con->request, "requested-attributes",
 	                	 IPP_TAG_KEYWORD);
 
@@ -4476,6 +4522,8 @@ get_printer_attrs(client_t        *con,	/* I - Client connection */
 					/* Resource portion of URI */
   int			port;		/* Port portion of URI */
   printer_t		*printer;	/* Printer/class */
+  char			printer_uri[HTTP_MAX_URI];
+					/* Printer URI */
   time_t		curtime;	/* Current time */
   int			i;		/* Looping var */
   ipp_attribute_t	*requested,	/* requested-attributes */
@@ -4520,6 +4568,16 @@ get_printer_attrs(client_t        *con,	/* I - Client connection */
   * Copy the printer attributes to the response using requested-attributes
   * and document-format attributes that may be provided by the client.
   */
+
+  if (!ippFindAttribute(printer->attrs, "printer-uri-supported",
+                        IPP_TAG_URI))
+  {
+    snprintf(printer_uri, sizeof(printer_uri), "ipp://%s:%d/printers/%s",
+             con->servername, con->serverport, printer->name);
+    ippAddString(con->response, IPP_TAG_PRINTER, IPP_TAG_URI,
+        	 "printer-uri-supported", NULL, printer_uri);
+    LogMessage(L_DEBUG2, "printer-uri-supported=\"%s\"", printer_uri);
+  }
 
   ippAddInteger(con->response, IPP_TAG_PRINTER, IPP_TAG_ENUM, "printer-state",
                 printer->state);
@@ -4606,6 +4664,8 @@ get_printers(client_t *con,		/* I - Client connection */
 		*nameptr;		/* Pointer into name */
   printer_t	*iclass;		/* Implicit class */
   const char	*username;		/* Current user */
+  char		printer_uri[HTTP_MAX_URI];
+					/* Printer URI */
 
 
   LogMessage(L_DEBUG2, "get_printers(%p[%d], %x)\n", con, con->http.fd, type);
@@ -4746,6 +4806,16 @@ get_printers(client_t *con,		/* I - Client connection */
       *    printer-state-time
       *    + all printer attributes
       */
+
+      if (!ippFindAttribute(printer->attrs, "printer-uri-supported",
+                            IPP_TAG_URI))
+      {
+	snprintf(printer_uri, sizeof(printer_uri), "ipp://%s:%d/printers/%s",
+        	 con->servername, con->serverport, printer->name);
+	ippAddString(con->response, IPP_TAG_PRINTER, IPP_TAG_URI,
+        	     "printer-uri-supported", NULL, printer_uri);
+        LogMessage(L_DEBUG2, "printer-uri-supported=\"%s\"", printer_uri);
+      }
 
       ippAddInteger(con->response, IPP_TAG_PRINTER, IPP_TAG_ENUM,
                     "printer-state", printer->state);

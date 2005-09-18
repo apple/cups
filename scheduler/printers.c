@@ -1381,8 +1381,6 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
 
   p->attrs = ippNew();
 
-  ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_URI, "printer-uri-supported",
-               NULL, p->uri);
   ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
                "uri-authentication-supported", NULL, auth_supported);
   ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
@@ -1442,6 +1440,9 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
    /*
     * Tell the client this is a remote printer of some type...
     */
+
+    ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_URI,
+	         "printer-uri-supported", NULL, p->uri);
 
     ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_TEXT,
                  "printer-make-and-model", NULL, p->make_model);
@@ -1832,13 +1833,12 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
           printer_type |= CUPS_PRINTER_REMOTE;
 
          /*
-	  * Reset the printer-uri-supported attribute to point at the
+	  * Point the printer-uri-supported attribute to the
 	  * remote printer...
 	  */
 
-	  attr = ippFindAttribute(p->attrs, "printer-uri-supported", IPP_TAG_URI);
-	  free(attr->values[0].string.text);
-	  attr->values[0].string.text = strdup(p->device_uri);
+	  ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_URI,
+	               "printer-uri-supported", NULL, p->device_uri);
 
          /*
 	  * Then set the make-and-model accordingly...

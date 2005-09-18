@@ -1696,9 +1696,9 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 
 
       if (NumListeners == 0)
-        lis = malloc(2 * sizeof(listener_t));
+        lis = malloc(sizeof(listener_t));
       else
-        lis = realloc(Listeners, (NumListeners + 2) * sizeof(listener_t));
+        lis = realloc(Listeners, (NumListeners + 1) * sizeof(listener_t));
 
       if (!lis)
       {
@@ -1722,36 +1722,17 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 
 #ifdef AF_INET6
         if (lis->address.addr.sa_family == AF_INET6)
-	{
           LogMessage(L_INFO, "Listening to %s:%d (IPv6)", temp,
                      ntohs(lis->address.ipv6.sin6_port));
-
-#  if ALSO_BIND_IPV4
-          if (value[0] == '*')
-	  {
-	   /*
-	    * Also listen on IPv4 address...
-	    */
-
-	    lis ++;
-	    NumListeners ++;
-
-            memset(lis, 0, sizeof(listener_t));
-            get_address(value, INADDR_ANY, IPP_PORT, AF_INET,
-	                &(lis->address));
-
-            httpAddrString(&(lis->address), temp, sizeof(temp));
-            LogMessage(L_INFO, "Listening to %s:%d (IPv4)", temp,
-                       ntohs(lis->address.ipv4.sin_port));
-          }
-#  endif /* ALSO_BIND_IPV4 */
-        }
 	else
 #endif /* AF_INET6 */
-        {
+#ifdef AF_LOCAL
+        if (lis->address.addr.sa_family == AF_LOCAL)
+          LogMessage(L_INFO, "Listening to %s (Domain)", temp);
+	else
+#endif /* AF_LOCAL */
 	  LogMessage(L_INFO, "Listening to %s:%d", temp,
                      ntohs(lis->address.ipv4.sin_port));
-	}
 
 	NumListeners ++;
       }

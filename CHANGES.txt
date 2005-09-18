@@ -3,6 +3,8 @@ CHANGES.txt - 09/17/2005
 
 CHANGES IN CUPS V1.2.0b1
 
+	- The scheduler now returns the address that was used to
+	  connect to it (STR #1076)
 	- Fixed a problem with N-up printing and OpenOffice (STR
 	  #576)
 	- Added support for the GCC position independent

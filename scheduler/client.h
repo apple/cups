@@ -51,6 +51,8 @@ struct client_s
 #ifdef HAVE_SSL
   int		auto_ssl;		/* Automatic test for SSL/TLS */
 #endif /* HAVE_SSL */
+  char		servername[256];	/* Server name for connection */
+  int		serverport;		/* Server port for connection */
 };
 
 #define HTTP(con) &((con)->http)

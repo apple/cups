@@ -285,6 +285,42 @@ AcceptClient(listener_t *lis)	/* I - Listener socket */
              con->http.hostname, ntohs(con->http.hostaddr.ipv4.sin_port));
 
  /*
+  * Get the local address the client connected to...
+  */
+
+  i = sizeof(temp);
+  if (getpeername(con->http.fd, (struct sockaddr *)&temp, &i))
+  {
+    LogMessage(L_ERROR, "Unable to get local address - %s", strerror(errno));
+
+    strcpy(con->servername, "localhost");
+    con->serverport = LocalPort;
+  }
+  else
+  {
+#ifdef AF_INET6
+    if (temp.addr.sa_family == AF_INET6)
+    {
+      httpAddrLookup(&temp, con->servername, sizeof(con->servername));
+      con->serverport = ntohs(lis->address.ipv6.sin6_port);
+    }
+    else
+#endif /* AF_INET6 */
+    if (temp.addr.sa_family == AF_INET)
+    {
+      httpAddrLookup(&temp, con->servername, sizeof(con->servername));
+      con->serverport = ntohs(lis->address.ipv4.sin_port);
+    }
+    else
+    {
+      strcpy(con->servername, "localhost");
+      con->serverport = LocalPort;
+    }
+  }
+
+  LogMessage(L_DEBUG2, "AcceptClient: %d connected to server on %s:%d",
+             con->http.fd, con->servername, con->serverport);
+ /*
   * Using TCP_NODELAY improves responsiveness, especially on systems
   * with a slow loopback interface...  Since we write large buffers
   * when sending print files and requests, there shouldn't be any
