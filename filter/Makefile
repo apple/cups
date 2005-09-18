@@ -27,7 +27,7 @@
 include ../Makedefs
 
 FILTERS	=	gziptoany hpgltops texttops pstops imagetops imagetoraster \
-		rastertodymo rastertoepson rastertohp rastertortl
+		rastertodymo rastertoepson rastertohp
 TARGETS	=	$(FILTERS) testraster
 
 HPGLOBJS =	hpgl-attr.o hpgl-config.o hpgl-main.o hpgl-prolog.o \
@@ -39,7 +39,7 @@ IMAGEOBJS =	image-bmp.o image-colorspace.o image-gif.o image-jpeg.o \
 FORMOBJS =	form-attr.o form-main.o form-ps.o form-text.o form-tree.o
 OBJS	=	$(HPGLOBJS) $(IMAGEOBJS) $(FORMOBJS) \
 		imagetops.o imagetoraster.o common.o pstops.o raster.o \
-		rastertodymo.o rastertoepson.o rastertohp.o rastertortl.o \
+		rastertodymo.o rastertoepson.o rastertohp.o \
 		texttops.o textcommon.o testraster.o gziptoany.o
 
 
@@ -250,15 +250,6 @@ rastertoepson:	rastertoepson.o ../cups/$(LIBCUPS) $(LIBCUPSIMAGE)
 rastertohp:	rastertohp.o ../cups/$(LIBCUPS) $(LIBCUPSIMAGE)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ rastertohp.o $(LINKCUPSIMAGE) $(IMGLIBS) $(LIBS)
-
-
-#
-# rastertortl
-#
-
-rastertortl:	rastertortl.o ../cups/$(LIBCUPS) $(LIBCUPSIMAGE)
-	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ rastertortl.o $(LINKCUPSIMAGE) $(IMGLIBS) $(LIBS)
 
 
 #

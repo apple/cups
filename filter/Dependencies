@@ -76,9 +76,6 @@ rastertoepson.o: ../config.h raster.h
 rastertohp.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
 rastertohp.o: ../cups/ppd.h ../cups/file.h ../cups/string.h ../config.h
 rastertohp.o: raster.h ../cups/ppd.h
-rastertortl.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
-rastertortl.o: ../cups/ppd.h ../cups/file.h ../cups/string.h ../config.h
-rastertortl.o: raster.h ../cups/ppd.h
 texttops.o: textcommon.h common.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
 texttops.o: ../cups/md5.h ../cups/ppd.h ../cups/file.h ../cups/language.h
 texttops.o: ../cups/string.h ../config.h
