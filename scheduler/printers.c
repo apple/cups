@@ -888,7 +888,7 @@ LoadAllPrinters(void)
           * See if the backend exists...
 	  */
 
-	  snprintf(line, sizeof(line), "%s/backends/%s", ServerBin,
+	  snprintf(line, sizeof(line), "%s/backend/%s", ServerBin,
 	           p->device_uri);
 
           if ((valueptr = strchr(line + strlen(ServerBin), ':')) != NULL)

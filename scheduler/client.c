@@ -414,8 +414,7 @@ CloseClient(client_t *con)	/* I - Client to close */
   * Flush pending writes before closing...
   */
 
- if (con->http.wused)
-   httpFlushWrite(HTTP(con));
+  httpFlushWrite(HTTP(con));
 
   partial = 0;
 
@@ -2318,7 +2317,7 @@ int					/* O - 1 if success, 0 if fail */
 WriteClient(client_t *con)		/* I - Client connection */
 {
   int		bytes;			/* Number of bytes written */
-  char		buf[HTTP_MAX_BUFFER + 1];/* Data buffer */
+  char		buf[16385];		/* Data buffer */
   char		*bufptr;		/* Pointer into buffer */
   ipp_state_t	ipp_state;		/* IPP state value */
 
@@ -2337,7 +2336,7 @@ WriteClient(client_t *con)		/* I - Client connection */
     ipp_state = ippWrite(&(con->http), con->response);
     bytes     = ipp_state != IPP_ERROR && ipp_state != IPP_DATA;
   }
-  else if ((bytes = read(con->file, buf, HTTP_MAX_BUFFER)) > 0)
+  else if ((bytes = read(con->file, buf, sizeof(buf) - 1)) > 0)
   {
 #ifdef DEBUG
     LogMessage(L_DEBUG2, "WriteClient: Read %d bytes from file %d...",
@@ -2454,9 +2453,6 @@ WriteClient(client_t *con)		/* I - Client connection */
       }
     }
 
-    if (con->http.wused)
-      httpFlushWrite(HTTP(con));
-
     con->http.state = HTTP_WAITING;
 
     LogMessage(L_DEBUG2, "WriteClient: Removing fd %d from OutputSet...",
@@ -2523,9 +2519,6 @@ WriteClient(client_t *con)		/* I - Client connection */
       FD_SET(con->file, InputSet);
     }
   }
-
-  if (bytes >= 1024)
-    LogMessage(L_DEBUG2, "WriteClient: %d %d bytes", con->http.fd, bytes);
 
   con->http.activity = time(NULL);
 
@@ -2784,6 +2777,9 @@ get_file(client_t    *con,		/* I  - Client connection */
 
   LogMessage(L_DEBUG2, "get_file: %d filename=%s size=%d",
              con->http.fd, filename, status ? -1 : (int)filestats->st_size);
+
+  if (!status)
+    con->http.data_remaining = (int)filestats->st_size;
 
   if (status)
     return (NULL);
