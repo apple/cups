@@ -402,7 +402,7 @@ cupsMarkOptions(
   conflict = 0;
 
   for (i = num_options, optptr = options; i > 0; i --, optptr ++)
-    if (strcasecmp(optptr->name, "media") == 0)
+    if (!strcasecmp(optptr->name, "media"))
     {
      /*
       * Loop through the option string, separating it at commas and
@@ -438,6 +438,10 @@ cupsMarkOptions(
 	  if (ppdMarkOption(ppd, "MediaType", s))
             conflict = 1;
 
+        if (cupsGetOption("EFMediaType", num_options, options) == NULL)
+	  if (ppdMarkOption(ppd, "EFMediaType", s))
+            conflict = 1;
+
         if (cupsGetOption("EFMediaQualityMode", num_options, options) == NULL)
 	  if (ppdMarkOption(ppd, "EFMediaQualityMode", s))	/* EFI */
             conflict = 1;
@@ -448,7 +452,7 @@ cupsMarkOptions(
 	    conflict = 1;
       }
     }
-    else if (strcasecmp(optptr->name, "sides") == 0)
+    else if (!strcasecmp(optptr->name, "sides"))
     {
       for (j = 0; j < (int)(sizeof(duplex_options) / sizeof(duplex_options[0])); j ++)
         if (cupsGetOption(duplex_options[j], num_options, options) != NULL)
@@ -463,7 +467,7 @@ cupsMarkOptions(
         continue;
       }
 
-      if (strcasecmp(optptr->value, "one-sided") == 0)
+      if (!strcasecmp(optptr->value, "one-sided"))
       {
        /*
         * Mark the appropriate duplex option for one-sided output...
@@ -485,7 +489,7 @@ cupsMarkOptions(
             }
         }
       }
-      else if (strcasecmp(optptr->value, "two-sided-long-edge") == 0)
+      else if (!strcasecmp(optptr->value, "two-sided-long-edge"))
       {
        /*
         * Mark the appropriate duplex option for two-sided-long-edge output...
@@ -507,7 +511,7 @@ cupsMarkOptions(
             }
         }
       }
-      else if (strcasecmp(optptr->value, "two-sided-short-edge") == 0)
+      else if (!strcasecmp(optptr->value, "two-sided-short-edge"))
       {
        /*
         * Mark the appropriate duplex option for two-sided-short-edge output...
@@ -530,8 +534,8 @@ cupsMarkOptions(
         }
       }
     }
-    else if (strcasecmp(optptr->name, "resolution") == 0 ||
-             strcasecmp(optptr->name, "printer-resolution") == 0)
+    else if (!strcasecmp(optptr->name, "resolution") ||
+             !strcasecmp(optptr->name, "printer-resolution"))
     {
       if (ppdMarkOption(ppd, "Resolution", optptr->value))
         conflict = 1;
@@ -543,7 +547,7 @@ cupsMarkOptions(
       if (ppdMarkOption(ppd, "CNRes_PGP", optptr->value))	/* Canon */
         conflict = 1;
     }
-    else if (strcasecmp(optptr->name, "output-bin") == 0)
+    else if (!strcasecmp(optptr->name, "output-bin"))
     {
       if (cupsGetOption("OutputBin", num_options, options) == NULL)
         if (ppdMarkOption(ppd, "OutputBin", optptr->value))
