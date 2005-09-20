@@ -804,19 +804,18 @@ DenyIP(location_t *loc,		/* I - Location to add to */
  * 'FindBest()' - Find the location entry that best matches the resource.
  */
 
-location_t *			/* O - Location that matches */
-FindBest(const char   *path,	/* I - Resource path */
-         http_state_t state)	/* I - HTTP state/request */
+location_t *				/* O - Location that matches */
+FindBest(const char   *path,		/* I - Resource path */
+         http_state_t state)		/* I - HTTP state/request */
 {
-  int		i;		/* Looping var */
-  char		uri[HTTP_MAX_URI],
-				/* URI in request... */
-		*uriptr;	/* Pointer into URI */
-  location_t	*loc,		/* Current location */
-		*best;		/* Best match for location so far */
-  int		bestlen;	/* Length of best match */
-  int		limit;		/* Limit field */
-  static const int limits[] =	/* Map http_status_t to AUTH_LIMIT_xyz */
+  int		i;			/* Looping var */
+  char		uri[HTTP_MAX_URI],	/* URI in request... */
+		*uriptr;		/* Pointer into URI */
+  location_t	*loc,			/* Current location */
+		*best;			/* Best match for location so far */
+  int		bestlen;		/* Length of best match */
+  int		limit;			/* Limit field */
+  static const int limits[] =		/* Map http_status_t to AUTH_LIMIT_xyz */
 		{
 		  AUTH_LIMIT_ALL,
 		  AUTH_LIMIT_OPTIONS,
@@ -843,8 +842,8 @@ FindBest(const char   *path,	/* I - Resource path */
 
   strlcpy(uri, path, sizeof(uri));
 
-  if (strncmp(uri, "/printers/", 10) == 0 ||
-      strncmp(uri, "/classes/", 9) == 0)
+  if (!strncmp(uri, "/printers/", 10) ||
+      !strncmp(uri, "/classes/", 9))
   {
    /*
     * Check if the URI has .ppd on the end...
@@ -852,7 +851,7 @@ FindBest(const char   *path,	/* I - Resource path */
 
     uriptr = uri + strlen(uri) - 4; /* len > 4 if we get here... */
 
-    if (strcmp(uriptr, ".ppd") == 0)
+    if (!strcmp(uriptr, ".ppd"))
       *uriptr = '\0';
   }
 
@@ -871,7 +870,7 @@ FindBest(const char   *path,	/* I - Resource path */
     LogMessage(L_DEBUG2, "FindBest: Location %s Limit %x",
                loc->location, loc->limit);
 
-    if (!strncmp(uri, "/printers/", 10) ||!strncmp(uri, "/classes/", 9))
+    if (!strncmp(uri, "/printers/", 10) || !strncmp(uri, "/classes/", 9))
     {
      /*
       * Use case-insensitive comparison for queue names...
@@ -893,7 +892,7 @@ FindBest(const char   *path,	/* I - Resource path */
       */
 
       if (loc->length > bestlen &&
-          strncmp(uri, loc->location, loc->length) == 0 &&
+          !strncmp(uri, loc->location, loc->length) &&
 	  loc->location[0] == '/' &&
 	  (limit & loc->limit) != 0)
       {
