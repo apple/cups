@@ -732,10 +732,10 @@ ReadConfiguration(void)
 			 "Renew-Subscription Cancel-Subscription "
 			 "Get-Notifications Reprocess-Job Cancel-Current-Job "
 			 "Suspend-Current-Job Resume-Job CUPS-Move-Job>");
-      LogMessage(L_INFO, "Order Allow,Deny");
+      LogMessage(L_INFO, "Order Deny,Allow");
 
       po = cupsdAddPolicyOp(p, NULL, IPP_SEND_DOCUMENT);
-      po->order_type = AUTH_DENY;
+      po->order_type = AUTH_ALLOW;
       po->level      = AUTH_USER;
 
       AddName(po, "@OWNER");
@@ -770,11 +770,11 @@ ReadConfiguration(void)
 			 "Schedule-Job-After CUPS-Add-Printer "
 			 "CUPS-Delete-Printer CUPS-Add-Class CUPS-Delete-Class "
 			 "CUPS-Accept-Jobs CUPS-Reject-Jobs CUPS-Set-Default>");
-      LogMessage(L_INFO, "Order Allow,Deny");
+      LogMessage(L_INFO, "Order Deny,Allow");
       LogMessage(L_INFO, "AuthType Basic");
 
       po = cupsdAddPolicyOp(p, NULL, IPP_PAUSE_PRINTER);
-      po->order_type = AUTH_DENY;
+      po->order_type = AUTH_ALLOW;
       po->type       = AUTH_BASIC;
       po->level      = AUTH_USER;
 
@@ -806,10 +806,10 @@ ReadConfiguration(void)
       LogMessage(L_INFO, "</Limit>");
 
       LogMessage(L_INFO, "<Limit All>");
-      LogMessage(L_INFO, "Order Allow,Deny");
+      LogMessage(L_INFO, "Order Deny,Allow");
 
       po = cupsdAddPolicyOp(p, NULL, IPP_ANY_OPERATION);
-      po->order_type = AUTH_DENY;
+      po->order_type = AUTH_ALLOW;
 
       LogMessage(L_INFO, "</Limit>");
       LogMessage(L_INFO, "</Policy>");

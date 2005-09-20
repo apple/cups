@@ -182,7 +182,33 @@ StartListening(void)
     * Create a socket for listening...
     */
 
-    if ((lis->fd = socket(lis->address.addr.sa_family, SOCK_STREAM, 0)) == -1)
+    lis->fd = socket(lis->address.addr.sa_family, SOCK_STREAM, 0);
+
+#ifdef AF_INET6
+    if (lis->fd == -1 && lis->address.addr.sa_family == AF_INET6 &&
+        (httpAddrLocalhost(&(lis->address)) || httpAddrAny(&(lis->address))))
+    {
+     /*
+      * Try binding to an IPv4 address instead...
+      */
+
+      LogMessage(L_NOTICE, "StartListening: Unable to use IPv6 address, trying IPv4...");
+
+      p = ntohs(lis->address.ipv6.sin6_port);
+
+      if (httpAddrAny(&(lis->address)))
+	lis->address.ipv4.sin_addr.s_addr = htonl(0x00000000);
+      else
+	lis->address.ipv4.sin_addr.s_addr = htonl(0x7f000001);
+
+      lis->address.ipv4.sin_port  = htons(p);
+      lis->address.addr.sa_family = AF_INET;
+
+      lis->fd = socket(lis->address.addr.sa_family, SOCK_STREAM, 0);
+    }
+#endif /* AF_INET6 */
+
+    if (lis->fd == -1)
     {
       LogMessage(L_ERROR, "StartListening: Unable to open listen socket for address %s:%d - %s.",
                  s, p, strerror(errno));
@@ -214,32 +240,9 @@ StartListening(void)
       status = bind(lis->fd, (struct sockaddr *)&(lis->address),
 	            sizeof(lis->address.ipv6));
 
-      if (status < 0 &&
-          (httpAddrLocalhost(&(lis->address)) ||
-           httpAddrAny(&(lis->address))))
-      {
-       /*
-        * Try binding to an IPv4 address instead...
-	*/
-
-        LogMessage(L_NOTICE, "StartListening: Unable to bind to IPv6 address, trying IPv4...");
-
-        p = ntohs(lis->address.ipv6.sin6_port);
-
-        if (httpAddrAny(&(lis->address)))
-	  lis->address.ipv4.sin_addr.s_addr = htonl(0x00000000);
-        else
-	  lis->address.ipv4.sin_addr.s_addr = htonl(0x7f000001);
-
-        lis->address.ipv4.sin_port  = htons(p);
-	lis->address.addr.sa_family = AF_INET;
-
-	status = bind(lis->fd, (struct sockaddr *)&(lis->address),
-	              sizeof(lis->address.ipv4));
-      }
 #ifdef IPV6_V6ONLY
-      else if (httpAddrLocalhost(&(lis->address)) ||
-               httpAddrAny(&(lis->address)))
+      if (status >= 0 &&
+          (httpAddrLocalhost(&(lis->address)) || httpAddrAny(&(lis->address))))
       {
        /*
         * Make sure that wildcard and loopback addresses accept

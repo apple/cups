@@ -1597,6 +1597,7 @@ do_config_server(http_t      *http,	/* I - HTTP connection */
 		wrote_admin_location,	/* Wrote the /admin location? */
 		wrote_conf_location,	/* Wrote the /admin/conf location? */
 		wrote_root_location;	/* Wrote the / location? */
+    int		indent;			/* Indentation */
 
 
    /*
@@ -1673,6 +1674,7 @@ do_config_server(http_t      *http,	/* I - HTTP connection */
 
     in_admin_location    = 0;
     in_cancel_job        = 0;
+    in_conf_location     = 0;
     in_policy            = 0;
     in_root_location     = 0;
     linenum              = 0;
@@ -1683,6 +1685,7 @@ do_config_server(http_t      *http,	/* I - HTTP connection */
     wrote_policy         = 0;
     wrote_port_listen    = 0;
     wrote_root_location  = 0;
+    indent               = 0;
 
     while (cupsFileGetConf(cupsd, line, sizeof(line), &value, &linenum))
     {
@@ -1695,7 +1698,7 @@ do_config_server(http_t      *http,	/* I - HTTP connection */
 	  if (share_printers || remote_admin)
 	  {
 	    cupsFilePuts(temp, "# Allow remote access\n");
-	    cupsFilePrintf(temp, "Port %d\n", ippPort());
+	    cupsFilePrintf(temp, "Listen *:%d\n", ippPort());
 	  }
 	  else
 	  {
@@ -1759,19 +1762,22 @@ do_config_server(http_t      *http,	/* I - HTTP connection */
 	in_policy = 1;
 
 	cupsFilePrintf(temp, "%s %s>\n", line, value);
+	indent += 2;
       }
       else if (!strcasecmp(line, "</Policy>"))
       {
+	indent -= 2;
         if (!wrote_policy)
 	{
 	  wrote_policy = 1;
 
           if (!user_cancel_any)
-	    cupsFilePuts(temp, "<Limit Cancel-Job>\n"
-	                       "Order allow,deny\n"
-	                       "Allow @SYSTEM\n"
-			       "Allow @OWNER\n"
-			       "</Limit>\n");
+	    cupsFilePuts(temp, "  # Only the owner or an administrator can cancel a job...\n"
+	                       "  <Limit Cancel-Job>\n"
+	                       "    Order deny,allow\n"
+	                       "    Allow @SYSTEM\n"
+			       "    Allow @OWNER\n"
+			       "  </Limit>\n");
         }
 
 	in_policy = 0;
@@ -1780,6 +1786,7 @@ do_config_server(http_t      *http,	/* I - HTTP connection */
       }
       else if (!strcasecmp(line, "<Location"))
       {
+	indent += 2;
         if (!strcmp(value, "/admin"))
 	  in_admin_location = 1;
         if (!strcmp(value, "/admin/conf"))
@@ -1791,57 +1798,58 @@ do_config_server(http_t      *http,	/* I - HTTP connection */
       }
       else if (!strcasecmp(line, "</Location>"))
       {
+	indent -= 2;
         if (in_admin_location)
 	{
 	  wrote_admin_location = 1;
 
 	  if (remote_admin)
-            cupsFilePuts(temp, "# Allow remote administration.\n");
+            cupsFilePuts(temp, "  # Allow remote administration...\n");
 	  else
-            cupsFilePuts(temp, "# Only allow local administration.\n");
+            cupsFilePuts(temp, "  # Restrict access to the admin pages...\n");
 
-          cupsFilePuts(temp, "Order allow,deny\n");
+          cupsFilePuts(temp, "  Order allow,deny\n");
 
 	  if (remote_admin)
-	    cupsFilePuts(temp, "Allow @LOCAL\n");
+	    cupsFilePuts(temp, "  Allow @LOCAL\n");
 	  else
-	    cupsFilePuts(temp, "Allow localhost\n");
+	    cupsFilePuts(temp, "  Allow localhost\n");
 	}
         else if (in_conf_location)
 	{
 	  wrote_conf_location = 1;
 
 	  if (remote_admin)
-            cupsFilePuts(temp, "# Allow remote administration.\n");
+            cupsFilePuts(temp, "  # Allow remote access to the configuration files...\n");
 	  else
-            cupsFilePuts(temp, "# Only allow local administration.\n");
+            cupsFilePuts(temp, "  # Restrict access to the configuration files...\n");
 
-          cupsFilePuts(temp, "Order allow,deny\n");
+          cupsFilePuts(temp, "  Order allow,deny\n");
 
 	  if (remote_admin)
-	    cupsFilePuts(temp, "Allow @LOCAL\n");
+	    cupsFilePuts(temp, "  Allow @LOCAL\n");
 	  else
-	    cupsFilePuts(temp, "Allow localhost\n");
+	    cupsFilePuts(temp, "  Allow localhost\n");
 	}
 	else if (in_root_location)
 	{
 	  wrote_root_location = 1;
 
 	  if (remote_admin && share_printers)
-            cupsFilePuts(temp, "# Allow shared printing and remote administration.\n");
+            cupsFilePuts(temp, "  # Allow shared printing and remote administration...\n");
 	  else if (remote_admin)
-            cupsFilePuts(temp, "# Allow remote administration.\n");
+            cupsFilePuts(temp, "  # Allow remote administration...\n");
 	  else if (share_printers)
-            cupsFilePuts(temp, "# Allow shared printing.\n");
+            cupsFilePuts(temp, "  # Allow shared printing...\n");
 	  else
-            cupsFilePuts(temp, "# Only allow local access.\n");
+            cupsFilePuts(temp, "  # Restrict access to the server...\n");
 
-          cupsFilePuts(temp, "Order allow,deny\n");
+          cupsFilePuts(temp, "  Order allow,deny\n");
 
 	  if (remote_admin || share_printers)
-	    cupsFilePuts(temp, "Allow @LOCAL\n");
+	    cupsFilePuts(temp, "  Allow @LOCAL\n");
 	  else
-	    cupsFilePuts(temp, "Allow localhost\n");
+	    cupsFilePuts(temp, "  Allow localhost\n");
 	}
 
 	in_admin_location = 0;
@@ -1852,6 +1860,8 @@ do_config_server(http_t      *http,	/* I - HTTP connection */
       }
       else if (!strcasecmp(line, "<Limit") && in_policy)
       {
+	indent += 2;
+
        /*
 	* See if the policy limit is for the Cancel-Job operation...
 	*/
@@ -1869,7 +1879,7 @@ do_config_server(http_t      *http,	/* I - HTTP connection */
 	}
 	else
 	{
-	  cupsFilePuts(temp, line);
+	  cupsFilePrintf(temp, "  %s", line);
 
 	  while (*value)
 	  {
@@ -1897,17 +1907,19 @@ do_config_server(http_t      *http,	/* I - HTTP connection */
       }
       else if (!strcasecmp(line, "</Limit>") && in_cancel_job)
       {
+	indent -= 2;
+
         if (in_cancel_job == 1)
-          cupsFilePuts(temp, "</Limit>\n");
+          cupsFilePuts(temp, "  </Limit>\n");
 
         wrote_policy = 1;
 
         if (!user_cancel_any)
-	  cupsFilePuts(temp, "<Limit Cancel-Job>\n"
-	                     "Order allow,deny\n"
-	                     "Allow @SYSTEM\n"
-			     "Allow @OWNER\n"
-			     "</Limit>\n");
+	  cupsFilePuts(temp, "  # Only the owner or an administrator can cancel a job...\n"
+	                     "  <Limit Cancel-Job>\n"
+	                     "    Order deny,allow\n"
+	                     "    Require user @OWNER @SYSTEM\n"
+			     "  </Limit>\n");
 
 	in_cancel_job = 0;
       }
@@ -1917,12 +1929,27 @@ do_config_server(http_t      *http,	/* I - HTTP connection */
 	continue;
       else if (in_cancel_job == 2)
         continue;
-      else if (line[0] == '<' && value)
-	cupsFilePrintf(temp, "%s %s>\n", line, value);
+      else if (!strcasecmp(line, "<Limit")  && value)
+	cupsFilePrintf(temp, "  %s %s>\n", line, value);
+      else if (line[0] == '<')
+      {
+        if (value)
+	{
+          cupsFilePrintf(temp, "%*s%s %s>\n", indent, "", line, value);
+	  indent += 2;
+	}
+	else
+	{
+	  if (line[1] == '/')
+	    indent -= 2;
+
+	  cupsFilePrintf(temp, "%*s%s\n", indent, "", line);
+	}
+      }
       else if (value)
-	cupsFilePrintf(temp, "%s %s\n", line, value);
+	cupsFilePrintf(temp, "%*s%s %s\n", indent, "", line, value);
       else
-	cupsFilePrintf(temp, "%s\n", line);
+	cupsFilePrintf(temp, "%*s%s\n", indent, "", line);
     }
 
    /*
@@ -1975,7 +2002,7 @@ do_config_server(http_t      *http,	/* I - HTTP connection */
       if (share_printers || remote_admin)
       {
 	cupsFilePuts(temp, "# Allow remote access\n");
-	cupsFilePrintf(temp, "Port %d\n", ippPort());
+	cupsFilePrintf(temp, "Listen *:%d\n", ippPort());
       }
       else
       {
@@ -1987,21 +2014,21 @@ do_config_server(http_t      *http,	/* I - HTTP connection */
     if (!wrote_root_location)
     {
       if (remote_admin && share_printers)
-        cupsFilePuts(temp, "# Allow shared printing and remote administration.\n");
+        cupsFilePuts(temp, "# Allow shared printing and remote administration...\n");
       else if (remote_admin)
-        cupsFilePuts(temp, "# Allow remote administration.\n");
+        cupsFilePuts(temp, "# Allow remote administration...\n");
       else if (share_printers)
-        cupsFilePuts(temp, "# Allow shared printing.\n");
+        cupsFilePuts(temp, "# Allow shared printing...\n");
       else
-        cupsFilePuts(temp, "# Only allow local access.\n");
+        cupsFilePuts(temp, "# Restrict access to the server...\n");
 
       cupsFilePuts(temp, "<Location />\n"
-                         "Order allow,deny\n");
+                         "  Order allow,deny\n");
 
       if (remote_admin || share_printers)
-	cupsFilePuts(temp, "Allow @LOCAL\n");
+	cupsFilePuts(temp, "  Allow @LOCAL\n");
       else
-	cupsFilePuts(temp, "Allow localhost\n");
+	cupsFilePuts(temp, "  Allow localhost\n");
 
       cupsFilePuts(temp, "</Location>\n");
     }
@@ -2009,19 +2036,19 @@ do_config_server(http_t      *http,	/* I - HTTP connection */
     if (!wrote_admin_location)
     {
       if (remote_admin)
-        cupsFilePuts(temp, "# Allow remote administration.\n");
+        cupsFilePuts(temp, "# Allow remote administration...\n");
       else
-        cupsFilePuts(temp, "# Only allow local administration.\n");
+        cupsFilePuts(temp, "# Restrict access to the admin pages...\n");
 
       cupsFilePuts(temp, "<Location /admin>\n"
-                         "AuthType Basic\n"
-                         "AuthClass System\n"
-                         "Order allow,deny\n");
+                         "  AuthType Basic\n"
+                         "  Require user @SYSTEM\n"
+                         "  Order allow,deny\n");
 
       if (remote_admin)
-	cupsFilePuts(temp, "Allow @LOCAL\n");
+	cupsFilePuts(temp, "  Allow @LOCAL\n");
       else
-	cupsFilePuts(temp, "Allow localhost\n");
+	cupsFilePuts(temp, "  Allow localhost\n");
 
       cupsFilePuts(temp, "</Location>\n");
     }
@@ -2029,19 +2056,19 @@ do_config_server(http_t      *http,	/* I - HTTP connection */
     if (!wrote_conf_location)
     {
       if (remote_admin)
-        cupsFilePuts(temp, "# Allow remote administration.\n");
+        cupsFilePuts(temp, "# Allow remote access to the configuration files...\n");
       else
-        cupsFilePuts(temp, "# Only allow local administration.\n");
+        cupsFilePuts(temp, "# Restrict access to the configuration files...\n");
 
       cupsFilePuts(temp, "<Location /admin/conf>\n"
-                         "AuthType Basic\n"
-                         "AuthClass System\n"
-                         "Order allow,deny\n");
+                         "  AuthType Basic\n"
+                         "  Require user @SYSTEM\n"
+                         "  Order allow,deny\n");
 
       if (remote_admin)
-	cupsFilePuts(temp, "Allow @LOCAL\n");
+	cupsFilePuts(temp, "  Allow @LOCAL\n");
       else
-	cupsFilePuts(temp, "Allow localhost\n");
+	cupsFilePuts(temp, "  Allow localhost\n");
 
       cupsFilePuts(temp, "</Location>\n");
     }
@@ -2049,17 +2076,18 @@ do_config_server(http_t      *http,	/* I - HTTP connection */
     if (!wrote_policy)
     {
       cupsFilePuts(temp, "<Policy default>\n"
-                         "<Limit Send-Document Send-URI Hold-Job Release-Job "
+                         "  # Job-related operations must be done by the owner or an adminstrator...\n"
+                         "  <Limit Send-Document Send-URI Hold-Job Release-Job "
 			 "Restart-Job Purge-Jobs Set-Job-Attributes "
 			 "Create-Job-Subscription Renew-Subscription "
 			 "Cancel-Subscription Get-Notifications Reprocess-Job "
 			 "Cancel-Current-Job Suspend-Current-Job Resume-Job "
 			 "CUPS-Move-Job>\n"
-                         "Order allow,deny\n"
-                         "Allow @OWNER\n"
-                         "Allow @SYSTEM\n"
-                         "</Limit>\n"
-                         "<Limit Pause-Printer Resume-Printer "
+                         "    Require user @OWNER @SYSTEM\n"
+                         "    Order deny,allow\n"
+                         "  </Limit>\n"
+                         "  # All administration operations require an adminstrator to authenticate...\n"
+			 "  <Limit Pause-Printer Resume-Printer "
                          "Set-Printer-Attributes Enable-Printer "
 			 "Disable-Printer Pause-Printer-After-Current-Job "
 			 "Hold-New-Jobs Release-Held-New-Jobs Deactivate-Printer "
@@ -2069,21 +2097,21 @@ do_config_server(http_t      *http,	/* I - HTTP connection */
 			 "CUPS-Add-Class CUPS-Delete-Class "
 			 "CUPS-Accept-Jobs CUPS-Reject-Jobs "
 			 "CUPS-Set-Default CUPS-Add-Device CUPS-Delete-Device>\n"
-                         "Order allow,deny\n"
-                         "Authenticate yes\n"
-                         "Allow @SYSTEM\n"
+                         "    AuthType Basic\n"
+			 "    Require user @SYSTEM\n"
+                         "    Order deny,allow\n"
                          "</Limit>\n");
 
       if (!user_cancel_any)
-	cupsFilePuts(temp, "<Limit Cancel-Job>\n"
-	                   "Order allow,deny\n"
-	                   "Allow @SYSTEM\n"
-			   "Allow @OWNER\n"
-			   "</Limit>\n");
+	cupsFilePuts(temp, "  # Only the owner or an administrator can cancel a job...\n"
+	                   "  <Limit Cancel-Job>\n"
+	                   "    Require user @OWNER @SYSTEM\n"
+	                   "    Order deny,allow\n"
+			   "  </Limit>\n");
 
-      cupsFilePuts(temp, "<Limit All>\n"
-                         "Order deny,allow\n"
-                         "</Limit>\n"
+      cupsFilePuts(temp, "  <Limit All>\n"
+                         "  Order deny,allow\n"
+                         "  </Limit>\n"
 			 "</Policy>\n");
     }
 

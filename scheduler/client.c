@@ -175,6 +175,7 @@ AcceptClient(listener_t *lis)	/* I - Listener socket */
     */
 
     strlcpy(con->http.hostname, "localhost", sizeof(con->http.hostname));
+    hostname = con->http.hostname;
   }
   else if (httpAddrEqual(&(con->http.hostaddr), &ServerAddr))
   {
@@ -183,6 +184,7 @@ AcceptClient(listener_t *lis)	/* I - Listener socket */
     */
 
     strlcpy(con->http.hostname, ServerName, sizeof(con->http.hostname));
+    hostname = con->http.hostname;
   }
   else if (HostNameLookups)
     hostname = httpAddrLookup(&(con->http.hostaddr), con->http.hostname,
