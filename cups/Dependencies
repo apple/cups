@@ -1,5 +1,6 @@
 # DO NOT DELETE
 
+array.o: array.h string.h ../config.h
 attr.o: ppd.h file.h debug.h string.h ../config.h
 auth.o: cups.h ipp.h http.h string.h ../config.h md5.h ppd.h file.h
 auth.o: language.h debug.h
