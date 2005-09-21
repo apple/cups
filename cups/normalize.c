@@ -132,11 +132,11 @@ static const char * const bidicat_index[] =
 
 typedef struct				/**** Line Break Class Index Struct****/
 {
-  cups_breakclass_t	breakclass;	/* Line Break Class Value */
+  cups__cups_break_class_t	breakclass;	/* Line Break Class Value */
   const char		*str;		/* Line Break Class String */
-} break_t;
+} _cups_break_t;
 
-static const break_t break_index[] =	/* Line Break Class Index */
+static const _cups_break_t break_index[] =	/* Line Break Class Index */
 {
   { CUPS_BREAK_AI, "AI" },		/* Ambiguous (Alphabetic or Ideograph) */
   { CUPS_BREAK_AL, "AL" },		/* Ordinary Alpha/Symbol Chars (XP) */
@@ -199,9 +199,9 @@ static int get_propmap(void);
 int					/* O - Zero or -1 on error */
 cupsNormalizeMapsGet(void)
 {
-  cups_normmap_t	*nmap;		/* Unicode Normalization Map */
-  cups_foldmap_t	*fmap;		/* Unicode Case Folding Map */
-  cups_globals_t	*cg = _cupsGlobals();
+  _cups_norm_map_t	*nmap;		/* Unicode Normalization Map */
+  _cups_fold_map_t	*fmap;		/* Unicode Case Folding Map */
+  _cups_globals_t	*cg = _cupsGlobals();
 					/* Pointer to library globals */
 
 
@@ -274,9 +274,9 @@ cupsNormalizeMapsGet(void)
 int					/* O - Zero or -1 on error */
 cupsNormalizeMapsFree(void)
 {
-  cups_normmap_t	*nmap;		/* Unicode Normalization Map */
-  cups_foldmap_t	*fmap;		/* Unicode Case Folding Map */
-  cups_globals_t	*cg = _cupsGlobals();
+  _cups_norm_map_t	*nmap;		/* Unicode Normalization Map */
+  _cups_fold_map_t	*fmap;		/* Unicode Case Folding Map */
+  _cups_globals_t	*cg = _cupsGlobals();
 					/* Pointer to library globals */
 
 
@@ -315,11 +315,11 @@ cupsNormalizeMapsFree(void)
 void
 cupsNormalizeMapsFlush(void)
 {
-  cups_normmap_t	*nmap;		/* Unicode Normalization Map */
-  cups_normmap_t	*nextnorm;	/* Next Unicode Normalization Map */
-  cups_foldmap_t	*fmap;		/* Unicode Case Folding Map */
-  cups_foldmap_t	*nextfold;	/* Next Unicode Case Folding Map */
-  cups_globals_t	*cg = _cupsGlobals();
+  _cups_norm_map_t	*nmap;		/* Unicode Normalization Map */
+  _cups_norm_map_t	*nextnorm;	/* Next Unicode Normalization Map */
+  _cups_fold_map_t	*fmap;		/* Unicode Case Folding Map */
+  _cups_fold_map_t	*nextfold;	/* Next Unicode Case Folding Map */
+  _cups_globals_t	*cg = _cupsGlobals();
 					/* Pointer to library globals */
 
 
@@ -447,8 +447,8 @@ cupsUTF32Normalize(
   int			hit;		/* Hit count from binary search */
   cups_utf32_t		unichar1;	/* Unicode character value */
   cups_utf32_t		unichar2;	/* Unicode character value */
-  cups_combclass_t	class1;		/* First Combining Class */
-  cups_combclass_t	class2;		/* Second Combining Class */
+  _cups_comb_class_t	class1;		/* First Combining Class */
+  _cups_comb_class_t	class2;		/* Second Combining Class */
   int			len;		/* String length */
   cups_utf32_t		work1[CUPS_MAX_USTRING];
 					/* First internal UCS-4 string */
@@ -456,9 +456,9 @@ cupsUTF32Normalize(
 					/* Second internal UCS-4 string */
   cups_utf32_t		*p1;		/* First UCS-4 string pointer */
   cups_utf32_t		*p2;		/* Second UCS-4 string pointer */
-  cups_normmap_t	*nmap;		/* Unicode Normalization Map */
+  _cups_norm_map_t	*nmap;		/* Unicode Normalization Map */
   cups_normalize_t	decompose;	/* Decomposition Type */
-  cups_globals_t	*cg = _cupsGlobals();
+  _cups_globals_t	*cg = _cupsGlobals();
 					/* Pointer to library globals */
 
 
@@ -775,8 +775,8 @@ cupsUTF32CaseFold(
   int			i;		/* Looping variable */
   int			result;		/* Result Value */
   cups_ucs2_t		*mp;		/* Map char pointer */
-  cups_foldmap_t	*fmap;		/* Unicode Case Folding Map */
-  cups_globals_t	*cg = _cupsGlobals();
+  _cups_fold_map_t	*fmap;		/* Unicode Case Folding Map */
+  _cups_globals_t	*cg = _cupsGlobals();
 					/* Pointer to library globals */
 
 
@@ -1149,9 +1149,9 @@ get_general_category(
 {
   int			result;		/* Result Value */
   cups_gencat_t		gencat;		/* General Category Value */
-  cups_propmap_t	*pmap;		/* Unicode Property Map */
-  cups_prop_t		*uni2prop;	/* Unicode Char -> Properties */
-  cups_globals_t	*cg = _cupsGlobals();
+  _cups_prop_map_t	*pmap;		/* Unicode Property Map */
+  _cups_prop_t		*uni2prop;	/* Unicode Char -> Properties */
+  _cups_globals_t	*cg = _cupsGlobals();
 					/* Pointer to library globals */
 
 
@@ -1180,8 +1180,8 @@ get_general_category(
   * Find character in map...
   */
 
-  uni2prop = (cups_prop_t *)bsearch(&ch, pmap->uni2prop, pmap->propcount,
-                                    (sizeof(cups_prop_t)), compare_propchar);
+  uni2prop = (_cups_prop_t *)bsearch(&ch, pmap->uni2prop, pmap->propcount,
+                                    (sizeof(_cups_prop_t)), compare_propchar);
 
   cupsNormalizeMapsFree();
 
@@ -1204,10 +1204,10 @@ static int				/* O - Class or -1 on error */
 get_bidi_category(const cups_utf32_t ch)/* I - Source char */
 {
   int			result;		/* Result Value */
-  cups_bidicat_t	bidicat;	/* Bidi Category Value */
-  cups_propmap_t	*pmap;		/* Unicode Property Map */
-  cups_prop_t		*uni2prop;	/* Unicode Char -> Properties */
-  cups_globals_t	*cg = _cupsGlobals();
+  cups_bidi_t	bidicat;	/* Bidi Category Value */
+  _cups_prop_map_t	*pmap;		/* Unicode Property Map */
+  _cups_prop_t		*uni2prop;	/* Unicode Char -> Properties */
+  _cups_globals_t	*cg = _cupsGlobals();
 					/* Pointer to library globals */
 
 
@@ -1236,15 +1236,15 @@ get_bidi_category(const cups_utf32_t ch)/* I - Source char */
   * Find character in map...
   */
 
-  uni2prop = (cups_prop_t *)bsearch(&ch, pmap->uni2prop, pmap->propcount,
-                                    (sizeof(cups_prop_t)), compare_propchar);
+  uni2prop = (_cups_prop_t *)bsearch(&ch, pmap->uni2prop, pmap->propcount,
+                                    (sizeof(_cups_prop_t)), compare_propchar);
 
   cupsNormalizeMapsFree();
 
   if (uni2prop == NULL)
     bidicat = CUPS_BIDI_ON;             /* Other Neutral */
   else
-    bidicat = (cups_bidicat_t)uni2prop->bidicat;
+    bidicat = (cups_bidi_t)uni2prop->bidicat;
 
   result = (int)bidicat;
 
@@ -1262,10 +1262,10 @@ get_combining_class(
     const cups_utf32_t ch)		/* I - Source char */
 {
   int			result;		/* Result Value */
-  cups_combmap_t	*cmap;		/* Unicode Combining Class Map */
-  cups_combclass_t	combclass;	/* Unicode Combining Class */
-  cups_comb_t		*uni2comb;	/* Unicode Char -> Combining Class */
-  cups_globals_t	*cg = _cupsGlobals();
+  _cups_comb_map_t	*cmap;		/* Unicode Combining Class Map */
+  _cups_comb_class_t	combclass;	/* Unicode Combining Class */
+  _cups_comb_t		*uni2comb;	/* Unicode Char -> Combining Class */
+  _cups_globals_t	*cg = _cupsGlobals();
 					/* Pointer to library globals */
 
 
@@ -1294,15 +1294,15 @@ get_combining_class(
   * Find combining character in map...
   */
 
-  uni2comb = (cups_comb_t *)bsearch(&ch, cmap->uni2comb, cmap->combcount,
-                                    (sizeof(cups_comb_t)), compare_combchar);
+  uni2comb = (_cups_comb_t *)bsearch(&ch, cmap->uni2comb, cmap->combcount,
+                                    (sizeof(_cups_comb_t)), compare_combchar);
 
   cupsNormalizeMapsFree();
 
   if (uni2comb == NULL)
     combclass = 0;
   else
-    combclass = (cups_combclass_t)uni2comb->combclass;
+    combclass = (_cups_comb_class_t)uni2comb->combclass;
 
   result = (int)combclass;
 
@@ -1318,10 +1318,10 @@ static int				/* O - Class or -1 on error */
 get_break_class(const cups_utf32_t ch)	/* I - Source char */
 {
   int			result;		/* Result Value */
-  cups_breakmap_t	*bmap;		/* Unicode Line Break Class Map */
-  cups_breakclass_t	breakclass;	/* Unicode Line Break Class */
+  _cups_break_map_t	*bmap;		/* Unicode Line Break Class Map */
+  cups__cups_break_class_t	breakclass;	/* Unicode Line Break Class */
   cups_ucs2_t		*uni2break;	/* Unicode -> Line Break Class */
-  cups_globals_t	*cg = _cupsGlobals();
+  _cups_globals_t	*cg = _cupsGlobals();
 					/* Pointer to library globals */
 
 
@@ -1359,7 +1359,7 @@ get_break_class(const cups_utf32_t ch)	/* I - Source char */
   if (uni2break == NULL)
     breakclass = CUPS_BREAK_AI;
   else
-    breakclass = (cups_breakclass_t)*(uni2break + 2);
+    breakclass = (cups__cups_break_class_t)*(uni2break + 2);
 
   result = (int)breakclass;
 
@@ -1436,7 +1436,7 @@ get_normmap(
   cups_utf32_t		unichar1;	/* Unicode character value */
   cups_utf32_t		unichar2;	/* Unicode character value */
   cups_utf32_t		unichar3;	/* Unicode character value */
-  cups_normmap_t	*nmap;		/* Unicode Normalization Map */
+  _cups_norm_map_t	*nmap;		/* Unicode Normalization Map */
   int			normcount;	/* Count of Unicode Source Chars */
   cups_ucs2_t		*uni2norm;	/* Unicode Char -> Normalization */
   char			*datadir;	/* CUPS_DATADIR environment variable */
@@ -1445,7 +1445,7 @@ get_normmap(
   cups_file_t		*fp;		/* Normalization map file pointer */
   char			*s;		/* Line parsing pointer */
   char			line[256];	/* Line from input map file */
-  cups_globals_t	*cg = _cupsGlobals();
+  _cups_globals_t	*cg = _cupsGlobals();
 					/* Pointer to library globals */
 
 
@@ -1500,7 +1500,7 @@ get_normmap(
   * Allocate memory for normalization map and add to cache...
   */
 
-  nmap = (cups_normmap_t *)calloc(1, sizeof(cups_normmap_t));
+  nmap = (_cups_norm_map_t *)calloc(1, sizeof(_cups_norm_map_t));
   if (nmap == NULL)
   {
     cupsFileClose(fp);
@@ -1561,7 +1561,7 @@ get_foldmap(const cups_folding_t fold)	/* I - Case folding type */
   cups_utf32_t		unichar2;	/* Unicode character value */
   cups_utf32_t		unichar3;	/* Unicode character value */
   cups_utf32_t		unichar4;	/* Unicode character value */
-  cups_foldmap_t	*fmap;		/* Unicode Case Folding Map */
+  _cups_fold_map_t	*fmap;		/* Unicode Case Folding Map */
   int			foldcount;	/* Count of Unicode Source Chars */
   cups_ucs2_t		*uni2fold;	/* Unicode -> Folded Char(s) */
   char			*datadir;	/* CUPS_DATADIR env variable */
@@ -1570,7 +1570,7 @@ get_foldmap(const cups_folding_t fold)	/* I - Case folding type */
   cups_file_t		*fp;		/* Case Folding map file pointer */
   char			*s;		/* Line parsing pointer */
   char			line[256];	/* Line from input map file */
-  cups_globals_t	*cg = _cupsGlobals();
+  _cups_globals_t	*cg = _cupsGlobals();
 					/* Pointer to library globals */
 
 
@@ -1616,7 +1616,7 @@ get_foldmap(const cups_folding_t fold)	/* I - Case folding type */
  /*
   * Allocate memory for case folding map and add to cache...
   */
-  fmap = (cups_foldmap_t *)calloc(1, sizeof(cups_foldmap_t));
+  fmap = (_cups_fold_map_t *)calloc(1, sizeof(_cups_fold_map_t));
   if (fmap == NULL)
   {
     cupsFileClose(fp);
@@ -1683,17 +1683,17 @@ get_propmap(void)
   int			len;		/* String length */
   cups_utf32_t		unichar;	/* Unicode character value */
   cups_gencat_t		gencat;		/* General Category Value */
-  cups_bidicat_t	bidicat;	/* Bidi Category Value */
-  cups_propmap_t	*pmap;		/* Unicode Char Property Map */
+  cups_bidi_t	bidicat;	/* Bidi Category Value */
+  _cups_prop_map_t	*pmap;		/* Unicode Char Property Map */
   int			propcount;	/* Count of Unicode Source Chars */
-  cups_prop_t		*uni2prop;	/* Unicode Char -> Properties */
+  _cups_prop_t		*uni2prop;	/* Unicode Char -> Properties */
   char			*datadir;	/* CUPS_DATADIR environment variable */
   char			*mapname;	/* Char Property map name */
   char			filename[1024];	/* Filename for charset map file */
   cups_file_t		*fp;		/* Char Property map file pointer */
   char			*s;		/* Line parsing pointer */
   char			line[256];	/* Line from input map file */
-  cups_globals_t	*cg = _cupsGlobals();
+  _cups_globals_t	*cg = _cupsGlobals();
 					/* Pointer to library globals */
 
 
@@ -1727,13 +1727,13 @@ get_propmap(void)
  /*
   * Allocate memory for char properties map and add to cache...
   */
-  pmap = (cups_propmap_t *)calloc(1, sizeof(cups_propmap_t));
+  pmap = (_cups_prop_map_t *)calloc(1, sizeof(_cups_prop_map_t));
   if (pmap == NULL)
   {
     cupsFileClose(fp);
     return (-1);
   }
-  uni2prop = (cups_prop_t *)calloc(1, sizeof(cups_prop_t) * propcount);
+  uni2prop = (_cups_prop_t *)calloc(1, sizeof(_cups_prop_t) * propcount);
   if (uni2prop == NULL)
   {
     free(pmap);
@@ -1788,7 +1788,7 @@ get_propmap(void)
     }
     if (bidicat_index[j] == NULL)
       return (-1);
-    bidicat = (cups_bidicat_t) j;
+    bidicat = (cups_bidi_t) j;
     uni2prop->ch = (cups_ucs2_t) unichar;
     uni2prop->gencat = (unsigned char) gencat;
     uni2prop->bidicat = (unsigned char) bidicat;
@@ -1812,16 +1812,16 @@ get_combmap(void)
   int			i;		/* Looping variable */
   cups_utf32_t		unichar;	/* Unicode character value */
   int			combclass;	/* Unicode char combining class */
-  cups_combmap_t	*cmap;		/* Unicode Comb Class Map */
+  _cups_comb_map_t	*cmap;		/* Unicode Comb Class Map */
   int			combcount;	/* Count of Unicode Source Chars */
-  cups_comb_t		*uni2comb;	/* Unicode Char -> Combining Class */
+  _cups_comb_t		*uni2comb;	/* Unicode Char -> Combining Class */
   char			*datadir;	/* CUPS_DATADIR environment variable */
   char			*mapname;	/* Comb Class map name */
   char			filename[1024];	/* Filename for charset map file */
   cups_file_t		*fp;		/* Comb Class map file pointer */
   char			*s;		/* Line parsing pointer */
   char			line[256];	/* Line from input map file */
-  cups_globals_t	*cg = _cupsGlobals();
+  _cups_globals_t	*cg = _cupsGlobals();
 					/* Pointer to library globals */
 
 
@@ -1857,14 +1857,14 @@ get_combmap(void)
   * Allocate memory for combining class map and add to cache...
   */
 
-  cmap = (cups_combmap_t *)calloc(1, sizeof(cups_combmap_t));
+  cmap = (_cups_comb_map_t *)calloc(1, sizeof(_cups_comb_map_t));
   if (cmap == NULL)
   {
     cupsFileClose(fp);
     return (-1);
   }
 
-  uni2comb = (cups_comb_t *)calloc(1, sizeof(cups_comb_t) * combcount);
+  uni2comb = (_cups_comb_t *)calloc(1, sizeof(_cups_comb_t) * combcount);
   if (uni2comb == NULL)
   {
     free(cmap);
@@ -1920,8 +1920,8 @@ get_breakmap(void)
   int			len;		/* String length */
   cups_utf32_t		unichar1;	/* Unicode character value */
   cups_utf32_t		unichar2;	/* Unicode character value */
-  cups_breakclass_t	breakclass;	/* Unicode char line break class */
-  cups_breakmap_t	*bmap;		/* Unicode Line Break Class Map */
+  cups__cups_break_class_t	breakclass;	/* Unicode char line break class */
+  _cups_break_map_t	*bmap;		/* Unicode Line Break Class Map */
   int			breakcount;	/* Count of Unicode Source Chars */
   cups_ucs2_t		*uni2break;	/* Unicode -> Line Break Class */
   char			*datadir;	/* CUPS_DATADIR environment variable */
@@ -1930,7 +1930,7 @@ get_breakmap(void)
   cups_file_t		*fp;		/* Comb Class map file pointer */
   char			*s;		/* Line parsing pointer */
   char			line[256];	/* Line from input map file */
-  cups_globals_t	*cg = _cupsGlobals();
+  _cups_globals_t	*cg = _cupsGlobals();
 					/* Pointer to library globals */
 
 
@@ -1966,7 +1966,7 @@ get_breakmap(void)
   * Allocate memory for line break class map and add to cache...
   */
 
-  bmap = (cups_breakmap_t *)calloc(1, sizeof(cups_breakmap_t));
+  bmap = (_cups_break_map_t *)calloc(1, sizeof(_cups_break_map_t));
   if (bmap == NULL)
   {
     cupsFileClose(fp);
@@ -2122,7 +2122,7 @@ compare_combchar(const void *k1,	/* I - Key char */
 {
   cups_utf32_t	*kp = (cups_utf32_t *)k1;
 					/* Key char pointer */
-  cups_comb_t	*cp = (cups_comb_t *)k2;/* Combining map row pointer */
+  _cups_comb_t	*cp = (_cups_comb_t *)k2;/* Combining map row pointer */
   cups_ucs2_t	ch;			/* Key char as UCS-2 */
   int		result;			/* Result Value */
 
@@ -2176,7 +2176,7 @@ compare_propchar(const void *k1,	/* I - Key char */
 {
   cups_utf32_t	*kp = (cups_utf32_t *)k1;
 					/* Key char pointer */
-  cups_prop_t	*pp = (cups_prop_t *)k2;/* Property map row pointer */
+  _cups_prop_t	*pp = (_cups_prop_t *)k2;/* Property map row pointer */
   cups_ucs2_t	ch;			/* Key char as UCS-2 */
   int		result;			/* Result Value */
 

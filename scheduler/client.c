@@ -1389,7 +1389,7 @@ ReadClient(client_t *con)		/* I - Client to read from */
 	      }
 
               if (con->options[0] == '/')
-	        cups_strcpy(con->options, con->options + 1);
+	        _cups_strcpy(con->options, con->options + 1);
 
               if (!SendCommand(con, con->command, con->options, 0))
 	      {
@@ -1558,7 +1558,7 @@ ReadClient(client_t *con)		/* I - Client to read from */
 	      }
 
 	      if (con->options[0] == '/')
-		cups_strcpy(con->options, con->options + 1);
+		_cups_strcpy(con->options, con->options + 1);
 
               LogMessage(L_DEBUG2, "ReadClient: %d command=\"%s\", options = \"%s\"",
 	        	 con->http.fd, con->command, con->options);
@@ -3165,7 +3165,7 @@ pipe_command(client_t *con,		/* I - Client connection */
       else
         *commptr |= tolower(commptr[2]) - 'a' + 10;
 
-      cups_strcpy(commptr + 1, commptr + 3);
+      _cups_strcpy(commptr + 1, commptr + 3);
 
      /*
       * Check for a %00 and break if that is the case...

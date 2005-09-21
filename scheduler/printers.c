@@ -2469,7 +2469,7 @@ cupsdSanitizeURI(const char *uri,	/* I - Original device URI */
     * authentication string...
     */
 
-    cups_strcpy(start, ptr + 1);
+    _cups_strcpy(start, ptr + 1);
   }
 
  /*

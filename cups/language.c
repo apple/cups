@@ -191,7 +191,7 @@ cupsLangFlush(void)
   int		i;			/* Looping var */
   cups_lang_t	*lang,			/* Current language */
 		*next;			/* Next language */
-  cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
+  _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
 
 
  /*
@@ -260,7 +260,7 @@ cupsLangGet(const char *language)	/* I - Language or locale */
   char			*text;		/* Message text */
   cups_lang_t		*lang;		/* Current language... */
   char			*oldlocale;	/* Old locale name */
-  cups_globals_t	*cg = _cupsGlobals();
+  _cups_globals_t	*cg = _cupsGlobals();
   					/* Pointer to library globals */
   static const char * const locale_encodings[] =
 		{			/* Locale charset names */
@@ -804,7 +804,7 @@ appleLangDefault(void)
 					/* List of localization data */
   CFStringRef		languageName;	/* Current name */
   CFStringRef		localeName;	/* Canonical from of name */
-  cups_globals_t	*cg = _cupsGlobals();
+  _cups_globals_t	*cg = _cupsGlobals();
   					/* Pointer to library globals */
 
 
@@ -872,9 +872,9 @@ typedef struct
 {
   const char * const name;		/* Language name */
   const char * const locale;		/* Locale name */
-} apple_name_locale_t;
+} _apple_name_locale_t;
 
-static const apple_name_locale_t apple_name_locale[] =
+static const _apple_name_locale_t apple_name_locale[] =
 {
   { "English"     , "en_US.UTF-8" },	{ "French"     , "fr.UTF-8" },
   { "German"      , "de.UTF-8" },	{ "Italian"    , "it.UTF-8" },  
@@ -951,7 +951,7 @@ appleLangDefault(void)
   CFStringRef		localizationName;
 					/* Current name */
   char			buff[256];	/* Temporary buffer */
-  cups_globals_t	*cg = _cupsGlobals();
+  _cups_globals_t	*cg = _cupsGlobals();
   					/* Pointer to library globals */
 
 
@@ -984,7 +984,7 @@ appleLangDefault(void)
 	    buff[sizeof(buff) - 1] = '\0';
 
 	    for (i = 0;
-		 i < sizeof(apple_name_locale) / sizeof(apple_name_locale[0]);
+		 i < sizeof(_apple_name_locale) / sizeof(apple_name_locale[0]);
 		 i++)
 	    {
 	      if (strcasecmp(buff, apple_name_locale[i].name) == 0)

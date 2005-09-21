@@ -187,8 +187,9 @@ libcups_s.a:	$(LIBOBJS)
 	echo Creating $@...
 	$(RM) libcups_s.exp
 	(echo _ipp_add_attr; echo _ipp_free_attr; \
-	 echo _cups_md5_init; echo _cups_md5_append; \
-	 echo _cups_md5_finish) >libcups_s.exp
+	 echo _cups_hstrerror; echo _cups_md5_init; \
+	 echo _cups_md5_append; echo _cups_md5_finish; \
+	 echo _cups_strlcat; echo _cups_strlcpy) >libcups_s.exp
 	$(DSO) $(DSOFLAGS) -Wl,-bexport:libcups_s.exp -o libcups_s.o $(LIBOBJS) $(SSLLIBS) $(COMMONLIBS) $(LIBZ) -lm
 	$(RM) $@
 	$(AR) $(ARFLAGS) $@ libcups_s.o
@@ -286,14 +287,10 @@ testlang:	testlang.o libcups.a
 # Automatic API reference manual...
 #
 
-apirm.xml:	$(HEADERS) $(LIBOBJS:.o=.c)
+apirm:	$(HEADERS) $(LIBOBJS:.o=.c)
 	echo Generating CUPS API Reference Manual...
 	$(RM) apirm.xml
-#	mxmldoc apirm.xml $(HEADERS) $(LIBOBJS:.o=.c) >../doc/apirm.html
-	valgrind --leak-check=yes ~/c/mxml/mxmldoc apirm.xml \
-		ppd.h attr.c emit.c extended.c mark.c page.c ppd.c \
-		>../doc/apirm.html 2>apirm.out
-#		$(HEADERS) $(LIBOBJS:.o=.c) >../doc/apirm.html 2>apirm.out
+	mxmldoc apirm.xml $(HEADERS) $(LIBOBJS:.o=.c) >../doc/help/apirm.html
 
 
 #

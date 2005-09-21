@@ -164,7 +164,7 @@ cupsTempFile(char *filename,		/* I - Pointer to buffer */
              int  len)			/* I - Size of buffer */
 {
   int		fd;			/* File descriptor for temp file */
-  cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
+  _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
 
 
  /*

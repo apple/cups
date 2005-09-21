@@ -30,7 +30,7 @@
  *   httpSeparate2()    - Separate a Universal Resource Identifier into its
  *                        components.
  *   httpStatus()       - Return a short string describing a HTTP status code.
- *   cups_hstrerror()   - hstrerror() emulation function for Solaris and others...
+ *   _cups_hstrerror()  - hstrerror() emulation function for Solaris and others...
  *   http_copy_decode() - Copy and decode a URI.
  */
 
@@ -334,11 +334,11 @@ httpStatus(http_status_t status)	/* I - HTTP status code */
 
 #ifndef HAVE_HSTRERROR
 /*
- * 'cups_hstrerror()' - hstrerror() emulation function for Solaris and others...
+ * '_cups_hstrerror()' - hstrerror() emulation function for Solaris and others...
  */
 
 const char *				/* O - Error string */
-cups_hstrerror(int error)		/* I - Error number */
+_cups_hstrerror(int error)		/* I - Error number */
 {
   static const char * const errors[] =	/* Error strings */
 		{

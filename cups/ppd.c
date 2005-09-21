@@ -117,11 +117,11 @@ static ppd_ext_param_t	*ppd_get_extparam(ppd_ext_option_t *opt,
 					  const char *text);
 #endif /* 0 */
 static ppd_group_t	*ppd_get_group(ppd_file_t *ppd, const char *name,
-			               const char *text, cups_globals_t *cg);
+			               const char *text, _cups_globals_t *cg);
 static ppd_option_t	*ppd_get_option(ppd_group_t *group, const char *name);
 static int		ppd_read(cups_file_t *fp, char *keyword, char *option,
 			         char *text, char **string, int ignoreblank,
-				 cups_globals_t *cg);
+				 _cups_globals_t *cg);
 
 
 /*
@@ -348,7 +348,7 @@ ppdErrorString(ppd_status_t status)	/* I - PPD status */
 ppd_status_t				/* O - Status code */
 ppdLastError(int *line)			/* O - Line number */
 {
-  cups_globals_t	*cg = _cupsGlobals();
+  _cups_globals_t	*cg = _cupsGlobals();
 					/* Global data */
 
 
@@ -428,7 +428,7 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
   char			**filter;	/* Pointer to filter */
   cups_lang_t		*language;	/* Default language */
   int			ui_keyword;	/* Is this line a UI keyword? */
-  cups_globals_t	*cg = _cupsGlobals();
+  _cups_globals_t	*cg = _cupsGlobals();
 					/* Global data */
   static const char * const ui_keywords[] =
 			{
@@ -1028,7 +1028,7 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
       */
 
       if (name[0] == '*')
-        cups_strcpy(name, name + 1); /* Eliminate leading asterisk */
+        _cups_strcpy(name, name + 1); /* Eliminate leading asterisk */
 
       for (i = strlen(name) - 1; i > 0 && isspace(name[i] & 255); i --)
         name[i] = '\0'; /* Eliminate trailing spaces */
@@ -1158,7 +1158,7 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
       */
 
       if (name[0] == '*')
-        cups_strcpy(name, name + 1);
+        _cups_strcpy(name, name + 1);
 
       option = ppd_get_option(group, name);
 
@@ -1280,7 +1280,7 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
       }
 
       if (keyword[0] == '*')
-        cups_strcpy(keyword, keyword + 1);
+        _cups_strcpy(keyword, keyword + 1);
 
       if (strcmp(name, "ExitServer") == 0)
         section = PPD_ORDER_EXIT;
@@ -1425,12 +1425,12 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
 	    */
 
 	    if (constraint->option1[0] == '*')
-	      cups_strcpy(constraint->option1, constraint->option1 + 1);
+	      _cups_strcpy(constraint->option1, constraint->option1 + 1);
 
 	    if (constraint->choice1[0] == '*')
-	      cups_strcpy(constraint->option2, constraint->choice1 + 1);
+	      _cups_strcpy(constraint->option2, constraint->choice1 + 1);
 	    else
-	      cups_strcpy(constraint->option2, constraint->choice1);
+	      _cups_strcpy(constraint->option2, constraint->choice1);
 
             constraint->choice1[0] = '\0';
             constraint->choice2[0] = '\0';
@@ -1438,23 +1438,23 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
 	    
 	case 3 : /* Two options, one choice... */
 	   /*
-	    * The following cups_strcpy's are safe, as optionN and
+	    * The following _cups_strcpy's are safe, as optionN and
 	    * choiceN are all the same size (size defined by PPD spec...)
 	    */
 
 	    if (constraint->option1[0] == '*')
-	      cups_strcpy(constraint->option1, constraint->option1 + 1);
+	      _cups_strcpy(constraint->option1, constraint->option1 + 1);
 
 	    if (constraint->choice1[0] == '*')
 	    {
-	      cups_strcpy(constraint->choice2, constraint->option2);
-	      cups_strcpy(constraint->option2, constraint->choice1 + 1);
+	      _cups_strcpy(constraint->choice2, constraint->option2);
+	      _cups_strcpy(constraint->option2, constraint->choice1 + 1);
               constraint->choice1[0] = '\0';
 	    }
 	    else
 	    {
 	      if (constraint->option2[0] == '*')
-  	        cups_strcpy(constraint->option2, constraint->option2 + 1);
+  	        _cups_strcpy(constraint->option2, constraint->option2 + 1);
 
               constraint->choice2[0] = '\0';
 	    }
@@ -1462,10 +1462,10 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
 	    
 	case 4 : /* Two options, two choices... */
 	    if (constraint->option1[0] == '*')
-	      cups_strcpy(constraint->option1, constraint->option1 + 1);
+	      _cups_strcpy(constraint->option1, constraint->option1 + 1);
 
 	    if (constraint->option2[0] == '*')
-  	      cups_strcpy(constraint->option2, constraint->option2 + 1);
+  	      _cups_strcpy(constraint->option2, constraint->option2 + 1);
 	    break;
       }
 
@@ -1944,7 +1944,7 @@ ppdOpenFd(int fd)			/* I - File to read from */
 {
   FILE			*fp;		/* File pointer */
   ppd_file_t		*ppd;		/* PPD file record */
-  cups_globals_t	*cg = _cupsGlobals();
+  _cups_globals_t	*cg = _cupsGlobals();
 					/* Global data */
 
 
@@ -1996,7 +1996,7 @@ ppdOpenFile(const char *filename)	/* I - File to read from */
 {
   cups_file_t		*fp;		/* File pointer */
   ppd_file_t		*ppd;		/* PPD file record */
-  cups_globals_t	*cg = _cupsGlobals();
+  _cups_globals_t	*cg = _cupsGlobals();
 					/* Global data */
 
 
@@ -2044,7 +2044,7 @@ ppdOpenFile(const char *filename)	/* I - File to read from */
 void
 ppdSetConformance(ppd_conform_t c)	/* I - Conformance level */
 {
-  cups_globals_t	*cg = _cupsGlobals();
+  _cups_globals_t	*cg = _cupsGlobals();
 					/* Global data */
 
 
@@ -2506,7 +2506,7 @@ static ppd_group_t *			/* O - Named group */
 ppd_get_group(ppd_file_t     *ppd,	/* I - PPD file */
               const char     *name,	/* I - Name of group */
 	      const char     *text,	/* I - Text for group */
-              cups_globals_t *cg)	/* I - Global data */
+              _cups_globals_t *cg)	/* I - Global data */
 {
   int		i;			/* Looping var */
   ppd_group_t	*group;			/* Group */
@@ -2610,7 +2610,7 @@ ppd_read(cups_file_t    *fp,		/* I - File to read from */
          char           *text,		/* O - Human-readable text from line */
 	 char           **string,	/* O - Code/string data */
          int            ignoreblank,	/* I - Ignore blank lines? */
-	 cups_globals_t *cg)		/* I - Global data */
+	 _cups_globals_t *cg)		/* I - Global data */
 {
   int		ch,			/* Character from file */
 		col,			/* Column in line */

@@ -166,7 +166,7 @@ static char	* const ipp_std_ops[] =
 const char *				/* O - Text string */
 ippErrorString(ipp_status_t error)	/* I - Error status */
 {
-  cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
+  _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
 
 
  /*
@@ -228,7 +228,7 @@ ippErrorValue(const char *name)		/* I - Name */
 const char *				/* O - Name */
 ippOpString(ipp_op_t op)		/* I - Operation ID */
 {
-  cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
+  _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
 
 
  /*
@@ -286,7 +286,7 @@ ippPort(void)
 {
   const char	*server_port;		/* SERVER_PORT environment variable */
   struct servent *port;			/* Port number info */  
-  cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
+  _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
 
 
   if (cg->ipp_port)

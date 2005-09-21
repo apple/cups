@@ -696,7 +696,7 @@ httpGet(http_t     *http,		/* I - HTTP data */
 const char *				/* O - Date/time string */
 httpGetDateString(time_t t)		/* I - UNIX time */
 {
-  cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
+  _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
 
 
   return (httpGetDateString2(t, cg->http_date, sizeof(cg->http_date)));

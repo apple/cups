@@ -25,12 +25,12 @@
  *
  * Contents:
  *
- *   cups_strcpy()      - Copy a string allowing for overlapping strings.
- *   cups_strdup()      - Duplicate a string.
- *   cups_strcasecmp()  - Do a case-insensitive comparison.
- *   cups_strncasecmp() - Do a case-insensitive comparison on up to N chars.
- *   cups_strlcat()     - Safely concatenate two strings.
- *   cups_strlcpy()     - Safely copy two strings.
+ *   _cups_strcpy()      - Copy a string allowing for overlapping strings.
+ *   _cups_strdup()      - Duplicate a string.
+ *   _cups_strcasecmp()  - Do a case-insensitive comparison.
+ *   _cups_strncasecmp() - Do a case-insensitive comparison on up to N chars.
+ *   _cups_strlcat()     - Safely concatenate two strings.
+ *   _cups_strlcpy()     - Safely copy two strings.
  */
 
 /*
@@ -41,11 +41,11 @@
 
 
 /*
- * 'cups_strcpy()' - Copy a string allowing for overlapping strings.
+ * '_cups_strcpy()' - Copy a string allowing for overlapping strings.
  */
 
 void
-cups_strcpy(char       *dst,		/* I - Destination string */
+_cups_strcpy(char       *dst,		/* I - Destination string */
             const char *src)		/* I - Source string */
 {
   while (*src)
@@ -56,14 +56,14 @@ cups_strcpy(char       *dst,		/* I - Destination string */
 
 
 /*
- * 'cups_strdup()' - Duplicate a string.
+ * '_cups_strdup()' - Duplicate a string.
  */
 
 #ifndef HAVE_STRDUP
-char 	*			/* O - New string pointer */
-cups_strdup(const char *s)	/* I - String to duplicate */
+char 	*				/* O - New string pointer */
+_cups_strdup(const char *s)		/* I - String to duplicate */
 {
-  char	*t;			/* New string pointer */
+  char	*t;				/* New string pointer */
 
 
   if (s == NULL)
@@ -78,12 +78,12 @@ cups_strdup(const char *s)	/* I - String to duplicate */
 
 
 /*
- * 'cups_strcasecmp()' - Do a case-insensitive comparison.
+ * '_cups_strcasecmp()' - Do a case-insensitive comparison.
  */
 
 #ifndef HAVE_STRCASECMP
 int				/* O - Result of comparison (-1, 0, or 1) */
-cups_strcasecmp(const char *s,	/* I - First string */
+_cups_strcasecmp(const char *s,	/* I - First string */
                 const char *t)	/* I - Second string */
 {
   while (*s != '\0' && *t != '\0')
@@ -107,14 +107,14 @@ cups_strcasecmp(const char *s,	/* I - First string */
 #endif /* !HAVE_STRCASECMP */
 
 /*
- * 'cups_strncasecmp()' - Do a case-insensitive comparison on up to N chars.
+ * '_cups_strncasecmp()' - Do a case-insensitive comparison on up to N chars.
  */
 
 #ifndef HAVE_STRNCASECMP
-int				/* O - Result of comparison (-1, 0, or 1) */
-cups_strncasecmp(const char *s,	/* I - First string */
-                 const char *t,	/* I - Second string */
-		 size_t     n)	/* I - Maximum number of characters to compare */
+int					/* O - Result of comparison (-1, 0, or 1) */
+_cups_strncasecmp(const char *s,	/* I - First string */
+                 vconst char *t,	/* I - Second string */
+		  size_t     n)		/* I - Maximum number of characters to compare */
 {
   while (*s != '\0' && *t != '\0' && n > 0)
   {
@@ -142,16 +142,16 @@ cups_strncasecmp(const char *s,	/* I - First string */
 
 #ifndef HAVE_STRLCAT
 /*
- * 'cups_strlcat()' - Safely concatenate two strings.
+ * '_cups_strlcat()' - Safely concatenate two strings.
  */
 
-size_t				/* O - Length of string */
-cups_strlcat(char       *dst,	/* O - Destination string */
-             const char *src,	/* I - Source string */
-	     size_t     size)	/* I - Size of destination string buffer */
+size_t					/* O - Length of string */
+_cups_strlcat(char       *dst,		/* O - Destination string */
+              const char *src,		/* I - Source string */
+	      size_t     size)		/* I - Size of destination string buffer */
 {
-  size_t	srclen;		/* Length of source string */
-  size_t	dstlen;		/* Length of destination string */
+  size_t	srclen;			/* Length of source string */
+  size_t	dstlen;			/* Length of destination string */
 
 
  /*
@@ -187,15 +187,15 @@ cups_strlcat(char       *dst,	/* O - Destination string */
 
 #ifndef HAVE_STRLCPY
 /*
- * 'cups_strlcpy()' - Safely copy two strings.
+ * '_cups_strlcpy()' - Safely copy two strings.
  */
 
-size_t				/* O - Length of string */
-cups_strlcpy(char       *dst,	/* O - Destination string */
-             const char *src,	/* I - Source string */
-	     size_t      size)	/* I - Size of destination string buffer */
+size_t					/* O - Length of string */
+_cups_strlcpy(char       *dst,		/* O - Destination string */
+              const char *src,		/* I - Source string */
+	      size_t      size)		/* I - Size of destination string buffer */
 {
-  size_t	srclen;		/* Length of source string */
+  size_t	srclen;			/* Length of source string */
 
 
  /*

@@ -62,7 +62,7 @@ cupsEncryption(void)
   char		line[1024],		/* Line from file */
 		*value;			/* Value on line */
   int		linenum;		/* Line number */
-  cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
+  _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
 
 
  /*
@@ -179,7 +179,7 @@ cupsServer(void)
   char		line[1024],		/* Line from file */
 		*value;			/* Value on line */
   int		linenum;		/* Line number in file */
-  cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
+  _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
 
 
  /*
@@ -267,7 +267,7 @@ cupsServer(void)
 void
 cupsSetPasswordCB(const char *(*cb)(const char *))	/* I - Callback function */
 {
-  cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
+  _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
 
 
   if (cb == (const char *(*)(const char *))0)
@@ -284,7 +284,7 @@ cupsSetPasswordCB(const char *(*cb)(const char *))	/* I - Callback function */
 void
 cupsSetServer(const char *server)	/* I - Server name */
 {
-  cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
+  _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
 
 
   if (server)
@@ -301,7 +301,7 @@ cupsSetServer(const char *server)	/* I - Server name */
 void
 cupsSetUser(const char *user)		/* I - User name */
 {
-  cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
+  _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
 
 
   if (user)
@@ -323,7 +323,7 @@ cupsSetUser(const char *user)		/* I - User name */
 const char *				/* O - User name */
 cupsUser(void)
 {
-  cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
+  _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
 
 
   if (!cg->user[0])
@@ -370,7 +370,7 @@ const char *				/* O - User name */
 cupsUser(void)
 {
   struct passwd	*pwd;			/* User/password entry */
-  cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
+  _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
 
 
   if (!cg->user[0])

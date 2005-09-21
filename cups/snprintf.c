@@ -25,8 +25,8 @@
  *
  * Contents:
  *
- *   cups_vsnprintf() - Format a string into a fixed size buffer.
- *   cups_snprintf()  - Format a string into a fixed size buffer.
+ *   _cups_vsnprintf() - Format a string into a fixed size buffer.
+ *   _cups_snprintf()  - Format a string into a fixed size buffer.
  */
 
 /*
@@ -40,14 +40,14 @@
 
 #ifndef HAVE_VSNPRINTF
 /*
- * 'cups_vsnprintf()' - Format a string into a fixed size buffer.
+ * '_cups_vsnprintf()' - Format a string into a fixed size buffer.
  */
 
 int					/* O - Number of bytes formatted */
-cups_vsnprintf(char       *buffer,	/* O - Output buffer */
-               size_t     bufsize,	/* O - Size of output buffer */
-	       const char *format,	/* I - printf-style format string */
-	       va_list    ap)		/* I - Pointer to additional arguments */
+_cups_vsnprintf(char       *buffer,	/* O - Output buffer */
+                size_t     bufsize,	/* O - Size of output buffer */
+	        const char *format,	/* I - printf-style format string */
+	        va_list    ap)		/* I - Pointer to additional arguments */
 {
   char		*bufptr,		/* Pointer to position in buffer */
 		*bufend,		/* Pointer to end of buffer */
@@ -339,14 +339,14 @@ cups_vsnprintf(char       *buffer,	/* O - Output buffer */
 
 #ifndef HAVE_SNPRINTF
 /*
- * 'cups_snprintf()' - Format a string into a fixed size buffer.
+ * '_cups_snprintf()' - Format a string into a fixed size buffer.
  */
 
 int					/* O - Number of bytes formatted */
-cups_snprintf(char       *buffer,	/* O - Output buffer */
-              size_t     bufsize,	/* O - Size of output buffer */
-              const char *format,	/* I - printf-style format string */
-	      ...)			/* I - Additional arguments as needed */
+_cups_snprintf(char       *buffer,	/* O - Output buffer */
+               size_t     bufsize,	/* O - Size of output buffer */
+               const char *format,	/* I - printf-style format string */
+	       ...)			/* I - Additional arguments as needed */
 {
   int		bytes;			/* Number of bytes formatted */
   va_list 	ap;			/* Pointer to additional arguments */

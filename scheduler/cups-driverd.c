@@ -677,7 +677,7 @@ load_ppds(const char *d,		/* I - Actual directory */
       strcpy(make_model, model_name);
 
     while (isspace(make_model[0] & 255))
-      cups_strcpy(make_model, make_model + 1);
+      _cups_strcpy(make_model, make_model + 1);
 
     if (!make_model[0])
       continue;	/* Nope... */
@@ -687,7 +687,7 @@ load_ppds(const char *d,		/* I - Actual directory */
     */
 
     while (isspace(manufacturer[0] & 255))
-      cups_strcpy(manufacturer, manufacturer + 1);
+      _cups_strcpy(manufacturer, manufacturer + 1);
 
     if (!manufacturer[0] || !strcmp(manufacturer, "ESP"))
     {
@@ -758,7 +758,7 @@ load_ppds(const char *d,		/* I - Actual directory */
       */
 
       country[0] = '_';
-      cups_strcpy(country + 1, ptr);
+      _cups_strcpy(country + 1, ptr);
     }
     else
     {

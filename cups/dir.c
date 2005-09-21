@@ -25,6 +25,15 @@
  *
  * Contents:
  *
+ *   _cups_dir_time() - Convert a FILETIME value to a UNIX time value.
+ *   cupsDirClose()   - Close a directory.
+ *   cupsDirOpen()    - Open a directory.
+ *   cupsDirRead()    - Read the next directory entry.
+ *   cupsDirRewind()  - Rewind to the start of the directory.
+ *   cupsDirClose()   - Close a directory.
+ *   cupsDirOpen()    - Open a directory.
+ *   cupsDirRead()    - Read the next directory entry.
+ *   cupsDirRewind()  - Rewind to the start of the directory.
  */
 
 /*
@@ -46,25 +55,23 @@
 #  include <windows.h>
 
 /*
- * Directory data structure...
- *
- * @private
+ * Types and structures...
  */
 
-struct cups_dir_s
+struct _cups_dir_s			/**** Directory data structure ****/
 {
-  char			directory[1024];/* Directory filename */
-  HANDLE		dir;		/* Directory handle */
-  cups_dentry_t	entry;		/* Directory entry */
+  char		directory[1024];	/* Directory filename */
+  HANDLE	dir;			/* Directory handle */
+  cups_dentry_t	entry;			/* Directory entry */
 };
 
 
 /*
- * 'cups_dir_time()' - Convert a FILETIME value to a UNIX time value.
+ * '_cups_dir_time()' - Convert a FILETIME value to a UNIX time value.
  */
 
 time_t					/* O - UNIX time */
-cups_dir_time(FILETIME ft)		/* I - File time */
+_cups_dir_time(FILETIME ft)		/* I - File time */
 {
   ULONGLONG	val;			/* File time in 0.1 usecs */
 
@@ -195,9 +202,9 @@ cupsDirRead(cups_dir_t *dp)		/* I - Directory */
   else
     dp->entry.st_mode = 0644;
 
-  dp->entry.st_atime = cups_dir_time(entry.ftLastAccessTime);
-  dp->entry.st_ctime = cups_dir_time(entry.ftCreationTime);
-  dp->entry.st_mtime = cups_dir_time(entry.ftLastWriteTime);
+  dp->entry.st_atime = _cups_dir_time(entry.ftLastAccessTime);
+  dp->entry.st_ctime = _cups_dir_time(entry.ftCreationTime);
+  dp->entry.st_mtime = _cups_dir_time(entry.ftLastWriteTime);
   dp->entry.st_size  = entry.nFileSizeLow + entry.nFileSizeHigh << 32;
 
  /*
@@ -242,18 +249,13 @@ cupsDirRewind(cups_dir_t *dp)		/* I - Directory */
 
 #  include <sys/types.h>
 #  include <dirent.h>
-#  ifndef PATH_MAX
-#    define PATH_MAX 1024
-#  endif /* PATH_MAX */
 
 
 /*
- * Directory data structure...
- *
- * @private
+ * Types and structures...
  */
 
-struct cups_dir_s
+struct _cups_dir_s			/**** Directory data structure ****/
 {
   char		directory[1024];	/* Directory filename */
   DIR		*dir;			/* Directory file */
@@ -345,7 +347,7 @@ cupsDirOpen(const char *directory)	/* I - Directory name */
 cups_dentry_t *				/* O - Directory entry */
 cupsDirRead(cups_dir_t *dp)		/* I - Directory */
 {
-  char		buffer[sizeof(struct dirent) + PATH_MAX];
+  char		buffer[sizeof(struct dirent) + 1024];
 					/* Directory entry buffer */
   struct dirent	*entry;			/* Pointer to entry */
   char		filename[1024];		/* Full filename */

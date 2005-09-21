@@ -56,10 +56,10 @@ extern "C" {
 
 
 /*
- * CUPS file type...
+ * Types and structures...
  */
 
-typedef struct cups_file_s cups_file_t;
+typedef struct _cups_file_s cups_file_t;/**** CUPS file type... ****/
 
 
 /*

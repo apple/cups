@@ -57,9 +57,9 @@ typedef enum                    /**** Case Folding Types ****/
 typedef enum                    /**** Unicode Char Property Types ****/
 {
   CUPS_PROP_GENERAL_CATEGORY,   /* See 'cups_gencat_t' enum */
-  CUPS_PROP_BIDI_CATEGORY,      /* See 'cups_bidicat_t' enum */
-  CUPS_PROP_COMBINING_CLASS,    /* See 'cups_combclass_t' type */
-  CUPS_PROP_BREAK_CLASS         /* See 'cups_breakclass_t' enum */
+  CUPS_PROP_BIDI_CATEGORY,      /* See 'cups_bidi_t' enum */
+  CUPS_PROP_COMBINING_CLASS,    /* See '_cups_comb_class_t' type */
+  CUPS_PROP_BREAK_CLASS         /* See 'cups__cups_break_class_t' enum */
 } cups_property_t;
 
 
@@ -129,7 +129,7 @@ typedef enum                    /**** Unicode Bidi Category ****/
   CUPS_BIDI_S,                  /* Segment Separator (Tab) */
   CUPS_BIDI_WS,                 /* Whitespace Space (Space, etc) */
   CUPS_BIDI_ON                  /* Other Neutrals */
-} cups_bidicat_t;
+} cups_bidi_t;
 
 /*
  * Note - add state table from UAX-14, section 7.3.
@@ -177,69 +177,69 @@ typedef enum                    /**** Unicode Line Break Class ****/
   CUPS_BREAK_SY,                /* Symbols Allowing Break After (A) */
   CUPS_BREAK_XX,                /* Unknown (XP) */
   CUPS_BREAK_ZW                 /* Zero Width Space (A) (norm) */
-} cups_breakclass_t;
+} cups__cups_break_class_t;
 
-typedef int cups_combclass_t;   /**** Unicode Combining Class ****/
+typedef int _cups_comb_class_t;   /**** Unicode Combining Class ****/
                                 /* 0=base, 1..254=combining char */
 
 /*
  * Structures...
  */
 
-typedef struct cups_normmap_str /**** Normalize Map Cache Struct ****/
+typedef struct _cups_normmap_s		/**** Normalize Map Cache Struct ****/
 {
-  struct cups_normmap_str *next;        /* Next normalize in cache */
+  struct _cups_normmap_s *next;        /* Next normalize in cache */
   int                   used;           /* Number of times entry used */
   cups_normalize_t      normalize;      /* Normalization type */
   int                   normcount;      /* Count of Source Chars */
   cups_ucs2_t           *uni2norm;      /* Char -> Normalization */
                                         /* ...only supports UCS-2 */
-} cups_normmap_t;
+} _cups_norm_map_t;
 
-typedef struct cups_foldmap_str /**** Case Fold Map Cache Struct ****/
+typedef struct _cups_foldmap_s		/**** Case Fold Map Cache Struct ****/
 {
-  struct cups_foldmap_str *next;        /* Next case fold in cache */
+  struct _cups_foldmap_s *next;        /* Next case fold in cache */
   int                   used;           /* Number of times entry used */
   cups_folding_t        fold;           /* Case folding type */
   int                   foldcount;      /* Count of Source Chars */
   cups_ucs2_t           *uni2fold;      /* Char -> Folded Char(s) */
                                         /* ...only supports UCS-2 */
-} cups_foldmap_t;
+} _cups_fold_map_t;
 
-typedef struct cups_prop_str    /**** Char Property Struct ****/
+typedef struct _cups_prop_s		/**** Char Property Struct ****/
 {
   cups_ucs2_t           ch;             /* Unicode Char as UCS-2 */
   unsigned char         gencat;         /* General Category */
   unsigned char         bidicat;        /* Bidirectional Category */
-} cups_prop_t;
+} _cups_prop_t;
 
-typedef struct                  /**** Char Property Map Struct ****/
+typedef struct _cups_prop_map_s		/**** Char Property Map Struct ****/
 {
   int                   used;           /* Number of times entry used */
   int                   propcount;      /* Count of Source Chars */
-  cups_prop_t           *uni2prop;      /* Char -> Properties */
-} cups_propmap_t;
+  _cups_prop_t           *uni2prop;      /* Char -> Properties */
+} _cups_prop_map_t;
 
-typedef struct                  /**** Line Break Class Map Struct ****/
+typedef struct _cups_break_map_s	/**** Line Break Class Map Struct ****/
 {
   int                   used;           /* Number of times entry used */
   int                   breakcount;     /* Count of Source Chars */
   cups_ucs2_t           *uni2break;     /* Char -> Line Break Class */
-} cups_breakmap_t;
+} _cups_break_map_t;
 
-typedef struct cups_comb_str    /**** Char Combining Class Struct ****/
+typedef struct _cups_comb_s		/**** Char Combining Class Struct ****/
 {
   cups_ucs2_t           ch;             /* Unicode Char as UCS-2 */
   unsigned char         combclass;      /* Combining Class */
   unsigned char         reserved;       /* Reserved for alignment */
-} cups_comb_t;
+} _cups_comb_t;
 
-typedef struct                  /**** Combining Class Map Struct ****/
+typedef struct _cups_comb_map_s		/**** Combining Class Map Struct ****/
 {
   int                   used;           /* Number of times entry used */
   int                   combcount;      /* Count of Source Chars */
-  cups_comb_t           *uni2comb;      /* Char -> Combining Class */
-} cups_combmap_t;
+  _cups_comb_t           *uni2comb;      /* Char -> Combining Class */
+} _cups_comb_map_t;
 
 /*
  * Prototypes...

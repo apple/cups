@@ -59,9 +59,9 @@
  */
 
 static int get_charmap_count(const char *filename);
-static cups_cmap_t *get_sbcs_charmap(const cups_encoding_t encoding,
+static _cups_cmap_t *get_sbcs_charmap(const cups_encoding_t encoding,
                                      const char *filename);
-static cups_vmap_t *get_vbcs_charmap(const cups_encoding_t encoding,
+static _cups_vmap_t *get_vbcs_charmap(const cups_encoding_t encoding,
                                      const char *filename);
 
 static int conv_utf8_to_sbcs(char *dest,
@@ -135,9 +135,9 @@ void
 cupsCharmapFree(const cups_encoding_t encoding)
                                         /* I - Encoding */
 {
-  cups_cmap_t   *cmap;          /* Legacy SBCS / Unicode Charset Map */
-  cups_vmap_t   *vmap;          /* Legacy VBCS / Unicode Charset Map */
-  cups_globals_t *cg = _cupsGlobals();
+  _cups_cmap_t   *cmap;          /* Legacy SBCS / Unicode Charset Map */
+  _cups_vmap_t   *vmap;          /* Legacy VBCS / Unicode Charset Map */
+  _cups_globals_t *cg = _cupsGlobals();
 				/* Pointer to library globals */
 
  /*
@@ -175,14 +175,14 @@ void
 cupsCharmapFlush(void)
 {
   int           i;              /* Looping variable */
-  cups_cmap_t   *cmap;          /* Legacy SBCS / Unicode Charset Map */
-  cups_vmap_t   *vmap;          /* Legacy VBCS / Unicode Charset Map */
-  cups_cmap_t   *cnext;         /* Next Legacy SBCS Charset Map */
-  cups_vmap_t   *vnext;         /* Next Legacy VBCS Charset Map */
+  _cups_cmap_t   *cmap;          /* Legacy SBCS / Unicode Charset Map */
+  _cups_vmap_t   *vmap;          /* Legacy VBCS / Unicode Charset Map */
+  _cups_cmap_t   *cnext;         /* Next Legacy SBCS Charset Map */
+  _cups_vmap_t   *vnext;         /* Next Legacy VBCS Charset Map */
   cups_ucs2_t   *crow;          /* Pointer to UCS-2 row in 'char2uni' */
   cups_sbcs_t   *srow;          /* Pointer to SBCS row in 'uni2char' */
   cups_vbcs_t   *vrow;          /* Pointer to VBCS row in 'uni2char' */
-  cups_globals_t *cg = _cupsGlobals();
+  _cups_globals_t *cg = _cupsGlobals();
   				/* Pointer to library globals */
 
  /*
@@ -857,7 +857,7 @@ get_charmap_count(const char *filename) /* I - Charmap Filename */
 /*
  * 'get_sbcs_charmap()' - Get SBCS Charmap.
  */
-static cups_cmap_t *                    /* O - Charmap or 0 on error */
+static _cups_cmap_t *                    /* O - Charmap or 0 on error */
 get_sbcs_charmap(const cups_encoding_t encoding,
                                         /* I - Charmap Encoding */
                  const char *filename)  /* I - Charmap Filename */
@@ -865,13 +865,13 @@ get_sbcs_charmap(const cups_encoding_t encoding,
   int           i;              /* Loop variable */
   unsigned long legchar;        /* Legacy character value */
   cups_utf32_t  unichar;        /* Unicode character value */
-  cups_cmap_t   *cmap;          /* Legacy SBCS / Unicode Charset Map */
+  _cups_cmap_t   *cmap;          /* Legacy SBCS / Unicode Charset Map */
   cups_file_t   *fp;            /* Charset map file pointer */
   char          *s;             /* Line parsing pointer */
   cups_ucs2_t   *crow;          /* Pointer to UCS-2 row in 'char2uni' */
   cups_sbcs_t   *srow;          /* Pointer to SBCS row in 'uni2char' */
   char          line[256];      /* Line from charset map file */
-  cups_globals_t *cg = _cupsGlobals();
+  _cups_globals_t *cg = _cupsGlobals();
 				/* Pointer to library globals */
 
  /*
@@ -902,7 +902,7 @@ get_sbcs_charmap(const cups_encoding_t encoding,
  /*
   * Allocate memory for SBCS charset map and add to cache...
   */
-  cmap = (cups_cmap_t *) calloc(1, sizeof(cups_cmap_t));
+  cmap = (_cups_cmap_t *) calloc(1, sizeof(_cups_cmap_t));
   if (cmap == NULL)
   {
     cupsFileClose(fp);
@@ -994,15 +994,15 @@ get_sbcs_charmap(const cups_encoding_t encoding,
 /*
  * 'get_vbcs_charmap()' - Get DBCS/VBCS Charmap.
  */
-static cups_vmap_t *                    /* O - Charmap or 0 on error */
+static _cups_vmap_t *                    /* O - Charmap or 0 on error */
 get_vbcs_charmap(const cups_encoding_t encoding,
                                         /* I - Charmap Encoding */
                  const char *filename)  /* I - Charmap Filename */
 {
-  cups_vmap_t       *vmap;      /* Legacy VBCS / Unicode Charset Map */
+  _cups_vmap_t       *vmap;      /* Legacy VBCS / Unicode Charset Map */
   cups_ucs2_t       *crow;      /* Pointer to UCS-2 row in 'char2uni' */
   cups_vbcs_t       *vrow;      /* Pointer to VBCS row in 'uni2char' */
-  cups_wide2uni_t   *wide2uni;  /* Pointer to row in 'wide2uni' */
+  _cups_wide2uni_t   *wide2uni;  /* Pointer to row in 'wide2uni' */
   cups_sbcs_t       leadchar;   /* Lead char of 2-byte legacy char */
   unsigned long     legchar;    /* Legacy character value */
   cups_utf32_t      unichar;    /* Unicode character value */
@@ -1012,7 +1012,7 @@ get_vbcs_charmap(const cups_encoding_t encoding,
   char              line[256];  /* Line from charset map file */
   int               i;          /* Loop variable */
   int               wide;       /* 32-bit legacy char */
-  cups_globals_t    *cg = _cupsGlobals();
+  _cups_globals_t    *cg = _cupsGlobals();
 				/* Pointer to library globals */
 
  /*
@@ -1050,7 +1050,7 @@ get_vbcs_charmap(const cups_encoding_t encoding,
  /*
   * Allocate memory for DBCS/VBCS charset map and add to cache...
   */
-  vmap = (cups_vmap_t *) calloc(1, sizeof(cups_vmap_t));
+  vmap = (_cups_vmap_t *) calloc(1, sizeof(_cups_vmap_t));
   if (vmap == NULL)
   {
     cupsFileClose(fp);
@@ -1154,8 +1154,8 @@ get_vbcs_charmap(const cups_encoding_t encoding,
       {
         wide = 1;
         vmap->widecount = (mapcount - i + 1);
-        wide2uni = (cups_wide2uni_t *)
-          calloc(vmap->widecount, sizeof(cups_wide2uni_t));
+        wide2uni = (_cups_wide2uni_t *)
+          calloc(vmap->widecount, sizeof(_cups_wide2uni_t));
         if (wide2uni == NULL)
         {
           cupsFileClose(fp);
@@ -1213,7 +1213,7 @@ conv_utf8_to_sbcs(char *dest,           /* O - Target string */
     const cups_encoding_t encoding)     /* I - Encoding */
 {
   char          *start = dest;  /* Start of destination string */
-  cups_cmap_t   *cmap;          /* Legacy SBCS / Unicode Charset Map */
+  _cups_cmap_t   *cmap;          /* Legacy SBCS / Unicode Charset Map */
   cups_sbcs_t   *srow;          /* Pointer to SBCS row in 'uni2char' */
   cups_utf32_t  unichar;        /* Character value */
   int           worklen;        /* Internal UCS-4 string length */
@@ -1235,7 +1235,7 @@ conv_utf8_to_sbcs(char *dest,           /* O - Target string */
  /*
   * Find legacy charset map in cache...
   */
-  cmap = (cups_cmap_t *) cupsCharmapGet(encoding);
+  cmap = (_cups_cmap_t *) cupsCharmapGet(encoding);
   if (cmap == NULL)
     return (-1);
 
@@ -1300,7 +1300,7 @@ conv_utf8_to_vbcs(char *dest,           /* O - Target string */
     const cups_encoding_t encoding)     /* I - Encoding */
 {
   char          *start = dest;  /* Start of destination string */
-  cups_vmap_t   *vmap;          /* Legacy DBCS / Unicode Charset Map */
+  _cups_vmap_t   *vmap;          /* Legacy DBCS / Unicode Charset Map */
   cups_vbcs_t   *vrow;          /* Pointer to VBCS row in 'uni2char' */
   cups_utf32_t  unichar;        /* Character value */
   cups_vbcs_t   legchar;        /* Legacy character value */
@@ -1323,7 +1323,7 @@ conv_utf8_to_vbcs(char *dest,           /* O - Target string */
  /*
   * Find legacy charset map in cache...
   */
-  vmap = (cups_vmap_t *) cupsCharmapGet(encoding);
+  vmap = (_cups_vmap_t *) cupsCharmapGet(encoding);
   if (vmap == NULL)
     return (-1);
 
@@ -1407,7 +1407,7 @@ conv_sbcs_to_utf8(cups_utf8_t *dest,    /* O - Target string */
     const int maxout,                   /* I - Max output */
     const cups_encoding_t encoding)     /* I - Encoding */
 {
-  cups_cmap_t   *cmap;          /* Legacy SBCS / Unicode Charset Map */
+  _cups_cmap_t   *cmap;          /* Legacy SBCS / Unicode Charset Map */
   cups_ucs2_t   *crow;          /* Pointer to UCS-2 row in 'char2uni' */
   unsigned long legchar;        /* Legacy character value */
   cups_utf32_t  unichar;        /* Unicode character value */
@@ -1430,7 +1430,7 @@ conv_sbcs_to_utf8(cups_utf8_t *dest,    /* O - Target string */
  /*
   * Find legacy charset map in cache...
   */
-  cmap = (cups_cmap_t *) cupsCharmapGet(encoding);
+  cmap = (_cups_cmap_t *) cupsCharmapGet(encoding);
   if (cmap == NULL)
     return (-1);
 
@@ -1486,9 +1486,9 @@ conv_vbcs_to_utf8(cups_utf8_t *dest,    /* O - Target string */
     const int maxout,                   /* I - Max output */
     const cups_encoding_t encoding)     /* I - Encoding */
 {
-  cups_vmap_t       *vmap;      /* Legacy VBCS / Unicode Charset Map */
+  _cups_vmap_t       *vmap;      /* Legacy VBCS / Unicode Charset Map */
   cups_ucs2_t       *crow;      /* Pointer to UCS-2 row in 'char2uni' */
-  cups_wide2uni_t   *wide2uni;  /* Pointer to row in 'wide2uni' */
+  _cups_wide2uni_t   *wide2uni;  /* Pointer to row in 'wide2uni' */
   cups_sbcs_t       leadchar;   /* Lead char of n-byte legacy char */
   cups_vbcs_t       legchar;    /* Legacy character value */
   cups_utf32_t      unichar;    /* Unicode character value */
@@ -1511,7 +1511,7 @@ conv_vbcs_to_utf8(cups_utf8_t *dest,    /* O - Target string */
  /*
   * Find legacy charset map in cache...
   */
-  vmap = (cups_vmap_t *) cupsCharmapGet(encoding);
+  vmap = (_cups_vmap_t *) cupsCharmapGet(encoding);
   if (vmap == NULL)
     return (-1);
 
@@ -1597,10 +1597,10 @@ conv_vbcs_to_utf8(cups_utf8_t *dest,    /* O - Target string */
     * Find 3-byte or 4-byte legacy character...
     */
     wide2uni = vmap->wide2uni;
-    wide2uni = (cups_wide2uni_t *) bsearch(&legchar,
+    wide2uni = (_cups_wide2uni_t *) bsearch(&legchar,
                                            vmap->wide2uni,
                                            vmap->widecount,
-                                           sizeof(cups_wide2uni_t),
+                                           sizeof(_cups_wide2uni_t),
                                            compare_wide);
 
    /*
@@ -1632,7 +1632,7 @@ compare_wide(const void *k1,            /* I - Key char */
 {
   cups_vbcs_t       *kp = (cups_vbcs_t *) k1;
                                 /* Key char pointer */
-  cups_wide2uni_t   *mp = (cups_wide2uni_t *) k2;
+  _cups_wide2uni_t   *mp = (_cups_wide2uni_t *) k2;
                                 /* Map char pointer */
   cups_vbcs_t       key;        /* Legacy key character */
   cups_vbcs_t       map;        /* Legacy map character */

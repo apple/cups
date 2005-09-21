@@ -48,7 +48,7 @@ extern "C" {
  * Data types...
  */
 
-typedef struct cups_dir_s cups_dir_t;	/**** Directory type ****/
+typedef struct _cups_dir_s cups_dir_t;	/**** Directory type ****/
 
 typedef struct cups_dentry_s		/**** Directory entry type ****/
 {

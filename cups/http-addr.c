@@ -274,7 +274,7 @@ httpGetHostByName(const char *name)	/* I - Hostname or IP address */
   int			i;		/* Looping var */
   const char		*nameptr;	/* Pointer into name */
   unsigned		ip[4];		/* IP address components */
-  cups_globals_t	*cg = _cupsGlobals();
+  _cups_globals_t	*cg = _cupsGlobals();
   					/* Pointer to library globals */
 
 

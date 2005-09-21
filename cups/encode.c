@@ -50,9 +50,9 @@ typedef struct
   const char	*name;
   ipp_tag_t	value_tag;
   ipp_tag_t	group_tag;
-} ipp_option_t;
+} _ipp_option_t;
 
-static const ipp_option_t ipp_options[] =
+static const _ipp_option_t ipp_options[] =
 {
   { "blackplot",		IPP_TAG_BOOLEAN,	IPP_TAG_JOB },
   { "brightness",		IPP_TAG_INTEGER,	IPP_TAG_JOB },

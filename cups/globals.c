@@ -66,10 +66,10 @@ static void	globals_destructor(void *value);
  * '_cupsGlobals()' - Return a pointer to thread local storage
  */
 
-cups_globals_t *			/* O - Pointer to global data */
+_cups_globals_t *			/* O - Pointer to global data */
 _cupsGlobals(void)
 {
-  cups_globals_t *globals;		/* Pointer to global data */
+  _cups_globals_t *globals;		/* Pointer to global data */
 
 
  /* 
@@ -82,13 +82,13 @@ _cupsGlobals(void)
   * See if we have allocated the data yet...
   */
 
-  if ((globals = (cups_globals_t *)pthread_getspecific(globals_key)) == NULL)
+  if ((globals = (_cups_globals_t *)pthread_getspecific(globals_key)) == NULL)
   {
    /*
     * No, allocate memory as set the pointer for the key...
     */
 
-    globals = calloc(1, sizeof(cups_globals_t));
+    globals = calloc(1, sizeof(_cups_globals_t));
     pthread_setspecific(globals_key, globals);
 
    /*
@@ -136,14 +136,12 @@ globals_destructor(void *value)		/* I - Data to free */
 
 /*
  * '_cupsGlobals()' - Return a pointer to thread local storage.
- *
- * @private
  */
 
-cups_globals_t *			/* O - Pointer to global data */
+_cups_globals_t *			/* O - Pointer to global data */
 _cupsGlobals(void)
 {
-  static cups_globals_t	globals = { 0 };/* Global data */
+  static _cups_globals_t	globals = { 0 };/* Global data */
   static int		initialized = 0;/* Global data initialized? */
 
 

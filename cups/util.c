@@ -82,7 +82,7 @@ cupsCancelJob(const char *name,		/* I - Name of printer or class */
   ipp_t		*request,		/* IPP request */
 		*response;		/* IPP response */
   cups_lang_t	*language;		/* Language info */
-  cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
+  _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
 
 
  /*
@@ -160,7 +160,7 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
   struct stat	fileinfo;		/* File information */
   int		bytes;			/* Number of bytes read/written */
   char		buffer[32768];		/* Output buffer */
-  cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
+  _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
 
 
   DEBUG_printf(("cupsDoFileRequest(%p, %p, \'%s\', \'%s\')\n",
@@ -504,7 +504,7 @@ cupsGetClasses(char ***classes)		/* O - Classes */
   ipp_attribute_t *attr;		/* Current attribute */
   cups_lang_t	*language;		/* Default language */
   char		**temp;			/* Temporary pointer */
-  cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
+  _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
 
 
   if (classes == NULL)
@@ -611,7 +611,7 @@ const char *				/* O - Default printer or NULL */
 cupsGetDefault(void)
 {
   const char	*var;			/* Environment variable */
-  cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
+  _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
 
 
  /*
@@ -657,7 +657,7 @@ cupsGetDefault2(http_t *http)		/* I - HTTP connection */
   ipp_attribute_t *attr;		/* Current attribute */
   cups_lang_t	*language;		/* Default language */
   const char	*var;			/* Environment variable */
-  cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
+  _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
 
 
  /*
@@ -736,7 +736,7 @@ cupsGetJobs(cups_job_t **jobs,		/* O - Job data */
             int        myjobs,		/* I - Only show my jobs? */
 	    int        completed)	/* I - Only show completed jobs? */
 {
-  cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
+  _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
 
  /*
   * Try to connect to the server...
@@ -787,7 +787,7 @@ cupsGetJobs2(http_t     *http,		/* I - HTTP connection */
 		*title,			/* job-name */
 		*user;			/* job-originating-user-name */
   char		uri[HTTP_MAX_URI];	/* URI for jobs */
-  cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
+  _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
   static const char * const attrs[] =	/* Requested attributes */
 		{
 		  "job-id",
@@ -1019,7 +1019,7 @@ cupsGetJobs2(http_t     *http,		/* I - HTTP connection */
 const char *				/* O - Filename for PPD file */
 cupsGetPPD(const char *name)		/* I - Printer name */
 {
-  cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
+  _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
 
  /*
   * See if we can connect to the server...
@@ -1063,7 +1063,7 @@ cupsGetPPD2(http_t     *http,		/* I - HTTP connection */
 		resource[HTTP_MAX_URI];	/* Resource name */
   int		port;			/* Port number */
   http_status_t	status;			/* HTTP status from server */
-  cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
+  _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
   static const char * const requested_attrs[] =
 		{			/* Requested attributes */
 		  "printer-uri-supported",
@@ -1276,7 +1276,7 @@ cupsGetPrinters(char ***printers)	/* O - Printers */
   ipp_attribute_t *attr;		/* Current attribute */
   cups_lang_t	*language;		/* Default language */
   char		**temp;			/* Temporary pointer */
-  cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
+  _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
 
 
   if (printers == NULL)
@@ -1439,7 +1439,7 @@ cupsPrintFiles(const char    *name,	/* I - Printer or class name */
 					/* I - Number of options */
 	       cups_option_t *options)	/* I - Options */
 {
-  cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
+  _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
 
   DEBUG_printf(("cupsPrintFiles(name=\"%s\", num_files=%d, "
                 "files=%p, title=\"%s\", num_options=%d, options=%p)\n",
@@ -1491,7 +1491,7 @@ cupsPrintFiles2(http_t        *http,	/* I - HTTP connection */
   char		uri[HTTP_MAX_URI];	/* Printer URI */
   cups_lang_t	*language;		/* Language to use */
   int		jobid;			/* New job ID */
-  cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
+  _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
 
 
   DEBUG_printf(("cupsPrintFiles(http=%p, name=\"%s\", num_files=%d, "
@@ -1664,7 +1664,7 @@ cups_connect(const char *name,		/* I - Destination (printer[@host]) */
              char       *hostname)	/* O - Hostname [HTTP_MAX_URI] */
 {
   char	hostbuf[HTTP_MAX_URI];		/* Name of host */
-  cups_globals_t  *cg = _cupsGlobals();	/* Pointer to library globals */
+  _cups_globals_t  *cg = _cupsGlobals();	/* Pointer to library globals */
 
 
   DEBUG_printf(("cups_connect(\"%s\", %p, %p)\n", name, printer, hostname));

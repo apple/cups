@@ -244,7 +244,7 @@ cupsParseOptions(const char    *arg,		/* I - Argument to parse */
       while (*ptr != '\'' && *ptr != '\0')
       {
         if (*ptr == '\\')
-	  cups_strcpy(ptr, ptr + 1);
+	  _cups_strcpy(ptr, ptr + 1);
 
         ptr ++;
       }
@@ -264,7 +264,7 @@ cupsParseOptions(const char    *arg,		/* I - Argument to parse */
       while (*ptr != '\"' && *ptr != '\0')
       {
         if (*ptr == '\\')
-	  cups_strcpy(ptr, ptr + 1);
+	  _cups_strcpy(ptr, ptr + 1);
 
         ptr ++;
       }
@@ -297,7 +297,7 @@ cupsParseOptions(const char    *arg,		/* I - Argument to parse */
 	  }
         }
         else if (*ptr == '\\')
-	  cups_strcpy(ptr, ptr + 1);
+	  _cups_strcpy(ptr, ptr + 1);
 
       if (*ptr != '\0')
         *ptr++ = '\0';
@@ -313,7 +313,7 @@ cupsParseOptions(const char    *arg,		/* I - Argument to parse */
       while (!isspace(*ptr & 255) && *ptr != '\0')
       {
         if (*ptr == '\\')
-	  cups_strcpy(ptr, ptr + 1);
+	  _cups_strcpy(ptr, ptr + 1);
 
         ptr ++;
       }

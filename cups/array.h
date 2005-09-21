@@ -47,12 +47,10 @@ extern "C" {
  * Types and structures...
  */
 
-struct cups_array_s;			/**** CUPS array structure @private ****/
-typedef struct cups_array_s cups_array_t;
+typedef struct _cups_array_s cups_array_t;
 					/**** CUPS array type ****/
-typedef int (*cups_array_func_t)(const void *first, const void *second,
-                                 void *data);
-					/**** Comparison function ****/
+typedef int (*cups_array_func_t)(void *first, void *second, void *data);
+					/**** Array comparison function ****/
 
 /*
  * Functions...

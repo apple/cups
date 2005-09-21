@@ -84,12 +84,10 @@
 
 
 /*
- * CUPS file structure...
- *
- * @private
+ * Types and structures...
  */
+struct _cups_file_s			/**** CUPS file structure... ****/
 
-struct cups_file_s
 {
   int		fd;			/* File descriptor */
   char		mode,			/* Mode ('r' or 'w') */
@@ -317,7 +315,7 @@ cupsFileGetConf(cups_file_t *fp,	/* I  - CUPS file */
     for (ptr = buf; isspace(*ptr & 255); ptr ++);
 
     if (ptr > buf)
-      cups_strcpy(buf, ptr);
+      _cups_strcpy(buf, ptr);
 
    /*
     * See if there is anything left...
@@ -1402,7 +1400,7 @@ cups_fill(cups_file_t *fp)		/* I - CUPS file */
  * 'cups_read()' - Read from a file descriptor.
  */
 
-ssize_t					/* O - Number of bytes read or -1 */
+static ssize_t				/* O - Number of bytes read or -1 */
 cups_read(cups_file_t *fp,		/* I - CUPS file */
           char        *buf,		/* I - Buffer */
 	  size_t      bytes)		/* I - Number bytes */
@@ -1446,7 +1444,7 @@ cups_read(cups_file_t *fp,		/* I - CUPS file */
  * 'cups_write()' - Write to a file descriptor.
  */
 
-ssize_t					/* O - Number of bytes written or -1 */
+static ssize_t				/* O - Number of bytes written or -1 */
 cups_write(cups_file_t *fp,		/* I - CUPS file */
            const char  *buf,		/* I - Buffer */
 	   size_t      bytes)		/* I - Number bytes */

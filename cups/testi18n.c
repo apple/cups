@@ -240,7 +240,7 @@ test_transcode(const int verbose)       /* I - Verbose flag */
   cups_utf16_t  utf16dest[1024];        /* UTF-16 destination string */
   cups_utf32_t  utf32src[1024];         /* UTF-32 source string */
   cups_utf32_t  utf32dest[1024];        /* UTF-32 destination string */
-  cups_vmap_t   *vmap;                  /* VBCS charmap pointer */
+  _cups_vmap_t   *vmap;                  /* VBCS charmap pointer */
 
  /*
   * Test with (inserted) and (deleted) leading BOM...
@@ -283,7 +283,7 @@ test_transcode(const int verbose)       /* I - Verbose flag */
   */
   if (verbose)
     printf("\ntesti18n: Loading VBCS charmap EUC-JP (Japanese)...\n");
-  vmap = (cups_vmap_t *) cupsCharmapGet(CUPS_EUC_JP);
+  vmap = (_cups_vmap_t *) cupsCharmapGet(CUPS_EUC_JP);
   if (vmap == NULL)
     return (1);
   if (verbose)
@@ -297,7 +297,7 @@ test_transcode(const int verbose)       /* I - Verbose flag */
   */
   if (verbose)
     printf("\ntesti18n: Loading VBCS charmap EUC-TW (Taiwan)...\n");
-  vmap = (cups_vmap_t *) cupsCharmapGet(CUPS_EUC_TW);
+  vmap = (_cups_vmap_t *) cupsCharmapGet(CUPS_EUC_TW);
   if (vmap == NULL)
     return (1);
   if (verbose)

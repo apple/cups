@@ -52,7 +52,7 @@
  * Types and structures...
  */
 
-struct cups_array_s			/**** CUPS array structure @private ****/
+struct _cups_array_s			/**** CUPS array structure ****/
 {
  /*
   * The current implementation uses an insertion sort into an array of

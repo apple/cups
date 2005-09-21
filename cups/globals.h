@@ -63,7 +63,7 @@ extern "C" {
  * specific data) for the static variables used in the library.
  */
 
-typedef struct cups_globals_s		/**** CUPS global state data ****/
+typedef struct _cups_globals_s		/**** CUPS global state data ****/
 {
   /* http.c */
   char			http_date[256];	/* Date+time buffer */
@@ -87,11 +87,11 @@ typedef struct cups_globals_s		/**** CUPS global state data ****/
 					/* Unknown error statuses */
 
   /* normalize.c */
-  cups_normmap_t	*normmap_cache;	/* Normalize Map cache */
-  cups_foldmap_t	*foldmap_cache;	/* Case Fold cache */
-  cups_propmap_t	*propmap_cache;	/* Char Prop Map Cache */
-  cups_combmap_t	*combmap_cache;	/* Comb Class Map Cache */
-  cups_breakmap_t	*breakmap_cache;/* Line Break Map Cache */
+  _cups_norm_map_t	*normmap_cache;	/* Normalize Map cache */
+  _cups_fold_map_t	*foldmap_cache;	/* Case Fold cache */
+  _cups_prop_map_t	*propmap_cache;	/* Char Prop Map Cache */
+  _cups_comb_map_t	*combmap_cache;	/* Comb Class Map Cache */
+  _cups_break_map_t	*breakmap_cache;/* Line Break Map Cache */
 
   /* language.c */
   cups_lang_t		*lang_cache;	/* Language string cache */
@@ -112,8 +112,8 @@ typedef struct cups_globals_s		/**** CUPS global state data ****/
   char			tempfile[1024];	/* cupsTempFd/File buffer */
 
   /* transcode.c */
-  cups_cmap_t		*cmap_cache;	/* SBCS Charmap Cache */
-  cups_vmap_t		*vmap_cache;	/* VBCS Charmap Cache */
+  _cups_cmap_t		*cmap_cache;	/* SBCS Charmap Cache */
+  _cups_vmap_t		*vmap_cache;	/* VBCS Charmap Cache */
 
   /* usersys.c */
   http_encryption_t	encryption;	/* Encryption setting */
@@ -129,7 +129,7 @@ typedef struct cups_globals_s		/**** CUPS global state data ****/
 					/* Default printer */
   char			ppd_filename[HTTP_MAX_URI];
 					/* PPD filename */
-} cups_globals_t;
+} _cups_globals_t;
 
 
 /*
@@ -137,7 +137,7 @@ typedef struct cups_globals_s		/**** CUPS global state data ****/
  */
 
 extern const char	*_cupsGetPassword(const char *prompt);
-extern cups_globals_t	*_cupsGlobals(void);
+extern _cups_globals_t	*_cupsGlobals(void);
 
 
 /*

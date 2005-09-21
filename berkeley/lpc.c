@@ -99,7 +99,7 @@ main(int  argc,		/* I - Number of command-line arguments */
       */
 
       while (isspace(line[0] & 255))
-        cups_strcpy(line, line + 1);
+        _cups_strcpy(line, line + 1);
 
       for (params = line; *params != '\0'; params ++)
         if (isspace(*params & 255))

@@ -309,7 +309,7 @@ cupsdStatBufUpdate(cupsd_statbuf_t *sb,	/* I - Status buffer */
   * Copy over the buffer data we've used up...
   */
 
-  cups_strcpy(sb->buffer, lineptr);
+  _cups_strcpy(sb->buffer, lineptr);
   sb->bufused -= lineptr - sb->buffer;
 
   if (sb->bufused < 0)
