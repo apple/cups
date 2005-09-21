@@ -59,7 +59,9 @@ cupsEncryption(void)
   cups_file_t	*fp;			/* client.conf file */
   char		*encryption;		/* CUPS_ENCRYPTION variable */
   const char	*home;			/* Home directory of user */
-  char		line[1024];		/* Line from file */
+  char		line[1024],		/* Line from file */
+		*value;			/* Value on line */
+  int		linenum;		/* Line number */
   cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
 
 
@@ -106,19 +108,16 @@ cupsEncryption(void)
 	* Read the config file and look for an Encryption line...
 	*/
 
-	while (cupsFileGets(fp, line, sizeof(line)) != NULL)
-	  if (strncmp(line, "Encryption ", 11) == 0 ||
-	      strncmp(line, "Encryption\t", 11) == 0)
+        linenum = 0;
+
+	while (cupsFileGetConf(fp, line, sizeof(line), &value, &linenum) != NULL)
+	  if (!strcasecmp(line, "Encryption") && value)
 	  {
 	   /*
-	    * Got it!  Drop any trailing newline and find the name...
+	    * Got it!
 	    */
 
-	    encryption = line + strlen(line) - 1;
-	    if (*encryption == '\n')
-              *encryption = '\0';
-
-	    for (encryption = line + 11; isspace(*encryption & 255); encryption ++);
+	    encryption = value;
 	    break;
 	  }
 
@@ -130,11 +129,11 @@ cupsEncryption(void)
     * Set the encryption preference...
     */
 
-    if (strcasecmp(encryption, "never") == 0)
+    if (!strcasecmp(encryption, "never"))
       cg->encryption = HTTP_ENCRYPT_NEVER;
-    else if (strcasecmp(encryption, "always") == 0)
+    else if (!strcasecmp(encryption, "always"))
       cg->encryption = HTTP_ENCRYPT_ALWAYS;
-    else if (strcasecmp(encryption, "required") == 0)
+    else if (!strcasecmp(encryption, "required"))
       cg->encryption = HTTP_ENCRYPT_REQUIRED;
     else
       cg->encryption = HTTP_ENCRYPT_IF_REQUESTED;
@@ -228,7 +227,7 @@ cupsServer(void)
 
         linenum = 0;
 	while (cupsFileGetConf(fp, line, sizeof(line), &value, &linenum) != NULL)
-	  if (!strcmp(line, "ServerName") && value)
+	  if (!strcasecmp(line, "ServerName") && value)
 	  {
 	   /*
 	    * Got it!
