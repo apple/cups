@@ -169,7 +169,7 @@ libmime.a:	$(MIMEOBJS)
 
 testmime:	testmime.o libmime.a
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ testmime.o libmime.a ../cups/libcups.a $(LIBZ)
+	$(CC) $(LDFLAGS) -o $@ testmime.o libmime.a ../cups/libcups.a $(COMMONLIBS) $(LIBZ)
 
 
 #

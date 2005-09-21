@@ -84,13 +84,6 @@
 
 
 /*
- * What is the format string for strftime?
- */
-
-#define CUPS_STRFTIME_FORMAT	NULL
-
-
-/*
  * Do we have various image libraries?
  */
 
@@ -291,6 +284,12 @@
  */
 
 #undef HAVE_USERSEC_H
+
+/*
+ * Do we have pthread support?
+ */
+
+#undef HAVE_PTHREAD_H
 
 
 /*

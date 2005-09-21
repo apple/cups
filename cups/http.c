@@ -81,18 +81,11 @@
  */
 
 #include "http-private.h"
-
-#include <stdio.h>
+#include "globals.h"
+#include "debug.h"
 #include <stdlib.h>
-#include <stdarg.h>
-#include <ctype.h>
-#include "string.h"
 #include <fcntl.h>
 #include <errno.h>
-
-#include "http.h"
-#include "debug.h"
-
 #ifndef WIN32
 #  include <signal.h>
 #  include <sys/time.h>
@@ -697,16 +690,16 @@ httpGet(http_t     *http,		/* I - HTTP data */
 /*
  * 'httpGetDateString()' - Get a formatted date/time string from a time value.
  *
- * This function is not thread-safe and is therefore deprecated.
+ * @deprecated
  */
 
 const char *				/* O - Date/time string */
 httpGetDateString(time_t t)		/* I - UNIX time */
 {
-  static char	datetime[256];		/* Date/time string */
+  cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
 
 
-  return (httpGetDateString2(t, datetime, sizeof(datetime)));
+  return (httpGetDateString2(t, cg->http_date, sizeof(cg->http_date)));
 }
 
 

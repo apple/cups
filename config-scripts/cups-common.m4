@@ -134,22 +134,6 @@ else
 	AC_CHECK_FUNCS(snprintf vsnprintf)
 fi
 
-dnl Check OS version and use appropriate format string for strftime...
-AC_MSG_CHECKING(for correct format string to use with strftime)
-
-case "$uname" in
-	IRIX | SunOS*)
-		# IRIX and SunOS
-		AC_MSG_RESULT(NULL)
-		AC_DEFINE(CUPS_STRFTIME_FORMAT, NULL)
-		;;
-	*)
-		# All others
-		AC_MSG_RESULT("%c")
-		AC_DEFINE(CUPS_STRFTIME_FORMAT, "%c")
-		;;
-esac
-
 dnl Checks for mkstemp and mkstemps functions.
 AC_CHECK_FUNCS(mkstemp mkstemps)
 

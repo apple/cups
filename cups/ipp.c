@@ -68,15 +68,10 @@
  * Include necessary headers...
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include "string.h"
-
-#include "ipp.h"
+#include "globals.h"
 #include "debug.h"
-#include <ctype.h>
+#include <stdlib.h>
 #include <errno.h>
-
 #ifdef WIN32
 #  include <io.h>
 #endif /* WIN32 */
@@ -96,13 +91,13 @@ static int		ipp_write_file(int *fd, ipp_uchar_t *buffer, int length);
  * 'ippAddBoolean()' - Add a boolean attribute to an IPP request.
  */
 
-ipp_attribute_t *				/* O - New attribute */
-ippAddBoolean(ipp_t      *ipp,			/* I - IPP request */
-              ipp_tag_t  group,			/* I - IPP group */
-              const char *name,			/* I - Name of attribute */
-              char       value)			/* I - Value of attribute */
+ipp_attribute_t *			/* O - New attribute */
+ippAddBoolean(ipp_t      *ipp,		/* I - IPP request */
+              ipp_tag_t  group,		/* I - IPP group */
+              const char *name,		/* I - Name of attribute */
+              char       value)		/* I - Value of attribute */
 {
-  ipp_attribute_t	*attr;			/* New attribute */
+  ipp_attribute_t	*attr;		/* New attribute */
 
 
   DEBUG_printf(("ippAddBoolean(%p, %02x, \'%s\', %d)\n", ipp, group, name, value));
@@ -126,16 +121,16 @@ ippAddBoolean(ipp_t      *ipp,			/* I - IPP request */
  * 'ippAddBooleans()' - Add an array of boolean values.
  */
 
-ipp_attribute_t *				/* O - New attribute */
-ippAddBooleans(ipp_t      *ipp,			/* I - IPP request */
-               ipp_tag_t  group,		/* I - IPP group */
-	       const char *name,		/* I - Name of attribute */
-	       int        num_values,		/* I - Number of values */
-	       const char *values)		/* I - Values */
+ipp_attribute_t *			/* O - New attribute */
+ippAddBooleans(ipp_t      *ipp,		/* I - IPP request */
+               ipp_tag_t  group,	/* I - IPP group */
+	       const char *name,	/* I - Name of attribute */
+	       int        num_values,	/* I - Number of values */
+	       const char *values)	/* I - Values */
 {
-  int			i;			/* Looping var */
-  ipp_attribute_t	*attr;			/* New attribute */
-  ipp_value_t		*value;			/* Current value */
+  int			i;		/* Looping var */
+  ipp_attribute_t	*attr;		/* New attribute */
+  ipp_value_t		*value;		/* Current value */
 
 
   DEBUG_printf(("ippAddBooleans(%p, %02x, \'%s\', %d, %p)\n", ipp,
@@ -165,13 +160,13 @@ ippAddBooleans(ipp_t      *ipp,			/* I - IPP request */
  * 'ippAddCollection()' - Add a collection value.
  */
 
-ipp_attribute_t *				/* O - New attribute */
-ippAddCollection(ipp_t      *ipp,		/* I - IPP request */
-                 ipp_tag_t  group,		/* I - IPP group */
-		 const char *name,		/* I - Name of attribute */
-		 ipp_t      *value)		/* I - Value */
+ipp_attribute_t *			/* O - New attribute */
+ippAddCollection(ipp_t      *ipp,	/* I - IPP request */
+                 ipp_tag_t  group,	/* I - IPP group */
+		 const char *name,	/* I - Name of attribute */
+		 ipp_t      *value)	/* I - Value */
 {
-  ipp_attribute_t	*attr;			/* New attribute */
+  ipp_attribute_t	*attr;		/* New attribute */
 
 
   DEBUG_printf(("ippAddCollection(%p, %02x, \'%s\', %p)\n", ipp, group, name,
@@ -196,16 +191,17 @@ ippAddCollection(ipp_t      *ipp,		/* I - IPP request */
  * 'ippAddCollections()' - Add an array of collection values.
  */
 
-ipp_attribute_t *				/* O - New attribute */
-ippAddCollections(ipp_t       *ipp,		/* I - IPP request */
-                  ipp_tag_t   group,		/* I - IPP group */
-		  const char  *name,		/* I - Name of attribute */
-		  int         num_values,	/* I - Number of values */
-		  const ipp_t **values)		/* I - Values */
+ipp_attribute_t *			/* O - New attribute */
+ippAddCollections(
+    ipp_t       *ipp,			/* I - IPP request */
+    ipp_tag_t   group,			/* I - IPP group */
+    const char  *name,			/* I - Name of attribute */
+    int         num_values,		/* I - Number of values */
+    const ipp_t **values)		/* I - Values */
 {
-  int			i;			/* Looping var */
-  ipp_attribute_t	*attr;			/* New attribute */
-  ipp_value_t		*value;			/* Current value */
+  int			i;		/* Looping var */
+  ipp_attribute_t	*attr;		/* New attribute */
+  ipp_value_t		*value;		/* Current value */
 
 
   DEBUG_printf(("ippAddCollections(%p, %02x, \'%s\', %d, %p)\n", ipp,
@@ -235,13 +231,13 @@ ippAddCollections(ipp_t       *ipp,		/* I - IPP request */
  * 'ippAddDate()' - Add a date attribute to an IPP request.
  */
 
-ipp_attribute_t *				/* O - New attribute */
-ippAddDate(ipp_t             *ipp,		/* I - IPP request */
-           ipp_tag_t         group,		/* I - IPP group */
-	   const char        *name,		/* I - Name of attribute */
-	   const ipp_uchar_t *value)		/* I - Value */
+ipp_attribute_t *			/* O - New attribute */
+ippAddDate(ipp_t             *ipp,	/* I - IPP request */
+           ipp_tag_t         group,	/* I - IPP group */
+	   const char        *name,	/* I - Name of attribute */
+	   const ipp_uchar_t *value)	/* I - Value */
 {
-  ipp_attribute_t	*attr;			/* New attribute */
+  ipp_attribute_t	*attr;		/* New attribute */
 
 
   DEBUG_printf(("ippAddDate(%p, %02x, \'%s\', %p)\n", ipp, group, name,
@@ -266,14 +262,14 @@ ippAddDate(ipp_t             *ipp,		/* I - IPP request */
  * 'ippAddInteger()' - Add a integer attribute to an IPP request.
  */
 
-ipp_attribute_t *				/* O - New attribute */
-ippAddInteger(ipp_t      *ipp,			/* I - IPP request */
-              ipp_tag_t  group,			/* I - IPP group */
-	      ipp_tag_t  type,			/* I - Type of attribute */
-              const char *name,			/* I - Name of attribute */
-              int        value)			/* I - Value of attribute */
+ipp_attribute_t *			/* O - New attribute */
+ippAddInteger(ipp_t      *ipp,		/* I - IPP request */
+              ipp_tag_t  group,		/* I - IPP group */
+	      ipp_tag_t  type,		/* I - Type of attribute */
+              const char *name,		/* I - Name of attribute */
+              int        value)		/* I - Value of attribute */
 {
-  ipp_attribute_t	*attr;			/* New attribute */
+  ipp_attribute_t	*attr;		/* New attribute */
 
 
   DEBUG_printf(("ippAddInteger(%p, %d, \'%s\', %d)\n", ipp, group, name,
@@ -298,17 +294,17 @@ ippAddInteger(ipp_t      *ipp,			/* I - IPP request */
  * 'ippAddIntegers()' - Add an array of integer values.
  */
 
-ipp_attribute_t *				/* O - New attribute */
-ippAddIntegers(ipp_t      *ipp,			/* I - IPP request */
-               ipp_tag_t  group,		/* I - IPP group */
-	       ipp_tag_t  type,			/* I - Type of attribute */
-	       const char *name,		/* I - Name of attribute */
-	       int        num_values,		/* I - Number of values */
-	       const int  *values)		/* I - Values */
+ipp_attribute_t *			/* O - New attribute */
+ippAddIntegers(ipp_t      *ipp,		/* I - IPP request */
+               ipp_tag_t  group,	/* I - IPP group */
+	       ipp_tag_t  type,		/* I - Type of attribute */
+	       const char *name,	/* I - Name of attribute */
+	       int        num_values,	/* I - Number of values */
+	       const int  *values)	/* I - Values */
 {
-  int			i;			/* Looping var */
-  ipp_attribute_t	*attr;			/* New attribute */
-  ipp_value_t		*value;			/* Current value */
+  int			i;		/* Looping var */
+  ipp_attribute_t	*attr;		/* New attribute */
+  ipp_value_t		*value;		/* Current value */
 
 
   if (ipp == NULL || name == NULL || num_values < 1)
@@ -335,15 +331,15 @@ ippAddIntegers(ipp_t      *ipp,			/* I - IPP request */
  * 'ippAddString()' - Add a language-encoded string to an IPP request.
  */
 
-ipp_attribute_t *				/* O - New attribute */
-ippAddString(ipp_t      *ipp,			/* I - IPP request */
-             ipp_tag_t  group,			/* I - IPP group */
-	     ipp_tag_t  type,			/* I - Type of attribute */
-             const char *name,			/* I - Name of attribute */
-             const char *charset,		/* I - Character set */
-             const char *value)			/* I - Value */
+ipp_attribute_t *			/* O - New attribute */
+ippAddString(ipp_t      *ipp,		/* I - IPP request */
+             ipp_tag_t  group,		/* I - IPP group */
+	     ipp_tag_t  type,		/* I - Type of attribute */
+             const char *name,		/* I - Name of attribute */
+             const char *charset,	/* I - Character set */
+             const char *value)		/* I - Value */
 {
-  ipp_attribute_t	*attr;			/* New attribute */
+  ipp_attribute_t	*attr;		/* New attribute */
 
 
   if (ipp == NULL || name == NULL)
@@ -396,18 +392,19 @@ ippAddString(ipp_t      *ipp,			/* I - IPP request */
  * 'ippAddStrings()' - Add language-encoded strings to an IPP request.
  */
 
-ipp_attribute_t *				/* O - New attribute */
-ippAddStrings(ipp_t              *ipp,		/* I - IPP request */
-              ipp_tag_t          group,		/* I - IPP group */
-	      ipp_tag_t          type,		/* I - Type of attribute */
-	      const char         *name,		/* I - Name of attribute */
-	      int                num_values,	/* I - Number of values */
-	      const char         *charset,	/* I - Character set */
-	      const char * const *values)	/* I - Values */
+ipp_attribute_t *			/* O - New attribute */
+ippAddStrings(
+    ipp_t              *ipp,		/* I - IPP request */
+    ipp_tag_t          group,		/* I - IPP group */
+    ipp_tag_t          type,		/* I - Type of attribute */
+    const char         *name,		/* I - Name of attribute */
+    int                num_values,	/* I - Number of values */
+    const char         *charset,	/* I - Character set */
+    const char * const *values)		/* I - Values */
 {
-  int			i;			/* Looping var */
-  ipp_attribute_t	*attr;			/* New attribute */
-  ipp_value_t		*value;			/* Current value */
+  int			i;		/* Looping var */
+  ipp_attribute_t	*attr;		/* New attribute */
+  ipp_value_t		*value;		/* Current value */
 
 
   if (ipp == NULL || name == NULL || num_values < 1)
@@ -457,14 +454,14 @@ ippAddStrings(ipp_t              *ipp,		/* I - IPP request */
  * 'ippAddRange()' - Add a range of values to an IPP request.
  */
 
-ipp_attribute_t *				/* O - New attribute */
-ippAddRange(ipp_t      *ipp,			/* I - IPP request */
-            ipp_tag_t  group,			/* I - IPP group */
-	    const char *name,			/* I - Name of attribute */
-	    int        lower,			/* I - Lower value */
-	    int        upper)			/* I - Upper value */
+ipp_attribute_t *			/* O - New attribute */
+ippAddRange(ipp_t      *ipp,		/* I - IPP request */
+            ipp_tag_t  group,		/* I - IPP group */
+	    const char *name,		/* I - Name of attribute */
+	    int        lower,		/* I - Lower value */
+	    int        upper)		/* I - Upper value */
 {
-  ipp_attribute_t	*attr;			/* New attribute */
+  ipp_attribute_t	*attr;		/* New attribute */
 
 
   if (ipp == NULL || name == NULL)
@@ -487,17 +484,17 @@ ippAddRange(ipp_t      *ipp,			/* I - IPP request */
  * 'ippAddRanges()' - Add ranges of values to an IPP request.
  */
 
-ipp_attribute_t *				/* O - New attribute */
-ippAddRanges(ipp_t      *ipp,			/* I - IPP request */
-             ipp_tag_t  group,			/* I - IPP group */
-	     const char *name,			/* I - Name of attribute */
-	     int        num_values,		/* I - Number of values */
-	     const int  *lower,			/* I - Lower values */
-	     const int  *upper)			/* I - Upper values */
+ipp_attribute_t *			/* O - New attribute */
+ippAddRanges(ipp_t      *ipp,		/* I - IPP request */
+             ipp_tag_t  group,		/* I - IPP group */
+	     const char *name,		/* I - Name of attribute */
+	     int        num_values,	/* I - Number of values */
+	     const int  *lower,		/* I - Lower values */
+	     const int  *upper)		/* I - Upper values */
 {
-  int			i;			/* Looping var */
-  ipp_attribute_t	*attr;			/* New attribute */
-  ipp_value_t		*value;			/* Current value */
+  int			i;		/* Looping var */
+  ipp_attribute_t	*attr;		/* New attribute */
+  ipp_value_t		*value;		/* Current value */
 
 
   if (ipp == NULL || name == NULL || num_values < 1)
@@ -527,15 +524,15 @@ ippAddRanges(ipp_t      *ipp,			/* I - IPP request */
  * 'ippAddResolution()' - Add a resolution value to an IPP request.
  */
 
-ipp_attribute_t *				/* O - New attribute */
-ippAddResolution(ipp_t      *ipp,		/* I - IPP request */
-        	 ipp_tag_t  group,		/* I - IPP group */
-		 const char *name,		/* I - Name of attribute */
-		 ipp_res_t  units,		/* I - Units for resolution */
-		 int        xres,		/* I - X resolution */
-		 int        yres)		/* I - Y resolution */
+ipp_attribute_t *			/* O - New attribute */
+ippAddResolution(ipp_t      *ipp,	/* I - IPP request */
+        	 ipp_tag_t  group,	/* I - IPP group */
+		 const char *name,	/* I - Name of attribute */
+		 ipp_res_t  units,	/* I - Units for resolution */
+		 int        xres,	/* I - X resolution */
+		 int        yres)	/* I - Y resolution */
 {
-  ipp_attribute_t	*attr;			/* New attribute */
+  ipp_attribute_t	*attr;		/* New attribute */
 
 
   if (ipp == NULL || name == NULL)
@@ -559,18 +556,18 @@ ippAddResolution(ipp_t      *ipp,		/* I - IPP request */
  * 'ippAddResolutions()' - Add resolution values to an IPP request.
  */
 
-ipp_attribute_t *				/* O - New attribute */
-ippAddResolutions(ipp_t      *ipp,		/* I - IPP request */
-        	  ipp_tag_t  group,		/* I - IPP group */
-		  const char *name,		/* I - Name of attribute */
-		  int        num_values,	/* I - Number of values */
-		  ipp_res_t  units,		/* I - Units for resolution */
-		  const int  *xres,		/* I - X resolutions */
-		  const int  *yres)		/* I - Y resolutions */
+ipp_attribute_t *			/* O - New attribute */
+ippAddResolutions(ipp_t      *ipp,	/* I - IPP request */
+        	  ipp_tag_t  group,	/* I - IPP group */
+		  const char *name,	/* I - Name of attribute */
+		  int        num_values,/* I - Number of values */
+		  ipp_res_t  units,	/* I - Units for resolution */
+		  const int  *xres,	/* I - X resolutions */
+		  const int  *yres)	/* I - Y resolutions */
 {
-  int			i;			/* Looping var */
-  ipp_attribute_t	*attr;			/* New attribute */
-  ipp_value_t		*value;			/* Current value */
+  int			i;		/* Looping var */
+  ipp_attribute_t	*attr;		/* New attribute */
+  ipp_value_t		*value;		/* Current value */
 
 
   if (ipp == NULL || name == NULL || num_values < 1)
@@ -601,10 +598,10 @@ ippAddResolutions(ipp_t      *ipp,		/* I - IPP request */
  * 'ippAddSeparator()' - Add a group separator to an IPP request.
  */
 
-ipp_attribute_t *				/* O - New attribute */
-ippAddSeparator(ipp_t *ipp)			/* I - IPP request */
+ipp_attribute_t *			/* O - New attribute */
+ippAddSeparator(ipp_t *ipp)		/* I - IPP request */
 {
-  ipp_attribute_t	*attr;			/* New attribute */
+  ipp_attribute_t	*attr;		/* New attribute */
 
 
   DEBUG_printf(("ippAddSeparator(%p)\n", ipp));
@@ -627,11 +624,11 @@ ippAddSeparator(ipp_t *ipp)			/* I - IPP request */
  *                     in seconds.
  */
 
-time_t						/* O - UNIX time value */
-ippDateToTime(const ipp_uchar_t *date)		/* I - RFC 1903 date info */
+time_t					/* O - UNIX time value */
+ippDateToTime(const ipp_uchar_t *date)	/* I - RFC 1903 date info */
 {
-  struct tm	unixdate;			/* UNIX date/time info */
-  time_t	t;				/* Computed time */
+  struct tm	unixdate;		/* UNIX date/time info */
+  time_t	t;			/* Computed time */
 
 
   memset(&unixdate, 0, sizeof(unixdate));
@@ -676,10 +673,10 @@ ippDateToTime(const ipp_uchar_t *date)		/* I - RFC 1903 date info */
  */
 
 void
-ippDelete(ipp_t *ipp)				/* I - IPP request */
+ippDelete(ipp_t *ipp)			/* I - IPP request */
 {
-  ipp_attribute_t	*attr,			/* Current attribute */
-			*next;			/* Next attribute */
+  ipp_attribute_t	*attr,		/* Current attribute */
+			*next;		/* Next attribute */
 
 
   DEBUG_printf(("ippDelete(): %p\n", ipp));
@@ -702,9 +699,42 @@ ippDelete(ipp_t *ipp)				/* I - IPP request */
  */
 
 void
-ippDeleteAttribute(ipp_t           *ipp,	/* I - IPP request */
-                   ipp_attribute_t *attr)	/* I - Attribute to delete */
+ippDeleteAttribute(
+    ipp_t           *ipp,		/* I - IPP request */
+    ipp_attribute_t *attr)		/* I - Attribute to delete */
 {
+  ipp_attribute_t	*current,	/* Current attribute */
+			*prev;		/* Previous attribute */
+
+
+ /*
+  * Find the attribute in the list...
+  */
+
+  for (current = ipp->attrs, prev = NULL;
+       current != NULL && current != attr;
+       prev = current, current = current->next);
+
+  if (current)
+  {
+   /*
+    * Found it, remove the attribute from the list...
+    */
+
+    if (prev)
+      prev->next = current->next;
+    else
+      ipp->attrs = current->next;
+
+    if (current == ipp->last)
+      ipp->last = prev;
+
+   /*
+    * Free memory used by the attribute...
+    */
+
+    _ipp_free_attr(current);
+  }
 }
 
 
@@ -712,10 +742,10 @@ ippDeleteAttribute(ipp_t           *ipp,	/* I - IPP request */
  * 'ippFindAttribute()' - Find a named attribute in a request...
  */
 
-ipp_attribute_t	*				/* O - Matching attribute */
-ippFindAttribute(ipp_t      *ipp,		/* I - IPP request */
-                 const char *name,		/* I - Name of attribute */
-		 ipp_tag_t  type)		/* I - Type of attribute */
+ipp_attribute_t	*			/* O - Matching attribute */
+ippFindAttribute(ipp_t      *ipp,	/* I - IPP request */
+                 const char *name,	/* I - Name of attribute */
+		 ipp_tag_t  type)	/* I - Type of attribute */
 {
   DEBUG_printf(("ippFindAttribute(%p, \'%s\')\n", ipp, name));
 
@@ -740,13 +770,13 @@ ippFindAttribute(ipp_t      *ipp,		/* I - IPP request */
  * 'ippFindNextAttribute()' - Find the next named attribute in a request...
  */
 
-ipp_attribute_t	*				/* O - Matching attribute */
-ippFindNextAttribute(ipp_t      *ipp,		/* I - IPP request */
-                     const char *name,		/* I - Name of attribute */
-		     ipp_tag_t  type)		/* I - Type of attribute */
+ipp_attribute_t	*			/* O - Matching attribute */
+ippFindNextAttribute(ipp_t      *ipp,	/* I - IPP request */
+                     const char *name,	/* I - Name of attribute */
+		     ipp_tag_t  type)	/* I - Type of attribute */
 {
-  ipp_attribute_t	*attr;			/* Current atttribute */
-  ipp_tag_t		value_tag;		/* Value tag */
+  ipp_attribute_t	*attr;		/* Current atttribute */
+  ipp_tag_t		value_tag;	/* Value tag */
 
 
   DEBUG_printf(("ippFindNextAttribute(%p, \'%s\')\n", ipp, name));
@@ -787,8 +817,8 @@ ippFindNextAttribute(ipp_t      *ipp,		/* I - IPP request */
  * 'ippLength()' - Compute the length of an IPP request.
  */
 
-size_t						/* O - Size of IPP request */
-ippLength(ipp_t *ipp)				/* I - IPP request */
+size_t					/* O - Size of IPP request */
+ippLength(ipp_t *ipp)			/* I - IPP request */
 {
   return (ipp_length(ipp, 0));
 }
@@ -824,9 +854,9 @@ ippNew(void)
  * 'ippRead()' - Read data for an IPP request from a HTTP connection.
  */
 
-ipp_state_t					/* O - Current state */
-ippRead(http_t *http,				/* I - HTTP connection */
-        ipp_t  *ipp)				/* I - IPP data */
+ipp_state_t				/* O - Current state */
+ippRead(http_t *http,			/* I - HTTP connection */
+        ipp_t  *ipp)			/* I - IPP data */
 {
   DEBUG_printf(("ippRead(http=%p, ipp=%p), data_remaining=%d\n", http, ipp,
                 http ? http->data_remaining : -1));
@@ -845,9 +875,9 @@ ippRead(http_t *http,				/* I - HTTP connection */
  * 'ippReadFile()' - Read data for an IPP request from a file.
  */
 
-ipp_state_t					/* O - Current state */
-ippReadFile(int   fd,				/* I - HTTP data */
-            ipp_t *ipp)				/* I - IPP data */
+ipp_state_t				/* O - Current state */
+ippReadFile(int   fd,			/* I - HTTP data */
+            ipp_t *ipp)			/* I - IPP data */
 {
   DEBUG_printf(("ippReadFile(%d, %p)\n", fd, ipp));
 
@@ -859,19 +889,19 @@ ippReadFile(int   fd,				/* I - HTTP data */
  * 'ippReadIO()' - Read data for an IPP request.
  */
 
-ipp_state_t					/* O - Current state */
-ippReadIO(void       *src,			/* I - Data source */
-          ipp_iocb_t cb,			/* I - Read callback function */
-	  int        blocking,			/* I - Use blocking IO? */
-	  ipp_t      *parent,			/* I - Parent request, if any */
-          ipp_t      *ipp)			/* I - IPP data */
+ipp_state_t				/* O - Current state */
+ippReadIO(void       *src,		/* I - Data source */
+          ipp_iocb_t cb,		/* I - Read callback function */
+	  int        blocking,		/* I - Use blocking IO? */
+	  ipp_t      *parent,		/* I - Parent request, if any */
+          ipp_t      *ipp)		/* I - IPP data */
 {
-  int			n;			/* Length of data */
-  unsigned char		buffer[32768],		/* Data buffer */
-			*bufptr;		/* Pointer into buffer */
-  ipp_attribute_t	*attr;			/* Current attribute */
-  ipp_tag_t		tag;			/* Current tag */
-  ipp_value_t		*value;			/* Current value */
+  int			n;		/* Length of data */
+  unsigned char		buffer[32768],	/* Data buffer */
+			*bufptr;	/* Pointer into buffer */
+  ipp_attribute_t	*attr;		/* Current attribute */
+  ipp_tag_t		tag;		/* Current tag */
+  ipp_value_t		*value;		/* Current value */
 
 
   DEBUG_printf(("ippReadIO(%p, %p, %d, %p, %p)\n", src, cb, blocking,
@@ -1343,11 +1373,12 @@ ippReadIO(void       *src,			/* I - Data source */
  * 'ippTimeToDate()' - Convert from UNIX time to RFC 1903 format.
  */
 
-const ipp_uchar_t *				/* O - RFC-1903 date/time data */
-ippTimeToDate(time_t t)				/* I - UNIX time value */
+const ipp_uchar_t *			/* O - RFC-1903 date/time data */
+ippTimeToDate(time_t t)			/* I - UNIX time value */
 {
-  struct tm		*unixdate;		/* UNIX unixdate/time info */
-  static ipp_uchar_t	date[11];		/* RFC-1903 date/time data */
+  struct tm	*unixdate;		/* UNIX unixdate/time info */
+  ipp_uchar_t	*date = _cupsGlobals()->ipp_date;
+					/* RFC-1903 date/time data */
 
 
  /*
@@ -1390,9 +1421,9 @@ ippTimeToDate(time_t t)				/* I - UNIX time value */
  * 'ippWrite()' - Write data for an IPP request to a HTTP connection.
  */
 
-ipp_state_t					/* O - Current state */
-ippWrite(http_t *http,				/* I - HTTP connection */
-         ipp_t  *ipp)				/* I - IPP data */
+ipp_state_t				/* O - Current state */
+ippWrite(http_t *http,			/* I - HTTP connection */
+         ipp_t  *ipp)			/* I - IPP data */
 {
   DEBUG_printf(("ippWrite(%p, %p)\n", http, ipp));
 
@@ -1408,9 +1439,9 @@ ippWrite(http_t *http,				/* I - HTTP connection */
  * 'ippWriteFile()' - Write data for an IPP request to a file.
  */
 
-ipp_state_t					/* O - Current state */
-ippWriteFile(int   fd,				/* I - HTTP data */
-             ipp_t *ipp)			/* I - IPP data */
+ipp_state_t				/* O - Current state */
+ippWriteFile(int   fd,			/* I - HTTP data */
+             ipp_t *ipp)		/* I - IPP data */
 {
   DEBUG_printf(("ippWriteFile(%d, %p)\n", fd, ipp));
 
@@ -1424,19 +1455,19 @@ ippWriteFile(int   fd,				/* I - HTTP data */
  * 'ippWriteIO()' - Write data for an IPP request.
  */
 
-ipp_state_t					/* O - Current state */
-ippWriteIO(void       *dst,			/* I - Destination */
-           ipp_iocb_t cb,			/* I - Write callback function */
-	   int        blocking,			/* I - Use blocking IO? */
-	   ipp_t      *parent,			/* I - Parent IPP request */
-           ipp_t      *ipp)			/* I - IPP data */
+ipp_state_t				/* O - Current state */
+ippWriteIO(void       *dst,		/* I - Destination */
+           ipp_iocb_t cb,		/* I - Write callback function */
+	   int        blocking,		/* I - Use blocking IO? */
+	   ipp_t      *parent,		/* I - Parent IPP request */
+           ipp_t      *ipp)		/* I - IPP data */
 {
-  int			i;			/* Looping var */
-  int			n;			/* Length of data */
-  unsigned char		buffer[32768],		/* Data buffer */
-			*bufptr;		/* Pointer into buffer */
-  ipp_attribute_t	*attr;			/* Current attribute */
-  ipp_value_t		*value;			/* Current value */
+  int			i;		/* Looping var */
+  int			n;		/* Length of data */
+  unsigned char		buffer[32768],	/* Data buffer */
+			*bufptr;	/* Pointer into buffer */
+  ipp_attribute_t	*attr;		/* Current attribute */
+  ipp_value_t		*value;		/* Current value */
 
 
   DEBUG_printf(("ippWriteIO(%p, %p, %d, %p, %p)\n", dst, cb, blocking,
@@ -2204,11 +2235,11 @@ ippWriteIO(void       *dst,			/* I - Destination */
  * '_ipp_add_attr()' - Add a new attribute to the request.
  */
 
-ipp_attribute_t *				/* O - New attribute */
-_ipp_add_attr(ipp_t *ipp,			/* I - IPP request */
-              int   num_values)			/* I - Number of values */
+ipp_attribute_t *			/* O - New attribute */
+_ipp_add_attr(ipp_t *ipp,		/* I - IPP request */
+              int   num_values)		/* I - Number of values */
 {
-  ipp_attribute_t	*attr;			/* New attribute */
+  ipp_attribute_t	*attr;		/* New attribute */
 
 
   DEBUG_printf(("_ipp_add_attr(%p, %d)\n", ipp, num_values));
@@ -2242,10 +2273,10 @@ _ipp_add_attr(ipp_t *ipp,			/* I - IPP request */
  */
 
 void
-_ipp_free_attr(ipp_attribute_t *attr)		/* I - Attribute to free */
+_ipp_free_attr(ipp_attribute_t *attr)	/* I - Attribute to free */
 {
-  int		i;				/* Looping var */
-  ipp_value_t	*value;				/* Current value */
+  int		i;			/* Looping var */
+  ipp_value_t	*value;			/* Current value */
 
 
   DEBUG_printf(("_ipp_free_attr(): %p\n", attr));
@@ -2294,15 +2325,15 @@ _ipp_free_attr(ipp_attribute_t *attr)		/* I - Attribute to free */
  * 'ipp_length()' - Compute the length of an IPP request or collection value.
  */
 
-static size_t					/* O - Size of IPP request */
-ipp_length(ipp_t *ipp,				/* I - IPP request or collection */
-           int   collection)			/* I - 1 if a collection, 0 otherwise */
+static size_t				/* O - Size of IPP request */
+ipp_length(ipp_t *ipp,			/* I - IPP request or collection */
+           int   collection)		/* I - 1 if a collection, 0 otherwise */
 {
-  int			i;			/* Looping var */
-  int			bytes;			/* Number of bytes */
-  ipp_attribute_t	*attr;			/* Current attribute */
-  ipp_tag_t		group;			/* Current group */
-  ipp_value_t		*value;			/* Current value */
+  int			i;		/* Looping var */
+  int			bytes;		/* Number of bytes */
+  ipp_attribute_t	*attr;		/* Current attribute */
+  ipp_tag_t		group;		/* Current group */
+  ipp_value_t		*value;		/* Current value */
 
 
   if (ipp == NULL)
@@ -2437,14 +2468,14 @@ ipp_length(ipp_t *ipp,				/* I - IPP request or collection */
  * 'ipp_read_http()' - Semi-blocking read on a HTTP connection...
  */
 
-static int					/* O - Number of bytes read */
-ipp_read_http(http_t      *http,		/* I - Client connection */
-              ipp_uchar_t *buffer,		/* O - Buffer for data */
-	      int         length)		/* I - Total length */
+static int				/* O - Number of bytes read */
+ipp_read_http(http_t      *http,	/* I - Client connection */
+              ipp_uchar_t *buffer,	/* O - Buffer for data */
+	      int         length)	/* I - Total length */
 {
-  int		tbytes,				/* Total bytes read */
-		bytes;				/* Bytes read this pass */
-  char		len[32];			/* Length string */
+  int		tbytes,			/* Total bytes read */
+		bytes;			/* Bytes read this pass */
+  char		len[32];		/* Length string */
   
 
   DEBUG_printf(("ipp_read_http(http=%p, buffer=%p, length=%d)\n",
@@ -2549,10 +2580,10 @@ ipp_read_http(http_t      *http,		/* I - Client connection */
  * 'ipp_read_file()' - Read IPP data from a file.
  */
 
-static int					/* O - Number of bytes read */
-ipp_read_file(int         *fd,			/* I - File descriptor */
-              ipp_uchar_t *buffer,		/* O - Read buffer */
-	      int         length)		/* I - Number of bytes to read */
+static int				/* O - Number of bytes read */
+ipp_read_file(int         *fd,		/* I - File descriptor */
+              ipp_uchar_t *buffer,	/* O - Read buffer */
+	      int         length)	/* I - Number of bytes to read */
 {
   return (read(*fd, buffer, length));
 }
@@ -2562,10 +2593,10 @@ ipp_read_file(int         *fd,			/* I - File descriptor */
  * 'ipp_write_file()' - Write IPP data to a file.
  */
 
-static int					/* O - Number of bytes written */
-ipp_write_file(int         *fd,			/* I - File descriptor */
-               ipp_uchar_t *buffer,		/* I - Data to write */
-               int         length)		/* I - Number of bytes to write */
+static int				/* O - Number of bytes written */
+ipp_write_file(int         *fd,		/* I - File descriptor */
+               ipp_uchar_t *buffer,	/* I - Data to write */
+               int         length)	/* I - Number of bytes to write */
 {
   return (write(*fd, buffer, length));
 }

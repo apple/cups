@@ -34,11 +34,9 @@
  * Include necessary headers...
  */
 
-#include "cups.h"
-#include "string.h"
+#include "globals.h"
 #include "debug.h"
 #include <stdlib.h>
-#include <ctype.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <sys/stat.h>
@@ -66,24 +64,7 @@ cupsTempFd(char *filename,		/* I - Pointer to buffer */
 #else
   struct timeval curtime;		/* Current time */
 #endif /* WIN32 */
-  static char	*buf = NULL;		/* Buffer if you pass in NULL and 0 */
 
-
- /*
-  * See if a filename was specified...
-  */
-
-  if (filename == NULL)
-  {
-    if (buf == NULL)
-      buf = calloc(1024, sizeof(char));
-
-    if (buf == NULL)
-      return (-1);
-
-    filename = buf;
-    len      = 1024;
-  }
 
  /*
   * See if TMPDIR is defined...
@@ -183,7 +164,7 @@ cupsTempFile(char *filename,		/* I - Pointer to buffer */
              int  len)			/* I - Size of buffer */
 {
   int		fd;			/* File descriptor for temp file */
-  static char	buf[1024] = "";		/* Buffer if you pass in NULL and 0 */
+  cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
 
 
  /*
@@ -192,8 +173,8 @@ cupsTempFile(char *filename,		/* I - Pointer to buffer */
 
   if (filename == NULL)
   {
-    filename = buf;
-    len      = sizeof(buf);
+    filename = cg->tempfile;
+    len      = sizeof(cg->tempfile);
   }
 
  /*

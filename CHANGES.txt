@@ -1,8 +1,9 @@
-CHANGES.txt - 09/18/2005
+CHANGES.txt - 09/21/2005
 ------------------------
 
 CHANGES IN CUPS V1.2.0b1
 
+	- Made the CUPS API library thread-safe (STR #1276)
 	- Added "media" option support for EFI EFMediaType option
 	  (STR #902)
 	- Added write buffering to the HTTP code to improve

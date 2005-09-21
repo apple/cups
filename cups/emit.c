@@ -64,7 +64,7 @@ static int	ppd_sort(ppd_choice_t **c1, ppd_choice_t **c2);
  * Local globals...
  */
 
-static const char *ppd_custom_code =
+static const char ppd_custom_code[] =
 		"pop pop pop\n"
 		"<</PageSize[5 -2 roll]/ImagingBBox null>>setpagedevice\n";
 

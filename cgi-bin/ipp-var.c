@@ -486,8 +486,7 @@ ippSetCGIVars(ipp_t      *response,	/* I - Response data to be copied... */
                 t    = (time_t)attr->values[i].integer;
 	        date = localtime(&t);
 
-		strftime(valptr, sizeof(value) - (valptr - value),
-		         CUPS_STRFTIME_FORMAT, date);
+		strftime(valptr, sizeof(value) - (valptr - value), "%c", date);
 	      }
 	      else
 	        snprintf(valptr, sizeof(value) - (valptr - value),

@@ -48,24 +48,11 @@
  * Include necessary headers...
  */
 
-#include <stdio.h>
+#include "globals.h"
 #include <stdlib.h>
-#include <string.h>
 #include <errno.h>
-#include <ctype.h>
 #include <time.h>
 
-#include "language.h"
-#include "string.h"
-#include "transcode.h"
-
-
-/*
- * Local Globals...
- */
-
-static cups_cmap_t      *cmap_cache = NULL;    /* SBCS Charmap Cache */
-static cups_vmap_t      *vmap_cache = NULL;    /* VBCS Charmap Cache */
 
 /*
  * Prototypes...
@@ -111,7 +98,7 @@ cupsCharmapGet(const cups_encoding_t encoding)
 {
   char          *datadir;       /* CUPS_DATADIR environment variable */
   char          mapname[80];    /* Name of charset map */
-  char          filename[256];  /* Filename for charset map file */
+  char          filename[1024];  /* Filename for charset map file */
 
  /*
   * Check for valid arguments...
@@ -150,11 +137,13 @@ cupsCharmapFree(const cups_encoding_t encoding)
 {
   cups_cmap_t   *cmap;          /* Legacy SBCS / Unicode Charset Map */
   cups_vmap_t   *vmap;          /* Legacy VBCS / Unicode Charset Map */
+  cups_globals_t *cg = _cupsGlobals();
+				/* Pointer to library globals */
 
  /*
   * See if we already have this SBCS charset map loaded...
   */
-  for (cmap = cmap_cache; cmap != NULL; cmap = cmap->next)
+  for (cmap = cg->cmap_cache; cmap != NULL; cmap = cmap->next)
   {
     if (cmap->encoding == encoding)
     {
@@ -167,7 +156,7 @@ cupsCharmapFree(const cups_encoding_t encoding)
  /*
   * See if we already have this DBCS/VBCS charset map loaded...
   */
-  for (vmap = vmap_cache; vmap != NULL; vmap = vmap->next)
+  for (vmap = cg->vmap_cache; vmap != NULL; vmap = vmap->next)
   {
     if (vmap->encoding == encoding)
     {
@@ -193,11 +182,13 @@ cupsCharmapFlush(void)
   cups_ucs2_t   *crow;          /* Pointer to UCS-2 row in 'char2uni' */
   cups_sbcs_t   *srow;          /* Pointer to SBCS row in 'uni2char' */
   cups_vbcs_t   *vrow;          /* Pointer to VBCS row in 'uni2char' */
+  cups_globals_t *cg = _cupsGlobals();
+  				/* Pointer to library globals */
 
  /*
   * Loop through SBCS charset map cache, free all memory...
   */
-  for (cmap = cmap_cache; cmap != NULL; cmap = cnext)
+  for (cmap = cg->cmap_cache; cmap != NULL; cmap = cnext)
   {
     for (i = 0; i < 256; i ++)
     {
@@ -207,12 +198,12 @@ cupsCharmapFlush(void)
     cnext = cmap->next;
     free(cmap);
   }
-  cmap_cache = NULL;
+  cg->cmap_cache = NULL;
 
  /*
   * Loop through DBCS/VBCS charset map cache, free all memory...
   */
-  for (vmap = vmap_cache; vmap != NULL; vmap = vnext)
+  for (vmap = cg->vmap_cache; vmap != NULL; vmap = vnext)
   {
     for (i = 0; i < 256; i ++)
     {
@@ -229,7 +220,7 @@ cupsCharmapFlush(void)
     vnext = vmap->next;
     free(vmap);
   }
-  vmap_cache = NULL;
+  cg->vmap_cache = NULL;
   return;
 }
 
@@ -815,7 +806,7 @@ static int                              /* O - Count or -1 on error */
 get_charmap_count(const char *filename) /* I - Charmap Filename */
 {
   int           i;              /* Looping variable */
-  FILE          *fp;            /* Map input file pointer */
+  cups_file_t	*fp;            /* Map input file pointer */
   char          *s;             /* Line parsing pointer */
   char          line[256];      /* Line from input map file */
   cups_utf32_t  unichar;        /* Unicode character value */
@@ -825,7 +816,7 @@ get_charmap_count(const char *filename) /* I - Charmap Filename */
   */
   if ((filename == NULL) || (*filename == '\0'))
     return (-1);
-  fp = fopen(filename, "r");
+  fp = cupsFileOpen(filename, "r");
   if (fp == NULL)
     return (-1);
 
@@ -834,7 +825,7 @@ get_charmap_count(const char *filename) /* I - Charmap Filename */
   */
   for (i = 0; i < CUPS_MAX_CHARMAP_LINES;)
   {
-    s = fgets(&line[0], sizeof(line), fp);
+    s = cupsFileGets(fp, line, sizeof(line));
     if (s == NULL)
       break;
     if ((*s == '#') || (*s == '\n') || (*s == '\0'))
@@ -848,7 +839,7 @@ get_charmap_count(const char *filename) /* I - Charmap Filename */
     if ((sscanf(s, "%lx", &unichar) != 1)
     || (unichar > 0xffff))
     {
-      fclose(fp);
+      cupsFileClose(fp);
       return (-1);
     }
     i ++;
@@ -859,7 +850,7 @@ get_charmap_count(const char *filename) /* I - Charmap Filename */
  /*
   * Close file and return charmap count (non-comment line count)...
   */
-  fclose(fp);
+  cupsFileClose(fp);
   return (i);
 }
 
@@ -875,11 +866,13 @@ get_sbcs_charmap(const cups_encoding_t encoding,
   unsigned long legchar;        /* Legacy character value */
   cups_utf32_t  unichar;        /* Unicode character value */
   cups_cmap_t   *cmap;          /* Legacy SBCS / Unicode Charset Map */
-  FILE          *fp;            /* Charset map file pointer */
+  cups_file_t   *fp;            /* Charset map file pointer */
   char          *s;             /* Line parsing pointer */
   cups_ucs2_t   *crow;          /* Pointer to UCS-2 row in 'char2uni' */
   cups_sbcs_t   *srow;          /* Pointer to SBCS row in 'uni2char' */
   char          line[256];      /* Line from charset map file */
+  cups_globals_t *cg = _cupsGlobals();
+				/* Pointer to library globals */
 
  /*
   * Check for valid arguments...
@@ -890,7 +883,7 @@ get_sbcs_charmap(const cups_encoding_t encoding,
  /*
   * See if we already have this SBCS charset map loaded...
   */
-  for (cmap = cmap_cache; cmap != NULL; cmap = cmap->next)
+  for (cmap = cg->cmap_cache; cmap != NULL; cmap = cmap->next)
   {
     if (cmap->encoding == encoding)
     {
@@ -902,7 +895,7 @@ get_sbcs_charmap(const cups_encoding_t encoding,
  /*
   * Open SBCS charset map input file...
   */
-  fp = fopen(filename, "r");
+  fp = cupsFileOpen(filename, "r");
   if (fp == NULL)
     return (NULL);
 
@@ -912,11 +905,11 @@ get_sbcs_charmap(const cups_encoding_t encoding,
   cmap = (cups_cmap_t *) calloc(1, sizeof(cups_cmap_t));
   if (cmap == NULL)
   {
-    fclose(fp);
+    cupsFileClose(fp);
     return (NULL);
   }
-  cmap->next = cmap_cache;
-  cmap_cache = cmap;
+  cmap->next = cg->cmap_cache;
+  cg->cmap_cache = cmap;
   cmap->used ++;
   cmap->encoding = encoding;
 
@@ -925,7 +918,7 @@ get_sbcs_charmap(const cups_encoding_t encoding,
   */
   for (i = 0; i < CUPS_MAX_CHARMAP_LINES;)
   {
-    s = fgets(&line[0], sizeof(line), fp);
+    s = cupsFileGets(fp, line, sizeof(line));
     if (s == NULL)
       break;
     if ((*s == '#') || (*s == '\n') || (*s == '\0'))
@@ -935,7 +928,7 @@ get_sbcs_charmap(const cups_encoding_t encoding,
     if ((sscanf(s, "%lx", &legchar) != 1)
     || (legchar > 0xff))
     {
-      fclose(fp);
+      cupsFileClose(fp);
       cupsCharmapFlush();
       return (NULL);
     }
@@ -947,7 +940,7 @@ get_sbcs_charmap(const cups_encoding_t encoding,
       s += 2;
     if (sscanf(s, "%lx", &unichar) != 1)
     {
-      fclose(fp);
+      cupsFileClose(fp);
       cupsCharmapFlush();
       return (NULL);
     }
@@ -974,7 +967,7 @@ get_sbcs_charmap(const cups_encoding_t encoding,
       srow = (cups_sbcs_t *) calloc(256, sizeof(cups_sbcs_t));
       if (srow == NULL)
       {
-        fclose(fp);
+        cupsFileClose(fp);
         cupsCharmapFlush();
         return (NULL);
       }
@@ -994,7 +987,7 @@ get_sbcs_charmap(const cups_encoding_t encoding,
     if (*srow == 0)
       *srow = (cups_sbcs_t) legchar;
   }
-  fclose(fp);
+  cupsFileClose(fp);
   return (cmap);
 }
 
@@ -1014,11 +1007,13 @@ get_vbcs_charmap(const cups_encoding_t encoding,
   unsigned long     legchar;    /* Legacy character value */
   cups_utf32_t      unichar;    /* Unicode character value */
   int               mapcount;   /* Count of lines in charmap file */
-  FILE              *fp;        /* Charset map file pointer */
+  cups_file_t       *fp;        /* Charset map file pointer */
   char              *s;         /* Line parsing pointer */
   char              line[256];  /* Line from charset map file */
   int               i;          /* Loop variable */
   int               wide;       /* 32-bit legacy char */
+  cups_globals_t    *cg = _cupsGlobals();
+				/* Pointer to library globals */
 
  /*
   * Check for valid arguments...
@@ -1029,7 +1024,7 @@ get_vbcs_charmap(const cups_encoding_t encoding,
  /*
   * See if we already have this DBCS/VBCS charset map loaded...
   */
-  for (vmap = vmap_cache; vmap != NULL; vmap = vmap->next)
+  for (vmap = cg->vmap_cache; vmap != NULL; vmap = vmap->next)
   {
     if (vmap->encoding == encoding)
     {
@@ -1048,7 +1043,7 @@ get_vbcs_charmap(const cups_encoding_t encoding,
  /*
   * Open VBCS charset map input file...
   */
-  fp = fopen(filename, "r");
+  fp = cupsFileOpen(filename, "r");
   if (fp == NULL)
     return (NULL);
 
@@ -1058,11 +1053,11 @@ get_vbcs_charmap(const cups_encoding_t encoding,
   vmap = (cups_vmap_t *) calloc(1, sizeof(cups_vmap_t));
   if (vmap == NULL)
   {
-    fclose(fp);
+    cupsFileClose(fp);
     return (NULL);
   }
-  vmap->next = vmap_cache;
-  vmap_cache = vmap;
+  vmap->next = cg->vmap_cache;
+  cg->vmap_cache = vmap;
   vmap->used ++;
   vmap->encoding = encoding;
 
@@ -1074,7 +1069,7 @@ get_vbcs_charmap(const cups_encoding_t encoding,
 
   for (i = 0, wide = 0; i < mapcount; )
   {
-    s = fgets(&line[0], sizeof(line), fp);
+    s = cupsFileGets(fp, line, sizeof(line));
     if (s == NULL)
       break;
     if ((*s == '#') || (*s == '\n') || (*s == '\0'))
@@ -1084,7 +1079,7 @@ get_vbcs_charmap(const cups_encoding_t encoding,
     if ((sscanf(s, "%lx", &legchar) != 1)
     || ((legchar > 0xffff) && (encoding < CUPS_ENCODING_DBCS_END)))
     {
-      fclose(fp);
+      cupsFileClose(fp);
       cupsCharmapFlush();
       return (NULL);
     }
@@ -1096,7 +1091,7 @@ get_vbcs_charmap(const cups_encoding_t encoding,
       s += 2;
     if (sscanf(s, "%lx", &unichar) != 1)
     {
-      fclose(fp);
+      cupsFileClose(fp);
       cupsCharmapFlush();
       return (NULL);
     }
@@ -1141,7 +1136,7 @@ get_vbcs_charmap(const cups_encoding_t encoding,
         crow = (cups_ucs2_t *) calloc(256, sizeof(cups_ucs2_t));
         if (crow == NULL)
         {
-          fclose(fp);
+          cupsFileClose(fp);
           cupsCharmapFlush();
           return (NULL);
         }
@@ -1163,7 +1158,7 @@ get_vbcs_charmap(const cups_encoding_t encoding,
           calloc(vmap->widecount, sizeof(cups_wide2uni_t));
         if (wide2uni == NULL)
         {
-          fclose(fp);
+          cupsFileClose(fp);
           cupsCharmapFlush();
           return (NULL);
         }
@@ -1183,7 +1178,7 @@ get_vbcs_charmap(const cups_encoding_t encoding,
       vrow = (cups_vbcs_t *) calloc(256, sizeof(cups_vbcs_t));
       if (vrow == NULL)
       {
-        fclose(fp);
+        cupsFileClose(fp);
         cupsCharmapFlush();
         return (NULL);
       }
@@ -1204,7 +1199,7 @@ get_vbcs_charmap(const cups_encoding_t encoding,
       *vrow = (cups_vbcs_t) legchar;
   }
   vmap->charcount = (i - vmap->widecount);
-  fclose(fp);
+  cupsFileClose(fp);
   return (vmap);
 }
 

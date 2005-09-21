@@ -68,7 +68,7 @@ OutputProlog(char  *title,	/* I - Job title */
   puts("%%DocumentSuppliedResources: procset hpgltops 1.1 0");
   puts("%%DocumentNeededResources: font Courier Helvetica");
   puts("%%Creator: hpgltops/" CUPS_SVERSION);
-  strftime(line, sizeof(line), CUPS_STRFTIME_FORMAT, curtm);
+  strftime(line, sizeof(line), "%c", curtm);
   printf("%%%%CreationDate: %s\n", line);
   printf("%%%%Title: %s\n", title);
   printf("%%%%For: %s\n", user);

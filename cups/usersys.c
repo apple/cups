@@ -34,44 +34,20 @@
  *   cupsSetServer()     - Set the default server name...
  *   cupsSetUser()       - Set the default user name...
  *   cupsUser()          - Return the current users name.
- *   cups_get_password() - Get a password from the user...
- *   cups_get_line()     - Get a line from a file...
+ *   _cupsGetPassword()  - Get a password from the user...
  */
 
 /*
  * Include necessary headers...
  */
 
-#include "cups.h"
-#include "string.h"
 #include "http-private.h"
+#include "globals.h"
 #include <stdlib.h>
-
 #ifdef WIN32
 #  include <windows.h>
 #endif /* WIN32 */
 
-
-/*
- * Local functions...
- */
-
-static const char	*cups_get_password(const char *prompt);
-static char		*cups_get_line(char *buf, int buflen, FILE *fp);
-
-
-/*
- * Local globals...
- */
-
-static http_encryption_t cups_encryption = (http_encryption_t)-1;
-static char		cups_user[65] = "",
-			cups_server[256] = "";
-static const char	*(*cups_pwdcb)(const char *) = cups_get_password;
-
-#ifdef HAVE_DOMAINSOCKETS
-char			cups_server_domainsocket[104] = "";
-#endif /* HAVE_DOMAINSOCKETS */
 
 /*
  * 'cupsEncryption()' - Get the default encryption settings...
@@ -80,17 +56,18 @@ char			cups_server_domainsocket[104] = "";
 http_encryption_t
 cupsEncryption(void)
 {
-  FILE		*fp;			/* client.conf file */
+  cups_file_t	*fp;			/* client.conf file */
   char		*encryption;		/* CUPS_ENCRYPTION variable */
   const char	*home;			/* Home directory of user */
   char		line[1024];		/* Line from file */
+  cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
 
 
  /*
   * First see if we have already set the encryption stuff...
   */
 
-  if (cups_encryption == (http_encryption_t)-1)
+  if (cg->encryption == (http_encryption_t)-1)
   {
    /*
     * Then see if the CUPS_ENCRYPTION environment variable is set...
@@ -105,7 +82,7 @@ cupsEncryption(void)
       if ((home = getenv("HOME")) != NULL)
       {
 	snprintf(line, sizeof(line), "%s/.cupsrc", home);
-	fp = fopen(line, "r");
+	fp = cupsFileOpen(line, "r");
       }
       else
 	fp = NULL;
@@ -115,10 +92,10 @@ cupsEncryption(void)
 	if ((home = getenv("CUPS_SERVERROOT")) != NULL)
 	{
 	  snprintf(line, sizeof(line), "%s/client.conf", home);
-	  fp = fopen(line, "r");
+	  fp = cupsFileOpen(line, "r");
 	}
 	else
-	  fp = fopen(CUPS_SERVERROOT "/client.conf", "r");
+	  fp = cupsFileOpen(CUPS_SERVERROOT "/client.conf", "r");
       }
 
       encryption = "IfRequested";
@@ -129,7 +106,7 @@ cupsEncryption(void)
 	* Read the config file and look for an Encryption line...
 	*/
 
-	while (cups_get_line(line, sizeof(line), fp) != NULL)
+	while (cupsFileGets(fp, line, sizeof(line)) != NULL)
 	  if (strncmp(line, "Encryption ", 11) == 0 ||
 	      strncmp(line, "Encryption\t", 11) == 0)
 	  {
@@ -145,7 +122,7 @@ cupsEncryption(void)
 	    break;
 	  }
 
-	fclose(fp);
+	cupsFileClose(fp);
       }
     }
 
@@ -154,16 +131,16 @@ cupsEncryption(void)
     */
 
     if (strcasecmp(encryption, "never") == 0)
-      cups_encryption = HTTP_ENCRYPT_NEVER;
+      cg->encryption = HTTP_ENCRYPT_NEVER;
     else if (strcasecmp(encryption, "always") == 0)
-      cups_encryption = HTTP_ENCRYPT_ALWAYS;
+      cg->encryption = HTTP_ENCRYPT_ALWAYS;
     else if (strcasecmp(encryption, "required") == 0)
-      cups_encryption = HTTP_ENCRYPT_REQUIRED;
+      cg->encryption = HTTP_ENCRYPT_REQUIRED;
     else
-      cups_encryption = HTTP_ENCRYPT_IF_REQUESTED;
+      cg->encryption = HTTP_ENCRYPT_IF_REQUESTED;
   }
 
-  return (cups_encryption);
+  return (cg->encryption);
 }
 
 
@@ -174,7 +151,7 @@ cupsEncryption(void)
 const char *				/* O - Password */
 cupsGetPassword(const char *prompt)	/* I - Prompt string */
 {
-  return ((*cups_pwdcb)(prompt));
+  return ((*_cupsGlobals()->password_cb)(prompt));
 }
 
 
@@ -185,7 +162,7 @@ cupsGetPassword(const char *prompt)	/* I - Prompt string */
 void
 cupsSetEncryption(http_encryption_t e)	/* I - New encryption preference */
 {
-  cups_encryption = e;
+  _cupsGlobals()->encryption = e;
 }
 
 
@@ -196,18 +173,21 @@ cupsSetEncryption(http_encryption_t e)	/* I - New encryption preference */
 const char *				/* O - Server name */
 cupsServer(void)
 {
-  FILE		*fp;			/* client.conf file */
+  cups_file_t	*fp;			/* client.conf file */
   char		*server;		/* Pointer to server name */
   const char	*home;			/* Home directory of user */
   char		*port;			/* Port number */
-  char		line[1024];		/* Line from file */
+  char		line[1024],		/* Line from file */
+		*value;			/* Value on line */
+  int		linenum;		/* Line number in file */
+  cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
 
 
  /*
   * First see if we have already set the server name...
   */
 
-  if (!cups_server[0])
+  if (!cg->server[0])
   {
    /*
     * Then see if the CUPS_SERVER environment variable is set...
@@ -222,7 +202,7 @@ cupsServer(void)
       if ((home = getenv("HOME")) != NULL)
       {
 	snprintf(line, sizeof(line), "%s/.cupsrc", home);
-	fp = fopen(line, "r");
+	fp = cupsFileOpen(line, "r");
       }
       else
 	fp = NULL;
@@ -232,10 +212,10 @@ cupsServer(void)
 	if ((home = getenv("CUPS_SERVERROOT")) != NULL)
 	{
 	  snprintf(line, sizeof(line), "%s/client.conf", home);
-	  fp = fopen(line, "r");
+	  fp = cupsFileOpen(line, "r");
 	}
 	else
-	  fp = fopen(CUPS_SERVERROOT "/client.conf", "r");
+	  fp = cupsFileOpen(CUPS_SERVERROOT "/client.conf", "r");
       }
 
       server = "localhost";
@@ -246,23 +226,19 @@ cupsServer(void)
 	* Read the config file and look for a ServerName line...
 	*/
 
-	while (cups_get_line(line, sizeof(line), fp) != NULL)
-	  if (strncmp(line, "ServerName ", 11) == 0 ||
-	      strncmp(line, "ServerName\t", 11) == 0)
+        linenum = 0;
+	while (cupsFileGetConf(fp, line, sizeof(line), &value, &linenum) != NULL)
+	  if (!strcmp(line, "ServerName") && value)
 	  {
 	   /*
-	    * Got it!  Drop any trailing newline and find the name...
+	    * Got it!
 	    */
 
-	    server = line + strlen(line) - 1;
-	    if (*server == '\n')
-              *server = '\0';
-
-	    for (server = line + 11; isspace(*server & 255); server ++);
+	    server = value;
 	    break;
 	  }
 
-	fclose(fp);
+	cupsFileClose(fp);
       }
     }
 
@@ -270,9 +246,9 @@ cupsServer(void)
     * Copy the server name over and set the port number, if any...
     */
 
-    strlcpy(cups_server, server, sizeof(cups_server));
+    strlcpy(cg->server, server, sizeof(cg->server));
 
-    if (cups_server[0] != '/' && (port = strrchr(cups_server, ':')) != NULL &&
+    if (cg->server[0] != '/' && (port = strrchr(cg->server, ':')) != NULL &&
         isdigit(port[1] & 255))
     {
       *port++ = '\0';
@@ -281,7 +257,7 @@ cupsServer(void)
     }
   }
 
-  return (cups_server);
+  return (cg->server);
 }
 
 
@@ -292,10 +268,13 @@ cupsServer(void)
 void
 cupsSetPasswordCB(const char *(*cb)(const char *))	/* I - Callback function */
 {
+  cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
+
+
   if (cb == (const char *(*)(const char *))0)
-    cups_pwdcb = cups_get_password;
+    cg->password_cb = _cupsGetPassword;
   else
-    cups_pwdcb = cb;
+    cg->password_cb = cb;
 }
 
 
@@ -306,10 +285,13 @@ cupsSetPasswordCB(const char *(*cb)(const char *))	/* I - Callback function */
 void
 cupsSetServer(const char *server)	/* I - Server name */
 {
+  cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
+
+
   if (server)
-    strlcpy(cups_server, server, sizeof(cups_server));
+    strlcpy(cg->server, server, sizeof(cg->server));
   else
-    cups_server[0] = '\0';
+    cg->server[0] = '\0';
 }
 
 
@@ -320,10 +302,13 @@ cupsSetServer(const char *server)	/* I - Server name */
 void
 cupsSetUser(const char *user)		/* I - User name */
 {
+  cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
+
+
   if (user)
-    strlcpy(cups_user, user, sizeof(cups_user));
+    strlcpy(cg->user, user, sizeof(cg->user));
   else
-    cups_user[0] = '\0';
+    cg->user[0] = '\0';
 }
 
 
@@ -339,32 +324,35 @@ cupsSetUser(const char *user)		/* I - User name */
 const char *				/* O - User name */
 cupsUser(void)
 {
-  if (!cups_user[0])
+  cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
+
+
+  if (!cg->user[0])
   {
     DWORD	size;		/* Size of string */
 
 
-    size = sizeof(cups_user);
-    if (!GetUserName(cups_user, &size))
+    size = sizeof(cg->user);
+    if (!GetUserName(cg->user, &size))
     {
      /*
       * Use the default username...
       */
 
-      strcpy(cups_user, "unknown");
+      strcpy(cg->user, "unknown");
     }
   }
 
-  return (cups_user);
+  return (cg->user);
 }
 
 
 /*
- * 'cups_get_password()' - Get a password from the user...
+ * '_cupsGetPassword()' - Get a password from the user...
  */
 
-static const char *			/* O - Password */
-cups_get_password(const char *prompt)	/* I - Prompt string */
+const char *				/* O - Password */
+_cupsGetPassword(const char *prompt)	/* I - Prompt string */
 {
   return (NULL);
 }
@@ -383,9 +371,10 @@ const char *				/* O - User name */
 cupsUser(void)
 {
   struct passwd	*pwd;			/* User/password entry */
+  cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
 
 
-  if (!cups_user[0])
+  if (!cg->user[0])
   {
    /*
     * Rewind the password file...
@@ -398,7 +387,7 @@ cupsUser(void)
     */
 
     if ((pwd = getpwuid(getuid())) == NULL)
-      strcpy(cups_user, "unknown");	/* Unknown user! */
+      strcpy(cg->user, "unknown");	/* Unknown user! */
     else
     {
      /*
@@ -407,7 +396,7 @@ cupsUser(void)
 
       setpwent();
 
-      strlcpy(cups_user, pwd->pw_name, sizeof(cups_user));
+      strlcpy(cg->user, pwd->pw_name, sizeof(cg->user));
     }
 
    /*
@@ -417,54 +406,20 @@ cupsUser(void)
     setpwent();
   }
 
-  return (cups_user);
+  return (cg->user);
 }
 
 
 /*
- * 'cups_get_password()' - Get a password from the user...
+ * '_cupsGetPassword()' - Get a password from the user...
  */
 
-static const char *			/* O - Password */
-cups_get_password(const char *prompt)	/* I - Prompt string */
+const char *				/* O - Password */
+_cupsGetPassword(const char *prompt)	/* I - Prompt string */
 {
   return (getpass(prompt));
 }
 #endif /* WIN32 */
-
-
-/*
- * 'cups_get_line()' - Get a line from a file.
- */
-
-static char *			/* O - Line from file */
-cups_get_line(char *buf,	/* I - Line buffer */
-              int  buflen,	/* I - Size of line buffer */
-	      FILE *fp)		/* I - File to read from */
-{
-  char	*bufptr;		/* Pointer to end of buffer */
-
-
- /*
-  * Get the line from a file...
-  */
-
-  if (fgets(buf, buflen, fp) == NULL)
-    return (NULL);
-
- /*
-  * Remove all trailing whitespace...
-  */
-
-  bufptr = buf + strlen(buf) - 1;
-  if (bufptr < buf)
-    return (NULL);
-
-  while (bufptr >= buf && isspace(*bufptr & 255))
-    *bufptr-- = '\0';
-
-  return (buf);
-}
 
 
 /*

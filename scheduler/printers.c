@@ -1211,7 +1211,7 @@ SaveAllPrinters(void)
 
   curtime = time(NULL);
   curdate = localtime(&curtime);
-  strftime(temp, sizeof(temp) - 1, CUPS_STRFTIME_FORMAT, curdate);
+  strftime(temp, sizeof(temp) - 1, "%c", curdate);
 
   cupsFilePuts(fp, "# Printer configuration file for " CUPS_SVERSION "\n");
   cupsFilePrintf(fp, "# Written by cupsd on %s\n", temp);

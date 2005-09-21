@@ -574,7 +574,7 @@ main(int  argc,		/* I - Number of command-line arguments */
   puts("%%DocumentData: Clean7Bit");
   puts("%%DocumentNeededResources: font Helvetica-Bold");
   puts("%%Creator: imagetops/" CUPS_SVERSION);
-  strftime(curdate, sizeof(curdate), CUPS_STRFTIME_FORMAT, curtm);
+  strftime(curdate, sizeof(curdate), "%c", curtm);
   printf("%%%%CreationDate: %s\n", curdate);
   printf("%%%%Title: %s\n", argv[3]);
   printf("%%%%For: %s\n", argv[2]);

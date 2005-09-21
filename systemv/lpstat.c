@@ -1621,7 +1621,7 @@ show_jobs(http_t     *http,		/* I - HTTP connection to server */
 	}
 	else
 	{
-	  if (!strftime(date, sizeof(date), CUPS_STRFTIME_FORMAT, jobdate))
+	  if (!strftime(date, sizeof(date), "%c", jobdate))
 	    strcpy(date, "Unknown");
 
           if (ranking)

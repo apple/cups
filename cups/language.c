@@ -42,8 +42,7 @@
  * Include necessary headers...
  */
 
-#include "string.h"
-#include "language.h"
+#include "globals.h"
 #include "debug.h"
 #include <stdlib.h>
 #ifdef HAVE_LANGINFO_H
@@ -64,7 +63,6 @@
 #  include <CoreFoundation/CoreFoundation.h>
 static const char	*appleLangDefault(void);
 #endif /* __APPLE__ */
-
 static cups_lang_t	*cups_cache_lookup(const char *name,
 			                   cups_encoding_t encoding);
   
@@ -73,9 +71,7 @@ static cups_lang_t	*cups_cache_lookup(const char *name,
  * Local globals...
  */
 
-static cups_lang_t	*lang_cache = NULL;
-					/* Language string cache */
-static const char	*lang_blank = "";
+static const char	lang_blank[] = "";
 					/* Blank constant string */
 static const char * const lang_encodings[] =
 			{		/* Encoding strings */
@@ -159,8 +155,8 @@ static const char *const lang_default[] =
  */
 
 const char *				/* O - Character encoding */
-cupsEncodingName(cups_encoding_t encoding)
-					/* I - Encoding enum */
+cupsEncodingName(
+    cups_encoding_t encoding)		/* I - Encoding value */
 {
   if (encoding < 0 ||
       encoding >= (sizeof(lang_encodings) / sizeof(const char *)))
@@ -195,13 +191,14 @@ cupsLangFlush(void)
   int		i;			/* Looping var */
   cups_lang_t	*lang,			/* Current language */
 		*next;			/* Next language */
+  cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
 
 
  /*
   * Free all languages in the cache...
   */
 
-  for (lang = lang_cache; lang != NULL; lang = next)
+  for (lang = cg->lang_cache; lang != NULL; lang = next)
   {
    /*
     * Free all messages...
@@ -219,7 +216,7 @@ cupsLangFlush(void)
     free(lang);
   }
 
-  lang_cache = NULL;
+  cg->lang_cache = NULL;
 }
 
 
@@ -230,7 +227,7 @@ cupsLangFlush(void)
  */
 
 void
-cupsLangFree(cups_lang_t *lang)	/* I - Language to free */
+cupsLangFree(cups_lang_t *lang)		/* I - Language to free */
 {
   if (lang != NULL && lang->used > 0)
     lang->used --;
@@ -263,6 +260,8 @@ cupsLangGet(const char *language)	/* I - Language or locale */
   char			*text;		/* Message text */
   cups_lang_t		*lang;		/* Current language... */
   char			*oldlocale;	/* Old locale name */
+  cups_globals_t	*cg = _cupsGlobals();
+  					/* Pointer to library globals */
   static const char * const locale_encodings[] =
 		{			/* Locale charset names */
 		  "ASCII",	"ISO88591",	"ISO88592",	"ISO88593",
@@ -406,6 +405,8 @@ cupsLangGet(const char *language)	/* I - Language or locale */
 
 #if defined(__APPLE__)
   /* The ctype bug isn't in Apple's libc */
+  (void)locale;			/* anti-compiler-warning-code */
+  (void)oldlocale;		/* anti-compiler-warning-code */
 #elif !defined(LC_CTYPE)
   oldlocale = _cupsSaveLocale(LC_ALL, "C");
 #else
@@ -602,7 +603,7 @@ cupsLangGet(const char *language)	/* I - Language or locale */
   * record...
   */
 
-  for (lang = lang_cache; lang != NULL; lang = lang->next)
+  for (lang = cg->lang_cache; lang != NULL; lang = lang->next)
     if (lang->used == 0)
       break;
 
@@ -618,8 +619,8 @@ cupsLangGet(const char *language)	/* I - Language or locale */
       return (NULL);
     }
 
-    lang->next = lang_cache;
-    lang_cache = lang;
+    lang->next     = cg->lang_cache;
+    cg->lang_cache = lang;
   }
 
  /*
@@ -648,7 +649,7 @@ cupsLangGet(const char *language)	/* I - Language or locale */
     lang->encoding = CUPS_US_ASCII;
 
     for (i = 0; i < (sizeof(lang_encodings) / sizeof(lang_encodings[0])); i ++)
-      if (strcmp(lang_encodings[i], line) == 0)
+      if (!strcmp(lang_encodings[i], line))
       {
 	lang->encoding = (cups_encoding_t)i;
 	break;
@@ -803,15 +804,15 @@ appleLangDefault(void)
 					/* List of localization data */
   CFStringRef		languageName;	/* Current name */
   CFStringRef		localeName;	/* Canonical from of name */
-  static char		language[32] = "";
-					/* Cached language */
+  cups_globals_t	*cg = _cupsGlobals();
+  					/* Pointer to library globals */
 
 
  /*
   * Only do the lookup and translation the first time.
   */
 
-  if (!language[0])
+  if (!cg->language[0])
   {
     localizationList =
         CFPreferencesCopyAppValue(CFSTR("AppleLanguages"),
@@ -832,14 +833,14 @@ appleLangDefault(void)
 
 	  if (localeName != NULL)
 	  {
-	    CFStringGetCString(localeName, language, sizeof(language),
+	    CFStringGetCString(localeName, cg->language, sizeof(cg->language),
 			       kCFStringEncodingASCII);
 	    CFRelease(localeName);
 
-	    if (!strcmp(language, "en"))
-	      strlcpy(language, "en_US.UTF-8", sizeof(language));
-	    else if (strchr(language, '.') == NULL)
-	      strlcat(language, ".UTF-8", sizeof(language));
+	    if (!strcmp(cg->language, "en"))
+	      strlcpy(cg->language, "en_US.UTF-8", sizeof(cg->language));
+	    else if (strchr(cg->language, '.') == NULL)
+	      strlcat(cg->language, ".UTF-8", sizeof(cg->language));
 	  }
         }
       }
@@ -851,15 +852,15 @@ appleLangDefault(void)
     * If we didn't find the language, default to en_US...
     */
 
-    if (!language[0])
-      strlcpy(language, "en_US.UTF-8", sizeof(language));
+    if (!cg->language[0])
+      strlcpy(cg->language, "en_US.UTF-8", sizeof(cg->language));
   }
 
  /*
   * Return the cached locale...
   */
 
-  return (language);
+  return (cg->language);
 }
 #  else
 /*
@@ -950,15 +951,15 @@ appleLangDefault(void)
   CFStringRef		localizationName;
 					/* Current name */
   char			buff[256];	/* Temporary buffer */
-  static const char	*language = NULL;
-					/* Cached language */
+  cups_globals_t	*cg = _cupsGlobals();
+  					/* Pointer to library globals */
 
 
  /*
   * Only do the lookup and translation the first time.
   */
 
-  if (language == NULL)
+  if (cg->language == NULL)
   {
     localizationList =
         CFPreferencesCopyAppValue(CFSTR("AppleLanguages"),
@@ -988,7 +989,7 @@ appleLangDefault(void)
 	    {
 	      if (strcasecmp(buff, apple_name_locale[i].name) == 0)
 	      {
-		language = apple_name_locale[i].locale;
+		cg->language = apple_name_locale[i].locale;
 		break;
 	      }
 	    }
@@ -1003,15 +1004,15 @@ appleLangDefault(void)
     * If we didn't find the language, default to en_US...
     */
 
-    if (language == NULL)
-      language = apple_name_locale[0].locale;
+    if (cg->language == NULL)
+      cg->language = apple_name_locale[0].locale;
   }
 
  /*
   * Return the cached locale...
   */
 
-  return (language);
+  return (cg->language);
 }
 #  endif /* HAVE_CF_LOCALE_ID */
 #endif /* __APPLE__ */
@@ -1037,7 +1038,7 @@ cups_cache_lookup(const char      *name,/* I - Name of locale */
   * Loop through the cache and return a match if found...
   */
 
-  for (lang = lang_cache; lang != NULL; lang = lang->next)
+  for (lang = _cupsGlobals()->lang_cache; lang != NULL; lang = lang->next)
   {
     DEBUG_printf(("cups_cache_lookup: lang=%p, language=\"%s\", encoding=%d(%s)\n",
                   lang, lang->language, lang->encoding,

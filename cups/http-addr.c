@@ -37,9 +37,8 @@
  * Include necessary headers...
  */
 
-#include "http.h"
+#include "globals.h"
 #include "debug.h"
-#include "string.h"
 #include <stdlib.h>
 
 
@@ -275,22 +274,19 @@ httpGetHostByName(const char *name)	/* I - Hostname or IP address */
   int			i;		/* Looping var */
   const char		*nameptr;	/* Pointer into name */
   unsigned		ip[4];		/* IP address components */
-  static unsigned	packed_ip[100][4];/* Packed IPv4/6 addresses */
-  static char		*packed_ptr[101];/* Pointer to packed address */
-  static struct hostent	host_ip;	/* Host entry for IP/domain address */
-#ifdef HAVE_GETADDRINFO
-  static char		h_name[1024];	/* Hostname */
-#endif /* HAVE_GETADDRINFO */
+  cups_globals_t	*cg = _cupsGlobals();
+  					/* Pointer to library globals */
 
 
   DEBUG_printf(("httpGetHostByName(name=\"%s\")\n", name));
 
-#if defined(__APPLE__)
-  /* OS X hack to avoid it's ocassional long delay in lookupd */
-  static const char sLoopback[] = "127.0.0.1";
+ /*
+  * Avoid lookup delays and configuration problems when connecting
+  * to the localhost address...
+  */
+
   if (!strcmp(name, "localhost"))
-    name = sLoopback;
-#endif /* __APPLE__ */
+    name = "127.0.0.1";
 
  /*
   * This function is needed because some operating systems have a
@@ -312,17 +308,17 @@ httpGetHostByName(const char *name)	/* I - Hostname or IP address */
     * A domain socket address, so make an AF_LOCAL entry and return it...
     */
 
-    host_ip.h_name      = (char *)name;
-    host_ip.h_aliases   = NULL;
-    host_ip.h_addrtype  = AF_LOCAL;
-    host_ip.h_length    = strlen(name) + 1;
-    host_ip.h_addr_list = packed_ptr;
-    packed_ptr[0]       = (char *)name;
-    packed_ptr[1]       = NULL;
+    cg->hostent.h_name      = (char *)name;
+    cg->hostent.h_aliases   = NULL;
+    cg->hostent.h_addrtype  = AF_LOCAL;
+    cg->hostent.h_length    = strlen(name) + 1;
+    cg->hostent.h_addr_list = cg->ip_ptrs;
+    cg->ip_ptrs[0]          = (char *)name;
+    cg->ip_ptrs[1]          = NULL;
 
     DEBUG_puts("httpGetHostByName: returning domain socket address...");
 
-    return (&host_ip);
+    return (&cg->hostent);
   }
 #endif /* AF_LOCAL */
 #ifdef AF_INET6
@@ -332,22 +328,22 @@ httpGetHostByName(const char *name)	/* I - Hostname or IP address */
     * A raw 128-bit IPv6 address of the form "[xxxx:xxxx:xxxx:xxxx]"
     */
 
-    host_ip.h_name      = (char *)name;
-    host_ip.h_aliases   = NULL;
-    host_ip.h_addrtype  = AF_INET6;
-    host_ip.h_length    = 16;
-    host_ip.h_addr_list = packed_ptr;
-    packed_ptr[0]       = (char *)(packed_ip[0]);
-    packed_ptr[1]       = NULL;
+    cg->hostent.h_name      = (char *)name;
+    cg->hostent.h_aliases   = NULL;
+    cg->hostent.h_addrtype  = AF_INET6;
+    cg->hostent.h_length    = 16;
+    cg->hostent.h_addr_list = cg->ip_ptrs;
+    cg->ip_ptrs[0]       = (char *)(cg->ip_addrs[0]);
+    cg->ip_ptrs[1]       = NULL;
 
     for (i = 0, nameptr = name + 1; *nameptr && i < 4; i ++)
     {
       if (*nameptr == ']')
         break;
       else if (*nameptr == ':')
-        packed_ip[0][i] = 0;
+        cg->ip_addrs[0][i] = 0;
       else
-        packed_ip[0][i] = htonl(strtoul(nameptr, (char **)&nameptr, 16));
+        cg->ip_addrs[0][i] = htonl(strtoul(nameptr, (char **)&nameptr, 16));
 
       if (*nameptr == ':' || *nameptr == ']')
         nameptr ++;
@@ -355,7 +351,7 @@ httpGetHostByName(const char *name)	/* I - Hostname or IP address */
 
     while (i < 4)
     {
-      packed_ip[0][i] = 0;
+      cg->ip_addrs[0][i] = 0;
       i ++;
     }
 
@@ -364,7 +360,7 @@ httpGetHostByName(const char *name)	/* I - Hostname or IP address */
 
     DEBUG_puts("httpGetHostByName: returning IPv6 address...");
 
-    return (&host_ip);
+    return (&cg->hostent);
   }
 #endif /* AF_INET6 */
 
@@ -383,24 +379,24 @@ httpGetHostByName(const char *name)	/* I - Hostname or IP address */
     if (ip[0] > 255 || ip[1] > 255 || ip[2] > 255 || ip[3] > 255)
       return (NULL);			/* Invalid byte ranges! */
 
-    packed_ip[0][0] = htonl(((((((ip[0] << 8) | ip[1]) << 8) | ip[2]) << 8) |
+    cg->ip_addrs[0][0] = htonl(((((((ip[0] << 8) | ip[1]) << 8) | ip[2]) << 8) |
                              ip[3]));
 
    /*
     * Fill in the host entry and return it...
     */
 
-    host_ip.h_name      = (char *)name;
-    host_ip.h_aliases   = NULL;
-    host_ip.h_addrtype  = AF_INET;
-    host_ip.h_length    = 4;
-    host_ip.h_addr_list = packed_ptr;
-    packed_ptr[0]       = (char *)packed_ip[0];
-    packed_ptr[1]       = NULL;
+    cg->hostent.h_name      = (char *)name;
+    cg->hostent.h_aliases   = NULL;
+    cg->hostent.h_addrtype  = AF_INET;
+    cg->hostent.h_length    = 4;
+    cg->hostent.h_addr_list = cg->ip_ptrs;
+    cg->ip_ptrs[0]       = (char *)cg->ip_addrs[0];
+    cg->ip_ptrs[1]       = NULL;
 
     DEBUG_puts("httpGetHostByName: returning IPv4 address...");
 
-    return (&host_ip);
+    return (&cg->hostent);
   }
   else
 #ifdef HAVE_GETADDRINFO
@@ -456,24 +452,26 @@ httpGetHostByName(const char *name)	/* I - Hostname or IP address */
       }
     }
 
-    strlcpy(h_name, current->ai_canonname, sizeof(h_name));
+    strlcpy(cg->hostname, current->ai_canonname, sizeof(cg->hostname));
 
-    host_ip.h_name      = h_name;
-    host_ip.h_aliases   = NULL;
-    host_ip.h_addrtype  = current->ai_family;
-    host_ip.h_addr_list = packed_ptr;
+    cg->hostent.h_name      = cg->hostname;
+    cg->hostent.h_aliases   = NULL;
+    cg->hostent.h_addrtype  = current->ai_family;
+    cg->hostent.h_addr_list = cg->ip_ptrs;
 
     if (current->ai_family == AF_INET6)
-      host_ip.h_length = 16;
+      cg->hostent.h_length = 16;
     else
-      host_ip.h_length = 4;
+      cg->hostent.h_length = 4;
 
    /*
     * Convert the address info to a hostent structure...
     */
 
-    for (i = 0, current = results; i < 100 && current; current = current->ai_next)
-      if (current->ai_family == host_ip.h_addrtype)
+    for (i = 0, current = results;
+         i < CUPS_MAX_ADDRS && current;
+	 current = current->ai_next)
+      if (current->ai_family == cg->hostent.h_addrtype)
       {
        /*
         * Copy this address...
@@ -482,15 +480,15 @@ httpGetHostByName(const char *name)	/* I - Hostname or IP address */
         address = (http_addr_t *)(current->ai_addr);
 
         if (current->ai_family == AF_INET)
-	  memcpy((char *)packed_ip[i], (char *)&(address->ipv4.sin_addr), 4);
+	  memcpy((char *)cg->ip_addrs[i], (char *)&(address->ipv4.sin_addr), 4);
 	else
-	  memcpy((char *)packed_ip[i], (char *)&(address->ipv6.sin6_addr), 16);
+	  memcpy((char *)cg->ip_addrs[i], (char *)&(address->ipv6.sin6_addr), 16);
 
-	packed_ptr[i] = (char *)packed_ip[i];
+	cg->ip_ptrs[i] = (char *)cg->ip_addrs[i];
 	i ++;
       }
 
-    packed_ptr[i] = NULL;
+    cg->ip_ptrs[i] = NULL;
 
    /*
     * Free the getaddrinfo() results and return the hostent structure...
@@ -498,7 +496,7 @@ httpGetHostByName(const char *name)	/* I - Hostname or IP address */
 
     freeaddrinfo(results);
 
-    return (&host_ip);
+    return (&cg->hostent);
   }
 #else
   {

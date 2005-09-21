@@ -201,7 +201,7 @@ WriteProlog(const char *title,		/* I - Title of job */
 
   curtime = time(NULL);
   curtm   = localtime(&curtime);
-  strftime(curdate, sizeof(curdate), CUPS_STRFTIME_FORMAT, curtm);
+  strftime(curdate, sizeof(curdate), "%c", curtm);
 
   puts("%!PS-Adobe-3.0");
   printf("%%%%BoundingBox: 0 0 %.0f %.0f\n", PageWidth, PageLength);

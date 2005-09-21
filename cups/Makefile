@@ -30,12 +30,43 @@ include ../Makedefs
 # Object files...
 #
 
-LIBOBJS	=	attr.o auth.o backchannel.o dest.o dir.o emit.o encode.o \
-		file.o getputfile.o http.o http-addr.o http-support.o \
-		ipp.o ipp-support.o langprintf.o language.o mark.o \
-		md5.o md5passwd.o normalize.o options.o page.o ppd.o \
-		snprintf.o string.o tempfile.o transcode.o usersys.o util.o
-OBJS	=	$(LIBOBJS) testhttp.o testi18n.o testipp.o testlang.o \
+LIBOBJS	=	\
+		attr.o \
+		auth.o \
+		backchannel.o \
+		dest.o \
+		dir.o \
+		emit.o \
+		encode.o \
+		file.o \
+		getputfile.o \
+		globals.o \
+		http.o \
+		http-addr.o \
+		http-support.o \
+		ipp.o \
+		ipp-support.o \
+		langprintf.o \
+		language.o \
+		mark.o \
+		md5.o \
+		md5passwd.o \
+		normalize.o \
+		options.o \
+		page.o \
+		ppd.o \
+		snprintf.o \
+		string.o \
+		tempfile.o \
+		transcode.o \
+		usersys.o \
+		util.o
+OBJS	=	\
+		$(LIBOBJS) \
+		testhttp.o \
+		testi18n.o \
+		testipp.o \
+		testlang.o \
 		php_cups_wrap.o
 
 
@@ -43,16 +74,30 @@ OBJS	=	$(LIBOBJS) testhttp.o testi18n.o testipp.o testlang.o \
 # Header files to install...
 #
 
-HEADERS	=	cups.h dir.h file.h http.h ipp.h language.h md5.h \
-		normalize.h ppd.h transcode.h
+HEADERS	=	\
+		cups.h \
+		dir.h \
+		file.h \
+		http.h \
+		ipp.h \
+		language.h \
+		md5.h \
+		normalize.h \
+		ppd.h \
+		transcode.h
 
 
 #
 # Targets in this directory...
 #
 
-TARGETS	=	$(LIBCUPS) libcups.a \
-		testhttp testi18n testipp testlang
+TARGETS	=	\
+		$(LIBCUPS) \
+		libcups.a \
+		testhttp \
+		testi18n \
+		testipp \
+		testlang
 
 
 #

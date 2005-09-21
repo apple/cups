@@ -38,21 +38,15 @@
  * Include necessary headers...
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include "string.h"
-#include "language.h"
-
-#include "ipp.h"
+#include "globals.h"
 #include "debug.h"
-#include <ctype.h>
+#include <stdlib.h>
 
 
 /*
  * Local globals...
  */
 
-static int	ipp_port = 0;
 static const char * const ipp_status_oks[] =	/* "OK" status codes */
 		{
 		  "successful-ok",
@@ -169,10 +163,10 @@ static char	* const ipp_std_ops[] =
  * 'ippErrorString()' - Return a name for the given status code.
  */
 
-const char *					/* O - Text string */
-ippErrorString(ipp_status_t error)		/* I - Error status */
+const char *				/* O - Text string */
+ippErrorString(ipp_status_t error)	/* I - Error status */
 {
-  static char	unknown[255];			/* Unknown error statuses */
+  cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
 
 
  /*
@@ -192,9 +186,9 @@ ippErrorString(ipp_status_t error)		/* I - Error status */
   * No, build an "unknown-xxxx" error string...
   */
 
-  sprintf(unknown, "unknown-%04x", error);
+  sprintf(cg->ipp_unknown, "unknown-%04x", error);
 
-  return (unknown);
+  return (cg->ipp_unknown);
 }
 
 
@@ -234,7 +228,7 @@ ippErrorValue(const char *name)		/* I - Name */
 const char *				/* O - Name */
 ippOpString(ipp_op_t op)		/* I - Operation ID */
 {
-  static char	unknown[255];		/* Unknown error statuses */
+  cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
 
 
  /*
@@ -252,9 +246,9 @@ ippOpString(ipp_op_t op)		/* I - Operation ID */
   * No, build an "unknown-xxxx" operation string...
   */
 
-  sprintf(unknown, "unknown-%04x", op);
+  sprintf(cg->ipp_unknown, "unknown-%04x", op);
 
-  return (unknown);
+  return (cg->ipp_unknown);
 }
 
 
@@ -287,21 +281,22 @@ ippOpValue(const char *name)		/* I - Textual name */
  * 'ippPort()' - Return the default IPP port number.
  */
 
-int						/* O - Port number */
+int					/* O - Port number */
 ippPort(void)
 {
-  const char	*server_port;			/* SERVER_PORT environment variable */
-  struct servent *port;				/* Port number info */  
+  const char	*server_port;		/* SERVER_PORT environment variable */
+  struct servent *port;			/* Port number info */  
+  cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
 
 
-  if (ipp_port)
-    return (ipp_port);
+  if (cg->ipp_port)
+    return (cg->ipp_port);
   else if ((server_port = getenv("IPP_PORT")) != NULL)
-    return (ipp_port = atoi(server_port));
+    return (cg->ipp_port = atoi(server_port));
   else if ((port = getservbyname("ipp", NULL)) == NULL)
-    return (ipp_port = CUPS_DEFAULT_IPP_PORT);
+    return (cg->ipp_port = CUPS_DEFAULT_IPP_PORT);
   else
-    return (ipp_port = ntohs(port->s_port));
+    return (cg->ipp_port = ntohs(port->s_port));
 }
 
 
@@ -310,9 +305,9 @@ ippPort(void)
  */
 
 void
-ippSetPort(int p)				/* I - Port number to use */
+ippSetPort(int p)			/* I - Port number to use */
 {
-  ipp_port = p;
+  _cupsGlobals()->ipp_port = p;
 }
 
 
