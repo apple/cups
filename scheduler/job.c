@@ -1347,42 +1347,22 @@ StartJob(int       id,			/* I - Job ID */
 		filterfds[2][2];	/* Pipes used between the filters */
   int		envc;			/* Number of environment variables */
   char		*argv[8],		/* Filter command-line arguments */
+		sani_uri[1024],		/* Sanitized DEVICE_URI env var */
 		filename[1024],		/* Job filename */
 		command[1024],		/* Full path to filter/backend command */
 		jobid[255],		/* Job ID string */
 		title[IPP_MAX_NAME],	/* Job title string */
 		copies[255],		/* # copies string */
 		*envp[100],		/* Environment variables */
-#ifdef __APPLE__
-		processPath[1050],	/* CFProcessPath environment variable */
-#endif	/* __APPLE__ */
-		path[1024],		/* PATH environment variable */
-		ipp_port[1024],		/* IPP_PORT environment variable */
-		language[255],		/* LANG environment variable */
 		charset[255],		/* CHARSET environment variable */
+		class_name[255],	/* CLASS environment variable */
 		classification[1024],	/* CLASSIFICATION environment variable */
 		content_type[1024],	/* CONTENT_TYPE environment variable */
 		device_uri[1024],	/* DEVICE_URI environment variable */
-		sani_uri[1024],		/* Sanitized DEVICE_URI env var */
+		lang[255],		/* LANG environment variable */
 		ppd[1024],		/* PPD environment variable */
-		class_name[255],	/* CLASS environment variable */
 		printer_name[255],	/* PRINTER environment variable */
-		cups_cachedir[1024],	/* CUPS_CACHEDIR environment variable */
-		cups_datadir[1024],	/* CUPS_DATADIR environment variable */
-		cups_docroot[1024],	/* CUPS_DOCROOT environment variable */
-		cups_fontpath[1024],	/* CUPS_FONTPATH environment variable */
-		cups_serverbin[1024],	/* CUPS_SERVERBIN environment variable */
-		cups_serverroot[1024],	/* CUPS_SERVERROOT environment variable */
-		cups_statedir[1024],	/* CUPS_STATEDIR environment variable */
-		cache[255],		/* RIP_MAX_CACHE environment variable */
-		tmpdir[1024],		/* TMPDIR environment variable */
-		ld_library_path[1024],	/* LD_LIBRARY_PATH environment variable */
-		ld_preload[1024],	/* LD_PRELOAD environment variable */
-		dyld_library_path[1024],/* DYLD_LIBRARY_PATH environment variable */
-		shlib_path[1024],	/* SHLIB_PATH environment variable */
-		nlspath[1024],		/* NLSPATH environment variable */
-		vg_args[1024],		/* VG_ARGS environment variable */
-		ld_assume_kernel[1024];	/* LD_ASSUME_KERNEL environment variable */
+		rip_max_cache[255];	/* RIP_MAX_CACHE environment variable */
   static char	*options = NULL;	/* Full list of options */
   static int	optlength = 0;		/* Length of option buffer */
 
@@ -1885,7 +1865,7 @@ StartJob(int       id,			/* I - Job ID */
 	* the POSIX locale...
 	*/
 
-	strcpy(language, "LANG=C");
+	strcpy(lang, "LANG=C");
 	break;
 
     case 2 :
@@ -1893,7 +1873,7 @@ StartJob(int       id,			/* I - Job ID */
         * Just the language code (ll)...
 	*/
 
-        snprintf(language, sizeof(language), "LANG=%s",
+        snprintf(lang, sizeof(lang), "LANG=%s",
 	         attr->values[0].string.text);
         break;
 
@@ -1902,7 +1882,7 @@ StartJob(int       id,			/* I - Job ID */
         * Language and country code (ll-cc)...
 	*/
 
-        snprintf(language, sizeof(language), "LANG=%c%c_%c%c",
+        snprintf(lang, sizeof(lang), "LANG=%c%c_%c%c",
 	         attr->values[0].string.text[0],
 		 attr->values[0].string.text[1],
 		 toupper(attr->values[0].string.text[3] & 255),
@@ -1923,7 +1903,6 @@ StartJob(int       id,			/* I - Job ID */
              attr->values[0].string.text);
   }
 
-  snprintf(path, sizeof(path), "PATH=%s/filter:/bin:/usr/bin", ServerBin);
   snprintf(content_type, sizeof(content_type), "CONTENT_TYPE=%s/%s",
            current->filetypes[current->current_file]->super,
            current->filetypes[current->current_file]->type);
@@ -1931,88 +1910,17 @@ StartJob(int       id,			/* I - Job ID */
   cupsdSanitizeURI(printer->device_uri, sani_uri, sizeof(sani_uri));
   snprintf(ppd, sizeof(ppd), "PPD=%s/ppd/%s.ppd", ServerRoot, printer->name);
   snprintf(printer_name, sizeof(printer_name), "PRINTER=%s", printer->name);
-  snprintf(cache, sizeof(cache), "RIP_MAX_CACHE=%s", RIPCache);
-  snprintf(cups_cachedir, sizeof(cups_cachedir), "CUPS_CACHEDIR=%s", CacheDir);
-  snprintf(cups_datadir, sizeof(cups_datadir), "CUPS_DATADIR=%s", DataDir);
-  snprintf(cups_docroot, sizeof(cups_docroot), "CUPS_DOCROOT=%s", DocumentRoot);
-  snprintf(cups_fontpath, sizeof(cups_fontpath), "CUPS_FONTPATH=%s", FontPath);
-  snprintf(cups_serverbin, sizeof(cups_serverbin), "CUPS_SERVERBIN=%s", ServerBin);
-  snprintf(cups_serverroot, sizeof(cups_serverroot), "CUPS_SERVERROOT=%s", ServerRoot);
-  snprintf(cups_statedir, sizeof(cups_statedir), "CUPS_STATEDIR=%s", StateDir);
-  snprintf(tmpdir, sizeof(tmpdir), "TMPDIR=%s", TempDir);
-  sprintf(ipp_port, "IPP_PORT=%d", LocalPort);
+  snprintf(rip_max_cache, sizeof(rip_max_cache), "RIP_MAX_CACHE=%s", RIPCache);
 
-  envc = 0;
+  envc = cupsdLoadEnv(envp, (int)(sizeof(envp) / sizeof(envp[0])));
 
-  envp[envc ++] = path;
-  envp[envc ++] = "SOFTWARE=CUPS/1.1";
-  envp[envc ++] = "USER=root";
   envp[envc ++] = charset;
-  envp[envc ++] = language;
-  if (TZ && TZ[0])
-    envp[envc ++] = TZ;
+  envp[envc ++] = lang;
   envp[envc ++] = ppd;
-  envp[envc ++] = cups_cachedir;
-  envp[envc ++] = cups_datadir;
-  envp[envc ++] = cups_docroot;
-  envp[envc ++] = cups_fontpath;
-  envp[envc ++] = cups_serverbin;
-  envp[envc ++] = cups_serverroot;
-  envp[envc ++] = cups_statedir;
-  envp[envc ++] = cache;
-  envp[envc ++] = tmpdir;
+  envp[envc ++] = rip_max_cache;
   envp[envc ++] = content_type;
   envp[envc ++] = device_uri;
   envp[envc ++] = printer_name;
-  envp[envc ++] = "CUPS_SERVER=localhost";
-  envp[envc ++] = ipp_port;
-
-  if (getenv("VG_ARGS") != NULL)
-  {
-    snprintf(vg_args, sizeof(vg_args), "VG_ARGS=%s", getenv("VG_ARGS"));
-    envp[envc ++] = vg_args;
-  }
-
-  if (getenv("LD_ASSUME_KERNEL") != NULL)
-  {
-    snprintf(ld_assume_kernel, sizeof(ld_assume_kernel), "LD_ASSUME_KERNEL=%s",
-             getenv("LD_ASSUME_KERNEL"));
-    envp[envc ++] = ld_assume_kernel;
-  }
-
-  if (getenv("LD_LIBRARY_PATH") != NULL)
-  {
-    snprintf(ld_library_path, sizeof(ld_library_path), "LD_LIBRARY_PATH=%s",
-             getenv("LD_LIBRARY_PATH"));
-    envp[envc ++] = ld_library_path;
-  }
-
-  if (getenv("LD_PRELOAD") != NULL)
-  {
-    snprintf(ld_preload, sizeof(ld_preload), "LD_PRELOAD=%s",
-             getenv("LD_PRELOAD"));
-    envp[envc ++] = ld_preload;
-  }
-
-  if (getenv("DYLD_LIBRARY_PATH") != NULL)
-  {
-    snprintf(dyld_library_path, sizeof(dyld_library_path), "DYLD_LIBRARY_PATH=%s",
-             getenv("DYLD_LIBRARY_PATH"));
-    envp[envc ++] = dyld_library_path;
-  }
-
-  if (getenv("SHLIB_PATH") != NULL)
-  {
-    snprintf(shlib_path, sizeof(shlib_path), "SHLIB_PATH=%s",
-             getenv("SHLIB_PATH"));
-    envp[envc ++] = shlib_path;
-  }
-
-  if (getenv("NLSPATH") != NULL)
-  {
-    snprintf(nlspath, sizeof(nlspath), "NLSPATH=%s", getenv("NLSPATH"));
-    envp[envc ++] = nlspath;
-  }
 
   if (Classification && !banner_page)
   {
@@ -2036,11 +1944,6 @@ StartJob(int       id,			/* I - Job ID */
     snprintf(class_name, sizeof(class_name), "CLASS=%s", current->dest);
     envp[envc ++] = class_name;
   }
-
-#ifdef __APPLE__
-  strlcpy(processPath, "<CFProcessPath>", sizeof(processPath));
-  envp[envc ++] = processPath;
-#endif	/* __APPLE__ */
 
   envp[envc] = NULL;
 

@@ -23,8 +23,8 @@
  *
  * Contents:
  *
- *   cupsdStartProcess() - Start a process.
  *   cupsdEndProcess()   - End a process.
+ *   cupsdStartProcess() - Start a process.
  */
 
 /*
@@ -33,6 +33,21 @@
 
 #include "cupsd.h"
 #include <grp.h>
+
+
+/*
+ * 'cupsdEndProcess()' - End a process.
+ */
+
+int					/* O - 0 on success, -1 on failure */
+cupsdEndProcess(int pid,		/* I - Process ID */
+                int force)		/* I - Force child to die */
+{
+  if (force)
+    return (kill(pid, SIGKILL));
+  else
+    return (kill(pid, SIGTERM));
+}
 
 
 /*
@@ -199,21 +214,6 @@ cupsdStartProcess(
   ReleaseSignals();
 
   return (*pid);
-}
-
-
-/*
- * 'cupsdEndProcess()' - End a process.
- */
-
-int					/* O - 0 on success, -1 on failure */
-cupsdEndProcess(int pid,		/* I - Process ID */
-                int force)		/* I - Force child to die */
-{
-  if (force)
-    return (kill(pid, SIGKILL));
-  else
-    return (kill(pid, SIGTERM));
 }
 
 

@@ -108,7 +108,14 @@ StartListening(void)
   listener_t	*lis;			/* Current listening socket */
   struct hostent *host;			/* Host entry for server address */
   char		s[256];			/* String addresss */
-  int		have_domain;		/* Have a domain socket */
+  const char	*have_domain;		/* Have a domain socket? */
+  static const char * const encryptions[] =
+		{			/* Encryption values */
+		  "IfRequested",
+		  "Never",
+		  "Required",
+		  "Always"
+		};
 
 
   LogMessage(L_DEBUG, "StartListening: NumListeners=%d", NumListeners);
@@ -143,7 +150,7 @@ StartListening(void)
   * Setup socket listeners...
   */
 
-  for (i = NumListeners, lis = Listeners, LocalPort = 0, have_domain = 0;
+  for (i = NumListeners, lis = Listeners, LocalPort = 0, have_domain = NULL;
        i > 0; i --, lis ++)
   {
     httpAddrString(&(lis->address), s, sizeof(s));
@@ -156,7 +163,7 @@ StartListening(void)
 #ifdef AF_LOCAL
     if (lis->address.addr.sa_family == AF_LOCAL)
     {
-      have_domain = 1;
+      have_domain = lis->address.un.sun_path;
       p           = 0;
     }
     else
@@ -329,6 +336,33 @@ StartListening(void)
 
     cupsdEndProcess(getpid(), 0);
   }
+
+ /*
+  * Set the CUPS_SERVER and IPP_PORT variables based on the listeners...
+  */
+
+  if (have_domain)
+  {
+   /*
+    * Use domain sockets for the local connection...
+    */
+
+    cupsdSetEnv("CUPS_SERVER", have_domain);
+  }
+  else
+  {
+   /*
+    * Use the default local loopback address for the server...
+    */
+
+    cupsdSetEnv("CUPS_SERVER", "localhost");
+    cupsdSetEnvf("IPP_PORT", "%d", LocalPort);
+    cupsdSetEnv("CUPS_ENCRYPTION", encryptions[LocalEncryption]);
+  }
+
+ /*
+  * Resume listening for connections...
+  */
 
   ResumeListening();
 }

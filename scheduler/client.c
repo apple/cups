@@ -3009,31 +3009,16 @@ pipe_command(client_t *con,		/* I - Client connection */
 		*envp[100];		/* Environment variables */
   char		content_length[1024],	/* CONTENT_LENGTH environment variable */
 		content_type[1024],	/* CONTENT_TYPE environment variable */
-		cups_cachedir[1024],	/* CUPS_CACHEDIR environment variable */
-		cups_datadir[1024],	/* CUPS_DATADIR environment variable */
-		cups_docroot[1024],	/* CUPS_DOCROOT environment variable */
-		cups_serverbin[1024],	/* CUPS_SERVERBIN environment variable */
-		cups_serverroot[1024],	/* CUPS_SERVERROOT environment variable */
-		cups_statedir[1024],	/* CUPS_STATEDIR environment variable */
 		http_cookie[1024],	/* HTTP_COOKIE environment variable */
 		http_user_agent[1024],	/* HTTP_USER_AGENT environment variable */
-		ipp_port[1024],		/* IPP_PORT environment variable */
 		lang[1024],		/* LANG environment variable */
-		ld_library_path[1024],	/* LD_LIBRARY_PATH environment variable */
-		ld_preload[1024],	/* LD_PRELOAD environment variable */
-		dyld_library_path[1024],/* DYLD_LIBRARY_PATH environment variable */
-		shlib_path[1024],	/* SHLIB_PATH environment variable */
-		nlspath[1024],		/* NLSPATH environment variable */
 		*query_string,		/* QUERY_STRING env variable */
 		remote_addr[1024],	/* REMOTE_ADDR environment variable */
 		remote_host[1024],	/* REMOTE_HOST environment variable */
 		remote_user[1024],	/* REMOTE_USER environment variable */
 		script_name[1024],	/* SCRIPT_NAME environment variable */
 		server_name[1024],	/* SERVER_NAME environment variable */
-		server_port[1024],	/* SERVER_PORT environment variable */
-		tmpdir[1024],		/* TMPDIR environment variable */
-		vg_args[1024],		/* VG_ARGS environment variable */
-		ld_assume_kernel[1024];	/* LD_ASSUME_KERNEL environment variable */
+		server_port[1024];	/* SERVER_PORT environment variable */
   static const char * const locale_encodings[] =
 		{			/* Locale charset names */
 		  "ASCII",	"ISO8859-1",	"ISO8859-2",	"ISO8859-3",
@@ -3073,13 +3058,6 @@ pipe_command(client_t *con,		/* I - Client connection */
 		  "",		"",		"",		"",
 
 		  "EUC-CN",	"EUC-JP",	"EUC-KR",	"EUC-TW"
-		};
-  static const char * const encryptions[] =
-		{
-		  "CUPS_ENCRYPTION=IfRequested",
-		  "CUPS_ENCRYPTION=Never",
-		  "CUPS_ENCRYPTION=Required",
-		  "CUPS_ENCRYPTION=Always"
 		};
 
 
@@ -3193,109 +3171,45 @@ pipe_command(client_t *con,		/* I - Client connection */
   else
     strcpy(lang, "LANG=C");
 
-  sprintf(ipp_port, "IPP_PORT=%d", LocalPort);
-#ifdef AF_INET6
-  if (con->http.hostaddr.addr.sa_family == AF_INET6)
-    sprintf(server_port, "SERVER_PORT=%d",
-            ntohs(con->http.hostaddr.ipv6.sin6_port));
-  else
-#endif /* AF_INET6 */
-    sprintf(server_port, "SERVER_PORT=%d",
-            ntohs(con->http.hostaddr.ipv4.sin_port));
-
-  if (strcmp(con->http.hostname, "localhost") == 0)
-    strlcpy(server_name, "SERVER_NAME=localhost", sizeof(server_name));
-  else
-    snprintf(server_name, sizeof(server_name), "SERVER_NAME=%s", ServerName);
-  snprintf(remote_host, sizeof(remote_host), "REMOTE_HOST=%s", con->http.hostname);
   strcpy(remote_addr, "REMOTE_ADDR=");
   httpAddrString(&(con->http.hostaddr), remote_addr + 12,
                  sizeof(remote_addr) - 12);
-  snprintf(remote_user, sizeof(remote_user), "REMOTE_USER=%s", con->username);
-  snprintf(tmpdir, sizeof(tmpdir), "TMPDIR=%s", TempDir);
-  snprintf(cups_cachedir, sizeof(cups_cachedir), "CUPS_CACHEDIR=%s", CacheDir);
-  snprintf(cups_datadir, sizeof(cups_datadir), "CUPS_DATADIR=%s", DataDir);
-  snprintf(cups_docroot, sizeof(cups_docroot), "CUPS_DOCROOT=%s", DocumentRoot);
-  snprintf(cups_serverbin, sizeof(cups_serverbin), "CUPS_SERVERBIN=%s", ServerBin);
-  snprintf(cups_serverroot, sizeof(cups_serverroot), "CUPS_SERVERROOT=%s", ServerRoot);
-  snprintf(cups_statedir, sizeof(cups_statedir), "CUPS_STATEDIR=%s", StateDir);
 
-  envc = 0;
+  snprintf(remote_host, sizeof(remote_host), "REMOTE_HOST=%s",
+           con->http.hostname);
 
-  envp[envc ++] = "PATH=/bin:/usr/bin";
-  envp[envc ++] = "SERVER_SOFTWARE=CUPS/1.1";
-  envp[envc ++] = "GATEWAY_INTERFACE=CGI/1.1";
+  snprintf(script_name, sizeof(script_name), "SCRIPT_NAME=%s", con->uri);
+  if ((uriptr = strchr(script_name, '?')) != NULL)
+    *uriptr = '\0';
+
+  sprintf(server_port, "SERVER_PORT=%d", con->serverport);
+
+  snprintf(server_name, sizeof(server_name), "SERVER_NAME=%s",
+           con->servername);
+
+  envc = cupsdLoadEnv(envp, (int)(sizeof(envp) / sizeof(envp[0])));
+
+  envp[envc ++] = lang;
+  envp[envc ++] = "REDIRECT_STATUS=1";
+  envp[envc ++] = server_name;
+  envp[envc ++] = server_port;
+  envp[envc ++] = remote_addr;
+  envp[envc ++] = remote_host;
+  envp[envc ++] = script_name;
+
+  if (con->username[0])
+  {
+    snprintf(remote_user, sizeof(remote_user), "REMOTE_USER=%s", con->username);
+
+    envp[envc ++] = remote_user;
+  }
+
   if (con->http.version == HTTP_1_1)
     envp[envc ++] = "SERVER_PROTOCOL=HTTP/1.1";
   else if (con->http.version == HTTP_1_0)
     envp[envc ++] = "SERVER_PROTOCOL=HTTP/1.0";
   else
     envp[envc ++] = "SERVER_PROTOCOL=HTTP/0.9";
-  envp[envc ++] = "REDIRECT_STATUS=1";
-  envp[envc ++] = "CUPS_SERVER=localhost";
-  envp[envc ++] = ipp_port;
-  envp[envc ++] = server_name;
-  envp[envc ++] = server_port;
-  envp[envc ++] = remote_addr;
-  envp[envc ++] = remote_host;
-  if (con->username[0])
-    envp[envc ++] = remote_user;
-  envp[envc ++] = lang;
-  envp[envc ++] = TZ;
-  envp[envc ++] = tmpdir;
-  envp[envc ++] = cups_cachedir;
-  envp[envc ++] = cups_datadir;
-  envp[envc ++] = cups_docroot;
-  envp[envc ++] = cups_serverbin;
-  envp[envc ++] = cups_serverroot;
-  envp[envc ++] = cups_statedir;
-
-  if (getenv("VG_ARGS") != NULL)
-  {
-    snprintf(vg_args, sizeof(vg_args), "VG_ARGS=%s", getenv("VG_ARGS"));
-    envp[envc ++] = vg_args;
-  }
-
-  if (getenv("LD_ASSUME_KERNEL") != NULL)
-  {
-    snprintf(ld_assume_kernel, sizeof(ld_assume_kernel), "LD_ASSUME_KERNEL=%s",
-             getenv("LD_ASSUME_KERNEL"));
-    envp[envc ++] = ld_assume_kernel;
-  }
-
-  if (getenv("LD_LIBRARY_PATH") != NULL)
-  {
-    snprintf(ld_library_path, sizeof(ld_library_path), "LD_LIBRARY_PATH=%s",
-             getenv("LD_LIBRARY_PATH"));
-    envp[envc ++] = ld_library_path;
-  }
-
-  if (getenv("LD_PRELOAD") != NULL)
-  {
-    snprintf(ld_preload, sizeof(ld_preload), "LD_PRELOAD=%s",
-             getenv("LD_PRELOAD"));
-    envp[envc ++] = ld_preload;
-  }
-
-  if (getenv("DYLD_LIBRARY_PATH") != NULL)
-  {
-    snprintf(dyld_library_path, sizeof(dyld_library_path), "DYLD_LIBRARY_PATH=%s",
-             getenv("DYLD_LIBRARY_PATH"));
-    envp[envc ++] = dyld_library_path;
-  }
-
-  if (getenv("SHLIB_PATH") != NULL)
-  {
-    snprintf(shlib_path, sizeof(shlib_path), "SHLIB_PATH=%s",
-             getenv("SHLIB_PATH"));
-    envp[envc ++] = shlib_path;
-  }
-
-  if (getenv("NLSPATH") != NULL)
-  {
-    snprintf(nlspath, sizeof(nlspath), "NLSPATH=%s", getenv("NLSPATH"));
-    envp[envc ++] = nlspath;
-  }
 
   if (con->http.cookie)
   {
@@ -3311,15 +3225,11 @@ pipe_command(client_t *con,		/* I - Client connection */
     envp[envc ++] = http_user_agent;
   }
 
-  snprintf(script_name, sizeof(script_name), "SCRIPT_NAME=%s", con->uri);
-  if ((uriptr = strchr(script_name, '?')) != NULL)
-    *uriptr = '\0';
-  envp[envc ++] = script_name;
-
   if (con->operation == HTTP_GET)
   {
     for (i = 0; i < argc; i ++)
       LogMessage(L_DEBUG2, "argv[%d] = \"%s\"", i, argv[i]);
+
     envp[envc ++] = "REQUEST_METHOD=GET";
 
     if (query_string)
@@ -3348,8 +3258,6 @@ pipe_command(client_t *con,		/* I - Client connection */
 
   if (con->http.encryption == HTTP_ENCRYPT_ALWAYS)
     envp[envc ++] = "HTTPS=ON";
-
-  envp[envc ++] = (char *)encryptions[LocalEncryption];
 
  /*
   * Terminate the environment array...

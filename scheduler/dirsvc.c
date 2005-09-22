@@ -1117,6 +1117,7 @@ StartPolling(void)
   char		interval[10];		/* Poll interval */
   int		statusfds[2];		/* Status pipe */
   char		*argv[6];		/* Arguments */
+  char		*envp[100];		/* Environment */
 
 
  /*
@@ -1149,6 +1150,8 @@ StartPolling(void)
   argv[4] = bport;
   argv[5] = NULL;
 
+  cupsdLoadEnv(envp, (int)(sizeof(envp) / sizeof(envp[0])));
+
  /*
   * Create a pipe that receives the status messages from each
   * polling daemon...
@@ -1176,7 +1179,7 @@ StartPolling(void)
 
     argv[1] = poll->hostname;
 
-    if (cupsdStartProcess(polld, argv, NULL, -1, -1, statusfds[1], -1,
+    if (cupsdStartProcess(polld, argv, envp, -1, -1, statusfds[1], -1,
                           0, &(poll->pid)) < 0)
     {
       LogMessage(L_ERROR, "StartPolling: Unable to fork polling daemon - %s",

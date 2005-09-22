@@ -280,11 +280,6 @@ main(int  argc,				/* I - Number of command-line arguments */
   * Set the timezone info...
   */
 
-  if (getenv("TZ") != NULL)
-    SetStringf(&TZ, "TZ=%s", getenv("TZ"));
-  else
-    SetString(&TZ, "");
-
   tzset();
 
 #ifdef LC_TIME
@@ -1053,7 +1048,7 @@ SetStringf(char       **s,		/* O - New string */
            const char *f,		/* I - Printf-style format string */
 	   ...)				/* I - Additional args as needed */
 {
-  char		v[1024];		/* Formatting string value */
+  char		v[4096];		/* Formatting string value */
   va_list	ap;			/* Argument pointer */
   char		*olds;			/* Old string */
 

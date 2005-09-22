@@ -162,9 +162,6 @@ VAR int			NeedReload	VALUE(RELOAD_ALL),
 			SignalCount	VALUE(0);
 					/* Signal handler level */
 
-VAR char		*TZ		VALUE(NULL);
-					/* Timezone configuration */
-
 
 /*
  * Prototypes...
@@ -177,16 +174,30 @@ extern void	IgnoreChildSignals(void);
 extern void	LoadPPDs(const char *d);
 extern void	ReleaseSignals(void);
 extern void	SetString(char **s, const char *v);
-extern void	SetStringf(char **s, const char *f, ...);
+extern void	SetStringf(char **s, const char *f, ...)
+#ifdef __GNUC__
+__attribute__ ((__format__ (__printf__, 2, 3)))
+#endif /* __GNUC__ */
+;
 extern void	StartServer(void);
 extern void	StopServer(void);
 extern void	cupsdClosePipe(int *fds);
 extern int	cupsdOpenPipe(int *fds);
 
+extern void	cupsdClearEnv(void);
+extern void	cupsdInitEnv(void);
+extern int	cupsdLoadEnv(char *envp[], int envmax);
+extern void	cupsdSetEnv(const char *name, const char *value);
+extern void	cupsdSetEnvf(const char *name, const char *value, ...)
+#ifdef __GNUC__
+__attribute__ ((__format__ (__printf__, 2, 3)))
+#endif /* __GNUC__ */
+;
+
+extern int	cupsdEndProcess(int pid, int force);
 extern int	cupsdStartProcess(const char *command, char *argv[],
 				  char *envp[], int infd, int outfd,
 				  int errfd, int backfd, int root, int *pid);
-extern int	cupsdEndProcess(int pid, int force);
 
 
 /*

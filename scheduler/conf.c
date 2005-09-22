@@ -651,6 +651,12 @@ ReadConfiguration(void)
   }
 
  /*
+  * Setup environment variables...
+  */
+
+  cupsdInitEnv();
+
+ /*
   * Check the MaxClients setting, and then allocate memory for it...
   */
 

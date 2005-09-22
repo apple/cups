@@ -24,19 +24,51 @@
 
 include ../Makedefs
 
-CUPSDOBJS =	auth.o banners.o cert.o classes.o client.o conf.o \
-		dirsvc.o main.o ipp.o listen.o job.o log.o network.o \
-		policy.o printers.o process.o quotas.o server.o \
-		statbuf.o subscriptions.o
-MIMEOBJS =	filter.o mime.o type.o
-OBJS	=	$(CUPSDOBJS) $(MIMEOBJS) \
-		cups-deviced.o cups-driverd.o util.o \
+CUPSDOBJS =	\
+		auth.o \
+		banners.o \
+		cert.o \
+		classes.o \
+		client.o \
+		conf.o \
+		dirsvc.o \
+		env.o \
+		main.o \
+		ipp.o \
+		listen.o \
+		job.o \
+		log.o \
+		network.o \
+		policy.o \
+		printers.o \
+		process.o \
+		quotas.o \
+		server.o \
+		statbuf.o \
+		subscriptions.o
+MIMEOBJS =	\
+		filter.o \
+		mime.o \
+		type.o
+OBJS	=	\
+		$(CUPSDOBJS) \
+		$(MIMEOBJS) \
+		cups-deviced.o \
+		cups-driverd.o \
 		cups-lpd.o \
 		cups-polld.o \
 		testmime.o \
-		testspeed.o
-TARGETS	=	cupsd cups-deviced cups-driverd cups-lpd cups-polld libmime.a \
-		testmime testspeed
+		testspeed.o \
+		util.o
+TARGETS	=	\
+		cupsd \
+		cups-deviced \
+		cups-driverd \
+		cups-lpd \
+		cups-polld \
+		libmime.a \
+		testmime \
+		testspeed
 
 
 #
