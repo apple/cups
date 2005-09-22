@@ -1165,9 +1165,58 @@ void PSOutputDev::writeHeader(int firstPage, int lastPage,
     s = obj1.getString();
     if ((s->getChar(0) & 0xff) == 0xfe &&
 	(s->getChar(1) & 0xff) == 0xff) {
-      // cheap Unicode-to-ASCII conversion
-      for (i = 3; i < s->getLength() && i < 400; i += 2) {
-	writePSChar(s->getChar(i));
+      // Convert UTF-16 to UTF-8...
+      for (i = 2; i < s->getLength() && i < 400; i += 2) {
+	int ch = ((s->getChar(i) & 255) << 8) | (s->getChar(i + 1) & 255);
+
+        if (ch >= 0xd800 && ch <= 0xdbff) {
+	  // Multi-word UTF-16 char...
+	  i += 2;
+	  int lch = ((s->getChar(i) & 255) << 8) | (s->getChar(i + 1) & 255);
+
+          if (lch < 0xdc00 || lch >= 0xdfff) continue;
+
+          ch = (((ch & 0x3ff) << 10) | (lch & 0x3ff)) + 0x10000;
+	}
+
+	if (ch < 0x80)
+	{
+	 /*
+	  * Single byte ASCII...
+	  */
+
+	  writePSChar(ch);
+	}
+	else if (ch < 0x800)
+	{
+	 /*
+	  * Two-byte UTF-8...
+	  */
+
+	  writePSChar(0xc0 | (ch >> 6));
+	  writePSChar(0x80 | (ch & 0x3f));
+	}
+	else if (ch < 0x10000)
+	{
+	 /*
+	  * Three-byte UTF-8...
+	  */
+
+	  writePSChar(0xe0 | (ch >> 12));
+	  writePSChar(0x80 | ((ch >> 6) & 0x3f));
+	  writePSChar(0x80 | (ch & 0x3f));
+	}
+	else
+	{
+	 /*
+	  * Four-byte UTF-8...
+	  */
+
+	  writePSChar(0xf0 | (ch >> 18));
+	  writePSChar(0x80 | ((ch >> 12) & 0x3f));
+	  writePSChar(0x80 | ((ch >> 6) & 0x3f));
+	  writePSChar(0x80 | (ch & 0x3f));
+	}
       }
     } else {
       for (i = 0; i < s->getLength() && i < 200; ++i) {
