@@ -27,6 +27,14 @@
  *
  * Contents:
  *
+ *   main()          - Scan for drivers and return an IPP response.
+ *   add_ppd()       - Add a PPD file.
+ *   cat_ppd()       - Copy a PPD file to stdout.
+ *   compare_names() - Compare PPD filenames for sorting.
+ *   compare_ppds()  - Compare PPD file make and model names for sorting.
+ *   list_ppds()     - List PPD files.
+ *   load_ppds()     - Load PPD files recursively.
+ *   load_drivers()  - Load driver-generated PPD files.
  */
 
 /*
@@ -101,9 +109,9 @@ main(int  argc,				/* I - Number of command-line args */
   * Install or list PPDs...
   */
 
-  if (!strcmp(argv[1], "cat") && argc == 3)
+  if (argc == 3 && !strcmp(argv[1], "cat"))
     return (cat_ppd(argv[2]));
-  else if (!strcmp(argv[1], "list") && argc == 5)
+  else if (argc == 5 && !strcmp(argv[1], "list"))
     return (list_ppds(atoi(argv[2]), atoi(argv[3]), argv[4]));
   else
   {
@@ -191,6 +199,121 @@ add_ppd(const char *name,		/* I - PPD name */
 int					/* O - Exit code */
 cat_ppd(const char *name)		/* I - PPD name */
 {
+  char		scheme[256],		/* Scheme from PPD name */
+		*sptr;			/* Pointer into scheme */
+  char		line[1024];		/* Line/filename */
+
+
+ /*
+  * Figure out if this is a static or dynamic PPD file...
+  */
+
+  strlcpy(scheme, name, sizeof(scheme));
+  if ((sptr = strchr(scheme, ':')) != NULL)
+  {
+    *sptr = '\0';
+
+    if (!strcmp(scheme, "file"))
+    {
+     /*
+      * "file:name" == "name"...
+      */
+
+      name += 5;
+      scheme[0] = '\0';
+    }
+  }
+  else
+    scheme[0] = '\0';
+
+  if (scheme[0])
+  {
+   /*
+    * Dynamic PPD, see if we have a driver program to support it...
+    */
+
+    const char	*serverbin;		/* CUPS_SERVERBIN env var */
+
+
+    if ((serverbin = getenv("CUPS_SERVERBIN")) == NULL)
+      serverbin = CUPS_SERVERBIN;
+
+    snprintf(line, sizeof(line), "%s/driver/%s", serverbin, scheme);
+    if (access(line, X_OK))
+    {
+     /*
+      * File does not exist or is not executable...
+      */
+
+      fprintf(stderr, "ERROR: [cups-driverd] Unable to access \"%s\" - %s\n",
+              line, strerror(errno));
+      return (1);
+    }
+
+   /*
+    * Yes, let it cat the PPD file...
+    */
+
+    if (execl(line, scheme, "cat", name, (char *)NULL))
+    {
+     /*
+      * Unable to execute driver...
+      */
+
+      fprintf(stderr, "ERROR: [cups-driverd] Unable to execute \"%s\" - %s\n",
+              line, strerror(errno));
+      return (1);
+    }
+  }
+  else
+  {
+   /*
+    * Static PPD, see if we have a valid path and it exists...
+    */
+
+    cups_file_t	*fp;			/* PPD file */
+    const char	*datadir;		/* CUPS_DATADIR env var */
+
+
+    if (name[0] == '/' || strstr(name, "../") || strstr(name, "/.."))
+    {
+     /*
+      * Bad name...
+      */
+
+      fprintf(stderr, "ERROR: [cups-driverd] Bad PPD name \"%s\"!\n", name);
+      return (1);
+    }
+
+   /*
+    * Try opening the file...
+    */
+
+    if ((datadir = getenv("CUPS_DATADIR")) == NULL)
+      datadir = CUPS_DATADIR;
+
+    snprintf(line, sizeof(line), "%s/model/%s", datadir, name);
+    if ((fp = cupsFileOpen(line, "r")) == NULL)
+    {
+      fprintf(stderr, "ERROR: [cups-driverd] Unable to open \"%s\" - %s\n",
+              line, strerror(errno));
+      return (1);
+    }
+
+   /*
+    * Now copy the file to stdout...
+    */
+
+    while (cupsFileGets(fp, line, sizeof(line)))
+      puts(line);
+
+    cupsFileClose(fp);
+  }
+
+ /*
+  * Return with no errors...
+  */
+
   return (0);
 }
 
