@@ -284,13 +284,18 @@ testlang:	testlang.o libcups.a
 
 
 #
-# Automatic API reference manual...
+# Automatic API help files...
 #
 
-apirm:	$(HEADERS) $(LIBOBJS:.o=.c)
-	echo Generating CUPS API Reference Manual...
-	$(RM) apirm.xml
-	mxmldoc apirm.xml $(HEADERS) $(LIBOBJS:.o=.c) >../doc/help/apirm.html
+apihelp:
+	echo Generating CUPS API help files...
+	mxmldoc --title "Array API" array.h array.c >../doc/help/api-array.html
+	mxmldoc --title "File and Directory API" file.h file.c dir.h dir.c >../doc/help/api-filedir.html
+	mxmldoc --title "PPD API" ppd.h attr.c emit.c mark.c page.c ppd.c >../doc/help/api-ppd.html
+#	mxmldoc --title " API" >../doc/help/api-.html
+#	mxmldoc --title " API" >../doc/help/api-.html
+#	mxmldoc --title " API" >../doc/help/api-.html
+#	mxmldoc --title " API" >../doc/help/api-.html
 
 
 #

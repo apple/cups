@@ -106,7 +106,9 @@ main(int  argc,				/* I - Number of command-line arguments */
   for (i = 0; i < argc; i ++)
     fprintf(stderr, "argv[%d]=\"%s\"\n", i, argv[i]);
 
-  if (strstr(argv[0], "help.cgi"))
+  if ((helpfile = getenv("PATH_INFO")) != NULL)
+    helpfile ++;
+  else if (strstr(argv[0], "help.cgi"))
     helpfile = NULL;
   else
     helpfile = argv[0];
@@ -284,12 +286,12 @@ main(int  argc,				/* I - Number of command-line arguments */
       {
         if (inbody)
 	{
-	  if (!strncmp(line, "</BODY>", 7))
+	  if (!strncasecmp(line, "</BODY>", 7))
 	    break;
 
 	  printf("%s\n", line);
         }
-	else if (!strncmp(line, "<BODY", 5))
+	else if (!strncasecmp(line, "<BODY", 5))
 	  inbody = 1;
       }
 

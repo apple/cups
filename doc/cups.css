@@ -52,10 +52,6 @@ INPUT[TYPE="TEXT"], TEXTAREA {
   font-family: monospace;
 }
 
-LI {
-  margin-bottom: 1em;
-}
-
 SUB, SUP {
   font-size: 50%;
 }
@@ -72,6 +68,21 @@ TR.page, TD.page, TR.page TD {
 TR.data, TD.data, TR.data TD {
   background-color: #eeeebb;
   padding: 5;
+}
+
+P.table TABLE {
+  border: solid thin #999966;
+  border-spacing: 0px;
+}
+
+P.table TABLE TD {
+  border: solid thin #bbbb88;
+}
+
+P.table TABLE TH {
+  background: #bbbb88;
+  border: none;
+  border-bottom: solid thin #999966;
 }
 
 HR {

@@ -59,7 +59,7 @@ typedef enum                    /**** Unicode Char Property Types ****/
   CUPS_PROP_GENERAL_CATEGORY,   /* See 'cups_gencat_t' enum */
   CUPS_PROP_BIDI_CATEGORY,      /* See 'cups_bidi_t' enum */
   CUPS_PROP_COMBINING_CLASS,    /* See '_cups_comb_class_t' type */
-  CUPS_PROP_BREAK_CLASS         /* See 'cups__cups_break_class_t' enum */
+  CUPS_PROP_BREAK_CLASS         /* See 'cups_break_class_t' enum */
 } cups_property_t;
 
 
@@ -177,7 +177,7 @@ typedef enum                    /**** Unicode Line Break Class ****/
   CUPS_BREAK_SY,                /* Symbols Allowing Break After (A) */
   CUPS_BREAK_XX,                /* Unknown (XP) */
   CUPS_BREAK_ZW                 /* Zero Width Space (A) (norm) */
-} cups__cups_break_class_t;
+} cups_break_class_t;
 
 typedef int _cups_comb_class_t;   /**** Unicode Combining Class ****/
                                 /* 0=base, 1..254=combining char */

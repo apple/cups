@@ -132,7 +132,7 @@ static const char * const bidicat_index[] =
 
 typedef struct				/**** Line Break Class Index Struct****/
 {
-  cups__cups_break_class_t	breakclass;	/* Line Break Class Value */
+  cups_break_class_t	breakclass;	/* Line Break Class Value */
   const char		*str;		/* Line Break Class String */
 } _cups_break_t;
 
@@ -1319,7 +1319,7 @@ get_break_class(const cups_utf32_t ch)	/* I - Source char */
 {
   int			result;		/* Result Value */
   _cups_break_map_t	*bmap;		/* Unicode Line Break Class Map */
-  cups__cups_break_class_t	breakclass;	/* Unicode Line Break Class */
+  cups_break_class_t	breakclass;	/* Unicode Line Break Class */
   cups_ucs2_t		*uni2break;	/* Unicode -> Line Break Class */
   _cups_globals_t	*cg = _cupsGlobals();
 					/* Pointer to library globals */
@@ -1359,7 +1359,7 @@ get_break_class(const cups_utf32_t ch)	/* I - Source char */
   if (uni2break == NULL)
     breakclass = CUPS_BREAK_AI;
   else
-    breakclass = (cups__cups_break_class_t)*(uni2break + 2);
+    breakclass = (cups_break_class_t)*(uni2break + 2);
 
   result = (int)breakclass;
 
@@ -1920,7 +1920,7 @@ get_breakmap(void)
   int			len;		/* String length */
   cups_utf32_t		unichar1;	/* Unicode character value */
   cups_utf32_t		unichar2;	/* Unicode character value */
-  cups__cups_break_class_t	breakclass;	/* Unicode char line break class */
+  cups_break_class_t	breakclass;	/* Unicode char line break class */
   _cups_break_map_t	*bmap;		/* Unicode Line Break Class Map */
   int			breakcount;	/* Count of Unicode Source Chars */
   cups_ucs2_t		*uni2break;	/* Unicode -> Line Break Class */
