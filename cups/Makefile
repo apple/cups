@@ -253,7 +253,8 @@ cups_C.h:	../locale/C/cups_C
 
 testhttp:	testhttp.o libcups.a
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ testhttp.o libcups.a $(NETLIBS) $(SSLLIBS) $(COMMONLIBS)
+	$(CC) $(LDFLAGS) -o $@ testhttp.o libcups.a \
+		$(NETLIBS) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
 
 
 #
@@ -262,7 +263,8 @@ testhttp:	testhttp.o libcups.a
 
 testipp:	testipp.o libcups.a
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ testipp.o libcups.a $(NETLIBS) $(SSLLIBS) $(COMMONLIBS)
+	$(CC) $(LDFLAGS) -o $@ testipp.o libcups.a \
+		$(NETLIBS) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
 
 
 #
@@ -271,7 +273,8 @@ testipp:	testipp.o libcups.a
 
 testi18n:	testi18n.o libcups.a
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ testi18n.o libcups.a $(NETLIBS) $(SSLLIBS) $(COMMONLIBS)
+	$(CC) $(LDFLAGS) -o $@ testi18n.o libcups.a \
+		$(NETLIBS) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
 
 
 #
@@ -280,7 +283,8 @@ testi18n:	testi18n.o libcups.a
 
 testlang:	testlang.o libcups.a
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ testlang.o libcups.a $(NETLIBS) $(SSLLIBS) $(COMMONLIBS)
+	$(CC) $(LDFLAGS) -o $@ testlang.o libcups.a \
+		$(NETLIBS) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
 
 
 #

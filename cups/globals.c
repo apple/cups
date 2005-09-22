@@ -141,7 +141,7 @@ globals_destructor(void *value)		/* I - Data to free */
 _cups_globals_t *			/* O - Pointer to global data */
 _cupsGlobals(void)
 {
-  static _cups_globals_t	globals = { 0 };/* Global data */
+  static _cups_globals_t globals;	/* Global data */
   static int		initialized = 0;/* Global data initialized? */
 
 
@@ -154,14 +154,16 @@ _cupsGlobals(void)
     initialized = 1;
 
    /*
-    * Initialize variables that have non-zero default values...
+    * Initialize global variables...
     */
+
+    memset(&globals, 0, sizeof(globals));
 
     globals.encryption  = (http_encryption_t)-1;
     globals.password_cb = _cupsGetPassword;
   }
 
-  return (&cups_globals);
+  return (&globals);
 }
 #endif /* HAVE_PTHREAD_H */
 
