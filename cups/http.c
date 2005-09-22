@@ -2538,7 +2538,7 @@ http_wait(http_t *http,			/* I - HTTP data */
  * 'http_write()' - Write a buffer to a HTTP connection.
  */
  
-int					/* O - Number of bytes written */
+static int				/* O - Number of bytes written */
 http_write(http_t     *http,		/* I - HTTP data */
           const char *buffer,		/* I - Buffer for data */
 	  int        length)		/* I - Number of bytes to write */
@@ -2652,7 +2652,7 @@ http_write_cdsa(
  * 'http_write_chunk()' - Write a chunked buffer.
  */
 
-int					/* O - Number bytes written */
+static int				/* O - Number bytes written */
 http_write_chunk(http_t     *http,	/* I - HTTP data */
                  const char *buffer,	/* I - Buffer to write */
 		 int        length)	/* I - Length of buffer */

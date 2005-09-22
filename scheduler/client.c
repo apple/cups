@@ -2446,6 +2446,8 @@ WriteClient(client_t *con)		/* I - Client connection */
   {
     LogRequest(con, HTTP_OK);
 
+    httpFlushWrite(HTTP(con));
+
     if (con->http.data_encoding == HTTP_ENCODE_CHUNKED)
     {
       if (httpPrintf(HTTP(con), "0\r\n\r\n") < 0)

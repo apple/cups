@@ -23,6 +23,7 @@
  *
  * Contents:
  *
+ *   main() - Main entry for CGI.
  */
 
 /*
