@@ -36,6 +36,7 @@
 #include "Page.h"
 #include "Stream.h"
 #include "Annot.h"
+#include "XRef.h"
 #include "PSOutputDev.h"
 
 #ifdef MACOS
@@ -1140,20 +1141,71 @@ PSOutputDev::~PSOutputDev() {
 void PSOutputDev::writeHeader(int firstPage, int lastPage,
 			      PDFRectangle *mediaBox, PDFRectangle *cropBox,
 			      int pageRotate) {
+  Object info, obj1;
   double x1, y1, x2, y2;
+  GString *s;
+  int i;
 
   switch (mode) {
   case psModePS:
     writePS("%!PS-Adobe-3.0\n");
-    writePSFmt("%%%%Creator: xpdf/pdftops %s\n", xpdfVersion);
-    writePSFmt("%%%%LanguageLevel: %d\n",
-	       (level == psLevel1 || level == psLevel1Sep) ? 1 :
-	       (level == psLevel2 || level == psLevel2Sep) ? 2 : 3);
-    if (level == psLevel1Sep || level == psLevel2Sep || level == psLevel3Sep) {
-      writePS("%%DocumentProcessColors: (atend)\n");
-      writePS("%%DocumentCustomColors: (atend)\n");
+    break;
+  case psModeEPS:
+    writePS("%!PS-Adobe-3.0 EPSF-3.0\n");
+    break;
+  case psModeForm:
+    writePS("%!PS-Adobe-3.0 Resource-Form\n");
+    break;
+  }
+
+  writePSFmt("% Produced by xpdf/pdftops %s\n", xpdfVersion);
+  xref->getDocInfo(&info);
+  if (info.dictLookup("Creator", &obj1)->isString()) {
+    writePS("%%Creator: ");
+    s = obj1.getString();
+    if ((s->getChar(0) & 0xff) == 0xfe &&
+	(s->getChar(1) & 0xff) == 0xff) {
+      // cheap Unicode-to-ASCII conversion
+      for (i = 3; i < s->getLength() && i < 400; i += 2) {
+	writePSChar(s->getChar(i));
+      }
+    } else {
+      for (i = 0; i < s->getLength() && i < 200; ++i) {
+	writePSChar(s->getChar(i));
+      }
     }
-    writePS("%%DocumentSuppliedResources: (atend)\n");
+    writePS("\n");
+  }
+  obj1.free();
+  if (info.dictLookup("Title", &obj1)->isString()) {
+    writePS("%%Title: ");
+    s = obj1.getString();
+    if ((s->getChar(0) & 0xff) == 0xfe &&
+	(s->getChar(1) & 0xff) == 0xff) {
+      // cheap Unicode-to-ASCII conversion
+      for (i = 3; i < s->getLength() && i < 400; i += 2) {
+	writePSChar(s->getChar(i));
+      }
+    } else {
+      for (i = 0; i < s->getLength() && i < 200; ++i) {
+	writePSChar(s->getChar(i));
+      }
+    }
+    writePS("\n");
+  }
+  obj1.free();
+  info.free();
+  writePSFmt("%%%%LanguageLevel: %d\n",
+	     (level == psLevel1 || level == psLevel1Sep) ? 1 :
+	     (level == psLevel2 || level == psLevel2Sep) ? 2 : 3);
+  if (level == psLevel1Sep || level == psLevel2Sep || level == psLevel3Sep) {
+    writePS("%%DocumentProcessColors: (atend)\n");
+    writePS("%%DocumentCustomColors: (atend)\n");
+  }
+  writePS("%%DocumentSuppliedResources: (atend)\n");
+
+  switch (mode) {
+  case psModePS:
     writePSFmt("%%%%DocumentMedia: plain %d %d 0 () ()\n",
 	       paperWidth, paperHeight);
     writePSFmt("%%%%BoundingBox: 0 0 %d %d\n", paperWidth, paperHeight);
@@ -1164,15 +1216,6 @@ void PSOutputDev::writeHeader(int firstPage, int lastPage,
     writePS("%%EndDefaults\n");
     break;
   case psModeEPS:
-    writePS("%!PS-Adobe-3.0 EPSF-3.0\n");
-    writePSFmt("%%%%Creator: xpdf/pdftops %s\n", xpdfVersion);
-    writePSFmt("%%%%LanguageLevel: %d\n",
-	       (level == psLevel1 || level == psLevel1Sep) ? 1 :
-	       (level == psLevel2 || level == psLevel2Sep) ? 2 : 3);
-    if (level == psLevel1Sep || level == psLevel2Sep || level == psLevel3Sep) {
-      writePS("%%DocumentProcessColors: (atend)\n");
-      writePS("%%DocumentCustomColors: (atend)\n");
-    }
     epsX1 = cropBox->x1;
     epsY1 = cropBox->y1;
     epsX2 = cropBox->x2;
@@ -1194,20 +1237,9 @@ void PSOutputDev::writeHeader(int firstPage, int lastPage,
 	floor(x2) != ceil(x2) || floor(y2) != ceil(y2)) {
       writePSFmt("%%%%HiResBoundingBox: %g %g %g %g\n", x1, y1, x2, y2);
     }
-    writePS("%%DocumentSuppliedResources: (atend)\n");
     writePS("%%EndComments\n");
     break;
   case psModeForm:
-    writePS("%!PS-Adobe-3.0 Resource-Form\n");
-    writePSFmt("%%%%Creator: xpdf/pdftops %s\n", xpdfVersion);
-    writePSFmt("%%%%LanguageLevel: %d\n",
-	       (level == psLevel1 || level == psLevel1Sep) ? 1 :
-	       (level == psLevel2 || level == psLevel2Sep) ? 2 : 3);
-    if (level == psLevel1Sep || level == psLevel2Sep || level == psLevel3Sep) {
-      writePS("%%DocumentProcessColors: (atend)\n");
-      writePS("%%DocumentCustomColors: (atend)\n");
-    }
-    writePS("%%DocumentSuppliedResources: (atend)\n");
     writePS("%%EndComments\n");
     writePS("32 dict dup begin\n");
     writePSFmt("/BBox [%d %d %d %d] def\n",
