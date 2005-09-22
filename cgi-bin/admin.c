@@ -2548,7 +2548,7 @@ do_menu(http_t      *http,		/* I - HTTP connection */
 		remote_admin = 0,	/* Remote administration allowed? */
 		browsing = 1,		/* Browsing enabled? */
 		browse_address = 0,	/* Browse address set? */
-		cancel_policy = 0,	/* Cancel-job policy set? */
+		cancel_policy = 1,	/* Cancel-job policy set? */
 		debug_logging = 0;	/* LogLevel debug set? */
     int		linenum = 0,		/* Line number in file */
 		in_policy = 0,		/* In a policy section? */
@@ -2610,7 +2610,7 @@ do_menu(http_t      *http,		/* I - HTTP connection */
 	  if (*valptr)
 	    *valptr++ = '\0';
 
-          if (!strcasecmp(value, "cancel-job"))
+          if (!strcasecmp(value, "cancel-job") || !strcasecmp(value, "all"))
 	  {
 	    in_cancel_job = 1;
 	    break;
@@ -2623,14 +2623,9 @@ do_menu(http_t      *http,		/* I - HTTP connection */
       {
         in_cancel_job = 0;
       }
-      else if (!strcasecmp(line, "Order") && in_cancel_job)
+      else if (!strcasecmp(line, "Require") && in_cancel_job)
       {
-       /*
-        * See if we are allowing all users to cancel jobs...
-	*/
-
-        if (!strcasecmp(value, "deny,allow"))
-	  cancel_policy = 1;
+        cancel_policy = 0;
       }
       else if (!strcasecmp(line, "<Location") && !strcasecmp(value, "/admin"))
       {
