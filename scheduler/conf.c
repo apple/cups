@@ -1065,8 +1065,9 @@ get_address(const char  *value,		/* I - Value string */
 
     address->un.sun_family = AF_LOCAL;
     strcpy(address->un.sun_path, value);
+
+    return (1);
   }
-  else
 #endif /* AF_LOCAL */
 
  /*
@@ -1780,11 +1781,11 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 
       memset(lis, 0, sizeof(listener_t));
 
-#ifdef AF_INET6
+#if defined(AF_INET6) && !defined(__OpenBSD__)
       if (get_address(value, INADDR_ANY, IPP_PORT, AF_INET6, &(lis->address)))
 #else
       if (get_address(value, INADDR_ANY, IPP_PORT, AF_INET, &(lis->address)))
-#endif /* AF_INET6 */
+#endif /* AF_INET6  && !__OpenBSD__ */
       {
         httpAddrString(&(lis->address), temp, sizeof(temp));
 

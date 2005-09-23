@@ -89,6 +89,31 @@ httpAddrEqual(const http_addr_t *addr1,		/* I - First address */
 
 
 /*
+ * 'httpAddrLength()' - Return the length of the address in bytes.
+ */
+
+int					/* O - Length in bytes */
+httpAddrLength(const http_addr_t *addr)	/* I - Address */
+{
+#ifdef AF_INET6
+  if (addr->addr.sa_family == AF_INET6)
+    return (sizeof(addr->ipv6));
+  else
+#endif /* AF_INET6 */
+#ifdef AF_LOCAL
+  if (addr->addr.sa_family == AF_LOCAL)
+    return (sizeof(addr->un.sun_family) + strlen(addr->un.sun_path));
+  else
+#endif /* AF_LOCAL */
+  if (addr->addr.sa_family == AF_INET)
+    return (sizeof(addr->ipv4));
+  else
+    return (0);
+
+}
+
+
+/*
  * 'httpAddrLoad()' - Load a host entry address into an HTTP address.
  */
 

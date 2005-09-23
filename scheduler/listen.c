@@ -170,8 +170,6 @@ StartListening(void)
 #endif /* AF_LOCAL */
     p = ntohs(lis->address.ipv4.sin_port);
 
-    LogMessage(L_DEBUG, "StartListening: address=%s port=%d", s, p);
-
    /*
     * Save the first port that is bound to the local loopback or
     * "any" address...
@@ -222,8 +220,6 @@ StartListening(void)
       exit(errno);
     }
 
-    LogMessage(L_DEBUG2, "StartListening: fd=%d", lis->fd);
-
     fcntl(lis->fd, F_SETFD, fcntl(lis->fd, F_GETFD) | FD_CLOEXEC);
 
    /*
@@ -245,7 +241,7 @@ StartListening(void)
     if (lis->address.addr.sa_family == AF_INET6)
     {
       status = bind(lis->fd, (struct sockaddr *)&(lis->address),
-	            sizeof(lis->address.ipv6));
+	            httpAddrLength(&(lis->address)));
 
 #ifdef IPV6_V6ONLY
       if (status >= 0 &&
@@ -254,6 +250,10 @@ StartListening(void)
        /*
         * Make sure that wildcard and loopback addresses accept
 	* connections from both IPv6 and IPv4 clients.
+	*
+	* NOTE: This DOES NOT WORK for OpenBSD, since they adopted a
+	*       stricter behavior in the name of security.  For OpenBSD,
+	*       you must list IPv4 and IPv6 listen addresses separately.
 	*/
 
         val = 0;
@@ -290,7 +290,7 @@ StartListening(void)
       */
 
       status = bind(lis->fd, (struct sockaddr *)&(lis->address),
-	            SUN_LEN(&(lis->address.un)));
+	            httpAddrLength(&(lis->address)));
 
      /*
       * Restore the umask...
@@ -320,6 +320,13 @@ StartListening(void)
                  s, p, strerror(errno));
       exit(errno);
     }
+
+    if (p)
+      LogMessage(L_INFO, "StartListening: Listening to %s:%d on fd %d...",
+        	 s, p, lis->fd);
+    else
+      LogMessage(L_INFO, "StartListening: Listening to %s on fd %d...",
+        	 s, lis->fd);
   }
 
  /*

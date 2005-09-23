@@ -418,6 +418,7 @@ extern void		httpSeparate2(const char *uri,
 extern int		httpAddrAny(const http_addr_t *addr);
 extern int		httpAddrEqual(const http_addr_t *addr1,
 			              const http_addr_t *addr2);
+extern int		httpAddrLength(const http_addr_t *addr);
 extern void		httpAddrLoad(const struct hostent *host, int port,
 			             int n, http_addr_t *addr);
 extern int		httpAddrLocalhost(const http_addr_t *addr);
