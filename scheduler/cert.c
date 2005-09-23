@@ -37,7 +37,6 @@
  */
 
 #include "cupsd.h"
-#include <grp.h>
 
 
 /*
@@ -52,7 +51,6 @@ AddCert(int        pid,			/* I - Process ID */
   cert_t	*cert;			/* Current certificate */
   int		fd;			/* Certificate file */
   char		filename[1024];		/* Certificate filename */
-  struct group	*grp;			/* System group */
   static const char hex[] = "0123456789ABCDEF";
 					/* Hex constants... */
 
@@ -99,13 +97,7 @@ AddCert(int        pid,			/* I - Process ID */
     */
 
     fchmod(fd, 0440);
-
-    if ((grp = getgrnam(SystemGroups[0])) == NULL)
-      fchown(fd, RunUser, 0);
-    else
-      fchown(fd, RunUser, grp->gr_gid);
-
-    endgrent();
+    fchown(fd, RunUser, SystemGroupIDs[0]);
 
     RootCertTime = time(NULL);
   }

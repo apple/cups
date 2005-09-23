@@ -313,7 +313,7 @@ ReadConfiguration(void)
 
   if ((language = DEFAULT_LANGUAGE) == NULL)
     language = "en";
-  else if (strcmp(language, "C") == 0 || strcmp(language, "POSIX") == 0)
+  else if (!strcmp(language, "C") || !strcmp(language, "POSIX"))
     language = "en";
 
   SetString(&DefaultLanguage, language);
@@ -337,36 +337,67 @@ ReadConfiguration(void)
 
   if (group != NULL)
   {
+   /*
+    * Found the group, use it!
+    */
+
     SetString(&SystemGroups[0], CUPS_DEFAULT_GROUP);
-    Group = group->gr_gid;
+
+    SystemGroupIDs[0] = group->gr_gid;
   }
   else
   {
+   /*
+    * Find the group associated with GID 0...
+    */
+
     group = getgrgid(0);
     endgrent();
 
     if (group != NULL)
-    {
       SetString(&SystemGroups[0], group->gr_name);
-      Group = 0;
-    }
     else
-    {
       SetString(&SystemGroups[0], "unknown");
-      Group = 0;
-    }
+
+    SystemGroupIDs[0] = 0;
   }
 
  /*
   * Find the default user...
   */
 
-  if ((user = getpwnam(CUPS_DEFAULT_USER)) == NULL)
-    User = 1;	/* Force to a non-priviledged account */
-  else
+  if ((user = getpwnam(CUPS_DEFAULT_USER)) != NULL)
     User = user->pw_uid;
+  else
+  {
+   /*
+    * Use the (historical) NFS nobody user ID (-2 as a 16-bit twos-
+    * complement number...)
+    */
+
+    User = 65534;
+  }
 
   endpwent();
+
+ /*
+  * Find the default group (nobody)...
+  */
+
+  group = getgrnam("nobody");
+  endgrent();
+
+  if (group != NULL)
+    Group = group->gr_gid;
+  else
+  {
+   /*
+    * Use the (historical) NFS nobody group ID (-2 as a 16-bit twos-
+    * complement number...)
+    */
+
+    Group = 65534;
+  }
 
  /*
   * Numeric options...
@@ -471,6 +502,44 @@ ReadConfiguration(void)
   LogMessage(L_INFO, "Loaded configuration file \"%s\"", ConfigurationFile);
 
  /*
+  * Validate the Group and SystemGroup settings - they cannot be the same,
+  * otherwise the CGI programs will be able to authenticate as root without
+  * a password!
+  */
+
+  if (!RunUser)
+  {
+    for (i = 0; i < NumSystemGroups; i ++)
+      if (Group == SystemGroupIDs[i])
+        break;
+
+    if (i < NumSystemGroups)
+    {
+     /*
+      * Log the error and reset the group to a safe value...
+      */
+
+      LogMessage(L_NOTICE, "Group and SystemGroup cannot use the same groups!");
+      LogMessage(L_INFO, "Resetting Group to \"nobody\"...");
+
+      group = getgrnam("nobody");
+      endgrent();
+
+      if (group != NULL)
+	Group = group->gr_gid;
+      else
+      {
+       /*
+	* Use the (historical) NFS nobody group ID (-2 as a 16-bit twos-
+	* complement number...)
+	*/
+
+	Group = 65534;
+      }
+    }
+  }
+
+ /*
   * Check that we have at least one listen/port line; if not, report this
   * as an error and exit!
   */
@@ -550,12 +619,12 @@ ReadConfiguration(void)
 
   snprintf(temp, sizeof(temp), "%s/certs", StateDir);
   if (access(temp, 0))
-    mkdir(temp, 0711);
-  chown(temp, RunUser, Group);
-  chmod(temp, 0711);
+    mkdir(temp, 0710);
+  chown(temp, RunUser, SystemGroupIDs[0]);
+  chmod(temp, 0710);
 
   chown(ServerRoot, RunUser, Group);
-  chmod(ServerRoot, 0775);
+  chmod(ServerRoot, 0755);
 
   snprintf(temp, sizeof(temp), "%s/ppd", ServerRoot);
   if (access(temp, 0))
@@ -575,19 +644,11 @@ ReadConfiguration(void)
 
   snprintf(temp, sizeof(temp), "%s/classes.conf", ServerRoot);
   chown(temp, RunUser, Group);
-#ifdef __APPLE__
   chmod(temp, 0600);
-#else
-  chmod(temp, ConfigFilePerm);
-#endif /* __APPLE__ */
 
   snprintf(temp, sizeof(temp), "%s/printers.conf", ServerRoot);
   chown(temp, RunUser, Group);
-#ifdef __APPLE__
   chmod(temp, 0600);
-#else
-  chmod(temp, ConfigFilePerm);
-#endif /* __APPLE__ */
 
   snprintf(temp, sizeof(temp), "%s/passwd.md5", ServerRoot);
   chown(temp, User, Group);
@@ -1620,6 +1681,7 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
   location_t	*location;		/* Browse location */
   cups_file_t	*incfile;		/* Include file */
   char		incname[1024];		/* Include filename */
+  struct group	*group;			/* Group */
 
 
  /*
@@ -2272,7 +2334,8 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 	if (p != NULL)
 	  User = p->pw_uid;
 	else
-	  LogMessage(L_WARN, "Unknown username \"%s\"", value);
+	  LogMessage(L_ERROR, "Unknown User \"%s\" on line %d, ignoring!",
+	             value, linenum);
       }
     }
     else if (!strcasecmp(line, "Group"))
@@ -2285,15 +2348,14 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
         Group = atoi(value);
       else
       {
-        struct group *g;	/* Group information */
-
         endgrent();
-	g = getgrnam(value);
+	group = getgrnam(value);
 
-	if (g != NULL)
-	  Group = g->gr_gid;
+	if (group != NULL)
+	  Group = group->gr_gid;
 	else
-	  LogMessage(L_WARN, "Unknown groupname \"%s\"", value);
+	  LogMessage(L_ERROR, "Unknown Group \"%s\" on line %d, ignoring!",
+	             value, linenum);
       }
     }
     else if (!strcasecmp(line, "SystemGroup"))
@@ -2306,7 +2368,7 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 		quote;		/* Quote character */
 
 
-      for (i = NumSystemGroups; *value && i < MAX_SYSTEM_GROUPS; i ++)
+      for (i = NumSystemGroups; *value && i < MAX_SYSTEM_GROUPS;)
       {
         if (*value == '\'' || *value == '\"')
 	{
@@ -2334,7 +2396,19 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
         if (*valueptr)
           *valueptr++ = '\0';
 
-        SetString(SystemGroups + i, value);
+        group = getgrnam(value);
+        if (group)
+	{
+          SetString(SystemGroups + i, value);
+	  SystemGroupIDs[i] = group->gr_gid;
+
+	  i ++;
+	}
+	else
+	  LogMessage(L_ERROR, "Unknown SystemGroup \"%s\" on line %d, ignoring!",
+	             value, linenum);
+
+        endgrent();
 
         value = valueptr;
 

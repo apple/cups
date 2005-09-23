@@ -72,9 +72,11 @@ VAR char		*ConfigurationFile	VALUE(NULL),
 					/* Root directory for documents */
 VAR int			NumSystemGroups		VALUE(0);
 					/* Number of system group names */
-VAR char		*SystemGroups[MAX_SYSTEM_GROUPS],
+VAR char		*SystemGroups[MAX_SYSTEM_GROUPS];
 					/* System group names */
-			*AccessLog		VALUE(NULL),
+VAR int			SystemGroupIDs[MAX_SYSTEM_GROUPS];
+					/* System group IDs */
+VAR char		*AccessLog		VALUE(NULL),
 					/* Access log filename */
 			*ErrorLog		VALUE(NULL),
 					/* Error log filename */
@@ -110,7 +112,7 @@ VAR gid_t		Group			VALUE(0);
 					/* Group ID for server */
 VAR int			ClassifyOverride	VALUE(0),
 					/* Allow overrides? */
-			ConfigFilePerm		VALUE(0600),
+			ConfigFilePerm		VALUE(0640),
 					/* Permissions for config files */
 			LogFilePerm		VALUE(0644),
 					/* Permissions for log files */
