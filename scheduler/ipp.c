@@ -128,7 +128,7 @@ static void	copy_attrs(ipp_t *to, ipp_t *from, ipp_attribute_t *req,
 		           ipp_tag_t group, int quickcopy);
 static int	copy_banner(client_t *con, job_t *job, const char *name);
 static int	copy_file(const char *from, const char *to);
-static int	copy_model(const char *from, const char *to);
+static int	copy_model(client_t *con, const char *from, const char *to);
 static void	create_job(client_t *con, ipp_attribute_t *uri);
 static void	create_subscription(client_t *con, ipp_attribute_t *uri);
 static void	delete_printer(client_t *con, ipp_attribute_t *uri);
@@ -1785,7 +1785,7 @@ add_printer(client_t        *con,	/* I - Client connection */
       snprintf(dstfile, sizeof(dstfile), "%s/ppd/%s.ppd", ServerRoot,
                printer->name);
 
-      if (strncmp(line, "*PPD-Adobe", 10) == 0)
+      if (!strncmp(line, "*PPD-Adobe", 10))
       {
        /*
 	* The new file is a PPD file, so move the file over to the
@@ -1818,7 +1818,7 @@ add_printer(client_t        *con,	/* I - Client connection */
   }
   else if ((attr = ippFindAttribute(con->request, "ppd-name", IPP_TAG_NAME)) != NULL)
   {
-    if (strcmp(attr->values[0].string.text, "raw") == 0)
+    if (!strcmp(attr->values[0].string.text, "raw"))
     {
      /*
       * Raw driver, remove any existing PPD or interface script files.
@@ -1838,9 +1838,6 @@ add_printer(client_t        *con,	/* I - Client connection */
       * PPD model file...
       */
 
-      snprintf(srcfile, sizeof(srcfile), "%s/model/%s", DataDir,
-               attr->values[0].string.text);
-
       snprintf(dstfile, sizeof(dstfile), "%s/interfaces/%s", ServerRoot,
                printer->name);
       unlink(dstfile);
@@ -1848,10 +1845,10 @@ add_printer(client_t        *con,	/* I - Client connection */
       snprintf(dstfile, sizeof(dstfile), "%s/ppd/%s.ppd", ServerRoot,
                printer->name);
 
-      if (copy_model(srcfile, dstfile))
+      if (copy_model(con, attr->values[0].string.text, dstfile))
       {
         LogMessage(L_ERROR, "add_printer: Unable to copy PPD file from %s to %s - %s!",
-	           srcfile, dstfile, strerror(errno));
+	           attr->values[0].string.text, dstfile, strerror(errno));
         send_ipp_error(con, IPP_INTERNAL_ERROR);
 	return;
       }
@@ -2989,9 +2986,16 @@ copy_file(const char *from,		/* I - Source file */
  */
 
 static int				/* O - 0 = success, -1 = error */
-copy_model(const char *from,		/* I - Source file */
+copy_model(client_t   *con,		/* I - Client connection */
+           const char *from,		/* I - Source file */
            const char *to)		/* I - Destination file */
 {
+  char		tempfile[1024];		/* Temporary PPD file */
+  int		tempfd;			/* Temporary PPD file descriptor */
+  int		temppid;		/* Process ID of cups-driverd */
+  struct stat	tempinfo;		/* Temporary PPD file information */
+  char		*argv[4],		/* Command-line arguments */
+		*envp[100];		/* Environment */
   cups_file_t	*src,			/* Source file */
 		*dst;			/* Destination file */
   char		buffer[2048],		/* Copy buffer */
@@ -3011,17 +3015,83 @@ copy_model(const char *from,		/* I - Source file */
 #endif /* HAVE_LIBPAPER */
 
 
-  LogMessage(L_DEBUG2, "copy_model(\"%s\", \"%s\")\n", from, to);
+  LogMessage(L_DEBUG2, "copy_model(con=%p, from=\"%s\", to=\"%s\")\n",
+             con, from, to);
+
+ /*
+  * Run cups-driverd to get the PPD file...
+  */
+
+  argv[0] = "cups-driverd";
+  argv[1] = "cat";
+  argv[2] = (char *)from;
+  argv[3] = NULL;
+
+  cupsdLoadEnv(envp, (int)(sizeof(envp) / sizeof(envp[0])));
+
+  snprintf(buffer, sizeof(buffer), "%s/daemon/cups-driverd", ServerBin);
+  snprintf(tempfile, sizeof(tempfile), "%s/%d.ppd", TempDir, con->http.fd);
+  tempfd = open(tempfile, O_WRONLY | O_CREAT | O_TRUNC, 0600);
+  if (tempfd < 0)
+    return (-1);
+
+  LogMessage(L_DEBUG, "copy_model: Running \"cups-driverd cat %s\"...", from);
+
+  if (!cupsdStartProcess(buffer, argv, envp, -1, tempfd, -1, -1, 0, &temppid))
+  {
+    close(tempfd);
+    unlink(tempfile);
+    return (-1);
+  }
+
+  close(tempfd);
+
+ /*
+  * Wait up to 30 seconds for the PPD file to be copied...  When
+  * the program is done, we'll get a SIGCHLD signal which will
+  * wake us up...
+  */
+
+  if (!sleep(30))
+  {
+    cupsdEndProcess(temppid, 0);
+    LogMessage(L_ERROR, "copy_model: cups-driverd did not complete within 30 "
+                        "seconds!");
+    unlink(tempfile);
+    return (-1);
+  }
+
+ /*
+  * Check to see if we have a PPD file...
+  */
+
+  if (stat(tempfile, &tempinfo))
+  {
+    LogMessage(L_ERROR, "copy_model: stat of \"%s\" failed - %s", tempfile,
+               strerror(errno));
+    unlink(tempfile);
+    return (-1);
+  }
+
+  if (!tempinfo.st_size)
+  {
+    LogMessage(L_ERROR, "copy_model: empty PPD file!");
+    unlink(tempfile);
+    return (-1);
+  }
 
  /*
   * Read the source file and see what page sizes are supported...
   */
 
+  if ((src = cupsFileOpen(tempfile, "rb")) == NULL)
+  {
+    unlink(tempfile);
+    return (-1);
+  }
+
   have_letter = 0;
   have_a4     = 0;
-
-  if ((src = cupsFileOpen(from, "rb")) == NULL)
-    return (-1);
 
   while (cupsFileGets(src, buffer, sizeof(buffer)) != NULL)
     if (!strncmp(buffer, "*PageSize ", 10))
@@ -3167,6 +3237,7 @@ copy_model(const char *from,		/* I - Source file */
       free(defaults);
 
     cupsFileClose(src);
+    unlink(tempfile);
     return (-1);
   }
 
@@ -3213,6 +3284,8 @@ copy_model(const char *from,		/* I - Source file */
   */
 
   cupsFileClose(src);
+
+  unlink(tempfile);
 
   return (cupsFileClose(dst));
 }
