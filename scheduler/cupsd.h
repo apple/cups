@@ -157,10 +157,8 @@ VAR fd_set		*InputSet,	/* Input files for select() */
 
 VAR time_t		ReloadTime	VALUE(0);
 					/* Time of reload request... */
-VAR int			NeedReload	VALUE(RELOAD_ALL),
+VAR int			NeedReload	VALUE(RELOAD_ALL);
 					/* Need to load configuration? */
-			SignalCount	VALUE(0);
-					/* Signal handler level */
 
 
 /*

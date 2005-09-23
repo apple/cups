@@ -619,9 +619,12 @@ ReadConfiguration(void)
 
   snprintf(temp, sizeof(temp), "%s/certs", StateDir);
   if (access(temp, 0))
-    mkdir(temp, 0710);
-  chown(temp, RunUser, SystemGroupIDs[0]);
-  chmod(temp, 0710);
+    mkdir(temp, 0510);
+  chown(temp, User, SystemGroupIDs[0]);
+  if (RunUser)
+    chmod(temp, 0710);
+  else
+    chmod(temp, 0510);
 
   chown(ServerRoot, RunUser, Group);
   chmod(ServerRoot, 0755);

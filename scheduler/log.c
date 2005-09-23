@@ -411,10 +411,10 @@ check_log_file(cups_file_t **lf,	/* IO - Log file */
 
 
  /*
-  * See if we have a log file to check or we are handling a signal...
+  * See if we have a log file to check...
   */
 
-  if (!lf || !logname || !logname[0] || SignalCount)
+  if (!lf || !logname || !logname[0])
     return (1);
 
  /*
