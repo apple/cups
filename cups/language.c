@@ -984,7 +984,7 @@ appleLangDefault(void)
 	    buff[sizeof(buff) - 1] = '\0';
 
 	    for (i = 0;
-		 i < sizeof(_apple_name_locale) / sizeof(apple_name_locale[0]);
+		 i < sizeof(apple_name_locale) / sizeof(apple_name_locale[0]);
 		 i++)
 	    {
 	      if (strcasecmp(buff, apple_name_locale[i].name) == 0)

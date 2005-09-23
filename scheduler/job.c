@@ -2023,16 +2023,6 @@ StartJob(int       id,			/* I - Job ID */
     else
       strlcpy(command, filters[i].filter, sizeof(command));
 
-#ifdef __APPLE__
-   /*
-    * Setting CFProcessPath lets OS X's Core Foundation code find
-    * the bundle that may be associated with a filter or backend.
-    */
-
-    snprintf(processPath, sizeof(processPath), "CFProcessPath=%s", command);
-    LogMessage(L_DEBUG, "StartJob: %s\n", processPath);
-#endif	/* __APPLE__ */
-
     if (i < (num_filters - 1))
     {
       if (cupsdOpenPipe(filterfds[slot]))
@@ -2188,16 +2178,6 @@ StartJob(int       id,			/* I - Job ID */
     {
       sscanf(printer->device_uri, "%254[^:]", method);
       snprintf(command, sizeof(command), "%s/backend/%s", ServerBin, method);
-
-#ifdef __APPLE__
-     /*
-      * Setting CFProcessPath lets OS X's Core Foundation code find
-      * the bundle that may be associated with a filter or backend.
-      */
-
-      snprintf(processPath, sizeof(processPath), "CFProcessPath=%s", command);
-      LogMessage(L_DEBUG, "StartJob: %s\n", processPath);
-#endif	/* __APPLE__ */
 
       argv[0] = sani_uri;
 
