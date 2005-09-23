@@ -291,7 +291,7 @@ AcceptClient(listener_t *lis)	/* I - Listener socket */
   */
 
   i = sizeof(temp);
-  if (getpeername(con->http.fd, (struct sockaddr *)&temp, &i))
+  if (getsockname(con->http.fd, (struct sockaddr *)&temp, &i))
   {
     LogMessage(L_ERROR, "Unable to get local address - %s", strerror(errno));
 
