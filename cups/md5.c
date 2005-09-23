@@ -45,6 +45,9 @@
 
 #include "md5.h"
 #include "string.h"
+#ifdef __APPLE__
+#  include "md5-apple.h"
+#endif /* __APPLE__ */
 
 #define T1 0xd76aa478
 #define T2 0xe8c7b756
