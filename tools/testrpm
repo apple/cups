@@ -30,4 +30,6 @@ tar czf cups-$version-r$rev-source.tar.gz cups-$version
 tar cjf cups-$version-r$rev-source.tar.bz2 cups-$version
 
 echo Building rpm...
+rm -f /usr/src/redhat/RPMS/i386/cups*.rpm
+rm -f /usr/src/redhat/SRPMS/cups*.rpm
 rpmbuild -ta cups-$version-r$rev-source.tar.gz
