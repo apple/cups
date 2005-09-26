@@ -36,7 +36,7 @@ A:link:hover, A:visited:hover, A:active {
 }
 
 A.sel, TR.sel {
-  background-color: #e8e8b8;
+  background-color: #eeeebb;
 }
 
 TR.sel TD {
@@ -61,12 +61,12 @@ TR.header, TR.header TH, TH.header {
 }
 
 TR.page, TD.page, TR.page TD {
-  background-color: #d4d4a4;
+  background-color: #eeeebb;
   padding: 5;
 }
 
 TR.data, TD.data, TR.data TD {
-  background-color: #eeeebb;
+  background-color: #ddddaa;
   padding: 5;
 }
 

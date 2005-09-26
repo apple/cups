@@ -2889,6 +2889,9 @@ do_menu(http_t      *http,		/* I - HTTP connection */
       */
 
       ippDelete(response);
+
+      if (num_printer_devices)
+        free(printer_devices);
     }
   }
 
