@@ -2992,6 +2992,7 @@ copy_model(client_t   *con,		/* I - Client connection */
 {
   fd_set	*input;			/* select() input set */
   struct timeval timeout;		/* select() timeout */
+  int		maxfd;			/* Maximum file descriptor for select() */
   char		tempfile[1024];		/* Temporary PPD file */
   int		tempfd;			/* Temporary PPD file descriptor */
   int		temppid;		/* Process ID of cups-driverd */
@@ -3053,8 +3054,8 @@ copy_model(client_t   *con,		/* I - Client connection */
 
   LogMessage(L_DEBUG, "copy_model: Running \"cups-driverd cat %s\"...", from);
 
-  if (!cupsdStartProcess(buffer, argv, envp, -1, temppipe[1], -1, -1, 0,
-                         &temppid))
+  if (!cupsdStartProcess(buffer, argv, envp, -1, temppipe[1], CGIPipes[1],
+                         -1, 0, &temppid))
   {
     close(tempfd);
     unlink(tempfile);
@@ -3069,6 +3070,11 @@ copy_model(client_t   *con,		/* I - Client connection */
 
   total = 0;
 
+  if (temppipe[0] > CGIPipes[0])
+    maxfd = temppipe[0] + 1;
+  else
+    maxfd = CGIPipes[0] + 1;
+
   for (;;)
   {
    /*
@@ -3078,38 +3084,46 @@ copy_model(client_t   *con,		/* I - Client connection */
     bytes = 0;
 
     FD_SET(temppipe[0], input);
+    FD_SET(CGIPipes[0], input);
 
     timeout.tv_sec  = 30;
     timeout.tv_usec = 0;
 
-    if (select(temppipe[0] + 1, input, NULL, NULL, &timeout) < 0)
+    if ((i = select(maxfd, input, NULL, NULL, &timeout)) < 0)
     {
       if (errno == EINTR)
         continue;
       else
         break;
     }
-
-   /*
-    * If there is no data ready here, then we have timed out...
-    */
-
-    if (!FD_ISSET(temppipe[0], input))
-      break;
-
-   /*
-    * Read the PPD file from the pipe, and write it to the PPD file.
-    */
-
-    if ((bytes = read(temppipe[0], buffer, sizeof(buffer))) > 0)
+    else if (i == 0)
     {
-      if (write(tempfd, buffer, bytes) < bytes)
-        break;
+     /*
+      * We have timed out...
+      */
 
-      total += bytes;
-    }
-    else
       break;
+    }
+
+    if (FD_ISSET(temppipe[0], input))
+    {
+     /*
+      * Read the PPD file from the pipe, and write it to the PPD file.
+      */
+
+      if ((bytes = read(temppipe[0], buffer, sizeof(buffer))) > 0)
+      {
+	if (write(tempfd, buffer, bytes) < bytes)
+          break;
+
+	total += bytes;
+      }
+      else
+	break;
+    }
+
+    if (FD_ISSET(CGIPipes[0], input))
+      UpdateCGI();
   }
 
   close(temppipe[0]);
