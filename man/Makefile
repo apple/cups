@@ -23,14 +23,65 @@
 #
 
 include ../Makedefs
-include Makefile.common
 
 
 #
-# Other languages...
+# Man pages...
 #
 
-LANGDIRS =	fr
+MAN1	=	backend.man \
+		cups-config.man \
+		cupstestppd.man \
+		filter.man \
+		lp.man \
+		lpoptions.man \
+		lppasswd.man \
+		lpq.man \
+		lprm.man \
+		lpr.man \
+		lpstat.man
+MAN5	=	classes.conf.man \
+		cupsd.conf.man \
+		mime.convs.man \
+		mime.types.man \
+		printers.conf.man
+MAN8	=	accept.man \
+		cupsaddsmb.man \
+		cups-lpd.man \
+		cups-polld.man \
+		cupsd.man \
+		enable.man \
+		lpadmin.man \
+		lpinfo.man \
+		lpmove.man \
+		lpc.man
+
+CAT1	=	backend.$(CAT1EXT) \
+		cups-config.$(CAT1EXT) \
+		cupstestppd.$(CAT1EXT) \
+		filter.$(CAT1EXT) \
+		lp.$(CAT1EXT) \
+		lpoptions.$(CAT1EXT) \
+		lppasswd.$(CAT1EXT) \
+		lpq.$(CAT1EXT) \
+		lprm.$(CAT1EXT) \
+		lpr.$(CAT1EXT) \
+		lpstat.$(CAT1EXT)
+CAT5	=	classes.conf.$(CAT5EXT) \
+		cupsd.conf.$(CAT5EXT) \
+		mime.convs.$(CAT5EXT) \
+		mime.types.$(CAT5EXT) \
+		printers.conf.$(CAT5EXT)
+CAT8	=	accept.$(CAT8EXT) \
+		cupsaddsmb.$(CAT8EXT) \
+		cups-lpd.$(CAT8EXT) \
+		cups-polld.$(CAT8EXT) \
+		cupsd.$(CAT8EXT) \
+		enable.$(CAT8EXT) \
+		lpadmin.$(CAT8EXT) \
+		lpinfo.$(CAT8EXT) \
+		lpmove.$(CAT8EXT) \
+		lpc.$(CAT8EXT)
 
 
 #
@@ -38,10 +89,6 @@ LANGDIRS =	fr
 #
 
 all:	$(CAT1) $(CAT5) $(CAT8)
-	for dir in $(LANGDIRS); do \
-		echo "Making all in man/$$dir..."; \
-		(cd $$dir; $(MAKE) $(MFLAGS) all); \
-	done
 
 
 #
@@ -50,10 +97,6 @@ all:	$(CAT1) $(CAT5) $(CAT8)
 
 clean:
 	$(RM) $(CAT1) $(CAT5) $(CAT8)
-	for dir in $(LANGDIRS); do \
-		echo "Cleaning all in man/$$dir..."; \
-		(cd $$dir; $(MAKE) $(MFLAGS) clean); \
-	done
 
 
 #
@@ -110,10 +153,6 @@ install:	all
 	$(LN) accept.$(CAT8EXT) $(AMANDIR)/cat$(MAN8EXT)/reject.$(CAT8EXT)
 	$(RM) $(AMANDIR)/cat$(MAN8EXT)/disable.$(CAT8EXT)
 	$(LN) enable.$(CAT8EXT) $(AMANDIR)/cat$(MAN8EXT)/disable.$(CAT8EXT)
-#	for dir in $(LANGDIRS); do \
-#		echo "Installing all in man/$$dir..."; \
-#		(cd $$dir; $(MAKE) $(MFLAGS) install); \
-#	done
 
 
 #

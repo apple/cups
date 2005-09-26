@@ -38,6 +38,7 @@
  * Include necessary headers.
  */
 
+#include <cups/backend.h>
 #include <cups/cups.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -173,13 +174,13 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   if (argc == 1)
   {
     puts("network lpd \"Unknown\" \"LPD/LPR Host or Printer\"");
-    return (0);
+    return (CUPS_BACKEND_OK);
   }
   else if (argc < 6 || argc > 7)
   {
     fprintf(stderr, "Usage: %s job-id user title copies options [file]\n",
             argv[0]);
-    return (1);
+    return (CUPS_BACKEND_FAILED);
   }
 
  /*
@@ -202,7 +203,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
     if ((fd = cupsTempFd(tmpfilename, sizeof(tmpfilename))) < 0)
     {
       perror("ERROR: unable to create temporary file");
-      return (1);
+      return (CUPS_BACKEND_FAILED);
     }
 
     while ((bytes = fread(buffer, 1, sizeof(buffer), stdin)) > 0)
@@ -211,7 +212,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
         perror("ERROR: unable to write to temporary file");
 	close(fd);
 	unlink(tmpfilename);
-	return (1);
+	return (CUPS_BACKEND_FAILED);
       }
 
     close(fd);
@@ -578,7 +579,7 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
     {
       fprintf(stderr, "ERROR: Unable to locate printer \'%s\' - %s\n",
               hostname, hstrerror(h_errno));
-      return (1);
+      return (CUPS_BACKEND_STOP);
     }
 
     fprintf(stderr, "INFO: Attempting to connect to host %s for printer %s\n",
@@ -610,7 +611,7 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
 	if ((fd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
 	{
           perror("ERROR: Unable to create socket");
-          return (1);
+          return (CUPS_BACKEND_FAILED);
 	}
 
         lport = 0;
@@ -667,7 +668,7 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
 
 	  sleep(5);
 
-          return (1);
+          return (CUPS_BACKEND_FAILED);
 	}
 
 	if (error == ECONNREFUSED || error == EHOSTDOWN ||
@@ -706,7 +707,7 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
     if (stat(filename, &filestats))
     {
       perror("ERROR: unable to stat print file");
-      return (1);
+      return (CUPS_BACKEND_FAILED);
     }
 
     filestats.st_size *= manual_copies;
@@ -714,7 +715,7 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
     if ((fp = fopen(filename, "rb")) == NULL)
     {
       perror("ERROR: unable to open print file for reading");
-      return (1);
+      return (CUPS_BACKEND_FAILED);
     }
 
    /*
@@ -724,7 +725,7 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
 
     if (lpd_command(fd, timeout, "\002%s\n",
                     printer))		/* Receive print job(s) */
-      return (1);
+      return (CUPS_BACKEND_FAILED);
 
     gethostname(localhost, sizeof(localhost));
     localhost[31] = '\0'; /* RFC 1179, Section 7.2 - host name < 32 chars */
@@ -758,7 +759,7 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
     {
       if (lpd_command(fd, timeout, "\002%d cfA%03.3d%.15s\n", strlen(control),
                       getpid() % 1000, localhost))
-        return (1);
+        return (CUPS_BACKEND_FAILED);
 
       fprintf(stderr, "INFO: Sending control file (%lu bytes)\n",
               (unsigned long)strlen(control));
@@ -800,7 +801,7 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
       if (lpd_command(fd, timeout, "\003%u dfA%03.3d%.15s\n",
                       (unsigned)filestats.st_size, getpid() % 1000,
 		      localhost))
-        return (1);
+        return (CUPS_BACKEND_FAILED);
 
       fprintf(stderr, "INFO: Sending data file (%u bytes)\n",
               (unsigned)filestats.st_size);
@@ -864,7 +865,7 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
     {
       if (lpd_command(fd, timeout, "\002%d cfA%03.3d%.15s\n", strlen(control),
                       getpid() % 1000, localhost))
-        return (1);
+        return (CUPS_BACKEND_FAILED);
 
       fprintf(stderr, "INFO: Sending control file (%lu bytes)\n",
               (unsigned long)strlen(control));
@@ -903,7 +904,7 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
     fclose(fp);
 
     if (status == 0)
-      return (0);
+      return (CUPS_BACKEND_OK);
 
    /*
     * Waiting for a retry...

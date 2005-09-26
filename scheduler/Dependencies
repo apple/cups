@@ -71,7 +71,7 @@ job.o: ../cups/md5.h ../cups/string.h ../cups/cups.h ../cups/ipp.h
 job.o: ../cups/ppd.h ../cups/file.h mime.h ../cups/ipp.h ../cups/file.h
 job.o: ../cups/http.h ../cups/language.h ../cups/debug.h statbuf.h cert.h
 job.o: auth.h client.h policy.h printers.h classes.h job.h conf.h banners.h
-job.o: dirsvc.h network.h subscriptions.h ../cups/dir.h
+job.o: dirsvc.h network.h subscriptions.h ../cups/backend.h ../cups/dir.h
 log.o: cupsd.h ../cups/http-private.h ../config.h ../cups/http.h
 log.o: ../cups/md5.h ../cups/string.h ../cups/cups.h ../cups/ipp.h
 log.o: ../cups/ppd.h ../cups/file.h mime.h ../cups/ipp.h ../cups/file.h

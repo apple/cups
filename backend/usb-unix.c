@@ -126,7 +126,7 @@ print_device(const char *uri,		/* I - Device URI */
 
 	sleep(5);
 
-        return (1);
+        return (CUPS_BACKEND_FAILED);
       }
 
       if (errno == EBUSY)
@@ -143,7 +143,7 @@ print_device(const char *uri,		/* I - Device URI */
       {
 	fprintf(stderr, "ERROR: Unable to open USB device \"%s\": %s\n",
 	        uri, strerror(errno));
-	return (1);
+	return (CUPS_BACKEND_FAILED);
       }
     }
   }
@@ -324,7 +324,7 @@ print_device(const char *uri,		/* I - Device URI */
 
   close(fd);
 
-  return (wbytes < 0);
+  return (wbytes < 0 ? CUPS_BACKEND_FAILED : CUPS_BACKEND_OK);
 }
 
 

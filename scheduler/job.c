@@ -60,6 +60,7 @@
 
 #include "cupsd.h"
 #include <grp.h>
+#include <cups/backend.h>
 #include <cups/dir.h>
 
 
@@ -435,55 +436,106 @@ FinishJob(job_t *job)			/* I - Job */
 
     printer = job->printer;
 
-    StopJob(job->id, 0);
-    job->state->values[0].integer = IPP_JOB_PENDING;
-    SaveJob(job->id);
+    switch (-job->status)
+    {
+      default :
+      case CUPS_BACKEND_FAILED :
+         /*
+	  * Backend failure, use the error-policy to determine how to
+	  * act...
+	  */
+
+	  StopJob(job->id, 0);
+	  job->state->values[0].integer = IPP_JOB_PENDING;
+	  SaveJob(job->id);
+
+	 /*
+	  * If the job was queued to a class, try requeuing it...  For
+	  * faxes and retry-job queues, hold the current job for 5 minutes.
+	  */
+
+	  if (job->dtype & (CUPS_PRINTER_CLASS | CUPS_PRINTER_IMPLICIT))
+	    CheckJobs();
+	  else if ((printer->type & CUPS_PRINTER_FAX) ||
+        	   !strcmp(printer->error_policy, "retry-job"))
+	  {
+	   /*
+	    * See how many times we've tried to send the job; if more than
+	    * the limit, cancel the job.
+	    */
+
+	    job->tries ++;
+
+	    if (job->tries >= FaxRetryLimit)
+	    {
+	     /*
+	      * Too many tries...
+	      */
+
+	      LogMessage(L_ERROR, "Canceling job %d since it could not be sent after %d tries.",
+	        	 job->id, FaxRetryLimit);
+
+	      cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, job->printer, job,
+                	    "Job cancelled since it could not be sent after %d tries.",
+			    FaxRetryLimit);
+
+	      CancelJob(job->id, 0);
+	    }
+	    else
+	    {
+	     /*
+	      * Try again in N seconds...
+	      */
+
+	      set_hold_until(job, time(NULL) + FaxRetryInterval);
+	    }
+	  }
+	  else if (!strcmp(printer->error_policy, "abort-job"))
+	    CancelJob(job->id, 0);
+          break;
+
+      case CUPS_BACKEND_CANCEL :
+         /*
+	  * Cancel the job...
+	  */
+
+	  CancelJob(job->id, 0);
+          break;
+
+      case CUPS_BACKEND_HOLD :
+         /*
+	  * Hold the job...
+	  */
+
+	  StopJob(job->id, 0);
+	  SetJobHoldUntil(job->id, "indefinite");
+	  SaveJob(job->id);
+          break;
+
+      case CUPS_BACKEND_STOP :
+         /*
+	  * Stop the printer...
+	  */
+
+	  StopJob(job->id, 0);
+	  SaveJob(job->id);
+	  SetPrinterState(printer, IPP_PRINTER_STOPPED, 1);
+          break;
+
+      case CUPS_BACKEND_AUTH_REQUIRED :
+	  StopJob(job->id, 0);
+	  SetJobHoldUntil(job->id, "indefinite");
+	  /**** TODO ****/
+	  /* cupsdSetJobStateReasons(job->id, "authentication-required"); */
+	  SaveJob(job->id);
+          break;
+    }
 
    /*
-    * If the job was queued to a class, try requeuing it...  For
-    * faxes and retry-job queues, hold the current job for 5 minutes.
+    * Try printing another job...
     */
 
-    if (job->dtype & (CUPS_PRINTER_CLASS | CUPS_PRINTER_IMPLICIT))
-      CheckJobs();
-    else if ((printer->type & CUPS_PRINTER_FAX) ||
-             !strcmp(printer->error_policy, "retry-job"))
-    {
-     /*
-      * See how many times we've tried to send the job; if more than
-      * the limit, cancel the job.
-      */
-
-      job->tries ++;
-
-      if (job->tries >= FaxRetryLimit)
-      {
-       /*
-	* Too many tries...
-	*/
-
-	LogMessage(L_ERROR, "Canceling job %d since it could not be sent after %d tries.",
-	           job->id, FaxRetryLimit);
-
-	cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, job->printer, job,
-                      "Job cancelled since it could not be sent after %d tries.",
-		      FaxRetryLimit);
-
-	CancelJob(job->id, 0);
-      }
-      else
-      {
-       /*
-	* Try again in N seconds...
-	*/
-
-	set_hold_until(job, time(NULL) + FaxRetryInterval);
-      }
-
-      CheckJobs();
-    }
-    else if (!strcmp(printer->error_policy, "abort-job"))
-      CheckJobs();
+    CheckJobs();
   }
   else if (job->status > 0)
   {
@@ -2454,6 +2506,14 @@ UpdateJob(job_t *job)			/* I - Job to check */
     }
     else if (loglevel == L_STATE)
       SetPrinterReasons(job->printer, message);
+    else if (loglevel == L_ATTR)
+    {
+     /*
+      * Set attribute(s)...
+      */
+
+      /**** TODO ****/
+    }
 
     if (!strchr(job->status_buffer->buffer, '\n'))
       break;

@@ -96,7 +96,7 @@ print_device(const char *resource,	/* I - SCSI device */
   if (strncmp(resource, "/dev/scsi/", 10) != 0)
   {
     fprintf(stderr, "ERROR: Bad SCSI device file \"%s\"!\n", resource);
-    return (1);
+    return (CUPS_BACKEND_STOP);
   }
 
  /*
@@ -132,7 +132,7 @@ print_device(const char *resource,	/* I - SCSI device */
       {
 	fprintf(stderr, "ERROR: Unable to open SCSI device \"%s\" - %s\n",
         	resource, strerror(errno));
-	return (1);
+	return (CUPS_BACKEND_FAILED);
       }
       else
       {
@@ -209,7 +209,7 @@ print_device(const char *resource,	/* I - SCSI device */
 	fprintf(stderr, "ERROR: Unable to send print data (%d)\n",
 	        scsi_req.ds_status);
         close(scsi_fd);
-	return (1);
+	return (CUPS_BACKEND_FAILED);
       }
     }
 
@@ -222,7 +222,7 @@ print_device(const char *resource,	/* I - SCSI device */
 
   close(fd);
 
-  return (0);
+  return (CUPS_BACKEND_OK);
 }
 
 

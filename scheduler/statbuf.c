@@ -270,6 +270,11 @@ cupsdStatBufUpdate(cupsd_statbuf_t *sb,	/* I - Status buffer */
     *loglevel = L_STATE;
     message   = sb->buffer + 6;
   }
+  else if (!strncmp(sb->buffer, "ATTR:", 5))
+  {
+    *loglevel = L_ATTR;
+    message   = sb->buffer + 5;
+  }
   else
   {
     *loglevel = L_DEBUG;

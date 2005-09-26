@@ -3454,9 +3454,11 @@ create_job(client_t        *con,	/* I - Client connection */
   {
     if (attr->values[0].integer < 1 || attr->values[0].integer > MaxCopies)
     {
-      LogMessage(L_INFO, "create_job: bad copies value %d.",
+      LogMessage(L_ERROR, "create_job: Bad copies value %d.",
                  attr->values[0].integer);
-      send_ipp_error(con, IPP_BAD_REQUEST);
+      send_ipp_error(con, IPP_ATTRIBUTES);
+      ippAddInteger(con->response, IPP_TAG_UNSUPPORTED_GROUP, IPP_TAG_INTEGER,
+	           "copies", attr->values[0].integer);
       return;
     }
   }
@@ -5513,9 +5515,11 @@ print_job(client_t        *con,		/* I - Client connection */
   {
     if (attr->values[0].integer < 1 || attr->values[0].integer > MaxCopies)
     {
-      LogMessage(L_INFO, "print_job: bad copies value %d.",
+      LogMessage(L_ERROR, "print_job: Bad copies value %d.",
                  attr->values[0].integer);
-      send_ipp_error(con, IPP_BAD_REQUEST);
+      send_ipp_error(con, IPP_ATTRIBUTES);
+      ippAddInteger(con->response, IPP_TAG_UNSUPPORTED_GROUP, IPP_TAG_INTEGER,
+	           "copies", attr->values[0].integer);
       return;
     }
   }

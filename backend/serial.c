@@ -33,6 +33,7 @@
  * Include necessary headers.
  */
 
+#include <cups/backend.h>
 #include <cups/cups.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -158,12 +159,12 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   if (argc == 1)
   {
     list_devices();
-    return (0);
+    return (CUPS_BACKEND_OK);
   }
   else if (argc < 6 || argc > 7)
   {
     fputs("Usage: serial job-id user title copies options [file]\n", stderr);
-    return (1);
+    return (CUPS_BACKEND_FAILED);
   }
 
  /*
@@ -185,7 +186,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
     if ((fp = open(argv[6], O_RDONLY)) < 0)
     {
       perror("ERROR: unable to open print file");
-      return (1);
+      return (CUPS_BACKEND_FAILED);
     }
 
     copies = atoi(argv[4]);
@@ -237,7 +238,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 
 	sleep(5);
 
-        return (1);
+        return (CUPS_BACKEND_FAILED);
       }
 
       if (errno == EBUSY)
@@ -249,7 +250,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
       {
 	fprintf(stderr, "ERROR: Unable to open serial port device file \"%s\": %s\n",
 	        resource, strerror(errno));
-	return (1);
+	return (CUPS_BACKEND_FAILED);
       }
     }
   }
@@ -638,7 +639,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   if (fp != 0)
     close(fp);
 
-  return (wbytes < 0);
+  return (wbytes < 0 ? CUPS_BACKEND_FAILED : CUPS_BACKEND_OK);
 }
 
 

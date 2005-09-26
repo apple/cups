@@ -44,6 +44,7 @@
 #include <errno.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <cups/backend.h>
 #include <cups/http-private.h>
 #include <cups/cups.h>
 #include <cups/language.h>
@@ -188,13 +189,13 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
       s = argv[0];
 
     printf("network %s \"Unknown\" \"Internet Printing Protocol (%s)\"\n", s, s);
-    return (0);
+    return (CUPS_BACKEND_OK);
   }
   else if (argc < 6 || argc > 7)
   {
     fprintf(stderr, "Usage: %s job-id user title copies options [file]\n",
             argv[0]);
-    return (1);
+    return (CUPS_BACKEND_STOP);
   }
 
  /*
@@ -223,7 +224,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   {
     fputs("ERROR: Missing device URI on command-line and no DEVICE_URI environment variable!\n",
           stderr);
-    return (1);
+    return (CUPS_BACKEND_STOP);
   }
 
   if (!strcmp(method, "https"))
@@ -249,7 +250,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
     if ((fd = cupsTempFd(tmpfilename, sizeof(tmpfilename))) < 0)
     {
       perror("ERROR: unable to create temporary file");
-      return (1);
+      return (CUPS_BACKEND_FAILED);
     }
 
     while ((bytes = fread(buffer, 1, sizeof(buffer), stdin)) > 0)
@@ -258,7 +259,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
         perror("ERROR: unable to write to temporary file");
 	close(fd);
 	unlink(tmpfilename);
-	return (1);
+	return (CUPS_BACKEND_FAILED);
       }
 
     close(fd);
@@ -431,7 +432,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 
 	sleep(5);
 
-        return (1);
+        return (CUPS_BACKEND_FAILED);
       }
 
       if (errno == ECONNREFUSED || errno == EHOSTDOWN ||
@@ -541,7 +542,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 	if (supported)
           ippDelete(supported);
 
-	return (1);
+	return (CUPS_BACKEND_STOP);
       }
       else
       {
@@ -624,7 +625,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 
       sleep(5);
 
-      return (1);
+      return (CUPS_BACKEND_FAILED);
     }
   }
 
@@ -740,7 +741,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 	*/
 
 	if (run_pictwps_filter(argv, filename))
-	  return (1);
+	  return (CUPS_BACKEND_FAILED);
 
         filename = pstmpname;
 
@@ -997,7 +998,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   * Return the queue status...
   */
 
-  return (ipp_status > IPP_OK_CONFLICT);
+  return (ipp_status > IPP_OK_CONFLICT ? CUPS_BACKEND_FAILED : CUPS_BACKEND_OK);
 }
 
 
@@ -1068,7 +1069,25 @@ password_cb(const char *prompt)	/* I - Prompt (not used) */
 {
   (void)prompt;
 
-  return (password);
+  if (password)
+    return (password);
+  else
+  {
+   /*
+    * If there is no password set in the device URI, return the
+    * "authentication required" exit code...
+    */
+
+    if (tmpfilename[0])
+      unlink(tmpfilename);
+
+#ifdef __APPLE__
+    if (pstmpname[0])
+      unlink(pstmpname);
+#endif /* __APPLE__ */
+
+    exit(CUPS_BACKEND_AUTH_REQUIRED);
+  }
 }
 
 

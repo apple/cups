@@ -53,6 +53,7 @@
  * Include necessary headers.
  */
 
+#include <cups/backend.h>
 #include <cups/cups.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -88,7 +89,7 @@ int	print_device(const char *resource, int fd, int copies);
  * Dummy functions that do nothing on unsupported platforms...
  */
 void	list_devices(void) {}
-int	print_device(const char *resource, int fd, int copies) { return (1); }
+int	print_device(const char *resource, int fd, int copies) { return (CUPS_BACKEND_FAILED); }
 #endif /* __linux */
 
 
@@ -145,12 +146,12 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   if (argc == 1)
   {
     list_devices();
-    return (0);
+    return (CUPS_BACKEND_OK);
   }
   else if (argc < 6 || argc > 7)
   {
     fputs("Usage: scsi:/dev/file job-id user title copies options [file]\n", stderr);
-    return (1);
+    return (CUPS_BACKEND_FAILED);
   }
 
  /*
@@ -172,7 +173,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
     if ((fp = open(argv[6], O_RDONLY)) < 0)
     {
       perror("ERROR: unable to open print file");
-      return (1);
+      return (CUPS_BACKEND_FAILED);
     }
 
     copies = atoi(argv[4]);

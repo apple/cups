@@ -28,6 +28,7 @@
  * Log levels...
  */
 
+#define L_ATTR		-3	/* Used internally for attributes */
 #define L_STATE		-2	/* Used internally for state-reasons */
 #define L_PAGE		-1	/* Used internally for page logging */
 #define L_NONE		0

@@ -32,6 +32,7 @@
  * Include necessary headers.
  */
 
+#include <cups/backend.h>
 #include <cups/cups.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -121,13 +122,13 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   if (argc == 1)
   {
     puts("network socket \"Unknown\" \"AppSocket/HP JetDirect\"");
-    return (0);
+    return (CUPS_BACKEND_OK);
   }
   else if (argc < 6 || argc > 7)
   {
     fprintf(stderr, "Usage: %s job-id user title copies options [file]\n",
             argv[0]);
-    return (1);
+    return (CUPS_BACKEND_FAILED);
   }
 
  /*
@@ -149,7 +150,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
     if ((fp = open(argv[6], O_RDONLY)) < 0)
     {
       perror("ERROR: unable to open print file");
-      return (1);
+      return (CUPS_BACKEND_FAILED);
     }
 
     copies = atoi(argv[4]);
@@ -172,7 +173,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   {
     fprintf(stderr, "ERROR: Unable to locate printer \'%s\' - %s\n",
             hostname, hstrerror(h_errno));
-    return (1);
+    return (CUPS_BACKEND_STOP);
   }
 
   fprintf(stderr, "INFO: Attempting to connect to host %s on port %d\n",
@@ -187,7 +188,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
       if ((fd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
       {
 	perror("ERROR: Unable to create socket");
-	return (1);
+	return (CUPS_BACKEND_FAILED);
       }
 
       for (i = 0; hostaddr->h_addr_list[i]; i ++)
@@ -222,7 +223,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 
 	  sleep(5);
 
-          return (1);
+          return (CUPS_BACKEND_FAILED);
 	}
 
 	if (error == ECONNREFUSED || error == EHOSTDOWN ||
@@ -416,7 +417,10 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   if (fp != 0)
     close(fp);
 
-  return (wbytes < 0);
+  if (wbytes >= 0)
+    fputs("INFO: Ready to print.\n", stderr);
+
+  return (wbytes < 0 ? CUPS_BACKEND_FAILED : CUPS_BACKEND_OK);
 }
 
 

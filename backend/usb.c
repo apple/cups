@@ -39,6 +39,7 @@
 #  include <ApplicationServices/ApplicationServices.h>
 #endif /* __APPLE__ */
 
+#include <cups/backend.h>
 #include <cups/cups.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -124,7 +125,7 @@ print_device(const char *uri,		/* I - Device URI */
   (void)fp;
   (void)copies;
 
-  return (1);
+  return (CUPS_BACKEND_FAILED);
 }
 #endif /* __APPLE__ */
 
@@ -183,12 +184,12 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   if (argc == 1)
   {
     list_devices();
-    return (0);
+    return (CUPS_BACKEND_OK);
   }
   else if (argc < 6 || argc > 7)
   {
     fputs("Usage: usb job-id user title copies options [file]\n", stderr);
-    return (1);
+    return (CUPS_BACKEND_FAILED);
   }
 
  /*
@@ -242,7 +243,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
     {
       fprintf(stderr, "ERROR: unable to open print file %s - %s\n",
               argv[6], strerror(errno));
-      return (1);
+      return (CUPS_BACKEND_FAILED);
     }
 
     copies = atoi(argv[4]);

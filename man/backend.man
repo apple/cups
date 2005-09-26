@@ -1,7 +1,7 @@
 .\"
 .\" "$Id$"
 .\"
-.\"   backend man page for the Common UNIX Printing System (CUPS).
+.\"   Backend man page for the Common UNIX Printing System (CUPS).
 .\"
 .\"   Copyright 1997-2005 by Easy Software Products.
 .\"
@@ -21,52 +21,200 @@
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
-.TH backend 1 "Common UNIX Printing System" "8 October 2004" "Easy Software Products"
+.TH backend 1 "Common UNIX Printing System" "26 September 2005" "Easy Software Products"
+
 .SH NAME
 backend \- cups backend transmission interfaces
+
 .SH SYNOPSIS
 .B backend
 job user title num-copies options [
 .I filename
 ]
+
 .SH DESCRIPTION
-The CUPS backend interface provides a standard method for sending document
-files to different physical interfaces.
+The CUPS backend interface provides a standard method for sending
+document files to different physical interfaces.
+
 .LP
-Backends must be capable of reading from a filename on the command-line
-or from the standard input, copying the standard input to a temporary file
-if required by the physical interface.
+Backends must be capable of reading from a filename on the
+command-line or from the standard input, copying the standard
+input to a temporary file if required by the physical interface.
+
 .LP
 The command name (argv[0]) is set to the device URI of the
 destination printer. Starting with CUPS 1.1.22, any
 authentication information in argv[0] will be removed, so
 backend developers are urged to use the DEVICE_URI environment
 variable whenever authentication information is required.
+
+.SH EXIT CODES
+The following exit codes are defined for backends:
+
+.TP 5
+0 (CUPS_BACKEND_OK)
+.br
+The print file was successfully transmitted to the device or
+remote server.
+
+.TP 5
+1 (CUPS_BACKEND_FAILED)
+.br
+The print file was not successfully transmitted to the device or
+remote server. The scheduler will respond to this by canceling
+the job, retrying the job, or stopping the queue depending on the
+state of the error-policy attribute.
+
+.TP 5
+2 (CUPS_BACKEND_CANCEL)
+.br
+The print file was not successfully transmitted because one or
+more attributes are not supported. The scheduler will respond to
+this by canceling the job.
+
+.TP 5
+3 (CUPS_BACKEND_HOLD)
+.br
+The print file was not successfully transmitted because it cannot
+be printed at this time. The scheduler will respond to this by
+holding the job.
+
+.TP 5
+4 (CUPS_BACKEND_STOP)
+.br
+The print file was not successfully transmitted because it cannot
+be printed at this time. The scheduler will respond to this by
+stopping the queue.
+
+.TP 5
+5 (CUPS_BACKEND_AUTH_REQUIRED)
+.br
+The print file was not successfully transmitted because valid
+authentication information is required. The scheduler will
+respond to this by holding the job and adding the
+authentication-required job-reasons keyword.
+
+.PP
+All other exit code values are reserved.
+
+.SH LOG MESSAGES
+Messages sent to stderr are generally logged to
+printer-state-message attribute and the current ErrorLog. Each
+line begins with a standard prefix:
+
+.TP 5
+ALERT: message
+.br
+Sets the printer-state-message attribute and adds the specified
+message to the current ErrorLog using the "alert" log level.
+
+.TP 5
+ATTR: attribute=value [attribute=value]
+.br
+Sets the named job attribute(s). Typically this will be used to
+set the job-remote-id attribute.
+
+.TP 5
+CRIT: message
+.br
+Sets the printer-state-message attribute and adds the specified
+message to the current ErrorLog using the "critical" log level.
+
+.TP 5
+DEBUG: message
+.br
+Sets the printer-state-message attribute and adds the specified
+message to the current ErrorLog using the "debug" log level.
+
+.TP 5
+DEBUG2: message
+.br
+Sets the printer-state-message attribute and adds the specified
+message to the current ErrorLog using the "debug2" log level.
+
+.TP 5
+EMERG: message
+.br
+Sets the printer-state-message attribute and adds the specified
+message to the current ErrorLog using the "emergency" log level.
+
+.TP 5
+ERROR: message
+.br
+Sets the printer-state-message attribute and adds the specified
+message to the current ErrorLog using the "error" log level.
+
+.TP 5
+INFO: message
+.br
+Sets the printer-state-message attribute. If the current LogLevel
+is set to "debug2", also adds the specified message to the
+current ErrorLog using the "info" log level.
+
+.TP 5
+NOTICE: message
+.br
+Sets the printer-state-message attribute and adds the specified
+message to the current ErrorLog using the "notice" log level.
+
+.TP 5
+PAGE: page-number #-copies
+.TP 5
+PAGE: #-pages total
+.br
+Adds an entry to the current PageLog. The first form adds
+#-copies to the job-media-sheets-completed attribute. The second
+form sets the job-media-sheets-completed attribute to #-pages.
+
+.TP 5
+STATE: printer-state-reason [printer-state-reason ...]
+.TP 5
+STATE: + printer-state-reason [printer-state-reason ...]
+.TP 5
+STATE: - printer-state-reason [printer-state-reason ...]
+.br
+Sets, adds, or removes printer-state-reason keywords to the
+current queue. Typically this is used to indicate media, ink, and
+toner conditions on a printer.
+
+.TP 5
+WARNING: message
+.br
+Sets the printer-state-message attribute and adds the specified
+message to the current ErrorLog using the "warning" log level.
+
 .SH ENVIRONMENT VARIABLES
-The following environment variables are defined by the CUPS server when
-executing the backend:
+The following environment variables are defined by the CUPS
+server when executing the backend:
+
 .TP 5
 CHARSET
 .br
-The default text character set (typically us-ascii or iso-8859-1).
+The default text character set, typically utf-8.
+
 .TP 5
 CLASS
 .br
 When a job is submitted to a printer class, contains the name of
 the destination printer class. Otherwise this environment
 variable will not be set.
+
 .TP 5
 CONTENT_TYPE
 .br
-The MIME type associated with the file (e.g. application/postscript).
+The MIME type associated with the file (e.g.
+application/postscript).
+
 .TP 5
 CUPS_DATADIR
 .br
 The directory where data files can be found.
+
 .TP 5
 CUPS_SERVERROOT
 .br
 The root directory of the server.
+
 .TP 5
 DEVICE_URI
 .br
@@ -74,47 +222,58 @@ The device-uri associated with the printer; this is provided for
 shell scripts which may not be able to get the passed argv[0]
 string and for backends that require any authentication
 information which is not included in argv[0].
+
 .TP 5
 LANG
 .br
 The default language locale (typically C or en).
+
 .TP 5
 PATH
 .br
 The standard execution path for external programs that may be run by
 the backend.
+
 .TP 5
 PPD
 .br
-The full pathname of the PostScript Printer Description (PPD) file for
-this printer.
+The full pathname of the PostScript Printer Description (PPD)
+file for this printer.
+
 .TP 5
 PRINTER
 .br
 The name of the printer.
+
 .TP 5
 RIP_CACHE
 .br
-The recommended amount of memory to use for Raster Image Processors (RIPs).
+The recommended amount of memory to use for Raster Image
+Processors (RIPs).
+
 .TP 5
 SOFTWARE
 .br
 The name and version number of the server (typically CUPS/1.1).
+
 .TP 5
 TZ
 .br
 The timezone of the server.
+
 .TP 5
 USER
 .br
-The user executing the backend, typically root; consult the cupsd.conf file for
-the current setting.
+The user executing the backend, typically root; consult the
+cupsd.conf file for the current setting.
+
 .SH SEE ALSO
 cupsd(8), filter(1)
 CUPS Interface Design Description,
 CUPS Software Administrators Manual,
 CUPS Software Programmers Manual,
-http://localhost:631/documentation.html
+http://localhost:631/help
+
 .SH COPYRIGHT
 Copyright 1993-2005 by Easy Software Products, All Rights Reserved.
 .\"
