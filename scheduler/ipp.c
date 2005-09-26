@@ -2990,14 +2990,18 @@ copy_model(client_t   *con,		/* I - Client connection */
            const char *from,		/* I - Source file */
            const char *to)		/* I - Destination file */
 {
+  fd_set	*input;			/* select() input set */
+  struct timeval timeout;		/* select() timeout */
   char		tempfile[1024];		/* Temporary PPD file */
   int		tempfd;			/* Temporary PPD file descriptor */
   int		temppid;		/* Process ID of cups-driverd */
-  struct stat	tempinfo;		/* Temporary PPD file information */
+  int		temppipe[2];		/* Temporary pipes */
   char		*argv[4],		/* Command-line arguments */
 		*envp[100];		/* Environment */
   cups_file_t	*src,			/* Source file */
 		*dst;			/* Destination file */
+  int		bytes,			/* Bytes from pipe */
+		total;			/* Total bytes from pipe */
   char		buffer[2048],		/* Copy buffer */
 		*ptr;			/* Pointer into buffer */
   int		i;			/* Looping var */
@@ -3035,46 +3039,88 @@ copy_model(client_t   *con,		/* I - Client connection */
   if (tempfd < 0)
     return (-1);
 
+  cupsdOpenPipe(temppipe);
+
+  if ((input = calloc(1, SetSize)) == NULL)
+  {
+    close(tempfd);
+    unlink(tempfile);
+
+    LogMessage(L_ERROR, "copy_model: Unable to allocate %d bytes for select()...",
+               SetSize);
+    return (-1);
+  }
+
   LogMessage(L_DEBUG, "copy_model: Running \"cups-driverd cat %s\"...", from);
 
-  if (!cupsdStartProcess(buffer, argv, envp, -1, tempfd, -1, -1, 0, &temppid))
+  if (!cupsdStartProcess(buffer, argv, envp, -1, temppipe[1], -1, -1, 0,
+                         &temppid))
   {
     close(tempfd);
     unlink(tempfile);
     return (-1);
   }
 
+  close(temppipe[1]);
+
+ /*
+  * Wait up to 30 seconds for the PPD file to be copied...
+  */
+
+  total = 0;
+
+  for (;;)
+  {
+   /*
+    * See if we have data ready...
+    */
+
+    bytes = 0;
+
+    FD_SET(temppipe[0], input);
+
+    timeout.tv_sec  = 30;
+    timeout.tv_usec = 0;
+
+    if (select(temppipe[0] + 1, input, NULL, NULL, &timeout) < 0)
+    {
+      if (errno == EINTR)
+        continue;
+      else
+        break;
+    }
+
+   /*
+    * If there is no data ready here, then we have timed out...
+    */
+
+    if (!FD_ISSET(temppipe[0], input))
+      break;
+
+   /*
+    * Read the PPD file from the pipe, and write it to the PPD file.
+    */
+
+    if ((bytes = read(temppipe[0], buffer, sizeof(buffer))) > 0)
+    {
+      if (write(tempfd, buffer, bytes) < bytes)
+        break;
+
+      total += bytes;
+    }
+    else
+      break;
+  }
+
+  close(temppipe[0]);
   close(tempfd);
 
- /*
-  * Wait up to 30 seconds for the PPD file to be copied...  When
-  * the program is done, we'll get a SIGCHLD signal which will
-  * wake us up...
-  */
-
-  if (!sleep(30))
+  if (!total)
   {
-    cupsdEndProcess(temppid, 0);
-    LogMessage(L_ERROR, "copy_model: cups-driverd did not complete within 30 "
-                        "seconds!");
-    unlink(tempfile);
-    return (-1);
-  }
+   /*
+    * No data from cups-deviced...
+    */
 
- /*
-  * Check to see if we have a PPD file...
-  */
-
-  if (stat(tempfile, &tempinfo))
-  {
-    LogMessage(L_ERROR, "copy_model: stat of \"%s\" failed - %s", tempfile,
-               strerror(errno));
-    unlink(tempfile);
-    return (-1);
-  }
-
-  if (!tempinfo.st_size)
-  {
     LogMessage(L_ERROR, "copy_model: empty PPD file!");
     unlink(tempfile);
     return (-1);

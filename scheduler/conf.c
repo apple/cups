@@ -926,6 +926,13 @@ ReadConfiguration(void)
 
     MimeDatabase = mimeLoad(ServerRoot, temp);
 
+    if (!MimeDatabase)
+    {
+      LogMessage(L_EMERG, "Unable to load MIME database from \'%s\'!",
+                 ServerRoot);
+      exit(errno);
+    }
+
     LogMessage(L_INFO, "Loaded MIME database from \'%s\': %d types, %d filters...",
                ServerRoot, MimeDatabase->num_types, MimeDatabase->num_filters);
 
