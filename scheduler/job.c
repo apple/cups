@@ -148,7 +148,7 @@ CancelJob(int id,			/* I - Job to cancel */
     if (current->id == id)
     {
      /*
-      * Stop any processes that are working on the current...
+      * Stop any processes that are working on the current job...
       */
 
       DEBUG_puts("CancelJob: found job in list.");
@@ -161,6 +161,14 @@ CancelJob(int id,			/* I - Job to cancel */
       set_time(current, "time-at-completed");
 
       cupsdExpireSubscriptions(NULL, current);
+
+     /*
+      * Remove any authentication data...
+      */
+
+      snprintf(filename, sizeof(filename), "%s/a%05d", RequestRoot,
+	       current->id);
+      unlink(filename);
 
      /*
       * Remove the print file for good if we aren't preserving jobs or
@@ -528,6 +536,9 @@ FinishJob(job_t *job)			/* I - Job */
 	  /**** TODO ****/
 	  /* cupsdSetJobStateReasons(job->id, "authentication-required"); */
 	  SaveJob(job->id);
+
+	  cupsdAddEvent(CUPSD_EVENT_JOB_STOPPED, printer, job,
+	                "Authentication is required for job %d.", job->id);
           break;
     }
 

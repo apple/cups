@@ -252,7 +252,8 @@ typedef enum			/**** IPP operations... ****/
   CUPS_SET_DEFAULT,
   CUPS_GET_DEVICES,
   CUPS_GET_PPDS,
-  CUPS_MOVE_JOB
+  CUPS_MOVE_JOB,
+  CUPS_AUTHENTICATE_JOB
 } ipp_op_t;
 
 typedef enum			/**** IPP status codes... ****/

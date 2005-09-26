@@ -374,8 +374,11 @@ CreateCommonData(void)
 		  CUPS_DELETE_CLASS,
 		  CUPS_ACCEPT_JOBS,
 		  CUPS_REJECT_JOBS,
+		  CUPS_SET_DEFAULT,
 		  CUPS_GET_DEVICES,
 		  CUPS_GET_PPDS,
+		  CUPS_MOVE_JOB,
+		  CUPS_AUTHENTICATE_JOB,
 		  IPP_RESTART_JOB
 		};
   static const char * const charsets[] =/* charset-supported values */
@@ -1363,13 +1366,23 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
     else
       snprintf(resource, sizeof(resource), "/printers/%s", p->name);
 
-    if ((auth = FindBest(resource, HTTP_POST)) != NULL)
+    if ((auth = FindBest(resource, HTTP_POST)) == NULL)
+      auth = cupsdFindPolicyOp(p->op_policy_ptr, IPP_PRINT_JOB);
+
+    if (auth)
     {
       if (auth->type == AUTH_BASIC || auth->type == AUTH_BASICDIGEST)
 	auth_supported = "basic";
       else if (auth->type == AUTH_DIGEST)
 	auth_supported = "digest";
+
+      if (auth->type != AUTH_NONE)
+        p->type |= CUPS_PRINTER_AUTHENTICATED;
+      else
+        p->type &= ~CUPS_PRINTER_AUTHENTICATED;
     }
+    else
+      p->type &= ~CUPS_PRINTER_AUTHENTICATED;
   }
 
  /*

@@ -94,6 +94,7 @@ cupsdInitEnv(void)
   cupsdSetEnv("CUPS_DATADIR", DataDir);
   cupsdSetEnv("CUPS_DOCROOT", DocumentRoot);
   cupsdSetEnv("CUPS_FONTPATH", FontPath);
+  cupsdSetEnv("CUPS_REQUESTROOT", RequestRoot);
   cupsdSetEnv("CUPS_SERVERBIN", ServerBin);
   cupsdSetEnv("CUPS_SERVERROOT", ServerRoot);
   cupsdSetEnv("CUPS_STATEDIR", StateDir);

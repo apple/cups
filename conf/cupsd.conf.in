@@ -63,8 +63,8 @@ DefaultAuthType Basic
     Order deny,allow
   </Limit>
 
-  # Only the owner or an administrator can cancel a job...
-  <Limit Cancel-Job>
+  # Only the owner or an administrator can cancel or authenticate a job...
+  <Limit Cancel-Job CUPS-Authenticate-Job>
     Require user @OWNER @SYSTEM
     Order deny,allow
   </Limit>

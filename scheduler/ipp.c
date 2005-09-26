@@ -34,6 +34,7 @@
  *   add_printer_state_reasons() - Add the "printer-state-reasons" attribute
  *                                 based upon the printer state...
  *   add_queued_job_count()      - Add the "queued-job-count" attribute for
+ *   authenticate_job()          - Set job authentication info.
  *   cancel_all_jobs()           - Cancel all print jobs.
  *   cancel_job()                - Cancel a print job.
  *   cancel_subscription()       - Cancel a subscription.
@@ -70,6 +71,7 @@
  *   reject_jobs()               - Reject print jobs to a printer.
  *   release_job()               - Release a held print job.
  *   restart_job()               - Restart an old print job.
+ *   save_auth_info()            - Save authentication information for a job.
  *   send_document()             - Send a file to a printer or class.
  *   send_ipp_error()            - Send an error status back to the IPP client.
  *   set_default()               - Set the default destination...
@@ -118,6 +120,7 @@ static void	add_job_subscriptions(client_t *con, job_t *job);
 static void	add_printer(client_t *con, ipp_attribute_t *uri);
 static void	add_printer_state_reasons(client_t *con, printer_t *p);
 static void	add_queued_job_count(client_t *con, printer_t *p);
+static void	authenticate_job(client_t *con, ipp_attribute_t *uri);
 static void	cancel_all_jobs(client_t *con, ipp_attribute_t *uri);
 static void	cancel_job(client_t *con, ipp_attribute_t *uri);
 static void	cancel_subscription(client_t *con, int id);
@@ -154,6 +157,7 @@ static void	reject_jobs(client_t *con, ipp_attribute_t *uri);
 static void	release_job(client_t *con, ipp_attribute_t *uri);
 static void	renew_subscription(client_t *con, int sub_id);
 static void	restart_job(client_t *con, ipp_attribute_t *uri);
+static void	save_auth_info(client_t *con, int job_id);
 static void	send_document(client_t *con, ipp_attribute_t *uri);
 static void	send_ipp_error(client_t *con, ipp_status_t status);
 static void	set_default(client_t *con, ipp_attribute_t *uri);
@@ -511,6 +515,10 @@ ProcessIPPRequest(client_t *con)	/* I - Client connection */
 
 	  case CUPS_MOVE_JOB :
               move_job(con, uri);
+              break;
+
+	  case CUPS_AUTHENTICATE_JOB :
+              authenticate_job(con, uri);
               break;
 
           case IPP_CREATE_PRINTER_SUBSCRIPTION :
@@ -1960,6 +1968,161 @@ add_queued_job_count(client_t  *con,	/* I - Client connection */
 
   ippAddInteger(con->response, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
                 "queued-job-count", count);
+}
+
+
+/*
+ * 'authenticate_job()' - Set job authentication info.
+ */
+
+static void
+authenticate_job(client_t        *con,	/* I - Client connection */
+	         ipp_attribute_t *uri)	/* I - Job URI */
+{
+  ipp_attribute_t	*attr;		/* Job-id attribute */
+  int			jobid;		/* Job ID */
+  job_t			*job;		/* Current job */
+  char			method[HTTP_MAX_URI],
+					/* Method portion of URI */
+			username[HTTP_MAX_URI],
+					/* Username portion of URI */
+			host[HTTP_MAX_URI],
+					/* Host portion of URI */
+			resource[HTTP_MAX_URI];
+					/* Resource portion of URI */
+  int			port;		/* Port portion of URI */
+
+
+  LogMessage(L_DEBUG2, "authenticate_job(%p[%d], %s)\n", con, con->http.fd,
+             uri->values[0].string.text);
+
+ /*
+  * Start with "everything is OK" status...
+  */
+
+  con->response->request.status.status_code = IPP_OK;
+
+ /*
+  * See if we have a job URI or a printer URI...
+  */
+
+  if (!strcmp(uri->name, "printer-uri"))
+  {
+   /*
+    * Got a printer URI; see if we also have a job-id attribute...
+    */
+
+    if ((attr = ippFindAttribute(con->request, "job-id", IPP_TAG_INTEGER)) == NULL)
+    {
+      LogMessage(L_ERROR, "authenticate_job: got a printer-uri attribute but no job-id!");
+      send_ipp_error(con, IPP_BAD_REQUEST);
+      return;
+    }
+
+    jobid = attr->values[0].integer;
+  }
+  else
+  {
+   /*
+    * Got a job URI; parse it to get the job ID...
+    */
+
+    httpSeparate(uri->values[0].string.text, method, username, host, &port, resource);
+ 
+    if (strncmp(resource, "/jobs/", 6))
+    {
+     /*
+      * Not a valid URI!
+      */
+
+      LogMessage(L_ERROR, "authenticate_job: bad job-uri attribute \'%s\'!\n",
+                 uri->values[0].string.text);
+      send_ipp_error(con, IPP_BAD_REQUEST);
+      return;
+    }
+
+    jobid = atoi(resource + 6);
+  }
+
+ /*
+  * See if the job exists...
+  */
+
+  if ((job = FindJob(jobid)) == NULL)
+  {
+   /*
+    * Nope - return a "not found" error...
+    */
+
+    LogMessage(L_ERROR, "authenticate_job: job #%d doesn't exist!", jobid);
+    send_ipp_error(con, IPP_NOT_FOUND);
+    return;
+  }
+
+ /*
+  * See if the job has been completed...
+  */
+
+  if (job->state->values[0].integer != IPP_JOB_HELD)
+  {
+   /*
+    * Return a "not-possible" error...
+    */
+
+    LogMessage(L_ERROR, "authenticate_job: job #%d is not held for authentication!", jobid);
+    send_ipp_error(con, IPP_NOT_POSSIBLE);
+    return;
+  }
+
+ /*
+  * See if we have already authenticated...
+  */
+
+  if (!con->username[0])
+  {
+    send_ipp_error(con, IPP_NOT_AUTHORIZED);
+    return;
+  }
+
+ /*
+  * See if the job is owned by the requesting user...
+  */
+
+  if (!validate_user(job, con, job->username, username, sizeof(username)))
+  {
+    LogMessage(L_ERROR, "authenticate_job: \"%s\" not authorized to authenticate job id %d owned by \"%s\"!",
+               username, jobid, job->username);
+    send_ipp_error(con, IPP_FORBIDDEN);
+    return;
+  }
+
+ /*
+  * Save the authentication information for this job...
+  */
+
+  save_auth_info(con, job->id);
+
+ /*
+  * Reset the job-hold-until value to "no-hold"...
+  */
+
+  if ((attr = ippFindAttribute(job->attrs, "job-hold-until", IPP_TAG_KEYWORD)) == NULL)
+    attr = ippFindAttribute(job->attrs, "job-hold-until", IPP_TAG_NAME);
+
+  if (attr != NULL)
+  {
+    attr->value_tag = IPP_TAG_KEYWORD;
+    SetString(&(attr->values[0].string.text), "no-hold");
+  }
+
+ /*
+  * Release the job and return...
+  */
+
+  ReleaseJob(jobid);
+
+  LogMessage(L_INFO, "Job %d was authenticated by \'%s\'.", jobid,
+             con->username);
 }
 
 
@@ -3427,7 +3590,8 @@ create_job(client_t        *con,	/* I - Client connection */
   * Check policy...
   */
 
-  if (!cupsdCheckPolicy(printer->op_policy_ptr, con, NULL))
+  if (!cupsdCheckPolicy(printer->op_policy_ptr, con, NULL) ||
+      ((printer->type & CUPS_PRINTER_AUTHENTICATED) && !con->username[0]))
   {
     LogMessage(L_ERROR, "create_job: not authorized!");
     send_ipp_error(con, IPP_NOT_AUTHORIZED);
@@ -3531,7 +3695,10 @@ create_job(client_t        *con,	/* I - Client connection */
   attr = ippFindAttribute(job->attrs, "requesting-user-name", IPP_TAG_NAME);
 
   if (con->username[0])
+  {
     SetString(&job->username, con->username);
+    save_auth_info(con, job->id);
+  }
   else if (attr != NULL)
   {
     LogMessage(L_DEBUG, "create_job: requesting-user-name = \'%s\'",
@@ -5609,8 +5776,7 @@ print_job(client_t        *con,		/* I - Client connection */
     strcpy(type, "octet-stream");
   }
 
-  if (strcmp(super, "application") == 0 &&
-      strcmp(type, "octet-stream") == 0)
+  if (!strcmp(super, "application") && !strcmp(type, "octet-stream"))
   {
    /*
     * Auto-type the file...
@@ -5665,8 +5831,8 @@ print_job(client_t        *con,		/* I - Client connection */
   * Read any embedded job ticket info from PS files...
   */
 
-  if (strcasecmp(filetype->super, "application") == 0 &&
-      strcasecmp(filetype->type, "postscript") == 0)
+  if (!strcasecmp(filetype->super, "application") &&
+      !strcasecmp(filetype->type, "postscript"))
     read_ps_job_ticket(con);
 
  /*
@@ -5703,7 +5869,8 @@ print_job(client_t        *con,		/* I - Client connection */
   * Check policy...
   */
 
-  if (!cupsdCheckPolicy(printer->op_policy_ptr, con, NULL))
+  if (!cupsdCheckPolicy(printer->op_policy_ptr, con, NULL) ||
+      ((printer->type & CUPS_PRINTER_AUTHENTICATED) && !con->username[0]))
   {
     LogMessage(L_ERROR, "print_job: not authorized!");
     send_ipp_error(con, IPP_NOT_AUTHORIZED);
@@ -5778,7 +5945,10 @@ print_job(client_t        *con,		/* I - Client connection */
   attr = ippFindAttribute(job->attrs, "requesting-user-name", IPP_TAG_NAME);
 
   if (con->username[0])
+  {
     SetString(&job->username, con->username);
+    save_auth_info(con, job->id);
+  }
   else if (attr != NULL)
   {
     LogMessage(L_DEBUG, "print_job: requesting-user-name = \'%s\'",
@@ -6729,6 +6899,90 @@ restart_job(client_t        *con,	/* I - Client connection */
   LogMessage(L_INFO, "Job %d was restarted by \'%s\'.", jobid, username);
 
   con->response->request.status.status_code = IPP_OK;
+}
+
+
+/*
+ * 'save_auth_info()' - Save authentication information for a job.
+ */
+
+static void
+save_auth_info(client_t *con,		/* I - Client connection */
+               int      job_id)		/* I - Job ID */
+{
+  int		i;			/* Looping var */
+  char		filename[1024];		/* Job authentication filename */
+  cups_file_t	*fp;			/* Job authentication file */
+  char		line[1024];		/* Line for file */
+
+
+ /*
+  * This function saves the in-memory authentication information for
+  * a job so that it can be used to authenticate with a remote host.
+  * The information is stored in a file that is readable only by the
+  * root user.  The username and password are Base-64 encoded, each
+  * on a separate line, followed by random number (up to 1024) of
+  * newlines to limit the amount of information that is exposed.
+  *
+  * Because of the potential for exposing of authentication information,
+  * this functionality is only enabled when running cupsd as root.
+  *
+  * This caching only works for the Basic and BasicDigest authentication
+  * types.  Digest authentication cannot be cached this way, and in
+  * the future Kerberos authentication may make all of this obsolete.
+  *
+  * Authentication information is saved whenever an authenticated
+  * Print-Job, Create-Job, or CUPS-Authenticate-Job operation is
+  * performed.
+  *
+  * This information is deleted after a job is completed or canceled,
+  * so reprints may require subsequent re-authentication.
+  */
+
+  if (RunUser)
+    return;
+
+ /*
+  * Create the authentication file and change permissions...
+  */
+
+  snprintf(filename, sizeof(filename), "%s/a%05d", RequestRoot, job_id);
+  if ((fp = cupsFileOpen(filename, "w")) == NULL)
+  {
+    LogMessage(L_ERROR, "Unable to save authentication info to \"%s\" - %s",
+               filename, strerror(errno));
+    return;
+  }
+
+  fchown(cupsFileNumber(fp), 0, 0);
+  fchmod(cupsFileNumber(fp), 0400);
+
+ /*
+  * Write the authenticated username...
+  */
+
+  httpEncode64_2(line, sizeof(line), con->username, strlen(con->username));
+  cupsFilePrintf(fp, "%s\n", line);
+
+ /*
+  * Write the authenticated password...
+  */
+
+  httpEncode64_2(line, sizeof(line), con->password, strlen(con->password));
+  cupsFilePrintf(fp, "%s\n", line);
+
+ /*
+  * Write a random number of newlines to the end of the file...
+  */
+
+  for (i = (rand() % 1024); i >= 0; i --)
+    cupsFilePutChar(fp, '\n');
+
+ /*
+  * Close the file and return...
+  */
+
+  cupsFileClose(fp);
 }
 
 

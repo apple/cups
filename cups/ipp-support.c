@@ -155,7 +155,8 @@ static char	* const ipp_std_ops[] =
 		  "CUPS-Set-Default",
 		  "CUPS-Get-Devices",
 		  "CUPS-Get-PPDs",
-		  "CUPS-Move-Job"
+		  "CUPS-Move-Job",
+		  "CUPS-Authenticate-Job"
 		};
 
 
@@ -239,7 +240,7 @@ ippOpString(ipp_op_t op)		/* I - Operation ID */
     return (ipp_std_ops[op]);
   else if (op == IPP_PRIVATE)
     return ("windows-ext");
-  else if (op >= CUPS_GET_DEFAULT && op <= CUPS_MOVE_JOB)
+  else if (op >= CUPS_GET_DEFAULT && op <= CUPS_AUTHENTICATE_JOB)
     return (ipp_cups_ops[op - CUPS_GET_DEFAULT]);
 
  /*

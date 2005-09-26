@@ -60,8 +60,8 @@ function reset_config()
 "    Order deny,allow\\n" +
 "  </Limit>\\n" +
 "\\n" +
-"  # Only the owner or an administrator can cancel a job...\\n" +
-"  <Limit Cancel-Job>\\n" +
+"  # Only the owner or an administrator can cancel or authenticate a job...\\n" +
+"  <Limit Cancel-Job CUPS-Authenticate-Job>\\n" +
 "    Require user @OWNER @SYSTEM\\n" +
 "    Order deny,allow\\n" +
 "  </Limit>\\n" +

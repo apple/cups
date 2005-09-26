@@ -801,7 +801,8 @@ ReadConfiguration(void)
 			 "Set-Job-Attributes Create-Job-Subscription "
 			 "Renew-Subscription Cancel-Subscription "
 			 "Get-Notifications Reprocess-Job Cancel-Current-Job "
-			 "Suspend-Current-Job Resume-Job CUPS-Move-Job>");
+			 "Suspend-Current-Job Resume-Job CUPS-Move-Job "
+			 "CUPS-Authenticate-Job>");
       LogMessage(L_INFO, "Order Deny,Allow");
 
       po = cupsdAddPolicyOp(p, NULL, IPP_SEND_DOCUMENT);
@@ -828,6 +829,7 @@ ReadConfiguration(void)
       cupsdAddPolicyOp(p, po, IPP_SUSPEND_CURRENT_JOB);
       cupsdAddPolicyOp(p, po, IPP_RESUME_JOB);
       cupsdAddPolicyOp(p, po, CUPS_MOVE_JOB);
+      cupsdAddPolicyOp(p, po, CUPS_AUTHENTICATE_JOB);
 
       LogMessage(L_INFO, "</Limit>");
 

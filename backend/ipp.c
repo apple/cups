@@ -395,10 +395,72 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 
   if (username[0])
   {
+   /*
+    * Use authenticaion information in the device URI...
+    */
+
     if ((password = strchr(username, ':')) != NULL)
       *password++ = '\0';
 
     cupsSetUser(username);
+  }
+  else if (!getuid())
+  {
+   /*
+    * Try loading authentication information from the a##### file.
+    */
+
+    const char	*request_root;		/* CUPS_REQUESTROOT env var */
+    char	afilename[1024],	/* a##### filename */
+		aline[1024];		/* Line from file */
+    FILE	*fp;			/* File pointer */
+
+
+    if ((request_root = getenv("CUPS_REQUESTROOT")) != NULL)
+    {
+     /*
+      * Try opening authentication cache file...
+      */
+
+      snprintf(afilename, sizeof(afilename), "%s/a%05d", request_root,
+               atoi(argv[1]));
+      if ((fp = fopen(afilename, "r")) != NULL)
+      {
+       /*
+        * Read username...
+	*/
+
+        if (fgets(aline, sizeof(aline), fp))
+	{
+	 /*
+	  * Decode username...
+	  */
+
+          i = sizeof(username);
+	  httpDecode64_2(username, &i, aline);
+
+         /*
+	  * Read password...
+	  */
+
+	  if (fgets(aline, sizeof(aline), fp))
+	  {
+	   /*
+	    * Decode password...
+	    */
+
+	    i = sizeof(password);
+	    httpDecode64_2(password, &i, aline);
+	  }
+	}
+
+       /*
+        * Close the file...
+	*/
+
+        fclose(fp);
+      }
+    }
   }
 
  /*
