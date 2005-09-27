@@ -1864,7 +1864,7 @@ GetSlpAttrVal(const char *attrlist,	/* I - Attribute list string */
 
       for (ptr1 = *valbuf; *ptr1; ptr1 ++)
 	if (*ptr1 == '\\' && ptr1[1])
-	  cups_strcpy(ptr1, ptr1 + 1);
+	  _cups_strcpy(ptr1, ptr1 + 1);
 
       return (0);
     }
