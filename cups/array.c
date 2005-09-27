@@ -497,7 +497,17 @@ cups_find(cups_array_t *a,		/* I - Array */
       else
 	left = current;
     }
-    while (right > left);
+    while ((right - left) > 1);
+
+    if (right > left && current == left && diff > 0)
+    {
+     /*
+      * Make sure we check the right-hand element, too!
+      */
+
+      current = right;
+      diff    = (*(a->compare))(e, a->elements[current], a->data);
+    }
   }
   else
   {
