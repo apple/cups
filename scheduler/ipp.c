@@ -3801,12 +3801,6 @@ create_job(client_t        *con,	/* I - Client connection */
                        "time-at-completed", 0);
   attr->value_tag = IPP_TAG_NOVALUE;
 
-  if (!Printers || !cupsArrayCount(Printers))
-  {
-    con->response->request.status.status_code = IPP_NOT_FOUND;
-    return;
-  }
-
  /*
   * Add remaining job attributes...
   */
