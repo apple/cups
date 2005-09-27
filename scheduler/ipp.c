@@ -819,8 +819,9 @@ add_class(client_t        *con,		/* I - Client connection */
 
     if (ImplicitAnyClasses)
     {
+      cupsArrayRemove(Printers, pclass);
       SetStringf(&pclass->name, "Any%s", resource + 9);
-      SortPrinters();
+      cupsArrayAdd(Printers, pclass);
     }
     else
       DeletePrinter(pclass, 1);
@@ -839,9 +840,10 @@ add_class(client_t        *con,		/* I - Client connection */
     */
 
     DeletePrinterFilters(pclass);
+    cupsArrayRemove(Printers, pclass);
     SetStringf(&pclass->name, "%s@%s", resource + 9, pclass->hostname);
     SetPrinterAttrs(pclass);
-    SortPrinters();
+    cupsArrayAdd(Printers, pclass);
 
    /*
     * Add the class as a new local class...
@@ -1466,8 +1468,9 @@ add_printer(client_t        *con,	/* I - Client connection */
 
     if (ImplicitAnyClasses)
     {
+      cupsArrayRemove(Printers, printer);
       SetStringf(&printer->name, "Any%s", resource + 10);
-      SortPrinters();
+      cupsArrayAdd(Printers, printer);
     }
     else
       DeletePrinter(printer, 1);
@@ -1486,9 +1489,10 @@ add_printer(client_t        *con,	/* I - Client connection */
     */
 
     DeletePrinterFilters(printer);
+    cupsArrayRemove(Printers, printer);
     SetStringf(&printer->name, "%s@%s", resource + 10, printer->hostname);
     SetPrinterAttrs(printer);
-    SortPrinters();
+    cupsArrayAdd(Printers, printer);
 
    /*
     * Add the printer as a new local printer...
@@ -3797,6 +3801,12 @@ create_job(client_t        *con,	/* I - Client connection */
                        "time-at-completed", 0);
   attr->value_tag = IPP_TAG_NOVALUE;
 
+  if (!Printers || !cupsArrayCount(Printers))
+  {
+    con->response->request.status.status_code = IPP_NOT_FOUND;
+    return;
+  }
+
  /*
   * Add remaining job attributes...
   */
@@ -4972,6 +4982,12 @@ get_printers(client_t *con,		/* I - Client connection */
 
   LogMessage(L_DEBUG2, "get_printers(%p[%d], %x)\n", con, con->http.fd, type);
 
+  if (!Printers || !cupsArrayCount(Printers))
+  {
+    con->response->request.status.status_code = IPP_NOT_FOUND;
+    return;
+  }
+
  /*
   * Check policy...
   */
@@ -5040,9 +5056,9 @@ get_printers(client_t *con,		/* I - Client connection */
 
   curtime = time(NULL);
 
-  for (count = 0, printer = Printers;
+  for (count = 0, printer = (printer_t *)cupsArrayFirst(Printers);
        count < limit && printer != NULL;
-       printer = printer->next)
+       printer = (printer_t *)cupsArrayNext(Printers))
     if ((!type || (printer->type & CUPS_PRINTER_CLASS) == type) &&
         (printer->type & printer_mask) == printer_type &&
 	(location == NULL || printer->location == NULL ||

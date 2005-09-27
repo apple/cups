@@ -82,8 +82,7 @@ ProcessBrowseData(const char   *uri,	/* I - URI of printer/class */
 					/* Local make and model */
   printer_t	*p,			/* Printer information */
 		*pclass,		/* Printer class */
-		*first,			/* First printer in class */
-		*next;			/* Next printer in list */
+		*first;			/* First printer in class */
   int		offset,			/* Offset of name */
 		len;			/* Length of name */
 
@@ -220,9 +219,10 @@ ProcessBrowseData(const char   *uri,	/* I - URI of printer/class */
                 	  "Class \'%s\' deleted by directory services.",
 			  p->name);
 
+            cupsArrayRemove(Printers, p);
             SetStringf(&p->name, "%s@%s", p->name, p->hostname);
 	    SetPrinterAttrs(p);
-	    SortPrinters();
+	    cupsArrayAdd(Printers, p);
 
 	    cupsdAddEvent(CUPSD_EVENT_PRINTER_ADDED, p, NULL,
                 	  "Class \'%s\' added by directory services.",
@@ -323,9 +323,10 @@ ProcessBrowseData(const char   *uri,	/* I - URI of printer/class */
                 	  "Printer \'%s\' deleted by directory services.",
 			  p->name);
 
+	    cupsArrayRemove(Printers, p);
 	    SetStringf(&p->name, "%s@%s", p->name, p->hostname);
 	    SetPrinterAttrs(p);
-	    SortPrinters();
+	    cupsArrayAdd(Printers, p);
 
 	    cupsdAddEvent(CUPSD_EVENT_PRINTER_ADDED, p, NULL,
                 	  "Printer \'%s\' added by directory services.",
@@ -480,7 +481,7 @@ ProcessBrowseData(const char   *uri,	/* I - URI of printer/class */
 
   if (DefaultPrinter == NULL && Printers != NULL)
   {
-    DefaultPrinter = Printers;
+    DefaultPrinter = (printer_t *)cupsArrayFirst(Printers);
 
     WritePrintcap();
   }
@@ -489,23 +490,17 @@ ProcessBrowseData(const char   *uri,	/* I - URI of printer/class */
   * Do auto-classing if needed...
   */
 
-  if (ImplicitClasses)
+  if (ImplicitClasses && Printers)
   {
    /*
     * Loop through all available printers and create classes as needed...
     */
 
-    for (p = Printers, len = 0, offset = 0, update = 0, pclass = NULL,
-             first = NULL;
+    for (p = (printer_t *)cupsArrayFirst(Printers), len = 0, offset = 0, update = 0,
+             pclass = NULL, first = NULL;
          p != NULL;
-	 p = next)
+	 p = (printer_t *)cupsArrayNext(Printers))
     {
-     /*
-      * Get next printer in list...
-      */
-
-      next = p->next;
-
      /*
       * Skip implicit classes...
       */
@@ -683,13 +678,12 @@ void
 SendBrowseList(void)
 {
   int			count;		/* Number of dests to update */
-  printer_t		*p,		/* Current printer */
-			*np;		/* Next printer */
+  printer_t		*p;		/* Current printer */
   time_t		ut,		/* Minimum update time */
 			to;		/* Timeout time */
 
 
-  if (!Browsing || !BrowseLocalProtocols)
+  if (!Browsing || !BrowseLocalProtocols || !Printers)
     return;
 
  /*
@@ -714,9 +708,11 @@ SendBrowseList(void)
     * the maximum number of queues to update each second...
     */
 
-    max_count = 2 * NumPrinters / BrowseInterval + 1;
+    max_count = 2 * cupsArrayCount(Printers) / BrowseInterval + 1;
 
-    for (count = 0, p = Printers; count < max_count && p != NULL; p = p->next)
+    for (count = 0, p = (printer_t *)cupsArrayFirst(Printers);
+         count < max_count && p != NULL;
+	 p = (printer_t *)cupsArrayNext(Printers))
       if (!(p->type & (CUPS_PRINTER_REMOTE | CUPS_PRINTER_IMPLICIT)) &&
           p->shared && p->browse_time < ut)
         count ++;
@@ -725,14 +721,16 @@ SendBrowseList(void)
     * Loop through all of the printers and send local updates as needed...
     */
 
-    for (p = BrowseNext; count > 0; p = p->next)
+    for (p = (printer_t *)cupsArrayFind(Printers, BrowseNext->name);
+         count > 0;
+	 p = (printer_t *)cupsArrayNext(Printers))
     {
      /*
       * Check for wraparound...
       */
 
       if (!p)
-        p = Printers;
+        p = (printer_t *)cupsArrayFirst(Printers);
 
       if (!p)
         break;
@@ -770,14 +768,10 @@ SendBrowseList(void)
   * Loop through all of the printers and send local updates as needed...
   */
 
-  for (p = Printers; p != NULL; p = np)
+  for (p = (printer_t *)cupsArrayFirst(Printers);
+       p;
+       p = (printer_t *)cupsArrayNext(Printers))
   {
-   /*
-    * Save the next printer pointer...
-    */
-
-    np = p->next;
-
    /*
     * If this is a remote queue, see if it needs to be timed out...
     */

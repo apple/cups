@@ -61,6 +61,7 @@
  * Local functions...
  */
 
+static int	compare_printers(void *first, void *second, void *data);
 #ifdef __sgi
 static void	write_irix_config(printer_t *p);
 static void	write_irix_state(printer_t *p);
@@ -74,9 +75,7 @@ static void	write_irix_state(printer_t *p);
 printer_t *			/* O - New printer */
 AddPrinter(const char *name)	/* I - Name of printer */
 {
-  printer_t	*p,		/* New printer */
-		*current,	/* Current printer in list */
-		*prev;		/* Previous printer in list */
+  printer_t	*p;		/* New printer */
 
 
  /*
@@ -126,22 +125,10 @@ AddPrinter(const char *name)	/* I - Name of printer */
   * Insert the printer in the printer list alphabetically...
   */
 
-  for (prev = NULL, current = Printers;
-       current != NULL;
-       prev = current, current = current->next)
-    if (strcasecmp(p->name, current->name) < 0)
-      break;
+  if (!Printers)
+    Printers = cupsArrayNew(compare_printers, NULL);
 
- /*
-  * Insert this printer before the current one...
-  */
-
-  if (prev == NULL)
-    Printers = p;
-  else
-    prev->next = p;
-
-  p->next = current;
+  cupsArrayAdd(Printers, p);
 
  /*
   * Write a new /etc/printcap or /var/spool/lp/pstatus file.
@@ -150,10 +137,8 @@ AddPrinter(const char *name)	/* I - Name of printer */
   WritePrintcap();
 
  /*
-  * Bump the printer count and return...
+  * Return the new printer...
   */
-
-  NumPrinters ++;
 
   return (p);
 }
@@ -501,13 +486,18 @@ CreateCommonData(void)
     }
   }
 
- /*
-  * Loop through the printers and update the op_policy_ptr values...
-  */
+  if (Printers)
+  {
+   /*
+    * Loop through the printers and update the op_policy_ptr values...
+    */
 
-  for (p = Printers; p; p = p->next)
-    if ((p->op_policy_ptr = cupsdFindPolicy(p->op_policy)) == NULL)
-      p->op_policy_ptr = DefaultPolicyPtr;
+    for (p = (printer_t *)cupsArrayFirst(Printers);
+         p;
+	 p = (printer_t *)cupsArrayNext(Printers))
+      if ((p->op_policy_ptr = cupsdFindPolicy(p->op_policy)) == NULL)
+	p->op_policy_ptr = DefaultPolicyPtr;
+  }
 }
 
 
@@ -518,17 +508,17 @@ CreateCommonData(void)
 void
 DeleteAllPrinters(void)
 {
-  printer_t	*p,	/* Pointer to current printer/class */
-		*next;	/* Pointer to next printer in list */
+  printer_t	*p;	/* Pointer to current printer/class */
 
 
-  for (p = Printers; p != NULL; p = next)
-  {
-    next = p->next;
+  if (!Printers)
+    return;
 
+  for (p = (printer_t *)cupsArrayFirst(Printers);
+       p;
+       p = (printer_t *)cupsArrayNext(Printers))
     if (!(p->type & CUPS_PRINTER_CLASS))
       DeletePrinter(p, 0);
-  }
 }
 
 
@@ -541,8 +531,6 @@ DeletePrinter(printer_t *p,		/* I - Printer to delete */
 	      int       update)		/* I - Update printers.conf? */
 {
   int		i;			/* Looping var */
-  printer_t	*current,		/* Current printer in list */
-		*prev;			/* Previous printer in list */
 #ifdef __sgi
   char		filename[1024];		/* Interface script filename */
 #endif /* __sgi */
@@ -551,52 +539,26 @@ DeletePrinter(printer_t *p,		/* I - Printer to delete */
   DEBUG_printf(("DeletePrinter(%08x): p->name = \"%s\"...\n", p, p->name));
 
  /*
-  * Range check input...
+  * If this printer is the next for browsing, point to the next one...
   */
 
-  if (p == NULL)
-    return;
-
- /*
-  * Find the printer in the list...
-  */
-
-  for (prev = NULL, current = Printers;
-       current != NULL;
-       prev = current, current = current->next)
-    if (p == current)
-      break;
-
-  if (current == NULL)
+  if (p == BrowseNext)
   {
-    LogMessage(L_ERROR, "Tried to delete a non-existent printer %s!\n",
-               p->name);
-    return;
+    cupsArrayFind(Printers, p);
+    BrowseNext = (printer_t *)cupsArrayNext(Printers);
   }
 
  /*
   * Remove the printer from the list...
   */
 
-  if (prev == NULL)
-    Printers = p->next;
-  else
-    prev->next = p->next;
-
-  NumPrinters --;
+  cupsArrayRemove(Printers, p);
 
  /*
   * Stop printing on this printer...
   */
 
   StopPrinter(p, update);
-
- /*
-  * If this printer is the next for browsing, point to the next one...
-  */
-
-  if (p == BrowseNext)
-    BrowseNext = p->next;
 
  /*
   * Remove the dummy interface/icon/option files under IRIX...
@@ -629,7 +591,7 @@ DeletePrinter(printer_t *p,		/* I - Printer to delete */
 
   if (p == DefaultPrinter)
   {
-    DefaultPrinter = Printers;
+    DefaultPrinter = (printer_t *)cupsArrayFirst(Printers);
 
     WritePrintcap();
   }
@@ -741,17 +703,14 @@ DeletePrinterFilters(printer_t *p)	/* I - Printer to remove from */
 printer_t *			/* O - Destination in list */
 FindDest(const char *name)	/* I - Name of printer or class to find */
 {
-  printer_t	*p;		/* Current destination */
-  int		diff;		/* Difference */
+  printer_t	key;		/* Search key */
 
 
-  for (p = Printers; p != NULL; p = p->next)
-    if ((diff = strcasecmp(name, p->name)) == 0)/* name == p->name */
-      return (p);
-    else if (diff < 0)				/* name < p->name */
-      return (NULL);
+  if (!Printers)
+    return (NULL);
 
-  return (NULL);
+  key.name = (char *)name;
+  return ((printer_t *)cupsArrayFind(Printers, &key));
 }
 
 
@@ -762,18 +721,13 @@ FindDest(const char *name)	/* I - Name of printer or class to find */
 printer_t *			/* O - Printer in list */
 FindPrinter(const char *name)	/* I - Name of printer to find */
 {
-  printer_t	*p;		/* Current printer */
-  int		diff;		/* Difference */
+  printer_t	*p;		/* Printer in list */
 
 
-  for (p = Printers; p != NULL; p = p->next)
-    if ((diff = strcasecmp(name, p->name)) == 0 &&
-        !(p->type & CUPS_PRINTER_CLASS))	/* name == p->name */
-      return (p);
-    else if (diff < 0)				/* name < p->name */
-      return (NULL);
-
-  return (NULL);
+  if ((p = FindDest(name)) != NULL && (p->type & CUPS_PRINTER_CLASS))
+    return (NULL);
+  else
+    return (p);
 }
 
 
@@ -1219,85 +1173,90 @@ SaveAllPrinters(void)
   cupsFilePuts(fp, "# Printer configuration file for " CUPS_SVERSION "\n");
   cupsFilePrintf(fp, "# Written by cupsd on %s\n", temp);
 
- /*
-  * Write each local printer known to the system...
-  */
-
-  for (printer = Printers; printer != NULL; printer = printer->next)
+  if (Printers)
   {
    /*
-    * Skip remote destinations and printer classes...
+    * Write each local printer known to the system...
     */
 
-    if ((printer->type & CUPS_PRINTER_REMOTE) ||
-        (printer->type & CUPS_PRINTER_CLASS) ||
-	(printer->type & CUPS_PRINTER_IMPLICIT))
-      continue;
-
-   /*
-    * Write printers as needed...
-    */
-
-    if (printer == DefaultPrinter)
-      cupsFilePrintf(fp, "<DefaultPrinter %s>\n", printer->name);
-    else
-      cupsFilePrintf(fp, "<Printer %s>\n", printer->name);
-
-    if (printer->info)
-      cupsFilePrintf(fp, "Info %s\n", printer->info);
-
-    if (printer->location)
-      cupsFilePrintf(fp, "Location %s\n", printer->location);
-
-    if (printer->device_uri)
-      cupsFilePrintf(fp, "DeviceURI %s\n", printer->device_uri);
-
-    if (printer->port_monitor)
-      cupsFilePrintf(fp, "PortMonitor %s\n", printer->port_monitor);
-
-    if (printer->state == IPP_PRINTER_STOPPED)
+    for (printer = (printer_t *)cupsArrayFirst(Printers);
+         printer;
+	 printer = (printer_t *)cupsArrayNext(Printers))
     {
-      cupsFilePuts(fp, "State Stopped\n");
-      cupsFilePrintf(fp, "StateMessage %s\n", printer->state_message);
-    }
-    else
-      cupsFilePuts(fp, "State Idle\n");
+     /*
+      * Skip remote destinations and printer classes...
+      */
 
-    if (printer->accepting)
-      cupsFilePuts(fp, "Accepting Yes\n");
-    else
-      cupsFilePuts(fp, "Accepting No\n");
+      if ((printer->type & CUPS_PRINTER_REMOTE) ||
+          (printer->type & CUPS_PRINTER_CLASS) ||
+	  (printer->type & CUPS_PRINTER_IMPLICIT))
+	continue;
 
-    if (printer->shared)
-      cupsFilePuts(fp, "Shared Yes\n");
-    else
-      cupsFilePuts(fp, "Shared No\n");
+     /*
+      * Write printers as needed...
+      */
 
-    cupsFilePrintf(fp, "JobSheets %s %s\n", printer->job_sheets[0],
-            printer->job_sheets[1]);
+      if (printer == DefaultPrinter)
+	cupsFilePrintf(fp, "<DefaultPrinter %s>\n", printer->name);
+      else
+	cupsFilePrintf(fp, "<Printer %s>\n", printer->name);
 
-    cupsFilePrintf(fp, "QuotaPeriod %d\n", printer->quota_period);
-    cupsFilePrintf(fp, "PageLimit %d\n", printer->page_limit);
-    cupsFilePrintf(fp, "KLimit %d\n", printer->k_limit);
+      if (printer->info)
+	cupsFilePrintf(fp, "Info %s\n", printer->info);
 
-    for (i = 0; i < printer->num_users; i ++)
-      cupsFilePrintf(fp, "%sUser %s\n", printer->deny_users ? "Deny" : "Allow",
-              printer->users[i]);
+      if (printer->location)
+	cupsFilePrintf(fp, "Location %s\n", printer->location);
 
-    if (printer->op_policy)
-      cupsFilePrintf(fp, "OpPolicy %s\n", printer->op_policy);
-    if (printer->error_policy)
-      cupsFilePrintf(fp, "ErrorPolicy %s\n", printer->error_policy);
+      if (printer->device_uri)
+	cupsFilePrintf(fp, "DeviceURI %s\n", printer->device_uri);
 
-    cupsFilePuts(fp, "</Printer>\n");
+      if (printer->port_monitor)
+	cupsFilePrintf(fp, "PortMonitor %s\n", printer->port_monitor);
+
+      if (printer->state == IPP_PRINTER_STOPPED)
+      {
+	cupsFilePuts(fp, "State Stopped\n");
+	cupsFilePrintf(fp, "StateMessage %s\n", printer->state_message);
+      }
+      else
+	cupsFilePuts(fp, "State Idle\n");
+
+      if (printer->accepting)
+	cupsFilePuts(fp, "Accepting Yes\n");
+      else
+	cupsFilePuts(fp, "Accepting No\n");
+
+      if (printer->shared)
+	cupsFilePuts(fp, "Shared Yes\n");
+      else
+	cupsFilePuts(fp, "Shared No\n");
+
+      cupsFilePrintf(fp, "JobSheets %s %s\n", printer->job_sheets[0],
+              printer->job_sheets[1]);
+
+      cupsFilePrintf(fp, "QuotaPeriod %d\n", printer->quota_period);
+      cupsFilePrintf(fp, "PageLimit %d\n", printer->page_limit);
+      cupsFilePrintf(fp, "KLimit %d\n", printer->k_limit);
+
+      for (i = 0; i < printer->num_users; i ++)
+	cupsFilePrintf(fp, "%sUser %s\n", printer->deny_users ? "Deny" : "Allow",
+        	printer->users[i]);
+
+      if (printer->op_policy)
+	cupsFilePrintf(fp, "OpPolicy %s\n", printer->op_policy);
+      if (printer->error_policy)
+	cupsFilePrintf(fp, "ErrorPolicy %s\n", printer->error_policy);
+
+      cupsFilePuts(fp, "</Printer>\n");
 
 #ifdef __sgi
-    /*
-     * Make IRIX desktop & printer status happy
-     */
+      /*
+       * Make IRIX desktop & printer status happy
+       */
 
-    write_irix_state(printer);
+      write_irix_state(printer);
 #endif /* __sgi */
+    }
   }
 
   cupsFileClose(fp);
@@ -2074,60 +2033,6 @@ SetPrinterState(printer_t    *p,	/* I - Printer to change */
 
 
 /*
- * 'SortPrinters()' - Sort the printer list when a printer name is changed.
- */
-
-void
-SortPrinters(void)
-{
-  printer_t	*current,	/* Current printer */
-		*prev,		/* Previous printer */
-		*next;		/* Next printer */
-  int		did_swap;	/* Non-zero if we did a swap */
-
-
-  do
-  {
-    for (did_swap = 0, current = Printers, prev = NULL; current != NULL;)
-      if (current->next == NULL)
-	break;
-      else if (strcasecmp(current->name, current->next->name) > 0)
-      {
-	DEBUG_printf(("Swapping %s and %s...\n", current->name,
-                      current->next->name));
-
-       /*
-	* Need to swap these two printers...
-	*/
-
-        did_swap = 1;
-
-	if (prev == NULL)
-          Printers = current->next;
-	else
-          prev->next = current->next;
-
-       /*
-	* Yes, we can all get a headache from the next bunch of pointer
-	* swapping...
-	*/
-
-	next          = current->next;
-	current->next = next->next;
-	next->next    = current;
-	prev          = next;
-      }
-      else
-      {
-        prev    = current;
-	current = current->next;
-      }
-  }
-  while (did_swap);
-}
-
-
-/*
  * 'StopPrinter()' - Stop a printer from printing any jobs...
  */
 
@@ -2234,8 +2139,7 @@ ValidateDest(const char   *hostname,	/* I - Host name */
   * See if the printer or class name exists...
   */
 
-  if ((p = FindPrinter(resource)) == NULL)
-    p = FindClass(resource);
+  p = FindDest(resource);
 
   if (p == NULL && strchr(resource, '@') == NULL)
     return (NULL);
@@ -2292,7 +2196,9 @@ ValidateDest(const char   *hostname,	/* I - Host name */
   * Find a matching printer or class...
   */
 
-  for (p = Printers; p != NULL; p = p->next)
+  for (p = (printer_t *)cupsArrayFirst(Printers);
+       p;
+       p = (printer_t *)cupsArrayNext(Printers))
     if (!strcasecmp(p->hostname, localname) &&
         !strcasecmp(p->name, resource))
     {
@@ -2354,67 +2260,77 @@ WritePrintcap(void)
           ServerRoot);
   cupsFilePuts(fp, "# will be lost.\n");
 
- /*
-  * Write a new printcap with the current list of printers.
-  */
-
-  switch (PrintcapFormat)
+  if (Printers)
   {
-    case PRINTCAP_BSD:
-       /*
-        * Each printer is put in the file as:
-	*
-	*    Printer1:
-	*    Printer2:
-	*    Printer3:
-	*    ...
-	*    PrinterN:
-	*/
+   /*
+    * Write a new printcap with the current list of printers.
+    */
 
-        if (DefaultPrinter)
-	  cupsFilePrintf(fp, "%s|%s:rm=%s:rp=%s:\n", DefaultPrinter->name,
-	          DefaultPrinter->info, ServerName, DefaultPrinter->name);
+    switch (PrintcapFormat)
+    {
+      case PRINTCAP_BSD:
+	 /*
+          * Each printer is put in the file as:
+	  *
+	  *    Printer1:
+	  *    Printer2:
+	  *    Printer3:
+	  *    ...
+	  *    PrinterN:
+	  */
 
-	for (p = Printers; p != NULL; p = p->next)
-	  if (p != DefaultPrinter)
-	    cupsFilePrintf(fp, "%s|%s:rm=%s:rp=%s:\n", p->name, p->info,
-	            ServerName, p->name);
-        break;
+          if (DefaultPrinter)
+	    cupsFilePrintf(fp, "%s|%s:rm=%s:rp=%s:\n", DefaultPrinter->name,
+	            DefaultPrinter->info, ServerName, DefaultPrinter->name);
 
-    case PRINTCAP_SOLARIS:
-       /*
-        * Each printer is put in the file as:
-	*
-	*    _all:all=Printer1,Printer2,Printer3,...,PrinterN
-	*    _default:use=DefaultPrinter
-	*    Printer1:\
-	*            :bsdaddr=ServerName,Printer1:\
-	*            :description=Description:
-	*    Printer2:
-	*            :bsdaddr=ServerName,Printer2:\
-	*            :description=Description:
-	*    Printer3:
-	*            :bsdaddr=ServerName,Printer3:\
-	*            :description=Description:
-	*    ...
-	*    PrinterN:
-	*            :bsdaddr=ServerName,PrinterN:\
-	*            :description=Description:
-	*/
+	  for (p = (printer_t *)cupsArrayFirst(Printers);
+	       p;
+	       p = (printer_t *)cupsArrayNext(Printers))
+	    if (p != DefaultPrinter)
+	      cupsFilePrintf(fp, "%s|%s:rm=%s:rp=%s:\n", p->name, p->info,
+	              ServerName, p->name);
+          break;
 
-        cupsFilePuts(fp, "_all:all=");
-	for (p = Printers; p != NULL; p = p->next)
-	  cupsFilePrintf(fp, "%s%c", p->name, p->next ? ',' : '\n');
+      case PRINTCAP_SOLARIS:
+	 /*
+          * Each printer is put in the file as:
+	  *
+	  *    _all:all=Printer1,Printer2,Printer3,...,PrinterN
+	  *    _default:use=DefaultPrinter
+	  *    Printer1:\
+	  *            :bsdaddr=ServerName,Printer1:\
+	  *            :description=Description:
+	  *    Printer2:
+	  *            :bsdaddr=ServerName,Printer2:\
+	  *            :description=Description:
+	  *    Printer3:
+	  *            :bsdaddr=ServerName,Printer3:\
+	  *            :description=Description:
+	  *    ...
+	  *    PrinterN:
+	  *            :bsdaddr=ServerName,PrinterN:\
+	  *            :description=Description:
+	  */
 
-        if (DefaultPrinter)
-	  cupsFilePrintf(fp, "_default:use=%s\n", DefaultPrinter->name);
+          cupsFilePuts(fp, "_all:all=");
+	  for (p = (printer_t *)cupsArrayFirst(Printers);
+	       p;
+	       p = (printer_t *)cupsArrayCurrent(Printers))
+	    cupsFilePrintf(fp, "%s%c", p->name,
+	                   cupsArrayNext(Printers) ? ',' : '\n');
 
-	for (p = Printers; p != NULL; p = p->next)
-	  cupsFilePrintf(fp, "%s:\\\n"
-	              "\t:bsdaddr=%s,%s:\\\n"
-		      "\t:description=%s:\n",
-		  p->name, ServerName, p->name, p->info ? p->info : "");
-        break;
+          if (DefaultPrinter)
+	    cupsFilePrintf(fp, "_default:use=%s\n", DefaultPrinter->name);
+
+	  for (p = (printer_t *)cupsArrayFirst(Printers);
+	       p;
+	       p = (printer_t *)cupsArrayNext(Printers))
+	    cupsFilePrintf(fp, "%s:\\\n"
+	        	"\t:bsdaddr=%s,%s:\\\n"
+			"\t:description=%s:\n",
+		    p->name, ServerName, p->name, p->info ? p->info : "");
+          break;
+    }
   }
 
  /*
@@ -2490,6 +2406,20 @@ cupsdSanitizeURI(const char *uri,	/* I - Original device URI */
   */
 
   return (buffer);
+}
+
+
+/*
+ * 'compare_printers()' - Compare two printers.
+ */
+
+static int				/* O - Result of comparison */
+compare_printers(void *first,		/* I - First printer */
+                 void *second,		/* I - Second printer */
+		 void *data)		/* I - App data (not used) */
+{
+  return (strcasecmp(((printer_t *)first)->name,
+                     ((printer_t *)second)->name));
 }
 
 

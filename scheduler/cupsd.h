@@ -47,6 +47,7 @@
 #  include <unistd.h>
 #endif /* WIN32 */
 
+#include <cups/array.h>
 #include <cups/cups.h>
 #include "mime.h"
 #include <cups/http.h>

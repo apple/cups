@@ -1347,7 +1347,9 @@ select_timeout(int fds)			/* I - Number of ready descriptors select returned */
 
     if (BrowseLocalProtocols & BROWSE_CUPS)
     {
-      for (p = Printers; p != NULL; p = p->next)
+      for (p = (printer_t *)cupsArrayFirst(Printers);
+           p;
+	   p = (printer_t *)cupsArrayNext(Printers))
       {
 	if (p->type & CUPS_PRINTER_REMOTE)
 	{

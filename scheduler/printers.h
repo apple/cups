@@ -41,7 +41,6 @@ typedef struct
 
 typedef struct printer_str
 {
-  struct printer_str *next;		/* Next printer in list */
   char		*uri,			/* Printer URI */
 		*hostname,		/* Host printer resides on */
 		*name,			/* Printer name */
@@ -90,9 +89,7 @@ typedef struct printer_str
 
 VAR ipp_t		*CommonData	VALUE(NULL);
 					/* Common printer object attrs */
-VAR int			NumPrinters	VALUE(0);
-					/* Number of printers */
-VAR printer_t		*Printers	VALUE(NULL);
+VAR cups_array_t	*Printers	VALUE(NULL);
 					/* Printer list */
 VAR printer_t		*DefaultPrinter	VALUE(NULL);
 					/* Default printer */
@@ -126,7 +123,6 @@ extern void		SaveAllPrinters(void);
 extern void		SetPrinterAttrs(printer_t *p);
 extern void		SetPrinterReasons(printer_t *p, const char *s);
 extern void		SetPrinterState(printer_t *p, ipp_pstate_t s, int update);
-extern void		SortPrinters(void);
 #define			StartPrinter(p,u) SetPrinterState((p), IPP_PRINTER_IDLE, (u))
 extern void		StopPrinter(printer_t *p, int update);
 extern quota_t		*UpdateQuota(printer_t *p, const char *username,
