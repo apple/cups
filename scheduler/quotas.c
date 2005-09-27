@@ -142,8 +142,7 @@ UpdateQuota(printer_t  *p,		/* I - Printer */
 	    int        k)		/* I - Number of kilobytes */
 {
   quota_t	*q;			/* Quota data */
-  job_t		*job,			/* Current job */
-		*next;			/* Next job */
+  job_t		*job;			/* Current job */
   time_t	curtime;		/* Current time */
   ipp_attribute_t *attr;		/* Job attribute */
 
@@ -179,10 +178,10 @@ UpdateQuota(printer_t  *p,		/* I - Printer */
   q->page_count  = 0;
   q->k_count     = 0;
 
-  for (job = Jobs; job; job = next)
+  for (job = (job_t *)cupsArrayFirst(Jobs);
+       job;
+       job = (job_t *)cupsArrayNext(Jobs))
   {
-    next = job->next;
-
     if (strcasecmp(job->dest, p->name) != 0 ||
         strcasecmp(job->username, q->username) != 0)
       continue;

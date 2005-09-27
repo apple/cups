@@ -2370,10 +2370,12 @@ cancel_job(client_t        *con,	/* I - Client connection */
        /*
         * No, see if there are any pending jobs...
 	*/
-
-        for (job = Jobs; job != NULL; job = job->next)
+        
+        for (job = (job_t *)cupsArrayFirst(ActiveJobs);
+	     job;
+	     job = (job_t *)cupsArrayNext(ActiveJobs))
 	  if (job->state->values[0].integer <= IPP_JOB_PROCESSING &&
-	      strcasecmp(job->dest, dest) == 0)
+	      !strcasecmp(job->dest, dest))
 	    break;
 
 	if (job != NULL)
@@ -3652,10 +3654,10 @@ create_job(client_t        *con,	/* I - Client connection */
   * Make sure we aren't over our limit...
   */
 
-  if (NumJobs >= MaxJobs && MaxJobs)
+  if (cupsArrayCount(Jobs) >= MaxJobs && MaxJobs)
     CleanJobs();
 
-  if (NumJobs >= MaxJobs && MaxJobs)
+  if (cupsArrayCount(Jobs) >= MaxJobs && MaxJobs)
   {
     LogMessage(L_INFO, "create_job: too many jobs.");
     send_ipp_error(con, IPP_NOT_POSSIBLE);
@@ -4386,11 +4388,13 @@ get_jobs(client_t        *con,		/* I - Client connection */
 		resource[HTTP_MAX_URI];	/* Resource portion of URI */
   int		port;			/* Port portion of URI */
   int		completed;		/* Completed jobs? */
+  int		first;			/* First job ID */
   int		limit;			/* Maximum number of jobs to return */
   int		count;			/* Number of jobs that match */
   job_t		*job;			/* Current job pointer */
   char		job_uri[HTTP_MAX_URI];	/* Job URI... */
   printer_t	*printer;		/* Printer */
+  cups_array_t	*list;			/* Which job list... */
 
 
   LogMessage(L_DEBUG2, "get_jobs(%p[%d], %s)\n", con, con->http.fd,
@@ -4462,10 +4466,21 @@ get_jobs(client_t        *con,		/* I - Client connection */
   */
 
   if ((attr = ippFindAttribute(con->request, "which-jobs", IPP_TAG_KEYWORD)) != NULL &&
-      strcmp(attr->values[0].string.text, "completed") == 0)
+      !strcmp(attr->values[0].string.text, "completed"))
+  {
     completed = 1;
-  else
+    list      = Jobs;
+  }
+  else if (attr && !strcmp(attr->values[0].string.text, "all"))
+  {
     completed = 0;
+    list      = Jobs;
+  }
+  else
+  {
+    completed = 0;
+    list      = ActiveJobs;
+  }
 
  /*
   * See if they want to limit the number of jobs reported...
@@ -4475,6 +4490,11 @@ get_jobs(client_t        *con,		/* I - Client connection */
     limit = attr->values[0].integer;
   else
     limit = 1000000;
+
+  if ((attr = ippFindAttribute(con->request, "first", IPP_TAG_INTEGER)) != NULL)
+    first = attr->values[0].integer;
+  else
+    first = 1;
 
  /*
   * See if we only want to see jobs for a specific user...
@@ -4500,7 +4520,9 @@ get_jobs(client_t        *con,		/* I - Client connection */
   * OK, build a list of jobs for this printer...
   */
 
-  for (count = 0, job = Jobs; count < limit && job != NULL; job = job->next)
+  for (count = 0, job = (job_t *)cupsArrayFirst(list);
+       count < limit && job;
+       job = (job_t *)cupsArrayNext(list))
   {
    /*
     * Filter out jobs that don't match...
@@ -4520,7 +4542,8 @@ get_jobs(client_t        *con,		/* I - Client connection */
 
     if (completed && job->state->values[0].integer <= IPP_JOB_STOPPED)
       continue;
-    if (!completed && job->state->values[0].integer > IPP_JOB_STOPPED)
+
+    if (job->id < first)
       continue;
 
     count ++;
@@ -5903,13 +5926,13 @@ print_job(client_t        *con,		/* I - Client connection */
   * Make sure we aren't over our limit...
   */
 
-  if (NumJobs >= MaxJobs && MaxJobs)
+  if (cupsArrayCount(Jobs) >= MaxJobs && MaxJobs)
     CleanJobs();
 
-  if (NumJobs >= MaxJobs && MaxJobs)
+  if (cupsArrayCount(Jobs) >= MaxJobs && MaxJobs)
   {
     LogMessage(L_INFO, "print_job: too many jobs - %d jobs, max jobs is %d.",
-               NumJobs, MaxJobs);
+               cupsArrayCount(Jobs), MaxJobs);
     send_ipp_error(con, IPP_NOT_POSSIBLE);
     return;
   }

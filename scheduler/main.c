@@ -97,8 +97,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   fd_set		*input,		/* Input set for select() */
 			*output;	/* Output set for select() */
   client_t		*con;		/* Current client */
-  job_t			*job,		/* Current job */
-			*next;		/* Next job */
+  job_t			*job;		/* Current job */
   listener_t		*lis;		/* Current listener */
   time_t		activity;	/* Activity timer */
   time_t		browse_time;	/* Next browse send time */
@@ -499,7 +498,9 @@ main(int  argc,				/* I - Number of command-line arguments */
       * Check for any active jobs...
       */
 
-      for (job = Jobs; job; job = job->next)
+      for (job = (job_t *)cupsArrayFirst(ActiveJobs);
+	   job;
+	   job = (job_t *)cupsArrayNext(ActiveJobs))
         if (job->state->values[0].integer == IPP_JOB_PROCESSING)
 	  break;
 
@@ -591,12 +592,13 @@ main(int  argc,				/* I - Number of command-line arguments */
 
       LogMessage(L_EMERG, "BrowseSocket = %d", BrowseSocket);
 
-      for (job = Jobs; job != NULL; job = job->next)
+      for (job = (job_t *)cupsArrayFirst(ActiveJobs);
+	   job;
+	   job = (job_t *)cupsArrayNext(ActiveJobs))
         LogMessage(L_EMERG, "Jobs[%d] = %d < [%d %d] > [%d %d]",
 	           job->id, job->status_buffer ? job->status_buffer->fd : -1,
 		   job->print_pipes[0], job->print_pipes[1],
 		   job->back_pipes[0], job->back_pipes[1]);
-
       break;
     }
 
@@ -604,10 +606,9 @@ main(int  argc,				/* I - Number of command-line arguments */
     * Check for status info from job filters...
     */
 
-    for (job = Jobs; job != NULL; job = next)
-    {
-      next = job->next;
-
+    for (job = (job_t *)cupsArrayFirst(ActiveJobs);
+	 job;
+	 job = (job_t *)cupsArrayNext(ActiveJobs))
       if (job->status_buffer && FD_ISSET(job->status_buffer->fd, input))
       {
        /*
@@ -623,7 +624,6 @@ main(int  argc,				/* I - Number of command-line arguments */
 
         UpdateJob(job);
       }
-    }
 
    /*
     * Update CGI messages as needed...
@@ -1157,7 +1157,9 @@ process_children(void)
     * Lookup the PID in the jobs list...
     */
 
-    for (job = Jobs; job != NULL; job = job->next)
+    for (job = (job_t *)cupsArrayFirst(ActiveJobs);
+	 job;
+	 job = (job_t *)cupsArrayNext(ActiveJobs))
       if (job->state != NULL &&
           job->state->values[0].integer == IPP_JOB_PROCESSING)
       {
@@ -1375,9 +1377,11 @@ select_timeout(int fds)			/* I - Number of ready descriptors select returned */
   * Check for any active jobs...
   */
 
-  if (timeout > (now + 10))
+  if (timeout > (now + 10) && ActiveJobs)
   {
-    for (job = Jobs; job != NULL; job = job->next)
+    for (job = (job_t *)cupsArrayFirst(ActiveJobs);
+	 job;
+	 job = (job_t *)cupsArrayNext(ActiveJobs))
       if (job->state->values[0].integer <= IPP_JOB_PROCESSING)
       {
 	timeout = now + 10;

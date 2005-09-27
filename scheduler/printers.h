@@ -39,7 +39,7 @@ typedef struct
  * Printer/class information structure...
  */
 
-typedef struct printer_str
+typedef struct printer_s
 {
   char		*uri,			/* Printer URI */
 		*hostname,		/* Host printer resides on */
@@ -68,7 +68,7 @@ typedef struct printer_str
   ipp_t		*attrs;			/* Attributes supported by this printer */
   int		num_printers,		/* Number of printers in class */
 		last_printer;		/* Last printer job was sent to */
-  struct printer_str **printers;	/* Printers in class */
+  struct printer_s **printers;		/* Printers in class */
   int		quota_period,		/* Period for quotas */
 		page_limit,		/* Maximum number of pages */
 		k_limit,		/* Maximum number of kilobytes */

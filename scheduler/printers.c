@@ -511,9 +511,6 @@ DeleteAllPrinters(void)
   printer_t	*p;	/* Pointer to current printer/class */
 
 
-  if (!Printers)
-    return;
-
   for (p = (printer_t *)cupsArrayFirst(Printers);
        p;
        p = (printer_t *)cupsArrayNext(Printers))
@@ -705,9 +702,6 @@ FindDest(const char *name)	/* I - Name of printer or class to find */
 {
   printer_t	key;		/* Search key */
 
-
-  if (!Printers)
-    return (NULL);
 
   key.name = (char *)name;
   return ((printer_t *)cupsArrayFind(Printers, &key));
@@ -1173,90 +1167,87 @@ SaveAllPrinters(void)
   cupsFilePuts(fp, "# Printer configuration file for " CUPS_SVERSION "\n");
   cupsFilePrintf(fp, "# Written by cupsd on %s\n", temp);
 
-  if (Printers)
+ /*
+  * Write each local printer known to the system...
+  */
+
+  for (printer = (printer_t *)cupsArrayFirst(Printers);
+       printer;
+       printer = (printer_t *)cupsArrayNext(Printers))
   {
    /*
-    * Write each local printer known to the system...
+    * Skip remote destinations and printer classes...
     */
 
-    for (printer = (printer_t *)cupsArrayFirst(Printers);
-         printer;
-	 printer = (printer_t *)cupsArrayNext(Printers))
+    if ((printer->type & CUPS_PRINTER_REMOTE) ||
+        (printer->type & CUPS_PRINTER_CLASS) ||
+	(printer->type & CUPS_PRINTER_IMPLICIT))
+      continue;
+
+   /*
+    * Write printers as needed...
+    */
+
+    if (printer == DefaultPrinter)
+      cupsFilePrintf(fp, "<DefaultPrinter %s>\n", printer->name);
+    else
+      cupsFilePrintf(fp, "<Printer %s>\n", printer->name);
+
+    if (printer->info)
+      cupsFilePrintf(fp, "Info %s\n", printer->info);
+
+    if (printer->location)
+      cupsFilePrintf(fp, "Location %s\n", printer->location);
+
+    if (printer->device_uri)
+      cupsFilePrintf(fp, "DeviceURI %s\n", printer->device_uri);
+
+    if (printer->port_monitor)
+      cupsFilePrintf(fp, "PortMonitor %s\n", printer->port_monitor);
+
+    if (printer->state == IPP_PRINTER_STOPPED)
     {
-     /*
-      * Skip remote destinations and printer classes...
-      */
+      cupsFilePuts(fp, "State Stopped\n");
+      cupsFilePrintf(fp, "StateMessage %s\n", printer->state_message);
+    }
+    else
+      cupsFilePuts(fp, "State Idle\n");
 
-      if ((printer->type & CUPS_PRINTER_REMOTE) ||
-          (printer->type & CUPS_PRINTER_CLASS) ||
-	  (printer->type & CUPS_PRINTER_IMPLICIT))
-	continue;
+    if (printer->accepting)
+      cupsFilePuts(fp, "Accepting Yes\n");
+    else
+      cupsFilePuts(fp, "Accepting No\n");
 
-     /*
-      * Write printers as needed...
-      */
+    if (printer->shared)
+      cupsFilePuts(fp, "Shared Yes\n");
+    else
+      cupsFilePuts(fp, "Shared No\n");
 
-      if (printer == DefaultPrinter)
-	cupsFilePrintf(fp, "<DefaultPrinter %s>\n", printer->name);
-      else
-	cupsFilePrintf(fp, "<Printer %s>\n", printer->name);
+    cupsFilePrintf(fp, "JobSheets %s %s\n", printer->job_sheets[0],
+            printer->job_sheets[1]);
 
-      if (printer->info)
-	cupsFilePrintf(fp, "Info %s\n", printer->info);
+    cupsFilePrintf(fp, "QuotaPeriod %d\n", printer->quota_period);
+    cupsFilePrintf(fp, "PageLimit %d\n", printer->page_limit);
+    cupsFilePrintf(fp, "KLimit %d\n", printer->k_limit);
 
-      if (printer->location)
-	cupsFilePrintf(fp, "Location %s\n", printer->location);
+    for (i = 0; i < printer->num_users; i ++)
+      cupsFilePrintf(fp, "%sUser %s\n", printer->deny_users ? "Deny" : "Allow",
+              printer->users[i]);
 
-      if (printer->device_uri)
-	cupsFilePrintf(fp, "DeviceURI %s\n", printer->device_uri);
+    if (printer->op_policy)
+      cupsFilePrintf(fp, "OpPolicy %s\n", printer->op_policy);
+    if (printer->error_policy)
+      cupsFilePrintf(fp, "ErrorPolicy %s\n", printer->error_policy);
 
-      if (printer->port_monitor)
-	cupsFilePrintf(fp, "PortMonitor %s\n", printer->port_monitor);
-
-      if (printer->state == IPP_PRINTER_STOPPED)
-      {
-	cupsFilePuts(fp, "State Stopped\n");
-	cupsFilePrintf(fp, "StateMessage %s\n", printer->state_message);
-      }
-      else
-	cupsFilePuts(fp, "State Idle\n");
-
-      if (printer->accepting)
-	cupsFilePuts(fp, "Accepting Yes\n");
-      else
-	cupsFilePuts(fp, "Accepting No\n");
-
-      if (printer->shared)
-	cupsFilePuts(fp, "Shared Yes\n");
-      else
-	cupsFilePuts(fp, "Shared No\n");
-
-      cupsFilePrintf(fp, "JobSheets %s %s\n", printer->job_sheets[0],
-              printer->job_sheets[1]);
-
-      cupsFilePrintf(fp, "QuotaPeriod %d\n", printer->quota_period);
-      cupsFilePrintf(fp, "PageLimit %d\n", printer->page_limit);
-      cupsFilePrintf(fp, "KLimit %d\n", printer->k_limit);
-
-      for (i = 0; i < printer->num_users; i ++)
-	cupsFilePrintf(fp, "%sUser %s\n", printer->deny_users ? "Deny" : "Allow",
-        	printer->users[i]);
-
-      if (printer->op_policy)
-	cupsFilePrintf(fp, "OpPolicy %s\n", printer->op_policy);
-      if (printer->error_policy)
-	cupsFilePrintf(fp, "ErrorPolicy %s\n", printer->error_policy);
-
-      cupsFilePuts(fp, "</Printer>\n");
+    cupsFilePuts(fp, "</Printer>\n");
 
 #ifdef __sgi
-      /*
-       * Make IRIX desktop & printer status happy
-       */
+    /*
+     * Make IRIX desktop & printer status happy
+     */
 
-      write_irix_state(printer);
+    write_irix_state(printer);
 #endif /* __sgi */
-    }
   }
 
   cupsFileClose(fp);

@@ -225,9 +225,6 @@ DeleteAllClasses(void)
   printer_t	*c;			/* Pointer to current printer/class */
 
 
-  if (!Printers)
-    return;
-
   for (c = (printer_t *)cupsArrayFirst(Printers);
        c;
        c = (printer_t *)cupsArrayNext(Printers))
@@ -696,79 +693,76 @@ SaveAllClasses(void)
   cupsFilePuts(fp, "# Class configuration file for " CUPS_SVERSION "\n");
   cupsFilePrintf(fp, "# Written by cupsd on %s\n", temp);
 
-  if (Printers)
+ /*
+  * Write each local class known to the system...
+  */
+
+  for (pclass = (printer_t *)cupsArrayFirst(Printers);
+       pclass;
+       pclass = (printer_t *)cupsArrayNext(Printers))
   {
    /*
-    * Write each local class known to the system...
+    * Skip remote destinations and regular printers...
     */
 
-    for (pclass = (printer_t *)cupsArrayFirst(Printers);
-         pclass;
-	 pclass = (printer_t *)cupsArrayNext(Printers))
+    if ((pclass->type & CUPS_PRINTER_REMOTE) ||
+        (pclass->type & CUPS_PRINTER_IMPLICIT) ||
+        !(pclass->type & CUPS_PRINTER_CLASS))
+      continue;
+
+   /*
+    * Write printers as needed...
+    */
+
+    if (pclass == DefaultPrinter)
+      cupsFilePrintf(fp, "<DefaultClass %s>\n", pclass->name);
+    else
+      cupsFilePrintf(fp, "<Class %s>\n", pclass->name);
+
+    if (pclass->info)
+      cupsFilePrintf(fp, "Info %s\n", pclass->info);
+
+    if (pclass->location)
+      cupsFilePrintf(fp, "Location %s\n", pclass->location);
+
+    if (pclass->state == IPP_PRINTER_STOPPED)
     {
-     /*
-      * Skip remote destinations and regular printers...
-      */
-
-      if ((pclass->type & CUPS_PRINTER_REMOTE) ||
-          (pclass->type & CUPS_PRINTER_IMPLICIT) ||
-          !(pclass->type & CUPS_PRINTER_CLASS))
-	continue;
-
-     /*
-      * Write printers as needed...
-      */
-
-      if (pclass == DefaultPrinter)
-	cupsFilePrintf(fp, "<DefaultClass %s>\n", pclass->name);
-      else
-	cupsFilePrintf(fp, "<Class %s>\n", pclass->name);
-
-      if (pclass->info)
-	cupsFilePrintf(fp, "Info %s\n", pclass->info);
-
-      if (pclass->location)
-	cupsFilePrintf(fp, "Location %s\n", pclass->location);
-
-      if (pclass->state == IPP_PRINTER_STOPPED)
-      {
-	cupsFilePuts(fp, "State Stopped\n");
-	cupsFilePrintf(fp, "StateMessage %s\n", pclass->state_message);
-      }
-      else
-	cupsFilePuts(fp, "State Idle\n");
-
-      if (pclass->accepting)
-	cupsFilePuts(fp, "Accepting Yes\n");
-      else
-	cupsFilePuts(fp, "Accepting No\n");
-
-      if (pclass->shared)
-	cupsFilePuts(fp, "Shared Yes\n");
-      else
-	cupsFilePuts(fp, "Shared No\n");
-
-      cupsFilePrintf(fp, "JobSheets %s %s\n", pclass->job_sheets[0],
-                     pclass->job_sheets[1]);
-
-      for (i = 0; i < pclass->num_printers; i ++)
-	cupsFilePrintf(fp, "Printer %s\n", pclass->printers[i]->name);
-
-      cupsFilePrintf(fp, "QuotaPeriod %d\n", pclass->quota_period);
-      cupsFilePrintf(fp, "PageLimit %d\n", pclass->page_limit);
-      cupsFilePrintf(fp, "KLimit %d\n", pclass->k_limit);
-
-      for (i = 0; i < pclass->num_users; i ++)
-	cupsFilePrintf(fp, "%sUser %s\n", pclass->deny_users ? "Deny" : "Allow",
-        	       pclass->users[i]);
-
-      if (pclass->op_policy)
-	cupsFilePrintf(fp, "OpPolicy %s\n", pclass->op_policy);
-      if (pclass->error_policy)
-	cupsFilePrintf(fp, "ErrorPolicy %s\n", pclass->error_policy);
-
-      cupsFilePuts(fp, "</Class>\n");
+      cupsFilePuts(fp, "State Stopped\n");
+      cupsFilePrintf(fp, "StateMessage %s\n", pclass->state_message);
     }
+    else
+      cupsFilePuts(fp, "State Idle\n");
+
+    if (pclass->accepting)
+      cupsFilePuts(fp, "Accepting Yes\n");
+    else
+      cupsFilePuts(fp, "Accepting No\n");
+
+    if (pclass->shared)
+      cupsFilePuts(fp, "Shared Yes\n");
+    else
+      cupsFilePuts(fp, "Shared No\n");
+
+    cupsFilePrintf(fp, "JobSheets %s %s\n", pclass->job_sheets[0],
+                   pclass->job_sheets[1]);
+
+    for (i = 0; i < pclass->num_printers; i ++)
+      cupsFilePrintf(fp, "Printer %s\n", pclass->printers[i]->name);
+
+    cupsFilePrintf(fp, "QuotaPeriod %d\n", pclass->quota_period);
+    cupsFilePrintf(fp, "PageLimit %d\n", pclass->page_limit);
+    cupsFilePrintf(fp, "KLimit %d\n", pclass->k_limit);
+
+    for (i = 0; i < pclass->num_users; i ++)
+      cupsFilePrintf(fp, "%sUser %s\n", pclass->deny_users ? "Deny" : "Allow",
+        	     pclass->users[i]);
+
+    if (pclass->op_policy)
+      cupsFilePrintf(fp, "OpPolicy %s\n", pclass->op_policy);
+    if (pclass->error_policy)
+      cupsFilePrintf(fp, "ErrorPolicy %s\n", pclass->error_policy);
+
+    cupsFilePuts(fp, "</Class>\n");
   }
 
   cupsFileClose(fp);
