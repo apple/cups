@@ -90,6 +90,13 @@ cupsArrayAdd(cups_array_t *a,		/* I - Array */
 
 
  /*
+  * Range check input...
+  */
+
+  if (!a || !e)
+    return (0);
+
+ /*
   * Verify we have room for the new element...
   */
 
@@ -178,6 +185,13 @@ void
 cupsArrayClear(cups_array_t *a)		/* I - Array */
 {
  /*
+  * Range check input...
+  */
+
+  if (!a)
+    return;
+
+ /*
   * Set the number of elements to 0; we don't actually free the memory
   * here - that is done in cupsArrayDelete()...
   */
@@ -193,6 +207,17 @@ cupsArrayClear(cups_array_t *a)		/* I - Array */
 int					/* O - Number of elements */
 cupsArrayCount(cups_array_t *a)		/* I - Array */
 {
+ /*
+  * Range check input...
+  */
+
+  if (!a)
+    return (0);
+
+ /*
+  * Return the number of elements...
+  */
+
   return (a->num_elements);
 }
 
@@ -204,6 +229,17 @@ cupsArrayCount(cups_array_t *a)		/* I - Array */
 void *					/* O - Element */
 cupsArrayCurrent(cups_array_t *a)	/* I - Array */
 {
+ /*
+  * Range check input...
+  */
+
+  if (!a)
+    return (NULL);
+
+ /*
+  * Return the current element...
+  */
+
   if (a->current >= 0 && a->current < a->num_elements)
     return (a->elements[a->current]);
   else
@@ -218,6 +254,13 @@ cupsArrayCurrent(cups_array_t *a)	/* I - Array */
 void
 cupsArrayDelete(cups_array_t *a)	/* I - Array */
 {
+ /*
+  * Range check input...
+  */
+
+  if (!a)
+    return;
+
  /*
   * Free the array of element pointers - the caller is responsible
   * for freeing the elements themselves...
@@ -239,6 +282,13 @@ cupsArrayDup(cups_array_t *a)		/* I - Array */
 {
   cups_array_t	*da;			/* Duplicate array */
 
+
+ /*
+  * Range check input...
+  */
+
+  if (!a)
+    return (NULL);
 
  /*
   * Allocate memory for the array...
@@ -294,6 +344,13 @@ cupsArrayFind(cups_array_t *a,		/* I - Array */
 
 
  /*
+  * Range check input...
+  */
+
+  if (!a || !e)
+    return (NULL);
+
+ /*
   * See if we have any elements...
   */
 
@@ -336,6 +393,13 @@ void *					/* O - First element or NULL */
 cupsArrayFirst(cups_array_t *a)		/* I - Array */
 {
  /*
+  * Range check input...
+  */
+
+  if (!a)
+    return (NULL);
+
+ /*
   * Return the first element...
   */
 
@@ -352,6 +416,13 @@ cupsArrayFirst(cups_array_t *a)		/* I - Array */
 void *					/* O - Last element or NULL */
 cupsArrayLast(cups_array_t *a)		/* I - Array */
 {
+ /*
+  * Range check input...
+  */
+
+  if (!a)
+    return (NULL);
+
  /*
   * Return the last element...
   */
@@ -396,6 +467,13 @@ void *					/* O - Next element or NULL */
 cupsArrayNext(cups_array_t *a)		/* I - Array */
 {
  /*
+  * Range check input...
+  */
+
+  if (!a)
+    return (NULL);
+
+ /*
   * Return the next element...
   */
 
@@ -413,6 +491,13 @@ cupsArrayNext(cups_array_t *a)		/* I - Array */
 void *					/* O - Previous element or NULL */
 cupsArrayPrev(cups_array_t *a)		/* I - Array */
 {
+ /*
+  * Range check input...
+  */
+
+  if (!a)
+    return (NULL);
+
  /*
   * Return the previous element...
   */
@@ -435,6 +520,13 @@ cupsArrayRemove(cups_array_t *a,	/* I - Array */
   int	current,			/* Current element */
 	diff;				/* Difference */
 
+
+ /*
+  * Range check input...
+  */
+
+  if (!a || !e)
+    return (0);
 
  /*
   * See if the element is in the array...
