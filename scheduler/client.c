@@ -478,6 +478,33 @@ CloseClient(client_t *con)	/* I - Client to close */
   }
 #endif /* HAVE_SSL */
 
+  if (con->pipe_pid != 0)
+  {
+   /*
+    * Stop any CGI process...
+    */
+
+    LogMessage(L_DEBUG2, "CloseClient: %d Killing process ID %d...",
+               con->http.fd, con->pipe_pid);
+    cupsdEndProcess(con->pipe_pid, 1);
+  }
+
+  if (con->file >= 0)
+  {
+    if (FD_ISSET(con->file, InputSet))
+    {
+      LogMessage(L_DEBUG2, "CloseClient: %d Removing fd %d from InputSet...",
+        	 con->http.fd, con->file);
+      FD_CLR(con->file, InputSet);
+    }
+
+    LogMessage(L_DEBUG2, "CloseClient: %d Closing data file %d.",
+               con->http.fd, con->file);
+
+    close(con->file);
+    con->file = -1;
+  }
+
  /*
   * Close the socket and clear the file from the input set for select()...
   */
@@ -508,33 +535,6 @@ CloseClient(client_t *con)	/* I - Client to close */
       FD_CLR(con->http.fd, OutputSet);
       con->http.fd = -1;
     }
-  }
-
-  if (con->pipe_pid != 0)
-  {
-   /*
-    * Stop any CGI process...
-    */
-
-    LogMessage(L_DEBUG2, "CloseClient: %d Killing process ID %d...",
-               con->http.fd, con->pipe_pid);
-    cupsdEndProcess(con->pipe_pid, 1);
-  }
-
-  if (con->file >= 0)
-  {
-    if (FD_ISSET(con->file, InputSet))
-    {
-      LogMessage(L_DEBUG2, "CloseClient: %d Removing fd %d from InputSet...",
-        	 con->http.fd, con->file);
-      FD_CLR(con->file, InputSet);
-    }
-
-    LogMessage(L_DEBUG2, "CloseClient: %d Closing data file %d.",
-               con->http.fd, con->file);
-
-    close(con->file);
-    con->file = -1;
   }
 
   if (!partial)
@@ -2340,10 +2340,8 @@ WriteClient(client_t *con)		/* I - Client connection */
   }
   else if ((bytes = read(con->file, buf, sizeof(buf) - 1)) > 0)
   {
-#ifdef DEBUG
     LogMessage(L_DEBUG2, "WriteClient: Read %d bytes from file %d...",
                bytes, con->file);
-#endif /* DEBUG */
 
     if (con->pipe_pid && !con->got_fields)
     {
@@ -2415,6 +2413,9 @@ WriteClient(client_t *con)		/* I - Client connection */
 	else if (*bufptr != '\r')
 	  con->field_col ++;
 
+      LogMessage(L_DEBUG2, "WriteClient: %d bytes=%d, got_fields=%d",
+                 con->http.fd, bytes, con->got_fields);
+
       if (bytes > 0 && !con->got_fields)
       {
        /*
@@ -2435,6 +2436,9 @@ WriteClient(client_t *con)		/* I - Client connection */
 
     if (httpWrite(HTTP(con), buf, bytes) < 0)
     {
+      LogMessage(L_DEBUG2, "WriteClient: %d Write of %d bytes failed!",
+                 con->http.fd, bytes);
+
       CloseClient(con);
       return (0);
     }
@@ -2444,6 +2448,8 @@ WriteClient(client_t *con)		/* I - Client connection */
 
   if (bytes <= 0)
   {
+    LogMessage(L_DEBUG2, "WriteClient: %d bytes < 0", con->http.fd);
+
     LogRequest(con, HTTP_OK);
 
     httpFlushWrite(HTTP(con));

@@ -292,8 +292,8 @@ httpConnectEncrypt(
   struct hostent	*hostaddr;	/* Host address data */
 
 
-  DEBUG_printf(("httpConnectEncrypt(host=\"%s\", port=%d, encrypt=%d)\n",
-                host ? host : "(null)", port, encrypt));
+  DEBUG_printf(("httpConnectEncrypt(host=\"%s\", port=%d, encryption=%d)\n",
+                host ? host : "(null)", port, encryption));
 
   if (!host)
     return (NULL);
@@ -1231,7 +1231,12 @@ httpPrintf(http_t     *http,		/* I - HTTP data */
   DEBUG_printf(("httpPrintf: %s", buf));
 
   if (http->wused)
-    httpFlushWrite(http);
+  {
+    DEBUG_puts("    flushing existing data...");
+
+    if (httpFlushWrite(http) < 0)
+      return (-1);
+  }
 
   return (http_write(http, buf, bytes));
 }
@@ -1693,7 +1698,12 @@ httpUpdate(http_t *http)		/* I - HTTP data */
   */
 
   if (http->wused)
-    httpFlushWrite(http);
+  {
+    DEBUG_puts("    flushing buffer...");
+
+    if (httpFlushWrite(http) < 0)
+      return (HTTP_ERROR);
+  }
 
  /*
   * If we haven't issued any commands, then there is nothing to "update"...
@@ -1882,6 +1892,9 @@ httpWrite(http_t     *http,		/* I - HTTP data */
   int	bytes;				/* Bytes written */
 
 
+  DEBUG_printf(("httpWrite(http=%p, buffer=%p, length=%d)\n", http,
+                buffer, length));
+
  /*
   * Range check input...
   */
@@ -1901,14 +1914,21 @@ httpWrite(http_t     *http,		/* I - HTTP data */
 
   if (length > 0)
   {
-    if ((length + http->wused) > sizeof(http->wbuffer))
+    if (http->wused && (length + http->wused) > sizeof(http->wbuffer))
+    {
+      DEBUG_printf(("    flushing buffer (wused=%d, length=%d)\n",
+                    http->wused, length));
+
       httpFlushWrite(http);
+    }
 
     if ((length + http->wused) <= sizeof(http->wbuffer))
     {
      /*
       * Write to buffer...
       */
+
+      DEBUG_printf(("    copying %d bytes to wbuffer...\n", length));
 
       memcpy(http->wbuffer + http->wused, buffer, length);
       http->wused += length;
@@ -1920,10 +1940,14 @@ httpWrite(http_t     *http,		/* I - HTTP data */
       * Otherwise write the data directly...
       */
 
+      DEBUG_printf(("    writing %d bytes to socket...\n", length));
+
       if (http->data_encoding == HTTP_ENCODE_CHUNKED)
-	length = http_write_chunk(http, buffer, length);
+	bytes = http_write_chunk(http, buffer, length);
       else
-	length = http_write(http, buffer, length);
+	bytes = http_write(http, buffer, length);
+
+      DEBUG_printf(("    wrote %d bytes...\n", bytes));
     }
 
     if (http->data_encoding == HTTP_ENCODE_LENGTH)
@@ -2669,13 +2693,22 @@ http_write_chunk(http_t     *http,	/* I - HTTP data */
 
   sprintf(header, "%x\r\n", length);
   if (http_write(http, header, strlen(header)) < 0)
+  {
+    DEBUG_puts("    http_write of length failed!");
     return (-1);
+  }
 
   if ((bytes = http_write(http, buffer, length)) < 0)
+  {
+    DEBUG_puts("    http_write of buffer failed!");
     return (-1);
+  }
 
   if (http_write(http, "\r\n", 2) < 0)
+  {
+    DEBUG_puts("    http_write of CR LF failed!");
     return (-1);
+  }
 
   return (bytes);
 }
