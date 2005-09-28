@@ -23,9 +23,9 @@
  *
  * Contents:
  *
- *   AddBanner()   - Add a banner to the array.
- *   FindBanner()  - Find a named banner.
- *   LoadBanners() - Load all available banner files...
+ *   cupsdAddBanner()   - Add a banner to the array.
+ *   cupsdFindBanner()  - Find a named banner.
+ *   cupsdLoadBanners() - Load all available banner files...
  *   compare()     - Compare two banners.
  */
 
@@ -41,19 +41,19 @@
  * Local functions...
  */
 
-static int	compare(const banner_t *b0, const banner_t *b1);
+static int	compare(const cupsd_banner_t *b0, const cupsd_banner_t *b1);
 
 
 /*
- * 'AddBanner()' - Add a banner to the array.
+ * 'cupsdAddBanner()' - Add a banner to the array.
  */
 
 void
-AddBanner(const char *name,	/* I - Name of banner */
+cupsdAddBanner(const char *name,	/* I - Name of banner */
           const char *filename)	/* I - Filename for banner */
 {
   mime_type_t	*filetype;	/* Filetype */
-  banner_t	*temp;		/* New banner data */
+  cupsd_banner_t	*temp;		/* New banner data */
 
 
  /*
@@ -62,7 +62,7 @@ AddBanner(const char *name,	/* I - Name of banner */
 
   if ((filetype = mimeFileType(MimeDatabase, filename, NULL)) == NULL)
   {
-    LogMessage(L_WARN, "AddBanner: Banner \"%s\" (\"%s\") is of an unknown file type - skipping!",
+    cupsdLogMessage(L_WARN, "cupsdAddBanner: Banner \"%s\" (\"%s\") is of an unknown file type - skipping!",
                name, filename);
     return;
   }
@@ -72,13 +72,13 @@ AddBanner(const char *name,	/* I - Name of banner */
   */
 
   if (NumBanners == 0)
-    temp = malloc(sizeof(banner_t));
+    temp = malloc(sizeof(cupsd_banner_t));
   else
-    temp = realloc(Banners, sizeof(banner_t) * (NumBanners + 1));
+    temp = realloc(Banners, sizeof(cupsd_banner_t) * (NumBanners + 1));
 
   if (temp == NULL)
   {
-    LogMessage(L_ERROR, "AddBanner: Ran out of memory adding a banner!");
+    cupsdLogMessage(L_ERROR, "cupsdAddBanner: Ran out of memory adding a banner!");
     return;
   }
 
@@ -90,35 +90,35 @@ AddBanner(const char *name,	/* I - Name of banner */
   temp    += NumBanners;
   NumBanners ++;
 
-  memset(temp, 0, sizeof(banner_t));
+  memset(temp, 0, sizeof(cupsd_banner_t));
   strlcpy(temp->name, name, sizeof(temp->name));
   temp->filetype = filetype;
 }
 
 
 /*
- * 'FindBanner()' - Find a named banner.
+ * 'cupsdFindBanner()' - Find a named banner.
  */
 
-banner_t *			/* O - Pointer to banner or NULL */
-FindBanner(const char *name)	/* I - Name of banner */
+cupsd_banner_t *			/* O - Pointer to banner or NULL */
+cupsdFindBanner(const char *name)	/* I - Name of banner */
 {
-  banner_t	key;		/* Search key */
+  cupsd_banner_t	key;		/* Search key */
 
 
   strlcpy(key.name, name, sizeof(key.name));
 
-  return ((banner_t *)bsearch(&key, Banners, NumBanners, sizeof(banner_t),
+  return ((cupsd_banner_t *)bsearch(&key, Banners, NumBanners, sizeof(cupsd_banner_t),
                               (int (*)(const void *, const void *))compare));
 }
 
 
 /*
- * 'LoadBanners()' - Load all available banner files...
+ * 'cupsdLoadBanners()' - Load all available banner files...
  */
 
 void
-LoadBanners(const char *d)		/* I - Directory to search */
+cupsdLoadBanners(const char *d)		/* I - Directory to search */
 {
   cups_dir_t	*dir;			/* Directory pointer */
   cups_dentry_t	*dent;			/* Directory entry */
@@ -142,7 +142,7 @@ LoadBanners(const char *d)		/* I - Directory to search */
 
   if ((dir = cupsDirOpen(d)) == NULL)
   {
-    LogMessage(L_ERROR, "LoadBanners: Unable to open banner directory \"%s\": %s",
+    cupsdLogMessage(L_ERROR, "cupsdLoadBanners: Unable to open banner directory \"%s\": %s",
                d, strerror(errno));
     return;
   }
@@ -176,7 +176,7 @@ LoadBanners(const char *d)		/* I - Directory to search */
     * Must be a valid file; add it!
     */
 
-    AddBanner(dent->filename, filename);
+    cupsdAddBanner(dent->filename, filename);
   }
 
  /*
@@ -186,7 +186,7 @@ LoadBanners(const char *d)		/* I - Directory to search */
   cupsDirClose(dir);
 
   if (NumBanners > 1)
-    qsort(Banners, NumBanners, sizeof(banner_t),
+    qsort(Banners, NumBanners, sizeof(cupsd_banner_t),
           (int (*)(const void *, const void *))compare);
 }
 
@@ -196,8 +196,8 @@ LoadBanners(const char *d)		/* I - Directory to search */
  */
 
 static int			/* O - -1 if name0 < name1, etc. */
-compare(const banner_t *b0,	/* I - First banner */
-        const banner_t *b1)	/* I - Second banner */
+compare(const cupsd_banner_t *b0,	/* I - First banner */
+        const cupsd_banner_t *b1)	/* I - Second banner */
 {
   return (strcasecmp(b0->name, b1->name));
 }

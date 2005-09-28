@@ -32,7 +32,7 @@ typedef struct
 {
   char		*name;			/* Policy name */
   int		num_ops;		/* Number of operations */
-  location_t	**ops;			/* Operations */
+  cupsd_location_t	**ops;			/* Operations */
 } cupsd_policy_t;
 
 
@@ -51,13 +51,13 @@ VAR cupsd_policy_t	**Policies	VALUE(NULL);
  */
 
 extern cupsd_policy_t	*cupsdAddPolicy(const char *policy);
-extern location_t	*cupsdAddPolicyOp(cupsd_policy_t *p, location_t *po,
+extern cupsd_location_t	*cupsdAddPolicyOp(cupsd_policy_t *p, cupsd_location_t *po,
 			                  ipp_op_t op);
-extern int		cupsdCheckPolicy(cupsd_policy_t *p, client_t *con,
+extern int		cupsdCheckPolicy(cupsd_policy_t *p, cupsd_client_t *con,
 				         const char *owner);
 extern void		cupsdDeleteAllPolicies(void);
 extern cupsd_policy_t	*cupsdFindPolicy(const char *policy);
-extern location_t	*cupsdFindPolicyOp(cupsd_policy_t *p, ipp_op_t op);
+extern cupsd_location_t	*cupsdFindPolicyOp(cupsd_policy_t *p, ipp_op_t op);
 
 
 /*

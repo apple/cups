@@ -23,10 +23,10 @@
  *
  * Contents:
  *
- *   AddQuota()    - Add a quota record for this printer and user.
- *   FindQuota()   - Find a quota record.
- *   FreeQuotas()  - Free quotas for a printer.
- *   UpdateQuota() - Update quota data for the specified printer and user.
+ *   cupsdAddQuota()    - Add a quota record for this printer and user.
+ *   cupsdFindQuota()   - Find a quota record.
+ *   cupsdFreeQuotas()  - Free quotas for a printer.
+ *   cupsdUpdateQuota() - Update quota data for the specified printer and user.
  *   compare()     - Compare two quota records...
  */
 
@@ -41,27 +41,27 @@
  * Local functions...
  */
 
-static int	compare(const quota_t *q1, const quota_t *q2);
+static int	compare(const cupsd_quota_t *q1, const cupsd_quota_t *q2);
 
 
 /*
- * 'AddQuota()' - Add a quota record for this printer and user.
+ * 'cupsdAddQuota()' - Add a quota record for this printer and user.
  */
 
-quota_t *				/* O - Quota data */
-AddQuota(printer_t  *p,			/* I - Printer */
+cupsd_quota_t *				/* O - Quota data */
+cupsdAddQuota(cupsd_printer_t  *p,			/* I - Printer */
          const char *username)		/* I - User */
 {
-  quota_t	*q;			/* New quota data */
+  cupsd_quota_t	*q;			/* New quota data */
 
 
   if (!p || !username)
     return (NULL);
 
   if (p->num_quotas == 0)
-    q = malloc(sizeof(quota_t));
+    q = malloc(sizeof(cupsd_quota_t));
   else
-    q = realloc(p->quotas, sizeof(quota_t) * (p->num_quotas + 1));
+    q = realloc(p->quotas, sizeof(cupsd_quota_t) * (p->num_quotas + 1));
 
   if (!q)
     return (NULL);
@@ -70,26 +70,26 @@ AddQuota(printer_t  *p,			/* I - Printer */
   q         += p->num_quotas;
   p->num_quotas ++;
 
-  memset(q, 0, sizeof(quota_t));
+  memset(q, 0, sizeof(cupsd_quota_t));
   strlcpy(q->username, username, sizeof(q->username));
 
   if (p->num_quotas > 1)
-    qsort(p->quotas, p->num_quotas, sizeof(quota_t),
+    qsort(p->quotas, p->num_quotas, sizeof(cupsd_quota_t),
           (int (*)(const void *, const void *))compare);
 
-  return (FindQuota(p, username));
+  return (cupsdFindQuota(p, username));
 }
 
 
 /*
- * 'FindQuota()' - Find a quota record.
+ * 'cupsdFindQuota()' - Find a quota record.
  */
 
-quota_t *				/* O - Quota data */
-FindQuota(printer_t  *p,		/* I - Printer */
+cupsd_quota_t *				/* O - Quota data */
+cupsdFindQuota(cupsd_printer_t  *p,		/* I - Printer */
           const char *username)		/* I - User */
 {
-  quota_t	*q,			/* Quota data pointer */
+  cupsd_quota_t	*q,			/* Quota data pointer */
 		match;			/* Search data */
 
 
@@ -102,23 +102,23 @@ FindQuota(printer_t  *p,		/* I - Printer */
   {
     strlcpy(match.username, username, sizeof(match.username));
 
-    q = bsearch(&match, p->quotas, p->num_quotas, sizeof(quota_t),
+    q = bsearch(&match, p->quotas, p->num_quotas, sizeof(cupsd_quota_t),
                 (int(*)(const void *, const void *))compare);
   }
 
   if (q)
     return (q);
   else
-    return (AddQuota(p, username));
+    return (cupsdAddQuota(p, username));
 }
 
 
 /*
- * 'FreeQuotas()' - Free quotas for a printer.
+ * 'cupsdFreeQuotas()' - Free quotas for a printer.
  */
 
 void
-FreeQuotas(printer_t *p)		/* I - Printer */
+cupsdFreeQuotas(cupsd_printer_t *p)		/* I - Printer */
 {
   if (!p)
     return;
@@ -132,17 +132,17 @@ FreeQuotas(printer_t *p)		/* I - Printer */
 
 
 /*
- * 'UpdateQuota()' - Update quota data for the specified printer and user.
+ * 'cupsdUpdateQuota()' - Update quota data for the specified printer and user.
  */
 
-quota_t *				/* O - Quota data */
-UpdateQuota(printer_t  *p,		/* I - Printer */
+cupsd_quota_t *				/* O - Quota data */
+cupsdUpdateQuota(cupsd_printer_t  *p,		/* I - Printer */
             const char *username,	/* I - User */
 	    int        pages,		/* I - Number of pages */
 	    int        k)		/* I - Number of kilobytes */
 {
-  quota_t	*q;			/* Quota data */
-  job_t		*job;			/* Current job */
+  cupsd_quota_t	*q;			/* Quota data */
+  cupsd_job_t		*job;			/* Current job */
   time_t	curtime;		/* Current time */
   ipp_attribute_t *attr;		/* Job attribute */
 
@@ -153,10 +153,10 @@ UpdateQuota(printer_t  *p,		/* I - Printer */
   if (!p->k_limit && !p->page_limit)
     return (NULL);
 
-  if ((q = FindQuota(p, username)) == NULL)
+  if ((q = cupsdFindQuota(p, username)) == NULL)
     return (NULL);
 
-  LogMessage(L_DEBUG, "UpdateQuota: p=%s username=%s pages=%d k=%d",
+  cupsdLogMessage(L_DEBUG, "cupsdUpdateQuota: p=%s username=%s pages=%d k=%d",
              p->name, username, pages, k);
 
   curtime = time(NULL);
@@ -178,9 +178,9 @@ UpdateQuota(printer_t  *p,		/* I - Printer */
   q->page_count  = 0;
   q->k_count     = 0;
 
-  for (job = (job_t *)cupsArrayFirst(Jobs);
+  for (job = (cupsd_job_t *)cupsArrayFirst(Jobs);
        job;
-       job = (job_t *)cupsArrayNext(Jobs))
+       job = (cupsd_job_t *)cupsArrayNext(Jobs))
   {
     if (strcasecmp(job->dest, p->name) != 0 ||
         strcasecmp(job->username, q->username) != 0)
@@ -199,7 +199,7 @@ UpdateQuota(printer_t  *p,		/* I - Printer */
     if (attr->values[0].integer < curtime)
     {
       if (JobAutoPurge)
-        CancelJob(job->id, 1);
+        cupsdCancelJob(job->id, 1);
 
       continue;
     }
@@ -225,8 +225,8 @@ UpdateQuota(printer_t  *p,		/* I - Printer */
  */
 
 static int				/* O - Result of comparison */
-compare(const quota_t *q1,		/* I - First quota record */
-        const quota_t *q2)		/* I - Second quota record */
+compare(const cupsd_quota_t *q1,		/* I - First quota record */
+        const cupsd_quota_t *q2)		/* I - Second quota record */
 {
   return (strcasecmp(q1->username, q2->username));
 }

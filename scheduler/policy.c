@@ -80,34 +80,34 @@ cupsdAddPolicy(const char *policy)	/* I - Name of policy */
  * 'cupsdAddPolicyOp()' - Add an operation to a policy.
  */
 
-location_t *				/* O - New policy operation */
+cupsd_location_t *				/* O - New policy operation */
 cupsdAddPolicyOp(cupsd_policy_t *p,	/* I - Policy */
-                 location_t     *po,	/* I - Policy operation to copy */
+                 cupsd_location_t     *po,	/* I - Policy operation to copy */
                  ipp_op_t       op)	/* I - IPP operation code */
 {
   int		i;			/* Looping var */
-  location_t	*temp,			/* New policy operation */
+  cupsd_location_t	*temp,			/* New policy operation */
 		**tempa;		/* New policy operation array */
   char		name[1024];		/* Interface name */
 
 
-  LogMessage(L_DEBUG2, "cupsdAddPolicyOp(p=%p, po=%p, op=%x(%s))",
+  cupsdLogMessage(L_DEBUG2, "cupsdAddPolicyOp(p=%p, po=%p, op=%x(%s))",
              p, po, op, ippOpString(op));
 
   if (p == NULL)
     return (NULL);
 
   if (p->num_ops == 0)
-    tempa = malloc(sizeof(location_t *));
+    tempa = malloc(sizeof(cupsd_location_t *));
   else
-    tempa = realloc(p->ops, sizeof(location_t *) * (p->num_ops + 1));
+    tempa = realloc(p->ops, sizeof(cupsd_location_t *) * (p->num_ops + 1));
 
   if (tempa == NULL)
     return (NULL);
 
   p->ops = tempa;
 
-  if ((temp = calloc(1, sizeof(location_t))) != NULL)
+  if ((temp = calloc(1, sizeof(cupsd_location_t))) != NULL)
   {
     p->ops            = tempa;
     tempa[p->num_ops] = temp;
@@ -129,24 +129,24 @@ cupsdAddPolicyOp(cupsd_policy_t *p,	/* I - Policy */
       temp->encryption = po->encryption;
 
       for (i = 0; i < po->num_names; i ++)
-        AddName(temp, po->names[i]);
+        cupsdAddName(temp, po->names[i]);
 
       for (i = 0; i < po->num_allow; i ++)
         switch (po->allow[i].type)
 	{
 	  case AUTH_IP :
-	      AllowIP(temp, po->allow[i].mask.ip.address,
+	      cupsdAllowIP(temp, po->allow[i].mask.ip.address,
 	              po->allow[i].mask.ip.netmask);
 	      break;
 
           case AUTH_INTERFACE :
 	      snprintf(name, sizeof(name), "@IF(%s)",
 	               po->allow[i].mask.name.name);
-              AllowHost(temp, name);
+              cupsdAllowHost(temp, name);
 	      break;
 
           default :
-              AllowHost(temp, po->allow[i].mask.name.name);
+              cupsdAllowHost(temp, po->allow[i].mask.name.name);
 	      break;
         }
 
@@ -154,18 +154,18 @@ cupsdAddPolicyOp(cupsd_policy_t *p,	/* I - Policy */
         switch (po->deny[i].type)
 	{
 	  case AUTH_IP :
-	      DenyIP(temp, po->deny[i].mask.ip.address,
+	      cupsdDenyIP(temp, po->deny[i].mask.ip.address,
 	              po->deny[i].mask.ip.netmask);
 	      break;
 
           case AUTH_INTERFACE :
 	      snprintf(name, sizeof(name), "@IF(%s)",
 	               po->deny[i].mask.name.name);
-              DenyHost(temp, name);
+              cupsdDenyHost(temp, name);
 	      break;
 
           default :
-              DenyHost(temp, po->deny[i].mask.name.name);
+              cupsdDenyHost(temp, po->deny[i].mask.name.name);
 	      break;
         }
     }
@@ -181,10 +181,10 @@ cupsdAddPolicyOp(cupsd_policy_t *p,	/* I - Policy */
 
 int					/* I - 1 if OK, 0 otherwise */
 cupsdCheckPolicy(cupsd_policy_t *p,	/* I - Policy */
-                 client_t       *con,	/* I - Client connection */
+                 cupsd_client_t       *con,	/* I - Client connection */
 	         const char     *owner)	/* I - Owner of object */
 {
-  location_t	*po;			/* Current policy operation */
+  cupsd_location_t	*po;			/* Current policy operation */
 
 
  /*
@@ -193,7 +193,7 @@ cupsdCheckPolicy(cupsd_policy_t *p,	/* I - Policy */
 
   if (!p || !con)
   {
-    LogMessage(L_CRIT, "cupsdCheckPolicy: p=%p, con=%p!", p, con);
+    cupsdLogMessage(L_CRIT, "cupsdCheckPolicy: p=%p, con=%p!", p, con);
 
     return (0);
   }
@@ -204,7 +204,7 @@ cupsdCheckPolicy(cupsd_policy_t *p,	/* I - Policy */
 
   if ((po = cupsdFindPolicyOp(p, con->request->request.op.operation_id)) == NULL)
   {
-    LogMessage(L_DEBUG2, "cupsdCheckPolicy: No matching operation, returning 0!");
+    cupsdLogMessage(L_DEBUG2, "cupsdCheckPolicy: No matching operation, returning 0!");
     return (0);
   }
 
@@ -227,7 +227,7 @@ cupsdDeleteAllPolicies(void)
 {
   int			i, j;		/* Looping vars */
   cupsd_policy_t	**p;		/* Current policy */
-  location_t		**po;		/* Current policy op */
+  cupsd_location_t		**po;		/* Current policy op */
 
 
   if (NumPolicies == 0)
@@ -288,15 +288,15 @@ cupsdFindPolicy(const char *policy)	/* I - Name of policy */
  * 'cupsdFindPolicyOp()' - Find a policy operation.
  */
 
-location_t *				/* O - Policy operation */
+cupsd_location_t *				/* O - Policy operation */
 cupsdFindPolicyOp(cupsd_policy_t *p,	/* I - Policy */
                   ipp_op_t       op)	/* I - IPP operation */
 {
   int		i;			/* Looping var */
-  location_t	**po;			/* Current policy operation */
+  cupsd_location_t	**po;			/* Current policy operation */
 
 
-  LogMessage(L_DEBUG2, "cupsdFindPolicyOp(p=%p, op=%x(%s))\n",
+  cupsdLogMessage(L_DEBUG2, "cupsdFindPolicyOp(p=%p, op=%x(%s))\n",
              p, op, ippOpString(op));
 
  /*
@@ -313,18 +313,18 @@ cupsdFindPolicyOp(cupsd_policy_t *p,	/* I - Policy */
   for (i = p->num_ops, po = p->ops; i > 0; i --, po ++)
     if ((*po)->op == op)
     {
-      LogMessage(L_DEBUG2, "cupsdFindPolicyOp: Found exact match...");
+      cupsdLogMessage(L_DEBUG2, "cupsdFindPolicyOp: Found exact match...");
       return (*po);
     }
 
   for (i = p->num_ops, po = p->ops; i > 0; i --, po ++)
     if ((*po)->op == IPP_ANY_OPERATION)
     {
-      LogMessage(L_DEBUG2, "cupsdFindPolicyOp: Found wildcard match...");
+      cupsdLogMessage(L_DEBUG2, "cupsdFindPolicyOp: Found wildcard match...");
       return (*po);
     }
 
-  LogMessage(L_DEBUG2, "cupsdFindPolicyOp: No match found!");
+  cupsdLogMessage(L_DEBUG2, "cupsdFindPolicyOp: No match found!");
 
   return (NULL);
 }

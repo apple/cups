@@ -81,8 +81,8 @@ typedef struct cupsd_event_s		/**** Event structure ****/
   cupsd_eventmask_t event;		/* Event */
   time_t	time;			/* Time of event */
   ipp_t		*attrs;			/* Notification message */
-  printer_t	*dest;			/* Associated printer, if any */
-  job_t		*job;			/* Associated job, if any */
+  cupsd_printer_t	*dest;			/* Associated printer, if any */
+  cupsd_job_t		*job;			/* Associated job, if any */
 } cupsd_event_t; 
 
 typedef struct cupsd_subscription_s	/**** Subscription structure ****/
@@ -95,8 +95,8 @@ typedef struct cupsd_subscription_s	/**** Subscription structure ****/
   int		user_data_len;		/* Length of notify-user-data */
   int		lease;			/* notify-lease-time */
   int		interval;		/* notify-interval */
-  printer_t	*dest;			/* notify-printer-uri, if any */
-  job_t		*job;			/* notify-job-id, if any */
+  cupsd_printer_t	*dest;			/* notify-printer-uri, if any */
+  cupsd_job_t		*job;			/* notify-job-id, if any */
   int		pid;			/* Process ID of notifier */
   int		pipe;			/* Pipe to notifier */
   int		status;			/* Exit status of notifier */
@@ -145,12 +145,12 @@ VAR cupsd_statbuf_t *NotifierStatusBuffer VALUE(NULL);
  * Prototypes...
  */
 
-extern void	cupsdAddEvent(cupsd_eventmask_t event, printer_t *dest,
-		              job_t *job, const char *text, ...);
+extern void	cupsdAddEvent(cupsd_eventmask_t event, cupsd_printer_t *dest,
+		              cupsd_job_t *job, const char *text, ...);
 extern cupsd_subscription_t *
 		cupsdAddSubscription(unsigned mask,
-		                     printer_t *dest,
-		                     job_t *job, const char *uri);
+		                     cupsd_printer_t *dest,
+		                     cupsd_job_t *job, const char *uri);
 extern void	cupsdDeleteAllEvents(void);
 extern void	cupsdDeleteAllSubscriptions(void);
 extern void	cupsdDeleteSubscription(cupsd_subscription_t *sub, int update);
@@ -161,7 +161,7 @@ extern cupsd_eventmask_t
 
 extern cupsd_subscription_t *
 		cupsdFindSubscription(int id);
-extern void	cupsdExpireSubscriptions(printer_t *dest, job_t *job);
+extern void	cupsdExpireSubscriptions(cupsd_printer_t *dest, cupsd_job_t *job);
 extern void	cupsdLoadAllSubscriptions(void);
 extern void	cupsdSaveAllSubscriptions(void);
 extern void	cupsdSendNotification(cupsd_subscription_t *sub,

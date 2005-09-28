@@ -24,10 +24,10 @@
  *
  * Contents:
  *
- *   PauseListening()  - Clear input polling on all listening sockets...
- *   ResumeListening() - Set input polling on all listening sockets...
- *   StartListening()  - Create all listening sockets...
- *   StopListening()   - Close all listening sockets...
+ *   cupsdPauseListening()  - Clear input polling on all listening sockets...
+ *   cupsdResumeListening() - Set input polling on all listening sockets...
+ *   cupsdStartListening()  - Create all listening sockets...
+ *   cupsdStopListening()   - Close all listening sockets...
  */
 
 /*
@@ -38,27 +38,27 @@
 
 
 /*
- * 'PauseListening()' - Clear input polling on all listening sockets...
+ * 'cupsdPauseListening()' - Clear input polling on all listening sockets...
  */
 
 void
-PauseListening(void)
+cupsdPauseListening(void)
 {
   int		i;		/* Looping var */
-  listener_t	*lis;		/* Current listening socket */
+  cupsd_listener_t	*lis;		/* Current listening socket */
 
 
   if (NumListeners < 1 || !FD_ISSET(Listeners[0].fd, InputSet))
     return;
 
   if (NumClients == MaxClients)
-    LogMessage(L_WARN, "Max clients reached, holding new connections...");
+    cupsdLogMessage(L_WARN, "Max clients reached, holding new connections...");
 
-  LogMessage(L_DEBUG, "PauseListening: Clearing input bits...");
+  cupsdLogMessage(L_DEBUG, "cupsdPauseListening: Clearing input bits...");
 
   for (i = NumListeners, lis = Listeners; i > 0; i --, lis ++)
   {
-    LogMessage(L_DEBUG2, "PauseListening: Removing fd %d from InputSet...",
+    cupsdLogMessage(L_DEBUG2, "cupsdPauseListening: Removing fd %d from InputSet...",
                lis->fd);
 
     FD_CLR(lis->fd, InputSet);
@@ -67,27 +67,27 @@ PauseListening(void)
 
 
 /*
- * 'ResumeListening()' - Set input polling on all listening sockets...
+ * 'cupsdResumeListening()' - Set input polling on all listening sockets...
  */
 
 void
-ResumeListening(void)
+cupsdResumeListening(void)
 {
   int		i;		/* Looping var */
-  listener_t	*lis;		/* Current listening socket */
+  cupsd_listener_t	*lis;		/* Current listening socket */
 
 
   if (NumListeners < 1 || FD_ISSET(Listeners[0].fd, InputSet))
     return;
 
   if (NumClients >= (MaxClients - 1))
-    LogMessage(L_WARN, "Resuming new connection processing...");
+    cupsdLogMessage(L_WARN, "Resuming new connection processing...");
 
-  LogMessage(L_DEBUG, "ResumeListening: Setting input bits...");
+  cupsdLogMessage(L_DEBUG, "cupsdResumeListening: Setting input bits...");
 
   for (i = NumListeners, lis = Listeners; i > 0; i --, lis ++)
   {
-    LogMessage(L_DEBUG2, "ResumeListening: Adding fd %d to InputSet...",
+    cupsdLogMessage(L_DEBUG2, "cupsdResumeListening: Adding fd %d to InputSet...",
                lis->fd);
     FD_SET(lis->fd, InputSet);
   }
@@ -95,17 +95,17 @@ ResumeListening(void)
 
 
 /*
- * 'StartListening()' - Create all listening sockets...
+ * 'cupsdStartListening()' - Create all listening sockets...
  */
 
 void
-StartListening(void)
+cupsdStartListening(void)
 {
   int		status;			/* Bind result */
   int		i,			/* Looping var */
 		p,			/* Port number */
 		val;			/* Parameter value */
-  listener_t	*lis;			/* Current listening socket */
+  cupsd_listener_t	*lis;			/* Current listening socket */
   struct hostent *host;			/* Host entry for server address */
   char		s[256];			/* String addresss */
   const char	*have_domain;		/* Have a domain socket? */
@@ -118,7 +118,7 @@ StartListening(void)
 		};
 
 
-  LogMessage(L_DEBUG, "StartListening: NumListeners=%d", NumListeners);
+  cupsdLogMessage(L_DEBUG, "cupsdStartListening: NumListeners=%d", NumListeners);
 
  /*
   * Get the server's IP address...
@@ -140,7 +140,7 @@ StartListening(void)
     * Didn't find it!  Use an address of 0...
     */
 
-    LogMessage(L_ERROR, "StartListening: Unable to find IP address for server name \"%s\" - %s\n",
+    cupsdLogMessage(L_ERROR, "cupsdStartListening: Unable to find IP address for server name \"%s\" - %s\n",
                ServerName, hstrerror(h_errno));
 
     ServerAddr.ipv4.sin_family = AF_INET;
@@ -197,7 +197,7 @@ StartListening(void)
       * Try binding to an IPv4 address instead...
       */
 
-      LogMessage(L_NOTICE, "StartListening: Unable to use IPv6 address, trying IPv4...");
+      cupsdLogMessage(L_NOTICE, "cupsdStartListening: Unable to use IPv6 address, trying IPv4...");
 
       p = ntohs(lis->address.ipv6.sin6_port);
 
@@ -215,7 +215,7 @@ StartListening(void)
 
     if (lis->fd == -1)
     {
-      LogMessage(L_ERROR, "StartListening: Unable to open listen socket for address %s:%d - %s.",
+      cupsdLogMessage(L_ERROR, "cupsdStartListening: Unable to open listen socket for address %s:%d - %s.",
                  s, p, strerror(errno));
       exit(errno);
     }
@@ -305,7 +305,7 @@ StartListening(void)
 
     if (status < 0)
     {
-      LogMessage(L_ERROR, "StartListening: Unable to bind socket for address %s:%d - %s.",
+      cupsdLogMessage(L_ERROR, "cupsdStartListening: Unable to bind socket for address %s:%d - %s.",
                  s, p, strerror(errno));
       exit(errno);
     }
@@ -316,16 +316,16 @@ StartListening(void)
 
     if (listen(lis->fd, ListenBackLog) < 0)
     {
-      LogMessage(L_ERROR, "StartListening: Unable to listen for clients on address %s:%d - %s.",
+      cupsdLogMessage(L_ERROR, "cupsdStartListening: Unable to listen for clients on address %s:%d - %s.",
                  s, p, strerror(errno));
       exit(errno);
     }
 
     if (p)
-      LogMessage(L_INFO, "StartListening: Listening to %s:%d on fd %d...",
+      cupsdLogMessage(L_INFO, "cupsdStartListening: Listening to %s:%d on fd %d...",
         	 s, p, lis->fd);
     else
-      LogMessage(L_INFO, "StartListening: Listening to %s on fd %d...",
+      cupsdLogMessage(L_INFO, "cupsdStartListening: Listening to %s on fd %d...",
         	 s, lis->fd);
   }
 
@@ -335,7 +335,7 @@ StartListening(void)
 
   if (!LocalPort && !have_domain)
   {
-    LogMessage(L_EMERG, "No Listen or Port lines were found to allow access via localhost!");
+    cupsdLogMessage(L_EMERG, "No Listen or Port lines were found to allow access via localhost!");
 
    /*
     * Commit suicide...
@@ -371,24 +371,24 @@ StartListening(void)
   * Resume listening for connections...
   */
 
-  ResumeListening();
+  cupsdResumeListening();
 }
 
 
 /*
- * 'StopListening()' - Close all listening sockets...
+ * 'cupsdStopListening()' - Close all listening sockets...
  */
 
 void
-StopListening(void)
+cupsdStopListening(void)
 {
   int		i;		/* Looping var */
-  listener_t	*lis;		/* Current listening socket */
+  cupsd_listener_t	*lis;		/* Current listening socket */
 
 
-  LogMessage(L_DEBUG, "StopListening: closing all listen sockets.");
+  cupsdLogMessage(L_DEBUG, "cupsdStopListening: closing all listen sockets.");
 
-  PauseListening();
+  cupsdPauseListening();
 
   for (i = NumListeners, lis = Listeners; i > 0; i --, lis ++)
   {

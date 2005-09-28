@@ -166,19 +166,19 @@ VAR int			NeedReload	VALUE(RELOAD_ALL);
  * Prototypes...
  */
 
-extern void	CatchChildSignals(void);
-extern void	ClearString(char **s);
-extern void	HoldSignals(void);
-extern void	IgnoreChildSignals(void);
-extern void	ReleaseSignals(void);
-extern void	SetString(char **s, const char *v);
-extern void	SetStringf(char **s, const char *f, ...)
+extern void	cupsdCatchChildSignals(void);
+extern void	cupsdClearString(char **s);
+extern void	cupsdHoldSignals(void);
+extern void	cupsdIgnoreChildSignals(void);
+extern void	cupsdReleaseSignals(void);
+extern void	cupsdSetString(char **s, const char *v);
+extern void	cupsdSetStringf(char **s, const char *f, ...)
 #ifdef __GNUC__
 __attribute__ ((__format__ (__printf__, 2, 3)))
 #endif /* __GNUC__ */
 ;
-extern void	StartServer(void);
-extern void	StopServer(void);
+extern void	cupsdStartServer(void);
+extern void	cupsdStopServer(void);
 extern void	cupsdClosePipe(int *fds);
 extern int	cupsdOpenPipe(int *fds);
 

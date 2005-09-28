@@ -27,9 +27,9 @@
  * Structures...
  */
 
-typedef struct cups_netif_str		/**** Network interface data ****/
+typedef struct cupsd_netif_s		/**** Network interface data ****/
 {
-  struct cups_netif_str	*next;		/* Next interface in list */
+  struct cupsd_netif_s	*next;		/* Next interface in list */
   char			name[32],	/* Network interface name */
 			hostname[HTTP_MAX_HOST];
 					/* Hostname associated with interface */
@@ -38,7 +38,7 @@ typedef struct cups_netif_str		/**** Network interface data ****/
   http_addr_t		address,	/* Network address */
 			mask,		/* Network mask */
 			broadcast;	/* Broadcast address */
-} cups_netif_t;
+} cupsd_netif_t;
 
 
 /*
@@ -47,16 +47,16 @@ typedef struct cups_netif_str		/**** Network interface data ****/
 
 VAR time_t		NetIFTime	VALUE(0);
 					/* Network interface list time */
-VAR cups_netif_t	*NetIFList	VALUE(NULL);
+VAR cupsd_netif_t	*NetIFList	VALUE(NULL);
 					/* List of network interfaces */
 
 /*
  * Prototypes...
  */
 
-extern cups_netif_t	*NetIFFind(const char *name);
-extern void		NetIFFree(void);
-extern void		NetIFUpdate(void);
+extern cupsd_netif_t	*NetIFFind(const char *name);
+extern void		cupsdNetIFFree(void);
+extern void		cupsdNetIFUpdate(void);
 
 
 /*

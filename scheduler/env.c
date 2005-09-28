@@ -57,7 +57,7 @@ cupsdClearEnv(void)
 
 
   for (i = 0; i < num_common_env; i ++)
-    ClearString(common_env + i);
+    cupsdClearString(common_env + i);
 
   num_common_env = 0;
 }
@@ -82,7 +82,7 @@ cupsdInitEnv(void)
   * to access their bundle resources properly...
   */
 
-  SetString(common_env, "<CFProcessPath>");
+  cupsdSetString(common_env, "<CFProcessPath>");
   num_common_env = 1;
 #endif	/* __APPLE__ */
 
@@ -162,7 +162,7 @@ cupsdSetEnv(const char *name,		/* I - Name of variable */
 
   if (num_common_env >= (int)(sizeof(common_env) / sizeof(common_env[0])))
   {
-    LogMessage(L_ERROR, "cupsdSetEnv: Too many environment variables set!");
+    cupsdLogMessage(L_ERROR, "cupsdSetEnv: Too many environment variables set!");
     return;
   }
 
@@ -180,9 +180,9 @@ cupsdSetEnv(const char *name,		/* I - Name of variable */
   * Set the new environment variable...
   */
 
-  SetStringf(common_env + num_common_env, "%s=%s", name, value);
+  cupsdSetStringf(common_env + num_common_env, "%s=%s", name, value);
 
-  LogMessage(L_DEBUG, "cupsdSetEnv: %s\n", common_env[num_common_env]);
+  cupsdLogMessage(L_DEBUG, "cupsdSetEnv: %s\n", common_env[num_common_env]);
 
   num_common_env ++;
 }

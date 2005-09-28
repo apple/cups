@@ -26,12 +26,12 @@
  * HTTP client structure...
  */
 
-struct client_s
+struct cupsd_client_s
 {
   http_t	http;			/* HTTP client connection */
   ipp_t		*request,		/* IPP request information */
 		*response;		/* IPP response information */
-  location_t	*best;			/* Best match for AAA */
+  cupsd_location_t	*best;			/* Best match for AAA */
   time_t	start;			/* Request start time */
   http_state_t	operation;		/* Request operation */
   int		bytes;			/* Bytes transferred for this request */
@@ -67,7 +67,7 @@ typedef struct
   int			fd;		/* File descriptor for this server */
   http_addr_t		address;	/* Bind address of socket */
   http_encryption_t	encryption;	/* To encrypt or not to encrypt... */
-} listener_t;
+} cupsd_listener_t;
 
 
 /*
@@ -82,11 +82,11 @@ VAR http_encryption_t	LocalEncryption	VALUE(HTTP_ENCRYPT_IF_REQUESTED);
 					/* Local port encryption to use */
 VAR int			NumListeners	VALUE(0);
 					/* Number of listening sockets */
-VAR listener_t		*Listeners	VALUE(NULL);
+VAR cupsd_listener_t		*Listeners	VALUE(NULL);
 					/* Listening sockets */
 VAR int			NumClients	VALUE(0);
 					/* Number of HTTP clients */
-VAR client_t		*Clients	VALUE(NULL);
+VAR cupsd_client_t		*Clients	VALUE(NULL);
 					/* HTTP clients */
 VAR http_addr_t		ServerAddr;	/* Server address */
 VAR char		*ServerHeader	VALUE(NULL);
@@ -101,27 +101,27 @@ VAR cupsd_statbuf_t	*CGIStatusBuffer VALUE(NULL);
  * Prototypes...
  */
 
-extern void	AcceptClient(listener_t *lis);
-extern void	CloseAllClients(void);
-extern int	CloseClient(client_t *con);
-extern int	EncryptClient(client_t *con);
-extern int	IsCGI(client_t *con, const char *filename,
+extern void	cupsdAcceptClient(cupsd_listener_t *lis);
+extern void	cupsdCloseAllClients(void);
+extern int	cupsdCloseClient(cupsd_client_t *con);
+extern int	cupsdEncryptClient(cupsd_client_t *con);
+extern int	cupsdIsCGI(cupsd_client_t *con, const char *filename,
 		      struct stat *filestats, mime_type_t *type);
-extern void	PauseListening(void);
-extern int	ProcessIPPRequest(client_t *con);
-extern int	ReadClient(client_t *con);
-extern void	ResumeListening(void);
-extern int	SendCommand(client_t *con, char *command, char *options,
+extern void	cupsdPauseListening(void);
+extern int	cupsdProcessIPPRequest(cupsd_client_t *con);
+extern int	cupsdReadClient(cupsd_client_t *con);
+extern void	cupsdResumeListening(void);
+extern int	cupsdSendCommand(cupsd_client_t *con, char *command, char *options,
 		            int root);
-extern int	SendError(client_t *con, http_status_t code);
-extern int	SendFile(client_t *con, http_status_t code, char *filename,
+extern int	cupsdSendError(cupsd_client_t *con, http_status_t code);
+extern int	cupsdSendFile(cupsd_client_t *con, http_status_t code, char *filename,
 		         char *type, struct stat *filestats);
-extern int	SendHeader(client_t *con, http_status_t code, char *type);
-extern void	ShutdownClient(client_t *con);
-extern void	StartListening(void);
-extern void	StopListening(void);
-extern void	UpdateCGI(void);
-extern int	WriteClient(client_t *con);
+extern int	cupsdSendHeader(cupsd_client_t *con, http_status_t code, char *type);
+extern void	cupsdShutdownClient(cupsd_client_t *con);
+extern void	cupsdStartListening(void);
+extern void	cupsdStopListening(void);
+extern void	cupsdUpdateCGI(void);
+extern int	cupsdWriteClient(cupsd_client_t *con);
 
 
 /*

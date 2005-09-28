@@ -73,17 +73,17 @@ void	freeifaddrs(struct ifaddrs *addrs);
  * 'NetIFFind()' - Find a network interface.
  */
 
-cups_netif_t *			/* O - Network interface data */
+cupsd_netif_t *			/* O - Network interface data */
 NetIFFind(const char *name)	/* I - Name of interface */
 {
-  cups_netif_t	*temp;		/* Current network interface */
+  cupsd_netif_t	*temp;		/* Current network interface */
 
 
  /*
   * Update the interface list as needed...
   */
 
-  NetIFUpdate();
+  cupsdNetIFUpdate();
 
  /*
   * Search for the named interface...
@@ -98,13 +98,13 @@ NetIFFind(const char *name)	/* I - Name of interface */
 
 
 /*
- * 'NetIFFree()' - Free the current network interface list.
+ * 'cupsdNetIFFree()' - Free the current network interface list.
  */
 
 void
-NetIFFree(void)
+cupsdNetIFFree(void)
 {
-  cups_netif_t	*next;		/* Next interface in list */
+  cupsd_netif_t	*next;		/* Next interface in list */
 
 
  /*
@@ -123,16 +123,16 @@ NetIFFree(void)
 
 
 /*
- * 'NetIFUpdate()' - Update the network interface list as needed...
+ * 'cupsdNetIFUpdate()' - Update the network interface list as needed...
  */
 
 void
-NetIFUpdate(void)
+cupsdNetIFUpdate(void)
 {
   int		i,		/* Looping var */
 		match;		/* Matching address? */
-  listener_t	*lis;		/* Listen address */
-  cups_netif_t	*temp;		/* Current interface */
+  cupsd_listener_t	*lis;		/* Listen address */
+  cupsd_netif_t	*temp;		/* Current interface */
   struct ifaddrs *addrs,	/* Interface address list */
 		*addr;		/* Current interface address */
 
@@ -151,7 +151,7 @@ NetIFUpdate(void)
   * Free the old interfaces...
   */
 
-  NetIFFree();
+  cupsdNetIFFree();
 
  /*
   * Grab a new list of interfaces...
@@ -179,7 +179,7 @@ NetIFUpdate(void)
     * OK, we have an IPv4/6 address, so create a new list node...
     */
 
-    if ((temp = calloc(1, sizeof(cups_netif_t))) == NULL)
+    if ((temp = calloc(1, sizeof(cupsd_netif_t))) == NULL)
       break;
 
     temp->next = NetIFList;

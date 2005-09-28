@@ -116,7 +116,7 @@ LoadPPDs(const char *d)			/* I - Directory to scan... */
 
     if ((ppds = malloc(sizeof(ppd_info_t) * num_ppds)) == NULL)
     {
-      LogMessage(L_ERROR, "LoadPPDs: Unable to allocate memory for %d PPD files!",
+      cupsdLogMessage(L_ERROR, "LoadPPDs: Unable to allocate memory for %d PPD files!",
                  num_ppds);
       num_ppds   = 0;
       alloc_ppds = 0;
@@ -131,7 +131,7 @@ LoadPPDs(const char *d)			/* I - Directory to scan... */
 
       cupsFileClose(fp);
 
-      LogMessage(L_INFO, "LoadPPDs: Read \"%s\", %d PPDs...", filename,
+      cupsdLogMessage(L_INFO, "LoadPPDs: Read \"%s\", %d PPDs...", filename,
                  num_ppds);
 
      /*
@@ -146,7 +146,7 @@ LoadPPDs(const char *d)			/* I - Directory to scan... */
     }
     else
     {
-      LogMessage(L_ERROR, "LoadPPDs: Unable to read \"%s\" - %s", filename,
+      cupsdLogMessage(L_ERROR, "LoadPPDs: Unable to read \"%s\" - %s", filename,
                  strerror(errno));
       num_ppds = 0;
     }
@@ -199,15 +199,15 @@ LoadPPDs(const char *d)			/* I - Directory to scan... */
 
       cupsFileClose(fp);
 
-      LogMessage(L_INFO, "LoadPPDs: Wrote \"%s\", %d PPDs...", filename,
+      cupsdLogMessage(L_INFO, "LoadPPDs: Wrote \"%s\", %d PPDs...", filename,
         	 num_ppds);
     }
     else
-      LogMessage(L_ERROR, "LoadPPDs: Unable to write \"%s\" - %s", filename,
+      cupsdLogMessage(L_ERROR, "LoadPPDs: Unable to write \"%s\" - %s", filename,
         	 strerror(errno));
   }
   else
-    LogMessage(L_INFO, "LoadPPDs: No new or changed PPDs...");
+    cupsdLogMessage(L_INFO, "LoadPPDs: No new or changed PPDs...");
 
  /*
   * Create the list of PPDs...
@@ -453,7 +453,7 @@ load_ppds(const char *d,		/* I - Actual directory */
 
   if ((dir = opendir(d)) == NULL)
   {
-    LogMessage(L_ERROR, "LoadPPDs: Unable to open PPD directory \"%s\": %s",
+    cupsdLogMessage(L_ERROR, "LoadPPDs: Unable to open PPD directory \"%s\": %s",
                d, strerror(errno));
     return;
   }
@@ -719,7 +719,7 @@ load_ppds(const char *d,		/* I - Actual directory */
       * Allocate memory for the new PPD file...
       */
 
-      LogMessage(L_DEBUG, "LoadPPDs: Adding ppd \"%s\"...", name);
+      cupsdLogMessage(L_DEBUG, "LoadPPDs: Adding ppd \"%s\"...", name);
 
       if (num_ppds >= alloc_ppds)
       {
@@ -734,7 +734,7 @@ load_ppds(const char *d,		/* I - Actual directory */
 
 	if (ppd == NULL)
 	{
-          LogMessage(L_ERROR, "load_ppds: Ran out of memory for %d PPD files!",
+          cupsdLogMessage(L_ERROR, "load_ppds: Ran out of memory for %d PPD files!",
 	             alloc_ppds + 32);
           closedir(dir);
 	  return;
@@ -748,7 +748,7 @@ load_ppds(const char *d,		/* I - Actual directory */
       num_ppds ++;
     }
     else
-      LogMessage(L_DEBUG, "LoadPPDs: Updating ppd \"%s\"...", name);
+      cupsdLogMessage(L_DEBUG, "LoadPPDs: Updating ppd \"%s\"...", name);
 
    /*
     * Zero the PPD record and copy the info over...

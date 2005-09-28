@@ -23,8 +23,8 @@
  *
  * Contents:
  *
- *   StartServer() - Start the server.
- *   StopServer()  - Stop the server.
+ *   cupsdStartServer() - Start the server.
+ *   cupsdStopServer()  - Stop the server.
  */
 
 /*
@@ -38,11 +38,11 @@
 
 
 /*
- * 'StartServer()' - Start the server.
+ * 'cupsdStartServer()' - Start the server.
  */
 
 void
-StartServer(void)
+cupsdStartServer(void)
 {
 #ifdef HAVE_LIBSSL
   int		i;		/* Looping var */
@@ -85,41 +85,41 @@ StartServer(void)
   * Startup all the networking stuff...
   */
 
-  StartListening();
-  StartBrowsing();
-  StartPolling();
+  cupsdStartListening();
+  cupsdStartBrowsing();
+  cupsdStartPolling();
 
  /*
   * Create a pipe for CGI processes...
   */
 
   if (cupsdOpenPipe(CGIPipes))
-    LogMessage(L_ERROR, "StartServer: Unable to create pipes for CGI status!");
+    cupsdLogMessage(L_ERROR, "cupsdStartServer: Unable to create pipes for CGI status!");
   else
   {
     CGIStatusBuffer = cupsdStatBufNew(CGIPipes[0], "[CGI]");
 
-    LogMessage(L_DEBUG2, "StartServer: Adding fd %d to InputSet...", CGIPipes[0]);
+    cupsdLogMessage(L_DEBUG2, "cupsdStartServer: Adding fd %d to InputSet...", CGIPipes[0]);
     FD_SET(CGIPipes[0], InputSet);
   }
 }
 
 
 /*
- * 'StopServer()' - Stop the server.
+ * 'cupsdStopServer()' - Stop the server.
  */
 
 void
-StopServer(void)
+cupsdStopServer(void)
 {
  /*
   * Close all network clients and stop all jobs...
   */
 
-  CloseAllClients();
-  StopListening();
-  StopPolling();
-  StopBrowsing();
+  cupsdCloseAllClients();
+  cupsdStopListening();
+  cupsdStopPolling();
+  cupsdStopBrowsing();
 
   if (Clients != NULL)
   {
@@ -145,7 +145,7 @@ StopServer(void)
 
   if (CGIPipes[0] >= 0)
   {
-    LogMessage(L_DEBUG2, "StopServer: Removing fd %d from InputSet...",
+    cupsdLogMessage(L_DEBUG2, "cupsdStopServer: Removing fd %d from InputSet...",
                CGIPipes[0]);
 
     FD_CLR(CGIPipes[0], InputSet);

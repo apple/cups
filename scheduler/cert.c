@@ -24,11 +24,11 @@
  *
  * Contents:
  *
- *   AddCert()        - Add a certificate.
- *   DeleteCert()     - Delete a single certificate.
- *   DeleteAllCerts() - Delete all certificates...
- *   FindCert()       - Find a certificate.
- *   InitCerts()      - Initialize the certificate "system" and root
+ *   cupsdAddCert()        - Add a certificate.
+ *   cupsdDeleteCert()     - Delete a single certificate.
+ *   cupsdDeleteAllCerts() - Delete all certificates...
+ *   cupsdFindCert()       - Find a certificate.
+ *   cupsdInitCerts()      - Initialize the certificate "system" and root
  *                      certificate.
  */
 
@@ -40,28 +40,28 @@
 
 
 /*
- * 'AddCert()' - Add a certificate.
+ * 'cupsdAddCert()' - Add a certificate.
  */
 
 void
-AddCert(int        pid,			/* I - Process ID */
+cupsdAddCert(int        pid,			/* I - Process ID */
         const char *username)		/* I - Username */
 {
   int		i;			/* Looping var */
-  cert_t	*cert;			/* Current certificate */
+  cupsd_cert_t	*cert;			/* Current certificate */
   int		fd;			/* Certificate file */
   char		filename[1024];		/* Certificate filename */
   static const char hex[] = "0123456789ABCDEF";
 					/* Hex constants... */
 
 
-  LogMessage(L_DEBUG2, "AddCert: adding certificate for pid %d", pid);
+  cupsdLogMessage(L_DEBUG2, "cupsdAddCert: adding certificate for pid %d", pid);
 
  /*
   * Allocate memory for the certificate...
   */
 
-  if ((cert = calloc(sizeof(cert_t), 1)) == NULL)
+  if ((cert = calloc(sizeof(cupsd_cert_t), 1)) == NULL)
     return;
 
  /*
@@ -84,7 +84,7 @@ AddCert(int        pid,			/* I - Process ID */
 
   if ((fd = open(filename, O_WRONLY | O_CREAT | O_EXCL, 0400)) < 0)
   {
-    LogMessage(L_ERROR, "AddCert: Unable to create certificate file %s - %s",
+    cupsdLogMessage(L_ERROR, "cupsdAddCert: Unable to create certificate file %s - %s",
                filename, strerror(errno));
     free(cert);
     return;
@@ -127,13 +127,13 @@ AddCert(int        pid,			/* I - Process ID */
 
 
 /*
- * 'DeleteCert()' - Delete a single certificate.
+ * 'cupsdDeleteCert()' - Delete a single certificate.
  */
 
 void
-DeleteCert(int pid)			/* I - Process ID */
+cupsdDeleteCert(int pid)			/* I - Process ID */
 {
-  cert_t	*cert,			/* Current certificate */
+  cupsd_cert_t	*cert,			/* Current certificate */
 		*prev;			/* Previous certificate */
   char		filename[1024];		/* Certificate file */
 
@@ -145,7 +145,7 @@ DeleteCert(int pid)			/* I - Process ID */
       * Remove this certificate from the list...
       */
 
-      LogMessage(L_DEBUG2, "DeleteCert: removing certificate for pid %d", pid);
+      cupsdLogMessage(L_DEBUG2, "cupsdDeleteCert: removing certificate for pid %d", pid);
 
       DEBUG_printf(("DELETE pid=%d, username=%s, cert=%s\n", cert->pid,
                     cert->username, cert->certificate));
@@ -163,7 +163,7 @@ DeleteCert(int pid)			/* I - Process ID */
 
       snprintf(filename, sizeof(filename), "%s/certs/%d", StateDir, pid);
       if (unlink(filename))
-	LogMessage(L_ERROR, "DeleteCert: Unable to remove %s!\n", filename);
+	cupsdLogMessage(L_ERROR, "cupsdDeleteCert: Unable to remove %s!\n", filename);
 
       return;
     }
@@ -171,13 +171,13 @@ DeleteCert(int pid)			/* I - Process ID */
 
 
 /*
- * 'DeleteAllCerts()' - Delete all certificates...
+ * 'cupsdDeleteAllCerts()' - Delete all certificates...
  */
 
 void
-DeleteAllCerts(void)
+cupsdDeleteAllCerts(void)
 {
-  cert_t	*cert,			/* Current certificate */
+  cupsd_cert_t	*cert,			/* Current certificate */
 		*next;			/* Next certificate */
   char		filename[1024];		/* Certificate file */
 
@@ -194,7 +194,7 @@ DeleteAllCerts(void)
 
     snprintf(filename, sizeof(filename), "%s/certs/%d", StateDir, cert->pid);
     if (unlink(filename))
-      LogMessage(L_ERROR, "DeleteAllCerts: Unable to remove %s!\n", filename);
+      cupsdLogMessage(L_ERROR, "cupsdDeleteAllCerts: Unable to remove %s!\n", filename);
 
    /*
     * Free memory...
@@ -209,16 +209,16 @@ DeleteAllCerts(void)
 
 
 /*
- * 'FindCert()' - Find a certificate.
+ * 'cupsdFindCert()' - Find a certificate.
  */
 
 const char *				/* O - Matching username or NULL */
-FindCert(const char *certificate)	/* I - Certificate */
+cupsdFindCert(const char *certificate)	/* I - Certificate */
 {
-  cert_t	*cert;			/* Current certificate */
+  cupsd_cert_t	*cert;			/* Current certificate */
 
 
-  DEBUG_printf(("FindCert(certificate=%s)\n", certificate));
+  DEBUG_printf(("cupsdFindCert(certificate=%s)\n", certificate));
   for (cert = Certs; cert != NULL; cert = cert->next)
     if (strcasecmp(certificate, cert->certificate) == 0)
     {
@@ -233,11 +233,11 @@ FindCert(const char *certificate)	/* I - Certificate */
 
 
 /*
- * 'InitCerts()' - Initialize the certificate "system" and root certificate.
+ * 'cupsdInitCerts()' - Initialize the certificate "system" and root certificate.
  */
 
 void
-InitCerts(void)
+cupsdInitCerts(void)
 {
   cups_file_t	*fp;			/* /dev/random file */
   unsigned	seed;			/* Seed for random number generator */
@@ -281,7 +281,7 @@ InitCerts(void)
   */
 
   if (!RunUser)
-    AddCert(0, "root");
+    cupsdAddCert(0, "root");
 }
 
 

@@ -23,10 +23,10 @@
  *
  * Contents:
  *
- *   GetDateTime()    - Returns a pointer to a date/time string.
- *   LogMessage()     - Log a message to the error log file.
- *   LogPage()        - Log a page to the page log file.
- *   LogRequest()     - Log an HTTP request in Common Log Format.
+ *   cupsdGetDateTime()    - Returns a pointer to a date/time string.
+ *   cupsdLogMessage()     - Log a message to the error log file.
+ *   cupsdLogPage()        - Log a page to the page log file.
+ *   cupsdLogRequest()     - Log an HTTP request in Common Log Format.
  *   check_log_file() - Open/rotate a log file if it needs it.
  */
 
@@ -50,11 +50,11 @@ static int	check_log_file(cups_file_t **, const char *);
 
 
 /*
- * 'GetDateTime()' - Returns a pointer to a date/time string.
+ * 'cupsdGetDateTime()' - Returns a pointer to a date/time string.
  */
 
 char *				/* O - Date/time string */
-GetDateTime(time_t t)		/* I - Time value */
+cupsdGetDateTime(time_t t)		/* I - Time value */
 {
   struct tm	*date;		/* Date/time value */
   static time_t	last_time = -1;	/* Last time value */
@@ -111,11 +111,11 @@ GetDateTime(time_t t)		/* I - Time value */
 
 
 /*
- * 'LogMessage()' - Log a message to the error log file.
+ * 'cupsdLogMessage()' - Log a message to the error log file.
  */
 
 int					/* O - 1 on success, 0 on error */
-LogMessage(int        level,		/* I - Log level */
+cupsdLogMessage(int        level,		/* I - Log level */
            const char *message,		/* I - printf-style message string */
 	   ...)				/* I - Additional args as needed */
 {
@@ -186,7 +186,7 @@ LogMessage(int        level,		/* I - Log level */
   * Print the log level and date/time...
   */
 
-  cupsFilePrintf(ErrorFile, "%c %s ", levels[level], GetDateTime(time(NULL)));
+  cupsFilePrintf(ErrorFile, "%c %s ", levels[level], cupsdGetDateTime(time(NULL)));
 
  /*
   * Allocate the line buffer as needed...
@@ -275,11 +275,11 @@ LogMessage(int        level,		/* I - Log level */
 
 
 /*
- * 'LogPage()' - Log a page to the page log file.
+ * 'cupsdLogPage()' - Log a page to the page log file.
  */
 
 int				/* O - 1 on success, 0 on error */
-LogPage(job_t       *job,	/* I - Job being printed */
+cupsdLogPage(cupsd_job_t       *job,	/* I - Job being printed */
         const char  *page)	/* I - Page being printed */
 {
   ipp_attribute_t *billing,	/* job-billing attribute */
@@ -322,7 +322,7 @@ LogPage(job_t       *job,	/* I - Job being printed */
 
   cupsFilePrintf(PageFile, "%s %s %d %s %s %s %s\n", job->printer->name,
         	 job->username ? job->username : "-",
-        	 job->id, GetDateTime(time(NULL)), page,
+        	 job->id, cupsdGetDateTime(time(NULL)), page,
 		 billing ? billing->values[0].string.text : "-",
         	 hostname->values[0].string.text);
   cupsFileFlush(PageFile);
@@ -332,11 +332,11 @@ LogPage(job_t       *job,	/* I - Job being printed */
 
 
 /*
- * 'LogRequest()' - Log an HTTP request in Common Log Format.
+ * 'cupsdLogRequest()' - Log an HTTP request in Common Log Format.
  */
 
 int				/* O - 1 on success, 0 on error */
-LogRequest(client_t      *con,	/* I - Request to log */
+cupsdLogRequest(cupsd_client_t      *con,	/* I - Request to log */
            http_status_t code)	/* I - Response code */
 {
   static const char * const states[] =
@@ -388,7 +388,7 @@ LogRequest(client_t      *con,	/* I - Request to log */
 
   cupsFilePrintf(AccessFile, "%s - %s %s \"%s %s HTTP/%d.%d\" %d %d\n",
         	 con->http.hostname, con->username[0] != '\0' ? con->username : "-",
-		 GetDateTime(con->start), states[con->operation], con->uri,
+		 cupsdGetDateTime(con->start), states[con->operation], con->uri,
 		 con->http.version / 100, con->http.version % 100,
 		 code, con->bytes);
   cupsFileFlush(AccessFile);

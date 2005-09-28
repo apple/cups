@@ -23,25 +23,25 @@
  *
  * Contents:
  *
- *   AddLocation()         - Add a location for authorization.
- *   AddName()             - Add a name to a location...
- *   AllowHost()           - Add a host name that is allowed to access the
+ *   cupsdAddLocation()         - Add a location for authorization.
+ *   cupsdAddName()             - Add a name to a location...
+ *   cupsdAllowHost()           - Add a host name that is allowed to access the
  *                           location.
- *   AllowIP()             - Add an IP address or network that is allowed to
+ *   cupsdAllowIP()             - Add an IP address or network that is allowed to
  *                           access the location.
- *   CheckAuth()           - Check authorization masks.
+ *   cupsdCheckAuth()           - Check authorization masks.
  *   cupsdCheckGroup()     - Check for a user's group membership.
- *   CopyLocation()        - Make a copy of a location...
- *   DeleteAllLocations()  - Free all memory used for location authorization.
+ *   cupsdCopyLocation()        - Make a copy of a location...
+ *   cupsdDeleteAllLocations()  - Free all memory used for location authorization.
  *   cupsdDeleteLocation() - Free all memory used by a location.
- *   DenyHost()            - Add a host name that is not allowed to access the
+ *   cupsdDenyHost()            - Add a host name that is not allowed to access the
  *                           location.
- *   DenyIP()              - Add an IP address or network that is not allowed
+ *   cupsdDenyIP()              - Add an IP address or network that is not allowed
  *                           to access the location.
- *   FindBest()            - Find the location entry that best matches the
+ *   cupsdFindBest()            - Find the location entry that best matches the
  *                           resource.
- *   FindLocation()        - Find the named location.
- *   GetMD5Passwd()        - Get an MD5 password.
+ *   cupsdFindLocation()        - Find the named location.
+ *   cupsdGetMD5Passwd()        - Get an MD5 password.
  *   cupsdIsAuthorized()   - Check to see if the user is authorized...
  *   add_allow()           - Add an allow mask to the location.
  *   add_deny()            - Add a deny mask to the location.
@@ -79,8 +79,8 @@
  * Local functions...
  */
 
-static authmask_t	*add_allow(location_t *loc);
-static authmask_t	*add_deny(location_t *loc);
+static cupsd_authmask_t	*add_allow(cupsd_location_t *loc);
+static cupsd_authmask_t	*add_deny(cupsd_location_t *loc);
 #if !HAVE_LIBPAM
 static char		*cups_crypt(const char *pw, const char *salt);
 #endif /* !HAVE_LIBPAM */
@@ -97,18 +97,18 @@ static void		to64(char *s, unsigned long v, int n);
  */
 
 #if defined(__hpux) && defined(HAVE_LIBPAM)
-static client_t		*auth_client;	/* Current client being authenticated */
+static cupsd_client_t		*auth_client;	/* Current client being authenticated */
 #endif /* __hpux && HAVE_LIBPAM */
 
 
 /*
- * 'AddLocation()' - Add a location for authorization.
+ * 'cupsdAddLocation()' - Add a location for authorization.
  */
 
-location_t *				/* O - Pointer to new location record */
-AddLocation(const char *location)	/* I - Location path */
+cupsd_location_t *				/* O - Pointer to new location record */
+cupsdAddLocation(const char *location)	/* I - Location path */
 {
-  location_t	*temp;			/* New location */
+  cupsd_location_t	*temp;			/* New location */
 
 
  /*
@@ -116,9 +116,9 @@ AddLocation(const char *location)	/* I - Location path */
   */
 
   if (NumLocations == 0)
-    temp = malloc(sizeof(location_t));
+    temp = malloc(sizeof(cupsd_location_t));
   else
-    temp = realloc(Locations, sizeof(location_t) * (NumLocations + 1));
+    temp = realloc(Locations, sizeof(cupsd_location_t) * (NumLocations + 1));
 
   if (temp == NULL)
     return (NULL);
@@ -131,11 +131,11 @@ AddLocation(const char *location)	/* I - Location path */
   * Initialize the record and copy the name over...
   */
 
-  memset(temp, 0, sizeof(location_t));
+  memset(temp, 0, sizeof(cupsd_location_t));
   strlcpy(temp->location, location, sizeof(temp->location));
   temp->length = strlen(temp->location);
 
-  LogMessage(L_DEBUG, "AddLocation: added location \'%s\'", location);
+  cupsdLogMessage(L_DEBUG, "cupsdAddLocation: added location \'%s\'", location);
 
  /*
   * Return the new record...
@@ -146,17 +146,17 @@ AddLocation(const char *location)	/* I - Location path */
 
 
 /*
- * 'AddName()' - Add a name to a location...
+ * 'cupsdAddName()' - Add a name to a location...
  */
 
 void
-AddName(location_t *loc,	/* I - Location to add to */
+cupsdAddName(cupsd_location_t *loc,	/* I - Location to add to */
         char       *name)	/* I - Name to add */
 {
   char	**temp;			/* Pointer to names array */
 
 
-  LogMessage(L_DEBUG2, "AddName(loc=%p, name=\"%s\")", loc, name);
+  cupsdLogMessage(L_DEBUG2, "cupsdAddName(loc=%p, name=\"%s\")", loc, name);
 
   if (loc->num_names == 0)
     temp = malloc(sizeof(char *));
@@ -165,7 +165,7 @@ AddName(location_t *loc,	/* I - Location to add to */
 
   if (temp == NULL)
   {
-    LogMessage(L_ERROR, "Unable to add name to location %s: %s", loc->location,
+    cupsdLogMessage(L_ERROR, "Unable to add name to location %s: %s", loc->location,
                strerror(errno));
     return;
   }
@@ -174,7 +174,7 @@ AddName(location_t *loc,	/* I - Location to add to */
 
   if ((temp[loc->num_names] = strdup(name)) == NULL)
   {
-    LogMessage(L_ERROR, "Unable to duplicate name for location %s: %s",
+    cupsdLogMessage(L_ERROR, "Unable to duplicate name for location %s: %s",
                loc->location, strerror(errno));
     return;
   }
@@ -184,19 +184,19 @@ AddName(location_t *loc,	/* I - Location to add to */
 
 
 /*
- * 'AllowHost()' - Add a host name that is allowed to access the location.
+ * 'cupsdAllowHost()' - Add a host name that is allowed to access the location.
  */
 
 void
-AllowHost(location_t *loc,	/* I - Location to add to */
+cupsdAllowHost(cupsd_location_t *loc,	/* I - Location to add to */
           char       *name)	/* I - Name of host or domain to add */
 {
-  authmask_t	*temp;		/* New host/domain mask */
+  cupsd_authmask_t	*temp;		/* New host/domain mask */
   char		ifname[32],	/* Interface name */
 		*ifptr;		/* Pointer to end of name */
 
 
-  LogMessage(L_DEBUG2, "AllowHost(loc=%p(%s), name=\"%s\")", loc,
+  cupsdLogMessage(L_DEBUG2, "cupsdAllowHost(loc=%p(%s), name=\"%s\")", loc,
              loc->location, name);
 
   if ((temp = add_allow(loc)) == NULL)
@@ -246,19 +246,19 @@ AllowHost(location_t *loc,	/* I - Location to add to */
 
 
 /*
- * 'AllowIP()' - Add an IP address or network that is allowed to access the
+ * 'cupsdAllowIP()' - Add an IP address or network that is allowed to access the
  *               location.
  */
 
 void
-AllowIP(location_t *loc,	/* I - Location to add to */
+cupsdAllowIP(cupsd_location_t *loc,	/* I - Location to add to */
         unsigned   address[4],	/* I - IP address to add */
         unsigned   netmask[4])	/* I - Netmask of address */
 {
-  authmask_t	*temp;		/* New host/domain mask */
+  cupsd_authmask_t	*temp;		/* New host/domain mask */
 
 
-  LogMessage(L_DEBUG2, "AllowIP(loc=%p(%s), address=%x:%x:%x:%x, netmask=%x:%x:%x:%x)",
+  cupsdLogMessage(L_DEBUG2, "cupsdAllowIP(loc=%p(%s), address=%x:%x:%x:%x, netmask=%x:%x:%x:%x)",
 	     loc, loc->location, address[0], address[1], address[2],
 	     address[3], netmask[0], netmask[1], netmask[2],
 	     netmask[3]);
@@ -273,18 +273,18 @@ AllowIP(location_t *loc,	/* I - Location to add to */
 
 
 /*
- * 'CheckAuth()' - Check authorization masks.
+ * 'cupsdCheckAuth()' - Check authorization masks.
  */
 
 int				/* O - 1 if mask matches, 0 otherwise */
-CheckAuth(unsigned   ip[4],	/* I - Client address */
+cupsdCheckAuth(unsigned   ip[4],	/* I - Client address */
           char       *name,	/* I - Client hostname */
           int        name_len,	/* I - Length of hostname */
           int        num_masks, /* I - Number of masks */
-          authmask_t *masks)	/* I - Masks */
+          cupsd_authmask_t *masks)	/* I - Masks */
 {
   int		i;		/* Looping var */
-  cups_netif_t	*iface;		/* Network interface */
+  cupsd_netif_t	*iface;		/* Network interface */
   unsigned	netip4;		/* IPv4 network address */
 #ifdef AF_INET6
   unsigned	netip6[4];	/* IPv6 network address */
@@ -314,7 +314,7 @@ CheckAuth(unsigned   ip[4],	/* I - Client address */
 	    * Check against all local interfaces...
 	    */
 
-            NetIFUpdate();
+            cupsdNetIFUpdate();
 
 	    for (iface = NetIFList; iface != NULL; iface = iface->next)
 	    {
@@ -451,7 +451,7 @@ cupsdCheckGroup(
   char			junk[33];	/* MD5 password (not used) */
 
 
-  LogMessage(L_DEBUG2, "cupsdCheckGroup(username=\"%s\", user=%p, groupname=\"%s\")\n",
+  cupsdLogMessage(L_DEBUG2, "cupsdCheckGroup(username=\"%s\", user=%p, groupname=\"%s\")\n",
              username, user, groupname);
 
  /*
@@ -493,7 +493,7 @@ cupsdCheckGroup(
   * file...
   */
 
-  if (GetMD5Passwd(username, groupname, junk) != NULL)
+  if (cupsdGetMD5Passwd(username, groupname, junk) != NULL)
     return (1);
 
  /*
@@ -505,15 +505,15 @@ cupsdCheckGroup(
 
 
 /*
- * 'CopyLocation()' - Make a copy of a location...
+ * 'cupsdCopyLocation()' - Make a copy of a location...
  */
 
-location_t *			/* O - New location */
-CopyLocation(location_t **loc)	/* IO - Original location */
+cupsd_location_t *			/* O - New location */
+cupsdCopyLocation(cupsd_location_t **loc)	/* IO - Original location */
 {
   int		i;		/* Looping var */
   int		locindex;	/* Index into Locations array */
-  location_t	*temp;		/* New location */
+  cupsd_location_t	*temp;		/* New location */
   char		location[HTTP_MAX_URI];	/* Location of resource */
 
 
@@ -525,13 +525,13 @@ CopyLocation(location_t **loc)	/* IO - Original location */
   locindex = *loc - Locations;
 
  /*
-  * Use a local copy of location because AddLocation may cause
+  * Use a local copy of location because cupsdAddLocation may cause
   * this memory to be moved...
   */
 
   strlcpy(location, (*loc)->location, sizeof(location));
 
-  if ((temp = AddLocation(location)) == NULL)
+  if ((temp = cupsdAddLocation(location)) == NULL)
     return (NULL);
 
   *loc = Locations + locindex;
@@ -555,7 +555,7 @@ CopyLocation(location_t **loc)	/* IO - Original location */
 
     if ((temp->names = calloc(temp->num_names, sizeof(char *))) == NULL)
     {
-      LogMessage(L_ERROR, "CopyLocation: Unable to allocate memory for %d names: %s",
+      cupsdLogMessage(L_ERROR, "cupsdCopyLocation: Unable to allocate memory for %d names: %s",
                  temp->num_names, strerror(errno));
       NumLocations --;
       return (NULL);
@@ -564,7 +564,7 @@ CopyLocation(location_t **loc)	/* IO - Original location */
     for (i = 0; i < temp->num_names; i ++)
       if ((temp->names[i] = strdup((*loc)->names[i])) == NULL)
       {
-	LogMessage(L_ERROR, "CopyLocation: Unable to copy name \"%s\": %s",
+	cupsdLogMessage(L_ERROR, "cupsdCopyLocation: Unable to copy name \"%s\": %s",
                    (*loc)->names[i], strerror(errno));
 
 	NumLocations --;
@@ -578,9 +578,9 @@ CopyLocation(location_t **loc)	/* IO - Original location */
     * Copy allow rules...
     */
 
-    if ((temp->allow = calloc(temp->num_allow, sizeof(authmask_t))) == NULL)
+    if ((temp->allow = calloc(temp->num_allow, sizeof(cupsd_authmask_t))) == NULL)
     {
-      LogMessage(L_ERROR, "CopyLocation: Unable to allocate memory for %d allow rules: %s",
+      cupsdLogMessage(L_ERROR, "cupsdCopyLocation: Unable to allocate memory for %d allow rules: %s",
                  temp->num_allow, strerror(errno));
       NumLocations --;
       return (NULL);
@@ -595,7 +595,7 @@ CopyLocation(location_t **loc)	/* IO - Original location */
 
             if (temp->allow[i].mask.name.name == NULL)
 	    {
-	      LogMessage(L_ERROR, "CopyLocation: Unable to copy allow name \"%s\": %s",
+	      cupsdLogMessage(L_ERROR, "cupsdCopyLocation: Unable to copy allow name \"%s\": %s",
                 	 (*loc)->allow[i].mask.name.name, strerror(errno));
 	      NumLocations --;
 	      return (NULL);
@@ -603,7 +603,7 @@ CopyLocation(location_t **loc)	/* IO - Original location */
 	    break;
 	case AUTH_IP :
 	    memcpy(&(temp->allow[i].mask.ip), &((*loc)->allow[i].mask.ip),
-	           sizeof(ipmask_t));
+	           sizeof(cupsd_ipmask_t));
 	    break;
       }
   }
@@ -614,9 +614,9 @@ CopyLocation(location_t **loc)	/* IO - Original location */
     * Copy deny rules...
     */
 
-    if ((temp->deny = calloc(temp->num_deny, sizeof(authmask_t))) == NULL)
+    if ((temp->deny = calloc(temp->num_deny, sizeof(cupsd_authmask_t))) == NULL)
     {
-      LogMessage(L_ERROR, "CopyLocation: Unable to allocate memory for %d deny rules: %s",
+      cupsdLogMessage(L_ERROR, "cupsdCopyLocation: Unable to allocate memory for %d deny rules: %s",
                  temp->num_deny, strerror(errno));
       NumLocations --;
       return (NULL);
@@ -631,7 +631,7 @@ CopyLocation(location_t **loc)	/* IO - Original location */
 
             if (temp->deny[i].mask.name.name == NULL)
 	    {
-	      LogMessage(L_ERROR, "CopyLocation: Unable to copy deny name \"%s\": %s",
+	      cupsdLogMessage(L_ERROR, "cupsdCopyLocation: Unable to copy deny name \"%s\": %s",
                 	 (*loc)->deny[i].mask.name.name, strerror(errno));
 	      NumLocations --;
 	      return (NULL);
@@ -639,7 +639,7 @@ CopyLocation(location_t **loc)	/* IO - Original location */
 	    break;
 	case AUTH_IP :
 	    memcpy(&(temp->deny[i].mask.ip), &((*loc)->deny[i].mask.ip),
-	           sizeof(ipmask_t));
+	           sizeof(cupsd_ipmask_t));
 	    break;
       }
   }
@@ -649,14 +649,14 @@ CopyLocation(location_t **loc)	/* IO - Original location */
 
 
 /*
- * 'DeleteAllLocations()' - Free all memory used for location authorization.
+ * 'cupsdDeleteAllLocations()' - Free all memory used for location authorization.
  */
 
 void
-DeleteAllLocations(void)
+cupsdDeleteAllLocations(void)
 {
   int		i;			/* Looping var */
-  location_t	*loc;			/* Current location */
+  cupsd_location_t	*loc;			/* Current location */
 
 
  /*
@@ -683,10 +683,10 @@ DeleteAllLocations(void)
  */
 
 void
-cupsdDeleteLocation(location_t *loc)	/* I - Location to delete */
+cupsdDeleteLocation(cupsd_location_t *loc)	/* I - Location to delete */
 {
   int		i;			/* Looping var */
-  authmask_t	*mask;			/* Current mask */
+  cupsd_authmask_t	*mask;			/* Current mask */
 
 
   for (i = loc->num_names - 1; i >= 0; i --)
@@ -712,19 +712,19 @@ cupsdDeleteLocation(location_t *loc)	/* I - Location to delete */
 
 
 /*
- * 'DenyHost()' - Add a host name that is not allowed to access the location.
+ * 'cupsdDenyHost()' - Add a host name that is not allowed to access the location.
  */
 
 void
-DenyHost(location_t *loc,	/* I - Location to add to */
+cupsdDenyHost(cupsd_location_t *loc,	/* I - Location to add to */
          char       *name)	/* I - Name of host or domain to add */
 {
-  authmask_t	*temp;		/* New host/domain mask */
+  cupsd_authmask_t	*temp;		/* New host/domain mask */
   char		ifname[32],	/* Interface name */
 		*ifptr;		/* Pointer to end of name */
 
 
-  LogMessage(L_DEBUG2, "DenyHost(loc=%p(%s), name=\"%s\")", loc,
+  cupsdLogMessage(L_DEBUG2, "cupsdDenyHost(loc=%p(%s), name=\"%s\")", loc,
              loc->location, name);
 
   if ((temp = add_deny(loc)) == NULL)
@@ -774,19 +774,19 @@ DenyHost(location_t *loc,	/* I - Location to add to */
 
 
 /*
- * 'DenyIP()' - Add an IP address or network that is not allowed to access
+ * 'cupsdDenyIP()' - Add an IP address or network that is not allowed to access
  *              the location.
  */
 
 void
-DenyIP(location_t *loc,		/* I - Location to add to */
+cupsdDenyIP(cupsd_location_t *loc,		/* I - Location to add to */
        unsigned   address[4],	/* I - IP address to add */
        unsigned   netmask[4])	/* I - Netmask of address */
 {
-  authmask_t	*temp;		/* New host/domain mask */
+  cupsd_authmask_t	*temp;		/* New host/domain mask */
 
 
-  LogMessage(L_DEBUG, "DenyIP(loc=%p(%s), address=%x:%x:%x:%x, netmask=%x:%x:%x:%x)",
+  cupsdLogMessage(L_DEBUG, "cupsdDenyIP(loc=%p(%s), address=%x:%x:%x:%x, netmask=%x:%x:%x:%x)",
 	     loc, loc->location, address[0], address[1], address[2],
 	     address[3], netmask[0], netmask[1], netmask[2],
 	     netmask[3]);
@@ -801,17 +801,17 @@ DenyIP(location_t *loc,		/* I - Location to add to */
 
 
 /*
- * 'FindBest()' - Find the location entry that best matches the resource.
+ * 'cupsdFindBest()' - Find the location entry that best matches the resource.
  */
 
-location_t *				/* O - Location that matches */
-FindBest(const char   *path,		/* I - Resource path */
+cupsd_location_t *				/* O - Location that matches */
+cupsdFindBest(const char   *path,		/* I - Resource path */
          http_state_t state)		/* I - HTTP state/request */
 {
   int		i;			/* Looping var */
   char		uri[HTTP_MAX_URI],	/* URI in request... */
 		*uriptr;		/* Pointer into URI */
-  location_t	*loc,			/* Current location */
+  cupsd_location_t	*loc,			/* Current location */
 		*best;			/* Best match for location so far */
   int		bestlen;		/* Length of best match */
   int		limit;			/* Limit field */
@@ -855,7 +855,7 @@ FindBest(const char   *path,		/* I - Resource path */
       *uriptr = '\0';
   }
 
-  LogMessage(L_DEBUG2, "FindBest: uri = \"%s\"...", uri);
+  cupsdLogMessage(L_DEBUG2, "cupsdFindBest: uri = \"%s\"...", uri);
 
  /*
   * Loop through the list of locations to find a match...
@@ -867,7 +867,7 @@ FindBest(const char   *path,		/* I - Resource path */
 
   for (i = NumLocations, loc = Locations; i > 0; i --, loc ++)
   {
-    LogMessage(L_DEBUG2, "FindBest: Location %s Limit %x",
+    cupsdLogMessage(L_DEBUG2, "cupsdFindBest: Location %s Limit %x",
                loc->location, loc->limit);
 
     if (!strncmp(uri, "/printers/", 10) || !strncmp(uri, "/classes/", 9))
@@ -906,18 +906,18 @@ FindBest(const char   *path,		/* I - Resource path */
   * Return the match, if any...
   */
 
-  LogMessage(L_DEBUG2, "FindBest: best = %s", best ? best->location : "NONE");
+  cupsdLogMessage(L_DEBUG2, "cupsdFindBest: best = %s", best ? best->location : "NONE");
 
   return (best);
 }
 
 
 /*
- * 'FindLocation()' - Find the named location.
+ * 'cupsdFindLocation()' - Find the named location.
  */
 
-location_t *				/* O - Location that matches */
-FindLocation(const char *location)	/* I - Connection */
+cupsd_location_t *				/* O - Location that matches */
+cupsdFindLocation(const char *location)	/* I - Connection */
 {
   int		i;			/* Looping var */
 
@@ -935,11 +935,11 @@ FindLocation(const char *location)	/* I - Connection */
 
 
 /*
- * 'GetMD5Passwd()' - Get an MD5 password.
+ * 'cupsdGetMD5Passwd()' - Get an MD5 password.
  */
 
 char *					/* O - MD5 password string */
-GetMD5Passwd(const char *username,	/* I - Username */
+cupsdGetMD5Passwd(const char *username,	/* I - Username */
              const char *group,		/* I - Group */
              char       passwd[33])	/* O - MD5 password string */
 {
@@ -950,13 +950,13 @@ GetMD5Passwd(const char *username,	/* I - Username */
 		tempgroup[33];		/* Group from file */
 
 
-  LogMessage(L_DEBUG2, "GetMD5Passwd(username=\"%s\", group=\"%s\", passwd=%p)",
+  cupsdLogMessage(L_DEBUG2, "cupsdGetMD5Passwd(username=\"%s\", group=\"%s\", passwd=%p)",
              username, group ? group : "(null)", passwd);
 
   snprintf(filename, sizeof(filename), "%s/passwd.md5", ServerRoot);
   if ((fp = cupsFileOpen(filename, "r")) == NULL)
   {
-    LogMessage(L_ERROR, "Unable to open %s - %s", filename, strerror(errno));
+    cupsdLogMessage(L_ERROR, "Unable to open %s - %s", filename, strerror(errno));
     return (NULL);
   }
 
@@ -964,7 +964,7 @@ GetMD5Passwd(const char *username,	/* I - Username */
   {
     if (sscanf(line, "%32[^:]:%32[^:]:%32s", tempuser, tempgroup, passwd) != 3)
     {
-      LogMessage(L_ERROR, "Bad MD5 password line: %s", line);
+      cupsdLogMessage(L_ERROR, "Bad MD5 password line: %s", line);
       continue;
     }
 
@@ -975,7 +975,7 @@ GetMD5Passwd(const char *username,	/* I - Username */
       * Found the password entry!
       */
 
-      LogMessage(L_DEBUG2, "Found MD5 user %s, group %s...", username,
+      cupsdLogMessage(L_DEBUG2, "Found MD5 user %s, group %s...", username,
                  tempgroup);
 
       cupsFileClose(fp);
@@ -997,13 +997,13 @@ GetMD5Passwd(const char *username,	/* I - Username */
  */
 
 http_status_t				/* O - HTTP_OK if authorized or error code */
-cupsdIsAuthorized(client_t   *con,	/* I - Connection */
+cupsdIsAuthorized(cupsd_client_t   *con,	/* I - Connection */
                   const char *owner)	/* I - Owner of object */
 {
   int		i, j,			/* Looping vars */
 		auth;			/* Authorization status */
   unsigned	address[4];		/* Authorization address */
-  location_t	*best;			/* Best match for location so far */
+  cupsd_location_t	*best;			/* Best match for location so far */
   int		hostlen;		/* Length of hostname */
   struct passwd	*pw;			/* User password data */
   char		nonce[HTTP_MAX_VALUE],	/* Nonce value from client */
@@ -1055,7 +1055,7 @@ cupsdIsAuthorized(client_t   *con,	/* I - Connection */
 		};
 
 
-  LogMessage(L_DEBUG2, "cupsdIsAuthorized: con->uri=\"%s\", con->best=%p(%s)",
+  cupsdLogMessage(L_DEBUG2, "cupsdIsAuthorized: con->uri=\"%s\", con->best=%p(%s)",
              con->uri, con->best, con->best ? con->best->location : "");
 
  /*
@@ -1075,12 +1075,12 @@ cupsdIsAuthorized(client_t   *con,	/* I - Connection */
 
   best = con->best;
 
-  LogMessage(L_DEBUG2, "cupsdIsAuthorized: level=AUTH_%s, type=AUTH_%s, satisfy=AUTH_SATISFY_%s, num_names=%d",
+  cupsdLogMessage(L_DEBUG2, "cupsdIsAuthorized: level=AUTH_%s, type=AUTH_%s, satisfy=AUTH_SATISFY_%s, num_names=%d",
              levels[best->level], types[best->type],
 	     best->satisfy ? "ANY" : "ALL", best->num_names);
 
   if (best->limit == AUTH_LIMIT_IPP)
-    LogMessage(L_DEBUG2, "cupsdIsAuthorized: op=%x(%s)", best->op,
+    cupsdLogMessage(L_DEBUG2, "cupsdIsAuthorized: op=%x(%s)", best->op,
                ippOpString(best->op));
 
  /*
@@ -1140,11 +1140,11 @@ cupsdIsAuthorized(client_t   *con,	/* I - Connection */
       case AUTH_ALLOW : /* Order Deny,Allow */
           auth = AUTH_ALLOW;
 
-          if (CheckAuth(address, con->http.hostname, hostlen,
+          if (cupsdCheckAuth(address, con->http.hostname, hostlen,
 	          	best->num_deny, best->deny))
 	    auth = AUTH_DENY;
 
-          if (CheckAuth(address, con->http.hostname, hostlen,
+          if (cupsdCheckAuth(address, con->http.hostname, hostlen,
 	        	best->num_allow, best->allow))
 	    auth = AUTH_ALLOW;
 	  break;
@@ -1152,18 +1152,18 @@ cupsdIsAuthorized(client_t   *con,	/* I - Connection */
       case AUTH_DENY : /* Order Allow,Deny */
           auth = AUTH_DENY;
 
-          if (CheckAuth(address, con->http.hostname, hostlen,
+          if (cupsdCheckAuth(address, con->http.hostname, hostlen,
 	        	best->num_allow, best->allow))
 	    auth = AUTH_ALLOW;
 
-          if (CheckAuth(address, con->http.hostname, hostlen,
+          if (cupsdCheckAuth(address, con->http.hostname, hostlen,
 	        	best->num_deny, best->deny))
 	    auth = AUTH_DENY;
 	  break;
     }
   }
 
-  LogMessage(L_DEBUG2, "cupsdIsAuthorized: auth=AUTH_%s...",
+  cupsdLogMessage(L_DEBUG2, "cupsdIsAuthorized: auth=AUTH_%s...",
              auth ? "DENY" : "ALLOW");
 
   if (auth == AUTH_DENY && best->satisfy == AUTH_SATISFY_ALL)
@@ -1176,7 +1176,7 @@ cupsdIsAuthorized(client_t   *con,	/* I - Connection */
 
   if (best->encryption >= HTTP_ENCRYPT_REQUIRED && !con->http.tls)
   {
-    LogMessage(L_DEBUG2, "cupsdIsAuthorized: Need upgrade to TLS...");
+    cupsdLogMessage(L_DEBUG2, "cupsdIsAuthorized: Need upgrade to TLS...");
     return (HTTP_UPGRADE_REQUIRED);
   }
 #endif /* HAVE_SSL */
@@ -1201,13 +1201,13 @@ cupsdIsAuthorized(client_t   *con,	/* I - Connection */
     attr = ippFindAttribute(con->request, "requesting-user-name", IPP_TAG_NAME);
     if (attr)
     {
-      LogMessage(L_DEBUG2, "cupsdIsAuthorized: requesting-user-name=\"%s\"",
+      cupsdLogMessage(L_DEBUG2, "cupsdIsAuthorized: requesting-user-name=\"%s\"",
                  attr->values[0].string.text);
       return (HTTP_OK);
     }
   }
 
-  LogMessage(L_DEBUG2, "cupsdIsAuthorized: username=\"%s\" password=%d chars",
+  cupsdLogMessage(L_DEBUG2, "cupsdIsAuthorized: username=\"%s\" password=%d chars",
 	     con->username, (int)strlen(con->password));
   DEBUG_printf(("cupsdIsAuthorized: username=\"%s\", password=\"%s\"\n",
 		con->username, con->password));
@@ -1224,7 +1224,7 @@ cupsdIsAuthorized(client_t   *con,	/* I - Connection */
   * Check the user's password...
   */
 
-  LogMessage(L_DEBUG2, "cupsdIsAuthorized: Checking \"%s\", address = %x:%x:%x:%x, hostname = \"%s\"",
+  cupsdLogMessage(L_DEBUG2, "cupsdIsAuthorized: Checking \"%s\", address = %x:%x:%x:%x, hostname = \"%s\"",
 	     con->username, address[0], address[1], address[2],
 	     address[3], con->http.hostname);
 
@@ -1277,7 +1277,7 @@ cupsdIsAuthorized(client_t   *con,	/* I - Connection */
 	  pamerr = pam_start("cups", con->username, &pamdata, &pamh);
 	  if (pamerr != PAM_SUCCESS)
 	  {
-	    LogMessage(L_ERROR, "cupsdIsAuthorized: pam_start() returned %d (%s)!\n",
+	    cupsdLogMessage(L_ERROR, "cupsdIsAuthorized: pam_start() returned %d (%s)!\n",
         	       pamerr, pam_strerror(pamh, pamerr));
 	    pam_end(pamh, 0);
 	    return (HTTP_UNAUTHORIZED);
@@ -1286,7 +1286,7 @@ cupsdIsAuthorized(client_t   *con,	/* I - Connection */
 	  pamerr = pam_authenticate(pamh, PAM_SILENT);
 	  if (pamerr != PAM_SUCCESS)
 	  {
-	    LogMessage(L_ERROR, "cupsdIsAuthorized: pam_authenticate() returned %d (%s)!\n",
+	    cupsdLogMessage(L_ERROR, "cupsdIsAuthorized: pam_authenticate() returned %d (%s)!\n",
         	       pamerr, pam_strerror(pamh, pamerr));
 	    pam_end(pamh, 0);
 	    return (HTTP_UNAUTHORIZED);
@@ -1295,7 +1295,7 @@ cupsdIsAuthorized(client_t   *con,	/* I - Connection */
 	  pamerr = pam_acct_mgmt(pamh, PAM_SILENT);
 	  if (pamerr != PAM_SUCCESS)
 	  {
-	    LogMessage(L_ERROR, "cupsdIsAuthorized: pam_acct_mgmt() returned %d (%s)!\n",
+	    cupsdLogMessage(L_ERROR, "cupsdIsAuthorized: pam_acct_mgmt() returned %d (%s)!\n",
         	       pamerr, pam_strerror(pamh, pamerr));
 	    pam_end(pamh, 0);
 	    return (HTTP_UNAUTHORIZED);
@@ -1307,13 +1307,13 @@ cupsdIsAuthorized(client_t   *con,	/* I - Connection */
 	  * Use AIX authentication interface...
 	  */
 
-	  LogMessage(L_DEBUG, "cupsdIsAuthorized: AIX authenticate of username \"%s\"",
+	  cupsdLogMessage(L_DEBUG, "cupsdIsAuthorized: AIX authenticate of username \"%s\"",
                      con->username);
 
 	  reenter = 1;
 	  if (authenticate(con->username, con->password, &reenter, &authmsg) != 0)
 	  {
-	    LogMessage(L_DEBUG, "cupsdIsAuthorized: Unable to authenticate username \"%s\": %s",
+	    cupsdLogMessage(L_DEBUG, "cupsdIsAuthorized: Unable to authenticate username \"%s\": %s",
 	               con->username, strerror(errno));
 	    return (HTTP_UNAUTHORIZED);
 	  }
@@ -1324,7 +1324,7 @@ cupsdIsAuthorized(client_t   *con,	/* I - Connection */
 
 	  if (pw == NULL)			/* No such user... */
 	  {
-	    LogMessage(L_WARN, "cupsdIsAuthorized: Unknown username \"%s\"; access denied.",
+	    cupsdLogMessage(L_WARN, "cupsdIsAuthorized: Unknown username \"%s\"; access denied.",
         	       con->username);
 	    return (HTTP_UNAUTHORIZED);
 	  }
@@ -1335,7 +1335,7 @@ cupsdIsAuthorized(client_t   *con,	/* I - Connection */
 
 	  if (spw == NULL && strcmp(pw->pw_passwd, "x") == 0)
 	  {					/* Don't allow blank passwords! */
-	    LogMessage(L_WARN, "cupsdIsAuthorized: Username \"%s\" has no shadow password; access denied.",
+	    cupsdLogMessage(L_WARN, "cupsdIsAuthorized: Username \"%s\" has no shadow password; access denied.",
         	       con->username);
 	    return (HTTP_UNAUTHORIZED);	/* No such user or bad shadow file */
 	  }
@@ -1352,7 +1352,7 @@ cupsdIsAuthorized(client_t   *con,	/* I - Connection */
 	  if (pw->pw_passwd[0] == '\0')
 #  endif /* HAVE_SHADOW_H */
 	  {					/* Don't allow blank passwords! */
-	    LogMessage(L_WARN, "cupsdIsAuthorized: Username \"%s\" has no password; access denied.",
+	    cupsdLogMessage(L_WARN, "cupsdIsAuthorized: Username \"%s\" has no password; access denied.",
         	       con->username);
 	    return (HTTP_UNAUTHORIZED);
 	  }
@@ -1363,7 +1363,7 @@ cupsdIsAuthorized(client_t   *con,	/* I - Connection */
 
 	  pass = cups_crypt(con->password, pw->pw_passwd);
 
-	  LogMessage(L_DEBUG2, "cupsdIsAuthorized: pw_passwd = %s, crypt = %s",
+	  cupsdLogMessage(L_DEBUG2, "cupsdIsAuthorized: pw_passwd = %s, crypt = %s",
 		     pw->pw_passwd, pass);
 
 	  if (pass == NULL || strcmp(pw->pw_passwd, pass) != 0)
@@ -1373,7 +1373,7 @@ cupsdIsAuthorized(client_t   *con,	/* I - Connection */
 	    {
 	      pass = cups_crypt(con->password, spw->sp_pwdp);
 
-	      LogMessage(L_DEBUG2, "cupsdIsAuthorized: sp_pwdp = %s, crypt = %s",
+	      cupsdLogMessage(L_DEBUG2, "cupsdIsAuthorized: sp_pwdp = %s, crypt = %s",
 			 spw->sp_pwdp, pass);
 
 	      if (pass == NULL || strcmp(spw->sp_pwdp, pass) != 0)
@@ -1394,49 +1394,49 @@ cupsdIsAuthorized(client_t   *con,	/* I - Connection */
 	  if (!httpGetSubField(&(con->http), HTTP_FIELD_AUTHORIZATION, "nonce",
                                nonce))
 	  {
-            LogMessage(L_ERROR, "cupsdIsAuthorized: No nonce value for Digest authentication!");
+            cupsdLogMessage(L_ERROR, "cupsdIsAuthorized: No nonce value for Digest authentication!");
             return (HTTP_UNAUTHORIZED);
 	  }
 
 	  if (strcmp(con->http.hostname, nonce) != 0)
 	  {
-            LogMessage(L_ERROR, "cupsdIsAuthorized: Nonce value error!");
-            LogMessage(L_ERROR, "cupsdIsAuthorized: Expected \"%s\",",
+            cupsdLogMessage(L_ERROR, "cupsdIsAuthorized: Nonce value error!");
+            cupsdLogMessage(L_ERROR, "cupsdIsAuthorized: Expected \"%s\",",
 	               con->http.hostname);
-            LogMessage(L_ERROR, "cupsdIsAuthorized: Got \"%s\"!", nonce);
+            cupsdLogMessage(L_ERROR, "cupsdIsAuthorized: Got \"%s\"!", nonce);
             return (HTTP_UNAUTHORIZED);
 	  }
 
-	  LogMessage(L_DEBUG2, "cupsdIsAuthorized: nonce = \"%s\"", nonce);
+	  cupsdLogMessage(L_DEBUG2, "cupsdIsAuthorized: nonce = \"%s\"", nonce);
 
 	  if (best->num_names && best->level == AUTH_GROUP)
 	  {
-	    LogMessage(L_DEBUG2, "cupsdIsAuthorized: num_names = %d", best->num_names);
+	    cupsdLogMessage(L_DEBUG2, "cupsdIsAuthorized: num_names = %d", best->num_names);
 
             for (i = 0; i < best->num_names; i ++)
 	    {
 	      if (!strcasecmp(best->names[i], "@SYSTEM"))
 	      {
 	        for (j = 0; j < NumSystemGroups; j ++)
-		  if (GetMD5Passwd(con->username, SystemGroups[j], md5))
+		  if (cupsdGetMD5Passwd(con->username, SystemGroups[j], md5))
 		    break;
 
                 if (j < NumSystemGroups)
 		  break;
 	      }
-	      else if (GetMD5Passwd(con->username, best->names[i], md5))
+	      else if (cupsdGetMD5Passwd(con->username, best->names[i], md5))
 		break;
             }
 
             if (i >= best->num_names)
 	      md5[0] = '\0';
 	  }
-	  else if (!GetMD5Passwd(con->username, NULL, md5))
+	  else if (!cupsdGetMD5Passwd(con->username, NULL, md5))
 	    md5[0] = '\0';
 
 	  if (!md5[0])
 	  {
-            LogMessage(L_DEBUG2, "cupsdIsAuthorized: No matching user:group for \"%s\" in passwd.md5!",
+            cupsdLogMessage(L_DEBUG2, "cupsdIsAuthorized: No matching user:group for \"%s\" in passwd.md5!",
 	               con->username);
             return (HTTP_UNAUTHORIZED);
 	  }
@@ -1445,7 +1445,7 @@ cupsdIsAuthorized(client_t   *con,	/* I - Connection */
 
 	  if (strcmp(md5, con->password) != 0)
 	  {
-            LogMessage(L_DEBUG2, "cupsdIsAuthorized: MD5s \"%s\" and \"%s\" don't match!",
+            cupsdLogMessage(L_DEBUG2, "cupsdIsAuthorized: MD5s \"%s\" and \"%s\" don't match!",
 	               md5, con->password);
             return (HTTP_UNAUTHORIZED);
 	  }
@@ -1458,32 +1458,32 @@ cupsdIsAuthorized(client_t   *con,	/* I - Connection */
 
 	  if (best->num_names && best->level == AUTH_GROUP)
 	  {
-	    LogMessage(L_DEBUG2, "cupsdIsAuthorized: num_names = %d", best->num_names);
+	    cupsdLogMessage(L_DEBUG2, "cupsdIsAuthorized: num_names = %d", best->num_names);
 
             for (i = 0; i < best->num_names; i ++)
 	    {
 	      if (!strcasecmp(best->names[i], "@SYSTEM"))
 	      {
 	        for (j = 0; j < NumSystemGroups; j ++)
-		  if (GetMD5Passwd(con->username, SystemGroups[j], md5))
+		  if (cupsdGetMD5Passwd(con->username, SystemGroups[j], md5))
 		    break;
 
                 if (j < NumSystemGroups)
 		  break;
 	      }
-	      else if (GetMD5Passwd(con->username, best->names[i], md5))
+	      else if (cupsdGetMD5Passwd(con->username, best->names[i], md5))
 		break;
             }
 
             if (i >= best->num_names)
 	      md5[0] = '\0';
 	  }
-	  else if (!GetMD5Passwd(con->username, NULL, md5))
+	  else if (!cupsdGetMD5Passwd(con->username, NULL, md5))
 	    md5[0] = '\0';
 
 	  if (!md5[0])
 	  {
-            LogMessage(L_DEBUG2, "cupsdIsAuthorized: No matching user:group for \"%s\" in passwd.md5!",
+            cupsdLogMessage(L_DEBUG2, "cupsdIsAuthorized: No matching user:group for \"%s\" in passwd.md5!",
 	               con->username);
             return (HTTP_UNAUTHORIZED);
 	  }
@@ -1492,7 +1492,7 @@ cupsdIsAuthorized(client_t   *con,	/* I - Connection */
 
 	  if (strcmp(md5, basicmd5) != 0)
 	  {
-            LogMessage(L_DEBUG2, "cupsdIsAuthorized: MD5s \"%s\" and \"%s\" don't match!",
+            cupsdLogMessage(L_DEBUG2, "cupsdIsAuthorized: MD5s \"%s\" and \"%s\" don't match!",
 	               md5, basicmd5);
             return (HTTP_UNAUTHORIZED);
 	  }
@@ -1524,7 +1524,7 @@ cupsdIsAuthorized(client_t   *con,	/* I - Connection */
     * any valid user is OK...
     */
 
-    LogMessage(L_DEBUG2, "cupsdIsAuthorized: Checking user membership...");
+    cupsdLogMessage(L_DEBUG2, "cupsdIsAuthorized: Checking user membership...");
 
     if (best->num_names == 0)
       return (HTTP_OK);
@@ -1561,7 +1561,7 @@ cupsdIsAuthorized(client_t   *con,	/* I - Connection */
   * Check to see if this user is in any of the named groups...
   */
 
-  LogMessage(L_DEBUG2, "cupsdIsAuthorized: Checking group membership...");
+  cupsdLogMessage(L_DEBUG2, "cupsdIsAuthorized: Checking group membership...");
 
   if (best->type == AUTH_BASIC)
   {
@@ -1571,7 +1571,7 @@ cupsdIsAuthorized(client_t   *con,	/* I - Connection */
 
     for (i = 0; i < best->num_names; i ++)
     {
-      LogMessage(L_DEBUG2, "cupsdIsAuthorized: Checking group \"%s\" membership...",
+      cupsdLogMessage(L_DEBUG2, "cupsdIsAuthorized: Checking group \"%s\" membership...",
                  best->names[i]);
 
       if (!strcasecmp(best->names[i], "@SYSTEM"))
@@ -1588,7 +1588,7 @@ cupsdIsAuthorized(client_t   *con,	/* I - Connection */
     * The user isn't part of the specified group, so deny access...
     */
 
-    LogMessage(L_DEBUG2, "cupsdIsAuthorized: User not in group(s)!");
+    cupsdLogMessage(L_DEBUG2, "cupsdIsAuthorized: User not in group(s)!");
 
     return (HTTP_UNAUTHORIZED);
   }
@@ -1605,10 +1605,10 @@ cupsdIsAuthorized(client_t   *con,	/* I - Connection */
  * 'add_allow()' - Add an allow mask to the location.
  */
 
-static authmask_t *		/* O - New mask record */
-add_allow(location_t *loc)	/* I - Location to add to */
+static cupsd_authmask_t *		/* O - New mask record */
+add_allow(cupsd_location_t *loc)	/* I - Location to add to */
 {
-  authmask_t	*temp;		/* New mask record */
+  cupsd_authmask_t	*temp;		/* New mask record */
 
 
  /*
@@ -1623,9 +1623,9 @@ add_allow(location_t *loc)	/* I - Location to add to */
   */
 
   if (loc->num_allow == 0)
-    temp = malloc(sizeof(authmask_t));
+    temp = malloc(sizeof(cupsd_authmask_t));
   else
-    temp = realloc(loc->allow, sizeof(authmask_t) * (loc->num_allow + 1));
+    temp = realloc(loc->allow, sizeof(cupsd_authmask_t) * (loc->num_allow + 1));
 
   if (temp == NULL)
     return (NULL);
@@ -1638,7 +1638,7 @@ add_allow(location_t *loc)	/* I - Location to add to */
   * Clear the mask record and return...
   */
 
-  memset(temp, 0, sizeof(authmask_t));
+  memset(temp, 0, sizeof(cupsd_authmask_t));
   return (temp);
 }
 
@@ -1647,10 +1647,10 @@ add_allow(location_t *loc)	/* I - Location to add to */
  * 'add_deny()' - Add a deny mask to the location.
  */
 
-static authmask_t *		/* O - New mask record */
-add_deny(location_t *loc)	/* I - Location to add to */
+static cupsd_authmask_t *		/* O - New mask record */
+add_deny(cupsd_location_t *loc)	/* I - Location to add to */
 {
-  authmask_t	*temp;		/* New mask record */
+  cupsd_authmask_t	*temp;		/* New mask record */
 
 
  /*
@@ -1665,9 +1665,9 @@ add_deny(location_t *loc)	/* I - Location to add to */
   */
 
   if (loc->num_deny == 0)
-    temp = malloc(sizeof(authmask_t));
+    temp = malloc(sizeof(cupsd_authmask_t));
   else
-    temp = realloc(loc->deny, sizeof(authmask_t) * (loc->num_deny + 1));
+    temp = realloc(loc->deny, sizeof(cupsd_authmask_t) * (loc->num_deny + 1));
 
   if (temp == NULL)
     return (NULL);
@@ -1680,7 +1680,7 @@ add_deny(location_t *loc)	/* I - Location to add to */
   * Clear the mask record and return...
   */
 
-  memset(temp, 0, sizeof(authmask_t));
+  memset(temp, 0, sizeof(cupsd_authmask_t));
   return (temp);
 }
 
@@ -1821,7 +1821,7 @@ pam_func(int                      num_msg,	/* I - Number of messages */
 {
   int			i;			/* Looping var */
   struct pam_response	*replies;		/* Replies */
-  client_t		*client;		/* Pointer client connection */
+  cupsd_client_t		*client;		/* Pointer client connection */
 
 
  /*
@@ -1846,7 +1846,7 @@ pam_func(int                      num_msg,	/* I - Number of messages */
   client = auth_client;
   (void)appdata_ptr;
 #else
-  client = (client_t *)appdata_ptr;
+  client = (cupsd_client_t *)appdata_ptr;
 #endif /* __hpux */
 
   for (i = 0; i < num_msg; i ++)

@@ -192,15 +192,15 @@ VAR CFArrayRef		ServerCertificatesArray	VALUE(NULL);
  * Prototypes...
  */
 
-extern char	*GetDateTime(time_t t);
-extern int	ReadConfiguration(void);
-extern int	LogRequest(client_t *con, http_status_t code);
-extern int	LogMessage(int level, const char *message, ...)
+extern char	*cupsdGetDateTime(time_t t);
+extern int	cupsdReadConfiguration(void);
+extern int	cupsdLogRequest(cupsd_client_t *con, http_status_t code);
+extern int	cupsdLogMessage(int level, const char *message, ...)
 #ifdef __GNUC__
 __attribute__ ((__format__ (__printf__, 2, 3)))
 #endif /* __GNUC__ */
 ;
-extern int	LogPage(job_t *job, const char *page);
+extern int	cupsdLogPage(cupsd_job_t *job, const char *page);
 
 
 /*

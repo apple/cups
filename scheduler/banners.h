@@ -30,7 +30,7 @@ typedef struct
 {
   char		name[256];	/* Name of banner */
   mime_type_t	*filetype;	/* Filetype for banner */
-} banner_t;
+} cupsd_banner_t;
 
 
 /*
@@ -39,7 +39,7 @@ typedef struct
 
 VAR int		NumBanners	VALUE(0);
 				/* Number of banner files available */
-VAR banner_t	*Banners	VALUE(NULL);
+VAR cupsd_banner_t	*Banners	VALUE(NULL);
 				/* Available banner files */
 
 
@@ -47,9 +47,9 @@ VAR banner_t	*Banners	VALUE(NULL);
  * Prototypes...
  */
 
-extern void	AddBanner(const char *name, const char *filename);
-extern banner_t	*FindBanner(const char *name);
-extern void	LoadBanners(const char *d);
+extern void	cupsdAddBanner(const char *name, const char *filename);
+extern cupsd_banner_t	*cupsdFindBanner(const char *name);
+extern void	cupsdLoadBanners(const char *d);
 
 
 /*

@@ -27,16 +27,16 @@
  * Prototypes...
  */
 
-extern printer_t	*AddClass(const char *name);
-extern void		AddPrinterToClass(printer_t *c, printer_t *p);
-extern void		DeletePrinterFromClass(printer_t *c, printer_t *p);
-extern void		DeletePrinterFromClasses(printer_t *p);
-extern void		DeleteAllClasses(void);
-extern printer_t	*FindAvailablePrinter(const char *name);
-extern printer_t	*FindClass(const char *name);
-extern void		LoadAllClasses(void);
-extern void		SaveAllClasses(void);
-extern void		UpdateImplicitClasses(void);
+extern cupsd_printer_t	*cupsdAddClass(const char *name);
+extern void		cupsdAddPrinterToClass(cupsd_printer_t *c, cupsd_printer_t *p);
+extern void		cupsdDeletePrinterFromClass(cupsd_printer_t *c, cupsd_printer_t *p);
+extern void		cupsdDeletePrinterFromClasses(cupsd_printer_t *p);
+extern void		cupsdDeleteAllClasses(void);
+extern cupsd_printer_t	*cupsdFindAvailablePrinter(const char *name);
+extern cupsd_printer_t	*cupsdFindClass(const char *name);
+extern void		cupsdLoadAllClasses(void);
+extern void		cupsdSaveAllClasses(void);
+extern void		cupsdUpdateImplicitClasses(void);
 
 
 /*

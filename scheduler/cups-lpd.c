@@ -517,7 +517,7 @@ recv_print_job(const char    *dest,	/* I - Destination */
 		command,		/* Command from line */
 		*count,			/* Number of bytes */
 		*name;			/* Name of file */
-  const char	*job_sheets;		/* Job sheets */
+  const char	*cupsd_job_sheets;		/* Job sheets */
   int		num_data;		/* Number of data files */
   char		control[1024],		/* Control filename */
 		data[32][256],		/* Data files */
@@ -855,10 +855,10 @@ recv_print_job(const char    *dest,	/* I - Destination */
 
               if (banner &&
 	          cupsGetOption("job-sheets", num_defaults, defaults) == NULL &&
-                  ((job_sheets = cupsGetOption("job-sheets",
+                  ((cupsd_job_sheets = cupsGetOption("job-sheets",
 		                               destptr->num_options,
 					       destptr->options)) == NULL ||
-                   !strcmp(job_sheets, "none,none")))
+                   !strcmp(cupsd_job_sheets, "none,none")))
 	      {
 	        num_options = cupsAddOption("job-sheets", "standard",
 		                            num_options, &options);

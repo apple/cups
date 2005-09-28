@@ -50,7 +50,7 @@ typedef struct
 {
   char			iface[32];	/* Destination interface */
   http_addr_t		to;		/* Destination address */
-} dirsvc_addr_t;
+} cupsd_dirsvc_addr_t;
 
 
 /*
@@ -59,9 +59,9 @@ typedef struct
 
 typedef struct
 {
-  authmask_t		from;		/* Source address/name mask */
+  cupsd_authmask_t		from;		/* Source address/name mask */
   http_addr_t		to;		/* Destination address */
-} dirsvc_relay_t;
+} cupsd_dirsvc_relay_t;
 
 
 /*
@@ -73,7 +73,7 @@ typedef struct
   char			hostname[64];	/* Hostname (actually, IP address) */
   int			port;		/* Port number */
   int			pid;		/* Current poll server PID */
-} dirsvc_poll_t;
+} cupsd_dirsvc_poll_t;
 
 
 /*
@@ -106,19 +106,19 @@ VAR char		*BrowseLocalOptions
 			*BrowseRemoteOptions
 					VALUE(NULL);
 					/* Options to add to remote printer URIs */
-VAR dirsvc_addr_t	*Browsers	VALUE(NULL);
+VAR cupsd_dirsvc_addr_t	*Browsers	VALUE(NULL);
 					/* Broadcast addresses */
-VAR location_t		*BrowseACL	VALUE(NULL);
+VAR cupsd_location_t		*BrowseACL	VALUE(NULL);
 					/* Browser access control list */
-VAR printer_t		*BrowseNext	VALUE(NULL);
+VAR cupsd_printer_t		*BrowseNext	VALUE(NULL);
 					/* Next class/printer to broadcast */
 VAR int			NumRelays	VALUE(0);
 					/* Number of broadcast relays */
-VAR dirsvc_relay_t	*Relays		VALUE(NULL);
+VAR cupsd_dirsvc_relay_t	*Relays		VALUE(NULL);
 					/* Broadcast relays */
 VAR int			NumPolled	VALUE(0);
 					/* Number of polled servers */
-VAR dirsvc_poll_t	*Polled		VALUE(NULL);
+VAR cupsd_dirsvc_poll_t	*Polled		VALUE(NULL);
 					/* Polled servers */
 VAR int			PollPipe	VALUE(0);
 					/* Status pipe for pollers */
@@ -137,20 +137,20 @@ VAR time_t		BrowseSLPRefresh VALUE(0);
  * Prototypes...
  */
 
-extern void	ProcessBrowseData(const char *uri, cups_ptype_t type,
+extern void	cupsdProcessBrowseData(const char *uri, cups_ptype_t type,
 		                  ipp_pstate_t state, const char *location,
 				  const char *info, const char *make_model);
-extern void	SendBrowseDelete(printer_t *p);
-extern void	SendBrowseList(void);
-extern void	SendCUPSBrowse(printer_t *p);
-extern void	SendSLPBrowse(printer_t *p);
-extern void	StartBrowsing(void);
-extern void	StartPolling(void);
-extern void	StopBrowsing(void);
-extern void	StopPolling(void);
-extern void	UpdateCUPSBrowse(void);
-extern void	UpdatePolling(void);
-extern void	UpdateSLPBrowse(void);
+extern void	cupsdSendBrowseDelete(cupsd_printer_t *p);
+extern void	cupsdSendBrowseList(void);
+extern void	cupsdSendCUPSBrowse(cupsd_printer_t *p);
+extern void	cupsdSendSLPBrowse(cupsd_printer_t *p);
+extern void	cupsdStartBrowsing(void);
+extern void	cupsdStartPolling(void);
+extern void	cupsdStopBrowsing(void);
+extern void	cupsdStopPolling(void);
+extern void	cupsdUpdateCUPSBrowse(void);
+extern void	cupsdUpdatePolling(void);
+extern void	cupsdUpdateSLPBrowse(void);
 
 
 /*

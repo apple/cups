@@ -77,23 +77,23 @@ typedef struct
 {
   unsigned	address[4],		/* IP address */
 		netmask[4];		/* IP netmask */
-} ipmask_t;
+} cupsd_ipmask_t;
 
 typedef struct
 {
   int		length;			/* Length of name */
   char		*name;			/* Name string */
-} namemask_t;
+} cupsd_namemask_t;
 
 typedef struct
 {
   int		type;			/* Mask type */
   union
   {
-    namemask_t	name;			/* Host/Domain name */
-    ipmask_t	ip;			/* IP address/network */
+    cupsd_namemask_t	name;			/* Host/Domain name */
+    cupsd_ipmask_t	ip;			/* IP address/network */
   }		mask;			/* Mask data */
-} authmask_t;
+} cupsd_authmask_t;
 
 typedef struct
 {
@@ -108,13 +108,13 @@ typedef struct
   int		num_names;		/* Number of names */
   char		**names;		/* User or group names */
   int		num_allow;		/* Number of Allow lines */
-  authmask_t	*allow;			/* Allow lines */
+  cupsd_authmask_t	*allow;			/* Allow lines */
   int		num_deny;		/* Number of Deny lines */
-  authmask_t	*deny;			/* Deny lines */
+  cupsd_authmask_t	*deny;			/* Deny lines */
   http_encryption_t encryption;		/* To encrypt or not to encrypt... */
-} location_t;
+} cupsd_location_t;
 
-typedef struct client_s client_t;
+typedef struct cupsd_client_s cupsd_client_t;
 
 
 /*
@@ -123,7 +123,7 @@ typedef struct client_s client_t;
 
 VAR int			NumLocations	VALUE(0);
 					/* Number of authorization locations */
-VAR location_t		*Locations	VALUE(NULL);
+VAR cupsd_location_t		*Locations	VALUE(NULL);
 					/* Authorization locations */
 VAR int			DefaultAuthType	VALUE(AUTH_BASIC);
 					/* Default AuthType, if not specified */
@@ -133,27 +133,27 @@ VAR int			DefaultAuthType	VALUE(AUTH_BASIC);
  * Prototypes...
  */
 
-extern location_t	*AddLocation(const char *location);
-extern void		AddName(location_t *loc, char *name);
-extern void		AllowHost(location_t *loc, char *name);
-extern void		AllowIP(location_t *loc, unsigned address[4],
+extern cupsd_location_t	*cupsdAddLocation(const char *location);
+extern void		cupsdAddName(cupsd_location_t *loc, char *name);
+extern void		cupsdAllowHost(cupsd_location_t *loc, char *name);
+extern void		cupsdAllowIP(cupsd_location_t *loc, unsigned address[4],
 			        unsigned netmask[4]);
-extern int		CheckAuth(unsigned ip[4], char *name, int namelen,
-				  int num_masks, authmask_t *masks);
+extern int		cupsdCheckAuth(unsigned ip[4], char *name, int namelen,
+				  int num_masks, cupsd_authmask_t *masks);
 extern int		cupsdCheckGroup(const char *username,
 			                struct passwd *user,
 			                const char *groupname);
-extern location_t	*CopyLocation(location_t **loc);
-extern void		DeleteAllLocations(void);
-extern void		cupsdDeleteLocation(location_t *loc);
-extern void		DenyHost(location_t *loc, char *name);
-extern void		DenyIP(location_t *loc, unsigned address[4],
+extern cupsd_location_t	*cupsdCopyLocation(cupsd_location_t **loc);
+extern void		cupsdDeleteAllLocations(void);
+extern void		cupsdDeleteLocation(cupsd_location_t *loc);
+extern void		cupsdDenyHost(cupsd_location_t *loc, char *name);
+extern void		cupsdDenyIP(cupsd_location_t *loc, unsigned address[4],
 			       unsigned netmask[4]);
-extern location_t	*FindBest(const char *path, http_state_t state);
-extern location_t	*FindLocation(const char *location);
-extern char		*GetMD5Passwd(const char *username, const char *group,
+extern cupsd_location_t	*cupsdFindBest(const char *path, http_state_t state);
+extern cupsd_location_t	*cupsdFindLocation(const char *location);
+extern char		*cupsdGetMD5Passwd(const char *username, const char *group,
 			              char passwd[33]);
-extern http_status_t	cupsdIsAuthorized(client_t *con, const char *owner);
+extern http_status_t	cupsdIsAuthorized(cupsd_client_t *con, const char *owner);
 
 
 /*

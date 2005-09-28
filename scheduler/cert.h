@@ -27,20 +27,20 @@
  * Certificate structure...
  */
 
-typedef struct cert_s
+typedef struct cupsd_cert_s
 {
-  struct cert_str *next;	/* Next certificate in list */
+  struct cupsd_cert_s *next;		/* Next certificate in list */
   int		pid;		/* Process ID (0 for root certificate) */
   char		certificate[33];/* 32 hex characters, or 128 bits */
   char		username[33];	/* Authenticated username */
-} cert_t;
+} cupsd_cert_t;
 
 
 /*
  * Globals...
  */
 
-VAR cert_t	*Certs;		/* List of certificates */
+VAR cupsd_cert_t	*Certs;		/* List of certificates */
 VAR time_t	RootCertTime;	/* Root certificate update time */
 
 
@@ -48,11 +48,11 @@ VAR time_t	RootCertTime;	/* Root certificate update time */
  * Prototypes...
  */
 
-extern void		AddCert(int pid, const char *username);
-extern void		DeleteCert(int pid);
-extern void		DeleteAllCerts(void);
-extern const char	*FindCert(const char *certificate);
-extern void		InitCerts(void);
+extern void		cupsdAddCert(int pid, const char *username);
+extern void		cupsdDeleteCert(int pid);
+extern void		cupsdDeleteAllCerts(void);
+extern const char	*cupsdFindCert(const char *certificate);
+extern void		cupsdInitCerts(void);
 
 
 /*

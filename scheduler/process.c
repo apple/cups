@@ -71,14 +71,14 @@ cupsdStartProcess(
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET */
 
 
-  LogMessage(L_DEBUG2, "cupsdStartProcess(\"%s\", %p, %p, %d, %d, %d)",
+  cupsdLogMessage(L_DEBUG2, "cupsdStartProcess(\"%s\", %p, %p, %d, %d, %d)",
              command, argv, envp, infd, outfd, errfd);
 
  /*
   * Block signals before forking...
   */
 
-  HoldSignals();
+  cupsdHoldSignals();
 
   if ((*pid = fork()) == 0)
   {
@@ -184,7 +184,7 @@ cupsdStartProcess(
     signal(SIGCHLD, SIG_DFL);
 #endif /* HAVE_SIGSET */
 
-    ReleaseSignals();
+    cupsdReleaseSignals();
 
    /*
     * Execute the command; if for some reason this doesn't work,
@@ -206,12 +206,12 @@ cupsdStartProcess(
     * Error - couldn't fork a new process!
     */
 
-    LogMessage(L_ERROR, "Unable to fork %s - %s.", command, strerror(errno));
+    cupsdLogMessage(L_ERROR, "Unable to fork %s - %s.", command, strerror(errno));
 
     *pid = 0;
   }
 
-  ReleaseSignals();
+  cupsdReleaseSignals();
 
   return (*pid);
 }

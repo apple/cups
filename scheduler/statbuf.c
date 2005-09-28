@@ -299,9 +299,9 @@ cupsdStatBufUpdate(cupsd_statbuf_t *sb,	/* I - Status buffer */
     */
 
     if (message[0] == '[')
-      LogMessage(*loglevel, "%s", message);
+      cupsdLogMessage(*loglevel, "%s", message);
     else
-      LogMessage(*loglevel, "%s %s", sb->prefix, message);
+      cupsdLogMessage(*loglevel, "%s %s", sb->prefix, message);
   }
 
  /*
