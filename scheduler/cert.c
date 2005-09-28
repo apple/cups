@@ -29,7 +29,7 @@
  *   cupsdDeleteAllCerts() - Delete all certificates...
  *   cupsdFindCert()       - Find a certificate.
  *   cupsdInitCerts()      - Initialize the certificate "system" and root
- *                      certificate.
+ *                           certificate.
  */
 
 /*
@@ -44,8 +44,8 @@
  */
 
 void
-cupsdAddCert(int        pid,			/* I - Process ID */
-        const char *username)		/* I - Username */
+cupsdAddCert(int        pid,		/* I - Process ID */
+             const char *username)	/* I - Username */
 {
   int		i;			/* Looping var */
   cupsd_cert_t	*cert;			/* Current certificate */
@@ -55,7 +55,8 @@ cupsdAddCert(int        pid,			/* I - Process ID */
 					/* Hex constants... */
 
 
-  cupsdLogMessage(L_DEBUG2, "cupsdAddCert: adding certificate for pid %d", pid);
+  cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                  "cupsdAddCert: adding certificate for pid %d", pid);
 
  /*
   * Allocate memory for the certificate...
@@ -84,8 +85,9 @@ cupsdAddCert(int        pid,			/* I - Process ID */
 
   if ((fd = open(filename, O_WRONLY | O_CREAT | O_EXCL, 0400)) < 0)
   {
-    cupsdLogMessage(L_ERROR, "cupsdAddCert: Unable to create certificate file %s - %s",
-               filename, strerror(errno));
+    cupsdLogMessage(CUPSD_LOG_ERROR,
+                    "cupsdAddCert: Unable to create certificate file %s - %s",
+                    filename, strerror(errno));
     free(cert);
     return;
   }
@@ -131,7 +133,7 @@ cupsdAddCert(int        pid,			/* I - Process ID */
  */
 
 void
-cupsdDeleteCert(int pid)			/* I - Process ID */
+cupsdDeleteCert(int pid)		/* I - Process ID */
 {
   cupsd_cert_t	*cert,			/* Current certificate */
 		*prev;			/* Previous certificate */
@@ -145,7 +147,8 @@ cupsdDeleteCert(int pid)			/* I - Process ID */
       * Remove this certificate from the list...
       */
 
-      cupsdLogMessage(L_DEBUG2, "cupsdDeleteCert: removing certificate for pid %d", pid);
+      cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                      "cupsdDeleteCert: removing certificate for pid %d", pid);
 
       DEBUG_printf(("DELETE pid=%d, username=%s, cert=%s\n", cert->pid,
                     cert->username, cert->certificate));
@@ -163,7 +166,8 @@ cupsdDeleteCert(int pid)			/* I - Process ID */
 
       snprintf(filename, sizeof(filename), "%s/certs/%d", StateDir, pid);
       if (unlink(filename))
-	cupsdLogMessage(L_ERROR, "cupsdDeleteCert: Unable to remove %s!\n", filename);
+	cupsdLogMessage(CUPSD_LOG_ERROR,
+	                "cupsdDeleteCert: Unable to remove %s!\n", filename);
 
       return;
     }
@@ -194,7 +198,8 @@ cupsdDeleteAllCerts(void)
 
     snprintf(filename, sizeof(filename), "%s/certs/%d", StateDir, cert->pid);
     if (unlink(filename))
-      cupsdLogMessage(L_ERROR, "cupsdDeleteAllCerts: Unable to remove %s!\n", filename);
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+                      "cupsdDeleteAllCerts: Unable to remove %s!\n", filename);
 
    /*
     * Free memory...
@@ -220,7 +225,7 @@ cupsdFindCert(const char *certificate)	/* I - Certificate */
 
   DEBUG_printf(("cupsdFindCert(certificate=%s)\n", certificate));
   for (cert = Certs; cert != NULL; cert = cert->next)
-    if (strcasecmp(certificate, cert->certificate) == 0)
+    if (!strcasecmp(certificate, cert->certificate))
     {
       DEBUG_printf(("    returning %s...\n", cert->username));
       return (cert->username);
@@ -233,7 +238,8 @@ cupsdFindCert(const char *certificate)	/* I - Certificate */
 
 
 /*
- * 'cupsdInitCerts()' - Initialize the certificate "system" and root certificate.
+ * 'cupsdInitCerts()' - Initialize the certificate "system" and root
+ *                      certificate.
  */
 
 void

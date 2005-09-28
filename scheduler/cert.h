@@ -30,9 +30,9 @@
 typedef struct cupsd_cert_s
 {
   struct cupsd_cert_s *next;		/* Next certificate in list */
-  int		pid;		/* Process ID (0 for root certificate) */
-  char		certificate[33];/* 32 hex characters, or 128 bits */
-  char		username[33];	/* Authenticated username */
+  int		pid;			/* Process ID (0 for root certificate) */
+  char		certificate[33];	/* 32 hex characters, or 128 bits */
+  char		username[33];		/* Authenticated username */
 } cupsd_cert_t;
 
 
@@ -41,7 +41,7 @@ typedef struct cupsd_cert_s
  */
 
 VAR cupsd_cert_t	*Certs;		/* List of certificates */
-VAR time_t	RootCertTime;	/* Root certificate update time */
+VAR time_t		RootCertTime;	/* Root certificate update time */
 
 
 /*

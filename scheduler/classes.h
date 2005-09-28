@@ -28,8 +28,10 @@
  */
 
 extern cupsd_printer_t	*cupsdAddClass(const char *name);
-extern void		cupsdAddPrinterToClass(cupsd_printer_t *c, cupsd_printer_t *p);
-extern void		cupsdDeletePrinterFromClass(cupsd_printer_t *c, cupsd_printer_t *p);
+extern void		cupsdAddPrinterToClass(cupsd_printer_t *c,
+			                       cupsd_printer_t *p);
+extern void		cupsdDeletePrinterFromClass(cupsd_printer_t *c,
+			                            cupsd_printer_t *p);
 extern void		cupsdDeletePrinterFromClasses(cupsd_printer_t *p);
 extern void		cupsdDeleteAllClasses(void);
 extern cupsd_printer_t	*cupsdFindAvailablePrinter(const char *name);

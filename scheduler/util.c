@@ -23,6 +23,7 @@
  *
  * Contents:
  *
+ *   cupsdCompareNames()   - Compare two names.
  *   cupsdSendIPPGroup()   - Send a group tag.
  *   cupsdSendIPPHeader()  - Send the IPP response header.
  *   cupsdSendIPPInteger() - Send an integer attribute.

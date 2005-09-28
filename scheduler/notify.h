@@ -70,9 +70,9 @@ enum
  * Types and structures...
  */
 
-typedef struct cupsd_subscription_str	/**** Subscription object ****/
+typedef struct cupsd_subscription_s	/**** Subscription object ****/
 {
-  struct cupsd_subscription_str *next;	/* Pointer to next subscription */
+  struct cupsd_subscription_s *next;	/* Pointer to next subscription */
   int		id;			/* subscription-id */
   unsigned	mask;			/* Event mask */
   ipp_t		*attrs;			/* Subscription attributes */
@@ -89,9 +89,9 @@ typedef struct cupsd_subscription_str	/**** Subscription object ****/
   time_t	last_time;		/* Time of last notification */
 } cupsd_subscription_t;
 
-typedef struct cupsd_event_str  	/**** Event object ****/
+typedef struct cupsd_event_s		/**** Event object ****/
 {
-  struct cupsd_event_str *next;		/* Pointer to next event */
+  struct cupsd_event_s *next;		/* Pointer to next event */
   int		id;			/* event-id */
   time_t	event_time;		/* event-time */
   ipp_t		*attrs;			/* Event attributes */

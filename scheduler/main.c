@@ -23,22 +23,24 @@
  *
  * Contents:
  *
- *   main()               - Main entry for the CUPS scheduler.
- *   cupsdClosePipe()     - Close a pipe as necessary.
- *   cupsdOpenPipe()      - Create a pipe which is closed on exec.
+ *   main()                    - Main entry for the CUPS scheduler.
+ *   cupsdClosePipe()          - Close a pipe as necessary.
+ *   cupsdOpenPipe()           - Create a pipe which is closed on exec.
  *   cupsdCatchChildSignals()  - Catch SIGCHLD signals...
  *   cupsdHoldSignals()        - Hold child and termination signals.
  *   cupsdIgnoreChildSignals() - Ignore SIGCHLD signals...
  *   cupsdReleaseSignals()     - Release signals for delivery.
  *   cupsdSetString()          - Set a string value.
  *   cupsdSetStringf()         - Set a formatted string value.
- *   parent_handler()     - Catch USR1/CHLD signals...
- *   process_children()   - Process all dead children...
- *   sigchld_handler()    - Handle 'child' signals from old processes.
- *   sighup_handler()     - Handle 'hangup' signals to reconfigure the scheduler.
- *   sigterm_handler()    - Handle 'terminate' signals that stop the scheduler.
- *   select_timeout()     - Calculate the select timeout value.
- *   usage()              - Show scheduler usage.
+ *   parent_handler()          - Catch USR1/CHLD signals...
+ *   process_children()        - Process all dead children...
+ *   sigchld_handler()         - Handle 'child' signals from old processes.
+ *   sighup_handler()          - Handle 'hangup' signals to reconfigure the
+ *                               scheduler.
+ *   sigterm_handler()         - Handle 'terminate' signals that stop the
+ *                               scheduler.
+ *   select_timeout()          - Calculate the select timeout value.
+ *   usage()                   - Show scheduler usage.
  */
 
 /*
@@ -96,9 +98,9 @@ main(int  argc,				/* I - Number of command-line arguments */
   int			fds;		/* Number of ready descriptors select returns */
   fd_set		*input,		/* Input set for select() */
 			*output;	/* Output set for select() */
-  cupsd_client_t		*con;		/* Current client */
-  cupsd_job_t			*job;		/* Current job */
-  cupsd_listener_t		*lis;		/* Current listener */
+  cupsd_client_t	*con;		/* Current client */
+  cupsd_job_t		*job;		/* Current job */
+  cupsd_listener_t	*lis;		/* Current listener */
   time_t		activity;	/* Activity timer */
   time_t		browse_time;	/* Next browse send time */
   time_t		senddoc_time;	/* Send-Document time */
@@ -163,7 +165,8 @@ main(int  argc,				/* I - Number of command-line arguments */
 	      break;
 
 	  default : /* Unknown option */
-              fprintf(stderr, "cupsd: Unknown option \'%c\' - aborting!\n", *opt);
+              fprintf(stderr, "cupsd: Unknown option \'%c\' - aborting!\n",
+	              *opt);
 	      usage();
 	      break;
 	}
@@ -459,8 +462,9 @@ main(int  argc,				/* I - Number of command-line arguments */
   while (!stop_scheduler)
   {
 #ifdef DEBUG
-    cupsdLogMessage(L_DEBUG2, "main: Top of loop, dead_children=%d, NeedReload=%d",
-               dead_children, NeedReload);
+    cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                    "main: Top of loop, dead_children=%d, NeedReload=%d",
+                    dead_children, NeedReload);
 #endif /* DEBUG */
 
    /*
@@ -537,9 +541,9 @@ main(int  argc,				/* I - Number of command-line arguments */
 
     if ((fds = select(MaxFDs, input, output, NULL, &timeout)) < 0)
     {
-      char	s[16384],	/* String buffer */
-		*sptr;		/* Pointer into buffer */
-      int	slen;		/* Length of string buffer */
+      char	s[16384],		/* String buffer */
+		*sptr;			/* Pointer into buffer */
+      int	slen;			/* Length of string buffer */
 
 
      /*
@@ -553,7 +557,8 @@ main(int  argc,				/* I - Number of command-line arguments */
       * Log all sorts of debug info to help track down the problem.
       */
 
-      cupsdLogMessage(L_EMERG, "select() failed - %s!", strerror(errno));
+      cupsdLogMessage(CUPSD_LOG_EMERG, "select() failed - %s!",
+                      strerror(errno));
 
       strcpy(s, "InputSet =");
       slen = 10;
@@ -567,7 +572,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	  sptr += strlen(sptr);
 	}
 
-      cupsdLogMessage(L_EMERG, s);
+      cupsdLogMessage(CUPSD_LOG_EMERG, s);
 
       strcpy(s, "OutputSet =");
       slen = 11;
@@ -581,24 +586,26 @@ main(int  argc,				/* I - Number of command-line arguments */
 	  sptr += strlen(sptr);
 	}
 
-      cupsdLogMessage(L_EMERG, s);
+      cupsdLogMessage(CUPSD_LOG_EMERG, s);
 
       for (i = 0, con = Clients; i < NumClients; i ++, con ++)
-        cupsdLogMessage(L_EMERG, "Clients[%d] = %d, file = %d, state = %d",
-	           i, con->http.fd, con->file, con->http.state);
+        cupsdLogMessage(CUPSD_LOG_EMERG,
+	                "Clients[%d] = %d, file = %d, state = %d",
+	                i, con->http.fd, con->file, con->http.state);
 
       for (i = 0, lis = Listeners; i < NumListeners; i ++, lis ++)
-        cupsdLogMessage(L_EMERG, "Listeners[%d] = %d", i, lis->fd);
+        cupsdLogMessage(CUPSD_LOG_EMERG, "Listeners[%d] = %d", i, lis->fd);
 
-      cupsdLogMessage(L_EMERG, "BrowseSocket = %d", BrowseSocket);
+      cupsdLogMessage(CUPSD_LOG_EMERG, "BrowseSocket = %d", BrowseSocket);
 
       for (job = (cupsd_job_t *)cupsArrayFirst(ActiveJobs);
 	   job;
 	   job = (cupsd_job_t *)cupsArrayNext(ActiveJobs))
-        cupsdLogMessage(L_EMERG, "Jobs[%d] = %d < [%d %d] > [%d %d]",
-	           job->id, job->status_buffer ? job->status_buffer->fd : -1,
-		   job->print_pipes[0], job->print_pipes[1],
-		   job->back_pipes[0], job->back_pipes[1]);
+        cupsdLogMessage(CUPSD_LOG_EMERG, "Jobs[%d] = %d < [%d %d] > [%d %d]",
+	        	job->id,
+			job->status_buffer ? job->status_buffer->fd : -1,
+			job->print_pipes[0], job->print_pipes[1],
+			job->back_pipes[0], job->back_pipes[1]);
       break;
     }
 
@@ -708,12 +715,14 @@ main(int  argc,				/* I - Number of command-line arguments */
         con->file_ready = 1;
 
 #ifdef DEBUG
-        cupsdLogMessage(L_DEBUG2, "main: Data ready file %d!", con->file);
+        cupsdLogMessage(CUPSD_LOG_DEBUG2, "main: Data ready file %d!",
+	                con->file);
 #endif /* DEBUG */
 
 	if (!FD_ISSET(con->http.fd, output))
 	{
-	  cupsdLogMessage(L_DEBUG2, "main: Removing fd %d from InputSet...", con->file);
+	  cupsdLogMessage(CUPSD_LOG_DEBUG2,
+	                  "main: Removing fd %d from InputSet...", con->file);
 	  FD_CLR(con->file, InputSet);
 	}
       }
@@ -737,8 +746,9 @@ main(int  argc,				/* I - Number of command-line arguments */
       activity = time(NULL) - Timeout;
       if (con->http.activity < activity && !con->pipe_pid)
       {
-        cupsdLogMessage(L_DEBUG, "Closing client %d after %d seconds of inactivity...",
-	           con->http.fd, Timeout);
+        cupsdLogMessage(CUPSD_LOG_DEBUG,
+	                "Closing client %d after %d seconds of inactivity...",
+	                con->http.fd, Timeout);
 
         cupsdCloseClient(con);
         con --;
@@ -761,15 +771,16 @@ main(int  argc,				/* I - Number of command-line arguments */
     * Log memory usage every minute...
     */
 
-    if ((time(NULL) - mallinfo_time) >= 60 && LogLevel >= L_DEBUG)
+    if ((time(NULL) - mallinfo_time) >= 60 && LogLevel >= CUPSD_LOG_DEBUG)
     {
-      struct mallinfo mem;	/* Malloc information */
+      struct mallinfo mem;		/* Malloc information */
 
 
       mem = mallinfo();
-      cupsdLogMessage(L_DEBUG, "mallinfo: arena = %d, used = %d, free = %d\n",
-                 mem.arena, mem.usmblks + mem.uordblks,
-		 mem.fsmblks + mem.fordblks);
+      cupsdLogMessage(CUPSD_LOG_DEBUG,
+                      "mallinfo: arena = %d, used = %d, free = %d\n",
+                      mem.arena, mem.usmblks + mem.uordblks,
+		      mem.fsmblks + mem.fordblks);
       mallinfo_time = time(NULL);
     }
 #endif /* HAVE_MALLINFO */
@@ -795,9 +806,10 @@ main(int  argc,				/* I - Number of command-line arguments */
   */
 
   if (stop_scheduler)
-    cupsdLogMessage(L_INFO, "Scheduler shutting down normally.");
+    cupsdLogMessage(CUPSD_LOG_INFO, "Scheduler shutting down normally.");
   else
-    cupsdLogMessage(L_ERROR, "Scheduler shutting down due to program error.");
+    cupsdLogMessage(CUPSD_LOG_ERROR,
+                    "Scheduler shutting down due to program error.");
 
  /*
   * Close all network clients and stop all jobs...
@@ -930,7 +942,7 @@ cupsdCatchChildSignals(void)
  */
 
 void
-cupsdClearString(char **s)			/* O - String value */
+cupsdClearString(char **s)		/* O - String value */
 {
   if (s && *s)
   {
@@ -1024,7 +1036,7 @@ cupsdReleaseSignals(void)
 
 void
 cupsdSetString(char       **s,		/* O - New string */
-          const char *v)		/* I - String value */
+               const char *v)		/* I - String value */
 {
   if (!s || *s == v)
     return;
@@ -1045,8 +1057,8 @@ cupsdSetString(char       **s,		/* O - New string */
 
 void
 cupsdSetStringf(char       **s,		/* O - New string */
-           const char *f,		/* I - Printf-style format string */
-	   ...)				/* I - Additional args as needed */
+                const char *f,		/* I - Printf-style format string */
+	        ...)			/* I - Additional args as needed */
 {
   char		v[4096];		/* Formatting string value */
   va_list	ap;			/* Argument pointer */
@@ -1079,7 +1091,7 @@ cupsdSetStringf(char       **s,		/* O - New string */
  */
 
 static void
-parent_handler(int sig)		/* I - Signal */
+parent_handler(int sig)			/* I - Signal */
 {
  /*
   * Store the signal we got from the OS and return...
@@ -1096,13 +1108,13 @@ parent_handler(int sig)		/* I - Signal */
 static void
 process_children(void)
 {
-  int		status;		/* Exit status of child */
-  int		pid;		/* Process ID of child */
-  cupsd_job_t		*job;		/* Current job */
-  int		i;		/* Looping var */
+  int		status;			/* Exit status of child */
+  int		pid;			/* Process ID of child */
+  cupsd_job_t	*job;			/* Current job */
+  int		i;			/* Looping var */
 
 
-  cupsdLogMessage(L_DEBUG2, "process_children()");
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "process_children()");
 
  /*
   * Reset the dead_children flag...
@@ -1122,7 +1134,8 @@ process_children(void)
   if ((pid = wait(&status)) > 0)
 #endif /* HAVE_WAITPID */
   {
-    cupsdLogMessage(L_DEBUG2, "process_children: pid = %d, status = %d\n", pid, status);
+    cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                    "process_children: pid = %d, status = %d\n", pid, status);
 
    /*
     * Ignore SIGTERM errors - that comes when a job is cancelled...
@@ -1134,17 +1147,18 @@ process_children(void)
     if (status)
     {
       if (WIFEXITED(status))
-	cupsdLogMessage(L_ERROR, "PID %d stopped with status %d!", pid,
-	           WEXITSTATUS(status));
+	cupsdLogMessage(CUPSD_LOG_ERROR, "PID %d stopped with status %d!", pid,
+	                WEXITSTATUS(status));
       else
-	cupsdLogMessage(L_ERROR, "PID %d crashed on signal %d!", pid,
-	           WTERMSIG(status));
+	cupsdLogMessage(CUPSD_LOG_ERROR, "PID %d crashed on signal %d!", pid,
+	                WTERMSIG(status));
 
-      if (LogLevel < L_DEBUG)
-        cupsdLogMessage(L_INFO, "Hint: Try setting the LogLevel to \"debug\" to find out more.");
+      if (LogLevel < CUPSD_LOG_DEBUG)
+        cupsdLogMessage(CUPSD_LOG_INFO,
+	                "Hint: Try setting the LogLevel to \"debug\" to find out more.");
     }
     else
-      cupsdLogMessage(L_DEBUG2, "PID %d exited with no errors.", pid);
+      cupsdLogMessage(CUPSD_LOG_DEBUG2, "PID %d exited with no errors.", pid);
 
    /*
     * Delete certificates for CGI processes...
@@ -1290,9 +1304,9 @@ select_timeout(int fds)			/* I - Number of ready descriptors select returned */
   int			i;		/* Looping var */
   long			timeout;	/* Timeout for select */
   time_t		now;		/* Current time */
-  cupsd_client_t		*con;		/* Client information */
-  cupsd_printer_t		*p;		/* Printer information */
-  cupsd_job_t			*job;		/* Job information */
+  cupsd_client_t	*con;		/* Client information */
+  cupsd_printer_t	*p;		/* Printer information */
+  cupsd_job_t		*job;		/* Job information */
   const char		*why;		/* Debugging aid */
 
 
@@ -1395,7 +1409,7 @@ select_timeout(int fds)			/* I - Number of ready descriptors select returned */
   * Log memory usage every minute...
   */
 
-  if (LogLevel >= L_DEBUG && (mallinfo_time + 60) < timeout)
+  if (LogLevel >= CUPSD_LOG_DEBUG && (mallinfo_time + 60) < timeout)
   {
     timeout = mallinfo_time + 60;
     why     = "display memory usage";
@@ -1433,7 +1447,8 @@ select_timeout(int fds)			/* I - Number of ready descriptors select returned */
   * Log and return the timeout value...
   */
 
-  cupsdLogMessage(L_DEBUG2, "select_timeout: %ld seconds to %s", timeout, why);
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "select_timeout: %ld seconds to %s",
+                  timeout, why);
 
   return (timeout);
 }

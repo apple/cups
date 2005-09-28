@@ -45,9 +45,9 @@ void
 cupsdStartServer(void)
 {
 #ifdef HAVE_LIBSSL
-  int		i;		/* Looping var */
-  struct timeval curtime;	/* Current time in microseconds */
-  unsigned char	data[1024];	/* Seed data */
+  int			i;		/* Looping var */
+  struct timeval	curtime;	/* Current time in microseconds */
+  unsigned char		data[1024];	/* Seed data */
 #endif /* HAVE_LIBSSL */
 
 
@@ -94,12 +94,15 @@ cupsdStartServer(void)
   */
 
   if (cupsdOpenPipe(CGIPipes))
-    cupsdLogMessage(L_ERROR, "cupsdStartServer: Unable to create pipes for CGI status!");
+    cupsdLogMessage(CUPSD_LOG_ERROR,
+                    "cupsdStartServer: Unable to create pipes for CGI status!");
   else
   {
     CGIStatusBuffer = cupsdStatBufNew(CGIPipes[0], "[CGI]");
 
-    cupsdLogMessage(L_DEBUG2, "cupsdStartServer: Adding fd %d to InputSet...", CGIPipes[0]);
+    cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                    "cupsdStartServer: Adding fd %d to InputSet...",
+		    CGIPipes[0]);
     FD_SET(CGIPipes[0], InputSet);
   }
 }
@@ -145,8 +148,9 @@ cupsdStopServer(void)
 
   if (CGIPipes[0] >= 0)
   {
-    cupsdLogMessage(L_DEBUG2, "cupsdStopServer: Removing fd %d from InputSet...",
-               CGIPipes[0]);
+    cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                    "cupsdStopServer: Removing fd %d from InputSet...",
+                    CGIPipes[0]);
 
     FD_CLR(CGIPipes[0], InputSet);
 

@@ -21,6 +21,14 @@
  *       Voice: (301) 373-9600
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
+ *
+ * Contents:
+ *
+ *   cupsdNetIFFind()   - Find a network interface.
+ *   cupsdNetIFFree()   - Free the current network interface list.
+ *   cupsdNetIFUpdate() - Update the network interface list as needed...
+ *   getifaddrs()       - Get a list of network interfaces on the system.
+ *   freeifaddrs()      - Free an interface list...
  */
 
 /*
@@ -53,7 +61,7 @@
 #    define ifr_netmask ifr_addr
 #  endif /* !ifr_netmask */
 
-struct ifaddrs			/**** Interface Structure ****/
+struct ifaddrs				/**** Interface Structure ****/
 {
   struct ifaddrs	*ifa_next;	/* Next interface in list */
   char			*ifa_name;	/* Name of interface */
@@ -70,13 +78,13 @@ void	freeifaddrs(struct ifaddrs *addrs);
 
 
 /*
- * 'NetIFFind()' - Find a network interface.
+ * 'cupsdNetIFFind()' - Find a network interface.
  */
 
-cupsd_netif_t *			/* O - Network interface data */
-NetIFFind(const char *name)	/* I - Name of interface */
+cupsd_netif_t *				/* O - Network interface data */
+cupsdNetIFFind(const char *name)	/* I - Name of interface */
 {
-  cupsd_netif_t	*temp;		/* Current network interface */
+  cupsd_netif_t	*temp;			/* Current network interface */
 
 
  /*
@@ -90,7 +98,7 @@ NetIFFind(const char *name)	/* I - Name of interface */
   */
 
   for (temp = NetIFList; temp != NULL; temp = temp->next)
-    if (strcasecmp(name, temp->name) == 0)
+    if (!strcasecmp(name, temp->name))
       return (temp);
 
   return (NULL);
@@ -104,7 +112,7 @@ NetIFFind(const char *name)	/* I - Name of interface */
 void
 cupsdNetIFFree(void)
 {
-  cupsd_netif_t	*next;		/* Next interface in list */
+  cupsd_netif_t	*next;			/* Next interface in list */
 
 
  /*
@@ -129,12 +137,12 @@ cupsdNetIFFree(void)
 void
 cupsdNetIFUpdate(void)
 {
-  int		i,		/* Looping var */
-		match;		/* Matching address? */
+  int			i,		/* Looping var */
+			match;		/* Matching address? */
   cupsd_listener_t	*lis;		/* Listen address */
-  cupsd_netif_t	*temp;		/* Current interface */
-  struct ifaddrs *addrs,	/* Interface address list */
-		*addr;		/* Current interface address */
+  cupsd_netif_t		*temp;		/* Current interface */
+  struct ifaddrs	*addrs,		/* Interface address list */
+			*addr;		/* Current interface address */
 
 
  /*
@@ -201,7 +209,8 @@ cupsdNetIFUpdate(void)
       memcpy(&(temp->mask), addr->ifa_netmask, sizeof(struct sockaddr_in));
 
       if (addr->ifa_dstaddr)
-	memcpy(&(temp->broadcast), addr->ifa_dstaddr, sizeof(struct sockaddr_in));
+	memcpy(&(temp->broadcast), addr->ifa_dstaddr,
+	       sizeof(struct sockaddr_in));
     }
 #ifdef AF_INET6
     else
@@ -214,7 +223,8 @@ cupsdNetIFUpdate(void)
       memcpy(&(temp->mask), addr->ifa_netmask, sizeof(struct sockaddr_in6));
 
       if (addr->ifa_dstaddr)
-	memcpy(&(temp->broadcast), addr->ifa_dstaddr, sizeof(struct sockaddr_in6));
+	memcpy(&(temp->broadcast), addr->ifa_dstaddr,
+	       sizeof(struct sockaddr_in6));
     }
 #endif /* AF_INET6 */
 
@@ -528,7 +538,6 @@ freeifaddrs(struct ifaddrs *addrs)	/* I - Interface list to free */
     addrs = next;
   }
 }
-
 #endif /* !HAVE_GETIFADDRS */
 
 

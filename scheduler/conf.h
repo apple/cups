@@ -28,19 +28,22 @@
  * Log levels...
  */
 
-#define L_ATTR		-3	/* Used internally for attributes */
-#define L_STATE		-2	/* Used internally for state-reasons */
-#define L_PAGE		-1	/* Used internally for page logging */
-#define L_NONE		0
-#define L_EMERG		1	/* Emergency issues */
-#define L_ALERT		2	/* Something bad happened that needs attention */
-#define L_CRIT		3	/* Critical error but server continues */
-#define L_ERROR		4	/* Error condition */
-#define L_WARN		5	/* Warning */
-#define L_NOTICE	6	/* Normal condition that needs logging */
-#define L_INFO		7	/* General information */
-#define L_DEBUG		8	/* General debugging */
-#define L_DEBUG2	9	/* Detailed debugging */
+typedef enum
+{
+  CUPSD_LOG_ATTR = -3,		/* Used internally for attributes */
+  CUPSD_LOG_STATE,		/* Used internally for state-reasons */
+  CUPSD_LOG_PAGE,		/* Used internally for page logging */
+  CUPSD_LOG_NONE,
+  CUPSD_LOG_EMERG,		/* Emergency issues */
+  CUPSD_LOG_ALERT,		/* Something bad happened that needs attention */
+  CUPSD_LOG_CRIT,		/* Critical error but server continues */
+  CUPSD_LOG_ERROR,		/* Error condition */
+  CUPSD_LOG_WARN,		/* Warning */
+  CUPSD_LOG_NOTICE,		/* Normal condition that needs logging */
+  CUPSD_LOG_INFO,		/* General information */
+  CUPSD_LOG_DEBUG,		/* General debugging */
+  CUPSD_LOG_DEBUG2		/* Detailed debugging */
+} cupsd_loglevel_t;
 
 
 /*
@@ -117,7 +120,7 @@ VAR int			ClassifyOverride	VALUE(0),
 					/* Permissions for config files */
 			LogFilePerm		VALUE(0644),
 					/* Permissions for log files */
-			LogLevel		VALUE(L_ERROR),
+			LogLevel		VALUE(CUPSD_LOG_ERROR),
 					/* Log level */
 			MaxClients		VALUE(0),
 					/* Maximum number of clients */

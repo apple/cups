@@ -241,7 +241,6 @@ print_rules(mime_magic_t *rules)	/* I - Rules to print */
 }
 
 
-
 /*
  * End of "$Id$".
  */

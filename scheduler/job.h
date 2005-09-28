@@ -23,41 +23,35 @@
  */
 
 /*
- * Constants...
- */
-
-#define JOB_BUFFER_SIZE	1024	/* Bytes for job status buffer */
-
-
-/*
  * Job request structure...
  */
 
 typedef struct cupsd_job_s
 {
-  int		id,			/* Job ID */
-		priority;		/* Job priority */
-  ipp_attribute_t *state;		/* Job state */
-  ipp_attribute_t *sheets;		/* job-media-sheets-completed */
-  time_t	hold_until;		/* Hold expiration date/time */
-  char		*username;		/* Printing user */
-  char		*dest;			/* Destination printer or class */
-  cups_ptype_t	dtype;			/* Destination type (class/remote bits) */
-  ipp_attribute_t *cupsd_job_sheets;		/* Job sheets (NULL if none) */
-  int		num_files;		/* Number of files in job */
-  int		current_file;		/* Current file in job */
-  mime_type_t	**filetypes;		/* File types */
-  int		*compressions;		/* Compression status of each file */
-  ipp_t		*attrs;			/* Job attributes */
-  cupsd_statbuf_t *status_buffer;	/* Status buffer for this job */
-  int		print_pipes[2],		/* Print data pipes */
-		back_pipes[2];		/* Backchannel pipes */
-  int		cost;			/* Filtering cost */
-  int		filters[MAX_FILTERS + 1];/* Filter process IDs, 0 terminated */
-  int		backend;		/* Backend process ID */
-  int		status;			/* Status code from filters */
-  cupsd_printer_t	*printer;		/* Printer this job is assigned to */
-  int		tries;			/* Number of tries for this job */
+  int			id,		/* Job ID */
+			priority;	/* Job priority */
+  ipp_attribute_t	*state;		/* Job state */
+  ipp_attribute_t	*sheets;	/* job-media-sheets-completed */
+  time_t		hold_until;	/* Hold expiration date/time */
+  char			*username;	/* Printing user */
+  char			*dest;		/* Destination printer or class */
+  cups_ptype_t		dtype;		/* Destination type (class/remote bits) */
+  ipp_attribute_t	*job_sheets;	/* Job sheets (NULL if none) */
+  int			num_files;	/* Number of files in job */
+  int			current_file;	/* Current file in job */
+  mime_type_t		**filetypes;	/* File types */
+  int			*compressions;	/* Compression status of each file */
+  ipp_t			*attrs;		/* Job attributes */
+  cupsd_statbuf_t	*status_buffer;	/* Status buffer for this job */
+  int			print_pipes[2],	/* Print data pipes */
+			back_pipes[2];	/* Backchannel pipes */
+  int			cost;		/* Filtering cost */
+  int			filters[MAX_FILTERS + 1];
+					/* Filter process IDs, 0 terminated */
+  int			backend;	/* Backend process ID */
+  int			status;		/* Status code from filters */
+  cupsd_printer_t	*printer;	/* Printer this job is assigned to */
+  int			tries;		/* Number of tries for this job */
 } cupsd_job_t;
 
 
@@ -96,28 +90,29 @@ VAR int			FaxRetryLimit	VALUE(5),
  */
 
 extern cupsd_job_t	*cupsdAddJob(int priority, const char *dest);
-extern void	cupsdCancelJob(int id, int purge);
-extern void	cupsdCancelJobs(const char *dest, const char *username, int purge);
-extern void	cupsdCheckJobs(void);
-extern void	cupsdCleanJobs(void);
-extern void	cupsdDeleteJob(int id);
+extern void		cupsdCancelJob(int id, int purge);
+extern void		cupsdCancelJobs(const char *dest, const char *username,
+			                int purge);
+extern void		cupsdCheckJobs(void);
+extern void		cupsdCleanJobs(void);
+extern void		cupsdDeleteJob(int id);
 extern cupsd_job_t	*cupsdFindJob(int id);
-extern void	cupsdFinishJob(cupsd_job_t *job);
-extern void	cupsdFreeAllJobs(void);
-extern int	cupsdGetPrinterJobCount(const char *dest);
-extern int	cupsdGetUserJobCount(const char *username);
-extern void	cupsdHoldJob(int id);
-extern void	cupsdLoadAllJobs(void);
-extern void	cupsdMoveJob(int id, const char *dest);
-extern void	cupsdReleaseJob(int id);
-extern void	cupsdRestartJob(int id);
-extern void	cupsdSaveJob(int id);
-extern void	cupsdSetJobHoldUntil(int id, const char *when);
-extern void	cupsdSetJobPriority(int id, int priority);
-extern void	cupsdStartJob(int id, cupsd_printer_t *printer);
-extern void	cupsdStopAllJobs(void);
-extern void	cupsdStopJob(int id, int force);
-extern void	cupsdUpdateJob(cupsd_job_t *job);
+extern void		cupsdFinishJob(cupsd_job_t *job);
+extern void		cupsdFreeAllJobs(void);
+extern int		cupsdGetPrinterJobCount(const char *dest);
+extern int		cupsdGetUserJobCount(const char *username);
+extern void		cupsdHoldJob(int id);
+extern void		cupsdLoadAllJobs(void);
+extern void		cupsdMoveJob(int id, const char *dest);
+extern void		cupsdReleaseJob(int id);
+extern void		cupsdRestartJob(int id);
+extern void		cupsdSaveJob(int id);
+extern void		cupsdSetJobHoldUntil(int id, const char *when);
+extern void		cupsdSetJobPriority(int id, int priority);
+extern void		cupsdStartJob(int id, cupsd_printer_t *printer);
+extern void		cupsdStopAllJobs(void);
+extern void		cupsdStopJob(int id, int force);
+extern void		cupsdUpdateJob(cupsd_job_t *job);
 
 
 /*

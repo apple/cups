@@ -53,14 +53,14 @@ static int	check_log_file(cups_file_t **, const char *);
  * 'cupsdGetDateTime()' - Returns a pointer to a date/time string.
  */
 
-char *				/* O - Date/time string */
+char *					/* O - Date/time string */
 cupsdGetDateTime(time_t t)		/* I - Time value */
 {
-  struct tm	*date;		/* Date/time value */
-  static time_t	last_time = -1;	/* Last time value */
-  static char	s[1024];	/* Date/time string */
-  static const char * const months[12] =
-		{		/* Months */
+  struct tm	*date;			/* Date/time value */
+  static time_t	last_time = -1;		/* Last time value */
+  static char	s[1024];		/* Date/time string */
+  static const char * const months[12] =/* Months */
+		{
 		  "Jan",
 		  "Feb",
 		  "Mar",
@@ -115,13 +115,13 @@ cupsdGetDateTime(time_t t)		/* I - Time value */
  */
 
 int					/* O - 1 on success, 0 on error */
-cupsdLogMessage(int        level,		/* I - Log level */
-           const char *message,		/* I - printf-style message string */
-	   ...)				/* I - Additional args as needed */
+cupsdLogMessage(int        level,	/* I - Log level */
+                const char *message,	/* I - printf-style message string */
+	        ...)			/* I - Additional args as needed */
 {
-  int		len;			/* Length of message */
-  va_list	ap;			/* Argument pointer */
-  static const char levels[] =		/* Log levels... */
+  int			len;		/* Length of message */
+  va_list		ap;		/* Argument pointer */
+  static const char	levels[] =	/* Log levels... */
 		{
 		  ' ',
 		  'X',
@@ -165,7 +165,7 @@ cupsdLogMessage(int        level,		/* I - Log level */
   * See if we are logging errors via syslog...
   */
 
-  if (strcmp(ErrorLog, "syslog") == 0)
+  if (!strcmp(ErrorLog, "syslog"))
   {
     va_start(ap, message);
     vsyslog(syslevels[level], message, ap);
@@ -278,12 +278,12 @@ cupsdLogMessage(int        level,		/* I - Log level */
  * 'cupsdLogPage()' - Log a page to the page log file.
  */
 
-int				/* O - 1 on success, 0 on error */
-cupsdLogPage(cupsd_job_t       *job,	/* I - Job being printed */
-        const char  *page)	/* I - Page being printed */
+int					/* O - 1 on success, 0 on error */
+cupsdLogPage(cupsd_job_t *job,		/* I - Job being printed */
+             const char  *page)		/* I - Page being printed */
 {
-  ipp_attribute_t *billing,	/* job-billing attribute */
-                  *hostname;	/* job-originating-host-name attribute */
+  ipp_attribute_t *billing,		/* job-billing attribute */
+                  *hostname;		/* job-originating-host-name attribute */
 
 
   billing  = ippFindAttribute(job->attrs, "job-billing", IPP_TAG_ZERO);
@@ -295,7 +295,7 @@ cupsdLogPage(cupsd_job_t       *job,	/* I - Job being printed */
   * See if we are logging pages via syslog...
   */
 
-  if (strcmp(PageLog, "syslog") == 0)
+  if (!strcmp(PageLog, "syslog"))
   {
     syslog(LOG_INFO, "PAGE %s %s %d %s %s %s", job->printer->name,
            job->username ? job->username : "-",
@@ -335,12 +335,12 @@ cupsdLogPage(cupsd_job_t       *job,	/* I - Job being printed */
  * 'cupsdLogRequest()' - Log an HTTP request in Common Log Format.
  */
 
-int				/* O - 1 on success, 0 on error */
-cupsdLogRequest(cupsd_client_t      *con,	/* I - Request to log */
-           http_status_t code)	/* I - Response code */
+int					/* O - 1 on success, 0 on error */
+cupsdLogRequest(cupsd_client_t *con,	/* I - Request to log */
+                http_status_t  code)	/* I - Response code */
 {
-  static const char * const states[] =
-		{		/* HTTP client states... */
+  static const char * const states[] =	/* HTTP client states... */
+		{
 		  "WAITING",
 		  "OPTIONS",
 		  "GET",
@@ -363,7 +363,7 @@ cupsdLogRequest(cupsd_client_t      *con,	/* I - Request to log */
   * See if we are logging accesses via syslog...
   */
 
-  if (strcmp(AccessLog, "syslog") == 0)
+  if (!strcmp(AccessLog, "syslog"))
   {
     syslog(LOG_INFO, "REQUEST %s - %s \"%s %s HTTP/%d.%d\" %d %d\n",
            con->http.hostname, con->username[0] != '\0' ? con->username : "-",

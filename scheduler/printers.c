@@ -37,17 +37,16 @@
  *   cupsdSetPrinterAttrs()      - Set printer attributes based upon the PPD file.
  *   cupsdSetPrinterReasons()    - Set/update the reasons strings.
  *   cupsdSetPrinterState()      - Update the current state of a printer.
- *   SortPrinters()         - Sort the printer list when a printer name is
- *                            changed.
  *   cupsdStopPrinter()          - Stop a printer from printing any jobs...
  *   cupsdValidateDest()         - Validate a printer/class destination.
  *   cupsdWritePrintcap()        - Write a pseudo-printcap file for older
- *                            applications that need it...
- *   cupsdSanitizeURI()     - Sanitize a device URI...
- *   write_irix_config()    - Update the config files used by the IRIX
- *                            desktop tools.
- *   write_irix_state()     - Update the status files used by IRIX printing
- *                            desktop tools.
+ *                                 applications that need it...
+ *   cupsdSanitizeURI()          - Sanitize a device URI...
+ *   compare_printers()          - Compare two printers.
+ *   write_irix_config()         - Update the config files used by the IRIX
+ *                                 desktop tools.
+ *   write_irix_state()          - Update the status files used by IRIX printing
+ *                                 desktop tools.
  */
 
 /*
@@ -82,10 +81,7 @@ cupsdAddPrinter(const char *name)	/* I - Name of printer */
   * Range check input...
   */
 
-  cupsdLogMessage(L_DEBUG2, "cupsdAddPrinter(\"%s\")", name ? name : "(null)");
-
-  if (name == NULL)
-    return (NULL);
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdAddPrinter(\"%s\")", name);
 
  /*
   * Create a new printer entity...
@@ -93,8 +89,8 @@ cupsdAddPrinter(const char *name)	/* I - Name of printer */
 
   if ((p = calloc(1, sizeof(cupsd_printer_t))) == NULL)
   {
-    cupsdLogMessage(L_CRIT, "Unable to allocate memory for printer - %s",
-               strerror(errno));
+    cupsdLogMessage(CUPSD_LOG_CRIT, "Unable to allocate memory for printer - %s",
+                    strerror(errno));
     return (NULL);
   }
 
@@ -110,8 +106,8 @@ cupsdAddPrinter(const char *name)	/* I - Name of printer */
   p->shared    = 1;
   p->filetype  = mimeAddType(MimeDatabase, "printer", name);
 
-  cupsdSetString(&p->cupsd_job_sheets[0], "none");
-  cupsdSetString(&p->cupsd_job_sheets[1], "none");
+  cupsdSetString(&p->job_sheets[0], "none");
+  cupsdSetString(&p->job_sheets[1], "none");
 
   cupsdSetString(&p->error_policy, "stop-printer");
   cupsdSetString(&p->op_policy, DefaultPolicy);
@@ -149,8 +145,9 @@ cupsdAddPrinter(const char *name)	/* I - Name of printer */
  */
 
 void
-cupsdAddPrinterFilter(cupsd_printer_t  *p,		/* I - Printer to add to */
-                 const char *filter)	/* I - Filter to add */
+cupsdAddPrinterFilter(
+    cupsd_printer_t  *p,		/* I - Printer to add to */
+    const char       *filter)		/* I - Filter to add */
 {
   int		i;			/* Looping var */
   char		super[MIME_MAX_SUPER],	/* Super-type for filter */
@@ -175,8 +172,9 @@ cupsdAddPrinterFilter(cupsd_printer_t  *p,		/* I - Printer to add to */
 
   if (sscanf(filter, "%15[^/]/%31s%d%1023s", super, type, &cost, program) != 4)
   {
-    cupsdLogMessage(L_ERROR, "cupsdAddPrinterFilter: Invalid filter string \"%s\"!",
-               filter);
+    cupsdLogMessage(CUPSD_LOG_ERROR,
+                    "cupsdAddPrinterFilter: Invalid filter string \"%s\"!",
+                    filter);
     return;
   }
 
@@ -191,10 +189,10 @@ cupsdAddPrinterFilter(cupsd_printer_t  *p,		/* I - Printer to add to */
          !strcasecmp((*temptype)->super, super)) &&
         (type[0] == '*' || !strcasecmp((*temptype)->type, type)))
     {
-      cupsdLogMessage(L_DEBUG2, "Adding filter %s/%s %s/%s %d %s",
-                 (*temptype)->super, (*temptype)->type,
-		 p->filetype->super, p->filetype->type,
-                 cost, program);
+      cupsdLogMessage(CUPSD_LOG_DEBUG2, "Adding filter %s/%s %s/%s %d %s",
+                      (*temptype)->super, (*temptype)->type,
+		      p->filetype->super, p->filetype->type,
+                      cost, program);
       mimeAddFilter(MimeDatabase, *temptype, p->filetype, cost, program);
     }
 }
@@ -205,7 +203,8 @@ cupsdAddPrinterFilter(cupsd_printer_t  *p,		/* I - Printer to add to */
  */
 
 void
-cupsdAddPrinterHistory(cupsd_printer_t *p)		/* I - Printer */
+cupsdAddPrinterHistory(
+    cupsd_printer_t *p)			/* I - Printer */
 {
   ipp_t	*history;			/* History collection */
 
@@ -265,8 +264,9 @@ cupsdAddPrinterHistory(cupsd_printer_t *p)		/* I - Printer */
  */
 
 void
-cupsdAddPrinterUser(cupsd_printer_t  *p,		/* I - Printer */
-               const char *username)	/* I - User */
+cupsdAddPrinterUser(
+    cupsd_printer_t *p,			/* I - Printer */
+    const char      *username)		/* I - User */
 {
   const char	**temp;			/* Temporary array pointer */
 
@@ -297,9 +297,9 @@ cupsdAddPrinterUser(cupsd_printer_t  *p,		/* I - Printer */
 void
 cupsdCreateCommonData(void)
 {
-  int		i;			/* Looping var */
-  ipp_attribute_t *attr;		/* Attribute data */
-  cupsd_printer_t	*p;			/* Current printer */
+  int			i;		/* Looping var */
+  ipp_attribute_t	*attr;		/* Attribute data */
+  cupsd_printer_t	*p;		/* Current printer */
   static const int nups[] =		/* number-up-supported values */
 		{ 1, 2, 4, 6, 9, 16 };
   static const ipp_orient_t orients[4] =/* orientation-requested-supported values */
@@ -474,9 +474,9 @@ cupsdCreateCommonData(void)
                 	   "job-sheets-supported", NumBanners + 1, NULL, NULL);
 
     if (attr == NULL)
-      cupsdLogMessage(L_EMERG, "cupsdSetPrinterAttrs: Unable to allocate memory for "
-                          "job-sheets-supported attribute: %s!",
-	         strerror(errno));
+      cupsdLogMessage(CUPSD_LOG_EMERG,
+                      "cupsdSetPrinterAttrs: Unable to allocate memory for "
+                      "job-sheets-supported attribute: %s!", strerror(errno));
     else if (!Classification || ClassifyOverride)
     {
       attr->values[0].string.text = strdup("none");
@@ -508,7 +508,7 @@ cupsdCreateCommonData(void)
 void
 cupsdDeleteAllPrinters(void)
 {
-  cupsd_printer_t	*p;	/* Pointer to current printer/class */
+  cupsd_printer_t	*p;		/* Pointer to current printer/class */
 
 
   for (p = (cupsd_printer_t *)cupsArrayFirst(Printers);
@@ -524,8 +524,9 @@ cupsdDeleteAllPrinters(void)
  */
 
 void
-cupsdDeletePrinter(cupsd_printer_t *p,		/* I - Printer to delete */
-	      int       update)		/* I - Update printers.conf? */
+cupsdDeletePrinter(
+    cupsd_printer_t *p,			/* I - Printer to delete */
+    int             update)		/* I - Update printers.conf? */
 {
   int		i;			/* Looping var */
 #ifdef __sgi
@@ -634,8 +635,8 @@ cupsdDeletePrinter(cupsd_printer_t *p,		/* I - Printer to delete */
   cupsdClearString(&p->location);
   cupsdClearString(&p->make_model);
   cupsdClearString(&p->info);
-  cupsdClearString(&p->cupsd_job_sheets[0]);
-  cupsdClearString(&p->cupsd_job_sheets[1]);
+  cupsdClearString(&p->job_sheets[0]);
+  cupsdClearString(&p->job_sheets[1]);
   cupsdClearString(&p->device_uri);
   cupsdClearString(&p->port_monitor);
   cupsdClearString(&p->op_policy);
@@ -656,7 +657,8 @@ cupsdDeletePrinter(cupsd_printer_t *p,		/* I - Printer to delete */
  */
 
 void
-cupsdDeletePrinterFilters(cupsd_printer_t *p)	/* I - Printer to remove from */
+cupsdDeletePrinterFilters(
+    cupsd_printer_t *p)			/* I - Printer to remove from */
 {
   int		i;			/* Looping var */
   mime_filter_t	*filter;		/* MIME filter looping var */
@@ -698,7 +700,7 @@ cupsdDeletePrinterFilters(cupsd_printer_t *p)	/* I - Printer to remove from */
  */
 
 cupsd_printer_t *			/* O - Destination in list */
-cupsdFindDest(const char *name)	/* I - Name of printer or class to find */
+cupsdFindDest(const char *name)		/* I - Name of printer or class to find */
 {
   cupsd_printer_t	key;		/* Search key */
 
@@ -730,9 +732,10 @@ cupsdFindPrinter(const char *name)	/* I - Name of printer to find */
  */
 
 void
-cupsdFreePrinterUsers(cupsd_printer_t *p)	/* I - Printer */
+cupsdFreePrinterUsers(
+    cupsd_printer_t *p)			/* I - Printer */
 {
-  int	i;			/* Looping var */
+  int	i;				/* Looping var */
 
 
   if (!p || !p->num_users)
@@ -755,12 +758,12 @@ cupsdFreePrinterUsers(cupsd_printer_t *p)	/* I - Printer */
 void
 cupsdLoadAllPrinters(void)
 {
-  cups_file_t	*fp;			/* printers.conf file */
-  int		linenum;		/* Current line number */
-  char		line[1024],		/* Line from file */
-		*value,			/* Pointer to value */
-		*valueptr;		/* Pointer into value */
-  cupsd_printer_t	*p;			/* Current printer */
+  cups_file_t		*fp;		/* printers.conf file */
+  int			linenum;	/* Current line number */
+  char			line[1024],	/* Line from file */
+			*value,		/* Pointer to value */
+			*valueptr;	/* Pointer into value */
+  cupsd_printer_t	*p;		/* Current printer */
 
 
  /*
@@ -770,8 +773,9 @@ cupsdLoadAllPrinters(void)
   snprintf(line, sizeof(line), "%s/printers.conf", ServerRoot);
   if ((fp = cupsFileOpen(line, "r")) == NULL)
   {
-    cupsdLogMessage(L_ERROR, "cupsdLoadAllPrinters: Unable to open %s - %s", line,
-               strerror(errno));
+    cupsdLogMessage(CUPSD_LOG_ERROR,
+                    "cupsdLoadAllPrinters: Unable to open %s - %s", line,
+                    strerror(errno));
     return;
   }
 
@@ -801,7 +805,8 @@ cupsdLoadAllPrinters(void)
         * Add the printer and a base file type...
 	*/
 
-        cupsdLogMessage(L_DEBUG, "cupsdLoadAllPrinters: Loading printer %s...", value);
+        cupsdLogMessage(CUPSD_LOG_DEBUG,
+	                "cupsdLoadAllPrinters: Loading printer %s...", value);
 
         p = cupsdAddPrinter(value);
 	p->accepting = 1;
@@ -816,8 +821,8 @@ cupsdLoadAllPrinters(void)
       }
       else
       {
-        cupsdLogMessage(L_ERROR, "Syntax error on line %d of printers.conf.",
-	           linenum);
+        cupsdLogMessage(CUPSD_LOG_ERROR,
+	                "Syntax error on line %d of printers.conf.", linenum);
         return;
       }
     }
@@ -861,15 +866,15 @@ cupsdLoadAllPrinters(void)
       }
       else
       {
-        cupsdLogMessage(L_ERROR, "Syntax error on line %d of printers.conf.",
-	           linenum);
+        cupsdLogMessage(CUPSD_LOG_ERROR,
+	                "Syntax error on line %d of printers.conf.", linenum);
         return;
       }
     }
     else if (!p)
     {
-      cupsdLogMessage(L_ERROR, "Syntax error on line %d of printers.conf.",
-	         linenum);
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+                      "Syntax error on line %d of printers.conf.", linenum);
       return;
     }
     else if (!strcasecmp(line, "Info"))
@@ -888,8 +893,8 @@ cupsdLoadAllPrinters(void)
 	cupsdSetString(&p->device_uri, value);
       else
       {
-	cupsdLogMessage(L_ERROR, "Syntax error on line %d of printers.conf.",
-	           linenum);
+	cupsdLogMessage(CUPSD_LOG_ERROR,
+	                "Syntax error on line %d of printers.conf.", linenum);
 	return;
       }
     }
@@ -901,8 +906,8 @@ cupsdLoadAllPrinters(void)
         cupsdClearString(&p->port_monitor);
       else
       {
-	cupsdLogMessage(L_ERROR, "Syntax error on line %d of printers.conf.",
-	           linenum);
+	cupsdLogMessage(CUPSD_LOG_ERROR,
+	                "Syntax error on line %d of printers.conf.", linenum);
 	return;
       }
     }
@@ -918,8 +923,8 @@ cupsdLoadAllPrinters(void)
         p->state = IPP_PRINTER_STOPPED;
       else
       {
-	cupsdLogMessage(L_ERROR, "Syntax error on line %d of printers.conf.",
-	           linenum);
+	cupsdLogMessage(CUPSD_LOG_ERROR,
+	                "Syntax error on line %d of printers.conf.", linenum);
 	return;
       }
     }
@@ -950,8 +955,8 @@ cupsdLoadAllPrinters(void)
         p->accepting = 0;
       else
       {
-	cupsdLogMessage(L_ERROR, "Syntax error on line %d of printers.conf.",
-	           linenum);
+	cupsdLogMessage(CUPSD_LOG_ERROR,
+	                "Syntax error on line %d of printers.conf.", linenum);
 	return;
       }
     }
@@ -973,8 +978,8 @@ cupsdLoadAllPrinters(void)
         p->shared = 0;
       else
       {
-	cupsdLogMessage(L_ERROR, "Syntax error on line %d of printers.conf.",
-	           linenum);
+	cupsdLogMessage(CUPSD_LOG_ERROR,
+	                "Syntax error on line %d of printers.conf.", linenum);
 	return;
       }
     }
@@ -991,7 +996,7 @@ cupsdLoadAllPrinters(void)
 	if (*valueptr)
           *valueptr++ = '\0';
 
-	cupsdSetString(&p->cupsd_job_sheets[0], value);
+	cupsdSetString(&p->job_sheets[0], value);
 
 	while (isspace(*valueptr & 255))
           valueptr ++;
@@ -1003,13 +1008,13 @@ cupsdLoadAllPrinters(void)
 	  if (*valueptr)
             *valueptr++ = '\0';
 
-	  cupsdSetString(&p->cupsd_job_sheets[1], value);
+	  cupsdSetString(&p->job_sheets[1], value);
 	}
       }
       else
       {
-	cupsdLogMessage(L_ERROR, "Syntax error on line %d of printers.conf.",
-	           linenum);
+	cupsdLogMessage(CUPSD_LOG_ERROR,
+	                "Syntax error on line %d of printers.conf.", linenum);
 	return;
       }
     }
@@ -1022,8 +1027,8 @@ cupsdLoadAllPrinters(void)
       }
       else
       {
-	cupsdLogMessage(L_ERROR, "Syntax error on line %d of printers.conf.",
-	           linenum);
+	cupsdLogMessage(CUPSD_LOG_ERROR,
+	                "Syntax error on line %d of printers.conf.", linenum);
 	return;
       }
     }
@@ -1036,8 +1041,8 @@ cupsdLoadAllPrinters(void)
       }
       else
       {
-	cupsdLogMessage(L_ERROR, "Syntax error on line %d of printers.conf.",
-	           linenum);
+	cupsdLogMessage(CUPSD_LOG_ERROR,
+	                "Syntax error on line %d of printers.conf.", linenum);
 	return;
       }
     }
@@ -1047,8 +1052,8 @@ cupsdLoadAllPrinters(void)
         p->quota_period = atoi(value);
       else
       {
-	cupsdLogMessage(L_ERROR, "Syntax error on line %d of printers.conf.",
-	           linenum);
+	cupsdLogMessage(CUPSD_LOG_ERROR,
+	                "Syntax error on line %d of printers.conf.", linenum);
 	return;
       }
     }
@@ -1058,8 +1063,8 @@ cupsdLoadAllPrinters(void)
         p->page_limit = atoi(value);
       else
       {
-	cupsdLogMessage(L_ERROR, "Syntax error on line %d of printers.conf.",
-	           linenum);
+	cupsdLogMessage(CUPSD_LOG_ERROR,
+	                "Syntax error on line %d of printers.conf.", linenum);
 	return;
       }
     }
@@ -1069,8 +1074,8 @@ cupsdLoadAllPrinters(void)
         p->k_limit = atoi(value);
       else
       {
-	cupsdLogMessage(L_ERROR, "Syntax error on line %d of printers.conf.",
-	           linenum);
+	cupsdLogMessage(CUPSD_LOG_ERROR,
+	                "Syntax error on line %d of printers.conf.", linenum);
 	return;
       }
     }
@@ -1080,8 +1085,8 @@ cupsdLoadAllPrinters(void)
         cupsdSetString(&p->op_policy, value);
       else
       {
-	cupsdLogMessage(L_ERROR, "Syntax error on line %d of printers.conf.",
-	           linenum);
+	cupsdLogMessage(CUPSD_LOG_ERROR,
+	                "Syntax error on line %d of printers.conf.", linenum);
 	return;
       }
     }
@@ -1091,8 +1096,8 @@ cupsdLoadAllPrinters(void)
         cupsdSetString(&p->error_policy, value);
       else
       {
-	cupsdLogMessage(L_ERROR, "Syntax error on line %d of printers.conf.",
-	           linenum);
+	cupsdLogMessage(CUPSD_LOG_ERROR,
+	                "Syntax error on line %d of printers.conf.", linenum);
 	return;
       }
     }
@@ -1102,8 +1107,9 @@ cupsdLoadAllPrinters(void)
       * Something else we don't understand...
       */
 
-      cupsdLogMessage(L_ERROR, "Unknown configuration directive %s on line %d of printers.conf.",
-	         line, linenum);
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+                      "Unknown configuration directive %s on line %d of printers.conf.",
+	              line, linenum);
     }
   }
 
@@ -1119,13 +1125,13 @@ cupsdLoadAllPrinters(void)
 void
 cupsdSaveAllPrinters(void)
 {
-  int		i;			/* Looping var */
-  cups_file_t	*fp;			/* printers.conf file */
-  char		temp[1024];		/* Temporary string */
-  char		backup[1024];		/* printers.conf.O file */
-  cupsd_printer_t	*printer;		/* Current printer class */
-  time_t	curtime;		/* Current time */
-  struct tm	*curdate;		/* Current date */
+  int			i;		/* Looping var */
+  cups_file_t		*fp;		/* printers.conf file */
+  char			temp[1024];	/* Temporary string */
+  char			backup[1024];	/* printers.conf.O file */
+  cupsd_printer_t	*printer;	/* Current printer class */
+  time_t		curtime;	/* Current time */
+  struct tm		*curdate;	/* Current date */
 
 
  /*
@@ -1136,18 +1142,21 @@ cupsdSaveAllPrinters(void)
   snprintf(backup, sizeof(backup), "%s/printers.conf.O", ServerRoot);
 
   if (rename(temp, backup))
-    cupsdLogMessage(L_ERROR, "Unable to backup printers.conf - %s", strerror(errno));
+    cupsdLogMessage(CUPSD_LOG_ERROR,
+                    "Unable to backup printers.conf - %s", strerror(errno));
 
   if ((fp = cupsFileOpen(temp, "w")) == NULL)
   {
-    cupsdLogMessage(L_ERROR, "Unable to save printers.conf - %s", strerror(errno));
+    cupsdLogMessage(CUPSD_LOG_ERROR,
+                    "Unable to save printers.conf - %s", strerror(errno));
 
     if (rename(backup, temp))
-      cupsdLogMessage(L_ERROR, "Unable to restore printers.conf - %s", strerror(errno));
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+                      "Unable to restore printers.conf - %s", strerror(errno));
     return;
   }
   else
-    cupsdLogMessage(L_INFO, "Saving printers.conf...");
+    cupsdLogMessage(CUPSD_LOG_INFO, "Saving printers.conf...");
 
  /*
   * Restrict access to the file...
@@ -1223,8 +1232,8 @@ cupsdSaveAllPrinters(void)
     else
       cupsFilePuts(fp, "Shared No\n");
 
-    cupsFilePrintf(fp, "JobSheets %s %s\n", printer->cupsd_job_sheets[0],
-            printer->cupsd_job_sheets[1]);
+    cupsFilePrintf(fp, "JobSheets %s %s\n", printer->job_sheets[0],
+            printer->job_sheets[1]);
 
     cupsFilePrintf(fp, "QuotaPeriod %d\n", printer->quota_period);
     cupsFilePrintf(fp, "PageLimit %d\n", printer->page_limit);
@@ -1259,27 +1268,30 @@ cupsdSaveAllPrinters(void)
  */
 
 void
-cupsdSetPrinterAttrs(cupsd_printer_t *p)		/* I - Printer to setup */
+cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
 {
-  char		uri[HTTP_MAX_URI];	/* URI for printer */
-  char		resource[HTTP_MAX_URI];	/* Resource portion of URI */
-  int		i;			/* Looping var */
-  char		filename[1024];		/* Name of PPD file */
-  int		num_media;		/* Number of media options */
-  cupsd_location_t	*auth;			/* Pointer to authentication element */
-  const char	*auth_supported;	/* Authentication supported */
-  cups_ptype_t	cupsd_printer_type;		/* Printer type data */
-  ppd_file_t	*ppd;			/* PPD file data */
-  ppd_option_t	*input_slot,		/* InputSlot options */
-		*media_type,		/* MediaType options */
-		*page_size,		/* PageSize options */
-		*output_bin,		/* OutputBin options */
-		*media_quality;		/* EFMediaQualityMode options */
-  ppd_attr_t	*ppdattr;		/* PPD attribute */
-  ipp_attribute_t *attr;		/* Attribute data */
-  ipp_value_t	*val;			/* Attribute value */
-  int		num_finishings;
-  ipp_finish_t	finishings[5];		/* finishings-supported values */
+  char			uri[HTTP_MAX_URI];
+					/* URI for printer */
+  char			resource[HTTP_MAX_URI];
+					/* Resource portion of URI */
+  int			i;		/* Looping var */
+  char			filename[1024];	/* Name of PPD file */
+  int			num_media;	/* Number of media options */
+  cupsd_location_t	*auth;		/* Pointer to authentication element */
+  const char		*auth_supported;/* Authentication supported */
+  cups_ptype_t		cupsd_printer_type;
+					/* Printer type data */
+  ppd_file_t		*ppd;		/* PPD file data */
+  ppd_option_t		*input_slot,	/* InputSlot options */
+			*media_type,	/* MediaType options */
+			*page_size,	/* PageSize options */
+			*output_bin,	/* OutputBin options */
+			*media_quality;	/* EFMediaQualityMode options */
+  ppd_attr_t		*ppdattr;	/* PPD attribute */
+  ipp_attribute_t	*attr;		/* Attribute data */
+  ipp_value_t		*val;		/* Attribute value */
+  int			num_finishings;	/* Number of finishings */
+  ipp_finish_t		finishings[5];	/* finishings-supported values */
   static const char * const sides[3] =	/* sides-supported values */
 		{
 		  "one",
@@ -1388,9 +1400,9 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)		/* I - Printer to setup */
     if (attr != NULL)
     {
       attr->values[0].string.text = strdup(Classification ?
-	                                   Classification : p->cupsd_job_sheets[0]);
+	                                   Classification : p->job_sheets[0]);
       attr->values[1].string.text = strdup(Classification ?
-	                                   Classification : p->cupsd_job_sheets[1]);
+	                                   Classification : p->job_sheets[1]);
     }
   }
 
@@ -1555,7 +1567,7 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)		/* I - Printer to setup */
 
         if (num_media == 0)
 	{
-	  cupsdLogMessage(L_CRIT, "cupsdSetPrinterAttrs: The PPD file for printer %s "
+	  cupsdLogMessage(CUPSD_LOG_CRIT, "cupsdSetPrinterAttrs: The PPD file for printer %s "
 	                     "contains no media options and is therefore "
 			     "invalid!", p->name);
 	}
@@ -1739,15 +1751,15 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)		/* I - Printer to setup */
 
         pstatus = ppdLastError(&pline);
 
-	cupsdLogMessage(L_ERROR, "PPD file for %s cannot be loaded!", p->name);
+	cupsdLogMessage(CUPSD_LOG_ERROR, "PPD file for %s cannot be loaded!", p->name);
 
 	if (pstatus <= PPD_ALLOC_ERROR)
-	  cupsdLogMessage(L_ERROR, "%s", strerror(errno));
+	  cupsdLogMessage(CUPSD_LOG_ERROR, "%s", strerror(errno));
         else
-	  cupsdLogMessage(L_ERROR, "%s on line %d.", ppdErrorString(pstatus),
+	  cupsdLogMessage(CUPSD_LOG_ERROR, "%s on line %d.", ppdErrorString(pstatus),
 	             pline);
 
-        cupsdLogMessage(L_INFO, "Hint: Run \"cupstestppd %s\" and fix any errors.",
+        cupsdLogMessage(CUPSD_LOG_INFO, "Hint: Run \"cupstestppd %s\" and fix any errors.",
 	           filename);
 
        /*
@@ -1868,8 +1880,9 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)		/* I - Printer to setup */
  */
 
 void
-cupsdSetPrinterReasons(cupsd_printer_t  *p,	/* I - Printer */
-                  const char *s)	/* I - Reasons strings */
+cupsdSetPrinterReasons(
+    cupsd_printer_t  *p,		/* I - Printer */
+    const char *s)			/* I - Reasons strings */
 {
   int		i;			/* Looping var */
   const char	*sptr;			/* Pointer into reasons */
@@ -1969,9 +1982,10 @@ cupsdSetPrinterReasons(cupsd_printer_t  *p,	/* I - Printer */
  */
 
 void
-cupsdSetPrinterState(cupsd_printer_t    *p,	/* I - Printer to change */
-                ipp_pstate_t s,		/* I - New state */
-		int          update)	/* I - Update printers.conf? */
+cupsdSetPrinterState(
+    cupsd_printer_t *p,			/* I - Printer to change */
+    ipp_pstate_t    s,			/* I - New state */
+    int             update)		/* I - Update printers.conf? */
 {
   ipp_pstate_t	old_state;		/* Old printer state */
 
@@ -2028,10 +2042,10 @@ cupsdSetPrinterState(cupsd_printer_t    *p,	/* I - Printer to change */
  */
 
 void
-cupsdStopPrinter(cupsd_printer_t *p,		/* I - Printer to stop */
-            int       update)		/* I - Update printers.conf? */
+cupsdStopPrinter(cupsd_printer_t *p,	/* I - Printer to stop */
+                 int             update)/* I - Update printers.conf? */
 {
-  cupsd_job_t	*job;				/* Active print job */
+  cupsd_job_t	*job;			/* Active print job */
 
 
  /*
@@ -2074,15 +2088,16 @@ cupsdStopPrinter(cupsd_printer_t *p,		/* I - Printer to stop */
  */
 
 const char *				/* O - Printer or class name */
-cupsdValidateDest(const char   *hostname,	/* I - Host name */
-             const char   *resource,	/* I - Resource name */
-             cups_ptype_t *dtype,	/* O - Type (printer or class) */
-	     cupsd_printer_t    **printer)	/* O - Printer pointer */
+cupsdValidateDest(
+    const char      *hostname,		/* I - Host name */
+    const char      *resource,		/* I - Resource name */
+    cups_ptype_t    *dtype,		/* O - Type (printer or class) */
+    cupsd_printer_t **printer)		/* O - Printer pointer */
 {
-  cupsd_printer_t	*p;			/* Current printer */
-  char		localname[1024],	/* Localized hostname */
-		*lptr,			/* Pointer into localized hostname */
-		*sptr;			/* Pointer into server name */
+  cupsd_printer_t	*p;		/* Current printer */
+  char			localname[1024],/* Localized hostname */
+			*lptr,		/* Pointer into localized hostname */
+			*sptr;		/* Pointer into server name */
 
 
   DEBUG_printf(("cupsdValidateDest(\"%s\", \"%s\", %p, %p)\n", hostname, resource,
@@ -2207,13 +2222,13 @@ cupsdValidateDest(const char   *hostname,	/* I - Host name */
 
 /*
  * 'cupsdWritePrintcap()' - Write a pseudo-printcap file for older applications
- *                     that need it...
+ *                          that need it...
  */
 
 void
 cupsdWritePrintcap(void)
 {
-  cups_file_t	*fp;		/* printcap file */
+  cups_file_t		*fp;		/* printcap file */
   cupsd_printer_t	*p;		/* Current printer */
 
 
@@ -2248,7 +2263,7 @@ cupsdWritePrintcap(void)
 
   cupsFilePuts(fp, "# This file was automatically generated by cupsd(8) from the\n");
   cupsFilePrintf(fp, "# %s/printers.conf file.  All changes to this file\n",
-          ServerRoot);
+                 ServerRoot);
   cupsFilePuts(fp, "# will be lost.\n");
 
   if (Printers)
@@ -2421,7 +2436,7 @@ compare_printers(void *first,		/* I - First printer */
  */
 
 static void
-write_irix_config(cupsd_printer_t *p)		/* I - Printer to update */
+write_irix_config(cupsd_printer_t *p)	/* I - Printer to update */
 {
   char		filename[1024];		/* Interface script filename */
   cups_file_t	*fp;			/* Interface script file */
@@ -2547,7 +2562,7 @@ write_irix_config(cupsd_printer_t *p)		/* I - Printer to update */
  */
 
 static void
-write_irix_state(cupsd_printer_t *p)		/* I - Printer to update */
+write_irix_state(cupsd_printer_t *p)	/* I - Printer to update */
 {
   char		filename[1024];		/* Interface script filename */
   cups_file_t	*fp;			/* Interface script file */

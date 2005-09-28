@@ -59,7 +59,7 @@ typedef struct
 
 typedef struct
 {
-  cupsd_authmask_t		from;		/* Source address/name mask */
+  cupsd_authmask_t	from;		/* Source address/name mask */
   http_addr_t		to;		/* Destination address */
 } cupsd_dirsvc_relay_t;
 
@@ -108,13 +108,13 @@ VAR char		*BrowseLocalOptions
 					/* Options to add to remote printer URIs */
 VAR cupsd_dirsvc_addr_t	*Browsers	VALUE(NULL);
 					/* Broadcast addresses */
-VAR cupsd_location_t		*BrowseACL	VALUE(NULL);
+VAR cupsd_location_t	*BrowseACL	VALUE(NULL);
 					/* Browser access control list */
-VAR cupsd_printer_t		*BrowseNext	VALUE(NULL);
+VAR cupsd_printer_t	*BrowseNext	VALUE(NULL);
 					/* Next class/printer to broadcast */
 VAR int			NumRelays	VALUE(0);
 					/* Number of broadcast relays */
-VAR cupsd_dirsvc_relay_t	*Relays		VALUE(NULL);
+VAR cupsd_dirsvc_relay_t *Relays	VALUE(NULL);
 					/* Broadcast relays */
 VAR int			NumPolled	VALUE(0);
 					/* Number of polled servers */
@@ -138,8 +138,8 @@ VAR time_t		BrowseSLPRefresh VALUE(0);
  */
 
 extern void	cupsdProcessBrowseData(const char *uri, cups_ptype_t type,
-		                  ipp_pstate_t state, const char *location,
-				  const char *info, const char *make_model);
+		                       ipp_pstate_t state, const char *location,
+				       const char *info, const char *make_model);
 extern void	cupsdSendBrowseDelete(cupsd_printer_t *p);
 extern void	cupsdSendBrowseList(void);
 extern void	cupsdSendCUPSBrowse(cupsd_printer_t *p);

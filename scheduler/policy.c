@@ -80,19 +80,19 @@ cupsdAddPolicy(const char *policy)	/* I - Name of policy */
  * 'cupsdAddPolicyOp()' - Add an operation to a policy.
  */
 
-cupsd_location_t *				/* O - New policy operation */
-cupsdAddPolicyOp(cupsd_policy_t *p,	/* I - Policy */
-                 cupsd_location_t     *po,	/* I - Policy operation to copy */
-                 ipp_op_t       op)	/* I - IPP operation code */
+cupsd_location_t *			/* O - New policy operation */
+cupsdAddPolicyOp(cupsd_policy_t   *p,	/* I - Policy */
+                 cupsd_location_t *po,	/* I - Policy operation to copy */
+                 ipp_op_t         op)	/* I - IPP operation code */
 {
-  int		i;			/* Looping var */
-  cupsd_location_t	*temp,			/* New policy operation */
-		**tempa;		/* New policy operation array */
-  char		name[1024];		/* Interface name */
+  int			i;		/* Looping var */
+  cupsd_location_t	*temp,		/* New policy operation */
+			**tempa;	/* New policy operation array */
+  char			name[1024];	/* Interface name */
 
 
-  cupsdLogMessage(L_DEBUG2, "cupsdAddPolicyOp(p=%p, po=%p, op=%x(%s))",
-             p, po, op, ippOpString(op));
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdAddPolicyOp(p=%p, po=%p, op=%x(%s))",
+                  p, po, op, ippOpString(op));
 
   if (p == NULL)
     return (NULL);
@@ -181,10 +181,10 @@ cupsdAddPolicyOp(cupsd_policy_t *p,	/* I - Policy */
 
 int					/* I - 1 if OK, 0 otherwise */
 cupsdCheckPolicy(cupsd_policy_t *p,	/* I - Policy */
-                 cupsd_client_t       *con,	/* I - Client connection */
+                 cupsd_client_t *con,	/* I - Client connection */
 	         const char     *owner)	/* I - Owner of object */
 {
-  cupsd_location_t	*po;			/* Current policy operation */
+  cupsd_location_t	*po;		/* Current policy operation */
 
 
  /*
@@ -193,7 +193,7 @@ cupsdCheckPolicy(cupsd_policy_t *p,	/* I - Policy */
 
   if (!p || !con)
   {
-    cupsdLogMessage(L_CRIT, "cupsdCheckPolicy: p=%p, con=%p!", p, con);
+    cupsdLogMessage(CUPSD_LOG_CRIT, "cupsdCheckPolicy: p=%p, con=%p!", p, con);
 
     return (0);
   }
@@ -204,7 +204,7 @@ cupsdCheckPolicy(cupsd_policy_t *p,	/* I - Policy */
 
   if ((po = cupsdFindPolicyOp(p, con->request->request.op.operation_id)) == NULL)
   {
-    cupsdLogMessage(L_DEBUG2, "cupsdCheckPolicy: No matching operation, returning 0!");
+    cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdCheckPolicy: No matching operation, returning 0!");
     return (0);
   }
 
@@ -227,7 +227,7 @@ cupsdDeleteAllPolicies(void)
 {
   int			i, j;		/* Looping vars */
   cupsd_policy_t	**p;		/* Current policy */
-  cupsd_location_t		**po;		/* Current policy op */
+  cupsd_location_t	**po;		/* Current policy op */
 
 
   if (NumPolicies == 0)
@@ -288,16 +288,16 @@ cupsdFindPolicy(const char *policy)	/* I - Name of policy */
  * 'cupsdFindPolicyOp()' - Find a policy operation.
  */
 
-cupsd_location_t *				/* O - Policy operation */
+cupsd_location_t *			/* O - Policy operation */
 cupsdFindPolicyOp(cupsd_policy_t *p,	/* I - Policy */
                   ipp_op_t       op)	/* I - IPP operation */
 {
-  int		i;			/* Looping var */
-  cupsd_location_t	**po;			/* Current policy operation */
+  int			i;		/* Looping var */
+  cupsd_location_t	**po;		/* Current policy operation */
 
 
-  cupsdLogMessage(L_DEBUG2, "cupsdFindPolicyOp(p=%p, op=%x(%s))\n",
-             p, op, ippOpString(op));
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdFindPolicyOp(p=%p, op=%x(%s))\n",
+                  p, op, ippOpString(op));
 
  /*
   * Range check...
@@ -313,18 +313,20 @@ cupsdFindPolicyOp(cupsd_policy_t *p,	/* I - Policy */
   for (i = p->num_ops, po = p->ops; i > 0; i --, po ++)
     if ((*po)->op == op)
     {
-      cupsdLogMessage(L_DEBUG2, "cupsdFindPolicyOp: Found exact match...");
+      cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                      "cupsdFindPolicyOp: Found exact match...");
       return (*po);
     }
 
   for (i = p->num_ops, po = p->ops; i > 0; i --, po ++)
     if ((*po)->op == IPP_ANY_OPERATION)
     {
-      cupsdLogMessage(L_DEBUG2, "cupsdFindPolicyOp: Found wildcard match...");
+      cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                      "cupsdFindPolicyOp: Found wildcard match...");
       return (*po);
     }
 
-  cupsdLogMessage(L_DEBUG2, "cupsdFindPolicyOp: No match found!");
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdFindPolicyOp: No match found!");
 
   return (NULL);
 }

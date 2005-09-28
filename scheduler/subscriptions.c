@@ -59,8 +59,8 @@ static void	cupsd_delete_event(cupsd_event_t *event);
 void
 cupsdAddEvent(
     cupsd_eventmask_t event,		/* I - Event */
-    cupsd_printer_t         *dest,		/* I - Printer associated with event */
-    cupsd_job_t             *job,		/* I - Job associated with event */
+    cupsd_printer_t   *dest,		/* I - Printer associated with event */
+    cupsd_job_t       *job,		/* I - Job associated with event */
     const char        *text,		/* I - Notification text */
     ...)				/* I - Additional arguments as needed */
 {
@@ -77,8 +77,9 @@ cupsdAddEvent(
 
   if (MaxEvents <= 0)
   {
-    cupsdLogMessage(L_WARN, "cupsdAddEvent: Discarding %s event since MaxEvents is %d!",
-               cupsdEventName(event), MaxEvents);
+    cupsdLogMessage(CUPSD_LOG_WARN,
+                    "cupsdAddEvent: Discarding %s event since MaxEvents is %d!",
+                    cupsdEventName(event), MaxEvents);
     return;
   }
 
@@ -93,8 +94,9 @@ cupsdAddEvent(
 
     if (!Events)
     {
-      cupsdLogMessage(L_CRIT, "Unable to allocate memory for event cache - %s",
-        	 strerror(errno));
+      cupsdLogMessage(CUPSD_LOG_CRIT,
+                      "Unable to allocate memory for event cache - %s",
+        	      strerror(errno));
       return;
     }
   }
@@ -128,8 +130,9 @@ cupsdAddEvent(
 
 	if ((temp = (cupsd_event_t *)calloc(1, sizeof(cupsd_event_t))) == NULL)
 	{
-	  cupsdLogMessage(L_CRIT, "Unable to allocate memory for event - %s",
-        	     strerror(errno));
+	  cupsdLogMessage(CUPSD_LOG_CRIT,
+	                  "Unable to allocate memory for event - %s",
+        	          strerror(errno));
 	  return;
 	}
 
@@ -296,8 +299,8 @@ cupsdAddEvent(
   if (temp)
     cupsdSaveAllSubscriptions();
   else
-    cupsdLogMessage(L_DEBUG, "Discarding unused %s event...",
-               cupsdEventName(event));
+    cupsdLogMessage(CUPSD_LOG_DEBUG, "Discarding unused %s event...",
+                    cupsdEventName(event));
 }
 
 
@@ -315,9 +318,10 @@ cupsdAddSubscription(
   cupsd_subscription_t	*temp;		/* New subscription object */
 
 
-  cupsdLogMessage(L_DEBUG, "cupsdAddSubscription(mask=%x(%s), dest=%p(%s), job=%p(%d), uri=\"%s\")",
-             mask, cupsdEventName(mask), dest, dest ? dest->name : "",
-	     job, job ? job->id : 0, uri);
+  cupsdLogMessage(CUPSD_LOG_DEBUG,
+                  "cupsdAddSubscription(mask=%x(%s), dest=%p(%s), job=%p(%d), uri=\"%s\")",
+                  mask, cupsdEventName(mask), dest, dest ? dest->name : "",
+	          job, job ? job->id : 0, uri);
 
   if (!Subscriptions)
   {
@@ -330,8 +334,9 @@ cupsdAddSubscription(
 
     if (!Subscriptions)
     {
-      cupsdLogMessage(L_CRIT, "Unable to allocate memory for subscriptions - %s",
-        	 strerror(errno));
+      cupsdLogMessage(CUPSD_LOG_CRIT,
+                      "Unable to allocate memory for subscriptions - %s",
+        	      strerror(errno));
       return (NULL);
     }
   }
@@ -349,8 +354,9 @@ cupsdAddSubscription(
 
   if ((temp = calloc(1, sizeof(cupsd_subscription_t))) == NULL)
   {
-    cupsdLogMessage(L_CRIT, "Unable to allocate memory for subscription object - %s",
-               strerror(errno));
+    cupsdLogMessage(CUPSD_LOG_CRIT,
+                    "Unable to allocate memory for subscription object - %s",
+                    strerror(errno));
     return (NULL);
   }
 
@@ -617,8 +623,8 @@ cupsdEventValue(const char *name)	/* I - Name of event */
 
 void
 cupsdExpireSubscriptions(
-    cupsd_printer_t *dest,			/* I - Printer, if any */
-    cupsd_job_t     *job)			/* I - Job, if any */
+    cupsd_printer_t *dest,		/* I - Printer, if any */
+    cupsd_job_t     *job)		/* I - Job, if any */
 {
   int			i;		/* Looping var */
   cupsd_subscription_t	*sub;		/* Current subscription */
@@ -636,7 +642,7 @@ cupsdExpireSubscriptions(
         (dest && sub->dest == dest) ||
 	(job && sub->job == job))
     {
-      cupsdLogMessage(L_INFO, "Subscription %d has expired...", sub->id);
+      cupsdLogMessage(CUPSD_LOG_INFO, "Subscription %d has expired...", sub->id);
 
       cupsdDeleteSubscription(sub, 0);
 
@@ -721,8 +727,9 @@ cupsdLoadAllSubscriptions(void)
   snprintf(line, sizeof(line), "%s/subscriptions.conf", ServerRoot);
   if ((fp = cupsFileOpen(line, "r")) == NULL)
   {
-    cupsdLogMessage(L_ERROR, "LoadAllSubscriptions: Unable to open %s - %s", line,
-               strerror(errno));
+    cupsdLogMessage(CUPSD_LOG_ERROR,
+                    "LoadAllSubscriptions: Unable to open %s - %s", line,
+                    strerror(errno));
     return;
   }
 
@@ -749,8 +756,9 @@ cupsdLoadAllSubscriptions(void)
       }
       else
       {
-        cupsdLogMessage(L_ERROR, "Syntax error on line %d of subscriptions.conf.",
-	           linenum);
+        cupsdLogMessage(CUPSD_LOG_ERROR,
+	                "Syntax error on line %d of subscriptions.conf.",
+	                linenum);
         return;
       }
     }
@@ -758,8 +766,9 @@ cupsdLoadAllSubscriptions(void)
     {
       if (!sub)
       {
-        cupsdLogMessage(L_ERROR, "Syntax error on line %d of subscriptions.conf.",
-	           linenum);
+        cupsdLogMessage(CUPSD_LOG_ERROR,
+	                "Syntax error on line %d of subscriptions.conf.",
+	                linenum);
         return;
       }
 
@@ -771,8 +780,9 @@ cupsdLoadAllSubscriptions(void)
     }
     else if (!sub)
     {
-      cupsdLogMessage(L_ERROR, "Syntax error on line %d of subscriptions.conf.",
-	         linenum);
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+                      "Syntax error on line %d of subscriptions.conf.",
+	              linenum);
       return;
     }
     else if (!strcasecmp(name, "Events"))
@@ -784,8 +794,9 @@ cupsdLoadAllSubscriptions(void)
 
       if (!value)
       {
-	cupsdLogMessage(L_ERROR, "Syntax error on line %d of subscriptions.conf.",
-	           linenum);
+	cupsdLogMessage(CUPSD_LOG_ERROR,
+	                "Syntax error on line %d of subscriptions.conf.",
+	                linenum);
 	return;
       }
 
@@ -806,8 +817,9 @@ cupsdLoadAllSubscriptions(void)
 
         if ((sub->mask |= cupsdEventValue(value)) == CUPSD_EVENT_NONE)
 	{
-	  cupsdLogMessage(L_ERROR, "Unknown event name \'%s\' on line %d of subscriptions.conf.",
-	             value, linenum);
+	  cupsdLogMessage(CUPSD_LOG_ERROR,
+	                  "Unknown event name \'%s\' on line %d of subscriptions.conf.",
+	                  value, linenum);
 	  return;
 	}
 
@@ -824,8 +836,9 @@ cupsdLoadAllSubscriptions(void)
 	cupsdSetString(&sub->owner, value);
       else
       {
-	cupsdLogMessage(L_ERROR, "Syntax error on line %d of subscriptions.conf.",
-	           linenum);
+	cupsdLogMessage(CUPSD_LOG_ERROR,
+	                "Syntax error on line %d of subscriptions.conf.",
+	                linenum);
 	return;
       }
     }
@@ -839,8 +852,9 @@ cupsdLoadAllSubscriptions(void)
 	cupsdSetString(&sub->recipient, value);
       else
       {
-	cupsdLogMessage(L_ERROR, "Syntax error on line %d of subscriptions.conf.",
-	           linenum);
+	cupsdLogMessage(CUPSD_LOG_ERROR,
+	                "Syntax error on line %d of subscriptions.conf.",
+	                linenum);
 	return;
       }
     }
@@ -854,15 +868,17 @@ cupsdLoadAllSubscriptions(void)
       {
         if ((sub->job = cupsdFindJob(atoi(value))) == NULL)
 	{
-	  cupsdLogMessage(L_ERROR, "Job %s not found on line %d of subscriptions.conf.",
-	             value, linenum);
+	  cupsdLogMessage(CUPSD_LOG_ERROR,
+	                  "Job %s not found on line %d of subscriptions.conf.",
+	                  value, linenum);
 	  delete_sub = 1;
 	}
       }
       else
       {
-	cupsdLogMessage(L_ERROR, "Syntax error on line %d of subscriptions.conf.",
-	           linenum);
+	cupsdLogMessage(CUPSD_LOG_ERROR,
+	                "Syntax error on line %d of subscriptions.conf.",
+	                linenum);
 	return;
       }
     }
@@ -876,15 +892,17 @@ cupsdLoadAllSubscriptions(void)
       {
         if ((sub->dest = cupsdFindDest(value)) == NULL)
 	{
-	  cupsdLogMessage(L_ERROR, "Printer \'%s\' not found on line %d of subscriptions.conf.",
-	             value, linenum);
+	  cupsdLogMessage(CUPSD_LOG_ERROR,
+	                  "Printer \'%s\' not found on line %d of subscriptions.conf.",
+	                  value, linenum);
 	  delete_sub = 1;
 	}
       }
       else
       {
-	cupsdLogMessage(L_ERROR, "Syntax error on line %d of subscriptions.conf.",
-	           linenum);
+	cupsdLogMessage(CUPSD_LOG_ERROR,
+	                "Syntax error on line %d of subscriptions.conf.",
+	                linenum);
 	return;
       }
     }
@@ -935,16 +953,18 @@ cupsdLoadAllSubscriptions(void)
 
 	if (*valueptr)
 	{
-	  cupsdLogMessage(L_ERROR, "Bad UserData \'%s\' on line %d of subscriptions.conf.",
-	             value, linenum);
+	  cupsdLogMessage(CUPSD_LOG_ERROR,
+	                  "Bad UserData \'%s\' on line %d of subscriptions.conf.",
+	                  value, linenum);
 	}
 	else
 	  sub->user_data_len = i;
       }
       else
       {
-	cupsdLogMessage(L_ERROR, "Syntax error on line %d of subscriptions.conf.",
-	           linenum);
+	cupsdLogMessage(CUPSD_LOG_ERROR,
+	                "Syntax error on line %d of subscriptions.conf.",
+	                linenum);
 	return;
       }
     }
@@ -958,8 +978,9 @@ cupsdLoadAllSubscriptions(void)
         sub->lease = atoi(value);
       else
       {
-	cupsdLogMessage(L_ERROR, "Syntax error on line %d of subscriptions.conf.",
-	           linenum);
+	cupsdLogMessage(CUPSD_LOG_ERROR,
+	                "Syntax error on line %d of subscriptions.conf.",
+	                linenum);
 	return;
       }
     }
@@ -973,8 +994,9 @@ cupsdLoadAllSubscriptions(void)
         sub->interval = atoi(value);
       else
       {
-	cupsdLogMessage(L_ERROR, "Syntax error on line %d of subscriptions.conf.",
-	           linenum);
+	cupsdLogMessage(CUPSD_LOG_ERROR,
+	                "Syntax error on line %d of subscriptions.conf.",
+	                linenum);
 	return;
       }
     }
@@ -988,8 +1010,9 @@ cupsdLoadAllSubscriptions(void)
         sub->expire = atoi(value);
       else
       {
-	cupsdLogMessage(L_ERROR, "Syntax error on line %d of subscriptions.conf.",
-	           linenum);
+	cupsdLogMessage(CUPSD_LOG_ERROR,
+	                "Syntax error on line %d of subscriptions.conf.",
+	                linenum);
 	return;
       }
     }
@@ -1003,8 +1026,9 @@ cupsdLoadAllSubscriptions(void)
         sub->next_event_id = sub->first_event_id = atoi(value);
       else
       {
-	cupsdLogMessage(L_ERROR, "Syntax error on line %d of subscriptions.conf.",
-	           linenum);
+	cupsdLogMessage(CUPSD_LOG_ERROR,
+	                "Syntax error on line %d of subscriptions.conf.",
+	                linenum);
 	return;
       }
     }
@@ -1014,8 +1038,9 @@ cupsdLoadAllSubscriptions(void)
       * Something else we don't understand...
       */
 
-      cupsdLogMessage(L_ERROR, "Unknown configuration directive %s on line %d of subscriptions.conf.",
-	         name, linenum);
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+                      "Unknown configuration directive %s on line %d of subscriptions.conf.",
+	              name, linenum);
     }
   }
 
@@ -1050,21 +1075,22 @@ cupsdSaveAllSubscriptions(void)
   snprintf(backup, sizeof(backup), "%s/subscriptions.conf.O", ServerRoot);
 
   if (rename(temp, backup))
-    cupsdLogMessage(L_ERROR, "Unable to backup subscriptions.conf - %s",
-               strerror(errno));
+    cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to backup subscriptions.conf - %s",
+                    strerror(errno));
 
   if ((fp = cupsFileOpen(temp, "w")) == NULL)
   {
-    cupsdLogMessage(L_ERROR, "Unable to save subscriptions.conf - %s",
-               strerror(errno));
+    cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to save subscriptions.conf - %s",
+                    strerror(errno));
 
     if (rename(backup, temp))
-      cupsdLogMessage(L_ERROR, "Unable to restore subscriptions.conf - %s",
-                 strerror(errno));
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+                      "Unable to restore subscriptions.conf - %s",
+                      strerror(errno));
     return;
   }
   else
-    cupsdLogMessage(L_INFO, "Saving subscriptions.conf...");
+    cupsdLogMessage(CUPSD_LOG_INFO, "Saving subscriptions.conf...");
 
  /*
   * Restrict access to the file...
@@ -1183,8 +1209,9 @@ cupsdSendNotification(
     cupsd_subscription_t *sub,		/* I - Subscription object */
     cupsd_event_t        *event)	/* I - Event to send */
 {
-  cupsdLogMessage(L_DEBUG, "cupsdSendNotification(sub=%p(%d), event=%p(%s))\n",
-             sub, sub->id, event, cupsdEventName(event->event));
+  cupsdLogMessage(CUPSD_LOG_DEBUG,
+                  "cupsdSendNotification(sub=%p(%d), event=%p(%s))\n",
+                  sub, sub->id, event, cupsdEventName(event->event));
 
  /*
   * Allocate the events array as needed...
@@ -1196,8 +1223,9 @@ cupsdSendNotification(
 
     if (!sub->events)
     {
-      cupsdLogMessage(L_CRIT, "Unable to allocate memory for subscription #%d!",
-                 sub->id);
+      cupsdLogMessage(CUPSD_LOG_CRIT,
+                      "Unable to allocate memory for subscription #%d!",
+                      sub->id);
       return;
     }
   }
@@ -1265,8 +1293,9 @@ cupsdStopAllNotifiers(void)
   * Close the status pipes...
   */
 
-  cupsdLogMessage(L_DEBUG2, "cupsdStopAllNotifiers: Removing fd %d from InputSet...",
-	     NotifierPipes[0]);
+  cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                  "cupsdStopAllNotifiers: Removing fd %d from InputSet...",
+	          NotifierPipes[0]);
   FD_CLR(NotifierPipes[0], InputSet);
 
   cupsdStatBufDelete(NotifierStatusBuffer);
@@ -1303,8 +1332,9 @@ cupsdUpdateNotiferStatus(void)
     * Fatal error on pipe - should never happen!
     */
 
-    cupsdLogMessage(L_CRIT, "cupsdUpdateNotifierStatus: error reading from notifier error pipe - %s",
-               strerror(errno));
+    cupsdLogMessage(CUPSD_LOG_CRIT,
+                    "cupsdUpdateNotifierStatus: error reading from notifier error pipe - %s",
+                    strerror(errno));
   }
 }
 

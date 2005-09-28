@@ -33,12 +33,12 @@
  *   cupsdStopPolling()       - Stop polling servers as needed.
  *   cupsdUpdateCUPSBrowse()  - Update the browse lists using the CUPS protocol.
  *   cupsdUpdatePolling()     - Read status messages from the poll daemons.
- *   RegReportCallback() - Empty SLPRegReport.
+ *   slp_reg_callback()      - Empty SLPRegReport.
  *   cupsdSendSLPBrowse()     - Register the specified printer with SLP.
- *   SLPDeregPrinter()   - SLPDereg() the specified printer
- *   GetSlpAttrVal()     - Get an attribute from an SLP registration.
- *   AttrCallback()      - SLP attribute callback 
- *   SrvUrlCallback()    - SLP service url callback
+ *   slp_dereg_printer()        - SLPDereg() the specified printer
+ *   slp_get_attr()          - Get an attribute from an SLP registration.
+ *   slp_attr_callback()           - SLP attribute callback 
+ *   slp_url_callback()         - SLP service url callback
  *   cupsdUpdateSLPBrowse()   - Get browsing information via SLP.
  */
 
@@ -51,7 +51,7 @@
 
 
 #ifdef HAVE_LIBSLP
-void	SLPDeregPrinter(cupsd_printer_t *p);
+static void	slp_dereg_printer(cupsd_printer_t *p);
 #endif /* HAVE_LIBSLP */
 
 
@@ -60,12 +60,13 @@ void	SLPDeregPrinter(cupsd_printer_t *p);
  */
 
 void
-cupsdProcessBrowseData(const char   *uri,	/* I - URI of printer/class */
-                  cups_ptype_t type,	/* I - Printer type */
-		  ipp_pstate_t state,	/* I - Printer state */
-                  const char   *location,/* I - Printer location */
-		  const char   *info,	/* I - Printer information */
-                  const char   *make_model) /* I - Printer make and model */
+cupsdProcessBrowseData(
+    const char   *uri,			/* I - URI of printer/class */
+    cups_ptype_t type,			/* I - Printer type */
+    ipp_pstate_t state,			/* I - Printer state */
+    const char   *location,		/* I - Printer location */
+    const char   *info,			/* I - Printer information */
+    const char   *make_model)		/* I - Printer make and model */
 {
   int		i;			/* Looping var */
   int		update;			/* Update printer attributes? */
@@ -80,7 +81,7 @@ cupsdProcessBrowseData(const char   *uri,	/* I - URI of printer/class */
 		*sptr;			/* Pointer into ServerName */
   char		local_make_model[IPP_MAX_NAME];
 					/* Local make and model */
-  cupsd_printer_t	*p,			/* Printer information */
+  cupsd_printer_t *p,			/* Printer information */
 		*pclass,		/* Printer class */
 		*first;			/* First printer in class */
   int		offset,			/* Offset of name */
@@ -101,8 +102,9 @@ cupsdProcessBrowseData(const char   *uri,	/* I - URI of printer/class */
       (strncmp(resource, "/printers/", 10) &&
        strncmp(resource, "/classes/", 9)))
   {
-    cupsdLogMessage(L_ERROR, "cupsdProcessBrowseData: Bad printer URI in browse data: %s",
-               uri);
+    cupsdLogMessage(CUPSD_LOG_ERROR,
+                    "cupsdProcessBrowseData: Bad printer URI in browse data: %s",
+                    uri);
     return;
   }
 
@@ -110,8 +112,9 @@ cupsdProcessBrowseData(const char   *uri,	/* I - URI of printer/class */
       (!strncmp(resource, "/printers/", 10) && strchr(resource + 10, '/')) ||
       (!strncmp(resource, "/classes/", 9) && strchr(resource + 9, '/')))
   {
-    cupsdLogMessage(L_ERROR, "cupsdProcessBrowseData: Bad resource in browse data: %s",
-               resource);
+    cupsdLogMessage(CUPSD_LOG_ERROR,
+                    "cupsdProcessBrowseData: Bad resource in browse data: %s",
+                    resource);
     return;
   }
 
@@ -213,8 +216,9 @@ cupsdProcessBrowseData(const char   *uri,	/* I - URI of printer/class */
 
 	  if (p->type & CUPS_PRINTER_REMOTE)
 	  {
-	    cupsdLogMessage(L_INFO, "Renamed remote class \"%s\" to \"%s@%s\"...",
-	               p->name, p->name, p->hostname);
+	    cupsdLogMessage(CUPSD_LOG_INFO,
+	                    "Renamed remote class \"%s\" to \"%s@%s\"...",
+	                    p->name, p->name, p->hostname);
 	    cupsdAddEvent(CUPSD_EVENT_PRINTER_DELETED, p, NULL,
                 	  "Class \'%s\' deleted by directory services.",
 			  p->name);
@@ -274,7 +278,7 @@ cupsdProcessBrowseData(const char   *uri,	/* I - URI of printer/class */
 
       p = cupsdAddClass(name);
 
-      cupsdLogMessage(L_INFO, "Added remote class \"%s\"...", name);
+      cupsdLogMessage(CUPSD_LOG_INFO, "Added remote class \"%s\"...", name);
 
       cupsdAddEvent(CUPSD_EVENT_PRINTER_ADDED, p, NULL,
                     "Class \'%s\' added by directory services.", name);
@@ -317,8 +321,9 @@ cupsdProcessBrowseData(const char   *uri,	/* I - URI of printer/class */
 
 	  if (p->type & CUPS_PRINTER_REMOTE)
 	  {
-	    cupsdLogMessage(L_INFO, "Renamed remote printer \"%s\" to \"%s@%s\"...",
-	               p->name, p->name, p->hostname);
+	    cupsdLogMessage(CUPSD_LOG_INFO,
+	                    "Renamed remote printer \"%s\" to \"%s@%s\"...",
+	                    p->name, p->name, p->hostname);
 	    cupsdAddEvent(CUPSD_EVENT_PRINTER_DELETED, p, NULL,
                 	  "Printer \'%s\' deleted by directory services.",
 			  p->name);
@@ -381,7 +386,7 @@ cupsdProcessBrowseData(const char   *uri,	/* I - URI of printer/class */
       cupsdAddEvent(CUPSD_EVENT_PRINTER_ADDED, p, NULL,
                     "Printer \'%s\' added by directory services.", name);
 
-      cupsdLogMessage(L_INFO, "Added remote printer \"%s\"...", name);
+      cupsdLogMessage(CUPSD_LOG_INFO, "Added remote printer \"%s\"...", name);
 
      /*
       * Force the URI to point to the real server...
@@ -496,8 +501,8 @@ cupsdProcessBrowseData(const char   *uri,	/* I - URI of printer/class */
     * Loop through all available printers and create classes as needed...
     */
 
-    for (p = (cupsd_printer_t *)cupsArrayFirst(Printers), len = 0, offset = 0, update = 0,
-             pclass = NULL, first = NULL;
+    for (p = (cupsd_printer_t *)cupsArrayFirst(Printers), len = 0, offset = 0,
+             update = 0, pclass = NULL, first = NULL;
          p != NULL;
 	 p = (cupsd_printer_t *)cupsArrayNext(Printers))
     {
@@ -550,7 +555,8 @@ cupsdProcessBrowseData(const char   *uri,	/* I - URI of printer/class */
 
           update = 1;
 
-          cupsdLogMessage(L_INFO, "Added implicit class \"%s\"...", name);
+          cupsdLogMessage(CUPSD_LOG_INFO, "Added implicit class \"%s\"...",
+	                  name);
 	}
 
         if (first != NULL)
@@ -642,7 +648,8 @@ cupsdProcessBrowseData(const char   *uri,	/* I - URI of printer/class */
  */
 
 void
-cupsdSendBrowseDelete(cupsd_printer_t *p)		/* I - Printer to delete */
+cupsdSendBrowseDelete(
+    cupsd_printer_t *p)			/* I - Printer to delete */
 {
  /*
   * Only announce if browsing is enabled...
@@ -665,7 +672,7 @@ cupsdSendBrowseDelete(cupsd_printer_t *p)		/* I - Printer to delete */
     cupsdSendCUPSBrowse(p);
 #ifdef HAVE_LIBSLP
   if (BrowseLocalProtocols & BROWSE_SLP)
-    SLPDeregPrinter(p);
+    slp_dereg_printer(p);
 #endif /* HAVE_LIBSLP */
 }
 
@@ -678,7 +685,7 @@ void
 cupsdSendBrowseList(void)
 {
   int			count;		/* Number of dests to update */
-  cupsd_printer_t		*p;		/* Current printer */
+  cupsd_printer_t	*p;		/* Current printer */
   time_t		ut,		/* Minimum update time */
 			to;		/* Timeout time */
 
@@ -785,8 +792,9 @@ cupsdSendBrowseList(void)
 		      (p->type & CUPS_PRINTER_CLASS) ? "Class" : "Printer",
 		      p->name);
 
-        cupsdLogMessage(L_INFO, "Remote destination \"%s\" has timed out; deleting it...",
-	           p->name);
+        cupsdLogMessage(CUPSD_LOG_INFO,
+	                "Remote destination \"%s\" has timed out; deleting it...",
+	                p->name);
 
         cupsdDeletePrinter(p, 1);
       }
@@ -800,11 +808,11 @@ cupsdSendBrowseList(void)
  */
 
 void
-cupsdSendCUPSBrowse(cupsd_printer_t *p)		/* I - Printer to send */
+cupsdSendCUPSBrowse(cupsd_printer_t *p)	/* I - Printer to send */
 {
   int			i;		/* Looping var */
   cups_ptype_t		type;		/* Printer type */
-  cupsd_dirsvc_addr_t		*b;		/* Browse address */
+  cupsd_dirsvc_addr_t	*b;		/* Browse address */
   int			bytes;		/* Length of packet */
   char			packet[1453];	/* Browse data packet */
   char			options[1024];	/* Browse local options */
@@ -871,8 +879,9 @@ cupsdSendCUPSBrowse(cupsd_printer_t *p)		/* I - Printer to send */
 
 	  bytes = strlen(packet);
 
-	  cupsdLogMessage(L_DEBUG2, "cupsdSendBrowseList: (%d bytes to \"%s\") %s", bytes,
-        	     iface->name, packet);
+	  cupsdLogMessage(CUPSD_LOG_DEBUG2,
+	                  "cupsdSendBrowseList: (%d bytes to \"%s\") %s", bytes,
+        	          iface->name, packet);
 
           if (iface->broadcast.addr.sa_family == AF_INET)
 	  {
@@ -894,7 +903,7 @@ cupsdSendCUPSBrowse(cupsd_printer_t *p)		/* I - Printer to send */
 #endif /* AF_INET6 */
         }
       }
-      else if ((iface = NetIFFind(b->iface)) != NULL)
+      else if ((iface = cupsdNetIFFind(b->iface)) != NULL)
       {
        /*
         * Send to the named interface...
@@ -912,8 +921,9 @@ cupsdSendCUPSBrowse(cupsd_printer_t *p)		/* I - Printer to send */
 
 	bytes = strlen(packet);
 
-	cupsdLogMessage(L_DEBUG2, "cupsdSendBrowseList: (%d bytes to \"%s\") %s", bytes,
-        	   iface->name, packet);
+	cupsdLogMessage(CUPSD_LOG_DEBUG2,
+	                "cupsdSendBrowseList: (%d bytes to \"%s\") %s", bytes,
+        	        iface->name, packet);
 
         if (iface->broadcast.addr.sa_family == AF_INET)
 	{
@@ -949,7 +959,8 @@ cupsdSendCUPSBrowse(cupsd_printer_t *p)		/* I - Printer to send */
 	       p->make_model ? p->make_model : "Unknown");
 
       bytes = strlen(packet);
-      cupsdLogMessage(L_DEBUG2, "cupsdSendBrowseList: (%d bytes) %s", bytes, packet);
+      cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                      "cupsdSendBrowseList: (%d bytes) %s", bytes, packet);
 
 #ifdef AF_INET6
       if (sendto(BrowseSocket, packet, bytes, 0,
@@ -968,8 +979,9 @@ cupsdSendCUPSBrowse(cupsd_printer_t *p)		/* I - Printer to send */
 	* list...
 	*/
 
-	cupsdLogMessage(L_ERROR, "cupsdSendBrowseList: sendto failed for browser %d - %s.",
-	           b - Browsers + 1, strerror(errno));
+	cupsdLogMessage(CUPSD_LOG_ERROR,
+	                "cupsdSendBrowseList: sendto failed for browser %d - %s.",
+	                b - Browsers + 1, strerror(errno));
 
         if (i > 1)
 	  memcpy(b, b + 1, (i - 1) * sizeof(cupsd_dirsvc_addr_t));
@@ -988,8 +1000,8 @@ cupsdSendCUPSBrowse(cupsd_printer_t *p)		/* I - Printer to send */
 void
 cupsdStartBrowsing(void)
 {
-  int			val;	/* Socket option value */
-  struct sockaddr_in	addr;	/* Broadcast address */
+  int			val;		/* Socket option value */
+  struct sockaddr_in	addr;		/* Broadcast address */
 
 
   if (!Browsing || !(BrowseLocalProtocols | BrowseRemoteProtocols))
@@ -1003,8 +1015,9 @@ cupsdStartBrowsing(void)
 
     if ((BrowseSocket = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
     {
-      cupsdLogMessage(L_ERROR, "cupsdStartBrowsing: Unable to create broadcast socket - %s.",
-        	 strerror(errno));
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+                      "cupsdStartBrowsing: Unable to create broadcast socket - %s.",
+        	      strerror(errno));
       BrowseLocalProtocols &= ~BROWSE_CUPS;
       BrowseRemoteProtocols &= ~BROWSE_CUPS;
       return;
@@ -1017,8 +1030,9 @@ cupsdStartBrowsing(void)
     val = 1;
     if (setsockopt(BrowseSocket, SOL_SOCKET, SO_BROADCAST, &val, sizeof(val)))
     {
-      cupsdLogMessage(L_ERROR, "cupsdStartBrowsing: Unable to set broadcast mode - %s.",
-        	 strerror(errno));
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+                      "cupsdStartBrowsing: Unable to set broadcast mode - %s.",
+        	      strerror(errno));
 
 #ifdef WIN32
       closesocket(BrowseSocket);
@@ -1043,8 +1057,9 @@ cupsdStartBrowsing(void)
 
     if (bind(BrowseSocket, (struct sockaddr *)&addr, sizeof(addr)))
     {
-      cupsdLogMessage(L_ERROR, "cupsdStartBrowsing: Unable to bind broadcast socket - %s.",
-        	 strerror(errno));
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+                      "cupsdStartBrowsing: Unable to bind broadcast socket - %s.",
+        	      strerror(errno));
 
 #ifdef WIN32
       closesocket(BrowseSocket);
@@ -1068,8 +1083,9 @@ cupsdStartBrowsing(void)
     * Finally, add the socket to the input selection set...
     */
 
-    cupsdLogMessage(L_DEBUG2, "cupsdStartBrowsing: Adding fd %d to InputSet...",
-               BrowseSocket);
+    cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                    "cupsdStartBrowsing: Adding fd %d to InputSet...",
+                    BrowseSocket);
 
     FD_SET(BrowseSocket, InputSet);
   }
@@ -1085,7 +1101,8 @@ cupsdStartBrowsing(void)
 
     if (SLPOpen("en", SLP_FALSE, &BrowseSLPHandle) != SLP_OK)
     {
-      cupsdLogMessage(L_ERROR, "Unable to open an SLP handle; disabling SLP browsing!");
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+                      "Unable to open an SLP handle; disabling SLP browsing!");
       BrowseLocalProtocols &= ~BROWSE_SLP;
       BrowseRemoteProtocols &= ~BROWSE_SLP;
     }
@@ -1103,15 +1120,15 @@ cupsdStartBrowsing(void)
 void
 cupsdStartPolling(void)
 {
-  int		i;			/* Looping var */
-  cupsd_dirsvc_poll_t	*poll;			/* Current polling server */
-  char		polld[1024];		/* Poll daemon path */
-  char		sport[10];		/* Server port */
-  char		bport[10];		/* Browser port */
-  char		interval[10];		/* Poll interval */
-  int		statusfds[2];		/* Status pipe */
-  char		*argv[6];		/* Arguments */
-  char		*envp[100];		/* Environment */
+  int			i;		/* Looping var */
+  cupsd_dirsvc_poll_t	*poll;		/* Current polling server */
+  char			polld[1024];	/* Poll daemon path */
+  char			sport[10];	/* Server port */
+  char			bport[10];	/* Browser port */
+  char			interval[10];	/* Poll interval */
+  int			statusfds[2];	/* Status pipe */
+  char			*argv[6];	/* Arguments */
+  char			*envp[100];	/* Environment */
 
 
  /*
@@ -1153,8 +1170,9 @@ cupsdStartPolling(void)
 
   if (cupsdOpenPipe(statusfds))
   {
-    cupsdLogMessage(L_ERROR, "Unable to create polling status pipes - %s.",
-	       strerror(errno));
+    cupsdLogMessage(CUPSD_LOG_ERROR,
+                    "Unable to create polling status pipes - %s.",
+	            strerror(errno));
     PollPipe         = -1;
     PollStatusBuffer = NULL;
     return;
@@ -1176,14 +1194,16 @@ cupsdStartPolling(void)
     if (cupsdStartProcess(polld, argv, envp, -1, -1, statusfds[1], -1,
                           0, &(poll->pid)) < 0)
     {
-      cupsdLogMessage(L_ERROR, "cupsdStartPolling: Unable to fork polling daemon - %s",
-                 strerror(errno));
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+                      "cupsdStartPolling: Unable to fork polling daemon - %s",
+                      strerror(errno));
       poll->pid = 0;
       break;
     }
     else
-      cupsdLogMessage(L_DEBUG, "cupsdStartPolling: Started polling daemon for %s:%d, pid = %d",
-                 poll->hostname, poll->port, poll->pid);
+      cupsdLogMessage(CUPSD_LOG_DEBUG,
+                      "cupsdStartPolling: Started polling daemon for %s:%d, pid = %d",
+                      poll->hostname, poll->port, poll->pid);
   }
 
   close(statusfds[1]);
@@ -1192,8 +1212,8 @@ cupsdStartPolling(void)
   * Finally, add the pipe to the input selection set...
   */
 
-  cupsdLogMessage(L_DEBUG2, "cupsdStartPolling: Adding fd %d to InputSet...",
-             PollPipe);
+  cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                  "cupsdStartPolling: Adding fd %d to InputSet...", PollPipe);
 
   FD_SET(PollPipe, InputSet);
 }
@@ -1223,8 +1243,9 @@ cupsdStopBrowsing(void)
       close(BrowseSocket);
 #endif /* WIN32 */
 
-      cupsdLogMessage(L_DEBUG2, "cupsdStopBrowsing: Removing fd %d from InputSet...",
-        	 BrowseSocket);
+      cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                      "cupsdStopBrowsing: Removing fd %d from InputSet...",
+        	      BrowseSocket);
 
       FD_CLR(BrowseSocket, InputSet);
       BrowseSocket = -1;
@@ -1251,7 +1272,7 @@ cupsdStopBrowsing(void)
 void
 cupsdStopPolling(void)
 {
-  int		i;		/* Looping var */
+  int			i;		/* Looping var */
   cupsd_dirsvc_poll_t	*poll;		/* Current polling server */
 
 
@@ -1260,8 +1281,8 @@ cupsdStopPolling(void)
     cupsdStatBufDelete(PollStatusBuffer);
     close(PollPipe);
 
-    cupsdLogMessage(L_DEBUG2, "cupsdStopPolling: removing fd %d from InputSet.",
-               PollPipe);
+    cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                    "cupsdStopPolling: removing fd %d from InputSet.", PollPipe);
     FD_CLR(PollPipe, InputSet);
 
     PollPipe         = -1;
@@ -1289,8 +1310,7 @@ cupsdUpdateCUPSBrowse(void)
 		*pptr;			/* Pointer into packet */
   http_addr_t	srcaddr;		/* Source address */
   char		srcname[1024];		/* Source hostname */
-  unsigned	address[4],		/* Source address */
-		temp;			/* Temporary address var (host order) */
+  unsigned	address[4];		/* Source address */
   unsigned	type;			/* Printer type */
   unsigned	state;			/* Printer state */
   char		uri[HTTP_MAX_URI],	/* Printer URI */
@@ -1321,8 +1341,9 @@ cupsdUpdateCUPSBrowse(void)
 
     if (errno != ECONNREFUSED && errno != EAGAIN)
     {
-      cupsdLogMessage(L_ERROR, "Browse recv failed - %s.", strerror(errno));
-      cupsdLogMessage(L_ERROR, "Browsing turned off.");
+      cupsdLogMessage(CUPSD_LOG_ERROR, "Browse recv failed - %s.",
+                      strerror(errno));
+      cupsdLogMessage(CUPSD_LOG_ERROR, "Browsing turned off.");
 
       cupsdStopBrowsing();
       Browsing = 0;
@@ -1348,15 +1369,10 @@ cupsdUpdateCUPSBrowse(void)
   else
 #endif /* AF_INET6 */
   {
-    temp = ntohl(srcaddr.ipv4.sin_addr.s_addr);
-
-    address[3] = temp & 255;
-    temp       >>= 8;
-    address[2] = temp & 255;
-    temp       >>= 8;
-    address[1] = temp & 255;
-    temp       >>= 8;
-    address[0] = temp & 255;
+    address[0] = 0;
+    address[1] = 0;
+    address[2] = 0;
+    address[3] = ntohl(srcaddr.ipv4.sin_addr.s_addr);
   }
 
   if (HostNameLookups)
@@ -1423,13 +1439,15 @@ cupsdUpdateCUPSBrowse(void)
 
   if (auth == AUTH_DENY)
   {
-    cupsdLogMessage(L_DEBUG, "cupsdUpdateCUPSBrowse: Refused %d bytes from %s", bytes,
-               srcname);
+    cupsdLogMessage(CUPSD_LOG_DEBUG,
+                    "cupsdUpdateCUPSBrowse: Refused %d bytes from %s", bytes,
+                    srcname);
     return;
   }
 
-  cupsdLogMessage(L_DEBUG2, "cupsdUpdateCUPSBrowse: (%d bytes from %s) %s", bytes, srcname,
-             packet);
+  cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                  "cupsdUpdateCUPSBrowse: (%d bytes from %s) %s", bytes,
+		  srcname, packet);
 
  /*
   * Parse packet...
@@ -1437,8 +1455,8 @@ cupsdUpdateCUPSBrowse(void)
 
   if (sscanf(packet, "%x%x%1023s", &type, &state, uri) < 3)
   {
-    cupsdLogMessage(L_WARN, "cupsdUpdateCUPSBrowse: Garbled browse packet - %s",
-               packet);
+    cupsdLogMessage(CUPSD_LOG_WARN,
+                    "cupsdUpdateCUPSBrowse: Garbled browse packet - %s", packet);
     return;
   }
 
@@ -1532,8 +1550,9 @@ cupsdUpdateCUPSBrowse(void)
                  (struct sockaddr *)&(Relays[i].to),
 		 sizeof(http_addr_t)) <= 0)
       {
-	cupsdLogMessage(L_ERROR, "cupsdUpdateCUPSBrowse: sendto failed for relay %d - %s.",
-	           i + 1, strerror(errno));
+	cupsdLogMessage(CUPSD_LOG_ERROR,
+	                "cupsdUpdateCUPSBrowse: sendto failed for relay %d - %s.",
+	                i + 1, strerror(errno));
 	return;
       }
 
@@ -1542,7 +1561,7 @@ cupsdUpdateCUPSBrowse(void)
   */
 
   cupsdProcessBrowseData(uri, (cups_ptype_t)type, (ipp_pstate_t)state, location,
-                    info, make_model);
+                         info, make_model);
 }
 
 
@@ -1569,7 +1588,8 @@ cupsdUpdatePolling(void)
     * All polling processes have died; stop polling...
     */
 
-    cupsdLogMessage(L_ERROR, "cupsdUpdatePolling: all polling processes have exited!");
+    cupsdLogMessage(CUPSD_LOG_ERROR,
+                    "cupsdUpdatePolling: all polling processes have exited!");
     cupsdStopPolling();
   }
 }
@@ -1600,11 +1620,11 @@ typedef struct _slpsrvurl
 
 
 /*
- * 'RegReportCallback()' - Empty SLPRegReport.
+ * 'slp_reg_callback()' - Empty SLPRegReport.
  */
 
-void
-RegReportCallback(SLPHandle hslp,
+static void
+slp_reg_callback(SLPHandle hslp,
                   SLPError  errcode,
 		  void      *cookie)
 {
@@ -1621,7 +1641,7 @@ RegReportCallback(SLPHandle hslp,
  */
 
 void 
-cupsdSendSLPBrowse(cupsd_printer_t *p)		/* I - Printer to register */
+cupsdSendSLPBrowse(cupsd_printer_t *p)	/* I - Printer to register */
 {
   char		srvurl[HTTP_MAX_URI],	/* Printer service URI */
 		attrs[8192],		/* Printer attributes */
@@ -1630,15 +1650,15 @@ cupsdSendSLPBrowse(cupsd_printer_t *p)		/* I - Printer to register */
 					/* Make and model, quoted */
 		location[IPP_MAX_NAME * 2],
 					/* Location, quoted */
-		info[IPP_MAX_NAME * 2],
-					/* Info, quoted */
+		info[IPP_MAX_NAME * 2],	/* Info, quoted */
 		*src,			/* Pointer to original string */
 		*dst;			/* Pointer to destination string */
   ipp_attribute_t *authentication;	/* uri-authentication-supported value */
   SLPError	error;			/* SLP error, if any */
 
 
-  cupsdLogMessage(L_DEBUG, "cupsdSendSLPBrowse(%p = \"%s\")", p, p->name);
+  cupsdLogMessage(CUPSD_LOG_DEBUG, "cupsdSendSLPBrowse(%p = \"%s\")", p,
+                  p->name);
 
  /*
   * Make the SLP service URL that conforms to the IANA 
@@ -1647,7 +1667,7 @@ cupsdSendSLPBrowse(cupsd_printer_t *p)		/* I - Printer to register */
 
   snprintf(srvurl, sizeof(srvurl), SLP_CUPS_SRVTYPE ":%s", p->uri);
 
-  cupsdLogMessage(L_DEBUG2, "Service URL = \"%s\"", srvurl);
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "Service URL = \"%s\"", srvurl);
 
  /*
   * Figure out the finishings string...
@@ -1779,34 +1799,34 @@ cupsdSendSLPBrowse(cupsd_printer_t *p)		/* I - Printer to register */
            p->type & CUPS_PRINTER_DUPLEX ?
 	       ",two-sided-long-edge,two-sided-short-edge" : "");
 
-  cupsdLogMessage(L_DEBUG2, "Attributes = \"%s\"", attrs);
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "Attributes = \"%s\"", attrs);
 
  /*
   * Register the printer with the SLP server...
   */
 
   error = SLPReg(BrowseSLPHandle, srvurl, BrowseTimeout,
-	         SLP_CUPS_SRVTYPE, attrs, SLP_TRUE, RegReportCallback, 0);
+	         SLP_CUPS_SRVTYPE, attrs, SLP_TRUE, slp_reg_callback, 0);
 
   if (error != SLP_OK)
-    cupsdLogMessage(L_ERROR, "SLPReg of \"%s\" failed with status %d!", p->name,
-               error);
+    cupsdLogMessage(CUPSD_LOG_ERROR, "SLPReg of \"%s\" failed with status %d!", p->name,
+                    error);
 }
 
 
 /*
- * 'SLPDeregPrinter()' - SLPDereg() the specified printer
+ * 'slp_dereg_printer()' - SLPDereg() the specified printer
  */
 
-void 
-SLPDeregPrinter(cupsd_printer_t *p)
+static void 
+slp_dereg_printer(cupsd_printer_t *p)
 {
   char	srvurl[HTTP_MAX_URI];	/* Printer service URI */
 
 
-  cupsdLogMessage(L_DEBUG, "SLPDeregPrinter: printer=\"%s\"", p->name);
+  cupsdLogMessage(CUPSD_LOG_DEBUG, "slp_dereg_printer: printer=\"%s\"", p->name);
 
-  if((p->type & CUPS_PRINTER_REMOTE) == 0)
+  if (!(p->type & CUPS_PRINTER_REMOTE))
   {
    /*
     * Make the SLP service URL that conforms to the IANA 
@@ -1819,19 +1839,19 @@ SLPDeregPrinter(cupsd_printer_t *p)
     * Deregister the printer...
     */
 
-    SLPDereg(BrowseSLPHandle, srvurl, RegReportCallback, 0);
+    SLPDereg(BrowseSLPHandle, srvurl, slp_reg_callback, 0);
   }
 }
 
 
 /*
- * 'GetSlpAttrVal()' - Get an attribute from an SLP registration.
+ * 'slp_get_attr()' - Get an attribute from an SLP registration.
  */
 
-int 					/* O - 0 on success */
-GetSlpAttrVal(const char *attrlist,	/* I - Attribute list string */
-              const char *tag,		/* I - Name of attribute */
-              char       **valbuf)	/* O - Value */
+static int 				/* O - 0 on success */
+slp_get_attr(const char *attrlist,	/* I - Attribute list string */
+             const char *tag,		/* I - Name of attribute */
+             char       **valbuf)	/* O - Value */
 {
   char	*ptr1,				/* Pointer into string */
 	*ptr2;				/* ... */
@@ -1869,17 +1889,18 @@ GetSlpAttrVal(const char *attrlist,	/* I - Attribute list string */
 
 
 /*
- * 'AttrCallback()' - SLP attribute callback 
+ * 'slp_attr_callback()' - SLP attribute callback 
  */
 
-SLPBoolean				/* O - SLP_TRUE for success */
-AttrCallback(SLPHandle  hslp,		/* I - SLP handle */
-             const char *attrlist,	/* I - Attribute list */
-             SLPError   errcode,	/* I - Parsing status for this attr */
-             void       *cookie)	/* I - Current printer */
+static SLPBoolean			/* O - SLP_TRUE for success */
+slp_attr_callback(
+    SLPHandle  hslp,			/* I - SLP handle */
+    const char *attrlist,		/* I - Attribute list */
+    SLPError   errcode,			/* I - Parsing status for this attr */
+    void       *cookie)			/* I - Current printer */
 {
-  char         *tmp = 0;
-  cupsd_printer_t    *p = (cupsd_printer_t*)cookie;
+  char			*tmp = 0;
+  cupsd_printer_t	*p = (cupsd_printer_t*)cookie;
 
 
  /*
@@ -1903,19 +1924,19 @@ AttrCallback(SLPHandle  hslp,		/* I - SLP handle */
 
   p->type = CUPS_PRINTER_REMOTE;
 
-  if (GetSlpAttrVal(attrlist, "(printer-location=", &(p->location)))
+  if (slp_get_attr(attrlist, "(printer-location=", &(p->location)))
     return (SLP_FALSE);
-  if (GetSlpAttrVal(attrlist, "(printer-info=", &(p->info)))
+  if (slp_get_attr(attrlist, "(printer-info=", &(p->info)))
     return (SLP_FALSE);
-  if (GetSlpAttrVal(attrlist, "(printer-make-and-model=", &(p->make_model)))
+  if (slp_get_attr(attrlist, "(printer-make-and-model=", &(p->make_model)))
     return (SLP_FALSE);
 
-  if (GetSlpAttrVal(attrlist, "(color-supported=", &tmp))
+  if (slp_get_attr(attrlist, "(color-supported=", &tmp))
     return (SLP_FALSE);
   if (strcasecmp(tmp, "true") == 0)
     p->type |= CUPS_PRINTER_COLOR;
 
-  if (GetSlpAttrVal(attrlist, "(finishings-supported=", &tmp))
+  if (slp_get_attr(attrlist, "(finishings-supported=", &tmp))
     return (SLP_FALSE);
   if (strstr(tmp, "staple"))
     p->type |= CUPS_PRINTER_STAPLE;
@@ -1924,7 +1945,7 @@ AttrCallback(SLPHandle  hslp,		/* I - SLP handle */
   if (strstr(tmp, "punch"))
     p->type |= CUPS_PRINTER_PUNCH;
 
-  if (GetSlpAttrVal(attrlist, "(sides-supported=", &tmp))
+  if (slp_get_attr(attrlist, "(sides-supported=", &tmp))
     return (SLP_FALSE);
   if (strstr(tmp,"two-sided"))
     p->type |= CUPS_PRINTER_DUPLEX;
@@ -1936,15 +1957,16 @@ AttrCallback(SLPHandle  hslp,		/* I - SLP handle */
 
 
 /*
- * 'SrvUrlCallback()' - SLP service url callback
+ * 'slp_url_callback()' - SLP service url callback
  */
 
-SLPBoolean				/* O - TRUE = OK, FALSE = error */
-SrvUrlCallback(SLPHandle      hslp, 	/* I - SLP handle */
-               const char     *srvurl, 	/* I - URL of service */
-               unsigned short lifetime,	/* I - Life of service */
-               SLPError       errcode, 	/* I - Existing error code */
-               void           *cookie)	/* I - Pointer to service list */
+static SLPBoolean			/* O - TRUE = OK, FALSE = error */
+slp_url_callback(
+    SLPHandle      hslp,	 	/* I - SLP handle */
+    const char     *srvurl, 		/* I - URL of service */
+    unsigned short lifetime,		/* I - Life of service */
+    SLPError       errcode, 		/* I - Existing error code */
+    void           *cookie)		/* I - Pointer to service list */
 {
   slpsrvurl_t	*s,			/* New service entry */
 		**head;			/* Pointer to head of entry */
@@ -2014,7 +2036,7 @@ cupsdUpdateSLPBrowse(void)
   int		port;			/* Port portion of URI */
 
 
-  cupsdLogMessage(L_DEBUG, "cupsdUpdateSLPBrowse() Start...");
+  cupsdLogMessage(CUPSD_LOG_DEBUG, "cupsdUpdateSLPBrowse() Start...");
 
  /*
   * Reset the refresh time...
@@ -2029,7 +2051,7 @@ cupsdUpdateSLPBrowse(void)
   s = NULL;
 
   SLPFindSrvs(BrowseSLPHandle, SLP_CUPS_SRVTYPE, "", "",
-	      SrvUrlCallback, &s);
+	      slp_url_callback, &s);
 
  /*
   * Loop through the list of available printers...
@@ -2047,7 +2069,7 @@ cupsdUpdateSLPBrowse(void)
     * Load a cupsd_printer_t structure with the SLP service attributes...
     */
 
-    SLPFindAttrs(BrowseSLPHandle, s->url, "", "", AttrCallback, &p);
+    SLPFindAttrs(BrowseSLPHandle, s->url, "", "", slp_attr_callback, &p);
 
    /*
     * Process this printer entry...
@@ -2087,7 +2109,7 @@ cupsdUpdateSLPBrowse(void)
     free(s);
   }       
 
-  cupsdLogMessage(L_DEBUG, "cupsdUpdateSLPBrowse() End...");
+  cupsdLogMessage(CUPSD_LOG_DEBUG, "cupsdUpdateSLPBrowse() End...");
 }
 #endif /* HAVE_LIBSLP */
 

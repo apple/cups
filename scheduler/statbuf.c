@@ -170,7 +170,7 @@ cupsdStatBufUpdate(cupsd_statbuf_t *sb,	/* I - Status buffer */
       * Return an empty line if we are interrupted...
       */
 
-      *loglevel = L_NONE;
+      *loglevel = CUPSD_LOG_NONE;
       line[0]   = '\0';
 
       return (line);
@@ -199,7 +199,7 @@ cupsdStatBufUpdate(cupsd_statbuf_t *sb,	/* I - Status buffer */
     * End of file...
     */
 
-    *loglevel = L_NONE;
+    *loglevel = CUPSD_LOG_NONE;
     line[0]   = '\0';
 
     return (NULL);
@@ -217,67 +217,67 @@ cupsdStatBufUpdate(cupsd_statbuf_t *sb,	/* I - Status buffer */
 
   if (!strncmp(sb->buffer, "EMERG:", 6))
   {
-    *loglevel = L_EMERG;
+    *loglevel = CUPSD_LOG_EMERG;
     message   = sb->buffer + 6;
   }
   else if (!strncmp(sb->buffer, "ALERT:", 6))
   {
-    *loglevel = L_ALERT;
+    *loglevel = CUPSD_LOG_ALERT;
     message   = sb->buffer + 6;
   }
   else if (!strncmp(sb->buffer, "CRIT:", 5))
   {
-    *loglevel = L_CRIT;
+    *loglevel = CUPSD_LOG_CRIT;
     message   = sb->buffer + 5;
   }
   else if (!strncmp(sb->buffer, "ERROR:", 6))
   {
-    *loglevel = L_ERROR;
+    *loglevel = CUPSD_LOG_ERROR;
     message   = sb->buffer + 6;
   }
   else if (!strncmp(sb->buffer, "WARNING:", 8))
   {
-    *loglevel = L_WARN;
+    *loglevel = CUPSD_LOG_WARN;
     message   = sb->buffer + 8;
   }
   else if (!strncmp(sb->buffer, "NOTICE:", 7))
   {
-    *loglevel = L_NOTICE;
+    *loglevel = CUPSD_LOG_NOTICE;
     message   = sb->buffer + 7;
   }
   else if (!strncmp(sb->buffer, "INFO:", 5))
   {
-    *loglevel = L_INFO;
+    *loglevel = CUPSD_LOG_INFO;
     message   = sb->buffer + 5;
   }
   else if (!strncmp(sb->buffer, "DEBUG:", 6))
   {
-    *loglevel = L_DEBUG;
+    *loglevel = CUPSD_LOG_DEBUG;
     message   = sb->buffer + 6;
   }
   else if (!strncmp(sb->buffer, "DEBUG2:", 7))
   {
-    *loglevel = L_DEBUG2;
+    *loglevel = CUPSD_LOG_DEBUG2;
     message   = sb->buffer + 7;
   }
   else if (!strncmp(sb->buffer, "PAGE:", 5))
   {
-    *loglevel = L_PAGE;
+    *loglevel = CUPSD_LOG_PAGE;
     message   = sb->buffer + 5;
   }
   else if (!strncmp(sb->buffer, "STATE:", 6))
   {
-    *loglevel = L_STATE;
+    *loglevel = CUPSD_LOG_STATE;
     message   = sb->buffer + 6;
   }
   else if (!strncmp(sb->buffer, "ATTR:", 5))
   {
-    *loglevel = L_ATTR;
+    *loglevel = CUPSD_LOG_ATTR;
     message   = sb->buffer + 5;
   }
   else
   {
-    *loglevel = L_DEBUG;
+    *loglevel = CUPSD_LOG_DEBUG;
     message   = sb->buffer;
   }
 
@@ -292,7 +292,8 @@ cupsdStatBufUpdate(cupsd_statbuf_t *sb,	/* I - Status buffer */
   * Send it to the log file as needed...
   */
 
-  if (*loglevel > L_NONE && (*loglevel != L_INFO || LogLevel == L_DEBUG2))
+  if (*loglevel > CUPSD_LOG_NONE &&
+      (*loglevel != CUPSD_LOG_INFO || LogLevel == CUPSD_LOG_DEBUG2))
   {
    /*
     * General status message; send it to the error_log file...

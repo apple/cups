@@ -33,7 +33,7 @@
  *   cupsdLoadAllClasses()           - Load classes from the classes.conf file.
  *   cupsdSaveAllClasses()           - Save classes to the classes.conf file.
  *   cupsdUpdateImplicitClasses()    - Update the accepting state of implicit
- *                                classes.
+ *                                     classes.
  */
 
 /*
@@ -48,7 +48,7 @@
  */
 
 cupsd_printer_t *			/* O - New class */
-cupsdAddClass(const char *name)	/* I - Name of class */
+cupsdAddClass(const char *name)		/* I - Name of class */
 {
   cupsd_printer_t	*c;		/* New class */
 
@@ -65,7 +65,8 @@ cupsdAddClass(const char *name)	/* I - Name of class */
 
     c->type = CUPS_PRINTER_CLASS;
 
-    cupsdSetStringf(&c->uri, "ipp://%s:%d/classes/%s", ServerName, LocalPort, name);
+    cupsdSetStringf(&c->uri, "ipp://%s:%d/classes/%s", ServerName, LocalPort,
+                    name);
     cupsdSetString(&c->error_policy, "retry-job");
   }
 
@@ -78,10 +79,11 @@ cupsdAddClass(const char *name)	/* I - Name of class */
  */
 
 void
-cupsdAddPrinterToClass(cupsd_printer_t *c,	/* I - Class to add to */
-                  cupsd_printer_t *p)	/* I - Printer to add */
+cupsdAddPrinterToClass(
+    cupsd_printer_t *c,			/* I - Class to add to */
+    cupsd_printer_t *p)			/* I - Printer to add */
 {
-  int		i;		/* Looping var */
+  int			i;		/* Looping var */
   cupsd_printer_t	**temp;		/* Pointer to printer array */
 
 
@@ -104,8 +106,8 @@ cupsdAddPrinterToClass(cupsd_printer_t *c,	/* I - Class to add to */
 
   if (temp == NULL)
   {
-    cupsdLogMessage(L_ERROR, "Unable to add printer %s to class %s!",
-               p->name, c->name);
+    cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to add printer %s to class %s!",
+                    p->name, c->name);
     return;
   }
 
@@ -126,8 +128,9 @@ cupsdAddPrinterToClass(cupsd_printer_t *c,	/* I - Class to add to */
  */
 
 void
-cupsdDeletePrinterFromClass(cupsd_printer_t *c,	/* I - Class to delete from */
-                       cupsd_printer_t *p)	/* I - Printer to delete */
+cupsdDeletePrinterFromClass(
+    cupsd_printer_t *c,			/* I - Class to delete from */
+    cupsd_printer_t *p)			/* I - Printer to delete */
 {
   int		i;			/* Looping var */
   cups_ptype_t	type;			/* Class type */
@@ -187,9 +190,10 @@ cupsdDeletePrinterFromClass(cupsd_printer_t *c,	/* I - Class to delete from */
  */
 
 void
-cupsdDeletePrinterFromClasses(cupsd_printer_t *p)	/* I - Printer to delete */
+cupsdDeletePrinterFromClasses(
+    cupsd_printer_t *p)			/* I - Printer to delete */
 {
-  cupsd_printer_t	*c;			/* Pointer to current class */
+  cupsd_printer_t	*c;		/* Pointer to current class */
 
 
  /*
@@ -222,7 +226,7 @@ cupsdDeletePrinterFromClasses(cupsd_printer_t *p)	/* I - Printer to delete */
 void
 cupsdDeleteAllClasses(void)
 {
-  cupsd_printer_t	*c;			/* Pointer to current printer/class */
+  cupsd_printer_t	*c;		/* Pointer to current printer/class */
 
 
   for (c = (cupsd_printer_t *)cupsArrayFirst(Printers);
@@ -237,11 +241,12 @@ cupsdDeleteAllClasses(void)
  * 'cupsdFindAvailablePrinter()' - Find an available printer in a class.
  */
 
-cupsd_printer_t *				/* O - Available printer or NULL */
-cupsdFindAvailablePrinter(const char *name)	/* I - Class to check */
+cupsd_printer_t *			/* O - Available printer or NULL */
+cupsdFindAvailablePrinter(
+    const char *name)			/* I - Class to check */
 {
-  int		i;			/* Looping var */
-  cupsd_printer_t	*c;			/* Printer class */
+  int			i;		/* Looping var */
+  cupsd_printer_t	*c;		/* Printer class */
 
 
  /*
@@ -250,7 +255,7 @@ cupsdFindAvailablePrinter(const char *name)	/* I - Class to check */
 
   if ((c = cupsdFindClass(name)) == NULL)
   {
-    cupsdLogMessage(L_ERROR, "Unable to find class \"%s\"!", name);
+    cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to find class \"%s\"!", name);
     return (NULL);
   }
 
@@ -308,13 +313,13 @@ cupsdFindClass(const char *name)	/* I - Name of class */
 void
 cupsdLoadAllClasses(void)
 {
-  cups_file_t	*fp;			/* classes.conf file */
-  int		linenum;		/* Current line number */
-  char		line[1024],		/* Line from file */
-		*value,			/* Pointer to value */
-		*valueptr;		/* Pointer into value */
-  cupsd_printer_t	*p,			/* Current printer class */
-		*temp;			/* Temporary pointer to printer */
+  cups_file_t		*fp;		/* classes.conf file */
+  int			linenum;	/* Current line number */
+  char			line[1024],	/* Line from file */
+			*value,		/* Pointer to value */
+			*valueptr;	/* Pointer into value */
+  cupsd_printer_t	*p,		/* Current printer class */
+			*temp;		/* Temporary pointer to printer */
 
 
  /*
@@ -324,8 +329,9 @@ cupsdLoadAllClasses(void)
   snprintf(line, sizeof(line), "%s/classes.conf", ServerRoot);
   if ((fp = cupsFileOpen(line, "r")) == NULL)
   {
-    cupsdLogMessage(L_ERROR, "cupsdLoadAllClasses: Unable to open %s - %s", line,
-               strerror(errno));
+    cupsdLogMessage(CUPSD_LOG_ERROR,
+                    "cupsdLoadAllClasses: Unable to open %s - %s", line,
+                    strerror(errno));
     return;
   }
 
@@ -351,7 +357,8 @@ cupsdLoadAllClasses(void)
 
       if (p == NULL && value)
       {
-        cupsdLogMessage(L_DEBUG, "cupsdLoadAllClasses: Loading class %s...", value);
+        cupsdLogMessage(CUPSD_LOG_DEBUG,
+	                "cupsdLoadAllClasses: Loading class %s...", value);
 
         p = cupsdAddClass(value);
 	p->accepting = 1;
@@ -362,8 +369,8 @@ cupsdLoadAllClasses(void)
       }
       else
       {
-        cupsdLogMessage(L_ERROR, "Syntax error on line %d of classes.conf.",
-	           linenum);
+        cupsdLogMessage(CUPSD_LOG_ERROR,
+	                "Syntax error on line %d of classes.conf.", linenum);
         return;
       }
     }
@@ -376,15 +383,15 @@ cupsdLoadAllClasses(void)
       }
       else
       {
-        cupsdLogMessage(L_ERROR, "Syntax error on line %d of classes.conf.",
-	           linenum);
+        cupsdLogMessage(CUPSD_LOG_ERROR,
+	                "Syntax error on line %d of classes.conf.", linenum);
         return;
       }
     }
     else if (!p)
     {
-      cupsdLogMessage(L_ERROR, "Syntax error on line %d of classes.conf.",
-	         linenum);
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+                      "Syntax error on line %d of classes.conf.", linenum);
       return;
     }
     else if (!strcasecmp(line, "Info"))
@@ -401,14 +408,15 @@ cupsdLoadAllClasses(void)
     {
       if (!value)
       {
-	cupsdLogMessage(L_ERROR, "Syntax error on line %d of classes.conf.",
-	           linenum);
+	cupsdLogMessage(CUPSD_LOG_ERROR,
+	                "Syntax error on line %d of classes.conf.", linenum);
 	return;
       }
       else if ((temp = cupsdFindPrinter(value)) == NULL)
       {
-	cupsdLogMessage(L_WARN, "Unknown printer %s on line %d of classes.conf.",
-	           value, linenum);
+	cupsdLogMessage(CUPSD_LOG_WARN,
+	                "Unknown printer %s on line %d of classes.conf.",
+	                value, linenum);
 
        /*
 	* Add the missing remote printer...
@@ -445,8 +453,9 @@ cupsdLoadAllClasses(void)
         p->state = IPP_PRINTER_STOPPED;
       else
       {
-	cupsdLogMessage(L_ERROR, "Syntax error on line %d of classes.conf.",
-	           linenum);
+	cupsdLogMessage(CUPSD_LOG_ERROR,
+	                "Syntax error on line %d of classes.conf.",
+	                linenum);
 	return;
       }
     }
@@ -477,8 +486,9 @@ cupsdLoadAllClasses(void)
         p->accepting = 0;
       else
       {
-	cupsdLogMessage(L_ERROR, "Syntax error on line %d of classes.conf.",
-	           linenum);
+	cupsdLogMessage(CUPSD_LOG_ERROR,
+	                "Syntax error on line %d of classes.conf.",
+	                linenum);
 	return;
       }
     }
@@ -500,8 +510,9 @@ cupsdLoadAllClasses(void)
         p->shared = 0;
       else
       {
-	cupsdLogMessage(L_ERROR, "Syntax error on line %d of printers.conf.",
-	           linenum);
+	cupsdLogMessage(CUPSD_LOG_ERROR,
+	                "Syntax error on line %d of printers.conf.",
+	                linenum);
 	return;
       }
     }
@@ -513,30 +524,34 @@ cupsdLoadAllClasses(void)
 
       if (value)
       {
-	for (valueptr = value; *valueptr && !isspace(*valueptr & 255); valueptr ++);
+	for (valueptr = value;
+	     *valueptr && !isspace(*valueptr & 255);
+	     valueptr ++);
 
 	if (*valueptr)
           *valueptr++ = '\0';
 
-	cupsdSetString(&p->cupsd_job_sheets[0], value);
+	cupsdSetString(&p->job_sheets[0], value);
 
 	while (isspace(*valueptr & 255))
           valueptr ++;
 
 	if (*valueptr)
 	{
-          for (value = valueptr; *valueptr && !isspace(*valueptr & 255); valueptr ++);
+          for (value = valueptr;
+	       *valueptr && !isspace(*valueptr & 255);
+	       valueptr ++);
 
 	  if (*valueptr)
             *valueptr++ = '\0';
 
-	  cupsdSetString(&p->cupsd_job_sheets[1], value);
+	  cupsdSetString(&p->job_sheets[1], value);
 	}
       }
       else
       {
-	cupsdLogMessage(L_ERROR, "Syntax error on line %d of classes.conf.",
-	           linenum);
+	cupsdLogMessage(CUPSD_LOG_ERROR,
+	                "Syntax error on line %d of classes.conf.", linenum);
 	return;
       }
     }
@@ -549,8 +564,8 @@ cupsdLoadAllClasses(void)
       }
       else
       {
-	cupsdLogMessage(L_ERROR, "Syntax error on line %d of classes.conf.",
-	           linenum);
+	cupsdLogMessage(CUPSD_LOG_ERROR,
+	                "Syntax error on line %d of classes.conf.", linenum);
 	return;
       }
     }
@@ -563,8 +578,8 @@ cupsdLoadAllClasses(void)
       }
       else
       {
-	cupsdLogMessage(L_ERROR, "Syntax error on line %d of classes.conf.",
-	           linenum);
+	cupsdLogMessage(CUPSD_LOG_ERROR,
+	                "Syntax error on line %d of classes.conf.", linenum);
 	return;
       }
     }
@@ -574,8 +589,8 @@ cupsdLoadAllClasses(void)
         p->quota_period = atoi(value);
       else
       {
-	cupsdLogMessage(L_ERROR, "Syntax error on line %d of classes.conf.",
-	           linenum);
+	cupsdLogMessage(CUPSD_LOG_ERROR,
+	                "Syntax error on line %d of classes.conf.", linenum);
 	return;
       }
     }
@@ -585,8 +600,8 @@ cupsdLoadAllClasses(void)
         p->page_limit = atoi(value);
       else
       {
-	cupsdLogMessage(L_ERROR, "Syntax error on line %d of classes.conf.",
-	           linenum);
+	cupsdLogMessage(CUPSD_LOG_ERROR,
+	                "Syntax error on line %d of classes.conf.", linenum);
 	return;
       }
     }
@@ -596,8 +611,8 @@ cupsdLoadAllClasses(void)
         p->k_limit = atoi(value);
       else
       {
-	cupsdLogMessage(L_ERROR, "Syntax error on line %d of classes.conf.",
-	           linenum);
+	cupsdLogMessage(CUPSD_LOG_ERROR,
+	                "Syntax error on line %d of classes.conf.", linenum);
 	return;
       }
     }
@@ -607,8 +622,8 @@ cupsdLoadAllClasses(void)
         cupsdSetString(&p->op_policy, value);
       else
       {
-	cupsdLogMessage(L_ERROR, "Syntax error on line %d of classes.conf.",
-	           linenum);
+	cupsdLogMessage(CUPSD_LOG_ERROR,
+	                "Syntax error on line %d of classes.conf.", linenum);
 	return;
       }
     }
@@ -618,8 +633,8 @@ cupsdLoadAllClasses(void)
         cupsdSetString(&p->error_policy, value);
       else
       {
-	cupsdLogMessage(L_ERROR, "Syntax error on line %d of classes.conf.",
-	           linenum);
+	cupsdLogMessage(CUPSD_LOG_ERROR,
+	                "Syntax error on line %d of classes.conf.", linenum);
 	return;
       }
     }
@@ -629,8 +644,9 @@ cupsdLoadAllClasses(void)
       * Something else we don't understand...
       */
 
-      cupsdLogMessage(L_ERROR, "Unknown configuration directive %s on line %d of classes.conf.",
-	         line, linenum);
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+                      "Unknown configuration directive %s on line %d of classes.conf.",
+	              line, linenum);
     }
   }
 
@@ -645,13 +661,13 @@ cupsdLoadAllClasses(void)
 void
 cupsdSaveAllClasses(void)
 {
-  cups_file_t	*fp;			/* classes.conf file */
-  char		temp[1024];		/* Temporary string */
-  char		backup[1024];		/* classes.conf.O file */
-  cupsd_printer_t	*pclass;		/* Current printer class */
-  int		i;			/* Looping var */
-  time_t	curtime;		/* Current time */
-  struct tm	*curdate;		/* Current date */
+  cups_file_t		*fp;		/* classes.conf file */
+  char			temp[1024];	/* Temporary string */
+  char			backup[1024];	/* classes.conf.O file */
+  cupsd_printer_t	*pclass;	/* Current printer class */
+  int			i;		/* Looping var */
+  time_t		curtime;	/* Current time */
+  struct tm		*curdate;	/* Current date */
 
 
  /*
@@ -662,18 +678,21 @@ cupsdSaveAllClasses(void)
   snprintf(backup, sizeof(backup), "%s/classes.conf.O", ServerRoot);
 
   if (rename(temp, backup))
-    cupsdLogMessage(L_ERROR, "Unable to backup classes.conf - %s", strerror(errno));
+    cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to backup classes.conf - %s",
+                    strerror(errno));
 
   if ((fp = cupsFileOpen(temp, "w")) == NULL)
   {
-    cupsdLogMessage(L_ERROR, "Unable to save classes.conf - %s", strerror(errno));
+    cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to save classes.conf - %s",
+                    strerror(errno));
 
     if (rename(backup, temp))
-      cupsdLogMessage(L_ERROR, "Unable to restore classes.conf - %s", strerror(errno));
+      cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to restore classes.conf - %s",
+                      strerror(errno));
     return;
   }
   else
-    cupsdLogMessage(L_INFO, "Saving classes.conf...");
+    cupsdLogMessage(CUPSD_LOG_INFO, "Saving classes.conf...");
 
  /*
   * Restrict access to the file...
@@ -743,8 +762,8 @@ cupsdSaveAllClasses(void)
     else
       cupsFilePuts(fp, "Shared No\n");
 
-    cupsFilePrintf(fp, "JobSheets %s %s\n", pclass->cupsd_job_sheets[0],
-                   pclass->cupsd_job_sheets[1]);
+    cupsFilePrintf(fp, "JobSheets %s %s\n", pclass->job_sheets[0],
+                   pclass->job_sheets[1]);
 
     for (i = 0; i < pclass->num_printers; i ++)
       cupsFilePrintf(fp, "Printer %s\n", pclass->printers[i]->name);
@@ -770,15 +789,16 @@ cupsdSaveAllClasses(void)
 
 
 /*
- * 'cupsdUpdateImplicitClasses()' - Update the accepting state of implicit classes.
+ * 'cupsdUpdateImplicitClasses()' - Update the accepting state of implicit
+ *                                  classes.
  */
 
 void
 cupsdUpdateImplicitClasses(void)
 {
-  int		i;			/* Looping var */
-  cupsd_printer_t	*pclass;		/* Current class */
-  int		accepting;		/* printer-is-accepting-jobs value */
+  int			i;		/* Looping var */
+  cupsd_printer_t	*pclass;	/* Current class */
+  int			accepting;	/* printer-is-accepting-jobs value */
 
 
   for (pclass = (cupsd_printer_t *)cupsArrayFirst(Printers);

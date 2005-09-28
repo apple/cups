@@ -54,7 +54,7 @@ VAR cupsd_netif_t	*NetIFList	VALUE(NULL);
  * Prototypes...
  */
 
-extern cupsd_netif_t	*NetIFFind(const char *name);
+extern cupsd_netif_t	*cupsdNetIFFind(const char *name);
 extern void		cupsdNetIFFree(void);
 extern void		cupsdNetIFUpdate(void);
 

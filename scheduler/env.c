@@ -162,7 +162,8 @@ cupsdSetEnv(const char *name,		/* I - Name of variable */
 
   if (num_common_env >= (int)(sizeof(common_env) / sizeof(common_env[0])))
   {
-    cupsdLogMessage(L_ERROR, "cupsdSetEnv: Too many environment variables set!");
+    cupsdLogMessage(CUPSD_LOG_ERROR,
+                    "cupsdSetEnv: Too many environment variables set!");
     return;
   }
 
@@ -182,7 +183,8 @@ cupsdSetEnv(const char *name,		/* I - Name of variable */
 
   cupsdSetStringf(common_env + num_common_env, "%s=%s", name, value);
 
-  cupsdLogMessage(L_DEBUG, "cupsdSetEnv: %s\n", common_env[num_common_env]);
+  cupsdLogMessage(CUPSD_LOG_DEBUG, "cupsdSetEnv: %s\n",
+                  common_env[num_common_env]);
 
   num_common_env ++;
 }

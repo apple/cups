@@ -78,34 +78,34 @@ typedef enum
 
 typedef struct cupsd_event_s		/**** Event structure ****/
 {
-  cupsd_eventmask_t event;		/* Event */
-  time_t	time;			/* Time of event */
-  ipp_t		*attrs;			/* Notification message */
-  cupsd_printer_t	*dest;			/* Associated printer, if any */
-  cupsd_job_t		*job;			/* Associated job, if any */
+  cupsd_eventmask_t	event;		/* Event */
+  time_t		time;		/* Time of event */
+  ipp_t			*attrs;		/* Notification message */
+  cupsd_printer_t	*dest;		/* Associated printer, if any */
+  cupsd_job_t		*job;		/* Associated job, if any */
 } cupsd_event_t; 
 
 typedef struct cupsd_subscription_s	/**** Subscription structure ****/
 {
-  int		id;			/* subscription-id */
-  unsigned	mask;			/* Event mask */
-  char		*owner;			/* notify-subscriber-user-name */
-  char		*recipient;		/* notify-recipient-uri, if applicable */
-  unsigned char	user_data[64];		/* notify-user-data */
-  int		user_data_len;		/* Length of notify-user-data */
-  int		lease;			/* notify-lease-time */
-  int		interval;		/* notify-interval */
-  cupsd_printer_t	*dest;			/* notify-printer-uri, if any */
-  cupsd_job_t		*job;			/* notify-job-id, if any */
-  int		pid;			/* Process ID of notifier */
-  int		pipe;			/* Pipe to notifier */
-  int		status;			/* Exit status of notifier */
-  time_t	last;			/* Time of last notification */
-  time_t	expire;			/* Lease expiration time */
-  int		first_event_id,		/* First event-id in cache */
-		next_event_id,		/* Next event-id to use */
-		num_events;		/* Number of cached events */
-  cupsd_event_t	**events;		/* Cached events */
+  int			id;		/* subscription-id */
+  unsigned		mask;		/* Event mask */
+  char			*owner;		/* notify-subscriber-user-name */
+  char			*recipient;	/* notify-recipient-uri, if applicable */
+  unsigned char		user_data[64];	/* notify-user-data */
+  int			user_data_len;	/* Length of notify-user-data */
+  int			lease;		/* notify-lease-time */
+  int			interval;	/* notify-interval */
+  cupsd_printer_t	*dest;		/* notify-printer-uri, if any */
+  cupsd_job_t		*job;		/* notify-job-id, if any */
+  int			pid;		/* Process ID of notifier */
+  int			pipe;		/* Pipe to notifier */
+  int			status;		/* Exit status of notifier */
+  time_t		last;		/* Time of last notification */
+  time_t		expire;		/* Lease expiration time */
+  int			first_event_id,	/* First event-id in cache */
+			next_event_id,	/* Next event-id to use */
+			num_events;	/* Number of cached events */
+  cupsd_event_t		**events;	/* Cached events */
 } cupsd_subscription_t;
 
 
@@ -161,7 +161,8 @@ extern cupsd_eventmask_t
 
 extern cupsd_subscription_t *
 		cupsdFindSubscription(int id);
-extern void	cupsdExpireSubscriptions(cupsd_printer_t *dest, cupsd_job_t *job);
+extern void	cupsdExpireSubscriptions(cupsd_printer_t *dest,
+		                         cupsd_job_t *job);
 extern void	cupsdLoadAllSubscriptions(void);
 extern void	cupsdSaveAllSubscriptions(void);
 extern void	cupsdSendNotification(cupsd_subscription_t *sub,

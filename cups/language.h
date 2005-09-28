@@ -273,20 +273,22 @@ typedef struct cups_lang_str	/**** Language Cache Structure ****/
  */
 
 #  define		cupsLangDefault() cupsLangGet(NULL)
-extern const char	*cupsEncodingName(cups_encoding_t encoding);
 extern const char	*cupsLangEncoding(cups_lang_t *lang);
 extern void		cupsLangFlush(void);
 extern void		cupsLangFree(cups_lang_t *lang);
 extern cups_lang_t	*cupsLangGet(const char *language);
-extern int		cupsLangPrintf(FILE *fp, cups_lang_t *lang,
-			               cups_msg_t msg, ...);
-extern int		cupsLangPuts(FILE *fp, cups_lang_t *lang,
-			             cups_msg_t msg);
 #  define		cupsLangString(lang,msg) (lang)->messages[(msg)]
 
 /**** New in CUPS 1.1.20 ****/
 extern void		_cupsRestoreLocale(int category, char *oldlocale);
 extern char		*_cupsSaveLocale(int category, const char *locale);
+
+/**** New in CUPS 1.2 ****/
+extern const char	*cupsEncodingName(cups_encoding_t encoding);
+extern int		cupsLangPrintf(FILE *fp, cups_lang_t *lang,
+			               cups_msg_t msg, ...);
+extern int		cupsLangPuts(FILE *fp, cups_lang_t *lang,
+			             cups_msg_t msg);
 
 #  ifdef __cplusplus
 }

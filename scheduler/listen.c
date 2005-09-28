@@ -44,7 +44,7 @@
 void
 cupsdPauseListening(void)
 {
-  int		i;		/* Looping var */
+  int			i;		/* Looping var */
   cupsd_listener_t	*lis;		/* Current listening socket */
 
 
@@ -52,14 +52,16 @@ cupsdPauseListening(void)
     return;
 
   if (NumClients == MaxClients)
-    cupsdLogMessage(L_WARN, "Max clients reached, holding new connections...");
+    cupsdLogMessage(CUPSD_LOG_WARN,
+                    "Max clients reached, holding new connections...");
 
-  cupsdLogMessage(L_DEBUG, "cupsdPauseListening: Clearing input bits...");
+  cupsdLogMessage(CUPSD_LOG_DEBUG, "cupsdPauseListening: Clearing input bits...");
 
   for (i = NumListeners, lis = Listeners; i > 0; i --, lis ++)
   {
-    cupsdLogMessage(L_DEBUG2, "cupsdPauseListening: Removing fd %d from InputSet...",
-               lis->fd);
+    cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                    "cupsdPauseListening: Removing fd %d from InputSet...",
+                    lis->fd);
 
     FD_CLR(lis->fd, InputSet);
   }
@@ -73,7 +75,7 @@ cupsdPauseListening(void)
 void
 cupsdResumeListening(void)
 {
-  int		i;		/* Looping var */
+  int			i;		/* Looping var */
   cupsd_listener_t	*lis;		/* Current listening socket */
 
 
@@ -81,14 +83,15 @@ cupsdResumeListening(void)
     return;
 
   if (NumClients >= (MaxClients - 1))
-    cupsdLogMessage(L_WARN, "Resuming new connection processing...");
+    cupsdLogMessage(CUPSD_LOG_WARN, "Resuming new connection processing...");
 
-  cupsdLogMessage(L_DEBUG, "cupsdResumeListening: Setting input bits...");
+  cupsdLogMessage(CUPSD_LOG_DEBUG, "cupsdResumeListening: Setting input bits...");
 
   for (i = NumListeners, lis = Listeners; i > 0; i --, lis ++)
   {
-    cupsdLogMessage(L_DEBUG2, "cupsdResumeListening: Adding fd %d to InputSet...",
-               lis->fd);
+    cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                    "cupsdResumeListening: Adding fd %d to InputSet...",
+                    lis->fd);
     FD_SET(lis->fd, InputSet);
   }
 }
@@ -101,14 +104,14 @@ cupsdResumeListening(void)
 void
 cupsdStartListening(void)
 {
-  int		status;			/* Bind result */
-  int		i,			/* Looping var */
-		p,			/* Port number */
-		val;			/* Parameter value */
-  cupsd_listener_t	*lis;			/* Current listening socket */
-  struct hostent *host;			/* Host entry for server address */
-  char		s[256];			/* String addresss */
-  const char	*have_domain;		/* Have a domain socket? */
+  int			status;		/* Bind result */
+  int			i,		/* Looping var */
+			p,		/* Port number */
+			val;		/* Parameter value */
+  cupsd_listener_t	*lis;		/* Current listening socket */
+  struct hostent	*host;		/* Host entry for server address */
+  char			s[256];		/* String addresss */
+  const char		*have_domain;	/* Have a domain socket? */
   static const char * const encryptions[] =
 		{			/* Encryption values */
 		  "IfRequested",
@@ -118,7 +121,8 @@ cupsdStartListening(void)
 		};
 
 
-  cupsdLogMessage(L_DEBUG, "cupsdStartListening: NumListeners=%d", NumListeners);
+  cupsdLogMessage(CUPSD_LOG_DEBUG, "cupsdStartListening: NumListeners=%d",
+                  NumListeners);
 
  /*
   * Get the server's IP address...
@@ -140,8 +144,9 @@ cupsdStartListening(void)
     * Didn't find it!  Use an address of 0...
     */
 
-    cupsdLogMessage(L_ERROR, "cupsdStartListening: Unable to find IP address for server name \"%s\" - %s\n",
-               ServerName, hstrerror(h_errno));
+    cupsdLogMessage(CUPSD_LOG_ERROR,
+                    "cupsdStartListening: Unable to find IP address for server name \"%s\" - %s\n",
+                    ServerName, hstrerror(h_errno));
 
     ServerAddr.ipv4.sin_family = AF_INET;
   }
@@ -197,7 +202,8 @@ cupsdStartListening(void)
       * Try binding to an IPv4 address instead...
       */
 
-      cupsdLogMessage(L_NOTICE, "cupsdStartListening: Unable to use IPv6 address, trying IPv4...");
+      cupsdLogMessage(CUPSD_LOG_NOTICE,
+                      "cupsdStartListening: Unable to use IPv6 address, trying IPv4...");
 
       p = ntohs(lis->address.ipv6.sin6_port);
 
@@ -215,8 +221,9 @@ cupsdStartListening(void)
 
     if (lis->fd == -1)
     {
-      cupsdLogMessage(L_ERROR, "cupsdStartListening: Unable to open listen socket for address %s:%d - %s.",
-                 s, p, strerror(errno));
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+                      "cupsdStartListening: Unable to open listen socket for address %s:%d - %s.",
+                      s, p, strerror(errno));
       exit(errno);
     }
 
@@ -305,8 +312,9 @@ cupsdStartListening(void)
 
     if (status < 0)
     {
-      cupsdLogMessage(L_ERROR, "cupsdStartListening: Unable to bind socket for address %s:%d - %s.",
-                 s, p, strerror(errno));
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+                      "cupsdStartListening: Unable to bind socket for address %s:%d - %s.",
+                      s, p, strerror(errno));
       exit(errno);
     }
 
@@ -316,17 +324,20 @@ cupsdStartListening(void)
 
     if (listen(lis->fd, ListenBackLog) < 0)
     {
-      cupsdLogMessage(L_ERROR, "cupsdStartListening: Unable to listen for clients on address %s:%d - %s.",
-                 s, p, strerror(errno));
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+                      "cupsdStartListening: Unable to listen for clients on address %s:%d - %s.",
+                      s, p, strerror(errno));
       exit(errno);
     }
 
     if (p)
-      cupsdLogMessage(L_INFO, "cupsdStartListening: Listening to %s:%d on fd %d...",
-        	 s, p, lis->fd);
+      cupsdLogMessage(CUPSD_LOG_INFO,
+                      "cupsdStartListening: Listening to %s:%d on fd %d...",
+        	      s, p, lis->fd);
     else
-      cupsdLogMessage(L_INFO, "cupsdStartListening: Listening to %s on fd %d...",
-        	 s, lis->fd);
+      cupsdLogMessage(CUPSD_LOG_INFO,
+                      "cupsdStartListening: Listening to %s on fd %d...",
+        	      s, lis->fd);
   }
 
  /*
@@ -335,7 +346,8 @@ cupsdStartListening(void)
 
   if (!LocalPort && !have_domain)
   {
-    cupsdLogMessage(L_EMERG, "No Listen or Port lines were found to allow access via localhost!");
+    cupsdLogMessage(CUPSD_LOG_EMERG,
+                    "No Listen or Port lines were found to allow access via localhost!");
 
    /*
     * Commit suicide...
@@ -386,7 +398,8 @@ cupsdStopListening(void)
   cupsd_listener_t	*lis;		/* Current listening socket */
 
 
-  cupsdLogMessage(L_DEBUG, "cupsdStopListening: closing all listen sockets.");
+  cupsdLogMessage(CUPSD_LOG_DEBUG,
+                  "cupsdStopListening: closing all listen sockets.");
 
   cupsdPauseListening();
 

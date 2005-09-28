@@ -28,31 +28,32 @@
 
 struct cupsd_client_s
 {
-  http_t	http;			/* HTTP client connection */
-  ipp_t		*request,		/* IPP request information */
-		*response;		/* IPP response information */
-  cupsd_location_t	*best;			/* Best match for AAA */
-  time_t	start;			/* Request start time */
-  http_state_t	operation;		/* Request operation */
-  int		bytes;			/* Bytes transferred for this request */
-  char		username[33],		/* Username from Authorization: line */
-		password[33],		/* Password from Authorization: line */
-		uri[HTTP_MAX_URI],	/* Localized URL/URI for GET/PUT */
-		*filename,		/* Filename of output file */
-		*command,		/* Command to run */
-		*options;		/* Options for command */
-  int		file;			/* Input/output file */
-  int		file_ready;		/* Input ready on file/pipe? */
-  int		pipe_pid;		/* Pipe process ID (or 0 if not a pipe) */
-  int		sent_header,		/* Non-zero if sent HTTP header */
-		got_fields,		/* Non-zero if all fields seen */
-		field_col;		/* Column within line */
-  cups_lang_t	*language;		/* Language to use */
+  http_t		http;		/* HTTP client connection */
+  ipp_t			*request,	/* IPP request information */
+			*response;	/* IPP response information */
+  cupsd_location_t	*best;		/* Best match for AAA */
+  time_t		start;		/* Request start time */
+  http_state_t		operation;	/* Request operation */
+  int			bytes;		/* Bytes transferred for this request */
+  char			username[33],	/* Username from Authorization: line */
+			password[33],	/* Password from Authorization: line */
+			uri[HTTP_MAX_URI],
+					/* Localized URL/URI for GET/PUT */
+			*filename,	/* Filename of output file */
+			*command,	/* Command to run */
+			*options;	/* Options for command */
+  int			file;		/* Input/output file */
+  int			file_ready;	/* Input ready on file/pipe? */
+  int			pipe_pid;	/* Pipe process ID (or 0 if not a pipe) */
+  int			sent_header,	/* Non-zero if sent HTTP header */
+			got_fields,	/* Non-zero if all fields seen */
+			field_col;	/* Column within line */
+  cups_lang_t		*language;	/* Language to use */
 #ifdef HAVE_SSL
-  int		auto_ssl;		/* Automatic test for SSL/TLS */
+  int			auto_ssl;	/* Automatic test for SSL/TLS */
 #endif /* HAVE_SSL */
-  char		servername[256];	/* Server name for connection */
-  int		serverport;		/* Server port for connection */
+  char			servername[256];/* Server name for connection */
+  int			serverport;	/* Server port for connection */
 };
 
 #define HTTP(con) &((con)->http)
@@ -106,17 +107,19 @@ extern void	cupsdCloseAllClients(void);
 extern int	cupsdCloseClient(cupsd_client_t *con);
 extern int	cupsdEncryptClient(cupsd_client_t *con);
 extern int	cupsdIsCGI(cupsd_client_t *con, const char *filename,
-		      struct stat *filestats, mime_type_t *type);
+		           struct stat *filestats, mime_type_t *type);
 extern void	cupsdPauseListening(void);
 extern int	cupsdProcessIPPRequest(cupsd_client_t *con);
 extern int	cupsdReadClient(cupsd_client_t *con);
 extern void	cupsdResumeListening(void);
-extern int	cupsdSendCommand(cupsd_client_t *con, char *command, char *options,
-		            int root);
+extern int	cupsdSendCommand(cupsd_client_t *con, char *command,
+		                 char *options, int root);
 extern int	cupsdSendError(cupsd_client_t *con, http_status_t code);
-extern int	cupsdSendFile(cupsd_client_t *con, http_status_t code, char *filename,
-		         char *type, struct stat *filestats);
-extern int	cupsdSendHeader(cupsd_client_t *con, http_status_t code, char *type);
+extern int	cupsdSendFile(cupsd_client_t *con, http_status_t code,
+		              char *filename, char *type,
+			      struct stat *filestats);
+extern int	cupsdSendHeader(cupsd_client_t *con, http_status_t code,
+		                char *type);
 extern void	cupsdShutdownClient(cupsd_client_t *con);
 extern void	cupsdStartListening(void);
 extern void	cupsdStopListening(void);

@@ -28,10 +28,10 @@
 
 typedef struct
 {
-  char		username[33];	/* User data */
-  time_t	next_update;	/* Next update time */
-  int		page_count,	/* Count of pages */
-		k_count;	/* Count of kilobytes */
+  char		username[33];		/* User data */
+  time_t	next_update;		/* Next update time */
+  int		page_count,		/* Count of pages */
+		k_count;		/* Count of kilobytes */
 } cupsd_quota_t;
 
 
@@ -57,7 +57,7 @@ typedef struct cupsd_printer_s
   int		num_reasons;		/* Number of printer-state-reasons */
   char		*reasons[16];		/* printer-state-reasons strings */
   time_t	state_time;		/* Time at this state */
-  char		*cupsd_job_sheets[2];		/* Banners/job sheets */
+  char		*job_sheets[2];		/* Banners/job sheets */
   cups_ptype_t	type;			/* Printer type (color, small, etc.) */
   time_t	browse_time;		/* Last time update was sent/received */
   char		*device_uri;		/* Device URI */
@@ -68,7 +68,7 @@ typedef struct cupsd_printer_s
   ipp_t		*attrs;			/* Attributes supported by this printer */
   int		num_printers,		/* Number of printers in class */
 		last_printer;		/* Last printer job was sent to */
-  struct cupsd_printer_s **printers;		/* Printers in class */
+  struct cupsd_printer_s **printers;	/* Printers in class */
   int		quota_period,		/* Period for quotas */
 		page_limit,		/* Maximum number of pages */
 		k_limit,		/* Maximum number of kilobytes */
@@ -91,7 +91,7 @@ VAR ipp_t		*CommonData	VALUE(NULL);
 					/* Common printer object attrs */
 VAR cups_array_t	*Printers	VALUE(NULL);
 					/* Printer list */
-VAR cupsd_printer_t		*DefaultPrinter	VALUE(NULL);
+VAR cupsd_printer_t	*DefaultPrinter	VALUE(NULL);
 					/* Default printer */
 VAR char		*DefaultPolicy	VALUE(NULL);
 					/* Default policy name */
@@ -108,14 +108,14 @@ extern cupsd_printer_t	*cupsdAddPrinter(const char *name);
 extern void		cupsdAddPrinterFilter(cupsd_printer_t *p, const char *filter);
 extern void		cupsdAddPrinterHistory(cupsd_printer_t *p);
 extern void		cupsdAddPrinterUser(cupsd_printer_t *p, const char *username);
-extern cupsd_quota_t		*cupsdAddQuota(cupsd_printer_t *p, const char *username);
+extern cupsd_quota_t	*cupsdAddQuota(cupsd_printer_t *p, const char *username);
 extern void		cupsdCreateCommonData(void);
 extern void		cupsdDeleteAllPrinters(void);
 extern void		cupsdDeletePrinter(cupsd_printer_t *p, int update);
 extern void		cupsdDeletePrinterFilters(cupsd_printer_t *p);
 extern cupsd_printer_t	*cupsdFindDest(const char *name);
 extern cupsd_printer_t	*cupsdFindPrinter(const char *name);
-extern cupsd_quota_t		*cupsdFindQuota(cupsd_printer_t *p, const char *username);
+extern cupsd_quota_t	*cupsdFindQuota(cupsd_printer_t *p, const char *username);
 extern void		cupsdFreePrinterUsers(cupsd_printer_t *p);
 extern void		cupsdFreeQuotas(cupsd_printer_t *p);
 extern void		cupsdLoadAllPrinters(void);
@@ -125,12 +125,12 @@ extern void		cupsdSetPrinterReasons(cupsd_printer_t *p, const char *s);
 extern void		cupsdSetPrinterState(cupsd_printer_t *p, ipp_pstate_t s, int update);
 #define			cupsdStartPrinter(p,u) cupsdSetPrinterState((p), IPP_PRINTER_IDLE, (u))
 extern void		cupsdStopPrinter(cupsd_printer_t *p, int update);
-extern cupsd_quota_t		*cupsdUpdateQuota(cupsd_printer_t *p, const char *username,
-			             int pages, int k);
+extern cupsd_quota_t	*cupsdUpdateQuota(cupsd_printer_t *p, const char *username,
+			                  int pages, int k);
 extern const char	*cupsdValidateDest(const char *hostname,
-			              const char *resource,
-			              cups_ptype_t *dtype,
-				      cupsd_printer_t **printer);
+			        	   const char *resource,
+			        	   cups_ptype_t *dtype,
+					   cupsd_printer_t **printer);
 extern void		cupsdWritePrintcap(void);
 
 extern char		*cupsdSanitizeURI(const char *uri, char *buffer,

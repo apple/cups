@@ -26,7 +26,7 @@
  *   cupsdAddBanner()   - Add a banner to the array.
  *   cupsdFindBanner()  - Find a named banner.
  *   cupsdLoadBanners() - Load all available banner files...
- *   compare()     - Compare two banners.
+ *   compare()          - Compare two banners.
  */
 
 /*
@@ -50,9 +50,9 @@ static int	compare(const cupsd_banner_t *b0, const cupsd_banner_t *b1);
 
 void
 cupsdAddBanner(const char *name,	/* I - Name of banner */
-          const char *filename)	/* I - Filename for banner */
+               const char *filename)	/* I - Filename for banner */
 {
-  mime_type_t	*filetype;	/* Filetype */
+  mime_type_t		*filetype;	/* Filetype */
   cupsd_banner_t	*temp;		/* New banner data */
 
 
@@ -62,8 +62,9 @@ cupsdAddBanner(const char *name,	/* I - Name of banner */
 
   if ((filetype = mimeFileType(MimeDatabase, filename, NULL)) == NULL)
   {
-    cupsdLogMessage(L_WARN, "cupsdAddBanner: Banner \"%s\" (\"%s\") is of an unknown file type - skipping!",
-               name, filename);
+    cupsdLogMessage(CUPSD_LOG_WARN,
+                    "cupsdAddBanner: Banner \"%s\" (\"%s\") is of an unknown file type - skipping!",
+                    name, filename);
     return;
   }
 
@@ -78,7 +79,8 @@ cupsdAddBanner(const char *name,	/* I - Name of banner */
 
   if (temp == NULL)
   {
-    cupsdLogMessage(L_ERROR, "cupsdAddBanner: Ran out of memory adding a banner!");
+    cupsdLogMessage(CUPSD_LOG_ERROR,
+                    "cupsdAddBanner: Ran out of memory adding a banner!");
     return;
   }
 
@@ -142,7 +144,7 @@ cupsdLoadBanners(const char *d)		/* I - Directory to search */
 
   if ((dir = cupsDirOpen(d)) == NULL)
   {
-    cupsdLogMessage(L_ERROR, "cupsdLoadBanners: Unable to open banner directory \"%s\": %s",
+    cupsdLogMessage(CUPSD_LOG_ERROR, "cupsdLoadBanners: Unable to open banner directory \"%s\": %s",
                d, strerror(errno));
     return;
   }
@@ -195,7 +197,7 @@ cupsdLoadBanners(const char *d)		/* I - Directory to search */
  * 'compare()' - Compare two banners.
  */
 
-static int			/* O - -1 if name0 < name1, etc. */
+static int				/* O - -1 if name0 < name1, etc. */
 compare(const cupsd_banner_t *b0,	/* I - First banner */
         const cupsd_banner_t *b1)	/* I - Second banner */
 {
