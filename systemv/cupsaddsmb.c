@@ -625,7 +625,7 @@ export_dest(const char *dest)		/* I - Destination to export */
     * See if we also have the CUPS driver files; if so, use them!
     */
 
-    snprintf(file, sizeof(file), "%s/drivers/cupsdrv6.dll", datadir);
+    snprintf(file, sizeof(file), "%s/drivers/cupsps6.dll", datadir);
     if (!access(file, 0))
     {
      /*
@@ -634,7 +634,7 @@ export_dest(const char *dest)		/* I - Destination to export */
 
       snprintf(subcmd, sizeof(subcmd),
                "put %s/drivers/cups6.ini W32X86/cups6.ini;"
-               "put %s/drivers/cupsdrv6.dll W32X86/cupsdrv6.dll;"
+               "put %s/drivers/cupsps6.dll W32X86/cupsps6.dll;"
 	       "put %s/drivers/cupsui6.dll W32X86/cupsui6.dll",
 	       datadir, datadir, datadir);
 
@@ -654,7 +654,7 @@ export_dest(const char *dest)		/* I - Destination to export */
                "adddriver \"Windows NT x86\" \"%s:"
 	       "pscript5.dll:%s.ppd:ps5ui.dll:pscript.hlp:NULL:RAW:"
 	       "pscript5.dll,%s.ppd,ps5ui.dll,pscript.hlp,pscript.ntf,"
-	       "cups6.ini,cupsdrv6.dll,cupsui6.dll\"",
+	       "cups6.ini,cupsps6.dll,cupsui6.dll\"",
 	       dest, dest, dest);
     }
     else
