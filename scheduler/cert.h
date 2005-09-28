@@ -27,7 +27,7 @@
  * Certificate structure...
  */
 
-typedef struct cert_str
+typedef struct cert_s
 {
   struct cert_str *next;	/* Next certificate in list */
   int		pid;		/* Process ID (0 for root certificate) */

@@ -170,7 +170,6 @@ extern void	CatchChildSignals(void);
 extern void	ClearString(char **s);
 extern void	HoldSignals(void);
 extern void	IgnoreChildSignals(void);
-extern void	LoadPPDs(const char *d);
 extern void	ReleaseSignals(void);
 extern void	SetString(char **s, const char *v);
 extern void	SetStringf(char **s, const char *f, ...)
