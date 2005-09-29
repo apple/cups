@@ -33,12 +33,12 @@
  *   cupsdStopPolling()       - Stop polling servers as needed.
  *   cupsdUpdateCUPSBrowse()  - Update the browse lists using the CUPS protocol.
  *   cupsdUpdatePolling()     - Read status messages from the poll daemons.
- *   slp_reg_callback()      - Empty SLPRegReport.
+ *   slp_reg_callback()       - Empty SLPRegReport.
  *   cupsdSendSLPBrowse()     - Register the specified printer with SLP.
- *   slp_dereg_printer()        - SLPDereg() the specified printer
- *   slp_get_attr()          - Get an attribute from an SLP registration.
- *   slp_attr_callback()           - SLP attribute callback 
- *   slp_url_callback()         - SLP service url callback
+ *   slp_dereg_printer()      - SLPDereg() the specified printer
+ *   slp_get_attr()           - Get an attribute from an SLP registration.
+ *   slp_attr_callback()      - SLP attribute callback 
+ *   slp_url_callback()       - SLP service url callback
  *   cupsdUpdateSLPBrowse()   - Get browsing information via SLP.
  */
 
@@ -729,7 +729,7 @@ cupsdSendBrowseList(void)
     */
 
     if (BrowseNext)
-      p = (cupsd_printer_t *)cupsArrayFind(Printers, BrowseNext->name);
+      p = (cupsd_printer_t *)cupsArrayFind(Printers, BrowseNext);
     else
       p = (cupsd_printer_t *)cupsArrayFirst(Printers);
 
@@ -1008,6 +1008,8 @@ cupsdStartBrowsing(void)
   int			val;		/* Socket option value */
   struct sockaddr_in	addr;		/* Broadcast address */
 
+
+  BrowseNext = NULL;
 
   if (!Browsing || !(BrowseLocalProtocols | BrowseRemoteProtocols))
     return;
