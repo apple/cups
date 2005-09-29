@@ -785,11 +785,17 @@ ippFindNextAttribute(ipp_t      *ipp,	/* I - IPP request */
     return (NULL);
 
   if (ipp->current)
-    attr = ipp->current->next;
+  {
+    ipp->prev = ipp->current;
+    attr      = ipp->current->next;
+  }
   else
-    attr = ipp->attrs;
+  {
+    ipp->prev = NULL;
+    attr      = ipp->attrs;
+  }
 
-  for (; attr != NULL; attr = attr->next)
+  for (; attr != NULL; ipp->prev = attr, attr = attr->next)
   {
     DEBUG_printf(("ippFindAttribute: attr = %p, name = \'%s\'\n", attr,
                   attr->name));
@@ -808,6 +814,7 @@ ippFindNextAttribute(ipp_t      *ipp,	/* I - IPP request */
   }
 
   ipp->current = NULL;
+  ipp->prev    = NULL;
 
   return (NULL);
 }
@@ -828,11 +835,13 @@ ippLength(ipp_t *ipp)			/* I - IPP request */
  * 'ippNew()' - Allocate a new IPP request.
  */
 
-ipp_t *						/* O - New IPP request */
+ipp_t *					/* O - New IPP request */
 ippNew(void)
 {
-  ipp_t	*temp;					/* New IPP request */
+  ipp_t	*temp;				/* New IPP request */
 
+
+  DEBUG_puts("ippNew()");
 
   if ((temp = (ipp_t *)calloc(1, sizeof(ipp_t))) != NULL)
   {
@@ -844,7 +853,7 @@ ippNew(void)
     temp->request.any.version[1] = 1;
   }
 
-  DEBUG_printf(("ippNew(): %p\n", temp));
+  DEBUG_printf(("ippNew: %p\n", temp));
 
   return (temp);
 }
@@ -948,15 +957,18 @@ ippReadIO(void       *src,		/* I - Data source */
           ipp->request.any.op_status   = (buffer[2] << 8) | buffer[3];
           ipp->request.any.request_id  = (((((buffer[4] << 8) | buffer[5]) << 8) |
 	                        	 buffer[6]) << 8) | buffer[7];
+
+          DEBUG_printf(("ippReadIO: version=%d.%d\n", buffer[0], buffer[1]));
+	  DEBUG_printf(("ippReadIO: op_status=%04x\n",
+	                ipp->request.any.op_status));
+	  DEBUG_printf(("ippReadIO: request_id=%d\n",
+	                ipp->request.any.request_id));
         }
 
         ipp->state   = IPP_ATTRIBUTE;
 	ipp->current = NULL;
 	ipp->curtag  = IPP_TAG_ZERO;
-
-        DEBUG_printf(("ippReadIO: version=%d.%d\n", buffer[0], buffer[1]));
-	DEBUG_printf(("ippReadIO: op_status=%04x\n", ipp->request.any.op_status));
-	DEBUG_printf(("ippReadIO: request_id=%d\n", ipp->request.any.request_id));
+	ipp->prev    = ipp->last;
 
        /*
         * If blocking is disabled, stop here...
@@ -968,6 +980,9 @@ ippReadIO(void       *src,		/* I - Data source */
     case IPP_ATTRIBUTE :
         while ((*cb)(src, buffer, 1) > 0)
 	{
+	  DEBUG_printf(("ippReadIO: ipp->current=%p, ipp->prev=%p\n",
+	                ipp->current, ipp->prev));
+
 	 /*
 	  * Read this attribute...
 	  */
@@ -992,11 +1007,14 @@ ippReadIO(void       *src,		/* I - Data source */
 	    */
 
             if (ipp->curtag == tag)
-	      ippAddSeparator(ipp);
+	      ipp->prev = ippAddSeparator(ipp);
+            else if (ipp->current)
+	      ipp->prev = ipp->current;
 
 	    ipp->curtag  = tag;
 	    ipp->current = NULL;
-	    DEBUG_printf(("ippReadIO: group tag = %x\n", tag));
+	    DEBUG_printf(("ippReadIO: group tag = %x, ipp->prev=%p\n", tag,
+	                  ipp->prev));
 	    continue;
 	  }
 
@@ -1022,7 +1040,8 @@ ippReadIO(void       *src,		/* I - Data source */
 
           DEBUG_printf(("ippReadIO: name length = %d\n", n));
 
-          if (n == 0 && tag != IPP_TAG_MEMBERNAME)
+          if (n == 0 && tag != IPP_TAG_MEMBERNAME &&
+	      tag != IPP_TAG_END_COLLECTION)
 	  {
 	   /*
 	    * More values for current attribute...
@@ -1059,27 +1078,29 @@ ippReadIO(void       *src,		/* I - Data source */
     		  (tag < IPP_TAG_TEXTLANG || tag > IPP_TAG_MIMETYPE))
 	        return (IPP_ERROR);
             }
-	    else if (attr->value_tag != tag &&
-		     tag != IPP_TAG_END_COLLECTION)
+	    else if (attr->value_tag != tag)
 	      return (IPP_ERROR);
 
            /*
 	    * Finally, reallocate the attribute array as needed...
 	    */
 
-	    if ((attr->num_values % IPP_MAX_VALUES) == 0 &&
-	        attr->num_values > 0)
+	    if (attr->num_values == 1 ||
+	        (attr->num_values > 0 &&
+	         (attr->num_values & (IPP_MAX_VALUES - 1)) == 0))
 	    {
-	      ipp_attribute_t	*temp,	/* Pointer to new buffer */
-				*ptr;	/* Pointer in attribute list */
+	      ipp_attribute_t	*temp;	/* Pointer to new buffer */
 
+
+              DEBUG_printf(("ippReadIO: reallocating for up to %d values...\n",
+	                    attr->num_values + IPP_MAX_VALUES));
 
              /*
 	      * Reallocate memory...
 	      */
 
               if ((temp = realloc(attr, sizeof(ipp_attribute_t) +
-	                                (attr->num_values + IPP_MAX_VALUES) *
+	                                (attr->num_values + IPP_MAX_VALUES - 1) *
 					sizeof(ipp_value_t))) == NULL)
 	        return (IPP_ERROR);
 
@@ -1089,10 +1110,8 @@ ippReadIO(void       *src,		/* I - Data source */
 		* Reset pointers in the list...
 		*/
 
-		for (ptr = ipp->attrs; ptr && ptr->next != attr; ptr = ptr->next);
-
-        	if (ptr)
-	          ptr->next = temp;
+        	if (ipp->prev)
+	          ipp->prev->next = temp;
 		else
 	          ipp->attrs = temp;
 
@@ -1112,13 +1131,19 @@ ippReadIO(void       *src,		/* I - Data source */
 	      return (IPP_ERROR);
 	    }
 
-	    attr = ipp->current = _ipp_add_attr(ipp, IPP_MAX_VALUES);
+            if (ipp->current)
+	      ipp->prev = ipp->current;
+
+	    attr = ipp->current = _ipp_add_attr(ipp, 1);
+
+	    DEBUG_printf(("ippReadIO: membername, ipp->current=%p, ipp->prev=%p\n",
+	                  ipp->current, ipp->prev));
 
 	    attr->group_tag  = ipp->curtag;
 	    attr->value_tag  = IPP_TAG_ZERO;
 	    attr->num_values = 0;
 	  }
-	  else
+	  else if (tag != IPP_TAG_END_COLLECTION)
 	  {
 	   /*
 	    * New attribute; read the name and add it...
@@ -1131,9 +1156,14 @@ ippReadIO(void       *src,		/* I - Data source */
 	    }
 
 	    buffer[n] = '\0';
-	    DEBUG_printf(("ippReadIO: name = \'%s\'\n", buffer));
 
-	    attr = ipp->current = _ipp_add_attr(ipp, IPP_MAX_VALUES);
+            if (ipp->current)
+	      ipp->prev = ipp->current;
+
+	    attr = ipp->current = _ipp_add_attr(ipp, 1);
+
+	    DEBUG_printf(("ippReadIO: name=\'%s\', ipp->current=%p, ipp->prev=%p\n",
+	                  buffer, ipp->current, ipp->prev));
 
 	    attr->group_tag  = ipp->curtag;
 	    attr->value_tag  = tag;
@@ -1141,7 +1171,8 @@ ippReadIO(void       *src,		/* I - Data source */
 	    attr->num_values = 0;
 	  }
 
-          value = attr->values + attr->num_values;
+          if (tag != IPP_TAG_END_COLLECTION)
+            value = attr->values + attr->num_values;
 
 	  if ((*cb)(src, buffer, 2) < 2)
 	  {
@@ -2252,15 +2283,15 @@ _ipp_add_attr(ipp_t *ipp,		/* I - IPP request */
 
   attr->num_values = num_values;
 
-  if (attr == NULL)
-    return (NULL);
+  if (attr != NULL)
+  {
+    if (ipp->last == NULL)
+      ipp->attrs = attr;
+    else
+      ipp->last->next = attr;
 
-  if (ipp->last == NULL)
-    ipp->attrs = attr;
-  else
-    ipp->last->next = attr;
-
-  ipp->last = attr;
+    ipp->last = attr;
+  }
 
   DEBUG_printf(("_ipp_add_attr(): %p\n", attr));
 
@@ -2432,11 +2463,7 @@ ipp_length(ipp_t *ipp,			/* I - IPP request or collection */
 	  for (i = 0, value = attr->values;
 	       i < attr->num_values;
 	       i ++, value ++)
-	  {
-/*            bytes += 5;*/		/* Overhead of begCollection */
             bytes += ipp_length(attr->values[i].collection, 1);
-/*            bytes += 5;*/		/* Overhead of endCollection */
-	  }
 	  break;
 
       default :

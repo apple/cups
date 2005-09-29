@@ -65,7 +65,7 @@ extern "C" {
  */
 
 #  define IPP_MAX_NAME		256
-#  define IPP_MAX_VALUES	10	/* Now just an allocation increment */
+#  define IPP_MAX_VALUES	8	/* Power-of-2 allocation increment */
 
 
 /*
@@ -400,6 +400,9 @@ struct ipp_str			/**** IPP Request/Response/Notification ****/
 		*last,		/* Last attribute in list */
 		*current;	/* Current attribute (for read/write) */
   ipp_tag_t	curtag;		/* Current attribute group tag */
+
+/**** New in CUPS 1.2 ****/
+  ipp_attribute_t *prev;	/* Previous attribute (for read) */
 };
 
 

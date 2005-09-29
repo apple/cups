@@ -48,7 +48,7 @@
  */
 
 int	do_test(const char *server, http_encryption_t encryption,
-		int requests);
+		int requests, int verbose);
 void	usage(void);
 
 
@@ -71,6 +71,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   time_t	start,			/* Start time */
 		end;			/* End time */
   double	elapsed;		/* Elapsed time */
+  int		verbose;		/* Verbosity */
 
 
  /*
@@ -81,6 +82,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   children   = 5;
   server     = cupsServer();
   encryption = HTTP_ENCRYPT_IF_REQUESTED;
+  verbose    = 0;
 
   for (i = 1; i < argc; i ++)
     if (!strcmp(argv[i], "-c"))
@@ -101,6 +103,8 @@ main(int  argc,				/* I - Number of command-line arguments */
     }
     else if (!strcmp(argv[i], "-E"))
       encryption = HTTP_ENCRYPT_REQUIRED;
+    else if (!strcmp(argv[i], "-v"))
+      verbose ++;
     else if (argv[i][0] == '-')
       usage();
     else
@@ -118,7 +122,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   if (children == 1)
   {
-    do_test(server, encryption, requests);
+    do_test(server, encryption, requests, verbose);
   }
   else
   {
@@ -129,7 +133,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	* Child goes here...
 	*/
 
-	exit(do_test(server, encryption, requests));
+	exit(do_test(server, encryption, requests, verbose));
       }
       else if (pid < 0)
       {
@@ -180,7 +184,8 @@ main(int  argc,				/* I - Number of command-line arguments */
 int					/* O - Exit status */
 do_test(const char        *server,	/* I - Server to use */
         http_encryption_t encryption,	/* I - Encryption to use */
-	int               requests)	/* I - Number of requests to send */
+	int               requests,	/* I - Number of requests to send */
+	int               verbose)	/* I - Verbose output? */
 {
   int		i;			/* Looping var */
   http_t	*http;			/* Connection to server */
@@ -219,7 +224,7 @@ do_test(const char        *server,	/* I - Server to use */
 
   for (elapsed = 0.0, i = 0; i < requests; i ++)
   {
-    if ((i % 10) == 0)
+    if (verbose && (i % 10) == 0)
       printf("testspeed(%d): %d%% complete...\n", getpid(), i * 100 / requests);
 
    /*
@@ -288,7 +293,7 @@ do_test(const char        *server,	/* I - Server to use */
 void
 usage(void)
 {
-  puts("Usage: testspeed [-c children] [-h] [-r requests] [-E] hostname");
+  puts("Usage: testspeed [-c children] [-h] [-r requests] [-v] [-E] hostname");
   exit(0);
 }
 
