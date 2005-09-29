@@ -728,7 +728,12 @@ cupsdSendBrowseList(void)
     * Loop through all of the printers and send local updates as needed...
     */
 
-    for (p = (cupsd_printer_t *)cupsArrayFind(Printers, BrowseNext->name);
+    if (BrowseNext)
+      p = (cupsd_printer_t *)cupsArrayFind(Printers, BrowseNext->name);
+    else
+      p = (cupsd_printer_t *)cupsArrayFirst(Printers);
+
+    for (;
          count > 0;
 	 p = (cupsd_printer_t *)cupsArrayNext(Printers))
     {
