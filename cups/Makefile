@@ -64,6 +64,7 @@ LIBOBJS	=	\
 		util.o
 OBJS	=	\
 		$(LIBOBJS) \
+		testarray.o \
 		testhttp.o \
 		testi18n.o \
 		testipp.o \
@@ -96,6 +97,7 @@ HEADERS	=	\
 TARGETS	=	\
 		$(LIBCUPS) \
 		libcups.a \
+		testarray \
 		testhttp \
 		testi18n \
 		testipp \
@@ -245,6 +247,16 @@ cups_C.h:	../locale/C/cups_C
 	echo Generating $@...
 	$(RM) cups_C.h
 	$(AWK) '{print "\"" $$0 "\","}' < ../locale/C/cups_C > cups_C.h
+
+
+#
+# testarray (dependency on static CUPS library is intentional)
+#
+
+testarray:	testarray.o libcups.a
+	echo Linking $@...
+	$(CC) $(LDFLAGS) -o $@ testarray.o libcups.a \
+		$(NETLIBS) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
 
 
 #

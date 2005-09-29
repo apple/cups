@@ -48,6 +48,7 @@ usersys.o: http-private.h ../config.h http.h string.h md5.h globals.h cups.h
 usersys.o: ipp.h ppd.h file.h language.h normalize.h transcode.h
 util.o: globals.h string.h ../config.h cups.h ipp.h http.h md5.h ppd.h file.h
 util.o: language.h normalize.h transcode.h debug.h
+testarray.o: ../cups/string.h ../config.h string.h ipp.h http.h md5.h
 testhttp.o: http.h string.h ../config.h md5.h
 testi18n.o: language.h string.h ../config.h transcode.h normalize.h
 testipp.o: ../cups/string.h ../config.h string.h ipp.h http.h md5.h
