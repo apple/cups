@@ -597,7 +597,7 @@ cupsdProcessBrowseData(
 	name[len] = '\0';
 	offset    = 0;
 
-	if ((first = cupsdFindDest(name)) != NULL &&
+	if ((first = (hptr ? cupsdFindDest(name) : p)) != NULL &&
 	    !(first->type & CUPS_PRINTER_IMPLICIT))
 	{
 	 /*

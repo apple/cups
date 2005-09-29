@@ -1,8 +1,10 @@
-CHANGES.txt - 09/22/2005
+CHANGES.txt - 09/29/2005
 ------------------------
 
 CHANGES IN CUPS V1.2.0b1
 
+	- Fixed a performance issue with the scheduler's implicit
+	  class implementation (STR #1283)
 	- The pdftops filter now adds the Title and Creator
 	  fields from the PDF file to the PostScript document
 	  comments section (STR #830)
