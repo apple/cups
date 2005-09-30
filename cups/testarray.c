@@ -25,7 +25,9 @@
  *
  * Contents:
  *
- *   main() - Main entry.
+ *   main()        - Main entry.
+ *   get_seconds() - Get the current time in seconds...
+ *   load_words()  - Load words from a file.
  */
 
 /*
@@ -37,6 +39,16 @@
 #include <cups/string.h>
 #include <errno.h>
 #include "array.h"
+#include "dir.h"
+#include "debug.h"
+
+
+/*
+ * Local functions...
+ */
+
+static double	get_seconds(void);
+static int	load_words(const char *filename, cups_array_t *array);
 
 
 /*
@@ -47,13 +59,16 @@ int					/* O - Exit status */
 main(int  argc,				/* I - Number of command-line arguments */
      char *argv[])			/* I - Command-line arguments */
 {
+  int		i;			/* Looping var */
   cups_array_t	*array,			/* Test array */
 		*dup_array;		/* Duplicate array */
   int		status;			/* Exit status */
   char		*text;			/* Text from array */
-#ifdef DEBUG
-  int		i;			/* Looping var */
-#endif /* DEBUG */
+  char		word[256];		/* Word from file */
+  double	start,			/* Start time */
+		end;			/* End time */
+  cups_dir_t	*dir;			/* Current directory */
+  cups_dentry_t	*dent;			/* Directory entry */
 
 
  /*
@@ -274,8 +289,94 @@ main(int  argc,				/* I - Number of command-line arguments */
     status ++;
   }
 
+ /*
+  * cupsArrayClear()
+  */
+
+  fputs("cupsArrayClear: ", stdout);
+  cupsArrayClear(array);
+  if (cupsArrayCount(array) == 0)
+    puts("PASS");
+  else
+  {
+    printf("FAIL (%d elements, expected 0 elements)\n",
+           cupsArrayCount(array));
+    status ++;
+  }
+
+ /*
+  * Now load this source file and grab all of the unique words...
+  */
+
+  fputs("Load unique words: ", stdout);
+  fflush(stdout);
+
+  start = get_seconds();
+
+  if ((dir = cupsDirOpen(".")) == NULL)
+  {
+    puts("FAIL (cupsDirOpen failed)");
+    status ++;
+  }
+  else
+  {
+    while ((dent = cupsDirRead(dir)) != NULL)
+    {
+      i = strlen(dent->filename) - 2;
+
+      if (i > 0 && dent->filename[i] == '.' &&
+          (dent->filename[i + 1] == 'c' ||
+	   dent->filename[i + 1] == 'h'))
+	load_words(dent->filename, array);
+    }
+
+    cupsDirClose(dir);
+
+    end = get_seconds();
+
+    printf("%d words in %.3f seconds (%.0f words/sec), ", cupsArrayCount(array),
+           end - start, cupsArrayCount(array) / (end - start));
+    fflush(stdout);
+
+    for (text = (char *)cupsArrayFirst(array); text;)
+    {
+     /*
+      * Copy this word to the word buffer (safe because we strdup'd from
+      * the same buffer in the first place... :)
+      */
+
+      strcpy(word, text);
+
+     /*
+      * Grab the next word and compare...
+      */
+
+      if ((text = (char *)cupsArrayNext(array)) == NULL)
+	break;
+
+      if (strcmp(word, text) >= 0)
+	break;
+    }
+
+    if (text)
+    {
+      printf("FAIL (\"%s\" >= \"%s\"!)\n", word, text);
+      status ++;
+    }
+    else
+      puts("PASS");
+  }
+
+ /*
+  * Delete the arrays...
+  */
+
   cupsArrayDelete(array);
   cupsArrayDelete(dup_array);
+
+ /*
+  * Summarize the results and return...
+  */
 
   if (!status)
     puts("\nALL TESTS PASSED!");
@@ -283,6 +384,70 @@ main(int  argc,				/* I - Number of command-line arguments */
     printf("\n%d TEST(S) FAILED!\n", status);
 
   return (status);
+}
+
+
+/*
+ * 'get_seconds()' - Get the current time in seconds...
+ */
+
+#ifdef WIN32
+#  include <windows.h>
+
+
+static double
+get_seconds(void)
+{
+}
+#else
+#  include <sys/time.h>
+
+
+static double
+get_seconds(void)
+{
+  struct timeval	curtime;	/* Current time */
+
+
+  gettimeofday(&curtime, NULL);
+  return (curtime.tv_sec + 0.000001 * curtime.tv_usec);
+}
+#endif /* WIN32 */
+
+
+/*
+ * 'load_words()' - Load words from a file.
+ */
+
+static int				/* O - 1 on success, 0 on failure */
+load_words(const char   *filename,	/* I - File to load */
+           cups_array_t *array)		/* I - Array to add to */
+{
+  FILE		*fp;			/* Test file */
+  char		word[256];		/* Word from file */
+
+
+  DEBUG_printf(("    Loading \"%s\"...\n", filename));
+
+  if ((fp = fopen(filename, "r")) == NULL)
+  {
+    perror(filename);
+    return (0);
+  }
+
+  while (fscanf(fp, "%255s", word) == 1)
+  {
+    if (!cupsArrayFind(array, word))
+    {
+      DEBUG_printf(("    Adding \"%s\"...\n", word));
+
+      cupsArrayAdd(array, strdup(word));
+    }
+  }
+
+  fclose(fp);
+
+  return (1);
 }
 
 

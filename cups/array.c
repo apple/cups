@@ -64,7 +64,8 @@ struct _cups_array_s			/**** CUPS array structure ****/
 
   int			num_elements,	/* Number of array elements */
 			alloc_elements,	/* Allocated array elements */
-			current;	/* Current element */
+			current,	/* Current element */
+			insert;		/* Last inserted element */
   void			**elements;	/* Array elements */
   cups_array_func_t	compare;	/* Element comparison function */
   void			*data;		/* User data passed to compare */
@@ -75,7 +76,7 @@ struct _cups_array_s			/**** CUPS array structure ****/
  * Local functions...
  */
 
-static int	cups_find(cups_array_t *a, void *e, int *rdiff);
+static int	cups_find(cups_array_t *a, void *e, int prev, int *rdiff);
 
 
 /*
@@ -164,7 +165,10 @@ cupsArrayAdd(cups_array_t *a,		/* I - Array */
     * Do a binary search for the insertion point...
     */
 
-    current = cups_find(a, e, &diff);
+    current = cups_find(a, e, a->insert, &diff);
+
+    if (diff > 0)
+      current ++;
   }
 
  /*
@@ -187,11 +191,17 @@ cupsArrayAdd(cups_array_t *a,		/* I - Array */
   }
 #ifdef DEBUG
   else
-    puts("cupsArrayAdd: append element...");
+    printf("cupsArrayAdd: append element at %d...\n", current);
 #endif /* DEBUG */
 
   a->elements[current] = e;
   a->num_elements ++;
+  a->insert = current;
+
+#ifdef DEBUG
+  for (current = 0; current < a->num_elements; current ++)
+    printf("cupsArrayAdd: a->elements[%d]=%p\n", current, a->elements[current]);
+#endif /* DEBUG */
 
   DEBUG_puts("cupsArrayAdd: returning 1");
 
@@ -219,6 +229,8 @@ cupsArrayClear(cups_array_t *a)		/* I - Array */
   */
 
   a->num_elements = 0;
+  a->current      = -1;
+  a->insert       = -1;
 }
 
 
@@ -322,6 +334,8 @@ cupsArrayDup(cups_array_t *a)		/* I - Array */
 
   da->compare = a->compare;
   da->data    = a->data;
+  da->current = a->current;
+  da->insert  = a->insert;
 
   if (a->num_elements)
   {
@@ -383,7 +397,7 @@ cupsArrayFind(cups_array_t *a,		/* I - Array */
   * Yes, look for a match...
   */
 
-  current = cups_find(a, e, &diff);
+  current = cups_find(a, e, a->current, &diff);
   if (!diff)
   {
    /*
@@ -476,6 +490,8 @@ cupsArrayNew(cups_array_func_t f,	/* I - Comparison function */
 
   a->compare = f;
   a->data    = d;
+  a->current = -1;
+  a->insert  = -1;
 
   return (a);
 }
@@ -557,7 +573,7 @@ cupsArrayRemove(cups_array_t *a,	/* I - Array */
   if (!a->num_elements)
     return (0);
 
-  current = cups_find(a, e, &diff);
+  current = cups_find(a, e, a->current, &diff);
   if (diff)
     return (0);
 
@@ -571,6 +587,12 @@ cupsArrayRemove(cups_array_t *a,	/* I - Array */
     memmove(a->elements + current, a->elements + current + 1,
             (a->num_elements - current) * sizeof(void *));
 
+  if (current < a->current)
+    a->current --;
+
+  if (current < a->insert)
+    a->insert --;
+
   return (1);
 }
 
@@ -582,6 +604,7 @@ cupsArrayRemove(cups_array_t *a,	/* I - Array */
 static int				/* O - Index of match */
 cups_find(cups_array_t *a,		/* I - Array */
           void         *e,		/* I - Element */
+	  int          prev,		/* I - Previous index */
 	  int          *rdiff)		/* O - Difference of match */
 {
   int	left,				/* Left side of search */
@@ -590,7 +613,8 @@ cups_find(cups_array_t *a,		/* I - Array */
 	diff;				/* Comparison with current element */
 
 
-  DEBUG_printf(("cups_find(a=%p, e=%p, rdiff=%p)\n", a, e, rdiff));
+  DEBUG_printf(("cups_find(a=%p, e=%p, prev=%d, rdiff=%p)\n", a, e, prev,
+                rdiff));
 
   if (a->compare)
   {
@@ -600,38 +624,42 @@ cups_find(cups_array_t *a,		/* I - Array */
 
     DEBUG_puts("cups_find: binary search");
 
-    if (a->current >= 0 && a->current < a->num_elements)
+    if (prev >= 0 && prev < a->num_elements)
     {
      /*
-      * Start search on either side of current...
+      * Start search on either side of previous...
       */
 
-      if ((diff = (*(a->compare))(e, a->elements[a->current], a->data)) == 0)
+      if ((diff = (*(a->compare))(e, a->elements[prev], a->data)) == 0 ||
+          (diff < 0 && prev == 0) ||
+	  (diff > 0 && prev == (a->num_elements - 1)))
       {
        /*
-        * Exact match, return it!
+        * Exact or edge match, return it!
 	*/
 
-	*rdiff = 0;
+        DEBUG_printf(("cups_find: Returning %d, diff=%d\n", prev, diff));
 
-	return (a->current);
+	*rdiff = diff;
+
+	return (prev);
       }
       else if (diff < 0)
       {
        /*
-        * Start with current on right side...
+        * Start with previous on right side...
 	*/
 
 	left  = 0;
-	right = a->current;
+	right = prev;
       }
       else
       {
        /*
-        * Start wih current on left side...
+        * Start wih previous on left side...
 	*/
 
-        left  = a->current;
+        left  = prev;
 	right = a->num_elements - 1;
       }
     }
@@ -668,9 +696,13 @@ cups_find(cups_array_t *a,		/* I - Array */
       * Check the last 1 or 2 elements...
       */
 
-      for (current = left; current <= right; current ++)
-	if ((diff = (*(a->compare))(e, a->elements[current], a->data)) <= 0)
-          break;
+      if ((diff = (*(a->compare))(e, a->elements[left], a->data)) <= 0)
+        current = left;
+      else
+      {
+        diff    = (*(a->compare))(e, a->elements[right], a->data);
+        current = right;
+      }
     }
   }
   else
