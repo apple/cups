@@ -66,6 +66,7 @@
  */
 
 static char	tmpfilename[1024] = "";	/* Temporary spool file name */
+static int	abort_job = 0;		/* Non-zero if we get SIGTERM */
 
 
 /*
@@ -465,6 +466,13 @@ lpd_command(int  fd,		/* I - Socket connection to LPD host */
 
 
  /*
+  * Don't try to send commands if the job has been cancelled...
+  */
+
+  if (abort_job)
+    return (-1);
+
+ /*
   * Format the string...
   */
 
@@ -541,9 +549,9 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
   http_addr_t		addr;		/* Socket address */
   struct hostent	*hostaddr;	/* Host address */
   int			copy;		/* Copies written */
-  size_t		nbytes,		/* Number of bytes written */
-			tbytes;		/* Total bytes written */
-  char			buffer[8192];	/* Output buffer */
+  size_t		nbytes;		/* Number of bytes written */
+  off_t			tbytes;		/* Total bytes written */
+  char			buffer[65536];	/* Output buffer */
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
   struct sigaction	action;		/* Actions for POSIX signals */
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET */
@@ -569,7 +577,7 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
   * Loop forever trying to print the file...
   */
 
-  for (;;) /* FOREVER */
+  while (!abort_job)
   {
    /*
     * First try to reserve a port for this connection...
@@ -587,6 +595,13 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
 
     for (lport = reserve == RESERVE_RFC1179 ? 732 : 1024;;)
     {
+     /*
+      * Stop if this job has been cancelled...
+      */
+
+      if (abort_job)
+        return (CUPS_BACKEND_FAILED);
+
      /*
       * Choose the next priviledged port...
       */
@@ -638,6 +653,12 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
 
       for (i = 0; hostaddr->h_addr_list[i]; i ++)
       {
+        if (abort_job)
+	{
+	  close(fd);
+	  return (CUPS_BACKEND_FAILED);
+	}
+
         httpAddrLoad(hostaddr, port, i, &addr);
 
 	if (!connect(fd, (struct sockaddr *)&addr, sizeof(addr)))
@@ -761,8 +782,8 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
                       getpid() % 1000, localhost))
         return (CUPS_BACKEND_FAILED);
 
-      fprintf(stderr, "INFO: Sending control file (%lu bytes)\n",
-              (unsigned long)strlen(control));
+      fprintf(stderr, "INFO: Sending control file (%u bytes)\n",
+              (unsigned)strlen(control));
 
       if (lpd_write(fd, control, strlen(control) + 1) < (strlen(control) + 1))
       {
@@ -798,13 +819,13 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
       * Send the print file...
       */
 
-      if (lpd_command(fd, timeout, "\003%u dfA%03.3d%.15s\n",
-                      (unsigned)filestats.st_size, getpid() % 1000,
+      if (lpd_command(fd, timeout, "\003" CUPS_LLFMT " dfA%03.3d%.15s\n",
+                      CUPS_LLCAST filestats.st_size, getpid() % 1000,
 		      localhost))
         return (CUPS_BACKEND_FAILED);
 
-      fprintf(stderr, "INFO: Sending data file (%u bytes)\n",
-              (unsigned)filestats.st_size);
+      fprintf(stderr, "INFO: Sending data file (" CUPS_LLFMT " bytes)\n",
+              CUPS_LLCAST filestats.st_size);
 
       tbytes = 0;
       for (copy = 0; copy < manual_copies; copy ++)
@@ -813,8 +834,8 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
 
 	while ((nbytes = fread(buffer, 1, sizeof(buffer), fp)) > 0)
 	{
-	  fprintf(stderr, "INFO: Spooling LPR job, %u%% complete...\n",
-        	  (unsigned)(100.0f * tbytes / filestats.st_size));
+	  fprintf(stderr, "INFO: Spooling LPR job, %.0f%% complete...\n",
+        	  100.0 * tbytes / filestats.st_size);
 
 	  if (lpd_write(fd, buffer, nbytes) < nbytes)
 	  {
@@ -912,6 +933,12 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
 
     sleep(30);
   }
+
+ /*
+  * If we get here, then the job has been cancelled...
+  */
+
+  return (CUPS_BACKEND_FAILED);
 }
 
 
@@ -942,6 +969,9 @@ lpd_write(int  lpd_fd,			/* I - LPD socket */
   int	bytes,				/* Number of bytes written */
 	total;				/* Total number of bytes written */
 
+
+  if (abort_job)
+    return (-1);
 
   total = 0;
   while ((bytes = send(lpd_fd, buffer, length - total, 0)) >= 0)
@@ -1058,14 +1088,7 @@ sigterm_handler(int sig)		/* I - Signal */
 {
   (void)sig;	/* remove compiler warnings... */
 
- /*
-  * Remove the temporary file if necessary...
-  */
-
-  if (tmpfilename[0])
-    unlink(tmpfilename);
-
-  exit(1);
+  abort_job = 1;
 }
 
 

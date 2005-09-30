@@ -1473,7 +1473,7 @@ show_jobs(http_t     *http,		/* I - HTTP connection to server */
 
         if (strcmp(attr->name, "job-k-octets") == 0 &&
 	    attr->value_tag == IPP_TAG_INTEGER)
-	  size = attr->values[0].integer * 1024;
+	  size = attr->values[0].integer;
 
         if (strcmp(attr->name, "time-at-creation") == 0 &&
 	    attr->value_tag == IPP_TAG_INTEGER)
@@ -1625,11 +1625,11 @@ show_jobs(http_t     *http,		/* I - HTTP connection to server */
 	    strcpy(date, "Unknown");
 
           if (ranking)
-	    printf("%3d %-21s %-13s %8d %s\n", rank, temp,
-	           username ? username : "unknown", size, date);
+	    printf("%3d %-21s %-13s %8.0f %s\n", rank, temp,
+	           username ? username : "unknown", 1024.0 * size, date);
           else
-	    printf("%-23s %-13s %8d   %s\n", temp,
-	           username ? username : "unknown", size, date);
+	    printf("%-23s %-13s %8.0f   %s\n", temp,
+	           username ? username : "unknown", 1024.0 * size, date);
           if (long_status)
 	    printf("\tqueued for %s\n", dest);
 	}

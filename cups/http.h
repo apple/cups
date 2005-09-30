@@ -313,7 +313,7 @@ typedef struct
 					/* Field values */
   char			*data;		/* Pointer to data buffer */
   http_encoding_t	data_encoding;	/* Chunked or not */
-  int			data_remaining;	/* Number of bytes left */
+  int			_data_remaining;/* Number of bytes left (deprecated) */
   int			used;		/* Number of bytes used in buffer */
   char			buffer[HTTP_MAX_BUFFER];
 					/* Buffer for incoming data */
@@ -339,6 +339,7 @@ typedef struct
   /**** New in CUPS 1.2 ****/
   http_addr_t		hostaddr;	/* Host address and port */
   int			wused;		/* Write buffer bytes used */
+  off_t			data_remaining;	/* Number of bytes left */
 } http_t;
 
 /**** New in CUPS 1.1.20+ ****/
@@ -426,9 +427,11 @@ extern char		*httpAddrLookup(const http_addr_t *addr,
                                         char *name, int namelen);
 extern char		*httpAddrString(const http_addr_t *addr,
 			                char *s, int slen);
+extern int		httpFlushWrite(http_t *http);
 extern const char	*httpGetDateString2(time_t t, char *s, int slen);
 extern const char	*httpGetHostname(char *s, int slen);
-extern int		httpFlushWrite(http_t *http);
+extern off_t		httpGetLength2(http_t *http);
+extern void		httpSetLength(http_t *http, off_t length);
 
 
 /*

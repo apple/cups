@@ -154,12 +154,12 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
 		  const char *filename)	/* I - File to send or NULL */
 {
   ipp_t		*response;		/* IPP response data */
-  char		length[255];		/* Content-Length field */
+  off_t		length;			/* Content-Length value */
   http_status_t	status;			/* Status of HTTP request */
   FILE		*file;			/* File to send */
   struct stat	fileinfo;		/* File information */
   int		bytes;			/* Number of bytes read/written */
-  char		buffer[32768];		/* Output buffer */
+  char		buffer[65536];		/* Output buffer */
   _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
 
 
@@ -237,14 +237,12 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
     * Setup the HTTP variables needed...
     */
 
-    if (filename != NULL)
-      sprintf(length, "%lu", (unsigned long)(ippLength(request) +
-                                             (size_t)fileinfo.st_size));
-    else
-      sprintf(length, "%lu", (unsigned long)ippLength(request));
+    length = ippLength(request);
+    if (filename)
+      length += fileinfo.st_size;
 
     httpClearFields(http);
-    httpSetField(http, HTTP_FIELD_CONTENT_LENGTH, length);
+    httpSetLength(http, length);
     httpSetField(http, HTTP_FIELD_CONTENT_TYPE, "application/ipp");
     httpSetField(http, HTTP_FIELD_AUTHORIZATION, http->authstring);
 

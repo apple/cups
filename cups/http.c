@@ -45,6 +45,8 @@
  *   httpGetDateTime()    - Get a time value from a formatted date/time string.
  *   httpGetLength()      - Get the amount of data remaining from the
  *                          content-length or transfer-encoding fields.
+ *   httpGetLength2()     - Get the amount of data remaining from the
+ *                          content-length or transfer-encoding fields.
  *   httpGetSubField()    - Get a sub-field value.
  *   httpGets()           - Get a line of text from a HTTP connection.
  *   httpHead()           - Send a HEAD request to the server.
@@ -58,6 +60,7 @@
  *   httpReconnect()      - Reconnect to a HTTP server...
  *   httpSetCookie()      - Set the cookie value(s)...
  *   httpSetField()       - Set the value of an HTTP header.
+ *   httpSetLength()      - Set the content-length and transfer-encoding.
  *   httpTrace()          - Send an TRACE request to the server.
  *   httpUpdate()         - Update the current HTTP state for incoming data.
  *   httpWait()           - Wait for data available on a connection.
@@ -918,16 +921,40 @@ httpGetSubField(http_t       *http,	/* I - HTTP data */
 /*
  * 'httpGetLength()' - Get the amount of data remaining from the
  *                     content-length or transfer-encoding fields.
+ *
+ * This function is deprecated and will not return lengths larger than
+ * 2^31 - 1; use httpGetLength2() instead.
  */
 
-int				/* O - Content length */
-httpGetLength(http_t *http)	/* I - HTTP data */
+int					/* O - Content length */
+httpGetLength(http_t *http)		/* I - HTTP data */
 {
-  DEBUG_printf(("httpGetLength(http=%p), state=%d\n", http, http->state));
+ /*
+  * Get the read content length and return the 32-bit value.
+  */
+
+  httpGetLength2(http);
+
+  return (http->_data_remaining);
+}
+
+
+/*
+ * 'httpGetLength2()' - Get the amount of data remaining from the
+ *                      content-length or transfer-encoding fields.
+ *
+ * This function returns the complete content length, even for
+ * content larger than 2^31 - 1.
+ */
+
+off_t					/* O - Content length */
+httpGetLength2(http_t *http)		/* I - HTTP data */
+{
+  DEBUG_printf(("httpGetLength2(http=%p), state=%d\n", http, http->state));
 
   if (!strcasecmp(http->fields[HTTP_FIELD_TRANSFER_ENCODING], "chunked"))
   {
-    DEBUG_puts("httpGetLength: chunked request!");
+    DEBUG_puts("httpGetLength2: chunked request!");
 
     http->data_encoding  = HTTP_ENCODE_CHUNKED;
     http->data_remaining = 0;
@@ -947,10 +974,17 @@ httpGetLength(http_t *http)	/* I - HTTP data */
     if (http->fields[HTTP_FIELD_CONTENT_LENGTH][0] == '\0')
       http->data_remaining = 2147483647;
     else
-      http->data_remaining = atoi(http->fields[HTTP_FIELD_CONTENT_LENGTH]);
+      http->data_remaining = strtoll(http->fields[HTTP_FIELD_CONTENT_LENGTH],
+                                     NULL, 10);
 
-    DEBUG_printf(("httpGetLength: content_length=%d\n", http->data_remaining));
+    DEBUG_printf(("httpGetLength2: content_length=" CUPS_LLFORMAT "\n",
+                  CUPS_LLCAST http->data_remaining));
   }
+
+  if (http->data_remaining <= INT_MAX)
+    http->_data_remaining = (int)http->data_remaining;
+  else
+    http->_data_remaining = INT_MAX;
 
   return (http->data_remaining);
 }
@@ -1289,7 +1323,7 @@ httpRead(http_t *http,			/* I - HTTP data */
       return (0);
     }
 
-    http->data_remaining = strtol(len, NULL, 16);
+    http->data_remaining = strtoll(len, NULL, 16);
     if (http->data_remaining < 0)
     {
       DEBUG_puts("httpRead: Negative chunk length!");
@@ -1415,7 +1449,14 @@ httpRead(http_t *http,			/* I - HTTP data */
   }
 
   if (bytes > 0)
+  {
     http->data_remaining -= bytes;
+
+    if (http->data_remaining <= INT_MAX)
+      http->_data_remaining = (int)http->data_remaining;
+    else
+      http->_data_remaining = INT_MAX;
+  }
   else if (bytes < 0)
   {
 #ifdef WIN32
@@ -1666,6 +1707,31 @@ httpSetField(http_t       *http,	/* I - HTTP data */
 
 
 /*
+ * 'httpSetLength()' - Set the content-length and content-encoding.
+ */
+
+void
+httpSetLength(http_t *http,		/* I - HTTP data */
+              off_t  length)		/* I - Length (0 for chunked) */
+{
+  if (!http || length < 0)
+    return;
+
+  if (!length)
+  {
+    strcpy(http->fields[HTTP_FIELD_TRANSFER_ENCODING], "chunked");
+    http->fields[HTTP_FIELD_CONTENT_LENGTH][0] = '\0';
+  }
+  else
+  {
+    http->fields[HTTP_FIELD_TRANSFER_ENCODING][0] = '\0';
+    snprintf(http->fields[HTTP_FIELD_CONTENT_LENGTH], HTTP_MAX_VALUE,
+             CUPS_LLFMT, CUPS_LLCAST length);
+  }
+}
+
+
+/*
  * 'httpTrace()' - Send an TRACE request to the server.
  */
 
@@ -1755,7 +1821,7 @@ httpUpdate(http_t *http)		/* I - HTTP data */
       }
 #endif /* HAVE_SSL */
 
-      httpGetLength(http);
+      httpGetLength2(http);
 
       switch (http->state)
       {
@@ -2185,7 +2251,7 @@ http_send(http_t       *http,	/* I - HTTP data */
     return (-1);
   }
 
-  httpGetLength(http);
+  httpGetLength2(http);
   httpClearFields(http);
 
   return (0);

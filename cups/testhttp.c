@@ -35,6 +35,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "http.h"
+#include "string.h"
 
 
 /*
@@ -57,7 +58,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 		username[HTTP_MAX_URI],	/* Username:password from URI */
 		resource[HTTP_MAX_URI];	/* Resource from URI */
   int		port;			/* Port number from URI */
-  long		length, total;		/* Length and total bytes */
+  off_t		length, total;		/* Length and total bytes */
   time_t	start, current;		/* Start and end time */
 
 
@@ -157,8 +158,8 @@ main(int  argc,				/* I - Number of command-line arguments */
 	printf("GET failed with status %d...\n", status);
 
 
-      start = time(NULL);
-      length = atoi(httpGetField(http, HTTP_FIELD_CONTENT_LENGTH));
+      start  = time(NULL);
+      length = httpGetLength2(http);
       total  = 0;
 
       while ((bytes = httpRead(http, buffer, sizeof(buffer))) > 0)
@@ -169,7 +170,8 @@ main(int  argc,				/* I - Number of command-line arguments */
 	{
           current = time(NULL);
           if (current == start) current ++;
-          printf("\r%ld/%ld bytes (%ld bytes/sec)      ", total, length,
+          printf("\r" CUPS_LLFMT "/" CUPS_LLFMT " bytes ("
+	         CUPS_LLFMT " bytes/sec)      ", total, length,
         	 total / (current - start));
           fflush(stdout);
 	}

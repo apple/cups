@@ -1,7 +1,7 @@
 dnl
 dnl "$Id$"
 dnl
-dnl   Common configuration stuff for the Common UNIX Printing System (CUPS).
+dnl   Compiler stuff for the Common UNIX Printing System (CUPS).
 dnl
 dnl   Copyright 1997-2005 by Easy Software Products, all rights reserved.
 dnl
@@ -21,9 +21,9 @@ dnl       Voice: (301) 373-9600
 dnl       EMail: cups-info@cups.org
 dnl         WWW: http://www.cups.org
 dnl
+
 dnl Clear the debugging and non-shared library options unless the user asks
 dnl for them...
-
 OPTIM=""
 AC_SUBST(OPTIM)
 

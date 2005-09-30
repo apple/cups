@@ -189,9 +189,8 @@ rm -rf $RPM_BUILD_ROOT
 /usr/share/locale/*
 
 %dir /usr/share/man/cat1
-/usr/share/man/cat1/backend.1
+/usr/share/man/cat1/cancel.1
 /usr/share/man/cat1/cupstestppd.1
-/usr/share/man/cat1/filter.1
 /usr/share/man/cat1/lp.1
 /usr/share/man/cat1/lpoptions.1
 /usr/share/man/cat1/lppasswd.1
@@ -204,9 +203,8 @@ rm -rf $RPM_BUILD_ROOT
 %dir /usr/share/man/cat8
 /usr/share/man/cat8/*
 %dir /usr/share/man/man1
-/usr/share/man/man1/backend.1.gz
+/usr/share/man/man1/cancel.1.gz
 /usr/share/man/man1/cupstestppd.1.gz
-/usr/share/man/man1/filter.1.gz
 /usr/share/man/man1/lp.1.gz
 /usr/share/man/man1/lpoptions.1.gz
 /usr/share/man/man1/lppasswd.1.gz
@@ -221,6 +219,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %dir /var/cache/cups
 %dir /var/cache/cups/ppd
+%dir /var/log/cups
 %dir /var/run/cups
 %attr(0711,lp,root) %dir /var/run/cups/certs
 %attr(0700,lp,root) %dir /var/spool/cups
@@ -229,9 +228,13 @@ rm -rf $RPM_BUILD_ROOT
 %files devel
 %defattr(-,root,root)
 %dir /usr/share/man/cat1
+/usr/share/man/cat1/backend.1
 /usr/share/man/cat1/cups-config.1
+/usr/share/man/cat1/filter.1
 %dir /usr/share/man/man1
+/usr/share/man/man1/backend.1.gz
 /usr/share/man/man1/cups-config.1.gz
+/usr/share/man/man1/filter.1.gz
 
 /usr/bin/cups-config
 %dir /usr/include/cups

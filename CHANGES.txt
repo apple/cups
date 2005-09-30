@@ -1,8 +1,9 @@
-CHANGES.txt - 09/29/2005
+CHANGES.txt - 09/30/2005
 ------------------------
 
 CHANGES IN CUPS V1.2.0b1
 
+	- Added large file (64-bit) support (STR #541)
 	- Fixed a performance issue with the ippReadIO()
 	  implementation (STR #1284)
 	- Fixed a performance issue with the scheduler's implicit

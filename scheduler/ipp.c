@@ -594,8 +594,13 @@ cupsdProcessIPPRequest(
 	con->http.data_encoding  = HTTP_ENCODE_LENGTH;
 	con->http.data_remaining = ippLength(con->response);
 
-	httpPrintf(HTTP(con), "Content-Length: %d\r\n\r\n",
-        	   con->http.data_remaining);
+        if (con->http.data_remaining < INT_MAX)
+	  con->http._data_remaining = con->http.data_remaining;
+	else
+	  con->http._data_remaining = INT_MAX;
+
+	httpPrintf(HTTP(con), "Content-Length: " CUPS_LLFMT "\r\n\r\n",
+        	   CUPS_LLCAST con->http.data_remaining);
       }
 
       cupsdLogMessage(CUPSD_LOG_DEBUG2,

@@ -365,11 +365,11 @@ cupsdLogRequest(cupsd_client_t *con,	/* I - Request to log */
 
   if (!strcmp(AccessLog, "syslog"))
   {
-    syslog(LOG_INFO, "REQUEST %s - %s \"%s %s HTTP/%d.%d\" %d %d\n",
+    syslog(LOG_INFO, "REQUEST %s - %s \"%s %s HTTP/%d.%d\" %d " CUPS_LLFMT "\n",
            con->http.hostname, con->username[0] != '\0' ? con->username : "-",
 	   states[con->operation], con->uri,
 	   con->http.version / 100, con->http.version % 100,
-	   code, con->bytes);
+	   code, CUPS_LLCAST con->bytes);
 
     return (1);
   }
@@ -386,11 +386,12 @@ cupsdLogRequest(cupsd_client_t *con,	/* I - Request to log */
   * Write a log of the request in "common log format"...
   */
 
-  cupsFilePrintf(AccessFile, "%s - %s %s \"%s %s HTTP/%d.%d\" %d %d\n",
+  cupsFilePrintf(AccessFile,
+                 "%s - %s %s \"%s %s HTTP/%d.%d\" %d " CUPS_LLFMT "\n",
         	 con->http.hostname, con->username[0] != '\0' ? con->username : "-",
 		 cupsdGetDateTime(con->start), states[con->operation], con->uri,
 		 con->http.version / 100, con->http.version % 100,
-		 code, con->bytes);
+		 code, CUPS_LLCAST con->bytes);
   cupsFileFlush(AccessFile);
 
   return (1);

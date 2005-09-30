@@ -1049,19 +1049,20 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 
         httpClearFields(HTTP(con));
 
-        con->http.activity       = time(NULL);
-        con->http.version        = HTTP_1_0;
-	con->http.keep_alive     = HTTP_KEEPALIVE_OFF;
-	con->http.data_encoding  = HTTP_ENCODE_LENGTH;
-	con->http.data_remaining = 0;
-	con->operation           = HTTP_WAITING;
-	con->bytes               = 0;
-	con->file                = -1;
-	con->file_ready          = 0;
-	con->pipe_pid            = 0;
-	con->username[0]         = '\0';
-	con->password[0]         = '\0';
-	con->uri[0]              = '\0';
+        con->http.activity        = time(NULL);
+        con->http.version         = HTTP_1_0;
+	con->http.keep_alive      = HTTP_KEEPALIVE_OFF;
+	con->http.data_encoding   = HTTP_ENCODE_LENGTH;
+	con->http.data_remaining  = 0;
+	con->http._data_remaining = 0;
+	con->operation            = HTTP_WAITING;
+	con->bytes                = 0;
+	con->file                 = -1;
+	con->file_ready           = 0;
+	con->pipe_pid             = 0;
+	con->username[0]          = '\0';
+	con->password[0]          = '\0';
+	con->uri[0]               = '\0';
 
 	cupsdClearString(&con->command);
 	cupsdClearString(&con->options);
@@ -1540,9 +1541,8 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	                    con->http.fields[HTTP_FIELD_CONTENT_TYPE]);
 
             if (con->http.fields[HTTP_FIELD_CONTENT_LENGTH][0] &&
-		atoi(con->http.fields[HTTP_FIELD_CONTENT_LENGTH]) >
-		    MaxRequestSize &&
-		MaxRequestSize > 0)
+		MaxRequestSize > 0 &&
+		con->http.data_remaining > MaxRequestSize)
 	    {
 	     /*
 	      * Request too large...
@@ -1553,7 +1553,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 
 	      break;
             }
-	    else if (atoi(con->http.fields[HTTP_FIELD_CONTENT_LENGTH]) < 0)
+	    else if (con->http.data_remaining < 0)
 	    {
 	     /*
 	      * Negative content lengths are invalid!
@@ -1689,9 +1689,8 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	                    con->http.fields[HTTP_FIELD_CONTENT_TYPE]);
 
             if (con->http.fields[HTTP_FIELD_CONTENT_LENGTH][0] &&
-		atoi(con->http.fields[HTTP_FIELD_CONTENT_LENGTH]) >
-		    MaxRequestSize &&
-		MaxRequestSize > 0)
+		MaxRequestSize > 0 &&
+		con->http.data_remaining > MaxRequestSize)
 	    {
 	     /*
 	      * Request too large...
@@ -1702,7 +1701,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 
 	      break;
             }
-	    else if (atoi(con->http.fields[HTTP_FIELD_CONTENT_LENGTH]) < 0)
+	    else if (con->http.data_remaining < 0)
 	    {
 	     /*
 	      * Negative content lengths are invalid!
@@ -1862,11 +1861,12 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
   {
     case HTTP_PUT_RECV :
         cupsdLogMessage(CUPSD_LOG_DEBUG2,
-	        	"cupsdReadClient: %d con->data_encoding = %s, con->data_remaining = %d, con->file = %d",
+	        	"cupsdReadClient: %d con->data_encoding=HTTP_ENCODE_%s, "
+			"con->data_remaining=" CUPS_LLFMT ", con->file=%d",
 			con->http.fd,
 			con->http.data_encoding == HTTP_ENCODE_CHUNKED ?
-			    "chunked" : "length",
-			con->http.data_remaining, con->file);
+			    "CHUNKED" : "LENGTH",
+			CUPS_LLCAST con->http.data_remaining, con->file);
 
         if ((bytes = httpRead(HTTP(con), line, sizeof(line))) < 0)
 	  return (cupsdCloseClient(con));
@@ -1907,8 +1907,10 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	  fstat(con->file, &filestats);
 
           cupsdLogMessage(CUPSD_LOG_DEBUG2,
-	                  "cupsdReadClient: %d Closing data file %d, size = %d.",
-                          con->http.fd, con->file, (int)filestats.st_size);
+	                  "cupsdReadClient: %d Closing data file %d, size="
+			  CUPS_LLFMT ".",
+                          con->http.fd, con->file,
+			  CUPS_LLCAST filestats.st_size);
 
 	  close(con->file);
 	  con->file = -1;
@@ -1947,11 +1949,12 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 
     case HTTP_POST_RECV :
         cupsdLogMessage(CUPSD_LOG_DEBUG2,
-	        	"cupsdReadClient: %d con->data_encoding = %s, con->data_remaining = %d, con->file = %d",
+	        	"cupsdReadClient: %d con->data_encoding=HTTP_ENCODE_"
+			"%s, con->data_remaining=" CUPS_LLFMT ", con->file=%d",
 			con->http.fd,
 			con->http.data_encoding == HTTP_ENCODE_CHUNKED ?
-			    "chunked" : "length",
-			con->http.data_remaining, con->file);
+			    "CHUNKED" : "LENGTH",
+			CUPS_LLCAST con->http.data_remaining, con->file);
 
         if (con->request != NULL)
 	{
@@ -2049,8 +2052,10 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	    fstat(con->file, &filestats);
 
             cupsdLogMessage(CUPSD_LOG_DEBUG2,
-	                    "cupsdReadClient: %d Closing data file %d, size = %d.",
-                            con->http.fd, con->file, (int)filestats.st_size);
+	                    "cupsdReadClient: %d Closing data file %d, "
+			    "size=" CUPS_LLFMT ".",
+                            con->http.fd, con->file,
+			    CUPS_LLCAST filestats.st_size);
 
 	    close(con->file);
 	    con->file = -1;
@@ -2286,8 +2291,8 @@ cupsdSendFile(cupsd_client_t *con,	/* I - Client connection */
   if (httpPrintf(HTTP(con), "Last-Modified: %s\r\n",
                  httpGetDateString(filestats->st_mtime)) < 0)
     return (0);
-  if (httpPrintf(HTTP(con), "Content-Length: %lu\r\n",
-                 (unsigned long)filestats->st_size) < 0)
+  if (httpPrintf(HTTP(con), "Content-Length: " CUPS_LLFMT "\r\n",
+                 CUPS_LLCAST filestats->st_size) < 0)
     return (0);
   if (httpPrintf(HTTP(con), "\r\n") < 0)
     return (0);
@@ -2656,7 +2661,7 @@ check_if_modified(
 {
   char		*ptr;			/* Pointer into field */
   time_t	date;			/* Time/date value */
-  int		size;			/* Size/length value */
+  off_t		size;			/* Size/length value */
 
 
   size = 0;
@@ -2678,7 +2683,7 @@ check_if_modified(
     if (strncasecmp(ptr, "length=", 7) == 0)
     {
       ptr += 7;
-      size = atoi(ptr);
+      size = strtoll(ptr, NULL, 10);
 
       while (isdigit(*ptr))
         ptr ++;
@@ -2692,8 +2697,10 @@ check_if_modified(
   }
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                  "check_if_modified: %d sizes=%d,%d dates=%d,%d",
-                  con->http.fd, size, (int)filestats->st_size, (int)date,
+                  "check_if_modified: %d sizes=" CUPS_LLFMT ","
+		  CUPS_LLFMT " dates=%d,%d",
+                  con->http.fd, CUPS_LLCAST size,
+		  CUPS_LLCAST filestats->st_size, (int)date,
 	          (int)filestats->st_mtime);
 
   return ((size != filestats->st_size && size != 0) ||
@@ -3328,7 +3335,7 @@ pipe_command(cupsd_client_t *con,	/* I - Client connection */
   }
   else
   {
-    sprintf(content_length, "CONTENT_LENGTH=%d", con->bytes);
+    sprintf(content_length, "CONTENT_LENGTH=" CUPS_LLFMT, con->bytes);
     snprintf(content_type, sizeof(content_type), "CONTENT_TYPE=%s",
              con->http.fields[HTTP_FIELD_CONTENT_TYPE]);
 

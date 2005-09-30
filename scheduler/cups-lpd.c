@@ -1284,7 +1284,7 @@ send_state(const char *dest,		/* I - Destination */
 
         if (strcmp(attr->name, "job-k-octets") == 0 &&
 	    attr->value_tag == IPP_TAG_INTEGER)
-	  jobsize = attr->values[0].integer * 1024;
+	  jobsize = attr->values[0].integer;
 
         if (strcmp(attr->name, "job-state") == 0 &&
 	    attr->value_tag == IPP_TAG_ENUM)
@@ -1350,11 +1350,11 @@ send_state(const char *dest,		/* I - Destination */
 	  strlcpy(namestr, jobname, sizeof(namestr));
 
         printf("%s: %-33.33s [job %d localhost]\n", jobuser, rankstr, jobid);
-        printf("        %-39.39s %d bytes\n", namestr, jobsize);
+        printf("        %-39.39s %.0f bytes\n", namestr, 1024.0 * jobsize);
       }
       else
-        printf("%-7s %-7.7s %-7d %-31.31s %d bytes\n", rankstr, jobuser,
-	       jobid, jobname, jobsize);
+        printf("%-7s %-7.7s %-7d %-31.31s %.0f bytes\n", rankstr, jobuser,
+	       jobid, jobname, 1024.0 * jobsize);
 
       if (attr == NULL)
         break;

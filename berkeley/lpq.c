@@ -397,7 +397,7 @@ show_jobs(http_t     *http,	/* I - HTTP connection to server */
 
         if (strcmp(attr->name, "job-k-octets") == 0 &&
 	    attr->value_tag == IPP_TAG_INTEGER)
-	  jobsize = attr->values[0].integer * 1024;
+	  jobsize = attr->values[0].integer;
 
 #ifdef __osf__
         if (strcmp(attr->name, "job-priority") == 0 &&
@@ -482,15 +482,15 @@ show_jobs(http_t     *http,	/* I - HTTP connection to server */
 	  strlcpy(namestr, jobname, sizeof(namestr));
 
         printf("%s: %-33.33s [job %d localhost]\n", jobuser, rankstr, jobid);
-        printf("        %-39.39s %d bytes\n", namestr, jobsize);
+        printf("        %-39.39s %.0f bytes\n", namestr, 1024.0 * jobsize);
       }
       else
 #ifdef __osf__
-        printf("%-6s %-10.10s %-4d %-10d %-27.27s %d bytes\n", rankstr, jobuser,
-	       jobpriority, jobid, jobname, jobsize);
+        printf("%-6s %-10.10s %-4d %-10d %-27.27s %.0f bytes\n", rankstr, jobuser,
+	       jobpriority, jobid, jobname, 1024.0 * jobsize);
 #else
-        printf("%-7s %-7.7s %-7d %-31.31s %d bytes\n", rankstr, jobuser,
-	       jobid, jobname, jobsize);
+        printf("%-7s %-7.7s %-7d %-31.31s %.0f bytes\n", rankstr, jobuser,
+	       jobid, jobname, 1024.0 * jobsize);
 #endif /* __osf */
 
       if (attr == NULL)

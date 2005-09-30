@@ -126,6 +126,29 @@
 #undef HAVE_STRINGS_H
 #undef HAVE_BSTRING_H
 
+/*
+ * Do we have the long long type?
+ */
+
+#undef HAVE_LONG_LONG
+
+#ifdef HAVE_LONG_LONG
+#  define CUPS_LLFMT	"%lld"
+#  define CUPS_LLCAST	(long long)
+#else
+#  define CUPS_LLFMT	"%ld"
+#  define CUPS_LLCAST	(long)
+#endif /* HAVE_LONG_LONG */
+
+/*
+ * Do we have the strtoll() function?
+ */
+
+#undef HAVE_STRTOLL
+
+#ifndef HAVE_STRTOLL
+#  define strtoll(nptr,endptr,base) strtol((nptr), (endptr), (base))
+#endif /* !HAVE_STRTOLL */
 
 /*
  * Do we have the strXXX() functions?

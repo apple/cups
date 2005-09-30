@@ -34,7 +34,7 @@ struct cupsd_client_s
   cupsd_location_t	*best;		/* Best match for AAA */
   time_t		start;		/* Request start time */
   http_state_t		operation;	/* Request operation */
-  int			bytes;		/* Bytes transferred for this request */
+  off_t			bytes;		/* Bytes transferred for this request */
   char			username[33],	/* Username from Authorization: line */
 			password[33],	/* Password from Authorization: line */
 			uri[HTTP_MAX_URI],

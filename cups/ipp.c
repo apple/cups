@@ -867,8 +867,8 @@ ipp_state_t				/* O - Current state */
 ippRead(http_t *http,			/* I - HTTP connection */
         ipp_t  *ipp)			/* I - IPP data */
 {
-  DEBUG_printf(("ippRead(http=%p, ipp=%p), data_remaining=%d\n", http, ipp,
-                http ? http->data_remaining : -1));
+  DEBUG_printf(("ippRead(http=%p, ipp=%p), data_remaining=" CUPS_LLFMT "\n",
+                http, ipp, CUPS_LLCAST (http ? http->data_remaining : -1)));
 
   if (http == NULL)
     return (IPP_ERROR);
@@ -2537,6 +2537,11 @@ ipp_read_http(http_t      *http,	/* I - Client connection */
 
       http->used           -= bytes;
       http->data_remaining -= bytes;
+
+      if (http->data_remaining <= INT_MAX)
+	http->_data_remaining = (int)http->data_remaining;
+      else
+	http->_data_remaining = INT_MAX;
 
       if (http->used > 0)
 	memmove(http->buffer, http->buffer + bytes, http->used);

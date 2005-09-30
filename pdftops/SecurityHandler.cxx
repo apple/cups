@@ -34,7 +34,9 @@
 SecurityHandler *SecurityHandler::make(PDFDoc *docA, Object *encryptDictA) {
   Object filterObj;
   SecurityHandler *secHdlr;
+#ifdef ENABLE_PLUGINS
   XpdfSecurityHandler *xsh;
+#endif
 
   encryptDictA->dictLookup("Filter", &filterObj);
   if (filterObj.isName("Standard")) {
