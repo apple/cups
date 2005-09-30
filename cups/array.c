@@ -46,6 +46,7 @@
 
 #include "array.h"
 #include "string.h"
+#include "debug.h"
 
 
 /*
@@ -89,12 +90,17 @@ cupsArrayAdd(cups_array_t *a,		/* I - Array */
 	diff;				/* Comparison with current element */
 
 
+  DEBUG_printf(("cupsArrayAdd(a=%p, e=%p)\n", a, e));
+
  /*
   * Range check input...
   */
 
   if (!a || !e)
+  {
+    DEBUG_puts("cupsArrayAdd: returning 0");
     return (0);
+  }
 
  /*
   * Verify we have room for the new element...
@@ -127,8 +133,13 @@ cupsArrayAdd(cups_array_t *a,		/* I - Array */
       temp = realloc(a->elements, count * sizeof(void *));
     }
 
+    DEBUG_printf(("cupsArrayAdd: count=%d\n", count));
+
     if (!temp)
+    {
+      DEBUG_puts("cupsAddAdd: allocation failed, returning 0");
       return (0);
+    }
 
     a->alloc_elements = count;
     a->elements       = temp;
@@ -140,7 +151,13 @@ cupsArrayAdd(cups_array_t *a,		/* I - Array */
   */
 
   if (!a->num_elements || !a->compare)
+  {
+   /*
+    * Append to the end...
+    */
+
     current = a->num_elements;
+  }
   else
   {
    /*
@@ -148,9 +165,6 @@ cupsArrayAdd(cups_array_t *a,		/* I - Array */
     */
 
     current = cups_find(a, e, &diff);
-
-    if (diff > 0)
-      current ++;
   }
 
  /*
@@ -168,10 +182,18 @@ cupsArrayAdd(cups_array_t *a,		/* I - Array */
 
     if (a->current >= current)
       a->current ++;
+
+    DEBUG_printf(("cupsArrayAdd: insert element at index %d...\n", current));
   }
+#ifdef DEBUG
+  else
+    puts("cupsArrayAdd: append element...");
+#endif /* DEBUG */
 
   a->elements[current] = e;
   a->num_elements ++;
+
+  DEBUG_puts("cupsArrayAdd: returning 1");
 
   return (1);
 }
@@ -568,11 +590,15 @@ cups_find(cups_array_t *a,		/* I - Array */
 	diff;				/* Comparison with current element */
 
 
+  DEBUG_printf(("cups_find(a=%p, e=%p, rdiff=%p)\n", a, e, rdiff));
+
   if (a->compare)
   {
    /*
     * Do a binary search for the element...
     */
+
+    DEBUG_puts("cups_find: binary search");
 
     left  = 0;
     right = a->num_elements - 1;
@@ -581,6 +607,9 @@ cups_find(cups_array_t *a,		/* I - Array */
     {
       current = (left + right) / 2;
       diff    = (*(a->compare))(e, a->elements[current], a->data);
+
+      DEBUG_printf(("cups_find: left=%d, right=%d, current=%d, diff=%d\n",
+                    left, right, current, diff));
 
       if (diff == 0)
 	break;
@@ -591,21 +620,21 @@ cups_find(cups_array_t *a,		/* I - Array */
     }
     while ((right - left) > 1);
 
-    if (right > left && current == left && diff > 0)
-    {
-     /*
-      * Make sure we check the right-hand element, too!
-      */
+   /*
+    * Now check the last 1 or 2 elements...
+    */
 
-      current = right;
-      diff    = (*(a->compare))(e, a->elements[current], a->data);
-    }
+    for (current = left; current <= right; current ++)
+      if ((diff = (*(a->compare))(e, a->elements[current], a->data)) <= 0)
+        break;
   }
   else
   {
    /*
     * Do a linear pointer search...
     */
+
+    DEBUG_puts("cups_find: linear search");
 
     diff = 0;
 
@@ -617,6 +646,8 @@ cups_find(cups_array_t *a,		/* I - Array */
  /*
   * Return the closest element and the difference...
   */
+
+  DEBUG_printf(("cups_find: Returning %d, diff=%d\n", current, diff));
 
   *rdiff = diff;
 

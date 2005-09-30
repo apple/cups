@@ -43,14 +43,17 @@
  * 'main()' - Main entry.
  */
 
-int				/* O - Exit status */
-main(int  argc,			/* I - Number of command-line arguments */
-     char *argv[])		/* I - Command-line arguments */
+int					/* O - Exit status */
+main(int  argc,				/* I - Number of command-line arguments */
+     char *argv[])			/* I - Command-line arguments */
 {
-  cups_array_t	*array,		/* Test array */
-		*dup_array;	/* Duplicate array */
-  int		status;		/* Exit status */
-  char		*text;		/* Text from array */
+  cups_array_t	*array,			/* Test array */
+		*dup_array;		/* Duplicate array */
+  int		status;			/* Exit status */
+  char		*text;			/* Text from array */
+#ifdef DEBUG
+  int		i;			/* Looping var */
+#endif /* DEBUG */
 
 
  /*
@@ -86,23 +89,63 @@ main(int  argc,			/* I - Number of command-line arguments */
     puts("FAIL (\"One Fish\")");
     status ++;
   }
-  else if (!cupsArrayAdd(array, strdup("Two Fish")))
-  {
-    puts("FAIL (\"Two Fish\")");
-    status ++;
-  }
-  else if (!cupsArrayAdd(array, strdup("Red Fish")))
-  {
-    puts("FAIL (\"Red Fish\")");
-    status ++;
-  }
-  else if (!cupsArrayAdd(array, strdup("Blue Fish")))
-  {
-    puts("FAIL (\"Blue Fish\")");
-    status ++;
-  }
   else
-    puts("PASS");
+  {
+#ifdef DEBUG
+    putchar('\n');
+    for (text = (char *)cupsArrayFirst(array), i = 0;
+         text;
+	 text = (char *)cupsArrayNext(array), i ++)
+      printf("    #1  array[%d]=\"%s\"\n", i, text);
+#endif /* DEBUG */
+
+    if (!cupsArrayAdd(array, strdup("Two Fish")))
+    {
+      puts("FAIL (\"Two Fish\")");
+      status ++;
+    }
+    else
+    {
+#ifdef DEBUG
+      for (text = (char *)cupsArrayFirst(array), i = 0;
+           text;
+	   text = (char *)cupsArrayNext(array), i ++)
+	printf("    #2  array[%d]=\"%s\"\n", i, text);
+#endif /* DEBUG */
+
+      if (!cupsArrayAdd(array, strdup("Red Fish")))
+      {
+	puts("FAIL (\"Red Fish\")");
+	status ++;
+      }
+      else
+      {
+#ifdef DEBUG
+	for (text = (char *)cupsArrayFirst(array), i = 0;
+             text;
+	     text = (char *)cupsArrayNext(array), i ++)
+	  printf("    #3  array[%d]=\"%s\"\n", i, text);
+#endif /* DEBUG */
+
+        if (!cupsArrayAdd(array, strdup("Blue Fish")))
+	{
+	  puts("FAIL (\"Blue Fish\")");
+	  status ++;
+	}
+	else
+	{
+#ifdef DEBUG
+	  for (text = (char *)cupsArrayFirst(array), i = 0;
+               text;
+	       text = (char *)cupsArrayNext(array), i ++)
+	    printf("    #4  array[%d]=\"%s\"\n", i, text);
+#endif /* DEBUG */
+
+	  puts("PASS");
+	}
+      }
+    }
+  }
 
  /*
   * cupsArrayCount()
