@@ -202,7 +202,7 @@ main(int  argc,			/* I - Number of command-line arguments */
     if (length != sizeof(collection))
     {
       printf("FAIL - wrong ippLength(), %d instead of %d bytes!\n",
-             length, sizeof(collection));
+             length, (int)sizeof(collection));
       status = 1;
     }
     else
@@ -227,7 +227,7 @@ main(int  argc,			/* I - Number of command-line arguments */
     else if (wused != sizeof(collection))
     {
       printf("FAIL - wrote %d bytes, expected %d bytes!\n", wused,
-             sizeof(collection));
+             (int)sizeof(collection));
       hex_dump("Bytes Written", wbuffer, wused);
       hex_dump("Baseline", collection, sizeof(collection));
       status = 1;
@@ -273,7 +273,7 @@ main(int  argc,			/* I - Number of command-line arguments */
     else if (length != sizeof(collection))
     {
       printf("FAIL - wrong ippLength(), %d instead of %d bytes!\n",
-             length, sizeof(collection));
+             length, (int)sizeof(collection));
       print_attributes(request, 8);
       status = 1;
     }
