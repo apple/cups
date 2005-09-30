@@ -90,28 +90,28 @@ VAR int			FaxRetryLimit	VALUE(5),
  */
 
 extern cupsd_job_t	*cupsdAddJob(int priority, const char *dest);
-extern void		cupsdCancelJob(int id, int purge);
+extern void		cupsdCancelJob(cupsd_job_t *job, int purge);
 extern void		cupsdCancelJobs(const char *dest, const char *username,
 			                int purge);
 extern void		cupsdCheckJobs(void);
 extern void		cupsdCleanJobs(void);
-extern void		cupsdDeleteJob(int id);
+extern void		cupsdDeleteJob(cupsd_job_t *job);
 extern cupsd_job_t	*cupsdFindJob(int id);
 extern void		cupsdFinishJob(cupsd_job_t *job);
 extern void		cupsdFreeAllJobs(void);
 extern int		cupsdGetPrinterJobCount(const char *dest);
 extern int		cupsdGetUserJobCount(const char *username);
-extern void		cupsdHoldJob(int id);
+extern void		cupsdHoldJob(cupsd_job_t *job);
 extern void		cupsdLoadAllJobs(void);
-extern void		cupsdMoveJob(int id, const char *dest);
-extern void		cupsdReleaseJob(int id);
-extern void		cupsdRestartJob(int id);
-extern void		cupsdSaveJob(int id);
-extern void		cupsdSetJobHoldUntil(int id, const char *when);
-extern void		cupsdSetJobPriority(int id, int priority);
-extern void		cupsdStartJob(int id, cupsd_printer_t *printer);
+extern void		cupsdMoveJob(cupsd_job_t *job, const char *dest);
+extern void		cupsdReleaseJob(cupsd_job_t *job);
+extern void		cupsdRestartJob(cupsd_job_t *job);
+extern void		cupsdSaveJob(cupsd_job_t *job);
+extern void		cupsdSetJobHoldUntil(cupsd_job_t *job, const char *when);
+extern void		cupsdSetJobPriority(cupsd_job_t *job, int priority);
+extern void		cupsdStartJob(cupsd_job_t *job, cupsd_printer_t *printer);
 extern void		cupsdStopAllJobs(void);
-extern void		cupsdStopJob(int id, int force);
+extern void		cupsdStopJob(cupsd_job_t *job, int force);
 extern void		cupsdUpdateJob(cupsd_job_t *job);
 
 

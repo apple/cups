@@ -157,7 +157,7 @@ static void	reject_jobs(cupsd_client_t *con, ipp_attribute_t *uri);
 static void	release_job(cupsd_client_t *con, ipp_attribute_t *uri);
 static void	renew_subscription(cupsd_client_t *con, int sub_id);
 static void	restart_job(cupsd_client_t *con, ipp_attribute_t *uri);
-static void	save_auth_info(cupsd_client_t *con, int job_id);
+static void	save_auth_info(cupsd_client_t *con, cupsd_job_t *job);
 static void	send_document(cupsd_client_t *con, ipp_attribute_t *uri);
 static void	send_ipp_error(cupsd_client_t *con, ipp_status_t status);
 static void	set_default(cupsd_client_t *con, ipp_attribute_t *uri);
@@ -1140,7 +1140,7 @@ add_file(cupsd_client_t *con,		/* I - Connection to client */
 
   if (compressions == NULL || filetypes == NULL)
   {
-    cupsdCancelJob(job->id, 1);
+    cupsdCancelJob(job, 1);
     cupsdLogMessage(CUPSD_LOG_ERROR,
                     "add_file: unable to allocate memory for file types!");
     send_ipp_error(con, IPP_INTERNAL_ERROR);
@@ -1949,7 +1949,7 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
 
     job = (cupsd_job_t *)printer->job;
 
-    cupsdStopJob(job->id, 1);
+    cupsdStopJob(job, 1);
     job->state->values[0].integer = IPP_JOB_PENDING;
   }
 
@@ -2166,7 +2166,7 @@ authenticate_job(cupsd_client_t  *con,	/* I - Client connection */
   * Save the authentication information for this job...
   */
 
-  save_auth_info(con, job->id);
+  save_auth_info(con, job);
 
  /*
   * Reset the job-hold-until value to "no-hold"...
@@ -2185,7 +2185,7 @@ authenticate_job(cupsd_client_t  *con,	/* I - Client connection */
   * Release the job and return...
   */
 
-  cupsdReleaseJob(jobid);
+  cupsdReleaseJob(job);
 
   cupsdLogMessage(CUPSD_LOG_INFO, "Job %d was authenticated by \'%s\'.", jobid,
                   con->username);
@@ -2529,7 +2529,7 @@ cancel_job(cupsd_client_t  *con,	/* I - Client connection */
   cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, job->printer, job,
                 "Job cancelled by \'%s\'.", username);
 
-  cupsdCancelJob(jobid, 0);
+  cupsdCancelJob(job, 0);
   cupsdCheckJobs();
 
   cupsdLogMessage(CUPSD_LOG_INFO, "Job %d was cancelled by \'%s\'.", jobid,
@@ -3790,7 +3790,7 @@ create_job(cupsd_client_t  *con,	/* I - Client connection */
   if (con->username[0])
   {
     cupsdSetString(&job->username, con->username);
-    save_auth_info(con, job->id);
+    save_auth_info(con, job);
   }
   else if (attr != NULL)
   {
@@ -3923,7 +3923,7 @@ create_job(cupsd_client_t  *con,	/* I - Client connection */
     * Hold job until specified time...
     */
 
-    cupsdSetJobHoldUntil(job->id, attr->values[0].string.text);
+    cupsdSetJobHoldUntil(job, attr->values[0].string.text);
   }
   else
     job->hold_until = time(NULL) + 60;
@@ -4093,7 +4093,7 @@ create_job(cupsd_client_t  *con,	/* I - Client connection */
   * Save and log the job...
   */
    
-  cupsdSaveJob(job->id);
+  cupsdSaveJob(job);
 
   cupsdLogMessage(CUPSD_LOG_INFO, "Job %d created on \'%s\' by \'%s\'.",
                   job->id, job->dest, job->username);
@@ -5439,7 +5439,7 @@ hold_job(cupsd_client_t  *con,		/* I - Client connection */
   * Hold the job and return...
   */
 
-  cupsdHoldJob(jobid);
+  cupsdHoldJob(job);
 
   if ((newattr = ippFindAttribute(con->request, "job-hold-until", IPP_TAG_KEYWORD)) == NULL)
     newattr = ippFindAttribute(con->request, "job-hold-until", IPP_TAG_NAME);
@@ -5470,7 +5470,7 @@ hold_job(cupsd_client_t  *con,		/* I - Client connection */
     * Hold job until specified time...
     */
 
-    cupsdSetJobHoldUntil(job->id, attr->values[0].string.text);
+    cupsdSetJobHoldUntil(job, attr->values[0].string.text);
   }
 
   cupsdLogMessage(CUPSD_LOG_INFO, "Job %d was held by \'%s\'.", jobid, username);
@@ -5638,7 +5638,7 @@ move_job(cupsd_client_t  *con,		/* I - Client connection */
   * Move the job to a different printer or class...
   */
 
-  cupsdMoveJob(jobid, dest);
+  cupsdMoveJob(job, dest);
 
  /*
   * Start jobs if possible...
@@ -6107,7 +6107,7 @@ print_job(cupsd_client_t  *con,		/* I - Client connection */
   if (con->username[0])
   {
     cupsdSetString(&job->username, con->username);
-    save_auth_info(con, job->id);
+    save_auth_info(con, job);
   }
   else if (attr != NULL)
   {
@@ -6247,7 +6247,7 @@ print_job(cupsd_client_t  *con,		/* I - Client connection */
     */
 
     job->state->values[0].integer = IPP_JOB_HELD;
-    cupsdSetJobHoldUntil(job->id, attr->values[0].string.text);
+    cupsdSetJobHoldUntil(job, attr->values[0].string.text);
   }
 
   if (!(printer->type & (CUPS_PRINTER_REMOTE | CUPS_PRINTER_IMPLICIT)) ||
@@ -6452,7 +6452,7 @@ print_job(cupsd_client_t  *con,		/* I - Client connection */
   cupsdLogMessage(CUPSD_LOG_DEBUG, "Job %d hold_until = %d", job->id,
                   (int)job->hold_until);
 
-  cupsdSaveJob(job->id);
+  cupsdSaveJob(job);
 
   cupsdAddEvent(CUPSD_EVENT_JOB_CREATED, printer, job, "Job created.");
 
@@ -6919,7 +6919,7 @@ release_job(cupsd_client_t  *con,	/* I - Client connection */
   * Release the job and return...
   */
 
-  cupsdReleaseJob(jobid);
+  cupsdReleaseJob(job);
 
   cupsdLogMessage(CUPSD_LOG_INFO, "Job %d was released by \'%s\'.", jobid,
                   username);
@@ -7088,7 +7088,7 @@ restart_job(cupsd_client_t  *con,	/* I - Client connection */
   * Restart the job and return...
   */
 
-  cupsdRestartJob(jobid);
+  cupsdRestartJob(job);
 
   cupsdLogMessage(CUPSD_LOG_INFO, "Job %d was restarted by \'%s\'.", jobid,
                   username);
@@ -7103,7 +7103,7 @@ restart_job(cupsd_client_t  *con,	/* I - Client connection */
 
 static void
 save_auth_info(cupsd_client_t *con,	/* I - Client connection */
-               int            job_id)	/* I - Job ID */
+               cupsd_job_t    *job)	/* I - Job */
 {
   int		i;			/* Looping var */
   char		filename[1024];		/* Job authentication filename */
@@ -7141,7 +7141,7 @@ save_auth_info(cupsd_client_t *con,	/* I - Client connection */
   * Create the authentication file and change permissions...
   */
 
-  snprintf(filename, sizeof(filename), "%s/a%05d", RequestRoot, job_id);
+  snprintf(filename, sizeof(filename), "%s/a%05d", RequestRoot, job->id);
   if ((fp = cupsFileOpen(filename, "w")) == NULL)
   {
     cupsdLogMessage(CUPSD_LOG_ERROR,
@@ -7509,7 +7509,7 @@ send_document(cupsd_client_t  *con,	/* I - Client connection */
 	job->state->values[0].integer = IPP_JOB_PENDING;
     }
 
-    cupsdSaveJob(job->id);
+    cupsdSaveJob(job);
 
    /*
     * Start the job if possible...  Since cupsdCheckJobs() can cancel a
@@ -7531,7 +7531,7 @@ send_document(cupsd_client_t  *con,	/* I - Client connection */
     {
       job->state->values[0].integer = IPP_JOB_HELD;
       job->hold_until               = time(NULL) + 60;
-      cupsdSaveJob(job->id);
+      cupsdSaveJob(job);
     }
   }
 
@@ -7694,8 +7694,7 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
 	      ipp_attribute_t *uri)	/* I - Job URI */
 {
   ipp_attribute_t	*attr,		/* Current attribute */
-			*attr2,		/* Job attribute */
-			*prev2;		/* Previous job attribute */
+			*attr2;		/* Job attribute */
   int			jobid;		/* Job ID */
   cupsd_job_t		*job;		/* Current job */
   char			method[HTTP_MAX_URI],
@@ -7874,7 +7873,7 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
 	return;
       }
       else if (con->response->request.status.status_code == IPP_OK)
-        cupsdSetJobPriority(jobid, attr->values[0].integer);
+        cupsdSetJobPriority(job, attr->values[0].integer);
     }
     else if (!strcmp(attr->name, "job-state"))
     {
@@ -7923,12 +7922,12 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
 	      }
               else if (con->response->request.status.status_code == IPP_OK)
 	      {
-                cupsdCancelJob(job->id, 0);
+                cupsdCancelJob(job, 0);
 
 		if (JobHistory)
 		{
                   job->state->values[0].integer = attr->values[0].integer;
-		  cupsdSaveJob(job->id);
+		  cupsdSaveJob(job);
 		}
 	      }
 	      break;
@@ -7943,23 +7942,13 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
       * Some other value; first free the old value...
       */
 
-      if (job->attrs->attrs == attr2)
-      {
-	job->attrs->attrs = attr2->next;
-	prev2             = NULL;
-      }
+      if (job->attrs->prev)
+        job->attrs->prev->next = attr2->next;
       else
-      {
-	for (prev2 = job->attrs->attrs; prev2 != NULL; prev2 = prev2->next)
-	  if (prev2->next == attr2)
-	  {
-	    prev2->next = attr2->next;
-	    break;
-	  }
-      }
+        job->attrs->attrs = attr2->next;
 
       if (job->attrs->last == attr2)
-        job->attrs->last = prev2;
+        job->attrs->last = job->attrs->prev;
 
       _ipp_free_attr(attr2);
 
@@ -7975,12 +7964,12 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
 
       if (!strcmp(attr->name, "job-hold-until"))
       {
-        cupsdSetJobHoldUntil(job->id, attr->values[0].string.text);
+        cupsdSetJobHoldUntil(job, attr->values[0].string.text);
 
 	if (!strcmp(attr->values[0].string.text, "no-hold"))
-	  cupsdReleaseJob(job->id);
+	  cupsdReleaseJob(job);
 	else
-	  cupsdHoldJob(job->id);
+	  cupsdHoldJob(job);
       }
     }
     else if (attr->value_tag == IPP_TAG_DELETEATTR)
@@ -7989,21 +7978,16 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
       * Delete the attribute...
       */
 
-      for (attr2 = job->attrs->attrs, prev2 = NULL;
-           attr2 != NULL;
-	   prev2 = attr2, attr2 = attr2->next)
-        if (attr2->name && strcmp(attr2->name, attr->name) == 0)
-	  break;
-
-      if (attr2)
+      if ((attr2 = ippFindAttribute(job->attrs, attr->name,
+                                    IPP_TAG_ZERO)) != NULL)
       {
-        if (prev2)
-	  prev2->next = attr2->next;
+        if (job->attrs->prev)
+	  job->attrs->prev->next = attr2->next;
 	else
 	  job->attrs->attrs = attr2->next;
 
         if (attr2 == job->attrs->last)
-	  job->attrs->last = prev2;
+	  job->attrs->last = job->attrs->prev;
 
         _ipp_free_attr(attr2);
       }
@@ -8022,7 +8006,7 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
   * Save the job...
   */
 
-  cupsdSaveJob(job->id);
+  cupsdSaveJob(job);
 
  /*
   * Start jobs if possible...

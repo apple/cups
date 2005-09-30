@@ -2070,7 +2070,7 @@ cupsdStopPrinter(cupsd_printer_t *p,	/* I - Printer to stop */
     * Stop it...
     */
 
-    cupsdStopJob(job->id, 0);
+    cupsdStopJob(job, 0);
 
    /*
     * Reset the state to pending...
@@ -2078,7 +2078,7 @@ cupsdStopPrinter(cupsd_printer_t *p,	/* I - Printer to stop */
 
     job->state->values[0].integer = IPP_JOB_PENDING;
 
-    cupsdSaveJob(job->id);
+    cupsdSaveJob(job);
   }
 }
 

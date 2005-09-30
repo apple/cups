@@ -202,7 +202,7 @@ cupsdUpdateQuota(
     if (attr->values[0].integer < curtime)
     {
       if (JobAutoPurge)
-        cupsdCancelJob(job->id, 1);
+        cupsdCancelJob(job, 1);
 
       continue;
     }
