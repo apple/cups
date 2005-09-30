@@ -600,8 +600,50 @@ cups_find(cups_array_t *a,		/* I - Array */
 
     DEBUG_puts("cups_find: binary search");
 
-    left  = 0;
-    right = a->num_elements - 1;
+    if (a->current >= 0 && a->current < a->num_elements)
+    {
+     /*
+      * Start search on either side of current...
+      */
+
+      if ((diff = (*(a->compare))(e, a->elements[a->current], a->data)) == 0)
+      {
+       /*
+        * Exact match, return it!
+	*/
+
+	*rdiff = 0;
+
+	return (a->current);
+      }
+      else if (diff < 0)
+      {
+       /*
+        * Start with current on right side...
+	*/
+
+	left  = 0;
+	right = a->current;
+      }
+      else
+      {
+       /*
+        * Start wih current on left side...
+	*/
+
+        left  = a->current;
+	right = a->num_elements - 1;
+      }
+    }
+    else
+    {
+     /*
+      * Start search in the middle...
+      */
+
+      left  = 0;
+      right = a->num_elements - 1;
+    }
 
     do
     {
@@ -620,13 +662,16 @@ cups_find(cups_array_t *a,		/* I - Array */
     }
     while ((right - left) > 1);
 
-   /*
-    * Now check the last 1 or 2 elements...
-    */
+    if (diff != 0)
+    {
+     /*
+      * Check the last 1 or 2 elements...
+      */
 
-    for (current = left; current <= right; current ++)
-      if ((diff = (*(a->compare))(e, a->elements[current], a->data)) <= 0)
-        break;
+      for (current = left; current <= right; current ++)
+	if ((diff = (*(a->compare))(e, a->elements[current], a->data)) <= 0)
+          break;
+    }
   }
   else
   {
