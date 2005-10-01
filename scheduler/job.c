@@ -294,6 +294,7 @@ cupsdCheckJobs(void)
     if (job->state->values[0].integer == IPP_JOB_PENDING && !NeedReload)
     {
       printer = cupsdFindDest(job->dest);
+      pclass  = NULL;
 
       while (printer &&
              (printer->type & (CUPS_PRINTER_IMPLICIT | CUPS_PRINTER_CLASS)))
