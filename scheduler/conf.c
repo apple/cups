@@ -1705,7 +1705,9 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 			temp2[HTTP_MAX_BUFFER],
 					/* Temporary buffer 2 for value */
 			*ptr,		/* Pointer into line/temp */
-			*value;		/* Pointer to value */
+			*value,		/* Pointer to value */
+			*valueptr,	/* Pointer into value */
+			quote;		/* Quote character */
   int			valuelen;	/* Length of value */
   cupsd_var_t		*var;		/* Current variable */
   unsigned		ip[4],		/* Address value */
@@ -2420,10 +2422,6 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
       * System (admin) group(s)...
       */
 
-      char	*valueptr,		/* Pointer into value */
-		quote;			/* Quote character */
-
-
       for (i = NumSystemGroups; *value && i < MAX_SYSTEM_GROUPS;)
       {
         if (*value == '\'' || *value == '\"')
@@ -2565,6 +2563,55 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
       else
 	cupsdLogMessage(CUPSD_LOG_WARN, "Unknown ServerTokens %s on line %d.",
                         value, linenum);
+    }
+    else if (!strcasecmp(line, "PassEnv"))
+    {
+     /*
+      * PassEnv variable [... variable]
+      */
+
+      for (; *value;)
+      {
+        for (valuelen = 0; value[valuelen]; valuelen ++)
+	  if (isspace(value[valuelen]) || value[valuelen] == ',')
+	    break;
+
+        if (value[valuelen])
+        {
+	  value[valuelen] = '\0';
+	  valuelen ++;
+	}
+
+        cupsdSetEnv(value, NULL);
+
+        for (value += valuelen; *value; value ++)
+	  if (!isspace(*value) || *value != ',')
+	    break;
+      }
+    }
+    else if (!strcasecmp(line, "SetEnv"))
+    {
+     /*
+      * SetEnv variable value
+      */
+
+      for (valueptr = value; *valueptr && !isspace(*valueptr & 255); valueptr ++);
+
+      if (*valueptr)
+      {
+       /*
+        * Found a value...
+	*/
+
+        while (isspace(*valueptr & 255))
+	  *valueptr++ = '\0';
+
+        cupsdSetEnv(value, valueptr);
+      }
+      else
+        cupsdLogMessage(CUPSD_LOG_ERROR,
+	                "Missing value for SetEnv directive on line %d.",
+	                linenum);
     }
     else
     {

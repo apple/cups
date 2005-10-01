@@ -21,7 +21,7 @@
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
-.TH cupsd.conf 5 "Common UNIX Printing System" "17 September 2005" "Easy Software Products"
+.TH cupsd.conf 5 "Common UNIX Printing System" "30 September 2005" "Easy Software Products"
 .SH NAME
 cupsd.conf \- server configuration file for cups
 .SH DESCRIPTION
@@ -306,6 +306,10 @@ PageLog
 .br
 Specifies the page log filename.
 .TP 5
+PassEnv variable [... variable]
+.br
+Passes the specified environment variable(s) to child processes.
+.TP 5
 <Policy name> ... </Policy>
 .br
 Specifies access control for the named policy.
@@ -400,6 +404,10 @@ ServerTokens
 .br
 Specifies what information is included in the Server header of HTTP
 responses.
+.TP 5
+SetEnv variable value
+.br
+Set the specified environment variable to be passed to child processes.
 .TP 5
 SSLListen
 .br
