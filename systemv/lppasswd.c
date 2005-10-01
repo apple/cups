@@ -124,8 +124,8 @@ main(int  argc,			/* I - Number of command-line arguments */
   * as root or when lppasswd is not setuid...
   */
 
-  if ((getuid() == geteuid() || !getuid()) &&
-      (root = getenv("CUPS_SERVERROOT")) == NULL)
+  if ((root = getenv("CUPS_SERVERROOT")) == NULL ||
+      (getuid() != geteuid() && getuid()))
     root = CUPS_SERVERROOT;
 
   snprintf(passwdmd5, sizeof(passwdmd5), "%s/passwd.md5", root);
