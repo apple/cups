@@ -169,7 +169,6 @@ gsave
 
   4 setlinewidth			% Draw wide lines
   0 setgray closepath stroke		% Draw a clipping rectangle
-  1 setlinewidth			% Draw normal lines
 
   /pageWidth pageRight pageLeft sub def	% pageWidth = pageRight - pageLeft
   /pageHeight pageTop pageBottom sub def% pageHeight = pageTop - pageBottom
@@ -202,12 +201,14 @@ gsave
   gsave					% Left side inches
     pageLeft 72 mul 0 translate		% Offset left edge
 
+    1 setlinewidth			% Draw normal lines
     0 72 pageTop 72 mul {		% Height inches
-      0 exch moveto 27 0 rlineto stroke	% Draw tic mark
+      0 exch moveto 18 0 rlineto stroke	% Draw tic mark
     } for
 
+    0.5 setlinewidth			% Draw thin lines
     36 72 pageTop 72 mul {		% 1/2 inches
-      0 exch moveto 18 0 rlineto stroke	% Draw tic mark
+      0 exch moveto 13.5 0 rlineto stroke	% Draw tic mark
     } for
 
     18 36 pageTop 72 mul {		% 1/4 inches
@@ -218,12 +219,14 @@ gsave
   gsave					% Bottom inches
     0 pageBottom 72 mul translate	% Offset bottom edge
 
+    1 setlinewidth			% Draw normal lines
     0 72 pageRight 72 mul {		% Width inches
-      0 moveto 0 27 rlineto stroke	% Draw tic mark
+      0 moveto 0 18 rlineto stroke	% Draw tic mark
     } for
 
+    0.5 setlinewidth			% Draw thin lines
     36 72 pageRight 72 mul {		% 1/2 inches
-      0 moveto 0 18 rlineto stroke	% Draw tic mark
+      0 moveto 0 13.5 rlineto stroke	% Draw tic mark
     } for
 
     18 36 pageRight 72 mul {		% 1/4 inches
@@ -234,10 +237,12 @@ gsave
   gsave					% Right side centimeters
     pageRight 72 mul 0 translate	% Offset right edge
 
+    1 setlinewidth			% Draw normal lines
     0 CENTIMETER pageTop 72 mul {	% Height centimeters
-      0 exch moveto -27 0 rlineto stroke% Draw tic mark
+      0 exch moveto -18 0 rlineto stroke% Draw tic mark
     } for
 
+    0.5 setlinewidth			% Draw thin lines
     0 MILLIMETER pageTop 72 mul {	% Millimeters
       0 exch moveto -9 0 rlineto stroke	% Draw tic mark
     } for
@@ -246,22 +251,23 @@ gsave
   gsave					% Top centimeters
     0 pageTop 72 mul translate		% Offset top edge
 
+    1 setlinewidth			% Draw normal lines
     0 CENTIMETER pageRight 72 mul {	% Width centimeters
-      0 moveto 0 -27 rlineto stroke	% Draw tic mark
+      0 moveto 0 -18 rlineto stroke	% Draw tic mark
     } for
 
+    0.5 setlinewidth			% Draw thin lines
     0 MILLIMETER pageRight 72 mul {	% Millimeters
       0 moveto 0 -9 rlineto stroke	% Draw tic mark
     } for
   grestore
 
   smallFont setfont			% Font
-  0.5 setgray				% Color
 
-  pageLeft 72 mul 27 add pageBottom 72 mul 27 add moveto
+  pageLeft 72 mul 20 add pageBottom 72 mul 20 add moveto
   (Inches) show				% Inches label
 
-  pageRight 72 mul 27 sub pageTop 72 mul 27 sub pageHeight sub moveto
+  pageRight 72 mul 20 sub pageTop 72 mul 20 sub pageHeight sub moveto
   (Centimeters) RIGHT			% Centimeter label
 
   % Offset page to account for lower-left margin...
@@ -272,6 +278,7 @@ gsave
   % Set text font and color...
   mediumFont setfont			% Font
   0 setgray				% Color
+  1 setlinewidth			% Draw normal lines
 
   % Draw the color wheel...
   gsave
@@ -557,7 +564,7 @@ gsave
 
   % Draw the label at the top...
   pageWidth 36 mul			% Center of page
-  pageHeight 68 mul			% Top of page (15/16ths)
+  pageHeight 66 mul			% Top of page (11/12ths)
   moveto				% Position text
   bigFont setfont			% Font
   (Printer Test Page) CENTER		% Show text centered
@@ -582,7 +589,7 @@ gsave
   pageHeight sub			% Move down...
   pageHeight sub			% Move down...
   moveto				% Position text
-  (Need help? Contact the operating system vendor or visit "http://www.cups.org/") CENTER
+  (Need help? Contact your operating system vendor or visit "http://www.cups.org/".) CENTER
 
   % Then the CUPS logo....
   gsave
