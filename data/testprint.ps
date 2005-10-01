@@ -195,6 +195,75 @@ gsave
   /smallFont /Times-Roman findfont	% smallFont = Times-Roman
   pageHeight scalefont def		% size = pageHeight (nominally 11)
 
+  % Draw rulers along the edges...
+  /CENTIMETER 72 2.54 div def
+  /MILLIMETER 72 25.4 div def
+
+  gsave					% Left side inches
+    pageLeft 72 mul 0 translate		% Offset left edge
+
+    0 72 pageTop 72 mul {		% Height inches
+      0 exch moveto 27 0 rlineto stroke	% Draw tic mark
+    } for
+
+    36 72 pageTop 72 mul {		% 1/2 inches
+      0 exch moveto 18 0 rlineto stroke	% Draw tic mark
+    } for
+
+    18 36 pageTop 72 mul {		% 1/4 inches
+      0 exch moveto 9 0 rlineto stroke	% Draw tic mark
+    } for
+  grestore
+
+  gsave					% Bottom inches
+    0 pageBottom 72 mul translate	% Offset bottom edge
+
+    0 72 pageRight 72 mul {		% Width inches
+      0 moveto 0 27 rlineto stroke	% Draw tic mark
+    } for
+
+    36 72 pageRight 72 mul {		% 1/2 inches
+      0 moveto 0 18 rlineto stroke	% Draw tic mark
+    } for
+
+    18 36 pageRight 72 mul {		% 1/4 inches
+      0 moveto 0 9 rlineto stroke	% Draw tic mark
+    } for
+  grestore
+
+  gsave					% Right side centimeters
+    pageRight 72 mul 0 translate	% Offset right edge
+
+    0 CENTIMETER pageTop 72 mul {	% Height centimeters
+      0 exch moveto -27 0 rlineto stroke% Draw tic mark
+    } for
+
+    0 MILLIMETER pageTop 72 mul {	% Millimeters
+      0 exch moveto -9 0 rlineto stroke	% Draw tic mark
+    } for
+  grestore
+
+  gsave					% Top centimeters
+    0 pageTop 72 mul translate		% Offset top edge
+
+    0 CENTIMETER pageRight 72 mul {	% Width centimeters
+      0 moveto 0 -27 rlineto stroke	% Draw tic mark
+    } for
+
+    0 MILLIMETER pageRight 72 mul {	% Millimeters
+      0 moveto 0 -9 rlineto stroke	% Draw tic mark
+    } for
+  grestore
+
+  smallFont setfont			% Font
+  0.5 setgray				% Color
+
+  pageLeft 72 mul 27 add pageBottom 72 mul 27 add moveto
+  (Inches) show				% Inches label
+
+  pageRight 72 mul 27 sub pageTop 72 mul 27 sub pageHeight sub moveto
+  (Centimeters) RIGHT			% Centimeter label
+
   % Offset page to account for lower-left margin...
   pageLeft 72 mul
   pageBottom 72 mul
@@ -482,14 +551,14 @@ gsave
 
   % Serial Number
   pageHeight 2 mul sub			% Move down...
-  2 copy moveto				% Move to x & y
+  moveto				% Move to x & y
   (Serial #: ) RIGHT			% Label
   1 serialnumber NUMBER			% S/N
 
   % Draw the label at the top...
   pageWidth 36 mul			% Center of page
   pageHeight 68 mul			% Top of page (15/16ths)
-  2 copy moveto				% Position text
+  moveto				% Position text
   bigFont setfont			% Font
   (Printer Test Page) CENTER		% Show text centered
 
@@ -512,7 +581,7 @@ gsave
   (44141 Airport View Drive, Suite 204, Hollywood, Maryland, 20636, USA.) CENTER
   pageHeight sub			% Move down...
   pageHeight sub			% Move down...
-  2 copy moveto				% Position text
+  moveto				% Position text
   (Need help? Contact the operating system vendor or visit "http://www.cups.org/") CENTER
 
   % Then the CUPS logo....
