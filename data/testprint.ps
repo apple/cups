@@ -3,10 +3,10 @@
 %%Pages: 1
 %%LanguageLevel: 1
 %%DocumentData: Clean7Bit
-%%DocumentSuppliedResources: procset testprint/1.0
+%%DocumentSuppliedResources: procset testprint/1.2
 %%DocumentNeededResources: font Helvetica Helvetica-Bold Times-Roman
 %%Creator: Michael Sweet, Easy Software Products
-%%CreationDate: May 11, 1999
+%%CreationDate: D:20050930220000+0500
 %%Title: Test Page
 %%EndComments
 %%BeginProlog
@@ -139,78 +139,21 @@
 } bind def
 /ESPLOGO {			% Draw the ESP logo
 				% height ESPLOGO
-  % Compute the size of the logo...
-  0 0
-  2 index 1.5 mul 3 index
+  gsave
+    48 div dup scale
 
-  % Do the "metallic" fill from 10% black to 40% black...
-  1 -0.001 0 {
-    dup			% loopval
-    -0.15 mul		% loopval * -0.15
-    0.9 add		% 0.9 - loopval * 0.15
-    setgray		% set gray shade
+    /Helvetica-Bold findfont 38.2 scalefont setfont
+    0 setgray
+    -3 19.5 moveto (ESP) show
 
-    0			% x
-    1 index neg		% loopval
-    1 add		% 1 - loopval
-    3 index		% height
-    mul			% height * (1 - loopval)
-    moveto		% starting point
+    /Helvetica-Narrow-Oblique findfont 8.2 scalefont setfont
+    0 2 moveto (Easy Software Products) show
 
-    dup			% loopval
-    3 index		% width
-    mul			% loopval * width
-    2 index		% height
-    lineto		% Next point
+    1 -0.01 0 { dup neg 1.0 add setgray 0 11 3 -1 roll 68 mul 4.5 rectfill } for
 
-    0			% x
-    2 index		% height
-    lineto		% Next point
-
-    closepath
-    fill
-
-    dup			% loopval
-    0.15 mul		% loopval * 0.15
-    0.6 add		% 0.6 + loopval * 0.15
-    setgray
-
-    dup			% loopval
-    neg 1 add		% 1 - loopval
-    3 index		% width
-    mul			% (1 - loopval) * width
-    0			% y
-    moveto		% Starting point
-
-    2 index		% width
-    exch		% loopval
-    2 index		% height
-    mul			% loopval * height
-    lineto		% Next point
-
-    1 index		% width
-    0			% y
-    lineto		% Next point
-
-    closepath
-    fill
-  } for
-
-  0 setgray rectstroke
-
-  /Helvetica-BoldOblique findfont 1 index 3 div scalefont setfont
-  dup 40 div
-
-  dup 4 mul 1 index 25 mul moveto (E) show
-  dup 10 mul 1 index 15 mul moveto (S) show
-  dup 16 mul 1 index 5 mul moveto (P) show
-
-  /Helvetica-BoldOblique findfont 2 index 5 div scalefont setfont
-  dup 14 mul 1 index 29 mul moveto (asy) show
-  dup 20 mul 1 index 19 mul moveto (oftware) show
-  dup 26 mul 1 index 9 mul moveto (roducts) show
-
-  pop
+    1 0 0 setrgbcolor
+    67.5 11 4.5 4.5 rectfill
+  grestore
 } bind def
 %%EndResource
 %%EndProlog
@@ -553,22 +496,24 @@ gsave
   % Draw the copyright notice at the bottom...
   pageWidth 36 mul			% Center of page
   pageHeight 10 mul			% Bottom of page
-  2 copy moveto				% Position text
+  moveto				% Position text
   (Printed Using CUPS v1.2.x) CENTER	% Show text centered
 
-  pageHeight 2 mul sub			% Move down...
+  pageWidth 34 mul			% Left-center of page
+  pageHeight 8 mul			% Move down...
   2 copy moveto				% Position text
   smallFont setfont			% Font
   (Copyright 1993-2005 Easy Software Products, All Rights Reserved.) CENTER
   pageHeight sub			% Move down...
   2 copy moveto				% Position text
-  (CUPS, and the CUPS logo are the trademark property of) CENTER
+  (CUPS, and the CUPS logo are the trademark property of Easy Software Products,) CENTER
   pageHeight sub			% Move down...
   2 copy moveto				% Position text
-  (Easy Software Products, 44141 Airport View Drive, Suite 204,) CENTER
+  (44141 Airport View Drive, Suite 204, Hollywood, Maryland, 20636, USA.) CENTER
+  pageHeight sub			% Move down...
   pageHeight sub			% Move down...
   2 copy moveto				% Position text
-  (Hollywood, Maryland, 20636, USA.) CENTER
+  (Need help? Contact the operating system vendor or visit "http://www.cups.org/") CENTER
 
   % Then the CUPS logo....
   gsave
