@@ -523,8 +523,21 @@ ippSetCGIVars(ipp_t      *response,	/* I - Response data to be copied... */
 	        * Rewrite URIs...
 		*/
 
-		ippRewriteURL(attr->values[i].string.text, valptr,
-		              sizeof(value) - (valptr - value), NULL);
+                if (!strcmp(name, "member_uris"))
+		{
+		  char	url[1024];	/* URL for class member... */
+
+
+		  ippRewriteURL(attr->values[i].string.text, url,
+		                sizeof(url), NULL);
+
+                  snprintf(valptr, sizeof(value) - (valptr - value),
+		           "<A HREF=\"%s\">%s</A>", url,
+			   strrchr(url, '/') + 1);
+		}
+		else
+		  ippRewriteURL(attr->values[i].string.text, valptr,
+		        	sizeof(value) - (valptr - value), NULL);
         	break;
               }
 

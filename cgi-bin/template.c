@@ -466,18 +466,50 @@ cgi_copy(FILE *out,		/* I - Output file */
  */
 
 static void
-cgi_puts(const char *s,
-         FILE       *out)
+cgi_puts(const char *s,			/* I - String to output */
+         FILE       *out)		/* I - Output file */
 {
   while (*s)
   {
-    if (s[0] == '<')
-      fputs("&lt;", out);
-    else if (s[0] == '>')
+    if (*s == '<')
+    {
+     /*
+      * Pass <A HREF="url"> and </A>, otherwise quote it...
+      */
+
+      if (!strncasecmp(s, "<A HREF=\"", 9))
+      {
+        fputs("<A HREF=\"", out);
+	s += 9;
+
+	while (*s && *s != '\"')
+	{
+          if (*s == '&')
+            fputs("&amp;", out);
+	  else
+	    putc(*s, out);
+
+	  s ++;
+	}
+
+        if (*s)
+	  s ++;
+
+	fputs("\">", out);
+      }
+      else if (!strncasecmp(s, "</A>", 4))
+      {
+        fputs("</A>", out);
+	s += 3;
+      }
+      else
+        fputs("&lt;", out);
+    }
+    else if (*s == '>')
       fputs("&gt;", out);
     else if (*s == '\"')
       fputs("&quot;", out);
-    else if (s[0] == '&')
+    else if (*s == '&')
       fputs("&amp;", out);
     else
       putc(*s, out);
