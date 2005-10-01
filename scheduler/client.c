@@ -3141,7 +3141,7 @@ pipe_command(cupsd_client_t *con,	/* I - Client connection */
 		*envp[100];		/* Environment variables */
   char		content_length[1024],	/* CONTENT_LENGTH environment variable */
 		content_type[1024],	/* CONTENT_TYPE environment variable */
-		http_cookie[1024],	/* HTTP_COOKIE environment variable */
+		http_cookie[32768],	/* HTTP_COOKIE environment variable */
 		http_user_agent[1024],	/* HTTP_USER_AGENT environment variable */
 		lang[1024],		/* LANG environment variable */
 		*query_string,		/* QUERY_STRING env variable */

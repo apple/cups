@@ -3,6 +3,9 @@ CHANGES.txt - 09/30/2005
 
 CHANGES IN CUPS V1.2.0b1
 
+	- CUPS now handles HTTP request/response lines up to 32k
+	  in length; this is mainly for better cookie support
+	  (STR #1274)
 	- Added support for the Apache PassEnv and SetEnv
 	  directives to cupsd.conf (STR #853)
 	- Added large file (64-bit) support (STR #541)

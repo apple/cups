@@ -1000,9 +1000,11 @@ httpGets(char   *line,			/* I - Line to read into */
 	 http_t *http)			/* I - HTTP data */
 {
   char	*lineptr,			/* Pointer into line */
+	*lineend,			/* End of line */
 	*bufptr,			/* Pointer into input buffer */
 	*bufend;			/* Pointer to end of buffer */
-  int	bytes;				/* Number of bytes read */
+  int	bytes,				/* Number of bytes read */
+	eol;				/* End-of-line? */
 
 
   DEBUG_printf(("httpGets(line=%p, length=%d, http=%p)\n", line, length, http));
@@ -1011,27 +1013,26 @@ httpGets(char   *line,			/* I - Line to read into */
     return (NULL);
 
  /*
-  * Pre-scan the buffer and see if there is a newline in there...
+  * Read a line from the buffer...
   */
+    
+  lineptr = line;
+  lineend = line + length - 1;
+  eol     = 0;
+
+  while (lineptr < lineend)
+  {
+   /*
+    * Pre-load the buffer as needed...
+    */
 
 #ifdef WIN32
-  WSASetLastError(0);
+    WSASetLastError(0);
 #else
-  errno = 0;
+    errno = 0;
 #endif /* WIN32 */
 
-  do
-  {
-    bufptr  = http->buffer;
-    bufend  = http->buffer + http->used;
-
-    while (bufptr < bufend)
-      if (*bufptr == 0x0a)
-	break;
-      else
-	bufptr ++;
-
-    if (bufptr >= bufend && http->used < HTTP_MAX_BUFFER)
+    while (http->used == 0)
     {
      /*
       * No newline; see if there is more data to be read...
@@ -1042,10 +1043,12 @@ httpGets(char   *line,			/* I - Line to read into */
 
 #ifdef HAVE_SSL
       if (http->tls)
-	bytes = http_read_ssl(http, bufend, HTTP_MAX_BUFFER - http->used);
+	bytes = http_read_ssl(http, http->buffer + http->used,
+	                      HTTP_MAX_BUFFER - http->used);
       else
 #endif /* HAVE_SSL */
-        bytes = recv(http->fd, bufend, HTTP_MAX_BUFFER - http->used, 0);
+        bytes = recv(http->fd, http->buffer + http->used,
+	             HTTP_MAX_BUFFER - http->used, 0);
 
       DEBUG_printf(("httpGets: read %d bytes...\n", bytes));
 
@@ -1085,52 +1088,49 @@ httpGets(char   *line,			/* I - Line to read into */
       }
 
      /*
-      * Yup, update the amount used and the end pointer...
+      * Yup, update the amount used...
       */
 
       http->used += bytes;
-      bufend     += bytes;
-      bufptr     = bufend;
     }
-  }
-  while (bufptr >= bufend && http->used < HTTP_MAX_BUFFER);
 
-  http->activity = time(NULL);
+   /*
+    * Now copy as much of the current line as possible...
+    */
 
- /*
-  * Read a line from the buffer...
-  */
-    
-  lineptr = line;
-  bufptr  = http->buffer;
-  bytes   = 0;
-  length --;
-
-  while (bufptr < bufend && bytes < length)
-  {
-    bytes ++;
-
-    if (*bufptr == 0x0a)
+    for (bufptr = http->buffer, bufend = http->buffer + http->used;
+         lineptr < lineend && bufptr < bufend;)
     {
-      bufptr ++;
-      break;
+      if (*bufptr == 0x0a)
+      {
+        eol = 1;
+	bufptr ++;
+	break;
+      }
+      else if (*bufptr == 0x0d)
+	bufptr ++;
+      else
+	*lineptr++ = *bufptr++;
     }
-    else if (*bufptr == 0x0d)
-      bufptr ++;
-    else
-      *lineptr++ = *bufptr++;
-  }
 
-  if (bytes > 0)
-  {
-    *lineptr = '\0';
-
-    http->used -= bytes;
+    http->used -= bufptr - http->buffer;
     if (http->used > 0)
       memmove(http->buffer, bufptr, http->used);
 
-    DEBUG_printf(("httpGets: Returning \"%s\"\n", line));
-    return (line);
+    if (eol)
+    {
+     /*
+      * End of line...
+      */
+
+      http->activity = time(NULL);
+
+      *lineptr = '\0';
+      
+      DEBUG_printf(("httpGets: Returning \"%s\"\n", line));
+
+      return (line);
+    }
   }
 
   DEBUG_puts("httpGets: No new line available!");
@@ -1750,7 +1750,7 @@ httpTrace(http_t     *http,		/* I - HTTP data */
 http_status_t				/* O - HTTP status */
 httpUpdate(http_t *http)		/* I - HTTP data */
 {
-  char		line[16384],		/* Line from connection... */
+  char		line[32768],		/* Line from connection... */
 		*value;			/* Pointer to value on line */
   http_field_t	field;			/* Field index */
   int		major, minor,		/* HTTP version numbers */
