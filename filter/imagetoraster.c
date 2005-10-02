@@ -45,7 +45,7 @@
  */
 
 #include "common.h"
-#include "image.h"
+#include "image-private.h"
 #include "raster.h"
 #include <unistd.h>
 #include <math.h>
@@ -55,12 +55,12 @@
  * Globals...
  */
 
-int	Flip = 0,		/* Flip/mirror pages */
-	XPosition = 0,		/* Horizontal position on page */
-	YPosition = 0,		/* Vertical position on page */
-	Collate = 0,		/* Collate copies? */
-	Copies = 1;		/* Number of copies */
-int	Floyd16x16[16][16] =	/* Traditional Floyd ordered dither */
+int	Flip = 0,			/* Flip/mirror pages */
+	XPosition = 0,			/* Horizontal position on page */
+	YPosition = 0,			/* Vertical position on page */
+	Collate = 0,			/* Collate copies? */
+	Copies = 1;			/* Number of copies */
+int	Floyd16x16[16][16] =		/* Traditional Floyd ordered dither */
 	{
 	  { 0,   128, 32,  160, 8,   136, 40,  168,
 	    2,   130, 34,  162, 10,  138, 42,  170 },
@@ -114,58 +114,58 @@ int	Floyd4x4[4][4] =
 	  { 15,  7, 13,  5 }
 	};
 
-ib_t	OnPixels[256],	/* On-pixel LUT */
-	OffPixels[256];	/* Off-pixel LUT */
-int	Planes[] =	/* Number of planes for each colorspace */
-	{
-	  1,		/* CUPS_CSPACE_W */
-	  3,		/* CUPS_CSPACE_RGB */
-	  4,		/* CUPS_CSPACE_RGBA */
-	  1,		/* CUPS_CSPACE_K */
-	  3,		/* CUPS_CSPACE_CMY */
-	  3,		/* CUPS_CSPACE_YMC */
-	  4,		/* CUPS_CSPACE_CMYK */
-	  4,		/* CUPS_CSPACE_YMCK */
-	  4,		/* CUPS_CSPACE_KCMY */
-	  6,		/* CUPS_CSPACE_KCMYcm */
-	  4,		/* CUPS_CSPACE_GMCK */
-	  4,		/* CUPS_CSPACE_GMCS */
-	  1,		/* CUPS_CSPACE_WHITE */
-	  1,		/* CUPS_CSPACE_GOLD */
-	  1,		/* CUPS_CSPACE_SILVER */
-	  3,		/* CUPS_CSPACE_CIEXYZ */
-	  3,		/* CUPS_CSPACE_CIELab */
-	  4,		/* CUPS_CSPACE_RGBW */
-	  0,		/* ... reserved ... */
-	  0,		/* ... reserved ... */
-	  0,		/* ... reserved ... */
-	  0,		/* ... reserved ... */
-	  0,		/* ... reserved ... */
-	  0,		/* ... reserved ... */
-	  0,		/* ... reserved ... */
-	  0,		/* ... reserved ... */
-	  0,		/* ... reserved ... */
-	  0,		/* ... reserved ... */
-	  0,		/* ... reserved ... */
-	  0,		/* ... reserved ... */
-	  0,		/* ... reserved ... */
-	  0,		/* ... reserved ... */
-	  3,		/* CUPS_CSPACE_ICC1 */
-	  3,		/* CUPS_CSPACE_ICC2 */
-	  3,		/* CUPS_CSPACE_ICC3 */
-	  3,		/* CUPS_CSPACE_ICC4 */
-	  3,		/* CUPS_CSPACE_ICC5 */
-	  3,		/* CUPS_CSPACE_ICC6 */
-	  3,		/* CUPS_CSPACE_ICC7 */
-	  3,		/* CUPS_CSPACE_ICC8 */
-	  3,		/* CUPS_CSPACE_ICC9 */
-	  3,		/* CUPS_CSPACE_ICCA */
-	  3,		/* CUPS_CSPACE_ICCB */
-	  3,		/* CUPS_CSPACE_ICCC */
-	  3,		/* CUPS_CSPACE_ICCD */
-	  3,		/* CUPS_CSPACE_ICCE */
-	  3		/* CUPS_CSPACE_ICCF */
-	};
+cups_ib_t	OnPixels[256],		/* On-pixel LUT */
+		OffPixels[256];		/* Off-pixel LUT */
+int		Planes[] =		/* Number of planes for each colorspace */
+		{
+		  1,			/* CUPS_CSPACE_W */
+		  3,			/* CUPS_CSPACE_RGB */
+		  4,			/* CUPS_CSPACE_RGBA */
+		  1,			/* CUPS_CSPACE_K */
+		  3,			/* CUPS_CSPACE_CMY */
+		  3,			/* CUPS_CSPACE_YMC */
+		  4,			/* CUPS_CSPACE_CMYK */
+		  4,			/* CUPS_CSPACE_YMCK */
+		  4,			/* CUPS_CSPACE_KCMY */
+		  6,			/* CUPS_CSPACE_KCMYcm */
+		  4,			/* CUPS_CSPACE_GMCK */
+		  4,			/* CUPS_CSPACE_GMCS */
+		  1,			/* CUPS_CSPACE_WHITE */
+		  1,			/* CUPS_CSPACE_GOLD */
+		  1,			/* CUPS_CSPACE_SILVER */
+		  3,			/* CUPS_CSPACE_CIEXYZ */
+		  3,			/* CUPS_CSPACE_CIELab */
+		  4,			/* CUPS_CSPACE_RGBW */
+		  0,			/* ... reserved ... */
+		  0,			/* ... reserved ... */
+		  0,			/* ... reserved ... */
+		  0,			/* ... reserved ... */
+		  0,			/* ... reserved ... */
+		  0,			/* ... reserved ... */
+		  0,			/* ... reserved ... */
+		  0,			/* ... reserved ... */
+		  0,			/* ... reserved ... */
+		  0,			/* ... reserved ... */
+		  0,			/* ... reserved ... */
+		  0,			/* ... reserved ... */
+		  0,			/* ... reserved ... */
+		  0,			/* ... reserved ... */
+		  3,			/* CUPS_CSPACE_ICC1 */
+		  3,			/* CUPS_CSPACE_ICC2 */
+		  3,			/* CUPS_CSPACE_ICC3 */
+		  3,			/* CUPS_CSPACE_ICC4 */
+		  3,			/* CUPS_CSPACE_ICC5 */
+		  3,			/* CUPS_CSPACE_ICC6 */
+		  3,			/* CUPS_CSPACE_ICC7 */
+		  3,			/* CUPS_CSPACE_ICC8 */
+		  3,			/* CUPS_CSPACE_ICC9 */
+		  3,			/* CUPS_CSPACE_ICCA */
+		  3,			/* CUPS_CSPACE_ICCB */
+		  3,			/* CUPS_CSPACE_ICCC */
+		  3,			/* CUPS_CSPACE_ICCD */
+		  3,			/* CUPS_CSPACE_ICCE */
+		  3			/* CUPS_CSPACE_ICCF */
+		};
 
 
 /*
@@ -173,83 +173,84 @@ int	Planes[] =	/* Number of planes for each colorspace */
  */
  
 static void	exec_code(cups_page_header2_t *header, const char *code);
-static void	format_CMY(cups_page_header2_t *header, unsigned char *row, int y, int z, int xsize, int ysize, int yerr0, int yerr1, ib_t *r0, ib_t *r1);
-static void	format_CMYK(cups_page_header2_t *header, unsigned char *row, int y, int z, int xsize, int ysize, int yerr0, int yerr1, ib_t *r0, ib_t *r1);
-static void	format_K(cups_page_header2_t *header, unsigned char *row, int y, int z, int xsize, int ysize, int yerr0, int yerr1, ib_t *r0, ib_t *r1);
-static void	format_KCMYcm(cups_page_header2_t *header, unsigned char *row, int y, int z, int xsize, int ysize, int yerr0, int yerr1, ib_t *r0, ib_t *r1);
-static void	format_KCMY(cups_page_header2_t *header, unsigned char *row, int y, int z, int xsize, int ysize, int yerr0, int yerr1, ib_t *r0, ib_t *r1);
+static void	format_CMY(cups_page_header2_t *header, unsigned char *row, int y, int z, int xsize, int ysize, int yerr0, int yerr1, cups_ib_t *r0, cups_ib_t *r1);
+static void	format_CMYK(cups_page_header2_t *header, unsigned char *row, int y, int z, int xsize, int ysize, int yerr0, int yerr1, cups_ib_t *r0, cups_ib_t *r1);
+static void	format_K(cups_page_header2_t *header, unsigned char *row, int y, int z, int xsize, int ysize, int yerr0, int yerr1, cups_ib_t *r0, cups_ib_t *r1);
+static void	format_KCMYcm(cups_page_header2_t *header, unsigned char *row, int y, int z, int xsize, int ysize, int yerr0, int yerr1, cups_ib_t *r0, cups_ib_t *r1);
+static void	format_KCMY(cups_page_header2_t *header, unsigned char *row, int y, int z, int xsize, int ysize, int yerr0, int yerr1, cups_ib_t *r0, cups_ib_t *r1);
 #define		format_RGB format_CMY
-static void	format_RGBA(cups_page_header2_t *header, unsigned char *row, int y, int z, int xsize, int ysize, int yerr0, int yerr1, ib_t *r0, ib_t *r1);
-static void	format_W(cups_page_header2_t *header, unsigned char *row, int y, int z, int xsize, int ysize, int yerr0, int yerr1, ib_t *r0, ib_t *r1);
-static void	format_YMC(cups_page_header2_t *header, unsigned char *row, int y, int z, int xsize, int ysize, int yerr0, int yerr1, ib_t *r0, ib_t *r1);
-static void	format_YMCK(cups_page_header2_t *header, unsigned char *row, int y, int z, int xsize, int ysize, int yerr0, int yerr1, ib_t *r0, ib_t *r1);
-static void	make_lut(ib_t *, int, float, float);
+static void	format_RGBA(cups_page_header2_t *header, unsigned char *row, int y, int z, int xsize, int ysize, int yerr0, int yerr1, cups_ib_t *r0, cups_ib_t *r1);
+static void	format_W(cups_page_header2_t *header, unsigned char *row, int y, int z, int xsize, int ysize, int yerr0, int yerr1, cups_ib_t *r0, cups_ib_t *r1);
+static void	format_YMC(cups_page_header2_t *header, unsigned char *row, int y, int z, int xsize, int ysize, int yerr0, int yerr1, cups_ib_t *r0, cups_ib_t *r1);
+static void	format_YMCK(cups_page_header2_t *header, unsigned char *row, int y, int z, int xsize, int ysize, int yerr0, int yerr1, cups_ib_t *r0, cups_ib_t *r1);
+static void	make_lut(cups_ib_t *, int, float, float);
 
 
 /*
  * 'main()' - Main entry...
  */
 
-int			/* O - Exit status */
-main(int  argc,		/* I - Number of command-line arguments */
-     char *argv[])	/* I - Command-line arguments */
+int					/* O - Exit status */
+main(int  argc,				/* I - Number of command-line arguments */
+     char *argv[])			/* I - Command-line arguments */
 {
-  int		i;		/* Looping var */
-  image_t	*img;		/* Image to print */
-  float		xprint,		/* Printable area */
-		yprint,
-		xinches,	/* Total size in inches */
-		yinches;
-  float		xsize,		/* Total size in points */
-		ysize,
-		xsize2,
-		ysize2;
-  float		aspect;		/* Aspect ratio */
-  int		xpages,		/* # x pages */
-		ypages,		/* # y pages */
-		xpage,		/* Current x page */
-		ypage,		/* Current y page */
-		xtemp,		/* Bitmap width in pixels */
-		ytemp,		/* Bitmap height in pixels */
-		page;		/* Current page number */
-  int		x0, y0,		/* Corners of the page in image coords */
-		x1, y1;
-  ppd_file_t	*ppd;		/* PPD file */
-  ppd_choice_t	*choice,	/* PPD option choice */
-		**choices;	/* List of marked choices */
-  int		count;		/* Number of marked choices */
-  char		*resolution,	/* Output resolution */
-		*media_type;	/* Media type */
-  ppd_profile_t	*profile;	/* Color profile */
-  ppd_profile_t	userprofile;	/* User-specified profile */
-  cups_raster_t	*ras;		/* Raster stream */
-  cups_page_header2_t header;	/* Page header */
-  int		num_options;	/* Number of print options */
-  cups_option_t	*options;	/* Print options */
-  const char	*val;		/* Option value */
-  int		slowcollate,	/* Collate copies the slow way */
-		slowcopies;	/* Make copies the "slow" way? */
-  float		g;		/* Gamma correction value */
-  float		b;		/* Brightness factor */
-  float		zoom;		/* Zoom facter */
-  int		xppi, yppi;	/* Pixels-per-inch */
-  int		hue, sat;	/* Hue and saturation adjustment */
-  izoom_t	*z;		/* ImageZoom buffer */
-  int		primary,	/* Primary image colorspace */
-		secondary;	/* Secondary image colorspace */
-  ib_t		*row,		/* Current row */
-		*r0,		/* Top row */
-		*r1;		/* Bottom row */
-  int		y,		/* Current Y coordinate on page */
-		iy,		/* Current Y coordinate in image */
-		last_iy,	/* Previous Y coordinate in image */
-		yerr0,		/* Top Y error value */
-		yerr1,		/* Bottom Y error value */
-		blank;		/* Blank value */
-  ib_t		lut[256];	/* Gamma/brightness LUT */
-  int		plane,		/* Current color plane */
-		num_planes;	/* Number of color planes */
-  char		filename[1024];	/* Name of file to print */
+  int			i;		/* Looping var */
+  cups_image_t		*img;		/* Image to print */
+  float			xprint,		/* Printable area */
+			yprint,
+			xinches,	/* Total size in inches */
+			yinches;
+  float			xsize,		/* Total size in points */
+			ysize,
+			xsize2,
+			ysize2;
+  float			aspect;		/* Aspect ratio */
+  int			xpages,		/* # x pages */
+			ypages,		/* # y pages */
+			xpage,		/* Current x page */
+			ypage,		/* Current y page */
+			xtemp,		/* Bitmap width in pixels */
+			ytemp,		/* Bitmap height in pixels */
+			page;		/* Current page number */
+  int			x0, y0,		/* Corners of the page in image coords */
+			x1, y1;
+  ppd_file_t		*ppd;		/* PPD file */
+  ppd_choice_t		*choice,	/* PPD option choice */
+			**choices;	/* List of marked choices */
+  int			count;		/* Number of marked choices */
+  char			*resolution,	/* Output resolution */
+			*media_type;	/* Media type */
+  ppd_profile_t		*profile;	/* Color profile */
+  ppd_profile_t		userprofile;	/* User-specified profile */
+  cups_raster_t		*ras;		/* Raster stream */
+  cups_page_header2_t	header;		/* Page header */
+  int			num_options;	/* Number of print options */
+  cups_option_t		*options;	/* Print options */
+  const char		*val;		/* Option value */
+  int			slowcollate,	/* Collate copies the slow way */
+			slowcopies;	/* Make copies the "slow" way? */
+  float			g;		/* Gamma correction value */
+  float			b;		/* Brightness factor */
+  float			zoom;		/* Zoom facter */
+  int			xppi, yppi;	/* Pixels-per-inch */
+  int			hue, sat;	/* Hue and saturation adjustment */
+  cups_izoom_t		*z;		/* Image zoom buffer */
+  cups_iztype_t		zoom_type;	/* Image zoom type */
+  int			primary,	/* Primary image colorspace */
+			secondary;	/* Secondary image colorspace */
+  cups_ib_t		*row,		/* Current row */
+			*r0,		/* Top row */
+			*r1;		/* Bottom row */
+  int			y,		/* Current Y coordinate on page */
+			iy,		/* Current Y coordinate in image */
+			last_iy,	/* Previous Y coordinate in image */
+			yerr0,		/* Top Y error value */
+			yerr1,		/* Bottom Y error value */
+			blank;		/* Blank value */
+  cups_ib_t		lut[256];	/* Gamma/brightness LUT */
+  int			plane,		/* Current color plane */
+			num_planes;	/* Number of color planes */
+  char			filename[1024];	/* Name of file to print */
 
 
  /*
@@ -528,8 +529,8 @@ main(int  argc,		/* I - Number of command-line arguments */
   switch (header.cupsColorSpace)
   {
     case CUPS_CSPACE_W :
-        primary   = IMAGE_WHITE;
-	secondary = IMAGE_WHITE;
+        primary   = CUPS_IMAGE_WHITE;
+	secondary = CUPS_IMAGE_WHITE;
         header.cupsBitsPerPixel = header.cupsBitsPerColor;
 	break;
 
@@ -537,8 +538,8 @@ main(int  argc,		/* I - Number of command-line arguments */
     case CUPS_CSPACE_RGB :
     case CUPS_CSPACE_RGBA :
     case CUPS_CSPACE_RGBW :
-        primary   = IMAGE_RGB;
-	secondary = IMAGE_RGB;
+        primary   = CUPS_IMAGE_RGB;
+	secondary = CUPS_IMAGE_RGB;
 
        /*
         * Ensure that colorimetric colorspaces use at least 8 bits per
@@ -564,8 +565,8 @@ main(int  argc,		/* I - Number of command-line arguments */
     case CUPS_CSPACE_WHITE :
     case CUPS_CSPACE_GOLD :
     case CUPS_CSPACE_SILVER :
-        primary   = IMAGE_BLACK;
-	secondary = IMAGE_BLACK;
+        primary   = CUPS_IMAGE_BLACK;
+	secondary = CUPS_IMAGE_BLACK;
         header.cupsBitsPerPixel = header.cupsBitsPerColor;
 	break;
 
@@ -574,8 +575,8 @@ main(int  argc,		/* I - Number of command-line arguments */
     case CUPS_CSPACE_KCMY :
     case CUPS_CSPACE_GMCK :
     case CUPS_CSPACE_GMCS :
-        primary   = IMAGE_CMYK;
-	secondary = IMAGE_CMYK;
+        primary   = CUPS_IMAGE_CMYK;
+	secondary = CUPS_IMAGE_CMYK;
 
 	if (header.cupsColorOrder == CUPS_ORDER_CHUNKED)
           header.cupsBitsPerPixel = header.cupsBitsPerColor * 4;
@@ -585,8 +586,8 @@ main(int  argc,		/* I - Number of command-line arguments */
 
     case CUPS_CSPACE_CMY :
     case CUPS_CSPACE_YMC :
-        primary   = IMAGE_CMY;
-	secondary = IMAGE_CMY;
+        primary   = CUPS_IMAGE_CMY;
+	secondary = CUPS_IMAGE_CMY;
 
 	if (header.cupsColorOrder == CUPS_ORDER_CHUNKED)
 	{
@@ -602,8 +603,8 @@ main(int  argc,		/* I - Number of command-line arguments */
     case CUPS_CSPACE_KCMYcm :
 	if (header.cupsBitsPerPixel == 1)
 	{
-          primary   = IMAGE_CMY;
-	  secondary = IMAGE_CMY;
+          primary   = CUPS_IMAGE_CMY;
+	  secondary = CUPS_IMAGE_CMY;
 
 	  if (header.cupsColorOrder == CUPS_ORDER_CHUNKED)
 	    header.cupsBitsPerPixel = 8;
@@ -612,8 +613,8 @@ main(int  argc,		/* I - Number of command-line arguments */
 	}
 	else
 	{
-          primary   = IMAGE_CMYK;
-	  secondary = IMAGE_CMYK;
+          primary   = CUPS_IMAGE_CMYK;
+	  secondary = CUPS_IMAGE_CMYK;
 
 	  if (header.cupsColorOrder == CUPS_ORDER_CHUNKED)
 	    header.cupsBitsPerPixel = header.cupsBitsPerColor * 4;
@@ -684,9 +685,9 @@ main(int  argc,		/* I - Number of command-line arguments */
     profile = NULL;
 
   if (profile)
-    ImageSetProfile(profile->density, profile->gamma, profile->matrix);
+    cupsImageSetProfile(profile->density, profile->gamma, profile->matrix);
 
-  ImageSetColorSpace(header.cupsColorSpace);
+  cupsImageSetColorSpace(header.cupsColorSpace);
 
  /*
   * Create a gamma/brightness LUT...
@@ -700,7 +701,7 @@ main(int  argc,		/* I - Number of command-line arguments */
 
   fputs("INFO: Loading image file...\n", stderr);
 
-  img = ImageOpen(filename, primary, secondary, sat, hue, lut);
+  img = cupsImageOpen(filename, primary, secondary, sat, hue, lut);
 
   if (argc == 6)
     unlink(filename);
@@ -1151,6 +1152,11 @@ main(int  argc,		/* I - Number of command-line arguments */
         break;
   }
 
+ if (header.cupsBitsPerColor >= 8)
+   zoom_type = CUPS_IZOOM_NORMAL;
+ else
+   zoom_type = CUPS_IZOOM_FAST;
+
  /*
   * See if we need to collate, and if so how we need to do it...
   */
@@ -1256,11 +1262,11 @@ main(int  argc,		/* I - Number of command-line arguments */
 	  */
 
           if (Flip)
-	    z = ImageZoomAlloc(img, x0, y0, x1, y1, -xtemp, ytemp,
-	                       Orientation & 1);
+	    z = cupsImageZoomNew(img, x0, y0, x1, y1, -xtemp, ytemp,
+	                         Orientation & 1, zoom_type);
           else
-	    z = ImageZoomAlloc(img, x0, y0, x1, y1, xtemp, ytemp,
-	                       Orientation & 1);
+	    z = cupsImageZoomNew(img, x0, y0, x1, y1, xtemp, ytemp,
+	                         Orientation & 1, zoom_type);
 
          /*
 	  * Write leading blank space as needed...
@@ -1280,7 +1286,7 @@ main(int  argc,		/* I - Number of command-line arguments */
 	              header.cupsBytesPerLine)
 	      {
 		fputs("ERROR: Unable to write raster data to driver!\n", stderr);
-		ImageClose(img);
+		cupsImageClose(img);
 		exit(1);
 	      }
             }
@@ -1296,25 +1302,10 @@ main(int  argc,		/* I - Number of command-line arguments */
 	  {
 	    if (iy != last_iy)
 	    {
-	      if (header.cupsBitsPerColor >= 8)
-	      {
-	       /*
-	        * Do bilinear interpolation for 8+ bpp images...
-		*/
+	      if (zoom_type != CUPS_IZOOM_FAST && (iy - last_iy) > 1)
+        	cupsImageZoomFill(z, iy);
 
-        	if ((iy - last_iy) > 1)
-        	  ImageZoomFill(z, iy);
-
-        	ImageZoomFill(z, iy + z->yincr);
-              }
-              else
-	      {
-	       /*
-	        * Just do nearest-neighbor sampling for < 8 bpp images...
-		*/
-
-        	ImageZoomQFill(z, iy);
-	      }
+              cupsImageZoomFill(z, iy + z->yincr);
 
               last_iy = iy;
 	    }
@@ -1387,7 +1378,7 @@ main(int  argc,		/* I - Number of command-line arguments */
 	                              header.cupsBytesPerLine)
 	    {
               fputs("ERROR: Unable to write raster data to driver!\n", stderr);
-	      ImageClose(img);
+	      cupsImageClose(img);
 	      exit(1);
 	    }
 
@@ -1424,7 +1415,7 @@ main(int  argc,		/* I - Number of command-line arguments */
 	              header.cupsBytesPerLine)
 	      {
 		fputs("ERROR: Unable to write raster data to driver!\n", stderr);
-		ImageClose(img);
+		cupsImageClose(img);
 		exit(1);
 	      }
             }
@@ -1434,7 +1425,7 @@ main(int  argc,		/* I - Number of command-line arguments */
 	  * Free memory used for the "zoom" engine...
 	  */
 
-          ImageZoomFree(z);
+          cupsImageZoomDelete(z);
         }
       }
 
@@ -1444,7 +1435,7 @@ main(int  argc,		/* I - Number of command-line arguments */
 
   free(row);
   cupsRasterClose(ras);
-  ImageClose(img);
+  cupsImageClose(img);
   ppdClose(ppd);
 
   return (0);
@@ -1642,10 +1633,10 @@ format_CMY(cups_page_header2_t *header,	/* I - Page header */
 	    int	               ysize,	/* I - Height of image data */
 	    int                yerr0,	/* I - Top Y error */
 	    int                yerr1,	/* I - Bottom Y error */
-	    ib_t               *r0,	/* I - Primary image data */
-	    ib_t               *r1)	/* I - Image data for interpolation */
+	    cups_ib_t               *r0,	/* I - Primary image data */
+	    cups_ib_t               *r1)	/* I - Image data for interpolation */
 {
-  ib_t		*ptr,		/* Pointer into row */
+  cups_ib_t		*ptr,		/* Pointer into row */
 		*cptr,		/* Pointer into cyan */
 		*mptr,		/* Pointer into magenta */
 		*yptr,		/* Pointer into yellow */
@@ -2016,10 +2007,10 @@ format_CMYK(cups_page_header2_t *header,	/* I - Page header */
 	    int	                ysize,	/* I - Height of image data */
 	    int                 yerr0,	/* I - Top Y error */
 	    int                 yerr1,	/* I - Bottom Y error */
-	    ib_t                *r0,	/* I - Primary image data */
-	    ib_t                *r1)	/* I - Image data for interpolation */
+	    cups_ib_t                *r0,	/* I - Primary image data */
+	    cups_ib_t                *r1)	/* I - Image data for interpolation */
 {
-  ib_t		*ptr,		/* Pointer into row */
+  cups_ib_t		*ptr,		/* Pointer into row */
 		*cptr,		/* Pointer into cyan */
 		*mptr,		/* Pointer into magenta */
 		*yptr,		/* Pointer into yellow */
@@ -2390,10 +2381,10 @@ format_K(cups_page_header2_t *header,	/* I - Page header */
 	 int	             ysize,	/* I - Height of image data */
 	 int                 yerr0,	/* I - Top Y error */
 	 int                 yerr1,	/* I - Bottom Y error */
-	 ib_t                *r0,	/* I - Primary image data */
-	 ib_t                *r1)	/* I - Image data for interpolation */
+	 cups_ib_t                *r0,	/* I - Primary image data */
+	 cups_ib_t                *r1)	/* I - Image data for interpolation */
 {
-  ib_t		*ptr,		/* Pointer into row */
+  cups_ib_t		*ptr,		/* Pointer into row */
 		bitmask;	/* Current mask for pixel */
   int		bitoffset;	/* Current offset in line */
   int		x,		/* Current X coordinate on page */
@@ -2508,10 +2499,10 @@ format_KCMY(cups_page_header2_t *header,	/* I - Page header */
 	    int	                ysize,	/* I - Height of image data */
 	    int                 yerr0,	/* I - Top Y error */
 	    int                 yerr1,	/* I - Bottom Y error */
-	    ib_t                *r0,	/* I - Primary image data */
-	    ib_t                *r1)	/* I - Image data for interpolation */
+	    cups_ib_t                *r0,	/* I - Primary image data */
+	    cups_ib_t                *r1)	/* I - Image data for interpolation */
 {
-  ib_t		*ptr,		/* Pointer into row */
+  cups_ib_t		*ptr,		/* Pointer into row */
 		*cptr,		/* Pointer into cyan */
 		*mptr,		/* Pointer into magenta */
 		*yptr,		/* Pointer into yellow */
@@ -2916,11 +2907,11 @@ format_KCMYcm(cups_page_header2_t *header,/* I - Page header */
 	      int	          ysize,/* I - Height of image data */
 	      int                 yerr0,/* I - Top Y error */
 	      int                 yerr1,/* I - Bottom Y error */
-	      ib_t                *r0,	/* I - Primary image data */
-	      ib_t                *r1)	/* I - Image data for interpolation */
+	      cups_ib_t                *r0,	/* I - Primary image data */
+	      cups_ib_t                *r1)	/* I - Image data for interpolation */
 {
   int		pc, pm, py, pk;	/* Cyan, magenta, yellow, and black values */
-  ib_t		*ptr,		/* Pointer into row */
+  cups_ib_t		*ptr,		/* Pointer into row */
 		*cptr,		/* Pointer into cyan */
 		*mptr,		/* Pointer into magenta */
 		*yptr,		/* Pointer into yellow */
@@ -3253,10 +3244,10 @@ format_RGBA(cups_page_header2_t *header,	/* I - Page header */
 	    int	                ysize,	/* I - Height of image data */
 	    int                 yerr0,	/* I - Top Y error */
 	    int                 yerr1,	/* I - Bottom Y error */
-	    ib_t                *r0,	/* I - Primary image data */
-	    ib_t                *r1)	/* I - Image data for interpolation */
+	    cups_ib_t                *r0,	/* I - Primary image data */
+	    cups_ib_t                *r1)	/* I - Image data for interpolation */
 {
-  ib_t		*ptr,		/* Pointer into row */
+  cups_ib_t		*ptr,		/* Pointer into row */
 		*cptr,		/* Pointer into cyan */
 		*mptr,		/* Pointer into magenta */
 		*yptr,		/* Pointer into yellow */
@@ -3656,10 +3647,10 @@ format_W(cups_page_header2_t *header,	/* I - Page header */
 	    int	             ysize,	/* I - Height of image data */
 	    int              yerr0,	/* I - Top Y error */
 	    int              yerr1,	/* I - Bottom Y error */
-	    ib_t             *r0,	/* I - Primary image data */
-	    ib_t             *r1)	/* I - Image data for interpolation */
+	    cups_ib_t             *r0,	/* I - Primary image data */
+	    cups_ib_t             *r1)	/* I - Image data for interpolation */
 {
-  ib_t		*ptr,		/* Pointer into row */
+  cups_ib_t		*ptr,		/* Pointer into row */
 		bitmask;	/* Current mask for pixel */
   int		bitoffset;	/* Current offset in line */
   int		x,		/* Current X coordinate on page */
@@ -3774,10 +3765,10 @@ format_YMC(cups_page_header2_t *header,	/* I - Page header */
 	    int	               ysize,	/* I - Height of image data */
 	    int                yerr0,	/* I - Top Y error */
 	    int                yerr1,	/* I - Bottom Y error */
-	    ib_t               *r0,	/* I - Primary image data */
-	    ib_t               *r1)	/* I - Image data for interpolation */
+	    cups_ib_t               *r0,	/* I - Primary image data */
+	    cups_ib_t               *r1)	/* I - Image data for interpolation */
 {
-  ib_t		*ptr,		/* Pointer into row */
+  cups_ib_t		*ptr,		/* Pointer into row */
 		*cptr,		/* Pointer into cyan */
 		*mptr,		/* Pointer into magenta */
 		*yptr,		/* Pointer into yellow */
@@ -4163,10 +4154,10 @@ format_YMCK(cups_page_header2_t *header,	/* I - Page header */
 	    int	                ysize,	/* I - Height of image data */
 	    int                 yerr0,	/* I - Top Y error */
 	    int                 yerr1,	/* I - Bottom Y error */
-	    ib_t                *r0,	/* I - Primary image data */
-	    ib_t                *r1)	/* I - Image data for interpolation */
+	    cups_ib_t                *r0,	/* I - Primary image data */
+	    cups_ib_t                *r1)	/* I - Image data for interpolation */
 {
-  ib_t		*ptr,		/* Pointer into row */
+  cups_ib_t		*ptr,		/* Pointer into row */
 		*cptr,		/* Pointer into cyan */
 		*mptr,		/* Pointer into magenta */
 		*yptr,		/* Pointer into yellow */
@@ -4566,13 +4557,13 @@ format_YMCK(cups_page_header2_t *header,	/* I - Page header */
  */
 
 static void
-make_lut(ib_t  *lut,		/* I - Lookup table */
-	 int   colorspace,	/* I - Colorspace */
-         float g,		/* I - Image gamma */
-         float b)		/* I - Image brightness */
+make_lut(cups_ib_t  *lut,		/* I - Lookup table */
+	 int        colorspace,		/* I - Colorspace */
+         float      g,			/* I - Image gamma */
+         float      b)			/* I - Image brightness */
 {
-  int	i;			/* Looping var */
-  int	v;			/* Current value */
+  int	i;				/* Looping var */
+  int	v;				/* Current value */
 
 
   g = 1.0 / g;

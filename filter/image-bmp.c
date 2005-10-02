@@ -25,50 +25,51 @@
  *
  * Contents:
  *
- *   ImageReadBMP() - Read a BMP image file.
- *   read_word()    - Read a 16-bit unsigned integer.
- *   read_dword()   - Read a 32-bit unsigned integer.
- *   read_long()    - Read a 32-bit signed integer.
+ *   _cupsImageReadBMP() - Read a BMP image file.
+ *   read_word()         - Read a 16-bit unsigned integer.
+ *   read_dword()        - Read a 32-bit unsigned integer.
+ *   read_long()         - Read a 32-bit signed integer.
  */
 
 /*
  * Include necessary headers...
  */
 
-#include "image.h"
+#include "image-private.h"
 
 
 /*
  * Constants for the bitmap compression...
  */
 
-#  define BI_RGB       0             /* No compression - straight BGR data */
-#  define BI_RLE8      1             /* 8-bit run-length compression */
-#  define BI_RLE4      2             /* 4-bit run-length compression */
-#  define BI_BITFIELDS 3             /* RGB bitmap with RGB masks */
+#  define BI_RGB	0		/* No compression - straight BGR data */
+#  define BI_RLE8	1		/* 8-bit run-length compression */
+#  define BI_RLE4	2		/* 4-bit run-length compression */
+#  define BI_BITFIELDS	3		/* RGB bitmap with RGB masks */
 
 
 /*
  * Local functions...
  */
 
-static unsigned short read_word(FILE *fp);
-static unsigned int   read_dword(FILE *fp);
-static int            read_long(FILE *fp);
+static unsigned short	read_word(FILE *fp);
+static unsigned int	read_dword(FILE *fp);
+static int		read_long(FILE *fp);
 
 
 /*
- * 'ImageReadBMP()' - Read a BMP image file.
+ * '_cupsImageReadBMP()' - Read a BMP image file.
  */
 
 int					/* O - Read status */
-ImageReadBMP(image_t    *img,		/* IO - Image */
-             FILE       *fp,		/* I - Image file */
-             int        primary,	/* I - Primary choice for colorspace */
-             int        secondary,	/* I - Secondary choice for colorspace */
-             int        saturation,	/* I - Color saturation (%) */
-             int        hue,		/* I - Color hue (degrees) */
-	     const ib_t *lut)		/* I - Lookup table for gamma/brightness */
+_cupsImageReadBMP(
+    cups_image_t    *img,		/* IO - cupsImage */
+    FILE            *fp,		/* I - cupsImage file */
+    cups_icspace_t  primary,		/* I - Primary choice for colorspace */
+    cups_icspace_t  secondary,		/* I - Secondary choice for colorspace */
+    int             saturation,		/* I - Color saturation (%) */
+    int             hue,		/* I - Color hue (degrees) */
+    const cups_ib_t *lut)		/* I - Lookup table for gamma/brightness */
 {
   int		offset,			/* Offset to bitmap data */
 		info_size,		/* Size of info header */
@@ -84,12 +85,12 @@ ImageReadBMP(image_t    *img,		/* IO - Image */
 		count,			/* Number of times to repeat */
 		temp,			/* Temporary color */
 		align;			/* Alignment bytes */
-  ib_t		bit,			/* Bit in image */
+  cups_ib_t	bit,			/* Bit in image */
 		byte;			/* Byte in image */
-  ib_t		*in,			/* Input pixels */
+  cups_ib_t	*in,			/* Input pixels */
 		*out,			/* Output pixels */
 		*ptr;			/* Pointer into pixels */
-  ib_t		colormap[256][4];	/* Colormap */
+  cups_ib_t	colormap[256][4];	/* Colormap */
 
 
   (void)secondary;
@@ -130,8 +131,8 @@ ImageReadBMP(image_t    *img,		/* IO - Image */
   colors_used      = read_dword(fp);
   colors_important = read_dword(fp);
 
-  if (img->xsize == 0 || img->xsize > IMAGE_MAX_WIDTH ||
-      img->ysize == 0 || img->ysize > IMAGE_MAX_HEIGHT ||
+  if (img->xsize == 0 || img->xsize > CUPS_IMAGE_MAX_WIDTH ||
+      img->ysize == 0 || img->ysize > CUPS_IMAGE_MAX_HEIGHT ||
       (depth != 1 && depth != 4 && depth != 8 && depth != 24))
   {
     fprintf(stderr, "ERROR: Bad BMP dimensions %ux%ux%d\n",
@@ -183,12 +184,12 @@ ImageReadBMP(image_t    *img,		/* IO - Image */
   * Setup image and buffers...
   */
 
-  img->colorspace = (primary == IMAGE_RGB_CMYK) ? IMAGE_RGB : primary;
+  img->colorspace = (primary == CUPS_IMAGE_RGB_CMYK) ? CUPS_IMAGE_RGB : primary;
 
-  ImageSetMaxTiles(img, 0);
+  cupsImageSetMaxTiles(img, 0);
 
   in  = malloc(img->xsize * 3);
-  bpp = ImageGetDepth(img);
+  bpp = cupsImageGetDepth(img);
   out = malloc(img->xsize * bpp);
 
  /*
@@ -201,7 +202,7 @@ ImageReadBMP(image_t    *img,		/* IO - Image */
 
   for (y = img->ysize - 1; y >= 0; y --)
   {
-    if (img->colorspace == IMAGE_RGB)
+    if (img->colorspace == CUPS_IMAGE_RGB)
       ptr = out;
     else
       ptr = in;
@@ -441,37 +442,43 @@ ImageReadBMP(image_t    *img,		/* IO - Image */
           break;
     }
 
-    if (img->colorspace == IMAGE_RGB)
+    if (img->colorspace == CUPS_IMAGE_RGB)
     {
       if (saturation != 100 || hue != 0)
-	ImageRGBAdjust(out, img->xsize, saturation, hue);
+	cupsImageRGBAdjust(out, img->xsize, saturation, hue);
     }
     else
     {
       if (saturation != 100 || hue != 0)
-	ImageRGBAdjust(in, img->xsize, saturation, hue);
+	cupsImageRGBAdjust(in, img->xsize, saturation, hue);
 
       switch (img->colorspace)
       {
-	case IMAGE_WHITE :
-	    ImageRGBToWhite(in, out, img->xsize);
+        default :
 	    break;
-	case IMAGE_BLACK :
-	    ImageRGBToBlack(in, out, img->xsize);
+
+	case CUPS_IMAGE_WHITE :
+	    cupsImageRGBToWhite(in, out, img->xsize);
 	    break;
-	case IMAGE_CMY :
-	    ImageRGBToCMY(in, out, img->xsize);
+
+	case CUPS_IMAGE_BLACK :
+	    cupsImageRGBToBlack(in, out, img->xsize);
 	    break;
-	case IMAGE_CMYK :
-	    ImageRGBToCMYK(in, out, img->xsize);
+
+	case CUPS_IMAGE_CMY :
+	    cupsImageRGBToCMY(in, out, img->xsize);
+	    break;
+
+	case CUPS_IMAGE_CMYK :
+	    cupsImageRGBToCMYK(in, out, img->xsize);
 	    break;
       }
     }
 
     if (lut)
-      ImageLut(out, img->xsize * bpp, lut);
+      cupsImageLut(out, img->xsize * bpp, lut);
 
-    ImagePutRow(img, 0, y, img->xsize, out);
+    _cupsImagePutRow(img, 0, y, img->xsize, out);
   }
 
   fclose(fp);

@@ -25,31 +25,32 @@
  *
  * Contents:
  *
- *   ImageReadPNG() - Read a PNG image file.
+ *   _cupsImageReadPNG() - Read a PNG image file.
  */
 
 /*
  * Include necessary headers...
  */
 
-#include "image.h"
+#include "image-private.h"
 
 #if defined(HAVE_LIBPNG) && defined(HAVE_LIBZ)
-#include <png.h>	/* Portable Network Graphics (PNG) definitions */
+#  include <png.h>	/* Portable Network Graphics (PNG) definitions */
 
 
 /*
- * 'ImageReadPNG()' - Read a PNG image file.
+ * '_cupsImageReadPNG()' - Read a PNG image file.
  */
 
 int					/* O - Read status */
-ImageReadPNG(image_t    *img,		/* IO - Image */
-             FILE       *fp,		/* I - Image file */
-             int        primary,	/* I - Primary choice for colorspace */
-             int        secondary,	/* I - Secondary choice for colorspace */
-             int        saturation,	/* I - Color saturation (%) */
-             int        hue,		/* I - Color hue (degrees) */
-	     const ib_t *lut)		/* I - Lookup table for gamma/brightness */
+_cupsImageReadPNG(
+    cups_image_t    *img,		/* IO - cupsImage */
+    FILE            *fp,		/* I - cupsImage file */
+    cups_icspace_t  primary,		/* I - Primary choice for colorspace */
+    cups_icspace_t  secondary,		/* I - Secondary choice for colorspace */
+    int             saturation,		/* I - Color saturation (%) */
+    int             hue,		/* I - Color hue (degrees) */
+    const cups_ib_t *lut)		/* I - Lookup table for gamma/brightness */
 {
   int		y;			/* Looping var */
   png_structp	pp;			/* PNG read pointer */
@@ -57,7 +58,7 @@ ImageReadPNG(image_t    *img,		/* IO - Image */
   int		bpp;			/* Bytes per pixel */
   int		pass,			/* Current pass */
 		passes;			/* Number of passes required */
-  ib_t		*in,			/* Input pixels */
+  cups_ib_t	*in,			/* Input pixels */
 		*inptr,			/* Pointer into pixels */
 		*out;			/* Output pixels */
   png_color_16	bg;			/* Background color */
@@ -99,12 +100,12 @@ ImageReadPNG(image_t    *img,		/* IO - Image */
     png_set_strip_16(pp);
 
   if (info->color_type & PNG_COLOR_MASK_COLOR)
-    img->colorspace = (primary == IMAGE_RGB_CMYK) ? IMAGE_RGB : primary;
+    img->colorspace = (primary == CUPS_IMAGE_RGB_CMYK) ? CUPS_IMAGE_RGB : primary;
   else
     img->colorspace = secondary;
 
-  if (info->width == 0 || info->width > IMAGE_MAX_WIDTH ||
-      info->height == 0 || info->height > IMAGE_MAX_HEIGHT)
+  if (info->width == 0 || info->width > CUPS_IMAGE_MAX_WIDTH ||
+      info->height == 0 || info->height > CUPS_IMAGE_MAX_HEIGHT)
   {
     fprintf(stderr, "ERROR: PNG image has invalid dimensions %ux%u!\n",
             (unsigned)info->width, (unsigned)info->height);
@@ -130,7 +131,7 @@ ImageReadPNG(image_t    *img,		/* IO - Image */
     }
   }
 
-  ImageSetMaxTiles(img, 0);
+  cupsImageSetMaxTiles(img, 0);
 
   passes = png_set_interlace_handling(pp);
 
@@ -172,7 +173,7 @@ ImageReadPNG(image_t    *img,		/* IO - Image */
       in = malloc(img->xsize * img->ysize * 3);
   }
 
-  bpp = ImageGetDepth(img);
+  bpp = cupsImageGetDepth(img);
   out = malloc(img->xsize * bpp);
 
  /*
@@ -193,24 +194,25 @@ ImageReadPNG(image_t    *img,		/* IO - Image */
 	if (info->color_type & PNG_COLOR_MASK_COLOR)
 	{
 	  if ((saturation != 100 || hue != 0) && bpp > 1)
-	    ImageRGBAdjust(inptr, img->xsize, saturation, hue);
+	    cupsImageRGBAdjust(inptr, img->xsize, saturation, hue);
 
 	  switch (img->colorspace)
 	  {
-	    case IMAGE_WHITE :
-		ImageRGBToWhite(inptr, out, img->xsize);
+	    case CUPS_IMAGE_WHITE :
+		cupsImageRGBToWhite(inptr, out, img->xsize);
 		break;
-	    case IMAGE_RGB :
+	    case CUPS_IMAGE_RGB :
+	    case CUPS_IMAGE_RGB_CMYK :
 		memcpy(out, inptr, img->xsize * 3);
 		break;
-	    case IMAGE_BLACK :
-		ImageRGBToBlack(inptr, out, img->xsize);
+	    case CUPS_IMAGE_BLACK :
+		cupsImageRGBToBlack(inptr, out, img->xsize);
 		break;
-	    case IMAGE_CMY :
-		ImageRGBToCMY(inptr, out, img->xsize);
+	    case CUPS_IMAGE_CMY :
+		cupsImageRGBToCMY(inptr, out, img->xsize);
 		break;
-	    case IMAGE_CMYK :
-		ImageRGBToCMYK(inptr, out, img->xsize);
+	    case CUPS_IMAGE_CMYK :
+		cupsImageRGBToCMYK(inptr, out, img->xsize);
 		break;
 	  }
 	}
@@ -218,28 +220,29 @@ ImageReadPNG(image_t    *img,		/* IO - Image */
 	{
 	  switch (img->colorspace)
 	  {
-	    case IMAGE_WHITE :
+	    case CUPS_IMAGE_WHITE :
 		memcpy(out, inptr, img->xsize);
 		break;
-	    case IMAGE_RGB :
-		ImageWhiteToRGB(inptr, out, img->xsize);
+	    case CUPS_IMAGE_RGB :
+	    case CUPS_IMAGE_RGB_CMYK :
+		cupsImageWhiteToRGB(inptr, out, img->xsize);
 		break;
-	    case IMAGE_BLACK :
-		ImageWhiteToBlack(inptr, out, img->xsize);
+	    case CUPS_IMAGE_BLACK :
+		cupsImageWhiteToBlack(inptr, out, img->xsize);
 		break;
-	    case IMAGE_CMY :
-		ImageWhiteToCMY(inptr, out, img->xsize);
+	    case CUPS_IMAGE_CMY :
+		cupsImageWhiteToCMY(inptr, out, img->xsize);
 		break;
-	    case IMAGE_CMYK :
-		ImageWhiteToCMYK(inptr, out, img->xsize);
+	    case CUPS_IMAGE_CMYK :
+		cupsImageWhiteToCMYK(inptr, out, img->xsize);
 		break;
 	  }
 	}
 
 	if (lut)
-	  ImageLut(out, img->xsize * bpp, lut);
+	  cupsImageLut(out, img->xsize * bpp, lut);
 
-	ImagePutRow(img, 0, y, img->xsize, out);
+	_cupsImagePutRow(img, 0, y, img->xsize, out);
       }
 
       if (passes > 1)
@@ -260,8 +263,6 @@ ImageReadPNG(image_t    *img,		/* IO - Image */
 
   return (0);
 }
-
-
 #endif /* HAVE_LIBPNG && HAVE_LIBZ */
 
 

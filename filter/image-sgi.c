@@ -25,37 +25,38 @@
  *
  * Contents:
  *
- *   ImageReadSGI() - Read a SGI image file.
+ *   _cupsImageReadSGI() - Read a SGI image file.
  */
 
 /*
  * Include necessary headers...
  */
 
-#include "image.h"
+#include "image-private.h"
 #include "image-sgi.h"
 
 
 /*
- * 'ImageReadSGI()' - Read a SGI image file.
+ * '_cupsImageReadSGI()' - Read a SGI image file.
  */
 
 int					/* O - Read status */
-ImageReadSGI(image_t    *img,		/* IO - Image */
-             FILE       *fp,		/* I - Image file */
-             int        primary,	/* I - Primary choice for colorspace */
-             int        secondary,	/* I - Secondary choice for colorspace */
-             int        saturation,	/* I - Color saturation (%) */
-             int        hue,		/* I - Color hue (degrees) */
-	     const ib_t *lut)		/* I - Lookup table for gamma/brightness */
+_cupsImageReadSGI(
+    cups_image_t    *img,		/* IO - cupsImage */
+    FILE            *fp,		/* I - cupsImage file */
+    cups_icspace_t  primary,		/* I - Primary choice for colorspace */
+    cups_icspace_t  secondary,		/* I - Secondary choice for colorspace */
+    int             saturation,		/* I - Color saturation (%) */
+    int             hue,		/* I - Color hue (degrees) */
+    const cups_ib_t *lut)		/* I - Lookup table for gamma/brightness */
 {
-  int		i, y;		/* Looping vars */
-  int		bpp;		/* Bytes per pixel */
-  sgi_t		*sgip;		/* SGI image file */
-  ib_t		*in,		/* Input pixels */
-		*inptr,		/* Current input pixel */
-		*out;		/* Output pixels */
-  unsigned short *rows[4],	/* Row pointers for image data */
+  int		i, y;			/* Looping vars */
+  int		bpp;			/* Bytes per pixel */
+  sgi_t		*sgip;			/* SGI image file */
+  cups_ib_t	*in,			/* Input pixels */
+		*inptr,			/* Current input pixel */
+		*out;			/* Output pixels */
+  unsigned short *rows[4],		/* Row pointers for image data */
 		*red,
 		*green,
 		*blue,
@@ -75,8 +76,8 @@ ImageReadSGI(image_t    *img,		/* IO - Image */
 
  /*
   * Check the image dimensions; since xsize and ysize are unsigned shorts,
-  * just check if they are 0 since they can't exceed IMAGE_MAX_WIDTH or
-  * IMAGE_MAX_HEIGHT...
+  * just check if they are 0 since they can't exceed CUPS_IMAGE_MAX_WIDTH or
+  * CUPS_IMAGE_MAX_HEIGHT...
   */
 
   if (sgip->xsize == 0 || sgip->ysize == 0 ||
@@ -92,14 +93,14 @@ ImageReadSGI(image_t    *img,		/* IO - Image */
   if (sgip->zsize < 3)
     img->colorspace = secondary;
   else
-    img->colorspace = (primary == IMAGE_RGB_CMYK) ? IMAGE_RGB : primary;
+    img->colorspace = (primary == CUPS_IMAGE_RGB_CMYK) ? CUPS_IMAGE_RGB : primary;
 
   img->xsize = sgip->xsize;
   img->ysize = sgip->ysize;
 
-  ImageSetMaxTiles(img, 0);
+  cupsImageSetMaxTiles(img, 0);
 
-  bpp = ImageGetDepth(img);
+  bpp = cupsImageGetDepth(img);
   in  = malloc(img->xsize * sgip->zsize);
   out = malloc(img->xsize * bpp);
 
@@ -198,74 +199,81 @@ ImageReadSGI(image_t    *img,		/* IO - Image */
 
     if (sgip->zsize < 3)
     {
-      if (img->colorspace == IMAGE_WHITE)
+      if (img->colorspace == CUPS_IMAGE_WHITE)
       {
         if (lut)
-	  ImageLut(in, img->xsize, lut);
+	  cupsImageLut(in, img->xsize, lut);
 
-        ImagePutRow(img, 0, y, img->xsize, in);
+        _cupsImagePutRow(img, 0, y, img->xsize, in);
       }
       else
       {
 	switch (img->colorspace)
 	{
-	  case IMAGE_RGB :
-	      ImageWhiteToRGB(in, out, img->xsize);
+	  default :
 	      break;
-	  case IMAGE_BLACK :
-	      ImageWhiteToBlack(in, out, img->xsize);
+
+	  case CUPS_IMAGE_RGB :
+	  case CUPS_IMAGE_RGB_CMYK :
+	      cupsImageWhiteToRGB(in, out, img->xsize);
 	      break;
-	  case IMAGE_CMY :
-	      ImageWhiteToCMY(in, out, img->xsize);
+	  case CUPS_IMAGE_BLACK :
+	      cupsImageWhiteToBlack(in, out, img->xsize);
 	      break;
-	  case IMAGE_CMYK :
-	      ImageWhiteToCMYK(in, out, img->xsize);
+	  case CUPS_IMAGE_CMY :
+	      cupsImageWhiteToCMY(in, out, img->xsize);
+	      break;
+	  case CUPS_IMAGE_CMYK :
+	      cupsImageWhiteToCMYK(in, out, img->xsize);
 	      break;
 	}
 
         if (lut)
-	  ImageLut(out, img->xsize * bpp, lut);
+	  cupsImageLut(out, img->xsize * bpp, lut);
 
-        ImagePutRow(img, 0, y, img->xsize, out);
+        _cupsImagePutRow(img, 0, y, img->xsize, out);
       }
     }
     else
     {
-      if (img->colorspace == IMAGE_RGB)
+      if (img->colorspace == CUPS_IMAGE_RGB)
       {
 	if (saturation != 100 || hue != 0)
-	  ImageRGBAdjust(in, img->xsize, saturation, hue);
+	  cupsImageRGBAdjust(in, img->xsize, saturation, hue);
 
         if (lut)
-	  ImageLut(in, img->xsize * 3, lut);
+	  cupsImageLut(in, img->xsize * 3, lut);
 
-        ImagePutRow(img, 0, y, img->xsize, in);
+        _cupsImagePutRow(img, 0, y, img->xsize, in);
       }
       else
       {
 	if ((saturation != 100 || hue != 0) && bpp > 1)
-	  ImageRGBAdjust(in, img->xsize, saturation, hue);
+	  cupsImageRGBAdjust(in, img->xsize, saturation, hue);
 
 	switch (img->colorspace)
 	{
-	  case IMAGE_WHITE :
-	      ImageRGBToWhite(in, out, img->xsize);
+	  default :
 	      break;
-	  case IMAGE_BLACK :
-	      ImageRGBToBlack(in, out, img->xsize);
+
+	  case CUPS_IMAGE_WHITE :
+	      cupsImageRGBToWhite(in, out, img->xsize);
 	      break;
-	  case IMAGE_CMY :
-	      ImageRGBToCMY(in, out, img->xsize);
+	  case CUPS_IMAGE_BLACK :
+	      cupsImageRGBToBlack(in, out, img->xsize);
 	      break;
-	  case IMAGE_CMYK :
-	      ImageRGBToCMYK(in, out, img->xsize);
+	  case CUPS_IMAGE_CMY :
+	      cupsImageRGBToCMY(in, out, img->xsize);
+	      break;
+	  case CUPS_IMAGE_CMYK :
+	      cupsImageRGBToCMYK(in, out, img->xsize);
 	      break;
 	}
 
         if (lut)
-	  ImageLut(out, img->xsize * bpp, lut);
+	  cupsImageLut(out, img->xsize * bpp, lut);
 
-        ImagePutRow(img, 0, y, img->xsize, out);
+        _cupsImagePutRow(img, 0, y, img->xsize, out);
       }
     }
   }

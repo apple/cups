@@ -54,57 +54,57 @@ int	Flip = 0,		/* Flip/mirror pages */
  * Local functions...
  */
 
-static void	ps_hex(ib_t *, int, int);
-static void	ps_ascii85(ib_t *, int, int);
+static void	ps_hex(cups_ib_t *, int, int);
+static void	ps_ascii85(cups_ib_t *, int, int);
 
 
 /*
  * 'main()' - Main entry...
  */
 
-int			/* O - Exit status */
-main(int  argc,		/* I - Number of command-line arguments */
-     char *argv[])	/* I - Command-line arguments */
+int					/* O - Exit status */
+main(int  argc,				/* I - Number of command-line arguments */
+     char *argv[])			/* I - Command-line arguments */
 {
-  image_t	*img;		/* Image to print */
-  float		xprint,		/* Printable area */
+  cups_image_t	*img;			/* Image to print */
+  float		xprint,			/* Printable area */
 		yprint,
-		xinches,	/* Total size in inches */
+		xinches,		/* Total size in inches */
 		yinches;
-  float		xsize,		/* Total size in points */
+  float		xsize,			/* Total size in points */
 		ysize,
 		xsize2,
 		ysize2;
-  float		aspect;		/* Aspect ratio */
-  int		xpages,		/* # x pages */
-		ypages,		/* # y pages */
-		xpage,		/* Current x page */
-		ypage,		/* Current y page */
-		page;		/* Current page number */
-  int		x0, y0,		/* Corners of the page in image coords */
+  float		aspect;			/* Aspect ratio */
+  int		xpages,			/* # x pages */
+		ypages,			/* # y pages */
+		xpage,			/* Current x page */
+		ypage,			/* Current y page */
+		page;			/* Current page number */
+  int		x0, y0,			/* Corners of the page in image coords */
 		x1, y1;
-  ib_t		*row;		/* Current row */
-  int		y;		/* Current Y coordinate in image */
-  int		colorspace;	/* Output colorspace */
-  int		out_offset,	/* Offset into output buffer */
-		out_length;	/* Length of output buffer */
-  ppd_file_t	*ppd;		/* PPD file */
-  ppd_choice_t	*choice;	/* PPD option choice */
-  int		num_options;	/* Number of print options */
-  cups_option_t	*options;	/* Print options */
-  const char	*val;		/* Option value */
-  int		slowcollate;	/* Collate copies the slow way */
-  float		g;		/* Gamma correction value */
-  float		b;		/* Brightness factor */
-  float		zoom;		/* Zoom facter */
-  int		xppi, yppi;	/* Pixels-per-inch */
-  int		hue, sat;	/* Hue and saturation adjustment */
-  int		realcopies;	/* Real copies being printed */
-  float		left, top;	/* Left and top of image */
-  char		filename[1024];	/* Name of file to print */
-  time_t	curtime;	/* Current time */
-  struct tm	*curtm;		/* Current date */
-  char		curdate[255];	/* Current date string */
+  cups_ib_t		*row;			/* Current row */
+  int		y;			/* Current Y coordinate in image */
+  int		colorspace;		/* Output colorspace */
+  int		out_offset,		/* Offset into output buffer */
+		out_length;		/* Length of output buffer */
+  ppd_file_t	*ppd;			/* PPD file */
+  ppd_choice_t	*choice;		/* PPD option choice */
+  int		num_options;		/* Number of print options */
+  cups_option_t	*options;		/* Print options */
+  const char	*val;			/* Option value */
+  int		slowcollate;		/* Collate copies the slow way */
+  float		g;			/* Gamma correction value */
+  float		b;			/* Brightness factor */
+  float		zoom;			/* Zoom facter */
+  int		xppi, yppi;		/* Pixels-per-inch */
+  int		hue, sat;		/* Hue and saturation adjustment */
+  int		realcopies;		/* Real copies being printed */
+  float		left, top;		/* Left and top of image */
+  char		filename[1024];		/* Name of file to print */
+  time_t	curtime;		/* Current time */
+  struct tm	*curtm;			/* Current date */
+  char		curdate[255];		/* Current date string */
 
 
  /*
@@ -267,9 +267,9 @@ main(int  argc,		/* I - Number of command-line arguments */
   * Open the input image to print...
   */
 
-  colorspace = ColorDevice ? IMAGE_RGB_CMYK : IMAGE_WHITE;
+  colorspace = ColorDevice ? CUPS_IMAGE_RGB_CMYK : CUPS_IMAGE_WHITE;
 
-  img = ImageOpen(filename, colorspace, IMAGE_WHITE, sat, hue, NULL);
+  img = cupsImageOpen(filename, colorspace, CUPS_IMAGE_WHITE, sat, hue, NULL);
 
   if (argc == 6)
     unlink(filename);
@@ -281,7 +281,7 @@ main(int  argc,		/* I - Number of command-line arguments */
     return (1);
   }
 
-  colorspace = img->colorspace;
+  colorspace = cupsImageGetColorSpace(img);
 
  /*
   * Scale as necessary...
@@ -289,8 +289,8 @@ main(int  argc,		/* I - Number of command-line arguments */
 
   if (zoom == 0.0 && xppi == 0)
   {
-    xppi = img->xppi;
-    yppi = img->yppi;
+    xppi = cupsImageGetXPPI(img);
+    yppi = cupsImageGetYPPI(img);
   }
 
   if (yppi == 0)
@@ -319,8 +319,8 @@ main(int  argc,		/* I - Number of command-line arguments */
     fprintf(stderr, "DEBUG: Before scaling: xprint=%.1f, yprint=%.1f\n",
             xprint, yprint);
 
-    xinches = (float)img->xsize / (float)xppi;
-    yinches = (float)img->ysize / (float)yppi;
+    xinches = (float)cupsImageGetWidth(img) / (float)xppi;
+    yinches = (float)cupsImageGetHeight(img) / (float)yppi;
 
     fprintf(stderr, "DEBUG: Image size is %.1f x %.1f inches...\n",
             xinches, yinches);
@@ -364,30 +364,30 @@ main(int  argc,		/* I - Number of command-line arguments */
 
     xprint = (PageRight - PageLeft) / 72.0;
     yprint = (PageTop - PageBottom) / 72.0;
-    aspect = (float)img->yppi / (float)img->xppi;
+    aspect = (float)cupsImageGetYPPI(img) / (float)cupsImageGetXPPI(img);
 
     fprintf(stderr, "DEBUG: Before scaling: xprint=%.1f, yprint=%.1f\n",
             xprint, yprint);
 
-    fprintf(stderr, "DEBUG: img->xppi = %d, img->yppi = %d, aspect = %f\n",
-            img->xppi, img->yppi, aspect);
+    fprintf(stderr, "DEBUG: cupsImageGetXPPI(img) = %d, cupsImageGetYPPI(img) = %d, aspect = %f\n",
+            cupsImageGetXPPI(img), cupsImageGetYPPI(img), aspect);
 
     xsize = xprint * zoom;
-    ysize = xsize * img->ysize / img->xsize / aspect;
+    ysize = xsize * cupsImageGetHeight(img) / cupsImageGetWidth(img) / aspect;
 
     if (ysize > (yprint * zoom))
     {
       ysize = yprint * zoom;
-      xsize = ysize * img->xsize * aspect / img->ysize;
+      xsize = ysize * cupsImageGetWidth(img) * aspect / cupsImageGetHeight(img);
     }
 
     xsize2 = yprint * zoom;
-    ysize2 = xsize2 * img->ysize / img->xsize / aspect;
+    ysize2 = xsize2 * cupsImageGetHeight(img) / cupsImageGetWidth(img) / aspect;
 
     if (ysize2 > (xprint * zoom))
     {
       ysize2 = xprint * zoom;
-      xsize2 = ysize2 * img->xsize * aspect / img->ysize;
+      xsize2 = ysize2 * cupsImageGetWidth(img) * aspect / cupsImageGetHeight(img);
     }
 
     fprintf(stderr, "DEBUG: Portrait size is %.2f x %.2f inches\n", xsize, ysize);
@@ -636,7 +636,7 @@ main(int  argc,		/* I - Number of command-line arguments */
   * Output the pages...
   */
 
-  row = malloc(img->xsize * abs(colorspace) + 3);
+  row = malloc(cupsImageGetWidth(img) * abs(colorspace) + 3);
 
   fprintf(stderr, "DEBUG: XPosition=%d, YPosition=%d, Orientation=%d\n",
           XPosition, YPosition, Orientation);
@@ -796,10 +796,10 @@ main(int  argc,		/* I - Number of command-line arguments */
 
         puts("gsave");
 
-	x0 = img->xsize * xpage / xpages;
-	x1 = img->xsize * (xpage + 1) / xpages - 1;
-	y0 = img->ysize * ypage / ypages;
-	y1 = img->ysize * (ypage + 1) / ypages - 1;
+	x0 = cupsImageGetWidth(img) * xpage / xpages;
+	x1 = cupsImageGetWidth(img) * (xpage + 1) / xpages - 1;
+	y0 = cupsImageGetHeight(img) * ypage / ypages;
+	y1 = cupsImageGetHeight(img) * (ypage + 1) / ypages - 1;
 
         printf("%.1f %.1f translate\n", left, top);
 
@@ -812,7 +812,7 @@ main(int  argc,		/* I - Number of command-line arguments */
 	  printf("/picture %d string def\n", (x1 - x0 + 1) * abs(colorspace));
 	  printf("%d %d 8[1 0 0 -1 0 1]", (x1 - x0 + 1), (y1 - y0 + 1));
 
-          if (colorspace == IMAGE_WHITE)
+          if (colorspace == CUPS_IMAGE_WHITE)
             puts("{currentfile picture readhexstring pop} image");
           else
             printf("{currentfile picture readhexstring pop} false %d colorimage\n",
@@ -820,7 +820,7 @@ main(int  argc,		/* I - Number of command-line arguments */
 
           for (y = y0; y <= y1; y ++)
           {
-            ImageGetRow(img, x0, y, x1 - x0 + 1, row);
+            cupsImageGetRow(img, x0, y, x1 - x0 + 1, row);
             ps_hex(row, (x1 - x0 + 1) * abs(colorspace), y == y1);
           }
 	}
@@ -828,19 +828,19 @@ main(int  argc,		/* I - Number of command-line arguments */
 	{
           switch (colorspace)
 	  {
-	    case IMAGE_WHITE :
+	    case CUPS_IMAGE_WHITE :
                 puts("/DeviceGray setcolorspace");
 		break;
-            case IMAGE_RGB :
+            case CUPS_IMAGE_RGB :
                 puts("/DeviceRGB setcolorspace");
 		break;
-            case IMAGE_CMYK :
+            case CUPS_IMAGE_CMYK :
                 puts("/DeviceCMYK setcolorspace");
 		break;
           }
 
           printf("<<"
-                 "/ImageType 1"
+                 "/cupsImageType 1"
 		 "/Width %d"
 		 "/Height %d"
 		 "/BitsPerComponent 8",
@@ -848,13 +848,13 @@ main(int  argc,		/* I - Number of command-line arguments */
 
           switch (colorspace)
 	  {
-	    case IMAGE_WHITE :
+	    case CUPS_IMAGE_WHITE :
                 fputs("/Decode[0 1]", stdout);
 		break;
-            case IMAGE_RGB :
+            case CUPS_IMAGE_RGB :
                 fputs("/Decode[0 1 0 1 0 1]", stdout);
 		break;
-            case IMAGE_CMYK :
+            case CUPS_IMAGE_CMYK :
                 fputs("/Decode[0 1 0 1 0 1 0 1]", stdout);
 		break;
           }
@@ -864,11 +864,11 @@ main(int  argc,		/* I - Number of command-line arguments */
           if (((x1 - x0 + 1) / xprint) < 100.0)
             fputs("/Interpolate true", stdout);
 
-          puts("/ImageMatrix[1 0 0 -1 0 1]>>image");
+          puts("/cupsImageMatrix[1 0 0 -1 0 1]>>image");
 
           for (y = y0, out_offset = 0; y <= y1; y ++)
           {
-            ImageGetRow(img, x0, y, x1 - x0 + 1, row + out_offset);
+            cupsImageGetRow(img, x0, y, x1 - x0 + 1, row + out_offset);
 
             out_length = (x1 - x0 + 1) * abs(colorspace) + out_offset;
             out_offset = out_length & 3;
@@ -898,7 +898,7 @@ main(int  argc,		/* I - Number of command-line arguments */
   * Close files...
   */
 
-  ImageClose(img);
+  cupsImageClose(img);
   ppdClose(ppd);
 
   return (0);
@@ -910,13 +910,13 @@ main(int  argc,		/* I - Number of command-line arguments */
  */
 
 static void
-ps_hex(ib_t *data,		/* I - Data to print */
-       int  length,		/* I - Number of bytes to print */
-       int  last_line)		/* I - Last line of raster data? */
+ps_hex(cups_ib_t *data,			/* I - Data to print */
+       int       length,		/* I - Number of bytes to print */
+       int       last_line)		/* I - Last line of raster data? */
 {
-  static int	col = 0;	/* Current column */
+  static int	col = 0;		/* Current column */
   static char	*hex = "0123456789ABCDEF";
-				/* Hex digits */
+					/* Hex digits */
 
 
   while (length > 0)
@@ -953,13 +953,13 @@ ps_hex(ib_t *data,		/* I - Data to print */
  */
 
 static void
-ps_ascii85(ib_t *data,		/* I - Data to print */
-	   int  length,		/* I - Number of bytes to print */
-	   int  last_line)	/* I - Last line of raster data? */
+ps_ascii85(cups_ib_t *data,		/* I - Data to print */
+	   int       length,		/* I - Number of bytes to print */
+	   int       last_line)		/* I - Last line of raster data? */
 {
-  unsigned	b;		/* Binary data word */
-  unsigned char	c[5];		/* ASCII85 encoded chars */
-  static int	col = 0;	/* Current column */
+  unsigned	b;			/* Binary data word */
+  unsigned char	c[5];			/* ASCII85 encoded chars */
+  static int	col = 0;		/* Current column */
 
 
   while (length > 3)

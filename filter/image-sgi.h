@@ -80,7 +80,7 @@ typedef struct
 
 extern int	sgiClose(sgi_t *sgip);
 extern int	sgiGetRow(sgi_t *sgip, unsigned short *row, int y, int z);
-extern sgi_t	*sgiOpen(char *filename, int mode, int comp, int bpp,
+extern sgi_t	*sgiOpen(const char *filename, int mode, int comp, int bpp,
 		         int xsize, int ysize, int zsize);
 extern sgi_t	*sgiOpenFile(FILE *file, int mode, int comp, int bpp,
 		             int xsize, int ysize, int zsize);

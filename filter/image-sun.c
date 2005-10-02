@@ -25,7 +25,7 @@
  *
  * Contents:
  *
- *   ImageReadSunRaster() - Read a SunRaster image file.
+ *   _cupsImageReadSunRaster() - Read a SunRaster image file.
  *   read_unsigned()      - Read a 32-bit unsigned integer.
  */
 
@@ -33,23 +33,23 @@
  * Include necessary headers...
  */
 
-#include "image.h"
+#include "image-private.h"
 
 
 #define	RAS_MAGIC	0x59a66a95
 
 	/* Sun supported ras_type's */
-#define RT_OLD		0	/* Raw pixrect image in 68000 byte order */
-#define RT_STANDARD	1	/* Raw pixrect image in 68000 byte order */
-#define RT_BYTE_ENCODED	2	/* Run-length compression of bytes */
-#define RT_FORMAT_RGB   3       /* XRGB or RGB instead of XBGR or BGR */
-#define RT_EXPERIMENTAL 0xffff	/* Reserved for testing */
+#define RT_OLD		0		/* Raw pixrect image in 68000 byte order */
+#define RT_STANDARD	1		/* Raw pixrect image in 68000 byte order */
+#define RT_BYTE_ENCODED	2		/* Run-length compression of bytes */
+#define RT_FORMAT_RGB	3		/* XRGB or RGB instead of XBGR or BGR */
+#define RT_EXPERIMENTAL	0xffff		/* Reserved for testing */
 
 	/* Sun registered ras_maptype's */
 #define RMT_RAW		2
 	/* Sun supported ras_maptype's */
-#define RMT_NONE	0	/* ras_maplength is expected to be 0 */
-#define RMT_EQUAL_RGB	1	/* red[ras_maplength/3],green[],blue[] */
+#define RMT_NONE	0		/* ras_maplength is expected to be 0 */
+#define RMT_EQUAL_RGB	1		/* red[ras_maplength/3],green[],blue[] */
 
 #define RAS_RLE 0x80
 
@@ -73,24 +73,25 @@ static unsigned	read_unsigned(FILE *fp);
 
 
 /*
- * 'ImageReadSunRaster()' - Read a SunRaster image file.
+ * '_cupsImageReadSunRaster()' - Read a SunRaster image file.
  */
 
 int					/* O - Read status */
-ImageReadSunRaster(image_t    *img,	/* IO - Image */
-        	   FILE       *fp,	/* I - Image file */
-        	   int        primary,	/* I - Primary choice for colorspace */
-        	   int        secondary,/* I - Secondary choice for colorspace */
-        	   int        saturation,/* I - Color saturation (%) */
-        	   int        hue,	/* I - Color hue (degrees) */
-		   const ib_t *lut)	/* I - Lookup table for gamma/brightness */
+_cupsImageReadSunRaster(
+    cups_image_t    *img,		/* IO - cupsImage */
+    FILE            *fp,		/* I - cupsImage file */
+    cups_icspace_t  primary,		/* I - Primary choice for colorspace */
+    cups_icspace_t  secondary,		/* I - Secondary choice for colorspace */
+    int             saturation,		/* I - Color saturation (%) */
+    int             hue,		/* I - Color hue (degrees) */
+    const cups_ib_t *lut)		/* I - Lookup table for gamma/brightness */
 {
   int		i, x, y,
 		bpp,			/* Bytes per pixel */
 		scanwidth,
 		run_count,
 		run_value;
-  ib_t		*in,
+  cups_ib_t	*in,
 		*out,
 		*scanline,
 		*scanptr,
@@ -103,7 +104,7 @@ ImageReadSunRaster(image_t    *img,	/* IO - Image */
 
 
  /*
-  * Read the header; we already know that this is a raster file (ImageOpen
+  * Read the header; we already know that this is a raster file (cupsImageOpen
   * checks this) so we don't need to check the magic number again.
   */
 
@@ -122,8 +123,8 @@ ImageReadSunRaster(image_t    *img,	/* IO - Image */
           img->xsize, img->ysize, ras_depth, ras_type, ras_maplength);
 
   if (ras_maplength > 768 ||
-      img->xsize == 0 || img->xsize > IMAGE_MAX_WIDTH ||
-      img->ysize == 0 || img->ysize > IMAGE_MAX_HEIGHT ||
+      img->xsize == 0 || img->xsize > CUPS_IMAGE_MAX_WIDTH ||
+      img->ysize == 0 || img->ysize > CUPS_IMAGE_MAX_HEIGHT ||
       ras_depth == 0 || ras_depth > 32)
   {
     fputs("ERROR: Raster image cannot be loaded!\n", stderr);
@@ -156,11 +157,11 @@ ImageReadSunRaster(image_t    *img,	/* IO - Image */
   }
   else
   {
-    img->colorspace = (primary == IMAGE_RGB_CMYK) ? IMAGE_RGB : primary;
+    img->colorspace = (primary == CUPS_IMAGE_RGB_CMYK) ? CUPS_IMAGE_RGB : primary;
     in = malloc(img->xsize * 3 + 1);
   }
 
-  bpp       = ImageGetDepth(img);
+  bpp       = cupsImageGetDepth(img);
   out       = malloc(img->xsize * bpp);
   scanline  = malloc(scanwidth);
   run_count = 0;
@@ -293,74 +294,80 @@ ImageReadSunRaster(image_t    *img,	/* IO - Image */
 
     if (ras_depth <= 8 && ras_maplength == 0)
     {
-      if (img->colorspace == IMAGE_WHITE)
+      if (img->colorspace == CUPS_IMAGE_WHITE)
       {
         if (lut)
-	  ImageLut(in, img->xsize, lut);
+	  cupsImageLut(in, img->xsize, lut);
 
-        ImagePutRow(img, 0, y, img->xsize, in);
+        _cupsImagePutRow(img, 0, y, img->xsize, in);
       }
       else
       {
 	switch (img->colorspace)
 	{
-	  case IMAGE_RGB :
-	      ImageWhiteToRGB(in, out, img->xsize);
+	  default :
 	      break;
-	  case IMAGE_BLACK :
-	      ImageWhiteToBlack(in, out, img->xsize);
+
+	  case CUPS_IMAGE_RGB :
+	      cupsImageWhiteToRGB(in, out, img->xsize);
 	      break;
-	  case IMAGE_CMY :
-	      ImageWhiteToCMY(in, out, img->xsize);
+	  case CUPS_IMAGE_BLACK :
+	      cupsImageWhiteToBlack(in, out, img->xsize);
 	      break;
-	  case IMAGE_CMYK :
-	      ImageWhiteToCMYK(in, out, img->xsize);
+	  case CUPS_IMAGE_CMY :
+	      cupsImageWhiteToCMY(in, out, img->xsize);
+	      break;
+	  case CUPS_IMAGE_CMYK :
+	      cupsImageWhiteToCMYK(in, out, img->xsize);
 	      break;
 	}
 
         if (lut)
-	  ImageLut(out, img->xsize * bpp, lut);
+	  cupsImageLut(out, img->xsize * bpp, lut);
 
-        ImagePutRow(img, 0, y, img->xsize, out);
+        _cupsImagePutRow(img, 0, y, img->xsize, out);
       }
     }
     else
     {
-      if (img->colorspace == IMAGE_RGB)
+      if (img->colorspace == CUPS_IMAGE_RGB)
       {
 	if (saturation != 100 || hue != 0)
-	  ImageRGBAdjust(in, img->xsize, saturation, hue);
+	  cupsImageRGBAdjust(in, img->xsize, saturation, hue);
 
         if (lut)
-	  ImageLut(in, img->xsize * 3, lut);
+	  cupsImageLut(in, img->xsize * 3, lut);
 
-        ImagePutRow(img, 0, y, img->xsize, in);
+        _cupsImagePutRow(img, 0, y, img->xsize, in);
       }
       else
       {
 	if ((saturation != 100 || hue != 0) && bpp > 1)
-	  ImageRGBAdjust(in, img->xsize, saturation, hue);
+	  cupsImageRGBAdjust(in, img->xsize, saturation, hue);
 
 	switch (img->colorspace)
 	{
-	  case IMAGE_WHITE :
-	      ImageRGBToWhite(in, out, img->xsize);
+	  default :
 	      break;
-	  case IMAGE_BLACK :
-	      ImageRGBToBlack(in, out, img->xsize);
+
+	  case CUPS_IMAGE_WHITE :
+	      cupsImageRGBToWhite(in, out, img->xsize);
 	      break;
-	  case IMAGE_CMY :
-	      ImageRGBToCMY(in, out, img->xsize);
+	  case CUPS_IMAGE_BLACK :
+	      cupsImageRGBToBlack(in, out, img->xsize);
 	      break;
-	  case IMAGE_CMYK :
-	      ImageRGBToCMYK(in, out, img->xsize);
+	  case CUPS_IMAGE_CMY :
+	      cupsImageRGBToCMY(in, out, img->xsize);
+	      break;
+	  case CUPS_IMAGE_CMYK :
+	      cupsImageRGBToCMYK(in, out, img->xsize);
 	      break;
 	}
 
         if (lut)
-	  ImageLut(out, img->xsize * bpp, lut);
+	  cupsImageLut(out, img->xsize * bpp, lut);
 
-        ImagePutRow(img, 0, y, img->xsize, out);
+        _cupsImagePutRow(img, 0, y, img->xsize, out);
       }
     }
   }
@@ -379,10 +386,10 @@ ImageReadSunRaster(image_t    *img,	/* IO - Image */
  * 'read_unsigned()' - Read a 32-bit unsigned integer.
  */
 
-static unsigned		/* O - Integer from file */
-read_unsigned(FILE *fp)	/* I - File to read from */
+static unsigned				/* O - Integer from file */
+read_unsigned(FILE *fp)			/* I - File to read from */
 {
-  unsigned	v;	/* Integer from file */
+  unsigned	v;			/* Integer from file */
 
 
   v = getc(fp);

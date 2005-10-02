@@ -25,48 +25,48 @@
  *
  * Contents:
  *
- *   ImageReadJPEG() - Read a JPEG image file.
+ *   _cupsImageReadJPEG() - Read a JPEG image file.
  */
 
 /*
  * Include necessary headers...
  */
 
-#include "image.h"
+#include "image-private.h"
 
 #ifdef HAVE_LIBJPEG
 #  include <jpeglib.h>	/* JPEG/JFIF image definitions */
 
 
 /*
- * 'ImageReadJPEG()' - Read a JPEG image file.
+ * '_cupsImageReadJPEG()' - Read a JPEG image file.
  */
 
-int					/* O - Read status */
-ImageReadJPEG(image_t    *img,		/* IO - Image */
-              FILE       *fp,		/* I - Image file */
-              int        primary,	/* I - Primary choice for colorspace */
-              int        secondary,	/* I - Secondary choice for colorspace */
-              int        saturation,	/* I - Color saturation (%) */
-              int        hue,		/* I - Color hue (degrees) */
-	      const ib_t *lut)		/* I - Lookup table for gamma/brightness */
+int					/* O  - Read status */
+_cupsImageReadJPEG(
+    cups_image_t    *img,		/* IO - cupsImage */
+    FILE            *fp,		/* I  - cupsImage file */
+    cups_icspace_t  primary,		/* I  - Primary choice for colorspace */
+    cups_icspace_t  secondary,		/* I  - Secondary choice for colorspace */
+    int             saturation,		/* I  - Color saturation (%) */
+    int             hue,		/* I  - Color hue (degrees) */
+    const cups_ib_t *lut)		/* I  - Lookup table for gamma/brightness */
 {
   struct jpeg_decompress_struct	cinfo;	/* Decompressor info */
-  struct jpeg_error_mgr		jerr;	/* Error handler info */
-  ib_t				*in,	/* Input pixels */
-				*out;	/* Output pixels */
-  char				header[16];
-  					/* Photoshop JPEG header */
-  int				psjpeg;	/* Non-zero if Photoshop JPEG */
-  static const char		*cspaces[] =
-				{	/* JPEG colorspaces... */
-				  "JCS_UNKNOWN",
-				  "JCS_GRAYSCALE",
-				  "JCS_RGB",
-				  "JCS_YCbCr",
-				  "JCS_CMYK",
-				  "JCS_YCCK"
-				};
+  struct jpeg_error_mgr	jerr;		/* Error handler info */
+  cups_ib_t		*in,		/* Input pixels */
+			*out;		/* Output pixels */
+  char			header[16];	/* Photoshop JPEG header */
+  int			psjpeg;		/* Non-zero if Photoshop JPEG */
+  static const char	*cspaces[] =
+			{		/* JPEG colorspaces... */
+			  "JCS_UNKNOWN",
+			  "JCS_GRAYSCALE",
+			  "JCS_RGB",
+			  "JCS_YCbCr",
+			  "JCS_CMYK",
+			  "JCS_YCCK"
+			};
 
 
  /*
@@ -111,7 +111,7 @@ ImageReadJPEG(image_t    *img,		/* IO - Image */
     cinfo.out_color_components = 4;
     cinfo.output_components    = 4;
 
-    img->colorspace = (primary == IMAGE_RGB_CMYK) ? IMAGE_CMYK : primary;
+    img->colorspace = (primary == CUPS_IMAGE_RGB_CMYK) ? CUPS_IMAGE_CMYK : primary;
   }
   else
   {
@@ -121,13 +121,13 @@ ImageReadJPEG(image_t    *img,		/* IO - Image */
     cinfo.out_color_components = 3;
     cinfo.output_components    = 3;
 
-    img->colorspace = (primary == IMAGE_RGB_CMYK) ? IMAGE_RGB : primary;
+    img->colorspace = (primary == CUPS_IMAGE_RGB_CMYK) ? CUPS_IMAGE_RGB : primary;
   }
 
   jpeg_calc_output_dimensions(&cinfo);
 
-  if (cinfo.output_width <= 0 || cinfo.output_width > IMAGE_MAX_WIDTH ||
-      cinfo.output_height <= 0 || cinfo.output_height > IMAGE_MAX_HEIGHT)
+  if (cinfo.output_width <= 0 || cinfo.output_width > CUPS_IMAGE_MAX_WIDTH ||
+      cinfo.output_height <= 0 || cinfo.output_height > CUPS_IMAGE_MAX_HEIGHT)
   {
     fprintf(stderr, "ERROR: Bad JPEG dimensions %dx%d!\n",
             cinfo.output_width, cinfo.output_height);
@@ -166,10 +166,10 @@ ImageReadJPEG(image_t    *img,		/* IO - Image */
           img->xsize, img->ysize, cinfo.output_components,
 	  img->xppi, img->yppi);
 
-  ImageSetMaxTiles(img, 0);
+  cupsImageSetMaxTiles(img, 0);
 
   in  = malloc(img->xsize * cinfo.output_components);
-  out = malloc(img->xsize * ImageGetDepth(img));
+  out = malloc(img->xsize * cupsImageGetDepth(img));
 
   jpeg_start_decompress(&cinfo);
 
@@ -183,7 +183,7 @@ ImageReadJPEG(image_t    *img,		/* IO - Image */
       * Invert CMYK data from Photoshop...
       */
 
-      ib_t	*ptr;	/* Pointer into buffer */
+      cups_ib_t	*ptr;	/* Pointer into buffer */
       int	i;	/* Looping var */
 
 
@@ -192,15 +192,15 @@ ImageReadJPEG(image_t    *img,		/* IO - Image */
     }
 
     if ((saturation != 100 || hue != 0) && cinfo.output_components == 3)
-      ImageRGBAdjust(in, img->xsize, saturation, hue);
+      cupsImageRGBAdjust(in, img->xsize, saturation, hue);
 
-    if ((img->colorspace == IMAGE_WHITE && cinfo.out_color_space == JCS_GRAYSCALE) ||
-        (img->colorspace == IMAGE_RGB && cinfo.out_color_space == JCS_RGB) ||
-	(img->colorspace == IMAGE_CMYK && cinfo.out_color_space == JCS_CMYK))
+    if ((img->colorspace == CUPS_IMAGE_WHITE && cinfo.out_color_space == JCS_GRAYSCALE) ||
+        (img->colorspace == CUPS_IMAGE_RGB && cinfo.out_color_space == JCS_RGB) ||
+	(img->colorspace == CUPS_IMAGE_CMYK && cinfo.out_color_space == JCS_CMYK))
     {
 #ifdef DEBUG
       int	i, j;
-      ib_t	*ptr;
+      cups_ib_t	*ptr;
 
 
       fputs("DEBUG: Direct Data...\n", stderr);
@@ -218,55 +218,61 @@ ImageReadJPEG(image_t    *img,		/* IO - Image */
 #endif /* DEBUG */
 
       if (lut)
-        ImageLut(in, img->xsize * ImageGetDepth(img), lut);
+        cupsImageLut(in, img->xsize * cupsImageGetDepth(img), lut);
 
-      ImagePutRow(img, 0, cinfo.output_scanline - 1, img->xsize, in);
+      _cupsImagePutRow(img, 0, cinfo.output_scanline - 1, img->xsize, in);
     }
     else if (cinfo.out_color_space == JCS_GRAYSCALE)
     {
       switch (img->colorspace)
       {
-        case IMAGE_BLACK :
-            ImageWhiteToBlack(in, out, img->xsize);
+        default :
+	    break;
+
+        case CUPS_IMAGE_BLACK :
+            cupsImageWhiteToBlack(in, out, img->xsize);
             break;
-        case IMAGE_RGB :
-            ImageWhiteToRGB(in, out, img->xsize);
+        case CUPS_IMAGE_RGB :
+            cupsImageWhiteToRGB(in, out, img->xsize);
             break;
-        case IMAGE_CMY :
-            ImageWhiteToCMY(in, out, img->xsize);
+        case CUPS_IMAGE_CMY :
+            cupsImageWhiteToCMY(in, out, img->xsize);
             break;
-        case IMAGE_CMYK :
-            ImageWhiteToCMYK(in, out, img->xsize);
+        case CUPS_IMAGE_CMYK :
+            cupsImageWhiteToCMYK(in, out, img->xsize);
             break;
       }
 
       if (lut)
-        ImageLut(out, img->xsize * ImageGetDepth(img), lut);
+        cupsImageLut(out, img->xsize * cupsImageGetDepth(img), lut);
 
-      ImagePutRow(img, 0, cinfo.output_scanline - 1, img->xsize, out);
+      _cupsImagePutRow(img, 0, cinfo.output_scanline - 1, img->xsize, out);
     }
     else if (cinfo.out_color_space == JCS_RGB)
     {
       switch (img->colorspace)
       {
-        case IMAGE_WHITE :
-            ImageRGBToWhite(in, out, img->xsize);
+        default :
+	    break;
+
+        case CUPS_IMAGE_WHITE :
+            cupsImageRGBToWhite(in, out, img->xsize);
             break;
-        case IMAGE_BLACK :
-            ImageRGBToBlack(in, out, img->xsize);
+        case CUPS_IMAGE_BLACK :
+            cupsImageRGBToBlack(in, out, img->xsize);
             break;
-        case IMAGE_CMY :
-            ImageRGBToCMY(in, out, img->xsize);
+        case CUPS_IMAGE_CMY :
+            cupsImageRGBToCMY(in, out, img->xsize);
             break;
-        case IMAGE_CMYK :
-            ImageRGBToCMYK(in, out, img->xsize);
+        case CUPS_IMAGE_CMYK :
+            cupsImageRGBToCMYK(in, out, img->xsize);
             break;
       }
 
       if (lut)
-        ImageLut(out, img->xsize * ImageGetDepth(img), lut);
+        cupsImageLut(out, img->xsize * cupsImageGetDepth(img), lut);
 
-      ImagePutRow(img, 0, cinfo.output_scanline - 1, img->xsize, out);
+      _cupsImagePutRow(img, 0, cinfo.output_scanline - 1, img->xsize, out);
     }
     else /* JCS_CMYK */
     {
@@ -274,24 +280,27 @@ ImageReadJPEG(image_t    *img,		/* IO - Image */
 
       switch (img->colorspace)
       {
-        case IMAGE_WHITE :
-            ImageCMYKToWhite(in, out, img->xsize);
+        default :
+	    break;
+
+        case CUPS_IMAGE_WHITE :
+            cupsImageCMYKToWhite(in, out, img->xsize);
             break;
-        case IMAGE_BLACK :
-            ImageCMYKToBlack(in, out, img->xsize);
+        case CUPS_IMAGE_BLACK :
+            cupsImageCMYKToBlack(in, out, img->xsize);
             break;
-        case IMAGE_CMY :
-            ImageCMYKToCMY(in, out, img->xsize);
+        case CUPS_IMAGE_CMY :
+            cupsImageCMYKToCMY(in, out, img->xsize);
             break;
-        case IMAGE_RGB :
-            ImageCMYKToRGB(in, out, img->xsize);
+        case CUPS_IMAGE_RGB :
+            cupsImageCMYKToRGB(in, out, img->xsize);
             break;
       }
 
       if (lut)
-        ImageLut(out, img->xsize * ImageGetDepth(img), lut);
+        cupsImageLut(out, img->xsize * cupsImageGetDepth(img), lut);
 
-      ImagePutRow(img, 0, cinfo.output_scanline - 1, img->xsize, out);
+      _cupsImagePutRow(img, 0, cinfo.output_scanline - 1, img->xsize, out);
     }
   }
 
@@ -305,8 +314,6 @@ ImageReadJPEG(image_t    *img,		/* IO - Image */
 
   return (0);
 }
-
-
 #endif /* HAVE_LIBJPEG */
 
 

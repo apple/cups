@@ -25,15 +25,15 @@
  *
  * Contents:
  *
- *   ImageReadPIX() - Read a PIX image file.
- *   read_short()   - Read a 16-bit integer.
+ *   _cupsImageReadPIX() - Read a PIX image file.
+ *   read_short()        - Read a 16-bit integer.
  */
 
 /*
  * Include necessary headers...
  */
 
-#include "image.h"
+#include "image-private.h"
 
 
 /*
@@ -44,17 +44,18 @@ static short	read_short(FILE *fp);
 
 
 /*
- * 'ImageReadPIX()' - Read a PIX image file.
+ * '_cupsImageReadPIX()' - Read a PIX image file.
  */
 
 int					/* O - Read status */
-ImageReadPIX(image_t    *img,		/* IO - Image */
-             FILE       *fp,		/* I - Image file */
-             int        primary,	/* I - Primary choice for colorspace */
-             int        secondary,	/* I - Secondary choice for colorspace */
-             int        saturation,	/* I - Color saturation (%) */
-             int        hue,		/* I - Color hue (degrees) */
-	     const ib_t *lut)		/* I - Lookup table for gamma/brightness */
+_cupsImageReadPIX(
+    cups_image_t    *img,		/* IO - cupsImage */
+    FILE            *fp,		/* I - cupsImage file */
+    cups_icspace_t  primary,		/* I - Primary choice for colorspace */
+    cups_icspace_t  secondary,		/* I - Secondary choice for colorspace */
+    int             saturation,		/* I - Color saturation (%) */
+    int             hue,		/* I - Color hue (degrees) */
+    const cups_ib_t *lut)		/* I - Lookup table for gamma/brightness */
 {
   short		width,			/* Width of image */
 		height,			/* Height of image */
@@ -62,8 +63,8 @@ ImageReadPIX(image_t    *img,		/* IO - Image */
   int		count,			/* Repetition count */
 		bpp,			/* Bytes per pixel */
 		x, y;			/* Looping vars */
-  ib_t		r, g, b;		/* Red, green/gray, blue values */
-  ib_t		*in,			/* Input pixels */
+  cups_ib_t	r, g, b;		/* Red, green/gray, blue values */
+  cups_ib_t	*in,			/* Input pixels */
 		*out,			/* Output pixels */
 		*ptr;			/* Pointer into pixels */
 
@@ -80,8 +81,8 @@ ImageReadPIX(image_t    *img,		/* IO - Image */
 
  /*
   * Check the dimensions of the image.  Since the short values used for the
-  * width and height cannot exceed IMAGE_MAX_WIDTH or IMAGE_MAX_HEIGHT, we
-  * just need to verify they are positive integers.
+  * width and height cannot exceed CUPS_IMAGE_MAX_WIDTH or
+  * CUPS_IMAGE_MAX_HEIGHT, we just need to verify they are positive integers.
   */
 
   if (width <= 0 || height <= 0 ||
@@ -96,15 +97,15 @@ ImageReadPIX(image_t    *img,		/* IO - Image */
   if (depth == 8)
     img->colorspace = secondary;
   else
-    img->colorspace = (primary == IMAGE_RGB_CMYK) ? IMAGE_RGB : primary;
+    img->colorspace = (primary == CUPS_IMAGE_RGB_CMYK) ? CUPS_IMAGE_RGB : primary;
 
   img->xsize = width;
   img->ysize = height;
 
-  ImageSetMaxTiles(img, 0);
+  cupsImageSetMaxTiles(img, 0);
 
   in  = malloc(img->xsize * (depth / 8));
-  bpp = ImageGetDepth(img);
+  bpp = cupsImageGetDepth(img);
   out = malloc(img->xsize * bpp);
 
  /*
@@ -115,7 +116,7 @@ ImageReadPIX(image_t    *img,		/* IO - Image */
   {
     for (count = 0, y = 0, g = 0; y < img->ysize; y ++)
     {
-      if (img->colorspace == IMAGE_WHITE)
+      if (img->colorspace == CUPS_IMAGE_WHITE)
         ptr = out;
       else
         ptr = in;
@@ -131,34 +132,34 @@ ImageReadPIX(image_t    *img,		/* IO - Image */
         *ptr++ = g;
       }
 
-      if (img->colorspace != IMAGE_WHITE)
+      if (img->colorspace != CUPS_IMAGE_WHITE)
 	switch (img->colorspace)
 	{
-	  case IMAGE_RGB :
-	      ImageWhiteToRGB(in, out, img->xsize);
+	  default :
+	      cupsImageWhiteToRGB(in, out, img->xsize);
 	      break;
-	  case IMAGE_BLACK :
-	      ImageWhiteToBlack(in, out, img->xsize);
+	  case CUPS_IMAGE_BLACK :
+	      cupsImageWhiteToBlack(in, out, img->xsize);
 	      break;
-	  case IMAGE_CMY :
-	      ImageWhiteToCMY(in, out, img->xsize);
+	  case CUPS_IMAGE_CMY :
+	      cupsImageWhiteToCMY(in, out, img->xsize);
 	      break;
-	  case IMAGE_CMYK :
-	      ImageWhiteToCMYK(in, out, img->xsize);
+	  case CUPS_IMAGE_CMYK :
+	      cupsImageWhiteToCMYK(in, out, img->xsize);
 	      break;
 	}
 
       if (lut)
-	ImageLut(out, img->xsize * bpp, lut);
+	cupsImageLut(out, img->xsize * bpp, lut);
 
-      ImagePutRow(img, 0, y, img->xsize, out);
+      _cupsImagePutRow(img, 0, y, img->xsize, out);
     }
   }
   else
   {
     for (count = 0, y = 0, r = 0, g = 0, b = 0; y < img->ysize; y ++)
     {
-      if (img->colorspace == IMAGE_RGB)
+      if (img->colorspace == CUPS_IMAGE_RGB)
         ptr = out;
       else
         ptr = in;
@@ -178,37 +179,40 @@ ImageReadPIX(image_t    *img,		/* IO - Image */
         *ptr++ = b;
       }
 
-      if (img->colorspace == IMAGE_RGB)
+      if (img->colorspace == CUPS_IMAGE_RGB)
       {
 	if (saturation != 100 || hue != 0)
-	  ImageRGBAdjust(out, img->xsize, saturation, hue);
+	  cupsImageRGBAdjust(out, img->xsize, saturation, hue);
       }
       else
       {
 	if (saturation != 100 || hue != 0)
-	  ImageRGBAdjust(in, img->xsize, saturation, hue);
+	  cupsImageRGBAdjust(in, img->xsize, saturation, hue);
 
 	switch (img->colorspace)
 	{
-	  case IMAGE_WHITE :
-	      ImageRGBToWhite(in, out, img->xsize);
+	  default :
 	      break;
-	  case IMAGE_BLACK :
-	      ImageRGBToBlack(in, out, img->xsize);
+
+	  case CUPS_IMAGE_WHITE :
+	      cupsImageRGBToWhite(in, out, img->xsize);
 	      break;
-	  case IMAGE_CMY :
-	      ImageRGBToCMY(in, out, img->xsize);
+	  case CUPS_IMAGE_BLACK :
+	      cupsImageRGBToBlack(in, out, img->xsize);
 	      break;
-	  case IMAGE_CMYK :
-	      ImageRGBToCMYK(in, out, img->xsize);
+	  case CUPS_IMAGE_CMY :
+	      cupsImageRGBToCMY(in, out, img->xsize);
+	      break;
+	  case CUPS_IMAGE_CMYK :
+	      cupsImageRGBToCMYK(in, out, img->xsize);
 	      break;
 	}
       }
 
       if (lut)
-	ImageLut(out, img->xsize * bpp, lut);
+	cupsImageLut(out, img->xsize * bpp, lut);
 
-      ImagePutRow(img, 0, y, img->xsize, out);
+      _cupsImagePutRow(img, 0, y, img->xsize, out);
     }
   }
 
@@ -224,10 +228,10 @@ ImageReadPIX(image_t    *img,		/* IO - Image */
  * 'read_short()' - Read a 16-bit integer.
  */
 
-static short			/* O - Value from file */
-read_short(FILE *fp)		/* I - File to read from */
+static short				/* O - Value from file */
+read_short(FILE *fp)			/* I - File to read from */
 {
-  int	ch;			/* Character from file */
+  int	ch;				/* Character from file */
 
 
   ch = getc(fp);

@@ -62,11 +62,11 @@ static int	write_rle16(FILE *, unsigned short *, int);
  * 'sgiClose()' - Close an SGI image file.
  */
 
-int
-sgiClose(sgi_t *sgip)	/* I - SGI image */
+int					/* O - 0 on success, -1 on error */
+sgiClose(sgi_t *sgip)			/* I - SGI image */
 {
-  int	i;		/* Return status */
-  long	*offset;	/* Looping var for offset table */
+  int	i;				/* Return status */
+  long	*offset;			/* Looping var for offset table */
 
 
   if (sgip == NULL)
@@ -119,14 +119,14 @@ sgiClose(sgi_t *sgip)	/* I - SGI image */
  * 'sgiGetRow()' - Get a row of image data from a file.
  */
 
-int
-sgiGetRow(sgi_t          *sgip,	/* I - SGI image */
-          unsigned short *row,	/* O - Row to read */
-          int            y,	/* I - Line to read */
-          int            z)	/* I - Channel to read */
+int					/* O - 0 on success, -1 on error */
+sgiGetRow(sgi_t          *sgip,		/* I - SGI image */
+          unsigned short *row,		/* O - Row to read */
+          int            y,		/* I - Line to read */
+          int            z)		/* I - Channel to read */
 {
-  int	x;			/* X coordinate */
-  long	offset;			/* File offset */
+  int	x;				/* X coordinate */
+  long	offset;				/* File offset */
 
 
   if (sgip == NULL ||
@@ -178,17 +178,17 @@ sgiGetRow(sgi_t          *sgip,	/* I - SGI image */
  * 'sgiOpen()' - Open an SGI image file for reading or writing.
  */
 
-sgi_t *
-sgiOpen(char *filename,	/* I - File to open */
-        int  mode,	/* I - Open mode (SGI_READ or SGI_WRITE) */
-        int  comp,	/* I - Type of compression */
-        int  bpp,	/* I - Bytes per pixel */
-        int  xsize,	/* I - Width of image in pixels */
-        int  ysize,	/* I - Height of image in pixels */
-        int  zsize)	/* I - Number of channels */
+sgi_t *					/* O - New image */
+sgiOpen(const char *filename,		/* I - File to open */
+        int        mode,		/* I - Open mode (SGI_READ or SGI_WRITE) */
+        int        comp,		/* I - Type of compression */
+        int        bpp,			/* I - Bytes per pixel */
+        int        xsize,		/* I - Width of image in pixels */
+        int        ysize,		/* I - Height of image in pixels */
+        int        zsize)		/* I - Number of channels */
 {
-  sgi_t	*sgip;		/* New SGI image file */
-  FILE	*file;		/* Image file pointer */
+  sgi_t	*sgip;				/* New SGI image file */
+  FILE	*file;				/* Image file pointer */
 
 
   if (mode == SGI_READ)
@@ -210,19 +210,19 @@ sgiOpen(char *filename,	/* I - File to open */
  * 'sgiOpenFile()' - Open an SGI image file for reading or writing.
  */
 
-sgi_t *
-sgiOpenFile(FILE *file,	/* I - File to open */
-            int  mode,	/* I - Open mode (SGI_READ or SGI_WRITE) */
-            int  comp,	/* I - Type of compression */
-            int  bpp,	/* I - Bytes per pixel */
-            int  xsize,	/* I - Width of image in pixels */
-            int  ysize,	/* I - Height of image in pixels */
-            int  zsize)	/* I - Number of channels */
+sgi_t *					/* O - New image */
+sgiOpenFile(FILE *file,			/* I - File to open */
+            int  mode,			/* I - Open mode (SGI_READ or SGI_WRITE) */
+            int  comp,			/* I - Type of compression */
+            int  bpp,			/* I - Bytes per pixel */
+            int  xsize,			/* I - Width of image in pixels */
+            int  ysize,			/* I - Height of image in pixels */
+            int  zsize)			/* I - Number of channels */
 {
-  int	i, j;		/* Looping var */
-  char	name[80];	/* Name of file in image header */
-  short	magic;		/* Magic number */
-  sgi_t	*sgip;		/* New image pointer */
+  int	i, j;				/* Looping var */
+  char	name[80];			/* Name of file in image header */
+  short	magic;				/* Magic number */
+  sgi_t	*sgip;				/* New image pointer */
 
 
   if ((sgip = calloc(sizeof(sgi_t), 1)) == NULL)
@@ -367,14 +367,14 @@ sgiOpenFile(FILE *file,	/* I - File to open */
  * 'sgiPutRow()' - Put a row of image data to a file.
  */
 
-int
-sgiPutRow(sgi_t          *sgip,	/* I - SGI image */
-          unsigned short *row,	/* I - Row to write */
-          int            y,	/* I - Line to write */
-          int            z)	/* I - Channel to write */
+int					/* O - 0 on success, -1 on error */
+sgiPutRow(sgi_t          *sgip,		/* I - SGI image */
+          unsigned short *row,		/* I - Row to write */
+          int            y,		/* I - Line to write */
+          int            z)		/* I - Channel to write */
 {
-  int	x;		/* X coordinate */
-  long	offset;		/* File offset */
+  int	x;				/* X coordinate */
+  long	offset;				/* File offset */
 
 
   if (sgip == NULL ||
@@ -516,10 +516,10 @@ sgiPutRow(sgi_t          *sgip,	/* I - SGI image */
  * 'getlong()' - Get a 32-bit big-endian integer.
  */
 
-static int
-getlong(FILE *fp)	/* I - File to read from */
+static int				/* O - Long value */
+getlong(FILE *fp)			/* I - File to read from */
 {
-  unsigned char	b[4];
+  unsigned char	b[4];			/* Bytes from file */
 
 
   fread(b, 4, 1, fp);
@@ -531,10 +531,10 @@ getlong(FILE *fp)	/* I - File to read from */
  * 'getshort()' - Get a 16-bit big-endian integer.
  */
 
-static int
-getshort(FILE *fp)	/* I - File to read from */
+static int				/* O - Short value */
+getshort(FILE *fp)			/* I - File to read from */
 {
-  unsigned char	b[2];
+  unsigned char	b[2];			/* Bytes from file */
 
 
   fread(b, 2, 1, fp);
@@ -546,9 +546,9 @@ getshort(FILE *fp)	/* I - File to read from */
  * 'putlong()' - Put a 32-bit big-endian integer.
  */
 
-static int
-putlong(long n,		/* I - Long to write */
-        FILE *fp)	/* I - File to write to */
+static int				/* O - 0 on success, -1 on error */
+putlong(long n,				/* I - Long to write */
+        FILE *fp)			/* I - File to write to */
 {
   if (putc(n >> 24, fp) == EOF)
     return (EOF);
@@ -567,9 +567,9 @@ putlong(long n,		/* I - Long to write */
  * 'putshort()' - Put a 16-bit big-endian integer.
  */
 
-static int
-putshort(unsigned short n,	/* I - Short to write */
-         FILE           *fp)	/* I - File to write to */
+static int				/* O - 0 on success, -1 on error */
+putshort(unsigned short n,		/* I - Short to write */
+         FILE           *fp)		/* I - File to write to */
 {
   if (putc(n >> 8, fp) == EOF)
     return (EOF);
@@ -584,15 +584,15 @@ putshort(unsigned short n,	/* I - Short to write */
  * 'read_rle8()' - Read 8-bit RLE data.
  */
 
-static int
-read_rle8(FILE           *fp,	/* I - File to read from */
-          unsigned short *row,	/* O - Data */
-          int            xsize)	/* I - Width of data in pixels */
+static int				/* O - Value on success, -1 on error */
+read_rle8(FILE           *fp,		/* I - File to read from */
+          unsigned short *row,		/* O - Data */
+          int            xsize)		/* I - Width of data in pixels */
 {
-  int	i,		/* Looping var */
-	ch,		/* Current character */
-	count,		/* RLE count */
-	length;		/* Number of bytes read... */
+  int	i,				/* Looping var */
+	ch,				/* Current character */
+	count,				/* RLE count */
+	length;				/* Number of bytes read... */
 
 
   length = 0;
@@ -629,15 +629,15 @@ read_rle8(FILE           *fp,	/* I - File to read from */
  * 'read_rle16()' - Read 16-bit RLE data.
  */
 
-static int
-read_rle16(FILE           *fp,	/* I - File to read from */
-           unsigned short *row,	/* O - Data */
-           int            xsize)/* I - Width of data in pixels */
+static int				/* O - Value on success, -1 on error */
+read_rle16(FILE           *fp,		/* I - File to read from */
+           unsigned short *row,		/* O - Data */
+           int            xsize)	/* I - Width of data in pixels */
 {
-  int	i,		/* Looping var */
-	ch,		/* Current character */
-	count,		/* RLE count */
-	length;		/* Number of bytes read... */
+  int	i,				/* Looping var */
+	ch,				/* Current character */
+	count,				/* RLE count */
+	length;				/* Number of bytes read... */
 
 
   length = 0;
@@ -674,17 +674,17 @@ read_rle16(FILE           *fp,	/* I - File to read from */
  * 'write_rle8()' - Write 8-bit RLE data.
  */
 
-static int
-write_rle8(FILE           *fp,	/* I - File to write to */
-           unsigned short *row,	/* I - Data */
-           int            xsize)/* I - Width of data in pixels */
+static int				/* O - Length on success, -1 on error */
+write_rle8(FILE           *fp,		/* I - File to write to */
+           unsigned short *row,		/* I - Data */
+           int            xsize)	/* I - Width of data in pixels */
 {
-  int		length,
-		count,
-		i,
-		x;
-  unsigned short *start,
-		repeat;
+  int			length,		/* Length in bytes */
+			count,		/* Number of repeating pixels */
+			i,		/* Looping var */
+			x;		/* Current column */
+  unsigned short	*start,		/* Start of current sequence */
+			repeat;		/* Repeated pixel */
 
 
   for (x = xsize, length = 0; x > 0;)
@@ -766,17 +766,17 @@ write_rle8(FILE           *fp,	/* I - File to write to */
  * 'write_rle16()' - Write 16-bit RLE data.
  */
 
-static int
-write_rle16(FILE           *fp,  /* I - File to write to */
-            unsigned short *row, /* I - Data */
-            int            xsize)/* I - Width of data in pixels */
+static int				/* O - Length in words */
+write_rle16(FILE           *fp,		/* I - File to write to */
+            unsigned short *row,	/* I - Data */
+            int            xsize)	/* I - Width of data in pixels */
 {
-  int		length,
-		count,
-		i,
-		x;
-  unsigned short *start,
-		repeat;
+  int			length,		/* Length in words */
+			count,		/* Number of repeating pixels */
+			i,		/* Looping var */
+			x;		/* Current column */
+  unsigned short	*start,		/* Start of current sequence */
+			repeat;		/* Repeated pixel */
 
 
   for (x = xsize, length = 0; x > 0;)

@@ -1,7 +1,7 @@
 /*
  * "$Id$"
  *
- *   Image zoom routines for the Common UNIX Printing System (CUPS).
+ *   cupsImage zoom routines for the Common UNIX Printing System (CUPS).
  *
  *   Copyright 1993-2005 by Easy Software Products.
  *
@@ -25,52 +25,100 @@
  *
  * Contents:
  *
- *   ImageZoomAlloc() - Allocate a pixel zoom record...
- *   ImageZoomFill()  - Fill a zoom record with image data utilizing bilinear
- *                      interpolation.
- *   ImageZoomQFill() - Fill a zoom record quickly using nearest-neighbor
- *                      sampling.
- *   ImageZoomFree()  - Free a zoom record...
+ *   cupsImageZoomDelete() - Free a zoom record...
+ *   cupsImageZoomFill()   - Fill a zoom record...
+ *   cupsImageZoomNew()    - Allocate a pixel zoom record...
+ *   zoom_bilinear()       - Fill a zoom record with image data utilizing
+ *                           bilinear interpolation.
+ *   zoom_nearest()        - Fill a zoom record quickly using nearest-neighbor
+ *                           sampling.
  */
 
 /*
  * Include necessary headers...
  */
 
-#include "image.h"
+#include "image-private.h"
 
 
 /*
- * 'ZoomAlloc()' - Allocate a pixel zoom record...
+ * Local functions...
  */
 
-izoom_t *
-ImageZoomAlloc(image_t *img,	/* I - Image to zoom */
-               int     x0,	/* I - Upper-lefthand corner */
-               int     y0,	/* I - ... */
-               int     x1,	/* I - Lower-righthand corner */
-               int     y1,	/* I - ... */
-               int     xsize,	/* I - Final width of image */
-               int     ysize,	/* I - Final height of image */
-               int     rotated)	/* I - Non-zero if image is rotated 90 degs */
+static void	zoom_bilinear(cups_izoom_t *z, int iy);
+static void	zoom_nearest(cups_izoom_t *z, int iy);
+
+
+/*
+ * 'cupsImageZoomDelete()' - Free a zoom record...
+ */
+
+void
+cupsImageZoomDelete(cups_izoom_t *z)	/* I - Zoom record to free */
 {
-  izoom_t	*z;		/* New zoom record */
-  int		flip;		/* Flip on X axis? */
+  free(z->rows[0]);
+  free(z->rows[1]);
+  free(z->in);
+  free(z);
+}
 
 
-  if (xsize > IMAGE_MAX_WIDTH ||
-      ysize > IMAGE_MAX_HEIGHT ||
-      (x1 - x0) > IMAGE_MAX_WIDTH ||
-      (y1 - y0) > IMAGE_MAX_HEIGHT)
+/*
+ * 'cupsImageZoomFill()' - Fill a zoom record with image data utilizing bilinear
+ *                         interpolation.
+ */
+
+void
+cupsImageZoomFill(cups_izoom_t *z,	/* I - Zoom record to fill */
+              int     iy)	/* I - Zoom image row */
+{
+  switch (z->type)
+  {
+    case CUPS_IZOOM_FAST :
+        zoom_nearest(z, iy);
+	break;
+
+    default :
+        zoom_bilinear(z, iy);
+	break;
+  }
+}
+
+
+/*
+ * 'cupsImageZoomNew()' - Allocate a pixel zoom record...
+ */
+
+cups_izoom_t *
+cupsImageZoomNew(
+    cups_image_t  *img,			/* I - cupsImage to zoom */
+    int           x0,			/* I - Upper-lefthand corner */
+    int           y0,			/* I - ... */
+    int           x1,			/* I - Lower-righthand corner */
+    int           y1,			/* I - ... */
+    int           xsize,		/* I - Final width of image */
+    int           ysize,		/* I - Final height of image */
+    int           rotated,		/* I - Non-zero if image is rotated 90 degs */
+    cups_iztype_t type)			/* I - Zoom type */
+{
+  cups_izoom_t	*z;			/* New zoom record */
+  int		flip;			/* Flip on X axis? */
+
+
+  if (xsize > CUPS_IMAGE_MAX_WIDTH ||
+      ysize > CUPS_IMAGE_MAX_HEIGHT ||
+      (x1 - x0) > CUPS_IMAGE_MAX_WIDTH ||
+      (y1 - y0) > CUPS_IMAGE_MAX_HEIGHT)
     return (NULL);		/* Protect against integer overflow */
 
-  if ((z = (izoom_t *)calloc(1, sizeof(izoom_t))) == NULL)
+  if ((z = (cups_izoom_t *)calloc(1, sizeof(cups_izoom_t))) == NULL)
     return (NULL);
 
   z->img     = img;
   z->row     = 0;
-  z->depth   = ImageGetDepth(img);
+  z->depth   = cupsImageGetDepth(img);
   z->rotated = rotated;
+  z->type    = type;
 
   if (xsize < 0)
   {
@@ -143,20 +191,20 @@ ImageZoomAlloc(image_t *img,	/* I - Image to zoom */
     z->inincr = -z->inincr;
   }
 
-  if ((z->rows[0] = (ib_t *)malloc(z->xsize * z->depth)) == NULL)
+  if ((z->rows[0] = (cups_ib_t *)malloc(z->xsize * z->depth)) == NULL)
   {
     free(z);
     return (NULL);
   }
 
-  if ((z->rows[1] = (ib_t *)malloc(z->xsize * z->depth)) == NULL)
+  if ((z->rows[1] = (cups_ib_t *)malloc(z->xsize * z->depth)) == NULL)
   {
     free(z->rows[0]);
     free(z);
     return (NULL);
   }
 
-  if ((z->in = (ib_t *)malloc(z->width * z->depth)) == NULL)
+  if ((z->in = (cups_ib_t *)malloc(z->width * z->depth)) == NULL)
   {
     free(z->rows[0]);
     free(z->rows[1]);
@@ -169,29 +217,29 @@ ImageZoomAlloc(image_t *img,	/* I - Image to zoom */
 
 
 /*
- * 'ImageZoomFill()' - Fill a zoom record with image data utilizing bilinear
+ * 'zoom_bilinear()' - Fill a zoom record with image data utilizing bilinear
  *                     interpolation.
  */
 
-void
-ImageZoomFill(izoom_t *z,	/* I - Zoom record to fill */
-              int     iy)	/* I - Zoom image row */
+static void
+zoom_bilinear(cups_izoom_t *z,		/* I - Zoom record to fill */
+              int          iy)		/* I - Zoom image row */
 {
-  ib_t	*r,			/* Row pointer */
-	*inptr;			/* Pixel pointer */
-  int	xerr0,			/* X error counter */
-	xerr1;			/* ... */
-  int	ix,
-	x,
-	count,
-	z_depth,
-	z_xstep,
-	z_xincr,
-	z_instep,
-	z_inincr,
-	z_xmax,
-	z_xmod,
-	z_xsize;
+  cups_ib_t	*r,			/* Row pointer */
+		*inptr;			/* Pixel pointer */
+  int		xerr0,			/* X error counter */
+		xerr1;			/* ... */
+  int		ix,
+		x,
+		count,
+		z_depth,
+		z_xstep,
+		z_xincr,
+		z_instep,
+		z_inincr,
+		z_xmax,
+		z_xmod,
+		z_xsize;
 
 
   if (iy > z->ymax)
@@ -209,9 +257,9 @@ ImageZoomFill(izoom_t *z,	/* I - Zoom record to fill */
   z_inincr = z->inincr;
 
   if (z->rotated)
-    ImageGetCol(z->img, z->xorig - iy, z->yorig, z->width, z->in);
+    cupsImageGetCol(z->img, z->xorig - iy, z->yorig, z->width, z->in);
   else
-    ImageGetRow(z->img, z->xorig, z->yorig + iy, z->width, z->in);
+    cupsImageGetRow(z->img, z->xorig, z->yorig + iy, z->width, z->in);
 
   if (z_inincr < 0)
     inptr = z->in + (z->width - 1) * z_depth;
@@ -250,26 +298,27 @@ ImageZoomFill(izoom_t *z,	/* I - Zoom record to fill */
 
 
 /*
- * 'ImageZoomQFill()' - Fill a zoom record quickly using nearest-neighbor sampling.
+ * 'zoom_nearest()' - Fill a zoom record quickly using nearest-neighbor
+ *                    sampling.
  */
 
-void
-ImageZoomQFill(izoom_t *z,	/* I - Zoom record to fill */
-               int     iy)	/* I - Zoom image row */
+static void
+zoom_nearest(cups_izoom_t *z,		/* I - Zoom record to fill */
+             int          iy)		/* I - Zoom image row */
 {
-  ib_t	*r,			/* Row pointer */
-	*inptr;			/* Pixel pointer */
-  int	xerr0;			/* X error counter */
-  int	ix,
-	x,
-	count,
-	z_depth,
-	z_xstep,
-	z_xincr,
-	z_instep,
-	z_inincr,
-	z_xmod,
-	z_xsize;
+  cups_ib_t	*r,			/* Row pointer */
+		*inptr;			/* Pixel pointer */
+  int		xerr0;			/* X error counter */
+  int		ix,
+		x,
+		count,
+		z_depth,
+		z_xstep,
+		z_xincr,
+		z_instep,
+		z_inincr,
+		z_xmod,
+		z_xsize;
 
 
   if (iy > z->ymax)
@@ -286,9 +335,9 @@ ImageZoomQFill(izoom_t *z,	/* I - Zoom record to fill */
   z_inincr = z->inincr;
 
   if (z->rotated)
-    ImageGetCol(z->img, z->xorig - iy, z->yorig, z->width, z->in);
+    cupsImageGetCol(z->img, z->xorig - iy, z->yorig, z->width, z->in);
   else
-    ImageGetRow(z->img, z->xorig, z->yorig + iy, z->width, z->in);
+    cupsImageGetRow(z->img, z->xorig, z->yorig + iy, z->width, z->in);
 
   if (z_inincr < 0)
     inptr = z->in + (z->width - 1) * z_depth;
@@ -313,20 +362,6 @@ ImageZoomQFill(izoom_t *z,	/* I - Zoom record to fill */
       inptr += z_inincr;
     }
   }
-}
-
-
-/*
- * 'ImageZoomFree()' - Free a zoom record...
- */
-
-void
-ImageZoomFree(izoom_t *z)	/* I - Zoom record to free */
-{
-  free(z->rows[0]);
-  free(z->rows[1]);
-  free(z->in);
-  free(z);
 }
 
 

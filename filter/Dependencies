@@ -24,23 +24,49 @@ hpgl-polygon.o: ../cups/language.h ../cups/string.h ../config.h
 hpgl-vector.o: hpgltops.h common.h ../cups/cups.h ../cups/ipp.h
 hpgl-vector.o: ../cups/http.h ../cups/md5.h ../cups/ppd.h ../cups/file.h
 hpgl-vector.o: ../cups/language.h ../cups/string.h ../config.h
-image-bmp.o: image.h ../config.h raster.h ../cups/ppd.h ../cups/file.h
-image-colorspace.o: image.h ../config.h raster.h ../cups/ppd.h ../cups/file.h
-image-gif.o: image.h ../config.h raster.h ../cups/ppd.h ../cups/file.h
-image-jpeg.o: image.h ../config.h raster.h ../cups/ppd.h ../cups/file.h
-image-photocd.o: image.h ../config.h raster.h ../cups/ppd.h ../cups/file.h
-image-pix.o: image.h ../config.h raster.h ../cups/ppd.h ../cups/file.h
-image-png.o: image.h ../config.h raster.h ../cups/ppd.h ../cups/file.h
-image-pnm.o: image.h ../config.h raster.h ../cups/ppd.h ../cups/file.h
-image-sgi.o: image.h ../config.h raster.h ../cups/ppd.h ../cups/file.h
+image-bmp.o: image-private.h image.h raster.h ../cups/ppd.h ../cups/file.h
+image-bmp.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
+image-bmp.o: ../cups/ppd.h ../cups/debug.h ../cups/string.h ../config.h
+image-colorspace.o: image-private.h image.h raster.h ../cups/ppd.h
+image-colorspace.o: ../cups/file.h ../cups/cups.h ../cups/ipp.h
+image-colorspace.o: ../cups/http.h ../cups/md5.h ../cups/ppd.h
+image-colorspace.o: ../cups/debug.h ../cups/string.h ../config.h
+image-gif.o: image-private.h image.h raster.h ../cups/ppd.h ../cups/file.h
+image-gif.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
+image-gif.o: ../cups/ppd.h ../cups/debug.h ../cups/string.h ../config.h
+image-jpeg.o: image-private.h image.h raster.h ../cups/ppd.h ../cups/file.h
+image-jpeg.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
+image-jpeg.o: ../cups/ppd.h ../cups/debug.h ../cups/string.h ../config.h
+image-photocd.o: image-private.h image.h raster.h ../cups/ppd.h
+image-photocd.o: ../cups/file.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
+image-photocd.o: ../cups/md5.h ../cups/ppd.h ../cups/debug.h ../cups/string.h
+image-photocd.o: ../config.h
+image-pix.o: image-private.h image.h raster.h ../cups/ppd.h ../cups/file.h
+image-pix.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
+image-pix.o: ../cups/ppd.h ../cups/debug.h ../cups/string.h ../config.h
+image-png.o: image-private.h image.h raster.h ../cups/ppd.h ../cups/file.h
+image-png.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
+image-png.o: ../cups/ppd.h ../cups/debug.h ../cups/string.h ../config.h
+image-pnm.o: image-private.h image.h raster.h ../cups/ppd.h ../cups/file.h
+image-pnm.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
+image-pnm.o: ../cups/ppd.h ../cups/debug.h ../cups/string.h ../config.h
+image-sgi.o: image-private.h image.h raster.h ../cups/ppd.h ../cups/file.h
+image-sgi.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
+image-sgi.o: ../cups/ppd.h ../cups/debug.h ../cups/string.h ../config.h
 image-sgi.o: image-sgi.h
 image-sgilib.o: image-sgi.h
-image-sun.o: image.h ../config.h raster.h ../cups/ppd.h ../cups/file.h
-image-tiff.o: image.h ../config.h raster.h ../cups/ppd.h ../cups/file.h
-image-zoom.o: image.h ../config.h raster.h ../cups/ppd.h ../cups/file.h
-image.o: image.h ../config.h raster.h ../cups/ppd.h ../cups/file.h
+image-sun.o: image-private.h image.h raster.h ../cups/ppd.h ../cups/file.h
+image-sun.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
+image-sun.o: ../cups/ppd.h ../cups/debug.h ../cups/string.h ../config.h
+image-tiff.o: image-private.h image.h raster.h ../cups/ppd.h ../cups/file.h
+image-tiff.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
+image-tiff.o: ../cups/ppd.h ../cups/debug.h ../cups/string.h ../config.h
+image-zoom.o: image-private.h image.h raster.h ../cups/ppd.h ../cups/file.h
+image-zoom.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
+image-zoom.o: ../cups/ppd.h ../cups/debug.h ../cups/string.h ../config.h
+image.o: image-private.h image.h raster.h ../cups/ppd.h ../cups/file.h
 image.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
-image.o: ../cups/ppd.h
+image.o: ../cups/ppd.h ../cups/debug.h ../cups/string.h ../config.h
 interpret.o: ../cups/ppd.h ../cups/file.h ../cups/string.h ../config.h
 interpret.o: raster.h
 raster.o: raster.h ../cups/ppd.h ../cups/file.h ../cups/string.h ../config.h
@@ -58,8 +84,9 @@ imagetops.o: ../cups/md5.h ../cups/ppd.h ../cups/file.h ../cups/language.h
 imagetops.o: ../cups/string.h ../config.h image.h raster.h ../cups/ppd.h
 imagetoraster.o: common.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
 imagetoraster.o: ../cups/md5.h ../cups/ppd.h ../cups/file.h
-imagetoraster.o: ../cups/language.h ../cups/string.h ../config.h image.h
-imagetoraster.o: raster.h ../cups/ppd.h
+imagetoraster.o: ../cups/language.h ../cups/string.h ../config.h
+imagetoraster.o: image-private.h image.h raster.h ../cups/ppd.h
+imagetoraster.o: ../cups/debug.h
 common.o: common.h ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
 common.o: ../cups/ppd.h ../cups/file.h ../cups/language.h ../cups/string.h
 common.o: ../config.h

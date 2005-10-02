@@ -24,225 +24,127 @@
  *   This file is subject to the Apple OS-Developed Software exception.
  */
 
-#ifndef _IMAGE_H_
-#  define _IMAGE_H_
+#ifndef _CUPS_IMAGE_H_
+#  define _CUPS_IMAGE_H_
 
 /*
  * Include necessary headers...
  */
 
 #  include <stdio.h>
-#  include <stdlib.h>
-#  include <string.h>
-#  include <errno.h>
-#  include <config.h>
 #  include "raster.h"
 
+#  ifdef __cplusplus
+extern "C" {
+#  endif /* __cplusplus */
 
 /*
- * Maximum image dimensions that we can handle...
+ * Constants...
  */
 
-#  define IMAGE_MAX_WIDTH	0x07ffffff	/* 2^27-1 to allow for 15-channel data */
-#  define IMAGE_MAX_HEIGHT	0x7fffffff	/* 2^31-1 */
-
-/*
- * Colorspaces...
- */
-
-#  define IMAGE_CMYK	-4		/* Cyan, magenta, yellow, and black */
-#  define IMAGE_CMY	-3		/* Cyan, magenta, and yellow */
-#  define IMAGE_BLACK	-1		/* Black */
-#  define IMAGE_WHITE	1		/* White (luminance) */
-#  define IMAGE_RGB	3		/* Red, green, and blue */
-#  define IMAGE_RGB_CMYK 4		/* Use RGB or CMYK */
-
-/*
- * Tile definitions...
- */
-
-#  define TILE_SIZE	256		/* 256x256 pixel tiles */
-#  define TILE_MINIMUM	10		/* Minimum number of tiles */
-
-/*
- * min/max/abs macros...
- */
-
-#ifndef max
-#  define 	max(a,b)	((a) > (b) ? (a) : (b))
-#endif /* !max */
-#ifndef min
-#  define 	min(a,b)	((a) < (b) ? (a) : (b))
-#endif /* !min */
-#ifndef abs
-#  define	abs(a)		((a) < 0 ? -(a) : (a))
-#endif /* !abs */
-
-
-/*
- * Image byte type...
- */
-
-typedef unsigned char ib_t;
-
-/*
- * Tile cache structure...
- */
-
-typedef struct ic_str
+typedef enum cups_icspace_e		/**** Image colorspaces ****/
 {
-  struct ic_str	*prev,		/* Previous tile in cache */
-		*next;		/* Next tile in cache */
-  void		*tile;		/* Tile this is attached to */
-  ib_t		*pixels;	/* Pixel data */
-} ic_t;
+  CUPS_IMAGE_CMYK = -4,			/* Cyan, magenta, yellow, and black */
+  CUPS_IMAGE_CMY = -3,			/* Cyan, magenta, and yellow */
+  CUPS_IMAGE_BLACK = -1,		/* Black */
+  CUPS_IMAGE_WHITE = 1,			/* White (luminance) */
+  CUPS_IMAGE_RGB = 3,			/* Red, green, and blue */
+  CUPS_IMAGE_RGB_CMYK = 4		/* Use RGB or CMYK */
+} cups_icspace_t;
 
-/*
- * Tile structure...
- */
-
-typedef struct
+typedef enum cups_iztype_e		/**** Image zoom type ****/
 {
-  int		dirty;		/* True if tile is dirty */
-  long		pos;		/* Position of tile on disk (-1 if not written) */
-  ic_t		*ic;		/* Pixel data */
-} itile_t;
-
-/*
- * Image structure...
- */
-
-typedef struct
-{
-  int		colorspace;	/* Colorspace of image */
-  unsigned	xsize,		/* Width of image in pixels */
-		ysize,		/* Height of image in pixels */
-		xppi,		/* X resolution in pixels-per-inch */
-		yppi,		/* Y resolution in pixels-per-inch */
-		num_ics,	/* Number of cached tiles */
-		max_ics;	/* Maximum number of cached tiles */
-  itile_t	**tiles;	/* Tiles in image */
-  ic_t		*first,		/* First cached tile in image */
-		*last;		/* Last cached tile in image */
-  FILE		*cachefile;	/* Tile cache file */
-  char		cachename[256];	/* Tile cache filename */
-} image_t;
-
-/*
- * Image row zooming structure...
- */
-
-typedef struct
-{
-  image_t	*img;		/* Image to zoom */
-  unsigned	xorig,
-		yorig,
-		width,		/* Width of input area */
-		height,		/* Height of input area */
-		depth,		/* Number of bytes per pixel */
-		rotated,	/* Non-zero if image needs to be rotated */
-		xsize,		/* Width of output image */
-		ysize,		/* Height of output image */
-		xmax,		/* Maximum input image X position */
-		ymax,		/* Maximum input image Y position */
-		xmod,		/* Threshold for Bresenheim rounding */
-		ymod;		/* ... */
-  int		xstep,		/* Amount to step for each pixel along X */
-		xincr,
-		instep,		/* Amount to step pixel pointer along X */
-		inincr,
-		ystep,		/* Amount to step for each pixel along Y */
-		yincr,
-		row;		/* Current row */
-  ib_t		*rows[2],	/* Horizontally scaled pixel data */
-		*in;		/* Unscaled input pixel data */
-} izoom_t;
+  CUPS_IZOOM_FAST,			/* Use nearest-neighbor sampling */
+  CUPS_IZOOM_NORMAL,			/* Use bilinear interpolation */
+  CUPS_IZOOM_BEST			/* Use bicubic interpolation */
+} cups_iztype_t;
 
 
 /*
- * Basic image functions...
+ * Types and structures...
  */
 
-extern image_t	*ImageOpen(char *filename, int primary, int secondary,
-		           int saturation, int hue, const ib_t *lut);
-extern void	ImageClose(image_t *img);
-extern void	ImageSetColorSpace(cups_cspace_t cs);
-extern void	ImageSetMaxTiles(image_t *img, int max_tiles);
-extern void	ImageSetProfile(float d, float g, float matrix[3][3]);
+typedef unsigned char cups_ib_t;	/**** Image byte ****/
 
-#define 	ImageGetDepth(img)	((img)->colorspace < 0 ? -(img)->colorspace : (img)->colorspace)
-extern int	ImageGetCol(image_t *img, int x, int y, int height, ib_t *pixels);
-extern int	ImageGetRow(image_t *img, int x, int y, int width, ib_t *pixels);
-extern int	ImagePutCol(image_t *img, int x, int y, int height, const ib_t *pixels);
-extern int	ImagePutRow(image_t *img, int x, int y, int width, const ib_t *pixels);
+struct cups_image_s;
+typedef struct cups_image_s cups_image_t;
+					/**** Image file data ****/
+
+struct cups_izoom_s;
+typedef struct cups_izoom_s cups_izoom_t;
+					/**** Image zoom data ****/
+
 
 /*
- * File formats...
+ * Prototypes...
  */
 
-extern int	ImageReadBMP(image_t *img, FILE *fp, int primary, int secondary,
-		             int saturation, int hue, const ib_t *lut);
-extern int	ImageReadFPX(image_t *img, FILE *fp, int primary, int secondary,
-		             int saturation, int hue, const ib_t *lut);
-extern int	ImageReadGIF(image_t *img, FILE *fp, int primary, int secondary,
-		             int saturation, int hue, const ib_t *lut);
-extern int	ImageReadJPEG(image_t *img, FILE *fp, int primary, int secondary,
-		              int saturation, int hue, const ib_t *lut);
-extern int	ImageReadPIX(image_t *img, FILE *fp, int primary, int secondary,
-		             int saturation, int hue, const ib_t *lut);
-extern int	ImageReadPNG(image_t *img, FILE *fp, int primary, int secondary,
-		             int saturation, int hue, const ib_t *lut);
-extern int	ImageReadPNM(image_t *img, FILE *fp, int primary, int secondary,
-		             int saturation, int hue, const ib_t *lut);
-extern int	ImageReadPhotoCD(image_t *img, FILE *fp, int primary,
-		                 int secondary, int saturation, int hue,
-				 const ib_t *lut);
-extern int	ImageReadSGI(image_t *img, FILE *fp, int primary, int secondary,
-		             int saturation, int hue, const ib_t *lut);
-extern int	ImageReadSunRaster(image_t *img, FILE *fp, int primary,
-		                   int secondary, int saturation, int hue,
-				   const ib_t *lut);
-extern int	ImageReadTIFF(image_t *img, FILE *fp, int primary, int secondary,
-		              int saturation, int hue, const ib_t *lut);
+extern void		cupsImageClose(cups_image_t *img);
+extern void		cupsImageCMYKToBlack(const cups_ib_t *in,
+			                     cups_ib_t *out, int count);
+extern void		cupsImageCMYKToCMY(const cups_ib_t *in,
+			                   cups_ib_t *out, int count);
+extern void		cupsImageCMYKToCMYK(const cups_ib_t *in,
+			                    cups_ib_t *out, int count);
+extern void		cupsImageCMYKToRGB(const cups_ib_t *in,
+			                   cups_ib_t *out, int count);
+extern void		cupsImageCMYKToWhite(const cups_ib_t *in,
+			                     cups_ib_t *out, int count);
+extern int		cupsImageGetCol(cups_image_t *img, int x, int y,
+			                int height, cups_ib_t *pixels);
+extern cups_icspace_t	cupsImageGetColorSpace(cups_image_t *img);
+extern int		cupsImageGetDepth(cups_image_t *img);
+extern unsigned		cupsImageGetHeight(cups_image_t *img);
+extern int		cupsImageGetRow(cups_image_t *img, int x, int y,
+			                int width, cups_ib_t *pixels);
+extern unsigned		cupsImageGetWidth(cups_image_t *img);
+extern unsigned		cupsImageGetXPPI(cups_image_t *img);
+extern unsigned		cupsImageGetYPPI(cups_image_t *img);
+extern void		cupsImageLut(cups_ib_t *pixels, int count,
+			             const cups_ib_t *lut);
+extern cups_image_t	*cupsImageOpen(const char *filename,
+			               cups_icspace_t primary,
+				       cups_icspace_t secondary,
+			               int saturation, int hue,
+				       const cups_ib_t *lut);
+extern void		cupsImageRGBAdjust(cups_ib_t *pixels, int count,
+			                   int saturation, int hue);
+extern void		cupsImageRGBToBlack(const cups_ib_t *in,
+			                    cups_ib_t *out, int count);
+extern void		cupsImageRGBToCMY(const cups_ib_t *in,
+			                  cups_ib_t *out, int count);
+extern void		cupsImageRGBToCMYK(const cups_ib_t *in,
+			                   cups_ib_t *out, int count);
+extern void		cupsImageRGBToRGB(const cups_ib_t *in,
+			                  cups_ib_t *out, int count);
+extern void		cupsImageRGBToWhite(const cups_ib_t *in,
+			                    cups_ib_t *out, int count);
+extern void		cupsImageSetMaxTiles(cups_image_t *img, int max_tiles);
+extern void		cupsImageSetProfile(float d, float g,
+			                    float matrix[3][3]);
+extern void		cupsImageSetRasterColorSpace(cups_cspace_t cs);
+extern void		cupsImageWhiteToBlack(const cups_ib_t *in,
+			                      cups_ib_t *out, int count);
+extern void		cupsImageWhiteToCMY(const cups_ib_t *in,
+			                    cups_ib_t *out, int count);
+extern void		cupsImageWhiteToCMYK(const cups_ib_t *in,
+			                     cups_ib_t *out, int count);
+extern void		cupsImageWhiteToRGB(const cups_ib_t *in,
+			                    cups_ib_t *out, int count);
+extern void		cupsImageWhiteToWhite(const cups_ib_t *in,
+			                      cups_ib_t *out, int count);
+extern void		cupsImageZoomDelete(cups_izoom_t *z);
+extern void		cupsImageZoomFill(cups_izoom_t *z, int iy);
+extern cups_izoom_t	*cupsImageZoomNew(cups_image_t *img, int x0, int y0,
+			                  int x1, int y1, int xsize, int ysize,
+					  int rotated, cups_iztype_t type);
 
-/*
- * Colorspace conversions...
- */
 
-extern void	ImageWhiteToWhite(const ib_t *in, ib_t *out, int count);
-extern void	ImageWhiteToRGB(const ib_t *in, ib_t *out, int count);
-extern void	ImageWhiteToBlack(const ib_t *in, ib_t *out, int count);
-extern void	ImageWhiteToCMY(const ib_t *in, ib_t *out, int count);
-extern void	ImageWhiteToCMYK(const ib_t *in, ib_t *out, int count);
+#  ifdef __cplusplus
+}
+#  endif /* __cplusplus */
 
-extern void	ImageRGBToWhite(const ib_t *in, ib_t *out, int count);
-extern void	ImageRGBToRGB(const ib_t *in, ib_t *out, int count);
-extern void	ImageRGBToBlack(const ib_t *in, ib_t *out, int count);
-extern void	ImageRGBToCMY(const ib_t *in, ib_t *out, int count);
-extern void	ImageRGBToCMYK(const ib_t *in, ib_t *out, int count);
-
-extern void	ImageCMYKToWhite(const ib_t *in, ib_t *out, int count);
-extern void	ImageCMYKToRGB(const ib_t *in, ib_t *out, int count);
-extern void	ImageCMYKToBlack(const ib_t *in, ib_t *out, int count);
-extern void	ImageCMYKToCMY(const ib_t *in, ib_t *out, int count);
-extern void	ImageCMYKToCMYK(const ib_t *in, ib_t *out, int count);
-
-extern void	ImageRGBAdjust(ib_t *pixels, int count, int saturation, int hue);
-
-extern void	ImageLut(ib_t *pixels, int count, const ib_t *lut);
-
-/*
- * Image scaling operations...
- */
-
-extern izoom_t	*ImageZoomAlloc(image_t *img, int x0, int y0, int x1, int y1,
-		                int xsize, int ysize, int rotated);
-extern void	ImageZoomFill(izoom_t *z, int iy);
-extern void	ImageZoomQFill(izoom_t *z, int iy);
-extern void	ImageZoomFree(izoom_t *z);
-
-
-#endif /* !_IMAGE_H_ */
+#endif /* !_CUPS_IMAGE_H_ */
 
 /*
  * End of "$Id$".

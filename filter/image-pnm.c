@@ -25,42 +25,42 @@
  *
  * Contents:
  *
- *   ImageReadPNM() - Read a PNM image file.
+ *   _cupsImageReadPNM() - Read a PNM image file.
  */
 
 /*
  * Include necessary headers...
  */
 
-#include "image.h"
-#include <ctype.h>
+#include "image-private.h"
 
 
 /*
- * 'ImageReadPNM()' - Read a PNM image file.
+ * '_cupsImageReadPNM()' - Read a PNM image file.
  */
 
 int					/* O - Read status */
-ImageReadPNM(image_t    *img,		/* IO - Image */
-             FILE       *fp,		/* I - Image file */
-             int        primary,	/* I - Primary choice for colorspace */
-             int        secondary,	/* I - Secondary choice for colorspace */
-             int        saturation,	/* I - Color saturation (%) */
-             int        hue,		/* I - Color hue (degrees) */
-	     const ib_t *lut)		/* I - Lookup table for gamma/brightness */
+_cupsImageReadPNM(
+    cups_image_t    *img,		/* IO - cupsImage */
+    FILE            *fp,		/* I - cupsImage file */
+    cups_icspace_t  primary,		/* I - Primary choice for colorspace */
+    cups_icspace_t  secondary,		/* I - Secondary choice for colorspace */
+    int             saturation,		/* I - Color saturation (%) */
+    int             hue,		/* I - Color hue (degrees) */
+    const cups_ib_t *lut)		/* I - Lookup table for gamma/brightness */
 {
-  int		x, y;		/* Looping vars */
-  int		bpp;		/* Bytes per pixel */
-  ib_t		*in,		/* Input pixels */
-		*inptr,		/* Current input pixel */
-		*out,		/* Output pixels */
-		*outptr,	/* Current output pixel */
-		bit;		/* Bit in input line */
-  char		line[255],	/* Input line */
-		*lineptr;	/* Pointer in line */
-  int		format,		/* Format of PNM file */
-		val,		/* Pixel value */
-		maxval;		/* Maximum pixel value */
+  int		x, y;			/* Looping vars */
+  int		bpp;			/* Bytes per pixel */
+  cups_ib_t	*in,			/* Input pixels */
+		*inptr,			/* Current input pixel */
+		*out,			/* Output pixels */
+		*outptr,		/* Current output pixel */
+		bit;			/* Bit in input line */
+  char		line[255],		/* Input line */
+		*lineptr;		/* Pointer in line */
+  int		format,			/* Format of PNM file */
+		val,			/* Pixel value */
+		maxval;			/* Maximum pixel value */
 
 
  /*
@@ -132,8 +132,8 @@ ImageReadPNM(image_t    *img,		/* IO - Image */
   else
     maxval = 1;
 
-  if (img->xsize == 0 || img->xsize > IMAGE_MAX_WIDTH ||
-      img->ysize == 0 || img->ysize > IMAGE_MAX_HEIGHT)
+  if (img->xsize == 0 || img->xsize > CUPS_IMAGE_MAX_WIDTH ||
+      img->ysize == 0 || img->ysize > CUPS_IMAGE_MAX_HEIGHT)
   {
     fprintf(stderr, "ERROR: Bad PNM dimensions %dx%d!\n",
             img->xsize, img->ysize);
@@ -151,11 +151,11 @@ ImageReadPNM(image_t    *img,		/* IO - Image */
   if (format == 1 || format == 2 || format == 4 || format == 5)
     img->colorspace = secondary;
   else
-    img->colorspace = (primary == IMAGE_RGB_CMYK) ? IMAGE_RGB : primary;
+    img->colorspace = (primary == CUPS_IMAGE_RGB_CMYK) ? CUPS_IMAGE_RGB : primary;
 
-  ImageSetMaxTiles(img, 0);
+  cupsImageSetMaxTiles(img, 0);
 
-  bpp = ImageGetDepth(img);
+  bpp = cupsImageGetDepth(img);
   in  = malloc(img->xsize * 3);
   out = malloc(img->xsize * bpp);
 
@@ -222,71 +222,77 @@ ImageReadPNM(image_t    *img,		/* IO - Image */
       case 2 :
       case 4 :
       case 5 :
-          if (img->colorspace == IMAGE_WHITE)
+          if (img->colorspace == CUPS_IMAGE_WHITE)
 	  {
 	    if (lut)
-	      ImageLut(in, img->xsize, lut);
+	      cupsImageLut(in, img->xsize, lut);
 
-            ImagePutRow(img, 0, y, img->xsize, in);
+            _cupsImagePutRow(img, 0, y, img->xsize, in);
 	  }
 	  else
 	  {
 	    switch (img->colorspace)
 	    {
-	      case IMAGE_RGB :
-		  ImageWhiteToRGB(in, out, img->xsize);
+              default :
 		  break;
-	      case IMAGE_BLACK :
-		  ImageWhiteToBlack(in, out, img->xsize);
+
+	      case CUPS_IMAGE_RGB :
+		  cupsImageWhiteToRGB(in, out, img->xsize);
 		  break;
-	      case IMAGE_CMY :
-		  ImageWhiteToCMY(in, out, img->xsize);
+	      case CUPS_IMAGE_BLACK :
+		  cupsImageWhiteToBlack(in, out, img->xsize);
 		  break;
-	      case IMAGE_CMYK :
-		  ImageWhiteToCMYK(in, out, img->xsize);
+	      case CUPS_IMAGE_CMY :
+		  cupsImageWhiteToCMY(in, out, img->xsize);
+		  break;
+	      case CUPS_IMAGE_CMYK :
+		  cupsImageWhiteToCMYK(in, out, img->xsize);
 		  break;
 	    }
 
 	    if (lut)
-	      ImageLut(out, img->xsize * bpp, lut);
+	      cupsImageLut(out, img->xsize * bpp, lut);
 
-            ImagePutRow(img, 0, y, img->xsize, out);
+            _cupsImagePutRow(img, 0, y, img->xsize, out);
 	  }
 	  break;
 
       default :
 	  if ((saturation != 100 || hue != 0) && bpp > 1)
-	    ImageRGBAdjust(in, img->xsize, saturation, hue);
+	    cupsImageRGBAdjust(in, img->xsize, saturation, hue);
 
-	  if (img->colorspace == IMAGE_RGB)
+	  if (img->colorspace == CUPS_IMAGE_RGB)
 	  {
 	    if (lut)
-	      ImageLut(in, img->xsize * 3, lut);
+	      cupsImageLut(in, img->xsize * 3, lut);
 
-            ImagePutRow(img, 0, y, img->xsize, in);
+            _cupsImagePutRow(img, 0, y, img->xsize, in);
 	  }
 	  else
 	  {
 	    switch (img->colorspace)
 	    {
-	      case IMAGE_WHITE :
-		  ImageRGBToWhite(in, out, img->xsize);
+              default :
 		  break;
-	      case IMAGE_BLACK :
-		  ImageRGBToBlack(in, out, img->xsize);
+
+	      case CUPS_IMAGE_WHITE :
+		  cupsImageRGBToWhite(in, out, img->xsize);
 		  break;
-	      case IMAGE_CMY :
-		  ImageRGBToCMY(in, out, img->xsize);
+	      case CUPS_IMAGE_BLACK :
+		  cupsImageRGBToBlack(in, out, img->xsize);
 		  break;
-	      case IMAGE_CMYK :
-		  ImageRGBToCMYK(in, out, img->xsize);
+	      case CUPS_IMAGE_CMY :
+		  cupsImageRGBToCMY(in, out, img->xsize);
+		  break;
+	      case CUPS_IMAGE_CMYK :
+		  cupsImageRGBToCMYK(in, out, img->xsize);
 		  break;
 	    }
 
 	    if (lut)
-	      ImageLut(out, img->xsize * bpp, lut);
+	      cupsImageLut(out, img->xsize * bpp, lut);
 
-            ImagePutRow(img, 0, y, img->xsize, out);
+            _cupsImagePutRow(img, 0, y, img->xsize, out);
 	  }
   	  break;
     }

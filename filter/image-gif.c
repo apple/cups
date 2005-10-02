@@ -25,19 +25,19 @@
  *
  * Contents:
  *
- *   ImageReadGIF()   - Read a GIF image file.
- *   gif_read_cmap()  - Read the colormap from a GIF file...
- *   gif_get_block()  - Read a GIF data block...
- *   gif_get_code()   - Get a LZW code from the file...
- *   gif_read_lzw()   - Read a byte from the LZW stream...
- *   gif_read_image() - Read a GIF image stream...
+ *   _cupsImageReadGIF() - Read a GIF image file.
+ *   gif_get_block()     - Read a GIF data block...
+ *   gif_get_code()      - Get a LZW code from the file...
+ *   gif_read_cmap()     - Read the colormap from a GIF file...
+ *   gif_read_image()    - Read a GIF image stream...
+ *   gif_read_lzw()      - Read a byte from the LZW stream...
  */
 
 /*
  * Include necessary headers...
  */
 
-#include "image.h"
+#include "image-private.h"
 
 
 /*
@@ -47,8 +47,8 @@
 #define GIF_INTERLACE	0x40
 #define GIF_COLORMAP	0x80
 
-typedef ib_t	gif_cmap_t[256][4];
-typedef short	gif_table_t[4096];
+typedef cups_ib_t	gif_cmap_t[256][4];
+typedef short		gif_table_t[4096];
 
 
 /*
@@ -62,43 +62,44 @@ static int	gif_eof = 0;		/* Did we hit EOF? */
  * Local functions...
  */
 
-static int	gif_read_cmap(FILE *fp, int ncolors, gif_cmap_t cmap,
-		              int *gray);
 static int	gif_get_block(FILE *fp, unsigned char *buffer);
 static int	gif_get_code (FILE *fp, int code_size, int first_time);
-static int	gif_read_lzw(FILE *fp, int first_time, int input_code_size);
-static int	gif_read_image(FILE *fp, image_t *img, gif_cmap_t cmap,
+static int	gif_read_cmap(FILE *fp, int ncolors, gif_cmap_t cmap,
+		              int *gray);
+static int	gif_read_image(FILE *fp, cups_image_t *img, gif_cmap_t cmap,
 		               int interlace);
+static int	gif_read_lzw(FILE *fp, int first_time, int input_code_size);
 
 
 /*
- * 'ImageReadGIF()' - Read a GIF image file.
+ * '_cupsImageReadGIF()' - Read a GIF image file.
  */
 
 int					/* O - Read status */
-ImageReadGIF(image_t    *img,		/* IO - Image */
-             FILE       *fp,		/* I - Image file */
-             int        primary,	/* I - Primary choice for colorspace */
-             int        secondary,	/* I - Secondary choice for colorspace */
-             int        saturation,	/* I - Color saturation (%) */
-             int        hue,		/* I - Color hue (degrees) */
-	     const ib_t *lut)		/* I - Lookup table for gamma/brightness */
+_cupsImageReadGIF(
+    cups_image_t    *img,		/* IO - cupsImage */
+    FILE            *fp,		/* I - cupsImage file */
+    cups_icspace_t  primary,		/* I - Primary choice for colorspace */
+    cups_icspace_t  secondary,		/* I - Secondary choice for colorspace */
+    int             saturation,		/* I - Color saturation (%) */
+    int             hue,		/* I - Color hue (degrees) */
+    const cups_ib_t *lut)		/* I - Lookup table for gamma/brightness */
 {
-  unsigned char	buf[1024];	/* Input buffer */
-  gif_cmap_t	cmap;		/* Colormap */
-  int		i,		/* Looping var */
-		bpp,		/* Bytes per pixel */
-		gray,		/* Grayscale image? */
-		ncolors,	/* Bits per pixel */
-		transparent;	/* Transparent color index */
+  unsigned char	buf[1024];		/* Input buffer */
+  gif_cmap_t	cmap;			/* Colormap */
+  int		i,			/* Looping var */
+		bpp,			/* Bytes per pixel */
+		gray,			/* Grayscale image? */
+		ncolors,		/* Bits per pixel */
+		transparent;		/* Transparent color index */
 
 
  /*
   * GIF files are either grayscale or RGB - no CMYK...
   */
 
-  if (primary == IMAGE_RGB_CMYK)
-    primary = IMAGE_RGB;
+  if (primary == CUPS_IMAGE_RGB_CMYK)
+    primary = CUPS_IMAGE_RGB;
 
  /*
   * Read the header; we already know it is a GIF file...
@@ -109,7 +110,7 @@ ImageReadGIF(image_t    *img,		/* IO - Image */
   img->xsize = (buf[7] << 8) | buf[6];
   img->ysize = (buf[9] << 8) | buf[8];
   ncolors    = 2 << (buf[10] & 0x07);
-  gray       = primary == IMAGE_BLACK || primary == IMAGE_WHITE;
+  gray       = primary == CUPS_IMAGE_BLACK || primary == CUPS_IMAGE_WHITE;
 
   if (buf[10] & GIF_COLORMAP)
     if (gif_read_cmap(fp, ncolors, cmap, &gray))
@@ -140,13 +141,13 @@ ImageReadGIF(image_t    *img,		/* IO - Image */
           while (gif_get_block(fp, buf) != 0);
           break;
 
-      case ',' :	/* Image data */
+      case ',' :	/* cupsImage data */
           fread(buf, 9, 1, fp);
 
           if (buf[8] & GIF_COLORMAP)
           {
             ncolors = 2 << (buf[8] & 0x07);
-            gray = primary == IMAGE_BLACK || primary == IMAGE_WHITE;
+            gray = primary == CUPS_IMAGE_BLACK || primary == CUPS_IMAGE_WHITE;
 
 	    if (gif_read_cmap(fp, ncolors, cmap, &gray))
 	    {
@@ -170,23 +171,24 @@ ImageReadGIF(image_t    *img,		/* IO - Image */
 	  {
 	    switch (secondary)
 	    {
-              case IMAGE_CMYK :
+              case CUPS_IMAGE_CMYK :
         	  for (i = ncolors - 1; i >= 0; i --)
-        	    ImageWhiteToCMYK(cmap[i], cmap[i], 1);
+        	    cupsImageWhiteToCMYK(cmap[i], cmap[i], 1);
         	  break;
-              case IMAGE_CMY :
+              case CUPS_IMAGE_CMY :
         	  for (i = ncolors - 1; i >= 0; i --)
-        	    ImageWhiteToCMY(cmap[i], cmap[i], 1);
+        	    cupsImageWhiteToCMY(cmap[i], cmap[i], 1);
         	  break;
-              case IMAGE_BLACK :
+              case CUPS_IMAGE_BLACK :
         	  for (i = ncolors - 1; i >= 0; i --)
-        	    ImageWhiteToBlack(cmap[i], cmap[i], 1);
+        	    cupsImageWhiteToBlack(cmap[i], cmap[i], 1);
         	  break;
-              case IMAGE_WHITE :
+              case CUPS_IMAGE_WHITE :
         	  break;
-              case IMAGE_RGB :
+              case CUPS_IMAGE_RGB :
+              case CUPS_IMAGE_RGB_CMYK :
         	  for (i = ncolors - 1; i >= 0; i --)
-        	    ImageWhiteToRGB(cmap[i], cmap[i], 1);
+        	    cupsImageWhiteToRGB(cmap[i], cmap[i], 1);
         	  break;
 	    }
 
@@ -196,27 +198,28 @@ ImageReadGIF(image_t    *img,		/* IO - Image */
 	  {
 	    if (hue != 0 || saturation != 100)
               for (i = ncolors - 1; i >= 0; i --)
-        	ImageRGBAdjust(cmap[i], 1, saturation, hue);
+        	cupsImageRGBAdjust(cmap[i], 1, saturation, hue);
 
 	    switch (primary)
 	    {
-              case IMAGE_CMYK :
+              case CUPS_IMAGE_CMYK :
         	  for (i = ncolors - 1; i >= 0; i --)
-        	    ImageRGBToCMYK(cmap[i], cmap[i], 1);
+        	    cupsImageRGBToCMYK(cmap[i], cmap[i], 1);
         	  break;
-              case IMAGE_CMY :
+              case CUPS_IMAGE_CMY :
         	  for (i = ncolors - 1; i >= 0; i --)
-        	    ImageRGBToCMY(cmap[i], cmap[i], 1);
+        	    cupsImageRGBToCMY(cmap[i], cmap[i], 1);
         	  break;
-              case IMAGE_BLACK :
+              case CUPS_IMAGE_BLACK :
         	  for (i = ncolors - 1; i >= 0; i --)
-        	    ImageRGBToBlack(cmap[i], cmap[i], 1);
+        	    cupsImageRGBToBlack(cmap[i], cmap[i], 1);
         	  break;
-              case IMAGE_WHITE :
+              case CUPS_IMAGE_WHITE :
         	  for (i = ncolors - 1; i >= 0; i --)
-        	    ImageRGBToWhite(cmap[i], cmap[i], 1);
+        	    cupsImageRGBToWhite(cmap[i], cmap[i], 1);
         	  break;
-              case IMAGE_RGB :
+              case CUPS_IMAGE_RGB :
+              case CUPS_IMAGE_RGB_CMYK :
         	  break;
 	    }
 
@@ -225,10 +228,10 @@ ImageReadGIF(image_t    *img,		/* IO - Image */
 
           if (lut)
 	  {
-	    bpp = ImageGetDepth(img);
+	    bpp = cupsImageGetDepth(img);
 
             for (i = ncolors - 1; i >= 0; i --)
-              ImageLut(cmap[i], bpp, lut);
+              cupsImageLut(cmap[i], bpp, lut);
 	  }
 
           img->xsize = (buf[5] << 8) | buf[4];
@@ -252,54 +255,6 @@ ImageReadGIF(image_t    *img,		/* IO - Image */
           return (i);
     }
   }
-}
-
-
-/*
- * 'gif_read_cmap()' - Read the colormap from a GIF file...
- */
-
-static int				/* O - -1 on error, 0 on success */
-gif_read_cmap(FILE       *fp,		/* I - File to read from */
-  	      int        ncolors,	/* I - Number of colors in file */
-	      gif_cmap_t cmap,		/* O - Colormap information */
-	      int        *gray)		/* IO - Is the image grayscale? */
-{
-  int	i;				/* Looping var */
-
-
- /*
-  * Read the colormap...
-  */
-
-  for (i = 0; i < ncolors; i ++)
-    if (fread(cmap[i], 3, 1, fp) < 1)
-      return (-1);
-
- /*
-  * Check to see if the colormap is a grayscale ramp...
-  */
-
-  for (i = 0; i < ncolors; i ++)
-    if (cmap[i][0] != cmap[i][1] || cmap[i][1] != cmap[i][2])
-      break;
-
-  if (i == ncolors)
-  {
-    *gray = 1;
-    return (0);
-  }
-
- /*
-  * If this needs to be a grayscale image, convert the RGB values to
-  * luminance values...
-  */
-
-  if (*gray)
-    for (i = 0; i < ncolors; i ++)
-      cmap[i][0] = (cmap[i][0] * 31 + cmap[i][1] * 61 + cmap[i][2] * 8) / 100;
-
-  return (0);
 }
 
 
@@ -341,10 +296,10 @@ gif_get_block(FILE          *fp,	/* I - File to read from */
  * 'gif_get_code()' - Get a LZW code from the file...
  */
 
-static int			/* O - LZW code */
-gif_get_code(FILE *fp,		/* I - File to read from */
-	     int  code_size,	/* I - Size of code in bits */
-	     int  first_time)	/* I - 1 = first time, 0 = not first time */
+static int				/* O - LZW code */
+gif_get_code(FILE *fp,			/* I - File to read from */
+	     int  code_size,		/* I - Size of code in bits */
+	     int  first_time)		/* I - 1 = first time, 0 = not first time */
 {
   unsigned		i, j,		/* Looping vars */
 			ret;		/* Return value */
@@ -432,6 +387,137 @@ gif_get_code(FILE *fp,		/* I - File to read from */
   curbit += code_size;
 
   return ret;
+}
+
+
+/*
+ * 'gif_read_cmap()' - Read the colormap from a GIF file...
+ */
+
+static int				/* O - -1 on error, 0 on success */
+gif_read_cmap(FILE       *fp,		/* I - File to read from */
+  	      int        ncolors,	/* I - Number of colors in file */
+	      gif_cmap_t cmap,		/* O - Colormap information */
+	      int        *gray)		/* IO - Is the image grayscale? */
+{
+  int	i;				/* Looping var */
+
+
+ /*
+  * Read the colormap...
+  */
+
+  for (i = 0; i < ncolors; i ++)
+    if (fread(cmap[i], 3, 1, fp) < 1)
+      return (-1);
+
+ /*
+  * Check to see if the colormap is a grayscale ramp...
+  */
+
+  for (i = 0; i < ncolors; i ++)
+    if (cmap[i][0] != cmap[i][1] || cmap[i][1] != cmap[i][2])
+      break;
+
+  if (i == ncolors)
+  {
+    *gray = 1;
+    return (0);
+  }
+
+ /*
+  * If this needs to be a grayscale image, convert the RGB values to
+  * luminance values...
+  */
+
+  if (*gray)
+    for (i = 0; i < ncolors; i ++)
+      cmap[i][0] = (cmap[i][0] * 31 + cmap[i][1] * 61 + cmap[i][2] * 8) / 100;
+
+  return (0);
+}
+
+
+/*
+ * 'gif_read_image()' - Read a GIF image stream...
+ */
+
+static int				/* I - 0 = success, -1 = failure */
+gif_read_image(FILE         *fp,	/* I - Input file */
+	       cups_image_t *img,	/* I - cupsImage pointer */
+	       gif_cmap_t   cmap,	/* I - Colormap */
+	       int          interlace)	/* I - Non-zero = interlaced image */
+{
+  unsigned char		code_size;	/* Code size */
+  cups_ib_t		*pixels,	/* Pixel buffer */
+			*temp;		/* Current pixel */
+  int			xpos,		/* Current X position */
+			ypos,		/* Current Y position */
+			pass;		/* Current pass */
+  int			pixel;		/* Current pixel */
+  int			bpp;		/* Bytes per pixel */
+  static const int	xpasses[4] =	/* X interleaving */
+			{ 8, 8, 4, 2 },
+			ypasses[5] =	/* Y interleaving */
+			{ 0, 4, 2, 1, 999999 };
+
+
+  bpp       = cupsImageGetDepth(img);
+  pixels    = calloc(bpp, img->xsize);
+  xpos      = 0;
+  ypos      = 0;
+  pass      = 0;
+  code_size = getc(fp);
+
+  if (gif_read_lzw(fp, 1, code_size) < 0)
+    return (-1);
+
+  temp = pixels;
+  while ((pixel = gif_read_lzw(fp, 0, code_size)) >= 0)
+  {
+    switch (bpp)
+    {
+      case 4 :
+          temp[3] = cmap[pixel][3];
+      case 3 :
+          temp[2] = cmap[pixel][2];
+      case 2 :
+          temp[1] = cmap[pixel][1];
+      default :
+          temp[0] = cmap[pixel][0];
+    }
+
+    xpos ++;
+    temp += bpp;
+    if (xpos == img->xsize)
+    {
+      _cupsImagePutRow(img, 0, ypos, img->xsize, pixels);
+
+      xpos = 0;
+      temp = pixels;
+
+      if (interlace)
+      {
+        ypos += xpasses[pass];
+
+        if (ypos >= img->ysize)
+	{
+	  pass ++;
+
+          ypos = ypasses[pass];
+	}
+      }
+      else
+	ypos ++;
+    }
+
+    if (ypos >= img->ysize)
+      break;
+  }
+
+  free(pixels);
+
+  return (0);
 }
 
 
@@ -603,89 +689,6 @@ gif_read_lzw(FILE *fp,			/* I - File to read from */
   }
 
   return (code);
-}
-
-
-/*
- * 'gif_read_image()' - Read a GIF image stream...
- */
-
-static int				/* I - 0 = success, -1 = failure */
-gif_read_image(FILE       *fp,		/* I - Input file */
-	       image_t    *img,		/* I - Image pointer */
-	       gif_cmap_t cmap,		/* I - Colormap */
-	       int        interlace)	/* I - Non-zero = interlaced image */
-{
-  unsigned char		code_size;	/* Code size */
-  ib_t			*pixels,	/* Pixel buffer */
-			*temp;		/* Current pixel */
-  int			xpos,		/* Current X position */
-			ypos,		/* Current Y position */
-			pass;		/* Current pass */
-  int			pixel;		/* Current pixel */
-  int			bpp;		/* Bytes per pixel */
-  static const int	xpasses[4] =	/* X interleaving */
-			{ 8, 8, 4, 2 },
-			ypasses[5] =	/* Y interleaving */
-			{ 0, 4, 2, 1, 999999 };
-
-
-  bpp       = ImageGetDepth(img);
-  pixels    = calloc(bpp, img->xsize);
-  xpos      = 0;
-  ypos      = 0;
-  pass      = 0;
-  code_size = getc(fp);
-
-  if (gif_read_lzw(fp, 1, code_size) < 0)
-    return (-1);
-
-  temp = pixels;
-  while ((pixel = gif_read_lzw(fp, 0, code_size)) >= 0)
-  {
-    switch (bpp)
-    {
-      case 4 :
-          temp[3] = cmap[pixel][3];
-      case 3 :
-          temp[2] = cmap[pixel][2];
-      case 2 :
-          temp[1] = cmap[pixel][1];
-      default :
-          temp[0] = cmap[pixel][0];
-    }
-
-    xpos ++;
-    temp += bpp;
-    if (xpos == img->xsize)
-    {
-      ImagePutRow(img, 0, ypos, img->xsize, pixels);
-
-      xpos = 0;
-      temp = pixels;
-
-      if (interlace)
-      {
-        ypos += xpasses[pass];
-
-        if (ypos >= img->ysize)
-	{
-	  pass ++;
-
-          ypos = ypasses[pass];
-	}
-      }
-      else
-	ypos ++;
-    }
-
-    if (ypos >= img->ysize)
-      break;
-  }
-
-  free(pixels);
-
-  return (0);
 }
 
 
