@@ -6,7 +6,7 @@
 %%DocumentSuppliedResources: procset testprint/1.2
 %%DocumentNeededResources: font Helvetica Helvetica-Bold Times-Roman
 %%Creator: Michael Sweet, Easy Software Products
-%%CreationDate: D:20050930220000+0500
+%%CreationDate: D:20051002193000+0500
 %%Title: Test Page
 %%EndComments
 %%BeginProlog
@@ -198,21 +198,26 @@ gsave
   /CENTIMETER 72 2.54 div def
   /MILLIMETER 72 25.4 div def
 
+  smallFont setfont			% Font
+
   gsave					% Left side inches
     pageLeft 72 mul 0 translate		% Offset left edge
 
     1 setlinewidth			% Draw normal lines
-    0 72 pageTop 72 mul {		% Height inches
-      0 exch moveto 18 0 rlineto stroke	% Draw tic mark
+    72 72 pageTop 72 mul {		% Height inches
+      dup dup
+      0 exch moveto 24 0 rlineto stroke	% Draw tic mark
+      24 exch pageHeight sub moveto	% Draw number
+      72 div cvi 10 string cvs RIGHT
     } for
 
     0.5 setlinewidth			% Draw thin lines
-    36 72 pageTop 72 mul {		% 1/2 inches
-      0 exch moveto 13.5 0 rlineto stroke	% Draw tic mark
+    18 18 pageTop 72 mul {		% 1/4 inches
+      0 exch moveto 15 0 rlineto stroke	% Draw tic mark
     } for
 
-    18 36 pageTop 72 mul {		% 1/4 inches
-      0 exch moveto 9 0 rlineto stroke	% Draw tic mark
+    9 9 pageTop 72 mul {		% 1/8 inches
+      0 exch moveto 6 0 rlineto stroke	% Draw tic mark
     } for
   grestore
 
@@ -220,17 +225,20 @@ gsave
     0 pageBottom 72 mul translate	% Offset bottom edge
 
     1 setlinewidth			% Draw normal lines
-    0 72 pageRight 72 mul {		% Width inches
-      0 moveto 0 18 rlineto stroke	% Draw tic mark
+    72 72 pageRight 72 mul {		% Width inches
+      dup dup
+      0 moveto 0 24 rlineto stroke	% Draw tic mark
+      3 add 27 pageHeight sub moveto	% Draw number
+      72 div cvi 10 string cvs show
     } for
 
     0.5 setlinewidth			% Draw thin lines
-    36 72 pageRight 72 mul {		% 1/2 inches
-      0 moveto 0 13.5 rlineto stroke	% Draw tic mark
+    18 18 pageRight 72 mul {		% 1/4 inches
+      0 moveto 0 15 rlineto stroke	% Draw tic mark
     } for
 
-    18 36 pageRight 72 mul {		% 1/4 inches
-      0 moveto 0 9 rlineto stroke	% Draw tic mark
+    9 9 pageRight 72 mul {		% 1/8 inches
+      0 moveto 0 6 rlineto stroke	% Draw tic mark
     } for
   grestore
 
@@ -238,13 +246,24 @@ gsave
     pageRight 72 mul 0 translate	% Offset right edge
 
     1 setlinewidth			% Draw normal lines
-    0 CENTIMETER pageTop 72 mul {	% Height centimeters
-      0 exch moveto -18 0 rlineto stroke% Draw tic mark
+    CENTIMETER CENTIMETER
+        pageTop 72 mul {		% Height centimeters
+      0 exch moveto -24 0 rlineto stroke% Draw tic mark
+    } for
+    1 1 pageTop 2.54 mul {		% Height labels
+      dup
+      -24 exch CENTIMETER mul
+          pageHeight sub moveto		% Draw number
+      cvi 10 string cvs show
     } for
 
     0.5 setlinewidth			% Draw thin lines
+    0 0.5 CENTIMETER mul
+        pageTop 72 mul {		% 1/2 centimeters
+      0 exch moveto -15 0 rlineto stroke% Draw tic mark
+    } for
     0 MILLIMETER pageTop 72 mul {	% Millimeters
-      0 exch moveto -9 0 rlineto stroke	% Draw tic mark
+      0 exch moveto -6 0 rlineto stroke	% Draw tic mark
     } for
   grestore
 
@@ -252,23 +271,25 @@ gsave
     0 pageTop 72 mul translate		% Offset top edge
 
     1 setlinewidth			% Draw normal lines
-    0 CENTIMETER pageRight 72 mul {	% Width centimeters
-      0 moveto 0 -18 rlineto stroke	% Draw tic mark
+    CENTIMETER CENTIMETER
+        pageRight 72 mul {		% Width centimeters
+      0 moveto 0 -24 rlineto stroke	% Draw tic mark
+    } for
+    1 1 pageRight 2.54 mul {		% Width labels
+      dup
+      CENTIMETER mul 3 add -24 moveto	% Draw number
+      cvi 10 string cvs show
     } for
 
     0.5 setlinewidth			% Draw thin lines
+    0 0.5 CENTIMETER mul
+        pageRight 72 mul {		% 1/2 centimeters
+      0 moveto 0 -15 rlineto stroke	% Draw tic mark
+    } for
     0 MILLIMETER pageRight 72 mul {	% Millimeters
-      0 moveto 0 -9 rlineto stroke	% Draw tic mark
+      0 moveto 0 -6 rlineto stroke	% Draw tic mark
     } for
   grestore
-
-  smallFont setfont			% Font
-
-  pageLeft 72 mul 20 add pageBottom 72 mul 20 add moveto
-  (Inches) show				% Inches label
-
-  pageRight 72 mul 20 sub pageTop 72 mul 20 sub pageHeight sub moveto
-  (Centimeters) RIGHT			% Centimeter label
 
   % Offset page to account for lower-left margin...
   pageLeft 72 mul
@@ -303,7 +324,7 @@ gsave
 
   % Label the color wheel...
   pageWidth 18 mul			% x = pageWidth * 1/4 * 72
-  pageHeight 44 mul			% y = pageHeight * 19/32 * 72
+  pageHeight 43 mul			% y = pageHeight * 19/32 * 72
   moveto				% Position the text
   (Color Wheel) CENTER			% Show the text centered
 
@@ -361,7 +382,7 @@ gsave
 
   % Label the gray ramp...
   pageWidth 36 mul			% x = pageWidth * 1/2 * 72
-  pageHeight 44 mul			% y = pageHeight * 19/32 * 72
+  pageHeight 43 mul			% y = pageHeight * 19/32 * 72
   moveto				% Position the text
   (Gray Ramp) CENTER			% Show the text centered
 
@@ -393,7 +414,7 @@ gsave
 
   % Label the lines...
   pageWidth 54 mul			% x = pageWidth * 3/4 * 72
-  pageHeight 44 mul			% y = pageHeight * 19/32 * 72
+  pageHeight 43 mul			% y = pageHeight * 19/32 * 72
   moveto				% Position the text
   (1 Degree Radial Lines) CENTER	% Show the text centered
 
@@ -571,7 +592,7 @@ gsave
 
   % Draw the copyright notice at the bottom...
   pageWidth 36 mul			% Center of page
-  pageHeight 10 mul			% Bottom of page
+  pageHeight 12 mul			% Bottom of page
   moveto				% Position text
   (Printed Using CUPS v1.2.x) CENTER	% Show text centered
 
@@ -601,7 +622,7 @@ gsave
 
   % And the ESP logo....
   gsave
-    pageWidth 59 mul
+    pageWidth 58 mul
     pageHeight 4 mul
     translate
     pageWidth 6 mul ESPLOGO
