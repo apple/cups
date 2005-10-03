@@ -105,10 +105,14 @@ main(int  argc,				/* I - Number of command-line arguments */
   else
     cgiSetVariable("TITLE", pclass);
 
-  cgiCopyTemplateLang(stdout, TEMPLATES, "header.tmpl", getenv("LANG"));
-
   if (op == NULL || strcasecmp(op, "print-test-page") != 0)
   {
+   /*
+    * Show the standard header...
+    */
+
+    cgiCopyTemplateLang(stdout, TEMPLATES, "header.tmpl", getenv("LANG"));
+
    /*
     * Get the default destination...
     */
@@ -280,6 +284,19 @@ main(int  argc,				/* I - Number of command-line arguments */
     * Print a test page...
     */
 
+    char	filename[1024];		/* Test page filename */
+    const char	*datadir;		/* CUPS_DATADIR env var */
+    char	refresh[1024];		/* Refresh URL */
+
+
+    cgiFormEncode(uri, pclass, sizeof(uri));
+    snprintf(refresh, sizeof(refresh), "2;/classes/%s", uri);
+    cgiSetVariable("refresh_page", refresh);
+
+    if ((datadir = getenv("CUPS_DATADIR")) == NULL)
+      datadir = CUPS_DATADIR;
+
+    snprintf(filename, sizeof(filename), "%s/data/testprint.ps", datadir);
     snprintf(uri, sizeof(uri), "ipp://localhost/classes/%s", pclass);
 
    /*
@@ -325,7 +342,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     */
 
     if ((response = cupsDoFileRequest(http, request, uri + 15,
-                                      CUPS_DATADIR "/data/testprint.ps")) != NULL)
+                                      filename)) != NULL)
     {
       status = response->request.status.status_code;
       ippSetCGIVars(response, NULL, NULL, NULL, 0);
@@ -336,6 +353,16 @@ main(int  argc,				/* I - Number of command-line arguments */
       status = cupsLastError();
 
     cgiSetVariable("PRINTER_NAME", pclass);
+
+   /*
+    * Show the standard header...
+    */
+
+    cgiCopyTemplateLang(stdout, TEMPLATES, "header.tmpl", getenv("LANG"));
+
+   /*
+    * Show the result...
+    */
 
     if (status > IPP_OK_CONFLICT)
     {

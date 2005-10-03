@@ -51,7 +51,8 @@ main(int  argc,				/* I - Number of command-line arguments */
   char		uri[HTTP_MAX_URI];	/* Printer URI */
   const char	*which_jobs;		/* Which jobs to show */
   const char	*op;			/* Operation to perform, if any */
-  static const char	*def_attrs[] =	/* Attributes for default printer */
+  char		refresh[1024];		/* Refresh URL */
+  static const char *def_attrs[] =	/* Attributes for default printer */
 		{
 		  "printer-name",
 		  "printer-uri-supported"
@@ -104,8 +105,6 @@ main(int  argc,				/* I - Number of command-line arguments */
   }
   else
     cgiSetVariable("TITLE", printer);
-
-  cgiCopyTemplateLang(stdout, TEMPLATES, "header.tmpl", getenv("LANG"));
 
   if (op == NULL || strcasecmp(op, "print-test-page") != 0)
   {
@@ -207,7 +206,31 @@ main(int  argc,				/* I - Number of command-line arguments */
 
     if ((response = cupsDoRequest(http, request, "/")) != NULL)
     {
+     /*
+      * Got the result; set the CGI variables and check the status of a
+      * single-queue request...
+      */
+
       ippSetCGIVars(response, NULL, NULL, NULL, 0);
+
+      if (printer && (attr = ippFindAttribute(response, "printer-state",
+                                              IPP_TAG_ENUM)) != NULL &&
+          attr->values[0].integer == IPP_PRINTER_PROCESSING)
+      {
+       /*
+        * Printer is processing - automatically refresh the page until we
+	* are done printing...
+	*/
+
+	cgiFormEncode(uri, printer, sizeof(uri));
+	snprintf(refresh, sizeof(refresh), "10;/printers/%s", uri);
+	cgiSetVariable("refresh_page", refresh);
+      }
+
+     /*
+      * Delete the response...
+      */
+
       ippDelete(response);
     }
     else if (printer)
@@ -216,6 +239,12 @@ main(int  argc,				/* I - Number of command-line arguments */
     else
       fprintf(stderr, "ERROR: CUPS-Get-Printers request failed - %s (%x)\n",
               ippErrorString(cupsLastError()), cupsLastError());
+
+   /*
+    * Show the standard header...
+    */
+
+    cgiCopyTemplateLang(stdout, TEMPLATES, "header.tmpl", getenv("LANG"));
 
    /*
     * Write the report...
@@ -294,6 +323,18 @@ main(int  argc,				/* I - Number of command-line arguments */
     * Print a test page...
     */
 
+    char	filename[1024];		/* Test page filename */
+    const char	*datadir;		/* CUPS_DATADIR env var */
+
+
+    cgiFormEncode(uri, printer, sizeof(uri));
+    snprintf(refresh, sizeof(refresh), "2;/printers/%s", uri);
+    cgiSetVariable("refresh_page", refresh);
+
+    if ((datadir = getenv("CUPS_DATADIR")) == NULL)
+      datadir = CUPS_DATADIR;
+
+    snprintf(filename, sizeof(filename), "%s/data/testprint.ps", datadir);
     snprintf(uri, sizeof(uri), "ipp://localhost/printers/%s", printer);
 
    /*
@@ -339,7 +380,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     */
 
     if ((response = cupsDoFileRequest(http, request, uri + 15,
-                                      CUPS_DATADIR "/data/testprint.ps")) != NULL)
+                                      filename)) != NULL)
     {
       status = response->request.status.status_code;
       ippSetCGIVars(response, NULL, NULL, NULL, 0);
@@ -350,6 +391,16 @@ main(int  argc,				/* I - Number of command-line arguments */
       status = cupsLastError();
 
     cgiSetVariable("PRINTER_NAME", printer);
+
+   /*
+    * Show the standard header...
+    */
+
+    cgiCopyTemplateLang(stdout, TEMPLATES, "header.tmpl", getenv("LANG"));
+
+   /*
+    * Show the result...
+    */
 
     if (status > IPP_OK_CONFLICT)
     {
