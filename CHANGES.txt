@@ -3,6 +3,8 @@ CHANGES.txt - 10/03/2005
 
 CHANGES IN CUPS V1.2.0b1
 
+	- Added a "cancel all jobs" button to the class and
+	  printer web interfaces (STR #1140)
 	- The add-printer web page now shows the
 	  set-printer-options page after the printer has been
 	  added (STR #690)

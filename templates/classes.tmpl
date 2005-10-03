@@ -45,6 +45,8 @@ Class State: {printer_state=3?idle:{printer_state=4?processing:stopped}},
 <A HREF="{admin_uri}?op=reject-jobs&amp;printer_name={printer_name}">
 <IMG SRC="/images/reject-jobs.gif" ALT="Reject Jobs" BORDER="0"></A>
 }
+<A HREF="{admin_uri}?op=purge-jobs&amp;printer_name={printer_name}">
+<IMG SRC="/images/cancel-all-jobs.gif" ALT="Cancel All Jobs" BORDER="0"></A>
 {printer_is_shared=0?
 <A HREF="{admin_uri}?op=set-sharing&amp;printer_name={printer_name}&amp;shared=1">
 <IMG SRC="/images/publish-printer.gif" ALT="Publish Printer" BORDER="0"></A>

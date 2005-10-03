@@ -36,8 +36,8 @@ WEBIMAGES	=	images/accept-jobs.gif \
 			images/bottom-left.gif \
 			images/bottom-right.gif \
 			images/cancel.gif \
+			images/cancel-all-jobs.gif \
 			images/cancel-job.gif \
-			images/cancel-jobs.gif \
 			images/change-settings.gif \
 			images/classes.gif \
 			images/config-printer.gif \
