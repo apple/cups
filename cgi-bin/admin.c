@@ -1057,14 +1057,21 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
     else
     {
      /*
-      * Redirect successful updates back to the printer page...
+      * Redirect successful updates back to the printer or set-options pages...
       */
 
       char	refresh[1024];		/* Refresh URL */
 
+
       cgiFormEncode(uri, name, sizeof(uri));
-      snprintf(refresh, sizeof(refresh), "2;/admin?OP=redirect&URL=/printers/%s",
-               uri);
+
+      if (modify)
+	snprintf(refresh, sizeof(refresh),
+	         "2;/admin?OP=redirect&URL=/printers/%s", uri);
+      else
+	snprintf(refresh, sizeof(refresh),
+	         "2;/admin?OP=config-printer&PRINTER_NAME=%s", uri);
+
       cgiSetVariable("refresh_page", refresh);
 
       cgiStartHTML(title);

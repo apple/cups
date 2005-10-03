@@ -1,8 +1,11 @@
-CHANGES.txt - 09/30/2005
+CHANGES.txt - 10/03/2005
 ------------------------
 
 CHANGES IN CUPS V1.2.0b1
 
+	- The add-printer web page now shows the
+	  set-printer-options page after the printer has been
+	  added (STR #690)
 	- The classes web page now provides links to each of the
 	  member printers (STR #307)
 	- CUPS now handles HTTP request/response lines up to 32k
