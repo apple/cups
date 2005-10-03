@@ -90,7 +90,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   * Connect to the HTTP server...
   */
 
-  http = httpConnectEncrypt("localhost", ippPort(), cupsEncryption());
+  http = httpConnectEncrypt(cupsServer(), ippPort(), cupsEncryption());
 
  /*
   * Set the web interface section...
@@ -1131,8 +1131,6 @@ do_config_printer(http_t      *http,	/* I - HTTP connection */
  /*
   * Get the PPD file...
   */
-
-  cupsSetServer("localhost");
 
   if ((filename = cupsGetPPD(printer)) == NULL)
   {

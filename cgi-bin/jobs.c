@@ -79,7 +79,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   * Connect to the HTTP server...
   */
 
-  http = httpConnectEncrypt("localhost", ippPort(), cupsEncryption());
+  http = httpConnectEncrypt(cupsServer(), ippPort(), cupsEncryption());
 
  /*
   * Tell the client to expect UTF-8 encoded HTML...

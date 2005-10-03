@@ -1047,6 +1047,7 @@ cupsGetPPD2(http_t     *http,		/* I - HTTP connection */
             const char *name)		/* I - Printer name */
 {
   int		i;			/* Looping var */
+  int		http_port;		/* Port number */
   http_t	*http2;			/* Alternate HTTP connection */
   ipp_t		*request,		/* IPP request */
 		*response;		/* IPP response */
@@ -1082,6 +1083,22 @@ cupsGetPPD2(http_t     *http,		/* I - HTTP connection */
     cg->last_error = IPP_INTERNAL_ERROR;
     return (NULL);
   }
+
+ /*
+  * Get the port number we are connect to...
+  */
+
+#ifdef AF_INET6
+  if (http->hostaddr.addr.sa_family == AF_INET6)
+    http_port = ntohs(http->hostaddr.ipv6.sin6_port);
+  else
+#endif /* AF_INET6 */
+  if (http->hostaddr.addr.sa_family == AF_INET)
+    http_port = ntohs(http->hostaddr.ipv4.sin_port);
+  else
+    http_port = ippPort(); 
+
+  port = http_port; 
 
  /*
   * Build an IPP_GET_PRINTER_ATTRIBUTES request, which requires the following
@@ -1139,7 +1156,7 @@ cupsGetPPD2(http_t     *http,		/* I - HTTP connection */
       {
 	httpSeparate(attr->values[0].string.text, method, username, hostname,
 	             &port, resource);
-	if (strncmp(resource, "/printers/", 10) == 0)
+	if (!strncmp(resource, "/printers/", 10))
 	{
 	 /*
 	  * Found a printer!
@@ -1168,9 +1185,9 @@ cupsGetPPD2(http_t     *http,		/* I - HTTP connection */
     * Remap local hostname to localhost...
     */
 
-    gethostname(uri, sizeof(uri));
+    httpGetHostname(uri, sizeof(uri));
 
-    if (strcasecmp(uri, hostname) == 0)
+    if (!strcasecmp(uri, hostname))
       strcpy(hostname, "localhost");
   }
 
@@ -1184,9 +1201,9 @@ cupsGetPPD2(http_t     *http,		/* I - HTTP connection */
   * Reconnect to the correct server as needed...
   */
 
-  if (!strcasecmp(http->hostname, hostname))
+  if (!strcasecmp(http->hostname, hostname) && port == http_port)
     http2 = http;
-  else if ((http2 = httpConnectEncrypt(hostname, ippPort(),
+  else if ((http2 = httpConnectEncrypt(hostname, port,
                                        cupsEncryption())) == NULL)
   {
     DEBUG_puts("Unable to connect to server!");
