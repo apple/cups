@@ -521,6 +521,8 @@ cupsdProcessBrowseData(
       * sign (if any).
       */
 
+      cupsArraySave(Printers);
+
       if (len > 0 &&
 	  strncasecmp(p->name, name + offset, len) == 0 &&
 	  (p->name[len] == '\0' || p->name[len] == '@'))
@@ -625,12 +627,15 @@ cupsdProcessBrowseData(
 	    */
 
 	    len = 0;
+            cupsArrayRestore(Printers);
 	    continue;
 	  }
 	}
 
 	first = p;
       }
+
+      cupsArrayRestore(Printers);
     }
 
    /*

@@ -5189,6 +5189,8 @@ get_printers(cupsd_client_t *con,	/* I - Client connection */
 	(location == NULL || printer->location == NULL ||
 	 !strcasecmp(printer->location, location)))
     {
+      cupsArraySave(Printers);
+
      /*
       * If HideImplicitMembers is enabled, see if this printer or class
       * is a member of an implicit class...
@@ -5217,9 +5219,14 @@ get_printers(cupsd_client_t *con,	/* I - Client connection */
 
           if ((iclass = cupsdFindPrinter(name)) != NULL &&
 	      (iclass->type & CUPS_PRINTER_IMPLICIT))
+	  {
+            cupsArrayRestore(Printers);
 	    continue;
+	  }
 	}
       }
+
+      cupsArrayRestore(Printers);
 
      /*
       * If a username is specified, see if it is allowed or denied
@@ -5351,7 +5358,7 @@ hold_job(cupsd_client_t  *con,		/* I - Client connection */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "hold_job(%p[%d], %s)", con, con->http.fd,
-             uri->values[0].string.text);
+                  uri->values[0].string.text);
 
  /*
   * Verify that the POST operation was done to a valid URI.

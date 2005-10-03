@@ -17,7 +17,7 @@ CHANGES IN CUPS V1.2.0b1
 	  class implementation (STR #1283)
 	- The pdftops filter now adds the Title and Creator
 	  fields from the PDF file to the PostScript document
-	  comments section (STR #830)
+	  comments section (STR #539, STR #830)
 	- Added a new cups_array_t and cupsArray*() functions to
 	  the CUPS API to support sorted lists of data.
 	- Made the CUPS API library thread-safe (STR #1276)

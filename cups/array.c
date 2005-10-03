@@ -65,7 +65,8 @@ struct _cups_array_s			/**** CUPS array structure ****/
   int			num_elements,	/* Number of array elements */
 			alloc_elements,	/* Allocated array elements */
 			current,	/* Current element */
-			insert;		/* Last inserted element */
+			insert,		/* Last inserted element */
+			saved;		/* Saved element */
   void			**elements;	/* Array elements */
   cups_array_func_t	compare;	/* Element comparison function */
   void			*data;		/* User data passed to compare */
@@ -187,6 +188,9 @@ cupsArrayAdd(cups_array_t *a,		/* I - Array */
     if (a->current >= current)
       a->current ++;
 
+    if (a->saved >= current)
+      a->saved ++;
+
     DEBUG_printf(("cupsArrayAdd: insert element at index %d...\n", current));
   }
 #ifdef DEBUG
@@ -231,6 +235,7 @@ cupsArrayClear(cups_array_t *a)		/* I - Array */
   a->num_elements = 0;
   a->current      = -1;
   a->insert       = -1;
+  a->saved        = -1;
 }
 
 
@@ -336,6 +341,7 @@ cupsArrayDup(cups_array_t *a)		/* I - Array */
   da->data    = a->data;
   da->current = a->current;
   da->insert  = a->insert;
+  da->saved   = a->saved;
 
   if (a->num_elements)
   {
@@ -492,6 +498,7 @@ cupsArrayNew(cups_array_func_t f,	/* I - Comparison function */
   a->data    = d;
   a->current = -1;
   a->insert  = -1;
+  a->saved   = -1;
 
   return (a);
 }
@@ -592,6 +599,11 @@ cupsArrayRemove(cups_array_t *a,	/* I - Array */
 
   if (current < a->insert)
     a->insert --;
+
+  if (current == a->saved)
+    a->saved = -1;
+  else if (current < a->saved)
+    a->saved --;
 
   return (1);
 }
@@ -729,6 +741,34 @@ cups_find(cups_array_t *a,		/* I - Array */
   *rdiff = diff;
 
   return (current);
+}
+
+
+/*
+ * 'cupsArrayRestore()' - Reset the current element to the last cupsArraySave.
+ */
+
+void *					/* O - New current element */
+cupsArrayRestore(cups_array_t *a)	/* I - Array */
+{
+  a->current = a->saved;
+  a->saved   = -1;
+
+  if (a->current >= 0 && a->current < a->num_elements)
+    return (a->elements[a->current]);
+  else
+    return (NULL);
+}
+
+
+/*
+ * 'cupsArraySave()' - Mark the current element for a later cupsArrayRestore.
+ */
+
+void
+cupsArraySave(cups_array_t *a)		/* I - Array */
+{
+  a->saved = a->current;
 }
 
 
