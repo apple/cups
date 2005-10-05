@@ -511,6 +511,7 @@ cupsdCloseClient(cupsd_client_t *con)	/* I - Client to close */
                     "cupsdCloseClient: %d Killing process ID %d...",
                     con->http.fd, con->pipe_pid);
     cupsdEndProcess(con->pipe_pid, 1);
+    con->pipe_pid = 0;
   }
 
   if (con->file >= 0)
