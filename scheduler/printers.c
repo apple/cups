@@ -126,6 +126,9 @@ cupsdAddPrinter(const char *name)	/* I - Name of printer */
 
   cupsArrayAdd(Printers, p);
 
+  if (!ImplicitPrinters)
+    ImplicitPrinters = cupsArrayNew(compare_printers, NULL);
+
  /*
   * Write a new /etc/printcap or /var/spool/lp/pstatus file.
   */

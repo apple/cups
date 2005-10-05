@@ -133,7 +133,8 @@ cupsdDeletePrinterFromClass(
     cupsd_printer_t *p)			/* I - Printer to delete */
 {
   int		i;			/* Looping var */
-  cups_ptype_t	type;			/* Class type */
+  cups_ptype_t	type,			/* Class type */
+		oldtype;		/* Old class type */
 
 
  /*
@@ -168,6 +169,7 @@ cupsdDeletePrinterFromClass(
 
   if (c->num_printers > 0)
   {
+    oldtype = c->type;
     type    = c->type & (CUPS_PRINTER_CLASS | CUPS_PRINTER_IMPLICIT);
     c->type = ~CUPS_PRINTER_REMOTE;
 
@@ -180,7 +182,8 @@ cupsdDeletePrinterFromClass(
     * Update the IPP attributes...
     */
 
-    cupsdSetPrinterAttrs(c);
+    if (c->type != oldtype)
+      cupsdSetPrinterAttrs(c);
   }
 }
 
@@ -211,11 +214,14 @@ cupsdDeletePrinterFromClasses(
   * Then clean out any empty implicit classes...
   */
 
-  for (c = (cupsd_printer_t *)cupsArrayFirst(Printers);
+  for (c = (cupsd_printer_t *)cupsArrayFirst(ImplicitPrinters);
        c;
-       c = (cupsd_printer_t *)cupsArrayNext(Printers))
-    if ((c->type & CUPS_PRINTER_IMPLICIT) && c->num_printers == 0)
+       c = (cupsd_printer_t *)cupsArrayNext(ImplicitPrinters))
+    if (c->num_printers == 0)
+    {
+      cupsArrayRemove(ImplicitPrinters, c);
       cupsdDeletePrinter(c, 0);
+    }
 }
 
 
@@ -801,22 +807,20 @@ cupsdUpdateImplicitClasses(void)
   int			accepting;	/* printer-is-accepting-jobs value */
 
 
-  for (pclass = (cupsd_printer_t *)cupsArrayFirst(Printers);
+  for (pclass = (cupsd_printer_t *)cupsArrayFirst(ImplicitPrinters);
        pclass;
-       pclass = (cupsd_printer_t *)cupsArrayNext(Printers))
-    if (pclass->type & CUPS_PRINTER_IMPLICIT)
-    {
-     /*
-      * Implicit class, loop through the printers to come up with a
-      * composite state...
-      */
+       pclass = (cupsd_printer_t *)cupsArrayNext(ImplicitPrinters))
+  {
+   /*
+    * Loop through the printers to come up with a composite state...
+    */
 
-      for (i = 0, accepting = 0; i < pclass->num_printers; i ++)
-        if ((accepting |= pclass->printers[i]->accepting) != 0)
-	  break;
+    for (i = 0, accepting = 0; i < pclass->num_printers; i ++)
+      if ((accepting = pclass->printers[i]->accepting) != 0)
+	break;
 
-      pclass->accepting = accepting;
-    }
+    pclass->accepting = accepting;
+  }
 }
 
 

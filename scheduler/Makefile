@@ -57,6 +57,7 @@ OBJS	=	\
 		cups-driverd.o \
 		cups-lpd.o \
 		cups-polld.o \
+		testdirsvc.o \
 		testmime.o \
 		testspeed.o \
 		util.o
@@ -67,6 +68,7 @@ TARGETS	=	\
 		cups-lpd \
 		cups-polld \
 		libmime.a \
+		testdirsvc \
 		testmime \
 		testspeed
 
@@ -147,6 +149,12 @@ cupsd:	$(CUPSDOBJS) libmime.a ../cups/$(LIBCUPS)
 		$(LIBZ) $(SSLLIBS) $(LIBSLP) $(PAMLIBS) $(LIBS) \
 		$(LIBPAPER) $(LIBMALLOC)
 
+cupsd-static:	$(CUPSDOBJS) libmime.a ../cups/libcups.a
+	echo Linking $@...
+	$(CC) $(LDFLAGS) -o cupsd-static $(CUPSDOBJS) libmime.a \
+		$(LIBZ) $(SSLLIBS) $(LIBSLP) $(PAMLIBS) ../cups/libcups.a \
+		$(COMMONLIBS) $(LIBZ) $(LIBPAPER) $(LIBMALLOC)
+
 
 #
 # Make the device daemon, "cups-deviced".
@@ -193,6 +201,15 @@ libmime.a:	$(MIMEOBJS)
 	$(RM) $@
 	$(AR) $(ARFLAGS) $@ $(MIMEOBJS)
 	$(RANLIB) $@
+
+
+#
+# Make the test program, "testdirsvc".
+#
+
+testdirsvc:	testdirsvc.o
+	echo Linking $@...
+	$(CC) $(LDFLAGS) -o testdirsvc testdirsvc.o $(COMMONLIBS)
 
 
 #

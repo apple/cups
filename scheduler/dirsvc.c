@@ -548,6 +548,8 @@ cupsdProcessBrowseData(
 	  */
 
 	  pclass = cupsdAddPrinter(name);
+	  cupsArrayAdd(ImplicitPrinters, pclass);
+
 	  pclass->type      |= CUPS_PRINTER_IMPLICIT;
 	  pclass->accepting = 1;
 	  pclass->state     = IPP_PRINTER_IDLE;
@@ -568,7 +570,10 @@ cupsdProcessBrowseData(
 	      break;
 
           if (i >= pclass->num_printers)
+	  {
+	    first->in_implicit_class = 1;
 	    cupsdAddPrinterToClass(pclass, first);
+          }
 
 	  first = NULL;
 	}
@@ -579,6 +584,7 @@ cupsdProcessBrowseData(
 
         if (i >= pclass->num_printers)
 	{
+	  p->in_implicit_class = 1;
 	  cupsdAddPrinterToClass(pclass, p);
 	  update = 1;
 	}

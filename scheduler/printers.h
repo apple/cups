@@ -52,6 +52,7 @@ typedef struct cupsd_printer_s
   cupsd_policy_t *op_policy_ptr;	/* Pointer to operation policy */
   int		shared;			/* Shared? */
   int		accepting;		/* Accepting jobs? */
+  int		in_implicit_class;	/* In an implicit class? */
   ipp_pstate_t	state;			/* Printer state */
   char		state_message[1024];	/* Printer state message */
   int		num_reasons;		/* Number of printer-state-reasons */
@@ -89,8 +90,10 @@ typedef struct cupsd_printer_s
 
 VAR ipp_t		*CommonData	VALUE(NULL);
 					/* Common printer object attrs */
-VAR cups_array_t	*Printers	VALUE(NULL);
+VAR cups_array_t	*Printers	VALUE(NULL),
 					/* Printer list */
+			*ImplicitPrinters VALUE(NULL);
+					/* Implicit class printers */
 VAR cupsd_printer_t	*DefaultPrinter	VALUE(NULL);
 					/* Default printer */
 VAR char		*DefaultPolicy	VALUE(NULL);

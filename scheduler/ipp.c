@@ -5096,9 +5096,6 @@ get_printers(cupsd_client_t *con,	/* I - Client connection */
   int		printer_type,		/* printer-type attribute */
 		printer_mask;		/* printer-type-mask attribute */
   char		*location;		/* Location string */
-  char		name[IPP_MAX_NAME],	/* Printer name */
-		*nameptr;		/* Pointer into name */
-  cupsd_printer_t *iclass;		/* Implicit class */
   const char	*username;		/* Current user */
   char		printer_uri[HTTP_MAX_URI];
 					/* Printer URI */
@@ -5189,44 +5186,14 @@ get_printers(cupsd_client_t *con,	/* I - Client connection */
 	(location == NULL || printer->location == NULL ||
 	 !strcasecmp(printer->location, location)))
     {
-      cupsArraySave(Printers);
-
      /*
       * If HideImplicitMembers is enabled, see if this printer or class
       * is a member of an implicit class...
       */
 
       if (ImplicitClasses && HideImplicitMembers &&
-          (printer->type & CUPS_PRINTER_REMOTE))
-      {
-       /*
-        * Make a copy of the printer name...
-	*/
-
-        strlcpy(name, printer->name, sizeof(name));
-
-	if ((nameptr = strchr(name, '@')) != NULL)
-	{
-	 /*
-	  * Strip trailing @server...
-	  */
-
-	  *nameptr = '\0';
-
-         /*
-	  * Find the core printer, if any...
-	  */
-
-          if ((iclass = cupsdFindPrinter(name)) != NULL &&
-	      (iclass->type & CUPS_PRINTER_IMPLICIT))
-	  {
-            cupsArrayRestore(Printers);
-	    continue;
-	  }
-	}
-      }
-
-      cupsArrayRestore(Printers);
+          printer->in_implicit_class)
+        continue;
 
      /*
       * If a username is specified, see if it is allowed or denied
