@@ -317,17 +317,20 @@ helpSaveIndex(help_index_t *hi,		/* I - Index */
 
     node = hi->nodes[i];
 
-   /* TODO: %lld for 64-bit file support */
     if (node->anchor)
     {
-      if (cupsFilePrintf(fp, "%s#%s %ld %ld %s\n", node->filename, node->anchor,
-                         node->offset, node->length, node->text) < 0)
+      if (cupsFilePrintf(fp, "%s#%s " CUPS_LLFMT " " CUPS_LLFMT " %s\n",
+                         node->filename, node->anchor,
+                         CUPS_LLCAST node->offset, CUPS_LLCAST node->length,
+			 node->text) < 0)
         break;
     }
     else
     {
-      if (cupsFilePrintf(fp, "%s %ld %ld %ld %s\n", node->filename, node->mtime,
-                         node->offset, node->length, node->text) < 0)
+      if (cupsFilePrintf(fp, "%s %d " CUPS_LLFMT " " CUPS_LLFMT " %s\n",
+                         node->filename, node->mtime,
+                         CUPS_LLCAST node->offset, CUPS_LLCAST node->length,
+			 node->text) < 0)
         break;
     }
   }
