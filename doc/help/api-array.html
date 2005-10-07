@@ -31,6 +31,8 @@
 	<li><a href='#cupsArrayNext'><tt>cupsArrayNext()</tt></a></li>
 	<li><a href='#cupsArrayPrev'><tt>cupsArrayPrev()</tt></a></li>
 	<li><a href='#cupsArrayRemove'><tt>cupsArrayRemove()</tt></a></li>
+	<li><a href='#cupsArrayRestore'><tt>cupsArrayRestore()</tt></a></li>
+	<li><a href='#cupsArraySave'><tt>cupsArraySave()</tt></a></li>
 </ul>
 <!-- NEW PAGE -->
 <h3><a name='cupsArrayAdd'>cupsArrayAdd()</a></h3>
@@ -216,7 +218,7 @@ cupsArrayLast(
 <pre>
 <a href='#cups_array_t'>cups_array_t</a> *
 cupsArrayNew(
-    cups_array_func_t f,
+    <a href='#cups_array_func_t'>cups_array_func_t</a> f,
     void * d);
 </pre>
 <h4>Arguments</h4>
@@ -288,24 +290,64 @@ cupsArrayRemove(
 <h4>Returns</h4>
 <p>1 on success, 0 on failure</p>
 <!-- NEW PAGE -->
+<h3><a name='cupsArrayRestore'>cupsArrayRestore()</a></h3>
+<hr noshade/>
+<h4>Description</h4>
+<p>Reset the current element to the last cupsArraySave.</p>
+<h4>Syntax</h4>
+<pre>
+void *
+cupsArrayRestore(
+    <a href='#cups_array_t'>cups_array_t</a> * a);
+</pre>
+<h4>Arguments</h4>
+<p class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' width='80%'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>a</tt></td><td>Array</td></tr>
+</tbody></table></p>
+<h4>Returns</h4>
+<p>New current element</p>
+<!-- NEW PAGE -->
+<h3><a name='cupsArraySave'>cupsArraySave()</a></h3>
+<hr noshade/>
+<h4>Description</h4>
+<p>Mark the current element for a later cupsArrayRestore.</p>
+<h4>Syntax</h4>
+<pre>
+void
+cupsArraySave(
+    <a href='#cups_array_t'>cups_array_t</a> * a);
+</pre>
+<h4>Arguments</h4>
+<p class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' width='80%'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>a</tt></td><td>Array</td></tr>
+</tbody></table></p>
+<h4>Returns</h4>
+<p>Nothing.</p>
+<!-- NEW PAGE -->
 <h2><a name='_types'>Types</a></h2>
 <ul>
+	<li><a href='#cups_array_func_t'><tt>cups_array_func_t</tt></a></li>
 	<li><a href='#cups_array_t'><tt>cups_array_t</tt></a></li>
-	<li><a href='#second'><tt>second</tt></a></li>
 </ul>
+<!-- NEW PAGE -->
+<h3><a name='cups_array_func_t'>cups_array_func_t</a></h3>
+<hr noshade/>
+<h4>Description</h4>
+<p>Array comparison function</p>
+<h4>Definition</h4>
+<pre>
+typedef int (*cups_array_func_t)(void *first, void *second, void *data);
+</pre>
 <!-- NEW PAGE -->
 <h3><a name='cups_array_t'>cups_array_t</a></h3>
 <hr noshade/>
 <h4>Definition</h4>
 <pre>
 typedef struct _cups_array_s cups_array_t;
-</pre>
-<!-- NEW PAGE -->
-<h3><a name='second'>second</a></h3>
-<hr noshade/>
-<h4>Definition</h4>
-<pre>
-typedef void * second;
 </pre>
 </body>
 </html>
