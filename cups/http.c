@@ -977,7 +977,7 @@ httpGetLength2(http_t *http)		/* I - HTTP data */
       http->data_remaining = strtoll(http->fields[HTTP_FIELD_CONTENT_LENGTH],
                                      NULL, 10);
 
-    DEBUG_printf(("httpGetLength2: content_length=" CUPS_LLFORMAT "\n",
+    DEBUG_printf(("httpGetLength2: content_length=" CUPS_LLFMT "\n",
                   CUPS_LLCAST http->data_remaining));
   }
 
@@ -1331,7 +1331,8 @@ httpRead(http_t *http,			/* I - HTTP data */
     }
   }
 
-  DEBUG_printf(("httpRead: data_remaining=%d\n", http->data_remaining));
+  DEBUG_printf(("httpRead: data_remaining=" CUPS_LLFMT "\n",
+                CUPS_LLCAST http->data_remaining));
 
   if (http->data_remaining <= 0)
   {

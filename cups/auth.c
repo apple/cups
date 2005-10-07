@@ -110,7 +110,7 @@ cupsDoAuthentication(http_t     *http,	/* I - HTTP connection to server */
              http->hostname);
 
     http->digest_tries  = strncasecmp(http->fields[HTTP_FIELD_WWW_AUTHENTICATE],
-                                      "Basic", 5) == 0;
+                                      "Digest", 5) != 0;
     http->userpass[0]   = '\0';
 
     if ((password = cupsGetPassword(prompt)) == NULL)
@@ -129,7 +129,7 @@ cupsDoAuthentication(http_t     *http,	/* I - HTTP connection to server */
   * Got a password; encode it for the server...
   */
 
-  if (strncmp(http->fields[HTTP_FIELD_WWW_AUTHENTICATE], "Basic", 5) == 0)
+  if (strncmp(http->fields[HTTP_FIELD_WWW_AUTHENTICATE], "Digest", 6))
   {
    /*
     * Basic authentication...
