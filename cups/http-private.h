@@ -53,6 +53,15 @@
 #    include <sys/select.h>
 #  endif /* __sun */
 
+#  ifdef __sgi
+/*
+ * IRIX does not define socklen_t, and in fact uses an int instead of
+ * unsigned type for length values...
+ */
+
+typedef int socklen_t;
+#  endif /* __sgi */
+
 #  include "http.h"
 
 #  if defined HAVE_LIBSSL

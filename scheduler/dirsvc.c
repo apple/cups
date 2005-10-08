@@ -1326,6 +1326,7 @@ cupsdUpdateCUPSBrowse(void)
   int		bytes;			/* Number of bytes left */
   char		packet[1541],		/* Broadcast packet */
 		*pptr;			/* Pointer into packet */
+  socklen_t	srclen;			/* Length of source address */
   http_addr_t	srcaddr;		/* Source address */
   char		srcname[1024];		/* Source hostname */
   unsigned	address[4];		/* Source address */
@@ -1347,9 +1348,9 @@ cupsdUpdateCUPSBrowse(void)
   * Read a packet from the browse socket...
   */
 
-  len = sizeof(srcaddr);
+  srclen = sizeof(srcaddr);
   if ((bytes = recvfrom(BrowseSocket, packet, sizeof(packet) - 1, 0, 
-                        (struct sockaddr *)&srcaddr, &len)) < 0)
+                        (struct sockaddr *)&srcaddr, &srclen)) < 0)
   {
    /*
     * "Connection refused" is returned under Linux if the destination port

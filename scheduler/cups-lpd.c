@@ -103,7 +103,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 		*list,			/* Pointer to list */
 		*agent,			/* Pointer to user */
 		status;			/* Status for client */
-  int		hostlen;		/* Size of client address */
+  socklen_t	hostlen;		/* Size of client address */
   http_addr_t	hostaddr;		/* Address of client */
   char		hostname[256],		/* Name of client */
 		hostip[256],		/* IP address */

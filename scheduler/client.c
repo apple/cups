@@ -88,6 +88,7 @@ cupsdAcceptClient(cupsd_listener_t *lis)/* I - Listener socket */
   cupsd_client_t	*con;		/* New client pointer */
   http_addrlist_t	*addrlist,	/* List of adddresses for host */
 			*addr;		/* Current address */
+  socklen_t		addrlen;	/* Length of address */
   char			*hostname;	/* Hostname for address */
   http_addr_t		temp;		/* Temporary address variable */
   static time_t		last_dos = 0;	/* Time of last DoS attack */
@@ -119,10 +120,10 @@ cupsdAcceptClient(cupsd_listener_t *lis)/* I - Listener socket */
   * Accept the client and get the remote address...
   */
 
-  val = sizeof(struct sockaddr_in);
+  addrlen = sizeof(http_addr_t);
 
   if ((con->http.fd = accept(lis->fd, (struct sockaddr *)con->http.hostaddr,
-                             &val)) < 0)
+                             &addrlen)) < 0)
   {
     cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to accept client connection - %s.",
                     strerror(errno));
@@ -295,8 +296,8 @@ cupsdAcceptClient(cupsd_listener_t *lis)/* I - Listener socket */
   * Get the local address the client connected to...
   */
 
-  i = sizeof(temp);
-  if (getsockname(con->http.fd, (struct sockaddr *)&temp, &i))
+  addrlen = sizeof(temp);
+  if (getsockname(con->http.fd, (struct sockaddr *)&temp, &addrlen))
   {
     cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to get local address - %s",
                     strerror(errno));
