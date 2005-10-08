@@ -64,7 +64,16 @@ AC_ARG_WITH(domainsocket, [  --with-domainsocket     set unix domain socket name
 
 if test x$enable_domainsocket != xno; then
 	if test "x$default_domainsocket" = x; then
-		CUPS_DEFAULT_DOMAINSOCKET="$CUPS_STATEDIR/cups.sock"
+		case "$uname" in
+			Darwin*)
+				# Darwin and MaxOS X do their own thing...
+				CUPS_DEFAULT_DOMAINSOCKET="$localstatedir/run/cupsd"
+				;;
+			*)
+				# All others use FHS standard...
+				CUPS_DEFAULT_DOMAINSOCKET="$CUPS_STATEDIR/cups.sock"
+				;;
+		esac
 	else
 		CUPS_DEFAULT_DOMAINSOCKET="$default_domainsocket"
 	fi

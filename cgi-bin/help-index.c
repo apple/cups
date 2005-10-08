@@ -179,45 +179,56 @@ helpLoadIndex(const char *hifile,	/* I - Index filename */
 
   if ((fp = cupsFileOpen(hifile, "r")) != NULL)
   {
+   /*
+    * Lock the file and then read the first line...
+    */
+
     cupsFileLock(fp, 1);
 
-    while (cupsFileGets(fp, line, sizeof(line)))
+    if (cupsFileGets(fp, line, sizeof(line)) && !strcmp(line, "HELPV0"))
     {
      /*
-      * Each line looks like one of the following:
-      *
-      *     filename mtime offset length text
-      *     filename#anchor offset length text
+      * Got a valid header line, now read the data lines...
       */
 
-      filename = line;
+      while (cupsFileGets(fp, line, sizeof(line)))
+      {
+       /*
+	* Each line looks like one of the following:
+	*
+	*     filename mtime offset length text
+	*     filename#anchor offset length text
+	*/
 
-      if ((ptr = strchr(line, ' ')) == NULL)
-        break;
+	filename = line;
 
-      while (isspace(*ptr & 255))
-        *ptr++ = '\0';
+	if ((ptr = strchr(line, ' ')) == NULL)
+          break;
 
-      if ((anchor = strrchr(filename, '#')) != NULL)
-        *anchor++ = '\0';
+	while (isspace(*ptr & 255))
+          *ptr++ = '\0';
 
-      mtime  = strtol(ptr, &ptr, 10);
-     /* TODO: Use strtoll for 64-bit file support */
-      offset = strtol(ptr, &ptr, 10);
-      length = strtol(ptr, &ptr, 10);
+	if ((anchor = strrchr(filename, '#')) != NULL)
+          *anchor++ = '\0';
 
-      while (isspace(*ptr & 255))
-        ptr ++;
+	mtime  = strtol(ptr, &ptr, 10);
+       /* TODO: Use strtoll for 64-bit file support */
+	offset = strtol(ptr, &ptr, 10);
+	length = strtol(ptr, &ptr, 10);
 
-      text = ptr;
+	while (isspace(*ptr & 255))
+          ptr ++;
 
-      if ((node = help_new_node(filename, anchor, text,
-				mtime, offset, length)) == NULL)
-        break;
+	text = ptr;
 
-      help_insert_node(hi, node);
+	if ((node = help_new_node(filename, anchor, text,
+				  mtime, offset, length)) == NULL)
+          break;
 
-      node->score = -1;
+	help_insert_node(hi, node);
+
+	node->score = -1;
+      }
     }
 
     cupsFileClose(fp);
@@ -308,6 +319,8 @@ helpSaveIndex(help_index_t *hi,		/* I - Index */
   */
 
   cupsFileLock(fp, 1);
+
+  cupsFilePuts(fp, "HELPV0\n");
 
   for (i = 0; i < hi->num_nodes; i ++)
   {
