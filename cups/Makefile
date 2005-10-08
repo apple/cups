@@ -65,6 +65,7 @@ LIBOBJS	=	\
 OBJS	=	\
 		$(LIBOBJS) \
 		testarray.o \
+		testfile.o \
 		testhttp.o \
 		testi18n.o \
 		testipp.o \
@@ -98,6 +99,7 @@ TARGETS	=	\
 		$(LIBCUPS) \
 		libcups.a \
 		testarray \
+		testfile \
 		testhttp \
 		testi18n \
 		testipp \
@@ -256,6 +258,16 @@ cups_C.h:	../locale/C/cups_C
 testarray:	testarray.o libcups.a
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ testarray.o libcups.a \
+		$(NETLIBS) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
+
+
+#
+# testfile (dependency on static CUPS library is intentional)
+#
+
+testfile:	testfile.o libcups.a
+	echo Linking $@...
+	$(CC) $(LDFLAGS) -o $@ testfile.o libcups.a \
 		$(NETLIBS) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
 
 

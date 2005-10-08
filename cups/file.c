@@ -49,6 +49,7 @@
  *   cupsFileTell()        - Return the current file position.
  *   cupsFileUnlock()      - Unlock access to a file.
  *   cupsFileWrite()       - Write to a file.
+ *   cups_compress()       - Compress a buffer of data...
  *   cups_fill()           - Fill the input buffer...
  *   cups_read()           - Read from a file descriptor.
  *   cups_write()          - Write to a file descriptor.
@@ -98,10 +99,11 @@ struct _cups_file_s			/**** CUPS file structure... ****/
 		*end;			/* End of buffer data */
   off_t		pos;			/* File position for start of buffer */
 
-#  ifdef HAVE_LIBZ
-  z_stream	stream;			/* Decompression stream */
-  unsigned char	cbuf[1024];		/* Decompression buffer */
-#  endif /* HAVE_LIBZ */
+#ifdef HAVE_LIBZ
+  z_stream	stream;			/* (De)compression stream */
+  Bytef		cbuf[1024];		/* (De)compression buffer */
+  uLong		crc;			/* (De)compression CRC */
+#endif /* HAVE_LIBZ */
 };
 
 
@@ -109,6 +111,9 @@ struct _cups_file_s			/**** CUPS file structure... ****/
  * Local functions...
  */
 
+#ifdef HAVE_LIBZ
+static ssize_t	cups_compress(cups_file_t *fp, const char *buf, size_t bytes);
+#endif /* HAVE_LIBZ */
 static ssize_t	cups_fill(cups_file_t *fp);
 static ssize_t	cups_read(cups_file_t *fp, char *buf, size_t bytes);
 static ssize_t	cups_write(cups_file_t *fp, const char *buf, size_t bytes);
@@ -123,6 +128,7 @@ cupsFileClose(cups_file_t *fp)		/* I - CUPS file */
 {
   int	fd;				/* File descriptor */
   char	mode;				/* Open mode */
+  int	status;				/* Return status */
 
 
   DEBUG_printf(("cupsFileClose(fp=%p)\n", fp));
@@ -134,17 +140,81 @@ cupsFileClose(cups_file_t *fp)		/* I - CUPS file */
   if (!fp)
     return (-1);
 
-#ifdef HAVE_LIBZ
  /*
-  * Free decompression data as needed...
+  * Flush pending write data...
   */
 
-  if (fp->compressed && fp->mode == 'r')
-    inflateEnd(&fp->stream);
-#endif /* HAVE_LIBZ */
-
   if (fp->mode == 'w')
-    cupsFileFlush(fp);
+    status = cupsFileFlush(fp);
+  else
+    status = 0;
+
+#ifdef HAVE_LIBZ
+  if (fp->compressed && status >= 0)
+  {
+    if (fp->mode == 'r')
+    {
+     /*
+      * Free decompression data...
+      */
+
+      inflateEnd(&fp->stream);
+    }
+    else
+    {
+     /*
+      * Flush any remaining compressed data...
+      */
+
+      unsigned char	trailer[8];	/* Trailer CRC and length */
+      int		done;		/* Done writing... */
+
+
+      fp->stream.avail_in = 0;
+
+      for (done = 0;;)
+      {
+        if (fp->stream.next_out > fp->cbuf)
+	{
+	  if (cups_write(fp, (char *)fp->cbuf,
+	                 fp->stream.next_out - fp->cbuf) < 0)
+	    status = -1;
+
+	  fp->stream.next_out  = fp->cbuf;
+	  fp->stream.avail_out = sizeof(fp->cbuf);
+	}
+
+        if (done || status < 0)
+	  break;
+
+        done = deflate(&fp->stream, Z_FINISH) == Z_STREAM_END &&
+	       fp->stream.next_out == fp->cbuf;
+      }
+
+     /*
+      * Write the CRC and length...
+      */
+
+      trailer[0] = fp->crc;
+      trailer[1] = fp->crc >> 8;
+      trailer[2] = fp->crc >> 16;
+      trailer[3] = fp->crc >> 24;
+      trailer[4] = fp->pos;
+      trailer[5] = fp->pos >> 8;
+      trailer[6] = fp->pos >> 16;
+      trailer[7] = fp->pos >> 24;
+
+      if (cups_write(fp, (char *)trailer, 8) < 0)
+        status = -1;
+
+     /*
+      * Free all memory used by the compression stream...
+      */
+
+      deflateEnd(&(fp->stream));
+    }
+  }
+#endif /* HAVE_LIBZ */
 
  /*
   * Save the file descriptor we used and free memory...
@@ -160,9 +230,17 @@ cupsFileClose(cups_file_t *fp)		/* I - CUPS file */
   */
 
   if (mode == 's')
-    return (closesocket(fd));
+  {
+    if (closesocket(fd) < 0)
+      status = -1;
+  }
   else
-    return (close(fd));
+  {
+    if (close(fd) < 0)
+      status = -1;
+  }
+
+  return (status);
 }
 
 
@@ -214,7 +292,12 @@ cupsFileFlush(cups_file_t *fp)		/* I - CUPS file */
 
   if (bytes > 0)
   {
-    if (cups_write(fp, fp->buf, bytes) < bytes)
+    if (fp->compressed)
+      bytes = cups_compress(fp, fp->buf, bytes);
+    else
+      bytes = cups_write(fp, fp->buf, bytes);
+
+    if (bytes < 0)
       return (-1);
 
     fp->ptr = fp->buf;
@@ -493,7 +576,7 @@ cupsFileOpen(const char *filename,	/* I - Name of file */
   cups_file_t	*fp;			/* New CUPS file */
   int		fd;			/* File descriptor */
   char		hostname[1024],		/* Hostname */
-		portname[64];		/* Port "name" (number or service) */
+		*portname;		/* Port "name" (number or service) */
   int		port;			/* Port number */
   struct servent *service;		/* Service */
   int		i;			/* Looping var */
@@ -529,7 +612,10 @@ cupsFileOpen(const char *filename,	/* I - Name of file */
         break;
 
     case 's' : /* Read/write socket */
-        if (sscanf(filename, "%1023[^:]:%63s", hostname, portname) != 2)
+        strlcpy(hostname, filename, sizeof(hostname));
+	if ((portname = strrchr(hostname, ':')) != NULL)
+	  *portname++ = '\0';
+	else
 	  return (NULL);
 
         if ((hostaddr = httpGetHostByName(hostname)) == NULL)
@@ -656,11 +742,55 @@ cupsFileOpenFd(int        fd,		/* I - File descriptor */
   * Open the file...
   */
 
+  fp->fd = fd;
+
   switch (*mode)
   {
     case 'w' :
     case 'a' :
 	fp->mode = 'w';
+	fp->ptr  = fp->buf;
+	fp->end  = fp->buf + sizeof(fp->buf);
+
+#ifdef HAVE_LIBZ
+	if (mode[1] >= '1' && mode[1] <= '9')
+	{
+	 /*
+	  * Open a compressed stream, so write the standard gzip file
+	  * header...
+	  */
+
+          unsigned char header[10];	/* gzip file header */
+	  time_t	curtime;	/* Current time */
+
+
+          curtime   = time(NULL);
+	  header[0] = 0x1f;
+	  header[1] = 0x8b;
+	  header[2] = Z_DEFLATED;
+	  header[3] = 0;
+	  header[4] = curtime;
+	  header[5] = curtime >> 8;
+	  header[6] = curtime >> 16;
+	  header[7] = curtime >> 24;
+	  header[8] = 0;
+	  header[9] = 0x03;
+
+	  cups_write(fp, (char *)header, 10);
+
+         /*
+	  * Initialize the compressor...
+	  */
+
+          deflateInit2(&(fp->stream), mode[1] - '0', Z_DEFLATED, -15, 8,
+	               Z_DEFAULT_STRATEGY);
+
+	  fp->stream.next_out  = fp->cbuf;
+	  fp->stream.avail_out = sizeof(fp->cbuf);
+	  fp->compressed       = 1;
+	  fp->crc              = crc32(0L, Z_NULL, 0);
+	}
+#endif /* HAVE_LIBZ */
         break;
 
     case 'r' :
@@ -675,24 +805,11 @@ cupsFileOpenFd(int        fd,		/* I - File descriptor */
         return (NULL);
   }
 
-  fp->fd = fd;
-
  /*
   * Don't pass this file to child processes...
   */
 
   fcntl(fp->fd, F_SETFD, fcntl(fp->fd, F_GETFD) | FD_CLOEXEC);
-
-  if (*mode == 'a')
-    fp->pos = lseek(fp->fd, 0, SEEK_END);
-  else
-    fp->pos = 0;
-
-  if (*mode != 'r' && *mode != 's')
-  {
-    fp->ptr = fp->buf;
-    fp->end = fp->buf + sizeof(fp->buf);
-  }
 
   return (fp);
 }
@@ -759,7 +876,12 @@ cupsFilePrintf(cups_file_t *fp,		/* I - CUPS file */
   fp->pos += bytes;
 
   if (bytes > sizeof(fp->buf))
-    return (cups_write(fp, buf, bytes));
+  {
+    if (fp->compressed)
+      return (cups_compress(fp, buf, bytes));
+    else
+      return (cups_write(fp, buf, bytes));
+  }
   else
   {
     memcpy(fp->ptr, buf, bytes);
@@ -858,7 +980,12 @@ cupsFilePuts(cups_file_t *fp,		/* I - CUPS file */
   fp->pos += bytes;
 
   if (bytes > sizeof(fp->buf))
-    return (cups_write(fp, s, bytes));
+  {
+    if (fp->compressed)
+      return (cups_compress(fp, s, bytes));
+    else
+      return (cups_write(fp, s, bytes));
+  }
   else
   {
     memcpy(fp->ptr, s, bytes);
@@ -1123,7 +1250,12 @@ cupsFileWrite(cups_file_t *fp,		/* I - CUPS file */
   fp->pos += bytes;
 
   if (bytes > sizeof(fp->buf))
-    return (cups_write(fp, buf, bytes));
+  {
+    if (fp->compressed)
+      return (cups_compress(fp, buf, bytes));
+    else
+      return (cups_write(fp, buf, bytes));
+  }
   else
   {
     memcpy(fp->ptr, buf, bytes);
@@ -1131,6 +1263,49 @@ cupsFileWrite(cups_file_t *fp,		/* I - CUPS file */
     return (bytes);
   }
 }
+
+
+#ifdef HAVE_LIBZ
+/*
+ * 'cups_compress()' - Compress a buffer of data...
+ */
+
+static ssize_t				/* O - Number of bytes written or -1 */
+cups_compress(cups_file_t *fp,		/* I - CUPS file */
+              const char  *buf,		/* I - Buffer */
+	      size_t      bytes)	/* I - Number bytes */
+{
+ /*
+  * Update the CRC...
+  */
+
+  fp->crc = crc32(fp->crc, (const Bytef *)buf, bytes);
+
+ /*
+  * Deflate the bytes...
+  */
+
+  fp->stream.next_in  = (Bytef *)buf;
+  fp->stream.avail_in = bytes;
+
+  while (fp->stream.avail_in > 0)
+  {
+   /*
+    * Flush the current buffer...
+    */
+
+    if (fp->stream.avail_out < (int)(sizeof(fp->cbuf) / 8))
+    {
+      if (cups_write(fp, (char *)fp->cbuf, fp->stream.next_out - fp->cbuf) < 0)
+        return (-1);
+    }
+
+    deflate(&(fp->stream), Z_NO_FLUSH);
+  }
+
+  return (bytes);
+}
+#endif /* HAVE_LIBZ */
 
 
 /*
@@ -1159,211 +1334,247 @@ cups_fill(cups_file_t *fp)		/* I - CUPS file */
     fp->pos += fp->end - fp->buf;
 
 #ifdef HAVE_LIBZ
- /*
-  * Check to see if we have read any data yet; if not, see if we have a
-  * compressed file...
-  */
-
-  if (!fp->ptr)
+  while (!fp->ptr || fp->compressed)
   {
    /*
-    * Reset the file position in case we are seeking...
+    * Check to see if we have read any data yet; if not, see if we have a
+    * compressed file...
     */
 
-    fp->compressed = 0;
-    fp->pos        = 0;
-
-   /*
-    * Read the first bytes in the file to determine if we have a gzip'd
-    * file...
-    */
-
-    if ((bytes = cups_read(fp, (char *)fp->cbuf, sizeof(fp->cbuf))) < 0)
+    if (!fp->ptr)
     {
      /*
-      * Can't read from file!
+      * Reset the file position in case we are seeking...
       */
 
-      return (-1);
+      fp->compressed = 0;
+      fp->pos        = 0;
+
+     /*
+      * Read the first bytes in the file to determine if we have a gzip'd
+      * file...
+      */
+
+      if ((bytes = cups_read(fp, (char *)fp->cbuf, sizeof(fp->cbuf))) < 0)
+      {
+       /*
+	* Can't read from file!
+	*/
+
+	return (-1);
+      }
+
+      if (bytes < 10 || fp->cbuf[0] != 0x1f || fp->cbuf[1] != 0x8b ||
+          fp->cbuf[2] != 8 || (fp->cbuf[3] & 0xe0) != 0)
+      {
+       /*
+	* Not a gzip'd file!
+	*/
+
+	memcpy(fp->buf, fp->cbuf, bytes);
+
+	fp->ptr = fp->buf;
+	fp->end = fp->buf + bytes;
+
+	return (bytes);
+      }
+
+     /*
+      * Parse header junk: extra data, original name, and comment...
+      */
+
+      ptr = (unsigned char *)fp->cbuf + 10;
+      end = (unsigned char *)fp->cbuf + bytes;
+
+      if (fp->cbuf[3] & 0x04)
+      {
+       /*
+	* Skip extra data...
+	*/
+
+	if ((ptr + 2) > end)
+	{
+	 /*
+	  * Can't read from file!
+	  */
+
+	  return (-1);
+	}
+
+	bytes = ((unsigned char)ptr[1] << 8) | (unsigned char)ptr[0];
+	ptr   += 2 + bytes;
+
+	if (ptr > end)
+	{
+	 /*
+	  * Can't read from file!
+	  */
+
+	  return (-1);
+	}
+      }
+
+      if (fp->cbuf[3] & 0x08)
+      {
+       /*
+	* Skip original name data...
+	*/
+
+	while (ptr < end && *ptr)
+          ptr ++;
+
+	if (ptr < end)
+          ptr ++;
+	else
+	{
+	 /*
+	  * Can't read from file!
+	  */
+
+	  return (-1);
+	}
+      }
+
+      if (fp->cbuf[3] & 0x10)
+      {
+       /*
+	* Skip comment data...
+	*/
+
+	while (ptr < end && *ptr)
+          ptr ++;
+
+	if (ptr < end)
+          ptr ++;
+	else
+	{
+	 /*
+	  * Can't read from file!
+	  */
+
+	  return (-1);
+	}
+      }
+
+      if (fp->cbuf[3] & 0x02)
+      {
+       /*
+	* Skip header CRC data...
+	*/
+
+	ptr += 2;
+
+	if (ptr > end)
+	{
+	 /*
+	  * Can't read from file!
+	  */
+
+	  return (-1);
+	}
+      }
+
+     /*
+      * Setup the decompressor data...
+      */
+
+      fp->stream.zalloc    = (alloc_func)0;
+      fp->stream.zfree     = (free_func)0;
+      fp->stream.opaque    = (voidpf)0;
+      fp->stream.next_in   = (Bytef *)ptr;
+      fp->stream.next_out  = NULL;
+      fp->stream.avail_in  = end - ptr;
+      fp->stream.avail_out = 0;
+      fp->crc              = crc32(0L, Z_NULL, 0);
+
+      if (inflateInit2(&(fp->stream), -15) != Z_OK)
+	return (-1);
+
+      fp->compressed = 1;
     }
 
-    if (bytes < 10 || fp->cbuf[0] != 0x1f || fp->cbuf[1] != 0x8b ||
-        fp->cbuf[2] != 8 || (fp->cbuf[3] & 0xe0) != 0)
+    if (fp->compressed)
     {
      /*
-      * Not a gzip'd file!
+      * If we have reached end-of-file, return immediately...
       */
 
-      memcpy(fp->buf, fp->cbuf, bytes);
+      if (fp->eof)
+	return (-1);
+
+     /*
+      * Fill the decompression buffer as needed...
+      */
+
+      if (fp->stream.avail_in == 0)
+      {
+	if ((bytes = cups_read(fp, (char *)fp->cbuf, sizeof(fp->cbuf))) <= 0)
+          return (-1);
+
+	fp->stream.next_in  = fp->cbuf;
+	fp->stream.avail_in = bytes;
+      }
+
+     /*
+      * Decompress data from the buffer...
+      */
+
+      fp->stream.next_out  = (Bytef *)fp->buf;
+      fp->stream.avail_out = sizeof(fp->buf);
+
+      if (inflate(&(fp->stream), Z_NO_FLUSH) == Z_STREAM_END)
+      {
+       /*
+	* Read the CRC and length...
+	*/
+
+	unsigned char	trailer[8];	/* Trailer bytes */
+	uLong		tcrc;		/* Trailer CRC */
+
+
+	if (read(fp->fd, trailer, sizeof(trailer)) < sizeof(trailer))
+	{
+	 /*
+          * Can't get it, so mark end-of-file...
+	  */
+
+          fp->eof = 1;
+	  return (-1);
+	}
+
+	tcrc = (((((trailer[3] << 8) | trailer[2]) << 8) | trailer[1]) << 8) |
+               trailer[0];
+
+	if (tcrc != fp->crc)
+	{
+	 /*
+          * Bad CRC, mark end-of-file...
+	  */
+	  fp->eof = 1;
+
+	  return (-1);
+	}
+
+       /*
+	* Otherwise, reset the current pointer so that we re-read the
+	* file header...
+	*/
+
+	fp->ptr = NULL;
+	continue;
+      }
+
+      bytes = sizeof(fp->buf) - fp->stream.avail_out;
+
+     /*
+      * Return the decompressed data...
+      */
 
       fp->ptr = fp->buf;
       fp->end = fp->buf + bytes;
 
       return (bytes);
     }
-
-   /*
-    * Parse header junk: extra data, original name, and comment...
-    */
-
-    ptr = fp->cbuf + 10;
-    end = fp->cbuf + bytes;
-
-    if (fp->cbuf[3] & 0x04)
-    {
-     /*
-      * Skip extra data...
-      */
-
-      if ((ptr + 2) > end)
-      {
-       /*
-	* Can't read from file!
-	*/
-
-	return (-1);
-      }
-
-      bytes = ((unsigned char)ptr[1] << 8) | (unsigned char)ptr[0];
-      ptr   += 2 + bytes;
-
-      if (ptr > end)
-      {
-       /*
-	* Can't read from file!
-	*/
-
-	return (-1);
-      }
-    }
-
-    if (fp->cbuf[3] & 0x08)
-    {
-     /*
-      * Skip original name data...
-      */
-
-      while (ptr < end && *ptr)
-        ptr ++;
-
-      if (ptr < end)
-        ptr ++;
-      else
-      {
-       /*
-	* Can't read from file!
-	*/
-
-	return (-1);
-      }
-    }
-
-    if (fp->cbuf[3] & 0x10)
-    {
-     /*
-      * Skip comment data...
-      */
-
-      while (ptr < end && *ptr)
-        ptr ++;
-
-      if (ptr < end)
-        ptr ++;
-      else
-      {
-       /*
-	* Can't read from file!
-	*/
-
-	return (-1);
-      }
-    }
-
-    if (fp->cbuf[3] & 0x02)
-    {
-     /*
-      * Skip header CRC data...
-      */
-
-      ptr += 2;
-
-      if (ptr > end)
-      {
-       /*
-	* Can't read from file!
-	*/
-
-	return (-1);
-      }
-    }
-
-   /*
-    * Setup the decompressor data...
-    */
-
-    fp->stream.zalloc    = (alloc_func)0;
-    fp->stream.zfree     = (free_func)0;
-    fp->stream.opaque    = (voidpf)0;
-    fp->stream.next_in   = (Bytef *)ptr;
-    fp->stream.next_out  = NULL;
-    fp->stream.avail_in  = end - ptr;
-    fp->stream.avail_out = 0;
-
-    if (inflateInit2(&(fp->stream), -15) != Z_OK)
-      return (-1);
-
-    fp->compressed = 1;
-  }
-
-  if (fp->compressed)
-  {
-   /*
-    * If we have reached end-of-file, return immediately...
-    */
-
-    if (fp->eof)
-      return (-1);
-
-   /*
-    * Fill the decompression buffer as needed...
-    */
-
-    if (fp->stream.avail_in == 0)
-    {
-      if ((bytes = cups_read(fp, (char *)fp->cbuf, sizeof(fp->cbuf))) <= 0)
-        return (-1);
-
-      fp->stream.next_in  = fp->cbuf;
-      fp->stream.avail_in = bytes;
-    }
-
-   /*
-    * Decompress data from the buffer...
-    */
-
-    fp->stream.next_out  = (Bytef *)fp->buf;
-    fp->stream.avail_out = sizeof(fp->buf);
-
-    if (inflate(&(fp->stream), Z_NO_FLUSH) == Z_STREAM_END)
-    {
-     /*
-      * Mark end-of-file; note: we do not support concatenated gzip files
-      * like gunzip does...
-      */
-
-      fp->eof = 1;
-    }
-
-    bytes = sizeof(fp->buf) - fp->stream.avail_out;
-
-   /*
-    * Return the decompressed data...
-    */
-
-    fp->ptr = fp->buf;
-    fp->end = fp->buf + bytes;
-
-    return (bytes);
   }
 #endif /* HAVE_LIBZ */
 
