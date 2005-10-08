@@ -40,6 +40,7 @@
 #include "globals.h"
 #include "debug.h"
 #include <stdlib.h>
+#include <stddef.h>
 
 
 /*
@@ -108,7 +109,8 @@ httpAddrLength(const http_addr_t *addr)	/* I - Address */
 #endif /* AF_INET6 */
 #ifdef AF_LOCAL
   if (addr->addr.sa_family == AF_LOCAL)
-    return (sizeof(addr->un.sun_family) + strlen(addr->un.sun_path));
+    return (offsetof(struct sockaddr_un, sun_path) +
+            strlen(addr->un.sun_path) + 1);
   else
 #endif /* AF_LOCAL */
   if (addr->addr.sa_family == AF_INET)
@@ -167,39 +169,71 @@ httpAddrLookup(const http_addr_t *addr,		/* I - Address to lookup */
                char              *name,		/* I - Host name buffer */
 	       int               namelen)	/* I - Size of name buffer */
 {
-  struct hostent	*host;			/* Host from name service */
-
-
   DEBUG_printf(("httpAddrLookup(addr=%p, name=%p, namelen=%d)\n",
                 addr, name, namelen));
 
-#ifdef AF_INET6
-  if (addr->addr.sa_family == AF_INET6)
-    host = gethostbyaddr(ADDR_CAST &(addr->ipv6.sin6_addr),
-                         sizeof(struct in6_addr), AF_INET6);
-  else
-#endif /* AF_INET6 */
-#ifdef AF_LOCAL
-  if (addr->addr.sa_family == AF_LOCAL)
-  {
-    strlcpy(name, addr->un.sun_path, namelen);
-    return (name);
-  }
-  else
-#endif /* AF_LOCAL */
-  if (addr->addr.sa_family == AF_INET)
-    host = gethostbyaddr(ADDR_CAST &(addr->ipv4.sin_addr),
-                         sizeof(struct in_addr), AF_INET);
-  else
-    host = NULL;
+ /*
+  * Range check input...
+  */
 
-  if (host == NULL)
+  if (!addr || !name || namelen <= 2)
   {
-    httpAddrString(addr, name, namelen);
+    if (name && namelen >= 1)
+      *name = '\0';
+
     return (NULL);
   }
 
-  strlcpy(name, host->h_name, namelen);
+#ifdef AF_LOCAL
+  if (addr->addr.sa_family == AF_LOCAL)
+    strlcpy(name, addr->un.sun_path, namelen);
+  else
+#endif /* AF_LOCAL */
+#ifdef HAVE_GETNAMEINFO
+  {
+    char	servname[1024];			/* Service name (not used) */
+
+
+    if (getnameinfo(&addr->addr, httpAddrLength(addr), name, namelen,
+                    servname, sizeof(servname), 0))
+    {
+     /*
+      * If we get an error back, then the address type is not supported
+      * and we should zero out the buffer...
+      */
+
+      name[0] = '\0';
+
+      return (NULL);
+    }
+  }
+#else
+  {
+    struct hostent	*host;			/* Host from name service */
+
+
+#  ifdef AF_INET6
+    if (addr->addr.sa_family == AF_INET6)
+      host = gethostbyaddr(ADDR_CAST &(addr->ipv6.sin6_addr),
+                	   sizeof(struct in_addr), AF_INET6);
+    else
+#  endif /* AF_INET6 */
+    host = gethostbyaddr(ADDR_CAST &(addr->ipv4.sin_addr),
+                	 sizeof(struct in_addr), AF_INET);
+
+    if (host == NULL)
+    {
+     /*
+      * No hostname, so return the raw address...
+      */
+
+      httpAddrString(addr, name, namelen);
+      return (NULL);
+    }
+
+    strlcpy(name, host->h_name, namelen);
+  }
+#endif /* HAVE_GETNAMEINFO */
 
   return (name);
 }
@@ -219,32 +253,140 @@ httpAddrString(const http_addr_t *addr,		/* I - Address to convert */
   DEBUG_printf(("httpAddrString(addr=%p, s=%p, slen=%d)\n",
                 addr, s, slen));
 
-#ifdef AF_INET6
-  if (addr->addr.sa_family == AF_INET6)
-    snprintf(s, slen, "[%x:%x:%x:%x]",
-             ntohl(addr->ipv6.sin6_addr.s6_addr32[0]),
-             ntohl(addr->ipv6.sin6_addr.s6_addr32[1]),
-             ntohl(addr->ipv6.sin6_addr.s6_addr32[2]),
-             ntohl(addr->ipv6.sin6_addr.s6_addr32[3]));
-  else
-#endif /* AF_INET6 */
+ /*
+  * Range check input...
+  */
+
+  if (!addr || !s || slen <= 2)
+  {
+    if (s && slen >= 1)
+      *s = '\0';
+
+    return (NULL);
+  }
+
 #ifdef AF_LOCAL
   if (addr->addr.sa_family == AF_LOCAL)
     strlcpy(s, addr->un.sun_path, slen);
   else
 #endif /* AF_LOCAL */
-  if (addr->addr.sa_family == AF_INET)
+#ifdef HAVE_GETNAMEINFO
   {
-    unsigned temp;				/* Temporary address */
+    char	servname[1024];			/* Service name (not used) */
 
 
-    temp = ntohl(addr->ipv4.sin_addr.s_addr);
+    if (getnameinfo(&addr->addr, httpAddrLength(addr), s, slen,
+                    servname, sizeof(servname), NI_NUMERICHOST))
+    {
+     /*
+      * If we get an error back, then the address type is not supported
+      * and we should zero out the buffer...
+      */
 
-    snprintf(s, slen, "%d.%d.%d.%d", (temp >> 24) & 255,
-             (temp >> 16) & 255, (temp >> 8) & 255, temp & 255);
+      s[0] = '\0';
+
+      return (NULL);
+    }
   }
-  else
-    strlcpy(s, "UNKNOWN", slen);
+#else
+  {
+#ifdef AF_INET6
+    if (addr->addr.sa_family == AF_INET6)
+    {
+      char		*sptr;		/* Pointer into string */
+      int		i;		/* Looping var */
+      unsigned		temp;		/* Current value */
+      const char	*prefix;	/* Prefix for address */
+
+
+      prefix = "[";
+      for (sptr = s, i = 0; i < 4 && addr->ipv6.sin6_addr.s6_addr32[i]; i ++)
+      {
+        temp = ntohl(addr->ipv6.sin6_addr.s6_addr32[i]);
+
+        snprintf(sptr, slen, "%s%x", prefix, (temp >> 16) & 0xffff);
+	prefix = ":";
+	slen -= strlen(sptr);
+	sptr += strlen(sptr);
+
+        temp &= 0xffff;
+
+	if (temp || i == 3 || addr->ipv6.sin6_addr.s6_addr32[i + 1])
+	{
+          snprintf(sptr, slen, "%s%x", prefix, temp);
+	  slen -= strlen(sptr);
+	  sptr += strlen(sptr);
+	}
+      }
+
+      if (i < 4)
+      {
+	while (i < 4 && !addr->ipv6.sin6_addr.s6_addr32[i])
+	  i ++;
+
+        if (i < 4)
+	{
+          snprintf(sptr, slen, "%s:", prefix);
+	  prefix = ":";
+	  slen -= strlen(sptr);
+	  sptr += strlen(sptr);
+
+	  for (; i < 4; i ++)
+	  {
+            temp = ntohl(addr->ipv6.sin6_addr.s6_addr32[i]);
+
+            if ((temp & 0xffff0000) || addr->ipv6.sin6_addr.s6_addr32[i - 1])
+	    {
+              snprintf(sptr, slen, "%s%x", prefix, (temp >> 16) & 0xffff);
+	      slen -= strlen(sptr);
+	      sptr += strlen(sptr);
+            }
+
+            snprintf(sptr, slen, "%s%x", prefix, temp & 0xffff);
+	    slen -= strlen(sptr);
+	    sptr += strlen(sptr);
+	  }
+	}
+	else if (sptr == s)
+	{
+	 /*
+          * Empty address...
+	  */
+
+          strlcpy(s, "[::", slen);
+	  sptr = s + 3;
+	  slen -= 3;
+	}
+	else
+	{
+	 /*
+	  * Empty at end...
+	  */
+
+          strlcpy(sptr, "::", slen);
+	  sptr += 2;
+	  slen -= 2;
+	}
+      }
+
+      strlcpy(sptr, "]", slen);
+    }
+    else
+#endif /* AF_INET6 */
+    if (addr->addr.sa_family == AF_INET)
+    {
+      unsigned temp;				/* Temporary address */
+
+
+      temp = ntohl(addr->ipv4.sin_addr.s_addr);
+
+      snprintf(s, slen, "%d.%d.%d.%d", (temp >> 24) & 255,
+               (temp >> 16) & 255, (temp >> 8) & 255, temp & 255);
+    }
+    else
+      strlcpy(s, "UNKNOWN", slen);
+  }
+#endif /* HAVE_GETNAMEINFO */
 
   DEBUG_printf(("httpAddrString: returning \"%s\"...\n", s));
 

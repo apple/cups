@@ -1,6 +1,6 @@
 # DO NOT DELETE
 
-array.o: array.h string.h ../config.h
+array.o: array.h string.h ../config.h debug.h
 attr.o: ppd.h file.h debug.h string.h ../config.h
 auth.o: cups.h ipp.h http.h string.h ../config.h md5.h ppd.h file.h
 auth.o: language.h debug.h
@@ -20,7 +20,11 @@ http.o: http-private.h ../config.h http.h string.h md5.h globals.h cups.h
 http.o: ipp.h ppd.h file.h language.h normalize.h transcode.h debug.h
 http-addr.o: globals.h string.h ../config.h cups.h ipp.h http.h md5.h ppd.h
 http-addr.o: file.h language.h normalize.h transcode.h debug.h
-http-support.o: string.h ../config.h http.h md5.h ipp.h
+http-addrlist.o: globals.h string.h ../config.h cups.h ipp.h http.h md5.h
+http-addrlist.o: ppd.h file.h language.h normalize.h transcode.h debug.h
+http-addrlist.o: http-private.h
+http-support.o: debug.h globals.h string.h ../config.h cups.h ipp.h http.h
+http-support.o: md5.h ppd.h file.h language.h normalize.h transcode.h
 ipp.o: globals.h string.h ../config.h cups.h ipp.h http.h md5.h ppd.h file.h
 ipp.o: language.h normalize.h transcode.h debug.h
 ipp-support.o: globals.h string.h ../config.h cups.h ipp.h http.h md5.h ppd.h
@@ -48,7 +52,8 @@ usersys.o: http-private.h ../config.h http.h string.h md5.h globals.h cups.h
 usersys.o: ipp.h ppd.h file.h language.h normalize.h transcode.h
 util.o: globals.h string.h ../config.h cups.h ipp.h http.h md5.h ppd.h file.h
 util.o: language.h normalize.h transcode.h debug.h
-testarray.o: ../cups/string.h ../config.h string.h ipp.h http.h md5.h
+testarray.o: ../cups/string.h ../config.h string.h array.h dir.h debug.h
+testfile.o: string.h ../config.h file.h debug.h
 testhttp.o: http.h string.h ../config.h md5.h
 testi18n.o: language.h string.h ../config.h transcode.h normalize.h
 testipp.o: ../cups/string.h ../config.h string.h ipp.h http.h md5.h

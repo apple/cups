@@ -217,7 +217,11 @@ cupsServer(void)
 	  fp = cupsFileOpen(CUPS_SERVERROOT "/client.conf", "r");
       }
 
+#ifdef CUPS_DEFAULT_DOMAINSOCKET
+      server = CUPS_DEFAULT_DOMAINSOCKET;
+#else
       server = "localhost";
+#endif /* CUPS_DEFAULT_DOMAINSOCKET */
 
       if (fp != NULL)
       {
@@ -248,12 +252,17 @@ cupsServer(void)
     strlcpy(cg->server, server, sizeof(cg->server));
 
     if (cg->server[0] != '/' && (port = strrchr(cg->server, ':')) != NULL &&
-        isdigit(port[1] & 255))
+        !strchr(port, ']') && isdigit(port[1] & 255))
     {
       *port++ = '\0';
 
       ippSetPort(atoi(port));
     }
+
+    if (cg->server[0] == '/')
+      strcpy(cg->servername, "localhost");
+    else
+      strlcpy(cg->servername, cg->server, sizeof(cg->servername));
   }
 
   return (cg->server);
@@ -284,13 +293,32 @@ cupsSetPasswordCB(const char *(*cb)(const char *))	/* I - Callback function */
 void
 cupsSetServer(const char *server)	/* I - Server name */
 {
+  char		*port;			/* Pointer to port */
   _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
 
 
   if (server)
+  {
     strlcpy(cg->server, server, sizeof(cg->server));
+
+    if (cg->server[0] != '/' && (port = strrchr(cg->server, ':')) != NULL &&
+        !strchr(port, ']') && isdigit(port[1] & 255))
+    {
+      *port++ = '\0';
+
+      ippSetPort(atoi(port));
+    }
+
+    if (cg->server[0] == '/')
+      strcpy(cg->servername, "localhost");
+    else
+      strlcpy(cg->servername, cg->server, sizeof(cg->servername));
+  }
   else
-    cg->server[0] = '\0';
+  {
+    cg->server[0]     = '\0';
+    cg->servername[0] = '\0';
+  }
 }
 
 

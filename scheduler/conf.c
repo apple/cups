@@ -1061,7 +1061,7 @@ get_address(const char  *value,		/* I - Value string */
 
   strlcpy(buffer, value, sizeof(buffer));
 
-  if ((portname = strrchr(buffer, ':')) != NULL)
+  if ((portname = strrchr(buffer, ':')) != NULL && !strchr(portname, ']'))
   {
     *portname++ = '\0';
     hostname = buffer;
@@ -2322,7 +2322,7 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
       * Extract the port name from the address...
       */
 
-      if ((portname = strrchr(value, ':')) != NULL)
+      if ((portname = strrchr(value, ':')) != NULL && !strchr(portname, ']'))
       {
         *portname++ = '\0';
 

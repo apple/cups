@@ -29,7 +29,7 @@ if test "$uname" != "IRIX"; then
 	AC_CHECK_LIB(nsl,gethostbyaddr,NETLIBS="$NETLIBS -lnsl")
 fi
 
-AC_CHECK_FUNCS(getaddrinfo getifaddrs hstrerror rresvport_af)
+AC_CHECK_FUNCS(getaddrinfo getifaddrs getnameinfo hstrerror rresvport_af)
 
 AC_CHECK_MEMBER(struct sockaddr.sa_len,,,[#include <sys/socket.h>])
 AC_CHECK_HEADER(sys/sockio.h,AC_DEFINE(HAVE_SYS_SOCKIO_H))
@@ -57,12 +57,11 @@ AC_DEFINE_UNQUOTED(CUPS_MAX_FDS, $maxfiles)
 CUPS_DEFAULT_DOMAINSOCKET=""
 
 dnl Domain socket support...
-AC_ARG_ENABLE(domainsocket, [  --enable-domainsocket   turn on domain socket support, default=yes])
 AC_ARG_WITH(domainsocket, [  --with-domainsocket     set unix domain socket name],
 	default_domainsocket="$withval",
 	default_domainsocket="")
 
-if test x$enable_domainsocket != xno; then
+if test x$enable_domainsocket != xno -a x$default_domainsocket != xno; then
 	if test "x$default_domainsocket" = x; then
 		case "$uname" in
 			Darwin*)
@@ -79,12 +78,12 @@ if test x$enable_domainsocket != xno; then
 	fi
 
 	CUPS_LISTEN_DOMAINSOCKET="Listen $CUPS_DEFAULT_DOMAINSOCKET"
+
+	AC_DEFINE_UNQUOTED(CUPS_DEFAULT_DOMAINSOCKET, "$CUPS_DEFAULT_DOMAINSOCKET")
 else
-	CUPS_DEFAULT_DOMAINSOCKET=""
 	CUPS_LISTEN_DOMAINSOCKET=""
 fi
 
-AC_DEFINE_UNQUOTED(CUPS_DEFAULT_DOMAINSOCKET, "$CUPS_DEFAULT_DOMAINSOCKET")
 AC_SUBST(CUPS_LISTEN_DOMAINSOCKET)
 
 dnl

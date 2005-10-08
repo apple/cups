@@ -110,8 +110,7 @@ typedef struct _cups_globals_s		/**** CUPS global state data ****/
   http_encryption_t	encryption;	/* Encryption setting */
   char			user[65],	/* User name */
 			server[256],	/* Server address */
-			domain_socket[256];
-					/* Domain socket address */
+			servername[256];/* Server hostname */
   const char		*(*password_cb)(const char *);
 					/* Password callback */
 

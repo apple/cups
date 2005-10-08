@@ -61,7 +61,7 @@
  * Do we have domain socket support?
  */
 
-#define CUPS_DEFAULT_DOMAINSOCKET ""
+#undef CUPS_DEFAULT_DOMAINSOCKET
 
 
 /*
@@ -272,6 +272,13 @@
  */
 
 #undef HAVE_GETADDRINFO
+
+
+/*
+ * Do we have getnameinfo()?
+ */
+
+#undef HAVE_GETNAMEINFO
 
 
 /*

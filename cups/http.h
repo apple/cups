@@ -103,6 +103,69 @@ extern "C" {
  * Types and structures...
  */
 
+typedef enum http_auth_e		/**** HTTP authentication types ****/
+{
+  HTTP_AUTH_NONE,			/* No authentication in use */
+  HTTP_AUTH_BASIC,			/* Basic authentication in use */
+  HTTP_AUTH_MD5,			/* Digest authentication in use */
+  HTTP_AUTH_MD5_SESS,			/* MD5-session authentication in use */
+  HTTP_AUTH_MD5_INT,			/* Digest authentication in use for body */
+  HTTP_AUTH_MD5_SESS_INT		/* MD5-session authentication in use for body */
+} http_auth_t;
+
+typedef enum http_encoding_e		/**** HTTP transfer encoding values ****/
+{
+  HTTP_ENCODE_LENGTH,			/* Data is sent with Content-Length */
+  HTTP_ENCODE_CHUNKED			/* Data is chunked */
+} http_encoding_t;
+
+typedef enum http_encryption_e		/**** HTTP encryption values ****/
+{
+  HTTP_ENCRYPT_IF_REQUESTED,		/* Encrypt if requested (TLS upgrade) */
+  HTTP_ENCRYPT_NEVER,			/* Never encrypt */
+  HTTP_ENCRYPT_REQUIRED,		/* Encryption is required (TLS upgrade) */
+  HTTP_ENCRYPT_ALWAYS			/* Always encrypt (SSL) */
+} http_encryption_t;
+
+typedef enum http_field_e		/**** HTTP field names ****/
+{
+  HTTP_FIELD_UNKNOWN = -1,		/* Unknown field */
+  HTTP_FIELD_ACCEPT_LANGUAGE,		/* Accept-Language field */
+  HTTP_FIELD_ACCEPT_RANGES,		/* Accept-Ranges field */
+  HTTP_FIELD_AUTHORIZATION,		/* Authorization field */
+  HTTP_FIELD_CONNECTION,		/* Connection field */
+  HTTP_FIELD_CONTENT_ENCODING,		/* Content-Encoding field */
+  HTTP_FIELD_CONTENT_LANGUAGE,		/* Content-Language field */
+  HTTP_FIELD_CONTENT_LENGTH,		/* Content-Length field */
+  HTTP_FIELD_CONTENT_LOCATION,		/* Content-Location field */
+  HTTP_FIELD_CONTENT_MD5,		/* Content-MD5 field */
+  HTTP_FIELD_CONTENT_RANGE,		/* Content-Range field */
+  HTTP_FIELD_CONTENT_TYPE,		/* Content-Type field */
+  HTTP_FIELD_CONTENT_VERSION,		/* Content-Version field */
+  HTTP_FIELD_DATE,			/* Date field */
+  HTTP_FIELD_HOST,			/* Host field */
+  HTTP_FIELD_IF_MODIFIED_SINCE,		/* If-Modified-Since field */
+  HTTP_FIELD_IF_UNMODIFIED_SINCE,	/* If-Unmodified-Since field */
+  HTTP_FIELD_KEEP_ALIVE,		/* Keep-Alive field */
+  HTTP_FIELD_LAST_MODIFIED,		/* Last-Modified field */
+  HTTP_FIELD_LINK,			/* Link field */
+  HTTP_FIELD_LOCATION,			/* Location field */
+  HTTP_FIELD_RANGE,			/* Range field */
+  HTTP_FIELD_REFERER,			/* Referer field */
+  HTTP_FIELD_RETRY_AFTER,		/* Retry-After field */
+  HTTP_FIELD_TRANSFER_ENCODING,		/* Transfer-Encoding field */
+  HTTP_FIELD_UPGRADE,			/* Upgrade field */
+  HTTP_FIELD_USER_AGENT,		/* User-Agent field */
+  HTTP_FIELD_WWW_AUTHENTICATE,		/* WWW-Authenticate field */
+  HTTP_FIELD_MAX			/* Maximum field index */
+} http_field_t;
+
+typedef enum http_keepalive_e		/**** HTTP keep-alive values ****/
+{
+  HTTP_KEEPALIVE_OFF = 0,		/* No keep alive support */
+  HTTP_KEEPALIVE_ON			/* Use keep alive */
+} http_keepalive_t;
+
 typedef enum http_state_e		/**** HTTP state values; states
 					 **** are server-oriented...
 					 ****/
@@ -122,43 +185,6 @@ typedef enum http_state_e		/**** HTTP state values; states
   HTTP_CLOSE,				/* CLOSE command, waiting for blank line */
   HTTP_STATUS				/* Command complete, sending status */
 } http_state_t;
-
-typedef enum http_version_e		/**** HTTP version numbers ****/
-{
-  HTTP_0_9 = 9,				/* HTTP/0.9 */
-  HTTP_1_0 = 100,			/* HTTP/1.0 */
-  HTTP_1_1 = 101			/* HTTP/1.1 */
-} http_version_t;
-
-typedef enum http_keepalive_e		/**** HTTP keep-alive values ****/
-{
-  HTTP_KEEPALIVE_OFF = 0,		/* No keep alive support */
-  HTTP_KEEPALIVE_ON			/* Use keep alive */
-} http_keepalive_t;
-
-typedef enum http_encoding_e		/**** HTTP transfer encoding values ****/
-{
-  HTTP_ENCODE_LENGTH,			/* Data is sent with Content-Length */
-  HTTP_ENCODE_CHUNKED			/* Data is chunked */
-} http_encoding_t;
-
-typedef enum http_encryption_e		/**** HTTP encryption values ****/
-{
-  HTTP_ENCRYPT_IF_REQUESTED,		/* Encrypt if requested (TLS upgrade) */
-  HTTP_ENCRYPT_NEVER,			/* Never encrypt */
-  HTTP_ENCRYPT_REQUIRED,		/* Encryption is required (TLS upgrade) */
-  HTTP_ENCRYPT_ALWAYS			/* Always encrypt (SSL) */
-} http_encryption_t;
-
-typedef enum http_auth_e		/**** HTTP authentication types ****/
-{
-  HTTP_AUTH_NONE,			/* No authentication in use */
-  HTTP_AUTH_BASIC,			/* Basic authentication in use */
-  HTTP_AUTH_MD5,			/* Digest authentication in use */
-  HTTP_AUTH_MD5_SESS,			/* MD5-session authentication in use */
-  HTTP_AUTH_MD5_INT,			/* Digest authentication in use for body */
-  HTTP_AUTH_MD5_SESS_INT		/* MD5-session authentication in use for body */
-} http_auth_t;
 
 typedef enum http_status_e		/**** HTTP status codes ****/
 {
@@ -208,38 +234,22 @@ typedef enum http_status_e		/**** HTTP status codes ****/
   HTTP_NOT_SUPPORTED			/* HTTP version not supported */
 } http_status_t;
 
-typedef enum http_field_e		/**** HTTP field names ****/
+typedef enum http_uri_status_e		/**** URI separation status @since CUPS1.2@ ****/
 {
-  HTTP_FIELD_UNKNOWN = -1,		/* Unknown field */
-  HTTP_FIELD_ACCEPT_LANGUAGE,		/* Accept-Language field */
-  HTTP_FIELD_ACCEPT_RANGES,		/* Accept-Ranges field */
-  HTTP_FIELD_AUTHORIZATION,		/* Authorization field */
-  HTTP_FIELD_CONNECTION,		/* Connection field */
-  HTTP_FIELD_CONTENT_ENCODING,		/* Content-Encoding field */
-  HTTP_FIELD_CONTENT_LANGUAGE,		/* Content-Language field */
-  HTTP_FIELD_CONTENT_LENGTH,		/* Content-Length field */
-  HTTP_FIELD_CONTENT_LOCATION,		/* Content-Location field */
-  HTTP_FIELD_CONTENT_MD5,		/* Content-MD5 field */
-  HTTP_FIELD_CONTENT_RANGE,		/* Content-Range field */
-  HTTP_FIELD_CONTENT_TYPE,		/* Content-Type field */
-  HTTP_FIELD_CONTENT_VERSION,		/* Content-Version field */
-  HTTP_FIELD_DATE,			/* Date field */
-  HTTP_FIELD_HOST,			/* Host field */
-  HTTP_FIELD_IF_MODIFIED_SINCE,		/* If-Modified-Since field */
-  HTTP_FIELD_IF_UNMODIFIED_SINCE,	/* If-Unmodified-Since field */
-  HTTP_FIELD_KEEP_ALIVE,		/* Keep-Alive field */
-  HTTP_FIELD_LAST_MODIFIED,		/* Last-Modified field */
-  HTTP_FIELD_LINK,			/* Link field */
-  HTTP_FIELD_LOCATION,			/* Location field */
-  HTTP_FIELD_RANGE,			/* Range field */
-  HTTP_FIELD_REFERER,			/* Referer field */
-  HTTP_FIELD_RETRY_AFTER,		/* Retry-After field */
-  HTTP_FIELD_TRANSFER_ENCODING,		/* Transfer-Encoding field */
-  HTTP_FIELD_UPGRADE,			/* Upgrade field */
-  HTTP_FIELD_USER_AGENT,		/* User-Agent field */
-  HTTP_FIELD_WWW_AUTHENTICATE,		/* WWW-Authenticate field */
-  HTTP_FIELD_MAX			/* Maximum field index */
-} http_field_t;
+  HTTP_URI_BAD_ARGUMENTS = -2,		/* Bad arguments to function (error) */
+  HTTP_URI_BAD_HOSTNAME = -1,		/* Bad hostname in URI (error) */
+  HTTP_URI_OK = 0,			/* URI decoded OK */
+  HTTP_URI_MISSING_SCHEME,		/* Missing scheme in URI (warning) */
+  HTTP_URI_UNKNOWN_SCHEME,		/* Unknown scheme in URI (warning) */
+  HTTP_URI_MISSING_RESOURCE		/* Missing resource in URI (warning) */
+} http_uri_status_t;
+
+typedef enum http_version_e		/**** HTTP version numbers ****/
+{
+  HTTP_0_9 = 9,				/* HTTP/0.9 */
+  HTTP_1_0 = 100,			/* HTTP/1.0 */
+  HTTP_1_1 = 101			/* HTTP/1.1 */
+} http_version_t;
 
 typedef union http_addr_u		/**** Socket address union, which
 					 **** makes using IPv6 and other
@@ -404,6 +414,11 @@ extern int		httpFlushWrite(http_t *http);
 extern const char	*httpGetDateString2(time_t t, char *s, int slen);
 extern const char	*httpGetHostname(char *s, int slen);
 extern off_t		httpGetLength2(http_t *http);
+extern http_uri_status_t httpSeparate3(const char *uri,
+			               char *method, int methodlen,
+			               char *username, int usernamelen,
+				       char *host, int hostlen, int *port,
+				       char *resource, int resourcelen);
 extern void		httpSetLength(http_t *http, off_t length);
 
 
