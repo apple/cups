@@ -178,14 +178,15 @@ CFArrayRef CDSAGetServerCerts();
  * Local functions...
  */
 
-static int	get_address(const char *value, unsigned defaddress, int defport,
-		            int deffamily, http_addr_t *address);
-static int	get_addr_and_mask(const char *value, unsigned *ip,
-		                  unsigned *mask);
-static int	parse_aaa(cupsd_location_t *loc, char *line, char *value, int linenum);
-static int	read_configuration(cups_file_t *fp);
-static int	read_location(cups_file_t *fp, char *name, int linenum);
-static int	read_policy(cups_file_t *fp, char *name, int linenum);
+static http_addrlist_t	*get_address(const char *value, unsigned defaddress,
+			             int defport, int deffamily);
+static int		get_addr_and_mask(const char *value, unsigned *ip,
+			                  unsigned *mask);
+static int		parse_aaa(cupsd_location_t *loc, char *line,
+			          char *value, int linenum);
+static int		read_configuration(cups_file_t *fp);
+static int		read_location(cups_file_t *fp, char *name, int linenum);
+static int		read_policy(cups_file_t *fp, char *name, int linenum);
 
 
 /*
@@ -1028,17 +1029,18 @@ cupsdReadConfiguration(void)
  * 'get_address()' - Get an address + port number from a line.
  */
 
-static int				/* O - 1 if address good, 0 if bad */
+static http_addrlist_t *		/* O - Pointer to list if address good, NULL if bad */
 get_address(const char  *value,		/* I - Value string */
             unsigned    defaddress,	/* I - Default address */
 	    int         defport,	/* I - Default port */
-	    int         deffamily,	/* I - Default family */
-            http_addr_t *address)	/* O - Socket address */
+	    int         deffamily)	/* I - Default family */
 {
-  char			hostname[1024],	/* Hostname or IP */
+  char			buffer[1024],	/* Hostname + port number buffer */
+			defpname[255],	/* Default port name */
+			*hostname,	/* Hostname or IP */
 			*portname;	/* Port number or name */
-  http_addrlist_t	*addrlist;	/* Address list */
   int			portnum;	/* Port number */
+  http_addrlist_t	*addrlist;	/* Address list */
   struct servent	*service;	/* Service entry */
 
 
@@ -1049,115 +1051,71 @@ get_address(const char  *value,		/* I - Value string */
   if (!*value)
   {
     cupsdLogMessage(CUPSD_LOG_ERROR, "Bad (empty) address!");
-    return (0);
+    return (NULL);
   }
 
  /*
-  * Initialize the socket address to the defaults...
+  * Grab a hostname and port number; if there is no colon and the port name
+  * is only digits, then we have a port number by itself...
   */
 
-  memset(address, 0, sizeof(http_addr_t));
+  strlcpy(buffer, value, sizeof(buffer));
 
-#ifdef AF_INET6
-  if (deffamily == AF_INET6)
+  if ((portname = strrchr(buffer, ':')) != NULL)
   {
-    address->ipv6.sin6_family            = AF_INET6;
-    address->ipv6.sin6_addr.s6_addr32[0] = htonl(defaddress);
-    address->ipv6.sin6_addr.s6_addr32[1] = htonl(defaddress);
-    address->ipv6.sin6_addr.s6_addr32[2] = htonl(defaddress);
-    address->ipv6.sin6_addr.s6_addr32[3] = htonl(defaddress);
-    address->ipv6.sin6_port              = htons(defport);
-  }
-  else
-#endif /* AF_INET6 */
-  {
-    address->ipv4.sin_family      = AF_INET;
-    address->ipv4.sin_addr.s_addr = htonl(defaddress);
-    address->ipv4.sin_port        = htons(defport);
-  }
-
-#ifdef AF_LOCAL
- /*
-  * If the address starts with a "/", it is a domain socket...
-  */
-
-  if (*value == '/')
-  {
-    if (strlen(value) >= sizeof(address->un.sun_path))
-    {
-      cupsdLogMessage(CUPSD_LOG_ERROR, "Domain socket name \"%s\" too long!",
-                      value);
-      return (0);
-    }
-
-    address->un.sun_family = AF_LOCAL;
-    strcpy(address->un.sun_path, value);
-
-    return (1);
-  }
-#endif /* AF_LOCAL */
-
- /*
-  * Try to grab a hostname and port number...
-  */
-
-  strlcpy(hostname, value, sizeof(hostname));
-
-  if ((portname = strrchr(hostname, ':')) != NULL)
     *portname++ = '\0';
-  else if (isdigit(value[0] & 255))
-  {
-   /*
-    * Port number...
-    */
-
-#ifdef AF_INET6
-    if (deffamily == AF_INET6)
-      address->ipv6.sin6_port = htons(atoi(value));
-    else
-#endif /* AF_INET6 */
-    address->ipv4.sin_port = htons(atoi(value));
-
-    return (1);
+    hostname = buffer;
   }
   else
   {
-   /*
-    * Hostname by itself...
-    */
+    for (portname = buffer; isdigit(*portname & 255); portname ++);
 
-    portname = NULL;
+    if (*portname)
+    {
+     /*
+      * Use the default port...
+      */
+
+      sprintf(defpname, "%d", defport);
+      portname = defpname;
+      hostname = buffer;
+    }
+    else
+    {
+     /*
+      * The buffer contains just a port number...
+      */
+
+      portname = buffer;
+      hostname = NULL;
+    }
   }
 
+  if (!strcmp(hostname, "*"))
+    hostname = NULL;
+
  /*
-  * Decode the hostname and port number as needed...
+  * Now lookup the address or use the default address...
   */
 
-  if (hostname[0] && strcmp(hostname, "*"))
+  if (hostname)
   {
-    if ((addrlist = httpAddrGetList(hostname, deffamily, portname)) == NULL)
-    {
+   /*
+    * Use httpAddrGetList() to get 1 or more addresses for the
+    * hostname and port name...
+    */
+
+    if ((addrlist = httpAddrGetList(hostname, AF_UNSPEC, portname)) == NULL)
       cupsdLogMessage(CUPSD_LOG_ERROR, "Hostname lookup for \"%s\" failed!",
                       hostname);
-      return (0);
-    }
-
-    memcpy(address, &(addrlist->addr), httpAddrLength(&(addrlist->addr)));
-
-    if (!portname)
-    {
-#ifdef AF_INET6
-      if (address->addr.sa_family == AF_INET6)
-	address->ipv6.sin6_port = htons(atoi(value));
-      else
-#endif /* AF_INET6 */
-      address->ipv4.sin_port = htons(atoi(value));
-    }
-
-    httpAddrFreeList(addrlist);
   }
-  else if (portname)
+  else
   {
+   /*
+    * Create up to 2 addresses entry using the default address and
+    * family, and set the port...
+    */
+
     if (isdigit(*portname & 255))
       portnum = atoi(portname);
     else if ((service = getservbyname(portname, NULL)) != NULL)
@@ -1166,18 +1124,69 @@ get_address(const char  *value,		/* I - Value string */
     {
       cupsdLogMessage(CUPSD_LOG_ERROR, "Service lookup for \"%s\" failed!",
                       portname);
-      return (0);
+      free(addrlist);
+      return (NULL);
+    }
+
+    addrlist = (http_addrlist_t *)calloc(1, sizeof(http_addrlist_t));
+
+    if (!addrlist)
+    {
+      cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to allocate address for \"%s\"!",
+                      value);
+      return (NULL);
     }
 
 #ifdef AF_INET6
     if (deffamily == AF_INET6)
-      address->ipv6.sin6_port = htons(portnum);
+    {
+      addrlist->addr.ipv6.sin6_family            = AF_INET6;
+      addrlist->addr.ipv6.sin6_addr.s6_addr32[0] = htonl(defaddress);
+      addrlist->addr.ipv6.sin6_addr.s6_addr32[1] = htonl(defaddress);
+      addrlist->addr.ipv6.sin6_addr.s6_addr32[2] = htonl(defaddress);
+      addrlist->addr.ipv6.sin6_addr.s6_addr32[3] = htonl(defaddress);
+      addrlist->addr.ipv6.sin6_port              = htons(portnum);
+    }
     else
 #endif /* AF_INET6 */
-    address->ipv4.sin_port = htons(portnum);
+    {
+      addrlist->addr.ipv4.sin_family      = AF_INET;
+      addrlist->addr.ipv4.sin_addr.s_addr = htonl(defaddress);
+      addrlist->addr.ipv4.sin_port        = htons(portnum);
+    }
+
+#if defined(AF_INET6) && defined(__OpenBSD__)
+   /*
+    * Since OpenBSD does no allow an IPv6 socket to accept IPv4 connections,
+    * add an IPv4 address...
+    */
+
+    if (deffamily == AF_INET6 && !defaddress)
+    {
+     /*
+      * Add an additional IPv4 address...
+      */
+
+      http_addrlist_t	*ipv4;		/* IPv4 address */
+
+
+      ipv4 = (http_addrlist_t *)calloc(1, sizeof(http_addrlist_t));
+      if (!ipv4)
+	cupsdLogMessage(CUPSD_LOG_ERROR,
+	                "Unable to allocate IPv4 address for \"%s\"!", value);
+      {
+        addrlist->next = ipv4;
+
+	ipv4->addr.ipv4.sin_family      = AF_INET;
+	ipv4->addr.ipv4.sin_addr.s_addr = htonl(defaddress);
+	ipv4->addr.ipv4.sin_port        = htons(defport);
+        ipv4->addr.ipv4.sin_port        = htons(portnum);
+      }
+    }
+#endif /* AF_INET6 && __OpenBSD__ */
   }
 
-  return (1);
+  return (addrlist);
 }
 
 
@@ -1709,11 +1718,12 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 			quote;		/* Quote character */
   int			valuelen;	/* Length of value */
   cupsd_var_t		*var;		/* Current variable */
+  http_addrlist_t	*addrlist,	/* Address list */
+			*addr;		/* Current address */
   unsigned		ip[4],		/* Address value */
 			mask[4];	/* Netmask value */
   cupsd_dirsvc_relay_t	*relay;		/* Relay data */
   cupsd_dirsvc_poll_t	*poll;		/* Polling data */
-  http_addr_t		polladdr;	/* Polling address */
   cupsd_location_t	*location;	/* Browse location */
   cups_file_t		*incfile;	/* Include file */
   char			incname[1024];	/* Include filename */
@@ -1790,90 +1800,73 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
         return (0);
       }
     }
-    else if (!strcasecmp(line, "Port") || !strcasecmp(line, "Listen"))
-    {
-     /*
-      * Add a listening address to the list...
-      */
-
-      cupsd_listener_t	*lis;		/* New listeners array */
-
-
-      if (NumListeners == 0)
-        lis = malloc(sizeof(cupsd_listener_t));
-      else
-        lis = realloc(Listeners, (NumListeners + 1) * sizeof(cupsd_listener_t));
-
-      if (!lis)
-      {
-        cupsdLogMessage(CUPSD_LOG_ERROR,
-	                "Unable to allocate %s at line %d - %s.",
-	                line, linenum, strerror(errno));
-        continue;
-      }
-
-      Listeners = lis;
-      lis      += NumListeners;
-
-      memset(lis, 0, sizeof(cupsd_listener_t));
-
-#if defined(AF_INET6) && !defined(__OpenBSD__)
-      if (get_address(value, INADDR_ANY, IPP_PORT, AF_INET6, &(lis->address)))
-#else
-      if (get_address(value, INADDR_ANY, IPP_PORT, AF_INET, &(lis->address)))
-#endif /* AF_INET6  && !__OpenBSD__ */
-      {
-        httpAddrString(&(lis->address), temp, sizeof(temp));
-
-#ifdef AF_INET6
-        if (lis->address.addr.sa_family == AF_INET6)
-          cupsdLogMessage(CUPSD_LOG_INFO, "Listening to %s:%d (IPv6)", temp,
-                          ntohs(lis->address.ipv6.sin6_port));
-	else
-#endif /* AF_INET6 */
-#ifdef AF_LOCAL
-        if (lis->address.addr.sa_family == AF_LOCAL)
-          cupsdLogMessage(CUPSD_LOG_INFO, "Listening to %s (Domain)", temp);
-	else
-#endif /* AF_LOCAL */
-	  cupsdLogMessage(CUPSD_LOG_INFO, "Listening to %s:%d (IPv4)", temp,
-                          ntohs(lis->address.ipv4.sin_port));
-
-	NumListeners ++;
-      }
-      else
-        cupsdLogMessage(CUPSD_LOG_ERROR, "Bad %s address %s at line %d.", line,
-	                value, linenum);
-    }
+    else if (!strcasecmp(line, "Port") || !strcasecmp(line, "Listen")
 #ifdef HAVE_SSL
-    else if (!strcasecmp(line, "SSLPort") || !strcasecmp(line, "SSLListen"))
+             || !strcasecmp(line, "SSLPort") || !strcasecmp(line, "SSLListen")
+#endif /* HAVE_SSL */
+	     )
     {
      /*
-      * Add a listening address to the list...
+      * Add listening address(es) to the list...
       */
 
       cupsd_listener_t	*lis;		/* New listeners array */
 
 
-      if (NumListeners == 0)
-        lis = malloc(sizeof(cupsd_listener_t));
-      else
-        lis = realloc(Listeners, (NumListeners + 1) * sizeof(cupsd_listener_t));
+     /*
+      * Get the address list...
+      */
 
-      if (!lis)
+#if defined(AF_INET6)
+      addrlist = get_address(value, INADDR_ANY, IPP_PORT, AF_INET6);
+#else
+      addrlist = get_address(value, INADDR_ANY, IPP_PORT, AF_INET);
+#endif /* AF_INET6 */
+
+      if (!addrlist)
       {
-        cupsdLogMessage(CUPSD_LOG_ERROR,
-	                "Unable to allocate %s at line %d - %s.",
-	                line, linenum, strerror(errno));
+        cupsdLogMessage(CUPSD_LOG_ERROR, "Bad %s address %s at line %d.", line,
+	                value, linenum);
         continue;
       }
 
-      Listeners = lis;
-      lis      += NumListeners;
+     /*
+      * Add each address...
+      */
 
-      if (get_address(value, INADDR_ANY, IPP_PORT, AF_INET, &(lis->address)))
+      for (addr = addrlist; addr; addr = addr->next)
       {
-        httpAddrString(&(lis->address), temp, sizeof(temp));
+       /*
+        * Allocate another listener...
+	*/
+
+	if (NumListeners == 0)
+          lis = malloc(sizeof(cupsd_listener_t));
+	else
+          lis = realloc(Listeners, (NumListeners + 1) * sizeof(cupsd_listener_t));
+
+	if (!lis)
+	{
+          cupsdLogMessage(CUPSD_LOG_ERROR,
+	                  "Unable to allocate %s at line %d - %s.",
+	                  line, linenum, strerror(errno));
+          break;
+	}
+
+	Listeners = lis;
+	lis      += NumListeners;
+
+       /*
+        * Copy the current address and log it...
+	*/
+
+	memset(lis, 0, sizeof(cupsd_listener_t));
+	memcpy(&(lis->address), &(addr->addr), sizeof(lis->address));
+
+#ifdef HAVE_SSL
+        if (!strcasecmp(line, "SSLPort") || !strcasecmp(line, "SSLListen"))
+          lis->encryption = HTTP_ENCRYPT_ALWAYS;
+#endif /* HAVE_SSL */
 
 #ifdef AF_INET6
         if (lis->address.addr.sa_family == AF_INET6)
@@ -1886,16 +1879,18 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
           cupsdLogMessage(CUPSD_LOG_INFO, "Listening to %s (Domain)", temp);
 	else
 #endif /* AF_LOCAL */
-        cupsdLogMessage(CUPSD_LOG_INFO, "Listening to %s:%d (IPv4)", temp,
+	cupsdLogMessage(CUPSD_LOG_INFO, "Listening to %s:%d (IPv4)", temp,
                         ntohs(lis->address.ipv4.sin_port));
-        lis->encryption = HTTP_ENCRYPT_ALWAYS;
+
 	NumListeners ++;
       }
-      else
-        cupsdLogMessage(CUPSD_LOG_ERROR, "Bad %s address %s at line %d.", line,
-	                value, linenum);
+
+     /*
+      * Free the list...
+      */
+
+      httpAddrFreeList(addrlist);
     }
-#endif /* HAVE_SSL */
     else if (!strcasecmp(line, "BrowseAddress"))
     {
      /*
@@ -1946,8 +1941,12 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 
 	NumBrowsers ++;
       }
-      else if (get_address(value, INADDR_NONE, BrowsePort, AF_INET, &(dira->to)))
+      else if ((addrlist = get_address(value, INADDR_NONE, BrowsePort,
+                                       AF_INET)) != NULL)
       {
+        memcpy(&(dira->to), &(addrlist->addr), sizeof(dira->to));
+	httpAddrFreeList(addrlist);
+
         httpAddrString(&(dira->to), temp, sizeof(temp));
 
 #ifdef AF_INET6
@@ -2267,8 +2266,12 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
       * Get "to" address and port...
       */
 
-      if (get_address(value, INADDR_BROADCAST, BrowsePort, AF_INET, &(relay->to)))
+      if ((addrlist = get_address(value, INADDR_BROADCAST, BrowsePort,
+                                  AF_INET)) != NULL)
       {
+        memcpy(&(relay->to), &(addrlist->addr), sizeof(relay->to));
+	httpAddrFreeList(addrlist);
+
         httpAddrString(&(relay->to), temp, sizeof(temp));
 
         if (relay->from.type == AUTH_IP)
@@ -2310,6 +2313,37 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
       * BrowsePoll address[:port]
       */
 
+      char		*portname;	/* Port name */
+      int		portnum;	/* Port number */
+      struct servent	*service;	/* Service */
+
+
+     /*
+      * Extract the port name from the address...
+      */
+
+      if ((portname = strrchr(value, ':')) != NULL)
+      {
+        *portname++ = '\0';
+
+        if (isdigit(*portname & 255))
+	  portnum = atoi(portname);
+	else if ((service = getservbyname(portname, NULL)) != NULL)
+	  portnum = ntohs(service->s_port);
+	else
+	{
+	  cupsdLogMessage(CUPSD_LOG_ERROR, "Lookup of service \"%s\" failed!",
+	                  portname);
+          continue;
+	}
+      }
+      else
+        portnum = ippPort();
+
+     /*
+      * Add the poll entry...
+      */
+
       if (NumPolled == 0)
         poll = malloc(sizeof(cupsd_dirsvc_poll_t));
       else
@@ -2326,30 +2360,14 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
       Polled = poll;
       poll   += NumPolled;
 
-     /*
-      * Get poll address and port...
-      */
+      NumPolled ++;
+      memset(poll, 0, sizeof(cupsd_dirsvc_poll_t));
 
-      if (get_address(value, INADDR_NONE, ippPort(), AF_INET, &polladdr))
-      {
-	NumPolled ++;
-	memset(poll, 0, sizeof(cupsd_dirsvc_poll_t));
+      strlcpy(poll->hostname, value, sizeof(poll->hostname));
+      poll->port = portnum;
 
-        httpAddrString(&polladdr, poll->hostname, sizeof(poll->hostname));
-
-#ifdef AF_INET6
-        if (polladdr.addr.sa_family == AF_INET6)
-          poll->port = ntohs(polladdr.ipv6.sin6_port);
-	else
-#endif /* AF_INET6 */
-        poll->port = ntohs(polladdr.ipv4.sin_port);
-
-        cupsdLogMessage(CUPSD_LOG_INFO, "Polling %s:%d", poll->hostname,
-	                poll->port);
-      }
-      else
-        cupsdLogMessage(CUPSD_LOG_ERROR, "Bad poll address %s at line %d.",
-	                value, linenum);
+      cupsdLogMessage(CUPSD_LOG_INFO, "Polling %s:%d", poll->hostname,
+	              poll->port);
     }
     else if (!strcasecmp(line, "DefaultAuthType"))
     {
