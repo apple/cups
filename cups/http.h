@@ -74,7 +74,7 @@ extern "C" {
  * core structure and union names, so the same defines or code
  * can't be used on all platforms.
  *
- * The following will likely need tweeking on new platforms that
+ * The following will likely need tweaking on new platforms that
  * support IPv6 - the "s6_addr32" define maps to the 32-bit integer
  * array in the in6_addr union, which is named differently on various
  * platforms.
@@ -100,186 +100,152 @@ extern "C" {
 
 
 /*
- * HTTP state values...
+ * Types and structures...
  */
 
-typedef enum			/* States are server-oriented */
+typedef enum http_state_e		/**** HTTP state values; states
+					 **** are server-oriented...
+					 ****/
 {
-  HTTP_WAITING,			/* Waiting for command */
-  HTTP_OPTIONS,			/* OPTIONS command, waiting for blank line */
-  HTTP_GET,			/* GET command, waiting for blank line */
-  HTTP_GET_SEND,		/* GET command, sending data */
-  HTTP_HEAD,			/* HEAD command, waiting for blank line */
-  HTTP_POST,			/* POST command, waiting for blank line */
-  HTTP_POST_RECV,		/* POST command, receiving data */
-  HTTP_POST_SEND,		/* POST command, sending data */
-  HTTP_PUT,			/* PUT command, waiting for blank line */
-  HTTP_PUT_RECV,		/* PUT command, receiving data */
-  HTTP_DELETE,			/* DELETE command, waiting for blank line */
-  HTTP_TRACE,			/* TRACE command, waiting for blank line */
-  HTTP_CLOSE,			/* CLOSE command, waiting for blank line */
-  HTTP_STATUS			/* Command complete, sending status */
+  HTTP_WAITING,				/* Waiting for command */
+  HTTP_OPTIONS,				/* OPTIONS command, waiting for blank line */
+  HTTP_GET,				/* GET command, waiting for blank line */
+  HTTP_GET_SEND,			/* GET command, sending data */
+  HTTP_HEAD,				/* HEAD command, waiting for blank line */
+  HTTP_POST,				/* POST command, waiting for blank line */
+  HTTP_POST_RECV,			/* POST command, receiving data */
+  HTTP_POST_SEND,			/* POST command, sending data */
+  HTTP_PUT,				/* PUT command, waiting for blank line */
+  HTTP_PUT_RECV,			/* PUT command, receiving data */
+  HTTP_DELETE,				/* DELETE command, waiting for blank line */
+  HTTP_TRACE,				/* TRACE command, waiting for blank line */
+  HTTP_CLOSE,				/* CLOSE command, waiting for blank line */
+  HTTP_STATUS				/* Command complete, sending status */
 } http_state_t;
 
-
-/*
- * HTTP version numbers...
- */
-
-typedef enum
+typedef enum http_version_e		/**** HTTP version numbers ****/
 {
-  HTTP_0_9 = 9,			/* HTTP/0.9 */
-  HTTP_1_0 = 100,		/* HTTP/1.0 */
-  HTTP_1_1 = 101		/* HTTP/1.1 */
+  HTTP_0_9 = 9,				/* HTTP/0.9 */
+  HTTP_1_0 = 100,			/* HTTP/1.0 */
+  HTTP_1_1 = 101			/* HTTP/1.1 */
 } http_version_t;
 
-
-/*
- * HTTP keep-alive values...
- */
-
-typedef enum
+typedef enum http_keepalive_e		/**** HTTP keep-alive values ****/
 {
-  HTTP_KEEPALIVE_OFF = 0,
-  HTTP_KEEPALIVE_ON
+  HTTP_KEEPALIVE_OFF = 0,		/* No keep alive support */
+  HTTP_KEEPALIVE_ON			/* Use keep alive */
 } http_keepalive_t;
 
-
-/*
- * HTTP transfer encoding values...
- */
-
-typedef enum
+typedef enum http_encoding_e		/**** HTTP transfer encoding values ****/
 {
-  HTTP_ENCODE_LENGTH,		/* Data is sent with Content-Length */
-  HTTP_ENCODE_CHUNKED		/* Data is chunked */
+  HTTP_ENCODE_LENGTH,			/* Data is sent with Content-Length */
+  HTTP_ENCODE_CHUNKED			/* Data is chunked */
 } http_encoding_t;
 
-
-/*
- * HTTP encryption values...
- */
-
-typedef enum
+typedef enum http_encryption_e		/**** HTTP encryption values ****/
 {
-  HTTP_ENCRYPT_IF_REQUESTED,	/* Encrypt if requested (TLS upgrade) */
-  HTTP_ENCRYPT_NEVER,		/* Never encrypt */
-  HTTP_ENCRYPT_REQUIRED,	/* Encryption is required (TLS upgrade) */
-  HTTP_ENCRYPT_ALWAYS		/* Always encrypt (SSL) */
+  HTTP_ENCRYPT_IF_REQUESTED,		/* Encrypt if requested (TLS upgrade) */
+  HTTP_ENCRYPT_NEVER,			/* Never encrypt */
+  HTTP_ENCRYPT_REQUIRED,		/* Encryption is required (TLS upgrade) */
+  HTTP_ENCRYPT_ALWAYS			/* Always encrypt (SSL) */
 } http_encryption_t;
 
-
-/*
- * HTTP authentication types...
- */
-
-typedef enum
+typedef enum http_auth_e		/**** HTTP authentication types ****/
 {
-  HTTP_AUTH_NONE,		/* No authentication in use */
-  HTTP_AUTH_BASIC,		/* Basic authentication in use */
-  HTTP_AUTH_MD5,		/* Digest authentication in use */
-  HTTP_AUTH_MD5_SESS,		/* MD5-session authentication in use */
-  HTTP_AUTH_MD5_INT,		/* Digest authentication in use for body */
-  HTTP_AUTH_MD5_SESS_INT	/* MD5-session authentication in use for body */
+  HTTP_AUTH_NONE,			/* No authentication in use */
+  HTTP_AUTH_BASIC,			/* Basic authentication in use */
+  HTTP_AUTH_MD5,			/* Digest authentication in use */
+  HTTP_AUTH_MD5_SESS,			/* MD5-session authentication in use */
+  HTTP_AUTH_MD5_INT,			/* Digest authentication in use for body */
+  HTTP_AUTH_MD5_SESS_INT		/* MD5-session authentication in use for body */
 } http_auth_t;
 
-
-/*
- * HTTP status codes...
- */
-
-typedef enum
+typedef enum http_status_e		/**** HTTP status codes ****/
 {
-  HTTP_ERROR = -1,		/* An error response from httpXxxx() */
+  HTTP_ERROR = -1,			/* An error response from httpXxxx() */
 
-  HTTP_CONTINUE = 100,		/* Everything OK, keep going... */
-  HTTP_SWITCHING_PROTOCOLS,	/* HTTP upgrade to TLS/SSL */
+  HTTP_CONTINUE = 100,			/* Everything OK, keep going... */
+  HTTP_SWITCHING_PROTOCOLS,		/* HTTP upgrade to TLS/SSL */
 
-  HTTP_OK = 200,		/* OPTIONS/GET/HEAD/POST/TRACE command was successful */
-  HTTP_CREATED,			/* PUT command was successful */
-  HTTP_ACCEPTED,		/* DELETE command was successful */
-  HTTP_NOT_AUTHORITATIVE,	/* Information isn't authoritative */
-  HTTP_NO_CONTENT,		/* Successful command, no new data */
-  HTTP_RESET_CONTENT,		/* Content was reset/recreated */
-  HTTP_PARTIAL_CONTENT,		/* Only a partial file was recieved/sent */
+  HTTP_OK = 200,			/* OPTIONS/GET/HEAD/POST/TRACE command was successful */
+  HTTP_CREATED,				/* PUT command was successful */
+  HTTP_ACCEPTED,			/* DELETE command was successful */
+  HTTP_NOT_AUTHORITATIVE,		/* Information isn't authoritative */
+  HTTP_NO_CONTENT,			/* Successful command, no new data */
+  HTTP_RESET_CONTENT,			/* Content was reset/recreated */
+  HTTP_PARTIAL_CONTENT,			/* Only a partial file was recieved/sent */
 
-  HTTP_MULTIPLE_CHOICES = 300,	/* Multiple files match request */
-  HTTP_MOVED_PERMANENTLY,	/* Document has moved permanently */
-  HTTP_MOVED_TEMPORARILY,	/* Document has moved temporarily */
-  HTTP_SEE_OTHER,		/* See this other link... */
-  HTTP_NOT_MODIFIED,		/* File not modified */
-  HTTP_USE_PROXY,		/* Must use a proxy to access this URI */
+  HTTP_MULTIPLE_CHOICES = 300,		/* Multiple files match request */
+  HTTP_MOVED_PERMANENTLY,		/* Document has moved permanently */
+  HTTP_MOVED_TEMPORARILY,		/* Document has moved temporarily */
+  HTTP_SEE_OTHER,			/* See this other link... */
+  HTTP_NOT_MODIFIED,			/* File not modified */
+  HTTP_USE_PROXY,			/* Must use a proxy to access this URI */
 
-  HTTP_BAD_REQUEST = 400,	/* Bad request */
-  HTTP_UNAUTHORIZED,		/* Unauthorized to access host */
-  HTTP_PAYMENT_REQUIRED,	/* Payment required */
-  HTTP_FORBIDDEN,		/* Forbidden to access this URI */
-  HTTP_NOT_FOUND,		/* URI was not found */
-  HTTP_METHOD_NOT_ALLOWED,	/* Method is not allowed */
-  HTTP_NOT_ACCEPTABLE,		/* Not Acceptable */
-  HTTP_PROXY_AUTHENTICATION,	/* Proxy Authentication is Required */
-  HTTP_REQUEST_TIMEOUT,		/* Request timed out */
-  HTTP_CONFLICT,		/* Request is self-conflicting */
-  HTTP_GONE,			/* Server has gone away */
-  HTTP_LENGTH_REQUIRED,		/* A content length or encoding is required */
-  HTTP_PRECONDITION,		/* Precondition failed */
-  HTTP_REQUEST_TOO_LARGE,	/* Request entity too large */
-  HTTP_URI_TOO_LONG,		/* URI too long */
-  HTTP_UNSUPPORTED_MEDIATYPE,	/* The requested media type is unsupported */
-  HTTP_UPGRADE_REQUIRED = 426,	/* Upgrade to SSL/TLS required */
+  HTTP_BAD_REQUEST = 400,		/* Bad request */
+  HTTP_UNAUTHORIZED,			/* Unauthorized to access host */
+  HTTP_PAYMENT_REQUIRED,		/* Payment required */
+  HTTP_FORBIDDEN,			/* Forbidden to access this URI */
+  HTTP_NOT_FOUND,			/* URI was not found */
+  HTTP_METHOD_NOT_ALLOWED,		/* Method is not allowed */
+  HTTP_NOT_ACCEPTABLE,			/* Not Acceptable */
+  HTTP_PROXY_AUTHENTICATION,		/* Proxy Authentication is Required */
+  HTTP_REQUEST_TIMEOUT,			/* Request timed out */
+  HTTP_CONFLICT,			/* Request is self-conflicting */
+  HTTP_GONE,				/* Server has gone away */
+  HTTP_LENGTH_REQUIRED,			/* A content length or encoding is required */
+  HTTP_PRECONDITION,			/* Precondition failed */
+  HTTP_REQUEST_TOO_LARGE,		/* Request entity too large */
+  HTTP_URI_TOO_LONG,			/* URI too long */
+  HTTP_UNSUPPORTED_MEDIATYPE,		/* The requested media type is unsupported */
+  HTTP_UPGRADE_REQUIRED = 426,		/* Upgrade to SSL/TLS required */
 
-  HTTP_SERVER_ERROR = 500,	/* Internal server error */
-  HTTP_NOT_IMPLEMENTED,		/* Feature not implemented */
-  HTTP_BAD_GATEWAY,		/* Bad gateway */
-  HTTP_SERVICE_UNAVAILABLE,	/* Service is unavailable */
-  HTTP_GATEWAY_TIMEOUT,		/* Gateway connection timed out */
-  HTTP_NOT_SUPPORTED		/* HTTP version not supported */
+  HTTP_SERVER_ERROR = 500,		/* Internal server error */
+  HTTP_NOT_IMPLEMENTED,			/* Feature not implemented */
+  HTTP_BAD_GATEWAY,			/* Bad gateway */
+  HTTP_SERVICE_UNAVAILABLE,		/* Service is unavailable */
+  HTTP_GATEWAY_TIMEOUT,			/* Gateway connection timed out */
+  HTTP_NOT_SUPPORTED			/* HTTP version not supported */
 } http_status_t;
 
-
-/*
- * HTTP field names...
- */
-
-typedef enum
+typedef enum http_field_e		/**** HTTP field names ****/
 {
-  HTTP_FIELD_UNKNOWN = -1,
-  HTTP_FIELD_ACCEPT_LANGUAGE,
-  HTTP_FIELD_ACCEPT_RANGES,
-  HTTP_FIELD_AUTHORIZATION,
-  HTTP_FIELD_CONNECTION,
-  HTTP_FIELD_CONTENT_ENCODING,
-  HTTP_FIELD_CONTENT_LANGUAGE,
-  HTTP_FIELD_CONTENT_LENGTH,
-  HTTP_FIELD_CONTENT_LOCATION,
-  HTTP_FIELD_CONTENT_MD5,
-  HTTP_FIELD_CONTENT_RANGE,
-  HTTP_FIELD_CONTENT_TYPE,
-  HTTP_FIELD_CONTENT_VERSION,
-  HTTP_FIELD_DATE,
-  HTTP_FIELD_HOST,
-  HTTP_FIELD_IF_MODIFIED_SINCE,
-  HTTP_FIELD_IF_UNMODIFIED_SINCE,
-  HTTP_FIELD_KEEP_ALIVE,
-  HTTP_FIELD_LAST_MODIFIED,
-  HTTP_FIELD_LINK,
-  HTTP_FIELD_LOCATION,
-  HTTP_FIELD_RANGE,
-  HTTP_FIELD_REFERER,
-  HTTP_FIELD_RETRY_AFTER,
-  HTTP_FIELD_TRANSFER_ENCODING,
-  HTTP_FIELD_UPGRADE,
-  HTTP_FIELD_USER_AGENT,
-  HTTP_FIELD_WWW_AUTHENTICATE,
-  HTTP_FIELD_MAX
+  HTTP_FIELD_UNKNOWN = -1,		/* Unknown field */
+  HTTP_FIELD_ACCEPT_LANGUAGE,		/* Accept-Language field */
+  HTTP_FIELD_ACCEPT_RANGES,		/* Accept-Ranges field */
+  HTTP_FIELD_AUTHORIZATION,		/* Authorization field */
+  HTTP_FIELD_CONNECTION,		/* Connection field */
+  HTTP_FIELD_CONTENT_ENCODING,		/* Content-Encoding field */
+  HTTP_FIELD_CONTENT_LANGUAGE,		/* Content-Language field */
+  HTTP_FIELD_CONTENT_LENGTH,		/* Content-Length field */
+  HTTP_FIELD_CONTENT_LOCATION,		/* Content-Location field */
+  HTTP_FIELD_CONTENT_MD5,		/* Content-MD5 field */
+  HTTP_FIELD_CONTENT_RANGE,		/* Content-Range field */
+  HTTP_FIELD_CONTENT_TYPE,		/* Content-Type field */
+  HTTP_FIELD_CONTENT_VERSION,		/* Content-Version field */
+  HTTP_FIELD_DATE,			/* Date field */
+  HTTP_FIELD_HOST,			/* Host field */
+  HTTP_FIELD_IF_MODIFIED_SINCE,		/* If-Modified-Since field */
+  HTTP_FIELD_IF_UNMODIFIED_SINCE,	/* If-Unmodified-Since field */
+  HTTP_FIELD_KEEP_ALIVE,		/* Keep-Alive field */
+  HTTP_FIELD_LAST_MODIFIED,		/* Last-Modified field */
+  HTTP_FIELD_LINK,			/* Link field */
+  HTTP_FIELD_LOCATION,			/* Location field */
+  HTTP_FIELD_RANGE,			/* Range field */
+  HTTP_FIELD_REFERER,			/* Referer field */
+  HTTP_FIELD_RETRY_AFTER,		/* Retry-After field */
+  HTTP_FIELD_TRANSFER_ENCODING,		/* Transfer-Encoding field */
+  HTTP_FIELD_UPGRADE,			/* Upgrade field */
+  HTTP_FIELD_USER_AGENT,		/* User-Agent field */
+  HTTP_FIELD_WWW_AUTHENTICATE,		/* WWW-Authenticate field */
+  HTTP_FIELD_MAX			/* Maximum field index */
 } http_field_t;
 
-
-/*
- * HTTP address structure (makes using IPv6 a little easier and more portable.)
- */  
-
-typedef union
+typedef union http_addr_u		/**** Socket address union, which
+					 **** makes using IPv6 and other
+					 **** address types easier and
+					 **** more portable. @since CUPS 1.2@
+					 ****/
 {
   struct sockaddr	addr;		/* Base structure for family value */
   struct sockaddr_in	ipv4;		/* IPv4 address */
@@ -289,14 +255,20 @@ typedef union
 #ifdef AF_LOCAL
   struct sockaddr_un	un;		/* Domain socket file */
 #endif /* AF_LOCAL */
-  char			pad[128];	/* Pad to ensure binary compatibility */
+  char			pad[256];	/* Padding to ensure binary compatibility */
 } http_addr_t;
 
-/*
- * HTTP connection structure...
- */
+typedef struct http_addrlist_s		/**** Socket address list, which is
+					 **** used to enumerate all of the
+					 **** addresses that are associated
+					 **** with a hostname. @since CUPS 1.2@
+					 ****/
+{
+  struct http_addrlist_s *next;		/* Pointer to next address in list */
+  http_addr_t		addr;		/* Address */
+} http_addrlist_t;
 
-typedef struct
+typedef struct http_s			/**** HTTP connection structure. ****/
 {
   int			fd;		/* File descriptor for this socket */
   int			blocking;	/* To block or not to block */
@@ -306,14 +278,14 @@ typedef struct
   http_status_t		status;		/* Status of last request */
   http_version_t	version;	/* Protocol version */
   http_keepalive_t	keep_alive;	/* Keep-alive supported? */
-  struct sockaddr_in	oldaddr;	/* Address of connected host */
+  struct sockaddr_in	_hostaddr;	/* Address of connected host @deprecated@ */
   char			hostname[HTTP_MAX_HOST],
   					/* Name of connected host */
 			fields[HTTP_FIELD_MAX][HTTP_MAX_VALUE];
 					/* Field values */
   char			*data;		/* Pointer to data buffer */
   http_encoding_t	data_encoding;	/* Chunked or not */
-  int			_data_remaining;/* Number of bytes left (deprecated) */
+  int			_data_remaining;/* Number of bytes left @deprecated@ */
   int			used;		/* Number of bytes used in buffer */
   char			buffer[HTTP_MAX_BUFFER];
 					/* Buffer for incoming data */
@@ -327,23 +299,22 @@ typedef struct
   void			*tls;		/* TLS state information */
   http_encryption_t	encryption;	/* Encryption requirements */
   /**** New in CUPS 1.1.19 ****/
-  fd_set		*input_set;	/* select() set for httpWait() */
-  http_status_t		expect;		/* Expect: header */
-  char			*cookie;	/* Cookie value(s) */
+  fd_set		*input_set;	/* select() set for httpWait() @since CUPS 1.1.19@ */
+  http_status_t		expect;		/* Expect: header @since CUPS 1.1.19@ */
+  char			*cookie;	/* Cookie value(s) @since CUPS 1.1.19@ */
   /**** New in CUPS 1.1.20 ****/
   char			authstring[HTTP_MAX_VALUE],
-					/* Current Authentication value */
+					/* Current Authentication value @since CUPS 1.1.20@ */
 			userpass[HTTP_MAX_VALUE];
-					/* Username:password string */
-  int			digest_tries;	/* Number of tries for digest auth */
+					/* Username:password string @since CUPS 1.1.20@ */
+  int			digest_tries;	/* Number of tries for digest auth @since CUPS 1.1.20@ */
   /**** New in CUPS 1.2 ****/
-  http_addr_t		hostaddr;	/* Host address and port */
-  int			wused;		/* Write buffer bytes used */
-  off_t			data_remaining;	/* Number of bytes left */
+  http_addr_t		*hostaddr;	/* Current host address and port @since CUPS 1.2@ */
+  http_addrlist_t	*addrlist;	/* List of valid addresses @since CUPS 1.2@ */
+  int			wused;		/* Write buffer bytes used @since CUPS 1.2@ */
+  off_t			data_remaining;	/* Number of bytes left @since CUPS 1.2@ */
 } http_t;
 
-/**** New in CUPS 1.1.20+ ****/
-extern int		httpWriteFlush(http_t *http);
 
 /*
  * Prototypes...
@@ -417,11 +388,13 @@ extern void		httpSeparate2(const char *uri,
 
 /**** New in CUPS 1.2 ****/
 extern int		httpAddrAny(const http_addr_t *addr);
+extern http_addrlist_t	*httpAddrConnect(http_addrlist_t *addrlist, int *sock);
 extern int		httpAddrEqual(const http_addr_t *addr1,
 			              const http_addr_t *addr2);
+extern void		httpAddrFreeList(http_addrlist_t *addrlist);
+extern http_addrlist_t	*httpAddrGetList(const char *hostname, int family,
+			                 const char *service);
 extern int		httpAddrLength(const http_addr_t *addr);
-extern void		httpAddrLoad(const struct hostent *host, int port,
-			             int n, http_addr_t *addr);
 extern int		httpAddrLocalhost(const http_addr_t *addr);
 extern char		*httpAddrLookup(const http_addr_t *addr,
                                         char *name, int namelen);

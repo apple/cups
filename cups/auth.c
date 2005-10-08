@@ -190,7 +190,7 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
   * See if we are accessing localhost...
   */
 
-  if (!httpAddrLocalhost(&http->hostaddr) &&
+  if (!httpAddrLocalhost(http->hostaddr) &&
       strcasecmp(http->hostname, "localhost") != 0)
   {
     DEBUG_puts("cups_local_auth: Not a local connection!");

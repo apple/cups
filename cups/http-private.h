@@ -33,6 +33,16 @@
 
 #  include "config.h"
 
+#  ifdef WIN32
+#    include <io.h>
+#    include <winsock2.h>
+#  else
+#    include <unistd.h>
+#    include <fcntl.h>
+#    include <sys/socket.h>
+#    define closesocket(f) close(f)
+#  endif /* WIN32 */
+
 #  ifdef __sun
 /*
  * Define FD_SETSIZE to CUPS_MAX_FDS on Solaris to get the correct version of

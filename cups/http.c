@@ -235,6 +235,8 @@ httpClose(http_t *http)		/* I - Connection to close */
   if (!http)
     return;
 
+  httpAddrFreeList(http->addrlist);
+
   if (http->input_set)
     free(http->input_set);
 
@@ -290,9 +292,9 @@ httpConnectEncrypt(
     int               port,		/* I - Port number */
     http_encryption_t encryption)	/* I - Type of encryption to use */
 {
-  int			i;		/* Looping var */
   http_t		*http;		/* New HTTP connection */
-  struct hostent	*hostaddr;	/* Host address data */
+  http_addrlist_t	*addrlist;	/* Host address data */
+  char			service[255];	/* Service name */
 
 
   DEBUG_printf(("httpConnectEncrypt(host=\"%s\", port=%d, encryption=%d)\n",
@@ -307,31 +309,9 @@ httpConnectEncrypt(
   * Lookup the host...
   */
 
-  if ((hostaddr = httpGetHostByName(host)) == NULL)
-  {
-   /*
-    * This hack to make users that don't have a localhost entry in
-    * their hosts file or DNS happy...
-    */
+  sprintf(service, "%d", port);
 
-    if (strcasecmp(host, "localhost") != 0)
-      return (NULL);
-    else if ((hostaddr = httpGetHostByName("127.0.0.1")) == NULL)
-      return (NULL);
-  }
-
- /*
-  * Verify that it is an IPv4, IPv6, or domain address...
-  */
-
-  if ((hostaddr->h_addrtype != AF_INET || hostaddr->h_length != 4)
-#ifdef AF_INET6
-      && (hostaddr->h_addrtype != AF_INET6 || hostaddr->h_length != 16)
-#endif /* AF_INET6 */
-#ifdef AF_LOCAL
-      && (hostaddr->h_addrtype != AF_LOCAL)
-#endif /* AF_LOCAL */
-      )
+  if ((addrlist = httpAddrGetList(host, AF_UNSPEC, service)) == NULL)
     return (NULL);
 
  /*
@@ -362,27 +342,23 @@ httpConnectEncrypt(
 
   strlcpy(http->hostname, host, sizeof(http->hostname));
 
-  for (i = 0; hostaddr->h_addr_list[i]; i ++)
-  {
-   /*
-    * Load the address...
-    */
+ /*
+  * Connect to the remote system...
+  */
 
-    httpAddrLoad(hostaddr, port, i, &(http->hostaddr));
+  http->addrlist = addrlist;
 
-   /*
-    * Connect to the remote system...
-    */
-
-    if (!httpReconnect(http))
-      return (http);
-  }
+  if (!httpReconnect(http))
+    return (http);
 
  /*
   * Could not connect to any known address - bail out!
   */
 
+  httpAddrFreeList(addrlist);
+
   free(http);
+
   return (NULL);
 }
 
@@ -1532,8 +1508,7 @@ httpRead(http_t *http,			/* I - HTTP data */
 int					/* O - 0 on success, non-zero on failure */
 httpReconnect(http_t *http)		/* I - HTTP data */
 {
-  int		val;			/* Socket option value */
-  int		status;			/* Connect status */
+  http_addrlist_t	*addr;		/* Connected address */
 
 
   DEBUG_printf(("httpReconnect(http=%p)\n", http));
@@ -1558,68 +1533,15 @@ httpReconnect(http_t *http)		/* I - HTTP data */
 #endif /* WIN32 */
 
  /*
-  * Create the socket and set options to allow reuse.
-  */
-
-  if ((http->fd = socket(http->hostaddr.addr.sa_family, SOCK_STREAM, 0)) < 0)
-  {
-#ifdef WIN32
-    http->error  = WSAGetLastError();
-#else
-    http->error  = errno;
-#endif /* WIN32 */
-    http->status = HTTP_ERROR;
-    return (-1);
-  }
-
-#ifdef FD_CLOEXEC
-  fcntl(http->fd, F_SETFD, FD_CLOEXEC);	/* Close this socket when starting *
-					 * other processes...              */
-#endif /* FD_CLOEXEC */
-
-  val = 1;
-  setsockopt(http->fd, SOL_SOCKET, SO_REUSEADDR, (char *)&val, sizeof(val));
-
-#ifdef SO_REUSEPORT
-  val = 1;
-  setsockopt(http->fd, SOL_SOCKET, SO_REUSEPORT, &val, sizeof(val));
-#endif /* SO_REUSEPORT */
-
- /*
-  * Using TCP_NODELAY improves responsiveness, especially on systems
-  * with a slow loopback interface...  Since we write large buffers
-  * when sending print files and requests, there shouldn't be any
-  * performance penalty for this...
-  */
-
-  val = 1;
-#ifdef WIN32
-  setsockopt(http->fd, IPPROTO_TCP, TCP_NODELAY, (char *)&val, sizeof(val)); 
-#else
-  setsockopt(http->fd, IPPROTO_TCP, TCP_NODELAY, &val, sizeof(val)); 
-#endif /* WIN32 */
-
- /*
   * Connect to the server...
   */
 
-#ifdef AF_INET6
-  if (http->hostaddr.addr.sa_family == AF_INET6)
-    status = connect(http->fd, (struct sockaddr *)&(http->hostaddr),
-                     sizeof(http->hostaddr.ipv6));
-  else
-#endif /* AF_INET6 */
-#ifdef AF_LOCAL
-  if (http->hostaddr.addr.sa_family == AF_LOCAL)
-    status = connect(http->fd, (struct sockaddr *)&(http->hostaddr),
-                     SUN_LEN(&(http->hostaddr.un)));
-  else
-#endif /* AF_LOCAL */
-  status = connect(http->fd, (struct sockaddr *)&(http->hostaddr),
-                   sizeof(http->hostaddr.ipv4));
-
-  if (status < 0)
+  if ((addr = httpAddrConnect(http->addrlist, &(http->fd))) == NULL)
   {
+   /*
+    * Unable to connect...
+    */
+
 #ifdef WIN32
     http->error  = WSAGetLastError();
 #else
@@ -1627,19 +1549,12 @@ httpReconnect(http_t *http)		/* I - HTTP data */
 #endif /* WIN32 */
     http->status = HTTP_ERROR;
 
-#ifdef WIN32
-    closesocket(http->fd);
-#else
-    close(http->fd);
-#endif
-
-    http->fd = -1;
-
     return (-1);
   }
 
-  http->error  = 0;
-  http->status = HTTP_CONTINUE;
+  http->hostaddr = &(addr->addr);
+  http->error    = 0;
+  http->status   = HTTP_CONTINUE;
 
 #ifdef HAVE_SSL
   if (http->encryption == HTTP_ENCRYPT_ALWAYS)

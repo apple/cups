@@ -52,6 +52,7 @@ struct cupsd_client_s
 #ifdef HAVE_SSL
   int			auto_ssl;	/* Automatic test for SSL/TLS */
 #endif /* HAVE_SSL */
+  http_addr_t		clientaddr;	/* Client address */
   char			servername[256];/* Server name for connection */
   int			serverport;	/* Server port for connection */
 };
@@ -83,13 +84,14 @@ VAR http_encryption_t	LocalEncryption	VALUE(HTTP_ENCRYPT_IF_REQUESTED);
 					/* Local port encryption to use */
 VAR int			NumListeners	VALUE(0);
 					/* Number of listening sockets */
-VAR cupsd_listener_t		*Listeners	VALUE(NULL);
+VAR cupsd_listener_t	*Listeners	VALUE(NULL);
 					/* Listening sockets */
 VAR int			NumClients	VALUE(0);
 					/* Number of HTTP clients */
-VAR cupsd_client_t		*Clients	VALUE(NULL);
+VAR cupsd_client_t	*Clients	VALUE(NULL);
 					/* HTTP clients */
-VAR http_addr_t		ServerAddr;	/* Server address */
+VAR http_addrlist_t	*ServerAddrs	VALUE(NULL);
+					/* Server address(es) */
 VAR char		*ServerHeader	VALUE(NULL);
 					/* Server header in requests */
 VAR int			CGIPipes[2]	VALUE2(-1,-1);

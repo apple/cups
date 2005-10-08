@@ -1089,12 +1089,12 @@ cupsGetPPD2(http_t     *http,		/* I - HTTP connection */
   */
 
 #ifdef AF_INET6
-  if (http->hostaddr.addr.sa_family == AF_INET6)
-    http_port = ntohs(http->hostaddr.ipv6.sin6_port);
+  if (http->hostaddr->addr.sa_family == AF_INET6)
+    http_port = ntohs(http->hostaddr->ipv6.sin6_port);
   else
 #endif /* AF_INET6 */
-  if (http->hostaddr.addr.sa_family == AF_INET)
-    http_port = ntohs(http->hostaddr.ipv4.sin_port);
+  if (http->hostaddr->addr.sa_family == AF_INET)
+    http_port = ntohs(http->hostaddr->ipv4.sin_port);
   else
     http_port = ippPort(); 
 

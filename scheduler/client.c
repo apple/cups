@@ -86,7 +86,8 @@ cupsdAcceptClient(cupsd_listener_t *lis)/* I - Listener socket */
   int			count;		/* Count of connections on a host */
   int			val;		/* Parameter value */
   cupsd_client_t	*con;		/* New client pointer */
-  const struct hostent	*host;		/* Host entry for address */
+  http_addrlist_t	*addrlist,	/* List of adddresses for host */
+			*addr;		/* Current address */
   char			*hostname;	/* Hostname for address */
   http_addr_t		temp;		/* Temporary address variable */
   static time_t		last_dos = 0;	/* Time of last DoS attack */
@@ -112,6 +113,7 @@ cupsdAcceptClient(cupsd_listener_t *lis)/* I - Listener socket */
   memset(con, 0, sizeof(cupsd_client_t));
   con->http.activity = time(NULL);
   con->file          = -1;
+  con->http.hostaddr = &(con->clientaddr);
 
  /*
   * Accept the client and get the remote address...
@@ -119,7 +121,7 @@ cupsdAcceptClient(cupsd_listener_t *lis)/* I - Listener socket */
 
   val = sizeof(struct sockaddr_in);
 
-  if ((con->http.fd = accept(lis->fd, (struct sockaddr *)&(con->http.hostaddr),
+  if ((con->http.fd = accept(lis->fd, (struct sockaddr *)con->http.hostaddr,
                              &val)) < 0)
   {
     cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to accept client connection - %s.",
@@ -129,18 +131,18 @@ cupsdAcceptClient(cupsd_listener_t *lis)/* I - Listener socket */
 
 #ifdef AF_INET6
   if (lis->address.addr.sa_family == AF_INET6)
-    con->http.hostaddr.ipv6.sin6_port = lis->address.ipv6.sin6_port;
+    con->http.hostaddr->ipv6.sin6_port = lis->address.ipv6.sin6_port;
   else
 #endif /* AF_INET6 */
   if (lis->address.addr.sa_family == AF_INET)
-    con->http.hostaddr.ipv4.sin_port = lis->address.ipv4.sin_port;
+    con->http.hostaddr->ipv4.sin_port = lis->address.ipv4.sin_port;
 
  /*
   * Check the number of clients on the same address...
   */
 
   for (i = 0, count = 0; i < NumClients; i ++)
-    if (httpAddrEqual(&(Clients[i].http.hostaddr), &(con->http.hostaddr)))
+    if (httpAddrEqual(Clients[i].http.hostaddr, con->http.hostaddr))
     {
       count ++;
       if (count >= MaxClientsPerHost)
@@ -170,7 +172,7 @@ cupsdAcceptClient(cupsd_listener_t *lis)/* I - Listener socket */
   * Get the hostname or format the IP address as needed...
   */
 
-  if (httpAddrLocalhost(&(con->http.hostaddr)))
+  if (httpAddrLocalhost(con->http.hostaddr))
   {
    /*
     * Map accesses from the loopback interface to "localhost"...
@@ -179,23 +181,30 @@ cupsdAcceptClient(cupsd_listener_t *lis)/* I - Listener socket */
     strlcpy(con->http.hostname, "localhost", sizeof(con->http.hostname));
     hostname = con->http.hostname;
   }
-  else if (httpAddrEqual(&(con->http.hostaddr), &ServerAddr))
+  else
   {
    /*
     * Map accesses from the same host to the server name.
     */
 
-    strlcpy(con->http.hostname, ServerName, sizeof(con->http.hostname));
-    hostname = con->http.hostname;
-  }
-  else if (HostNameLookups)
-    hostname = httpAddrLookup(&(con->http.hostaddr), con->http.hostname,
-                              sizeof(con->http.hostname));
-  else
-  {
-    hostname = NULL;
-    httpAddrString(&(con->http.hostaddr), con->http.hostname,
-                   sizeof(con->http.hostname));
+    for (addr = ServerAddrs; addr; addr = addr->next)
+      if (httpAddrEqual(con->http.hostaddr, &(addr->addr)))
+        break;
+
+    if (addr)
+    {
+      strlcpy(con->http.hostname, ServerName, sizeof(con->http.hostname));
+      hostname = con->http.hostname;
+    }
+    else if (HostNameLookups)
+      hostname = httpAddrLookup(con->http.hostaddr, con->http.hostname,
+                                sizeof(con->http.hostname));
+    else
+    {
+      hostname = NULL;
+      httpAddrString(con->http.hostaddr, con->http.hostname,
+                     sizeof(con->http.hostname));
+    }
   }
 
   if (hostname == NULL && HostNameLookups == 2)
@@ -226,40 +235,22 @@ cupsdAcceptClient(cupsd_listener_t *lis)/* I - Listener socket */
     * Do double lookups as needed...
     */
 
-    if ((host = httpGetHostByName(con->http.hostname)) != NULL)
+    if ((addrlist = httpAddrGetList(con->http.hostname, AF_UNSPEC, NULL)) != NULL)
     {
      /*
       * See if the hostname maps to the same IP address...
       */
 
-      if (host->h_addrtype != con->http.hostaddr.addr.sa_family)
-      {
-       /*
-        * Not the right type of address...
-	*/
-
-	host = NULL;
-      }
-      else
-      {
-       /*
-        * Compare all of the addresses against this one...
-	*/
-
-	for (i = 0; host->h_addr_list[i]; i ++)
-	{
-	  httpAddrLoad(host, 0, i, &temp);
-
-          if (httpAddrEqual(&(con->http.hostaddr), &temp))
-	    break;
-        }
-
-        if (!host->h_addr_list[i])
-	  host = NULL;
-      }
+      for (addr = addrlist; addr; addr = addr->next)
+        if (httpAddrEqual(con->http.hostaddr, &(addr->addr)))
+          break;
     }
+    else
+      addr = NULL;
 
-    if (host == NULL)
+    httpAddrFreeList(addrlist);
+
+    if (!addr)
     {
      /*
       * Can't have a hostname that doesn't resolve to the same IP address
@@ -284,21 +275,21 @@ cupsdAcceptClient(cupsd_listener_t *lis)/* I - Listener socket */
   }
 
 #ifdef AF_INET6
-  if (con->http.hostaddr.addr.sa_family == AF_INET6)
+  if (con->http.hostaddr->addr.sa_family == AF_INET6)
     cupsdLogMessage(CUPSD_LOG_DEBUG, "cupsdAcceptClient: %d from %s:%d (IPv6)",
                     con->http.fd, con->http.hostname,
-		    ntohs(con->http.hostaddr.ipv6.sin6_port));
+		    ntohs(con->http.hostaddr->ipv6.sin6_port));
   else
 #endif /* AF_INET6 */
 #ifdef AF_LOCAL
-  if (con->http.hostaddr.addr.sa_family == AF_LOCAL)
+  if (con->http.hostaddr->addr.sa_family == AF_LOCAL)
     cupsdLogMessage(CUPSD_LOG_DEBUG, "cupsdAcceptClient: %d from %s (Domain)",
                     con->http.fd, con->http.hostname);
   else
 #endif /* AF_LOCAL */
   cupsdLogMessage(CUPSD_LOG_DEBUG, "cupsdAcceptClient: %d from %s:%d (IPv4)",
                   con->http.fd, con->http.hostname,
-		  ntohs(con->http.hostaddr.ipv4.sin_port));
+		  ntohs(con->http.hostaddr->ipv4.sin_port));
 
  /*
   * Get the local address the client connected to...
@@ -3265,7 +3256,7 @@ pipe_command(cupsd_client_t *con,	/* I - Client connection */
     strcpy(lang, "LANG=C");
 
   strcpy(remote_addr, "REMOTE_ADDR=");
-  httpAddrString(&(con->http.hostaddr), remote_addr + 12,
+  httpAddrString(con->http.hostaddr, remote_addr + 12,
                  sizeof(remote_addr) - 12);
 
   snprintf(remote_host, sizeof(remote_host), "REMOTE_HOST=%s",

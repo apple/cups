@@ -52,13 +52,6 @@ extern "C" {
 
 
 /*
- * Constants/limits...
- */
-
-#  define CUPS_MAX_ADDRS	100	/* Limit on number of addresses... */
-
-
-/*
  * To make libcups thread safe, define thread safe globals (aka thread-
  * specific data) for the static variables used in the library.
  */
@@ -69,10 +62,8 @@ typedef struct _cups_globals_s		/**** CUPS global state data ****/
   char			http_date[256];	/* Date+time buffer */
 
   /* http-addr.c */
-  unsigned		ip_addrs[CUPS_MAX_ADDRS][4];
-					/* Packed IPv4/6 addresses */
-  char			*ip_ptrs[CUPS_MAX_ADDRS + 1];
-					/* Pointer to packed address */
+  unsigned		ip_addr;	/* Packed IPv4 address */
+  char			*ip_ptrs[2];	/* Pointer to packed address */
   struct hostent	hostent;	/* Host entry for IP address */
 #  ifdef HAVE_GETADDRINFO
   char			hostname[1024];	/* Hostname */
@@ -118,7 +109,9 @@ typedef struct _cups_globals_s		/**** CUPS global state data ****/
   /* usersys.c */
   http_encryption_t	encryption;	/* Encryption setting */
   char			user[65],	/* User name */
-			server[256];	/* Server address */
+			server[256],	/* Server address */
+			domain_socket[256];
+					/* Domain socket address */
   const char		*(*password_cb)(const char *);
 					/* Password callback */
 

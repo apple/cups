@@ -536,7 +536,6 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
 	  int        manual_copies,	/* I - Do copies by hand... */
 	  int        timeout)		/* I - Timeout... */
 {
-  int			i;		/* Looping var */
   FILE			*fp;		/* Job file */
   char			localhost[255];	/* Local host name */
   int			error;		/* Error number */
@@ -546,8 +545,9 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
   char			control[10240],	/* LPD control 'file' */
 			*cptr;		/* Pointer into control file string */
   char			status;		/* Status byte from command */
-  http_addr_t		addr;		/* Socket address */
-  struct hostent	*hostaddr;	/* Host address */
+  char			portname[255];	/* Port name */
+  http_addrlist_t	*addrlist,	/* Address list */
+			*addr;		/* Socket address */
   int			copy;		/* Copies written */
   size_t		nbytes;		/* Number of bytes written */
   off_t			tbytes;		/* Total bytes written */
@@ -574,6 +574,19 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
 #endif /* HAVE_SIGSET */
 
  /*
+  * Find the printer...
+  */
+
+  sprintf(portname, "%d", port);
+
+  if ((addrlist = httpAddrGetList(hostname, AF_UNSPEC, portname)) == NULL)
+  {
+    fprintf(stderr, "ERROR: Unable to locate printer \'%s\'!\n",
+            hostname);
+    return (CUPS_BACKEND_STOP);
+  }
+
+ /*
   * Loop forever trying to print the file...
   */
 
@@ -583,28 +596,29 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
     * First try to reserve a port for this connection...
     */
 
-    if ((hostaddr = httpGetHostByName(hostname)) == NULL)
-    {
-      fprintf(stderr, "ERROR: Unable to locate printer \'%s\' - %s\n",
-              hostname, hstrerror(h_errno));
-      return (CUPS_BACKEND_STOP);
-    }
-
     fprintf(stderr, "INFO: Attempting to connect to host %s for printer %s\n",
             hostname, printer);
 
-    for (lport = reserve == RESERVE_RFC1179 ? 732 : 1024;;)
+    for (lport = reserve == RESERVE_RFC1179 ? 732 : 1024, addr = addrlist;;
+         addr = addr->next)
     {
      /*
       * Stop if this job has been cancelled...
       */
 
       if (abort_job)
+      {
+        httpAddrFreeList(addrlist);
+
         return (CUPS_BACKEND_FAILED);
+      }
 
      /*
       * Choose the next priviledged port...
       */
+
+      if (!addr)
+        addr = addrlist;
 
       lport --;
 
@@ -623,10 +637,12 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
 	* Just create a regular socket...
 	*/
 
-	if ((fd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
+	if ((fd = socket(addr->addr.addr.sa_family, SOCK_STREAM, 0)) < 0)
 	{
           perror("ERROR: Unable to create socket");
-          return (CUPS_BACKEND_FAILED);
+	  sleep(1);
+
+          continue;
 	}
 
         lport = 0;
@@ -638,7 +654,7 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
 	* priviledged lport between 721 and 731...
 	*/
 
-	if ((fd = rresvport_af(&lport, hostaddr->h_addrtype)) < 0)
+	if ((fd = rresvport_af(&lport, addr->addr.addr.sa_family)) < 0)
 	{
 	  perror("ERROR: Unable to reserve port");
 	  sleep(1);
@@ -651,70 +667,68 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
       * Connect to the printer or server...
       */
 
-      for (i = 0; hostaddr->h_addr_list[i]; i ++)
+      if (abort_job)
       {
-        if (abort_job)
-	{
-	  close(fd);
-	  return (CUPS_BACKEND_FAILED);
-	}
+        httpAddrFreeList(addrlist);
 
-        httpAddrLoad(hostaddr, port, i, &addr);
+	close(fd);
 
-	if (!connect(fd, (struct sockaddr *)&addr, sizeof(addr)))
-	  break;
+	return (CUPS_BACKEND_FAILED);
       }
 
-      if (!hostaddr->h_addr_list[i])
+      if (!connect(fd, &(addr->addr.addr), httpAddrLength(&(addr->addr))))
+	break;
+
+      error = errno;
+      close(fd);
+      fd = -1;
+
+      if (addr->next)
+        continue;
+
+      if (getenv("CLASS") != NULL)
       {
-	error = errno;
-	close(fd);
-	fd = -1;
+       /*
+        * If the CLASS environment variable is set, the job was submitted
+	* to a class and not to a specific queue.  In this case, we want
+	* to abort immediately so that the job can be requeued on the next
+	* available printer in the class.
+	*/
 
-	if (getenv("CLASS") != NULL)
-	{
-	 /*
-          * If the CLASS environment variable is set, the job was submitted
-	  * to a class and not to a specific queue.  In this case, we want
-	  * to abort immediately so that the job can be requeued on the next
-	  * available printer in the class.
-	  */
+        fprintf(stderr, "INFO: Unable to connect to %s, queuing on next printer in class...\n",
+		hostname);
 
-          fprintf(stderr, "INFO: Unable to connect to %s, queuing on next printer in class...\n",
-		  hostname);
+        httpAddrFreeList(addrlist);
 
-	 /*
-          * Sleep 5 seconds to keep the job from requeuing too rapidly...
-	  */
+       /*
+        * Sleep 5 seconds to keep the job from requeuing too rapidly...
+	*/
 
-	  sleep(5);
+	sleep(5);
 
-          return (CUPS_BACKEND_FAILED);
-	}
+        return (CUPS_BACKEND_FAILED);
+      }
 
-	if (error == ECONNREFUSED || error == EHOSTDOWN ||
-            error == EHOSTUNREACH)
-	{
-	  fprintf(stderr, "WARNING: Network host \'%s\' is busy, down, or unreachable; will retry in 30 seconds...\n",
-                  hostname);
-	  sleep(30);
-	}
-	else if (error == EADDRINUSE)
-	{
-	 /*
-	  * Try on another port...
-	  */
+      if (error == ECONNREFUSED || error == EHOSTDOWN ||
+          error == EHOSTUNREACH)
+      {
+	fprintf(stderr, "WARNING: Network host \'%s\' is busy, down, or unreachable; will retry in 30 seconds...\n",
+                hostname);
+	sleep(30);
+      }
+      else if (error == EADDRINUSE)
+      {
+       /*
+	* Try on another port...
+	*/
 
-	  sleep(1);
-	}
-	else
-	{
-	  perror("ERROR: Unable to connect to printer; will retry in 30 seconds...");
-          sleep(30);
-	}
+	sleep(1);
       }
       else
-	break;
+      {
+	perror("ERROR: Unable to connect to printer; will retry in 30 seconds...");
+        sleep(30);
+      }
     }
 
     fprintf(stderr, "INFO: Connected to %s...\n", hostname);
@@ -727,6 +741,9 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
 
     if (stat(filename, &filestats))
     {
+      httpAddrFreeList(addrlist);
+      close(fd);
+
       perror("ERROR: unable to stat print file");
       return (CUPS_BACKEND_FAILED);
     }
@@ -735,6 +752,9 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
 
     if ((fp = fopen(filename, "rb")) == NULL)
     {
+      httpAddrFreeList(addrlist);
+      close(fd);
+
       perror("ERROR: unable to open print file for reading");
       return (CUPS_BACKEND_FAILED);
     }
@@ -746,9 +766,13 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
 
     if (lpd_command(fd, timeout, "\002%s\n",
                     printer))		/* Receive print job(s) */
+    {
+      httpAddrFreeList(addrlist);
+      close(fd);
       return (CUPS_BACKEND_FAILED);
+    }
 
-    gethostname(localhost, sizeof(localhost));
+    httpGetHostname(localhost, sizeof(localhost));
     localhost[31] = '\0'; /* RFC 1179, Section 7.2 - host name < 32 chars */
 
     snprintf(control, sizeof(control), "H%s\nP%s\nJ%s\n", localhost, user,
@@ -780,7 +804,12 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
     {
       if (lpd_command(fd, timeout, "\002%d cfA%03.3d%.15s\n", strlen(control),
                       getpid() % 1000, localhost))
+      {
+        httpAddrFreeList(addrlist);
+	close(fd);
+
         return (CUPS_BACKEND_FAILED);
+      }
 
       fprintf(stderr, "INFO: Sending control file (%u bytes)\n",
               (unsigned)strlen(control));
@@ -822,7 +851,12 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
       if (lpd_command(fd, timeout, "\003" CUPS_LLFMT " dfA%03.3d%.15s\n",
                       CUPS_LLCAST filestats.st_size, getpid() % 1000,
 		      localhost))
+      {
+        httpAddrFreeList(addrlist);
+	close(fd);
+
         return (CUPS_BACKEND_FAILED);
+      }
 
       fprintf(stderr, "INFO: Sending data file (" CUPS_LLFMT " bytes)\n",
               CUPS_LLCAST filestats.st_size);
@@ -886,7 +920,12 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
     {
       if (lpd_command(fd, timeout, "\002%d cfA%03.3d%.15s\n", strlen(control),
                       getpid() % 1000, localhost))
+      {
+        httpAddrFreeList(addrlist);
+	close(fd);
+
         return (CUPS_BACKEND_FAILED);
+      }
 
       fprintf(stderr, "INFO: Sending control file (%lu bytes)\n",
               (unsigned long)strlen(control));
@@ -925,7 +964,11 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
     fclose(fp);
 
     if (status == 0)
+    {
+      httpAddrFreeList(addrlist);
+
       return (CUPS_BACKEND_OK);
+    }
 
    /*
     * Waiting for a retry...
@@ -933,6 +976,8 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
 
     sleep(30);
   }
+
+  httpAddrFreeList(addrlist);
 
  /*
   * If we get here, then the job has been cancelled...

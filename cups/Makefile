@@ -44,6 +44,7 @@ LIBOBJS	=	\
 		globals.o \
 		http.o \
 		http-addr.o \
+		http-addrlist.o \
 		http-support.o \
 		ipp.o \
 		ipp-support.o \

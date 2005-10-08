@@ -1113,20 +1113,20 @@ cupsdIsAuthorized(cupsd_client_t *con,	/* I - Connection */
   */
 
 #ifdef AF_INET6
-  if (con->http.hostaddr.addr.sa_family == AF_INET6)
+  if (con->http.hostaddr->addr.sa_family == AF_INET6)
   {
    /*
     * Copy IPv6 address...
     */
 
-    address[0] = ntohl(con->http.hostaddr.ipv6.sin6_addr.s6_addr32[0]);
-    address[1] = ntohl(con->http.hostaddr.ipv6.sin6_addr.s6_addr32[1]);
-    address[2] = ntohl(con->http.hostaddr.ipv6.sin6_addr.s6_addr32[2]);
-    address[3] = ntohl(con->http.hostaddr.ipv6.sin6_addr.s6_addr32[3]);
+    address[0] = ntohl(con->http.hostaddr->ipv6.sin6_addr.s6_addr32[0]);
+    address[1] = ntohl(con->http.hostaddr->ipv6.sin6_addr.s6_addr32[1]);
+    address[2] = ntohl(con->http.hostaddr->ipv6.sin6_addr.s6_addr32[2]);
+    address[3] = ntohl(con->http.hostaddr->ipv6.sin6_addr.s6_addr32[3]);
   }
   else
 #endif /* AF_INET6 */
-  if (con->http.hostaddr.addr.sa_family == AF_INET)
+  if (con->http.hostaddr->addr.sa_family == AF_INET)
   {
    /*
     * Copy IPv4 address...
@@ -1135,7 +1135,7 @@ cupsdIsAuthorized(cupsd_client_t *con,	/* I - Connection */
     address[0] = 0;
     address[1] = 0;
     address[2] = 0;
-    address[3] = ntohl(con->http.hostaddr.ipv4.sin_addr.s_addr);
+    address[3] = ntohl(con->http.hostaddr->ipv4.sin_addr.s_addr);
   }
   else
     memset(address, 0, sizeof(address));

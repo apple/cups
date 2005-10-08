@@ -1035,11 +1035,11 @@ get_address(const char  *value,		/* I - Value string */
 	    int         deffamily,	/* I - Default family */
             http_addr_t *address)	/* O - Socket address */
 {
-  char			hostname[256],	/* Hostname or IP */
-			portname[256],	/* Port number or name */
-			*ptr;		/* Pointer into hostname string */
-  struct hostent	*host;		/* Host address */
-  struct servent	*port;		/* Port number */  
+  char			hostname[1024],	/* Hostname or IP */
+			*portname;	/* Port number or name */
+  http_addrlist_t	*addrlist;	/* Address list */
+  int			portnum;	/* Port number */
+  struct servent	*service;	/* Service entry */
 
 
  /*
@@ -1103,24 +1103,22 @@ get_address(const char  *value,		/* I - Value string */
 
   strlcpy(hostname, value, sizeof(hostname));
 
-  if ((ptr = strrchr(hostname, ':')) != NULL)
-  {
-   /*
-    * Copy hostname and port separately...
-    */
-
-    *ptr++ = '\0';
-
-    strlcpy(portname, ptr, sizeof(portname));
-  }
+  if ((portname = strrchr(hostname, ':')) != NULL)
+    *portname++ = '\0';
   else if (isdigit(value[0] & 255))
   {
    /*
     * Port number...
     */
 
-    hostname[0] = '\0';
-    strlcpy(portname, value, sizeof(portname));
+#ifdef AF_INET6
+    if (deffamily == AF_INET6)
+      address->ipv6.sin6_port = htons(atoi(value));
+    else
+#endif /* AF_INET6 */
+    address->ipv4.sin_port = htons(atoi(value));
+
+    return (1);
   }
   else
   {
@@ -1128,7 +1126,7 @@ get_address(const char  *value,		/* I - Value string */
     * Hostname by itself...
     */
 
-    portname[0] = '\0';
+    portname = NULL;
   }
 
  /*
@@ -1137,45 +1135,46 @@ get_address(const char  *value,		/* I - Value string */
 
   if (hostname[0] && strcmp(hostname, "*"))
   {
-    if ((host = httpGetHostByName(hostname)) == NULL)
+    if ((addrlist = httpAddrGetList(hostname, deffamily, portname)) == NULL)
     {
-      cupsdLogMessage(CUPSD_LOG_ERROR, "httpGetHostByName(\"%s\") failed - %s!",
-                      hostname, hstrerror(h_errno));
+      cupsdLogMessage(CUPSD_LOG_ERROR, "Hostname lookup for \"%s\" failed!",
+                      hostname);
       return (0);
     }
 
-    httpAddrLoad(host, defport, 0, address);
-  }
+    memcpy(address, &(addrlist->addr), httpAddrLength(&(addrlist->addr)));
 
-  if (portname[0] != '\0')
-  {
-    if (isdigit(portname[0] & 255))
+    if (!portname)
     {
 #ifdef AF_INET6
       if (address->addr.sa_family == AF_INET6)
-        address->ipv6.sin6_port = htons(atoi(portname));
+	address->ipv6.sin6_port = htons(atoi(value));
       else
 #endif /* AF_INET6 */
-      address->ipv4.sin_port = htons(atoi(portname));
+      address->ipv4.sin_port = htons(atoi(value));
     }
+
+    httpAddrFreeList(addrlist);
+  }
+  else if (portname)
+  {
+    if (isdigit(*portname & 255))
+      portnum = atoi(portname);
+    else if ((service = getservbyname(portname, NULL)) != NULL)
+      portnum = ntohs(service->s_port);
     else
     {
-      if ((port = getservbyname(portname, NULL)) == NULL)
-      {
-        cupsdLogMessage(CUPSD_LOG_ERROR, "getservbyname(\"%s\") failed - %s!",
-	                portname, strerror(errno));
-        return (0);
-      }
-      else
-      {
-#ifdef AF_INET6
-	if (address->addr.sa_family == AF_INET6)
-          address->ipv6.sin6_port = htons(port->s_port);
-	else
-#endif /* AF_INET6 */
-	address->ipv4.sin_port = htons(port->s_port);
-      }
+      cupsdLogMessage(CUPSD_LOG_ERROR, "Service lookup for \"%s\" failed!",
+                      portname);
+      return (0);
     }
+
+#ifdef AF_INET6
+    if (deffamily == AF_INET6)
+      address->ipv6.sin6_port = htons(portnum);
+    else
+#endif /* AF_INET6 */
+    address->ipv4.sin_port = htons(portnum);
   }
 
   return (1);

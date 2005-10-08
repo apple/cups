@@ -109,7 +109,6 @@ cupsdStartListening(void)
 			p,		/* Port number */
 			val;		/* Parameter value */
   cupsd_listener_t	*lis;		/* Current listening socket */
-  struct hostent	*host;		/* Host entry for server address */
   char			s[256];		/* String addresss */
   const char		*have_domain;	/* Have a domain socket? */
   static const char * const encryptions[] =
@@ -128,27 +127,18 @@ cupsdStartListening(void)
   * Get the server's IP address...
   */
 
-  memset(&ServerAddr, 0, sizeof(ServerAddr));
+  if (ServerAddrs)
+    httpAddrFreeList(ServerAddrs);
 
-  if ((host = httpGetHostByName(ServerName)) != NULL)
-  {
-   /*
-    * Found the server's address!
-    */
-
-    httpAddrLoad(host, 0, 0, &ServerAddr);
-  }
-  else
+  if ((ServerAddrs = httpAddrGetList(ServerName, AF_UNSPEC, NULL)) == NULL)
   {
    /*
     * Didn't find it!  Use an address of 0...
     */
 
     cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "cupsdStartListening: Unable to find IP address for server name \"%s\" - %s\n",
-                    ServerName, hstrerror(h_errno));
-
-    ServerAddr.ipv4.sin_family = AF_INET;
+                    "cupsdStartListening: Unable to find IP address for server name \"%s\"!\n",
+                    ServerName);
   }
 
  /*

@@ -68,7 +68,6 @@ int					/* O - Exit status */
 main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
      char *argv[])			/* I - Command-line arguments */
 {
-  int		i;			/* Looping var */
   char		method[255],		/* Method in URI */
 		hostname[1024],		/* Hostname */
 		username[255],		/* Username info (not used) */
@@ -76,11 +75,11 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   int		fp;			/* Print file */
   int		copies;			/* Number of copies to print */
   int		port;			/* Port number */
+  char		portname[255];		/* Port name */
   int		delay;			/* Delay for retries... */
   int		fd;			/* AppSocket */
   int		error;			/* Error code (if any) */
-  http_addr_t	addr;			/* Socket address */
-  struct hostent *hostaddr;		/* Host address */
+  http_addrlist_t *addrlist;		/* Address list */
   int		rbytes;			/* Number of bytes read */
   int		wbytes;			/* Number of bytes written */
   int		nbytes;			/* Number of bytes read */
@@ -169,10 +168,11 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   * Then try to connect to the remote host...
   */
 
-  if ((hostaddr = httpGetHostByName(hostname)) == NULL)
+  sprintf(portname, "%d", port);
+
+  if ((addrlist = httpAddrGetList(hostname, AF_UNSPEC, portname)) == NULL)
   {
-    fprintf(stderr, "ERROR: Unable to locate printer \'%s\' - %s\n",
-            hostname, hstrerror(h_errno));
+    fprintf(stderr, "ERROR: Unable to locate printer \'%s\'!\n", hostname);
     return (CUPS_BACKEND_STOP);
   }
 
@@ -185,25 +185,10 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   {
     for (delay = 5;;)
     {
-      if ((fd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
-      {
-	perror("ERROR: Unable to create socket");
-	return (CUPS_BACKEND_FAILED);
-      }
-
-      for (i = 0; hostaddr->h_addr_list[i]; i ++)
-      {
-        httpAddrLoad(hostaddr, port, i, &addr);
-
-        if (!connect(fd, (struct sockaddr *)&addr, sizeof(addr)))
-	  break;
-      }
-
-      if (!hostaddr->h_addr_list[i])
+      if (!httpAddrConnect(addrlist, &fd))
       {
 	error = errno;
-	close(fd);
-	fd = -1;
+	fd    = -1;
 
 	if (getenv("CLASS") != NULL)
 	{
@@ -409,6 +394,8 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 
     close(fd);
   }
+
+  httpAddrFreeList(addrlist);
 
  /*
   * Close the input file and return...

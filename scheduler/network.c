@@ -143,6 +143,7 @@ cupsdNetIFUpdate(void)
   cupsd_netif_t		*temp;		/* Current interface */
   struct ifaddrs	*addrs,		/* Interface address list */
 			*addr;		/* Current interface address */
+  http_addrlist_t	*saddr;		/* Current server address */
 
 
  /*
@@ -294,11 +295,18 @@ cupsdNetIFUpdate(void)
 
       if (httpAddrLocalhost(&(temp->address)))
         strcpy(temp->hostname, "localhost");
-      else if (httpAddrEqual(&(temp->address), &ServerAddr))
-        strlcpy(temp->hostname, ServerName, sizeof(temp->hostname));
       else
-        httpAddrString(&(temp->address), temp->hostname,
-	               sizeof(temp->hostname));
+      {
+        for (saddr = ServerAddrs; saddr; saddr = saddr->next)
+	  if (httpAddrEqual(&(temp->address), &(saddr->addr)))
+	    break;
+
+	if (saddr)
+          strlcpy(temp->hostname, ServerName, sizeof(temp->hostname));
+	else
+          httpAddrString(&(temp->address), temp->hostname,
+	        	 sizeof(temp->hostname));
+      }
     }
   }
 

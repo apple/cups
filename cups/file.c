@@ -67,16 +67,6 @@
 #include <cups/debug.h>
 #include <sys/types.h>
 
-#ifdef WIN32
-#  include <io.h>
-#  include <winsock2.h>
-#else
-#  include <unistd.h>
-#  include <fcntl.h>
-#  include <sys/socket.h>
-#  define closesocket(f) close(f)
-#endif /* WIN32 */
-
 #include "file.h"
 #ifdef HAVE_LIBZ
 #  include <zlib.h>
@@ -577,12 +567,7 @@ cupsFileOpen(const char *filename,	/* I - Name of file */
   int		fd;			/* File descriptor */
   char		hostname[1024],		/* Hostname */
 		*portname;		/* Port "name" (number or service) */
-  int		port;			/* Port number */
-  struct servent *service;		/* Service */
-  int		i;			/* Looping var */
-  int		val;			/* Socket value */
-  struct hostent *hostaddr;		/* Host address data */
-  http_addr_t	sockaddr;		/* Socket address */
+  http_addrlist_t *addrlist;		/* Host address list */
 
 
  /*
@@ -618,72 +603,24 @@ cupsFileOpen(const char *filename,	/* I - Name of file */
 	else
 	  return (NULL);
 
-        if ((hostaddr = httpGetHostByName(hostname)) == NULL)
-          return (NULL);
+       /*
+        * Lookup the hostname and service...
+	*/
 
-        if (isdigit(portname[0] & 255))
-	  port = atoi(portname);
-	else if ((service = getservbyname(portname, NULL)) != NULL)
-	  port = ntohs(service->s_port);
-	else
+        if ((addrlist = httpAddrGetList(hostname, AF_UNSPEC, portname)) == NULL)
 	  return (NULL);
 
-	for (i = 0, fd = -1; hostaddr->h_addr_list[i]; i ++)
+       /*
+	* Connect to the server...
+	*/
+
+        if (!httpAddrConnect(addrlist, &fd))
 	{
-	 /*
-	  * Load the address...
-	  */
-
-	  httpAddrLoad(hostaddr, port, i, &sockaddr);
-
-	 /*
-	  * Create a socket...
-	  */
-
-	  if ((fd = socket(sockaddr.addr.sa_family, SOCK_STREAM, 0)) < 0)
-	    continue;
-
-	  val = 1;
-	  setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &val, sizeof(val));
-
-#ifdef SO_REUSEPORT
-	  val = 1;
-	  setsockopt(fd, SOL_SOCKET, SO_REUSEPORT, &val, sizeof(val));
-#endif /* SO_REUSEPORT */
-
-	 /*
-	  * Using TCP_NODELAY improves responsiveness, especially on systems
-	  * with a slow loopback interface...  Since we write large buffers
-	  * when sending print files and requests, there shouldn't be any
-	  * performance penalty for this...
-	  */
-
-	  val = 1;
-	  setsockopt(fd, IPPROTO_TCP, TCP_NODELAY, &val, sizeof(val)); 
-
-	 /*
-	  * Connect to the server...
-	  */
-
-#ifdef AF_INET6
-	  if (sockaddr.addr.sa_family == AF_INET6)
-	  {
-	    if (connect(fd, (struct sockaddr *)&sockaddr,
-			sizeof(sockaddr.ipv6)) < 0)
-	    {
-	      fd = -1;
-	      continue;
-	    }
-	  }
-	  else
-#endif /* AF_INET6 */
-	  if (connect(fd, (struct sockaddr *)&sockaddr,
-		      sizeof(sockaddr.ipv4)) < 0)
-	  {
-	    fd = -1;
-	    continue;
-	  }
+	  httpAddrFreeList(addrlist);
+	  return (NULL);
 	}
+
+	httpAddrFreeList(addrlist);
 	break;
 
     default : /* Remove bogus compiler warning... */

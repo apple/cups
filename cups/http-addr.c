@@ -25,12 +25,12 @@
  *
  *   httpAddrAny()       - Check for the "any" address.
  *   httpAddrEqual()     - Compare two addresses.
- *   httpAddrLoad()      - Load a host entry address into an HTTP address.
  *   httpAddrLocalhost() - Check for the local loopback address.
  *   httpAddrLookup()    - Lookup the hostname associated with the address.
  *   httpAddrString()    - Convert an IP address to a dotted string.
  *   httpGetHostByName() - Lookup a hostname or IP address, and return
  *                         address records for the specified name.
+ *   httpGetHostname()   - Get the FQDN for the local system.
  */
 
 /*
@@ -44,6 +44,8 @@
 
 /*
  * 'httpAddrAny()' - Check for the "any" address.
+ *
+ * @since CUPS 1.2@
  */
 
 int					/* O - 1 if "any", 0 otherwise */
@@ -65,6 +67,8 @@ httpAddrAny(const http_addr_t *addr)	/* I - Address to check */
 
 /*
  * 'httpAddrEqual()' - Compare two addresses.
+ *
+ * @since CUPS 1.2@
  */
 
 int						/* O - 1 if equal, 0 if != */
@@ -90,6 +94,8 @@ httpAddrEqual(const http_addr_t *addr1,		/* I - First address */
 
 /*
  * 'httpAddrLength()' - Return the length of the address in bytes.
+ *
+ * @since CUPS 1.2@
  */
 
 int					/* O - Length in bytes */
@@ -114,60 +120,14 @@ httpAddrLength(const http_addr_t *addr)	/* I - Address */
 
 
 /*
- * 'httpAddrLoad()' - Load a host entry address into an HTTP address.
- */
-
-void
-httpAddrLoad(const struct hostent *host,	/* I - Host entry */
-             int                  port,		/* I - Port number */
-             int                  n,		/* I - Index into host entry */
-	     http_addr_t          *addr)	/* O - Address to load */
-{
-#ifdef AF_INET6
-  if (host->h_addrtype == AF_INET6)
-  {
-#  ifdef WIN32
-    addr->ipv6.sin6_port = htons((u_short)port);
-#  else
-    addr->ipv6.sin6_port = htons(port);
-#  endif /* WIN32 */
-
-    memcpy((char *)&(addr->ipv6.sin6_addr), host->h_addr_list[n],
-           host->h_length);
-    addr->ipv6.sin6_family = AF_INET6;
-  }
-  else
-#endif /* AF_INET6 */
-#ifdef AF_LOCAL
-  if (host->h_addrtype == AF_LOCAL)
-  {
-    addr->un.sun_family = AF_LOCAL;
-    strlcpy(addr->un.sun_path, host->h_addr_list[n], sizeof(addr->un.sun_path));
-  }
-  else
-#endif /* AF_LOCAL */
-  if (host->h_addrtype == AF_INET)
-  {
-#  ifdef WIN32
-    addr->ipv4.sin_port = htons((u_short)port);
-#  else
-    addr->ipv4.sin_port = htons(port);
-#  endif /* WIN32 */
-
-    memcpy((char *)&(addr->ipv4.sin_addr), host->h_addr_list[n],
-           host->h_length);
-    addr->ipv4.sin_family = AF_INET;
-  }
-}
-
-
-/*
  * 'httpAddrLocalhost()' - Check for the local loopback address.
+ *
+ * @since CUPS 1.2@
  */
 
 int					/* O - 1 if local host, 0 otherwise */
-httpAddrLocalhost(const http_addr_t *addr)
-					/* I - Address to check */
+httpAddrLocalhost(
+    const http_addr_t *addr)		/* I - Address to check */
 {
 #ifdef AF_INET6
   if (addr->addr.sa_family == AF_INET6 &&
@@ -198,6 +158,8 @@ httpAddrLocalhost(const http_addr_t *addr)
 
 /*
  * 'httpAddrLookup()' - Lookup the hostname associated with the address.
+ *
+ * @since CUPS 1.2@
  */
 
 char *						/* O - Host name */
@@ -245,6 +207,8 @@ httpAddrLookup(const http_addr_t *addr,		/* I - Address to lookup */
 
 /*
  * 'httpAddrString()' - Convert an IP address to a dotted string.
+ *
+ * @since CUPS 1.2@
  */
 
 char *						/* O - IP string */
@@ -289,14 +253,15 @@ httpAddrString(const http_addr_t *addr,		/* I - Address to convert */
 
 
 /*
- * 'httpGetHostByName()' - Lookup a hostname or IP address, and return
+ * 'httpGetHostByName()' - Lookup a hostname or IPv4 address, and return
  *                         address records for the specified name.
+ *
+ * @deprecated@
  */
 
 struct hostent *			/* O - Host entry */
 httpGetHostByName(const char *name)	/* I - Hostname or IP address */
 {
-  int			i;		/* Looping var */
   const char		*nameptr;	/* Pointer into name */
   unsigned		ip[4];		/* IP address components */
   _cups_globals_t	*cg = _cupsGlobals();
@@ -346,48 +311,6 @@ httpGetHostByName(const char *name)	/* I - Hostname or IP address */
     return (&cg->hostent);
   }
 #endif /* AF_LOCAL */
-#ifdef AF_INET6
-  if (name[0] == '[')
-  {
-   /*
-    * A raw 128-bit IPv6 address of the form "[xxxx:xxxx:xxxx:xxxx]"
-    */
-
-    cg->hostent.h_name      = (char *)name;
-    cg->hostent.h_aliases   = NULL;
-    cg->hostent.h_addrtype  = AF_INET6;
-    cg->hostent.h_length    = 16;
-    cg->hostent.h_addr_list = cg->ip_ptrs;
-    cg->ip_ptrs[0]       = (char *)(cg->ip_addrs[0]);
-    cg->ip_ptrs[1]       = NULL;
-
-    for (i = 0, nameptr = name + 1; *nameptr && i < 4; i ++)
-    {
-      if (*nameptr == ']')
-        break;
-      else if (*nameptr == ':')
-        cg->ip_addrs[0][i] = 0;
-      else
-        cg->ip_addrs[0][i] = htonl(strtoul(nameptr, (char **)&nameptr, 16));
-
-      if (*nameptr == ':' || *nameptr == ']')
-        nameptr ++;
-    }
-
-    while (i < 4)
-    {
-      cg->ip_addrs[0][i] = 0;
-      i ++;
-    }
-
-    if (*nameptr)
-      return (NULL);
-
-    DEBUG_puts("httpGetHostByName: returning IPv6 address...");
-
-    return (&cg->hostent);
-  }
-#endif /* AF_INET6 */
 
   for (nameptr = name; isdigit(*nameptr & 255) || *nameptr == '.'; nameptr ++);
 
@@ -404,8 +327,8 @@ httpGetHostByName(const char *name)	/* I - Hostname or IP address */
     if (ip[0] > 255 || ip[1] > 255 || ip[2] > 255 || ip[3] > 255)
       return (NULL);			/* Invalid byte ranges! */
 
-    cg->ip_addrs[0][0] = htonl(((((((ip[0] << 8) | ip[1]) << 8) | ip[2]) << 8) |
-                             ip[3]));
+    cg->ip_addr = htonl(((((((ip[0] << 8) | ip[1]) << 8) | ip[2]) << 8) |
+                         ip[3]));
 
    /*
     * Fill in the host entry and return it...
@@ -416,117 +339,17 @@ httpGetHostByName(const char *name)	/* I - Hostname or IP address */
     cg->hostent.h_addrtype  = AF_INET;
     cg->hostent.h_length    = 4;
     cg->hostent.h_addr_list = cg->ip_ptrs;
-    cg->ip_ptrs[0]       = (char *)cg->ip_addrs[0];
-    cg->ip_ptrs[1]       = NULL;
+    cg->ip_ptrs[0]          = (char *)&(cg->ip_addr);
+    cg->ip_ptrs[1]          = NULL;
 
     DEBUG_puts("httpGetHostByName: returning IPv4 address...");
 
     return (&cg->hostent);
   }
   else
-#ifdef HAVE_GETADDRINFO
   {
    /*
-    * Use the getaddrinfo() function to get the IP address for the
-    * name...
-    */
-
-    struct addrinfo	hints,		/* Address lookup hints */
-			*results,	/* Address lookup results */
-			*current;	/* Current result */
-    http_addr_t		*address;	/* Current address */
-
-
-    memset(&hints, 0, sizeof(hints));
-    hints.ai_family   = PF_UNSPEC;
-    hints.ai_socktype = SOCK_STREAM;
-    hints.ai_flags    = AI_CANONNAME;
-
-    if (getaddrinfo(name, NULL, &hints, &results))
-    {
-     /*
-      * If getaddrinfo() fails, try gethostbyname()...
-      */
-
-      return (gethostbyname(name));
-    }
-
-   /*
-    * Initialize hostent structure, preferring the IPv6 address...
-    */
-
-    for (current = results; current; current = current->ai_next)
-      if (current->ai_family == AF_INET6)
-        break;
-
-    if (!current)
-    {
-      for (current = results; current; current = current->ai_next)
-	if (current->ai_family == AF_INET)
-          break;
-
-      if (!current)
-      {
-       /*
-	* No IPv4 or IPv6 addresses, try gethostbyname()...
-	*/
-
-        freeaddrinfo(results);
-
-	return (gethostbyname(name));
-      }
-    }
-
-    strlcpy(cg->hostname, current->ai_canonname, sizeof(cg->hostname));
-
-    cg->hostent.h_name      = cg->hostname;
-    cg->hostent.h_aliases   = NULL;
-    cg->hostent.h_addrtype  = current->ai_family;
-    cg->hostent.h_addr_list = cg->ip_ptrs;
-
-    if (current->ai_family == AF_INET6)
-      cg->hostent.h_length = 16;
-    else
-      cg->hostent.h_length = 4;
-
-   /*
-    * Convert the address info to a hostent structure...
-    */
-
-    for (i = 0, current = results;
-         i < CUPS_MAX_ADDRS && current;
-	 current = current->ai_next)
-      if (current->ai_family == cg->hostent.h_addrtype)
-      {
-       /*
-        * Copy this address...
-	*/
-
-        address = (http_addr_t *)(current->ai_addr);
-
-        if (current->ai_family == AF_INET)
-	  memcpy((char *)cg->ip_addrs[i], (char *)&(address->ipv4.sin_addr), 4);
-	else
-	  memcpy((char *)cg->ip_addrs[i], (char *)&(address->ipv6.sin6_addr), 16);
-
-	cg->ip_ptrs[i] = (char *)cg->ip_addrs[i];
-	i ++;
-      }
-
-    cg->ip_ptrs[i] = NULL;
-
-   /*
-    * Free the getaddrinfo() results and return the hostent structure...
-    */
-
-    freeaddrinfo(results);
-
-    return (&cg->hostent);
-  }
-#else
-  {
-   /*
-    * Use the gethostbyname() function to get the IP address for
+    * Use the gethostbyname() function to get the IPv4 address for
     * the name...
     */
 
@@ -534,7 +357,6 @@ httpGetHostByName(const char *name)	/* I - Hostname or IP address */
 
     return (gethostbyname(name));
   }
-#endif /* HAVE_GETADDRINFO */
 }
 
 
@@ -543,6 +365,8 @@ httpGetHostByName(const char *name)	/* I - Hostname or IP address */
  *
  * This function uses both gethostname() and gethostbyname() to
  * get the local hostname with domain.
+ *
+ * @since CUPS 1.2@
  */
 
 const char *				/* O - FQDN for this system */
