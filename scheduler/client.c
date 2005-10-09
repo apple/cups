@@ -23,26 +23,26 @@
  *
  * Contents:
  *
- *   cupsdAcceptClient()    - Accept a new client.
- *   cupsdCloseAllClients() - Close all remote clients immediately.
- *   cupsdCloseClient()     - Close a remote client.
- *   cupsdEncryptClient()   - Enable encryption for the client...
- *   cupsdIsCGI()           - Is the resource a CGI script/program?
- *   cupsdReadClient()      - Read data from a client.
- *   cupsdSendCommand()     - Send output from a command via HTTP.
- *   cupsdSendError()       - Send an error message via HTTP.
- *   cupsdSendFile()        - Send a file via HTTP.
- *   cupsdSendHeader()      - Send an HTTP request.
- *   cupsdUpdateCGI()       - Read status messages from CGI scripts and programs.
- *   cupsdWriteClient()     - Write data to a client as needed.
- *   check_if_modified()    - Decode an "If-Modified-Since" line.
- *   decode_auth()          - Decode an authorization string.
- *   get_file()             - Get a filename and state info.
- *   install_conf_file()    - Install a configuration file.
- *   is_path_absolute()     - Is a path absolute and free of relative elements.
- *   pipe_command()         - Pipe the output of a command to the remote client.
- *   CDSAReadFunc()         - Read function for CDSA decryption code.
- *   CDSAWriteFunc()        - Write function for CDSA encryption code.
+ *   cupsdAcceptClient()     - Accept a new client.
+ *   cupsdCloseAllClients()  - Close all remote clients immediately.
+ *   cupsdCloseClient()      - Close a remote client.
+ *   cupsdEncryptClient()    - Enable encryption for the client...
+ *   cupsdIsCGI()            - Is the resource a CGI script/program?
+ *   cupsdReadClient()       - Read data from a client.
+ *   cupsdSendCommand()      - Send output from a command via HTTP.
+ *   cupsdSendError()        - Send an error message via HTTP.
+ *   cupsdSendFile()         - Send a file via HTTP.
+ *   cupsdSendHeader()       - Send an HTTP request.
+ *   cupsdUpdateCGI()        - Read status messages from CGI scripts and programs.
+ *   cupsdWriteClient()      - Write data to a client as needed.
+ *   check_if_modified()     - Decode an "If-Modified-Since" line.
+ *   decode_auth()           - Decode an authorization string.
+ *   get_cdsa_server_certs() - Convert a keychain name into the CFArrayRef
+ *			       required by SSLSetCertificate.
+ *   get_file()              - Get a filename and state info.
+ *   install_conf_file()     - Install a configuration file.
+ *   is_path_absolute()      - Is a path absolute and free of relative elements.
+ *   pipe_command()          - Pipe the output of a command to the remote client.
  */
 
 /*
@@ -52,6 +52,10 @@
 #include <cups/http-private.h>
 #include "cupsd.h"
 
+#ifdef HAVE_CDSASSL
+#  include <Security/Security.h>
+#endif /* HAVE_CDSASSL */
+
 
 /*
  * Local functions...
@@ -60,19 +64,15 @@
 static int		check_if_modified(cupsd_client_t *con,
 			                  struct stat *filestats);
 static void		decode_auth(cupsd_client_t *con);
+#ifdef HAVE_CDSASSL
+static CFArrayRef	get_cdsa_server_certs(void);
+#endif /* HAVE_CDSASSL */
 static char		*get_file(cupsd_client_t *con, struct stat *filestats, 
 			          char *filename, int len);
 static http_status_t	install_conf_file(cupsd_client_t *con);
 static int		is_path_absolute(const char *path);
 static int		pipe_command(cupsd_client_t *con, int infile, int *outfile,
 			             char *command, char *options, int root);
-
-#ifdef HAVE_CDSASSL
-static OSStatus		CDSAReadFunc(SSLConnectionRef connection, void *data,
-			             size_t *dataLength);
-static OSStatus		CDSAWriteFunc(SSLConnectionRef connection,
-			              const void *data, size_t *dataLength);
-#endif /* HAVE_CDSASSL */
 
 
 /*
@@ -406,7 +406,7 @@ int					/* O - 1 if partial close, 0 if fully closed */
 cupsdCloseClient(cupsd_client_t *con)	/* I - Client to close */
 {
   int		partial;		/* Do partial close for SSL? */
-#if defined(HAVE_LIBSSL)
+#ifdef HAVE_LIBSSL
   SSL_CTX	*context;		/* Context for encryption */
   SSL		*conn;			/* Connection for encryption */
   unsigned long	error;			/* Error code */
@@ -415,8 +415,6 @@ cupsdCloseClient(cupsd_client_t *con)	/* I - Client to close */
   int            error;			/* Error code */
   gnutls_certificate_server_credentials *credentials;
 					/* TLS credentials */
-#elif defined(HAVE_CDSASSL)
-  int		status;			/* Error status */
 #endif /* HAVE_LIBSSL */
 
 
@@ -485,7 +483,7 @@ cupsdCloseClient(cupsd_client_t *con)	/* I - Client to close */
     free(conn);
 
 #  elif defined(HAVE_CDSASSL)
-    status = SSLClose((SSLContextRef)con->http.tls);
+    SSLClose((SSLContextRef)con->http.tls);
     SSLDisposeContext((SSLContextRef)con->http.tls);
 #  endif /* HAVE_LIBSSL */
 
@@ -620,7 +618,7 @@ cupsdCloseClient(cupsd_client_t *con)	/* I - Client to close */
 int					/* O - 1 on success, 0 on error */
 cupsdEncryptClient(cupsd_client_t *con)	/* I - Client to encrypt */
 {
-#if defined HAVE_LIBSSL
+#ifdef HAVE_LIBSSL
   SSL_CTX	*context;		/* Context for encryption */
   SSL		*conn;			/* Connection for encryption */
   unsigned long	error;			/* Error code */
@@ -724,15 +722,10 @@ cupsdEncryptClient(cupsd_client_t *con)	/* I - Client to encrypt */
   return (1);
 
 #elif defined(HAVE_CDSASSL)
-  OSStatus		error;		/* Error info */
-  SSLContextRef		conn;		/* New connection */
-  SSLProtocol		tryVersion;	/* Protocol version */
-  const char		*hostName;	/* Local hostname */
-  int			allowExpired;	/* Allow expired certificates? */
-  int			allowAnyRoot;	/* Allow any root certificate? */
-  SSLProtocol		*negVersion;	/* Negotiated protocol version */
-  SSLCipherSuite	*negCipher;	/* Negotiated cypher */
-  CFArrayRef		*peerCerts;	/* Certificates */
+  OSStatus	error;			/* Error info */
+  SSLContextRef	conn;			/* New connection */
+  int		allowExpired;		/* Allow expired certificates? */
+  int		allowAnyRoot;		/* Allow any root certificate? */
 
 
   conn         = NULL;
@@ -740,8 +733,19 @@ cupsdEncryptClient(cupsd_client_t *con)	/* I - Client to encrypt */
   allowExpired = 1;
   allowAnyRoot = 1;
 
+  if (!ServerCertificatesArray)
+    ServerCertificatesArray = get_cdsa_server_certs();
+
+  if (!ServerCertificatesArray)
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR,
+        	    "EncryptClient: Could not find signing key in keychain "
+		    "\"%s\"", ServerCertificate);
+    error = errSSLBadConfiguration;
+  }
+
   if (!error)
-    error = SSLSetIOFuncs(conn, CDSAReadFunc, CDSAWriteFunc);
+    error = SSLSetIOFuncs(conn, _httpReadCDSA, _httpWriteCDSA);
 
   if (!error)
     error = SSLSetProtocolVersion(conn, kSSLProtocol3);
@@ -750,19 +754,16 @@ cupsdEncryptClient(cupsd_client_t *con)	/* I - Client to encrypt */
     error = SSLSetConnection(conn, (SSLConnectionRef)con->http.fd);
 
   if (!error)
-  {
-    hostName = ServerName;	/* MRS: ??? */
-    error    = SSLSetPeerDomainName(conn, hostName, strlen(hostName) + 1);
-  }
+    error = SSLSetPeerDomainName(conn, ServerName, strlen(ServerName) + 1);
 
-  /* have to do these options befor setting server certs */
+  /* have to do these options before setting server certs */
   if (!error && allowExpired)
     error = SSLSetAllowsExpiredCerts(conn, true);
 
   if (!error && allowAnyRoot)
     error = SSLSetAllowsAnyRoot(conn, true);
 
-  if (!error && ServerCertificatesArray != NULL)
+  if (!error && ServerCertificatesArray)
     error = SSLSetCertificate(conn, ServerCertificatesArray);
 
  /*
@@ -782,7 +783,7 @@ cupsdEncryptClient(cupsd_client_t *con)	/* I - Client to encrypt */
                     con->http.hostname);
 
     cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "cupsdEncryptClient: CDSA error code is %d", error);
+                    "cupsdEncryptClient: CDSA error code is %d", (int)error);
 
     con->http.error  = error;
     con->http.status = HTTP_ERROR;
@@ -802,7 +803,7 @@ cupsdEncryptClient(cupsd_client_t *con)	/* I - Client to encrypt */
 
 #else
   return (0);
-#endif /* HAVE_GNUTLS */
+#endif /* HAVE_LIBSSL */
 }
 
 
@@ -2777,6 +2778,96 @@ decode_auth(cupsd_client_t *con)	/* I - Client to decode to */
 }
 
 
+#ifdef HAVE_CDSASSL
+/*
+ * 'get_cdsa_server_certs()' - Convert a keychain name into the CFArrayRef
+ *			       required by SSLSetCertificate.
+ *
+ * For now we assumes that there is exactly one SecIdentity in the
+ * keychain - i.e. there is exactly one matching cert/private key pair.
+ * In the future we will search a keychain for a SecIdentity matching a
+ * specific criteria.  We also skip the operation of adding additional
+ * non-signing certs from the keychain to the CFArrayRef.
+ *
+ * To create a self-signed certificate for testing use the certtool.
+ * Executing the following as root will do it:
+ *
+ *     certtool c c v k=CUPS
+ */
+
+static CFArrayRef			/* O - Array of certificates */
+get_cdsa_server_certs(void)
+{
+  OSStatus		err;		/* Error info */
+  SecKeychainRef	kcRef;		/* Keychain reference */
+  SecIdentitySearchRef	srchRef;	/* Search reference */
+  SecIdentityRef	identity;	/* Identity */
+  CFArrayRef		ca;		/* Certificate array */
+
+
+  kcRef    = NULL;
+  srchRef  = NULL;
+  identity = NULL;
+  ca	   = NULL;
+  err      = SecKeychainOpen(ServerCertificate, &kcRef);
+
+  if (err)
+    cupsdLogMessage(CUPSD_LOG_ERROR, "Cannot open keychain \"%s\", error %d.",
+	            ServerCertificate, (int)err);
+  else
+  {
+   /*
+    * Search for "any" identity matching specified key use; 
+    * in this app, we expect there to be exactly one. 
+    */
+
+    err = SecIdentitySearchCreate(kcRef, CSSM_KEYUSE_SIGN, &srchRef);
+
+    if (err)
+      cupsdLogMessage(CUPSD_LOG_DEBUG2,
+		      "Cannot find signing key in keychain \"%s\", error %d",
+		      ServerCertificate, (int)err);
+    else
+    {
+      err = SecIdentitySearchCopyNext(srchRef, &identity);
+
+      if (err)
+	cupsdLogMessage(CUPSD_LOG_DEBUG2,
+			"Cannot find signing key in keychain \"%s\", error %d",
+			ServerCertificate, (int)err);
+      else
+      {
+	if (CFGetTypeID(identity) != SecIdentityGetTypeID())
+	  cupsdLogMessage(CUPSD_LOG_ERROR,
+	                  "SecIdentitySearchCopyNext CFTypeID failure!");
+	else
+	{
+	 /* 
+	  * Found one. Place it in a CFArray. 
+	  * TBD: snag other (non-identity) certs from keychain and add them
+	  * to array as well.
+	  */
+
+	  ca = CFArrayCreate(NULL, (const void **)&identity, 1, NULL);
+
+	  if (ca == nil)
+	    cupsdLogMessage(CUPSD_LOG_ERROR, "CFArrayCreate error");
+	}
+
+	/*CFRelease(identity);*/
+      }
+
+      /*CFRelease(srchRef);*/
+    }
+
+    /*CFRelease(kcRef);*/
+  }
+
+  return (ca);
+}
+#endif /* HAVE_CDSASSL */
+
+
 /*
  * 'get_file()' - Get a filename and state info.
  */
@@ -3409,56 +3500,6 @@ pipe_command(cupsd_client_t *con,	/* I - Client connection */
 
   return (pid);
 }
-
-
-#if defined(HAVE_CDSASSL)
-/*
- * 'CDSAReadFunc()' - Read function for CDSA decryption code.
- */
-
-static OSStatus				/* O  - -1 on error, 0 on success */
-CDSAReadFunc(
-    SSLConnectionRef connection,	/* I  - SSL/TLS connection */
-    void             *data,		/* I  - Data buffer */
-    size_t           *dataLength)	/* IO - Number of bytes */
-{
-  ssize_t	bytes;			/* Number of bytes read */
-
-
-  bytes = recv((int)connection, data, *dataLength, 0);
-  if (bytes >= 0)
-  {
-    *dataLength = bytes;
-    return (0);
-  }
-  else
-    return (-1);
-}
-
-
-/*
- * 'CDSAWriteFunc()' - Write function for CDSA encryption code.
- */
-
-static OSStatus				/* O  - -1 on error, 0 on success */
-CDSAWriteFunc(
-    SSLConnectionRef connection,	/* I  - SSL/TLS connection */
-    const void       *data,		/* I  - Data buffer */
-    size_t           *dataLength)	/* IO - Number of bytes */
-{
-  ssize_t bytes;
-
-
-  bytes = write((int)connection, data, *dataLength);
-  if (bytes >= 0)
-  {
-    *dataLength = bytes;
-    return (0);
-  }
-  else
-    return (-1);
-}
-#endif /* HAVE_CDSASSL */
 
 
 /*

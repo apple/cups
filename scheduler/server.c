@@ -33,7 +33,6 @@
 
 #include <cups/http-private.h>
 #include "cupsd.h"
-
 #include <grp.h>
 
 
@@ -77,8 +76,6 @@ cupsdStartServer(void)
   */
 
   gnutls_global_init();
-#elif defined(HAVE_CDSASSL)
-  ServerCertificatesArray = CDSAGetServerCerts();
 #endif /* HAVE_LIBSSL */
 
  /*

@@ -31,8 +31,6 @@
  *   read_configuration()     - Read a configuration file.
  *   read_location()          - Read a <Location path> definition.
  *   read_policy()            - Read a <Policy name> definition.
- *   CDSAGetServerCerts()     - Convert a keychain name into the CFArrayRef
- *                              required by SSLSetCertificate.
  */
 
 /*
@@ -44,11 +42,6 @@
 #include <grp.h>
 #include <sys/utsname.h>
 #include <cups/dir.h>
-
-#ifdef HAVE_CDSASSL
-#  include <Security/SecureTransport.h>
-#  include <Security/SecIdentitySearch.h>
-#endif /* HAVE_CDSASSL */
 
 #ifdef HAVE_VSYSLOG
 #  include <syslog.h>
@@ -168,10 +161,6 @@ static unsigned		zeros[4] =
 			{
 			  0x00000000, 0x00000000, 0x00000000, 0x00000000
 			};
-
-#ifdef HAVE_CDSASSL
-CFArrayRef CDSAGetServerCerts();
-#endif /* HAVE_CDSASSL */
 
 
 /*
@@ -3009,96 +2998,6 @@ read_policy(cups_file_t *fp,		/* I - Configuration file */
 
   return (0);
 }
-
-
-#ifdef HAVE_CDSASSL
-/*
- * 'CDSAGetServerCerts()' - Convert a keychain name into the CFArrayRef
- *                          required by SSLSetCertificate.
- *
- * For now we assumes that there is exactly one SecIdentity in the
- * keychain - i.e. there is exactly one matching cert/private key pair.
- * In the future we will search a keychain for a SecIdentity matching a
- * specific criteria.  We also skip the operation of adding additional
- * non-signing certs from the keychain to the CFArrayRef.
- *
- * To create a self-signed certificate for testing use the certtool.
- * Executing the following as root will do it:
- *
- *     certtool c c v k=CUPS
- */
-
-CFArrayRef
-CDSAGetServerCerts(void)
-{
-  OSStatus		err;		/* Error info */
-  SecKeychainRef 	kcRef;		/* Keychain reference */
-  SecIdentitySearchRef	srchRef;	/* Search reference */
-  SecIdentityRef	identity;	/* Identity */
-  CFArrayRef		ca;		/* Certificate array */
-
-
-  kcRef    = NULL;
-  srchRef  = NULL;
-  identity = NULL;
-  ca       = NULL;
-  err      = SecKeychainOpen(ServerCertificate, &kcRef);
-
-  if (err)
-    cupsdLogMessage(CUPSD_LOG_ERROR, "Cannot open keychain \"%s\", error %d.",
-                    ServerCertificate, err);
-  else
-  {
-   /*
-    * Search for "any" identity matching specified key use; 
-    * in this app, we expect there to be exactly one. 
-    */
-
-    err = SecIdentitySearchCreate(kcRef, CSSM_KEYUSE_SIGN, &srchRef);
-
-    if (err)
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "Cannot find signing key in keychain \"%s\", error %d",
-                      ServerCertificate, err);
-    else
-    {
-      err = SecIdentitySearchCopyNext(srchRef, &identity);
-
-      if (err)
-	cupsdLogMessage(CUPSD_LOG_ERROR,
-	                "Cannot find signing key in keychain \"%s\", error %d",
-	                ServerCertificate, err);
-      else
-      {
-	if (CFGetTypeID(identity) != SecIdentityGetTypeID())
-	  cupsdLogMessage(CUPSD_LOG_ERROR,
-	                  "SecIdentitySearchCopyNext CFTypeID failure!");
-	else
-	{
-	 /* 
-	  * Found one. Place it in a CFArray. 
-	  * TBD: snag other (non-identity) certs from keychain and add them
-	  * to array as well.
-	  */
-
-	  ca = CFArrayCreate(NULL, (const void **)&identity, 1, NULL);
-
-	  if (ca == nil)
-	    cupsdLogMessage(CUPSD_LOG_ERROR, "CFArrayCreate error");
-	}
-
-	/*CFRelease(identity);*/
-      }
-
-      /*CFRelease(srchRef);*/
-    }
-
-    /*CFRelease(kcRef);*/
-  }
-
-  return ca;
-}
-#endif /* HAVE_CDSASSL */
 
 
 /*

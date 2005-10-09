@@ -98,6 +98,10 @@ typedef struct
 
 typedef SSLConnectionRef http_tls_t;
 
+extern OSStatus	_httpReadCDSA(SSLConnectionRef connection, void *data,
+		              size_t *dataLength);
+extern OSStatus	_httpWriteCDSA(SSLConnectionRef connection, const void *data,
+		               size_t *dataLength);
 #  endif /* HAVE_LIBSSL */
 
 /*

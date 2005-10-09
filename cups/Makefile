@@ -194,7 +194,8 @@ libcups_s.a:	$(LIBOBJS)
 	(echo _ipp_add_attr; echo _ipp_free_attr; \
 	 echo _cups_hstrerror; echo _cups_md5_init; \
 	 echo _cups_md5_append; echo _cups_md5_finish; \
-	 echo _cups_strlcat; echo _cups_strlcpy) >libcups_s.exp
+	 echo _cups_strlcat; echo _cups_strlcpy; \
+	 echo _httpReadCDSA; echo _httpWriteCDSA) >libcups_s.exp
 	$(DSO) $(DSOFLAGS) -Wl,-bexport:libcups_s.exp -o libcups_s.o $(LIBOBJS) $(SSLLIBS) $(COMMONLIBS) $(LIBZ) -lm
 	$(RM) $@
 	$(AR) $(ARFLAGS) $@ libcups_s.o

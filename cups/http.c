@@ -50,6 +50,7 @@
  *   httpPrintf()         - Print a formatted string to a HTTP connection.
  *   httpPut()            - Send a PUT request to the server.
  *   httpRead()           - Read data from a HTTP connection.
+ *   _httpReadCDSA()      - Read function for CDSA decryption code.
  *   httpReconnect()      - Reconnect to a HTTP server...
  *   httpSetCookie()      - Set the cookie value(s)...
  *   httpSetField()       - Set the value of an HTTP header.
@@ -58,6 +59,7 @@
  *   httpUpdate()         - Update the current HTTP state for incoming data.
  *   httpWait()           - Wait for data available on a connection.
  *   httpWrite()          - Write data to a HTTP connection.
+ *   _httpWriteCDSA()     - Write function for CDSA encryption code.
  *   http_field()         - Return the field index for a field name.
  *   http_read_ssl()      - Read from a SSL/TLS connection.
  *   http_send()          - Send a request with all fields and the trailing
@@ -68,8 +70,6 @@
  *   http_wait()          - Wait for data available on a connection.
  *   http_write()         - Write data to a connection.
  *   http_write_ssl()     - Write to a SSL/TLS connection.
- *   http_read_cdsa()       - Read function for CDSA decryption code.
- *   http_write_cdsa()      - Write function for CDSA encryption code.
  */
 
 /*
@@ -112,16 +112,10 @@ static int		http_write(http_t *http, const char *buffer,
 static int		http_write_chunk(http_t *http, const char *buffer,
 			                 int length);
 #ifdef HAVE_SSL
-#  ifdef HAVE_CDSASSL
-static OSStatus		http_read_cdsa(SSLConnectionRef connection, void *data, size_t *dataLength);
-#  endif /* HAVE_CDSASSL */
 static int		http_read_ssl(http_t *http, char *buf, int len);
 static int		http_setup_ssl(http_t *http);
 static void		http_shutdown_ssl(http_t *http);
 static int		http_upgrade(http_t *http);
-#  ifdef HAVE_CDSASSL
-static OSStatus		http_write_cdsa(SSLConnectionRef connection, const void *data, size_t *dataLength);
-#  endif /* HAVE_CDSASSL */
 static int		http_write_ssl(http_t *http, const char *buf, int len);
 #endif /* HAVE_SSL */
 
@@ -1165,6 +1159,32 @@ httpRead(http_t *http,			/* I - HTTP data */
 }
 
 
+#if defined(HAVE_SSL) && defined(HAVE_CDSASSL)
+/*
+ * '_httpReadCDSA()' - Read function for CDSA decryption code.
+ */
+
+OSStatus				/* O  - -1 on error, 0 on success */
+_httpReadCDSA(
+    SSLConnectionRef connection,	/* I  - SSL/TLS connection */
+    void             *data,		/* I  - Data buffer */
+    size_t           *dataLength)	/* IO - Number of bytes */
+{
+  ssize_t	bytes;			/* Number of bytes read */
+
+
+  bytes = recv((int)connection, data, *dataLength, 0);
+  if (bytes >= 0)
+  {
+    *dataLength = bytes;
+    return (0);
+  }
+  else
+    return (-1);
+}
+#endif /* HAVE_SSL && HAVE_CDSASSL */
+
+
 /*
  * 'httpReconnect()' - Reconnect to a HTTP server...
  */
@@ -1651,6 +1671,32 @@ httpWrite(http_t     *http,		/* I - HTTP data */
 }
 
 
+#if defined(HAVE_SSL) && defined(HAVE_CDSASSL)
+/*
+ * '_httpWriteCDSA()' - Write function for CDSA encryption code.
+ */
+
+OSStatus				/* O  - -1 on error, 0 on success */
+_httpWriteCDSA(
+    SSLConnectionRef connection,	/* I  - SSL/TLS connection */
+    const void       *data,		/* I  - Data buffer */
+    size_t           *dataLength)	/* IO - Number of bytes */
+{
+  ssize_t bytes;			/* Number of write written */
+
+
+  bytes = write((int)connection, data, *dataLength);
+  if (bytes >= 0)
+  {
+    *dataLength = bytes;
+    return (0);
+  }
+  else
+    return (-1);
+}
+#endif /* HAVE_SSL && HAVE_CDSASSL */
+
+
 /*
  * 'http_field()' - Return the field index for a field name.
  */
@@ -1667,32 +1713,6 @@ http_field(const char *name)	/* I - String name */
 
   return (HTTP_FIELD_UNKNOWN);
 }
-
-
-#if defined(HAVE_SSL) && defined(HAVE_CDSASSL)
-/*
- * 'http_read_cdsa()' - Read function for CDSA decryption code.
- */
-
-static OSStatus				/* O  - -1 on error, 0 on success */
-http_read_cdsa(
-    SSLConnectionRef connection,	/* I  - SSL/TLS connection */
-    void             *data,		/* I  - Data buffer */
-    size_t           *dataLength)	/* IO - Number of bytes */
-{
-  ssize_t	bytes;			/* Number of bytes read */
-
-
-  bytes = recv((int)connection, data, *dataLength, 0);
-  if (bytes >= 0)
-  {
-    *dataLength = bytes;
-    return (0);
-  }
-  else
-    return (-1);
-}
-#endif /* HAVE_SSL && HAVE_CDSASSL */
 
 
 #ifdef HAVE_SSL
@@ -1941,7 +1961,7 @@ http_setup_ssl(http_t *http)		/* I - HTTP data */
   error = SSLNewContext(false, &conn);
 
   if (!error)
-    error = SSLSetIOFuncs(conn, http_read_cdsa, http_write_cdsa);
+    error = SSLSetIOFuncs(conn, _httpReadCDSA, _httpWriteCDSA);
 
   if (!error)
     error = SSLSetConnection(conn, (SSLConnectionRef)http->fd);
@@ -2296,32 +2316,6 @@ http_write(http_t     *http,		/* I - HTTP data */
 
   return (tbytes);
 }
-
-
-#if defined(HAVE_SSL) && defined(HAVE_CDSASSL)
-/*
- * 'http_write_cdsa()' - Write function for CDSA encryption code.
- */
-
-static OSStatus				/* O  - -1 on error, 0 on success */
-http_write_cdsa(
-    SSLConnectionRef connection,	/* I  - SSL/TLS connection */
-    const void       *data,		/* I  - Data buffer */
-    size_t           *dataLength)	/* IO - Number of bytes */
-{
-  ssize_t bytes;			/* Number of write written */
-
-
-  bytes = write((int)connection, data, *dataLength);
-  if (bytes >= 0)
-  {
-    *dataLength = bytes;
-    return (0);
-  }
-  else
-    return (-1);
-}
-#endif /* HAVE_SSL && HAVE_CDSASSL */
 
 
 /*
