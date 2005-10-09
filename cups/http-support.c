@@ -666,7 +666,11 @@ httpSeparate3(const char *uri,		/* I - Universal Resource Identifier */
       */
 
       for (ptr = host; *ptr; ptr ++)
-        if (!isalnum(*ptr & 255) && *ptr != '-' && *ptr != '_' && *ptr != '.')
+        if (!strchr("abcdefghijklmnopqrstuvwxyz"
+		    "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+		    "0123456789"
+	            "-._~"
+		    "!$&'()*+,;=", *ptr))
 	{
 	  *host = '\0';
 	  return (HTTP_URI_BAD_HOSTNAME);

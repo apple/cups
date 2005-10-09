@@ -125,7 +125,7 @@ static uri_test_t	uri_tests[] =	/* URI test data */
 			    "http", "", "", "", 80 },
 			  { HTTP_URI_BAD_HOSTNAME, "http://[",
 			    "http", "", "", "", 80 },
-			  { HTTP_URI_BAD_HOSTNAME, "http://%7erver/index.html",
+			  { HTTP_URI_BAD_HOSTNAME, "http://serve%7/index.html",
 			    "http", "", "", "", 80 },
 
 			  /* Bad port number */
