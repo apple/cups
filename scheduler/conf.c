@@ -1199,18 +1199,33 @@ get_addr_and_mask(const char *value,	/* I - String from config file */
                   unsigned   *ip,	/* O - Address value */
 		  unsigned   *mask)	/* O - Mask value */
 {
-  int		i,			/* Looping var */
+  int		i, j,			/* Looping vars */
 		family,			/* Address family */
 		ipcount;		/* Count of fields in address */
+  unsigned	ipval;			/* Value */
   const char	*maskval,		/* Pointer to start of mask value */
-		*ptr;			/* Pointer into value */
-  static unsigned netmasks[4][4] =	/* Standard netmasks... */
+		*ptr,			/* Pointer into value */
+		*ptr2;			/* ... */
+  static unsigned netmasks[4][4] =	/* Standard IPv4 netmasks... */
   {
-    { 0xffffffff, 0x00000000, 0x00000000, 0x00000000 },
-    { 0xffffffff, 0xffffffff, 0x00000000, 0x00000000 },
-    { 0xffffffff, 0xffffffff, 0xffffffff, 0x00000000 },
+    { 0xffffffff, 0xffffffff, 0xffffffff, 0xff000000 },
+    { 0xffffffff, 0xffffffff, 0xffffffff, 0xffff0000 },
+    { 0xffffffff, 0xffffffff, 0xffffffff, 0xffffff00 },
     { 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff }
   };
+#ifdef AF_INET6
+  static unsigned netmasks6[8][4] =	/* Standard IPv6 netmasks... */
+  {
+    { 0xffff0000, 0x00000000, 0x00000000, 0x00000000 },
+    { 0xffffffff, 0x00000000, 0x00000000, 0x00000000 },
+    { 0xffffffff, 0xffff0000, 0x00000000, 0x00000000 },
+    { 0xffffffff, 0xffffffff, 0x00000000, 0x00000000 },
+    { 0xffffffff, 0xffffffff, 0xffff0000, 0x00000000 },
+    { 0xffffffff, 0xffffffff, 0xffffffff, 0x00000000 },
+    { 0xffffffff, 0xffffffff, 0xffffffff, 0xffff0000 },
+    { 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff }
+  };
+#endif /* AF_INET6 */
 
 
  /*
@@ -1237,16 +1252,34 @@ get_addr_and_mask(const char *value,	/* I - String from config file */
 
     family  = AF_INET6;
 
-    for (i = 0, ptr = value + 1; *ptr && i < 4; i ++)
+    for (i = 0, ptr = value + 1; *ptr && i < 8; i ++)
     {
       if (*ptr == ']')
         break;
-      else if (*ptr == ':')
-        ip[i] = 0;
-      else
-        ip[i] = strtoul(ptr, (char **)&ptr, 16);
+      else if (!strncmp(ptr, "::", 2))
+      {
+        for (ptr2 = strchr(ptr + 2, ':'), j = 0;
+	     ptr2;
+	     ptr2 = strchr(ptr2 + 1, ':'), j ++);
 
-      if (*ptr == ':' || *ptr == ']')
+        i = 7 - j;
+      }
+      else if (isxdigit(*ptr & 255))
+      {
+        ipval = strtoul(ptr, (char **)&ptr, 16);
+
+	if (ipval > 0xffff)
+	  return (0);
+
+        if (i & 1)
+          ip[i] |= ipval;
+	else
+          ip[i] |= ipval << 16;
+      }
+      else
+        return (0);
+
+      while (*ptr == ':')
         ptr ++;
     }
 
@@ -1278,22 +1311,40 @@ get_addr_and_mask(const char *value,	/* I - String from config file */
     memset(mask, 0, sizeof(unsigned) * 4);
 
 #ifdef AF_INET6
-    if (maskval[1] == '[')
+    if (*maskval == '[')
     {
      /*
       * Get hexadecimal mask value...
       */
 
-      for (i = 0, ptr = maskval + 1; *ptr && i < 4; i ++)
+      for (i = 0, ptr = maskval + 1; *ptr && i < 8; i ++)
       {
 	if (*ptr == ']')
 	  break;
-	else if (*ptr == ':')
-          mask[i] = 0;
-	else
-          mask[i] = strtoul(ptr, (char **)&ptr, 16);
+	else if (!strncmp(ptr, "::", 2))
+	{
+          for (ptr2 = strchr(ptr + 2, ':'), j = 0;
+	       ptr2;
+	       ptr2 = strchr(ptr2 + 1, ':'), j ++);
 
-	if (*ptr == ':' || *ptr == ']')
+          i = 7 - j;
+	}
+	else if (isxdigit(*ptr & 255))
+	{
+          ipval = strtoul(ptr, (char **)&ptr, 16);
+
+	  if (ipval > 0xffff)
+	    return (0);
+
+          if (i & 1)
+            mask[i] |= ipval;
+	  else
+            mask[i] |= ipval << 16;
+	}
+	else
+          return (0);
+
+        while (*ptr == ':')
           ptr ++;
       }
 
@@ -1369,6 +1420,10 @@ get_addr_and_mask(const char *value,	/* I - String from config file */
       }
     }
   }
+#ifdef AF_INET6
+  else if (family == AF_INET6)
+    memcpy(mask, netmasks6[ipcount - 1], sizeof(unsigned) * 4);
+#endif /* AF_INET6 */
   else
     memcpy(mask, netmasks[ipcount - 1], sizeof(unsigned) * 4);
 
