@@ -59,8 +59,7 @@
 
 static const char * const http_days[7] =
 			{
-			  "Sun",
-			  "Mon",
+			  "Sun",			  "Mon",
 			  "Tue",
 			  "Wed",
 			  "Thu",
@@ -421,7 +420,7 @@ httpSeparate(const char *uri,		/* I - Universal Resource Identifier */
 	     int        *port,		/* O - Port number to use */
              char       *resource)	/* O - Resource/filename [1024] */
 {
-  httpSeparate2(uri, scheme, 32, username, HTTP_MAX_URI, host, HTTP_MAX_URI,
+  httpSeparate3(uri, scheme, 32, username, HTTP_MAX_URI, host, HTTP_MAX_URI,
                 port, resource, HTTP_MAX_URI);
 }
 
@@ -469,11 +468,30 @@ httpSeparate3(const char *uri,		/* I - Universal Resource Identifier */
               char       *resource,	/* O - Resource/filename */
 	      int        resourcelen)	/* I - Size of resource buffer */
 {
-  char			*ptr;		/* Pointer into string... */
-  const char		*atsign,	/* @ sign */
-			*slash;		/* Separator */
+  char			*ptr,		/* Pointer into string... */
+			*end;		/* End of string */
+  const char		*sep;		/* Separator character */
   http_uri_status_t	status;		/* Result of separation */
 
+
+ /*
+  * Initialize everything to blank...
+  */
+
+  if (scheme && schemelen > 0)
+    *scheme = '\0';
+
+  if (username && usernamelen > 0)
+    *username = '\0';
+
+  if (host && hostlen > 0)
+    *host = '\0';
+
+  if (port)
+    *port = 0;
+
+  if (resource && resourcelen > 0)
+    *resource = '\0';
 
  /*
   * Range check input...
@@ -484,17 +502,14 @@ httpSeparate3(const char *uri,		/* I - Universal Resource Identifier */
       resourcelen <= 0)
     return (HTTP_URI_BAD_ARGUMENTS);
 
- /*
-  * Initialize everything to blank...
-  */
-
-  *scheme = *username = *host = *resource = '\0';
-  *port   = 0;
-  status  = HTTP_URI_OK;
+  if (!*uri)
+    return (HTTP_URI_BAD_URI);
 
  /*
   * Grab the scheme portion of the URI...
   */
+
+  status = HTTP_URI_OK;
 
   if (!strncmp(uri, "//", 2))
   {
@@ -503,18 +518,15 @@ httpSeparate3(const char *uri,		/* I - Universal Resource Identifier */
     */
 
     strlcpy(scheme, "ipp", schemelen);
-
     status = HTTP_URI_MISSING_SCHEME;
   }
-  else if (uri[0] == '/')
+  else if (*uri == '/')
   {
    /*
     * Filename...
     */
 
     strlcpy(scheme, "file", schemelen);
-    http_copy_decode(resource, uri, resourcelen, "");
-
     status = HTTP_URI_MISSING_SCHEME;
   }
   else
@@ -523,16 +535,115 @@ httpSeparate3(const char *uri,		/* I - Universal Resource Identifier */
     * Standard URI with scheme...
     */
 
+    for (ptr = scheme, end = scheme + schemelen - 1;
+         *uri && *uri != ':' && ptr < end;)
+      if (isalnum(*uri & 255) || *uri == '-' || *uri == '+' || *uri == '.')
+        *ptr++ = *uri++;
+      else
+        break;
+
+    *ptr = '\0';
+
+    if (*uri != ':')
+    {
+      *scheme = '\0';
+      return (HTTP_URI_BAD_SCHEME);
+    }
+
+    uri ++;
+  }
+
+ /*
+  * Set the default port number...
+  */
+
+  if (!strcmp(scheme, "http"))
+    *port = 80;
+  else if (!strcmp(scheme, "https"))
+    *port = 443;
+  else if (!strcmp(scheme, "ipp"))
+    *port = 631;
+  else if (!strcasecmp(scheme, "lpd"))
+    *port = 515;
+  else if (!strcmp(scheme, "socket"))	/* Not yet registered with IANA... */
+    *port = 9100;
+  else if (strcmp(scheme, "file") && strcmp(scheme, "mailto"))
+    status = HTTP_URI_UNKNOWN_SCHEME;
+
+ /*
+  * Now see if we have a hostname...
+  */
+
+  if (!strncmp(uri, "//", 2))
+  {
+   /*
+    * Yes, extract it...
+    */
+
+    uri += 2;
+
+   /*
+    * Grab the username, if any...
+    */
+
+    if ((sep = strpbrk(uri, "@/")) != NULL && *sep == '@')
+    {
+     /*
+      * Get a username:password combo...
+      */
+
+      uri = http_copy_decode(username, uri, usernamelen, "@");
+
+      if (!uri)
+      {
+        *username = '\0';
+        return (HTTP_URI_BAD_USERNAME);
+      }
+
+      uri ++;
+    }
+
+   /*
+    * Then the hostname/IP address...
+    */
+
     if (*uri == '[')
     {
      /*
       * Grab IPv6 address...
       */
 
-      uri = http_copy_decode(host, uri + 1, hostlen, "]/?");
+      *host = '[';
+      uri   = http_copy_decode(host + 1, uri + 1, hostlen - 1, "]");
+
+      if (!uri)
+      {
+        *host = '\0';
+        return (HTTP_URI_BAD_HOSTNAME);
+      }
+
+     /*
+      * Validate value...
+      */
 
       if (*uri != ']')
+      {
+        *host = '\0';
         return (HTTP_URI_BAD_HOSTNAME);
+      }
+
+      for (ptr = host + 1; *ptr; ptr ++)
+        if (*ptr != ':' && *ptr != '.' && !isxdigit(*ptr & 255))
+	{
+	  *host = '\0';
+	  return (HTTP_URI_BAD_HOSTNAME);
+	}
+
+     /*
+      * Add the trailing "]"...
+      */
+
+      strlcat(host, "]", hostlen);
 
       uri ++;
     }
@@ -542,128 +653,55 @@ httpSeparate3(const char *uri,		/* I - Universal Resource Identifier */
       * Grab hostname or IPv4 address...
       */
 
-      uri = http_copy_decode(host, uri, hostlen, ":?");
-    }
+      uri = http_copy_decode(host, uri, hostlen, ":?/");
 
-    if (*uri == ':')
-      uri ++;
-
-   /*
-    * If the scheme contains a period, slash or colon, then it's probably
-    * hostname/filename...
-    */
-
-    if (strpbrk(host, "./:") || !*uri)
-    {
-      if ((ptr = strchr(host, '/')) != NULL)
+      if (!uri)
       {
-	strlcpy(resource, ptr, resourcelen);
-	*ptr = '\0';
+        *host = '\0';
+        return (HTTP_URI_BAD_HOSTNAME);
       }
 
-      if (isdigit(*uri & 255))
-      {
-       /*
-	* OK, we have "hostname:port[/resource]"...
-	*/
-
-	*port = strtol(uri, (char **)&uri, 10);
-
-	if (*uri == '/')
-	  http_copy_decode(resource, uri, resourcelen, "");
-      }
-      else
-	*port = 631;
-
-      strlcpy(scheme, "http", schemelen);
-      return (HTTP_URI_OK);
-    }
-    else
-    {
      /*
-      * Copy scheme over...
+      * Validate value...
       */
 
-      strlcpy(scheme, host, schemelen);
+      for (ptr = host; *ptr; ptr ++)
+        if (!isalnum(*ptr & 255) && *ptr != '-' && *ptr != '_' && *ptr != '.')
+	{
+	  *host = '\0';
+	  return (HTTP_URI_BAD_HOSTNAME);
+	}
     }
-  }
 
- /*
-  * Grab the username, if any...
-  */
-
-  uri += 2;
-
-  if ((slash = strchr(uri, '/')) == NULL)
-    slash = uri + strlen(uri);
-
-  if ((atsign = strchr(uri, '@')) != NULL && atsign < slash)
-  {
    /*
-    * Get a username:password combo...
+    * Validate hostname for file scheme - only empty and localhost are
+    * acceptable.
     */
 
-    uri = http_copy_decode(username, uri, usernamelen, "@") + 1;
-  }
-
- /*
-  * Grab the hostname...
-  */
-
-  if (uri[0] == '[')
-  {
-   /*
-    * Get IPv6 address...
-    */
-
-    uri = http_copy_decode(host, uri + 1, hostlen, "]/?");
-
-    if (*uri != ']')
+    if (!strcmp(scheme, "file") && strcmp(host, "localhost") && host[0])
     {
       *host = '\0';
       return (HTTP_URI_BAD_HOSTNAME);
     }
 
-    uri ++;
-  }
-  else
-  {
    /*
-    * Get IPv4 address or hostname...
+    * See if we have a port number...
     */
 
-    uri = http_copy_decode(host, uri, hostlen, ":/?");
-  }
-
-  if (*uri != ':')
-  {
-   /*
-    * Use a standard port number for the given scheme.
-    */
-
-    if (!strcmp(scheme, "http"))
-      *port = 80;
-    else if (!strcmp(scheme, "https"))
-      *port = 443;
-    else if (!strcmp(scheme, "ipp"))
-      *port = 631;
-    else if (!strcasecmp(scheme, "lpd"))
-      *port = 515;
-    else if (!strcmp(scheme, "socket"))	/* Not yet registered... */
-      *port = 9100;
-    else
+    if (*uri == ':')
     {
-      status = HTTP_URI_UNKNOWN_SCHEME;
-      *port  = 0;
-    }
-  }
-  else
-  {
-   /*
-    * Parse port number...
-    */
+     /*
+      * Yes, collect the port number...
+      */
 
-    *port = strtol(uri + 1, (char **)&uri, 10);
+      *port = strtol(uri + 1, (char **)&uri, 10);
+
+      if (*uri != '/')
+      {
+        *port = 0;
+        return (HTTP_URI_BAD_PORT);
+      }
+    }
   }
 
  /*
@@ -676,12 +714,22 @@ httpSeparate3(const char *uri,		/* I - Universal Resource Identifier */
     * Hostname but no path...
     */
 
-    status      = HTTP_URI_MISSING_RESOURCE;
-    resource[0] = '/';
-    http_copy_decode(resource + 1, uri, resourcelen - 1, "");
+    status    = HTTP_URI_MISSING_RESOURCE;
+    *resource = '/';
+    uri       = http_copy_decode(resource + 1, uri, resourcelen - 1, "");
   }
   else
-    http_copy_decode(resource, uri, resourcelen, "");
+    uri = http_copy_decode(resource, uri, resourcelen, "");
+
+  if (!uri)
+  {
+    *resource = '\0';
+    return (HTTP_URI_BAD_RESOURCE);
+  }
+
+ /*
+  * Return the URI separation status...
+  */
 
   return (status);
 }
@@ -764,7 +812,7 @@ _cups_hstrerror(int error)		/* I - Error number */
  * 'http_copy_decode()' - Copy and decode a URI.
  */
 
-static const char *			/* O - New source pointer */
+static const char *			/* O - New source pointer or NULL on error */
 http_copy_decode(char       *dst,	/* O - Destination buffer */ 
                  const char *src,	/* I - Source pointer */
 		 int        dstsize,	/* I - Destination size */
@@ -783,25 +831,37 @@ http_copy_decode(char       *dst,	/* O - Destination buffer */
   for (ptr = dst, end = dst + dstsize - 1; *src && !strchr(term, *src); src ++)
     if (ptr < end)
     {
-      if (*src == '%' && isxdigit(src[1] & 255) && isxdigit(src[2] & 255))
+      if (*src == '%')
       {
-       /*
-	* Grab a hex-encoded character...
-	*/
+        if (isxdigit(src[1] & 255) && isxdigit(src[2] & 255))
+	{
+	 /*
+	  * Grab a hex-encoded character...
+	  */
 
-        src ++;
-	if (isalpha(*src))
-	  quoted = (tolower(*src) - 'a' + 10) << 4;
+          src ++;
+	  if (isalpha(*src))
+	    quoted = (tolower(*src) - 'a' + 10) << 4;
+	  else
+	    quoted = (*src - '0') << 4;
+
+          src ++;
+	  if (isalpha(*src))
+	    quoted |= tolower(*src) - 'a' + 10;
+	  else
+	    quoted |= *src - '0';
+
+          *ptr++ = quoted;
+	}
 	else
-	  quoted = (*src - '0') << 4;
+	{
+	 /*
+	  * Bad hex-encoded character...
+	  */
 
-        src ++;
-	if (isalpha(*src))
-	  quoted |= tolower(*src) - 'a' + 10;
-	else
-	  quoted |= *src - '0';
-
-        *ptr++ = quoted;
+	  *ptr = '\0';
+	  return (NULL);
+	}
       }
       else
 	*ptr++ = *src;

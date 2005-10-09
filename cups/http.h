@@ -236,8 +236,13 @@ typedef enum http_status_e		/**** HTTP status codes ****/
 
 typedef enum http_uri_status_e		/**** URI separation status @since CUPS1.2@ ****/
 {
-  HTTP_URI_BAD_ARGUMENTS = -2,		/* Bad arguments to function (error) */
-  HTTP_URI_BAD_HOSTNAME = -1,		/* Bad hostname in URI (error) */
+  HTTP_URI_BAD_ARGUMENTS = -7,		/* Bad arguments to function (error) */
+  HTTP_URI_BAD_RESOURCE = -6,		/* Bad resource in URI (error) */
+  HTTP_URI_BAD_PORT = -5,		/* Bad port number in URI (error) */
+  HTTP_URI_BAD_HOSTNAME = -4,		/* Bad hostname in URI (error) */
+  HTTP_URI_BAD_USERNAME = -3,		/* Bad username in URI (error) */
+  HTTP_URI_BAD_SCHEME = -2,		/* Bad scheme in URI (error) */
+  HTTP_URI_BAD_URI = -1,		/* Bad/empty URI (error) */
   HTTP_URI_OK = 0,			/* URI decoded OK */
   HTTP_URI_MISSING_SCHEME,		/* Missing scheme in URI (warning) */
   HTTP_URI_UNKNOWN_SCHEME,		/* Unknown scheme in URI (warning) */
