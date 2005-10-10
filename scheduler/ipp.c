@@ -4486,7 +4486,7 @@ get_jobs(cupsd_client_t  *con,		/* I - Client connection */
 		resource[HTTP_MAX_URI];	/* Resource portion of URI */
   int		port;			/* Port portion of URI */
   int		completed;		/* Completed jobs? */
-  int		first;			/* First job ID */
+  int		first_job_id;		/* First job ID */
   int		limit;			/* Maximum number of jobs to return */
   int		count;			/* Number of jobs that match */
   cupsd_job_t	*job;			/* Current job pointer */
@@ -4590,10 +4590,11 @@ get_jobs(cupsd_client_t  *con,		/* I - Client connection */
   else
     limit = 1000000;
 
-  if ((attr = ippFindAttribute(con->request, "first", IPP_TAG_INTEGER)) != NULL)
-    first = attr->values[0].integer;
+  if ((attr = ippFindAttribute(con->request, "first-job-id",
+                               IPP_TAG_INTEGER)) != NULL)
+    first_job_id = attr->values[0].integer;
   else
-    first = 1;
+    first_job_id = 1;
 
  /*
   * See if we only want to see jobs for a specific user...
@@ -4642,7 +4643,7 @@ get_jobs(cupsd_client_t  *con,		/* I - Client connection */
     if (completed && job->state->values[0].integer <= IPP_JOB_STOPPED)
       continue;
 
-    if (job->id < first)
+    if (job->id < first_job_id)
       continue;
 
     count ++;
@@ -5097,6 +5098,7 @@ get_printers(cupsd_client_t *con,	/* I - Client connection */
 		printer_mask;		/* printer-type-mask attribute */
   char		*location;		/* Location string */
   const char	*username;		/* Current user */
+  char		*first_printer_name;	/* first-printer-name attribute */
   char		printer_uri[HTTP_MAX_URI];
 					/* Printer URI */
 
@@ -5130,28 +5132,38 @@ get_printers(cupsd_client_t *con,	/* I - Client connection */
   else
     limit = 10000000;
 
+  if ((attr = ippFindAttribute(con->request, "first-printer-name",
+                               IPP_TAG_NAME)) != NULL)
+    first_printer_name = attr->values[0].string.text;
+  else
+    first_printer_name = NULL;
+
  /*
   * Support filtering...
   */
 
-  if ((attr = ippFindAttribute(con->request, "printer-type", IPP_TAG_ENUM)) != NULL)
+  if ((attr = ippFindAttribute(con->request, "printer-type",
+                               IPP_TAG_ENUM)) != NULL)
     printer_type = attr->values[0].integer;
   else
     printer_type = 0;
 
-  if ((attr = ippFindAttribute(con->request, "printer-type-mask", IPP_TAG_ENUM)) != NULL)
+  if ((attr = ippFindAttribute(con->request, "printer-type-mask",
+                               IPP_TAG_ENUM)) != NULL)
     printer_mask = attr->values[0].integer;
   else
     printer_mask = 0;
 
-  if ((attr = ippFindAttribute(con->request, "printer-location", IPP_TAG_TEXT)) != NULL)
+  if ((attr = ippFindAttribute(con->request, "printer-location",
+                               IPP_TAG_TEXT)) != NULL)
     location = attr->values[0].string.text;
   else
     location = NULL;
 
   if (con->username[0])
     username = con->username;
-  else if ((attr = ippFindAttribute(con->request, "requesting-user-name", IPP_TAG_NAME)) != NULL)
+  else if ((attr = ippFindAttribute(con->request, "requesting-user-name",
+                                    IPP_TAG_NAME)) != NULL)
     username = attr->values[0].string.text;
   else
     username = NULL;
@@ -5178,7 +5190,15 @@ get_printers(cupsd_client_t *con,	/* I - Client connection */
 
   curtime = time(NULL);
 
-  for (count = 0, printer = (cupsd_printer_t *)cupsArrayFirst(Printers);
+  if (first_printer_name)
+  {
+    if ((printer = cupsdFindDest(first_printer_name)) == NULL)
+      printer = (cupsd_printer_t *)cupsArrayFirst(Printers);
+  }
+  else
+    printer = (cupsd_printer_t *)cupsArrayFirst(Printers);
+
+  for (count = 0;
        count < limit && printer != NULL;
        printer = (cupsd_printer_t *)cupsArrayNext(Printers))
     if ((!type || (printer->type & CUPS_PRINTER_CLASS) == type) &&
