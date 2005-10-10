@@ -1,8 +1,10 @@
-CHANGES.txt - 10/05/2005
+CHANGES.txt - 10/10/2005
 ------------------------
 
 CHANGES IN CUPS V1.2.0b1
 
+	- The lpstat command could show the wrong active job for
+	  a printer (STR #1301)
 	- Fixed a potential crash problem in the scheduler when
 	  aborting a CGI program (STR #1290)
 	- Added a "cancel all jobs" button to the class and

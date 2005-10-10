@@ -1942,13 +1942,27 @@ show_printers(http_t      *http,	/* I - HTTP connection to server */
 	  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI,
 	               "printer-uri", NULL, printer_uri);
 
-	  ippAddInteger(request, IPP_TAG_OPERATION, IPP_TAG_INTEGER,
-	        	"limit", 1);
-
           if ((jobs = cupsDoRequest(http, request, "/")) != NULL)
 	  {
-	    if ((jobattr = ippFindAttribute(jobs, "job-id", IPP_TAG_INTEGER)) != NULL)
-              jobid = jobattr->values[0].integer;
+	   /*
+	    * Get the current active job on this queue...
+	    */
+
+	    jobid = 0;
+
+	    for (jobattr = jobs->attrs; jobattr; jobattr = jobattr->next)
+	    {
+	      if (!jobattr->name)
+	        continue;
+
+	      if (!strcmp(jobattr->name, "job-id") &&
+	          jobattr->value_tag == IPP_TAG_INTEGER)
+		jobid = jobattr->values[0].integer;
+              else if (!strcmp(jobattr->name, "job-state") &&
+	               jobattr->value_tag == IPP_TAG_ENUM &&
+		       jobattr->values[0].integer == IPP_JOB_PROCESSING)
+		break;
+	    }
 
             ippDelete(jobs);
 	  }
