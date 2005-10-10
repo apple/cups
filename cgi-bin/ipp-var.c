@@ -247,8 +247,9 @@ ippRewriteURL(const char *uri,		/* I - Current URI */
 
   httpSeparate(uri, method, userpass, hostname, &port, rawresource);
 
-  if (strcmp(method, "ipp") == 0 ||
-      strcmp(method, "http") == 0)
+  if (!strcmp(method, "ipp") ||
+      !strcmp(method, "http") ||
+      !strcmp(method, "https"))
   {
     if (newresource)
     {
@@ -287,8 +288,9 @@ ippRewriteURL(const char *uri,		/* I - Current URI */
     * Map local access to a local URI...
     */
 
-    if (strcasecmp(hostname, server) == 0 ||
-	strcasecmp(hostname, servername) == 0)
+    if (!strcasecmp(hostname, "localhost") ||
+	!strcasecmp(hostname, server) ||
+	!strcasecmp(hostname, servername))
     {
      /*
       * Make URI relative to the current server...
