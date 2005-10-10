@@ -27,19 +27,19 @@
  *   cupsdSendBrowseDelete()  - Send a "browse delete" message for a printer.
  *   cupsdSendBrowseList()    - Send new browsing information as necessary.
  *   cupsdSendCUPSBrowse()    - Send new browsing information using the CUPS protocol.
+ *   cupsdSendSLPBrowse()     - Register the specified printer with SLP.
  *   cupsdStartBrowsing()     - Start sending and receiving broadcast information.
  *   cupsdStartPolling()      - Start polling servers as needed.
  *   cupsdStopBrowsing()      - Stop sending and receiving broadcast information.
  *   cupsdStopPolling()       - Stop polling servers as needed.
  *   cupsdUpdateCUPSBrowse()  - Update the browse lists using the CUPS protocol.
  *   cupsdUpdatePolling()     - Read status messages from the poll daemons.
- *   slp_reg_callback()       - Empty SLPRegReport.
- *   cupsdSendSLPBrowse()     - Register the specified printer with SLP.
+ *   cupsdUpdateSLPBrowse()   - Get browsing information via SLP.
+ *   slp_attr_callback()      - SLP attribute callback 
  *   slp_dereg_printer()      - SLPDereg() the specified printer
  *   slp_get_attr()           - Get an attribute from an SLP registration.
- *   slp_attr_callback()      - SLP attribute callback 
+ *   slp_reg_callback()       - Empty SLPRegReport.
  *   slp_url_callback()       - SLP service url callback
- *   cupsdUpdateSLPBrowse()   - Get browsing information via SLP.
  */
 
 /*
@@ -50,8 +50,45 @@
 #include <grp.h>
 
 
-#ifdef HAVE_LIBSLP
-static void	slp_dereg_printer(cupsd_printer_t *p);
+/*
+ * SLP definitions...
+ */
+
+#ifdef HAVE_LIBSLP 
+/*
+ * SLP service name for CUPS...
+ */
+
+#  define SLP_CUPS_SRVTYPE	"service:printer"
+#  define SLP_CUPS_SRVLEN	15
+
+
+/* 
+ * Printer service URL structure
+ */
+
+typedef struct _slpsrvurl_s		/**** SLP URL list ****/
+{
+  struct _slpsrvurl_s	*next;		/* Next URL in list */
+  char			url[HTTP_MAX_URI];
+					/* URL */
+} slpsrvurl_t;
+
+
+/*
+ * Local functions...
+ */
+
+static SLPBoolean	slp_attr_callback(SLPHandle hslp, const char *attrlist,
+			                  SLPError errcode, void *cookie);
+static void		slp_dereg_printer(cupsd_printer_t *p);
+static int 		slp_get_attr(const char *attrlist, const char *tag,
+			             char **valbuf);
+static void		slp_reg_callback(SLPHandle hslp, SLPError errcode,
+					 void *cookie);
+static SLPBoolean	slp_url_callback(SLPHandle hslp, const char *srvurl,
+			                 unsigned short lifetime,
+			                 SLPError errcode, void *cookie);
 #endif /* HAVE_LIBSLP */
 
 
@@ -1009,6 +1046,186 @@ cupsdSendCUPSBrowse(cupsd_printer_t *p)	/* I - Printer to send */
 }
 
 
+#ifdef HAVE_LIBSLP
+/*
+ * 'cupsdSendSLPBrowse()' - Register the specified printer with SLP.
+ */
+
+void 
+cupsdSendSLPBrowse(cupsd_printer_t *p)	/* I - Printer to register */
+{
+  char		srvurl[HTTP_MAX_URI],	/* Printer service URI */
+		attrs[8192],		/* Printer attributes */
+		finishings[1024],	/* Finishings to support */
+		make_model[IPP_MAX_NAME * 2],
+					/* Make and model, quoted */
+		location[IPP_MAX_NAME * 2],
+					/* Location, quoted */
+		info[IPP_MAX_NAME * 2],	/* Info, quoted */
+		*src,			/* Pointer to original string */
+		*dst;			/* Pointer to destination string */
+  ipp_attribute_t *authentication;	/* uri-authentication-supported value */
+  SLPError	error;			/* SLP error, if any */
+
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG, "cupsdSendSLPBrowse(%p = \"%s\")", p,
+                  p->name);
+
+ /*
+  * Make the SLP service URL that conforms to the IANA 
+  * 'printer:' template.
+  */
+
+  snprintf(srvurl, sizeof(srvurl), SLP_CUPS_SRVTYPE ":%s", p->uri);
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "Service URL = \"%s\"", srvurl);
+
+ /*
+  * Figure out the finishings string...
+  */
+
+  if (p->type & CUPS_PRINTER_STAPLE)
+    strcpy(finishings, "staple");
+  else
+    finishings[0] = '\0';
+
+  if (p->type & CUPS_PRINTER_BIND)
+  {
+    if (finishings[0])
+      strlcat(finishings, ",bind", sizeof(finishings));
+    else
+      strcpy(finishings, "bind");
+  }
+
+  if (p->type & CUPS_PRINTER_PUNCH)
+  {
+    if (finishings[0])
+      strlcat(finishings, ",punch", sizeof(finishings));
+    else
+      strcpy(finishings, "punch");
+  }
+
+  if (p->type & CUPS_PRINTER_COVER)
+  {
+    if (finishings[0])
+      strlcat(finishings, ",cover", sizeof(finishings));
+    else
+      strcpy(finishings, "cover");
+  }
+
+  if (p->type & CUPS_PRINTER_SORT)
+  {
+    if (finishings[0])
+      strlcat(finishings, ",sort", sizeof(finishings));
+    else
+      strcpy(finishings, "sort");
+  }
+
+  if (!finishings[0])
+    strcpy(finishings, "none");
+
+ /*
+  * Quote any commas in the make and model, location, and info strings...
+  */
+
+  for (src = p->make_model, dst = make_model;
+       src && *src && dst < (make_model + sizeof(make_model) - 2);)
+  {
+    if (*src == ',' || *src == '\\' || *src == ')')
+      *dst++ = '\\';
+
+    *dst++ = *src++;
+  }
+
+  *dst = '\0';
+
+  if (!make_model[0])
+    strcpy(make_model, "Unknown");
+
+  for (src = p->location, dst = location;
+       src && *src && dst < (location + sizeof(location) - 2);)
+  {
+    if (*src == ',' || *src == '\\' || *src == ')')
+      *dst++ = '\\';
+
+    *dst++ = *src++;
+  }
+
+  *dst = '\0';
+
+  if (!location[0])
+    strcpy(location, "Unknown");
+
+  for (src = p->info, dst = info;
+       src && *src && dst < (info + sizeof(info) - 2);)
+  {
+    if (*src == ',' || *src == '\\' || *src == ')')
+      *dst++ = '\\';
+
+    *dst++ = *src++;
+  }
+
+  *dst = '\0';
+
+  if (!info[0])
+    strcpy(info, "Unknown");
+
+ /*
+  * Get the authentication value...
+  */
+
+  authentication = ippFindAttribute(p->attrs, "uri-authentication-supported",
+                                    IPP_TAG_KEYWORD);
+
+ /*
+  * Make the SLP attribute string list that conforms to
+  * the IANA 'printer:' template.
+  */
+
+  snprintf(attrs, sizeof(attrs),
+           "(printer-uri-supported=%s),"
+           "(uri-authentication-supported=%s>),"
+#ifdef HAVE_SSL
+           "(uri-security-supported=tls>),"
+#else
+           "(uri-security-supported=none>),"
+#endif /* HAVE_SSL */
+           "(printer-name=%s),"
+           "(printer-location=%s),"
+           "(printer-info=%s),"
+           "(printer-more-info=%s),"
+           "(printer-make-and-model=%s),"
+	   "(charset-supported=utf-8),"
+	   "(natural-language-configured=%s),"
+	   "(natural-language-supported=de,en,es,fr,it),"
+           "(color-supported=%s),"
+           "(finishings-supported=%s),"
+           "(sides-supported=one-sided%s),"
+	   "(multiple-document-jobs-supported=true)"
+	   "(ipp-versions-supported=1.0,1.1)",
+	   p->uri, authentication->values[0].string.text, p->name, location,
+	   info, p->uri, make_model, DefaultLanguage,
+           p->type & CUPS_PRINTER_COLOR ? "true" : "false",
+           finishings,
+           p->type & CUPS_PRINTER_DUPLEX ?
+	       ",two-sided-long-edge,two-sided-short-edge" : "");
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "Attributes = \"%s\"", attrs);
+
+ /*
+  * Register the printer with the SLP server...
+  */
+
+  error = SLPReg(BrowseSLPHandle, srvurl, BrowseTimeout,
+	         SLP_CUPS_SRVTYPE, attrs, SLP_TRUE, slp_reg_callback, 0);
+
+  if (error != SLP_OK)
+    cupsdLogMessage(CUPSD_LOG_ERROR, "SLPReg of \"%s\" failed with status %d!", p->name,
+                    error);
+}
+#endif /* HAVE_LIBSLP */
+
+
 /*
  * 'cupsdStartBrowsing()' - Start sending and receiving broadcast information.
  */
@@ -1614,429 +1831,7 @@ cupsdUpdatePolling(void)
 }
 
 
-/***********************************************************************
- **** SLP Support Code *************************************************
- ***********************************************************************/
-
 #ifdef HAVE_LIBSLP 
-/*
- * SLP service name for CUPS...
- */
-
-#  define SLP_CUPS_SRVTYPE	"service:printer"
-#  define SLP_CUPS_SRVLEN	15
-
-
-/* 
- * Printer service URL structure
- */
-
-typedef struct _slpsrvurl
-{
-  struct _slpsrvurl	*next;
-  char			url[HTTP_MAX_URI];
-} slpsrvurl_t;
-
-
-/*
- * 'slp_reg_callback()' - Empty SLPRegReport.
- */
-
-static void
-slp_reg_callback(SLPHandle hslp,
-                  SLPError  errcode,
-		  void      *cookie)
-{
-  (void)hslp;
-  (void)errcode;
-  (void)cookie;
-
-  return;
-}
-
-
-/*
- * 'cupsdSendSLPBrowse()' - Register the specified printer with SLP.
- */
-
-void 
-cupsdSendSLPBrowse(cupsd_printer_t *p)	/* I - Printer to register */
-{
-  char		srvurl[HTTP_MAX_URI],	/* Printer service URI */
-		attrs[8192],		/* Printer attributes */
-		finishings[1024],	/* Finishings to support */
-		make_model[IPP_MAX_NAME * 2],
-					/* Make and model, quoted */
-		location[IPP_MAX_NAME * 2],
-					/* Location, quoted */
-		info[IPP_MAX_NAME * 2],	/* Info, quoted */
-		*src,			/* Pointer to original string */
-		*dst;			/* Pointer to destination string */
-  ipp_attribute_t *authentication;	/* uri-authentication-supported value */
-  SLPError	error;			/* SLP error, if any */
-
-
-  cupsdLogMessage(CUPSD_LOG_DEBUG, "cupsdSendSLPBrowse(%p = \"%s\")", p,
-                  p->name);
-
- /*
-  * Make the SLP service URL that conforms to the IANA 
-  * 'printer:' template.
-  */
-
-  snprintf(srvurl, sizeof(srvurl), SLP_CUPS_SRVTYPE ":%s", p->uri);
-
-  cupsdLogMessage(CUPSD_LOG_DEBUG2, "Service URL = \"%s\"", srvurl);
-
- /*
-  * Figure out the finishings string...
-  */
-
-  if (p->type & CUPS_PRINTER_STAPLE)
-    strcpy(finishings, "staple");
-  else
-    finishings[0] = '\0';
-
-  if (p->type & CUPS_PRINTER_BIND)
-  {
-    if (finishings[0])
-      strlcat(finishings, ",bind", sizeof(finishings));
-    else
-      strcpy(finishings, "bind");
-  }
-
-  if (p->type & CUPS_PRINTER_PUNCH)
-  {
-    if (finishings[0])
-      strlcat(finishings, ",punch", sizeof(finishings));
-    else
-      strcpy(finishings, "punch");
-  }
-
-  if (p->type & CUPS_PRINTER_COVER)
-  {
-    if (finishings[0])
-      strlcat(finishings, ",cover", sizeof(finishings));
-    else
-      strcpy(finishings, "cover");
-  }
-
-  if (p->type & CUPS_PRINTER_SORT)
-  {
-    if (finishings[0])
-      strlcat(finishings, ",sort", sizeof(finishings));
-    else
-      strcpy(finishings, "sort");
-  }
-
-  if (!finishings[0])
-    strcpy(finishings, "none");
-
- /*
-  * Quote any commas in the make and model, location, and info strings...
-  */
-
-  for (src = p->make_model, dst = make_model;
-       src && *src && dst < (make_model + sizeof(make_model) - 2);)
-  {
-    if (*src == ',' || *src == '\\' || *src == ')')
-      *dst++ = '\\';
-
-    *dst++ = *src++;
-  }
-
-  *dst = '\0';
-
-  if (!make_model[0])
-    strcpy(make_model, "Unknown");
-
-  for (src = p->location, dst = location;
-       src && *src && dst < (location + sizeof(location) - 2);)
-  {
-    if (*src == ',' || *src == '\\' || *src == ')')
-      *dst++ = '\\';
-
-    *dst++ = *src++;
-  }
-
-  *dst = '\0';
-
-  if (!location[0])
-    strcpy(location, "Unknown");
-
-  for (src = p->info, dst = info;
-       src && *src && dst < (info + sizeof(info) - 2);)
-  {
-    if (*src == ',' || *src == '\\' || *src == ')')
-      *dst++ = '\\';
-
-    *dst++ = *src++;
-  }
-
-  *dst = '\0';
-
-  if (!info[0])
-    strcpy(info, "Unknown");
-
- /*
-  * Get the authentication value...
-  */
-
-  authentication = ippFindAttribute(p->attrs, "uri-authentication-supported",
-                                    IPP_TAG_KEYWORD);
-
- /*
-  * Make the SLP attribute string list that conforms to
-  * the IANA 'printer:' template.
-  */
-
-  snprintf(attrs, sizeof(attrs),
-           "(printer-uri-supported=%s),"
-           "(uri-authentication-supported=%s>),"
-#ifdef HAVE_SSL
-           "(uri-security-supported=tls>),"
-#else
-           "(uri-security-supported=none>),"
-#endif /* HAVE_SSL */
-           "(printer-name=%s),"
-           "(printer-location=%s),"
-           "(printer-info=%s),"
-           "(printer-more-info=%s),"
-           "(printer-make-and-model=%s),"
-	   "(charset-supported=utf-8),"
-	   "(natural-language-configured=%s),"
-	   "(natural-language-supported=de,en,es,fr,it),"
-           "(color-supported=%s),"
-           "(finishings-supported=%s),"
-           "(sides-supported=one-sided%s),"
-	   "(multiple-document-jobs-supported=true)"
-	   "(ipp-versions-supported=1.0,1.1)",
-	   p->uri, authentication->values[0].string.text, p->name, location,
-	   info, p->uri, make_model, DefaultLanguage,
-           p->type & CUPS_PRINTER_COLOR ? "true" : "false",
-           finishings,
-           p->type & CUPS_PRINTER_DUPLEX ?
-	       ",two-sided-long-edge,two-sided-short-edge" : "");
-
-  cupsdLogMessage(CUPSD_LOG_DEBUG2, "Attributes = \"%s\"", attrs);
-
- /*
-  * Register the printer with the SLP server...
-  */
-
-  error = SLPReg(BrowseSLPHandle, srvurl, BrowseTimeout,
-	         SLP_CUPS_SRVTYPE, attrs, SLP_TRUE, slp_reg_callback, 0);
-
-  if (error != SLP_OK)
-    cupsdLogMessage(CUPSD_LOG_ERROR, "SLPReg of \"%s\" failed with status %d!", p->name,
-                    error);
-}
-
-
-/*
- * 'slp_dereg_printer()' - SLPDereg() the specified printer
- */
-
-static void 
-slp_dereg_printer(cupsd_printer_t *p)
-{
-  char	srvurl[HTTP_MAX_URI];	/* Printer service URI */
-
-
-  cupsdLogMessage(CUPSD_LOG_DEBUG, "slp_dereg_printer: printer=\"%s\"", p->name);
-
-  if (!(p->type & CUPS_PRINTER_REMOTE))
-  {
-   /*
-    * Make the SLP service URL that conforms to the IANA 
-    * 'printer:' template.
-    */
-
-    snprintf(srvurl, sizeof(srvurl), SLP_CUPS_SRVTYPE ":%s", p->uri);
-
-   /*
-    * Deregister the printer...
-    */
-
-    SLPDereg(BrowseSLPHandle, srvurl, slp_reg_callback, 0);
-  }
-}
-
-
-/*
- * 'slp_get_attr()' - Get an attribute from an SLP registration.
- */
-
-static int 				/* O - 0 on success */
-slp_get_attr(const char *attrlist,	/* I - Attribute list string */
-             const char *tag,		/* I - Name of attribute */
-             char       **valbuf)	/* O - Value */
-{
-  char	*ptr1,				/* Pointer into string */
-	*ptr2;				/* ... */
-
-
-  cupsdClearString(valbuf);
-
-  if ((ptr1 = strstr(attrlist, tag)) != NULL)
-  {
-    ptr1 += strlen(tag);
-
-    if ((ptr2 = strchr(ptr1,')')) != NULL)
-    {
-     /*
-      * Copy the value...
-      */
-
-      *valbuf = calloc(ptr2 - ptr1 + 1, 1);
-      strncpy(*valbuf, ptr1, ptr2 - ptr1);
-
-     /*
-      * Dequote the value...
-      */
-
-      for (ptr1 = *valbuf; *ptr1; ptr1 ++)
-	if (*ptr1 == '\\' && ptr1[1])
-	  _cups_strcpy(ptr1, ptr1 + 1);
-
-      return (0);
-    }
-  }
-
-  return (-1);
-}
-
-
-/*
- * 'slp_attr_callback()' - SLP attribute callback 
- */
-
-static SLPBoolean			/* O - SLP_TRUE for success */
-slp_attr_callback(
-    SLPHandle  hslp,			/* I - SLP handle */
-    const char *attrlist,		/* I - Attribute list */
-    SLPError   errcode,			/* I - Parsing status for this attr */
-    void       *cookie)			/* I - Current printer */
-{
-  char			*tmp = 0;
-  cupsd_printer_t	*p = (cupsd_printer_t*)cookie;
-
-
- /*
-  * Let the compiler know we won't be using these...
-  */
-
-  (void)hslp;
-
- /*
-  * Bail if there was an error
-  */
-
-  if (errcode != SLP_OK)
-    return (SLP_TRUE);
-
- /*
-  * Parse the attrlist to obtain things needed to build CUPS browse packet
-  */
-
-  memset(p, 0, sizeof(cupsd_printer_t));
-
-  p->type = CUPS_PRINTER_REMOTE;
-
-  if (slp_get_attr(attrlist, "(printer-location=", &(p->location)))
-    return (SLP_FALSE);
-  if (slp_get_attr(attrlist, "(printer-info=", &(p->info)))
-    return (SLP_FALSE);
-  if (slp_get_attr(attrlist, "(printer-make-and-model=", &(p->make_model)))
-    return (SLP_FALSE);
-
-  if (slp_get_attr(attrlist, "(color-supported=", &tmp))
-    return (SLP_FALSE);
-  if (strcasecmp(tmp, "true") == 0)
-    p->type |= CUPS_PRINTER_COLOR;
-
-  if (slp_get_attr(attrlist, "(finishings-supported=", &tmp))
-    return (SLP_FALSE);
-  if (strstr(tmp, "staple"))
-    p->type |= CUPS_PRINTER_STAPLE;
-  if (strstr(tmp, "bind"))
-    p->type |= CUPS_PRINTER_BIND;
-  if (strstr(tmp, "punch"))
-    p->type |= CUPS_PRINTER_PUNCH;
-
-  if (slp_get_attr(attrlist, "(sides-supported=", &tmp))
-    return (SLP_FALSE);
-  if (strstr(tmp,"two-sided"))
-    p->type |= CUPS_PRINTER_DUPLEX;
-
-  cupsdClearString(&tmp);
-
-  return (SLP_TRUE);
-}
-
-
-/*
- * 'slp_url_callback()' - SLP service url callback
- */
-
-static SLPBoolean			/* O - TRUE = OK, FALSE = error */
-slp_url_callback(
-    SLPHandle      hslp,	 	/* I - SLP handle */
-    const char     *srvurl, 		/* I - URL of service */
-    unsigned short lifetime,		/* I - Life of service */
-    SLPError       errcode, 		/* I - Existing error code */
-    void           *cookie)		/* I - Pointer to service list */
-{
-  slpsrvurl_t	*s,			/* New service entry */
-		**head;			/* Pointer to head of entry */
-
-
- /*
-  * Let the compiler know we won't be using these vars...
-  */
-
-  (void)hslp;
-  (void)lifetime;
-
- /*
-  * Bail if there was an error
-  */
-
-  if (errcode != SLP_OK)
-    return (SLP_TRUE);
-
- /*
-  * Grab the head of the list...
-  */
-
-  head = (slpsrvurl_t**)cookie;
-
- /*
-  * Allocate a *temporary* slpsrvurl_t to hold this entry.
-  */
-
-  if ((s = (slpsrvurl_t *)calloc(1, sizeof(slpsrvurl_t))) == NULL)
-    return (SLP_FALSE);
-
- /*
-  * Copy the SLP service URL...
-  */
-
-  strlcpy(s->url, srvurl, sizeof(s->url));
-
- /* 
-  * Link the SLP service URL into the head of the list
-  */
-
-  if (*head)
-    s->next = *head;
-
-  *head = s;
-
-  return (SLP_TRUE);
-}
-
-
 /*
  * 'cupsdUpdateSLPBrowse()' - Get browsing information via SLP.
  */
@@ -2044,15 +1839,19 @@ slp_url_callback(
 void
 cupsdUpdateSLPBrowse(void)
 {
-  slpsrvurl_t	*s,			/* Temporary list of service URLs */
-		*next;			/* Next service in list */
-  cupsd_printer_t	p;			/* Printer information */
-  const char	*uri;			/* Pointer to printer URI */
-  char		method[HTTP_MAX_URI],	/* Method portion of URI */
-		username[HTTP_MAX_URI],	/* Username portion of URI */
-		host[HTTP_MAX_URI],	/* Host portion of URI */
-		resource[HTTP_MAX_URI];	/* Resource portion of URI */
-  int		port;			/* Port portion of URI */
+  slpsrvurl_t		*s,		/* Temporary list of service URLs */
+			*next;		/* Next service in list */
+  cupsd_printer_t	p;		/* Printer information */
+  const char		*uri;		/* Pointer to printer URI */
+  char			method[HTTP_MAX_URI],
+					/* Method portion of URI */
+			username[HTTP_MAX_URI],
+					/* Username portion of URI */
+			host[HTTP_MAX_URI],
+					/* Host portion of URI */
+			resource[HTTP_MAX_URI];
+					/* Resource portion of URI */
+  int			port;		/* Port portion of URI */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG, "cupsdUpdateSLPBrowse() Start...");
@@ -2129,6 +1928,227 @@ cupsdUpdateSLPBrowse(void)
   }       
 
   cupsdLogMessage(CUPSD_LOG_DEBUG, "cupsdUpdateSLPBrowse() End...");
+}
+
+
+/*
+ * 'slp_attr_callback()' - SLP attribute callback 
+ */
+
+static SLPBoolean			/* O - SLP_TRUE for success */
+slp_attr_callback(
+    SLPHandle  hslp,			/* I - SLP handle */
+    const char *attrlist,		/* I - Attribute list */
+    SLPError   errcode,			/* I - Parsing status for this attr */
+    void       *cookie)			/* I - Current printer */
+{
+  char			*tmp = 0;
+  cupsd_printer_t	*p = (cupsd_printer_t*)cookie;
+
+
+ /*
+  * Let the compiler know we won't be using these...
+  */
+
+  (void)hslp;
+
+ /*
+  * Bail if there was an error
+  */
+
+  if (errcode != SLP_OK)
+    return (SLP_TRUE);
+
+ /*
+  * Parse the attrlist to obtain things needed to build CUPS browse packet
+  */
+
+  memset(p, 0, sizeof(cupsd_printer_t));
+
+  p->type = CUPS_PRINTER_REMOTE;
+
+  if (slp_get_attr(attrlist, "(printer-location=", &(p->location)))
+    return (SLP_FALSE);
+  if (slp_get_attr(attrlist, "(printer-info=", &(p->info)))
+    return (SLP_FALSE);
+  if (slp_get_attr(attrlist, "(printer-make-and-model=", &(p->make_model)))
+    return (SLP_FALSE);
+
+  if (slp_get_attr(attrlist, "(color-supported=", &tmp))
+    return (SLP_FALSE);
+  if (strcasecmp(tmp, "true") == 0)
+    p->type |= CUPS_PRINTER_COLOR;
+
+  if (slp_get_attr(attrlist, "(finishings-supported=", &tmp))
+    return (SLP_FALSE);
+  if (strstr(tmp, "staple"))
+    p->type |= CUPS_PRINTER_STAPLE;
+  if (strstr(tmp, "bind"))
+    p->type |= CUPS_PRINTER_BIND;
+  if (strstr(tmp, "punch"))
+    p->type |= CUPS_PRINTER_PUNCH;
+
+  if (slp_get_attr(attrlist, "(sides-supported=", &tmp))
+    return (SLP_FALSE);
+  if (strstr(tmp,"two-sided"))
+    p->type |= CUPS_PRINTER_DUPLEX;
+
+  cupsdClearString(&tmp);
+
+  return (SLP_TRUE);
+}
+
+
+/*
+ * 'slp_dereg_printer()' - SLPDereg() the specified printer
+ */
+
+static void 
+slp_dereg_printer(cupsd_printer_t *p)	/* I - Printer */
+{
+  char	srvurl[HTTP_MAX_URI];		/* Printer service URI */
+
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG, "slp_dereg_printer: printer=\"%s\"", p->name);
+
+  if (!(p->type & CUPS_PRINTER_REMOTE))
+  {
+   /*
+    * Make the SLP service URL that conforms to the IANA 
+    * 'printer:' template.
+    */
+
+    snprintf(srvurl, sizeof(srvurl), SLP_CUPS_SRVTYPE ":%s", p->uri);
+
+   /*
+    * Deregister the printer...
+    */
+
+    SLPDereg(BrowseSLPHandle, srvurl, slp_reg_callback, 0);
+  }
+}
+
+
+/*
+ * 'slp_get_attr()' - Get an attribute from an SLP registration.
+ */
+
+static int 				/* O - 0 on success */
+slp_get_attr(const char *attrlist,	/* I - Attribute list string */
+             const char *tag,		/* I - Name of attribute */
+             char       **valbuf)	/* O - Value */
+{
+  char	*ptr1,				/* Pointer into string */
+	*ptr2;				/* ... */
+
+
+  cupsdClearString(valbuf);
+
+  if ((ptr1 = strstr(attrlist, tag)) != NULL)
+  {
+    ptr1 += strlen(tag);
+
+    if ((ptr2 = strchr(ptr1,')')) != NULL)
+    {
+     /*
+      * Copy the value...
+      */
+
+      *valbuf = calloc(ptr2 - ptr1 + 1, 1);
+      strncpy(*valbuf, ptr1, ptr2 - ptr1);
+
+     /*
+      * Dequote the value...
+      */
+
+      for (ptr1 = *valbuf; *ptr1; ptr1 ++)
+	if (*ptr1 == '\\' && ptr1[1])
+	  _cups_strcpy(ptr1, ptr1 + 1);
+
+      return (0);
+    }
+  }
+
+  return (-1);
+}
+
+
+/*
+ * 'slp_reg_callback()' - Empty SLPRegReport.
+ */
+
+static void
+slp_reg_callback(SLPHandle hslp,	/* I - SLP handle */
+                 SLPError  errcode,	/* I - Error code, if any */
+		 void      *cookie)	/* I - App data */
+{
+  (void)hslp;
+  (void)errcode;
+  (void)cookie;
+
+  return;
+}
+
+
+/*
+ * 'slp_url_callback()' - SLP service url callback
+ */
+
+static SLPBoolean			/* O - TRUE = OK, FALSE = error */
+slp_url_callback(
+    SLPHandle      hslp,	 	/* I - SLP handle */
+    const char     *srvurl, 		/* I - URL of service */
+    unsigned short lifetime,		/* I - Life of service */
+    SLPError       errcode, 		/* I - Existing error code */
+    void           *cookie)		/* I - Pointer to service list */
+{
+  slpsrvurl_t	*s,			/* New service entry */
+		**head;			/* Pointer to head of entry */
+
+
+ /*
+  * Let the compiler know we won't be using these vars...
+  */
+
+  (void)hslp;
+  (void)lifetime;
+
+ /*
+  * Bail if there was an error
+  */
+
+  if (errcode != SLP_OK)
+    return (SLP_TRUE);
+
+ /*
+  * Grab the head of the list...
+  */
+
+  head = (slpsrvurl_t**)cookie;
+
+ /*
+  * Allocate a *temporary* slpsrvurl_t to hold this entry.
+  */
+
+  if ((s = (slpsrvurl_t *)calloc(1, sizeof(slpsrvurl_t))) == NULL)
+    return (SLP_FALSE);
+
+ /*
+  * Copy the SLP service URL...
+  */
+
+  strlcpy(s->url, srvurl, sizeof(s->url));
+
+ /* 
+  * Link the SLP service URL into the head of the list
+  */
+
+  if (*head)
+    s->next = *head;
+
+  *head = s;
+
+  return (SLP_TRUE);
 }
 #endif /* HAVE_LIBSLP */
 

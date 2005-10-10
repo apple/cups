@@ -73,8 +73,8 @@
 static unsigned	cups_raster_read_header(cups_raster_t *r);
 static void	cups_raster_update(cups_raster_t *r);
 static int	cups_raster_write(cups_raster_t *r);
-static int	cups_read(int fd, char *buf, int bytes);
-static int	cups_write(int fd, const char *buf, int bytes);
+static int	cups_read(int fd, unsigned char *buf, int bytes);
+static int	cups_write(int fd, const unsigned char *buf, int bytes);
 
 
 /*
@@ -117,7 +117,8 @@ cupsRasterOpen(int         fd,		/* I - File descriptor */
     * Open for read - get sync word...
     */
 
-    if (cups_read(r->fd, (char *)&(r->sync), sizeof(r->sync)) < sizeof(r->sync))
+    if (cups_read(r->fd, (unsigned char *)&(r->sync), sizeof(r->sync))
+            < sizeof(r->sync))
     {
       free(r);
       return (NULL);
@@ -139,7 +140,8 @@ cupsRasterOpen(int         fd,		/* I - File descriptor */
     */
 
     r->sync = CUPS_RASTER_SYNC;
-    if (cups_write(r->fd, (char *)&(r->sync), sizeof(r->sync)) < sizeof(r->sync))
+    if (cups_write(r->fd, (unsigned char *)&(r->sync), sizeof(r->sync))
+            < sizeof(r->sync))
     {
       free(r);
       return (NULL);
@@ -154,9 +156,10 @@ cupsRasterOpen(int         fd,		/* I - File descriptor */
  * 'cupsRasterReadHeader()' - Read a V1 raster page header.
  */
 
-unsigned					/* O - 1 on success, 0 on fail */
-cupsRasterReadHeader(cups_raster_t      *r,	/* I - Raster stream */
-                     cups_page_header_t *h)	/* I - Pointer to header data */
+unsigned				/* O - 1 on success, 0 on fail */
+cupsRasterReadHeader(
+    cups_raster_t      *r,		/* I - Raster stream */
+    cups_page_header_t *h)		/* I - Pointer to header data */
 {
  /*
   * Get the raster header...
@@ -179,9 +182,10 @@ cupsRasterReadHeader(cups_raster_t      *r,	/* I - Raster stream */
  * 'cupsRasterReadHeader2()' - Read a V2 raster page header.
  */
 
-unsigned					/* O - 1 on success, 0 on fail */
-cupsRasterReadHeader2(cups_raster_t       *r,	/* I - Raster stream */
-                      cups_page_header2_t *h)	/* I - Pointer to header data */
+unsigned				/* O - 1 on success, 0 on fail */
+cupsRasterReadHeader2(
+    cups_raster_t       *r,		/* I - Raster stream */
+    cups_page_header2_t *h)		/* I - Pointer to header data */
 {
  /*
   * Get the raster header...
@@ -392,9 +396,10 @@ cupsRasterReadPixels(cups_raster_t *r,	/* I - Raster stream */
  * 'cupsRasterWriteHeader()' - Write a V2 raster page header.
  */
  
-unsigned					/* O - 1 on success, 0 on failure */
-cupsRasterWriteHeader(cups_raster_t      *r,	/* I - Raster stream */
-                      cups_page_header_t *h)	/* I - Raster page header */
+unsigned				/* O - 1 on success, 0 on failure */
+cupsRasterWriteHeader(
+    cups_raster_t      *r,		/* I - Raster stream */
+    cups_page_header_t *h)		/* I - Raster page header */
 {
   if (r == NULL || r->mode != CUPS_RASTER_WRITE)
     return (0);
@@ -413,7 +418,8 @@ cupsRasterWriteHeader(cups_raster_t      *r,	/* I - Raster stream */
   * Write the raster header...
   */
 
-  return (cups_write(r->fd, (char *)&(r->header), sizeof(r->header)) > 0);
+  return (cups_write(r->fd, (unsigned char *)&(r->header), sizeof(r->header))
+              > 0);
 }
 
 
@@ -421,9 +427,10 @@ cupsRasterWriteHeader(cups_raster_t      *r,	/* I - Raster stream */
  * 'cupsRasterWriteHeader2()' - Write a V2 raster page header.
  */
  
-unsigned					/* O - 1 on success, 0 on failure */
-cupsRasterWriteHeader2(cups_raster_t       *r,	/* I - Raster stream */
-                       cups_page_header2_t *h)	/* I - Raster page header */
+unsigned				/* O - 1 on success, 0 on failure */
+cupsRasterWriteHeader2(
+    cups_raster_t       *r,		/* I - Raster stream */
+    cups_page_header2_t *h)		/* I - Raster page header */
 {
   if (r == NULL || r->mode != CUPS_RASTER_WRITE)
     return (0);
@@ -441,7 +448,8 @@ cupsRasterWriteHeader2(cups_raster_t       *r,	/* I - Raster stream */
   * Write the raster header...
   */
 
-  return (cups_write(r->fd, (char *)&(r->header), sizeof(r->header)) > 0);
+  return (cups_write(r->fd, (unsigned char *)&(r->header), sizeof(r->header))
+              > 0);
 }
 
 
@@ -559,11 +567,12 @@ cupsRasterWritePixels(cups_raster_t *r,	/* I - Raster stream */
  * 'cups_raster_read_header()' - Read a raster page header.
  */
 
-static unsigned					/* O - 1 on success, 0 on fail */
-cups_raster_read_header(cups_raster_t *r)	/* I - Raster stream */
+static unsigned				/* O - 1 on success, 0 on fail */
+cups_raster_read_header(
+    cups_raster_t *r)			/* I - Raster stream */
 {
-  int		len;				/* Number of words to swap */
-  union swap_s					/* Swapping structure */
+  int		len;			/* Number of words to swap */
+  union swap_s				/* Swapping structure */
   {
     unsigned char	b[4];
     unsigned		v;
@@ -588,7 +597,7 @@ cups_raster_read_header(cups_raster_t *r)	/* I - Raster stream */
 
   memset(&(r->header), 0, sizeof(r->header));
 
-  if (cups_read(r->fd, (char *)&(r->header), len) < len)
+  if (cups_read(r->fd, (unsigned char *)&(r->header), len) < len)
     return (0);
 
  /*
@@ -760,7 +769,7 @@ cups_raster_write(cups_raster_t *r)	/* I - Raster stream */
       if (cups_write(r->fd, start, r->bpp) < r->bpp)
         return (0);
     }
-    else if (memcmp(start, ptr, r->bpp) == 0)
+    else if (!memcmp(start, ptr, r->bpp))
     {
      /*
       * Encode a sequence of repeating pixels...
@@ -787,7 +796,7 @@ cups_raster_write(cups_raster_t *r)	/* I - Raster stream */
       */
 
       for (count = 1; count < 127 && ptr < (r->pend - r->bpp); count ++, ptr += r->bpp)
-        if (memcmp(ptr, ptr + r->bpp, r->bpp) == 0)
+        if (!memcmp(ptr, ptr + r->bpp, r->bpp))
 	  break;
 
       if (ptr >= (r->pend - r->bpp) && count < 128)
@@ -816,13 +825,13 @@ cups_raster_write(cups_raster_t *r)	/* I - Raster stream */
  * 'cups_read()' - Read bytes from a file.
  */
 
-static int					/* O - Bytes read or -1 */
-cups_read(int  fd,				/* I - File descriptor */
-          char *buf,				/* I - Buffer for read */
-	  int  bytes)				/* I - Number of bytes to read */
+static int				/* O - Bytes read or -1 */
+cups_read(int           fd,		/* I - File descriptor */
+          unsigned char *buf,		/* I - Buffer for read */
+	  int           bytes)		/* I - Number of bytes to read */
 {
-  int	count,					/* Number of bytes read */
-	total;					/* Total bytes read */
+  int	count,				/* Number of bytes read */
+	total;				/* Total bytes read */
 
 
   for (total = 0; total < bytes; total += count, buf += count)
@@ -848,13 +857,13 @@ cups_read(int  fd,				/* I - File descriptor */
  * 'cups_write()' - Write bytes to a file.
  */
 
-static int					/* O - Bytes written or -1 */
-cups_write(int        fd,			/* I - File descriptor */
-           const char *buf,			/* I - Bytes to write */
-	   int        bytes)			/* I - Number of bytes to write */
+static int				/* O - Bytes written or -1 */
+cups_write(int                 fd,	/* I - File descriptor */
+           const unsigned char *buf,	/* I - Bytes to write */
+	   int                 bytes)	/* I - Number of bytes to write */
 {
-  int	count,					/* Number of bytes written */
-	total;					/* Total bytes written */
+  int	count,				/* Number of bytes written */
+	total;				/* Total bytes written */
 
 
   for (total = 0; total < bytes; total += count, buf += count)

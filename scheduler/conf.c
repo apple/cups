@@ -1113,7 +1113,6 @@ get_address(const char  *value,		/* I - Value string */
     {
       cupsdLogMessage(CUPSD_LOG_ERROR, "Service lookup for \"%s\" failed!",
                       portname);
-      free(addrlist);
       return (NULL);
     }
 

@@ -935,6 +935,8 @@ help_load_directory(
   if ((dir = opendir(directory)) == NULL)
     return (0);
 
+  update = 0;
+
   while ((dent = readdir(dir)) != NULL)
   {
    /*

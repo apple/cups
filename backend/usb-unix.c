@@ -212,7 +212,8 @@ print_device(const char *uri,		/* I - Device URI */
   * Finally, send the print file...
   */
 
-  wbytes = 0;
+  wbytes   = 0;
+  paperout = 0;
 
   while (copies > 0)
   {

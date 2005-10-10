@@ -41,20 +41,8 @@ AC_SUBST(CXXLIBS)
 if test -n "$GCC"; then
 	if test -z "$OPTIM"; then
 		if test "x$with_optim" = x; then
-			case "$uname" in
-				HP-UX*)
-					# GCC under HP-UX has bugs with -O2
-					OPTIM="-O1"
-					;;
-				Darwin*)
-					# Apple likes to optimize for size and include debugging information...
-		       			OPTIM="-Os -g"
-					;;
-				*)
-					# All others...
-		       			OPTIM="-O2"
-					;;
-			esac
+			# Default to optimize-for-size and debug
+       			OPTIM="-Os -g"
 		else
 			OPTIM="$with_optim $OPTIM"
 		fi

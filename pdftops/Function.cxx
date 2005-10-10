@@ -1150,6 +1150,7 @@ GBool PostScriptFunction::parseCode(Stream *str, int *codePtr) {
       a = -1;
       b = nPSOps;
       // invariant: psOpNames[a] < tok < psOpNames[b]
+      cmp = 1;
       while (b - a > 1) {
 	mid = (a + b) / 2;
 	cmp = tok->cmp(psOpNames[mid]);

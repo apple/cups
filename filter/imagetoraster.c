@@ -687,7 +687,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   if (profile)
     cupsImageSetProfile(profile->density, profile->gamma, profile->matrix);
 
-  cupsImageSetColorSpace(header.cupsColorSpace);
+  cupsImageSetRasterColorSpace(header.cupsColorSpace);
 
  /*
   * Create a gamma/brightness LUT...

@@ -688,6 +688,7 @@ Operator *Gfx::findOp(char *name) {
   a = -1;
   b = numOps;
   // invariant: opTab[a] < name < opTab[b]
+  cmp = 1;
   while (b - a > 1) {
     m = (a + b) / 2;
     cmp = strcmp(opTab[m].name, name);

@@ -28,39 +28,42 @@
  *
  * Contents:
  *
- *   cupsImageCMYKToBlack()   - Convert CMYK data to black.
- *   cupsImageCMYKToCMY()     - Convert CMYK colors to CMY.
- *   cupsImageCMYKToCMYK()    - Convert CMYK colors to CMYK.
- *   cupsImageCMYKToRGB()     - Convert CMYK colors to device-dependent RGB.
- *   cupsImageCMYKToWhite()   - Convert CMYK colors to luminance.
- *   cupsImageLut()           - Adjust all pixel values with the given LUT.
- *   cupsImageRGBAdjust()     - Adjust the hue and saturation of the given
- *                              RGB colors.
- *   cupsImageRGBToBlack()    - Convert RGB data to black.
- *   cupsImageRGBToCMY()      - Convert RGB colors to CMY.
- *   cupsImageRGBToCMYK()     - Convert RGB colors to CMYK.
- *   cupsImageRGBToRGB()      - Convert RGB colors to device-dependent RGB.
- *   cupsImageRGBToWhite()    - Convert RGB colors to luminance.
- *   cupsImageSetColorSpace() - Set the destination colorspace.
- *   cupsImageSetProfile()    - Set the device color profile.
- *   cupsImageWhiteToBlack()  - Convert luminance colors to black.
- *   cupsImageWhiteToCMY()    - Convert luminance colors to CMY.
- *   cupsImageWhiteToCMYK()   - Convert luminance colors to CMYK.
- *   cupsImageWhiteToRGB()    - Convert luminance data to RGB.
- *   cupsImageWhiteToWhite()  - Convert luminance colors to device-dependent
- *                              luminance.
- *   cielab()                 - Map CIE Lab transformation...
- *   huerotate()              - Rotate the hue, maintaining luminance.
- *   ident()                  - Make an identity matrix.
- *   mult()                   - Multiply two matrices.
- *   rgb_to_lab()             - Convert an RGB color to CIE Lab.
- *   rgb_to_xyz()             - Convert an RGB color to CIE XYZ.
- *   saturate()               - Make a saturation matrix.
- *   xform()                  - Transform a 3D point using a matrix...
- *   xrotate()                - Rotate about the x (red) axis...
- *   yrotate()                - Rotate about the y (green) axis...
- *   zrotate()                - Rotate about the z (blue) axis...
- *   zshear()                 - Shear z using x and y...
+ *   cupsImageCMYKToBlack()         - Convert CMYK data to black.
+ *   cupsImageCMYKToCMY()           - Convert CMYK colors to CMY.
+ *   cupsImageCMYKToCMYK()          - Convert CMYK colors to CMYK.
+ *   cupsImageCMYKToRGB()           - Convert CMYK colors to device-dependent
+ *                                    RGB.
+ *   cupsImageCMYKToWhite()         - Convert CMYK colors to luminance.
+ *   cupsImageLut()                 - Adjust all pixel values with the given
+ *                                    LUT.
+ *   cupsImageRGBAdjust()           - Adjust the hue and saturation of the
+ *                                    given RGB colors.
+ *   cupsImageRGBToBlack()          - Convert RGB data to black.
+ *   cupsImageRGBToCMY()            - Convert RGB colors to CMY.
+ *   cupsImageRGBToCMYK()           - Convert RGB colors to CMYK.
+ *   cupsImageRGBToRGB()            - Convert RGB colors to device-dependent
+ *                                    RGB.
+ *   cupsImageRGBToWhite()          - Convert RGB colors to luminance.
+ *   cupsImageSetProfile()          - Set the device color profile.
+ *   cupsImageSetRasterColorSpace() - Set the destination colorspace.
+ *   cupsImageWhiteToBlack()        - Convert luminance colors to black.
+ *   cupsImageWhiteToCMY()          - Convert luminance colors to CMY.
+ *   cupsImageWhiteToCMYK()         - Convert luminance colors to CMYK.
+ *   cupsImageWhiteToRGB()          - Convert luminance data to RGB.
+ *   cupsImageWhiteToWhite()        - Convert luminance colors to device-
+ *                                    dependent luminance.
+ *   cielab()                       - Map CIE Lab transformation...
+ *   huerotate()                    - Rotate the hue, maintaining luminance.
+ *   ident()                        - Make an identity matrix.
+ *   mult()                         - Multiply two matrices.
+ *   rgb_to_lab()                   - Convert an RGB color to CIE Lab.
+ *   rgb_to_xyz()                   - Convert an RGB color to CIE XYZ.
+ *   saturate()                     - Make a saturation matrix.
+ *   xform()                        - Transform a 3D point using a matrix...
+ *   xrotate()                      - Rotate about the x (red) axis...
+ *   yrotate()                      - Rotate about the y (green) axis...
+ *   zrotate()                      - Rotate about the z (blue) axis...
+ *   zshear()                       - Shear z using x and y...
  */
 
 /*
@@ -898,28 +901,6 @@ cupsImageRGBToWhite(
 
 
 /*
- * 'cupsImageSetColorSpace()' - Set the destination colorspace.
- */
-
-void
-cupsImageSetColorSpace(cups_cspace_t cs)/* I - Destination colorspace */
-{
- /*
-  * Set the destination colorspace...
-  */
-
-  cupsImageColorSpace  = cs;
-
- /*
-  * Don't use color profiles in colorimetric colorspaces...
-  */
-
-  if (cs >= CUPS_CSPACE_CIEXYZ)
-    cupsImageHaveProfile = 0;
-}
-
-
-/*
  * 'cupsImageSetProfile()' - Set the device color profile.
  */
 
@@ -962,6 +943,29 @@ cupsImageSetProfile(float d,		/* I - Ink/marker density */
 
   for (k = 0, im = cupsImageDensity; k < 256; k ++)
     *im++ = 255.0 * d * pow((float)k / 255.0, g) + 0.5;
+}
+
+
+/*
+ * 'cupsImageSetRasterColorSpace()' - Set the destination colorspace.
+ */
+
+void
+cupsImageSetRasterColorSpace(
+    cups_cspace_t cs)			/* I - Destination colorspace */
+{
+ /*
+  * Set the destination colorspace...
+  */
+
+  cupsImageColorSpace  = cs;
+
+ /*
+  * Don't use color profiles in colorimetric colorspaces...
+  */
+
+  if (cs >= CUPS_CSPACE_CIEXYZ)
+    cupsImageHaveProfile = 0;
 }
 
 

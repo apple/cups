@@ -851,6 +851,8 @@ main(int  argc,			/* I - Number of command-line arguments */
 	    else
 	      ydpi = xdpi;
 	  }
+	  else
+	    ydpi = xdpi;
 
 	  if (xdpi <= 0 || ydpi <= 0 || strcmp(ptr, "dpi"))
 	  {

@@ -1170,9 +1170,13 @@ ippReadIO(void       *src,		/* I - Data source */
 	    attr->name       = strdup((char *)buffer);
 	    attr->num_values = 0;
 	  }
+	  else
+	    attr = NULL;
 
           if (tag != IPP_TAG_END_COLLECTION)
             value = attr->values + attr->num_values;
+	  else
+	    value = NULL;
 
 	  if ((*cb)(src, buffer, 2) < 2)
 	  {

@@ -2734,6 +2734,8 @@ do_menu(http_t      *http,		/* I - HTTP connection */
         qsort(printer_devices, num_printer_devices, sizeof(char *),
 	      compare_printer_devices);
     }
+    else
+      printer_devices = NULL;
 
    /*
     * Free the printer list and get the device list...

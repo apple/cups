@@ -1625,6 +1625,8 @@ httpWrite(http_t     *http,		/* I - HTTP data */
     if (http->data_encoding == HTTP_ENCODE_LENGTH)
       http->data_remaining -= bytes;
   }
+  else
+    bytes = 0;
 
  /*
   * Handle end-of-request processing...
