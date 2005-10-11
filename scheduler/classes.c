@@ -305,10 +305,11 @@ cupsdFindClass(const char *name)	/* I - Name of class */
   cupsd_printer_t	*c;		/* Current class/printer */
 
 
-  if ((c = cupsdFindDest(name)) != NULL && !(c->type & CUPS_PRINTER_CLASS))
-    return (NULL);
-  else
+  if ((c = cupsdFindDest(name)) != NULL &&
+      (c->type & (CUPS_PRINTER_CLASS | CUPS_PRINTER_IMPLICIT)))
     return (c);
+  else
+    return (NULL);
 }
 
 
