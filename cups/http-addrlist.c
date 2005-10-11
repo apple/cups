@@ -208,7 +208,8 @@ httpAddrGetList(const char *hostname,	/* I - Hostname or IP address */
     struct addrinfo	hints,		/* Address lookup hints */
 			*results,	/* Address lookup results */
 			*current;	/* Current result */
-
+    char		ipv6[1024];	/* IPv6 address */
+    int			ipv6len;	/* Length of IPv6 address */
 
 
    /*
@@ -218,6 +219,20 @@ httpAddrGetList(const char *hostname,	/* I - Hostname or IP address */
     memset(&hints, 0, sizeof(hints));
     hints.ai_family   = family;
     hints.ai_socktype = SOCK_STREAM;
+
+    if (*hostname == '[')
+    {
+     /*
+      * Remove brackets from numeric IPv6 address...
+      */
+
+      strlcpy(ipv6, hostname + 1, sizeof(ipv6));
+      if ((ipv6len = strlen(ipv6) - 1) >= 0 && ipv6[ipv6len] == ']')
+      {
+        ipv6[ipv6len] = '\0';
+	hostname      = ipv6;
+      }
+    }
 
     if (!getaddrinfo(hostname, service, &hints, &results))
     {

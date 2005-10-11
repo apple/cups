@@ -206,6 +206,17 @@ httpAddrLookup(const http_addr_t *addr,		/* I - Address to lookup */
 
       return (NULL);
     }
+
+   /*
+    * Check for a numeric IPv6 address, which will contain a colon; if
+    * so, convert the address to "[address]".
+    */
+
+    if (strchr(name, ':'))
+    {
+      strlcpy(servname, name, sizeof(servname));
+      snprintf(name, namelen, "[%s]", servname);
+    }
   }
 #else
   {
@@ -272,11 +283,34 @@ httpAddrString(const http_addr_t *addr,		/* I - Address to convert */
 #endif /* AF_LOCAL */
 #ifdef HAVE_GETNAMEINFO
   {
-    char	servname[1024];			/* Service name (not used) */
+    char	servname[1024];		/* Service name (not used) */
 
 
-    if (getnameinfo(&addr->addr, httpAddrLength(addr), s, slen,
-                    servname, sizeof(servname), NI_NUMERICHOST))
+    if (addr->addr.sa_family == AF_INET6)
+    {
+     /*
+      * Make sure that IPv6 addresses have brackets...
+      */
+
+      s[0] = '[';
+
+      if (getnameinfo(&addr->addr, httpAddrLength(addr), s + 1, slen - 2,
+                      servname, sizeof(servname), NI_NUMERICHOST))
+      {
+       /*
+	* If we get an error back, then the address type is not supported
+	* and we should zero out the buffer...
+	*/
+
+	s[0] = '\0';
+
+	return (NULL);
+      }
+
+      strlcat(s, "]", slen);
+    }
+    else if (getnameinfo(&addr->addr, httpAddrLength(addr), s, slen,
+                	 servname, sizeof(servname), NI_NUMERICHOST))
     {
      /*
       * If we get an error back, then the address type is not supported
