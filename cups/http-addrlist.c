@@ -23,6 +23,9 @@
  *
  * Contents:
  *
+ *   httpAddrConnect()  - Connect to any of the addresses in the list.
+ *   httpAddrFreeList() - Free an address list.
+ *   httpAddrGetList()  - Get a list of address for a hostname.
  */
 
 /*
@@ -163,15 +166,17 @@ httpAddrGetList(const char *hostname,	/* I - Hostname or IP address */
 			*temp;		/* New address */
 
 
-  DEBUG_printf(("httpAddrGetList(hostname=\"%s\", family=AF_%s, service=\"%s\")\n",
-                hostname, family == AF_UNSPEC ? "UNSPEC" :
-#ifdef AF_LOCAL
-		          family == AF_LOCAL ? "LOCAL" :
-#endif /* AF_LOCAL */
-#ifdef AF_INET6
-			  family == AF_INET6 ? "INET6" :
-#endif /* AF_INET6 */
-			  family == AF_INET ? "INET" : "???", service));
+#ifdef DEBUG
+  printf("httpAddrGetList(hostname=\"%s\", family=AF_%s, service=\"%s\")\n",
+         hostname, family == AF_UNSPEC ? "UNSPEC" :
+#  ifdef AF_LOCAL
+		       family == AF_LOCAL ? "LOCAL" :
+#  endif /* AF_LOCAL */
+#  ifdef AF_INET6
+		       family == AF_INET6 ? "INET6" :
+#  endif /* AF_INET6 */
+		       family == AF_INET ? "INET" : "???", service);
+#endif /* DEBUG */
 
  /*
   * Avoid lookup delays and configuration problems when connecting
