@@ -140,7 +140,9 @@ cupsdNetIFUpdate(void)
   int			i,		/* Looping var */
 			match;		/* Matching address? */
   cupsd_listener_t	*lis;		/* Listen address */
-  cupsd_netif_t		*temp;		/* Current interface */
+  cupsd_netif_t		*temp,		/* New interface */
+			*prev,		/* Previous interface */
+			*current;	/* Current interface */
   struct ifaddrs	*addrs,		/* Interface address list */
 			*addr;		/* Current interface address */
   http_addrlist_t	*saddr;		/* Current server address */
@@ -191,8 +193,25 @@ cupsdNetIFUpdate(void)
     if ((temp = calloc(1, sizeof(cupsd_netif_t))) == NULL)
       break;
 
-    temp->next = NetIFList;
-    NetIFList  = temp;
+   /*
+    * Insert the node in sorted order; since we don't expect to
+    * have a lot of network interfaces, we just do a simple linear
+    * search...
+    */
+
+    for (current = NetIFList, prev = NULL;
+         current;
+	 prev = current, current = current->next)
+      if (strcasecmp(addr->ifa_name, current->name) <= 0)
+        break;
+
+    if (current)
+      temp->next = current;
+
+    if (prev)
+      prev->next = temp;
+    else
+      NetIFList = temp;
 
    /*
     * Then copy all of the information...
