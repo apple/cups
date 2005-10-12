@@ -132,7 +132,23 @@ cupsdAcceptClient(cupsd_listener_t *lis)/* I - Listener socket */
 
 #ifdef AF_INET6
   if (lis->address.addr.sa_family == AF_INET6)
+  {
+   /*
+    * Save the connected port number...
+    */
+
     con->http.hostaddr->ipv6.sin6_port = lis->address.ipv6.sin6_port;
+
+   /*
+    * Convert IPv4 over IPv6 addresses (::ffff:n.n.n.n) to IPv4 forms we
+    * can more easily use...
+    */
+
+    if (con->http.hostaddr->ipv6.sin6_addr.s6_addr32[0] == 0 &&
+        con->http.hostaddr->ipv6.sin6_addr.s6_addr32[1] == 0 &&
+        ntohl(con->http.hostaddr->ipv6.sin6_addr.s6_addr32[2]) == 0xffff)
+      con->http.hostaddr->ipv6.sin6_addr.s6_addr32[2] = 0;
+  }
   else
 #endif /* AF_INET6 */
   if (lis->address.addr.sa_family == AF_INET)

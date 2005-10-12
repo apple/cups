@@ -77,7 +77,27 @@ httpAddrEqual(const http_addr_t *addr1,		/* I - First address */
               const http_addr_t *addr2)		/* I - Second address */
 {
   if (addr1->addr.sa_family != addr2->addr.sa_family)
+  {
+#ifdef AF_INET6
+    if (addr1->addr.sa_family == AF_INET && addr2->addr.sa_family == AF_INET6 &&
+        !addr2->ipv6.sin6_addr.s6_addr32[0] &&
+	!addr2->ipv6.sin6_addr.s6_addr32[1] &&
+	(!addr2->ipv6.sin6_addr.s6_addr32[2] ||
+	 ntohl(addr2->ipv6.sin6_addr.s6_addr32[2]) == 0xffff) &&
+	addr1->ipv4.sin_addr.s_addr == addr2->ipv6.sin6_addr.s6_addr32[3])
+      return (1);
+    else if (addr1->addr.sa_family == AF_INET6 &&
+             addr2->addr.sa_family == AF_INET &&
+             !addr1->ipv6.sin6_addr.s6_addr32[0] &&
+	     !addr1->ipv6.sin6_addr.s6_addr32[1] &&
+	     (!addr1->ipv6.sin6_addr.s6_addr32[2] ||
+	      ntohl(addr1->ipv6.sin6_addr.s6_addr32[2]) == 0xffff) &&
+	     addr2->ipv4.sin_addr.s_addr == addr1->ipv6.sin6_addr.s6_addr32[3])
+      return (1);
+    else
+#endif /* AF_INET6 */
     return (0);
+  }
 
 #ifdef AF_LOCAL
   if (addr1->addr.sa_family == AF_LOCAL)
@@ -86,7 +106,7 @@ httpAddrEqual(const http_addr_t *addr1,		/* I - First address */
 
 #ifdef AF_INET6
   if (addr1->addr.sa_family == AF_INET6)
-    return (memcmp(&(addr1->ipv6.sin6_addr), &(addr2->ipv6.sin6_addr), 16) == 0);
+    return (!memcmp(&(addr1->ipv6.sin6_addr), &(addr2->ipv6.sin6_addr), 16));
 #endif /* AF_INET6 */
 
   return (addr1->ipv4.sin_addr.s_addr == addr2->ipv4.sin_addr.s_addr);
@@ -134,7 +154,12 @@ httpAddrLocalhost(
 #ifdef AF_INET6
   if (addr->addr.sa_family == AF_INET6 &&
       (IN6_IS_ADDR_LOOPBACK(&(addr->ipv6.sin6_addr)) ||
-       IN6_IS_ADDR_UNSPECIFIED(&(addr->ipv6.sin6_addr))))
+       IN6_IS_ADDR_UNSPECIFIED(&(addr->ipv6.sin6_addr)) ||
+       (!addr->ipv6.sin6_addr.s6_addr32[0] &&
+        !addr->ipv6.sin6_addr.s6_addr32[1] &&
+        (!addr->ipv6.sin6_addr.s6_addr32[2] ||
+	 ntohl(addr->ipv6.sin6_addr.s6_addr32[2]) == 0xffff) &&
+        ntohl(addr->ipv6.sin6_addr.s6_addr32[3]) == 0x7f000001)))
     return (1);
 #endif /* AF_INET6 */
 
