@@ -48,7 +48,7 @@ cupsdPauseListening(void)
   cupsd_listener_t	*lis;		/* Current listening socket */
 
 
-  if (NumListeners < 1 || !FD_ISSET(Listeners[0].fd, InputSet))
+  if (NumListeners < 1)
     return;
 
   if (NumClients == MaxClients)
@@ -80,7 +80,7 @@ cupsdResumeListening(void)
   cupsd_listener_t	*lis;		/* Current listening socket */
 
 
-  if (NumListeners < 1 || FD_ISSET(Listeners[0].fd, InputSet))
+  if (NumListeners < 1)
     return;
 
   if (NumClients >= (MaxClients - 1))

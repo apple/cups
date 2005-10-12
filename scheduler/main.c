@@ -669,7 +669,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     */
 
     for (i = NumListeners, lis = Listeners; i > 0; i --, lis ++)
-      if (FD_ISSET(lis->fd, input))
+      if (lis->fd >= 0 && FD_ISSET(lis->fd, input))
       {
         FD_CLR(lis->fd, input);
         cupsdAcceptClient(lis);
