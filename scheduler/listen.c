@@ -153,10 +153,7 @@ cupsdStartListening(void)
 #endif /* AF_INET6 */
 #ifdef AF_LOCAL
     if (lis->address.addr.sa_family == AF_LOCAL)
-    {
-      have_domain = lis->address.un.sun_path;
-      p           = 0;
-    }
+      p = 0;
     else
 #endif /* AF_LOCAL */
     p = ntohs(lis->address.ipv4.sin_port);
@@ -294,6 +291,11 @@ cupsdStartListening(void)
       LocalPort       = p;
       LocalEncryption = lis->encryption;
     }
+
+#ifdef AF_LOCAL
+    if (lis->address.addr.sa_family == AF_LOCAL && !have_domain)
+      have_domain = lis->address.un.sun_path;
+#endif /* AF_LOCAL */
   }
 
  /*
@@ -313,7 +315,8 @@ cupsdStartListening(void)
   }
 
  /*
-  * Set the CUPS_SERVER and IPP_PORT variables based on the listeners...
+  * Set the CUPS_SERVER, IPP_PORT, and CUPS_ENCRYPTION variables based on
+  * the listeners...
   */
 
   if (have_domain)
@@ -331,9 +334,10 @@ cupsdStartListening(void)
     */
 
     cupsdSetEnv("CUPS_SERVER", "localhost");
-    cupsdSetEnvf("IPP_PORT", "%d", LocalPort);
-    cupsdSetEnv("CUPS_ENCRYPTION", encryptions[LocalEncryption]);
   }
+
+  cupsdSetEnv("CUPS_ENCRYPTION", encryptions[LocalEncryption]);
+  cupsdSetEnvf("IPP_PORT", "%d", LocalPort);
 
  /*
   * Resume listening for connections...
