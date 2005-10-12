@@ -284,6 +284,7 @@ httpAddrString(const http_addr_t *addr,		/* I - Address to convert */
 #ifdef HAVE_GETNAMEINFO
   {
     char	servname[1024];		/* Service name (not used) */
+    char	*percent;		/* Pointer to "%ifname" */
 
 
     if (addr->addr.sa_family == AF_INET6)
@@ -307,7 +308,17 @@ httpAddrString(const http_addr_t *addr,		/* I - Address to convert */
 	return (NULL);
       }
 
-      strlcat(s, "]", slen);
+     /*
+      * On Linux, getnameinfo() includes the interface name in the
+      * returned address (this is probably a bug...)  If we find a
+      * "%" character, replace it and the interface name with the
+      * "]".  Otherwise, append "]"...
+      */
+
+      if ((percent = strchr(s, '%')) != NULL)
+        strcpy(percent, "]");
+      else
+        strlcat(s, "]", slen);
     }
     else if (getnameinfo(&addr->addr, httpAddrLength(addr), s, slen,
                 	 servname, sizeof(servname), NI_NUMERICHOST))

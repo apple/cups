@@ -366,7 +366,9 @@ cupsdCheckAuth(
 	    * Check the named interface...
 	    */
 
-            if ((iface = cupsdNetIFFind(masks->mask.name.name)) != NULL)
+            for (iface = cupsdNetIFFind(masks->mask.name.name);
+	         iface && !strcasecmp(masks->mask.name.name, iface->name);
+		 iface = iface->next)
 	    {
               if (iface->address.addr.sa_family == AF_INET)
 	      {

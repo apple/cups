@@ -917,10 +917,11 @@ cupsdSendCUPSBrowse(cupsd_printer_t *p)	/* I - Printer to send */
         for (iface = NetIFList; iface != NULL; iface = iface->next)
 	{
 	 /*
-	  * Only send to local interfaces...
+	  * Only send to local, IPv4 interfaces...
 	  */
 
-	  if (!iface->is_local || !iface->port)
+	  if (!iface->is_local || !iface->port ||
+	      iface->address.addr.sa_family != AF_INET)
 	    continue;
 
 	  snprintf(packet, sizeof(packet), "%x %x ipp://%s:%d/%s/%s%s \"%s\" \"%s\" \"%s\"\n",
@@ -936,66 +937,51 @@ cupsdSendCUPSBrowse(cupsd_printer_t *p)	/* I - Printer to send */
 	                  "cupsdSendBrowseList: (%d bytes to \"%s\") %s", bytes,
         	          iface->name, packet);
 
-          if (iface->broadcast.addr.sa_family == AF_INET)
-	  {
-            iface->broadcast.ipv4.sin_port = htons(BrowsePort);
-
-	    sendto(BrowseSocket, packet, bytes, 0,
-		   (struct sockaddr *)&(iface->broadcast),
-		   sizeof(struct sockaddr_in));
-          }
-#ifdef AF_INET6
-	  else
-	  {
-            iface->broadcast.ipv6.sin6_port = htons(BrowsePort);
-
-	    sendto(BrowseSocket, packet, bytes, 0,
-		   (struct sockaddr *)&(iface->broadcast),
-		   sizeof(struct sockaddr_in6));
-          }
-#endif /* AF_INET6 */
-        }
-      }
-      else if ((iface = cupsdNetIFFind(b->iface)) != NULL)
-      {
-       /*
-        * Send to the named interface...
-	*/
-
-        if (!iface->port)
-	  continue;
-
-	snprintf(packet, sizeof(packet), "%x %x ipp://%s:%d/%s/%s%s \"%s\" \"%s\" \"%s\"\n",
-        	 type, p->state, iface->hostname, iface->port,
-		 (p->type & CUPS_PRINTER_CLASS) ? "classes" : "printers",
-		 p->name, options, p->location ? p->location : "",
-		 p->info ? p->info : "",
-		 p->make_model ? p->make_model : "Unknown");
-
-	bytes = strlen(packet);
-
-	cupsdLogMessage(CUPSD_LOG_DEBUG2,
-	                "cupsdSendBrowseList: (%d bytes to \"%s\") %s", bytes,
-        	        iface->name, packet);
-
-        if (iface->broadcast.addr.sa_family == AF_INET)
-	{
           iface->broadcast.ipv4.sin_port = htons(BrowsePort);
 
 	  sendto(BrowseSocket, packet, bytes, 0,
 		 (struct sockaddr *)&(iface->broadcast),
 		 sizeof(struct sockaddr_in));
         }
-#ifdef AF_INET6
-	else
+      }
+      else if ((iface = cupsdNetIFFind(b->iface)) != NULL)
+      {
+       /*
+        * Send to the named interface using the IPv4 address...
+	*/
+
+        while (iface)
+	  if (strcasecmp(b->iface, iface->name))
+	  {
+	    iface = NULL;
+	    break;
+	  }
+	  else if (iface->address.addr.sa_family == AF_INET && iface->port)
+	    break;
+	  else
+	    iface = iface->next;
+
+        if (iface)
 	{
-          iface->broadcast.ipv6.sin6_port = htons(BrowsePort);
+	  snprintf(packet, sizeof(packet), "%x %x ipp://%s:%d/%s/%s%s \"%s\" \"%s\" \"%s\"\n",
+        	   type, p->state, iface->hostname, iface->port,
+		   (p->type & CUPS_PRINTER_CLASS) ? "classes" : "printers",
+		   p->name, options, p->location ? p->location : "",
+		   p->info ? p->info : "",
+		   p->make_model ? p->make_model : "Unknown");
+
+	  bytes = strlen(packet);
+
+	  cupsdLogMessage(CUPSD_LOG_DEBUG2,
+	                  "cupsdSendBrowseList: (%d bytes to \"%s\") %s", bytes,
+        	          iface->name, packet);
+
+          iface->broadcast.ipv4.sin_port = htons(BrowsePort);
 
 	  sendto(BrowseSocket, packet, bytes, 0,
 		 (struct sockaddr *)&(iface->broadcast),
-		 sizeof(struct sockaddr_in6));
+		 sizeof(struct sockaddr_in));
         }
-#endif /* AF_INET6 */
       }
     }
     else
@@ -1015,17 +1001,9 @@ cupsdSendCUPSBrowse(cupsd_printer_t *p)	/* I - Printer to send */
       cupsdLogMessage(CUPSD_LOG_DEBUG2,
                       "cupsdSendBrowseList: (%d bytes) %s", bytes, packet);
 
-#ifdef AF_INET6
-      if (sendto(BrowseSocket, packet, bytes, 0,
-		 (struct sockaddr *)&(b->to),
-		 b->to.addr.sa_family == AF_INET ?
-		     sizeof(struct sockaddr_in) :
-		     sizeof(struct sockaddr_in6)) <= 0)
-#else
       if (sendto(BrowseSocket, packet, bytes, 0,
 		 (struct sockaddr *)&(b->to),
 		 sizeof(struct sockaddr_in)) <= 0)
-#endif /* AF_INET6 */
       {
        /*
         * Unable to send browse packet, so remove this address from the
