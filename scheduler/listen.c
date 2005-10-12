@@ -58,13 +58,14 @@ cupsdPauseListening(void)
   cupsdLogMessage(CUPSD_LOG_DEBUG, "cupsdPauseListening: Clearing input bits...");
 
   for (i = NumListeners, lis = Listeners; i > 0; i --, lis ++)
-  {
-    cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                    "cupsdPauseListening: Removing fd %d from InputSet...",
-                    lis->fd);
+    if (lis->fd >= 0)
+    {
+      cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                      "cupsdPauseListening: Removing fd %d from InputSet...",
+                      lis->fd);
 
-    FD_CLR(lis->fd, InputSet);
-  }
+      FD_CLR(lis->fd, InputSet);
+    }
 }
 
 
@@ -88,12 +89,13 @@ cupsdResumeListening(void)
   cupsdLogMessage(CUPSD_LOG_DEBUG, "cupsdResumeListening: Setting input bits...");
 
   for (i = NumListeners, lis = Listeners; i > 0; i --, lis ++)
-  {
-    cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                    "cupsdResumeListening: Adding fd %d to InputSet...",
-                    lis->fd);
-    FD_SET(lis->fd, InputSet);
-  }
+    if (lis->fd >= 0)
+    {
+      cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                      "cupsdResumeListening: Adding fd %d to InputSet...",
+                      lis->fd);
+      FD_SET(lis->fd, InputSet);
+    }
 }
 
 
@@ -131,15 +133,9 @@ cupsdStartListening(void)
     httpAddrFreeList(ServerAddrs);
 
   if ((ServerAddrs = httpAddrGetList(ServerName, AF_UNSPEC, NULL)) == NULL)
-  {
-   /*
-    * Didn't find it!  Use an address of 0...
-    */
-
     cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "cupsdStartListening: Unable to find IP address for server name \"%s\"!\n",
-                    ServerName);
-  }
+                    "cupsdStartListening: Unable to find IP address for "
+		    "server name \"%s\"!\n", ServerName);
 
  /*
   * Setup socket listeners...
@@ -166,55 +162,17 @@ cupsdStartListening(void)
     p = ntohs(lis->address.ipv4.sin_port);
 
    /*
-    * Save the first port that is bound to the local loopback or
-    * "any" address...
-    */
-
-    if (!LocalPort && p > 0 &&
-        (httpAddrLocalhost(&(lis->address)) ||
-         httpAddrAny(&(lis->address))))
-    {
-      LocalPort       = p;
-      LocalEncryption = lis->encryption;
-    }
-
-   /*
     * Create a socket for listening...
     */
 
     lis->fd = socket(lis->address.addr.sa_family, SOCK_STREAM, 0);
-
-#ifdef AF_INET6
-    if (lis->fd == -1 && lis->address.addr.sa_family == AF_INET6 &&
-        (httpAddrLocalhost(&(lis->address)) || httpAddrAny(&(lis->address))))
-    {
-     /*
-      * Try binding to an IPv4 address instead...
-      */
-
-      cupsdLogMessage(CUPSD_LOG_NOTICE,
-                      "cupsdStartListening: Unable to use IPv6 address, trying IPv4...");
-
-      p = ntohs(lis->address.ipv6.sin6_port);
-
-      if (httpAddrAny(&(lis->address)))
-	lis->address.ipv4.sin_addr.s_addr = htonl(0x00000000);
-      else
-	lis->address.ipv4.sin_addr.s_addr = htonl(0x7f000001);
-
-      lis->address.ipv4.sin_port  = htons(p);
-      lis->address.addr.sa_family = AF_INET;
-
-      lis->fd = socket(lis->address.addr.sa_family, SOCK_STREAM, 0);
-    }
-#endif /* AF_INET6 */
 
     if (lis->fd == -1)
     {
       cupsdLogMessage(CUPSD_LOG_ERROR,
                       "cupsdStartListening: Unable to open listen socket for address %s:%d - %s.",
                       s, p, strerror(errno));
-      exit(errno);
+      continue;
     }
 
     fcntl(lis->fd, F_SETFD, fcntl(lis->fd, F_GETFD) | FD_CLOEXEC);
@@ -237,30 +195,23 @@ cupsdStartListening(void)
 #ifdef AF_INET6
     if (lis->address.addr.sa_family == AF_INET6)
     {
+#  ifdef IPV6_V6ONLY
+     /*
+      * Accept only IPv6 connections on this socket, to avoid
+      * potential security issues and to make all platforms behave
+      * the same.
+      */
+
+      val = 1;
+#    ifdef __sun
+      setsockopt(lis->fd, IPPROTO_IPV6, IPV6_V6ONLY, (char *)&val, sizeof(val));
+#    else
+      setsockopt(lis->fd, IPPROTO_IPV6, IPV6_V6ONLY, &val, sizeof(val));
+#    endif /* __sun */
+#  endif /* IPV6_V6ONLY */
+
       status = bind(lis->fd, (struct sockaddr *)&(lis->address),
 	            httpAddrLength(&(lis->address)));
-
-#ifdef IPV6_V6ONLY
-      if (status >= 0 &&
-          (httpAddrLocalhost(&(lis->address)) || httpAddrAny(&(lis->address))))
-      {
-       /*
-        * Make sure that wildcard and loopback addresses accept
-	* connections from both IPv6 and IPv4 clients.
-	*
-	* NOTE: This DOES NOT WORK for OpenBSD, since they adopted a
-	*       stricter behavior in the name of security.  For OpenBSD,
-	*       you must list IPv4 and IPv6 listen addresses separately.
-	*/
-
-        val = 0;
-#  ifdef __sun
-        setsockopt(lis->fd, IPPROTO_IPV6, IPV6_V6ONLY, (char *)&val, sizeof(val));
-#  else
-        setsockopt(lis->fd, IPPROTO_IPV6, IPV6_V6ONLY, &val, sizeof(val));
-#  endif /* __sun */
-      }
-#endif /* IPV6_V6ONLY */
     }
     else
 #endif /* AF_INET6 */
@@ -305,7 +256,9 @@ cupsdStartListening(void)
       cupsdLogMessage(CUPSD_LOG_ERROR,
                       "cupsdStartListening: Unable to bind socket for address %s:%d - %s.",
                       s, p, strerror(errno));
-      exit(errno);
+      close(lis->fd);
+      lis->fd = -1;
+      continue;
     }
 
    /*
@@ -328,6 +281,19 @@ cupsdStartListening(void)
       cupsdLogMessage(CUPSD_LOG_INFO,
                       "cupsdStartListening: Listening to %s on fd %d...",
         	      s, lis->fd);
+
+   /*
+    * Save the first port that is bound to the local loopback or
+    * "any" address...
+    */
+
+    if (!LocalPort && p > 0 &&
+        (httpAddrLocalhost(&(lis->address)) ||
+         httpAddrAny(&(lis->address))))
+    {
+      LocalPort       = p;
+      LocalEncryption = lis->encryption;
+    }
   }
 
  /*

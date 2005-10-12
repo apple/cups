@@ -25,7 +25,7 @@
  *
  *   httpAddrConnect()  - Connect to any of the addresses in the list.
  *   httpAddrFreeList() - Free an address list.
- *   httpAddrGetList()  - Get a list of address for a hostname.
+ *   httpAddrGetList()  - Get a list of addresses for a hostname.
  */
 
 /*
@@ -151,13 +151,13 @@ httpAddrFreeList(
 
 
 /*
- * 'httpAddrGetList()' - Get a list of address for a hostname.
+ * 'httpAddrGetList()' - Get a list of addresses for a hostname.
  *
  * @since CUPS 1.2@
  */
 
 http_addrlist_t	*			/* O - List of addresses or NULL */
-httpAddrGetList(const char *hostname,	/* I - Hostname or IP address */
+httpAddrGetList(const char *hostname,	/* I - Hostname, IP address, or NULL for passive listen address */
                 int        family,	/* I - Address family or AF_UNSPEC */
 		const char *service)	/* I - Service name or port number */
 {
@@ -168,23 +168,16 @@ httpAddrGetList(const char *hostname,	/* I - Hostname or IP address */
 
 #ifdef DEBUG
   printf("httpAddrGetList(hostname=\"%s\", family=AF_%s, service=\"%s\")\n",
-         hostname, family == AF_UNSPEC ? "UNSPEC" :
+         hostname ? hostname : "(nil)",
+	 family == AF_UNSPEC ? "UNSPEC" :
 #  ifdef AF_LOCAL
-		       family == AF_LOCAL ? "LOCAL" :
+	     family == AF_LOCAL ? "LOCAL" :
 #  endif /* AF_LOCAL */
 #  ifdef AF_INET6
-		       family == AF_INET6 ? "INET6" :
+	     family == AF_INET6 ? "INET6" :
 #  endif /* AF_INET6 */
-		       family == AF_INET ? "INET" : "???", service);
+	     family == AF_INET ? "INET" : "???", service);
 #endif /* DEBUG */
-
- /*
-  * Avoid lookup delays and configuration problems when connecting
-  * to the localhost address...
-  */
-
-  if (!strcmp(hostname, "localhost"))
-    hostname = "127.0.0.1";
 
  /*
   * Lookup the address the best way we can...
@@ -192,7 +185,7 @@ httpAddrGetList(const char *hostname,	/* I - Hostname or IP address */
 
   first = addr = NULL;
 
-  if (hostname[0] == '/')
+  if (hostname && hostname[0] == '/')
   {
    /*
     * Domain socket address...
@@ -218,9 +211,10 @@ httpAddrGetList(const char *hostname,	/* I - Hostname or IP address */
 
     memset(&hints, 0, sizeof(hints));
     hints.ai_family   = family;
+    hints.ai_flags    = hostname ? 0 : AI_PASSIVE;
     hints.ai_socktype = SOCK_STREAM;
 
-    if (*hostname == '[')
+    if (hostname && *hostname == '[')
     {
      /*
       * Remove brackets from numeric IPv6 address...
@@ -281,10 +275,131 @@ httpAddrGetList(const char *hostname,	/* I - Hostname or IP address */
       freeaddrinfo(results);
     }
 #else
-    int			i;		/* Looping vars */
-    unsigned		ip[4];		/* IPv4 address components */
-    const char		*ptr;		/* Pointer into hostname */
-    struct hostent	*host;		/* Result of lookup */
+    if (hostname)
+    {
+      int		i;		/* Looping vars */
+      unsigned		ip[4];		/* IPv4 address components */
+      const char	*ptr;		/* Pointer into hostname */
+      struct hostent	*host;		/* Result of lookup */
+      struct servent	*port;		/* Port number for service */
+      int		portnum;	/* Port number */
+
+
+     /*
+      * Lookup the service...
+      */
+
+      if (!service)
+	portnum = 0;
+      else if (isdigit(*service & 255))
+	portnum = atoi(service);
+      else if ((port = getservbyname(service, NULL)) != NULL)
+	portnum = ntohs(port->s_port);
+      else if (!strcmp(service, "http"))
+        portnum = 80;
+      else if (!strcmp(service, "https"))
+        portnum = 443;
+      else if (!strcmp(service, "ipp"))
+        portnum = 631;
+      else if (!strcmp(service, "lpd"))
+        portnum = 515;
+      else if (!strcmp(service, "socket"))
+        portnum = 9100;
+      else
+	return (NULL);
+
+     /*
+      * This code is needed because some operating systems have a
+      * buggy implementation of gethostbyname() that does not support
+      * IPv4 addresses.  If the hostname string is an IPv4 address, then
+      * sscanf() is used to extract the IPv4 components.  We then pack
+      * the components into an IPv4 address manually, since the
+      * inet_aton() function is deprecated.  We use the htonl() macro
+      * to get the right byte order for the address.
+      */
+
+      for (ptr = hostname; isdigit(*ptr & 255) || *ptr == '.'; ptr ++);
+
+      if (!*nameptr)
+      {
+       /*
+	* We have an IPv4 address; break it up and create an IPv4 address...
+	*/
+
+	if (sscanf(name, "%u.%u.%u.%u", ip, ip + 1, ip + 2, ip + 3) == 4 &&
+            ip[0] <= 255 && ip[1] <= 255 && ip[2] <= 255 && ip[3] <= 255)
+	{
+	  first = (http_addrlist_t *)calloc(1, sizeof(http_addrlist_t));
+	  if (!first)
+	    return (NULL);
+
+          first->addr.ipv4.sin_family = AF_INET;
+          first->addr.ipv4.sin_addr.s_addr = htonl(((((((ip[0] << 8) |
+	                                               ip[1]) << 8) |
+						     ip[2]) << 8) | ip[3]));
+          first->addr.ipv4.sin_port = htons(portnum);
+	}
+      }
+      else if ((host = gethostbyname(hostname)) != NULL &&
+#  ifdef AF_INET6
+               (host->h_addrtype == AF_INET || host->h_addrtype == AF_INET6))
+#  else
+               host->h_addrtype == AF_INET)
+#  endif /* AF_INET6 */
+      {
+	for (i = 0; host->h_addr_list[i]; i ++)
+	{
+	 /*
+          * Copy the address over...
+	  */
+
+	  temp = (http_addrlist_t *)calloc(1, sizeof(http_addrlist_t));
+	  if (!temp)
+	  {
+	    httpAddrFreeList(first);
+	    return (NULL);
+	  }
+
+#  ifdef AF_INET6
+          if (host->h_addrtype == AF_INET6)
+	  {
+            first->addr.ipv6.sin6_family = AF_INET6;
+	    memcpy(&(temp->addr.ipv6), host->h_addr_list[i],
+	           sizeof(temp->addr.ipv6));
+            temp->addr.ipv6.sin6_port = htons(portnum);
+	  }
+	  else
+#  endif /* AF_INET6 */
+	  {
+            first->addr.ipv4.sin_family = AF_INET;
+	    memcpy(&(temp->addr.ipv4), host->h_addr_list[i],
+	           sizeof(temp->addr.ipv4));
+            temp->addr.ipv4.sin_port = htons(portnum);
+          }
+
+	 /*
+	  * Append the address to the list...
+	  */
+
+	  if (!first)
+	    first = temp;
+
+	  if (addr)
+	    addr->next = temp;
+
+	  addr = temp;
+	}
+      }
+    }
+#endif /* HAVE_GETADDRINFO */
+  }
+
+ /*
+  * Detect some common errors and handle them sanely...
+  */
+
+  if (!addr && (!hostname || !strcmp(hostname, "localhost")))
+  {
     struct servent	*port;		/* Port number for service */
     int			portnum;	/* Port number */
 
@@ -299,52 +414,33 @@ httpAddrGetList(const char *hostname,	/* I - Hostname or IP address */
       portnum = atoi(service);
     else if ((port = getservbyname(service, NULL)) != NULL)
       portnum = ntohs(port->s_port);
+    else if (!strcmp(service, "http"))
+      portnum = 80;
+    else if (!strcmp(service, "https"))
+      portnum = 443;
+    else if (!strcmp(service, "ipp"))
+      portnum = 631;
+    else if (!strcmp(service, "lpd"))
+      portnum = 515;
+    else if (!strcmp(service, "socket"))
+      portnum = 9100;
     else
       return (NULL);
 
-   /*
-    * This code is needed because some operating systems have a
-    * buggy implementation of gethostbyname() that does not support
-    * IPv4 addresses.  If the hostname string is an IPv4 address, then
-    * sscanf() is used to extract the IPv4 components.  We then pack
-    * the components into an IPv4 address manually, since the
-    * inet_aton() function is deprecated.  We use the htonl() macro
-    * to get the right byte order for the address.
-    */
-
-    for (ptr = hostname; isdigit(*ptr & 255) || *ptr == '.'; ptr ++);
-
-    if (!*nameptr)
+    if (hostname && !strcmp(hostname, "localhost"))
     {
      /*
-      * We have an IPv4 address; break it up and create an IPv4 address...
+      * Unfortunately, some users ignore all of the warnings in the
+      * /etc/hosts file and delete "localhost" from it. If we get here
+      * then we were unable to resolve the name, so use the IPv6 and/or
+      * IPv4 loopback interface addresses...
       */
 
-      if (sscanf(name, "%u.%u.%u.%u", ip, ip + 1, ip + 2, ip + 3) == 4 &&
-          ip[0] <= 255 && ip[1] <= 255 && ip[2] <= 255 && ip[3] <= 255)
-      {
-	first = (http_addrlist_t *)calloc(1, sizeof(http_addrlist_t));
-	if (!first)
-	  return (NULL);
-
-        first->addr.ipv4.sin_family = AF_INET;
-        first->addr.ipv4.sin_addr.s_addr = htonl(((((((ip[0] << 8) |
-	                                             ip[1]) << 8) |
-						   ip[2]) << 8) | ip[3]));
-        first->addr.ipv4.sin_port = htons(portnum);
-      }
-    }
-    else if ((host = gethostbyname(hostname)) != NULL &&
 #ifdef AF_INET6
-             (host->h_addrtype == AF_INET || host->h_addrtype == AF_INET6))
-#else
-             host->h_addrtype == AF_INET)
-#endif /* AF_INET6 */
-    {
-      for (i = 0; host->h_addr_list[i]; i ++)
+      if (family != AF_INET)
       {
        /*
-        * Copy the address over...
+        * Add [::1] to the address list...
 	*/
 
 	temp = (http_addrlist_t *)calloc(1, sizeof(http_addrlist_t));
@@ -354,37 +450,86 @@ httpAddrGetList(const char *hostname,	/* I - Hostname or IP address */
 	  return (NULL);
 	}
 
-#ifdef AF_INET6
-        if (host->h_addrtype == AF_INET6)
-	{
-          first->addr.ipv6.sin6_family = AF_INET6;
-	  memcpy(&(temp->addr.ipv6), host->h_addr_list[i],
-	         sizeof(temp->addr.ipv6));
-          temp->addr.ipv6.sin6_port = htons(portnum);
-	}
-	else
-#endif /* AF_INET6 */
-	{
-          first->addr.ipv4.sin_family = AF_INET;
-	  memcpy(&(temp->addr.ipv4), host->h_addr_list[i],
-	         sizeof(temp->addr.ipv4));
-          temp->addr.ipv4.sin_port = htons(portnum);
-        }
+        temp->addr.ipv6.sin6_family            = AF_INET6;
+	temp->addr.ipv6.sin6_port              = htons(portnum);
+	temp->addr.ipv6.sin6_addr.s6_addr32[3] = htonl(1);
 
+        addr = temp;
+      }
+
+      if (family != AF_INET6)
+#endif /* AF_INET6 */
+      {
        /*
-	* Append the address to the list...
+        * Add 127.0.0.1 to the address list...
 	*/
 
-	if (!first)
-	  first = temp;
+	temp = (http_addrlist_t *)calloc(1, sizeof(http_addrlist_t));
+	if (!temp)
+	{
+	  httpAddrFreeList(first);
+	  return (NULL);
+	}
 
-	if (addr)
+        temp->addr.ipv4.sin_family      = AF_INET;
+	temp->addr.ipv4.sin_port        = htons(portnum);
+	temp->addr.ipv4.sin_addr.s_addr = htonl(0x7f000001);
+
+        if (addr)
 	  addr->next = temp;
-
-	addr = temp;
+	else
+          addr = temp;
       }
     }
-#endif /* HAVE_GETADDRINFO */
+    else if (!hostname)
+    {
+     /*
+      * Provide one or more passive listening addresses...
+      */
+
+#ifdef AF_INET6
+      if (family != AF_INET)
+      {
+       /*
+        * Add [::] to the address list...
+	*/
+
+	temp = (http_addrlist_t *)calloc(1, sizeof(http_addrlist_t));
+	if (!temp)
+	{
+	  httpAddrFreeList(first);
+	  return (NULL);
+	}
+
+        temp->addr.ipv6.sin6_family = AF_INET6;
+	temp->addr.ipv6.sin6_port   = htons(portnum);
+
+        addr = temp;
+      }
+
+      if (family != AF_INET6)
+#endif /* AF_INET6 */
+      {
+       /*
+        * Add 0.0.0.0 to the address list...
+	*/
+
+	temp = (http_addrlist_t *)calloc(1, sizeof(http_addrlist_t));
+	if (!temp)
+	{
+	  httpAddrFreeList(first);
+	  return (NULL);
+	}
+
+        temp->addr.ipv4.sin_family = AF_INET;
+	temp->addr.ipv4.sin_port   = htons(portnum);
+
+        if (addr)
+	  addr->next = temp;
+	else
+          addr = temp;
+      }
+    }
   }
 
  /*

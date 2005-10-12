@@ -167,8 +167,7 @@ static unsigned		zeros[4] =
  * Local functions...
  */
 
-static http_addrlist_t	*get_address(const char *value, unsigned defaddress,
-			             int defport, int deffamily);
+static http_addrlist_t	*get_address(const char *value, int defport);
 static int		get_addr_and_mask(const char *value, unsigned *ip,
 			                  unsigned *mask);
 static int		parse_aaa(cupsd_location_t *loc, char *line,
@@ -1020,17 +1019,13 @@ cupsdReadConfiguration(void)
 
 static http_addrlist_t *		/* O - Pointer to list if address good, NULL if bad */
 get_address(const char  *value,		/* I - Value string */
-            unsigned    defaddress,	/* I - Default address */
-	    int         defport,	/* I - Default port */
-	    int         deffamily)	/* I - Default family */
+	    int         defport)	/* I - Default port */
 {
   char			buffer[1024],	/* Hostname + port number buffer */
 			defpname[255],	/* Default port name */
 			*hostname,	/* Hostname or IP */
 			*portname;	/* Port number or name */
-  int			portnum;	/* Port number */
   http_addrlist_t	*addrlist;	/* Address list */
-  struct servent	*service;	/* Service entry */
 
 
  /*
@@ -1084,95 +1079,12 @@ get_address(const char  *value,		/* I - Value string */
     hostname = NULL;
 
  /*
-  * Now lookup the address or use the default address...
+  * Now lookup the address using httpAddrGetList()...
   */
 
-  if (hostname)
-  {
-   /*
-    * Use httpAddrGetList() to get 1 or more addresses for the
-    * hostname and port name...
-    */
-
-    if ((addrlist = httpAddrGetList(hostname, AF_UNSPEC, portname)) == NULL)
-      cupsdLogMessage(CUPSD_LOG_ERROR, "Hostname lookup for \"%s\" failed!",
-                      hostname);
-  }
-  else
-  {
-   /*
-    * Create up to 2 addresses entry using the default address and
-    * family, and set the port...
-    */
-
-    if (isdigit(*portname & 255))
-      portnum = atoi(portname);
-    else if ((service = getservbyname(portname, NULL)) != NULL)
-      portnum = ntohs(service->s_port);
-    else
-    {
-      cupsdLogMessage(CUPSD_LOG_ERROR, "Service lookup for \"%s\" failed!",
-                      portname);
-      return (NULL);
-    }
-
-    addrlist = (http_addrlist_t *)calloc(1, sizeof(http_addrlist_t));
-
-    if (!addrlist)
-    {
-      cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to allocate address for \"%s\"!",
-                      value);
-      return (NULL);
-    }
-
-#ifdef AF_INET6
-    if (deffamily == AF_INET6)
-    {
-      addrlist->addr.ipv6.sin6_family            = AF_INET6;
-      addrlist->addr.ipv6.sin6_addr.s6_addr32[0] = htonl(defaddress);
-      addrlist->addr.ipv6.sin6_addr.s6_addr32[1] = htonl(defaddress);
-      addrlist->addr.ipv6.sin6_addr.s6_addr32[2] = htonl(defaddress);
-      addrlist->addr.ipv6.sin6_addr.s6_addr32[3] = htonl(defaddress);
-      addrlist->addr.ipv6.sin6_port              = htons(portnum);
-    }
-    else
-#endif /* AF_INET6 */
-    {
-      addrlist->addr.ipv4.sin_family      = AF_INET;
-      addrlist->addr.ipv4.sin_addr.s_addr = htonl(defaddress);
-      addrlist->addr.ipv4.sin_port        = htons(portnum);
-    }
-
-#if defined(AF_INET6) && defined(__OpenBSD__)
-   /*
-    * Since OpenBSD does no allow an IPv6 socket to accept IPv4 connections,
-    * add an IPv4 address...
-    */
-
-    if (deffamily == AF_INET6 && !defaddress)
-    {
-     /*
-      * Add an additional IPv4 address...
-      */
-
-      http_addrlist_t	*ipv4;		/* IPv4 address */
-
-
-      ipv4 = (http_addrlist_t *)calloc(1, sizeof(http_addrlist_t));
-      if (!ipv4)
-	cupsdLogMessage(CUPSD_LOG_ERROR,
-	                "Unable to allocate IPv4 address for \"%s\"!", value);
-      {
-        addrlist->next = ipv4;
-
-	ipv4->addr.ipv4.sin_family      = AF_INET;
-	ipv4->addr.ipv4.sin_addr.s_addr = htonl(defaddress);
-	ipv4->addr.ipv4.sin_port        = htons(defport);
-        ipv4->addr.ipv4.sin_port        = htons(portnum);
-      }
-    }
-#endif /* AF_INET6 && __OpenBSD__ */
-  }
+  if ((addrlist = httpAddrGetList(hostname, AF_UNSPEC, portname)) == NULL)
+    cupsdLogMessage(CUPSD_LOG_ERROR, "Hostname lookup for \"%s\" failed!",
+                    hostname ? hostname : "(nil)");
 
   return (addrlist);
 }
@@ -1860,11 +1772,7 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
       * Get the address list...
       */
 
-#if defined(AF_INET6)
-      addrlist = get_address(value, INADDR_ANY, IPP_PORT, AF_INET6);
-#else
-      addrlist = get_address(value, INADDR_ANY, IPP_PORT, AF_INET);
-#endif /* AF_INET6 */
+      addrlist = get_address(value, IPP_PORT);
 
       if (!addrlist)
       {
@@ -1984,8 +1892,7 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 
 	NumBrowsers ++;
       }
-      else if ((addrlist = get_address(value, INADDR_NONE, BrowsePort,
-                                       AF_INET)) != NULL)
+      else if ((addrlist = get_address(value, BrowsePort)) != NULL)
       {
         memcpy(&(dira->to), &(addrlist->addr), sizeof(dira->to));
 	httpAddrFreeList(addrlist);
@@ -2309,8 +2216,7 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
       * Get "to" address and port...
       */
 
-      if ((addrlist = get_address(value, INADDR_BROADCAST, BrowsePort,
-                                  AF_INET)) != NULL)
+      if ((addrlist = get_address(value, BrowsePort)) != NULL)
       {
         memcpy(&(relay->to), &(addrlist->addr), sizeof(relay->to));
 	httpAddrFreeList(addrlist);
