@@ -308,6 +308,9 @@ cupsdNetIFUpdate(void)
 	        	 sizeof(temp->hostname));
       }
     }
+
+    cupsdLogMessage(CUPSD_LOG_DEBUG, "cupsdNetIFUpdate: \"%s\" = %s...",
+                    temp->name, temp->hostname);
   }
 
   freeifaddrs(addrs);
