@@ -38,6 +38,7 @@
  *   cupsdSetPrinterReasons()    - Set/update the reasons strings.
  *   cupsdSetPrinterState()      - Update the current state of a printer.
  *   cupsdStopPrinter()          - Stop a printer from printing any jobs...
+ *   cupsdUpdatePrinters()       - Update printers after a partial reload.
  *   cupsdValidateDest()         - Validate a printer/class destination.
  *   cupsdWritePrintcap()        - Write a pseudo-printcap file for older
  *                                 applications that need it...
@@ -2082,6 +2083,40 @@ cupsdStopPrinter(cupsd_printer_t *p,	/* I - Printer to stop */
     job->state->values[0].integer = IPP_JOB_PENDING;
 
     cupsdSaveJob(job);
+  }
+}
+
+
+/*
+ * 'cupsdUpdatePrinters()' - Update printers after a partial reload.
+ */
+
+void
+cupsdUpdatePrinters(void)
+{
+  cupsd_printer_t	*p;		/* Current printer */
+
+
+ /*
+  * Loop through the printers and recreate the printer attributes
+  * for any local printers since the policy and/or access control
+  * stuff may have changed.  Also, if browsing is disabled, remove
+  * any remote printers...
+  */
+
+  for (p = (cupsd_printer_t *)cupsArrayFirst(Printers);
+       p;
+       p = (cupsd_printer_t *)cupsArrayNext(Printers))
+  {
+    if (!Browsing && (p->type & (CUPS_PRINTER_IMPLICIT | CUPS_PRINTER_REMOTE)))
+    {
+      if (p->type & CUPS_PRINTER_IMPLICIT)
+        cupsArrayRemove(ImplicitPrinters, p);
+
+      cupsdDeletePrinter(p, 0);
+    }
+    else if (!(p->type & CUPS_PRINTER_REMOTE))
+      cupsdSetPrinterAttrs(p);
   }
 }
 

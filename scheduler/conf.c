@@ -989,7 +989,17 @@ cupsdReadConfiguration(void)
   }
   else
   {
+   /*
+    * Not a full reload, so recreate the common printer attributes...
+    */
+
     cupsdCreateCommonData();
+
+   /*
+    * Update all printers as needed...
+    */
+
+    cupsdUpdatePrinters();
 
     cupsdLogMessage(CUPSD_LOG_INFO, "Partial reload complete.");
   }

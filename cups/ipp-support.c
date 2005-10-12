@@ -285,19 +285,26 @@ ippOpValue(const char *name)		/* I - Textual name */
 int					/* O - Port number */
 ippPort(void)
 {
-  const char	*server_port;		/* SERVER_PORT environment variable */
+  const char	*ipp_port;		/* IPP_PORT environment variable */
   struct servent *port;			/* Port number info */  
+  int		portnum;		/* Port number */
   _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
 
 
-  if (cg->ipp_port)
-    return (cg->ipp_port);
-  else if ((server_port = getenv("IPP_PORT")) != NULL)
-    return (cg->ipp_port = atoi(server_port));
-  else if ((port = getservbyname("ipp", NULL)) == NULL)
-    return (cg->ipp_port = CUPS_DEFAULT_IPP_PORT);
-  else
-    return (cg->ipp_port = ntohs(port->s_port));
+  if (!cg->ipp_port)
+  {
+    if ((ipp_port = getenv("IPP_PORT")) != NULL)
+      portnum = atoi(ipp_port);
+    else if ((port = getservbyname("ipp", NULL)) == NULL)
+      portnum = CUPS_DEFAULT_IPP_PORT;
+    else
+      portnum = ntohs(port->s_port);
+
+    if (portnum > 0)
+      cg->ipp_port = portnum;
+  }
+
+  return (cg->ipp_port);
 }
 
 
@@ -308,6 +315,8 @@ ippPort(void)
 void
 ippSetPort(int p)			/* I - Port number to use */
 {
+  fprintf(stderr, "ippSetPort(p=%d)\n", p);
+
   _cupsGlobals()->ipp_port = p;
 }
 

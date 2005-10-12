@@ -218,10 +218,11 @@ cupsServer(void)
       }
 
 #ifdef CUPS_DEFAULT_DOMAINSOCKET
-      server = CUPS_DEFAULT_DOMAINSOCKET;
-#else
-      server = "localhost";
+      if (!access(CUPS_DEFAULT_DOMAINSOCKET, 0))
+        server = CUPS_DEFAULT_DOMAINSOCKET;
+      else
 #endif /* CUPS_DEFAULT_DOMAINSOCKET */
+      server = "localhost";
 
       if (fp != NULL)
       {

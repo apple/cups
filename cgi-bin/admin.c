@@ -1710,6 +1710,10 @@ do_config_server(http_t      *http,	/* I - HTTP connection */
 	    cupsFilePuts(temp, "# Only listen for connections from the local machine.\n");
 	    cupsFilePrintf(temp, "Listen localhost:%d\n", ippPort());
 	  }
+
+#ifdef CUPS_DEFAULT_DOMAINSOCKET
+          cupsFilePuts(temp, "Listen " CUPS_DEFAULT_DOMAINSOCKET "\n");
+#endif /* CUPS_DEFAULT_DOMAINSOCKET */
 	}
       }
       else if (!strcasecmp(line, "Browsing") ||
@@ -2014,6 +2018,10 @@ do_config_server(http_t      *http,	/* I - HTTP connection */
 	cupsFilePuts(temp, "# Only listen for connections from the local machine.\n");
 	cupsFilePrintf(temp, "Listen localhost:%d\n", ippPort());
       }
+
+#ifdef CUPS_DEFAULT_DOMAINSOCKET
+      cupsFilePuts(temp, "Listen " CUPS_DEFAULT_DOMAINSOCKET "\n");
+#endif /* CUPS_DEFAULT_DOMAINSOCKET */
     }
 
     if (!wrote_root_location)
