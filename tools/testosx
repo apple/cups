@@ -1,6 +1,6 @@
 #!/bin/sh
 # Make sure we are running in the right directory...
-if test ! -d tools/testosx; then
+if test ! -f tools/testosx; then
 	echo "Run this script from the top-level CUPS source directory, e.g.:"
 	echo ""
 	echo "    tools/testosx"
@@ -30,7 +30,9 @@ make BUILDROOT=$pkgdir/Package install
 
 # Install resource files into the Resources directory...
 echo Installing resource files...
-cp *.rtf $pkgdir/Resoources
+cp LICENSE.rtf $pkgdir/Resources/License.rtf
+cp README.rtf $pkgdir/Resources/ReadMe.rtf
+cp WELCOME.rtf $pkgdir/Resources/Welcome.rtf
 
 # Tag the current revision in the plist and web interface files...
 sed -e '1,$s/@CUPS_VERSION@/1.2svn-r'$rev'/g' <cups-desc.plist.in >cups-desc.plist
@@ -47,7 +49,12 @@ fi
 # Create the package...
 echo Creating MacOS X package...
 rm -rf cups-1.2svn-$rev-macosx.pkg
-$PackageMaker -build -p $topdir/cups-1.2svn-$rev-macosx.pkg \
+echo $PackageMaker -build -v -p $topdir/cups-1.2svn-$rev-macosx.pkg \
+	-f $pkgdir/Package \
+	-r $pkgdir/Resources \
+	-d $topdir/cups-desc.plist \
+	-i $topdir/cups-info.plist
+sh -c $PackageMaker -build -v -p $topdir/cups-1.2svn-$rev-macosx.pkg \
 	-f $pkgdir/Package \
 	-r $pkgdir/Resources \
 	-d $topdir/cups-desc.plist \
