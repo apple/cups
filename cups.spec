@@ -184,7 +184,11 @@ rm -rf $RPM_BUILD_ROOT
 %dir /usr/share/cups
 /usr/share/cups/*
 %dir /usr/share/doc/cups
-/usr/share/doc/cups/*
+/usr/share/doc/cups/*.*
+%dir /usr/share/doc/cups/help
+/usr/share/doc/cups/help/*-reference.html
+%dir /usr/share/doc/cups/images
+/usr/share/doc/cups/images/*
 %dir /usr/share/locale
 /usr/share/locale/*
 
@@ -241,6 +245,9 @@ rm -rf $RPM_BUILD_ROOT
 /usr/include/cups/*
 /usr/lib/*.a
 /usr/lib/*.so
+
+%dir /usr/share/doc/cups/help
+/usr/share/doc/cups/help/api*.html
 
 %files libs
 %defattr(-,root,root)
