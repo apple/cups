@@ -38,6 +38,16 @@
 
 
 /*
+ * Make sure the IPV6_V6ONLY is defined on Linux - older versions of
+ * glibc don't define it even if the kernel supports it...
+ */
+
+#if defined(__linux) && !defined(IPV6_V6ONLY)
+#  define IPV6_V6ONLY 26
+#endif /* __linux && !IPV6_V6ONLY */
+
+
+/*
  * 'cupsdPauseListening()' - Clear input polling on all listening sockets...
  */
 
