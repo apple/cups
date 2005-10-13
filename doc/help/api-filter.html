@@ -2,11 +2,13 @@
 <html xmlns='http://www.w3.org/1999/xhtml' xml:lang='en' lang='en'>
 <head>
 	<title>Filter and Backend APIs</title>
-	<meta name='creator' content='Mini-XML v2.2.3'/>
+	<meta name='creator' content='Mini-XML v2.3'/>
 	<style><!--
 	h1, h2, h3, p { font-family: sans-serif; text-align: justify; }
 	tt, pre a:link, pre a:visited, tt a:link, tt a:visited { font-weight: bold; color: #7f0000; }
 	pre { font-weight: bold; color: #7f0000; margin-left: 2em; }
+	span.info { font-weight: bold; font-style: italic; color: #ffffff; background: #000000; }
+	h3 span.info { float: right; }
 	--></style>
 </head>
 <body>
@@ -17,11 +19,11 @@
 <!-- NEW PAGE -->
 <h2><a name='_functions'>Functions</a></h2>
 <ul>
-	<li><a href='#cupsBackchannelRead'><tt>cupsBackchannelRead()</tt></a></li>
-	<li><a href='#cupsBackchannelWrite'><tt>cupsBackchannelWrite()</tt></a></li>
+	<li><a href='#cupsBackchannelRead'><tt>cupsBackchannelRead()</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
+	<li><a href='#cupsBackchannelWrite'><tt>cupsBackchannelWrite()</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
 </ul>
 <!-- NEW PAGE -->
-<h3><a name='cupsBackchannelRead'>cupsBackchannelRead()</a></h3>
+<h3><a name='cupsBackchannelRead'>cupsBackchannelRead()</a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></h3>
 <hr noshade/>
 <h4>Description</h4>
 <p>Read data from the backchannel.
@@ -29,7 +31,9 @@
 Reads up to &quot;bytes&quot; bytes from the backchannel. The &quot;timeout&quot;
 parameter controls how many seconds to wait for the data - use
 0.0 to return immediately if there is no data, -1.0 to wait
-for data indefinitely.</p>
+for data indefinitely.
+
+</p>
 <h4>Syntax</h4>
 <pre>
 int
@@ -49,7 +53,7 @@ cupsBackchannelRead(
 <h4>Returns</h4>
 <p>Bytes read or -1 on error</p>
 <!-- NEW PAGE -->
-<h3><a name='cupsBackchannelWrite'>cupsBackchannelWrite()</a></h3>
+<h3><a name='cupsBackchannelWrite'>cupsBackchannelWrite()</a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></h3>
 <hr noshade/>
 <h4>Description</h4>
 <p>Write data to the backchannel.
@@ -57,7 +61,9 @@ cupsBackchannelRead(
 Writes &quot;bytes&quot; bytes to the backchannel. The &quot;timeout&quot; parameter
 controls how many seconds to wait for the data to be written - use
 0.0 to return immediately if the data cannot be written, -1.0 to wait
-indefinitely.</p>
+indefinitely.
+
+</p>
 <h4>Syntax</h4>
 <pre>
 int

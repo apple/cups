@@ -158,6 +158,8 @@ ippAddBooleans(ipp_t      *ipp,		/* I - IPP request */
 
 /*
  * 'ippAddCollection()' - Add a collection value.
+ *
+ * @since CUPS 1.1.19@
  */
 
 ipp_attribute_t *			/* O - New attribute */
@@ -189,6 +191,8 @@ ippAddCollection(ipp_t      *ipp,	/* I - IPP request */
 
 /*
  * 'ippAddCollections()' - Add an array of collection values.
+ *
+ * @since CUPS 1.1.19@
  */
 
 ipp_attribute_t *			/* O - New attribute */
@@ -696,6 +700,8 @@ ippDelete(ipp_t *ipp)			/* I - IPP request */
 
 /*
  * 'ippDeleteAttribute()' - Delete a single attribute in an IPP request.
+ *
+ * @since CUPS 1.1.19@
  */
 
 void
@@ -882,6 +888,8 @@ ippRead(http_t *http,			/* I - HTTP connection */
 
 /*
  * 'ippReadFile()' - Read data for an IPP request from a file.
+ *
+ * @since CUPS 1.1.19@
  */
 
 ipp_state_t				/* O - Current state */
@@ -896,6 +904,8 @@ ippReadFile(int   fd,			/* I - HTTP data */
 
 /*
  * 'ippReadIO()' - Read data for an IPP request.
+ *
+ * @since CUPS 1.1.19@
  */
 
 ipp_state_t				/* O - Current state */
@@ -1472,6 +1482,8 @@ ippWrite(http_t *http,			/* I - HTTP connection */
 
 /*
  * 'ippWriteFile()' - Write data for an IPP request to a file.
+ *
+ * @since CUPS 1.1.19@
  */
 
 ipp_state_t				/* O - Current state */
@@ -1488,6 +1500,8 @@ ippWriteFile(int   fd,			/* I - HTTP data */
 
 /*
  * 'ippWriteIO()' - Write data for an IPP request.
+ *
+ * @since CUPS 1.1.19@
  */
 
 ipp_state_t				/* O - Current state */

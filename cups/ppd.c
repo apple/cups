@@ -304,6 +304,8 @@ ppdClose(ppd_file_t *ppd)		/* I - PPD file record */
 
 /*
  * 'ppdErrorString()' - Returns the text assocated with a status.
+ *
+ * @since CUPS 1.1.19@
  */
 
 const char *				/* O - Status string */
@@ -343,6 +345,8 @@ ppdErrorString(ppd_status_t status)	/* I - PPD status */
 
 /*
  * 'ppdLastError()' - Return the status from the last ppdOpen*().
+ *
+ * @since CUPS 1.1.19@
  */
 
 ppd_status_t				/* O - Status code */
@@ -395,6 +399,8 @@ ppdOpen(FILE *fp)			/* I - File to read from */
 
 /*
  * 'ppdOpen2()' - Read a PPD file into memory.
+ *
+ * @since CUPS 1.2@
  */
 
 ppd_file_t *				/* O - PPD file record */
@@ -2039,6 +2045,8 @@ ppdOpenFile(const char *filename)	/* I - File to read from */
 
 /*
  * 'ppdSetConformance()' - Set the conformance level for PPD files.
+ *
+ * @since CUPS 1.1.20@
  */
 
 void

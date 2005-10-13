@@ -25,6 +25,9 @@
  *
  * Contents:
  *
+ *   cupsBackChannelRead()  - Read data from the backchannel.
+ *   cupsBackChannelWrite() - Write data to the backchannel.
+ *   cups_setup()           - Setup select() 
  */
 
 /*
@@ -53,6 +56,8 @@ static void	cups_setup(fd_set *set, struct timeval *tval,
  * parameter controls how many seconds to wait for the data - use
  * 0.0 to return immediately if there is no data, -1.0 to wait
  * for data indefinitely.
+ *
+ * @since CUPS 1.2@
  */
 
 int					/* O - Bytes read or -1 on error */
@@ -98,6 +103,8 @@ cupsBackchannelRead(char   *buffer,	/* I - Buffer to read */
  * controls how many seconds to wait for the data to be written - use
  * 0.0 to return immediately if the data cannot be written, -1.0 to wait
  * indefinitely.
+ *
+ * @since CUPS 1.2@
  */
 
 int					/* O - Bytes written or -1 on error */

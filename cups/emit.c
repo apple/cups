@@ -657,6 +657,8 @@ ppdEmitJCL(ppd_file_t *ppd,		/* I - PPD file record */
 
 /*
  * 'ppdEmitJCLEnd()' - Emit JCLEnd code to a file.
+ *
+ * @since CUPS 1.2@
  */
 
 int					/* O - 0 on success, -1 on failure */

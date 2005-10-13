@@ -47,6 +47,8 @@ extern int	_ppd_attr_compare(ppd_attr_t **a, ppd_attr_t **b);
 
 /*
  * 'ppdFindAttr()' - Find the first matching attribute...
+ *
+ * @since CUPS 1.1.19@
  */
 
 ppd_attr_t *			/* O - Attribute or NULL if not found */
@@ -117,6 +119,8 @@ ppdFindAttr(ppd_file_t *ppd,	/* I - PPD file data */
 
 /*
  * 'ppdFindNextAttr()' - Find the next matching attribute...
+ *
+ * @since CUPS 1.1.19@
  */
 
 ppd_attr_t *				/* O - Attribute or NULL if not found */

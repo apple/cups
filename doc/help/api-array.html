@@ -2,11 +2,13 @@
 <html xmlns='http://www.w3.org/1999/xhtml' xml:lang='en' lang='en'>
 <head>
 	<title>Array API</title>
-	<meta name='creator' content='Mini-XML v2.2.3'/>
+	<meta name='creator' content='Mini-XML v2.3'/>
 	<style><!--
 	h1, h2, h3, p { font-family: sans-serif; text-align: justify; }
 	tt, pre a:link, pre a:visited, tt a:link, tt a:visited { font-weight: bold; color: #7f0000; }
 	pre { font-weight: bold; color: #7f0000; margin-left: 2em; }
+	span.info { font-weight: bold; font-style: italic; color: #ffffff; background: #000000; }
+	h3 span.info { float: right; }
 	--></style>
 </head>
 <body>
@@ -18,24 +20,24 @@
 <!-- NEW PAGE -->
 <h2><a name='_functions'>Functions</a></h2>
 <ul>
-	<li><a href='#cupsArrayAdd'><tt>cupsArrayAdd()</tt></a></li>
-	<li><a href='#cupsArrayClear'><tt>cupsArrayClear()</tt></a></li>
-	<li><a href='#cupsArrayCount'><tt>cupsArrayCount()</tt></a></li>
-	<li><a href='#cupsArrayCurrent'><tt>cupsArrayCurrent()</tt></a></li>
-	<li><a href='#cupsArrayDelete'><tt>cupsArrayDelete()</tt></a></li>
-	<li><a href='#cupsArrayDup'><tt>cupsArrayDup()</tt></a></li>
-	<li><a href='#cupsArrayFind'><tt>cupsArrayFind()</tt></a></li>
-	<li><a href='#cupsArrayFirst'><tt>cupsArrayFirst()</tt></a></li>
-	<li><a href='#cupsArrayLast'><tt>cupsArrayLast()</tt></a></li>
-	<li><a href='#cupsArrayNew'><tt>cupsArrayNew()</tt></a></li>
-	<li><a href='#cupsArrayNext'><tt>cupsArrayNext()</tt></a></li>
-	<li><a href='#cupsArrayPrev'><tt>cupsArrayPrev()</tt></a></li>
-	<li><a href='#cupsArrayRemove'><tt>cupsArrayRemove()</tt></a></li>
-	<li><a href='#cupsArrayRestore'><tt>cupsArrayRestore()</tt></a></li>
-	<li><a href='#cupsArraySave'><tt>cupsArraySave()</tt></a></li>
+	<li><a href='#cupsArrayAdd'><tt>cupsArrayAdd()</tt></a> </li>
+	<li><a href='#cupsArrayClear'><tt>cupsArrayClear()</tt></a> </li>
+	<li><a href='#cupsArrayCount'><tt>cupsArrayCount()</tt></a> </li>
+	<li><a href='#cupsArrayCurrent'><tt>cupsArrayCurrent()</tt></a> </li>
+	<li><a href='#cupsArrayDelete'><tt>cupsArrayDelete()</tt></a> </li>
+	<li><a href='#cupsArrayDup'><tt>cupsArrayDup()</tt></a> </li>
+	<li><a href='#cupsArrayFind'><tt>cupsArrayFind()</tt></a> </li>
+	<li><a href='#cupsArrayFirst'><tt>cupsArrayFirst()</tt></a> </li>
+	<li><a href='#cupsArrayLast'><tt>cupsArrayLast()</tt></a> </li>
+	<li><a href='#cupsArrayNew'><tt>cupsArrayNew()</tt></a> </li>
+	<li><a href='#cupsArrayNext'><tt>cupsArrayNext()</tt></a> </li>
+	<li><a href='#cupsArrayPrev'><tt>cupsArrayPrev()</tt></a> </li>
+	<li><a href='#cupsArrayRemove'><tt>cupsArrayRemove()</tt></a> </li>
+	<li><a href='#cupsArrayRestore'><tt>cupsArrayRestore()</tt></a> </li>
+	<li><a href='#cupsArraySave'><tt>cupsArraySave()</tt></a> </li>
 </ul>
 <!-- NEW PAGE -->
-<h3><a name='cupsArrayAdd'>cupsArrayAdd()</a></h3>
+<h3><a name='cupsArrayAdd'>cupsArrayAdd()</a> </h3>
 <hr noshade/>
 <h4>Description</h4>
 <p>Add an element to the array.</p>
@@ -56,7 +58,7 @@ cupsArrayAdd(
 <h4>Returns</h4>
 <p>1 on success, 0 on failure</p>
 <!-- NEW PAGE -->
-<h3><a name='cupsArrayClear'>cupsArrayClear()</a></h3>
+<h3><a name='cupsArrayClear'>cupsArrayClear()</a> </h3>
 <hr noshade/>
 <h4>Description</h4>
 <p>Clear the array.</p>
@@ -75,7 +77,7 @@ cupsArrayClear(
 <h4>Returns</h4>
 <p>Nothing.</p>
 <!-- NEW PAGE -->
-<h3><a name='cupsArrayCount'>cupsArrayCount()</a></h3>
+<h3><a name='cupsArrayCount'>cupsArrayCount()</a> </h3>
 <hr noshade/>
 <h4>Description</h4>
 <p>Get the number of elements in the array.</p>
@@ -94,7 +96,7 @@ cupsArrayCount(
 <h4>Returns</h4>
 <p>Number of elements</p>
 <!-- NEW PAGE -->
-<h3><a name='cupsArrayCurrent'>cupsArrayCurrent()</a></h3>
+<h3><a name='cupsArrayCurrent'>cupsArrayCurrent()</a> </h3>
 <hr noshade/>
 <h4>Description</h4>
 <p>Return the current element in the array.</p>
@@ -113,7 +115,7 @@ cupsArrayCurrent(
 <h4>Returns</h4>
 <p>Element</p>
 <!-- NEW PAGE -->
-<h3><a name='cupsArrayDelete'>cupsArrayDelete()</a></h3>
+<h3><a name='cupsArrayDelete'>cupsArrayDelete()</a> </h3>
 <hr noshade/>
 <h4>Description</h4>
 <p>Free all memory used by the array.</p>
@@ -132,7 +134,7 @@ cupsArrayDelete(
 <h4>Returns</h4>
 <p>Nothing.</p>
 <!-- NEW PAGE -->
-<h3><a name='cupsArrayDup'>cupsArrayDup()</a></h3>
+<h3><a name='cupsArrayDup'>cupsArrayDup()</a> </h3>
 <hr noshade/>
 <h4>Description</h4>
 <p>Duplicate the array.</p>
@@ -151,7 +153,7 @@ cupsArrayDup(
 <h4>Returns</h4>
 <p>Duplicate array</p>
 <!-- NEW PAGE -->
-<h3><a name='cupsArrayFind'>cupsArrayFind()</a></h3>
+<h3><a name='cupsArrayFind'>cupsArrayFind()</a> </h3>
 <hr noshade/>
 <h4>Description</h4>
 <p>Find an elemrnt in the array.</p>
@@ -172,7 +174,7 @@ cupsArrayFind(
 <h4>Returns</h4>
 <p>Element found or NULL</p>
 <!-- NEW PAGE -->
-<h3><a name='cupsArrayFirst'>cupsArrayFirst()</a></h3>
+<h3><a name='cupsArrayFirst'>cupsArrayFirst()</a> </h3>
 <hr noshade/>
 <h4>Description</h4>
 <p>Get the first element in the array.</p>
@@ -191,7 +193,7 @@ cupsArrayFirst(
 <h4>Returns</h4>
 <p>First element or NULL</p>
 <!-- NEW PAGE -->
-<h3><a name='cupsArrayLast'>cupsArrayLast()</a></h3>
+<h3><a name='cupsArrayLast'>cupsArrayLast()</a> </h3>
 <hr noshade/>
 <h4>Description</h4>
 <p>Get the last element in the array.</p>
@@ -210,7 +212,7 @@ cupsArrayLast(
 <h4>Returns</h4>
 <p>Last element or NULL</p>
 <!-- NEW PAGE -->
-<h3><a name='cupsArrayNew'>cupsArrayNew()</a></h3>
+<h3><a name='cupsArrayNew'>cupsArrayNew()</a> </h3>
 <hr noshade/>
 <h4>Description</h4>
 <p>Create a new array.</p>
@@ -231,7 +233,7 @@ cupsArrayNew(
 <h4>Returns</h4>
 <p>Array</p>
 <!-- NEW PAGE -->
-<h3><a name='cupsArrayNext'>cupsArrayNext()</a></h3>
+<h3><a name='cupsArrayNext'>cupsArrayNext()</a> </h3>
 <hr noshade/>
 <h4>Description</h4>
 <p>Get the next element in the array.</p>
@@ -250,7 +252,7 @@ cupsArrayNext(
 <h4>Returns</h4>
 <p>Next element or NULL</p>
 <!-- NEW PAGE -->
-<h3><a name='cupsArrayPrev'>cupsArrayPrev()</a></h3>
+<h3><a name='cupsArrayPrev'>cupsArrayPrev()</a> </h3>
 <hr noshade/>
 <h4>Description</h4>
 <p>Get the previous element in the array.</p>
@@ -269,7 +271,7 @@ cupsArrayPrev(
 <h4>Returns</h4>
 <p>Previous element or NULL</p>
 <!-- NEW PAGE -->
-<h3><a name='cupsArrayRemove'>cupsArrayRemove()</a></h3>
+<h3><a name='cupsArrayRemove'>cupsArrayRemove()</a> </h3>
 <hr noshade/>
 <h4>Description</h4>
 <p>Remove an element from the array.</p>
@@ -290,7 +292,7 @@ cupsArrayRemove(
 <h4>Returns</h4>
 <p>1 on success, 0 on failure</p>
 <!-- NEW PAGE -->
-<h3><a name='cupsArrayRestore'>cupsArrayRestore()</a></h3>
+<h3><a name='cupsArrayRestore'>cupsArrayRestore()</a> </h3>
 <hr noshade/>
 <h4>Description</h4>
 <p>Reset the current element to the last cupsArraySave.</p>
@@ -309,7 +311,7 @@ cupsArrayRestore(
 <h4>Returns</h4>
 <p>New current element</p>
 <!-- NEW PAGE -->
-<h3><a name='cupsArraySave'>cupsArraySave()</a></h3>
+<h3><a name='cupsArraySave'>cupsArraySave()</a> </h3>
 <hr noshade/>
 <h4>Description</h4>
 <p>Mark the current element for a later cupsArrayRestore.</p>
@@ -330,11 +332,11 @@ cupsArraySave(
 <!-- NEW PAGE -->
 <h2><a name='_types'>Types</a></h2>
 <ul>
-	<li><a href='#cups_array_func_t'><tt>cups_array_func_t</tt></a></li>
-	<li><a href='#cups_array_t'><tt>cups_array_t</tt></a></li>
+	<li><a href='#cups_array_func_t'><tt>cups_array_func_t</tt></a> </li>
+	<li><a href='#cups_array_t'><tt>cups_array_t</tt></a> </li>
 </ul>
 <!-- NEW PAGE -->
-<h3><a name='cups_array_func_t'>cups_array_func_t</a></h3>
+<h3><a name='cups_array_func_t'>cups_array_func_t</a> </h3>
 <hr noshade/>
 <h4>Description</h4>
 <p>Array comparison function</p>
@@ -343,7 +345,7 @@ cupsArraySave(
 typedef int (*cups_array_func_t)(void *first, void *second, void *data);
 </pre>
 <!-- NEW PAGE -->
-<h3><a name='cups_array_t'>cups_array_t</a></h3>
+<h3><a name='cups_array_t'>cups_array_t</a> </h3>
 <hr noshade/>
 <h4>Definition</h4>
 <pre>

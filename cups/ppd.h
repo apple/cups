@@ -101,7 +101,7 @@ typedef enum ppd_cs_e		/**** Colorspaces ****/
   PPD_CS_N			/* DeviceN colorspace */
 } ppd_cs_t;
 
-typedef enum ppd_status_e	/**** Status Codes ****/
+typedef enum ppd_status_e	/**** Status Codes @since CUPS 1.1.19@ ****/
 {
   PPD_OK = 0,			/* OK */
   PPD_FILE_OPEN_ERROR,		/* Unable to open PPD file */
@@ -131,7 +131,7 @@ typedef enum ppd_conform_e	/**** Conformance Levels ****/
   PPD_CONFORM_STRICT		/* Require strict conformance */
 } ppd_conform_t;
 
-typedef struct ppd_attr_str	/**** PPD Attribute Structure ****/
+typedef struct ppd_attr_str	/**** PPD Attribute Structure @since CUPS 1.1.19@ ****/
 {
   char		name[PPD_MAX_NAME];
   				/* Name of attribute (cupsXYZ) */
@@ -181,7 +181,7 @@ typedef struct ppd_group_str	/**** Groups ****/
   char		text[PPD_MAX_TEXT - PPD_MAX_NAME];
   				/* Human-readable group name */
   char		name[PPD_MAX_NAME];
-				/* Group name */
+				/* Group name @since CUPS 1.1.18@ */
   int		num_options;	/* Number of options */
   ppd_option_t	*options;	/* Options */
   int		num_subgroups;	/* Number of sub-groups */
@@ -227,7 +227,7 @@ typedef struct ppd_profile_str	/**** sRGB Color Profiles ****/
   char		resolution[PPD_MAX_NAME];
   				/* Resolution or "-" */
   char		media_type[PPD_MAX_NAME];
-				/* Media type of "-" */
+				/* Media type or "-" */
   float		density;	/* Ink density to use */
   float		gamma;		/* Gamma correction to use */
   float		matrix[3][3];	/* Transform matrix */
@@ -235,7 +235,7 @@ typedef struct ppd_profile_str	/**** sRGB Color Profiles ****/
 
 /**** New in CUPS 1.2 ****/
 #  if 0
-typedef enum ppd_ext_ui_e	/**** Extended UI Types ****/
+typedef enum ppd_ext_ui_e	/**** Extended UI Types @since CUPS 1.2@ ****/
 {
   PPD_UI_CUPS_TEXT,		/* Specify a string */
   PPD_UI_CUPS_INTEGER,		/* Specify an integer number */
@@ -247,7 +247,7 @@ typedef enum ppd_ext_ui_e	/**** Extended UI Types ****/
   PPD_UI_CUPS_XY_ARRAY		/* Specify an array of X/Y real numbers */
 } ppd_ext_ui_t;
 
-typedef union ppd_ext_value_u	/**** Extended Values ****/
+typedef union ppd_ext_value_u	/**** Extended Values @since CUPS 1.2@ ****/
 {
   char		*text;		/* Text value */
   int		integer;	/* Integer value */
@@ -276,7 +276,7 @@ typedef union ppd_ext_value_u	/**** Extended Values ****/
   }		xy_array;	/* XY array value */
 } ppd_ext_value_t;
 
-typedef struct ppd_ext_param_str/**** Extended Parameter ****/
+typedef struct ppd_ext_param_str/**** Extended Parameter @since CUPS 1.2@ ****/
 {
   char		keyword[PPD_MAX_NAME];
 				/* Parameter name */
@@ -289,7 +289,7 @@ typedef struct ppd_ext_param_str/**** Extended Parameter ****/
 } ppd_ext_param_t;
 
 typedef struct ppd_ext_option_str
-				/**** Extended Options ****/
+				/**** Extended Options @since CUPS 1.2@ ****/
 {
   char		keyword[PPD_MAX_NAME];
 				/* Name of option that is being extended... */
@@ -345,19 +345,19 @@ typedef struct ppd_file_str	/**** Files ****/
   char		**filters;	/* Filter strings... */
 
   /**** New in CUPS 1.1 ****/
-  int		flip_duplex;	/* 1 = Flip page for back sides */
+  int		flip_duplex;	/* 1 = Flip page for back sides @since CUPS 1.1@ */
 
   /**** New in CUPS 1.1.19 ****/
-  char		*protocols;	/* Protocols (BCP, TBCP) string */
-  char		*pcfilename;	/* PCFileName string */
-  int		num_attrs;	/* Number of attributes */
-  int		cur_attr;	/* Current attribute */
-  ppd_attr_t	**attrs;	/* Attributes */
+  char		*protocols;	/* Protocols (BCP, TBCP) string @since CUPS 1.1.19@ */
+  char		*pcfilename;	/* PCFileName string @since CUPS 1.1.19@ */
+  int		num_attrs;	/* Number of attributes @since CUPS 1.1.19@ */
+  int		cur_attr;	/* Current attribute @since CUPS 1.1.19@ */
+  ppd_attr_t	**attrs;	/* Attributes @since CUPS 1.1.19@ */
 
   /**** New in CUPS 1.2 ****/
 #  if 0
-  int		num_extended;	/* Number of extended options */
-  ppd_ext_option_t **extended;	/* Extended options */
+  int		num_extended;	/* Number of extended options @since CUPS 1.2@ */
+  ppd_ext_option_t **extended;	/* Extended options @since CUPS 1.2@ */
 #  endif /* 0 */
 } ppd_file_t;
 

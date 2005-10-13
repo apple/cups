@@ -89,6 +89,19 @@ HR {
   border: solid thin;
 }
 
+SPAN.info {
+  background: #999966;
+  border: thin solid #666644;
+  color: #ffffff;
+  font-weight: bold;
+  font-style: italic;
+  white-space: nowrap;
+}
+
+H4 SPAN.info {
+  float: right;
+}
+
 .conflict {
   color: red;
 }

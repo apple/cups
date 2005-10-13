@@ -200,6 +200,8 @@ cupsTempFile(char *filename,		/* I - Pointer to buffer */
 
 /*
  * 'cupsTempFile2()' - Create a temporary CUPS file.
+ *
+ * @since CUPS 1.2@
  */
 
 cups_file_t *				/* O - CUPS file or NULL on error */

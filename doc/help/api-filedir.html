@@ -2,11 +2,13 @@
 <html xmlns='http://www.w3.org/1999/xhtml' xml:lang='en' lang='en'>
 <head>
 	<title>File and Directory APIs</title>
-	<meta name='creator' content='Mini-XML v2.2.3'/>
+	<meta name='creator' content='Mini-XML v2.3'/>
 	<style><!--
 	h1, h2, h3, p { font-family: sans-serif; text-align: justify; }
 	tt, pre a:link, pre a:visited, tt a:link, tt a:visited { font-weight: bold; color: #7f0000; }
 	pre { font-weight: bold; color: #7f0000; margin-left: 2em; }
+	span.info { font-weight: bold; font-style: italic; color: #ffffff; background: #000000; }
+	h3 span.info { float: right; }
 	--></style>
 </head>
 <body>
@@ -19,34 +21,34 @@
 <!-- NEW PAGE -->
 <h2><a name='_functions'>Functions</a></h2>
 <ul>
-	<li><a href='#cupsDirClose'><tt>cupsDirClose()</tt></a></li>
-	<li><a href='#cupsDirOpen'><tt>cupsDirOpen()</tt></a></li>
-	<li><a href='#cupsDirRead'><tt>cupsDirRead()</tt></a></li>
-	<li><a href='#cupsDirRewind'><tt>cupsDirRewind()</tt></a></li>
-	<li><a href='#cupsFileClose'><tt>cupsFileClose()</tt></a></li>
-	<li><a href='#cupsFileCompression'><tt>cupsFileCompression()</tt></a></li>
-	<li><a href='#cupsFileEOF'><tt>cupsFileEOF()</tt></a></li>
-	<li><a href='#cupsFileFlush'><tt>cupsFileFlush()</tt></a></li>
-	<li><a href='#cupsFileGetChar'><tt>cupsFileGetChar()</tt></a></li>
-	<li><a href='#cupsFileGetConf'><tt>cupsFileGetConf()</tt></a></li>
-	<li><a href='#cupsFileGets'><tt>cupsFileGets()</tt></a></li>
-	<li><a href='#cupsFileLock'><tt>cupsFileLock()</tt></a></li>
-	<li><a href='#cupsFileNumber'><tt>cupsFileNumber()</tt></a></li>
-	<li><a href='#cupsFileOpen'><tt>cupsFileOpen()</tt></a></li>
-	<li><a href='#cupsFileOpenFd'><tt>cupsFileOpenFd()</tt></a></li>
-	<li><a href='#cupsFilePeekChar'><tt>cupsFilePeekChar()</tt></a></li>
-	<li><a href='#cupsFilePrintf'><tt>cupsFilePrintf()</tt></a></li>
-	<li><a href='#cupsFilePutChar'><tt>cupsFilePutChar()</tt></a></li>
-	<li><a href='#cupsFilePuts'><tt>cupsFilePuts()</tt></a></li>
-	<li><a href='#cupsFileRead'><tt>cupsFileRead()</tt></a></li>
-	<li><a href='#cupsFileRewind'><tt>cupsFileRewind()</tt></a></li>
-	<li><a href='#cupsFileSeek'><tt>cupsFileSeek()</tt></a></li>
-	<li><a href='#cupsFileTell'><tt>cupsFileTell()</tt></a></li>
-	<li><a href='#cupsFileUnlock'><tt>cupsFileUnlock()</tt></a></li>
-	<li><a href='#cupsFileWrite'><tt>cupsFileWrite()</tt></a></li>
+	<li><a href='#cupsDirClose'><tt>cupsDirClose()</tt></a> </li>
+	<li><a href='#cupsDirOpen'><tt>cupsDirOpen()</tt></a> </li>
+	<li><a href='#cupsDirRead'><tt>cupsDirRead()</tt></a> </li>
+	<li><a href='#cupsDirRewind'><tt>cupsDirRewind()</tt></a> </li>
+	<li><a href='#cupsFileClose'><tt>cupsFileClose()</tt></a> </li>
+	<li><a href='#cupsFileCompression'><tt>cupsFileCompression()</tt></a> </li>
+	<li><a href='#cupsFileEOF'><tt>cupsFileEOF()</tt></a> </li>
+	<li><a href='#cupsFileFlush'><tt>cupsFileFlush()</tt></a> </li>
+	<li><a href='#cupsFileGetChar'><tt>cupsFileGetChar()</tt></a> </li>
+	<li><a href='#cupsFileGetConf'><tt>cupsFileGetConf()</tt></a> </li>
+	<li><a href='#cupsFileGets'><tt>cupsFileGets()</tt></a> </li>
+	<li><a href='#cupsFileLock'><tt>cupsFileLock()</tt></a> </li>
+	<li><a href='#cupsFileNumber'><tt>cupsFileNumber()</tt></a> </li>
+	<li><a href='#cupsFileOpen'><tt>cupsFileOpen()</tt></a> </li>
+	<li><a href='#cupsFileOpenFd'><tt>cupsFileOpenFd()</tt></a> </li>
+	<li><a href='#cupsFilePeekChar'><tt>cupsFilePeekChar()</tt></a> </li>
+	<li><a href='#cupsFilePrintf'><tt>cupsFilePrintf()</tt></a> </li>
+	<li><a href='#cupsFilePutChar'><tt>cupsFilePutChar()</tt></a> </li>
+	<li><a href='#cupsFilePuts'><tt>cupsFilePuts()</tt></a> </li>
+	<li><a href='#cupsFileRead'><tt>cupsFileRead()</tt></a> </li>
+	<li><a href='#cupsFileRewind'><tt>cupsFileRewind()</tt></a> </li>
+	<li><a href='#cupsFileSeek'><tt>cupsFileSeek()</tt></a> </li>
+	<li><a href='#cupsFileTell'><tt>cupsFileTell()</tt></a> </li>
+	<li><a href='#cupsFileUnlock'><tt>cupsFileUnlock()</tt></a> </li>
+	<li><a href='#cupsFileWrite'><tt>cupsFileWrite()</tt></a> </li>
 </ul>
 <!-- NEW PAGE -->
-<h3><a name='cupsDirClose'>cupsDirClose()</a></h3>
+<h3><a name='cupsDirClose'>cupsDirClose()</a> </h3>
 <hr noshade/>
 <h4>Description</h4>
 <p>Close a directory.</p>
@@ -65,7 +67,7 @@ cupsDirClose(
 <h4>Returns</h4>
 <p>Nothing.</p>
 <!-- NEW PAGE -->
-<h3><a name='cupsDirOpen'>cupsDirOpen()</a></h3>
+<h3><a name='cupsDirOpen'>cupsDirOpen()</a> </h3>
 <hr noshade/>
 <h4>Description</h4>
 <p>Open a directory.</p>
@@ -84,7 +86,7 @@ cupsDirOpen(
 <h4>Returns</h4>
 <p>Directory</p>
 <!-- NEW PAGE -->
-<h3><a name='cupsDirRead'>cupsDirRead()</a></h3>
+<h3><a name='cupsDirRead'>cupsDirRead()</a> </h3>
 <hr noshade/>
 <h4>Description</h4>
 <p>Read the next directory entry.</p>
@@ -103,7 +105,7 @@ cupsDirRead(
 <h4>Returns</h4>
 <p>Directory entry</p>
 <!-- NEW PAGE -->
-<h3><a name='cupsDirRewind'>cupsDirRewind()</a></h3>
+<h3><a name='cupsDirRewind'>cupsDirRewind()</a> </h3>
 <hr noshade/>
 <h4>Description</h4>
 <p>Rewind to the start of the directory.</p>
@@ -122,7 +124,7 @@ cupsDirRewind(
 <h4>Returns</h4>
 <p>Nothing.</p>
 <!-- NEW PAGE -->
-<h3><a name='cupsFileClose'>cupsFileClose()</a></h3>
+<h3><a name='cupsFileClose'>cupsFileClose()</a> </h3>
 <hr noshade/>
 <h4>Description</h4>
 <p>Close a CUPS file.</p>
@@ -141,7 +143,7 @@ cupsFileClose(
 <h4>Returns</h4>
 <p>0 on success, -1 on error</p>
 <!-- NEW PAGE -->
-<h3><a name='cupsFileCompression'>cupsFileCompression()</a></h3>
+<h3><a name='cupsFileCompression'>cupsFileCompression()</a> </h3>
 <hr noshade/>
 <h4>Description</h4>
 <p>Return whether a file is compressed.</p>
@@ -160,7 +162,7 @@ cupsFileCompression(
 <h4>Returns</h4>
 <p>CUPS_FILE_NONE or CUPS_FILE_GZIP</p>
 <!-- NEW PAGE -->
-<h3><a name='cupsFileEOF'>cupsFileEOF()</a></h3>
+<h3><a name='cupsFileEOF'>cupsFileEOF()</a> </h3>
 <hr noshade/>
 <h4>Description</h4>
 <p>Return the end-of-file status.</p>
@@ -179,7 +181,7 @@ cupsFileEOF(
 <h4>Returns</h4>
 <p>1 on EOF, 0 otherwise</p>
 <!-- NEW PAGE -->
-<h3><a name='cupsFileFlush'>cupsFileFlush()</a></h3>
+<h3><a name='cupsFileFlush'>cupsFileFlush()</a> </h3>
 <hr noshade/>
 <h4>Description</h4>
 <p>Flush pending output.</p>
@@ -198,7 +200,7 @@ cupsFileFlush(
 <h4>Returns</h4>
 <p>0 on success, -1 on error</p>
 <!-- NEW PAGE -->
-<h3><a name='cupsFileGetChar'>cupsFileGetChar()</a></h3>
+<h3><a name='cupsFileGetChar'>cupsFileGetChar()</a> </h3>
 <hr noshade/>
 <h4>Description</h4>
 <p>Get a single character from a file.</p>
@@ -217,7 +219,7 @@ cupsFileGetChar(
 <h4>Returns</h4>
 <p>Character or -1 on EOF</p>
 <!-- NEW PAGE -->
-<h3><a name='cupsFileGetConf'>cupsFileGetConf()</a></h3>
+<h3><a name='cupsFileGetConf'>cupsFileGetConf()</a> </h3>
 <hr noshade/>
 <h4>Description</h4>
 <p>Get a line from a configuration file...</p>
@@ -244,7 +246,7 @@ cupsFileGetConf(
 <h4>Returns</h4>
 <p>Line read of NULL on eof/error</p>
 <!-- NEW PAGE -->
-<h3><a name='cupsFileGets'>cupsFileGets()</a></h3>
+<h3><a name='cupsFileGets'>cupsFileGets()</a> </h3>
 <hr noshade/>
 <h4>Description</h4>
 <p>Get a CR and/or LF-terminated line.</p>
@@ -267,7 +269,7 @@ cupsFileGets(
 <h4>Returns</h4>
 <p>Line read or NULL on eof/error</p>
 <!-- NEW PAGE -->
-<h3><a name='cupsFileLock'>cupsFileLock()</a></h3>
+<h3><a name='cupsFileLock'>cupsFileLock()</a> </h3>
 <hr noshade/>
 <h4>Description</h4>
 <p>Temporarily lock access to a file.</p>
@@ -288,7 +290,7 @@ cupsFileLock(
 <h4>Returns</h4>
 <p>0 on success, -1 on error</p>
 <!-- NEW PAGE -->
-<h3><a name='cupsFileNumber'>cupsFileNumber()</a></h3>
+<h3><a name='cupsFileNumber'>cupsFileNumber()</a> </h3>
 <hr noshade/>
 <h4>Description</h4>
 <p>Return the file descriptor associated with a CUPS file.</p>
@@ -307,7 +309,7 @@ cupsFileNumber(
 <h4>Returns</h4>
 <p>File descriptor</p>
 <!-- NEW PAGE -->
-<h3><a name='cupsFileOpen'>cupsFileOpen()</a></h3>
+<h3><a name='cupsFileOpen'>cupsFileOpen()</a> </h3>
 <hr noshade/>
 <h4>Description</h4>
 <p>Open a CUPS file.</p>
@@ -328,7 +330,7 @@ cupsFileOpen(
 <h4>Returns</h4>
 <p>CUPS file or NULL</p>
 <!-- NEW PAGE -->
-<h3><a name='cupsFileOpenFd'>cupsFileOpenFd()</a></h3>
+<h3><a name='cupsFileOpenFd'>cupsFileOpenFd()</a> </h3>
 <hr noshade/>
 <h4>Description</h4>
 <p>Open a CUPS file using a file descriptor.</p>
@@ -349,7 +351,7 @@ cupsFileOpenFd(
 <h4>Returns</h4>
 <p>CUPS file or NULL</p>
 <!-- NEW PAGE -->
-<h3><a name='cupsFilePeekChar'>cupsFilePeekChar()</a></h3>
+<h3><a name='cupsFilePeekChar'>cupsFilePeekChar()</a> </h3>
 <hr noshade/>
 <h4>Description</h4>
 <p>Peek at the next character from a file.</p>
@@ -368,7 +370,7 @@ cupsFilePeekChar(
 <h4>Returns</h4>
 <p>Character or -1 on EOF</p>
 <!-- NEW PAGE -->
-<h3><a name='cupsFilePrintf'>cupsFilePrintf()</a></h3>
+<h3><a name='cupsFilePrintf'>cupsFilePrintf()</a> </h3>
 <hr noshade/>
 <h4>Description</h4>
 <p>Write a formatted string.</p>
@@ -391,7 +393,7 @@ cupsFilePrintf(
 <h4>Returns</h4>
 <p>Number of bytes written or -1</p>
 <!-- NEW PAGE -->
-<h3><a name='cupsFilePutChar'>cupsFilePutChar()</a></h3>
+<h3><a name='cupsFilePutChar'>cupsFilePutChar()</a> </h3>
 <hr noshade/>
 <h4>Description</h4>
 <p>Write a character.</p>
@@ -412,7 +414,7 @@ cupsFilePutChar(
 <h4>Returns</h4>
 <p>0 on success, -1 on error</p>
 <!-- NEW PAGE -->
-<h3><a name='cupsFilePuts'>cupsFilePuts()</a></h3>
+<h3><a name='cupsFilePuts'>cupsFilePuts()</a> </h3>
 <hr noshade/>
 <h4>Description</h4>
 <p>Write a string.</p>
@@ -433,7 +435,7 @@ cupsFilePuts(
 <h4>Returns</h4>
 <p>Number of bytes written or -1</p>
 <!-- NEW PAGE -->
-<h3><a name='cupsFileRead'>cupsFileRead()</a></h3>
+<h3><a name='cupsFileRead'>cupsFileRead()</a> </h3>
 <hr noshade/>
 <h4>Description</h4>
 <p>Read from a file.</p>
@@ -456,7 +458,7 @@ cupsFileRead(
 <h4>Returns</h4>
 <p>Number of bytes read or -1</p>
 <!-- NEW PAGE -->
-<h3><a name='cupsFileRewind'>cupsFileRewind()</a></h3>
+<h3><a name='cupsFileRewind'>cupsFileRewind()</a> </h3>
 <hr noshade/>
 <h4>Description</h4>
 <p>Rewind a file.</p>
@@ -475,7 +477,7 @@ cupsFileRewind(
 <h4>Returns</h4>
 <p>New file position or -1</p>
 <!-- NEW PAGE -->
-<h3><a name='cupsFileSeek'>cupsFileSeek()</a></h3>
+<h3><a name='cupsFileSeek'>cupsFileSeek()</a> </h3>
 <hr noshade/>
 <h4>Description</h4>
 <p>Seek in a file.</p>
@@ -496,7 +498,7 @@ cupsFileSeek(
 <h4>Returns</h4>
 <p>New file position or -1</p>
 <!-- NEW PAGE -->
-<h3><a name='cupsFileTell'>cupsFileTell()</a></h3>
+<h3><a name='cupsFileTell'>cupsFileTell()</a> </h3>
 <hr noshade/>
 <h4>Description</h4>
 <p>Return the current file position.</p>
@@ -515,7 +517,7 @@ cupsFileTell(
 <h4>Returns</h4>
 <p>File position</p>
 <!-- NEW PAGE -->
-<h3><a name='cupsFileUnlock'>cupsFileUnlock()</a></h3>
+<h3><a name='cupsFileUnlock'>cupsFileUnlock()</a> </h3>
 <hr noshade/>
 <h4>Description</h4>
 <p>Unlock access to a file.</p>
@@ -534,7 +536,7 @@ cupsFileUnlock(
 <h4>Returns</h4>
 <p>0 on success, -1 on error</p>
 <!-- NEW PAGE -->
-<h3><a name='cupsFileWrite'>cupsFileWrite()</a></h3>
+<h3><a name='cupsFileWrite'>cupsFileWrite()</a> </h3>
 <hr noshade/>
 <h4>Description</h4>
 <p>Write to a file.</p>
@@ -559,10 +561,10 @@ cupsFileWrite(
 <!-- NEW PAGE -->
 <h2><a name='_structures'>Structures</a></h2>
 <ul>
-	<li><a href='#cups_dentry_s'><tt>cups_dentry_s</tt></a></li>
+	<li><a href='#cups_dentry_s'><tt>cups_dentry_s</tt></a> </li>
 </ul>
 <!-- NEW PAGE -->
-<h3><a name='cups_dentry_s'>cups_dentry_s</a></h3>
+<h3><a name='cups_dentry_s'>cups_dentry_s</a> </h3>
 <hr noshade/>
 <h4>Description</h4>
 <p>Directory entry type</p>
@@ -578,18 +580,18 @@ struct cups_dentry_s
 <p class='table'><table align='center' border='1' width='80%'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>fileinfo</tt></td><td>File information</td></tr>
-<tr><td><tt>filename[260]</tt></td><td>File name</td></tr>
+<tr><td><tt>fileinfo</tt> </td><td>File information</td></tr>
+<tr><td><tt>filename[260]</tt> </td><td>File name</td></tr>
 </tbody></table></p>
 <!-- NEW PAGE -->
 <h2><a name='_types'>Types</a></h2>
 <ul>
-	<li><a href='#cups_dentry_t'><tt>cups_dentry_t</tt></a></li>
-	<li><a href='#cups_dir_t'><tt>cups_dir_t</tt></a></li>
-	<li><a href='#cups_file_t'><tt>cups_file_t</tt></a></li>
+	<li><a href='#cups_dentry_t'><tt>cups_dentry_t</tt></a> </li>
+	<li><a href='#cups_dir_t'><tt>cups_dir_t</tt></a> </li>
+	<li><a href='#cups_file_t'><tt>cups_file_t</tt></a> </li>
 </ul>
 <!-- NEW PAGE -->
-<h3><a name='cups_dentry_t'>cups_dentry_t</a></h3>
+<h3><a name='cups_dentry_t'>cups_dentry_t</a> </h3>
 <hr noshade/>
 <h4>Description</h4>
 <p>Directory entry type</p>
@@ -598,14 +600,14 @@ struct cups_dentry_s
 typedef struct <a href='#cups_dentry_s'>cups_dentry_s</a> cups_dentry_t;
 </pre>
 <!-- NEW PAGE -->
-<h3><a name='cups_dir_t'>cups_dir_t</a></h3>
+<h3><a name='cups_dir_t'>cups_dir_t</a> </h3>
 <hr noshade/>
 <h4>Definition</h4>
 <pre>
 typedef struct _cups_dir_s cups_dir_t;
 </pre>
 <!-- NEW PAGE -->
-<h3><a name='cups_file_t'>cups_file_t</a></h3>
+<h3><a name='cups_file_t'>cups_file_t</a> </h3>
 <hr noshade/>
 <h4>Definition</h4>
 <pre>

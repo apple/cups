@@ -195,6 +195,8 @@ ippErrorString(ipp_status_t error)	/* I - Error status */
 
 /*
  * 'ippErrorValue()' - Return a status code for the given name.
+ *
+ * @since CUPS 1.2@
  */
 
 ipp_status_t				/* O - IPP status code */
@@ -224,6 +226,8 @@ ippErrorValue(const char *name)		/* I - Name */
 
 /*
  * 'ippOpString()' - Return a name for the given operation id.
+ *
+ * @since CUPS 1.2@
  */
 
 const char *				/* O - Name */
@@ -255,6 +259,8 @@ ippOpString(ipp_op_t op)		/* I - Operation ID */
 
 /*
  * 'ippOpValue()' - Return an operation id for the given name.
+ *
+ * @since CUPS 1.2@
  */
 
 ipp_op_t				/* O - Operation ID */

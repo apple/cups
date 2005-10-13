@@ -123,6 +123,8 @@ cupsEncodeOptions(ipp_t         *ipp,		/* I - Request to add to */
 
 /*
  * 'cupsEncodeOptions2()' - Encode printer options into IPP attributes for a group.
+ *
+ * @since CUPS 1.2@
  */
 
 void

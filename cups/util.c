@@ -645,6 +645,8 @@ cupsGetDefault(void)
 
 /*
  * 'cupsGetDefault2()' - Get the default printer or class.
+ *
+ * @since CUPS 1.1.21@
  */
 
 const char *				/* O - Default printer or NULL */
@@ -758,6 +760,8 @@ cupsGetJobs(cups_job_t **jobs,		/* O - Job data */
 
 /*
  * 'cupsGetJobs2()' - Get the jobs from the server.
+ *
+ * @since CUPS 1.1.21@
  */
 
 int					/* O - Number of jobs */
@@ -1040,6 +1044,8 @@ cupsGetPPD(const char *name)		/* I - Printer name */
 
 /*
  * 'cupsGetPPD2()' - Get the PPD file for a printer.
+ *
+ * @since CUPS 1.1.21@
  */
 
 const char *				/* O - Filename for PPD file */
@@ -1422,6 +1428,8 @@ cupsPrintFile(const char    *name,	/* I - Printer or class name */
 
 /*
  * 'cupsPrintFile2()' - Print a file to a printer or class.
+ *
+ * @since CUPS 1.1.21@
  */
 
 int					/* O - Job ID */
@@ -1486,6 +1494,8 @@ cupsPrintFiles(const char    *name,	/* I - Printer or class name */
 
 /*
  * 'cupsPrintFiles2()' - Print one or more files to a printer or class.
+ *
+ * @since CUPS 1.1.21@
  */
 
 int					/* O - Job ID */

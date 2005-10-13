@@ -60,6 +60,8 @@ static int	cups_local_auth(http_t *http);
 
 /*
  * 'cupsDoAuthentication()' - Authenticate a request...
+ *
+ * @since CUPS 1.1.20@
  */
 
 int					/* O - 0 on success, -1 on error */

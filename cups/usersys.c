@@ -53,7 +53,7 @@
  * 'cupsEncryption()' - Get the default encryption settings...
  */
 
-http_encryption_t
+http_encryption_t			/* O - Encryption settings */
 cupsEncryption(void)
 {
   cups_file_t	*fp;			/* client.conf file */

@@ -54,6 +54,8 @@
 
 /*
  * 'cupsGetFd()' - Get a file from the server.
+ *
+ * @since CUPS 1.1.20@
  */
 
 http_status_t				/* O - Status */
@@ -170,6 +172,8 @@ cupsGetFd(http_t     *http,		/* I - HTTP connection to server */
 
 /*
  * 'cupsGetFile()' - Get a file from the server.
+ *
+ * @since CUPS 1.1.20@
  */
 
 http_status_t				/* O - Status */
@@ -233,6 +237,8 @@ cupsGetFile(http_t     *http,		/* I - HTTP connection to server */
 
 /*
  * 'cupsPutFd()' - Put a file on the server.
+ *
+ * @since CUPS 1.1.20@
  */
 
 http_status_t				/* O - Status */
@@ -364,6 +370,8 @@ cupsPutFd(http_t     *http,		/* I - HTTP connection to server */
 
 /*
  * 'cupsPutFile()' - Put a file on the server.
+ *
+ * @since CUPS 1.1.20@
  */
 
 http_status_t				/* O - Status */

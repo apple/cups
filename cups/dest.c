@@ -32,6 +32,7 @@
  *   cupsGetDests()    - Get the list of destinations.
  *   cupsGetDests2()   - Get the list of destinations using a HTTP connection.
  *   cupsSetDests()    - Set the list of destinations.
+ *   cupsSetDests2()   - Set the list of destinations.
  *   cups_get_dests()  - Get destinations from a file.
  *   cups_get_sdests() - Get destinations from a server.
  */
@@ -231,6 +232,8 @@ cupsGetDests(cups_dest_t **dests)	/* O - Destinations */
 
 /*
  * 'cupsGetDests2()' - Get the list of destinations.
+ *
+ * @since CUPS 1.1.21@
  */
 
 int					/* O - Number of destinations */
@@ -415,7 +418,9 @@ cupsSetDests(int         num_dests,	/* I - Number of destinations */
 
 
 /*
- * 'cupsSetDests()' - Set the list of destinations.
+ * 'cupsSetDests2()' - Set the list of destinations.
+ *
+ * @since CUPS 1.1.21@
  */
 
 int					/* O - 0 on success, -1 on error */
