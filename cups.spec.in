@@ -1,5 +1,5 @@
 #
-# "$Id: cups.spec 4604 2005-08-26 23:40:29Z mike $"
+# "$Id: cups.spec 4787 2005-10-13 20:13:21Z mike $"
 #
 #   RPM "spec" file for the Common UNIX Printing System (CUPS).
 #
@@ -184,7 +184,11 @@ rm -rf $RPM_BUILD_ROOT
 %dir /usr/share/cups
 /usr/share/cups/*
 %dir /usr/share/doc/cups
-/usr/share/doc/cups/*
+/usr/share/doc/cups/*.*
+%dir /usr/share/doc/cups/help
+/usr/share/doc/cups/help/*-reference.html
+%dir /usr/share/doc/cups/images
+/usr/share/doc/cups/images/*
 %dir /usr/share/locale
 /usr/share/locale/*
 
@@ -242,6 +246,9 @@ rm -rf $RPM_BUILD_ROOT
 /usr/lib/*.a
 /usr/lib/*.so
 
+%dir /usr/share/doc/cups/help
+/usr/share/doc/cups/help/api*.html
+
 %files libs
 %defattr(-,root,root)
 /usr/lib/*.so.*
@@ -254,5 +261,5 @@ rm -rf $RPM_BUILD_ROOT
 #/etc/xinetd.d/cups-lpd
 
 #
-# End of "$Id: cups.spec 4604 2005-08-26 23:40:29Z mike $".
+# End of "$Id: cups.spec 4787 2005-10-13 20:13:21Z mike $".
 #
