@@ -2054,8 +2054,6 @@ do_config_server(http_t      *http,	/* I - HTTP connection */
         cupsFilePuts(temp, "# Restrict access to the admin pages...\n");
 
       cupsFilePuts(temp, "<Location /admin>\n"
-                         "  AuthType Basic\n"
-                         "  Require user @SYSTEM\n"
                          "  Order allow,deny\n");
 
       if (remote_admin)
@@ -2560,6 +2558,7 @@ do_menu(http_t      *http,		/* I - HTTP connection */
     int		remote_access = 0,	/* Remote access allowed? */
 		remote_admin = 0,	/* Remote administration allowed? */
 		browsing = 1,		/* Browsing enabled? */
+		browse_allow = 1,	/* Browse address set? */
 		browse_address = 0,	/* Browse address set? */
 		cancel_policy = 1,	/* Cancel-job policy set? */
 		debug_logging = 0;	/* LogLevel debug set? */
@@ -2594,6 +2593,14 @@ do_menu(http_t      *http,		/* I - HTTP connection */
       else if (!strcasecmp(line, "BrowseAddress"))
       {
         browse_address = 1;
+      }
+      else if (!strcasecmp(line, "BrowseAllow"))
+      {
+        browse_allow = 1;
+      }
+      else if (!strcasecmp(line, "BrowseOrder"))
+      {
+        browse_allow = !strncasecmp(value, "deny,", 5);
       }
       else if (!strcasecmp(line, "LogLevel"))
       {
@@ -2657,7 +2664,7 @@ do_menu(http_t      *http,		/* I - HTTP connection */
 
     cupsFileClose(cupsd);
 
-    if (browsing)
+    if (browsing && browse_allow)
       cgiSetVariable("REMOTE_PRINTERS", "CHECKED");
 
     if (remote_access && browsing && browse_address)
@@ -2671,9 +2678,6 @@ do_menu(http_t      *http,		/* I - HTTP connection */
 
     if (debug_logging)
       cgiSetVariable("DEBUG_LOGGING", "CHECKED");
-
-    printf("<!-- browsing=%d, browse_address=%d, cancel_policy=%d, debug_logging=%d, remote_access=%d, remote_admin=%d -->\n",
-           browsing, browse_address, cancel_policy, debug_logging, remote_access, remote_admin);
   }
 
  /*
