@@ -1237,7 +1237,7 @@ do_config_printer(http_t      *http,	/* I - HTTP connection */
 	 i > 0;
 	 i --, group ++)
     {
-      if (strcmp(group->text, "InstallableOptions") == 0)
+      if (!strcmp(group->name, "InstallableOptions"))
 	cgiSetVariable("GROUP",
 	               cupsLangString(language, CUPS_MSG_OPTIONS_INSTALLED));
       else
@@ -1367,6 +1367,80 @@ do_config_printer(http_t      *http,	/* I - HTTP connection */
 
 	cgiCopyTemplateLang(stdout, TEMPLATES, "option-pickone.tmpl",
 	                    getenv("LANG"));
+
+	cgiCopyTemplateLang(stdout, TEMPLATES, "option-trailer.tmpl",
+                            getenv("LANG"));
+      }
+
+      if (ippFindAttribute(response, "printer-error-policy-supported",
+                           IPP_TAG_ZERO) ||
+          ippFindAttribute(response, "printer-op-policy-supported",
+	                   IPP_TAG_ZERO))
+      {
+       /*
+	* Add the error and operation policy options...
+	*/
+
+	cgiSetVariable("GROUP", "Policies");
+	cgiCopyTemplateLang(stdout, TEMPLATES, "option-header.tmpl",
+                            getenv("LANG"));
+
+       /*
+        * Error policy...
+	*/
+
+        attr = ippFindAttribute(response, "printer-error-policy-supported",
+	                        IPP_TAG_ZERO);
+
+        if (attr)
+	{
+	  cgiSetSize("CHOICES", attr->num_values);
+	  cgiSetSize("TEXT", attr->num_values);
+	  for (k = 0; k < attr->num_values; k ++)
+	  {
+	    cgiSetArray("CHOICES", k, attr->values[k].string.text);
+	    cgiSetArray("TEXT", k, attr->values[k].string.text);
+	  }
+
+          attr = ippFindAttribute(response, "printer-error-policy",
+	                          IPP_TAG_ZERO);
+
+          cgiSetVariable("KEYWORD", "printer_error_policy");
+          cgiSetVariable("KEYTEXT", "Error Policy");
+          cgiSetVariable("DEFCHOICE", attr == NULL ?
+	                              "" : attr->values[0].string.text);
+        }
+
+	cgiCopyTemplateLang(stdout, TEMPLATES, "option-pickone.tmpl",
+	                    getenv("LANG"));
+
+       /*
+        * Operation policy...
+	*/
+
+        attr = ippFindAttribute(response, "printer-op-policy-supported",
+	                        IPP_TAG_ZERO);
+
+        if (attr)
+	{
+	  cgiSetSize("CHOICES", attr->num_values);
+	  cgiSetSize("TEXT", attr->num_values);
+	  for (k = 0; k < attr->num_values; k ++)
+	  {
+	    cgiSetArray("CHOICES", k, attr->values[k].string.text);
+	    cgiSetArray("TEXT", k, attr->values[k].string.text);
+	  }
+
+          attr = ippFindAttribute(response, "printer-op-policy", IPP_TAG_ZERO);
+
+          cgiSetVariable("KEYWORD", "printer_op_policy");
+          cgiSetVariable("KEYTEXT", "Operation Policy");
+          cgiSetVariable("DEFCHOICE", attr == NULL ?
+	                              "" : attr->values[0].string.text);
+
+	  cgiCopyTemplateLang(stdout, TEMPLATES, "option-pickone.tmpl",
+	                      getenv("LANG"));
+        }
 
 	cgiCopyTemplateLang(stdout, TEMPLATES, "option-trailer.tmpl",
                             getenv("LANG"));
@@ -1516,6 +1590,14 @@ do_config_printer(http_t      *http,	/* I - HTTP connection */
                          "job-sheets-default", 2, NULL, NULL);
     attr->values[0].string.text = strdup(cgiGetVariable("job_sheets_start"));
     attr->values[1].string.text = strdup(cgiGetVariable("job_sheets_end"));
+
+    if ((var = cgiGetVariable("printer_error_policy")) != NULL)
+      attr = ippAddString(request, IPP_TAG_PRINTER, IPP_TAG_NAME,
+                          "printer-error-policy", NULL, var);
+
+    if ((var = cgiGetVariable("printer_op_policy")) != NULL)
+      attr = ippAddString(request, IPP_TAG_PRINTER, IPP_TAG_NAME,
+                          "printer-op-policy", NULL, var);
 
    /*
     * Do the request and get back a response...

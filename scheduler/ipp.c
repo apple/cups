@@ -989,7 +989,8 @@ add_class(cupsd_client_t  *con,		/* I - Client connection */
     cupsdFreeQuotas(pclass);
     pclass->page_limit = attr->values[0].integer;
   }
-  if ((attr = ippFindAttribute(con->request, "printer-op-policy", IPP_TAG_TEXT)) != NULL)
+  if ((attr = ippFindAttribute(con->request, "printer-op-policy",
+                               IPP_TAG_NAME)) != NULL)
   {
     cupsd_policy_t *p;			/* Policy */
 
@@ -1011,7 +1012,8 @@ add_class(cupsd_client_t  *con,		/* I - Client connection */
       return;
     }
   }
-  if ((attr = ippFindAttribute(con->request, "printer-error-policy", IPP_TAG_TEXT)) != NULL)
+  if ((attr = ippFindAttribute(con->request, "printer-error-policy",
+                               IPP_TAG_NAME)) != NULL)
   {
     if (strcmp(attr->values[0].string.text, "abort-job") &&
         strcmp(attr->values[0].string.text, "retry-job") &&
@@ -1749,7 +1751,8 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
     cupsdFreeQuotas(printer);
     printer->page_limit = attr->values[0].integer;
   }
-  if ((attr = ippFindAttribute(con->request, "printer-op-policy", IPP_TAG_TEXT)) != NULL)
+  if ((attr = ippFindAttribute(con->request, "printer-op-policy",
+                               IPP_TAG_NAME)) != NULL)
   {
     cupsd_policy_t *p;			/* Policy */
 
@@ -1771,7 +1774,8 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
       return;
     }
   }
-  if ((attr = ippFindAttribute(con->request, "printer-error-policy", IPP_TAG_TEXT)) != NULL)
+  if ((attr = ippFindAttribute(con->request, "printer-error-policy",
+                               IPP_TAG_NAME)) != NULL)
   {
     if (strcmp(attr->values[0].string.text, "abort-job") &&
         strcmp(attr->values[0].string.text, "retry-job") &&
@@ -4326,7 +4330,7 @@ get_default(cupsd_client_t *con)	/* I - Client connection */
                ippTimeToDate(curtime));
 
     ippAddString(con->response, IPP_TAG_PRINTER, IPP_TAG_NAME,
-        	 "printer-error-policy", NULL, DefaultPrinter->op_policy);
+        	 "printer-error-policy", NULL, DefaultPrinter->error_policy);
     ippAddString(con->response, IPP_TAG_PRINTER, IPP_TAG_NAME,
         	 "printer-op-policy", NULL, DefaultPrinter->op_policy);
 
@@ -5043,7 +5047,7 @@ get_printer_attrs(cupsd_client_t  *con,	/* I - Client connection */
              ippTimeToDate(curtime));
 
   ippAddString(con->response, IPP_TAG_PRINTER, IPP_TAG_NAME,
-               "printer-error-policy", NULL, printer->op_policy);
+               "printer-error-policy", NULL, printer->error_policy);
   ippAddString(con->response, IPP_TAG_PRINTER, IPP_TAG_NAME,
                "printer-op-policy", NULL, printer->op_policy);
 
@@ -5281,7 +5285,7 @@ get_printers(cupsd_client_t *con,	/* I - Client connection */
         	 ippTimeToDate(curtime));
 
       ippAddString(con->response, IPP_TAG_PRINTER, IPP_TAG_NAME,
-                   "printer-error-policy", NULL, printer->op_policy);
+                   "printer-error-policy", NULL, printer->error_policy);
       ippAddString(con->response, IPP_TAG_PRINTER, IPP_TAG_NAME,
                    "printer-op-policy", NULL, printer->op_policy);
 

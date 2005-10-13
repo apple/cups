@@ -438,6 +438,7 @@ cupsdReadConfiguration(void)
   MaxJobsPerPrinter   = 0;
   MaxCopies           = 100;
 
+  cupsdDeleteAllPolicies();
   cupsdClearString(&DefaultPolicy);
 
  /*
@@ -889,6 +890,11 @@ cupsdReadConfiguration(void)
       cupsdLogMessage(CUPSD_LOG_INFO, "</Policy>");
     }
   }
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG,"NumPolicies=%d", NumPolicies);
+  for (i = 0; i < NumPolicies; i ++)
+    cupsdLogMessage(CUPSD_LOG_DEBUG, "Policies[%d]=\"%s\"", i,
+                    Policies[i]->name);
 
  /*
   * If we are doing a full reload or the server root has changed, flush
