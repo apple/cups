@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IFPkgDescriptionDeleteWarning</key>
+	<string></string>
+	<key>IFPkgDescriptionDescription</key>
+	<string>The Common UNIX Printing System provides a portable printing layer for UNIX(r) operating systems.  It has been developed by Easy Software Products to promote a standard printing solution for all UNIX vendors and users.  CUPS provides the System V and Berkeley command-line interfaces.</string>
+	<key>IFPkgDescriptionTitle</key>
+	<string>Common UNIX Printing System</string>
+	<key>IFPkgDescriptionVersion</key>
+	<string>@CUPS_VERSION@</string>
+</dict>
+</plist>

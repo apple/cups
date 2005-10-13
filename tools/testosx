@@ -1,0 +1,61 @@
+#!/bin/sh
+# Make sure we are running in the right directory...
+if test ! -d tools/testosx; then
+	echo "Run this script from the top-level CUPS source directory, e.g.:"
+	echo ""
+	echo "    tools/testosx"
+	echo ""
+	exit 1
+fi
+
+# Update the current working copy...
+svn up
+rev=`svnversion .`
+
+# Make everything...
+make all
+
+# Setup an install directory...
+user=`whoami`
+topdir=`pwd`
+pkgdir="/tmp/cups-$user"
+
+echo Building package using temp directory $pkgdir...
+rm -rf $pkgdir
+mkdir -p $pkgdir/Package
+mkdir -p $pkgdir/Resources
+
+# Install CUPS into the Package directory...
+make BUILDROOT=$pkgdir/Package install
+
+# Install resource files into the Resources directory...
+echo Installing resource files...
+cp *.rtf $pkgdir/Resoources
+
+# Tag the current revision in the plist and web interface files...
+sed -e '1,$s/@CUPS_VERSION@/1.2svn-r'$rev'/g' <cups-desc.plist.in >cups-desc.plist
+sed -e '1,$s/@CUPS_VERSION@/1.2svn-r'$rev'/g' <cups-info.plist.in >cups-info.plist
+sed -e '1,$s/@CUPS_VERSION@/1.2svn-r'$rev'/g' <doc/index.html.in >doc/index.html
+
+# Figure out where PackageMaker is installled...
+if test -d /Developer/Applications/Utilities/PackageMaker.app; then
+	PackageMaker=/Developer/Applications/Utilities/PackageMaker.app/Contents/MacOS/PackageMaker
+else
+	PackageMaker=/Developer/Applications/PackageMaker.app/Contents/MacOS/PackageMaker
+fi
+
+# Create the package...
+echo Creating MacOS X package...
+rm -rf cups-1.2svn-$rev-macosx.pkg
+$PackageMaker -build -p $topdir/cups-1.2svn-$rev-macosx.pkg \
+	-f $pkgdir/Package \
+	-r $pkgdir/Resources \
+	-d $topdir/cups-desc.plist \
+	-i $topdir/cups-info.plist
+
+# Create a disk image...
+echo Creating MacOS X disk image...
+
+# Cleanup temp files...
+echo Removing temporary files...
+#rm -rf $pkgdir
