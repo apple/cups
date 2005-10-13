@@ -1538,8 +1538,7 @@ cupsPrintFiles2(http_t        *http,	/* I - HTTP connection */
                                                       IPP_CREATE_JOB;
   request->request.op.request_id   = 1;
 
-  snprintf(uri, sizeof(uri), "ipp://%s:%d/printers/%s", http->hostname,
-           ippPort(), name);
+  snprintf(uri, sizeof(uri), "ipp://localhost/printers/%s", name);
 
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
                "attributes-charset", NULL, cupsLangEncoding(language));
@@ -1615,8 +1614,7 @@ cupsPrintFiles2(http_t        *http,	/* I - HTTP connection */
       request->request.op.operation_id = IPP_SEND_DOCUMENT;
       request->request.op.request_id   = 1;
 
-      snprintf(uri, sizeof(uri), "ipp://%s:%d/jobs/%d", http->hostname,
-               ippPort(), jobid);
+      snprintf(uri, sizeof(uri), "ipp://localhost/jobs/%d", jobid);
 
       ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
         	   "attributes-charset", NULL, cupsLangEncoding(language));
@@ -1710,7 +1708,7 @@ cups_connect(const char *name,		/* I - Destination (printer[@host]) */
 
   if (cg->http != NULL)
   {
-    if (strcasecmp(cg->http->hostname, hostname) == 0)
+    if (!strcasecmp(cg->http->hostname, hostname))
       return (printer);
 
     httpClose(cg->http);
