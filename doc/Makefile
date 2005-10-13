@@ -29,7 +29,8 @@ include ../Makedefs
 #
 
 WEBPAGES	=	cups.css cupsdoc.css index.html robots.txt
-WEBIMAGES	=	images/accept-jobs.gif \
+WEBIMAGES	=	\
+			images/accept-jobs.gif \
 			images/add-class.gif \
 			images/add-printer.gif \
 			images/add-this-printer.gif \
@@ -88,7 +89,13 @@ WEBIMAGES	=	images/accept-jobs.gif \
 			images/view-access-log.gif \
 			images/view-error-log.gif \
 			images/view-page-log.gif
-HELPFILES	=	help/access_log-reference.html \
+HELPFILES	=	\
+			help/access_log-reference.html \
+			help/api-array.html \
+			help/api-filedir.html \
+			help/api-filter.html \
+			help/api-httpipp.html \
+			help/api-ppd.html \
 			help/classes-conf-reference.html \
 			help/client-conf-reference.html \
 			help/cupsd-conf-reference.html \
