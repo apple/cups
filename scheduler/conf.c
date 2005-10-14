@@ -245,17 +245,7 @@ cupsdReadConfiguration(void)
 
   if (NumListeners > 0)
   {
-#ifdef HAVE_DOMAINSOCKETS
-    int			i;		/* Looping var */
-    cupsd_listener_t	*lis;		/* Current listening socket */
-
-    for (i = NumListeners, lis = Listeners; i > 0; i --, lis ++)
-      if (lis->address.sin_family == AF_LOCAL)
-	cupsdClearString((char **)&lis->address.sin_addr);
-#endif /* HAVE_DOMAINSOCKETS */
-
     free(Listeners);
-
     NumListeners = 0;
   }
 
@@ -1091,7 +1081,7 @@ get_address(const char  *value,		/* I - Value string */
     }
   }
 
-  if (!strcmp(hostname, "*"))
+  if (hostname && !strcmp(hostname, "*"))
     hostname = NULL;
 
  /*
@@ -1910,22 +1900,30 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
       }
       else if ((addrlist = get_address(value, BrowsePort)) != NULL)
       {
-        memcpy(&(dira->to), &(addrlist->addr), sizeof(dira->to));
-	httpAddrFreeList(addrlist);
+       /*
+        * Only IPv4 addresses are supported...
+        */
 
-        httpAddrString(&(dira->to), temp, sizeof(temp));
+	for (addr = addrlist; addr; addr = addr->next)
+	  if (addr->addr.addr.sa_family == AF_INET)
+	    break;	    
 
-#ifdef AF_INET6
-        if (dira->to.addr.sa_family == AF_INET6)
-          cupsdLogMessage(CUPSD_LOG_INFO,
-	                  "Sending browsing info to %s:%d (IPv6)", temp,
-                          ntohs(dira->to.ipv6.sin6_port));
+	if (addr)
+	{
+	  memcpy(&(dira->to), &(addrlist->addr), sizeof(dira->to));
+	  httpAddrString(&(dira->to), temp, sizeof(temp));
+
+	  cupsdLogMessage(CUPSD_LOG_INFO,
+	                  "Sending browsing info to %s:%d (IPv4)",
+			  temp, ntohs(dira->to.ipv4.sin_port));
+  
+	  NumBrowsers ++;
+	}
 	else
-#endif /* AF_INET6 */
-        cupsdLogMessage(CUPSD_LOG_INFO, "Sending browsing info to %s:%d (IPv4)",
-	                temp, ntohs(dira->to.ipv4.sin_port));
+	  cupsdLogMessage(CUPSD_LOG_ERROR, "Bad BrowseAddress %s at line %d.",
+			  value, linenum);
 
-	NumBrowsers ++;
+	httpAddrFreeList(addrlist);
       }
       else
         cupsdLogMessage(CUPSD_LOG_ERROR, "Bad BrowseAddress %s at line %d.",
@@ -2234,34 +2232,43 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 
       if ((addrlist = get_address(value, BrowsePort)) != NULL)
       {
-        memcpy(&(relay->to), &(addrlist->addr), sizeof(relay->to));
+       /*
+        * Only IPv4 addresses are supported...
+        */
+
+	for (addr = addrlist; addr; addr = addr->next)
+	  if (addr->addr.addr.sa_family == AF_INET)
+	    break;	    
+
+	if (addr)
+	{
+	  memcpy(&(relay->to), &(addrlist->addr), sizeof(relay->to));
+  
+	  httpAddrString(&(relay->to), temp, sizeof(temp));
+  
+	  if (relay->from.type == AUTH_IP)
+	    snprintf(temp2, sizeof(temp2), "%u.%u.%u.%u/%u.%u.%u.%u",
+		     relay->from.mask.ip.address[0],
+		     relay->from.mask.ip.address[1],
+		     relay->from.mask.ip.address[2],
+		     relay->from.mask.ip.address[3],
+		     relay->from.mask.ip.netmask[0],
+		     relay->from.mask.ip.netmask[1],
+		     relay->from.mask.ip.netmask[2],
+		     relay->from.mask.ip.netmask[3]);
+	  else
+	    strlcpy(temp2, relay->from.mask.name.name, sizeof(temp2));
+  
+	  cupsdLogMessage(CUPSD_LOG_INFO, "Relaying from %s to %s:%d (IPv4)",
+			  temp, temp2, ntohs(relay->to.ipv4.sin_port));
+  
+	  NumRelays ++;
+	}
+	else
+	  cupsdLogMessage(CUPSD_LOG_ERROR, "Bad relay address %s at line %d.",
+	                  value, linenum);
+
 	httpAddrFreeList(addrlist);
-
-        httpAddrString(&(relay->to), temp, sizeof(temp));
-
-        if (relay->from.type == AUTH_IP)
-	  snprintf(temp2, sizeof(temp2), "%u.%u.%u.%u/%u.%u.%u.%u",
-		   relay->from.mask.ip.address[0],
-		   relay->from.mask.ip.address[1],
-		   relay->from.mask.ip.address[2],
-		   relay->from.mask.ip.address[3],
-		   relay->from.mask.ip.netmask[0],
-		   relay->from.mask.ip.netmask[1],
-		   relay->from.mask.ip.netmask[2],
-		   relay->from.mask.ip.netmask[3]);
-	else
-	  strlcpy(temp2, relay->from.mask.name.name, sizeof(temp2));
-
-#ifdef AF_INET6
-        if (relay->to.addr.sa_family == AF_INET6)
-          cupsdLogMessage(CUPSD_LOG_INFO, "Relaying from %s to %s:%d (IPv6)",
-	                  temp, temp2, ntohs(relay->to.ipv6.sin6_port));
-	else
-#endif /* AF_INET6 */
-        cupsdLogMessage(CUPSD_LOG_INFO, "Relaying from %s to %s:%d (IPv4)",
-	                temp, temp2, ntohs(relay->to.ipv4.sin_port));
-
-	NumRelays ++;
       }
       else
       {

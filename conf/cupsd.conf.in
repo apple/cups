@@ -14,7 +14,7 @@ LogLevel info
 SystemGroup @CUPS_GROUP@
 
 # Only listen for connections from the local machine.
-Listen 127.0.0.1:@DEFAULT_IPP_PORT@
+Listen localhost:@DEFAULT_IPP_PORT@
 @CUPS_LISTEN_DOMAINSOCKET@
 
 # Show shared printers on the local network.

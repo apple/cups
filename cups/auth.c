@@ -185,8 +185,8 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
   const char	*state;			/* Server state directory */
 
 
-  DEBUG_printf(("cups_local_auth(http=%p) hostaddr=%08x, hostname=\"%s\"\n",
-                http, ntohl(http->hostaddr.sin_addr.s_addr), http->hostname));
+  DEBUG_printf(("cups_local_auth(http=%p) hostaddr=%s, hostname=\"%s\"\n",
+                http, httpAddrString(http->hostaddr, filename, sizeof(filename)), http->hostname));
 
  /*
   * See if we are accessing localhost...
