@@ -2,15 +2,21 @@
 <!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>IFPkgFormatVersion</key>
-	<real>0.1</real>
-	<key>IFPkgFlagAuthorizationAction</key>
-	<string>RootAuthorization</string>
-	<key>CFBundleName</key>
-	<string>Common UNIX Printing System</string>
-	<key>CFBundleGetInfoString</key>
-	<string>Common UNIX Printing System, @CUPS_VERSION@</string>
-	<key>CFBundleShortVersionString</key>
-	<string>@CUPS_VERSION@</string>
+        <key>IFPkgFlagAuthorizationAction</key>
+        <string>RootAuthorization</string>
+	<key>IFPkgFlagBackgroundAlignment</key>
+	<string>bottomleft</string>
+        <key>IFPkgFormatVersion</key>
+        <real>0.1</real>
+	<key>CFBundleIdentifier</key>
+	<string>org.cups.cups</string>
+        <key>CFBundleName</key>
+        <string>Common UNIX Printing System</string>
+        <key>CFBundleGetInfoString</key>
+        <string>Common UNIX Printing System, @CUPS_VERSION@</string>
+        <key>CFBundleShortVersionString</key>
+        <string>@CUPS_VERSION@</string>
+	<key>IFPkgFlagAllowBackRev</key>
+	<true/>
 </dict>
 </plist>

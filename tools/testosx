@@ -10,7 +10,7 @@ fi
 
 # Update the current working copy...
 svn up
-rev=`svnversion .`
+rev=`svnversion . | sed -e '1,$s/[a-zA-Z]//g'`
 
 # Make everything...
 make all
@@ -26,6 +26,7 @@ mkdir -p $pkgdir/Package
 mkdir -p $pkgdir/Resources
 
 # Install CUPS into the Package directory...
+#make INSTALL=$topdir/install-sh BUILDROOT=$pkgdir/Package install
 make BUILDROOT=$pkgdir/Package install
 
 # Install resource files into the Resources directory...
@@ -33,6 +34,19 @@ echo Installing resource files...
 cp LICENSE.rtf $pkgdir/Resources/License.rtf
 cp README.rtf $pkgdir/Resources/ReadMe.rtf
 cp WELCOME.rtf $pkgdir/Resources/Welcome.rtf
+cp doc/images/cups-medium.gif $pkgdir/Resources/background.gif
+
+cat >$pkgdir/Resources/preflight <<EOF
+#!/bin/sh
+killall cupsd
+EOF
+chmod 755 $pkgdir/Resources/preflight
+
+cat >$pkgdir/Resources/postflight <<EOF
+#!/bin/sh
+/usr/sbin/cupsd
+EOF
+chmod 755 $pkgdir/Resources/postflight
 
 # Tag the current revision in the plist and web interface files...
 sed -e '1,$s/@CUPS_VERSION@/1.2svn-r'$rev'/g' <cups-desc.plist.in >cups-desc.plist
@@ -49,20 +63,20 @@ fi
 # Create the package...
 echo Creating MacOS X package...
 rm -rf cups-1.2svn-$rev-macosx.pkg
-echo $PackageMaker -build -v -p $topdir/cups-1.2svn-$rev-macosx.pkg \
+echo $PackageMaker -build -v -p cups-1.2svn-$rev-macosx.pkg \
 	-f $pkgdir/Package \
 	-r $pkgdir/Resources \
-	-d $topdir/cups-desc.plist \
-	-i $topdir/cups-info.plist
-sh -c $PackageMaker -build -v -p $topdir/cups-1.2svn-$rev-macosx.pkg \
+	-d cups-desc.plist \
+	-i cups-info.plist
+$PackageMaker -build -v -p cups-1.2svn-$rev-macosx.pkg \
 	-f $pkgdir/Package \
 	-r $pkgdir/Resources \
-	-d $topdir/cups-desc.plist \
-	-i $topdir/cups-info.plist
+	-d cups-desc.plist \
+	-i cups-info.plist
 
 # Create a disk image...
 echo Creating MacOS X disk image...
 
 # Cleanup temp files...
 echo Removing temporary files...
-#rm -rf $pkgdir
+rm -rf $pkgdir
