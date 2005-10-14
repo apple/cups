@@ -6,6 +6,8 @@
         <string>RootAuthorization</string>
 	<key>IFPkgFlagBackgroundAlignment</key>
 	<string>bottomleft</string>
+	<key>IFPkgFlagBackgroundScaling</key>
+	<string>none</string>
         <key>IFPkgFormatVersion</key>
         <real>0.1</real>
 	<key>CFBundleIdentifier</key>
@@ -15,7 +17,7 @@
         <key>CFBundleGetInfoString</key>
         <string>Common UNIX Printing System, @CUPS_VERSION@</string>
         <key>CFBundleShortVersionString</key>
-        <string>@CUPS_VERSION@</string>
+        <string>@CUPS_RELEASE@</string>
 	<key>IFPkgFlagAllowBackRev</key>
 	<true/>
 </dict>

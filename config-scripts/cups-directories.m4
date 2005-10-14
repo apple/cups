@@ -60,7 +60,11 @@ fi
 dnl Fix "localstatedir" variable if it hasn't been specified...
 if test "$localstatedir" = "\${prefix}/var"; then
 	if test "$prefix" = "/"; then
-		localstatedir="/var"
+		if test "$uname" = Darwin; then
+			localstatedir="/private/var"
+		else
+			localstatedir="/var"
+		fi
 	else
 		localstatedir="$prefix/var"
 	fi
@@ -69,7 +73,11 @@ fi
 dnl Fix "sysconfdir" variable if it hasn't been specified...
 if test "$sysconfdir" = "\${prefix}/etc"; then
 	if test "$prefix" = "/"; then
-		sysconfdir="/etc"
+		if test "$uname" = Darwin; then
+			sysconfdir="/private/etc"
+		else
+			sysconfdir="/etc"
+		fi
 	else
 		sysconfdir="$prefix/etc"
 	fi

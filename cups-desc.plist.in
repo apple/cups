@@ -10,6 +10,6 @@
         <key>IFPkgDescriptionTitle</key>
         <string>Common UNIX Printing System</string>
         <key>IFPkgDescriptionVersion</key>
-        <string>@CUPS_VERSION@</string>
+        <string>@CUPS_RELEASE@</string>
 </dict>
 </plist>

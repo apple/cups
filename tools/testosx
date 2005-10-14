@@ -31,10 +31,9 @@ make BUILDROOT=$pkgdir/Package install
 
 # Install resource files into the Resources directory...
 echo Installing resource files...
-cp LICENSE.rtf $pkgdir/Resources/License.rtf
-cp README.rtf $pkgdir/Resources/ReadMe.rtf
+cp LICENSE.rtf $pkgdir/Resources/ReadMe.rtf
 cp WELCOME.rtf $pkgdir/Resources/Welcome.rtf
-cp doc/images/cups-medium.gif $pkgdir/Resources/background.gif
+cp doc/images/cups-installer.tif $pkgdir/Resources/background.tif
 
 cat >$pkgdir/Resources/preflight <<EOF
 #!/bin/sh
@@ -49,8 +48,12 @@ EOF
 chmod 755 $pkgdir/Resources/postflight
 
 # Tag the current revision in the plist and web interface files...
-sed -e '1,$s/@CUPS_VERSION@/1.2svn-r'$rev'/g' <cups-desc.plist.in >cups-desc.plist
-sed -e '1,$s/@CUPS_VERSION@/1.2svn-r'$rev'/g' <cups-info.plist.in >cups-info.plist
+sed -e '1,$s/@CUPS_VERSION@/1.2svn-r'$rev'/g' \
+	-e '1,$s/@CUPS_RELEASE@/1.2.'$rev'/g' \
+	<cups-desc.plist.in >cups-desc.plist
+sed -e '1,$s/@CUPS_VERSION@/1.2svn-r'$rev'/g' \
+	-e '1,$s/@CUPS_RELEASE@/1.2.'$rev'/g' \
+	<cups-info.plist.in >cups-info.plist
 sed -e '1,$s/@CUPS_VERSION@/1.2svn-r'$rev'/g' <doc/index.html.in >doc/index.html
 
 # Figure out where PackageMaker is installled...
@@ -62,13 +65,13 @@ fi
 
 # Create the package...
 echo Creating MacOS X package...
-rm -rf cups-1.2svn-$rev-macosx.pkg
-echo $PackageMaker -build -v -p cups-1.2svn-$rev-macosx.pkg \
+rm -rf cups.pkg
+echo $PackageMaker -build -v -p cups.pkg \
 	-f $pkgdir/Package \
 	-r $pkgdir/Resources \
 	-d cups-desc.plist \
 	-i cups-info.plist
-$PackageMaker -build -v -p cups-1.2svn-$rev-macosx.pkg \
+$PackageMaker -build -v -p cups.pkg \
 	-f $pkgdir/Package \
 	-r $pkgdir/Resources \
 	-d cups-desc.plist \
@@ -76,6 +79,7 @@ $PackageMaker -build -v -p cups-1.2svn-$rev-macosx.pkg \
 
 # Create a disk image...
 echo Creating MacOS X disk image...
+hdiutil create -ov -srcfolder cups.pkg cups-1.2svn-r$rev.dmg
 
 # Cleanup temp files...
 echo Removing temporary files...
