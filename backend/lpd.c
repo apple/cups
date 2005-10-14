@@ -99,7 +99,7 @@ static int	lpd_queue(const char *hostname, int port, const char *printer,
 static void	lpd_timeout(int sig);
 static int	lpd_write(int lpd_fd, char *buffer, int length);
 #ifndef HAVE_RRESVPORT_AF
-extern int	rresvport_af(int *port, int family);
+static int	rresvport_af(int *port, int family);
 #endif /* !HAVE_RRESVPORT_AF */
 static void	sigterm_handler(int sig);
 
@@ -1040,7 +1040,7 @@ lpd_write(int  lpd_fd,			/* I - LPD socket */
  * 'rresvport_af()' - A simple implementation of rresvport_af().
  */
 
-int					/* O  - Socket or -1 on error */
+static int				/* O  - Socket or -1 on error */
 rresvport_af(int *port,			/* IO - Port number to bind to */
              int family)		/* I  - Address family */
 {

@@ -32,7 +32,7 @@
  */
 
 #  include "config.h"
-
+#  include <limits.h>
 #  ifdef WIN32
 #    include <io.h>
 #    include <winsock2.h>
