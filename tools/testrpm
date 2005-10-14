@@ -3,9 +3,18 @@
 # Test script for making RPMs...
 #
 
+# Make sure we are running in the right directory...
+if test ! -f tools/testrpm; then
+        echo "Run this script from the top-level CUPS source directory, e.g.:"
+        echo ""
+        echo "    tools/testrpm"
+        echo ""
+        exit 1
+fi
+
 echo Updating...
 svn up
-rev=`svnversion .`
+rev=`svnversion . | sed -e '1,$s/[a-zA-Z]//g'`
 version="1.2svn"
 
 echo Exporting $version...
