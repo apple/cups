@@ -32,10 +32,10 @@
  * Include necessary headers...
  */
 
+#include "http-private.h"
 #include "globals.h"
 #include "debug.h"
 #include <stdlib.h>
-#include "http-private.h"
 
 
 /*
@@ -185,6 +185,7 @@ httpAddrGetList(const char *hostname,	/* I - Hostname, IP address, or NULL for p
 
   first = addr = NULL;
 
+#ifdef AF_LOCAL
   if (hostname && hostname[0] == '/')
   {
    /*
@@ -196,6 +197,7 @@ httpAddrGetList(const char *hostname,	/* I - Hostname, IP address, or NULL for p
     strlcpy(first->addr.un.sun_path, hostname, sizeof(first->addr.un.sun_path));
   }
   else
+#endif /* AF_LOCAL */
   {
 #ifdef HAVE_GETADDRINFO
     struct addrinfo	hints,		/* Address lookup hints */
@@ -320,13 +322,13 @@ httpAddrGetList(const char *hostname,	/* I - Hostname, IP address, or NULL for p
 
       for (ptr = hostname; isdigit(*ptr & 255) || *ptr == '.'; ptr ++);
 
-      if (!*nameptr)
+      if (!*ptr)
       {
        /*
 	* We have an IPv4 address; break it up and create an IPv4 address...
 	*/
 
-	if (sscanf(name, "%u.%u.%u.%u", ip, ip + 1, ip + 2, ip + 3) == 4 &&
+	if (sscanf(hostname, "%u.%u.%u.%u", ip, ip + 1, ip + 2, ip + 3) == 4 &&
             ip[0] <= 255 && ip[1] <= 255 && ip[2] <= 255 && ip[3] <= 255)
 	{
 	  first = (http_addrlist_t *)calloc(1, sizeof(http_addrlist_t));
