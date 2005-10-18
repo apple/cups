@@ -1334,7 +1334,7 @@ void
 cupsdStartPolling(void)
 {
   int			i;		/* Looping var */
-  cupsd_dirsvc_poll_t	*poll;		/* Current polling server */
+  cupsd_dirsvc_poll_t	*pollp;		/* Current polling server */
   char			polld[1024];	/* Poll daemon path */
   char			sport[10];	/* Server port */
   char			bport[10];	/* Browser port */
@@ -1398,25 +1398,25 @@ cupsdStartPolling(void)
   * Run each polling daemon, redirecting stderr to the polling pipe...
   */
 
-  for (i = 0, poll = Polled; i < NumPolled; i ++, poll ++)
+  for (i = 0, pollp = Polled; i < NumPolled; i ++, pollp ++)
   {
-    sprintf(sport, "%d", poll->port);
+    sprintf(sport, "%d", pollp->port);
 
-    argv[1] = poll->hostname;
+    argv[1] = pollp->hostname;
 
     if (cupsdStartProcess(polld, argv, envp, -1, -1, statusfds[1], -1,
-                          0, &(poll->pid)) < 0)
+                          0, &(pollp->pid)) < 0)
     {
       cupsdLogMessage(CUPSD_LOG_ERROR,
                       "cupsdStartPolling: Unable to fork polling daemon - %s",
                       strerror(errno));
-      poll->pid = 0;
+      pollp->pid = 0;
       break;
     }
     else
       cupsdLogMessage(CUPSD_LOG_DEBUG,
                       "cupsdStartPolling: Started polling daemon for %s:%d, pid = %d",
-                      poll->hostname, poll->port, poll->pid);
+                      pollp->hostname, pollp->port, pollp->pid);
   }
 
   close(statusfds[1]);
@@ -1486,7 +1486,7 @@ void
 cupsdStopPolling(void)
 {
   int			i;		/* Looping var */
-  cupsd_dirsvc_poll_t	*poll;		/* Current polling server */
+  cupsd_dirsvc_poll_t	*pollp;		/* Current polling server */
 
 
   if (PollPipe >= 0)
@@ -1502,9 +1502,9 @@ cupsdStopPolling(void)
     PollStatusBuffer = NULL;
   }
 
-  for (i = 0, poll = Polled; i < NumPolled; i ++, poll ++)
-    if (poll->pid)
-      cupsdEndProcess(poll->pid, 0);
+  for (i = 0, pollp = Polled; i < NumPolled; i ++, pollp ++)
+    if (pollp->pid)
+      cupsdEndProcess(pollp->pid, 0);
 }
 
 

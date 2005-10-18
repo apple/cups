@@ -1684,7 +1684,7 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
   unsigned		ip[4],		/* Address value */
 			mask[4];	/* Netmask value */
   cupsd_dirsvc_relay_t	*relay;		/* Relay data */
-  cupsd_dirsvc_poll_t	*poll;		/* Polling data */
+  cupsd_dirsvc_poll_t	*pollp;		/* Polling data */
   cupsd_location_t	*location;	/* Browse location */
   cups_file_t		*incfile;	/* Include file */
   char			incname[1024];	/* Include filename */
@@ -2317,11 +2317,11 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
       */
 
       if (NumPolled == 0)
-        poll = malloc(sizeof(cupsd_dirsvc_poll_t));
+        pollp = malloc(sizeof(cupsd_dirsvc_poll_t));
       else
-        poll = realloc(Polled, (NumPolled + 1) * sizeof(cupsd_dirsvc_poll_t));
+        pollp = realloc(Polled, (NumPolled + 1) * sizeof(cupsd_dirsvc_poll_t));
 
-      if (!poll)
+      if (!pollp)
       {
         cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Unable to allocate BrowsePoll at line %d - %s.",
@@ -2329,17 +2329,17 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
         continue;
       }
 
-      Polled = poll;
-      poll   += NumPolled;
+      Polled = pollp;
+      pollp   += NumPolled;
 
       NumPolled ++;
-      memset(poll, 0, sizeof(cupsd_dirsvc_poll_t));
+      memset(pollp, 0, sizeof(cupsd_dirsvc_poll_t));
 
-      strlcpy(poll->hostname, value, sizeof(poll->hostname));
-      poll->port = portnum;
+      strlcpy(pollp->hostname, value, sizeof(pollp->hostname));
+      pollp->port = portnum;
 
-      cupsdLogMessage(CUPSD_LOG_INFO, "Polling %s:%d", poll->hostname,
-	              poll->port);
+      cupsdLogMessage(CUPSD_LOG_INFO, "Polling %s:%d", pollp->hostname,
+	              pollp->port);
     }
     else if (!strcasecmp(line, "DefaultAuthType"))
     {

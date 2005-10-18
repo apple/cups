@@ -68,6 +68,7 @@
  * Include necessary headers...
  */
 
+#include "http-private.h"
 #include "globals.h"
 #include "debug.h"
 #include <stdlib.h>

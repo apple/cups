@@ -225,7 +225,8 @@ do_test(const char        *server,	/* I - Server to use */
   for (elapsed = 0.0, i = 0; i < requests; i ++)
   {
     if (verbose && (i % 10) == 0)
-      printf("testspeed(%d): %d%% complete...\n", getpid(), i * 100 / requests);
+      printf("testspeed(%d): %d%% complete...\n", (int)getpid(),
+             i * 100 / requests);
 
    /*
     * Build a request which requires the following attributes:
@@ -280,7 +281,7 @@ do_test(const char        *server,	/* I - Server to use */
   httpClose(http);
 
   printf("testspeed(%d): %d requests in %.1fs (%.3fs/r, %.1fr/s)\n",
-         getpid(), i, elapsed, elapsed / i, i / elapsed);
+         (int)getpid(), i, elapsed, elapsed / i, i / elapsed);
 
   return (0);
 }

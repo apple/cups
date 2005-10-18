@@ -39,13 +39,13 @@
  * Include necessary headers.
  */
 
+#include <cups/http-private.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <cups/backend.h>
-#include <cups/http-private.h>
 #include <cups/cups.h>
 #include <cups/language.h>
 #include <cups/string.h>

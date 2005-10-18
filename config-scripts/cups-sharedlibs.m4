@@ -87,7 +87,7 @@ AC_SUBST(LIBCUPS)
 AC_SUBST(LIBCUPSIMAGE)
 
 if test x$enable_shared = xno; then
-	LINKCUPS="../cups/libcups.a \$(SSLLIBS)"
+	LINKCUPS="../cups/libcups.a"
 	LINKCUPSIMAGE="../filter/libcupsimage.a"
 else
 	if test $uname = AIX; then

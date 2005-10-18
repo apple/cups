@@ -209,7 +209,7 @@ libmime.a:	$(MIMEOBJS)
 
 testdirsvc:	testdirsvc.o
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o testdirsvc testdirsvc.o $(COMMONLIBS)
+	$(CC) $(LDFLAGS) -o testdirsvc testdirsvc.o $(COMMONLIBS) $(NETLIBS)
 
 
 #
@@ -218,7 +218,8 @@ testdirsvc:	testdirsvc.o
 
 testmime:	testmime.o libmime.a
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ testmime.o libmime.a ../cups/libcups.a $(COMMONLIBS) $(LIBZ)
+	$(CC) $(LDFLAGS) -o $@ testmime.o libmime.a ../cups/libcups.a \
+		$(COMMONLIBS) $(NETLIBS) $(LIBZ)
 
 
 #

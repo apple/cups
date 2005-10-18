@@ -32,16 +32,6 @@
  */
 
 #  include "config.h"
-#  include <limits.h>
-#  ifdef WIN32
-#    include <io.h>
-#    include <winsock2.h>
-#  else
-#    include <unistd.h>
-#    include <fcntl.h>
-#    include <sys/socket.h>
-#    define closesocket(f) close(f)
-#  endif /* WIN32 */
 
 #  ifdef __sun
 /*
@@ -52,6 +42,17 @@
 #    define FD_SETSIZE	CUPS_MAX_FDS
 #    include <sys/select.h>
 #  endif /* __sun */
+
+#  include <limits.h>
+#  ifdef WIN32
+#    include <io.h>
+#    include <winsock2.h>
+#  else
+#    include <unistd.h>
+#    include <fcntl.h>
+#    include <sys/socket.h>
+#    define closesocket(f) close(f)
+#  endif /* WIN32 */
 
 #  ifdef __sgi
 /*

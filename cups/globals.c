@@ -34,8 +34,8 @@
  * Include necessary headers...
  */
 
-#include "globals.h"
 #include "http-private.h"
+#include "globals.h"
 #include <stdlib.h>
 
 

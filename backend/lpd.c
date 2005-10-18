@@ -789,21 +789,21 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
     while (copies > 0)
     {
       snprintf(cptr, sizeof(control) - (cptr - control), "%cdfA%03d%.15s\n", format,
-               getpid() % 1000, localhost);
+               (int)getpid() % 1000, localhost);
       cptr   += strlen(cptr);
       copies --;
     }
 
     snprintf(cptr, sizeof(control) - (cptr - control),
              "UdfA%03d%.15s\nN%s\n",
-             getpid() % 1000, localhost, title);
+             (int)getpid() % 1000, localhost, title);
 
     fprintf(stderr, "DEBUG: Control file is:\n%s", control);
 
     if (order == ORDER_CONTROL_DATA)
     {
       if (lpd_command(fd, timeout, "\002%d cfA%03.3d%.15s\n", strlen(control),
-                      getpid() % 1000, localhost))
+                      (int)getpid() % 1000, localhost))
       {
         httpAddrFreeList(addrlist);
 	close(fd);
@@ -849,7 +849,7 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
       */
 
       if (lpd_command(fd, timeout, "\003" CUPS_LLFMT " dfA%03.3d%.15s\n",
-                      CUPS_LLCAST filestats.st_size, getpid() % 1000,
+                      CUPS_LLCAST filestats.st_size, (int)getpid() % 1000,
 		      localhost))
       {
         httpAddrFreeList(addrlist);
@@ -919,7 +919,7 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
     if (status == 0 && order == ORDER_DATA_CONTROL)
     {
       if (lpd_command(fd, timeout, "\002%d cfA%03.3d%.15s\n", strlen(control),
-                      getpid() % 1000, localhost))
+                      (int)getpid() % 1000, localhost))
       {
         httpAddrFreeList(addrlist);
 	close(fd);
@@ -1073,7 +1073,7 @@ rresvport_af(int *port,			/* IO - Port number to bind to */
     */
 
 #  ifdef AF_INET6
-    if (family == AF_INET6
+    if (family == AF_INET6)
       addr.ipv6.sin6_port = htons(*port);
     else
 #  endif /* AF_INET6 */

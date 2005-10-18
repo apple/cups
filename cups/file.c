@@ -62,6 +62,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
+#include "http-private.h"
 #include "string.h"
 #include <errno.h>
 #include <cups/debug.h>
@@ -71,7 +72,6 @@
 #ifdef HAVE_LIBZ
 #  include <zlib.h>
 #endif /* HAVE_LIBZ */
-#include "http-private.h"
 
 
 /*

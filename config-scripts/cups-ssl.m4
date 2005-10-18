@@ -55,12 +55,10 @@ if test x$enable_ssl != xno; then
 	    dnl included...
 	    SAVELIBS="$LIBS"
 
-	    TEST_GNUTLS_LIBS=`libgnutls-config --libs`
 	    AC_CHECK_LIB(gnutls, gnutls_init,
-		[SSLLIBS=$TEST_GNUTLS_LIBS
+		[SSLLIBS="-lgnutls"
 		 AC_DEFINE(HAVE_SSL)
-		 AC_DEFINE(HAVE_GNUTLS)],,
-		$TEST_GNUTLS_LIBS)
+		 AC_DEFINE(HAVE_GNUTLS)])
 
 	    LIBS="$SAVELIBS")
     fi
