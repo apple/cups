@@ -146,6 +146,8 @@ cups-lpd.o: ../cups/language.h
 cups-polld.o: ../cups/http-private.h ../config.h ../cups/http.h ../cups/md5.h
 cups-polld.o: ../cups/cups.h ../cups/ipp.h ../cups/ppd.h ../cups/file.h
 cups-polld.o: ../cups/language.h ../cups/string.h
+testdirsvc.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
+testdirsvc.o: ../cups/ppd.h ../cups/file.h ../cups/string.h ../config.h
 testmime.o: ../cups/string.h ../config.h mime.h ../cups/ipp.h ../cups/file.h
 testspeed.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
 testspeed.o: ../cups/ppd.h ../cups/file.h ../cups/language.h ../cups/debug.h

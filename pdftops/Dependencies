@@ -86,7 +86,7 @@ PSOutputDev.o: ../config.h GString.h GList.h gtypes.h GlobalParams.h
 PSOutputDev.o: CharTypes.h Object.h gmem.h Array.h Dict.h Stream.h Error.h
 PSOutputDev.o: Function.h Gfx.h GfxState.h GfxFont.h UnicodeMap.h
 PSOutputDev.o: FoFiType1C.h FoFiBase.h FoFiTrueType.h Catalog.h Page.h
-PSOutputDev.o: Annot.h PSOutputDev.h OutputDev.h
+PSOutputDev.o: Annot.h XRef.h PSOutputDev.h OutputDev.h
 PSTokenizer.o: ../config.h PSTokenizer.h gtypes.h
 SecurityHandler.o: ../config.h GString.h PDFDoc.h XRef.h gtypes.h Object.h
 SecurityHandler.o: gmem.h Array.h Dict.h Stream.h Catalog.h Page.h Decrypt.h

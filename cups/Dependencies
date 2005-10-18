@@ -10,23 +10,23 @@ dest.o: language.h
 dir.o: dir.h string.h ../config.h debug.h
 emit.o: ppd.h file.h string.h ../config.h
 encode.o: cups.h ipp.h http.h string.h ../config.h md5.h ppd.h file.h debug.h
-file.o: string.h ../config.h ../cups/debug.h file.h http-private.h http.h
-file.o: md5.h
+file.o: http-private.h ../config.h http.h string.h md5.h ../cups/debug.h
+file.o: file.h
 getputfile.o: cups.h ipp.h http.h string.h ../config.h md5.h ppd.h file.h
 getputfile.o: language.h debug.h
-globals.o: globals.h string.h ../config.h cups.h ipp.h http.h md5.h ppd.h
-globals.o: file.h language.h normalize.h transcode.h http-private.h
+globals.o: http-private.h ../config.h http.h string.h md5.h globals.h cups.h
+globals.o: ipp.h ppd.h file.h language.h normalize.h transcode.h
 http.o: http-private.h ../config.h http.h string.h md5.h globals.h cups.h
 http.o: ipp.h ppd.h file.h language.h normalize.h transcode.h debug.h
 http-addr.o: globals.h string.h ../config.h cups.h ipp.h http.h md5.h ppd.h
 http-addr.o: file.h language.h normalize.h transcode.h debug.h
-http-addrlist.o: globals.h string.h ../config.h cups.h ipp.h http.h md5.h
-http-addrlist.o: ppd.h file.h language.h normalize.h transcode.h debug.h
-http-addrlist.o: http-private.h
+http-addrlist.o: http-private.h ../config.h http.h string.h md5.h globals.h
+http-addrlist.o: cups.h ipp.h ppd.h file.h language.h normalize.h transcode.h
+http-addrlist.o: debug.h
 http-support.o: debug.h globals.h string.h ../config.h cups.h ipp.h http.h
 http-support.o: md5.h ppd.h file.h language.h normalize.h transcode.h
-ipp.o: globals.h string.h ../config.h cups.h ipp.h http.h md5.h ppd.h file.h
-ipp.o: language.h normalize.h transcode.h debug.h
+ipp.o: http-private.h ../config.h http.h string.h md5.h globals.h cups.h
+ipp.o: ipp.h ppd.h file.h language.h normalize.h transcode.h debug.h
 ipp-support.o: globals.h string.h ../config.h cups.h ipp.h http.h md5.h ppd.h
 ipp-support.o: file.h language.h normalize.h transcode.h debug.h
 langprintf.o: string.h ../config.h language.h transcode.h
