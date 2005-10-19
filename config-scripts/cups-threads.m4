@@ -28,8 +28,7 @@ have_pthread=no
 
 if test "x$enable_threads" != xno; then
 	AC_CHECK_HEADER(pthread.h, AC_DEFINE(HAVE_PTHREAD_H))
-	AC_CHECK_LIB(pthread, pthread_create,
-		COMMONLIBS="-lpthread $COMMONLIBS")
+	AC_CHECK_LIB(pthread, pthread_create)
 
 	if test "x$ac_cv_lib_pthread_pthread_create" = xyes -a x$ac_cv_header_pthread_h = xyes; then
         	have_pthread=yes
@@ -40,9 +39,8 @@ if test "x$enable_threads" != xno; then
 		LIBS="-pthread $LIBS"
         	AC_TRY_LINK([#include <pthread.h>],
 			[pthread_create(0, 0, 0, 0);],
-        		COMMONLIBS="-pthread $COMMONLIBS"
-        		have_pthread=yes)
-		LIBS="$SAVELIBS"
+        		have_pthread=yes,
+			LIBS="$SAVELIBS")
         	AC_MSG_RESULT([$have_pthread])
 	fi
 fi

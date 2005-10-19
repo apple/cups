@@ -184,16 +184,14 @@ dnl Extra platform-specific libraries...
 case $uname in
         Darwin*)
                 BACKLIBS="-framework IOKit"
-                COMMONLIBS="-framework CoreFoundation"
+                LIBS="-framework CoreFoundation $LIBS"
                 ;;
         *)
                 BACKLIBS=""
-		COMMONLIBS=""
                 ;;
 esac
 
 AC_SUBST(BACKLIBS)
-AC_SUBST(COMMONLIBS)
 
 dnl New default port definition for IPP...
 AC_ARG_WITH(ipp-port, [  --with-ipp-port         set default port number for IPP ],

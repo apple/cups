@@ -40,7 +40,7 @@ cups_serverroot=@CUPS_SERVERROOT@
 # flags for C++ compiler:
 CFLAGS=""
 LDFLAGS="@EXPORT_LDFLAGS@"
-LIBS="@EXPORT_SSLLIBS@ @NETLIBS@ @COMMONLIBS@"
+LIBS="@EXPORT_SSLLIBS@ @LIBS@"
 IMGLIBS="@EXPORT_LIBTIFF@ @EXPORT_LIBJPEG@ @EXPORT_LIBPNG@ @EXPORT_LIBZ@"
 
 if test $includedir != /usr/include; then
