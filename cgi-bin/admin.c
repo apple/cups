@@ -1951,14 +1951,14 @@ do_config_server(http_t      *http,	/* I - HTTP connection */
       }
       else if (!strcasecmp(line, "<Limit") && in_policy)
       {
-	indent += 2;
-
        /*
 	* See if the policy limit is for the Cancel-Job operation...
 	*/
 
 	char	*valptr;		/* Pointer into value */
 
+
+	indent += 2;
 
         if (!strcasecmp(value, "cancel-job"))
 	{
