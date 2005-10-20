@@ -55,8 +55,9 @@
  * The Dymo printers support printing at 136, 203, and 300 DPI.
  *
  * The Zebra portion of the driver has been tested with the LP-2844Z label
- * printer; it may also work with other models.  The driver supports both
- * EPL and ZPL as defined in Zebra's on-line developer documentation.
+ * printer; it may also work with other models.  The driver supports EPL
+ * line mode, EPL page mode, ZPL, and CPCL as defined in Zebra's on-line
+ * developer documentation.
  */
 
 /*
@@ -68,6 +69,7 @@
 #define ZEBRA_EPL_LINE	0x10		/* Zebra EPL line mode printers */
 #define ZEBRA_EPL_PAGE	0x11		/* Zebra EPL page mode printers */
 #define ZEBRA_ZPL	0x12		/* Zebra ZPL-based printers */
+#define ZEBRA_CPCL	0x13		/* Zebra CPCL-based printers */
 
 
 /*
@@ -141,6 +143,9 @@ Setup(ppd_file_t *ppd)			/* I - PPD file */
 	break;
 
     case ZEBRA_ZPL :
+        break;
+
+    case ZEBRA_CPCL :
         break;
   }
 }
@@ -243,6 +248,16 @@ StartPage(ppd_file_t *ppd,		/* I - PPD file */
 	CompBuffer = malloc(2 * header->cupsBytesPerLine + 1);
 	LastBuffer = malloc(header->cupsBytesPerLine);
 	LastSet    = 0;
+        break;
+
+    case ZEBRA_CPCL :
+       /*
+        * Start label...
+	*/
+
+        printf("!0 %u %u %u %u\r\n", header->HWResolution[0],
+	       header->HWResolution[1], header->cupsHeight,
+	       header->NumCopies);
         break;
   }
 
@@ -432,6 +447,56 @@ EndPage(ppd_file_t *ppd,		/* I - PPD file */
 	free(CompBuffer);
 	free(LastBuffer);
         break;
+
+    case ZEBRA_CPCL :
+       /*
+        * Set tear-off adjust position...
+	*/
+
+	if (header->AdvanceDistance)
+          printf("PRESENT-AT %d 1\r\n", (int)header->AdvanceDistance);
+
+       /*
+        * Allow for reprinting after an error...
+	*/
+
+	if (ppdIsMarked(ppd, "zeErrorReprint", "Always"))
+	  puts("ON-OUT-OF-PAPER WAIT\r");
+	else if (ppdIsMarked(ppd, "zeErrorReprint", "Never"))
+	  puts("ON-OUT-OF-PAPER PURGE\r");
+
+       /*
+        * Cut label?
+	*/
+
+	if (header->CutMedia)
+	  puts("CUT\r");
+
+       /*
+        * Set darkness...
+	*/
+
+	if (header->cupsCompression > 0)
+	  printf("TONE %u\n", 2 * header->cupsCompression);
+
+       /*
+        * Set print rate...
+	*/
+
+	if ((choice = ppdFindMarkedChoice(ppd, "zePrintRate")) != NULL &&
+	    strcmp(choice->choice, "Default"))
+	{
+	  val = atoi(choice->choice);
+	  printf("SPEED %d\r\n", val);
+	}
+
+       /*
+        * Print the label...
+	*/
+
+        puts("FORM\r");
+	puts("PRINT\r");
+	break;
   }
 
   fflush(stdout);
@@ -615,6 +680,20 @@ OutputLine(ppd_file_t         *ppd,	/* I - PPD file */
 	memcpy(LastBuffer, Buffer, header->cupsBytesPerLine);
 	LastSet = 1;
         break;
+
+    case ZEBRA_CPCL :
+        printf("CG %u 1 0 %d ", header->cupsBytesPerLine, y);
+
+	for (ptr = Buffer, i = header->cupsBytesPerLine;
+	     i > 0;
+	     i --, ptr ++)
+        {
+	  putchar(hex[*ptr >> 4]);
+	  putchar(hex[*ptr & 15]);
+	}
+
+	puts("\r");
+	break;
   }
 }
 

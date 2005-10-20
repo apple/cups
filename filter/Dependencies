@@ -94,9 +94,9 @@ pstops.o: common.h ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
 pstops.o: ../cups/ppd.h ../cups/file.h ../cups/language.h ../cups/string.h
 pstops.o: ../config.h
 raster.o: raster.h ../cups/ppd.h ../cups/file.h ../cups/string.h ../config.h
-rastertodymo.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
-rastertodymo.o: ../cups/ppd.h ../cups/file.h ../cups/string.h ../config.h
-rastertodymo.o: raster.h ../cups/ppd.h
+rastertolabel.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
+rastertolabel.o: ../cups/ppd.h ../cups/file.h ../cups/string.h ../config.h
+rastertolabel.o: raster.h ../cups/ppd.h
 rastertoepson.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
 rastertoepson.o: ../cups/ppd.h ../cups/file.h ../cups/ppd.h ../cups/string.h
 rastertoepson.o: ../config.h raster.h

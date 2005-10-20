@@ -1,8 +1,12 @@
-CHANGES.txt - 10/10/2005
+CHANGES.txt - 10/20/2005
 ------------------------
 
 CHANGES IN CUPS V1.2.0b1
 
+	- The rastertodymo driver has been renamed to
+	  rastertolabel (a symlink is installed so that existing
+	  queues continue to work) and now also supports Zebra's
+	  CPCL language.
 	- The lpstat command could show the wrong active job for
 	  a printer (STR #1301)
 	- Fixed a potential crash problem in the scheduler when

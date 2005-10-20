@@ -27,7 +27,7 @@
 include ../Makedefs
 
 FILTERS	=	gziptoany hpgltops texttops pstops imagetops imagetoraster \
-		rastertodymo rastertoepson rastertohp
+		rastertolabel rastertoepson rastertohp
 TARGETS	=	$(FILTERS) testraster
 
 HPGLOBJS =	hpgl-attr.o hpgl-config.o hpgl-main.o hpgl-prolog.o \
@@ -39,7 +39,7 @@ IMAGEOBJS =	image-bmp.o image-colorspace.o image-gif.o image-jpeg.o \
 FORMOBJS =	form-attr.o form-main.o form-ps.o form-text.o form-tree.o
 OBJS	=	$(HPGLOBJS) $(IMAGEOBJS) $(FORMOBJS) \
 		imagetops.o imagetoraster.o common.o pstops.o raster.o \
-		rastertodymo.o rastertoepson.o rastertohp.o \
+		rastertolabel.o rastertoepson.o rastertohp.o \
 		texttops.o textcommon.o testraster.o gziptoany.o
 
 
@@ -76,6 +76,8 @@ install:	all installhdrs
 	for file in $(FILTERS); do \
 		$(INSTALL_BIN) $$file $(SERVERBIN)/filter; \
 	done
+	$(RM) $(SERVERBIN)/filter/rastertodymo
+	$(LN) rastertolabel $(SERVERBIN)/filter/rastertodymo
 	$(INSTALL_DIR) $(LIBDIR)
 	$(INSTALL_LIB) $(LIBCUPSIMAGE) $(LIBDIR)
 	-if test $(LIBCUPSIMAGE) = "libcupsimage.so.2" -o $(LIBCUPSIMAGE) = "libcupsimage.sl.2"; then \
@@ -226,12 +228,12 @@ pstops:	pstops.o common.o ../cups/$(LIBCUPS)
 
 
 #
-# rastertodymo
+# rastertolabel
 #
 
-rastertodymo:	rastertodymo.o ../cups/$(LIBCUPS) $(LIBCUPSIMAGE)
+rastertolabel:	rastertolabel.o ../cups/$(LIBCUPS) $(LIBCUPSIMAGE)
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ rastertodymo.o $(LINKCUPSIMAGE) $(IMGLIBS) $(LIBS)
+	$(CC) $(LDFLAGS) -o $@ rastertolabel.o $(LINKCUPSIMAGE) $(IMGLIBS) $(LIBS)
 
 
 #
