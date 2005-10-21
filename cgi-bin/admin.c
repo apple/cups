@@ -264,8 +264,8 @@ do_am_class(http_t      *http,		/* I - HTTP connection */
       ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
         	   "attributes-natural-language", NULL, language->language);
 
-      snprintf(uri, sizeof(uri), "ipp://localhost/classes/%s",
-               cgiGetVariable("PRINTER_NAME"));
+      httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, "localhost", 0,
+                       "/classes/%s", cgiGetVariable("PRINTER_NAME"));
       ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
                    NULL, uri);
 
@@ -397,8 +397,8 @@ do_am_class(http_t      *http,		/* I - HTTP connection */
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
         	 "attributes-natural-language", NULL, language->language);
 
-    snprintf(uri, sizeof(uri), "ipp://localhost/classes/%s",
-             cgiGetVariable("PRINTER_NAME"));
+    httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, "localhost", 0,
+                     "/classes/%s", cgiGetVariable("PRINTER_NAME"));
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
                  NULL, uri);
 
@@ -464,8 +464,8 @@ do_am_class(http_t      *http,		/* I - HTTP connection */
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
         	 "attributes-natural-language", NULL, language->language);
 
-    snprintf(uri, sizeof(uri), "ipp://localhost/classes/%s",
-             cgiGetVariable("PRINTER_NAME"));
+    httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, "localhost", 0,
+                     "/classes/%s", cgiGetVariable("PRINTER_NAME"));
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
                  NULL, uri);
 
@@ -596,8 +596,8 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
         	 "attributes-natural-language", NULL, language->language);
 
-    snprintf(uri, sizeof(uri), "ipp://localhost/printers/%s",
-             cgiGetVariable("PRINTER_NAME"));
+    httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, "localhost", 0,
+                     "/printers/%s", cgiGetVariable("PRINTER_NAME"));
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
                  NULL, uri);
 
@@ -998,8 +998,8 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
         	 "attributes-natural-language", NULL, language->language);
 
-    snprintf(uri, sizeof(uri), "ipp://localhost/printers/%s",
-             cgiGetVariable("PRINTER_NAME"));
+    httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, "localhost", 0,
+                     "/printers/%s", cgiGetVariable("PRINTER_NAME"));
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
                  NULL, uri);
 
@@ -1125,7 +1125,8 @@ do_config_printer(http_t      *http,	/* I - HTTP connection */
   */
 
   if ((printer = cgiGetVariable("PRINTER_NAME")) != NULL)
-    snprintf(uri, sizeof(uri), "ipp://localhost/printers/%s", printer);
+    httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, "localhost", 0,
+                     "/printers/%s", printer);
   else
   {
     cgiSetVariable("ERROR", ippErrorString(IPP_NOT_FOUND));
@@ -1322,7 +1323,8 @@ do_config_printer(http_t      *http,	/* I - HTTP connection */
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
         	 "attributes-natural-language", NULL, language->language);
 
-    snprintf(uri, sizeof(uri), "ipp://localhost/printers/%s", printer);
+    httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, "localhost", 0,
+                     "/printers/%s", printer);
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
                  NULL, uri);
 
@@ -1581,8 +1583,8 @@ do_config_printer(http_t      *http,	/* I - HTTP connection */
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
         	 "attributes-natural-language", NULL, language->language);
 
-    snprintf(uri, sizeof(uri), "ipp://localhost/printers/%s",
-             cgiGetVariable("PRINTER_NAME"));
+    httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, "localhost", 0,
+                     "/printers/%s", cgiGetVariable("PRINTER_NAME"));
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
                  NULL, uri);
 
@@ -2440,7 +2442,8 @@ do_delete_class(http_t      *http,	/* I - HTTP connection */
   }
 
   if ((pclass = cgiGetVariable("PRINTER_NAME")) != NULL)
-    snprintf(uri, sizeof(uri), "ipp://localhost/classes/%s", pclass);
+    httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, "localhost", 0,
+                     "/classes/%s", pclass);
   else
   {
     cgiSetVariable("ERROR", ippErrorString(IPP_NOT_FOUND));
@@ -2524,7 +2527,8 @@ do_delete_printer(http_t      *http,	/* I - HTTP connection */
   }
 
   if ((printer = cgiGetVariable("PRINTER_NAME")) != NULL)
-    snprintf(uri, sizeof(uri), "ipp://localhost/printers/%s", printer);
+    httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, "localhost", 0,
+                     "/printers/%s", printer);
   else
   {
     cgiSetVariable("ERROR", ippErrorString(IPP_NOT_FOUND));
@@ -3024,7 +3028,8 @@ do_printer_op(http_t      *http,	/* I - HTTP connection */
 
 
   if ((printer = cgiGetVariable("PRINTER_NAME")) != NULL)
-    snprintf(uri, sizeof(uri), "ipp://localhost/printers/%s", printer);
+    httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, "localhost", 0,
+                     "/printers/%s", printer);
   else
   {
     cgiSetVariable("ERROR", ippErrorString(IPP_NOT_FOUND));
@@ -3139,7 +3144,8 @@ do_set_allowed_users(
 
 
   if ((printer = cgiGetVariable("PRINTER_NAME")) != NULL)
-    snprintf(uri, sizeof(uri), "ipp://localhost/printers/%s", printer);
+    httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, "localhost", 0,
+                     "/printers/%s", printer);
   else
   {
     cgiSetVariable("ERROR", ippErrorString(IPP_NOT_FOUND));
@@ -3402,7 +3408,8 @@ do_set_sharing(http_t      *http,	/* I - HTTP connection */
 
 
   if ((printer = cgiGetVariable("PRINTER_NAME")) != NULL)
-    snprintf(uri, sizeof(uri), "ipp://localhost/printers/%s", printer);
+    httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, "localhost", 0,
+                     "/printers/%s", printer);
   else
   {
     cgiSetVariable("ERROR", ippErrorString(IPP_NOT_FOUND));

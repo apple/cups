@@ -206,17 +206,6 @@ httpAddrLookup(const http_addr_t *addr,		/* I - Address to lookup */
 
       return (NULL);
     }
-
-   /*
-    * Check for a numeric IPv6 address, which will contain a colon; if
-    * so, convert the address to "[address]".
-    */
-
-    if (strchr(name, ':'))
-    {
-      strlcpy(servname, name, sizeof(servname));
-      snprintf(name, namelen, "[%s]", servname);
-    }
   }
 #else
   {
@@ -284,44 +273,10 @@ httpAddrString(const http_addr_t *addr,		/* I - Address to convert */
 #ifdef HAVE_GETNAMEINFO
   {
     char	servname[1024];		/* Service name (not used) */
-    char	*percent;		/* Pointer to "%ifname" */
 
 
-    if (addr->addr.sa_family == AF_INET6)
-    {
-     /*
-      * Make sure that IPv6 addresses have brackets...
-      */
-
-      s[0] = '[';
-
-      if (getnameinfo(&addr->addr, httpAddrLength(addr), s + 1, slen - 2,
-                      servname, sizeof(servname), NI_NUMERICHOST))
-      {
-       /*
-	* If we get an error back, then the address type is not supported
-	* and we should zero out the buffer...
-	*/
-
-	s[0] = '\0';
-
-	return (NULL);
-      }
-
-     /*
-      * On Linux, getnameinfo() includes the interface name in the
-      * returned address (this is probably a bug...)  If we find a
-      * "%" character, replace it and the interface name with the
-      * "]".  Otherwise, append "]"...
-      */
-
-      if ((percent = strchr(s, '%')) != NULL)
-        strcpy(percent, "]");
-      else
-        strlcat(s, "]", slen);
-    }
-    else if (getnameinfo(&addr->addr, httpAddrLength(addr), s, slen,
-                	 servname, sizeof(servname), NI_NUMERICHOST))
+    if (getnameinfo(&addr->addr, httpAddrLength(addr), s, slen,
+                    servname, sizeof(servname), NI_NUMERICHOST))
     {
      /*
       * If we get an error back, then the address type is not supported
@@ -344,7 +299,7 @@ httpAddrString(const http_addr_t *addr,		/* I - Address to convert */
       const char	*prefix;	/* Prefix for address */
 
 
-      prefix = "[";
+      prefix = "";
       for (sptr = s, i = 0; i < 4 && addr->ipv6.sin6_addr.s6_addr32[i]; i ++)
       {
         temp = ntohl(addr->ipv6.sin6_addr.s6_addr32[i]);
@@ -398,9 +353,9 @@ httpAddrString(const http_addr_t *addr,		/* I - Address to convert */
           * Empty address...
 	  */
 
-          strlcpy(s, "[::", slen);
-	  sptr = s + 3;
-	  slen -= 3;
+          strlcpy(s, "::", slen);
+	  sptr = s + 2;
+	  slen -= 2;
 	}
 	else
 	{
@@ -413,8 +368,6 @@ httpAddrString(const http_addr_t *addr,		/* I - Address to convert */
 	  slen -= 2;
 	}
       }
-
-      strlcpy(sptr, "]", slen);
     }
     else
 #endif /* AF_INET6 */

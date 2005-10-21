@@ -192,8 +192,8 @@ main(int  argc,				/* I - Number of command-line arguments */
       request->request.op.operation_id = IPP_GET_PRINTER_ATTRIBUTES;
       request->request.op.request_id   = 1;
 
-      snprintf(uri, sizeof(uri), "ipp://%s/printers/%s", getenv("SERVER_NAME"),
-               printer);
+      httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, "localhost", 0,
+                       "/printers/%s", printer);
       ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri", NULL,
                    uri);
     }
@@ -278,8 +278,8 @@ main(int  argc,				/* I - Number of command-line arguments */
       request->request.op.operation_id = IPP_GET_JOBS;
       request->request.op.request_id   = 1;
 
-      snprintf(uri, sizeof(uri), "ipp://%s/printers/%s", getenv("SERVER_NAME"),
-               printer);
+      httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, "localhost", 0,
+                       "/printers/%s", printer);
       ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri", NULL,
                    uri);
 
@@ -335,7 +335,8 @@ main(int  argc,				/* I - Number of command-line arguments */
       datadir = CUPS_DATADIR;
 
     snprintf(filename, sizeof(filename), "%s/data/testprint.ps", datadir);
-    snprintf(uri, sizeof(uri), "ipp://localhost/printers/%s", printer);
+    httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, "localhost", 0,
+                     "/printers/%s", printer);
 
    /*
     * Build an IPP_PRINT_JOB request, which requires the following

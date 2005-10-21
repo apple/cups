@@ -520,7 +520,8 @@ export_dest(const char *dest)		/* I - Destination to export */
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
                "attributes-natural-language", NULL, language->language);
 
-  snprintf(command, sizeof(command), "ipp://localhost/printers/%s", dest);
+  httpAssembleURIf(command, sizeof(command), "ipp", NULL, "localhost", 0,
+                   "/printers/%s", dest);
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI,
                "printer-uri", NULL, command);
 

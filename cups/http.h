@@ -236,6 +236,7 @@ typedef enum http_status_e		/**** HTTP status codes ****/
 
 typedef enum http_uri_status_e		/**** URI separation status @since CUPS1.2@ ****/
 {
+  HTTP_URI_OVERFLOW = -8,		/* URI buffer for httpAssembleURI is too small */
   HTTP_URI_BAD_ARGUMENTS = -7,		/* Bad arguments to function (error) */
   HTTP_URI_BAD_RESOURCE = -6,		/* Bad resource in URI (error) */
   HTTP_URI_BAD_PORT = -5,		/* Bad port number in URI (error) */
@@ -415,15 +416,25 @@ extern char		*httpAddrLookup(const http_addr_t *addr,
                                         char *name, int namelen);
 extern char		*httpAddrString(const http_addr_t *addr,
 			                char *s, int slen);
+extern http_uri_status_t httpAssembleURI(char *uri, int urilen,
+			        	 const char *scheme,
+					 const char *username,
+					 const char *host, int port,
+					 const char *resource);
+extern http_uri_status_t httpAssembleURIf(char *uri, int urilen,
+			        	  const char *scheme,
+					  const char *username,
+					  const char *host, int port,
+					  const char *resourcef, ...);
 extern int		httpFlushWrite(http_t *http);
 extern const char	*httpGetDateString2(time_t t, char *s, int slen);
 extern const char	*httpGetHostname(char *s, int slen);
 extern off_t		httpGetLength2(http_t *http);
-extern http_uri_status_t httpSeparate3(const char *uri,
-			               char *method, int methodlen,
-			               char *username, int usernamelen,
-				       char *host, int hostlen, int *port,
-				       char *resource, int resourcelen);
+extern http_uri_status_t httpSeparateURI(const char *uri,
+			        	 char *scheme, int schemelen,
+			        	 char *username, int usernamelen,
+					 char *host, int hostlen, int *port,
+					 char *resource, int resourcelen);
 extern void		httpSetLength(http_t *http, off_t length);
 
 

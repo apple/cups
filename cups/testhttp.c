@@ -50,7 +50,8 @@ typedef struct uri_test_s		/**** URI test cases ****/
 			*username,	/* Username:password string */
 			*hostname,	/* Hostname string */
 			*resource;	/* Resource string */
-  int			port;		/* Port number */
+  int			port,		/* Port number */
+			assemble_port;	/* Port number for httpAssembleURI() */
 } uri_test_t;
 
 
@@ -62,79 +63,81 @@ static uri_test_t	uri_tests[] =	/* URI test data */
 			{
 			  /* Start with valid URIs */
 			  { HTTP_URI_OK, "file:/filename",
-			    "file", "", "", "/filename", 0 },
+			    "file", "", "", "/filename", 0, 0 },
 			  { HTTP_URI_OK, "file:/filename%20with%20spaces",
-			    "file", "", "", "/filename with spaces", 0 },
+			    "file", "", "", "/filename with spaces", 0, 0 },
 			  { HTTP_URI_OK, "file:///filename",
-			    "file", "", "", "/filename", 0 },
+			    "file", "", "", "/filename", 0, 0 },
 			  { HTTP_URI_OK, "file:///filename%20with%20spaces",
-			    "file", "", "", "/filename with spaces", 0 },
+			    "file", "", "", "/filename with spaces", 0, 0 },
 			  { HTTP_URI_OK, "file://localhost/filename",
-			    "file", "", "localhost", "/filename", 0 },
+			    "file", "", "localhost", "/filename", 0, 0 },
 			  { HTTP_URI_OK, "file://localhost/filename%20with%20spaces",
-			    "file", "", "localhost", "/filename with spaces", 0 },
+			    "file", "", "localhost", "/filename with spaces", 0, 0 },
 			  { HTTP_URI_OK, "http://server/",
-			    "http", "", "server", "/", 80 },
+			    "http", "", "server", "/", 80, 0 },
 			  { HTTP_URI_OK, "http://username@server/",
-			    "http", "username", "server", "/", 80 },
+			    "http", "username", "server", "/", 80, 0 },
 			  { HTTP_URI_OK, "http://username:passwor%64@server/",
-			    "http", "username:password", "server", "/", 80 },
+			    "http", "username:password", "server", "/", 80, 0 },
 			  { HTTP_URI_OK, "http://username:passwor%64@server:8080/",
-			    "http", "username:password", "server", "/", 8080 },
+			    "http", "username:password", "server", "/", 8080, 8080 },
 			  { HTTP_URI_OK, "http://username:passwor%64@server:8080/directory/filename",
-			    "http", "username:password", "server", "/directory/filename", 8080 },
+			    "http", "username:password", "server", "/directory/filename", 8080, 8080 },
 			  { HTTP_URI_OK, "https://username:passwor%64@server/directory/filename",
-			    "https", "username:password", "server", "/directory/filename", 443 },
+			    "https", "username:password", "server", "/directory/filename", 443, 0 },
 			  { HTTP_URI_OK, "ipp://username:passwor%64@[::1]/ipp",
-			    "ipp", "username:password", "[::1]", "/ipp", 631 },
+			    "ipp", "username:password", "::1", "/ipp", 631, 0 },
 			  { HTTP_URI_OK, "lpd://server/queue?reserve=yes",
-			    "lpd", "", "server", "/queue?reserve=yes", 515 },
+			    "lpd", "", "server", "/queue?reserve=yes", 515, 0 },
 			  { HTTP_URI_OK, "mailto:user@domain.com",
-			    "mailto", "", "", "user@domain.com", 0 },
+			    "mailto", "", "", "user@domain.com", 0, 0 },
 			  { HTTP_URI_OK, "socket://server/",
-			    "socket", "", "server", "/", 9100 },
+			    "socket", "", "server", "/", 9100, 0 },
+			  { HTTP_URI_OK, "ipp://username:password@[v1.fe80::200:1234:5678:9abc%25eth0]:999/ipp",
+			    "ipp", "username:password", "fe80::200:1234:5678:9abc%eth0", "/ipp", 999, 999 },
 
 			  /* Missing scheme */
 			  { HTTP_URI_MISSING_SCHEME, "/path/to/file/index.html",
-			    "file", "", "", "/path/to/file/index.html", 0 },
+			    "file", "", "", "/path/to/file/index.html", 0, 0 },
 			  { HTTP_URI_MISSING_SCHEME, "//server/ipp",
-			    "ipp", "", "server", "/ipp", 631 },
+			    "ipp", "", "server", "/ipp", 631, 0 },
 
 			  /* Unknown scheme */
 			  { HTTP_URI_UNKNOWN_SCHEME, "vendor://server/resource",
-			    "vendor", "", "server", "/resource", 0 },
+			    "vendor", "", "server", "/resource", 0, 0 },
 
 			  /* Missing resource */
 			  { HTTP_URI_MISSING_RESOURCE, "socket://[::192.168.2.1]",
-			    "socket", "", "[::192.168.2.1]", "/", 9100 },
+			    "socket", "", "::192.168.2.1", "/", 9100, 0 },
 
 			  /* Bad URI */
 			  { HTTP_URI_BAD_URI, "",
-			    "", "", "", "", 0 },
+			    "", "", "", "", 0, 0 },
 
 			  /* Bad scheme */
 			  { HTTP_URI_BAD_SCHEME, "bad_scheme://server/resource",
-			    "", "", "", "", 0 },
+			    "", "", "", "", 0, 0 },
 
 			  /* Bad username */
 			  { HTTP_URI_BAD_USERNAME, "http://username:passwor%6@server/resource",
-			    "http", "", "", "", 80 },
+			    "http", "", "", "", 80, 0 },
 
 			  /* Bad hostname */
 			  { HTTP_URI_BAD_HOSTNAME, "http://[/::1]/index.html",
-			    "http", "", "", "", 80 },
+			    "http", "", "", "", 80, 0 },
 			  { HTTP_URI_BAD_HOSTNAME, "http://[",
-			    "http", "", "", "", 80 },
+			    "http", "", "", "", 80, 0 },
 			  { HTTP_URI_BAD_HOSTNAME, "http://serve%7/index.html",
-			    "http", "", "", "", 80 },
+			    "http", "", "", "", 80, 0 },
 
 			  /* Bad port number */
 			  { HTTP_URI_BAD_PORT, "http://127.0.0.1:9999a/index.html",
-			    "http", "", "127.0.0.1", "", 0 },
+			    "http", "", "127.0.0.1", "", 0, 0 },
 
 			  /* Bad resource */
 			  { HTTP_URI_BAD_RESOURCE, "http://server/index.html%",
-			    "http", "", "server", "", 80 }
+			    "http", "", "server", "", 80, 0 }
 			};
 static const char * const base64_tests[][2] =
 			{
@@ -161,7 +164,7 @@ int					/* O - Exit status */
 main(int  argc,				/* I - Number of command-line arguments */
      char *argv[])			/* I - Command-line arguments */
 {
-  int		i, j;			/* Looping vars */
+  int		i, j, k;		/* Looping vars */
   http_t	*http;			/* HTTP connection */
   http_status_t	status;			/* Status of GET command */
   int		failures;		/* Number of test failures */
@@ -183,6 +186,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   time_t	start, current;		/* Start and end time */
   static const char * const uri_status_strings[] =
 		{
+		  "HTTP_URI_OVERFLOW",
 		  "HTTP_URI_BAD_ARGUMENTS",
 		  "HTTP_URI_BAD_RESOURCE",
 		  "HTTP_URI_BAD_PORT",
@@ -204,34 +208,6 @@ main(int  argc,				/* I - Number of command-line arguments */
   if (argc == 1)
   {
     failures = 0;
-
-   /*
-    * httpGetDateString()/httpGetDateTime()
-    */
-
-    fputs("httpGetDateString()/httpGetDateTime(): ", stdout);
-
-    start = time(NULL);
-    strcpy(buffer, httpGetDateString(start));
-    current = httpGetDateTime(buffer);
-
-    i = (int)(current - start);
-    if (i < 0)
-      i = -i;
-
-    if (!i)
-      puts("PASS");
-    else
-    {
-      failures ++;
-      puts("FAIL");
-      printf("    Difference is %d seconds, %02d:%02d:%02d...\n", i, i / 3600,
-             (i / 60) % 60, i % 60);
-      printf("    httpGetDateString(%d) returned \"%s\"\n", (int)start, buffer);
-      printf("    httpGetDateTime(\"%s\") returned %d\n", buffer, (int)current);
-      printf("    httpGetDateString(%d) returned \"%s\"\n", (int)current,
-             httpGetDateString(current));
-    }
 
    /*
     * httpGetDateString()/httpGetDateTime()
@@ -341,16 +317,16 @@ main(int  argc,				/* I - Number of command-line arguments */
     }
 
    /*
-    * Test httpSeparate3()...
+    * Test httpSeparateURI()...
     */
 
-    fputs("httpSeparate3(): ", stdout);
+    fputs("httpSeparateURI(): ", stdout);
     for (i = 0, j = 0; i < (int)(sizeof(uri_tests) / sizeof(uri_tests[0])); i ++)
     {
-      uri_status = httpSeparate3(uri_tests[i].uri, scheme, sizeof(scheme),
-                                 username, sizeof(username),
-				 hostname, sizeof(hostname), &port,
-				 resource, sizeof(resource));
+      uri_status = httpSeparateURI(uri_tests[i].uri, scheme, sizeof(scheme),
+                                   username, sizeof(username),
+				   hostname, sizeof(hostname), &port,
+				   resource, sizeof(resource));
       if (uri_status != uri_tests[i].result ||
           strcmp(scheme, uri_tests[i].scheme) ||
 	  strcmp(username, uri_tests[i].username) ||
@@ -370,8 +346,8 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 	if (uri_status != uri_tests[i].result)
 	  printf("        Returned %s instead of %s\n",
-	         uri_status_strings[uri_status + 7],
-		 uri_status_strings[uri_tests[i].result + 7]);
+	         uri_status_strings[uri_status + 8],
+		 uri_status_strings[uri_tests[i].result + 8]);
 
         if (strcmp(scheme, uri_tests[i].scheme))
 	  printf("        Scheme \"%s\" instead of \"%s\"\n",
@@ -398,6 +374,57 @@ main(int  argc,				/* I - Number of command-line arguments */
     if (!j)
       printf("PASS (%d URIs tested)\n",
              (int)(sizeof(uri_tests) / sizeof(uri_tests[0])));
+
+   /*
+    * Test httpAssembleURI()...
+    */
+
+    fputs("httpAssembleURI(): ", stdout);
+    for (i = 0, j = 0, k = 0;
+         i < (int)(sizeof(uri_tests) / sizeof(uri_tests[0]));
+	 i ++)
+      if (uri_tests[i].result == HTTP_URI_OK &&
+          !strstr(uri_tests[i].uri, "%64") &&
+          strstr(uri_tests[i].uri, "//"))
+      {
+        k ++;
+	uri_status = httpAssembleURI(buffer, sizeof(buffer),
+	                             uri_tests[i].scheme,
+				     uri_tests[i].username,
+	                             uri_tests[i].hostname,
+				     uri_tests[i].assemble_port,
+				     uri_tests[i].resource);
+
+        if (uri_status != HTTP_URI_OK)
+	{
+          failures ++;
+
+	  if (!j)
+	  {
+	    puts("FAIL");
+	    j = 1;
+	  }
+
+          printf("    \"%s\": %s\n", uri_tests[i].uri,
+	         uri_status_strings[uri_status + 8]);
+        }
+	else if (strcmp(buffer, uri_tests[i].uri))
+	{
+          failures ++;
+
+	  if (!j)
+	  {
+	    puts("FAIL");
+	    j = 1;
+	  }
+
+          printf("    \"%s\": assembled = \"%s\"\n", uri_tests[i].uri,
+	         buffer);
+	}
+      }
+
+    if (!j)
+      printf("PASS (%d URIs tested)\n", k);
 
    /*
     * Show a summary and return...
@@ -430,9 +457,9 @@ main(int  argc,				/* I - Number of command-line arguments */
       continue;
     }
 
-    httpSeparate3(argv[i], scheme, sizeof(scheme), username, sizeof(username),
-                  hostname, sizeof(hostname), &port,
-		  resource, sizeof(resource));
+    httpSeparateURI(argv[i], scheme, sizeof(scheme), username, sizeof(username),
+                    hostname, sizeof(hostname), &port,
+		    resource, sizeof(resource));
 
     http = httpConnectEncrypt(hostname, port, HTTP_ENCRYPT_IF_REQUESTED);
     if (http == NULL)

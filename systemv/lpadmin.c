@@ -748,7 +748,8 @@ add_printer_to_class(http_t *http,	/* I - Server connection */
   *    printer-uri
   */
 
-  snprintf(uri, sizeof(uri), "ipp://localhost/classes/%s", pclass);
+  httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, "localhost", 0,
+                   "/classes/%s", pclass);
 
   request = ippNew();
 
@@ -818,7 +819,8 @@ add_printer_to_class(http_t *http,	/* I - Server connection */
   * OK, the printer isn't part of the class, so add it...
   */
 
-  snprintf(uri, sizeof(uri), "ipp://localhost/printers/%s", printer);
+  httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, "localhost", 0,
+                   "/printers/%s", printer);
 
   if (response != NULL &&
       (members = ippFindAttribute(response, "member-uris", IPP_TAG_URI)) != NULL)
@@ -893,7 +895,8 @@ default_printer(http_t *http,		/* I - Server connection */
   *    printer-uri
   */
 
-  snprintf(uri, sizeof(uri), "ipp://localhost/printers/%s", printer);
+  httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, "localhost", 0,
+                   "/printers/%s", printer);
 
   request = ippNew();
 
@@ -965,7 +968,8 @@ delete_printer(http_t *http,		/* I - Server connection */
   *    printer-uri
   */
 
-  snprintf(uri, sizeof(uri), "ipp://localhost/printers/%s", printer);
+  httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, "localhost", 0,
+                   "/printers/%s", printer);
 
   request = ippNew();
 
@@ -1044,7 +1048,8 @@ delete_printer_from_class(http_t *http,	/* I - Server connection */
   *    printer-uri
   */
 
-  snprintf(uri, sizeof(uri), "ipp://localhost/classes/%s", pclass);
+  httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, "localhost", 0,
+                   "/classes/%s", pclass);
 
   request = ippNew();
 
@@ -1222,7 +1227,8 @@ enable_printer(http_t *http,		/* I - Server connection */
   *    printer-is-accepting-jobs
   */
 
-  snprintf(uri, sizeof(uri), "ipp://localhost/printers/%s", printer);
+  httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, "localhost", 0,
+                   "/printers/%s", printer);
 
   request = ippNew();
 
@@ -1348,7 +1354,8 @@ set_printer_device(http_t *http,	/* I - Server connection */
   *    printer-uri
   */
 
-  snprintf(uri, sizeof(uri), "ipp://localhost/printers/%s", printer);
+  httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, "localhost", 0,
+                   "/printers/%s", printer);
 
   request = ippNew();
 
@@ -1481,7 +1488,8 @@ set_printer_file(http_t *http,		/* I - Server connection */
   *    printer-uri
   */
 
-  snprintf(uri, sizeof(uri), "ipp://localhost/printers/%s", printer);
+  httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, "localhost", 0,
+                   "/printers/%s", printer);
 
   request = ippNew();
 
@@ -1559,7 +1567,8 @@ set_printer_info(http_t *http,		/* I - Server connection */
   *    printer-uri
   */
 
-  snprintf(uri, sizeof(uri), "ipp://localhost/printers/%s", printer);
+  httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, "localhost", 0,
+                   "/printers/%s", printer);
 
   request = ippNew();
 
@@ -1639,7 +1648,8 @@ set_printer_location(http_t *http,	/* I - Server connection */
   *    printer-uri
   */
 
-  snprintf(uri, sizeof(uri), "ipp://localhost/printers/%s", printer);
+  httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, "localhost", 0,
+                   "/printers/%s", printer);
 
   request = ippNew();
 
@@ -1718,7 +1728,8 @@ set_printer_model(http_t *http,		/* I - Server connection */
   *    ppd-name
   */
 
-  snprintf(uri, sizeof(uri), "ipp://localhost/printers/%s", printer);
+  httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, "localhost", 0,
+                   "/printers/%s", printer);
 
   request = ippNew();
 
@@ -1804,7 +1815,8 @@ set_printer_options(http_t        *http,/* I - Server connection */
 
   language = cupsLangDefault();
 
-  snprintf(uri, sizeof(uri), "ipp://localhost/printers/%s", printer);
+  httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, "localhost", 0,
+                   "/printers/%s", printer);
 
  /*
   * Build a GET_PRINTER_ATTRIBUTES request, which requires the following
@@ -1850,7 +1862,8 @@ set_printer_options(http_t        *http,/* I - Server connection */
       if (attr->values[0].integer & (CUPS_PRINTER_CLASS | CUPS_PRINTER_IMPLICIT))
       {
         op = CUPS_ADD_CLASS;
-        snprintf(uri, sizeof(uri), "ipp://localhost/classes/%s", printer);
+	httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, "localhost", 0,
+                	 "/classes/%s", printer);
       }
     }
 

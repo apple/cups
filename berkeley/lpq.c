@@ -327,7 +327,8 @@ show_jobs(http_t     *http,	/* I - HTTP connection to server */
   }
   else
   {
-    snprintf(resource, sizeof(resource), "ipp://localhost/printers/%s", dest);
+    httpAssembleURIf(resource, sizeof(resource), "ipp", NULL, "localhost", 0,
+	             "/printers/%s", dest);
 
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
                  NULL, resource);
@@ -554,7 +555,8 @@ show_printer(http_t     *http,	/* I - HTTP connection to server */
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
                "attributes-natural-language", NULL, language->language);
 
-  snprintf(uri, sizeof(uri), "ipp://localhost/printers/%s", dest);
+  httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, "localhost", 0,
+	           "/printers/%s", dest);
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI,
                "printer-uri", NULL, uri);
 

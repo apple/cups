@@ -97,6 +97,17 @@ cupsCancelJob(const char *name,		/* I - Name of printer or class */
   }
 
  /*
+  * Create a printer URI...
+  */
+
+  if (httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, "localhost", 0,
+                       "/printers/%s", printer) != HTTP_URI_OK)
+  {
+    cg->last_error = IPP_INTERNAL_ERROR;
+    return (0);
+  }
+
+ /*
   * Build an IPP_CANCEL_JOB request, which requires the following
   * attributes:
   *
@@ -123,7 +134,6 @@ cupsCancelJob(const char *name,		/* I - Name of printer or class */
 
   cupsLangFree(language);
 
-  snprintf(uri, sizeof(uri), "ipp://%s:%d/printers/%s", hostname, ippPort(), printer);
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
                NULL, uri);
 
@@ -806,11 +816,32 @@ cupsGetJobs2(http_t     *http,		/* I - HTTP connection */
 		};
 
 
+ /*
+  * Range check input...
+  */
+
   if (!http || !jobs)
   {
     cg->last_error = IPP_INTERNAL_ERROR;
     return (-1);
   }
+
+ /*
+  * Get the right URI...
+  */
+
+  if (mydest)
+  {
+    if (httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, "localhost", 0,
+                         "/printers/%s", mydest) != HTTP_URI_OK)
+    {
+      cg->last_error = IPP_INTERNAL_ERROR;
+      return (-1);
+    }
+  }
+  else
+    strcpy(uri, "ipp://localhost/jobs");
+
 
  /*
   * Build an IPP_GET_JOBS request, which requires the following
@@ -839,11 +870,6 @@ cupsGetJobs2(http_t     *http,		/* I - HTTP connection */
                "attributes-natural-language", NULL, language->language);
 
   cupsLangFree(language);
-
-  if (mydest)
-    snprintf(uri, sizeof(uri), "ipp://localhost/printers/%s", mydest);
-  else
-    strcpy(uri, "ipp://localhost/jobs");
 
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI,
                "printer-uri", NULL, uri);
@@ -1091,6 +1117,17 @@ cupsGetPPD2(http_t     *http,		/* I - HTTP connection */
   }
 
  /*
+  * Setup the printer URI...
+  */
+
+  if (httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, "localhost", 0,
+                       "/printers/%s", name) != HTTP_URI_OK)
+  {
+    cg->last_error = IPP_INTERNAL_ERROR;
+    return (NULL);
+  }
+
+ /*
   * Get the port number we are connect to...
   */
 
@@ -1131,7 +1168,6 @@ cupsGetPPD2(http_t     *http,		/* I - HTTP connection */
 
   cupsLangFree(language);
 
-  snprintf(uri, sizeof(uri), "ipp://localhost/printers/%s", name);
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI,
                "printer-uri", NULL, uri);
 
@@ -1528,7 +1564,21 @@ cupsPrintFiles2(http_t        *http,	/* I - HTTP connection */
   */
 
   if (!http || !name || num_files < 1 || files == NULL)
+  {
+    cg->last_error = IPP_INTERNAL_ERROR;
     return (0);
+  }
+
+ /*
+  * Setup the printer URI...
+  */
+
+  if (httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, "localhost", 0,
+                       "/printers/%s", name) != HTTP_URI_OK)
+  {
+    cg->last_error = IPP_INTERNAL_ERROR;
+    return (0);
+  }
 
  /*
   * Setup the request data...
@@ -1542,13 +1592,14 @@ cupsPrintFiles2(http_t        *http,	/* I - HTTP connection */
   */
 
   if ((request = ippNew()) == NULL)
+  {
+    cg->last_error = IPP_INTERNAL_ERROR;
     return (0);
+  }
 
   request->request.op.operation_id = num_files == 1 ? IPP_PRINT_JOB :
                                                       IPP_CREATE_JOB;
   request->request.op.request_id   = 1;
-
-  snprintf(uri, sizeof(uri), "ipp://localhost/printers/%s", name);
 
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
                "attributes-charset", NULL, cupsLangEncoding(language));

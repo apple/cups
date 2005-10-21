@@ -1937,8 +1937,8 @@ show_printers(http_t      *http,	/* I - HTTP connection to server */
                 	"requested-attributes",
 		        sizeof(jattrs) / sizeof(jattrs[0]), NULL, jattrs);
 
-          snprintf(printer_uri, sizeof(printer_uri), "ipp://%s/printers/%s",
-	           http->hostname, printer);
+	  httpAssembleURIf(printer_uri, sizeof(printer_uri), "ipp", NULL,
+	                   "localhost", 0, "/printers/%s", printer);
 	  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI,
 	               "printer-uri", NULL, printer_uri);
 

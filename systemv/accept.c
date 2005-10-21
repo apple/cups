@@ -190,7 +190,8 @@ main(int  argc,			/* I - Number of command-line arguments */
       ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
                    "attributes-natural-language", NULL, language->language);
 
-      snprintf(uri, sizeof(uri), "ipp://localhost/printers/%s", argv[i]);
+      httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, "localhost", 0,
+                       "/printers/%s", argv[i]);
       ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI,
                    "printer-uri", NULL, uri);
 

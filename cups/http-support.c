@@ -25,6 +25,10 @@
  *
  * Contents:
  *
+ *   httpAssembleURI()    - Assemble a uniform resource identifier from its
+ *                          components.
+ *   httpAssembleURIf()   - Assemble a uniform resource identifier from its
+ *                          components with a formatted resource.
  *   httpDecode64()       - Base64-decode a string.
  *   httpDecode64_2()     - Base64-decode a string.
  *   httpEncode64()       - Base64-encode a string.
@@ -36,12 +40,13 @@
  *                          components.
  *   httpSeparate2()      - Separate a Universal Resource Identifier into its
  *                          components.
- *   httpSeparate3()      - Separate a Universal Resource Identifier into its
+ *   httpSeparateURI()    - Separate a Universal Resource Identifier into its
  *                          components.
  *   httpStatus()         - Return a short string describing a HTTP status code.
  *   _cups_hstrerror()    - hstrerror() emulation function for Solaris and
  *                          others...
  *   http_copy_decode()   - Copy and decode a URI.
+ *   http_copy_encode()   - Copy and encode a URI.
  */
 
 /*
@@ -89,6 +94,255 @@ static const char * const http_months[12] =
 
 static const char	*http_copy_decode(char *dst, const char *src,
 			                  int dstsize, const char *term);
+static char		*http_copy_encode(char *dst, const char *src,
+			                  char *dstend, const char *reserved);
+
+
+/*
+ * 'httpAssembleURI()' - Assemble a uniform resource identifier from its
+ *                       components.
+ *
+ * This function properly escapes all reserved characters in a URI.  You
+ * should use this function in place of traditional string functions
+ * whenever you need to create a URI string.
+ *
+ * @since CUPS 1.2@
+ */
+
+http_uri_status_t			/* O - URI status */
+httpAssembleURI(char       *uri,	/* I - URI buffer */
+                int        urilen,	/* I - Size of URI buffer */
+		const char *scheme,	/* I - Scheme name */
+		const char *username,	/* I - Username */
+		const char *host,	/* I - Hostname or address */
+		int        port,	/* I - Port number */
+		const char *resource)	/* I - Resource */
+{
+  return (httpAssembleURIf(uri, urilen, scheme, username, host, port, "%s",
+                           resource));
+}
+
+
+/*
+ * 'httpAssembleURIf()' - Assemble a uniform resource identifier from its
+ *                        components with a formatted resource.
+ *
+ * This function creates a formatted version of the resource string
+ * argument "resourcef" and properly escapes all reserved characters
+ * in a URI.  You should use this function in place of traditional
+ * string functions whenever you need to create a URI string.
+ *
+ * @since CUPS 1.2@
+ */
+
+http_uri_status_t			/* O - URI status */
+httpAssembleURIf(char       *uri,	/* I - URI buffer */
+                 int        urilen,	/* I - Size of URI buffer */
+		 const char *scheme,	/* I - Scheme name */
+	 	 const char *username,	/* I - Username */
+		 const char *host,	/* I - Hostname or address */
+		 int        port,	/* I - Port number */
+		 const char *resourcef,	/* I - Printf-style resource */
+		 ...)			/* I - Additional arguments as needed */
+{
+  char		*ptr,			/* Pointer into URI buffer */
+		*end;			/* End of URI buffer */
+  va_list	ap;			/* Pointer to additional arguments */
+  char		resource[1024];		/* Formatted resource string */
+  int		bytes;			/* Bytes in formatted string */
+
+
+ /*
+  * Range check input...
+  */
+
+  if (!uri || urilen < 1 || !scheme || port < 0)
+  {
+    if (uri)
+      *uri = '\0';
+
+    return (HTTP_URI_BAD_ARGUMENTS);
+  }
+
+ /*
+  * Assemble the URI starting with the scheme...
+  */
+
+  end = uri + urilen - 1;
+  ptr = http_copy_encode(uri, scheme, end, NULL);
+
+  if (!ptr)
+    goto assemble_overflow;
+
+  if (!strcmp(scheme, "mailto:"))
+  {
+   /*
+    * mailto: only has :, no //...
+    */
+
+    if (ptr < end)
+      *ptr++ = ':';
+    else
+      goto assemble_overflow;
+  }
+  else
+  {
+   /*
+    * Schemes other than mailto: all have //...
+    */
+
+    if ((ptr + 2) < end)
+    {
+      *ptr++ = ':';
+      *ptr++ = '/';
+      *ptr++ = '/';
+    }
+    else
+      goto assemble_overflow;
+  }
+
+ /*
+  * Next the username and hostname, if any...
+  */
+
+  if (host)
+  {
+    if (username && *username)
+    {
+     /*
+      * Add username@ first...
+      */
+
+      ptr = http_copy_encode(ptr, username, end, "/?@");
+
+      if (!ptr)
+        goto assemble_overflow;
+
+      if (ptr < end)
+	*ptr++ = '@';
+      else
+        goto assemble_overflow;
+    }
+
+   /*
+    * Then add the hostname.  Since IPv6 is a particular pain to deal
+    * with, we have several special cases to deal with...
+    */
+
+    if (strchr(host, ':'))
+    {
+     /*
+      * We have an IPv6 address...
+      */
+
+      if (strchr(host, '%'))
+      {
+       /*
+        * We have a link-local address, add "[v1." prefix...
+	*/
+
+	if ((ptr + 4) < end)
+	{
+	  *ptr++ = '[';
+	  *ptr++ = 'v';
+	  *ptr++ = '1';
+	  *ptr++ = '.';
+	}
+	else
+          goto assemble_overflow;
+      }
+      else
+      {
+       /*
+        * We have a normal address, add "[" prefix...
+	*/
+
+	if (ptr < end)
+	  *ptr++ = '[';
+	else
+          goto assemble_overflow;
+      }
+
+     /*
+      * Copy the rest of the IPv6 address, and terminate with "]".
+      */
+
+      ptr = http_copy_encode(ptr, host, end, NULL);
+
+      if (!ptr)
+        goto assemble_overflow;
+
+      if (ptr < end)
+	*ptr++ = ']';
+      else
+        goto assemble_overflow;
+    }
+    else
+    {
+     /*
+      * Otherwise, just copy the host string...
+      */
+
+      ptr = http_copy_encode(ptr, host, end, NULL);
+
+      if (!ptr)
+        goto assemble_overflow;
+    }
+
+   /*
+    * Finish things off with the port number...
+    */
+
+    if (port > 0)
+    {
+      snprintf(ptr, end - ptr + 1, ":%d", port);
+      ptr += strlen(ptr);
+
+      if (ptr >= end)
+	goto assemble_overflow;
+    }
+  }
+
+ /*
+  * Last but not least, add the resource string...
+  */
+
+  if (resourcef)
+  {
+    va_start(ap, resourcef);
+    bytes = vsnprintf(resource, sizeof(resource), resourcef, ap);
+    va_end(ap);
+
+    if (bytes >= sizeof(resource))
+      goto assemble_overflow;
+
+    ptr = http_copy_encode(ptr, resource, end, NULL);
+    if (!ptr)
+      goto assemble_overflow;
+  }
+  else if (ptr < end)
+    *ptr++ = '/';
+  else
+    goto assemble_overflow;
+
+ /*
+  * Nul-terminate the URI buffer and return with no errors...
+  */
+
+  *ptr = '\0';
+
+  return (HTTP_URI_OK);
+
+ /*
+  * Clear the URI string and return an overflow error; I don't usually
+  * like goto's, but in this case it makes sense...
+  */
+
+  assemble_overflow:
+
+  *uri = '\0';
+  return (HTTP_URI_OVERFLOW);
+}
 
 
 /*
@@ -420,8 +674,8 @@ httpSeparate(const char *uri,		/* I - Universal Resource Identifier */
 	     int        *port,		/* O - Port number to use */
              char       *resource)	/* O - Resource/filename [1024] */
 {
-  httpSeparate3(uri, scheme, 32, username, HTTP_MAX_URI, host, HTTP_MAX_URI,
-                port, resource, HTTP_MAX_URI);
+  httpSeparateURI(uri, scheme, 32, username, HTTP_MAX_URI, host, HTTP_MAX_URI,
+                  port, resource, HTTP_MAX_URI);
 }
 
 
@@ -444,29 +698,29 @@ httpSeparate2(const char *uri,		/* I - Universal Resource Identifier */
               char       *resource,	/* O - Resource/filename */
 	      int        resourcelen)	/* I - Size of resource buffer */
 {
-  httpSeparate3(uri, scheme, schemelen, username, usernamelen, host, hostlen,
-                port, resource, resourcelen);
+  httpSeparateURI(uri, scheme, schemelen, username, usernamelen, host, hostlen,
+                  port, resource, resourcelen);
 }
 
 
 /*
- * 'httpSeparate3()' - Separate a Universal Resource Identifier into its
- *                     components.
+ * 'httpSeparateURI()' - Separate a Universal Resource Identifier into its
+ *                       components.
  *
  * @since CUPS 1.2@
  */
 
 http_uri_status_t			/* O - Result of separation */
-httpSeparate3(const char *uri,		/* I - Universal Resource Identifier */
-              char       *scheme,	/* O - Scheme (http, https, etc.) */
-	      int        schemelen,	/* I - Size of scheme buffer */
-	      char       *username,	/* O - Username */
-	      int        usernamelen,	/* I - Size of username buffer */
-	      char       *host,		/* O - Hostname */
-	      int        hostlen,	/* I - Size of hostname buffer */
-	      int        *port,		/* O - Port number to use */
-              char       *resource,	/* O - Resource/filename */
-	      int        resourcelen)	/* I - Size of resource buffer */
+httpSeparateURI(const char *uri,	/* I - Universal Resource Identifier */
+                char       *scheme,	/* O - Scheme (http, https, etc.) */
+	        int        schemelen,	/* I - Size of scheme buffer */
+	        char       *username,	/* O - Username */
+		int        usernamelen,	/* I - Size of username buffer */
+		char       *host,	/* O - Hostname */
+		int        hostlen,	/* I - Size of hostname buffer */
+		int        *port,	/* O - Port number to use */
+        	char       *resource,	/* O - Resource/filename */
+		int        resourcelen)	/* I - Size of resource buffer */
 {
   char			*ptr,		/* Pointer into string... */
 			*end;		/* End of string */
@@ -613,8 +867,11 @@ httpSeparate3(const char *uri,		/* I - Universal Resource Identifier */
       * Grab IPv6 address...
       */
 
-      *host = '[';
-      uri   = http_copy_decode(host + 1, uri + 1, hostlen - 1, "]");
+      uri ++;
+      if (!strncmp(uri, "v1.", 3))
+        uri += 3;			/* Skip IPvN leader... */
+
+      uri = http_copy_decode(host, uri, hostlen, "]");
 
       if (!uri)
       {
@@ -632,20 +889,16 @@ httpSeparate3(const char *uri,		/* I - Universal Resource Identifier */
         return (HTTP_URI_BAD_HOSTNAME);
       }
 
-      for (ptr = host + 1; *ptr; ptr ++)
-        if (*ptr != ':' && *ptr != '.' && !isxdigit(*ptr & 255))
+      uri ++;
+
+      for (ptr = host; *ptr; ptr ++)
+        if (*ptr == '%')
+	  break;			/* Stop at link name... */
+	else if (*ptr != ':' && *ptr != '.' && !isxdigit(*ptr & 255))
 	{
 	  *host = '\0';
 	  return (HTTP_URI_BAD_HOSTNAME);
 	}
-
-     /*
-      * Add the trailing "]"...
-      */
-
-      strlcat(host, "]", hostlen);
-
-      uri ++;
     }
     else
     {
@@ -874,6 +1127,48 @@ http_copy_decode(char       *dst,	/* O - Destination buffer */
   *ptr = '\0';
 
   return (src);
+}
+
+
+/*
+ * 'http_copy_encode()' - Copy and encode a URI.
+ */
+
+static char *				/* O - End of current URI */
+http_copy_encode(char       *dst,	/* O - Destination buffer */ 
+                 const char *src,	/* I - Source pointer */
+		 char       *dstend,	/* I - End of destination buffer */
+                 const char *reserved)	/* I - Extra reserved characters */
+{
+  static const char *hex = "0123456789ABCDEF";
+
+
+  while (*src && dst < dstend)
+  {
+    if (*src == '%' || *src <= ' ' || *src & 128 ||
+        (reserved && strchr(reserved, *src)))
+    {
+     /*
+      * Hex encode reserved characters...
+      */
+
+      if ((dst + 2) >= dstend)
+        break;
+
+      *dst++ = '%';
+      *dst++ = hex[(*src >> 4) & 15];
+      *dst++ = hex[*src & 15];
+
+      src ++;
+    }
+    else
+      *dst++ = *src++;
+  }
+
+  if (*src)
+    return (NULL);
+  else
+    return (dst);
 }
 
 
