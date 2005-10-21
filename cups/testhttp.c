@@ -94,7 +94,7 @@ static uri_test_t	uri_tests[] =	/* URI test data */
 			    "mailto", "", "", "user@domain.com", 0, 0 },
 			  { HTTP_URI_OK, "socket://server/",
 			    "socket", "", "server", "/", 9100, 0 },
-			  { HTTP_URI_OK, "ipp://username:password@[v1.fe80::200:1234:5678:9abc%25eth0]:999/ipp",
+			  { HTTP_URI_OK, "ipp://username:password@[v1.fe80::200:1234:5678:9abc+eth0]:999/ipp",
 			    "ipp", "username:password", "fe80::200:1234:5678:9abc%eth0", "/ipp", 999, 999 },
 
 			  /* Missing scheme */

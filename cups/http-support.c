@@ -267,9 +267,18 @@ httpAssembleURIf(char       *uri,	/* I - URI buffer */
       * Copy the rest of the IPv6 address, and terminate with "]".
       */
 
-      ptr = http_copy_encode(ptr, host, end, NULL);
+      while (ptr < end && *host)
+      {
+        if (*host == '%')
+	{
+          *ptr++ = '+';			/* Convert zone separator */
+	  host ++;
+	}
+	else
+	  *ptr++ = *host++;
+      }
 
-      if (!ptr)
+      if (*host)
         goto assemble_overflow;
 
       if (ptr < end)
@@ -892,8 +901,15 @@ httpSeparateURI(const char *uri,	/* I - Universal Resource Identifier */
       uri ++;
 
       for (ptr = host; *ptr; ptr ++)
-        if (*ptr == '%')
-	  break;			/* Stop at link name... */
+        if (*ptr == '+')
+	{
+	 /*
+	  * Convert zone separator to % and stop here...
+	  */
+
+	  *ptr = '%';
+	  break;
+	}
 	else if (*ptr != ':' && *ptr != '.' && !isxdigit(*ptr & 255))
 	{
 	  *host = '\0';

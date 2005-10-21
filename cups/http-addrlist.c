@@ -203,9 +203,9 @@ httpAddrGetList(const char *hostname,	/* I - Hostname, IP address, or NULL for p
     struct addrinfo	hints,		/* Address lookup hints */
 			*results,	/* Address lookup results */
 			*current;	/* Current result */
-    char		ipv6[1024];	/* IPv6 address */
+    char		ipv6[1024],	/* IPv6 address */
+			*ipv6zone;	/* Pointer to zone separator */
     int			ipv6len;	/* Length of IPv6 address */
-
 
    /*
     * Lookup the address as needed...
@@ -222,11 +222,38 @@ httpAddrGetList(const char *hostname,	/* I - Hostname, IP address, or NULL for p
       * Remove brackets from numeric IPv6 address...
       */
 
-      strlcpy(ipv6, hostname + 1, sizeof(ipv6));
-      if ((ipv6len = strlen(ipv6) - 1) >= 0 && ipv6[ipv6len] == ']')
+      if (!strncmp(hostname, "[v1.", 4))
       {
-        ipv6[ipv6len] = '\0';
-	hostname      = ipv6;
+       /*
+        * Copy the newer address format which supports link-local addresses...
+	*/
+
+	strlcpy(ipv6, hostname + 4, sizeof(ipv6));
+	if ((ipv6len = strlen(ipv6) - 1) >= 0 && ipv6[ipv6len] == ']')
+	{
+          ipv6[ipv6len] = '\0';
+	  hostname      = ipv6;
+
+         /*
+	  * Convert "+zone" in address to "%zone"...
+	  */
+
+          if ((ipv6zone = strrchr(ipv6, '+')) != NULL)
+	    *ipv6zone = '%';
+	}
+      }
+      else
+      {
+       /*
+        * Copy the regular non-link-local IPv6 address...
+	*/
+
+	strlcpy(ipv6, hostname + 1, sizeof(ipv6));
+	if ((ipv6len = strlen(ipv6) - 1) >= 0 && ipv6[ipv6len] == ']')
+	{
+          ipv6[ipv6len] = '\0';
+	  hostname      = ipv6;
+	}
       }
     }
 
