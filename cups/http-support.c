@@ -226,10 +226,12 @@ httpAssembleURIf(char       *uri,	/* I - URI buffer */
 
    /*
     * Then add the hostname.  Since IPv6 is a particular pain to deal
-    * with, we have several special cases to deal with...
+    * with, we have several special cases to deal with...  If we get
+    * an IPv6 address with brackets around it, assume it is already in
+    * URI format...
     */
 
-    if (strchr(host, ':'))
+    if (host[0] != '[' && strchr(host, ':'))
     {
      /*
       * We have an IPv6 address...
