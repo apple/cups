@@ -204,7 +204,7 @@ move_job(http_t     *http,	/* I - HTTP connection to server */
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "requesting-user-name",
                NULL, cupsUser());
 
-  httpAssembleURIf(printer_uri, sizeof(printer_uri), "ipp", NULL, "localhost",
+  httpAssembleURIf(printer_uri, sizeof(printer_uri), "ipp", NULL, "localhost", 0,
                    "/printers/%s", dest);
   ippAddString(request, IPP_TAG_JOB, IPP_TAG_URI, "job-printer-uri",
                NULL, printer_uri);
