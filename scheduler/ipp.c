@@ -4300,8 +4300,9 @@ get_default(cupsd_client_t *con)	/* I - Client connection */
     if (!ippFindAttribute(DefaultPrinter->attrs, "printer-uri-supported",
                           IPP_TAG_URI))
     {
-      snprintf(printer_uri, sizeof(printer_uri), "ipp://%s:%d/printers/%s",
-               con->servername, con->serverport, DefaultPrinter->name);
+      httpAssembleURIf(printer_uri, sizeof(printer_uri), "ipp", NULL,
+                       con->servername, con->serverport, "/printers/%s",
+        	       DefaultPrinter->name);
       ippAddString(con->response, IPP_TAG_PRINTER, IPP_TAG_URI,
         	   "printer-uri-supported", NULL, printer_uri);
       cupsdLogMessage(CUPSD_LOG_DEBUG2, "printer-uri-supported=\"%s\"",
@@ -5018,8 +5019,9 @@ get_printer_attrs(cupsd_client_t  *con,	/* I - Client connection */
   if (!ippFindAttribute(printer->attrs, "printer-uri-supported",
                         IPP_TAG_URI))
   {
-    snprintf(printer_uri, sizeof(printer_uri), "ipp://%s:%d/printers/%s",
-             con->servername, con->serverport, printer->name);
+    httpAssembleURIf(printer_uri, sizeof(printer_uri), "ipp", NULL,
+                     con->servername, con->serverport, "/printers/%s",
+        	     printer->name);
     ippAddString(con->response, IPP_TAG_PRINTER, IPP_TAG_URI,
         	 "printer-uri-supported", NULL, printer_uri);
     cupsdLogMessage(CUPSD_LOG_DEBUG2, "printer-uri-supported=\"%s\"",
@@ -5257,8 +5259,9 @@ get_printers(cupsd_client_t *con,	/* I - Client connection */
       if (!ippFindAttribute(printer->attrs, "printer-uri-supported",
                             IPP_TAG_URI))
       {
-	snprintf(printer_uri, sizeof(printer_uri), "ipp://%s:%d/printers/%s",
-        	 con->servername, con->serverport, printer->name);
+	httpAssembleURIf(printer_uri, sizeof(printer_uri), "ipp", NULL,
+                	 con->servername, con->serverport, "/printers/%s",
+        		 printer->name);
 	ippAddString(con->response, IPP_TAG_PRINTER, IPP_TAG_URI,
         	     "printer-uri-supported", NULL, printer_uri);
         cupsdLogMessage(CUPSD_LOG_DEBUG2, "printer-uri-supported=\"%s\"", printer_uri);

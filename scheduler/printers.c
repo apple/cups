@@ -541,6 +541,12 @@ cupsdDeletePrinter(
   DEBUG_printf(("cupsdDeletePrinter(%08x): p->name = \"%s\"...\n", p, p->name));
 
  /*
+  * Stop printing on this printer...
+  */
+
+  cupsdStopPrinter(p, update);
+
+ /*
   * If this printer is the next for browsing, point to the next one...
   */
 
@@ -555,12 +561,6 @@ cupsdDeletePrinter(
   */
 
   cupsArrayRemove(Printers, p);
-
- /*
-  * Stop printing on this printer...
-  */
-
-  cupsdStopPrinter(p, update);
 
  /*
   * Remove the dummy interface/icon/option files under IRIX...

@@ -868,6 +868,7 @@ cupsdSendCUPSBrowse(cupsd_printer_t *p)	/* I - Printer to send */
   cupsd_dirsvc_addr_t	*b;		/* Browse address */
   int			bytes;		/* Length of packet */
   char			packet[1453];	/* Browse data packet */
+  char			uri[1024];	/* Printer URI */
   char			options[1024];	/* Browse local options */
   cupsd_netif_t		*iface;		/* Network interface */
 
@@ -924,10 +925,13 @@ cupsdSendCUPSBrowse(cupsd_printer_t *p)	/* I - Printer to send */
 	      iface->address.addr.sa_family != AF_INET)
 	    continue;
 
-	  snprintf(packet, sizeof(packet), "%x %x ipp://%s:%d/%s/%s%s \"%s\" \"%s\" \"%s\"\n",
-        	   type, p->state, iface->hostname, iface->port,
-		   (p->type & CUPS_PRINTER_CLASS) ? "classes" : "printers",
-		   p->name, options, p->location ? p->location : "",
+	  httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, iface->hostname,
+	                   iface->port,
+			   (p->type & CUPS_PRINTER_CLASS) ? "/classes/%s%s" :
+			                                    "/printers/%s%s",
+			   p->name, options);
+	  snprintf(packet, sizeof(packet), "%x %x %s \"%s\" \"%s\" \"%s\"\n",
+        	   type, p->state, uri, p->location ? p->location : "",
 		   p->info ? p->info : "",
 		   p->make_model ? p->make_model : "Unknown");
 
@@ -963,10 +967,13 @@ cupsdSendCUPSBrowse(cupsd_printer_t *p)	/* I - Printer to send */
 
         if (iface)
 	{
-	  snprintf(packet, sizeof(packet), "%x %x ipp://%s:%d/%s/%s%s \"%s\" \"%s\" \"%s\"\n",
-        	   type, p->state, iface->hostname, iface->port,
-		   (p->type & CUPS_PRINTER_CLASS) ? "classes" : "printers",
-		   p->name, options, p->location ? p->location : "",
+	  httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, iface->hostname,
+	                   iface->port,
+			   (p->type & CUPS_PRINTER_CLASS) ? "/classes/%s%s" :
+			                                    "/printers/%s%s",
+			   p->name, options);
+	  snprintf(packet, sizeof(packet), "%x %x %s \"%s\" \"%s\" \"%s\"\n",
+        	   type, p->state, uri, p->location ? p->location : "",
 		   p->info ? p->info : "",
 		   p->make_model ? p->make_model : "Unknown");
 
@@ -1873,8 +1880,7 @@ cupsdUpdateSLPBrowse(void)
 
     uri = s->url + SLP_CUPS_SRVLEN + 1;
 
-    if (strncmp(uri, "http://", 7) == 0 ||
-        strncmp(uri, "ipp://", 6) == 0)
+    if (!strncmp(uri, "http://", 7) || !strncmp(uri, "ipp://", 6))
     {
      /*
       * Pull the URI apart to see if this is a local or remote printer...
