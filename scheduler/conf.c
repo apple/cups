@@ -570,15 +570,21 @@ cupsdReadConfiguration(void)
   if (ServerCertificate[0] != '/')
     cupsdSetStringf(&ServerCertificate, "%s/%s", ServerRoot, ServerCertificate);
 
-#  if defined(HAVE_LIBSSL) || defined(HAVE_GNUTLS)
-  chown(ServerCertificate, RunUser, Group);
-  chmod(ServerCertificate, ConfigFilePerm);
+  if (!strncmp(ServerRoot, ServerCertificate, strlen(ServerRoot)))
+  {
+    chown(ServerCertificate, RunUser, Group);
+    chmod(ServerCertificate, ConfigFilePerm);
+  }
 
+#  if defined(HAVE_LIBSSL) || defined(HAVE_GNUTLS)
   if (ServerKey[0] != '/')
     cupsdSetStringf(&ServerKey, "%s/%s", ServerRoot, ServerKey);
 
-  chown(ServerKey, RunUser, Group);
-  chmod(ServerKey, ConfigFilePerm);
+  if (!strncmp(ServerRoot, ServerKey, strlen(ServerRoot)))
+  {
+    chown(ServerKey, RunUser, Group);
+    chmod(ServerKey, ConfigFilePerm);
+  }
 #  endif /* HAVE_LIBSSL || HAVE_GNUTLS */
 #endif /* HAVE_SSL */
 
