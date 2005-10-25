@@ -1457,8 +1457,10 @@ cupsdGetMD5Passwd(const char *username,	/* I - Username */
   snprintf(filename, sizeof(filename), "%s/passwd.md5", ServerRoot);
   if ((fp = cupsFileOpen(filename, "r")) == NULL)
   {
-    cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to open %s - %s", filename,
-                    strerror(errno));
+    if (errno != ENOENT)
+      cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to open %s - %s", filename,
+                      strerror(errno));
+
     return (NULL);
   }
 
